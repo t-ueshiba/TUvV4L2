@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.10 2004-01-26 04:44:32 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.11 2004-10-15 05:33:36 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Manip.h"
@@ -29,13 +29,22 @@
 #ifndef STDC_HEADERS
 #  define STDC_HEADERS
 #endif
-extern "C"
-{
-#include "epbm.h"
-}
+
 
 namespace TU
 {
+    enum EPBM_Sign {
+	EPBM_UNSIGNED = 0,
+	EPBM_SIGNED   = 1
+    };
+    enum EPBM_DataType {
+	EPBM_CHAR8    = 0,
+	EPBM_SHORT16  = 1,
+	EPBM_INT32    = 2,
+	EPBM_FLOAT32  = 3,
+	EPBM_DOUBLE64 = 4
+    };
+
 /************************************************************************
 *  static functions							*
 ************************************************************************/
