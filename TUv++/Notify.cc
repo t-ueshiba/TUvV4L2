@@ -1,5 +1,5 @@
 /*
- *  $Id: Notify.cc,v 1.2 2002-07-25 02:38:12 ueshiba Exp $
+ *  $Id: Notify.cc,v 1.3 2002-07-25 07:52:50 ueshiba Exp $
  */
 #include "TU/v/Notify.h"
 
@@ -34,7 +34,7 @@ Notify::~Notify()
 void
 Notify::show()
 {
-    pane().setString(c_Message, str().data());
+    pane().setString(c_Message, str().c_str());
     ModalDialog::show();
 }
 

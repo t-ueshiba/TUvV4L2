@@ -1,5 +1,5 @@
 /*
- *  $Id: SliderCmd.cc,v 1.2 2002-07-25 02:38:12 ueshiba Exp $
+ *  $Id: SliderCmd.cc,v 1.3 2002-07-25 07:52:50 ueshiba Exp $
  */
 #include "SliderCmd_.h"
 #include "vSlider_.h"
@@ -131,7 +131,7 @@ SliderCmd::setValueInternal(CmdVal val)
 	s << std::setw(4) << _val;
     else
 	s << std::setw(4) << (float)_val / (float)_div;
-    XtVaSetValues(_text, XtNlabel, s.str().data(), NULL);
+    XtVaSetValues(_text, XtNlabel, s.str().c_str(), NULL);
 }
 
 }
