@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.4 2002-12-18 05:46:12 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.5 2003-02-20 07:52:34 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef WIN32
@@ -92,7 +92,7 @@ ImageLine<YUV411>::fill(const S* src)
 /************************************************************************
 *  class Image<T>							*
 ************************************************************************/
-template <class T> inline std::istream&
+template <class T> std::istream&
 Image<T>::restoreData(std::istream& in, Type type)
 {
     switch (type)
