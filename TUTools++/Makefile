@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.20 2004-04-28 02:28:28 ueshiba Exp $
+#  $Id: Makefile,v 1.21 2004-06-17 00:28:04 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -106,8 +106,7 @@ SRCS		= Allocator++.cc \
 		TriggerGenerator.cc \
 		Vector++.cc \
 		Vector++.inst.cc \
-		manipulators.cc \
-		strtoull.c
+		manipulators.cc
 OBJS		= Allocator++.o \
 		Array++.o \
 		Array++.inst.o \
@@ -142,13 +141,12 @@ OBJS		= Allocator++.o \
 		TriggerGenerator.o \
 		Vector++.o \
 		Vector++.inst.o \
-		manipulators.o \
-		strtoull.o
+		manipulators.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.20 $	|		\
+REV		= $(shell echo $Revision: 1.21 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
