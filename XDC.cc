@@ -1,9 +1,8 @@
 /*
- *  $Id: XDC.cc,v 1.2 2002-07-25 02:38:13 ueshiba Exp $
+ *  $Id: XDC.cc,v 1.3 2002-07-25 07:23:47 ueshiba Exp $
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
-#include <cstring>
 #include <X11/XWDFile.h>
 #ifndef __APPLE__
 #  include <netinet/in.h>
