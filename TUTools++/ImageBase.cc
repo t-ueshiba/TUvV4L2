@@ -20,13 +20,13 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.3 2002-07-25 07:23:02 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.4 2002-10-28 00:37:01 ueshiba Exp $
  */
 #ifdef WIN32
 #  include <winsock2.h>
 #else
 #  ifdef __APPLE__
-#    include <netinet/ip_compat.h>
+#    include <arpa/inet.h>
 #  else
 #    include <netinet/in.h>
 #  endif

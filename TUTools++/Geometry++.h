@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.4 2002-08-28 01:51:07 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.5 2002-10-28 00:37:01 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -466,6 +466,8 @@ class CameraBase
 	    jacobianK(const Point2<double>& xc)			const	;
 	virtual Matrix<double>
 	    jacobianXC(const Point2<double>& xc)		const	;
+	virtual Point2<double>
+	    xc(const Point2<double>& u)				const	;
 
       // calibration matrices.    
 	virtual Matrix<double>	K()				const	;
@@ -504,6 +506,7 @@ class CameraBase
     
   // various operations in canonical coordinates.
     Point2<double>	xc(const Vector<double>& x)		const	;
+    Point2<double>	xc(const Point2<double>& u)		const	;
     Matrix<double>	Pc()					const	;
     Matrix<double>	jacobianPc(const Vector<double>& x)	const	;
     Matrix<double>	jacobianXc(const Vector<double>& x)	const	;
@@ -536,6 +539,8 @@ class CameraBase
     CameraBase&		setRotation(const Matrix<double>& Rt)	;
 
   // intrinsic parameters.
+    virtual const Intrinsic&
+			intrinsic()	const	= 0;
     double		k()		const	{return intrinsic().k();}
     Point2<double>	principal()	const	{return intrinsic().principal();}
     double		aspect()	const	{return intrinsic().aspect();}
@@ -548,8 +553,7 @@ class CameraBase
     std::ostream&	put(std::ostream& out)		const	;
 
   private:
-    virtual const Intrinsic&	intrinsic()		const	= 0;
-    virtual Intrinsic&		intrinsic()			= 0;
+    virtual Intrinsic&	intrinsic()		= 0;
 
     Vector<double>	_t;			// camera center.
     Matrix<double>	_Rt;			// camera orientation.
@@ -574,6 +578,17 @@ CameraBase::xc(const Vector<double>& x) const
 {
     const Vector<double>&	xx = _Rt * (x - _t);
     return Point2<double>(xx[0] / xx[2], xx[1] / xx[2]);
+}
+
+//! 画像座標における点の2次元位置をcanonicalカメラ座標系に直す．
+/*!
+  \param u	画像座標系における点の2次元位置．
+  \return	canonicalカメラ座標系におけるuの2次元位置．
+*/
+inline Point2<double>
+CameraBase::xc(const Point2<double>& u) const
+{
+    return intrinsic().xc(u);
 }
 
 //! 3次元空間中の点の像の画像座標系における位置を求める．
@@ -724,6 +739,8 @@ class CameraWithFocalLength : public CameraBase
 	    jacobianK(const Point2<double>& xc)			const	;
 	virtual Matrix<double>
 	    jacobianXC(const Point2<double>& xc)		const	;
+	virtual Point2<double>
+	    xc(const Point2<double>& u)				const	;
 
       // calibration matrices.
 	virtual Matrix<double>		K()			const	;
@@ -796,6 +813,8 @@ class CameraWithEuclideanImagePlane : public CameraBase
 	    operator ()(const Point2<double>& xc)		const	;
 	virtual Matrix<double>
 	    jacobianK(const Point2<double>& xc)			const	;
+	virtual Point2<double>
+	    xc(const Point2<double>& u)				const	;
     
       // calibration matrices.	
 	virtual Matrix<double>		K()			const	;
@@ -890,9 +909,11 @@ class Camera : public CameraBase
 	virtual Point2<double>
 	    operator ()(const Point2<double>& xc)		const	;
 	virtual Matrix<double>
-	    jacobianK(const Point2<double>& xc)		const	;
+	    jacobianK(const Point2<double>& xc)			const	;
 	virtual Matrix<double>
 	    jacobianXC(const Point2<double>& xc)		const	;
+	virtual Point2<double>
+	    xc(const Point2<double>& u)				const	;
 
       // calibration matrices.
 	virtual Matrix<double>	K()				const	;
@@ -1033,7 +1054,9 @@ class CameraWithDistortion : public CameraBase
 	    jacobianK(const Point2<double>& xc)			const	;
 	virtual CameraBase::Intrinsic&
 	    update(const Vector<double>& dp)				;
-    
+	virtual Point2<double>
+	    xc(const Point2<double>& u)				const	;
+
       // intrinsic parameters.
 	virtual double		d1()				const	;
 	virtual double		d2()				const	;

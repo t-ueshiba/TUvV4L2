@@ -1,10 +1,11 @@
 /*
- *  $Id: Minimize++.h,v 1.3 2002-08-28 01:37:29 ueshiba Exp $
+ *  $Id: Minimize++.h,v 1.4 2002-10-28 00:37:01 ueshiba Exp $
  */
 #ifndef __TUMinimizePP_h
 #define __TUMinimizePP_h
 
 #include "TU/Vector++.h"
+#include <stdexcept>
 
 namespace TU
 {
@@ -86,8 +87,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 		lambda *= 10.0;			// Increase L-M parameter.
 	}
     }
-    cerr << "minimizeSquare: maximum iteration limit [" << niter_max
-	 << "] exceeded!" << endl;
+    throw std::runtime_error("minimizeSquare: maximum iteration limit exceeded!");
 }
 
 /************************************************************************
@@ -199,8 +199,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		lambda *= 10.0;			// Increase L-M parameter.
 	}
     }
-    cerr << "minimizeSquareSparse: maximum iteration limit ["
-	 << niter_max << "] exceeded!" << endl;
+    throw std::runtime_error("minimizeSquareSparse: maximum iteration limit exceeded!");
 }
 
 /************************************************************************
@@ -312,8 +311,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		lambda *= 10.0;			// Increase L-M parameter.
 	}
     }
-    cerr << "minimizeSquareSparseDebug: maximum iteration limit ["
-	 << niter_max << "] exceeded!" << endl;
+    throw std::runtime_error("minimizeSquareSparseDebug: maximum iteration limit exceeded!");
 }
  
 }

@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithDistortion.cc,v 1.4 2002-08-22 04:08:32 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.5 2002-10-28 00:37:01 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -129,6 +129,14 @@ CameraWithDistortion::Intrinsic::jacobianK(const Point2<double>& xc) const
     J[1][6] = sqr * J[1][5];
 
     return J;
+}
+
+Point2<double>
+CameraWithDistortion::Intrinsic::xc(const Point2<double>& u) const
+{
+    Point2<double>	xd = Camera::Intrinsic::xc(u);
+    const double	sqr = xd * xd, tmp = 1.0 - sqr*(_d1 + sqr*_d2);
+    return Point2<double>(tmp * xd[0], tmp * xd[1]);
 }
 
 CameraBase::Intrinsic&

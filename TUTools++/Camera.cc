@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Camera.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: Camera.cc,v 1.3 2002-10-28 00:37:01 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -138,6 +138,14 @@ Camera::Intrinsic::jacobianXC(const Point2<double>& xc) const
     J[1][1] = k();
 
     return J;
+}
+
+Point2<double>
+Camera::Intrinsic::xc(const Point2<double>& u) const
+{
+    return Point2<double>((u[0] - principal()[0] -
+			   (u[1] - principal()[1]) * _k01 / k()) / _k00,
+			  (u[1] - principal()[1]) / k());
 }
 
 Matrix<double>
