@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithDistortion.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.3 2002-08-19 07:52:27 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -12,7 +12,66 @@ namespace TU
 CameraBase&
 CameraWithDistortion::setProjection(const Matrix<double>& PP)
 {
-    throw std::runtime_error("CameraWithDistortion::setProjection: Not implemented!!");
+  /*    throw std::runtime_error("CameraWithDistortion::setProjection: Not implemented!!");
+	return *this;*/
+
+    if (PP.nrow() != 3 || PP.ncol() != 4)
+	throw std::invalid_argument("CameraWithDistortion::setProjection: Illegal dimension of P!!");
+
+    Matrix<double>	KK(3, 3);	// camera intrinsic parameters.
+    KK[0]    = PP[2](0, 3);
+    KK[1]    = PP[1](0, 3);
+    KK[2]    = PP[0](0, 3);
+    QRDecomposition<double>	qr(KK);
+    KK[0][0] =  qr.Rt()[2][2];
+    KK[0][1] =  qr.Rt()[2][1];
+    KK[0][2] = -qr.Rt()[2][0];
+    KK[1][0] =  0.0;
+    KK[1][1] =  qr.Rt()[1][1];
+    KK[1][2] = -qr.Rt()[1][0];
+    KK[2][0] =  0.0;
+    KK[2][1] =  0.0;
+    KK[2][2] = -qr.Rt()[0][0];
+
+    Matrix<double>	RRt(3, 3);	// camera rotation.
+    RRt[0]   =  qr.Qt()[2];
+    RRt[1]   =  qr.Qt()[1];
+    RRt[2]   = -qr.Qt()[0];
+
+    Vector<double>	tt(3);		// camera translation.
+    tt[0]    = -PP[0][3];
+    tt[1]    = -PP[1][3];
+    tt[2]    = -PP[2][3];
+
+  // Negate sign of PP so that KK has positive determinant.
+    if (KK[0][0] * KK[1][1] * KK[2][2] < 0.0)
+    {
+	KK *= -1.0;
+	tt *= -1.0;
+    }
+    
+    if (KK[0][0] < 0.0)
+    {
+	KK[0][0] *= -1.0;
+	RRt[0] *= -1.0;
+    }
+    if (KK[1][1] < 0.0)
+    {
+	KK[0][1] *= -1.0;
+	KK[1][1] *= -1.0;
+	RRt[1] *= -1.0;
+    }
+    if (KK[2][2] < 0.0)
+    {
+	KK[0][2] *= -1.0;
+	KK[1][2] *= -1.0;
+	KK[2][2] *= -1.0;
+	RRt[2] *= -1.0;
+    }
+    tt = (KK.inv() * tt) * RRt;
+
+    setIntrinsic(KK).setTranslation(tt).setRotation(RRt);
+
     return *this;
 }
 
@@ -35,15 +94,13 @@ CameraWithDistortion::intrinsic()
 *  class CameraWithDistortion::Intrinsic				*
 ************************************************************************/
 Point2<double>
-CameraWithDistortion::Intrinsic
-		      ::operator ()(const Point2<double>& xc) const
+CameraWithDistortion::Intrinsic::operator ()(const Point2<double>& xc) const
 {
     return Camera::Intrinsic::operator ()(xd(xc));
 }
 
 Matrix<double>
-CameraWithDistortion::Intrinsic
-		      ::jacobianXC(const Point2<double>& xc) const
+CameraWithDistortion::Intrinsic::jacobianXC(const Point2<double>& xc) const
 {
     const double	sqr = xc * xc, tmp = 2.0*(_d1 + 2.0*sqr*_d2);
     Matrix<double>	J(2, 2);

@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.3 2002-08-19 07:52:27 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -1060,11 +1060,12 @@ class CameraWithDistortion : public CameraBase
 			 double		       d2=0.0)
 	:CameraBase(t, Rt),
 	 _intrinsic(k, u0, v0, aspect, skew, d1, d2)	{}
-    CameraWithDistortion(const Matrix<double>& P)
-	:CameraBase(), _intrinsic()			{setProjection(P);}
+    CameraWithDistortion(const Matrix<double>& P, double d1=0.0, double d2=0.0)
+	:CameraBase(), _intrinsic()			{setProjection(P);
+							 setDistortion(d1,d2);}
 
   // projection matrices.
-    virtual CameraBase&	setProjection(const Matrix<double>& P);
+    virtual CameraBase&		setProjection(const Matrix<double>& P)	;
 
   // intrinsic parameters.
     CameraWithDistortion&	setFocalLength(double k)		;

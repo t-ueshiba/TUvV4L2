@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.3 2002-08-19 07:52:27 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef WIN32
@@ -92,10 +92,10 @@ ImageLine<YUV411>::fill(const S* src)
 /************************************************************************
 *  class Image<T>							*
 ************************************************************************/
-template <class T> std::istream&
-Image<T>::restore(std::istream& in)
+template <class T> inline std::istream&
+Image<T>::restoreData(std::istream& in, Type type)
 {
-    switch (restoreHeader(in))
+    switch (type)
     {
       case U_CHAR:
 	return restoreRows<u_char>(in);
@@ -118,9 +118,8 @@ Image<T>::restore(std::istream& in)
 }
 
 template <class T> std::ostream&
-Image<T>::save(std::ostream& out, Type type) const
+Image<T>::saveData(std::ostream& out, Type type) const
 {
-    saveHeader(out, type);
     switch (type)
     {
       case U_CHAR:
