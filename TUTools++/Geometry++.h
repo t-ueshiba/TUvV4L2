@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.7 2003-03-17 00:22:30 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.8 2003-05-19 08:09:35 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -550,6 +550,7 @@ class CameraBase
   // intrinsic parameters.
     virtual const Intrinsic&
 			intrinsic()	const	= 0;
+    virtual Intrinsic&	intrinsic()		= 0;
     u_int		dofIntrinsic()	const	{return intrinsic().dof();}
     double		k()		const	{return intrinsic().k();}
     Point2<double>	principal()	const	{return intrinsic().principal();}
@@ -569,8 +570,6 @@ class CameraBase
     std::ostream&	put(std::ostream& out)		const	;
 
   private:
-    virtual Intrinsic&	intrinsic()		= 0;
-
     Vector<double>	_t;			// camera center.
     Matrix<double>	_Rt;			// camera orientation.
 };
@@ -771,10 +770,9 @@ class CanonicalCamera : public CameraBase
 
     virtual CameraBase&	setProjection(const Matrix<double>& P)		;
     virtual const CameraBase::Intrinsic&	intrinsic()	const	;
+    virtual CameraBase::Intrinsic&		intrinsic()		;
 
   private:
-    virtual CameraBase::Intrinsic&		intrinsic()		;
-    
     Intrinsic	_intrinsic;
 };
 
@@ -833,10 +831,9 @@ class CameraWithFocalLength : public CameraBase
 
     virtual CameraBase&		setProjection(const Matrix<double>& P)	;
     virtual const CameraBase::Intrinsic&	intrinsic()	const	;
-
-  private:
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
+  private:
     Intrinsic	_intrinsic;
 };
 
@@ -899,10 +896,9 @@ class CameraWithEuclideanImagePlane : public CameraBase
 
     virtual CameraBase&	setProjection(const Matrix<double>& P)		;
     virtual const CameraBase::Intrinsic&	intrinsic()	const	;
-
-  private:
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
+  private:
     Intrinsic	_intrinsic;
 };
     
@@ -986,10 +982,9 @@ class Camera : public CameraBase
 
     virtual CameraBase&	setProjection(const Matrix<double>& P);
     virtual const CameraBase::Intrinsic&	intrinsic()	const	;
-
-  private:
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
+  private:
     Intrinsic	_intrinsic;
 };
 
@@ -1058,10 +1053,9 @@ class CameraWithDistortion : public CameraBase
 
     virtual CameraBase&		setProjection(const Matrix<double>& P)	;
     virtual const CameraBase::Intrinsic&	intrinsic()	const	;
-
-  private:
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
+  private:
     Intrinsic	_intrinsic;
 };
  

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.7 2003-02-07 06:08:58 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.8 2003-05-19 08:09:35 ueshiba Exp $
  */
 #ifdef WIN32
 #  include <winsock2.h>
@@ -127,19 +127,13 @@ ImageBase::restoreHeader(std::istream& in)
 	else if (!strcmp(key, "PinHoleParameterH34:"))
 	    in >> P[2][3];
 	else if (!strcmp(key, "DistortionParameterA:"))
-	{
-	    in >> d2;
-	    d2 *= -1.0;
-	}
+	    in >> distortionA;
 	else if (!strcmp(key, "DistortionParameterB:"))
-	{
-	    in >> d1;
-	    d1 *= -1.0;
-	}
+	    in >> distortionB;
 	else if (!strcmp(key, "DistortionParameterCOLD:"))
-	    in >> ud0;
+	    in >> distortionU0;
 	else if (!strcmp(key, "DistortionParameterROWD:"))
-	    in >> vd0;
+	    in >> distortionV0;
     }
     in.putback(c);
 
@@ -244,11 +238,11 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
 	<< "# PinHoleParameterH34: " << P[2][3] << endl
 	<< "# PinHoleParameterF: 1.0" << endl
 	<< "# PinHoleParameterM: 0.0" << endl;
-    if (ud0 != 0 || vd0 != 0)
-	out << "# DistortionParameterA: " << -d2 << endl
-	    << "# DistortionParameterB: " << -d1 << endl
-	    << "# DistortionParameterCOLD: " << ud0 << endl
-	    << "# DistortionParameterROWD: " << vd0 << endl;
+    if (distortionA != 0.0 || distortionB != 0.0)
+	out << "# DistortionParameterA: " << distortionA << endl
+	    << "# DistortionParameterB: " << distortionB << endl
+	    << "# DistortionParameterCOLD: " << distortionU0 << endl
+	    << "# DistortionParameterROWD: " << distortionV0 << endl;
     out << _width() << ' ' << _height() << '\n'
 	<< ((1 << depth) - 1) << endl;
     
