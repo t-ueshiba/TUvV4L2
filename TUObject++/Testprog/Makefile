@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2002-07-25 07:21:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -21,9 +21,9 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Object++.cc \
-		/home/ueshiba/include/TU/Object++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= /home1/ueshiba/include/TU/Object++.cc \
+		/home1/ueshiba/include/TU/Object++.h \
+		/home1/ueshiba/include/TU/types.h
 HDRS		=
 SRCS		= ptest.cc
 OBJS		= ptest.o
@@ -31,7 +31,7 @@ OBJS		= ptest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1.1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -43,5 +43,6 @@ REV		= $(shell echo $Revision: 1.1.1.1 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-ptest.o: /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h /home/ueshiba/include/TU/Object++.cc
+ptest.o: /home1/ueshiba/include/TU/Object++.h \
+	/home1/ueshiba/include/TU/types.h \
+	/home1/ueshiba/include/TU/Object++.cc

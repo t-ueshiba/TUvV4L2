@@ -1,5 +1,5 @@
 /*
- *  $Id: ptest.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: ptest.cc,v 1.2 2002-07-25 07:21:06 ueshiba Exp $
  */
 #include "TU/Object++.h"
 #ifdef __GNUG__
@@ -39,6 +39,7 @@ class Int : public Object
 };
 
 const Object::Desc	Int::_desc(id_Int, 0, Int::newObject, 0);
+template <>
 const Object::Desc	Cons<Int>::_desc(id_Cons, 0,
 					   Cons<Int>::newObject,
 					   &Cons<Int>::_ca,
