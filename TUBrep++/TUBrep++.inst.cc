@@ -1,17 +1,15 @@
 /*
- *  $Id: TUBrep++.inst.cc,v 1.2 2002-07-25 02:37:36 ueshiba Exp $
+ *  $Id: TUBrep++.inst.cc,v 1.3 2004-03-08 02:05:01 ueshiba Exp $
  */
-#ifdef __GNUG__
+
+#if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
 #include "TU/Brep/Brep++.h"
 #include "TU/Object++.cc"
 
 namespace TU
 {
-namespace Brep
-{
-template class Cons<PointB>;
-}
+template class Cons<Brep::PointB>;
 }
 
 #endif
