@@ -1,11 +1,12 @@
 /*
- *  $Id: main.cc,v 1.1 2002-07-25 04:36:08 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2002-07-26 08:59:31 ueshiba Exp $
  */
 #include <iostream>
 #include "TU/Allocator++.h"
 #ifdef __GNUG__
 #  include "TU/Allocator++.cc"
 #  include "TU/List++.cc"
+#  include "TU/Array++.cc"
 #endif
 
 namespace TU

@@ -1,18 +1,18 @@
 #
-#  $Id: Makefile,v 1.1 2002-07-25 04:35:50 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2002-07-26 08:57:37 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(BINDIR)			# destination of the program
-INCDIRS		= -I../ObjList -I$(HOME)/include
+INCDIRS		= -I../ObjList -I../../TUObject++ -I$(HOME)/include
 
 PROGRAM		= dlisttest
 LIBS		= -lTUCollection++ -lTUObject++ -lTUTools++
 
-CPPFLAGS	=
+CPPFLAGS	= -DTUObjectPP_DEBUG
 CFLAGS		= -g
-CCFLAGS		= 
+CCFLAGS		= -g
 LDFLAGS		= -L$(LIBDIR)
 
 LINKER		= $(CCC)
@@ -21,20 +21,24 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= ../ObjList/Int.h \
-		/home/ueshiba/include/TU/Collection++.h \
-		/home/ueshiba/include/TU/Object++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= ../../TUObject++/Object++_.h \
+		../../TUObject++/TU/Object++.h \
+		../ObjList/Int.h \
+		/Users/ueshiba/include/TU/Collection++.cc \
+		/Users/ueshiba/include/TU/Collection++.h \
+		/Users/ueshiba/include/TU/types.h
 HDRS		=
-SRCS		= Int.cc \
+SRCS		= Desc.cc \
+		Int.cc \
 		dlisttest.cc
-OBJS		= Int.o \
+OBJS		= Desc.o \
+		Int.o \
 		dlisttest.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= `echo $Revision: 1.1 $	|			\
+REV		= `echo $Revision: 1.2 $	|			\
 		  sed 's/evision://'	|			\
 		  awk -F"."					\
 		  '{						\
@@ -46,8 +50,11 @@ REV		= `echo $Revision: 1.1 $	|			\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-Int.o: ../ObjList/Int.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h
-dlisttest.o: ../ObjList/Int.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Collection++.h
+Desc.o: ../../TUObject++/Object++_.h ../../TUObject++/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h
+Int.o: ../ObjList/Int.h ../../TUObject++/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h
+dlisttest.o: ../ObjList/Int.h ../../TUObject++/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Collection++.h \
+	/Users/ueshiba/include/TU/Collection++.cc

@@ -2,13 +2,14 @@
 #  User customizable macros	#
 #################################
 DEST		= /home/ueshiba/bin
-INCDIRS		= -I$(HOME)/include		# header directories
+INCDIRS		= -I../../TUObject++ -I$(HOME)/include
 
 PROGRAM		= listtest
-LIBS		= -lTUCollection++ -lTUObject++ -lTUTools++
+LIBS		= -lTUCollection++ -lTUObject++
 
+CPPFLAGS	= -DTUObjectPP_DEBUG
 CFLAGS		= -g
-CCFLAGS		= 
+CCFLAGS		= -g
 LDFLAGS		= -L$(LIBDIR)
 
 LINKER		= $(CCC)
@@ -17,19 +18,26 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Collection++.h \
-		/home/ueshiba/include/TU/Object++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= ../../TUObject++/Object++_.h \
+		../../TUObject++/TU/Object++.h \
+		/Users/ueshiba/include/TU/Collection++.cc \
+		/Users/ueshiba/include/TU/Collection++.h \
+		/Users/ueshiba/include/TU/types.h
 HDRS		= Int.h
-SRCS		= Int.cc \
+SRCS		= Desc.cc \
+		Int.cc \
 		listtest.cc
-OBJS		= Int.o \
+OBJS		= Desc.o \
+		Int.o \
 		listtest.o
 
 include $(PROJECT)/lib/p.mk
 ###
-Int.o: Int.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h
-listtest.o: Int.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Collection++.h
+Desc.o: ../../TUObject++/Object++_.h ../../TUObject++/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h
+Int.o: Int.h ../../TUObject++/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h
+listtest.o: Int.h ../../TUObject++/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Collection++.h \
+	/Users/ueshiba/include/TU/Collection++.cc

@@ -2,7 +2,6 @@
 #include "Int.h"
 #include "TU/Collection++.h"
 
-
 main()
 {
     using namespace	std;
@@ -54,3 +53,12 @@ main()
 	cout << iter2;
     cout << endl;
 }
+
+namespace TU
+{
+template const Object::Desc	ObjDList<Int>::_desc;
+}
+
+#ifdef __GNUG__
+#  include "TU/Collection++.cc"
+#endif
