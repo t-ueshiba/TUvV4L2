@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.9 2003-07-06 23:53:21 ueshiba Exp $
+ *  $Id: Image++.h,v 1.10 2004-01-26 04:44:31 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -495,7 +495,7 @@ Image<T>::save(std::ostream& out, Type type) const
 template <class T> inline void
 Image<T>::resize(u_int h, u_int w)
 {
-    Array2<ImageLine<T> >::resize(h, w);
+    _resize(h, w);
 }
 
 template <class T> inline void
