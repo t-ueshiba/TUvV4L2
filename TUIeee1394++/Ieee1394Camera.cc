@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.5 2002-08-14 05:21:20 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.6 2002-10-04 01:53:45 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
@@ -103,7 +103,7 @@ Ieee1394Camera::~Ieee1394Camera()
 Ieee1394Camera&
 Ieee1394Camera::powerOn()
 {
-    checkAvailability(Cam_Power_Cntl);
+    checkAvailability(Cam_Power_Cntl_Inq);
     writeQuadletToRegister(Camera_Power, 0x1 << 31);
     return *this;
 }
@@ -115,7 +115,7 @@ Ieee1394Camera::powerOn()
 Ieee1394Camera&
 Ieee1394Camera::powerOff()
 {
-    checkAvailability(Cam_Power_Cntl);
+    checkAvailability(Cam_Power_Cntl_Inq);
     writeQuadletToRegister(Camera_Power, 0x00000000);
     return *this;
 }
@@ -844,7 +844,7 @@ Ieee1394Camera::inContinuousShot() const
 Ieee1394Camera&
 Ieee1394Camera::oneShot()
 {
-    checkAvailability(One_Shot);
+    checkAvailability(One_Shot_Inq);
     stopContinuousShot();
     writeQuadletToRegister(One_Shot, 0x1 << 31);
     return *this;
@@ -861,7 +861,7 @@ Ieee1394Camera::oneShot()
 Ieee1394Camera&
 Ieee1394Camera::multiShot(u_short nframes)
 {
-    checkAvailability(Multi_Shot);
+    checkAvailability(Multi_Shot_Inq);
     stopContinuousShot();
     writeQuadletToRegister(One_Shot, (0x1 << 30) | (nframes & 0xffff));
     return *this;
@@ -1104,7 +1104,7 @@ Ieee1394Camera::uintToFormat(u_int format)
 
 //! unsinged intの値を同じビットパターンを持つ#FrameRateに直す
 /*!
-  \param format	#FrameRateに直したいunsigned int値．
+  \param rate	#FrameRateに直したいunsigned int値．
   \return	#FrameRate型のenum値．
  */
 Ieee1394Camera::FrameRate
@@ -1133,8 +1133,8 @@ Ieee1394Camera::uintToFrameRate(u_int rate)
 
 //! unsinged intの値を同じビットパターンを持つ#Featureに直す
 /*!
-  \param format	#Featureに直したいunsigned int値．
-  \return	#Feature型のenum値．
+  \param feature	#Featureに直したいunsigned int値．
+  \return		#Feature型のenum値．
  */
 Ieee1394Camera::Feature
 Ieee1394Camera::uintToFeature(u_int feature)
@@ -1188,8 +1188,8 @@ Ieee1394Camera::uintToFeature(u_int feature)
 
 //! unsinged intの値を同じビットパターンを持つ#TriggerModeに直す
 /*!
-  \param format	#TriggerModeに直したいunsigned int値．
-  \return	#TriggerMode型のenum値．
+  \param triggerMode	#TriggerModeに直したいunsigned int値．
+  \return		#TriggerMode型のenum値．
  */
 Ieee1394Camera::TriggerMode
 Ieee1394Camera::uintToTriggerMode(u_int triggerMode)

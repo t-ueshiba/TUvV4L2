@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.5 2002-08-14 05:21:20 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.6 2002-10-04 01:53:45 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -181,10 +181,10 @@ class Ieee1394Camera : public Ieee1394Node
       よって知ることができる．*/
     enum BasicFunction
     {
-	Advanced_Feature	= (0x1 << 31),	//!< カメラベンダ依存の機能
-	Cam_Power_Cntl		= (0x1 << 15),	//!< 電源on/offの制御
-	One_Shot		= (0x1 << 12),	//!< 画像1枚だけの撮影
-	Multi_Shot		= (0x1 << 11)	//!< 指定された枚数の撮影
+	Advanced_Feature_Inq	= (0x1 << 31),	//!< カメラベンダ依存の機能
+	Cam_Power_Cntl_Inq	= (0x1 << 15),	//!< 電源on/offの制御
+	One_Shot_Inq		= (0x1 << 12),	//!< 画像1枚だけの撮影
+	Multi_Shot_Inq		= (0x1 << 11)	//!< 指定された枚数の撮影
     };
 
   //! カメラが出力する画像の形式
