@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithDistortion.cc,v 1.3 2002-08-19 07:52:27 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.4 2002-08-22 04:08:32 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -168,7 +168,7 @@ CameraWithDistortion::Intrinsic::put(std::ostream& out) const
     
     Camera::Intrinsic::put(out);
     cerr << "Distortion-1:    "; out << _d1 << endl;
-    cerr << "Distortion-2     "; out << _d2 << endl;
+    cerr << "Distortion-2:    "; out << _d2 << endl;
 
     return out;
 }
