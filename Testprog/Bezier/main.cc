@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2002-07-25 04:36:09 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2002-07-26 08:59:31 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
@@ -44,9 +44,10 @@ MyCanvasPane::repaintUnderlay(int, int, int, int)
     
     glCallList(BezierCurv);
     glCallList(RBezierCurv);
-    glCallList(BezierSurf);
+   // glCallList(BezierSurf);
     
     glFlush();
+    _dc.swapBuffers();
 }
 
 void
@@ -224,6 +225,7 @@ main(int argc, char* argv[])
 				   GLX_GREEN_SIZE,	1,
 				   GLX_BLUE_SIZE,	1,
 				   GLX_DEPTH_SIZE,	8,
+				   GLX_DOUBLEBUFFER,
 				   None};
     XVisualInfo*	vinfo = glXChooseVisual(vapp.colormap().display(),
 						vapp.colormap().vinfo().screen,

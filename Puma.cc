@@ -1,5 +1,5 @@
 /*
- *  $Id: Puma.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
+ *  $Id: Puma.cc,v 1.4 2002-07-26 08:59:31 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 
@@ -126,23 +126,20 @@ Puma::set_axis(Puma::Axis axis)
 *  friends of class Puma						*
 ************************************************************************/
 Puma&
-operator <<(Puma& puma, const Vector<float>& position)
+operator <<(Puma& puma, const Puma::Position& position)
 {
-    if (position.dim() > 0)
-    {
-	puma << "poi tmp" << endc;		// wait for "Change ? "
-	const u_int	n = (position.dim() > 6 ? 6 : position.dim()) - 1;
-	for (u_int i = 0; i < n; i++)
-	    puma << position[i] << ',';
-	puma << position[n] << endc;		// wait for "Change ? "
-	puma << endc;				// wait for prompt
-	puma << "do move tmp" << endc;		// wait for prompt
-    }
+    puma << "poi tmp" << endc;		// wait for "Change ? "
+    for (u_int i = 0; i < 5; i++)
+	puma << position[i] << ',';
+    puma << position[5] << endc;		// wait for "Change ? "
+    puma << endc;				// wait for prompt
+    puma << "do move tmp" << endc;		// wait for prompt
+
     return puma;
 }
 #ifndef sgi
 Puma&
-operator >>(Puma& puma, Vector<float>& position)
+operator >>(Puma& puma, Puma::Position& position)
 {
     puma << "where\r" >> skipl >> skipl;	// ignore "X Y Z O A T"
     operator >>((istream&)puma, position);
