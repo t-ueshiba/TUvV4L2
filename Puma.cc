@@ -1,7 +1,7 @@
 /*
- *  $Id: Puma.cc,v 1.5 2003-07-06 23:53:21 ueshiba Exp $
+ *  $Id: Puma.cc,v 1.6 2004-04-28 02:28:28 ueshiba Exp $
  */
-#ifndef __APPLE__
+#if (!defined(__GNUC__) || (__GNUC__ < 3))
 
 #include "TU/Serial++.h"
 
@@ -166,4 +166,4 @@ Puma&	echo   (Puma& puma)	{puma._echo = Puma::DoEcho; return puma;}
 Puma&	no_echo(Puma& puma)	{puma._echo = Puma::NoEcho; return puma;}
 
 }
-#endif	/* !__APPLE__	*/
+#endif

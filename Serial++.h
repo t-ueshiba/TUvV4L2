@@ -1,10 +1,10 @@
 /*
- *  $Id: Serial++.h,v 1.7 2003-07-06 23:53:21 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.8 2004-04-28 02:28:28 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
 
-#ifndef __APPLE__
+#if (!defined(__GNUC__) || (__GNUC__ < 3))
 
 #include <termios.h>
 #ifndef sgi
@@ -204,5 +204,5 @@ class TriggerGenerator : public Serial
 #  include "TU/Geometry++.cc"
 #endif
 
-#endif	/* !__APPLE__		*/
-#endif	/* !__TUSerialPP_h	*/
+#endif	/* !__GNUC__ || __GNUC__ < 3	*/
+#endif	/* !__TUSerialPP_h		*/

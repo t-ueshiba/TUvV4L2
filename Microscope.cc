@@ -1,7 +1,7 @@
 /*
- *  $Id: Microscope.cc,v 1.4 2003-07-06 23:53:21 ueshiba Exp $
+ *  $Id: Microscope.cc,v 1.5 2004-04-28 02:28:28 ueshiba Exp $
  */
-#ifndef __APPLE__
+#if (!defined(__GNUC__) || (__GNUC__ < 3))
 
 #include "TU/Serial++.h"
 #include <stdexcept>
@@ -195,4 +195,4 @@ ready(Microscope& ms)
 }
  
 }
-#endif	/* !__APPLE__	*/
+#endif

@@ -1,7 +1,7 @@
 /*
- *  $Id: TriggerGenerator.cc,v 1.5 2003-07-06 23:53:22 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.6 2004-04-28 02:28:28 ueshiba Exp $
  */
-#ifndef __APPLE__
+#if (!defined(__GNUC__) || (__GNUC__ < 3))
 
 #include <iomanip>
 #include <stdlib.h>
@@ -113,4 +113,4 @@ TriggerGenerator::getConfiguration(u_int& channel, u_int& interval)
 }
 
 }
-#endif	/* !__APPLE__	*/
+#endif
