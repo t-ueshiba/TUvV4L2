@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.6 2002-10-04 01:53:45 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.7 2002-12-09 07:47:50 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
@@ -9,53 +9,41 @@ namespace TU
 /************************************************************************
 *  local constants							*
 ************************************************************************/
-static const u_int	unit_spec_ID	= 0x00a02d;
+static const u_int	unit_spec_ID		= 0x00a02d;
 
-static const u_int	V_FORMAT_INQ	= 0x100;
+static const u_int	Cur_V_Frm_Rate		= 0x600;
+static const u_int	Cur_V_Mode		= 0x604;
+static const u_int	Cur_V_Format		= 0x608;
+static const u_int	ISO_Channel		= 0x60c;
+static const u_int	Camera_Power		= 0x610;
+static const u_int	ISO_EN			= 0x614;
+static const u_int	Memory_Save		= 0x618;
+static const u_int	One_Shot		= 0x61c;
+static const u_int	Mem_Save_Ch		= 0x620;
+static const u_int	Cur_Mem_Ch		= 0x624;
 
-static const quadlet_t	Format_0	= 0x1 << 31;
-static const quadlet_t	Format_1	= 0x1 << 30;
-static const quadlet_t	Format_2	= 0x1 << 29;
-static const quadlet_t	Format_6	= 0x1 << 25;
-static const quadlet_t	Format_7	= 0x1 << 24;
+static const quadlet_t	One_Push		= 0x1 << 26;
+static const quadlet_t	ON_OFF			= 0x1 << 25;
+static const quadlet_t	A_M_Mode		= 0x1 << 24;
 
-static const u_int	V_MODE_INQ_0	= 0x180;
-static const u_int	V_MODE_INQ_1	= 0x184;
-static const u_int	V_MODE_INQ_2	= 0x188;
-static const u_int	V_MODE_INQ_6	= 0x198;
-static const u_int	V_MODE_INQ_7	= 0x19c;
-
-static const quadlet_t	Mode_0		= 0x1 << 31;
-static const quadlet_t	Mode_1		= 0x1 << 30;
-static const quadlet_t	Mode_2		= 0x1 << 29;
-static const quadlet_t	Mode_3		= 0x1 << 28;
-static const quadlet_t	Mode_4		= 0x1 << 27;
-static const quadlet_t	Mode_5		= 0x1 << 26;
-static const quadlet_t	Mode_6		= 0x1 << 25;
-static const quadlet_t	Mode_7		= 0x1 << 26;
-
-static const u_int	Feature_Hi_Inq	= 0x404;
-static const u_int	Feature_Lo_Inq	= 0x408;
-
-static const u_int	Cur_V_Frm_Rate	= 0x600;
-static const u_int	Cur_V_Mode	= 0x604;
-static const u_int	Cur_V_Format	= 0x608;
-static const u_int	ISO_Channel	= 0x60c;
-static const u_int	Camera_Power	= 0x610;
-static const u_int	ISO_EN		= 0x614;
-static const u_int	Memory_Save	= 0x618;
-static const u_int	One_Shot	= 0x61c;
-static const u_int	Mem_Save_Ch	= 0x620;
-static const u_int	Cur_Mem_Ch	= 0x624;
-
-static const quadlet_t	One_Push	= 0x1 << 26;
-static const quadlet_t	ON_OFF		= 0x1 << 25;
-static const quadlet_t	A_M_Mode	= 0x1 << 24;
-
-static const quadlet_t	Polarity_Inq	= 0x1 << 25;
+// Video Mode CSR for Format_7.
+static const u_int	MAX_IMAGE_SIZE_INQ	= 0x000;
+static const u_int	UNIT_SIZE_INQ		= 0x004;
+static const u_int	IMAGE_POSITION		= 0x008;
+static const u_int	IMAGE_SIZE		= 0x00c;
+static const u_int	COLOR_CODING_ID		= 0x010;
+static const u_int	COLOR_CODING_INQ	= 0x014;
+static const u_int	PIXEL_NUMBER_INQ	= 0x034;
+static const u_int	TOTAL_BYTES_HI_INQ	= 0x038;
+static const u_int	TOTAL_BYTES_LO_INQ	= 0x03c;
+static const u_int	PACKET_PARA_INQ		= 0x040;
+static const u_int	BYTE_PER_PACKET		= 0x044;
+static const u_int	PACKET_PER_FRAME_INQ	= 0x048;
+static const u_int	UNIT_POSITION_INQ	= 0x04c;
+static const u_int	VALUE_SETTING		= 0x07c;
 
 // NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
-static const u_int	NBUFFERS	= 4;
+static const u_int	NBUFFERS		= 4;
 
 /************************************************************************
 *  class Ieee1394Camera							*
@@ -63,8 +51,8 @@ static const u_int	NBUFFERS	= 4;
 //! IEEE1394カメラノードを生成する
 /*!
   \param prt		このカメラが接続されているポート．
-  \param channel	isochronous転送用のチャネル番号(\f$0 \leq
-			\f$channel\f$ < 64\f$)
+  \param ch		isochronous転送用のチャネル番号(\f$0 \leq
+			\f$ch\f$ < 64\f$)
   \param uniqId		個々のカメラ固有の64bit ID．同一のIEEE1394 busに
 			複数のカメラが接続されている場合，これによって
 			同定を行う．0が与えられると，まだ#Ieee1394Camera
@@ -77,7 +65,7 @@ Ieee1394Camera::Ieee1394Camera(Ieee1394Port& prt, u_int ch, u_int64 uniqId)
     :Ieee1394Node(prt, unit_spec_ID, ch, 1, VIDEO1394_SYNC_FRAMES, uniqId),
      _cmdRegBase(CSR_REGISTER_BASE
 		 + 4 * int64_t(readValueFromUnitDependentDirectory(0x40))),
-     _w(0), _h(0), _p(MONO), _buf(0)
+     _w(0), _h(0), _p(MONO_8), _buf(0)
 {
   // Assign IsoChannel to this camera.
     writeQuadletToRegister(ISO_Channel,
@@ -130,39 +118,10 @@ Ieee1394Camera::powerOff()
 quadlet_t
 Ieee1394Camera::inquireFrameRate(Format format) const
 {
-    quadlet_t	inq = 0;
+    quadlet_t	quad = inquireFrameRate_or_Format_7_Offset(format);
 
-    switch (format)	// Check presence of format.
+    switch (format)
     {
-      case YUV444_160x120:
-      case YUV422_320x240:
-      case YUV411_640x480:
-      case YUV422_640x480:
-      case RGB24_640x480:
-      case MONO8_640x480:
-      case MONO16_640x480:
-	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_0;
-	break;
-      case YUV422_800x600:
-      case RGB24_800x600:
-      case MONO8_800x600:
-      case YUV422_1024x768:
-      case RGB24_1024x768:
-      case MONO8_1024x768:
-      case MONO16_800x600:
-      case MONO16_1024x768:
-	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_1;
-	break;
-      case YUV422_1280x960:
-      case RGB24_1280x960:
-      case MONO8_1280x960:
-      case YUV422_1600x1200:
-      case RGB24_1600x1200:
-      case MONO8_1600x1200:
-      case MONO16_1280x960:
-      case MONO16_1600x1200:
-	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_2;
-	break;
       case Format_7_0:
       case Format_7_1:
       case Format_7_2:
@@ -171,113 +130,12 @@ Ieee1394Camera::inquireFrameRate(Format format) const
       case Format_7_5:
       case Format_7_6:
       case Format_7_7:
-	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_7;
+	if (quad != 0)
+	    return FrameRate_x;
 	break;
     }
-    if (inq == 0)
-	return 0;
 
-    inq = 0;
-    switch (format)	// Check presence of mode.
-    {
-      case YUV444_160x120:
-	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_0;
-	break;
-      case YUV422_320x240:
-	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_1;
-	break;
-      case YUV411_640x480:
-	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_2;
-	break;
-      case YUV422_640x480:
-	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_3;
-	break;
-      case RGB24_640x480:
-	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_4;
-	break;
-      case MONO8_640x480:
-	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_5;
-	break;
-      case MONO16_640x480:
-	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_6;
-	break;
-      case YUV422_800x600:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_0;
-	break;
-      case RGB24_800x600:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_1;
-	break;
-      case MONO8_800x600:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_2;
-	break;
-      case YUV422_1024x768:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_3;
-	break;
-      case RGB24_1024x768:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_4;
-	break;
-      case MONO8_1024x768:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_5;
-	break;
-      case MONO16_800x600:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_6;
-	break;
-      case MONO16_1024x768:
-	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_7;
-	break;
-      case YUV422_1280x960:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_0;
-	break;
-      case RGB24_1280x960:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_1;
-	break;
-      case MONO8_1280x960:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_2;
-	break;
-      case YUV422_1600x1200:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_3;
-	break;
-      case RGB24_1600x1200:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_4;
-	break;
-      case MONO8_1600x1200:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_5;
-	break;
-      case MONO16_1280x960:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_6;
-	break;
-      case MONO16_1600x1200:
-	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_7;
-	break;
-      case Format_7_0:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_0;
-	break;
-      case Format_7_1:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_1;
-	break;
-      case Format_7_2:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_2;
-	break;
-      case Format_7_3:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_3;
-	break;
-      case Format_7_4:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_4;
-	break;
-      case Format_7_5:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_5;
-	break;
-      case Format_7_6:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_6;
-	break;
-      case Format_7_7:
-	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_7;
-	break;
-    }
-    if (inq == 0)
-	return 0;
-    
-    return readQuadletFromRegister(format);
+    return quad;
 }
 
 //! 画像フォーマットとフレームレートを設定する
@@ -342,7 +200,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
       case MONO8_640x480:
 	_w = 640;
 	_h = 480;
-	_p = MONO;
+	_p = MONO_8;
 	packet_size = 640 * sizeof(quadlet_t);
 	break;
       case MONO16_640x480:
@@ -366,7 +224,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
       case MONO8_800x600:
 	_w = 800;
 	_h = 600;
-	_p = MONO;
+	_p = MONO_8;
 	packet_size = 1000 * sizeof(quadlet_t);
 	break;
       case YUV422_1024x768:
@@ -384,7 +242,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
       case MONO8_1024x768:
 	_w = 1024;
 	_h = 768;
-	_p = MONO;
+	_p = MONO_8;
 	packet_size = 1536 * sizeof(quadlet_t);
 	break;
       case MONO16_800x600:
@@ -414,7 +272,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
       case MONO8_1280x960:
 	_w = 1280;
 	_h = 960;
-	_p = MONO;
+	_p = MONO_8;
 	packet_size = 2560 * sizeof(quadlet_t);
 	break;
       case YUV422_1600x1200:
@@ -432,7 +290,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
       case MONO8_1600x1200:
 	_w = 1600;
 	_h = 1200;
-	_p = MONO;
+	_p = MONO_8;
 	packet_size = 4000 * sizeof(quadlet_t);
 	break;
       case MONO16_1280x960:
@@ -447,11 +305,28 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 	_p = MONO_16;
 	packet_size = 8000 * sizeof(quadlet_t);
 	break;
+      case Format_7_0:
+      case Format_7_1:
+      case Format_7_2:
+      case Format_7_3:
+      case Format_7_4:
+      case Format_7_5:
+      case Format_7_6:
+      case Format_7_7:
+      {
+	const Format_7_Info	fmt7info = getFormat_7_Info(format);
+	_w	    = fmt7info.width;
+	_h	    = fmt7info.height;
+	_p	    = fmt7info.pixelFormat;
+	packet_size = setFormat_7_PacketSize(format);
+	rt = 5;		// frameRateによってpacket_sizeを変えないようにする．
+      }
+	break;
       default:
 	throw std::invalid_argument("Ieee1394Camera::setFormat: not implemented format!!");
 	break;
     }
-    packet_size >>= (5 - rt);
+    packet_size >>= (5 - rt);	// frameRateによってpacket_sizeを変える．
     u_int	buf_size = _w * _h;
     switch (_p)
     {
@@ -501,6 +376,135 @@ Ieee1394Camera::getFrameRate() const
 			       & 0x7)));
 }
 
+//! 指定されたFormat_7タイプのフォーマットの内容を返す
+/*
+  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
+  \return	 指定されたフォーマットの内容．
+ */
+Ieee1394Camera::Format_7_Info
+Ieee1394Camera::getFormat_7_Info(Format format7) const
+{
+    const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
+    quadlet_t		quad;
+    Format_7_Info	fmt7info;
+    quad = readQuadlet(base + MAX_IMAGE_SIZE_INQ);
+    fmt7info.maxWidth  = (quad & 0xffff0000) >> 16;
+    fmt7info.maxHeight = (quad & 0xffff);
+    quad = readQuadlet(base + UNIT_SIZE_INQ);
+    fmt7info.unitWidth  = (quad & 0xffff0000) >> 16;
+    fmt7info.unitHeight = (quad & 0xffff);
+    quad = readQuadlet(base + UNIT_POSITION_INQ);
+    fmt7info.unitU0 = (quad & 0xffff0000) >> 16;
+    if (fmt7info.unitU0 == 0)
+	fmt7info.unitU0 = fmt7info.unitWidth;
+    fmt7info.unitV0 = (quad & 0xffff);
+    if (fmt7info.unitV0 == 0)
+	fmt7info.unitV0 = fmt7info.unitHeight;
+    quad = readQuadlet(base + IMAGE_POSITION);
+    fmt7info.u0 = (quad & 0xffff0000) >> 16;
+    fmt7info.v0 = (quad & 0xffff);
+    quad = readQuadlet(base + IMAGE_SIZE);
+    fmt7info.width  = (quad & 0xffff0000) >> 16;
+    fmt7info.height = (quad & 0xffff);
+    quad = readQuadlet(base + COLOR_CODING_ID);
+    if (quad > 31)
+	throw std::runtime_error("Ieee1394Camera::getFormat_7_Info: Sorry, unsupported COLOR_CODING_ID!!");
+    fmt7info.pixelFormat = uintToPixelFormat(0x1 << (31 - quad));
+    quad = readQuadlet(base + COLOR_CODING_INQ);
+    fmt7info.availablePixelFormats = quad | fmt7info.pixelFormat;
+
+    return fmt7info;
+}
+
+//! 指定されたFormat_7タイプのフォーマットについて，注目領域(Region Of Interest)を設定する
+/*
+  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
+  \param u0	 注目領域の左上隅の横座標．
+  \param v0	 注目領域の左上隅の縦座標．
+  \param width	 注目領域の幅．
+  \param height	 注目領域の高さ．
+  \return	 このIEEE1394カメラオブジェクト．
+ */
+Ieee1394Camera&
+Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
+				u_int width, u_int height)
+{
+    const Format_7_Info	fmt7info = getFormat_7_Info(format7);
+
+  // 与えられたu0, v0, width, heightを，(1) それぞれが最小単位の倍数となる，
+  // (2) ROIが最大画像サイズ内に収まる，(3）widthとheightが0より大きい，の
+  // 3条件を満たすように修正する．
+    u0 = fmt7info.unitU0 * (u0 / fmt7info.unitU0);
+    while (u0 > fmt7info.maxWidth - fmt7info.unitWidth)
+	u0 -= fmt7info.unitU0;
+    width = fmt7info.unitWidth
+	  * (width > 0 ? (width - 1) / fmt7info.unitWidth + 1 : 1);
+    while (u0 + width > fmt7info.maxWidth)
+	width -= fmt7info.unitWidth;
+
+    v0 = fmt7info.unitV0 * (v0 / fmt7info.unitV0);
+    while (v0 > fmt7info.maxWidth - fmt7info.unitWidth)
+	v0 -= fmt7info.unitV0;
+    height = fmt7info.unitHeight
+	   * (height > 0 ? (height - 1) / fmt7info.unitHeight + 1 : 1);
+    while (v0 + height > fmt7info.maxHeight)
+	height -= fmt7info.unitHeight;
+
+  // 画像出力中はROIを変更できないので，もしそうであれば停止する．
+    const bool	cont = inContinuousShot();
+    if (cont)
+	stopContinuousShot();
+
+  // ROIを指定する．
+    const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
+    writeQuadlet(base + IMAGE_POSITION,
+		 ((u0 << 16) & 0xffff0000) | (v0 & 0xffff));
+    writeQuadlet(base + IMAGE_SIZE,
+		 ((width << 16) & 0xffff0000) | (height & 0xffff));
+    if (getFormat() == format7)
+	setFormatAndFrameRate(format7, getFrameRate());
+    
+    if (cont)
+	continuousShot();
+    
+    return *this;
+}
+
+//! 指定されたFormat_7タイプのフォーマットについて，画素形式を設定する
+/*
+  \param format7	対象となるフォーマット(#Format_7_0 - #Format_7_7の
+			いずれか)．
+  \param pixelFormat	画素形式．
+  \return		このIEEE1394カメラオブジェクト．
+ */
+Ieee1394Camera&
+Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
+					PixelFormat pixelFormat)
+{
+    const Format_7_Info	fmt7info = getFormat_7_Info(format7);
+    if (!(pixelFormat & fmt7info.availablePixelFormats))
+	throw std::invalid_argument("Ieee1394Camera::setFormat_7_pixelFormat: unsupported pixel format!!");
+
+  // 画像出力中はpixel formatを変更できないので，もしそうであれば停止する．
+    const bool	cont = inContinuousShot();
+    if (cont)
+	stopContinuousShot();
+
+  // pixel formatを指定する．
+    const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
+    u_int		colorCodingID = 0;
+    while ((0x1 << (31 - colorCodingID)) != pixelFormat)
+	++colorCodingID;
+    writeQuadlet(base + COLOR_CODING_ID, colorCodingID);
+    if (getFormat() == format7)
+	setFormatAndFrameRate(format7, getFrameRate());
+    
+    if (cont)
+	continuousShot();
+    
+    return *this;
+}
+
 //! 指定された属性においてカメラがサポートする機能を返す
 /*!
   \param feature	対象となる属性．
@@ -510,12 +514,16 @@ Ieee1394Camera::getFrameRate() const
 quadlet_t
 Ieee1394Camera::inquireFeatureFunction(Feature feature) const
 {
-    u_int	n = (u_int(feature) - 0x800) >> 2;
+    u_int	n   = (u_int(feature) - 0x800) >> 2;
     quadlet_t	inq = 0;
     if (n < 32)		// FEATURE_HI
+    {
+	const u_int	Feature_Hi_Inq	= 0x404;
 	inq = readQuadletFromRegister(Feature_Hi_Inq) & (0x1 << (31 - n));
+    }
     else		// FEATURE_LO
     {
+	const u_int	Feature_Lo_Inq	= 0x408;
 	n -= 32;
 	inq = readQuadletFromRegister(Feature_Lo_Inq) & (0x1 << (31 - n));
     }
@@ -774,6 +782,7 @@ Ieee1394Camera::getTriggerMode() const
 Ieee1394Camera&
 Ieee1394Camera::setTriggerPolarity(TriggerPolarity polarity)
 {
+    const quadlet_t	Polarity_Inq = 0x1 << 25;
     checkAvailability(TRIGGER_MODE, Polarity_Inq);
     writeQuadletToRegister(TRIGGER_MODE, (readQuadletFromRegister(TRIGGER_MODE)
 					  & ~HighActiveInput) | polarity);
@@ -939,7 +948,7 @@ Ieee1394Camera::getMemoryChannelMax() const
 		    -# #YUV_422 -> T
 		    -# #YUV_411 -> T
 		    -# #RGB_24 -> T (YUV444, YUV422, YUV411を除く) 
-		    -# #MONO -> T
+		    -# #MONO_8 -> T
 		    -# #MONO_16 -> T
   \return	このIEEE1394カメラオブジェクト．
 */
@@ -980,7 +989,7 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 	    src = image[v].fill(src);
       }
 	break;
-      case MONO:
+      case MONO_8:
       {
 	const u_char*	src = _buf;
 	for (u_int v = 0; v < image.height(); ++v)
@@ -1124,6 +1133,8 @@ Ieee1394Camera::uintToFrameRate(u_int rate)
 	return FrameRate_30;
       case FrameRate_60:
 	return FrameRate_60;
+      case FrameRate_x:
+	return FrameRate_x;
     }
 
     throw std::invalid_argument("Unknown frame rate!!");
@@ -1211,9 +1222,271 @@ Ieee1394Camera::uintToTriggerMode(u_int triggerMode)
     return Trigger_Mode0;
 }
  
+//! unsinged intの値を同じビットパターンを持つ#PixelFormatに直す
+/*!
+  \param triggerMode	#PixelFormatに直したいunsigned int値．
+  \return		#PixelFormat型のenum値．
+ */
+Ieee1394Camera::PixelFormat
+Ieee1394Camera::uintToPixelFormat(u_int pixelFormat)
+{
+    switch (pixelFormat)
+    {
+      case MONO_8:
+	return MONO_8;
+      case YUV_411:
+	return YUV_411;
+      case YUV_422:
+	return YUV_422;
+      case YUV_444:
+	return YUV_444;
+      case RGB_24:
+	return RGB_24;
+      case MONO_16:
+	return MONO_16;
+      case RGB_48:
+	return RGB_48;
+    }
+
+    throw std::invalid_argument("Unknown pixel format!!");
+    
+    return MONO_8;
+}
+
+nodeaddr_t
+Ieee1394Camera::getFormat_7_BaseAddr(Format format7) const
+{
+    if (format7 < Format_7_0)
+	throw std::invalid_argument("Ieee1394Camera::getFormat_7_BaseAddr: not Format_7_x!!");
+
+    const quadlet_t offset = inquireFrameRate_or_Format_7_Offset(format7) * 4;
+    if (offset == 0)
+	throw std::invalid_argument("Ieee1394Camera::getFormat_7_BaseAddr: unsupported Format_7_x!!");
+    
+    return CSR_REGISTER_BASE + offset;
+}
+
+u_int
+Ieee1394Camera::setFormat_7_PacketSize(Format format7)
+{
+    const quadlet_t	Presence    = 0x1 << 31;
+    const quadlet_t	Setting_1   = 0x1 << 30;
+    const quadlet_t	ErrorFlag_1 = 0x1 << 23;
+    const quadlet_t	ErrorFlag_2 = 0x1 << 22;
+
+  // 画像サイズが0なら，最小サイズを設定．
+    const Format_7_Info	fmt7info = getFormat_7_Info(format7);
+    if (fmt7info.width == 0 || fmt7info.height == 0)
+	setFormat_7_ROI(format7, fmt7info.u0, fmt7info.v0,
+			fmt7info.unitWidth, fmt7info.unitHeight);
+    
+    const nodeaddr_t	base	= getFormat_7_BaseAddr(format7);
+    const bool		present = readQuadlet(base + VALUE_SETTING) & Presence;
+    if (present)
+    {
+	writeQuadlet(base + VALUE_SETTING, Setting_1);
+	quadlet_t	quad;
+	while ((quad = readQuadlet(base + VALUE_SETTING)) & Setting_1)
+	    ;
+	if (quad & ErrorFlag_1)
+	    throw std::runtime_error("Ieee1394Camera::setFormat_7_PacketSize: failed to compute packet parameters!!");
+    }
+    u_int	bytePerPacket = readQuadlet(base + BYTE_PER_PACKET) & 0xffff;
+    if (bytePerPacket != 0)
+	writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);
+    else
+    {
+	const quadlet_t	quad = readQuadlet(base + PACKET_PARA_INQ);
+	const u_int	unitBytePerPacket = (quad & 0xffff0000) >> 16,
+			maxBytePerPacket  = (quad & 0xffff);
+	bytePerPacket = (unitBytePerPacket != 0 ?
+			 unitBytePerPacket * (maxBytePerPacket /
+					      unitBytePerPacket) : 0);
+	writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);
+    }
+    if (present)
+    {
+	if (readQuadlet(base + VALUE_SETTING) & ErrorFlag_2)
+	    throw std::runtime_error("Ieee1394Camera::setFormat_7_PacketSize: failed to set bytePerPacket!!");
+    }
+    
+    return bytePerPacket;
+}
+
+quadlet_t
+Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
+{
+    const u_int		V_FORMAT_INQ	= 0x100;
+    const quadlet_t	Format_0	= 0x1 << 31;
+    const quadlet_t	Format_1	= 0x1 << 30;
+    const quadlet_t	Format_2	= 0x1 << 29;
+    const quadlet_t	Format_6	= 0x1 << 25;
+    const quadlet_t	Format_7	= 0x1 << 24;
+    quadlet_t		inq		= 0;
+    switch (format)	// Check presence of format.
+    {
+      case YUV444_160x120:
+      case YUV422_320x240:
+      case YUV411_640x480:
+      case YUV422_640x480:
+      case RGB24_640x480:
+      case MONO8_640x480:
+      case MONO16_640x480:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_0;
+	break;
+      case YUV422_800x600:
+      case RGB24_800x600:
+      case MONO8_800x600:
+      case YUV422_1024x768:
+      case RGB24_1024x768:
+      case MONO8_1024x768:
+      case MONO16_800x600:
+      case MONO16_1024x768:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_1;
+	break;
+      case YUV422_1280x960:
+      case RGB24_1280x960:
+      case MONO8_1280x960:
+      case YUV422_1600x1200:
+      case RGB24_1600x1200:
+      case MONO8_1600x1200:
+      case MONO16_1280x960:
+      case MONO16_1600x1200:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_2;
+	break;
+      case Format_7_0:
+      case Format_7_1:
+      case Format_7_2:
+      case Format_7_3:
+      case Format_7_4:
+      case Format_7_5:
+      case Format_7_6:
+      case Format_7_7:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_7;
+	break;
+    }
+    if (inq == 0)
+	return 0;
+
+    const u_int		V_MODE_INQ_0	= 0x180;
+    const u_int		V_MODE_INQ_1	= 0x184;
+    const u_int		V_MODE_INQ_2	= 0x188;
+    const u_int		V_MODE_INQ_6	= 0x198;
+    const u_int		V_MODE_INQ_7	= 0x19c;
+    const quadlet_t	Mode_0		= 0x1 << 31;
+    const quadlet_t	Mode_1		= 0x1 << 30;
+    const quadlet_t	Mode_2		= 0x1 << 29;
+    const quadlet_t	Mode_3		= 0x1 << 28;
+    const quadlet_t	Mode_4		= 0x1 << 27;
+    const quadlet_t	Mode_5		= 0x1 << 26;
+    const quadlet_t	Mode_6		= 0x1 << 25;
+    const quadlet_t	Mode_7		= 0x1 << 26;
+    inq = 0;
+    switch (format)	// Check presence of mode.
+    {
+      case YUV444_160x120:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_0;
+	break;
+      case YUV422_320x240:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_1;
+	break;
+      case YUV411_640x480:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_2;
+	break;
+      case YUV422_640x480:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_3;
+	break;
+      case RGB24_640x480:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_4;
+	break;
+      case MONO8_640x480:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_5;
+	break;
+      case MONO16_640x480:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_6;
+	break;
+      case YUV422_800x600:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_0;
+	break;
+      case RGB24_800x600:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_1;
+	break;
+      case MONO8_800x600:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_2;
+	break;
+      case YUV422_1024x768:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_3;
+	break;
+      case RGB24_1024x768:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_4;
+	break;
+      case MONO8_1024x768:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_5;
+	break;
+      case MONO16_800x600:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_6;
+	break;
+      case MONO16_1024x768:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_7;
+	break;
+      case YUV422_1280x960:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_0;
+	break;
+      case RGB24_1280x960:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_1;
+	break;
+      case MONO8_1280x960:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_2;
+	break;
+      case YUV422_1600x1200:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_3;
+	break;
+      case RGB24_1600x1200:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_4;
+	break;
+      case MONO8_1600x1200:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_5;
+	break;
+      case MONO16_1280x960:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_6;
+	break;
+      case MONO16_1600x1200:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_7;
+	break;
+      case Format_7_0:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_0;
+	break;
+      case Format_7_1:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_1;
+	break;
+      case Format_7_2:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_2;
+	break;
+      case Format_7_3:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_3;
+	break;
+      case Format_7_4:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_4;
+	break;
+      case Format_7_5:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_5;
+	break;
+      case Format_7_6:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_6;
+	break;
+      case Format_7_7:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_7;
+	break;
+    }
+    if (inq == 0)
+	return 0;
+    
+    return readQuadletFromRegister(format);
+}
+
 }
 #ifdef HAVE_TUToolsPP
-#  ifdef __GNUG__
+#  if defined __GNUG__ || __INTEL_COMPILER
 #    include "TU/Array++.cc"
 #    include "TU/Image++.cc"
 namespace TU

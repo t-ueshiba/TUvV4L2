@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Node.cc,v 1.2 2002-07-25 02:38:02 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.3 2002-12-09 07:47:50 ueshiba Exp $
  */
 #include <netinet/in.h>
 #include <sys/ioctl.h>
@@ -193,7 +193,7 @@ Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
  */
 void
 Ieee1394Node::mapListenBuffer(size_t packet_size,
-				size_t buf_size, u_int nb_buffers)
+			      size_t buf_size, u_int nb_buffers)
 {
     using namespace	std;
     
@@ -218,8 +218,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 
   // Reset buffer status and re-map new buffer.
     if ((_buf = (u_char*)mmap(0, _mmap.nb_buffers * _mmap.buf_size,
-			      PROT_READ | PROT_WRITE, MAP_SHARED,
-			      _port.fd(), 0))
+			      PROT_READ, MAP_SHARED, _port.fd(), 0))
 	== (u_char*)-1)
     {
 	_buf = 0;

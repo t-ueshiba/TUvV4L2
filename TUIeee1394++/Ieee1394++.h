@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.6 2002-10-04 01:53:45 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.7 2002-12-09 07:47:50 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -233,18 +233,20 @@ class Ieee1394Camera : public Ieee1394Node
 	FrameRate_7_5	= (0x1 << 29),	//!< 7.5fps
 	FrameRate_15	= (0x1 << 28),	//!< 15fps
 	FrameRate_30	= (0x1 << 27),	//!< 30fps
-	FrameRate_60	= (0x1 << 26)	//!< 60fps
+	FrameRate_60	= (0x1 << 26),	//!< 60fps
+	FrameRate_x	= (0x1 << 25)	//!< 特殊なフレームレート
     };
     
   //! 出力画像の画素の形式
     enum PixelFormat
     {
-	YUV_444,			//!< YUV(4:4:4)	24bit/pixel
-	YUV_422,			//!< YUV(4:2:2)	16bit/pixel
-	YUV_411,			//!< YUV(4:1:1)	12bit/pixel
-	RGB_24,				//!< RGB	24bit/pixel
-	MONO,				//!< Y(mono)	 8bit/pixel
-	MONO_16				//!< Y(mono16)	16bit/pixel
+	MONO_8		= (0x1 << 31),	//!< Y(mono)	 8bit/pixel
+	YUV_411		= (0x1 << 30),	//!< YUV(4:1:1)	12bit/pixel
+	YUV_422		= (0x1 << 29),	//!< YUV(4:2:2)	16bit/pixel
+	YUV_444		= (0x1 << 28),	//!< YUV(4:4:4)	24bit/pixel
+	RGB_24		= (0x1 << 27),	//!< RGB	24bit/pixel
+	MONO_16		= (0x1 << 26),	//!< Y(mono16)	16bit/pixel
+	RGB_48		= (0x1 << 25)	//!< RGB	48bit/pixel
     };
 
   //! 値を設定できるカメラの属性
@@ -301,6 +303,22 @@ class Ieee1394Camera : public Ieee1394Node
 	HighActiveInput	= (0x1 << 24)	//!< highでトリガon
     };
 
+    struct Format_7_Info
+    {
+	u_int		maxWidth;		//!< 画像の最大幅
+	u_int		maxHeight;		//!< 画像の最大高さ
+	u_int		unitWidth;		//!< 画像幅の最小単位
+	u_int		unitHeight;		//!< 画像高さの最小単位
+	u_int		unitU0;			//!< 原点水平位置指定の最小単位
+	u_int		unitV0;			//!< 原点垂直位置指定の最小単位
+	u_int		u0;			//!< 原点水平位置
+	u_int		v0;			//!< 原点垂直位置
+	u_int		width;			//!< 画像の幅
+	u_int		height;			//!< 画像の高さ
+	PixelFormat	pixelFormat;		//!< 画像の画素形式
+	u_int		availablePixelFormats;	//!< 利用できる画素形式
+    };
+    
   private:
     struct Mono16
     {
@@ -331,6 +349,14 @@ class Ieee1394Camera : public Ieee1394Node
     u_int		width()					const	;
     u_int		height()				const	;
     PixelFormat		pixelFormat()				const	;
+
+  // Format_7 stuffs.
+    Format_7_Info	getFormat_7_Info(Format format7)	const	;
+    Ieee1394Camera&	setFormat_7_ROI(Format format7, 
+					u_int u0, u_int v0,
+					u_int width, u_int height)	;
+    Ieee1394Camera&	setFormat_7_PixelFormat(Format format7, 
+						PixelFormat pixelFormat);
     
   // Feature stuffs.
     quadlet_t		inquireFeatureFunction(Feature feature)	const	;
@@ -386,8 +412,12 @@ class Ieee1394Camera : public Ieee1394Node
     static FrameRate	uintToFrameRate(u_int frameRate)		;
     static Feature	uintToFeature(u_int feature)			;
     static TriggerMode	uintToTriggerMode(u_int triggerMode)		;
+    static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
     
   private:
+    nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
+    u_int	setFormat_7_PacketSize(Format format7)			;
+    quadlet_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
     void	checkAvailability(Format format, FrameRate rate) const	;
     quadlet_t	checkAvailability(Feature feature, u_int inq)	 const	;
     void	checkAvailability(BasicFunction func)		 const	;
