@@ -1,11 +1,240 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.10 2002-12-13 02:46:07 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.11 2003-02-20 05:51:15 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
 
 namespace TU
 {
+/************************************************************************
+*  static functions							*
+************************************************************************/
+template <class S, class T> static const S*
+bayerRGGB2x2(const S* buf, T* rgb, int w)
+{
+    const S*	nxt = buf + w;		// next line.
+    while ((w -= 2) > 0)
+    {								// v
+	rgb->r = *buf;						// R G
+	rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;	// G B
+	rgb->b = *(nxt + 1);
+	++rgb;
+	++buf;
+	++nxt;							// v
+	rgb->r = *(buf + 1);					// G R
+	rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;	// B G
+	rgb->b = *nxt;
+	++rgb;
+	++buf;
+	++nxt;
+    }								// v
+    rgb->r = *buf;						// R G
+    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G B
+    rgb->b = *(nxt + 1);
+    ++rgb;
+    ++buf;
+    ++nxt;							//   v
+    rgb->r = *(buf - 1);					// R G
+    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G B
+    rgb->b = *nxt;
+    ++buf;
+
+    return buf;
+}
+
+template <class S, class T> static const S*
+bayerRGGBOdd3x3(const S* buf, T* rgb, int w)
+{
+    const S	*prv = buf - w, *nxt = buf + w;
+  // 奇数行左端の画素は2x2で処理．				// v
+    rgb->r = *nxt;						// G B
+    rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;		// R G
+    rgb->b = *(buf + 1);
+    ++rgb;
+    ++prv;
+    ++buf;
+    ++nxt;
+    while ((w -= 2) > 0)	// 奇数行中間の列を処理．
+    {
+	rgb->r = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +	// R G R
+		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;	// G B G
+	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// R G R
+		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;
+	rgb->b = *buf;
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+	rgb->r = (u_int(*prv) + u_int(*nxt)) >> 1;		// G R G
+	rgb->g = *buf;						// B G B
+	rgb->b = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G R G
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+    }
+  // 奇数行右端の画素は2x2で処理．				//   v
+    rgb->r = *(nxt - 1);					// G B
+    rgb->g = (u_int(*(buf - 1)) + u_int(*nxt)) >> 1;		// R G
+    rgb->b = *buf;
+    ++buf;
+
+    return buf;
+}
+
+template <class S, class T> static const S*
+bayerRGGBEven3x3(const S* buf, T* rgb, int w)
+{
+    const S	*prv = buf - w, *nxt = buf + w;
+  // 偶数行左端の画素は2x2で処理．				// v
+    rgb->r = *buf;						// R G
+    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G B
+    rgb->b = *(nxt + 1);
+    ++rgb;
+    ++prv;
+    ++buf;
+    ++nxt;
+    while ((w -= 2) > 0)	// 偶数行中間の列を処理．
+    {
+	rgb->r = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G B G
+	rgb->g = *buf;						// R G R
+	rgb->b = (u_int(*prv) + u_int(*nxt)) >> 1;		// G B G
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+	rgb->r = *buf;						// B G B
+	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// G R G
+		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;	// B G B
+	rgb->b = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +
+		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+    }
+  // 偶数行右端の画素は2x2で処理．				//   v
+    rgb->r = *(buf - 1);					// R G
+    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G B
+    rgb->b = *nxt;
+    ++buf;
+
+    return buf;
+}
+
+template <class S, class T> static const S*
+bayerBGGR2x2(const S* buf, T* rgb, int w)
+{
+    const S*	nxt = buf + w;		// next line.
+    while ((w -= 2) > 0)
+    {								// v
+	rgb->r = *(nxt + 1);					// B G
+	rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;	// G R
+	rgb->b = *buf;
+	++rgb;
+	++buf;
+	++nxt;							// v
+	rgb->r = *nxt;						// G B
+	rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;	// R G
+	rgb->b = *(buf + 1);
+	++rgb;
+	++buf;
+	++nxt;
+    }								// v
+    rgb->r = *(nxt + 1);					// B G
+    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G R
+    rgb->b = *buf;
+    ++rgb;
+    ++buf;
+    ++nxt;							//   v
+    rgb->r = *nxt;						// B G
+    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G R
+    rgb->b = *(buf - 1);
+    ++buf;
+
+    return buf;
+}
+
+template <class S, class T> static const S*
+bayerBGGROdd3x3(const S* buf, T* rgb, int w)
+{
+    const S	*prv = buf - w, *nxt = buf + w;
+  // 奇数行左端の画素は2x2で処理．				// v
+    rgb->r = *(buf + 1);					// G R
+    rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;		// B G
+    rgb->b = *nxt;
+    ++rgb;
+    ++prv;
+    ++buf;
+    ++nxt;
+    while ((w -= 2) > 0)	// 奇数行中間の列を処理．
+    {
+	rgb->r = *buf;						// B G B
+	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// G R G
+		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;	// B G B
+	rgb->b = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +
+		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+	rgb->r = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G B G
+	rgb->g = *buf;						// R G R
+	rgb->b = (u_int(*prv) + u_int(*nxt)) >> 1;		// G B G
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+    }
+  // 奇数行右端の画素は2x2で処理．				//   v
+    rgb->r = *buf;						// G R
+    rgb->g = (u_int(*(buf - 1)) + u_int(*nxt)) >> 1;		// B G
+    rgb->b = *(nxt - 1);
+    ++buf;
+
+    return buf;
+}
+
+template <class S, class T> static const S*
+bayerBGGREven3x3(const S* buf, T* rgb, int w)
+{
+    const S	*prv = buf - w, *nxt = buf + w;
+  // 偶数行左端の画素は2x2で処理．				// v
+    rgb->r = *(nxt + 1);					// B G
+    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G R
+    rgb->b = *buf;
+    ++rgb;
+    ++prv;
+    ++buf;
+    ++nxt;
+    while ((w -= 2) > 0)	// 偶数行中間の列を処理．
+    {
+	rgb->r = (u_int(*prv) + u_int(*nxt)) >> 1;		// G R G
+	rgb->g = *buf;						// B G B
+	rgb->b = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G R G
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+	rgb->r = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +	// R G R
+		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;	// G B G
+	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// R G R
+		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;
+	rgb->b = *buf;
+	++rgb;
+	++prv;
+	++buf;
+	++nxt;
+    }
+  // 偶数行右端の画素は2x2で処理．				//   v
+    rgb->r = *nxt;						// B G
+    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G R
+    rgb->b = *(buf - 1);
+    ++buf;
+
+    return buf;
+}
+
 /************************************************************************
 *  local constants							*
 ************************************************************************/
@@ -1025,6 +1254,118 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 
     return *this;
 }
+
+//! IEEE1394カメラから出力されたBayer(RGGB)パターン画像1枚分のデータをRGB形式に変換して取り込む
+/*!
+  テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
+  呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
+  \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
+		現在カメラに設定されている画像サイズに合わせて自動的に
+		設定される．サポートされている画素形式Tは，RGB, RGBA,
+		BGR, ABGRのいずれかである．カメラの画素形式が#MONO_8
+		または#MONO_16 以外に設定されている場合は
+		std::domain_error例外が送出される．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+template <class T> const Ieee1394Camera&
+Ieee1394Camera::captureBayerRGGB(Image<T>& image) const
+{
+    if (_buf == 0)
+	throw std::runtime_error("TU::Ieee1394Camera::captureBayerRGGB >>: no images snapped!!");
+  // Transfer image data from current buffer.
+    image.resize(height(), width());
+    switch (pixelFormat())
+    {
+      case MONO_8:
+      {
+	const u_char*	p = bayerRGGB2x2(_buf, &image[0][0], width());
+	int		v = 1;
+	while (v < image.height() - 1)	// 中間の行を処理．
+	{
+	    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
+	    p = bayerRGGBEven3x3(p, &image[v++][0], width());
+	}
+	bayerRGGB2x2(p - width(), &image[v][0], width());
+      }
+        break;
+
+      case MONO_16:
+      {
+	const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf,
+					 &image[0][0], width());
+	int		v = 1;
+	while (v < image.height() - 1)	// 中間の行を処理．
+	{
+	    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
+	    p = bayerRGGBEven3x3(p, &image[v++][0], width());
+	}
+	bayerRGGB2x2(p - width(), &image[v][0], width());
+      }
+        break;
+
+      default:
+	throw std::domain_error("TU::Ieee1394Camera::captureBayerRGGB: must be MONO_8 or MONO_16 format!!");
+	break;
+    }
+
+    return *this;
+}
+
+//! IEEE1394カメラから出力されたBayer(BGGR)パターン画像1枚分のデータをRGB形式に変換して取り込む
+/*!
+  テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
+  呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
+  \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
+		現在カメラに設定されている画像サイズに合わせて自動的に
+		設定される．サポートされている画素形式Tは，RGB, RGBA,
+		BGR, ABGRのいずれかである．カメラの画素形式が#MONO_8
+		または#MONO_16 以外に設定されている場合は
+		std::domain_error例外が送出される．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+template <class T> const Ieee1394Camera&
+Ieee1394Camera::captureBayerBGGR(Image<T>& image) const
+{
+    if (_buf == 0)
+	throw std::runtime_error("TU::Ieee1394Camera::captureBayerBGGR >>: no images snapped!!");
+  // Transfer image data from current buffer.
+    image.resize(height(), width());
+    switch (pixelFormat())
+    {
+      case MONO_8:
+      {
+	const u_char*	p = bayerBGGR2x2(_buf, &image[0][0], width());
+	int		v = 1;
+	while (v < image.height() - 1)	// 中間の行を処理．
+	{
+	    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
+	    p = bayerBGGREven3x3(p, &image[v++][0], width());
+	}
+	bayerBGGR2x2(p - width(), &image[v][0], width());
+      }
+        break;
+
+      case MONO_16:
+      {
+	const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf,
+					 &image[0][0], width());
+	int		v = 1;
+	while (v < image.height() - 1)	// 中間の行を処理．
+	{
+	    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
+	    p = bayerBGGREven3x3(p, &image[v++][0], width());
+	}
+	bayerBGGR2x2(p - width(), &image[v][0], width());
+      }
+        break;
+
+      default:
+	throw std::domain_error("TU::Ieee1394Camera::captureBayerBGGR: must be MONO_8 or MONO_16 format!!");
+	break;
+    }
+
+    return *this;
+}
 #endif	// HAVE_TUToolsPP
 
 //! IEEE1394カメラから出力された画像1枚分のデータをなんら変換を行わずに取り込む
@@ -1043,6 +1384,128 @@ Ieee1394Camera::captureRaw(void* image) const
 	throw std::runtime_error("TU::Ieee1394Camera::captureRaw: no images snapped!!");
   // Transfer image data from current buffer.
     memcpy(image, _buf, bufferSize());
+
+    return *this;
+}
+
+//! IEEE1394カメラから出力されたBayerパターン(RGGB)画像1枚分のデータをRGB形式に変換して取り込む
+/*!
+  本関数を呼び出す前にsnap()によってカメラからの画像を保持しておかなければ
+  ならない．
+  \param image	画像データの格納領域へのポインタ．width(), height()および
+		pixelFormat()を用いて画像のサイズと画素の形式を調べて
+		画像1枚分の領域を確保しておくのは，ユーザの責任である．
+		画像データは，各画素毎に R, G, B (各 1 byte)の順で格納され
+		る．カメラの画素形式が#MONO_8 または#MONO_16 以外に設定され
+		ている場合はstd::domain_error例外が送出される．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+const Ieee1394Camera&
+Ieee1394Camera::captureBayerRGGBRaw(void* image) const
+{
+    if (_buf == 0)
+	throw std::runtime_error("TU::Ieee1394Camera::captureBayerRGGBRaw >>: no images snapped!!");
+
+  // Transfer image data from current buffer.
+    switch (pixelFormat())
+    {
+      case MONO_8:
+      {
+	RGB*		rgb = (RGB*)image;
+	const u_char*	p = bayerRGGB2x2(_buf, rgb, width());
+	rgb += width();
+	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	{
+	    p = bayerRGGBOdd3x3 (p, rgb, width());
+	    rgb += width();
+	    p = bayerRGGBEven3x3(p, rgb, width());
+	    rgb += width();
+	}
+	bayerRGGB2x2(p - width(), rgb, width());
+      }
+        break;
+
+      case MONO_16:
+      {
+	RGB*		rgb = (RGB*)image;
+	const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf, rgb, width());
+	rgb += width();
+	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	{
+	    p = bayerRGGBOdd3x3 (p, rgb, width());
+	    rgb += width();
+	    p = bayerRGGBEven3x3(p, rgb, width());
+	    rgb += width();
+	}
+	bayerRGGB2x2(p - width(), rgb, width());
+      }
+        break;
+
+      default:
+	throw std::domain_error("TU::Ieee1394Camera::captureRGGBBayerRaw: must be MONO_8 or MONO_16 format!!");
+	break;
+    }
+
+    return *this;
+}
+
+//! IEEE1394カメラから出力されたBayerパターン(BGGR)画像1枚分のデータをRGB形式に変換して取り込む
+/*!
+  本関数を呼び出す前にsnap()によってカメラからの画像を保持しておかなければ
+  ならない．
+  \param image	画像データの格納領域へのポインタ．width(), height()および
+		pixelFormat()を用いて画像のサイズと画素の形式を調べて
+		画像1枚分の領域を確保しておくのは，ユーザの責任である．
+		画像データは，各画素毎に R, G, B (各 1 byte)の順で格納され
+		る．カメラの画素形式が#MONO_8 または#MONO_16 以外に設定され
+		ている場合はstd::domain_error例外が送出される．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+const Ieee1394Camera&
+Ieee1394Camera::captureBayerBGGRRaw(void* image) const
+{
+    if (_buf == 0)
+	throw std::runtime_error("TU::Ieee1394Camera::captureBayerBGGRRaw >>: no images snapped!!");
+
+  // Transfer image data from current buffer.
+    switch (pixelFormat())
+    {
+      case MONO_8:
+      {
+	RGB*		rgb = (RGB*)image;
+	const u_char*	p = bayerBGGR2x2(_buf, rgb, width());
+	rgb += width();
+	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	{
+	    p = bayerBGGROdd3x3 (p, rgb, width());
+	    rgb += width();
+	    p = bayerBGGREven3x3(p, rgb, width());
+	    rgb += width();
+	}
+	bayerBGGR2x2(p - width(), rgb, width());
+      }
+        break;
+
+      case MONO_16:
+      {
+	RGB*		rgb = (RGB*)image;
+	const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf, rgb, width());
+	rgb += width();
+	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	{
+	    p = bayerBGGROdd3x3 (p, rgb, width());
+	    rgb += width();
+	    p = bayerBGGREven3x3(p, rgb, width());
+	    rgb += width();
+	}
+	bayerBGGR2x2(p - width(), rgb, width());
+      }
+        break;
+
+      default:
+	throw std::domain_error("TU::Ieee1394Camera::captureBGGRBayerRaw: must be MONO_8 or MONO_16 format!!");
+	break;
+    }
 
     return *this;
 }
@@ -1494,7 +1957,7 @@ Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
 
 }
 #ifdef HAVE_TUToolsPP
-#  if defined __GNUG__ || __INTEL_COMPILER
+#  if defined(__GNUG__) || defined(__INTEL_COMPILER)
 #    include "TU/Array++.cc"
 #    include "TU/Image++.cc"
 namespace TU
@@ -1521,6 +1984,22 @@ template const Ieee1394Camera&
 Ieee1394Camera::operator >>(Image<YUV422>& image)	const	;
 template const Ieee1394Camera&
 Ieee1394Camera::operator >>(Image<YUV411>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerRGGB(Image<RGB>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerRGGB(Image<RGBA>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerRGGB(Image<BGR>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerRGGB(Image<ABGR>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerBGGR(Image<RGB>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerBGGR(Image<RGBA>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerBGGR(Image<BGR>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::captureBayerBGGR(Image<ABGR>& image)	const	;
 }
 #  endif	// __GNUG__
 #endif		// HAVE_TUToolsPP

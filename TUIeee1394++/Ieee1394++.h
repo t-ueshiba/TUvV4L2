@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.9 2002-12-10 08:16:05 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.10 2003-02-20 05:51:15 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -325,6 +325,9 @@ class Ieee1394Camera : public Ieee1394Node
     {
 	operator u_char()		const	{return u_char(ntohs(s));}
 	operator short()		const	{return ntohs(s);}
+	operator u_short()		const	{return u_short(ntohs(s));}
+	operator int()			const	{return int(ntohs(s));}
+	operator u_int()		const	{return u_int(ntohs(s));}
 	operator float()		const	{return float(ntohs(s));}
 	operator double()		const	{return double(ntohs(s));}
 	      
@@ -404,9 +407,17 @@ class Ieee1394Camera : public Ieee1394Node
 #ifdef HAVE_TUToolsPP
     template <class T> const Ieee1394Camera&
 			operator >>(Image<T>& image)		const	;
+    template <class T> const Ieee1394Camera&
+			captureBayerRGGB(Image<T>& image)	const	;
+    template <class T> const Ieee1394Camera&
+			captureBayerBGGR(Image<T>& image)	const	;
 #endif
     const Ieee1394Camera&
 			captureRaw(void* image)			const	;
+    const Ieee1394Camera&
+			captureBayerRGGBRaw(void* image)	const	;
+    const Ieee1394Camera&
+			captureBayerBGGRRaw(void* image)	const	;
 
   // Utility functions.
     static Format	uintToFormat(u_int format)			;
