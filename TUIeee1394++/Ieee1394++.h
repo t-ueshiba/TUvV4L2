@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.7 2002-12-09 07:47:50 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.8 2002-12-09 08:02:30 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -303,6 +303,7 @@ class Ieee1394Camera : public Ieee1394Node
 	HighActiveInput	= (0x1 << 24)	//!< highでトリガon
     };
 
+  //! 本カメラがサポートするFormat_7に関する情報(getFormat_7_Info()で得られる)
     struct Format_7_Info
     {
 	u_int		maxWidth;		//!< 画像の最大幅

@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.7 2002-12-09 07:47:50 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.8 2002-12-09 08:02:30 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
@@ -377,7 +377,7 @@ Ieee1394Camera::getFrameRate() const
 }
 
 //! 指定されたFormat_7タイプのフォーマットの内容を返す
-/*
+/*!
   \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
   \return	 指定されたフォーマットの内容．
  */
@@ -417,7 +417,7 @@ Ieee1394Camera::getFormat_7_Info(Format format7) const
 }
 
 //! 指定されたFormat_7タイプのフォーマットについて，注目領域(Region Of Interest)を設定する
-/*
+/*!
   \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
   \param u0	 注目領域の左上隅の横座標．
   \param v0	 注目領域の左上隅の縦座標．
@@ -471,7 +471,7 @@ Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
 }
 
 //! 指定されたFormat_7タイプのフォーマットについて，画素形式を設定する
-/*
+/*!
   \param format7	対象となるフォーマット(#Format_7_0 - #Format_7_7の
 			いずれか)．
   \param pixelFormat	画素形式．
@@ -1224,7 +1224,7 @@ Ieee1394Camera::uintToTriggerMode(u_int triggerMode)
  
 //! unsinged intの値を同じビットパターンを持つ#PixelFormatに直す
 /*!
-  \param triggerMode	#PixelFormatに直したいunsigned int値．
+  \param pixelFormat	#PixelFormatに直したいunsigned int値．
   \return		#PixelFormat型のenum値．
  */
 Ieee1394Camera::PixelFormat
