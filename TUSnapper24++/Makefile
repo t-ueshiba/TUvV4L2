@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.6 2002-12-18 06:07:14 ueshiba Exp $
+#  $Id: Makefile,v 1.7 2004-03-08 02:08:52 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -38,8 +38,7 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/v/XilDC.h \
 		TU/Snapper24++.h
 HDRS		= Snapper24++.h \
-		TUSnapper24++.h \
-		TUsnp24.h
+		TUSnapper24++.h
 SRCS		= Snapper24++.cc \
 		Snapper24.cc \
 		snp24.c
@@ -50,7 +49,7 @@ OBJS		= Snapper24++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.6 $	|		\
+REV		= $(shell echo $Revision: 1.7 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

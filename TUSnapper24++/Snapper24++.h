@@ -1,5 +1,5 @@
 /*
- *  $Id: Snapper24++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: Snapper24++.h,v 1.3 2004-03-08 02:08:52 ueshiba Exp $
  */
 #ifndef __TUSnapper24PP_h
 #define __TUSnapper24PP_h
@@ -145,19 +145,19 @@ Snapper24::handle() const
 inline Snapper24&
 x1(Snapper24& snp24)
 {
-    return snp24.set("SNP24_CAPRE", SNP24_SUB_X1);
+    return snp24.set("SNP24_CAPTURE", SNP24_SUB_X1);
 }
 
 inline Snapper24&
 x2(Snapper24& snp24)
 {
-    return snp24.set("SNP24_CAPRE", SNP24_SUB_X2);
+    return snp24.set("SNP24_CAPTURE", SNP24_SUB_X2);
 }
 
 inline Snapper24&
 x4(Snapper24& snp24)
 {
-    return snp24.set("SNP24_CAPRE", SNP24_SUB_X4);
+    return snp24.set("SNP24_CAPTURE", SNP24_SUB_X4);
 }
 
 inline Snapper24&
