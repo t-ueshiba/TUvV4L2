@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2002-07-25 07:57:45 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2002-07-25 18:45:08 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -20,9 +20,12 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home1/ueshiba/include/TU/Object++.cc \
-		/home1/ueshiba/include/TU/Object++.h \
-		/home1/ueshiba/include/TU/types.h \
+EXTHDRS		= /Users/ueshiba/include/TU/Array++.h \
+		/Users/ueshiba/include/TU/Geometry++.h \
+		/Users/ueshiba/include/TU/Object++.cc \
+		/Users/ueshiba/include/TU/Object++.h \
+		/Users/ueshiba/include/TU/Vector++.h \
+		/Users/ueshiba/include/TU/types.h \
 		TU/Brep/Brep++.h
 HDRS		= Brep++.h
 SRCS		= Geometry.cc \
@@ -43,7 +46,7 @@ OBJS		= Geometry.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -55,18 +58,39 @@ REV		= $(shell echo $Revision: 1.3 $	|		\
 include $(PROJECT)/lib/l.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-Geometry.o: TU/Brep/Brep++.h /home1/ueshiba/include/TU/Object++.h \
-	/home1/ueshiba/include/TU/types.h
-HalfEdge.o: TU/Brep/Brep++.h /home1/ueshiba/include/TU/Object++.h \
-	/home1/ueshiba/include/TU/types.h
-Loop.o: TU/Brep/Brep++.h /home1/ueshiba/include/TU/Object++.h \
-	/home1/ueshiba/include/TU/types.h
-Neighbor.o: TU/Brep/Brep++.h /home1/ueshiba/include/TU/Object++.h \
-	/home1/ueshiba/include/TU/types.h
-PointB.o: TU/Brep/Brep++.h /home1/ueshiba/include/TU/Object++.h \
-	/home1/ueshiba/include/TU/types.h
-TUBrep++.inst.o: TU/Brep/Brep++.h /home1/ueshiba/include/TU/Object++.h \
-	/home1/ueshiba/include/TU/types.h \
-	/home1/ueshiba/include/TU/Object++.cc
-TUBrep++.sa.o: TU/Brep/Brep++.h /home1/ueshiba/include/TU/Object++.h \
-	/home1/ueshiba/include/TU/types.h
+Geometry.o: TU/Brep/Brep++.h /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h
+HalfEdge.o: TU/Brep/Brep++.h /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h
+Loop.o: TU/Brep/Brep++.h /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h
+Neighbor.o: TU/Brep/Brep++.h /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h
+PointB.o: TU/Brep/Brep++.h /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h
+TUBrep++.inst.o: TU/Brep/Brep++.h /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h \
+	/Users/ueshiba/include/TU/Object++.cc
+TUBrep++.sa.o: TU/Brep/Brep++.h /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h
