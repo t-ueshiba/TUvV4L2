@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.h,v 1.3 2002-08-12 01:24:46 ueshiba Exp $
+ *  $Id: Array++.h,v 1.4 2002-08-12 01:51:02 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -79,22 +79,20 @@ class Array
     bool		resize(u_int)			;
     void		resize(T*, u_int)		;
     void		check_dim(u_int)	const	;
+
+  private:
     std::istream&	get(std::istream&, int)		;
     
-  private:
     u_int	_d;		// dimension of array
     ET*		_p;		// pointer to buffer area
     u_int	_shr : 1;	// buffer area is shared with other object
     u_int	_siz : 31;	// buffer size (unit: element, >= dim())
 	
-  //    friend std::istream&	operator >>(std::istream& in, Array& a)	;
+    friend std::istream&	operator >>(std::istream& in, Array& a)
+				{
+				    return a.get(in >> std::ws, 0);
+				}
 };
-
-template <class T> inline std::istream&
-operator >>(std::istream& in, Array<T>& a)
-{
-    return a.get(in >> std::ws, 0);
-}
 
 template <class T> std::ostream&
 operator <<(std::ostream&, const Array<T>&);
@@ -160,15 +158,11 @@ class Array2 : public Array<T>
     Array<ET>		_ary;
 
     friend std::istream&	operator >>(std::istream& in, Array2<T>& a)
-	{return a.get(in >> std::ws, 0, 0, 0);}
+				{
+				    return a.get(in >> std::ws, 0, 0, 0);
+				}
 };
-/*
-template <class T> inline std::istream&
-operator >>(std::istream& in, Array2<T>& a)
-{
-    return a.get(in >> std::ws, 0, 0, 0);
-}
-*/
+
 /************************************************************************
 *  numerical operators							*
 ************************************************************************/
