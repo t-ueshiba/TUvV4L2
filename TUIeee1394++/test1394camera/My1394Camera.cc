@@ -1,5 +1,5 @@
 /*
- *  $Id: My1394Camera.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.2 2002-12-09 07:48:22 ueshiba Exp $
  */
 #include <sys/time.h>
 #include <stdexcept>
@@ -130,12 +130,13 @@ My1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 	buffSize = width() * height() * 3;
 	break;
       case YUV_422:
+      case MONO_16:
 	buffSize = width() * height() * 2;
 	break;
       case YUV_411:
 	buffSize = width() * height() * 3 / 2;
 	break;
-      case MONO:
+      case MONO_8:
 	buffSize = width() * height();
 	break;
       default:
@@ -239,11 +240,24 @@ My1394Camera::draw()
 			   0, 0, width(), height(),
 			   GDK_RGB_DITHER_NONE, (guchar*)_buf, 3*width());
 	break;
-      case MONO:
+      case MONO_8:
 	gdk_draw_gray_image(_canvas->window,
 			    _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			    0, 0, width(), height(),
 			    GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
+	break;
+      case MONO_16:
+      {
+	const u_short*	p = (u_short*)_buf;
+	u_char*		q = _buf;
+	for (u_int y = 0; y < height(); ++y)
+	    for (u_int x = 0; x < width(); ++x)
+		*q++ = htons(*p++);
+	gdk_draw_gray_image(_canvas->window,
+			    _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
+			    0, 0, width(), height(),
+			    GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
+      }
 	break;
     }
 }

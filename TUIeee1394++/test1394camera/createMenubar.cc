@@ -1,5 +1,5 @@
 /*
- *  $Id: createMenubar.cc,v 1.2 2002-08-01 05:04:02 ueshiba Exp $
+ *  $Id: createMenubar.cc,v 1.3 2002-12-09 07:48:22 ueshiba Exp $
  */
 #include "My1394Camera.h"
 #include <iomanip>
@@ -26,18 +26,23 @@ static const MyFormat	format[] =
     {Ieee1394Camera::YUV422_640x480,   "640x480-YUV(4:2:2)"},
     {Ieee1394Camera::RGB24_640x480,    "640x480-RGB"},
     {Ieee1394Camera::MONO8_640x480,    "640x480-Y(mono)"},
+    {Ieee1394Camera::MONO16_640x480,   "640x480-Y(mono16)"},
     {Ieee1394Camera::YUV422_800x600,   "800x600-YUV(4:2:2)"},
     {Ieee1394Camera::RGB24_800x600,    "800x600-RGB"},
     {Ieee1394Camera::MONO8_800x600,    "800x600-Y(mono)"},
     {Ieee1394Camera::YUV422_1024x768,  "1024x768-YUV(4:2:2)"},
     {Ieee1394Camera::RGB24_1024x768,   "1024x768-RGB"},
     {Ieee1394Camera::MONO8_1024x768,   "1024x768-Y(mono)"},
+    {Ieee1394Camera::MONO16_800x600,   "800x600-Y(mono16)"},
+    {Ieee1394Camera::MONO16_1024x768,  "1024x768-Y(mono16)"},
     {Ieee1394Camera::YUV422_1280x960,  "1280x960-YUV(4:2:2)"},
     {Ieee1394Camera::RGB24_1280x960,   "1280x960-RGB"},
     {Ieee1394Camera::MONO8_1280x960,   "1280x960-Y(mono)"},
     {Ieee1394Camera::YUV422_1600x1200, "1600x1200-YUV(4:2:2)"},
     {Ieee1394Camera::RGB24_1600x1200,  "1600x1200-RGB"},
-    {Ieee1394Camera::MONO8_1600x1200,  "1600x1200-Y(mono)"}
+    {Ieee1394Camera::MONO8_1600x1200,  "1600x1200-Y(mono)"},
+    {Ieee1394Camera::MONO16_1280x960,  "1280x960-Y(mono16)"},
+    {Ieee1394Camera::MONO16_1600x1200, "1600x1200-Y(mono16)"}
 };
 static const int	NFORMATS = sizeof(format)/sizeof(format[0]);
 
