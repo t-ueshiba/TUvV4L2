@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.6 2002-08-22 04:08:32 ueshiba Exp $
+ *  $Id: Image++.h,v 1.7 2002-12-18 05:46:12 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -345,11 +345,11 @@ class ImageBase
     
     Type		restoreHeader(std::istream& in)			;
     std::ostream&	saveHeader(std::ostream& out, Type type) const	;
-    virtual void	resize(u_int, u_int)				= 0;
 	
   private:
     virtual u_int	_width()				const	= 0;
     virtual u_int	_height()				const	= 0;
+    virtual void	_resize(u_int, u_int)				= 0;
 
     static u_int	type2depth(Type type)				;
     
@@ -466,9 +466,9 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     std::ostream&	save(std::ostream& out, Type type)	const	;
     std::istream&	restoreData(std::istream& in, Type type)	;
     std::ostream&	saveData(std::ostream& out, Type type)	const	;
-    virtual void	resize(u_int h, u_int w)			;
-    virtual void	resize(T* p, u_int h, u_int w)			;
-    
+    void		resize(u_int h, u_int w)			;
+    void		resize(T* p, u_int h, u_int w)			;
+
   private:
     template <class S>
     std::istream&	restoreRows(std::istream& in)			;
@@ -477,6 +477,7 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
 
     virtual u_int	_width()				const	;
     virtual u_int	_height()				const	;
+    virtual void	_resize(u_int h, u_int w)			;
 };
 
 template <class T> inline std::istream&
@@ -491,7 +492,19 @@ Image<T>::save(std::ostream& out, Type type) const
     saveHeader(out, type);
     return saveData(out, type);
 }
-    
+
+template <class T> inline void
+Image<T>::resize(u_int h, u_int w)
+{
+    Array2<ImageLine<T> >::resize(h, w);
+}
+
+template <class T> inline void
+Image<T>::resize(T* p, u_int h, u_int w)
+{
+    Array2<ImageLine<T> >::resize(p, h, w);
+}
+ 
 template <> inline
 Image<YUV411>::Image(u_int w, u_int h)
     :Array2<ImageLine<TU::YUV411> >(h, w/2), ImageBase()
@@ -506,8 +519,7 @@ Image<YUV411>::Image(TU::YUV411* p, u_int w, u_int h)
 }
 
 template <> inline
-Image<YUV411>::Image(const Image& i,
-		     u_int u, u_int v, u_int w, u_int h)
+Image<YUV411>::Image(const Image& i, u_int u, u_int v, u_int w, u_int h)
     :Array2<ImageLine<TU::YUV411> >(i, v, u/2, h, w/2), ImageBase(i)
 {
 }
@@ -518,12 +530,18 @@ Image<YUV411>::width() const
     return 2 * ncol();
 }
 
-template <> void
-Image<YUV411>::resize(u_int h, u_int w)			;
+template <> inline void
+Image<YUV411>::resize(u_int h, u_int w)
+{
+    Array2<ImageLine<YUV411> >::resize(h, w/2);
+}
 
-template <> void
-Image<YUV411>::resize(TU::YUV411* p, u_int h, u_int w)	;
- 
+template <> inline void
+Image<YUV411>::resize(TU::YUV411* p, u_int h, u_int w)
+{
+    Array2<ImageLine<YUV411> >::resize(p, h, w/2);
+}
+
 }
 
 #endif	/* !__TUImagePP_h */

@@ -20,9 +20,9 @@
  */
 
 /*
- *  $Id: Image++.inst.cc,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
+ *  $Id: Image++.inst.cc,v 1.3 2002-12-18 05:46:12 ueshiba Exp $
  */
-#ifdef __GNUG__
+#if defined __GNUG__ || defined __INTEL_COMPILER
 
 #include "TU/Array++.cc"
 #include "TU/Image++.cc"
