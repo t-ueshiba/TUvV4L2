@@ -20,9 +20,8 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.3 2002-07-25 07:23:02 ueshiba Exp $
  */
-#include <cstring>
 #ifdef WIN32
 #  include <winsock2.h>
 #else
