@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.9 2002-12-10 08:16:05 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.10 2002-12-13 02:46:07 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
@@ -427,6 +427,13 @@ Ieee1394Camera::getFormat_7_Info(Format format7)
 
 //! 指定されたFormat_7タイプのフォーマットについて，注目領域(Region Of Interest)を設定する
 /*!
+  一般に，u0, v0, width, heightは，予め決められた最小単位
+  (Format_7_Info::unitU0, Format_7_Info::unitV0, Format_7_Info::unitWidth,
+  Format_7_Info::unitHeight)でしか指定できない．そこで，実際には注目領域は，
+  (u0, v0)と(u0 + width - 1, v0 + height - 1)を対角線とする矩形を含む最小領域
+  となるように設定される．また，widthもしくはheightに0を指定しても，ROIの幅
+  もしくは高さは，それぞれFormat_7_Info::unitWidth, Format_7_Info::unitHeight
+  以上に設定される．
   \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
   \param u0	 注目領域の左上隅の横座標．
   \param v0	 注目領域の左上隅の縦座標．
@@ -440,24 +447,23 @@ Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
 {
     const Format_7_Info	fmt7info = getFormat_7_Info(format7);
 
-  // 与えられたu0, v0, width, heightを，(1) それぞれが最小単位の倍数となる，
-  // (2) ROIが最大画像サイズ内に収まる，(3）widthとheightが0より大きい，の
-  // 3条件を満たすように修正する．
-    u0 = fmt7info.unitU0 * (u0 / fmt7info.unitU0);
+    const u_int	u1 = u0 + width;		    // 右端の希望値
+    u0 = fmt7info.unitU0 * (u0 / fmt7info.unitU0);  // 左端を最小単位の倍数に
     while (u0 > fmt7info.maxWidth - fmt7info.unitWidth)
-	u0 -= fmt7info.unitU0;
-    width = fmt7info.unitWidth
-	  * (width > 0 ? (width - 1) / fmt7info.unitWidth + 1 : 1);
+	u0 -= fmt7info.unitU0;	// 右に最小幅の余白ができるよう左端を修正
+    width = fmt7info.unitWidth	// 右端希望値を含むよう幅を最小単位の倍数に
+	  * (u1 - u0 > 0 ? (u1 - u0 - 1) / fmt7info.unitWidth + 1 : 1);
     while (u0 + width > fmt7info.maxWidth)
-	width -= fmt7info.unitWidth;
+	width -= fmt7info.unitWidth;	// 最大幅に収まるよう幅を修正
 
-    v0 = fmt7info.unitV0 * (v0 / fmt7info.unitV0);
+    const u_int	v1 = v0 + height;		    // 下端の希望値
+    v0 = fmt7info.unitV0 * (v0 / fmt7info.unitV0);  // 上端を最小単位の倍数に
     while (v0 > fmt7info.maxWidth - fmt7info.unitWidth)
-	v0 -= fmt7info.unitV0;
-    height = fmt7info.unitHeight
-	   * (height > 0 ? (height - 1) / fmt7info.unitHeight + 1 : 1);
+	v0 -= fmt7info.unitV0;	 // 下に最小高さの余白ができるよう上端を修正
+    height = fmt7info.unitHeight // 下端希望値を含むよう高さを最小単位の倍数に
+	   * (v1 - v0 > 0 ? (v1 - v0 - 1) / fmt7info.unitHeight + 1 : 1);
     while (v0 + height > fmt7info.maxHeight)
-	height -= fmt7info.unitHeight;
+	height -= fmt7info.unitHeight;	// 最大高さに収まるよう高さを修正
 
   // 画像出力中はROIを変更できないので，もしそうであれば停止する．
     const bool	cont = inContinuousShot();
