@@ -1,8 +1,52 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.11 2003-02-20 05:51:15 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.12 2003-02-24 01:31:36 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
+
+#define XY_YZ(X, Y, Z)						\
+{								\
+    rgb->X = *buf;						\
+    rgb->Y = (u_int(*(buf+1)) + u_int(*nxt)) >> 1;		\
+    rgb->Z = *(nxt+1);						\
+    ++rgb;							\
+    ++buf;							\
+    ++nxt;							\
+}
+
+#define YX_ZY(X, Y, Z)						\
+{								\
+    rgb->X = *(buf+1);						\
+    rgb->Y = (u_int(*buf) + u_int(*(nxt+1))) >> 1;		\
+    rgb->Z = *nxt;						\
+    ++rgb;							\
+    ++buf;							\
+    ++nxt;							\
+}
+
+#define XYX_YZY_XYX(X, Y, Z)					\
+{								\
+    rgb->X = (u_int(*(prv-1)) + u_int(*(prv+1)) +		\
+	       u_int(*(nxt-1)) + u_int(*(nxt+1))) >> 2;		\
+    rgb->Y = (u_int(*(buf-1)) +u_int(*(buf+1)) +		\
+	       u_int(*prv) + u_int(*nxt)) >> 2;			\
+    rgb->Z = *buf;						\
+    ++rgb;							\
+    ++prv;							\
+    ++buf;							\
+    ++nxt;							\
+}
+
+#define yXy_ZYZ_yXy(X, Y, Z)					\
+{								\
+    rgb->X = (u_int(*prv) + u_int(*nxt)) >> 1;			\
+    rgb->Y = *buf;						\
+    rgb->Z = (u_int(*(buf-1)) + u_int(*(buf+1))) >> 1;		\
+    ++rgb;							\
+    ++prv;							\
+    ++buf;							\
+    ++nxt;							\
+}
 
 namespace TU
 {
@@ -12,227 +56,107 @@ namespace TU
 template <class S, class T> static const S*
 bayerRGGB2x2(const S* buf, T* rgb, int w)
 {
-    const S*	nxt = buf + w;		// next line.
+    const S*	nxt = buf + w;			// next line.
     while ((w -= 2) > 0)
-    {								// v
-	rgb->r = *buf;						// R G
-	rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;	// G B
-	rgb->b = *(nxt + 1);
-	++rgb;
-	++buf;
-	++nxt;							// v
-	rgb->r = *(buf + 1);					// G R
-	rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;	// B G
-	rgb->b = *nxt;
-	++rgb;
-	++buf;
-	++nxt;
-    }								// v
-    rgb->r = *buf;						// R G
-    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G B
-    rgb->b = *(nxt + 1);
-    ++rgb;
-    ++buf;
-    ++nxt;							//   v
-    rgb->r = *(buf - 1);					// R G
-    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G B
-    rgb->b = *nxt;
-    ++buf;
-
-    return buf;
+    {
+	XY_YZ(r, g, b)
+	YX_ZY(r, g, b)
+    }
+    XY_YZ(r, g, b)
+    --buf;
+    --nxt;
+    XY_YZ(r, g, b)
+    
+    return buf + 1;
 }
 
 template <class S, class T> static const S*
 bayerRGGBOdd3x3(const S* buf, T* rgb, int w)
 {
-    const S	*prv = buf - w, *nxt = buf + w;
-  // 奇数行左端の画素は2x2で処理．				// v
-    rgb->r = *nxt;						// G B
-    rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;		// R G
-    rgb->b = *(buf + 1);
-    ++rgb;
-    ++prv;
-    ++buf;
-    ++nxt;
-    while ((w -= 2) > 0)	// 奇数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line.
+    YX_ZY(b, g, r)				// 左端の画素は2x2で処理．
+    const S	*prv = buf - w;			// previous line.
+    while ((w -= 2) > 0)			// 奇数行中間の列を処理．
     {
-	rgb->r = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +	// R G R
-		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;	// G B G
-	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// R G R
-		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;
-	rgb->b = *buf;
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
-	rgb->r = (u_int(*prv) + u_int(*nxt)) >> 1;		// G R G
-	rgb->g = *buf;						// B G B
-	rgb->b = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G R G
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
+	XYX_YZY_XYX(r, g, b)
+	yXy_ZYZ_yXy(r, g, b)
     }
-  // 奇数行右端の画素は2x2で処理．				//   v
-    rgb->r = *(nxt - 1);					// G B
-    rgb->g = (u_int(*(buf - 1)) + u_int(*nxt)) >> 1;		// R G
-    rgb->b = *buf;
-    ++buf;
-
-    return buf;
+    --buf;
+    --nxt;
+    YX_ZY(b, g, r)				// 右端の画素は2x2で処理．
+    
+    return buf + 1;
 }
 
 template <class S, class T> static const S*
 bayerRGGBEven3x3(const S* buf, T* rgb, int w)
 {
-    const S	*prv = buf - w, *nxt = buf + w;
-  // 偶数行左端の画素は2x2で処理．				// v
-    rgb->r = *buf;						// R G
-    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G B
-    rgb->b = *(nxt + 1);
-    ++rgb;
-    ++prv;
-    ++buf;
-    ++nxt;
-    while ((w -= 2) > 0)	// 偶数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line.
+    XY_YZ(r, g, b)				// 左端の画素は2x2で処理．
+    const S	*prv = buf - w;			// previous line.
+    while ((w -= 2) > 0)			// 偶数行中間の列を処理．
     {
-	rgb->r = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G B G
-	rgb->g = *buf;						// R G R
-	rgb->b = (u_int(*prv) + u_int(*nxt)) >> 1;		// G B G
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
-	rgb->r = *buf;						// B G B
-	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// G R G
-		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;	// B G B
-	rgb->b = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +
-		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
+	yXy_ZYZ_yXy(b, g, r)
+	XYX_YZY_XYX(b, g, r)
     }
-  // 偶数行右端の画素は2x2で処理．				//   v
-    rgb->r = *(buf - 1);					// R G
-    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G B
-    rgb->b = *nxt;
-    ++buf;
+    --buf;
+    --nxt;
+    XY_YZ(r, g, b)				// 右端の画素は2x2で処理．
 
-    return buf;
+    return buf + 1;
 }
 
 template <class S, class T> static const S*
 bayerBGGR2x2(const S* buf, T* rgb, int w)
 {
-    const S*	nxt = buf + w;		// next line.
+    const S*	nxt = buf + w;			// next line.
     while ((w -= 2) > 0)
-    {								// v
-	rgb->r = *(nxt + 1);					// B G
-	rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;	// G R
-	rgb->b = *buf;
-	++rgb;
-	++buf;
-	++nxt;							// v
-	rgb->r = *nxt;						// G B
-	rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;	// R G
-	rgb->b = *(buf + 1);
-	++rgb;
-	++buf;
-	++nxt;
-    }								// v
-    rgb->r = *(nxt + 1);					// B G
-    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G R
-    rgb->b = *buf;
-    ++rgb;
-    ++buf;
-    ++nxt;							//   v
-    rgb->r = *nxt;						// B G
-    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G R
-    rgb->b = *(buf - 1);
-    ++buf;
+    {
+	XY_YZ(b, g, r)
+	YX_ZY(b, g, r)
+    }
+    XY_YZ(b, g, r)
+    --buf;
+    --nxt;
+    XY_YZ(b, g, r)
 
-    return buf;
+    return buf + 1;
 }
 
 template <class S, class T> static const S*
 bayerBGGROdd3x3(const S* buf, T* rgb, int w)
 {
-    const S	*prv = buf - w, *nxt = buf + w;
-  // 奇数行左端の画素は2x2で処理．				// v
-    rgb->r = *(buf + 1);					// G R
-    rgb->g = (u_int(*buf) + u_int(*(nxt + 1))) >> 1;		// B G
-    rgb->b = *nxt;
-    ++rgb;
-    ++prv;
-    ++buf;
-    ++nxt;
-    while ((w -= 2) > 0)	// 奇数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line.
+    YX_ZY(r, g, b)				// 左端の画素は2x2で処理．
+    const S	*prv = buf - w;			// previous line.
+    while ((w -= 2) > 0)			// 奇数行中間の列を処理．
     {
-	rgb->r = *buf;						// B G B
-	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// G R G
-		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;	// B G B
-	rgb->b = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +
-		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
-	rgb->r = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G B G
-	rgb->g = *buf;						// R G R
-	rgb->b = (u_int(*prv) + u_int(*nxt)) >> 1;		// G B G
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
+	XYX_YZY_XYX(b, g, r)
+	yXy_ZYZ_yXy(b, g, r)
     }
-  // 奇数行右端の画素は2x2で処理．				//   v
-    rgb->r = *buf;						// G R
-    rgb->g = (u_int(*(buf - 1)) + u_int(*nxt)) >> 1;		// B G
-    rgb->b = *(nxt - 1);
-    ++buf;
+    --buf;
+    --nxt;
+    YX_ZY(r, g, b)				// 右端の画素は2x2で処理．
 
-    return buf;
+    return buf + 1;
 }
 
 template <class S, class T> static const S*
 bayerBGGREven3x3(const S* buf, T* rgb, int w)
 {
-    const S	*prv = buf - w, *nxt = buf + w;
-  // 偶数行左端の画素は2x2で処理．				// v
-    rgb->r = *(nxt + 1);					// B G
-    rgb->g = (u_int(*(buf + 1)) + u_int(*nxt)) >> 1;		// G R
-    rgb->b = *buf;
-    ++rgb;
-    ++prv;
-    ++buf;
-    ++nxt;
-    while ((w -= 2) > 0)	// 偶数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line.
+    XY_YZ(b, g, r)				// 左端の画素は2x2で処理．
+    const S	*prv = buf - w;			// previous line.
+    while ((w -= 2) > 0)			// 偶数行中間の列を処理．
     {
-	rgb->r = (u_int(*prv) + u_int(*nxt)) >> 1;		// G R G
-	rgb->g = *buf;						// B G B
-	rgb->b = (u_int(*(buf - 1)) + u_int(*(buf + 1))) >> 1;	// G R G
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
-	rgb->r = (u_int(*(prv - 1)) + u_int(*(prv + 1)) +	// R G R
-		  u_int(*(nxt - 1)) + u_int(*(nxt + 1))) >> 2;	// G B G
-	rgb->g = (u_int(*prv) + u_int(*(buf - 1)) +		// R G R
-		  u_int(*(buf + 1)) + u_int(*nxt)) >> 2;
-	rgb->b = *buf;
-	++rgb;
-	++prv;
-	++buf;
-	++nxt;
+	yXy_ZYZ_yXy(r, g, b)
+	XYX_YZY_XYX(r, g, b)
     }
-  // 偶数行右端の画素は2x2で処理．				//   v
-    rgb->r = *nxt;						// B G
-    rgb->g = (u_int(*buf) + u_int(*(nxt - 1))) >> 1;		// G R
-    rgb->b = *(buf - 1);
-    ++buf;
+    --buf;
+    --nxt;
+    XY_YZ(b, g, r)				// 右端の画素は2x2で処理．
 
-    return buf;
+    return buf + 1;
 }
 
 /************************************************************************
@@ -1291,8 +1215,8 @@ Ieee1394Camera::captureBayerRGGB(Image<T>& image) const
 
       case MONO_16:
       {
-	const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf,
-					 &image[0][0], width());
+	const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf, &image[0][0],
+					 width());
 	int		v = 1;
 	while (v < image.height() - 1)	// 中間の行を処理．
 	{
@@ -1347,8 +1271,8 @@ Ieee1394Camera::captureBayerBGGR(Image<T>& image) const
 
       case MONO_16:
       {
-	const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf,
-					 &image[0][0], width());
+	const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf, &image[0][0],
+					 width());
 	int		v = 1;
 	while (v < image.height() - 1)	// 中間の行を処理．
 	{
@@ -1366,6 +1290,11 @@ Ieee1394Camera::captureBayerBGGR(Image<T>& image) const
 
     return *this;
 }
+#else
+struct RGB
+{
+    u_char	r, g, b;
+};
 #endif	// HAVE_TUToolsPP
 
 //! IEEE1394カメラから出力された画像1枚分のデータをなんら変換を行わずに取り込む
