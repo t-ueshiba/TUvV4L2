@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.5 2002-08-28 01:37:29 ueshiba Exp $
+#  $Id: Makefile,v 1.6 2002-12-18 06:07:05 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -20,7 +20,11 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		=
+EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
+		/home/ueshiba/include/TU/Image++.h \
+		/home/ueshiba/include/TU/Vector++.h \
+		/home/ueshiba/include/TU/types.h \
+		TU/S2200++.h
 HDRS		= S2200++.h
 SRCS		= S2200.cc
 OBJS		= S2200.o
@@ -28,7 +32,7 @@ OBJS		= S2200.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.5 $	|		\
+REV		= $(shell echo $Revision: 1.6 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -40,3 +44,6 @@ REV		= $(shell echo $Revision: 1.5 $	|		\
 include $(PROJECT)/lib/l.mk
 include $(PROJECT)/lib/RCS.mk
 ###
+S2200.o: TU/S2200++.h /home/ueshiba/include/TU/Image++.h \
+	/home/ueshiba/include/TU/Vector++.h \
+	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
