@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.8 2002-12-09 08:02:30 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.9 2002-12-10 08:16:05 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
@@ -22,9 +22,9 @@ static const u_int	One_Shot		= 0x61c;
 static const u_int	Mem_Save_Ch		= 0x620;
 static const u_int	Cur_Mem_Ch		= 0x624;
 
-static const quadlet_t	One_Push		= 0x1 << 26;
-static const quadlet_t	ON_OFF			= 0x1 << 25;
-static const quadlet_t	A_M_Mode		= 0x1 << 24;
+static const quadlet_t	One_Push		= 0x1u << 26;
+static const quadlet_t	ON_OFF			= 0x1u << 25;
+static const quadlet_t	A_M_Mode		= 0x1u << 24;
 
 // Video Mode CSR for Format_7.
 static const u_int	MAX_IMAGE_SIZE_INQ	= 0x000;
@@ -92,7 +92,7 @@ Ieee1394Camera&
 Ieee1394Camera::powerOn()
 {
     checkAvailability(Cam_Power_Cntl_Inq);
-    writeQuadletToRegister(Camera_Power, 0x1 << 31);
+    writeQuadletToRegister(Camera_Power, 0x1u << 31);
     return *this;
 }
 
@@ -371,18 +371,20 @@ Ieee1394Camera::FrameRate
 Ieee1394Camera::getFrameRate() const
 {
     return
-	uintToFrameRate(0x1 << 
+	uintToFrameRate(0x1u << 
 			(31 - ((readQuadletFromRegister(Cur_V_Frm_Rate) >> 29)
 			       & 0x7)));
 }
 
 //! 指定されたFormat_7タイプのフォーマットの内容を返す
 /*!
+  ただし，注目領域(ROI)の幅または高さが0の場合(カメラ電源投入直後など)は，
+  幅と高さをそれぞれの最小単位に設定し，その情報を返す．
   \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
   \return	 指定されたフォーマットの内容．
  */
 Ieee1394Camera::Format_7_Info
-Ieee1394Camera::getFormat_7_Info(Format format7) const
+Ieee1394Camera::getFormat_7_Info(Format format7)
 {
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
     quadlet_t		quad;
@@ -406,10 +408,17 @@ Ieee1394Camera::getFormat_7_Info(Format format7) const
     quad = readQuadlet(base + IMAGE_SIZE);
     fmt7info.width  = (quad & 0xffff0000) >> 16;
     fmt7info.height = (quad & 0xffff);
+    if (fmt7info.width == 0 || fmt7info.height == 0)
+    {
+	fmt7info.width  = fmt7info.unitWidth;
+	fmt7info.height = fmt7info.unitHeight;
+	writeQuadlet(base + IMAGE_SIZE, ((fmt7info.width << 16) & 0xffff0000) |
+					(fmt7info.height & 0xffff));
+    }
     quad = readQuadlet(base + COLOR_CODING_ID);
     if (quad > 31)
 	throw std::runtime_error("Ieee1394Camera::getFormat_7_Info: Sorry, unsupported COLOR_CODING_ID!!");
-    fmt7info.pixelFormat = uintToPixelFormat(0x1 << (31 - quad));
+    fmt7info.pixelFormat = uintToPixelFormat(0x1u << (31 - quad));
     quad = readQuadlet(base + COLOR_CODING_INQ);
     fmt7info.availablePixelFormats = quad | fmt7info.pixelFormat;
 
@@ -493,7 +502,7 @@ Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
   // pixel formatを指定する．
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
     u_int		colorCodingID = 0;
-    while ((0x1 << (31 - colorCodingID)) != pixelFormat)
+    while ((0x1u << (31 - colorCodingID)) != pixelFormat)
 	++colorCodingID;
     writeQuadlet(base + COLOR_CODING_ID, colorCodingID);
     if (getFormat() == format7)
@@ -519,13 +528,13 @@ Ieee1394Camera::inquireFeatureFunction(Feature feature) const
     if (n < 32)		// FEATURE_HI
     {
 	const u_int	Feature_Hi_Inq	= 0x404;
-	inq = readQuadletFromRegister(Feature_Hi_Inq) & (0x1 << (31 - n));
+	inq = readQuadletFromRegister(Feature_Hi_Inq) & (0x1u << (31 - n));
     }
     else		// FEATURE_LO
     {
 	const u_int	Feature_Lo_Inq	= 0x408;
 	n -= 32;
-	inq = readQuadletFromRegister(Feature_Lo_Inq) & (0x1 << (31 - n));
+	inq = readQuadletFromRegister(Feature_Lo_Inq) & (0x1u << (31 - n));
     }
     if (inq == 0)	// Check presence of feature.
 	return 0;
@@ -641,7 +650,7 @@ bool
 Ieee1394Camera::inOnePushOperation(Feature feature) const
 {
     checkAvailability(feature, One_Push);
-    return readQuadletFromRegister(feature) & (0x1 << 26);
+    return readQuadletFromRegister(feature) & (0x1u << 26);
 }
 
 //! 指定された属性がonになっているか調べる
@@ -653,7 +662,7 @@ bool
 Ieee1394Camera::isTurnedOn(Feature feature) const
 {
     checkAvailability(feature, OnOff);
-    return readQuadletFromRegister(feature) & (0x1 << 25);
+    return readQuadletFromRegister(feature) & (0x1u << 25);
 }
 
 //! 指定された属性が自動設定モードになっているか調べる
@@ -666,7 +675,7 @@ bool
 Ieee1394Camera::isAuto(Feature feature) const
 {
     checkAvailability(feature, Auto);
-    return readQuadletFromRegister(feature) & (0x1 << 24);
+    return readQuadletFromRegister(feature) & (0x1u << 24);
 }
 
 //! 指定された属性がとり得る値の範囲を調べる
@@ -755,7 +764,7 @@ Ieee1394Camera::getAimedTemperature() const
 Ieee1394Camera&
 Ieee1394Camera::setTriggerMode(TriggerMode mode)
 {
-    checkAvailability(TRIGGER_MODE, (0x1 << (15 - mode)));
+    checkAvailability(TRIGGER_MODE, (0x1u << (15 - mode)));
     writeQuadletToRegister(TRIGGER_MODE,
 			   (readQuadletFromRegister(TRIGGER_MODE) & ~0xf0000) |
 			   ((mode & 0xf) << 16));
@@ -782,7 +791,7 @@ Ieee1394Camera::getTriggerMode() const
 Ieee1394Camera&
 Ieee1394Camera::setTriggerPolarity(TriggerPolarity polarity)
 {
-    const quadlet_t	Polarity_Inq = 0x1 << 25;
+    const quadlet_t	Polarity_Inq = 0x1u << 25;
     checkAvailability(TRIGGER_MODE, Polarity_Inq);
     writeQuadletToRegister(TRIGGER_MODE, (readQuadletFromRegister(TRIGGER_MODE)
 					  & ~HighActiveInput) | polarity);
@@ -813,7 +822,7 @@ Ieee1394Camera&
 Ieee1394Camera::continuousShot()
 {
     if (!inContinuousShot())
-	writeQuadletToRegister(ISO_EN, 0x1 << 31);
+	writeQuadletToRegister(ISO_EN, 0x1u << 31);
     return *this;
 }
 
@@ -840,7 +849,7 @@ Ieee1394Camera::stopContinuousShot()
 bool
 Ieee1394Camera::inContinuousShot() const
 {
-    return readQuadletFromRegister(ISO_EN) & (0x1 << 31);
+    return readQuadletFromRegister(ISO_EN) & (0x1u << 31);
 }
 
 //! 画像を1枚だけ撮影してそれを出力する
@@ -855,7 +864,7 @@ Ieee1394Camera::oneShot()
 {
     checkAvailability(One_Shot_Inq);
     stopContinuousShot();
-    writeQuadletToRegister(One_Shot, 0x1 << 31);
+    writeQuadletToRegister(One_Shot, 0x1u << 31);
     return *this;
 }
 
@@ -872,7 +881,7 @@ Ieee1394Camera::multiShot(u_short nframes)
 {
     checkAvailability(Multi_Shot_Inq);
     stopContinuousShot();
-    writeQuadletToRegister(One_Shot, (0x1 << 30) | (nframes & 0xffff));
+    writeQuadletToRegister(One_Shot, (0x1u << 30) | (nframes & 0xffff));
     return *this;
 }
 
@@ -891,8 +900,8 @@ Ieee1394Camera::saveConfig(u_int mem_ch)
     if (mem_ch == 0 || mem_ch > max)
 	throw std::invalid_argument("TU::Ieee1394Camera::saveConfig: invalid memory channel!!");
     writeQuadletToRegister(Mem_Save_Ch, mem_ch << 28);
-    writeQuadletToRegister(Memory_Save, 0x1 << 31);
-    while ((readQuadletFromRegister(Memory_Save) & (0x1 << 31)) != 0)
+    writeQuadletToRegister(Memory_Save, 0x1u << 31);
+    while ((readQuadletFromRegister(Memory_Save) & (0x1u << 31)) != 0)
 	;
     return *this;
 }
@@ -1269,17 +1278,10 @@ Ieee1394Camera::getFormat_7_BaseAddr(Format format7) const
 u_int
 Ieee1394Camera::setFormat_7_PacketSize(Format format7)
 {
-    const quadlet_t	Presence    = 0x1 << 31;
-    const quadlet_t	Setting_1   = 0x1 << 30;
-    const quadlet_t	ErrorFlag_1 = 0x1 << 23;
-    const quadlet_t	ErrorFlag_2 = 0x1 << 22;
-
-  // 画像サイズが0なら，最小サイズを設定．
-    const Format_7_Info	fmt7info = getFormat_7_Info(format7);
-    if (fmt7info.width == 0 || fmt7info.height == 0)
-	setFormat_7_ROI(format7, fmt7info.u0, fmt7info.v0,
-			fmt7info.unitWidth, fmt7info.unitHeight);
-    
+    const quadlet_t	Presence    = 0x1u << 31;
+    const quadlet_t	Setting_1   = 0x1u << 30;
+    const quadlet_t	ErrorFlag_1 = 0x1u << 23;
+    const quadlet_t	ErrorFlag_2 = 0x1u << 22;
     const nodeaddr_t	base	= getFormat_7_BaseAddr(format7);
     const bool		present = readQuadlet(base + VALUE_SETTING) & Presence;
     if (present)
@@ -1317,11 +1319,11 @@ quadlet_t
 Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
 {
     const u_int		V_FORMAT_INQ	= 0x100;
-    const quadlet_t	Format_0	= 0x1 << 31;
-    const quadlet_t	Format_1	= 0x1 << 30;
-    const quadlet_t	Format_2	= 0x1 << 29;
-    const quadlet_t	Format_6	= 0x1 << 25;
-    const quadlet_t	Format_7	= 0x1 << 24;
+    const quadlet_t	Format_0	= 0x1u << 31;
+    const quadlet_t	Format_1	= 0x1u << 30;
+    const quadlet_t	Format_2	= 0x1u << 29;
+    const quadlet_t	Format_6	= 0x1u << 25;
+    const quadlet_t	Format_7	= 0x1u << 24;
     quadlet_t		inq		= 0;
     switch (format)	// Check presence of format.
     {
@@ -1373,14 +1375,14 @@ Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
     const u_int		V_MODE_INQ_2	= 0x188;
     const u_int		V_MODE_INQ_6	= 0x198;
     const u_int		V_MODE_INQ_7	= 0x19c;
-    const quadlet_t	Mode_0		= 0x1 << 31;
-    const quadlet_t	Mode_1		= 0x1 << 30;
-    const quadlet_t	Mode_2		= 0x1 << 29;
-    const quadlet_t	Mode_3		= 0x1 << 28;
-    const quadlet_t	Mode_4		= 0x1 << 27;
-    const quadlet_t	Mode_5		= 0x1 << 26;
-    const quadlet_t	Mode_6		= 0x1 << 25;
-    const quadlet_t	Mode_7		= 0x1 << 26;
+    const quadlet_t	Mode_0		= 0x1u << 31;
+    const quadlet_t	Mode_1		= 0x1u << 30;
+    const quadlet_t	Mode_2		= 0x1u << 29;
+    const quadlet_t	Mode_3		= 0x1u << 28;
+    const quadlet_t	Mode_4		= 0x1u << 27;
+    const quadlet_t	Mode_5		= 0x1u << 26;
+    const quadlet_t	Mode_6		= 0x1u << 25;
+    const quadlet_t	Mode_7		= 0x1u << 26;
     inq = 0;
     switch (format)	// Check presence of mode.
     {

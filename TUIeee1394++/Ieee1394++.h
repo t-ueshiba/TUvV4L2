@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.8 2002-12-09 08:02:30 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.9 2002-12-10 08:16:05 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -181,10 +181,10 @@ class Ieee1394Camera : public Ieee1394Node
       よって知ることができる．*/
     enum BasicFunction
     {
-	Advanced_Feature_Inq	= (0x1 << 31),	//!< カメラベンダ依存の機能
-	Cam_Power_Cntl_Inq	= (0x1 << 15),	//!< 電源on/offの制御
-	One_Shot_Inq		= (0x1 << 12),	//!< 画像1枚だけの撮影
-	Multi_Shot_Inq		= (0x1 << 11)	//!< 指定された枚数の撮影
+	Advanced_Feature_Inq	= (0x1u << 31),	//!< カメラベンダ依存の機能
+	Cam_Power_Cntl_Inq	= (0x1u << 15),	//!< 電源on/offの制御
+	One_Shot_Inq		= (0x1u << 12),	//!< 画像1枚だけの撮影
+	Multi_Shot_Inq		= (0x1u << 11)	//!< 指定された枚数の撮影
     };
 
   //! カメラが出力する画像の形式
@@ -228,25 +228,25 @@ class Ieee1394Camera : public Ieee1394Node
       によって知ることができる．*/
     enum FrameRate
     {
-	FrameRate_1_875	= (0x1 << 31),	//!< 1.875fps
-	FrameRate_3_75	= (0x1 << 30),	//!< 3.75fps
-	FrameRate_7_5	= (0x1 << 29),	//!< 7.5fps
-	FrameRate_15	= (0x1 << 28),	//!< 15fps
-	FrameRate_30	= (0x1 << 27),	//!< 30fps
-	FrameRate_60	= (0x1 << 26),	//!< 60fps
-	FrameRate_x	= (0x1 << 25)	//!< 特殊なフレームレート
+	FrameRate_1_875	= (0x1u << 31),	//!< 1.875fps
+	FrameRate_3_75	= (0x1u << 30),	//!< 3.75fps
+	FrameRate_7_5	= (0x1u << 29),	//!< 7.5fps
+	FrameRate_15	= (0x1u << 28),	//!< 15fps
+	FrameRate_30	= (0x1u << 27),	//!< 30fps
+	FrameRate_60	= (0x1u << 26),	//!< 60fps
+	FrameRate_x	= (0x1u << 25)	//!< 特殊なフレームレート
     };
     
   //! 出力画像の画素の形式
     enum PixelFormat
     {
-	MONO_8		= (0x1 << 31),	//!< Y(mono)	 8bit/pixel
-	YUV_411		= (0x1 << 30),	//!< YUV(4:1:1)	12bit/pixel
-	YUV_422		= (0x1 << 29),	//!< YUV(4:2:2)	16bit/pixel
-	YUV_444		= (0x1 << 28),	//!< YUV(4:4:4)	24bit/pixel
-	RGB_24		= (0x1 << 27),	//!< RGB	24bit/pixel
-	MONO_16		= (0x1 << 26),	//!< Y(mono16)	16bit/pixel
-	RGB_48		= (0x1 << 25)	//!< RGB	48bit/pixel
+	MONO_8		= (0x1u << 31),	//!< Y(mono)	 8bit/pixel
+	YUV_411		= (0x1u << 30),	//!< YUV(4:1:1)	12bit/pixel
+	YUV_422		= (0x1u << 29),	//!< YUV(4:2:2)	16bit/pixel
+	YUV_444		= (0x1u << 28),	//!< YUV(4:4:4)	24bit/pixel
+	RGB_24		= (0x1u << 27),	//!< RGB	24bit/pixel
+	MONO_16		= (0x1u << 26),	//!< Y(mono16)	16bit/pixel
+	RGB_48		= (0x1u << 25)	//!< RGB	48bit/pixel
     };
 
   //! 値を設定できるカメラの属性
@@ -278,13 +278,13 @@ class Ieee1394Camera : public Ieee1394Node
       て知ることができる．*/
     enum FeatureFunction
     {
-	Presence	= (0x1 << 31),	//!< この属性そのものをサポート
-      //Abs_Control	= (0x1 << 30),	//!< この属性を値によって制御可能
-	One_Push	= (0x1 << 28),	//!< one pushモードをサポート
-	ReadOut		= (0x1 << 27),	//!< この属性の値を読み出しが可能
-	OnOff		= (0x1 << 26),	//!< この属性のon/offが可能
-	Auto		= (0x1 << 25),	//!< この属性の値の自動設定が可能
-	Manual		= (0x1 << 24)	//!< この属性の値の手動設定が可能
+	Presence	= (0x1u << 31),	//!< この属性そのものをサポート
+      //Abs_Control	= (0x1u << 30),	//!< この属性を値によって制御可能
+	One_Push	= (0x1u << 28),	//!< one pushモードをサポート
+	ReadOut		= (0x1u << 27),	//!< この属性の値を読み出しが可能
+	OnOff		= (0x1u << 26),	//!< この属性のon/offが可能
+	Auto		= (0x1u << 25),	//!< この属性の値の自動設定が可能
+	Manual		= (0x1u << 24)	//!< この属性の値の手動設定が可能
     };
     
   //! カメラの外部トリガーモード
@@ -300,7 +300,7 @@ class Ieee1394Camera : public Ieee1394Node
     enum TriggerPolarity
     {
 	LowActiveInput	= 0,		//!< lowでトリガon
-	HighActiveInput	= (0x1 << 24)	//!< highでトリガon
+	HighActiveInput	= (0x1u << 24)	//!< highでトリガon
     };
 
   //! 本カメラがサポートするFormat_7に関する情報(getFormat_7_Info()で得られる)
@@ -352,7 +352,7 @@ class Ieee1394Camera : public Ieee1394Node
     PixelFormat		pixelFormat()				const	;
 
   // Format_7 stuffs.
-    Format_7_Info	getFormat_7_Info(Format format7)	const	;
+    Format_7_Info	getFormat_7_Info(Format format7)		;
     Ieee1394Camera&	setFormat_7_ROI(Format format7, 
 					u_int u0, u_int v0,
 					u_int width, u_int height)	;
@@ -489,7 +489,7 @@ Ieee1394Camera::checkAvailability(Format format, FrameRate rate) const
 	cerr << "Ieee1394Camera::checkAvailability: Incompatible combination of format[0x"
 	     << hex << format << "] and frame rate[0x" << rate << "]!!"
 	     << endl;
-  //	throw TUExceptionWithMessage("Ieee1394Camera::checkAvailability: Incompatible combination of frame rate and format!!");
+  //	throw runtime_error("Ieee1394Camera::checkAvailability: Incompatible combination of format and frame rate!!");
 }
 
 inline quadlet_t
@@ -501,10 +501,10 @@ Ieee1394Camera::checkAvailability(Feature feature, u_int inq) const
     if ((quad & inq) != inq)
 	cerr << "Ieee1394Camera::checkAvailability: This feature[0x"
 	     << hex << feature
-	     << "] is not present or this field is not available (quad: 0x"
+	     << "] is not present or this field is unavailable (quad: 0x"
 	     << quad << ", inq: " << inq << ")!!"
 	     << endl;
-  //	throw TUExceptionWithMessage("Ieee1394Camera::checkAvailability: This feature is not present or this field is not available!!");
+  //	throw runtime_error("Ieee1394Camera::checkAvailability: This feature is not present or this field is unavailable!!");
     return quad;
 }
 
@@ -518,7 +518,7 @@ Ieee1394Camera::checkAvailability(BasicFunction func) const
 	cerr << "Ieee1394Camera::checkAvailabilityOfBasicFuntion: This fucntion is not present (quad: 0x"
 	     << hex << quad << ", func: " << func << ")!!"
 	     << endl;
-  //	throw TUExceptionWithMessage("Ieee1394Camera::checkAvailabilityOfBasicFunction: This function is not present!!");
+  //	throw runtime_error("Ieee1394Camera::checkAvailabilityOfBasicFunction: This function is not present!!");
 }
 
 inline quadlet_t
