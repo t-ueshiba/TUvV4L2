@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.2 2002-07-26 08:59:31 ueshiba Exp $
+#  $Id: Makefile,v 1.3 2002-07-26 09:26:21 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -21,12 +21,13 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /Users/ueshiba/include/TU/Allocator++.cc \
-		/Users/ueshiba/include/TU/Allocator++.h \
-		/Users/ueshiba/include/TU/Array++.h \
-		/Users/ueshiba/include/TU/List++.cc \
-		/Users/ueshiba/include/TU/List++.h \
-		/Users/ueshiba/include/TU/types.h
+EXTHDRS		= /home1/ueshiba/include/TU/Allocator++.cc \
+		/home1/ueshiba/include/TU/Allocator++.h \
+		/home1/ueshiba/include/TU/Array++.cc \
+		/home1/ueshiba/include/TU/Array++.h \
+		/home1/ueshiba/include/TU/List++.cc \
+		/home1/ueshiba/include/TU/List++.h \
+		/home1/ueshiba/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -34,7 +35,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.2 $	|		\
+REV		= $(shell echo $Revision: 1.3 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -46,8 +47,9 @@ REV		= $(shell echo $Revision: 1.2 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-main.o: /Users/ueshiba/include/TU/Allocator++.h \
-	/Users/ueshiba/include/TU/List++.h \
-	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/Allocator++.cc \
-	/Users/ueshiba/include/TU/List++.cc
+main.o: /home1/ueshiba/include/TU/Allocator++.h \
+	/home1/ueshiba/include/TU/List++.h \
+	/home1/ueshiba/include/TU/Array++.h /home1/ueshiba/include/TU/types.h \
+	/home1/ueshiba/include/TU/Allocator++.cc \
+	/home1/ueshiba/include/TU/List++.cc \
+	/home1/ueshiba/include/TU/Array++.cc
