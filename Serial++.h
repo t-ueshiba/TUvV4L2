@@ -1,5 +1,5 @@
 /*
- *  $Id: Serial++.h,v 1.4 2002-07-26 08:59:31 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.5 2002-12-18 05:46:12 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
@@ -198,7 +198,7 @@ class TriggerGenerator : public Serial
  
 }
 
-#ifdef __GNUG__
+#if defined __GNUG__ || __INTEL_COMPILER
 #  include "TU/Geometry++.cc"
 #endif
 

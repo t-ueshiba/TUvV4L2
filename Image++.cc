@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.3 2002-08-19 07:52:27 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.4 2002-12-18 05:46:12 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef WIN32
@@ -181,15 +181,9 @@ Image<T>::_height() const
 }
 
 template <class T> void
-Image<T>::resize(u_int h, u_int w)
+Image<T>::_resize(u_int h, u_int w)
 {
     Array2<ImageLine<T> >::resize(h, w);
-}
-
-template <class T> void
-Image<T>::resize(T* p, u_int h, u_int w)
-{
-    Array2<ImageLine<T> >::resize(p, h, w);
 }
  
 }

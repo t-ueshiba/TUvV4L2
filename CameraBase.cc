@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraBase.cc,v 1.3 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: CameraBase.cc,v 1.4 2002-12-18 05:46:12 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 
@@ -74,15 +74,17 @@ CameraBase::jacobianP(const Vector<double>& x) const
 std::istream&
 CameraBase::get(std::istream& in)
 {
-    in >> _t >> _Rt;
+    Vector<double>	axis;
+    in >> _t >> axis;
+    _Rt = Matrix<double>::Rt(axis);
     return intrinsic().get(in);
 }
 
 std::ostream&
 CameraBase::put(std::ostream& out) const
 {
-    std::cerr << "Position:\n";    out << _t;
-    std::cerr << "Rotation:\n";    out << _Rt;
+    std::cerr << "Position:       ";    out << _t;
+    std::cerr << "Rotation:       ";    out << _Rt.rot2axis();
     return intrinsic().put(out);
 }
 

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.4 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.5 2002-12-18 05:46:12 ueshiba Exp $
  */
 #ifdef WIN32
 #  include <winsock2.h>
@@ -146,7 +146,7 @@ ImageBase::restoreHeader(std::istream& in)
     u_int	w, h;
     in >> w;
     in >> h;
-    resize(h, w);				// set width & height
+    _resize(h, w);				// set width & height
     in >> w >> ign;				// skip MaxValue
 
     switch (magic)

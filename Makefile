@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.12 2002-09-02 10:10:49 ueshiba Exp $
+#  $Id: Makefile,v 1.13 2002-12-18 05:46:12 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -83,7 +83,6 @@ SRCS		= Allocator++.cc \
 		Heap++.cc \
 		Image++.cc \
 		Image++.inst.cc \
-		Image.cc \
 		ImageBase.cc \
 		ImageLine.cc \
 		List++.cc \
@@ -100,7 +99,8 @@ SRCS		= Allocator++.cc \
 		TriggerGenerator.cc \
 		Vector++.cc \
 		Vector++.inst.cc \
-		manipulators.cc
+		manipulators.cc \
+		strtoull.c
 OBJS		= Allocator++.o \
 		Array++.o \
 		Array++.inst.o \
@@ -119,7 +119,6 @@ OBJS		= Allocator++.o \
 		Heap++.o \
 		Image++.o \
 		Image++.inst.o \
-		Image.o \
 		ImageBase.o \
 		ImageLine.o \
 		List++.o \
@@ -136,12 +135,13 @@ OBJS		= Allocator++.o \
 		TriggerGenerator.o \
 		Vector++.o \
 		Vector++.inst.o \
-		manipulators.o
+		manipulators.o \
+		strtoull.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.12 $	|		\
+REV		= $(shell echo $Revision: 1.13 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -186,8 +186,6 @@ Image++.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Image++.cc TU/Image++.h TU/TU/TU/Vector++.h
-Image.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Array++.cc
 ImageBase.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h TU/Manip.h /usr/local/VVV/include/epbm.h \
 	/usr/local/VVV/include/vvvconf.h /usr/local/VVV/include/vvvstd.h \
