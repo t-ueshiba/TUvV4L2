@@ -1,5 +1,5 @@
 /*
- *  $Id: ChoiceMenuButtonCmd_.h,v 1.1.1.1 2002-07-25 02:14:17 ueshiba Exp $
+ *  $Id: ChoiceMenuButtonCmd_.h,v 1.2 2002-07-25 02:38:10 ueshiba Exp $
  */
 #ifndef __TUvChoiceMenuButtonCmd_h
 #define __TUvChoiceMenuButtonCmd_h

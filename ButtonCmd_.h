@@ -1,5 +1,5 @@
 /*
- *  $Id: ButtonCmd_.h,v 1.1.1.1 2002-07-25 02:14:17 ueshiba Exp $
+ *  $Id: ButtonCmd_.h,v 1.2 2002-07-25 02:38:09 ueshiba Exp $
  */
 #ifndef __TUvButtonCmd_h
 #define __TUvButtonCmd_h

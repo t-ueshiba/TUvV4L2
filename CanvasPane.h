@@ -1,5 +1,5 @@
 /*
- *  $Id: CanvasPane.h,v 1.1.1.1 2002-07-25 02:14:17 ueshiba Exp $
+ *  $Id: CanvasPane.h,v 1.2 2002-07-25 02:38:09 ueshiba Exp $
  */
 #ifndef __TUvCanvasPane_h
 #define __TUvCanvasPane_h

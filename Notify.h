@@ -1,5 +1,5 @@
 /*
- *  $Id: Notify.h,v 1.1.1.1 2002-07-25 02:14:18 ueshiba Exp $
+ *  $Id: Notify.h,v 1.2 2002-07-25 02:38:12 ueshiba Exp $
  */
 #ifndef __TUvNotify_h
 #define __TUvNotify_h

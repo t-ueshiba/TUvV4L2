@@ -1,5 +1,5 @@
 /*
- *  $Id: Widget-Xaw.h,v 1.1.1.1 2002-07-25 02:14:18 ueshiba Exp $
+ *  $Id: Widget-Xaw.h,v 1.2 2002-07-25 02:38:13 ueshiba Exp $
  */
 class Widget
 {

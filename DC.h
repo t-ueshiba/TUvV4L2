@@ -1,5 +1,5 @@
 /*
- *  $Id: DC.h,v 1.1.1.1 2002-07-25 02:14:17 ueshiba Exp $
+ *  $Id: DC.h,v 1.2 2002-07-25 02:38:10 ueshiba Exp $
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h

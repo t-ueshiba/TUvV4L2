@@ -1,5 +1,5 @@
 /*
- *  $Id: MenuButtonCmd.cc,v 1.1.1.1 2002-07-25 02:14:17 ueshiba Exp $
+ *  $Id: MenuButtonCmd.cc,v 1.2 2002-07-25 02:38:12 ueshiba Exp $
  */
 #include "MenuButtonCmd_.h"
 

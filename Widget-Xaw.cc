@@ -1,5 +1,5 @@
 /*
- *  $Id: Widget-Xaw.cc,v 1.1.1.1 2002-07-25 02:14:17 ueshiba Exp $
+ *  $Id: Widget-Xaw.cc,v 1.2 2002-07-25 02:38:13 ueshiba Exp $
  */
 #include "TU/v/TUv++.h"
 #include <X11/Xaw3d/ThreeD.h>
