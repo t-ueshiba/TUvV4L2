@@ -1,5 +1,5 @@
 /*
- *  $Id: XvDC.cc,v 1.2 2002-07-25 02:38:09 ueshiba Exp $
+ *  $Id: XvDC.cc,v 1.3 2002-12-18 06:09:39 ueshiba Exp $
  */
 #include "TU/v/XvDC.h"
 #include <stdexcept>
@@ -247,6 +247,3 @@ XvDC::grabPort(XvPortID base_id, u_long num_ports)
  
 }
 }
-#ifdef __GNUG__
-#  include "TU/List++.cc"
-#endif
