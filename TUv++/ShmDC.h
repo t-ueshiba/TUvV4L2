@@ -1,5 +1,5 @@
 /*
- *  $Id: ShmDC.h,v 1.1.1.1 2002-07-25 02:14:18 ueshiba Exp $
+ *  $Id: ShmDC.h,v 1.2 2002-07-25 02:38:12 ueshiba Exp $
  */
 #ifndef __TUvShmDC_h
 #define __TUvShmDC_h

@@ -1,5 +1,5 @@
 /*
- *  $Id: XilXglDC.h,v 1.1.1.1 2002-07-25 02:14:17 ueshiba Exp $
+ *  $Id: XilXglDC.h,v 1.2 2002-07-25 02:38:08 ueshiba Exp $
  */
 #ifndef __TUvXilXglDC_h
 #define __TUvXilXglDC_h

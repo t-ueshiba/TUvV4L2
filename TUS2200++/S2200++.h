@@ -1,5 +1,5 @@
 /*
- *  $Id: S2200++.h,v 1.1.1.1 2002-07-25 02:14:16 ueshiba Exp $
+ *  $Id: S2200++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
  */
 #ifndef __TUS2200PP_h
 #define __TUS2200PP_h

@@ -1,5 +1,5 @@
 /*
- *  $Id: Bezier++.h,v 1.1.1.1 2002-07-25 02:14:16 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h

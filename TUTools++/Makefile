@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1.1.1 2002-07-25 02:14:16 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -141,7 +141,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1.1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

@@ -1,5 +1,5 @@
 /*
- *  $Id: PointB.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: PointB.cc,v 1.2 2002-07-25 02:37:36 ueshiba Exp $
  */
 #include "TU/Brep/Brep++.h"
 

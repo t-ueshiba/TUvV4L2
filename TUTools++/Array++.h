@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.h,v 1.1.1.1 2002-07-25 02:14:16 ueshiba Exp $
+ *  $Id: Array++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h

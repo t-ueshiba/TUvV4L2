@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry.cc,v 1.1.1.1 2002-07-25 02:14:14 ueshiba Exp $
+ *  $Id: Geometry.cc,v 1.2 2002-07-25 02:37:35 ueshiba Exp $
  */
 #include "TU/Brep/Brep++.h"
 

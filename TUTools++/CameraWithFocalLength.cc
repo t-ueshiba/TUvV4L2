@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithFocalLength.cc,v 1.1.1.1 2002-07-25 02:14:16 ueshiba Exp $
+ *  $Id: CameraWithFocalLength.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
