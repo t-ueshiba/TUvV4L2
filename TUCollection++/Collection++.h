@@ -1,5 +1,5 @@
 /*
- *  $Id: Collection++.h,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: Collection++.h,v 1.3 2002-07-25 18:45:57 ueshiba Exp $
  */
 #ifndef __TUCollectionPP_h
 #define __TUCollectionPP_h
@@ -87,7 +87,7 @@ ObjList<T>::ObjList(T* p, ObjList<T>* next)
 
 template <class T> const Object::Desc
 ObjList<T>::_desc(id_List, 0, ObjList<T>::newObject,
-		  &ObjList<T>::_p, &ObjList<T>::_next, 0);
+		  &ObjList<T>::_p, &ObjList<T>::_next, MbrpEnd);
 
 /************************************************************************
 *  class ObjDList							*
@@ -177,7 +177,7 @@ ObjDList<T>::ObjDList(T* p, ObjDList<T>* prev, ObjDList<T>* next)
 template <class T> const Object::Desc
 ObjDList<T>::_desc(id_DList, 0, ObjDList<T>::newObject,
 		   &ObjDList<T>::_p, &ObjDList<T>::_next, &ObjDList<T>::_prev,
-		   0);
+		   MbrpEnd);
 
 /************************************************************************
 *  class ObjTree							*
