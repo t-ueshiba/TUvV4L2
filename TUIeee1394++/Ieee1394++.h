@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.4 2002-08-02 02:14:54 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.5 2002-08-14 05:21:20 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -122,7 +122,7 @@ class Ieee1394Node
   /*!
     \return	受信用バッファ1つあたりのサイズ(単位: byte)
    */
-    u_int	getBufferSize()			const	{return _buf_size;}
+    u_int	bufferSize()			const	{return _buf_size;}
     u_int64	globalUniqueId()		const	;
     
   protected:

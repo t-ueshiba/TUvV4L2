@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.4 2002-08-02 02:14:54 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.5 2002-08-14 05:21:20 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
@@ -1018,7 +1018,7 @@ Ieee1394Camera::captureRaw(void* image) const
     if (_buf == 0)
 	throw std::runtime_error("TU::Ieee1394Camera::captureRaw: no images snapped!!");
   // Transfer image data from current buffer.
-    memcpy(image, _buf, getBufferSize());
+    memcpy(image, _buf, bufferSize());
 
     return *this;
 }

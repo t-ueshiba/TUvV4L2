@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2002-08-14 05:21:36 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -40,7 +40,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1.1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -50,8 +50,7 @@ REV		= $(shell echo $Revision: 1.1.1.1 $	|		\
 		  }')
 
 include $(PROJECT)/lib/p.mk
-include $(PROJECT)/lib/RCS.mk
-include $(PROJECT)/lib/install-srcs.mk
+include $(PROJECT)/lib/p-install-srcs.mk
 ###
 My1394Camera.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
 	/home/ueshiba/include/TU/Image++.h \
