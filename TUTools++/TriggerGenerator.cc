@@ -1,12 +1,14 @@
 /*
- *  $Id: TriggerGenerator.cc,v 1.2 2002-07-25 02:38:07 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
  */
 #include <iomanip>
-#include <cstdlib>
 #include "TU/Serial++.h"
 
 namespace TU
 {
+#ifndef sgi
+    using namespace	std;
+#endif
 /************************************************************************
 *  class TriggerGenerator						*
 ************************************************************************/
@@ -15,13 +17,13 @@ TriggerGenerator::TriggerGenerator(const char* ttyname)
 {
     *this >> through << through
 	  << baud(9600) << csize(8) << noparity << stop1;
-    setf(std::ios::uppercase);
+    setf(ios::uppercase);
 }
 
 TriggerGenerator&
 TriggerGenerator::showId(std::ostream& o)
 {
-    *this << 'V' << std::endl;
+    *this << 'V' << endl;
     for (char c; get(c); )
     {
 	o << c;
@@ -34,8 +36,6 @@ TriggerGenerator::showId(std::ostream& o)
 TriggerGenerator&
 TriggerGenerator::selectChannel(u_int channel)
 {
-    using namespace	std;
-    
     setf(ios::hex, ios::basefield);
     *this << 'A';
     width(8);
@@ -48,8 +48,6 @@ TriggerGenerator::selectChannel(u_int channel)
 TriggerGenerator&
 TriggerGenerator::setInterval(u_int interval)
 {
-    using namespace	std;
-    
     if (10 <= interval && interval <= 255)
     {
 	setf(ios::dec, ios::basefield);
@@ -62,7 +60,7 @@ TriggerGenerator::setInterval(u_int interval)
 TriggerGenerator&
 TriggerGenerator::oneShot()
 {
-    *this << 'T' << std::endl;
+    *this << 'T' << endl;
     *this >> ign;
     return *this;
 }
@@ -70,7 +68,7 @@ TriggerGenerator::oneShot()
 TriggerGenerator&
 TriggerGenerator::continuousShot()
 {
-    *this << 'R' << std::endl;
+    *this << 'R' << endl;
     *this >> ign;
     return *this;
 }
@@ -78,7 +76,7 @@ TriggerGenerator::continuousShot()
 TriggerGenerator&
 TriggerGenerator::stopContinuousShot()
 {
-    *this << 'S' << std::endl;
+    *this << 'S' << endl;
     *this >> ign;
     return *this;
 }
@@ -86,8 +84,6 @@ TriggerGenerator::stopContinuousShot()
 int
 TriggerGenerator::getConfiguration(u_int& channel, u_int& interval)
 {
-    using namespace	std;
-    
     *this << 'I' << endl;
     char	token[64];
     for (char c, *p = token; get(c); )

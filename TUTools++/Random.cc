@@ -1,8 +1,8 @@
 /*
- *  $Id: Random.cc,v 1.2 2002-07-25 02:38:06 ueshiba Exp $
+ *  $Id: Random.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
  */
 #include <time.h>
-#include <cmath>
+#include <math.h>
 #include "TU/Random.h"
 #include <stdexcept>
 
@@ -89,6 +89,8 @@ Random::uniform48()
 double
 Random::gaussian(double (Random::*uni)())
 {
+    using namespace	std;
+    
     if (!_has_extra)
     {
 	double	v0, v1, r;
@@ -98,7 +100,7 @@ Random::gaussian(double (Random::*uni)())
 	    v1 = 2.0 * (this->*uni)() - 1.0;		// -1 <= v1 < 1
 	    r  = v0*v0 + v1*v1;
 	} while (r >= 1.0);
-	double	fac = std::sqrt(-2.0 * std::log(r) / r);
+	double	fac = sqrt(-2.0 * log(r) / r);
 	_extra = v0 * fac;
 	_has_extra = 1;
 	return v1 * fac;

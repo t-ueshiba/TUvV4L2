@@ -1,5 +1,5 @@
 /*
- *  $Id: Microscope.cc,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
+ *  $Id: Microscope.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 #include <stdexcept>
@@ -7,34 +7,37 @@
 
 namespace TU
 {
+#ifndef sgi
+    using namespace	std;
+#endif
 /************************************************************************
 *  Static functions							*
 ************************************************************************/ 
 static inline Microscope&
 operator <<(Microscope& ms, char c)
 {
-    ms.std::ostream::operator <<(c);
+    ms.fstream::operator <<(c);
     return ms;
 }
 
 static inline Microscope&
 operator <<(Microscope& ms, int i)
 {
-    ms.std::ostream::operator <<(i);
+    ms.fstream::operator <<(i);
     return ms;
 }
 
 static inline Microscope&
 operator <<(Microscope& ms, const char* s)
 {
-    ms.std::ostream::operator <<(s);
+    ms.fstream::operator <<(s);
     return ms;
 }
     
 static Microscope&
 endc(Microscope& ms)
 {
-    ms << std::endl;
+    ms << endl;
     if (ms.get() == 'N')
 	throw std::runtime_error("TU::endc: error happened!");
     ms >> skipl;
