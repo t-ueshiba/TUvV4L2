@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.3 2002-08-01 05:03:15 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
@@ -86,8 +86,7 @@ struct Mono16
 			一番最初にみつかったものがこのオブジェクトと結び
 			つけられる．
 */
-Ieee1394Camera::Ieee1394Camera(Ieee1394Port& prt, u_int ch,
-				   u_int64 uniqId)
+Ieee1394Camera::Ieee1394Camera(Ieee1394Port& prt, u_int ch, u_int64 uniqId)
     :Ieee1394Node(prt, unit_spec_ID, ch, 1, VIDEO1394_SYNC_FRAMES, uniqId),
      _cmdRegBase(CSR_REGISTER_BASE
 		 + 4 * int64_t(readValueFromUnitDependentDirectory(0x40))),
@@ -117,7 +116,7 @@ Ieee1394Camera::~Ieee1394Camera()
 Ieee1394Camera&
 Ieee1394Camera::powerOn()
 {
-    checkAvailabilityOfBasicFunction(Cam_Power_Cntl_Inq);
+    checkAvailability(Cam_Power_Cntl);
     writeQuadletToRegister(Camera_Power, 0x1 << 31);
     return *this;
 }
@@ -129,50 +128,52 @@ Ieee1394Camera::powerOn()
 Ieee1394Camera&
 Ieee1394Camera::powerOff()
 {
-    checkAvailabilityOfBasicFunction(Cam_Power_Cntl_Inq);
+    checkAvailability(Cam_Power_Cntl);
     writeQuadletToRegister(Camera_Power, 0x00000000);
     return *this;
 }
 
-//! ある画像フォーマットがこのIEEE1394カメラによってサポートされているか調べる
+//! 指定された画像フォーマットにおいてサポートされているフレームレートを調べる
 /*!
-  \param format	サポートされているか調べたいフォーマット．
-  \return	4 byteの整数．
+  \param format	対象となるフォーマット．
+  \return	サポートされているフレームレートを#FrameRate型の列挙値
+		のorとして返す．指定されたフォーマット自体がこのカメラでサ
+		ポートされていなければ，0が返される．
 */
 quadlet_t
-Ieee1394Camera::inquireFormat(Format format) const
+Ieee1394Camera::inquireFrameRate(Format format) const
 {
     quadlet_t	inq = 0;
 
     switch (format)	// Check presence of format.
     {
-      case Format_0_0:
-      case Format_0_1:
-      case Format_0_2:
-      case Format_0_3:
-      case Format_0_4:
-      case Format_0_5:
-      case Format_0_6:
+      case YUV444_160x120:
+      case YUV422_320x240:
+      case YUV411_640x480:
+      case YUV422_640x480:
+      case RGB24_640x480:
+      case MONO8_640x480:
+      case MONO16_640x480:
 	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_0;
 	break;
-      case Format_1_0:
-      case Format_1_1:
-      case Format_1_2:
-      case Format_1_3:
-      case Format_1_4:
-      case Format_1_5:
-      case Format_1_6:
-      case Format_1_7:
+      case YUV422_800x600:
+      case RGB24_800x600:
+      case MONO8_800x600:
+      case YUV422_1024x768:
+      case RGB24_1024x768:
+      case MONO8_1024x768:
+      case MONO16_800x600:
+      case MONO16_1024x768:
 	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_1;
 	break;
-      case Format_2_0:
-      case Format_2_1:
-      case Format_2_2:
-      case Format_2_3:
-      case Format_2_4:
-      case Format_2_5:
-      case Format_2_6:
-      case Format_2_7:
+      case YUV422_1280x960:
+      case RGB24_1280x960:
+      case MONO8_1280x960:
+      case YUV422_1600x1200:
+      case RGB24_1600x1200:
+      case MONO8_1600x1200:
+      case MONO16_1280x960:
+      case MONO16_1600x1200:
 	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_2;
 	break;
       case Format_7_0:
@@ -192,73 +193,73 @@ Ieee1394Camera::inquireFormat(Format format) const
     inq = 0;
     switch (format)	// Check presence of mode.
     {
-      case Format_0_0:
+      case YUV444_160x120:
 	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_0;
 	break;
-      case Format_0_1:
+      case YUV422_320x240:
 	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_1;
 	break;
-      case Format_0_2:
+      case YUV411_640x480:
 	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_2;
 	break;
-      case Format_0_3:
+      case YUV422_640x480:
 	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_3;
 	break;
-      case Format_0_4:
+      case RGB24_640x480:
 	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_4;
 	break;
-      case Format_0_5:
+      case MONO8_640x480:
 	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_5;
 	break;
-      case Format_0_6:
+      case MONO16_640x480:
 	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_6;
 	break;
-      case Format_1_0:
+      case YUV422_800x600:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_0;
 	break;
-      case Format_1_1:
+      case RGB24_800x600:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_1;
 	break;
-      case Format_1_2:
+      case MONO8_800x600:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_2;
 	break;
-      case Format_1_3:
+      case YUV422_1024x768:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_3;
 	break;
-      case Format_1_4:
+      case RGB24_1024x768:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_4;
 	break;
-      case Format_1_5:
+      case MONO8_1024x768:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_5;
 	break;
-      case Format_1_6:
+      case MONO16_800x600:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_6;
 	break;
-      case Format_1_7:
+      case MONO16_1024x768:
 	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_7;
 	break;
-      case Format_2_0:
+      case YUV422_1280x960:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_0;
 	break;
-      case Format_2_1:
+      case RGB24_1280x960:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_1;
 	break;
-      case Format_2_2:
+      case MONO8_1280x960:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_2;
 	break;
-      case Format_2_3:
+      case YUV422_1600x1200:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_3;
 	break;
-      case Format_2_4:
+      case RGB24_1600x1200:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_4;
 	break;
-      case Format_2_5:
+      case MONO8_1600x1200:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_5;
 	break;
-      case Format_2_6:
+      case MONO16_1280x960:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_6;
 	break;
-      case Format_2_7:
+      case MONO16_1600x1200:
 	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_7;
 	break;
       case Format_7_0:
@@ -304,13 +305,16 @@ Ieee1394Camera&
 Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 {
     checkAvailability(format, rate);
-    const u_int	fmt  = (u_int(format) - u_int(Format_0_0)) / 0x20,
-		mode = (u_int(format) - u_int(Format_0_0)) % 0x20 / 4;
+    const u_int	fmt  = (u_int(format) - u_int(YUV444_160x120)) / 0x20,
+		mode = (u_int(format) - u_int(YUV444_160x120)) % 0x20 / 4;
     const bool	cont = inContinuousShot();
     
     if (cont)
 	stopContinuousShot();
-    writeQuadletToRegister(Cur_V_Frm_Rate, rate << 29);
+    u_int	rt = 0;
+    for (u_int bit = FrameRate_1_875; bit != rate; bit >>= 1)
+	++rt;
+    writeQuadletToRegister(Cur_V_Frm_Rate, rt   << 29);
     writeQuadletToRegister(Cur_V_Mode,	   mode << 29);
     writeQuadletToRegister(Cur_V_Format,   fmt  << 29);
 
@@ -318,149 +322,149 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
     u_int	packet_size = 0;
     switch (format)
     {
-      case Format_0_0:	// 160x120 YUV(4:4:4)
+      case YUV444_160x120:
 	_w = 160;
 	_h = 120;
 	_p = YUV_444;
 	packet_size = 120 * sizeof(quadlet_t);
 	break;
-      case Format_0_1:	// 320x240 YUV(4:2:2)
+      case YUV422_320x240:
 	_w = 320;
 	_h = 240;
 	_p = YUV_422;
 	packet_size = 320 * sizeof(quadlet_t);
 	break;
-      case Format_0_2:	// 640x480 YUV(4:1:1)
+      case YUV411_640x480:
 	_w = 640;
 	_h = 480;
 	_p = YUV_411;
 	packet_size = 960 * sizeof(quadlet_t);
 	break;
-      case Format_0_3:	// 640x480 YUV(4:2:2)
+      case YUV422_640x480:
 	_w = 640;
 	_h = 480;
 	_p = YUV_422;
 	packet_size = 1280 * sizeof(quadlet_t);
 	break;
-      case Format_0_4:	// 640x480 RGB
+      case RGB24_640x480:
 	_w = 640;
 	_h = 480;
 	_p = RGB_24;
 	packet_size = 1920 * sizeof(quadlet_t);
 	break;
-      case Format_0_5:	// 640x480 Y(mono)
+      case MONO8_640x480:
 	_w = 640;
 	_h = 480;
 	_p = MONO;
 	packet_size = 640 * sizeof(quadlet_t);
 	break;
-      case Format_0_6:	// 640x480 Y(mono16)
+      case MONO16_640x480:
 	_w = 640;
 	_h = 480;
 	_p = MONO_16;
 	packet_size = 1280 * sizeof(quadlet_t);
 	break;
-      case Format_1_0:	// 800x600 YUV(4:2:2)
+      case YUV422_800x600:
 	_w = 800;
 	_h = 600;
 	_p = YUV_422;
 	packet_size = 2000 * sizeof(quadlet_t);
 	break;
-      case Format_1_1:	// 800x600 RGB
+      case RGB24_800x600:
 	_w = 800;
 	_h = 600;
 	_p = RGB_24;
 	packet_size = 3000 * sizeof(quadlet_t);
 	break;
-      case Format_1_2:	// 800x600 Y(mono)
+      case MONO8_800x600:
 	_w = 800;
 	_h = 600;
 	_p = MONO;
 	packet_size = 1000 * sizeof(quadlet_t);
 	break;
-      case Format_1_3:	// 1024x768 YUV(4:2:2)
+      case YUV422_1024x768:
 	_w = 1024;
 	_h = 768;
 	_p = YUV_422;
 	packet_size = 3072 * sizeof(quadlet_t);
 	break;
-      case Format_1_4:	// 1024x768 RGB
+      case RGB24_1024x768:
 	_w = 1024;
 	_h = 768;
 	_p = RGB_24;
 	packet_size = 4608 * sizeof(quadlet_t);
 	break;
-      case Format_1_5:	// 1024x768 Y(mono)
+      case MONO8_1024x768:
 	_w = 1024;
 	_h = 768;
 	_p = MONO;
 	packet_size = 1536 * sizeof(quadlet_t);
 	break;
-      case Format_1_6:	// 800x600 Y(mono16)
+      case MONO16_800x600:
 	_w = 800;
 	_h = 600;
 	_p = MONO_16;
 	packet_size = 2000 * sizeof(quadlet_t);
 	break;
-      case Format_1_7:	// 1024x768 Y(mono16)
+      case MONO16_1024x768:
 	_w = 1024;
 	_h = 768;
 	_p = MONO_16;
 	packet_size = 3072 * sizeof(quadlet_t);
 	break;
-      case Format_2_0:	// 1280x960 YUV(4:2:2)
+      case YUV422_1280x960:
 	_w = 1280;
 	_h = 960;
 	_p = YUV_422;
 	packet_size = 5120 * sizeof(quadlet_t);
 	break;
-      case Format_2_1:	// 1280x960 RGB
+      case RGB24_1280x960:
 	_w = 1280;
 	_h = 960;
 	_p = RGB_24;
 	packet_size = 7680 * sizeof(quadlet_t);
 	break;
-      case Format_2_2:	// 1280x960 Y(mono)
+      case MONO8_1280x960:
 	_w = 1280;
 	_h = 960;
 	_p = MONO;
 	packet_size = 2560 * sizeof(quadlet_t);
 	break;
-      case Format_2_3:	// 1600x1200 YUV(4:2:2)
+      case YUV422_1600x1200:
 	_w = 1600;
 	_h = 1200;
 	_p = YUV_422;
 	packet_size = 8000 * sizeof(quadlet_t);
 	break;
-      case Format_2_4:	// 1600x1200 RGB
+      case RGB24_1600x1200:
 	_w = 1600;
 	_h = 1200;
 	_p = RGB_24;
 	packet_size = 12000 * sizeof(quadlet_t);
 	break;
-      case Format_2_5:	// 1600x1200 Y(mono)
+      case MONO8_1600x1200:
 	_w = 1600;
 	_h = 1200;
 	_p = MONO;
 	packet_size = 4000 * sizeof(quadlet_t);
 	break;
-      case Format_2_6:	// 1280x960 Y(mono16)
+      case MONO16_1280x960:
 	_w = 1280;
 	_h = 960;
 	_p = MONO_16;
 	packet_size = 5120 * sizeof(quadlet_t);
 	break;
-      case Format_2_7:	// 1600x1200 Y(mono16)
+      case MONO16_1600x1200:
 	_w = 1600;
 	_h = 1200;
 	_p = MONO_16;
 	packet_size = 8000 * sizeof(quadlet_t);
 	break;
       default:
-	throw std::invalid_argument("Ieee1394Camera::setFormat: unknwon format!!");
+	throw std::invalid_argument("Ieee1394Camera::setFormat: not implemented format!!");
 	break;
     }
-    packet_size >>= (5 - rate);
+    packet_size >>= (5 - rt);
     u_int	buf_size = _w * _h;
     switch (_p)
     {
@@ -492,7 +496,7 @@ Ieee1394Camera::Format
 Ieee1394Camera::getFormat() const
 {
     return
-	uintToFormat(Format_0_0 +
+	uintToFormat(YUV444_160x120 +
 		     ((readQuadletFromRegister(Cur_V_Mode)  >>29) & 0x7)*4 + 
 		     ((readQuadletFromRegister(Cur_V_Format)>>29) & 0x7)*0x20);
 }
@@ -505,17 +509,19 @@ Ieee1394Camera::FrameRate
 Ieee1394Camera::getFrameRate() const
 {
     return
-	uintToFrameRate((readQuadletFromRegister(Cur_V_Frm_Rate) >> 29) & 0x7);
+	uintToFrameRate(0x1 << 
+			(31 - ((readQuadletFromRegister(Cur_V_Frm_Rate) >> 29)
+			       & 0x7)));
 }
 
-//! ある属性についてカメラがサポートしている機能を表すビットパターンを返す
+//! 指定された属性においてカメラがサポートする機能を返す
 /*!
   \param feature	対象となる属性．
-  \return		サポートされている機能を#InquireFeature型の列挙値
+  \return		サポートされている機能を#FeatureFunction型の列挙値
 			のorとして返す．
  */
 quadlet_t
-Ieee1394Camera::inquireFeature(Feature feature) const
+Ieee1394Camera::inquireFeatureFunction(Feature feature) const
 {
     u_int	n = (u_int(feature) - 0x800) >> 2;
     quadlet_t	inq = 0;
@@ -542,7 +548,7 @@ Ieee1394Camera::inquireFeature(Feature feature) const
 Ieee1394Camera&
 Ieee1394Camera::onePush(Feature feature)
 {
-    checkAvailability(feature, Presence_Inq | One_Push_Inq);
+    checkAvailability(feature, One_Push);
     writeQuadletToRegister(feature,
 			   readQuadletFromRegister(feature) | One_Push);
     return *this;
@@ -556,7 +562,7 @@ Ieee1394Camera::onePush(Feature feature)
 Ieee1394Camera&
 Ieee1394Camera::turnOn(Feature feature)
 {
-    checkAvailability(feature, Presence_Inq | OnOff_Inq);
+    checkAvailability(feature, OnOff);
     writeQuadletToRegister(feature, readQuadletFromRegister(feature) | ON_OFF);
     return *this;
 }
@@ -569,7 +575,7 @@ Ieee1394Camera::turnOn(Feature feature)
 Ieee1394Camera&
 Ieee1394Camera::turnOff(Feature feature)
 {
-    checkAvailability(feature, Presence_Inq | OnOff_Inq);
+    checkAvailability(feature, OnOff);
     writeQuadletToRegister(feature,
 			   readQuadletFromRegister(feature) & ~ON_OFF);
     return *this;
@@ -585,7 +591,7 @@ Ieee1394Camera::turnOff(Feature feature)
 Ieee1394Camera&
 Ieee1394Camera::setAutoMode(Feature feature)
 {
-    checkAvailability(feature, Presence_Inq | Auto_Inq);
+    checkAvailability(feature, Auto);
     writeQuadletToRegister(feature,
 			   readQuadletFromRegister(feature) | A_M_Mode);
     return *this;
@@ -599,7 +605,7 @@ Ieee1394Camera::setAutoMode(Feature feature)
 Ieee1394Camera&
 Ieee1394Camera::setManualMode(Feature feature)
 {
-    checkAvailability(feature, Presence_Inq | Manual_Inq);
+    checkAvailability(feature, Manual);
     writeQuadletToRegister(feature,
 			   readQuadletFromRegister(feature) & ~A_M_Mode);
     return *this;
@@ -618,7 +624,7 @@ Ieee1394Camera::setValue(Feature feature, u_int value)
 {
     if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
 	throw std::invalid_argument("TU::Ieee1394Camera::setValue: cannot set WHITE_BALANCE/TRIGGER_MODE value using this method!!");
-    checkAvailability(feature, Presence_Inq | Manual_Inq);
+    checkAvailability(feature, Manual);
     if (feature == TEMPERATURE)
 	writeQuadletToRegister(TEMPERATURE,
 			       (readQuadletFromRegister(TEMPERATURE) &
@@ -639,7 +645,7 @@ Ieee1394Camera::setValue(Feature feature, u_int value)
 bool
 Ieee1394Camera::inOnePushOperation(Feature feature) const
 {
-    checkAvailability(feature, Presence_Inq | One_Push_Inq);
+    checkAvailability(feature, One_Push);
     return readQuadletFromRegister(feature) & (0x1 << 26);
 }
 
@@ -651,7 +657,7 @@ Ieee1394Camera::inOnePushOperation(Feature feature) const
 bool
 Ieee1394Camera::isTurnedOn(Feature feature) const
 {
-    checkAvailability(feature, Presence_Inq | OnOff_Inq);
+    checkAvailability(feature, OnOff);
     return readQuadletFromRegister(feature) & (0x1 << 25);
 }
 
@@ -664,7 +670,7 @@ Ieee1394Camera::isTurnedOn(Feature feature) const
 bool
 Ieee1394Camera::isAuto(Feature feature) const
 {
-    checkAvailability(feature, Presence_Inq | Auto_Inq);
+    checkAvailability(feature, Auto);
     return readQuadletFromRegister(feature) & (0x1 << 24);
 }
 
@@ -678,7 +684,7 @@ void
 Ieee1394Camera::getMinMax(Feature feature, u_int& min, u_int& max) const
 {
     
-    quadlet_t	quad = checkAvailability(feature, Presence_Inq);
+    quadlet_t	quad = checkAvailability(feature, Presence);
     min = (quad >> 12) & 0xfff;
     max = quad & 0xfff;
 }
@@ -698,7 +704,7 @@ Ieee1394Camera::getValue(Feature feature) const
 {
     if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
 	throw std::invalid_argument("TU::Ieee1394Camera::getValue: cannot get WHITE_BALANCE/TRIGGER_MODE value using this method!!");
-    checkAvailability(feature, Presence_Inq | ReadOut_Inq);
+    checkAvailability(feature, ReadOut);
     return readQuadletFromRegister(feature) & 0xfff;	// 12bit value.
 }
 
@@ -711,7 +717,7 @@ Ieee1394Camera::getValue(Feature feature) const
 Ieee1394Camera&
 Ieee1394Camera::setWhiteBalance(u_int ub, u_int vr)
 {
-    checkAvailability(WHITE_BALANCE, Presence_Inq | Manual_Inq);
+    checkAvailability(WHITE_BALANCE, Manual);
     writeQuadletToRegister(WHITE_BALANCE,
 			   (readQuadletFromRegister(WHITE_BALANCE) &
 			    0xff000000) | ((ub & 0xfff) << 12) | (vr & 0xfff));
@@ -726,7 +732,7 @@ Ieee1394Camera::setWhiteBalance(u_int ub, u_int vr)
 void
 Ieee1394Camera::getWhiteBalance(u_int &ub, u_int& vr) const
 {
-    checkAvailability(WHITE_BALANCE, Presence_Inq | ReadOut_Inq);
+    checkAvailability(WHITE_BALANCE, ReadOut);
     quadlet_t	quad = readQuadletFromRegister(WHITE_BALANCE);
     ub = (quad >> 12) & 0xfff;
     vr = quad & 0xfff;
@@ -740,7 +746,7 @@ Ieee1394Camera::getWhiteBalance(u_int &ub, u_int& vr) const
 u_int
 Ieee1394Camera::getAimedTemperature() const
 {
-    checkAvailability(TEMPERATURE, Presence_Inq | ReadOut_Inq);
+    checkAvailability(TEMPERATURE, ReadOut);
     return (readQuadletFromRegister(TEMPERATURE) >> 12) & 0xfff;
 }
 
@@ -754,7 +760,7 @@ Ieee1394Camera::getAimedTemperature() const
 Ieee1394Camera&
 Ieee1394Camera::setTriggerMode(TriggerMode mode)
 {
-    checkAvailability(TRIGGER_MODE, Presence_Inq | (0x1 << (15 - mode)));
+    checkAvailability(TRIGGER_MODE, (0x1 << (15 - mode)));
     writeQuadletToRegister(TRIGGER_MODE,
 			   (readQuadletFromRegister(TRIGGER_MODE) & ~0xf0000) |
 			   ((mode & 0xf) << 16));
@@ -768,23 +774,9 @@ Ieee1394Camera::setTriggerMode(TriggerMode mode)
 Ieee1394Camera::TriggerMode
 Ieee1394Camera::getTriggerMode() const
 {
-    checkAvailability(TRIGGER_MODE, Presence_Inq | ReadOut_Inq);
-    u_int	trigger = (readQuadletFromRegister(TRIGGER_MODE) >> 16) & 0xf;
-    switch (trigger)
-    {
-      case Trigger_Mode0:
-	return Trigger_Mode0;
-      case Trigger_Mode1:
-	return Trigger_Mode1;
-      case Trigger_Mode2:
-	return Trigger_Mode2;
-      case Trigger_Mode3:
-	return Trigger_Mode3;
-    }
-
-    throw std::domain_error("TU::Ieee1394Camera::getTriggerMode(): unknown trigger mode!!");
-    
-    return Trigger_Mode0;
+    checkAvailability(TRIGGER_MODE, ReadOut);
+    return uintToTriggerMode((readQuadletFromRegister(TRIGGER_MODE) >> 16)
+			     & 0xf);
 }
 
 //! トリガ信号の極性を設定する
@@ -795,7 +787,7 @@ Ieee1394Camera::getTriggerMode() const
 Ieee1394Camera&
 Ieee1394Camera::setTriggerPolarity(TriggerPolarity polarity)
 {
-    checkAvailability(TRIGGER_MODE, Presence_Inq | Polarity_Inq);
+    checkAvailability(TRIGGER_MODE, Polarity_Inq);
     writeQuadletToRegister(TRIGGER_MODE, (readQuadletFromRegister(TRIGGER_MODE)
 					  & ~HighActiveInput) | polarity);
     return *this;
@@ -808,7 +800,7 @@ Ieee1394Camera::setTriggerPolarity(TriggerPolarity polarity)
 Ieee1394Camera::TriggerPolarity
 Ieee1394Camera::getTriggerPolarity() const
 {
-    checkAvailability(TRIGGER_MODE, Presence_Inq | Polarity_Inq);
+    checkAvailability(TRIGGER_MODE, ReadOut);
     if (readQuadletFromRegister(TRIGGER_MODE) & HighActiveInput)
 	return HighActiveInput;
     else
@@ -865,7 +857,7 @@ Ieee1394Camera::inContinuousShot() const
 Ieee1394Camera&
 Ieee1394Camera::oneShot()
 {
-    checkAvailabilityOfBasicFunction(One_Shot_Inq);
+    checkAvailability(One_Shot);
     stopContinuousShot();
     writeQuadletToRegister(One_Shot, 0x1 << 31);
     return *this;
@@ -882,7 +874,7 @@ Ieee1394Camera::oneShot()
 Ieee1394Camera&
 Ieee1394Camera::multiShot(u_short nframes)
 {
-    checkAvailabilityOfBasicFunction(Multi_Shot_Inq);
+    checkAvailability(Multi_Shot);
     stopContinuousShot();
     writeQuadletToRegister(One_Shot, (0x1 << 30) | (nframes & 0xffff));
     return *this;
@@ -1053,52 +1045,52 @@ Ieee1394Camera::uintToFormat(u_int format)
 {
     switch (format)
     {
-      case Format_0_0:
-	return Format_0_0;
-      case Format_0_1:
-	return Format_0_1;
-      case Format_0_2:
-	return Format_0_2;
-      case Format_0_3:
-	return Format_0_3;
-      case Format_0_4:
-	return Format_0_4;
-      case Format_0_5:
-	return Format_0_5;
-      case Format_0_6:
-	return Format_0_6;
-      case Format_1_0:
-	return Format_1_0;
-      case Format_1_1:
-	return Format_1_1;
-      case Format_1_2:
-	return Format_1_2;
-      case Format_1_3:
-	return Format_1_3;
-      case Format_1_4:
-	return Format_1_4;
-      case Format_1_5:
-	return Format_1_5;
-      case Format_1_6:
-	return Format_1_6;
-      case Format_1_7:
-	return Format_1_7;
-      case Format_2_0:
-	return Format_2_0;
-      case Format_2_1:
-	return Format_2_1;
-      case Format_2_2:
-	return Format_2_2;
-      case Format_2_3:
-	return Format_2_3;
-      case Format_2_4:
-	return Format_2_4;
-      case Format_2_5:
-	return Format_2_5;
-      case Format_2_6:
-	return Format_2_6;
-      case Format_2_7:
-	return Format_2_7;
+      case YUV444_160x120:
+	return YUV444_160x120;
+      case YUV422_320x240:
+	return YUV422_320x240;
+      case YUV411_640x480:
+	return YUV411_640x480;
+      case YUV422_640x480:
+	return YUV422_640x480;
+      case RGB24_640x480:
+	return RGB24_640x480;
+      case MONO8_640x480:
+	return MONO8_640x480;
+      case MONO16_640x480:
+	return MONO16_640x480;
+      case YUV422_800x600:
+	return YUV422_800x600;
+      case RGB24_800x600:
+	return RGB24_800x600;
+      case MONO8_800x600:
+	return MONO8_800x600;
+      case YUV422_1024x768:
+	return YUV422_1024x768;
+      case RGB24_1024x768:
+	return RGB24_1024x768;
+      case MONO8_1024x768:
+	return MONO8_1024x768;
+      case MONO16_800x600:
+	return MONO16_800x600;
+      case MONO16_1024x768:
+	return MONO16_1024x768;
+      case YUV422_1280x960:
+	return YUV422_1280x960;
+      case RGB24_1280x960:
+	return RGB24_1280x960;
+      case MONO8_1280x960:
+	return MONO8_1280x960;
+      case YUV422_1600x1200:
+	return YUV422_1600x1200;
+      case RGB24_1600x1200:
+	return RGB24_1600x1200;
+      case MONO8_1600x1200:
+	return MONO8_1600x1200;
+      case MONO16_1280x960:
+	return MONO16_1280x960;
+      case MONO16_1600x1200:
+	return MONO16_1600x1200;
       case Format_7_0:
 	return Format_7_0;
       case Format_7_1:
@@ -1119,7 +1111,7 @@ Ieee1394Camera::uintToFormat(u_int format)
 
     throw std::invalid_argument("Unknown format!!");
     
-    return Format_0_0;
+    return YUV444_160x120;
 }
 
 //! unsinged intの値を同じbitパターンを持つ#FrameRateに直す
@@ -1132,23 +1124,23 @@ Ieee1394Camera::uintToFrameRate(u_int rate)
 {
     switch (rate)
     {
-      case FrameRate_0:
-	return FrameRate_0;
-      case FrameRate_1:
-	return FrameRate_1;
-      case FrameRate_2:
-	return FrameRate_2;
-      case FrameRate_3:
-	return FrameRate_3;
-      case FrameRate_4:
-	return FrameRate_4;
-      case FrameRate_5:
-	return FrameRate_5;
+      case FrameRate_1_875:
+	return FrameRate_1_875;
+      case FrameRate_3_75:
+	return FrameRate_3_75;
+      case FrameRate_7_5:
+	return FrameRate_7_5;
+      case FrameRate_15:
+	return FrameRate_15;
+      case FrameRate_30:
+	return FrameRate_30;
+      case FrameRate_60:
+	return FrameRate_60;
     }
 
     throw std::invalid_argument("Unknown frame rate!!");
     
-    return FrameRate_0;
+    return FrameRate_1_875;
 }
 
 //! unsinged intの値を同じbitパターンを持つ#Featureに直す

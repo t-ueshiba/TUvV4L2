@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.3 2002-08-01 05:03:15 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -126,8 +126,7 @@ class Ieee1394Node
     
   protected:
     Ieee1394Node(Ieee1394Port& prt, u_int unit_spec_ID,
-		   u_int channel, int sync_tag, int flag,
-		   u_int64 uniqId)					;
+		 u_int channel, int sync_tag, int flag, u_int64 uniqId)	;
     virtual		~Ieee1394Node()					;
 
     u_int		readValueFromUnitDependentDirectory(u_char key)
@@ -176,53 +175,77 @@ Ieee1394Node::readQuadletFromConfigROM(u_int offset) const
 class Ieee1394Camera : public Ieee1394Node
 {
   public:
+  //! カメラがサポートしている基本機能を表すビットマップ
+  /*! どのような基本機能がサポートされているかは，inquireBasicFunction()に
+      よって知ることができる．*/
+    enum BasicFunction
+    {
+	Advanced_Feature	= (0x1 << 31),	//!< カメラベンダ依存の機能
+	Cam_Power_Cntl		= (0x1 << 15),	//!< 電源on/offの制御
+	One_Shot		= (0x1 << 12),	//!< 画像1枚だけの撮影
+	Multi_Shot		= (0x1 << 11)	//!< 指定された枚数の撮影
+    };
+
   //! カメラが出力する画像の形式
     enum Format
     {
-	Format_0_0	= 0x200,	//!< 160x120 YUV(4:4:4)
-	Format_0_1	= 0x204,	//!< 320x240 YUV(4:2:2)
-	Format_0_2	= 0x208,	//!< 640x480 YUV(4:1:1)
-	Format_0_3	= 0x20c,	//!< 640x480 YUV(4:2:2)
-	Format_0_4	= 0x210,	//!< 640x480 RGB
-	Format_0_5	= 0x214,	//!< 640x480 Y(mono)
-	Format_0_6	= 0x218,	//!< 640x480 Y(mono16)
-	Format_1_0	= 0x220,	//!< 800x600 YUV(4:2:2)
-	Format_1_1	= 0x224,	//!< 800x600 RGB
-	Format_1_2	= 0x228,	//!< 800x600 Y(mono)
-	Format_1_3	= 0x22c,	//!< 1024x768 YUV(4:2:2)
-	Format_1_4	= 0x230,	//!< 1024x768 RGB
-	Format_1_5	= 0x234,	//!< 1024x768 Y(mono)
-	Format_1_6	= 0x238,	//!< 800x600 Y(mono16)
-	Format_1_7	= 0x23c,	//!< 1024x768 Y(mono16)
-	Format_2_0	= 0x240,	//!< 1280x960 YUV(4:2:2)
-	Format_2_1	= 0x244,	//!< 1280x960 RGB
-	Format_2_2	= 0x248,	//!< 1280x960 Y(mono)
-	Format_2_3	= 0x24c,	//!< 1600x1200 YUV(4:2:2)
-	Format_2_4	= 0x250,	//!< 1600x1200 RGB
-	Format_2_5	= 0x254,	//!< 1600x1200 Y(mono)
-	Format_2_6	= 0x258,	//!< 1280x1024 Y(mono16)
-	Format_2_7	= 0x25c,	//!< 1600x1200 Y(mono16)
-	Format_7_0	= 0x2e0,	//!< カメラ機種に依存
-	Format_7_1	= 0x2e4,	//!< カメラ機種に依存
-	Format_7_2	= 0x2e8,	//!< カメラ機種に依存
-	Format_7_3	= 0x2ec,	//!< カメラ機種に依存
-	Format_7_4	= 0x2f0,	//!< カメラ機種に依存
-	Format_7_5	= 0x2f4,	//!< カメラ機種に依存
-	Format_7_6	= 0x2f8,	//!< カメラ機種に依存
-	Format_7_7	= 0x2fc		//!< カメラ機種に依存
+	YUV444_160x120	 = 0x200,	//!< Format_0_0: 160x120 YUV(4:4:4)
+	YUV422_320x240	 = 0x204,	//!< Format_0_1: 320x240 YUV(4:2:2)
+	YUV411_640x480	 = 0x208,	//!< Format_0_2: 640x480 YUV(4:1:1)
+	YUV422_640x480	 = 0x20c,	//!< Format_0_3: 640x480 YUV(4:2:2)
+	RGB24_640x480	 = 0x210,	//!< Format_0_4: 640x480 RGB
+	MONO8_640x480	 = 0x214,	//!< Format_0_5: 640x480 Y(mono)
+	MONO16_640x480	 = 0x218,	//!< Format_0_6: 640x480 Y(mono16)
+	YUV422_800x600	 = 0x220,	//!< Format_1_0: 800x600 YUV(4:2:2)
+	RGB24_800x600	 = 0x224,	//!< Format_1_1: 800x600 RGB
+	MONO8_800x600	 = 0x228,	//!< Format_1_2: 800x600 Y(mono)
+	YUV422_1024x768	 = 0x22c,	//!< Format_1_3: 1024x768 YUV(4:2:2)
+	RGB24_1024x768	 = 0x230,	//!< Format_1_4: 1024x768 RGB
+	MONO8_1024x768	 = 0x234,	//!< Format_1_5: 1024x768 Y(mono)
+	MONO16_800x600	 = 0x238,	//!< Format_1_6: 800x600 Y(mono16)
+	MONO16_1024x768	 = 0x23c,	//!< Format_1_7: 1024x768 Y(mono16)
+	YUV422_1280x960	 = 0x240,	//!< Format_2_0: 1280x960 YUV(4:2:2)
+	RGB24_1280x960	 = 0x244,	//!< Format_2_1: 1280x960 RGB
+	MONO8_1280x960	 = 0x248,	//!< Format_2_2: 1280x960 Y(mono)
+	YUV422_1600x1200 = 0x24c,	//!< Format_2_3: 1600x1200 YUV(4:2:2)
+	RGB24_1600x1200	 = 0x250,	//!< Format_2_4: 1600x1200 RGB
+	MONO8_1600x1200	 = 0x254,	//!< Format_2_5: 1600x1200 Y(mono)
+	MONO16_1280x960	 = 0x258,	//!< Format_2_6: 1280x960 Y(mono16)
+	MONO16_1600x1200 = 0x25c,	//!< Format_2_7: 1600x1200 Y(mono16)
+	Format_7_0	 = 0x2e0,	//!< Format_7_0: カメラ機種に依存
+	Format_7_1	 = 0x2e4,	//!< Format_7_1: カメラ機種に依存
+	Format_7_2	 = 0x2e8,	//!< Format_7_2: カメラ機種に依存
+	Format_7_3	 = 0x2ec,	//!< Format_7_3: カメラ機種に依存
+	Format_7_4	 = 0x2f0,	//!< Format_7_4: カメラ機種に依存
+	Format_7_5	 = 0x2f4,	//!< Format_7_5: カメラ機種に依存
+	Format_7_6	 = 0x2f8,	//!< Format_7_6: カメラ機種に依存
+	Format_7_7	 = 0x2fc	//!< Format_7_7: カメラ機種に依存
     };
 
   //! カメラのフレームレート
+  /*! どのようなフレームレートがサポートされているかは，inquireFrameRate()
+      によって知ることができる．*/
     enum FrameRate
     {
-	FrameRate_0	= 0,		//!< 1.875fps
-	FrameRate_1	= 1,		//!< 3.75fps
-	FrameRate_2	= 2,		//!< 7.5fps
-	FrameRate_3	= 3,		//!< 15fps
-	FrameRate_4	= 4,		//!< 30fps
-	FrameRate_5	= 5		//!< 60fps
+	FrameRate_1_875	= (0x1 << 31),	//!< 1.875fps
+	FrameRate_3_75	= (0x1 << 30),	//!< 3.75fps
+	FrameRate_7_5	= (0x1 << 29),	//!< 7.5fps
+	FrameRate_15	= (0x1 << 28),	//!< 15fps
+	FrameRate_30	= (0x1 << 27),	//!< 30fps
+	FrameRate_60	= (0x1 << 26)	//!< 60fps
     };
     
+  //! 出力画像の画素の形式
+    enum PixelFormat
+    {
+	YUV_444,			//!< YUV(4:4:4)
+	YUV_422,			//!< YUV(4:2:2)
+	YUV_411,			//!< YUV(4:1:1)
+	RGB_24,				//!< RGB
+	MONO,				//!< Y(mono)
+	MONO_16				//!< Y(mono16)
+    };
+
   //! 値を設定できるカメラの属性
     enum Feature
     {
@@ -247,11 +270,25 @@ class Ieee1394Camera : public Ieee1394Node
 	CAPTURE_QUALITY	= 0x8c4
     };
 
+  //! 各属性(#Feature)についてカメラがサポートしている機能を表すビットマップ
+  /*! どのような機能がサポートされているかは，inquireFeatureFunction()によっ
+      て知ることができる．*/
+    enum FeatureFunction
+    {
+	Presence	= (0x1 << 31),	//!< この属性そのものをサポート
+      //Abs_Control	= (0x1 << 30),	//!< この属性を値によって制御可能
+	One_Push	= (0x1 << 28),	//!< one pushモードをサポート
+	ReadOut		= (0x1 << 27),	//!< この属性の値を読み出しが可能
+	OnOff		= (0x1 << 26),	//!< この属性のon/offが可能
+	Auto		= (0x1 << 25),	//!< この属性の値の自動設定が可能
+	Manual		= (0x1 << 24)	//!< この属性の値の手動設定が可能
+    };
+    
   //! カメラの外部トリガーモード
     enum TriggerMode
     {
-	Trigger_Mode0	= 0,
-	Trigger_Mode1	= 1,
+	Trigger_Mode0	= 0,	//!< トリガonから#SHUTTERで指定した時間だけ蓄積
+	Trigger_Mode1	= 1,	//!< トリガonからトリガoffになるまで蓄積
 	Trigger_Mode2	= 2,
 	Trigger_Mode3	= 3
     };
@@ -263,52 +300,9 @@ class Ieee1394Camera : public Ieee1394Node
 	HighActiveInput	= (0x1 << 24)	//!< highでトリガon
     };
 
-  //! 出力画像の画素の形式
-    enum PixelFormat
-    {
-	YUV_444,			//!< YUV(4:4:4)
-	YUV_422,			//!< YUV(4:2:2)
-	YUV_411,			//!< YUV(4:1:1)
-	RGB_24,				//!< RGB
-	MONO,				//!< Y(mono)
-	MONO_16				//!< Y(mono16)
-    };
-
-  //! 各属性(#Feature)についてカメラがサポートしている機能を表すビットマップ
-    enum InquireFeature
-    {
-	Presence_Inq	= (0x1 << 31),	//!< この属性そのものをサポート
-      //Abs_Control_Inq	= (0x1 << 30),	//!< この属性を値によって制御可能
-	One_Push_Inq	= (0x1 << 28),	//!< one pushモードをサポート
-	ReadOut_Inq	= (0x1 << 27),	//!< この属性の値を読み出しが可能
-	OnOff_Inq	= (0x1 << 26),	//!< この属性のon/offが可能
-	Auto_Inq	= (0x1 << 25),	//!< この属性の値の自動設定が可能
-	Manual_Inq	= (0x1 << 24)	//!< この属性の値の手動設定が可能
-    };
-    
-  //! 各フォーマット(#Format)についてサポートされているフレームレート(#FrameRate)を表すビットマップ
-    enum InquireFrameRate
-    {
-	FrameRate_0_Inq	= (0x1 << 31),	//!< #FrameRate_0 (1.875fps)をサポート
-	FrameRate_1_Inq	= (0x1 << 30),	//!< #FrameRate_1 (3.75fps)をサポート
-	FrameRate_2_Inq	= (0x1 << 29),	//!< #FrameRate_2 (7.5fps)をサポート
-	FrameRate_3_Inq	= (0x1 << 28),	//!< #FrameRate_3 (15fps)をサポート
-	FrameRate_4_Inq	= (0x1 << 27),	//!< #FrameRate_4 (30fps)をサポート
-	FrameRate_5_Inq	= (0x1 << 26)	//!< #FrameRate_5 (60fps)をサポート
-    };
-
-  //! カメラがサポートしている基本機能を表すビットマップ
-    enum InquireBasicFunction
-    {
-	Advanced_Feature_Inq	= (0x1 << 31),	//!< カメラベンダ依存の機能
-	Cam_Power_Cntl_Inq	= (0x1 << 15),	//!< 電源on/offの制御
-	One_Shot_Inq		= (0x1 << 12),	//!< 画像1枚だけの撮影
-	Multi_Shot_Inq		= (0x1 << 11)	//!< 指定された枚数の撮影
-    };
-
   public:
     Ieee1394Camera(Ieee1394Port& port, u_int channel=0,
-		     u_int64 uniqId=0)					;
+		   u_int64 uniqId=0)					;
     virtual ~Ieee1394Camera()						;
 
   // Power ON/OFF stuffs.
@@ -317,7 +311,7 @@ class Ieee1394Camera : public Ieee1394Node
     Ieee1394Camera&	powerOff()					;
 
   // Format and frame rate stuffs.
-    quadlet_t		inquireFormat(Format format)		const	;
+    quadlet_t		inquireFrameRate(Format format)		const	;
     Ieee1394Camera&	setFormatAndFrameRate(Format format,
 					      FrameRate rate)		;
     Format		getFormat()				const	;
@@ -327,7 +321,7 @@ class Ieee1394Camera : public Ieee1394Node
     PixelFormat		pixelFormat()				const	;
     
   // Feature stuffs.
-    quadlet_t		inquireFeature(Feature feature)		const	;
+    quadlet_t		inquireFeatureFunction(Feature feature)	const	;
     Ieee1394Camera&	onePush(Feature feature)			;
     Ieee1394Camera&	turnOn(Feature feature)				;
     Ieee1394Camera&	turnOff(Feature feature)			;
@@ -384,14 +378,14 @@ class Ieee1394Camera : public Ieee1394Node
   private:
     void	checkAvailability(Format format, FrameRate rate) const	;
     quadlet_t	checkAvailability(Feature feature, u_int inq)	 const	;
-    void	checkAvailabilityOfBasicFunction(u_int inq)	 const	;
+    void	checkAvailability(BasicFunction func)		 const	;
     quadlet_t	readQuadletFromRegister(u_int offset)		 const	;
     void	writeQuadletToRegister(u_int offset, quadlet_t quad)	;
     
     const nodeaddr_t	_cmdRegBase;
-    u_int		_w, _h;		// width and height.
-    PixelFormat		_p;		// pixel format.
-    const u_char*	_buf;		// currently available image buffer.
+    u_int		_w, _h;	// width and height of current image format.
+    PixelFormat		_p;	// pixel format of current image format.
+    const u_char*	_buf;	// currently available image buffer.
 };
 
 //! 現在設定されている画像フォーマット(#Format)の幅を返す
@@ -415,7 +409,7 @@ Ieee1394Camera::pixelFormat() const
     return _p;
 }
 
-//! カメラがサポートしている基本機能を表すビットパターンを返す
+//! カメラがサポートしている基本機能を返す
 /*!
   \return	サポートされている機能を#InquireBasicFunction型の列挙値
 		のorとして返す．
@@ -447,13 +441,10 @@ Ieee1394Camera::checkAvailability(Format format, FrameRate rate) const
 {
     using namespace	std;
     
-    quadlet_t	quad = inquireFormat(format),
-		inq = u_int(FrameRate_0_Inq) >> rate;
-    if ((quad & inq) != inq)
+    quadlet_t	quad = inquireFrameRate(format);
+    if (!(quad & rate))
 	cerr << "Ieee1394Camera::checkAvailability: Incompatible combination of format[0x"
-	     << hex << format
-	     << "] and frame rate[0x"
-	     << rate << "]!! (inq: " << inq << ")"
+	     << hex << format << "] and frame rate[0x" << rate << "]!!"
 	     << endl;
   //	throw TUExceptionWithMessage("Ieee1394Camera::checkAvailability: Incompatible combination of frame rate and format!!");
 }
@@ -463,7 +454,7 @@ Ieee1394Camera::checkAvailability(Feature feature, u_int inq) const
 {
     using namespace	std;
     
-    quadlet_t	quad = inquireFeature(feature);
+    quadlet_t	quad = inquireFeatureFunction(feature);
     if ((quad & inq) != inq)
 	cerr << "Ieee1394Camera::checkAvailability: This feature[0x"
 	     << hex << feature
@@ -475,14 +466,14 @@ Ieee1394Camera::checkAvailability(Feature feature, u_int inq) const
 }
 
 inline void
-Ieee1394Camera::checkAvailabilityOfBasicFunction(u_int inq) const
+Ieee1394Camera::checkAvailability(BasicFunction func) const
 {
     using namespace	std;
 
     quadlet_t	quad = inquireBasicFunction();
-    if ((quad & inq) != inq)
+    if (!(quad & func))
 	cerr << "Ieee1394Camera::checkAvailabilityOfBasicFuntion: This fucntion is not present (quad: 0x"
-	     << quad << ", inq: " << inq << ")!!"
+	     << hex << quad << ", func: " << func << ")!!"
 	     << endl;
   //	throw TUExceptionWithMessage("Ieee1394Camera::checkAvailabilityOfBasicFunction: This function is not present!!");
 }
