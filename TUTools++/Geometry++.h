@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.3 2002-08-19 07:52:27 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.4 2002-08-28 01:51:07 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -1058,11 +1058,9 @@ class CameraWithDistortion : public CameraBase
 			 double		       skew=0.0,
 			 double		       d1=0.0,
 			 double		       d2=0.0)
-	:CameraBase(t, Rt),
-	 _intrinsic(k, u0, v0, aspect, skew, d1, d2)	{}
-    CameraWithDistortion(const Matrix<double>& P, double d1=0.0, double d2=0.0)
-	:CameraBase(), _intrinsic()			{setProjection(P);
-							 setDistortion(d1,d2);}
+	:CameraBase(t, Rt), _intrinsic(k, u0, v0, aspect, skew, d1, d2)	{}
+    CameraWithDistortion(const Matrix<double>& P,
+			 double d1=0.0, double d2=0.0)			;
 
   // projection matrices.
     virtual CameraBase&		setProjection(const Matrix<double>& P)	;
@@ -1139,6 +1137,15 @@ CameraWithDistortion::setDistortion(double d1, double d2)
     return *this;
 }
  
+inline
+CameraWithDistortion::CameraWithDistortion(const Matrix<double>& P,
+					   double d1, double d2)
+    :CameraBase(), _intrinsic()
+{
+    setProjection(P);
+    setDistortion(d1,d2);
+}
+
 }
 
 #endif	/* !__TUGeometryPP_h */
