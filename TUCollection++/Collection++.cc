@@ -1,5 +1,5 @@
 /*
- *  $Id: Collection++.cc,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: Collection++.cc,v 1.3 2002-07-25 04:35:25 ueshiba Exp $
  */
 #include "TU/Collection++.h"
 
@@ -14,7 +14,8 @@ ObjList<T>::findnode(T* p) const
     ObjList<T>* const	head = (ObjList<T>*)this;
     T* const		tmp  = head->_p;	
     head->_p = p;
-    for (ObjList<T>* node = head; node->_next->_p != p; node = node->_next);
+    ObjList<T>* node = head;
+    for (; node->_next->_p != p; node = node->_next);
     head->_p = tmp;
     return (node->_next == head ? 0 : node);
 }
@@ -28,7 +29,8 @@ ObjDList<T>::findnode(T* p) const
     ObjDList<T>* const	head = (ObjDList<T>*)this;
     T* const		tmp  = head->_p;	
     head->_p = p;
-    for (ObjDList<T>* node = head; (node = node->_next)->_p != p; );
+    ObjDList<T>* node = head;
+    for (; (node = node->_next)->_p != p; );
     head->_p = tmp;
     return (node->_next == head ? 0 : node);
 }
