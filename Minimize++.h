@@ -1,5 +1,5 @@
 /*
- *  $Id: Minimize++.h,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
+ *  $Id: Minimize++.h,v 1.3 2002-08-28 01:37:29 ueshiba Exp $
  */
 #ifndef __TUMinimizePP_h
 #define __TUMinimizePP_h
@@ -20,11 +20,11 @@ class NullConstraint
 };
 
 /************************************************************************
-*  function tuMinimizeSquare						*
+*  function minimizeSquare						*
 *    -- Compute x st. ||f(x)||^2 -> min under g(x) = 0.			*
 ************************************************************************/
 template <class F, class G, class AT> void
-tuMinimizeSquare(const F& f, const G& g, AT& x,
+minimizeSquare(const F& f, const G& g, AT& x,
 		 int niter_max=100, double tol=1.5e-8)
 {
     using namespace		std;
@@ -86,16 +86,16 @@ tuMinimizeSquare(const F& f, const G& g, AT& x,
 		lambda *= 10.0;			// Increase L-M parameter.
 	}
     }
-    cerr << "tuMinimizeSquare: maximum iteration limit [" << niter_max
+    cerr << "minimizeSquare: maximum iteration limit [" << niter_max
 	 << "] exceeded!" << endl;
 }
 
 /************************************************************************
-*  function tuMinimizeSquareSparse					*
+*  function minimizeSquareSparse					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
 template <class F, class G, class ATA, class ATB> void
-tuMinimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
+minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		       int niter_max=100, double tol=1.5e-8)
 {
     using namespace		std;
@@ -121,9 +121,9 @@ tuMinimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	Array<Vector<T> >	Ktf(b.dim());
 	for (int j = 0; j < b.dim(); ++j)
 	{
-	    const JT&		J  = f.jacobianA(a, b[j]);
+	    const JT&		J  = f.jacobianA(a, b[j], j);
 	    const JT&		Jt = J.trns();
-	    const Matrix<T>&	K  = f.jacobianB(a, b[j]);
+	    const Matrix<T>&	K  = f.jacobianB(a, b[j], j);
 
 	    U     += Jt * J;
 	    Jtf   += fval[j] * J;
@@ -199,16 +199,16 @@ tuMinimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		lambda *= 10.0;			// Increase L-M parameter.
 	}
     }
-    cerr << "tuMinimizeSquareSparse: maximum iteration limit ["
+    cerr << "minimizeSquareSparse: maximum iteration limit ["
 	 << niter_max << "] exceeded!" << endl;
 }
 
 /************************************************************************
-*  function tuMinimizeSquareSparseDebug					*
+*  function minimizeSquareSparseDebug					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
 template <class F, class G, class ATA, class ATB> void
-tuMinimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
+minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 			    int niter_max=100, double tol=1.5e-8)
 {
     using namespace		std;
@@ -237,9 +237,9 @@ tuMinimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	Matrix<T>		A(adim + bdim + gdim, adim + bdim + gdim);
 	for (int j = 0; j < b.dim(); ++j)
 	{
-	    const Matrix<T>&	J  = f.jacobianA(a, b[j]);
+	    const Matrix<T>&	J  = f.jacobianA(a, b[j], j);
 	    const Matrix<T>&	Jt = J.trns();
-	    const Matrix<T>&	K  = f.jacobianB(a, b[j]);
+	    const Matrix<T>&	K  = f.jacobianB(a, b[j], j);
 
 	    U     += Jt * J;
 	    Jtf   += fval[j] * J;
@@ -312,7 +312,7 @@ tuMinimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		lambda *= 10.0;			// Increase L-M parameter.
 	}
     }
-    cerr << "tuMinimizeSquareSparseDebug: maximum iteration limit ["
+    cerr << "minimizeSquareSparseDebug: maximum iteration limit ["
 	 << niter_max << "] exceeded!" << endl;
 }
  
