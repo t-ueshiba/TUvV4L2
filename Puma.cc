@@ -1,6 +1,8 @@
 /*
- *  $Id: Puma.cc,v 1.4 2002-07-26 08:59:31 ueshiba Exp $
+ *  $Id: Puma.cc,v 1.5 2003-07-06 23:53:21 ueshiba Exp $
  */
+#ifndef __APPLE__
+
 #include "TU/Serial++.h"
 
 namespace TU
@@ -164,3 +166,4 @@ Puma&	echo   (Puma& puma)	{puma._echo = Puma::DoEcho; return puma;}
 Puma&	no_echo(Puma& puma)	{puma._echo = Puma::NoEcho; return puma;}
 
 }
+#endif	/* !__APPLE__	*/

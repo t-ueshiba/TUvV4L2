@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.inst.cc,v 1.5 2003-02-07 05:14:45 ueshiba Exp $
+ *  $Id: Image++.inst.cc,v 1.6 2003-07-06 23:53:21 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
@@ -33,6 +33,11 @@ template class Array<ImageLine<u_char> >;
 template class Array<ImageLine<short> >;
 template class Array<ImageLine<float> >;
 template class Array<ImageLine<double> >;
+
+template class Array2<ImageLine<u_char> >;
+template class Array2<ImageLine<short> >;
+template class Array2<ImageLine<float> >;
+template class Array2<ImageLine<double> >;
 
 template class Image<u_char>;
 template class Image<short>;

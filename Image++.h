@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.8 2003-05-19 08:09:35 ueshiba Exp $
+ *  $Id: Image++.h,v 1.9 2003-07-06 23:53:21 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -335,9 +335,7 @@ class ImageBase
 {
   protected:
     ImageBase()
-	:P(3, 4),
-	 distortionA(0), distortionB(0), distortionU0(0), distortionV0(0)
-					{P[0][0] = P[1][1] = P[2][2] = 1.0;}
+	:P(3, 4), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
     virtual ~ImageBase()		;
     
   public:
@@ -357,10 +355,7 @@ class ImageBase
     
   public:
     Matrix<double>	P;			// projection matrix
-    double		distortionA,
-			distortionB,
-			distortionU0,
-			distortionV0;		// distortion parameters
+    double		d1, d2;			// distortion parameters
 };
 
 /************************************************************************
