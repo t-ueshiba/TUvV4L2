@@ -20,22 +20,23 @@
  */
 
 /*
- *  $Id: Rotation.cc,v 1.2 2002-07-25 02:38:06 ueshiba Exp $
+ *  $Id: Rotation.cc,v 1.3 2003-03-14 02:26:07 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
 namespace TU
 {
 Rotation::Rotation(int p, int q, double x, double y)
-    :_p(p), _q(q)
+    :_p(p), _q(q), _c(1.0), _s(0.0)
 {
-    if (fabs(x) > fabs(y))
+    const double	absy = fabs(y);
+    if (fabs(x) > absy)
     {
 	const double	t = y / x;
 	_c = 1 / sqrt(t*t + 1);
 	_s = t * _c;
     }
-    else
+    else if (absy != 0.0)
     {
 	const double	t = x / y;
 	_s = 1 / sqrt(t*t + 1);

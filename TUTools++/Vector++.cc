@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.6 2002-09-03 00:00:13 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.7 2003-03-14 02:26:07 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -874,10 +874,12 @@ template <class T> void
 TriDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 {
     const double	g = (_diagonal[n] - _diagonal[n-1]) /
-			     (2*_off_diagonal[n]),
-			t = (g > 0 ?
-			      -1 / (g + sqrt(g*g+1)) : -1 / (g - sqrt(g*g+1)));
-    x = _diagonal[m] - (_diagonal[n]-t*_off_diagonal[n]);
+			    (2*_off_diagonal[n]),
+			absg = fabs(g),
+			gg1 = (absg > 1.0 ? absg * sqrt(1.0 + 1.0/(absg*absg))
+					  : sqrt(1.0 + absg*absg)),
+			t = (g > 0 ? g + gg1 : g - gg1);
+    x = _diagonal[m] - _diagonal[n] - _off_diagonal[n]/t;
   //x = _diagonal[m];					// without shifting
     y = _off_diagonal[m+1];
 }
@@ -1066,11 +1068,12 @@ BiDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 			  / (2*_diagonal[n-1]*_off_diagonal[n]),
       // Caution!! You have to ensure that _diagonal[n-1] != 0
       // as well as _off_diagonal[n].
-			t = (g > 0 ?
-			     -1 / (g + sqrt(g*g+1)) : -1 / (g - sqrt(g*g+1)));
-    x = _diagonal[m]*_diagonal[m]
-      - (_diagonal[n]*_diagonal[n]+_off_diagonal[n]*_off_diagonal[n] -
-	 t*_diagonal[n-1]*_off_diagonal[n]);
+			absg = fabs(g),
+			gg1 = (absg > 1.0 ? absg * sqrt(1.0 + 1.0/(absg*absg))
+					  : sqrt(1.0 + absg*absg)),
+			t = (g > 0 ? g + gg1 : g - gg1);
+    x = (_diagonal[m] + _diagonal[n]) * (_diagonal[m] - _diagonal[n])
+      - _off_diagonal[n]*(_off_diagonal[n] + _diagonal[n-1]/t);
   //x = _diagonal[m]*_diagonal[m];			// without shifting
     y = _diagonal[m]*_off_diagonal[m+1];
 }
