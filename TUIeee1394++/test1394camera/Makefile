@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2002-12-18 04:34:08 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2003-02-20 05:51:50 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,10 +10,11 @@ SRCDIR		= $(HOME)/VVV/Pkg/vvv/utilities/test1394camera
 
 PROGRAM		= test1394camera
 LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 `gtk-config --libs`
+#LIBS		= -lTUIeee1394++ -lraw1394 `gtk-config --libs`
 
 CPPFLAGS	=
 CFLAGS		= -g
-CCFLAGS		= -O3
+CCFLAGS		= -O
 LDFLAGS		= -L$(LIBDIR)
 
 LINKER		= $(CCC)
@@ -43,7 +44,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

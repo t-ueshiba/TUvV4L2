@@ -1,5 +1,5 @@
 /*
- *  $Id: createCommands.cc,v 1.3 2002-12-18 04:34:08 ueshiba Exp $
+ *  $Id: createCommands.cc,v 1.4 2003-02-20 05:51:50 ueshiba Exp $
  */
 #include "My1394Camera.h"
 
@@ -45,6 +45,17 @@ struct CameraAndFeature
     Ieee1394Camera::Feature	feature;	//!< 操作したい機能
 };
 static CameraAndFeature		cameraAndFeature[NFEATURES];
+
+/*!
+  カメラと Bayer -> RGB 変換の種類の2ツ組．コールバック関数: CBbayerToRGB()
+  の引数として渡される．
+ */
+struct CameraAndBayer
+{
+    My1394Camera*		camera;		//!< カメラ
+    My1394Camera::Bayer		bayer;		//!< Bayer -> RGB 変換の種類
+};
+static CameraAndBayer		cameraAndBayer[3];
 
 /************************************************************************
 *  callback functions							*
@@ -101,6 +112,19 @@ CBtriggerMode(GtkWidget* toggle, gpointer userdata)
 	    .setTriggerMode(Ieee1394Camera::Trigger_Mode0);
     else
 	camera->turnOff(Ieee1394Camera::TRIGGER_MODE);
+}
+
+//! Bayer -> RGB変換ボタンがクリックされると呼ばれるコールバック関数．
+/*!
+  Bayer pattern -> RGB変換を設定する．
+  \param userdata	CameraAndBayer (IEEE1394カメラと設定したい Bayer
+			-> RGB 変換の種類の2ツ組)
+*/
+static void
+CBbayerToRGB(GtkWidget*, gpointer userdata)
+{
+    CameraAndBayer*	cameraAndBayer = (CameraAndBayer*)userdata;
+    cameraAndBayer->camera->setBayer(cameraAndBayer->bayer);
 }
 
 //! on/off ボタンの状態が変更されると呼ばれるコールバック関数．
@@ -195,7 +219,7 @@ CBsetWhiteBalanceVR(GtkAdjustment* adj, gpointer userdata)
 GtkWidget*
 createCommands(My1394Camera& camera)
 {
-    GtkWidget*	commands = gtk_table_new(4, 2 + NFEATURES, FALSE);
+    GtkWidget*	commands = gtk_table_new(4, 3 + NFEATURES, FALSE);
     u_int	y = 0;
 
   // カメラからの画像取り込みをon/offするtoggle buttonを生成．
@@ -225,6 +249,33 @@ createCommands(My1394Camera& camera)
 	++y;
     }
     
+  // Bayer pattern -> RGB変換の種類を設定するradio buttonを生成．
+    GtkWidget*	box = gtk_hbox_new(FALSE, 10);
+    gtk_container_set_border_width(GTK_CONTAINER(box), 10);
+    GtkWidget*	button = gtk_radio_button_new_with_label(NULL, "None");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+    cameraAndBayer[0].camera = &camera;
+    cameraAndBayer[0].bayer  = My1394Camera::NONE;
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+		       GTK_SIGNAL_FUNC(CBbayerToRGB), &cameraAndBayer[0]);
+    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    button = gtk_radio_button_new_with_label(
+		 gtk_radio_button_group(GTK_RADIO_BUTTON(button)), "RGGB");
+    cameraAndBayer[1].camera = &camera;
+    cameraAndBayer[1].bayer  = My1394Camera::RGGB;
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+		       GTK_SIGNAL_FUNC(CBbayerToRGB), &cameraAndBayer[1]);
+    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    button = gtk_radio_button_new_with_label(
+		 gtk_radio_button_group(GTK_RADIO_BUTTON(button)), "BGGR");
+    cameraAndBayer[2].camera = &camera;
+    cameraAndBayer[2].bayer  = My1394Camera::BGGR;
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+		       GTK_SIGNAL_FUNC(CBbayerToRGB), &cameraAndBayer[2]);
+    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    gtk_table_attach_defaults(GTK_TABLE(commands), box, 1, 2, y, y+1);
+    ++y;
+
     for (int i = 0; i < NFEATURES; ++i)
     {
 	u_int	inq = camera.inquireFeatureFunction(feature[i].feature);

@@ -1,9 +1,12 @@
 /*
- *  $Id: createMenubar.cc,v 1.5 2003-02-07 05:16:46 ueshiba Exp $
+ *  $Id: createMenubar.cc,v 1.6 2003-02-20 05:51:50 ueshiba Exp $
  */
 #include "My1394Camera.h"
 #include "MyDialog.h"
 #include <iomanip>
+#include <fstream>
+
+#define DEFAULT_IMAGE_FILE_NAME	"test1394camera.pbm"
 
 namespace TU
 {
@@ -87,11 +90,22 @@ struct FormatAndFrameRate
 };
 static FormatAndFrameRate	fmtAndFRate[NFORMATS * NRATES];
 
+/*!
+  カメラとfile selection widgetの2ツ組．コールバック関数:
+  CBfileSelectionOK() の引数として渡される．
+ */
+struct CameraAndFileSelection
+{
+    My1394Camera*		camera;
+    GtkWidget*			filesel;
+};
+static CameraAndFileSelection	cameraAndFileSelection;
+
 /************************************************************************
 *  static functions							*
 ************************************************************************/
 static std::ostream&
-operator <<(std::ostream& out, const Ieee1394Camera& camera)
+operator <<(std::ostream& out, const My1394Camera& camera)
 {
     using namespace	std;
     
@@ -155,6 +169,16 @@ operator <<(std::ostream& out, const Ieee1394Camera& camera)
 	}
     }
 
+    switch (camera.getBayer())
+    {
+      case My1394Camera::RGGB:
+	out << " BayerRGGB";
+	break;
+      case My1394Camera::BGGR:
+	out << " BayerBGGR";
+	break;
+    }
+
     return out << endl;
 }
 
@@ -181,6 +205,46 @@ CBmenuitem(GtkMenuItem*, gpointer userdata)
     }
     fmtAndFRate->camera->setFormatAndFrameRate(fmtAndFRate->format,
 					       fmtAndFRate->frameRate);
+}
+
+//! 選択されたファイルに画像をセーブするためのコールバック関数．
+/*!
+  \param userdata	My1394Camera (IEEE1394カメラ)
+*/
+static void
+CBfileSelectionOK(GtkWidget* filesel, gpointer userdata)
+{
+    CameraAndFileSelection*	camAndFSel = (CameraAndFileSelection*)userdata;
+    std::ofstream	out(gtk_file_selection_get_filename(
+				GTK_FILE_SELECTION(camAndFSel->filesel)));
+    if (out)
+	camAndFSel->camera->save(out);
+    gtk_widget_destroy(camAndFSel->filesel);
+}
+
+//! 画像をセーブするファイルを選択するdialogを表示するためのコールバック関数．
+/*!
+  \param userdata	My1394Camera (IEEE1394カメラ)
+*/
+static void
+CBsave(GtkMenuItem*, gpointer userdata)
+{
+    GtkWidget*		filesel = gtk_file_selection_new("Save image");
+    gtk_signal_connect(GTK_OBJECT(filesel), "destroy",
+		       GTK_SIGNAL_FUNC(gtk_main_quit), filesel);
+    cameraAndFileSelection.camera  = (My1394Camera*)userdata;
+    cameraAndFileSelection.filesel = filesel;
+    gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
+		       "clicked", (GtkSignalFunc)CBfileSelectionOK,
+		       &cameraAndFileSelection);
+    gtk_signal_connect_object(GTK_OBJECT(GTK_FILE_SELECTION(filesel)
+					 ->cancel_button), "clicked",
+			      (GtkSignalFunc)gtk_widget_destroy,
+			      GTK_OBJECT(filesel));
+    gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel),
+				    DEFAULT_IMAGE_FILE_NAME);
+    gtk_widget_show(filesel);
+    gtk_main();
 }
 
 //! カメラの設定値を標準出力に書き出して終了するためのコールバック関数．
@@ -216,7 +280,11 @@ createMenubar(My1394Camera& camera)
 
   // "File"メニューを生成．
     GtkWidget*	menu = gtk_menu_new();
-    GtkWidget*	item = gtk_menu_item_new_with_label("Quit");
+    GtkWidget*	item = gtk_menu_item_new_with_label("Save");
+    gtk_signal_connect(GTK_OBJECT(item), "activate",
+		       GTK_SIGNAL_FUNC(CBsave), &camera);
+    gtk_menu_append(GTK_MENU(menu), item);
+    item = gtk_menu_item_new_with_label("Quit");
     gtk_signal_connect(GTK_OBJECT(item), "activate",
 		       GTK_SIGNAL_FUNC(CBexit), &camera);
     gtk_menu_append(GTK_MENU(menu), item);

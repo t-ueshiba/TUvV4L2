@@ -1,5 +1,5 @@
 /*
- *  $Id: My1394Camera.cc,v 1.4 2002-12-18 04:34:08 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.5 2003-02-20 05:51:50 ueshiba Exp $
  */
 #include <sys/time.h>
 #include <stdexcept>
@@ -96,7 +96,8 @@ My1394Camera::My1394Camera(Ieee1394Port& port, u_int64 uniqId)
     :Ieee1394Camera(port, 0, uniqId),
      _canvas(gtk_drawing_area_new()),
      _buf(0),
-     _rgb(0)
+     _rgb(0),
+     _bayer(NONE)
 {
     initialize_tbl();			// YUV -> RGB 変換テーブルの初期化．
     gdk_rgb_init();
@@ -174,7 +175,22 @@ My1394Camera::idle()
     static struct timeval	start;
     countTime(nframes, start);
 
-    snap().captureRaw(_buf);	// IEEE1394Camera から画像データを読み込む．
+  // IEEE1394Camera から画像データを読み込む．
+    if (pixelFormat() == MONO_8 || pixelFormat() == MONO_16)
+	switch (_bayer)
+	{
+	  case RGGB:
+	    snap().captureBayerRGGBRaw(_rgb);
+	    break;
+	  case BGGR:
+	    snap().captureBayerBGGRRaw(_rgb);
+	    break;
+	  default:
+	    snap().captureRaw(_buf);
+	    break;
+	}
+    else
+	snap().captureRaw(_buf);
     draw();			// canvasに表示する．
 }
 
@@ -247,25 +263,86 @@ My1394Camera::draw()
 			   GDK_RGB_DITHER_NONE, (guchar*)_buf, 3*width());
 	break;
       case MONO_8:
-	gdk_draw_gray_image(_canvas->window,
-			    _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			    0, 0, width(), height(),
-			    GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
+	if (_bayer != NONE)
+	    gdk_draw_rgb_image(_canvas->window,
+			       _canvas->style
+				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
+			       0, 0, width(), height(),
+			       GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
+	else
+	    gdk_draw_gray_image(_canvas->window,
+				_canvas->style
+				       ->fg_gc[GTK_WIDGET_STATE(_canvas)],
+				0, 0, width(), height(),
+				GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
 	break;
       case MONO_16:
-      {
-	const u_short*	p = (u_short*)_buf;
-	u_char*		q = _buf;
-	for (u_int y = 0; y < height(); ++y)
-	    for (u_int x = 0; x < width(); ++x)
-		*q++ = htons(*p++);
-	gdk_draw_gray_image(_canvas->window,
-			    _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			    0, 0, width(), height(),
-			    GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
-      }
+      	if (_bayer != NONE)
+	    gdk_draw_rgb_image(_canvas->window,
+			       _canvas->style
+				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
+			       0, 0, width(), height(),
+			       GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
+	else
+	{
+	    const u_short*	p = (u_short*)_buf;
+	    u_char*		q = _buf;
+	    for (u_int y = 0; y < height(); ++y)
+		for (u_int x = 0; x < width(); ++x)
+		    *q++ = htons(*p++);
+	    gdk_draw_gray_image(_canvas->window,
+				_canvas->style
+				       ->fg_gc[GTK_WIDGET_STATE(_canvas)],
+				0, 0, width(), height(),
+				GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
+	}
 	break;
     }
+}
+ 
+//! バッファ中の画像をsaveする．
+/*!
+  モノクロ画像はPGM形式で、カラー画像はPPM形式でsaveされる．
+  \param out	画像を書き出す出力ストリーム．
+  \return	outで指定した出力ストリーム．
+*/
+std::ostream&
+My1394Camera::save(std::ostream& out) const
+{
+    switch (pixelFormat())
+    {
+      case YUV_444:
+      case YUV_422:
+      case YUV_411:
+	out << "P6" << '\n' << width() << ' ' << height() << '\n' << 255
+	    << endl;
+	out.write((const char*)_rgb, 3*width()*height());
+	break;
+
+      case RGB_24:
+	out << "P6" << '\n' << width() << ' ' << height() << '\n' << 255
+	    << endl;
+	out.write((const char*)_buf, 3*width()*height());
+	break;
+
+      case MONO_8:
+      case MONO_16:
+	if (_bayer != NONE)
+	{
+	    out << "P6" << '\n' << width() << ' ' << height() << '\n' << 255
+		<< endl;
+	    out.write((const char*)_rgb, 3*width()*height());
+	}
+	else
+	{
+	    out << "P5" << '\n' << width() << ' ' << height() << '\n' << 255
+		<< endl;
+	    out.write((const char*)_buf, width()*height());
+	}
+	break;
+    }
+    
+    return out;
 }
  
 }
