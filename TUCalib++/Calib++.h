@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.4 2002-08-09 00:09:41 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.5 2002-08-28 01:37:29 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
@@ -271,9 +271,9 @@ class MeasurementMatrix : public Matrix<double>
 	Vector<T>	operator ()(const ATA& K,
 				    const ATB& camera, int i)	const	;
 	JT		jacobianA(const ATA& K,
-				  const ATB& camera)		const	;
+				  const ATB& camera, int i)	const	;
 	Matrix<T>	jacobianB(const ATA& K,
-				  const ATB& camera)		const	;
+				  const ATB& camera, int i)	const	;
 	void		updateA(ATA& K,
 				const Vector<T>& dK)		const	;
 	void		updateB(ATB& camera,
@@ -334,18 +334,22 @@ class MeasurementMatrix : public Matrix<double>
 
       public:
 	CostBA(const MeasurementMatrix& Wt,
-	       u_int dofIntrinsic, int fixCameraCenter=0)		;
+	       u_int dofIntrinsic, bool fixCameraCenter=false)		;
 
 	Vector<T>	operator ()(const ATA& p,
 				    const ATB& x, int j)	const	;
-	JT		jacobianA(const ATA& p, const ATB& x)	const	;
-	Matrix<T>	jacobianB(const ATA& p, const ATB& x)	const	;
+	JT		jacobianA(const ATA& p,
+				  const ATB& x, int j)		const	;
+	Matrix<T>	jacobianB(const ATA& p,
+				  const ATB& x, int j)		const	;
 	void		updateA(ATA& p,	const Vector<T>& dp)	const	;
 	void		updateB(ATB& x, const Vector<T>& dx)	const	;
 	Vector<T>	operator ()(const ATAF& p,
 				    const ATB& x, int j)	const	;
-	JT		jacobianA(const ATAF& p, const ATB& x)	const	;
-	Matrix<T>	jacobianB(const ATAF& p, const ATB& x)	const	;
+	JT		jacobianA(const ATAF& p,
+				  const ATB& x, int j)		const	;
+	Matrix<T>	jacobianB(const ATAF& p,
+				  const ATB& x, int j)		const	;
 	void		updateA(ATAF& p, const Vector<T>& dp)	const	;
 
 	u_int			nframes()	const	{return _Wt.nframes();}
@@ -354,7 +358,7 @@ class MeasurementMatrix : public Matrix<double>
     
       private:
 	const MeasurementMatrix&	_Wt;	// measurement matrix.
-	const int			_fcc;	// fix camera center or not.
+	const bool			_fcc;	// fix camera center or not.
 	u_int				_adim;	// dimension of parameters A.
 	Array<u_int>			_adims;	// dimensions of block jacobian.
     };
@@ -401,8 +405,10 @@ class MeasurementMatrix : public Matrix<double>
 
 	Vector<T>	operator ()(const ATA& p,
 				    const ATB& x, int j)	const	;
-	Matrix<T>	jacobianA(const ATA& p, const ATB& x)	const	;
-	Matrix<T>	jacobianB(const ATA& p, const ATB& x)	const	;
+	Matrix<T>	jacobianA(const ATA& p,
+				  const ATB& x, int j)		const	;
+	Matrix<T>	jacobianB(const ATA& p,
+				  const ATB& x, int j)		const	;
 	void		updateA(ATA& p, const Vector<T>& dp)	const	;
 	void		updateB(ATB& x, const Vector<T>& dx)	const	;
 

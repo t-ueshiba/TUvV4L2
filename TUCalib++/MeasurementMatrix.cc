@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.5 2002-08-20 03:13:41 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.6 2002-08-28 01:37:29 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include "TU/Minimize++.h"
@@ -696,7 +696,7 @@ MeasurementMatrix::projectiveToMetric(Matrix<T>& P, Matrix<T>& Xt) const
     Vector<T>				p = q(0, 3);
     CostPM				f(A, b);
     NullConstraint<T, CostPM::AT>	g;
-    tuMinimizeSquare(f, g, p);
+    minimizeSquare(f, g, p);
     
   // Construct projective transformation H.
     Matrix<T>	Ht(4, 4);
@@ -832,7 +832,7 @@ MeasurementMatrix::refineCalibrationWithPlanes
     CostCP				err(*this, 5);
     NullConstraint<T, CostCP::ATA>	g;
 
-    tuMinimizeSquareSparse(err, g, K, cameras, 30);
+    minimizeSquareSparse(err, g, K, cameras, 30);
 }
 
 //! 平面上のパターンを複数の視点から観測した画像の像を用いて，カメラの内部パラメータ(歪みあり)と外部パラメータをrefineする．
@@ -846,8 +846,7 @@ MeasurementMatrix::refineCalibrationWithPlanes
  */
 void
 MeasurementMatrix::refineCalibrationWithPlanes
-    (CameraWithDistortion::Intrinsic& K,
-     Array<CanonicalCamera>& cameras) const
+    (CameraWithDistortion::Intrinsic& K, Array<CanonicalCamera>& cameras) const
 {
     if (nframes() < 3)
 	throw std::invalid_argument("TU::MeasurementMatrix::refineCalibrationWithPlanes: Two or more frames required!!");
@@ -855,7 +854,7 @@ MeasurementMatrix::refineCalibrationWithPlanes
     CostCP				err(*this, 7);
     NullConstraint<T, CostCP::ATA>	g;
 
-    tuMinimizeSquareSparse(err, g, K, cameras, 500);
+    minimizeSquareSparse(err, g, K, cameras, 500);
 }
 
 //! カメラの外部パラメータと特徴点位置の初期値を非線型最適化によりrefineする．
@@ -867,7 +866,7 @@ MeasurementMatrix::refineCalibrationWithPlanes
 */
 void
 MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,
-				      Matrix<T>& Xt) const
+				    Matrix<T>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment: Two or more frames required!!");
@@ -876,7 +875,7 @@ MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,
     CostBA::CostCD	g(cameras);
     Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    tuMinimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 30);
 }
 
 //! カメラの外部パラメータ，焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
@@ -887,9 +886,8 @@ MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,
 			与える．その最適推定値が返される．
 */
 void
-MeasurementMatrix::bundleAdjustment
-	(Array<CameraWithFocalLength>&	cameras,
-	 Matrix<T>&				Xt) const
+MeasurementMatrix::bundleAdjustment(Array<CameraWithFocalLength>& cameras,
+				    Matrix<T>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment (with focal lengths estimation): Two or more frames required!!");
@@ -898,7 +896,7 @@ MeasurementMatrix::bundleAdjustment
     CostBA::CostCD	g(cameras);
     Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    tuMinimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 30);
 }
 
 //! カメラの外部パラメータ，全てのカメラに共通な焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
@@ -923,7 +921,7 @@ MeasurementMatrix::bundleAdjustment(CameraWithFocalLength::Intrinsic& K,
     CostBACFE::CostCD	g(params);
     Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    tuMinimizeSquareSparse(err, g, params, shape, 30);
+    minimizeSquareSparse(err, g, params, shape, 30);
 
     K = params.K;
     for (int i = 0; i < cameras.dim(); ++i)
@@ -942,13 +940,13 @@ MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
 	(Array<CanonicalCamera>& cameras, Matrix<double>& Xt) const
 {
     if (nframes() < 3)
-	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment (with fixed camera centers): Three or more frames required!!");
+	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters: Three or more frames required!!");
 
-    CostBA				err(*this, 0, 1);
+    CostBA				err(*this, 0, true);
     NullConstraint<T, CostBA::ATA>	g;
     Matrix<double>			shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    tuMinimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 30);
 }
 
 //! カメラの位置が不変との仮定のもとで，個々のカメラの姿勢，焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
@@ -960,17 +958,16 @@ MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
 */
 void
 MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
-	(Array<CameraWithFocalLength>&	cameras,
-	 Matrix<double>&			Xt) const
+	(Array<CameraWithFocalLength>&	cameras, Matrix<double>& Xt) const
 {
     if (nframes() < 3)
 	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment (and focal lengths estimation with fixed camera centers): Three or more frames required!!");
 
-    CostBA				err(*this, 1, 1);
+    CostBA				err(*this, 1, true);
     NullConstraint<T, CostBA::ATAF>	g;
     Matrix<double>			shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    tuMinimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 30);
 }
 
 //! 複数の画像上における特徴点の像の位置から，その3次元空間での位置を求める．
@@ -984,8 +981,7 @@ MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
   \return		特徴点の3次元位置を表す同次座標．
 */
 Matrix<double>
-MeasurementMatrix::reconstruction(const Matrix<T>& P,
-				    bool inhomogeneous) const
+MeasurementMatrix::reconstruction(const Matrix<T>& P, bool inhomogeneous) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::reconstruction: Two or more frames required!!");
@@ -1022,7 +1018,7 @@ MeasurementMatrix::reconstruction(const Matrix<T>& P,
  */
 double
 MeasurementMatrix::assessFundamental(const Matrix<T>& F,
-				       u_int frame0, u_int frame1) const
+				     u_int frame0, u_int frame1) const
 {
     T	d_sum = 0.0;
     for (int j = 0; j < npoints(); ++j)
@@ -1193,7 +1189,7 @@ MeasurementMatrix::initializeCalibrationWithPlanes
 
 void
 MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<T>& P,
-						      Matrix<T>& Xt) const
+						    Matrix<T>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::initializeFocalLengthsEstimation: Two or more frames required!!");
@@ -1427,7 +1423,7 @@ MeasurementMatrix::CostPF::minimize(Vector<double>& mu)
 
 void
 MeasurementMatrix::CostPF::print(int i, double val,
-				   const Vector<double>& mu) const
+				 const Vector<double>& mu) const
 {
 #ifdef DEBUG
     std::cerr << std::setw(3) << i << ": (" << val << ')' << mu;
@@ -1465,7 +1461,7 @@ MeasurementMatrix::CostPM::jacobian(const AT& p) const
 ************************************************************************/
 Vector<double>
 MeasurementMatrix::CostCP::operator ()(const ATA& K,
-					 const ATB& camera, int i) const
+				       const ATB& camera, int i) const
 {
   // Compute errors for all points.
     Vector<T>	val(2 * npoints());
@@ -1482,7 +1478,8 @@ MeasurementMatrix::CostCP::operator ()(const ATA& K,
 }
 
 Matrix<double>
-MeasurementMatrix::CostCP::jacobianA(const ATA& K, const ATB& camera) const
+MeasurementMatrix::CostCP::jacobianA(const ATA& K,
+				     const ATB& camera, int i) const
 {
     Matrix<T>		J(2 * npoints(), adim());
     for (int j = 0; j < npoints(); ++j)
@@ -1496,7 +1493,8 @@ MeasurementMatrix::CostCP::jacobianA(const ATA& K, const ATB& camera) const
 }
 
 Matrix<double>
-MeasurementMatrix::CostCP::jacobianB(const ATA& K, const ATB& camera) const
+MeasurementMatrix::CostCP::jacobianB(const ATA& K,
+				     const ATB& camera, int i) const
 {
     Matrix<T>	KK(2 * npoints(), 6);
     for (int j = 0; j < npoints(); ++j)
@@ -1518,7 +1516,7 @@ MeasurementMatrix::CostCP::updateA(ATA& K, const Vector<T>& dK) const
 
 void
 MeasurementMatrix::CostCP::updateB(ATB& camera,
-				     const Vector<T>& dcamera) const
+				   const Vector<T>& dcamera) const
 {
     camera.update(dcamera);
 }
@@ -1527,7 +1525,7 @@ MeasurementMatrix::CostCP::updateB(ATB& camera,
 *  class MeasurementMatrix::CostBA					*
 ************************************************************************/
 MeasurementMatrix::CostBA::CostBA(const MeasurementMatrix& Wt,
-				    u_int dofIntrinsic, int fixCameraCenter)
+				  u_int dofIntrinsic, bool fixCameraCenter)
     :_Wt(Wt), _fcc(fixCameraCenter), _adim(0), _adims(nframes())
 {
     _adims[0] = dofIntrinsic + (_fcc ? 3 : 0);
@@ -1540,8 +1538,7 @@ MeasurementMatrix::CostBA::CostBA(const MeasurementMatrix& Wt,
 }
 
 Vector<double>
-MeasurementMatrix::CostBA::operator ()(const ATA& p,
-					 const ATB& x, int j) const
+MeasurementMatrix::CostBA::operator ()(const ATA& p, const ATB& x, int j) const
 {
     Vector<T>	val(2 * nframes());
     for (int i = 0; i < nframes(); ++i)
@@ -1555,7 +1552,7 @@ MeasurementMatrix::CostBA::operator ()(const ATA& p,
 }
 
 BlockMatrix<double>
-MeasurementMatrix::CostBA::jacobianA(const ATA& p, const ATB& x) const
+MeasurementMatrix::CostBA::jacobianA(const ATA& p, const ATB& x, int j) const
 {
     BlockMatrix<T>	J(nframes());
     J[0] = (_fcc ? p[0].jacobianFCC(x) : p[0].jacobianK(x));
@@ -1566,7 +1563,7 @@ MeasurementMatrix::CostBA::jacobianA(const ATA& p, const ATB& x) const
 }
 
 Matrix<double>
-MeasurementMatrix::CostBA::jacobianB(const ATA& p, const ATB& x) const
+MeasurementMatrix::CostBA::jacobianB(const ATA& p, const ATB& x, int j) const
 {
     Matrix<T>	K(2 * nframes(), 3);
     for (int i = 0; i < nframes(); ++i)
@@ -1611,7 +1608,7 @@ MeasurementMatrix::CostBA::updateB(ATB& x, const Vector<T>& dx) const
 
 Vector<double>
 MeasurementMatrix::CostBA::operator ()(const ATAF& p,
-					 const ATB& x, int j) const
+				       const ATB& x, int j) const
 {
     Vector<T>	val(2 * nframes());
     for (int i = 0; i < nframes(); ++i)
@@ -1625,7 +1622,7 @@ MeasurementMatrix::CostBA::operator ()(const ATAF& p,
 }
 
 BlockMatrix<double>
-MeasurementMatrix::CostBA::jacobianA(const ATAF& p, const ATB& x) const
+MeasurementMatrix::CostBA::jacobianA(const ATAF& p, const ATB& x, int j) const
 {
     BlockMatrix<T>	J(nframes());
     J[0] = (_fcc ? p[0].jacobianFCC(x) : p[0].jacobianK(x));
@@ -1636,7 +1633,7 @@ MeasurementMatrix::CostBA::jacobianA(const ATAF& p, const ATB& x) const
 }
 
 Matrix<double>
-MeasurementMatrix::CostBA::jacobianB(const ATAF& p, const ATB& x) const
+MeasurementMatrix::CostBA::jacobianB(const ATAF& p, const ATB& x, int j) const
 {
     Matrix<T>	K(2 * nframes(), 3);
     for (int i = 0; i < nframes(); ++i)
@@ -1677,8 +1674,8 @@ MeasurementMatrix::CostBA::updateA(ATAF& p, const Vector<T>& dp) const
 *  class MeasurementMatrix::CostBACFE					*
 ************************************************************************/
 Vector<double>
-MeasurementMatrix::CostBACFE::operator ()
-    (const ATA& p, const ATB& x, int j) const
+MeasurementMatrix::CostBACFE::operator ()(const ATA& p,
+					  const ATB& x, int j) const
 {
     Vector<T>	val(2 * nframes());
     for (int i = 0; i < nframes(); ++i)
@@ -1692,7 +1689,8 @@ MeasurementMatrix::CostBACFE::operator ()
 }
 
 Matrix<double>
-MeasurementMatrix::CostBACFE::jacobianA(const ATA& p, const ATB& x) const
+MeasurementMatrix::CostBACFE::jacobianA(const ATA& p,
+					const ATB& x, int j) const
 {
     Matrix<T>		J(2 * nframes(), adim());
     J(0, 0, 2, 1) = p.K.jacobianK(p[0].xc(x));
@@ -1707,7 +1705,8 @@ MeasurementMatrix::CostBACFE::jacobianA(const ATA& p, const ATB& x) const
 }
 
 Matrix<double>
-MeasurementMatrix::CostBACFE::jacobianB(const ATA& p,	const ATB& x) const
+MeasurementMatrix::CostBACFE::jacobianB(const ATA& p,
+					const ATB& x, int j) const
 {
     Matrix<T>	K(2 * nframes(), 3);
     for (int i = 0; i < nframes(); ++i)
@@ -1718,7 +1717,7 @@ MeasurementMatrix::CostBACFE::jacobianB(const ATA& p,	const ATB& x) const
 }
 
 void
-MeasurementMatrix::CostBACFE::updateA(ATA& p,	const Vector<T>& dp) const
+MeasurementMatrix::CostBACFE::updateA(ATA& p, const Vector<T>& dp) const
 {
     p.K.update(dp(0, 1));
     for (int i = 1; i < nframes(); ++i)
