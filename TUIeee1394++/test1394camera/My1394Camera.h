@@ -1,5 +1,5 @@
 /*
- *  $Id: My1394Camera.h,v 1.2 2003-02-20 05:51:50 ueshiba Exp $
+ *  $Id: My1394Camera.h,v 1.3 2003-02-27 03:48:13 ueshiba Exp $
  */
 #include <gtk/gtk.h>
 #include "TU/Ieee1394++.h"
@@ -27,54 +27,27 @@ struct MyRGB
 class My1394Camera : public Ieee1394Camera
 {
   public:
-  /*!
-    Bayerパターン -> RGB 変換の種類．
-  */
-    enum Bayer
-    {
-	NONE,		//!< 変換しない
-	RGGB,		//!< RGGB Bayer pattern から RGB 形式へ
-	BGGR		//!< BGGR Bayer pattern から RGB 形式へ
-    };
-    
-    My1394Camera(Ieee1394Port& port, u_int64 uniqId)	;
-    ~My1394Camera()					;
+    My1394Camera(Ieee1394Port& port, u_int64 uniqId)			;
+    ~My1394Camera()							;
 
   //! 画像の表示領域となるキャンバスを返す．
-    GtkWidget*		canvas()		const	{return _canvas;}
+    GtkWidget*		canvas()				const	;
     Ieee1394Camera&	setFormatAndFrameRate(Format format,
-					      FrameRate rate)	;
-    void		idle()					;
-    void		draw()					;
-    Bayer		getBayer()			const	;
-    void		setBayer(Bayer bayer)			;
-    std::ostream&	save(std::ostream& out)		const	;
+					      FrameRate rate)		;
+    void		idle()						;
+    void		draw()						;
+    std::ostream&	save(std::ostream& out)			const	;
     
   private:
     GtkWidget* const	_canvas;	// 画像を表示する領域
     u_char*		_buf;		// 入力画像用バッファ
     MyRGB*		_rgb;		// RGB カラー画像(表示用)バッファ
-    Bayer		_bayer;		// Bayer -> RGB 変換の種類を示すflag
 };
- 
-//! 現在設定されているBayerパターン -> RGB 変換の種類を返す．
-/*!
-  \return	変換の種類．
-*/
-inline My1394Camera::Bayer
-My1394Camera::getBayer() const
-{
-    return _bayer;
-}
 
-//! Bayerパターン -> RGB 変換の種類を指定する．
-/*!
-  \param bayer	変換の種類．
-*/
-inline void
-My1394Camera::setBayer(Bayer bayer)
+inline GtkWidget*
+My1394Camera::canvas() const
 {
-    _bayer = bayer;
+    return _canvas;
 }
 
 }

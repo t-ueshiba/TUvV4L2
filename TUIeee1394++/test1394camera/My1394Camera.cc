@@ -1,5 +1,5 @@
 /*
- *  $Id: My1394Camera.cc,v 1.6 2003-02-20 10:08:03 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.7 2003-02-27 03:48:13 ueshiba Exp $
  */
 #include <sys/time.h>
 #include <stdexcept>
@@ -96,8 +96,7 @@ My1394Camera::My1394Camera(Ieee1394Port& port, u_int64 uniqId)
     :Ieee1394Camera(port, 0, uniqId),
      _canvas(gtk_drawing_area_new()),
      _buf(0),
-     _rgb(0),
-     _bayer(NONE)
+     _rgb(0)
 {
     initialize_tbl();			// YUV -> RGB 変換テーブルの初期化．
     gdk_rgb_init();
@@ -176,19 +175,9 @@ My1394Camera::idle()
     countTime(nframes, start);
 
   // IEEE1394Camera から画像データを読み込む．
-    if (pixelFormat() == MONO_8 || pixelFormat() == MONO_16)
-	switch (_bayer)
-	{
-	  case RGGB:
-	    snap().captureBayerRGGBRaw(_rgb);
-	    break;
-	  case BGGR:
-	    snap().captureBayerBGGRRaw(_rgb);
-	    break;
-	  default:
-	    snap().captureRaw(_buf);
-	    break;
-	}
+    if (bayerTileMapping() != Ieee1394Camera::YYYY &&
+	(pixelFormat() == MONO_8 || pixelFormat() == MONO_16))
+	snap().captureBayerRaw(_rgb);
     else
 	snap().captureRaw(_buf);
     draw();			// canvasに表示する．
@@ -263,7 +252,7 @@ My1394Camera::draw()
 			   GDK_RGB_DITHER_NONE, (guchar*)_buf, 3*width());
 	break;
       case MONO_8:
-	if (_bayer != NONE)
+	if (bayerTileMapping() != Ieee1394Camera::YYYY)
 	    gdk_draw_rgb_image(_canvas->window,
 			       _canvas->style
 				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
@@ -277,7 +266,7 @@ My1394Camera::draw()
 				GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
 	break;
       case MONO_16:
-      	if (_bayer != NONE)
+	if (bayerTileMapping() != Ieee1394Camera::YYYY)
 	    gdk_draw_rgb_image(_canvas->window,
 			       _canvas->style
 				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
@@ -329,7 +318,7 @@ My1394Camera::save(std::ostream& out) const
 
       case MONO_8:
       case MONO_16:
-	if (_bayer != NONE)
+	if (bayerTileMapping() != Ieee1394Camera::YYYY)
 	{
 	    out << "P6" << '\n' << width() << ' ' << height() << '\n' << 255
 		<< endl;

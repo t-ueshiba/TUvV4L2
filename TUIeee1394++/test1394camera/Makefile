@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.4 2003-02-20 05:51:50 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2003-02-27 03:48:13 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,7 +14,7 @@ LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 `gtk-config --libs`
 
 CPPFLAGS	=
 CFLAGS		= -g
-CCFLAGS		= -O
+CCFLAGS		= -g -O
 LDFLAGS		= -L$(LIBDIR)
 
 LINKER		= $(CCC)
@@ -44,7 +44,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

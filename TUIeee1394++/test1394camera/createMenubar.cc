@@ -1,5 +1,5 @@
 /*
- *  $Id: createMenubar.cc,v 1.6 2003-02-20 05:51:50 ueshiba Exp $
+ *  $Id: createMenubar.cc,v 1.7 2003-02-27 03:48:13 ueshiba Exp $
  */
 #include "My1394Camera.h"
 #include "MyDialog.h"
@@ -167,16 +167,6 @@ operator <<(std::ostream& out, const My1394Camera& camera)
 	    else
 		out << camera.getValue(feature[i].feature);
 	}
-    }
-
-    switch (camera.getBayer())
-    {
-      case My1394Camera::RGGB:
-	out << " BayerRGGB";
-	break;
-      case My1394Camera::BGGR:
-	out << " BayerBGGR";
-	break;
     }
 
     return out << endl;
