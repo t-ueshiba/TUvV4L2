@@ -1,5 +1,5 @@
 /*
- *  $Id: Allocator++.cc,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: Allocator++.cc,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
  */
 #include "TU/Allocator++.h"
 
@@ -28,7 +28,7 @@ Allocator<T>::free(void* p)
     if (p != 0)
     {
 	_freeList.push_front(*(Element*)p);
-	for (List<Enumerator>::Iterator iter = _enumeratorList.begin();
+	for (typename List<Enumerator>::Iterator iter = _enumeratorList.begin();
 	     iter != _enumeratorList.end(); ++iter)
 	    iter->unmark(p);
     }
@@ -89,7 +89,7 @@ Allocator<T>::Enumerator::Enumerator(const Allocator<T>& allocator)
 	    _mark[_page][_index] = ~0;
 
   // Unmark bits corresponding to the elements in _freeList.
-    for (FreeList::ConstIterator iter = _allocator._freeList.begin();
+    for (typename FreeList::ConstIterator iter = _allocator._freeList.begin();
 	 iter != _allocator._freeList.end(); ++iter)
 	unmark(iter.operator ->());
 
@@ -149,8 +149,8 @@ Allocator<T>::Enumerator::operator ++()
 template <class T> void
 Allocator<T>::Enumerator::unmark(const void* p)
 {
-    PageList::ConstIterator	iter = _allocator._pageList.begin();
-    u_int			page = 0;
+    typename PageList::ConstIterator	iter = _allocator._pageList.begin();
+    u_int				page = 0;
     for (; p < iter->nth(0) || p >= iter->nth(iter->nelements()); ++iter)
 	++page;
 

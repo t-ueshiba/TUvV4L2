@@ -1,5 +1,5 @@
 /*
- *  $Id: Mesh++.cc,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
+ *  $Id: Mesh++.cc,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
  */
 #include <float.h>
 #include <map>
@@ -190,13 +190,13 @@ Mesh<V, E, F, M>::put(std::ostream& out) const
 {
     std::map<V*, int>	dict;
     int					vnum = 1;
-    for (Allocator<V>::Enumerator vertices(_v); vertices; ++vertices)
+    for (typename Allocator<V>::Enumerator vertices(_v); vertices; ++vertices)
     {
 	dict[vertices] = vnum;
 	out << "Vertex " << vnum++ << ' ' << *vertices;
     }
     int		fnum = 1;
-    for (Allocator<F>::Enumerator faces(_f); faces; ++faces)
+    for (typename Allocator<F>::Enumerator faces(_f); faces; ++faces)
     {
 	out << "Face " << fnum++;
 	for (int e = 0; e < M; ++e)
@@ -215,7 +215,7 @@ Mesh<V, E, F, M>::boundingBox() const
     bbox.xmin = bbox.ymin = bbox.zmin = FLT_MAX;
     bbox.xmax = bbox.ymax = bbox.zmax = FLT_MIN;
     
-    for (Allocator<F>::Enumerator faces(_f); faces; ++faces)
+    for (typename Allocator<F>::Enumerator faces(_f); faces; ++faces)
 	for (int e = 0; e < M; ++e)
 	{
 	    if (faces->v(e)[0] <= bbox.xmin)
@@ -241,12 +241,12 @@ Mesh<V, E, F, M>::clean()
     using namespace	std;
     
     set<V*>	verticesUsed;
-    for (Allocator<F>::Enumerator faces(_f); faces; ++faces)
+    for (typename Allocator<F>::Enumerator faces(_f); faces; ++faces)
 	for (int e = 0; e < M; ++e)
 	    verticesUsed.insert(&(faces->v(e)));
-    for (Allocator<V>::Enumerator vertices(_v); vertices; ++vertices)
+    for (typename Allocator<V>::Enumerator vertices(_v); vertices; ++vertices)
     {
-	set<V*, less<V*> >::iterator	p = verticesUsed.find(vertices);
+	typename set<V*, less<V*> >::iterator	p = verticesUsed.find(vertices);
 	if (p == verticesUsed.end())
 	{
 	    vertices->~V();
@@ -373,13 +373,13 @@ Mesh<V, E, F, M>::Topology::_a = 0;
 template <class V, class E, class F, u_int M> void
 Mesh<V, E, F, M>::Topology::pair() const
 {
-    for (List<FaceNode>::ConstIterator iter = begin(); iter != end(); ++iter)
+    for (typename List<FaceNode>::ConstIterator iter = begin(); iter != end(); ++iter)
     {
 	Edge	edge(iter->f());
 	while (&edge.v() != _v)
 	    ++edge;
 	V*	vn = &edge.next().v();
-	for (List<FaceNode>::ConstIterator iter1(iter); ++iter1 != end(); )
+	for (typename List<FaceNode>::ConstIterator iter1(iter); ++iter1 != end(); )
 	{
 	    Edge	edgeF0(iter1->f()), edgeF(edgeF0);
 	    do

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.6 2002-07-26 09:26:21 ueshiba Exp $
+#  $Id: Makefile,v 1.7 2002-07-29 00:09:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -21,12 +21,12 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home1/ueshiba/include/epbm.h \
-		/home1/ueshiba/include/vvvconf.h \
-		/home1/ueshiba/include/vvverror.h \
-		/home1/ueshiba/include/vvverrorcode.h \
-		/home1/ueshiba/include/vvvsize.h \
-		/home1/ueshiba/include/vvvstd.h \
+EXTHDRS		= /usr/local/VVV/include/epbm.h \
+		/usr/local/VVV/include/vvvconf.h \
+		/usr/local/VVV/include/vvverror.h \
+		/usr/local/VVV/include/vvverrorcode.h \
+		/usr/local/VVV/include/vvvsize.h \
+		/usr/local/VVV/include/vvvstd.h \
 		TU/Allocator++.h \
 		TU/Array++.cc \
 		TU/Bezier++.h \
@@ -141,7 +141,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.6 $	|		\
+REV		= $(shell echo $Revision: 1.7 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -190,10 +190,10 @@ Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
 Image.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Array++.cc
 ImageBase.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/Manip.h /home1/ueshiba/include/epbm.h \
-	/home1/ueshiba/include/vvvconf.h /home1/ueshiba/include/vvvstd.h \
-	/home1/ueshiba/include/vvvsize.h /home1/ueshiba/include/vvverror.h \
-	/home1/ueshiba/include/vvverrorcode.h
+	TU/TU/TU/types.h TU/Manip.h /usr/local/VVV/include/epbm.h \
+	/usr/local/VVV/include/vvvconf.h /usr/local/VVV/include/vvvstd.h \
+	/usr/local/VVV/include/vvvsize.h /usr/local/VVV/include/vvverror.h \
+	/usr/local/VVV/include/vvverrorcode.h
 ImageLine.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 List++.o: TU/TU/List++.h
