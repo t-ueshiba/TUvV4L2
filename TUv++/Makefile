@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.7 2003-01-10 00:50:06 ueshiba Exp $
+#  $Id: Makefile,v 1.8 2003-02-20 08:49:23 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -13,9 +13,14 @@ INCDIRS		= -I. -I$(HOME)/include -I$(X11HOME)/include -I/opt/Shikaku/include
 
 NAME		= TUv++
 
-CPPFLAGS	= -DUseXaw #-DDEBUG #-DUseShm #-DDESTROY_WIDGET
+CPPFLAGS	= -DUseXaw #-DDEBUG #-DDESTROY_WIDGET
 CFLAGS		= -O -g
-CCFLAGS		= -O -g
+ifeq ($(CCC), icc)
+  CCFLAGS	= -O3 -tpp7 -xW -parallel
+else
+  CCFLAGS	= -O -g
+#  CCFLAGS      = -g
+endif
 
 LINKER		= $(CCC)
 
@@ -192,7 +197,7 @@ OBJS		= App.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.7 $	|		\
+REV		= $(shell echo $Revision: 1.8 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
