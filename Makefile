@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.15 2003-03-14 02:26:07 ueshiba Exp $
+#  $Id: Makefile,v 1.16 2003-03-17 00:22:30 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -105,8 +105,7 @@ SRCS		= Allocator++.cc \
 		TriggerGenerator.cc \
 		Vector++.cc \
 		Vector++.inst.cc \
-		manipulators.cc \
-		strtoull.c
+		manipulators.cc
 OBJS		= Allocator++.o \
 		Array++.o \
 		Array++.inst.o \
@@ -141,13 +140,12 @@ OBJS		= Allocator++.o \
 		TriggerGenerator.o \
 		Vector++.o \
 		Vector++.inst.o \
-		manipulators.o \
-		strtoull.o
+		manipulators.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.15 $	|		\
+REV		= $(shell echo $Revision: 1.16 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -194,7 +192,7 @@ Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Image++.cc TU/Image++.h TU/TU/TU/Vector++.h
 ImageBase.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h TU/Manip.h /usr/local/VVV/include/epbm.h \
-	/usr/local/VVV/include/vvvconf.h /usr/local/VVV/include/vvvstd.h \
+	/usr/local/VVV/include/vvvstd.h /usr/local/VVV/include/vvvconf.h \
 	/usr/local/VVV/include/vvvsize.h /usr/local/VVV/include/vvverror.h \
 	/usr/local/VVV/include/vvverrorcode.h
 ImageLine.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \

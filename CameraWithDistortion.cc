@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithDistortion.cc,v 1.6 2003-02-27 09:09:52 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.7 2003-03-17 00:22:30 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -153,6 +153,12 @@ CameraWithDistortion::Intrinsic::update(const Vector<double>& dp)
     _d1 -= dp[5];
     _d2 -= dp[6];
     return *this;
+}
+
+u_int
+CameraWithDistortion::Intrinsic::dof() const
+{
+    return 7;
 }
 
 double

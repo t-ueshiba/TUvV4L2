@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithFocalLength.cc,v 1.4 2003-02-27 09:09:52 ueshiba Exp $
+ *  $Id: CameraWithFocalLength.cc,v 1.5 2003-03-17 00:22:30 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -115,6 +115,12 @@ CameraWithFocalLength::Intrinsic::Ktinv() const
     mat[2][2] = 1.0;
 
     return mat;
+}
+
+u_int
+CameraWithFocalLength::Intrinsic::dof() const
+{
+    return 1;
 }
 
 double
