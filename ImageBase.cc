@@ -20,17 +20,8 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.9 2003-07-06 23:53:21 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.10 2004-01-26 04:44:32 ueshiba Exp $
  */
-#ifdef WIN32
-#  include <winsock2.h>
-#else
-#  ifdef __APPLE__
-#    include <arpa/inet.h>
-#  else
-#    include <netinet/in.h>
-#  endif
-#endif
 #include "TU/Image++.h"
 #include "TU/Manip.h"
 #include "TU/Geometry++.h"
@@ -61,7 +52,13 @@ ImageBase::Type
 ImageBase::restoreHeader(std::istream& in)
 {
     using namespace	std;
+
+  // Reset calibration parameters.
+    P = 0.0;
+    P[0][0] = P[1][1] = P[2][2] = 1.0;
+    d1 = d2 = 0.0;
     
+  // Read the magic number.
     int	magic = in.get();
     if (magic == EOF)
 	return END;
