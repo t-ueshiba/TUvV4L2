@@ -1,5 +1,5 @@
 /*
- *  $Id: CanvasPaneDC.cc,v 1.2 2002-07-25 02:38:09 ueshiba Exp $
+ *  $Id: CanvasPaneDC.cc,v 1.3 2004-09-27 08:32:00 ueshiba Exp $
  */
 #include "TU/v/CanvasPaneDC.h"
 #include "vCanvas_.h"
@@ -129,12 +129,12 @@ CBcanvasPaneDC(::Widget, XtPointer client_data, XtPointer)
  *  Public member functions
  */
 CanvasPaneDC::CanvasPaneDC(CanvasPane& parentCanvasPane,
-				 u_int w, u_int h)
+			   u_int w, u_int h)
     :Object(parentCanvasPane),
      XDC(w != 0 ? w : parentCanvasPane.widget().width(),
-	    h != 0 ? h : parentCanvasPane.widget().height(),
-	    window().colormap(),
-	    XtAllocateGC(window().widget(), 0, 0, 0, 0, 0)),
+	 h != 0 ? h : parentCanvasPane.widget().height(),
+	 window().colormap(),
+	 XtAllocateGC(window().widget(), 0, 0, 0, 0, 0)),
      _widget(XtVaCreateManagedWidget("TUvCanvasPaneDC",	   // widget name
 				     vCanvasWidgetClass,   // widget class 
 				     parent().widget(),    // parent widget
