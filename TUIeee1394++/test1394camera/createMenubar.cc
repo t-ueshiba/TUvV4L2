@@ -1,7 +1,8 @@
 /*
- *  $Id: createMenubar.cc,v 1.3 2002-12-09 07:48:22 ueshiba Exp $
+ *  $Id: createMenubar.cc,v 1.4 2002-12-18 04:34:08 ueshiba Exp $
  */
 #include "My1394Camera.h"
+#include "MyDialog.h"
 #include <iomanip>
 
 namespace TU
@@ -42,7 +43,15 @@ static const MyFormat	format[] =
     {Ieee1394Camera::RGB24_1600x1200,  "1600x1200-RGB"},
     {Ieee1394Camera::MONO8_1600x1200,  "1600x1200-Y(mono)"},
     {Ieee1394Camera::MONO16_1280x960,  "1280x960-Y(mono16)"},
-    {Ieee1394Camera::MONO16_1600x1200, "1600x1200-Y(mono16)"}
+    {Ieee1394Camera::MONO16_1600x1200, "1600x1200-Y(mono16)"},
+    {Ieee1394Camera::Format_7_0,       "Format_7_0"},
+    {Ieee1394Camera::Format_7_1,       "Format_7_1"},
+    {Ieee1394Camera::Format_7_2,       "Format_7_2"},
+    {Ieee1394Camera::Format_7_3,       "Format_7_3"},
+    {Ieee1394Camera::Format_7_4,       "Format_7_4"},
+    {Ieee1394Camera::Format_7_5,       "Format_7_5"},
+    {Ieee1394Camera::Format_7_6,       "Format_7_6"},
+    {Ieee1394Camera::Format_7_6,       "Format_7_7"}
 };
 static const int	NFORMATS = sizeof(format)/sizeof(format[0]);
 
@@ -61,7 +70,8 @@ static const MyFrameRate	frameRate[] =
     {Ieee1394Camera::FrameRate_7_5,   "7.5fps"},
     {Ieee1394Camera::FrameRate_15,    "15fps"},
     {Ieee1394Camera::FrameRate_30,    "30fps"},
-    {Ieee1394Camera::FrameRate_60,    "60fps"}
+    {Ieee1394Camera::FrameRate_60,    "60fps"},
+    {Ieee1394Camera::FrameRate_x,     "custom"}
 };
 static const int	NRATES=sizeof(frameRate)/sizeof(frameRate[0]);
 
@@ -74,7 +84,6 @@ struct FormatAndFrameRate
     My1394Camera*		camera;
     Ieee1394Camera::Format	format;
     Ieee1394Camera::FrameRate	frameRate;
-    
 };
 static FormatAndFrameRate	fmtAndFRate[NFORMATS * NRATES];
 
@@ -159,6 +168,15 @@ static void
 CBmenuitem(GtkMenuItem*, gpointer userdata)
 {
     FormatAndFrameRate*	fmtAndFRate = (FormatAndFrameRate*)userdata;
+    if (fmtAndFRate->format >= Ieee1394Camera::Format_7_0)
+    {
+	MyDialog	dialog(fmtAndFRate->camera->
+			       getFormat_7_Info(fmtAndFRate->format));
+	u_int		u0, v0, width, height;
+	dialog.getROI(u0, v0, width, height);
+	fmtAndFRate->camera->setFormat_7_ROI(fmtAndFRate->format,
+					     u0, v0, width, height);
+    }
     fmtAndFRate->camera->setFormatAndFrameRate(fmtAndFRate->format,
 					       fmtAndFRate->frameRate);
 }
@@ -197,12 +215,9 @@ createMenubar(My1394Camera& camera)
     GtkWidget*	item = gtk_menu_item_new_with_label("Quit");
     gtk_signal_connect(GTK_OBJECT(item), "activate",
 		       GTK_SIGNAL_FUNC(CBexit), &camera);
-    gtk_widget_show(item);
     gtk_menu_append(GTK_MENU(menu), item);
-    gtk_widget_show(menu);
     item = gtk_menu_item_new_with_label("File");
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
-    gtk_widget_show(item);
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
 
   // "Format"メニューを生成．
@@ -233,7 +248,6 @@ createMenubar(My1394Camera& camera)
 		gtk_signal_connect(GTK_OBJECT(item), "activate",
 				   GTK_SIGNAL_FUNC(CBmenuitem),
 				   (gpointer)&fmtAndFRate[nitems]);
-		gtk_widget_show(item);
 		++nitems;
 	    }
 	}
@@ -242,20 +256,17 @@ createMenubar(My1394Camera& camera)
       // フォーマットがサポートされていることになる．
 	if (submenu != 0)
 	{
-	    gtk_widget_show(submenu);
 	    GtkWidget*	item = gtk_menu_item_new_with_label(format[i].name);
 	    gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), submenu);
 	    gtk_menu_append(GTK_MENU(menu), item);
-	    gtk_widget_show(item);
 	}
 	
     }
     item = gtk_menu_item_new_with_label("Format");
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
-    gtk_widget_show(item);
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
 
-    gtk_widget_show(menubar);
+    gtk_widget_show_all(menubar);
     
     return menubar;
 }

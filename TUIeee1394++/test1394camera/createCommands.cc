@@ -1,5 +1,5 @@
 /*
- *  $Id: createCommands.cc,v 1.2 2002-08-01 05:04:02 ueshiba Exp $
+ *  $Id: createCommands.cc,v 1.3 2002-12-18 04:34:08 ueshiba Exp $
  */
 #include "My1394Camera.h"
 
@@ -84,6 +84,23 @@ CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
 	gtk_idle_remove(idleTag);	// idle処理を中止する．
 	camera->stopContinuousShot();	// カメラからの画像出力を停止する．
     }
+}
+
+//! トリガモードボタンの状態が変更されると呼ばれるコールバック関数．
+/*!
+  trigger modeを on/off する．
+  \param toggle		トリガモードボタン
+  \param userdata	My1394Camera (IEEE1394カメラ)
+*/
+static void
+CBtriggerMode(GtkWidget* toggle, gpointer userdata)
+{
+    My1394Camera*	camera = (My1394Camera*)userdata;
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
+	camera->turnOn(Ieee1394Camera::TRIGGER_MODE)
+	    .setTriggerMode(Ieee1394Camera::Trigger_Mode0);
+    else
+	camera->turnOff(Ieee1394Camera::TRIGGER_MODE);
 }
 
 //! on/off ボタンの状態が変更されると呼ばれるコールバック関数．
@@ -178,8 +195,9 @@ CBsetWhiteBalanceVR(GtkAdjustment* adj, gpointer userdata)
 GtkWidget*
 createCommands(My1394Camera& camera)
 {
-    GtkWidget*	commands = gtk_table_new(4, 1 + NFEATURES, FALSE);
-    
+    GtkWidget*	commands = gtk_table_new(4, 2 + NFEATURES, FALSE);
+    u_int	y = 0;
+
   // カメラからの画像取り込みをon/offするtoggle buttonを生成．
     GtkWidget* toggle = gtk_toggle_button_new_with_label("Capture");
   // コールバック関数の登録．
@@ -188,11 +206,25 @@ createCommands(My1394Camera& camera)
   // カメラの現在の画像取り込み状態をtoggle buttonに反映．
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 				 (camera.inContinuousShot() ? TRUE : FALSE));
-    gtk_widget_show(toggle);
-    gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
-			      1, 2, 0, 1);
+    gtk_table_attach_defaults(GTK_TABLE(commands), toggle, 1, 2, y, y+1);
+    ++y;
 
-    u_int	y = 1;
+  // もしもカメラがトリガモードをサポートしていれば．．．
+    if (camera.inquireFeatureFunction(Ieee1394Camera::TRIGGER_MODE) &
+	Ieee1394Camera::Presence)
+    {
+      // カメラのtrigger modeをon/offするtoggle buttonを生成．
+	toggle = gtk_toggle_button_new_with_label("Trigger mode");
+      // コールバック関数の登録．
+	gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
+			   GTK_SIGNAL_FUNC(CBtriggerMode), &camera);
+      // カメラの現在のtrigger modeをtoggle buttonに反映．
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
+	     (camera.isTurnedOn(Ieee1394Camera::TRIGGER_MODE) ? TRUE : FALSE));
+	gtk_table_attach_defaults(GTK_TABLE(commands), toggle, 1, 2, y, y+1);
+	++y;
+    }
+    
     for (int i = 0; i < NFEATURES; ++i)
     {
 	u_int	inq = camera.inquireFeatureFunction(feature[i].feature);
@@ -213,7 +245,6 @@ createCommands(My1394Camera& camera)
 	      // カメラの現在のon/off状態をtoggle buttonに反映．
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 		    (camera.isTurnedOn(feature[i].feature) ? TRUE : FALSE));
-		gtk_widget_show(toggle);
 		gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
 					  x, x+1, y, y+1);
 		++x;
@@ -235,13 +266,11 @@ createCommands(My1394Camera& camera)
 		  // カメラの現在のauto/manual状態をtoggle buttonに反映．
 		    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 			(camera.isAuto(feature[i].feature) ? TRUE : FALSE));
-		    gtk_widget_show(toggle);
 		    gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
 					      x, x+1, y, y+1);
 		}
 		
 		GtkWidget*	label = gtk_label_new(feature[i].name);
-		gtk_widget_show(label);
 		gtk_table_attach_defaults(GTK_TABLE(commands), label,
 					  0, 1, y, y+1);
 	      // この機能が取り得る値の範囲を調べる．
@@ -263,13 +292,11 @@ createCommands(My1394Camera& camera)
 		    GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
 		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
-		    gtk_widget_show(scale);
 		    gtk_table_attach_defaults(GTK_TABLE(commands), scale,
 					      1, 2, y, y+1);
 		    ++i;
 		    ++y;
 		    GtkWidget*	label = gtk_label_new(feature[i].name);
-		    gtk_widget_show(label);
 		    gtk_table_attach_defaults(GTK_TABLE(commands), label,
 					      0, 1, y, y+1);
 		  // white balanceのVR値を与えるためのadjustment widgetを生成．
@@ -282,7 +309,6 @@ createCommands(My1394Camera& camera)
 		    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
 		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
-		    gtk_widget_show(scale);
 		    gtk_table_attach_defaults(GTK_TABLE(commands), scale,
 					      1, 2, y, y+1);
 		}
@@ -303,7 +329,6 @@ createCommands(My1394Camera& camera)
 		    GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
 		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
-		    gtk_widget_show(scale);
 		    gtk_table_attach_defaults(GTK_TABLE(commands), scale,
 					      1, 2, y, y+1);
 		}
@@ -313,7 +338,7 @@ createCommands(My1394Camera& camera)
 	}
     }
 
-    gtk_widget_show(commands);
+    gtk_widget_show_all(commands);
 
     return commands;
 }

@@ -1,5 +1,5 @@
 /*
- *  $Id: My1394Camera.cc,v 1.3 2002-12-10 08:16:50 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.4 2002-12-18 04:34:08 ueshiba Exp $
  */
 #include <sys/time.h>
 #include <stdexcept>
@@ -60,7 +60,7 @@ countTime(int& nframes, struct timeval& start)
 	gettimeofday(&end, NULL);
 	double	interval = (end.tv_sec  - start.tv_sec) +
 	    (end.tv_usec - start.tv_usec) / 1.0e6;
-	cerr << nframes / interval << " frames/sec" << endl;
+	std::cerr << nframes / interval << " frames/sec" << std::endl;
 	nframes = 0;
     }
     if (nframes++ == 0)
@@ -117,6 +117,9 @@ My1394Camera::~My1394Camera()
 //! 画像フォーマットとフレームレートを指定する．
 /*!
   さらに入力画像バッファとRGBバッファを確保し直し，canvasの大きさを変更する．
+  \param format	設定したい画像フォーマット．
+  \param rate	設定したいフレームレート．
+  \return	このIEEE1394カメラオブジェクト．
 */
 Ieee1394Camera&
 My1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)

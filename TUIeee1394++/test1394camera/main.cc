@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2002-12-18 04:34:08 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera
@@ -18,8 +18,8 @@
 
 namespace TU
 {
-GtkWidget*	createMenubar(My1394Camera& camera)	;
-GtkWidget*	createCommands(My1394Camera& camera)	;
+GtkWidget*	createMenubar(My1394Camera& camera)			;
+GtkWidget*	createCommands(My1394Camera& camera)			;
 
 /************************************************************************
 *  static functions							*
@@ -101,8 +101,7 @@ main(int argc, char* argv[])
 			 GTK_SHRINK, GTK_SHRINK, 5, 0);
 	gtk_table_attach(GTK_TABLE(table), camera.canvas(), 0, 1, 1, 2,
 			 GTK_SHRINK, GTK_SHRINK, 0, 0);
-	gtk_widget_show(table);
-	gtk_widget_show(window);
+	gtk_widget_show_all(window);
 
 	gtk_main();
     }

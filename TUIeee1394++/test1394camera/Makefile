@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.2 2002-08-14 05:21:36 ueshiba Exp $
+#  $Id: Makefile,v 1.3 2002-12-18 04:34:08 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include `gtk-config --cflags`
+INCDIRS		= -I$(HOME)/include -I/usr/local/include `gtk-config --cflags`
 SRCDIR		= $(HOME)/VVV/Pkg/vvv/utilities/test1394camera
 
 PROGRAM		= test1394camera
@@ -27,12 +27,15 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Image++.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/types.h
-HDRS		= My1394Camera.h
+HDRS		= My1394Camera.h \
+		MyDialog.h
 SRCS		= My1394Camera.cc \
+		MyDialog.cc \
 		createCommands.cc \
 		createMenubar.cc \
 		main.cc
 OBJS		= My1394Camera.o \
+		MyDialog.o \
 		createCommands.o \
 		createMenubar.o \
 		main.o
@@ -40,7 +43,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.2 $	|		\
+REV		= $(shell echo $Revision: 1.3 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -56,6 +59,10 @@ My1394Camera.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
 	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+MyDialog.o: MyDialog.h /home/ueshiba/include/TU/Ieee1394++.h \
+	/home/ueshiba/include/TU/Image++.h \
+	/home/ueshiba/include/TU/Vector++.h \
+	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
 createCommands.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
 	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Vector++.h \
@@ -63,7 +70,8 @@ createCommands.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
 createMenubar.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
 	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
+	MyDialog.h
 main.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
 	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Vector++.h \
