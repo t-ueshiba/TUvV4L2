@@ -1,5 +1,5 @@
 /*
- *  $Id: DC.h,v 1.2 2002-07-25 02:38:10 ueshiba Exp $
+ *  $Id: DC.h,v 1.3 2004-07-15 20:18:12 ueshiba Exp $
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -25,8 +25,7 @@ class DC
     DC(u_int width, u_int height)
 	:_width(width), _height(height),
 	 _mul(1), _div(1), _offset(0, 0),
-	_layer(UNDERLAY), _pointStyle(DOT),
-	_thickness(1)					{}
+	_layer(UNDERLAY), _pointStyle(DOT)		{}
     virtual		~DC()				;
     
     u_int		width()			const	{return _width;}
@@ -41,7 +40,7 @@ class DC
     virtual DC&		setOffset(int u0, int v0)		;
     virtual DC&		setLayer(Layer layer)			;
 	    DC&		setPointStyle(PointStyle pointStyle)	;
-	    DC&		setThickness(u_int thickness)		;
+    virtual DC&		setThickness(u_int thickness)		= 0;
     virtual DC&		setForeground(const BGR& fg)		= 0;
     virtual DC&		setBackground(const BGR& bg)		= 0;
     virtual DC&		setForeground(u_int index)		= 0;
@@ -86,7 +85,7 @@ class DC
 
     Layer		getLayer()		const	;
     PointStyle		getPointStyle()		const	;
-    u_int		getThickness()		const	;
+    virtual u_int	getThickness()		const	= 0;
     
     virtual DC&		repaintUnderlay()		= 0;
     virtual DC&		repaintOverlay()		= 0;
@@ -99,7 +98,6 @@ class DC
 					// temporary offset
     Layer		_layer;		// flag indicating underlay/overlay
     PointStyle		_pointStyle;	// drawing style for points
-    u_int		_thickness;	// thickness of lines
 };
 
 inline DC&
@@ -181,16 +179,8 @@ DC::setPointStyle(PointStyle pointStyle)
     return *this;
 }
 
-inline DC&
-DC::setThickness(u_int thickness)
-{
-    _thickness = thickness;
-    return *this;
-}
-
 inline DC::Layer	DC::getLayer()		const	{return _layer;}
 inline DC::PointStyle	DC::getPointStyle()	const	{return _pointStyle;}
-inline u_int		DC::getThickness()	const	{return _thickness;}
 
 /************************************************************************
 *  Manipulators								*
