@@ -1,8 +1,9 @@
 /*
- *  $Id: ptest.cc,v 1.4 2002-07-26 08:56:04 ueshiba Exp $
+ *  $Id: ptest.cc,v 1.5 2002-12-10 01:08:04 ueshiba Exp $
  */
 #include "TU/Object++.h"
-#ifdef __GNUG__
+//#ifdef __GNUG__
+#if defined __GNUG__ || __INTEL_COMPILER
 #  include "TU/Object++.cc"
 #endif
 
