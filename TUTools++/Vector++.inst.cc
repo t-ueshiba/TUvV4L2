@@ -18,7 +18,7 @@
  *  No Warranty.
  *  Authors are not responsible for any damage in use of this program.
  */
-#if defined __GNUG__ || defined __INTEL_COMPILER
+#if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
 #include "TU/Array++.cc"
 #include "TU/Vector++.cc"

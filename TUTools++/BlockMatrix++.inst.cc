@@ -1,7 +1,7 @@
 /*
- *  $Id: BlockMatrix++.inst.cc,v 1.3 2002-12-18 05:46:12 ueshiba Exp $
+ *  $Id: BlockMatrix++.inst.cc,v 1.4 2003-01-10 00:30:54 ueshiba Exp $
  */
-#if defined __GNUG__ || defined __INTEL_COMPILER
+#if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
 #include "TU/BlockMatrix++.cc"
 #include "TU/Array++.cc"
