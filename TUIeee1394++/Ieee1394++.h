@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.3 2002-08-01 05:03:15 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.4 2002-08-02 02:14:54 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -7,6 +7,7 @@
 #include <libraw1394/raw1394.h>
 #include <libraw1394/csr.h>
 #include <video1394.h>
+#include <netinet/in.h>
 #ifdef HAVE_TUToolsPP
 #  include "TU/Image++.h"
 #else
@@ -222,7 +223,7 @@ class Ieee1394Camera : public Ieee1394Node
 	Format_7_7	 = 0x2fc	//!< Format_7_7: カメラ機種に依存
     };
 
-  //! カメラのフレームレート
+  //! カメラのフレームレートを表すビットマップ
   /*! どのようなフレームレートがサポートされているかは，inquireFrameRate()
       によって知ることができる．*/
     enum FrameRate
@@ -238,12 +239,12 @@ class Ieee1394Camera : public Ieee1394Node
   //! 出力画像の画素の形式
     enum PixelFormat
     {
-	YUV_444,			//!< YUV(4:4:4)
-	YUV_422,			//!< YUV(4:2:2)
-	YUV_411,			//!< YUV(4:1:1)
-	RGB_24,				//!< RGB
-	MONO,				//!< Y(mono)
-	MONO_16				//!< Y(mono16)
+	YUV_444,			//!< YUV(4:4:4)	24bit/pixel
+	YUV_422,			//!< YUV(4:2:2)	16bit/pixel
+	YUV_411,			//!< YUV(4:1:1)	12bit/pixel
+	RGB_24,				//!< RGB	24bit/pixel
+	MONO,				//!< Y(mono)	 8bit/pixel
+	MONO_16				//!< Y(mono16)	16bit/pixel
     };
 
   //! 値を設定できるカメラの属性
@@ -298,6 +299,17 @@ class Ieee1394Camera : public Ieee1394Node
     {
 	LowActiveInput	= 0,		//!< lowでトリガon
 	HighActiveInput	= (0x1 << 24)	//!< highでトリガon
+    };
+
+  private:
+    struct Mono16
+    {
+	operator u_char()		const	{return u_char(ntohs(s));}
+	operator short()		const	{return ntohs(s);}
+	operator float()		const	{return float(ntohs(s));}
+	operator double()		const	{return double(ntohs(s));}
+	      
+	short	s;
     };
 
   public:
@@ -411,8 +423,8 @@ Ieee1394Camera::pixelFormat() const
 
 //! カメラがサポートしている基本機能を返す
 /*!
-  \return	サポートされている機能を#InquireBasicFunction型の列挙値
-		のorとして返す．
+  \return	サポートされている機能を#BasicFunction型の列挙値のorとして
+		返す．
  */
 inline quadlet_t
 Ieee1394Camera::inquireBasicFunction() const

@@ -1,9 +1,8 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.3 2002-08-01 05:03:15 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.4 2002-08-02 02:14:54 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <stdexcept>
-#include <netinet/in.h>
 
 namespace TU
 {
@@ -59,19 +58,6 @@ static const quadlet_t	Polarity_Inq	= 0x1 << 25;
 static const u_int	NBUFFERS	= 4;
 
 /************************************************************************
-*  struct Mono16							*
-************************************************************************/
-struct Mono16
-{
-    operator u_char()			const	{return u_char(ntohs(s));}
-    operator short()			const	{return ntohs(s);}
-    operator float()			const	{return float(ntohs(s));}
-    operator double()			const	{return double(ntohs(s));}
-    
-    short	s;
-};
-    
-/************************************************************************
 *  class Ieee1394Camera							*
 ************************************************************************/
 //! IEEE1394カメラノードを生成する
@@ -84,7 +70,8 @@ struct Mono16
 			同定を行う．0が与えられると，まだ#Ieee1394Camera
 			オブジェクトを割り当てられていないカメラのうち，
 			一番最初にみつかったものがこのオブジェクトと結び
-			つけられる．
+			つけられる．オブジェクト生成後は，globalUniqueId()
+			によってこの値を知ることができる．
 */
 Ieee1394Camera::Ieee1394Camera(Ieee1394Port& prt, u_int ch, u_int64 uniqId)
     :Ieee1394Node(prt, unit_spec_ID, ch, 1, VIDEO1394_SYNC_FRAMES, uniqId),
@@ -943,16 +930,17 @@ Ieee1394Camera::getMemoryChannelMax() const
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．また，カメラに設定されたフォーマットの画素形式
 		が画像のそれに一致しない場合は，自動的に変換が行われる．
-		サポートされている画素形式Tは，u_char, RGB, RGBA, BGR,
-		ABGR, YUV444, YUV422, YUV411のいずれかである．
+		サポートされている画素形式Tは，u_char, short, float, double,
+		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUV411のいずれかである．
 		また，サポートされている変換は以下のとおりであり，カメラの
-		画素形式がこれ以外に設定されている場合はTUExceptionWithMessage
+		画素形式がこれ以外に設定されている場合はstd::domain_error
 		例外が送出される．
-		    -# #YUV444 -> T
-		    -# #YUV422 -> T
-		    -# #YUV411 -> T
-		    -# #RGB -> T (YUV444, YUV422, YUV411を除く) 
+		    -# #YUV_444 -> T
+		    -# #YUV_422 -> T
+		    -# #YUV_411 -> T
+		    -# #RGB_24 -> T (YUV444, YUV422, YUV411を除く) 
 		    -# #MONO -> T
+		    -# #MONO_16 -> T
   \return	このIEEE1394カメラオブジェクト．
 */
 template <class T> const Ieee1394Camera&
@@ -1035,7 +1023,7 @@ Ieee1394Camera::captureRaw(void* image) const
     return *this;
 }
 
-//! unsinged intの値を同じbitパターンを持つ#Formatに直す
+//! unsinged intの値を同じビットパターンを持つ#Formatに直す
 /*!
   \param format	#Formatに直したいunsigned int値．
   \return	#Format型のenum値．
@@ -1114,7 +1102,7 @@ Ieee1394Camera::uintToFormat(u_int format)
     return YUV444_160x120;
 }
 
-//! unsinged intの値を同じbitパターンを持つ#FrameRateに直す
+//! unsinged intの値を同じビットパターンを持つ#FrameRateに直す
 /*!
   \param format	#FrameRateに直したいunsigned int値．
   \return	#FrameRate型のenum値．
@@ -1143,7 +1131,7 @@ Ieee1394Camera::uintToFrameRate(u_int rate)
     return FrameRate_1_875;
 }
 
-//! unsinged intの値を同じbitパターンを持つ#Featureに直す
+//! unsinged intの値を同じビットパターンを持つ#Featureに直す
 /*!
   \param format	#Featureに直したいunsigned int値．
   \return	#Feature型のenum値．
@@ -1198,7 +1186,7 @@ Ieee1394Camera::uintToFeature(u_int feature)
     return BRIGHTNESS;
 }
 
-//! unsinged intの値を同じbitパターンを持つ#TriggerModeに直す
+//! unsinged intの値を同じビットパターンを持つ#TriggerModeに直す
 /*!
   \param format	#TriggerModeに直したいunsigned int値．
   \return	#TriggerMode型のenum値．
