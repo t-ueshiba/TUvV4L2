@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.14 2003-02-07 05:14:45 ueshiba Exp $
+#  $Id: Makefile,v 1.15 2003-03-14 02:26:07 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,10 +11,11 @@ SRCDIR		= $(HOME)/VVV/Pkg/vvv/libraries/libTUTools++
 
 NAME		= TUTools++
 
-CPPFLAGS	= #-DHAVE_CONFIG_H
-CFLAGS		= -g
+CPPFLAGS	= #-DTUVectorPP_DEBUG -DTUBidiagonal_DEBUG #-DHAVE_CONFIG_H
+CFLAGS		= -O -g
 ifeq ($(CCC), icc)
-  CCFLAGS	= -O3 -tpp7 -xW -parallel
+#  CCFLAGS	= -O3 -tpp7 -xW -parallel
+  CCFLAGS	= -g
 else
   CCFLAGS	= -O -g
 #  CCFLAGS      = -g
@@ -146,7 +147,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.14 $	|		\
+REV		= $(shell echo $Revision: 1.15 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

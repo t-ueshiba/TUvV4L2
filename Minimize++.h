@@ -1,5 +1,5 @@
 /*
- *  $Id: Minimize++.h,v 1.4 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: Minimize++.h,v 1.5 2003-03-14 02:26:07 ueshiba Exp $
  */
 #ifndef __TUMinimizePP_h
 #define __TUMinimizePP_h
@@ -24,9 +24,9 @@ class NullConstraint
 *  function minimizeSquare						*
 *    -- Compute x st. ||f(x)||^2 -> min under g(x) = 0.			*
 ************************************************************************/
-template <class F, class G, class AT> void
+template <class F, class G, class AT> Matrix<typename F::T>
 minimizeSquare(const F& f, const G& g, AT& x,
-		 int niter_max=100, double tol=1.5e-8)
+	       int niter_max=100, double tol=1.5e-8)
 {
     using namespace		std;
     typedef typename F::T	T;		// element type.
@@ -73,7 +73,11 @@ minimizeSquare(const F& f, const G& g, AT& x,
 #endif
 	    if (fabs(sqr_new - sqr) <=
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
-		return;
+	    {
+		for (int i = 0; i < xdim; ++i)
+		    A[i][i] = diagA[i];
+		return A(0, 0, xdim, xdim).pinv(1.0e8);
+	    }
 
 	    if (sqr_new < sqr)
 	    {
@@ -88,28 +92,29 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	}
     }
     throw std::runtime_error("minimizeSquare: maximum iteration limit exceeded!");
+    return Matrix<T>(0, 0);
 }
 
 /************************************************************************
 *  function minimizeSquareSparse					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
-template <class F, class G, class ATA, class ATB> void
+template <class F, class G, class ATA, class ATB> Matrix<typename F::T>
 minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
-		       int niter_max=100, double tol=1.5e-8)
+		     int niter_max=100, double tol=1.5e-8)
 {
     using namespace		std;
-    typedef typename F::T	T;	// element type.
-    typedef typename F::JT	JT;	// Jacobian type.
+    typedef typename F::T	T;		// element type.
+    typedef typename F::JT	JT;		// Jacobian type.
 
-    Array<Vector<T>	>	fval(b.dim());	// function values.
+    Array<Vector<T> >		fval(b.dim());	// function values.
     T				sqr = 0;	// sum of squares.
     for (int j = 0; j < b.dim(); ++j)
     {
 	fval[j] = f(a, b[j], j);
 	sqr    += fval[j] * fval[j];
     }
-    T	lambda = 1.0e-7;		// L-M parameter.
+    T	lambda = 1.0e-7;			// L-M parameter.
 
     for (int n = 0; n++ < niter_max; )
     {
@@ -146,7 +151,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	    for (int i = 0; i < adim; ++i)
 		A[i][i] *= (1.0 + lambda);		// Augument diagonals.
 
-	    Vector<T>			da(adim + gdim);
+	    Vector<T>		da(adim + gdim);
 	    da(0, adim) = Jtf;
 	    da(adim, gdim) = gval;
 	    Array<Matrix<T> >	VinvWt(b.dim());
@@ -165,11 +170,11 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	    da.solve(A);
 
 	  // Compute updated parameters and function value to it.
-	    ATA				a_new(a);
+	    ATA			a_new(a);
 	    f.updateA(a_new, da(0, adim));
 	    Array<ATB>		b_new(b);
 	    Array<Vector<T> >	fval_new(b.dim());
-	    T				sqr_new = 0;
+	    T			sqr_new = 0;
 	    for (int j = 0; j < b.dim(); ++j)
 	    {
 		const Vector<T>& db = VinvKtf[j] - VinvWt[j] * da(0, adim);
@@ -184,8 +189,40 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 #endif
 	    if (fabs(sqr_new - sqr) <=
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
-		return;
-
+	    {
+		u_int		bdim = 0;
+		for (int j = 0; j < b.dim(); ++j)
+		    bdim += V[j].dim();
+		Matrix<T>	S(adim + bdim, adim + bdim);
+		Matrix<T>	Sa(S, 0, 0, adim, adim);
+		Sa = U;
+		for (int j = 0; j < b.dim(); ++j)
+		{
+		    VinvWt[j] = V[j].inv() * W[j].trns();
+		    Sa -= W[j] * VinvWt[j];
+		}
+		for (int jj = adim, j = 0; j < b.dim(); ++j)
+		{
+		    const Matrix<T>&	VinvWtSa = VinvWt[j] * Sa;
+		    for (int kk = adim, k = 0; k <= j; ++k)
+		    {
+			S(jj, kk, VinvWtSa.nrow(), VinvWt[k].nrow())
+			     = VinvWtSa * VinvWt[k].trns();
+			kk += VinvWt[k].nrow();
+		    }
+		    S(jj, jj, V[j].nrow(), V[j].nrow()) += V[j].inv();
+		    jj += VinvWt[j].nrow();
+		}
+		Sa = Sa.pinv(1.0e8);
+		for (int jj = adim, j = 0; j < b.dim(); ++j)
+		{
+		    S(jj, 0, VinvWt[j].nrow(), adim) = -VinvWt[j] * Sa;
+		    jj += VinvWt[j].nrow();
+		}
+		    
+		return S.symmetrize() *= sqr;
+	    }
+	    
 	    if (sqr_new < sqr)
 	    {
 		a = a_new;			// Update parameters.
@@ -200,20 +237,22 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	}
     }
     throw std::runtime_error("minimizeSquareSparse: maximum iteration limit exceeded!");
+
+    return Matrix<T>(0, 0);
 }
 
 /************************************************************************
 *  function minimizeSquareSparseDebug					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
-template <class F, class G, class ATA, class ATB> void
+template <class F, class G, class ATA, class ATB>  Matrix<typename F::T>
 minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
-			    int niter_max=100, double tol=1.5e-8)
+			  int niter_max=100, double tol=1.5e-8)
 {
     using namespace		std;
     typedef typename F::T	T;		// element type.
 
-    Array<Vector<T>	>	fval(b.dim());	// function values.
+    Array<Vector<T> >		fval(b.dim());	// function values.
     T				sqr = 0;	// sum of squares.
     for (int j = 0; j < b.dim(); ++j)
     {
@@ -275,11 +314,11 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	    dx.solve(A);
 	    
 	  // Compute updated parameters and function value to it.
-	    ATA				a_new(a);
+	    ATA			a_new(a);
 	    f.updateA(a_new, dx(0, adim));
-	    Array<ATB>		b_new(b.dim());
-	    Array<Vector<T> >	fval_new(b);
-	    T				sqr_new = 0;
+	    Array<ATB>		b_new(b);
+	    Array<Vector<T> >	fval_new(b.dim());
+	    T			sqr_new = 0;
 	    for (int j = 0; j < b.dim(); ++j)
 	    {
 		const Vector<T>& db = dx(adim + j*f.bdim(), f.bdim());
@@ -296,7 +335,16 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 #endif
 	    if (fabs(sqr_new - sqr) <=
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
-		return;
+	    {
+		A(0, 0, adim, adim) = U;
+		for (int j = 0; j < b.dim(); ++j)
+		    A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
+			= V[j];
+		Vector<T>	evalue;
+		A(0, 0, adim + bdim, adim + bdim).eigen(evalue);
+		cerr << evalue;
+		return A(0, 0, adim + bdim, adim + bdim).pinv(1.0e8) *= sqr;
+	    }
 
 	    if (sqr_new < sqr)
 	    {
@@ -312,6 +360,8 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	}
     }
     throw std::runtime_error("minimizeSquareSparseDebug: maximum iteration limit exceeded!");
+
+    return Matrix<T>(0, 0);
 }
  
 }
