@@ -1,7 +1,7 @@
 /*
- *  $Id: Serial.cc,v 1.4 2003-07-06 23:53:22 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.5 2004-04-28 02:28:28 ueshiba Exp $
  */
-#ifndef __APPLE__
+#if (!defined(__GNUC__) || (__GNUC__ < 3))
 
 #include "TU/Serial++.h"
 #include <stdexcept>
@@ -301,4 +301,4 @@ csize(int cs)
 }
  
 }
-#endif	/* !__APPLE__	*/
+#endif
