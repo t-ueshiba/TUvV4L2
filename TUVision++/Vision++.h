@@ -1,5 +1,5 @@
 /*
- *  $Id: Vision++.h,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
+ *  $Id: Vision++.h,v 1.4 2004-03-18 00:59:20 ueshiba Exp $
  */
 #ifndef __TUVisionPP_h
 #define __TUVisionPP_h
@@ -15,7 +15,7 @@ namespace v
 /************************************************************************
 *  color indices							*
 ************************************************************************/
-#ifndef __APPLE__
+#ifdef UseOverlay
 const int	Color_BG	= 0;
 const int	Color_WHITE	= 1;
 const int	Color_RED	= 2;

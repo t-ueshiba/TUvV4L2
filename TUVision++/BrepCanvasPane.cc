@@ -1,5 +1,5 @@
 /*
- *  $Id: BrepCanvasPane.cc,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
+ *  $Id: BrepCanvasPane.cc,v 1.4 2004-03-18 00:59:20 ueshiba Exp $
  */
 #include "TU/v/Vision++.h"
 #include <limits.h>
@@ -18,7 +18,7 @@ BrepCanvasPane::BrepCanvasPane(Window& parentWindow,
     :CanvasPane(parentWindow, width, height),
      _dc(*this), _root(root), _h_cache(0), _cmd(0)
 {
-#ifndef __APPLE__
+#ifdef UseOverlay
     _dc << overlay;
 #endif
 }
@@ -95,7 +95,7 @@ BrepCanvasPane::draw(const Loop* l, DrawMode mode)
 void
 BrepCanvasPane::draw(const HalfEdge* h, DrawMode mode)
 {
-#ifndef __APPLE__
+#ifdef UseOverlay
     u_int	jnc = Color_BG, pnt = Color_BG;
 #else
     BGR		jnc = Color_BG, pnt = Color_BG;
@@ -130,7 +130,7 @@ BrepCanvasPane::draw(const HalfEdge* h, DrawMode mode)
 void
 BrepCanvasPane::draw(const Geometry* g, DrawMode mode)
 {
-#ifndef __APPLE__
+#ifdef UseOverlay
     u_int	pnt = Color_BG;
 #else
     BGR		jnc = Color_BG, pnt = Color_BG;
@@ -154,7 +154,7 @@ BrepCanvasPane::draw(const Geometry* g, DrawMode mode)
 }
 
 void
-#ifndef __APPLE__
+#ifdef UseOverlay
 BrepCanvasPane::repaintOverlay(int, int, int, int)
 #else
 BrepCanvasPane::repaintUnderlay(int, int, int, int)
@@ -174,7 +174,7 @@ BrepCanvasPane::repaintUnderlay(int, int, int, int)
 }
 
 void
-#ifndef __APPLE__
+#ifdef UseOverlay
 BrepCanvasPane::repaintUnderlay(int, int, int, int)
 #else
 BrepCanvasPane::repaintOverlay(int, int, int, int)
