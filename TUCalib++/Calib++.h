@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.3 2002-08-02 06:58:08 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.4 2002-08-09 00:09:41 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
@@ -137,6 +137,7 @@ class MeasurementMatrix : public Matrix<double>
 
     Vector<T>		centroid()		const	;
     const Matrix<T>	frame(u_int i)		const	;
+    Matrix<T>		frame(u_int i)			;
 
     
     Matrix<T>	affineFundamental(u_int frame0=0, u_int frame1=1) const	;
@@ -437,6 +438,10 @@ void		get_flengths(const Matrix<double>& F,
 Matrix<double>	get_principal(const Matrix<double>& F,
 			      const Matrix<double>& ldata,
 			      const Matrix<double>& rdata);
+void		decompose_essential(const Matrix<double>& E,
+				    const Matrix<double>& ldata,
+				    const Matrix<double>& rdata,
+				    Matrix<double>& Rt, Vector<double>& t);
 void		decompose_homography(const Matrix<double>& H,
 				     const Matrix<double>& ldata,
 				     const Matrix<double>& rdata,

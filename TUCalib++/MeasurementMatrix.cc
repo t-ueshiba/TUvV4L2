@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.3 2002-08-02 06:58:08 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.4 2002-08-09 00:09:41 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include "TU/Minimize++.h"
@@ -99,6 +99,18 @@ MeasurementMatrix::centroid() const
 */
 const Matrix<double>
 MeasurementMatrix::frame(u_int i) const
+{
+    return (*this)(0, 3*i, npoints(), 3);
+}
+
+//! 指定されたフレームの特徴点像を取り出す．
+/*!
+  \param i	フレームのindex．
+  \return	i番目のフレームに観測された特徴点を表す npoints() \f$\times\f$
+		3行列．
+*/
+Matrix<double>
+MeasurementMatrix::frame(u_int i)
 {
     return (*this)(0, 3*i, npoints(), 3);
 }
