@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.6 2003-02-07 05:14:45 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.7 2003-02-07 06:08:58 ueshiba Exp $
  */
 #ifdef WIN32
 #  include <winsock2.h>
@@ -34,6 +34,9 @@
 #include "TU/Image++.h"
 #include "TU/Manip.h"
 #include <stdexcept>
+#ifndef STDC_HEADERS
+#  define STDC_HEADERS
+#endif
 extern "C"
 {
 #include "epbm.h"
