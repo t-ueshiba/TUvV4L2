@@ -20,11 +20,11 @@
  */
 
 /*
- *  $Id: io.cc,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: io.cc,v 1.3 2002-07-25 07:47:28 ueshiba Exp $
  */
 #include "TU/Calib++.h"
-#include <cstring>
 #include <fstream>
+#include <string>
 
 namespace TU
 {
@@ -38,12 +38,11 @@ get_Cdata(const char* filename, const char* suffix, u_int ncol, u_int nrow_min)
 	cerr << "get_Cdata: filename must be specified!!" << endl;
 	exit(1);
     }
-    char	s[128];
-    strcpy(s, filename);
+    string	s(filename);
     if (suffix != 0)
-	strcat(s, suffix);
+	s += suffix;
     
-    ifstream	in(s);
+    ifstream	in(s.c_str());
     if (in.fail())
     {
 	cerr << "get_Cdata: <" << s << "> cannot be opened!!"
@@ -82,12 +81,11 @@ get_full_Cdata(const char* filename, const char* suffix, u_int nrow_min)
 	cin >> tmp;
     else
     {
-	char	s[128];
-	strcpy(s, filename);
+	string	s(filename);
 	if (suffix != 0)
-	    strcat(s, suffix);
+	    s += suffix;
     
-	ifstream	in(s);
+	ifstream	in(s.c_str());
 	if (in.fail())
 	{
 	    cerr << "get_full_Cdata: <" << s << "> cannot be opened!!"
@@ -127,11 +125,10 @@ get_matrix(const char* filename, const char* suffix)
 	cin >> m;
     else
     {
-	char	s[128];
-	strcpy(s, filename);
+	string	s(filename);
 	if (suffix != 0)
-	    strcat(s, suffix);
-	ifstream	in(s);
+	    s += suffix;
+	ifstream	in(s.c_str());
 	if (in.fail())
 	{
 	    cerr << "get_matrix: <" << s << "> cannot be opened!!" << endl;
@@ -152,11 +149,10 @@ put_matrix(const char* filename, const char* suffix, const Matrix<double>& m)
 	cout << m;
     else
     {
-	char	s[128];
-	strcpy(s, filename);
+	string	s(filename);
 	if (suffix != 0)
-	    strcat(s, suffix);
-	ofstream	out(s);
+	    s += suffix;
+	ofstream	out(s.c_str());
 	if (out.fail())
 	{
 	    cerr << "put_matrix: <" << s << "> cannot be opened!!" << endl;
