@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2003-02-20 05:51:15 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2003-02-27 03:47:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,8 +14,8 @@ NAME		= $(shell basename $(PWD))
 CPPFLAGS	= -DHAVE_TUToolsPP
 CFLAGS		= -O -g
 ifeq ($(CCC), icc)
-#  CCFLAGS	= -O3 -tpp7 -xW -parallel
-  CCFLAGS	= -O
+  CCFLAGS	= -O3 -tpp7 -xW -parallel
+#  CCFLAGS	= -O
 else
   CCFLAGS	= -O -g
 endif
@@ -44,7 +44,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

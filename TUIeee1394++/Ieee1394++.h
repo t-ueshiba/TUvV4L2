@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.10 2003-02-20 05:51:15 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.11 2003-02-27 03:47:26 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -8,6 +8,7 @@
 #include <libraw1394/csr.h>
 #include <video1394.h>
 #include <netinet/in.h>
+#include <stdexcept>
 #ifdef HAVE_TUToolsPP
 #  include "TU/Image++.h"
 #else
@@ -320,6 +321,14 @@ class Ieee1394Camera : public Ieee1394Node
 	u_int		availablePixelFormats;	//!< 利用できる画素形式
     };
     
+  //! Dragonfly(Pointgrey Research Inc.)のBayerパターン
+    enum Bayer
+    {
+	RGGB = 0x52474742,	//!< 左上から右下に向かってR, G, G, B
+	BGGR = 0x42474752,	//!< 左上から右下に向かってB, G, G, R
+	YYYY = 0x59595959	//!< すべてY(monochrome)
+    };
+
   private:
     struct Mono16
     {
@@ -339,11 +348,12 @@ class Ieee1394Camera : public Ieee1394Node
 		   u_int64 uniqId=0)					;
     virtual ~Ieee1394Camera()						;
 
-  // Power ON/OFF stuffs.
+  // Basic function stuffs.
     quadlet_t		inquireBasicFunction()			const	;
     Ieee1394Camera&	powerOn()					;
     Ieee1394Camera&	powerOff()					;
-
+    Bayer		bayerTileMapping()			const	;
+    
   // Format and frame rate stuffs.
     quadlet_t		inquireFrameRate(Format format)		const	;
     Ieee1394Camera&	setFormatAndFrameRate(Format format,
@@ -408,16 +418,12 @@ class Ieee1394Camera : public Ieee1394Node
     template <class T> const Ieee1394Camera&
 			operator >>(Image<T>& image)		const	;
     template <class T> const Ieee1394Camera&
-			captureBayerRGGB(Image<T>& image)	const	;
-    template <class T> const Ieee1394Camera&
-			captureBayerBGGR(Image<T>& image)	const	;
+			captureRGBImage(Image<T>& image)	const	;
 #endif
     const Ieee1394Camera&
 			captureRaw(void* image)			const	;
     const Ieee1394Camera&
-			captureBayerRGGBRaw(void* image)	const	;
-    const Ieee1394Camera&
-			captureBayerBGGRRaw(void* image)	const	;
+			captureBayerRaw(void* image)		const	;
 
   // Utility functions.
     static Format	uintToFormat(u_int format)			;
@@ -425,11 +431,12 @@ class Ieee1394Camera : public Ieee1394Node
     static Feature	uintToFeature(u_int feature)			;
     static TriggerMode	uintToTriggerMode(u_int triggerMode)		;
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
-    
+
   private:
     nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
     u_int	setFormat_7_PacketSize(Format format7)			;
     quadlet_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
+    bool	unlockAdvancedFeature(u_int64 featureId, u_int timeout)	;
     void	checkAvailability(Format format, FrameRate rate) const	;
     quadlet_t	checkAvailability(Feature feature, u_int inq)	 const	;
     void	checkAvailability(BasicFunction func)		 const	;
@@ -440,7 +447,16 @@ class Ieee1394Camera : public Ieee1394Node
     u_int		_w, _h;	// width and height of current image format.
     PixelFormat		_p;	// pixel format of current image format.
     const u_char*	_buf;	// currently available image buffer.
+    nodeaddr_t		_acr;	// access control register(ACR).
+    Bayer		_bayer;	// Bayer pattern supported by this camera.
 };
+
+//! このカメラがサポートするBayerパターン(#Bayer)を返す
+inline Ieee1394Camera::Bayer
+Ieee1394Camera::bayerTileMapping() const
+{
+    return _bayer;
+}
 
 //! 現在設定されている画像フォーマット(#Format)の幅を返す
 inline u_int
@@ -497,10 +513,10 @@ Ieee1394Camera::checkAvailability(Format format, FrameRate rate) const
     
     quadlet_t	quad = inquireFrameRate(format);
     if (!(quad & rate))
-	cerr << "Ieee1394Camera::checkAvailability: Incompatible combination of format[0x"
+      /*	cerr << "Ieee1394Camera::checkAvailability: Incompatible combination of format[0x"
 	     << hex << format << "] and frame rate[0x" << rate << "]!!"
-	     << endl;
-  //	throw runtime_error("Ieee1394Camera::checkAvailability: Incompatible combination of format and frame rate!!");
+	     << endl;*/
+      	throw runtime_error("Ieee1394Camera::checkAvailability: Incompatible combination of format and frame rate!!");
 }
 
 inline quadlet_t
@@ -510,12 +526,12 @@ Ieee1394Camera::checkAvailability(Feature feature, u_int inq) const
     
     quadlet_t	quad = inquireFeatureFunction(feature);
     if ((quad & inq) != inq)
-	cerr << "Ieee1394Camera::checkAvailability: This feature[0x"
+      /*	cerr << "Ieee1394Camera::checkAvailability: This feature[0x"
 	     << hex << feature
 	     << "] is not present or this field is unavailable (quad: 0x"
 	     << quad << ", inq: " << inq << ")!!"
-	     << endl;
-  //	throw runtime_error("Ieee1394Camera::checkAvailability: This feature is not present or this field is unavailable!!");
+	     << endl;*/
+      	throw runtime_error("Ieee1394Camera::checkAvailability: This feature is not present or this field is unavailable!!");
     return quad;
 }
 
@@ -526,10 +542,10 @@ Ieee1394Camera::checkAvailability(BasicFunction func) const
 
     quadlet_t	quad = inquireBasicFunction();
     if (!(quad & func))
-	cerr << "Ieee1394Camera::checkAvailabilityOfBasicFuntion: This fucntion is not present (quad: 0x"
+      /*	cerr << "Ieee1394Camera::checkAvailabilityOfBasicFuntion: This fucntion is not present (quad: 0x"
 	     << hex << quad << ", func: " << func << ")!!"
-	     << endl;
-  //	throw runtime_error("Ieee1394Camera::checkAvailabilityOfBasicFunction: This function is not present!!");
+	     << endl;*/
+      	throw runtime_error("Ieee1394Camera::checkAvailabilityOfBasicFunction: This function is not present!!");
 }
 
 inline quadlet_t

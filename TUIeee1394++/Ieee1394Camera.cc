@@ -1,8 +1,7 @@
 /*
- *  $Id: Ieee1394Camera.cc,v 1.12 2003-02-24 01:31:36 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.13 2003-02-27 03:47:26 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
-#include <stdexcept>
 
 #define XY_YZ(X, Y, Z)						\
 {								\
@@ -218,7 +217,7 @@ Ieee1394Camera::Ieee1394Camera(Ieee1394Port& prt, u_int ch, u_int64 uniqId)
     :Ieee1394Node(prt, unit_spec_ID, ch, 1, VIDEO1394_SYNC_FRAMES, uniqId),
      _cmdRegBase(CSR_REGISTER_BASE
 		 + 4 * int64_t(readValueFromUnitDependentDirectory(0x40))),
-     _w(0), _h(0), _p(MONO_8), _buf(0)
+     _w(0), _h(0), _p(MONO_8), _buf(0), _acr(0), _bayer(YYYY)
 {
   // Assign IsoChannel to this camera.
     writeQuadletToRegister(ISO_Channel,
@@ -226,6 +225,23 @@ Ieee1394Camera::Ieee1394Camera(Ieee1394Port& prt, u_int ch, u_int64 uniqId)
 
   // Map video1394 buffer according to current format and frame rate.
     setFormatAndFrameRate(getFormat(), getFrameRate());
+
+  // Get base address of access control register if supported.
+    if (inquireBasicFunction() & Advanced_Feature_Inq)
+	_acr = CSR_REGISTER_BASE + readQuadletFromRegister(0x480) * 4;
+    
+  // Get Bayer pattern supported by this camera.
+    const u_int64	Dragonfly_Feature_ID = 0x00b09d000004ull;
+    if (_acr != 0 && unlockAdvancedFeature(Dragonfly_Feature_ID, 10))
+	switch (readQuadlet(_acr + 0x40))
+	{
+	  case RGGB:
+	    _bayer = RGGB;
+	    break;
+	  case BGGR:
+	    _bayer = BGGR;
+	    break;
+	}
 }
 
 //! IEEE1394カメラオブジェクトを破壊する
@@ -259,36 +275,6 @@ Ieee1394Camera::powerOff()
     checkAvailability(Cam_Power_Cntl_Inq);
     writeQuadletToRegister(Camera_Power, 0x00000000);
     return *this;
-}
-
-//! 指定された画像フォーマットにおいてサポートされているフレームレートを調べる
-/*!
-  \param format	対象となるフォーマット．
-  \return	サポートされているフレームレートを#FrameRate型の列挙値
-		のorとして返す．指定されたフォーマット自体がこのカメラでサ
-		ポートされていなければ，0が返される．
-*/
-quadlet_t
-Ieee1394Camera::inquireFrameRate(Format format) const
-{
-    quadlet_t	quad = inquireFrameRate_or_Format_7_Offset(format);
-
-    switch (format)
-    {
-      case Format_7_0:
-      case Format_7_1:
-      case Format_7_2:
-      case Format_7_3:
-      case Format_7_4:
-      case Format_7_5:
-      case Format_7_6:
-      case Format_7_7:
-	if (quad != 0)
-	    return FrameRate_x;
-	break;
-    }
-
-    return quad;
 }
 
 //! 画像フォーマットとフレームレートを設定する
@@ -1179,112 +1165,101 @@ Ieee1394Camera::operator >>(Image<T>& image) const
     return *this;
 }
 
-//! IEEE1394カメラから出力されたBayer(RGGB)パターン画像1枚分のデータをRGB形式に変換して取り込む
+//! IEEE1394カメラから出力された画像をRGB形式カラー画像として取り込む
 /*!
+  operator >>()との違いは，カメラがBayerパターンをサポートしたカメラで
+  ある場合，BayerパターンからRGB形式への変換を行うことである．
   テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
   呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
   \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．サポートされている画素形式Tは，RGB, RGBA,
-		BGR, ABGRのいずれかである．カメラの画素形式が#MONO_8
-		または#MONO_16 以外に設定されている場合は
-		std::domain_error例外が送出される．
+		BGR, ABGRのいずれかである．
   \return	このIEEE1394カメラオブジェクト．
 */
 template <class T> const Ieee1394Camera&
-Ieee1394Camera::captureBayerRGGB(Image<T>& image) const
+Ieee1394Camera::captureRGBImage(Image<T>& image) const
 {
     if (_buf == 0)
-	throw std::runtime_error("TU::Ieee1394Camera::captureBayerRGGB >>: no images snapped!!");
+	throw std::runtime_error("TU::Ieee1394Camera::captureRGBImage: no images snapped!!");
   // Transfer image data from current buffer.
     image.resize(height(), width());
     switch (pixelFormat())
     {
       case MONO_8:
-      {
-	const u_char*	p = bayerRGGB2x2(_buf, &image[0][0], width());
-	int		v = 1;
-	while (v < image.height() - 1)	// 中間の行を処理．
+	switch (_bayer)
 	{
-	    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
-	    p = bayerRGGBEven3x3(p, &image[v++][0], width());
-	}
-	bayerRGGB2x2(p - width(), &image[v][0], width());
-      }
-        break;
+	  case RGGB:
+	  {
+	    const u_char*	p = bayerRGGB2x2(_buf, &image[0][0], width());
+	    int			v = 1;
+	    while (v < image.height() - 1)	// 中間の行を処理．
+	    {
+		p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
+		p = bayerRGGBEven3x3(p, &image[v++][0], width());
+	    }
+	    bayerRGGB2x2(p - width(), &image[v][0], width());
+	  }
+	    break;
 
-      case MONO_16:
-      {
-	const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf, &image[0][0],
-					 width());
-	int		v = 1;
-	while (v < image.height() - 1)	// 中間の行を処理．
-	{
-	    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
-	    p = bayerRGGBEven3x3(p, &image[v++][0], width());
-	}
-	bayerRGGB2x2(p - width(), &image[v][0], width());
-      }
-        break;
+	  case BGGR:
+	  {
+	    const u_char*	p = bayerBGGR2x2(_buf, &image[0][0], width());
+	    int			v = 1;
+	    while (v < image.height() - 1)	// 中間の行を処理．
+	    {
+		p = bayerBGGROdd3x3 (p, &image[v++][0], width());
+		p = bayerBGGREven3x3(p, &image[v++][0], width());
+	    }
+	    bayerBGGR2x2(p - width(), &image[v][0], width());
+	  }
+	    break;
 
-      default:
-	throw std::domain_error("TU::Ieee1394Camera::captureBayerRGGB: must be MONO_8 or MONO_16 format!!");
+	  default:
+	    *this >> image;
+	    break;
+	}
 	break;
-    }
-
-    return *this;
-}
-
-//! IEEE1394カメラから出力されたBayer(BGGR)パターン画像1枚分のデータをRGB形式に変換して取り込む
-/*!
-  テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
-  呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
-  \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
-		現在カメラに設定されている画像サイズに合わせて自動的に
-		設定される．サポートされている画素形式Tは，RGB, RGBA,
-		BGR, ABGRのいずれかである．カメラの画素形式が#MONO_8
-		または#MONO_16 以外に設定されている場合は
-		std::domain_error例外が送出される．
-  \return	このIEEE1394カメラオブジェクト．
-*/
-template <class T> const Ieee1394Camera&
-Ieee1394Camera::captureBayerBGGR(Image<T>& image) const
-{
-    if (_buf == 0)
-	throw std::runtime_error("TU::Ieee1394Camera::captureBayerBGGR >>: no images snapped!!");
-  // Transfer image data from current buffer.
-    image.resize(height(), width());
-    switch (pixelFormat())
-    {
-      case MONO_8:
-      {
-	const u_char*	p = bayerBGGR2x2(_buf, &image[0][0], width());
-	int		v = 1;
-	while (v < image.height() - 1)	// 中間の行を処理．
-	{
-	    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
-	    p = bayerBGGREven3x3(p, &image[v++][0], width());
-	}
-	bayerBGGR2x2(p - width(), &image[v][0], width());
-      }
-        break;
-
+	
       case MONO_16:
-      {
-	const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf, &image[0][0],
-					 width());
-	int		v = 1;
-	while (v < image.height() - 1)	// 中間の行を処理．
+	switch (_bayer)
 	{
-	    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
-	    p = bayerBGGREven3x3(p, &image[v++][0], width());
+	  case RGGB:
+	  {
+	    const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf,
+						 &image[0][0], width());
+	    int			v = 1;
+	    while (v < image.height() - 1)	// 中間の行を処理．
+	    {
+		p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
+		p = bayerRGGBEven3x3(p, &image[v++][0], width());
+	    }
+	    bayerRGGB2x2(p - width(), &image[v][0], width());
+	  }
+	    break;
+
+	  case BGGR:
+	  {
+	    const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf,
+						 &image[0][0], width());
+	    int			v = 1;
+	    while (v < image.height() - 1)	// 中間の行を処理．
+	    {
+		p = bayerBGGROdd3x3 (p, &image[v++][0], width());
+		p = bayerBGGREven3x3(p, &image[v++][0], width());
+	    }
+	    bayerBGGR2x2(p - width(), &image[v][0], width());
+	  }
+	    break;
+
+	  default:
+	    *this >> image;
+	    break;
 	}
-	bayerBGGR2x2(p - width(), &image[v][0], width());
-      }
-        break;
+	break;
 
       default:
-	throw std::domain_error("TU::Ieee1394Camera::captureBayerBGGR: must be MONO_8 or MONO_16 format!!");
+	*this >> image;
 	break;
     }
 
@@ -1317,7 +1292,7 @@ Ieee1394Camera::captureRaw(void* image) const
     return *this;
 }
 
-//! IEEE1394カメラから出力されたBayerパターン(RGGB)画像1枚分のデータをRGB形式に変換して取り込む
+//! IEEE1394カメラから出力されたBayerパターン画像1枚分のデータをRGB形式に変換して取り込む
 /*!
   本関数を呼び出す前にsnap()によってカメラからの画像を保持しておかなければ
   ならない．
@@ -1330,109 +1305,116 @@ Ieee1394Camera::captureRaw(void* image) const
   \return	このIEEE1394カメラオブジェクト．
 */
 const Ieee1394Camera&
-Ieee1394Camera::captureBayerRGGBRaw(void* image) const
+Ieee1394Camera::captureBayerRaw(void* image) const
 {
     if (_buf == 0)
-	throw std::runtime_error("TU::Ieee1394Camera::captureBayerRGGBRaw >>: no images snapped!!");
+	throw std::runtime_error("TU::Ieee1394Camera::captureBayerRaw: no images snapped!!");
 
   // Transfer image data from current buffer.
     switch (pixelFormat())
     {
       case MONO_8:
-      {
-	RGB*		rgb = (RGB*)image;
-	const u_char*	p = bayerRGGB2x2(_buf, rgb, width());
-	rgb += width();
-	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	switch (_bayer)
 	{
-	    p = bayerRGGBOdd3x3 (p, rgb, width());
+	  case RGGB:
+	  {
+	    RGB*		rgb = (RGB*)image;
+	    const u_char*	p = bayerRGGB2x2(_buf, rgb, width());
 	    rgb += width();
-	    p = bayerRGGBEven3x3(p, rgb, width());
-	    rgb += width();
-	}
-	bayerRGGB2x2(p - width(), rgb, width());
-      }
-        break;
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    {
+		p = bayerRGGBOdd3x3 (p, rgb, width());
+		rgb += width();
+		p = bayerRGGBEven3x3(p, rgb, width());
+		rgb += width();
+	    }
+	    bayerRGGB2x2(p - width(), rgb, width());
+	  }
+	    break;
 
-      case MONO_16:
-      {
-	RGB*		rgb = (RGB*)image;
-	const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf, rgb, width());
-	rgb += width();
-	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
-	{
-	    p = bayerRGGBOdd3x3 (p, rgb, width());
+	  case BGGR:
+	  {
+	    RGB*		rgb = (RGB*)image;
+	    const u_char*	p = bayerBGGR2x2(_buf, rgb, width());
 	    rgb += width();
-	    p = bayerRGGBEven3x3(p, rgb, width());
-	    rgb += width();
-	}
-	bayerRGGB2x2(p - width(), rgb, width());
-      }
-        break;
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    {
+		p = bayerBGGROdd3x3 (p, rgb, width());
+		rgb += width();
+		p = bayerBGGREven3x3(p, rgb, width());
+		rgb += width();
+	    }
+	    bayerBGGR2x2(p - width(), rgb, width());
+	  }
+	    break;
 
-      default:
-	throw std::domain_error("TU::Ieee1394Camera::captureRGGBBayerRaw: must be MONO_8 or MONO_16 format!!");
+	  default:
+	  {
+	    RGB*		rgb = (RGB*)image;
+	    const u_char*	p = _buf;
+	    for (int n = width() * height(); n-- > 0; )
+	    {
+		rgb->r = rgb->g = rgb->b = *p++;
+		++rgb;
+	    }
+	  }
+	    break;
+	}
 	break;
-    }
-
-    return *this;
-}
-
-//! IEEE1394カメラから出力されたBayerパターン(BGGR)画像1枚分のデータをRGB形式に変換して取り込む
-/*!
-  本関数を呼び出す前にsnap()によってカメラからの画像を保持しておかなければ
-  ならない．
-  \param image	画像データの格納領域へのポインタ．width(), height()および
-		pixelFormat()を用いて画像のサイズと画素の形式を調べて
-		画像1枚分の領域を確保しておくのは，ユーザの責任である．
-		画像データは，各画素毎に R, G, B (各 1 byte)の順で格納され
-		る．カメラの画素形式が#MONO_8 または#MONO_16 以外に設定され
-		ている場合はstd::domain_error例外が送出される．
-  \return	このIEEE1394カメラオブジェクト．
-*/
-const Ieee1394Camera&
-Ieee1394Camera::captureBayerBGGRRaw(void* image) const
-{
-    if (_buf == 0)
-	throw std::runtime_error("TU::Ieee1394Camera::captureBayerBGGRRaw >>: no images snapped!!");
-
-  // Transfer image data from current buffer.
-    switch (pixelFormat())
-    {
-      case MONO_8:
-      {
-	RGB*		rgb = (RGB*)image;
-	const u_char*	p = bayerBGGR2x2(_buf, rgb, width());
-	rgb += width();
-	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
-	{
-	    p = bayerBGGROdd3x3 (p, rgb, width());
-	    rgb += width();
-	    p = bayerBGGREven3x3(p, rgb, width());
-	    rgb += width();
-	}
-	bayerBGGR2x2(p - width(), rgb, width());
-      }
-        break;
-
+	
       case MONO_16:
-      {
-	RGB*		rgb = (RGB*)image;
-	const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf, rgb, width());
-	rgb += width();
-	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	switch (_bayer)
 	{
-	    p = bayerBGGROdd3x3 (p, rgb, width());
+	  case RGGB:
+	  {
+	    RGB*		rgb = (RGB*)image;
+	    const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf, rgb,
+						 width());
 	    rgb += width();
-	    p = bayerBGGREven3x3(p, rgb, width());
-	    rgb += width();
-	}
-	bayerBGGR2x2(p - width(), rgb, width());
-      }
-        break;
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    {
+		p = bayerRGGBOdd3x3 (p, rgb, width());
+		rgb += width();
+		p = bayerRGGBEven3x3(p, rgb, width());
+		rgb += width();
+	    }
+	    bayerRGGB2x2(p - width(), rgb, width());
+	  }
+	    break;
 
+	  case BGGR:
+	  {
+	    RGB*		rgb = (RGB*)image;
+	    const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf, rgb,
+						 width());
+	    rgb += width();
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    {
+		p = bayerBGGROdd3x3 (p, rgb, width());
+		rgb += width();
+		p = bayerBGGREven3x3(p, rgb, width());
+		rgb += width();
+	    }
+	    bayerBGGR2x2(p - width(), rgb, width());
+	  }
+	    break;
+	    
+	  default:
+	  {
+	    RGB*		rgb = (RGB*)image;
+	    const Mono16*	p = (const Mono16*)_buf;
+	    for (int n = width() * height(); n-- > 0; )
+	    {
+		rgb->r = rgb->g = rgb->b = *p++;
+		++rgb;
+	    }
+	  }
+	    break;
+	}
+	break;
+	
       default:
-	throw std::domain_error("TU::Ieee1394Camera::captureBGGRBayerRaw: must be MONO_8 or MONO_16 format!!");
+	throw std::domain_error("TU::Ieee1394Camera::captureBayerRaw: must be MONO_8 or MONO_16 format!!");
 	break;
     }
 
@@ -1660,6 +1642,36 @@ Ieee1394Camera::uintToPixelFormat(u_int pixelFormat)
     return MONO_8;
 }
 
+//! 指定された画像フォーマットにおいてサポートされているフレームレートを調べる
+/*!
+  \param format	対象となるフォーマット．
+  \return	サポートされているフレームレートを#FrameRate型の列挙値
+		のorとして返す．指定されたフォーマット自体がこのカメラでサ
+		ポートされていなければ，0が返される．
+*/
+quadlet_t
+Ieee1394Camera::inquireFrameRate(Format format) const
+{
+    quadlet_t	quad = inquireFrameRate_or_Format_7_Offset(format);
+
+    switch (format)
+    {
+      case Format_7_0:
+      case Format_7_1:
+      case Format_7_2:
+      case Format_7_3:
+      case Format_7_4:
+      case Format_7_5:
+      case Format_7_6:
+      case Format_7_7:
+	if (quad != 0)
+	    return FrameRate_x;
+	break;
+    }
+
+    return quad;
+}
+
 nodeaddr_t
 Ieee1394Camera::getFormat_7_BaseAddr(Format format7) const
 {
@@ -1884,6 +1896,29 @@ Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
     return readQuadletFromRegister(format);
 }
 
+//! カメラベンダー依存の機能へのアクセス制限を解除してそれを使えるようにする
+/*
+  \param featureId	アクセス制限を解除したい機能を表す48bitのID．
+  \param timeout	解除してからまたロックされるまでのタイムアウト値
+			(単位: msec) .
+  \return		解除に成功すればtrueを，失敗するかこの機能自体が
+			存在しなければfalseを返す．
+*/
+bool
+Ieee1394Camera::unlockAdvancedFeature(u_int64 featureId, u_int timeout)
+{
+    if (_acr == 0)
+	return false;
+    writeQuadlet(_acr,	   (featureId >> 16) & 0xffffffff);
+    writeQuadlet(_acr + 4, (featureId & 0xffff) | 0xf000 | (timeout & 0xfff));
+  /*    u_int	busId_nodeId = readQuadlet(_acr) >> 16;
+    std::cerr << "NodeId = " << std::hex << nodeId()
+	      << ", BusId + NodeId = " << std::hex << busId_nodeId
+	      << std::endl;*/
+    
+    return true;
+}
+
 }
 #ifdef HAVE_TUToolsPP
 #  if defined(__GNUG__) || defined(__INTEL_COMPILER)
@@ -1914,21 +1949,13 @@ Ieee1394Camera::operator >>(Image<YUV422>& image)	const	;
 template const Ieee1394Camera&
 Ieee1394Camera::operator >>(Image<YUV411>& image)	const	;
 template const Ieee1394Camera&
-Ieee1394Camera::captureBayerRGGB(Image<RGB>& image)	const	;
+Ieee1394Camera::captureRGBImage(Image<RGB>& image)	const	;
 template const Ieee1394Camera&
-Ieee1394Camera::captureBayerRGGB(Image<RGBA>& image)	const	;
+Ieee1394Camera::captureRGBImage(Image<RGBA>& image)	const	;
 template const Ieee1394Camera&
-Ieee1394Camera::captureBayerRGGB(Image<BGR>& image)	const	;
+Ieee1394Camera::captureRGBImage(Image<BGR>& image)	const	;
 template const Ieee1394Camera&
-Ieee1394Camera::captureBayerRGGB(Image<ABGR>& image)	const	;
-template const Ieee1394Camera&
-Ieee1394Camera::captureBayerBGGR(Image<RGB>& image)	const	;
-template const Ieee1394Camera&
-Ieee1394Camera::captureBayerBGGR(Image<RGBA>& image)	const	;
-template const Ieee1394Camera&
-Ieee1394Camera::captureBayerBGGR(Image<BGR>& image)	const	;
-template const Ieee1394Camera&
-Ieee1394Camera::captureBayerBGGR(Image<ABGR>& image)	const	;
+Ieee1394Camera::captureRGBImage(Image<ABGR>& image)	const	;
 }
 #  endif	// __GNUG__
 #endif		// HAVE_TUToolsPP
