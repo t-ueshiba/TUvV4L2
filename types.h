@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.2 2002-07-25 02:38:07 ueshiba Exp $
+ *  $Id: types.h,v 1.3 2003-02-07 05:14:45 ueshiba Exp $
  */
 #ifndef __TUtypes_h
 #define __TUtypes_h
@@ -17,5 +17,12 @@ typedef unsigned long	u_long;
 typedef signed char		s_char;
 typedef long long		int64;
 typedef unsigned long long	u_int64;
+
+#ifdef __INTEL_COMPILER
+extern "C"
+{
+    unsigned long long	strtoull(const char*, char**, int);
+}
+#endif
 
 #endif	/*  !__TUtypes_h	*/
