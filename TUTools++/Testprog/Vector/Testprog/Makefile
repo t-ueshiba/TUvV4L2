@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2003-07-18 02:26:32 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2004-04-28 01:52:32 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -28,7 +28,7 @@ OBJS		= mtest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -40,5 +40,5 @@ REV		= $(shell echo $Revision: 1.8 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-mtest.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+mtest.o: /Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.10 2003-07-18 04:40:12 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.11 2004-04-28 01:52:32 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -215,15 +215,13 @@ template <class T> Matrix<T>
 Matrix<T>::pinv(double cndnum) const
 {
     SVDecomposition<T>	svd(*this);
-    Matrix<T>		Ut(svd.Ut()(0, 0, svd.nrow(), svd.ncol()));
-
-    for (int i = 0; i < svd.nrow(); ++i)
+    Matrix<T>		B(svd.ncol(), svd.nrow());
+    
+    for (int i = 0; i < svd.diagonal().dim(); ++i)
 	if (fabs(svd[i]) * cndnum > fabs(svd[0]))
-	    Ut[i] /= svd[i];
-	else
-	    Ut[i] = 0.0;
+	    B += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
 
-    return Ut.trns() * svd.Vt();
+    return B;
 }
 
 template <class T> Matrix<T>
