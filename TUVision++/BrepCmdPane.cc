@@ -1,8 +1,9 @@
 /*
- *  $Id: BrepCmdPane.cc,v 1.2 2002-07-25 02:38:07 ueshiba Exp $
+ *  $Id: BrepCmdPane.cc,v 1.3 2002-07-25 08:37:07 ueshiba Exp $
  */
 #include "TU/v/Vision++.h"
-#include <cstdio>
+#include <iomanip>
+#include <sstream>
 
 namespace TU
 {
@@ -136,9 +137,9 @@ BrepCmdPane::callback(CmdId id, CmdVal val)
 	    setGeometry(h->geom());
 	else if (_g != 0)
 	{
-	    char	str[10];
-	    sprintf(str, "%4d", _g->parent()->n);
-	    setString(c_h_txt, str);
+	    ostringstream	s;
+	    s << setw(4) << _g->parent()->n;
+	    setString(c_h_txt, s.str().c_str());
 	}
 	else
 	    setString(c_h_txt, "");
@@ -175,23 +176,30 @@ BrepCmdPane::setGeometry(const Geometry* g)
     }
     _canvas.sync();
 
-    char	str[20];
-    sprintf(str, "(%3d,%3d)",
-	    (*g->prev()->point())[0], (*g->prev()->point())[1]);
-    setString(c_gp_txt, str);
-    sprintf(str, "(%3d,%3d)", (*g->point())[0], (*g->point())[1]);
-    setString(c_g_txt, str);
-    sprintf(str, "(%3d,%3d)",
-	    (*g->next()->point())[0], (*g->next()->point())[1]);
-    setString(c_gn_txt, str);
-    sprintf(str, "%4d", h->prev()->n);
-    setString(c_hp_txt, str);
-    sprintf(str, "%4d", h->n);
-    setString(c_h_txt, str);
-    sprintf(str, "%4d", h->next()->n);
-    setString(c_hn_txt, str);
-    sprintf(str, "%4d", h->conj()->n);
-    setString(c_hc_txt, str);
+    ostringstream	s;
+    s << '(' << setw(3) << (*g->prev()->point())[0]
+      << ',' << setw(3) << (*g->prev()->point())[1] << ')';
+    setString(c_gp_txt, s.str().c_str());
+    s.str("");
+    s << '(' << setw(3) << (*g->point())[0]
+      << ',' << setw(3) << (*g->point())[1] << ')';
+    setString(c_g_txt, s.str().c_str());
+    s.str("");
+    s << '(' << setw(3) << (*g->next()->point())[0]
+      << ',' << setw(3) << (*g->next()->point())[1] << ')';
+    setString(c_gn_txt, s.str().c_str());
+    s.str("");
+    s << setw(4) << h->prev()->n;
+    setString(c_hp_txt, s.str().c_str());
+    s.str("");
+    s << setw(4) << h->n;
+    setString(c_h_txt, s.str().c_str());
+    s.str("");
+    s << setw(4) << h->next()->n;
+    setString(c_hn_txt, s.str().c_str());
+    s.str("");
+    s << setw(4) << h->conj()->n;
+    setString(c_hc_txt, s.str().c_str());
 
     _g = g;
 }
