@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2002-12-18 04:34:08 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2003-02-07 05:16:46 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera
@@ -16,6 +16,13 @@
 #include <stdexcept>
 #include "My1394Camera.h"
 
+#ifdef __INTEL_COMPILER
+extern "C"
+{
+    unsigned long long	strtoull(const char*, char**, int);
+}
+#endif
+
 namespace TU
 {
 GtkWidget*	createMenubar(My1394Camera& camera)			;
@@ -31,6 +38,8 @@ GtkWidget*	createCommands(My1394Camera& camera)			;
 static void
 usage(const char* s)
 {
+    using namespace	std;
+    
     cerr << "\nControl an IEEE1394 digital camera.\n"
 	 << endl;
     cerr << " Usage: " << s << " [-p portnum] [uniqueID]"

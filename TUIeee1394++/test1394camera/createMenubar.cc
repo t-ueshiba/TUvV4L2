@@ -1,5 +1,5 @@
 /*
- *  $Id: createMenubar.cc,v 1.4 2002-12-18 04:34:08 ueshiba Exp $
+ *  $Id: createMenubar.cc,v 1.5 2003-02-07 05:16:46 ueshiba Exp $
  */
 #include "My1394Camera.h"
 #include "MyDialog.h"
@@ -90,9 +90,11 @@ static FormatAndFrameRate	fmtAndFRate[NFORMATS * NRATES];
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-static ostream&
-operator <<(ostream& out, const Ieee1394Camera& camera)
+static std::ostream&
+operator <<(std::ostream& out, const Ieee1394Camera& camera)
 {
+    using namespace	std;
+    
     for (int i = 0; i < NFORMATS; ++i)
 	if (camera.getFormat() == format[i].format)
 	{
@@ -188,6 +190,8 @@ CBmenuitem(GtkMenuItem*, gpointer userdata)
 static void
 CBexit(GtkMenuItem*, gpointer userdata)
 {
+    using namespace	std;
+    
     My1394Camera*	camera = (My1394Camera*)userdata;
     camera->stopContinuousShot();
     cout << "0x" << hex << setw(16) << setfill('0')
