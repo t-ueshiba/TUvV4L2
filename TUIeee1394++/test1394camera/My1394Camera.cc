@@ -1,5 +1,5 @@
 /*
- *  $Id: My1394Camera.cc,v 1.2 2002-12-09 07:48:22 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.3 2002-12-10 08:16:50 ueshiba Exp $
  */
 #include <sys/time.h>
 #include <stdexcept>
@@ -88,6 +88,9 @@ CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
 //! IEEE1394カメラノードを生成する
 /*!
   \param port	このカメラが接続されているポート．
+  \param uniqId	個々のカメラ固有の64bit ID．同一のIEEE1394 busに
+		複数のカメラが接続されている場合，これによって
+		同定を行う．
 */
 My1394Camera::My1394Camera(Ieee1394Port& port, u_int64 uniqId)
     :Ieee1394Camera(port, 0, uniqId),
