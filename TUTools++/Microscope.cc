@@ -1,6 +1,8 @@
 /*
- *  $Id: Microscope.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
+ *  $Id: Microscope.cc,v 1.4 2003-07-06 23:53:21 ueshiba Exp $
  */
+#ifndef __APPLE__
+
 #include "TU/Serial++.h"
 #include <stdexcept>
 #include <iomanip>
@@ -193,3 +195,4 @@ ready(Microscope& ms)
 }
  
 }
+#endif	/* !__APPLE__	*/

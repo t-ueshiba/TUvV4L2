@@ -1,6 +1,8 @@
 /*
- *  $Id: TriggerGenerator.cc,v 1.4 2002-07-25 12:03:39 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.5 2003-07-06 23:53:22 ueshiba Exp $
  */
+#ifndef __APPLE__
+
 #include <iomanip>
 #include <stdlib.h>
 #include "TU/Serial++.h"
@@ -111,3 +113,4 @@ TriggerGenerator::getConfiguration(u_int& channel, u_int& interval)
 }
 
 }
+#endif	/* !__APPLE__	*/

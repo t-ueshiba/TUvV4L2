@@ -1,6 +1,8 @@
 /*
- *  $Id: Pata.cc,v 1.2 2002-07-25 02:38:06 ueshiba Exp $
+ *  $Id: Pata.cc,v 1.3 2003-07-06 23:53:21 ueshiba Exp $
  */
+#ifndef __APPLE__
+
 #include "TU/Serial++.h"
 
 namespace TU
@@ -15,3 +17,4 @@ Pata::Pata(const char* ttyname)
 }
  
 }
+#endif	/* !__APPLE__	*/

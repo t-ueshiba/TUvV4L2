@@ -1,6 +1,8 @@
 /*
- *  $Id: Serial.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.4 2003-07-06 23:53:22 ueshiba Exp $
  */
+#ifndef __APPLE__
+
 #include "TU/Serial++.h"
 #include <stdexcept>
 #include <string>
@@ -299,3 +301,4 @@ csize(int cs)
 }
  
 }
+#endif	/* !__APPLE__	*/

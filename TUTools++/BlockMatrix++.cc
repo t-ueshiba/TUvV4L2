@@ -1,5 +1,5 @@
 /*
- *  $Id: BlockMatrix++.cc,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: BlockMatrix++.cc,v 1.3 2003-07-06 23:53:21 ueshiba Exp $
  */
 #include "TU/BlockMatrix++.h"
 #include <stdexcept>
@@ -80,13 +80,16 @@ template <class T> Matrix<T>
 operator *(const BlockMatrix<T>& b, const Matrix<T>& m)
 {
     Matrix<T>	val(b.nrow(), m.ncol());
-    for (int r = 0, c = 0, i = 0; i < b.dim(); ++i)
+    int		r = 0, c = 0;
+    for (int i = 0; i < b.dim(); ++i)
     {
 	val(r, 0, b[i].nrow(), m.ncol())
 	    = b[i] * m(c, 0, b[i].ncol(), m.ncol());
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
+    if (c != m.nrow())
+	throw std::invalid_argument("TU::operaotr *(const BlockMatrix<T>&, const Matrix<T>&): dimension mismatch!!");
     return val;
 }
 
@@ -94,13 +97,16 @@ template <class T> Matrix<T>
 operator *(const Matrix<T>& m, const BlockMatrix<T>& b)
 {
     Matrix<T>	val(m.nrow(), b.ncol());
-    for (int r = 0, c = 0, i = 0; i < b.dim(); ++i)
+    int		r = 0, c = 0;
+    for (int i = 0; i < b.dim(); ++i)
     {
 	val(0, c, m.nrow(), b[i].ncol())
 	    = m(0, r, m.nrow(), b[i].nrow()) * b[i];
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
+    if (r != m.ncol())
+	throw std::invalid_argument("TU::operaotr *(const Matrix<T>&, const BlockMatrix<T>&): dimension mismatch!!");
     return val;
 }
 
@@ -108,12 +114,15 @@ template <class T> Vector<T>
 operator *(const BlockMatrix<T>& b, const Vector<T>& v)
 {
     Vector<T>	val(b.nrow());
-    for (int r = 0, c = 0, i = 0; i < b.dim(); ++i)
+    int		r = 0, c = 0;
+    for (int i = 0; i < b.dim(); ++i)
     {
 	val(r, b[i].nrow()) = b[i] * v(c, b[i].ncol());
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
+    if (c != v.dim())
+	throw std::invalid_argument("TU::operaotr *(const BlockMatrix<T>&, const Vector<T>&): dimension mismatch!!");
     return val;
 }
 
@@ -121,12 +130,15 @@ template <class T> Vector<T>
 operator *(const Vector<T>& v, const BlockMatrix<T>& b)
 {
     Vector<T>	val(b.ncol());
-    for (int r = 0, c = 0, i = 0; i < b.dim(); ++i)
+    int		r = 0, c = 0;
+    for (int i = 0; i < b.dim(); ++i)
     {
 	val(c, b[i].ncol()) = v(r, b[i].nrow()) * b[i];
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
+    if (r != v.dim())
+	throw std::invalid_argument("TU::operaotr *(const Vector<T>&, const BlockMatrix<T>&): dimension mismatch!!");
     return val;
 }
  

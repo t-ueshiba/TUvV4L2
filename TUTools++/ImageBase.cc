@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.8 2003-05-19 08:09:35 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.9 2003-07-06 23:53:21 ueshiba Exp $
  */
 #ifdef WIN32
 #  include <winsock2.h>
@@ -33,6 +33,7 @@
 #endif
 #include "TU/Image++.h"
 #include "TU/Manip.h"
+#include "TU/Geometry++.h"
 #include <stdexcept>
 #ifndef STDC_HEADERS
 #  define STDC_HEADERS
@@ -127,15 +128,19 @@ ImageBase::restoreHeader(std::istream& in)
 	else if (!strcmp(key, "PinHoleParameterH34:"))
 	    in >> P[2][3];
 	else if (!strcmp(key, "DistortionParameterA:"))
-	    in >> distortionA;
+	    in >> d1;
 	else if (!strcmp(key, "DistortionParameterB:"))
-	    in >> distortionB;
-	else if (!strcmp(key, "DistortionParameterCOLD:"))
-	    in >> distortionU0;
-	else if (!strcmp(key, "DistortionParameterROWD:"))
-	    in >> distortionV0;
+	    in >> d2;
     }
     in.putback(c);
+
+    if (d1 != 0.0 || d2 != 0.0)
+    {
+	Camera	camera(P);
+	double	k = camera.k();
+	d1 *= (k * k);
+	d2 *= (k * k * k * k);
+    }
 
     u_int	w, h;
     in >> w;
@@ -238,13 +243,17 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
 	<< "# PinHoleParameterH34: " << P[2][3] << endl
 	<< "# PinHoleParameterF: 1.0" << endl
 	<< "# PinHoleParameterM: 0.0" << endl;
-    if (distortionA != 0.0 || distortionB != 0.0)
-	out << "# DistortionParameterA: " << distortionA << endl
-	    << "# DistortionParameterB: " << distortionB << endl
-	    << "# DistortionParameterCOLD: " << distortionU0 << endl
-	    << "# DistortionParameterROWD: " << distortionV0 << endl;
+    if (d1 != 0.0 || d2 != 0.0)
+    {
+	Camera	camera(P);
+	double	k = camera.k();
+	out << "# DistortionParameterA: " << d1 / (k * k) << endl
+	    << "# DistortionParameterB: " << d2 / (k * k * k * k) << endl
+	    << "# DistortionParameterCOLD: " << camera.principal()[0] << endl
+	    << "# DistortionParameterROWD: " << camera.principal()[1] << endl;
+    }
     out << _width() << ' ' << _height() << '\n'
-	<< ((1 << depth) - 1) << endl;
+	<< 255 << endl;
     
     return out;
 }
