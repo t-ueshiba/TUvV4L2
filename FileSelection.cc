@@ -1,5 +1,5 @@
 /*
- *  $Id: FileSelection.cc,v 1.2 2002-07-25 02:38:11 ueshiba Exp $
+ *  $Id: FileSelection.cc,v 1.3 2002-12-18 06:09:59 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/types.h>
@@ -126,9 +126,9 @@ FileSelection::callback(CmdId id, CmdVal val)
 		fullname = fullPathName(id == c_FileList ? _filenames[val] :
 					pane().getString(id));
 	mode_t	filemode = fileMode(fullname);
-	if (id == c_FileList && filemode & S_IFDIR)	// directory ?
+	if (id == c_FileList && filemode & S_IFDIR)	   // directory ?
 	    changeDirectory(fullname);
-	else if (filemode & S_IFREG)			// normal file?
+	else if ((filemode & S_IFREG) || (filemode == 0))  // normal/new file?
 	{
 	    _fullname = fullname;
 	    hide();
@@ -224,6 +224,6 @@ FileSelection::fullPathName(const char* name) const
 }
 }
 
-#ifdef __GNUG__
+#if defined __GNUG__ || __INTEL_COMPILER
 #  include "TU/Array++.cc"
 #endif

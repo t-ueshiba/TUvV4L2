@@ -1,5 +1,5 @@
 /*
- *  $Id: Window.cc,v 1.2 2002-07-25 02:38:13 ueshiba Exp $
+ *  $Id: Window.cc,v 1.3 2002-12-18 06:09:59 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include <stdexcept>
@@ -66,3 +66,4 @@ Window::paned()
 
 }
 }
+
