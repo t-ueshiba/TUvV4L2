@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.4 2002-08-22 04:08:32 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.5 2002-09-02 10:10:49 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -382,9 +382,18 @@ Matrix<T>::rot2axis(double& c, double& s) const
 template <class T> Vector<T>
 Matrix<T>::rot2axis() const
 {
-    double	c, s;
-    Vector<T>	n = rot2axis(c, s);
-    return n *= acos(c);
+    if (nrow() != 3 || ncol() != 3)
+	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
+
+    Vector<T>	axis(3);
+    axis[0] = ((*this)[1][2] - (*this)[2][1]) * 0.5;
+    axis[1] = ((*this)[2][0] - (*this)[0][2]) * 0.5;
+    axis[2] = ((*this)[0][1] - (*this)[1][0]) * 0.5;
+    double	s = sqrt(axis.square());
+    if (s + 1.0 == 1.0)			// s << 1 ?
+	return axis;
+    else
+	return asin(s) / s * axis;
 }
 
 template <class T> Matrix<T>
@@ -409,13 +418,13 @@ template <class T> Matrix<T>
 Matrix<T>::Rt(const Vector<T>& axis)
 {
     double	theta = axis.length();
-    if (theta != 0.0)
+    if (theta + 1.0 == 1.0)		// theta << 1 ?
+	return I(3);
+    else
     {
 	double	c = cos(theta), s = sin(theta);
 	return Rt(axis / theta, c, s);
     }
-    else
-	return I(3);
 }
 
 /************************************************************************
