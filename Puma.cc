@@ -1,38 +1,41 @@
 /*
- *  $Id: Puma.cc,v 1.2 2002-07-25 02:38:06 ueshiba Exp $
+ *  $Id: Puma.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 
 namespace TU
 {
+#ifndef sgi
+    using namespace	std;
+#endif
 /************************************************************************
 *  Static functions							*
 ************************************************************************/ 
 static inline Puma&
 operator <<(Puma& puma, char c)
 {
-    puma.std::ostream::operator <<(c);
+    puma.fstream::operator <<(c);
     return puma;
 }
 
 static inline Puma&
 operator <<(Puma& puma, const char* s)
 {
-    puma.std::ostream::operator <<(s);
+    puma.fstream::operator <<(s);
     return puma;
 }
 
 static inline Puma&
 operator <<(Puma& puma, int i)
 {
-    puma.std::ostream::operator <<(i);
+    puma.fstream::operator <<(i);
     return puma;
 }
 
 static inline Puma&
 operator <<(Puma& puma, float f)
 {
-    puma.std::ostream::operator <<(f);
+    puma.fstream::operator <<(f);
     return puma;
 }
 
@@ -102,7 +105,7 @@ Puma::wait()
 	    continue;
 	
 	if (_echo)
-	    std::cerr << c;
+	    cerr << c;
 
 	for (i = 0; i < nmsg; i++)
 	    if (c == *p[i] || c == *(p[i] = msg[i]))
@@ -137,15 +140,15 @@ operator <<(Puma& puma, const Vector<float>& position)
     }
     return puma;
 }
-
+#ifndef sgi
 Puma&
 operator >>(Puma& puma, Vector<float>& position)
 {
     puma << "where\r" >> skipl >> skipl;	// ignore "X Y Z O A T"
-    operator >>((std::istream&)puma, position);
+    operator >>((istream&)puma, position);
     return puma << wait;			// wait for prompt
 }
-
+#endif
 /*
  *  Manipulators
  */

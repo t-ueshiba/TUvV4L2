@@ -1,11 +1,15 @@
 /*
- *  $Id: Serial++.h,v 1.2 2002-07-25 02:38:06 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
 
 #include <termios.h>
-#include <fstream>
+#ifndef sgi
+#  include <fstream>
+#else
+#  include <fstream.h>
+#endif
 #include "TU/Manip.h"
 #include "TU/Vector++.h"
 
@@ -13,8 +17,12 @@ namespace TU
 {
 /************************************************************************
 *  class Serial								*
-************************************************************************/ 
+************************************************************************/
+#ifndef sgi
 class Serial : public std::fstream
+#else
+class Serial : public fstream
+#endif
 {
   public:
 		Serial(const char*)			;
@@ -62,6 +70,10 @@ operator <<(Serial& serial, Serial& (*f)(Serial&))
     return f(serial);
 }
 
+#ifdef sgi
+::istream&	ign(::istream& in)	;
+::istream&	skipl(::istream& in)	;
+#endif
 extern IOManip<Serial>	nl2cr;
 #ifndef __APPLE__
 extern IOManip<Serial>	cr2nl;

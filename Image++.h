@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
+ *  $Id: Image++.h,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -30,7 +30,7 @@
 namespace TU
 {
 /************************************************************************
-*  class RGB, BGR, RGBA & ABGR					*
+*  class RGB, BGR, RGBA & ABGR						*
 *	Note:	X::operator =(const X&) must be explicitly defined	*
 *		to avoid X -> double -> u_char -> X conversion.		*
 ************************************************************************/
@@ -42,7 +42,7 @@ struct RGB
     RGB(u_char c)				:r(c), g(c), b(c)	{}
     RGB(u_char rr, u_char gg, u_char bb)	:r(rr), g(gg), b(bb)	{}
     RGB(const BGR&)				;
-    RGB(const YUV444&)			;
+    RGB(const YUV444&)				;
 
 		operator u_char()	const	{return u_char(double(*this));}
 		operator short()	const	{return short(double(*this));}
@@ -78,8 +78,8 @@ struct BGR
     BGR()					:b(0),   g(0),   r(0)	{}
     BGR(u_char c)				:b(c),   g(c),   r(c)	{}
     BGR(u_char rr, u_char gg, u_char bb)	:b(bb),  g(gg),  r(rr)	{}
-    BGR(const RGB& v)			:b(v.b), g(v.g), r(v.r)	{}
-    BGR(const YUV444&)			;
+    BGR(const RGB& v)				:b(v.b), g(v.g), r(v.r)	{}
+    BGR(const YUV444&)				;
 
 		operator u_char()	const	{return u_char(double(*this));}
 		operator short()	const	{return short(double(*this));}
@@ -130,7 +130,7 @@ struct RGBA : public RGB, public Alpha
     RGBA(const RGB& v)		:RGB(v), Alpha()  	{}
     RGBA(const BGR& v)		:RGB(v), Alpha()  	{}
     RGBA(const RGBA& v)		:RGB(v), Alpha(v) 	{}
-    RGBA(const YUV444& v)	:RGB(v), Alpha()	{}
+    RGBA(const YUV444& v)				;
 
     bool	operator ==(const RGBA& v) const
 		{return (Alpha::operator ==(v) && RGB::operator ==(v));}
@@ -144,7 +144,7 @@ struct ABGR : public Alpha, public BGR
     ABGR(const BGR& v)		:Alpha(),  BGR(v)	{}
     ABGR(const RGB& v)		:Alpha(),  BGR(v)	{}
     ABGR(const ABGR& v)		:Alpha(v), BGR(v)	{}
-    ABGR(const YUV444& v)	:Alpha(),  BGR(v)	{}
+    ABGR(const YUV444& v)				;
 
     bool	operator ==(const ABGR& v) const
 		{return (Alpha::operator ==(v) && BGR::operator ==(v));}
@@ -313,6 +313,18 @@ inline
 BGR::BGR(const YUV444& v)
 {
     *this = fromYUV<BGR>(v.y, v.u, v.v);
+}
+
+inline
+RGBA::RGBA(const YUV444& v)
+     :RGB(v), Alpha()
+{
+}
+
+inline
+ABGR::ABGR(const YUV444& v)
+     :Alpha(),  BGR(v)
+{
 }
 
 /************************************************************************

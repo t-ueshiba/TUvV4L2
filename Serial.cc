@@ -1,5 +1,5 @@
 /*
- *  $Id: Serial.cc,v 1.2 2002-07-25 02:38:06 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 #include <stdexcept>
@@ -8,24 +8,25 @@
 
 namespace TU
 {
+#ifndef sgi
+    using namespace	std;
+#endif
 /************************************************************************
 *  Public member functions						*
 ************************************************************************/ 
 Serial::Serial(const char* ttyname)
-    :std::fstream(ttyname, std::ios::in|std::ios::out)
+    :fstream(ttyname, ios::in|ios::out)
 {
-    using namespace	std;
-    
     if (!*this)
-	throw runtime_error(string("TU::Serial::Serial: cannot open fstream; ")
-			    + strerror(errno));
+	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open fstream; ")
+				 + strerror(errno));
     
     termios	termios;
     if (::tcgetattr(fd(), &termios) == -1)
     {
 	clear(ios::badbit|rdstate());
-	throw runtime_error(string("TU::Serial::Serial: tcgetattr; ")
-			    + strerror(errno));
+	throw std::runtime_error(std::string("TU::Serial::Serial: tcgetattr; ")
+				 + strerror(errno));
     }
 
     _termios_bak = termios;		// backup termios structure
@@ -35,8 +36,8 @@ Serial::Serial(const char* ttyname)
     if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
     {
 	clear(ios::badbit|rdstate());
-	throw runtime_error(string("TU::Serial::Serial: tcsetattr; ")
-			    + strerror(errno));
+	throw std::runtime_error(std::string("TU::Serial::Serial: tcsetattr; ")
+				 + strerror(errno));
     }
 }
 
@@ -159,21 +160,20 @@ Serial::c_baud(int baud)	// set baud rate
 	return set_flag(&termios::c_cflag, CBAUD, B38400);
     }
 #else
-    using namespace	std;
     termios		termios;
 
     if (::tcgetattr(fd(), &termios) == -1)
     {
 	clear(ios::badbit|rdstate());
-	throw runtime_error(string("TU::Serial::c_baud: tcgetattr; ")
-			    + strerror(errno));
+	throw std::runtime_error(std::string("TU::Serial::c_baud: tcgetattr; ")
+				 + strerror(errno));
     }
     termios.c_ispeed = termios.c_ospeed = baud;
     if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
     {
 	clear(ios::badbit|rdstate());
-	throw runtime_error(string("TU::Serial::c_baud: tcsetattr; ")
-			    + strerror(errno));
+	throw std::runtime_error(std::string("TU::Serial::c_baud: tcsetattr; ")
+				 + strerror(errno));
     }
 #endif
     return *this;
@@ -233,22 +233,23 @@ Serial&
 Serial::set_flag(tcflag_t termios::* flag,
 		 unsigned long clearbits, unsigned long setbits)
 {
-    using namespace	std;
     termios		termios;
 
     if (::tcgetattr(fd(), &termios) == -1)
     {
 	clear(ios::badbit|rdstate());
-	throw runtime_error(string("TU::Serial::set_flag: tcgetattr; ")
-			    + strerror(errno));
+	throw
+	    std::runtime_error(std::string("TU::Serial::set_flag: tcgetattr; ")
+			       + strerror(errno));
     }
     termios.*flag &= ~clearbits;
     termios.*flag |= setbits;
     if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
     {
 	clear(ios::badbit|rdstate());
-	throw runtime_error(string("TU::Serial::set_flag: tcsetattr; ")
-			    + strerror(errno));
+	throw
+	    std::runtime_error(std::string("TU::Serial::set_flag: tcsetattr; ")
+			       + strerror(errno));
     }
     return *this;
 }
@@ -256,6 +257,28 @@ Serial::set_flag(tcflag_t termios::* flag,
 /************************************************************************
 *  Manipulators for Serial						*
 ************************************************************************/
+#ifdef sgi
+::istream&
+ign(::istream& in)	// manipulator for skipping the rest of a line
+{
+    char	c;
+    while (in.get(c))
+	if (c == '\n')
+	    break;
+    return in;
+}
+
+::istream&
+skipl(::istream& in)
+{
+    char	c;
+    
+    while (in.get(c))
+	if (c == '\n' || c == '\r')
+	    break;
+    return in;
+}
+#endif
 Serial&	igncr	(Serial& s)	{return s.i_igncr();}
 Serial&	even	(Serial& s)	{return s.c_even();}
 Serial&	odd	(Serial& s)	{return s.c_odd();}
