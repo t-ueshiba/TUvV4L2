@@ -1,5 +1,5 @@
 /*
- *  $Id: Allocator++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: Allocator++.h,v 1.3 2002-07-26 09:26:21 ueshiba Exp $
  */
 #ifndef __TUAllocatorPP_h
 #define __TUAllocatorPP_h
@@ -64,10 +64,10 @@ class Allocator
 	
 	void		unmark(const void* p)		;
 	
-	const Allocator<T>&		_allocator;
-	List<Page>::ConstIterator	_pageIter;
-	u_int				_page, _index, _bit;
-	T*				_p;
+	const Allocator<T>&			_allocator;
+	typename List<Page>::ConstIterator	_pageIter;
+	u_int					_page, _index, _bit;
+	T*					_p;
 	Array<Array<u_int> >	_mark;	// marked if not in freeList.
     };
 
