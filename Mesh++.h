@@ -1,5 +1,5 @@
 /*
- *  $Id: Mesh++.h,v 1.5 2002-08-12 01:51:02 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.6 2002-08-14 02:41:39 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
@@ -61,13 +61,17 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 	static void	setAllocator(Allocator<V>& a)	{_a = &a;}
 	V*		v()			const	{return _v;}
 	void		pair()			const	;
-
+#ifndef __APPLE__
       private:
 	std::istream&	get(std::istream& in)		;
 
       	friend std::istream&
 	  operator >>(std::istream& in, Topology& t)	{return t.get(in);}
+#else
+	std::istream&	get(std::istream& in)		;
 
+      private:
+#endif
 	V*			_v;			// Vertex.
 
 	static Allocator<V>*	_a;
