@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.9 2003-07-09 11:33:37 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.10 2004-03-08 02:06:19 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include <iomanip>
@@ -273,6 +273,53 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 	      << std::endl;
 #endif
     return norm1.Tt() * F * norm0.T();
+}
+
+//! 2枚のフレーム間のアフィン変換行列を計算する．
+/*!
+  \param frame0		一方のフレームのindex.
+  \param frame1		もう一方のフレームのindex.
+  \return		frame0, frame1間のアフィン変換行列．frame0=\f$i\f$,
+			frame1=\f$i'\f$のとき
+			\f[
+			\forall j~\TUtud{u}{i'j}\approx\TUvec{A}{}\TUud{u}{ij}
+			\f]
+			を満たす\f$\TUvec{A}{}\in\TUspace{R}{3\times3}\f$を返
+			す．ただし，\f$A_{31} = A_{32} = 0,~A_{33} = 1\f$．
+*/
+Matrix<double>
+MeasurementMatrix::affinity(u_int frame0, u_int frame1) const
+{
+    if (frame0 >= nframes() || frame1 >= nframes())
+	throw std::invalid_argument("TU::MeasurementMatrix::affinity: Cannot find specified frames!!");
+    if (npoints() < 3)
+	throw std::invalid_argument("TU::MeasurementMatrix::affinity: At least 3 points needed!!");
+
+    const Vector<T>&	c = centroid();
+    Matrix<T>		X(4, 4);
+    Vector<T>		a(4);
+    for (int j = 0; j < npoints(); ++j)
+    {
+	const Vector<T>&	dx = (*this)[j](3*frame0, 2) - c(3*frame0, 2);
+	const Vector<T>&	du = (*this)[j](3*frame1, 2) - c(3*frame1, 2);
+	
+	X(0, 0, 2, 2) += dx % dx;
+	X(2, 2, 2, 2) += dx % dx;
+	a(0, 2) += dx * du[0];
+	a(2, 2) += dx * du[1];
+    }
+    a.solve(X);
+    
+    Matrix<T>	A(3, 3);
+    A[0][0] = a[0];
+    A[0][1] = a[1];
+    A[0][2] = c[3*frame1  ] - a(0, 2) * c(3*frame0, 2);
+    A[1][0] = a[2];
+    A[1][1] = a[3];
+    A[1][2] = c[3*frame1+1] - a(2, 2) * c(3*frame0, 2);
+    A[2][2] = 1.0;
+    
+    return A;
 }
 
 //! 2枚のフレーム間の射影変換行列を計算する．

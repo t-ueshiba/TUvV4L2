@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.8 2003-07-09 11:33:37 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.9 2004-03-08 02:06:19 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
@@ -143,6 +143,7 @@ class MeasurementMatrix : public Matrix<double>
     
     Matrix<T>	affineFundamental(u_int frame0=0, u_int frame1=1) const	;
     Matrix<T>	fundamental(u_int frame0=0, u_int frame1=1)	const	;
+    Matrix<T>	affinity(u_int frame0=0, u_int frame1=1)	const	;
     Matrix<T>	homography(u_int frame0=0, u_int frame1=1,
 			   bool doRefinement=true)		const	;
     Matrix<T>	rotation(u_int frame0=0, u_int frame1=1)	const	;
