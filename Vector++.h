@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.4 2002-07-25 12:10:45 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.5 2002-08-12 01:24:46 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -122,8 +122,8 @@ class Matrix : public Array2<Vector<T> >
 	:Array2<Vector<T> >(r, c)				{*this = 0.0;}
     Matrix(T* p, u_int r, u_int c) :Array2<Vector<T> >(p, r, c)	{}
     Matrix(const Matrix& m, u_int i, u_int j, u_int r, u_int c)
-	:Array2<Vector<T> >(m, i, j, r, c)				{}
-    Matrix(const Matrix& m)	:Array2<Vector<T> >(m)	{}
+	:Array2<Vector<T> >(m, i, j, r, c)			{}
+    Matrix(const Matrix& m)	:Array2<Vector<T> >(m)		{}
     Matrix&	operator =(const Matrix& m)
 			{Array2<Vector<T> >::operator =(m); return *this;}
 
@@ -143,7 +143,7 @@ class Matrix : public Array2<Vector<T> >
     Matrix&	operator -=(const Matrix& m)	{Array2<Vector<T> >::
 						 operator -=(m); return *this;}
     Matrix&	operator *=(const Matrix& m)	{return *this = *this * m;}
-    Matrix&	operator ^=(const Vector<T>&)		;
+    Matrix&	operator ^=(const Vector<T>&)	;
     Matrix	operator  -()			const	{Matrix r(*this);
 							 r *= -1; return r;}
     Matrix	trns()				const	;
@@ -279,7 +279,7 @@ class LUDecomposition : private Array2<Vector<T> >
 };
 
 /************************************************************************
-*  class Householder<T>						*
+*  class Householder<T>							*
 ************************************************************************/
 template <class T>	class QRDecomposition;
 template <class T>	class TriDiagonal;
@@ -317,7 +317,7 @@ template <class T>
 class QRDecomposition : private Matrix<T>
 {
   public:
-    QRDecomposition(const Matrix<T>&)		;
+    QRDecomposition(const Matrix<T>&)			;
 
     Matrix<T>::dim;
     const Matrix<T>&	Rt()			const	{return *this;}
@@ -458,7 +458,7 @@ class Minimization
 		 
   public:
     Minimization(S tol = DEFAULT_TOL, int niter_max = DEFAULT_NITER_MAX,
-		   int pr = 0)
+		 int pr = 0)
       :_tol(tol), _niter_max(niter_max), _print(pr)			{}
     
     virtual S		operator ()(const T&)			const	= 0;

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: Array++.h,v 1.3 2002-08-12 01:24:46 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -45,9 +45,9 @@ class Array
   //! 要素数を指定して配列を生成する
     explicit Array(u_int d=0):_d(d), _p(new T[_d]), _shr(0), _siz(_d)	{}
   //! 外部の領域とそのサイズを指定して配列を生成する
-    Array(T* p, u_int d) :_d(d), _p(p),	  _shr(1), _siz(_d)	{}
-    Array(const Array&, u_int, u_int)	;
-    Array(const Array&)			;
+    Array(T* p, u_int d)     :_d(d), _p(p),	    _shr(1), _siz(_d)	{}
+    Array(const Array&, u_int, u_int)		;
+    Array(const Array&)				;
     ~Array()					{if (!_shr) delete [] _p;}
     Array&	operator =(const Array&)	;
 
@@ -118,9 +118,9 @@ class Array2 : public Array<T>
     Array2(ET* p, u_int r, u_int c)
 	:Array<T>(r), _cols(c), _ary(p, nrow()*ncol())	{set_rows();}
     Array2(const Array2&, u_int, u_int, u_int, u_int)	;
-    Array2(const Array2& a)					;
-    Array2&	operator =(const Array2& a)			;
-    virtual ~Array2()						;
+    Array2(const Array2& a)				;
+    Array2&	operator =(const Array2& a)		;
+    virtual ~Array2()					;
 
   //! 2次元配列の行数を返す    
     u_int	nrow()			const	{return dim();}
@@ -147,28 +147,28 @@ class Array2 : public Array<T>
   //! すべての要素の符号を反転した配列を返す
     Array2	operator  -()		const	{Array2 r(*this);
 						 r *= -1; return r;}
-    std::istream&	restore(std::istream&)		;
-    std::ostream&	save(std::ostream&)	const	;
-    void		resize(u_int, u_int)		;
-    void		resize(ET*, u_int, u_int)	;
-    std::istream&	get(std::istream&, int, int, int)	;
+    std::istream&	restore(std::istream&)			;
+    std::ostream&	save(std::ostream&)		const	;
+    void		resize(u_int, u_int)			;
+    void		resize(ET*, u_int, u_int)		;
     
   private:
-    virtual void	set_rows()		;
+    virtual void	set_rows()				;
+    std::istream&	get(std::istream&, int, int, int)	;
     
     u_int		_cols;			// # of columns (width)
     Array<ET>		_ary;
 
-  /*    friend std::istream&	operator >>(std::istream& in, Array2<T>& a)
-	{return a.get(in >> std::ws, 0, 0, 0);}*/
+    friend std::istream&	operator >>(std::istream& in, Array2<T>& a)
+	{return a.get(in >> std::ws, 0, 0, 0);}
 };
-
+/*
 template <class T> inline std::istream&
 operator >>(std::istream& in, Array2<T>& a)
 {
     return a.get(in >> std::ws, 0, 0, 0);
 }
-
+*/
 /************************************************************************
 *  numerical operators							*
 ************************************************************************/

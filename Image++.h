@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
+ *  $Id: Image++.h,v 1.4 2002-08-12 01:24:46 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -252,7 +252,7 @@ class ConversionFromYUV
 
   private:
     template <class T>
-    friend T	fromYUV(u_char y, u_char u, u_char v)		;
+    friend T	fromYUV(u_char y, u_char u, u_char v)	;
     
     int		_r[256], _g0[256], _g1[256], _b[256];
 };
@@ -359,21 +359,21 @@ class ImageBase
 };
 
 /************************************************************************
-*  class ImageLine<T>:	Generic image scanline class		*
+*  class ImageLine<T>:	Generic image scanline class			*
 ************************************************************************/
 template <class T>
 class ImageLine : public Array<T>
 {
   public:
     explicit ImageLine(u_int d=0)	:Array<T>(d)		{*this = 0;}
-    ImageLine(T* p, u_int d)		:Array<T>(p, d)	{}
-    ImageLine&	operator =(double c)
+    ImageLine(T* p, u_int d)		:Array<T>(p, d)		{}
+    ImageLine&		operator =(double c)
 			{
 			    Array<T>::operator =(c);
 			    return *this;
 			}
-    const YUV422*	fill(const YUV422* src)		;
-    const YUV411*	fill(const YUV411* src)		;
+    const YUV422*	fill(const YUV422* src)			;
+    const YUV411*	fill(const YUV411* src)			;
     const T*		fill(const T* src)			;
     template <class S>
     const S*		fill(const S* src)			;
@@ -391,15 +391,15 @@ class ImageLine<YUV422> : public Array<YUV422>
 {
   public:
     explicit ImageLine(u_int d=0)	:Array<YUV422>(d)	{*this = 0;}
-    ImageLine(YUV422* p, u_int d)	:Array<YUV422>(p, d){}
-    ImageLine&	operator =(double c)
+    ImageLine(YUV422* p, u_int d)	:Array<YUV422>(p, d)	{}
+    ImageLine&		operator =(double c)
 			{
 			    Array<YUV422>::operator =(c);
 			    return *this;
 			}
-    const YUV444*	fill(const YUV444* src)		;
-    const YUV422*	fill(const YUV422* src)		;
-    const YUV411*	fill(const YUV411* src)		;
+    const YUV444*	fill(const YUV444* src)			;
+    const YUV422*	fill(const YUV422* src)			;
+    const YUV411*	fill(const YUV411* src)			;
     template <class S>
     const S*		fill(const S* src)			;
 };
@@ -417,7 +417,7 @@ class ImageLine<YUV411> : public Array<YUV411>
   public:
     explicit ImageLine(u_int d=0)	:Array<YUV411>(d)	{*this = 0;}
     ImageLine(YUV411* p, u_int d)	:Array<YUV411>(p, d)	{}
-    ImageLine&	operator =(double c)
+    ImageLine&		operator =(double c)
 			{
 			    Array<YUV411>::operator =(c);
 			    return *this;
