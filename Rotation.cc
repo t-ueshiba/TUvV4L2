@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Rotation.cc,v 1.4 2003-07-18 02:26:19 ueshiba Exp $
+ *  $Id: Rotation.cc,v 1.5 2003-07-18 04:40:12 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
@@ -31,9 +31,9 @@ inline double	sqr(double x)	{return x * x;}
 Rotation::Rotation(int p, int q, double x, double y)
     :_p(p), _q(q), _l(1.0), _c(1.0), _s(0.0)
 {
-    const double	absx = std::abs(x), absy = std::abs(y);
-    _l = (absx > absy ? absx * std::sqrt(1.0 + sqr(absy/absx))
-		      : absy * std::sqrt(1.0 + sqr(absx/absy)));
+    const double	absx = fabs(x), absy = fabs(y);
+    _l = (absx > absy ? absx * sqrt(1.0 + sqr(absy/absx))
+		      : absy * sqrt(1.0 + sqr(absx/absy)));
     if (_l != 0.0)
     {
 	_c = x / _l;
@@ -42,7 +42,7 @@ Rotation::Rotation(int p, int q, double x, double y)
 }
 
 Rotation::Rotation(int p, int q, double theta)
-    :_p(p), _q(q), _l(1.0), _c(std::cos(theta)), _s(std::sin(theta))
+    :_p(p), _q(q), _l(1.0), _c(::cos(theta)), _s(::sin(theta))
 {
 }
  
