@@ -1,5 +1,5 @@
 /*
- *  $Id: TUv++.h,v 1.3 2002-12-18 06:09:59 ueshiba Exp $
+ *  $Id: TUv++.h,v 1.4 2003-01-10 00:33:11 ueshiba Exp $
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
@@ -12,9 +12,6 @@
 #  include "TU/v/Colormap.h"
 #endif
 #include "TU/List++.h"
-#if defined __GNUG__ || __INTEL_COMPILER
-#  include "TU/List++.cc"
-#endif
 #include "TU/Geometry++.h"
 #include "TU/types.h"
 
