@@ -54,6 +54,10 @@ main()
     cout << endl;
 }
 
+#ifdef __GNUG__
+#  include "TU/Collection++.cc"
+#endif
+
 namespace TU
 {
 template const Object::Desc	ObjDList<Int>::_desc;

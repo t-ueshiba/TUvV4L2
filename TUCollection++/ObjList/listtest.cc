@@ -56,6 +56,11 @@ main()
     cout << list->head() << endl;
 }
 
+
+#ifdef __GNUG__
+#  include "TU/Collection++.cc"
+#endif
+
 namespace TU
 {
 template const Object::Desc	ObjList<Int>::_desc;
@@ -64,3 +69,4 @@ template const Object::Desc	ObjList<Int>::_desc;
 #ifdef __GNUG__
 #  include "TU/Collection++.cc"
 #endif
+
