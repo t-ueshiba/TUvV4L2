@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.4 2002-08-09 00:09:41 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.5 2002-08-20 03:13:41 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include "TU/Minimize++.h"
@@ -1739,15 +1739,4 @@ MeasurementMatrix::CostBACFE::updateB(ATB& x, const Vector<T>& dx) const
 }
 #ifdef __GNUG__
 #  include "TU/Array++.cc"
-
-namespace TU
-{
-template 
-Array<CanonicalCamera>::Array<CanonicalCamera>
-	(const Array<CanonicalCamera>& )			;
-template 
-Array<CameraWithFocalLength>::Array<CameraWithFocalLength>
-	(const Array<CameraWithFocalLength>& )			;
-}
-
 #endif
