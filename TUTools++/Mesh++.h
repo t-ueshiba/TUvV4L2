@@ -1,5 +1,5 @@
 /*
- *  $Id: Mesh++.h,v 1.3 2002-07-26 08:59:31 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.4 2002-08-12 01:24:46 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
@@ -62,11 +62,11 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 	V*		v()			const	{return _v;}
 	void		pair()			const	;
 
-      private:
 	std::istream&	get(std::istream& in)		;
- 
-	friend std::istream&
-	     operator >>(std::istream& in, Topology& t)	{return t.get(in);}
+
+      private:
+      /*	friend std::istream&
+		operator >>(std::istream& in, Topology& t)	{return t.get(in);}*/
 
 	V*			_v;			// Vertex.
 

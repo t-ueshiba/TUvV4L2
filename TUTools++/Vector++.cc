@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.2 2002-07-25 02:38:07 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.3 2002-08-12 01:24:46 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -46,7 +46,7 @@ Vector<T>::operator ()(u_int i, u_int dd) const	// partial vector
 }
 
 template <class T> Vector<T>
-Vector<T>::operator ()(u_int i, u_int dd)		// partial vector
+Vector<T>::operator ()(u_int i, u_int dd)	// partial vector
 {
     return Vector<T>(*this, i, dd);
 }
@@ -570,7 +570,7 @@ LUDecomposition<T>::substitute(Vector<T>& b) const
 }
 
 /************************************************************************
-*  class Householder<T>						*
+*  class Householder<T>							*
 ************************************************************************/
 template <class T>
 Householder<T>::Householder(const Matrix<T>& a, u_int d)
@@ -859,7 +859,7 @@ TriDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 }
 
 /************************************************************************
-*  class BiDiagonal<T>						*
+*  class BiDiagonal<T>							*
 ************************************************************************/
 template <class T>
 BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
