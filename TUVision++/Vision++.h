@@ -1,5 +1,5 @@
 /*
- *  $Id: Vision++.h,v 1.2 2002-07-25 02:38:07 ueshiba Exp $
+ *  $Id: Vision++.h,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
  */
 #ifndef __TUVisionPP_h
 #define __TUVisionPP_h
@@ -15,6 +15,7 @@ namespace v
 /************************************************************************
 *  color indices							*
 ************************************************************************/
+#ifndef __APPLE__
 const int	Color_BG	= 0;
 const int	Color_WHITE	= 1;
 const int	Color_RED	= 2;
@@ -23,7 +24,16 @@ const int	Color_BLUE	= 4;
 const int	Color_CYAN	= 5;
 const int	Color_MAGENDA	= 6;
 const int	Color_YELLOW	= 7;
-
+#else
+const BGR	Color_BG(0, 0, 0);
+const BGR	Color_White(255, 255, 255);	// white
+const BGR	Color_RED(255,   0,   0);	// red
+const BGR	Color_GREEN(  0, 255,   0);	// green
+const BGR	Color_BLUE(  0,   0, 255);	// blue
+const BGR	Color_CYAN(  0, 255, 255);	// cyan
+const BGR	Color_MAGENDA(255,   0, 255);	// magenda
+const BGR	Color_YELLOW(255, 255,   0);	// yellow
+#endif
 /************************************************************************
 *  class BrepCmdPane							*
 ************************************************************************/

@@ -1,5 +1,5 @@
 /*
- *  $Id: BrepCanvasPane.cc,v 1.2 2002-07-25 02:38:07 ueshiba Exp $
+ *  $Id: BrepCanvasPane.cc,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
  */
 #include "TU/v/Vision++.h"
 #include <limits.h>
@@ -18,7 +18,9 @@ BrepCanvasPane::BrepCanvasPane(Window& parentWindow,
     :CanvasPane(parentWindow, width, height),
      _dc(*this), _root(root), _h_cache(0), _cmd(0)
 {
+#ifndef __APPLE__
     _dc << overlay;
+#endif
 }
 
 BrepCanvasPane::~BrepCanvasPane()
@@ -93,7 +95,11 @@ BrepCanvasPane::draw(const Loop* l, DrawMode mode)
 void
 BrepCanvasPane::draw(const HalfEdge* h, DrawMode mode)
 {
+#ifndef __APPLE__
     u_int	jnc = Color_BG, pnt = Color_BG;
+#else
+    BGR		jnc = Color_BG, pnt = Color_BG;
+#endif
     switch (mode)
     {
       case Draw:
@@ -124,7 +130,11 @@ BrepCanvasPane::draw(const HalfEdge* h, DrawMode mode)
 void
 BrepCanvasPane::draw(const Geometry* g, DrawMode mode)
 {
+#ifndef __APPLE__
     u_int	pnt = Color_BG;
+#else
+    BGR		jnc = Color_BG, pnt = Color_BG;
+#endif
     switch (mode)
     {
       case Draw:
@@ -144,12 +154,11 @@ BrepCanvasPane::draw(const Geometry* g, DrawMode mode)
 }
 
 void
-BrepCanvasPane::repaintUnderlay(int, int, int, int)
-{
-}
-
-void
+#ifndef __APPLE__
 BrepCanvasPane::repaintOverlay(int, int, int, int)
+#else
+BrepCanvasPane::repaintUnderlay(int, int, int, int)
+#endif
 {
     _dc << clear;
     drawDescendants(_root, Draw);
@@ -162,6 +171,15 @@ BrepCanvasPane::repaintOverlay(int, int, int, int)
 	draw(h, Highlight2);
 	draw(g, Highlight3);
     }
+}
+
+void
+#ifndef __APPLE__
+BrepCanvasPane::repaintUnderlay(int, int, int, int)
+#else
+BrepCanvasPane::repaintOverlay(int, int, int, int)
+#endif
+{
 }
 
 Geometry*

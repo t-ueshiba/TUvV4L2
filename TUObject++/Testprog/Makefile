@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.4 2002-07-26 08:56:04 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2002-07-29 00:09:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(BINDIR)
-INCDIRS		= -I.. -I$(HOME)/include
+INCDIRS		= -I$(HOME)/include
 
 PROGRAM		= ptest
 LIBS		= -lTUObject++
@@ -21,20 +21,17 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= ../Object++_.h \
-		../TU/Object++.cc \
-		../TU/Object++.h \
+EXTHDRS		= /Users/ueshiba/include/TU/Object++.cc \
+		/Users/ueshiba/include/TU/Object++.h \
 		/Users/ueshiba/include/TU/types.h
 HDRS		=
-SRCS		= Desc.cc \
-		ptest.cc
-OBJS		= Desc.o \
-		ptest.o
+SRCS		= ptest.cc
+OBJS		= ptest.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -46,6 +43,6 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-Desc.o: ../Object++_.h ../TU/Object++.h /Users/ueshiba/include/TU/types.h
-ptest.o: ../TU/Object++.h /Users/ueshiba/include/TU/types.h \
-	../TU/Object++.cc
+ptest.o: /Users/ueshiba/include/TU/Object++.h \
+	/Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Object++.cc
