@@ -20,13 +20,14 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.6 2002-12-18 06:04:32 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.7 2003-03-17 00:49:53 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
 
 #include "TU/Geometry++.h"
 #include "TU/BlockMatrix++.h"
+#include "TU/Minimize++.h"
 
 /*!
   \mainpage	libTUCalib++ - カメラキャリブレーション用ライブラリ
@@ -145,13 +146,9 @@ class MeasurementMatrix : public Matrix<double>
     Matrix<T>	homography(u_int frame0=0, u_int frame1=1)	const	;
     Matrix<T>	rotation(u_int frame0=0, u_int frame1=1)	const	;
 
-    Camera::Intrinsic
+    template <class INTRINSIC> INTRINSIC
 		calibrateWithPlanes
 			(Array<CanonicalCamera>& cameras)	const	;
-    CameraWithDistortion::Intrinsic
-		 calibrateWithPlanesConsideringDistortion
-			(Array<CanonicalCamera>& cameras)	const	;
-    
     void	affineFactorization(Matrix<T>& P,
 				    Matrix<T>& Xt)		const	;
     static void	affineToMetric(Matrix<T>& P,
@@ -165,26 +162,21 @@ class MeasurementMatrix : public Matrix<double>
     void	projectiveToMetricWithCommonFocalLengthEstimation
 		    (Matrix<T>& P, Matrix<T>& Xt)		const	;
 
+    template <class INTRINSIC>
     void	refineCalibrationWithPlanes
-				(Camera::Intrinsic& K,
+				(INTRINSIC& K,
 				 Array<CanonicalCamera>& cameras)
 								const	;
-    void	refineCalibrationWithPlanes
-				(CameraWithDistortion::Intrinsic& K,
-				 Array<CanonicalCamera>& cameras)
-								const	;
-    void	bundleAdjustment(Array<CanonicalCamera>& cameras,
+    template <class CAMERA>
+    void	bundleAdjustment(Array<CAMERA>& cameras,
 				 Matrix<T>& Xt)			const	;
-    void	bundleAdjustment(Array<CameraWithFocalLength>& cameras,
-				 Matrix<T>& Xt)			const	;
-    void	bundleAdjustment(CameraWithFocalLength::Intrinsic& K,
+    template <class INTRINSIC>
+    void	bundleAdjustment(INTRINSIC& K,
 				 Array<CanonicalCamera>& cameras,
 				 Matrix<T>& Xt)			const	;
+    template <class CAMERA>
     void	bundleAdjustmentWithFixedCameraCenters
-				(Array<CanonicalCamera>& cameras,
-				 Matrix<T>& Xt)			const	;
-    void	bundleAdjustmentWithFixedCameraCenters
-				(Array<CameraWithFocalLength>& cameras,
+				(Array<CAMERA>& cameras,
 				 Matrix<T>& Xt)			const	;
     Matrix<T>	reconstruction(const Matrix<T>& P,
 			       bool inhomogeneous=false)	const	;
@@ -330,20 +322,19 @@ class MeasurementMatrix : public Matrix<double>
 	const u_int			_adim;
     };
 
+    template <class CAMERA>
     class CostBA	// cost function for bundle adjustment.
     {
       public:
-	typedef double				T;
-	typedef Array<CanonicalCamera>		ATA;
-	typedef Array<CameraWithFocalLength>	ATAF;
-	typedef Vector<T>			ATB;
-	typedef BlockMatrix<T>			JT;
+	typedef double			T;
+	typedef Array<CAMERA>		ATA;
+	typedef Vector<T>		ATB;
+	typedef BlockMatrix<T>		JT;
 
 	class CostCD	// cost function for keeping distance between 0th
 	{		//   and 1st cameras constant.
 	  public:
 	    CostCD(const ATA& p)  :_sqdist01(p[0].t().sqdist(p[1].t()))	{}
-	    CostCD(const ATAF& p) :_sqdist01(p[0].t().sqdist(p[1].t()))	{}
 	
 	    Vector<T>	operator ()(const ATA& p) const
 			{
@@ -353,20 +344,10 @@ class MeasurementMatrix : public Matrix<double>
 			}
 	    Matrix<T>	jacobian(const ATA& p) const
 			{
-			    Matrix<T>	L(1, 6*(p.dim()-1));
-			    (L[0](0, 3) = p[1].t() - p[0].t()) *= 2.0;
-			    return L;
-			}
-	    Vector<T>	operator ()(const ATAF& p) const
-			{
-			    Vector<T>	val(1);
-			    val[0] = p[0].t().sqdist(p[1].t()) - _sqdist01;
-			    return val;
-			}
-	    Matrix<T>	jacobian(const ATAF& p) const
-			{
-			    Matrix<T>	L(1, 1 + 7*(p.dim()-1));
-			    (L[0](1, 3) = p[1].t() - p[0].t()) *= 2.0;
+			    Matrix<T>	L(1, p[0].dofIntrinsic() +
+					  (6+p[0].dofIntrinsic())*(p.dim()-1));
+			    (L[0](p[0].dofIntrinsic(), 3) = p[1].t()-p[0].t())
+				*= 2.0;
 			    return L;
 			}
 
@@ -386,13 +367,6 @@ class MeasurementMatrix : public Matrix<double>
 				  const ATB& x, int j)		const	;
 	void		updateA(ATA& p,	const Vector<T>& dp)	const	;
 	void		updateB(ATB& x, const Vector<T>& dx)	const	;
-	Vector<T>	operator ()(const ATAF& p,
-				    const ATB& x, int j)	const	;
-	JT		jacobianA(const ATAF& p,
-				  const ATB& x, int j)		const	;
-	Matrix<T>	jacobianB(const ATAF& p,
-				  const ATB& x, int j)		const	;
-	void		updateA(ATAF& p, const Vector<T>& dp)	const	;
 
 	u_int			nframes()	const	{return _Wt.nframes();}
 	u_int			adim()		const	{return _adim;}
@@ -405,17 +379,18 @@ class MeasurementMatrix : public Matrix<double>
 	Array<u_int>			_adims;	// dimensions of block jacobian.
     };
 
-    class CostBACFE	// cost function for bundle adjustment
-    {			//   with common focal length estimation.
+    template <class INTRINSIC>
+    class CostBACI	// cost function for bundle adjustment
+    {			//   with common intrinsic parameters estimation.
       public:
 	typedef double			T;
 	struct ATA : public Array<CanonicalCamera>
 	{
-	    ATA(const CameraWithFocalLength::Intrinsic& KK,
+	    ATA(const INTRINSIC& KK,
 		const Array<CanonicalCamera>& cc)
 		:Array<CanonicalCamera>(cc), K(KK)			{}
 	    
-	    CameraWithFocalLength::Intrinsic	K;	// common focal length.
+	    INTRINSIC			K;	// common intrinsic parameters.
 	};
 	typedef Vector<T>		ATB;
 	typedef Matrix<T>		JT;
@@ -433,8 +408,9 @@ class MeasurementMatrix : public Matrix<double>
 			}
 	    Matrix<T>	jacobian(const ATA& p) const
 			{
-			    Matrix<T>	L(1, 1 + 6*(p.dim()-1));
-			    (L[0](1, 3) = (p[1].t()-p[0].t())) *= 2.0;
+			    Matrix<T>	L(1, p.K.dof() + 6*(p.dim()-1));
+			    (L[0](p.K.dof(), 3) = (p[1].t()-p[0].t()))
+				*= 2.0;
 			    return L;
 			}
 
@@ -443,7 +419,7 @@ class MeasurementMatrix : public Matrix<double>
 	};
 
       public:
-	CostBACFE(const MeasurementMatrix& Wt)	:_Wt(Wt)		{}
+	CostBACI(const MeasurementMatrix& Wt)	:_Wt(Wt)		{}
 
 	Vector<T>	operator ()(const ATA& p,
 				    const ATB& x, int j)	const	;
@@ -462,7 +438,7 @@ class MeasurementMatrix : public Matrix<double>
 	const MeasurementMatrix&	_Wt;	// measurement matrix.
     };
 };
-
+ 
 //! 観測行列をストリームから読み込む
 /*!
   \param in	入力ストリーム．

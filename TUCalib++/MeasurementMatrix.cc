@@ -1,8 +1,7 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.7 2002-12-18 06:04:32 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.8 2003-03-17 00:49:53 ueshiba Exp $
  */
 #include "TU/Calib++.h"
-#include "TU/Minimize++.h"
 #include <iomanip>
 #include <stdexcept>
 
@@ -370,67 +369,6 @@ MeasurementMatrix::rotation(u_int frame0, u_int frame1) const
     SVDecomposition<double>   svd(M);
     
     return svd.Ut().trns() * svd.Vt();
-}
-
-//! 複数の視点から平面パターンを観測してカメラキャリブレーション(歪み推定なし)を行う．
-/*!
-  ワールド座標系を参照平面に固定し，平面上の特徴点の同次座標を
-  \f$[X_j, Y_j, 0, 1]^\top~(j=0,\ldots,P-1)\f$とする．これを内部パラメータ
-  を固定して視点iから観測した像を\f$\TUud{u}{ij}=[u_{ij},v_{ij},1]^\top~
-  (i=0,\ldots,F-1)\f$とする．これらのデータより観測行列を
-  \f[
-    \TUtvec{W}{} =
-    \TUbeginarray{cccccc}
-      X_0     & Y_0     & 1 & \TUtud{u}{00}    & \cdots & \TUtud{u}{0~F-1} \\
-      \vdots  & \vdots  & \vdots & \vdots      &	& \vdots	   \\
-      X_{P-1} & Y_{P-1} & 1 & \TUtud{u}{P-1~0} & \cdots & \TUtud{u}{P-1~F-1}
-    \TUendarray
-  \f]
-  と構成する．この観測行列に対して本アルゴリズム適用すると，カメラの内部
-  パラメータおよび各視点でのカメラの外部パラメータが計算される．
-  \param cameras 各視点について，参照平面に固定されたワールド座標系から見た
-		 カメラの外部パラメータが返される．
-  \return	 カメラの内部パラメータ(歪み推定値を含まない)．
- */
-Camera::Intrinsic
-MeasurementMatrix::calibrateWithPlanes(Array<CanonicalCamera>& cameras)
-    const
-{
-    Camera::Intrinsic	K(initializeCalibrationWithPlanes(cameras));
-    refineCalibrationWithPlanes(K, cameras);
-
-    return K;
-}
-
-//! 複数の視点から平面パターンを観測してカメラキャリブレーション(歪み推定あり)を行う．
-/*!
-  ワールド座標系を参照平面に固定し，平面上の特徴点の同次座標を
-  \f$[X_j, Y_j, 0, 1]^\top~(j=0,\ldots,P-1)\f$とする．これを内部パラメータ
-  を固定して視点iから観測した像を\f$\TUud{u}{ij}=[u_{ij},v_{ij},1]^\top~
-  (i=0,\ldots,F-1)\f$とする．これらのデータより観測行列を
-  \f[
-    \TUtvec{W}{} =
-    \TUbeginarray{cccccc}
-      X_0     & Y_0     & 1 & \TUtud{u}{00}    & \cdots & \TUtud{u}{0~F-1} \\
-      \vdots  & \vdots  & \vdots & \vdots      &	& \vdots	   \\
-      X_{P-1} & Y_{P-1} & 1 & \TUtud{u}{P-1~0} & \cdots & \TUtud{u}{P-1~F-1}
-    \TUendarray
-  \f]
-  と構成する．この観測行列に対して本アルゴリズム適用すると，カメラの内部
-  パラメータおよび各視点でのカメラの外部パラメータが計算される．
-  \param cameras 各視点について，参照平面に固定されたワールド座標系から見た
-		 カメラの外部パラメータが返される．
-  \return	 カメラの内部パラメータ(歪み推定値を含む).
- */
-CameraWithDistortion::Intrinsic
-MeasurementMatrix::calibrateWithPlanesConsideringDistortion
-	(Array<CanonicalCamera>& cameras) const
-{
-    CameraWithDistortion::Intrinsic
-	K(initializeCalibrationWithPlanes(cameras));
-    refineCalibrationWithPlanes(K, cameras);
-
-    return K;
 }
 
 //! 観測行列をアフィンカメラ行列と特徴点の3次元アフィン座標に分解する．
@@ -815,163 +753,6 @@ MeasurementMatrix::projectiveToMetricWithCommonFocalLengthEstimation
 	P[3*i  ] *= K.k();
 	P[3*i+1] *= K.k();
     }
-}
-
-//! 平面上のパターンを複数の視点から観測した画像の像を用いて，カメラの内部パラメータ(歪みなし)と外部パラメータをrefineする．
-/*!
-  観測行列の形式についてはcalibrateWithPlanes()を参照．
-  \param K	 カメラの内部パラメータの初期値(歪み推定値を含まない)を与える．
-		 その最適推定値が返される．
-  \param cameras 各視点について，参照平面に固定されたワールド座標系から見た
-		 カメラの外部パラメータの初期値を与える．その最適推定値が
-		 返される．
- */
-void
-MeasurementMatrix::refineCalibrationWithPlanes
-    (Camera::Intrinsic& K, Array<CanonicalCamera>& cameras) const
-{
-    if (nframes() < 3)
-	throw std::invalid_argument("TU::MeasurementMatrix::refineCalibrationWithPlanes: Two or more frames required!!");
-
-    CostCP				err(*this, 5);
-    NullConstraint<T, CostCP::ATA>	g;
-
-    minimizeSquareSparse(err, g, K, cameras, 30);
-}
-
-//! 平面上のパターンを複数の視点から観測した画像の像を用いて，カメラの内部パラメータ(歪みあり)と外部パラメータをrefineする．
-/*!
-  観測行列の形式についてはcalibrateWithPlanes()を参照．
-  \param K	 カメラの内部パラメータの初期値(歪み推定値を含む)を与える．
-		 その最適推定値が返される．
-  \param cameras 各視点について，参照平面に固定されたワールド座標系から見た
-		 カメラの外部パラメータの初期値を与える．その最適推定値が
-		 返される．
- */
-void
-MeasurementMatrix::refineCalibrationWithPlanes
-    (CameraWithDistortion::Intrinsic& K, Array<CanonicalCamera>& cameras) const
-{
-    if (nframes() < 3)
-	throw std::invalid_argument("TU::MeasurementMatrix::refineCalibrationWithPlanes: Two or more frames required!!");
-
-    CostCP				err(*this, 7);
-    NullConstraint<T, CostCP::ATA>	g;
-
-    minimizeSquareSparse(err, g, K, cameras, 500);
-}
-
-//! カメラの外部パラメータと特徴点位置の初期値を非線型最適化によりrefineする．
-/*!
-  \param cameras	個々のカメラの外部パラメータの初期値を与える．その最
-			適推定値が返される．
-  \param Xt		特徴点のユークリッド座標系における同次座標の初期値を
-			与える．その最適推定値が返される．
-*/
-void
-MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,
-				    Matrix<T>& Xt) const
-{
-    if (nframes() < 2)
-	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment: Two or more frames required!!");
-
-    CostBA		err(*this, 0);
-    CostBA::CostCD	g(cameras);
-    Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
-
-    minimizeSquareSparse(err, g, cameras, shape, 200);
-}
-
-//! カメラの外部パラメータ，焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
-/*!
-  \param cameras	個々のカメラの外部パラメータと焦点距離の初期値を与え
-			る．その最適推定値が返される．
-  \param Xt		特徴点のユークリッド座標系における同次座標の初期値を
-			与える．その最適推定値が返される．
-*/
-void
-MeasurementMatrix::bundleAdjustment(Array<CameraWithFocalLength>& cameras,
-				    Matrix<T>& Xt) const
-{
-    if (nframes() < 2)
-	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment (with focal lengths estimation): Two or more frames required!!");
-
-    CostBA		err(*this, 1);
-    CostBA::CostCD	g(cameras);
-    Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
-
-    minimizeSquareSparse(err, g, cameras, shape, 200);
-}
-
-//! カメラの外部パラメータ，全てのカメラに共通な焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
-/*!
-  \param K		全てのカメラに共通な焦点距離の初期値を与える．その最
-			適推定値が返される．
-  \param cameras	個々のカメラの外部パラメータの初期値を与える．その最
-			適推定値が返される．
-  \param Xt		特徴点のユークリッド座標系における同次座標の初期値を
-			与える．その最適推定値が返される．
-*/
-void
-MeasurementMatrix::bundleAdjustment(CameraWithFocalLength::Intrinsic& K,
-				      Array<CanonicalCamera>& cameras,
-				      Matrix<T>&		  Xt) const
-{
-    if (nframes() < 2)
-	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment (with common focal length estimation): Two or more frames required!!");
-
-    CostBACFE		err(*this);
-    CostBACFE::ATA	params(K, cameras);
-    CostBACFE::CostCD	g(params);
-    Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
-
-    minimizeSquareSparse(err, g, params, shape, 200);
-
-    K = params.K;
-    for (int i = 0; i < cameras.dim(); ++i)
-	cameras[i] = params[i];
-}
-
-//! カメラの位置が不変との仮定のもとで，個々のカメラの姿勢および特徴点位置の初期値を非線型最適化によりrefineする．
-/*!
-  \param cameras	個々のカメラの姿勢の初期値を与える．その最適推定値が
-			返される．
-  \param Xt		特徴点のユークリッド座標系における同次座標の初期値を
-			与える．その最適推定値が返される．
-*/
-void
-MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
-	(Array<CanonicalCamera>& cameras, Matrix<double>& Xt) const
-{
-    if (nframes() < 3)
-	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters: Three or more frames required!!");
-
-    CostBA				err(*this, 0, true);
-    NullConstraint<T, CostBA::ATA>	g;
-    Matrix<double>			shape(Xt, 0, 0, Xt.nrow(), 3);
-
-    minimizeSquareSparse(err, g, cameras, shape, 200);
-}
-
-//! カメラの位置が不変との仮定のもとで，個々のカメラの姿勢，焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
-/*!
-  \param cameras	個々のカメラの姿勢と焦点距離の初期値を与える．その最
-			適推定値が返される．
-  \param Xt		特徴点のユークリッド座標系における同次座標の初期値を
-			与える．その最適推定値が返される．
-*/
-void
-MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
-	(Array<CameraWithFocalLength>&	cameras, Matrix<double>& Xt) const
-{
-    if (nframes() < 3)
-	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment (and focal lengths estimation with fixed camera centers): Three or more frames required!!");
-
-    CostBA				err(*this, 1, true);
-    NullConstraint<T, CostBA::ATAF>	g;
-    Matrix<double>			shape(Xt, 0, 0, Xt.nrow(), 3);
-
-    minimizeSquareSparse(err, g, cameras, shape, 200);
 }
 
 //! 複数の画像上における特徴点の像の位置から，その3次元空間での位置を求める．
@@ -1566,221 +1347,37 @@ MeasurementMatrix::CostCP::updateB(ATB& camera,
     camera.update(dcamera);
 }
 
-/************************************************************************
-*  class MeasurementMatrix::CostBA					*
-************************************************************************/
-MeasurementMatrix::CostBA::CostBA(const MeasurementMatrix& Wt,
-				  u_int dofIntrinsic, bool fixCameraCenter)
-    :_Wt(Wt), _fcc(fixCameraCenter), _adim(0), _adims(nframes())
-{
-    _adims[0] = dofIntrinsic + (_fcc ? 3 : 0);
-    _adim += _adims[0];
-    for (int i = 1; i < _adims.dim(); ++i)
-    {
-	_adims[i] = dofIntrinsic + (_fcc ? 3 : 6);
-	_adim += _adims[i];
-    }
 }
-
-Vector<double>
-MeasurementMatrix::CostBA::operator ()(const ATA& p, const ATB& x, int j) const
-{
-    Vector<T>	val(2 * nframes());
-    for (int i = 0; i < nframes(); ++i)
-    {
-	const Point2<T>&	u = p[i](x);
-	val[2*i]   = u[0] - _Wt[j][3*i];
-	val[2*i+1] = u[1] - _Wt[j][3*i+1];
-    }
-
-    return val;
-}
-
-BlockMatrix<double>
-MeasurementMatrix::CostBA::jacobianA(const ATA& p, const ATB& x, int j) const
-{
-    BlockMatrix<T>	J(nframes());
-    J[0] = (_fcc ? p[0].jacobianFCC(x) : p[0].jacobianK(x));
-    for (int i = 1; i < nframes(); ++i)
-	J[i] = (_fcc ? p[i].jacobianFCC(x) : p[i].jacobianP(x));
-    
-    return J;
-}
-
-Matrix<double>
-MeasurementMatrix::CostBA::jacobianB(const ATA& p, const ATB& x, int j) const
-{
-    Matrix<T>	K(2 * nframes(), 3);
-    for (int i = 0; i < nframes(); ++i)
-	K(2*i, 0, 2, K.ncol()) = p[i].jacobianX(x);
-
-    return K;
-}
-
-void
-MeasurementMatrix::CostBA::updateA(ATA& p, const Vector<T>& dp) const
-{
-    int	d = 0;
-    if (_fcc)
-	p[0].updateFCC(dp(d, _adims[0]));
-    else
-	p[0].updateIntrinsic(dp(d, _adims[0]));
-    d += _adims[0];
-    for (int i = 1; i < _adims.dim(); ++i)
-    {
-      // Update camera parameters.
-	if (_fcc)
-	    p[i].updateFCC(dp(d, _adims[i]));
-	else
-	    p[i].update(dp(d, _adims[i]));
-	d += _adims[i];
-    }
-
-    if (!_fcc)
-    {
-      // Force the distance between 0th and 1st cameras keep constant.
-	Vector<T>	t = p[1].t() - p[0].t();
-	t.normalize() *= p[0].t().dist(p[1].t());
-	p[1].setTranslation(p[0].t() + t);
-    }
-}
-
-void
-MeasurementMatrix::CostBA::updateB(ATB& x, const Vector<T>& dx) const
-{
-    x -= dx;
-}
-
-Vector<double>
-MeasurementMatrix::CostBA::operator ()(const ATAF& p,
-				       const ATB& x, int j) const
-{
-    Vector<T>	val(2 * nframes());
-    for (int i = 0; i < nframes(); ++i)
-    {
-	const Point2<T>&	u = p[i](x);
-	val[2*i]   = u[0] - _Wt[j][3*i];
-	val[2*i+1] = u[1] - _Wt[j][3*i+1];
-    }
-    
-    return val;
-}
-
-BlockMatrix<double>
-MeasurementMatrix::CostBA::jacobianA(const ATAF& p, const ATB& x, int j) const
-{
-    BlockMatrix<T>	J(nframes());
-    J[0] = (_fcc ? p[0].jacobianFCC(x) : p[0].jacobianK(x));
-    for (int i = 1; i < nframes(); ++i)
-	J[i] = (_fcc ? p[i].jacobianFCC(x) : p[i].jacobianP(x));
-    
-    return J;
-}
-
-Matrix<double>
-MeasurementMatrix::CostBA::jacobianB(const ATAF& p, const ATB& x, int j) const
-{
-    Matrix<T>	K(2 * nframes(), 3);
-    for (int i = 0; i < nframes(); ++i)
-	K(2*i, 0, 2, K.ncol()) = p[i].jacobianX(x);
-
-    return K;
-}
-
-void
-MeasurementMatrix::CostBA::updateA(ATAF& p, const Vector<T>& dp) const
-{
-    int	d = 0;
-    if (_fcc)
-	p[0].updateFCC(dp(d, _adims[0]));
-    else
-	p[0].updateIntrinsic(dp(d, _adims[0]));
-    d += _adims[0];
-    for (int i = 1; i < _adims.dim(); ++i)
-    {
-      // Update camera parameters.
-	if (_fcc)
-	    p[i].updateFCC(dp(d, _adims[i]));
-	else
-	    p[i].update(dp(d, _adims[i]));
-	d += _adims[i];
-    }
-
-    if (!_fcc)
-    {
-      // Force the distance between 0th and 1st cameras keep constant.
-	Vector<T>	t = p[1].t() - p[0].t();
-	t.normalize() *= p[0].t().dist(p[1].t());
-	p[1].setTranslation(p[0].t() + t);
-    }
-}
-
-/************************************************************************
-*  class MeasurementMatrix::CostBACFE					*
-************************************************************************/
-Vector<double>
-MeasurementMatrix::CostBACFE::operator ()(const ATA& p,
-					  const ATB& x, int j) const
-{
-    Vector<T>	val(2 * nframes());
-    for (int i = 0; i < nframes(); ++i)
-    {
-	const Point2<T>&	u = p.K(p[i].xc(x));
-	val[2*i]   = u[0] - _Wt[j][3*i];
-	val[2*i+1] = u[1] - _Wt[j][3*i+1];
-    }
-
-    return val;
-}
-
-Matrix<double>
-MeasurementMatrix::CostBACFE::jacobianA(const ATA& p,
-					const ATB& x, int j) const
-{
-    Matrix<T>		J(2 * nframes(), adim());
-    J(0, 0, 2, 1) = p.K.jacobianK(p[0].xc(x));
-    for (int i = 1; i < nframes(); ++i)
-    {
-	const Point2<T>& xc = p[i].xc(x);
-	J(2*i, 0, 2, 1) = p.K.jacobianK(xc);
-	J(2*i, 1 + 6*(i-1), 2, 6) = p.K.jacobianXC(xc) * p[i].jacobianPc(x);
-    }
-    
-    return J;
-}
-
-Matrix<double>
-MeasurementMatrix::CostBACFE::jacobianB(const ATA& p,
-					const ATB& x, int j) const
-{
-    Matrix<T>	K(2 * nframes(), 3);
-    for (int i = 0; i < nframes(); ++i)
-	K(2*i, 0, 2, K.ncol())
-	    = p.K.jacobianXC(p[i].xc(x)) * p[i].jacobianXc(x);
-
-    return K;
-}
-
-void
-MeasurementMatrix::CostBACFE::updateA(ATA& p, const Vector<T>& dp) const
-{
-    p.K.update(dp(0, 1));
-    for (int i = 1; i < nframes(); ++i)
-	p[i].update(dp(1 + 6*(i-1), 6));
-
-  // Force the distance between 0th and 1st cameras keep constant.
-    Vector<T>	t = p[1].t() - p[0].t();
-    t.normalize() *= (p[0].t().dist(p[1].t()));
-    p[1].setTranslation(p[0].t() + t);
-}
-
-void
-MeasurementMatrix::CostBACFE::updateB(ATB& x, const Vector<T>& dx) const
-{
-    x -= dx;
-}
-
-}
-#if defined __GNUG__ || defined __INTEL_COMPILER
+#if defined(__GNUG__) || defined(__INTEL_COMPILER)
 #  include "TU/Array++.cc"
+#  include "TU/Calib++.cc"
+namespace TU
+{
+template Camera::Intrinsic
+MeasurementMatrix::calibrateWithPlanes<Camera::Intrinsic>
+    (Array<CanonicalCamera>& cameras) const;
+template CameraWithDistortion::Intrinsic
+MeasurementMatrix::calibrateWithPlanes<CameraWithDistortion::Intrinsic>
+    (Array<CanonicalCamera>& cameras) const;
+
+template void
+MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,
+				    Matrix<T>& Xt) const;
+template void
+MeasurementMatrix::bundleAdjustment(Array<CameraWithFocalLength>& cameras,
+				    Matrix<T>& Xt) const;
+
+template void
+MeasurementMatrix::bundleAdjustment(CameraWithFocalLength::Intrinsic& K,
+				    Array<CanonicalCamera>&,
+				    Matrix<T>& Xt) const;
+
+template void
+MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
+    (Array<CanonicalCamera>& cameras, Matrix<double>& Xt) const;
+template void
+MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
+    (Array<CameraWithFocalLength>& cameras, Matrix<double>& Xt) const;
+}
+
 #endif
