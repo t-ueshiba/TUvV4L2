@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.6 2002-08-28 01:37:29 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.7 2002-12-18 06:04:32 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include "TU/Minimize++.h"
@@ -190,11 +190,10 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 	      << std::endl;
 #endif
   // Normalize the input measurement matrix.
-    Normalization	norm0((*this)(0, 3*frame0, npoints(), 3)),
-			norm1((*this)(0, 3*frame1, npoints(), 3));
+    Normalization	norm0(frame(frame0)), norm1(frame(frame1));
     Matrix<T>		Wt(npoints(), 6);
-    Wt(0, 0, npoints(), 3) = (*this)(0, 3*frame0, npoints(), 3) * norm0.Tt();
-    Wt(0, 3, npoints(), 3) = (*this)(0, 3*frame1, npoints(), 3) * norm1.Tt();
+    Wt(0, 0, npoints(), 3) = frame(frame0) * norm0.Tt();
+    Wt(0, 3, npoints(), 3) = frame(frame1) * norm1.Tt();
     
     Matrix<T>	F(3, 3), A(9, 9);
     Vector<T>	weight(npoints());
@@ -297,11 +296,10 @@ MeasurementMatrix::homography(u_int frame0, u_int frame1) const
 	throw std::invalid_argument("TU::MeasurementMatrix::homography: At least 4 points needed!!");
 
   // Normalize the input measurement matrix.
-    Normalization	norm0((*this)(0, 3*frame0, npoints(), 3)),
-			norm1((*this)(0, 3*frame1, npoints(), 3));
+    Normalization	norm0(frame(frame0)), norm1(frame(frame1));
     Matrix<T>		Wt(npoints(), 6);
-    Wt(0, 0, npoints(), 3) = (*this)(0, 3*frame0, npoints(), 3) * norm0.Tt();
-    Wt(0, 3, npoints(), 3) = (*this)(0, 3*frame1, npoints(), 3) * norm1.Tt();
+    Wt(0, 0, npoints(), 3) = frame(frame0) * norm0.Tt();
+    Wt(0, 3, npoints(), 3) = frame(frame1) * norm1.Tt();
 
     Matrix<T>	Q(9, 9);
     for (int j = 0; j < npoints(); ++j)
@@ -325,7 +323,14 @@ MeasurementMatrix::homography(u_int frame0, u_int frame1) const
     std::cerr << "TU::MeasurementMatrix::homography():: eigen values = "
 	      << evalue;
 #endif
-    H = norm1.Tinv() * H * norm0.T();
+    H = norm1.Tinv() * H * norm0.T();	// Unnormalize computed homography.
+
+  // Nonlinear refinement based on MLE(optional).
+  /*    CostH		err(*this, frame0, frame1);
+    CostH::CostCN	g(h);
+    minimizeSquare(err, g, h);*/
+
+  // Normalize the computed homography to make determinant unity.
     double	det = H.det();
     if (det > 0)
 	H /= pow(det, 1.0/3.0);
@@ -359,7 +364,7 @@ MeasurementMatrix::rotation(u_int frame0, u_int frame1) const
     for (int j = 0; j < npoints(); ++j)
     {
 	const Vector<T>	&ldata = (*this)[j](3*frame0, 3),
-				&rdata = (*this)[j](3*frame1, 3);
+			&rdata = (*this)[j](3*frame1, 3);
 	M += ldata.normal() % rdata.normal();
     }
     SVDecomposition<double>   svd(M);
@@ -611,9 +616,8 @@ MeasurementMatrix::projectiveFactorization(Matrix<T>& P, Matrix<T>& Xt) const
     Matrix<T>			Wt(npoints(), 3*nframes());
     for (int i = 0; i < nframes(); ++i)
     {
-	norm[i].initialize((*this)(0, 3*i, npoints(), 3));
-	Wt(0, 3*i, npoints(), 3) = (*this)(0, 3*i, npoints(), 3)
-				 * norm[i].Tt();
+	norm[i].initialize(frame(i));
+	Wt(0, 3*i, npoints(), 3) = frame(i) * norm[i].Tt();
     }
 
   // Minimize cost function.
@@ -875,7 +879,7 @@ MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,
     CostBA::CostCD	g(cameras);
     Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 200);
 }
 
 //! カメラの外部パラメータ，焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
@@ -896,7 +900,7 @@ MeasurementMatrix::bundleAdjustment(Array<CameraWithFocalLength>& cameras,
     CostBA::CostCD	g(cameras);
     Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 200);
 }
 
 //! カメラの外部パラメータ，全てのカメラに共通な焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
@@ -921,7 +925,7 @@ MeasurementMatrix::bundleAdjustment(CameraWithFocalLength::Intrinsic& K,
     CostBACFE::CostCD	g(params);
     Matrix<T>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, params, shape, 30);
+    minimizeSquareSparse(err, g, params, shape, 200);
 
     K = params.K;
     for (int i = 0; i < cameras.dim(); ++i)
@@ -946,7 +950,7 @@ MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
     NullConstraint<T, CostBA::ATA>	g;
     Matrix<double>			shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 200);
 }
 
 //! カメラの位置が不変との仮定のもとで，個々のカメラの姿勢，焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
@@ -967,7 +971,7 @@ MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
     NullConstraint<T, CostBA::ATAF>	g;
     Matrix<double>			shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, cameras, shape, 30);
+    minimizeSquareSparse(err, g, cameras, shape, 200);
 }
 
 //! 複数の画像上における特徴点の像の位置から，その3次元空間での位置を求める．
@@ -1273,10 +1277,51 @@ MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<T>& P,
 }
 
 /************************************************************************
+*  class MeasurementMatrix::CostH					*
+************************************************************************/
+Vector<double>
+MeasurementMatrix::CostH::operator ()(const AT& h) const
+{
+    Vector<T>	val(2 * npoints());
+    for (int j = 0; j < npoints(); ++j)
+    {
+	const Vector<T>&	x = _Wt[j](3*_frame0, 3);
+	T			w = h(6, 3) * x;
+	val[2*j  ] = h(0, 3) * x / w - _Wt[j][3*_frame1];
+	val[2*j+1] = h(3, 3) * x / w - _Wt[j][3*_frame1+1];
+    }
+    
+    return val;
+}
+
+Matrix<double>
+MeasurementMatrix::CostH::jacobian(const AT& h) const
+{
+    Matrix<T>	J(2 * npoints(), 9);
+    for (int j = 0; j < npoints(); ++j)
+    {
+	const Vector<T>&	x = _Wt[j](3*_frame0, 3);
+	T			w = h(6, 3) * x;
+	J[2*j](0, 3) = J[2*j](6, 3) = J[2*j+1](3, 3) = J[2*j+1](6, 3) = x;
+	(J[2*j  ](6, 3) *= (h(0, 3) * x)) /= -w;
+	(J[2*j+1](6, 3) *= (h(3, 3) * x)) /= -w;
+	J(2*j, 0, 2, 9) /= w;
+    }
+    
+    return J;
+}
+
+void
+MeasurementMatrix::CostH::update(AT& h, const Vector<T>& dh) const
+{
+    T	l = h.length();
+    (h -= dh).normalize() *= l;
+}
+
+/************************************************************************
 *  class MeasurementMatrix::CostPF					*
 ************************************************************************/
-MeasurementMatrix::CostPF::CostPF(const Matrix<double>& Wt0,
-				    u_int niter_max)
+MeasurementMatrix::CostPF::CostPF(const Matrix<double>& Wt0, u_int niter_max)
     :_niter_max(niter_max), _Wt0(Wt0), _s(), _Ut(), _Vt()
 {
 }
@@ -1736,6 +1781,6 @@ MeasurementMatrix::CostBACFE::updateB(ATB& x, const Vector<T>& dx) const
 }
 
 }
-#ifdef __GNUG__
+#if defined __GNUG__ || defined __INTEL_COMPILER
 #  include "TU/Array++.cc"
 #endif

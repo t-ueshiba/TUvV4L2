@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.5 2002-08-28 01:37:29 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.6 2002-12-18 06:04:32 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
@@ -204,6 +204,48 @@ class MeasurementMatrix : public Matrix<double>
     void	initializeFocalLengthsEstimation(Matrix<T>& P,
 						 Matrix<T>& Xt) const	;
 
+    class CostH		// cost function for homography estimation.
+    {
+      public:
+	typedef double		T;
+	typedef Vector<T>	AT;
+
+	class CostCN	// cost function for keeping norm of H constant.
+	{
+	  public:
+	    CostCN(const AT& h)	:_sqr(h.square())			{}
+
+	    Vector<T>	operator ()(const AT& h) const
+			{
+			    Vector<T>	val(1);
+			    val[0] = h.square() - _sqr;
+			    return val;
+			}
+	    Matrix<T>	jacobian(const AT& h) const
+			{
+			    Matrix<T>	L(1, h.dim());
+			    (L[0] = h) *= 2.0;
+			    return L;
+			}
+	
+	  private:
+	    const T	_sqr;
+	};
+	
+      public:
+	CostH(const MeasurementMatrix& Wt, u_int frame0, u_int frame1)
+	    :_Wt(Wt), _frame0(frame0), _frame1(frame1)			{}
+
+	Vector<T>	operator ()(const AT& h)		const	;
+	Matrix<T>	jacobian(const AT& h)			const	;
+	void		update(AT& h, const Vector<T>& dh)	const	;
+	u_int		npoints()		const	{return _Wt.npoints();}
+	
+      private:
+	const MeasurementMatrix&	_Wt;
+	const u_int			_frame0, _frame1;
+    };
+    
     class CostPF	// cost function for projective factorization.
     {
       private:
