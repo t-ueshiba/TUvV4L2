@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.8 2003-03-17 00:49:53 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.9 2003-07-09 11:33:37 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include <iomanip>
@@ -277,17 +277,19 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 
 //! 2枚のフレーム間の射影変換行列を計算する．
 /*!
-  \param frame0	一方のフレームのindex.
-  \param frame1	もう一方のフレームのindex.
-  \return	frame0, frame1間の射影変換行列．frame0=\f$i\f$,
-		frame1=\f$i'\f$のとき
-		\f[
-		\forall j~\TUtud{u}{i'j} \approx \TUvec{H}{}\TUud{u}{ij}
-		\f]
-		を満たす\f$\TUvec{H}{}\in\TUspace{R}{3\times3}\f$を返す．
+  \param frame0		一方のフレームのindex.
+  \param frame1		もう一方のフレームのindex.
+  \param doRefinement	trueの場合，非線型最適化によるrefinementを行う．
+  \return		frame0, frame1間の射影変換行列．frame0=\f$i\f$,
+			frame1=\f$i'\f$のとき
+			\f[
+			\forall j~\TUtud{u}{i'j}\approx\TUvec{H}{}\TUud{u}{ij}
+			\f]
+			を満たす\f$\TUvec{H}{}\in\TUspace{R}{3\times3}\f$を返す．
 */
 Matrix<double>
-MeasurementMatrix::homography(u_int frame0, u_int frame1) const
+MeasurementMatrix::homography(u_int frame0, u_int frame1,
+			      bool doRefinement) const
 {
     if (frame0 >= nframes() || frame1 >= nframes())
 	throw std::invalid_argument("TU::MeasurementMatrix::homography: Cannot find specified frames!!");
@@ -325,9 +327,12 @@ MeasurementMatrix::homography(u_int frame0, u_int frame1) const
     H = norm1.Tinv() * H * norm0.T();	// Unnormalize computed homography.
 
   // Nonlinear refinement based on MLE(optional).
-  /*    CostH		err(*this, frame0, frame1);
-    CostH::CostCN	g(h);
-    minimizeSquare(err, g, h);*/
+    if (doRefinement)
+    {
+	CostH		err(*this, frame0, frame1);
+	CostH::CostCN	g(h);
+	minimizeSquare(err, g, h);
+    }
 
   // Normalize the computed homography to make determinant unity.
     double	det = H.det();
@@ -1355,10 +1360,10 @@ namespace TU
 {
 template Camera::Intrinsic
 MeasurementMatrix::calibrateWithPlanes<Camera::Intrinsic>
-    (Array<CanonicalCamera>& cameras) const;
+    (Array<CanonicalCamera>& cameras, bool doRefinement) const;
 template CameraWithDistortion::Intrinsic
 MeasurementMatrix::calibrateWithPlanes<CameraWithDistortion::Intrinsic>
-    (Array<CanonicalCamera>& cameras) const;
+    (Array<CanonicalCamera>& cameras, bool doRefinement) const;
 
 template void
 MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,

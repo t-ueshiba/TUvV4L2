@@ -1,5 +1,5 @@
 /*
- *  $Id: Calib++.cc,v 1.1 2003-03-17 00:49:53 ueshiba Exp $
+ *  $Id: Calib++.cc,v 1.2 2003-07-09 11:33:37 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 
@@ -24,16 +24,20 @@ namespace TU
   \f]
   と構成する．この観測行列に対して本アルゴリズム適用すると，カメラの内部
   パラメータおよび各視点でのカメラの外部パラメータが計算される．
-  \param cameras 各視点について，参照平面に固定されたワールド座標系から見た
-		 カメラの外部パラメータが返される．
-  \return	 カメラの内部パラメータ．
+  \param cameras	各視点について，参照平面に固定されたワールド座標系
+			から見たカメラの外部パラメータが返される．
+  \param doRefinement	trueの場合，非線型最適化によって内部/外部パラメータ
+			をrefineする．
+  \return		カメラの内部パラメータ．
  */
 template <class INTRINSIC> INTRINSIC
-MeasurementMatrix::calibrateWithPlanes(Array<CanonicalCamera>& cameras)
+MeasurementMatrix::calibrateWithPlanes(Array<CanonicalCamera>& cameras,
+				       bool doRefinement)
     const
 {
     INTRINSIC	K(initializeCalibrationWithPlanes(cameras));
-    refineCalibrationWithPlanes(K, cameras);
+    if (doRefinement)
+	refineCalibrationWithPlanes(K, cameras);
 
     return K;
 }
