@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithDistortion.cc,v 1.5 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.6 2003-02-27 09:09:52 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -99,6 +99,13 @@ CameraWithDistortion::Intrinsic::operator ()(const Point2<double>& xc) const
     return Camera::Intrinsic::operator ()(xd(xc));
 }
 
+Point2<double>
+CameraWithDistortion::Intrinsic::xd(const Point2<double>& xc) const
+{
+    const double	sqr = xc * xc, tmp = 1.0 + sqr*(_d1 + sqr*_d2);
+    return Point2<double>(tmp * xc[0], tmp * xc[1]);
+}
+
 Matrix<double>
 CameraWithDistortion::Intrinsic::jacobianXC(const Point2<double>& xc) const
 {
@@ -158,6 +165,14 @@ double
 CameraWithDistortion::Intrinsic::d2() const
 {
     return _d2;
+}
+
+CameraBase::Intrinsic&
+CameraWithDistortion::Intrinsic::setDistortion(double d1, double d2)
+{
+    _d1 = d1;
+    _d2 = d2;
+    return *this;
 }
 
 std::istream&

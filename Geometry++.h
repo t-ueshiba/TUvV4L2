@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.5 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.6 2003-02-27 09:09:52 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -462,6 +462,8 @@ class CameraBase
       // various operations.
 	virtual Point2<double>
 	    operator ()(const Point2<double>& xc)		const	;
+	virtual Point2<double>
+	    xd(const Point2<double>& xc)			const	;
 	virtual Matrix<double>
 	    jacobianK(const Point2<double>& xc)			const	;
 	virtual Matrix<double>
@@ -482,6 +484,12 @@ class CameraBase
 	virtual double		skew()				const	;
 	virtual double		d1()				const	;
 	virtual double		d2()				const	;
+	virtual Intrinsic&	setFocalLength(double k)		;
+	virtual Intrinsic&	setPrincipal(double u0, double v0)	;
+	virtual Intrinsic&	setAspect(double aspect)		;
+	virtual Intrinsic&	setSkew(double skew)			;
+	virtual Intrinsic&	setIntrinsic(const Matrix<double>& K)	;
+	virtual Intrinsic&	setDistortion(double d1, double d2)	;
 	
       // parameter updating functions.
 	virtual Intrinsic&	update(const Vector<double>& dp)	;
@@ -547,7 +555,13 @@ class CameraBase
     double		skew()		const	{return intrinsic().skew();}
     double		d1()		const	{return intrinsic().d1();}
     double		d2()		const	{return intrinsic().d2();}
-	
+    CameraBase&		setFocalLength(double k)		;
+    CameraBase&		setPrincipal(double u0, double v0)	;
+    CameraBase&		setAspect(double aspect)		;
+    CameraBase&		setSkew(double skew)			;
+    CameraBase&		setIntrinsic(const Matrix<double>& K)	;
+    CameraBase&		setDistortion(double d1, double d2)	;
+    
   // I/O functions.
     std::istream&	get(std::istream& in)			;
     std::ostream&	put(std::ostream& out)		const	;
@@ -675,6 +689,48 @@ CameraBase::setRotation(const Matrix<double>& Rt)
     return *this;
 }
 
+inline CameraBase&
+CameraBase::setFocalLength(double k)
+{
+    intrinsic().setFocalLength(k);
+    return *this;
+}
+
+inline CameraBase&
+CameraBase::setPrincipal(double u0, double v0)
+{
+    intrinsic().setPrincipal(u0, v0);
+    return *this;
+}
+
+inline CameraBase&
+CameraBase::setAspect(double aspect)
+{
+    intrinsic().setAspect(aspect);
+    return *this;
+}
+
+inline CameraBase&
+CameraBase::setSkew(double skew)
+{
+    intrinsic().setSkew(skew);
+    return *this;
+}
+
+inline CameraBase&
+CameraBase::setIntrinsic(const Matrix<double>& K)
+{
+    intrinsic().setIntrinsic(K);
+    return *this;
+}
+
+inline CameraBase&
+CameraBase::setDistortion(double d1, double d2)
+{
+    intrinsic().setDistortion(d1, d2);
+    return *this;
+}
+
 inline std::istream&
 operator >>(std::istream& in, CameraBase& camera)
 {
@@ -711,18 +767,17 @@ class CanonicalCamera : public CameraBase
     CanonicalCamera(const Matrix<double>& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
 
-  // projection matrices.
-    virtual CameraBase&	setProjection(const Matrix<double>& P);
+    virtual CameraBase&	setProjection(const Matrix<double>& P)		;
+    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
 
   private:
-    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
     Intrinsic	_intrinsic;
 };
 
 /************************************************************************
-*  class CameraWithFocalLength					*
+*  class CameraWithFocalLength						*
 ************************************************************************/
 class CameraWithFocalLength : public CameraBase
 {
@@ -750,7 +805,7 @@ class CameraWithFocalLength : public CameraBase
 
       // intrinsic parameters.
 	virtual double			k()			const	;
-	virtual	Intrinsic&		setFocalLength(double k)	;
+	virtual	CameraBase::Intrinsic&	setFocalLength(double k)	;
 
       // parameter updating functions.
 	virtual CameraBase::Intrinsic&
@@ -773,25 +828,14 @@ class CameraWithFocalLength : public CameraBase
     CameraWithFocalLength(const Matrix<double>& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
 
-  // projection matrices.
     virtual CameraBase&		setProjection(const Matrix<double>& P)	;
-
-  // intrinsic parameters.
-    CameraWithFocalLength&	setFocalLength(double k)	 	;
+    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
 
   private:
-    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
     Intrinsic	_intrinsic;
 };
-
-inline CameraWithFocalLength&
-CameraWithFocalLength::setFocalLength(double k)
-{
-    _intrinsic.setFocalLength(k);
-    return *this;
-}
 
 /************************************************************************
 *  class CameraWithEuclideanImagePlane					*
@@ -824,7 +868,7 @@ class CameraWithEuclideanImagePlane : public CameraBase
 
       // intrinsic parameters.
 	virtual Point2<double>		principal()		const	;
-		Intrinsic&		setPrincipal(double u0,
+	virtual CameraBase::Intrinsic&	setPrincipal(double u0,
 						     double v0)		;
 
       // parameter updating functions.
@@ -849,41 +893,14 @@ class CameraWithEuclideanImagePlane : public CameraBase
     CameraWithEuclideanImagePlane(const Matrix<double>& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
 
-  // projection matrices.
     virtual CameraBase&	setProjection(const Matrix<double>& P)		;
-
-  // intrinsic parameters.
-    CameraWithEuclideanImagePlane&	setFocalLength(double k)	  ;
-    CameraWithEuclideanImagePlane&	setPrincipal(double u0, double v0);
+    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
 
   private:
-    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
     Intrinsic	_intrinsic;
 };
-
-inline CameraWithEuclideanImagePlane::Intrinsic&
-CameraWithEuclideanImagePlane::Intrinsic::setPrincipal(double u0, double v0)
-{
-    _principal[0] = u0;
-    _principal[1] = v0;
-    return *this;
-}
-
-inline CameraWithEuclideanImagePlane&
-CameraWithEuclideanImagePlane::setFocalLength(double k)
-{
-    _intrinsic.setFocalLength(k);
-    return *this;
-}
-
-inline CameraWithEuclideanImagePlane&
-CameraWithEuclideanImagePlane::setPrincipal(double u0, double v0)
-{
-    _intrinsic.setPrincipal(u0, v0);
-    return *this;
-}
     
 /************************************************************************
 *  class Camera								*
@@ -924,15 +941,18 @@ class Camera : public CameraBase
       // intrinsic parameters.
 	virtual double		aspect()			const	;
 	virtual double		skew()				const	;
-	virtual	CameraWithFocalLength::Intrinsic&
+	virtual	CameraBase::Intrinsic&
 				setFocalLength(double k)		;
-		Intrinsic&	setAspect(double aspect)		;
-		Intrinsic&	setSkew(double skew)			;
-		Intrinsic&	setIntrinsic(const Matrix<double>& K)	;
+	virtual CameraBase::Intrinsic&
+				setAspect(double aspect)		;
+	virtual CameraBase::Intrinsic&
+				setSkew(double skew)			;
+	virtual CameraBase::Intrinsic&
+				setIntrinsic(const Matrix<double>& K)	;
 
       // parameter updating functions.
 	virtual CameraBase::Intrinsic&
-	    update(const Vector<double>& dp)				;
+				update(const Vector<double>& dp)	;
     
       // I/O functions.
 	virtual std::istream&	get(std::istream& in)			;
@@ -959,71 +979,14 @@ class Camera : public CameraBase
     Camera(const Matrix<double>& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
 
-  // projection matrices.
     virtual CameraBase&	setProjection(const Matrix<double>& P);
-
-  // intrinsic parameters.
-	    Camera&		setFocalLength(double k)		;
-	    Camera&		setPrincipal(double u0, double v0)	;
-	    Camera&		setAspect(double aspect)		;
-	    Camera&		setSkew(double skew)			;
-	    Camera&		setIntrinsic(const Matrix<double>& K)	;
+    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
 
   private:
-    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
     Intrinsic	_intrinsic;
 };
-
-inline Camera::Intrinsic&
-Camera::Intrinsic::setAspect(double aspect)
-{
-    _k00 = aspect * k();
-    return *this;
-}
-
-inline Camera::Intrinsic&
-Camera::Intrinsic::setSkew(double skew)
-{
-    _k01 = skew * k();
-    return *this;
-}
-
-inline Camera&
-Camera::setFocalLength(double k)
-{
-    _intrinsic.setFocalLength(k);
-    return *this;
-}
-
-inline Camera&
-Camera::setPrincipal(double u0, double v0)
-{
-    _intrinsic.setPrincipal(u0, v0);
-    return *this;
-}
-
-inline Camera&
-Camera::setAspect(double aspect)
-{
-    _intrinsic.setAspect(aspect);
-    return *this;
-}
-
-inline Camera&
-Camera::setSkew(double skew)
-{
-    _intrinsic.setSkew(skew);
-    return *this;
-}
-
-inline Camera&
-Camera::setIntrinsic(const Matrix<double>& K)
-{
-    _intrinsic.setIntrinsic(K);
-    return *this;
-}
 
 /************************************************************************
 *  class CameraWithDistortion						*
@@ -1045,9 +1008,10 @@ class CameraWithDistortion : public CameraBase
 	    :Camera::Intrinsic(), _d1(0.0), _d2(0.0)	{setIntrinsic(K);}
 	
       // various operations.
-	Point2<double>	xd(const Point2<double>& xc)		const	;
 	virtual Point2<double>
 	    operator ()(const Point2<double>& xc)		const	;
+	virtual Point2<double>
+	    xd(const Point2<double>& xc)			const	;
 	virtual Matrix<double>
 	    jacobianXC(const Point2<double>& xc)		const	;
 	virtual Matrix<double>
@@ -1060,7 +1024,8 @@ class CameraWithDistortion : public CameraBase
       // intrinsic parameters.
 	virtual double		d1()				const	;
 	virtual double		d2()				const	;
-		Intrinsic&	setDistortion(double d1, double d2)	;
+	virtual CameraBase::Intrinsic&	
+				setDistortion(double d1, double d2)	;
 
       // I/O functions.
 	virtual std::istream&	get(std::istream& in)			;
@@ -1085,80 +1050,14 @@ class CameraWithDistortion : public CameraBase
     CameraWithDistortion(const Matrix<double>& P,
 			 double d1=0.0, double d2=0.0)			;
 
-  // projection matrices.
     virtual CameraBase&		setProjection(const Matrix<double>& P)	;
-
-  // intrinsic parameters.
-    CameraWithDistortion&	setFocalLength(double k)		;
-    CameraWithDistortion&	setPrincipal(double u0, double v0)	;
-    CameraWithDistortion&	setAspect(double aspect)		;
-    CameraWithDistortion&	setSkew(double skew)			;
-    CameraWithDistortion&	setIntrinsic(const Matrix<double>& K)	;
-    CameraWithDistortion&	setDistortion(double d1, double d2)	;
+    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
 
   private:
-    virtual const CameraBase::Intrinsic&	intrinsic()	const	;
     virtual CameraBase::Intrinsic&		intrinsic()		;
     
     Intrinsic	_intrinsic;
 };
-
-inline Point2<double>
-CameraWithDistortion::Intrinsic::xd(const Point2<double>& xc) const
-{
-    const double	sqr = xc * xc, tmp = 1.0 + sqr*(_d1 + sqr*_d2);
-    return Point2<double>(tmp * xc[0], tmp * xc[1]);
-}
-
-inline CameraWithDistortion::Intrinsic&
-CameraWithDistortion::Intrinsic::setDistortion(double d1, double d2)
-{
-    _d1 = d1;
-    _d2 = d2;
-    return *this;
-}
-
-inline CameraWithDistortion&
-CameraWithDistortion::setFocalLength(double k)
-{
-    _intrinsic.setFocalLength(k);
-    return *this;
-}
-
-inline CameraWithDistortion&
-CameraWithDistortion::setPrincipal(double u0, double v0)
-{
-    _intrinsic.setPrincipal(u0, v0);
-    return *this;
-}
-
-inline CameraWithDistortion&
-CameraWithDistortion::setAspect(double aspect)
-{
-    _intrinsic.setAspect(aspect);
-    return *this;
-}
-
-inline CameraWithDistortion&
-CameraWithDistortion::setSkew(double skew)
-{
-    _intrinsic.setSkew(skew);
-    return *this;
-}
-
-inline CameraWithDistortion&
-CameraWithDistortion::setIntrinsic(const Matrix<double>& K)
-{
-    _intrinsic.setIntrinsic(K);
-    return *this;
-}
-
-inline CameraWithDistortion&
-CameraWithDistortion::setDistortion(double d1, double d2)
-{
-    _intrinsic.setDistortion(d1, d2);
-    return *this;
-}
  
 inline
 CameraWithDistortion::CameraWithDistortion(const Matrix<double>& P,

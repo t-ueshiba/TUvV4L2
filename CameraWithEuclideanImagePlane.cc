@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithEuclideanImagePlane.cc,v 1.3 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: CameraWithEuclideanImagePlane.cc,v 1.4 2003-02-27 09:09:52 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -113,6 +113,14 @@ Point2<double>
 CameraWithEuclideanImagePlane::Intrinsic::principal() const
 {
     return _principal;
+}
+
+CameraBase::Intrinsic&
+CameraWithEuclideanImagePlane::Intrinsic::setPrincipal(double u0, double v0)
+{
+    _principal[0] = u0;
+    _principal[1] = v0;
+    return *this;
 }
 
 CameraBase::Intrinsic&

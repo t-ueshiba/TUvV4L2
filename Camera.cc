@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Camera.cc,v 1.3 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: Camera.cc,v 1.4 2003-02-27 09:09:52 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -216,7 +216,7 @@ Camera::Intrinsic::skew() const
     return _k01 / k();
 }
 
-CameraWithFocalLength::Intrinsic&
+CameraBase::Intrinsic&
 Camera::Intrinsic::setFocalLength(double kk)
 {
     _k00 *= (kk / k());
@@ -224,7 +224,7 @@ Camera::Intrinsic::setFocalLength(double kk)
     return CameraWithFocalLength::Intrinsic::setFocalLength(kk);
 }
 
-Camera::Intrinsic&
+CameraBase::Intrinsic&
 Camera::Intrinsic::setIntrinsic(const Matrix<double>& K)
 {
     setAspect(K[0][0] / K[1][1])
@@ -232,6 +232,20 @@ Camera::Intrinsic::setIntrinsic(const Matrix<double>& K)
 	.setPrincipal(K[0][2]/K[2][2], K[1][2]/K[2][2])
 	.setFocalLength(K[1][1]/K[2][2]);
 
+    return *this;
+}
+
+CameraBase::Intrinsic&
+Camera::Intrinsic::setAspect(double aspect)
+{
+    _k00 = aspect * k();
+    return *this;
+}
+
+CameraBase::Intrinsic&
+Camera::Intrinsic::setSkew(double skew)
+{
+    _k01 = skew * k();
     return *this;
 }
 

@@ -1,5 +1,5 @@
 /*
- *  $Id: CanonicalCamera.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: CanonicalCamera.cc,v 1.3 2003-02-27 09:09:52 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -25,15 +25,15 @@ CanonicalCamera::setProjection(const Matrix<double>& PP)
     return *this;
 }
 
-/*
- *  private members
- */
 const CameraBase::Intrinsic&
 CanonicalCamera::intrinsic() const
 {
     return _intrinsic;
 }
 
+/*
+ *  private members
+ */
 CameraBase::Intrinsic&
 CanonicalCamera::intrinsic()
 {
