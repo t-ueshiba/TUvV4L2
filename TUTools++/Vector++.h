@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.6 2002-08-22 04:08:32 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.7 2003-03-17 00:22:30 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -300,7 +300,7 @@ class Householder : public Matrix<T>
     void		make_transformation()			;
     const Vector<T>&	sigma()			const	{return _sigma;}
     Vector<T>&		sigma()				{return _sigma;}
-    int			sigma_is_zero(int, T)	const	;
+    bool		sigma_is_zero(int, T)	const	;
 
   private:
     const u_int		_d;		// deviation from diagonal element
@@ -346,7 +346,7 @@ class TriDiagonal
   private:
     enum		{NITER_MAX = 30};
 
-    int			off_diagonal_is_zero(int)		const	;
+    bool		off_diagonal_is_zero(int)		const	;
     void		initialize_rotation(int, int,
 					    double&, double&)	const	;
     
@@ -368,23 +368,25 @@ class BiDiagonal
     u_int		ncol()		const	{return _Ut.ncol();}
     const Matrix<T>&	Ut()		const	{return _Ut;}
     const Matrix<T>&	Vt()		const	{return _Vt;}
-    const Vector<T>&	diagonal()	const	{return _Ut.sigma();}
-    const Vector<T>&	off_diagonal()	const	{return _Vt.sigma();}
+    const Vector<T>&	diagonal()	const	{return _Dt.sigma();}
+    const Vector<T>&	off_diagonal()	const	{return _Et.sigma();}
     void		diagonalize()		;
 
   private:
     enum		{NITER_MAX = 30};
     
-    int			diagonal_is_zero(int)			const	;
-    int			off_diagonal_is_zero(int)		const	;
+    bool		diagonal_is_zero(int)			const	;
+    bool		off_diagonal_is_zero(int)		const	;
     void		initialize_rotation(int, int,
 					    double&, double&)	const	;
 
-    Householder<T>	_Ut;
-    Householder<T>	_Vt;
+    Householder<T>	_Dt;
+    Householder<T>	_Et;
     Vector<T>&		_diagonal;
     Vector<T>&		_off_diagonal;
     T			_anorm;
+    const Matrix<T>&	_Ut;
+    const Matrix<T>&	_Vt;
 };
 
 /************************************************************************

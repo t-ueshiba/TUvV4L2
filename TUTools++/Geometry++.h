@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.6 2003-02-27 09:09:52 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.7 2003-03-17 00:22:30 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -478,6 +478,7 @@ class CameraBase
 	virtual Matrix<double>	Ktinv()				const	;
 
       // intrinsic parameters.
+	virtual u_int		dof()				const	;
 	virtual double		k()				const	;
 	virtual Point2<double>	principal()			const	;
 	virtual double		aspect()			const	;
@@ -490,7 +491,7 @@ class CameraBase
 	virtual Intrinsic&	setSkew(double skew)			;
 	virtual Intrinsic&	setIntrinsic(const Matrix<double>& K)	;
 	virtual Intrinsic&	setDistortion(double d1, double d2)	;
-	
+
       // parameter updating functions.
 	virtual Intrinsic&	update(const Vector<double>& dp)	;
 
@@ -549,6 +550,7 @@ class CameraBase
   // intrinsic parameters.
     virtual const Intrinsic&
 			intrinsic()	const	= 0;
+    u_int		dofIntrinsic()	const	{return intrinsic().dof();}
     double		k()		const	{return intrinsic().k();}
     Point2<double>	principal()	const	{return intrinsic().principal();}
     double		aspect()	const	{return intrinsic().aspect();}
@@ -804,6 +806,7 @@ class CameraWithFocalLength : public CameraBase
 	virtual Matrix<double>		Ktinv()			const	;
 
       // intrinsic parameters.
+	virtual u_int			dof()			const	;
 	virtual double			k()			const	;
 	virtual	CameraBase::Intrinsic&	setFocalLength(double k)	;
 
@@ -867,6 +870,7 @@ class CameraWithEuclideanImagePlane : public CameraBase
 	virtual Matrix<double>		Ktinv()			const	;
 
       // intrinsic parameters.
+	virtual u_int			dof()			const	;
 	virtual Point2<double>		principal()		const	;
 	virtual CameraBase::Intrinsic&	setPrincipal(double u0,
 						     double v0)		;
@@ -939,6 +943,7 @@ class Camera : public CameraBase
 	virtual Matrix<double>	Ktinv()				const	;
 
       // intrinsic parameters.
+	virtual u_int		dof()				const	;
 	virtual double		aspect()			const	;
 	virtual double		skew()				const	;
 	virtual	CameraBase::Intrinsic&
@@ -1022,6 +1027,7 @@ class CameraWithDistortion : public CameraBase
 	    xc(const Point2<double>& u)				const	;
 
       // intrinsic parameters.
+	virtual u_int		dof()				const	;
 	virtual double		d1()				const	;
 	virtual double		d2()				const	;
 	virtual CameraBase::Intrinsic&	

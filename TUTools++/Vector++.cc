@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.7 2003-03-14 02:26:07 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.8 2003-03-17 00:22:30 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -754,10 +754,10 @@ Householder<T>::make_transformation()
     }
 }
 
-template <class T> int
+template <class T> bool
 Householder<T>::sigma_is_zero(int m, T comp) const
 {
-    return (fabs(_sigma[m]) + comp == comp);
+    return (T(fabs(_sigma[m])) + comp == comp);
 }
 
 /************************************************************************
@@ -863,7 +863,7 @@ TriDiagonal<T>::diagonalize()
 	    }
 }
 
-template <class T> int
+template <class T> bool
 TriDiagonal<T>::off_diagonal_is_zero(int n) const
 {
     return (n == 0 ||
@@ -889,33 +889,40 @@ TriDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 ************************************************************************/
 template <class T>
 BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
-    :_Ut(a.ncol(), 0), _Vt(a.nrow(), 1),
-     _diagonal(_Ut.sigma()), _off_diagonal(_Vt.sigma()), _anorm(0)
+    :_Dt((a.nrow() < a.ncol() ? a.ncol() : a.nrow()), 0),
+     _Et((a.nrow() < a.ncol() ? a.nrow() : a.ncol()), 1),
+     _diagonal(_Dt.sigma()), _off_diagonal(_Et.sigma()), _anorm(0),
+     _Ut(a.nrow() < a.ncol() ? _Dt : _Et),
+     _Vt(a.nrow() < a.ncol() ? _Et : _Dt)
 {
-    if (nrow() > ncol())
-	throw std::invalid_argument("TU::BiDiagonal<T>::BiDiagonal: # of rows must be less than or equal to # of column!!");
+    if (nrow() < ncol())
+	for (int i = 0; i < nrow(); ++i)
+	    for (int j = 0; j < ncol(); ++j)
+		_Dt[i][j] = a[i][j];
+    else
+	for (int i = 0; i < nrow(); ++i)
+	    for (int j = 0; j < ncol(); ++j)
+		_Dt[j][i] = a[i][j];
 
-    _Ut(0, 0, nrow(), ncol()) = a;
-    
   /* Householder reduction to bi-diagonal (off-diagonal in lower part) form */
-    for (int m = 0; m < nrow(); m++)
+    for (int m = 0; m < _Et.dim(); ++m)
     {
-	_Ut.apply_from_right(_Ut, m);
-	_Vt.apply_from_left(_Ut, m);
+	_Dt.apply_from_right(_Dt, m);
+	_Et.apply_from_left(_Dt, m);
 
 	double	anorm = fabs(_diagonal[m]) + fabs(_off_diagonal[m]);
 	if (anorm > _anorm)
 	    _anorm = anorm;
     }
 
-    _Ut.make_transformation();	// Accumulate right-hand transformation: V
-    _Vt.make_transformation();	// Accumulate left-hand transformation: U
+    _Dt.make_transformation();	// Accumulate right-hand transformation: V
+    _Et.make_transformation();	// Accumulate left-hand transformation: U
 }
 
 template <class T> void
 BiDiagonal<T>::diagonalize()
 {
-    for (int n = nrow(); --n >= 0; )
+    for (int n = _Et.dim(); --n >= 0; )
     {
 	int	niter = 0;
 	
@@ -937,17 +944,17 @@ BiDiagonal<T>::diagonalize()
 		    _off_diagonal[m] = 0.0;
 		    for (int i = m; i <= n; ++i)
 		    {
-			Rotation	rot_u(m-1, i, x, -y);
+			Rotation	rotD(m-1, i, x, -y);
 
-			_Ut.rotate_from_left(rot_u);
+			_Dt.rotate_from_left(rotD);
 			
-			_diagonal[i] = -y*rot_u.sin()
-				     + _diagonal[i]*rot_u.cos();
+			_diagonal[i] = -y*rotD.sin()
+				     + _diagonal[i]*rotD.cos();
 			if (i < n)
 			{
 			    x = _diagonal[i+1];
-			    y = _off_diagonal[i+1]*rot_u.sin();
-			    _off_diagonal[i+1] *= rot_u.cos();
+			    y = _off_diagonal[i+1]*rotD.sin();
+			    _off_diagonal[i+1] *= rotD.cos();
 			}
 		    }
 		    break;	// if _diagonal[n-1] is zero, m == n here.
@@ -969,40 +976,40 @@ BiDiagonal<T>::diagonalize()
 	    for (int i = m; ++i <= n; )
 	    {
 	      /* Apply rotation from left */
-		Rotation	rot_v(i-1, i, x, y);
+		Rotation	rotE(i-1, i, x, y);
 		
-		_Vt.rotate_from_left(rot_v);
+		_Et.rotate_from_left(rotE);
 
 		if (i > m+1)
-		    _off_diagonal[i-1] = rot_v.cos()*_off_diagonal[i-1]
-				       + rot_v.sin()*y;
+		    _off_diagonal[i-1] = rotE.cos()*_off_diagonal[i-1]
+				       + rotE.sin()*y;
 		T	tmp = _diagonal[i-1];
-		_diagonal[i-1]	 =  rot_v.cos()*tmp
-				 +  rot_v.sin()*_off_diagonal[i];
-		_off_diagonal[i] = -rot_v.sin()*tmp
-				 +  rot_v.cos()*_off_diagonal[i];
+		_diagonal[i-1]	 =  rotE.cos()*tmp
+				 +  rotE.sin()*_off_diagonal[i];
+		_off_diagonal[i] = -rotE.sin()*tmp
+				 +  rotE.cos()*_off_diagonal[i];
 		if (diagonal_is_zero(i))
 		    break;		// No more Given's rotation needed.
-		y		 =  rot_v.sin()*_diagonal[i];
-		_diagonal[i]	*=  rot_v.cos();
+		y		 =  rotE.sin()*_diagonal[i];
+		_diagonal[i]	*=  rotE.cos();
 
 		x = _diagonal[i-1];
 		
 	      /* Apply rotation from right to recover bi-diagonality */
-		Rotation	rot_u(i-1, i, x, y);
+		Rotation	rotD(i-1, i, x, y);
 
-		_Ut.rotate_from_left(rot_u);
+		_Dt.rotate_from_left(rotD);
 
-		_diagonal[i-1] = _diagonal[i-1]*rot_u.cos() + y*rot_u.sin();
+		_diagonal[i-1] = _diagonal[i-1]*rotD.cos() + y*rotD.sin();
 		tmp = _off_diagonal[i];
-		_off_diagonal[i] =  tmp*rot_u.cos() + _diagonal[i]*rot_u.sin();
-		_diagonal[i]	 = -tmp*rot_u.sin() + _diagonal[i]*rot_u.cos();
+		_off_diagonal[i] =  tmp*rotD.cos() + _diagonal[i]*rotD.sin();
+		_diagonal[i]	 = -tmp*rotD.sin() + _diagonal[i]*rotD.cos();
 		if (i < n)
 		{
 		    if (off_diagonal_is_zero(i+1))
 			break;		// No more Given's rotation needed.
-		    y		        = _off_diagonal[i+1]*rot_u.sin();
-		    _off_diagonal[i+1] *= rot_u.cos();
+		    y		        = _off_diagonal[i+1]*rotD.sin();
+		    _off_diagonal[i+1] *= rotD.cos();
 
 		    x		        = _off_diagonal[i];
 		}
@@ -1013,49 +1020,49 @@ BiDiagonal<T>::diagonalize()
 	}
     }
 
-    for (int m = 0; m < nrow(); m++)	// sort singular values and vectors
-	for (int n = m+1; n < nrow(); n++)
+    for (int m = 0; m < _Et.dim(); m++)	// sort singular values and vectors
+	for (int n = m+1; n < _Et.dim(); n++)
 	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
-		for (int j = 0; j < nrow(); j++)
+		for (int j = 0; j < _Et.dim(); j++)
 		{
-		    const T	tmp = _Vt[m][j];
-		    _Vt[m][j] = _Vt[n][j];
-		    _Vt[n][j] = -tmp;
+		    const T	tmp = _Et[m][j];
+		    _Et[m][j] = _Et[n][j];
+		    _Et[n][j] = -tmp;
 		}
-		for (int j = 0; j < ncol(); j++)
+		for (int j = 0; j < _Dt.dim(); j++)
 		{
-		    const T	tmp = _Ut[m][j];
-		    _Ut[m][j] = _Ut[n][j];
-		    _Ut[n][j] = -tmp;
+		    const T	tmp = _Dt[m][j];
+		    _Dt[m][j] = _Dt[n][j];
+		    _Dt[n][j] = -tmp;
 		}
 	    }
 
-    int l = nrow() - 1;			// last index
+    int l = _Et.dim() - 1;		// last index
     for (int m = 0; m < l; m++)		// ensure positivity of all singular
 	if (_diagonal[m] < 0.0)		// values except for the last one.
 	{
 	    _diagonal[m] = -_diagonal[m];
 	    _diagonal[l] = -_diagonal[l];
-	    for (int j = 0; j < nrow(); j++)
+	    for (int j = 0; j < _Et.dim(); j++)
 	    {
-		_Vt[m][j] = -_Vt[m][j];
-		_Vt[l][j] = -_Vt[l][j];
+		_Et[m][j] = -_Et[m][j];
+		_Et[l][j] = -_Et[l][j];
 	    }
 	}
 }
 
-template <class T> int
+template <class T> bool
 BiDiagonal<T>::diagonal_is_zero(int n) const
 {
-    return _Ut.sigma_is_zero(n, _anorm);
+    return _Dt.sigma_is_zero(n, _anorm);
 }
 
-template <class T> int
+template <class T> bool
 BiDiagonal<T>::off_diagonal_is_zero(int n) const
 {
-    return _Vt.sigma_is_zero(n, _anorm);
+    return _Et.sigma_is_zero(n, _anorm);
 }
 
 template <class T> void
