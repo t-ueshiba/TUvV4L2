@@ -20,12 +20,12 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.7 2003-03-17 00:22:30 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.8 2003-07-18 02:26:19 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
 
-#include <math.h>
+#include <cmath>
 #ifdef WIN32
 #  define M_PI	3.14159265358979323846
 #endif
@@ -44,11 +44,13 @@ class Rotation
     
     int		p()				const	{return _p;}
     int		q()				const	{return _q;}
+    double	length()			const	{return _l;}
     double	cos()				const	{return _c;}
     double	sin()				const	{return _s;}
     
   private:
     const int	_p, _q;				// rotation axis
+    double	_l;				// length of (x, y)
     double	_c, _s;				// cos & sin
 };
 
@@ -85,9 +87,9 @@ class Vector : public Array<T>
     Vector	operator  -()		const	{Vector r(*this);
 						 r *= -1; return r;}
     double	square()		const	{return *this * *this;}
-    double	length()		const	{return sqrt(square());}
+    double	length()		const	{return std::sqrt(square());}
     double	sqdist(const Vector& v) const	{return (*this - v).square();}
-    double	dist(const Vector& v)	const	{return sqrt(sqdist(v));}
+    double	dist(const Vector& v)	const	{return std::sqrt(sqdist(v));}
     Vector&	normalize()			{return *this /= length();}
     Vector	normal()		const	;
     Vector&	solve(const Matrix<T>&)		;
@@ -162,7 +164,7 @@ class Matrix : public Array2<Vector<T> >
     Matrix&	rotate_from_left(const Rotation&)	;
     Matrix&	rotate_from_right(const Rotation&)	;
     double	square()			const	;
-    double	length()		const	{return sqrt(square());}
+    double	length()		const	{return std::sqrt(square());}
     Matrix&	symmetrize()				;
     Matrix&	antisymmetrize()			;
     void	rot2angle(double& theta_x,
@@ -487,7 +489,7 @@ template <class S, class T> inline int
 Minimization<S, T>::near_enough(S a, S b) const
 {
 #define EPS	1.0e-10
-    return 2.0 * fabs(a - b) <= _tol * (fabs(a) + fabs(b) + EPS);
+    return 2.0*std::fabs(a - b) <= _tol*(std::fabs(a) + std::fabs(b) + EPS);
 }
  
 }
