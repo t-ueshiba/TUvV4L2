@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.2 2002-07-25 02:38:00 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.3 2002-08-02 06:58:08 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include "TU/Minimize++.h"
@@ -89,6 +89,18 @@ MeasurementMatrix::centroid() const
     for (int j = 0; j < npoints(); ++j)
 	c += (*this)[j];
     return c /= npoints();
+}
+
+//! 指定されたフレームの特徴点像を取り出す．
+/*!
+  \param i	フレームのindex．
+  \return	i番目のフレームに観測された特徴点を表す npoints() \f$\times\f$
+		3行列．
+*/
+const Matrix<double>
+MeasurementMatrix::frame(u_int i) const
+{
+    return (*this)(0, 3*i, npoints(), 3);
 }
 
 //! 2枚のフレーム間のアフィン基礎行列を計算する．

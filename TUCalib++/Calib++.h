@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.2 2002-07-25 02:38:00 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.3 2002-08-02 06:58:08 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
@@ -133,9 +133,11 @@ class MeasurementMatrix : public Matrix<double>
   /*!
     \return	特徴点数(観測行列の行数)．
   */
-    u_int	npoints()			const	{return nrow();}
+    u_int		npoints()		const	{return nrow();}
 
-    Vector<T>	centroid()			const	;
+    Vector<T>		centroid()		const	;
+    const Matrix<T>	frame(u_int i)		const	;
+
     
     Matrix<T>	affineFundamental(u_int frame0=0, u_int frame1=1) const	;
     Matrix<T>	fundamental(u_int frame0=0, u_int frame1=1)	const	;
