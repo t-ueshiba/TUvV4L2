@@ -1,5 +1,5 @@
 /*
- *  $Id: FileSelection.cc,v 1.3 2002-12-18 06:09:59 ueshiba Exp $
+ *  $Id: FileSelection.cc,v 1.4 2003-01-10 00:33:11 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/types.h>
@@ -224,6 +224,6 @@ FileSelection::fullPathName(const char* name) const
 }
 }
 
-#if defined __GNUG__ || __INTEL_COMPILER
+#if defined(__GNUG__) || defined(__INTEL_COMPILER)
 #  include "TU/Array++.cc"
 #endif
