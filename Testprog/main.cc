@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2002-07-25 04:36:11 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2002-07-29 00:09:06 ueshiba Exp $
  */
 #include <iomanip>
 #include <fstream>
@@ -380,7 +380,7 @@ main(int argc, char* argv[])
 
     v::App		vapp(argc, argv);
     Image<u_char>	image;
-    ifstream		in("/home/ueshiba/data/pbm/ALV.pgm", ios::in);
+    ifstream		in("/Users/ueshiba/data/pbm/ALV.pgm", ios::in);
     image.restore(in);
 
     try
