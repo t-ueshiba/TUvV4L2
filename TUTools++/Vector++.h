@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.5 2002-08-12 01:24:46 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.6 2002-08-22 04:08:32 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -151,6 +151,7 @@ class Matrix : public Array2<Vector<T> >
     Matrix&	solve(const Matrix<T>&)			;
     T		det()				const	;
     T		det(u_int, u_int)		const	;
+    T		trace()				const	;
     Matrix	adj()				const	;
     Matrix	pinv(double)			const	;
     Matrix	eigen(Vector<T>&)		const	;

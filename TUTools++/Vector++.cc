@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.3 2002-08-12 01:24:46 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.4 2002-08-22 04:08:32 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -187,6 +187,18 @@ Matrix<T>::det(u_int p, u_int q) const
 	    d[i][j] = (*this)[i+1][j+1];
     }
     return d.det();
+}
+
+template <class T> T
+Matrix<T>::trace() const
+{
+    if (nrow() != ncol())
+        throw
+	  std::invalid_argument("TU::Matrix<T>::trace(): not square matrix!!");
+    T	val = 0.0;
+    for (int i = 0; i < nrow(); ++i)
+	val += (*this)[i][i];
+    return val;
 }
 
 template <class T> Matrix<T>

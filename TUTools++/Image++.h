@@ -20,11 +20,12 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.5 2002-08-19 07:52:27 ueshiba Exp $
+ *  $Id: Image++.h,v 1.6 2002-08-22 04:08:32 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
 
+#include <string.h>
 #include "TU/Vector++.h"
 
 namespace TU
