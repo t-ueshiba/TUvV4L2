@@ -1,0 +1,101 @@
+/*!
+  \mainpage	libTUIeee1394++ - IEEE1394デジタルカメラコントローラ
+  \anchor	libTUIeee1394
+
+  \section introduction libTUIeee1394++とは
+
+  libTUIeee1394++は，<a href="http://www.1394ta.com/">IEEE1394</a>
+  デバイスおよび
+  <a href="http://www.1394ta.com/Technology/Specifications/Descriptions/IIDC_Spec_v1_30.htm">1394-based Digital Camera Specification ver. 1.30</a>
+  に準拠したデジタルカメラのためのコントローラライブラリである．
+
+  LINUXの kernel-2.2.1[7-9], kernel-2.4.18での動作実績あり．2.4.17
+  以前の2.4系kernalでは，カメラからの画像ストリームを長時間取り込み続けていると
+  PCがフリーズすることがある．原因は不明だが，kernelに標準で入っている
+  IEEE1394 driverに問題がある可能性もある．
+
+  \section ieee1394 IEEE1394モジュールのインストール
+
+  libTUIeee1394++は，LINUXのIEEE1394関係のモジュールを利用する．kernel-2.4
+  系では標準でサポートされているが，kernel-2.2系では，以下のように
+  <a href="http://sourceforge.net/projects/linux1394">IEEE1394 for LINUX
+  の開発サイト</a>からパッチを入手してカーネルを再構築する必要がある．
+  \verbatim
+  (1) kernel-2.2.1[7-9]のソースを/usr/srcの下に展開する．
+
+  (2) 上記サイトからkernel-2.2.1[7-9]用のドライバパッチ:
+      ieee1394-2.2.19-20010527.gz を入手し
+
+　　　# gunzip ieee1394-2.2.19-20010527.gz	// 解凍してpatch_fileを抽出
+　　　# cd /usr/src/linux
+　　　# patch -p1 < patch_file			// ソースにdriverを追加
+
+　　  として，ソースにIEEE1394ドライバを追加する．
+
+  (3) IEEE1394関係を有効にするよう，以下を設定する．
+  　　# make xconfig
+
+	Code maturity level options
+	    Prompt for development...[Y]
+	IEEE1394 (FireWire) support
+	    IEEE1394 (FireWire) support...[M]
+	    OHCI support...[M]
+	    Video1394 support...[M]
+	    Raw IEEE1394 I/O support...[M]
+
+  (4) カーネルのコンパイルとインストール
+      # make dep
+      # make clean
+      # make bzImage		// kernelのコンパイル
+      # make install
+      # make modules		// loadable moduleのコンパイル
+      # make modules_install
+
+      # vi /etc/lilo.conf	// 新カーネルのエントリを追加
+      # /sbin/lilo\endverbatim
+
+  (ここから先は，kernel-2.4系, kernel-2.2系に共通)
+  次に，IEEE1394関係のデバイスノードを作成する．
+
+  \verbatim
+  # cd /dev
+  # mknod -m666 raw1394 c 171 0
+  # mknod -m666 video1394.0 c 172 0
+  # mknod -m666 video1394.1 c 172 1
+  # mknod -m666 video1394.2 c 172 2
+  # ln -s video1394.0 video1394\endverbatim
+
+  さらに，IEEE1394デバイスにアクセスした時に自動的にモジュールがロードされる
+  よう，/etc/modules.confに以下の内容を追加する．
+
+  \verbatim
+  alias char-major-171 raw1394
+  alias char-major-172 video1394
+  options ohci1394 attempt_root=1\endverbatim
+
+  LINUXのIEEE1394 driverを使うには，libraw1394をインストールする必要がある．
+  <a href="http://sourceforge.net/projects/libraw1394">開発サイト</a>から
+　libraw1394_0.9.0.tar.gzを入手する．configure & makeで簡単にインストールでき，
+  \verbatim
+  /usr/local/lib/libraw1394.*
+  /usr/local/include/libraw1394/*.h\endverbatim
+  が生成される．
+
+  最後に
+  \verbatim
+  # cd /usr/local/include
+  # ln -s /usr/src/linux/drivers/ieee1394/video1394.h\endverbatim
+  として，/usr/local/includeの下にvideo1394.hへのリンクを作成する
+  (RedHat-7.3の場合，デフォルトインストールではカーネルソースが
+  インストールされないので，あとからカスタムインストールする必要あり)．
+  これがないとlibTUIeee1394++がコンパイルできない．
+
+  \section install libTUIeee1394++のインストール
+
+  \section example プログラム例 - test1394camera
+
+  完全なプログラム例として，1台のカメラをX window上のGUI
+  によりコントロールするプログラム: \ref test1394cameraがある．
+  カメラの各種機能を制御するとともに，画像ストリームを表示する機能を持つ．
+  GUIのためにGTK+を用いている．
+*/

@@ -1,0 +1,1265 @@
+/*
+ *  $Id: Ieee1394Camera.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ */
+#include "TU/Ieee1394++.h"
+#include <stdexcept>
+#include <netinet/in.h>
+
+namespace TU
+{
+/************************************************************************
+*  local constants							*
+************************************************************************/
+static const u_int	unit_spec_ID	= 0x00a02d;
+
+static const u_int	V_FORMAT_INQ	= 0x100;
+
+static const quadlet_t	Format_0	= 0x1 << 31;
+static const quadlet_t	Format_1	= 0x1 << 30;
+static const quadlet_t	Format_2	= 0x1 << 29;
+static const quadlet_t	Format_6	= 0x1 << 25;
+static const quadlet_t	Format_7	= 0x1 << 24;
+
+static const u_int	V_MODE_INQ_0	= 0x180;
+static const u_int	V_MODE_INQ_1	= 0x184;
+static const u_int	V_MODE_INQ_2	= 0x188;
+static const u_int	V_MODE_INQ_6	= 0x198;
+static const u_int	V_MODE_INQ_7	= 0x19c;
+
+static const quadlet_t	Mode_0		= 0x1 << 31;
+static const quadlet_t	Mode_1		= 0x1 << 30;
+static const quadlet_t	Mode_2		= 0x1 << 29;
+static const quadlet_t	Mode_3		= 0x1 << 28;
+static const quadlet_t	Mode_4		= 0x1 << 27;
+static const quadlet_t	Mode_5		= 0x1 << 26;
+static const quadlet_t	Mode_6		= 0x1 << 25;
+static const quadlet_t	Mode_7		= 0x1 << 26;
+
+static const u_int	Feature_Hi_Inq	= 0x404;
+static const u_int	Feature_Lo_Inq	= 0x408;
+
+static const u_int	Cur_V_Frm_Rate	= 0x600;
+static const u_int	Cur_V_Mode	= 0x604;
+static const u_int	Cur_V_Format	= 0x608;
+static const u_int	ISO_Channel	= 0x60c;
+static const u_int	Camera_Power	= 0x610;
+static const u_int	ISO_EN		= 0x614;
+static const u_int	Memory_Save	= 0x618;
+static const u_int	One_Shot	= 0x61c;
+static const u_int	Mem_Save_Ch	= 0x620;
+static const u_int	Cur_Mem_Ch	= 0x624;
+
+static const quadlet_t	One_Push	= 0x1 << 26;
+static const quadlet_t	ON_OFF		= 0x1 << 25;
+static const quadlet_t	A_M_Mode	= 0x1 << 24;
+
+static const quadlet_t	Polarity_Inq	= 0x1 << 25;
+
+// NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
+static const u_int	NBUFFERS	= 4;
+
+/************************************************************************
+*  struct Mono16							*
+************************************************************************/
+struct Mono16
+{
+    operator u_char()			const	{return u_char(ntohs(s));}
+    operator short()			const	{return ntohs(s);}
+    operator float()			const	{return float(ntohs(s));}
+    operator double()			const	{return double(ntohs(s));}
+    
+    short	s;
+};
+    
+/************************************************************************
+*  class Ieee1394Camera							*
+************************************************************************/
+//! IEEE1394カメラノードを生成する
+/*!
+  \param prt		このカメラが接続されているポート．
+  \param channel	isochronous転送用のチャネル番号(\f$0 \leq
+			\f$channel\f$ < 64\f$)
+  \param uniqId		個々のカメラ固有の64bit ID．同一のIEEE1394 busに
+			複数のカメラが接続されている場合，これによって
+			同定を行う．0が与えられると，まだ#Ieee1394Camera
+			オブジェクトを割り当てられていないカメラのうち，
+			一番最初にみつかったものがこのオブジェクトと結び
+			つけられる．
+*/
+Ieee1394Camera::Ieee1394Camera(Ieee1394Port& prt, u_int ch,
+				   u_int64 uniqId)
+    :Ieee1394Node(prt, unit_spec_ID, ch, 1, VIDEO1394_SYNC_FRAMES, uniqId),
+     _cmdRegBase(CSR_REGISTER_BASE
+		 + 4 * int64_t(readValueFromUnitDependentDirectory(0x40))),
+     _w(0), _h(0), _p(MONO), _buf(0)
+{
+  // Assign IsoChannel to this camera.
+    writeQuadletToRegister(ISO_Channel,
+			   (ch << 28)|(Ieee1394Node::SPD_400M << 24));
+
+  // Map video1394 buffer according to current format and frame rate.
+    setFormatAndFrameRate(getFormat(), getFrameRate());
+}
+
+//! IEEE1394カメラオブジェクトを破壊する
+/*!
+  画像データ出力中であった場合は，それを停止する．
+*/
+Ieee1394Camera::~Ieee1394Camera()
+{
+    stopContinuousShot();
+}
+
+//! IEEE1394カメラの電源をonにする
+/*!
+  \return	このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::powerOn()
+{
+    checkAvailabilityOfBasicFunction(Cam_Power_Cntl_Inq);
+    writeQuadletToRegister(Camera_Power, 0x1 << 31);
+    return *this;
+}
+
+//! IEEE1394カメラの電源をoffにする
+/*!
+  \return	このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::powerOff()
+{
+    checkAvailabilityOfBasicFunction(Cam_Power_Cntl_Inq);
+    writeQuadletToRegister(Camera_Power, 0x00000000);
+    return *this;
+}
+
+//! ある画像フォーマットがこのIEEE1394カメラによってサポートされているか調べる
+/*!
+  \param format	サポートされているか調べたいフォーマット．
+  \return	4 byteの整数．
+*/
+quadlet_t
+Ieee1394Camera::inquireFormat(Format format) const
+{
+    quadlet_t	inq = 0;
+
+    switch (format)	// Check presence of format.
+    {
+      case Format_0_0:
+      case Format_0_1:
+      case Format_0_2:
+      case Format_0_3:
+      case Format_0_4:
+      case Format_0_5:
+      case Format_0_6:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_0;
+	break;
+      case Format_1_0:
+      case Format_1_1:
+      case Format_1_2:
+      case Format_1_3:
+      case Format_1_4:
+      case Format_1_5:
+      case Format_1_6:
+      case Format_1_7:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_1;
+	break;
+      case Format_2_0:
+      case Format_2_1:
+      case Format_2_2:
+      case Format_2_3:
+      case Format_2_4:
+      case Format_2_5:
+      case Format_2_6:
+      case Format_2_7:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_2;
+	break;
+      case Format_7_0:
+      case Format_7_1:
+      case Format_7_2:
+      case Format_7_3:
+      case Format_7_4:
+      case Format_7_5:
+      case Format_7_6:
+      case Format_7_7:
+	inq = readQuadletFromRegister(V_FORMAT_INQ) & Format_7;
+	break;
+    }
+    if (inq == 0)
+	return 0;
+
+    inq = 0;
+    switch (format)	// Check presence of mode.
+    {
+      case Format_0_0:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_0;
+	break;
+      case Format_0_1:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_1;
+	break;
+      case Format_0_2:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_2;
+	break;
+      case Format_0_3:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_3;
+	break;
+      case Format_0_4:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_4;
+	break;
+      case Format_0_5:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_5;
+	break;
+      case Format_0_6:
+	inq = readQuadletFromRegister(V_MODE_INQ_0) & Mode_6;
+	break;
+      case Format_1_0:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_0;
+	break;
+      case Format_1_1:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_1;
+	break;
+      case Format_1_2:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_2;
+	break;
+      case Format_1_3:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_3;
+	break;
+      case Format_1_4:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_4;
+	break;
+      case Format_1_5:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_5;
+	break;
+      case Format_1_6:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_6;
+	break;
+      case Format_1_7:
+	inq = readQuadletFromRegister(V_MODE_INQ_1) & Mode_7;
+	break;
+      case Format_2_0:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_0;
+	break;
+      case Format_2_1:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_1;
+	break;
+      case Format_2_2:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_2;
+	break;
+      case Format_2_3:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_3;
+	break;
+      case Format_2_4:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_4;
+	break;
+      case Format_2_5:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_5;
+	break;
+      case Format_2_6:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_6;
+	break;
+      case Format_2_7:
+	inq = readQuadletFromRegister(V_MODE_INQ_2) & Mode_7;
+	break;
+      case Format_7_0:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_0;
+	break;
+      case Format_7_1:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_1;
+	break;
+      case Format_7_2:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_2;
+	break;
+      case Format_7_3:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_3;
+	break;
+      case Format_7_4:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_4;
+	break;
+      case Format_7_5:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_5;
+	break;
+      case Format_7_6:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_6;
+	break;
+      case Format_7_7:
+	inq = readQuadletFromRegister(V_MODE_INQ_7) & Mode_7;
+	break;
+    }
+    if (inq == 0)
+	return 0;
+    
+    return readQuadletFromRegister(format);
+}
+
+//! 画像フォーマットとフレームレートを設定する
+/*!
+  画像データを出力中であった場合はそれを停止して設定を行うが，それが
+  完了すれば出力を再開する．
+  \param format	設定したい画像フォーマット．
+  \param rate	設定したいフレームレート．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
+{
+    checkAvailability(format, rate);
+    const u_int	fmt  = (u_int(format) - u_int(Format_0_0)) / 0x20,
+		mode = (u_int(format) - u_int(Format_0_0)) % 0x20 / 4;
+    const bool	cont = inContinuousShot();
+    
+    if (cont)
+	stopContinuousShot();
+    writeQuadletToRegister(Cur_V_Frm_Rate, rate << 29);
+    writeQuadletToRegister(Cur_V_Mode,	   mode << 29);
+    writeQuadletToRegister(Cur_V_Format,   fmt  << 29);
+
+  // Change buffer size and listen to the channel.
+    u_int	packet_size = 0;
+    switch (format)
+    {
+      case Format_0_0:	// 160x120 YUV(4:4:4)
+	_w = 160;
+	_h = 120;
+	_p = YUV_444;
+	packet_size = 120 * sizeof(quadlet_t);
+	break;
+      case Format_0_1:	// 320x240 YUV(4:2:2)
+	_w = 320;
+	_h = 240;
+	_p = YUV_422;
+	packet_size = 320 * sizeof(quadlet_t);
+	break;
+      case Format_0_2:	// 640x480 YUV(4:1:1)
+	_w = 640;
+	_h = 480;
+	_p = YUV_411;
+	packet_size = 960 * sizeof(quadlet_t);
+	break;
+      case Format_0_3:	// 640x480 YUV(4:2:2)
+	_w = 640;
+	_h = 480;
+	_p = YUV_422;
+	packet_size = 1280 * sizeof(quadlet_t);
+	break;
+      case Format_0_4:	// 640x480 RGB
+	_w = 640;
+	_h = 480;
+	_p = RGB_24;
+	packet_size = 1920 * sizeof(quadlet_t);
+	break;
+      case Format_0_5:	// 640x480 Y(mono)
+	_w = 640;
+	_h = 480;
+	_p = MONO;
+	packet_size = 640 * sizeof(quadlet_t);
+	break;
+      case Format_0_6:	// 640x480 Y(mono16)
+	_w = 640;
+	_h = 480;
+	_p = MONO_16;
+	packet_size = 1280 * sizeof(quadlet_t);
+	break;
+      case Format_1_0:	// 800x600 YUV(4:2:2)
+	_w = 800;
+	_h = 600;
+	_p = YUV_422;
+	packet_size = 2000 * sizeof(quadlet_t);
+	break;
+      case Format_1_1:	// 800x600 RGB
+	_w = 800;
+	_h = 600;
+	_p = RGB_24;
+	packet_size = 3000 * sizeof(quadlet_t);
+	break;
+      case Format_1_2:	// 800x600 Y(mono)
+	_w = 800;
+	_h = 600;
+	_p = MONO;
+	packet_size = 1000 * sizeof(quadlet_t);
+	break;
+      case Format_1_3:	// 1024x768 YUV(4:2:2)
+	_w = 1024;
+	_h = 768;
+	_p = YUV_422;
+	packet_size = 3072 * sizeof(quadlet_t);
+	break;
+      case Format_1_4:	// 1024x768 RGB
+	_w = 1024;
+	_h = 768;
+	_p = RGB_24;
+	packet_size = 4608 * sizeof(quadlet_t);
+	break;
+      case Format_1_5:	// 1024x768 Y(mono)
+	_w = 1024;
+	_h = 768;
+	_p = MONO;
+	packet_size = 1536 * sizeof(quadlet_t);
+	break;
+      case Format_1_6:	// 800x600 Y(mono16)
+	_w = 800;
+	_h = 600;
+	_p = MONO_16;
+	packet_size = 2000 * sizeof(quadlet_t);
+	break;
+      case Format_1_7:	// 1024x768 Y(mono16)
+	_w = 1024;
+	_h = 768;
+	_p = MONO_16;
+	packet_size = 3072 * sizeof(quadlet_t);
+	break;
+      case Format_2_0:	// 1280x960 YUV(4:2:2)
+	_w = 1280;
+	_h = 960;
+	_p = YUV_422;
+	packet_size = 5120 * sizeof(quadlet_t);
+	break;
+      case Format_2_1:	// 1280x960 RGB
+	_w = 1280;
+	_h = 960;
+	_p = RGB_24;
+	packet_size = 7680 * sizeof(quadlet_t);
+	break;
+      case Format_2_2:	// 1280x960 Y(mono)
+	_w = 1280;
+	_h = 960;
+	_p = MONO;
+	packet_size = 2560 * sizeof(quadlet_t);
+	break;
+      case Format_2_3:	// 1600x1200 YUV(4:2:2)
+	_w = 1600;
+	_h = 1200;
+	_p = YUV_422;
+	packet_size = 8000 * sizeof(quadlet_t);
+	break;
+      case Format_2_4:	// 1600x1200 RGB
+	_w = 1600;
+	_h = 1200;
+	_p = RGB_24;
+	packet_size = 12000 * sizeof(quadlet_t);
+	break;
+      case Format_2_5:	// 1600x1200 Y(mono)
+	_w = 1600;
+	_h = 1200;
+	_p = MONO;
+	packet_size = 4000 * sizeof(quadlet_t);
+	break;
+      case Format_2_6:	// 1280x960 Y(mono16)
+	_w = 1280;
+	_h = 960;
+	_p = MONO_16;
+	packet_size = 5120 * sizeof(quadlet_t);
+	break;
+      case Format_2_7:	// 1600x1200 Y(mono16)
+	_w = 1600;
+	_h = 1200;
+	_p = MONO_16;
+	packet_size = 8000 * sizeof(quadlet_t);
+	break;
+      default:
+	throw std::invalid_argument("Ieee1394Camera::setFormat: unknwon format!!");
+	break;
+    }
+    packet_size >>= (5 - rate);
+    u_int	buf_size = _w * _h;
+    switch (_p)
+    {
+      case YUV_444:
+      case RGB_24:
+	buf_size *= 3;
+	break;
+      case YUV_422:
+      case MONO_16:
+	buf_size *= 2;
+	break;
+      case YUV_411:
+	(buf_size *= 3) /= 2;
+	break;
+    }
+    mapListenBuffer(packet_size, buf_size, NBUFFERS);
+
+    if (cont)
+	continuousShot();
+    
+    return *this;
+}
+
+//! 現在カメラに設定されている画像フォーマットを返す
+/*!
+  \return	設定されている画像フォーマット．
+*/
+Ieee1394Camera::Format
+Ieee1394Camera::getFormat() const
+{
+    return
+	uintToFormat(Format_0_0 +
+		     ((readQuadletFromRegister(Cur_V_Mode)  >>29) & 0x7)*4 + 
+		     ((readQuadletFromRegister(Cur_V_Format)>>29) & 0x7)*0x20);
+}
+
+//! 現在カメラに設定されているフレームレートを返す
+/*!
+  \return	設定されているフレームレート．
+*/
+Ieee1394Camera::FrameRate
+Ieee1394Camera::getFrameRate() const
+{
+    return
+	uintToFrameRate((readQuadletFromRegister(Cur_V_Frm_Rate) >> 29) & 0x7);
+}
+
+//! ある属性についてカメラがサポートしている機能を表すビットパターンを返す
+/*!
+  \param feature	対象となる属性．
+  \return		サポートされている機能を#InquireFeature型の列挙値
+			のorとして返す．
+ */
+quadlet_t
+Ieee1394Camera::inquireFeature(Feature feature) const
+{
+    u_int	n = (u_int(feature) - 0x800) >> 2;
+    quadlet_t	inq = 0;
+    if (n < 32)		// FEATURE_HI
+	inq = readQuadletFromRegister(Feature_Hi_Inq) & (0x1 << (31 - n));
+    else		// FEATURE_LO
+    {
+	n -= 32;
+	inq = readQuadletFromRegister(Feature_Lo_Inq) & (0x1 << (31 - n));
+    }
+    if (inq == 0)	// Check presence of feature.
+	return 0;
+
+    return readQuadletFromRegister(feature - 0x300);
+}
+
+//! 指定された属性を1回だけ自動設定する．
+/*!
+  本関数を呼ぶと，指定した属性の自動設定が直ちに開始される．自動設定が終了
+  したかどうかは，inOnePushOperation()で知ることができる．
+  \param feature	自動設定したい属性．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::onePush(Feature feature)
+{
+    checkAvailability(feature, Presence_Inq | One_Push_Inq);
+    writeQuadletToRegister(feature,
+			   readQuadletFromRegister(feature) | One_Push);
+    return *this;
+}
+
+//! 指定された属性をonにする
+/*!
+  \param feature	onにしたい属性．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::turnOn(Feature feature)
+{
+    checkAvailability(feature, Presence_Inq | OnOff_Inq);
+    writeQuadletToRegister(feature, readQuadletFromRegister(feature) | ON_OFF);
+    return *this;
+}
+
+//! 指定された属性をoffにする
+/*!
+  \param feature	offにしたい属性．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::turnOff(Feature feature)
+{
+    checkAvailability(feature, Presence_Inq | OnOff_Inq);
+    writeQuadletToRegister(feature,
+			   readQuadletFromRegister(feature) & ~ON_OFF);
+    return *this;
+}
+
+//! 指定された属性を自動設定モードにする
+/*!
+  自動設定にすると，この属性の値は環境の変化に追従して継続的に自動的に調整
+  される．
+  \param feature	自動設定モードにしたい属性．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::setAutoMode(Feature feature)
+{
+    checkAvailability(feature, Presence_Inq | Auto_Inq);
+    writeQuadletToRegister(feature,
+			   readQuadletFromRegister(feature) | A_M_Mode);
+    return *this;
+}
+
+//! 指定された属性を手動設定モードにする
+/*!
+  \param feature	手動設定モードにしたい属性．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::setManualMode(Feature feature)
+{
+    checkAvailability(feature, Presence_Inq | Manual_Inq);
+    writeQuadletToRegister(feature,
+			   readQuadletFromRegister(feature) & ~A_M_Mode);
+    return *this;
+}
+
+//! 指定された属性の値を設定する
+/*!
+  #WHITE_BALANCE, #TRIGGER_MODEの値を設定することはできない．代わりに
+  setWhiteBalance(), setTriggerMode(), setTriggerPolarity()を用いること．
+  \param feature	値を設定したい属性．
+  \param value		設定する値．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::setValue(Feature feature, u_int value)
+{
+    if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
+	throw std::invalid_argument("TU::Ieee1394Camera::setValue: cannot set WHITE_BALANCE/TRIGGER_MODE value using this method!!");
+    checkAvailability(feature, Presence_Inq | Manual_Inq);
+    if (feature == TEMPERATURE)
+	writeQuadletToRegister(TEMPERATURE,
+			       (readQuadletFromRegister(TEMPERATURE) &
+				0xff000fff) | ((value & 0xfff) << 12));
+    else
+	writeQuadletToRegister(feature,
+			       (readQuadletFromRegister(feature) &
+				0xfffff000) | (value & 0xfff));
+    return *this;
+}
+
+//! 指定された属性が1回だけの自動設定の最中であるか調べる
+/*!
+  \param feature	対象となる属性．
+  \return		onePush()を行った属性値の自動設定が継続中であれば
+			trueを，終了していればfalseを返す．
+*/
+bool
+Ieee1394Camera::inOnePushOperation(Feature feature) const
+{
+    checkAvailability(feature, Presence_Inq | One_Push_Inq);
+    return readQuadletFromRegister(feature) & (0x1 << 26);
+}
+
+//! 指定された属性がonになっているか調べる
+/*!
+  \param feature	対象となる属性．
+  \return		onになっていればtrueを，そうでなければfalseを返す．
+*/
+bool
+Ieee1394Camera::isTurnedOn(Feature feature) const
+{
+    checkAvailability(feature, Presence_Inq | OnOff_Inq);
+    return readQuadletFromRegister(feature) & (0x1 << 25);
+}
+
+//! 指定された属性が自動設定モードになっているか調べる
+/*!
+  \param feature	対象となる属性．
+  \return		自動設定モードになっていればtrueを，そうでなければ
+			falseを返す．
+*/
+bool
+Ieee1394Camera::isAuto(Feature feature) const
+{
+    checkAvailability(feature, Presence_Inq | Auto_Inq);
+    return readQuadletFromRegister(feature) & (0x1 << 24);
+}
+
+//! 指定された属性がとり得る値の範囲を調べる
+/*!
+  \param feature	対象となる属性．
+  \param min		とり得る値の最小値が返される．
+  \param max		とり得る値の最大値が返される．
+*/
+void
+Ieee1394Camera::getMinMax(Feature feature, u_int& min, u_int& max) const
+{
+    
+    quadlet_t	quad = checkAvailability(feature, Presence_Inq);
+    min = (quad >> 12) & 0xfff;
+    max = quad & 0xfff;
+}
+
+//! 指定された属性の現在の値を調べる
+/*!
+  feature = #TEMPERATUREの場合は，setValue()で設定した目標値ではなく，
+  実際値が返される．目標値を得るには，getAimedTemperature()を用いる．
+  また，#WHITE_BALANCE, #TRIGGER_MODEの値を知ることはできない．代わり
+  にgetWhiteBalance(), getTriggerMode(), getTriggerPolarity()を用いる
+  こと．
+  \param	feature 対象となる属性．
+  \return	現在の値．
+*/
+u_int
+Ieee1394Camera::getValue(Feature feature) const
+{
+    if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
+	throw std::invalid_argument("TU::Ieee1394Camera::getValue: cannot get WHITE_BALANCE/TRIGGER_MODE value using this method!!");
+    checkAvailability(feature, Presence_Inq | ReadOut_Inq);
+    return readQuadletFromRegister(feature) & 0xfff;	// 12bit value.
+}
+
+//! ホワイトバランスの値を設定する
+/*!
+  \param ub		設定するU/B値．
+  \param vr		設定するV/R値．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::setWhiteBalance(u_int ub, u_int vr)
+{
+    checkAvailability(WHITE_BALANCE, Presence_Inq | Manual_Inq);
+    writeQuadletToRegister(WHITE_BALANCE,
+			   (readQuadletFromRegister(WHITE_BALANCE) &
+			    0xff000000) | ((ub & 0xfff) << 12) | (vr & 0xfff));
+    return *this;
+}
+
+//! ホワイトバランスの値を調べる
+/*!
+  \param ub		U/B値が返される．
+  \param vr		V/R値が返される．
+*/
+void
+Ieee1394Camera::getWhiteBalance(u_int &ub, u_int& vr) const
+{
+    checkAvailability(WHITE_BALANCE, Presence_Inq | ReadOut_Inq);
+    quadlet_t	quad = readQuadletFromRegister(WHITE_BALANCE);
+    ub = (quad >> 12) & 0xfff;
+    vr = quad & 0xfff;
+}
+
+//! 色温度の目標値を調べる
+/*!
+  色温度の実際値を知るには，代わりにgetValue()を用いよ．
+  \return	設定されている目標値が返される．
+*/
+u_int
+Ieee1394Camera::getAimedTemperature() const
+{
+    checkAvailability(TEMPERATURE, Presence_Inq | ReadOut_Inq);
+    return (readQuadletFromRegister(TEMPERATURE) >> 12) & 0xfff;
+}
+
+//! トリガモードを設定する
+/*!
+  実際にカメラが外部トリガによって駆動されるためには，この関数でモード設定
+  を行った後に#turnOn(#TRIGGER_MODE)を行わなければならない．
+  \param mode	設定したいトリガモード．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::setTriggerMode(TriggerMode mode)
+{
+    checkAvailability(TRIGGER_MODE, Presence_Inq | (0x1 << (15 - mode)));
+    writeQuadletToRegister(TRIGGER_MODE,
+			   (readQuadletFromRegister(TRIGGER_MODE) & ~0xf0000) |
+			   ((mode & 0xf) << 16));
+    return *this;
+}
+
+//! 現在設定されているトリガモードを調べる
+/*!
+  \return	現在設定されているトリガモード．
+*/
+Ieee1394Camera::TriggerMode
+Ieee1394Camera::getTriggerMode() const
+{
+    checkAvailability(TRIGGER_MODE, Presence_Inq | ReadOut_Inq);
+    u_int	trigger = (readQuadletFromRegister(TRIGGER_MODE) >> 16) & 0xf;
+    switch (trigger)
+    {
+      case Trigger_Mode0:
+	return Trigger_Mode0;
+      case Trigger_Mode1:
+	return Trigger_Mode1;
+      case Trigger_Mode2:
+	return Trigger_Mode2;
+      case Trigger_Mode3:
+	return Trigger_Mode3;
+    }
+
+    throw std::domain_error("TU::Ieee1394Camera::getTriggerMode(): unknown trigger mode!!");
+    
+    return Trigger_Mode0;
+}
+
+//! トリガ信号の極性を設定する
+/*!
+  \param polarity	設定したい極性．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::setTriggerPolarity(TriggerPolarity polarity)
+{
+    checkAvailability(TRIGGER_MODE, Presence_Inq | Polarity_Inq);
+    writeQuadletToRegister(TRIGGER_MODE, (readQuadletFromRegister(TRIGGER_MODE)
+					  & ~HighActiveInput) | polarity);
+    return *this;
+}
+
+//! 現在設定されているトリガ信号の極性を調べる
+/*!
+  \return	現在設定されているトリガ信号の極性．
+*/
+Ieee1394Camera::TriggerPolarity
+Ieee1394Camera::getTriggerPolarity() const
+{
+    checkAvailability(TRIGGER_MODE, Presence_Inq | Polarity_Inq);
+    if (readQuadletFromRegister(TRIGGER_MODE) & HighActiveInput)
+	return HighActiveInput;
+    else
+	return LowActiveInput;
+}
+
+//! カメラからの画像の連続的出力を開始する
+/*!
+  #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
+  れる．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::continuousShot()
+{
+    if (!inContinuousShot())
+	writeQuadletToRegister(ISO_EN, 0x1 << 31);
+    return *this;
+}
+
+//! カメラからの画像の連続的出力を停止する
+/*!
+  \return	このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::stopContinuousShot()
+{
+    if (inContinuousShot())
+    {
+	writeQuadletToRegister(ISO_EN, 0x0);
+	flushListenBuffer();
+	_buf = 0;
+    }
+    return *this;
+}
+
+//! カメラから画像が出力中であるか調べる
+/*!
+  \return	画像出力中であればtrueを，そうでなければfalseを返す．
+*/
+bool
+Ieee1394Camera::inContinuousShot() const
+{
+    return readQuadletFromRegister(ISO_EN) & (0x1 << 31);
+}
+
+//! 画像を1枚だけ撮影してそれを出力する
+/*!
+  画像を連続的に出力中であれば，それを停止した後にあらためて1枚だけ撮影する．
+  #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
+  れる．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::oneShot()
+{
+    checkAvailabilityOfBasicFunction(One_Shot_Inq);
+    stopContinuousShot();
+    writeQuadletToRegister(One_Shot, 0x1 << 31);
+    return *this;
+}
+
+//! 画像を指定された枚数だけ撮影してそれを出力する
+/*!
+  画像を連続的に出力中であれば，それを停止した後にあらためて撮影を開始する．
+  #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
+  れる．
+  \param nframes	撮影したい枚数．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::multiShot(u_short nframes)
+{
+    checkAvailabilityOfBasicFunction(Multi_Shot_Inq);
+    stopContinuousShot();
+    writeQuadletToRegister(One_Shot, (0x1 << 30) | (nframes & 0xffff));
+    return *this;
+}
+
+//! 現在のカメラの設定を指定されたメモリチャンネルに記憶する
+/*!
+  IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
+  カメラ内部のメモリチャンネルに記憶できるものがある．
+  \param mem_ch		値を記憶するメモリチャンネル番号．0以上の値をとり，
+			最大値はgetMemoryChannelMaxで調べられる．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::saveConfig(u_int mem_ch)
+{
+    u_int	max = getMemoryChannelMax();
+    if (mem_ch == 0 || mem_ch > max)
+	throw std::invalid_argument("TU::Ieee1394Camera::saveConfig: invalid memory channel!!");
+    writeQuadletToRegister(Mem_Save_Ch, mem_ch << 28);
+    writeQuadletToRegister(Memory_Save, 0x1 << 31);
+    while ((readQuadletFromRegister(Memory_Save) & (0x1 << 31)) != 0)
+	;
+    return *this;
+}
+
+//! 指定されたメモリチャンネルに記憶された値をカメラに設定する
+/*!
+  IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
+  カメラ内部のメモリチャンネルに記憶できるものがある．
+  \param mem_ch		設定したい値を記憶しているメモリチャンネル番号．0以上
+			の値をとり，最大値はgetMemoryChannelMaxで調べられる．
+  \return		このIEEE1394カメラオブジェクト．
+*/
+Ieee1394Camera&
+Ieee1394Camera::restoreConfig(u_int mem_ch)
+{
+    u_int	max = getMemoryChannelMax();
+    if (mem_ch > max)
+	throw std::invalid_argument("TU::Ieee1394Camera::restoreConfig: invalid memory channel!!");
+    writeQuadletToRegister(Cur_Mem_Ch, mem_ch << 28);
+    return *this;
+}
+
+//! メモリチャンネルの最大値を調べる
+/*!
+  IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
+  カメラ内部のメモリチャンネルに記憶できるものがある．
+  \return 	メモリチャンネル番号の最大値．
+*/
+u_int
+Ieee1394Camera::getMemoryChannelMax() const
+{
+    return (inquireBasicFunction() & 0xf);
+}
+
+/*
+ *  Capture stuffs.
+ */
+#ifdef HAVE_TUToolsPP
+//! IEEE1394カメラから出力された画像1枚分のデータを適当な形式に変換して取り込む
+/*!
+  テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
+  呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
+  \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
+		現在カメラに設定されている画像サイズに合わせて自動的に
+		設定される．また，カメラに設定されたフォーマットの画素形式
+		が画像のそれに一致しない場合は，自動的に変換が行われる．
+		サポートされている画素形式Tは，u_char, RGB, RGBA, BGR,
+		ABGR, YUV444, YUV422, YUV411のいずれかである．
+		また，サポートされている変換は以下のとおりであり，カメラの
+		画素形式がこれ以外に設定されている場合はTUExceptionWithMessage
+		例外が送出される．
+		    -# #YUV444 -> T
+		    -# #YUV422 -> T
+		    -# #YUV411 -> T
+		    -# #RGB -> T (YUV444, YUV422, YUV411を除く) 
+		    -# #MONO -> T
+  \return	このIEEE1394カメラオブジェクト．
+*/
+template <class T> const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<T>& image) const
+{
+    if (_buf == 0)
+	throw std::runtime_error("TU::Ieee1394Camera::operator >>: no images snapped!!");
+  // Transfer image data from current buffer.
+    image.resize(height(), width());
+    switch (pixelFormat())
+    {
+      case YUV_444:
+      {
+	const YUV444*	src = (const YUV444*)_buf;
+	for (u_int v = 0; v < image.height(); ++v)
+	    src = image[v].fill(src);
+      }
+	break;
+      case YUV_422:
+      {
+	const YUV422*	src = (const YUV422*)_buf;
+	for (u_int v = 0; v < image.height(); ++v)
+	    src = image[v].fill(src);
+      }
+	break;
+      case YUV_411:
+      {
+	const YUV411*	src = (const YUV411*)_buf;
+	for (u_int v = 0; v < image.height(); ++v)
+	    src = image[v].fill(src);
+      }
+	break;
+      case RGB_24:
+      {
+	const RGB*	src = (const RGB*)_buf;
+	for (u_int v = 0; v < image.height(); ++v)
+	    src = image[v].fill(src);
+      }
+	break;
+      case MONO:
+      {
+	const u_char*	src = _buf;
+	for (u_int v = 0; v < image.height(); ++v)
+	    src = image[v].fill(src);
+      }
+	break;
+      case MONO_16:
+      {
+	const Mono16*	src = (const Mono16*)_buf;
+	for (u_int v = 0; v < image.height(); ++v)
+	    src = image[v].fill(src);
+      }
+	break;
+      default:
+	throw std::domain_error("TU::Ieee1394Camera::operator >>: unknown pixel format!!");
+	break;
+    }
+
+    return *this;
+}
+#endif	// HAVE_TUToolsPP
+
+//! IEEE1394カメラから出力された画像1枚分のデータをなんら変換を行わずに取り込む
+/*!
+  本関数を呼び出す前にsnap()によってカメラからの画像を保持しておかなければ
+  ならない．
+  \param image	画像データの格納領域へのポインタ．width(), height()および
+		pixelFormat()を用いて画像のサイズと画素の形式を調べて
+		画像1枚分の領域を確保しておくのは，ユーザの責任である．
+  \return	このIEEE1394カメラオブジェクト．
+*/
+const Ieee1394Camera&
+Ieee1394Camera::captureRaw(void* image) const
+{
+    if (_buf == 0)
+	throw std::runtime_error("TU::Ieee1394Camera::captureRaw: no images snapped!!");
+  // Transfer image data from current buffer.
+    memcpy(image, _buf, getBufferSize());
+
+    return *this;
+}
+
+//! unsinged intの値を同じbitパターンを持つ#Formatに直す
+/*!
+  \param format	#Formatに直したいunsigned int値．
+  \return	#Format型のenum値．
+ */
+Ieee1394Camera::Format
+Ieee1394Camera::uintToFormat(u_int format)
+{
+    switch (format)
+    {
+      case Format_0_0:
+	return Format_0_0;
+      case Format_0_1:
+	return Format_0_1;
+      case Format_0_2:
+	return Format_0_2;
+      case Format_0_3:
+	return Format_0_3;
+      case Format_0_4:
+	return Format_0_4;
+      case Format_0_5:
+	return Format_0_5;
+      case Format_0_6:
+	return Format_0_6;
+      case Format_1_0:
+	return Format_1_0;
+      case Format_1_1:
+	return Format_1_1;
+      case Format_1_2:
+	return Format_1_2;
+      case Format_1_3:
+	return Format_1_3;
+      case Format_1_4:
+	return Format_1_4;
+      case Format_1_5:
+	return Format_1_5;
+      case Format_1_6:
+	return Format_1_6;
+      case Format_1_7:
+	return Format_1_7;
+      case Format_2_0:
+	return Format_2_0;
+      case Format_2_1:
+	return Format_2_1;
+      case Format_2_2:
+	return Format_2_2;
+      case Format_2_3:
+	return Format_2_3;
+      case Format_2_4:
+	return Format_2_4;
+      case Format_2_5:
+	return Format_2_5;
+      case Format_2_6:
+	return Format_2_6;
+      case Format_2_7:
+	return Format_2_7;
+      case Format_7_0:
+	return Format_7_0;
+      case Format_7_1:
+	return Format_7_1;
+      case Format_7_2:
+	return Format_7_2;
+      case Format_7_3:
+	return Format_7_3;
+      case Format_7_4:
+	return Format_7_4;
+      case Format_7_5:
+	return Format_7_5;
+      case Format_7_6:
+	return Format_7_6;
+      case Format_7_7:
+	return Format_7_7;
+    }
+
+    throw std::invalid_argument("Unknown format!!");
+    
+    return Format_0_0;
+}
+
+//! unsinged intの値を同じbitパターンを持つ#FrameRateに直す
+/*!
+  \param format	#FrameRateに直したいunsigned int値．
+  \return	#FrameRate型のenum値．
+ */
+Ieee1394Camera::FrameRate
+Ieee1394Camera::uintToFrameRate(u_int rate)
+{
+    switch (rate)
+    {
+      case FrameRate_0:
+	return FrameRate_0;
+      case FrameRate_1:
+	return FrameRate_1;
+      case FrameRate_2:
+	return FrameRate_2;
+      case FrameRate_3:
+	return FrameRate_3;
+      case FrameRate_4:
+	return FrameRate_4;
+      case FrameRate_5:
+	return FrameRate_5;
+    }
+
+    throw std::invalid_argument("Unknown frame rate!!");
+    
+    return FrameRate_0;
+}
+
+//! unsinged intの値を同じbitパターンを持つ#Featureに直す
+/*!
+  \param format	#Featureに直したいunsigned int値．
+  \return	#Feature型のenum値．
+ */
+Ieee1394Camera::Feature
+Ieee1394Camera::uintToFeature(u_int feature)
+{
+    switch (feature)
+    {
+      case BRIGHTNESS:
+	return BRIGHTNESS;
+      case AUTO_EXPOSURE:
+	return AUTO_EXPOSURE;
+      case SHARPNESS:
+	return SHARPNESS;
+      case WHITE_BALANCE:
+	return WHITE_BALANCE;
+      case HUE:
+	return HUE;
+      case SATURATION:
+	return SATURATION;
+      case GAMMA:
+	return GAMMA;
+      case SHUTTER:
+	return SHUTTER;
+      case GAIN:
+	return GAIN;
+      case IRIS:
+	return IRIS;
+      case FOCUS:
+	return FOCUS;
+      case TEMPERATURE:
+	return TEMPERATURE;
+      case TRIGGER_MODE:
+	return TRIGGER_MODE;
+      case ZOOM:
+	return ZOOM;
+      case PAN:
+	return PAN;
+      case TILT:
+	return TILT;
+      case OPTICAL_FILTER:
+	return OPTICAL_FILTER;
+      case CAPTURE_SIZE:
+	return CAPTURE_SIZE;
+      case CAPTURE_QUALITY:
+	return CAPTURE_QUALITY;
+    }
+
+    throw std::invalid_argument("Unknown feature!!");
+    
+    return BRIGHTNESS;
+}
+
+//! unsinged intの値を同じbitパターンを持つ#TriggerModeに直す
+/*!
+  \param format	#TriggerModeに直したいunsigned int値．
+  \return	#TriggerMode型のenum値．
+ */
+Ieee1394Camera::TriggerMode
+Ieee1394Camera::uintToTriggerMode(u_int triggerMode)
+{
+    switch (triggerMode)
+    {
+      case Trigger_Mode0:
+	return Trigger_Mode0;
+      case Trigger_Mode1:
+	return Trigger_Mode1;
+      case Trigger_Mode2:
+	return Trigger_Mode2;
+      case Trigger_Mode3:
+	return Trigger_Mode3;
+    }
+
+    throw std::invalid_argument("Unknown trigger mode!!");
+    
+    return Trigger_Mode0;
+}
+ 
+}
+#ifdef HAVE_TUToolsPP
+#  ifdef __GNUG__
+#    include "TU/Array++.cc"
+#    include "TU/Image++.cc"
+namespace TU
+{
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<u_char>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<short>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<float>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<double>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<RGB>& image)		const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<RGBA>& image)		const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<BGR>& image)		const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<ABGR>& image)		const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<YUV444>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<YUV422>& image)	const	;
+template const Ieee1394Camera&
+Ieee1394Camera::operator >>(Image<YUV411>& image)	const	;
+}
+#  endif	// __GNUG__
+#endif		// HAVE_TUToolsPP
