@@ -1,5 +1,5 @@
 /*
- *  $Id: My1394Camera.cc,v 1.5 2003-02-20 05:51:50 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.6 2003-02-20 10:08:03 ueshiba Exp $
  */
 #include <sys/time.h>
 #include <stdexcept>
@@ -309,6 +309,8 @@ My1394Camera::draw()
 std::ostream&
 My1394Camera::save(std::ostream& out) const
 {
+    using namespace	std;
+    
     switch (pixelFormat())
     {
       case YUV_444:
