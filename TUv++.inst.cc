@@ -1,5 +1,5 @@
 /*
- *  $Id: TUv++.inst.cc,v 1.3 2003-01-10 00:33:11 ueshiba Exp $
+ *  $Id: TUv++.inst.cc,v 1.4 2003-01-10 00:59:19 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
@@ -8,12 +8,9 @@
 
 namespace TU
 {
-namespace v
-{
-template class List<Cmd>;
-template class List<Window>;
-template class List<Pane>;
-}
+template class List<v::Cmd>;
+template class List<v::Window>;
+template class List<v::Pane>;
 }
 
 #endif
