@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.9 2002-08-12 02:37:50 ueshiba Exp $
+#  $Id: Makefile,v 1.10 2002-08-14 05:15:32 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -141,7 +141,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.9 $	|		\
+REV		= $(shell echo $Revision: 1.10 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -151,8 +151,7 @@ REV		= $(shell echo $Revision: 1.9 $	|		\
 		  }')
 
 include $(PROJECT)/lib/l.mk
-include $(PROJECT)/lib/RCS.mk
-include $(PROJECT)/lib/install-srcs.mk
+include $(PROJECT)/lib/l-install-srcs.mk
 ###
 Allocator++.o: TU/Allocator++.h TU/TU/List++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
