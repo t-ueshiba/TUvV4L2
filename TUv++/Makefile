@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2003-02-20 08:49:23 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2004-03-08 02:12:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -17,6 +17,7 @@ CPPFLAGS	= -DUseXaw #-DDEBUG #-DDESTROY_WIDGET
 CFLAGS		= -O -g
 ifeq ($(CCC), icc)
   CCFLAGS	= -O3 -tpp7 -xW -parallel
+#  CCFLAGS	= -O3
 else
   CCFLAGS	= -O -g
 #  CCFLAGS      = -g
@@ -197,7 +198,7 @@ OBJS		= App.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

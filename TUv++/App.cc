@@ -1,5 +1,5 @@
 /*
- *  $Id: App.cc,v 1.2 2002-07-25 02:38:09 ueshiba Exp $
+ *  $Id: App.cc,v 1.3 2004-03-08 02:12:26 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include <stdexcept>
@@ -85,14 +85,16 @@ static String	fallback[] =
   // Important to have topShadow and bottomShadow be drawn correctly.
     "*beNiceToColormap:			false",
 
+  // Set default font.
+    "*font:				7x13bold",
+
   // Followings are same as vLightControlShadow and vDarkControlShadow.
     "*topShadowPixel:			#DEDEDEDEDEDE",
     "*bottomShadowPixel:		#7F7F7F7F7F7F",
     "*borderColor:			white",
 
-  // Followings are same as vControlBG and vControlFace.
+  // Following corresponds to both vControlBG and vControlFace.
     "*background:			#B3B3B3B3B3B3",
-    "*TUvCmdPane.background:		#BFBFBFBFBFBF",
 
     "*TUvCanvasPaneDC.translations:\
 	<Btn3Down>:	XawPositionSimpleMenu(TUvMenu) MenuPopup(TUvMenu)",
