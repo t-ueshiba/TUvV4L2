@@ -20,32 +20,29 @@
  */
 
 /*
- *  $Id: Rotation.cc,v 1.3 2003-03-14 02:26:07 ueshiba Exp $
+ *  $Id: Rotation.cc,v 1.4 2003-07-18 02:26:19 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
 namespace TU
 {
+inline double	sqr(double x)	{return x * x;}
+    
 Rotation::Rotation(int p, int q, double x, double y)
-    :_p(p), _q(q), _c(1.0), _s(0.0)
+    :_p(p), _q(q), _l(1.0), _c(1.0), _s(0.0)
 {
-    const double	absy = fabs(y);
-    if (fabs(x) > absy)
+    const double	absx = std::abs(x), absy = std::abs(y);
+    _l = (absx > absy ? absx * std::sqrt(1.0 + sqr(absy/absx))
+		      : absy * std::sqrt(1.0 + sqr(absx/absy)));
+    if (_l != 0.0)
     {
-	const double	t = y / x;
-	_c = 1 / sqrt(t*t + 1);
-	_s = t * _c;
-    }
-    else if (absy != 0.0)
-    {
-	const double	t = x / y;
-	_s = 1 / sqrt(t*t + 1);
-	_c = t * _s;
+	_c = x / _l;
+	_s = y / _l;
     }
 }
 
 Rotation::Rotation(int p, int q, double theta)
-    :_p(p), _q(q), _c(::cos(theta)), _s(::sin(theta))
+    :_p(p), _q(q), _l(1.0), _c(std::cos(theta)), _s(std::sin(theta))
 {
 }
  

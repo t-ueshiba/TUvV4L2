@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.8 2003-03-17 00:22:30 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.9 2003-07-18 02:26:19 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -215,10 +215,10 @@ template <class T> Matrix<T>
 Matrix<T>::pinv(double cndnum) const
 {
     SVDecomposition<T>	svd(*this);
-    Matrix<T>			Ut(svd.Ut()(0, 0, svd.nrow(), svd.ncol()));
+    Matrix<T>		Ut(svd.Ut()(0, 0, svd.nrow(), svd.ncol()));
 
     for (int i = 0; i < svd.nrow(); ++i)
-	if (fabs(svd[i]) * cndnum > fabs(svd[0]))
+	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
 	    Ut[i] /= svd[i];
 	else
 	    Ut[i] = 0.0;
@@ -261,7 +261,7 @@ Matrix<T>::cholesky() const
 	    throw std::runtime_error("TU::Matrix<T>::cholesky(): not positive definite matrix!!");
 	for (int j = 0; j < i; ++j)
 	    Lt[i][j] = 0.0;
-	Lt[i][i] = d = sqrt(d);
+	Lt[i][i] = d = std::sqrt(d);
 	for (int j = i + 1; j < ncol(); ++j)
 	    Lt[i][j] /= d;
 	for (int j = i + 1; j < nrow(); ++j)
@@ -279,7 +279,7 @@ Matrix<T>::normalize()
     
     for (int i = 0; i < nrow(); ++i)
 	sum += (*this)[i] * (*this)[i];
-    return *this /= sqrt(sum);
+    return *this /= std::sqrt(sum);
 }
 
 template <class T> Matrix<T>&
@@ -341,6 +341,8 @@ Matrix<T>::antisymmetrize()
 template <class T> void
 Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
 {
+    using namespace	std;
+    
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2angle: input matrix must be 3x3!!");
 
@@ -367,7 +369,7 @@ Matrix<T>::rot2axis(double& c, double& s) const
   // Compute cosine and sine of rotation angle.
     const double	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
     c = (trace - 1.0) / 2.0;
-    s = sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
+    s = std::sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
 
   // Compute rotation axis.
     Vector<T>	n(3);
@@ -389,14 +391,14 @@ Matrix<T>::rot2axis() const
     axis[0] = ((*this)[1][2] - (*this)[2][1]) * 0.5;
     axis[1] = ((*this)[2][0] - (*this)[0][2]) * 0.5;
     axis[2] = ((*this)[0][1] - (*this)[1][0]) * 0.5;
-    const double	s = sqrt(axis.square());
+    const double	s = std::sqrt(axis.square());
     if (s + 1.0 == 1.0)		// s << 1 ?
 	return axis;
     const double	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
     if (trace > 1.0)		// cos > 0 ?
-	return  asin(s) / s * axis;
+	return  std::asin(s) / s * axis;
     else
-	return -asin(s) / s * axis;
+	return -std::asin(s) / s * axis;
 }
 
 template <class T> Matrix<T>
@@ -425,7 +427,7 @@ Matrix<T>::Rt(const Vector<T>& axis)
 	return I(3);
     else
     {
-	double	c = cos(theta), s = sin(theta);
+	double	c = std::cos(theta), s = std::sin(theta);
 	return Rt(axis / theta, c, s);
     }
 }
@@ -521,7 +523,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 
 	for (int i = 0; i < nrow(); i++)
 	{
-	    const double tmp = fabs((*this)[i][j]);
+	    const double tmp = std::fabs((*this)[i][j]);
 	    if (tmp > max)
 		max = tmp;
 	}
@@ -544,7 +546,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 	    T& sum = (*this)[i][j];
 	    for (int k = 0; k < i; k++)
 		sum -= (*this)[i][k] * (*this)[k][j];
-	    const double tmp = fabs(sum) * scale[j];
+	    const double tmp = std::fabs(sum) * scale[j];
 	    if (tmp >= max)
 	    {
 		max  = tmp;
@@ -607,6 +609,8 @@ Householder<T>::Householder(const Matrix<T>& a, u_int d)
 template <class T> void
 Householder<T>::apply_from_left(Matrix<T>& a, int m)
 {
+    using namespace	std;
+    
     if (a.nrow() < dim())
 	throw std::invalid_argument("TU::Householder<T>::apply_from_left: # of rows of given matrix is smaller than my dimension !!");
     
@@ -647,6 +651,8 @@ Householder<T>::apply_from_left(Matrix<T>& a, int m)
 template <class T> void
 Householder<T>::apply_from_right(Matrix<T>& a, int m)
 {
+    using namespace	std;
+    
     if (a.ncol() < dim())
 	throw std::invalid_argument("Householder<T>::apply_from_right: # of column of given matrix is smaller than my dimension !!");
     
@@ -687,6 +693,8 @@ Householder<T>::apply_from_right(Matrix<T>& a, int m)
 template <class T> void
 Householder<T>::apply_from_both(Matrix<T>& a, int m)
 {
+    using namespace	std;
+    
     Vector<T>		u = a[m](m+_d, a.ncol()-m-_d);
     double		scale = 0.0;
     for (int j = 0; j < u.dim(); j++)
@@ -757,7 +765,7 @@ Householder<T>::make_transformation()
 template <class T> bool
 Householder<T>::sigma_is_zero(int m, T comp) const
 {
-    return (T(fabs(_sigma[m])) + comp == comp);
+    return (T(std::fabs(_sigma[m])) + comp == comp);
 }
 
 /************************************************************************
@@ -827,15 +835,14 @@ TriDiagonal<T>::diagonalize()
 		_Ut.rotate_from_left(rot);
 
 		if (i > m+1)
-		    _off_diagonal[i-1] = rot.cos()*_off_diagonal[i-1]
-				       + rot.sin()*y;
+		    _off_diagonal[i-1] = rot.length();
 		const double w = _diagonal[i] - _diagonal[i-1];
 		const double d = rot.sin()*(rot.sin()*w
-			       + 2*rot.cos()*_off_diagonal[i]);
+			       + 2.0*rot.cos()*_off_diagonal[i]);
 		_diagonal[i-1]	 += d;
 		_diagonal[i]	 -= d;
 		_off_diagonal[i] += rot.sin()*(rot.cos()*w
-				  - 2*rot.sin()*_off_diagonal[i]);
+				  - 2.0*rot.sin()*_off_diagonal[i]);
 		if (i < n)
 		{
 		    x = _off_diagonal[i];
@@ -851,7 +858,7 @@ TriDiagonal<T>::diagonalize()
 
     for (int m = 0; m < dim(); m++)	// sort eigen values and eigen vectors
 	for (int n = m+1; n < dim(); n++)
-	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
+	    if (std::fabs(_diagonal[n]) > std::fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
 		for (int j = 0; j < dim(); j++)
@@ -866,19 +873,22 @@ TriDiagonal<T>::diagonalize()
 template <class T> bool
 TriDiagonal<T>::off_diagonal_is_zero(int n) const
 {
-    return (n == 0 ||
-	    _Ut.sigma_is_zero(n, fabs(_diagonal[n-1]) + fabs(_diagonal[n])));
+    return (n == 0 || _Ut.sigma_is_zero(n, std::fabs(_diagonal[n-1]) +
+					   std::fabs(_diagonal[n])));
 }
 
 template <class T> void
 TriDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 {
+    using namespace	std;
+    
     const double	g = (_diagonal[n] - _diagonal[n-1]) /
-			    (2*_off_diagonal[n]),
+			    (2.0*_off_diagonal[n]),
 			absg = fabs(g),
-			gg1 = (absg > 1.0 ? absg * sqrt(1.0 + 1.0/(absg*absg))
-					  : sqrt(1.0 + absg*absg)),
-			t = (g > 0 ? g + gg1 : g - gg1);
+			gg1 = (absg > 1.0 ?
+			       absg * sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
+			       sqrt(1.0 + absg*absg)),
+			t = (g > 0.0 ? g + gg1 : g - gg1);
     x = _diagonal[m] - _diagonal[n] - _off_diagonal[n]/t;
   //x = _diagonal[m];					// without shifting
     y = _off_diagonal[m+1];
@@ -909,14 +919,17 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
     {
 	_Dt.apply_from_right(_Dt, m);
 	_Et.apply_from_left(_Dt, m);
-
-	double	anorm = fabs(_diagonal[m]) + fabs(_off_diagonal[m]);
-	if (anorm > _anorm)
-	    _anorm = anorm;
     }
 
     _Dt.make_transformation();	// Accumulate right-hand transformation: V
     _Et.make_transformation();	// Accumulate left-hand transformation: U
+
+    for (int m = 0; m < _Et.dim(); ++m)
+    {
+	double	anorm = std::fabs(_diagonal[m]) + std::fabs(_off_diagonal[m]);
+	if (anorm > _anorm)
+	    _anorm = anorm;
+    }
 }
 
 template <class T> void
@@ -981,8 +994,7 @@ BiDiagonal<T>::diagonalize()
 		_Et.rotate_from_left(rotE);
 
 		if (i > m+1)
-		    _off_diagonal[i-1] = rotE.cos()*_off_diagonal[i-1]
-				       + rotE.sin()*y;
+		    _off_diagonal[i-1] = rotE.length();
 		T	tmp = _diagonal[i-1];
 		_diagonal[i-1]	 =  rotE.cos()*tmp
 				 +  rotE.sin()*_off_diagonal[i];
@@ -1000,7 +1012,7 @@ BiDiagonal<T>::diagonalize()
 
 		_Dt.rotate_from_left(rotD);
 
-		_diagonal[i-1] = _diagonal[i-1]*rotD.cos() + y*rotD.sin();
+		_diagonal[i-1] = rotD.length();
 		tmp = _off_diagonal[i];
 		_off_diagonal[i] =  tmp*rotD.cos() + _diagonal[i]*rotD.sin();
 		_diagonal[i]	 = -tmp*rotD.sin() + _diagonal[i]*rotD.cos();
@@ -1022,7 +1034,7 @@ BiDiagonal<T>::diagonalize()
 
     for (int m = 0; m < _Et.dim(); m++)	// sort singular values and vectors
 	for (int n = m+1; n < _Et.dim(); n++)
-	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
+	    if (std::fabs(_diagonal[n]) > std::fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
 		for (int j = 0; j < _Et.dim(); j++)
@@ -1068,21 +1080,24 @@ BiDiagonal<T>::off_diagonal_is_zero(int n) const
 template <class T> void
 BiDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 {
+    using namespace	std;
+    
     const double	g = ((_diagonal[n]     + _diagonal[n-1])*
 			     (_diagonal[n]     - _diagonal[n-1])+
 			     (_off_diagonal[n] + _off_diagonal[n-1])*
 			     (_off_diagonal[n] - _off_diagonal[n-1]))
-			  / (2*_diagonal[n-1]*_off_diagonal[n]),
+			  / (2.0*_diagonal[n-1]*_off_diagonal[n]),
       // Caution!! You have to ensure that _diagonal[n-1] != 0
       // as well as _off_diagonal[n].
 			absg = fabs(g),
-			gg1 = (absg > 1.0 ? absg * sqrt(1.0 + 1.0/(absg*absg))
-					  : sqrt(1.0 + absg*absg)),
-			t = (g > 0 ? g + gg1 : g - gg1);
-    x = (_diagonal[m] + _diagonal[n]) * (_diagonal[m] - _diagonal[n])
-      - _off_diagonal[n]*(_off_diagonal[n] + _diagonal[n-1]/t);
-  //x = _diagonal[m]*_diagonal[m];			// without shifting
-    y = _diagonal[m]*_off_diagonal[m+1];
+			gg1 = (absg > 1.0 ?
+			       absg * sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
+			       sqrt(1.0 + absg*absg)),
+			t = (g > 0.0 ? g + gg1 : g - gg1);
+    x = ((_diagonal[m] + _diagonal[n])*(_diagonal[m] - _diagonal[n]) -
+	 _off_diagonal[n]*(_off_diagonal[n] + _diagonal[n-1]/t)) / _diagonal[m];
+  //x = _diagonal[m];				// without shifting
+    y = _off_diagonal[m+1];
 }
 
 /************************************************************************
@@ -1097,6 +1112,7 @@ template <class S> S
 Minimization1<S>::minimize(S& x, S w) const
 {
 #define W	0.38197
+    using namespace	std;
 
     S	x1 = x, x2 = x + w, f1 = (*this)(x1), f2 = (*this)(x2);
     
