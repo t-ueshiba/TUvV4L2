@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.4 2002-08-12 01:24:46 ueshiba Exp $
+ *  $Id: Image++.h,v 1.5 2002-08-19 07:52:27 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -461,22 +461,36 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     
     Image&	operator = (double c)		{Array2<ImageLine<T> >::
 						 operator  =(c); return *this;}
-    std::istream&	restore(std::istream& in)		;
-    std::ostream&	save(std::ostream& out, Type type)const	;
-
-    virtual void	resize(u_int h, u_int w)		;
-    virtual void	resize(T* p, u_int h, u_int w)		;
+    std::istream&	restore(std::istream& in)			;
+    std::ostream&	save(std::ostream& out, Type type)	const	;
+    std::istream&	restoreData(std::istream& in, Type type)	;
+    std::ostream&	saveData(std::ostream& out, Type type)	const	;
+    virtual void	resize(u_int h, u_int w)			;
+    virtual void	resize(T* p, u_int h, u_int w)			;
     
   private:
     template <class S>
-    std::istream&	restoreRows(std::istream& in)		;
+    std::istream&	restoreRows(std::istream& in)			;
     template <class D>
-    std::ostream&	saveRows(std::ostream& out)	const	;
+    std::ostream&	saveRows(std::ostream& out)		const	;
 
-    virtual u_int	_width()			const	;
-    virtual u_int	_height()			const	;
+    virtual u_int	_width()				const	;
+    virtual u_int	_height()				const	;
 };
 
+template <class T> inline std::istream&
+Image<T>::restore(std::istream& in)
+{
+    return restoreData(in, restoreHeader(in));
+}
+
+template <class T> inline std::ostream&
+Image<T>::save(std::ostream& out, Type type) const
+{
+    saveHeader(out, type);
+    return saveData(out, type);
+}
+    
 template <> inline
 Image<YUV411>::Image(u_int w, u_int h)
     :Array2<ImageLine<TU::YUV411> >(h, w/2), ImageBase()
