@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraBase.cc,v 1.4 2002-12-18 05:46:12 ueshiba Exp $
+ *  $Id: CameraBase.cc,v 1.5 2003-02-27 09:09:52 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 
@@ -102,6 +102,12 @@ CameraBase::Intrinsic::operator ()(const Point2<double>& xc) const
     return xc;
 }
 
+Point2<double>
+CameraBase::Intrinsic::xd(const Point2<double>& xc) const
+{
+    return xc;
+}
+
 Matrix<double>
 CameraBase::Intrinsic::jacobianK(const Point2<double>& xc) const
 {
@@ -180,6 +186,42 @@ CameraBase::Intrinsic::d2() const
     return 0.0;
 }
 
+CameraBase::Intrinsic&
+CameraBase::Intrinsic::setFocalLength(double k)
+{
+    return *this;				// Do nothing.
+}
+
+CameraBase::Intrinsic&
+CameraBase::Intrinsic::setPrincipal(double u0, double v0)
+{
+    return *this;				// Do nothing.
+}
+
+CameraBase::Intrinsic&
+CameraBase::Intrinsic::setAspect(double aspect)
+{
+    return *this;				// Do nothing.
+}
+
+CameraBase::Intrinsic&
+CameraBase::Intrinsic::setSkew(double skew)
+{
+    return *this;				// Do nothing.
+}
+
+CameraBase::Intrinsic&
+CameraBase::Intrinsic::setIntrinsic(const Matrix<double>& K)
+{
+    return *this;				// Do nothing.
+}
+
+CameraBase::Intrinsic&
+CameraBase::Intrinsic::setDistortion(double d1, double d2)
+{
+    return *this;				// Do nothing.
+}
+	
 CameraBase::Intrinsic&
 CameraBase::Intrinsic::update(const Vector<double>& dp)
 {

@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithFocalLength.cc,v 1.3 2002-10-28 00:37:01 ueshiba Exp $
+ *  $Id: CameraWithFocalLength.cc,v 1.4 2003-02-27 09:09:52 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -7,7 +7,7 @@
 namespace TU
 {
 /************************************************************************
-*  class CameraWithFocalLength					*
+*  class CameraWithFocalLength						*
 ************************************************************************/
 CameraBase&
 CameraWithFocalLength::setProjection(const Matrix<double>& PP)
@@ -29,15 +29,15 @@ CameraWithFocalLength::setProjection(const Matrix<double>& PP)
     return *this;
 }
 
-/*
- *  private members
- */
 const CameraBase::Intrinsic&
 CameraWithFocalLength::intrinsic() const
 {
     return _intrinsic;
 }
 
+/*
+ *  private members
+ */
 CameraBase::Intrinsic&
 CameraWithFocalLength::intrinsic()
 {
@@ -123,7 +123,7 @@ CameraWithFocalLength::Intrinsic::k() const
     return _k;
 }
 
-CameraWithFocalLength::Intrinsic&
+CameraBase::Intrinsic&
 CameraWithFocalLength::Intrinsic::setFocalLength(double k)
 {
     _k = k;
