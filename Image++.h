@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.10 2004-01-26 04:44:31 ueshiba Exp $
+ *  $Id: Image++.h,v 1.11 2004-03-08 02:09:45 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -365,18 +365,33 @@ template <class T>
 class ImageLine : public Array<T>
 {
   public:
-    explicit ImageLine(u_int d=0)	:Array<T>(d)		{*this = 0;}
-    ImageLine(T* p, u_int d)		:Array<T>(p, d)		{}
+    explicit ImageLine(u_int d=0)
+        :Array<T>(d), _lmost(0), _rmost(d)		{*this = 0;}
+    ImageLine(T* p, u_int d)
+        :Array<T>(p, d), _lmost(0), _rmost(d)		{}
     ImageLine&		operator =(double c)
 			{
 			    Array<T>::operator =(c);
 			    return *this;
 			}
-    const YUV422*	fill(const YUV422* src)			;
-    const YUV411*	fill(const YUV411* src)			;
-    const T*		fill(const T* src)			;
+    const YUV422*	fill(const YUV422* src)		;
+    const YUV411*	fill(const YUV411* src)		;
+    const T*		fill(const T* src)		;
     template <class S>
-    const S*		fill(const S* src)			;
+    const S*		fill(const S* src)		;
+    int			lmost()			const	{return _lmost;}
+    int			rmost()			const	{return _rmost;}
+    void		setLimits(int l, int r)		{_lmost = l;
+							 _rmost = r;}
+    bool		valid(int u)		const	{return (u >= _lmost &&
+								 u <  _rmost);}
+	
+    bool		resize(u_int d)			;
+    void		resize(T* p, u_int d)		;
+
+  private:
+    int			_lmost;
+    int			_rmost;
 };
 
 template <class T> inline const T*
@@ -386,22 +401,53 @@ ImageLine<T>::fill(const T* src)
     return src + dim();
 }
 
+template <class T> inline bool
+ImageLine<T>::resize(u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    return Array<T>::resize(d);
+}
+
+template <class T> inline void
+ImageLine<T>::resize(T* p, u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    Array<T>::resize(p, d);
+}
+
 template <>
 class ImageLine<YUV422> : public Array<YUV422>
 {
   public:
-    explicit ImageLine(u_int d=0)	:Array<YUV422>(d)	{*this = 0;}
-    ImageLine(YUV422* p, u_int d)	:Array<YUV422>(p, d)	{}
+    explicit ImageLine(u_int d=0)
+	:Array<YUV422>(d), _lmost(0), _rmost(d)		{*this = 0;}
+    ImageLine(YUV422* p, u_int d)
+	:Array<YUV422>(p, d), _lmost(0), _rmost(d)	{}
     ImageLine&		operator =(double c)
 			{
 			    Array<YUV422>::operator =(c);
 			    return *this;
 			}
-    const YUV444*	fill(const YUV444* src)			;
-    const YUV422*	fill(const YUV422* src)			;
-    const YUV411*	fill(const YUV411* src)			;
+    const YUV444*	fill(const YUV444* src)		;
+    const YUV422*	fill(const YUV422* src)		;
+    const YUV411*	fill(const YUV411* src)		;
     template <class S>
-    const S*		fill(const S* src)			;
+    const S*		fill(const S* src)		;
+    int			lmost()			const	{return _lmost;}
+    int			rmost()			const	{return _rmost;}
+    void		setLimits(int l, int r)		{_lmost = l;
+							 _rmost = r;}
+    bool		valid(int u)		const	{return (u >= _lmost &&
+								 u <  _rmost);}
+	
+    bool		resize(u_int d)			;
+    void		resize(YUV422* p, u_int d)	;
+
+  private:
+    int			_lmost;
+    int			_rmost;
 };
 
 inline const YUV422*
@@ -411,22 +457,53 @@ ImageLine<YUV422>::fill(const YUV422* src)
     return src + dim();
 }
 
+inline bool
+ImageLine<YUV422>::resize(u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    return Array<YUV422>::resize(d);
+}
+
+inline void
+ImageLine<YUV422>::resize(YUV422* p, u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    Array<YUV422>::resize(p, d);
+}
+
 template <>
 class ImageLine<YUV411> : public Array<YUV411>
 {
   public:
-    explicit ImageLine(u_int d=0)	:Array<YUV411>(d)	{*this = 0;}
-    ImageLine(YUV411* p, u_int d)	:Array<YUV411>(p, d)	{}
+    explicit ImageLine(u_int d=0)
+	:Array<YUV411>(d), _lmost(0), _rmost(d)		{*this = 0;}
+    ImageLine(YUV411* p, u_int d)
+	:Array<YUV411>(p, d), _lmost(0), _rmost(d)	{}
     ImageLine&		operator =(double c)
 			{
 			    Array<YUV411>::operator =(c);
 			    return *this;
 			}
-    const YUV444*	fill(const YUV444* src)			;
-    const YUV422*	fill(const YUV422* src)			;
-    const YUV411*	fill(const YUV411* src)			;
+    const YUV444*	fill(const YUV444* src)		;
+    const YUV422*	fill(const YUV422* src)		;
+    const YUV411*	fill(const YUV411* src)		;
     template <class S>
-    const S*		fill(const S* src)			;
+    const S*		fill(const S* src)		;
+    int			lmost()			const	{return _lmost;}
+    int			rmost()			const	{return _rmost;}
+    void		setLimits(int l, int r)		{_lmost = l;
+							 _rmost = r;}
+    bool		valid(int u)		const	{return (u >= _lmost &&
+								 u <  _rmost);}
+	
+    bool		resize(u_int d)			;
+    void		resize(YUV411* p, u_int d)	;
+
+  private:
+    int			_lmost;
+    int			_rmost;
 };
 
 inline const YUV411*
@@ -434,6 +511,22 @@ ImageLine<YUV411>::fill(const YUV411* src)
 {
     memcpy((YUV411*)*this, src, dim() * sizeof(YUV411));
     return src + dim();
+}
+
+inline bool
+ImageLine<YUV411>::resize(u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    return Array<YUV411>::resize(d);
+}
+
+inline void
+ImageLine<YUV411>::resize(YUV411* p, u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    Array<YUV411>::resize(p, d);
 }
 
 /************************************************************************
@@ -495,7 +588,7 @@ Image<T>::save(std::ostream& out, Type type) const
 template <class T> inline void
 Image<T>::resize(u_int h, u_int w)
 {
-    _resize(h, w);
+    Array2<ImageLine<T> >::resize(h, w);
 }
 
 template <class T> inline void
