@@ -1,7 +1,8 @@
 /*
- *  $Id: TriggerGenerator.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.4 2002-07-25 12:03:39 ueshiba Exp $
  */
 #include <iomanip>
+#include <stdlib.h>
 #include "TU/Serial++.h"
 
 namespace TU
