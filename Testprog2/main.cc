@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2002-07-25 04:36:12 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2004-03-08 02:12:54 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
@@ -119,6 +119,6 @@ main(int argc, char* argv[])
     return 0;
 }
 
-#ifdef __GNUG__
+#if defined(__GNUG__) || defined(__INTEL_COMPILER)
 #  include "TU/Array++.cc"
 #endif
