@@ -1,14 +1,10 @@
 /*
- *  $Id: XDC.cc,v 1.3 2002-07-25 07:23:47 ueshiba Exp $
+ *  $Id: XDC.cc,v 1.4 2003-02-20 08:49:23 ueshiba Exp $
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
 #include <X11/XWDFile.h>
-#ifndef __APPLE__
-#  include <netinet/in.h>
-#else
-#  include <netinet/ip_compat.h>
-#endif
+#include <arpa/inet.h>
 
 namespace TU
 {
