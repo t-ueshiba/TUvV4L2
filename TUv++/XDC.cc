@@ -1,5 +1,5 @@
 /*
- *  $Id: XDC.cc,v 1.4 2003-02-20 08:49:23 ueshiba Exp $
+ *  $Id: XDC.cc,v 1.5 2004-07-15 20:18:12 ueshiba Exp $
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -148,6 +148,17 @@ XDC::setLayer(Layer layer)
 }
 
 DC&
+XDC::setThickness(u_int thickness)
+{
+    XGCValues       values;
+    XGetGCValues(_colormap.display(), _gc, GCLineWidth, &values);
+    values.line_width = thickness;
+    XChangeGC(_colormap.display(), _gc, GCLineWidth, &values);
+    
+    return *this;
+}
+
+DC&
 XDC::setForeground(const BGR& fg)
 {
     XSetForeground(_colormap.display(), _gc,
@@ -245,41 +256,19 @@ XDC::operator <<(const Point2<int>& p)
 	break;
 	
       case CROSS:
-      {
-	XGCValues       values;
-	XGetGCValues(_colormap.display(), _gc,
-		     GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle,
-		     &values);
-      //	set_lineWidth();
-      //	set_lineStyle(LineSolid);
 	XDrawLine(_colormap.display(), drawable(), _gc,
 		  log2devU(p[0] - PRADIUS), log2devV(p[1] - PRADIUS),
 		  log2devU(p[0] + PRADIUS), log2devV(p[1] + PRADIUS));
 	XDrawLine(_colormap.display(), drawable(), _gc,
 		  log2devU(p[0] - PRADIUS), log2devV(p[1] + PRADIUS),
 		  log2devU(p[0] + PRADIUS), log2devV(p[1] - PRADIUS));
-	XChangeGC(_colormap.display(), _gc,
-		  GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle,
-		  &values);
-      }
         break;
       
       case CIRCLE:
-      {
-	XGCValues       values;
-	XGetGCValues(_colormap.display(), _gc,
-		     GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle,
-		     &values);
-      //	set_lineWidth();
-      //	set_lineStyle(LineSolid);
 	XDrawArc(_colormap.display(), drawable(), _gc, 
 		 log2devU(p[0] - PRADIUS),  log2devV(p[1] - PRADIUS),
 		 log2devR(2*(int)PRADIUS + 1), log2devR(2*(int)PRADIUS + 1),
 		 0, 360 * 64);
-	XChangeGC(_colormap.display(), _gc,
-		  GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle,
-		  &values);
-      }
 	break;
     }
     
@@ -309,17 +298,8 @@ XDC::operator <<(const LineP2<double>& l)
 	q[1] = int(0.5 + ((offset()[0] - (int)width()) * l[0] - l[2]) / l[1]);
     }
 
-    XGCValues	values;
-    XGetGCValues(_colormap.display(), _gc,
-		 GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle,
-		 &values);
-  /*    set_lineWidth();
-    set_lineStyle(LineSolid);*/
     XDrawLine(_colormap.display(), drawable(), _gc,
 	      log2devU(p[0]), log2devV(p[1]), log2devU(q[0]), log2devV(q[1]));
-    XChangeGC(_colormap.display(), _gc,
-	      GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle,
-	      &values);
 
     return *this;
 }
@@ -600,6 +580,14 @@ XDC::putXImage() const
     XPutImage(_colormap.display(), drawable(), _gc, _ximage,
 	      0, 0, log2devR(offset()[0]), log2devR(offset()[1]),
 	      _ximage->width, _ximage->height);
+}
+
+u_int
+XDC::getThickness() const
+{
+    XGCValues       values;
+    XGetGCValues(_colormap.display(), _gc, GCLineWidth, &values);
+    return values.line_width;
 }
 
 u_int

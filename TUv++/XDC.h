@@ -1,5 +1,5 @@
 /*
- *  $Id: XDC.h,v 1.2 2002-07-25 02:38:13 ueshiba Exp $
+ *  $Id: XDC.h,v 1.3 2004-07-15 20:18:12 ueshiba Exp $
  */
 #ifndef __TUvXDC_h
 #define __TUvXDC_h
@@ -72,6 +72,7 @@ class XDC : public DC
     
   public:
     virtual DC&		setLayer(Layer layer)				;
+    virtual DC&		setThickness(u_int thickness)			;
     virtual DC&		setForeground(const BGR& fg)			;
     virtual DC&		setBackground(const BGR& bg)			;
     virtual DC&		setForeground(u_int fg)				;
@@ -111,6 +112,8 @@ class XDC : public DC
     virtual void	allocateXImage(int buffWidth, int buffHeight)	;
     virtual void	putXImage()				const	;
     
+    virtual u_int	getThickness()				const	;
+
   private:
     virtual u_int	realWidth()				const	;
     virtual u_int	realHeight()				const	;
