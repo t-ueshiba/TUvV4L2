@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.h,v 1.5 2002-08-12 02:37:50 ueshiba Exp $
+ *  $Id: Array++.h,v 1.6 2002-08-12 02:47:46 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -79,12 +79,9 @@ class Array
     bool		resize(u_int)			;
     void		resize(T*, u_int)		;
     void		check_dim(u_int)	const	;
-
-  private:
     std::istream&	get(std::istream&, int)		;
-
-    friend std::istream&	operator >><>(std::istream& in, Array<T>& a);
     
+  private:
     u_int	_d;		// dimension of array
     ET*		_p;		// pointer to buffer area
     u_int	_shr : 1;	// buffer area is shared with other object
@@ -152,12 +149,10 @@ class Array2 : public Array<T>
     std::ostream&	save(std::ostream&)		const	;
     void		resize(u_int, u_int)			;
     void		resize(ET*, u_int, u_int)		;
+    std::istream&	get(std::istream&, int, int, int)	;
     
   private:
     virtual void	set_rows()				;
-    std::istream&	get(std::istream&, int, int, int)	;
-    
-    friend std::istream&	operator >><>(std::istream& in, Array2<T>& a);
 
     u_int		_cols;			// # of columns (width)
     Array<ET>		_ary;
