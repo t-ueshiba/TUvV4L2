@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.inst.cc,v 1.4 2003-01-10 00:30:54 ueshiba Exp $
+ *  $Id: Image++.inst.cc,v 1.5 2003-02-07 05:14:45 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
@@ -29,6 +29,11 @@
 
 namespace TU
 {
+template class Array<ImageLine<u_char> >;
+template class Array<ImageLine<short> >;
+template class Array<ImageLine<float> >;
+template class Array<ImageLine<double> >;
+
 template class Image<u_char>;
 template class Image<short>;
 template class Image<float>;
