@@ -1,5 +1,5 @@
 /*
- *  $Id: mtest.cc,v 1.1 2002-07-25 04:36:11 ueshiba Exp $
+ *  $Id: mtest.cc,v 1.2 2002-08-12 02:38:23 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <exception>
@@ -210,7 +210,7 @@ main()
 	    break;
 	}
 	}
-	catch (exception& err)
+	catch (std::exception& err)
 	{
 	    cerr << err.what() << endl;
 	}
