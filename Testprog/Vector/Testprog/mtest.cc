@@ -1,5 +1,5 @@
 /*
- *  $Id: mtest.cc,v 1.2 2002-08-12 02:38:23 ueshiba Exp $
+ *  $Id: mtest.cc,v 1.3 2004-04-28 01:52:32 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <exception>
@@ -90,10 +90,11 @@ main()
 	  case 'G':
 	    cerr << " A >> ";
 	    cin >> A;
-	    B = A.pinv(CNDNUM);
+	    B = A.pinv();
 	    cout << "--- A ---\n"		<< A
 		 << "--- A.pinv(...) --\n"	<< B
-		 << "--- A * A.pinv(...) ---\n" << A * B << endl;
+		 << "--- A * A.pinv(...) ---\n" << A * B
+		 << "--- A.pinv(...) * A ---\n" << B * A << endl;
 	    break;
 
 	  case 'A':

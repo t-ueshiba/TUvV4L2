@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.9 2003-07-18 04:40:12 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.10 2004-04-28 01:52:32 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -114,8 +114,6 @@ operator <<(std::ostream& out, const Vector<T>& v)
 /************************************************************************
 *  class Matrix<T>							*
 ************************************************************************/
-const double	CNDNUM = 1.0e4;		// default condition number for pinv
-
 template <class T>
 class Matrix : public Array2<Vector<T> >
 {
@@ -155,7 +153,7 @@ class Matrix : public Array2<Vector<T> >
     T		det(u_int, u_int)		const	;
     T		trace()				const	;
     Matrix	adj()				const	;
-    Matrix	pinv(double)			const	;
+    Matrix	pinv(double cndnum=1.0e5)	const	;
     Matrix	eigen(Vector<T>&)		const	;
     Matrix	geigen(const Matrix<T>&,
 		       Vector<T>&)		const	;
@@ -367,7 +365,7 @@ class BiDiagonal
     BiDiagonal(const Matrix<T>&)		;
 
     u_int		nrow()		const	{return _Vt.nrow();}
-    u_int		ncol()		const	{return _Ut.ncol();}
+    u_int		ncol()		const	{return _Ut.nrow();}
     const Matrix<T>&	Ut()		const	{return _Ut;}
     const Matrix<T>&	Vt()		const	{return _Vt;}
     const Vector<T>&	diagonal()	const	{return _Dt.sigma();}
