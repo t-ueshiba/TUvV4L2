@@ -1,5 +1,5 @@
 /*
- *  $Id: Object++.h,v 1.3 2002-07-25 18:34:04 ueshiba Exp $
+ *  $Id: Object++.h,v 1.4 2002-07-26 08:56:04 ueshiba Exp $
  */
 #ifndef __TUObjectPP_h
 #define __TUObjectPP_h
@@ -17,7 +17,7 @@ namespace TU
 ************************************************************************/
 class				Object;
 typedef Object* Object::*	Mbrp;
-const Mbrp			MbrpEnd = 0;
+Mbrp const			MbrpEnd = 0;
     
 class PtrBase
 {
@@ -94,15 +94,17 @@ class Object : private ObjectHeader
 
       public:
 	Desc(u_short, u_short, Pftype, ...)	;
+	~Desc()					;
 	u_short		id()		const	{return _id;}
 	const Mbrp*	mbrp()		const	{return _p;}
-	static Object*	newObject(u_short id)	{return _map[id]->_pf();}
+	static Object*	newObject(u_short id)	{return (*_map)[id]->_pf();}
 
       private:    
 	u_int		nMbrp()		const	;
 	bool		setMbrp()		;
     
-	static Map	_map;
+	static u_int	_ndescs;		// # of descs
+	static Map*	_map;			// id -> desc looking-up
     
 	const u_short	_id;			// class ID of mine
 	const u_short	_bid;			// class ID of base

@@ -1,7 +1,7 @@
 /*
- *  $Id: Object.cc,v 1.2 2002-07-25 02:38:02 ueshiba Exp $
+ *  $Id: Object.cc,v 1.3 2002-07-26 08:56:04 ueshiba Exp $
  */
-#include "TU/Object++_.h"
+#include "Object++_.h"
 #include <stdexcept>
 
 namespace TU

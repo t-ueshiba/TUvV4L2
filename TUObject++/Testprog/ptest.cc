@@ -1,5 +1,5 @@
 /*
- *  $Id: ptest.cc,v 1.3 2002-07-25 18:34:04 ueshiba Exp $
+ *  $Id: ptest.cc,v 1.4 2002-07-26 08:56:04 ueshiba Exp $
  */
 #include "TU/Object++.h"
 #ifdef __GNUG__
@@ -8,13 +8,12 @@
 
 namespace TU
 {
-/*
- *  class Int
- */
 const unsigned	id_Int  = 256;
 const unsigned	id_Cons = 257;
 
-
+/*
+ *  class Int
+ */
 class Int : public Object
 {
   public:

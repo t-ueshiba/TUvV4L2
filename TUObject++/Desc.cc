@@ -1,7 +1,7 @@
 /*
- *  $Id: Desc.cc,v 1.3 2002-07-25 18:34:04 ueshiba Exp $
+ *  $Id: Desc.cc,v 1.4 2002-07-26 08:56:04 ueshiba Exp $
  */
-#include "TU/Object++_.h"
+#include "Object++_.h"
 #include <stdarg.h>
 
 namespace TU
@@ -17,7 +17,9 @@ Object::Desc::Desc(u_short id, u_short bid, Pftype ctor, ...)
     std::cerr << "Desc::Desc(): myId = " << _id << ", baseId = " << _bid
 	      << std::endl;
 #endif
-    _map[_id] = this;
+    if (_ndescs++ == 0)
+	_map = new Map;
+    (*_map)[_id] = this;
 
     u_int       i = 0;
     va_list     args;
@@ -25,16 +27,16 @@ Object::Desc::Desc(u_short id, u_short bid, Pftype ctor, ...)
     for (Mbrp q; (q = va_arg(args, Mbrp)) != 0; )
 	++i;
     va_end(args);
+#ifdef TUObjectPP_DEBUG
+    std::cerr << "  " << i << " members found..." << std::endl;
+#endif
     _p = new Mbrp[i+1];
     va_start(args, ctor);
     for (i = 0; (_p[i] = va_arg(args, Mbrp)) != 0; )
 	++i;
     va_end(args);
 
-#ifdef TUObjectPP_DEBUG
-    std::cerr << "  " << i << " members found..." << std::endl;
-#endif
-    for (Map::iterator i = _map.begin(); i != _map.end(); ++i)
+    for (Map::iterator i = _map->begin(); i != _map->end(); ++i)
     {
 #ifdef TUObjectPP_DEBUG
         std::cerr << "  setting pointers to member functions of class "
@@ -42,6 +44,13 @@ Object::Desc::Desc(u_short id, u_short bid, Pftype ctor, ...)
 #endif
 	(*i).second->setMbrp();
     }
+}
+
+Object::Desc::~Desc()
+{
+    delete [] _p;
+    if (--_ndescs == 0)
+	delete _map;
 }
 
 u_int
@@ -58,7 +67,7 @@ Object::Desc::setMbrp()
 {
     if (!_init)		// Not initialized yet?
     {
-	Desc*	base = (_map.find(_bid) == _map.end() ? 0 : _map[_bid]);
+	Desc*	base = (_map->find(_bid) == _map->end() ? 0 : (*_map)[_bid]);
 
 	if (base != 0 && base->setMbrp() == true)
 	{

@@ -1,8 +1,8 @@
 /*
- *  $Id: TUObject+.sa.cc,v 1.2 2002-07-25 02:38:02 ueshiba Exp $
+ *  $Id: TUObject+.sa.cc,v 1.3 2002-07-26 08:56:04 ueshiba Exp $
  */
 
-#include "TU/Object++_.h"
+#include "Object++_.h"
 
 namespace TU
 {
@@ -11,7 +11,8 @@ PtrBase*		PtrBase::_root = 0;	// root of the all objects
 Page::Root		Page::_root;		// root of page list
 Page::Cell		Page::Cell::_head[];
 
-Object::Desc::Map	Object::Desc::_map;
+u_int			Object::Desc::_ndescs = 0;
+Object::Desc::Map*	Object::Desc::_map = 0;
 SaveMap::Map		SaveMap::_map;
 u_long			SaveMap::_maxID = 0;	// maxID of save table
 RestoreMap::Map		RestoreMap::_map;
