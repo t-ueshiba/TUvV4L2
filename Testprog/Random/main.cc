@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2002-07-25 04:36:10 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2002-09-02 02:43:44 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iostream>
@@ -21,13 +21,13 @@ main(int argc, char* argv[])
     Random	random;
     for (int i = 0; i < n; ++i)
     {
-	double	val = random.gaussian();
+	double	val = random.gaussian48();
 	int	index = floor(10.0*val) + m/2;
 	if (index >= 0 && index < m)
 	    ++histogram[index];
     }
     for (int i = 0; i < m; ++i)
-	cout << 0.1 * (i - m/2) << ' ' << histogram[i] << endl;
+	cout << 0.1 * (i - m/2) << '\t' << histogram[i] << endl;
     
     return 0;
     

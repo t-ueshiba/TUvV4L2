@@ -1,10 +1,14 @@
 /*
- *  $Id: Random.cc,v 1.3 2002-07-25 11:53:22 ueshiba Exp $
+ *  $Id: Random.cc,v 1.4 2002-09-02 02:43:44 ueshiba Exp $
  */
 #include <time.h>
 #include <math.h>
+#include <stdlib.h>
 #include "TU/Random.h"
 #include <stdexcept>
+#ifdef __APPLE__
+#  include <limits.h>
+#endif
 
 namespace TU
 {
@@ -80,7 +84,7 @@ double
 Random::uniform48()
 {
 #ifdef __APPLE__
-    return random();
+    return double(random()) / double(LONG_MAX);
 #else
     return drand48();
 #endif
