@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.9 2003-07-18 02:26:19 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.10 2003-07-18 04:40:12 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -218,7 +218,7 @@ Matrix<T>::pinv(double cndnum) const
     Matrix<T>		Ut(svd.Ut()(0, 0, svd.nrow(), svd.ncol()));
 
     for (int i = 0; i < svd.nrow(); ++i)
-	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
+	if (fabs(svd[i]) * cndnum > fabs(svd[0]))
 	    Ut[i] /= svd[i];
 	else
 	    Ut[i] = 0.0;
@@ -261,7 +261,7 @@ Matrix<T>::cholesky() const
 	    throw std::runtime_error("TU::Matrix<T>::cholesky(): not positive definite matrix!!");
 	for (int j = 0; j < i; ++j)
 	    Lt[i][j] = 0.0;
-	Lt[i][i] = d = std::sqrt(d);
+	Lt[i][i] = d = sqrt(d);
 	for (int j = i + 1; j < ncol(); ++j)
 	    Lt[i][j] /= d;
 	for (int j = i + 1; j < nrow(); ++j)
@@ -279,7 +279,7 @@ Matrix<T>::normalize()
     
     for (int i = 0; i < nrow(); ++i)
 	sum += (*this)[i] * (*this)[i];
-    return *this /= std::sqrt(sum);
+    return *this /= sqrt(sum);
 }
 
 template <class T> Matrix<T>&
@@ -369,7 +369,7 @@ Matrix<T>::rot2axis(double& c, double& s) const
   // Compute cosine and sine of rotation angle.
     const double	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
     c = (trace - 1.0) / 2.0;
-    s = std::sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
+    s = sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
 
   // Compute rotation axis.
     Vector<T>	n(3);
@@ -391,14 +391,14 @@ Matrix<T>::rot2axis() const
     axis[0] = ((*this)[1][2] - (*this)[2][1]) * 0.5;
     axis[1] = ((*this)[2][0] - (*this)[0][2]) * 0.5;
     axis[2] = ((*this)[0][1] - (*this)[1][0]) * 0.5;
-    const double	s = std::sqrt(axis.square());
+    const double	s = sqrt(axis.square());
     if (s + 1.0 == 1.0)		// s << 1 ?
 	return axis;
     const double	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
     if (trace > 1.0)		// cos > 0 ?
-	return  std::asin(s) / s * axis;
+	return  asin(s) / s * axis;
     else
-	return -std::asin(s) / s * axis;
+	return -asin(s) / s * axis;
 }
 
 template <class T> Matrix<T>
@@ -427,7 +427,7 @@ Matrix<T>::Rt(const Vector<T>& axis)
 	return I(3);
     else
     {
-	double	c = std::cos(theta), s = std::sin(theta);
+	double	c = cos(theta), s = sin(theta);
 	return Rt(axis / theta, c, s);
     }
 }
@@ -523,7 +523,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 
 	for (int i = 0; i < nrow(); i++)
 	{
-	    const double tmp = std::fabs((*this)[i][j]);
+	    const double tmp = fabs((*this)[i][j]);
 	    if (tmp > max)
 		max = tmp;
 	}
@@ -546,7 +546,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 	    T& sum = (*this)[i][j];
 	    for (int k = 0; k < i; k++)
 		sum -= (*this)[i][k] * (*this)[k][j];
-	    const double tmp = std::fabs(sum) * scale[j];
+	    const double tmp = fabs(sum) * scale[j];
 	    if (tmp >= max)
 	    {
 		max  = tmp;
@@ -765,7 +765,7 @@ Householder<T>::make_transformation()
 template <class T> bool
 Householder<T>::sigma_is_zero(int m, T comp) const
 {
-    return (T(std::fabs(_sigma[m])) + comp == comp);
+    return (T(fabs(_sigma[m])) + comp == comp);
 }
 
 /************************************************************************
@@ -858,7 +858,7 @@ TriDiagonal<T>::diagonalize()
 
     for (int m = 0; m < dim(); m++)	// sort eigen values and eigen vectors
 	for (int n = m+1; n < dim(); n++)
-	    if (std::fabs(_diagonal[n]) > std::fabs(_diagonal[m]))
+	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
 		for (int j = 0; j < dim(); j++)
@@ -873,8 +873,8 @@ TriDiagonal<T>::diagonalize()
 template <class T> bool
 TriDiagonal<T>::off_diagonal_is_zero(int n) const
 {
-    return (n == 0 || _Ut.sigma_is_zero(n, std::fabs(_diagonal[n-1]) +
-					   std::fabs(_diagonal[n])));
+    return (n == 0 || _Ut.sigma_is_zero(n, fabs(_diagonal[n-1]) +
+					   fabs(_diagonal[n])));
 }
 
 template <class T> void
@@ -926,7 +926,7 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
 
     for (int m = 0; m < _Et.dim(); ++m)
     {
-	double	anorm = std::fabs(_diagonal[m]) + std::fabs(_off_diagonal[m]);
+	double	anorm = fabs(_diagonal[m]) + fabs(_off_diagonal[m]);
 	if (anorm > _anorm)
 	    _anorm = anorm;
     }
@@ -1034,7 +1034,7 @@ BiDiagonal<T>::diagonalize()
 
     for (int m = 0; m < _Et.dim(); m++)	// sort singular values and vectors
 	for (int n = m+1; n < _Et.dim(); n++)
-	    if (std::fabs(_diagonal[n]) > std::fabs(_diagonal[m]))
+	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
 		for (int j = 0; j < _Et.dim(); j++)
