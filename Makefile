@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.21 2004-06-17 00:28:04 ueshiba Exp $
+#  $Id: Makefile,v 1.22 2004-10-15 05:33:36 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,8 +14,8 @@ NAME		= TUTools++
 CPPFLAGS	= #-DTUVectorPP_DEBUG -DTUBidiagonal_DEBUG #-DHAVE_CONFIG_H
 CFLAGS		= -O -g
 ifeq ($(CCC), icc)
-  CCFLAGS	= -O3 -tpp7 -xW -parallel
-#  CCFLAGS	= -O3 -parallel
+#  CCFLAGS	= -O3 -tpp7 -xW -parallel
+  CCFLAGS	= -O3 -parallel
 #  CCFLAGS	= -g
 else
   CCFLAGS	= -O -g
@@ -28,13 +28,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /usr/local/VVV/include/epbm.h \
-		/usr/local/VVV/include/vvvconf.h \
-		/usr/local/VVV/include/vvverror.h \
-		/usr/local/VVV/include/vvverrorcode.h \
-		/usr/local/VVV/include/vvvsize.h \
-		/usr/local/VVV/include/vvvstd.h \
-		TU/Allocator++.h \
+EXTHDRS		= TU/Allocator++.h \
 		TU/Array++.cc \
 		TU/Bezier++.h \
 		TU/BlockMatrix++.cc \
@@ -146,7 +140,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.21 $	|		\
+REV		= $(shell echo $Revision: 1.22 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -192,11 +186,7 @@ Image++.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Image++.cc TU/Image++.h TU/TU/TU/Vector++.h
 ImageBase.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/Manip.h TU/TU/Geometry++.h \
-	/usr/local/VVV/include/epbm.h /usr/local/VVV/include/vvvstd.h \
-	/usr/local/VVV/include/vvvconf.h /usr/local/VVV/include/vvvsize.h \
-	/usr/local/VVV/include/vvverror.h \
-	/usr/local/VVV/include/vvverrorcode.h
+	TU/TU/TU/types.h TU/Manip.h TU/TU/Geometry++.h
 ImageLine.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 List++.o: TU/TU/List++.h
