@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.4 2002-08-12 02:38:23 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2002-10-28 00:37:01 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -12,7 +12,7 @@ LIBS		= -lTUTools++
 
 CPPFLAGS	= -g
 CFLAGS		= -g
-CCFLAGS		= 
+CCFLAGS		=
 LDFLAGS		= -L$(LIBDIR)
 
 LINKER		= $(CCC)
@@ -28,7 +28,7 @@ OBJS		= mtest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -40,5 +40,5 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-mtest.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+mtest.o: /Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h

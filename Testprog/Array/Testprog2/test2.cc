@@ -1,5 +1,17 @@
 #include "TU/Array++.h"
 
+namespace TU
+{
+template <class T> std::ostream&
+operator <<(std::ostream& out , const Array2<T>& a)
+{
+    for (int i = 0; i < a.dim(); ++i)
+	out << a[i];
+    return out;
+}
+	
+}
+
 main()
 {
     using namespace	std;

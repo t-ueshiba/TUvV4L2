@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithFocalLength.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: CameraWithFocalLength.cc,v 1.3 2002-10-28 00:37:01 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -71,6 +71,12 @@ CameraWithFocalLength::Intrinsic::jacobianXC(const Point2<double>& xc) const
     return J.diag(_k);
 }
     
+Point2<double>
+CameraWithFocalLength::Intrinsic::xc(const Point2<double>& u) const
+{
+    return Point2<double>(u[0] / _k, u[1] / _k);
+}
+
 Matrix<double>
 CameraWithFocalLength::Intrinsic::K() const
 {
