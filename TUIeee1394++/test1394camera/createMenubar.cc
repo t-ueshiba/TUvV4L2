@@ -1,5 +1,5 @@
 /*
- *  $Id: createMenubar.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: createMenubar.cc,v 1.2 2002-08-01 05:04:02 ueshiba Exp $
  */
 #include "My1394Camera.h"
 #include <iomanip>
@@ -12,51 +12,51 @@ namespace TU
 /*!
   カメラがサポートする画像フォーマットとその名称．
 */
-struct Format
+struct MyFormat
 {
     const Ieee1394Camera::Format	format;		//!< 画像フォーマット
     const char* const			name;		//!< その名称
     
 };
-static const Format	format[] =
+static const MyFormat	format[] =
 {
-    {Ieee1394Camera::Format_0_0, "160x120-YUV(4:4:4)"},
-    {Ieee1394Camera::Format_0_1, "320x240-YUV(4:2:2)"},
-    {Ieee1394Camera::Format_0_2, "640x480-YUV(4:1:1)"},
-    {Ieee1394Camera::Format_0_3, "640x480-YUV(4:2:2)"},
-    {Ieee1394Camera::Format_0_4, "640x480-RGB"},
-    {Ieee1394Camera::Format_0_5, "640x480-Y(mono)"},
-    {Ieee1394Camera::Format_1_0, "800x600-YUV(4:2:2)"},
-    {Ieee1394Camera::Format_1_1, "800x600-RGB"},
-    {Ieee1394Camera::Format_1_2, "800x600-Y(mono)"},
-    {Ieee1394Camera::Format_1_3, "1024x768-YUV(4:2:2)"},
-    {Ieee1394Camera::Format_1_4, "1024x768-RGB"},
-    {Ieee1394Camera::Format_1_5, "1024x768-Y(mono)"},
-    {Ieee1394Camera::Format_2_0, "1280x960-YUV(4:2:2)"},
-    {Ieee1394Camera::Format_2_1, "1280x960-RGB"},
-    {Ieee1394Camera::Format_2_2, "1280x960-Y(mono)"},
-    {Ieee1394Camera::Format_2_3, "1600x1200-YUV(4:2:2)"},
-    {Ieee1394Camera::Format_2_4, "1600x1200-RGB"},
-    {Ieee1394Camera::Format_2_5, "1600x1200-Y(mono)"}
+    {Ieee1394Camera::YUV444_160x120,   "160x120-YUV(4:4:4)"},
+    {Ieee1394Camera::YUV422_320x240,   "320x240-YUV(4:2:2)"},
+    {Ieee1394Camera::YUV411_640x480,   "640x480-YUV(4:1:1)"},
+    {Ieee1394Camera::YUV422_640x480,   "640x480-YUV(4:2:2)"},
+    {Ieee1394Camera::RGB24_640x480,    "640x480-RGB"},
+    {Ieee1394Camera::MONO8_640x480,    "640x480-Y(mono)"},
+    {Ieee1394Camera::YUV422_800x600,   "800x600-YUV(4:2:2)"},
+    {Ieee1394Camera::RGB24_800x600,    "800x600-RGB"},
+    {Ieee1394Camera::MONO8_800x600,    "800x600-Y(mono)"},
+    {Ieee1394Camera::YUV422_1024x768,  "1024x768-YUV(4:2:2)"},
+    {Ieee1394Camera::RGB24_1024x768,   "1024x768-RGB"},
+    {Ieee1394Camera::MONO8_1024x768,   "1024x768-Y(mono)"},
+    {Ieee1394Camera::YUV422_1280x960,  "1280x960-YUV(4:2:2)"},
+    {Ieee1394Camera::RGB24_1280x960,   "1280x960-RGB"},
+    {Ieee1394Camera::MONO8_1280x960,   "1280x960-Y(mono)"},
+    {Ieee1394Camera::YUV422_1600x1200, "1600x1200-YUV(4:2:2)"},
+    {Ieee1394Camera::RGB24_1600x1200,  "1600x1200-RGB"},
+    {Ieee1394Camera::MONO8_1600x1200,  "1600x1200-Y(mono)"}
 };
 static const int	NFORMATS = sizeof(format)/sizeof(format[0]);
 
 /*!
   カメラがサポートするフレームレートとその名称．
 */
-struct FrameRate
+struct MyFrameRate
 {
     const Ieee1394Camera::FrameRate	frameRate;	//!< フレームレート
     const char* const			name;		//!< その名称
 };
-static const FrameRate	frameRate[] =
+static const MyFrameRate	frameRate[] =
 {
-    {Ieee1394Camera::FrameRate_0, "1.875fps"},
-    {Ieee1394Camera::FrameRate_1, "3.75fps"},
-    {Ieee1394Camera::FrameRate_2, "7.5fps"},
-    {Ieee1394Camera::FrameRate_3, "15fps"},
-    {Ieee1394Camera::FrameRate_4, "30fps"},
-    {Ieee1394Camera::FrameRate_5, "60fps"}
+    {Ieee1394Camera::FrameRate_1_875, "1.875fps"},
+    {Ieee1394Camera::FrameRate_3_75,  "3.75fps"},
+    {Ieee1394Camera::FrameRate_7_5,   "7.5fps"},
+    {Ieee1394Camera::FrameRate_15,    "15fps"},
+    {Ieee1394Camera::FrameRate_30,    "30fps"},
+    {Ieee1394Camera::FrameRate_60,    "60fps"}
 };
 static const int	NRATES=sizeof(frameRate)/sizeof(frameRate[0]);
 
@@ -119,13 +119,13 @@ operator <<(ostream& out, const Ieee1394Camera& camera)
 		    
     for (int i = 0; i < nfeatures; ++i)
     {
-	u_int	inq = camera.inquireFeature(feature[i].feature);
-	if ((inq & Ieee1394Camera::Presence_Inq) &&
-	    (inq & Ieee1394Camera::Manual_Inq))
+	u_int	inq = camera.inquireFeatureFunction(feature[i].feature);
+	if ((inq & Ieee1394Camera::Presence) &&
+	    (inq & Ieee1394Camera::Manual))
 	{
 	    out << ' ' << feature[i].name << ' ';
 
-	    if ((inq & Ieee1394Camera::Auto_Inq) && 
+	    if ((inq & Ieee1394Camera::Auto) && 
 		camera.isAuto(feature[i].feature))
 		out << -1;
 	    else if (feature[i].feature == Ieee1394Camera::WHITE_BALANCE)
@@ -209,12 +209,12 @@ createMenubar(My1394Camera& camera)
     for (int i = 0; i < NFORMATS; ++i)	// 全てのフォーマットについて...
     {
       // このフォーマットがサポートされているか調べる．
-	u_int		inq = camera.inquireFormat(format[i].format);
+	u_int		inq = camera.inquireFrameRate(format[i].format);
 	GtkWidget*	submenu = 0;
 	for (int j = 0; j < NRATES; ++j) // 全てのフレームレートについて...
 	{
 	  // このフレームレートがサポートされているか調べる．
-	    if (inq & (u_int(Ieee1394Camera::FrameRate_0_Inq) >> j))
+	    if (inq & frameRate[j].frameRate)
 	    {
 	      // フレームレートを指定するためのサブメニューを作る．
 		if (submenu == 0)

@@ -1,5 +1,5 @@
 /*
- *  $Id: createCommands.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: createCommands.cc,v 1.2 2002-08-01 05:04:02 ueshiba Exp $
  */
 #include "My1394Camera.h"
 
@@ -11,12 +11,12 @@ namespace TU
 /*!
   カメラがサポートする機能とその名称．
 */
-struct Feature
+struct MyFeature
 {
     const Ieee1394Camera::Feature	feature;	//!< カメラの機能
     const char* const			name;		//!< その名称
 };
-static const Feature	feature[] =
+static const MyFeature	feature[] =
 {
     {Ieee1394Camera::BRIGHTNESS,	"Brightness:"},
     {Ieee1394Camera::AUTO_EXPOSURE,	"Auto exposure:"},
@@ -195,12 +195,12 @@ createCommands(My1394Camera& camera)
     u_int	y = 1;
     for (int i = 0; i < NFEATURES; ++i)
     {
-	u_int	inq = camera.inquireFeature(feature[i].feature);
-	if (inq & Ieee1394Camera::Presence_Inq)  // この機能が存在？
+	u_int	inq = camera.inquireFeatureFunction(feature[i].feature);
+	if (inq & Ieee1394Camera::Presence)  // この機能が存在？
 	{
 	    u_int	x = 2;
 	    
-	    if (inq & Ieee1394Camera::OnOff_Inq)  // on/off操作が可能？
+	    if (inq & Ieee1394Camera::OnOff)  // on/off操作が可能？
 	    {
 	      // on/offを切り替えるtoggle buttonを生成．
 		GtkWidget* toggle = gtk_toggle_button_new_with_label("On");
@@ -219,9 +219,9 @@ createCommands(My1394Camera& camera)
 		++x;
 	    }
 
-	    if (inq & Ieee1394Camera::Manual_Inq)  // manual操作が可能？
+	    if (inq & Ieee1394Camera::Manual)  // manual操作が可能？
 	    {
-		if (inq & Ieee1394Camera::Auto_Inq)  // 自動設定が可能？
+		if (inq & Ieee1394Camera::Auto)  // 自動設定が可能？
 		{
 		  // manual/autoを切り替えるtoggle buttonを生成．
 		    GtkWidget*	toggle
