@@ -1,5 +1,5 @@
 /*
- *  $Id: ptest.cc,v 1.2 2002-07-25 07:21:06 ueshiba Exp $
+ *  $Id: ptest.cc,v 1.3 2002-07-25 18:34:04 ueshiba Exp $
  */
 #include "TU/Object++.h"
 #ifdef __GNUG__
@@ -38,13 +38,13 @@ class Int : public Object
     DECLARE_CONSTRUCTORS(Int)
 };
 
-const Object::Desc	Int::_desc(id_Int, 0, Int::newObject, 0);
+const Object::Desc	Int::_desc(id_Int, 0, Int::newObject, MbrpEnd);
 template <>
 const Object::Desc	Cons<Int>::_desc(id_Cons, 0,
-					   Cons<Int>::newObject,
-					   &Cons<Int>::_ca,
-					   &Cons<Int>::_cd,
-					   0);
+					 Cons<Int>::newObject,
+					 &Cons<Int>::_ca,
+					 &Cons<Int>::_cd,
+					 MbrpEnd);
 
 /*
  *  Output functions
@@ -93,7 +93,7 @@ sub()
 	list = list->cons(Int::newInt(n));
 	cout << "Current:\t" << list << endl;
     }
-    
+
     list = list->append(list);
     cout << "Append:\t" << list << endl;
     

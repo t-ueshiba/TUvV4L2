@@ -1,5 +1,5 @@
 /*
- *  $Id: Object++.h,v 1.2 2002-07-25 02:38:02 ueshiba Exp $
+ *  $Id: Object++.h,v 1.3 2002-07-25 18:34:04 ueshiba Exp $
  */
 #ifndef __TUObjectPP_h
 #define __TUObjectPP_h
@@ -17,7 +17,8 @@ namespace TU
 ************************************************************************/
 class				Object;
 typedef Object* Object::*	Mbrp;
-
+const Mbrp			MbrpEnd = 0;
+    
 class PtrBase
 {
   public:

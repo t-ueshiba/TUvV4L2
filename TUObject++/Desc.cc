@@ -1,5 +1,5 @@
 /*
- *  $Id: Desc.cc,v 1.2 2002-07-25 02:38:02 ueshiba Exp $
+ *  $Id: Desc.cc,v 1.3 2002-07-25 18:34:04 ueshiba Exp $
  */
 #include "TU/Object++_.h"
 #include <stdarg.h>
@@ -13,6 +13,10 @@ namespace TU
 Object::Desc::Desc(u_short id, u_short bid, Pftype ctor, ...)
     :_id(id), _bid(bid), _pf(ctor), _p(0), _init(_bid == 0)
 {
+#ifdef TUObjectPP_DEBUG
+    std::cerr << "Desc::Desc(): myId = " << _id << ", baseId = " << _bid
+	      << std::endl;
+#endif
     _map[_id] = this;
 
     u_int       i = 0;
@@ -28,8 +32,7 @@ Object::Desc::Desc(u_short id, u_short bid, Pftype ctor, ...)
     va_end(args);
 
 #ifdef TUObjectPP_DEBUG
-    std::cerr << "Desc::Desc(): myId = " << _id << ", baseId = " << _bid
-	      << std::endl;
+    std::cerr << "  " << i << " members found..." << std::endl;
 #endif
     for (Map::iterator i = _map.begin(); i != _map.end(); ++i)
     {
