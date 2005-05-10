@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.23 2005-05-10 02:51:15 ueshiba Exp $
+#  $Id: Makefile,v 1.24 2005-05-10 05:20:25 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,15 +11,13 @@ INCDIRS		= -I$(INCDIR)
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
-CFLAGS		= -O
-CCFLAGS		= -O
-LDFLAGS		=
-LINKER		= $(CCC)
-ifeq ($(CCC), icc)
-  CCFLAGS	= -cxxlib-icc -no-gcc -O3 -parallel
-  LDFLAGS      += -cxxlib-icc
-  LINKER	= icpc
+CFLAGS		= -O -g
+CCFLAGS		= -O -g
+ifeq ($(CCC), icpc)
+  CCFLAGS	= -O3 -parallel
 endif
+LDFLAGS		= $(CCFLAGS)
+LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
@@ -137,7 +135,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.23 $	|		\
+REV		= $(shell echo $Revision: 1.24 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

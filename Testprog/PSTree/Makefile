@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.2 2002-07-26 08:59:31 ueshiba Exp $
+#  $Id: Makefile,v 1.3 2005-05-10 05:20:25 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -21,13 +21,17 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /Users/ueshiba/include/TU/Array++.h \
-		/Users/ueshiba/include/TU/Geometry++.h \
-		/Users/ueshiba/include/TU/Heap++.h \
-		/Users/ueshiba/include/TU/List++.h \
-		/Users/ueshiba/include/TU/PSTree++.h \
-		/Users/ueshiba/include/TU/Vector++.h \
-		/Users/ueshiba/include/TU/types.h
+EXTHDRS		= /home/ueshiba/include/TU/Array++.cc \
+		/home/ueshiba/include/TU/Array++.h \
+		/home/ueshiba/include/TU/Geometry++.h \
+		/home/ueshiba/include/TU/Heap++.cc \
+		/home/ueshiba/include/TU/Heap++.h \
+		/home/ueshiba/include/TU/List++.cc \
+		/home/ueshiba/include/TU/List++.h \
+		/home/ueshiba/include/TU/PSTree++.cc \
+		/home/ueshiba/include/TU/PSTree++.h \
+		/home/ueshiba/include/TU/Vector++.h \
+		/home/ueshiba/include/TU/types.h
 HDRS		=
 SRCS		= pstreetest.cc
 OBJS		= pstreetest.o
@@ -35,7 +39,7 @@ OBJS		= pstreetest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.2 $	|		\
+REV		= $(shell echo $Revision: 1.3 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -47,8 +51,10 @@ REV		= $(shell echo $Revision: 1.2 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-pstreetest.o: /Users/ueshiba/include/TU/Geometry++.h \
-	/Users/ueshiba/include/TU/Vector++.h \
-	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/PSTree++.h \
-	/Users/ueshiba/include/TU/Heap++.h /Users/ueshiba/include/TU/List++.h
+pstreetest.o: /home/ueshiba/include/TU/Geometry++.h \
+	/home/ueshiba/include/TU/Vector++.h \
+	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
+	/home/ueshiba/include/TU/PSTree++.h /home/ueshiba/include/TU/Heap++.h \
+	/home/ueshiba/include/TU/List++.h /home/ueshiba/include/TU/Array++.cc \
+	/home/ueshiba/include/TU/Heap++.cc /home/ueshiba/include/TU/List++.cc \
+	/home/ueshiba/include/TU/PSTree++.cc
