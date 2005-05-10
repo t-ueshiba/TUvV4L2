@@ -1,28 +1,25 @@
 #
-#  $Id: Makefile,v 1.22 2004-10-15 05:33:36 ueshiba Exp $
+#  $Id: Makefile,v 1.23 2005-05-10 02:51:15 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU
-INCDIRS		= -I$(VVVHOME)/include
-SRCDIR		= $(HOME)/VVV/Pkg/vvv/libraries/libTUTools++
+INCDIRS		= -I$(INCDIR)
 
-NAME		= TUTools++
+NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	= #-DTUVectorPP_DEBUG -DTUBidiagonal_DEBUG #-DHAVE_CONFIG_H
-CFLAGS		= -O -g
-ifeq ($(CCC), icc)
-#  CCFLAGS	= -O3 -tpp7 -xW -parallel
-  CCFLAGS	= -O3 -parallel
-#  CCFLAGS	= -g
-else
-  CCFLAGS	= -O -g
-#  CCFLAGS      = -g
-endif
-
+CPPFLAGS	=
+CFLAGS		= -O
+CCFLAGS		= -O
+LDFLAGS		=
 LINKER		= $(CCC)
+ifeq ($(CCC), icc)
+  CCFLAGS	= -cxxlib-icc -no-gcc -O3 -parallel
+  LDFLAGS      += -cxxlib-icc
+  LINKER	= icpc
+endif
 
 #########################
 #  Macros set by mkmf	#
@@ -140,7 +137,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.22 $	|		\
+REV		= $(shell echo $Revision: 1.23 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -150,7 +147,6 @@ REV		= $(shell echo $Revision: 1.22 $	|		\
 		  }')
 
 include $(PROJECT)/lib/l.mk
-include $(PROJECT)/lib/l-install-srcs.mk
 ###
 Allocator++.o: TU/Allocator++.h TU/TU/List++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h

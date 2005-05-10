@@ -1,5 +1,5 @@
 /*
- *  $Id: ObjTreeBase.cc,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: ObjTreeBase.cc,v 1.3 2005-05-10 02:51:13 ueshiba Exp $
  */
 #include "TU/Collection++.h"
 
@@ -139,6 +139,8 @@ ObjTreeBase::Node::restoreGuts(std::istream& in)
 void
 ObjTreeBase::Node::check_depth() const
 {
+    using namespace	std;
+
     if (this == 0)
 	return;
 

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.6 2002-12-18 06:07:57 ueshiba Exp $
+#  $Id: Makefile,v 1.7 2005-05-10 02:51:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -20,26 +20,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/List++.h \
-		/home/ueshiba/include/TU/Manip.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/v/CanvasPane.h \
-		/home/ueshiba/include/TU/v/CanvasPaneDC.h \
-		/home/ueshiba/include/TU/v/CanvasPaneDC3.h \
-		/home/ueshiba/include/TU/v/Colormap.h \
-		/home/ueshiba/include/TU/v/DC.h \
-		/home/ueshiba/include/TU/v/DC3.h \
-		/home/ueshiba/include/TU/v/Menu.h \
-		/home/ueshiba/include/TU/v/TUv++.h \
-		/home/ueshiba/include/TU/v/Widget-Xaw.h \
-		/home/ueshiba/include/TU/v/XDC.h \
-		/home/ueshiba/include/TU/v/XglDC.h \
-		/home/ueshiba/include/TU/v/XilDC.h \
-		TU/v/XilXglDC.h
+EXTHDRS		= TU/v/XilXglDC.h
 HDRS		= XilXglDC.h
 SRCS		= XilXglDC.cc
 OBJS		= XilXglDC.o
@@ -47,7 +28,7 @@ OBJS		= XilXglDC.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.6 $	|		\
+REV		= $(shell echo $Revision: 1.7 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -59,17 +40,4 @@ REV		= $(shell echo $Revision: 1.6 $	|		\
 include $(PROJECT)/lib/l.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-XilXglDC.o: TU/v/XilXglDC.h /home/ueshiba/include/TU/v/XilDC.h \
-	/home/ueshiba/include/TU/v/CanvasPaneDC.h \
-	/home/ueshiba/include/TU/v/XDC.h /home/ueshiba/include/TU/v/DC.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
-	/home/ueshiba/include/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/v/CanvasPane.h \
-	/home/ueshiba/include/TU/v/TUv++.h /home/ueshiba/include/TU/List++.h \
-	/home/ueshiba/include/TU/v/Widget-Xaw.h \
-	/home/ueshiba/include/TU/v/Menu.h /home/ueshiba/include/TU/v/XglDC.h \
-	/home/ueshiba/include/TU/v/CanvasPaneDC3.h \
-	/home/ueshiba/include/TU/v/DC3.h
+XilXglDC.o: TU/v/XilXglDC.h

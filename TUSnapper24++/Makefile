@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.7 2004-03-08 02:08:52 ueshiba Exp $
+#  $Id: Makefile,v 1.8 2005-05-10 02:51:15 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -20,25 +20,8 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/List++.h \
-		/home/ueshiba/include/TU/Manip.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/v/CanvasPane.h \
-		/home/ueshiba/include/TU/v/CanvasPaneDC.h \
-		/home/ueshiba/include/TU/v/Colormap.h \
-		/home/ueshiba/include/TU/v/DC.h \
-		/home/ueshiba/include/TU/v/Menu.h \
-		/home/ueshiba/include/TU/v/TUv++.h \
-		/home/ueshiba/include/TU/v/Widget-Xaw.h \
-		/home/ueshiba/include/TU/v/XDC.h \
-		/home/ueshiba/include/TU/v/XilDC.h \
-		TU/Snapper24++.h
-HDRS		= Snapper24++.h \
-		TUSnapper24++.h
+EXTHDRS		= TU/Snapper24++.h
+HDRS		= Snapper24++.h
 SRCS		= Snapper24++.cc \
 		Snapper24.cc \
 		snp24.c
@@ -49,7 +32,7 @@ OBJS		= Snapper24++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.7 $	|		\
+REV		= $(shell echo $Revision: 1.8 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -61,27 +44,5 @@ REV		= $(shell echo $Revision: 1.7 $	|		\
 include $(PROJECT)/lib/l.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-Snapper24++.o: TU/Snapper24++.h /home/ueshiba/include/TU/v/XilDC.h \
-	/home/ueshiba/include/TU/v/CanvasPaneDC.h \
-	/home/ueshiba/include/TU/v/XDC.h /home/ueshiba/include/TU/v/DC.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
-	/home/ueshiba/include/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/v/CanvasPane.h \
-	/home/ueshiba/include/TU/v/TUv++.h /home/ueshiba/include/TU/List++.h \
-	/home/ueshiba/include/TU/v/Widget-Xaw.h \
-	/home/ueshiba/include/TU/v/Menu.h
-Snapper24.o: TU/Snapper24++.h /home/ueshiba/include/TU/v/XilDC.h \
-	/home/ueshiba/include/TU/v/CanvasPaneDC.h \
-	/home/ueshiba/include/TU/v/XDC.h /home/ueshiba/include/TU/v/DC.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
-	/home/ueshiba/include/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/v/CanvasPane.h \
-	/home/ueshiba/include/TU/v/TUv++.h /home/ueshiba/include/TU/List++.h \
-	/home/ueshiba/include/TU/v/Widget-Xaw.h \
-	/home/ueshiba/include/TU/v/Menu.h
+Snapper24++.o: TU/Snapper24++.h
+Snapper24.o: TU/Snapper24++.h

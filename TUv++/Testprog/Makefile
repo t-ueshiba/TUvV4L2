@@ -1,21 +1,26 @@
 #
-#  $Id: Makefile,v 1.3 2002-12-18 06:10:13 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2005-05-10 02:51:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include -I$(X11HOME)/include -I/opt/Shikaku/include
+INCDIRS		= -I$(HOME)/include
 
 PROGRAM		= vtest
 LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11
 
-CPPFLAGS	= -DUseXaw #-DUseShm #-DTUArrayPP_RangeCheck
+CPPFLAGS	= -DUseXaw
 CFLAGS		= -g
 CCFLAGS		= -g
 LDFLAGS		= -L$(LIBDIR) -L$(X11HOME)/lib
-
 LINKER		= $(CCC)
+ifeq ($(CCC), icc)
+#  CCFLAGS	= -cxxlib-icc -O3 -parallel
+  CCFLAGS	= -cxxlib-icc -g
+  LDFLAGS      += -cxxlib-icc
+  LINKER	= icpc
+endif
 
 #########################
 #  Macros set by mkmf	#
@@ -50,7 +55,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -60,7 +65,6 @@ REV		= $(shell echo $Revision: 1.3 $	|		\
 		  }')
 
 include $(PROJECT)/lib/p.mk
-include $(PROJECT)/lib/RCS.mk
 ###
 main.o: /home/ueshiba/include/TU/v/App.h \
 	/home/ueshiba/include/TU/v/TUv++.h \

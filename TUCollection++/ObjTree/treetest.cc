@@ -1,4 +1,4 @@
-#include <fstream.h>
+#include <fstream>
 #include "Int.h"
 #include "TU/Collection++.h"
 
@@ -31,7 +31,6 @@ comp(const Int* p, const Int* q)
 }
 
 }
-#include <fstream.h>
 
 main()
 {

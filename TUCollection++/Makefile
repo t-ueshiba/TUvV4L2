@@ -1,28 +1,33 @@
 #
-#  $Id: Makefile,v 1.8 2004-06-17 00:28:04 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2005-05-10 02:51:13 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU
-INCDIRS		= -I. -I$(HOME)/include
+INCDIRS		= -I$(HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	=
+CPPFLAGS	= -DTUCollectionPP_DEBUG
 CFLAGS		= -O
 CCFLAGS		= -O
-
+LDFLAGS		=
 LINKER		= $(CCC)
+ifeq ($(CCC), icc)
+  CCFLAGS	= -cxxlib-icc -O3 -parallel
+  LDFLAGS      += -cxxlib-icc
+  LINKER	= icpc
+endif
 
 #########################
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /Users/ueshiba/include/TU/Collection++.h \
-		/Users/ueshiba/include/TU/Object++.h \
-		/Users/ueshiba/include/TU/types.h
+EXTHDRS		= /home/ueshiba/include/TU/Object++.h \
+		/home/ueshiba/include/TU/types.h \
+		TU/Collection++.h
 HDRS		= Collection++.h
 SRCS		= Collection++.cc \
 		ObjTreeBase.cc \
@@ -34,7 +39,7 @@ OBJS		= Collection++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -44,14 +49,10 @@ REV		= $(shell echo $Revision: 1.8 $	|		\
 		  }')
 
 include $(PROJECT)/lib/l.mk
-include $(PROJECT)/lib/RCS.mk
 ###
-Collection++.o: /Users/ueshiba/include/TU/Collection++.h \
-	/Users/ueshiba/include/TU/Object++.h \
-	/Users/ueshiba/include/TU/types.h
-ObjTreeBase.o: /Users/ueshiba/include/TU/Collection++.h \
-	/Users/ueshiba/include/TU/Object++.h \
-	/Users/ueshiba/include/TU/types.h
-TUCollection++.sa.o: /Users/ueshiba/include/TU/Collection++.h \
-	/Users/ueshiba/include/TU/Object++.h \
-	/Users/ueshiba/include/TU/types.h
+Collection++.o: TU/Collection++.h /home/ueshiba/include/TU/Object++.h \
+	/home/ueshiba/include/TU/types.h
+ObjTreeBase.o: TU/Collection++.h /home/ueshiba/include/TU/Object++.h \
+	/home/ueshiba/include/TU/types.h
+TUCollection++.sa.o: TU/Collection++.h /home/ueshiba/include/TU/Object++.h \
+	/home/ueshiba/include/TU/types.h
