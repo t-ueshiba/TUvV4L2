@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.12 2005-05-10 02:51:16 ueshiba Exp $
+#  $Id: Makefile,v 1.13 2005-05-10 05:20:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,15 +11,13 @@ INCDIRS		= -I$(HOME)/include -I$(X11HOME)/include
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	= -DUseXaw #-DDEBUG -DDESTROY_WIDGET
-CFLAGS		= -O
-CCFLAGS		= -O
-LDFLAGS		=
-LINKER		= $(CCC)
-ifeq ($(CCC), icc)
-  CCFLAGS	= -cxxlib-icc -O3 -parallel
-  LDFLAGS      += -cxxlib-icc
-  LINKER	= icpc
+CFLAGS		= -O -g
+CCFLAGS		= -O -g
+ifeq ($(CCC), icpc)
+  CCFLAGS	= -O3 -parallel
 endif
+LDFLAGS		= $(CCFLAGS)
+LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
@@ -197,7 +195,7 @@ OBJS		= App.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.12 $	|		\
+REV		= $(shell echo $Revision: 1.13 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
