@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.11 2004-10-15 05:33:36 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.12 2005-07-13 08:58:58 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Manip.h"
@@ -76,6 +76,7 @@ ImageBase::restoreHeader(std::istream& in)
     in >> magic >> ws; // Read pbm magic number and trailing white spaces.
 
     u_int	dataType = EPBM_CHAR8, sign = EPBM_UNSIGNED;
+    bool	legacy = false;	// legacy style of dist. param. representation
     int		c;
   // Process comment lines.
     for (; (c = in.get()) == '#'; in >> ign)
@@ -133,14 +134,30 @@ ImageBase::restoreHeader(std::istream& in)
 	    in >> P[2][2];
 	else if (!strcmp(key, "PinHoleParameterH34:"))
 	    in >> P[2][3];
-	else if (!strcmp(key, "DistortionParameterA:"))
+	else if (!strcmp(key, "DistortionParameterD1:"))
+	{
 	    in >> d1;
-	else if (!strcmp(key, "DistortionParameterB:"))
+	    legacy = false;
+	}
+	else if (!strcmp(key, "DistortionParameterD2:"))
+	{
 	    in >> d2;
+	    legacy = false;
+	}
+	else if (!strcmp(key, "DistortionParameterA:"))	// legacy dist. param.
+	{
+	    in >> d1;
+	    legacy = true;
+	}
+	else if (!strcmp(key, "DistortionParameterB:"))	// legacy dist. param.
+	{
+	    in >> d2;
+	    legacy = true;
+	}
     }
     in.putback(c);
 
-    if (d1 != 0.0 || d2 != 0.0)
+    if (legacy)
     {
 	Camera	camera(P);
 	double	k = camera.k();
@@ -246,18 +263,10 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
 	<< "# PinHoleParameterH31: " << P[2][0] << endl
 	<< "# PinHoleParameterH32: " << P[2][1] << endl
 	<< "# PinHoleParameterH33: " << P[2][2] << endl
-	<< "# PinHoleParameterH34: " << P[2][3] << endl
-	<< "# PinHoleParameterF: 1.0" << endl
-	<< "# PinHoleParameterM: 0.0" << endl;
+	<< "# PinHoleParameterH34: " << P[2][3] << endl;
     if (d1 != 0.0 || d2 != 0.0)
-    {
-	Camera	camera(P);
-	double	k = camera.k();
-	out << "# DistortionParameterA: " << d1 / (k * k) << endl
-	    << "# DistortionParameterB: " << d2 / (k * k * k * k) << endl
-	    << "# DistortionParameterCOLD: " << camera.principal()[0] << endl
-	    << "# DistortionParameterROWD: " << camera.principal()[1] << endl;
-    }
+	out << "# DistortionParameterD1: " << d1 << endl
+	    << "# DistortionParameterD2: " << d2 << endl;
     out << _width() << ' ' << _height() << '\n'
 	<< 255 << endl;
     
