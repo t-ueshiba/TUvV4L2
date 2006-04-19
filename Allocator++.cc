@@ -1,5 +1,5 @@
 /*
- *  $Id: Allocator++.cc,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
+ *  $Id: Allocator++.cc,v 1.4 2006-04-19 02:34:37 ueshiba Exp $
  */
 #include "TU/Allocator++.h"
 
@@ -44,7 +44,7 @@ Allocator<T>::setPageSize(u_int n)
 }
 
 /************************************************************************
-*  class Allocator<T>::PageList					*
+*  class Allocator<T>::PageList						*
 ************************************************************************/
 template <class T>
 Allocator<T>::PageList::~PageList()

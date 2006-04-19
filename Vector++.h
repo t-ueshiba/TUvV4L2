@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.10 2004-04-28 01:52:32 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.11 2006-04-19 02:34:37 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -72,6 +72,7 @@ class Vector : public Array<T>
     const Vector	operator ()(u_int, u_int)	const	;
     Vector		operator ()(u_int, u_int)		;
 
+    using	Array<T>::dim;
     Vector&	operator  =(double c)		{Array<T>::operator  =(c);
 						 return *this;}
     Vector&	operator *=(double c)		{Array<T>::operator *=(c);
@@ -130,6 +131,10 @@ class Matrix : public Array2<Vector<T> >
     const Matrix	operator ()(u_int, u_int, u_int, u_int)	const	;
     Matrix		operator ()(u_int, u_int, u_int, u_int)		;
 
+    using	Array2<Vector<T> >::dim;
+    using	Array2<Vector<T> >::nrow;
+    using	Array2<Vector<T> >::ncol;
+    
     Matrix&	diag(double)			;
     Matrix&	rot(double, int)		;
     Matrix&	operator  =(double c)		{Array2<Vector<T> >::
@@ -275,6 +280,9 @@ class LUDecomposition : private Array2<Vector<T> >
     T		det()				const	{return _det;}
     
   private:
+    using	Array2<Vector<T> >::nrow;
+    using	Array2<Vector<T> >::ncol;
+    
     Array<int>	_index;
     T		_det;
 };
@@ -291,9 +299,13 @@ class Householder : public Matrix<T>
 {
   private:
     Householder(u_int dd, u_int d)
-	:Matrix<T>(dd, dd), _d(d), _sigma(nrow())		{}
+	:Matrix<T>(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
     Householder(const Matrix<T>&, u_int)			;
 
+    using		Matrix<T>::dim;
+    using		Matrix<T>::nrow;
+    using		Matrix<T>::ncol;
+    
     void		apply_from_left(Matrix<T>&, int)	;
     void		apply_from_right(Matrix<T>&, int)	;
     void		apply_from_both(Matrix<T>&, int)	;
@@ -320,11 +332,14 @@ class QRDecomposition : private Matrix<T>
   public:
     QRDecomposition(const Matrix<T>&)			;
 
-    Matrix<T>::dim;
+    using		Matrix<T>::dim;
     const Matrix<T>&	Rt()			const	{return *this;}
     const Matrix<T>&	Qt()			const	{return _Qt;}
     
   private:
+    using		Matrix<T>::nrow;
+    using		Matrix<T>::ncol;
+    
     Householder<T>	_Qt;			// rotation matrix
 };
 
@@ -397,13 +412,13 @@ class SVDecomposition : private BiDiagonal<T>
 {
   public:
     SVDecomposition(const Matrix<T>& a)
-	:BiDiagonal<T>(a)			{diagonalize();}
+	:BiDiagonal<T>(a)			{BiDiagonal<T>::diagonalize();}
 
-    BiDiagonal<T>::nrow;
-    BiDiagonal<T>::ncol;
-    BiDiagonal<T>::Ut;
-    BiDiagonal<T>::Vt;
-    BiDiagonal<T>::diagonal;
+    using	BiDiagonal<T>::nrow;
+    using	BiDiagonal<T>::ncol;
+    using	BiDiagonal<T>::Ut;
+    using	BiDiagonal<T>::Vt;
+    using	BiDiagonal<T>::diagonal;
     
     const T&	operator [](int i)	const	{return diagonal()[i];}
 };

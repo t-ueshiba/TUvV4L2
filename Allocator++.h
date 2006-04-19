@@ -1,5 +1,5 @@
 /*
- *  $Id: Allocator++.h,v 1.3 2002-07-26 09:26:21 ueshiba Exp $
+ *  $Id: Allocator++.h,v 1.4 2006-04-19 02:34:37 ueshiba Exp $
  */
 #ifndef __TUAllocatorPP_h
 #define __TUAllocatorPP_h
@@ -36,6 +36,12 @@ class Allocator
     {
       public:
       	~PageList()					;
+
+	using		List<Page>::begin;
+	using		List<Page>::end;
+	using		List<Page>::empty;
+	using		List<Page>::front;
+	using		List<Page>::pop_front;
     };
 
     class Element : public List<Element>::Node
@@ -46,6 +52,12 @@ class Allocator
     {
       public:
 	void		addPage(Page& page)		;
+
+	using		List<Element>::begin;
+	using		List<Element>::end;
+	using		List<Element>::empty;
+	using		List<Element>::front;
+	using		List<Element>::pop_front;
     };
 
     class Enumerator : public List<Enumerator>::Node

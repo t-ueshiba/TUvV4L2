@@ -1,5 +1,5 @@
 /*
- *  $Id: BlockMatrix++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: BlockMatrix++.h,v 1.3 2006-04-19 02:34:37 ueshiba Exp $
  */
 #ifndef __TUBlockMatrixPP_h
 #define __TUBlockMatrixPP_h
@@ -19,6 +19,7 @@ class BlockMatrix : public Array<Matrix<T> >
     BlockMatrix(const Array<u_int>& nrows,
 		const Array<u_int>& ncols)			;
 
+    using		Array<Matrix<T> >::dim;
     u_int		nrow()				const	;
     u_int		ncol()				const	;
     BlockMatrix		trns()				const	;
