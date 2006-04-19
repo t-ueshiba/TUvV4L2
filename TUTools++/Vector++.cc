@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.11 2004-04-28 01:52:32 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.12 2006-04-19 02:34:37 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -1300,7 +1300,7 @@ Minimization<S, T>::update(const T&)
 template <class S, class T> void
 Minimization<S, T>::print(int i, S val, const T& x) const
 {
-    std::cerr << setw(3) << i << ": (" << val << ')' << x;
+    std::cerr << std::setw(3) << i << ": (" << val << ')' << x;
 }
  
 }

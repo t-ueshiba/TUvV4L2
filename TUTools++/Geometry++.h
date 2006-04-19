@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.8 2003-05-19 08:09:35 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.9 2006-04-19 02:34:37 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -116,6 +116,7 @@ class Coordinate : public CoordBase<T, D>
 			{CoordBase<T, D>::operator =(v); return *this;}
     Coordinate&		operator =(const CoordinateP<T, D>&)	;
 
+    using		CoordBase<T, D>::dim;
     Coordinate&		operator +=(const Coordinate& p)
 			{
 			    CoordBase<T, D>::operator +=(p);
@@ -186,6 +187,8 @@ class CoordinateP : public CoordBase<T, D+1u>
     CoordinateP(const CoordinateP& p)    :CoordBase<T, D+1u>(p)	{}
     CoordinateP(const Vector<double>& v) :CoordBase<T, D+1u>(v)	{}
     CoordinateP(const Coordinate<T, D>&)				;
+
+    using		CoordBase<T, D+1u>::dim;
     CoordinateP&	operator =(const CoordinateP& p)
 			{CoordBase<T, D+1u>::operator =(p); return *this;}
     CoordinateP&	operator =(const Vector<double>& v)

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.11 2004-03-08 02:09:45 ueshiba Exp $
+ *  $Id: Image++.h,v 1.12 2006-04-19 02:34:37 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -374,6 +374,8 @@ class ImageLine : public Array<T>
 			    Array<T>::operator =(c);
 			    return *this;
 			}
+
+    using		Array<T>::dim;
     const YUV422*	fill(const YUV422* src)		;
     const YUV411*	fill(const YUV411* src)		;
     const T*		fill(const T* src)		;
@@ -549,8 +551,10 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
 						 (ImageBase&)*this = i;
 						 return *this;}
 
-    u_int	width()			const	{return ncol();}
-    u_int	height()		const	{return nrow();}
+    u_int	width()			const	{return
+						 Array2<ImageLine<T> >::ncol();}
+    u_int	height()		const	{return
+						 Array2<ImageLine<T> >::nrow();}
     
     Image&	operator = (double c)		{Array2<ImageLine<T> >::
 						 operator  =(c); return *this;}

@@ -1,5 +1,5 @@
 /*
- *  $Id: Mesh++.h,v 1.9 2003-01-10 00:30:54 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.10 2006-04-19 02:34:37 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
@@ -57,6 +57,9 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 	Topology(const Topology& t) :List<FaceNode>(), _v(t._v)	{}
 
 	Topology&	operator =(const Topology& t)	{_v=t._v;return *this;}
+
+	using		List<FaceNode>::begin;
+	using		List<FaceNode>::end;
 	
 	static void	setAllocator(Allocator<V>& a)	{_a = &a;}
 	V*		v()			const	{return _v;}

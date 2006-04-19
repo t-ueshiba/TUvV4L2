@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.h,v 1.6 2002-08-12 02:47:46 ueshiba Exp $
+ *  $Id: Array++.h,v 1.7 2006-04-19 02:34:37 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -120,6 +120,8 @@ class Array2 : public Array<T>
     Array2&	operator =(const Array2& a)		;
     virtual ~Array2()					;
 
+    using	Array<T>::dim;
+    
   //! 2次元配列の行数を返す    
     u_int	nrow()			const	{return dim();}
   //! 2次元配列の列数を返す    
