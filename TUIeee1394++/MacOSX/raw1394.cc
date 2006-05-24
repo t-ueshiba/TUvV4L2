@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.1 2006-05-24 08:06:26 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.2 2006-05-24 08:14:31 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -67,10 +67,6 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
 {
     using namespace	std;
     
-    mach_port_t		masterPort;
-    if (IOMasterPort(MACH_PORT_NULL, &masterPort) != kIOReturnSuccess)
-	throw runtime_error("raw1394::raw1394: failed to get masterPort!!");
-
   // Find a specified device node.
     CFMutableDictionaryRef
 		dictionary = IOServiceMatching("IOFireWireUnit");
@@ -86,28 +82,39 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
 	CFRelease(cfValue);
     }
     io_iterator_t	iterator;
-    if (IOServiceGetMatchingServices(masterPort, dictionary, &iterator)
-	!= kIOReturnSuccess)
+    if (IOServiceGetMatchingServices(kIOMasterPortDefault,
+				     dictionary, &iterator) != kIOReturnSuccess)
 	throw runtime_error("raw1394::raw1394: failed to get a matched service(=device)!!");
-    io_object_t	service;
-    if (!(service = IOIteratorNext(iterator)))
-	throw runtime_error("raw1394::raw1394: no specified service(=device) found!!");
-    IOObjectRelease(iterator);
 
   // Find a FireWire device interface.
-    SInt32	theScore;
-    if (IOCreatePlugInInterfaceForService(
-	    service, kIOFireWireLibTypeID, kIOCFPlugInInterfaceID,
-	    &_cfPlugInInterface, &theScore) != kIOReturnSuccess)
-	throw runtime_error("raw1394::raw1394: failed to create plug-in interface!!");
-    if ((*_cfPlugInInterface)->QueryInterface(
-	    _cfPlugInInterface,
-	    CFUUIDGetUUIDBytes(kIOFireWireDeviceInterfaceID_v5),
-	    (void**)&_fwDeviceInterface) != S_OK)
-	throw runtime_error("raw1394::raw1394: no specified interface found!!");
-    
-    if ((*_fwDeviceInterface)->Open(_fwDeviceInterface) != kIOReturnSuccess)
-	throw runtime_error("raw1394::raw1394: failed to open the interface!!");
+    for (io_object_t service; service = IOIteratorNext(iterator); )
+    {
+	SInt32	theScore;
+	if ((IOCreatePlugInInterfaceForService(service, kIOFireWireLibTypeID,
+		kIOCFPlugInInterfaceID, &_cfPlugInInterface, &theScore)
+	     == kIOReturnSuccess) &&
+	    ((*_cfPlugInInterface)->QueryInterface(_cfPlugInInterface,
+		CFUUIDGetUUIDBytes(kIOFireWireDeviceInterfaceID_v5),
+		(void**)&_fwDeviceInterface)
+	     == S_OK) &&
+	    ((*_fwDeviceInterface)->Open(_fwDeviceInterface)
+	     == kIOReturnSuccess))
+	    break;
+
+	if (_cfPlugInInterface)
+	{
+	    if (_fwDeviceInterface)
+	    {
+		(*_fwDeviceInterface)->Release(_fwDeviceInterface);
+		_fwDeviceInterface = 0;
+	    }
+	    IODestroyPlugInInterface(_cfPlugInInterface);
+	    _cfPlugInInterface = 0;
+	}
+    }
+    IOObjectRelease(iterator);
+    if (!_fwDeviceInterface)
+	throw runtime_error("raw1394::raw1394: no specified service(=device) found!!");
 
   // Add a callback dispatcher to RunLoop with a specific mode.
     char	mode[] = "raw1394.x";
@@ -252,7 +259,6 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 					       interval.label);
 	interval.jump = (DCLJump*)dcl;
     }
-    dcl->pNextDCLCommand = nil;	// terminate the program.
 
   // [Step 1.4] Create a local isochronous port.
     if (!(_localIsochPort = (*_fwDeviceInterface)->CreateLocalIsochPort(
