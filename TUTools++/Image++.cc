@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.5 2003-02-20 07:52:34 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.6 2006-05-25 02:10:17 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef WIN32
@@ -142,6 +142,12 @@ Image<T>::saveData(std::ostream& out, Type type) const
     return out;
 }
 
+template <> void
+Image<YUV411>::resize(u_int h, u_int w)
+{
+    Array2<ImageLine<YUV411> >::resize(h, w/2);
+}
+
 template <class T> template <class S> std::istream&
 Image<T>::restoreRows(std::istream& in)
 {
@@ -171,19 +177,19 @@ Image<T>::saveRows(std::ostream& out) const
 template <class T> u_int
 Image<T>::_width() const
 {
-    return width();
+    return Image<T>::width();		// Don't call ImageBase::width!
 }
 
 template <class T> u_int
 Image<T>::_height() const
 {
-    return height();
+    return Image<T>::height();		// Don't call ImageBase::height!
 }
 
 template <class T> void
 Image<T>::_resize(u_int h, u_int w)
 {
-    Array2<ImageLine<T> >::resize(h, w);
+    Image<T>::resize(h, w);		// Don't call ImageBase::resize!
 }
- 
+
 }
