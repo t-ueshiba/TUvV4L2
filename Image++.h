@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.12 2006-04-19 02:34:37 ueshiba Exp $
+ *  $Id: Image++.h,v 1.13 2006-05-25 02:10:17 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -345,13 +345,17 @@ class ImageBase
     
     Type		restoreHeader(std::istream& in)			;
     std::ostream&	saveHeader(std::ostream& out, Type type) const	;
+
+    u_int		width()			const	{return _width();}
+    u_int		height()		const	{return _height();}
+    void		resize(u_int h, u_int w)	{_resize(h, w);}
 	
   private:
-    virtual u_int	_width()				const	= 0;
-    virtual u_int	_height()				const	= 0;
-    virtual void	_resize(u_int, u_int)				= 0;
+    virtual u_int	_width()		const	= 0;
+    virtual u_int	_height()		const	= 0;
+    virtual void	_resize(u_int h, u_int w)	= 0;
 
-    static u_int	type2depth(Type type)				;
+    static u_int	type2depth(Type type)		;
     
   public:
     Matrix<double>	P;			// projection matrix
@@ -624,12 +628,6 @@ template <> inline u_int
 Image<YUV411>::width() const
 {
     return 2 * ncol();
-}
-
-template <> inline void
-Image<YUV411>::resize(u_int h, u_int w)
-{
-    Array2<ImageLine<YUV411> >::resize(h, w/2);
 }
 
 template <> inline void
