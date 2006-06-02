@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.h,v 1.1 2006-05-24 08:06:26 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.2 2006-06-02 05:40:16 ueshiba Exp $
  */
 #ifndef _LIBRAW1394_RAW1394_H
 #define _LIBRAW1394_RAW1394_H
@@ -81,7 +81,7 @@ int	raw1394_iso_recv_init(raw1394handle_t		     handle,
 			      raw1394_iso_recv_handler_t     handler,
 			      unsigned int		     buf_packets,
 			      unsigned int		     max_packet_size,
-			      unsigned char		     channel,
+			      unsigned char&		     channel,
 			      raw1394_iso_dma_recv_mode	     mode,
 			      int			     irq_interval);
 void	raw1394_iso_shutdown(raw1394handle_t handle);

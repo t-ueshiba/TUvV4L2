@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.15 2006-05-24 08:04:47 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.16 2006-06-02 05:39:58 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -336,8 +336,6 @@ static const u_int	NBUFFERS		= 4;
 			一番最初にみつかったものがこのオブジェクトと結び
 			つけられる．オブジェクト生成後は，globalUniqueId()
 			によってこの値を知ることができる．
-  \param ch		isochronous転送用のチャネル番号(\f$0 \leq
-			\f$ch\f$ < 64\f$)
   \param delay		IEEE1394カードの種類によっては，レジスタの読み書き
 			(Ieee1394Node::readQuadlet(),
 			Ieee1394Node::writeQuadlet())時に遅延を入れないと
@@ -346,8 +344,8 @@ static const u_int	NBUFFERS		= 4;
 			付属のボードでは0)
 */
 Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
-			       u_int64 uniqId, u_int ch, u_int delay)
-    :Ieee1394Node(type, uniqId, ch, delay
+			       u_int64 uniqId, u_int delay)
+    :Ieee1394Node(type, uniqId, delay
 #if defined(USE_VIDEO1394)
 		  , 1, VIDEO1394_SYNC_FRAMES
 #endif
@@ -356,10 +354,10 @@ Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
 		 + 4 * int64_t(readValueFromUnitDependentDirectory(0x40))),
      _w(0), _h(0), _p(MONO_8), _buf(0), _acr(0), _bayer(YYYY), _littleEndian(false)
 {
-  // Assign IsoChannel to this camera.
-    quadlet_t	quad = ((ch << 28) | (Ieee1394Node::SPD_400M << 24));
+  // Set speed of isochronous transmission.
+    quadlet_t	quad = (Ieee1394Node::SPD_400M << 24);
     if (i1394b && (inquireBasicFunction() & I1394b_mode_Capability))
-	quad |= ((0x1u << 15) | (ch << 8) | Ieee1394Node::SPD_800M);
+	quad |= ((0x1u << 15) | Ieee1394Node::SPD_800M);
     writeQuadletToRegister(ISO_Channel, quad);
 
   // Map video1394 buffer according to current format and frame rate.
@@ -646,7 +644,12 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
     }
   // buf_sizeをpacket_sizeの整数倍にしてからmapする．
     buf_size = packet_size * ((buf_size - 1) / packet_size + 1);
-    mapListenBuffer(packet_size, buf_size, NBUFFERS);
+    const u_char ch = mapListenBuffer(packet_size, buf_size, NBUFFERS);
+
+  // map時に割り当てられたチャンネル番号をカメラに設定する．
+    quadlet_t	 quad = readQuadletFromRegister(ISO_Channel);
+    (quad &= 0x0fffc0ff) |= ((ch << 28) | (ch << 8));
+    writeQuadletToRegister(ISO_Channel, quad);
 
     if (cont)
 	continuousShot();

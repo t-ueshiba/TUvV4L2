@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.1 2006-05-24 08:06:26 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.2 2006-06-02 05:40:16 ueshiba Exp $
  */
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
@@ -77,7 +77,7 @@ struct raw1394
     IOReturn	writeQuadlet(const FWAddress& addr, UInt32 quad)const	;
     IOReturn	isoRecvInit(raw1394_iso_recv_handler_t handler,
 			    UInt32 nPackets, UInt32 maxPacketSize,
-			    UInt8 channel, SInt32 irqInterval)		;
+			    UInt8& channel, SInt32 irqInterval)	;
     void	isoShutdown()						;
     IOReturn	isoRecvStart()						;
     IOReturn	isoStop()						;
@@ -93,6 +93,10 @@ struct raw1394
 		getSupportedHandler(IOFireWireLibIsochPortRef isochPort,
 				    IOFWSpeed*		      speed,
 				    UInt64*		      channel)	;
+    static IOReturn
+		allocatePortHandler(IOFireWireLibIsochPortRef isochPort,
+				    IOFWSpeed		      speed,
+				    UInt32		      channel)	;
     static IOReturn
 		stopHandler(IOFireWireLibIsochPortRef isochPort)	;
     

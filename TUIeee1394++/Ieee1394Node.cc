@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.5 2006-05-24 08:04:47 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.6 2006-06-02 05:39:58 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <unistd.h>
@@ -84,10 +84,18 @@ Ieee1394Node::Port::~Port()
 #  endif
 }
 
-void
+u_char
 Ieee1394Node::Port::registerNode(const Ieee1394Node& node)
 {
-    _nodes |= (0x1ULL << (node.nodeId() & 0x3f));
+  // Count the number of nodes already registered.
+    u_char	nnodes = 0;
+    for (int i = 0; i < 8*sizeof(_nodes); ++i)
+	if ((_nodes & (0x1ULL << i)) != 0)
+	    ++nnodes;
+
+    _nodes |= (0x1ULL << (node.nodeId() & 0x3f));	// Register this node.
+
+    return nnodes;
 }
 
 bool
@@ -119,8 +127,6 @@ std::map<int, Ieee1394Node::Port*>	Ieee1394Node::_portMap;
 			まだ#Ieee1394Nodeオブジェクトを割り当てられて
 			いない機器のうち，一番最初にみつかったものがこの
 			オブジェクトと結びつけられる．
-  \param channel	isochronous転送用のチャネル番号(\f$0 \leq
-			\f$channel\f$ < 64\f$)
   \param delay		IEEE1394カードの種類によっては，レジスタの読み書き
 			(Ieee1394Node::readQuadlet(),
 			Ieee1394Node::writeQuadlet())時に遅延を入れないと
@@ -135,8 +141,7 @@ std::map<int, Ieee1394Node::Port*>	Ieee1394Node::_portMap;
 			VIDEO1394_INCLUDE_ISO_HEADERS,
 			VIDEO1394_VARIABLE_PACKET_SIZEの組合わせ．
 */
-Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId,
-			   u_int channel, u_int delay
+Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int delay
 #if defined(USE_VIDEO1394)
 			   , int sync_tag, int flags
 #endif
@@ -150,7 +155,7 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId,
 #if defined(USE_VIDEO1394)
      _mmap(), _current(0), _buf_size(0),
 #else
-     _channel(channel), _current(0), _end(0),
+     _channel(0), _current(0), _end(0),
 #endif
      _buf(0), _filltime(), _delay(delay)
 {
@@ -199,15 +204,16 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId,
     throw runtime_error("TU::Ieee1394Node::Ieee1394Node: node with specified unit_spec_ID (and global_unique_ID) not found!!");
 
   ok:
-    _port->registerNode(*this);		// Register this node to the port.
 #  if defined(USE_VIDEO1394)
-    _mmap.channel     = channel;
+    _mmap.channel     = _port->registerNode(*this);
     _mmap.sync_tag    = sync_tag;
     _mmap.nb_buffers  = 0;
     _mmap.buf_size    = 0;
     _mmap.packet_size = 0;
     _mmap.fps	      = 0;
     _mmap.flags	      = flags;
+#  else
+    _channel = _port->registerNode(*this);  // Register this node to the port.
 #  endif
 #endif	// !__APPLE__
     _filltime.tv_sec = _filltime.tv_usec = 0;
@@ -355,8 +361,9 @@ Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
   \param packet_size	受信するパケット1つあたりのサイズ(単位: byte).
   \param buf_size	バッファ1つあたりのサイズ(単位: byte)．
   \param nb_buffers	割り当てるバッファ数．
+  \return		割り当てられたisochronous受信用のチャンネル．
  */
-void
+u_char
 Ieee1394Node::mapListenBuffer(size_t packet_size,
 			      size_t buf_size, u_int nb_buffers)
 {
@@ -392,6 +399,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
     }
 
     usleep(100000);
+    return _mmap.channel;
 #else
     _buf = _current = new u_char[buf_size];
     _end = _buf + buf_size;
@@ -403,6 +411,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to initialize iso reception!! ") + strerror(errno));
     if (raw1394_iso_recv_start(_handle, -1, -1, 0) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to start iso reception!! ") + strerror(errno));
+    return _channel;
 #endif
 }
 

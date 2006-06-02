@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.2 2006-05-24 08:14:31 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.3 2006-06-02 05:40:16 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -175,7 +175,7 @@ raw1394::cmdRegBase() const
 IOReturn
 raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 		     UInt32 nPackets, UInt32 maxPacketSize,
-		     UInt8 channel, SInt32 irqInterval)
+		     UInt8& channel, SInt32 irqInterval)
 {
     isoShutdown();		// Release preveously allocated resouces.
     
@@ -277,7 +277,6 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     _interval[0].prev = &_interval[_nIntervals - 1];
 
   // [Step 2] Set up a remote isochronous port.
-    _channel = channel;
     if (!(_remoteIsochPort = (*_fwDeviceInterface)->CreateRemoteIsochPort(
 	      _fwDeviceInterface, true,
 	      CFUUIDGetUUIDBytes(kIOFireWireRemoteIsochPortInterfaceID))))
@@ -286,6 +285,8 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 				   this);
     (*_remoteIsochPort)->SetGetSupportedHandler(_remoteIsochPort,
 						&getSupportedHandler);
+    (*_remoteIsochPort)->SetAllocatePortHandler(_remoteIsochPort,
+						&allocatePortHandler);
     (*_remoteIsochPort)->SetStopHandler(_remoteIsochPort, &stopHandler);
 
   // [Step 4] Set up an isochronous channel.
@@ -302,6 +303,7 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     if ((err = (*_isochChannel)->AllocateChannel(_isochChannel))
 	!= kIOReturnSuccess)
 	return err;
+    channel = _channel;		// Return the assinged channel number.
     
     return kIOReturnSuccess;
 }
@@ -400,10 +402,25 @@ raw1394::getSupportedHandler(IOFireWireLibIsochPortRef	isochPort,
 			     IOFWSpeed*			speed,
 			     UInt64*			channel)
 {
-    raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
     *speed = kFWSpeedMaximum;
-    *channel = 0x1ULL << (63 - me->_channel);
+  /*    raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
+   *channel = 0x1ULL << (63 - me->_channel);*/
+    *channel = 0xffff000000000000ULL;
     
+    return kIOReturnSuccess;
+}
+    
+IOReturn
+raw1394::allocatePortHandler(IOFireWireLibIsochPortRef	isochPort,
+			     IOFWSpeed			speed,
+			     UInt32			channel)
+{
+    raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
+    me->_channel = channel;
+#ifdef DEBUG
+    std::cerr << "raw1394::allocatePortHandler: channel[" << channel
+	      << "] assigned." << std::endl;
+#endif
     return kIOReturnSuccess;
 }
     
@@ -483,7 +500,7 @@ raw1394_iso_recv_init(raw1394handle_t			handle,
 		      raw1394_iso_recv_handler_t	handler,
 		      unsigned int			buf_packets,
 		      unsigned int			max_packet_size,
-		      unsigned char			channel,
+		      unsigned char&			channel,
 		      raw1394_iso_dma_recv_mode		mode,
 		      int				irq_interval)
 {

@@ -19,21 +19,19 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.13 2006-05-24 08:04:47 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.14 2006-06-02 05:39:58 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
 
 #define USE_VIDEO1394
-#if defined(__APPLE__)
-#  undef USE_VIDEO1394
-#endif
 
 #include <libraw1394/raw1394.h>
-#if !defined(__APPLE__)
+#if defined(__APPLE__)
+#  undef USE_VIDEO1394
+#else
 #  include <map>
 #  if defined(USE_VIDEO1394)
-#    define __user
 #    include <video1394.h>
 #  endif
 #endif
@@ -70,7 +68,7 @@ class Ieee1394Node
 #  endif
 	int	portNumber()			const	{return _portNumber;}
 	
-	void	registerNode(const Ieee1394Node& node)		;
+	u_char	registerNode(const Ieee1394Node& node)		;
 	bool	unregisterNode(const Ieee1394Node& node)	;
 	bool	isRegisteredNode(const Ieee1394Node& node) const;
     
@@ -108,15 +106,15 @@ class Ieee1394Node
     timeval	filltime()			const	{return _filltime;}
 #if defined(USE_VIDEO1394)
     u_int	bufferSize()			const	{return _buf_size;}
-    u_int	channel()			const	{return _mmap.channel;}
+    u_char	channel()			const	{return _mmap.channel;}
 #else
     u_int	bufferSize()			const	{return _end - _buf;}
-    u_int	channel()			const	{return _channel;}
+    u_char	channel()			const	{return _channel;}
 #endif
     u_int	delay()				const	{return _delay;}
     
   protected:
-    Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int channel, u_int delay
+    Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int delay
 #if defined(USE_VIDEO1394)
 		 , int sync_tag, int flag
 #endif
@@ -129,7 +127,7 @@ class Ieee1394Node
 								const	;
     quadlet_t		readQuadlet(nodeaddr_t addr)		const	;
     void		writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;
-    void		mapListenBuffer(size_t packet_size,
+    u_char		mapListenBuffer(size_t packet_size,
 					size_t buf_size,
 					u_int nb_buffers)		;
     const u_char*	waitListenBuffer()				;
@@ -153,6 +151,8 @@ class Ieee1394Node
 				u_int cycle, u_int dropped)		;
 #endif
 #if !defined(__APPLE__)    
+    static std::map<int, Port*>	_portMap;
+
     Port*			_port;
 #endif
     raw1394handle_t		_handle;
@@ -162,16 +162,13 @@ class Ieee1394Node
     u_int			_current;	// index of current ready buffer.
     u_int			_buf_size;	// buffer size excluding header.
 #else
-    const u_int			_channel;	// iso receive channel.
+    u_char			_channel;	// iso receive channel.
     u_char*			_current;	// current buffer head.
     u_char*			_end;		// end of the buffer.
 #endif
     u_char*			_buf;		// mapped buffer.
     timeval			_filltime;	// time of buffer filled.
     const u_int			_delay;
-#if !defined(__APPLE__)
-    static std::map<int, Port*>	_portMap;
-#endif
 };
 
 /************************************************************************
@@ -381,7 +378,7 @@ class Ieee1394Camera : public Ieee1394Node
 
   public:
     Ieee1394Camera(Type type=Monocular, bool i1394b=false,
-		   u_int64 uniqId=0, u_int channel=0, u_int delay=0)	;
+		   u_int64 uniqId=0, u_int delay=0)			;
     ~Ieee1394Camera()							;
 
   // Basic function stuffs.
