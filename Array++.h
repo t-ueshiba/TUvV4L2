@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.h,v 1.7 2006-04-19 02:34:37 ueshiba Exp $
+ *  $Id: Array++.h,v 1.8 2006-09-07 04:21:41 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -149,7 +149,7 @@ class Array2 : public Array<T>
 						 r *= -1; return r;}
     std::istream&	restore(std::istream&)			;
     std::ostream&	save(std::ostream&)		const	;
-    void		resize(u_int, u_int)			;
+    bool		resize(u_int, u_int)			;
     void		resize(ET*, u_int, u_int)		;
     std::istream&	get(std::istream&, int, int, int)	;
     

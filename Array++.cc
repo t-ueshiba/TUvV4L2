@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.cc,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: Array++.cc,v 1.3 2006-09-07 04:21:41 ueshiba Exp $
  */
 #include "TU/Array++.h"
 #include <stdexcept>
@@ -303,23 +303,24 @@ Array2<T>::save(std::ostream& out) const
     return out;
 }
 
-template <class T> void
+template <class T> bool
 Array2<T>::resize(u_int r, u_int c)
 {
-    const u_int	old_ncol = ncol();
+    if (!Array<T>::resize(r) && ncol() == c)
+	return false;
 
     _cols = c;
-    _ary.resize(r*ncol());
-    if (Array<T>::resize(r) || ncol() != old_ncol)
-	set_rows();
+    _ary.resize(nrow()*ncol());
+    set_rows();
+    return true;
 }
 
 template <class T> void
 Array2<T>::resize(ET* p, u_int r, u_int c)
 {
-    _cols = c;
-    _ary.resize(p, r*ncol());
     Array<T>::resize(r);
+    _cols = c;
+    _ary.resize(p, nrow()*ncol());
     set_rows();
 }
 
