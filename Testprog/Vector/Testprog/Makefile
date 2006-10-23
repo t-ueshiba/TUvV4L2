@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.13 2006-05-26 07:30:19 ueshiba Exp $
+#  $Id: Makefile,v 1.14 2006-10-23 01:23:04 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -20,9 +20,9 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /Users/ueshiba/include/TU/Array++.h \
-		/Users/ueshiba/include/TU/Vector++.h \
-		/Users/ueshiba/include/TU/types.h
+EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
+		/home/ueshiba/include/TU/Vector++.h \
+		/home/ueshiba/include/TU/types.h
 HDRS		=
 SRCS		= mtest.cc
 OBJS		= mtest.o
@@ -30,7 +30,7 @@ OBJS		= mtest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.13 $	|		\
+REV		= $(shell echo $Revision: 1.14 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -41,5 +41,5 @@ REV		= $(shell echo $Revision: 1.13 $	|		\
 
 include $(PROJECT)/lib/p.mk
 ###
-mtest.o: /Users/ueshiba/include/TU/Vector++.h \
-	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h
+mtest.o: /home/ueshiba/include/TU/Vector++.h \
+	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
