@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.24 2005-05-10 05:20:25 ueshiba Exp $
+#  $Id: Makefile,v 1.25 2006-10-23 01:22:00 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,6 +14,7 @@ CPPFLAGS	=
 CFLAGS		= -O -g
 CCFLAGS		= -O -g
 ifeq ($(CCC), icpc)
+  CPPFLAGS     += -DSSE2
   CCFLAGS	= -O3 -parallel
 endif
 LDFLAGS		= $(CCFLAGS)
@@ -30,10 +31,13 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/BlockMatrix++.h \
 		TU/Geometry++.cc \
 		TU/Heap++.h \
+		TU/IIRFilter++.cc \
+		TU/IIRFilter++.h \
 		TU/Image++.cc \
 		TU/Image++.h \
 		TU/Manip.h \
 		TU/Mesh++.h \
+		TU/Minimize++.h \
 		TU/Nurbs++.h \
 		TU/PSTree++.h \
 		TU/Random.h \
@@ -43,13 +47,15 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/TU/List++.h \
 		TU/TU/TU/Vector++.h \
 		TU/TU/TU/types.h \
-		TU/Vector++.cc
+		TU/Vector++.cc \
+		TU/mmInstructions.h
 HDRS		= Allocator++.h \
 		Array++.h \
 		Bezier++.h \
 		BlockMatrix++.h \
 		Geometry++.h \
 		Heap++.h \
+		IIRFilter++.h \
 		Image++.h \
 		List++.h \
 		Manip.h \
@@ -60,6 +66,7 @@ HDRS		= Allocator++.h \
 		Random.h \
 		Serial++.h \
 		Vector++.h \
+		mmInstructions.h \
 		types.h
 SRCS		= Allocator++.cc \
 		Array++.cc \
@@ -77,6 +84,8 @@ SRCS		= Allocator++.cc \
 		Geometry++.cc \
 		Geometry++.inst.cc \
 		Heap++.cc \
+		IIRFilter++.cc \
+		IIRFilter.cc \
 		Image++.cc \
 		Image++.inst.cc \
 		ImageBase.cc \
@@ -112,6 +121,8 @@ OBJS		= Allocator++.o \
 		Geometry++.o \
 		Geometry++.inst.o \
 		Heap++.o \
+		IIRFilter++.o \
+		IIRFilter.o \
 		Image++.o \
 		Image++.inst.o \
 		ImageBase.o \
@@ -135,7 +146,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.24 $	|		\
+REV		= $(shell echo $Revision: 1.25 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -168,21 +179,27 @@ CameraWithFocalLength.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h
 CanonicalCamera.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
-ConversionFromYUV.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h
+ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h
 Geometry++.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 Geometry++.inst.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h TU/Geometry++.cc
 Heap++.o: TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h
-Image++.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h
+IIRFilter++.o: TU/IIRFilter++.h TU/Image++.h TU/TU/Geometry++.h \
+	TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/mmInstructions.h
+IIRFilter.o: TU/IIRFilter++.h TU/Image++.h TU/TU/Geometry++.h \
+	TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Minimize++.h \
+	TU/Array++.cc TU/IIRFilter++.cc TU/mmInstructions.h
+Image++.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h
 Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Image++.cc TU/Image++.h TU/TU/TU/Vector++.h
-ImageBase.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/Manip.h TU/TU/Geometry++.h
-ImageLine.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h
+	TU/Image++.cc TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h
+ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h TU/Manip.h
+ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h
 List++.o: TU/TU/List++.h
 Mesh++.o: TU/Mesh++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/Allocator++.h TU/TU/List++.h
@@ -200,8 +217,8 @@ Random.o: TU/Random.h
 Rotation.o: TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 Serial.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/Geometry++.cc
-TUTools++.sa.o: TU/Image++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h \
+TUTools++.sa.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h TU/Serial++.h TU/Manip.h \
 	TU/Geometry++.cc
 TriggerGenerator.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h \
 	TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Geometry++.cc

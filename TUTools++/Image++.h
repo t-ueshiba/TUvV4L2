@@ -20,13 +20,13 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.13 2006-05-25 02:10:17 ueshiba Exp $
+ *  $Id: Image++.h,v 1.14 2006-10-23 01:22:00 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
 
 #include <string.h>
-#include "TU/Vector++.h"
+#include "TU/Geometry++.h"
 
 namespace TU
 {
@@ -554,14 +554,18 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
 						 operator =(i);
 						 (ImageBase&)*this = i;
 						 return *this;}
-
+    template <class S>
+    const T&	operator ()(const Point2<S>& p)
+					const	{return (*this)[p[1]][p[0]];}
+    template <class S>
+    T&		operator ()(const Point2<S>& p)	{return (*this)[p[1]][p[0]];}
     u_int	width()			const	{return
 						 Array2<ImageLine<T> >::ncol();}
     u_int	height()		const	{return
 						 Array2<ImageLine<T> >::nrow();}
     
     Image&	operator = (double c)		{Array2<ImageLine<T> >::
-						 operator  =(c); return *this;}
+						 operator =(c); return *this;}
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out, Type type)	const	;
     std::istream&	restoreData(std::istream& in, Type type)	;
