@@ -1,5 +1,5 @@
 /*
- *  $Id: IIRFilter.cc,v 1.1 2006-10-23 01:22:00 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.2 2006-10-23 06:39:47 ueshiba Exp $
  */
 #include <math.h>
 #include "TU/IIRFilter++.h"
@@ -32,10 +32,10 @@ coefficients4(float a0, float b0, float omega0, float alpha0,
 /************************************************************************
 *  class DericheConvoler						*
 ************************************************************************/
-//! ‚±‚ÌCanny-DericheŠj‚Ì‰Šú‰»‚ğs‚¤
+//! $B$3$N(BCanny-Deriche$B3K$N=i4|2=$r9T$&(B
 /*!
-  \param alpha	ƒtƒBƒ‹ƒ^ƒTƒCƒY‚ğ•\‚·³”D¬‚³‚¢‚Ù‚ÇL‚ª‚è‚ª‘å‚«‚¢D
-  \return	‚±‚ÌCanny-DericheŠj©g.
+  \param alpha	$B%U%#%k%?%5%$%:$rI=$9@5?t!%>.$5$$$[$I9-$,$j$,Bg$-$$!%(B
+  \return	$B$3$N(BCanny-Deriche$B3K<+?H(B.
 */
 DericheConvolver&
 DericheConvolver::initialize(float alpha)
@@ -179,10 +179,10 @@ GaussianConvolver::CostFunction::update(AT& params, const Vector<T>& dp) const
 /************************************************************************
 *  class GaussianConvolver						*
 ************************************************************************/
-//! ‚±‚ÌGaussŠj‚Ì‰Šú‰»‚ğs‚¤
+//! $B$3$N(BGauss$B3K$N=i4|2=$r9T$&(B
 /*!
-  \param sigma	ƒtƒBƒ‹ƒ^ƒTƒCƒY‚ğ•\‚·³”D‘å‚«‚¢‚Ù‚ÇL‚ª‚è‚ª‘å‚«‚¢D
-  \return	‚±‚ÌGaussŠj©g.
+  \param sigma	$B%U%#%k%?%5%$%:$rI=$9@5?t!%Bg$-$$$[$I9-$,$j$,Bg$-$$!%(B
+  \return	$B$3$N(BGauss$B3K<+?H(B.
 */
 GaussianConvolver&
 GaussianConvolver::initialize(float sigma)

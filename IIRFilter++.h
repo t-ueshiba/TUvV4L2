@@ -1,5 +1,5 @@
 /*
- *  $Id: IIRFilter++.h,v 1.1 2006-10-23 01:22:00 ueshiba Exp $
+ *  $Id: IIRFilter++.h,v 1.2 2006-10-23 06:39:47 ueshiba Exp $
  */
 #ifndef __TUIIRFilterPP_h
 #define __TUIIRFilterPP_h
@@ -12,7 +12,7 @@ namespace TU
 *  class IIRFilter							*
 ************************************************************************/
 /*!
-  •Ğ‘¤Infinite Inpulse Response Filter‚ğ•\‚·ƒNƒ‰ƒXD
+  $BJRB&(BInfinite Inpulse Response Filter$B$rI=$9%/%i%9!%(B
 */
 template <u_int D> class IIRFilter
 {
@@ -35,17 +35,17 @@ template <u_int D> class IIRFilter
 *  class BilateralIIRFilter						*
 ************************************************************************/
 /*!
-  —¼‘¤Infinite Inpulse Response Filter‚ğ•\‚·ƒNƒ‰ƒXD
+  $BN>B&(BInfinite Inpulse Response Filter$B$rI=$9%/%i%9!%(B
 */
 template <u_int D> class BilateralIIRFilter
 {
   public:
-  //! ”÷•ª‚ÌŠK”
+  //! $BHyJ,$N3,?t(B
     enum Order
     {
-	Zeroth,						//! 0ŠK”÷•ª
-	First,						//! 1ŠK”÷•ª
-	Second						//! 2ŠK”÷•ª
+	Zeroth,						//! 0$B3,HyJ,(B
+	First,						//! 1$B3,HyJ,(B
+	Second						//! 2$B3,HyJ,(B
     };
     
     BilateralIIRFilter&	initialize(const float cF[D+D], const float cB[D+D]);
@@ -65,17 +65,17 @@ template <u_int D> class BilateralIIRFilter
     Array<float>	_bufB;
 };
 
-//! ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
+//! $B%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
 /*!
-  \param cF	‘Oiz•ÏŠ·ŒW”. z•ÏŠ·‚Í 
+  \param cF	$BA0?J(Bz$BJQ4978?t(B. z$BJQ49$O(B 
 		  Hf(w) =
 		      (cF[D-1] + cF[D-2]*w + cF[D-3]*w^2 + ... + cF[0]*w^(D-1))
 		    / (1 - cF[D+D-1]*w - cF[D+D-2]*w^2... - cF[D]*w^D)
-		‚Æ‚È‚é. ‚½‚¾‚µ w = z^(-1).
-  \param cB	Œã‘Şz•ÏŠ·ŒW”. z•ÏŠ·‚Í
+		$B$H$J$k(B. $B$?$@$7(B w = z^(-1).
+  \param cB	$B8eB`(Bz$BJQ4978?t(B. z$BJQ49$O(B
 		  Hb(z) = (cB[0]*z + cB[1]*z^2 + ... + cB[D-1]*z^D)
 		        / (1 - cB[D]*z - cB[D+1]*z^2... - cB[D+D-1]*z^D)
-		‚Æ‚È‚é.
+		$B$H$J$k(B.
 */
 template <u_int D> inline BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
@@ -91,10 +91,10 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
     return *this;
 }
 
-//! ƒtƒBƒ‹ƒ^‚É‚æ‚éô‚İ‚İ‚ğs‚¤. o—Í‚Í operator [](int) ‚Åæ‚èo‚·
+//! $B%U%#%k%?$K$h$k>v$_9~$_$r9T$&(B. $B=PNO$O(B operator [](int) $B$G<h$j=P$9(B
 /*!
-  \param in	“ü—Íƒf[ƒ^—ñ.
-  return	‚±‚ÌƒtƒBƒ‹ƒ^©g.
+  \param in	$BF~NO%G!<%?Ns(B.
+  return	$B$3$N%U%#%k%?<+?H(B.
 */
 template <u_int D> template <class S> inline BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::convolve(const Array<S>& in)
@@ -105,9 +105,9 @@ BilateralIIRFilter<D>::convolve(const Array<S>& in)
     return *this;
 }
 
-//! ô‚İ‚İ‚Ìo—Íƒf[ƒ^—ñ‚ÌŸŒ³‚ğ•Ô‚·
+//! $B>v$_9~$_$N=PNO%G!<%?Ns$N<!85$rJV$9(B
 /*!
-  \return	o—Íƒf[ƒ^—ñ‚ÌŸŒ³.
+  \return	$B=PNO%G!<%?Ns$N<!85(B.
 */
 template <u_int D> inline u_int
 BilateralIIRFilter<D>::dim() const
@@ -115,10 +115,10 @@ BilateralIIRFilter<D>::dim() const
     return _bufF.dim();
 }
 
-//! ô‚İ‚İ‚Ìo—Íƒf[ƒ^‚Ì“Á’è‚Ì—v‘f‚ğ•Ô‚·
+//! $B>v$_9~$_$N=PNO%G!<%?$NFCDj$NMWAG$rJV$9(B
 /*!
-  \param i	—v‘f‚Ìindex.
-  \return	—v‘f‚Ì’l.
+  \param i	$BMWAG$N(Bindex.
+  \return	$BMWAG$NCM(B.
 */
 template <u_int D> inline float
 BilateralIIRFilter<D>::operator [](int i) const
@@ -130,7 +130,7 @@ BilateralIIRFilter<D>::operator [](int i) const
 *  class BilateralIIRFilter2						*
 ************************************************************************/
 /*!
-  2ŸŒ³—¼‘¤Infinite Inpulse Response Filter‚ğ•\‚·ƒNƒ‰ƒXD
+  2$B<!85N>B&(BInfinite Inpulse Response Filter$B$rI=$9%/%i%9!%(B
 */
 template <u_int D> class BilateralIIRFilter2
 {
@@ -152,13 +152,13 @@ template <u_int D> class BilateralIIRFilter2
     Array2<Array<float> >	_buf;
 };
     
-//! ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
+//! $B%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
 /*!
-  \param cHF	‰¡•ûŒü‘Oiz•ÏŠ·ŒW”.
-  \param cHB	‰¡•ûŒüŒã‘Şz•ÏŠ·ŒW”.
-  \param cHV	c•ûŒü‘Oiz•ÏŠ·ŒW”.
-  \param cHV	c•ûŒüŒã‘Şz•ÏŠ·ŒW”.
-  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g.
+  \param cHF	$B2#J}8~A0?J(Bz$BJQ4978?t(B.
+  \param cHB	$B2#J}8~8eB`(Bz$BJQ4978?t(B.
+  \param cHV	$B=DJ}8~A0?J(Bz$BJQ4978?t(B.
+  \param cHV	$B=DJ}8~8eB`(Bz$BJQ4978?t(B.
+  \return	$B$3$N%U%#%k%?<+?H(B.
 */
 template <u_int D> inline BilateralIIRFilter2<D>&
 BilateralIIRFilter2<D>::initialize(float cHF[D+D], float cHB[D+D],
@@ -170,13 +170,13 @@ BilateralIIRFilter2<D>::initialize(float cHF[D+D], float cHB[D+D],
     return *this;
 }
 
-//! ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
+//! $B%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
 /*!
-  \param cHF	‰¡•ûŒü‘Oiz•ÏŠ·ŒW”.
-  \param orderH ‰¡•ûŒü”÷•ªŠK”.
-  \param cHV	c•ûŒü‘Oiz•ÏŠ·ŒW”.
-  \param orderV	c•ûŒü”÷•ªŠK”.
-  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g.
+  \param cHF	$B2#J}8~A0?J(Bz$BJQ4978?t(B.
+  \param orderH $B2#J}8~HyJ,3,?t(B.
+  \param cHV	$B=DJ}8~A0?J(Bz$BJQ4978?t(B.
+  \param orderV	$B=DJ}8~HyJ,3,?t(B.
+  \return	$B$3$N%U%#%k%?<+?H(B.
 */
 template <u_int D> inline BilateralIIRFilter2<D>&
 BilateralIIRFilter2<D>::initialize(float cHF[D+D], Order orderH,
@@ -192,8 +192,8 @@ BilateralIIRFilter2<D>::initialize(float cHF[D+D], Order orderH,
 *  class DericheConvoler						*
 ************************************************************************/
 /*!
-  Canny-DericheŠj‚É‚æ‚éƒXƒ€[ƒVƒ“ƒOC1Ÿ”÷•ª‚¨‚æ‚Ñ2Ÿ”÷•ª‚ğŠÜ‚Ş
-  ‰æ‘œô‚İ‚İ‚ğs‚¤ƒNƒ‰ƒXD
+  Canny-Deriche$B3K$K$h$k%9%`!<%7%s%0!$(B1$B<!HyJ,$*$h$S(B2$B<!HyJ,$r4^$`(B
+  $B2hA|>v$_9~$_$r9T$&%/%i%9!%(B
 */
 class DericheConvolver : private BilateralIIRFilter2<2u>
 {
@@ -219,11 +219,11 @@ class DericheConvolver : private BilateralIIRFilter2<2u>
     Image<float>	_tmp;	// buffer for storing intermediate values
 };
 
-//! Canny-DericheŠj‚É‚æ‚éƒXƒ€[ƒVƒ“ƒO
+//! Canny-Deriche$B3K$K$h$k%9%`!<%7%s%0(B
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌCanny-DericheŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BCanny-Deriche$B3K<+?H(B.
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::smooth(const Image<S>& in, Image<T>& out)
@@ -235,11 +235,11 @@ DericheConvolver::smooth(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Canny-DericheŠj‚É‚æ‚é‰¡•ûŒü1Ÿ”÷•ª
+//! Canny-Deriche$B3K$K$h$k2#J}8~(B1$B<!HyJ,(B
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌCanny-DericheŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BCanny-Deriche$B3K<+?H(B.
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::gradH(const Image<S>& in, Image<T>& out)
@@ -251,11 +251,11 @@ DericheConvolver::gradH(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Canny-DericheŠj‚É‚æ‚éc•ûŒü1Ÿ”÷•ª
+//! Canny-Deriche$B3K$K$h$k=DJ}8~(B1$B<!HyJ,(B
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌCanny-DericheŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BCanny-Deriche$B3K<+?H(B.
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::gradV(const Image<S>& in, Image<T>& out)
@@ -267,11 +267,11 @@ DericheConvolver::gradV(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Canny-DericheŠj‚É‚æ‚éƒ‰ƒvƒ‰ƒVƒAƒ“
+//! Canny-Deriche$B3K$K$h$k%i%W%i%7%"%s(B
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌCanny-DericheŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BCanny-Deriche$B3K<+?H(B.
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::laplacian(const Image<S>& in, Image<T>& out)
@@ -290,8 +290,8 @@ DericheConvolver::laplacian(const Image<S>& in, Image<T>& out)
 *  class GaussianConvoler						*
 ************************************************************************/
 /*!
-  GaussŠj‚É‚æ‚éƒXƒ€[ƒVƒ“ƒOC1Ÿ”÷•ª(DOG)‚¨‚æ‚Ñ2Ÿ”÷•ª(LOG)‚ğŠÜ‚Ş
-  ‰æ‘œô‚İ‚İ‚ğs‚¤ƒNƒ‰ƒXD
+  Gauss$B3K$K$h$k%9%`!<%7%s%0!$(B1$B<!HyJ,(B(DOG)$B$*$h$S(B2$B<!HyJ,(B(LOG)$B$r4^$`(B
+  $B2hA|>v$_9~$_$r9T$&%/%i%9!%(B
 */
 class GaussianConvolver : private BilateralIIRFilter2<4u>
 {
@@ -359,11 +359,11 @@ class GaussianConvolver : private BilateralIIRFilter2<4u>
     Image<float>	_tmp;	// buffer for storing intermediate values
 };
 
-//! GaussŠj‚É‚æ‚éƒXƒ€[ƒVƒ“ƒO
+//! Gauss$B3K$K$h$k%9%`!<%7%s%0(B
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌGaussŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BGauss$B3K<+?H(B.
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::smooth(const Image<S>& in, Image<T>& out)
@@ -375,11 +375,11 @@ GaussianConvolver::smooth(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! GaussŠj‚É‚æ‚é‰¡•ûŒü1Ÿ”÷•ª(DOG)
+//! Gauss$B3K$K$h$k2#J}8~(B1$B<!HyJ,(B(DOG)
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌGaussŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BGauss$B3K<+?H(B.
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::gradH(const Image<S>& in, Image<T>& out)
@@ -391,11 +391,11 @@ GaussianConvolver::gradH(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! GaussŠj‚É‚æ‚éc•ûŒü1Ÿ”÷•ª(DOG)
+//! Gauss$B3K$K$h$k=DJ}8~(B1$B<!HyJ,(B(DOG)
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌGaussŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BGauss$B3K<+?H(B.
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::gradV(const Image<S>& in, Image<T>& out)
@@ -407,11 +407,11 @@ GaussianConvolver::gradV(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! GaussŠj‚É‚æ‚éƒ‰ƒvƒ‰ƒVƒAƒ“(LOG)
+//! Gauss$B3K$K$h$k%i%W%i%7%"%s(B(LOG)
 /*!
-  \param in	“ü—Í‰æ‘œ.
-  \param out	o—Í‰æ‘œ.
-  \return	‚±‚ÌGaussŠj©g.
+  \param in	$BF~NO2hA|(B.
+  \param out	$B=PNO2hA|(B.
+  \return	$B$3$N(BGauss$B3K<+?H(B.
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::laplacian(const Image<S>& in, Image<T>& out)
