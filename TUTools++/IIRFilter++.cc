@@ -1,5 +1,5 @@
 /*
- *  $Id: IIRFilter++.cc,v 1.2 2006-10-23 06:39:47 ueshiba Exp $
+ *  $Id: IIRFilter++.cc,v 1.3 2006-10-24 08:10:50 ueshiba Exp $
  */
 #include <algorithm>
 #include "TU/IIRFilter++.h"
@@ -60,11 +60,17 @@ static inline mmFlt	mmIIR4(const u_char* src, const float* dst,
 //! フィルタのz変換係数をセットする
 /*!
   \param c	z変換係数. z変換関数は，前進フィルタの場合は
-		  H(w) = (c[D-1] + c[D-2]*w + c[D-3]*w^2 + ... + c[0]*w^(D-1))
-		       / (1 - c[D+D-1]*w - c[D+D-2]*w^2... - c[D]*w^D)
-		ただし w = z^(-1). 後退フィルタの場合は
-		  H(z) = (c[0]*z + c[1]*z^2 + ... + c[D-1]*z^D)
-		       / (1 - c[D]*z - c[D+1]*z^2... - c[D+D-1]*z^D)
+		\f[
+		  H(z^{-1}) = \frac{c_{D-1} + c_{D-2}z^{-1} + c_{D-3}z^{-2} +
+		  \cdots
+		  + c_{0}z^{-(D-1)}}{1 - c_{2D-1}z^{-1} - c_{2D-2}z^{-2} -
+		  \cdots - c_{D}z^{-D}}
+		\f]
+		後退フィルタの場合は
+		\f[
+		  H(z) = \frac{c_{0}z + c_{1}z^2 + \cdots + c_{D-1}*z^D}
+		       {1 - c_{D}z - c_{D+1}z^2 - \cdots - c_{2D-1}*z^D}
+		\f]
   \return	このフィルタ自身.
 */
 template <u_int D> IIRFilter<D>&
@@ -335,13 +341,16 @@ IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
 ************************************************************************/
 //! 両側フィルタのz変換係数をセットする
 /*!
-  \param c	前進方向z変換係数. 
-		  H(w) = (c[D-1] + c[D-2]*w + c[D-3]*w^2 + ... + c[0]*w^(D-1))
-		       / (1 - c[D+D-1]*w - c[D+D-2]*w^2... - c[D]*w^D)
-		ただし w = z^(-1).
-  \param order	フィルタの微分階数. ZerothまたはSecondならば対称フィルタ
-		として，Firstならば反対称フィルタとして自動的に後退方向の
-		z変換係数を計算する．Zeroth, First, Secondのときに，それ
+  \param c	前進方向z変換係数. z変換関数は
+		\f[
+		  H(z^{-1}) = \frac{c_{D-1} + c_{D-2}z^{-1} + c_{D-3}z^{-2} +
+		  \cdots
+		  + c_{0}z^{-(D-1)}}{1 - c_{2D-1}z^{-1} - c_{2D-2}z^{-2} -
+		  \cdots - c_{D}z^{-D}}
+		\f]
+  \param order	フィルタの微分階数. #Zerothまたは#Secondならば対称フィルタ
+		として，#Firstならば反対称フィルタとして自動的に後退方向の
+		z変換係数を計算する．#Zeroth, #First, #Secondのときに，それ
 		ぞれ in(n) = 1, in(n) = n, in(n) = n^2 に対する出力が
 		1, 1, 2になるよう，全体のスケールも調整される．
   \return	このフィルタ自身.
@@ -400,7 +409,7 @@ BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
 /*!
   \param limit0		一定入力 in(n) = 1 を与えたときの出力極限値を返す.
   \param limit1		傾き一定入力 in(n) = n を与えたときの出力極限値を返す.
-  \param limit1		2次入力 in(n) = n^2 を与えたときの出力極限値を返す.
+  \param limit2		2次入力 in(n) = n^2 を与えたときの出力極限値を返す.
 */
 template <u_int D> void
 BilateralIIRFilter<D>::limits(float& limit0, float& limit1, float& limit2) const
