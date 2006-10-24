@@ -1,5 +1,5 @@
 /*
- *  $Id: IIRFilter++.h,v 1.2 2006-10-23 06:39:47 ueshiba Exp $
+ *  $Id: IIRFilter++.h,v 1.3 2006-10-24 08:10:50 ueshiba Exp $
  */
 #ifndef __TUIIRFilterPP_h
 #define __TUIIRFilterPP_h
@@ -43,9 +43,9 @@ template <u_int D> class BilateralIIRFilter
   //! 微分の階数
     enum Order
     {
-	Zeroth,						//! 0階微分
-	First,						//! 1階微分
-	Second						//! 2階微分
+	Zeroth,						//!< 0階微分
+	First,						//!< 1階微分
+	Second						//!< 2階微分
     };
     
     BilateralIIRFilter&	initialize(const float cF[D+D], const float cB[D+D]);
@@ -68,13 +68,18 @@ template <u_int D> class BilateralIIRFilter
 //! フィルタのz変換係数をセットする
 /*!
   \param cF	前進z変換係数. z変換は 
-		  Hf(w) =
-		      (cF[D-1] + cF[D-2]*w + cF[D-3]*w^2 + ... + cF[0]*w^(D-1))
-		    / (1 - cF[D+D-1]*w - cF[D+D-2]*w^2... - cF[D]*w^D)
-		となる. ただし w = z^(-1).
+		\f[
+		  H^F(z^{-1}) = \frac{c^F_{D-1} + c^F_{D-2}z^{-1}
+		  + c^F_{D-3}z^{-2} + \cdots
+		  + c^F_{0}z^{-(D-1)}}{1 - c^F_{2D-1}z^{-1}
+		  - c^F_{2D-2}z^{-2} - \cdots - c^F_{D}z^{-D}}
+		\f]
+		となる. 
   \param cB	後退z変換係数. z変換は
-		  Hb(z) = (cB[0]*z + cB[1]*z^2 + ... + cB[D-1]*z^D)
-		        / (1 - cB[D]*z - cB[D+1]*z^2... - cB[D+D-1]*z^D)
+		\f[
+		  H^B(z) = \frac{c^B_{0}z + c^B_{1}z^2 + \cdots + c^B_{D-1}*z^D}
+		       {1 - c^B_{D}z - c^B_{D+1}z^2 - \cdots - c^B_{2D-1}*z^D}
+		\f]
 		となる.
 */
 template <u_int D> inline BilateralIIRFilter<D>&
