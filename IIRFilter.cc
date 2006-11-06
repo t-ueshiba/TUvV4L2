@@ -1,8 +1,8 @@
 /*
- *  $Id: IIRFilter.cc,v 1.2 2006-10-23 06:39:47 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.3 2006-11-06 02:17:41 ueshiba Exp $
  */
 #include <math.h>
-#include "TU/IIRFilter++.h"
+#include "TU/Image++.h"
 #include "TU/Minimize++.h"
 
 namespace TU
@@ -214,7 +214,7 @@ GaussianConvolver::initialize(float sigma)
 template class BilateralIIRFilter<2u>;
 
 template class BilateralIIRFilter2<2u>;
-template class BilateralIIRFilter2<2u>&
+template BilateralIIRFilter2<2u>&
 BilateralIIRFilter2<2u>::convolve(const Image<u_char>& in, Image<u_char>& out);
 template BilateralIIRFilter2<2u>&
 BilateralIIRFilter2<2u>::convolve(const Image<u_char>& in, Image<float>& out);
@@ -224,7 +224,7 @@ BilateralIIRFilter2<2u>::convolve(const Image<float>& in, Image<float>& out);
 template class BilateralIIRFilter<4u>;
 
 template class BilateralIIRFilter2<4u>;
-template class BilateralIIRFilter2<4u>&
+template BilateralIIRFilter2<4u>&
 BilateralIIRFilter2<4u>::convolve(const Image<u_char>& in, Image<u_char>& out);
 template BilateralIIRFilter2<4u>&
 BilateralIIRFilter2<4u>::convolve(const Image<u_char>& in, Image<float>& out);
@@ -235,5 +235,5 @@ BilateralIIRFilter2<4u>::convolve(const Image<float>& in, Image<float>& out);
 
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 #  include "TU/Array++.cc"
-#  include "TU/IIRFilter++.cc"
+#  include "TU/Image++.cc"
 #endif

@@ -1,8 +1,8 @@
 /*
- *  $Id: main.cc,v 1.1 2006-10-23 01:22:31 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2006-11-06 02:17:41 ueshiba Exp $
  */
 #include <unistd.h>
-#include "TU/IIRFilter++.h"
+#include "TU/Image++.h"
 #include "EdgeDetector.h"
 
 namespace TU
