@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.15 2006-11-06 02:17:41 ueshiba Exp $
+ *  $Id: Image++.h,v 1.16 2006-11-07 01:15:06 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -718,8 +718,8 @@ template <u_int D> class BilateralIIRFilter
 		となる. 
   \param cB	後退z変換係数. z変換は
 		\f[
-		  H^B(z) = \frac{c^B_{0}z + c^B_{1}z^2 + \cdots + c^B_{D-1}*z^D}
-		       {1 - c^B_{D}z - c^B_{D+1}z^2 - \cdots - c^B_{2D-1}*z^D}
+		  H^B(z) = \frac{c^B_{0}z + c^B_{1}z^2 + \cdots + c^B_{D-1}z^D}
+		       {1 - c^B_{D}z - c^B_{D+1}z^2 - \cdots - c^B_{2D-1}z^D}
 		\f]
 		となる.
 */
@@ -838,7 +838,7 @@ BilateralIIRFilter2<D>::initialize(float cHF[D+D], Order orderH,
 *  class DericheConvoler						*
 ************************************************************************/
 /*!
-  Canny-Deriche核によるスムーシング，1次微分および2次微分を含む
+  Canny-Deriche核によるスムーシング，1階微分および2階微分を含む
   画像畳み込みを行うクラス．
 */
 class DericheConvolver : private BilateralIIRFilter2<2u>
@@ -852,11 +852,15 @@ class DericheConvolver : private BilateralIIRFilter2<2u>
     template <class S, class T>
     DericheConvolver&	smooth(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
-    DericheConvolver&	gradH(const Image<S>& in, Image<T>& out)	;
+    DericheConvolver&	diffH(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
-    DericheConvolver&	gradV(const Image<S>& in, Image<T>& out)	;
+    DericheConvolver&	diffV(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
-    DericheConvolver&	gradHV(const Image<S>& in, Image<T>& out)	;
+    DericheConvolver&	diffHH(const Image<S>& in, Image<T>& out)	;
+    template <class S, class T>
+    DericheConvolver&	diffHV(const Image<S>& in, Image<T>& out)	;
+    template <class S, class T>
+    DericheConvolver&	diffVV(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
     DericheConvolver&	laplacian(const Image<S>& in, Image<T>& out)	;
 
@@ -883,14 +887,14 @@ DericheConvolver::smooth(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Canny-Deriche核による横方向1次微分
+//! Canny-Deriche核による横方向1階微分
 /*!
   \param in	入力画像.
   \param out	出力画像.
   \return	このCanny-Deriche核自身.
 */
 template <class S, class T> inline DericheConvolver&
-DericheConvolver::gradH(const Image<S>& in, Image<T>& out)
+DericheConvolver::diffH(const Image<S>& in, Image<T>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c1, BilateralIIRFilter<2u>::First,
@@ -899,14 +903,14 @@ DericheConvolver::gradH(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Canny-Deriche核による縦方向1次微分
+//! Canny-Deriche核による縦方向1階微分
 /*!
   \param in	入力画像.
   \param out	出力画像.
   \return	このCanny-Deriche核自身.
 */
 template <class S, class T> inline DericheConvolver&
-DericheConvolver::gradV(const Image<S>& in, Image<T>& out)
+DericheConvolver::diffV(const Image<S>& in, Image<T>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c0, BilateralIIRFilter<2u>::Zeroth,
@@ -915,18 +919,50 @@ DericheConvolver::gradV(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Canny-Deriche核による縦横両方向1次微分
+//! Canny-Deriche核による横方向2階微分
 /*!
   \param in	入力画像.
   \param out	出力画像.
   \return	このCanny-Deriche核自身.
 */
 template <class S, class T> inline DericheConvolver&
-DericheConvolver::gradHV(const Image<S>& in, Image<T>& out)
+DericheConvolver::diffHH(const Image<S>& in, Image<T>& out)
+{
+    BilateralIIRFilter2<2u>::
+	initialize(_c2, BilateralIIRFilter<2u>::Second,
+		   _c0, BilateralIIRFilter<2u>::Zeroth).convolve(in, out);
+
+    return *this;
+}
+
+//! Canny-Deriche核による縦横両方向2階微分
+/*!
+  \param in	入力画像.
+  \param out	出力画像.
+  \return	このCanny-Deriche核自身.
+*/
+template <class S, class T> inline DericheConvolver&
+DericheConvolver::diffHV(const Image<S>& in, Image<T>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c1, BilateralIIRFilter<2u>::First,
 		   _c1, BilateralIIRFilter<2u>::First).convolve(in, out);
+
+    return *this;
+}
+
+//! Canny-Deriche核による縦方向2階微分
+/*!
+  \param in	入力画像.
+  \param out	出力画像.
+  \return	このCanny-Deriche核自身.
+*/
+template <class S, class T> inline DericheConvolver&
+DericheConvolver::diffVV(const Image<S>& in, Image<T>& out)
+{
+    BilateralIIRFilter2<2u>::
+	initialize(_c0, BilateralIIRFilter<2u>::Zeroth,
+		   _c2, BilateralIIRFilter<2u>::Second).convolve(in, out);
 
     return *this;
 }
@@ -940,11 +976,7 @@ DericheConvolver::gradHV(const Image<S>& in, Image<T>& out)
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::laplacian(const Image<S>& in, Image<T>& out)
 {
-    BilateralIIRFilter2<2u>::
-	initialize(_c2, BilateralIIRFilter<2u>::Second,
-		   _c0, BilateralIIRFilter<2u>::Zeroth).convolve(in, _tmp).
-	initialize(_c0, BilateralIIRFilter<2u>::Zeroth,
-		   _c2, BilateralIIRFilter<2u>::Second).convolve(in, out);
+    diffHH(in, _tmp).diffVV(in, out);
     out += _tmp;
     
     return *this;
@@ -954,7 +986,7 @@ DericheConvolver::laplacian(const Image<S>& in, Image<T>& out)
 *  class GaussianConvoler						*
 ************************************************************************/
 /*!
-  Gauss核によるスムーシング，1次微分(DOG)および2次微分(LOG)を含む
+  Gauss核によるスムーシング，1階微分(DOG)および2階微分(LOG)を含む
   画像畳み込みを行うクラス．
 */
 class GaussianConvolver : private BilateralIIRFilter2<4u>
@@ -1010,11 +1042,15 @@ class GaussianConvolver : private BilateralIIRFilter2<4u>
     template <class S, class T>
     GaussianConvolver&	smooth(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
-    GaussianConvolver&	gradH(const Image<S>& in, Image<T>& out)	;
+    GaussianConvolver&	diffH(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
-    GaussianConvolver&	gradV(const Image<S>& in, Image<T>& out)	;
+    GaussianConvolver&	diffV(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
-    GaussianConvolver&	gradHV(const Image<S>& in, Image<T>& out)	;
+    GaussianConvolver&	diffHH(const Image<S>& in, Image<T>& out)	;
+    template <class S, class T>
+    GaussianConvolver&	diffHV(const Image<S>& in, Image<T>& out)	;
+    template <class S, class T>
+    GaussianConvolver&	diffVV(const Image<S>& in, Image<T>& out)	;
     template <class S, class T>
     GaussianConvolver&	laplacian(const Image<S>& in, Image<T>& out)	;
 
@@ -1041,14 +1077,14 @@ GaussianConvolver::smooth(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Gauss核による横方向1次微分(DOG)
+//! Gauss核による横方向1階微分(DOG)
 /*!
   \param in	入力画像.
   \param out	出力画像.
   \return	このGauss核自身.
 */
 template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::gradH(const Image<S>& in, Image<T>& out)
+GaussianConvolver::diffH(const Image<S>& in, Image<T>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c1, BilateralIIRFilter<4u>::First,
@@ -1057,14 +1093,14 @@ GaussianConvolver::gradH(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Gauss核による縦方向1次微分(DOG)
+//! Gauss核による縦方向1階微分(DOG)
 /*!
   \param in	入力画像.
   \param out	出力画像.
   \return	このGauss核自身.
 */
 template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::gradV(const Image<S>& in, Image<T>& out)
+GaussianConvolver::diffV(const Image<S>& in, Image<T>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c0, BilateralIIRFilter<4u>::Zeroth,
@@ -1073,18 +1109,50 @@ GaussianConvolver::gradV(const Image<S>& in, Image<T>& out)
     return *this;
 }
 
-//! Gauss核による縦横両方向1次微分(DOG)
+//! Gauss核による横方向2階微分
 /*!
   \param in	入力画像.
   \param out	出力画像.
   \return	このGauss核自身.
 */
 template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::gradHV(const Image<S>& in, Image<T>& out)
+GaussianConvolver::diffHH(const Image<S>& in, Image<T>& out)
+{
+    BilateralIIRFilter2<4u>::
+	initialize(_c2, BilateralIIRFilter<4u>::Second,
+		   _c0, BilateralIIRFilter<4u>::Zeroth).convolve(in, out);
+
+    return *this;
+}
+
+//! Gauss核による縦横両方向2階微分
+/*!
+  \param in	入力画像.
+  \param out	出力画像.
+  \return	このGauss核自身.
+*/
+template <class S, class T> inline GaussianConvolver&
+GaussianConvolver::diffHV(const Image<S>& in, Image<T>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c1, BilateralIIRFilter<4u>::First,
 		   _c1, BilateralIIRFilter<4u>::First).convolve(in, out);
+
+    return *this;
+}
+
+//! Gauss核による縦方向2階微分
+/*!
+  \param in	入力画像.
+  \param out	出力画像.
+  \return	このGauss核自身.
+*/
+template <class S, class T> inline GaussianConvolver&
+GaussianConvolver::diffVV(const Image<S>& in, Image<T>& out)
+{
+    BilateralIIRFilter2<4u>::
+	initialize(_c0, BilateralIIRFilter<4u>::Zeroth,
+		   _c2, BilateralIIRFilter<4u>::Second).convolve(in, out);
 
     return *this;
 }
@@ -1098,13 +1166,67 @@ GaussianConvolver::gradHV(const Image<S>& in, Image<T>& out)
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::laplacian(const Image<S>& in, Image<T>& out)
 {
-    BilateralIIRFilter2<4u>::
-	initialize(_c2, BilateralIIRFilter<4u>::Second,
-		   _c0, BilateralIIRFilter<4u>::Zeroth).convolve(in, _tmp).
-	initialize(_c0, BilateralIIRFilter<4u>::Zeroth,
-		   _c2, BilateralIIRFilter<4u>::Second).convolve(in, out);
+    diffHH(in, _tmp).diffVV(in, out);
     out += _tmp;
     
+    return *this;
+}
+
+/************************************************************************
+*  class EdgeDetector							*
+************************************************************************/
+/*!
+  エッジ検出を行うクラス.
+*/ 
+class EdgeDetector
+{
+  public:
+    enum	{TRACED = 0x4, EDGE = 0x02, WEAK = 0x01};
+    
+    EdgeDetector(float th_low=2.0, float th_high=5.0)			;
+    
+    EdgeDetector&	initialize(float th_low, float th_high)		;
+    const EdgeDetector&
+	strength(const Image<float>& edgeH,
+		 const Image<float>& edgeV, Image<float>& out)	  const	;
+    const EdgeDetector&
+	direction4(const Image<float>& edgeH,
+		   const Image<float>& edgeV, Image<u_char>& out) const	;
+    const EdgeDetector&
+	direction8(const Image<float>& edgeH,
+		   const Image<float>& edgeV, Image<u_char>& out) const	;
+    const EdgeDetector&
+	suppressNonmaxima(const Image<float>& strength,
+			  const Image<u_char>& direction,
+			  Image<u_char>& out)			  const	;
+
+  private:
+    float		_th_low, _th_high;
+};
+
+//! エッジ検出器を生成する
+/*!
+  \param th_low		弱いエッジの閾値.
+  \param th_low		強いエッジの閾値.
+*/
+inline
+EdgeDetector::EdgeDetector(float th_low, float th_high)
+{
+    initialize(th_low, th_high);
+}
+
+//! エッジ検出の閾値を設定する
+/*!
+  \param th_low		弱いエッジの閾値.
+  \param th_low		強いエッジの閾値.
+  \return		このエッジ検出器自身.
+*/
+inline EdgeDetector&
+EdgeDetector::initialize(float th_low, float th_high)
+{
+    _th_low  = th_low;
+    _th_high = th_high;
+
     return *this;
 }
 

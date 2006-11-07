@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2006-11-06 02:17:41 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2006-11-07 01:15:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -29,16 +29,14 @@ EXTHDRS		= /Users/ueshiba/include/TU/Array++.cc \
 		/Users/ueshiba/include/TU/Vector++.h \
 		/Users/ueshiba/include/TU/mmInstructions.h \
 		/Users/ueshiba/include/TU/types.h
-HDRS		= EdgeDetector.h
-SRCS		= EdgeDetector.cc \
-		main.cc
-OBJS		= EdgeDetector.o \
-		main.o
+HDRS		=
+SRCS		= main.cc
+OBJS		= main.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -50,15 +48,10 @@ REV		= $(shell echo $Revision: 1.3 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-EdgeDetector.o: EdgeDetector.h /Users/ueshiba/include/TU/Image++.h \
-	/Users/ueshiba/include/TU/Geometry++.h \
-	/Users/ueshiba/include/TU/Vector++.h \
-	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/mmInstructions.h
 main.o: /Users/ueshiba/include/TU/Image++.h \
 	/Users/ueshiba/include/TU/Geometry++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	EdgeDetector.h /Users/ueshiba/include/TU/Array++.cc \
+	/Users/ueshiba/include/TU/Array++.cc \
 	/Users/ueshiba/include/TU/Image++.cc \
 	/Users/ueshiba/include/TU/mmInstructions.h

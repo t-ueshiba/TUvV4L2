@@ -1,9 +1,8 @@
 /*
- *  $Id: main.cc,v 1.2 2006-11-06 02:17:41 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2006-11-07 01:15:06 ueshiba Exp $
  */
 #include <unistd.h>
 #include "TU/Image++.h"
-#include "EdgeDetector.h"
 
 namespace TU
 {
@@ -51,7 +50,7 @@ main(int argc, char* argv[])
   //GaussianConvolver	convolver(alpha);
 
     Image<float>	edgeH, edgeV;
-    convolver.gradH(in, edgeH).gradV(in, edgeV);
+    convolver.diffH(in, edgeH).diffV(in, edgeV);
     
     EdgeDetector	edgeDetector(th_low, th_high);
     Image<float>	str;

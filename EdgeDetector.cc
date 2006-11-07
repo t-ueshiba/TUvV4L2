@@ -1,7 +1,7 @@
 /*
- *  $Id: EdgeDetector.cc,v 1.1 2006-10-23 01:22:31 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.1 2006-11-07 01:15:06 ueshiba Exp $
  */
-#include "EdgeDetector.h"
+#include "TU/Image++.h"
 #ifdef __INTEL_COMPILER
 #  define SSE2
 #  include "TU/mmInstructions.h"
