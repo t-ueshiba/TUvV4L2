@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.8 2006-11-06 02:17:41 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.9 2006-11-07 01:15:06 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef WIN32
@@ -250,8 +250,8 @@ static inline mmFlt	mmIIR4(const u_char* src, const float* dst,
 		\f]
 		後退フィルタの場合は
 		\f[
-		  H(z) = \frac{c_{0}z + c_{1}z^2 + \cdots + c_{D-1}*z^D}
-		       {1 - c_{D}z - c_{D+1}z^2 - \cdots - c_{2D-1}*z^D}
+		  H(z) = \frac{c_{0}z + c_{1}z^2 + \cdots + c_{D-1}z^D}
+		       {1 - c_{D}z - c_{D+1}z^2 - \cdots - c_{2D-1}z^D}
 		\f]
   \return	このフィルタ自身.
 */

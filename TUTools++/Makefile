@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.27 2006-11-06 02:17:41 ueshiba Exp $
+#  $Id: Makefile,v 1.28 2006-11-07 01:15:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -45,8 +45,8 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/TU/List++.h \
 		TU/TU/TU/Vector++.h \
 		TU/TU/TU/types.h \
-		TU/TU/mmInstructions.h \
-		TU/Vector++.cc
+		TU/Vector++.cc \
+		TU/mmInstructions.h
 HDRS		= Allocator++.h \
 		Array++.h \
 		Bezier++.h \
@@ -78,6 +78,7 @@ SRCS		= Allocator++.cc \
 		CameraWithFocalLength.cc \
 		CanonicalCamera.cc \
 		ConversionFromYUV.cc \
+		EdgeDetector.cc \
 		Geometry++.cc \
 		Geometry++.inst.cc \
 		Heap++.cc \
@@ -114,6 +115,7 @@ OBJS		= Allocator++.o \
 		CameraWithFocalLength.o \
 		CanonicalCamera.o \
 		ConversionFromYUV.o \
+		EdgeDetector.o \
 		Geometry++.o \
 		Geometry++.inst.o \
 		Heap++.o \
@@ -141,7 +143,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.27 $	|		\
+REV		= $(shell echo $Revision: 1.28 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -176,6 +178,8 @@ CanonicalCamera.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h
+EdgeDetector.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h
 Geometry++.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 Geometry++.inst.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
@@ -183,12 +187,12 @@ Geometry++.inst.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 Heap++.o: TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h
 IIRFilter.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/Minimize++.h TU/Array++.cc \
-	TU/Image++.cc TU/TU/mmInstructions.h
+	TU/Image++.cc TU/mmInstructions.h
 Image++.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
-	TU/TU/Array++.h TU/TU/TU/types.h TU/TU/mmInstructions.h
+	TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h
 Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Image++.cc TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
-	TU/TU/mmInstructions.h
+	TU/mmInstructions.h
 ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/Manip.h
 ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
