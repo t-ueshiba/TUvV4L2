@@ -1,18 +1,12 @@
 /*
- *  $Id: Nurbs++.cc,v 1.2 2002-07-25 02:38:06 ueshiba Exp $
+ *  $Id: Nurbs++.cc,v 1.3 2006-11-14 06:22:10 ueshiba Exp $
  */
+#include "TU/functions.h"
 #include "TU/Nurbs++.h"
 #include <stdexcept>
 
 namespace TU
 {
-/************************************************************************
-*  static functions							*
-************************************************************************/
-inline int	min(int a, int b)	{return (a < b ? a : b);}
-inline int	max(int a, int b)	{return (a > b ? a : b);}
-inline void	swap(int& a, int& b)	{int tmp = a; a = b; b = tmp;}
-
 /************************************************************************
 *  class BSplineKnots<T>						*
 ************************************************************************/
