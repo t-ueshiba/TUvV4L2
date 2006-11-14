@@ -20,8 +20,9 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.9 2006-11-07 01:15:06 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.10 2006-11-14 06:22:10 ueshiba Exp $
  */
+#include "TU/functions.h"
 #include "TU/Image++.h"
 #ifdef WIN32
 #  include <winsock2.h>
@@ -190,8 +191,6 @@ Image<T>::_resize(u_int h, u_int w)
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-static inline int	min(int a, int b)	{return (a < b ? a : b);}
-
 #ifdef SSE3
 static inline mmFlt	mmIIR2(const float* src, const float* dst,
 			       const float* c)

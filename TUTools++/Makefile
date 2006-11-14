@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.28 2006-11-07 01:15:06 ueshiba Exp $
+#  $Id: Makefile,v 1.29 2006-11-14 06:22:10 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -45,6 +45,7 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/TU/List++.h \
 		TU/TU/TU/Vector++.h \
 		TU/TU/TU/types.h \
+		TU/TU/functions.h \
 		TU/Vector++.cc \
 		TU/mmInstructions.h
 HDRS		= Allocator++.h \
@@ -63,6 +64,7 @@ HDRS		= Allocator++.h \
 		Random.h \
 		Serial++.h \
 		Vector++.h \
+		functions.h \
 		mmInstructions.h \
 		types.h
 SRCS		= Allocator++.cc \
@@ -143,7 +145,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.28 $	|		\
+REV		= $(shell echo $Revision: 1.29 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -187,12 +189,13 @@ Geometry++.inst.o: TU/TU/Geometry++.h TU/TU/TU/Vector++.h TU/TU/Array++.h \
 Heap++.o: TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h
 IIRFilter.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/Minimize++.h TU/Array++.cc \
-	TU/Image++.cc TU/mmInstructions.h
-Image++.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
-	TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h
-Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Image++.cc TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
+	TU/Image++.cc TU/TU/functions.h TU/mmInstructions.h
+Image++.o: TU/TU/functions.h TU/Image++.h TU/TU/Geometry++.h \
+	TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/mmInstructions.h
+Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/Image++.cc TU/TU/functions.h TU/Image++.h TU/TU/Geometry++.h \
+	TU/TU/TU/Vector++.h TU/mmInstructions.h
 ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/Manip.h
 ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
@@ -202,8 +205,8 @@ Mesh++.o: TU/Mesh++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/Allocator++.h TU/TU/List++.h
 Microscope.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h \
 	TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Geometry++.cc
-Nurbs++.o: TU/Nurbs++.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
-	TU/TU/Array++.h TU/TU/TU/types.h
+Nurbs++.o: TU/TU/functions.h TU/Nurbs++.h TU/TU/Geometry++.h \
+	TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 PSTree++.o: TU/PSTree++.h TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/TU/List++.h
 Pata.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h TU/TU/TU/Vector++.h \
