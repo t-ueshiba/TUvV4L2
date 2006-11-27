@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.3 2006-11-07 01:15:06 ueshiba Exp $
+ *  $Id: main.cc,v 1.4 2006-11-27 00:26:03 ueshiba Exp $
  */
 #include <unistd.h>
 #include "TU/Image++.h"
@@ -28,8 +28,9 @@ main(int argc, char* argv[])
     using namespace	TU;
 
     float		alpha = 1.0, th_low = 2.0, th_high = 5.0;
+    bool		gaussian = false, laplacian = false;
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "a:l:h:")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "a:l:h:GL")) != EOF; )
 	switch (c)
 	{
 	  case 'a':
@@ -41,24 +42,41 @@ main(int argc, char* argv[])
 	  case 'h':
 	    th_high = atof(optarg);
 	    break;
+	  case 'G':
+	    gaussian = true;
+	    break;
+	  case 'L':
+	    laplacian = true;
+	    break;
 	}
 
-    Image<u_char>	in;
+    Image<u_char>	in, edge;
     in.restore(cin);
 
-    DericheConvolver	convolver(alpha);
-  //GaussianConvolver	convolver(alpha);
-
-    Image<float>	edgeH, edgeV;
-    convolver.diffH(in, edgeH).diffV(in, edgeV);
+    if (laplacian)
+    {
+	Image<float>	lap;
+	if (gaussian)
+	    GaussianConvolver(alpha).laplacian(in, lap);
+	else
+	    DericheConvolver(alpha).laplacian(in, lap);
+	EdgeDetector(th_low, th_high).zeroCrossing(lap, edge);
+    }
+    else
+    {
+	Image<float>	edgeH, edgeV;
+	if (gaussian)
+	    GaussianConvolver(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	else
+	    DericheConvolver(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	Image<float>	str;
+	Image<u_char>	dir;
+	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
+				     .direction4(edgeH, edgeV, dir)
+				     .suppressNonmaxima(str, dir, edge);
+    }
     
-    EdgeDetector	edgeDetector(th_low, th_high);
-    Image<float>	str;
-    Image<u_char>	dir, edge;
-    edgeDetector.strength(edgeH, edgeV, str).direction4(edgeH, edgeV, dir)
-		.suppressNonmaxima(str, dir, edge);
-
-    Image<RGB>	out;
+    Image<RGB>		out;
     superImpose(in, edge, out);
     out.save(cout, ImageBase::RGB_24);
     

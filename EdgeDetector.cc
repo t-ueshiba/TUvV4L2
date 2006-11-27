@@ -1,5 +1,5 @@
 /*
- *  $Id: EdgeDetector.cc,v 1.2 2006-11-14 06:22:10 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.3 2006-11-27 00:26:03 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef __INTEL_COMPILER
@@ -343,4 +343,46 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
     return *this;
 }
 
+//! 入力微分画像のゼロ交差点を検出する
+/*!
+  \param in		入力微分画像.
+  \param out		細線化されたエッジ画像.
+  \return		このエッジ検出器自身.
+*/
+const EdgeDetector&
+EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
+{
+    out.resize(in.height(), in.width());
+
+  // 出力画像の下端と右端を0にする．
+    if (out.height() > 0)
+	for (int u = 0; u < out.width(); ++u)
+	    out[out.height()-1][u] = 0;
+    if (out.width() > 0)
+	for (int v = 0; v < out.height(); ++v)
+	    out[v][out.width()-1] = 0;
+
+  // 現在点を左上隅とする2x2ウィンドウ中の画素が異符号ならエッジ点とする．
+    for (int v = 0; v < out.height() - 1; ++v)
+    {
+	const float		*cur = in[v],
+				*nxt = in[v+1];
+	const u_char* const	end  = &out[v][out.width() - 1];
+	for (u_char* dst = out[v]; dst < end; )
+	{
+	    if ((*cur >= 0.0 && *(cur+1) >= 0.0 &&
+		 *nxt >= 0.0 && *(nxt+1) >= 0.0) ||
+		(*cur <= 0.0 && *(cur+1) <= 0.0 &&
+		 *nxt <= 0.0 && *(nxt+1) <= 0.0))
+		*dst++ = 0;
+	    else
+		*dst++ = 255;
+	    ++cur;
+	    ++nxt;
+	}
+    }
+
+    return *this;
+}
+    
 }

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.16 2006-11-07 01:15:06 ueshiba Exp $
+ *  $Id: Image++.h,v 1.17 2006-11-27 00:26:03 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -1199,6 +1199,8 @@ class EdgeDetector
 	suppressNonmaxima(const Image<float>& strength,
 			  const Image<u_char>& direction,
 			  Image<u_char>& out)			  const	;
+    const EdgeDetector&
+	zeroCrossing(const Image<float>& in, Image<u_char>& out)  const	;
 
   private:
     float		_th_low, _th_high;
