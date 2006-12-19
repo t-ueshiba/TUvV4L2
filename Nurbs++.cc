@@ -1,5 +1,5 @@
 /*
- *  $Id: Nurbs++.cc,v 1.3 2006-11-14 06:22:10 ueshiba Exp $
+ *  $Id: Nurbs++.cc,v 1.4 2006-12-19 07:09:24 ueshiba Exp $
  */
 #include "TU/functions.h"
 #include "TU/Nurbs++.h"
@@ -219,7 +219,7 @@ BSplineKnots<T>::removeKnot(int k)
 {
     k = rightmost(k);			// index of the knot to be removed
     Array<T>	tmp(*this);
-    resize(dim() - 1);
+    Array<T>::resize(dim() - 1);
     for (int i = 0; i < k; ++i)		// copy unchanged knots
 	(*this)[i] = tmp[i];
     for (int i = M(); i >= k; --i)	// shift unchanged knots

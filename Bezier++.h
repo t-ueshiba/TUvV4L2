@@ -1,5 +1,5 @@
 /*
- *  $Id: Bezier++.h,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.3 2006-12-19 07:09:24 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -30,10 +30,10 @@ class BezierCurveBase : private Array<C>
     void	elevateDegree()			;
     
   //    Array<C>::operator [];
-    Array<C>::operator ==;
-    Array<C>::operator !=;
-    Array<C>::save;
-    Array<C>::restore;
+    using	Array<C>::operator ==;
+    using	Array<C>::operator !=;
+    using	Array<C>::save;
+    using	Array<C>::restore;
 
     friend class Array2<BezierCurveBase<T, C> >; // allow access to resize.
     
@@ -88,7 +88,7 @@ class BezierSurfaceBase : protected Array2<BezierCurveBase<T, C> >
 
     BezierSurfaceBase(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}
     BezierSurfaceBase(const Array2<Array<C> >& b)			;
-    
+
     static u_int	dim()				{return C::dim();}
 
     const Curve&	operator [](int i)	const
@@ -103,11 +103,13 @@ class BezierSurfaceBase : protected Array2<BezierCurveBase<T, C> >
     void	uElevateDegree()			;
     void	vElevateDegree()			;
 
-  //    Array2<Curve>::operator [];
-    Array2<Curve>::operator ==;
-    Array2<Curve>::operator !=;
-    Array2<Curve>::save;
-    Array2<Curve>::restore;
+  //using	Array2<Curve>::operator [];
+    using	Array2<Curve>::nrow;
+    using	Array2<Curve>::ncol;
+    using	Array2<Curve>::operator ==;
+    using	Array2<Curve>::operator !=;
+    using	Array2<Curve>::save;
+    using	Array2<Curve>::restore;
     
     friend std::istream&
     operator >>(std::istream& in, BezierSurfaceBase<T, C>& b)

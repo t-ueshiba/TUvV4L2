@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraBase.cc,v 1.6 2003-03-17 00:22:30 ueshiba Exp $
+ *  $Id: CameraBase.cc,v 1.7 2006-12-19 07:09:24 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 
@@ -59,7 +59,7 @@ CameraBase::jacobianXc(const Vector<double>& x) const
     return J;
 }
  
-//! カメラパラメータに関する投影点の画像座標の1次微分を求める．
+//! カメラパラメータに関する投影点の画像座標の1次微分を求める
 Matrix<double>
 CameraBase::jacobianP(const Vector<double>& x) const
 {

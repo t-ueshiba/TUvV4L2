@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.9 2006-04-19 02:34:37 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.10 2006-12-19 07:09:24 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -448,15 +448,11 @@ class PlaneP3 : public CoordinateP<T, 3u>
 /************************************************************************
 *  class CameraBase							*
 ************************************************************************/
-/*!
-  すべての透視投影カメラの基底となるクラス．
-*/
+//! すべての透視投影カメラの基底となるクラス
 class CameraBase
 {
   public:
-  /*!
-    カメラの内部パラメータを表すクラス．
-  */
+  //! カメラの内部パラメータを表すクラス
     class Intrinsic
     {
       public:
@@ -504,10 +500,10 @@ class CameraBase
     };
     
   public:
-  //! 位置を原点に，姿勢を単位行列にセットして初期化．
+  //! 位置を原点に，姿勢を単位行列にセットして初期化
     CameraBase()
 	:_t(3), _Rt(3, 3)	{_Rt[0][0] = _Rt[1][1] = _Rt[2][2] = 1.0;}
-  //! 位置と姿勢を単位行列にセットして初期化．
+  //! 位置と姿勢を単位行列にセットして初期化
   /*!
     \param t	カメラ位置を表す3次元ベクトル．
     \param Rt	カメラ姿勢を表す3x3回転行列．
@@ -577,7 +573,7 @@ class CameraBase
     Matrix<double>	_Rt;			// camera orientation.
 };
 
-//! 3次元空間中の点の像のcanonicalカメラ座標系における位置を求める．
+//! 3次元空間中の点の像のcanonicalカメラ座標系における位置を求める
 /*!
   像は以下のように計算される．
   \f[
@@ -598,7 +594,7 @@ CameraBase::xc(const Vector<double>& x) const
     return Point2<double>(xx[0] / xx[2], xx[1] / xx[2]);
 }
 
-//! 画像座標における点の2次元位置をcanonicalカメラ座標系に直す．
+//! 画像座標における点の2次元位置をcanonicalカメラ座標系に直す
 /*!
   \param u	画像座標系における点の2次元位置．
   \return	canonicalカメラ座標系におけるuの2次元位置．
@@ -609,7 +605,7 @@ CameraBase::xc(const Point2<double>& u) const
     return intrinsic().xc(u);
 }
 
-//! 3次元空間中の点の像の画像座標系における位置を求める．
+//! 3次元空間中の点の像の画像座標系における位置を求める
 /*!
   \param x	3次元空間中の点を表す3次元ベクトル．
   \return	xの像の画像座標系における位置．
@@ -620,7 +616,7 @@ CameraBase::operator ()(const Vector<double>& x) const
     return intrinsic()(xc(x));
 }
 
-//! 3次元ユークリッド空間から画像平面への投影行列を求める．
+//! 3次元ユークリッド空間から画像平面への投影行列を求める
 /*!
   \return	投影行列．
 */
@@ -630,7 +626,7 @@ CameraBase::P() const
     return K() * Pc();
 }
 
-//! 位置を固定したときの内部/外部パラメータに関するJacobianを求める．
+//! 位置を固定したときの内部/外部パラメータに関するJacobianを求める
 /*!
   \return	
 */
