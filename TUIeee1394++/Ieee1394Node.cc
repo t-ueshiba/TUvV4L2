@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.6 2006-06-02 05:39:58 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.7 2006-12-19 07:05:20 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <unistd.h>
@@ -436,10 +436,13 @@ Ieee1394Node::waitListenBuffer()
 
     return _buf + _current * _mmap.buf_size;
 #else
+#  if defined(USE_THREAD)
+    raw1394_raise(_handle);
+#  else    
     while (_current < _end)
 	raw1394_loop_iterate(_handle);
     gettimeofday(&_filltime, NULL);
-
+#  endif
     return _buf;
 #endif    
 }

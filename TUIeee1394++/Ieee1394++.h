@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.14 2006-06-02 05:39:58 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.15 2006-12-19 07:05:20 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -44,14 +44,19 @@
   typedef unsigned long long	u_int64;
 #endif
 
+/*!
+  \namespace	TU
+  \brief	本ライブラリで定義されたクラスおよび関数を納める名前空間
+ */
 namespace TU
 {
 /************************************************************************
 *  class Ieee1394Node							*
 ************************************************************************/
+//! IEEE1394のノードを表すクラス
 /*!
-  IEEE1394のノードを表すクラス．一般には，より具体的な機能を持ったノード
-  (ex. デジタルカメラ)を表すクラスの基底クラスとして用いられる．
+  一般には，より具体的な機能を持ったノード(ex. デジタルカメラ)を表す
+  クラスの基底クラスとして用いられる．
 */
 class Ieee1394Node
 {
@@ -112,6 +117,9 @@ class Ieee1394Node
     u_char	channel()			const	{return _channel;}
 #endif
     u_int	delay()				const	{return _delay;}
+#if defined(USE_THREAD)
+    void	wait()					;
+#endif
     
   protected:
     Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int delay
@@ -171,12 +179,20 @@ class Ieee1394Node
     const u_int			_delay;
 };
 
+#if defined(USE_THREAD)
+inline void
+Ieee1394Node::wait()
+{
+    raw1394_wait(_handle);
+}
+#endif
+    
 /************************************************************************
 *  class Ieee1394Camera							*
 ************************************************************************/
+//! IEEE1394デジタルカメラを表すクラス
 /*!
-  1394-based Digital Camera Specification ver. 1.30に準拠したデジタルカメラ
-  を表すクラス．
+  1394-based Digital Camera Specification ver. 1.30に準拠．
 */
 class Ieee1394Camera : public Ieee1394Node
 {
@@ -534,7 +550,7 @@ Ieee1394Camera::inquireBasicFunction() const
     return readQuadletFromRegister(0x400);
 }
 
-//! カメラから出力される最初の画像を保持する．
+//! カメラから出力される最初の画像を保持する
 /*!
   カメラからの画像出力は，continuousShot(), oneShot(), multiShot()のいずれか
   によって行われる．実際に画像データが受信されるまで，本関数は呼び出し側に

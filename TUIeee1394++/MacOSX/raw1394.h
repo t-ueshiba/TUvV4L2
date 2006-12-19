@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.h,v 1.2 2006-06-02 05:40:16 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.3 2006-12-19 07:05:20 ueshiba Exp $
  */
 #ifndef _LIBRAW1394_RAW1394_H
 #define _LIBRAW1394_RAW1394_H
@@ -90,7 +90,10 @@ int	raw1394_iso_recv_start(raw1394handle_t handle,
 			       int sync);
 void	raw1394_iso_stop(raw1394handle_t handle);
 int	raw1394_iso_recv_flush(raw1394handle_t handle);
-
+#ifdef USE_THREAD
+void	raw1394_raise(raw1394handle_t handle);
+void	raw1394_wait(raw1394handle_t handle);
+#endif
 #ifdef __cplusplus
 }
 #endif

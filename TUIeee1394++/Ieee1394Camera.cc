@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.16 2006-06-02 05:39:58 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.17 2006-12-19 07:05:20 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -2536,7 +2536,7 @@ static const int	NFEATURES = sizeof(features) / sizeof(features[0]);
 *  global functions							*
 ************************************************************************/
 //! 現在のカメラの設定をストリームに書き出す
-/*
+/*!
   \param out		出力ストリーム．
   \param camera		対象となるカメラ．
   \return		outで指定した出力ストリームを返す．
@@ -2589,7 +2589,7 @@ operator <<(std::ostream& out, const Ieee1394Camera& camera)
 }
 
 //! ストリームから読み込んだ設定をカメラにセットする
-/*
+/*!
   \param in		入力ストリーム．
   \param camera		対象となるカメラ．
   \return		inで指定した入力ストリームを返す．

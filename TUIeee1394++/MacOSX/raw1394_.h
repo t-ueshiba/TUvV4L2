@@ -19,12 +19,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.2 2006-06-02 05:40:16 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.3 2006-12-19 07:05:20 ueshiba Exp $
  */
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
 #include <mach/mach.h>
-
+#ifdef USE_THREAD
+#  include <pthread.h>
+#endif
 /************************************************************************
 *  struct raw1394							*
 ************************************************************************/
@@ -82,7 +84,9 @@ struct raw1394
     IOReturn	isoRecvStart()						;
     IOReturn	isoStop()						;
     IOReturn	isoRecvFlush()						;
+#ifndef USE_THREAD
     SInt32	loopIterate()						;
+#endif
     
   private:
     raw1394(const raw1394&)						;
@@ -99,7 +103,7 @@ struct raw1394
 				    UInt32		      channel)	;
     static IOReturn
 		stopHandler(IOFireWireLibIsochPortRef isochPort)	;
-    
+
   private:
     IOCFPlugInInterface**		_cfPlugInInterface;
     IOFireWireLibDeviceRef		_fwDeviceInterface;
@@ -119,7 +123,23 @@ struct raw1394
 
     void*				_userData;
 
-    static UInt32			_id;
+    static UInt32			_nnodes;
+
+#ifdef USE_THREAD
+  public:
+    void		raise()					const	;
+    void		wait()					const	;
+    
+  private:
+    static void*	threadProc(void* thread)			;
+    
+    enum State		{Ready, Idle, Exit};
+
+    mutable pthread_mutex_t	_mutex;
+    mutable pthread_cond_t	_cond;
+    pthread_t			_thread;
+    mutable State		_state;
+#endif
 };
 
 inline void
@@ -181,9 +201,21 @@ raw1394::isoStop()
 {
     return (*_isochChannel)->Stop(_isochChannel);
 }
-    
+
+#ifdef USE_THREAD
+inline void
+raw1394::raise() const
+{
+    pthread_mutex_lock(&_mutex);
+    _state = Ready;
+    pthread_cond_signal(&_cond);	// Send Ready signal to the child.
+    pthread_mutex_unlock(&_mutex);
+}
+#else
 inline SInt32
 raw1394::loopIterate()
 {
     return CFRunLoopRunInMode(_runLoopMode, (CFTimeInterval)1, true);
+  //return CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)1, true);
 }
+#endif

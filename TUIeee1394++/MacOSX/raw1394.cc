@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.3 2006-06-02 05:40:16 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.4 2006-12-19 07:05:20 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -56,7 +56,7 @@ raw1394::Interval::resize(UInt32 n, raw1394* parent)
 /************************************************************************
 *  class raw1394							*
 ************************************************************************/
-static SInt32	DefaultIrqInterval = 10;
+static SInt32	DefaultIrqInterval = 16;
 
 raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
     :_cfPlugInInterface(0), _fwDeviceInterface(0), _runLoopMode(),
@@ -64,6 +64,9 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
      _nIntervals(0), _interval(0), _localIsochPort(0),
      _channel(0), _remoteIsochPort(0), _isochChannel(0),
      _userData(0)
+#ifdef USE_THREAD
+     ,_mutex(), _cond(), _thread(), _state(Idle)
+#endif
 {
     using namespace	std;
     
@@ -94,7 +97,7 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
 		kIOCFPlugInInterfaceID, &_cfPlugInInterface, &theScore)
 	     == kIOReturnSuccess) &&
 	    ((*_cfPlugInInterface)->QueryInterface(_cfPlugInInterface,
-		CFUUIDGetUUIDBytes(kIOFireWireDeviceInterfaceID_v5),
+		CFUUIDGetUUIDBytes(kIOFireWireDeviceInterfaceID_v8),
 		(void**)&_fwDeviceInterface)
 	     == S_OK) &&
 	    ((*_fwDeviceInterface)->Open(_fwDeviceInterface)
@@ -116,32 +119,51 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
     if (!_fwDeviceInterface)
 	throw runtime_error("raw1394::raw1394: no specified service(=device) found!!");
 
+#ifdef USE_THREAD
+    pthread_mutex_init(&_mutex, NULL);
+    pthread_cond_init(&_cond, NULL);
+
+    pthread_create(&_thread, NULL, threadProc, this);
+#else
   // Add a callback dispatcher to RunLoop with a specific mode.
     char	mode[] = "raw1394.x";
-    mode[strlen(mode)-1] = '0' + _id++;
+    mode[strlen(mode)-1] = '0' + _nnodes++;
     _runLoopMode = CFStringCreateWithCString(kCFAllocatorDefault, mode,
 					     CFStringGetSystemEncoding());
     if ((*_fwDeviceInterface)->AddIsochCallbackDispatcherToRunLoopForMode(
 	    _fwDeviceInterface, CFRunLoopGetCurrent(), _runLoopMode)
 	    != kIOReturnSuccess)
-	throw runtime_error("raw1394::raw1394: failed to add an isochronous callback dispatcher!!");
+	    throw runtime_error("raw1394::raw1394: failed to add an isochronous callback dispatcher!!");
+#endif
 }
 
 raw1394::~raw1394()
 {
-    isoShutdown();
-
-    --_id;
-    CFRelease(_runLoopMode);
-
-    if (_fwDeviceInterface)
-    {
-	CFRelease(_runLoopMode);
-	(*_fwDeviceInterface)->Close(_fwDeviceInterface);
-	(*_fwDeviceInterface)->Release(_fwDeviceInterface);
-    }
     if (_cfPlugInInterface)
+    {
+	if (_fwDeviceInterface)
+	{
+	    isoShutdown();
+#ifdef USE_THREAD
+	    pthread_mutex_lock(&_mutex);
+	    _state = Exit;
+	    pthread_cond_signal(&_cond);    // Send Exit signal to the child.
+	    pthread_mutex_unlock(&_mutex);
+
+	    pthread_join(_thread, NULL);    // Wait the child terminating.
+	    pthread_cond_destroy(&_cond);
+	    pthread_mutex_destroy(&_mutex);
+#else
+	    (*_fwDeviceInterface)
+		->RemoveIsochCallbackDispatcherFromRunLoop(_fwDeviceInterface);
+	    CFRelease(_runLoopMode);
+	    --_nnodes;
+#endif
+	    (*_fwDeviceInterface)->Close(_fwDeviceInterface);
+	    (*_fwDeviceInterface)->Release(_fwDeviceInterface);
+	}
 	IODestroyPlugInInterface(_cfPlugInInterface);
+    }
 }
 
 FWAddress
@@ -249,7 +271,7 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 
       // Allocate a CallProc command with the isochronous receive handler.
 	dcl = (*_commandPool)->AllocateCallProcDCL(_commandPool, dcl,
-						   &receiveHandler,
+						   receiveHandler,
 						   (UInt32)&interval);
 #ifdef DEBUG
 	std::cerr << i << ": dcl = " << std::hex << dcl << std::endl;
@@ -261,10 +283,20 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     }
 
   // [Step 1.4] Create a local isochronous port.
-    if (!(_localIsochPort = (*_fwDeviceInterface)->CreateLocalIsochPort(
+#ifdef USE_THREAD
+    if (!(_localIsochPort =
+	  (*_fwDeviceInterface)->CreateLocalIsochPort(
 	      _fwDeviceInterface, false, (DCLCommand*)_interval[0].label,
 	      kFWDCLSyBitsEvent, 0x1, 0x1, nil, 0, nil, 0,
 	      CFUUIDGetUUIDBytes(kIOFireWireLocalIsochPortInterfaceID))))
+#else
+    if (!(_localIsochPort =
+	  (*_fwDeviceInterface)->CreateLocalIsochPortWithOptions(
+	      _fwDeviceInterface, false, (DCLCommand*)_interval[0].label,
+	      kFWDCLSyBitsEvent, 0x1, 0x1, nil, 0, nil, 0,
+	      kFWIsochPortUseSeparateKernelThread,
+	      CFUUIDGetUUIDBytes(kIOFireWireLocalIsochPortInterfaceID))))
+#endif
 	return kIOReturnError;
 
   // [Step 1.5] Modify jump labels.
@@ -284,10 +316,10 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     (*_remoteIsochPort)->SetRefCon((IOFireWireLibIsochPortRef)_remoteIsochPort,
 				   this);
     (*_remoteIsochPort)->SetGetSupportedHandler(_remoteIsochPort,
-						&getSupportedHandler);
+						getSupportedHandler);
     (*_remoteIsochPort)->SetAllocatePortHandler(_remoteIsochPort,
-						&allocatePortHandler);
-    (*_remoteIsochPort)->SetStopHandler(_remoteIsochPort, &stopHandler);
+						allocatePortHandler);
+    (*_remoteIsochPort)->SetStopHandler(_remoteIsochPort, stopHandler);
 
   // [Step 4] Set up an isochronous channel.
     if (!(_isochChannel = (*_fwDeviceInterface)->CreateIsochChannel(
@@ -295,10 +327,10 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 	      CFUUIDGetUUIDBytes(kIOFireWireIsochChannelInterfaceID))))
 	return kIOReturnError;
     if ((err = (*_isochChannel)->SetTalker(_isochChannel,
-	   (IOFireWireLibIsochPortRef)_localIsochPort)) != kIOReturnSuccess)
+	   (IOFireWireLibIsochPortRef)_remoteIsochPort)) != kIOReturnSuccess)
 	return err;
     if ((err = (*_isochChannel)->AddListener(_isochChannel,
-	   (IOFireWireLibIsochPortRef)_remoteIsochPort)) != kIOReturnSuccess)
+	   (IOFireWireLibIsochPortRef)_localIsochPort)) != kIOReturnSuccess)
 	return err;
     if ((err = (*_isochChannel)->AllocateChannel(_isochChannel))
 	!= kIOReturnSuccess)
@@ -403,8 +435,6 @@ raw1394::getSupportedHandler(IOFireWireLibIsochPortRef	isochPort,
 			     UInt64*			channel)
 {
     *speed = kFWSpeedMaximum;
-  /*    raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
-   *channel = 0x1ULL << (63 - me->_channel);*/
     *channel = 0xffff000000000000ULL;
     
     return kIOReturnSuccess;
@@ -427,17 +457,59 @@ raw1394::allocatePortHandler(IOFireWireLibIsochPortRef	isochPort,
 IOReturn
 raw1394::stopHandler(IOFireWireLibIsochPortRef isochPort)
 {
+#ifndef USE_THREAD
     raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
-    while (CFRunLoopRunInMode(me->_runLoopMode, 1, true)
-	   == kCFRunLoopRunHandledSource);
-
+    while (me->loopIterate() == kCFRunLoopRunHandledSource);
+#endif
     return kIOReturnSuccess;
 }
 
 /************************************************************************
 *  static member variables for class raw1394				*
 ************************************************************************/
-UInt32	raw1394::_id = 0;
+UInt32	raw1394::_nnodes = 0;
+
+#ifdef USE_THREAD
+/************************************************************************
+*  thread relevant stuffs for class raw1394				*
+************************************************************************/
+void
+raw1394::wait() const
+{
+    pthread_mutex_lock(&_mutex);
+    while (_state != Idle)
+	pthread_cond_wait(&_cond, &_mutex);
+    pthread_mutex_unlock(&_mutex);
+}
+
+void*
+raw1394::threadProc(void* r1394)
+{
+    raw1394*	me = (raw1394*)r1394;
+
+    pthread_mutex_lock(&me->_mutex);
+    (*me->_fwDeviceInterface)
+	->AddIsochCallbackDispatcherToRunLoop(me->_fwDeviceInterface,
+					      CFRunLoopGetCurrent());
+    for (;;)
+    {
+	pthread_cond_wait(&me->_cond, &me->_mutex);
+	if (me->_state == Ready)
+	{
+	    CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true);
+	    me->_state = Idle;
+	    pthread_cond_signal(&me->_cond);  // Send Idle signal to the parent.
+	}
+	else if (me->_state == Exit)
+	    break;
+    }
+    (*me->_fwDeviceInterface)->RemoveIsochCallbackDispatcherFromRunLoop(
+	me->_fwDeviceInterface);
+    pthread_mutex_unlock(&me->_mutex);
+
+    return 0;
+}
+#endif
 
 /************************************************************************
 *  wrapper C functions							*
@@ -489,11 +561,25 @@ raw1394_write(raw1394handle_t handle, nodeid_t node,
 	    == kIOReturnSuccess ? 0 : -1);
 }
 
+#ifdef USE_THREAD
+extern "C" void
+raw1394_raise(raw1394handle_t handle)
+{
+    handle->raise();
+}
+
+extern "C" void
+raw1394_wait(raw1394handle_t handle)
+{
+    handle->wait();
+}
+#else
 extern "C" int
 raw1394_loop_iterate(raw1394handle_t handle)
 {
     return (handle->loopIterate() == kCFRunLoopRunHandledSource ? 0 : -1);
 }
+#endif
 
 extern "C" int
 raw1394_iso_recv_init(raw1394handle_t			handle,
@@ -532,4 +618,3 @@ raw1394_iso_recv_flush(raw1394handle_t handle)
 {
     return (handle->isoRecvFlush() == kIOReturnSuccess ? 0 : -1);
 }
-
