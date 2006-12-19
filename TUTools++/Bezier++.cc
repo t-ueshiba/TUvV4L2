@@ -1,5 +1,5 @@
 /*
- *  $Id: Bezier++.cc,v 1.2 2002-07-25 02:38:03 ueshiba Exp $
+ *  $Id: Bezier++.cc,v 1.3 2006-12-19 07:09:24 ueshiba Exp $
  */
 #include "TU/Bezier++.h"
 
@@ -47,7 +47,7 @@ template <class T, class C> void
 BezierCurveBase<T, C>::elevateDegree()
 {
     Array<C>	b_tmp(*this);
-    resize(degree() + 2);
+    Array<C>::resize(degree() + 2);
     (*this)[0] = b_tmp[0];
     for (int i = 1; i < degree(); ++i)
     {

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.17 2006-11-27 00:26:03 ueshiba Exp $
+ *  $Id: Image++.h,v 1.18 2006-12-19 07:09:24 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -652,9 +652,7 @@ Image<YUV411>::resize(TU::YUV411* p, u_int h, u_int w)
 /************************************************************************
 *  class IIRFilter							*
 ************************************************************************/
-/*!
-  片側Infinite Inpulse Response Filterを表すクラス．
-*/
+//! 片側Infinite Inpulse Response Filterを表すクラス
 template <u_int D> class IIRFilter
 {
   public:
@@ -675,9 +673,7 @@ template <u_int D> class IIRFilter
 /************************************************************************
 *  class BilateralIIRFilter						*
 ************************************************************************/
-/*!
-  両側Infinite Inpulse Response Filterを表すクラス．
-*/
+//! 両側Infinite Inpulse Response Filterを表すクラス
 template <u_int D> class BilateralIIRFilter
 {
   public:
@@ -775,9 +771,7 @@ BilateralIIRFilter<D>::operator [](int i) const
 /************************************************************************
 *  class BilateralIIRFilter2						*
 ************************************************************************/
-/*!
-  2次元両側Infinite Inpulse Response Filterを表すクラス．
-*/
+//! 2次元両側Infinite Inpulse Response Filterを表すクラス
 template <u_int D> class BilateralIIRFilter2
 {
   public:
@@ -837,10 +831,7 @@ BilateralIIRFilter2<D>::initialize(float cHF[D+D], Order orderH,
 /************************************************************************
 *  class DericheConvoler						*
 ************************************************************************/
-/*!
-  Canny-Deriche核によるスムーシング，1階微分および2階微分を含む
-  画像畳み込みを行うクラス．
-*/
+//! Canny-Deriche核による画像畳み込みを行うクラス
 class DericheConvolver : private BilateralIIRFilter2<2u>
 {
   public:
@@ -985,10 +976,7 @@ DericheConvolver::laplacian(const Image<S>& in, Image<T>& out)
 /************************************************************************
 *  class GaussianConvoler						*
 ************************************************************************/
-/*!
-  Gauss核によるスムーシング，1階微分(DOG)および2階微分(LOG)を含む
-  画像畳み込みを行うクラス．
-*/
+//! Gauss核による画像畳み込みを行うクラス
 class GaussianConvolver : private BilateralIIRFilter2<4u>
 {
   private:
@@ -1175,9 +1163,7 @@ GaussianConvolver::laplacian(const Image<S>& in, Image<T>& out)
 /************************************************************************
 *  class EdgeDetector							*
 ************************************************************************/
-/*!
-  エッジ検出を行うクラス.
-*/ 
+//! エッジ検出を行うクラス
 class EdgeDetector
 {
   public:
@@ -1235,9 +1221,7 @@ EdgeDetector::initialize(float th_low, float th_high)
 /************************************************************************
 *  class IntegralImage<T>						*
 ************************************************************************/
-/*!
-  積分画像(integral image)を表すクラス.
-*/
+//! 積分画像(integral image)を表すクラス
 template <class T>
 class IntegralImage : public Image<T>
 {
@@ -1292,9 +1276,7 @@ IntegralImage<T>::crossVal(int u, int v, int cropSize) const
 /************************************************************************
 *  class DiagonalIntegralImage						*
 ************************************************************************/
-/*!
-  対角積分画像(diagonal integral image)を表すクラス.
-*/
+//! 対角積分画像(diagonal integral image)を表すクラス
 template <class T>
 class DiagonalIntegralImage : public Image<T>
 {

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.cc,v 1.3 2006-09-07 04:21:41 ueshiba Exp $
+ *  $Id: Array++.cc,v 1.4 2006-12-19 07:09:24 ueshiba Exp $
  */
 #include "TU/Array++.h"
 #include <stdexcept>
@@ -30,12 +30,18 @@ namespace TU
 /************************************************************************
 *  class Array<T>							*
 ************************************************************************/
-inline u_int
+static inline u_int
 _pdim(u_int i, u_int d, u_int a)
 {
     return (i+d <= a ? d : i < a ? a-i : 0);
 }
 
+//! 記憶領域を元の配列と共有した部分配列を作る
+/*!
+  \param a	配列.
+  \param i	部分配列の第0要素を指定するindex.
+  \param d	部分配列の次元(要素数).
+*/
 template <class T>
 Array<T>::Array(const Array<T>& a, u_int i, u_int d)
     :_d(_pdim(i, d, a.dim())),
@@ -48,6 +54,10 @@ Array<T>::Array(const Array<T>& a, u_int i, u_int d)
 #endif
 }
 
+//! コピーコンストラクタ
+/*!
+  \param a	コピー元の配列.
+*/
 template <class T>
 Array<T>::Array(const Array<T>& a)
     :_d(a.dim()), _p(new T[dim()]), _siz(dim()), _shr(0)
@@ -61,6 +71,10 @@ Array<T>::Array(const Array<T>& a)
 	(*this)[i] = a[i];
 }
 
+//! 配列のコピー
+/*!
+  \param a	コピー元の配列.
+*/
 template <class T> Array<T>&
 Array<T>::operator =(const Array<T>& a)
 {
@@ -77,6 +91,10 @@ Array<T>::operator =(const Array<T>& a)
     return *this;
 }
 
+//! 配列の要素へアクセスする(indexのチェックあり)
+/*!
+  \param i	要素を指定するindex.
+*/
 template <class T> const T&
 Array<T>::at(int i) const
 {
@@ -85,6 +103,10 @@ Array<T>::at(int i) const
     return _p[i];
 }
 
+//! 配列の要素へアクセスする(indexのチェックあり)
+/*!
+  \param i	要素を指定するindex.
+*/
 template <class T> T&
 Array<T>::at(int i)
 {
@@ -93,6 +115,10 @@ Array<T>::at(int i)
     return _p[i];
 }
 
+//! 全ての要素に同一の数値を代入する
+/*!
+  \param d	代入する値.
+*/
 template <class T> Array<T>&
 Array<T>::operator =(double c)
 {
@@ -101,6 +127,10 @@ Array<T>::operator =(double c)
     return *this;
 }
 
+//! 全ての要素に同一の数値を掛ける
+/*!
+  \param d	掛ける値.
+*/
 template <class T> Array<T>&
 Array<T>::operator *=(double c)
 {
@@ -109,6 +139,10 @@ Array<T>::operator *=(double c)
     return *this;
 }
     
+//! 全ての要素を同一の数値で割る
+/*!
+  \param d	割る値.
+*/
 template <class T> Array<T>&
 Array<T>::operator /=(double c)
 {
@@ -117,6 +151,10 @@ Array<T>::operator /=(double c)
     return *this;
 }
 
+//! 各要素に他の配列の要素を足す
+/*!
+  \param a	足す配列.
+*/
 template <class T> Array<T>&
 Array<T>::operator +=(const Array<T>& a)
 {
@@ -126,6 +164,10 @@ Array<T>::operator +=(const Array<T>& a)
     return *this;
 }
 
+//! 各要素から他の配列の要素を引く
+/*!
+  \param a	引く配列.
+*/
 template <class T> Array<T>&
 Array<T>::operator -=(const Array<T>& a)
 {
@@ -135,6 +177,11 @@ Array<T>::operator -=(const Array<T>& a)
     return *this;
 }
 
+//! 2つの配列を要素毎に比較し，同じであるか調べる
+/*!
+  \param a	比較対象となる配列.
+  \return	全ての要素が同じならばtrueを，そうでなければfalseを返す．
+*/
 template <class T> bool
 Array<T>::operator ==(const Array<T>& a) const
 {
@@ -146,6 +193,11 @@ Array<T>::operator ==(const Array<T>& a) const
     return true;
 }
 
+//! 入力ストリームから配列を読み込む(binary)
+/*!
+  \param in	入力ストリーム.
+  \return	inで指定した入力ストリーム.
+*/
 template <class T> std::istream&
 Array<T>::restore(std::istream& in)
 {
@@ -153,6 +205,11 @@ Array<T>::restore(std::istream& in)
     return in;
 }
 
+//! 出力ストリームに配列を書き出す(binary)
+/*!
+  \param out	出力ストリーム.
+  \return	outで指定した出力ストリーム.
+*/
 template <class T> std::ostream&
 Array<T>::save(std::ostream& out) const
 {
@@ -160,6 +217,11 @@ Array<T>::save(std::ostream& out) const
     return out;
 }
 
+//! 配列の次元を変更する
+/*!
+  \param d	新しい次元.
+  \return	dが元の次元よりも大きければtrueを，そうでなければfalseを返す.
+*/
 template <class T> bool
 Array<T>::resize(u_int d)
 {
@@ -179,6 +241,11 @@ Array<T>::resize(u_int d)
     return dim() > old_dim;
 }
 
+//! 配列が内部で使用する記憶領域を指定したものに変更する
+/*!
+  \param p	新しい記憶領域へのポインタ.
+  \param d	新しい次元.
+*/
 template <class T> void
 Array<T>::resize(T* p, u_int d)
 {
@@ -190,6 +257,10 @@ Array<T>::resize(T* p, u_int d)
     _siz = d;
 }
 
+//! 指定した符号なし整数値がこの配列の次元に一致しなければ例外を投げる
+/*!
+  \param d	調べたい符号なし整数値.
+*/
 template <class T> void
 Array<T>::check_dim(u_int d) const
 {
@@ -198,6 +269,12 @@ Array<T>::check_dim(u_int d) const
 	    std::invalid_argument("Array<T>::check_dim: dimension mismatch!");
 }
 
+//! 入力ストリームから指定した箇所に配列を読み込む(ASCII)
+/*!
+  \param in	入力ストリーム.
+  \param m	読み込み先の先頭を指定するindex.
+  \return	inで指定した入力ストリーム.
+*/
 template <class T> std::istream&
 Array<T>::get(std::istream& in, int m)
 {
@@ -230,6 +307,12 @@ Array<T>::get(std::istream& in, int m)
     return in;
 }
 
+//! 出力ストリームへ配列を書き出す(ASCII)
+/*!
+  \param out	出力ストリーム.
+  \param a	書き出す配列.
+  \return	outで指定した出力ストリーム.
+*/
 template <class T> std::ostream&
 operator <<(std::ostream& out, const Array<T>& a)
 {
@@ -241,6 +324,14 @@ operator <<(std::ostream& out, const Array<T>& a)
 /************************************************************************
 *  class Array2<T>							*
 ************************************************************************/
+//! 記憶領域を元の配列と共有した部分配列を作る
+/*!
+  \param a	配列.
+  \param i	部分配列の左上隅要素の行を指定するindex.
+  \param j	部分配列の左上隅要素の列を指定するindex.
+  \param r	部分配列の行数.
+  \param c	部分配列の列数.
+*/
 template <class T>
 Array2<T>::Array2(const Array2<T>& a, u_int i, u_int j, u_int r, u_int c)
     :Array<T>(_pdim(i, r, a.nrow())), _cols(_pdim(j, c, a.ncol())),
@@ -255,6 +346,10 @@ Array2<T>::Array2(const Array2<T>& a, u_int i, u_int j, u_int r, u_int c)
 	(*this)[ii].resize((ET*)&a[i+ii][j], ncol());
 }    
 
+//! コピーコンストラクタ
+/*!
+  \param a	コピー元の配列.
+*/
 template <class T>
 Array2<T>::Array2(const Array2<T>& a)
     :Array<T>(a.nrow()), _cols(a.ncol()), _ary(nrow()*ncol())
@@ -269,11 +364,16 @@ Array2<T>::Array2(const Array2<T>& a)
 	(*this)[i] = a[i];
 }    
 
+//! デストラクタ
 template <class T>
 Array2<T>::~Array2()
 {
 }
 
+//! 配列のコピー
+/*!
+  \param a	コピー元の配列.
+*/
 template <class T> Array2<T>&
 Array2<T>::operator =(const Array2<T>& a)
 {
@@ -287,6 +387,11 @@ Array2<T>::operator =(const Array2<T>& a)
     return *this;
 }
 
+//! 入力ストリームから配列を読み込む(binary)
+/*!
+  \param in	入力ストリーム.
+  \return	inで指定した入力ストリーム.
+*/
 template <class T> std::istream&
 Array2<T>::restore(std::istream& in)
 {
@@ -295,6 +400,11 @@ Array2<T>::restore(std::istream& in)
     return in;
 }
 
+//! 出力ストリームに配列を書き出す(binary)
+/*!
+  \param out	出力ストリーム.
+  \return	outで指定した出力ストリーム.
+*/
 template <class T> std::ostream&
 Array2<T>::save(std::ostream& out) const
 {
@@ -303,6 +413,13 @@ Array2<T>::save(std::ostream& out) const
     return out;
 }
 
+//! 配列のサイズを変更する
+/*!
+  \param r	新しい行数.
+  \param c	新しい列数.
+  \return	rが元の行数より大きい又はcが元の列数と異なればtrueを，
+		そうでなければfalseを返す.
+*/
 template <class T> bool
 Array2<T>::resize(u_int r, u_int c)
 {
@@ -315,6 +432,12 @@ Array2<T>::resize(u_int r, u_int c)
     return true;
 }
 
+//! 配列が内部で使用する記憶領域を指定したものに変更する
+/*!
+  \param p	新しい記憶領域へのポインタ.
+  \param r	新しい行数.
+  \param c	新しい列数.
+*/
 template <class T> void
 Array2<T>::resize(ET* p, u_int r, u_int c)
 {

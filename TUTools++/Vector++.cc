@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.12 2006-04-19 02:34:37 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.13 2006-12-19 07:09:24 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -39,18 +39,36 @@ swap(T& a, T& b)
 /************************************************************************
 *  class Vector<T>							*
 ************************************************************************/
+//! このベクトルと記憶領域を共有した部分ベクトルを生成する
+/*!
+    \param i	部分ベクトルの第0要素を指定するindex.
+    \param d	部分ベクトルの次元.
+    \return	生成された部分ベクトル.
+*/
 template <class T> const Vector<T>
 Vector<T>::operator ()(u_int i, u_int dd) const	// partial vector
 {
     return Vector<T>(*this, i, dd);
 }
 
+//! このベクトルと記憶領域を共有した部分ベクトルを生成する
+/*!
+    \param i	部分ベクトルの第0要素を指定するindex.
+    \param d	部分ベクトルの次元.
+    \return	生成された部分ベクトル.
+*/
 template <class T> Vector<T>
 Vector<T>::operator ()(u_int i, u_int dd)	// partial vector
 {
     return Vector<T>(*this, i, dd);
 }
 
+//! このベクトルと他の3次元ベクトルとのベクトル積をとる
+/*!
+    \param v	他のベクトル.
+    \return	このベクトル，すなわち
+		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\times\TUvec{v}{}\f$.
+*/
 template <class T> Vector<T>&
 Vector<T>::operator ^=(const Vector<T>& v)	// outer product
 {
@@ -64,6 +82,11 @@ Vector<T>::operator ^=(const Vector<T>& v)	// outer product
     return *this;
 }
 
+//! このベクトルの長さを1に正規化したベクトルを返す
+/*!
+  \return	長さを正規化したベクトル，すなわち
+		\f$\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}\f$.
+*/
 template <class T> Vector<T>
 Vector<T>::normal() const			// return normalized vector
 {
@@ -72,6 +95,13 @@ Vector<T>::normal() const			// return normalized vector
     return r;
 }
 
+//! 連立1次方程式を解く
+/*!
+  \param m	正則な正方行列.
+  \return	\f$\TUtvec{u}{} = \TUtvec{x}{}\TUvec{M}{}\f$
+		の解を納めたこのベクトル，すなわち
+		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$.
+*/
 template <class T> Vector<T>&
 Vector<T>::solve(const Matrix<T>& m)
 {
@@ -79,6 +109,16 @@ Vector<T>::solve(const Matrix<T>& m)
     return *this;
 }
 
+//! この3次元ベクトルから3x3反対称行列を生成する
+/*!
+  \return	生成された反対称行列，すなわち
+  \f[
+    \TUskew{u}{} \equiv
+    \TUbeginarray{ccc}
+      & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
+    \TUendarray
+  \f]
+*/
 template <class T> Matrix<T>
 Vector<T>::skew() const
 {
@@ -97,18 +137,39 @@ Vector<T>::skew() const
 /************************************************************************
 *  class Matrix<T>							*
 ************************************************************************/
+//! この行列と記憶領域を共有した部分行列を生成する
+/*!
+    \param i	部分行列の左上隅要素となる行を指定するindex.
+    \param j	部分行列の左上隅要素となる列を指定するindex.
+    \param r	部分行列の行数.
+    \param c	部分行列の列数.
+    \return	生成された部分行列.
+*/
 template <class T> const Matrix<T>
 Matrix<T>::operator ()(u_int i, u_int j, u_int r, u_int c) const
 {
     return Matrix<T>(*this, i, j, r, c);
 }
 
+//! この行列と記憶領域を共有した部分行列を生成する
+/*!
+    \param i	部分行列の左上隅要素となる行を指定するindex.
+    \param j	部分行列の左上隅要素となる列を指定するindex.
+    \param r	部分行列の行数.
+    \param c	部分行列の列数.
+    \return	生成された部分行列.
+*/
 template <class T> Matrix<T>
 Matrix<T>::operator ()(u_int i, u_int j, u_int r, u_int c)
 {
     return Matrix<T>(*this, i, j, r, c);
 }
 
+//! この正方行列を全て同一の対角成分値を持つ対角行列にする
+/*!
+  \param c	対角成分の値.
+  \return	この行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::diag(double c)
 {
@@ -126,6 +187,12 @@ Matrix<T>::rot(double angle, int axis)
     return *this;
 }
 
+//! この?x3行列の各行と3次元ベクトルとのベクトル積をとる
+/*!
+  \param v	3次元ベクトル.
+  \return	この行列，すなわち
+		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::operator ^=(const Vector<T>& v)
 {
@@ -134,6 +201,10 @@ Matrix<T>::operator ^=(const Vector<T>& v)
     return *this;
 }
 
+//! この行列の転置行列を返す
+/*!
+  \return	転置行列，すなわち\f$\TUtvec{A}{}\f$.
+*/
 template <class T> Matrix<T>
 Matrix<T>::trns() const				// transpose
 {
@@ -144,6 +215,10 @@ Matrix<T>::trns() const				// transpose
     return val;
 }
 
+//! この行列の逆行列を返す
+/*!
+  \return	逆行列，すなわち\f$\TUinv{A}{}\f$.
+*/
 template <class T> Matrix<T>
 Matrix<T>::inv() const
 {
@@ -152,6 +227,13 @@ Matrix<T>::inv() const
     return identity.diag(1.0).solve(*this);
 }
 
+//! 連立1次方程式を解く
+/*!
+  \param m	正則な正方行列.
+  \return	\f$\TUvec{A}{} = \TUvec{X}{}\TUvec{M}{}\f$
+		の解を納めたこの行列，すなわち
+		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::solve(const Matrix<T>& m)
 {
@@ -162,12 +244,22 @@ Matrix<T>::solve(const Matrix<T>& m)
     return *this;
 }
 
+//! この行列の行列式を返す
+/*!
+  \return	行列式，すなわち\f$\det\TUvec{A}{}\f$.
+*/
 template <class T> T
 Matrix<T>::det() const
 {
     return LUDecomposition<T>(*this).det();
 }
 
+//! この行列の小行列式を返す
+/*!
+  \param p	元の行列から取り除く行を指定するindex.
+  \param q	元の行列から取り除く列を指定するindex.
+  \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$.
+*/
 template <class T> T
 Matrix<T>::det(u_int p, u_int q) const
 {
@@ -189,6 +281,10 @@ Matrix<T>::det(u_int p, u_int q) const
     return d.det();
 }
 
+//! この行列のtraceを返す
+/*!
+  \return	trace, すなわち\f$\trace\TUvec{A}{}\f$.
+*/
 template <class T> T
 Matrix<T>::trace() const
 {
@@ -201,6 +297,11 @@ Matrix<T>::trace() const
     return val;
 }
 
+//! この行列の余因子行列を返す
+/*!
+  \return	余因子行列，すなわち
+		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$.
+*/
 template <class T> Matrix<T>
 Matrix<T>::adj() const
 {
@@ -211,6 +312,20 @@ Matrix<T>::adj() const
     return val;
 }
 
+//! この行列の疑似逆行列を返す
+/*!
+  \param cndnum	最大特異値に対する絶対値の割合がこれに達しない基底は無視.
+  \return	疑似逆行列，すなわち与えられた行列の特異値分解を
+		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
+		\TUtvec{U}{}\f$とすると
+		\f[
+		  \TUvec{u}{0}\sigma_0^{-1}\TUtvec{v}{0} + \cdots +
+		  \TUvec{u}{r}\sigma_{r-1}^{-1}\TUtvec{v}{r-1},
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUabs{\sigma_1} > \epsilon\TUabs{\sigma_0},\ldots,
+		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
+		\f]
+*/
 template <class T> Matrix<T>
 Matrix<T>::pinv(double cndnum) const
 {
@@ -224,6 +339,17 @@ Matrix<T>::pinv(double cndnum) const
     return B;
 }
 
+//! この対称行列の固有値と固有ベクトルを返す
+/*!
+    \param eval	絶対値の大きい順に並べられた固有値.
+    \return	各行が固有ベクトルから成る回転行列，すなわち
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} = \TUvec{U}{}\diag(e_0,\ldots,e_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
+		\f]
+		なる\f$\TUtvec{U}{}\f$.
+*/
 template <class T> Matrix<T>
 Matrix<T>::eigen(Vector<T>& eval) const
 {
@@ -235,6 +361,20 @@ Matrix<T>::eigen(Vector<T>& eval) const
     return tri.Ut();
 }
 
+//! この対称行列の一般固有値と一般固有ベクトルを返す
+/*!
+    \param B	もとの行列と同一サイズの正値対称行列.
+    \param eval	絶対値の大きい順に並べられた一般固有値.
+    \return	各行が一般固有ベクトルから成る正則行列
+		（ただし直交行列ではない），すなわち
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{B}{}\TUvec{U}{}\diag(e_0,\ldots,e_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
+		\f]
+		なる\f$\TUtvec{U}{}\f$.
+*/
 template <class T> Matrix<T>
 Matrix<T>::geigen(const Matrix<T>& B, Vector<T>& eval) const
 {
@@ -244,6 +384,12 @@ Matrix<T>::geigen(const Matrix<T>& B, Vector<T>& eval) const
     return Ut * Linv;
 }
 
+//! この正値対称行列のCholesky分解（上半三角行列）を返す
+/*!
+  計算においては，もとの行列の上半部分しか使わない.
+  \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$なる
+		\f$\TUtvec{L}{}\f$（上半三角行列）.
+*/
 template <class T> Matrix<T>
 Matrix<T>::cholesky() const
 {
@@ -270,6 +416,13 @@ Matrix<T>::cholesky() const
     return Lt;
 }
 
+//! この行列のノルムを1に正規化する
+/*!
+    \return	この行列，すなわち
+		\f$
+		  \TUvec{A}{}\leftarrow\frac{\TUvec{A}{}}{\TUnorm{\TUvec{A}{}}}
+		\f$.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::normalize()
 {
@@ -280,6 +433,11 @@ Matrix<T>::normalize()
     return *this /= sqrt(sum);
 }
 
+//! この行列の左から（転置された）回転行列を掛ける
+/*!
+    \return	この行列，すなわち
+		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::rotate_from_left(const Rotation& r)
 {
@@ -293,6 +451,11 @@ Matrix<T>::rotate_from_left(const Rotation& r)
     return *this;
 }
 
+//! この行列の右から回転行列を掛ける
+/*!
+    \return	この行列，すなわち
+		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::rotate_from_right(const Rotation& r)
 {
@@ -306,6 +469,10 @@ Matrix<T>::rotate_from_right(const Rotation& r)
     return *this;
 }
 
+//! この行列の2乗ノルムの2乗を返す
+/*!
+    \return	行列の2乗ノルムの2乗，すなわち\f$\TUnorm{\TUvec{A}{}}^2\f$.
+*/
 template <class T> double
 Matrix<T>::square() const
 {
@@ -315,6 +482,10 @@ Matrix<T>::square() const
     return val;
 }
 
+//! この行列の下半三角部分を上半三角部分にコピーして対称化する
+/*!
+    \return	この行列.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::symmetrize()
 {
@@ -324,6 +495,10 @@ Matrix<T>::symmetrize()
     return *this;
 }
 
+//! この行列の下半三角部分の符号を反転し，上半三角部分にコピーして反対称化する
+/*!
+    \return	この行列.
+*/
 template <class T> Matrix<T>&
 Matrix<T>::antisymmetrize()
 {
@@ -336,6 +511,33 @@ Matrix<T>::antisymmetrize()
     return *this;
 }
 
+//! この3次元回転行列から各軸周りの回転角を取り出す
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUvec{R}{} =
+    \TUbeginarray{ccc}
+      \cos\theta_z & -\sin\theta_z & \\
+      \sin\theta_z &  \cos\theta_z & \\
+      & & 1
+    \TUendarray
+    \TUbeginarray{ccc}
+       \cos\theta_y & & \sin\theta_y \\
+       & 1 & \\
+      -\sin\theta_y & & \cos\theta_y
+    \TUendarray
+    \TUbeginarray{ccc}
+      1 & & \\
+      & \cos\theta_x & -\sin\theta_x \\
+      & \sin\theta_x &  \cos\theta_x
+    \TUendarray
+  \f]
+  なる\f$\theta_x, \theta_y, \theta_z\f$が回転角となる．
+ \param theta_x	x軸周りの回転角(\f$ -\pi \le \theta_x \le \pi\f$)を返す.
+ \param theta_y	y軸周りの回転角
+	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)を返す.
+ \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す.
+*/
 template <class T> void
 Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
 {
@@ -358,6 +560,19 @@ Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
     }
 }
 
+//! この3次元回転行列から回転角と回転軸を取り出す
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
+ \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す.
+ \param s	回転角のsin値，すなわち\f$\sin\theta\f$を返す.
+ \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$.
+*/
 template <class T> Vector<T>
 Matrix<T>::rot2axis(double& c, double& s) const
 {
@@ -379,6 +594,18 @@ Matrix<T>::rot2axis(double& c, double& s) const
     return n;
 }
 
+//! この3次元回転行列から回転角と回転軸を取り出す
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
+ \return	回転角と回転軸を表す3次元ベクトル，すなわち
+		\f$\theta\TUvec{n}{}\f$.
+*/
 template <class T> Vector<T>
 Matrix<T>::rot2axis() const
 {
@@ -399,6 +626,18 @@ Matrix<T>::rot2axis() const
 	return -asin(s) / s * axis;
 }
 
+//! 3次元回転行列を生成する
+/*!
+  \param n	回転軸を表す3次元単位ベクトル.
+  \param c	回転角のcos値.
+  \param s	回転角のsin値.
+  \return	生成された回転行列，すなわち
+		\f[
+		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+		  - \TUskew{n}{}\sin\theta
+		\f]
+*/
 template <class T> Matrix<T>
 Matrix<T>::Rt(const Vector<T>& n, double c, double s)
 {
@@ -417,6 +656,18 @@ Matrix<T>::Rt(const Vector<T>& n, double c, double s)
     return Qt;
 }
 
+//! 3次元回転行列を生成する
+/*!
+  \param axis	回転角と回転軸を表す3次元ベクトル.
+  \return	生成された回転行列，すなわち
+		\f[
+		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+		  - \TUskew{n}{}\sin\theta,{\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \theta = \TUnorm{\TUvec{a}{}},~
+		  \TUvec{n}{} = \frac{\TUvec{a}{}}{\TUnorm{\TUvec{a}{}}}
+		\f]
+*/
 template <class T> Matrix<T>
 Matrix<T>::Rt(const Vector<T>& axis)
 {
@@ -433,6 +684,12 @@ Matrix<T>::Rt(const Vector<T>& axis)
 /************************************************************************
 *  numerical operators							*
 ************************************************************************/
+//! 2つのベクトルの内積
+/*!
+  \param v	第1引数.
+  \param w	第2引数.
+  \return	内積，すなわち\f$\TUtvec{v}{}\TUvec{w}{}\f$.
+*/
 template <class T> double
 operator *(const Vector<T>& v, const Vector<T>& w)	// inner product
 {
@@ -443,6 +700,12 @@ operator *(const Vector<T>& v, const Vector<T>& w)	// inner product
     return val;
 }
 
+//! ベクトルと行列の積
+/*!
+  \param v	ベクトル.
+  \param m	行列.
+  \return	結果のベクトル，すなわち\f$\TUtvec{v}{}\TUvec{M}{}\f$.
+*/
 template <class T> Vector<T>
 operator *(const Vector<T>& v, const Matrix<T>& m)	// multiply by matrix
 {
@@ -454,6 +717,12 @@ operator *(const Vector<T>& v, const Matrix<T>& m)	// multiply by matrix
     return val;
 }
 
+//! 2つのベクトルの外積
+/*!
+  \param v	第1引数.
+  \param w	第2引数.
+  \return	結果の行列，すなわち\f$\TUvec{v}{}\TUtvec{w}{}\f$.
+*/
 template <class T> Matrix<T>
 operator %(const Vector<T>& v, const Vector<T>& w)	// multiply by vector
 {
@@ -464,6 +733,12 @@ operator %(const Vector<T>& v, const Vector<T>& w)	// multiply by vector
     return val;
 }
 
+//! 3次元ベクトルと3x?行列の各列とのベクトル積
+/*!
+  \param v	3次元ベクトル.
+  \param m	3x?行列.
+  \return	結果の3x?行列，すなわち\f$\TUvec{v}{}\times\TUvec{M}{}\f$.
+*/
 template <class T> Matrix<T>
 operator ^(const Vector<T>& v, const Matrix<T>& m)
 {
@@ -480,6 +755,12 @@ operator ^(const Vector<T>& v, const Matrix<T>& m)
     return val;
 }
 
+//! 2つの行列の積
+/*!
+  \param m	第1引数.
+  \param n	第2引数.
+  \return	結果の行列，すなわち\f$\TUvec{M}{}\TUvec{N}{}\f$.
+*/
 template <class T> Matrix<T>
 operator *(const Matrix<T>& m, const Matrix<T>& n)	// multiply by matrix
 {
@@ -492,6 +773,12 @@ operator *(const Matrix<T>& m, const Matrix<T>& n)	// multiply by matrix
     return val;
 }
 
+//! 行列とベクトルの積
+/*!
+  \param m	行列.
+  \param v	ベクトル.
+  \return	結果のベクトル，すなわち\f$\TUvec{M}{}\TUvec{v}{}\f$.
+*/
 template <class T> Vector<T>
 operator *(const Matrix<T>& m, const Vector<T>& v)	// multiply by vector
 {

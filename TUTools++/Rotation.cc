@@ -20,14 +20,25 @@
  */
 
 /*
- *  $Id: Rotation.cc,v 1.5 2003-07-18 04:40:12 ueshiba Exp $
+ *  $Id: Rotation.cc,v 1.6 2006-12-19 07:09:24 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
 namespace TU
 {
-inline double	sqr(double x)	{return x * x;}
+static inline double	sqr(double x)	{return x * x;}
     
+//! 2次元超平面内での回転を生成する
+/*!
+  \param p	p軸を指定するindex.
+  \param q	q軸を指定するindex.
+  \param x	回転角を生成する際のx値.
+  \param y	回転角を生成する際のy値.
+		\f[
+		  \cos\theta = \frac{x}{\sqrt{x^2+y^2}},{\hskip 1em}
+		  \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
+		\f]
+*/
 Rotation::Rotation(int p, int q, double x, double y)
     :_p(p), _q(q), _l(1.0), _c(1.0), _s(0.0)
 {
@@ -41,6 +52,12 @@ Rotation::Rotation(int p, int q, double x, double y)
     }
 }
 
+//! 2次元超平面内での回転を生成する
+/*!
+  \param p	p軸を指定するindex.
+  \param q	q軸を指定するindex.
+  \param theta	回転角.
+*/
 Rotation::Rotation(int p, int q, double theta)
     :_p(p), _q(q), _l(1.0), _c(::cos(theta)), _s(::sin(theta))
 {
