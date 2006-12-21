@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.12 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.13 2006-12-21 05:12:00 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -653,6 +653,11 @@ class LUDecomposition : private Array2<Vector<T> >
     LUDecomposition(const Matrix<T>&)			;
 
     void	substitute(Vector<T>&)		const	;
+
+  //! もとの正方行列の行列式を返す
+  /*!
+    \return	もとの正方行列の行列式.
+  */
     T		det()				const	{return _det;}
     
   private:
@@ -704,6 +709,14 @@ class Householder : public Matrix<T>
 *  class QRDecomposition<T>						*
 ************************************************************************/
 //! 一般行列のQR分解を表すクラス
+/*!
+  与えられた行列\f$\TUtvec{A}{} \in \TUspace{R}{m\times n}\f$に対して
+  \f$\TUtvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$なる下半三角行列
+  \f$\TUtvec{R}{} \in \TUspace{R}{m\times n}\f$と回転行列
+  \f$\TUtvec{Q}{} \in \TUspace{R}{n\times n}\f$を求める
+  （\f$\TUtvec{A}{}\f$の各行を\f$\TUtvec{Q}{}\f$の行の線型結合で表現す
+  る）．
+ */
 template <class T>
 class QRDecomposition : private Matrix<T>
 {
@@ -711,7 +724,17 @@ class QRDecomposition : private Matrix<T>
     QRDecomposition(const Matrix<T>&)			;
 
     using		Matrix<T>::dim;
+
+  //! QR分解の下半三角行列部分を返す
+  /*!
+    \return	下半三角行列\f$\TUtvec{R}{}\f$.
+  */
     const Matrix<T>&	Rt()			const	{return *this;}
+
+  //! QR分解の回転行列部分を返す
+  /*!
+    \return	回転行列\f$\TUtvec{Q}{}\f$.
+  */
     const Matrix<T>&	Qt()			const	{return _Qt;}
     
   private:
@@ -725,16 +748,41 @@ class QRDecomposition : private Matrix<T>
 *  class TriDiagonal<T>							*
 ************************************************************************/
 //! 対称行列の3重対角化を表すクラス
+/*!
+  与えられた対称行列\f$\TUvec{A}{} \in \TUspace{R}{d\times d}\f$に対し
+  て\f$\TUtvec{U}{}\TUvec{A}{}\TUvec{U}{}\f$が3重対角行列となるような回
+  転行列\f$\TUtvec{U}{} \in \TUspace{R}{d\times d}\f$を求める．
+ */
 template <class T>
 class TriDiagonal
 {
   public:
     TriDiagonal(const Matrix<T>&)			;
 
+  //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す
+  /*!
+    \return	対称行列の次元.
+  */
     u_int		dim()			const	{return _Ut.nrow();}
+
+  //! 3重対角化を行う回転行列を返す
+  /*!
+    \return	回転行列.
+  */
     const Matrix<T>&	Ut()			const	{return _Ut;}
+
+  //! 3重対角行列の対角成分を返す
+  /*!
+    \return	対角成分.
+  */
     const Vector<T>&	diagonal()		const	{return _diagonal;}
+
+  //! 3重対角行列の非対角成分を返す
+  /*!
+    \return	非対角成分.
+  */
     const Vector<T>&	off_diagonal()		const	{return _Ut.sigma();}
+
     void		diagonalize()			;
     
   private:
@@ -753,18 +801,56 @@ class TriDiagonal
 *  class BiDiagonal<T>							*
 ************************************************************************/
 //! 一般行列の2重対角化を表すクラス
+/*!
+  与えられた一般行列\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$に対し
+  て\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$が2重対角行列となるような2
+  つの回転行列\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
+  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$を求める．\f$m \le n\f$
+  の場合は下半三角な2重対角行列に，\f$m > n\f$の場合は上半三角な2重対角
+  行列になる．
+ */
 template <class T>
 class BiDiagonal
 {
   public:
     BiDiagonal(const Matrix<T>&)		;
 
+  //! 2重対角化される行列の行数を返す
+  /*!
+    \return	行列の行数.
+  */
     u_int		nrow()		const	{return _Vt.nrow();}
+
+  //! 2重対角化される行列の列数を返す
+  /*!
+    \return	行列の列数.
+  */
     u_int		ncol()		const	{return _Ut.nrow();}
+
+  //! 2重対角化を行うために右から掛ける回転行列の転置を返す
+  /*!
+    \return	右から掛ける回転行列の転置.
+  */
     const Matrix<T>&	Ut()		const	{return _Ut;}
+
+  //! 2重対角化を行うために左から掛ける回転行列を返す
+  /*!
+    \return	左から掛ける回転行列.
+  */
     const Matrix<T>&	Vt()		const	{return _Vt;}
+
+  //! 2重対角行列の対角成分を返す
+  /*!
+    \return	対角成分.
+  */
     const Vector<T>&	diagonal()	const	{return _Dt.sigma();}
+
+  //! 2重対角行列の非対角成分を返す
+  /*!
+    \return	非対角成分.
+  */
     const Vector<T>&	off_diagonal()	const	{return _Et.sigma();}
+
     void		diagonalize()		;
 
   private:
@@ -788,10 +874,20 @@ class BiDiagonal
 *  class SVDecomposition<T>						*
 ************************************************************************/
 //! 一般行列の特異値分解を表すクラス
+/*!
+  与えられた一般行列\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$に対し
+  て\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$が対角行列となるような2つの
+  回転行列\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
+  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$を求める．
+ */
 template <class T>
 class SVDecomposition : private BiDiagonal<T>
 {
   public:
+  //! 与えられた一般行列の特異値分解を求める
+  /*!
+    \param a	特異値分解する一般行列.
+  */
     SVDecomposition(const Matrix<T>& a)
 	:BiDiagonal<T>(a)			{BiDiagonal<T>::diagonalize();}
 
@@ -800,7 +896,12 @@ class SVDecomposition : private BiDiagonal<T>
     using	BiDiagonal<T>::Ut;
     using	BiDiagonal<T>::Vt;
     using	BiDiagonal<T>::diagonal;
-    
+
+  //! 特異値を求める
+  /*!
+    \param i	絶対値の大きい順に並んだ特異値の1つを指定するindex.
+    \return	指定されたindexに対応する特異値.
+  */
     const T&	operator [](int i)	const	{return diagonal()[i];}
 };
 

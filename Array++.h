@@ -19,7 +19,7 @@
  *  Authors are not responsible for any damage in use of this program.
  */
 /*
- *  $Id: Array++.h,v 1.9 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Array++.h,v 1.10 2006-12-21 05:12:00 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -82,12 +82,14 @@ class Array
   //! 配列の要素へアクセスする(indexのチェックなし)
   /*!
     \param i	要素を指定するindex.
+    \return	indexによって指定された要素.
   */
     const ET&	operator [](int i)		const	{return _p[i];}
 
   //! 配列の要素へアクセスする(indexのチェックなし)
   /*!
     \param i	要素を指定するindex.
+    \return	indexによって指定された要素.
   */
     ET&		operator [](int i)			{return _p[i];}
 

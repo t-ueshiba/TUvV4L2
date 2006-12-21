@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.cc,v 1.4 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Array++.cc,v 1.5 2006-12-21 05:12:00 ueshiba Exp $
  */
 #include "TU/Array++.h"
 #include <stdexcept>
@@ -67,7 +67,7 @@ Array<T>::Array(const Array<T>& a)
 	      << "  this = " << (void*)this << ", dim = " << dim()
 	      << std::endl;		
 #endif
-    for (int i = 0; i < dim(); i++)
+    for (int i = 0; i < dim(); ++i)
 	(*this)[i] = a[i];
 }
 
@@ -85,7 +85,7 @@ Array<T>::operator =(const Array<T>& a)
     if (_p != a._p)
     {
 	resize(a.dim());
-	for (int i = 0; i < dim(); i++)
+	for (int i = 0; i < dim(); ++i)
 	    (*this)[i] = a[i];
     }
     return *this;
@@ -93,7 +93,9 @@ Array<T>::operator =(const Array<T>& a)
 
 //! 配列の要素へアクセスする(indexのチェックあり)
 /*!
-  \param i	要素を指定するindex.
+  \param i			要素を指定するindex.
+  \return			indexによって指定された要素.
+  \throw std::out_of_range	0 <= i < dim()でない場合に送出.
 */
 template <class T> const T&
 Array<T>::at(int i) const
@@ -105,7 +107,9 @@ Array<T>::at(int i) const
 
 //! 配列の要素へアクセスする(indexのチェックあり)
 /*!
-  \param i	要素を指定するindex.
+  \param i			要素を指定するindex.
+  \return			indexによって指定された要素.
+  \throw std::out_of_range	0 <= i < dim()でない場合に送出.
 */
 template <class T> T&
 Array<T>::at(int i)
@@ -159,7 +163,7 @@ template <class T> Array<T>&
 Array<T>::operator +=(const Array<T>& a)
 {
     check_dim(a.dim());
-    for (int i = 0; i < dim(); i++)
+    for (int i = 0; i < dim(); ++i)
 	(*this)[i] += a[i];
     return *this;
 }
@@ -172,7 +176,7 @@ template <class T> Array<T>&
 Array<T>::operator -=(const Array<T>& a)
 {
     check_dim(a.dim());
-    for (int i = 0; i < dim(); i++)
+    for (int i = 0; i < dim(); ++i)
 	(*this)[i] -= a[i];
     return *this;
 }
@@ -219,8 +223,11 @@ Array<T>::save(std::ostream& out) const
 
 //! 配列の次元を変更する
 /*!
-  \param d	新しい次元.
-  \return	dが元の次元よりも大きければtrueを，そうでなければfalseを返す.
+  \param d			新しい次元.
+  \return			dが元の次元よりも大きければtrueを，そうでな
+				ければfalseを返す.
+  \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
+				に送出.
 */
 template <class T> bool
 Array<T>::resize(u_int d)
@@ -259,7 +266,8 @@ Array<T>::resize(T* p, u_int d)
 
 //! 指定した符号なし整数値がこの配列の次元に一致しなければ例外を投げる
 /*!
-  \param d	調べたい符号なし整数値.
+  \param d			調べたい符号なし整数値.
+  \throw std::invalid_argument	dがこの配列の次元に一致しない場合に送出.
 */
 template <class T> void
 Array<T>::check_dim(u_int d) const
@@ -342,7 +350,7 @@ Array2<T>::Array2(const Array2<T>& a, u_int i, u_int j, u_int r, u_int c)
 	      << "  this = " << (void*)this << ", " << nrow() << 'x' << ncol()
 	      << std::endl;
 #endif
-    for (int ii = 0; ii < nrow(); ii++)
+    for (int ii = 0; ii < nrow(); ++ii)
 	(*this)[ii].resize((ET*)&a[i+ii][j], ncol());
 }    
 
@@ -360,7 +368,7 @@ Array2<T>::Array2(const Array2<T>& a)
 	      << std::endl;
 #endif
     set_rows();
-    for (int i = 0; i < nrow(); i++)
+    for (int i = 0; i < nrow(); ++i)
 	(*this)[i] = a[i];
 }    
 
@@ -382,7 +390,7 @@ Array2<T>::operator =(const Array2<T>& a)
 	      << std::endl;
 #endif
     resize(a.nrow(), a.ncol());
-    for (int i = 0; i < nrow(); i++)
+    for (int i = 0; i < nrow(); ++i)
 	(*this)[i] = a[i];
     return *this;
 }
@@ -450,7 +458,7 @@ Array2<T>::resize(ET* p, u_int r, u_int c)
 template <class T> void
 Array2<T>::set_rows()
 {
-    for (int i = 0; i < nrow(); i++)
+    for (int i = 0; i < nrow(); ++i)
 	(*this)[i].resize((ET*)*this + i*ncol(), ncol());
 }
 

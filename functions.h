@@ -1,5 +1,5 @@
 /*
- *  $Id: functions.h,v 1.2 2006-11-17 01:34:49 ueshiba Exp $
+ *  $Id: functions.h,v 1.3 2006-12-21 05:12:00 ueshiba Exp $
  */
 #ifndef __TUfunctions_h
 #define __TUfunctions_h
@@ -29,6 +29,12 @@ template <class T> static inline T	diff(T a, T b)
 					    return (a > b ? a - b : b - a);
 					}
 template <class T> static inline T	abs(T a) {return (a > 0 ? a : -a);}
+template <class T> static inline void	swap(T& a, T& b)
+					{
+					    const T tmp = a;
+					    a = b;
+					    b = tmp;
+					}
 }
 
 #endif	/* __TUfunctions_h */

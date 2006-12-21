@@ -1,5 +1,5 @@
 /*
- *  $Id: Bezier++.h,v 1.3 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.4 2006-12-21 05:12:00 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -20,16 +20,12 @@ class BezierCurveBase : private Array<C>
 
     static u_int	dim()			{return C::dim();}
 
-    const C&	operator [](int i)	  const	{return
-						   Array<C>::operator [](i);}
-    C&		operator [](int i)		{return
-						   Array<C>::operator [](i);}
     u_int	degree()		  const	{return Array<C>::dim()-1;}
     C		operator ()(T t)	  const	;
     Array<C>	deCasteljau(T t, u_int r) const	;
     void	elevateDegree()			;
     
-  //    Array<C>::operator [];
+    using	Array<C>::operator [];
     using	Array<C>::operator ==;
     using	Array<C>::operator !=;
     using	Array<C>::save;
@@ -91,10 +87,6 @@ class BezierSurfaceBase : protected Array2<BezierCurveBase<T, C> >
 
     static u_int	dim()				{return C::dim();}
 
-    const Curve&	operator [](int i)	const
-				{return Array2<Curve>::operator [](i);}
-    Curve&		operator [](int i)		
-				{return Array2<Curve>::operator [](i);}
     u_int	uDegree()			const	{return ncol()-1;}
     u_int	vDegree()			const	{return nrow()-1;}
     C		operator ()(T u, T v)		const	;
@@ -103,7 +95,7 @@ class BezierSurfaceBase : protected Array2<BezierCurveBase<T, C> >
     void	uElevateDegree()			;
     void	vElevateDegree()			;
 
-  //using	Array2<Curve>::operator [];
+    using	Array2<Curve>::operator [];
     using	Array2<Curve>::nrow;
     using	Array2<Curve>::ncol;
     using	Array2<Curve>::operator ==;

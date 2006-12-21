@@ -20,22 +20,15 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.13 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.14 2006-12-21 05:12:00 ueshiba Exp $
  */
 #include "TU/Vector++.h"
+#include "TU/functions.h"
 #include <stdexcept>
 #include <iomanip>
 
 namespace TU
 {
-template <class T> inline void
-swap(T& a, T& b)
-{
-    const T tmp = a;
-    a = b;
-    b = tmp;
-}
-
 /************************************************************************
 *  class Vector<T>							*
 ************************************************************************/
@@ -68,6 +61,7 @@ Vector<T>::operator ()(u_int i, u_int dd)	// partial vector
     \param v	他のベクトル.
     \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\times\TUvec{v}{}\f$.
+    \throw std::invalid_argument	このベクトルとvが3次元でない場合に送出.
 */
 template <class T> Vector<T>&
 Vector<T>::operator ^=(const Vector<T>& v)	// outer product
@@ -118,6 +112,7 @@ Vector<T>::solve(const Matrix<T>& m)
       & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
     \TUendarray
   \f]
+  \throw std::invalid_argument	3次元ベクトルでない場合に送出.
 */
 template <class T> Matrix<T>
 Vector<T>::skew() const
@@ -175,7 +170,7 @@ Matrix<T>::diag(double c)
 {
     check_dim(dim());
     *this = 0.0;
-    for (int i = 0; i < dim(); i++)
+    for (int i = 0; i < dim(); ++i)
 	(*this)[i][i] = c;
     return *this;
 }
@@ -196,7 +191,7 @@ Matrix<T>::rot(double angle, int axis)
 template <class T> Matrix<T>&
 Matrix<T>::operator ^=(const Vector<T>& v)
 {
-    for (int i = 0; i < nrow(); i++)
+    for (int i = 0; i < nrow(); ++i)
 	(*this)[i] ^= v;
     return *this;
 }
@@ -209,8 +204,8 @@ template <class T> Matrix<T>
 Matrix<T>::trns() const				// transpose
 {
     Matrix<T> val(ncol(), nrow());
-    for (int i = 0; i < nrow(); i++)
-	for (int j = 0; j < ncol(); j++)
+    for (int i = 0; i < nrow(); ++i)
+	for (int j = 0; j < ncol(); ++j)
 	    val[j][i] = (*this)[i][j];
     return val;
 }
@@ -239,7 +234,7 @@ Matrix<T>::solve(const Matrix<T>& m)
 {
     LUDecomposition<T>	lu(m);
     
-    for (int i = 0; i < nrow(); i++)
+    for (int i = 0; i < nrow(); ++i)
 	lu.substitute((*this)[i]);
     return *this;
 }
@@ -281,9 +276,10 @@ Matrix<T>::det(u_int p, u_int q) const
     return d.det();
 }
 
-//! この行列のtraceを返す
+//! この正方行列のtraceを返す
 /*!
-  \return	trace, すなわち\f$\trace\TUvec{A}{}\f$.
+  \return			trace, すなわち\f$\trace\TUvec{A}{}\f$.
+  \throw std::invalid_argument	正方行列でない場合に送出.
 */
 template <class T> T
 Matrix<T>::trace() const
@@ -344,7 +340,8 @@ Matrix<T>::pinv(double cndnum) const
     \param eval	絶対値の大きい順に並べられた固有値.
     \return	各行が固有ベクトルから成る回転行列，すなわち
 		\f[
-		  \TUvec{A}{}\TUvec{U}{} = \TUvec{U}{}\diag(e_0,\ldots,e_{n-1}),
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
 		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
 		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
 		\f]
@@ -369,7 +366,7 @@ Matrix<T>::eigen(Vector<T>& eval) const
 		（ただし直交行列ではない），すなわち
 		\f[
 		  \TUvec{A}{}\TUvec{U}{} =
-		  \TUvec{B}{}\TUvec{U}{}\diag(e_0,\ldots,e_{n-1}),
+		  \TUvec{B}{}\TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
 		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
 		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
 		\f]
@@ -389,6 +386,8 @@ Matrix<T>::geigen(const Matrix<T>& B, Vector<T>& eval) const
   計算においては，もとの行列の上半部分しか使わない.
   \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$なる
 		\f$\TUtvec{L}{}\f$（上半三角行列）.
+  \throw std::invalid_argument	正方行列でない場合に送出.
+  \throw std::runtime_error	正値でない場合に送出.
 */
 template <class T> Matrix<T>
 Matrix<T>::cholesky() const
@@ -441,7 +440,7 @@ Matrix<T>::normalize()
 template <class T> Matrix<T>&
 Matrix<T>::rotate_from_left(const Rotation& r)
 {
-    for (int j = 0; j < ncol(); j++)
+    for (int j = 0; j < ncol(); ++j)
     {
 	const T	tmp = (*this)[r.p()][j];
 	
@@ -459,7 +458,7 @@ Matrix<T>::rotate_from_left(const Rotation& r)
 template <class T> Matrix<T>&
 Matrix<T>::rotate_from_right(const Rotation& r)
 {
-    for (int i = 0; i < nrow(); i++)
+    for (int i = 0; i < nrow(); ++i)
     {
 	const T	tmp = (*this)[i][r.p()];
 	
@@ -537,6 +536,7 @@ Matrix<T>::antisymmetrize()
  \param theta_y	y軸周りの回転角
 	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)を返す.
  \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す.
+ \throw invalid_argument	3次元正方行列でない場合に送出.
 */
 template <class T> void
 Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
@@ -605,6 +605,7 @@ Matrix<T>::rot2axis(double& c, double& s) const
   なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
  \return	回転角と回転軸を表す3次元ベクトル，すなわち
 		\f$\theta\TUvec{n}{}\f$.
+ \throw invalid_argument	3次元正方行列でない場合に送出.
 */
 template <class T> Vector<T>
 Matrix<T>::rot2axis() const
@@ -695,7 +696,7 @@ operator *(const Vector<T>& v, const Vector<T>& w)	// inner product
 {
     v.check_dim(w.dim());
     double val = 0;
-    for (int i = 0; i < v.dim(); i++)
+    for (int i = 0; i < v.dim(); ++i)
 	val += v[i] * w[i];
     return val;
 }
@@ -711,8 +712,8 @@ operator *(const Vector<T>& v, const Matrix<T>& m)	// multiply by matrix
 {
     v.check_dim(m.nrow());
     Vector<T> val(m.ncol());
-    for (int j = 0; j < m.ncol(); j++)
-	for (int i = 0; i < m.nrow(); i++)
+    for (int j = 0; j < m.ncol(); ++j)
+	for (int i = 0; i < m.nrow(); ++i)
 	    val[j] += v[i] * m[i][j];
     return val;
 }
@@ -727,8 +728,8 @@ template <class T> Matrix<T>
 operator %(const Vector<T>& v, const Vector<T>& w)	// multiply by vector
 {
     Matrix<T> val(v.dim(), w.dim());
-    for (int i = 0; i < v.dim(); i++)
-	for (int j = 0; j < w.dim(); j++)
+    for (int i = 0; i < v.dim(); ++i)
+	for (int j = 0; j < w.dim(); ++j)
 	    val[i][j] = v[i] * w[j];
     return val;
 }
@@ -746,7 +747,7 @@ operator ^(const Vector<T>& v, const Matrix<T>& m)
     if (v.dim() != 3)
 	throw std::invalid_argument("operator ^(const Vecotr<T>&, const Matrix<T>&): dimension of vector must be 3!!");
     Matrix<T>	val(m.nrow(), m.ncol());
-    for (int j = 0; j < val.ncol(); j++)
+    for (int j = 0; j < val.ncol(); ++j)
     {
 	val[0][j] = v[1] * m[2][j] - v[2] * m[1][j];
 	val[1][j] = v[2] * m[0][j] - v[0] * m[2][j];
@@ -766,9 +767,9 @@ operator *(const Matrix<T>& m, const Matrix<T>& n)	// multiply by matrix
 {
     n.check_dim(m.ncol());
     Matrix<T> val(m.nrow(), n.ncol());
-    for (int i = 0; i < m.nrow(); i++)
-	for (int j = 0; j < n.ncol(); j++)
-	    for (int k = 0; k < m.ncol(); k++)
+    for (int i = 0; i < m.nrow(); ++i)
+	for (int j = 0; j < n.ncol(); ++j)
+	    for (int k = 0; k < m.ncol(); ++k)
 		val[i][j] += m[i][k] * n[k][j];
     return val;
 }
@@ -783,7 +784,7 @@ template <class T> Vector<T>
 operator *(const Matrix<T>& m, const Vector<T>& v)	// multiply by vector
 {
     Vector<T> val(m.nrow());
-    for (int i = 0; i < m.nrow(); i++)
+    for (int i = 0; i < m.nrow(); ++i)
 	val[i] = m[i] * v;
     return val;
 }
@@ -791,6 +792,10 @@ operator *(const Matrix<T>& m, const Vector<T>& v)	// multiply by vector
 /************************************************************************
 *  class LUDecomposition<T>						*
 ************************************************************************/
+//! 与えられた行列のLU分解を生成する
+/*!
+ \param m	LU分解する行列.
+*/
 template <class T>
 LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
     :Array2<Vector<T> >(m), _index(ncol()), _det(1.0)
@@ -798,15 +803,15 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
     if (nrow() != ncol())
         throw std::invalid_argument("TU::LUDecomposition<T>::LUDecomposition: not square matrix!!");
 
-    for (int j = 0; j < ncol(); j++)	// initialize column index
+    for (int j = 0; j < ncol(); ++j)	// initialize column index
 	_index[j] = j;			// for explicit pivotting
 
     Vector<T>	scale(ncol());
-    for (int j = 0; j < ncol(); j++)	// find maximum abs. value in each col.
+    for (int j = 0; j < ncol(); ++j)	// find maximum abs. value in each col.
     {					// for implicit pivotting
 	double max = 0.0;
 
-	for (int i = 0; i < nrow(); i++)
+	for (int i = 0; i < nrow(); ++i)
 	{
 	    const double tmp = fabs((*this)[i][j]);
 	    if (tmp > max)
@@ -815,21 +820,21 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 	scale[j] = (max != 0.0 ? 1.0 / max : 1.0);
     }
 
-    for (int i = 0; i < nrow(); i++)
+    for (int i = 0; i < nrow(); ++i)
     {
-	for (int j = 0; j < i; j++)		// left part (j < i)
+	for (int j = 0; j < i; ++j)		// left part (j < i)
 	{
 	    T& sum = (*this)[i][j];
-	    for (int k = 0; k < j; k++)
+	    for (int k = 0; k < j; ++k)
 		sum -= (*this)[i][k] * (*this)[k][j];
 	}
 
 	int	jmax;
 	double	max = 0.0;
-	for (int j = i; j < ncol(); j++)  // diagonal and right part (i <= j)
+	for (int j = i; j < ncol(); ++j)  // diagonal and right part (i <= j)
 	{
 	    T& sum = (*this)[i][j];
-	    for (int k = 0; k < i; k++)
+	    for (int k = 0; k < i; ++k)
 		sum -= (*this)[i][k] * (*this)[k][j];
 	    const double tmp = fabs(sum) * scale[j];
 	    if (tmp >= max)
@@ -840,7 +845,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 	}
 	if (jmax != i)			// pivotting required ?
 	{
-	    for (int k = 0; k < nrow(); k++)	// swap i-th and jmax-th column
+	    for (int k = 0; k < nrow(); ++k)	// swap i-th and jmax-th column
 		swap((*this)[k][i], (*this)[k][jmax]);
 	    swap(_index[i], _index[jmax]);	// swap column index
 	    swap(scale[i], scale[jmax]);	// swap colum-wise scale factor
@@ -852,11 +857,17 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 	if ((*this)[i][i] == 0.0)	// singular matrix ?
 	    break;
 
-	for (int j = i + 1; j < nrow(); j++)
+	for (int j = i + 1; j < nrow(); ++j)
 	    (*this)[i][j] /= (*this)[i][i];
     }
 }
 
+//! もとの正方行列を係数行列とした連立1次方程式を解く
+/*!
+  \param b	もとの正方行列\f$\TUvec{M}{}\f$と同じ次元を持つベクトル．
+		\f$\TUtvec{b}{} = \TUtvec{x}{}\TUvec{M}{}\f$の解に変換
+		される.
+*/
 template <class T> void
 LUDecomposition<T>::substitute(Vector<T>& b) const
 {
@@ -864,11 +875,11 @@ LUDecomposition<T>::substitute(Vector<T>& b) const
 	throw std::invalid_argument("TU::LUDecomposition<T>::substitute: Dimension of given vector is not equal to mine!!");
     
     Vector<T>	tmp(b);
-    for (int j = 0; j < b.dim(); j++)
+    for (int j = 0; j < b.dim(); ++j)
 	b[j] = tmp[_index[j]];
 
-    for (int j = 0; j < b.dim(); j++)		// forward substitution
-	for (int i = 0; i < j; i++)
+    for (int j = 0; j < b.dim(); ++j)		// forward substitution
+	for (int i = 0; i < j; ++i)
 	    b[j] -= b[i] * (*this)[i][j];
     for (int j = b.dim(); --j >= 0; )		// backward substitution
     {
@@ -900,13 +911,13 @@ Householder<T>::apply_from_left(Matrix<T>& a, int m)
 	throw std::invalid_argument("TU::Householder<T>::apply_from_left: # of rows of given matrix is smaller than my dimension !!");
     
     double	scale = 0.0;
-    for (int i = m+_d; i < dim(); i++)
+    for (int i = m+_d; i < dim(); ++i)
 	scale += fabs(a[i][m]);
 	
     if (scale != 0.0)
     {
 	double	h = 0.0;
-	for (int i = m+_d; i < dim(); i++)
+	for (int i = m+_d; i < dim(); ++i)
 	{
 	    a[i][m] /= scale;
 	    h += a[i][m] * a[i][m];
@@ -916,18 +927,18 @@ Householder<T>::apply_from_left(Matrix<T>& a, int m)
 	h	     += s * a[m+_d][m];			// H = u^2 / 2
 	a[m+_d][m]   += s;				// m-th col <== u
 	    
-	for (int j = m+1; j < a.ncol(); j++)
+	for (int j = m+1; j < a.ncol(); ++j)
 	{
 	    T	p = 0.0;
-	    for (int i = m+_d; i < dim(); i++)
+	    for (int i = m+_d; i < dim(); ++i)
 		p += a[i][m] * a[i][j];
 	    p /= h;					// p[j] (p' = u'A / H)
-	    for (int i = m+_d; i < dim(); i++)
+	    for (int i = m+_d; i < dim(); ++i)
 		a[i][j] -= a[i][m] * p;			// A = A - u*p'
 	    a[m+_d][j] = -a[m+_d][j];
 	}
 	    
-	for (int i = m+_d; i < dim(); i++)
+	for (int i = m+_d; i < dim(); ++i)
 	    (*this)[m][i] = scale * a[i][m];		// copy u
 	_sigma[m+_d] = scale * s;
     }
@@ -942,13 +953,13 @@ Householder<T>::apply_from_right(Matrix<T>& a, int m)
 	throw std::invalid_argument("Householder<T>::apply_from_right: # of column of given matrix is smaller than my dimension !!");
     
     double	scale = 0.0;
-    for (int j = m+_d; j < dim(); j++)
+    for (int j = m+_d; j < dim(); ++j)
 	scale += fabs(a[m][j]);
 	
     if (scale != 0.0)
     {
 	double	h = 0.0;
-	for (int j = m+_d; j < dim(); j++)
+	for (int j = m+_d; j < dim(); ++j)
 	{
 	    a[m][j] /= scale;
 	    h += a[m][j] * a[m][j];
@@ -958,18 +969,18 @@ Householder<T>::apply_from_right(Matrix<T>& a, int m)
 	h	     += s * a[m][m+_d];			// H = u^2 / 2
 	a[m][m+_d]   += s;				// m-th row <== u
 
-	for (int i = m+1; i < a.nrow(); i++)
+	for (int i = m+1; i < a.nrow(); ++i)
 	{
 	    T	p = 0.0;
-	    for (int j = m+_d; j < dim(); j++)
+	    for (int j = m+_d; j < dim(); ++j)
 		p += a[i][j] * a[m][j];
 	    p /= h;					// p[i] (p = Au / H)
-	    for (int j = m+_d; j < dim(); j++)
+	    for (int j = m+_d; j < dim(); ++j)
 		a[i][j] -= p * a[m][j];			// A = A - p*u'
 	    a[i][m+_d] = -a[i][m+_d];
 	}
 	    
-	for (int j = m+_d; j < dim(); j++)
+	for (int j = m+_d; j < dim(); ++j)
 	    (*this)[m][j] = scale * a[m][j];		// copy u
 	_sigma[m+_d] = scale * s;
     }
@@ -982,7 +993,7 @@ Householder<T>::apply_from_both(Matrix<T>& a, int m)
     
     Vector<T>		u = a[m](m+_d, a.ncol()-m-_d);
     double		scale = 0.0;
-    for (int j = 0; j < u.dim(); j++)
+    for (int j = 0; j < u.dim(); ++j)
 	scale += fabs(u[j]);
 	
     if (scale != 0.0)
@@ -996,20 +1007,20 @@ Householder<T>::apply_from_both(Matrix<T>& a, int m)
 
 	Matrix<T>	A = a(m+_d, m+_d, a.nrow()-m-_d, a.ncol()-m-_d);
 	Vector<T>	p = _sigma(m+_d, nrow()-m-_d);
-	for (int i = 0; i < A.nrow(); i++)
+	for (int i = 0; i < A.nrow(); ++i)
 	    p[i] = (A[i] * u) / h;			// p = Au / H
 
 	const double	k = (u * p) / (h + h);		// K = u*p / 2H
-	for (int i = 0; i < A.nrow(); i++)
+	for (int i = 0; i < A.nrow(); ++i)
 	{				// m-th col of 'a' is used as 'q'
 	    a[m+_d+i][m] = p[i] - k * u[i];		// q = p - Ku
-	    for (int j = 0; j <= i; j++)		// A = A - uq' - qu'
+	    for (int j = 0; j <= i; ++j)		// A = A - uq' - qu'
 		A[j][i] = (A[i][j] -= (u[i]*a[m+_d+j][m] + a[m+_d+i][m]*u[j]));
 	}
-	for (int j = 1; j < A.nrow(); j++)
+	for (int j = 1; j < A.nrow(); ++j)
 	    A[j][0] = A[0][j] = -A[0][j];
 
-	for (int j = m+_d; j < a.ncol(); j++)
+	for (int j = m+_d; j < a.ncol(); ++j)
 	    (*this)[m][j] = scale * a[m][j];		// copy u
 	_sigma[m+_d] = scale * s;
     }
@@ -1020,27 +1031,27 @@ Householder<T>::make_transformation()
 {
     for (int m = nrow(); --m >= 0; )
     {
-	for (int i = m+1; i < nrow(); i++)
+	for (int i = m+1; i < nrow(); ++i)
 	    (*this)[i][m] = 0.0;
 
 	if (_sigma[m] != 0.0)
 	{
-	    for (int i = m+1; i < nrow(); i++)
+	    for (int i = m+1; i < nrow(); ++i)
 	    {
 		T	g = 0.0;
-		for (int j = m+1; j < ncol(); j++)
+		for (int j = m+1; j < ncol(); ++j)
 		    g += (*this)[i][j] * (*this)[m-_d][j];
 		g /= (_sigma[m] * (*this)[m-_d][m]);	// g[i] (g = Uu / H)
-		for (int j = m; j < ncol(); j++)
+		for (int j = m; j < ncol(); ++j)
 		    (*this)[i][j] -= g * (*this)[m-_d][j];	// U = U - gu'
 	    }
-	    for (int j = m; j < ncol(); j++)
+	    for (int j = m; j < ncol(); ++j)
 		(*this)[m][j] = (*this)[m-_d][j] / _sigma[m];
 	    (*this)[m][m] -= 1.0;
 	}
 	else
 	{
-	    for (int j = m+1; j < ncol(); j++)
+	    for (int j = m+1; j < ncol(); ++j)
 		(*this)[m][j] = 0.0;
 	    (*this)[m][m] = 1.0;
 	}
@@ -1056,6 +1067,10 @@ Householder<T>::sigma_is_zero(int m, T comp) const
 /************************************************************************
 *  class QRDeomposition<T>						*
 ************************************************************************/
+//! 与えられた行列のQR分解を生成する
+/*!
+ \param m	QR分解する行列.
+*/
 template <class T>
 QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
     :Matrix<T>(m), _Qt(m.ncol(), 0)
@@ -1074,6 +1089,10 @@ QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
 /************************************************************************
 *  class TriDiagonal<T>							*
 ************************************************************************/
+//! 与えられた対称行列を3重対角化する
+/*!
+  \param a	3重対角化する対称行列.
+*/
 template <class T>
 TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
@@ -1081,7 +1100,7 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
     if (_Ut.nrow() != _Ut.ncol())
         throw std::invalid_argument("TU::TriDiagonal<T>::TriDiagonal: not square matrix!!");
 
-    for (int m = 0; m < dim(); m++)
+    for (int m = 0; m < dim(); ++m)
     {
 	_Ut.apply_from_both(_Ut, m);
 	_diagonal[m] = _Ut[m][m];
@@ -1090,6 +1109,10 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
     _Ut.make_transformation();
 }
 
+//! 3重対角行列を対角化する（固有値，固有ベクトルの計算）
+/*!
+  対角成分は固有値となり，\f$\TUtvec{U}{}\f$の各行は固有ベクトルを与える．
+*/ 
 template <class T> void
 TriDiagonal<T>::diagonalize()
 {
@@ -1141,12 +1164,12 @@ TriDiagonal<T>::diagonalize()
 	}
     }
 
-    for (int m = 0; m < dim(); m++)	// sort eigen values and eigen vectors
-	for (int n = m+1; n < dim(); n++)
+    for (int m = 0; m < dim(); ++m)	// sort eigen values and eigen vectors
+	for (int n = m+1; n < dim(); ++n)
 	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
-		for (int j = 0; j < dim(); j++)
+		for (int j = 0; j < dim(); ++j)
 		{
 		    const T	tmp = _Ut[m][j];
 		    _Ut[m][j] = _Ut[n][j];
@@ -1182,6 +1205,10 @@ TriDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 /************************************************************************
 *  class BiDiagonal<T>							*
 ************************************************************************/
+//! 与えられた一般行列を2重対角化する
+/*!
+  \param a	2重対角化する一般行列.
+*/
 template <class T>
 BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
     :_Dt((a.nrow() < a.ncol() ? a.ncol() : a.nrow()), 0),
@@ -1217,6 +1244,11 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
     }
 }
 
+//! 2重対角行列を対角化する（特異値分解）
+/*!
+  対角成分は特異値となり，\f$\TUtvec{U}{}\f$と\f$\TUtvec{V}{}\f$
+  の各行はそれぞれ右特異ベクトルと左特異ベクトルを与える．
+*/ 
 template <class T> void
 BiDiagonal<T>::diagonalize()
 {
@@ -1317,18 +1349,18 @@ BiDiagonal<T>::diagonalize()
 	}
     }
 
-    for (int m = 0; m < _Et.dim(); m++)	// sort singular values and vectors
-	for (int n = m+1; n < _Et.dim(); n++)
+    for (int m = 0; m < _Et.dim(); ++m)	// sort singular values and vectors
+	for (int n = m+1; n < _Et.dim(); ++n)
 	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
-		for (int j = 0; j < _Et.dim(); j++)
+		for (int j = 0; j < _Et.dim(); ++j)
 		{
 		    const T	tmp = _Et[m][j];
 		    _Et[m][j] = _Et[n][j];
 		    _Et[n][j] = -tmp;
 		}
-		for (int j = 0; j < _Dt.dim(); j++)
+		for (int j = 0; j < _Dt.dim(); ++j)
 		{
 		    const T	tmp = _Dt[m][j];
 		    _Dt[m][j] = _Dt[n][j];
@@ -1337,12 +1369,12 @@ BiDiagonal<T>::diagonalize()
 	    }
 
     int l = _Et.dim() - 1;		// last index
-    for (int m = 0; m < l; m++)		// ensure positivity of all singular
+    for (int m = 0; m < l; ++m)		// ensure positivity of all singular
 	if (_diagonal[m] < 0.0)		// values except for the last one.
 	{
 	    _diagonal[m] = -_diagonal[m];
 	    _diagonal[l] = -_diagonal[l];
-	    for (int j = 0; j < _Et.dim(); j++)
+	    for (int j = 0; j < _Et.dim(); ++j)
 	    {
 		_Et[m][j] = -_Et[m][j];
 		_Et[l][j] = -_Et[l][j];
