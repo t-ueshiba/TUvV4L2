@@ -33,6 +33,8 @@ template class Vector<float>;
 template class Vector<double>;
 template class Matrix<float>;
 template class Matrix<double>;
+template class LUDecomposition<float>;
+template class LUDecomposition<double>;
 template class QRDecomposition<float>;
 template class QRDecomposition<double>;
 template class TriDiagonal<float>;

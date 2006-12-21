@@ -1,5 +1,5 @@
 /*
- *  $Id: Nurbs++.h,v 1.3 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.4 2006-12-21 05:12:00 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -17,10 +17,8 @@ class BSplineKnots : private Array<T>
   public:
     BSplineKnots(u_int degree, T us, T ue)	;
     
-    const T&	operator [](int i)const	{return Array<T>::operator [](i);}
-    T&		operator [](int i)	{return Array<T>::operator [](i);}
 		operator T*()	const	{return Array<T>::operator T*();}
-	
+    
     u_int	degree()		const	{return _degree;}
     u_int	M()			const	{return dim()-1;}
     u_int	L()			const	{return M()-degree()-degree();}
@@ -38,7 +36,7 @@ class BSplineKnots : private Array<T>
     void	elevateDegree()			{++_degree;}
 
     using	Array<T>::dim;
-  //using	Array<T>::operator [];		// knots
+    using	Array<T>::operator [];		// knots
   //using	Array<T>::operator T*;
     
   private:
@@ -56,8 +54,6 @@ class BSplineCurveBase : private Array<C>
 
     static u_int	dim()			{return C::dim();}
 
-    const C&	operator [](int i)const	{return Array<C>::operator [](i);}
-    C&		operator [](int i)	{return Array<C>::operator [](i);}
     u_int	degree()		  const	{return _knots.degree();}
     u_int	M()			  const	{return _knots.M();}
     u_int	L()			  const	{return _knots.L();}
@@ -75,7 +71,7 @@ class BSplineCurveBase : private Array<C>
     int		removeKnot(int k)		;
     void	elevateDegree()			;
 
-  //    Array<C>::operator [];
+    using	Array<C>::operator [];
     using	Array<C>::operator ==;
     using	Array<C>::operator !=;
     using	Array<C>::save;
@@ -128,10 +124,6 @@ class BSplineSurfaceBase : protected Array2<Array<C> >
 
     static u_int	dim()			{return C::dim();}
 
-    const Array<C>&	operator [](int i)	const
-			    {return Array2<Array<C> >::operator [](i);}
-    Array<C>&		operator [](int i)
-			    {return Array2<Array<C> >::operator [](i);}
     u_int	uDegree()		const	{return _uKnots.degree();}
     u_int	uM()			const	{return _uKnots.M();}
     u_int	uL()			const	{return _uKnots.L();}
@@ -162,7 +154,7 @@ class BSplineSurfaceBase : protected Array2<Array<C> >
     void	uElevateDegree()		;
     void	vElevateDegree()		;
 
-  //using	Array2<Array<C> >::operator [];
+    using	Array2<Array<C> >::operator [];
     using	Array2<Array<C> >::ncol;
     using	Array2<Array<C> >::nrow;
     using	Array2<Array<C> >::operator ==;
