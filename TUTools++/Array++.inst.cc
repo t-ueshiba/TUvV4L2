@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.inst.cc,v 1.4 2003-01-10 00:30:54 ueshiba Exp $
+ *  $Id: Array++.inst.cc,v 1.5 2006-12-22 05:50:48 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
@@ -38,6 +38,17 @@ template class Array<long>;
 template class Array<u_long>;
 template class Array<float>;
 template class Array<double>;
+
+template class Array<Array<char> >;
+template class Array<Array<u_char> >;
+template class Array<Array<short> >;
+template class Array<Array<u_short> >;
+template class Array<Array<int> >;
+template class Array<Array<u_int> >;
+template class Array<Array<long> >;
+template class Array<Array<u_long> >;
+template class Array<Array<float> >;
+template class Array<Array<double> >;
 
 template class Array2<Array<char> >;
 template class Array2<Array<u_char> >;
