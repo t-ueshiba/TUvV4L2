@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.13 2006-12-21 05:12:00 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.14 2006-12-22 00:05:55 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -675,7 +675,7 @@ template <class T>	class QRDecomposition;
 template <class T>	class TriDiagonal;
 template <class T>	class BiDiagonal;
 
-//! 正方行列のHouseholder変換を表すクラス
+//! Householder変換を表すクラス
 template <class T>
 class Householder : public Matrix<T>
 {
@@ -710,11 +710,11 @@ class Householder : public Matrix<T>
 ************************************************************************/
 //! 一般行列のQR分解を表すクラス
 /*!
-  与えられた行列\f$\TUtvec{A}{} \in \TUspace{R}{m\times n}\f$に対して
-  \f$\TUtvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$なる下半三角行列
+  与えられた行列\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$に対して
+  \f$\TUvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$なる下半三角行列
   \f$\TUtvec{R}{} \in \TUspace{R}{m\times n}\f$と回転行列
   \f$\TUtvec{Q}{} \in \TUspace{R}{n\times n}\f$を求める
-  （\f$\TUtvec{A}{}\f$の各行を\f$\TUtvec{Q}{}\f$の行の線型結合で表現す
+  （\f$\TUvec{A}{}\f$の各行を\f$\TUtvec{Q}{}\f$の行の線型結合で表現す
   る）．
  */
 template <class T>
@@ -725,13 +725,13 @@ class QRDecomposition : private Matrix<T>
 
     using		Matrix<T>::dim;
 
-  //! QR分解の下半三角行列部分を返す
+  //! QR分解の下半三角行列を返す
   /*!
     \return	下半三角行列\f$\TUtvec{R}{}\f$.
   */
     const Matrix<T>&	Rt()			const	{return *this;}
 
-  //! QR分解の回転行列部分を返す
+  //! QR分解の回転行列を返す
   /*!
     \return	回転行列\f$\TUtvec{Q}{}\f$.
   */

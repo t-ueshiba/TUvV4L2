@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.14 2006-12-21 05:12:00 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.15 2006-12-22 00:05:55 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include "TU/functions.h"
@@ -572,6 +572,7 @@ Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
  \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す.
  \param s	回転角のsin値，すなわち\f$\sin\theta\f$を返す.
  \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$.
+ \throw std::invalid_argument	3x3行列でない場合に送出.
 */
 template <class T> Vector<T>
 Matrix<T>::rot2axis(double& c, double& s) const
@@ -605,7 +606,7 @@ Matrix<T>::rot2axis(double& c, double& s) const
   なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
  \return	回転角と回転軸を表す3次元ベクトル，すなわち
 		\f$\theta\TUvec{n}{}\f$.
- \throw invalid_argument	3次元正方行列でない場合に送出.
+ \throw invalid_argument	3x3行列でない場合に送出.
 */
 template <class T> Vector<T>
 Matrix<T>::rot2axis() const
@@ -736,9 +737,12 @@ operator %(const Vector<T>& v, const Vector<T>& w)	// multiply by vector
 
 //! 3次元ベクトルと3x?行列の各列とのベクトル積
 /*!
-  \param v	3次元ベクトル.
-  \param m	3x?行列.
-  \return	結果の3x?行列，すなわち\f$\TUvec{v}{}\times\TUvec{M}{}\f$.
+  \param v			3次元ベクトル.
+  \param m			3x?行列.
+  \return			結果の3x?行列，すなわち
+				\f$\TUvec{v}{}\times\TUvec{M}{}\f$.
+  \throw std::invalid_argument	vが3次元ベクトルでないかmが3x?行列でない場合に
+				送出.
 */
 template <class T> Matrix<T>
 operator ^(const Vector<T>& v, const Matrix<T>& m)
@@ -792,9 +796,10 @@ operator *(const Matrix<T>& m, const Vector<T>& v)	// multiply by vector
 /************************************************************************
 *  class LUDecomposition<T>						*
 ************************************************************************/
-//! 与えられた行列のLU分解を生成する
+//! 与えられた正方行列のLU分解を生成する
 /*!
- \param m	LU分解する行列.
+ \param m			LU分解する正方行列.
+ \throw std::invalid_argument	mが正方行列でない場合に送出.
 */
 template <class T>
 LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
@@ -864,9 +869,13 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
 
 //! もとの正方行列を係数行列とした連立1次方程式を解く
 /*!
-  \param b	もとの正方行列\f$\TUvec{M}{}\f$と同じ次元を持つベクトル．
-		\f$\TUtvec{b}{} = \TUtvec{x}{}\TUvec{M}{}\f$の解に変換
-		される.
+  \param b			もとの正方行列\f$\TUvec{M}{}\f$と同じ次
+				元を持つベクトル．\f$\TUtvec{b}{} =
+				\TUtvec{x}{}\TUvec{M}{}\f$の解に変換さ
+				れる.
+  \throw std::invalid_argument	ベクトルbの次元がもとの正方行列の次元に一致
+				しない場合に送出.
+  \throw std::runtime_error	もとの正方行列が正則でない場合に送出.
 */
 template <class T> void
 LUDecomposition<T>::substitute(Vector<T>& b) const
@@ -1067,18 +1076,19 @@ Householder<T>::sigma_is_zero(int m, T comp) const
 /************************************************************************
 *  class QRDeomposition<T>						*
 ************************************************************************/
-//! 与えられた行列のQR分解を生成する
+//! 与えられた一般行列のQR分解を生成する
 /*!
- \param m	QR分解する行列.
+ \param m	QR分解する一般行列.
 */
 template <class T>
 QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
     :Matrix<T>(m), _Qt(m.ncol(), 0)
 {
-    for (int j = 0; j < ncol(); ++j)
+    u_int	n = min(nrow(), ncol());
+    for (int j = 0; j < n; ++j)
 	_Qt.apply_from_right(*this, j);
     _Qt.make_transformation();
-    for (int i = 0; i < nrow(); ++i)
+    for (int i = 0; i < n; ++i)
     {
 	(*this)[i][i] = _Qt.sigma()[i];
 	for (int j = i + 1; j < ncol(); ++j)
@@ -1091,7 +1101,8 @@ QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
 ************************************************************************/
 //! 与えられた対称行列を3重対角化する
 /*!
-  \param a	3重対角化する対称行列.
+  \param a			3重対角化する対称行列.
+  \throw std::invalid_argument	aが正方行列でない場合に送出.
 */
 template <class T>
 TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
@@ -1112,6 +1123,7 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
 //! 3重対角行列を対角化する（固有値，固有ベクトルの計算）
 /*!
   対角成分は固有値となり，\f$\TUtvec{U}{}\f$の各行は固有ベクトルを与える．
+  \throw std::runtime_error	指定した繰り返し回数を越えた場合に送出.
 */ 
 template <class T> void
 TriDiagonal<T>::diagonalize()
@@ -1248,6 +1260,7 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
 /*!
   対角成分は特異値となり，\f$\TUtvec{U}{}\f$と\f$\TUtvec{V}{}\f$
   の各行はそれぞれ右特異ベクトルと左特異ベクトルを与える．
+  \throw std::runtime_error	指定した繰り返し回数を越えた場合に送出.
 */ 
 template <class T> void
 BiDiagonal<T>::diagonalize()
