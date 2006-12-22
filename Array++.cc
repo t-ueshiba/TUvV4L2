@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Array++.cc,v 1.5 2006-12-21 05:12:00 ueshiba Exp $
+ *  $Id: Array++.cc,v 1.6 2006-12-22 00:05:55 ueshiba Exp $
  */
 #include "TU/Array++.h"
 #include <stdexcept>
@@ -223,6 +223,8 @@ Array<T>::save(std::ostream& out) const
 
 //! 配列の次元を変更する
 /*!
+  ただし，他のオブジェクトと記憶領域を共有している配列の次元を変更することは
+  できない．
   \param d			新しい次元.
   \return			dが元の次元よりも大きければtrueを，そうでな
 				ければfalseを返す.
@@ -264,10 +266,10 @@ Array<T>::resize(T* p, u_int d)
     _siz = d;
 }
 
-//! 指定した符号なし整数値がこの配列の次元に一致しなければ例外を投げる
+//! 指定した符号なし整数値がこの配列の次元に一致するか調べる
 /*!
   \param d			調べたい符号なし整数値.
-  \throw std::invalid_argument	dがこの配列の次元に一致しない場合に送出.
+  \throw std::invalid_argument	d != dim()の場合に送出.
 */
 template <class T> void
 Array<T>::check_dim(u_int d) const
