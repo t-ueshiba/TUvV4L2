@@ -1,5 +1,5 @@
 /*
- *  $Id: IIRFilter.cc,v 1.3 2006-11-06 02:17:41 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.4 2007-01-16 07:52:58 ueshiba Exp $
  */
 #include <math.h>
 #include "TU/Image++.h"
@@ -34,8 +34,8 @@ coefficients4(float a0, float b0, float omega0, float alpha0,
 ************************************************************************/
 //! このCanny-Deriche核の初期化を行う
 /*!
-  \param alpha	フィルタサイズを表す正数．小さいほど広がりが大きい．
-  \return	このCanny-Deriche核自身.
+  \param alpha	フィルタサイズを表す正数（小さいほど広がりが大きい）
+  \return	このCanny-Deriche核自身
 */
 DericheConvolver&
 DericheConvolver::initialize(float alpha)
@@ -181,8 +181,8 @@ GaussianConvolver::CostFunction::update(AT& params, const Vector<T>& dp) const
 ************************************************************************/
 //! このGauss核の初期化を行う
 /*!
-  \param sigma	フィルタサイズを表す正数．大きいほど広がりが大きい．
-  \return	このGauss核自身.
+  \param sigma	フィルタサイズを表す正数（大きいほど広がりが大きい）
+  \return	このGauss核自身
 */
 GaussianConvolver&
 GaussianConvolver::initialize(float sigma)
