@@ -1,5 +1,4 @@
 /*
- *
  * libTUIeee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
  * Copyright (C) 2003-2006 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
@@ -20,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- *  $Id: raw1394.h,v 1.4 2007-01-16 07:55:41 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.5 2007-01-16 08:18:43 ueshiba Exp $
  */
 /*!
  \file

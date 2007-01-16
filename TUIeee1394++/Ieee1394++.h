@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.16 2007-01-16 07:55:41 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.17 2007-01-16 08:18:43 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -100,22 +100,42 @@ class Ieee1394Node
   public:
   //! このノードのID(IEEE1394 bus上のアドレス)を返す
   /*!
-    \return	このノードのID．
+    \return	このノードのID
    */
     nodeid_t	nodeId()			const	{return _nodeId;}
+
     u_int64	globalUniqueId()		const	;
+
   //! このノードに割り当てられたisochronous受信用バッファが満たされた時刻を返す
   /*!
     \return	受信用バッファが満たされた時刻
    */
     timeval	filltime()			const	{return _filltime;}
+
+  //! このノードに割り当てられたisochronous受信用バッファのサイズを返す
+  /*!
+    \return	受信用バッファのサイズ（単位：bytes）
+   */
 #if defined(USE_VIDEO1394)
     u_int	bufferSize()			const	{return _buf_size;}
-    u_char	channel()			const	{return _mmap.channel;}
 #else
     u_int	bufferSize()			const	{return _end - _buf;}
+#endif    
+
+  //! このノードに割り当てられたisochronousチャンネルを返す
+  /*!
+    \return	isochronousチャンネル
+   */
+#if defined(USE_VIDEO1394)
+    u_char	channel()			const	{return _mmap.channel;}
+#else
     u_char	channel()			const	{return _channel;}
 #endif
+
+  //! このノードに割り当てられたasynchronous通信の遅延量を返す
+  /*!
+    \return	遅延量（単位：micro seconds）
+   */
     u_int	delay()				const	{return _delay;}
     
   protected:
