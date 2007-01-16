@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.17 2006-12-19 07:05:20 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.18 2007-01-16 07:55:41 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -327,8 +327,8 @@ static const u_int	NBUFFERS		= 4;
 ************************************************************************/
 //! IEEE1394カメラノードを生成する
 /*!
-  \param type		カメラのタイプ．
-  \param 1394b		IEEE1394bモード (800Mbps)で動作．
+  \param type		カメラのタイプ
+  \param 1394b		IEEE1394bモード (800Mbps)で動作
   \param uniqId		個々のカメラ固有の64bit ID．同一のIEEE1394 busに
 			複数のカメラが接続されている場合，これによって
 			同定を行う．0が与えられると，まだ#Ieee1394Camera
@@ -404,7 +404,7 @@ Ieee1394Camera::~Ieee1394Camera()
 
 //! IEEE1394カメラの電源をonにする
 /*!
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::powerOn()
@@ -430,9 +430,9 @@ Ieee1394Camera::powerOff()
 /*!
   画像データを出力中であった場合はそれを停止して設定を行うが，それが
   完了すれば出力を再開する．
-  \param format	設定したい画像フォーマット．
-  \param rate	設定したいフレームレート．
-  \return	このIEEE1394カメラオブジェクト．
+  \param format	設定したい画像フォーマット
+  \param rate	設定したいフレームレート
+  \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
@@ -659,7 +659,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 
 //! 現在カメラに設定されている画像フォーマットを返す
 /*!
-  \return	設定されている画像フォーマット．
+  \return	設定されている画像フォーマット
 */
 Ieee1394Camera::Format
 Ieee1394Camera::getFormat() const
@@ -672,7 +672,7 @@ Ieee1394Camera::getFormat() const
 
 //! 現在カメラに設定されているフレームレートを返す
 /*!
-  \return	設定されているフレームレート．
+  \return	設定されているフレームレート
 */
 Ieee1394Camera::FrameRate
 Ieee1394Camera::getFrameRate() const
@@ -699,8 +699,8 @@ Ieee1394Camera::getFrameRate() const
 /*!
   ただし，注目領域(ROI)の幅または高さが0の場合(カメラ電源投入直後など)は，
   幅と高さをそれぞれの最小単位に設定し，その情報を返す．
-  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
-  \return	 指定されたフォーマットの内容．
+  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)
+  \return	 指定されたフォーマットの内容
  */
 Ieee1394Camera::Format_7_Info
 Ieee1394Camera::getFormat_7_Info(Format format7)
@@ -761,12 +761,12 @@ Ieee1394Camera::getFormat_7_Info(Format format7)
   となるように設定される．また，widthもしくはheightに0を指定しても，ROIの幅
   もしくは高さは，それぞれFormat_7_Info::unitWidth, Format_7_Info::unitHeight
   以上に設定される．
-  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)．
-  \param u0	 注目領域の左上隅の横座標．
-  \param v0	 注目領域の左上隅の縦座標．
-  \param width	 注目領域の幅．
-  \param height	 注目領域の高さ．
-  \return	 このIEEE1394カメラオブジェクト．
+  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)
+  \param u0	 注目領域の左上隅の横座標
+  \param v0	 注目領域の左上隅の縦座標
+  \param width	 注目領域の幅
+  \param height	 注目領域の高さ
+  \return	 このIEEE1394カメラオブジェクト
  */
 Ieee1394Camera&
 Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
@@ -815,9 +815,9 @@ Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
 //! 指定されたFormat_7タイプのフォーマットについて，画素形式を設定する
 /*!
   \param format7	対象となるフォーマット(#Format_7_0 - #Format_7_7の
-			いずれか)．
-  \param pixelFormat	画素形式．
-  \return		このIEEE1394カメラオブジェクト．
+			いずれか)
+  \param pixelFormat	画素形式
+  \return		このIEEE1394カメラオブジェクト
  */
 Ieee1394Camera&
 Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
@@ -849,9 +849,9 @@ Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
 
 //! 指定された属性においてカメラがサポートする機能を返す
 /*!
-  \param feature	対象となる属性．
+  \param feature	対象となる属性
   \return		サポートされている機能を#FeatureFunction型の列挙値
-			のorとして返す．
+			のorとして返す
  */
 quadlet_t
 Ieee1394Camera::inquireFeatureFunction(Feature feature) const
@@ -879,8 +879,8 @@ Ieee1394Camera::inquireFeatureFunction(Feature feature) const
 /*!
   本関数を呼ぶと，指定した属性の自動設定が直ちに開始される．自動設定が終了
   したかどうかは，inOnePushOperation()で知ることができる．
-  \param feature	自動設定したい属性．
-  \return		このIEEE1394カメラオブジェクト．
+  \param feature	自動設定したい属性
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::onePush(Feature feature)
@@ -893,8 +893,8 @@ Ieee1394Camera::onePush(Feature feature)
 
 //! 指定された属性をonにする
 /*!
-  \param feature	onにしたい属性．
-  \return		このIEEE1394カメラオブジェクト．
+  \param feature	onにしたい属性
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::turnOn(Feature feature)
@@ -906,8 +906,8 @@ Ieee1394Camera::turnOn(Feature feature)
 
 //! 指定された属性をoffにする
 /*!
-  \param feature	offにしたい属性．
-  \return		このIEEE1394カメラオブジェクト．
+  \param feature	offにしたい属性
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::turnOff(Feature feature)
@@ -922,8 +922,8 @@ Ieee1394Camera::turnOff(Feature feature)
 /*!
   自動設定にすると，この属性の値は環境の変化に追従して継続的に自動的に調整
   される．
-  \param feature	自動設定モードにしたい属性．
-  \return		このIEEE1394カメラオブジェクト．
+  \param feature	自動設定モードにしたい属性
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::setAutoMode(Feature feature)
@@ -936,8 +936,8 @@ Ieee1394Camera::setAutoMode(Feature feature)
 
 //! 指定された属性を手動設定モードにする
 /*!
-  \param feature	手動設定モードにしたい属性．
-  \return		このIEEE1394カメラオブジェクト．
+  \param feature	手動設定モードにしたい属性
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::setManualMode(Feature feature)
@@ -952,9 +952,9 @@ Ieee1394Camera::setManualMode(Feature feature)
 /*!
   #WHITE_BALANCE, #TRIGGER_MODEの値を設定することはできない．代わりに
   setWhiteBalance(), setTriggerMode(), setTriggerPolarity()を用いること．
-  \param feature	値を設定したい属性．
-  \param value		設定する値．
-  \return		このIEEE1394カメラオブジェクト．
+  \param feature	値を設定したい属性
+  \param value		設定する値
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::setValue(Feature feature, u_int value)
@@ -975,7 +975,7 @@ Ieee1394Camera::setValue(Feature feature, u_int value)
 
 //! 指定された属性が1回だけの自動設定の最中であるか調べる
 /*!
-  \param feature	対象となる属性．
+  \param feature	対象となる属性
   \return		onePush()を行った属性値の自動設定が継続中であれば
 			trueを，終了していればfalseを返す．
 */
@@ -988,7 +988,7 @@ Ieee1394Camera::inOnePushOperation(Feature feature) const
 
 //! 指定された属性がonになっているか調べる
 /*!
-  \param feature	対象となる属性．
+  \param feature	対象となる属性
   \return		onになっていればtrueを，そうでなければfalseを返す．
 */
 bool
@@ -1000,7 +1000,7 @@ Ieee1394Camera::isTurnedOn(Feature feature) const
 
 //! 指定された属性が自動設定モードになっているか調べる
 /*!
-  \param feature	対象となる属性．
+  \param feature	対象となる属性
   \return		自動設定モードになっていればtrueを，そうでなければ
 			falseを返す．
 */
@@ -1013,7 +1013,7 @@ Ieee1394Camera::isAuto(Feature feature) const
 
 //! 指定された属性がとり得る値の範囲を調べる
 /*!
-  \param feature	対象となる属性．
+  \param feature	対象となる属性
   \param min		とり得る値の最小値が返される．
   \param max		とり得る値の最大値が返される．
 */
@@ -1033,8 +1033,8 @@ Ieee1394Camera::getMinMax(Feature feature, u_int& min, u_int& max) const
   また，#WHITE_BALANCE, #TRIGGER_MODEの値を知ることはできない．代わり
   にgetWhiteBalance(), getTriggerMode(), getTriggerPolarity()を用いる
   こと．
-  \param	feature 対象となる属性．
-  \return	現在の値．
+  \param feature	対象となる属性
+  \return		現在の値
 */
 u_int
 Ieee1394Camera::getValue(Feature feature) const
@@ -1047,9 +1047,9 @@ Ieee1394Camera::getValue(Feature feature) const
 
 //! ホワイトバランスの値を設定する
 /*!
-  \param ub		設定するU/B値．
-  \param vr		設定するV/R値．
-  \return		このIEEE1394カメラオブジェクト．
+  \param ub		設定するU/B値
+  \param vr		設定するV/R値
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::setWhiteBalance(u_int ub, u_int vr)
@@ -1063,8 +1063,8 @@ Ieee1394Camera::setWhiteBalance(u_int ub, u_int vr)
 
 //! ホワイトバランスの値を調べる
 /*!
-  \param ub		U/B値が返される．
-  \param vr		V/R値が返される．
+  \param ub		U/B値が返される
+  \param vr		V/R値が返される
 */
 void
 Ieee1394Camera::getWhiteBalance(u_int &ub, u_int& vr) const
@@ -1091,8 +1091,8 @@ Ieee1394Camera::getAimedTemperature() const
 /*!
   実際にカメラが外部トリガによって駆動されるためには，この関数でモード設定
   を行った後に#turnOn(#TRIGGER_MODE)を行わなければならない．
-  \param mode	設定したいトリガモード．
-  \return	このIEEE1394カメラオブジェクト．
+  \param mode	設定したいトリガモード
+  \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::setTriggerMode(TriggerMode mode)
@@ -1106,7 +1106,7 @@ Ieee1394Camera::setTriggerMode(TriggerMode mode)
 
 //! 現在設定されているトリガモードを調べる
 /*!
-  \return	現在設定されているトリガモード．
+  \return	現在設定されているトリガモード
 */
 Ieee1394Camera::TriggerMode
 Ieee1394Camera::getTriggerMode() const
@@ -1118,8 +1118,8 @@ Ieee1394Camera::getTriggerMode() const
 
 //! トリガ信号の極性を設定する
 /*!
-  \param polarity	設定したい極性．
-  \return		このIEEE1394カメラオブジェクト．
+  \param polarity	設定したい極性
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::setTriggerPolarity(TriggerPolarity polarity)
@@ -1133,7 +1133,7 @@ Ieee1394Camera::setTriggerPolarity(TriggerPolarity polarity)
 
 //! 現在設定されているトリガ信号の極性を調べる
 /*!
-  \return	現在設定されているトリガ信号の極性．
+  \return	現在設定されているトリガ信号の極性
 */
 Ieee1394Camera::TriggerPolarity
 Ieee1394Camera::getTriggerPolarity() const
@@ -1149,7 +1149,7 @@ Ieee1394Camera::getTriggerPolarity() const
 /*!
   #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
   れる．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::continuousShot()
@@ -1161,7 +1161,7 @@ Ieee1394Camera::continuousShot()
 
 //! カメラからの画像の連続的出力を停止する
 /*!
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::stopContinuousShot()
@@ -1190,7 +1190,7 @@ Ieee1394Camera::inContinuousShot() const
   画像を連続的に出力中であれば，それを停止した後にあらためて1枚だけ撮影する．
   #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
   れる．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::oneShot()
@@ -1206,8 +1206,8 @@ Ieee1394Camera::oneShot()
   画像を連続的に出力中であれば，それを停止した後にあらためて撮影を開始する．
   #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
   れる．
-  \param nframes	撮影したい枚数．
-  \return		このIEEE1394カメラオブジェクト．
+  \param nframes	撮影したい枚数
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::multiShot(u_short nframes)
@@ -1224,7 +1224,7 @@ Ieee1394Camera::multiShot(u_short nframes)
   カメラ内部のメモリチャンネルに記憶できるものがある．
   \param mem_ch		値を記憶するメモリチャンネル番号．0以上の値をとり，
 			最大値はgetMemoryChannelMaxで調べられる．
-  \return		このIEEE1394カメラオブジェクト．
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::saveConfig(u_int mem_ch)
@@ -1245,7 +1245,7 @@ Ieee1394Camera::saveConfig(u_int mem_ch)
   カメラ内部のメモリチャンネルに記憶できるものがある．
   \param mem_ch		設定したい値を記憶しているメモリチャンネル番号．0以上
 			の値をとり，最大値はgetMemoryChannelMaxで調べられる．
-  \return		このIEEE1394カメラオブジェクト．
+  \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
 Ieee1394Camera::restoreConfig(u_int mem_ch)
@@ -1261,7 +1261,7 @@ Ieee1394Camera::restoreConfig(u_int mem_ch)
 /*!
   IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
   カメラ内部のメモリチャンネルに記憶できるものがある．
-  \return 	メモリチャンネル番号の最大値．
+  \return 	メモリチャンネル番号の最大値
 */
 u_int
 Ieee1394Camera::getMemoryChannelMax() const
@@ -1292,7 +1292,7 @@ Ieee1394Camera::getMemoryChannelMax() const
 		    -# #RGB_24 -> T (YUV444, YUV422, YUV411を除く) 
 		    -# #MONO_8 -> T
 		    -# #MONO_16 -> T
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 template <class T> const Ieee1394Camera&
 Ieee1394Camera::operator >>(Image<T>& image) const
@@ -1386,7 +1386,7 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．サポートされている画素形式Tは，RGB, RGBA,
 		BGR, ABGRのいずれかである．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 template <class T> const Ieee1394Camera&
 Ieee1394Camera::captureRGBImage(Image<T>& image) const
@@ -1596,7 +1596,7 @@ struct RGB
   \param image	画像データの格納領域へのポインタ．width(), height()および
 		pixelFormat()を用いて画像のサイズと画素の形式を調べて
 		画像1枚分の領域を確保しておくのは，ユーザの責任である．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 const Ieee1394Camera&
 Ieee1394Camera::captureRaw(void* image) const
@@ -1619,7 +1619,7 @@ Ieee1394Camera::captureRaw(void* image) const
 		画像データは，各画素毎に R, G, B (各 1 byte)の順で格納され
 		る．カメラの画素形式が#MONO_8 または#MONO_16 以外に設定され
 		ている場合はstd::domain_error例外が送出される．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 const Ieee1394Camera&
 Ieee1394Camera::captureBayerRaw(void* image) const
@@ -1873,8 +1873,8 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 
 //! unsinged intの値を同じビットパターンを持つ#Formatに直す
 /*!
-  \param format	#Formatに直したいunsigned int値．
-  \return	#Format型のenum値．
+  \param format	#Formatに直したいunsigned int値
+  \return	#Format型のenum値
  */
 Ieee1394Camera::Format
 Ieee1394Camera::uintToFormat(u_int format)
@@ -1968,8 +1968,8 @@ Ieee1394Camera::uintToFormat(u_int format)
 
 //! unsinged intの値を同じビットパターンを持つ#FrameRateに直す
 /*!
-  \param rate	#FrameRateに直したいunsigned int値．
-  \return	#FrameRate型のenum値．
+  \param rate	#FrameRateに直したいunsigned int値
+  \return	#FrameRate型のenum値
  */
 Ieee1394Camera::FrameRate
 Ieee1394Camera::uintToFrameRate(u_int rate)
@@ -2003,8 +2003,8 @@ Ieee1394Camera::uintToFrameRate(u_int rate)
 
 //! unsinged intの値を同じビットパターンを持つ#Featureに直す
 /*!
-  \param feature	#Featureに直したいunsigned int値．
-  \return		#Feature型のenum値．
+  \param feature	#Featureに直したいunsigned int値
+  \return		#Feature型のenum値
  */
 Ieee1394Camera::Feature
 Ieee1394Camera::uintToFeature(u_int feature)
@@ -2058,8 +2058,8 @@ Ieee1394Camera::uintToFeature(u_int feature)
 
 //! unsinged intの値を同じビットパターンを持つ#TriggerModeに直す
 /*!
-  \param triggerMode	#TriggerModeに直したいunsigned int値．
-  \return		#TriggerMode型のenum値．
+  \param triggerMode	#TriggerModeに直したいunsigned int値
+  \return		#TriggerMode型のenum値
  */
 Ieee1394Camera::TriggerMode
 Ieee1394Camera::uintToTriggerMode(u_int triggerMode)
@@ -2089,8 +2089,8 @@ Ieee1394Camera::uintToTriggerMode(u_int triggerMode)
  
 //! unsinged intの値を同じビットパターンを持つ#PixelFormatに直す
 /*!
-  \param pixelFormat	#PixelFormatに直したいunsigned int値．
-  \return		#PixelFormat型のenum値．
+  \param pixelFormat	#PixelFormatに直したいunsigned int値
+  \return		#PixelFormat型のenum値
  */
 Ieee1394Camera::PixelFormat
 Ieee1394Camera::uintToPixelFormat(u_int pixelFormat)
@@ -2128,7 +2128,7 @@ Ieee1394Camera::uintToPixelFormat(u_int pixelFormat)
 
 //! 指定された画像フォーマットにおいてサポートされているフレームレートを調べる
 /*!
-  \param format	対象となるフォーマット．
+  \param format	対象となるフォーマット
   \return	サポートされているフレームレートを#FrameRate型の列挙値
 		のorとして返す．指定されたフォーマット自体がこのカメラでサ
 		ポートされていなければ，0が返される．
@@ -2420,7 +2420,7 @@ Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
 /*
   \param featureId	アクセス制限を解除したい機能を表す48bitのID．
   \param timeout	解除してからまたロックされるまでのタイムアウト値
-			(単位: msec) .
+			(単位: msec)
   \return		解除に成功すればtrueを，失敗するかこの機能自体が
 			存在しなければfalseを返す．
 */
@@ -2537,9 +2537,9 @@ static const int	NFEATURES = sizeof(features) / sizeof(features[0]);
 ************************************************************************/
 //! 現在のカメラの設定をストリームに書き出す
 /*!
-  \param out		出力ストリーム．
-  \param camera		対象となるカメラ．
-  \return		outで指定した出力ストリームを返す．
+  \param out		出力ストリーム
+  \param camera		対象となるカメラ
+  \return		outで指定した出力ストリーム
 */
 std::ostream&
 operator <<(std::ostream& out, const Ieee1394Camera& camera)
@@ -2590,9 +2590,9 @@ operator <<(std::ostream& out, const Ieee1394Camera& camera)
 
 //! ストリームから読み込んだ設定をカメラにセットする
 /*!
-  \param in		入力ストリーム．
-  \param camera		対象となるカメラ．
-  \return		inで指定した入力ストリームを返す．
+  \param in		入力ストリーム
+  \param camera		対象となるカメラ
+  \return		inで指定した入力ストリーム
 */
 std::istream&
 operator >>(std::istream& in, Ieee1394Camera& camera)

@@ -19,49 +19,47 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.3 2006-12-19 07:05:20 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.4 2007-01-16 07:55:41 ueshiba Exp $
  */
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
 #include <mach/mach.h>
-#ifdef USE_THREAD
-#  include <pthread.h>
-#endif
 /************************************************************************
 *  struct raw1394							*
 ************************************************************************/
+//! IEEE1394デバイスへのlibraw1394に互換なアクセスをMacOS X上で提供する構造体
 struct raw1394
 {
   private:
     class Interval
     {
       public:
-	Interval()				;
-	~Interval()				;
+	Interval()					;
+	~Interval()					;
 
-	UInt32		nPackets()	const	{return _nPackets;}
-	DCLCommand**	commandList()	const	{return (DCLCommand**)_packet;}
-	DCLTransferPacket*
-			operator [](int i)const	{return _packet[i];}
-	DCLTransferPacket*&
-			operator [](int i)	{return _packet[i];}
-	raw1394*	parent()	const	{return _parent;}
-
-	void		resize(UInt32 n, raw1394* parent)	;
+	UInt32		nPackets()		const	{return _nPackets;}
+	const NuDCLRef& operator [](int i)	const	{return _packet[i];}
+	NuDCLRef&	operator [](int i)		{return _packet[i];}
+	const NuDCLRef&	first()			const	{return _packet[0];}
+	const NuDCLRef&	last()			const	{return
+							 _packet[_nPackets-1];}
+	raw1394*	parent()		const	{return _parent;}
+	const Interval*	prev()			const	{return _prev;}
+	
+	void		resize(UInt32 n, const Interval& prv, raw1394* parent);
 
       private:
-	Interval(const Interval&)				;
-	Interval&	operator =(const Interval&)		;
+	Interval(const Interval&)			;
+	Interval&	operator =(const Interval&)	;
 	
       private:
-	UInt32			_nPackets;
-	DCLTransferPacket**	_packet;
-	raw1394*		_parent;
+	UInt32		_nPackets;
+	NuDCLRef*	_packet;
+	raw1394*	_parent;
+	const Interval*	_prev;
+
       public:
-	Interval*		prev;
-	DCLLabel*		label;
-	DCLJump*		jump;
-	UInt32			nPacketsDropped;
+	UInt32		nPacketsDropped;
     };
     
   public:
@@ -84,15 +82,13 @@ struct raw1394
     IOReturn	isoRecvStart()						;
     IOReturn	isoStop()						;
     IOReturn	isoRecvFlush()						;
-#ifndef USE_THREAD
     SInt32	loopIterate()						;
-#endif
     
   private:
     raw1394(const raw1394&)						;
     raw1394&	operator =(const raw1394&)				;
     
-    static void	receiveHandler(DCLCommand* dcl)				;
+    static void	receiveHandler(void* refcon, NuDCLRef dcl)		;
     static IOReturn
 		getSupportedHandler(IOFireWireLibIsochPortRef isochPort,
 				    IOFWSpeed*		      speed,
@@ -109,7 +105,7 @@ struct raw1394
     IOFireWireLibDeviceRef		_fwDeviceInterface;
     CFStringRef				_runLoopMode;
 
-    IOFireWireLibDCLCommandPoolRef	_commandPool;
+    IOFireWireLibNuDCLPoolRef		_dclPool;
     vm_address_t			_vm;
     vm_size_t				_vmSize;
     raw1394_iso_recv_handler_t		_recvHandlerExt;
@@ -124,36 +120,36 @@ struct raw1394
     void*				_userData;
 
     static UInt32			_nnodes;
-
-#ifdef USE_THREAD
-  public:
-    void		raise()					const	;
-    void		wait()					const	;
-    
-  private:
-    static void*	threadProc(void* thread)			;
-    
-    enum State		{Ready, Idle, Exit};
-
-    mutable pthread_mutex_t	_mutex;
-    mutable pthread_cond_t	_cond;
-    pthread_t			_thread;
-    mutable State		_state;
-#endif
 };
 
+//! raw1394構造体にユーザが指定したデータへのポインタを貼付ける
+/*!
+  \param data	貼付けたいデータへのポインタ
+*/
 inline void
 raw1394::setUserData(void* data)
 {
     _userData = data;
 }
     
+//! このraw1394構造体に貼付けたデータへのポインタを得る
+/*!
+  \return	貼付けたデータへのポインタ
+*/
 inline void*
 raw1394::getUserData() const
 {
     return _userData;
 }
-    
+
+//! 指定したFireWireアドレスから任意バイト数のデータをasynchronous転送で読み込む
+/*!
+  \param addr	読み込み元のFireWireアドレス
+  \param buf	読み込み先のバッファアドレス
+  \param size	読み込みデータのバイト数
+  \return	読み込みが成功すればkIOReturnSuccess，そうでなければ
+		エラーの原因を示すコード
+*/
 inline IOReturn
 raw1394::read(const FWAddress& addr, void* buf, UInt32 size) const
 {
@@ -163,6 +159,13 @@ raw1394::read(const FWAddress& addr, void* buf, UInt32 size) const
 	       &addr, buf, &size, kFWDontFailOnReset, 0);
 }
 
+//! 指定したFireWireアドレスから4バイトのデータをasynchronous転送で読み込む
+/*!
+  \param addr	読み込み元のFireWireアドレス
+  \param quad	読み込み先のアドレス
+  \return	読み込みが成功すればkIOReturnSuccess，そうでなければ
+		エラーの原因を示すコード
+*/
 inline IOReturn
 raw1394::readQuadlet(const FWAddress& addr, UInt32* quad) const
 {
@@ -172,6 +175,14 @@ raw1394::readQuadlet(const FWAddress& addr, UInt32* quad) const
 		      &addr, quad, kFWDontFailOnReset, 0);
 }
 
+//! 指定したFireWireアドレスに任意バイト数のデータをasynchronous転送で書き込む
+/*!
+  \param addr	書き込み先のFireWireアドレス
+  \param buf	書き込み元のバッファアドレス
+  \param size	書き込みデータのバイト数
+  \return	書き込みが成功すればkIOReturnSuccess，そうでなければ
+		エラーの原因を示すコード
+*/
 inline IOReturn
 raw1394::write(const FWAddress& addr, const void* buf, UInt32 size) const
 {
@@ -181,6 +192,13 @@ raw1394::write(const FWAddress& addr, const void* buf, UInt32 size) const
 		&addr, buf, &size, kFWDontFailOnReset, 0);
 }
 	       
+//! 指定したFireWireアドレスに4バイトのデータをasynchronous転送で書き込む
+/*!
+  \param addr	書き込み先のFireWireアドレス
+  \param quad	書き込むデータ
+  \return	書き込みが成功すればkIOReturnSuccess，そうでなければ
+		エラーの原因を示すコード
+*/
 inline IOReturn
 raw1394::writeQuadlet(const FWAddress& addr, UInt32 quad) const
 {
@@ -190,32 +208,35 @@ raw1394::writeQuadlet(const FWAddress& addr, UInt32 quad) const
 		       &addr, quad, kFWDontFailOnReset, 0);
 }
 
+//! isochronous受信を開始する
+/*!
+  \return	開始が成功すればkIOReturnSuccess，そうでなければ
+		エラーの原因を示すコード
+*/
 inline IOReturn
 raw1394::isoRecvStart()
 {
     return (*_isochChannel)->Start(_isochChannel);
 }
     
+//! isochronous受信を停止する
+/*!
+  \return	停止が成功すればkIOReturnSuccess，そうでなければ
+		エラーの原因を示すコード
+*/
 inline IOReturn
 raw1394::isoStop()
 {
     return (*_isochChannel)->Stop(_isochChannel);
 }
 
-#ifdef USE_THREAD
-inline void
-raw1394::raise() const
-{
-    pthread_mutex_lock(&_mutex);
-    _state = Ready;
-    pthread_cond_signal(&_cond);	// Send Ready signal to the child.
-    pthread_mutex_unlock(&_mutex);
-}
-#else
+//! isochronous転送のループを1回実行する
+/*!
+  \return	ループの実行が終了した原因を示すコード
+*/
 inline SInt32
 raw1394::loopIterate()
 {
-    return CFRunLoopRunInMode(_runLoopMode, (CFTimeInterval)1, true);
-  //return CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)1, true);
+    return CFRunLoopRunInMode(_runLoopMode, (CFTimeInterval)0, true);
 }
-#endif
+

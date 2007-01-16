@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.7 2006-12-19 07:05:20 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.8 2007-01-16 07:55:41 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <unistd.h>
@@ -119,7 +119,7 @@ std::map<int, Ieee1394Node::Port*>	Ieee1394Node::_portMap;
 //! IEEE1394ノードオブジェクトを生成する
 /*!
   \param unit_spec_ID	このノードの種類を示すID(ex. IEEE1394デジタルカメラ
-			であれば，0x00a02d).
+			であれば，0x00a02d)
   \param uniqId		個々の機器固有の64bit ID．同一のIEEE1394 busに
 			同一のunit_spec_IDを持つ複数の機器が接続されて
 			いる場合，これによって同定を行う．
@@ -253,7 +253,7 @@ Ieee1394Node::globalUniqueId() const
 
 //! 与えられたkeyに対する値をUnit Dependent Directoryから読み出す
 /*!
-  \param key	keyすなわち4byteの並びのMSB側8bit．
+  \param key	keyすなわち4byteの並びのMSB側8bit
  */
 u_int
 Ieee1394Node::readValueFromUnitDependentDirectory(u_char key) const
@@ -276,7 +276,7 @@ Ieee1394Node::readValueFromUnitDependentDirectory(u_char key) const
 
 //! 与えられたkeyに対する値をUnit Directoryから読み出す
 /*!
-  \param key	keyすなわち4byteの並びのMSB側8bit．
+  \param key	keyすなわち4byteの並びのMSB側8bit
  */
 u_int
 Ieee1394Node::readValueFromUnitDirectory(u_char key) const
@@ -324,7 +324,7 @@ Ieee1394Node::readQuadletFromConfigROM(u_int offset) const
     
 //! ノード内の指定されたアドレスから4byteの値を読み出す
 /*!
-  \param addr	個々のノード内の絶対アドレス．
+  \param addr	個々のノード内の絶対アドレス
  */
 quadlet_t
 Ieee1394Node::readQuadlet(nodeaddr_t addr) const
@@ -341,8 +341,8 @@ Ieee1394Node::readQuadlet(nodeaddr_t addr) const
 
 //! ノード内の指定されたアドレスに4byteの値を書き込む
 /*!
-  \param addr	個々のノード内の絶対アドレス．
-  \param quad	書き込む4byteの値．
+  \param addr	個々のノード内の絶対アドレス
+  \param quad	書き込む4byteの値
  */
 void
 Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
@@ -358,10 +358,10 @@ Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
 
 //! isochronous受信用のバッファを割り当てる
 /*!
-  \param packet_size	受信するパケット1つあたりのサイズ(単位: byte).
-  \param buf_size	バッファ1つあたりのサイズ(単位: byte)．
-  \param nb_buffers	割り当てるバッファ数．
-  \return		割り当てられたisochronous受信用のチャンネル．
+  \param packet_size	受信するパケット1つあたりのサイズ(単位: byte)
+  \param buf_size	バッファ1つあたりのサイズ(単位: byte)
+  \param nb_buffers	割り当てるバッファ数
+  \return		割り当てられたisochronous受信用のチャンネル
  */
 u_char
 Ieee1394Node::mapListenBuffer(size_t packet_size,
@@ -436,13 +436,10 @@ Ieee1394Node::waitListenBuffer()
 
     return _buf + _current * _mmap.buf_size;
 #else
-#  if defined(USE_THREAD)
-    raw1394_raise(_handle);
-#  else    
     while (_current < _end)
 	raw1394_loop_iterate(_handle);
     gettimeofday(&_filltime, NULL);
-#  endif
+
     return _buf;
 #endif    
 }
@@ -526,9 +523,9 @@ Ieee1394Node::unmapListenBuffer()
 #if !defined(USE_VIDEO1394)
 //! このノードに割り当てられたisochronous受信用バッファを満たす
 /*!
-  \param data	受信用バッファにセーブするデータ．
-  \param len	データのバイト数．
-  \param sy	先頭のデータであれば1, そうでなければ0．
+  \param data	受信用バッファにセーブするデータ
+  \param len	データのバイト数
+  \param sy	先頭のデータであれば1, そうでなければ0
 */
 raw1394_iso_disposition
 Ieee1394Node::receive(raw1394handle_t handle,

@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.4 2006-12-19 07:05:20 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.5 2007-01-16 07:55:41 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -27,11 +27,15 @@
 #  include <iostream>
 #endif
 /************************************************************************
+*  static functions							*
+************************************************************************/
+static inline int	min(int a, int b)	{return (a < b ? a : b);}
+
+/************************************************************************
 *  class raw1394::Interval						*
 ************************************************************************/
 raw1394::Interval::Interval()
-    :_nPackets(0), _packet(0), _parent(0),
-     prev(0), label(0), jump(0), nPacketsDropped(0)
+    :_nPackets(0), _packet(0), _parent(0), _prev(0), nPacketsDropped(0)
 {
 }
 
@@ -41,32 +45,30 @@ raw1394::Interval::~Interval()
 }
     
 void
-raw1394::Interval::resize(UInt32 n, raw1394* parent)
+raw1394::Interval::resize(UInt32 n, const Interval& prv, raw1394* parent)
 {
     delete [] _packet;
     _nPackets	    = n;
-    _packet	    = new DCLTransferPacket*[_nPackets];
+    _packet	    = new NuDCLRef[_nPackets];
     _parent	    = parent;
-    prev	    = 0;
-    label	    = 0;
-    jump	    = 0;
+    _prev	    = &prv;
     nPacketsDropped = 0;
 }
     
 /************************************************************************
 *  class raw1394							*
 ************************************************************************/
-static SInt32	DefaultIrqInterval = 16;
-
+//! raw1394構造体を生成する
+/*!
+  \param unit_spec_ID	この構造体が表すIEEE1394ノードの種類を示すID
+  \param uniqId		個々の機器固有の64bit ID
+*/
 raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
     :_cfPlugInInterface(0), _fwDeviceInterface(0), _runLoopMode(),
-     _commandPool(0), _vm(0), _vmSize(0), _recvHandlerExt(0),
+     _dclPool(0), _vm(0), _vmSize(0), _recvHandlerExt(0),
      _nIntervals(0), _interval(0), _localIsochPort(0),
      _channel(0), _remoteIsochPort(0), _isochChannel(0),
      _userData(0)
-#ifdef USE_THREAD
-     ,_mutex(), _cond(), _thread(), _state(Idle)
-#endif
 {
     using namespace	std;
     
@@ -119,24 +121,24 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
     if (!_fwDeviceInterface)
 	throw runtime_error("raw1394::raw1394: no specified service(=device) found!!");
 
-#ifdef USE_THREAD
-    pthread_mutex_init(&_mutex, NULL);
-    pthread_cond_init(&_cond, NULL);
-
-    pthread_create(&_thread, NULL, threadProc, this);
-#else
   // Add a callback dispatcher to RunLoop with a specific mode.
     char	mode[] = "raw1394.x";
     mode[strlen(mode)-1] = '0' + _nnodes++;
     _runLoopMode = CFStringCreateWithCString(kCFAllocatorDefault, mode,
 					     CFStringGetSystemEncoding());
+    if ((*_fwDeviceInterface)->AddCallbackDispatcherToRunLoopForMode(
+	    _fwDeviceInterface, CFRunLoopGetCurrent(), _runLoopMode)
+	    != kIOReturnSuccess)
+	    throw runtime_error("raw1394::raw1394: failed to add a callback dispatcher!!");
     if ((*_fwDeviceInterface)->AddIsochCallbackDispatcherToRunLoopForMode(
 	    _fwDeviceInterface, CFRunLoopGetCurrent(), _runLoopMode)
 	    != kIOReturnSuccess)
 	    throw runtime_error("raw1394::raw1394: failed to add an isochronous callback dispatcher!!");
-#endif
+    if (!(*_fwDeviceInterface)->TurnOnNotification(_fwDeviceInterface))
+	    throw runtime_error("raw1394::raw1394: failed to turn on notification!!");
 }
 
+//! raw1394構造体を破壊する
 raw1394::~raw1394()
 {
     if (_cfPlugInInterface)
@@ -144,21 +146,12 @@ raw1394::~raw1394()
 	if (_fwDeviceInterface)
 	{
 	    isoShutdown();
-#ifdef USE_THREAD
-	    pthread_mutex_lock(&_mutex);
-	    _state = Exit;
-	    pthread_cond_signal(&_cond);    // Send Exit signal to the child.
-	    pthread_mutex_unlock(&_mutex);
-
-	    pthread_join(_thread, NULL);    // Wait the child terminating.
-	    pthread_cond_destroy(&_cond);
-	    pthread_mutex_destroy(&_mutex);
-#else
 	    (*_fwDeviceInterface)
 		->RemoveIsochCallbackDispatcherFromRunLoop(_fwDeviceInterface);
+	    (*_fwDeviceInterface)
+		->RemoveCallbackDispatcherFromRunLoop(_fwDeviceInterface);
 	    CFRelease(_runLoopMode);
 	    --_nnodes;
-#endif
 	    (*_fwDeviceInterface)->Close(_fwDeviceInterface);
 	    (*_fwDeviceInterface)->Release(_fwDeviceInterface);
 	}
@@ -166,6 +159,10 @@ raw1394::~raw1394()
     }
 }
 
+//! このraw1394構造体が表すノードのコマンドレジスタのベースアドレスを返す
+/*!
+  \return		コマンドレジスタのベースアドレス
+*/
 FWAddress
 raw1394::cmdRegBase() const
 {
@@ -194,6 +191,16 @@ raw1394::cmdRegBase() const
     return addr;
 }
 
+//! isochronous受信の初期設定を行う
+/*!
+  \param handler	カーネルが受信した各パケットに対して実行されるハンドラ
+  \param nPackets	受信するパケット数
+  \param maxPacketSize	受信パケットの最大バイト数
+  \param channel	ishochronous受信のチャンネル
+  \param irqInterval	カーネルが割り込みをかける間隔を指定するパケット数
+  \return		初期設定が成功すればkIOReturnSuccess，そうでなければ
+			エラーの原因を示すコード
+*/
 IOReturn
 raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 		     UInt32 nPackets, UInt32 maxPacketSize,
@@ -201,23 +208,17 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 {
     isoShutdown();		// Release preveously allocated resouces.
     
+    if (irqInterval <= 0)
+	irqInterval = 16;	// Default vlaue of IrqInterval.
+    if (irqInterval > nPackets)
+	irqInterval = nPackets;
+
   // [Step 1] Set up a local isochronous port.
   // [Step 1.1] Create DCL command pool.
     maxPacketSize += 4;			// Add 4bytes for isochronous header.
-    if (irqInterval <= 0)
-	irqInterval = DefaultIrqInterval;
-    if (irqInterval > nPackets)
-	irqInterval = nPackets;
-    const UInt32 nIntervals		= (nPackets - 1) / irqInterval + 1,
-		 nPacketsOfLastInterval	= (nPackets - 1) % irqInterval + 1;
-    const UInt32 poolSize = nIntervals*(sizeof(DCLLabel) +
-					sizeof(DCLUpdateDCLList) +
-					sizeof(DCLCallProc) +
-					sizeof(DCLJump)) +
-			      nPackets* sizeof(DCLTransferPacket);
-    if (!(_commandPool = (*_fwDeviceInterface)->CreateDCLCommandPool(
-	      _fwDeviceInterface, poolSize,
-	      CFUUIDGetUUIDBytes(kIOFireWireDCLCommandPoolInterfaceID))))
+    if (!(_dclPool = (*_fwDeviceInterface)->CreateNuDCLPool(
+	      _fwDeviceInterface, nPackets,
+	      CFUUIDGetUUIDBytes(kIOFireWireNuDCLPoolInterfaceID))))
 	return kIOReturnError;
 
   // [Step 1.2] Allocate virtual memory. Don't use "new" or "malloc"!!
@@ -235,78 +236,59 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 
   // [Step 1.3] Write a DCL program.
     _recvHandlerExt = handler;
-    _nIntervals	    = nIntervals;
+    _nIntervals	    = (nPackets - 1) / irqInterval + 1;
     _interval	    = new Interval[_nIntervals];
-    DCLCommand*	dcl = nil;
-    UInt8*	packet = (UInt8*)_vm;
+    IOVirtualRange	range = {_vm, maxPacketSize};
     for (int n = 0, i = 0; i < _nIntervals; ++i)
     {
 	Interval&	interval = _interval[i];
 
 	interval.resize((i < _nIntervals - 1 ?
-			 irqInterval : nPacketsOfLastInterval), this);
-
-      // Allocate a Label.
-	dcl = (*_commandPool)->AllocateLabelDCL(_commandPool, dcl);
-	interval.label = (DCLLabel*)dcl;
+			 irqInterval : (nPackets - 1) % irqInterval + 1),
+			(i > 0 ? _interval[i-1] : _interval[_nIntervals-1]),
+			this);
 
       // Allocate ReceivePacketStart commands.
+	NuDCLRef	dcl;
 	for (int j = 0; j < interval.nPackets(); ++j)
 	{
-	    dcl = (*_commandPool)->AllocateReceivePacketStartDCL(
-		_commandPool, dcl, packet, maxPacketSize);
-	    interval[j] = (DCLTransferPacket*)dcl;
-	    packet += maxPacketSize;
+	    dcl = (*_dclPool)->AllocateReceivePacket(_dclPool,
+						     NULL, 4, 1, &range);
+	    if (j == 0)
+	    {
+		(*_dclPool)->SetDCLWaitControl(dcl, true);
+		(*_dclPool)->SetDCLFlags(dcl, kNuDCLDynamic);
+	    }
+	    interval[j] = dcl;
+	    range.address += maxPacketSize;
 	    if (++n == nPacketsPerPage)
 	    {
 		n = 0;
-		packet += frac;
+		range.address += frac;
 	    }
 	}
 
-      // Allocate an UpdateDCLList command.
-	dcl = (*_commandPool)->AllocateUpdateDCLListDCL(_commandPool, dcl,
-							interval.commandList(),
-							interval.nPackets());
-
-      // Allocate a CallProc command with the isochronous receive handler.
-	dcl = (*_commandPool)->AllocateCallProcDCL(_commandPool, dcl,
-						   receiveHandler,
-						   (UInt32)&interval);
+      // Bind the interval and set the isochronous receive handler
+      // to the last ReceivePacket command.
+	(*_dclPool)->SetDCLRefcon(dcl, &interval);
+	(*_dclPool)->SetDCLCallback(dcl, receiveHandler);
 #ifdef DEBUG
 	std::cerr << i << ": dcl = " << std::hex << dcl << std::endl;
 #endif
-      // Allocate a Jump command.
-	dcl = (*_commandPool)->AllocateJumpDCL(_commandPool, dcl,
-					       interval.label);
-	interval.jump = (DCLJump*)dcl;
     }
+    (*_dclPool)->SetDCLBranch(_interval[_nIntervals-1].last(),
+			      _interval[_nIntervals-1].first());
 
-  // [Step 1.4] Create a local isochronous port.
-#ifdef USE_THREAD
-    if (!(_localIsochPort =
-	  (*_fwDeviceInterface)->CreateLocalIsochPort(
-	      _fwDeviceInterface, false, (DCLCommand*)_interval[0].label,
-	      kFWDCLSyBitsEvent, 0x1, 0x1, nil, 0, nil, 0,
-	      CFUUIDGetUUIDBytes(kIOFireWireLocalIsochPortInterfaceID))))
-#else
+  // [Step 1.4] Create a local isochronous port and bind it the DCL program.
+    range.address = _vm;
+    range.length  = _vmSize;
     if (!(_localIsochPort =
 	  (*_fwDeviceInterface)->CreateLocalIsochPortWithOptions(
-	      _fwDeviceInterface, false, (DCLCommand*)_interval[0].label,
-	      kFWDCLSyBitsEvent, 0x1, 0x1, nil, 0, nil, 0,
+	      _fwDeviceInterface, false, (*_dclPool)->GetProgram(_dclPool),
+	      kFWDCLSyBitsEvent, 0x1, 0x1, nil, 0, &range, 1,
 	      kFWIsochPortUseSeparateKernelThread,
 	      CFUUIDGetUUIDBytes(kIOFireWireLocalIsochPortInterfaceID))))
-#endif
 	return kIOReturnError;
-
-  // [Step 1.5] Modify jump labels.
-    for (int i = 0; i < _nIntervals - 1; ++i)
-    {
-	(*_localIsochPort)->ModifyJumpDCL(_localIsochPort, _interval[i].jump,
-					  _interval[i+1].label);
-	_interval[i+1].prev = &_interval[i];
-    }
-    _interval[0].prev = &_interval[_nIntervals - 1];
 
   // [Step 2] Set up a remote isochronous port.
     if (!(_remoteIsochPort = (*_fwDeviceInterface)->CreateRemoteIsochPort(
@@ -321,7 +303,7 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 						allocatePortHandler);
     (*_remoteIsochPort)->SetStopHandler(_remoteIsochPort, stopHandler);
 
-  // [Step 4] Set up an isochronous channel.
+  // [Step 3] Set up an isochronous channel.
     if (!(_isochChannel = (*_fwDeviceInterface)->CreateIsochChannel(
 	      _fwDeviceInterface, true, maxPacketSize, kFWSpeed400MBit,
 	      CFUUIDGetUUIDBytes(kIOFireWireIsochChannelInterfaceID))))
@@ -340,7 +322,8 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     return kIOReturnSuccess;
 }
 
-inline void
+//! isochronous転送を停止して必要なリソースを解放する
+void
 raw1394::isoShutdown()
 {
     if (_isochChannel)
@@ -369,13 +352,18 @@ raw1394::isoShutdown()
 	vm_deallocate(mach_task_self(), _vm, _vmSize);
 	_vm = 0;
     }
-    if (_commandPool)
+    if (_dclPool)
     {
-	(*_commandPool)->Release(_commandPool);
-	_commandPool = 0;
+	(*_dclPool)->Release(_dclPool);
+	_dclPool = 0;
     }
 }
 
+//! カーネル空間に保持されているisochronous受信データをユーザ空間に転送する
+/*!
+  \return		転送が成功すればkIOReturnSuccess, そうでなければ
+			原因を示すエラーコード
+*/
 IOReturn
 raw1394::isoRecvFlush()
 {
@@ -386,24 +374,32 @@ raw1394::isoRecvFlush()
 *  Isochronous handlers implemented as static member functions		*
 ************************************************************************/
 void
-raw1394::receiveHandler(DCLCommand* dcl)
+raw1394::receiveHandler(void* refcon, NuDCLRef dcl)
 {
 #ifdef DEBUG
     static int	n = 0;
     std::cerr << "BEGIN [" << std::dec << n++ << "] receiveHandler: dcl = "
 	      << std::hex << dcl << std::endl;
 #endif
-    Interval*	interval =  (Interval*)((DCLCallProc*)dcl)->procData;
-    if (interval->jump->pJumpDCLLabel == interval->label)
+    Interval*	interval =  (Interval*)refcon;
+    raw1394*	me	 = interval->parent();
+    if ((*me->_dclPool)->GetDCLBranch(interval->last()) == interval->first())
     {
 	interval->nPacketsDropped += interval->nPackets();
 	return;
     }
     
-    raw1394*	me = interval->parent();
+    for (int j = 0; j < interval->nPackets(); j += 30)
+	(*me->_localIsochPort)->Notify(me->_localIsochPort,
+				       kFWNuDCLUpdateNotification,
+				       (void**)&(*interval)[j],
+				       min(interval->nPackets() - j, 30));
     for (int j = 0; j < interval->nPackets(); ++j)
     {
-	UInt8*	p	= (UInt8*)(*interval)[j]->buffer;
+	IOVirtualRange	range;
+	(*me->_dclPool)->GetDCLRanges((*interval)[j], 1, &range);
+	
+	UInt8*	p	= (UInt8*)range.address;
 	UInt32	header  = *((UInt32*)p),
 		len	= (header & kFWIsochDataLength)
 						     >> kFWIsochDataLengthPhase,
@@ -416,13 +412,14 @@ raw1394::receiveHandler(DCLCommand* dcl)
 	interval->nPacketsDropped = 0;
     }
 
-  // This interval with which all packets has been processed becomes
-  // a new dead-end.
-    (*(me->_localIsochPort))->ModifyJumpDCL(me->_localIsochPort,
-					    interval->jump, interval->label);
-    (*(me->_localIsochPort))->ModifyJumpDCL(me->_localIsochPort,
-					    interval->prev->jump,
-					    interval->label);
+    (*me->_dclPool)->SetDCLBranch(interval->last(), interval->first());
+    (*me->_dclPool)->SetDCLBranch(interval->prev()->last(), interval->first());
+    (*me->_localIsochPort)->Notify(me->_localIsochPort,
+				   kFWNuDCLModifyJumpNotification,
+				   (void**)&interval->last(), 1);
+    (*me->_localIsochPort)->Notify(me->_localIsochPort,
+				   kFWNuDCLModifyJumpNotification,
+				   (void**)&interval->prev()->last(), 1);
 #ifdef DEBUG
     std::cerr << "END   [" << std::dec << n-1 << "] receiveHandler:"
 	      << std::endl;
@@ -457,59 +454,15 @@ raw1394::allocatePortHandler(IOFireWireLibIsochPortRef	isochPort,
 IOReturn
 raw1394::stopHandler(IOFireWireLibIsochPortRef isochPort)
 {
-#ifndef USE_THREAD
     raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
     while (me->loopIterate() == kCFRunLoopRunHandledSource);
-#endif
     return kIOReturnSuccess;
 }
 
 /************************************************************************
-*  static member variables for class raw1394				*
+*  static member variables for struct raw1394				*
 ************************************************************************/
 UInt32	raw1394::_nnodes = 0;
-
-#ifdef USE_THREAD
-/************************************************************************
-*  thread relevant stuffs for class raw1394				*
-************************************************************************/
-void
-raw1394::wait() const
-{
-    pthread_mutex_lock(&_mutex);
-    while (_state != Idle)
-	pthread_cond_wait(&_cond, &_mutex);
-    pthread_mutex_unlock(&_mutex);
-}
-
-void*
-raw1394::threadProc(void* r1394)
-{
-    raw1394*	me = (raw1394*)r1394;
-
-    pthread_mutex_lock(&me->_mutex);
-    (*me->_fwDeviceInterface)
-	->AddIsochCallbackDispatcherToRunLoop(me->_fwDeviceInterface,
-					      CFRunLoopGetCurrent());
-    for (;;)
-    {
-	pthread_cond_wait(&me->_cond, &me->_mutex);
-	if (me->_state == Ready)
-	{
-	    CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true);
-	    me->_state = Idle;
-	    pthread_cond_signal(&me->_cond);  // Send Idle signal to the parent.
-	}
-	else if (me->_state == Exit)
-	    break;
-    }
-    (*me->_fwDeviceInterface)->RemoveIsochCallbackDispatcherFromRunLoop(
-	me->_fwDeviceInterface);
-    pthread_mutex_unlock(&me->_mutex);
-
-    return 0;
-}
-#endif
 
 /************************************************************************
 *  wrapper C functions							*
@@ -561,25 +514,11 @@ raw1394_write(raw1394handle_t handle, nodeid_t node,
 	    == kIOReturnSuccess ? 0 : -1);
 }
 
-#ifdef USE_THREAD
-extern "C" void
-raw1394_raise(raw1394handle_t handle)
-{
-    handle->raise();
-}
-
-extern "C" void
-raw1394_wait(raw1394handle_t handle)
-{
-    handle->wait();
-}
-#else
 extern "C" int
 raw1394_loop_iterate(raw1394handle_t handle)
 {
     return (handle->loopIterate() == kCFRunLoopRunHandledSource ? 0 : -1);
 }
-#endif
 
 extern "C" int
 raw1394_iso_recv_init(raw1394handle_t			handle,

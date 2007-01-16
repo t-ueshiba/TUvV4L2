@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.15 2006-12-19 07:05:20 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.16 2007-01-16 07:55:41 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -117,9 +117,6 @@ class Ieee1394Node
     u_char	channel()			const	{return _channel;}
 #endif
     u_int	delay()				const	{return _delay;}
-#if defined(USE_THREAD)
-    void	wait()					;
-#endif
     
   protected:
     Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int delay
@@ -178,14 +175,6 @@ class Ieee1394Node
     timeval			_filltime;	// time of buffer filled.
     const u_int			_delay;
 };
-
-#if defined(USE_THREAD)
-inline void
-Ieee1394Node::wait()
-{
-    raw1394_wait(_handle);
-}
-#endif
     
 /************************************************************************
 *  class Ieee1394Camera							*
@@ -542,7 +531,7 @@ Ieee1394Camera::pixelFormat() const
 //! カメラがサポートしている基本機能を返す
 /*!
   \return	サポートされている機能を#BasicFunction型の列挙値のorとして
-		返す．
+		返す
  */
 inline quadlet_t
 Ieee1394Camera::inquireBasicFunction() const
@@ -555,7 +544,7 @@ Ieee1394Camera::inquireBasicFunction() const
   カメラからの画像出力は，continuousShot(), oneShot(), multiShot()のいずれか
   によって行われる．実際に画像データが受信されるまで，本関数は呼び出し側に
   制御を返さない．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
  */
 inline Ieee1394Camera&
 Ieee1394Camera::snap()
@@ -577,7 +566,7 @@ Ieee1394Camera::snap()
   \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト
 */
 template <class T> const Ieee1394Camera&
 Ieee1394Camera::captureDirectly(Image<T>& image) const
