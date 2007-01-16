@@ -1,5 +1,5 @@
 /*
- *  $Id: DC.h,v 1.3 2004-07-15 20:18:12 ueshiba Exp $
+ *  $Id: DC.h,v 1.4 2007-01-16 23:41:08 ueshiba Exp $
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -134,10 +134,12 @@ inline int
 DC::log2devR(int r)	const	{return r * _mul / _div;}
 
 inline int
-DC::log2devU(int u)	const	{return log2devR(u + _offset[0]);}
+DC::log2devU(int u)	const	{return
+				   log2devR(u + _offset[0]) + _mul/(2*_div);}
 
 inline int
-DC::log2devV(int v)	const	{return log2devR(v + _offset[1]);}
+DC::log2devV(int v)	const	{return
+				   log2devR(v + _offset[1]) + _mul/(2*_div);}
 
 inline Point2<int>
 DC::log2dev(const Point2<int>& p) const
@@ -152,10 +154,12 @@ inline int
 DC::dev2logR(int r)	const	{return r * _div / _mul;}
 
 inline int
-DC::dev2logU(int u)	const	{return dev2logR(u) - _offset[0];}
+DC::dev2logU(int u)	const	{return
+				   dev2logR(u - _mul/(2*_div)) - _offset[0];}
 
 inline int
-DC::dev2logV(int v)	const	{return dev2logR(v) - _offset[1];}
+DC::dev2logV(int v)	const	{return
+				   dev2logR(v - _mul/(2*_div)) - _offset[1];}
 
 inline Point2<int>
 DC::dev2log(const Point2<int>& p) const
