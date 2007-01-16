@@ -1,5 +1,5 @@
 /*
- *  $Id: EdgeDetector.cc,v 1.3 2006-11-27 00:26:03 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.4 2007-01-16 07:52:58 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef __INTEL_COMPILER
@@ -43,10 +43,10 @@ static inline mmInt	mmDir8(mmFlt eH, mmFlt eV)
 
 //! あるエッジ点と指定された方向の近傍点が接続しているか調べる
 /*!
-  \param edge	エッジ画像.
-  \param p	エッジ点.
-  \param dir	近傍点の方向.
-  \return	接続していればtrueを，そうでなければfalseを返す.
+  \param edge	エッジ画像
+  \param p	エッジ点
+  \param dir	近傍点の方向
+  \return	接続していればtrue，そうでなければfalse
 */
 static inline bool
 isLink(const Image<u_char>& edge, const Point2<int>& p, int dir)
@@ -60,8 +60,8 @@ isLink(const Image<u_char>& edge, const Point2<int>& p, int dir)
     
 //! あるエッジ点を起点にして，接続するエッジ点を追跡する
 /*!
-  \param edge	エッジ画像.
-  \param p	エッジ点.
+  \param edge	エッジ画像
+  \param p	エッジ点
 */
 static void
 trace(Image<u_char>& edge, const Point2<int>& p)
@@ -79,9 +79,9 @@ trace(Image<u_char>& edge, const Point2<int>& p)
 
 //! ある点を打つと，EDGEラベルが付いている点とそうでない点を結べるか調べる
 /*!
-  \param edge	エッジ画像.
-  \param p	打とうとする点.
-  \return	結べるのであればtrueを，そうでなければfalseを返す．
+  \param edge	エッジ画像
+  \param p	打とうとする点
+  \return	結べるのであればtrue，そうでなければfalse
 */
 static bool
 canInterpolate(const Image<u_char>& edge, const Point2<int>& p)
@@ -108,10 +108,10 @@ canInterpolate(const Image<u_char>& edge, const Point2<int>& p)
 ************************************************************************/
 //! エッジ強度を求める
 /*!
-  \param edgeH	横方向1階微分入力画像.
-  \param edgeV	縦方向1階微分入力画像.
-  \param out	エッジ強度出力画像.
-  \return	このエッジ検出器自身.
+  \param edgeH	横方向1階微分入力画像
+  \param edgeV	縦方向1階微分入力画像
+  \param out	エッジ強度出力画像
+  \return	このエッジ検出器自身
 */
 const EdgeDetector&
 EdgeDetector::strength(const Image<float>& edgeH,
@@ -147,10 +147,10 @@ EdgeDetector::strength(const Image<float>& edgeH,
     
 //! 4近傍によるエッジ方向を求める
 /*!
-  \param edgeH	横方向1階微分入力画像.
-  \param edgeV	縦方向1階微分入力画像.
-  \param out	エッジ方向出力画像.
-  \return	このエッジ検出器自身.
+  \param edgeH	横方向1階微分入力画像
+  \param edgeV	縦方向1階微分入力画像
+  \param out	エッジ方向出力画像
+  \return	このエッジ検出器自身
 */
 const EdgeDetector&
 EdgeDetector::direction4(const Image<float>& edgeH,
@@ -195,10 +195,10 @@ EdgeDetector::direction4(const Image<float>& edgeH,
     
 //! 8近傍によるエッジ方向を求める
 /*!
-  \param edgeH	横方向1階微分入力画像.
-  \param edgeV	縦方向1階微分入力画像.
-  \param out	エッジ方向出力画像.
-  \return	このエッジ検出器自身.
+  \param edgeH	横方向1階微分入力画像
+  \param edgeV	縦方向1階微分入力画像
+  \param out	エッジ方向出力画像
+  \return	このエッジ検出器自身
 */
 const EdgeDetector&
 EdgeDetector::direction8(const Image<float>& edgeH,
@@ -250,10 +250,10 @@ EdgeDetector::direction8(const Image<float>& edgeH,
     
 //! 非極大値抑制処理により細線化を行う
 /*!
-  \param strength	エッジ強度入力画像.
-  \param direction	エッジ方向入力画像.
-  \param out		細線化されたエッジ画像.
-  \return		このエッジ検出器自身.
+  \param strength	エッジ強度入力画像
+  \param direction	エッジ方向入力画像
+  \param out		細線化されたエッジ画像
+  \return		このエッジ検出器自身
 */
 const EdgeDetector&
 EdgeDetector::suppressNonmaxima(const Image<float>& strength,
@@ -345,9 +345,9 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
 
 //! 入力微分画像のゼロ交差点を検出する
 /*!
-  \param in		入力微分画像.
-  \param out		細線化されたエッジ画像.
-  \return		このエッジ検出器自身.
+  \param in		入力微分画像
+  \param out		細線化されたエッジ画像
+  \return		このエッジ検出器自身
 */
 const EdgeDetector&
 EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const

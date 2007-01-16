@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.15 2006-12-22 00:05:55 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.16 2007-01-16 07:52:58 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include "TU/functions.h"
@@ -34,9 +34,9 @@ namespace TU
 ************************************************************************/
 //! このベクトルと記憶領域を共有した部分ベクトルを生成する
 /*!
-    \param i	部分ベクトルの第0要素を指定するindex.
-    \param d	部分ベクトルの次元.
-    \return	生成された部分ベクトル.
+    \param i	部分ベクトルの第0要素を指定するindex
+    \param d	部分ベクトルの次元
+    \return	生成された部分ベクトル
 */
 template <class T> const Vector<T>
 Vector<T>::operator ()(u_int i, u_int dd) const	// partial vector
@@ -46,9 +46,9 @@ Vector<T>::operator ()(u_int i, u_int dd) const	// partial vector
 
 //! このベクトルと記憶領域を共有した部分ベクトルを生成する
 /*!
-    \param i	部分ベクトルの第0要素を指定するindex.
-    \param d	部分ベクトルの次元.
-    \return	生成された部分ベクトル.
+    \param i	部分ベクトルの第0要素を指定するindex
+    \param d	部分ベクトルの次元
+    \return	生成された部分ベクトル
 */
 template <class T> Vector<T>
 Vector<T>::operator ()(u_int i, u_int dd)	// partial vector
@@ -58,10 +58,10 @@ Vector<T>::operator ()(u_int i, u_int dd)	// partial vector
 
 //! このベクトルと他の3次元ベクトルとのベクトル積をとる
 /*!
-    \param v	他のベクトル.
+    \param v	他のベクトル
     \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\times\TUvec{v}{}\f$.
-    \throw std::invalid_argument	このベクトルとvが3次元でない場合に送出.
+		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\times\TUvec{v}{}\f$
+    \throw std::invalid_argument	このベクトルとvが3次元でない場合に送出
 */
 template <class T> Vector<T>&
 Vector<T>::operator ^=(const Vector<T>& v)	// outer product
@@ -79,7 +79,7 @@ Vector<T>::operator ^=(const Vector<T>& v)	// outer product
 //! このベクトルの長さを1に正規化したベクトルを返す
 /*!
   \return	長さを正規化したベクトル，すなわち
-		\f$\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}\f$.
+		\f$\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}\f$
 */
 template <class T> Vector<T>
 Vector<T>::normal() const			// return normalized vector
@@ -91,10 +91,10 @@ Vector<T>::normal() const			// return normalized vector
 
 //! 連立1次方程式を解く
 /*!
-  \param m	正則な正方行列.
+  \param m	正則な正方行列
   \return	\f$\TUtvec{u}{} = \TUtvec{x}{}\TUvec{M}{}\f$
 		の解を納めたこのベクトル，すなわち
-		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$.
+		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
 */
 template <class T> Vector<T>&
 Vector<T>::solve(const Matrix<T>& m)
@@ -112,7 +112,7 @@ Vector<T>::solve(const Matrix<T>& m)
       & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
     \TUendarray
   \f]
-  \throw std::invalid_argument	3次元ベクトルでない場合に送出.
+  \throw std::invalid_argument	3次元ベクトルでない場合に送出
 */
 template <class T> Matrix<T>
 Vector<T>::skew() const
@@ -134,11 +134,11 @@ Vector<T>::skew() const
 ************************************************************************/
 //! この行列と記憶領域を共有した部分行列を生成する
 /*!
-    \param i	部分行列の左上隅要素となる行を指定するindex.
-    \param j	部分行列の左上隅要素となる列を指定するindex.
-    \param r	部分行列の行数.
-    \param c	部分行列の列数.
-    \return	生成された部分行列.
+    \param i	部分行列の左上隅要素となる行を指定するindex
+    \param j	部分行列の左上隅要素となる列を指定するindex
+    \param r	部分行列の行数
+    \param c	部分行列の列数
+    \return	生成された部分行列
 */
 template <class T> const Matrix<T>
 Matrix<T>::operator ()(u_int i, u_int j, u_int r, u_int c) const
@@ -148,11 +148,11 @@ Matrix<T>::operator ()(u_int i, u_int j, u_int r, u_int c) const
 
 //! この行列と記憶領域を共有した部分行列を生成する
 /*!
-    \param i	部分行列の左上隅要素となる行を指定するindex.
-    \param j	部分行列の左上隅要素となる列を指定するindex.
-    \param r	部分行列の行数.
-    \param c	部分行列の列数.
-    \return	生成された部分行列.
+    \param i	部分行列の左上隅要素となる行を指定するindex
+    \param j	部分行列の左上隅要素となる列を指定するindex
+    \param r	部分行列の行数
+    \param c	部分行列の列数
+    \return	生成された部分行列
 */
 template <class T> Matrix<T>
 Matrix<T>::operator ()(u_int i, u_int j, u_int r, u_int c)
@@ -162,8 +162,8 @@ Matrix<T>::operator ()(u_int i, u_int j, u_int r, u_int c)
 
 //! この正方行列を全て同一の対角成分値を持つ対角行列にする
 /*!
-  \param c	対角成分の値.
-  \return	この行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$.
+  \param c	対角成分の値
+  \return	この行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
 */
 template <class T> Matrix<T>&
 Matrix<T>::diag(double c)
@@ -184,9 +184,9 @@ Matrix<T>::rot(double angle, int axis)
 
 //! この?x3行列の各行と3次元ベクトルとのベクトル積をとる
 /*!
-  \param v	3次元ベクトル.
+  \param v	3次元ベクトル
   \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$.
+		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
 template <class T> Matrix<T>&
 Matrix<T>::operator ^=(const Vector<T>& v)
@@ -198,7 +198,7 @@ Matrix<T>::operator ^=(const Vector<T>& v)
 
 //! この行列の転置行列を返す
 /*!
-  \return	転置行列，すなわち\f$\TUtvec{A}{}\f$.
+  \return	転置行列，すなわち\f$\TUtvec{A}{}\f$
 */
 template <class T> Matrix<T>
 Matrix<T>::trns() const				// transpose
@@ -212,7 +212,7 @@ Matrix<T>::trns() const				// transpose
 
 //! この行列の逆行列を返す
 /*!
-  \return	逆行列，すなわち\f$\TUinv{A}{}\f$.
+  \return	逆行列，すなわち\f$\TUinv{A}{}\f$
 */
 template <class T> Matrix<T>
 Matrix<T>::inv() const
@@ -224,10 +224,10 @@ Matrix<T>::inv() const
 
 //! 連立1次方程式を解く
 /*!
-  \param m	正則な正方行列.
+  \param m	正則な正方行列
   \return	\f$\TUvec{A}{} = \TUvec{X}{}\TUvec{M}{}\f$
 		の解を納めたこの行列，すなわち
-		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$.
+		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
 */
 template <class T> Matrix<T>&
 Matrix<T>::solve(const Matrix<T>& m)
@@ -241,7 +241,7 @@ Matrix<T>::solve(const Matrix<T>& m)
 
 //! この行列の行列式を返す
 /*!
-  \return	行列式，すなわち\f$\det\TUvec{A}{}\f$.
+  \return	行列式，すなわち\f$\det\TUvec{A}{}\f$
 */
 template <class T> T
 Matrix<T>::det() const
@@ -251,9 +251,9 @@ Matrix<T>::det() const
 
 //! この行列の小行列式を返す
 /*!
-  \param p	元の行列から取り除く行を指定するindex.
-  \param q	元の行列から取り除く列を指定するindex.
-  \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$.
+  \param p	元の行列から取り除く行を指定するindex
+  \param q	元の行列から取り除く列を指定するindex
+  \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
 */
 template <class T> T
 Matrix<T>::det(u_int p, u_int q) const
@@ -278,8 +278,8 @@ Matrix<T>::det(u_int p, u_int q) const
 
 //! この正方行列のtraceを返す
 /*!
-  \return			trace, すなわち\f$\trace\TUvec{A}{}\f$.
-  \throw std::invalid_argument	正方行列でない場合に送出.
+  \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
+  \throw std::invalid_argument	正方行列でない場合に送出
 */
 template <class T> T
 Matrix<T>::trace() const
@@ -296,7 +296,7 @@ Matrix<T>::trace() const
 //! この行列の余因子行列を返す
 /*!
   \return	余因子行列，すなわち
-		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$.
+		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
 */
 template <class T> Matrix<T>
 Matrix<T>::adj() const
@@ -310,7 +310,7 @@ Matrix<T>::adj() const
 
 //! この行列の疑似逆行列を返す
 /*!
-  \param cndnum	最大特異値に対する絶対値の割合がこれに達しない基底は無視.
+  \param cndnum	最大特異値に対する絶対値の割合がこれに達しない基底は無視
   \return	疑似逆行列，すなわち与えられた行列の特異値分解を
 		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
 		\TUtvec{U}{}\f$とすると
@@ -337,7 +337,7 @@ Matrix<T>::pinv(double cndnum) const
 
 //! この対称行列の固有値と固有ベクトルを返す
 /*!
-    \param eval	絶対値の大きい順に並べられた固有値.
+    \param eval	絶対値の大きい順に並べられた固有値
     \return	各行が固有ベクトルから成る回転行列，すなわち
 		\f[
 		  \TUvec{A}{}\TUvec{U}{} =
@@ -345,7 +345,7 @@ Matrix<T>::pinv(double cndnum) const
 		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
 		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
 		\f]
-		なる\f$\TUtvec{U}{}\f$.
+		なる\f$\TUtvec{U}{}\f$
 */
 template <class T> Matrix<T>
 Matrix<T>::eigen(Vector<T>& eval) const
@@ -360,8 +360,8 @@ Matrix<T>::eigen(Vector<T>& eval) const
 
 //! この対称行列の一般固有値と一般固有ベクトルを返す
 /*!
-    \param B	もとの行列と同一サイズの正値対称行列.
-    \param eval	絶対値の大きい順に並べられた一般固有値.
+    \param B	もとの行列と同一サイズの正値対称行列
+    \param eval	絶対値の大きい順に並べられた一般固有値
     \return	各行が一般固有ベクトルから成る正則行列
 		（ただし直交行列ではない），すなわち
 		\f[
@@ -370,7 +370,7 @@ Matrix<T>::eigen(Vector<T>& eval) const
 		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
 		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
 		\f]
-		なる\f$\TUtvec{U}{}\f$.
+		なる\f$\TUtvec{U}{}\f$
 */
 template <class T> Matrix<T>
 Matrix<T>::geigen(const Matrix<T>& B, Vector<T>& eval) const
@@ -383,11 +383,11 @@ Matrix<T>::geigen(const Matrix<T>& B, Vector<T>& eval) const
 
 //! この正値対称行列のCholesky分解（上半三角行列）を返す
 /*!
-  計算においては，もとの行列の上半部分しか使わない.
+  計算においては，もとの行列の上半部分しか使わない
   \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$なる
-		\f$\TUtvec{L}{}\f$（上半三角行列）.
-  \throw std::invalid_argument	正方行列でない場合に送出.
-  \throw std::runtime_error	正値でない場合に送出.
+		\f$\TUtvec{L}{}\f$（上半三角行列）
+  \throw std::invalid_argument	正方行列でない場合に送出
+  \throw std::runtime_error	正値でない場合に送出
 */
 template <class T> Matrix<T>
 Matrix<T>::cholesky() const
@@ -420,7 +420,7 @@ Matrix<T>::cholesky() const
     \return	この行列，すなわち
 		\f$
 		  \TUvec{A}{}\leftarrow\frac{\TUvec{A}{}}{\TUnorm{\TUvec{A}{}}}
-		\f$.
+		\f$
 */
 template <class T> Matrix<T>&
 Matrix<T>::normalize()
@@ -435,7 +435,7 @@ Matrix<T>::normalize()
 //! この行列の左から（転置された）回転行列を掛ける
 /*!
     \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$.
+		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
 */
 template <class T> Matrix<T>&
 Matrix<T>::rotate_from_left(const Rotation& r)
@@ -453,7 +453,7 @@ Matrix<T>::rotate_from_left(const Rotation& r)
 //! この行列の右から回転行列を掛ける
 /*!
     \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$.
+		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
 */
 template <class T> Matrix<T>&
 Matrix<T>::rotate_from_right(const Rotation& r)
@@ -470,7 +470,7 @@ Matrix<T>::rotate_from_right(const Rotation& r)
 
 //! この行列の2乗ノルムの2乗を返す
 /*!
-    \return	行列の2乗ノルムの2乗，すなわち\f$\TUnorm{\TUvec{A}{}}^2\f$.
+    \return	行列の2乗ノルムの2乗，すなわち\f$\TUnorm{\TUvec{A}{}}^2\f$
 */
 template <class T> double
 Matrix<T>::square() const
@@ -483,7 +483,7 @@ Matrix<T>::square() const
 
 //! この行列の下半三角部分を上半三角部分にコピーして対称化する
 /*!
-    \return	この行列.
+    \return	この行列
 */
 template <class T> Matrix<T>&
 Matrix<T>::symmetrize()
@@ -496,7 +496,7 @@ Matrix<T>::symmetrize()
 
 //! この行列の下半三角部分の符号を反転し，上半三角部分にコピーして反対称化する
 /*!
-    \return	この行列.
+    \return	この行列
 */
 template <class T> Matrix<T>&
 Matrix<T>::antisymmetrize()
@@ -532,11 +532,11 @@ Matrix<T>::antisymmetrize()
     \TUendarray
   \f]
   なる\f$\theta_x, \theta_y, \theta_z\f$が回転角となる．
- \param theta_x	x軸周りの回転角(\f$ -\pi \le \theta_x \le \pi\f$)を返す.
+ \param theta_x	x軸周りの回転角(\f$ -\pi \le \theta_x \le \pi\f$)を返す．
  \param theta_y	y軸周りの回転角
-	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)を返す.
- \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す.
- \throw invalid_argument	3次元正方行列でない場合に送出.
+	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)を返す．
+ \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す．
+ \throw invalid_argument	3次元正方行列でない場合に送出
 */
 template <class T> void
 Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
@@ -569,10 +569,10 @@ Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
     - \TUskew{n}{}\sin\theta
   \f]
   なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
- \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す.
- \param s	回転角のsin値，すなわち\f$\sin\theta\f$を返す.
- \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$.
- \throw std::invalid_argument	3x3行列でない場合に送出.
+ \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す．
+ \param s	回転角のsin値，すなわち\f$\sin\theta\f$を返す．
+ \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
+ \throw std::invalid_argument	3x3行列でない場合に送出
 */
 template <class T> Vector<T>
 Matrix<T>::rot2axis(double& c, double& s) const
@@ -604,9 +604,9 @@ Matrix<T>::rot2axis(double& c, double& s) const
     - \TUskew{n}{}\sin\theta
   \f]
   なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
- \return	回転角と回転軸を表す3次元ベクトル，すなわち
-		\f$\theta\TUvec{n}{}\f$.
- \throw invalid_argument	3x3行列でない場合に送出.
+ \return			回転角と回転軸を表す3次元ベクトル，すなわち
+				\f$\theta\TUvec{n}{}\f$
+ \throw invalid_argument	3x3行列でない場合に送出
 */
 template <class T> Vector<T>
 Matrix<T>::rot2axis() const
@@ -630,9 +630,9 @@ Matrix<T>::rot2axis() const
 
 //! 3次元回転行列を生成する
 /*!
-  \param n	回転軸を表す3次元単位ベクトル.
-  \param c	回転角のcos値.
-  \param s	回転角のsin値.
+  \param n	回転軸を表す3次元単位ベクトル
+  \param c	回転角のcos値
+  \param s	回転角のsin値
   \return	生成された回転行列，すなわち
 		\f[
 		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
@@ -660,7 +660,7 @@ Matrix<T>::Rt(const Vector<T>& n, double c, double s)
 
 //! 3次元回転行列を生成する
 /*!
-  \param axis	回転角と回転軸を表す3次元ベクトル.
+  \param axis	回転角と回転軸を表す3次元ベクトル
   \return	生成された回転行列，すなわち
 		\f[
 		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
@@ -688,9 +688,9 @@ Matrix<T>::Rt(const Vector<T>& axis)
 ************************************************************************/
 //! 2つのベクトルの内積
 /*!
-  \param v	第1引数.
-  \param w	第2引数.
-  \return	内積，すなわち\f$\TUtvec{v}{}\TUvec{w}{}\f$.
+  \param v	第1引数
+  \param w	第2引数
+  \return	内積，すなわち\f$\TUtvec{v}{}\TUvec{w}{}\f$
 */
 template <class T> double
 operator *(const Vector<T>& v, const Vector<T>& w)	// inner product
@@ -704,9 +704,9 @@ operator *(const Vector<T>& v, const Vector<T>& w)	// inner product
 
 //! ベクトルと行列の積
 /*!
-  \param v	ベクトル.
-  \param m	行列.
-  \return	結果のベクトル，すなわち\f$\TUtvec{v}{}\TUvec{M}{}\f$.
+  \param v	ベクトル
+  \param m	行列
+  \return	結果のベクトル，すなわち\f$\TUtvec{v}{}\TUvec{M}{}\f$
 */
 template <class T> Vector<T>
 operator *(const Vector<T>& v, const Matrix<T>& m)	// multiply by matrix
@@ -721,9 +721,9 @@ operator *(const Vector<T>& v, const Matrix<T>& m)	// multiply by matrix
 
 //! 2つのベクトルの外積
 /*!
-  \param v	第1引数.
-  \param w	第2引数.
-  \return	結果の行列，すなわち\f$\TUvec{v}{}\TUtvec{w}{}\f$.
+  \param v	第1引数
+  \param w	第2引数
+  \return	結果の行列，すなわち\f$\TUvec{v}{}\TUtvec{w}{}\f$
 */
 template <class T> Matrix<T>
 operator %(const Vector<T>& v, const Vector<T>& w)	// multiply by vector
@@ -737,12 +737,12 @@ operator %(const Vector<T>& v, const Vector<T>& w)	// multiply by vector
 
 //! 3次元ベクトルと3x?行列の各列とのベクトル積
 /*!
-  \param v			3次元ベクトル.
-  \param m			3x?行列.
+  \param v			3次元ベクトル
+  \param m			3x?行列
   \return			結果の3x?行列，すなわち
-				\f$\TUvec{v}{}\times\TUvec{M}{}\f$.
+				\f$\TUvec{v}{}\times\TUvec{M}{}\f$
   \throw std::invalid_argument	vが3次元ベクトルでないかmが3x?行列でない場合に
-				送出.
+				送出
 */
 template <class T> Matrix<T>
 operator ^(const Vector<T>& v, const Matrix<T>& m)
@@ -762,9 +762,9 @@ operator ^(const Vector<T>& v, const Matrix<T>& m)
 
 //! 2つの行列の積
 /*!
-  \param m	第1引数.
-  \param n	第2引数.
-  \return	結果の行列，すなわち\f$\TUvec{M}{}\TUvec{N}{}\f$.
+  \param m	第1引数
+  \param n	第2引数
+  \return	結果の行列，すなわち\f$\TUvec{M}{}\TUvec{N}{}\f$
 */
 template <class T> Matrix<T>
 operator *(const Matrix<T>& m, const Matrix<T>& n)	// multiply by matrix
@@ -780,9 +780,9 @@ operator *(const Matrix<T>& m, const Matrix<T>& n)	// multiply by matrix
 
 //! 行列とベクトルの積
 /*!
-  \param m	行列.
-  \param v	ベクトル.
-  \return	結果のベクトル，すなわち\f$\TUvec{M}{}\TUvec{v}{}\f$.
+  \param m	行列
+  \param v	ベクトル
+  \return	結果のベクトル，すなわち\f$\TUvec{M}{}\TUvec{v}{}\f$
 */
 template <class T> Vector<T>
 operator *(const Matrix<T>& m, const Vector<T>& v)	// multiply by vector
@@ -798,8 +798,8 @@ operator *(const Matrix<T>& m, const Vector<T>& v)	// multiply by vector
 ************************************************************************/
 //! 与えられた正方行列のLU分解を生成する
 /*!
- \param m			LU分解する正方行列.
- \throw std::invalid_argument	mが正方行列でない場合に送出.
+ \param m			LU分解する正方行列
+ \throw std::invalid_argument	mが正方行列でない場合に送出
 */
 template <class T>
 LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
@@ -872,10 +872,10 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
   \param b			もとの正方行列\f$\TUvec{M}{}\f$と同じ次
 				元を持つベクトル．\f$\TUtvec{b}{} =
 				\TUtvec{x}{}\TUvec{M}{}\f$の解に変換さ
-				れる.
+				れる．
   \throw std::invalid_argument	ベクトルbの次元がもとの正方行列の次元に一致
-				しない場合に送出.
-  \throw std::runtime_error	もとの正方行列が正則でない場合に送出.
+				しない場合に送出
+  \throw std::runtime_error	もとの正方行列が正則でない場合に送出
 */
 template <class T> void
 LUDecomposition<T>::substitute(Vector<T>& b) const
@@ -1078,7 +1078,7 @@ Householder<T>::sigma_is_zero(int m, T comp) const
 ************************************************************************/
 //! 与えられた一般行列のQR分解を生成する
 /*!
- \param m	QR分解する一般行列.
+ \param m	QR分解する一般行列
 */
 template <class T>
 QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
@@ -1101,8 +1101,8 @@ QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
 ************************************************************************/
 //! 与えられた対称行列を3重対角化する
 /*!
-  \param a			3重対角化する対称行列.
-  \throw std::invalid_argument	aが正方行列でない場合に送出.
+  \param a			3重対角化する対称行列
+  \throw std::invalid_argument	aが正方行列でない場合に送出
 */
 template <class T>
 TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
@@ -1123,7 +1123,7 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
 //! 3重対角行列を対角化する（固有値，固有ベクトルの計算）
 /*!
   対角成分は固有値となり，\f$\TUtvec{U}{}\f$の各行は固有ベクトルを与える．
-  \throw std::runtime_error	指定した繰り返し回数を越えた場合に送出.
+  \throw std::runtime_error	指定した繰り返し回数を越えた場合に送出
 */ 
 template <class T> void
 TriDiagonal<T>::diagonalize()
@@ -1219,7 +1219,7 @@ TriDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 ************************************************************************/
 //! 与えられた一般行列を2重対角化する
 /*!
-  \param a	2重対角化する一般行列.
+  \param a	2重対角化する一般行列
 */
 template <class T>
 BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
@@ -1260,7 +1260,7 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
 /*!
   対角成分は特異値となり，\f$\TUtvec{U}{}\f$と\f$\TUtvec{V}{}\f$
   の各行はそれぞれ右特異ベクトルと左特異ベクトルを与える．
-  \throw std::runtime_error	指定した繰り返し回数を越えた場合に送出.
+  \throw std::runtime_error	指定した繰り返し回数を越えた場合に送出
 */ 
 template <class T> void
 BiDiagonal<T>::diagonalize()

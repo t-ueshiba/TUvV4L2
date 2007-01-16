@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.10 2006-11-14 06:22:10 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.11 2007-01-16 07:52:58 ueshiba Exp $
  */
 #include "TU/functions.h"
 #include "TU/Image++.h"
@@ -252,7 +252,7 @@ static inline mmFlt	mmIIR4(const u_char* src, const float* dst,
 		  H(z) = \frac{c_{0}z + c_{1}z^2 + \cdots + c_{D-1}z^D}
 		       {1 - c_{D}z - c_{D+1}z^2 - \cdots - c_{2D-1}z^D}
 		\f]
-  \return	このフィルタ自身.
+  \return	このフィルタ自身
 */
 template <u_int D> IIRFilter<D>&
 IIRFilter<D>::initialize(const float c[D+D])
@@ -265,9 +265,9 @@ IIRFilter<D>::initialize(const float c[D+D])
 
 //! 前進方向にフィルタを適用する
 /*!
-  \param in	入力データ列.
-  \param out	出力データ列.
-  \return	このフィルタ自身.
+  \param in	入力データ列
+  \param out	出力データ列
+  \return	このフィルタ自身
 */
 template <u_int D> template <class S> const IIRFilter<D>&
 IIRFilter<D>::forward(const Array<S>& in, Array<float>& out) const
@@ -296,9 +296,9 @@ IIRFilter<D>::forward(const Array<S>& in, Array<float>& out) const
     
 //! 後退方向にフィルタを適用する
 /*!
-  \param in	入力データ列.
-  \param out	出力データ列.
-  \return	このフィルタ自身.
+  \param in	入力データ列
+  \param out	出力データ列
+  \return	このフィルタ自身
 */
 template <u_int D> template <class S> const IIRFilter<D>&
 IIRFilter<D>::backward(const Array<S>& in, Array<float>& out) const
@@ -467,9 +467,9 @@ IIRFilter<4u>::backward(const Array<S>& in, Array<float>& out) const
 
 //! 特定の入力データ列に対して前進方向にフィルタを適用した場合の極限値を求める
 /*!
-  \param limit0F	一定入力 in(n) = 1 を与えたときの出力極限値を返す.
-  \param limit1F	傾き一定入力 in(n) = n を与えたときの出力極限値を返す.
-  \param limit1F	2次入力 in(n) = n^2 を与えたときの出力極限値を返す.
+  \param limit0F	一定入力 in(n) = 1 を与えたときの出力極限値を返す．
+  \param limit1F	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
+  \param limit1F	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
 template <u_int D> void
 IIRFilter<D>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
@@ -493,9 +493,9 @@ IIRFilter<D>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
 
 //! 特定の入力データ列に対して後退方向にフィルタを適用した場合の極限値を求める
 /*!
-  \param limit0B	一定入力 in(n) = 1 を与えたときの出力極限値を返す.
-  \param limit1B	傾き一定入力 in(n) = n を与えたときの出力極限値を返す.
-  \param limit1B	2次入力 in(n) = n^2 を与えたときの出力極限値を返す.
+  \param limit0B	一定入力 in(n) = 1 を与えたときの出力極限値を返す．
+  \param limit1B	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
+  \param limit1B	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
 template <u_int D> void
 IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
@@ -534,7 +534,7 @@ IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
 		z変換係数を計算する．#Zeroth, #First, #Secondのときに，それ
 		ぞれ in(n) = 1, in(n) = n, in(n) = n^2 に対する出力が
 		1, 1, 2になるよう，全体のスケールも調整される．
-  \return	このフィルタ自身.
+  \return	このフィルタ自身
 */
 template <u_int D> BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
@@ -588,9 +588,9 @@ BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
     
 //! 特定の入力データ列に対してフィルタを適用した場合の極限値を求める
 /*!
-  \param limit0		一定入力 in(n) = 1 を与えたときの出力極限値を返す.
-  \param limit1		傾き一定入力 in(n) = n を与えたときの出力極限値を返す.
-  \param limit2		2次入力 in(n) = n^2 を与えたときの出力極限値を返す.
+  \param limit0		一定入力 in(n) = 1 を与えたときの出力極限値を返す．
+  \param limit1		傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
+  \param limit2		2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
 template <u_int D> void
 BilateralIIRFilter<D>::limits(float& limit0, float& limit1, float& limit2) const
@@ -611,9 +611,9 @@ BilateralIIRFilter<D>::limits(float& limit0, float& limit1, float& limit2) const
 ************************************************************************/
 //! 与えられた画像とこのフィルタの畳み込みを行う
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このフィルタ自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このフィルタ自身
 */
 template <u_int D> template <class S, class T> BilateralIIRFilter2<D>&
 BilateralIIRFilter2<D>::convolve(const Image<S>& in, Image<T>& out)
@@ -644,8 +644,8 @@ BilateralIIRFilter2<D>::convolve(const Image<S>& in, Image<T>& out)
 ************************************************************************/
 //! 与えられた画像から積分画像を作る
 /*!
-  \param image		入力画像.
-  \return		この積分画像.
+  \param image		入力画像
+  \return		この積分画像
 */
 template <class T> template <class S> IntegralImage<T>&
 IntegralImage<T>::initialize(const Image<S>& image)
@@ -674,11 +674,11 @@ IntegralImage<T>::initialize(const Image<S>& image)
 
 //! 原画像に設定した長方形ウィンドウ内の画素値の総和を返す
 /*!
-  \param u		ウィンドウの左上隅の横座標.
-  \param v		ウィンドウの左上隅の縦座標.
-  \param w		ウィンドウの幅.
-  \param h		ウィンドウの高さ.
-  \return		ウィンドウ内の画素値の総和.
+  \param u		ウィンドウの左上隅の横座標
+  \param v		ウィンドウの左上隅の縦座標
+  \param w		ウィンドウの幅
+  \param h		ウィンドウの高さ
+  \return		ウィンドウ内の画素値の総和
 */
 template <class T> T
 IntegralImage<T>::crop(int u, int v, int w, int h) const
@@ -707,10 +707,10 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
 
 //! 原画像の全ての点に正方形の二値十字テンプレートを適用した画像を求める
 /*!
-  \param out		原画像にテンプレートを適用した出力画像.
-  \param cropSize	テンプレートサイズを指定するパラメータ.
-			テンプレートは一辺 2*cropSize+1 の正方形.
-  \return		この積分画像.
+  \param out		原画像にテンプレートを適用した出力画像
+  \param cropSize	テンプレートサイズを指定するパラメータ
+			テンプレートは一辺 2*cropSize+1 の正方形
+  \return		この積分画像
 */
 template <class T> template <class S> const IntegralImage<T>&
 IntegralImage<T>::crossVal(Image<S>& out, int cropSize) const
@@ -728,8 +728,8 @@ IntegralImage<T>::crossVal(Image<S>& out, int cropSize) const
 ************************************************************************/
 //! 与えられた画像から対角積分画像を作る
 /*!
-  \param image		入力画像.
-  \return		この対角積分画像.
+  \param image		入力画像
+  \return		この対角積分画像
 */
 template <class T> template <class S> DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::initialize(const Image<S>& image)
@@ -765,11 +765,11 @@ DiagonalIntegralImage<T>::initialize(const Image<S>& image)
 
 //! 原画像に45度傾けて設定した長方形ウィンドウ内の画素値の総和を返す
 /*!
-  \param u		ウィンドウの上隅の横座標.
-  \param v		ウィンドウの上隅の縦座標.
-  \param w		ウィンドウの幅.
-  \param h		ウィンドウの高さ.
-  \return		ウィンドウ内の画素値の総和.
+  \param u		ウィンドウの上隅の横座標
+  \param v		ウィンドウの上隅の縦座標
+  \param w		ウィンドウの幅
+  \param h		ウィンドウの高さ
+  \return		ウィンドウ内の画素値の総和
 */
 template <class T> T
 DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
@@ -791,10 +791,10 @@ DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
 
 //! 原画像の全ての点に正方形の二値クロステンプレートを適用した画像を求める
 /*!
-  \param out		原画像にテンプレートを適用した出力画像.
-  \param cropSize	テンプレートサイズを指定するパラメータ.
-			テンプレートは一辺 2*cropSize+1 の正方形.
-  \return		この対角積分画像.
+  \param out		原画像にテンプレートを適用した出力画像
+  \param cropSize	テンプレートサイズを指定するパラメータ
+			テンプレートは一辺 2*cropSize+1 の正方形
+  \return		この対角積分画像
 */
 template <class T> template <class S> const DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::crossVal(Image<S>& out, int cropSize) const

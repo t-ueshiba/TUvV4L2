@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.18 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Image++.h,v 1.19 2007-01-16 07:52:58 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -735,8 +735,8 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
 
 //! フィルタによる畳み込みを行う. 出力は operator [](int) で取り出す
 /*!
-  \param in	入力データ列.
-  return	このフィルタ自身.
+  \param in	入力データ列
+  return	このフィルタ自身
 */
 template <u_int D> template <class S> inline BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::convolve(const Array<S>& in)
@@ -749,7 +749,7 @@ BilateralIIRFilter<D>::convolve(const Array<S>& in)
 
 //! 畳み込みの出力データ列の次元を返す
 /*!
-  \return	出力データ列の次元.
+  \return	出力データ列の次元
 */
 template <u_int D> inline u_int
 BilateralIIRFilter<D>::dim() const
@@ -759,8 +759,8 @@ BilateralIIRFilter<D>::dim() const
 
 //! 畳み込みの出力データの特定の要素を返す
 /*!
-  \param i	要素のindex.
-  \return	要素の値.
+  \param i	要素のindex
+  \return	要素の値
 */
 template <u_int D> inline float
 BilateralIIRFilter<D>::operator [](int i) const
@@ -794,11 +794,11 @@ template <u_int D> class BilateralIIRFilter2
     
 //! フィルタのz変換係数をセットする
 /*!
-  \param cHF	横方向前進z変換係数.
-  \param cHB	横方向後退z変換係数.
-  \param cHV	縦方向前進z変換係数.
-  \param cHV	縦方向後退z変換係数.
-  \return	このフィルタ自身.
+  \param cHF	横方向前進z変換係数
+  \param cHB	横方向後退z変換係数
+  \param cHV	縦方向前進z変換係数
+  \param cHV	縦方向後退z変換係数
+  \return	このフィルタ自身
 */
 template <u_int D> inline BilateralIIRFilter2<D>&
 BilateralIIRFilter2<D>::initialize(float cHF[D+D], float cHB[D+D],
@@ -812,11 +812,11 @@ BilateralIIRFilter2<D>::initialize(float cHF[D+D], float cHB[D+D],
 
 //! フィルタのz変換係数をセットする
 /*!
-  \param cHF	横方向前進z変換係数.
-  \param orderH 横方向微分階数.
-  \param cHV	縦方向前進z変換係数.
-  \param orderV	縦方向微分階数.
-  \return	このフィルタ自身.
+  \param cHF	横方向前進z変換係数
+  \param orderH 横方向微分階数
+  \param cHV	縦方向前進z変換係数
+  \param orderV	縦方向微分階数
+  \return	このフィルタ自身
 */
 template <u_int D> inline BilateralIIRFilter2<D>&
 BilateralIIRFilter2<D>::initialize(float cHF[D+D], Order orderH,
@@ -864,9 +864,9 @@ class DericheConvolver : private BilateralIIRFilter2<2u>
 
 //! Canny-Deriche核によるスムーシング
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このCanny-Deriche核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このCanny-Deriche核自身
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::smooth(const Image<S>& in, Image<T>& out)
@@ -880,9 +880,9 @@ DericheConvolver::smooth(const Image<S>& in, Image<T>& out)
 
 //! Canny-Deriche核による横方向1階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このCanny-Deriche核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このCanny-Deriche核自身
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::diffH(const Image<S>& in, Image<T>& out)
@@ -896,9 +896,9 @@ DericheConvolver::diffH(const Image<S>& in, Image<T>& out)
 
 //! Canny-Deriche核による縦方向1階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このCanny-Deriche核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このCanny-Deriche核自身
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::diffV(const Image<S>& in, Image<T>& out)
@@ -912,9 +912,9 @@ DericheConvolver::diffV(const Image<S>& in, Image<T>& out)
 
 //! Canny-Deriche核による横方向2階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このCanny-Deriche核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このCanny-Deriche核自身
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::diffHH(const Image<S>& in, Image<T>& out)
@@ -928,9 +928,9 @@ DericheConvolver::diffHH(const Image<S>& in, Image<T>& out)
 
 //! Canny-Deriche核による縦横両方向2階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このCanny-Deriche核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このCanny-Deriche核自身
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::diffHV(const Image<S>& in, Image<T>& out)
@@ -944,9 +944,9 @@ DericheConvolver::diffHV(const Image<S>& in, Image<T>& out)
 
 //! Canny-Deriche核による縦方向2階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このCanny-Deriche核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このCanny-Deriche核自身
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::diffVV(const Image<S>& in, Image<T>& out)
@@ -960,9 +960,9 @@ DericheConvolver::diffVV(const Image<S>& in, Image<T>& out)
 
 //! Canny-Deriche核によるラプラシアン
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このCanny-Deriche核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このCanny-Deriche核自身
 */
 template <class S, class T> inline DericheConvolver&
 DericheConvolver::laplacian(const Image<S>& in, Image<T>& out)
@@ -1051,9 +1051,9 @@ class GaussianConvolver : private BilateralIIRFilter2<4u>
 
 //! Gauss核によるスムーシング
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このGauss核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このGauss核自身
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::smooth(const Image<S>& in, Image<T>& out)
@@ -1067,9 +1067,9 @@ GaussianConvolver::smooth(const Image<S>& in, Image<T>& out)
 
 //! Gauss核による横方向1階微分(DOG)
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このGauss核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このGauss核自身
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::diffH(const Image<S>& in, Image<T>& out)
@@ -1083,9 +1083,9 @@ GaussianConvolver::diffH(const Image<S>& in, Image<T>& out)
 
 //! Gauss核による縦方向1階微分(DOG)
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このGauss核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このGauss核自身
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::diffV(const Image<S>& in, Image<T>& out)
@@ -1099,9 +1099,9 @@ GaussianConvolver::diffV(const Image<S>& in, Image<T>& out)
 
 //! Gauss核による横方向2階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このGauss核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このGauss核自身
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::diffHH(const Image<S>& in, Image<T>& out)
@@ -1115,9 +1115,9 @@ GaussianConvolver::diffHH(const Image<S>& in, Image<T>& out)
 
 //! Gauss核による縦横両方向2階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このGauss核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このGauss核自身
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::diffHV(const Image<S>& in, Image<T>& out)
@@ -1131,9 +1131,9 @@ GaussianConvolver::diffHV(const Image<S>& in, Image<T>& out)
 
 //! Gauss核による縦方向2階微分
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このGauss核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このGauss核自身
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::diffVV(const Image<S>& in, Image<T>& out)
@@ -1147,9 +1147,9 @@ GaussianConvolver::diffVV(const Image<S>& in, Image<T>& out)
 
 //! Gauss核によるラプラシアン(LOG)
 /*!
-  \param in	入力画像.
-  \param out	出力画像.
-  \return	このGauss核自身.
+  \param in	入力画像
+  \param out	出力画像
+  \return	このGauss核自身
 */
 template <class S, class T> inline GaussianConvolver&
 GaussianConvolver::laplacian(const Image<S>& in, Image<T>& out)
@@ -1194,8 +1194,8 @@ class EdgeDetector
 
 //! エッジ検出器を生成する
 /*!
-  \param th_low		弱いエッジの閾値.
-  \param th_low		強いエッジの閾値.
+  \param th_low		弱いエッジの閾値
+  \param th_low		強いエッジの閾値
 */
 inline
 EdgeDetector::EdgeDetector(float th_low, float th_high)
@@ -1205,9 +1205,9 @@ EdgeDetector::EdgeDetector(float th_low, float th_high)
 
 //! エッジ検出の閾値を設定する
 /*!
-  \param th_low		弱いエッジの閾値.
-  \param th_low		強いエッジの閾値.
-  \return		このエッジ検出器自身.
+  \param th_low		弱いエッジの閾値
+  \param th_low		強いエッジの閾値
+  \return		このエッジ検出器自身
 */
 inline EdgeDetector&
 EdgeDetector::initialize(float th_low, float th_high)
@@ -1249,7 +1249,7 @@ IntegralImage<T>::IntegralImage()
     
 //! 与えられた画像から積分画像を作る
 /*!
-  \param image		入力画像.
+  \param image		入力画像
 */
 template <class T> template <class S> inline
 IntegralImage<T>::IntegralImage(const Image<S>& image)
@@ -1259,10 +1259,10 @@ IntegralImage<T>::IntegralImage(const Image<S>& image)
     
 //! 原画像に正方形の二値十字テンプレートを適用した値を返す
 /*!
-  \param u		テンプレート中心の横座標.
-  \param v		テンプレート中心の縦座標.
-  \param cropSize	テンプレートは一辺 2*cropSize + 1 の正方形.
-  \return		テンプレートを適用した値.
+  \param u		テンプレート中心の横座標
+  \param v		テンプレート中心の縦座標
+  \param cropSize	テンプレートは一辺 2*cropSize + 1 の正方形
+  \return		テンプレートを適用した値
 */
 template <class T> inline T
 IntegralImage<T>::crossVal(int u, int v, int cropSize) const
@@ -1307,7 +1307,7 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage()
     
 //! 与えられた画像から対角積分画像を作る
 /*!
-  \param image		入力画像.
+  \param image		入力画像
 */
 template <class T> template <class S> inline
 DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S>& image)
@@ -1317,10 +1317,10 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S>& image)
     
 //! 原画像に正方形の二値クロステンプレートを適用した値を返す
 /*!
-  \param u		テンプレート中心の横座標.
-  \param v		テンプレート中心の縦座標.
-  \param cropSize	テンプレートは一辺 2*cropSize + 1 の正方形.
-  \return		テンプレートを適用した値.
+  \param u		テンプレート中心の横座標
+  \param v		テンプレート中心の縦座標
+  \param cropSize	テンプレートは一辺 2*cropSize + 1 の正方形
+  \return		テンプレートを適用した値
 */
 template <class T> inline T
 DiagonalIntegralImage<T>::crossVal(int u, int v, int cropSize) const

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.14 2006-12-22 00:05:55 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.15 2007-01-16 07:52:58 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -73,32 +73,32 @@ class Rotation
 
   //! p軸を返す
   /*!
-    \return	p軸のindex.
+    \return	p軸のindex
   */
     int		p()				const	{return _p;}
 
   //! q軸を返す
   /*!
-    \return	q軸のindex.
+    \return	q軸のindex
   */
     int		q()				const	{return _q;}
 
   //! 回転角生成ベクトルの長さを返す
   /*!
     \return	回転角生成ベクトル(x, y)に対して
-		\f$\sqrt{x^2 + y^2}\f$を返す.
+		\f$\sqrt{x^2 + y^2}\f$
   */
     double	length()			const	{return _l;}
 
   //! 回転角のcos値を返す
   /*!
-    \return	回転角のcos値.
+    \return	回転角のcos値
   */
     double	cos()				const	{return _c;}
 
   //! 回転角のsin値を返す
   /*!
-    \return	回転角のsin値.
+    \return	回転角のsin値
   */
     double	sin()				const	{return _s;}
     
@@ -120,35 +120,35 @@ class Vector : public Array<T>
   public:
   //! 指定された次元のベクトルを生成し，全要素を0で初期化する
   /*!
-    \param d	ベクトルの次元.
+    \param d	ベクトルの次元
   */
     explicit Vector(u_int d=0)			:Array<T>(d)	{*this = 0.0;}
 
   //! 外部記憶領域と次元を指定してベクトルを生成する
   /*!
-    \param p	外部記憶領域へのポインタ.
-    \param d	ベクトルの次元.
+    \param p	外部記憶領域へのポインタ
+    \param d	ベクトルの次元
   */
     Vector(T* p, u_int d)			:Array<T>(p, d)		{}
 
   //! 与えられたベクトルと記憶領域を共有する部分ベクトルを生成する
   /*!
-    \param v	元のベクトル.
-    \param i	部分ベクトルの第0要素を指定するindex.
-    \param d	部分ベクトルの次元.
+    \param v	元のベクトル
+    \param i	部分ベクトルの第0要素を指定するindex
+    \param d	部分ベクトルの次元
   */
     Vector(const Vector& v, u_int i, u_int d)	:Array<T>(v, i, d)	{}
 
   //! コピーコンストラクタ
   /*!
-    \param v	コピー元ベクトル.
+    \param v	コピー元ベクトル
   */
     Vector(const Vector& v)			:Array<T>(v)		{}
     
   //! コピー演算子
   /*!
-    \param v	コピー元ベクトル.
-    \return	このベクトル.
+    \param v	コピー元ベクトル
+    \return	このベクトル
   */
     Vector&	operator =(const Vector& v)	{Array<T>::operator =(v);
 						 return *this;}
@@ -160,43 +160,43 @@ class Vector : public Array<T>
 
   //! このベクトルの全ての要素に同一の数値を代入する
   /*!
-    \param c	代入する数値.
-    \return	このベクトル.
+    \param c	代入する数値
+    \return	このベクトル
   */
     Vector&	operator  =(double c)		{Array<T>::operator  =(c);
 						 return *this;}
 
   //! このベクトルに指定された数値を掛ける
   /*!
-    \param c	掛ける数値.
-    \return	このベクトル，すなわち\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$.
+    \param c	掛ける数値
+    \return	このベクトル，すなわち\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$
   */
     Vector&	operator *=(double c)		{Array<T>::operator *=(c);
 						 return *this;}
 
   //! このベクトルを指定された数値で割る
   /*!
-    \param c	割る数値.
+    \param c	割る数値
     \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \frac{\TUvec{u}{}}{c}\f$.
+		\f$\TUvec{u}{}\leftarrow \frac{\TUvec{u}{}}{c}\f$
   */
     Vector&	operator /=(double c)		{Array<T>::operator /=(c);
 						 return *this;}
 
   //! このベクトルに他のベクトルを足す
   /*!
-    \param v	足すベクトル.
+    \param v	足すベクトル
     \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} + \TUvec{v}{}\f$.
+		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} + \TUvec{v}{}\f$
   */
     Vector&	operator +=(const Vector& v)	{Array<T>::operator +=(v);
 						 return *this;}
 
   //! このベクトルから他のベクトルを引く
   /*!
-    \param v	引くベクトル.
+    \param v	引くベクトル
     \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} - \TUvec{v}{}\f$.
+		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} - \TUvec{v}{}\f$
   */
     Vector&	operator -=(const Vector& v)	{Array<T>::operator -=(v);
 						 return *this;}
@@ -205,44 +205,44 @@ class Vector : public Array<T>
 
   //! このベクトルの右から行列を掛ける
   /*!
-    \param m	掛ける行列.
+    \param m	掛ける行列
     \return	このベクトル，すなわち
-		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUvec{M}{}\f$.
+		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUvec{M}{}\f$
   */
     Vector&	operator *=(const Matrix<T>& m) {return *this = *this * m;}
 
   //! このベクトルの符号を反転したベクトルを返す
   /*!
-    \return	符号を反転したベクトル，すなわち\f$-\TUvec{u}{}\f$.
+    \return	符号を反転したベクトル，すなわち\f$-\TUvec{u}{}\f$
   */
     Vector	operator  -()		const	{Vector r(*this);
 						 r *= -1; return r;}
 
   //! このベクトルの長さの2乗を返す
   /*!
-    \return	ベクトルの長さの2乗，すなわち\f$\TUnorm{\TUvec{u}{}}^2\f$.
+    \return	ベクトルの長さの2乗，すなわち\f$\TUnorm{\TUvec{u}{}}^2\f$
   */
     double	square()		const	{return *this * *this;}
 
   //! このベクトルの長さを返す
   /*!
-    \return	ベクトルの長さ，すなわち\f$\TUnorm{\TUvec{u}{}}\f$.
+    \return	ベクトルの長さ，すなわち\f$\TUnorm{\TUvec{u}{}}\f$
   */
     double	length()		const	{return sqrt(square());}
 
   //! このベクトルと他のベクトルの差の長さの2乗を返す
   /*!
-    \param v	比較対象となるベクトル.
+    \param v	比較対象となるベクトル
     \return	ベクトル間の差の2乗，すなわち
-		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$.
+		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
   */
     double	sqdist(const Vector& v) const	{return (*this - v).square();}
 
   //! このベクトルと他のベクトルの差の長さを返す
   /*!
-    \param v	比較対象となるベクトル.
+    \param v	比較対象となるベクトル
     \return	ベクトル間の差，すなわち
-		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$.
+		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
   */
     double	dist(const Vector& v)	const	{return sqrt(sqdist(v));}
 
@@ -251,7 +251,7 @@ class Vector : public Array<T>
     \return	このベクトル，すなわち
 		\f$
 		  \TUvec{u}{}\leftarrow\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}
-		\f$.
+		\f$
   */
     Vector&	normalize()			{return *this /= length();}
 
@@ -261,23 +261,23 @@ class Vector : public Array<T>
 
   //! ベクトルの次元を変更し，0に初期化する
   /*!
-    \param d	新しい次元.
+    \param d	新しい次元
   */
     void	resize(u_int d)		{Array<T>::resize(d); *this = 0.0;}
 
   //! ベクトルの内部記憶領域と次元を変更する
   /*!
-    \param p	新しい内部記憶領域へのポインタ.
-    \param d	新しい次元.
+    \param p	新しい内部記憶領域へのポインタ
+    \param d	新しい次元
   */
     void	resize(T* p, u_int d)	{Array<T>::resize(p, d);}
 };
 
 //! 入力ストリームからベクトルを読み込む(ASCII)
 /*!
-  \param in	入力ストリーム.
-  \param a	ベクトルの読み込み先.
-  \return	inで指定した入力ストリーム.
+  \param in	入力ストリーム
+  \param a	ベクトルの読み込み先
+  \return	inで指定した入力ストリーム
 */
 template <class T> inline std::istream&
 operator >>(std::istream& in, Vector<T>& v)
@@ -287,9 +287,9 @@ operator >>(std::istream& in, Vector<T>& v)
 
 //! 出力ストリームへベクトルを書き出す(ASCII)
 /*!
-  \param out	出力ストリーム.
-  \param a	書き出すベクトル.
-  \return	outで指定した出力ストリーム.
+  \param out	出力ストリーム
+  \param a	書き出すベクトル
+  \return	outで指定した出力ストリーム
 */
 template <class T> inline std::ostream&
 operator <<(std::ostream& out, const Vector<T>& v)
@@ -310,41 +310,41 @@ class Matrix : public Array2<Vector<T> >
   public:
   //! 指定されたサイズの行列を生成し，全要素を0で初期化する
   /*!
-    \param r	行列の行数.
-    \param c	行列の列数.
+    \param r	行列の行数
+    \param c	行列の列数
   */
     explicit Matrix(u_int r=0, u_int c=0)
 	:Array2<Vector<T> >(r, c)				{*this = 0.0;}
 
   //! 外部記憶領域とサイズを指定して行列を生成する
   /*!
-    \param p	外部記憶領域へのポインタ.
-    \param r	行列の行数.
-    \param c	行列の列数.
+    \param p	外部記憶領域へのポインタ
+    \param r	行列の行数
+    \param c	行列の列数
   */
     Matrix(T* p, u_int r, u_int c) :Array2<Vector<T> >(p, r, c)	{}
 
   //! 与えられた行列と記憶領域を共有する部分行列を生成する
   /*!
-    \param m	元の行列.
-    \param i	部分行列の第0行を指定するindex.
-    \param j	部分行列の第0列を指定するindex.
-    \param r	部分行列の行数.
-    \param c	部分行列の列数.
+    \param m	元の行列
+    \param i	部分行列の第0行を指定するindex
+    \param j	部分行列の第0列を指定するindex
+    \param r	部分行列の行数
+    \param c	部分行列の列数
   */
     Matrix(const Matrix& m, u_int i, u_int j, u_int r, u_int c)
 	:Array2<Vector<T> >(m, i, j, r, c)			{}
 
   //! コピーコンストラクタ
   /*!
-    \param m	コピー元行列.
+    \param m	コピー元行列
   */
     Matrix(const Matrix& m)	:Array2<Vector<T> >(m)		{}
 
   //! コピー演算子
   /*!
-    \param m	コピー元行列.
-    \return	この行列.
+    \param m	コピー元行列
+    \return	この行列
   */
     Matrix&	operator =(const Matrix& m)
 			{Array2<Vector<T> >::operator =(m); return *this;}
@@ -361,51 +361,51 @@ class Matrix : public Array2<Vector<T> >
 
   //! この行列の全ての要素に同一の数値を代入する
   /*!
-    \param c	代入する数値.
-    \return	この行列.
+    \param c	代入する数値
+    \return	この行列
   */
     Matrix&	operator  =(double c)		{Array2<Vector<T> >::
 						 operator  =(c); return *this;}
   //! この行列に指定された数値を掛ける
   /*!
-    \param c	掛ける数値.
-    \return	この行列，すなわち\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$.
+    \param c	掛ける数値
+    \return	この行列，すなわち\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
   */
     Matrix&	operator *=(double c)		{Array2<Vector<T> >::
 						 operator *=(c); return *this;}
 
   //! この行列を指定された数値で割る
   /*!
-    \param c	割る数値.
+    \param c	割る数値
     \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \frac{\TUvec{A}{}}{c}\f$.
+		\f$\TUvec{A}{}\leftarrow \frac{\TUvec{A}{}}{c}\f$
   */
     Matrix&	operator /=(double c)		{Array2<Vector<T> >::
 						 operator /=(c); return *this;}
 
   //! この行列に他の行列を足す
   /*!
-    \param m	足す行列.
+    \param m	足す行列
     \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} + \TUvec{M}{}\f$.
+		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} + \TUvec{M}{}\f$
   */
     Matrix&	operator +=(const Matrix& m)	{Array2<Vector<T> >::
 						 operator +=(m); return *this;}
 
   //! この行列から他の行列を引く
   /*!
-    \param m	引く行列.
+    \param m	引く行列
     \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} - \TUvec{M}{}\f$.
+		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} - \TUvec{M}{}\f$
   */
     Matrix&	operator -=(const Matrix& m)	{Array2<Vector<T> >::
 						 operator -=(m); return *this;}
 
   //! この行列に他の行列を掛ける
   /*!
-    \param m	掛ける行列.
+    \param m	掛ける行列
     \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$.
+		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
   */
     Matrix&	operator *=(const Matrix& m)	{return *this = *this * m;}
 
@@ -413,7 +413,7 @@ class Matrix : public Array2<Vector<T> >
 
   //! この行列の符号を反転した行列を返す
   /*!
-    \return	符号を反転した行列，すなわち\f$-\TUvec{A}{}\f$.
+    \return	符号を反転した行列，すなわち\f$-\TUvec{A}{}\f$
   */
     Matrix	operator  -()			const	{Matrix r(*this);
 							 r *= -1; return r;}
@@ -437,7 +437,7 @@ class Matrix : public Array2<Vector<T> >
 
   //! この行列の2乗ノルムを返す
   /*!
-    \return	行列の2乗ノルム，すなわち\f$\TUnorm{\TUvec{A}{}}\f$.
+    \return	行列の2乗ノルム，すなわち\f$\TUnorm{\TUvec{A}{}}\f$
   */
     double	length()		const	{return sqrt(square());}
 
@@ -451,8 +451,8 @@ class Matrix : public Array2<Vector<T> >
 
   //! 単位正方行列を生成する
   /*!
-    \param d	単位正方行列の次元.
-    \return	単位正方行列.
+    \param d	単位正方行列の次元
+    \return	単位正方行列
   */
     static Matrix	I(u_int d)	{return Matrix<T>(d, d).diag(1.0);}
 
@@ -461,17 +461,17 @@ class Matrix : public Array2<Vector<T> >
 
   //! 行列のサイズを変更し，0に初期化する
   /*!
-    \param r	新しい行数.
-    \param c	新しい列数.
+    \param r	新しい行数
+    \param c	新しい列数
   */
     void	resize(u_int r, u_int c)
 			{Array2<Vector<T> >::resize(r, c); *this = 0.0;}
 
   //! 行列の内部記憶領域とサイズを変更する
   /*!
-    \param p	新しい内部記憶領域へのポインタ.
-    \param r	新しい行数.
-    \param c	新しい列数.
+    \param p	新しい内部記憶領域へのポインタ
+    \param r	新しい行数
+    \param c	新しい列数
   */
     void	resize(T* p, u_int r, u_int c)
 			{Array2<Vector<T> >::resize(p, r, c);}
@@ -479,9 +479,9 @@ class Matrix : public Array2<Vector<T> >
 
 //! 入力ストリームから行列を読み込む(ASCII)
 /*!
-  \param in	入力ストリーム.
-  \param a	行列の読み込み先.
-  \return	inで指定した入力ストリーム.
+  \param in	入力ストリーム
+  \param a	行列の読み込み先
+  \return	inで指定した入力ストリーム
 */
 template <class T> inline std::istream&
 operator >>(std::istream& in, Matrix<T>& m)
@@ -491,9 +491,9 @@ operator >>(std::istream& in, Matrix<T>& m)
 
 //! 出力ストリームへ行列を書き出す(ASCII)
 /*!
-  \param out	出力ストリーム.
-  \param a	書き出す行列.
-  \return	outで指定した出力ストリーム.
+  \param out	出力ストリーム
+  \param a	書き出す行列
+  \return	outで指定した出力ストリーム
 */
 template <class T> inline std::ostream&
 operator <<(std::ostream& out, const Matrix<T>& m)
@@ -506,9 +506,9 @@ operator <<(std::ostream& out, const Matrix<T>& m)
 ************************************************************************/
 //! 2つのベクトルの足し算
 /*!
-  \param a	第1引数.
-  \param b	第2引数.
-  \return	結果を格納したベクトル，すなわち\f$\TUvec{a}{}+\TUvec{b}{}\f$.
+  \param a	第1引数
+  \param b	第2引数
+  \return	結果を格納したベクトル，すなわち\f$\TUvec{a}{}+\TUvec{b}{}\f$
 */
 template <class T> inline Vector<T>
 operator +(const Vector<T>& a, const Vector<T>& b)
@@ -516,9 +516,9 @@ operator +(const Vector<T>& a, const Vector<T>& b)
 
 //! 2つのベクトルの引き算
 /*!
-  \param a	第1引数.
-  \param b	第2引数.
-  \return	結果を格納したベクトル，すなわち\f$\TUvec{a}{}-\TUvec{b}{}\f$.
+  \param a	第1引数
+  \param b	第2引数
+  \return	結果を格納したベクトル，すなわち\f$\TUvec{a}{}-\TUvec{b}{}\f$
 */
 template <class T> inline Vector<T>
 operator -(const Vector<T>& a, const Vector<T>& b)
@@ -526,9 +526,9 @@ operator -(const Vector<T>& a, const Vector<T>& b)
 
 //! ベクトルに定数を掛ける
 /*!
-  \param c	掛ける定数.
-  \param a	ベクトル.
-  \return	結果を格納したベクトル，すなわち\f$c\TUvec{a}{}\f$.
+  \param c	掛ける定数
+  \param a	ベクトル
+  \return	結果を格納したベクトル，すなわち\f$c\TUvec{a}{}\f$
 */
 template <class T> inline Vector<T>
 operator *(double c, const Vector<T>& a)
@@ -536,9 +536,9 @@ operator *(double c, const Vector<T>& a)
 
 //! ベクトルに定数を掛ける
 /*!
-  \param a	ベクトル.
-  \param c	掛ける定数.
-  \return	結果を格納したベクトル，すなわち\f$c\TUvec{a}{}\f$.
+  \param a	ベクトル
+  \param c	掛ける定数
+  \return	結果を格納したベクトル，すなわち\f$c\TUvec{a}{}\f$
 */
 template <class T> inline Vector<T>
 operator *(const Vector<T>& a, double c)
@@ -546,9 +546,9 @@ operator *(const Vector<T>& a, double c)
 
 //! ベクトルの各要素を定数で割る
 /*!
-  \param a	ベクトル.
-  \param c	割る定数.
-  \return	結果を格納したベクトル，すなわち\f$\frac{1}{c}\TUvec{a}{}\f$.
+  \param a	ベクトル
+  \param c	割る定数
+  \return	結果を格納したベクトル，すなわち\f$\frac{1}{c}\TUvec{a}{}\f$
 */
 template <class T> inline Vector<T>
 operator /(const Vector<T>& a, double c)
@@ -556,9 +556,9 @@ operator /(const Vector<T>& a, double c)
 
 //! 2つの行列の足し算
 /*!
-  \param a	第1引数.
-  \param b	第2引数.
-  \return	結果を格納した行列，すなわち\f$\TUvec{A}{}+\TUvec{B}{}\f$.
+  \param a	第1引数
+  \param b	第2引数
+  \return	結果を格納した行列，すなわち\f$\TUvec{A}{}+\TUvec{B}{}\f$
 */
 template <class T> inline Matrix<T>
 operator +(const Matrix<T>& a, const Matrix<T>& b)
@@ -566,9 +566,9 @@ operator +(const Matrix<T>& a, const Matrix<T>& b)
 
 //! 2つの行列の引き算
 /*!
-  \param a	第1引数.
-  \param b	第2引数.
-  \return	結果を格納した行列，すなわち\f$\TUvec{A}{}-\TUvec{B}{}\f$.
+  \param a	第1引数
+  \param b	第2引数
+  \return	結果を格納した行列，すなわち\f$\TUvec{A}{}-\TUvec{B}{}\f$
 */
 template <class T> inline Matrix<T>
 operator -(const Matrix<T>& a, const Matrix<T>& b)
@@ -576,9 +576,9 @@ operator -(const Matrix<T>& a, const Matrix<T>& b)
 
 //! 行列に定数を掛ける
 /*!
-  \param c	掛ける定数.
-  \param a	行列.
-  \return	結果を格納した行列，すなわち\f$c\TUvec{A}{}\f$.
+  \param c	掛ける定数
+  \param a	行列
+  \return	結果を格納した行列，すなわち\f$c\TUvec{A}{}\f$
 */
 template <class T> inline Matrix<T>
 operator *(double c, const Matrix<T>& a)
@@ -586,9 +586,9 @@ operator *(double c, const Matrix<T>& a)
 
 //! 行列に定数を掛ける
 /*!
-  \param a	行列.
-  \param c	掛ける定数.
-  \return	結果を格納した行列，すなわち\f$c\TUvec{A}{}\f$.
+  \param a	行列
+  \param c	掛ける定数
+  \return	結果を格納した行列，すなわち\f$c\TUvec{A}{}\f$
 */
 template <class T> inline Matrix<T>
 operator *(const Matrix<T>& a, double c)
@@ -596,9 +596,9 @@ operator *(const Matrix<T>& a, double c)
 
 //! 行列の各要素を定数で割る
 /*!
-  \param a	行列.
-  \param c	割る定数.
-  \return	結果を格納した行列，すなわち\f$\frac{1}{c}\TUvec{A}{}\f$.
+  \param a	行列
+  \param c	割る定数
+  \return	結果を格納した行列，すなわち\f$\frac{1}{c}\TUvec{A}{}\f$
 */
 template <class T> inline Matrix<T>
 operator /(const Matrix<T>& a, double c)
@@ -609,9 +609,9 @@ operator *(const Vector<T>&, const Vector<T>&)	;
 
 //! 2つの3次元ベクトルのベクトル積
 /*!
-  \param v	第1引数.
-  \param w	第2引数.
-  \return	ベクトル積，すなわち\f$\TUvec{v}{}\times\TUvec{w}{}\f$.
+  \param v	第1引数
+  \param w	第2引数
+  \return	ベクトル積，すなわち\f$\TUvec{v}{}\times\TUvec{w}{}\f$
 */
 template <class T> inline Vector<T>
 operator ^(const Vector<T>& v, const Vector<T>& w)
@@ -634,9 +634,9 @@ operator *(const Matrix<T>&, const Vector<T>&)	;
 
 //! ?x3行列の各行と3次元ベクトルのベクトル積
 /*!
-  \param m	?x3行列.
-  \param v	3次元ベクトル.
-  \return	結果の行列，すなわち\f$(\TUtvec{M}{}\times\TUvec{v}{})^\top\f$.
+  \param m	?x3行列
+  \param v	3次元ベクトル
+  \return	結果の行列，すなわち\f$(\TUtvec{M}{}\times\TUvec{v}{})^\top\f$
 */
 template <class T> inline Matrix<T>
 operator ^(const Matrix<T>& m, const Vector<T>& v)
@@ -656,7 +656,7 @@ class LUDecomposition : private Array2<Vector<T> >
 
   //! もとの正方行列の行列式を返す
   /*!
-    \return	もとの正方行列の行列式.
+    \return	もとの正方行列の行列式
   */
     T		det()				const	{return _det;}
     
@@ -727,13 +727,13 @@ class QRDecomposition : private Matrix<T>
 
   //! QR分解の下半三角行列を返す
   /*!
-    \return	下半三角行列\f$\TUtvec{R}{}\f$.
+    \return	下半三角行列\f$\TUtvec{R}{}\f$
   */
     const Matrix<T>&	Rt()			const	{return *this;}
 
   //! QR分解の回転行列を返す
   /*!
-    \return	回転行列\f$\TUtvec{Q}{}\f$.
+    \return	回転行列\f$\TUtvec{Q}{}\f$
   */
     const Matrix<T>&	Qt()			const	{return _Qt;}
     
@@ -761,25 +761,25 @@ class TriDiagonal
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す
   /*!
-    \return	対称行列の次元.
+    \return	対称行列の次元
   */
     u_int		dim()			const	{return _Ut.nrow();}
 
   //! 3重対角化を行う回転行列を返す
   /*!
-    \return	回転行列.
+    \return	回転行列
   */
     const Matrix<T>&	Ut()			const	{return _Ut;}
 
   //! 3重対角行列の対角成分を返す
   /*!
-    \return	対角成分.
+    \return	対角成分
   */
     const Vector<T>&	diagonal()		const	{return _diagonal;}
 
   //! 3重対角行列の非対角成分を返す
   /*!
-    \return	非対角成分.
+    \return	非対角成分
   */
     const Vector<T>&	off_diagonal()		const	{return _Ut.sigma();}
 
@@ -817,37 +817,37 @@ class BiDiagonal
 
   //! 2重対角化される行列の行数を返す
   /*!
-    \return	行列の行数.
+    \return	行列の行数
   */
     u_int		nrow()		const	{return _Vt.nrow();}
 
   //! 2重対角化される行列の列数を返す
   /*!
-    \return	行列の列数.
+    \return	行列の列数
   */
     u_int		ncol()		const	{return _Ut.nrow();}
 
   //! 2重対角化を行うために右から掛ける回転行列の転置を返す
   /*!
-    \return	右から掛ける回転行列の転置.
+    \return	右から掛ける回転行列の転置
   */
     const Matrix<T>&	Ut()		const	{return _Ut;}
 
   //! 2重対角化を行うために左から掛ける回転行列を返す
   /*!
-    \return	左から掛ける回転行列.
+    \return	左から掛ける回転行列
   */
     const Matrix<T>&	Vt()		const	{return _Vt;}
 
   //! 2重対角行列の対角成分を返す
   /*!
-    \return	対角成分.
+    \return	対角成分
   */
     const Vector<T>&	diagonal()	const	{return _Dt.sigma();}
 
   //! 2重対角行列の非対角成分を返す
   /*!
-    \return	非対角成分.
+    \return	非対角成分
   */
     const Vector<T>&	off_diagonal()	const	{return _Et.sigma();}
 
@@ -886,7 +886,7 @@ class SVDecomposition : private BiDiagonal<T>
   public:
   //! 与えられた一般行列の特異値分解を求める
   /*!
-    \param a	特異値分解する一般行列.
+    \param a	特異値分解する一般行列
   */
     SVDecomposition(const Matrix<T>& a)
 	:BiDiagonal<T>(a)			{BiDiagonal<T>::diagonalize();}
@@ -899,8 +899,8 @@ class SVDecomposition : private BiDiagonal<T>
 
   //! 特異値を求める
   /*!
-    \param i	絶対値の大きい順に並んだ特異値の1つを指定するindex.
-    \return	指定されたindexに対応する特異値.
+    \param i	絶対値の大きい順に並んだ特異値の1つを指定するindex
+    \return	指定されたindexに対応する特異値
   */
     const T&	operator [](int i)	const	{return diagonal()[i];}
 };
