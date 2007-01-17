@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.5 2007-01-16 07:55:41 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.6 2007-01-17 00:17:12 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -27,15 +27,10 @@
 #  include <iostream>
 #endif
 /************************************************************************
-*  static functions							*
-************************************************************************/
-static inline int	min(int a, int b)	{return (a < b ? a : b);}
-
-/************************************************************************
 *  class raw1394::Interval						*
 ************************************************************************/
 raw1394::Interval::Interval()
-    :_nPackets(0), _packet(0), _parent(0), _prev(0), nPacketsDropped(0)
+    :_nPackets(0), _packet(0), _prev(0), _parent(0), nPacketsDropped(0)
 {
 }
 
@@ -45,13 +40,13 @@ raw1394::Interval::~Interval()
 }
     
 void
-raw1394::Interval::resize(UInt32 n, const Interval& prv, raw1394* parent)
+raw1394::Interval::resize(UInt32 n, const Interval& prv, raw1394* prnt)
 {
     delete [] _packet;
     _nPackets	    = n;
     _packet	    = new NuDCLRef[_nPackets];
-    _parent	    = parent;
     _prev	    = &prv;
+    _parent	    = prnt;
     nPacketsDropped = 0;
 }
     
@@ -389,11 +384,10 @@ raw1394::receiveHandler(void* refcon, NuDCLRef dcl)
 	return;
     }
     
-    for (int j = 0; j < interval->nPackets(); j += 30)
-	(*me->_localIsochPort)->Notify(me->_localIsochPort,
-				       kFWNuDCLUpdateNotification,
-				       (void**)&(*interval)[j],
-				       min(interval->nPackets() - j, 30));
+    (*me->_localIsochPort)->Notify(me->_localIsochPort,
+				   kFWNuDCLUpdateNotification,
+				   (void**)&interval->first(),
+				   interval->nPackets());
     for (int j = 0; j < interval->nPackets(); ++j)
     {
 	IOVirtualRange	range;
@@ -414,12 +408,9 @@ raw1394::receiveHandler(void* refcon, NuDCLRef dcl)
 
     (*me->_dclPool)->SetDCLBranch(interval->last(), interval->first());
     (*me->_dclPool)->SetDCLBranch(interval->prev()->last(), interval->first());
+    void*	dcls[] = {interval->last(), interval->prev()->last()};
     (*me->_localIsochPort)->Notify(me->_localIsochPort,
-				   kFWNuDCLModifyJumpNotification,
-				   (void**)&interval->last(), 1);
-    (*me->_localIsochPort)->Notify(me->_localIsochPort,
-				   kFWNuDCLModifyJumpNotification,
-				   (void**)&interval->prev()->last(), 1);
+				   kFWNuDCLModifyJumpNotification, dcls, 2);
 #ifdef DEBUG
     std::cerr << "END   [" << std::dec << n-1 << "] receiveHandler:"
 	      << std::endl;

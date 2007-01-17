@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.4 2007-01-16 07:55:41 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.5 2007-01-17 00:17:12 ueshiba Exp $
  */
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
@@ -43,10 +43,10 @@ struct raw1394
 	const NuDCLRef&	first()			const	{return _packet[0];}
 	const NuDCLRef&	last()			const	{return
 							 _packet[_nPackets-1];}
-	raw1394*	parent()		const	{return _parent;}
 	const Interval*	prev()			const	{return _prev;}
+	raw1394*	parent()		const	{return _parent;}
 	
-	void		resize(UInt32 n, const Interval& prv, raw1394* parent);
+	void		resize(UInt32 n, const Interval& prv, raw1394* prnt);
 
       private:
 	Interval(const Interval&)			;
@@ -55,8 +55,8 @@ struct raw1394
       private:
 	UInt32		_nPackets;
 	NuDCLRef*	_packet;
-	raw1394*	_parent;
 	const Interval*	_prev;
+	raw1394*	_parent;
 
       public:
 	UInt32		nPacketsDropped;
