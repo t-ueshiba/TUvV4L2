@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.18 2007-01-16 07:55:41 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.19 2007-01-19 02:28:07 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -334,7 +334,7 @@ static const u_int	NBUFFERS		= 4;
 			同定を行う．0が与えられると，まだ#Ieee1394Camera
 			オブジェクトを割り当てられていないカメラのうち，
 			一番最初にみつかったものがこのオブジェクトと結び
-			つけられる．オブジェクト生成後は，globalUniqueId()
+			つけられる．オブジェクト生成後は，#globalUniqueId()
 			によってこの値を知ることができる．
   \param delay		IEEE1394カードの種類によっては，レジスタの読み書き
 			(Ieee1394Node::readQuadlet(),
@@ -755,11 +755,11 @@ Ieee1394Camera::getFormat_7_Info(Format format7)
 //! 指定されたFormat_7タイプのフォーマットについて，注目領域(Region Of Interest)を設定する
 /*!
   一般に，u0, v0, width, heightは，予め決められた最小単位
-  (Format_7_Info::unitU0, Format_7_Info::unitV0, Format_7_Info::unitWidth,
-  Format_7_Info::unitHeight)でしか指定できない．そこで，実際には注目領域は，
+  (#Format_7_Info::unitU0, #Format_7_Info::unitV0, #Format_7_Info::unitWidth,
+  #Format_7_Info::unitHeight)でしか指定できない．そこで，実際には注目領域は，
   (u0, v0)と(u0 + width - 1, v0 + height - 1)を対角線とする矩形を含む最小領域
   となるように設定される．また，widthもしくはheightに0を指定しても，ROIの幅
-  もしくは高さは，それぞれFormat_7_Info::unitWidth, Format_7_Info::unitHeight
+  もしくは高さは，それぞれ#Format_7_Info::unitWidth, #Format_7_Info::unitHeight
   以上に設定される．
   \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)
   \param u0	 注目領域の左上隅の横座標
@@ -878,7 +878,7 @@ Ieee1394Camera::inquireFeatureFunction(Feature feature) const
 //! 指定された属性を1回だけ自動設定する．
 /*!
   本関数を呼ぶと，指定した属性の自動設定が直ちに開始される．自動設定が終了
-  したかどうかは，inOnePushOperation()で知ることができる．
+  したかどうかは，#inOnePushOperation()で知ることができる．
   \param feature	自動設定したい属性
   \return		このIEEE1394カメラオブジェクト
 */
@@ -976,7 +976,7 @@ Ieee1394Camera::setValue(Feature feature, u_int value)
 //! 指定された属性が1回だけの自動設定の最中であるか調べる
 /*!
   \param feature	対象となる属性
-  \return		onePush()を行った属性値の自動設定が継続中であれば
+  \return		#onePush()を行った属性値の自動設定が継続中であれば
 			trueを，終了していればfalseを返す．
 */
 bool
@@ -1028,10 +1028,10 @@ Ieee1394Camera::getMinMax(Feature feature, u_int& min, u_int& max) const
 
 //! 指定された属性の現在の値を調べる
 /*!
-  feature = #TEMPERATUREの場合は，setValue()で設定した目標値ではなく，
-  実際値が返される．目標値を得るには，getAimedTemperature()を用いる．
+  feature = #TEMPERATUREの場合は，#setValue()で設定した目標値ではなく，
+  実際値が返される．目標値を得るには，#getAimedTemperature()を用いる．
   また，#WHITE_BALANCE, #TRIGGER_MODEの値を知ることはできない．代わり
-  にgetWhiteBalance(), getTriggerMode(), getTriggerPolarity()を用いる
+  に#getWhiteBalance(), #getTriggerMode(), #getTriggerPolarity()を用いる
   こと．
   \param feature	対象となる属性
   \return		現在の値
@@ -1077,7 +1077,7 @@ Ieee1394Camera::getWhiteBalance(u_int &ub, u_int& vr) const
 
 //! 色温度の目標値を調べる
 /*!
-  色温度の実際値を知るには，代わりにgetValue()を用いよ．
+  色温度の実際値を知るには，代わりに#getValue()を用いよ．
   \return	設定されている目標値が返される．
 */
 u_int
@@ -1223,7 +1223,7 @@ Ieee1394Camera::multiShot(u_short nframes)
   IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
   カメラ内部のメモリチャンネルに記憶できるものがある．
   \param mem_ch		値を記憶するメモリチャンネル番号．0以上の値をとり，
-			最大値はgetMemoryChannelMaxで調べられる．
+			最大値は#getMemoryChannelMax()で調べられる．
   \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
@@ -1244,7 +1244,7 @@ Ieee1394Camera::saveConfig(u_int mem_ch)
   IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
   カメラ内部のメモリチャンネルに記憶できるものがある．
   \param mem_ch		設定したい値を記憶しているメモリチャンネル番号．0以上
-			の値をとり，最大値はgetMemoryChannelMaxで調べられる．
+			の値をとり，最大値は#getMemoryChannelMax()で調べられる．
   \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
@@ -1378,10 +1378,10 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 
 //! IEEE1394カメラから出力された画像をRGB形式カラー画像として取り込む
 /*!
-  operator >>()との違いは，カメラがBayerパターンをサポートしたカメラで
+  #operator >>()との違いは，カメラがBayerパターンをサポートしたカメラで
   ある場合，BayerパターンからRGB形式への変換を行うことである．
   テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
-  呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
+  呼び出す前に#snap()によってカメラからの画像を保持しておかなければならない．
   \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．サポートされている画素形式Tは，RGB, RGBA,
@@ -1591,10 +1591,10 @@ struct RGB
 
 //! IEEE1394カメラから出力された画像1枚分のデータをなんら変換を行わずに取り込む
 /*!
-  本関数を呼び出す前にsnap()によってカメラからの画像を保持しておかなければ
+  本関数を呼び出す前に#snap()によってカメラからの画像を保持しておかなければ
   ならない．
-  \param image	画像データの格納領域へのポインタ．width(), height()および
-		pixelFormat()を用いて画像のサイズと画素の形式を調べて
+  \param image	画像データの格納領域へのポインタ．#width(), #height()および
+		#pixelFormat()を用いて画像のサイズと画素の形式を調べて
 		画像1枚分の領域を確保しておくのは，ユーザの責任である．
   \return	このIEEE1394カメラオブジェクト
 */
@@ -1611,10 +1611,10 @@ Ieee1394Camera::captureRaw(void* image) const
 
 //! IEEE1394カメラから出力されたBayerパターン画像1枚分のデータをRGB形式に変換して取り込む
 /*!
-  本関数を呼び出す前にsnap()によってカメラからの画像を保持しておかなければ
+  本関数を呼び出す前に#snap()によってカメラからの画像を保持しておかなければ
   ならない．
-  \param image	画像データの格納領域へのポインタ．width(), height()および
-		pixelFormat()を用いて画像のサイズと画素の形式を調べて
+  \param image	画像データの格納領域へのポインタ．#width(), #height()および
+		#pixelFormat()を用いて画像のサイズと画素の形式を調べて
 		画像1枚分の領域を確保しておくのは，ユーザの責任である．
 		画像データは，各画素毎に R, G, B (各 1 byte)の順で格納され
 		る．カメラの画素形式が#MONO_8 または#MONO_16 以外に設定され

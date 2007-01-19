@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.17 2007-01-16 08:18:43 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.18 2007-01-19 02:28:07 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -214,7 +214,7 @@ class Ieee1394Camera : public Ieee1394Node
     };
 	
   //! カメラがサポートしている基本機能を表すビットマップ
-  /*! どのような基本機能がサポートされているかは，inquireBasicFunction()に
+  /*! どのような基本機能がサポートされているかは，#inquireBasicFunction()に
       よって知ることができる．*/
     enum BasicFunction
     {
@@ -270,7 +270,7 @@ class Ieee1394Camera : public Ieee1394Node
     };
 
   //! カメラのフレームレートを表すビットマップ
-  /*! どのようなフレームレートがサポートされているかは，inquireFrameRate()
+  /*! どのようなフレームレートがサポートされているかは，#inquireFrameRate()
       によって知ることができる．*/
     enum FrameRate
     {
@@ -328,7 +328,7 @@ class Ieee1394Camera : public Ieee1394Node
     };
 
   //! 各属性(#Feature)についてカメラがサポートしている機能を表すビットマップ
-  /*! どのような機能がサポートされているかは，inquireFeatureFunction()によっ
+  /*! どのような機能がサポートされているかは，#inquireFeatureFunction()によっ
       て知ることができる．*/
     enum FeatureFunction
     {
@@ -360,7 +360,7 @@ class Ieee1394Camera : public Ieee1394Node
 	HighActiveInput	= (0x1u << 24)	//!< highでトリガon
     };
 
-  //! 本カメラがサポートするFormat_7に関する情報(getFormat_7_Info()で得られる)
+  //! 本カメラがサポートするFormat_7に関する情報(#getFormat_7_Info()で得られる)
     struct Format_7_Info
     {
 	u_int		maxWidth;		//!< 画像の最大幅
@@ -561,7 +561,7 @@ Ieee1394Camera::inquireBasicFunction() const
 
 //! カメラから出力される最初の画像を保持する
 /*!
-  カメラからの画像出力は，continuousShot(), oneShot(), multiShot()のいずれか
+  カメラからの画像出力は，#continuousShot(), #oneShot(), #multiShot()のいずれか
   によって行われる．実際に画像データが受信されるまで，本関数は呼び出し側に
   制御を返さない．
   \return	このIEEE1394カメラオブジェクト
@@ -578,11 +578,11 @@ Ieee1394Camera::snap()
 #ifdef HAVE_TUToolsPP
 //! IEEE1394カメラから出力された画像を直接的に取り込む
 /*!
-  operator >>()との違いは，画像形式の変換を行わないことと，Image<T>構造体
+  #operator >>()との違いは，画像形式の変換を行わないことと，Image<T>構造体
   の中のデータ領域へのポインタをIEEE1394入力バッファへのポインタに書き換える
   ことによって，実際にはデータのコピーを行わないことである．
   テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
-  呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
+  呼び出す前に#snap()によってカメラからの画像を保持しておかなければならない．
   \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．

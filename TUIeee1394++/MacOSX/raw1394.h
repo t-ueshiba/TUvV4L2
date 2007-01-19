@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- *  $Id: raw1394.h,v 1.5 2007-01-16 08:18:43 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.6 2007-01-19 02:27:48 ueshiba Exp $
  */
 /*!
  \file
@@ -108,7 +108,7 @@ raw1394handle_t
 
 //! IEEE1394インターフェースである::raw1394構造体を破壊する
 /*!
-  \param handle		破壊する::raw1394構造体へのハンドル
+  \param handle		::raw1394構造体へのハンドル
 */
 void	raw1394_destroy_handle(raw1394handle_t handle);
 

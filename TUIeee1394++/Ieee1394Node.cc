@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.8 2007-01-16 07:55:41 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.9 2007-01-19 02:28:07 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <unistd.h>
@@ -419,7 +419,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 /*!
   実際にデータが受信されるまで，本関数は呼び出し側に制御を返さない．
   \return	データの入ったバッファの先頭アドレス．データのサイズは
-		bufferSize()で知ることができる．
+		#bufferSize()で知ることができる．
  */
 const u_char*
 Ieee1394Node::waitListenBuffer()

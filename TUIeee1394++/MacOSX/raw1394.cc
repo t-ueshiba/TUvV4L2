@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.6 2007-01-17 00:17:12 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.7 2007-01-19 02:27:48 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -53,7 +53,7 @@ raw1394::Interval::resize(UInt32 n, const Interval& prv, raw1394* prnt)
 /************************************************************************
 *  class raw1394							*
 ************************************************************************/
-//! raw1394構造体を生成する
+//! ::raw1394構造体を生成する
 /*!
   \param unit_spec_ID	この構造体が表すIEEE1394ノードの種類を示すID
   \param uniqId		個々の機器固有の64bit ID
@@ -133,7 +133,7 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
 	    throw runtime_error("raw1394::raw1394: failed to turn on notification!!");
 }
 
-//! raw1394構造体を破壊する
+//! ::raw1394構造体を破壊する
 raw1394::~raw1394()
 {
     if (_cfPlugInInterface)
@@ -154,7 +154,7 @@ raw1394::~raw1394()
     }
 }
 
-//! このraw1394構造体が表すノードのコマンドレジスタのベースアドレスを返す
+//! この::raw1394構造体が表すノードのコマンドレジスタのベースアドレスを返す
 /*!
   \return		コマンドレジスタのベースアドレス
 */

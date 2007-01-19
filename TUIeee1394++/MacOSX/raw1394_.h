@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.5 2007-01-17 00:17:12 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.6 2007-01-19 02:27:48 ueshiba Exp $
  */
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
@@ -122,7 +122,7 @@ struct raw1394
     static UInt32			_nnodes;
 };
 
-//! raw1394構造体にユーザが指定したデータへのポインタを貼付ける
+//! ::raw1394構造体にユーザが指定したデータへのポインタを貼付ける
 /*!
   \param data	貼付けたいデータへのポインタ
 */
@@ -132,7 +132,7 @@ raw1394::setUserData(void* data)
     _userData = data;
 }
     
-//! このraw1394構造体に貼付けたデータへのポインタを得る
+//! この::raw1394構造体に貼付けたデータへのポインタを得る
 /*!
   \return	貼付けたデータへのポインタ
 */
