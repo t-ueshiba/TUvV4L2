@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: Geometry++.cc,v 1.3 2007-01-21 23:36:36 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -181,6 +181,18 @@ Coordinate<T, D>::operator =(const CoordinateP<T, D>& p)
     return *this;
 }
 
+template <class T, u_int D> double
+Coordinate<T, D>::sqdist(const Coordinate& p) const
+{
+    double	val = 0.0;
+    for (u_int i = 0; i < dim(); ++i)
+    {
+	double	d = (*this)[i] - p[i];
+	val += d * d;
+    }
+    return val;
+}
+    
 /*
  *  numerical operators
  */

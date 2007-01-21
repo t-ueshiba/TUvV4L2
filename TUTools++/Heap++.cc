@@ -1,5 +1,5 @@
 /*
- *  $Id: Heap++.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: Heap++.cc,v 1.3 2007-01-21 23:36:36 ueshiba Exp $
  */
 #include "TU/Heap++.h"
 #include <stdexcept>
@@ -9,12 +9,22 @@ namespace TU
 /************************************************************************
 *  class Heap<T, Compare>						*
 ************************************************************************/
+//! 空のヒープを作る
+/*!
+  \param d		ヒープの最大要素数
+  \param compare	比較関数オブジェクト
+*/
 template <class T, class Compare>
 Heap<T, Compare>::Heap(u_int d, Compare compare)
     :_array(d), _n(0), _compare(compare)
 {
 }
 
+//! 1次元配列からヒープを作る
+/*!
+  \param a		1次元配列
+  \param compare	比較関数オブジェクト
+*/
 template <class T, class Compare>
 Heap<T, Compare>::Heap(Array<T>& a, Compare compare)
     :_array((T*)a, a.dim()), _n(a.dim()), _compare(compare)
@@ -23,6 +33,10 @@ Heap<T, Compare>::Heap(Array<T>& a, Compare compare)
 	downheap(i);
 }
 
+//! ヒープに要素を追加する
+/*!
+  \param item	追加する要素
+*/
 template <class T, class Compare> void
 Heap<T, Compare>::add(T item)
 {
@@ -33,6 +47,10 @@ Heap<T, Compare>::add(T item)
     upheap(_n++);
 }
 
+//! ヒープ先頭の要素を取り除く
+/*!
+  \return	取り除かれた要素
+*/
 template <class T, class Compare> T
 Heap<T, Compare>::detach()
 {
@@ -53,7 +71,7 @@ Heap<T, Compare>::upheap(int current)
     while (current > 0)				// While having a parent...
     {
 	int	parent = (current - 1) / 2;	// Index of the parent node.
-	if (_compare(item, _array[parent]))
+	if (_compare(val, _array[parent]))
 	    break;
 	
 	_array[current] = _array[parent];	// Pull-down the parent.
@@ -83,6 +101,11 @@ Heap<T, Compare>::downheap(int current)
 /************************************************************************
 *  Global functions							*
 ************************************************************************/
+//! 1次元配列のヒープソートを行う
+/*!
+  \param a		ソートする配列
+  \param compare	比較関数オブジェクト
+*/
 template <class T, class Compare> void
 sort(Array<T>& a, Compare compare)
 {
