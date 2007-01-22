@@ -1,9 +1,13 @@
 /*
- *  $Id: IIRFilter.cc,v 1.4 2007-01-16 07:52:58 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.5 2007-01-22 01:57:04 ueshiba Exp $
  */
 #include <math.h>
 #include "TU/Image++.h"
 #include "TU/Minimize++.h"
+#if defined(__GNUG__) || defined(__INTEL_COMPILER)
+#  include "TU/Array++.cc"
+#  include "TU/Image++.cc"
+#endif
 
 namespace TU
 {
@@ -232,8 +236,3 @@ template BilateralIIRFilter2<4u>&
 BilateralIIRFilter2<4u>::convolve(const Image<float>& in, Image<float>& out);
 
 }
-
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Array++.cc"
-#  include "TU/Image++.cc"
-#endif
