@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.4 2006-11-27 00:26:03 ueshiba Exp $
+ *  $Id: main.cc,v 1.5 2007-01-29 03:31:11 ueshiba Exp $
  */
 #include <unistd.h>
 #include "TU/Image++.h"
@@ -55,12 +55,17 @@ main(int argc, char* argv[])
 
     if (laplacian)
     {
-	Image<float>	lap;
+	Image<float>	lap, edgeH, edgeV;
 	if (gaussian)
-	    GaussianConvolver(alpha).laplacian(in, lap);
+	    GaussianConvolver(alpha).laplacian(in, lap)
+				    .diffH(in, edgeH).diffV(in, edgeV);
 	else
-	    DericheConvolver(alpha).laplacian(in, lap);
-	EdgeDetector(th_low, th_high).zeroCrossing(lap, edge);
+	    DericheConvolver(alpha).laplacian(in, lap)
+				   .diffH(in, edgeH).diffV(in, edgeV);
+	Image<float>	str;
+	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
+				     .zeroCrossing(lap, str, edge)
+				     .hysteresisThresholding(edge);
     }
     else
     {
@@ -73,7 +78,8 @@ main(int argc, char* argv[])
 	Image<u_char>	dir;
 	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
 				     .direction4(edgeH, edgeV, dir)
-				     .suppressNonmaxima(str, dir, edge);
+				     .suppressNonmaxima(str, dir, edge)
+				     .hysteresisThresholding(edge);
     }
     
     Image<RGB>		out;
@@ -85,28 +91,6 @@ main(int argc, char* argv[])
   //edgeH.save(cout, ImageBase::FLOAT);
   //edgeV.save(cout, ImageBase::FLOAT);
   //out.save(cout, ImageBase::U_CHAR);
-    
-  /*    BilateralIIRFilter<2u>	bi;
-    const float	e  = expf(-alpha), beta = sinhf(alpha);
-    float	c0[4], c1[4], c2[4];
-    c0[0] =  (alpha - 1.0) * e;			// i(n-1)
-    c0[1] =  1.0;				// i(n)
-    c0[2] = -e * e;				// oF(n-2)
-    c0[3] =  2.0 * e;				// oF(n-1)
-
-    c1[0] = -1.0;				// i(n-1)
-    c1[1] =  0.0;				// i(n)
-    c1[2] = -e * e;				// oF(n-2)
-    c1[3] =  2.0 * e;				// oF(n-1)
-
-    c2[0] =  (1.0 + beta) * e;			// i(n-1)
-    c2[1] = -1.0;				// i(n)
-    c2[2] = -e * e;				// oF(n-2)
-    c2[3] =  2.0 * e;				// oF(n-1)
-    bi.initialize(c0, BilateralIIRFilter<2u>::Zeroth).convolve(in[64]);
-    for (int i = 0; i < bi.dim(); ++i)
-	cerr << ' ' << bi[i];
-	cerr << endl;*/
     
     return 0;
 }
