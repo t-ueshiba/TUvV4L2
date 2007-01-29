@@ -1,5 +1,5 @@
 /*
- *  $Id: EdgeDetector.cc,v 1.5 2007-01-29 03:31:11 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.6 2007-01-29 04:43:26 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef __INTEL_COMPILER
@@ -253,7 +253,7 @@ EdgeDetector::direction8(const Image<float>& edgeH,
   \param strength	エッジ強度入力画像
   \param direction	エッジ方向入力画像
   \param out		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
-			#WEAKラベルを付けた画像
+			#WEAKラベルを付けた出力画像
   \return		このエッジ検出器自身
 */
 const EdgeDetector&
@@ -319,10 +319,10 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
     return *this;
 }
 
-//! 入力微分画像のゼロ交差点を検出する
+//! 2次微分画像のゼロ交差点を検出する
 /*!
-  \param in		入力微分画像
-  \param out		ゼロ交差点を255，そうでない点を0としたエッジ画像
+  \param in		入力2次微分画像
+  \param out		ゼロ交差点を255，そうでない点を0とした出力画像
   \return		このエッジ検出器自身
 */
 const EdgeDetector&
@@ -361,12 +361,12 @@ EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
     return *this;
 }
     
-//! 入力２次微分画像のゼロ交差点を検出し，エッジ強度によって分類する
+//! 2次微分画像のゼロ交差点を検出し，エッジ強度によって分類する
 /*!
-  \param in		入力２次微分画像
+  \param in		入力2次微分画像
   \param strength	入力エッジ強度画像
   \param out		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
-			#WEAKラベルを付けた画像
+			#WEAKラベルを付けた出力画像
   \return		このエッジ検出器自身
 */
 const EdgeDetector&
@@ -390,22 +390,20 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
 				*nxt = in[v+1],
 				*str = strength[v];
 	const u_char* const	end  = &out[v][out.width() - 1];
-	for (u_char* dst = out[v]; dst < end; )
+	for (u_char* dst = out[v]; ++dst < end; )
 	{
 	    ++cur;
 	    ++nxt;
 	    ++str;
 
-	    if (*str >= _th_low)
-		if ((*cur >= 0.0 && *(cur+1) >= 0.0 &&
-		     *nxt >= 0.0 && *(nxt+1) >= 0.0) ||
-		    (*cur <= 0.0 && *(cur+1) <= 0.0 &&
-		     *nxt <= 0.0 && *(nxt+1) <= 0.0))
-		    *dst++ = 0;
-		else
-		    *dst++ = (*str >= _th_high ? EDGE : WEAK);
+	    if ((*str < _th_low) ||
+		(*cur >= 0.0 && *(cur+1) >= 0.0 &&
+		 *nxt >= 0.0 && *(nxt+1) >= 0.0) ||
+		(*cur <= 0.0 && *(cur+1) <= 0.0 &&
+		 *nxt <= 0.0 && *(nxt+1) <= 0.0))
+		*dst = 0;
 	    else
-		*dst++ = 0;
+		*dst = (*str >= _th_high ? EDGE : WEAK);
 	}
     }
 
@@ -415,7 +413,7 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
 //! 強いエッジ点を起点に弱いエッジを追跡することによりヒステリシス閾値処理を行う
 /*!
   \param edge		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
-			#WEAKラベルを付けた画像を与えると，最終的なエッジ
+			#WEAKラベルを付けた画像．処理が終わると最終的なエッジ
 			点に255を，そうでない点には0を書き込んで返される．
   \return		このエッジ検出器自身
 */

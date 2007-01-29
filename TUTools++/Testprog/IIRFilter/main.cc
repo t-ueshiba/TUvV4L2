@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.5 2007-01-29 03:31:11 ueshiba Exp $
+ *  $Id: main.cc,v 1.6 2007-01-29 04:43:26 ueshiba Exp $
  */
 #include <unistd.h>
 #include "TU/Image++.h"
@@ -63,9 +63,10 @@ main(int argc, char* argv[])
 	    DericheConvolver(alpha).laplacian(in, lap)
 				   .diffH(in, edgeH).diffV(in, edgeV);
 	Image<float>	str;
-	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
+      	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
 				     .zeroCrossing(lap, str, edge)
 				     .hysteresisThresholding(edge);
+      //EdgeDetector(th_low, th_high).zeroCrossing(lap, edge);
     }
     else
     {
