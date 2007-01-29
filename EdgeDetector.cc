@@ -1,5 +1,5 @@
 /*
- *  $Id: EdgeDetector.cc,v 1.4 2007-01-16 07:52:58 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.5 2007-01-29 03:31:11 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #ifdef __INTEL_COMPILER
@@ -77,7 +77,7 @@ trace(Image<u_char>& edge, const Point2<int>& p)
 	    trace(edge, p.neighbor(dir));	// さらに追跡を続ける．
 }
 
-//! ある点を打つと，EDGEラベルが付いている点とそうでない点を結べるか調べる
+//! ある点を打てばEDGEラベルが付いている点とそうでない点を結べるか調べる
 /*!
   \param edge	エッジ画像
   \param p	打とうとする点
@@ -252,7 +252,8 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 /*!
   \param strength	エッジ強度入力画像
   \param direction	エッジ方向入力画像
-  \param out		細線化されたエッジ画像
+  \param out		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
+			#WEAKラベルを付けた画像
   \return		このエッジ検出器自身
 */
 const EdgeDetector&
@@ -315,38 +316,13 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
 	}
     }
 
-  // 強いエッジ点を起点にして，接続する弱いエッジ点を追跡しEDGEラベルを付ける．
-    for (int v = 0; ++v < out.height() - 1; )
-	for (int u = 0; ++u < out.width() - 1; )
-	    if (out[v][u] & EDGE)
-		trace(out, Point2<int>(u, v));
-
-  // EDGEラベルが付いておらず，かつ付いている点と付いていない弱いエッジ点の
-  // 橋渡しになれる点に新たにEDGEラベルを付けて追跡を行う．
-    for (int v = 0; ++v < out.height() - 1; )
-	for (int u = 0; ++u < out.width() - 1; )
-	{
-	    Point2<int>	p(u, v);
-	    
-	    if (!(out(p) & EDGE) && canInterpolate(out, p))
-		trace(out, p);
-	}
-
-  // EDGE点には255を，そうでない点には0を書き込む．
-    for (int v = 0; v < out.height(); )
-    {
-	u_char*	dst = out[v++];
-	for (const u_char* const end = dst + out.width(); dst < end; ++dst)
-	    *dst = (*dst & EDGE ? 255 : 0);
-    }
-    
     return *this;
 }
 
 //! 入力微分画像のゼロ交差点を検出する
 /*!
   \param in		入力微分画像
-  \param out		細線化されたエッジ画像
+  \param out		ゼロ交差点を255，そうでない点を0としたエッジ画像
   \return		このエッジ検出器自身
 */
 const EdgeDetector&
@@ -380,6 +356,96 @@ EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
 	    ++cur;
 	    ++nxt;
 	}
+    }
+
+    return *this;
+}
+    
+//! 入力２次微分画像のゼロ交差点を検出し，エッジ強度によって分類する
+/*!
+  \param in		入力２次微分画像
+  \param strength	入力エッジ強度画像
+  \param out		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
+			#WEAKラベルを付けた画像
+  \return		このエッジ検出器自身
+*/
+const EdgeDetector&
+EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
+			   Image<u_char>& out) const
+{
+    out.resize(in.height(), in.width());
+
+  // 出力画像の外周を0にする．
+    if (out.height() > 0)
+	for (int u = 0; u < out.width(); ++u)
+	    out[0][u] = out[out.height()-1][u] = 0;
+    if (out.width() > 0)
+	for (int v = 0; v < out.height(); ++v)
+	    out[v][0] = out[v][out.width()-1] = 0;
+
+  // 現在点を左上隅とする2x2ウィンドウ中の画素が異符号ならエッジ点とする．
+    for (int v = 0; ++v < out.height() - 1; )
+    {
+	const float		*cur = in[v],
+				*nxt = in[v+1],
+				*str = strength[v];
+	const u_char* const	end  = &out[v][out.width() - 1];
+	for (u_char* dst = out[v]; dst < end; )
+	{
+	    ++cur;
+	    ++nxt;
+	    ++str;
+
+	    if (*str >= _th_low)
+		if ((*cur >= 0.0 && *(cur+1) >= 0.0 &&
+		     *nxt >= 0.0 && *(nxt+1) >= 0.0) ||
+		    (*cur <= 0.0 && *(cur+1) <= 0.0 &&
+		     *nxt <= 0.0 && *(nxt+1) <= 0.0))
+		    *dst++ = 0;
+		else
+		    *dst++ = (*str >= _th_high ? EDGE : WEAK);
+	    else
+		*dst++ = 0;
+	}
+    }
+
+    return *this;
+}
+
+//! 強いエッジ点を起点に弱いエッジを追跡することによりヒステリシス閾値処理を行う
+/*!
+  \param edge		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
+			#WEAKラベルを付けた画像を与えると，最終的なエッジ
+			点に255を，そうでない点には0を書き込んで返される．
+  \return		このエッジ検出器自身
+*/
+const EdgeDetector&
+EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
+{
+    
+  // 強いエッジ点を起点にして，接続する弱いエッジ点を追跡しEDGEラベルを付ける．
+    for (int v = 0; ++v < edge.height() - 1; )
+	for (int u = 0; ++u < edge.width() - 1; )
+	    if (edge[v][u] & EDGE)
+		trace(edge, Point2<int>(u, v));
+
+  // EDGEラベルが付いておらず，かつ付いている点と付いていない弱いエッジ点の
+  // 橋渡しになれる点に新たにEDGEラベルを付けて追跡を行う．
+    for (int v = 0; ++v < edge.height() - 1; )
+	for (int u = 0; ++u < edge.width() - 1; )
+	{
+	    Point2<int>	p(u, v);
+	    
+	    if (!(edge(p) & EDGE) && canInterpolate(edge, p))
+		trace(edge, p);
+	}
+
+  // EDGE点には255を，そうでない点には0を書き込む．
+    for (int v = 0; v < edge.height(); )
+    {
+	u_char*	dst = edge[v++];
+	for (const u_char* const end = dst + edge.width(); dst < end; ++dst)
+	    *dst = (*dst & EDGE ? 255 : 0);
     }
 
     return *this;

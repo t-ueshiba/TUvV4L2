@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.19 2007-01-16 07:52:58 ueshiba Exp $
+ *  $Id: Image++.h,v 1.20 2007-01-29 03:31:11 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -1167,7 +1167,12 @@ GaussianConvolver::laplacian(const Image<S>& in, Image<T>& out)
 class EdgeDetector
 {
   public:
-    enum	{TRACED = 0x4, EDGE = 0x02, WEAK = 0x01};
+    enum
+    {
+	TRACED	= 0x04,
+	EDGE	= 0x02,					//!< 強いエッジ点
+	WEAK	= 0x01					//!< 弱いエッジ点
+    };
     
     EdgeDetector(float th_low=2.0, float th_high=5.0)			;
     
@@ -1187,6 +1192,12 @@ class EdgeDetector
 			  Image<u_char>& out)			  const	;
     const EdgeDetector&
 	zeroCrossing(const Image<float>& in, Image<u_char>& out)  const	;
+    const EdgeDetector&
+	zeroCrossing(const Image<float>& in,
+		     const Image<float>& strength,
+		     Image<u_char>& out)			  const	;
+    const EdgeDetector&
+	hysteresisThresholding(Image<u_char>& edge)		  const	;
 
   private:
     float		_th_low, _th_high;
