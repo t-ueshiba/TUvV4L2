@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.10 2004-03-08 02:06:19 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.11 2007-01-31 05:42:44 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include <iomanip>
@@ -84,7 +84,7 @@ MeasurementMatrix::MeasurementMatrix(const MeasurementMatrix& Wt,
 Vector<double>
 MeasurementMatrix::centroid() const
 {
-    Vector<T>	c(ncol());
+    Vector<ET>	c(ncol());
     for (int j = 0; j < npoints(); ++j)
 	c += (*this)[j];
     return c /= npoints();
@@ -135,24 +135,24 @@ MeasurementMatrix::affineFundamental(u_int frame0, u_int frame1) const
     if (npoints() < 4)
 	throw std::invalid_argument("TU::MeasurementMatrix::affineFundamental: At least 4 points needed!!");
 
-    const Vector<T>&	c = centroid();
-    Matrix<T>		u(npoints(), 4);
+    const Vector<ET>&	c = centroid();
+    Matrix<ET>		u(npoints(), 4);
     for (int j = 0; j < npoints(); ++j)
     {
 	u[j](0, 2) = (*this)[j](3*frame0, 2) - c(3*frame0, 2);
 	u[j](2, 2) = (*this)[j](3*frame1, 2) - c(3*frame1, 2);
     }
     
-    Matrix<double>	A(4, 4);
+    Matrix<ET>	A(4, 4);
     for (int j = 0; j < npoints(); ++j)
 	A += u[j] % u[j];
-    Vector<double>	evalue;
-    Vector<double>	n = A.eigen(evalue)[3];
+    Vector<ET>	evalue;
+    Vector<ET>	n = A.eigen(evalue)[3];
 #ifdef DEBUG
     std::cerr << "-----------------" << std::endl
 	      << "  Eigen values = " << evalue;
 #endif
-    Matrix<double>	F(3, 3);
+    Matrix<ET>	F(3, 3);
     
     F[2][0] = n[0];
     F[2][1] = n[1];
@@ -190,29 +190,29 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 #endif
   // Normalize the input measurement matrix.
     Normalization	norm0(frame(frame0)), norm1(frame(frame1));
-    Matrix<T>		Wt(npoints(), 6);
+    Matrix<ET>		Wt(npoints(), 6);
     Wt(0, 0, npoints(), 3) = frame(frame0) * norm0.Tt();
     Wt(0, 3, npoints(), 3) = frame(frame1) * norm1.Tt();
     
-    Matrix<T>	F(3, 3), A(9, 9);
-    Vector<T>	weight(npoints());
-    T		c = 0.0;
+    Matrix<ET>	F(3, 3), A(9, 9);
+    Vector<ET>	weight(npoints());
+    ET		c = 0.0;
     weight = 1.0 / npoints();
     for (;;)
     {
-	Matrix<T>	B(9, 9);
+	Matrix<ET>	B(9, 9);
 	A = 0.0;
 	for (int i = 0; i < npoints(); ++i)
 	{
-	    Vector<T>		v(9);
-	    const Vector<T>	&ldata = Wt[i](0, 3), &rdata = Wt[i](3, 3);
+	    Vector<ET>		v(9);
+	    const Vector<ET>	&ldata = Wt[i](0, 3), &rdata = Wt[i](3, 3);
 	    
 	    v(0, 3) = rdata[0] * ldata;
 	    v(3, 3) = rdata[1] * ldata;
 	    v(6, 3) = rdata[2] * ldata;
 	    A += (weight[i] * v) % v;
 
-	    const Matrix<T>&	tmp = (weight[i] * ldata) % ldata;
+	    const Matrix<ET>&	tmp = (weight[i] * ldata) % ldata;
 	    B(0, 0, 3, 3) += tmp;
 	    B(3, 3, 3, 3) += tmp;
 	    for (int j = 0; j < 3; ++j)
@@ -223,8 +223,8 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 		}
 	}
 	A -= c * B;
-	Vector<T>	f((T*)F, 9);
-	Vector<T>	evalue;
+	Vector<ET>	f((ET*)F, 9);
+	Vector<ET>	evalue;
 	f = A.eigen(evalue)[8];
 #ifdef DEBUG
 	std::cerr << " -----------------" << std::endl
@@ -238,7 +238,7 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 	c += evalue[8] / (f * B * f);      // Update error.
 	
       // Update weights.
-      	T	weight_sum = 0.0;
+      	ET	weight_sum = 0.0;
 	for (int i = 0; i < npoints(); ++i)
 	    weight_sum += (weight[i] =
 			   1.0 / ((F(0, 0, 2, 3) * Wt[i](0, 3)).square() +
@@ -246,17 +246,17 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 	weight /= weight_sum;
     }
 #ifdef DEBUG
-    SVDecomposition<T>	svdF(F);
+    SVDecomposition<ET>	svdF(F);
     std::cerr << " Singular values of uncorrected F = " << svdF.diagonal();
 #endif
-    const Matrix<T>&	Ainv = A.pinv(1.0e6);
-    Vector<T>		f((T*)F, 9);
+    const Matrix<ET>&	Ainv = A.pinv(1.0e6);
+    Vector<ET>		f((ET*)F, 9);
     
     for (;;)
     {
-	const Matrix<T>&	G = F.adj().trns();
-	Vector<T>		g((T*)G, 9);
-	const T			detF = f * g / 3.0;
+	const Matrix<ET>&	G = F.adj().trns();
+	Vector<ET>		g((ET*)G, 9);
+	const ET		detF = f * g / 3.0;
 #ifdef DEBUG	
 	std::cerr << " det(F) = " << detF << std::endl;
 #endif
@@ -267,7 +267,7 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
 	f.normalize();
     }
 #ifdef DEBUG    
-    SVDecomposition<T>	svdF2(F);
+    SVDecomposition<ET>	svdF2(F);
     std::cerr << " Singular values of corrected F = " << svdF2.diagonal();
     std::cerr << "=== END:   MeasurementMatrix::fundamental ==="
 	      << std::endl;
@@ -295,13 +295,13 @@ MeasurementMatrix::affinity(u_int frame0, u_int frame1) const
     if (npoints() < 3)
 	throw std::invalid_argument("TU::MeasurementMatrix::affinity: At least 3 points needed!!");
 
-    const Vector<T>&	c = centroid();
-    Matrix<T>		X(4, 4);
-    Vector<T>		a(4);
+    const Vector<ET>&	c = centroid();
+    Matrix<ET>		X(4, 4);
+    Vector<ET>		a(4);
     for (int j = 0; j < npoints(); ++j)
     {
-	const Vector<T>&	dx = (*this)[j](3*frame0, 2) - c(3*frame0, 2);
-	const Vector<T>&	du = (*this)[j](3*frame1, 2) - c(3*frame1, 2);
+	const Vector<ET>&	dx = (*this)[j](3*frame0, 2) - c(3*frame0, 2);
+	const Vector<ET>&	du = (*this)[j](3*frame1, 2) - c(3*frame1, 2);
 	
 	X(0, 0, 2, 2) += dx % dx;
 	X(2, 2, 2, 2) += dx % dx;
@@ -310,7 +310,7 @@ MeasurementMatrix::affinity(u_int frame0, u_int frame1) const
     }
     a.solve(X);
     
-    Matrix<T>	A(3, 3);
+    Matrix<ET>	A(3, 3);
     A[0][0] = a[0];
     A[0][1] = a[1];
     A[0][2] = c[3*frame1  ] - a(0, 2) * c(3*frame0, 2);
@@ -345,15 +345,15 @@ MeasurementMatrix::homography(u_int frame0, u_int frame1,
 
   // Normalize the input measurement matrix.
     Normalization	norm0(frame(frame0)), norm1(frame(frame1));
-    Matrix<T>		Wt(npoints(), 6);
+    Matrix<ET>		Wt(npoints(), 6);
     Wt(0, 0, npoints(), 3) = frame(frame0) * norm0.Tt();
     Wt(0, 3, npoints(), 3) = frame(frame1) * norm1.Tt();
 
-    Matrix<T>	Q(9, 9);
+    Matrix<ET>	Q(9, 9);
     for (int j = 0; j < npoints(); ++j)
     {
-	const Vector<T>	&ldata = Wt[j](0, 3), &rdata = Wt[j](3, 3);
-	const Matrix<double>	X = ldata % ldata;
+	const Vector<ET>	&ldata = Wt[j](0, 3), &rdata = Wt[j](3, 3);
+	const Matrix<ET>	X = ldata % ldata;
 	
 	Q(0, 0, 3, 3) += (rdata[1]*rdata[1] + rdata[2]*rdata[2]) * X;
 	Q(3, 3, 3, 3) += (rdata[2]*rdata[2] + rdata[0]*rdata[0]) * X;
@@ -363,9 +363,9 @@ MeasurementMatrix::homography(u_int frame0, u_int frame1,
 	Q(3, 6, 3, 3) = (Q(6, 3, 3, 3) -= rdata[1]*rdata[2] * X);
     }
 
-    Matrix<double>	H(3, 3);
-    Vector<double>	h((double*)H, 9);
-    Vector<double>	evalue(9);
+    Matrix<ET>	H(3, 3);
+    Vector<ET>	h((ET*)H, 9);
+    Vector<ET>	evalue(9);
     h = Q.eigen(evalue)[8];
 #ifdef DEBUG
     std::cerr << "TU::MeasurementMatrix::homography():: eigen values = "
@@ -376,13 +376,13 @@ MeasurementMatrix::homography(u_int frame0, u_int frame1,
   // Nonlinear refinement based on MLE(optional).
     if (doRefinement)
     {
-	CostH		err(*this, frame0, frame1);
-	CostH::CostCN	g(h);
+	CostH					err(*this, frame0, frame1);
+	ConstNormConstraint<Vector<ET> >	g(h);
 	minimizeSquare(err, g, h);
     }
 
   // Normalize the computed homography to make determinant unity.
-    double	det = H.det();
+    ET	det = H.det();
     if (det > 0)
 	H /= pow(det, 1.0/3.0);
     else
@@ -411,14 +411,14 @@ MeasurementMatrix::rotation(u_int frame0, u_int frame1) const
     if (npoints() < 3)
 	throw std::invalid_argument("TU::MeasurementMatrix::rotation: At least 3 points needed!!");
 
-    Matrix<double>    M(3, 3);                        // Moment matrix.
+    Matrix<ET>	M(3, 3);                        // Moment matrix.
     for (int j = 0; j < npoints(); ++j)
     {
-	const Vector<T>	&ldata = (*this)[j](3*frame0, 3),
-			&rdata = (*this)[j](3*frame1, 3);
+	const Vector<ET>	&ldata = (*this)[j](3*frame0, 3),
+				&rdata = (*this)[j](3*frame1, 3);
 	M += ldata.normal() % rdata.normal();
     }
-    SVDecomposition<double>   svd(M);
+    SVDecomposition<ET>	svd(M);
     
     return svd.Ut().trns() * svd.Vt();
 }
@@ -437,14 +437,14 @@ MeasurementMatrix::rotation(u_int frame0, u_int frame1) const
 		第j行とする\f$P\times 4\f$行列として返す．
 */
 void
-MeasurementMatrix::affineFactorization(Matrix<T>& P, Matrix<T>& Xt) const
+MeasurementMatrix::affineFactorization(Matrix<ET>& P, Matrix<ET>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::affineFactorization: Two or more frames required!!");
     
   // Make affine measurement matrix around the centroid.
-    const Vector<T>	c = centroid();
-    Matrix<T>		Wa(2*nframes(), npoints());
+    const Vector<ET>	c = centroid();
+    Matrix<ET>		Wa(2*nframes(), npoints());
     for (int i = 0; i < nframes(); ++i)
 	for (int j = 0; j < npoints(); ++j)
 	{
@@ -453,7 +453,7 @@ MeasurementMatrix::affineFactorization(Matrix<T>& P, Matrix<T>& Xt) const
 	}
 
   // Factor the affine measurement matrix.
-    SVDecomposition<T> svd(Wa);
+    SVDecomposition<ET> svd(Wa);
 #ifdef DEBUG
     std::cerr << "  singular vaules of Wa: " << svd.diagonal();
 #endif
@@ -492,7 +492,7 @@ MeasurementMatrix::affineFactorization(Matrix<T>& P, Matrix<T>& Xt) const
 		これがユークリッド座標に変換されて返される．
 */
 void
-MeasurementMatrix::affineToMetric(Matrix<T>& P, Matrix<T>& Xt)
+MeasurementMatrix::affineToMetric(Matrix<ET>& P, Matrix<ET>& Xt)
 {
     const u_int	nframes = P.nrow() / 3;
 
@@ -500,11 +500,11 @@ MeasurementMatrix::affineToMetric(Matrix<T>& P, Matrix<T>& Xt)
 	throw std::invalid_argument("TU::MeasurementMatrix::affineToMetric: Three or more frames required!!");
     
   // Construct constraint matrix C.
-    Matrix<T>	C(2*nframes, 6);
+    Matrix<ET>	C(2*nframes, 6);
     for (int i = 0; i < nframes; ++i)
     {
-	const Vector<T>	&p = P[3*i](0, 3), &q = P[3*i+1](0, 3);
-	const T			one_uu = 1.0 + P[3*i  ][3]*P[3*i  ][3],
+	const Vector<ET>	&p = P[3*i](0, 3), &q = P[3*i+1](0, 3);
+	const ET		one_uu = 1.0 + P[3*i  ][3]*P[3*i  ][3],
 				one_vv = 1.0 + P[3*i+1][3]*P[3*i+1][3],
 				uv     = P[3*i][3]*P[3*i+1][3];
 	
@@ -526,12 +526,12 @@ MeasurementMatrix::affineToMetric(Matrix<T>& P, Matrix<T>& Xt)
     }
 
   // Construct B.
-    Vector<T>		evalue;
-    const Vector<T>&	b = (C.trns()*C).eigen(evalue)[5];
+    Vector<ET>		evalue;
+    const Vector<ET>&	b = (C.trns()*C).eigen(evalue)[5];
 #ifdef DEBUG
     std::cerr << "  eigen values of CC: " << evalue;
 #endif
-    Matrix<T>	B(3, 3);
+    Matrix<ET>	B(3, 3);
     B[0][0] = b[0];
     B[1][1] = b[1];
     B[2][2] = b[2];
@@ -542,7 +542,7 @@ MeasurementMatrix::affineToMetric(Matrix<T>& P, Matrix<T>& Xt)
 	B *= -1.0;
     
   // Factor B into A and At s.t. B = A * At.
-    Matrix<T>	At(4, 4);
+    Matrix<ET>	At(4, 4);
     At(0, 0, 3, 3) = B.cholesky();
     At[3][3] = 1.0;
 
@@ -553,13 +553,13 @@ MeasurementMatrix::affineToMetric(Matrix<T>& P, Matrix<T>& Xt)
   // Convert Affine projection matrices to Euclidean ones.
     for (int i = 0; i < nframes; ++i)
     {
-	const T		xc = P[3*i][3], yc = P[3*i+1][3];
-	Matrix<T>	Nt(3, 3);
+	const ET	xc = P[3*i][3], yc = P[3*i+1][3];
+	Matrix<ET>	Nt(3, 3);
 	Nt[0] = P[3*i  ](0, 3);
 	Nt[1] = P[3*i+1](0, 3);
 	Nt[2] = -xc * Nt[0] - yc * Nt[1];
 
-	SVDecomposition<T>	svd(Nt);
+	SVDecomposition<ET>	svd(Nt);
 	P(3*i, 0, 3, 3)  = svd.Vt().trns() * svd.Ut();
 	P(3*i, 3, 3, 1) *= ((2.0 + xc*xc + yc*yc) / (svd[0] + svd[1]));
     }
@@ -571,7 +571,7 @@ MeasurementMatrix::affineToMetric(Matrix<T>& P, Matrix<T>& Xt)
     At[3][1] = -P[1][3];
     At[3][2] = -P[2][3];
     At[3](0, 3) *= P(0, 0, 3, 3);	// t0: translation of 0th camera.
-    Vector<T>	t(3);
+    Vector<ET>	t(3);
     t[0] = -P[3][3];
     t[1] = -P[4][3];
     t[2] = -P[5][3];
@@ -596,14 +596,14 @@ MeasurementMatrix::affineToMetric(Matrix<T>& P, Matrix<T>& Xt)
 		とする\f$P\times 4\f$行列として返す．
 */
 void
-MeasurementMatrix::projectiveFactorization(Matrix<T>& P, Matrix<T>& Xt) const
+MeasurementMatrix::projectiveFactorization(Matrix<ET>& P, Matrix<ET>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::projectiveFactorization: Two or more frames required!!");
     
   // Normalize the input measurement matrix.
     Array<Normalization>	norm(nframes());
-    Matrix<T>			Wt(npoints(), 3*nframes());
+    Matrix<ET>			Wt(npoints(), 3*nframes());
     for (int i = 0; i < nframes(); ++i)
     {
 	norm[i].initialize(frame(i));
@@ -612,7 +612,7 @@ MeasurementMatrix::projectiveFactorization(Matrix<T>& P, Matrix<T>& Xt) const
 
   // Minimize cost function.
     MeasurementMatrix::CostPF	f(Wt);
-    Vector<T>	mu((f.nframes() - 1) * (f.npoints() - 1));
+    Vector<ET>	mu((f.nframes() - 1) * (f.npoints() - 1));
     mu = 1.0;
     f.minimize(mu);
 
@@ -643,26 +643,26 @@ MeasurementMatrix::projectiveFactorization(Matrix<T>& P, Matrix<T>& Xt) const
 		これがユークリッド座標に変換されて返される．
 */
 void
-MeasurementMatrix::projectiveToMetric(Matrix<T>& P, Matrix<T>& Xt) const
+MeasurementMatrix::projectiveToMetric(Matrix<ET>& P, Matrix<ET>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::projectiveToMetric: Two or more frames required!!");
     
   // Compute the focal point and the inverse projection of 0-th camera.
-    SVDecomposition<T>	svd(P(0, 0, 3, 4));
-    const Vector<T>&		c0 = svd.Ut()[3];
-    const Matrix<T>&		P0tinv = svd.Ut()[0] % svd.Vt()[0] / svd[0]
+    SVDecomposition<ET>	svd(P(0, 0, 3, 4));
+    const Vector<ET>&		c0 = svd.Ut()[3];
+    const Matrix<ET>&		P0tinv = svd.Ut()[0] % svd.Vt()[0] / svd[0]
 				       + svd.Ut()[1] % svd.Vt()[1] / svd[1]
 				       + svd.Ut()[2] % svd.Vt()[2] / svd[2];
 
   // Initial guess of the parameter: q.
-    Matrix<T>	A(5*(nframes()-1), 4);
-    Vector<T>	b(5*(nframes()-1));
+    Matrix<ET>	A(5*(nframes()-1), 4);
+    Vector<ET>	b(5*(nframes()-1));
     for (int i = 0; i < nframes()-1; ++i)
     {
-	const Matrix<T>&	Pi = P(3*(i+1), 0, 3, 4);
-	const Matrix<T>&	Nt = Pi * P0tinv;
-	const Vector<T>&	e  = Pi * c0;
+	const Matrix<ET>&	Pi = P(3*(i+1), 0, 3, 4);
+	const Matrix<ET>&	Nt = Pi * P0tinv;
+	const Vector<ET>&	e  = Pi * c0;
 	
 	A[5*i  ](0, 3)	= 2*e[0]*Nt[0] - 2*e[2]*Nt[2];
 	A[5*i+1](0, 3)	= 2*e[1]*Nt[1] - 2*e[2]*Nt[2];
@@ -680,20 +680,20 @@ MeasurementMatrix::projectiveToMetric(Matrix<T>& P, Matrix<T>& Xt) const
 	b[5*i+3]	= -Nt[0]*Nt[2];
 	b[5*i+4]	= -Nt[1]*Nt[2];
     }
-    Vector<T>	q = b * A;
+    Vector<ET>	q = b * A;
     q.solve(A.trns() * A);
 #ifdef DEBUG	// Check the order of magnitute of last two eigen values.
     std::cerr << "q = " << q;
     std::cerr << "sqrt(fabs(q(0, 3)*q(0, 3) - q[3])) = "
 	      << sqrt(fabs(q(0, 3)*q(0, 3) - q[3])) << std::endl;
 #endif
-    Vector<T>				p = q(0, 3);
-    CostPM				f(A, b);
-    NullConstraint<T, CostPM::AT>	g;
+    Vector<ET>		p = q(0, 3);
+    CostPM		f(A, b);
+    NullConstraint<ET>	g;
     minimizeSquare(f, g, p);
     
   // Construct projective transformation H.
-    Matrix<T>	Ht(4, 4);
+    Matrix<ET>	Ht(4, 4);
     Ht(0, 0, 3, 4) = P0tinv.trns() + p % c0;
     Ht[3] = c0;
     
@@ -740,7 +740,7 @@ MeasurementMatrix::projectiveToMetric(Matrix<T>& P, Matrix<T>& Xt) const
 */
 void
 MeasurementMatrix::projectiveToMetricWithFocalLengthsEstimation
-			(Matrix<T>& P, Matrix<T>& Xt) const
+			(Matrix<ET>& P, Matrix<ET>& Xt) const
 {
     initializeFocalLengthsEstimation(P, Xt);
     
@@ -769,24 +769,24 @@ MeasurementMatrix::projectiveToMetricWithFocalLengthsEstimation
 */
 void
 MeasurementMatrix::projectiveToMetricWithCommonFocalLengthEstimation
-			(Matrix<T>& P, Matrix<T>& Xt) const
+			(Matrix<ET>& P, Matrix<ET>& Xt) const
 {
     initializeFocalLengthsEstimation(P, Xt);
     
   // Extract translation and rotation components of camera motion.
     Array<CanonicalCamera>	cameras(nframes());
-    T				k = 0.0;
+    ET				k = 0.0;
     for (int i = 0; i < nframes(); ++i)
     {
-	Matrix<T>	Nt = P(3*i, 0, 3, 3);
+	Matrix<ET>	Nt = P(3*i, 0, 3, 3);
 	Nt[0] *= 0.5;
 	Nt[1] *= 0.5;
-	SVDecomposition<T>	svd(Nt);
+	SVDecomposition<ET>	svd(Nt);
 	if (svd.diagonal()[2] < 0.0)
 	    throw std::domain_error("TU::MeasurementMatrix::projectiveToMetricWithCommonFocalLengthEstimation: cannot extract camera rotation due to nevative singular value!");
-	const Matrix<T>&	Rt = svd.Vt().trns() * svd.Ut();
-	T			p = Rt[0]*Nt[0] + Rt[1]*Nt[1], q = Rt[2]*Nt[2];
-	Vector<T>	t(3);
+	const Matrix<ET>&	Rt = svd.Vt().trns() * svd.Ut();
+	ET			p = Rt[0]*Nt[0] + Rt[1]*Nt[1], q = Rt[2]*Nt[2];
+	Vector<ET>	t(3);
 	t[0] = -P[3*i  ][3] / p;
 	t[1] = -P[3*i+1][3] / p;
 	t[2] = -P[3*i+2][3] / q;
@@ -818,21 +818,21 @@ MeasurementMatrix::projectiveToMetricWithCommonFocalLengthEstimation
   \return		特徴点の3次元位置を表す同次座標．
 */
 Matrix<double>
-MeasurementMatrix::reconstruction(const Matrix<T>& P, bool inhomogeneous) const
+MeasurementMatrix::reconstruction(const Matrix<ET>& P, bool inhomogeneous) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::reconstruction: Two or more frames required!!");
 
-    Matrix<T>	Xt(npoints(), 4);
+    Matrix<ET>	Xt(npoints(), 4);
     for (int j = 0; j < npoints(); ++j)
     {
-	Matrix<T>	Q(2*nframes(), 4);
+	Matrix<ET>	Q(2*nframes(), 4);
 	for (int i = 0; i < nframes(); ++i)
 	{
 	    Q[2*i  ] = P[3*i  ] - (*this)[j][3*i  ] * P[3*i+2];
 	    Q[2*i+1] = P[3*i+1] - (*this)[j][3*i+1] * P[3*i+2];
 	}
-	Vector<T>	evalue;
+	Vector<ET>	evalue;
 	Xt[j] = (Q.trns() * Q).eigen(evalue)[3];
 	if (inhomogeneous)
 	    Xt[j] /= Xt[j][3];
@@ -854,15 +854,15 @@ MeasurementMatrix::reconstruction(const Matrix<T>& P, bool inhomogeneous) const
   \return	特徴点像とエピポーラ線との距離の平均値．
  */
 double
-MeasurementMatrix::assessFundamental(const Matrix<T>& F,
+MeasurementMatrix::assessFundamental(const Matrix<ET>& F,
 				     u_int frame0, u_int frame1) const
 {
-    T	d_sum = 0.0;
+    ET	d_sum = 0.0;
     for (int j = 0; j < npoints(); ++j)
     {
-	const Vector<T>	&ldata = (*this)[j](3*frame0, 3),
+	const Vector<ET>	&ldata = (*this)[j](3*frame0, 3),
 				&rdata = (*this)[j](3*frame1, 3);
-	Vector<T>		l = F * ldata;
+	Vector<ET>		l = F * ldata;
 	d_sum += fabs(rdata * l) / l(0, 2).length();
 	l = rdata * F;
 	d_sum += fabs(l * ldata) / l(0, 2).length();
@@ -883,15 +883,15 @@ MeasurementMatrix::assessFundamental(const Matrix<T>& F,
   \return	変換した特徴点像と実際の特徴点像との距離の平均値．
  */
 double
-MeasurementMatrix::assessHomography(const Matrix<T>& H,
+MeasurementMatrix::assessHomography(const Matrix<ET>& H,
 				    u_int frame0, u_int frame1) const
 {
-    T	d_sum = 0.0;
+    ET	d_sum = 0.0;
     for (int j = 0; j < npoints(); ++j)
     {
-	const Vector<T>	&ldata = (*this)[j](3*frame0, 3),
+	const Vector<ET>	&ldata = (*this)[j](3*frame0, 3),
 				&rdata = (*this)[j](3*frame1, 3);
-	Vector<T>		r = H * ldata;
+	Vector<ET>		r = H * ldata;
 	r /= r[2];
 	d_sum += r.dist(rdata);
     }
@@ -908,20 +908,20 @@ MeasurementMatrix::assessHomography(const Matrix<T>& H,
   \return	特徴点像とエピポーラ線との距離の平均値．
  */
 double
-MeasurementMatrix::assessError(const Matrix<T>& P) const
+MeasurementMatrix::assessError(const Matrix<ET>& P) const
 {
     u_int	ncombinations = 0;
-    T		d_sum = 0.0;
+    ET		d_sum = 0.0;
     for (int i = 0; i < nframes(); ++i)
     {
-	const Matrix<T>&	Pi = P(3*i, 0, 3, 4);
+	const Matrix<ET>&	Pi = P(3*i, 0, 3, 4);
 	
 	for (int j = i+1; j < nframes(); ++j)
 	{
-	    const Matrix<T>&		Pj = P(3*j, 0, 3, 4);
-	    SVDecomposition<T>	svd(Pi);
-	    const Vector<T>&		c = svd.Ut()[3];
-	    const Matrix<T>&		F = (Pj * c).skew() * Pj * Pi.trns()
+	    const Matrix<ET>&		Pj = P(3*j, 0, 3, 4);
+	    SVDecomposition<ET>	svd(Pi);
+	    const Vector<ET>&		c = svd.Ut()[3];
+	    const Matrix<ET>&		F = (Pj * c).skew() * Pj * Pi.trns()
 					  * (Pi * Pi.trns()).inv();
 
 	    d_sum += assessFundamental(F, i, j);
@@ -950,7 +950,7 @@ MeasurementMatrix::get(std::istream& in, int j, u_int nfrms)
 	return in;
     }
     in.putback(c);
-    Vector<T> val;
+    Vector<ET> val;
     in >> val;
     get(in, j + 1, val.dim() / 2);
     for (int i = 0; i < nframes(); ++i)
@@ -970,29 +970,29 @@ MeasurementMatrix::initializeCalibrationWithPlanes
 	throw std::invalid_argument("TU::MeasurementMatrix::initializeCalibrationWithPlanes(): not enough frames!!");
 	
   // Compute homographies.
-    Array<Matrix<T> >	Ht(nframes()-1);
+    Array<Matrix<ET> >	Ht(nframes()-1);
     for (int i = 0; i < Ht.dim(); ++i)
 	Ht[i] = homography(0, i+1).trns();
     
   // Compute IAG(Image of Absolute Conic).
-    Matrix<T>	A(2*Ht.dim(), 6);
+    Matrix<ET>	A(2*Ht.dim(), 6);
     for (int i = 0; i < Ht.dim(); ++i)
     {
 	A[2*i  ] = extpro(Ht[i][0], Ht[i][0]) - extpro(Ht[i][1], Ht[i][1]);
 	A[2*i+1] = extpro(Ht[i][0], Ht[i][1]);
     }
-    Vector<T>		evalue;
-    const Matrix<T>&	evector = (A.trns() * A).eigen(evalue);
+    Vector<ET>		evalue;
+    const Matrix<ET>&	evector = (A.trns() * A).eigen(evalue);
 #ifdef DEBUG
     std::cerr << "TU::MeasurementMatrix::initializeCalibrationWithPlanes():: eigen values = "
 	      << evalue;
 #endif
-    Vector<T>		a;
+    Vector<ET>		a;
     if (Ht.dim() < 3)			// two reference planes.
 	a = evector[5][1] * evector[4] - evector[4][1] * evector[5];
     else
 	a = evector[5];
-    Matrix<T>	omega(3, 3);
+    Matrix<ET>	omega(3, 3);
     omega[0][0]		      = a[0];
     omega[0][1] = omega[1][0] = a[1];
     omega[0][2] = omega[2][0] = a[2];
@@ -1003,36 +1003,36 @@ MeasurementMatrix::initializeCalibrationWithPlanes
 	omega *= -1.0;
 
   // Extract intrinsic parameters from IAG.
-    const Matrix<T>	&Kinv = omega.cholesky(), &Ktinv = Kinv.trns();
+    const Matrix<ET>	&Kinv = omega.cholesky(), &Ktinv = Kinv.trns();
     cameras.resize(Ht.dim());
     for (int i = 0; i < cameras.dim(); ++i)
     {
-	const Matrix<T>&	tmp = Ht[i] * Ktinv;
-	SVDecomposition<T>	svd(tmp(0, 0, 2, 3));
-	Matrix<T>		R(3, 3);
+	const Matrix<ET>&	tmp = Ht[i] * Ktinv;
+	SVDecomposition<ET>	svd(tmp(0, 0, 2, 3));
+	Matrix<ET>		R(3, 3);
 	R(0, 0, 2, 3) = svd.Vt().trns() * svd.Ut()(0, 0, 2, 3);
 	R[2] = R[0] ^ R[1];
 	
-	const Vector<T>&	t = -2.0 / (svd[0] + svd[1]) * R * tmp[2];
+	const Vector<ET>&	t = -2.0 / (svd[0] + svd[1]) * R * tmp[2];
 
 	cameras[i].setRotation(R.trns()).setTranslation(t);
     }
 
-    Matrix<T>	K(Kinv.inv());
+    Matrix<ET>	K(Kinv.inv());
     K /= K[2][2];
 
     return K;
 }
 
 void
-MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<T>& P,
-						    Matrix<T>& Xt) const
+MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<ET>& P,
+						    Matrix<ET>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::initializeFocalLengthsEstimation: Two or more frames required!!");
     
   // Compute B = H * Ht.
-    Matrix<T>	Q(4*nframes(), 10);
+    Matrix<ET>	Q(4*nframes(), 10);
     for (int i = 0; i < nframes(); ++i)
     {
 	Q[4*i  ] = extpro(P[3*i  ], P[3*i  ])
@@ -1041,12 +1041,12 @@ MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<T>& P,
 	Q[4*i+2] = extpro(P[3*i  ], P[3*i+2]);		// ac
 	Q[4*i+3] = extpro(P[3*i+1], P[3*i+2]);		// bc
     }
-    Vector<T>		evalue;
-    const Vector<T>	b = (Q.trns()*Q).eigen(evalue)[9];
+    Vector<ET>		evalue;
+    const Vector<ET>	b = (Q.trns()*Q).eigen(evalue)[9];
 #ifdef DEBUG	// Check the order of magnitute of last two eigen values.
     std::cerr << "evalue of QQ = " << evalue;
 #endif
-    Matrix<T>	B(4, 4);
+    Matrix<ET>	B(4, 4);
     B[0][0]	      = b[0];
     B[0][1] = B[1][0] = b[1];
     B[0][2] = B[2][0] = b[2];
@@ -1059,7 +1059,7 @@ MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<T>& P,
     B[3][3]	      = b[9];
 
   // Factor B into H and Ht.
-    Matrix<T>	Ht = B.eigen(evalue);
+    Matrix<ET>	Ht = B.eigen(evalue);
     if (evalue[0] < 0.0)
 	evalue *= -1.0;
 #ifdef DEBUG	// First three eigen values should be positive.
@@ -1072,7 +1072,7 @@ MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<T>& P,
 	    throw std::domain_error("TU::MeasurementMatirix::initializeFocalLengtsEstimation: cannot decompose B into H and Ht due to nevative eigen value!");
 
   // Compute inverse of H.
-    Matrix<T>	Hinv(4, 4);
+    Matrix<ET>	Hinv(4, 4);
     (Hinv[0] = Ht[0]) /= evalue[0];
     (Hinv[1] = Ht[1]) /= evalue[1];
     (Hinv[2] = Ht[2]) /= evalue[2];
@@ -1115,11 +1115,11 @@ MeasurementMatrix::initializeFocalLengthsEstimation(Matrix<T>& P,
 Vector<double>
 MeasurementMatrix::CostH::operator ()(const AT& h) const
 {
-    Vector<T>	val(2 * npoints());
+    Vector<ET>	val(2 * npoints());
     for (int j = 0; j < npoints(); ++j)
     {
-	const Vector<T>&	x = _Wt[j](3*_frame0, 3);
-	T			w = h(6, 3) * x;
+	const Vector<ET>&	x = _Wt[j](3*_frame0, 3);
+	ET			w = h(6, 3) * x;
 	val[2*j  ] = h(0, 3) * x / w - _Wt[j][3*_frame1];
 	val[2*j+1] = h(3, 3) * x / w - _Wt[j][3*_frame1+1];
     }
@@ -1130,11 +1130,11 @@ MeasurementMatrix::CostH::operator ()(const AT& h) const
 Matrix<double>
 MeasurementMatrix::CostH::jacobian(const AT& h) const
 {
-    Matrix<T>	J(2 * npoints(), 9);
+    Matrix<ET>	J(2 * npoints(), 9);
     for (int j = 0; j < npoints(); ++j)
     {
-	const Vector<T>&	x = _Wt[j](3*_frame0, 3);
-	T			w = h(6, 3) * x;
+	const Vector<ET>&	x = _Wt[j](3*_frame0, 3);
+	ET			w = h(6, 3) * x;
 	J[2*j](0, 3) = J[2*j](6, 3) = J[2*j+1](3, 3) = J[2*j+1](6, 3) = x;
 	(J[2*j  ](6, 3) *= (h(0, 3) * x)) /= -w;
 	(J[2*j+1](6, 3) *= (h(3, 3) * x)) /= -w;
@@ -1145,16 +1145,16 @@ MeasurementMatrix::CostH::jacobian(const AT& h) const
 }
 
 void
-MeasurementMatrix::CostH::update(AT& h, const Vector<T>& dh) const
+MeasurementMatrix::CostH::update(AT& h, const Vector<ET>& dh) const
 {
-    T	l = h.length();
+    ET	l = h.length();
     (h -= dh).normalize() *= l;
 }
 
 /************************************************************************
 *  class MeasurementMatrix::CostPF					*
 ************************************************************************/
-MeasurementMatrix::CostPF::CostPF(const Matrix<double>& Wt0, u_int niter_max)
+MeasurementMatrix::CostPF::CostPF(const Matrix<ET>& Wt0, u_int niter_max)
     :_niter_max(niter_max), _Wt0(Wt0), _s(), _Ut(), _Vt()
 {
 }
@@ -1175,15 +1175,15 @@ MeasurementMatrix::CostPF::point_index(u_int p) const
  *  Value of the cost function: J = \sum_{n=4}^N \sigma^2
  */
 double
-MeasurementMatrix::CostPF::operator ()(const Vector<double>& mu)
+MeasurementMatrix::CostPF::operator ()(const Vector<ET>& mu)
 {
   /* Compute projective measurement matrix. */
-    Matrix<double>	Wt(_Wt0);
+    Matrix<ET>	Wt(_Wt0);
     for (int p = 0; p < mu.dim(); ++p)
 	Wt[point_index(p)](3*frame_index(p), 3) *= mu[p];
 
   /* Decompose it by using SVD. */
-    SVDecomposition<double>	svd(Wt.trns());
+    SVDecomposition<ET>	svd(Wt.trns());
     _s  = svd.diagonal()(0, N());
     _Ut = svd.Ut();
     _Vt = svd.Vt();
@@ -1198,7 +1198,7 @@ MeasurementMatrix::CostPF::operator ()(const Vector<double>& mu)
 Matrix<double>
 MeasurementMatrix::CostPF::S(int m) const
 {
-    Matrix<double>	Sm(_Vt.nrow(), (nframes()-1)*(npoints()-1));
+    Matrix<ET>	Sm(_Vt.nrow(), (nframes()-1)*(npoints()-1));
     
     for (int p = 0; p < Sm.ncol(); ++p)
     {
@@ -1216,7 +1216,7 @@ MeasurementMatrix::CostPF::S(int m) const
 Matrix<double>
 MeasurementMatrix::CostPF::T(int m) const
 {
-    Matrix<double>	Tm(_Ut.nrow(), (nframes()-1)*(npoints()-1));
+    Matrix<ET>	Tm(_Ut.nrow(), (nframes()-1)*(npoints()-1));
 
     for (int p = 0; p < Tm.ncol(); ++p)
     {
@@ -1228,9 +1228,9 @@ MeasurementMatrix::CostPF::T(int m) const
 }
 
 double
-MeasurementMatrix::CostPF::minimize(Vector<double>& mu)
+MeasurementMatrix::CostPF::minimize(Vector<ET>& mu)
 {
-    double	val = (*this)(mu);
+    ET	val = (*this)(mu);
     
     for (int iter = 0; iter < _niter_max; ++iter)
     {
@@ -1238,8 +1238,8 @@ MeasurementMatrix::CostPF::minimize(Vector<double>& mu)
       //      	std::cerr << "    sigma = " << _s;
 	
       /* Make a gradient vector and a Hessian matrix. */
-	Vector<double>	grad(mu.dim());
-	Matrix<double>	H(mu.dim(), mu.dim()), dH(mu.dim(), mu.dim());
+	Vector<ET>	grad(mu.dim());
+	Matrix<ET>	H(mu.dim(), mu.dim()), dH(mu.dim(), mu.dim());
 	
 	for (int p = 0; p < H.nrow(); ++p)
 	{
@@ -1249,13 +1249,13 @@ MeasurementMatrix::CostPF::minimize(Vector<double>& mu)
 	
 	for (int m = 0; m < 4; ++m)	// for first four sigular values...
 	{
-	    const Matrix<double>	&Sm = S(m), &Tm = T(m);
+	    const Matrix<ET>	&Sm = S(m), &Tm = T(m);
 	    
 	    for (int p = 0; p < H.nrow(); ++p)
 	    {
 		for (int q = 0; q <= p; ++q)
 		{
-		    double	ddsigma = 0.0;	// 2nd derivative of S-value
+		    ET	ddsigma = 0.0;	// 2nd derivative of S-value
 		    for (int n = 0; n < N(); ++n)
 			if (n != m)
 			    ddsigma += ((_s[m] * (Sm[n][p] * Sm[n][q] +
@@ -1279,8 +1279,8 @@ MeasurementMatrix::CostPF::minimize(Vector<double>& mu)
 	dH.symmetrize();
 
       /* Update projective depths: mu */
-	Vector<double>	dmu = grad;
-	double			val_next = (*this)(mu - dmu.solve(H+dH));
+	Vector<ET>	dmu = grad;
+	ET		val_next = (*this)(mu - dmu.solve(H+dH));
 	if (val_next > val)
 	{
 	    dmu = grad;
@@ -1300,8 +1300,7 @@ MeasurementMatrix::CostPF::minimize(Vector<double>& mu)
 }
 
 void
-MeasurementMatrix::CostPF::print(int i, double val,
-				 const Vector<double>& mu) const
+MeasurementMatrix::CostPF::print(int i, ET val, const Vector<ET>& mu) const
 {
 #ifdef DEBUG
     std::cerr << std::setw(3) << i << ": (" << val << ')' << mu;
@@ -1316,7 +1315,7 @@ MeasurementMatrix::CostPF::print(int i, double val,
 Vector<double>
 MeasurementMatrix::CostPM::operator ()(const AT& p) const
 {
-    Vector<T>	q(4);
+    Vector<ET>	q(4);
     q(0, 3) = p;
     q[3] = p * p;
 
@@ -1326,7 +1325,7 @@ MeasurementMatrix::CostPM::operator ()(const AT& p) const
 Matrix<double>
 MeasurementMatrix::CostPM::jacobian(const AT& p) const
 {
-    Matrix<T>	J;
+    Matrix<ET>	J;
     J = _AA(0, 0, _AA.nrow(), 3);
     for (int i = 0; i < J.nrow(); ++i)
 	J[i] += (2.0 * _AA[i][3] * p);
@@ -1342,12 +1341,12 @@ MeasurementMatrix::CostCP::operator ()(const ATA& K,
 				       const ATB& camera, int i) const
 {
   // Compute errors for all points.
-    Vector<T>	val(2 * npoints());
+    Vector<ET>	val(2 * npoints());
     for (int j = 0; j < npoints(); ++j)
     {
-	Vector<T>	X(3);
+	Vector<ET>	X(3);
 	X(0, 2) = _Wt[j](0, 2);		// 3D reference points (X[2] = 0.0)
-      	const Point2<T>&	u = K(camera.xc(X));
+      	const Point2<ET>&	u = K(camera.xc(X));
 	val[2*j]   = u[0] - _Wt[j][3*(i+1)];
 	val[2*j+1] = u[1] - _Wt[j][3*(i+1)+1];
     }
@@ -1359,10 +1358,10 @@ Matrix<double>
 MeasurementMatrix::CostCP::jacobianA(const ATA& K,
 				     const ATB& camera, int i) const
 {
-    Matrix<T>		J(2 * npoints(), adim());
+    Matrix<ET>		J(2 * npoints(), adim());
     for (int j = 0; j < npoints(); ++j)
     {
-	Vector<T>	X(3);
+	Vector<ET>	X(3);
 	X(0, 2) = _Wt[j](0, 2);		// 3D reference points (X[2] = 0.0)
 	J(2*j, 0, 2, J.ncol()) = K.jacobianK(camera.xc(X));
     }
@@ -1374,10 +1373,10 @@ Matrix<double>
 MeasurementMatrix::CostCP::jacobianB(const ATA& K,
 				     const ATB& camera, int i) const
 {
-    Matrix<T>	KK(2 * npoints(), 6);
+    Matrix<ET>	KK(2 * npoints(), 6);
     for (int j = 0; j < npoints(); ++j)
     {
-	Vector<T>	X(3);
+	Vector<ET>	X(3);
 	X(0, 2) = _Wt[j](0, 2);		// 3D reference points (X[2] = 0.0)
 	KK(2*j, 0, 2, KK.ncol())
 	    = K.jacobianXC(camera.xc(X)) * camera.jacobianPc(X);
@@ -1387,14 +1386,14 @@ MeasurementMatrix::CostCP::jacobianB(const ATA& K,
 }
 
 void
-MeasurementMatrix::CostCP::updateA(ATA& K, const Vector<T>& dK) const
+MeasurementMatrix::CostCP::updateA(ATA& K, const Vector<ET>& dK) const
 {
     K.update(dK);
 }
 
 void
 MeasurementMatrix::CostCP::updateB(ATB& camera,
-				   const Vector<T>& dcamera) const
+				   const Vector<ET>& dcamera) const
 {
     camera.update(dcamera);
 }
@@ -1414,22 +1413,22 @@ MeasurementMatrix::calibrateWithPlanes<CameraWithDistortion::Intrinsic>
 
 template void
 MeasurementMatrix::bundleAdjustment(Array<CanonicalCamera>& cameras,
-				    Matrix<T>& Xt) const;
+				    Matrix<ET>& Xt) const;
 template void
 MeasurementMatrix::bundleAdjustment(Array<CameraWithFocalLength>& cameras,
-				    Matrix<T>& Xt) const;
+				    Matrix<ET>& Xt) const;
 
 template void
 MeasurementMatrix::bundleAdjustment(CameraWithFocalLength::Intrinsic& K,
 				    Array<CanonicalCamera>&,
-				    Matrix<T>& Xt) const;
+				    Matrix<ET>& Xt) const;
 
 template void
 MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
-    (Array<CanonicalCamera>& cameras, Matrix<double>& Xt) const;
+    (Array<CanonicalCamera>& cameras, Matrix<ET>& Xt) const;
 template void
 MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
-    (Array<CameraWithFocalLength>& cameras, Matrix<double>& Xt) const;
+    (Array<CameraWithFocalLength>& cameras, Matrix<ET>& Xt) const;
 }
 
 #endif

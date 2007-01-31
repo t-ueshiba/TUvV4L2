@@ -1,5 +1,5 @@
 /*
- *  $Id: IIRFilter.cc,v 1.5 2007-01-22 01:57:04 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.6 2007-01-31 05:42:20 ueshiba Exp $
  */
 #include <math.h>
 #include "TU/Image++.h"
@@ -92,8 +92,8 @@ GaussianConvolver::Params::operator -=(const Vector<double>& p)
 Vector<double>
 GaussianConvolver::EvenConstraint::operator ()(const AT& params) const
 {
-    Vector<T>	val(1);
-    const T	as0 = params[0].alpha/_sigma, ts0 = params[0].theta/_sigma,
+    Vector<ET>	val(1);
+    const ET	as0 = params[0].alpha/_sigma, ts0 = params[0].theta/_sigma,
 		as1 = params[1].alpha/_sigma, ts1 = params[1].theta/_sigma;
     val[0] = (params[0].a*sinh(as0) + params[0].b* sin(ts0)) *
 	     (cosh(as1) - cos(ts1))
@@ -106,12 +106,12 @@ GaussianConvolver::EvenConstraint::operator ()(const AT& params) const
 Matrix<double>
 GaussianConvolver::EvenConstraint::jacobian(const AT& params) const
 {
-    T	c0  = cos(params[0].theta/_sigma),  s0  = sin(params[0].theta/_sigma),
+    ET	c0  = cos(params[0].theta/_sigma),  s0  = sin(params[0].theta/_sigma),
 	ch0 = cosh(params[0].alpha/_sigma), sh0 = sinh(params[0].alpha/_sigma),
 	c1  = cos(params[1].theta/_sigma),  s1  = sin(params[1].theta/_sigma),
 	ch1 = cosh(params[1].alpha/_sigma), sh1 = sinh(params[1].alpha/_sigma);
 	
-    Matrix<T>	val(1, 8);
+    Matrix<ET>	val(1, 8);
     val[0][0] = sh0*(ch1 - c1);
     val[0][1] = s0 *(ch1 - c1);
     val[0][2] = (params[0].b*c0 *(ch1 - c1) +
@@ -134,10 +134,10 @@ GaussianConvolver::EvenConstraint::jacobian(const AT& params) const
 Vector<double>
 GaussianConvolver::CostFunction::operator ()(const AT& params) const
 {
-    Vector<T>	val(_ndivisions+1);
+    Vector<ET>	val(_ndivisions+1);
     for (int k = 0; k < val.dim(); ++k)
     {
-	T	f = 0.0, x = k*_range/_ndivisions;
+	ET	f = 0.0, x = k*_range/_ndivisions;
 	for (int i = 0; i < params.dim(); ++i)
 	{
 	    const Params&	p = params[i];
@@ -152,16 +152,16 @@ GaussianConvolver::CostFunction::operator ()(const AT& params) const
 Matrix<double>
 GaussianConvolver::CostFunction::jacobian(const AT& params) const
 {
-    Matrix<T>	val(_ndivisions+1, 4*params.dim());
+    Matrix<ET>	val(_ndivisions+1, 4*params.dim());
     for (int k = 0; k < val.nrow(); ++k)
     {
-	Vector<T>&	row = val[k];
-	T		x = k*_range/_ndivisions;
+	Vector<ET>&	row = val[k];
+	ET		x = k*_range/_ndivisions;
 	
 	for (int i = 0; i < params.dim(); ++i)
 	{
 	    const Params&	p = params[i];
-	    const T		c = cos(x*p.theta), s = sin(x*p.theta),
+	    const ET		c = cos(x*p.theta), s = sin(x*p.theta),
 				e = exp(-x*p.alpha);
 	    row[4*i]   = c * e;
 	    row[4*i+1] = s * e;
@@ -174,7 +174,7 @@ GaussianConvolver::CostFunction::jacobian(const AT& params) const
 }
 
 void
-GaussianConvolver::CostFunction::update(AT& params, const Vector<T>& dp) const
+GaussianConvolver::CostFunction::update(AT& params, const Vector<ET>& dp) const
 {
     for (int i = 0; i < params.dim(); ++i)
 	params[i] -= dp(4*i, 4);

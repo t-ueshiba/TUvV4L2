@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.9 2004-03-08 02:06:19 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.10 2007-01-31 05:42:44 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
@@ -117,10 +117,10 @@ Normalization::dim() const
 class MeasurementMatrix : public Matrix<double>
 {
   public:
-    typedef double	T;			//!< ベクトル, 行列の要素の型
+    typedef double	ET;		//!< ベクトル, 行列の要素の型
 
   //! 観測行列を\f$0\times 0\f$行列(フレーム数と特徴点数が共に0)として初期化．
-    MeasurementMatrix()	:Matrix<T>()			{}
+    MeasurementMatrix()	:Matrix<ET>()			{}
     MeasurementMatrix(const MeasurementMatrix& Wt,
 		      const Array<u_int>&      index)	;
 
@@ -128,7 +128,7 @@ class MeasurementMatrix : public Matrix<double>
   /*!
     \return	フレーム数(観測行列の列数の1/3)．
   */
-    u_int	nframes()			const	{return ncol()/3;}
+    u_int		nframes()		const	{return ncol()/3;}
 
   //! 観測行列に含まれる特徴点数を返す．
   /*!
@@ -136,103 +136,80 @@ class MeasurementMatrix : public Matrix<double>
   */
     u_int		npoints()		const	{return nrow();}
 
-    Vector<T>		centroid()		const	;
-    const Matrix<T>	frame(u_int i)		const	;
-    Matrix<T>		frame(u_int i)			;
+    Vector<ET>		centroid()		const	;
+    const Matrix<ET>	frame(u_int i)		const	;
+    Matrix<ET>		frame(u_int i)			;
 
     
-    Matrix<T>	affineFundamental(u_int frame0=0, u_int frame1=1) const	;
-    Matrix<T>	fundamental(u_int frame0=0, u_int frame1=1)	const	;
-    Matrix<T>	affinity(u_int frame0=0, u_int frame1=1)	const	;
-    Matrix<T>	homography(u_int frame0=0, u_int frame1=1,
+    Matrix<ET>	affineFundamental(u_int frame0=0, u_int frame1=1) const	;
+    Matrix<ET>	fundamental(u_int frame0=0, u_int frame1=1)	const	;
+    Matrix<ET>	affinity(u_int frame0=0, u_int frame1=1)	const	;
+    Matrix<ET>	homography(u_int frame0=0, u_int frame1=1,
 			   bool doRefinement=true)		const	;
-    Matrix<T>	rotation(u_int frame0=0, u_int frame1=1)	const	;
+    Matrix<ET>	rotation(u_int frame0=0, u_int frame1=1)	const	;
 
     template <class INTRINSIC> INTRINSIC
 		calibrateWithPlanes(Array<CanonicalCamera>& cameras,
 				    bool doRefinement=true)	const	;
-    void	affineFactorization(Matrix<T>& P,
-				    Matrix<T>& Xt)		const	;
-    static void	affineToMetric(Matrix<T>& P,
-			       Matrix<T>& Xt)				;
-    void	projectiveFactorization(Matrix<T>& P,
-					Matrix<T>& Xt)		const	;
-    void	projectiveToMetric(Matrix<T>& P,
-				   Matrix<T>& Xt)		const	;
+    void	affineFactorization(Matrix<ET>& P,
+				    Matrix<ET>& Xt)		const	;
+    static void	affineToMetric(Matrix<ET>& P,
+			       Matrix<ET>& Xt)				;
+    void	projectiveFactorization(Matrix<ET>& P,
+					Matrix<ET>& Xt)		const	;
+    void	projectiveToMetric(Matrix<ET>& P,
+				   Matrix<ET>& Xt)		const	;
     void	projectiveToMetricWithFocalLengthsEstimation
-		    (Matrix<T>& P, Matrix<T>& Xt)		const	;
+		    (Matrix<ET>& P, Matrix<ET>& Xt)		const	;
     void	projectiveToMetricWithCommonFocalLengthEstimation
-		    (Matrix<T>& P, Matrix<T>& Xt)		const	;
+		    (Matrix<ET>& P, Matrix<ET>& Xt)		const	;
 
     template <class INTRINSIC>
     void	refineCalibrationWithPlanes
 				(INTRINSIC& K,
-				 Array<CanonicalCamera>& cameras)
-								const	;
+				 Array<CanonicalCamera>& cameras) const	;
     template <class CAMERA>
     void	bundleAdjustment(Array<CAMERA>& cameras,
-				 Matrix<T>& Xt)			const	;
+				 Matrix<ET>& Xt)		  const	;
     template <class INTRINSIC>
     void	bundleAdjustment(INTRINSIC& K,
 				 Array<CanonicalCamera>& cameras,
-				 Matrix<T>& Xt)			const	;
+				 Matrix<ET>& Xt)		  const	;
     template <class CAMERA>
     void	bundleAdjustmentWithFixedCameraCenters
 				(Array<CAMERA>& cameras,
-				 Matrix<T>& Xt)			const	;
-    Matrix<T>	reconstruction(const Matrix<T>& P,
-			       bool inhomogeneous=false)	const	;
-    T		assessFundamental(const Matrix<T>& F,
+				 Matrix<ET>& Xt)		  const	;
+    Matrix<ET>	reconstruction(const Matrix<ET>& P,
+			       bool inhomogeneous=false)	  const	;
+    ET		assessFundamental(const Matrix<ET>& F,
 				  u_int frame0=0, u_int frame1=1) const	;
-    T		assessHomography(const Matrix<T>& H,
+    ET		assessHomography(const Matrix<ET>& H,
 				 u_int frame0=0, u_int frame1=1)  const	;
-    T		assessError(const Matrix<T>& P)			  const	;
+    ET		assessError(const Matrix<ET>& P)		  const	;
     
     friend std::istream&
 		operator >>(std::istream& in, MeasurementMatrix& Wt)	;
 
   private:
     std::istream&	get(std::istream& in, int j, u_int nfrms)	;
-    Matrix<T>	initializeCalibrationWithPlanes
-			    (Array<CanonicalCamera>& cameras)	const	;
-    void	initializeFocalLengthsEstimation(Matrix<T>& P,
-						 Matrix<T>& Xt) const	;
+    Matrix<ET>	initializeCalibrationWithPlanes
+			    (Array<CanonicalCamera>& cameras)	  const	;
+    void	initializeFocalLengthsEstimation(Matrix<ET>& P,
+						 Matrix<ET>& Xt)  const	;
 
     class CostH		// cost function for homography estimation.
     {
       public:
-	typedef double		T;
-	typedef Vector<T>	AT;
+      	typedef double		ET;
+	typedef Vector<ET>	AT;
 
-	class CostCN	// cost function for keeping norm of H constant.
-	{
-	  public:
-	    CostCN(const AT& h)	:_sqr(h.square())			{}
-
-	    Vector<T>	operator ()(const AT& h) const
-			{
-			    Vector<T>	val(1);
-			    val[0] = h.square() - _sqr;
-			    return val;
-			}
-	    Matrix<T>	jacobian(const AT& h) const
-			{
-			    Matrix<T>	L(1, h.dim());
-			    (L[0] = h) *= 2.0;
-			    return L;
-			}
-	
-	  private:
-	    const T	_sqr;
-	};
-	
       public:
 	CostH(const MeasurementMatrix& Wt, u_int frame0, u_int frame1)
 	    :_Wt(Wt), _frame0(frame0), _frame1(frame1)			{}
 
-	Vector<T>	operator ()(const AT& h)		const	;
-	Matrix<T>	jacobian(const AT& h)			const	;
-	void		update(AT& h, const Vector<T>& dh)	const	;
+	Vector<ET>	operator ()(const AT& h)		const	;
+	Matrix<ET>	jacobian(const AT& h)			const	;
+	void		update(AT& h, const Vector<ET>& dh)	const	;
 	u_int		npoints()		const	{return _Wt.npoints();}
 	
       private:
@@ -246,74 +223,75 @@ class MeasurementMatrix : public Matrix<double>
 	enum		{DEFAULT_NITER_MAX = 50};
     
       public:
-	CostPF(const Matrix<double>& Wt0, u_int niter_max=DEFAULT_NITER_MAX);
+	CostPF(const Matrix<ET>& Wt0, u_int niter_max=DEFAULT_NITER_MAX);
     
-	double			minimize(Vector<double>& mu)		;
+	ET			minimize(Vector<ET>& mu)		;
     
 	u_int			nframes()	const	{return _Wt0.ncol()/3;}
 	u_int			npoints()	const	{return _Wt0.nrow();}
 	u_int			N()		const	{return _Wt0.ncol();}
-	const Vector<double>&	s()		const	{return _s;}
-	const Matrix<double>&	Ut()		const	{return _Ut;}
-	const Matrix<double>&	Vt()		const	{return _Vt;}
+	const Vector<ET>&	s()		const	{return _s;}
+	const Matrix<ET>&	Ut()		const	{return _Ut;}
+	const Matrix<ET>&	Vt()		const	{return _Vt;}
     
       private:
 	int			frame_index(u_int p)		const	;
 	int			point_index(u_int p)		const	;
-	double			operator ()(const Vector<double>& mu)	;
-	Matrix<double>		S(int m)			const	;
-	Matrix<double>		T(int m)			const	;
-	void			update(const Vector<double>& mu)	;
-	void			print(int i, double val,
-				      const Vector<double>& mu) const	;
+	ET			operator ()(const Vector<ET>& mu)	;
+	Matrix<ET>		S(int m)			const	;
+	Matrix<ET>		T(int m)			const	;
+	void			update(const Vector<ET>& mu)		;
+	void			print(int i, ET val,
+				      const Vector<ET>& mu)	const	;
     
 	const u_int		_niter_max;
-	const Matrix<double>&	_Wt0;	// initial measurement matrix: W
-	Vector<double>		_s;	// singular values of W
-	Matrix<double>		_Ut;	// right basis of SVD
-	Matrix<double>		_Vt;	// left basis of SVD
+	const Matrix<ET>&	_Wt0;	// initial measurement matrix: W
+	Vector<ET>		_s;	// singular values of W
+	Matrix<ET>		_Ut;	// right basis of SVD
+	Matrix<ET>		_Vt;	// left basis of SVD
     };
 
     class CostPM	// cost function for projective to metric conversion.
     {
       public:
-      	typedef double		T;
-	typedef Vector<T>	AT;
+      	typedef double		ET;
+	typedef Vector<ET>	AT;
 
-	CostPM(const Matrix<T>& A, const Vector<T>& b) :_AA(A), _b(b) {}
+      public:
+	CostPM(const Matrix<ET>& A, const Vector<ET>& b) :_AA(A), _b(b) {}
 	
-	Vector<T>	operator ()(const AT& p)	const	;
-	Matrix<T>	jacobian(const AT& p)		const	;
+	Vector<ET>	operator ()(const AT& p)	const	;
+	Matrix<ET>	jacobian(const AT& p)		const	;
 	void		update(AT& p,
-			       const Vector<T>& dp)	const	{p -= dp;}
+			       const Vector<ET>& dp)	const	{p -= dp;}
 
       private:
-	const Matrix<T>&	_AA;
-	const Vector<T>&	_b;
+	const Matrix<ET>&	_AA;
+	const Vector<ET>&	_b;
     };
 
     class CostCP	// cost function for refining calibration
     {			//   using multiple planar patterns.
       public:
-	typedef double			T;
+      	typedef double			ET;
 	typedef CameraBase::Intrinsic	ATA;
 	typedef CanonicalCamera		ATB;
-	typedef Matrix<T>		JT;
+	typedef Matrix<ET>		JT;
 
       public:
 	CostCP(const MeasurementMatrix& Wt, u_int adim)
 	    :_Wt(Wt), _adim(adim)					{}
 
-	Vector<T>	operator ()(const ATA& K,
+	Vector<ET>	operator ()(const ATA& K,
 				    const ATB& camera, int i)	const	;
 	JT		jacobianA(const ATA& K,
 				  const ATB& camera, int i)	const	;
-	Matrix<T>	jacobianB(const ATA& K,
+	Matrix<ET>	jacobianB(const ATA& K,
 				  const ATB& camera, int i)	const	;
 	void		updateA(ATA& K,
-				const Vector<T>& dK)		const	;
+				const Vector<ET>& dK)		const	;
 	void		updateB(ATB& camera,
-				const Vector<T>& dcamera)	const	;
+				const Vector<ET>& dcamera)	const	;
 
 	u_int		npoints()	const	{return _Wt.npoints();}
 	u_int		adim()		const	{return _adim;}
@@ -328,25 +306,25 @@ class MeasurementMatrix : public Matrix<double>
     class CostBA	// cost function for bundle adjustment.
     {
       public:
-	typedef double			T;
+      	typedef double			ET;
 	typedef Array<CAMERA>		ATA;
-	typedef Vector<T>		ATB;
-	typedef BlockMatrix<T>		JT;
+	typedef Vector<ET>		ATB;
+	typedef BlockMatrix<ET>		JT;
 
 	class CostCD	// cost function for keeping distance between 0th
 	{		//   and 1st cameras constant.
 	  public:
 	    CostCD(const ATA& p)  :_sqdist01(p[0].t().sqdist(p[1].t()))	{}
 	
-	    Vector<T>	operator ()(const ATA& p) const
+	    Vector<ET>	operator ()(const ATA& p) const
 			{
-			    Vector<T>	val(1);
+			    Vector<ET>	val(1);
 			    val[0] = p[0].t().sqdist(p[1].t()) - _sqdist01;
 			    return val;
 			}
-	    Matrix<T>	jacobian(const ATA& p) const
+	    Matrix<ET>	jacobian(const ATA& p) const
 			{
-			    Matrix<T>	L(1, p[0].dofIntrinsic() +
+			    Matrix<ET>	L(1, p[0].dofIntrinsic() +
 					  (6+p[0].dofIntrinsic())*(p.dim()-1));
 			    (L[0](p[0].dofIntrinsic(), 3) = p[1].t()-p[0].t())
 				*= 2.0;
@@ -354,21 +332,21 @@ class MeasurementMatrix : public Matrix<double>
 			}
 
 	  private:
-	    const T	_sqdist01;
+	    const ET	_sqdist01;
 	};
 
       public:
 	CostBA(const MeasurementMatrix& Wt,
 	       u_int dofIntrinsic, bool fixCameraCenter=false)		;
 
-	Vector<T>	operator ()(const ATA& p,
+	Vector<ET>	operator ()(const ATA& p,
 				    const ATB& x, int j)	const	;
 	JT		jacobianA(const ATA& p,
 				  const ATB& x, int j)		const	;
-	Matrix<T>	jacobianB(const ATA& p,
+	Matrix<ET>	jacobianB(const ATA& p,
 				  const ATB& x, int j)		const	;
-	void		updateA(ATA& p,	const Vector<T>& dp)	const	;
-	void		updateB(ATB& x, const Vector<T>& dx)	const	;
+	void		updateA(ATA& p,	const Vector<ET>& dp)	const	;
+	void		updateB(ATB& x, const Vector<ET>& dx)	const	;
 
 	u_int			nframes()	const	{return _Wt.nframes();}
 	u_int			adim()		const	{return _adim;}
@@ -385,7 +363,8 @@ class MeasurementMatrix : public Matrix<double>
     class CostBACI	// cost function for bundle adjustment
     {			//   with common intrinsic parameters estimation.
       public:
-	typedef double			T;
+      	typedef double			ET;
+
 	struct ATA : public Array<CanonicalCamera>
 	{
 	    ATA(const INTRINSIC& KK,
@@ -394,43 +373,43 @@ class MeasurementMatrix : public Matrix<double>
 	    
 	    INTRINSIC			K;	// common intrinsic parameters.
 	};
-	typedef Vector<T>		ATB;
-	typedef Matrix<T>		JT;
+	typedef Vector<ET>		ATB;
+	typedef Matrix<ET>		JT;
     
 	class CostCD	// cost function for keeping distance between 0th
 	{		//   and 1st cameras constant.
 	  public:
 	    CostCD(const ATA& p) :_sqdist01(p[0].t().sqdist(p[1].t()))	{}
 	
-	    Vector<T>	operator ()(const ATA& p) const
+	    Vector<ET>	operator ()(const ATA& p) const
 			{
-			    Vector<T>	val(1);
+			    Vector<ET>	val(1);
 			    val[0] = p[0].t().sqdist(p[1].t()) - _sqdist01;
 			    return val;
 			}
-	    Matrix<T>	jacobian(const ATA& p) const
+	    Matrix<ET>	jacobian(const ATA& p) const
 			{
-			    Matrix<T>	L(1, p.K.dof() + 6*(p.dim()-1));
+			    Matrix<ET>	L(1, p.K.dof() + 6*(p.dim()-1));
 			    (L[0](p.K.dof(), 3) = (p[1].t()-p[0].t()))
 				*= 2.0;
 			    return L;
 			}
 
 	  private:
-	    const T	_sqdist01;
+	    const ET	_sqdist01;
 	};
 
       public:
 	CostBACI(const MeasurementMatrix& Wt)	:_Wt(Wt)		{}
 
-	Vector<T>	operator ()(const ATA& p,
+	Vector<ET>	operator ()(const ATA& p,
 				    const ATB& x, int j)	const	;
-	Matrix<T>	jacobianA(const ATA& p,
+	Matrix<ET>	jacobianA(const ATA& p,
 				  const ATB& x, int j)		const	;
-	Matrix<T>	jacobianB(const ATA& p,
+	Matrix<ET>	jacobianB(const ATA& p,
 				  const ATB& x, int j)		const	;
-	void		updateA(ATA& p, const Vector<T>& dp)	const	;
-	void		updateB(ATB& x, const Vector<T>& dx)	const	;
+	void		updateA(ATA& p, const Vector<ET>& dp)	const	;
+	void		updateB(ATB& x, const Vector<ET>& dx)	const	;
 
 	u_int		nframes()	const	{return _Wt.nframes();}
 	u_int		adim()		const	{return 1 + 6*(nframes() - 1);}

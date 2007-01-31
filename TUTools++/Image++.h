@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.20 2007-01-29 03:31:11 ueshiba Exp $
+ *  $Id: Image++.h,v 1.21 2007-01-31 05:42:20 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -991,36 +991,36 @@ class GaussianConvolver : private BilateralIIRFilter2<4u>
     class EvenConstraint
     {
       public:
-	typedef double		T;
+	typedef double		ET;
 	typedef Array<Params>	AT;
 
-	EvenConstraint(T sigma) :_sigma(sigma)				{}
+	EvenConstraint(ET sigma) :_sigma(sigma)				{}
 	
-	Vector<T>	operator ()(const AT& params)		const	;
-	Matrix<T>	jacobian(const AT& params)		const	;
+	Vector<ET>	operator ()(const AT& params)		const	;
+	Matrix<ET>	jacobian(const AT& params)		const	;
 
       private:
-	T		_sigma;
+	ET		_sigma;
     };
 
     class CostFunction
     {
       public:
-	typedef double		T;
+	typedef double		ET;
 	typedef Array<Params>	AT;
     
 	enum			{D = 2};
 
-	CostFunction(int ndivisions, T range)
+	CostFunction(int ndivisions, ET range)
 	    :_ndivisions(ndivisions), _range(range)			{}
     
-	Vector<T>	operator ()(const AT& params)		const	;
-	Matrix<T>	jacobian(const AT& params)		const	;
-	void		update(AT& params, const Vector<T>& dp)	const	;
+	Vector<ET>	operator ()(const AT& params)		 const	;
+	Matrix<ET>	jacobian(const AT& params)		 const	;
+	void		update(AT& params, const Vector<ET>& dp) const	;
 
       private:
 	const int	_ndivisions;
-	const T		_range;
+	const ET	_range;
     };
 
   public:

@@ -1,5 +1,5 @@
 /*
- *  $Id: Calib++.cc,v 1.2 2003-07-09 11:33:37 ueshiba Exp $
+ *  $Id: Calib++.cc,v 1.3 2007-01-31 05:42:44 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 
@@ -58,8 +58,8 @@ MeasurementMatrix::refineCalibrationWithPlanes
     if (nframes() < 3)
 	throw std::invalid_argument("TU::MeasurementMatrix::refineCalibrationWithPlanes: Two or more frames required!!");
 
-    CostCP				err(*this, K.dof());
-    NullConstraint<T, CostCP::ATA>	g;
+    CostCP		err(*this, K.dof());
+    NullConstraint<ET>	g;
 
     minimizeSquareSparse(err, g, K, cameras, 200);
 }
@@ -73,14 +73,14 @@ MeasurementMatrix::refineCalibrationWithPlanes
 */
 template <class CAMERA> void
 MeasurementMatrix::bundleAdjustment(Array<CAMERA>& cameras,
-				    Matrix<T>& Xt) const
+				    Matrix<ET>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment: Two or more frames required!!");
 
     CostBA<CAMERA>			err(*this, cameras[0].dofIntrinsic());
     typename CostBA<CAMERA>::CostCD	g(cameras);
-    Matrix<T>				shape(Xt, 0, 0, Xt.nrow(), 3);
+    Matrix<ET>				shape(Xt, 0, 0, Xt.nrow(), 3);
 
     minimizeSquareSparse(err, g, cameras, shape, 200);
 }
@@ -96,8 +96,8 @@ MeasurementMatrix::bundleAdjustment(Array<CAMERA>& cameras,
 */
 template <class INTRINSIC> void
 MeasurementMatrix::bundleAdjustment(INTRINSIC& K,
-				      Array<CanonicalCamera>& cameras,
-				      Matrix<T>&		  Xt) const
+				    Array<CanonicalCamera>& cameras,
+				    Matrix<ET>& Xt) const
 {
     if (nframes() < 2)
 	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustment (with common intrinsic parameters estimation): Two or more frames required!!");
@@ -105,7 +105,7 @@ MeasurementMatrix::bundleAdjustment(INTRINSIC& K,
     CostBACI<INTRINSIC>				err(*this);
     typename CostBACI<INTRINSIC>::ATA		params(K, cameras);
     typename CostBACI<INTRINSIC>::CostCD	g(params);
-    Matrix<T>					shape(Xt, 0, 0, Xt.nrow(), 3);
+    Matrix<ET>					shape(Xt, 0, 0, Xt.nrow(), 3);
 
     minimizeSquareSparse(err, g, params, shape, 200);
 
@@ -123,14 +123,14 @@ MeasurementMatrix::bundleAdjustment(INTRINSIC& K,
 */
 template <class CAMERA> void
 MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
-	(Array<CAMERA>& cameras, Matrix<double>& Xt) const
+	(Array<CAMERA>& cameras, Matrix<ET>& Xt) const
 {
     if (nframes() < 3)
 	throw std::invalid_argument("TU::MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters: Three or more frames required!!");
 
     CostBA<CAMERA>	err(*this, cameras[0].dofIntrinsic(), true);
-    NullConstraint<T, typename CostBA<CAMERA>::ATA>	g;
-    Matrix<double>	shape(Xt, 0, 0, Xt.nrow(), 3);
+    NullConstraint<ET>	g;
+    Matrix<ET>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
     minimizeSquareSparse(err, g, cameras, shape, 200);
 }
@@ -157,10 +157,10 @@ template <class CAMERA> Vector<double>
 MeasurementMatrix::CostBA<CAMERA>::operator ()(const ATA& p,
 					       const ATB& x, int j) const
 {
-    Vector<T>	val(2 * nframes());
+    Vector<ET>	val(2 * nframes());
     for (int i = 0; i < nframes(); ++i)
     {
-	const Point2<T>&	u = p[i](x);
+	const Point2<ET>&	u = p[i](x);
 	val[2*i]   = u[0] - _Wt[j][3*i];
 	val[2*i+1] = u[1] - _Wt[j][3*i+1];
     }
@@ -172,7 +172,7 @@ template <class CAMERA> BlockMatrix<double>
 MeasurementMatrix::CostBA<CAMERA>::jacobianA(const ATA& p,
 					     const ATB& x, int j) const
 {
-    BlockMatrix<T>	J(nframes());
+    BlockMatrix<ET>	J(nframes());
     J[0] = (_fcc ? p[0].jacobianFCC(x) : p[0].jacobianK(x));
     for (int i = 1; i < nframes(); ++i)
 	J[i] = (_fcc ? p[i].jacobianFCC(x) : p[i].jacobianP(x));
@@ -184,7 +184,7 @@ template <class CAMERA> Matrix<double>
 MeasurementMatrix::CostBA<CAMERA>::jacobianB(const ATA& p,
 					     const ATB& x, int j) const
 {
-    Matrix<T>	K(2 * nframes(), 3);
+    Matrix<ET>	K(2 * nframes(), 3);
     for (int i = 0; i < nframes(); ++i)
 	K(2*i, 0, 2, K.ncol()) = p[i].jacobianX(x);
 
@@ -192,7 +192,7 @@ MeasurementMatrix::CostBA<CAMERA>::jacobianB(const ATA& p,
 }
 
 template <class CAMERA> void
-MeasurementMatrix::CostBA<CAMERA>::updateA(ATA& p, const Vector<T>& dp) const
+MeasurementMatrix::CostBA<CAMERA>::updateA(ATA& p, const Vector<ET>& dp) const
 {
     int	d = 0;
     if (_fcc)
@@ -213,14 +213,14 @@ MeasurementMatrix::CostBA<CAMERA>::updateA(ATA& p, const Vector<T>& dp) const
     if (!_fcc)
     {
       // Force the distance between 0th and 1st cameras keep constant.
-	Vector<T>	t = p[1].t() - p[0].t();
+	Vector<ET>	t = p[1].t() - p[0].t();
 	t.normalize() *= p[0].t().dist(p[1].t());
 	p[1].setTranslation(p[0].t() + t);
     }
 }
 
 template <class CAMERA> void
-MeasurementMatrix::CostBA<CAMERA>::updateB(ATB& x, const Vector<T>& dx) const
+MeasurementMatrix::CostBA<CAMERA>::updateB(ATB& x, const Vector<ET>& dx) const
 {
     x -= dx;
 }
@@ -232,10 +232,10 @@ template <class INTRINSIC> Vector<double>
 MeasurementMatrix::CostBACI<INTRINSIC>::operator ()(const ATA& p,
 						    const ATB& x, int j) const
 {
-    Vector<T>	val(2 * nframes());
+    Vector<ET>	val(2 * nframes());
     for (int i = 0; i < nframes(); ++i)
     {
-	const Point2<T>&	u = p.K(p[i].xc(x));
+	const Point2<ET>&	u = p.K(p[i].xc(x));
 	val[2*i]   = u[0] - _Wt[j][3*i];
 	val[2*i+1] = u[1] - _Wt[j][3*i+1];
     }
@@ -247,11 +247,11 @@ template <class INTRINSIC> Matrix<double>
 MeasurementMatrix::CostBACI<INTRINSIC>::jacobianA(const ATA& p,
 						  const ATB& x, int j) const
 {
-    Matrix<T>	J(2 * nframes(), adim());
+    Matrix<ET>	J(2 * nframes(), adim());
     J(0, 0, 2, p.K.dof()) = p.K.jacobianK(p[0].xc(x));
     for (int i = 1; i < nframes(); ++i)
     {
-	const Point2<T>& xc = p[i].xc(x);
+	const Point2<ET>& xc = p[i].xc(x);
 	J(2*i, 0, 2, p.K.dof()) = p.K.jacobianK(xc);
 	J(2*i, p.K.dof() + 6*(i-1), 2, 6)
 	    = p.K.jacobianXC(xc) * p[i].jacobianPc(x);
@@ -264,7 +264,7 @@ template <class INTRINSIC> Matrix<double>
 MeasurementMatrix::CostBACI<INTRINSIC>::jacobianB(const ATA& p,
 						  const ATB& x, int j) const
 {
-    Matrix<T>	K(2 * nframes(), 3);
+    Matrix<ET>	K(2 * nframes(), 3);
     for (int i = 0; i < nframes(); ++i)
 	K(2*i, 0, 2, K.ncol())
 	    = p.K.jacobianXC(p[i].xc(x)) * p[i].jacobianXc(x);
@@ -274,21 +274,21 @@ MeasurementMatrix::CostBACI<INTRINSIC>::jacobianB(const ATA& p,
 
 template <class INTRINSIC> void
 MeasurementMatrix::CostBACI<INTRINSIC>::updateA(ATA& p,
-						const Vector<T>& dp) const
+						const Vector<ET>& dp) const
 {
     p.K.update(dp(0, p.K.dof()));
     for (int i = 1; i < nframes(); ++i)
 	p[i].update(dp(p.K.dof() + 6*(i-1), 6));
 
   // Force the distance between 0th and 1st cameras keep constant.
-    Vector<T>	t = p[1].t() - p[0].t();
+    Vector<ET>	t = p[1].t() - p[0].t();
     t.normalize() *= (p[0].t().dist(p[1].t()));
     p[1].setTranslation(p[0].t() + t);
 }
 
 template <class INTRINSIC> void
 MeasurementMatrix::CostBACI<INTRINSIC>::updateB(ATB& x,
-						const Vector<T>& dx) const
+						const Vector<ET>& dx) const
 {
     x -= dx;
 }
