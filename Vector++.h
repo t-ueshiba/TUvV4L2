@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.15 2007-01-16 07:52:58 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.16 2007-01-31 05:42:20 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -130,6 +130,13 @@ class Vector : public Array<T>
     \param d	ベクトルの次元
   */
     Vector(T* p, u_int d)			:Array<T>(p, d)		{}
+
+  //! 与えられた行列の行を並べて記憶領域を共有するベクトルを生成する
+  /*!
+    \param m	記憶領域を共有する行列．全行の記憶領域は連続していなければ
+		ならない．
+  */
+    Vector(const Matrix<T>& m)	:Array<T>((T*)m, m.nrow()*m.ncol())	{}
 
   //! 与えられたベクトルと記憶領域を共有する部分ベクトルを生成する
   /*!
