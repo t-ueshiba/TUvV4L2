@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.4 2006-12-19 07:09:24 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2007-02-01 01:27:19 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -31,8 +31,8 @@ EXTHDRS		= /Users/ueshiba/include/TU/Array++.cc \
 		/Users/ueshiba/include/TU/Nurbs++.cc \
 		/Users/ueshiba/include/TU/Nurbs++.h \
 		/Users/ueshiba/include/TU/Vector++.h \
-		/Users/ueshiba/include/TU/functions.h \
 		/Users/ueshiba/include/TU/types.h \
+		/Users/ueshiba/include/TU/utility.h \
 		/Users/ueshiba/include/TU/v/App.h \
 		/Users/ueshiba/include/TU/v/CanvasPane.h \
 		/Users/ueshiba/include/TU/v/CanvasPaneDC.h \
@@ -55,7 +55,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -84,7 +84,7 @@ draw.o: draw.h /Users/ueshiba/include/TU/v/OglDC.h \
 	/Users/ueshiba/include/TU/Nurbs++.h \
 	/Users/ueshiba/include/TU/Array++.cc \
 	/Users/ueshiba/include/TU/Nurbs++.cc \
-	/Users/ueshiba/include/TU/functions.h
+	/Users/ueshiba/include/TU/utility.h
 main.o: /Users/ueshiba/include/TU/v/App.h \
 	/Users/ueshiba/include/TU/v/TUv++.h \
 	/Users/ueshiba/include/TU/v/Colormap.h \
@@ -104,4 +104,4 @@ main.o: /Users/ueshiba/include/TU/v/App.h \
 	/Users/ueshiba/include/TU/v/DC3.h /Users/ueshiba/include/TU/Nurbs++.h \
 	/Users/ueshiba/include/TU/Array++.cc \
 	/Users/ueshiba/include/TU/Nurbs++.cc \
-	/Users/ueshiba/include/TU/functions.h
+	/Users/ueshiba/include/TU/utility.h
