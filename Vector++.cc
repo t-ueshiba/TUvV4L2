@@ -20,10 +20,10 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.16 2007-01-16 07:52:58 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.17 2007-02-01 01:27:19 ueshiba Exp $
  */
+#include "TU/utility.h"
 #include "TU/Vector++.h"
-#include "TU/functions.h"
 #include <stdexcept>
 #include <iomanip>
 

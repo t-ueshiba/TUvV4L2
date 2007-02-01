@@ -20,9 +20,9 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.11 2007-01-16 07:52:58 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.12 2007-02-01 01:27:19 ueshiba Exp $
  */
-#include "TU/functions.h"
+#include "TU/utility.h"
 #include "TU/Image++.h"
 #ifdef WIN32
 #  include <winsock2.h>

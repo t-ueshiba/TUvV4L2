@@ -1,7 +1,7 @@
 /*
- *  $Id: Nurbs++.cc,v 1.4 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Nurbs++.cc,v 1.5 2007-02-01 01:27:19 ueshiba Exp $
  */
-#include "TU/functions.h"
+#include "TU/utility.h"
 #include "TU/Nurbs++.h"
 #include <stdexcept>
 
