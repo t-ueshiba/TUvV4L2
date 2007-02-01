@@ -1,5 +1,5 @@
 /*
- *  $Id: utility.h,v 1.1 2007-02-01 01:27:19 ueshiba Exp $
+ *  $Id: utility.h,v 1.2 2007-02-01 07:04:25 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -40,10 +40,9 @@ template <class T> static inline void	swap(T& a, T& b)
 
 //! std::pairを要素とするコンテナにおいてpairの第1要素にアクセスする反復子
 /*!
-  \param Container	std::pair<First, Second>を要素とするコンテナ
-  \param Iterator	本反復子のベースとなるContainerの反復子
+  \param Iterator	本反復子のベースとなる反復子
 */
-template <class Container, class Iterator=typename Container::iterator>
+template <class Iterator>
 class first_iterator : public std::iterator_traits<Iterator>
 {
   public:
@@ -98,10 +97,9 @@ class first_iterator : public std::iterator_traits<Iterator>
 
 //! std::pairを要素とするコンテナにおいてpairの第2要素にアクセスする反復子
 /*!
-  \param Container	std::pair<First, Second>を要素とするコンテナ
-  \param Iterator	本反復子のベースとなるContainerの反復子
+  \param Iterator	本反復子のベースとなる反復子
 */
-template <class Container, class Iterator=typename Container::iterator>
+template <class Iterator>
 class second_iterator : public std::iterator_traits<Iterator>
 {
   public:
@@ -154,6 +152,26 @@ class second_iterator : public std::iterator_traits<Iterator>
     Iterator	_i;
 };
 
+//! std::pairを要素とするコンテナについてpairの第1要素にアクセスする反復子を作る
+/*!
+  \param i	ベースとなる反復子
+*/
+template <class Iterator> inline first_iterator<Iterator>
+make_first_iterator(const Iterator& i)
+{
+    return first_iterator<Iterator>(i);
+}
+    
+//! std::pairを要素とするコンテナについてpairの第2要素にアクセスする反復子を作る
+/*!
+  \param i	ベースとなる反復子
+*/
+template <class Iterator> inline second_iterator<Iterator>
+make_second_iterator(const Iterator& i)
+{
+    return second_iterator<Iterator>(i);
+}
+    
 }
 
 #endif	/* __TUutility_h */
