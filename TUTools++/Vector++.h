@@ -20,12 +20,12 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.16 2007-01-31 05:42:20 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.17 2007-02-04 23:59:53 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
 
-#include <math.h>
+#include <cmath>
 #ifdef WIN32
 #  define M_PI	3.14159265358979323846
 #endif

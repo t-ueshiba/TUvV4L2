@@ -1,7 +1,6 @@
 /*
- *  $Id: IIRFilter.cc,v 1.6 2007-01-31 05:42:20 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.7 2007-02-04 23:59:53 ueshiba Exp $
  */
-#include <math.h>
 #include "TU/Image++.h"
 #include "TU/Minimize++.h"
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1 2006-12-22 00:05:55 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2007-02-04 23:59:53 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -24,8 +24,8 @@ EXTHDRS		= /Users/ueshiba/include/TU/Array++.cc \
 		/Users/ueshiba/include/TU/Array++.h \
 		/Users/ueshiba/include/TU/Vector++.cc \
 		/Users/ueshiba/include/TU/Vector++.h \
-		/Users/ueshiba/include/TU/functions.h \
-		/Users/ueshiba/include/TU/types.h
+		/Users/ueshiba/include/TU/types.h \
+		/Users/ueshiba/include/TU/utility.h
 HDRS		=
 SRCS		= mtest.cc
 OBJS		= mtest.o
@@ -33,7 +33,7 @@ OBJS		= mtest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -48,4 +48,4 @@ mtest.o: /Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
 	/Users/ueshiba/include/TU/Array++.cc \
 	/Users/ueshiba/include/TU/Vector++.cc \
-	/Users/ueshiba/include/TU/functions.h
+	/Users/ueshiba/include/TU/utility.h
