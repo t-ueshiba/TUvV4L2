@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.12 2005-07-13 08:58:58 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.13 2007-02-04 23:59:53 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Manip.h"
@@ -29,7 +29,6 @@
 #ifndef STDC_HEADERS
 #  define STDC_HEADERS
 #endif
-
 
 namespace TU
 {
@@ -107,8 +106,13 @@ ImageBase::restoreHeader(std::istream& in)
 	else if (!strcmp(key, "Endian:"))	// big- or little-endian
 	{
 	    in >> val;
+#ifdef BIG_ENDIAN
+	    if (strcmp(val, "Little") && dataType != EPBM_CHAR8)
+		throw runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
+#else
 	    if (strcmp(val, "Big") && dataType != EPBM_CHAR8)
 		throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
+#endif
 	}
 	else if (!strcmp(key, "PinHoleParameterH11:"))
 	    in >> P[0][0];
@@ -224,7 +228,7 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     out << "# DataType: ";
     switch (type)
     {
-      case U_CHAR:
+      default:
 	out << "Char" << endl;
 	break;
       case SHORT:
@@ -236,22 +240,24 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
       case DOUBLE:
 	out << "Double" << endl;
 	break;
-      default:
-	out << endl;
-	break;
     }
     out << "# Sign: ";
     switch (type)
     {
-      case U_CHAR:
-      case RGB_24:
-	out << "Unsigned" << endl;
-	break;
-      default:
+      case SHORT:
+      case FLOAT:
+      case DOUBLE:
 	out << "Signed" << endl;
 	break;
+      default:
+	out << "Unsigned" << endl;
+	break;
     }
+#ifdef BIG_ENDIAN
     out << "# Endian: Big" << endl;
+#else
+    out << "# Endian: Little" << endl;
+#endif
     out << "# PinHoleParameterH11: " << P[0][0] << endl
 	<< "# PinHoleParameterH12: " << P[0][1] << endl
 	<< "# PinHoleParameterH13: " << P[0][2] << endl

@@ -1,42 +1,43 @@
 /*
- *  $Id: utility.h,v 1.2 2007-02-01 07:04:25 ueshiba Exp $
+ *  $Id: utility.h,v 1.3 2007-02-04 23:59:53 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
 
+#include <algorithm>
 #include <iterator>
 
 namespace TU
 {
-template <class T> static inline T	min(T a, T b) {return (a < b ? a : b);}
-template <class T> static inline T	max(T a, T b) {return (a > b ? a : b);}
-template <class T> static inline T	min(T a, T b, T c)
-					{
-					    return min(min(a, b), c);
-					}
-template <class T> static inline T	max(T a, T b, T c)
-					{
-					    return max(max(a, b), c);
-					}
-template <class T> static inline T	min(T a, T b, T c, T d)
-					{
-					    return min(min(a, b, c), d);
-					}
-template <class T> static inline T	max(T a, T b, T c, T d)
-					{
-					    return max(max(a, b, c), d);
-					}
-template <class T> static inline T	diff(T a, T b)
-					{
-					    return (a > b ? a - b : b - a);
-					}
-template <class T> static inline T	abs(T a) {return (a > 0 ? a : -a);}
-template <class T> static inline void	swap(T& a, T& b)
-					{
-					    const T tmp = a;
-					    a = b;
-					    b = tmp;
-					}
+template <class T> inline const T&
+min(const T& a, const T& b, const T& c)
+{
+    return std::min(std::min(a, b), c);
+}
+
+template <class T> inline const T&
+max(const T& a, const T& b, const T& c)
+{
+    return std::max(std::max(a, b), c);
+}
+    
+template <class T> inline const T&
+min(const T& a, const T& b, const T& c, const T& d)
+{
+    return min(min(a, b, c), d);
+}
+
+template <class T> inline const T&
+max(const T& a, const T& b, const T& c, const T& d)
+{
+    return max(max(a, b, c), d);
+}
+
+template <class T> inline T
+diff(T a, T b)
+{
+    return (a > b ? a - b : b - a);
+}
 
 //! std::pairを要素とするコンテナにおいてpairの第1要素にアクセスする反復子
 /*!

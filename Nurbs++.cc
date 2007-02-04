@@ -1,5 +1,5 @@
 /*
- *  $Id: Nurbs++.cc,v 1.5 2007-02-01 01:27:19 ueshiba Exp $
+ *  $Id: Nurbs++.cc,v 1.6 2007-02-04 23:59:53 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Nurbs++.h"
@@ -174,7 +174,7 @@ BSplineKnots<T>::derivatives(T u, u_int K, int& I) const
 			      / ndu[i-k+j][degree()-k+1];
 		N[k][i] += a[current][j] * ndu[degree()-k][i-k+j];
 	    }
-	    swap(current, previous);
+	    std::swap(current, previous);
 	}
     }
 

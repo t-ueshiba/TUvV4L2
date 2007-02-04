@@ -1,14 +1,11 @@
 /*
- *  $Id: Random.cc,v 1.4 2002-09-02 02:43:44 ueshiba Exp $
+ *  $Id: Random.cc,v 1.5 2007-02-04 23:59:53 ueshiba Exp $
  */
 #include <time.h>
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 #include "TU/Random.h"
 #include <stdexcept>
-#ifdef __APPLE__
-#  include <limits.h>
-#endif
 
 namespace TU
 {
@@ -40,11 +37,7 @@ Random::Random()
     :_seed(-int(time(0))), _x1(0), _x2(0), _x3(0), _ff(0),
      _has_extra(0), _extra(0.0)
 {
-#ifdef __APPLE__
-    srandom(-_seed);
-#else
     srand48(-_seed);
-#endif
 }
 
 double
@@ -83,11 +76,7 @@ Random::uniform()
 double
 Random::uniform48()
 {
-#ifdef __APPLE__
-    return double(random()) / double(LONG_MAX);
-#else
     return drand48();
-#endif
 }
 
 double

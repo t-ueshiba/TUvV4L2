@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.12 2007-02-01 01:27:19 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.13 2007-02-04 23:59:53 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
@@ -685,7 +685,8 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
 {
     --u;
     --v;
-    const int	u1 = min(u+w, int(width())-1), v1 = min(v+h, int(height())-1);
+    const int	u1 = std::min(u+w, int(width())-1),
+		v1 = std::min(v+h, int(height())-1);
     if (u >= int(width()) || v >= int(height()) || u1 < 0 || v1 < 0)
 	return 0;
     

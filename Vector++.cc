@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.17 2007-02-01 01:27:19 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.18 2007-02-04 23:59:53 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Vector++.h"
@@ -544,7 +544,7 @@ Matrix<T>::rot2angle(double& theta_x, double& theta_y, double& theta_z) const
     using namespace	std;
     
     if (nrow() != 3 || ncol() != 3)
-	throw std::invalid_argument("TU::Matrix<T>::rot2angle: input matrix must be 3x3!!");
+	throw invalid_argument("TU::Matrix<T>::rot2angle: input matrix must be 3x3!!");
 
     if ((*this)[0][0] == 0.0 && (*this)[0][1] == 0.0)
     {
@@ -805,8 +805,10 @@ template <class T>
 LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
     :Array2<Vector<T> >(m), _index(ncol()), _det(1.0)
 {
+    using namespace	std;
+    
     if (nrow() != ncol())
-        throw std::invalid_argument("TU::LUDecomposition<T>::LUDecomposition: not square matrix!!");
+        throw invalid_argument("TU::LUDecomposition<T>::LUDecomposition: not square matrix!!");
 
     for (int j = 0; j < ncol(); ++j)	// initialize column index
 	_index[j] = j;			// for explicit pivotting
@@ -914,8 +916,6 @@ Householder<T>::Householder(const Matrix<T>& a, u_int d)
 template <class T> void
 Householder<T>::apply_from_left(Matrix<T>& a, int m)
 {
-    using namespace	std;
-    
     if (a.nrow() < dim())
 	throw std::invalid_argument("TU::Householder<T>::apply_from_left: # of rows of given matrix is smaller than my dimension !!");
     
@@ -956,8 +956,6 @@ Householder<T>::apply_from_left(Matrix<T>& a, int m)
 template <class T> void
 Householder<T>::apply_from_right(Matrix<T>& a, int m)
 {
-    using namespace	std;
-    
     if (a.ncol() < dim())
 	throw std::invalid_argument("Householder<T>::apply_from_right: # of column of given matrix is smaller than my dimension !!");
     
@@ -998,8 +996,6 @@ Householder<T>::apply_from_right(Matrix<T>& a, int m)
 template <class T> void
 Householder<T>::apply_from_both(Matrix<T>& a, int m)
 {
-    using namespace	std;
-    
     Vector<T>		u = a[m](m+_d, a.ncol()-m-_d);
     double		scale = 0.0;
     for (int j = 0; j < u.dim(); ++j)
@@ -1084,7 +1080,7 @@ template <class T>
 QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
     :Matrix<T>(m), _Qt(m.ncol(), 0)
 {
-    u_int	n = min(nrow(), ncol());
+    u_int	n = std::min(nrow(), ncol());
     for (int j = 0; j < n; ++j)
 	_Qt.apply_from_right(*this, j);
     _Qt.make_transformation();
@@ -1128,17 +1124,19 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
 template <class T> void
 TriDiagonal<T>::diagonalize()
 {
+    using namespace	std;
+    
     for (int n = dim(); --n >= 0; )
     {
 	int	niter = 0;
 	
 #ifdef TUVectorPP_DEBUG
-	std::cerr << "******** n = " << n << " ********" << std::endl;
+	cerr << "******** n = " << n << " ********" << endl;
 #endif
 	while (!off_diagonal_is_zero(n))
 	{					// n > 0 here
 	    if (niter++ > NITER_MAX)
-		throw std::runtime_error("TU::TriDiagonal::diagonalize(): Number of iteration exceeded maximum value!!");
+		throw runtime_error("TU::TriDiagonal::diagonalize(): Number of iteration exceeded maximum value!!");
 
 	  /* Find first m (< n) whose off-diagonal element is 0 */
 	    int	m = n;
@@ -1171,7 +1169,7 @@ TriDiagonal<T>::diagonalize()
 		}
 	    }
 #ifdef TUVectorPP_DEBUG
-	    std::cerr << "  niter = " << niter << ": " << off_diagonal();
+	    cerr << "  niter = " << niter << ": " << off_diagonal();
 #endif	    
 	}
     }
@@ -1200,8 +1198,6 @@ TriDiagonal<T>::off_diagonal_is_zero(int n) const
 template <class T> void
 TriDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 {
-    using namespace	std;
-    
     const double	g = (_diagonal[n] - _diagonal[n-1]) /
 			    (2.0*_off_diagonal[n]),
 			absg = fabs(g),
@@ -1265,17 +1261,19 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
 template <class T> void
 BiDiagonal<T>::diagonalize()
 {
+    using namespace	std;
+    
     for (int n = _Et.dim(); --n >= 0; )
     {
 	int	niter = 0;
 	
 #ifdef TUVectorPP_DEBUG
-	std::cerr << "******** n = " << n << " ********" << std::endl;
+	cerr << "******** n = " << n << " ********" << endl;
 #endif
 	while (!off_diagonal_is_zero(n))	// n > 0 here
 	{
 	    if (niter++ > NITER_MAX)
-		throw std::runtime_error("TU::BiDiagonal::diagonalize(): Number of iteration exceeded maximum value");
+		throw runtime_error("TU::BiDiagonal::diagonalize(): Number of iteration exceeded maximum value");
 	    
 	  /* Find first m (< n) whose off-diagonal element is 0 */
 	    int m = n;
@@ -1310,10 +1308,10 @@ BiDiagonal<T>::diagonalize()
 	    double	x, y;
 	    initialize_rotation(m, n, x, y);
 #ifdef TUBiDiagonal_DEBUG
-	    std::cerr << "--- m = " << m << ", n = " << n << "---"
-		      << std::endl;
-	    std::cerr << "  diagonal:     " << diagonal();
-	    std::cerr << "  off-diagonal: " << off_diagonal();
+	    cerr << "--- m = " << m << ", n = " << n << "---"
+		 << endl;
+	    cerr << "  diagonal:     " << diagonal();
+	    cerr << "  off-diagonal: " << off_diagonal();
 #endif
 	  /* Apply rotation P(i-1, i) for each i (i = m+1, n+2, ... , n) */
 	    for (int i = m; ++i <= n; )
@@ -1357,7 +1355,7 @@ BiDiagonal<T>::diagonalize()
 		}
 	    }
 #ifdef TUVectorPP_DEBUG
-	    std::cerr << "  niter = " << niter << ": " << off_diagonal();
+	    cerr << "  niter = " << niter << ": " << off_diagonal();
 #endif
 	}
     }
@@ -1410,8 +1408,6 @@ BiDiagonal<T>::off_diagonal_is_zero(int n) const
 template <class T> void
 BiDiagonal<T>::initialize_rotation(int m, int n, double& x, double& y) const
 {
-    using namespace	std;
-    
     const double	g = ((_diagonal[n]     + _diagonal[n-1])*
 			     (_diagonal[n]     - _diagonal[n-1])+
 			     (_off_diagonal[n] + _off_diagonal[n-1])*
