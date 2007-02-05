@@ -1,5 +1,5 @@
 /*
- *  $Id: utility.h,v 1.3 2007-02-04 23:59:53 ueshiba Exp $
+ *  $Id: utility.h,v 1.4 2007-02-05 00:42:28 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -24,13 +24,13 @@ max(const T& a, const T& b, const T& c)
 template <class T> inline const T&
 min(const T& a, const T& b, const T& c, const T& d)
 {
-    return min(min(a, b, c), d);
+    return std::min(min(a, b, c), d);
 }
 
 template <class T> inline const T&
 max(const T& a, const T& b, const T& c, const T& d)
 {
-    return max(max(a, b, c), d);
+    return std::max(max(a, b, c), d);
 }
 
 template <class T> inline T
