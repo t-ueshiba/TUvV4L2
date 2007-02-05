@@ -1,10 +1,10 @@
 /*
- *  $Id: Geometry++.h,v 1.11 2007-01-21 23:36:36 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.12 2007-02-05 23:24:03 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
 
-#include "TU/Vector++.h"
+#include "TU/Minimize++.h"
 
 namespace TU
 {
@@ -449,6 +449,684 @@ class PlaneP3 : public CoordinateP<T, 3u>
 	:CoordinateP<T, 3u>((const CoordinateP<T, 3u>&)l)		{}
     PlaneP3(const Vector<double>& v):CoordinateP<T, 3u>(v)		{}
 };
+
+/************************************************************************
+*  class Normalize							*
+************************************************************************/
+//! 点の非同次座標の正規化変換を行うクラス
+/*!
+  \f$\TUud{x}{}=[\TUtvec{x}{}, 1]^\top~
+  (\TUvec{x}{} \in \TUspace{R}{d})\f$に対して，以下のような平行移動と
+  スケーリングを行う:
+  \f[
+	\TUud{y}{} =
+	\TUbeginarray{c} s^{-1}(\TUvec{x}{} - \TUvec{c}{}) \\ 1	\TUendarray =
+	\TUbeginarray{ccc}
+	  s^{-1} \TUvec{I}{d} & -s^{-1}\TUvec{c}{} \\ \TUtvec{0}{d} & 1
+	\TUendarray
+	\TUbeginarray{c} \TUvec{x}{} \\ 1 \TUendarray =
+	\TUvec{T}{}\TUud{x}{}
+  \f]
+  \f$s\f$と\f$\TUvec{c}{}\f$は，振幅の2乗平均値が空間の次元\f$d\f$に,
+  重心が原点になるよう決定される．
+*/
+class Normalize
+{
+  public:
+  //! 空間の次元を指定して正規化変換オブジェクトを生成する．
+  /*!
+    恒等変換として初期化される．
+    \param d	空間の次元
+  */
+    Normalize(u_int d=2) :_scale(1.0), _centroid(d)			{}
+
+    template <class Iterator>
+    Normalize(Iterator first, Iterator last)				;
+    
+    template <class Iterator>
+    void		initialize(Iterator first, Iterator last)	;
+
+    u_int		spaceDim()				const	;
+    Vector<double>	operator ()(const Vector<double>& x)	const	;
+    Vector<double>	normalizeP(const Vector<double>& x)	const	;
+    
+    Matrix<double>		T()				const	;
+    Matrix<double>		Tt()				const	;
+    Matrix<double>		Tinv()				const	;
+    Matrix<double>		Ttinv()				const	;
+    double			scale()				const	;
+    const Vector<double>&	centroid()			const	;
+    
+  private:
+    double		_scale;
+    Vector<double>	_centroid;
+};
+
+//! 与えられた点群の非同次座標から正規化変換オブジェクトを生成する．
+/*!
+  振幅の2乗平均値が#spaceDim(), 重心が原点になるような正規化変換が計算される．
+  \param first	点群の先頭を示す反復子
+  \param last	点群の末尾を示す反復子
+*/
+template <class Iterator> inline
+Normalize::Normalize(Iterator first, Iterator last)
+    :_scale(1.0), _centroid()
+{
+    initialize(first, last);
+}
+    
+//! 与えられた点群の非同次座標から正規化変換を計算する．
+/*!
+  振幅の2乗平均値が#spaceDim(), 重心が原点になるような正規化変換が計算される．
+  \param first			点群の先頭を示す反復子
+  \param last			点群の末尾を示す反復子
+  \throw std::invalid_argument	与えられた点の数が0の場合に送出
+*/
+template <class Iterator> void
+Normalize::initialize(Iterator first, Iterator last)
+{
+    u_int	ndata = 0;
+    _scale = 0.0;
+    _centroid.resize(first->dim());
+    while (first != last)
+    {
+	_scale += first->square();
+	_centroid += *first++;
+	++ndata;
+    }
+    if (ndata == 0)
+	throw std::invalid_argument("Normalize::initialize(): 0-length input data!!");
+    _scale = sqrt(_scale / (ndata * spaceDim()));
+    _centroid /= ndata;
+}
+
+//! この正規化変換が適用される空間の次元を返す．
+/*! 
+  \return	空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
+*/
+inline u_int
+Normalize::spaceDim() const
+{
+    return _centroid.dim();
+}
+    
+//! 与えられた点に正規化変換を適用してその非同次座標を返す．
+/*!
+  \param x	点の非同次座標（#spaceDim()次元）
+  \return	正規化された点の非同次座標（#spaceDim()次元）
+*/
+inline Vector<double>
+Normalize::operator ()(const Vector<double>& x) const
+{
+    return (x - _centroid) / _scale;
+}
+
+//! 与えられた点に正規化変換を適用してその同次座標を返す．
+/*!
+  \param x	点の非同次座標（#spaceDim()次元）
+  \return	正規化された点の同次座標（#spaceDim()+1次元）
+*/
+inline Vector<double>
+Normalize::normalizeP(const Vector<double>& x) const
+{
+    Vector<double>	val(spaceDim()+1);
+    val(0, spaceDim()) = (*this)(x);
+    val[spaceDim()] = 1.0;
+    return val;
+}
+
+//! 正規化変換のスケーリング定数を返す．
+/*!
+  \return	スケーリング定数（与えられた点列の振幅の2乗平均値）
+*/
+inline double
+Normalize::scale() const
+{
+    return _scale;
+}
+
+//! 正規化変換の平行移動成分を返す．
+/*!
+  \return	平行移動成分（与えられた点列の重心）
+*/
+inline const Vector<double>&
+Normalize::centroid() const
+{
+    return _centroid;
+}
+
+/************************************************************************
+*  class ProjectiveMapping						*
+************************************************************************/
+//! 射影変換を行うクラス
+/*!
+  \f$\TUvec{T}{} \in \TUspace{R}{(n+1)\times(m+1)}\f$を用いてm次元空間の点
+  \f$\TUud{x}{} \in \TUspace{R}{m+1}\f$をn次元空間の点
+  \f$\TUud{y}{} \simeq \TUvec{T}{}\TUud{x}{} \in \TUspace{R}{n+1}\f$
+  に写す（\f$m \neq n\f$でも構わない）．
+*/
+class ProjectiveMapping
+{
+  public:
+    ProjectiveMapping(u_int inDim=2, u_int outDim=2)			;
+
+  //! 変換行列を指定して射影変換オブジェクトを生成する．
+  /*!
+    \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+  */
+    ProjectiveMapping(const Matrix<double>& T)	:_T(T)			{}
+
+    template <class Iterator>
+    ProjectiveMapping(Iterator first, Iterator last, bool refine=false)	;
+
+    template <class Iterator>
+    void		initialize(Iterator first, Iterator last,
+				   bool refine=false)			;
+
+  //! この射影変換の入力空間の次元を返す．
+  /*! 
+    \return	入力空間の次元(同次座標のベクトルとしての次元は#inDim()+1)
+  */
+    u_int		inDim()			const	{return _T.ncol()-1;}
+
+  //! この射影変換の出力空間の次元を返す．
+  /*! 
+    \return	出力空間の次元(同次座標のベクトルとしての次元は#outDim()+1)
+  */
+    u_int		outDim()		const	{return _T.nrow()-1;}
+
+    u_int		ndataMin()		const	;
+    
+  //! この射影変換を表現する行列を返す．
+  /*! 
+    \return	(#outDim()+1)x(#inDim()+1)行列
+  */
+    const Matrix<double>&	T()		const	{return _T;}
+    
+    Vector<double>	operator ()(const Vector<double>& x)	const	;
+    Vector<double>	mapP(const Vector<double>& x)		const	;
+
+    template <class In, class Out>
+    double		sqdist(const std::pair<In, Out>& pair)	const	;
+    template <class In, class Out>
+    double		dist(const std::pair<In, Out>& pair)	const	;
+    
+  protected:
+    Matrix<double>	_T;			//!< 射影変換を表現する行列
+
+  private:
+  //! 射影変換行列の最尤推定のためのコスト関数
+    class Cost
+    {
+      public:
+	typedef double		ET;
+	typedef Matrix<ET>	AT;
+
+	template <class Iterator>
+	Cost(Iterator first, Iterator last)				;
+
+	Vector<ET>	operator ()(const AT& T)		const	;
+	Matrix<ET>	jacobian(const AT& T)			const	;
+	void		update(AT& T, const Vector<ET>& dt)	const	;
+
+	u_int		npoints()		const	{return _X.nrow();}
+	     
+      private:
+	Matrix<ET>	_X, _Y;
+    };
+};
+
+//! 与えられた点対列の非同次座標から射影変換オブジェクトを生成する．
+/*!
+  \param first			点対列の先頭を示す反復子
+  \param last			点対列の末尾を示す反復子
+  \param refine			非線型最適化の有(true)／無(false)を指定
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template <class Iterator> inline
+ProjectiveMapping::ProjectiveMapping(Iterator first, Iterator last,
+				     bool refine)
+{
+    initialize(first, last, refine);
+}
+
+//! 与えられた点対列の非同次座標から射影変換を計算する．
+/*!
+  \param first			点対列の先頭を示す反復子
+  \param last			点対列の末尾を示す反復子
+  \param refine			非線型最適化の有(true)／無(false)を指定
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template <class Iterator> void
+ProjectiveMapping::initialize(Iterator first, Iterator last, bool refine)
+{
+  // 点列の正規化
+    const Normalize	xNormalize(make_first_iterator(first),
+				   make_first_iterator(last)),
+			yNormalize(make_second_iterator(first),
+				   make_second_iterator(last));
+
+  // 充分な個数の点対があるか？
+    const u_int		ndata = std::distance(first, last),
+			xdim  = xNormalize.spaceDim() + 1,
+			ydim  = yNormalize.spaceDim() + 1;
+    if (ndata*(ydim - 1) < xdim*ydim - 1)	// _Tのサイズが未定なので
+						// ndataMin()は無効
+	throw std::invalid_argument("ProjectiveMapping::initialize(): not enough input data!!");
+
+  // データ行列の計算
+    Matrix<double>	A(xdim*ydim + ndata, xdim*ydim + ndata);
+    int			n = xdim*ydim;
+    for (Iterator iter = first; iter != last; ++iter)
+    {
+	const Vector<double>&	x = xNormalize.normalizeP(iter->first);
+	const Vector<double>&	y = yNormalize.normalizeP(iter->second);
+
+	A(0, 0, xdim, xdim) += x % x;
+	for (int j = 0; j < ydim; ++j)
+	    A[n](j*xdim, xdim) = -y[j] * x;
+	A[n][n] = y * y;
+	++n;
+    }
+    for (int j = 1; j < ydim; ++j)
+	A(j*xdim, j*xdim, xdim, xdim) = A(0, 0, xdim, xdim);
+    A.symmetrize();
+
+  // データ行列の最小固有値に対応する固有ベクトルから変換行列を計算し，
+  // 正規化をキャンセルする．
+    Vector<double>		eval;
+    const Matrix<double>&	Ut = A.eigen(eval);
+    _T = yNormalize.Tinv()
+       * Matrix<double>((double*)Ut[Ut.nrow()-1], ydim, xdim)
+       * xNormalize.T();
+
+  // 変換行列が正方ならば，その行列式が１になるように正規化する．
+    if (_T.nrow() == _T.ncol())
+    {
+	double	det = _T.det();
+	if (det > 0)
+	    _T /= pow(det, 1.0/_T.nrow());
+	else
+	    _T /= -pow(-det, 1.0/_T.nrow());
+    }
+
+  // 非線型最適化を行う．
+    if (refine)
+    {
+	Cost					cost(first, last);
+	ConstNormConstraint<Matrix<double> >	constraint(_T);
+	minimizeSquare(cost, constraint, _T);
+    }
+}
+
+//! 射影変換を求めるために必要な点対の最小個数を返す．
+/*!
+  現在設定されている入出力空間の次元をもとに計算される．
+  \return	必要な点対の最小個数すなわち入力空間の次元m，出力空間の次元n
+		に対して m + 1 + m/n
+*/
+inline u_int
+ProjectiveMapping::ndataMin() const
+{
+    return inDim() + 1 + u_int(ceil(double(inDim())/double(outDim())));
+}
+    
+//! 与えられた点に射影変換を適用してその非同次座標を返す．
+/*!
+  \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
+  \return	射影変換された点の非同次座標（#outDim()次元）
+*/
+inline Vector<double>
+ProjectiveMapping::operator ()(const Vector<double>& x)	const
+{
+    const Vector<double>&	y = mapP(x);
+    return y(0, outDim()) / y[outDim()];
+}
+
+//! 与えられた点に射影変換を適用してその同次座標を返す．
+/*!
+  \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
+  \return	射影変換された点の同次座標（#outDim()+1次元）
+*/
+inline Vector<double>
+ProjectiveMapping::mapP(const Vector<double>& x) const
+{
+    if (x.dim() == inDim())
+    {
+	Vector<double>	xx(inDim()+1);
+	xx(0, inDim()) = x;
+	xx[inDim()] = 1.0;
+	return _T * xx;
+    }
+    else
+	return _T * x;
+}
+
+//! 入力点に射影変換を適用した点と出力点の距離の2乗を返す．
+/*!
+  \param pair	入力点の非同次座標（#inDim()次元）と出力点の非同次座標
+		（#outDim()+1次元）の対
+  \return	変換された入力点と出力点の距離の2乗
+*/
+template <class In, class Out> inline double
+ProjectiveMapping::sqdist(const std::pair<In, Out>& pair) const
+{
+    return (*this)(pair.first).sqdist(pair.second);
+}
+    
+//! 入力点に射影変換を適用した点と出力点の距離を返す．
+/*!
+  \param pair	入力点の非同次座標（#inDim()次元）と出力点の非同次座標
+		（#outDim()+1次元）の対
+  \return	変換された入力点と出力点の距離
+*/
+template <class In, class Out> inline double
+ProjectiveMapping::dist(const std::pair<In, Out>& pair) const
+{
+    return sqrt(sqdist(pair));
+}
+    
+template <class Iterator>
+ProjectiveMapping::Cost::Cost(Iterator first, Iterator last)
+    :_X(), _Y()
+{
+    const u_int	ndata = std::distance(first, last);
+    _X.resize(ndata, first->first.dim() + 1);
+    _Y.resize(ndata, first->second.dim());
+    for (int n = 0; first != last; ++first)
+    {
+	_X[n](0, _X.ncol() - 1) = first->first;
+	_X[n][_X.ncol() - 1]	= 1.0;
+	_Y[n++]			= first->second;
+    }
+}
+    
+/************************************************************************
+*  class AffineMapping							*
+************************************************************************/
+//! アフィン変換を行うクラス
+/*!
+  \f$\TUvec{A}{} \in \TUspace{R}{n\times m}\f$と
+  \f$\TUvec{b}{} \in \TUspace{R}{n}\f$を用いてm次元空間の点
+  \f$\TUvec{x}{} \in \TUspace{R}{m}\f$をn次元空間の点
+  \f$\TUvec{y}{} \simeq \TUvec{A}{}\TUvec{x}{} + \TUvec{b}{}
+  \in \TUspace{R}{n}\f$に写す（\f$m \neq n\f$でも構わない）．
+*/
+class AffineMapping : public ProjectiveMapping
+{
+  public:
+  //! 入力空間と出力空間の次元を指定してアフィン変換オブジェクトを生成する．
+  /*!
+    恒等変換として初期化される．
+    \param inDim	入力空間の次元
+    \param outDim	出力空間の次元
+  */
+    AffineMapping(u_int inDim=2, u_int outDim=2)
+	:ProjectiveMapping(inDim, outDim)				{}
+
+    AffineMapping(const Matrix<double>& T)				;
+    template <class Iterator>
+    AffineMapping(Iterator first, Iterator last)			;
+
+    template <class Iterator>
+    void	initialize(Iterator first, Iterator last)		;
+    u_int	ndataMin()					const	;
+    
+  //! このアフィン変換の変形部分を表現する行列を返す．
+  /*! 
+    \return	#outDim() x #inDim()行列
+  */
+    const Matrix<double>
+			A()	const	{return _T(0, 0, outDim(), inDim());}
+    
+    Vector<double>	b()	const	;
+};
+
+//! 変換行列を指定してアフィン変換オブジェクトを生成する．
+/*!
+  変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
+  \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+*/
+inline
+AffineMapping::AffineMapping(const Matrix<double>& T)
+    :ProjectiveMapping(T)
+{
+    _T[outDim()]	  = 0.0;
+    _T[outDim()][inDim()] = 1.0;
+}
+
+//! 与えられた点対列の非同次座標からアフィン変換オブジェクトを生成する．
+/*!
+  \param first			点対列の先頭を示す反復子
+  \param last			点対列の末尾を示す反復子
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template <class Iterator> inline
+AffineMapping::AffineMapping(Iterator first, Iterator last)
+{
+    initialize(first, last);
+}
+
+//! 与えられた点対列の非同次座標からアフィン変換を計算する．
+/*!
+  \param first			点対列の先頭を示す反復子
+  \param last			点対列の末尾を示す反復子
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template <class Iterator> void
+AffineMapping::initialize(Iterator first, Iterator last)
+{
+  // 充分な個数の点対があるか？
+    const u_int	ndata = std::distance(first, last);
+    if (ndata == 0)		// firstが有効か？
+	throw std::invalid_argument("AffineMapping::initialize(): 0-length input data!!");
+    const u_int	xdim = first->first.dim();
+    if (ndata < xdim + 1)	// _Tのサイズが未定なのでndataMin()は無効
+	throw std::invalid_argument("AffineMapping::initialize(): not enough input data!!");
+
+  // データ行列の計算
+    const u_int		ydim = first->second.dim(), xydim2 = xdim*ydim;
+    Matrix<double>	M(xdim, xdim);
+    Vector<double>	c(xdim), v(xydim2 + ydim);
+    for (; first != last; ++first)
+    {
+	const Vector<double>&	x = first->first;
+	const Vector<double>&	y = first->second;
+
+	M += x % x;
+	c += x;
+	for (int j = 0; j < ydim; ++j)
+	    v(j*xdim, xdim) += y[j]*x;
+	v(xydim2, ydim) += y;
+    }
+    Matrix<double>	W(xydim2 + ydim, xydim2 + ydim);
+    for (int j = 0; j < ydim; ++j)
+    {
+	W(j*xdim, j*xdim, xdim, xdim) = M;
+	W[xydim2 + j](j*xdim, xdim)   = c;
+	W[xydim2 + j][xydim2 + j]     = ndata;
+    }
+    W.symmetrize();
+
+  // W*u = vを解いて変換パラメータを求める．
+    v.solve(W);
+
+  // 変換行列をセットする．
+    _T.resize(ydim + 1, xdim + 1);
+    _T(0, 0, ydim, xdim) = Matrix<double>((double*)v, ydim, xdim);
+    for (int j = 0; j < ydim; ++j)
+	 _T[j][xdim] = v[xydim2 + j];
+    _T[ydim][xdim] = 1.0;
+}
+
+//! アフィン変換を求めるために必要な点対の最小個数を返す．
+/*!
+  現在設定されている入出力空間の次元をもとに計算される．
+  \return	必要な点対の最小個数すなわち入力空間の次元mに対して m + 1
+*/
+inline u_int
+AffineMapping::ndataMin() const
+{
+    return inDim() + 1;
+}
+    
+/************************************************************************
+*  class HyperPlane							*
+************************************************************************/
+//! d次元射影空間中の超平面を表現するクラス
+/*!
+  d次元射影空間の点\f$\TUud{x}{} \in \TUspace{R}{d+1}\f$に対して
+  \f$\TUtud{p}{}\TUud{x}{} = 0,~\TUud{p}{} \in \TUspace{R}{d+1}\f$
+  によって表される．
+*/
+class HyperPlane
+{
+  public:
+    HyperPlane(u_int d=2)						;
+
+  //! 同次座標ベクトルを指定して超平面オブジェクトを生成する．
+  /*!
+    \param p	(d+1)次元ベクトル（dはもとの射影区間の次元）
+  */
+    HyperPlane(const Vector<double>& p)	:_p(p)				{}
+
+    template <class Iterator>
+    HyperPlane(Iterator first, Iterator last)				;
+
+    template <class Iterator>
+    void	initialize(Iterator first, Iterator last)		;
+
+  //! この超平面が存在する射影空間の次元を返す．
+  /*! 
+    \return	射影空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
+  */
+    u_int	spaceDim()			const	{return _p.dim()-1;}
+
+  //! 超平面を求めるために必要な点の最小個数を返す．
+  /*!
+    現在設定されている射影空間の次元をもとに計算される．
+    \return	必要な点の最小個数すなわち入力空間の次元#spaceDim()
+  */
+    u_int	ndataMin()			const	{return spaceDim();}
+
+  //! この超平面を表現する同次座標ベクトルを返す．
+  /*!
+    \return	(#spaceDim()+1)次元ベクトル
+  */
+    const Vector<double>&
+		p()				const	{return _p;}
+
+    double	sqdist(const Vector<double>& x)	const	;
+    double	dist(const Vector<double>& x)	const	;
+    
+  private:
+    Vector<double>	_p;	//!> 超平面を表現するベクトル
+};
+
+//! 空間の次元を指定して超平面オブジェクトを生成する．
+/*!
+  無限遠超平面([0, 0,..., 0, 1])に初期化される．
+  \param d	この超平面が存在する射影空間の次元
+*/
+inline
+HyperPlane::HyperPlane(u_int d)
+    :_p(d + 1)
+{
+    _p[d] = 1.0;
+}
+    
+//! 与えられた点列の非同次座標に当てはめられた超平面オブジェクトを生成する．
+/*!
+  \param first			点列の先頭を示す反復子
+  \param last			点列の末尾を示す反復子
+  \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
+*/
+template <class Iterator> inline
+HyperPlane::HyperPlane(Iterator first, Iterator last)
+{
+    initialize(first, last);
+}
+
+//! 与えられた点列の非同次座標に超平面を当てはめる．
+/*!
+  \param first			点列の先頭を示す反復子
+  \param last			点列の末尾を示す反復子
+  \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
+*/
+template <class Iterator> void
+HyperPlane::initialize(Iterator first, Iterator last)
+{
+  // 点列の正規化
+    const Normalize	normalize(first, last);
+
+  // 充分な個数の点があるか？
+    const u_int		ndata = std::distance(first, last),
+			d     = normalize.spaceDim();
+    if (ndata < d)	// _pのサイズが未定なのでndataMin()は無効
+	throw std::invalid_argument("Hyperplane::initialize(): not enough input data!!");
+
+  // データ行列の計算
+    Matrix<double>	A(d, d);
+    while (first != last)
+    {
+	const Vector<double>&	x = normalize(*first++);
+	A += x % x;
+    }
+
+  // データ行列の最小固有値に対応する固有ベクトルから法線ベクトルを計算し，
+  // さらに点列の重心より原点からの距離を計算する．
+    Vector<double>		eval;
+    const Matrix<double>&	Ut = A.eigen(eval);
+    _p.resize(d+1);
+    _p(0, d) = Ut[Ut.nrow()-1];
+    _p[d] = -(_p(0, d)*normalize.centroid());
+    if (_p[d] > 0.0)
+	_p *= -1.0;
+}
+
+//! 与えられた点と超平面の距離の2乗を返す．
+/*!
+  \param x	点の非同次座標（#spaceDim()次元）または同次座標
+		（#spaceDim()+1次元）
+  \return	点と超平面の距離の2乗
+*/
+inline double
+HyperPlane::sqdist(const Vector<double>& x) const
+{
+    const double	d = dist(x);
+    return d*d;
+}
+
+//! 与えられた点と超平面の距離を返す．
+/*!
+  \param x			点の非同次座標（#spaceDim()次元）または
+				同次座標（#spaceDim()+1次元）
+  \return			点と超平面の距離（非負）
+  \throw std::invalid_argument	点のベクトルとしての次元が#spaceDim()，
+				#spaceDim()+1のいずれでもない場合，もしくは
+				この点が無限遠点である場合に送出．
+*/
+inline double
+HyperPlane::dist(const Vector<double>& x) const
+{
+    if (x.dim() == spaceDim())
+    {
+	Vector<double>	xx(spaceDim()+1);
+	xx(0, spaceDim()) = x;
+	xx[spaceDim()] = 1.0;
+	return fabs(_p * xx);
+    }
+    else if (x.dim() == spaceDim() + 1)
+    {
+	if (x[spaceDim()] == 0.0)
+	    throw std::invalid_argument("HyperPlane::dist(): point at infinitiy!!");
+	return fabs((_p * x)/x[spaceDim()]);
+    }
+    else
+	throw std::invalid_argument("HyperPlane::dist(): dimension mismatch!!");
+
+    return 0;
+}
 
 /************************************************************************
 *  class CameraBase							*

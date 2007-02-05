@@ -19,7 +19,7 @@
  *  Authors are not responsible for any damage in use of this program.
  */
 /*
- *  $Id: Array++.h,v 1.11 2007-01-16 07:52:58 ueshiba Exp $
+ *  $Id: Array++.h,v 1.12 2007-02-05 23:24:03 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -27,10 +27,6 @@
 #include <iostream>
 #include "TU/types.h"
 
-/*!
-  \namespace	TU
-  \brief	本ライブラリで定義されたクラスおよび関数を納める名前空間
- */
 namespace TU
 {
 /************************************************************************
