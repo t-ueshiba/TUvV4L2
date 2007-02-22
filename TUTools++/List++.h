@@ -1,5 +1,5 @@
 /*
- *  $Id: List++.h,v 1.2 2002-07-25 02:38:05 ueshiba Exp $
+ *  $Id: List++.h,v 1.3 2007-02-22 23:23:21 ueshiba Exp $
  */
 #ifndef __TUListPP_h
 #define __TUListPP_h
@@ -60,9 +60,9 @@ class List
       public:
 	Iterator()	:_list(0), _prev(0)	{}
 	
-	int		operator ==(const Iterator& i) const
+	bool		operator ==(const Iterator& i) const
 						{return _prev == i._prev;}
-	int		operator !=(const Iterator& i) const
+	bool		operator !=(const Iterator& i) const
 						{return !(*this == i);}
 	pointer		operator ->()	const	{return (_prev == 0 ?
 							 _list->_front :
@@ -101,9 +101,9 @@ class List
 	ConstIterator()	:_current(0)					{}
 	ConstIterator(const Iterator& i) :_current(i.operator ->())	{}
 	
-	int		operator ==(const ConstIterator& i) const
+	bool		operator ==(const ConstIterator& i) const
 						{return _current==i._current;}
-	int		operator !=(const ConstIterator& i) const
+	bool		operator !=(const ConstIterator& i) const
 						{return !(*this == i);}
 	const_pointer	operator ->()	const	{return _current;}
 	const_reference	operator * ()	const	{return *(operator ->());}
@@ -131,7 +131,7 @@ class List
     Iterator		end()			{return Iterator(this, _back);}
     ConstIterator	begin()		const	{return _front;}
     ConstIterator	end()		const	{return 0;}
-    int			empty()		const	{return _front == 0;}
+    bool		empty()		const	{return _front == 0;}
     reference		front()			{return *begin();}
     const_reference	front()		const	{return *begin();}
     void		push_front(T& x)	{insert(begin(), x);}
