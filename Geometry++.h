@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.12 2007-02-05 23:24:03 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.13 2007-02-22 23:23:21 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -478,13 +478,13 @@ class Normalize
     恒等変換として初期化される．
     \param d	空間の次元
   */
-    Normalize(u_int d=2) :_scale(1.0), _centroid(d)			{}
+    Normalize(u_int d=2) :_npoints(0), _scale(1.0), _centroid(d)	{}
 
     template <class Iterator>
     Normalize(Iterator first, Iterator last)				;
     
     template <class Iterator>
-    void		initialize(Iterator first, Iterator last)	;
+    void		update(Iterator first, Iterator last)		;
 
     u_int		spaceDim()				const	;
     Vector<double>	operator ()(const Vector<double>& x)	const	;
@@ -498,8 +498,9 @@ class Normalize
     const Vector<double>&	centroid()			const	;
     
   private:
-    double		_scale;
-    Vector<double>	_centroid;
+    u_int		_npoints;	//!< これまでに与えた点の総数
+    double		_scale;		//!< これまでに与えた点の振幅のRMS値
+    Vector<double>	_centroid;	//!< これまでに与えた点群の重心
 };
 
 //! 与えられた点群の非同次座標から正規化変換オブジェクトを生成する．
@@ -510,34 +511,39 @@ class Normalize
 */
 template <class Iterator> inline
 Normalize::Normalize(Iterator first, Iterator last)
-    :_scale(1.0), _centroid()
+    :_npoints(0), _scale(1.0), _centroid()
 {
-    initialize(first, last);
+    update(first, last);
 }
     
-//! 与えられた点群の非同次座標から正規化変換を計算する．
+//! 新たに点群を追加してその非同次座標から現在の正規化変換を更新する．
 /*!
   振幅の2乗平均値が#spaceDim(), 重心が原点になるような正規化変換が計算される．
   \param first			点群の先頭を示す反復子
   \param last			点群の末尾を示す反復子
-  \throw std::invalid_argument	与えられた点の数が0の場合に送出
+  \throw std::invalid_argument	これまでに与えられた点の総数が0の場合に送出
 */
 template <class Iterator> void
-Normalize::initialize(Iterator first, Iterator last)
+Normalize::update(Iterator first, Iterator last)
 {
-    u_int	ndata = 0;
-    _scale = 0.0;
-    _centroid.resize(first->dim());
+    if (_npoints == 0)
+    {
+	if (first == last)
+	    throw std::invalid_argument("Normalize::update(): 0-length input data!!");
+	_centroid.resize(first->dim());
+    }
+    _scale = _npoints * (spaceDim() * _scale * _scale + _centroid * _centroid);
+    _centroid *= _npoints;
     while (first != last)
     {
 	_scale += first->square();
 	_centroid += *first++;
-	++ndata;
+	++_npoints;
     }
-    if (ndata == 0)
-	throw std::invalid_argument("Normalize::initialize(): 0-length input data!!");
-    _scale = sqrt(_scale / (ndata * spaceDim()));
-    _centroid /= ndata;
+    if (_npoints == 0)
+	throw std::invalid_argument("Normalize::update(): no input data accumulated!!");
+    _centroid /= _npoints;
+    _scale = sqrt((_scale / _npoints - _centroid * _centroid) / spaceDim());
 }
 
 //! この正規化変換が適用される空間の次元を返す．
@@ -701,10 +707,10 @@ template <class Iterator> void
 ProjectiveMapping::initialize(Iterator first, Iterator last, bool refine)
 {
   // 点列の正規化
-    const Normalize	xNormalize(make_first_iterator(first),
-				   make_first_iterator(last)),
-			yNormalize(make_second_iterator(first),
-				   make_second_iterator(last));
+    const Normalize	xNormalize(make_const_first_iterator(first),
+				   make_const_first_iterator(last)),
+			yNormalize(make_const_second_iterator(first),
+				   make_const_second_iterator(last));
 
   // 充分な個数の点対があるか？
     const u_int		ndata = std::distance(first, last),
