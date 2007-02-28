@@ -8,7 +8,7 @@ SUBDIR	= TUTools++		\
 	  TUCollection++	\
 	  TUVision++		\
 	  TUXv++		
-#`	  Kanatani		\
+#	  Kanatani		\
 #	  TUXgl++		\
 #	  TUXil++		\
 #	  TUXilXgl++		\

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.16 2007-01-31 05:42:44 ueshiba Exp $
+#  $Id: Makefile,v 1.17 2007-02-28 00:18:40 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -23,13 +23,13 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /Users/ueshiba/include/TU/Array++.cc \
-		/Users/ueshiba/include/TU/Array++.h \
+EXTHDRS		= /Users/ueshiba/include/TU/Array++.h \
 		/Users/ueshiba/include/TU/BlockMatrix++.h \
 		/Users/ueshiba/include/TU/Geometry++.h \
 		/Users/ueshiba/include/TU/Minimize++.h \
 		/Users/ueshiba/include/TU/Vector++.h \
 		/Users/ueshiba/include/TU/types.h \
+		/Users/ueshiba/include/TU/utility.h \
 		TU/Calib++.cc \
 		TU/Calib++.h
 HDRS		= Calib++.h
@@ -65,7 +65,7 @@ OBJS		= Calib++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.16 $	|		\
+REV		= $(shell echo $Revision: 1.17 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -77,33 +77,37 @@ REV		= $(shell echo $Revision: 1.16 $	|		\
 include $(PROJECT)/lib/l.mk
 ###
 Calib++.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
-	/Users/ueshiba/include/TU/Vector++.h \
-	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
-	/Users/ueshiba/include/TU/Minimize++.h
-MeasurementMatrix.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
-	/Users/ueshiba/include/TU/Vector++.h \
-	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
+	/Users/ueshiba/include/TU/utility.h \
 	/Users/ueshiba/include/TU/Minimize++.h \
-	/Users/ueshiba/include/TU/Array++.cc TU/Calib++.cc
-Normalization.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
-	/Users/ueshiba/include/TU/Minimize++.h
+	/Users/ueshiba/include/TU/BlockMatrix++.h
+MeasurementMatrix.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/BlockMatrix++.h TU/Calib++.cc
+Normalization.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/BlockMatrix++.h
 affine_registration.o: /Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h
 assess_projection.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
-	/Users/ueshiba/include/TU/Minimize++.h
+	/Users/ueshiba/include/TU/BlockMatrix++.h
 decompose_essential.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
-	/Users/ueshiba/include/TU/Minimize++.h
+	/Users/ueshiba/include/TU/BlockMatrix++.h
 decompose_homography.o: /Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h
 euclidean_registration.o: /Users/ueshiba/include/TU/Vector++.h \
@@ -113,19 +117,22 @@ get_flengths.o: /Users/ueshiba/include/TU/Vector++.h \
 get_principal.o: /Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h
 io.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
-	/Users/ueshiba/include/TU/Minimize++.h
+	/Users/ueshiba/include/TU/BlockMatrix++.h
 plane_motion.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
-	/Users/ueshiba/include/TU/Minimize++.h
+	/Users/ueshiba/include/TU/BlockMatrix++.h
 projection.o: TU/Calib++.h /Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
-	/Users/ueshiba/include/TU/BlockMatrix++.h \
-	/Users/ueshiba/include/TU/Minimize++.h
+	/Users/ueshiba/include/TU/BlockMatrix++.h
 similarity_registration.o: /Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h

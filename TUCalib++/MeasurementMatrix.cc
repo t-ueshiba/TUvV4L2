@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.11 2007-01-31 05:42:44 ueshiba Exp $
+ *  $Id: MeasurementMatrix.cc,v 1.12 2007-02-28 00:18:40 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 #include <iomanip>
@@ -254,7 +254,7 @@ MeasurementMatrix::fundamental(u_int frame0, u_int frame1) const
     
     for (;;)
     {
-	const Matrix<ET>&	G = F.adj().trns();
+	Matrix<ET>		G = F.adj().trns();
 	Vector<ET>		g((ET*)G, 9);
 	const ET		detF = f * g / 3.0;
 #ifdef DEBUG	
@@ -1400,7 +1400,6 @@ MeasurementMatrix::CostCP::updateB(ATB& camera,
 
 }
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Array++.cc"
 #  include "TU/Calib++.cc"
 namespace TU
 {

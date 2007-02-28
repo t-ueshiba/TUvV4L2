@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.19 2007-01-19 02:28:07 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.20 2007-02-28 00:18:40 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -2666,7 +2666,6 @@ operator >>(std::istream& in, Ieee1394Camera& camera)
 }
 #ifdef HAVE_TUToolsPP
 #  if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#    include "TU/Array++.cc"
 #    include "TU/Image++.cc"
 namespace TU
 {

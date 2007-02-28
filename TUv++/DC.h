@@ -1,5 +1,5 @@
 /*
- *  $Id: DC.h,v 1.4 2007-01-16 23:41:08 ueshiba Exp $
+ *  $Id: DC.h,v 1.5 2007-02-28 00:18:40 ueshiba Exp $
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -52,10 +52,9 @@ class DC
 	    DC&		repaintAll()				;
     virtual DC&		sync()					= 0;
     
-	    DC&		operator <<(const Point2<short>& p)	;
     virtual DC&		operator <<(const Point2<int>& p)	= 0;
-	    DC&		operator <<(const Point2<float>& p)	;
-	    DC&		operator <<(const Point2<double>& p)	;
+    template <class T>
+	    DC&		operator <<(const Point2<T>& p)		;
     virtual DC&		operator <<(const LineP2<double>& p)	= 0;
     virtual DC&		operator <<(const Image<u_char>& image)	= 0;
     virtual DC&		operator <<(const Image<s_char>& image)	= 0;
@@ -106,28 +105,10 @@ DC::setZoom(u_int mul, u_int div)
     return setSize(width(), height(), mul, div);
 }
     
-inline DC&
-DC::operator <<(const Point2<short>& p)
+template <class T> inline DC&
+DC::operator <<(const Point2<T>& p)
 {
-    const Point2<int>	q(p[0], p[1]);
-    return *this << q;
-    
-}
-
-inline DC&
-DC::operator <<(const Point2<float>& p)
-{
-    const Point2<int>	q((int)p[0], (int)p[1]);
-    return *this << q;
-    
-}
-
-inline DC&
-DC::operator <<(const Point2<double>& p)
-{
-    const Point2<int>	q((int)p[0], (int)p[1]);
-    return *this << q;
-    
+    return *this << Point2<int>(p);
 }
 
 inline int
