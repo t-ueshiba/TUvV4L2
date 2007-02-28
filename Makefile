@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.34 2007-02-05 23:24:03 ueshiba Exp $
+#  $Id: Makefile,v 1.35 2007-02-28 00:16:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -8,14 +8,15 @@ DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU
 INCDIRS		= -I$(INCDIR)
 
-NAME		= $(shell basename $(PWD))
+NAME		= TUTools++
 
 CPPFLAGS	=
-CFLAGS		= -g
+CFLAGS		= -g -O
 CCFLAGS		= -g -O
 ifeq ($(CCC), icpc)
   CPPFLAGS     += -DSSE3
-  CCFLAGS	= -O3 -parallel
+  CFLAGS	= -O3 -parallel
+  CCFLAGS	= $(CFLAGS)
 endif
 LDFLAGS		= $(CCFLAGS)
 LINKER		= $(CCC)
@@ -25,11 +26,11 @@ LINKER		= $(CCC)
 #########################
 SUFFIX		= .cc:sC
 EXTHDRS		= TU/Allocator++.h \
-		TU/Array++.cc \
 		TU/Bezier++.h \
 		TU/BlockMatrix++.cc \
 		TU/BlockMatrix++.h \
 		TU/Geometry++.cc \
+		TU/Geometry++.h \
 		TU/Heap++.h \
 		TU/Image++.cc \
 		TU/Image++.h \
@@ -40,11 +41,10 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/Random.h \
 		TU/Serial++.h \
 		TU/TU/Array++.h \
-		TU/TU/Geometry++.h \
 		TU/TU/List++.h \
-		TU/TU/TU/Minimize++.h \
-		TU/TU/TU/TU/Vector++.h \
+		TU/TU/Minimize++.h \
 		TU/TU/TU/types.h \
+		TU/TU/Vector++.h \
 		TU/TU/utility.h \
 		TU/Vector++.cc \
 		TU/mmInstructions.h
@@ -69,8 +69,6 @@ HDRS		= Allocator++.h \
 		types.h \
 		utility.h
 SRCS		= Allocator++.cc \
-		Array++.cc \
-		Array++.inst.cc \
 		Bezier++.cc \
 		BlockMatrix++.cc \
 		BlockMatrix++.inst.cc \
@@ -108,8 +106,6 @@ SRCS		= Allocator++.cc \
 		Vector++.inst.cc \
 		manipulators.cc
 OBJS		= Allocator++.o \
-		Array++.o \
-		Array++.inst.o \
 		Bezier++.o \
 		BlockMatrix++.o \
 		BlockMatrix++.inst.o \
@@ -150,7 +146,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.34 $	|		\
+REV		= $(shell echo $Revision: 1.35 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -163,84 +159,78 @@ include $(PROJECT)/lib/l.mk
 ###
 Allocator++.o: TU/Allocator++.h TU/TU/List++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
-Array++.o: TU/TU/Array++.h TU/TU/TU/types.h
-Array++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h
-Bezier++.o: TU/Bezier++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-BlockMatrix++.o: TU/BlockMatrix++.h TU/TU/TU/TU/Vector++.h TU/TU/Array++.h \
+Bezier++.o: TU/Bezier++.h TU/TU/Vector++.h TU/TU/Array++.h \
+	TU/TU/TU/types.h
+BlockMatrix++.o: TU/BlockMatrix++.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 BlockMatrix++.inst.o: TU/BlockMatrix++.cc TU/BlockMatrix++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Array++.cc
-Camera.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h TU/TU/TU/TU/Vector++.h \
-	TU/TU/Array++.h TU/TU/TU/types.h
-CameraBase.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-CameraWithDistortion.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-CameraWithEuclideanImagePlane.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-CameraWithFocalLength.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-CanonicalCamera.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-EdgeDetector.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+Camera.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+CameraBase.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+CameraWithDistortion.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+CameraWithEuclideanImagePlane.o: TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+CameraWithFocalLength.o: TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+CanonicalCamera.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+ConversionFromYUV.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+EdgeDetector.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/mmInstructions.h
-Geometry++.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-Geometry++.inst.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Geometry++.cc
+Geometry++.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+Geometry++.inst.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Geometry++.cc
 Heap++.o: TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h
-IIRFilter.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Array++.cc \
-	TU/Image++.cc TU/TU/utility.h TU/mmInstructions.h
-Image++.o: TU/TU/utility.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/TU/Minimize++.h TU/TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/mmInstructions.h
-Image++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Image++.cc TU/TU/utility.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/TU/Minimize++.h TU/TU/TU/TU/Vector++.h TU/mmInstructions.h
-ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Manip.h
-ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-LinearMapping.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+IIRFilter.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/Image++.cc TU/mmInstructions.h
+Image++.o: TU/TU/utility.h TU/Image++.h TU/Geometry++.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h
+Image++.inst.o: TU/Image++.cc TU/TU/utility.h TU/Image++.h TU/Geometry++.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/mmInstructions.h
+ImageBase.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/Manip.h
+ImageLine.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+LinearMapping.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 List++.o: TU/TU/List++.h
-Mesh++.o: TU/Mesh++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+Mesh++.o: TU/Mesh++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Allocator++.h TU/TU/List++.h
-Microscope.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h \
-	TU/TU/TU/Minimize++.h TU/TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/Geometry++.cc
-Normalize.o: TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-Nurbs++.o: TU/TU/utility.h TU/Nurbs++.h TU/TU/Geometry++.h \
-	TU/TU/TU/Minimize++.h TU/TU/TU/TU/Vector++.h TU/TU/Array++.h \
+Microscope.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/Geometry++.cc
+Normalize.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
+	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+Nurbs++.o: TU/TU/utility.h TU/Nurbs++.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 PSTree++.o: TU/PSTree++.h TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/TU/List++.h
-Pata.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+Pata.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Geometry++.cc
-Puma.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+Puma.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Geometry++.cc
 Random.o: TU/Random.h
-Rotation.o: TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-Serial.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h \
-	TU/TU/TU/Minimize++.h TU/TU/TU/TU/Vector++.h TU/TU/Array++.h \
+Rotation.o: TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+Serial.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/Geometry++.cc
+TUTools++.sa.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/Serial++.h TU/Manip.h TU/Geometry++.cc
+TriggerGenerator.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h \
+	TU/TU/utility.h TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h TU/Geometry++.cc
-TUTools++.sa.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/Minimize++.h \
-	TU/TU/TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Serial++.h \
-	TU/Manip.h TU/Geometry++.cc
-TriggerGenerator.o: TU/Serial++.h TU/Manip.h TU/TU/Geometry++.h \
-	TU/TU/TU/Minimize++.h TU/TU/TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/Geometry++.cc
-Vector++.o: TU/TU/utility.h TU/TU/TU/TU/Vector++.h TU/TU/Array++.h \
+Vector++.o: TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+Vector++.inst.o: TU/Vector++.cc TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
-Vector++.inst.o: TU/Array++.cc TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Vector++.cc TU/TU/utility.h TU/TU/TU/TU/Vector++.h

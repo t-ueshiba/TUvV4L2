@@ -6,22 +6,22 @@ namespace TU
 namespace v
 {
 extern OglDC&
-operator <<(OglDC& dc, const BSplineCurve<float, 2u>& c)		;
+operator <<(OglDC& dc, const BSplineCurve2f& c)			;
 
 extern OglDC&
-operator <<(OglDC& dc, const RationalBSplineCurve<float, 2u>& c)	;
+operator <<(OglDC& dc, const RationalBSplineCurve2f& c)		;
 
 extern OglDC&
-operator <<(OglDC& dc, const BSplineCurve<float, 3u>& c)		;
+operator <<(OglDC& dc, const BSplineCurve3f& c)			;
 
 extern OglDC&
-operator <<(OglDC& dc, const RationalBSplineCurve<float, 3u>& c)	;
+operator <<(OglDC& dc, const RationalBSplineCurve3f& c)		;
 
 extern OglDC&
-operator <<(OglDC& dc, const BSplineSurface<float>& s)		;
+operator <<(OglDC& dc, const BSplineSurface3f& s)		;
 /*
 extern OglDC&
-operator <<(OglDC& dc, const RationalBSplineSurface<float>& s)	;
+operator <<(OglDC& dc, const RationalBSplineSurface3f& s)	;
 */
 }
 }

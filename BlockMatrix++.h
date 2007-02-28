@@ -1,5 +1,5 @@
 /*
- *  $Id: BlockMatrix++.h,v 1.3 2006-04-19 02:34:37 ueshiba Exp $
+ *  $Id: BlockMatrix++.h,v 1.4 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef __TUBlockMatrixPP_h
 #define __TUBlockMatrixPP_h
@@ -9,7 +9,7 @@
 namespace TU
 {
 /************************************************************************
-*  class BlockMatrix<T>						*
+*  class BlockMatrix<T>							*
 ************************************************************************/
 template <class T>
 class BlockMatrix : public Array<Matrix<T> >
@@ -23,8 +23,7 @@ class BlockMatrix : public Array<Matrix<T> >
     u_int		nrow()				const	;
     u_int		ncol()				const	;
     BlockMatrix		trns()				const	;
-    BlockMatrix&	operator  =(double c)
-			{Array<Matrix<T> >::operator  =(c); return *this;}
+    BlockMatrix&	operator  =(T c)			;
     BlockMatrix&	operator *=(double c)
 			{Array<Matrix<T> >::operator *=(c); return *this;}
     BlockMatrix&	operator /=(double c)

@@ -1,15 +1,15 @@
 /*
- *  $Id: Bezier++.cc,v 1.3 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: Bezier++.cc,v 1.4 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/Bezier++.h"
 
 namespace TU
 {
 /************************************************************************
-*  class BezierCurveBase<T, C>						*
+*  class BezierCurve<C>							*
 ************************************************************************/
-template <class T, class C> C
-BezierCurveBase<T, C>::operator ()(T t) const
+template <class C> C
+BezierCurve<C>::operator ()(T t) const
 {
     T		s = 1.0 - t, fact = 1.0;
     int		nCi = 1;
@@ -28,8 +28,8 @@ BezierCurveBase<T, C>::operator ()(T t) const
     return b;
 }
 
-template <class T, class C> Array<C>
-BezierCurveBase<T, C>::deCasteljau(T t, u_int r) const
+template <class C> Array<C>
+BezierCurve<C>::deCasteljau(T t, u_int r) const
 {
     if (r > degree())
 	r = degree();
@@ -43,8 +43,8 @@ BezierCurveBase<T, C>::deCasteljau(T t, u_int r) const
     return b_tmp;
 }
 
-template <class T, class C> void
-BezierCurveBase<T, C>::elevateDegree()
+template <class C> void
+BezierCurve<C>::elevateDegree()
 {
     Array<C>	b_tmp(*this);
     Array<C>::resize(degree() + 2);
@@ -59,10 +59,10 @@ BezierCurveBase<T, C>::elevateDegree()
 }
 
 /************************************************************************
-*  class BezierSurfaceBase<T, C>					*
+*  class BezierSurface<C>						*
 ************************************************************************/
-template <class T, class C>
-BezierSurfaceBase<T, C>::BezierSurfaceBase(const Array2<Array<C> >& b)
+template <class C>
+BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
     :Array2<Curve>(b.nrow(), b.ncol())
 {
     for (int j = 0; j <= vDegree(); ++j)
@@ -70,10 +70,10 @@ BezierSurfaceBase<T, C>::BezierSurfaceBase(const Array2<Array<C> >& b)
 	    (*this)[j][i] = b[j][i];
 }
 
-template <class T, class C> C
-BezierSurfaceBase<T, C>::operator ()(T u, T v) const
+template <class C> C
+BezierSurface<C>::operator ()(T u, T v) const
 {
-    BezierCurveBase<T, C>	vCurve(vDegree());
+    BezierCurve<C>	vCurve(vDegree());
     for (int j = 0; j <= vDegree(); ++j)
 	vCurve[j] = (*this)[j](u);
     return vCurve(v);

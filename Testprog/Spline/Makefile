@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.5 2007-02-01 01:27:19 ueshiba Exp $
+#  $Id: Makefile,v 1.6 2007-02-28 00:16:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -22,12 +22,12 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /Users/ueshiba/include/TU/Array++.cc \
-		/Users/ueshiba/include/TU/Array++.h \
+EXTHDRS		= /Users/ueshiba/include/TU/Array++.h \
 		/Users/ueshiba/include/TU/Geometry++.h \
 		/Users/ueshiba/include/TU/Image++.h \
 		/Users/ueshiba/include/TU/List++.h \
 		/Users/ueshiba/include/TU/Manip.h \
+		/Users/ueshiba/include/TU/Minimize++.h \
 		/Users/ueshiba/include/TU/Nurbs++.cc \
 		/Users/ueshiba/include/TU/Nurbs++.h \
 		/Users/ueshiba/include/TU/Vector++.h \
@@ -55,7 +55,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.5 $	|		\
+REV		= $(shell echo $Revision: 1.6 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -72,6 +72,8 @@ draw.o: draw.h /Users/ueshiba/include/TU/v/OglDC.h \
 	/Users/ueshiba/include/TU/v/CanvasPaneDC.h \
 	/Users/ueshiba/include/TU/v/XDC.h /Users/ueshiba/include/TU/v/DC.h \
 	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
 	/Users/ueshiba/include/TU/Image++.h /Users/ueshiba/include/TU/Manip.h \
@@ -81,15 +83,14 @@ draw.o: draw.h /Users/ueshiba/include/TU/v/OglDC.h \
 	/Users/ueshiba/include/TU/List++.h \
 	/Users/ueshiba/include/TU/v/Widget-Xaw.h \
 	/Users/ueshiba/include/TU/v/Menu.h /Users/ueshiba/include/TU/v/DC3.h \
-	/Users/ueshiba/include/TU/Nurbs++.h \
-	/Users/ueshiba/include/TU/Array++.cc \
-	/Users/ueshiba/include/TU/Nurbs++.cc \
-	/Users/ueshiba/include/TU/utility.h
+	/Users/ueshiba/include/TU/Nurbs++.h
 main.o: /Users/ueshiba/include/TU/v/App.h \
 	/Users/ueshiba/include/TU/v/TUv++.h \
 	/Users/ueshiba/include/TU/v/Colormap.h \
 	/Users/ueshiba/include/TU/Image++.h \
 	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
 	/Users/ueshiba/include/TU/Vector++.h \
 	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
 	/Users/ueshiba/include/TU/List++.h \
@@ -102,6 +103,4 @@ main.o: /Users/ueshiba/include/TU/v/App.h \
 	/Users/ueshiba/include/TU/v/XDC.h /Users/ueshiba/include/TU/v/DC.h \
 	/Users/ueshiba/include/TU/Manip.h /Users/ueshiba/include/TU/v/Menu.h \
 	/Users/ueshiba/include/TU/v/DC3.h /Users/ueshiba/include/TU/Nurbs++.h \
-	/Users/ueshiba/include/TU/Array++.cc \
-	/Users/ueshiba/include/TU/Nurbs++.cc \
-	/Users/ueshiba/include/TU/utility.h
+	/Users/ueshiba/include/TU/Nurbs++.cc

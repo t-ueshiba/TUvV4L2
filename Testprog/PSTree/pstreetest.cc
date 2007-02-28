@@ -1,5 +1,5 @@
 /*
- *  $Id: pstreetest.cc,v 1.2 2002-07-26 08:59:31 ueshiba Exp $
+ *  $Id: pstreetest.cc,v 1.3 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include "TU/PSTree++.h"
@@ -83,7 +83,6 @@ main()
 }
 
 #ifdef __GNUG__
-#  include "TU/Array++.cc"
 #  include "TU/Heap++.cc"
 #  include "TU/List++.cc"
 #  include "TU/PSTree++.cc"

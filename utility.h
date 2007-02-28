@@ -1,5 +1,5 @@
 /*
- *  $Id: utility.h,v 1.7 2007-02-22 23:23:21 ueshiba Exp $
+ *  $Id: utility.h,v 1.8 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h

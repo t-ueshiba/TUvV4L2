@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.4 2006-12-19 07:09:24 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2007-02-28 00:16:06 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -22,16 +22,17 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= ../../TU/Array++.cc \
-		../../TU/Bezier++.cc \
+EXTHDRS		= ../../TU/Bezier++.cc \
 		../../TU/Bezier++.h \
 		../../TU/Geometry++.h \
 		../../TU/Image++.h \
 		../../TU/List++.h \
 		../../TU/Manip.h \
-		../../TU/TU/TU/Array++.h \
-		../../TU/TU/TU/TU/types.h \
-		../../TU/TU/Vector++.h \
+		../../TU/TU/Minimize++.h \
+		../../TU/TU/TU/TU/Array++.h \
+		../../TU/TU/TU/TU/TU/types.h \
+		../../TU/TU/TU/Vector++.h \
+		../../TU/TU/utility.h \
 		/Users/ueshiba/include/TU/v/App.h \
 		/Users/ueshiba/include/TU/v/CanvasPane.h \
 		/Users/ueshiba/include/TU/v/CanvasPaneDC.h \
@@ -54,7 +55,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -70,19 +71,21 @@ draw.o: draw.h /Users/ueshiba/include/TU/v/OglDC.h \
 	/Users/ueshiba/include/TU/v/CanvasPaneDC3.h \
 	/Users/ueshiba/include/TU/v/CanvasPaneDC.h \
 	/Users/ueshiba/include/TU/v/XDC.h /Users/ueshiba/include/TU/v/DC.h \
-	../../TU/Geometry++.h ../../TU/TU/Vector++.h ../../TU/TU/TU/Array++.h \
-	../../TU/TU/TU/TU/types.h ../../TU/Image++.h ../../TU/Manip.h \
+	../../TU/Geometry++.h ../../TU/TU/utility.h ../../TU/TU/Minimize++.h \
+	../../TU/TU/TU/Vector++.h ../../TU/TU/TU/TU/Array++.h \
+	../../TU/TU/TU/TU/TU/types.h ../../TU/Image++.h ../../TU/Manip.h \
 	/Users/ueshiba/include/TU/v/Colormap.h \
 	/Users/ueshiba/include/TU/v/CanvasPane.h \
 	/Users/ueshiba/include/TU/v/TUv++.h ../../TU/List++.h \
 	/Users/ueshiba/include/TU/v/Widget-Xaw.h \
 	/Users/ueshiba/include/TU/v/Menu.h /Users/ueshiba/include/TU/v/DC3.h \
-	../../TU/Bezier++.h ../../TU/Array++.cc ../../TU/Bezier++.cc
+	../../TU/Bezier++.h
 main.o: /Users/ueshiba/include/TU/v/App.h \
 	/Users/ueshiba/include/TU/v/TUv++.h \
 	/Users/ueshiba/include/TU/v/Colormap.h ../../TU/Image++.h \
-	../../TU/Geometry++.h ../../TU/TU/Vector++.h ../../TU/TU/TU/Array++.h \
-	../../TU/TU/TU/TU/types.h ../../TU/List++.h \
+	../../TU/Geometry++.h ../../TU/TU/utility.h ../../TU/TU/Minimize++.h \
+	../../TU/TU/TU/Vector++.h ../../TU/TU/TU/TU/Array++.h \
+	../../TU/TU/TU/TU/TU/types.h ../../TU/List++.h \
 	/Users/ueshiba/include/TU/v/Widget-Xaw.h \
 	/Users/ueshiba/include/TU/v/CmdWindow.h \
 	/Users/ueshiba/include/TU/v/CanvasPane.h draw.h \
@@ -92,4 +95,4 @@ main.o: /Users/ueshiba/include/TU/v/App.h \
 	/Users/ueshiba/include/TU/v/XDC.h /Users/ueshiba/include/TU/v/DC.h \
 	../../TU/Manip.h /Users/ueshiba/include/TU/v/Menu.h \
 	/Users/ueshiba/include/TU/v/DC3.h ../../TU/Bezier++.h \
-	../../TU/Array++.cc ../../TU/Bezier++.cc
+	../../TU/Bezier++.cc

@@ -1,22 +1,25 @@
 /*
- *  $Id: Bezier++.h,v 1.4 2006-12-21 05:12:00 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.5 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
 
-#include "TU/Geometry++.h"
+#include "TU/Vector++.h"
 
 namespace TU
 {
 /************************************************************************
-*  class BezierCurveBase<T, C>						*
+*  class BezierCurve<C>							*
 ************************************************************************/
-template <class T, class C>
-class BezierCurveBase : private Array<C>
+template <class C>
+class BezierCurve : private Array<C>
 {
   public:
-    BezierCurveBase(u_int p=0)		:Array<C>(p+1)		{}
-    BezierCurveBase(const Array<C>& b)	:Array<C>(b)		{}
+    typedef typename C::value_type		T;
+    typedef C					Coord;
+    
+    BezierCurve(u_int p=0)		:Array<C>(p+1)		{}
+    BezierCurve(const Array<C>& b)	:Array<C>(b)		{}
 
     static u_int	dim()			{return C::dim();}
 
@@ -24,6 +27,9 @@ class BezierCurveBase : private Array<C>
     C		operator ()(T t)	  const	;
     Array<C>	deCasteljau(T t, u_int r) const	;
     void	elevateDegree()			;
+		operator const T*()	  const	{return (*this)[0];}
+
+    friend	class Array2<BezierCurve<C> >;	// allow access to resize.
     
     using	Array<C>::operator [];
     using	Array<C>::operator ==;
@@ -31,59 +37,35 @@ class BezierCurveBase : private Array<C>
     using	Array<C>::save;
     using	Array<C>::restore;
 
-    friend class Array2<BezierCurveBase<T, C> >; // allow access to resize.
-    
     friend std::istream&
-    operator >>(std::istream& in, BezierCurveBase<T, C>& b)
+    operator >>(std::istream& in, BezierCurve<C>& b)
 	{return in >> (Array<C>&)b;}
     friend std::ostream&
-    operator <<(std::ostream& out, const BezierCurveBase<T, C>& b)
+    operator <<(std::ostream& out, const BezierCurve<C>& b)
 	{return out << (const Array<C>&)b;}
 };
 
-/************************************************************************
-*  class BezierCurve<T, D>						*
-************************************************************************/
-template <class T, u_int D>
-class BezierCurve : public BezierCurveBase<T, Coordinate<T, D> >
-{
-  public:
-    typedef Coordinate<T, D>	Coord;
-    
-    BezierCurve(u_int p) :BezierCurveBase<T, Coord>(p)			{}
-    BezierCurve(const Array<Coord>& b)
-	:BezierCurveBase<T, Coord>(b)					{}
-
-    operator T*()			const	{return (*this)[0];}
-};
+typedef BezierCurve<Vector2f>	BezierCurve2f;
+typedef BezierCurve<Vector3f>	RationalBezierCurve2f;
+typedef BezierCurve<Vector3f>	BezierCurve3f;
+typedef BezierCurve<Vector4f>	RationalBezierCurve3f;
+typedef BezierCurve<Vector2d>	BezierCurve2d;
+typedef BezierCurve<Vector3d>	RationalBezierCurve2d;
+typedef BezierCurve<Vector3d>	BezierCurve3d;
+typedef BezierCurve<Vector4d>	RationalBezierCurve3d;
 
 /************************************************************************
-*  class RationalBezierCurve<T, D>					*
+*  class BezierSurface<C>						*
 ************************************************************************/
-template <class T, u_int D>
-class RationalBezierCurve : public BezierCurveBase<T, CoordinateP<T, D> >
+template <class C>
+class BezierSurface : protected Array2<BezierCurve<C> >
 {
   public:
-    typedef CoordinateP<T, D>	Coord;
+    typedef BezierCurve<C>	Curve;
+    typedef typename Curve::T	T;
 
-    RationalBezierCurve(u_int p) :BezierCurveBase<T, Coord>(p)		{}
-    RationalBezierCurve(const Array<Coord>& b)
-	:BezierCurveBase<T, Coord>(b)					{}
-
-    operator T*()			const	{return (*this)[0];}
-};
-
-/************************************************************************
-*  class BezierSurfaceBase<T, C>					*
-************************************************************************/
-template <class T, class C>
-class BezierSurfaceBase : protected Array2<BezierCurveBase<T, C> >
-{
-  public:
-    typedef BezierCurveBase<T, C>	Curve;
-
-    BezierSurfaceBase(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}
-    BezierSurfaceBase(const Array2<Array<C> >& b)			;
+    BezierSurface(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}
+    BezierSurface(const Array2<Array<C> >& b)			;
 
     static u_int	dim()				{return C::dim();}
 
@@ -94,6 +76,7 @@ class BezierSurfaceBase : protected Array2<BezierCurveBase<T, C> >
 		deCasteljau(T u, T v, u_int r)	const	;
     void	uElevateDegree()			;
     void	vElevateDegree()			;
+		operator const T*()		const	{return (*this)[0][0];}
 
     using	Array2<Curve>::operator [];
     using	Array2<Curve>::nrow;
@@ -104,47 +87,17 @@ class BezierSurfaceBase : protected Array2<BezierCurveBase<T, C> >
     using	Array2<Curve>::restore;
     
     friend std::istream&
-    operator >>(std::istream& in, BezierSurfaceBase<T, C>& b)
+    operator >>(std::istream& in, BezierSurface<C>& b)
 	{return in >> (Array2<Curve>&)b;}
     friend std::ostream&
-    operator <<(std::ostream& out, const BezierSurfaceBase<T, C>& b)
+    operator <<(std::ostream& out, const BezierSurface<C>& b)
 	{return out << (const Array2<Curve>&)b;}
 };
 
-/************************************************************************
-*  class BezierSurface<T>						*
-************************************************************************/
-template <class T>
-class BezierSurface : public BezierSurfaceBase<T, TU::Coordinate<T, 3u> >
-{
-  public:
-    typedef Coordinate<T, 3u>		Coord;
-    
-    BezierSurface(u_int p, u_int q)
-	:BezierSurfaceBase<T, Coord>(p, q)			{}
-    BezierSurface(const Array2<Array<Coord> >& b)
-	:BezierSurfaceBase<T, Coord>(b)				{}
-
-    operator T*()			const	{return (*this)[0][0];}
-};
-
-/************************************************************************
-*  class RationalBezierSurface<T>					*
-************************************************************************/
-template <class T>
-class RationalBezierSurface
-	: public BezierSurfaceBase<T, TU::CoordinateP<T, 3u> >
-{
-  public:
-    typedef CoordinateP<T, 3u>	Coord;
-
-    RationalBezierSurface(u_int p, u_int q)
-	:BezierSurfaceBase<T, Coord>(p)				{}
-    RationalBezierSurface(const Array2<Array<Coord> >& b)
-	:BezierSurfaceBase<T, Coord>(b)				{}
-
-    operator T*()			const	{return (*this)[0][0];}
-};
+typedef BezierSurface<Vector3f>	BezierSurface3f;
+typedef BezierSurface<Vector4f>	RationalBezierSurface3f;
+typedef BezierSurface<Vector3d>	BezierSurface3d;
+typedef BezierSurface<Vector4d>	RationalBezierSurface3d;
  
 }
 

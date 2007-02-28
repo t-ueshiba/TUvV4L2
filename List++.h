@@ -1,5 +1,5 @@
 /*
- *  $Id: List++.h,v 1.3 2007-02-22 23:23:21 ueshiba Exp $
+ *  $Id: List++.h,v 1.4 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef __TUListPP_h
 #define __TUListPP_h
@@ -16,10 +16,10 @@ class List
   public:
     typedef T		value_type;
     typedef ptrdiff_t	difference_type;
-    typedef T&		reference;
-    typedef const T&	const_reference;
     typedef T*		pointer;
+    typedef T&		reference;
     typedef const T*	const_pointer;
+    typedef const T&	const_reference;
 
     class		Iterator;
     class		ConstIterator;
@@ -46,16 +46,15 @@ class List
     };
     
     class Iterator
-#if (defined(__GNUC__) && (__GNUC__ < 3))
-	: public forward_iterator<value_type, difference_type>
-#else
 	: public std::iterator<std::forward_iterator_tag, 
 			       value_type, difference_type, pointer, reference>
-#endif
     {
       public:
-        typedef typename List<T>::reference	reference;
-	typedef typename List<T>::pointer	pointer;
+	typedef std::forward_iterator_tag		iterator_category;
+	typedef typename List<T>::value_type		value_type;
+	typedef typename List<T>::difference_type	difference_type;
+	typedef typename List<T>::pointer		pointer;
+        typedef typename List<T>::reference		reference;
 
       public:
 	Iterator()	:_list(0), _prev(0)	{}
@@ -86,16 +85,16 @@ class List
     };
 
     class ConstIterator
-#if (defined(__GNUC__) && (__GNUC__ < 3))
-	: public forward_iterator<value_type, difference_type>
-#else
 	: public std::iterator<std::forward_iterator_tag,
-			       value_type, difference_type, pointer, reference>
-#endif
+			       value_type, difference_type,
+			       const_pointer, const_reference>
     {
       public:
-	typedef typename List<T>::const_reference	const_reference;
-	typedef typename List<T>::const_pointer		const_pointer;
+	typedef std::forward_iterator_tag		iterator_category;
+	typedef typename List<T>::value_type		value_type;
+	typedef typename List<T>::difference_type	difference_type;
+	typedef typename List<T>::const_pointer		pointer;
+        typedef typename List<T>::const_reference	reference;
 
       public:
 	ConstIterator()	:_current(0)					{}
@@ -105,8 +104,8 @@ class List
 						{return _current==i._current;}
 	bool		operator !=(const ConstIterator& i) const
 						{return !(*this == i);}
-	const_pointer	operator ->()	const	{return _current;}
-	const_reference	operator * ()	const	{return *(operator ->());}
+	pointer		operator ->()	const	{return _current;}
+	reference	operator * ()	const	{return *(operator ->());}
 	ConstIterator&	operator ++()		{_current = _current->_next; 
 						 return *this;}
 	ConstIterator	operator ++(int)	{ConstIterator tmp = *this;

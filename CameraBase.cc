@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraBase.cc,v 1.7 2006-12-19 07:09:24 ueshiba Exp $
+ *  $Id: CameraBase.cc,v 1.8 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 
@@ -84,7 +84,7 @@ std::ostream&
 CameraBase::put(std::ostream& out) const
 {
     std::cerr << "Position:       ";    out << _t;
-    std::cerr << "Rotation:       ";    out << _Rt.rot2axis();
+    std::cerr << "Rotation:       ";    out << _Rt.rot2axis() << std::endl;
     return intrinsic().put(out);
 }
 

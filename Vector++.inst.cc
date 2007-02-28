@@ -18,58 +18,47 @@
  *  No Warranty.
  *  Authors are not responsible for any damage in use of this program.
  */
+/*
+ *  $Id: Vector++.inst.cc,v 1.5 2007-02-28 00:16:06 ueshiba Exp $
+ */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
-#include "TU/Array++.cc"
 #include "TU/Vector++.cc"
 
 namespace TU
 {
-template class Array<Vector<float> >;
-template class Array<Vector<double> >;
-template class Array2<Vector<float> >;
-template class Array2<Vector<double> >;
+template class Vector<short,  FixedSizedBuf<short,  2> >;
+template class Vector<int,    FixedSizedBuf<int,    2> >;
+template class Vector<float,  FixedSizedBuf<float,  2> >;
+template class Vector<double, FixedSizedBuf<double, 2> >;
+
+template class Vector<short,  FixedSizedBuf<short,  3> >;
+template class Vector<int,    FixedSizedBuf<int,    3> >;
+template class Vector<float,  FixedSizedBuf<float,  3> >;
+template class Vector<double, FixedSizedBuf<double, 3> >;
+
+template class Vector<short,  FixedSizedBuf<short,  4> >;
+template class Vector<int,    FixedSizedBuf<int,    4> >;
+template class Vector<float,  FixedSizedBuf<float,  4> >;
+template class Vector<double, FixedSizedBuf<double, 4> >;
+
 template class Vector<float>;
 template class Vector<double>;
+
 template class Matrix<float>;
 template class Matrix<double>;
+
 template class LUDecomposition<float>;
 template class LUDecomposition<double>;
+
 template class QRDecomposition<float>;
 template class QRDecomposition<double>;
+
 template class TriDiagonal<float>;
 template class TriDiagonal<double>;
+
 template class BiDiagonal<float>;
 template class BiDiagonal<double>;
-
-template std::ostream&	operator <<(std::ostream&,
-				    const Array<Vector<float> >&);
-template std::ostream&	operator <<(std::ostream&,
-				    const Array<Vector<double> >&);
-template double		operator *(const Vector<float>&,
-				   const Vector<float>&);
-template double		operator *(const Vector<double>&,
-				   const Vector<double>&);
-template Vector<float>	operator *(const Vector<float>&,
-				   const Matrix<float>&);
-template Vector<double>	operator *(const Vector<double>&,
-				   const Matrix<double>&);
-template Matrix<float>	operator %(const Vector<float>&,
-				   const Vector<float>&);
-template Matrix<double>	operator %(const Vector<double>&,
-				   const Vector<double>&);
-template Matrix<float>	operator ^(const Vector<float>&,
-				   const Matrix<float>&);
-template Matrix<double>	operator ^(const Vector<double>&,
-				   const Matrix<double>&);
-template Matrix<float>	operator *(const Matrix<float>&,
-				   const Matrix<float>&);
-template Matrix<double>	operator *(const Matrix<double>&,
-				   const Matrix<double>&);
-template Vector<float>	operator *(const Matrix<float>&,
-				   const Vector<float>&);
-template Vector<double>	operator *(const Matrix<double>&,
-				   const Vector<double>&);
 }
 
 #endif

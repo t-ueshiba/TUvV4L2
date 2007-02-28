@@ -1,5 +1,5 @@
 /*
- *  $Id: BlockMatrix++.cc,v 1.3 2003-07-06 23:53:21 ueshiba Exp $
+ *  $Id: BlockMatrix++.cc,v 1.4 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/BlockMatrix++.h"
 #include <stdexcept>
@@ -26,7 +26,7 @@ BlockMatrix<T>::BlockMatrix(const Array<u_int>& nrows,
 template <class T> u_int
 BlockMatrix<T>::nrow() const
 {
-    u_int	r = 0;
+    size_t	r = 0;
     for (int i = 0; i < dim(); ++i)
 	r += (*this)[i].nrow();
     return r;
@@ -35,7 +35,7 @@ BlockMatrix<T>::nrow() const
 template <class T> u_int
 BlockMatrix<T>::ncol() const
 {
-    u_int	c = 0;
+    size_t	c = 0;
     for (int i = 0; i < dim(); ++i)
 	c += (*this)[i].ncol();
     return c;
@@ -50,6 +50,14 @@ BlockMatrix<T>::trns() const
     return val;
 }
 
+template <class T> BlockMatrix<T>&
+BlockMatrix<T>::operator =(T c)
+{
+    for (int i = 0; i < dim(); ++i)
+	(*this)[i] = c;
+    return *this;
+}
+    
 template <class T>
 BlockMatrix<T>::operator Matrix<T>() const
 {

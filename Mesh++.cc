@@ -1,5 +1,5 @@
 /*
- *  $Id: Mesh++.cc,v 1.3 2002-07-29 00:09:06 ueshiba Exp $
+ *  $Id: Mesh++.cc,v 1.4 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include <float.h>
 #include <map>
@@ -306,10 +306,10 @@ Mesh<V, E, F, M>::Face::Face(V* v[], int fn)
     }
 }
 
-template <class V, class E, class F, u_int M> Coordinate<float, 3u>
+template <class V, class E, class F, u_int M> Vector3f
 Mesh<V, E, F, M>::Face::centroid() const
 {
-    Coordinate<float, 3u>	c;
+    Vector3f	c;
     for (u_int i = 0; i < M; ++i)
 	c += *_v[i];
     c /= M;
