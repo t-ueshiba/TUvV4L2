@@ -1,8 +1,7 @@
 /*
- *  $Id: mtest.cc,v 1.1 2006-12-22 00:05:55 ueshiba Exp $
+ *  $Id: mtest.cc,v 1.2 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/Vector++.h"
-#include <exception>
 
 main()
 {
@@ -217,8 +216,3 @@ main()
 	}
     }
 }
-
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Array++.cc"
-#  include "TU/Vector++.cc"
-#endif

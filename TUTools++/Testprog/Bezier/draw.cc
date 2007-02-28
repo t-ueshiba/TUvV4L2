@@ -1,5 +1,5 @@
 /*
- *  $Id: draw.cc,v 1.1 2002-07-25 04:36:09 ueshiba Exp $
+ *  $Id: draw.cc,v 1.2 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "draw.h"
 
@@ -8,11 +8,12 @@ namespace TU
 namespace v
 {
 OglDC&
-operator <<(OglDC& dc, const BezierCurve<double, 3u>& b)
+operator <<(OglDC& dc, const BezierCurve3d& b)
 {
     glPushAttrib(GL_EVAL_BIT);
     glEnable(GL_MAP1_VERTEX_3);
-    glMap1d(GL_MAP1_VERTEX_3, 0.0, 1.0, b.dim(), b.degree()+1, (double*)b);
+    glMap1d(GL_MAP1_VERTEX_3,
+	    0.0, 1.0, b.dim(), b.degree()+1, (const double*)b);
     glBegin(GL_LINE_STRIP);
       for (int sample = 0; sample <= 20; ++sample)
 	  glEvalCoord1f((GLfloat)sample/20.0);
@@ -25,7 +26,7 @@ operator <<(OglDC& dc, const BezierCurve<double, 3u>& b)
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
       for (int i = 0; i <= b.degree(); ++i)
-	  glVertex3dv((double*)b[i]);
+	  glVertex3dv((const double*)b[i]);
     glEnd();
     glPopAttrib();
 
@@ -33,11 +34,12 @@ operator <<(OglDC& dc, const BezierCurve<double, 3u>& b)
 }
 
 OglDC&
-operator <<(OglDC& dc, const RationalBezierCurve<double, 3u>& b)
+operator <<(OglDC& dc, const RationalBezierCurve3d& b)
 {
     glPushAttrib(GL_EVAL_BIT);
     glEnable(GL_MAP1_VERTEX_4);
-    glMap1d(GL_MAP1_VERTEX_4, 0.0, 1.0, b.dim(), b.degree()+1, (double*)b);
+    glMap1d(GL_MAP1_VERTEX_4,
+	    0.0, 1.0, b.dim(), b.degree()+1, (const double*)b);
     glBegin(GL_LINE_STRIP);
       for (int sample = 0; sample <= 20; ++sample)
 	  glEvalCoord1f((GLfloat)sample/20.0);
@@ -50,7 +52,7 @@ operator <<(OglDC& dc, const RationalBezierCurve<double, 3u>& b)
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
       for (int i = 0; i <= b.degree(); ++i)
-	  glVertex4dv((double*)b[i]);
+	  glVertex4dv((const double*)b[i]);
     glEnd();
     glPopAttrib();
     
@@ -58,13 +60,13 @@ operator <<(OglDC& dc, const RationalBezierCurve<double, 3u>& b)
 }
 /*
 OglDC&
-operator <<(OglDC& dc, const BezierSurface<double>& b)
+operator <<(OglDC& dc, const BezierSurface3d& b)
 {
     glPushAttrib(GL_EVAL_BIT);
     glEnable(GL_MAP2_VERTEX_3);
     glMap2d(GL_MAP2_VERTEX_3,
 	    0.0, 1.0,			b.dim(), b.uDegree()+1,
-	    0.0, 1.0, (b.uDegree()+1) * b.dim(), b.vDegree()+1, (double*)b);
+	    0.0, 1.0, (b.uDegree()+1) * b.dim(), b.vDegree()+1, (const double*)b);
     for (int mesh = 0; mesh <= 8; ++mesh)
     {
       glBegin(GL_LINE_STRIP);
@@ -86,14 +88,14 @@ operator <<(OglDC& dc, const BezierSurface<double>& b)
     {
 	glBegin(GL_LINE_STRIP);
 	for (int i = 0; i <= b.uDegree(); ++i)
-	    glVertex3dv((double*)b[j][i]);
+	    glVertex3dv((const double*)b[j][i]);
 	glEnd();
     }
     for (int i = 0; i <= b.uDegree(); ++i)
     {
 	glBegin(GL_LINE_STRIP);
 	for (int j = 0; j <= b.vDegree(); ++j)
-	    glVertex3dv((double*)b[j][i]);
+	    glVertex3dv((const double*)b[j][i]);
 	glEnd();
     }
     glPopAttrib();
@@ -102,13 +104,14 @@ operator <<(OglDC& dc, const BezierSurface<double>& b)
 }
 */
 OglDC&
-operator <<(OglDC& dc, const BezierSurface<double>& b)
+operator <<(OglDC& dc, const BezierSurface3d& b)
 {
     glPushAttrib(GL_EVAL_BIT);
     glEnable(GL_MAP2_VERTEX_3);
     glMap2d(GL_MAP2_VERTEX_3,
 	    0.0, 1.0,			b.dim(), b.uDegree()+1,
-	    0.0, 1.0, (b.uDegree()+1) *	b.dim(), b.vDegree()+1, (double*)b);
+	    0.0, 1.0, (b.uDegree()+1) *	b.dim(), b.vDegree()+1,
+	    (const double*)b);
     glMapGrid2d(20, 0.0, 1.0, 20, 0.0, 1.0);
     glFrontFace(GL_CW);
     glEvalMesh2(GL_FILL, 0, 20, 0, 20);
@@ -123,14 +126,14 @@ operator <<(OglDC& dc, const BezierSurface<double>& b)
     {
 	glBegin(GL_LINE_STRIP);
 	for (int i = 0; i <= b.uDegree(); ++i)
-	    glVertex3dv((double*)b[j][i]);
+	    glVertex3dv((const double*)b[j][i]);
 	glEnd();
     }
     for (int i = 0; i <= b.uDegree(); ++i)
     {
 	glBegin(GL_LINE_STRIP);
 	for (int j = 0; j <= b.vDegree(); ++j)
-	    glVertex3dv((double*)b[j][i]);
+	    glVertex3dv((const double*)b[j][i]);
 	glEnd();
     }
     glPopAttrib();
@@ -140,8 +143,3 @@ operator <<(OglDC& dc, const BezierSurface<double>& b)
  
 }
 }
-
-#ifdef __GNUG__
-#  include "TU/Array++.cc"
-#  include "TU/Bezier++.cc"
-#endif

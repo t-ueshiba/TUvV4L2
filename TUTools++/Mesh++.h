@@ -1,36 +1,14 @@
 /*
- *  $Id: Mesh++.h,v 1.10 2006-04-19 02:34:37 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.11 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
 
-#include "TU/Geometry++.h"
+#include "TU/Vector++.h"
 #include "TU/Allocator++.h"
 
 namespace TU
 {
-typedef Coordinate<float, 3u>	Coord3f;
-
-inline Coord3f
-operator +(const Coord3f& a, const Coord3f& b)
-    {Coord3f r(a); r += b; return r;}
-
-inline Coord3f
-operator -(const Coord3f& a, const Coord3f& b)
-    {Coord3f r(a); r -= b; return r;}
-
-inline Coord3f
-operator *(double c, const Coord3f& a)
-    {Coord3f r(a); r *= c; return r;}
-
-inline Coord3f
-operator *(const Coord3f& a, double c)
-    {Coord3f r(a); r *= c; return r;}
-
-inline Coord3f
-operator /(const Coord3f& a, double c)
-    {Coord3f r(a); r /= c; return r;}
-
 /************************************************************************
 *  class Mesh<V, E, F, M>						*
 ************************************************************************/
@@ -124,11 +102,11 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 #endif
 	~Face()						{}
 
-	F&			f(int e)	const	{return *_f[e];}
-	V&			v(int e)	const	{return *_v[e];}
-	Coordinate<float, 3u>	centroid()	const	;
+	F&		f(int e)		const	{return *_f[e];}
+	V&		v(int e)		const	{return *_v[e];}
+	Vector3f	centroid()		const	;
 	
-	void*	operator new(size_t, void* p)		{return p;}
+	void*		operator new(size_t, void* p)	{return p;}
 	
       private:
 	friend class	Edge;

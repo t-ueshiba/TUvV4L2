@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.21 2007-01-31 05:42:20 ueshiba Exp $
+ *  $Id: Image++.h,v 1.22 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -382,7 +382,7 @@ class ImageLine : public Array<T>
         :Array<T>(d), _lmost(0), _rmost(d)		{*this = 0;}
     ImageLine(T* p, u_int d)
         :Array<T>(p, d), _lmost(0), _rmost(d)		{}
-    ImageLine&		operator =(double c)
+    ImageLine&		operator =(T c)
 			{
 			    Array<T>::operator =(c);
 			    return *this;
@@ -496,7 +496,7 @@ class ImageLine<YUV411> : public Array<YUV411>
 	:Array<YUV411>(d), _lmost(0), _rmost(d)		{*this = 0;}
     ImageLine(YUV411* p, u_int d)
 	:Array<YUV411>(p, d), _lmost(0), _rmost(d)	{}
-    ImageLine&		operator =(double c)
+    ImageLine&		operator =(YUV411 c)
 			{
 			    Array<YUV411>::operator =(c);
 			    return *this;
@@ -555,7 +555,7 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
 	:Array2<ImageLine<T> >(h, w), ImageBase()		{*this = 0;}
     Image(T* p, u_int w, u_int h)			
 	:Array2<ImageLine<T> >(p, h, w), ImageBase()		{}
-    Image(const Image& i, u_int u, u_int v, u_int w, u_int h)
+    Image(const Image& i, int u, int v, u_int w, u_int h)
 	:Array2<ImageLine<T> >(i, v, u, h, w), ImageBase(i)	{}
     Image(const Image& i)			
 	:Array2<ImageLine<T> >(i), ImageBase(i)			{}
@@ -573,7 +573,7 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     u_int	height()		const	{return
 						 Array2<ImageLine<T> >::nrow();}
     
-    Image&	operator = (double c)		{Array2<ImageLine<T> >::
+    Image&	operator = (T c)		{Array2<ImageLine<T> >::
 						 operator =(c); return *this;}
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out, Type type)	const	;
@@ -622,7 +622,7 @@ template <> inline
 Image<YUV411>::Image(u_int w, u_int h)
     :Array2<ImageLine<TU::YUV411> >(h, w/2), ImageBase()
 {
-    *this = 0.0;
+    *this = 0;
 }
 
 template <> inline
@@ -632,7 +632,7 @@ Image<YUV411>::Image(TU::YUV411* p, u_int w, u_int h)
 }
 
 template <> inline
-Image<YUV411>::Image(const Image& i, u_int u, u_int v, u_int w, u_int h)
+Image<YUV411>::Image(const Image& i, int u, int v, u_int w, u_int h)
     :Array2<ImageLine<TU::YUV411> >(i, v, u/2, h, w/2), ImageBase(i)
 {
 }

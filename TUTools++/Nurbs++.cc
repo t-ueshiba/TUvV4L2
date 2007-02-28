@@ -1,5 +1,5 @@
 /*
- *  $Id: Nurbs++.cc,v 1.6 2007-02-04 23:59:53 ueshiba Exp $
+ *  $Id: Nurbs++.cc,v 1.7 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Nurbs++.h"
@@ -167,7 +167,7 @@ BSplineKnots<T>::derivatives(T u, u_int K, int& I) const
 	for (int k = 1; k <= K; ++k)			// k-th derivative
 	{
 	    N[k][i] = 0.0;
-	    for (int j = max(0, k-i); j <= min(k, degree()-i); ++j)
+	    for (int j = std::max(0, k-i); j <= std::min(k, degree()-i); ++j)
 	    {
 		a[current][j] = ((j != k ? a[previous][j]   : 0.0) -
 				 (j != 0 ? a[previous][j-1] : 0.0))
@@ -228,21 +228,21 @@ BSplineKnots<T>::removeKnot(int k)
 }
 
 /************************************************************************
-*  class BSplineCurveBase<T, C>					*
+*  class BSplineCurve<C>						*
 ************************************************************************/
-template <class T, class C>
-BSplineCurveBase<T, C>::BSplineCurveBase(u_int degree, T us, T ue)
+template <class C>
+BSplineCurve<C>::BSplineCurve(u_int degree, T us, T ue)
     :Array<C>(degree + 1), _knots(degree, us, ue)
 {
 }
 
 /*
- *  C BSplineCurveBase<T, C>::operator ()(T u) const
+ *  C BSplineCurve<C>::operator ()(T u) const
  *
  *    Evaluate the coodinate of the curve at 'u'.
  */
-template <class T, class C> C
-BSplineCurveBase<T, C>::operator ()(T u) const
+template <class C> C
+BSplineCurve<C>::operator ()(T u) const
 {
     int		span;
     Array<T>	N = _knots.basis(u, span);
@@ -253,13 +253,13 @@ BSplineCurveBase<T, C>::operator ()(T u) const
 }
 
 /*
- *  Array<C> BSplineCurveBase<T, C>::derivatives(T u, u_int K) const
+ *  Array<C> BSplineCurve<C>::derivatives(T u, u_int K) const
  *
  *    Evaluate up to K-th derivatives of the curve at 'u':
  *      array[k] = "k-th derivative of the curve at 'u'" where 0 <= k <= K.
  */
-template <class T, class C> Array<C>
-BSplineCurveBase<T, C>::derivatives(T u, u_int K) const
+template <class C> Array<C>
+BSplineCurve<C>::derivatives(T u, u_int K) const
 {
     int				I;
     Array2<Array<T> >	dN = _knots.derivatives(u, min(K,degree()), I);
@@ -271,13 +271,13 @@ BSplineCurveBase<T, C>::derivatives(T u, u_int K) const
 }
 
 /*
- *  int BSplineCurveBase<T, C>::insertKnot(T u)
+ *  int BSplineCurve<C>::insertKnot(T u)
  *
  *    Insert a knot at 'u', recompute control points and return the index
  *    of the new knot.
  */
-template <class T, class C> int
-BSplineCurveBase<T, C>::insertKnot(T u)
+template <class C> int
+BSplineCurve<C>::insertKnot(T u)
 {
     int		l = _knots.insertKnot(u);
     Array<C>	tmp(*this);
@@ -300,13 +300,13 @@ BSplineCurveBase<T, C>::insertKnot(T u)
 }
 
 /*
- *  int BSplineCurveBase<T, C>::removeKnot(int k)
+ *  int BSplineCurve<C>::removeKnot(int k)
  *
  *    Remove k-th knot, recompute control points and return the index of
  *    the removed knot.
  */
-template <class T, class C> int
-BSplineCurveBase<T, C>::removeKnot(int k)
+template <class C> int
+BSplineCurve<C>::removeKnot(int k)
 {
     u_int	s = multiplicity(k);
     T		u = knots(k);
@@ -337,12 +337,12 @@ BSplineCurveBase<T, C>::removeKnot(int k)
 }
 
 /*
- *  void BSplineCurveBase<T, C>::elevateDegree()
+ *  void BSplineCurve<C>::elevateDegree()
  *
  *    Elevate degree of the curve by one.
  */
-template <class T, class C> void
-BSplineCurveBase<T, C>::elevateDegree()
+template <class C> void
+BSplineCurve<C>::elevateDegree()
 {
   // Convert to Bezier segments.
     Array<u_int>	mul(L());
@@ -384,10 +384,10 @@ BSplineCurveBase<T, C>::elevateDegree()
 }
 
 /************************************************************************
-*  class BSplineSurfaceBase<T, C>					*
+*  class BSplineSurface<C>						*
 ************************************************************************/
-template <class T, class C>
-BSplineSurfaceBase<T, C>::BSplineSurfaceBase(u_int uDeg, u_int vDeg,
+template <class C>
+BSplineSurface<C>::BSplineSurface(u_int uDeg, u_int vDeg,
 						 T us, T ue, T vs, T ve)
     :Array2<Array<C> >(vDeg + 1, uDeg + 1),
      _uKnots(uDeg, us, ue), _vKnots(vDeg, vs, ve)
@@ -395,12 +395,12 @@ BSplineSurfaceBase<T, C>::BSplineSurfaceBase(u_int uDeg, u_int vDeg,
 }
 
 /*
- *  C BSplineSurfaceBase<T, C>::operator ()(T u, T v) const
+ *  C BSplineSurface<C>::operator ()(T u, T v) const
  *
  *    Evaluate the coodinate of the surface at (u, v).
  */
-template <class T, class C> C
-BSplineSurfaceBase<T, C>::operator ()(T u, T v) const
+template <class C> C
+BSplineSurface<C>::operator ()(T u, T v) const
 {
     int		uSpan, vSpan;
     Array<T>	Nu = _uKnots.basis(u, uSpan);
@@ -418,14 +418,14 @@ BSplineSurfaceBase<T, C>::operator ()(T u, T v) const
 
 /*
  *  Array2<Array<C> >
- *  BSplineSurfaceBase<T, C>::derivatives(T u, T v, u_int D) const
+ *  BSplineSurface<C>::derivatives(T u, T v, u_int D) const
  *
  *    Evaluate up derivatives of the surface at (u, v):
  *      array[l][k] = "derivative of order k w.r.t u and order l w.r.t v"
  *        where 0 <= k <= D and 0 <= l <= D.
  */
-template <class T, class C> Array2<Array<C> >
-BSplineSurfaceBase<T, C>::derivatives(T u, T v, u_int D) const
+template <class C> Array2<Array<C> >
+BSplineSurface<C>::derivatives(T u, T v, u_int D) const
 {
     int				I, J;
     Array2<Array<T> >	udN =
@@ -447,13 +447,13 @@ BSplineSurfaceBase<T, C>::derivatives(T u, T v, u_int D) const
 }
 
 /*
- *  int BSplineSurfaceBase<T, C>::uInsertKnot(T u)
+ *  int BSplineSurface<C>::uInsertKnot(T u)
  *
  *    Insert a knot in u-direction at 'u', recompute control points and return
  *    the index of the new knot.
  */
-template <class T, class C> int
-BSplineSurfaceBase<T, C>::uInsertKnot(T u)
+template <class C> int
+BSplineSurface<C>::uInsertKnot(T u)
 {
     int				l = _uKnots.insertKnot(u);
     Array2<Array<C> >	tmp(*this);
@@ -477,13 +477,13 @@ BSplineSurfaceBase<T, C>::uInsertKnot(T u)
 }
 
 /*
- *  int BSplineSurfaceBase<T, C>::vInsertKnot(T v)
+ *  int BSplineSurface<C>::vInsertKnot(T v)
  *
  *    Insert a knot in v-direction at 'v', recompute control points and return
  *    the index of the new knot.
  */
-template <class T, class C> int
-BSplineSurfaceBase<T, C>::vInsertKnot(T v)
+template <class C> int
+BSplineSurface<C>::vInsertKnot(T v)
 {
     int				l = _vKnots.insertKnot(v);
     Array2<Array<C> >	tmp(*this);
@@ -507,16 +507,16 @@ BSplineSurfaceBase<T, C>::vInsertKnot(T v)
 }
 
 /*
- *  int BSplineSurfaceBase<T, C>::uRemoveKnot(int k)
+ *  int BSplineSurface<C>::uRemoveKnot(int k)
  *
  *    Remove k-th knot in u-derection, recompute control points and return 
  *    the index of the removed knot.
  */
-template <class T, class C> int
-BSplineSurfaceBase<T, C>::uRemoveKnot(int k)
+template <class C> int
+BSplineSurface<C>::uRemoveKnot(int k)
 {
-    u_int			s = uMultiplicity(k);
-    T				u = uKnots(k);
+    u_int	s = uMultiplicity(k);
+    T		u = uKnots(k);
     k = _uKnots.removeKnot(k);
     Array2<Array<C> >	tmp(*this);
     resize(nrow(), ncol()-1);
@@ -556,16 +556,16 @@ BSplineSurfaceBase<T, C>::uRemoveKnot(int k)
 }
 
 /*
- *  int BSplineSurfaceBase<T, C>::vRemoveKnot(int l)
+ *  int BSplineSurface<C>::vRemoveKnot(int l)
  *
  *    Remove l-th knot in v-derection, recompute control points and return 
  *    the index of the removed knot.
  */
-template <class T, class C> int
-BSplineSurfaceBase<T, C>::vRemoveKnot(int l)
+template <class C> int
+BSplineSurface<C>::vRemoveKnot(int l)
 {
-    u_int			s = vMultiplicity(l);
-    T				v = vKnots(l);
+    u_int	s = vMultiplicity(l);
+    T		v = vKnots(l);
     l = _vKnots.removeKnot(l);
     Array2<Array<C> >	tmp(*this);
     resize(nrow()-1, ncol());
@@ -605,12 +605,12 @@ BSplineSurfaceBase<T, C>::vRemoveKnot(int l)
 }
 
 /*
- *  void BSplineSurfaceBase<T, C>::uElevateDegree()
+ *  void BSplineSurface<C>::uElevateDegree()
  *
  *    Elevate degree of the surface by one in u-direction.
  */
-template <class T, class C> void
-BSplineSurfaceBase<T, C>::uElevateDegree()
+template <class C> void
+BSplineSurface<C>::uElevateDegree()
 {
   // Convert to Bezier segments.
     Array<u_int>	mul(uL());
@@ -657,12 +657,12 @@ BSplineSurfaceBase<T, C>::uElevateDegree()
 }
 
 /*
- *  void BSplineSurfaceBase<T, C>::vElevateDegree()
+ *  void BSplineSurface<C>::vElevateDegree()
  *
  *    Elevate degree of the surface by one in v-direction.
  */
-template <class T, class C> void
-BSplineSurfaceBase<T, C>::vElevateDegree()
+template <class C> void
+BSplineSurface<C>::vElevateDegree()
 {
   // Convert to Bezier segments.
     Array<u_int>	mul(vL());

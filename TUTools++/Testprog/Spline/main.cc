@@ -1,10 +1,13 @@
 /*
- *  $Id: main.cc,v 1.2 2002-07-26 08:59:31 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CanvasPane.h"
 #include "draw.h"
+#ifdef __GNUG__
+#  include "TU/Nurbs++.cc"
+#endif
 
 namespace TU
 {
@@ -17,11 +20,11 @@ class MyCanvasPane : public CanvasPane
 {
   public:
     MyCanvasPane(Window& parentWin,
-		 const BSplineCurve<float, 3u>& b,
-		 const BSplineCurve<float, 3u>& bb,
-		 const RationalBSplineCurve<float, 3u>& c,
-	 	 const BSplineSurface<float>& s,
-	 	 const BSplineSurface<float>& ss)
+		 const BSplineCurve3f& b,
+		 const BSplineCurve3f& bb,
+		 const RationalBSplineCurve3f& c,
+	 	 const BSplineSurface3f& s,
+	 	 const BSplineSurface3f& ss)
 	:CanvasPane(parentWin, 640, 480),
 	 _dc(*this), _b(b), _bb(bb), _c(c), _s(s), _ss(ss)		{}
     
@@ -34,10 +37,10 @@ class MyCanvasPane : public CanvasPane
     enum	{BSplineCurv = 1, BSplineCurv1, RBSplineCurv,
 		 BSplineSurf, BSplineSurf1, RBSplineSurf};
     
-    OglDC					_dc;
-    const BSplineCurve<float, 3u>&		_b, _bb;
-    const RationalBSplineCurve<float, 3u>&	_c;
-    const BSplineSurface<float>&		_s, _ss;
+    OglDC				_dc;
+    const BSplineCurve3f&		_b, _bb;
+    const RationalBSplineCurve3f&	_c;
+    const BSplineSurface3f&		_s, _ss;
 };
 
 void
@@ -89,15 +92,15 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (int i = _b.degree(); i <= _b.M() - _b.degree(); ++i)
 	{
-	    Coordinate<float, 3u>	p = _b(_b.knots(i));
-	    glVertex3fv((float*)p);
+	    Vector3f	p = _b(_b.knots(i));
+	    glVertex3fv((const float*)p);
 	}
       glEnd();
     /*      for (float u = _b.knots(0); u <= _b.knots(_b.M()); u += 0.05)
       {
-	  Array<Coordinate<float, 3u> >	p = _b.derivatives(u, 1);
+	  Array<Vector3f>	p = _b.derivatives(u, 1);
 	  glBegin(GL_LINE_STRIP);
-	    glVertex3fv((float*)p[0]);
+	    glVertex3fv((const float*)p[0]);
 	    glVertex3f(p[0][0]+p[1][0], p[0][1]+p[1][1], p[0][2]+p[1][2]);
 	  glEnd();
 	  }*/
@@ -110,8 +113,8 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (int i = _bb.degree(); i <= _bb.M() - _bb.degree(); ++i)
 	{
-	    Coordinate<float, 3u>	p = _bb(_bb.knots(i));
-	    glVertex3fv((float*)p);
+	    Vector3f	p = _bb(_bb.knots(i));
+	    glVertex3fv((const float*)p);
 	}
       glEnd();
     glEndList();
@@ -124,8 +127,8 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (int i = _c.degree(); i <= _c.M() - _c.degree(); ++i)
 	{
-	    CoordinateP<float, 3u>	p = _c(_c.knots()[i]);
-	    glVertex4fv((float*)p);
+	    Vector4f	p = _c(_c.knots()[i]);
+	    glVertex4fv((const float*)p);
 	}
       glEnd();
     glEndList();
@@ -139,8 +142,8 @@ MyCanvasPane::initializeGraphics()
 	for (int j = _s.vDegree(); j <= _s.vM() - _s.vDegree(); ++j)
 	    for (int i = _s.uDegree(); i <= _s.uM() - _s.uDegree(); ++i)
 	    {
-		Coordinate<float, 3u>	p = _s(_s.uKnots(i), _s.vKnots(j));
-		glVertex3fv((float*)p);
+		Vector3f	p = _s(_s.uKnots(i), _s.vKnots(j));
+		glVertex3fv((const float*)p);
 	    }
       glEnd();
     glEndList();
@@ -154,8 +157,8 @@ MyCanvasPane::initializeGraphics()
 	for (int j = _ss.vDegree(); j <= _ss.vM() - _ss.vDegree(); ++j)
 	    for (int i = _ss.uDegree(); i <= _ss.uM() - _ss.uDegree(); ++i)
 	    {
-		Coordinate<float, 3u>	p = _ss(_ss.uKnots(i), _ss.vKnots(j));
-		glVertex3fv((float*)p);
+		Vector3f	p = _ss(_ss.uKnots(i), _ss.vKnots(j));
+		glVertex3fv((const float*)p);
 	    }
       glEnd();
     glEndList();
@@ -167,14 +170,14 @@ MyCanvasPane::initializeGraphics()
 class MyCmdWindow : public CmdWindow
 {
   public:
-    MyCmdWindow(App&						parentApp,
-		const char*					name,
-		const XVisualInfo*				vinfo,
-		const BSplineCurve<float, 3u>&		b,
-		const BSplineCurve<float, 3u>&		bb,
-	      	const RationalBSplineCurve<float, 3u>&	c,
-		const BSplineSurface<float>&			s,
-		const BSplineSurface<float>&			ss)	;
+    MyCmdWindow(App&				parentApp,
+		const char*			name,
+		const XVisualInfo*		vinfo,
+		const BSplineCurve3f&		b,
+		const BSplineCurve3f&		bb,
+	      	const RationalBSplineCurve3f&	c,
+		const BSplineSurface3f&		s,
+		const BSplineSurface3f&		ss)		;
 
   private:
     MyCanvasPane	_canvas;
@@ -182,11 +185,11 @@ class MyCmdWindow : public CmdWindow
 
 MyCmdWindow::MyCmdWindow(App& parentApp, const char* name,
 			 const XVisualInfo* vinfo,
-			 const BSplineCurve<float, 3u>& b,
-			 const BSplineCurve<float, 3u>& bb,
-		       	 const RationalBSplineCurve<float, 3u>& c,
-			 const BSplineSurface<float>& s,
-			 const BSplineSurface<float>& ss)
+			 const BSplineCurve3f& b,
+			 const BSplineCurve3f& bb,
+		       	 const RationalBSplineCurve3f& c,
+			 const BSplineSurface3f& s,
+			 const BSplineSurface3f& ss)
     :CmdWindow(parentApp, name, vinfo, Colormap::RGBColor, 16, 0, 0),
      _canvas(*this, b, bb, c, s, ss)
 {
@@ -207,7 +210,7 @@ main(int argc, char* argv[])
     v::App				vapp(argc, argv);
 
   /* Create a B-spline curve */
-    BSplineCurve<float, 3u>		b(3);
+    BSplineCurve3f		b(3);
     b.insertKnot(0.25);
     b.insertKnot(0.5);
     b.insertKnot(0.75);
@@ -225,31 +228,31 @@ main(int argc, char* argv[])
     b.insertKnot(0.75);
     
   /* Create a B-spline curve */
-    BSplineCurve<float, 3u>		bb(b);
+    BSplineCurve3f		bb(b);
   //  bb.removeKnot(6);
     bb.elevateDegree();
     
   /* Create a rational B-Spline curve */
-    RationalBSplineCurve<float, 3u>	c(3);
+    RationalBSplineCurve3f	c(3);
     c.insertKnot(0.25);
     c.insertKnot(0.5);
     c.insertKnot(0.75);
     c.insertKnot(0.75);
     
-    c[0] = b[0];
-    c[1] = b[1];
-    c[2] = b[2];
-    c[3] = b[3];
-    c[4] = b[4];
-    c[5] = b[5];
-    c[6] = b[6];
-    c[7] = b[7];
+    c[0](0, 3) = b[0]; c[0][3] = 1;
+    c[1](0, 3) = b[1]; c[1][3] = 1;
+    c[2](0, 3) = b[2]; c[2][3] = 1;
+    c[3](0, 3) = b[3]; c[3][3] = 1;
+    c[4](0, 3) = b[4]; c[4][3] = 1;
+    c[5](0, 3) = b[5]; c[5][3] = 1;
+    c[6](0, 3) = b[6]; c[6][3] = 1;
+    c[7](0, 3) = b[7]; c[7][3] = 1;
     c[4] *= 3.0;
     c[5] *= 2.0;
     c.insertKnot(0.25);
     
   /* Create a B-Spline surface */
-    BSplineSurface<float>	s(3, 2);
+    BSplineSurface3f	s(3, 2);
     s.uInsertKnot(0.33);
     s.uInsertKnot(0.66);
     s.vInsertKnot(0.33);
@@ -290,7 +293,7 @@ main(int argc, char* argv[])
     s[4][5][0] =  5.0;    s[4][5][1] =  1.5;    s[4][5][2] = -2.0;
     
   /* Create a B-spline curve */
-    BSplineSurface<float>		ss(s);
+    BSplineSurface3f		ss(s);
   //    ss.vRemoveKnot(4);
     ss.vElevateDegree();
     
@@ -317,8 +320,3 @@ main(int argc, char* argv[])
 
     return 0;
 }
-
-#ifdef __GNUG__
-#  include "TU/Array++.cc"
-#  include "TU/Nurbs++.cc"
-#endif

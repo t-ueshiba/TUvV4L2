@@ -1,307 +1,32 @@
 /*
- *  $Id: Geometry++.h,v 1.13 2007-02-22 23:23:21 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.14 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
 
+#include "TU/utility.h"
 #include "TU/Minimize++.h"
 
 namespace TU
 {
 /************************************************************************
-*  class CoordBase<T, D>						*
-************************************************************************/
-template <class T, u_int D>
-class CoordBase
-{
-  public:
-    typedef T	ET;
-    
-    CoordBase()							{*this = 0.0;}
-    CoordBase(const CoordBase&)					;
-    CoordBase(const Vector<double>&)				;
-    CoordBase&		operator =(const CoordBase&)		;
-    CoordBase&		operator =(const Vector<double>&)	;
-    
-    CoordBase&		operator +=(const CoordBase&)		;
-    CoordBase&		operator -=(const CoordBase&)		;
-    CoordBase&		operator  =(double c)			;
-    CoordBase&		operator *=(double c)			;
-    CoordBase&		operator /=(double c)			;
-    CoordBase		operator  -()			const	{CoordBase
-								     r(*this);
-								 r *= -1;
-								 return r;}
-			operator T*()			const	{return(T*)_p;}
-			operator Vector<double>()	const	;
-    static u_int	dim()					{return D;}
-    const T&		operator [](int i)		const	{return _p[i];}
-    T&			operator [](int i)			{return _p[i];}
-    int			operator ==(const CoordBase&)	const	;
-    int			operator !=(const CoordBase& p) const
-			{
-			    return !(*this == p);
-			}
-    std::istream&	restore(std::istream&)		;
-    std::ostream&	save(std::ostream&)	const	;
-    double		square()		const	;
-    double		length()		const	{return
-							   sqrt(square());}
-    CoordBase&		normalize()			{return
-							   *this /= length();}
-    CoordBase		normal()		const	;
-    void		check_dim(u_int d)	const	;
-
-  private:
-    T		_p[D];
-};
-
-template <class T, u_int D> inline double
-CoordBase<T, D>::square() const
-{
-    return Vector<double>(*this).square();
-}
-
-/*
- *  I/O functions
- */
-template <class T, u_int D> std::istream&
-operator >>(std::istream& in, CoordBase<T, D>& p)		;
-template <class T, u_int D> std::ostream&
-operator <<(std::ostream& out, const CoordBase<T, D>& p)	;
-
-/*
- *  numerical operators
- */
-template <class T, u_int D> T
-operator *(const CoordBase<T, D>&, const CoordBase<T, D>&)	;
-
-template <class T, u_int D> inline CoordBase<T, D>
-operator +(const CoordBase<T, D>& a, const CoordBase<T, D>& b)
-    {CoordBase<T, D> r(a); r += b; return r;}
-
-template <class T, u_int D> inline CoordBase<T, D>
-operator -(const CoordBase<T, D>& a, const CoordBase<T, D>& b)
-    {CoordBase<T, D> r(a); r -= b; return r;}
-
-template <class T, u_int D> inline CoordBase<T, D>
-operator *(double c, const CoordBase<T, D>& a)
-    {CoordBase<T, D> r(a); r *= c; return r;}
-
-template <class T, u_int D> inline CoordBase<T, D>
-operator *(const Array<T>& a, double c)
-    {CoordBase<T, D> r(a); r *= c; return r;}
-
-template <class T, u_int D> inline CoordBase<T, D>
-operator /(const Array<T>& a, double c)
-    {CoordBase<T, D> r(a); r /= c; return r;}
-
-/************************************************************************
-*  class Coordinate<T, D>						*
-************************************************************************/
-template <class T, u_int D>
-class CoordinateP;
-
-template <class T, u_int D>
-class Coordinate : public CoordBase<T, D>
-{
-  public:
-    Coordinate()				:CoordBase<T, D>()	{}
-    Coordinate(const Coordinate& p)		:CoordBase<T, D>(p)	{}
-    Coordinate(const Vector<double>& v)	:CoordBase<T, D>(v)		{}
-    Coordinate(const CoordinateP<T, D>&)				;
-    Coordinate&		operator =(const Coordinate& p)
-			{CoordBase<T, D>::operator =(p); return *this;}
-    Coordinate&		operator =(const Vector<double>& v)
-			{CoordBase<T, D>::operator =(v); return *this;}
-    Coordinate&		operator =(const CoordinateP<T, D>&)		;
-
-    using		CoordBase<T, D>::dim;
-    Coordinate&		operator +=(const Coordinate& p)
-			{
-			    CoordBase<T, D>::operator +=(p);
-			    return *this;
-			}
-    Coordinate&		operator -=(const Coordinate& p)
-			{
-			    CoordBase<T, D>::operator -=(p);
-			    return *this;
-			}
-    Coordinate&		operator  =(double c)
-			{
-			    CoordBase<T, D>::operator =(c);
-			    return *this;
-			}
-    Coordinate&		operator *=(double c)
-			{
-			    CoordBase<T, D>::operator *=(c);
-			    return *this;
-			}
-    Coordinate&		operator /=(double c)
-			{
-			    CoordBase<T, D>::operator /=(c);
-			    return *this;
-			}
-    Coordinate		operator -() const
-			{
-			    Coordinate	r(*this);
-			    r *= -1;
-			    return r;
-			}
-    double		sqdist(const Coordinate& p)		 const	;
-    double		dist(const Coordinate& p) const
-			{
-			    return sqrt(sqdist(p));
-			}
-};
-
-/*
- *  numerical operators
- */
-template <class T> Coordinate<T, 3u>
-operator ^(const Coordinate<T, 3u>&, const Coordinate<T, 3u>&);
-
-template <class T, u_int D> inline Coordinate<T, D>
-operator +(const Coordinate<T, D>& a, const Coordinate<T, D>& b)
-    {Coordinate<T, D> r(a); r += b; return r;}
-
-template <class T, u_int D> inline Coordinate<T, D>
-operator -(const Coordinate<T, D>& a, const Coordinate<T, D>& b)
-    {Coordinate<T, D> r(a); r -= b; return r;}
-
-template <class T, u_int D> inline Coordinate<T, D>
-operator *(double c, const Coordinate<T, D>& a)
-    {Coordinate<T, D> r(a); r *= c; return r;}
-
-template <class T, u_int D> inline Coordinate<T, D>
-operator *(const Coordinate<T, D>& a, double c)
-    {Coordinate<T, D> r(a); r *= c; return r;}
-
-template <class T, u_int D> inline Coordinate<T, D>
-operator /(const Coordinate<T, D>& a, double c)
-    {Coordinate<T, D> r(a); r /= c; return r;}
-
-/************************************************************************
-*  class CoordinateP<T, D>						*
-************************************************************************/
-template <class T, u_int D>
-class CoordinateP : public CoordBase<T, D+1u>
-{
-  public:
-    CoordinateP()			     :CoordBase<T, D+1u>()	{}
-    CoordinateP(const CoordinateP& p)    :CoordBase<T, D+1u>(p)	{}
-    CoordinateP(const Vector<double>& v) :CoordBase<T, D+1u>(v)	{}
-    CoordinateP(const Coordinate<T, D>&)				;
-
-    using		CoordBase<T, D+1u>::dim;
-    CoordinateP&	operator =(const CoordinateP& p)
-			{CoordBase<T, D+1u>::operator =(p); return *this;}
-    CoordinateP&	operator =(const Vector<double>& v)
-			{CoordBase<T, D+1u>::operator =(v); return *this;}
-    CoordinateP&	operator =(const Coordinate<T, D>&)		;
-
-    CoordinateP&	operator  =(double c)
-			{
-			    CoordBase<T, D+1u>::operator =(c);
-			    return *this;
-			}
-    CoordinateP&	operator *=(double c)
-			{
-			    CoordBase<T, D+1u>::operator *=(c);
-			    return *this;
-			}
-    CoordinateP&	operator /=(double c)
-			{
-			    CoordBase<T, D+1u>::operator /=(c);
-			    return *this;
-			}
-    CoordinateP		operator -() const
-			{
-			    CoordinateP	r(*this);
-			    r *= -1;
-			    return r;
-			}
-    int			operator ==(const CoordinateP& p)	const	;
-};
-
-/*
- *  numerical operators
- */
-template <class T> CoordinateP<T, 2u>
-operator ^(const CoordinateP<T, 2u>&, const CoordinateP<T, 2u>&);
-
-template <class T, u_int D> inline CoordinateP<T, D>
-operator *(double c, const CoordinateP<T, D>& a)
-    {CoordinateP<T, D> r(a); r *= c; return r;}
-
-template <class T, u_int D> inline CoordinateP<T, D>
-operator *(const CoordinateP<T, D>& a, double c)
-    {CoordinateP<T, D> r(a); r *= c; return r;}
-
-template <class T, u_int D> inline CoordinateP<T, D>
-operator /(const CoordinateP<T, D>& a, double c)
-    {CoordinateP<T, D> r(a); r /= c; return r;}
-
-/************************************************************************
 *  class Point2<T>							*
 ************************************************************************/
-template <class T>	class PointP2;
 template <class T>
-class Point2 : public Coordinate<T, 2u>
+class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
 {
+  private:
+    typedef Vector<T, FixedSizedBuf<T, 2> >	array_type;
+    
   public:
-    Point2()				:Coordinate<T, 2u>()	{}
-    Point2(T, T)						;
-    Point2(const Point2<T>& p)
-	:Coordinate<T, 2u>((const Coordinate<T, 2u>&)p)	{}
-    Point2(const PointP2<T>& p)
-	:Coordinate<T, 2u>((const CoordinateP<T, 2u>&)p)	{}
-    Point2(const Vector<double>& v)	:Coordinate<T, 2u>(v)	{}
-    Point2&	operator =(const Point2<T>& p)
+    Point2(T u=0, T v=0)						;
+    template <class T2, class B2>
+    Point2(const Vector<T2, B2>& v) :array_type(v)			{}
+    template <class T2, class B2>
+    Point2&	operator =(const Vector<T2, B2>& v)
 		{
-		    Coordinate<T, 2u>::operator =(p);
+		    array_type::operator =(v);
 		    return *this;
-		}
-    Point2&	operator =(const PointP2<T>& p)
-		{
-		    Coordinate<T, 2u>::operator =(p);
-		    return *this;
-		}
-    Point2&	operator =(const Vector<double>& v)
-		{
-		    Coordinate<T, 2u>::operator =(v);
-		    return *this;
-		}
-    Point2&	operator +=(const Point2& p)
-		{
-		    Coordinate<T, 2u>::operator +=(p);
-		    return *this;
-		}
-    Point2&	operator -=(const Point2& p)
-		{
-		    Coordinate<T, 2u>::operator -=(p);
-		    return *this;
-		}
-    Point2&	operator  =(double c)
-		{
-		    Coordinate<T, 2u>::operator =(c);
-		    return *this;
-		}
-    Point2&	operator *=(double c)
-		{
-		    Coordinate<T, 2u>::operator *=(c);
-		    return *this;
-		}
-    Point2&	operator /=(double c)
-		{
-		    Coordinate<T, 2u>::operator /=(c);
-		    return *this;
-		}
-    Point2	operator -() const
-		{
-		    Point2	r(*this);
-		    r *= -1;
-		    return r;
 		}
 
     Point2	neighbor(int)				const	;
@@ -313,7 +38,7 @@ class Point2 : public Coordinate<T, 2u>
 
 template <class T> inline
 Point2<T>::Point2(T u, T v)
-    :Coordinate<T, 2u>()
+    :array_type()
 {
     (*this)[0] = u;
     (*this)[1] = v;
@@ -322,133 +47,59 @@ Point2<T>::Point2(T u, T v)
 template <class T> inline Point2<T>
 Point2<T>::neighbor(int dir) const
 {
-    Point2<T>	d(*this);
-    return d.move(dir);
-}
-
-/************************************************************************
-*  class PointP2<T>							*
-************************************************************************/
-template <class T>
-class PointP2 : public CoordinateP<T, 2u>
-{
-  public:
-    PointP2()				:CoordinateP<T, 2u>()		{}
-    PointP2(T, T)							;
-    PointP2(const PointP2<T>& p)
-	:CoordinateP<T, 2u>((const CoordinateP<T, 2u>&)p)		{}
-    PointP2(const Point2<T>& p)
-	:CoordinateP<T, 2u>((const Coordinate<T, 2u>&)p)		{}
-    PointP2(const Vector<double>& v)	:CoordinateP<T, 2u>(v)		{}
-    PointP2&	operator =(const PointP2<T>& p)
-		{
-		    CoordinateP<T, 2u>::operator =(p);
-		    return *this;
-		}
-    PointP2&	operator =(const Point2<T>& p)
-		{
-		    CoordinateP<T, 2u>::operator =(p);
-		    return *this;
-		}
-    PointP2&	operator =(const Vector<double>& v)
-		{
-		    CoordinateP<T, 2u>::operator =(v);
-		    return *this;
-		}
-    PointP2&	operator  =(double c)
-		{
-		    CoordinateP<T, 2u>::operator =(c);
-		    return *this;
-		}
-    PointP2&	operator *=(double c)
-		{
-		    CoordinateP<T, 2u>::operator *=(c);
-		    return *this;
-		}
-    PointP2&	operator /=(double c)
-		{
-		    CoordinateP<T, 2u>::operator /=(c);
-		    return *this;
-		}
-    PointP2	operator -() const
-		{
-		    PointP2	r(*this);
-		    r *= -1;
-		    return r;
-		}
-    PointP2	neighbor(int)					const	;
-    PointP2&	move(int)						;
-    int		adj(const PointP2&)				const	;
-    int		dir(const PointP2&)				const	;
-    int		angle(const PointP2&, const PointP2&)		const	;
-};
-
-template <class T> inline
-PointP2<T>::PointP2(T u, T v)
-    :CoordinateP<T, 2u>()
-{
-    (*this)[0] = u;
-    (*this)[1] = v;
-    (*this)[2] = 1;
-}
-
-template <class T> inline PointP2<T>
-PointP2<T>::neighbor(int dir) const
-{
-    Point2<T>	d(*this);
-    return d.move(dir);
-}
-
-template <class T> inline PointP2<T>&
-PointP2<T>::move(int dir)
-{
-    Point2<T>	d(*this);
-    *this = d.move(dir);
-    return *this;
-}
-
-template <class T> int
-PointP2<T>::dir(const PointP2<T>& p) const
-{
-    Point2<T>	d(*this);
-    return d.dir(p);
-}
-
-template <class T> int
-PointP2<T>::angle(const PointP2<T>& pp, const PointP2<T>& pn) const
-{
-    Point2<T>	d(*this);
-    return d.angle(pp, pn);
+    return Point2(*this).move(dir);
 }
 
 /************************************************************************
 *  class LineP2<T>							*
 ************************************************************************/
 template <class T>
-class LineP2 : public CoordinateP<T, 2u>
+class LineP2 : public Vector<T, FixedSizedBuf<T, 3> >
 {
+  private:
+    typedef Vector<T, FixedSizedBuf<T, 3> >	array_type;
+    
   public:
-    LineP2()				:CoordinateP<T, 2u>()		{}
-    LineP2(const LineP2<T>& l)
-	:CoordinateP<T, 2u>((const CoordinateP<T, 2u>&)l)		{}
-    LineP2(const Vector<double>& v)	:CoordinateP<T, 2u>(v)		{}
-
-    CoordinateP<T, 2u>::operator [];	// should not be needed, but due to
-					// the bug in SGI C++ compiler....
+    LineP2()				:array_type()			{}
+    template <class T2, class B2>
+    LineP2(const Vector<T2, B2>& v)	:array_type(v)			{}
+    template <class T2, class B2>
+    LineP2&	operator =(const Vector<T2, B2>& v)
+		{
+		    array_type::operator =(v);
+		    return *this;
+		}
 };
 
 /************************************************************************
-*  class PlaneP3<T>							*
+*  class Point3<T>							*
 ************************************************************************/
 template <class T>
-class PlaneP3 : public CoordinateP<T, 3u>
+class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 {
+  private:
+    typedef Vector<T, FixedSizedBuf<T, 3> >	array_type;
+    
   public:
-    PlaneP3()				:CoordinateP<T, 3u>()		{}
-    PlaneP3(const PlaneP3<T>& l)
-	:CoordinateP<T, 3u>((const CoordinateP<T, 3u>&)l)		{}
-    PlaneP3(const Vector<double>& v):CoordinateP<T, 3u>(v)		{}
+    Point3(T x=0, T y=0, T z=0)						;
+    template <class T2, class B2>
+    Point3(const Vector<T2, B2>& v) :array_type(v)			{}
+    template <class T2, class B2>
+    Point3&	operator =(const Vector<T2, B2>& v)
+		{
+		    array_type::operator =(v);
+		    return *this;
+		}
 };
+
+template <class T> inline
+Point3<T>::Point3(T x, T y, T z)
+    :array_type()
+{
+    (*this)[0] = x;
+    (*this)[1] = y;
+    (*this)[2] = z;
+}
 
 /************************************************************************
 *  class Normalize							*
@@ -487,8 +138,10 @@ class Normalize
     void		update(Iterator first, Iterator last)		;
 
     u_int		spaceDim()				const	;
-    Vector<double>	operator ()(const Vector<double>& x)	const	;
-    Vector<double>	normalizeP(const Vector<double>& x)	const	;
+    template <class T2, class B2>
+    Vector<double>	operator ()(const Vector<T2, B2>& x)	const	;
+    template <class T2, class B2>
+    Vector<double>	normalizeP(const Vector<T2, B2>& x)	const	;
     
     Matrix<double>		T()				const	;
     Matrix<double>		Tt()				const	;
@@ -561,10 +214,10 @@ Normalize::spaceDim() const
   \param x	点の非同次座標（#spaceDim()次元）
   \return	正規化された点の非同次座標（#spaceDim()次元）
 */
-inline Vector<double>
-Normalize::operator ()(const Vector<double>& x) const
+template <class T2, class B2> inline Vector<double>
+Normalize::operator ()(const Vector<T2, B2>& x) const
 {
-    return (x - _centroid) / _scale;
+    return (Vector<double>(x) -= _centroid) /= _scale;
 }
 
 //! 与えられた点に正規化変換を適用してその同次座標を返す．
@@ -572,8 +225,8 @@ Normalize::operator ()(const Vector<double>& x) const
   \param x	点の非同次座標（#spaceDim()次元）
   \return	正規化された点の同次座標（#spaceDim()+1次元）
 */
-inline Vector<double>
-Normalize::normalizeP(const Vector<double>& x) const
+template <class T2, class B2> inline Vector<double>
+Normalize::normalizeP(const Vector<T2, B2>& x) const
 {
     Vector<double>	val(spaceDim()+1);
     val(0, spaceDim()) = (*this)(x);
@@ -648,9 +301,11 @@ class ProjectiveMapping
     \return	(#outDim()+1)x(#inDim()+1)行列
   */
     const Matrix<double>&	T()		const	{return _T;}
-    
-    Vector<double>	operator ()(const Vector<double>& x)	const	;
-    Vector<double>	mapP(const Vector<double>& x)		const	;
+
+    template <class T2, class B2>
+    Vector<double>	operator ()(const Vector<T2, B2>& x)	const	;
+    template <class T2, class B2>
+    Vector<double>	mapP(const Vector<T2, B2>& x)		const	;
 
     template <class In, class Out>
     double		sqdist(const std::pair<In, Out>& pair)	const	;
@@ -660,7 +315,7 @@ class ProjectiveMapping
   protected:
     Matrix<double>	_T;			//!< 射影変換を表現する行列
 
-  private:
+  protected:
   //! 射影変換行列の最尤推定のためのコスト関数
     class Cost
     {
@@ -713,8 +368,8 @@ ProjectiveMapping::initialize(Iterator first, Iterator last, bool refine)
 				   make_const_second_iterator(last));
 
   // 充分な個数の点対があるか？
-    const u_int		ndata = std::distance(first, last),
-			xdim  = xNormalize.spaceDim() + 1,
+    const u_int		ndata = std::distance(first, last);
+    const u_int	xdim  = xNormalize.spaceDim() + 1,
 			ydim  = yNormalize.spaceDim() + 1;
     if (ndata*(ydim - 1) < xdim*ydim - 1)	// _Tのサイズが未定なので
 						// ndataMin()は無効
@@ -740,8 +395,8 @@ ProjectiveMapping::initialize(Iterator first, Iterator last, bool refine)
 
   // データ行列の最小固有値に対応する固有ベクトルから変換行列を計算し，
   // 正規化をキャンセルする．
-    Vector<double>		eval;
-    const Matrix<double>&	Ut = A.eigen(eval);
+    Vector<double>	eval;
+    Matrix<double>	Ut = A.eigen(eval);
     _T = yNormalize.Tinv()
        * Matrix<double>((double*)Ut[Ut.nrow()-1], ydim, xdim)
        * xNormalize.T();
@@ -782,8 +437,8 @@ ProjectiveMapping::ndataMin() const
   \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
   \return	射影変換された点の非同次座標（#outDim()次元）
 */
-inline Vector<double>
-ProjectiveMapping::operator ()(const Vector<double>& x)	const
+template <class T2, class B2> inline Vector<double>
+ProjectiveMapping::operator ()(const Vector<T2, B2>& x) const
 {
     const Vector<double>&	y = mapP(x);
     return y(0, outDim()) / y[outDim()];
@@ -794,8 +449,8 @@ ProjectiveMapping::operator ()(const Vector<double>& x)	const
   \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
   \return	射影変換された点の同次座標（#outDim()+1次元）
 */
-inline Vector<double>
-ProjectiveMapping::mapP(const Vector<double>& x) const
+template <class T2, class B2> inline Vector<double>
+ProjectiveMapping::mapP(const Vector<T2, B2>& x) const
 {
     if (x.dim() == inDim())
     {
@@ -923,10 +578,10 @@ template <class Iterator> void
 AffineMapping::initialize(Iterator first, Iterator last)
 {
   // 充分な個数の点対があるか？
-    const u_int	ndata = std::distance(first, last);
+    const u_int		ndata = std::distance(first, last);
     if (ndata == 0)		// firstが有効か？
 	throw std::invalid_argument("AffineMapping::initialize(): 0-length input data!!");
-    const u_int	xdim = first->first.dim();
+    const u_int		xdim = first->first.dim();
     if (ndata < xdim + 1)	// _Tのサイズが未定なのでndataMin()は無効
 	throw std::invalid_argument("AffineMapping::initialize(): not enough input data!!");
 
@@ -1022,8 +677,10 @@ class HyperPlane
     const Vector<double>&
 		p()				const	{return _p;}
 
-    double	sqdist(const Vector<double>& x)	const	;
-    double	dist(const Vector<double>& x)	const	;
+    template <class T, class B>
+    double	sqdist(const Vector<T, B>& x)	const	;
+    template <class T, class B>
+    double	dist(const Vector<T, B>& x)	const	;
     
   private:
     Vector<double>	_p;	//!> 超平面を表現するベクトル
@@ -1096,8 +753,8 @@ HyperPlane::initialize(Iterator first, Iterator last)
 		（#spaceDim()+1次元）
   \return	点と超平面の距離の2乗
 */
-inline double
-HyperPlane::sqdist(const Vector<double>& x) const
+template <class T, class B> inline double
+HyperPlane::sqdist(const Vector<T, B>& x) const
 {
     const double	d = dist(x);
     return d*d;
@@ -1112,8 +769,8 @@ HyperPlane::sqdist(const Vector<double>& x) const
 				#spaceDim()+1のいずれでもない場合，もしくは
 				この点が無限遠点である場合に送出．
 */
-inline double
-HyperPlane::dist(const Vector<double>& x) const
+template <class T, class B> double
+HyperPlane::dist(const Vector<T, B>& x) const
 {
     if (x.dim() == spaceDim())
     {

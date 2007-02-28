@@ -1,5 +1,5 @@
 /*
- *  $Id: CameraWithEuclideanImagePlane.cc,v 1.5 2003-03-17 00:22:30 ueshiba Exp $
+ *  $Id: CameraWithEuclideanImagePlane.cc,v 1.6 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -150,7 +150,7 @@ CameraWithEuclideanImagePlane::Intrinsic::put(std::ostream& out) const
 {
     CameraWithFocalLength::Intrinsic::put(out);
     std::cerr << "Principal point:";
-    return out << _principal;
+    return out << _principal << std::endl;
 }
  
 }

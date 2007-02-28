@@ -1,10 +1,13 @@
 /*
- *  $Id: main.cc,v 1.2 2002-07-26 08:59:31 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CanvasPane.h"
 #include "draw.h"
+#ifdef __GNUG__
+#  include "TU/Bezier++.cc"
+#endif
 
 namespace TU
 {
@@ -16,10 +19,10 @@ namespace v
 class MyCanvasPane : public CanvasPane
 {
   public:
-    MyCanvasPane(Window&				parentWin,
-		 const BezierCurve<double, 3u>&		b,
-		 const RationalBezierCurve<double, 3u>&	c,
-		 const BezierSurface<double>&		s)
+    MyCanvasPane(Window&			parentWin,
+		 const BezierCurve3d&		b,
+		 const RationalBezierCurve3d&	c,
+		 const BezierSurface3d&		s)
 	:CanvasPane(parentWin, 640, 480),
 	 _dc(*this), _b(b), _c(c), _s(s)				{}
     
@@ -31,10 +34,10 @@ class MyCanvasPane : public CanvasPane
   private:
     enum	{BezierCurv = 1, RBezierCurv, BezierSurf, RBezierSurf};
     
-    OglDC					_dc;
-    const BezierCurve<double, 3u>&		_b;
-    const RationalBezierCurve<double, 3u>&	_c;
-    const BezierSurface<double>&		_s;
+    OglDC				_dc;
+    const BezierCurve3d&		_b;
+    const RationalBezierCurve3d&	_c;
+    const BezierSurface3d&		_s;
 };
 
 void
@@ -44,7 +47,7 @@ MyCanvasPane::repaintUnderlay(int, int, int, int)
     
     glCallList(BezierCurv);
     glCallList(RBezierCurv);
-   // glCallList(BezierSurf);
+    glCallList(BezierSurf);
     
     glFlush();
     _dc.swapBuffers();
@@ -81,8 +84,8 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (int i = 0; i <= 20; ++i)
 	{
-	    Coordinate<double, 3u>	p = _b(i / 20.0);
-	    glVertex3dv((double*)p);
+	    Vector3d	p = _b(i / 20.0);
+	    glVertex3dv((const double*)p);
 	}
       glEnd();
 
@@ -90,9 +93,9 @@ MyCanvasPane::initializeGraphics()
 	for (int r = 1; r <= _b.degree(); ++r)
 	{
 	    glBegin(GL_LINE_STRIP);
-	    Array<Coordinate<double, 3u> >	p = _b.deCasteljau(0.3, r);
+	    Array<Vector3d>	p = _b.deCasteljau(0.3, r);
 	    for (int i = 0; i < p.dim(); ++i)
-		glVertex3dv((double*)p[i]);
+		glVertex3dv((const double*)p[i]);
 	    glEnd();
 	}
     glEndList();
@@ -106,8 +109,8 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (int i = 0; i <= 20; ++i)
 	{
-	    CoordinateP<double, 3u>	p = _c(i / 20.0);
-	    glVertex4dv((double*)p);
+	    Vector4d	p = _c(i / 20.0);
+	    glVertex4dv((const double*)p);
 	}
       glEnd();
 
@@ -115,9 +118,9 @@ MyCanvasPane::initializeGraphics()
 	for (int r = 1; r <= _c.degree(); ++r)
 	{
 	    glBegin(GL_LINE_STRIP);
-	    Array<CoordinateP<double, 3u> >	p = _c.deCasteljau(0.3, r);
+	    Array<Vector4d>	p = _c.deCasteljau(0.3, r);
 	    for (int i = 0; i < p.dim(); ++i)
-		glVertex4dv((double*)p[i]);
+		glVertex4dv((const double*)p[i]);
 	    glEnd();
 	}
     glEndList();
@@ -126,16 +129,16 @@ MyCanvasPane::initializeGraphics()
       glColor3f(0.0, 0.0, 1.0);
       _dc << _s;
 
-    /*      glColor3f(1.0, 1.0, 1.0);
+    glColor3f(1.0, 1.0, 1.0);
       glPointSize(3.0);
       glBegin(GL_POINTS);
 	for (int j = 0; j <= 20; ++j)
 	    for (int i = 0; i <= 20; ++i)
 	    {
-		Coordinate<double, 3u>	p = _s(i / 20.0, j / 20.0);
-		glVertex3dv((double*)p);
+		Vector3d	p = _s(i / 20.0, j / 20.0);
+		glVertex3dv((const double*)p);
 	    }
-	    glEnd();*/
+      glEnd();
     glEndList();
 }
 
@@ -145,22 +148,22 @@ MyCanvasPane::initializeGraphics()
 class MyCmdWindow : public CmdWindow
 {
   public:
-    MyCmdWindow(App&					parentApp,
-		const char*				name,
-		const XVisualInfo*			vinfo,
-		const BezierCurve<double, 3u>&		b,
-		const RationalBezierCurve<double, 3u>&	c,
-		const BezierSurface<double>&		s)	;
+    MyCmdWindow(App&				parentApp,
+		const char*			name,
+		const XVisualInfo*		vinfo,
+		const BezierCurve3d&		b,
+		const RationalBezierCurve3d&	c,
+		const BezierSurface3d&		s)			;
 
   private:
     MyCanvasPane	_canvas;
 };
 
-MyCmdWindow::MyCmdWindow(App& parentApp, const char*		name,
-			 const XVisualInfo*			vinfo,
-			 const BezierCurve<double, 3u>&		b,
-			 const RationalBezierCurve<double, 3u>&	c,
-			 const BezierSurface<double>&		s)
+MyCmdWindow::MyCmdWindow(App& parentApp, const char*	name,
+			 const XVisualInfo*		vinfo,
+			 const BezierCurve3d&		b,
+			 const RationalBezierCurve3d&	c,
+			 const BezierSurface3d&		s)
     :CmdWindow(parentApp, name, vinfo, Colormap::RGBColor, 16, 0, 0),
      _canvas(*this, b, c, s)
 {
@@ -181,24 +184,24 @@ main(int argc, char* argv[])
     v::App	vapp(argc, argv);
 
   /* Create a Bezier curve */
-    BezierCurve<double, 3u>		b(3);
+    BezierCurve3d		b(3);
     b[0][0] = -4.0;    b[0][1] = -4.0;    b[0][2] =  0.0;
     b[1][0] = -2.0;    b[1][1] =  4.0;    b[1][2] =  5.0;
     b[2][0] =  2.0;    b[2][1] = -4.0;    b[2][2] = -1.0;
     b[3][0] =  4.0;    b[3][1] =  4.0;    b[3][2] =  0.0;
 
   /* Create a rational Bezier curve */
-    RationalBezierCurve<double, 3u>	c(3);
-    c[0] = b[0];
-    c[1] = b[1];
-    c[2] = b[2];
-    c[3] = b[3];
+    RationalBezierCurve3d	c(3);
+    c[0](0, 3) = b[0]; c[0][3] = 1;
+    c[1](0, 3) = b[1]; c[1][3] = 1;
+    c[2](0, 3) = b[2]; c[2][3] = 1;
+    c[3](0, 3) = b[3]; c[3][3] = 1;
     c[1] *= 2.0;
     c[2] *= 2.0;
     c.elevateDegree();
 
   /* Create a Bezier surface */
-    BezierSurface<double>		s(3, 2);
+    BezierSurface3d		s(3, 2);
     s[0][0][0] = -1.5;    s[0][0][1] = -1.5;    s[0][0][2] =  4.0;
     s[0][1][0] = -0.5;    s[0][1][1] = -1.5;    s[0][1][2] =  2.0;
     s[0][2][0] =  0.5;    s[0][2][1] = -1.5;    s[0][2][2] = -1.0;
@@ -218,7 +221,6 @@ main(int argc, char* argv[])
     s[3][1][0] = -0.5;    s[3][1][1] =  1.5;    s[3][1][2] = -2.0;
     s[3][2][0] =  0.5;    s[3][2][1] =  1.5;    s[3][2][2] =  0.0;
     s[3][3][0] =  1.5;    s[3][3][1] =  1.5;    s[3][3][2] = -1.0;*/
-
 
     int			attrs[] = {GLX_RGBA,
 				   GLX_RED_SIZE,	1,
@@ -243,8 +245,3 @@ main(int argc, char* argv[])
 
     return 0;
 }
-
-#ifdef __GNUG__
-#  include "TU/Array++.cc"
-#  include "TU/Bezier++.cc"
-#endif

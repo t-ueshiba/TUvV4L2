@@ -1,10 +1,9 @@
 /*
- *  $Id: IIRFilter.cc,v 1.7 2007-02-04 23:59:53 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.8 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Minimize++.h"
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Array++.cc"
 #  include "TU/Image++.cc"
 #endif
 

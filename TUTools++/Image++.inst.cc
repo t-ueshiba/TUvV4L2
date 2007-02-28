@@ -18,29 +18,15 @@
  *  No Warranty.
  *  Authors are not responsible for any damage in use of this program.
  */
-
 /*
- *  $Id: Image++.inst.cc,v 1.7 2006-11-06 02:17:41 ueshiba Exp $
+ *  $Id: Image++.inst.cc,v 1.8 2007-02-28 00:16:06 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
-#include "TU/Array++.cc"
 #include "TU/Image++.cc"
 
 namespace TU
 {
-template class Array<ImageLine<u_char> >;
-template class Array<ImageLine<short> >;
-template class Array<ImageLine<long> >;
-template class Array<ImageLine<float> >;
-template class Array<ImageLine<double> >;
-
-template class Array2<ImageLine<u_char> >;
-template class Array2<ImageLine<short> >;
-template class Array2<ImageLine<long> >;
-template class Array2<ImageLine<float> >;
-template class Array2<ImageLine<double> >;
-
 template class Image<u_char>;
 template class Image<short>;
 template class Image<long>;

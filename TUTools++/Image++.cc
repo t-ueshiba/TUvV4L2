@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.13 2007-02-04 23:59:53 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.14 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
@@ -163,7 +163,7 @@ Image<T>::saveRows(std::ostream& out) const
     ImageLine<D>	buf(width());
     for (int v = 0; v < height(); )
     {
-	buf.fill((T*)(*this)[v++]);
+	buf.fill((const T*)(*this)[v++]);
 	if (!buf.save(out))
 	    break;
     }

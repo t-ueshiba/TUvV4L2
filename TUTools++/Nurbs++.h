@@ -1,10 +1,10 @@
 /*
- *  $Id: Nurbs++.h,v 1.4 2006-12-21 05:12:00 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.5 2007-02-28 00:16:06 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
 
-#include "TU/Geometry++.h"
+#include "TU/Vector++.h"
 
 namespace TU
 {
@@ -37,20 +37,23 @@ class BSplineKnots : private Array<T>
 
     using	Array<T>::dim;
     using	Array<T>::operator [];		// knots
-  //using	Array<T>::operator T*;
+    using	Array<T>::operator const T*;
     
   private:
     u_int	_degree;
 };
 
 /************************************************************************
-*  class BSplineCurveBase<T, C>						*
+*  class BSplineCurve<C>						*
 ************************************************************************/
-template <class T, class C>
-class BSplineCurveBase : private Array<C>
+template <class C>
+class BSplineCurve : private Array<C>
 {
   public:
-    BSplineCurveBase(u_int degree, T us, T ue)		;
+    typedef typename C::value_type		T;
+    typedef C					Coord;
+    
+    BSplineCurve(u_int degree, T us=0.0, T ue=1.0)	;
 
     static u_int	dim()			{return C::dim();}
 
@@ -70,6 +73,7 @@ class BSplineCurveBase : private Array<C>
     int		insertKnot(T u)			;
     int		removeKnot(int k)		;
     void	elevateDegree()			;
+		operator const T*()	  const	{return (*this)[0];}
 
     using	Array<C>::operator [];
     using	Array<C>::operator ==;
@@ -81,46 +85,35 @@ class BSplineCurveBase : private Array<C>
     BSplineKnots<T>	_knots;
 };
 
-/************************************************************************
-*  class BSplineCurve<T, D>						*
-************************************************************************/
-template <class T, u_int D>
-class BSplineCurve : public BSplineCurveBase<T, Coordinate<T, D> >
-{
-  public:
-    typedef Coordinate<T, D>	Coord;
+typedef BSplineCurve<Vector<float, FixedSizedBuf<float, 2> > >
+BSplineCurve2f;
+typedef BSplineCurve<Vector<float, FixedSizedBuf<float, 3> > >
+RationalBSplineCurve2f;
+typedef BSplineCurve<Vector<float, FixedSizedBuf<float, 3> > >
+BSplineCurve3f;
+typedef BSplineCurve<Vector<float, FixedSizedBuf<float, 4> > >
+RationalBSplineCurve3f;
+typedef BSplineCurve<Vector<double, FixedSizedBuf<double, 2> > >
+BSplineCurve2d;
+typedef BSplineCurve<Vector<double, FixedSizedBuf<double, 3> > >
+RationalBSplineCurve2d;
+typedef BSplineCurve<Vector<double, FixedSizedBuf<double, 3> > >
+BSplineCurve3d;
+typedef BSplineCurve<Vector<double, FixedSizedBuf<double, 4> > >
+RationalBSplineCurve3d;
     
-    BSplineCurve(u_int degree, T us=0.0, T ue=1.0)
-	:BSplineCurveBase<T, Coord>(degree, us, ue)		{}
-
-    operator T*()			const	{return (*this)[0];}
-};
-
 /************************************************************************
-*  class RationalBSplineCurve<T, D>					*
+*  class BSplineSurface<C>						*
 ************************************************************************/
-template <class T, u_int D>
-class RationalBSplineCurve
-    : public BSplineCurveBase<T, CoordinateP<T, D> >
+template <class C>
+class BSplineSurface : private Array2<Array<C> >
 {
   public:
-    typedef CoordinateP<T, D>	Coord;
+    typedef typename C::value_type		T;
+    typedef C					Coord;
     
-    RationalBSplineCurve(u_int degree, T us=0.0, T ue=1.0)
-	:BSplineCurveBase<T, Coord>(degree, us, ue)			{}
-
-    operator T*()			const	{return (*this)[0];}
-};
-
-/************************************************************************
-*  class BSplineSurfaceBase<T, C>					*
-************************************************************************/
-template <class T, class C>
-class BSplineSurfaceBase : protected Array2<Array<C> >
-{
-  public:
-    BSplineSurfaceBase(u_int uDegree, u_int vDegree,
-			 T us, T ue, T vs, T ve)	;
+    BSplineSurface(u_int uDegree, u_int vDegree,
+		   T us=0.0, T ue=1.0, T vs=0.0, T ve=1.0)	;
 
     static u_int	dim()			{return C::dim();}
 
@@ -153,6 +146,7 @@ class BSplineSurfaceBase : protected Array2<Array<C> >
     int		vRemoveKnot(int l)		;
     void	uElevateDegree()		;
     void	vElevateDegree()		;
+		operator const T*()	const	{return (*this)[0][0];}
 
     using	Array2<Array<C> >::operator [];
     using	Array2<Array<C> >::ncol;
@@ -163,31 +157,24 @@ class BSplineSurfaceBase : protected Array2<Array<C> >
     using	Array2<Array<C> >::restore;
     
     friend std::istream&
-    operator >>(std::istream& in, BSplineSurfaceBase<T, C>& b)
+    operator >>(std::istream& in, BSplineSurface<C>& b)
 	{return in >> (Array2<Array<C> >&)b;}
     friend std::ostream&
-    operator <<(std::ostream& out, const BSplineSurfaceBase<T, C>& b)
+    operator <<(std::ostream& out, const BSplineSurface<C>& b)
 	{return out << (const Array2<Array<C> >&)b;}
 
   private:
     BSplineKnots<T>	_uKnots, _vKnots;
 };
 
-/************************************************************************
-*  class BSplineSurface<T>						*
-************************************************************************/
-template <class T>
-class BSplineSurface : public BSplineSurfaceBase<T, Coordinate<T, 3u> >
-{
-  public:
-    typedef Coordinate<T, 3u>	Coord;
-    
-    BSplineSurface(u_int uDegree, u_int vDegree,
-		     T us=0.0, T ue=1.0, T vs=0.0, T ve=1.0)
-	:BSplineSurfaceBase<T, Coord>(uDegree, vDegree, us, ue, vs, ve) {}
-
-    operator T*()			const	{return (*this)[0][0];}
-};
+typedef BSplineSurface<Vector<float, FixedSizedBuf<float, 3> > >
+BSplineSurface3f;
+typedef BSplineSurface<Vector<float, FixedSizedBuf<float, 4> > >
+RationalBSplineSurface3f;
+typedef BSplineSurface<Vector<double, FixedSizedBuf<double, 3> > >
+BSplineSurface3d;
+typedef BSplineSurface<Vector<double, FixedSizedBuf<double, 4> > >
+RationalBSplineSurface3d;
 
 }
 #endif

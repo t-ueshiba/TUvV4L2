@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.6 2007-01-29 04:43:26 ueshiba Exp $
+ *  $Id: main.cc,v 1.7 2007-02-28 00:16:06 ueshiba Exp $
  */
 #include <unistd.h>
 #include "TU/Image++.h"
@@ -97,6 +97,5 @@ main(int argc, char* argv[])
 }
 
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Array++.cc"
 #  include "TU/Image++.cc"
 #endif
