@@ -1,11 +1,11 @@
 /*
- *  $Id: ConversionFromYUV.cc,v 1.2 2002-07-25 02:38:04 ueshiba Exp $
+ *  $Id: ConversionFromYUV.cc,v 1.3 2007-03-06 07:15:31 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
 namespace TU
 {
-inline int	flt2fix(float flt)	{return int(flt * (1 << 10));}
+static inline int	flt2fix(float flt)	{return int(flt * (1 << 10));}
 
 /************************************************************************
 *  class ConversionFromYUV						*

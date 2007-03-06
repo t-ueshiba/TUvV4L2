@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.cc,v 1.19 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.20 2007-03-06 07:15:31 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -42,7 +42,7 @@ namespace TU
   \f]
   \throw std::invalid_argument	3次元ベクトルでない場合に送出
 */
-template <class T, class B> Matrix<T>
+template <class T, class B> Matrix<T, Buf<T> >
 Vector<T, B>::skew() const
 {
     if (dim() != 3)
@@ -58,29 +58,15 @@ Vector<T, B>::skew() const
 }
 
 /************************************************************************
-*  class Matrix<T>							*
+*  class Matrix<T, B>							*
 ************************************************************************/
-//! この?x3行列の各行と3次元ベクトルとのベクトル積をとる．
-/*!
-  \param v	3次元ベクトル
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
-*/
-template <class T> template <class T2, class B2> Matrix<T>&
-Matrix<T>::operator ^=(const Vector<T2, B2>& v)
-{
-    for (int i = 0; i < nrow(); ++i)
-	(*this)[i] ^= v;
-    return *this;
-}
-
 //! この正方行列を全て同一の対角成分値を持つ対角行列にする．
 /*!
   \param c	対角成分の値
   \return	この行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
 */
-template <class T> Matrix<T>&
-Matrix<T>::diag(T c)
+template <class T, class B> Matrix<T, B>&
+Matrix<T, B>::diag(T c)
 {
     check_dim(ncol());
     *this = 0;
@@ -93,8 +79,8 @@ Matrix<T>::diag(T c)
 /*!
   \return	転置行列，すなわち\f$\TUtvec{A}{}\f$
 */
-template <class T> Matrix<T>
-Matrix<T>::trns() const				// transpose
+template <class T, class B> Matrix<T>
+Matrix<T, B>::trns() const
 {
     Matrix<T> val(ncol(), nrow());
     for (int i = 0; i < nrow(); ++i)
@@ -109,8 +95,8 @@ Matrix<T>::trns() const				// transpose
   \param q	元の行列から取り除く列を指定するindex
   \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
 */
-template <class T> T
-Matrix<T>::det(int p, int q) const
+template <class T, class B> T
+Matrix<T, B>::det(int p, int q) const
 {
     Matrix<T>		d(nrow()-1, ncol()-1);
     for (int i = 0; i < p; ++i)
@@ -135,8 +121,8 @@ Matrix<T>::det(int p, int q) const
   \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
   \throw std::invalid_argument	正方行列でない場合に送出
 */
-template <class T> T
-Matrix<T>::trace() const
+template <class T, class B> T
+Matrix<T, B>::trace() const
 {
     if (nrow() != ncol())
         throw
@@ -152,10 +138,10 @@ Matrix<T>::trace() const
   \return	余因子行列，すなわち
 		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
 */
-template <class T> Matrix<T>
-Matrix<T>::adj() const
+template <class T, class B> Matrix<T, B>
+Matrix<T, B>::adj() const
 {
-    Matrix<T>		val(nrow(), ncol());
+    Matrix<T, B>	val(nrow(), ncol());
     for (int i = 0; i < val.nrow(); ++i)
 	for (int j = 0; j < val.ncol(); ++j)
 	    val[i][j] = ((i + j) % 2 ? -det(j, i) : det(j, i));
@@ -176,17 +162,17 @@ Matrix<T>::adj() const
 		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
 		\f]
 */
-template <class T> Matrix<T>
-Matrix<T>::pinv(T cndnum) const
+template <class T, class B> Matrix<T>
+Matrix<T, B>::pinv(T cndnum) const
 {
     SVDecomposition<T>	svd(*this);
-    Matrix<T>		B(svd.ncol(), svd.nrow());
+    Matrix<T>		val(svd.ncol(), svd.nrow());
     
     for (int i = 0; i < svd.diagonal().dim(); ++i)
 	if (fabs(svd[i]) * cndnum > fabs(svd[0]))
-	    B += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
+	    val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
 
-    return B;
+    return val;
 }
 
 //! この対称行列の固有値と固有ベクトルを返す．
@@ -201,8 +187,8 @@ Matrix<T>::pinv(T cndnum) const
 		\f]
 		なる\f$\TUtvec{U}{}\f$
 */
-template <class T> Matrix<T>
-Matrix<T>::eigen(Vector<T>& eval) const
+template <class T, class B> Matrix<T>
+Matrix<T, B>::eigen(Vector<T>& eval) const
 {
     TriDiagonal<T>	tri(*this);
 
@@ -226,10 +212,10 @@ Matrix<T>::eigen(Vector<T>& eval) const
 		\f]
 		なる\f$\TUtvec{U}{}\f$
 */
-template <class T> Matrix<T>
-Matrix<T>::geigen(const Matrix<T>& B, Vector<T>& eval) const
+template <class T, class B> Matrix<T>
+Matrix<T, B>::geigen(const Matrix<T>& BB, Vector<T>& eval) const
 {
-    Matrix<T>	Ltinv = B.cholesky().inv(), Linv = Ltinv.trns();
+    Matrix<T>	Ltinv = BB.cholesky().inv(), Linv = Ltinv.trns();
     Matrix<T>	Ut = (Linv * (*this) * Ltinv).eigen(eval);
     
     return Ut * Linv;
@@ -243,14 +229,14 @@ Matrix<T>::geigen(const Matrix<T>& B, Vector<T>& eval) const
   \throw std::invalid_argument	正方行列でない場合に送出
   \throw std::runtime_error	正値でない場合に送出
 */
-template <class T> Matrix<T>
-Matrix<T>::cholesky() const
+template <class T, class B> Matrix<T, B>
+Matrix<T, B>::cholesky() const
 {
     if (nrow() != ncol())
         throw
 	    std::invalid_argument("TU::Matrix<T>::cholesky(): not square matrix!!");
 
-    Matrix<T>	Lt(*this);
+    Matrix<T, B>	Lt(*this);
     for (int i = 0; i < nrow(); ++i)
     {
 	T d = Lt[i][i];
@@ -276,8 +262,8 @@ Matrix<T>::cholesky() const
 		  \TUvec{A}{}\leftarrow\frac{\TUvec{A}{}}{\TUnorm{\TUvec{A}{}}}
 		\f$
 */
-template <class T> Matrix<T>&
-Matrix<T>::normalize()
+template <class T, class B> Matrix<T, B>&
+Matrix<T, B>::normalize()
 {
     T	sum = 0.0;
     for (int i = 0; i < nrow(); ++i)
@@ -290,8 +276,8 @@ Matrix<T>::normalize()
     \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
 */
-template <class T> Matrix<T>&
-Matrix<T>::rotate_from_left(const Rotation& r)
+template <class T, class B> Matrix<T, B>&
+Matrix<T, B>::rotate_from_left(const Rotation& r)
 {
     for (int j = 0; j < ncol(); ++j)
     {
@@ -308,8 +294,8 @@ Matrix<T>::rotate_from_left(const Rotation& r)
     \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
 */
-template <class T> Matrix<T>&
-Matrix<T>::rotate_from_right(const Rotation& r)
+template <class T, class B> Matrix<T, B>&
+Matrix<T, B>::rotate_from_right(const Rotation& r)
 {
     for (int i = 0; i < nrow(); ++i)
     {
@@ -325,8 +311,8 @@ Matrix<T>::rotate_from_right(const Rotation& r)
 /*!
     \return	行列の2乗ノルムの2乗，すなわち\f$\TUnorm{\TUvec{A}{}}^2\f$
 */
-template <class T> T
-Matrix<T>::square() const
+template <class T, class B> T
+Matrix<T, B>::square() const
 {
     T	val = 0.0;
     for (int i = 0; i < nrow(); ++i)
@@ -338,8 +324,8 @@ Matrix<T>::square() const
 /*!
     \return	この行列
 */
-template <class T> Matrix<T>&
-Matrix<T>::symmetrize()
+template <class T, class B> Matrix<T, B>&
+Matrix<T, B>::symmetrize()
 {
     for (int i = 0; i < nrow(); ++i)
 	for (int j = 0; j < i; ++j)
@@ -351,8 +337,8 @@ Matrix<T>::symmetrize()
 /*!
     \return	この行列
 */
-template <class T> Matrix<T>&
-Matrix<T>::antisymmetrize()
+template <class T, class B> Matrix<T, B>&
+Matrix<T, B>::antisymmetrize()
 {
     for (int i = 0; i < nrow(); ++i)
     {
@@ -391,8 +377,8 @@ Matrix<T>::antisymmetrize()
  \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す．
  \throw invalid_argument	3次元正方行列でない場合に送出
 */
-template <class T> void
-Matrix<T>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
+template <class T, class B> void
+Matrix<T, B>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
 {
     using namespace	std;
     
@@ -427,8 +413,8 @@ Matrix<T>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
  \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
  \throw std::invalid_argument	3x3行列でない場合に送出
 */
-template <class T> Vector<T, FixedSizedBuf<T, 3> >
-Matrix<T>::rot2axis(T& c, T& s) const
+template <class T, class B> Vector<T, FixedSizedBuf<T, 3> >
+Matrix<T, B>::rot2axis(T& c, T& s) const
 {
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
@@ -461,8 +447,8 @@ Matrix<T>::rot2axis(T& c, T& s) const
 				\f$\theta\TUvec{n}{}\f$
  \throw invalid_argument	3x3行列でない場合に送出
 */
-template <class T> Vector<T, FixedSizedBuf<T, 3u> >
-Matrix<T>::rot2axis() const
+template <class T, class B> Vector<T, FixedSizedBuf<T, 3u> >
+Matrix<T, B>::rot2axis() const
 {
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
@@ -482,92 +468,8 @@ Matrix<T>::rot2axis() const
 }
 
 /************************************************************************
-*  class LUDecomposition<T>						*
-************************************************************************/
-//! 与えられた正方行列のLU分解を生成する．
-/*!
- \param m			LU分解する正方行列
- \throw std::invalid_argument	mが正方行列でない場合に送出
-*/
-template <class T>
-LUDecomposition<T>::LUDecomposition(const Matrix<T>& m)
-    :Array2<Vector<T> >(m), _index(ncol()), _det(1.0)
-{
-    using namespace	std;
-    
-    if (nrow() != ncol())
-        throw invalid_argument("TU::LUDecomposition<T>::LUDecomposition: not square matrix!!");
-
-    for (int j = 0; j < ncol(); ++j)	// initialize column index
-	_index[j] = j;			// for explicit pivotting
-
-    Vector<T>	scale(ncol());
-    for (int j = 0; j < ncol(); ++j)	// find maximum abs. value in each col.
-    {					// for implicit pivotting
-	T max = 0.0;
-
-	for (int i = 0; i < nrow(); ++i)
-	{
-	    const T tmp = fabs((*this)[i][j]);
-	    if (tmp > max)
-		max = tmp;
-	}
-	scale[j] = (max != 0.0 ? 1.0 / max : 1.0);
-    }
-
-    for (int i = 0; i < nrow(); ++i)
-    {
-	for (int j = 0; j < i; ++j)		// left part (j < i)
-	{
-	    T& sum = (*this)[i][j];
-	    for (int k = 0; k < j; ++k)
-		sum -= (*this)[i][k] * (*this)[k][j];
-	}
-
-	int	jmax;
-	T	max = 0.0;
-	for (int j = i; j < ncol(); ++j)  // diagonal and right part (i <= j)
-	{
-	    T& sum = (*this)[i][j];
-	    for (int k = 0; k < i; ++k)
-		sum -= (*this)[i][k] * (*this)[k][j];
-	    const T tmp = fabs(sum) * scale[j];
-	    if (tmp >= max)
-	    {
-		max  = tmp;
-		jmax = j;
-	    }
-	}
-	if (jmax != i)			// pivotting required ?
-	{
-	    for (int k = 0; k < nrow(); ++k)	// swap i-th and jmax-th column
-		swap((*this)[k][i], (*this)[k][jmax]);
-	    swap(_index[i], _index[jmax]);	// swap column index
-	    swap(scale[i], scale[jmax]);	// swap colum-wise scale factor
-	    _det = -_det;
-	}
-
-	_det *= (*this)[i][i];
-
-	if ((*this)[i][i] == 0.0)	// singular matrix ?
-	    break;
-
-	for (int j = i + 1; j < nrow(); ++j)
-	    (*this)[i][j] /= (*this)[i][i];
-    }
-}
-
-/************************************************************************
 *  class Householder<T>							*
 ************************************************************************/
-template <class T>
-Householder<T>::Householder(const Matrix<T>& a, u_int d)
-    :Matrix<T>(a), _d(d), _sigma(dim())
-{
-    if (a.nrow() != a.ncol())
-	throw std::invalid_argument("TU::Householder<T>::Householder: Given matrix must be square !!");
-}
-
 template <class T> void
 Householder<T>::apply_from_left(Matrix<T>& a, int m)
 {
@@ -725,52 +627,8 @@ Householder<T>::sigma_is_zero(int m, T comp) const
 }
 
 /************************************************************************
-*  class QRDeomposition<T>						*
-************************************************************************/
-//! 与えられた一般行列のQR分解を生成する．
-/*!
- \param m	QR分解する一般行列
-*/
-template <class T>
-QRDecomposition<T>::QRDecomposition(const Matrix<T>& m)
-    :Matrix<T>(m), _Qt(m.ncol(), 0)
-{
-    u_int	n = std::min(nrow(), ncol());
-    for (int j = 0; j < n; ++j)
-	_Qt.apply_from_right(*this, j);
-    _Qt.make_transformation();
-    for (int i = 0; i < n; ++i)
-    {
-	(*this)[i][i] = _Qt.sigma()[i];
-	for (int j = i + 1; j < ncol(); ++j)
-	    (*this)[i][j] = 0.0;
-    }
-}
-
-/************************************************************************
 *  class TriDiagonal<T>							*
 ************************************************************************/
-//! 与えられた対称行列を3重対角化する．
-/*!
-  \param a			3重対角化する対称行列
-  \throw std::invalid_argument	aが正方行列でない場合に送出
-*/
-template <class T>
-TriDiagonal<T>::TriDiagonal(const Matrix<T>& a)
-    :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
-{
-    if (_Ut.nrow() != _Ut.ncol())
-        throw std::invalid_argument("TU::TriDiagonal<T>::TriDiagonal: not square matrix!!");
-
-    for (int m = 0; m < dim(); ++m)
-    {
-	_Ut.apply_from_both(_Ut, m);
-	_diagonal[m] = _Ut[m][m];
-    }
-
-    _Ut.make_transformation();
-}
-
 //! 3重対角行列を対角化する（固有値，固有ベクトルの計算）．
 /*!
   対角成分は固有値となり，\f$\TUtvec{U}{}\f$の各行は固有ベクトルを与える．
@@ -868,45 +726,6 @@ TriDiagonal<T>::initialize_rotation(int m, int n, T& x, T& y) const
 /************************************************************************
 *  class BiDiagonal<T>							*
 ************************************************************************/
-//! 与えられた一般行列を2重対角化する．
-/*!
-  \param a	2重対角化する一般行列
-*/
-template <class T>
-BiDiagonal<T>::BiDiagonal(const Matrix<T>& a)
-    :_Dt((a.nrow() < a.ncol() ? a.ncol() : a.nrow()), 0),
-     _Et((a.nrow() < a.ncol() ? a.nrow() : a.ncol()), 1),
-     _diagonal(_Dt.sigma()), _off_diagonal(_Et.sigma()), _anorm(0),
-     _Ut(a.nrow() < a.ncol() ? _Dt : _Et),
-     _Vt(a.nrow() < a.ncol() ? _Et : _Dt)
-{
-    if (nrow() < ncol())
-	for (int i = 0; i < nrow(); ++i)
-	    for (int j = 0; j < ncol(); ++j)
-		_Dt[i][j] = a[i][j];
-    else
-	for (int i = 0; i < nrow(); ++i)
-	    for (int j = 0; j < ncol(); ++j)
-		_Dt[j][i] = a[i][j];
-
-  /* Householder reduction to bi-diagonal (off-diagonal in lower part) form */
-    for (int m = 0; m < _Et.dim(); ++m)
-    {
-	_Dt.apply_from_right(_Dt, m);
-	_Et.apply_from_left(_Dt, m);
-    }
-
-    _Dt.make_transformation();	// Accumulate right-hand transformation: V
-    _Et.make_transformation();	// Accumulate left-hand transformation: U
-
-    for (int m = 0; m < _Et.dim(); ++m)
-    {
-	T	anorm = fabs(_diagonal[m]) + fabs(_off_diagonal[m]);
-	if (anorm > _anorm)
-	    _anorm = anorm;
-    }
-}
-
 //! 2重対角行列を対角化する（特異値分解）．
 /*!
   対角成分は特異値となり，\f$\TUtvec{U}{}\f$と\f$\TUtvec{V}{}\f$

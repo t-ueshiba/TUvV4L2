@@ -1,5 +1,5 @@
 /*
- *  $Id: Bezier++.cc,v 1.4 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Bezier++.cc,v 1.5 2007-03-06 07:15:31 ueshiba Exp $
  */
 #include "TU/Bezier++.h"
 

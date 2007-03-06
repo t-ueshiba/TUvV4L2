@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.35 2007-02-28 00:16:06 ueshiba Exp $
+#  $Id: Makefile,v 1.36 2007-03-06 07:15:31 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -8,7 +8,7 @@ DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU
 INCDIRS		= -I$(INCDIR)
 
-NAME		= TUTools++
+NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
 CFLAGS		= -g -O
@@ -146,7 +146,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.35 $	|		\
+REV		= $(shell echo $Revision: 1.36 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

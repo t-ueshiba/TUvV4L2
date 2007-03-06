@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.22 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Image++.h,v 1.23 2007-03-06 07:15:31 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -31,12 +31,14 @@
 namespace TU
 {
 /************************************************************************
-*  class RGB, BGR, RGBA & ABGR						*
+*  struct RGB, BGR, RGBA & ABGR						*
 *	Note:	X::operator =(const X&) must be explicitly defined	*
 *		to avoid X -> double -> u_char -> X conversion.		*
 ************************************************************************/
 struct BGR;
 struct YUV444;
+
+//! Red, Green, Blue（各8bit）の順で並んだカラー画素
 struct RGB
 {
     RGB()					:r(0), g(0), b(0)	{}
@@ -75,6 +77,7 @@ operator <<(std::ostream& out, const RGB& v)
     return out << (u_int)v.r << ' ' << (u_int)v.g << ' ' << (u_int)v.b;
 }
 
+//! Blue, Green, Red（各8bit）の順で並んだカラー画素
 struct BGR
 {
     BGR()					:b(0),   g(0),   r(0)	{}
@@ -125,6 +128,7 @@ struct Alpha
     u_char	a;
 };
 
+//! Red, Green, Blue, Alpha（各8bit）の順で並んだカラー画素
 struct RGBA : public RGB, public Alpha
 {
     RGBA()			:RGB(),  Alpha()  	{}
@@ -139,6 +143,7 @@ struct RGBA : public RGB, public Alpha
     bool	operator !=(const RGBA& v)	const	{return !(*this != v);}
 };
 
+//! Alpha, Blue, Green, Red（各8bit）の順で並んだカラー画素
 struct ABGR : public Alpha, public BGR
 {
     ABGR()			:Alpha(),  BGR()	{}
@@ -154,8 +159,9 @@ struct ABGR : public Alpha, public BGR
 };
 
 /************************************************************************
-*  class YUV444, YUV422, YUV411						*
+*  struct YUV444, YUV422, YUV411					*
 ************************************************************************/
+//! Y, U, V（各8bit）の順で並んだカラー画素
 struct YUV444
 {
     YUV444(u_char yy=0, u_char uu=128, u_char vv=128)
@@ -189,6 +195,7 @@ operator <<(std::ostream& out, const YUV444& yuv)
     return out << (u_int)yuv.y << ' ' << (u_int)yuv.u << ' ' << (u_int)yuv.v;
 }
 
+//! [U, Y0], [V, Y1]（各8bit）の順で並んだカラー画素(16bits/pixel)
 struct YUV422
 {
     YUV422(u_char yy=0, u_char xx=128) :x(xx),  y(yy)	{}
@@ -219,6 +226,7 @@ operator <<(std::ostream& out, const YUV422& yuv)
     return out << (u_int)yuv.y << ' ' << (u_int)yuv.x;
 }
 
+//! [U, Y0, Y1], [V, Y2, Y3]（各8bit）の順で並んだカラー画素(12bits/pixel)
 struct YUV411
 {
     YUV411(u_char yy0=0, u_char yy1=0, u_char xx=128)
@@ -249,6 +257,7 @@ operator <<(std::ostream& out, const YUV411& yuv)
 /************************************************************************
 *  function fromYUV<T>()						*
 ************************************************************************/
+//! カラーのY, U, V値を与えて他のカラー表現に変換するクラス
 class ConversionFromYUV
 {
   public:
@@ -340,6 +349,7 @@ ABGR::ABGR(const YUV444& v)
 /************************************************************************
 *  class ImageBase:	basic image class				*
 ************************************************************************/
+//! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
 class ImageBase
 {
   protected:
@@ -367,13 +377,17 @@ class ImageBase
     static u_int	type2depth(Type type)		;
     
   public:
-    Matrix<double>	P;			// projection matrix
-    double		d1, d2;			// distortion parameters
+    Matrix<double>	P;			//!< 3x4カメラ行列
+    double		d1, d2;			//!< レンズ歪み係数
 };
 
 /************************************************************************
 *  class ImageLine<T>:	Generic image scanline class			*
 ************************************************************************/
+//! T型の画素を持つ画像のスキャンラインを表すクラス
+/*!
+  \param T	画素の型
+*/
 template <class T>
 class ImageLine : public Array<T>
 {
@@ -547,22 +561,23 @@ ImageLine<YUV411>::resize(YUV411* p, u_int d)
 /************************************************************************
 *  class Image<T>:	Generic image class				*
 ************************************************************************/
-template <class T>
-class Image : public Array2<ImageLine<T> >, public ImageBase
+//! T型の画素を持つ画像を表すクラス
+/*!
+  \param T	画素の型
+  \param B	バッファの型
+*/
+template <class T, class B=Buf<T> >
+class Image : public Array2<ImageLine<T>, B>, public ImageBase
 {
   public:
     explicit Image(u_int w=0, u_int h=0)
-	:Array2<ImageLine<T> >(h, w), ImageBase()		{*this = 0;}
+	:Array2<ImageLine<T>, B>(h, w), ImageBase()		{*this = 0;}
     Image(T* p, u_int w, u_int h)			
-	:Array2<ImageLine<T> >(p, h, w), ImageBase()		{}
-    Image(const Image& i, int u, int v, u_int w, u_int h)
-	:Array2<ImageLine<T> >(i, v, u, h, w), ImageBase(i)	{}
-    Image(const Image& i)			
-	:Array2<ImageLine<T> >(i), ImageBase(i)			{}
-    Image&	operator =(const Image& i)	{Array2<ImageLine<T> >::
-						 operator =(i);
-						 (ImageBase&)*this = i;
-						 return *this;}
+	:Array2<ImageLine<T>, B>(p, h, w), ImageBase()		{}
+    template <class B2>
+    Image(const Image<T, B2>& i, int u, int v, u_int w, u_int h)
+	:Array2<ImageLine<T>, B>(i, v, u, h, w), ImageBase(i)	{}
+
     template <class S>
     const T&	operator ()(const Point2<S>& p)
 					const	{return (*this)[p[1]][p[0]];}
@@ -593,60 +608,61 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     virtual void	_resize(u_int h, u_int w)			;
 };
 
-template <class T> inline std::istream&
-Image<T>::restore(std::istream& in)
+template <class T, class B> inline std::istream&
+Image<T, B>::restore(std::istream& in)
 {
     return restoreData(in, restoreHeader(in));
 }
 
-template <class T> inline std::ostream&
-Image<T>::save(std::ostream& out, Type type) const
+template <class T, class B> inline std::ostream&
+Image<T, B>::save(std::ostream& out, Type type) const
 {
     saveHeader(out, type);
     return saveData(out, type);
 }
 
-template <class T> inline void
-Image<T>::resize(u_int h, u_int w)
+template <class T, class B> inline void
+Image<T, B>::resize(u_int h, u_int w)
 {
-    Array2<ImageLine<T> >::resize(h, w);
+    Array2<ImageLine<T>, B>::resize(h, w);
 }
 
-template <class T> inline void
-Image<T>::resize(T* p, u_int h, u_int w)
+template <class T, class B> inline void
+Image<T, B>::resize(T* p, u_int h, u_int w)
 {
-    Array2<ImageLine<T> >::resize(p, h, w);
+    Array2<ImageLine<T>, B>::resize(p, h, w);
 }
  
 template <> inline
-Image<YUV411>::Image(u_int w, u_int h)
-    :Array2<ImageLine<TU::YUV411> >(h, w/2), ImageBase()
+Image<YUV411, Buf<YUV411> >::Image(u_int w, u_int h)
+    :Array2<ImageLine<YUV411>, Buf<YUV411> >(h, w/2), ImageBase()
 {
     *this = 0;
 }
 
 template <> inline
-Image<YUV411>::Image(TU::YUV411* p, u_int w, u_int h)
-    :Array2<ImageLine<TU::YUV411> >(p, h, w/2), ImageBase()
+Image<YUV411, Buf<YUV411> >::Image(YUV411* p, u_int w, u_int h)
+    :Array2<ImageLine<YUV411>, Buf<YUV411> >(p, h, w/2), ImageBase()
 {
 }
 
-template <> inline
-Image<YUV411>::Image(const Image& i, int u, int v, u_int w, u_int h)
-    :Array2<ImageLine<TU::YUV411> >(i, v, u/2, h, w/2), ImageBase(i)
+template <> template <class B2> inline
+Image<YUV411, Buf<YUV411> >::Image(const Image<YUV411, B2>& i,
+				   int u, int v, u_int w, u_int h)
+    :Array2<ImageLine<YUV411>, Buf<YUV411> >(i, v, u/2, h, w/2), ImageBase(i)
 {
 }
 
 template <> inline u_int
-Image<YUV411>::width() const
+Image<YUV411, Buf<YUV411> >::width() const
 {
     return 2 * ncol();
 }
 
 template <> inline void
-Image<YUV411>::resize(TU::YUV411* p, u_int h, u_int w)
+Image<YUV411, Buf<YUV411> >::resize(YUV411* p, u_int h, u_int w)
 {
-    Array2<ImageLine<YUV411> >::resize(p, h, w/2);
+    Array2<ImageLine<YUV411>, Buf<YUV411> >::resize(p, h, w/2);
 }
 
 /************************************************************************
@@ -657,10 +673,12 @@ template <u_int D> class IIRFilter
 {
   public:
     IIRFilter&	initialize(const float c[D+D])				;
-    template <class S> const IIRFilter&
-		forward(const Array<S>& in, Array<float>& out)	const	;
-    template <class S> const IIRFilter&
-		backward(const Array<S>& in, Array<float>& out)	const	;
+    template <class S, class B, class B2> const IIRFilter&
+		forward(const Array<S, B>& in,
+			Array<float, B2>& out)			const	;
+    template <class S, class B, class B2> const IIRFilter&
+		backward(const Array<S, B>& in,
+			 Array<float, B2>& out)			const	;
     void	limitsF(float& limit0F,
 			float& limit1F, float& limit2F)		const	;
     void	limitsB(float& limit0B,
@@ -687,8 +705,8 @@ template <u_int D> class BilateralIIRFilter
     
     BilateralIIRFilter&	initialize(const float cF[D+D], const float cB[D+D]);
     BilateralIIRFilter&	initialize(const float c[D+D], Order order)	;
-    template <class S>
-    BilateralIIRFilter&	convolve(const Array<S>& in)			;
+    template <class S, class B>
+    BilateralIIRFilter&	convolve(const Array<S, B>& in)			;
     u_int		dim()					const	;
     float		operator [](int i)			const	;
     void		limits(float& limit0,
@@ -738,8 +756,8 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
   \param in	入力データ列
   return	このフィルタ自身
 */
-template <u_int D> template <class S> inline BilateralIIRFilter<D>&
-BilateralIIRFilter<D>::convolve(const Array<S>& in)
+template <u_int D> template <class S, class B> inline BilateralIIRFilter<D>&
+BilateralIIRFilter<D>::convolve(const Array<S, B>& in)
 {
     _iirF.forward(in, _bufF);
     _iirB.backward(in, _bufB);
@@ -783,8 +801,8 @@ template <u_int D> class BilateralIIRFilter2
     BilateralIIRFilter2&
 		initialize(float cHF[D+D], Order orderH,
 			   float cVF[D+D], Order orderV)		;
-    template <class S, class T> BilateralIIRFilter2&
-		convolve(const Image<S>& in, Image<T>& out)		;
+    template <class T1, class B1, class T2, class B2> BilateralIIRFilter2&
+		convolve(const Image<T1, B1>& in, Image<T2, B2>& out)	;
     
   private:
     BilateralIIRFilter<D>	_iirH;
@@ -840,20 +858,20 @@ class DericheConvolver : private BilateralIIRFilter2<2u>
     DericheConvolver(float alpha=1.0)		{initialize(alpha);}
 
     DericheConvolver&	initialize(float alpha)				;
-    template <class S, class T>
-    DericheConvolver&	smooth(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    DericheConvolver&	diffH(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    DericheConvolver&	diffV(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    DericheConvolver&	diffHH(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    DericheConvolver&	diffHV(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    DericheConvolver&	diffVV(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    DericheConvolver&	laplacian(const Image<S>& in, Image<T>& out)	;
+    template <class T1, class B1, class T2, class B2> DericheConvolver&
+	smooth(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> DericheConvolver&
+	diffH(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> DericheConvolver&
+	diffV(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> DericheConvolver&
+	diffHH(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> DericheConvolver&
+	diffHV(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> DericheConvolver&
+	diffVV(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> DericheConvolver&
+	laplacian(const Image<T1, B1>& in, Image<T2, B2>& out)		;
 
   private:
     float		_c0[4];	// forward coefficients for smoothing
@@ -868,8 +886,8 @@ class DericheConvolver : private BilateralIIRFilter2<2u>
   \param out	出力画像
   \return	このCanny-Deriche核自身
 */
-template <class S, class T> inline DericheConvolver&
-DericheConvolver::smooth(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
+DericheConvolver::smooth(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c0, BilateralIIRFilter<2u>::Zeroth,
@@ -884,8 +902,8 @@ DericheConvolver::smooth(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このCanny-Deriche核自身
 */
-template <class S, class T> inline DericheConvolver&
-DericheConvolver::diffH(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
+DericheConvolver::diffH(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c1, BilateralIIRFilter<2u>::First,
@@ -900,8 +918,8 @@ DericheConvolver::diffH(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このCanny-Deriche核自身
 */
-template <class S, class T> inline DericheConvolver&
-DericheConvolver::diffV(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
+DericheConvolver::diffV(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c0, BilateralIIRFilter<2u>::Zeroth,
@@ -916,8 +934,8 @@ DericheConvolver::diffV(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このCanny-Deriche核自身
 */
-template <class S, class T> inline DericheConvolver&
-DericheConvolver::diffHH(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
+DericheConvolver::diffHH(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c2, BilateralIIRFilter<2u>::Second,
@@ -932,8 +950,8 @@ DericheConvolver::diffHH(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このCanny-Deriche核自身
 */
-template <class S, class T> inline DericheConvolver&
-DericheConvolver::diffHV(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
+DericheConvolver::diffHV(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c1, BilateralIIRFilter<2u>::First,
@@ -948,8 +966,8 @@ DericheConvolver::diffHV(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このCanny-Deriche核自身
 */
-template <class S, class T> inline DericheConvolver&
-DericheConvolver::diffVV(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
+DericheConvolver::diffVV(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<2u>::
 	initialize(_c0, BilateralIIRFilter<2u>::Zeroth,
@@ -964,8 +982,8 @@ DericheConvolver::diffVV(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このCanny-Deriche核自身
 */
-template <class S, class T> inline DericheConvolver&
-DericheConvolver::laplacian(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
+DericheConvolver::laplacian(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     diffHH(in, _tmp).diffVV(in, out);
     out += _tmp;
@@ -1027,20 +1045,20 @@ class GaussianConvolver : private BilateralIIRFilter2<4u>
     GaussianConvolver(float sigma=1.0)		{initialize(sigma);}
 
     GaussianConvolver&	initialize(float sigma)				;
-    template <class S, class T>
-    GaussianConvolver&	smooth(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    GaussianConvolver&	diffH(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    GaussianConvolver&	diffV(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    GaussianConvolver&	diffHH(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    GaussianConvolver&	diffHV(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    GaussianConvolver&	diffVV(const Image<S>& in, Image<T>& out)	;
-    template <class S, class T>
-    GaussianConvolver&	laplacian(const Image<S>& in, Image<T>& out)	;
+    template <class T1, class B1, class T2, class B2> GaussianConvolver&
+	smooth(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> GaussianConvolver&
+	diffH(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> GaussianConvolver&
+	diffV(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> GaussianConvolver&
+	diffHH(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> GaussianConvolver&
+	diffHV(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> GaussianConvolver&
+	diffVV(const Image<T1, B1>& in, Image<T2, B2>& out)		;
+    template <class T1, class B1, class T2, class B2> GaussianConvolver&
+	laplacian(const Image<T1, B1>& in, Image<T2, B2>& out)		;
 
   private:
     float		_c0[8];	// forward coefficients for smoothing
@@ -1055,8 +1073,8 @@ class GaussianConvolver : private BilateralIIRFilter2<4u>
   \param out	出力画像
   \return	このGauss核自身
 */
-template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::smooth(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
+GaussianConvolver::smooth(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c0, BilateralIIRFilter<4u>::Zeroth,
@@ -1071,8 +1089,8 @@ GaussianConvolver::smooth(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このGauss核自身
 */
-template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::diffH(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
+GaussianConvolver::diffH(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c1, BilateralIIRFilter<4u>::First,
@@ -1087,8 +1105,8 @@ GaussianConvolver::diffH(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このGauss核自身
 */
-template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::diffV(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
+GaussianConvolver::diffV(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c0, BilateralIIRFilter<4u>::Zeroth,
@@ -1103,8 +1121,8 @@ GaussianConvolver::diffV(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このGauss核自身
 */
-template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::diffHH(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
+GaussianConvolver::diffHH(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c2, BilateralIIRFilter<4u>::Second,
@@ -1119,8 +1137,8 @@ GaussianConvolver::diffHH(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このGauss核自身
 */
-template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::diffHV(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
+GaussianConvolver::diffHV(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c1, BilateralIIRFilter<4u>::First,
@@ -1135,8 +1153,8 @@ GaussianConvolver::diffHV(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このGauss核自身
 */
-template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::diffVV(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
+GaussianConvolver::diffVV(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     BilateralIIRFilter2<4u>::
 	initialize(_c0, BilateralIIRFilter<4u>::Zeroth,
@@ -1151,8 +1169,8 @@ GaussianConvolver::diffVV(const Image<S>& in, Image<T>& out)
   \param out	出力画像
   \return	このGauss核自身
 */
-template <class S, class T> inline GaussianConvolver&
-GaussianConvolver::laplacian(const Image<S>& in, Image<T>& out)
+template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
+GaussianConvolver::laplacian(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     diffHH(in, _tmp).diffVV(in, out);
     out += _tmp;
@@ -1238,15 +1256,15 @@ class IntegralImage : public Image<T>
 {
   public:
     IntegralImage()							;
-    template <class S>
-    IntegralImage(const Image<S>& image)				;
+    template <class S, class B>
+    IntegralImage(const Image<S, B>& image)				;
 
-    template <class S> IntegralImage&
-		initialize(const Image<S>& image)			;
+    template <class S, class B> IntegralImage&
+		initialize(const Image<S, B>& image)			;
     T		crop(int u, int v, int w, int h)		const	;
     T		crossVal(int u, int v, int cropSize)		const	;
-    template <class S> const IntegralImage&
-		crossVal(Image<S>& out, int cropSize)		const	;
+    template <class S, class B> const IntegralImage&
+		crossVal(Image<S, B>& out, int cropSize)	const	;
 
     using	Image<T>::width;
     using	Image<T>::height;
@@ -1262,8 +1280,8 @@ IntegralImage<T>::IntegralImage()
 /*!
   \param image		入力画像
 */
-template <class T> template <class S> inline
-IntegralImage<T>::IntegralImage(const Image<S>& image)
+template <class T> template <class S, class B> inline
+IntegralImage<T>::IntegralImage(const Image<S, B>& image)
 {
     initialize(image);
 }
@@ -1293,15 +1311,15 @@ class DiagonalIntegralImage : public Image<T>
 {
   public:
     DiagonalIntegralImage()						;
-    template <class S>
-    DiagonalIntegralImage(const Image<S>& image)			;
+    template <class S, class B>
+    DiagonalIntegralImage(const Image<S, B>& image)			;
 
-    template <class S> DiagonalIntegralImage&
-		initialize(const Image<S>& image)			;
+    template <class S, class B> DiagonalIntegralImage&
+		initialize(const Image<S, B>& image)			;
     T		crop(int u, int v, int w, int h)		const	;
     T		crossVal(int u, int v, int cropSize)		const	;
-    template <class S> const DiagonalIntegralImage&
-		crossVal(Image<S>& out, int cropSize)		const	;
+    template <class S, class B> const DiagonalIntegralImage&
+		crossVal(Image<S, B>& out, int cropSize)	const	;
 
     using	Image<T>::width;
     using	Image<T>::height;
@@ -1320,8 +1338,8 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage()
 /*!
   \param image		入力画像
 */
-template <class T> template <class S> inline
-DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S>& image)
+template <class T> template <class S, class B> inline
+DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
 {
     initialize(image);
 }

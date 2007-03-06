@@ -1,5 +1,5 @@
 /*
- *  $Id: Nurbs++.cc,v 1.7 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Nurbs++.cc,v 1.8 2007-03-06 07:15:31 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Nurbs++.h"
@@ -139,7 +139,7 @@ BSplineKnots<T>::derivatives(T u, u_int K, int& I) const
     I = findSpan(u);
     
     Array2<Array<T> >	ndu(degree()+1, degree()+1);
-    Array<T>			left(degree()), right(degree());
+    Array<T>		left(degree()), right(degree());
     ndu[0][0] = 1.0;
     for (int i = 0; i < degree(); ++i)
     {
@@ -261,9 +261,9 @@ BSplineCurve<C>::operator ()(T u) const
 template <class C> Array<C>
 BSplineCurve<C>::derivatives(T u, u_int K) const
 {
-    int				I;
+    int			I;
     Array2<Array<T> >	dN = _knots.derivatives(u, min(K,degree()), I);
-    Array<C>			ders(K+1);
+    Array<C>		ders(K+1);
     for (int k = 0; k < dN.nrow(); ++k)
 	for (int i = 0; i <= degree(); ++i)
 	    ders[k] += dN[k][i] * (*this)[I-degree()+i];
@@ -388,7 +388,7 @@ BSplineCurve<C>::elevateDegree()
 ************************************************************************/
 template <class C>
 BSplineSurface<C>::BSplineSurface(u_int uDeg, u_int vDeg,
-						 T us, T ue, T vs, T ve)
+				  T us, T ue, T vs, T ve)
     :Array2<Array<C> >(vDeg + 1, uDeg + 1),
      _uKnots(uDeg, us, ue), _vKnots(vDeg, vs, ve)
 {
@@ -427,11 +427,9 @@ BSplineSurface<C>::operator ()(T u, T v) const
 template <class C> Array2<Array<C> >
 BSplineSurface<C>::derivatives(T u, T v, u_int D) const
 {
-    int				I, J;
-    Array2<Array<T> >	udN =
-				  _uKnots.derivatives(u, min(D,uDegree()), I),
-				vdN =
-				  _vKnots.derivatives(v, min(D,vDegree()), J);
+    int			I, J;
+    Array2<Array<T> >	udN = _uKnots.derivatives(u, min(D,uDegree()), I),
+			vdN = _vKnots.derivatives(v, min(D,vDegree()), J);
     Array2<Array<C> >	ders(D+1, D+1);
     for (int k = 0; k < udN.nrow(); ++k)		// derivatives w.r.t u
     {
@@ -455,10 +453,10 @@ BSplineSurface<C>::derivatives(T u, T v, u_int D) const
 template <class C> int
 BSplineSurface<C>::uInsertKnot(T u)
 {
-    int				l = _uKnots.insertKnot(u);
+    int			l = _uKnots.insertKnot(u);
     Array2<Array<C> >	tmp(*this);
     resize(nrow(), ncol()+1);
-    Array<T>			alpha(uDegree());
+    Array<T>		alpha(uDegree());
     for (int i = l-uDegree(); i < l; ++i)
 	alpha[i-l+uDegree()] =
 	    (u - uKnots(i)) / (uKnots(i+uDegree()+1) - uKnots(i));
@@ -485,10 +483,10 @@ BSplineSurface<C>::uInsertKnot(T u)
 template <class C> int
 BSplineSurface<C>::vInsertKnot(T v)
 {
-    int				l = _vKnots.insertKnot(v);
+    int			l = _vKnots.insertKnot(v);
     Array2<Array<C> >	tmp(*this);
     resize(nrow()+1, ncol());
-    Array<T>			alpha(vDegree());
+    Array<T>		alpha(vDegree());
     for (int j = l-vDegree(); j < l; ++j)
 	alpha[j-l+vDegree()] =
 	    (v - vKnots(j)) / (vKnots(j+vDegree()+1) - vKnots(j));

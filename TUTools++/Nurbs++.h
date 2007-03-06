@@ -1,5 +1,5 @@
 /*
- *  $Id: Nurbs++.h,v 1.5 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.6 2007-03-06 07:15:31 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -16,8 +16,6 @@ class BSplineKnots : private Array<T>
 {
   public:
     BSplineKnots(u_int degree, T us, T ue)	;
-    
-		operator T*()	const	{return Array<T>::operator T*();}
     
     u_int	degree()		const	{return _degree;}
     u_int	M()			const	{return dim()-1;}
@@ -50,7 +48,8 @@ template <class C>
 class BSplineCurve : private Array<C>
 {
   public:
-    typedef typename C::value_type		T;
+    typedef typename C::ET			T;
+    typedef typename Array<C>::ET		ET;
     typedef C					Coord;
     
     BSplineCurve(u_int degree, T us=0.0, T ue=1.0)	;
@@ -109,7 +108,8 @@ template <class C>
 class BSplineSurface : private Array2<Array<C> >
 {
   public:
-    typedef typename C::value_type		T;
+    typedef typename C::ET			T;
+    typedef typename Array2<Array<C> >::ET	ET;
     typedef C					Coord;
     
     BSplineSurface(u_int uDegree, u_int vDegree,
