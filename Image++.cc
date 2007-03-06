@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.cc,v 1.14 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.15 2007-03-06 07:15:31 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
@@ -92,10 +92,10 @@ ImageLine<YUV411>::fill(const S* src)
 }
 
 /************************************************************************
-*  class Image<T>							*
+*  class Image<T, B>							*
 ************************************************************************/
-template <class T> std::istream&
-Image<T>::restoreData(std::istream& in, Type type)
+template <class T, class B> std::istream&
+Image<T, B>::restoreData(std::istream& in, Type type)
 {
     switch (type)
     {
@@ -119,8 +119,8 @@ Image<T>::restoreData(std::istream& in, Type type)
     return in;
 }
 
-template <class T> std::ostream&
-Image<T>::saveData(std::ostream& out, Type type) const
+template <class T, class B> std::ostream&
+Image<T, B>::saveData(std::ostream& out, Type type) const
 {
     switch (type)
     {
@@ -144,8 +144,8 @@ Image<T>::saveData(std::ostream& out, Type type) const
     return out;
 }
 
-template <class T> template <class S> std::istream&
-Image<T>::restoreRows(std::istream& in)
+template <class T, class B> template <class S> std::istream&
+Image<T, B>::restoreRows(std::istream& in)
 {
     ImageLine<S>	buf(width());
     for (int v = 0; v < height(); )
@@ -157,8 +157,8 @@ Image<T>::restoreRows(std::istream& in)
     return in;
 }
 
-template <class T> template <class D> std::ostream&
-Image<T>::saveRows(std::ostream& out) const
+template <class T, class B> template <class D> std::ostream&
+Image<T, B>::saveRows(std::ostream& out) const
 {
     ImageLine<D>	buf(width());
     for (int v = 0; v < height(); )
@@ -170,22 +170,22 @@ Image<T>::saveRows(std::ostream& out) const
     return out;
 }
 
-template <class T> u_int
-Image<T>::_width() const
+template <class T, class B> u_int
+Image<T, B>::_width() const
 {
-    return Image<T>::width();		// Don't call ImageBase::width!
+    return Image<T, B>::width();	// Don't call ImageBase::width!
 }
 
-template <class T> u_int
-Image<T>::_height() const
+template <class T, class B> u_int
+Image<T, B>::_height() const
 {
-    return Image<T>::height();		// Don't call ImageBase::height!
+    return Image<T, B>::height();	// Don't call ImageBase::height!
 }
 
-template <class T> void
-Image<T>::_resize(u_int h, u_int w)
+template <class T, class B> void
+Image<T, B>::_resize(u_int h, u_int w)
 {
-    Image<T>::resize(h, w);		// Don't call ImageBase::resize!
+    Image<T, B>::resize(h, w);		// Don't call ImageBase::resize!
 }
 
 /************************************************************************
@@ -269,8 +269,8 @@ IIRFilter<D>::initialize(const float c[D+D])
   \param out	出力データ列
   \return	このフィルタ自身
 */
-template <u_int D> template <class S> const IIRFilter<D>&
-IIRFilter<D>::forward(const Array<S>& in, Array<float>& out) const
+template <u_int D> template <class S, class B, class B2> const IIRFilter<D>&
+IIRFilter<D>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 {
     out.resize(in.dim());
 
@@ -300,8 +300,8 @@ IIRFilter<D>::forward(const Array<S>& in, Array<float>& out) const
   \param out	出力データ列
   \return	このフィルタ自身
 */
-template <u_int D> template <class S> const IIRFilter<D>&
-IIRFilter<D>::backward(const Array<S>& in, Array<float>& out) const
+template <u_int D> template <class S, class B, class B2> const IIRFilter<D>&
+IIRFilter<D>::backward(const Array<S, B>& in, Array<float, B2>& out) const
 {
     out.resize(in.dim());
 
@@ -319,8 +319,8 @@ IIRFilter<D>::backward(const Array<S>& in, Array<float>& out) const
     return *this;
 }
 
-template <> template <class S> const IIRFilter<2u>&
-IIRFilter<2u>::forward(const Array<S>& in, Array<float>& out) const
+template <> template <class S, class B, class B2> const IIRFilter<2u>&
+IIRFilter<2u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 {
     if (in.dim() < 2)
 	return *this;
@@ -352,8 +352,8 @@ IIRFilter<2u>::forward(const Array<S>& in, Array<float>& out) const
     return *this;
 }
     
-template <> template <class S> const IIRFilter<2u>&
-IIRFilter<2u>::backward(const Array<S>& in, Array<float>& out) const
+template <> template <class S, class B, class B2> const IIRFilter<2u>&
+IIRFilter<2u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
 {
     if (in.dim() < 2)
 	return *this;
@@ -388,8 +388,8 @@ IIRFilter<2u>::backward(const Array<S>& in, Array<float>& out) const
     return *this;
 }
 
-template <> template <class S> const IIRFilter<4u>&
-IIRFilter<4u>::forward(const Array<S>& in, Array<float>& out) const
+template <> template <class S, class B, class B2> const IIRFilter<4u>&
+IIRFilter<4u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 {
     if (in.dim() < 4)
 	return *this;
@@ -427,8 +427,8 @@ IIRFilter<4u>::forward(const Array<S>& in, Array<float>& out) const
     return *this;
 }
     
-template <> template <class S> const IIRFilter<4u>&
-IIRFilter<4u>::backward(const Array<S>& in, Array<float>& out) const
+template <> template <class S, class B, class B2> const IIRFilter<4u>&
+IIRFilter<4u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
 {
     if (in.dim() < 4)
 	return *this;
@@ -615,8 +615,9 @@ BilateralIIRFilter<D>::limits(float& limit0, float& limit1, float& limit2) const
   \param out	出力画像
   \return	このフィルタ自身
 */
-template <u_int D> template <class S, class T> BilateralIIRFilter2<D>&
-BilateralIIRFilter2<D>::convolve(const Image<S>& in, Image<T>& out)
+template <u_int D> template <class T1, class B1, class T2, class B2>
+BilateralIIRFilter2<D>&
+BilateralIIRFilter2<D>::convolve(const Image<T1, B1>& in, Image<T2, B2>& out)
 {
     _buf.resize(in.width(), in.height());
     for (int v = 0; v < in.height(); ++v)
@@ -631,7 +632,7 @@ BilateralIIRFilter2<D>::convolve(const Image<S>& in, Image<T>& out)
     for (int u = 0; u < _buf.nrow(); ++u)
     {
 	_iirV.convolve(_buf[u]);
-      	ImageLine<T>*	col = &out[0];
+      	ImageLine<T2>*	col = &out[0];
 	for (int v = 0; v < _iirV.dim(); ++v)
 	    (*col++)[u] = _iirV[v];
     }
@@ -647,8 +648,8 @@ BilateralIIRFilter2<D>::convolve(const Image<S>& in, Image<T>& out)
   \param image		入力画像
   \return		この積分画像
 */
-template <class T> template <class S> IntegralImage<T>&
-IntegralImage<T>::initialize(const Image<S>& image)
+template <class T> template <class S, class B> IntegralImage<T>&
+IntegralImage<T>::initialize(const Image<S, B>& image)
 {
     resize(image.height(), image.width());
     
@@ -713,8 +714,8 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
 			テンプレートは一辺 2*cropSize+1 の正方形
   \return		この積分画像
 */
-template <class T> template <class S> const IntegralImage<T>&
-IntegralImage<T>::crossVal(Image<S>& out, int cropSize) const
+template <class T> template <class S, class B> const IntegralImage<T>&
+IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(height(), width());
     for (int v = 0; v < out.height(); ++v)
@@ -732,8 +733,8 @@ IntegralImage<T>::crossVal(Image<S>& out, int cropSize) const
   \param image		入力画像
   \return		この対角積分画像
 */
-template <class T> template <class S> DiagonalIntegralImage<T>&
-DiagonalIntegralImage<T>::initialize(const Image<S>& image)
+template <class T> template <class S, class B> DiagonalIntegralImage<T>&
+DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
 {
     resize(image.height(), image.width());
     
@@ -797,8 +798,8 @@ DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
 			テンプレートは一辺 2*cropSize+1 の正方形
   \return		この対角積分画像
 */
-template <class T> template <class S> const DiagonalIntegralImage<T>&
-DiagonalIntegralImage<T>::crossVal(Image<S>& out, int cropSize) const
+template <class T> template <class S, class B> const DiagonalIntegralImage<T>&
+DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(height(), width());
     for (int v = 0; v < out.height() - 2*cropSize - 1; ++v)

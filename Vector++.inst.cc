@@ -19,7 +19,7 @@
  *  Authors are not responsible for any damage in use of this program.
  */
 /*
- *  $Id: Vector++.inst.cc,v 1.5 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Vector++.inst.cc,v 1.6 2007-03-06 07:15:31 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
@@ -42,6 +42,8 @@ template class Vector<int,    FixedSizedBuf<int,    4> >;
 template class Vector<float,  FixedSizedBuf<float,  4> >;
 template class Vector<double, FixedSizedBuf<double, 4> >;
 
+template class Matrix<double, FixedSizedBuf<double, 9> >;
+
 template class Vector<float>;
 template class Vector<double>;
 
@@ -50,6 +52,9 @@ template class Matrix<double>;
 
 template class LUDecomposition<float>;
 template class LUDecomposition<double>;
+
+template class Householder<float>;
+template class Householder<double>;
 
 template class QRDecomposition<float>;
 template class QRDecomposition<double>;

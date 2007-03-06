@@ -1,5 +1,5 @@
 /*
- *  $Id: Bezier++.h,v 1.5 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.6 2007-03-06 07:15:31 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -15,11 +15,12 @@ template <class C>
 class BezierCurve : private Array<C>
 {
   public:
-    typedef typename C::value_type		T;
+    typedef typename C::ET			T;
+    typedef typename Array<C>::ET		ET;
     typedef C					Coord;
     
-    BezierCurve(u_int p=0)		:Array<C>(p+1)		{}
-    BezierCurve(const Array<C>& b)	:Array<C>(b)		{}
+    BezierCurve(u_int p=0)	 :Array<C>(p+1)	{}
+    BezierCurve(const Array<C>& b) :Array<C>(b)	{}
 
     static u_int	dim()			{return C::dim();}
 
@@ -58,11 +59,13 @@ typedef BezierCurve<Vector4d>	RationalBezierCurve3d;
 *  class BezierSurface<C>						*
 ************************************************************************/
 template <class C>
-class BezierSurface : protected Array2<BezierCurve<C> >
+class BezierSurface : private Array2<BezierCurve<C> >
 {
   public:
-    typedef BezierCurve<C>	Curve;
-    typedef typename Curve::T	T;
+    typedef typename C::ET				T;
+    typedef typename Array2<BezierCurve<C> >::ET	ET;
+    typedef C						Coord;
+    typedef BezierCurve<C>				Curve;
 
     BezierSurface(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}
     BezierSurface(const Array2<Array<C> >& b)			;
