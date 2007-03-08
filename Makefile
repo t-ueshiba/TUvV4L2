@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.36 2007-03-06 07:15:31 ueshiba Exp $
+#  $Id: Makefile,v 1.37 2007-03-08 01:33:47 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -146,7 +146,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.36 $	|		\
+REV		= $(shell echo $Revision: 1.37 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -205,32 +205,27 @@ LinearMapping.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
 List++.o: TU/TU/List++.h
 Mesh++.o: TU/Mesh++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Allocator++.h TU/TU/List++.h
-Microscope.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Geometry++.cc
+Microscope.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h TU/TU/Array++.h \
+	TU/TU/TU/types.h
 Normalize.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
 	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 Nurbs++.o: TU/TU/utility.h TU/Nurbs++.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 PSTree++.o: TU/PSTree++.h TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/TU/List++.h
-Pata.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Geometry++.cc
-Puma.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Geometry++.cc
+Pata.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h TU/TU/Array++.h \
+	TU/TU/TU/types.h
+Puma.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h TU/TU/Array++.h \
+	TU/TU/TU/types.h
 Random.o: TU/Random.h
 Rotation.o: TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-Serial.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h TU/TU/utility.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Geometry++.cc
+Serial.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h TU/TU/Array++.h \
+	TU/TU/TU/types.h
 TUTools++.sa.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
 	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Serial++.h TU/Manip.h TU/Geometry++.cc
-TriggerGenerator.o: TU/Serial++.h TU/Manip.h TU/Geometry++.h \
-	TU/TU/utility.h TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h \
-	TU/TU/TU/types.h TU/Geometry++.cc
+	TU/Serial++.h TU/Manip.h
+TriggerGenerator.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h
 Vector++.o: TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 Vector++.inst.o: TU/Vector++.cc TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
