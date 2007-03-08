@@ -1,5 +1,5 @@
 /*
- *  $Id: Serial++.h,v 1.8 2004-04-28 02:28:28 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.9 2007-03-08 01:32:55 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
@@ -13,7 +13,7 @@
 #  include <fstream.h>
 #endif
 #include "TU/Manip.h"
-#include "TU/Geometry++.h"
+#include "TU/Vector++.h"
 
 namespace TU
 {
@@ -97,7 +97,7 @@ OManip1<Serial, int>	csize	(int)			;
 class Puma : public Serial
 {
   public:
-    typedef Coordinate<float, 6u>	Position;
+    typedef Vector<float, FixedSizedBuf<float, 6> >	Position;
 	
     enum Axis		{Jt1=1, Jt2=2, Jt3=3, Jt4=4, Jt5=5, Jt6=6};
     
@@ -199,10 +199,6 @@ class TriggerGenerator : public Serial
 };
  
 }
-
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Geometry++.cc"
-#endif
 
 #endif	/* !__GNUC__ || __GNUC__ < 3	*/
 #endif	/* !__TUSerialPP_h		*/
