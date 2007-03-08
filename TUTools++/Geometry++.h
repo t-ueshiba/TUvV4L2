@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.14 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.15 2007-03-08 01:32:55 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -267,6 +267,9 @@ Normalize::centroid() const
 class ProjectiveMapping
 {
   public:
+    typedef double	ET;
+
+  public:
     ProjectiveMapping(u_int inDim=2, u_int outDim=2)			;
 
   //! 変換行列を指定して射影変換オブジェクトを生成する．
@@ -302,38 +305,44 @@ class ProjectiveMapping
   */
     const Matrix<double>&	T()		const	{return _T;}
 
-    template <class T2, class B2>
-    Vector<double>	operator ()(const Vector<T2, B2>& x)	const	;
-    template <class T2, class B2>
-    Vector<double>	mapP(const Vector<T2, B2>& x)		const	;
+    template <class S, class B>
+    Vector<double>	operator ()(const Vector<S, B>& x)	const	;
+    template <class S, class B>
+    Vector<double>	mapP(const Vector<S, B>& x)		const	;
+    template <class S, class B>
+    Matrix<double>	jacobian(const Vector<S, B>& x)	const	;
 
     template <class In, class Out>
     double		sqdist(const std::pair<In, Out>& pair)	const	;
     template <class In, class Out>
     double		dist(const std::pair<In, Out>& pair)	const	;
+    double		square()				const	;
+			operator const Vector<double>()		const	;
+    u_int		dof()					const	;
+    void		update(const Vector<double>& dt)		;
     
   protected:
     Matrix<double>	_T;			//!< 射影変換を表現する行列
 
   protected:
   //! 射影変換行列の最尤推定のためのコスト関数
+    template <class T, class Iterator>
     class Cost
     {
       public:
-	typedef double		ET;
-	typedef Matrix<ET>	AT;
+	typedef double	ET;
+	typedef T	AT;
 
-	template <class Iterator>
 	Cost(Iterator first, Iterator last)				;
 
-	Vector<ET>	operator ()(const AT& T)		const	;
-	Matrix<ET>	jacobian(const AT& T)			const	;
-	void		update(AT& T, const Vector<ET>& dt)	const	;
+	Vector<ET>	operator ()(const AT& map)		const	;
+	Matrix<ET>	jacobian(const AT& map)			const	;
+	static void	update(AT& map, const Vector<ET>& dm)		;
+	u_int		npoints()				const	;
 
-	u_int		npoints()		const	{return _X.nrow();}
-	     
       private:
-	Matrix<ET>	_X, _Y;
+	const Iterator	_first, _last;
+	const u_int	_npoints;
     };
 };
 
@@ -414,9 +423,9 @@ ProjectiveMapping::initialize(Iterator first, Iterator last, bool refine)
   // 非線型最適化を行う．
     if (refine)
     {
-	Cost					cost(first, last);
-	ConstNormConstraint<Matrix<double> >	constraint(_T);
-	minimizeSquare(cost, constraint, _T);
+	Cost<ProjectiveMapping, Iterator>	cost(first, last);
+	ConstNormConstraint<ProjectiveMapping>	constraint(*this);
+	minimizeSquare(cost, constraint, *this);
     }
 }
 
@@ -437,8 +446,8 @@ ProjectiveMapping::ndataMin() const
   \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
   \return	射影変換された点の非同次座標（#outDim()次元）
 */
-template <class T2, class B2> inline Vector<double>
-ProjectiveMapping::operator ()(const Vector<T2, B2>& x) const
+template <class S, class B> inline Vector<double>
+ProjectiveMapping::operator ()(const Vector<S, B>& x) const
 {
     const Vector<double>&	y = mapP(x);
     return y(0, outDim()) / y[outDim()];
@@ -449,8 +458,8 @@ ProjectiveMapping::operator ()(const Vector<T2, B2>& x) const
   \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
   \return	射影変換された点の同次座標（#outDim()+1次元）
 */
-template <class T2, class B2> inline Vector<double>
-ProjectiveMapping::mapP(const Vector<T2, B2>& x) const
+template <class S, class B> inline Vector<double>
+ProjectiveMapping::mapP(const Vector<S, B>& x) const
 {
     if (x.dim() == inDim())
     {
@@ -463,6 +472,35 @@ ProjectiveMapping::mapP(const Vector<T2, B2>& x) const
 	return _T * x;
 }
 
+//! 与えられた点におけるJacobianを返す．
+/*!
+  Jacobianとは射影変換行列成分に関する1階微分のことである．
+  \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
+  \return	Jacobian（#outDim() x (#outDim()+1)x(#inDim()+1)行列）
+*/
+template <class S, class B> Matrix<double>
+ProjectiveMapping::jacobian(const Vector<S, B>& x) const
+{
+    Vector<double>		xP(inDim() + 1);
+    if (x.dim() == inDim())
+    {
+	xP(0, inDim()) = x;
+	xP[inDim()]    = 1.0;
+    }
+    else
+	xP = x;
+    const Vector<double>&	y = mapP(xP);
+    Matrix<double>		J(outDim(), (outDim() + 1)*xP.dim());
+    for (int i = 0; i < J.nrow(); ++i)
+    {
+	J[i](i*xP.dim(), xP.dim()) = xP;
+	(J[i](outDim()*xP.dim(), xP.dim()) = xP) *= (-y[i]/y[outDim()]);
+    }
+    J /= y[outDim()];
+
+    return J;
+}
+    
 //! 入力点に射影変換を適用した点と出力点の距離の2乗を返す．
 /*!
   \param pair	入力点の非同次座標（#inDim()次元）と出力点の非同次座標
@@ -486,20 +524,89 @@ ProjectiveMapping::dist(const std::pair<In, Out>& pair) const
 {
     return sqrt(sqdist(pair));
 }
-    
-template <class Iterator>
-ProjectiveMapping::Cost::Cost(Iterator first, Iterator last)
-    :_X(), _Y()
+
+//! 射影変換行列のノルムの2乗を返す．
+/*!
+  \return	射影変換行列のノルムの2乗
+*/
+inline double
+ProjectiveMapping::square() const
 {
-    const u_int	ndata = std::distance(first, last);
-    _X.resize(ndata, first->first.dim() + 1);
-    _Y.resize(ndata, first->second.dim());
-    for (int n = 0; first != last; ++first)
+    return _T.square();
+}
+
+//! 射影変換行列の各行を順番に並べたベクトルを返す．
+/*!
+  \return	#T()の成分を並べたベクトル（(#outDim()+1)x(#inDim()+1)次元）
+*/
+inline
+ProjectiveMapping::operator const Vector<double>() const
+{
+    return Vector<double>(const_cast<Matrix<double>&>(_T));
+}
+
+//! この射影変換の自由度を返す．
+/*!
+  \return	射影変換の自由度（(#outDim()+1)x(#inDim()+1)）
+*/
+inline u_int
+ProjectiveMapping::dof() const
+{
+    return (outDim() + 1)*(inDim() + 1);
+}
+
+//! 射影変換行列を与えられた量だけ修正する．
+/*!
+  \param dt	修正量を表すベクトル（(#outDim()+1)x(#inDim()+1)次元）
+*/
+inline void
+ProjectiveMapping::update(const Vector<double>& dt)
+{
+    Vector<double>	t(_T);
+    double		l = t.length();
+    (t -= dt).normalize() *= l;
+}
+    
+template <class T, class Iterator>
+ProjectiveMapping::Cost<T, Iterator>::Cost(Iterator first, Iterator last)
+    :_first(first), _last(last), _npoints(std::distance(_first, _last))
+{
+}
+    
+template <class T, class Iterator> Vector<double>
+ProjectiveMapping::Cost<T, Iterator>::operator ()(const AT& map) const
+{
+    const u_int	outDim = map.outDim();
+    Vector<ET>	val(_npoints*outDim);
+    int	n = 0;
+    for (Iterator iter = _first; iter != _last; ++iter)
     {
-	_X[n](0, _X.ncol() - 1) = first->first;
-	_X[n][_X.ncol() - 1]	= 1.0;
-	_Y[n++]			= first->second;
+	val(n, outDim) = map(iter->first) - iter->second;
+	n += outDim;
     }
+    
+    return val;
+}
+    
+template <class T, class Iterator> Matrix<double>
+ProjectiveMapping::Cost<T, Iterator>::jacobian(const AT& map) const
+{
+    const u_int	outDim = map.outDim();
+    Matrix<ET>	J(_npoints*outDim, map.dof());
+    int	n = 0;
+    for (Iterator iter = _first; iter != _last; ++iter)
+    {
+	J(n, 0, outDim, J.ncol()) = map.jacobian(iter->first);
+	n += outDim;
+    }
+
+    return J;
+}
+
+template <class T, class Iterator> inline void
+ProjectiveMapping::Cost<T, Iterator>::update(AT& map, const Vector<ET>& dm)
+{
+    map.update(dm);
 }
     
 /************************************************************************
