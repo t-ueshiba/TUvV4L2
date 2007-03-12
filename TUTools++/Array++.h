@@ -19,7 +19,7 @@
  *  Authors are not responsible for any damage in use of this program.
  */
 /*
- *  $Id: Array++.h,v 1.15 2007-03-12 07:15:29 ueshiba Exp $
+ *  $Id: Array++.h,v 1.16 2007-03-12 07:43:51 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -589,6 +589,8 @@ class Array : public B
     using		B::size;
     using		B::dim;
 
+			operator T*()					;
+			operator const T*()			const	;
     T&			at(int i)					;
     const T&		at(int i)				const	;
     T&			operator [](int i)				;
@@ -770,6 +772,26 @@ Array<T, B>::at(int i)
     if (i < 0 || i >= dim())
 	throw std::out_of_range("TU::Array<T, B>::at: invalid index!");
     return (*this)[i];
+}
+
+//! 配列の内部記憶領域へのポインタを返す．
+/*!
+  \return	内部記憶領域へのポインタ
+*/
+template <class T, class B> inline
+Array<T, B>::operator T*()
+{
+    return B::operator T*();
+}
+
+//! 配列の内部記憶領域へのポインタを返す．
+/*!
+  \return	内部記憶領域へのポインタ
+*/
+template <class T, class B> inline
+Array<T, B>::operator const T*() const
+{
+    return B::operator const T*();
 }
 
 //! 配列の要素へアクセスする（indexのチェックあり）．

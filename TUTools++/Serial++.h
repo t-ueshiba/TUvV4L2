@@ -1,10 +1,10 @@
 /*
- *  $Id: Serial++.h,v 1.10 2007-03-12 07:15:29 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.11 2007-03-12 07:43:51 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
 
-#if (defined(__GNUC__) && (__GNUC__ >= 3))
+#ifdef __GNUC__
 #  define HAVE_STDIO_FILEBUF
 #endif
 
