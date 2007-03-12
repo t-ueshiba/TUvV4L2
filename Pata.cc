@@ -1,8 +1,6 @@
 /*
- *  $Id: Pata.cc,v 1.4 2004-04-28 02:28:28 ueshiba Exp $
+ *  $Id: Pata.cc,v 1.5 2007-03-12 07:15:29 ueshiba Exp $
  */
-#if (!defined(__GNUC__) || (__GNUC__ < 3))
-
 #include "TU/Serial++.h"
 
 namespace TU
@@ -17,4 +15,4 @@ Pata::Pata(const char* ttyname)
 }
  
 }
-#endif
+

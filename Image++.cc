@@ -18,17 +18,11 @@
  *  No Warranty.
  *  Authors are not responsible for any damage in use of this program.
  */
-
 /*
- *  $Id: Image++.cc,v 1.15 2007-03-06 07:15:31 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.16 2007-03-12 07:15:29 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
-#ifdef WIN32
-#  include <winsock2.h>
-#else
-#  include <netinet/in.h>
-#endif
 #include "TU/mmInstructions.h"
 
 namespace TU
@@ -691,7 +685,7 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
     if (u >= int(width()) || v >= int(height()) || u1 < 0 || v1 < 0)
 	return 0;
     
-    int		a = 0, b = 0, c = 0;
+    T	a = 0, b = 0, c = 0;
     if (u >= 0)
     {
 	c = (*this)[v1][u];

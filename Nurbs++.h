@@ -1,5 +1,5 @@
 /*
- *  $Id: Nurbs++.h,v 1.6 2007-03-06 07:15:31 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.7 2007-03-12 07:15:29 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -32,10 +32,11 @@ class BSplineKnots : private Array<T>
     int		insertKnot(T u)			;
     int		removeKnot(int k)		;
     void	elevateDegree()			{++_degree;}
+		operator const T*()	const	{return
+						  Array<T>::operator const T*();}
 
     using	Array<T>::dim;
     using	Array<T>::operator [];		// knots
-    using	Array<T>::operator const T*;
     
   private:
     u_int	_degree;

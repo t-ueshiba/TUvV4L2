@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Vector++.h,v 1.19 2007-03-06 07:15:31 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.20 2007-03-12 07:15:29 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -147,8 +147,8 @@ class Vector : public Array<T, B>
     using		Array<T, B>::end;
     using		Array<T, B>::size;
     using		Array<T, B>::dim;
-    using		Array<T, B>::operator pointer;
-    using		Array<T, B>::operator const_pointer;
+  //    using		Array<T, B>::operator pointer;
+  //    using		Array<T, B>::operator const_pointer;
 
     const Vector<T>	operator ()(int i, u_int d)		const	;
     Vector<T>		operator ()(int i, u_int d)			;
@@ -165,11 +165,11 @@ class Vector : public Array<T, B>
     Vector&		operator *=(const Matrix<T2, B2>& m)		;
     Vector		operator  -()				const	;
     T			square()				const	;
-    T			length()				const	;
+    double		length()				const	;
     template <class T2, class B2>
     T			sqdist(const Vector<T2, B2>& v)		const	;
     template <class T2, class B2>
-    T			dist(const Vector<T2, B2>& v)		const	;
+    double		dist(const Vector<T2, B2>& v)		const	;
     Vector&		normalize()					;
     Vector		normal()				const	;
     template <class T2, class B2>
@@ -397,7 +397,7 @@ Vector<T, B>::square() const
 /*!
   \return	ベクトルの長さ，すなわち\f$\TUnorm{\TUvec{u}{}}\f$
 */
-template <class T, class B> inline T
+template <class T, class B> inline double
 Vector<T, B>::length() const
 {
     return sqrt(square());
@@ -421,7 +421,7 @@ Vector<T, B>::sqdist(const Vector<T2, B2>& v) const
   \return	ベクトル間の差，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
-template <class T, class B> template <class T2, class B2> inline T
+template <class T, class B> template <class T2, class B2> inline double
 Vector<T, B>::dist(const Vector<T2, B2>& v) const
 {
     return sqrt(sqdist(v));
@@ -513,8 +513,8 @@ class Matrix : public Array2<Vector<T>, B>
     using		Array2<Vector<T>, B>::dim;
     using		Array2<Vector<T>, B>::nrow;
     using		Array2<Vector<T>, B>::ncol;
-    using		Array2<Vector<T>, B>::operator pointer;
-    using		Array2<Vector<T>, B>::operator const_pointer;
+  //    using		Array2<Vector<T>, B>::operator T*;
+  //    using		Array2<Vector<T>, B>::operator const T*;
     
     const Matrix<T>	operator ()(int i, int j,
 				    u_int r, u_int c)		const	;
@@ -550,7 +550,7 @@ class Matrix : public Array2<Vector<T>, B>
     Matrix&		rotate_from_left(const Rotation& r)		;
     Matrix&		rotate_from_right(const Rotation& r)		;
     T			square()				const	;
-    T			length()				const	;
+    double		length()				const	;
     Matrix&		symmetrize()					;
     Matrix&		antisymmetrize()				;
     void		rot2angle(T& theta_x,
@@ -771,7 +771,7 @@ Matrix<T, B>::inv() const
 /*!
   \return	行列の2乗ノルム，すなわち\f$\TUnorm{\TUvec{A}{}}\f$
 */
-template <class T, class B> inline T
+template <class T, class B> inline double
 Matrix<T, B>::length() const
 {
     return sqrt(square());
