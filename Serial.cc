@@ -1,5 +1,5 @@
 /*
- *  $Id: Serial.cc,v 1.6 2007-03-12 07:15:29 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.7 2007-03-12 07:43:51 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 #include <stdexcept>
@@ -17,8 +17,13 @@ namespace TU
 Serial::Serial(const char* ttyname)
 #ifdef HAVE_STDIO_FILEBUF
     :std::basic_iostream<char>(NULL),
+#  if (__GNUC__ < 4)
      _filebuf(::open(ttyname, O_RDWR, S_IRUSR | S_IWUSR),
 	      ios_base::in|ios_base::out, true, BUFSIZ)
+#  else
+     _filebuf(::open(ttyname, O_RDWR, S_IRUSR | S_IWUSR),
+	      ios_base::in|ios_base::out)
+#  endif
 #else
     :std::fstream(ttyname, ios_base::in|ios_base::out)
 #endif
