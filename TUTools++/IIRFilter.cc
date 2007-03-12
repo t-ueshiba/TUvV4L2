@@ -1,5 +1,5 @@
 /*
- *  $Id: IIRFilter.cc,v 1.8 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: IIRFilter.cc,v 1.9 2007-03-12 07:15:29 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Minimize++.h"
@@ -217,8 +217,6 @@ template class BilateralIIRFilter<2u>;
 
 template class BilateralIIRFilter2<2u>;
 template BilateralIIRFilter2<2u>&
-BilateralIIRFilter2<2u>::convolve(const Image<u_char>& in, Image<u_char>& out);
-template BilateralIIRFilter2<2u>&
 BilateralIIRFilter2<2u>::convolve(const Image<u_char>& in, Image<float>& out);
 template BilateralIIRFilter2<2u>&
 BilateralIIRFilter2<2u>::convolve(const Image<float>& in, Image<float>& out);
@@ -226,8 +224,6 @@ BilateralIIRFilter2<2u>::convolve(const Image<float>& in, Image<float>& out);
 template class BilateralIIRFilter<4u>;
 
 template class BilateralIIRFilter2<4u>;
-template BilateralIIRFilter2<4u>&
-BilateralIIRFilter2<4u>::convolve(const Image<u_char>& in, Image<u_char>& out);
 template BilateralIIRFilter2<4u>&
 BilateralIIRFilter2<4u>::convolve(const Image<u_char>& in, Image<float>& out);
 template BilateralIIRFilter2<4u>&

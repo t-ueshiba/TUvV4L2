@@ -1,16 +1,18 @@
 /*
- *  $Id: Serial++.h,v 1.9 2007-03-08 01:32:55 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.10 2007-03-12 07:15:29 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
 
-#if (!defined(__GNUC__) || (__GNUC__ < 3))
+#if (defined(__GNUC__) && (__GNUC__ >= 3))
+#  define HAVE_STDIO_FILEBUF
+#endif
 
 #include <termios.h>
-#ifndef sgi
-#  include <fstream>
+#ifdef HAVE_STDIO_FILEBUF
+#  include <ext/stdio_filebuf.h>
 #else
-#  include <fstream.h>
+#  include <fstream>
 #endif
 #include "TU/Manip.h"
 #include "TU/Vector++.h"
@@ -20,10 +22,11 @@ namespace TU
 /************************************************************************
 *  class Serial								*
 ************************************************************************/
-#ifndef sgi
-class Serial : public std::fstream
+class Serial
+#ifdef HAVE_STDIO_FILEBUF
+    : public std::basic_iostream<char>
 #else
-class Serial : public fstream
+    : public std::fstream
 #endif
 {
   public:
@@ -52,7 +55,12 @@ class Serial : public fstream
     Serial&	c_stop2()				;
     
   private:
+#ifdef HAVE_STDIO_FILEBUF
+    int		fd()					{return _filebuf.fd();}
+    __gnu_cxx::stdio_filebuf<char>	_filebuf;
+#else
     int		fd()					{return rdbuf()->fd();}
+#endif
     Serial&	set_flag(tcflag_t termios::* flag,
 			 unsigned long clearbits,
 			 unsigned long setbits)		;
@@ -72,10 +80,6 @@ operator <<(Serial& serial, Serial& (*f)(Serial&))
     return f(serial);
 }
 
-#ifdef sgi
-::istream&	ign(::istream& in)	;
-::istream&	skipl(::istream& in)	;
-#endif
 extern IOManip<Serial>	nl2cr;
 #ifndef __APPLE__
 extern IOManip<Serial>	cr2nl;
@@ -200,5 +204,4 @@ class TriggerGenerator : public Serial
  
 }
 
-#endif	/* !__GNUC__ || __GNUC__ < 3	*/
 #endif	/* !__TUSerialPP_h		*/

@@ -1,24 +1,35 @@
 /*
- *  $Id: Serial.cc,v 1.5 2004-04-28 02:28:28 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.6 2007-03-12 07:15:29 ueshiba Exp $
  */
-#if (!defined(__GNUC__) || (__GNUC__ < 3))
-
 #include "TU/Serial++.h"
 #include <stdexcept>
 #include <string>
 #include <errno.h>
+#ifdef HAVE_STDIO_FILEBUF
+#  include <fcntl.h>
+#endif
 
 namespace TU
 {
-#ifndef sgi
-    using namespace	std;
-#endif
 /************************************************************************
 *  Public member functions						*
 ************************************************************************/ 
 Serial::Serial(const char* ttyname)
-    :fstream(ttyname, ios::in|ios::out)
+#ifdef HAVE_STDIO_FILEBUF
+    :std::basic_iostream<char>(NULL),
+     _filebuf(::open(ttyname, O_RDWR, S_IRUSR | S_IWUSR),
+	      ios_base::in|ios_base::out, true, BUFSIZ)
+#else
+    :std::fstream(ttyname, ios_base::in|ios_base::out)
+#endif
 {
+#ifdef HAVE_STDIO_FILEBUF
+    init(&_filebuf);
+    if (fd() < 0)
+	setstate(ios_base::failbit);
+    else
+	clear();
+#endif
     if (!*this)
 	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open fstream; ")
 				 + strerror(errno));
@@ -26,7 +37,7 @@ Serial::Serial(const char* ttyname)
     termios	termios;
     if (::tcgetattr(fd(), &termios) == -1)
     {
-	clear(ios::badbit|rdstate());
+	clear(ios_base::badbit|rdstate());
 	throw std::runtime_error(std::string("TU::Serial::Serial: tcgetattr; ")
 				 + strerror(errno));
     }
@@ -37,7 +48,7 @@ Serial::Serial(const char* ttyname)
     termios.c_cc[VTIME] = 0;
     if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
     {
-	clear(ios::badbit|rdstate());
+	clear(ios_base::badbit|rdstate());
 	throw std::runtime_error(std::string("TU::Serial::Serial: tcsetattr; ")
 				 + strerror(errno));
     }
@@ -166,14 +177,14 @@ Serial::c_baud(int baud)	// set baud rate
 
     if (::tcgetattr(fd(), &termios) == -1)
     {
-	clear(ios::badbit|rdstate());
+	clear(ios_base::badbit|rdstate());
 	throw std::runtime_error(std::string("TU::Serial::c_baud: tcgetattr; ")
 				 + strerror(errno));
     }
     termios.c_ispeed = termios.c_ospeed = baud;
     if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
     {
-	clear(ios::badbit|rdstate());
+	clear(ios_base::badbit|rdstate());
 	throw std::runtime_error(std::string("TU::Serial::c_baud: tcsetattr; ")
 				 + strerror(errno));
     }
@@ -239,7 +250,7 @@ Serial::set_flag(tcflag_t termios::* flag,
 
     if (::tcgetattr(fd(), &termios) == -1)
     {
-	clear(ios::badbit|rdstate());
+	clear(ios_base::badbit|rdstate());
 	throw
 	    std::runtime_error(std::string("TU::Serial::set_flag: tcgetattr; ")
 			       + strerror(errno));
@@ -248,7 +259,7 @@ Serial::set_flag(tcflag_t termios::* flag,
     termios.*flag |= setbits;
     if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
     {
-	clear(ios::badbit|rdstate());
+	clear(ios_base::badbit|rdstate());
 	throw
 	    std::runtime_error(std::string("TU::Serial::set_flag: tcsetattr; ")
 			       + strerror(errno));
@@ -259,28 +270,6 @@ Serial::set_flag(tcflag_t termios::* flag,
 /************************************************************************
 *  Manipulators for Serial						*
 ************************************************************************/
-#ifdef sgi
-::istream&
-ign(::istream& in)	// manipulator for skipping the rest of a line
-{
-    char	c;
-    while (in.get(c))
-	if (c == '\n')
-	    break;
-    return in;
-}
-
-::istream&
-skipl(::istream& in)
-{
-    char	c;
-    
-    while (in.get(c))
-	if (c == '\n' || c == '\r')
-	    break;
-    return in;
-}
-#endif
 Serial&	igncr	(Serial& s)	{return s.i_igncr();}
 Serial&	even	(Serial& s)	{return s.c_even();}
 Serial&	odd	(Serial& s)	{return s.c_odd();}
@@ -301,4 +290,4 @@ csize(int cs)
 }
  
 }
-#endif
+

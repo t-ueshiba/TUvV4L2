@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.cc,v 1.4 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Geometry++.cc,v 1.5 2007-03-12 07:15:29 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include <stdexcept>
@@ -56,7 +56,7 @@ Point2<T>::move(int dir)
 template <class T> int
 Point2<T>::adj(const Point2<T>& p) const
 {
-    register int du = p[0] - (*this)[0], dv = p[1] - (*this)[1];
+    const int	du = int(p[0] - (*this)[0]), dv = int(p[1] - (*this)[1]);
 
     if (du == 0 && dv == 0)
         return -1;
@@ -82,7 +82,7 @@ Point2<T>::adj(const Point2<T>& p) const
 template <class T> int
 Point2<T>::dir(const Point2<T>& p) const
 {
-    register int du = p[0] - (*this)[0], dv = p[1] - (*this)[1];
+    const int	du = int(p[0] - (*this)[0]), dv = int(p[1] - (*this)[1]);
 
     if (du == 0 && dv == 0)
         return 4;

@@ -1,45 +1,40 @@
 /*
- *  $Id: Microscope.cc,v 1.5 2004-04-28 02:28:28 ueshiba Exp $
+ *  $Id: Microscope.cc,v 1.6 2007-03-12 07:15:29 ueshiba Exp $
  */
-#if (!defined(__GNUC__) || (__GNUC__ < 3))
-
 #include "TU/Serial++.h"
 #include <stdexcept>
 #include <iomanip>
 
 namespace TU
 {
-#ifndef sgi
-    using namespace	std;
-#endif
 /************************************************************************
 *  Static functions							*
 ************************************************************************/ 
 static inline Microscope&
 operator <<(Microscope& ms, char c)
 {
-    ms.fstream::operator <<(c);
+    ms.Serial::operator <<(c);
     return ms;
 }
 
 static inline Microscope&
 operator <<(Microscope& ms, int i)
 {
-    ms.fstream::operator <<(i);
+    ms.Serial::operator <<(i);
     return ms;
 }
 
 static inline Microscope&
 operator <<(Microscope& ms, const char* s)
 {
-    ms.fstream::operator <<(s);
+    ms.Serial::operator <<(s);
     return ms;
 }
     
 static Microscope&
 endc(Microscope& ms)
 {
-    ms << endl;
+    ms << std::endl;
     if (ms.get() == 'N')
 	throw std::runtime_error("TU::endc: error happened!");
     ms >> skipl;
@@ -195,4 +190,3 @@ ready(Microscope& ms)
 }
  
 }
-#endif
