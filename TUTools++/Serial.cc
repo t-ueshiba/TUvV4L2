@@ -1,5 +1,5 @@
 /*
- *  $Id: Serial.cc,v 1.7 2007-03-12 07:43:51 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.8 2007-03-13 23:23:26 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 #include <stdexcept>
@@ -11,19 +11,31 @@
 
 namespace TU
 {
+#ifdef HAVE_STDIO_FILEBUF
+/************************************************************************
+*  static functions							*
+************************************************************************/
+static int
+get_fd(const char* ttyname)
+{
+    int	fd = ::open(ttyname, O_RDWR, S_IRUSR | S_IWUSR);
+    if (fd < 0)
+	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open tty; ")
+				 + strerror(errno));
+    return fd;
+}
+#endif
 /************************************************************************
 *  Public member functions						*
-************************************************************************/ 
+************************************************************************/
 Serial::Serial(const char* ttyname)
 #ifdef HAVE_STDIO_FILEBUF
     :std::basic_iostream<char>(NULL),
+     _filebuf(get_fd(ttyname), ios_base::in|ios_base::out
 #  if (__GNUC__ < 4)
-     _filebuf(::open(ttyname, O_RDWR, S_IRUSR | S_IWUSR),
-	      ios_base::in|ios_base::out, true, BUFSIZ)
-#  else
-     _filebuf(::open(ttyname, O_RDWR, S_IRUSR | S_IWUSR),
-	      ios_base::in|ios_base::out)
+	      , true, BUFSIZ
 #  endif
+	     )
 #else
     :std::fstream(ttyname, ios_base::in|ios_base::out)
 #endif

@@ -1,5 +1,5 @@
 /*
- *  $Id: Serial++.h,v 1.11 2007-03-12 07:43:51 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.12 2007-03-13 23:23:26 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
@@ -55,16 +55,15 @@ class Serial
     Serial&	c_stop2()				;
     
   private:
+    Serial&	set_flag(tcflag_t termios::* flag,
+			 unsigned long clearbits,
+			 unsigned long setbits)		;
 #ifdef HAVE_STDIO_FILEBUF
     int		fd()					{return _filebuf.fd();}
     __gnu_cxx::stdio_filebuf<char>	_filebuf;
 #else
     int		fd()					{return rdbuf()->fd();}
 #endif
-    Serial&	set_flag(tcflag_t termios::* flag,
-			 unsigned long clearbits,
-			 unsigned long setbits)		;
-
     termios	_termios_bak;
 };
 
