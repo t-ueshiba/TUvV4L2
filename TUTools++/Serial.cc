@@ -1,5 +1,5 @@
 /*
- *  $Id: Serial.cc,v 1.8 2007-03-13 23:23:26 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.9 2007-04-11 23:40:57 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 #include <stdexcept>
@@ -18,7 +18,8 @@ namespace TU
 static int
 get_fd(const char* ttyname)
 {
-    int	fd = ::open(ttyname, O_RDWR, S_IRUSR | S_IWUSR);
+    int	fd = ::open(ttyname, O_RDWR,
+		    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     if (fd < 0)
 	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open tty; ")
 				 + strerror(errno));
@@ -31,7 +32,7 @@ get_fd(const char* ttyname)
 Serial::Serial(const char* ttyname)
 #ifdef HAVE_STDIO_FILEBUF
     :std::basic_iostream<char>(NULL),
-     _filebuf(get_fd(ttyname), ios_base::in|ios_base::out
+     _fd(get_fd(ttyname)), _filebuf(_fd, ios_base::in|ios_base::out
 #  if (__GNUC__ < 4)
 	      , true, BUFSIZ
 #  endif
@@ -42,10 +43,10 @@ Serial::Serial(const char* ttyname)
 {
 #ifdef HAVE_STDIO_FILEBUF
     init(&_filebuf);
-    if (fd() < 0)
+  /*    if (fd() < 0)
 	setstate(ios_base::failbit);
     else
-	clear();
+    clear();*/
 #endif
     if (!*this)
 	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open fstream; ")
