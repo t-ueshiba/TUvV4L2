@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.24 2007-03-12 07:15:29 ueshiba Exp $
+ *  $Id: Image++.h,v 1.25 2007-04-11 23:34:56 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -583,6 +583,8 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
 	:Array2<ImageLine<T>, B>(i, v, u, h, w), ImageBase(i)	{}
 
     template <class S>
+    S		at(const Point2<S>& p)				const	;
+    template <class S>
     const T&	operator ()(const Point2<S>& p)
 					const	{return (*this)[p[1]][p[0]];}
     template <class S>
@@ -611,6 +613,17 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     virtual u_int	_height()				const	;
     virtual void	_resize(u_int h, u_int w)			;
 };
+
+template <class T, class B> template <class S> inline S
+Image<T, B>::at(const Point2<S>& p) const
+{
+    const int	u  = floor(p[0]), v  = floor(p[1]);
+    const S	du = p[0] - u,	  dv = p[1] - v;
+    const T	*in0 = &(*this)[v][u], *in1 = &(*this)[v+1][u];
+    const S	out0 = *in0 + du*(*(in0 + 1) - *in0),
+		out1 = *in1 + du*(*(in1 + 1) - *in1);
+    return out0 + dv * (out1 - out0);
+}
 
 template <class T, class B> inline std::istream&
 Image<T, B>::restore(std::istream& in)
