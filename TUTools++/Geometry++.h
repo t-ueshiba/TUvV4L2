@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.15 2007-03-08 01:32:55 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.16 2007-04-11 23:34:56 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -28,12 +28,13 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
 		    array_type::operator =(v);
 		    return *this;
 		}
-
-    Point2	neighbor(int)				const	;
-    Point2&	move(int)					;
-    int		adj(const Point2&)			const	;
-    int		dir(const Point2&)			const	;
-    int		angle(const Point2&, const Point2&)	const	;
+    Vector<T, FixedSizedBuf<T, 3> >
+		hom()						const	;
+    Point2	neighbor(int)					const	;
+    Point2&	move(int)						;
+    int		adj(const Point2&)				const	;
+    int		dir(const Point2&)				const	;
+    int		angle(const Point2&, const Point2&)		const	;
 };
 
 template <class T> inline
@@ -48,6 +49,16 @@ template <class T> inline Point2<T>
 Point2<T>::neighbor(int dir) const
 {
     return Point2(*this).move(dir);
+}
+
+template <class T> inline Vector<T, FixedSizedBuf<T, 3> >
+Point2<T>::hom() const
+{
+    Vector<T, FixedSizedBuf<T, 3> >	v;
+    v[0] = (*this)[0];
+    v[1] = (*this)[1];
+    v[2] = 1;
+    return v;
 }
 
 /************************************************************************
@@ -90,6 +101,8 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 		    array_type::operator =(v);
 		    return *this;
 		}
+    Vector<T, FixedSizedBuf<T, 4> >
+		hom()						const	;
 };
 
 template <class T> inline
@@ -99,6 +112,17 @@ Point3<T>::Point3(T x, T y, T z)
     (*this)[0] = x;
     (*this)[1] = y;
     (*this)[2] = z;
+}
+
+template <class T> inline Vector<T, FixedSizedBuf<T, 4> >
+Point3<T>::hom() const
+{
+    Vector<T, FixedSizedBuf<T, 4> >	v;
+    v[0] = (*this)[0];
+    v[1] = (*this)[1];
+    v[2] = (*this)[2];
+    v[3] = 1;
+    return v;
 }
 
 /************************************************************************
