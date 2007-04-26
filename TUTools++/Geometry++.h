@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.16 2007-04-11 23:34:56 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.17 2007-04-26 07:25:45 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -402,28 +402,26 @@ ProjectiveMapping::initialize(Iterator first, Iterator last, bool refine)
 
   // 充分な個数の点対があるか？
     const u_int		ndata = std::distance(first, last);
-    const u_int	xdim  = xNormalize.spaceDim() + 1,
-			ydim  = yNormalize.spaceDim() + 1;
-    if (ndata*(ydim - 1) < xdim*ydim - 1)	// _Tのサイズが未定なので
+    const u_int		xdim1 = xNormalize.spaceDim() + 1,
+			ydim  = yNormalize.spaceDim();
+    if (ndata*ydim < xdim1*(ydim + 1) - 1)	// _Tのサイズが未定なので
 						// ndataMin()は無効
 	throw std::invalid_argument("ProjectiveMapping::initialize(): not enough input data!!");
 
   // データ行列の計算
-    Matrix<double>	A(xdim*ydim + ndata, xdim*ydim + ndata);
-    int			n = xdim*ydim;
+    Matrix<double>	A(xdim1*(ydim + 1), xdim1*(ydim + 1));
     for (Iterator iter = first; iter != last; ++iter)
     {
-	const Vector<double>&	x = xNormalize.normalizeP(iter->first);
-	const Vector<double>&	y = yNormalize.normalizeP(iter->second);
-
-	A(0, 0, xdim, xdim) += x % x;
+	const Vector<double>&	x  = xNormalize.normalizeP(iter->first);
+	const Vector<double>&	y  = yNormalize(iter->second);
+	const Matrix<double>&	xx = x % x;
+	A(0, 0, xdim1, xdim1) += xx;
 	for (int j = 0; j < ydim; ++j)
-	    A[n](j*xdim, xdim) = -y[j] * x;
-	A[n][n] = y * y;
-	++n;
+	    A(ydim*xdim1, j*xdim1, xdim1, xdim1) -= y[j] * xx;
+	A(ydim*xdim1, ydim*xdim1, xdim1, xdim1) += (y*y) * xx;
     }
     for (int j = 1; j < ydim; ++j)
-	A(j*xdim, j*xdim, xdim, xdim) = A(0, 0, xdim, xdim);
+	A(j*xdim1, j*xdim1, xdim1, xdim1) = A(0, 0, xdim1, xdim1);
     A.symmetrize();
 
   // データ行列の最小固有値に対応する固有ベクトルから変換行列を計算し，
@@ -431,7 +429,7 @@ ProjectiveMapping::initialize(Iterator first, Iterator last, bool refine)
     Vector<double>	eval;
     Matrix<double>	Ut = A.eigen(eval);
     _T = yNormalize.Tinv()
-       * Matrix<double>((double*)Ut[Ut.nrow()-1], ydim, xdim)
+       * Matrix<double>((double*)Ut[Ut.nrow()-1], ydim + 1, xdim1)
        * xNormalize.T();
 
   // 変換行列が正方ならば，その行列式が１になるように正規化する．
