@@ -20,34 +20,18 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.13 2007-02-04 23:59:53 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.14 2007-05-23 01:36:27 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Manip.h"
-#include "TU/Geometry++.h"
 #include <stdexcept>
-#ifndef STDC_HEADERS
-#  define STDC_HEADERS
-#endif
 
 namespace TU
 {
-    enum EPBM_Sign {
-	EPBM_UNSIGNED = 0,
-	EPBM_SIGNED   = 1
-    };
-    enum EPBM_DataType {
-	EPBM_CHAR8    = 0,
-	EPBM_SHORT16  = 1,
-	EPBM_INT32    = 2,
-	EPBM_FLOAT32  = 3,
-	EPBM_DOUBLE64 = 4
-    };
-
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-inline u_int	bit2byte(u_int i)	{return ((i - 1)/8 + 1);}
+inline static u_int	bit2byte(u_int i)	{return ((i - 1)/8 + 1);}
 
 /************************************************************************
 *  class ImageBase							*
@@ -67,17 +51,29 @@ ImageBase::restoreHeader(std::istream& in)
     d1 = d2 = 0.0;
     
   // Read the magic number.
-    int	magic = in.get();
-    if (magic == EOF)
+    int	c = in.get();
+    if (c == EOF)
 	return END;
-    if (magic != 'P')
+    if (c != 'P')
 	throw runtime_error("TU::ImageBase::restoreHeader: not a pbm file!!");
-    in >> magic >> ws; // Read pbm magic number and trailing white spaces.
 
-    u_int	dataType = EPBM_CHAR8, sign = EPBM_UNSIGNED;
-    bool	legacy = false;	// legacy style of dist. param. representation
-    int		c;
+  // Read pbm type.
+    in >> c >> ws;	// Read pbm type and trailing white spaces.
+    Type	type;
+    switch (c)
+    {
+      case U_CHAR:
+	type = U_CHAR;
+	break;
+      case RGB_24:
+	type = RGB_24;
+	break;
+      default:
+	throw runtime_error("TU::ImageBase::restoreHeader: unknown pbm type!!");
+    }
+
   // Process comment lines.
+    bool	legacy = false;	// legacy style of dist. param. representation
     for (; (c = in.get()) == '#'; in >> ign)
     {
 	char	key[256], val[256];
@@ -86,33 +82,42 @@ ImageBase::restoreHeader(std::istream& in)
 	{
 	    in >> val;
 	    if (!strcmp(val, "Char"))
-		dataType = EPBM_CHAR8;
+		type = U_CHAR;
 	    else if (!strcmp(val, "Short"))
-		dataType = EPBM_SHORT16;
+		type = SHORT;
 	    else if (!strcmp(val, "Int"))
-		dataType = EPBM_INT32;
+		type = INT;
 	    else if (!strcmp(val, "Float"))
-		dataType = EPBM_FLOAT32;
+		type = FLOAT;
 	    else if (!strcmp(val, "Double"))
-		dataType = EPBM_DOUBLE64;
+		type = DOUBLE;
+	    else if (!strcmp(val, "YUV444"))
+		type = YUV_444;
+	    else if (!strcmp(val, "YUV422"))
+		type = YUV_422;
+	    else if (!strcmp(val, "YUV411"))
+		type = YUV_411;
 	    else
 		throw runtime_error("TU::ImageBase::restore_epbm: unknown data type!!");
-	}
-	else if (!strcmp(key, "Sign:"))		// signed- or unsigned-image
-	{
-	    in >> val;
-	    sign = (!strcmp(val, "Unsigned") ? EPBM_UNSIGNED : EPBM_SIGNED);
 	}
 	else if (!strcmp(key, "Endian:"))	// big- or little-endian
 	{
 	    in >> val;
+	    switch (type)
+	    {
+	      case SHORT:
+	      case INT:
+	      case FLOAT:
+	      case DOUBLE:
 #ifdef BIG_ENDIAN
-	    if (strcmp(val, "Little") && dataType != EPBM_CHAR8)
-		throw runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
+		if (strcmp(val, "Little"))
+		    throw runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
 #else
-	    if (strcmp(val, "Big") && dataType != EPBM_CHAR8)
-		throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
+		if (strcmp(val, "Big"))
+		    throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
 #endif
+		break;
+	    }
 	}
 	else if (!strcmp(key, "PinHoleParameterH11:"))
 	    in >> P[0][0];
@@ -172,36 +177,10 @@ ImageBase::restoreHeader(std::istream& in)
     u_int	w, h;
     in >> w;
     in >> h;
-    _resize(h, w);				// set width & height
+    _resize(h, w, type);			// set width & height
     in >> w >> ign;				// skip MaxValue
 
-    switch (magic)
-    {
-      case U_CHAR:
-	switch (dataType)
-	{
-	  case EPBM_CHAR8:
-	    return U_CHAR;
-	  case EPBM_SHORT16:
-	    return SHORT;
-	  case EPBM_FLOAT32:
-	    return FLOAT;
-	  case EPBM_DOUBLE64:
-	    return DOUBLE;
-	}
-	break;
-      case RGB_24:
-	return RGB_24;
-      case YUV_444:
-	return YUV_444;
-      case YUV_422:
-	return YUV_422;
-      case YUV_411:
-	return YUV_411;
-    }
-
-    throw
-      runtime_error("TU::ImageBase::restoreHeader: unknown data type!!");
+    return type;
 }
 
 std::ostream&
@@ -212,14 +191,11 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     out << 'P';
     switch (type)
     {
-      case U_CHAR:
-      case SHORT:
-      case FLOAT:
-      case DOUBLE:
-	out << (int)U_CHAR << endl;
+      case RGB_24:
+	out << int(RGB_24) << endl;
 	break;
       default:
-	out << (int)type << endl;
+	out << int(U_CHAR) << endl;
 	break;
     }
 
@@ -234,17 +210,30 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
       case SHORT:
 	out << "Short" << endl;
 	break;
+      case INT:
+	out << "Int" << endl;
+	break;
       case FLOAT:
 	out << "Float" << endl;
 	break;
       case DOUBLE:
 	out << "Double" << endl;
 	break;
+      case YUV_444:
+	out << "YUV444" << endl;
+	break;
+      case YUV_422:
+	out << "YUV422" << endl;
+	break;
+      case YUV_411:
+	out << "YUV411" << endl;
+	break;
     }
     out << "# Sign: ";
     switch (type)
     {
       case SHORT:
+      case INT:
       case FLOAT:
       case DOUBLE:
 	out << "Signed" << endl;
@@ -286,12 +275,19 @@ ImageBase::type2depth(Type type)
     {
       case SHORT:
 	return 8*sizeof(short);
+      case INT:
+	return 8*sizeof(int);
       case FLOAT:
 	return 8*sizeof(float);
       case DOUBLE:
 	return 8*sizeof(double);
       case RGB_24:
+      case YUV_444:
 	return 24;
+      case YUV_422:
+	return 16;
+      case YUV_411:
+	return 12;
     }
 
     return 8;
