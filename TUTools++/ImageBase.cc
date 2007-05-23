@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.14 2007-05-23 01:36:27 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.15 2007-05-23 07:59:36 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Manip.h"
@@ -81,9 +81,8 @@ ImageBase::restoreHeader(std::istream& in)
 	if (!strcmp(key, "DataType:"))		// pixel data type
 	{
 	    in >> val;
-	    if (!strcmp(val, "Char"))
-		type = U_CHAR;
-	    else if (!strcmp(val, "Short"))
+	    
+	    if (!strcmp(val, "Short"))
 		type = SHORT;
 	    else if (!strcmp(val, "Int"))
 		type = INT;
@@ -97,7 +96,7 @@ ImageBase::restoreHeader(std::istream& in)
 		type = YUV_422;
 	    else if (!strcmp(val, "YUV411"))
 		type = YUV_411;
-	    else
+	    else if (strcmp(val, "Char") && strcmp(val, "RGB24"))
 		throw runtime_error("TU::ImageBase::restore_epbm: unknown data type!!");
 	}
 	else if (!strcmp(key, "Endian:"))	// big- or little-endian
@@ -206,6 +205,9 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     {
       default:
 	out << "Char" << endl;
+	break;
+      case RGB_24:
+	out << "RGB24" << endl;
 	break;
       case SHORT:
 	out << "Short" << endl;
