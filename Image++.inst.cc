@@ -19,7 +19,7 @@
  *  Authors are not responsible for any damage in use of this program.
  */
 /*
- *  $Id: Image++.inst.cc,v 1.8 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: Image++.inst.cc,v 1.9 2007-05-23 01:36:27 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
@@ -29,7 +29,7 @@ namespace TU
 {
 template class Image<u_char>;
 template class Image<short>;
-template class Image<long>;
+template class Image<int>;
 template class Image<float>;
 template class Image<double>;
 template class Image<RGB>;
@@ -40,13 +40,13 @@ template class Image<YUV444>;
 template class Image<YUV422>;
 template class Image<YUV411>;
 
-template class IntegralImage<long>;
-template IntegralImage<long>&
-IntegralImage<long>::initialize(const Image<u_char>& image)		;
-template const IntegralImage<long>&
-IntegralImage<long>::crossVal(Image<long>& out, int cropSize)	const	;
-template const IntegralImage<long>&
-IntegralImage<long>::crossVal(Image<float>& out, int cropSize)	const	;
+template class IntegralImage<int>;
+template IntegralImage<int>&
+IntegralImage<int>::initialize(const Image<u_char>& image)		;
+template const IntegralImage<int>&
+IntegralImage<int>::crossVal(Image<int>& out, int cropSize)	const	;
+template const IntegralImage<int>&
+IntegralImage<int>::crossVal(Image<float>& out, int cropSize)	const	;
     
 template class IntegralImage<float>;
 template IntegralImage<float>&
@@ -56,13 +56,13 @@ IntegralImage<float>::initialize(const Image<float>& image)		;
 template const IntegralImage<float>&
 IntegralImage<float>::crossVal(Image<float>& out, int cropSize)	const	;
 
-template class DiagonalIntegralImage<long>;
-template DiagonalIntegralImage<long>&
-DiagonalIntegralImage<long>::initialize(const Image<u_char>& image)	;
-template const DiagonalIntegralImage<long>&
-DiagonalIntegralImage<long>::crossVal(Image<long>& out, int cropSize)	const;
-template const DiagonalIntegralImage<long>&
-DiagonalIntegralImage<long>::crossVal(Image<float>& out, int cropSize)	const;
+template class DiagonalIntegralImage<int>;
+template DiagonalIntegralImage<int>&
+DiagonalIntegralImage<int>::initialize(const Image<u_char>& image)	;
+template const DiagonalIntegralImage<int>&
+DiagonalIntegralImage<int>::crossVal(Image<int>& out, int cropSize)	const;
+template const DiagonalIntegralImage<int>&
+DiagonalIntegralImage<int>::crossVal(Image<float>& out, int cropSize)	const;
     
 template class DiagonalIntegralImage<float>;
 template DiagonalIntegralImage<float>&

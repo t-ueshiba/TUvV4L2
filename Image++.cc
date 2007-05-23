@@ -19,7 +19,7 @@
  *  Authors are not responsible for any damage in use of this program.
  */
 /*
- *  $Id: Image++.cc,v 1.16 2007-03-12 07:15:29 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.17 2007-05-23 01:36:27 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
@@ -97,6 +97,8 @@ Image<T, B>::restoreData(std::istream& in, Type type)
 	return restoreRows<u_char>(in);
       case SHORT:
 	return restoreRows<short>(in);
+      case INT:
+	return restoreRows<int>(in);
       case FLOAT:
 	return restoreRows<float>(in);
       case DOUBLE:
@@ -122,6 +124,8 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
 	return saveRows<u_char>(out);
       case SHORT:
 	return saveRows<short>(out);
+      case INT:
+	return saveRows<int>(out);
       case FLOAT:
 	return saveRows<float>(out);
       case DOUBLE:
@@ -177,7 +181,7 @@ Image<T, B>::_height() const
 }
 
 template <class T, class B> void
-Image<T, B>::_resize(u_int h, u_int w)
+Image<T, B>::_resize(u_int h, u_int w, Type)
 {
     Image<T, B>::resize(h, w);		// Don't call ImageBase::resize!
 }

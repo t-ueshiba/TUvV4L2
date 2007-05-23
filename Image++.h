@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.25 2007-04-11 23:34:56 ueshiba Exp $
+ *  $Id: Image++.h,v 1.26 2007-05-23 01:36:27 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -52,7 +52,7 @@ struct RGB
 
 		operator u_char()	const	{return u_char(double(*this));}
 		operator short()	const	{return short(double(*this));}
-		operator long()		const	{return long(double(*this));}
+		operator int()		const	{return int(double(*this));}
 		operator float()	const	{return float(double(*this));}
 		operator double()	const	{return 0.3*r+0.59*g+0.11*b+0.5;}
     
@@ -94,6 +94,7 @@ struct BGR
 
 		operator u_char()	const	{return u_char(double(*this));}
 		operator short()	const	{return short(double(*this));}
+		operator int()		const	{return int(double(*this));}
 		operator float()	const	{return float(double(*this));}
 		operator double()	const	{return 0.3*r+0.59*g+0.11*b+0.5;}
 
@@ -187,7 +188,7 @@ struct YUV444
 
 		operator u_char()		const	{return u_char(y);}
 		operator short()		const	{return short(y);}
-		operator long()			const	{return long(y);}
+		operator int()			const	{return int(y);}
 		operator float()		const	{return float(y);}
 		operator double()		const	{return double(y);}
     bool	operator ==(const YUV444& yuv)	const	{return (u == yuv.u &&
@@ -220,7 +221,7 @@ struct YUV422
 
 		operator u_char()		const	{return u_char(y);}
 		operator short()		const	{return short(y);}
-		operator long()			const	{return long(y);}
+		operator int()			const	{return int(y);}
 		operator float()		const	{return float(y);}
 		operator double()		const	{return double(y);}
     bool	operator ==(const YUV422& p)	const	{return (x == p.x &&
@@ -314,8 +315,8 @@ fromYUV<short>(u_char y, u_char, u_char)
     return y;
 }
 
-template <> inline long
-fromYUV<long>(u_char y, u_char, u_char)
+template <> inline int
+fromYUV<int>(u_char y, u_char, u_char)
 {
     return y;
 }
@@ -356,30 +357,31 @@ BGR::BGR(const YUV444& p)
 //! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
 class ImageBase
 {
+  public:
+    enum Type		{END = 0, U_CHAR = 5, RGB_24 = 6,
+			 SHORT, INT, FLOAT, DOUBLE,
+			 YUV_444, YUV_422, YUV_411};
+    
   protected:
     ImageBase()
 	:P(3, 4), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
     virtual ~ImageBase()		;
     
-  public:
-    enum Type		{END = 0, U_CHAR = 5, RGB_24 = 6,
-			 SHORT, FLOAT, DOUBLE,
-			 YUV_444, YUV_422, YUV_411};
+    static u_int	type2depth(Type type)		;
     
+  public:
     Type		restoreHeader(std::istream& in)			;
     std::ostream&	saveHeader(std::ostream& out, Type type) const	;
 
     u_int		width()			const	{return _width();}
     u_int		height()		const	{return _height();}
-    void		resize(u_int h, u_int w)	{_resize(h, w);}
+    void		resize(u_int h, u_int w)	{_resize(h, w, END);}
 	
   private:
-    virtual u_int	_width()		const	= 0;
-    virtual u_int	_height()		const	= 0;
-    virtual void	_resize(u_int h, u_int w)	= 0;
+    virtual u_int	_width()			const	= 0;
+    virtual u_int	_height()			const	= 0;
+    virtual void	_resize(u_int h, u_int w, Type type)	= 0;
 
-    static u_int	type2depth(Type type)		;
-    
   public:
     Matrix<double>	P;			//!< 3x4カメラ行列
     double		d1, d2;			//!< レンズ歪み係数
@@ -611,7 +613,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
 
     virtual u_int	_width()				const	;
     virtual u_int	_height()				const	;
-    virtual void	_resize(u_int h, u_int w)			;
+    virtual void	_resize(u_int h, u_int w, Type)			;
 };
 
 template <class T, class B> template <class S> inline S
