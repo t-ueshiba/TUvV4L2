@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: ImageBase.cc,v 1.16 2007-05-23 23:45:47 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.17 2007-05-29 02:36:55 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Manip.h"
@@ -106,10 +106,10 @@ ImageBase::restoreHeader(std::istream& in)
 	      case FLOAT:
 	      case DOUBLE:
 #ifdef BIG_ENDIAN
-		if (strcmp(val, "Little"))
+		if (!strcmp(val, "Little"))
 		    throw runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
 #else
-		if (strcmp(val, "Big"))
+		if (!strcmp(val, "Big"))
 		    throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
 #endif
 		break;
