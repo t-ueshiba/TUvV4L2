@@ -1,10 +1,11 @@
 /*
- *  $Id: Minimize++.h,v 1.6 2007-01-31 05:42:20 ueshiba Exp $
+ *  $Id: Minimize++.h,v 1.7 2007-06-28 23:59:20 ueshiba Exp $
  */
 #ifndef __TUMinimizePP_h
 #define __TUMinimizePP_h
 
 #include "TU/Vector++.h"
+#include <algorithm>
 #include <stdexcept>
 
 namespace TU
@@ -130,19 +131,22 @@ minimizeSquare(const F& f, const G& g, AT& x,
 *  function minimizeSquareSparse					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
-template <class F, class G, class ATA, class ATB> Matrix<typename F::ET>
-minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
+template <class F, class G, class ATA, class IB> Matrix<typename F::ET>
+minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		     int niter_max=100, double tol=1.5e-8)
 {
-    using namespace		std;
-    typedef typename F::ET	ET;		// element type.
-    typedef typename F::JT	JT;		// Jacobian type.
-
-    Array<Vector<ET> >		fval(b.dim());	// function values.
+    using namespace					std;
+    typedef typename F::ET				ET;  // element type.
+    typedef typename F::JT				JT;  // Jacobian type.
+    typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
+    
+    const u_int			nb = distance(bbegin, bend);
+    Array<Vector<ET> >		fval(nb);	// function values.
     ET				sqr = 0;	// sum of squares.
-    for (int j = 0; j < b.dim(); ++j)
+    int				j = 0;
+    for (IB b = bbegin; b != bend; ++b, ++j)
     {
-	fval[j] = f(a, b[j], j);
+	fval[j] = f(a, *b, j);
 	sqr    += fval[j] * fval[j];
     }
     ET	lambda = 1.0e-7;			// L-M parameter.
@@ -152,14 +156,15 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	const u_int		adim = f.adim();
 	JT			U(f.adims(), f.adims());
 	Vector<ET>		Jtf(adim);
-	Array<Matrix<ET> >	V(b.dim());
-	Array<Matrix<ET> >	W(b.dim());
-	Array<Vector<ET> >	Ktf(b.dim());
-	for (int j = 0; j < b.dim(); ++j)
+	Array<Matrix<ET> >	V(nb);
+	Array<Matrix<ET> >	W(nb);
+	Array<Vector<ET> >	Ktf(nb);
+	j = 0;
+	for (IB b = bbegin; b != bend; ++b, ++j)
 	{
-	    const JT&		J  = f.jacobianA(a, b[j], j);
+	    const JT&		J  = f.jacobianA(a, *b, j);
 	    const JT&		Jt = J.trns();
-	    const Matrix<ET>&	K  = f.jacobianB(a, b[j], j);
+	    const Matrix<ET>&	K  = f.jacobianB(a, *b, j);
 
 	    U     += Jt * J;
 	    Jtf   += fval[j] * J;
@@ -185,9 +190,9 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	    Vector<ET>		da(adim + gdim);
 	    da(0, adim) = Jtf;
 	    da(adim, gdim) = gval;
-	    Array<Matrix<ET> >	VinvWt(b.dim());
-	    Array<Vector<ET> >	VinvKtf(b.dim());
-	    for (int j = 0; j < b.dim(); ++j)
+	    Array<Matrix<ET> >	VinvWt(nb);
+	    Array<Vector<ET> >	VinvKtf(nb);
+	    for (int j = 0; j < nb; ++j)
 	    {
 		Matrix<ET>	Vinv = V[j];
 		for (int k = 0; k < Vinv.dim(); ++k)
@@ -203,10 +208,11 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	  // Compute updated parameters and function value to it.
 	    ATA			a_new(a);
 	    f.updateA(a_new, da(0, adim));
-	    Array<ATB>		b_new(b);
-	    Array<Vector<ET> >	fval_new(b.dim());
+	    Array<ATB>		b_new(nb);
+	    copy(bbegin, bend, b_new.begin());
+	    Array<Vector<ET> >	fval_new(nb);
 	    ET			sqr_new = 0;
-	    for (int j = 0; j < b.dim(); ++j)
+	    for (int j = 0; j < nb; ++j)
 	    {
 		const Vector<ET>& db = VinvKtf[j] - VinvWt[j] * da(0, adim);
 		f.updateB(b_new[j], db);
@@ -222,17 +228,17 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
 	    {
 		u_int		bdim = 0;
-		for (int j = 0; j < b.dim(); ++j)
+		for (int j = 0; j < nb; ++j)
 		    bdim += V[j].dim();
 		Matrix<ET>	S(adim + bdim, adim + bdim);
 		Matrix<ET>	Sa(S, 0, 0, adim, adim);
 		Sa = U;
-		for (int j = 0; j < b.dim(); ++j)
+		for (int j = 0; j < nb; ++j)
 		{
 		    VinvWt[j] = V[j].inv() * W[j].trns();
 		    Sa -= W[j] * VinvWt[j];
 		}
-		for (int jj = adim, j = 0; j < b.dim(); ++j)
+		for (int jj = adim, j = 0; j < nb; ++j)
 		{
 		    const Matrix<ET>&	VinvWtSa = VinvWt[j] * Sa;
 		    for (int kk = adim, k = 0; k <= j; ++k)
@@ -245,7 +251,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		    jj += VinvWt[j].nrow();
 		}
 		Sa = Sa.pinv(1.0e8);
-		for (int jj = adim, j = 0; j < b.dim(); ++j)
+		for (int jj = adim, j = 0; j < nb; ++j)
 		{
 		    S(jj, 0, VinvWt[j].nrow(), adim) = -VinvWt[j] * Sa;
 		    jj += VinvWt[j].nrow();
@@ -257,7 +263,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	    if (sqr_new < sqr)
 	    {
 		a = a_new;			// Update parameters.
-		b = b_new;
+		copy(b_new.begin(), b_new.end(), bbegin);
 		fval = fval_new;		// Update function values.
 		sqr = sqr_new;			// Update residual.
 		lambda *= 0.1;			// Decrease L-M parameter.
@@ -276,18 +282,21 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, Array<ATB>& b,
 *  function minimizeSquareSparseDebug					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
-template <class F, class G, class ATA, class ATB>  Matrix<typename F::ET>
-minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
+template <class F, class G, class ATA, class IB>  Matrix<typename F::ET>
+minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 			  int niter_max=100, double tol=1.5e-8)
 {
-    using namespace		std;
-    typedef typename F::ET	ET;		// element type.
+    using namespace					std;
+    typedef typename F::ET				ET;  // element type.
+    typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
 
-    Array<Vector<ET> >		fval(b.dim());	// function values.
+    const u_int			nb = distance(bbegin, bend);
+    Array<Vector<ET> >		fval(nb);	// function values.
     ET				sqr = 0;	// sum of squares.
-    for (int j = 0; j < b.dim(); ++j)
+    int				j = 0;
+    for (IB b = bbegin; b != bend; ++b, ++j)
     {
-	fval[j] = f(a, b[j], j);
+	fval[j] = f(a, *b, j);
 	sqr    += fval[j] * fval[j];
     }
     ET	lambda = 1.0e-7;			// L-M parameter.
@@ -295,20 +304,21 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
     for (int n = 0; n++ < niter_max; )
     {
 	const u_int		adim = f.adim();
-	const u_int		bdim = f.bdim() * b.dim();
+	const u_int		bdim = f.bdim() * nb;
       	const Vector<ET>&	gval = g(a);
 	const u_int		gdim = gval.dim();
 	Matrix<ET>		U(adim, adim);
 	Vector<ET>		Jtf(adim);
-	Array<Matrix<ET> >	V(b.dim());
-	Array<Matrix<ET> >	W(b.dim());
-	Array<Vector<ET> >	Ktf(b.dim());
+	Array<Matrix<ET> >	V(nb);
+	Array<Matrix<ET> >	W(nb);
+	Array<Vector<ET> >	Ktf(nb);
 	Matrix<ET>		A(adim + bdim + gdim, adim + bdim + gdim);
-	for (int j = 0; j < b.dim(); ++j)
+	j = 0;
+	for (IB b = bbegin; b != bend; ++b, ++j)
 	{
-	    const Matrix<ET>&	J  = f.jacobianA(a, b[j], j);
+	    const Matrix<ET>&	J  = f.jacobianA(a, *b, j);
 	    const Matrix<ET>&	Jt = J.trns();
-	    const Matrix<ET>&	K  = f.jacobianB(a, b[j], j);
+	    const Matrix<ET>&	K  = f.jacobianB(a, *b, j);
 
 	    U     += Jt * J;
 	    Jtf   += fval[j] * J;
@@ -328,7 +338,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	    A(0, 0, adim, adim) = U;
 	    for (int i = 0; i < adim; ++i)
 		A[i][i] *= (1.0 + lambda);
-	    for (int j = 0; j < b.dim(); ++j)
+	    for (int j = 0; j < nb; ++j)
 	    {
 		A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
 		    = V[j];
@@ -339,7 +349,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 
 	    Vector<ET>	dx(adim + bdim + gdim);
 	    dx(0, adim) = Jtf;
-	    for (int j = 0; j < b.dim(); ++j)
+	    for (int j = 0; j < nb; ++j)
 		dx(adim + j*f.bdim(), f.bdim()) = Ktf[j];
 	    dx(adim + bdim, gdim) = gval;
 	    dx.solve(A);
@@ -347,10 +357,11 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	  // Compute updated parameters and function value to it.
 	    ATA			a_new(a);
 	    f.updateA(a_new, dx(0, adim));
-	    Array<ATB>		b_new(b);
-	    Array<Vector<ET> >	fval_new(b.dim());
+	    Array<ATB>		b_new(nb);
+	    copy(bbegin, bend, b_new.begin());
+	    Array<Vector<ET> >	fval_new(nb);
 	    ET			sqr_new = 0;
-	    for (int j = 0; j < b.dim(); ++j)
+	    for (int j = 0; j < nb; ++j)
 	    {
 		const Vector<ET>& db = dx(adim + j*f.bdim(), f.bdim());
 	      /*		cerr << "*** check:  "
@@ -368,7 +379,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
 	    {
 		A(0, 0, adim, adim) = U;
-		for (int j = 0; j < b.dim(); ++j)
+		for (int j = 0; j < nb; ++j)
 		    A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
 			= V[j];
 		Vector<ET>	evalue;
@@ -380,7 +391,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, Array<ATB>& b,
 	    if (sqr_new < sqr)
 	    {
 		a = a_new;			// Update parameters.
-		b = b_new;
+		copy(b_new.begin(), b_new.end(), bbegin);
 		fval = fval_new;		// Update function values.
 		sqr = sqr_new;			// Update residual.
 		lambda *= 0.1;			// Decrease L-M parameter.

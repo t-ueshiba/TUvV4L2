@@ -1,5 +1,5 @@
 /*
- *  $Id: Calib++.cc,v 1.3 2007-01-31 05:42:44 ueshiba Exp $
+ *  $Id: Calib++.cc,v 1.4 2007-06-28 23:59:20 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 
@@ -61,7 +61,7 @@ MeasurementMatrix::refineCalibrationWithPlanes
     CostCP		err(*this, K.dof());
     NullConstraint<ET>	g;
 
-    minimizeSquareSparse(err, g, K, cameras, 200);
+    minimizeSquareSparse(err, g, K, cameras.begin(), cameras.end(), 200);
 }
 
 //! カメラの全パラメータと特徴点位置の初期値を非線型最適化によりrefineする．
@@ -82,7 +82,7 @@ MeasurementMatrix::bundleAdjustment(Array<CAMERA>& cameras,
     typename CostBA<CAMERA>::CostCD	g(cameras);
     Matrix<ET>				shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, cameras, shape, 200);
+    minimizeSquareSparse(err, g, cameras, shape.begin(), shape.end(), 200);
 }
 
 //! カメラの外部パラメータ，全てのカメラに共通な焦点距離および特徴点位置の初期値を非線型最適化によりrefineする．
@@ -107,7 +107,7 @@ MeasurementMatrix::bundleAdjustment(INTRINSIC& K,
     typename CostBACI<INTRINSIC>::CostCD	g(params);
     Matrix<ET>					shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, params, shape, 200);
+    minimizeSquareSparse(err, g, params, shape.begin(), shape.end(), 200);
 
     K = params.K;
     for (int i = 0; i < cameras.dim(); ++i)
@@ -132,7 +132,7 @@ MeasurementMatrix::bundleAdjustmentWithFixedCameraCenters
     NullConstraint<ET>	g;
     Matrix<ET>		shape(Xt, 0, 0, Xt.nrow(), 3);
 
-    minimizeSquareSparse(err, g, cameras, shape, 200);
+    minimizeSquareSparse(err, g, cameras, shape.begin(), shape.end(), 200);
 }
 
 /************************************************************************
