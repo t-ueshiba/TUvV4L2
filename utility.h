@@ -1,5 +1,5 @@
 /*
- *  $Id: utility.h,v 1.8 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: utility.h,v 1.9 2007-07-24 00:05:02 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -82,26 +82,31 @@ diff(const T& a, const T& b)
   \param Iterator	本反復子のベースとなる反復子
 */
 template <class Iterator, class T>
-class mem_iterator
-    : public std::iterator<typename Iterator::iterator_category, T,
-			   typename Iterator::difference_type, T*, T&>
+class mbr_iterator
+  : public
+      std::iterator<typename std::iterator_traits<Iterator>::iterator_category,
+		    T,
+		    typename std::iterator_traits<Iterator>::difference_type,
+		    T*, T&>
 {
   public:
-    typedef typename Iterator::iterator_category	iterator_categoty;
+    typedef typename std::iterator_traits<Iterator>::iterator_category
+							iterator_categoty;
     typedef T						value_type;
-    typedef typename Iterator::difference_type		difference_type;
+    typedef typename std::iterator_traits<Iterator>::difference_type
+							difference_type;
     typedef value_type*					pointer;
     typedef value_type&					reference;
-    typedef value_type Iterator::value_type::*		mem_pointer;
+    typedef value_type std::iterator_traits<Iterator>::value_type::*
+							mbr_pointer;
     
-    mem_iterator(const Iterator& i, mem_pointer m)
-	:_i(i), _m(m)						{}
+    mbr_iterator(Iterator i, mbr_pointer m)	:_i(i), _m(m)	{}
 
-    bool		operator ==(const mem_iterator& i) const
+    bool		operator ==(const mbr_iterator& i) const
 			{
 			    return _i == i._i;
 			}
-    bool		operator !=(const mem_iterator& i) const
+    bool		operator !=(const mbr_iterator& i) const
 			{
 			    return !(*this == i);
 			}
@@ -113,44 +118,59 @@ class mem_iterator
 			{
 			    return &(operator *());
 			}
-    mem_iterator&	operator ++()
+    mbr_iterator&	operator ++()
 			{
 			    ++_i;
 			    return *this;
 			}
-    mem_iterator	operator ++(int)
+    mbr_iterator	operator ++(int)
 			{
-			    mem_iterator	tmp = *this;
+			    mbr_iterator	tmp = *this;
 			    ++_i;
 			    return tmp;
 			}
-    mem_iterator&	operator --()
+    mbr_iterator&	operator --()
 			{
 			    --_i;
 			    return *this;
 			}
-    mem_iterator	operator --(int)
+    mbr_iterator	operator --(int)
 			{
-			    mem_iterator	tmp = *this;
+			    mbr_iterator	tmp = *this;
 			    --_i;
 			    return tmp;
 			}
 	
   private:
     Iterator		_i;
-    const mem_pointer	_m;
+    const mbr_pointer	_m;
 };
+
+//! T型のメンバを持つオブジェクトを要素とするコンテナについてそのメンバにアクセス(R/W)する反復子を作る．
+template <class Iterator, class T> inline mbr_iterator<Iterator, T>
+make_mbr_iterator(Iterator i, T std::iterator_traits<Iterator>::value_type::* m)
+{
+    return mbr_iterator<Iterator, T>(i, m);
+}
+    
+//! T型のメンバを持つオブジェクトを要素とするコンテナについてそのメンバにアクセス(R)する反復子を作る．
+template <class Iterator, class T> inline mbr_iterator<Iterator, const T>
+make_const_mbr_iterator(Iterator i,
+			const T std::iterator_traits<Iterator>::value_type::* m)
+{
+    return mbr_iterator<Iterator, const T>(i, m);
+}
 
 //! std::pairを要素とするコンテナについてpairの第1要素にアクセス(R/W)する反復子を作る．
 /*!
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mem_iterator<Iterator, typename Iterator::value_type::first_type>
-make_first_iterator(const Iterator& i)
+inline mbr_iterator<Iterator, typename std::iterator_traits<Iterator>
+					  ::value_type::first_type>
+make_first_iterator(Iterator i)
 {
-    return mem_iterator<Iterator, typename Iterator::value_type::first_type>
-		(i, &Iterator::value_type::first);
+    return make_mbr_iterator(i, &Iterator::value_type::first);
 }
     
 //! std::pairを要素とするコンテナについてpairの第1要素にアクセス(R)する反復子を作る．
@@ -158,12 +178,10 @@ make_first_iterator(const Iterator& i)
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mem_iterator<Iterator, const typename Iterator::value_type::first_type>
-make_const_first_iterator(const Iterator& i)
+inline mbr_iterator<Iterator, const typename Iterator::value_type::first_type>
+make_const_first_iterator(Iterator i)
 {
-    return mem_iterator<Iterator,
-			const typename Iterator::value_type::first_type>
-		(i, &Iterator::value_type::first);
+    return make_const_mbr_iterator(i, &Iterator::value_type::first);
 }
     
 //! std::pairを要素とするコンテナについてpairの第2要素にアクセス(R/W)する反復子を作る．
@@ -171,11 +189,10 @@ make_const_first_iterator(const Iterator& i)
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mem_iterator<Iterator, typename Iterator::value_type::second_type>
-make_second_iterator(const Iterator& i)
+inline mbr_iterator<Iterator, typename Iterator::value_type::second_type>
+make_second_iterator(Iterator i)
 {
-    return mem_iterator<Iterator, typename Iterator::value_type::second_type>
-		(i, &Iterator::value_type::second);
+    return make_mbr_iterator(i, &Iterator::value_type::second);
 }
 
 //! std::pairを要素とするコンテナについてpairの第2要素にアクセス(R)する反復子を作る．
@@ -183,12 +200,10 @@ make_second_iterator(const Iterator& i)
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mem_iterator<Iterator, const typename Iterator::value_type::second_type>
-make_const_second_iterator(const Iterator& i)
+inline mbr_iterator<Iterator, const typename Iterator::value_type::second_type>
+make_const_second_iterator(Iterator i)
 {
-    return mem_iterator<Iterator,
-			const typename Iterator::value_type::second_type>
-		(i, &Iterator::value_type::second);
+    return make_const_mbr_iterator(i, &Iterator::value_type::second);
 }
     
 }
