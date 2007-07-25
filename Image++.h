@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Image++.h,v 1.26 2007-05-23 01:36:27 ueshiba Exp $
+ *  $Id: Image++.h,v 1.27 2007-07-25 23:43:13 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -383,7 +383,7 @@ class ImageBase
     virtual void	_resize(u_int h, u_int w, Type type)	= 0;
 
   public:
-    Matrix<double>	P;			//!< 3x4カメラ行列
+    Matrix34d		P;			//!< 3x4カメラ行列
     double		d1, d2;			//!< レンズ歪み係数
 };
 
