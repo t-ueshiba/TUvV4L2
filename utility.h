@@ -1,5 +1,5 @@
 /*
- *  $Id: utility.h,v 1.9 2007-07-24 00:05:02 ueshiba Exp $
+ *  $Id: utility.h,v 1.10 2007-07-26 11:51:07 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -102,6 +102,10 @@ class mbr_iterator
     
     mbr_iterator(Iterator i, mbr_pointer m)	:_i(i), _m(m)	{}
 
+    Iterator		base() const
+			{
+			    return _i;
+			}
     bool		operator ==(const mbr_iterator& i) const
 			{
 			    return _i == i._i;
@@ -140,11 +144,92 @@ class mbr_iterator
 			    --_i;
 			    return tmp;
 			}
+    mbr_iterator&	operator +=(difference_type n)
+			{
+			    _i += n;
+			    return *this;
+			}
+    mbr_iterator&	operator -=(difference_type n)
+			{
+			    _i -= n;
+			    return *this;
+			}
+    mbr_iterator	operator +(difference_type n) const
+			{
+			    mbr_iterator	tmp = *this;
+			    return tmp += n;
+			}
+    mbr_iterator	operator -(difference_type n) const
+			{
+			    mbr_iterator	tmp = *this;
+			    return tmp -= n;
+			}
+    reference		operator [](difference_type n) const
+			{
+			    return *(*this + n);
+			}
 	
   private:
     Iterator		_i;
     const mbr_pointer	_m;
 };
+
+template <class Iterator, class T> inline bool 
+operator ==(const mbr_iterator<Iterator, T>& x,
+	    const mbr_iterator<Iterator, T>& y) 
+{
+    return x.base() == y.base();
+}
+
+template<class Iterator, class T> inline bool 
+operator <(const mbr_iterator<Iterator, T>& x, 
+	   const mbr_iterator<Iterator, T>& y) 
+{
+    return x.base() < y.base();
+}
+
+template<class Iterator, class T> inline bool 
+operator !=(const mbr_iterator<Iterator, T>& x, 
+	    const mbr_iterator<Iterator, T>& y) 
+{
+    return !(x == y);
+}
+
+template<class Iterator, class T> inline bool 
+operator >(const mbr_iterator<Iterator, T>& x, 
+	   const mbr_iterator<Iterator, T>& y) 
+{
+    return y < x;
+}
+
+template<class Iterator, class T> inline bool 
+operator <=(const mbr_iterator<Iterator, T>& x, 
+	    const mbr_iterator<Iterator, T>& y) 
+{
+    return !(y < x);
+}
+
+template<class Iterator, class T> inline bool 
+operator >=(const mbr_iterator<Iterator, T>& x, 
+	    const mbr_iterator<Iterator, T>& y) 
+{
+    return !(x < y);
+}
+
+template<class Iterator, class T>
+inline typename mbr_iterator<Iterator, T>::difference_type
+operator -(const mbr_iterator<Iterator, T>& x, 
+	   const mbr_iterator<Iterator, T>& y) 
+{
+    return x.base() - y.base();
+}
+
+template<class Iterator, class T> inline mbr_iterator<Iterator, T> 
+operator +(typename mbr_iterator<Iterator, T>::difference_type n,
+	   const mbr_iterator<Iterator, T>& x) 
+{
+    return x + n;
+}
 
 //! T型のメンバを持つオブジェクトを要素とするコンテナについてそのメンバにアクセス(R/W)する反復子を作る．
 template <class Iterator, class T> inline mbr_iterator<Iterator, T>
