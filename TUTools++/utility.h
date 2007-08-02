@@ -1,5 +1,5 @@
 /*
- *  $Id: utility.h,v 1.10 2007-07-26 11:51:07 ueshiba Exp $
+ *  $Id: utility.h,v 1.11 2007-08-02 12:26:21 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -106,14 +106,6 @@ class mbr_iterator
 			{
 			    return _i;
 			}
-    bool		operator ==(const mbr_iterator& i) const
-			{
-			    return _i == i._i;
-			}
-    bool		operator !=(const mbr_iterator& i) const
-			{
-			    return !(*this == i);
-			}
     reference		operator * () const
 			{
 			    return (*_i).*_m;
@@ -182,17 +174,17 @@ operator ==(const mbr_iterator<Iterator, T>& x,
 }
 
 template<class Iterator, class T> inline bool 
-operator <(const mbr_iterator<Iterator, T>& x, 
-	   const mbr_iterator<Iterator, T>& y) 
-{
-    return x.base() < y.base();
-}
-
-template<class Iterator, class T> inline bool 
 operator !=(const mbr_iterator<Iterator, T>& x, 
 	    const mbr_iterator<Iterator, T>& y) 
 {
     return !(x == y);
+}
+
+template<class Iterator, class T> inline bool 
+operator <(const mbr_iterator<Iterator, T>& x, 
+	   const mbr_iterator<Iterator, T>& y) 
+{
+    return x.base() < y.base();
 }
 
 template<class Iterator, class T> inline bool 
