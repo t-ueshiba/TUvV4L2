@@ -1,5 +1,5 @@
 /*
- *  $Id: utility.h,v 1.11 2007-08-02 12:26:21 ueshiba Exp $
+ *  $Id: utility.h,v 1.12 2007-08-02 23:33:54 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -247,7 +247,8 @@ inline mbr_iterator<Iterator, typename std::iterator_traits<Iterator>
 					  ::value_type::first_type>
 make_first_iterator(Iterator i)
 {
-    return make_mbr_iterator(i, &Iterator::value_type::first);
+    return make_mbr_iterator(i, &std::iterator_traits<Iterator>
+				    ::value_type::first);
 }
     
 //! std::pairを要素とするコンテナについてpairの第1要素にアクセス(R)する反復子を作る．
@@ -255,10 +256,12 @@ make_first_iterator(Iterator i)
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mbr_iterator<Iterator, const typename Iterator::value_type::first_type>
+inline mbr_iterator<Iterator, const typename std::iterator_traits<Iterator>
+						::value_type::first_type>
 make_const_first_iterator(Iterator i)
 {
-    return make_const_mbr_iterator(i, &Iterator::value_type::first);
+    return make_const_mbr_iterator(i, &std::iterator_traits<Iterator>
+					  ::value_type::first);
 }
     
 //! std::pairを要素とするコンテナについてpairの第2要素にアクセス(R/W)する反復子を作る．
@@ -266,10 +269,12 @@ make_const_first_iterator(Iterator i)
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mbr_iterator<Iterator, typename Iterator::value_type::second_type>
+inline mbr_iterator<Iterator, typename std::iterator_traits<Iterator>
+					  ::value_type::second_type>
 make_second_iterator(Iterator i)
 {
-    return make_mbr_iterator(i, &Iterator::value_type::second);
+    return make_mbr_iterator(i, &std::iterator_traits<Iterator>
+				    ::value_type::second);
 }
 
 //! std::pairを要素とするコンテナについてpairの第2要素にアクセス(R)する反復子を作る．
@@ -277,10 +282,12 @@ make_second_iterator(Iterator i)
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mbr_iterator<Iterator, const typename Iterator::value_type::second_type>
+inline mbr_iterator<Iterator, const typename std::iterator_traits<Iterator>
+						::value_type::second_type>
 make_const_second_iterator(Iterator i)
 {
-    return make_const_mbr_iterator(i, &Iterator::value_type::second);
+    return make_const_mbr_iterator(i, &std::iterator_traits<Iterator>
+					  ::value_type::second);
 }
     
 }
