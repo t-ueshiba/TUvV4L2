@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.18 2007-07-27 07:01:43 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.19 2007-09-09 23:39:41 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -583,12 +583,12 @@ ProjectiveMapping::operator const Vector<double>() const
 
 //! この射影変換の自由度を返す．
 /*!
-  \return	射影変換の自由度（(#outDim()+1)x(#inDim()+1)）
+  \return	射影変換の自由度（(#outDim()+1)x(#inDim()+1)-1）
 */
 inline u_int
 ProjectiveMapping::dof() const
 {
-    return (outDim() + 1)*(inDim() + 1);
+    return (outDim() + 1)*(inDim() + 1)-1;
 }
 
 //! 射影変換行列を与えられた量だけ修正する．
@@ -628,7 +628,7 @@ template <class T, class Iterator> Matrix<double>
 ProjectiveMapping::Cost<T, Iterator>::jacobian(const AT& map) const
 {
     const u_int	outDim = map.outDim();
-    Matrix<ET>	J(_npoints*outDim, map.dof());
+    Matrix<ET>	J(_npoints*outDim, map.dof()+1);
     int	n = 0;
     for (Iterator iter = _first; iter != _last; ++iter)
     {
