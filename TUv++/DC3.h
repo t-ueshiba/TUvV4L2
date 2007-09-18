@@ -1,5 +1,5 @@
 /*
- *  $Id: DC3.h,v 1.2 2002-07-25 02:38:11 ueshiba Exp $
+ *  $Id: DC3.h,v 1.3 2007-09-18 00:32:37 ueshiba Exp $
  */
 #ifndef __TUvDC3_h
 #define __TUvDC3_h
@@ -25,7 +25,7 @@ class DC3
     
     virtual DC3&	setInternal(int	   u0,	 int	v0,
 				    double ku,	 double kv,
-				    double near, double far)		= 0;
+				    double near, double far=0.0)	= 0;
     virtual DC3&	setExternal(const Vector<double>& t,
 				    const Matrix<double>& Rt)		= 0;
     virtual const DC3&	getInternal(int&    u0,	  int&	  v0,
