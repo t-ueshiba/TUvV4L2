@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.10 2007-02-28 00:18:40 ueshiba Exp $
+#  $Id: Makefile,v 1.11 2007-09-30 23:30:09 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,7 +10,7 @@ INCDIRS		= -I$(HOME)/include -I$(X11HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	= -DUseXaw -DTUBrepPP_DEBUG
+CPPFLAGS	= -DTUBrepPP_DEBUG
 CFLAGS		= -O -g
 CCFLAGS		= -O -g
 LDFLAGS		=
@@ -54,7 +54,7 @@ OBJS		= BrepCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.10 $	|		\
+REV		= $(shell echo $Revision: 1.11 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
