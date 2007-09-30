@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.2 2007-02-28 00:18:40 ueshiba Exp $
+#  $Id: Makefile,v 1.3 2007-09-30 23:30:09 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,7 +10,7 @@ INCDIRS		= -I$(HOME)/include -I$(X11HOME)/include
 PROGRAM		= vtest
 LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11
 
-CPPFLAGS	= -DUseXaw -DTUArrayPP_RangeCheck
+CPPFLAGS	= -DTUArrayPP_RangeCheck
 CFLAGS		= -g
 CCFLAGS		= -g
 LDFLAGS		= -L$(LIBDIR) -L$(X11HOME)/lib
@@ -50,7 +50,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.2 $	|		\
+REV		= $(shell echo $Revision: 1.3 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

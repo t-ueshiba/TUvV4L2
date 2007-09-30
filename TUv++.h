@@ -1,15 +1,15 @@
 /*
- *  $Id: TUv++.h,v 1.4 2003-01-10 00:33:11 ueshiba Exp $
+ *  $Id: TUv++.h,v 1.5 2007-09-30 23:30:09 ueshiba Exp $
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
 
-#ifdef UseXaw
-#  include <X11/Intrinsic.h>
-#  include <X11/StringDefs.h>
-#elif UseGtk
+#ifdef UseGtk
 #  include <gtk/gtk.h>
 #  include "TU/v/Colormap.h"
+#else
+#  include <X11/Intrinsic.h>
+#  include <X11/StringDefs.h>
 #endif
 #include "TU/List++.h"
 #include "TU/Geometry++.h"
@@ -187,10 +187,10 @@ class Timer;
 class Object
 {
   public:
-#ifdef UseXaw
-#  include "TU/v/Widget-Xaw.h"
-#elif UseGtk
+#ifdef UseGtk
 #  include "TU/v/Widget-Gtk+.h"
+#else
+#  include "TU/v/Widget-Xaw.h"
 #endif
 
   public:
