@@ -1,5 +1,5 @@
 /*
- *  $Id: Geometry++.h,v 1.19 2007-09-09 23:39:41 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.20 2007-10-23 02:27:06 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -61,26 +61,10 @@ Point2<T>::hom() const
     return v;
 }
 
-/************************************************************************
-*  class LineP2<T>							*
-************************************************************************/
-template <class T>
-class LineP2 : public Vector<T, FixedSizedBuf<T, 3> >
-{
-  private:
-    typedef Vector<T, FixedSizedBuf<T, 3> >	array_type;
-    
-  public:
-    LineP2()				:array_type()			{}
-    template <class T2, class B2>
-    LineP2(const Vector<T2, B2>& v)	:array_type(v)			{}
-    template <class T2, class B2>
-    LineP2&	operator =(const Vector<T2, B2>& v)
-		{
-		    array_type::operator =(v);
-		    return *this;
-		}
-};
+typedef Point2<short>					Point2s;
+typedef Point2<int>					Point2i;
+typedef Point2<float>					Point2f;
+typedef Point2<double>					Point2d;
 
 /************************************************************************
 *  class Point3<T>							*
@@ -125,19 +109,10 @@ Point3<T>::hom() const
     return v;
 }
 
-/************************************************************************
-*  typedefs								*
-************************************************************************/
-typedef Point2<short>	Point2s;
-typedef Point2<int>	Point2i;
-typedef Point2<float>	Point2f;
-typedef Point2<double>	Point2d;
-typedef LineP2<float>	LineP2f;
-typedef LineP2<double>	LineP2d;
-typedef Point3<short>	Point3s;
-typedef Point3<int>	Point3i;
-typedef Point3<float>	Point3f;
-typedef Point3<double>	Point3d;
+typedef Point3<short>					Point3s;
+typedef Point3<int>					Point3i;
+typedef Point3<float>					Point3f;
+typedef Point3<double>					Point3d;
 
 /************************************************************************
 *  class Normalize							*
@@ -783,50 +758,51 @@ AffineMapping::ndataMin() const
   \f$\TUtud{p}{}\TUud{x}{} = 0,~\TUud{p}{} \in \TUspace{R}{d+1}\f$
   によって表される．
 */
-class HyperPlane
+template <class T, class B=Buf<T> >
+class HyperPlane : public Vector<T, B>
 {
   public:
     HyperPlane(u_int d=2)						;
 
   //! 同次座標ベクトルを指定して超平面オブジェクトを生成する．
   /*!
-    \param p	(d+1)次元ベクトル（dはもとの射影区間の次元）
+    \param p	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
   */
-    HyperPlane(const Vector<double>& p)	:_p(p)				{}
+    template <class T2, class B2>
+    HyperPlane(const Vector<T2, B2>& p)	:Vector<T, B>(p)		{}
 
     template <class Iterator>
     HyperPlane(Iterator first, Iterator last)				;
 
+  //! 超平面オブジェクトの同次座標ベクトルを指定する．
+  /*!
+    \param v	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
+    \return	この超平面オブジェクト
+  */
+    template <class T2, class B2>
+    HyperPlane&	operator =(const Vector<T2, B2>& v)
+				{Vector<T, B>::operator =(v); return *this;}
+
     template <class Iterator>
-    void	initialize(Iterator first, Iterator last)		;
+    void	fit(Iterator first, Iterator last)			;
 
   //! この超平面が存在する射影空間の次元を返す．
   /*! 
     \return	射影空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
   */
-    u_int	spaceDim()			const	{return _p.dim()-1;}
+    u_int	spaceDim()		const	{return Vector<T, B>::dim()-1;}
 
   //! 超平面を求めるために必要な点の最小個数を返す．
   /*!
     現在設定されている射影空間の次元をもとに計算される．
     \return	必要な点の最小個数すなわち入力空間の次元#spaceDim()
   */
-    u_int	ndataMin()			const	{return spaceDim();}
+    u_int	ndataMin()		const	{return spaceDim();}
 
-  //! この超平面を表現する同次座標ベクトルを返す．
-  /*!
-    \return	(#spaceDim()+1)次元ベクトル
-  */
-    const Vector<double>&
-		p()				const	{return _p;}
-
-    template <class T, class B>
-    double	sqdist(const Vector<T, B>& x)	const	;
-    template <class T, class B>
-    double	dist(const Vector<T, B>& x)	const	;
-    
-  private:
-    Vector<double>	_p;	//!> 超平面を表現するベクトル
+    template <class T2, class B2> inline T
+    sqdist(const Vector<T2, B2>& x)		const	;
+    template <class T2, class B2> inline double
+    dist(const Vector<T2, B2>& x)		const	;
 };
 
 //! 空間の次元を指定して超平面オブジェクトを生成する．
@@ -834,11 +810,11 @@ class HyperPlane
   無限遠超平面([0, 0,..., 0, 1])に初期化される．
   \param d	この超平面が存在する射影空間の次元
 */
-inline
-HyperPlane::HyperPlane(u_int d)
-    :_p(d + 1)
+template <class T, class B> inline
+HyperPlane<T, B>::HyperPlane(u_int d)
+    :Vector<T, B>(d + 1)
 {
-    _p[d] = 1.0;
+    (*this)[d] = 1;
 }
     
 //! 与えられた点列の非同次座標に当てはめられた超平面オブジェクトを生成する．
@@ -847,10 +823,10 @@ HyperPlane::HyperPlane(u_int d)
   \param last			点列の末尾を示す反復子
   \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
 */
-template <class Iterator> inline
-HyperPlane::HyperPlane(Iterator first, Iterator last)
+template <class T, class B> template <class Iterator> inline
+HyperPlane<T, B>::HyperPlane(Iterator first, Iterator last)
 {
-    initialize(first, last);
+    fit(first, last);
 }
 
 //! 与えられた点列の非同次座標に超平面を当てはめる．
@@ -859,8 +835,8 @@ HyperPlane::HyperPlane(Iterator first, Iterator last)
   \param last			点列の末尾を示す反復子
   \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
 */
-template <class Iterator> void
-HyperPlane::initialize(Iterator first, Iterator last)
+template <class T, class B> template <class Iterator> void
+HyperPlane<T, B>::fit(Iterator first, Iterator last)
 {
   // 点列の正規化
     const Normalize	normalize(first, last);
@@ -868,26 +844,26 @@ HyperPlane::initialize(Iterator first, Iterator last)
   // 充分な個数の点があるか？
     const u_int		ndata = std::distance(first, last),
 			d     = normalize.spaceDim();
-    if (ndata < d)	// _pのサイズが未定なのでndataMin()は無効
+    if (ndata < d)	// Vector<T, B>のサイズが未定なのでndataMin()は無効
 	throw std::invalid_argument("Hyperplane::initialize(): not enough input data!!");
 
   // データ行列の計算
-    Matrix<double>	A(d, d);
+    Matrix<T>	A(d, d);
     while (first != last)
     {
-	const Vector<double>&	x = normalize(*first++);
+	const Vector<T>&	x = normalize(*first++);
 	A += x % x;
     }
 
   // データ行列の最小固有値に対応する固有ベクトルから法線ベクトルを計算し，
   // さらに点列の重心より原点からの距離を計算する．
-    Vector<double>		eval;
-    const Matrix<double>&	Ut = A.eigen(eval);
-    _p.resize(d+1);
-    _p(0, d) = Ut[Ut.nrow()-1];
-    _p[d] = -(_p(0, d)*normalize.centroid());
-    if (_p[d] > 0.0)
-	_p *= -1.0;
+    Vector<T>		eval;
+    const Matrix<T>&	Ut = A.eigen(eval);
+    Vector<T, B>::resize(d+1);
+    (*this)(0, d) = Ut[Ut.nrow()-1];
+    (*this)[d] = -((*this)(0, d)*normalize.centroid());
+    if ((*this)[d] > 0.0)
+	Vector<T, B>::operator *=(-1.0);
 }
 
 //! 与えられた点と超平面の距離の2乗を返す．
@@ -896,8 +872,8 @@ HyperPlane::initialize(Iterator first, Iterator last)
 		（#spaceDim()+1次元）
   \return	点と超平面の距離の2乗
 */
-template <class T, class B> inline double
-HyperPlane::sqdist(const Vector<T, B>& x) const
+template <class T, class B> template <class T2, class B2> inline T
+HyperPlane<T, B>::sqdist(const Vector<T2, B2>& x) const
 {
     const double	d = dist(x);
     return d*d;
@@ -912,27 +888,33 @@ HyperPlane::sqdist(const Vector<T, B>& x) const
 				#spaceDim()+1のいずれでもない場合，もしくは
 				この点が無限遠点である場合に送出．
 */
-template <class T, class B> double
-HyperPlane::dist(const Vector<T, B>& x) const
+template <class T, class B> template <class T2, class B2> double
+HyperPlane<T, B>::dist(const Vector<T2, B2>& x) const
 {
     if (x.dim() == spaceDim())
     {
-	Vector<double>	xx(spaceDim()+1);
+	Vector<T2>	xx(spaceDim()+1);
 	xx(0, spaceDim()) = x;
-	xx[spaceDim()] = 1.0;
-	return fabs(_p * xx);
+	xx[spaceDim()] = 1;
+	return fabs((*this * xx)/(*this)(0, spaceDim()).length());
     }
     else if (x.dim() == spaceDim() + 1)
     {
 	if (x[spaceDim()] == 0.0)
 	    throw std::invalid_argument("HyperPlane::dist(): point at infinitiy!!");
-	return fabs((_p * x)/x[spaceDim()]);
+	return fabs(((*this) * x)/
+		    ((*this)(0, spaceDim()).length() * x[spaceDim()]));
     }
     else
 	throw std::invalid_argument("HyperPlane::dist(): dimension mismatch!!");
 
     return 0;
 }
+
+typedef HyperPlane<float,  FixedSizedBuf<float,  3> >	LineP2f;
+typedef HyperPlane<double, FixedSizedBuf<double, 3> >	LineP2d;
+typedef HyperPlane<float,  FixedSizedBuf<float,  4> >	PlaneP3f;
+typedef HyperPlane<double, FixedSizedBuf<double, 4> >	PlaneP3d;
 
 /************************************************************************
 *  class CameraBase							*
@@ -1538,5 +1520,4 @@ CameraWithDistortion::CameraWithDistortion(const Matrix<double>& P,
 }
 
 }
-
 #endif	/* !__TUGeometryPP_h */
