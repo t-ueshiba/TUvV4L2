@@ -1,5 +1,5 @@
 /*
- *  $Id: XvDC.cc,v 1.4 2003-02-27 09:11:03 ueshiba Exp $
+ *  $Id: XvDC.cc,v 1.5 2007-10-23 02:27:07 ueshiba Exp $
  */
 #include "TU/v/XvDC.h"
 #include <stdexcept>
@@ -125,7 +125,7 @@ XvDC::operator <<(const Point2<int>& p)
 }
 
 DC&
-XvDC::operator <<(const LineP2<double>& l)
+XvDC::operator <<(const LineP2d& l)
 {
     ShmDC::operator <<(l);
     return *this;

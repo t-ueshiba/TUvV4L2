@@ -1,5 +1,5 @@
 /*
- *  $Id: Ransac++.h,v 1.1 2007-02-05 23:24:03 ueshiba Exp $
+ *  $Id: Ransac++.h,v 1.2 2007-10-23 02:27:07 ueshiba Exp $
  */
 #ifndef __TURansacPP_h
 #define __TURansacPP_h
@@ -32,7 +32,7 @@ namespace TU
   \verbatim
   1. メンバ関数
 	template <class Iterator>
-	void	Model::initialize(Iterator first, Iterator last);
+	void	Model::fit(Iterator first, Iterator last);
      によって点集合にモデルを当てはめることができる．
   2. 1.に必要な最少点数をメンバ関数
 	u_int	Model::ndataMin() const;
@@ -79,7 +79,7 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 	const Container&	minimalSet = pointSet.sample(model.ndataMin());
 
       // サンプルした点からモデルを生成する．
-	model.initialize(minimalSet.begin(), minimalSet.end());
+	model.fit(minimalSet.begin(), minimalSet.end());
 
       // 全点の中で生成したモデルに適合する(inlier)ものを集める．
 	inliers->clear();
@@ -93,7 +93,7 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 	    std::swap(inliers, inliersMax);
     }
   // 最大集合に含まれる点を真のinlierとし，それら全てからモデルを生成する．
-    model.initialize(inliersMax->begin(), inliersMax->end());
+    model.fit(inliersMax->begin(), inliersMax->end());
 
     return *inliersMax;
 }

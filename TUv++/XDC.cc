@@ -1,5 +1,5 @@
 /*
- *  $Id: XDC.cc,v 1.5 2004-07-15 20:18:12 ueshiba Exp $
+ *  $Id: XDC.cc,v 1.6 2007-10-23 02:27:07 ueshiba Exp $
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -276,7 +276,7 @@ XDC::operator <<(const Point2<int>& p)
 }
 
 DC&
-XDC::operator <<(const LineP2<double>& l)
+XDC::operator <<(const LineP2d& l)
 {
     if (fabs(l[0]) == 0.0 && fabs(l[1]) == 0.0)
 	return *this;

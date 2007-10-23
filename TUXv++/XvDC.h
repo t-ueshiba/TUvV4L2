@@ -1,5 +1,5 @@
 /*
- *  $Id: XvDC.h,v 1.2 2002-07-25 02:38:09 ueshiba Exp $
+ *  $Id: XvDC.h,v 1.3 2007-10-23 02:27:07 ueshiba Exp $
  */
 #ifndef __TUvXvDC_h
 #define __TUvXvDC_h
@@ -21,7 +21,7 @@ class XvDC : public ShmDC, public List<XvDC>::Node
     virtual		~XvDC()						;
     
     virtual DC&		operator <<(const Point2<int>& p)		;
-    virtual DC&		operator <<(const LineP2<double>& l)		;
+    virtual DC&		operator <<(const LineP2d& l)			;
     virtual DC&		operator <<(const Image<u_char>& image)		;
     virtual DC&		operator <<(const Image<short>&  image)		;
     virtual DC&		operator <<(const Image<BGR>&  image)		;
