@@ -1,5 +1,5 @@
 /*
- *  $Id: XDC.h,v 1.4 2007-02-06 23:31:02 ueshiba Exp $
+ *  $Id: XDC.h,v 1.5 2007-10-23 02:27:07 ueshiba Exp $
  */
 #ifndef __TUvXDC_h
 #define __TUvXDC_h
@@ -84,7 +84,7 @@ class XDC : public DC
 
     using		DC::operator <<;
     virtual DC&		operator <<(const Point2<int>& p)		;
-    virtual DC&		operator <<(const LineP2<double>& p)		;
+    virtual DC&		operator <<(const LineP2d& p)			;
     virtual DC&		operator <<(const Image<u_char>& image)		;
     virtual DC&		operator <<(const Image<s_char>& image)		;
     virtual DC&		operator <<(const Image<short>& image)		;
