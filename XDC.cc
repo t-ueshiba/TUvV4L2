@@ -1,5 +1,5 @@
 /*
- *  $Id: XDC.cc,v 1.6 2007-10-23 02:27:07 ueshiba Exp $
+ *  $Id: XDC.cc,v 1.7 2007-11-05 00:01:21 ueshiba Exp $
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -273,6 +273,12 @@ XDC::operator <<(const Point2<int>& p)
     }
     
     return *this;
+}
+
+DC&
+XDC::operator <<(const LineP2f& l)
+{
+    return operator <<(LineP2d(l));
 }
 
 DC&
