@@ -1,5 +1,5 @@
 /*
- *  $Id: DC.h,v 1.6 2007-10-23 02:27:07 ueshiba Exp $
+ *  $Id: DC.h,v 1.7 2007-11-05 00:01:21 ueshiba Exp $
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -55,7 +55,8 @@ class DC
     virtual DC&		operator <<(const Point2<int>& p)	= 0;
     template <class T>
 	    DC&		operator <<(const Point2<T>& p)		;
-    virtual DC&		operator <<(const LineP2d& p)		= 0;
+    virtual DC&		operator <<(const LineP2f& l)		= 0;
+    virtual DC&		operator <<(const LineP2d& l)		= 0;
     virtual DC&		operator <<(const Image<u_char>& image)	= 0;
     virtual DC&		operator <<(const Image<s_char>& image)	= 0;
     virtual DC&		operator <<(const Image<short>&  image)	= 0;
