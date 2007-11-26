@@ -1,5 +1,30 @@
 /*
- *  $Id: Geometry++.h,v 1.20 2007-10-23 02:27:06 ueshiba Exp $
+ *  平成19年（独）産業技術総合研究所 著作権所有
+ *  
+ *  創作者：植芝俊夫
+ *
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  同所が著作権を所有する秘密情報です．著作者による許可なしにこのプロ
+ *  グラムを第三者へ開示，複製，改変，使用する等の著作権を侵害する行為
+ *  を禁止します．
+ *  
+ *  このプログラムによって生じるいかなる損害に対しても、著作者は責任
+ *  を負いません。 
+ *
+ *  Copyright 2007
+ *  National Institute of Advanced Industrial Science and Technology (AIST)
+ *
+ *  Author: Toshio UESHIBA
+ *
+ *  Confidentail and all rights reserved.
+ *  This program is confidential. Any changing, copying or giving
+ *  information about the source code of any part of this software
+ *  and/or documents without permission by the authors are prohibited.
+ *
+ *  No Warranty.
+ *  Authors are not responsible for any damages in the use of this program.
+ *  
+ *  $Id: Geometry++.h,v 1.21 2007-11-26 07:28:09 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -754,8 +779,8 @@ AffineMapping::ndataMin() const
 ************************************************************************/
 //! d次元射影空間中の超平面を表現するクラス
 /*!
-  d次元射影空間の点\f$\TUud{x}{} \in \TUspace{R}{d+1}\f$に対して
-  \f$\TUtud{p}{}\TUud{x}{} = 0,~\TUud{p}{} \in \TUspace{R}{d+1}\f$
+  d次元射影空間の点\f$\TUud{x}{} \in \TUspace{R}{d+1}\f$に対して
+  \f$\TUtud{p}{}\TUud{x}{} = 0,~\TUud{p}{} \in \TUspace{R}{d+1}\f$
   によって表される．
 */
 template <class T, class B=Buf<T> >
@@ -766,7 +791,7 @@ class HyperPlane : public Vector<T, B>
 
   //! 同次座標ベクトルを指定して超平面オブジェクトを生成する．
   /*!
-    \param p	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
+    \param p	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
   */
     template <class T2, class B2>
     HyperPlane(const Vector<T2, B2>& p)	:Vector<T, B>(p)		{}
@@ -776,8 +801,8 @@ class HyperPlane : public Vector<T, B>
 
   //! 超平面オブジェクトの同次座標ベクトルを指定する．
   /*!
-    \param v	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
-    \return	この超平面オブジェクト
+    \param v	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
+    \return	この超平面オブジェクト
   */
     template <class T2, class B2>
     HyperPlane&	operator =(const Vector<T2, B2>& v)
@@ -788,14 +813,14 @@ class HyperPlane : public Vector<T, B>
 
   //! この超平面が存在する射影空間の次元を返す．
   /*! 
-    \return	射影空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
+    \return	射影空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
   */
     u_int	spaceDim()		const	{return Vector<T, B>::dim()-1;}
 
   //! 超平面を求めるために必要な点の最小個数を返す．
   /*!
     現在設定されている射影空間の次元をもとに計算される．
-    \return	必要な点の最小個数すなわち入力空間の次元#spaceDim()
+    \return	必要な点の最小個数すなわち入力空間の次元#spaceDim()
   */
     u_int	ndataMin()		const	{return spaceDim();}
 
@@ -808,7 +833,7 @@ class HyperPlane : public Vector<T, B>
 //! 空間の次元を指定して超平面オブジェクトを生成する．
 /*!
   無限遠超平面([0, 0,..., 0, 1])に初期化される．
-  \param d	この超平面が存在する射影空間の次元
+  \param d	この超平面が存在する射影空間の次元
 */
 template <class T, class B> inline
 HyperPlane<T, B>::HyperPlane(u_int d)
@@ -819,9 +844,9 @@ HyperPlane<T, B>::HyperPlane(u_int d)
     
 //! 与えられた点列の非同次座標に当てはめられた超平面オブジェクトを生成する．
 /*!
-  \param first			点列の先頭を示す反復子
-  \param last			点列の末尾を示す反復子
-  \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
+  \param first			点列の先頭を示す反復子
+  \param last			点列の末尾を示す反復子
+  \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
 */
 template <class T, class B> template <class Iterator> inline
 HyperPlane<T, B>::HyperPlane(Iterator first, Iterator last)
@@ -831,9 +856,9 @@ HyperPlane<T, B>::HyperPlane(Iterator first, Iterator last)
 
 //! 与えられた点列の非同次座標に超平面を当てはめる．
 /*!
-  \param first			点列の先頭を示す反復子
-  \param last			点列の末尾を示す反復子
-  \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
+  \param first			点列の先頭を示す反復子
+  \param last			点列の末尾を示す反復子
+  \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
 */
 template <class T, class B> template <class Iterator> void
 HyperPlane<T, B>::fit(Iterator first, Iterator last)
@@ -868,9 +893,9 @@ HyperPlane<T, B>::fit(Iterator first, Iterator last)
 
 //! 与えられた点と超平面の距離の2乗を返す．
 /*!
-  \param x	点の非同次座標（#spaceDim()次元）または同次座標
+  \param x	点の非同次座標（#spaceDim()次元）または同次座標
 		（#spaceDim()+1次元）
-  \return	点と超平面の距離の2乗
+  \return	点と超平面の距離の2乗
 */
 template <class T, class B> template <class T2, class B2> inline T
 HyperPlane<T, B>::sqdist(const Vector<T2, B2>& x) const
@@ -881,29 +906,24 @@ HyperPlane<T, B>::sqdist(const Vector<T2, B2>& x) const
 
 //! 与えられた点と超平面の距離を返す．
 /*!
-  \param x			点の非同次座標（#spaceDim()次元）または
+  \param x			点の非同次座標（#spaceDim()次元）または
 				同次座標（#spaceDim()+1次元）
-  \return			点と超平面の距離（非負）
-  \throw std::invalid_argument	点のベクトルとしての次元が#spaceDim()，
+  \return			点と超平面の距離（非負）
+  \throw std::invalid_argument	点のベクトルとしての次元が#spaceDim()，
 				#spaceDim()+1のいずれでもない場合，もしくは
 				この点が無限遠点である場合に送出．
 */
 template <class T, class B> template <class T2, class B2> double
 HyperPlane<T, B>::dist(const Vector<T2, B2>& x) const
 {
+    const Vector<T2>&	p = (*this)(0, spaceDim());
     if (x.dim() == spaceDim())
-    {
-	Vector<T2>	xx(spaceDim()+1);
-	xx(0, spaceDim()) = x;
-	xx[spaceDim()] = 1;
-	return fabs((*this * xx)/(*this)(0, spaceDim()).length());
-    }
+	return (p * x + (*this)[spaceDim()]) / p.length();
     else if (x.dim() == spaceDim() + 1)
     {
 	if (x[spaceDim()] == 0.0)
 	    throw std::invalid_argument("HyperPlane::dist(): point at infinitiy!!");
-	return fabs(((*this) * x)/
-		    ((*this)(0, spaceDim()).length() * x[spaceDim()]));
+	return (*this * x) / (p.length() * x[spaceDim()]);
     }
     else
 	throw std::invalid_argument("HyperPlane::dist(): dimension mismatch!!");

@@ -1,26 +1,30 @@
 /*
- *  平9年 電子技術総合研究所 植芝俊夫 著作権所有
+ *  平成19年（独）産業技術総合研究所 著作権所有
+ *  
+ *  創作者：植芝俊夫
  *
- *  著作者による許可なしにこのプログラムの第三者への開示、複製、改変、
- *  使用等その他の著作人格権を侵害する行為を禁止します。
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  同所が著作権を所有する秘密情報です．著作者による許可なしにこのプロ
+ *  グラムを第三者へ開示，複製，改変，使用する等の著作権を侵害する行為
+ *  を禁止します．
+ *  
  *  このプログラムによって生じるいかなる損害に対しても、著作者は責任
  *  を負いません。 
  *
+ *  Copyright 2007
+ *  National Institute of Advanced Industrial Science and Technology (AIST)
  *
- *  Copyright 1996
- *  Toshio UESHIBA, Electrotechnical Laboratory
+ *  Author: Toshio UESHIBA
  *
- *  All rights reserved.
- *  Any changing, copying or giving information about source programs of
- *  any part of this software and/or documentation without permission of the
- *  authors are prohibited.
+ *  Confidentail and all rights reserved.
+ *  This program is confidential. Any changing, copying or giving
+ *  information about the source code of any part of this software
+ *  and/or documents without permission by the authors are prohibited.
  *
  *  No Warranty.
- *  Authors are not responsible for any damage in use of this program.
- */
-
-/*
- *  $Id: Image++.h,v 1.27 2007-07-25 23:43:13 ueshiba Exp $
+ *  Authors are not responsible for any damages in the use of this program.
+ *  
+ *  $Id: Image++.h,v 1.28 2007-11-26 07:28:09 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -409,6 +413,8 @@ class ImageLine : public Array<T>
 			}
 
     using		Array<T>::dim;
+    template <class S>
+    S			at(S uf)		const	;
     const YUV422*	fill(const YUV422* src)		;
     const YUV411*	fill(const YUV411* src)		;
     const T*		fill(const T* src)		;
@@ -428,6 +434,15 @@ class ImageLine : public Array<T>
     int			_lmost;
     int			_rmost;
 };
+
+template <class T> template <class S> inline S
+ImageLine<T>::at(S uf) const
+{
+    const int	u   = floor(uf);
+    const S	du  = uf - u;
+    const T	*in = &(*this)[u];
+    return *in + du*(*(in + 1) - *in);
+}
 
 template <class T> inline const T*
 ImageLine<T>::fill(const T* src)
@@ -619,11 +634,9 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
 template <class T, class B> template <class S> inline S
 Image<T, B>::at(const Point2<S>& p) const
 {
-    const int	u  = floor(p[0]), v  = floor(p[1]);
-    const S	du = p[0] - u,	  dv = p[1] - v;
-    const T	*in0 = &(*this)[v][u], *in1 = &(*this)[v+1][u];
-    const S	out0 = *in0 + du*(*(in0 + 1) - *in0),
-		out1 = *in1 + du*(*(in1 + 1) - *in1);
+    const int	v  = floor(p[1]);
+    const S	dv = p[1] - v;
+    const S	out0 = (*this)[v].at(p[0]), out1 = (*this)[v+1].at(p[0]);
     return out0 + dv * (out1 - out0);
 }
 
