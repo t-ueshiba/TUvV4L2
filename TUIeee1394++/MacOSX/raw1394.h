@@ -19,11 +19,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- *  $Id: raw1394.h,v 1.6 2007-01-19 02:27:48 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.7 2007-11-26 08:14:17 ueshiba Exp $
  */
 /*!
  \file
- \brief	libraw1394‚ÉŒİŠ·‚È‹@”\‚ğMacOS Xã‚Å’ñ‹Ÿ‚·‚éƒGƒ~ƒ…ƒŒ[ƒVƒ‡ƒ“ƒ‰ƒCƒuƒ‰ƒŠ
+ \brief	libraw1394$B$K8_49$J5!G=$r(BMacOS X$B>e$GDs6!$9$k%(%_%e%l!<%7%g%s%i%$%V%i%j(B
 */
 #ifndef _LIBRAW1394_RAW1394_H
 #define _LIBRAW1394_RAW1394_H
@@ -36,51 +36,51 @@ extern "C" {
 /************************************************************************
 *  type definitions							*
 ************************************************************************/
-/*! ::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹ */
+/*! ::raw1394$B9=B$BN$X$N%O%s%I%k(B */
 typedef struct raw1394*		raw1394handle_t;
 
 typedef unsigned short		nodeid_t;
 typedef unsigned long long	nodeaddr_t;
 
-/*! asynchronous“]‘—ƒf[ƒ^‚Ì’PˆÊ(4 bytes) */
+/*! asynchronous$BE>Aw%G!<%?$NC10L(B(4 bytes) */
 typedef unsigned long		quadlet_t;
 
-/*! ishochronous‘—/óMƒnƒ“ƒhƒ‰‚ÌI—¹ó‘Ô‚ğ•\‚µC‚³‚ç‚É‚±‚ê‚ğŒÄ‚ñ‚¾
-    raw1394_loop_iterate()‚É‚Ç‚Ì‚æ‚¤‚Èˆ—‚ğ‚³‚¹‚é‚©‚ğw’è‚·‚éƒR[ƒh
+/*! ishochronous$BAw(B/$B<u?.%O%s%I%i$N=*N;>uBV$rI=$7!$$5$i$K$3$l$r8F$s$@(B
+    raw1394_loop_iterate()$B$K$I$N$h$&$J=hM}$r$5$;$k$+$r;XDj$9$k%3!<%I(B
 */
 enum raw1394_iso_disposition
 {
-  /*! ƒnƒ“ƒhƒ‰‚Í³í‚ÉI—¹CŸ‚ÌƒpƒPƒbƒg‚ğˆ—. */
+  /*! $B%O%s%I%i$O@5>o$K=*N;!$<!$N%Q%1%C%H$r=hM}(B. */
     RAW1394_ISO_OK		= 0,
-  /*! ƒnƒ“ƒhƒ‰‚Í³í‚ÉI—¹C#raw1394_loop_iterate()‚©‚ç’¼‚¿‚ÉƒŠƒ^[ƒ“ */
+  /*! $B%O%s%I%i$O@5>o$K=*N;!$(B#raw1394_loop_iterate()$B$+$iD>$A$K%j%?!<%s(B */
     RAW1394_ISO_DEFER		= 1,
-  /*! ƒnƒ“ƒhƒ‰‚ÉƒGƒ‰[‚ª”­¶C#raw1394_loop_iterate()‚©‚ç’¼‚¿‚ÉƒŠƒ^[ƒ“ */
+  /*! $B%O%s%I%i$K%(%i!<$,H/@8!$(B#raw1394_loop_iterate()$B$+$iD>$A$K%j%?!<%s(B */
     RAW1394_ISO_ERROR		= 2,
-  /*! #raw1394_loop_iterate()‚©‚ç’¼‚¿‚ÉƒŠƒ^[ƒ“‚µ‚ÄisochronousóM‚ğ’â~ */
+  /*! #raw1394_loop_iterate()$B$+$iD>$A$K%j%?!<%s$7$F(Bisochronous$B<u?.$rDd;_(B */
     RAW1394_ISO_STOP		= 3,
-  /*! (isochronous‘—M‚Ì‚İg—p) */
+  /*! (isochronous$BAw?.;~$N$_;HMQ(B) */
     RAW1394_ISO_STOP_NOSYNC	= 4,
-  /*! (isochronous‘—M‚Ì‚İg—p) */
+  /*! (isochronous$BAw?.;~$N$_;HMQ(B) */
     RAW1394_ISO_AGAIN		= 5
 };
 
-/*! isochronousóM‚Ìƒ‚[ƒh */    
+/*! isochronous$B<u?.$N%b!<%I(B */    
 enum raw1394_iso_dma_recv_mode
 {
-    RAW1394_DMA_DEFAULT		  = -1,	/*!< ƒfƒtƒHƒ‹ƒgƒ‚[ƒh */
-    RAW1394_DMA_BUFFERFILL	  =  1,	/*!< BUFFER_FILLƒ‚[ƒh */
-    RAW1394_DMA_PACKET_PER_BUFFER =  2	/*!< PACKET_PER_BUFFERƒ‚[ƒh */
+    RAW1394_DMA_DEFAULT		  = -1,	/*!< $B%G%U%)%k%H%b!<%I(B */
+    RAW1394_DMA_BUFFERFILL	  =  1,	/*!< BUFFER_FILL$B%b!<%I(B */
+    RAW1394_DMA_PACKET_PER_BUFFER =  2	/*!< PACKET_PER_BUFFER$B%b!<%I(B */
 };
 
-/*! ƒJ[ƒlƒ‹‚ªóM‚µ‚½ŠeƒpƒPƒbƒg‚É‘Î‚µ‚ÄÀs‚³‚ê‚éƒnƒ“ƒhƒ‰
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \param data		ƒpƒPƒbƒg’†‚Ìƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^(ƒwƒbƒ_ŠÜ‚Ü‚¸)
-  \param len		ƒpƒPƒbƒg’†‚Ìƒf[ƒ^‚ÌƒoƒCƒg”(ƒwƒbƒ_ŠÜ‚Ü‚¸)
-  \param channel	isochronousóM‚Ìƒ`ƒƒƒ“ƒlƒ‹
-  \param tag		ƒpƒPƒbƒg‚Ìƒwƒbƒ_’†‚Ìtagƒrƒbƒg
-  \param sy		ƒpƒPƒbƒg‚Ìƒwƒbƒ_’†‚Ìsyƒrƒbƒg
-  \param cycle		ƒpƒPƒbƒg‚Ìcycle”Ô†
-  \param dropped	‚Æ‚è‚±‚Ú‚µ‚½ƒpƒPƒbƒg”
+/*! $B%+!<%M%k$,<u?.$7$?3F%Q%1%C%H$KBP$7$F<B9T$5$l$k%O%s%I%i(B
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \param data		$B%Q%1%C%HCf$N%G!<%?$X$N%]%$%s%?(B($B%X%C%@4^$^$:(B)
+  \param len		$B%Q%1%C%HCf$N%G!<%?$N%P%$%H?t(B($B%X%C%@4^$^$:(B)
+  \param channel	isochronous$B<u?.$N%A%c%s%M%k(B
+  \param tag		$B%Q%1%C%H$N%X%C%@Cf$N(Btag$B%S%C%H(B
+  \param sy		$B%Q%1%C%H$N%X%C%@Cf$N(Bsy$B%S%C%H(B
+  \param cycle		$B%Q%1%C%H$N(Bcycle$BHV9f(B
+  \param dropped	$B$H$j$3$\$7$?%Q%1%C%H?t(B
   \return
 */
 typedef raw1394_iso_disposition	(*raw1394_iso_recv_handler_t)(
@@ -96,87 +96,87 @@ typedef raw1394_iso_disposition	(*raw1394_iso_recv_handler_t)(
 /************************************************************************
 *  wrapper C functions							*
 ************************************************************************/
-//! IEEE1394ƒCƒ“ƒ^[ƒtƒF[ƒX‚Å‚ ‚é::raw1394\‘¢‘Ì‚ğ¶¬‚·‚é
+//! IEEE1394$B%$%s%?!<%U%'!<%9$G$"$k(B::raw1394$B9=B$BN$r@8@.$9$k(B
 /*!
-  \param unit_spec_ID	‚±‚Ì\‘¢‘Ì‚ª•\‚·IEEE1394ƒm[ƒh‚Ìí—Ş‚ğ¦‚·ID
-  \param uniqId		ŒÂX‚Ì‹@ŠíŒÅ—L‚Ì64bit ID
-  \return		¶¬‚³‚ê‚½::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
+  \param unit_spec_ID	$B$3$N9=B$BN$,I=$9(BIEEE1394$B%N!<%I$N<oN`$r<($9(BID
+  \param uniqId		$B8D!9$N5!4o8GM-$N(B64bit ID
+  \return		$B@8@.$5$l$?(B::raw1394$B9=B$BN$X$N%O%s%I%k(B
 */
 raw1394handle_t
 	raw1394_new_handle(unsigned int unit_spec_ID,
 			   unsigned long long uniqId);
 
-//! IEEE1394ƒCƒ“ƒ^[ƒtƒF[ƒX‚Å‚ ‚é::raw1394\‘¢‘Ì‚ğ”j‰ó‚·‚é
+//! IEEE1394$B%$%s%?!<%U%'!<%9$G$"$k(B::raw1394$B9=B$BN$rGK2u$9$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
 */
 void	raw1394_destroy_handle(raw1394handle_t handle);
 
-//! ::raw1394\‘¢‘Ì‚Éƒ†[ƒU‚ªw’è‚µ‚½ƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ“\•t‚¯‚é
+//! ::raw1394$B9=B$BN$K%f!<%6$,;XDj$7$?%G!<%?$X$N%]%$%s%?$rE=IU$1$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \param data		“\•t‚¯‚½‚¢ƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \param data		$BE=IU$1$?$$%G!<%?$X$N%]%$%s%?(B
 */
 void	raw1394_set_userdata(raw1394handle_t handle, void* data);
 
-//! ::raw1394\‘¢‘Ì‚É“\•t‚¯‚½ƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ“¾‚é
+//! ::raw1394$B9=B$BN$KE=IU$1$?%G!<%?$X$N%]%$%s%?$rF@$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \return		“\•t‚¯‚½ƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \return		$BE=IU$1$?%G!<%?$X$N%]%$%s%?(B
 */
 void*	raw1394_get_userdata(raw1394handle_t handle);
 
-//! ::raw1394\‘¢‘Ì‚ª•\‚·ƒm[ƒh‚ÌƒRƒ}ƒ“ƒhƒŒƒWƒXƒ^‚Ìƒx[ƒXƒAƒhƒŒƒX‚ğ•Ô‚·
+//! ::raw1394$B9=B$BN$,I=$9%N!<%I$N%3%^%s%I%l%8%9%?$N%Y!<%9%"%I%l%9$rJV$9(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \return		ƒRƒ}ƒ“ƒhƒŒƒWƒXƒ^‚Ìƒx[ƒXƒAƒhƒŒƒX
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \return		$B%3%^%s%I%l%8%9%?$N%Y!<%9%"%I%l%9(B
 */
 nodeaddr_t
 	raw1394_command_register_base(raw1394handle_t handle);
 
-//! w’è‚µ‚½FireWireƒAƒhƒŒƒX‚©‚ç”CˆÓƒoƒCƒg”‚Ìƒf[ƒ^‚ğasynchronous“]‘—‚Å“Ç‚İ‚Ş
+//! $B;XDj$7$?(BFireWire$B%"%I%l%9$+$iG$0U%P%$%H?t$N%G!<%?$r(Basynchronous$BE>Aw$GFI$_9~$`(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \param node		(ƒ_ƒ~[ˆø”)
-  \param addr		“Ç‚İ‚İŒ³‚ÌFireWireƒAƒhƒŒƒX
-  \param length		“Ç‚İ‚İƒf[ƒ^‚ÌƒoƒCƒg”
-  \param quad		“Ç‚İ‚İæ‚Ìƒoƒbƒtƒ@ƒAƒhƒŒƒX
-  \return		“Ç‚İ‚İ‚ª¬Œ÷‚·‚ê‚Î0C‚»‚¤‚Å‚È‚¯‚ê‚Î-1
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \param node		($B%@%_!<0z?t(B)
+  \param addr		$BFI$_9~$_85$N(BFireWire$B%"%I%l%9(B
+  \param length		$BFI$_9~$_%G!<%?$N%P%$%H?t(B
+  \param quad		$BFI$_9~$_@h$N%P%C%U%!%"%I%l%9(B
+  \return		$BFI$_9~$_$,@.8y$9$l$P(B0$B!$$=$&$G$J$1$l$P(B-1
 */
 int	raw1394_read(raw1394handle_t handle, nodeid_t node,
 		     nodeaddr_t addr, size_t length, quadlet_t* quad);
 
-//! w’è‚µ‚½FireWireƒAƒhƒŒƒX‚É”CˆÓƒoƒCƒg”‚Ìƒf[ƒ^‚ğasynchronous“]‘—‚Å‘‚«‚Ş
+//! $B;XDj$7$?(BFireWire$B%"%I%l%9$KG$0U%P%$%H?t$N%G!<%?$r(Basynchronous$BE>Aw$G=q$-9~$`(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \param node		(ƒ_ƒ~[ˆø”)
-  \param addr		‘‚«‚İæ‚ÌFireWireƒAƒhƒŒƒX
-  \param length		‘‚«‚İƒf[ƒ^‚ÌƒoƒCƒg”
-  \param quad		‘‚«‚İŒ³‚Ìƒoƒbƒtƒ@ƒAƒhƒŒƒX
-  \return		‘‚«‚İ‚ª¬Œ÷‚·‚ê‚Î0C‚»‚¤‚Å‚È‚¯‚ê‚Î-1
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \param node		($B%@%_!<0z?t(B)
+  \param addr		$B=q$-9~$_@h$N(BFireWire$B%"%I%l%9(B
+  \param length		$B=q$-9~$_%G!<%?$N%P%$%H?t(B
+  \param quad		$B=q$-9~$_85$N%P%C%U%!%"%I%l%9(B
+  \return		$B=q$-9~$_$,@.8y$9$l$P(B0$B!$$=$&$G$J$1$l$P(B-1
 */
 int	raw1394_write(raw1394handle_t handle, nodeid_t node,
 		      nodeaddr_t addr, size_t length, quadlet_t* quad);
 
-//! isochronous“]‘—‚Ìƒ‹[ƒv‚ğ1‰ñÀs‚·‚é
+//! isochronous$BE>Aw$N%k!<%W$r(B1$B2s<B9T$9$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \return		ƒ‹[ƒv‚ÌÀs‚ª³í‚ÉI—¹‚·‚ê‚Î0C‚»‚¤‚Å‚È‚¯‚ê‚Î-1
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \return		$B%k!<%W$N<B9T$,@5>o$K=*N;$9$l$P(B0$B!$$=$&$G$J$1$l$P(B-1
 */
 int	raw1394_loop_iterate(raw1394handle_t handle);
 
-//! isochronousóM‚Ì‰Šúİ’è‚ğs‚¤
+//! isochronous$B<u?.$N=i4|@_Dj$r9T$&(B
 /*!
-  \param handle			::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \param handler		ƒJ[ƒlƒ‹‚ªóM‚µ‚½ŠeƒpƒPƒbƒg‚É‘Î‚µ‚ÄÀs‚³‚ê‚é
-				ƒnƒ“ƒhƒ‰
-  \param buf_packets		óM‚·‚éƒpƒPƒbƒg”
-  \param max_packet_size	óMƒpƒPƒbƒg‚ÌÅ‘åƒoƒCƒg”
-  \param channel		ishochronousóM‚Ìƒ`ƒƒƒ“ƒlƒ‹
-  \param mode			(ƒ_ƒ~[ˆø”)
-  \param irq_interval		ƒJ[ƒlƒ‹‚ªŠ„‚è‚İ‚ğ‚©‚¯‚éŠÔŠu‚ğw’è‚·‚é
-				ƒpƒPƒbƒg”
-  \return			‰Šúİ’è‚ª¬Œ÷‚·‚ê‚Î0C‚»‚¤‚Å‚È‚¯‚ê‚Î-1
+  \param handle			::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \param handler		$B%+!<%M%k$,<u?.$7$?3F%Q%1%C%H$KBP$7$F<B9T$5$l$k(B
+				$B%O%s%I%i(B
+  \param buf_packets		$B<u?.$9$k%Q%1%C%H?t(B
+  \param max_packet_size	$B<u?.%Q%1%C%H$N:GBg%P%$%H?t(B
+  \param channel		ishochronous$B<u?.$N%A%c%s%M%k(B
+  \param mode			($B%@%_!<0z?t(B)
+  \param irq_interval		$B%+!<%M%k$,3d$j9~$_$r$+$1$k4V3V$r;XDj$9$k(B
+				$B%Q%1%C%H?t(B
+  \return			$B=i4|@_Dj$,@.8y$9$l$P(B0$B!$$=$&$G$J$1$l$P(B-1
 */
 int	raw1394_iso_recv_init(raw1394handle_t		     handle,
 			      raw1394_iso_recv_handler_t     handler,
@@ -186,33 +186,33 @@ int	raw1394_iso_recv_init(raw1394handle_t		     handle,
 			      raw1394_iso_dma_recv_mode	     mode,
 			      int			     irq_interval);
 
-//! isochronous“]‘—‚ğ’â~‚µ‚Ä•K—v‚ÈƒŠƒ\[ƒX‚ğ‰ğ•ú‚·‚é
+//! isochronous$BE>Aw$rDd;_$7$FI,MW$J%j%=!<%9$r2rJ|$9$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
 */
 void	raw1394_iso_shutdown(raw1394handle_t handle);
 
-//! isochronousóM‚ğŠJn‚·‚é
+//! isochronous$B<u?.$r3+;O$9$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \param start_on_cycle	(ƒ_ƒ~[ˆø”)
-  \param tag_mask	(ƒ_ƒ~[ˆø”)
-  \param sync		(ƒ_ƒ~[ˆø”)
-  \return		ŠJn‚ª¬Œ÷‚·‚ê‚Î0C‚»‚¤‚Å‚È‚¯‚ê‚Î-1
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \param start_on_cycle	($B%@%_!<0z?t(B)
+  \param tag_mask	($B%@%_!<0z?t(B)
+  \param sync		($B%@%_!<0z?t(B)
+  \return		$B3+;O$,@.8y$9$l$P(B0$B!$$=$&$G$J$1$l$P(B-1
 */
 int	raw1394_iso_recv_start(raw1394handle_t handle,
 			       int start_on_cycle, int tag_mask,
 			       int sync);
-//! isochronousóM‚ğ’â~‚·‚é
+//! isochronous$B<u?.$rDd;_$9$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
 */
 void	raw1394_iso_stop(raw1394handle_t handle);
 
-//! ƒJ[ƒlƒ‹‹óŠÔ‚É•Û‚³‚ê‚Ä‚¢‚éisochronousóMƒf[ƒ^‚ğƒ†[ƒU‹óŠÔ‚É“]‘—‚·‚é
+//! $B%+!<%M%k6u4V$KJ];}$5$l$F$$$k(Bisochronous$B<u?.%G!<%?$r%f!<%66u4V$KE>Aw$9$k(B
 /*!
-  \param handle		::raw1394\‘¢‘Ì‚Ö‚Ìƒnƒ“ƒhƒ‹
-  \return		“]‘—‚ª¬Œ÷‚·‚ê‚Î0, ‚»‚¤‚Å‚È‚¯‚ê‚Î-1
+  \param handle		::raw1394$B9=B$BN$X$N%O%s%I%k(B
+  \return		$BE>Aw$,@.8y$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
 */
 int	raw1394_iso_recv_flush(raw1394handle_t handle);
 
