@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.46 2007-11-29 07:06:36 ueshiba Exp $
+#  $Id: Makefile,v 1.47 2007-12-20 04:11:34 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,7 +14,7 @@ CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
 ifeq ($(CCC), icpc)
-  CPPFLAGS     += -DSSE2
+  CPPFLAGS     += -DSSE3
   CFLAGS	= -O3 -parallel
   CCFLAGS	= $(CFLAGS)
 endif
@@ -54,7 +54,6 @@ HDRS		= Allocator++.h \
 		BlockMatrix++.h \
 		Geometry++.h \
 		Heap++.h \
-		Image++.ORG.h \
 		Image++.h \
 		List++.h \
 		Manip.h \
@@ -147,7 +146,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.46 $	|		\
+REV		= $(shell echo $Revision: 1.47 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
