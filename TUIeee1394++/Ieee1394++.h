@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.18 2007-01-19 02:28:07 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.19 2008-03-06 06:00:48 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -32,6 +32,7 @@
 #else
 #  include <map>
 #  if defined(USE_VIDEO1394)
+#    define __user
 #    include <video1394.h>
 #  endif
 #endif
