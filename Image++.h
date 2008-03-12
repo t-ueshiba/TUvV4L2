@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.h,v 1.31 2007-12-20 04:11:34 ueshiba Exp $
+ *  $Id: Image++.h,v 1.32 2008-03-12 00:12:34 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -697,6 +697,46 @@ template <> inline void
 Image<YUV411, Buf<YUV411> >::resize(YUV411* p, u_int h, u_int w)
 {
     Array2<ImageLine<YUV411>, Buf<YUV411> >::resize(p, h, w/2);
+}
+
+/************************************************************************
+*  class GenericImage							*
+************************************************************************/
+//! 画素の型を問わない総称画像クラス
+/*!
+  個々の行や画素にアクセスすることはできない．
+*/
+class GenericImage : public Array2<Array<u_char> >, public ImageBase
+{
+  public:
+    GenericImage() :_type(U_CHAR)					{}
+    
+    std::istream&	restore(std::istream& in)			;
+    std::ostream&	save(std::ostream& out)			const	;
+    std::istream&	restoreData(std::istream& in)			;
+    std::ostream&	saveData(std::ostream& out)		const	;
+    
+  private:
+    virtual u_int	_width()				const	;
+    virtual u_int	_height()				const	;
+    virtual void	_resize(u_int h, u_int w,
+				ImageBase::Type type)			;
+
+    ImageBase::Type	_type;
+};
+
+inline std::istream&
+GenericImage::restore(std::istream& in)
+{
+    _type = restoreHeader(in);
+    return restoreData(in);
+}
+
+inline std::ostream&
+GenericImage::save(std::ostream& out) const
+{
+    saveHeader(out, _type);
+    return saveData(out);
 }
 
 /************************************************************************
