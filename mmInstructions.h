@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: mmInstructions.h,v 1.4 2007-11-29 07:06:37 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.5 2008-03-24 00:48:37 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -145,38 +145,49 @@ namespace TU
   static inline mmInt	mmSet32(int y, int x)	   {return _mm_set_pi32(y, x);}
   static inline mmInt	mmSetRMost(short x)	   {return _mm_set_pi16(
 							0, 0, 0, x);}
-  static inline mmInt	mmPack(mmInt x, mmInt y)   {return _m_packsswb(x, y);}
-  static inline mmInt	mmPackUS(mmInt x, mmInt y) {return _m_packuswb(x, y);}
-  static inline mmInt	mmPack32(mmInt x, mmInt y) {return _m_packssdw(x, y);}
+  static inline mmInt	mmPack(mmInt x, mmInt y)   {return _mm_packs_pi16(
+							x, y);}
+  static inline mmInt	mmPackUS(mmInt x, mmInt y) {return _mm_packs_pu16(
+							x, y);}
+  static inline mmInt	mmPack32(mmInt x, mmInt y) {return _mm_packs_pi32(
+							x, y);}
   static inline mmInt	mmUnpackL8(mmInt x,
-				   mmInt y)	   {return _m_punpcklbw(x, y);}
+				   mmInt y)	   {return _mm_unpacklo_pi8(
+							x, y);}
   static inline mmInt	mmUnpackH8(mmInt x,
-				   mmInt y)	   {return _m_punpckhbw(x, y);}
-  static inline mmInt	mmUnpackL(mmInt x, mmInt y){return _m_punpcklwd(x, y);}
-  static inline mmInt	mmUnpackH(mmInt x, mmInt y){return _m_punpckhwd(x, y);}
+				   mmInt y)	   {return _mm_unpackhi_pi8(
+							x, y);}
+  static inline mmInt	mmUnpackL(mmInt x, mmInt y){return _mm_unpacklo_pi16(
+							x, y);}
+  static inline mmInt	mmUnpackH(mmInt x, mmInt y){return _mm_unpackhi_pi16(
+							x, y);}
   static inline mmInt	mmUnpackL32(mmInt x,
-				    mmInt y)	   {return _m_punpckldq(x, y);}
+				    mmInt y)	   {return _mm_unpacklo_pi32(
+							x, y);}
   static inline mmInt	mmUnpackH32(mmInt x,
-				    mmInt y)	   {return _m_punpckhdq(x, y);}
-  static inline mmInt	mmAnd(mmInt x, mmInt y)    {return _m_pand(x, y);}
-  static inline mmInt	mmAndNot(mmInt x, mmInt y) {return _m_pandn(x, y);}
-  static inline mmInt	mmOr(mmInt x, mmInt y)     {return _m_por(x, y);}
-  static inline mmInt	mmXor(mmInt x, mmInt y)    {return _m_pxor(x, y);}
-  static inline mmInt	mmAdd(mmInt x, mmInt y)	   {return _m_paddsw(x, y);}
-  static inline mmInt	mmSub(mmInt x, mmInt y)	   {return _m_psubsw(x, y);}
-  static inline mmInt	mmAvg(mmInt x, mmInt y)	   {return _m_psrawi(
+				    mmInt y)	   {return _mm_unpackhi_pi32(
+							x, y);}
+  static inline mmInt	mmAnd(mmInt x, mmInt y)    {return _mm_and_si64(x, y);}
+  static inline mmInt	mmAndNot(mmInt x, mmInt y) {return _mm_andnot_si64(
+							x, y);}
+  static inline mmInt	mmOr(mmInt x, mmInt y)     {return _mm_or_si64(x, y);}
+  static inline mmInt	mmXor(mmInt x, mmInt y)    {return _mm_xor_si64(x, y);}
+  static inline mmInt	mmAdd(mmInt x, mmInt y)	   {return _mm_adds_pi16(x, y);}
+  static inline mmInt	mmSub(mmInt x, mmInt y)	   {return _mm_subs_pi16(x, y);}
+  static inline mmInt	mmAvg(mmInt x, mmInt y)	   {return _mm_srai_pi16(
 							mmAdd(x, y), 1);}
-  static inline mmInt	mmSubAvg(mmInt x, mmInt y) {return _m_psrawi(
+  static inline mmInt	mmSubAvg(mmInt x, mmInt y) {return _mm_srai_pi16(
 							mmSub(x, y), 1);}
-  static inline mmInt	mmCmpLE(mmInt x, mmInt y)  {return _m_pcmpgtw(y, x);}
-  static inline mmInt	mmAdd8(mmInt x, mmInt y)   {return _m_paddusb(x, y);}
-  static inline mmInt	mmSub8(mmInt x, mmInt y)   {return _m_psubusb(x, y);}
+  static inline mmInt	mmCmpLE(mmInt x, mmInt y)  {return _mm_cmpgt_pi16(
+							y, x);}
+  static inline mmInt	mmAdd8(mmInt x, mmInt y)   {return _mm_adds_pu8(x, y);}
+  static inline mmInt	mmSub8(mmInt x, mmInt y)   {return _mm_subs_pu8(x, y);}
 #  if defined(SSE)
-  static inline mmInt	mmMax(mmInt x, mmInt y)	   {return _m_pmaxsw(x, y);}
-  static inline mmInt	mmMin(mmInt x, mmInt y)	   {return _m_pminsw(x, y);}
-  static inline mmInt	mmAvg8(mmInt x, mmInt y)   {return _m_pavgb(x, y);}
-  static inline mmInt	mmMax8(mmInt x, mmInt y)   {return _m_pmaxub(x, y);}
-  static inline mmInt	mmMin8(mmInt x, mmInt y)   {return _m_pminub(x, y);}
+  static inline mmInt	mmMax(mmInt x, mmInt y)	   {return _mm_max_pi16(x, y);}
+  static inline mmInt	mmMin(mmInt x, mmInt y)	   {return _mm_min_pi16(x, y);}
+  static inline mmInt	mmAvg8(mmInt x, mmInt y)   {return _mm_avg_pu8(x, y);}
+  static inline mmInt	mmMax8(mmInt x, mmInt y)   {return _mm_max_pu8(x, y);}
+  static inline mmInt	mmMin8(mmInt x, mmInt y)   {return _mm_min_pu8(x, y);}
 #  else
   static inline mmInt	mmMax(mmInt x, mmInt y)
 			{
@@ -197,12 +208,12 @@ namespace TU
 			}
   static inline mmInt	mmMax8(mmInt x, mmInt y)
 			{
-			    mmInt	mask = _m_pcmpgtb(x, y);
+			    mmInt	mask = _mm_cmpgt_pi8(x, y);
 			    return mmOr(mmAnd(mask, x), mmAndNot(mask, y));
 			}
   static inline mmInt	mmMin8(mmInt x, mmInt y)
 			{
-			    mmInt	mask = _m_pcmpgtb(y, x);
+			    mmInt	mask = _mm_cmpgt_pi8(y, x);
 			    return mmOr(mmAnd(mask, x), mmAndNot(mask, y));
 			}
 #  endif
@@ -241,7 +252,7 @@ namespace TU
   static inline mmFlt	mmToFlt(mmInt x)	    {return _mm_cvtpi16_ps(x);}
   static inline mmFlt	mmToFlt0(mmInt x)	    {return _mm_cvtpu8_ps(x);}
   static inline mmFlt	mmToFlt1(mmInt x)	    {return _mm_cvtpu8_ps(
-						      _m_psrlqi(x, 32));}
+						      _mm_srli_si64(x, 32));}
   static inline mmInt	mmToIntF(mmFlt x)	    {return _mm_cvtps_pi16(x);}
   static inline mmInt	mmToInt8F(mmFlt x)	    {return _mm_cvtps_pi8(x);}
 #  endif
