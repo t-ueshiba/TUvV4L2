@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: mmInstructions.h,v 1.5 2008-03-24 00:48:37 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.6 2008-05-13 01:43:35 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -243,7 +243,9 @@ namespace TU
 						     _mm_movepi64_pi64(
 						      _mm_srli_si128(x, 12)));}
   static inline mmFlt	mmToFlt32(mmInt x)	    {return
-							_mm_cvtepi32_ps(x);}
+							 _mm_cvtepi32_ps(x);}
+  static inline mmInt	mmToInt32F(mmFlt x)	    {return
+							 _mm_cvttps_epi32(x);}
   static inline mmFlt	mmCastToFlt(mmInt x)	    {return
 							_mm_castsi128_ps(x);}
   static inline mmInt	mmCastToInt(mmFlt x)	    {return
