@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPaneDC3.cc,v 1.4 2007-11-29 07:06:06 ueshiba Exp $
+ *  $Id: CanvasPaneDC3.cc,v 1.5 2008-05-15 08:51:04 ueshiba Exp $
  */
 #include "TU/v/CanvasPaneDC3.h"
 #include <X11/keysym.h>
@@ -57,54 +57,54 @@ CanvasPaneDC3::callback(CmdId id, CmdVal val)
 	switch (val)
 	{
 	  case 'n':
-	    *this << TU::v::axis(Z) << TU::v::rotate( 5 * M_PI / 180.0)
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Z) << v::rotate( 5 * M_PI / 180.0)
+		  << v::repaint;
+	    break;
 	  case 'm':
-	    *this << TU::v::axis(Z) << TU::v::rotate(-5 * M_PI / 180.0)
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Z) << v::rotate(-5 * M_PI / 180.0)
+		  << v::repaint;
+	    break;
 	  case 'h':
-	    *this << TU::v::axis(Y) << TU::v::rotate( 5 * M_PI / 180.0)
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Y) << v::rotate( 5 * M_PI / 180.0)
+		  << v::repaint;
+	    break;
 	  case 'j':
-	    *this << TU::v::axis(X) << TU::v::rotate( 5 * M_PI / 180.0)
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(X) << v::rotate( 5 * M_PI / 180.0)
+		  << v::repaint;
+	    break;
 	  case 'k':
-	    *this << TU::v::axis(X) << TU::v::rotate(-5 * M_PI / 180.0)
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(X) << v::rotate(-5 * M_PI / 180.0)
+		  << v::repaint;
+	    break;
 	  case 'l':
-	    *this << TU::v::axis(Y) << TU::v::rotate(-5 * M_PI / 180.0)
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Y) << v::rotate(-5 * M_PI / 180.0)
+		  << v::repaint;
+	    break;
 
 	  case 'N':
-	    *this << TU::v::axis(Z) << TU::v::translate(-0.05 * getDistance())
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Z) << v::translate(-0.05 * getDistance())
+		  << v::repaint;
+	    break;
 	  case 'M':
-	    *this << TU::v::axis(Z) << TU::v::translate( 0.05 * getDistance())
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Z) << v::translate( 0.05 * getDistance())
+		  << v::repaint;
+	    break;
 	  case 'H':
-	    *this << TU::v::axis(X) << TU::v::translate( 0.05 * getDistance())
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(X) << v::translate( 0.05 * getDistance())
+		  << v::repaint;
+	    break;
 	  case 'J':
-	    *this << TU::v::axis(Y) << TU::v::translate(-0.05 * getDistance())
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Y) << v::translate(-0.05 * getDistance())
+		  << v::repaint;
+	    break;
 	  case 'K':
-	    *this << TU::v::axis(Y) << TU::v::translate( 0.05 * getDistance())
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(Y) << v::translate( 0.05 * getDistance())
+		  << v::repaint;
+	    break;
 	  case 'L':
-	    *this << TU::v::axis(X) << TU::v::translate(-0.05 * getDistance())
-		  << TU::v::repaint;
-	    break;;
+	    *this << axis(X) << v::translate(-0.05 * getDistance())
+		  << v::repaint;
+	    break;
 	}
     else
 	CanvasPaneDC::callback(id, val);
