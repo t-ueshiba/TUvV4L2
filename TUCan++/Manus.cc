@@ -1,5 +1,5 @@
 /*
- *  $Id: Manus.cc,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: Manus.cc,v 1.3 2008-05-15 08:53:48 ueshiba Exp $
  */
 #include "TU/Can++.h"
 
@@ -381,8 +381,8 @@ Manus::moveTo(const Position& ref)
 
 	speed = ref - _pos;
 
-	cerr << " moveTo: position =" << _pos
-	     << "         error    =" << speed;
+	std::cerr << " moveTo: position =" << _pos
+		  << "         error    =" << speed;
 	
 	int	i;
 	for (i = 0; i < 6; ++i)
@@ -489,13 +489,3 @@ Manus::toStatus(u_char hi, u_char lo)
 }
 
 }
-#ifdef __GNUG__
-#  include "TU/Geometry++.cc"
-
-namespace TU
-{
-template
-CoordBase<int, 7u>&	CoordBase<int, 7u>::operator =(double);
-}
-
-#endif

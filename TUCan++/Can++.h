@@ -1,12 +1,12 @@
 /*
- *  $Id: Can++.h,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: Can++.h,v 1.3 2008-05-15 08:53:48 ueshiba Exp $
  */
 #ifndef __TUCanPP_h
 #define __TUCanPP_h
 
 #include <sys/types.h>
-#include <can.h>
-#include "TU/Geometry++.h"
+#include <can4linux.h>
+#include "TU/Vector++.h"
 #include <stdexcept>
 
 namespace TU
@@ -77,9 +77,9 @@ class Manus : public Can
 {
   public:
   //! Manusの現在位置
-    typedef Coordinate<int, 7u>	Position;
+    typedef Vector<int, FixedSizedBuf<int, 7> >	Position;
   //! Manusへの速度指令値
-    typedef Coordinate<int, 7u>	Speed;
+    typedef Vector<int, FixedSizedBuf<int, 7> >	Speed;
 
   //! Manusの動作モード
     enum Mode

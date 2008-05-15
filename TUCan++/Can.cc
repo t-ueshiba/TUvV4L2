@@ -1,5 +1,5 @@
 /*
- *  $Id: Can.cc,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id: Can.cc,v 1.3 2008-05-15 08:53:48 ueshiba Exp $
  */
 /*!
   \mainpage	libTUCan++ - CANおよびManusマニピュレータコントローラ
@@ -138,7 +138,7 @@ Can::nreceive()
     rx.Rx     = &_msg;
     rx.error  = 0;
     rx.retval = 0;
-    if (::ioctl(_fd, RECEIVE, &rx) < 0)
+    if (::ioctl(_fd, CAN_IOCTL_RECEIVE, &rx) < 0)
 	throw runtime_error(string("ioctl (TU::Can::nreceive) ")
 			    + strerror(errno));
     return (rx.retval != 0 ? id() : ~0);
@@ -159,7 +159,7 @@ Can::receive()
     rx.retval = 0;
     do
     {
-	if (::ioctl(_fd, RECEIVE, &rx) < 0)
+	if (::ioctl(_fd, CAN_IOCTL_RECEIVE, &rx) < 0)
 	    throw runtime_error(string("ioctl (TU::Can::receive) ")
 				+ strerror(errno));
     } while (rx.retval == 0);
@@ -168,14 +168,14 @@ Can::receive()
 
 //! メッセージに含まれるデータを返す
 /*!
-  \param i	データへのindex．\f$0 \leq i < \f$nbytes()でなければならない．
+  \param i	データへのindex．＼f$0 \leq i < \f$nbytes()でなければならない．
   \return	現在読み込まれているメッセージのi番目のデータ．
   \exception std::out_of_range	iが範囲外．
 */
 u_char
 Can::get(u_int i) const
 {
-    if (i < 0 || i >= _msg.length)
+    if (i >= _msg.length)
 	throw std::out_of_range("TU::Can::get: invalid index!!");
     return _msg.data[i];
 }
@@ -192,19 +192,19 @@ Can::setBaud(Baud baud)
     using namespace		std;
     volatile Command_par_t	cmd;
     cmd.cmd = CMD_STOP;
-    if (::ioctl(_fd, COMMAND, &cmd) == -1)
+    if (::ioctl(_fd, CAN_IOCTL_COMMAND, &cmd) == -1)
 	throw runtime_error(string("ioctl (TU::Can::setBaud) ")
 			    + strerror(errno));
     
     Config_par_t		cfg;
     cfg.target = CONF_TIMING;
     cfg.val1   = baud;
-    if (::ioctl(_fd, CONFIG, &cfg) == -1)
+    if (::ioctl(_fd, CAN_IOCTL_CONFIG, &cfg) == -1)
 	throw runtime_error(string("ioctl (TU::Can::setBaud) ")
 			    + strerror(errno));
     
     cmd.cmd = CMD_START;
-    if (::ioctl(_fd, COMMAND, &cmd) == -1)
+    if (::ioctl(_fd, CAN_IOCTL_COMMAND, &cmd) == -1)
 	throw runtime_error(string("ioctl (TU::Can::setBaud) ")
 			    + strerror(errno));
 
@@ -257,7 +257,7 @@ Can::send() const
     tx.Tx     = (canmsg_t*)&_msg;
     tx.error  = 0;
     tx.retval = 0;
-    if (::ioctl(_fd, SEND, &tx) < 0)
+    if (::ioctl(_fd, CAN_IOCTL_SEND, &tx) < 0)
 	throw runtime_error(string("ioctl (TU::Can::send) ")
 			    + strerror(errno));
     return *this;

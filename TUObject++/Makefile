@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.11 2007-02-28 00:18:40 ueshiba Exp $
+#  $Id: Makefile,v 1.12 2008-05-15 08:53:48 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -23,7 +23,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /Users/ueshiba/include/TU/types.h \
+EXTHDRS		= /home/ueshiba/include/TU/types.h \
 		TU/Object++.h
 HDRS		= Object++.h \
 		Object++_.h
@@ -41,7 +41,7 @@ OBJS		= Desc.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.11 $	|		\
+REV		= $(shell echo $Revision: 1.12 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -52,9 +52,9 @@ REV		= $(shell echo $Revision: 1.11 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Desc.o: Object++_.h TU/Object++.h /Users/ueshiba/include/TU/types.h
-Object++.o: TU/Object++.h /Users/ueshiba/include/TU/types.h
-Object.o: Object++_.h TU/Object++.h /Users/ueshiba/include/TU/types.h
-Page.o: Object++_.h TU/Object++.h /Users/ueshiba/include/TU/types.h
+Desc.o: Object++_.h TU/Object++.h /home/ueshiba/include/TU/types.h
+Object++.o: TU/Object++.h /home/ueshiba/include/TU/types.h
+Object.o: Object++_.h TU/Object++.h /home/ueshiba/include/TU/types.h
+Page.o: Object++_.h TU/Object++.h /home/ueshiba/include/TU/types.h
 TUObject++.sa.o: Object++_.h TU/Object++.h \
-	/Users/ueshiba/include/TU/types.h
+	/home/ueshiba/include/TU/types.h
