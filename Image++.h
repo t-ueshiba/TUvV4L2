@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.h,v 1.32 2008-03-12 00:12:34 ueshiba Exp $
+ *  $Id: Image++.h,v 1.33 2008-05-18 23:34:27 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -600,6 +600,11 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     Image(const Image<T, B2>& i, int u, int v, u_int w, u_int h)
 	:Array2<ImageLine<T>, B>(i, v, u, h, w), ImageBase(i)	{}
 
+    const Image<T>	operator ()(int u, int v,
+				    u_int w, u_int h)	const	;
+    Image<T>		operator ()(int u, int v,
+				    u_int w, u_int h)		;
+    
     template <class T2, class S>
     T2		at(const Point2<S>& p)			const	;
     template <class S>
@@ -632,6 +637,18 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     virtual void	_resize(u_int h, u_int w, Type)			;
 };
 
+template <class T, class B> inline const Image<T>
+Image<T, B>::operator ()(int u, int v, u_int w, u_int h) const
+{
+    return Image<T>(*this, u, v, w, h);
+}
+    
+template <class T, class B> inline Image<T>
+Image<T, B>::operator ()(int u, int v, u_int w, u_int h)
+{
+    return Image<T>(*this, u, v, w, h);
+}
+    
 template <class T, class B> template <class T2, class S> inline T2
 Image<T, B>::at(const Point2<S>& p) const
 {
