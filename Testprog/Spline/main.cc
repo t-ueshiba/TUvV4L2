@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.3 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: main.cc,v 1.4 2008-05-27 11:38:25 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
@@ -28,7 +28,7 @@ class MyCanvasPane : public CanvasPane
 	:CanvasPane(parentWin, 640, 480),
 	 _dc(*this), _b(b), _bb(bb), _c(c), _s(s), _ss(ss)		{}
     
-    virtual void	repaintUnderlay(int x, int y, int w, int h)	;
+    virtual void	repaintUnderlay()				;
 
   protected:
     virtual void	initializeGraphics()				;
@@ -44,7 +44,7 @@ class MyCanvasPane : public CanvasPane
 };
 
 void
-MyCanvasPane::repaintUnderlay(int, int, int, int)
+MyCanvasPane::repaintUnderlay()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
