@@ -1,5 +1,5 @@
 /*
- *  $Id: BrepCanvasPane.cc,v 1.4 2004-03-18 00:59:20 ueshiba Exp $
+ *  $Id: BrepCanvasPane.cc,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
  */
 #include "TU/v/Vision++.h"
 #include <limits.h>
@@ -155,9 +155,9 @@ BrepCanvasPane::draw(const Geometry* g, DrawMode mode)
 
 void
 #ifdef UseOverlay
-BrepCanvasPane::repaintOverlay(int, int, int, int)
+BrepCanvasPane::repaintOverlay()
 #else
-BrepCanvasPane::repaintUnderlay(int, int, int, int)
+BrepCanvasPane::repaintUnderlay()
 #endif
 {
     _dc << clear;
@@ -175,9 +175,9 @@ BrepCanvasPane::repaintUnderlay(int, int, int, int)
 
 void
 #ifdef UseOverlay
-BrepCanvasPane::repaintUnderlay(int, int, int, int)
+BrepCanvasPane::repaintUnderlay()
 #else
-BrepCanvasPane::repaintOverlay(int, int, int, int)
+BrepCanvasPane::repaintOverlay()
 #endif
 {
 }

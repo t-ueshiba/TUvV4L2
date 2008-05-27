@@ -1,5 +1,5 @@
 /*
- *  $Id: Vision++.h,v 1.4 2004-03-18 00:59:20 ueshiba Exp $
+ *  $Id: Vision++.h,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
  */
 #ifndef __TUVisionPP_h
 #define __TUVisionPP_h
@@ -83,8 +83,8 @@ class BrepCanvasPane : public CanvasPane
     void	draw(const Brep::Geometry* g, DrawMode mode)		;
     void	sync()							;
     
-    virtual void	repaintUnderlay(int x, int y, int w, int h)	;
-    virtual void	repaintOverlay(int x, int y, int w, int h)	;
+    virtual void	repaintUnderlay()				;
+    virtual void	repaintOverlay()				;
     
   private:
     Brep::Geometry*	findGeometry(int u, int v)	const	;

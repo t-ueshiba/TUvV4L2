@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPaneDC.cc,v 1.5 2007-11-29 07:06:06 ueshiba Exp $
+ *  $Id: CanvasPaneDC.cc,v 1.6 2008-05-27 11:38:25 ueshiba Exp $
  */
 #include "TU/v/CanvasPaneDC.h"
 #include "vCanvas_.h"
@@ -263,14 +263,14 @@ CanvasPaneDC::initializeGraphics()
 DC&
 CanvasPaneDC::repaintUnderlay()
 {
-    canvasPane().repaintUnderlay(0, 0, deviceWidth(), deviceHeight());
+    canvasPane().repaintUnderlay();
     return *this;
 }
 
 DC&
 CanvasPaneDC::repaintOverlay()
 {
-    canvasPane().repaintOverlay(0, 0, deviceWidth(), deviceHeight());
+    canvasPane().repaintOverlay();
     return *this;
 }
 

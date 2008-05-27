@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPane.cc,v 1.4 2007-11-29 07:06:06 ueshiba Exp $
+ *  $Id: CanvasPane.cc,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
  */
 #include "TU/v/CanvasPane.h"
 #include "vViewport_.h"
@@ -82,14 +82,12 @@ CanvasPane::initializeGraphics()
 }
 
 void
-CanvasPane::repaintUnderlay(int /* u */, int /* v */,
-			    int /* width */, int /* height */)
+CanvasPane::repaintUnderlay()
 {
 }
 
 void
-CanvasPane::repaintOverlay(int /* u */, int /* v */,
-			   int /* width */, int /* height */)
+CanvasPane::repaintOverlay()
 {
 }
 

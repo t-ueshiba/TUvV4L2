@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.3 2002-12-18 06:10:13 ueshiba Exp $
+ *  $Id: main.cc,v 1.4 2008-05-27 11:38:27 ueshiba Exp $
  */
 #include <iomanip>
 #include <fstream>
@@ -106,8 +106,8 @@ class MyCanvasPane : public CanvasPane
 
     CanvasPaneDC&	dc()					{return _dc;}
     
-    virtual void	repaintUnderlay(int x, int y, int w, int h)	;
-    virtual void	repaintOverlay(int x, int y, int w, int h)	;
+    virtual void	repaintUnderlay()				;
+    virtual void	repaintOverlay()				;
 
   private:
     CanvasPaneDC		_dc;
@@ -120,7 +120,7 @@ class MyCanvasPane : public CanvasPane
 };
 
 void
-MyCanvasPane::repaintUnderlay(int, int, int, int)
+MyCanvasPane::repaintUnderlay()
 {
     if (!_underlay)
 	return;
@@ -129,7 +129,7 @@ MyCanvasPane::repaintUnderlay(int, int, int, int)
 }
 
 void
-MyCanvasPane::repaintOverlay(int, int, int, int)
+MyCanvasPane::repaintOverlay()
 {
     if (!_overlay)
 	return;
@@ -405,7 +405,3 @@ main(int argc, char* argv[])
 
     return 0;
 }
-
-#ifdef __GNUG__
-#  include "TU/Array++.cc"
-#endif

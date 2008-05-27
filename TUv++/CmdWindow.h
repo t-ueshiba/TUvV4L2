@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CmdWindow.h,v 1.4 2007-11-29 07:06:07 ueshiba Exp $
+ *  $Id: CmdWindow.h,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
  */
 #ifndef __TUvCmdWindow_h
 #define __TUvCmdWindow_h
@@ -61,14 +61,16 @@ class CmdWindow : public Window
 	      Colormap::Mode		mode,
 	      u_int			resolution,
 	      u_int			underlayCmapDim,
-	      u_int			overlayDepth)		;
+	      u_int			overlayDepth,
+	      bool			fullScreen=false)	;
     CmdWindow(Window&			parentWindow,
 	      const char*		myName,
 	      const XVisualInfo*	vinfo,
 	      Colormap::Mode		mode,
 	      u_int			resolution,
 	      u_int			underlayCmapDim,
-	      u_int			overlayDepth)		;
+	      u_int			overlayDepth,
+	      bool			fullScreen=false)	;
     virtual			~CmdWindow()			;
 
     virtual const Widget&	widget()		const	;

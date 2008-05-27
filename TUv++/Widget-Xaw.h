@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Widget-Xaw.h,v 1.4 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: Widget-Xaw.h,v 1.5 2008-05-27 11:38:26 ueshiba Exp $
  */
 class Widget
 {
@@ -44,7 +44,7 @@ class Widget
     Widget&		setWidth(u_int w)			;
     Widget&		setHeight(u_int h)			;
     Widget&		setPosition(const Point2<int>&)		;
-
+    
   private:
     Widget(const Widget&)					;
     Widget&		operator =(const Widget&)		;

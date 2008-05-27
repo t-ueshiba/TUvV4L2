@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: TUv++.h,v 1.7 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: TUv++.h,v 1.8 2008-05-27 11:38:26 ueshiba Exp $
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
@@ -224,6 +224,7 @@ class Object
 
     virtual void		callback(CmdId id, CmdVal val)	;
     virtual void		tick()				;
+	    void		grabKeyboard()		const	;
     
   protected:
     Object(Object& parentObject)	:_parent(parentObject)	{}
@@ -234,6 +235,7 @@ class Object
     virtual App&	app()				;
     virtual Window&	window()			;
     virtual CanvasPane&	canvasPane()			;
+
     
   private:
     Object(const Object&)				;

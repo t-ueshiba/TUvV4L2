@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CmdWindow.cc,v 1.4 2007-11-29 07:06:07 ueshiba Exp $
+ *  $Id: CmdWindow.cc,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
  */
 #include "TU/v/CmdWindow.h"
 #include "TU/v/App.h"
@@ -48,8 +48,8 @@ selectVisual(const Colormap& parentColormap,
     long		vinfo_mask[5];
     int			n = 0;
     Display* const	display = parentColormap.display();
-    const int		screen	= parentColormap.vinfo().screen;
-    
+    const int		screen  = parentColormap.vinfo().screen;
+
     if (mode == Colormap::IndexedColor)
     {
 	vinfo_template[n].c_class = DirectColor;
@@ -122,7 +122,7 @@ selectVisual(const Colormap& parentColormap,
     }
 
     std::cerr << "No appropriate visual. Visual of the parent colormap will be used..."
-	      << std::endl;
+              << std::endl;
     
     return parentColormap.vinfo();
 }
@@ -153,7 +153,8 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		     Colormap::Mode	mode,
 		     u_int		resolution,
 		     u_int		underlayCmapDim,
-		     u_int		overlayDepth)
+		     u_int		overlayDepth,
+		     bool		fullScreen)
     :Window(parentWindow),
      _colormap(parentWindow.colormap().display(),
 	       selectVisual(parentWindow.colormap(), mode, overlayDepth),
@@ -169,6 +170,16 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 				  NULL)),
      _paned(*this)
 {
+    if (fullScreen)
+	XtVaSetValues(_widget,
+		      XtNborderWidth,		0,
+		      XtNx,			0,
+		      XtNy,			0,
+		      XtNwidth,			XtScreen(_widget)->width,
+		      XtNheight,		XtScreen(_widget)->height,
+		      XtNallowShellResize,	FALSE,
+		      XtNoverrideRedirect,	TRUE,
+		      NULL);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }
 
@@ -178,7 +189,8 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		     Colormap::Mode	mode,
 		     u_int		resolution,
 		     u_int		underlayCmapDim,
-		     u_int		overlayDepth)
+		     u_int		overlayDepth,
+		     bool		fullScreen)
     :Window(parentWindow),
      _colormap(parentWindow.colormap().display(), 
 	       (xvinfo != 0 ? *xvinfo : parentWindow.colormap().vinfo()),
@@ -194,6 +206,16 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 				  NULL)),
      _paned(*this)
 {
+    if (fullScreen)
+	XtVaSetValues(_widget,
+		      XtNborderWidth,		0,
+		      XtNx,			0,
+		      XtNy,			0,
+		      XtNwidth,			XtScreen(_widget)->width,
+		      XtNheight,		XtScreen(_widget)->height,
+		      XtNallowShellResize,	FALSE,
+		      XtNoverrideRedirect,	TRUE,
+		      NULL);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }
 
@@ -221,11 +243,14 @@ CmdWindow::show()
 {
     Window::show();
     app().addColormapWindow(*this);
-    
+
   // Add the delete protocol.
     Atom	delete_window = XInternAtom(XtDisplay(_widget),
 					    "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(XtDisplay(_widget), XtWindow(_widget), &delete_window, 1);
+    XSetWMProtocols(XtDisplay(_widget), XtWindow(_widget),
+		    &delete_window, 1);
+
+    XRaiseWindow(XtDisplay(_widget), XtWindow(_widget));
 }
 
 /*

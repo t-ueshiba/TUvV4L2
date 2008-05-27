@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.17 2007-11-29 07:06:07 ueshiba Exp $
+#  $Id: Makefile,v 1.18 2008-05-27 11:38:25 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,8 +11,8 @@ INCDIRS		= -I$(HOME)/include -I$(X11HOME)/include
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	= #-DDEBUG -DDESTROY_WIDGET
-CFLAGS		= -O -g
-CCFLAGS		= -O -g
+CFLAGS		= -g
+CCFLAGS		= -g
 ifeq ($(CCC), icpc)
   CFLAGS	= -O3 -parallel
   CCFLAGS	= -O3 -parallel
@@ -198,7 +198,7 @@ OBJS		= App.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.17 $	|		\
+REV		= $(shell echo $Revision: 1.18 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

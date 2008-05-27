@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2004-03-08 02:12:54 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2008-05-27 11:38:27 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
@@ -37,7 +37,7 @@ class MyCanvasPane : public CanvasPane
 
     CanvasPaneDC&	dc()					{return _dc;}
     
-    virtual void	repaintUnderlay(int x, int y, int w, int h)	;
+    virtual void	repaintUnderlay()			;
 
   private:
       //  CanvasPaneDC		_dc;
@@ -46,7 +46,7 @@ class MyCanvasPane : public CanvasPane
 };
 
 void
-MyCanvasPane::repaintUnderlay(int, int, int, int)
+MyCanvasPane::repaintUnderlay()
 {
     _dc << clear << _image;
 }
@@ -118,7 +118,3 @@ main(int argc, char* argv[])
 
     return 0;
 }
-
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Array++.cc"
-#endif
