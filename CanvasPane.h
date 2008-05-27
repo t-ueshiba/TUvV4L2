@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPane.h,v 1.4 2007-11-29 07:06:06 ueshiba Exp $
+ *  $Id: CanvasPane.h,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
  */
 #ifndef __TUvCanvasPane_h
 #define __TUvCanvasPane_h
@@ -47,10 +47,8 @@ class CanvasPane : public Pane
 
     virtual const Widget&	widget()			const	;
 
-    virtual void		repaintUnderlay(int u, int v,
-						int width, int height)	;
-    virtual void		repaintOverlay(int u, int v,
-					       int width, int height)	;
+    virtual void		repaintUnderlay()			;
+    virtual void		repaintOverlay()			;
     void			moveDC(int u, int v)			;
     
   protected:
