@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPaneDC.cc,v 1.6 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: CanvasPaneDC.cc,v 1.7 2008-06-05 02:26:24 ueshiba Exp $
  */
 #include "TU/v/CanvasPaneDC.h"
 #include "vCanvas_.h"
@@ -149,7 +149,7 @@ CBcanvasPaneDC(::Widget, XtPointer client_data, XtPointer)
 }
 
 /************************************************************************
-*  class CanvasPaneDC						*
+*  class CanvasPaneDC							*
 ************************************************************************/
 /*
  *  Public member functions
@@ -244,6 +244,12 @@ CanvasPaneDC::callback(CmdId id, CmdVal val)
 
     canvasPane().moveDC(log2devU(_u_last), log2devV(_v_last));
     *this << TU::v::repaintAll;
+}
+
+void
+CanvasPaneDC::grabKeyboard() const
+{
+    XtGrabKeyboard(_widget, TRUE, GrabModeAsync, GrabModeAsync, CurrentTime);
 }
 
 /*

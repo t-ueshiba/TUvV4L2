@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CmdWindow.h,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: CmdWindow.h,v 1.6 2008-06-05 02:26:24 ueshiba Exp $
  */
 #ifndef __TUvCmdWindow_h
 #define __TUvCmdWindow_h
@@ -62,6 +62,7 @@ class CmdWindow : public Window
 	      u_int			resolution,
 	      u_int			underlayCmapDim,
 	      u_int			overlayDepth,
+	      int			screen=-1,
 	      bool			fullScreen=false)	;
     CmdWindow(Window&			parentWindow,
 	      const char*		myName,

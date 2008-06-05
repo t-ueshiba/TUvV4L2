@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: TUv++.h,v 1.8 2008-05-27 11:38:26 ueshiba Exp $
+ *  $Id: TUv++.h,v 1.9 2008-06-05 02:26:24 ueshiba Exp $
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
@@ -224,7 +224,6 @@ class Object
 
     virtual void		callback(CmdId id, CmdVal val)	;
     virtual void		tick()				;
-	    void		grabKeyboard()		const	;
     
   protected:
     Object(Object& parentObject)	:_parent(parentObject)	{}
@@ -271,6 +270,7 @@ class Window : public Object, public List<Window>::Node
 	
     virtual void	show()					;
     virtual void	hide()					;
+	    bool	isFullScreen()			const	;
 
   protected:
     Window(Window& parentWindow)				;

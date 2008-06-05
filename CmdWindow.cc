@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CmdWindow.cc,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: CmdWindow.cc,v 1.6 2008-06-05 02:26:24 ueshiba Exp $
  */
 #include "TU/v/CmdWindow.h"
 #include "TU/v/App.h"
@@ -41,14 +41,12 @@ namespace v
 *  static functions							*
 ************************************************************************/
 static XVisualInfo
-selectVisual(const Colormap& parentColormap,
+selectVisual(Display* display, int screen,
 	     Colormap::Mode mode, u_int overlayDepth)
 {
     XVisualInfo		vinfo_template[5];
     long		vinfo_mask[5];
     int			n = 0;
-    Display* const	display = parentColormap.display();
-    const int		screen  = parentColormap.vinfo().screen;
 
     if (mode == Colormap::IndexedColor)
     {
@@ -103,6 +101,7 @@ selectVisual(const Colormap& parentColormap,
 	}
     }
     
+    XVisualInfo	vinfo_return;
     for (int i = 0; i < n; ++i)
     {
 	int		nvinfo;
@@ -110,7 +109,6 @@ selectVisual(const Colormap& parentColormap,
 					       &vinfo_template[i], &nvinfo);
 	if (nvinfo != 0)
 	{
-	    static XVisualInfo	vinfo_return;
 	    vinfo_return = vinfo[0];
 	    for (int j = 1; j < nvinfo; ++j)
 		if (vinfo[j].colormap_size > vinfo_return.colormap_size)
@@ -121,10 +119,8 @@ selectVisual(const Colormap& parentColormap,
 	}
     }
 
-    std::cerr << "No appropriate visual. Visual of the parent colormap will be used..."
-              << std::endl;
-    
-    return parentColormap.vinfo();
+    throw std::runtime_error("No appropriate visual!!");
+    return vinfo_return;
 }
 
 /************************************************************************
@@ -154,16 +150,23 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		     u_int		resolution,
 		     u_int		underlayCmapDim,
 		     u_int		overlayDepth,
+		     int		screen,
 		     bool		fullScreen)
     :Window(parentWindow),
      _colormap(parentWindow.colormap().display(),
-	       selectVisual(parentWindow.colormap(), mode, overlayDepth),
+	       selectVisual(parentWindow.colormap().display(),
+			    (screen < 0 ?
+			     parentWindow.colormap().vinfo().screen : screen),
+			    mode, overlayDepth),
 	       mode, resolution, underlayCmapDim, overlayDepth, 6, 9, 4),
      _widget(XtVaCreatePopupShell("TUvCmdWindow",
 				  topLevelShellWidgetClass,
 				  parent().widget(),
 				  XtNtitle,		myName,
 				  XtNallowShellResize,	TRUE,
+				  XtNscreen,	ScreenOfDisplay(
+						    _colormap.display(),
+						    _colormap.vinfo().screen),
 				  XtNvisual,	_colormap.vinfo().visual,
 				  XtNdepth,	_colormap.vinfo().depth,
 				  XtNcolormap,	(::Colormap)_colormap,
@@ -172,13 +175,13 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 {
     if (fullScreen)
 	XtVaSetValues(_widget,
-		      XtNborderWidth,		0,
-		      XtNx,			0,
-		      XtNy,			0,
-		      XtNwidth,			XtScreen(_widget)->width,
-		      XtNheight,		XtScreen(_widget)->height,
-		      XtNallowShellResize,	FALSE,
-		      XtNoverrideRedirect,	TRUE,
+		      XtNallowShellResize,  FALSE,
+		      XtNborderWidth,	    0,	
+		      XtNx,		    0,
+		      XtNy,		    0,
+		      XtNwidth,		    WidthOfScreen(XtScreen(_widget)),
+		      XtNheight,	    HeightOfScreen(XtScreen(_widget)),
+		      XtNoverrideRedirect,  TRUE,
 		      NULL);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }
@@ -200,6 +203,9 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 				  parent().widget(),
 				  XtNtitle,		myName,
 				  XtNallowShellResize,	TRUE,
+				  XtNscreen,	ScreenOfDisplay(
+						    _colormap.display(),
+						    _colormap.vinfo().screen),
 				  XtNvisual,	_colormap.vinfo().visual,
 				  XtNdepth,	_colormap.vinfo().depth,
 				  XtNcolormap,	(::Colormap)_colormap,
@@ -208,13 +214,13 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 {
     if (fullScreen)
 	XtVaSetValues(_widget,
-		      XtNborderWidth,		0,
-		      XtNx,			0,
-		      XtNy,			0,
-		      XtNwidth,			XtScreen(_widget)->width,
-		      XtNheight,		XtScreen(_widget)->height,
-		      XtNallowShellResize,	FALSE,
-		      XtNoverrideRedirect,	TRUE,
+		      XtNallowShellResize,  FALSE,
+		      XtNborderWidth,	    0,	
+		      XtNx,		    0,
+		      XtNy,		    0,
+		      XtNwidth,		    WidthOfScreen(XtScreen(_widget)),
+		      XtNheight,	    HeightOfScreen(XtScreen(_widget)),
+		      XtNoverrideRedirect,  TRUE,
 		      NULL);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }

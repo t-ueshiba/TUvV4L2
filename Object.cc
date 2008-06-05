@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Object.cc,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: Object.cc,v 1.6 2008-06-05 02:26:24 ueshiba Exp $
  */
 #include "TU/v/TUv++.h"
 
@@ -45,12 +45,6 @@ Object::callback(CmdId id, CmdVal val)
 void
 Object::tick()
 {
-}
-
-void
-Object::grabKeyboard() const
-{
-    XtGrabKeyboard(widget(), TRUE, GrabModeAsync, GrabModeAsync, CurrentTime);
 }
 
 /*
