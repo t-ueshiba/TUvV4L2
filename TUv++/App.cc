@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: App.cc,v 1.5 2007-11-29 07:06:06 ueshiba Exp $
+ *  $Id: App.cc,v 1.6 2008-06-05 02:26:24 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include <stdexcept>
@@ -96,9 +96,12 @@ submenuPopup(Widget menu, XEvent* event, String*, Cardinal*)
 static int
 xerrorHandler(Display* display, XErrorEvent* error)
 {
+    using namespace	std;
+    
     char	buf[129];
     XGetErrorText(display, error->error_code, buf, sizeof(buf)-1);
-    throw std::runtime_error(buf);
+  //throw runtime_error(buf);
+    cerr << buf << endl;
 
     return 0;
 }

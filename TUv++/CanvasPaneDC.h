@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPaneDC.h,v 1.4 2007-11-29 07:06:06 ueshiba Exp $
+ *  $Id: CanvasPaneDC.h,v 1.5 2008-06-05 02:26:24 ueshiba Exp $
  */
 #ifndef __TUvCanvasPaneDC_h
 #define __TUvCanvasPaneDC_h
@@ -53,6 +53,7 @@ class CanvasPaneDC : public Object, public XDC
     virtual DC&		setSize(u_int width, u_int height,
 				u_int mul,   u_int div)			;
     virtual void	callback(CmdId id, CmdVal val)			;
+	    void	grabKeyboard()				const	;
 
   protected:
     virtual Drawable	drawable()				const	;

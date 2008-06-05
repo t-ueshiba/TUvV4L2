@@ -25,9 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Window.cc,v 1.5 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: Window.cc,v 1.6 2008-06-05 02:26:24 ueshiba Exp $
  */
 #include "TU/v/App.h"
+#include <X11/Shell.h>
 #include <stdexcept>
 
 namespace TU
@@ -66,6 +67,14 @@ void
 Window::hide()
 {
     XtPopdown(widget());
+}
+
+bool
+Window::isFullScreen() const
+{
+    Boolean	overrideRedirect;
+    XtVaGetValues(widget(), XtNoverrideRedirect, &overrideRedirect, NULL);
+    return (overrideRedirect == TRUE);
 }
 
 /*
