@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPaneDC.cc,v 1.7 2008-06-05 02:26:24 ueshiba Exp $
+ *  $Id: CanvasPaneDC.cc,v 1.8 2008-06-09 00:16:20 ueshiba Exp $
  */
 #include "TU/v/CanvasPaneDC.h"
 #include "vCanvas_.h"
@@ -249,7 +249,7 @@ CanvasPaneDC::callback(CmdId id, CmdVal val)
 void
 CanvasPaneDC::grabKeyboard() const
 {
-    XtGrabKeyboard(_widget, TRUE, GrabModeAsync, GrabModeAsync, CurrentTime);
+    XtGrabKeyboard(_widget, FALSE, GrabModeAsync, GrabModeAsync, CurrentTime);
 }
 
 /*
