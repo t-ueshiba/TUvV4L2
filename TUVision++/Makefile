@@ -1,23 +1,29 @@
 #
-#  $Id: Makefile,v 1.12 2008-05-15 08:53:48 ueshiba Exp $
+#  $Id: Makefile,v 1.13 2008-06-09 00:10:43 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU/v
-INCDIRS		= -I$(HOME)/include -I$(X11HOME)/include
+INCDIRS		= -I. -I$(HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	= -DTUBrepPP_DEBUG
-CFLAGS		= -O -g
-CCFLAGS		= -O -g
-LDFLAGS		=
-LINKER		= $(CCC)
+CFLAGS		= -g
 ifeq ($(CCC), icpc)
-  CCFLAGS	= -O3 -parallel
+  ifeq ($(OSTYPE), darwin)
+    CPPFLAGS   += -DSSE3
+    CFLAGS	= -O3 -axP -parallel -ip
+  else
+    CPPFLAGS   += -DSSE2
+    CFLAGS	= -O3 -tpp7 -xW -ip
+  endif
 endif
+CCFLAGS		= $(CFLAGS)
+
+LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
@@ -54,7 +60,7 @@ OBJS		= BrepCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.12 $	|		\
+REV		= $(shell echo $Revision: 1.13 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

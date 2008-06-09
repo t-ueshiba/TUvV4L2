@@ -1,28 +1,43 @@
 #
-#  $Id: Makefile,v 1.13 2008-05-15 08:53:28 ueshiba Exp $
+#  $Id: Makefile,v 1.14 2008-06-09 00:10:28 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU/Brep
-INCDIRS		= -I$(HOME)/include
+INCDIRS		= -I. -I$(HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	= -DTUBrepPP_DEBUG
-CFLAGS		= -O -g
-CCFLAGS		= -O -g
+CFLAGS		= -g
 ifeq ($(CCC), icpc)
-  CCFLAGS	= -O3 -parallel
+  ifeq ($(OSTYPE), darwin)
+    CPPFLAGS   += -DSSE3
+    CFLAGS	= -O3 -axP -parallel -ip
+  else
+    CPPFLAGS   += -DSSE2
+    CFLAGS	= -O3 -tpp7 -xW -ip
+  endif
 endif
-LDFLAGS		= $(CCFLAGS)
+CCFLAGS		= $(CFLAGS)
+
 LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
+EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
+		/home/ueshiba/include/TU/Geometry++.h \
+		/home/ueshiba/include/TU/Minimize++.h \
+		/home/ueshiba/include/TU/Object++.cc \
+		/home/ueshiba/include/TU/Object++.h \
+		/home/ueshiba/include/TU/Vector++.h \
+		/home/ueshiba/include/TU/types.h \
+		/home/ueshiba/include/TU/utility.h \
+		TU/Brep/Brep++.h
 HDRS		= Brep++.h
 SRCS		= Geometry.cc \
 		HalfEdge.cc \
@@ -42,7 +57,7 @@ OBJS		= Geometry.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.13 $	|		\
+REV		= $(shell echo $Revision: 1.14 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

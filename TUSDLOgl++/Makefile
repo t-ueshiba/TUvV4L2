@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1 2008-05-15 09:03:17 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2008-06-09 00:10:43 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,10 +11,18 @@ INCDIRS		= -I. -I$(HOME)/include
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
-CFLAGS		= -O -g
-CCFLAGS		= -O -g
-#CCFLAGS	= -O3 -parallel
-LDFLAGS		= $(CCFLAGS)
+CFLAGS		= -g
+ifeq ($(CCC), icpc)
+  ifeq ($(OSTYPE), darwin)
+    CPPFLAGS   += -DSSE3
+    CFLAGS	= -O3 -axP -parallel -ip
+  else
+    CPPFLAGS   += -DSSE2
+    CFLAGS	= -O3 -tpp7 -xW -ip
+  endif
+endif
+CCFLAGS		= $(CFLAGS)
+
 LINKER		= $(CCC)
 
 #########################
@@ -34,7 +42,7 @@ OBJS		= SDLOglDC.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
