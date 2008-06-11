@@ -1,4 +1,5 @@
 SUBDIR	= TUTools++		\
+	  TUThread++		\
 	  TUv++			\
 	  TUCalib++		\
 	  TUOgl++		\
