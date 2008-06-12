@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CmdWindow.cc,v 1.6 2008-06-05 02:26:24 ueshiba Exp $
+ *  $Id: CmdWindow.cc,v 1.7 2008-06-12 08:18:01 ueshiba Exp $
  */
 #include "TU/v/CmdWindow.h"
 #include "TU/v/App.h"
@@ -227,9 +227,6 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 
 CmdWindow::~CmdWindow()
 {
-#ifndef DESTROY_WIDGET
-    XtDestroyWidget(_widget);
-#endif
 }
 
 const Object::Widget&

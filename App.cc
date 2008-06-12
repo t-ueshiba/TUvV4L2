@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: App.cc,v 1.6 2008-06-05 02:26:24 ueshiba Exp $
+ *  $Id: App.cc,v 1.7 2008-06-12 08:18:01 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include <stdexcept>
@@ -185,7 +185,7 @@ App::App(int& argc, char* argv[])
 App::~App()
 {
 #ifndef DESTROY_WIDGET
-    XtDestroyWidget(_widget);
+  //XtDestroyWidget(_widget);
 #endif
 }
 

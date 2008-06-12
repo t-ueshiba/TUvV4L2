@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Widget-Xaw.cc,v 1.4 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: Widget-Xaw.cc,v 1.5 2008-06-12 08:18:02 ueshiba Exp $
  */
 #include "TU/v/TUv++.h"
 #include <X11/Xaw3d/ThreeD.h>
@@ -88,6 +88,8 @@ Object::Widget::Widget(::Widget widget)
     :_widget(widget)
 {
 #ifdef DEBUG
+    using namespace	std;
+    
     cerr << " Widget() --- widget: " << hex << (void*)_widget << dec
 	 << " (" << XtName(_widget) << ')'
 	 << endl;
@@ -104,6 +106,8 @@ Object::Widget::Widget(const Widget& parentWidget,
 				     NULL))
 {
 #ifdef DEBUG
+    using namespace	std;
+    
     cerr << " Widget() --- widget: " << hex << (void*)_widget << dec
 	 << " (" << XtName(_widget) << ')'
 	 << endl;
@@ -220,6 +224,8 @@ Object::Widget::Widget(const Widget& parentWidget,
 Object::Widget::~Widget()
 {
 #ifdef DEBUG
+    using namespace	std;
+    
     cerr << "~Widget() --- widget: " << hex << (void*)_widget << dec
 	 << " (" << XtName(_widget) << ')'
 	 << endl;
