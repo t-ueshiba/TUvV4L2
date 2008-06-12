@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Dialog.cc,v 1.4 2007-11-29 07:06:07 ueshiba Exp $
+ *  $Id: Dialog.cc,v 1.5 2008-06-12 08:18:02 ueshiba Exp $
  */
 #include "TU/v/Dialog.h"
 #include "TU/v/Colormap.h"
@@ -56,9 +56,6 @@ Dialog::Dialog(Window& parentWindow, const char* myName, const CmdDef cmd[])
 
 Dialog::~Dialog()
 {
-#ifndef DESTROY_WIDGET
-    XtDestroyWidget(_widget);
-#endif
 }
 
 const Object::Widget&
