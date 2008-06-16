@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Thread.cc,v 1.1 2008-06-11 05:04:12 ueshiba Exp $
+ *  $Id: Thread.cc,v 1.2 2008-06-16 02:22:31 ueshiba Exp $
  */
 #include "TU/Thread++.h"
 #include <iostream>
@@ -42,15 +42,16 @@ Thread::Thread()
     pthread_cond_init(&_cond, NULL);
 
     pthread_create(&_thread, NULL, threadProc, this);
+  // The Exit signal may be sent to the child thread from ~Thread()
+  // before the child reaches pthread_cond_wait() when ~Thread() is
+  // called immediately after Thread(). This results in the child
+  // failing to catch the signal and wait it forever! So, we need some
+  // delay here.
+    usleep(1000);
 }
 
 Thread::~Thread()
 {
-  // The Exit signal may be sent to the child thread before the child
-  // reach pthread_cond_wait() when ~Thread() is called immediately
-  // after Thread(). This results in the child failing to catch the
-  // signal and wait it forever! So, we need some delay here.
-    usleep(1000);
     pthread_mutex_lock(&_mutex);
     _state = Exit;
     pthread_cond_signal(&_cond);	// Send Exit signal to the child.
