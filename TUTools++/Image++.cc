@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.cc,v 1.20 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.21 2008-06-16 04:41:47 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
@@ -196,15 +196,12 @@ Image<T, B>::_resize(u_int h, u_int w, Type)
 *  static functions							*
 ************************************************************************/
 #ifdef SSE3
-static inline mmFlt	mmIIR2(const float* src, const float* dst,
-			       const float* c)
+static inline mmFlt	mmIIR2(const float* src, const float* dst, mmFlt c)
 			{
 			    return mmInpro4F(mmUnpackLF2(mmLoadFU(src),
-							 mmLoadFU(dst)),
-					     mmLoadFU(c));
+							 mmLoadFU(dst)), c);
 			}
-static inline mmFlt	mmIIR2(const u_char* src, const float* dst,
-			       const float* c)
+static inline mmFlt	mmIIR2(const u_char* src, const float* dst, mmFlt c)
 			{
 			    return mmInpro4F(
 				       mmUnpackLF2(
@@ -214,18 +211,16 @@ static inline mmFlt	mmIIR2(const u_char* src, const float* dst,
 							    0, 0, 0, src[1],
 							    0, 0, 0, src[0])),
 					   mmLoadFU(dst)),
-				       mmLoadFU(c));
+				       c);
 			}
 static inline mmFlt	mmIIR4(const float* src, const float* dst,
-			       const float* c)
+			       mmFlt cL, mmFlt cH)
 			{
-			    return mmAddF(mmInpro4F(mmLoadFU(src),
-						    mmLoadFU(c)), 
-					  mmInpro4F(mmLoadFU(dst),
-						    mmLoadFU(c + 4)));
+			    return mmAddF(mmInpro4F(mmLoadFU(src), cL), 
+					  mmInpro4F(mmLoadFU(dst), cH));
 			}
 static inline mmFlt	mmIIR4(const u_char* src, const float* dst,
-			       const float* c)
+			       mmFlt cL, mmFlt cH)
 			{
 			    return mmAddF(mmInpro4F(mmToFlt32(
 							_mm_set_epi8(
@@ -233,9 +228,8 @@ static inline mmFlt	mmIIR4(const u_char* src, const float* dst,
 							    0, 0, 0, src[2],
 							    0, 0, 0, src[1],
 							    0, 0, 0, src[0])),
-						    mmLoadFU(c)), 
-					  mmInpro4F(mmLoadFU(dst),
-						    mmLoadFU(c + 4)));
+						    cL), 
+					  mmInpro4F(mmLoadFU(dst), cH));
 			}
 #endif
 
@@ -341,9 +335,10 @@ IIRFilter<2u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 
     const S* const	tail = &in[in.dim()];
 #if defined(SSE3)
+    const mmFlt	c = mmLoadFU(_c);
     for (const S* const	tail2 = tail - 2; src < tail2; ++src)
     {
-	mmStoreRMostF(dst, mmIIR2(src - 1, dst - 2, _c));
+	mmStoreRMostF(dst, mmIIR2(src - 1, dst - 2, c));
 	++dst;
     }
 #endif
@@ -378,12 +373,13 @@ IIRFilter<2u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
     --src;
     --dst;
     *dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*dst[1] + _c[3]*dst[2];
+    const mmFlt	c = mmLoadFU(_c);
 #endif
     for (const S* const head = in; --src >= head; )
     {
 	--dst;
 #if defined(SSE3)
-	mmStoreRMostF(dst, mmIIR2(src + 1, dst + 1, _c));
+	mmStoreRMostF(dst, mmIIR2(src + 1, dst + 1, c));
 #else
 	*dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*dst[1] + _c[3]*dst[2];
 #endif
@@ -416,11 +412,13 @@ IIRFilter<4u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 	 + (_c[4] + _c[5])*dst[-3]	 + _c[6]*dst[-2] + _c[7]*dst[-1];
     ++src;
     ++dst;
-
+#if defined(SSE3)
+    const mmFlt	cL = mmLoadFU(_c), cH = mmLoadFU(_c + 4);
+#endif
     for (const S* const	tail = &in[in.dim()]; src < tail; ++src)
     {
 #if defined(SSE3)
-	mmStoreRMostF(dst, mmIIR4(src - 3, dst - 4, _c));
+	mmStoreRMostF(dst, mmIIR4(src - 3, dst - 4, cL, cH));
 #else
 	*dst = _c[0]*src[-3] + _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
 	     + _c[4]*dst[-4] + _c[5]*dst[-3] + _c[6]*dst[-2] + _c[7]*dst[-1];
@@ -455,11 +453,14 @@ IIRFilter<4u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
     --dst;
     *dst = _c[0]*src[1] + _c[1]*src[2] + (_c[2] + _c[3])*src[3]
 	 + _c[4]*dst[1] + _c[5]*dst[2] + (_c[6] + _c[7])*dst[3];
+#if defined(SSE3)
+    const mmFlt	cL = mmLoadFU(_c), cH = mmLoadFU(_c + 4);
+#endif
     for (const S* const head = in; --src >= head; )
     {
 	--dst;
 #if defined(SSE3)
-	mmStoreRMostF(dst, mmIIR4(src + 1, dst + 1, _c));
+	mmStoreRMostF(dst, mmIIR4(src + 1, dst + 1, cL, cH));
 #else
 	*dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*src[3] + _c[3]*src[4]
 	     + _c[4]*dst[1] + _c[5]*dst[2] + _c[6]*dst[3] + _c[7]*dst[4];
