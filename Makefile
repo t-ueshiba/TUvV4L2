@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.51 2008-06-11 05:02:43 ueshiba Exp $
+#  $Id: Makefile,v 1.52 2008-06-16 02:21:04 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -84,6 +84,7 @@ SRCS		= Allocator++.cc \
 		CameraWithFocalLength.cc \
 		CanonicalCamera.cc \
 		ConversionFromYUV.cc \
+		CorrectIntensity.cc \
 		EdgeDetector.cc \
 		GenericImage.cc \
 		Geometry++.cc \
@@ -123,6 +124,7 @@ OBJS		= Allocator++.o \
 		CameraWithFocalLength.o \
 		CanonicalCamera.o \
 		ConversionFromYUV.o \
+		CorrectIntensity.o \
 		EdgeDetector.o \
 		GenericImage.o \
 		Geometry++.o \
@@ -155,7 +157,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.51 $	|		\
+REV		= $(shell echo $Revision: 1.52 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -188,6 +190,9 @@ CanonicalCamera.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
 	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 ConversionFromYUV.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
 	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
+CorrectIntensity.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/mmInstructions.h
 EdgeDetector.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
 	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/mmInstructions.h

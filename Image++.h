@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.h,v 1.34 2008-06-11 05:02:42 ueshiba Exp $
+ *  $Id: Image++.h,v 1.35 2008-06-16 02:21:04 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -1544,6 +1544,33 @@ Warp::operator ()(int u, int v) const
     val[0] = float(fracs.us[u]) + float(fracs.du[u]) / 128.0;
     val[1] = float(fracs.vs[u]) + float(fracs.dv[u]) / 128.0;
     return val;
+}
+
+/************************************************************************
+*  class CorrectIntensity						*
+************************************************************************/
+class CorrectIntensity
+{
+  public:
+    CorrectIntensity(float gain=1.0, float offset=0.0)
+	:_gain(gain), _offset(offset)					{}
+
+    void	initialize(float gain, float offset)			;
+    template <class T>
+    void	operator()(Image<T>& image, int vs=0, int ve=0)	const	;
+    
+  private:
+    template <class T>
+    T		val(T pixel)					const	;
+    
+    float	_gain, _offset;
+};
+
+inline void
+CorrectIntensity::initialize(float gain, float offset)
+{
+    _gain   = gain;
+    _offset = offset;
 }
 
 }
