@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.20 2007-02-28 00:18:40 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.21 2008-06-24 00:42:24 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -519,7 +519,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 	_w = 1024;
 	_h = 768;
 	_p = YUV_422;
-	packet_size = 12280 * sizeof(quadlet_t);
+	packet_size = 12288 * sizeof(quadlet_t);
 	break;
       case RGB24_1024x768:
 	_w = 1024;
