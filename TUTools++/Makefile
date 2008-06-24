@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.52 2008-06-16 02:21:04 ueshiba Exp $
+#  $Id: Makefile,v 1.53 2008-06-24 00:40:50 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -42,6 +42,7 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/Mesh++.h \
 		TU/Nurbs++.h \
 		TU/PSTree++.h \
+		TU/Profiler.h \
 		TU/Random.h \
 		TU/Serial++.h \
 		TU/TU/Array++.h \
@@ -58,7 +59,6 @@ HDRS		= Allocator++.h \
 		BlockMatrix++.h \
 		Geometry++.h \
 		Heap++.h \
-		Image++.ORG.h \
 		Image++.h \
 		List++.h \
 		Manip.h \
@@ -66,6 +66,7 @@ HDRS		= Allocator++.h \
 		Minimize++.h \
 		Nurbs++.h \
 		PSTree++.h \
+		Profiler.h \
 		Random.h \
 		Ransac++.h \
 		Serial++.h \
@@ -103,6 +104,7 @@ SRCS		= Allocator++.cc \
 		Nurbs++.cc \
 		PSTree++.cc \
 		Pata.cc \
+		Profiler.cc \
 		Puma.cc \
 		Random.cc \
 		Rotation.cc \
@@ -143,6 +145,7 @@ OBJS		= Allocator++.o \
 		Nurbs++.o \
 		PSTree++.o \
 		Pata.o \
+		Profiler.o \
 		Puma.o \
 		Random.o \
 		Rotation.o \
@@ -157,7 +160,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.52 $	|		\
+REV		= $(shell echo $Revision: 1.53 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -231,6 +234,7 @@ PSTree++.o: TU/PSTree++.h TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/TU/List++.h
 Pata.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
+Profiler.o: TU/Profiler.h TU/TU/Array++.h TU/TU/TU/types.h
 Puma.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
 Random.o: TU/Random.h
