@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.21 2008-06-24 00:42:24 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.22 2008-06-27 07:53:20 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -621,30 +621,31 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 	break;
     }
     packet_size >>= (7 - rt);	// frameRateによってpacket_sizeを変える．
-    u_int	buf_size = _w * _h;
+    u_int	data_size = _w * _h;
     switch (_p)
     {
       case YUV_444:
       case RGB_24:
-	buf_size *= 3;
+	data_size *= 3;
 	break;
       case YUV_422:
       case MONO_16:
       case SIGNED_MONO_16:
       case RAW_16:
-	buf_size *= 2;
+	data_size *= 2;
 	break;
       case RGB_48:
       case SIGNED_RGB_48:
-	buf_size *= 6;
+	data_size *= 6;
 	break;
       case YUV_411:
-	(buf_size *= 3) /= 2;
+	(data_size *= 3) /= 2;
 	break;
     }
   // buf_sizeをpacket_sizeの整数倍にしてからmapする．
-    buf_size = packet_size * ((buf_size - 1) / packet_size + 1);
-    const u_char ch = mapListenBuffer(packet_size, buf_size, NBUFFERS);
+    const u_int  buf_size = packet_size * ((data_size - 1) / packet_size + 1);
+    const u_char ch = mapListenBuffer(packet_size, buf_size, data_size,
+				      NBUFFERS);
 
   // map時に割り当てられたチャンネル番号をカメラに設定する．
     quadlet_t	 quad = readQuadletFromRegister(ISO_Channel);
@@ -1604,7 +1605,7 @@ Ieee1394Camera::captureRaw(void* image) const
     if (_buf == 0)
 	throw std::runtime_error("TU::Ieee1394Camera::captureRaw: no images snapped!!");
   // Transfer image data from current buffer.
-    memcpy(image, _buf, bufferSize());
+    memcpy(image, _buf, dataSize());
 
     return *this;
 }

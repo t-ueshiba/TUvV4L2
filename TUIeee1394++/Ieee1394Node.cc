@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.9 2007-01-19 02:28:07 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.10 2008-06-27 07:53:20 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <unistd.h>
@@ -153,11 +153,11 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int delay
 #endif
      _nodeId(0),
 #if defined(USE_VIDEO1394)
-     _mmap(), _current(0), _buf_size(0),
+     _mmap(), _current(0),
 #else
      _channel(0), _current(0), _end(0),
 #endif
-     _buf(0), _filltime(), _delay(delay)
+     _buf(0), _data_size(0), _filltime(), _delay(delay)
 {
     using namespace	std;
 
@@ -360,14 +360,18 @@ Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
 /*!
   \param packet_size	受信するパケット1つあたりのサイズ(単位: byte)
   \param buf_size	バッファ1つあたりのサイズ(単位: byte)
+  \param data_size	1つのバッファ中のデータの有効サイズ(単位: byte)
   \param nb_buffers	割り当てるバッファ数
   \return		割り当てられたisochronous受信用のチャンネル
  */
 u_char
-Ieee1394Node::mapListenBuffer(size_t packet_size,
-			      size_t buf_size, u_int nb_buffers)
+Ieee1394Node::mapListenBuffer(size_t packet_size, size_t buf_size,
+			      size_t data_size, u_int nb_buffers)
 {
     using namespace	std;
+    
+    if (data_size > buf_size)
+	data_size = buf_size;
     
   // Unmap previously mapped buffer and unlisten the channel.
     unmapListenBuffer();
@@ -376,7 +380,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
   // Change buffer size and listen to the channel.
   //   *Caution: _mmap.buf_size may be changed by VIDEO1394_LISTEN_CHANNEL.
     _mmap.nb_buffers  = nb_buffers;
-    _mmap.buf_size    = _buf_size = buf_size;
+    _mmap.buf_size    = buf_size;
     _mmap.packet_size = packet_size;
     if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_CHANNEL, &_mmap) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: VIDEO1394_IOC_LISTEN_CHANNEL failed!! ") + strerror(errno));
@@ -398,6 +402,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 	throw runtime_error(string("Ieee1394Node::mapListenBuffer: mmap failed!! ") + strerror(errno));
     }
 
+    _data_size = data_size;
     usleep(100000);
     return _mmap.channel;
 #else
@@ -469,7 +474,8 @@ Ieee1394Node::flushListenBuffer()
 #if defined(USE_VIDEO1394)
   // Force flushing by doing unmap and then map buffer.
     if (_buf != 0)
-	mapListenBuffer(_mmap.packet_size, _buf_size, _mmap.nb_buffers);
+	mapListenBuffer(_mmap.packet_size, _mmap.buf_size, _data_size,
+			_mmap.nb_buffers);
     
   // POLL(kernel-2.4以降のみで有効)してREADY状態のバッファを全てrequeueする．
   // 1つのバッファが一杯になる前にisochronous転送が停止されると，そのバッファ
@@ -507,7 +513,7 @@ Ieee1394Node::unmapListenBuffer()
 #if defined(USE_VIDEO1394)
 	munmap(_buf, _mmap.nb_buffers * _mmap.buf_size);
 	_buf = 0;				// Reset buffer status.
-	_buf_size = _current = 0;		// ibid.
+	_current = 0;				// ibid.
 	if (ioctl(_port->fd(), VIDEO1394_IOC_UNLISTEN_CHANNEL, &_mmap.channel) < 0)
 	    throw runtime_error(string("TU::Ieee1394Node::unmapListenBuffer: VIDEO1394_IOC_UNLISTEN_CHANNEL failed!! ") + strerror(errno));
 #else

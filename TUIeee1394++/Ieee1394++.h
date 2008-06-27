@@ -1,5 +1,5 @@
 /*
- * libTUIeee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
+ * Libtuieee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
  * Copyright (C) 2003-2006 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
  *
@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.19 2008-03-06 06:00:48 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.20 2008-06-27 07:53:20 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -113,15 +113,11 @@ class Ieee1394Node
    */
     timeval	filltime()			const	{return _filltime;}
 
-  //! このノードに割り当てられたisochronous受信用バッファのサイズを返す
+  //! このノードに割り当てられたisochronous受信用バッファ中のデータの有効サイズを返す
   /*!
-    \return	受信用バッファのサイズ（単位：bytes）
+    \return	受信用バッファ中のデータの有効サイズ（単位：bytes）
    */
-#if defined(USE_VIDEO1394)
-    u_int	bufferSize()			const	{return _buf_size;}
-#else
-    u_int	bufferSize()			const	{return _end - _buf;}
-#endif    
+    u_int	dataSize()			const	{return _data_size;}
 
   //! このノードに割り当てられたisochronousチャンネルを返す
   /*!
@@ -155,6 +151,7 @@ class Ieee1394Node
     void		writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;
     u_char		mapListenBuffer(size_t packet_size,
 					size_t buf_size,
+					size_t data_size,
 					u_int nb_buffers)		;
     const u_char*	waitListenBuffer()				;
     void		requeueListenBuffer()				;
@@ -186,13 +183,13 @@ class Ieee1394Node
 #if defined(USE_VIDEO1394)
     video1394_mmap		_mmap;		// mmap structure for video1394.
     u_int			_current;	// index of current ready buffer.
-    u_int			_buf_size;	// buffer size excluding header.
 #else
     u_char			_channel;	// iso receive channel.
     u_char*			_current;	// current buffer head.
     u_char*			_end;		// end of the buffer.
 #endif
     u_char*			_buf;		// mapped buffer.
+    u_int			_data_size;	// effective data size.
     timeval			_filltime;	// time of buffer filled.
     const u_int			_delay;
 };

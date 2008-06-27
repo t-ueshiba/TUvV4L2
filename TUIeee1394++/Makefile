@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.15 2008-06-09 00:10:42 ueshiba Exp $
+#  $Id: Makefile,v 1.16 2008-06-27 07:53:20 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -29,15 +29,15 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Image++.cc \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/Minimize++.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/mmInstructions.h \
-		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/utility.h
+EXTHDRS		= /Users/ueshiba/include/TU/Array++.h \
+		/Users/ueshiba/include/TU/Geometry++.h \
+		/Users/ueshiba/include/TU/Image++.cc \
+		/Users/ueshiba/include/TU/Image++.h \
+		/Users/ueshiba/include/TU/Minimize++.h \
+		/Users/ueshiba/include/TU/Vector++.h \
+		/Users/ueshiba/include/TU/mmInstructions.h \
+		/Users/ueshiba/include/TU/types.h \
+		/Users/ueshiba/include/TU/utility.h
 HDRS		= Ieee1394++.h
 SRCS		= Ieee1394Camera.cc \
 		Ieee1394Node.cc
@@ -47,7 +47,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.15 $	|		\
+REV		= $(shell echo $Revision: 1.16 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -58,17 +58,17 @@ REV		= $(shell echo $Revision: 1.15 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Ieee1394Camera.o: Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.cc \
-	/home/ueshiba/include/TU/mmInstructions.h
-Ieee1394Node.o: Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+Ieee1394Camera.o: Ieee1394++.h /Users/ueshiba/include/TU/Image++.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h \
+	/Users/ueshiba/include/TU/Image++.cc \
+	/Users/ueshiba/include/TU/mmInstructions.h
+Ieee1394Node.o: Ieee1394++.h /Users/ueshiba/include/TU/Image++.h \
+	/Users/ueshiba/include/TU/Geometry++.h \
+	/Users/ueshiba/include/TU/utility.h \
+	/Users/ueshiba/include/TU/Minimize++.h \
+	/Users/ueshiba/include/TU/Vector++.h \
+	/Users/ueshiba/include/TU/Array++.h /Users/ueshiba/include/TU/types.h
