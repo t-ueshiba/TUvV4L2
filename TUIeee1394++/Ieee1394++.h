@@ -1,5 +1,5 @@
 /*
- * Libtuieee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
+ * libTUIeee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
  * Copyright (C) 2003-2006 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
  *
@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394++.h,v 1.20 2008-06-27 07:53:20 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.21 2008-06-30 00:27:04 ueshiba Exp $
  */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -113,12 +113,6 @@ class Ieee1394Node
    */
     timeval	filltime()			const	{return _filltime;}
 
-  //! このノードに割り当てられたisochronous受信用バッファ中のデータの有効サイズを返す
-  /*!
-    \return	受信用バッファ中のデータの有効サイズ（単位：bytes）
-   */
-    u_int	dataSize()			const	{return _data_size;}
-
   //! このノードに割り当てられたisochronousチャンネルを返す
   /*!
     \return	isochronousチャンネル
@@ -151,7 +145,6 @@ class Ieee1394Node
     void		writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;
     u_char		mapListenBuffer(size_t packet_size,
 					size_t buf_size,
-					size_t data_size,
 					u_int nb_buffers)		;
     const u_char*	waitListenBuffer()				;
     void		requeueListenBuffer()				;
@@ -183,13 +176,13 @@ class Ieee1394Node
 #if defined(USE_VIDEO1394)
     video1394_mmap		_mmap;		// mmap structure for video1394.
     u_int			_current;	// index of current ready buffer.
+    u_int			_buf_size;	// buffer size excluding header.
 #else
     u_char			_channel;	// iso receive channel.
     u_char*			_current;	// current buffer head.
     u_char*			_end;		// end of the buffer.
 #endif
     u_char*			_buf;		// mapped buffer.
-    u_int			_data_size;	// effective data size.
     timeval			_filltime;	// time of buffer filled.
     const u_int			_delay;
 };
@@ -505,7 +498,8 @@ class Ieee1394Camera : public Ieee1394Node
     const nodeaddr_t	_cmdRegBase;
     u_int		_w, _h;		// width and height of current image format.
     PixelFormat		_p;		// pixel format of current image format.
-    const u_char*	_buf;		// currently available image buffer.
+    const u_char*	_img;		// currently available image data.
+    u_int		_img_size;	// image data size.
     nodeaddr_t		_acr;		// access control register(ACR).
     Bayer		_bayer;		// Bayer pattern supported by this camera.
     bool		_littleEndian;	// true if MONO16 is in little endian format.
@@ -567,9 +561,9 @@ Ieee1394Camera::inquireBasicFunction() const
 inline Ieee1394Camera&
 Ieee1394Camera::snap()
 {
-    if (_buf != 0)
+    if (_img != 0)
 	requeueListenBuffer();
-    _buf = waitListenBuffer();
+    _img = waitListenBuffer();
     return *this;
 }
 
@@ -589,9 +583,9 @@ Ieee1394Camera::snap()
 template <class T> const Ieee1394Camera&
 Ieee1394Camera::captureDirectly(Image<T>& image) const
 {
-    if (_buf == 0)
+    if (_img == 0)
 	throw std::runtime_error("TU::Ieee1394Camera::captureDirectly: no images snapped!!");
-    image.resize((T*)_buf, height(), width());
+    image.resize((T*)_img, height(), width());
 
     return *this;
 }

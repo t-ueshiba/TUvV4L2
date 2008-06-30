@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.22 2008-06-27 07:53:20 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.23 2008-06-30 00:27:04 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -352,7 +352,8 @@ Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
 		  ),
      _cmdRegBase(CSR_REGISTER_BASE
 		 + 4 * int64_t(readValueFromUnitDependentDirectory(0x40))),
-     _w(0), _h(0), _p(MONO_8), _buf(0), _acr(0), _bayer(YYYY), _littleEndian(false)
+     _w(0), _h(0), _p(MONO_8), _img(0), _img_size(0),
+     _acr(0), _bayer(YYYY), _littleEndian(false)
 {
   // Set speed of isochronous transmission.
     quadlet_t	quad = (Ieee1394Node::SPD_400M << 24);
@@ -621,31 +622,30 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 	break;
     }
     packet_size >>= (7 - rt);	// frameRateによってpacket_sizeを変える．
-    u_int	data_size = _w * _h;
+    _img_size = _w * _h;
     switch (_p)
     {
       case YUV_444:
       case RGB_24:
-	data_size *= 3;
+	_img_size *= 3;
 	break;
       case YUV_422:
       case MONO_16:
       case SIGNED_MONO_16:
       case RAW_16:
-	data_size *= 2;
+	_img_size *= 2;
 	break;
       case RGB_48:
       case SIGNED_RGB_48:
-	data_size *= 6;
+	_img_size *= 6;
 	break;
       case YUV_411:
-	(data_size *= 3) /= 2;
+	(_img_size *= 3) /= 2;
 	break;
     }
   // buf_sizeをpacket_sizeの整数倍にしてからmapする．
-    const u_int  buf_size = packet_size * ((data_size - 1) / packet_size + 1);
-    const u_char ch = mapListenBuffer(packet_size, buf_size, data_size,
-				      NBUFFERS);
+    const u_int	 buf_size = packet_size * ((_img_size - 1) / packet_size + 1);
+    const u_char ch = mapListenBuffer(packet_size, buf_size, NBUFFERS);
 
   // map時に割り当てられたチャンネル番号をカメラに設定する．
     quadlet_t	 quad = readQuadletFromRegister(ISO_Channel);
@@ -1171,7 +1171,8 @@ Ieee1394Camera::stopContinuousShot()
     {
 	writeQuadletToRegister(ISO_EN, 0x0);
 	flushListenBuffer();
-	_buf = 0;
+	_img = 0;
+	_img_size = 0;
     }
     return *this;
 }
@@ -1298,7 +1299,7 @@ Ieee1394Camera::getMemoryChannelMax() const
 template <class T> const Ieee1394Camera&
 Ieee1394Camera::operator >>(Image<T>& image) const
 {
-    if (_buf == 0)
+    if (_img == 0)
 	throw std::runtime_error("TU::Ieee1394Camera::operator >>: no images snapped!!");
   // Transfer image data from current buffer.
     image.resize(height(), width());
@@ -1306,28 +1307,28 @@ Ieee1394Camera::operator >>(Image<T>& image) const
     {
       case YUV_444:
       {
-	const YUV444*	src = (const YUV444*)_buf;
+	const YUV444*	src = (const YUV444*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
       case YUV_422:
       {
-	const YUV422*	src = (const YUV422*)_buf;
+	const YUV422*	src = (const YUV422*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
       case YUV_411:
       {
-	const YUV411*	src = (const YUV411*)_buf;
+	const YUV411*	src = (const YUV411*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
       case RGB_24:
       {
-	const RGB*	src = (const RGB*)_buf;
+	const RGB*	src = (const RGB*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
@@ -1335,7 +1336,7 @@ Ieee1394Camera::operator >>(Image<T>& image) const
       case MONO_8:
       case RAW_8:
       {
-	const u_char*	src = _buf;
+	const u_char*	src = _img;
 	for (u_int v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
@@ -1344,13 +1345,13 @@ Ieee1394Camera::operator >>(Image<T>& image) const
       case RAW_16:
 	if (_littleEndian)
 	{
-	    const u_short*	src = (const u_short*)_buf;
+	    const u_short*	src = (const u_short*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
 		src = image[v].fill(src);
 	}
 	else
 	{
-	    const Mono16*	src = (const Mono16*)_buf;
+	    const Mono16*	src = (const Mono16*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
 		src = image[v].fill(src);
 	}
@@ -1358,13 +1359,13 @@ Ieee1394Camera::operator >>(Image<T>& image) const
       case SIGNED_MONO_16:
 	if (_littleEndian)
 	{
-	    const short*	src = (const short*)_buf;
+	    const short*	src = (const short*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
 		src = image[v].fill(src);
 	}
 	else
 	{
-	    const Mono16*	src = (const Mono16*)_buf;
+	    const Mono16*	src = (const Mono16*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
 		src = image[v].fill(src);
 	}
@@ -1392,7 +1393,7 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 template <class T> const Ieee1394Camera&
 Ieee1394Camera::captureRGBImage(Image<T>& image) const
 {
-    if (_buf == 0)
+    if (_img == 0)
 	throw std::runtime_error("TU::Ieee1394Camera::captureRGBImage: no images snapped!!");
   // Transfer image data from current buffer.
     image.resize(height(), width());
@@ -1403,7 +1404,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	{
 	  case RGGB:
 	  {
-	    const u_char*	p = bayerRGGB2x2(_buf, &image[0][0], width());
+	    const u_char*	p = bayerRGGB2x2(_img, &image[0][0], width());
 	    int			v = 1;
 	    while (v < image.height() - 1)	// 中間の行を処理．
 	    {
@@ -1416,7 +1417,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 
 	  case BGGR:
 	  {
-	    const u_char*	p = bayerBGGR2x2(_buf, &image[0][0], width());
+	    const u_char*	p = bayerBGGR2x2(_img, &image[0][0], width());
 	    int			v = 1;
 	    while (v < image.height() - 1)	// 中間の行を処理．
 	    {
@@ -1429,7 +1430,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 
 	  case GRBG:
 	  {
-	    const u_char*	p = bayerGRBG2x2(_buf, &image[0][0], width());
+	    const u_char*	p = bayerGRBG2x2(_img, &image[0][0], width());
 	    int			v = 1;
 	    while (v < image.height() - 1)	// 中間の行を処理．
 	    {
@@ -1442,7 +1443,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 
 	  case GBRG:
 	  {
-	    const u_char*	p = bayerGBRG2x2(_buf, &image[0][0], width());
+	    const u_char*	p = bayerGBRG2x2(_img, &image[0][0], width());
 	    int			v = 1;
 	    while (v < image.height() - 1)	// 中間の行を処理．
 	    {
@@ -1465,7 +1466,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  case RGGB:
 	    if (_littleEndian)
 	    {
-		const u_short*	p = bayerRGGB2x2((const u_short*)_buf,
+		const u_short*	p = bayerRGGB2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1477,7 +1478,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	    }
 	    else
 	    {
-		const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf,
+		const Mono16*	p = bayerRGGB2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1492,7 +1493,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  case BGGR:
 	    if (_littleEndian)
 	    {
-		const u_short*	p = bayerBGGR2x2((const u_short*)_buf,
+		const u_short*	p = bayerBGGR2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1504,7 +1505,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	    }
 	    else
 	    {
-		const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf,
+		const Mono16*	p = bayerBGGR2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1519,7 +1520,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  case GRBG:
 	    if (_littleEndian)
 	    {
-		const u_short*	p = bayerGRBG2x2((const u_short*)_buf,
+		const u_short*	p = bayerGRBG2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1531,7 +1532,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	    }
 	    else
 	    {
-		const Mono16*	p = bayerGRBG2x2((const Mono16*)_buf,
+		const Mono16*	p = bayerGRBG2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1546,7 +1547,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  case GBRG:
 	    if (_littleEndian)
 	    {
-		const u_short*	p = bayerGBRG2x2((const u_short*)_buf,
+		const u_short*	p = bayerGBRG2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1558,7 +1559,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	    }
 	    else
 	    {
-		const Mono16*	p = bayerGBRG2x2((const Mono16*)_buf,
+		const Mono16*	p = bayerGBRG2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
 		while (v < image.height() - 1)	// 中間の行を処理．
@@ -1602,10 +1603,10 @@ struct RGB
 const Ieee1394Camera&
 Ieee1394Camera::captureRaw(void* image) const
 {
-    if (_buf == 0)
+    if (_img == 0)
 	throw std::runtime_error("TU::Ieee1394Camera::captureRaw: no images snapped!!");
   // Transfer image data from current buffer.
-    memcpy(image, _buf, dataSize());
+    memcpy(image, _img, _img_size);
 
     return *this;
 }
@@ -1625,7 +1626,7 @@ Ieee1394Camera::captureRaw(void* image) const
 const Ieee1394Camera&
 Ieee1394Camera::captureBayerRaw(void* image) const
 {
-    if (_buf == 0)
+    if (_img == 0)
 	throw std::runtime_error("TU::Ieee1394Camera::captureBayerRaw: no images snapped!!");
 
   // Transfer image data from current buffer.
@@ -1637,7 +1638,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	  case RGGB:
 	  {
 	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerRGGB2x2(_buf, rgb, width());
+	    const u_char*	p = bayerRGGB2x2(_img, rgb, width());
 	    rgb += width();
 	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 	    {
@@ -1653,7 +1654,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	  case BGGR:
 	  {
 	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerBGGR2x2(_buf, rgb, width());
+	    const u_char*	p = bayerBGGR2x2(_img, rgb, width());
 	    rgb += width();
 	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 	    {
@@ -1669,7 +1670,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	  case GRBG:
 	  {
 	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerGRBG2x2(_buf, rgb, width());
+	    const u_char*	p = bayerGRBG2x2(_img, rgb, width());
 	    rgb += width();
 	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 	    {
@@ -1685,7 +1686,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	  case GBRG:
 	  {
 	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerGBRG2x2(_buf, rgb, width());
+	    const u_char*	p = bayerGBRG2x2(_img, rgb, width());
 	    rgb += width();
 	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 	    {
@@ -1701,7 +1702,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	  default:
 	  {
 	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = _buf;
+	    const u_char*	p = _img;
 	    for (int n = width() * height(); n-- > 0; )
 	    {
 		rgb->r = rgb->g = rgb->b = *p++;
@@ -1719,7 +1720,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    if (_littleEndian)
 	    {
 		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerRGGB2x2((const u_short*)_buf, rgb, width());
+		const u_short*	p = bayerRGGB2x2((const u_short*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1733,7 +1734,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    else
 	    {
 		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerRGGB2x2((const Mono16*)_buf, rgb, width());
+		const Mono16*	p = bayerRGGB2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1750,7 +1751,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    if (_littleEndian)
 	    {
 		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerBGGR2x2((const u_short*)_buf, rgb, width());
+		const u_short*	p = bayerBGGR2x2((const u_short*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1764,7 +1765,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    else
 	    {
 		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerBGGR2x2((const Mono16*)_buf, rgb, width());
+		const Mono16*	p = bayerBGGR2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1781,7 +1782,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    if (_littleEndian)
 	    {
 		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerGRBG2x2((const u_short*)_buf, rgb, width());
+		const u_short*	p = bayerGRBG2x2((const u_short*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1795,7 +1796,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    else
 	    {
 		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerGRBG2x2((const Mono16*)_buf, rgb, width());
+		const Mono16*	p = bayerGRBG2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1812,7 +1813,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    if (_littleEndian)
 	    {
 		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerGBRG2x2((const u_short*)_buf, rgb, width());
+		const u_short*	p = bayerGBRG2x2((const u_short*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1826,7 +1827,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    else
 	    {
 		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerGBRG2x2((const Mono16*)_buf, rgb, width());
+		const Mono16*	p = bayerGBRG2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
 		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
 		{
@@ -1843,7 +1844,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    if (_littleEndian)
 	    {
 		RGB*		rgb = (RGB*)image;
-		const u_short*	p = (const u_short*)_buf;
+		const u_short*	p = (const u_short*)_img;
 		for (int n = width() * height(); n-- > 0; )
 		{
 		    rgb->r = rgb->g = rgb->b = *p++;
@@ -1853,7 +1854,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    else
 	    {
 		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = (const Mono16*)_buf;
+		const Mono16*	p = (const Mono16*)_img;
 		for (int n = width() * height(); n-- > 0; )
 		{
 		    rgb->r = rgb->g = rgb->b = *p++;
