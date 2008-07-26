@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XDC.h,v 1.8 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: XDC.h,v 1.9 2008-07-26 01:51:17 ueshiba Exp $
  */
 #ifndef __TUvXDC_h
 #define __TUvXDC_h
@@ -122,6 +122,8 @@ class XDC : public DC
     virtual DC&		operator <<(const Image<YUV444>& image)		;
     virtual DC&		operator <<(const Image<YUV422>& image)		;
     virtual DC&		operator <<(const Image<YUV411>& image)		;
+    virtual DC&		drawLine(const Point2<int>& p,
+				 const Point2<int>& q)			;
     virtual DC&		draw(const char* s, int u, int v)		;
 
     void		dump(std::ostream& out)			const	;
