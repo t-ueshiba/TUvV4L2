@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: DC.h,v 1.9 2007-11-29 07:06:07 ueshiba Exp $
+ *  $Id: DC.h,v 1.10 2008-07-26 01:51:16 ueshiba Exp $
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -91,6 +91,11 @@ class DC
     virtual DC&		operator <<(const Image<YUV444>& image)	= 0;
     virtual DC&		operator <<(const Image<YUV422>& image)	= 0;
     virtual DC&		operator <<(const Image<YUV411>& image)	= 0;
+    virtual DC&		drawLine(const Point2<int>& p,
+				 const Point2<int>& q)		= 0;
+    template <class T>
+	    DC&		drawLine(const Point2<T>& p,
+				 const Point2<T>& q)		;
     virtual DC&		draw(const char* s, int u, int v)	= 0;
 
     int			log2devR(int r)			const	;
@@ -136,6 +141,12 @@ template <class T> inline DC&
 DC::operator <<(const Point2<T>& p)
 {
     return *this << Point2<int>(p);
+}
+
+template <class T> inline DC&
+DC::drawLine(const Point2<T>& p, const Point2<T>& q)
+{
+    return drawLine(Point2<int>(p), Point2<int>(q));
 }
 
 inline int

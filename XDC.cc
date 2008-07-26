@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XDC.cc,v 1.9 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: XDC.cc,v 1.10 2008-07-26 01:51:17 ueshiba Exp $
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -432,6 +432,15 @@ XDC::operator <<(const Image<YUV411>& image)
     setColorcube();
     createXImage(image);
     putXImage();
+
+    return *this;
+}
+
+DC&
+XDC::drawLine(const Point2<int>& p, const Point2<int>& q)
+{
+    XDrawLine(_colormap.display(), drawable(), _gc,
+	      log2devU(p[0]), log2devV(p[1]), log2devU(q[0]), log2devU(q[1]));
 
     return *this;
 }
