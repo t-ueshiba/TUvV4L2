@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.cc,v 1.21 2008-06-16 04:41:47 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.22 2008-08-04 05:46:08 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
@@ -195,42 +195,190 @@ Image<T, B>::_resize(u_int h, u_int w, Type)
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-#ifdef SSE3
-static inline mmFlt	mmIIR2(const float* src, const float* dst, mmFlt c)
-			{
-			    return mmInpro4F(mmUnpackLF2(mmLoadFU(src),
-							 mmLoadFU(dst)), c);
-			}
-static inline mmFlt	mmIIR2(const u_char* src, const float* dst, mmFlt c)
-			{
-			    return mmInpro4F(
-				       mmUnpackLF2(
-					   mmToFlt32(
-					       _mm_set_epi8(0, 0, 0, 0,
-							    0, 0, 0, 0,
-							    0, 0, 0, src[1],
-							    0, 0, 0, src[0])),
-					   mmLoadFU(dst)),
-				       c);
-			}
-static inline mmFlt	mmIIR4(const float* src, const float* dst,
-			       mmFlt cL, mmFlt cH)
-			{
-			    return mmAddF(mmInpro4F(mmLoadFU(src), cL), 
-					  mmInpro4F(mmLoadFU(dst), cH));
-			}
-static inline mmFlt	mmIIR4(const u_char* src, const float* dst,
-			       mmFlt cL, mmFlt cH)
-			{
-			    return mmAddF(mmInpro4F(mmToFlt32(
-							_mm_set_epi8(
-							    0, 0, 0, src[3],
-							    0, 0, 0, src[2],
-							    0, 0, 0, src[1],
-							    0, 0, 0, src[0])),
-						    cL), 
-					  mmInpro4F(mmLoadFU(dst), cH));
-			}
+#if defined(SSE2)
+static inline mmFlt
+mmForward2(mmFlt in3210, mmFlt c0123, mmFlt& tmp)
+{
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c0123, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(0,0,0,0))));
+    mmFlt	out0123 = tmp;
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c0123, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(1,1,0,0))));
+    out0123 = mmReplaceRMostF(mmShiftLF(out0123), tmp);
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c0123, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(2,2,0,0))));
+    out0123 = mmReplaceRMostF(mmShiftLF(out0123), tmp);
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c0123, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(3,3,0,0))));
+    return mmReverseF(mmReplaceRMostF(mmShiftLF(out0123), tmp));
+}
+
+static inline mmFlt
+mmBackward2(mmFlt in3210, mmFlt c1032, mmFlt& tmp)
+{
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c1032, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(3,3,0,0))));
+    mmFlt	out3210 = tmp;
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c1032, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(2,2,0,0))));
+    out3210 = mmReplaceRMostF(mmShiftLF(out3210), tmp);
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c1032, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(1,1,0,0))));
+    out3210 = mmReplaceRMostF(mmShiftLF(out3210), tmp);
+    tmp = mmAddF(mmShiftRF(tmp),
+		 mmMulF(c1032, _mm_shuffle_ps(tmp, in3210,
+					      _MM_SHUFFLE(0,0,0,0))));
+    return mmReplaceRMostF(mmShiftLF(out3210), tmp);
+}
+
+template <class S> static void
+mmForward2(const S*& src, float*& dst, mmFlt c0123, mmFlt& tmp);
+
+template <> inline void
+mmForward2(const u_char*& src, float*& dst, mmFlt c0123, mmFlt& tmp)
+{
+    mmInt	in8 = mmLoadU((const mmInt*)src);
+    mmStoreFU(dst, mmForward2(mmToFlt0(in8), c0123, tmp));
+    dst += 4;
+    mmStoreFU(dst, mmForward2(mmToFlt1(in8), c0123, tmp));
+    dst += 4;
+    mmStoreFU(dst, mmForward2(mmToFlt2(in8), c0123, tmp));
+    dst += 4;
+    mmStoreFU(dst, mmForward2(mmToFlt3(in8), c0123, tmp));
+    dst += 4;
+    src += mmNBytes;
+}
+
+template <> inline void
+mmForward2(const float*& src, float*& dst, mmFlt c0123, mmFlt& tmp)
+{
+    mmStoreFU(dst, mmForward2(mmLoadFU(src), c0123, tmp));
+    dst += 4;
+    src += 4;
+}
+
+template <class S> static void
+mmBackward2(const S*& src, float*& dst, mmFlt c1032, mmFlt& tmp);
+
+template <> inline void
+mmBackward2(const u_char*& src, float*& dst, mmFlt c1032, mmFlt& tmp)
+{
+    src -= mmNBytes;
+    mmInt	in8 = mmLoadU((const mmInt*)src);
+    dst -= 4;
+    mmStoreFU(dst, mmBackward2(mmToFlt3(in8), c1032, tmp));
+    dst -= 4;
+    mmStoreFU(dst, mmBackward2(mmToFlt2(in8), c1032, tmp));
+    dst -= 4;
+    mmStoreFU(dst, mmBackward2(mmToFlt1(in8), c1032, tmp));
+    dst -= 4;
+    mmStoreFU(dst, mmBackward2(mmToFlt0(in8), c1032, tmp));
+}
+
+template <> inline void
+mmBackward2(const float*& src, float*& dst, mmFlt c1032, mmFlt& tmp)
+{
+    src -= 4;
+    dst -= 4;
+    mmStoreFU(dst, mmBackward2(mmLoadFU(src), c1032, tmp));
+}
+
+static inline mmFlt
+mmForward4(mmFlt in3210, mmFlt c0123, mmFlt c4567, mmFlt& tmp)
+{
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c0123, mmSet0F(in3210)),
+					mmMulF(c4567, mmSet0F(tmp))));
+    mmFlt	out0123 = tmp;
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c0123, mmSet1F(in3210)),
+					mmMulF(c4567, mmSet0F(tmp))));
+    out0123 = mmReplaceRMostF(mmShiftLF(out0123), tmp);
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c0123, mmSet2F(in3210)),
+					mmMulF(c4567, mmSet0F(tmp))));
+    out0123 = mmReplaceRMostF(mmShiftLF(out0123), tmp);
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c0123, mmSet3F(in3210)),
+					mmMulF(c4567, mmSet0F(tmp))));
+    return mmReverseF(mmReplaceRMostF(mmShiftLF(out0123), tmp));
+}
+
+static inline mmFlt
+mmBackward4(mmFlt in3210, mmFlt c3210, mmFlt c7654, mmFlt& tmp)
+{
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c3210, mmSet3F(in3210)),
+					mmMulF(c7654, mmSet0F(tmp))));
+    mmFlt	out3210 = tmp;
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c3210, mmSet2F(in3210)),
+					mmMulF(c7654, mmSet0F(tmp))));
+    out3210 = mmReplaceRMostF(mmShiftLF(out3210), tmp);
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c3210, mmSet1F(in3210)),
+					mmMulF(c7654, mmSet0F(tmp))));
+    out3210 = mmReplaceRMostF(mmShiftLF(out3210), tmp);
+    tmp = mmAddF(mmShiftRF(tmp), mmAddF(mmMulF(c3210, mmSet0F(in3210)),
+					mmMulF(c7654, mmSet0F(tmp))));
+    return mmReplaceRMostF(mmShiftLF(out3210), tmp);
+}
+
+template <class S> static void
+mmForward4(const S*& src, float*& dst, mmFlt c0123, mmFlt c4567, mmFlt& tmp);
+
+template <> inline void
+mmForward4(const u_char*& src, float*& dst,
+	   mmFlt c0123, mmFlt c4567, mmFlt& tmp)
+{
+    mmInt	in8 = mmLoadU((const mmInt*)src);
+    mmStoreFU(dst, mmForward4(mmToFlt0(in8), c0123, c4567, tmp));
+    dst += 4;
+    mmStoreFU(dst, mmForward4(mmToFlt1(in8), c0123, c4567, tmp));
+    dst += 4;
+    mmStoreFU(dst, mmForward4(mmToFlt2(in8), c0123, c4567, tmp));
+    dst += 4;
+    mmStoreFU(dst, mmForward4(mmToFlt3(in8), c0123, c4567, tmp));
+    dst += 4;
+    src += mmNBytes;
+}
+
+template <> inline void
+mmForward4(const float*& src, float*& dst,
+	   mmFlt c0123, mmFlt c4567, mmFlt& tmp)
+{
+    mmStoreFU(dst, mmForward4(mmLoadFU(src), c0123, c4567, tmp));
+    dst += 4;
+    src += 4;
+}
+
+template <class S> static void
+mmBackward4(const S*& src, float*& dst, mmFlt c3210, mmFlt c7654, mmFlt& tmp);
+
+template <> inline void
+mmBackward4(const u_char*& src, float*& dst,
+	    mmFlt c3210, mmFlt c7654, mmFlt& tmp)
+{
+    src -= mmNBytes;
+    mmInt	in8 = mmLoadU((const mmInt*)src);
+    dst -= 4;
+    mmStoreFU(dst, mmBackward4(mmToFlt3(in8), c3210, c7654, tmp));
+    dst -= 4;
+    mmStoreFU(dst, mmBackward4(mmToFlt2(in8), c3210, c7654, tmp));
+    dst -= 4;
+    mmStoreFU(dst, mmBackward4(mmToFlt1(in8), c3210, c7654, tmp));
+    dst -= 4;
+    mmStoreFU(dst, mmBackward4(mmToFlt0(in8), c3210, c7654, tmp));
+}
+
+template <> inline void
+mmBackward4(const float*& src, float*& dst,
+	    mmFlt c3210, mmFlt c7654, mmFlt& tmp)
+{
+    src -= 4;
+    dst -= 4;
+    mmStoreFU(dst, mmBackward4(mmLoadFU(src), c3210, c7654, tmp));
+}
 #endif
 
 /************************************************************************
@@ -276,7 +424,7 @@ IIRFilter<D>::forward(const Array<S, B>& in, Array<float, B2>& out) const
     float*	dst = out;
     for (const S* const	tail = &in[in.dim()]; src < tail; ++src)
     {
-	const int	d = min(D, src - (S*)in);
+	const int	d = std::min(int(D), src - (const S*)in);
 	
 	if (d == 0)
 	    *dst = _c[1] * src[0];
@@ -307,7 +455,7 @@ IIRFilter<D>::backward(const Array<S, B>& in, Array<float, B2>& out) const
     float*	dst = &out[out.dim()];
     for (const S* const	head = in; src > head; )
     {
-	const int	d = min(D, &in[in.dim()] - src--);
+	const int	d = std::min(int(D), &in[in.dim()] - src--);
 
       	*--dst = 0;
 	for (int i = 0; i < d; ++i)
@@ -324,23 +472,23 @@ IIRFilter<2u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    const S*	src = in;
-    float*	dst = out;
+    const S*		src = in;
+    float*		dst = out;
+    const S* const	tail = &in[in.dim()];
+#if defined(SSE2)
+    const mmFlt	c0123 = mmSetF(_c[0], _c[1], _c[2], _c[3]);
+    mmFlt	tmp = mmSetF(_c[0]*src[1], _c[0]*src[0] + _c[1]*src[1],
+			     _c[0]*src[0] + _c[1]*src[0], 0.0);
+    src += 2;
+    for (const S* const tail2 = tail - mmNBytes/sizeof(S); src <= tail2; )
+	mmForward2(src, dst, c0123, tmp);
+#else
     *dst = (_c[0] + _c[1])*src[0];
     ++src;
     ++dst;
     *dst = _c[0]*src[-1] + _c[1]*src[0] + (_c[2] + _c[3])*dst[-1];
     ++src;
     ++dst;
-
-    const S* const	tail = &in[in.dim()];
-#if defined(SSE3)
-    const mmFlt	c = mmLoadFU(_c);
-    for (const S* const	tail2 = tail - 2; src < tail2; ++src)
-    {
-	mmStoreRMostF(dst, mmIIR2(src - 1, dst - 2, c));
-	++dst;
-    }
 #endif
     for (; src < tail; ++src)
     {
@@ -358,31 +506,28 @@ IIRFilter<2u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    float*	dst = &out[out.dim()];
-    const S*	src = &in[in.dim()];
+    float*		dst = &out[out.dim()];
+    const S*		src = &in[in.dim()];
+    const S* const	head = &in[0];
+#if defined(SSE2)
+    const mmFlt		c1032 = mmSetF(_c[1], _c[0], _c[3], _c[2]);
+    mmFlt		tmp   = mmSetF(_c[1]*src[-1], (_c[0] + _c[1])*src[-1],
+				       (_c[0] + _c[1])*src[-1], 0.0);
+    src -= 2;
+    for (const S* const head2 = head + mmNBytes/sizeof(S); src >= head2; )
+	mmBackward2(src, dst, c1032, tmp);
+#else
     --src;
     --dst;
     *dst = (_c[0] + _c[1])*src[0];
     --src;
     --dst;
     *dst = (_c[0] + _c[1])*src[1] + (_c[2] + _c[3])*dst[1];
-#ifdef SSE3
-    --src;
-    --dst;
-    *dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*dst[1] + _c[3]*dst[2];
-    --src;
-    --dst;
-    *dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*dst[1] + _c[3]*dst[2];
-    const mmFlt	c = mmLoadFU(_c);
 #endif
     for (const S* const head = in; --src >= head; )
     {
 	--dst;
-#if defined(SSE3)
-	mmStoreRMostF(dst, mmIIR2(src + 1, dst + 1, c));
-#else
 	*dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*dst[1] + _c[3]*dst[2];
-#endif
     }
 
     return *this;
@@ -395,36 +540,36 @@ IIRFilter<4u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    const S*	src = in;
-    float*	dst = out;
+    const S*		src = in;
+    float*		dst = out;
+    const S* const	tail = &in[in.dim()];
+#if defined(SSE2)
+    const mmFlt		c0123 = mmSetF(_c[0], _c[1], _c[2], _c[3]),
+			c4567 = mmSetF(_c[4], _c[5], _c[6], _c[7]);
+    mmFlt		tmp   = mmSetF(_c[0]*src[0], (_c[0] + _c[1])*src[0],
+				       (_c[0] + _c[1] + _c[2])*src[0], 0.0);
+    for (const S* const tail2 = tail - mmNBytes/sizeof(S); src <= tail2; )
+	mmForward4(src, dst, c0123, c4567, tmp);
+#else
     *dst = (_c[0] + _c[1] + _c[2] + _c[3])*src[0];
     ++src;
     ++dst;
     *dst = (_c[0] + _c[1] + _c[2])*src[-1] + _c[3]*src[0]
-	 + (_c[4] + _c[5] + _c[6] + _c[7])*dst[-1];
+					   + _c[7]*dst[-1];
     ++src;
     ++dst;
     *dst = (_c[0] + _c[1])*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
-	 + (_c[4] + _c[5] + _c[6])*dst[-2]	   + _c[7]*dst[-1];
+				   + _c[6]*dst[-2] + _c[7]*dst[-1];
     ++src;
     ++dst;
     *dst = _c[0]*src[-3] + _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
-	 + (_c[4] + _c[5])*dst[-3]	 + _c[6]*dst[-2] + _c[7]*dst[-1];
+			 + _c[5]*dst[-3] + _c[6]*dst[-2] + _c[7]*dst[-1];
     ++src;
     ++dst;
-#if defined(SSE3)
-    const mmFlt	cL = mmLoadFU(_c), cH = mmLoadFU(_c + 4);
 #endif
-    for (const S* const	tail = &in[in.dim()]; src < tail; ++src)
-    {
-#if defined(SSE3)
-	mmStoreRMostF(dst, mmIIR4(src - 3, dst - 4, cL, cH));
-#else
-	*dst = _c[0]*src[-3] + _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
-	     + _c[4]*dst[-4] + _c[5]*dst[-3] + _c[6]*dst[-2] + _c[7]*dst[-1];
-#endif
-	++dst;
-    }
+    for (; src < tail; ++src)
+	*dst++ = _c[0]*src[-3] + _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
+	       + _c[4]*dst[-4] + _c[5]*dst[-3] + _c[6]*dst[-2] + _c[7]*dst[-1];
 
     return *this;
 }
@@ -436,35 +581,38 @@ IIRFilter<4u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    float*	dst = &out[out.dim()];
-    const S*	src = &in[in.dim()];
+    float*		dst = &out[out.dim()];
+    const S*		src = &in[in.dim()];
+    const S* const	head = &in[0];
+#if defined(SSE2)
+    const mmFlt		c3210 = mmSetF(_c[3], _c[2], _c[1], _c[0]),
+			c7654 = mmSetF(_c[7], _c[6], _c[5], _c[4]);
+    mmFlt		tmp   = mmSetF(_c[3]*src[-1], (_c[3] + _c[2])*src[-1],
+				       (_c[3] + _c[2] + _c[1])*src[-1], 0.0);
+    for (const S* const head2 = head + mmNBytes/sizeof(S); src >= head2; )
+	mmBackward4(src, dst, c3210, c7654, tmp);
+#else
     --src;
     --dst;
     *dst = (_c[0] + _c[1] + _c[2] + _c[3])*src[0];
     --src;
     --dst;
     *dst = (_c[0] + _c[1] + _c[2] + _c[3])*src[1];
-	 + (_c[4] + _c[5] + _c[6] + _c[7])*dst[1];
+	 + _c[4]*dst[1];
     --src;
     --dst;
     *dst = _c[0]*src[1] + (_c[1] + _c[2] + _c[3])*src[2]
-	 + _c[4]*dst[1] + (_c[5] + _c[6] + _c[7])*dst[2];
+	 + _c[4]*dst[1] + _c[5]*dst[2];
     --src;
     --dst;
     *dst = _c[0]*src[1] + _c[1]*src[2] + (_c[2] + _c[3])*src[3]
-	 + _c[4]*dst[1] + _c[5]*dst[2] + (_c[6] + _c[7])*dst[3];
-#if defined(SSE3)
-    const mmFlt	cL = mmLoadFU(_c), cH = mmLoadFU(_c + 4);
+	 + _c[4]*dst[1] + _c[5]*dst[2] + _c[6]*dst[3];
 #endif
     for (const S* const head = in; --src >= head; )
     {
 	--dst;
-#if defined(SSE3)
-	mmStoreRMostF(dst, mmIIR4(src + 1, dst + 1, cL, cH));
-#else
 	*dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*src[3] + _c[3]*src[4]
 	     + _c[4]*dst[1] + _c[5]*dst[2] + _c[6]*dst[3] + _c[7]*dst[4];
-#endif
     }
 
     return *this;

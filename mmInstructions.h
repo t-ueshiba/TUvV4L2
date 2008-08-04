@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: mmInstructions.h,v 1.6 2008-05-13 01:43:35 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.7 2008-08-04 05:46:08 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -250,6 +250,16 @@ namespace TU
 							_mm_castsi128_ps(x);}
   static inline mmInt	mmCastToInt(mmFlt x)	    {return
 							_mm_castps_si128(x);}
+  static inline mmFlt	mmShiftLF(mmFlt x)
+			{
+			    return mmCastToFlt(
+				     _mm_slli_si128(mmCastToInt(x), 4));
+			}
+  static inline mmFlt	mmShiftRF(mmFlt x)
+			{
+			    return mmCastToFlt(
+				     _mm_srli_si128(mmCastToInt(x), 4));
+			}
 #  else
   static inline mmFlt	mmToFlt(mmInt x)	    {return _mm_cvtpi16_ps(x);}
   static inline mmFlt	mmToFlt0(mmInt x)	    {return _mm_cvtpu8_ps(x);}
@@ -288,6 +298,26 @@ namespace TU
   static inline mmFlt	mmRotateRF(mmFlt x)
 			{
 			    return _mm_shuffle_ps(x, x, _MM_SHUFFLE(0,3,2,1));
+			}
+  static inline mmFlt	mmReverseF(mmFlt x)
+			{
+			    return _mm_shuffle_ps(x, x, _MM_SHUFFLE(0,1,2,3));
+			}
+  static inline mmFlt	mmSet0F(mmFlt x)
+			{
+			    return _mm_shuffle_ps(x, x, _MM_SHUFFLE(0,0,0,0));
+			}
+  static inline mmFlt	mmSet1F(mmFlt x)
+			{
+			    return _mm_shuffle_ps(x, x, _MM_SHUFFLE(1,1,1,1));
+			}
+  static inline mmFlt	mmSet2F(mmFlt x)
+			{
+			    return _mm_shuffle_ps(x, x, _MM_SHUFFLE(2,2,2,2));
+			}
+  static inline mmFlt	mmSet3F(mmFlt x)
+			{
+			    return _mm_shuffle_ps(x, x, _MM_SHUFFLE(3,3,3,3));
 			}
   static inline mmFlt	mmReplaceRMostF(mmFlt x,
 					mmFlt y)    {return _mm_move_ss(x, y);}
