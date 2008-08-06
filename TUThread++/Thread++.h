@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Thread++.h,v 1.2 2008-06-16 02:22:31 ueshiba Exp $
+ *  $Id: Thread++.h,v 1.3 2008-08-06 08:03:55 ueshiba Exp $
  */
 #ifndef __TUThreadPP_h
 #define __TUThreadPP_h
@@ -150,7 +150,7 @@ MultiThread<OP, DATA>::OperatorThread::raise(const OP& op, DATA& data,
     postRaise();
 }
 
-template <class OP, class DATA> inline void
+template <class OP, class DATA> void
 MultiThread<OP, DATA>::OperatorThread::doJob()
 {
     (*_op)(*_data, _is, _ie);
@@ -227,7 +227,7 @@ MultiThread2<OP, IN, OUT>::OperatorThread::raise(const OP& op,
     postRaise();
 }
 
-template <class OP, class IN, class OUT> inline void
+template <class OP, class IN, class OUT> void
 MultiThread2<OP, IN, OUT>::OperatorThread::doJob()
 {
     (*_op)(*_in, *_out, _is, _ie);
