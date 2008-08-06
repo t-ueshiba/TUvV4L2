@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.h,v 1.35 2008-06-16 02:21:04 ueshiba Exp $
+ *  $Id: Image++.h,v 1.36 2008-08-06 07:51:44 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -796,8 +796,8 @@ template <u_int D> class BilateralIIRFilter
     
     BilateralIIRFilter&	initialize(const float cF[D+D], const float cB[D+D]);
     BilateralIIRFilter&	initialize(const float c[D+D], Order order)	;
-    template <class S, class B>
-    BilateralIIRFilter&	convolve(const Array<S, B>& in)			;
+    template <class S, class B> const BilateralIIRFilter&
+			convolve(const Array<S, B>& in)		const	;
     u_int		dim()					const	;
     float		operator [](int i)			const	;
     void		limits(float& limit0,
@@ -805,10 +805,10 @@ template <u_int D> class BilateralIIRFilter
 			       float& limit2)			const	;
     
   private:
-    IIRFilter<D>	_iirF;
-    Array<float>	_bufF;
-    IIRFilter<D>	_iirB;
-    Array<float>	_bufB;
+    IIRFilter<D>		_iirF;
+    mutable Array<float>	_bufF;
+    IIRFilter<D>		_iirB;
+    mutable Array<float>	_bufB;
 };
 
 //! フィルタのz変換係数をセットする
@@ -847,8 +847,9 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
   \param in	入力データ列
   return	このフィルタ自身
 */
-template <u_int D> template <class S, class B> inline BilateralIIRFilter<D>&
-BilateralIIRFilter<D>::convolve(const Array<S, B>& in)
+template <u_int D> template <class S, class B>
+inline const BilateralIIRFilter<D>&
+BilateralIIRFilter<D>::convolve(const Array<S, B>& in) const
 {
     _iirF.forward(in, _bufF);
     _iirB.backward(in, _bufB);

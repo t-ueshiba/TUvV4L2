@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.cc,v 1.22 2008-08-04 05:46:08 ueshiba Exp $
+ *  $Id: Image++.cc,v 1.23 2008-08-06 07:51:44 ueshiba Exp $
  */
 #include "TU/utility.h"
 #include "TU/Image++.h"
@@ -482,6 +482,7 @@ IIRFilter<2u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
     src += 2;
     for (const S* const tail2 = tail - mmNBytes/sizeof(S); src <= tail2; )
 	mmForward2(src, dst, c0123, tmp);
+    _mm_empty();
 #else
     *dst = (_c[0] + _c[1])*src[0];
     ++src;
@@ -516,6 +517,7 @@ IIRFilter<2u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
     src -= 2;
     for (const S* const head2 = head + mmNBytes/sizeof(S); src >= head2; )
 	mmBackward2(src, dst, c1032, tmp);
+    _mm_empty();
 #else
     --src;
     --dst;
@@ -550,6 +552,7 @@ IIRFilter<4u>::forward(const Array<S, B>& in, Array<float, B2>& out) const
 				       (_c[0] + _c[1] + _c[2])*src[0], 0.0);
     for (const S* const tail2 = tail - mmNBytes/sizeof(S); src <= tail2; )
 	mmForward4(src, dst, c0123, c4567, tmp);
+    _mm_empty();
 #else
     *dst = (_c[0] + _c[1] + _c[2] + _c[3])*src[0];
     ++src;
@@ -591,6 +594,7 @@ IIRFilter<4u>::backward(const Array<S, B>& in, Array<float, B2>& out) const
 				       (_c[3] + _c[2] + _c[1])*src[-1], 0.0);
     for (const S* const head2 = head + mmNBytes/sizeof(S); src >= head2; )
 	mmBackward4(src, dst, c3210, c7654, tmp);
+    _mm_empty();
 #else
     --src;
     --dst;
