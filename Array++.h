@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Array++.h,v 1.19 2007-11-29 07:06:35 ueshiba Exp $
+ *  $Id: Array++.h,v 1.20 2008-08-06 07:51:44 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -222,8 +222,8 @@ template <class T> std::istream&
 Buf<T>::get(std::istream& in, int m)
 {
     const u_int	BufSiz = 2048;
-    T			tmp[BufSiz];
-    int			n = 0;
+    T		tmp[BufSiz];
+    int		n = 0;
     
     while (n < BufSiz)
     {
@@ -969,6 +969,8 @@ template <class T, class B=Buf<typename T::ET> >
 class Array2 : public Array<T>
 {
   public:
+    typedef T			RT;		  //!< 行の型
+    typedef RT			row_type;	  //!< 行の型
     typedef typename T::ET	ET;		  //!< 要素の型
     typedef ET			value_type;	  //!< 要素の型
     typedef ptrdiff_t		difference_type;  //!< ポインタ間の差
