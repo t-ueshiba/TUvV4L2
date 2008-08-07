@@ -1,8 +1,11 @@
 /*
- *  $Id: main.cc,v 1.7 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: main.cc,v 1.8 2008-08-07 07:27:05 ueshiba Exp $
  */
-#include <unistd.h>
+#include <stdlib.h>
 #include "TU/Image++.h"
+#include "TU/GaussianConvolver.h"
+#include "TU/DericheConvolver.h"
+#include "TU/EdgeDetector.h"
 
 namespace TU
 {
@@ -95,7 +98,3 @@ main(int argc, char* argv[])
     
     return 0;
 }
-
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Image++.cc"
-#endif

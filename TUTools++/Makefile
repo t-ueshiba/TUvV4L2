@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.53 2008-06-24 00:40:50 ueshiba Exp $
+#  $Id: Makefile,v 1.54 2008-08-07 07:26:50 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -33,10 +33,13 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/Bezier++.h \
 		TU/BlockMatrix++.cc \
 		TU/BlockMatrix++.h \
+		TU/CorrectIntensity.h \
+		TU/DericheConvolver.h \
+		TU/EdgeDetector.h \
+		TU/GaussianConvolver.h \
 		TU/Geometry++.cc \
 		TU/Geometry++.h \
 		TU/Heap++.h \
-		TU/Image++.cc \
 		TU/Image++.h \
 		TU/Manip.h \
 		TU/Mesh++.h \
@@ -46,20 +49,28 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/Random.h \
 		TU/Serial++.h \
 		TU/TU/Array++.h \
+		TU/TU/IIRFilter++.h \
 		TU/TU/List++.h \
 		TU/TU/Minimize++.h \
 		TU/TU/TU/types.h \
 		TU/TU/Vector++.h \
 		TU/TU/utility.h \
 		TU/Vector++.cc \
+		TU/Warp.h \
 		TU/mmInstructions.h
 HDRS		= Allocator++.h \
 		Array++.h \
 		Bezier++.h \
 		BlockMatrix++.h \
+		CorrectIntensity.h \
+		DericheConvolver.h \
+		EdgeDetector.h \
+		GaussianConvolver.h \
 		Geometry++.h \
 		Heap++.h \
+		IIRFilter++.h \
 		Image++.h \
+		IntegralImage++.h \
 		List++.h \
 		Manip.h \
 		Mesh++.h \
@@ -71,6 +82,7 @@ HDRS		= Allocator++.h \
 		Ransac++.h \
 		Serial++.h \
 		Vector++.h \
+		Warp.h \
 		mmInstructions.h \
 		types.h \
 		utility.h
@@ -86,13 +98,13 @@ SRCS		= Allocator++.cc \
 		CanonicalCamera.cc \
 		ConversionFromYUV.cc \
 		CorrectIntensity.cc \
+		DericheConvolver.cc \
 		EdgeDetector.cc \
+		GaussianConvolver.cc \
 		GenericImage.cc \
 		Geometry++.cc \
 		Geometry++.inst.cc \
 		Heap++.cc \
-		IIRFilter.cc \
-		Image++.cc \
 		Image++.inst.cc \
 		ImageBase.cc \
 		ImageLine.cc \
@@ -127,13 +139,13 @@ OBJS		= Allocator++.o \
 		CanonicalCamera.o \
 		ConversionFromYUV.o \
 		CorrectIntensity.o \
+		DericheConvolver.o \
 		EdgeDetector.o \
+		GaussianConvolver.o \
 		GenericImage.o \
 		Geometry++.o \
 		Geometry++.inst.o \
 		Heap++.o \
-		IIRFilter.o \
-		Image++.o \
 		Image++.inst.o \
 		ImageBase.o \
 		ImageLine.o \
@@ -160,7 +172,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.53 $	|		\
+REV		= $(shell echo $Revision: 1.54 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -193,12 +205,17 @@ CanonicalCamera.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
 	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 ConversionFromYUV.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
 	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
-CorrectIntensity.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/mmInstructions.h
-EdgeDetector.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/mmInstructions.h
+CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/Geometry++.h \
+	TU/TU/utility.h TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h \
+	TU/TU/TU/types.h TU/mmInstructions.h
+DericheConvolver.o: TU/DericheConvolver.h TU/TU/IIRFilter++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h
+EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/Geometry++.h \
+	TU/TU/utility.h TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h \
+	TU/TU/TU/types.h TU/mmInstructions.h
+GaussianConvolver.o: TU/GaussianConvolver.h TU/TU/Vector++.h \
+	TU/TU/Array++.h TU/TU/TU/types.h TU/TU/IIRFilter++.h \
+	TU/mmInstructions.h TU/TU/Minimize++.h
 GenericImage.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
 	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 Geometry++.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
@@ -206,14 +223,8 @@ Geometry++.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
 Geometry++.inst.o: TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
 	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/Geometry++.cc
 Heap++.o: TU/Heap++.h TU/TU/Array++.h TU/TU/TU/types.h
-IIRFilter.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/Image++.cc TU/mmInstructions.h
-Image++.o: TU/TU/utility.h TU/Image++.h TU/Geometry++.h TU/TU/Minimize++.h \
-	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h
-Image++.inst.o: TU/Image++.cc TU/TU/utility.h TU/Image++.h TU/Geometry++.h \
-	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
-	TU/mmInstructions.h
+Image++.inst.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 ImageBase.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
 	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
 	TU/Manip.h
@@ -249,6 +260,6 @@ TriggerGenerator.o: TU/Serial++.h TU/Manip.h TU/TU/Vector++.h \
 Vector++.o: TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h
 Vector++.inst.o: TU/Vector++.cc TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h
-Warp.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h TU/TU/Minimize++.h \
-	TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h \
-	TU/Image++.cc
+Warp.o: TU/Warp.h TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
+	TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h TU/TU/TU/types.h \
+	TU/mmInstructions.h

@@ -25,13 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: IIRFilter.cc,v 1.12 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: GaussianConvolver.cc,v 1.1 2008-08-07 07:26:48 ueshiba Exp $
  */
-#include "TU/Image++.h"
+#include "TU/GaussianConvolver.h"
 #include "TU/Minimize++.h"
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Image++.cc"
-#endif
 
 namespace TU
 {
@@ -57,36 +54,6 @@ coefficients4(float a0, float b0, float omega0, float alpha0,
     c[7] =  2.0*(e0*c0 + e1*c1);				// o(n-1)
 }
 
-/************************************************************************
-*  class DericheConvoler						*
-************************************************************************/
-//! このCanny-Deriche核の初期化を行う
-/*!
-  \param alpha	フィルタサイズを表す正数（小さいほど広がりが大きい）
-  \return	このCanny-Deriche核自身
-*/
-DericheConvolver&
-DericheConvolver::initialize(float alpha)
-{
-    const float	e  = expf(-alpha), beta = sinhf(alpha);
-    _c0[0] =  (alpha - 1.0) * e;		// i(n-1)
-    _c0[1] =  1.0;				// i(n)
-    _c0[2] = -e * e;				// oF(n-2)
-    _c0[3] =  2.0 * e;				// oF(n-1)
-
-    _c1[0] = -1.0;				// i(n-1)
-    _c1[1] =  0.0;				// i(n)
-    _c1[2] = -e * e;				// oF(n-2)
-    _c1[3] =  2.0 * e;				// oF(n-1)
-
-    _c2[0] =  (1.0 + beta) * e;			// i(n-1)
-    _c2[1] = -1.0;				// i(n)
-    _c2[2] = -e * e;				// oF(n-2)
-    _c2[3] =  2.0 * e;				// oF(n-1)
-
-    return *this;
-}
-    
 /************************************************************************
 *  class GaussianConvoler::Params					*
 ************************************************************************/
@@ -238,21 +205,5 @@ GaussianConvolver::initialize(float sigma)
 
     return *this;
 }
-
-template class BilateralIIRFilter<2u>;
-
-template class BilateralIIRFilter2<2u>;
-template BilateralIIRFilter2<2u>&
-BilateralIIRFilter2<2u>::convolve(const Image<u_char>& in, Image<float>& out);
-template BilateralIIRFilter2<2u>&
-BilateralIIRFilter2<2u>::convolve(const Image<float>& in, Image<float>& out);
-
-template class BilateralIIRFilter<4u>;
-
-template class BilateralIIRFilter2<4u>;
-template BilateralIIRFilter2<4u>&
-BilateralIIRFilter2<4u>::convolve(const Image<u_char>& in, Image<float>& out);
-template BilateralIIRFilter2<4u>&
-BilateralIIRFilter2<4u>::convolve(const Image<float>& in, Image<float>& out);
 
 }

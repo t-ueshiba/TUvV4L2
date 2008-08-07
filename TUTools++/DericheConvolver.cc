@@ -25,26 +25,41 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.inst.cc,v 1.13 2008-08-07 07:26:50 ueshiba Exp $
+ *  $Id: DericheConvolver.cc,v 1.1 2008-08-07 07:26:46 ueshiba Exp $
  */
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-
-#include "TU/Image++.h"
+#include <cmath>
+#include "TU/DericheConvolver.h"
 
 namespace TU
 {
-template class Image<u_char>;
-template class Image<short>;
-template class Image<int>;
-template class Image<float>;
-template class Image<double>;
-template class Image<RGB>;
-template class Image<BGR>;
-template class Image<RGBA>;
-template class Image<ABGR>;
-template class Image<YUV444>;
-template class Image<YUV422>;
-template class Image<YUV411>;
+/************************************************************************
+*  class DericheConvoler						*
+************************************************************************/
+//! このCanny-Deriche核の初期化を行う
+/*!
+  \param alpha	フィルタサイズを表す正数（小さいほど広がりが大きい）
+  \return	このCanny-Deriche核自身
+*/
+DericheConvolver&
+DericheConvolver::initialize(float alpha)
+{
+    const float	e  = expf(-alpha), beta = sinhf(alpha);
+    _c0[0] =  (alpha - 1.0) * e;		// i(n-1)
+    _c0[1] =  1.0;				// i(n)
+    _c0[2] = -e * e;				// oF(n-2)
+    _c0[3] =  2.0 * e;				// oF(n-1)
+
+    _c1[0] = -1.0;				// i(n-1)
+    _c1[1] =  0.0;				// i(n)
+    _c1[2] = -e * e;				// oF(n-2)
+    _c1[3] =  2.0 * e;				// oF(n-1)
+
+    _c2[0] =  (1.0 + beta) * e;			// i(n-1)
+    _c2[1] = -1.0;				// i(n)
+    _c2[2] = -e * e;				// oF(n-2)
+    _c2[3] =  2.0 * e;				// oF(n-1)
+
+    return *this;
 }
 
-#endif
+}
