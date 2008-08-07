@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Thread++.h,v 1.3 2008-08-06 08:03:55 ueshiba Exp $
+ *  $Id: Thread++.h,v 1.4 2008-08-07 08:11:23 ueshiba Exp $
  */
 #ifndef __TUThreadPP_h
 #define __TUThreadPP_h
@@ -202,10 +202,10 @@ MultiThread2<OP, IN, OUT>::createThreads(u_int nthreads)
 template <class OP, class IN, class OUT> void
 MultiThread2<OP, IN, OUT>::raiseThreads(const IN& in, OUT& out) const
 {
-    const int	d = out.dim() / _threads.dim();
+    const int	d = in.dim() / _threads.dim();
     for (int is = 0, n = 0; n < _threads.dim(); ++n)
     {
-	const int	ie = (n < _threads.dim() - 1 ? is + d : out.dim());
+	const int	ie = (n < _threads.dim() - 1 ? is + d : in.dim());
 	_threads[n].raise(*this, in, out, is, ie);
 	is = ie;
     }
@@ -233,32 +233,5 @@ MultiThread2<OP, IN, OUT>::OperatorThread::doJob()
     (*_op)(*_in, *_out, _is, _ie);
 }
 
-/************************************************************************
-*  class MultiThread2<Warp, Image<T> >					*
-************************************************************************/
-template <> inline void
-MultiThread2<Warp, Image<u_char> >::
-  operator ()(const Image<u_char>& in, Image<u_char>& out) const
-{
-    out.resize(height(), width());
-    raiseThreads(in, out);
-}
-    
-template <> inline void
-MultiThread2<Warp, Image<RGBA> >::
-  operator ()(const Image<RGBA>& in, Image<RGBA>& out) const
-{
-    out.resize(height(), width());
-    raiseThreads(in, out);
-}
-    
-template <> inline void
-MultiThread2<Warp, Image<ABGR> >::
-  operator ()(const Image<ABGR>& in, Image<ABGR>& out) const
-{
-    out.resize(height(), width());
-    raiseThreads(in, out);
-}
-    
 }
 #endif	// !__TUThreadPP_h
