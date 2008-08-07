@@ -25,9 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *
- *  $Id: CorrectIntensity.cc,v 1.1 2008-06-16 02:21:04 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.2 2008-08-07 07:26:46 ueshiba Exp $
  */
-#include "TU/Image++.h"
+#include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
 
 namespace TU

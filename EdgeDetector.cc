@@ -25,12 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.9 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.10 2008-08-07 07:26:47 ueshiba Exp $
  */
-#include "TU/Image++.h"
-#ifdef __INTEL_COMPILER
-#  include "TU/mmInstructions.h"
-#endif
+#include "TU/EdgeDetector.h"
+#include "TU/mmInstructions.h"
 
 namespace TU
 {

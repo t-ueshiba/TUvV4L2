@@ -25,9 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Warp.cc,v 1.1 2008-06-11 05:02:43 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.2 2008-08-07 07:26:51 ueshiba Exp $
  */
-#include "TU/Image++.h"
+#include "TU/Warp.h"
 #if defined(__INTEL_COMPILER)
 #  undef SSE3
 #  undef SSE2
@@ -36,8 +36,8 @@
 //#  define SSE
 //#  define SSE2
 //#  define SSE3
-#  include "TU/mmInstructions.h"
 #endif
+#include "TU/mmInstructions.h"
 
 namespace TU
 {
@@ -368,7 +368,3 @@ template void	Warp::operator ()(const Image<RGBA>& in,
 template void	Warp::operator ()(const Image<ABGR>& in,
 				  Image<ABGR>& out, int vs, int ve) const;
 }
-
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/Image++.cc"
-#endif
