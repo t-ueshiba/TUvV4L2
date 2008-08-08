@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: DericheConvolver.h,v 1.1 2008-08-07 07:26:47 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.2 2008-08-08 08:03:42 ueshiba Exp $
  */
 #ifndef	__TUDericheConvolver_h
 #define	__TUDericheConvolver_h
@@ -37,7 +37,7 @@ namespace TU
 /************************************************************************
 *  class DericheConvoler						*
 ************************************************************************/
-//! Canny-Deriche核による画像畳み込みを行うクラス
+//! Canny-Deriche核による2次元配列畳み込みを行うクラス
 class DericheConvolver : private BilateralIIRFilter2<2u>
 {
   public:
@@ -71,8 +71,8 @@ class DericheConvolver : private BilateralIIRFilter2<2u>
 
 //! Canny-Deriche核によるスムーシング
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
 template <class T1, class B1, class T2, class B2> inline DericheConvolver&
@@ -87,8 +87,8 @@ DericheConvolver::smooth(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Canny-Deriche核による横方向1階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
 template <class T1, class B1, class T2, class B2> inline DericheConvolver&
@@ -103,8 +103,8 @@ DericheConvolver::diffH(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Canny-Deriche核による縦方向1階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
 template <class T1, class B1, class T2, class B2> inline DericheConvolver&
@@ -119,8 +119,8 @@ DericheConvolver::diffV(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Canny-Deriche核による横方向2階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
 template <class T1, class B1, class T2, class B2> inline DericheConvolver&
@@ -135,8 +135,8 @@ DericheConvolver::diffHH(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Canny-Deriche核による縦横両方向2階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
 template <class T1, class B1, class T2, class B2> inline DericheConvolver&
@@ -151,8 +151,8 @@ DericheConvolver::diffHV(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Canny-Deriche核による縦方向2階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
 template <class T1, class B1, class T2, class B2> inline DericheConvolver&
@@ -167,8 +167,8 @@ DericheConvolver::diffVV(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Canny-Deriche核によるラプラシアン
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
 template <class T1, class B1, class T2, class B2> inline DericheConvolver&

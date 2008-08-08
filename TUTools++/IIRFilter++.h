@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: IIRFilter++.h,v 1.5 2008-08-07 07:26:49 ueshiba Exp $
+ *  $Id: IIRFilter++.h,v 1.6 2008-08-08 08:03:43 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -686,12 +686,12 @@ BilateralIIRFilter<D>::convolve(const Array<T, B>& in) const
     return *this;
 }
 
-//! フィルタによる畳み込みを行う.
+//! 2次元配列の各行に対してフィルタによる畳み込みを行う.
 /*!
-  \param in	入力データ列
-  \param out
-  \param is
-  \param ie
+  \param in	入力2次元配列
+  \param out	出力2次元配列
+  \param is	処理を開始する行
+  \param ie	処理を終了する次の行．0を与えると最後の行まで処理する．
   return	このフィルタ自身
 */
 template <u_int D> template <class T1, class B1, class T2, class B2>
@@ -817,10 +817,10 @@ BilateralIIRFilter2<D>::initialize(float cHF[D+D], Order orderH,
     return *this;
 }
 
-//! 与えられた画像とこのフィルタの畳み込みを行う
+//! 与えられた2次元配列とこのフィルタの畳み込みを行う
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このフィルタ自身
 */
 template <u_int D> template <class T1, class B1, class T2, class B2>
