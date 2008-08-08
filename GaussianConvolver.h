@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.1 2008-08-07 07:26:48 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.2 2008-08-08 08:03:43 ueshiba Exp $
  */
 #ifndef	__TUGaussianConvolver_h
 #define	__TUGaussianConvolver_h
@@ -38,7 +38,7 @@ namespace TU
 /************************************************************************
 *  class GaussianConvoler						*
 ************************************************************************/
-//! Gauss核による画像畳み込みを行うクラス
+//! Gauss核による2次元配列畳み込みを行うクラス
 class GaussianConvolver : private BilateralIIRFilter2<4u>
 {
   private:
@@ -114,8 +114,8 @@ class GaussianConvolver : private BilateralIIRFilter2<4u>
 
 //! Gauss核によるスムーシング
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このGauss核自身
 */
 template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
@@ -130,8 +130,8 @@ GaussianConvolver::smooth(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Gauss核による横方向1階微分(DOG)
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このGauss核自身
 */
 template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
@@ -146,8 +146,8 @@ GaussianConvolver::diffH(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Gauss核による縦方向1階微分(DOG)
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このGauss核自身
 */
 template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
@@ -162,8 +162,8 @@ GaussianConvolver::diffV(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Gauss核による横方向2階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このGauss核自身
 */
 template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
@@ -178,8 +178,8 @@ GaussianConvolver::diffHH(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Gauss核による縦横両方向2階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このGauss核自身
 */
 template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
@@ -194,8 +194,8 @@ GaussianConvolver::diffHV(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Gauss核による縦方向2階微分
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このGauss核自身
 */
 template <class T1, class B1, class T2, class B2> inline GaussianConvolver&
@@ -210,8 +210,8 @@ GaussianConvolver::diffVV(const Array2<T1, B1>& in, Array2<T2, B2>& out)
 
 //! Gauss核によるラプラシアン(LOG)
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力2次元配列
+  \param out	出力2次元配列
   \return	このGauss核自身
 */
 template <class T1, class B1, class T2, class B2> inline GaussianConvolver&

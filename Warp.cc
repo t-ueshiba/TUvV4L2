@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Warp.cc,v 1.2 2008-08-07 07:26:51 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.3 2008-08-08 08:03:43 ueshiba Exp $
  */
 #include "TU/Warp.h"
 #if defined(__INTEL_COMPILER)
@@ -318,7 +318,7 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 	    *outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
 	out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
     }
-#if defined(MMX) && !defined(SSE2)
+#if defined(MMX)
     _mm_empty();
 #endif	
 }
@@ -358,7 +358,7 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 	    *outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
 	out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
     }
-#if defined(MMX) && !defined(SSE2)
+#if defined(MMX)
     _mm_empty();
 #endif	
 }
