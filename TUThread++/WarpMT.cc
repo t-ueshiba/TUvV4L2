@@ -1,15 +1,15 @@
 /*
- *  Ê¿À®14-19Ç¯¡ÊÆÈ¡Ë»º¶Èµ»½ÑÁí¹ç¸¦µæ½ê Ãøºî¸¢½êÍ­
+ *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
  *  
- *  ÁÏºî¼Ô¡§¿¢¼Ç½ÓÉ×
+ *  $BAO:n<T!'?"<G=SIW(B
  *
- *  ËÜ¥×¥í¥°¥é¥à¤Ï¡ÊÆÈ¡Ë»º¶Èµ»½ÑÁí¹ç¸¦µæ½ê¤Î¿¦°÷¤Ç¤¢¤ë¿¢¼Ç½ÓÉ×¤¬ÁÏºî¤·¡¤
- *  ¡ÊÆÈ¡Ë»º¶Èµ»½ÑÁí¹ç¸¦µæ½ê¤¬Ãøºî¸¢¤ò½êÍ­¤¹¤ëÈëÌ©¾ðÊó¤Ç¤¹¡¥ÁÏºî¼Ô¤Ë¤è
- *  ¤ëµö²Ä¤Ê¤·¤ËËÜ¥×¥í¥°¥é¥à¤ò»ÈÍÑ¡¤Ê£À½¡¤²þÊÑ¡¤Âè»°¼Ô¤Ø³«¼¨¤¹¤ëÅù¤ÎÃø
- *  ºî¸¢¤ò¿¯³²¤¹¤ë¹Ô°Ù¤ò¶Ø»ß¤·¤Þ¤¹¡¥
+ *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
+ *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%AO:n<T$K$h(B
+ *  $B$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$kEy$NCx(B
+ *  $B:n8"$r?/32$9$k9T0Y$r6X;_$7$^$9!%(B
  *  
- *  ¤³¤Î¥×¥í¥°¥é¥à¤Ë¤è¤Ã¤ÆÀ¸¤¸¤ë¤¤¤«¤Ê¤ëÂ»³²¤ËÂÐ¤·¤Æ¤â¡¤Ãøºî¸¢½êÍ­¼Ô¤ª
- *  ¤è¤ÓÁÏºî¼Ô¤ÏÀÕÇ¤¤òÉé¤¤¤Þ¤»¤ó¡£
+ *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
+ *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: WarpMT.cc,v 1.1 2008-08-07 08:11:23 ueshiba Exp $
+ *  $Id: WarpMT.cc,v 1.2 2008-08-08 08:02:28 ueshiba Exp $
  */
 #include "TU/Thread++.h"
 #include "TU/Warp.h"

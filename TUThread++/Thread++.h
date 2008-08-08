@@ -25,13 +25,13 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Thread++.h,v 1.4 2008-08-07 08:11:23 ueshiba Exp $
+ *  $Id: Thread++.h,v 1.5 2008-08-08 08:02:28 ueshiba Exp $
  */
 #ifndef __TUThreadPP_h
 #define __TUThreadPP_h
 
 #include <pthread.h>
-#include "TU/Image++.h"
+#include "TU/Array++.h"
 
 namespace TU
 {
@@ -202,10 +202,10 @@ MultiThread2<OP, IN, OUT>::createThreads(u_int nthreads)
 template <class OP, class IN, class OUT> void
 MultiThread2<OP, IN, OUT>::raiseThreads(const IN& in, OUT& out) const
 {
-    const int	d = in.dim() / _threads.dim();
+    const int	d = out.dim() / _threads.dim();
     for (int is = 0, n = 0; n < _threads.dim(); ++n)
     {
-	const int	ie = (n < _threads.dim() - 1 ? is + d : in.dim());
+	const int	ie = (n < _threads.dim() - 1 ? is + d : out.dim());
 	_threads[n].raise(*this, in, out, is, ie);
 	is = ie;
     }

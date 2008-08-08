@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.2 2008-08-07 08:11:22 ueshiba Exp $
+#  $Id: Makefile,v 1.3 2008-08-08 08:02:27 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -47,7 +47,7 @@ OBJS		= Thread.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.2 $	|		\
+REV		= $(shell echo $Revision: 1.3 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -58,16 +58,12 @@ REV		= $(shell echo $Revision: 1.2 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Thread.o: TU/Thread++.h /home/ueshiba/include/TU/Image++.h \
+Thread.o: TU/Thread++.h /home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/types.h
+WarpMT.o: TU/Thread++.h /home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/types.h /home/ueshiba/include/TU/Warp.h \
+	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/utility.h \
 	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
-WarpMT.o: TU/Thread++.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Warp.h
+	/home/ueshiba/include/TU/Vector++.h
