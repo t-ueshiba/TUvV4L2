@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2008-08-08 08:02:27 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2008-08-11 07:06:59 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -38,7 +38,8 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/types.h \
 		/home/ueshiba/include/TU/utility.h \
 		TU/Thread++.h
-HDRS		= Thread++.h
+HDRS		= IIRFilterMT++.h \
+		Thread++.h
 SRCS		= Thread.cc \
 		WarpMT.cc
 OBJS		= Thread.o \
@@ -47,7 +48,7 @@ OBJS		= Thread.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

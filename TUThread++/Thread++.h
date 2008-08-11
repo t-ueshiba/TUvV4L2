@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Thread++.h,v 1.5 2008-08-08 08:02:28 ueshiba Exp $
+ *  $Id: Thread++.h,v 1.6 2008-08-11 07:07:00 ueshiba Exp $
  */
 #ifndef __TUThreadPP_h
 #define __TUThreadPP_h
@@ -107,8 +107,6 @@ class MultiThread : public OP
     void	operator ()(DATA& data)				const	;
     
   private:
-    void	raiseThreads(DATA& data)			const	;
-    
     Array<OperatorThread>	_threads;
 };
 
@@ -120,12 +118,6 @@ MultiThread<OP, DATA>::createThreads(u_int nthreads)
 
 template <class OP, class DATA> inline void
 MultiThread<OP, DATA>::operator ()(DATA& data) const
-{
-    raiseThreads(data);
-}
-
-template <class OP, class DATA> void
-MultiThread<OP, DATA>::raiseThreads(DATA& data) const
 {
     const int	d = data.dim() / _threads.dim();
     for (int is = 0, n = 0; n < _threads.dim(); ++n)
