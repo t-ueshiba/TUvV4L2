@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.54 2008-08-07 07:26:50 ueshiba Exp $
+#  $Id: Makefile,v 1.55 2008-08-11 07:09:37 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -34,9 +34,8 @@ EXTHDRS		= TU/Allocator++.h \
 		TU/BlockMatrix++.cc \
 		TU/BlockMatrix++.h \
 		TU/CorrectIntensity.h \
-		TU/DericheConvolver.h \
 		TU/EdgeDetector.h \
-		TU/GaussianConvolver.h \
+		TU/GaussianConvolver++.h \
 		TU/Geometry++.cc \
 		TU/Geometry++.h \
 		TU/Heap++.h \
@@ -63,9 +62,9 @@ HDRS		= Allocator++.h \
 		Bezier++.h \
 		BlockMatrix++.h \
 		CorrectIntensity.h \
-		DericheConvolver.h \
+		DericheConvolver++.h \
 		EdgeDetector.h \
-		GaussianConvolver.h \
+		GaussianConvolver++.h \
 		Geometry++.h \
 		Heap++.h \
 		IIRFilter++.h \
@@ -98,9 +97,8 @@ SRCS		= Allocator++.cc \
 		CanonicalCamera.cc \
 		ConversionFromYUV.cc \
 		CorrectIntensity.cc \
-		DericheConvolver.cc \
 		EdgeDetector.cc \
-		GaussianConvolver.cc \
+		GaussianCoefficients.cc \
 		GenericImage.cc \
 		Geometry++.cc \
 		Geometry++.inst.cc \
@@ -139,9 +137,8 @@ OBJS		= Allocator++.o \
 		CanonicalCamera.o \
 		ConversionFromYUV.o \
 		CorrectIntensity.o \
-		DericheConvolver.o \
 		EdgeDetector.o \
-		GaussianConvolver.o \
+		GaussianCoefficients.o \
 		GenericImage.o \
 		Geometry++.o \
 		Geometry++.inst.o \
@@ -172,7 +169,7 @@ OBJS		= Allocator++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.54 $	|		\
+REV		= $(shell echo $Revision: 1.55 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -208,12 +205,10 @@ ConversionFromYUV.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \
 CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/Geometry++.h \
 	TU/TU/utility.h TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h TU/mmInstructions.h
-DericheConvolver.o: TU/DericheConvolver.h TU/TU/IIRFilter++.h \
-	TU/TU/Array++.h TU/TU/TU/types.h TU/mmInstructions.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/Geometry++.h \
 	TU/TU/utility.h TU/TU/Minimize++.h TU/TU/Vector++.h TU/TU/Array++.h \
 	TU/TU/TU/types.h TU/mmInstructions.h
-GaussianConvolver.o: TU/GaussianConvolver.h TU/TU/Vector++.h \
+GaussianCoefficients.o: TU/GaussianConvolver++.h TU/TU/Vector++.h \
 	TU/TU/Array++.h TU/TU/TU/types.h TU/TU/IIRFilter++.h \
 	TU/mmInstructions.h TU/TU/Minimize++.h
 GenericImage.o: TU/Image++.h TU/Geometry++.h TU/TU/utility.h \

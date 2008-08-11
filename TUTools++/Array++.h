@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Array++.h,v 1.20 2008-08-06 07:51:44 ueshiba Exp $
+ *  $Id: Array++.h,v 1.21 2008-08-11 07:09:32 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -565,6 +565,7 @@ template <class T, class B=Buf<T> >
 class Array : public B
 {
   public:
+    typedef B			BT;		  //!< バッファの型
     typedef T			ET;		  //!< 要素の型
     typedef ET			value_type;	  //!< 要素の型
     typedef ptrdiff_t		difference_type;  //!< ポインタ間の差
@@ -969,6 +970,7 @@ template <class T, class B=Buf<typename T::ET> >
 class Array2 : public Array<T>
 {
   public:
+    typedef B			BT;		  //!< バッファの型
     typedef T			RT;		  //!< 行の型
     typedef RT			row_type;	  //!< 行の型
     typedef typename T::ET	ET;		  //!< 要素の型

@@ -1,10 +1,10 @@
 /*
- *  $Id: main.cc,v 1.8 2008-08-07 07:27:05 ueshiba Exp $
+ *  $Id: main.cc,v 1.9 2008-08-11 07:09:55 ueshiba Exp $
  */
 #include <stdlib.h>
 #include "TU/Image++.h"
-#include "TU/GaussianConvolver.h"
-#include "TU/DericheConvolver.h"
+#include "TU/GaussianConvolver++.h"
+#include "TU/DericheConvolver++.h"
 #include "TU/EdgeDetector.h"
 
 namespace TU
@@ -60,11 +60,11 @@ main(int argc, char* argv[])
     {
 	Image<float>	lap, edgeH, edgeV;
 	if (gaussian)
-	    GaussianConvolver(alpha).laplacian(in, lap)
-				    .diffH(in, edgeH).diffV(in, edgeV);
+	    GaussianConvolver2<>(alpha).laplacian(in, lap)
+				       .diffH(in, edgeH).diffV(in, edgeV);
 	else
-	    DericheConvolver(alpha).laplacian(in, lap)
-				   .diffH(in, edgeH).diffV(in, edgeV);
+	    DericheConvolver2<>(alpha).laplacian(in, lap)
+				      .diffH(in, edgeH).diffV(in, edgeV);
 	Image<float>	str;
       	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
 				     .zeroCrossing(lap, str, edge)
@@ -75,9 +75,9 @@ main(int argc, char* argv[])
     {
 	Image<float>	edgeH, edgeV;
 	if (gaussian)
-	    GaussianConvolver(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	    GaussianConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
 	else
-	    DericheConvolver(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	    DericheConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
 	Image<float>	str;
 	Image<u_char>	dir;
 	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
