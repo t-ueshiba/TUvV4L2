@@ -25,9 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: GaussianConvolver.cc,v 1.1 2008-08-07 07:26:48 ueshiba Exp $
+ *  $Id: GaussianCoefficients.cc,v 1.1 2008-08-11 07:09:34 ueshiba Exp $
  */
-#include "TU/GaussianConvolver.h"
+#include "TU/GaussianConvolver++.h"
 #include "TU/Minimize++.h"
 
 namespace TU
@@ -55,10 +55,10 @@ coefficients4(float a0, float b0, float omega0, float alpha0,
 }
 
 /************************************************************************
-*  class GaussianConvoler::Params					*
+*  class GaussianCoefficients::Params					*
 ************************************************************************/
 void
-GaussianConvolver::Params::set(double aa, double bb, double tt, double aaa)
+GaussianCoefficients::Params::set(double aa, double bb, double tt, double aaa)
 {
     a	  = aa;
     b	  = bb;
@@ -66,8 +66,8 @@ GaussianConvolver::Params::set(double aa, double bb, double tt, double aaa)
     alpha = aaa;
 }
 
-GaussianConvolver::Params&
-GaussianConvolver::Params::operator -=(const Vector<double>& p)
+GaussianCoefficients::Params&
+GaussianCoefficients::Params::operator -=(const Vector<double>& p)
 {
     a	  -= p[0];
     b	  -= p[1];
@@ -78,10 +78,10 @@ GaussianConvolver::Params::operator -=(const Vector<double>& p)
 }
 
 /************************************************************************
-*  class GaussianConvolver::EvenConstraint				*
+*  class GaussianCoefficients::EvenConstraint				*
 ************************************************************************/
 Vector<double>
-GaussianConvolver::EvenConstraint::operator ()(const AT& params) const
+GaussianCoefficients::EvenConstraint::operator ()(const AT& params) const
 {
     Vector<ET>	val(1);
     const ET	as0 = params[0].alpha/_sigma, ts0 = params[0].theta/_sigma,
@@ -95,7 +95,7 @@ GaussianConvolver::EvenConstraint::operator ()(const AT& params) const
 }
 
 Matrix<double>
-GaussianConvolver::EvenConstraint::jacobian(const AT& params) const
+GaussianCoefficients::EvenConstraint::jacobian(const AT& params) const
 {
     ET	c0  = cos(params[0].theta/_sigma),  s0  = sin(params[0].theta/_sigma),
 	ch0 = cosh(params[0].alpha/_sigma), sh0 = sinh(params[0].alpha/_sigma),
@@ -120,10 +120,10 @@ GaussianConvolver::EvenConstraint::jacobian(const AT& params) const
 }
 
 /************************************************************************
-*  class GaussianConvolver::CostFunction				*
+*  class GaussianCoefficients::CostFunction				*
 ************************************************************************/
 Vector<double>
-GaussianConvolver::CostFunction::operator ()(const AT& params) const
+GaussianCoefficients::CostFunction::operator ()(const AT& params) const
 {
     Vector<ET>	val(_ndivisions+1);
     for (int k = 0; k < val.dim(); ++k)
@@ -141,7 +141,7 @@ GaussianConvolver::CostFunction::operator ()(const AT& params) const
 }
     
 Matrix<double>
-GaussianConvolver::CostFunction::jacobian(const AT& params) const
+GaussianCoefficients::CostFunction::jacobian(const AT& params) const
 {
     Matrix<ET>	val(_ndivisions+1, 4*params.dim());
     for (int k = 0; k < val.nrow(); ++k)
@@ -165,22 +165,23 @@ GaussianConvolver::CostFunction::jacobian(const AT& params) const
 }
 
 void
-GaussianConvolver::CostFunction::update(AT& params, const Vector<ET>& dp) const
+GaussianCoefficients::CostFunction::update(AT& params,
+					   const Vector<ET>& dp) const
 {
     for (int i = 0; i < params.dim(); ++i)
 	params[i] -= dp(4*i, 4);
 }
 
 /************************************************************************
-*  class GaussianConvolver						*
+*  class GaussianCoefficients						*
 ************************************************************************/
 //! このGauss核の初期化を行う
 /*!
   \param sigma	フィルタサイズを表す正数（大きいほど広がりが大きい）
   \return	このGauss核自身
 */
-GaussianConvolver&
-GaussianConvolver::initialize(float sigma)
+void
+GaussianCoefficients::initialize(float sigma)
 {
     coefficients4( 1.80579,   7.42555, 0.676413/sigma, 2.10032/sigma,
 		  -0.805838, -1.50785, 1.90174/sigma,  2.15811/sigma, _c0);
@@ -195,15 +196,13 @@ GaussianConvolver::initialize(float sigma)
     params[1].set(0.32, -1.7, 2.2, 1.3);
     CostFunction	err(100, 5.0);
     if (sigma < 0.55)
-	throw std::runtime_error("GaussianConvolver::initialize(): sigma must be greater than 0.55");
+	throw std::runtime_error("GaussianCoefficients::initialize(): sigma must be greater than 0.55");
     EvenConstraint	g(sigma);
     minimizeSquare(err, g, params, 1000, 1.0e-6);
     coefficients4(params[0].a, params[0].b,
 		  params[0].theta/sigma, params[0].alpha/sigma,
 		  params[1].a, params[1].b,
 		  params[1].theta/sigma, params[1].alpha/sigma, _c2);
-
-    return *this;
 }
 
 }
