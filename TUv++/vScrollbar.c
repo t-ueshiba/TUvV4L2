@@ -289,7 +289,7 @@ static void FillArea (sbw, top, bottom, fill)
 
 
 
-/* _ShadowSurroundedBox is somewhat redundant with 
+/* _ShadowSurroundedBoxLocal is somewhat redundant with 
      _Xaw3dDrawShadows (gw, event, region, out)
   in ThreeD.c; however, it is more general and allows to
   specify the boxsize of the shawdowbox explicitely. In order
@@ -300,11 +300,11 @@ static void FillArea (sbw, top, bottom, fill)
 
 /* ARGSUSED */
 static void
-_ShadowSurroundedBox (gw, event, region, xtl, ytl, xbr, ybr, out)
+_ShadowSurroundedBoxLocal (gw, event, region, xtl, ytl, xbr, ybr, out)
     Widget gw;
     XEvent *event;
     Region region;
-    Dimension  xtl, ytl, xbr, ybr; /* INNER corners */
+    Dimension xtl, ytl, xbr, ybr; /* INNER corners */
     Boolean out;
 {
     XPoint       pt[6];
@@ -422,16 +422,16 @@ static void PaintThumb (sbw, event)
 
           if (sbw->scrollbar.orientation == XtorientHorizontal) 
 	      {
-	      _ShadowSurroundedBox(
-		  sbw, event,
+	      _ShadowSurroundedBoxLocal(
+		  (Widget)sbw, event,
 		  (Region)NULL,
 		  newtop + s, 2 * s,
 		  newbot - s, sbw->core.height - 2 * s, TRUE);
 	      }
 	  else 
 	      {
-	      _ShadowSurroundedBox(
-		  sbw, event,
+	      _ShadowSurroundedBoxLocal(
+		  (Widget)sbw, event,
 		  (Region)NULL,
 		  2 * s, newtop + s,
 		  sbw->core.width - 2 * s, newbot - s,
@@ -1252,6 +1252,6 @@ void vScrollbarSetThumb (w, top, shown)
     sbw->scrollbar.shown = (shown > 1.0) ? 1.0 :
 				(shown >= 0.0) ? shown : sbw->scrollbar.shown;
 
-    PaintThumb (sbw);
+    PaintThumb (sbw, NULL);
 }
 

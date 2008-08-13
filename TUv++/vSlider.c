@@ -244,7 +244,7 @@ static void FillArea (sbw, top, bottom, fill)
 
 
 
-/* _ShadowSurroundedBox is somewhat redundant with 
+/* _ShadowSurroundedBoxLocal is somewhat redundant with 
      _Xaw3dDrawShadows (gw, event, region, out)
   in ThreeD.c; however, it is more general and allows to
   specify the boxsize of the shawdowbox explicitely. In order
@@ -255,7 +255,7 @@ static void FillArea (sbw, top, bottom, fill)
 
 /* ARGSUSED */
 static void
-_ShadowSurroundedBox (gw, event, region, xtl, ytl, xbr, ybr,
+_ShadowSurroundedBoxLocal (gw, event, region, xtl, ytl, xbr, ybr,
 		      xts, yts, xbs, ybs, out)
     Widget gw;
     XEvent *event;
@@ -392,15 +392,15 @@ static void PaintThumb (sbw, event)
 
           if (sbw->slider.orientation == XtorientHorizontal) 
 	      {
-	      _ShadowSurroundedBox(
-		  sbw, event,
+	      _ShadowSurroundedBoxLocal(
+		  (Widget)sbw, event,
 		  (Region)NULL,
 		  newtop + s, 2 * s,
 		  newmid - 1, sbw->core.height - 2 * s,
 		  s, s, 1, s,
 	          TRUE);
-	      _ShadowSurroundedBox(
-		  sbw, event,
+	      _ShadowSurroundedBoxLocal(
+		  (Widget)sbw, event,
 		  (Region)NULL,
 		  newmid + 1, 2 * s,
 		  newbot - s, sbw->core.height - 2 * s,
@@ -409,15 +409,15 @@ static void PaintThumb (sbw, event)
 	      }
 	  else 
 	      {
-	      _ShadowSurroundedBox(
-		  sbw, event,
+	      _ShadowSurroundedBoxLocal(
+		  (Widget)sbw, event,
 		  (Region)NULL,
 		  2 * s, newtop + s,
 		  sbw->core.width - 2 * s, newmid - 1,
 		  s, s, s, 1,
 		  TRUE);
-	      _ShadowSurroundedBox(
-		  sbw, event,
+	      _ShadowSurroundedBoxLocal(
+		  (Widget)sbw, event,
 		  (Region)NULL,
 		  2 * s, newmid + 1,
 		  sbw->core.width - 2 * s, newbot - s,
@@ -972,6 +972,6 @@ void XawSliderSetThumb (w, top, shown)
     sbw->slider.shown = (shown > 1.0) ? 1.0 :
 				(shown >= 0.0) ? shown : sbw->slider.shown;
 
-    PaintThumb (sbw);
+    PaintThumb (sbw, NULL);
 }
 

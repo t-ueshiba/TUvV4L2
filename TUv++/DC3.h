@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: DC3.h,v 1.5 2007-11-29 07:06:07 ueshiba Exp $
+ *  $Id: DC3.h,v 1.6 2008-08-13 06:06:35 ueshiba Exp $
  */
 #ifndef __TUvDC3_h
 #define __TUvDC3_h
@@ -63,10 +63,10 @@ class DC3
     virtual DC3&	rotate(double angle)				= 0;
 
     
-    friend OManip1<DC3, Axis>	axis(Axis)			;
-    friend OManip1<DC3, double>	distance(double)		;
-    friend OManip1<DC3, double>	translate(double)		;
-    friend OManip1<DC3, double>	rotate(double)			;
+    friend OManip1<DC3, Axis>	axis(Axis axis)			;
+    friend OManip1<DC3, double>	distance(double dist)		;
+    friend OManip1<DC3, double>	translate(double d)		;
+    friend OManip1<DC3, double>	rotate(double angle)		;
     
     Axis		getAxis()	const	{return _axis;}
     double		getDistance()	const	{return _distance;}
@@ -79,6 +79,11 @@ class DC3
     Axis		_axis;
     double		_distance;
 };
+
+OManip1<DC3, DC3::Axis>	axis(DC3::Axis axis)		;
+OManip1<DC3, double>	distance(double dist)		;
+OManip1<DC3, double>	translate(double d)		;
+OManip1<DC3, double>	rotate(double angle)		;
 
 }
 }

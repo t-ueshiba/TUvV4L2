@@ -25,11 +25,12 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *
- *  $Id: vCanvas.c,v 1.2 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: vCanvas.c,v 1.3 2008-08-13 06:06:35 ueshiba Exp $
  */
 #include <X11/IntrinsicP.h>
 #include <X11/StringDefs.h>
 #include <X11/Xmu/Converters.h>
+#include <X11/Xaw3d/XawInit.h>
 #include "vCanvasP_.h"
 
 /****************************************************************
