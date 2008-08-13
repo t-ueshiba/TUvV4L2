@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: IIRFilter++.h,v 1.7 2008-08-11 07:09:36 ueshiba Exp $
+ *  $Id: IIRFilter++.h,v 1.8 2008-08-13 06:05:33 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -225,14 +225,12 @@ mmBackward4(const float*& src, float*& dst,
 #endif
 
 /************************************************************************
-*  class IIRFilter<ODR>							*
+*  class IIRFilter<D>							*
 ************************************************************************/
 //! 片側Infinite Inpulse Response Filterを表すクラス
-template <u_int ODR> class IIRFilter
+template <u_int D> class IIRFilter
 {
   public:
-    enum	{D = ODR};
-    
     IIRFilter&	initialize(const float c[D+D])				;
     template <class T, class B, class B2> const IIRFilter&
 		forward(const Array<T, B>& in,
@@ -265,8 +263,8 @@ template <u_int ODR> class IIRFilter
 		\f]
   \return	このフィルタ自身
 */
-template <u_int ODR> IIRFilter<ODR>&
-IIRFilter<ODR>::initialize(const float c[D+D])
+template <u_int D> IIRFilter<D>&
+IIRFilter<D>::initialize(const float c[D+D])
 {
     for (int i = 0; i < D+D; ++i)
 	_c[i] = c[i];
@@ -280,9 +278,9 @@ IIRFilter<ODR>::initialize(const float c[D+D])
   \param out	出力データ列
   \return	このフィルタ自身
 */
-template <u_int ODR> template <class T, class B, class B2>
-const IIRFilter<ODR>&
-IIRFilter<ODR>::forward(const Array<T, B>& in, Array<float, B2>& out) const
+template <u_int D> template <class T, class B, class B2>
+const IIRFilter<D>&
+IIRFilter<D>::forward(const Array<T, B>& in, Array<float, B2>& out) const
 {
     out.resize(in.dim());
 
@@ -312,9 +310,9 @@ IIRFilter<ODR>::forward(const Array<T, B>& in, Array<float, B2>& out) const
   \param out	出力データ列
   \return	このフィルタ自身
 */
-template <u_int ODR> template <class T, class B, class B2>
-const IIRFilter<ODR>&
-IIRFilter<ODR>::backward(const Array<T, B>& in, Array<float, B2>& out) const
+template <u_int D> template <class T, class B, class B2>
+const IIRFilter<D>&
+IIRFilter<D>::backward(const Array<T, B>& in, Array<float, B2>& out) const
 {
     out.resize(in.dim());
 
@@ -495,8 +493,8 @@ IIRFilter<4u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
   \param limit1F	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
   \param limit1F	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
-template <u_int ODR> void
-IIRFilter<ODR>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
+template <u_int D> void
+IIRFilter<D>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
 {
     float	n0 = 0.0, d0 = 1.0, n1 = 0.0, d1 = 0.0, n2 = 0.0, d2 = 0.0;
     for (int i = 0; i < D; ++i)
@@ -521,8 +519,8 @@ IIRFilter<ODR>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
   \param limit1B	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
   \param limit1B	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
-template <u_int ODR> void
-IIRFilter<ODR>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
+template <u_int D> void
+IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
 {
     float	n0 = 0.0, d0 = 1.0, n1 = 0.0, d1 = 0.0, n2 = 0.0, d2 = 0.0;
     for (int i = 0; i < D; ++i)
@@ -542,15 +540,12 @@ IIRFilter<ODR>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
 }
 
 /************************************************************************
-*  class BilateralIIRFilter<ORD>					*
+*  class BilateralIIRFilterBase						*
 ************************************************************************/
-//! 両側Infinite Inpulse Response Filterを表すクラス
-template <u_int ORD> class BilateralIIRFilter
+//! 両側Infinite Inpulse Response Filterのベースとなるクラス
+class BilateralIIRFilterBase
 {
   public:
-    enum			{D = ORD};
-    typedef IIRFilter<D>	IIR;
-    
   //! 微分の階数
     enum Order
     {
@@ -558,6 +553,16 @@ template <u_int ORD> class BilateralIIRFilter
 	First,						//!< 1階微分
 	Second						//!< 2階微分
     };
+};
+
+/************************************************************************
+*  class BilateralIIRFilter<D>						*
+************************************************************************/
+//! 両側Infinite Inpulse Response Filterを表すクラス
+template <u_int D> class BilateralIIRFilter : public BilateralIIRFilterBase
+{
+  public:
+    typedef IIRFilter<D>	IIR;
     
     BilateralIIRFilter&
 		initialize(const float cF[D+D], const float cB[D+D])	;
@@ -600,8 +605,8 @@ template <u_int ORD> class BilateralIIRFilter
 		\f]
 		となる.
 */
-template <u_int ORD> inline BilateralIIRFilter<ORD>&
-BilateralIIRFilter<ORD>::initialize(const float cF[D+D], const float cB[D+D])
+template <u_int D> inline BilateralIIRFilter<D>&
+BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
 {
     _iirF.initialize(cF);
     _iirB.initialize(cB);
@@ -630,8 +635,8 @@ BilateralIIRFilter<ORD>::initialize(const float cF[D+D], const float cB[D+D])
 		1, 1, 2になるよう，全体のスケールも調整される．
   \return	このフィルタ自身
 */
-template <u_int ORD> BilateralIIRFilter<ORD>&
-BilateralIIRFilter<ORD>::initialize(const float c[D+D], Order order)
+template <u_int D> BilateralIIRFilter<D>&
+BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
 {
   // Compute 0th, 1st and 2nd derivatives of the forward z-transform
   // functions at z = 1.
@@ -685,9 +690,9 @@ BilateralIIRFilter<ORD>::initialize(const float c[D+D], Order order)
   \param in	入力データ列
   \return	このフィルタ自身
 */
-template <u_int ORD> template <class T, class B>
-inline const BilateralIIRFilter<ORD>&
-BilateralIIRFilter<ORD>::convolve(const Array<T, B>& in) const
+template <u_int D> template <class T, class B>
+inline const BilateralIIRFilter<D>&
+BilateralIIRFilter<D>::convolve(const Array<T, B>& in) const
 {
     _iirF.forward(in, _bufF);
     _iirB.backward(in, _bufB);
@@ -701,10 +706,10 @@ BilateralIIRFilter<ORD>::convolve(const Array<T, B>& in) const
   \param out	出力データ列
   \return	このフィルタ自身
 */
-template <u_int ORD> template <class T1, class B1, class T2, class B2>
-inline const BilateralIIRFilter<ORD>&
-BilateralIIRFilter<ORD>::convolve(const Array<T1, B1>& in,
-				  Array<T2, B2>& out) const
+template <u_int D> template <class T1, class B1, class T2, class B2>
+inline const BilateralIIRFilter<D>&
+BilateralIIRFilter<D>::convolve(const Array<T1, B1>& in,
+				Array<T2, B2>& out) const
 {
     convolve(in);
     out.resize(dim());
@@ -722,11 +727,11 @@ BilateralIIRFilter<ORD>::convolve(const Array<T1, B1>& in,
   \param ie	処理を終了する次の行．0を与えると最後の行まで処理する．
   \return	このフィルタ自身
 */
-template <u_int ORD> template <class T1, class B1, class T2, class B2>
-const BilateralIIRFilter<ORD>&
-BilateralIIRFilter<ORD>::operator ()(const Array2<T1, B1>& in,
-				     Array2<T2, B2>& out,
-				     int is, int ie) const
+template <u_int D> template <class T1, class B1, class T2, class B2>
+const BilateralIIRFilter<D>&
+BilateralIIRFilter<D>::operator ()(const Array2<T1, B1>& in,
+				   Array2<T2, B2>& out,
+				   int is, int ie) const
 {
     out.resize(in.ncol(), in.nrow());
     if (ie == 0)
@@ -747,8 +752,8 @@ BilateralIIRFilter<ORD>::operator ()(const Array2<T1, B1>& in,
 /*!
   \return	出力データ列の次元
 */
-template <u_int ORD> inline u_int
-BilateralIIRFilter<ORD>::dim() const
+template <u_int D> inline u_int
+BilateralIIRFilter<D>::dim() const
 {
     return _bufF.dim();
 }
@@ -758,8 +763,8 @@ BilateralIIRFilter<ORD>::dim() const
   \param i	要素のindex
   \return	要素の値
 */
-template <u_int ORD> inline float
-BilateralIIRFilter<ORD>::operator [](int i) const
+template <u_int D> inline float
+BilateralIIRFilter<D>::operator [](int i) const
 {
     return _bufF[i] + _bufB[i];
 }
@@ -770,9 +775,9 @@ BilateralIIRFilter<ORD>::operator [](int i) const
   \param limit1		傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
   \param limit2		2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
-template <u_int ORD> void
-BilateralIIRFilter<ORD>::limits(float& limit0,
-				float& limit1, float& limit2) const
+template <u_int D> void
+BilateralIIRFilter<D>::limits(float& limit0,
+			      float& limit1, float& limit2) const
 {
     float	limit0F, limit1F, limit2F;
     _iirF.limitsF(limit0F, limit1F, limit2F);
@@ -792,19 +797,18 @@ BilateralIIRFilter<ORD>::limits(float& limit0,
 template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
 {
   public:
-    enum						{D = BIIRH::D};
-    typedef typename BilateralIIRFilter<D>::Order	Order;
-
+    typedef typename BIIRH::Order	Order;
+    
     BilateralIIRFilter2()	:_biirH(), _biirV()			{}
     BilateralIIRFilter2(u_int nthreads)
     	:_biirH(nthreads), _biirV(nthreads)				{}
 
     BilateralIIRFilter2&
-		initialize(float cHF[D+D], float cHB[D+D],
-			   float cVF[D+D], float cVB[D+D])		;
+		initialize(float cHF[], float cHB[],
+			   float cVF[], float cVB[])			;
     BilateralIIRFilter2&
-		initialize(float cHF[D+D], Order orderH,
-			   float cVF[D+D], Order orderV)		;
+		initialize(float cHF[], Order orderH,
+			   float cVF[], Order orderV)			;
     template <class T1, class B1, class T2, class B2>
     const BilateralIIRFilter2&
 		convolve(const Array2<T1, B1>& in,
@@ -825,8 +829,8 @@ template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
   \return	このフィルタ自身
 */
 template <class BIIRH, class BIIRV> inline BilateralIIRFilter2<BIIRH, BIIRV>&
-BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[D+D], float cHB[D+D],
-					      float cVF[D+D], float cVB[D+D])
+BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], float cHB[],
+					      float cVF[], float cVB[])
 {
     _biirH.initialize(cHF, cHB);
     _biirV.initialize(cVF, cVB);
@@ -843,8 +847,8 @@ BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[D+D], float cHB[D+D],
   \return	このフィルタ自身
 */
 template <class BIIRH, class BIIRV> inline BilateralIIRFilter2<BIIRH, BIIRV>&
-BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[D+D], Order orderH,
-					      float cVF[D+D], Order orderV)
+BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], Order orderH,
+					      float cVF[], Order orderV)
 {
     _biirH.initialize(cHF, orderH);
     _biirV.initialize(cVF, orderV);

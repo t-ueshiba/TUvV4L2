@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Serial++.h,v 1.16 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Serial++.h,v 1.17 2008-08-13 06:05:34 ueshiba Exp $
  */
 #ifndef __TUSerialPP_h
 #define __TUSerialPP_h
@@ -159,9 +159,12 @@ operator <<(Puma& puma, Puma& (*f)(Puma&))
 
 Puma&	operator <<(Puma&, const Puma::Position)		;
 Puma&	operator >>(Puma&, Puma::Position&)			;
-Puma&	calib(Puma&)						;
-Puma&	ready(Puma&)						;
-Puma&	nest (Puma&)						;
+Puma&	wait   (Puma&)						;
+Puma&	calib  (Puma&)						;
+Puma&	ready  (Puma&)						;
+Puma&	nest   (Puma&)						;
+Puma&	echo   (Puma&)						;
+Puma&	no_echo(Puma&)						;
 
 /************************************************************************
 *  class Pata								*
