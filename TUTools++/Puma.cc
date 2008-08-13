@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Puma.cc,v 1.10 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Puma.cc,v 1.11 2008-08-13 06:05:34 ueshiba Exp $
  */
 #include "TU/Serial++.h"
 
