@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Thread.cc,v 1.2 2008-06-16 02:22:31 ueshiba Exp $
+ *  $Id: Thread.cc,v 1.3 2008-08-22 20:59:34 ueshiba Exp $
  */
 #include "TU/Thread++.h"
-#include <iostream>
+#include <unistd.h>
 
 namespace TU
 {
