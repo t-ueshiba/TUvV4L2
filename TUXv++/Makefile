@@ -1,12 +1,12 @@
 #
-#  $Id: Makefile,v 1.15 2008-08-25 05:49:39 ueshiba Exp $
+#  $Id: Makefile,v 1.16 2008-08-25 06:02:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU/v
-INCDIRS		= -I. -I$(HOME)/include
+INCDIRS		= -I. -I$(HOME)/include -I$(X11HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
@@ -57,7 +57,7 @@ OBJS		= TUXv++.sa.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.15 $	|		\
+REV		= $(shell echo $Revision: 1.16 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
