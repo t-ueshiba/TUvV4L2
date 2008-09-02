@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: DericheConvolver++.h,v 1.1 2008-08-11 07:09:32 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.4 2008-09-02 05:13:00 ueshiba Exp $
  */
-#ifndef	__TUDericheConvolverPP_h
-#define	__TUDericheConvolverPP_h
+#ifndef	__TUDericheConvolver_h
+#define	__TUDericheConvolver_h
 
 #include "TU/IIRFilter++.h"
 
@@ -303,4 +303,4 @@ DericheConvolver2<BIIRH, BIIRV>::laplacian(const Array2<T1, B1>& in,
 
 }
 
-#endif	/* !__TUDericheConvolverPP_h */
+#endif	/* !__TUDericheConvolver_h */

@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Minimize++.h,v 1.10 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Minimize.h,v 1.1 2008-09-02 05:13:06 ueshiba Exp $
  */
-#ifndef __TUMinimizePP_h
-#define __TUMinimizePP_h
+#ifndef __TUMinimize_h
+#define __TUMinimize_h
 
 #include "TU/Vector++.h"
 #include <algorithm>
@@ -433,4 +433,4 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 }
  
 }
-#endif	/* !__TUMinimizePP_h	*/
+#endif	/* !__TUMinimize_h	*/

@@ -25,13 +25,13 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Geometry++.h,v 1.23 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.24 2008-09-02 05:13:01 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
 
 #include "TU/utility.h"
-#include "TU/Minimize++.h"
+#include "TU/Minimize.h"
 
 namespace TU
 {

@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.cc,v 1.6 2007-11-29 07:08:56 ueshiba Exp $
+ *  $Id: XvDC.cc,v 1.7 2008-09-02 05:15:33 ueshiba Exp $
  */
 #include "TU/v/XvDC.h"
 #include <stdexcept>
@@ -273,7 +273,3 @@ XvDC::grabPort(XvPortID base_id, u_long num_ports)
  
 }
 }
-
-#if defined(__GNUG__) || defined(__INTEL_COMPILER)
-#  include "TU/List++.cc"
-#endif

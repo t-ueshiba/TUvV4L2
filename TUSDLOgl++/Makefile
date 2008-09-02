@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.4 2008-08-25 05:49:39 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2008-09-02 05:15:32 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -28,12 +28,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Manip.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/v/DC3.h \
-		TU/SDLOglDC.h
+EXTHDRS		= TU/SDLOglDC.h
 HDRS		= SDLOglDC.h
 SRCS		= SDLOglDC.cc
 OBJS		= SDLOglDC.o
@@ -41,7 +36,7 @@ OBJS		= SDLOglDC.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -52,7 +47,4 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-SDLOglDC.o: TU/SDLOglDC.h /home/ueshiba/include/TU/v/DC3.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Manip.h
+SDLOglDC.o: TU/SDLOglDC.h

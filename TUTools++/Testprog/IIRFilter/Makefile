@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.14 2008-08-11 07:09:55 ueshiba Exp $
+#  $Id: Makefile,v 1.15 2008-09-02 05:13:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -22,13 +22,13 @@ LINKER		= $(CCC)
 #########################
 SUFFIX		= .cc:sC
 EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/DericheConvolver++.h \
+		/home/ueshiba/include/TU/DericheConvolver.h \
 		/home/ueshiba/include/TU/EdgeDetector.h \
-		/home/ueshiba/include/TU/GaussianConvolver++.h \
+		/home/ueshiba/include/TU/GaussianConvolver.h \
 		/home/ueshiba/include/TU/Geometry++.h \
 		/home/ueshiba/include/TU/IIRFilter++.h \
 		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/Minimize++.h \
+		/home/ueshiba/include/TU/Minimize.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/mmInstructions.h \
 		/home/ueshiba/include/TU/types.h \
@@ -40,7 +40,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.14 $	|		\
+REV		= $(shell echo $Revision: 1.15 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -55,11 +55,11 @@ include $(PROJECT)/lib/p.mk
 main.o: /home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
+	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/GaussianConvolver++.h \
+	/home/ueshiba/include/TU/GaussianConvolver.h \
 	/home/ueshiba/include/TU/IIRFilter++.h \
 	/home/ueshiba/include/TU/mmInstructions.h \
-	/home/ueshiba/include/TU/DericheConvolver++.h \
+	/home/ueshiba/include/TU/DericheConvolver.h \
 	/home/ueshiba/include/TU/EdgeDetector.h

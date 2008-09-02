@@ -25,12 +25,11 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: TUv++.inst.cc,v 1.6 2007-11-29 07:06:08 ueshiba Exp $
+ *  $Id: TUv++.inst.cc,v 1.7 2008-09-02 05:15:33 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
 #include "TU/v/TUv++.h"
-#include "TU/List++.cc"
 
 namespace TU
 {

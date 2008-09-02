@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: TUv++.h,v 1.9 2008-06-05 02:26:24 ueshiba Exp $
+ *  $Id: TUv++.h,v 1.10 2008-09-02 05:15:33 ueshiba Exp $
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
@@ -37,7 +37,7 @@
 #  include <X11/Intrinsic.h>
 #  include <X11/StringDefs.h>
 #endif
-#include "TU/List++.h"
+#include "TU/List.h"
 #include "TU/Geometry++.h"
 #include "TU/types.h"
 

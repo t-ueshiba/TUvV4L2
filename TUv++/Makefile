@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.22 2008-08-25 05:49:39 ueshiba Exp $
+#  $Id: Makefile,v 1.23 2008-09-02 05:15:33 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -28,17 +28,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/List++.cc \
-		/home/ueshiba/include/TU/List++.h \
-		/home/ueshiba/include/TU/Manip.h \
-		/home/ueshiba/include/TU/Minimize++.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/utility.h \
-		TU/v/App.h \
+EXTHDRS		= TU/v/App.h \
 		TU/v/Bitmap.h \
 		TU/v/CanvasPane.h \
 		TU/v/CanvasPaneDC.h \
@@ -201,7 +191,7 @@ OBJS		= App.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.22 $	|		\
+REV		= $(shell echo $Revision: 1.23 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -213,339 +203,95 @@ REV		= $(shell echo $Revision: 1.22 $	|		\
 include $(PROJECT)/lib/l.mk
 ###
 App.o: TU/v/App.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
-Bitmap.o: TU/v/Bitmap.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
+Bitmap.o: TU/v/Bitmap.h TU/v/TU/v/TU/v/Colormap.h
 ButtonCmd.o: ButtonCmd_.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/Bitmap.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/Bitmap.h
 CanvasPane.o: TU/v/CanvasPane.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	vViewport_.h vGridbox_.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h vViewport_.h \
+	vGridbox_.h
 CanvasPaneDC.o: TU/v/CanvasPaneDC.h TU/v/TU/v/XDC.h TU/v/TU/v/TU/v/DC.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
 	TU/v/TU/v/TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TU/v/TUv++.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/TU/v/Menu.h vCanvas_.h vViewport_.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/TU/v/Menu.h vCanvas_.h vViewport_.h
 CanvasPaneDC3.o: TU/v/CanvasPaneDC3.h TU/v/CanvasPaneDC.h TU/v/TU/v/XDC.h \
-	TU/v/TU/v/TU/v/DC.h /home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
-	TU/v/TU/v/TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TU/v/TUv++.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/TU/v/Menu.h TU/v/TU/v/DC3.h
+	TU/v/TU/v/TU/v/DC.h TU/v/TU/v/TU/v/Colormap.h TU/v/CanvasPane.h \
+	TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/TU/v/Menu.h \
+	TU/v/TU/v/DC3.h
 ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h
 ChoiceMenuButtonCmd.o: ChoiceMenuButtonCmd_.h TU/v/TU/v/Menu.h \
 	TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
 Cmd.o: TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	LabelCmd_.h SliderCmd_.h FrameCmd_.h ButtonCmd_.h TU/v/Bitmap.h \
-	ToggleButtonCmd_.h MenuButtonCmd_.h TU/v/TU/v/Menu.h \
-	ChoiceMenuButtonCmd_.h RadioButtonCmd_.h ChoiceFrameCmd_.h ListCmd_.h \
-	TextInCmd_.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h LabelCmd_.h SliderCmd_.h FrameCmd_.h \
+	ButtonCmd_.h TU/v/Bitmap.h ToggleButtonCmd_.h MenuButtonCmd_.h \
+	TU/v/TU/v/Menu.h ChoiceMenuButtonCmd_.h RadioButtonCmd_.h \
+	ChoiceFrameCmd_.h ListCmd_.h TextInCmd_.h
 CmdPane.o: TU/v/CmdPane.h TU/v/TU/v/CmdWindow.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	vGridbox_.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h vGridbox_.h
 CmdParent.o: TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
 CmdWindow.o: TU/v/TU/v/CmdWindow.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/App.h vGridbox_.h
-Colormap.o: TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/App.h \
+	vGridbox_.h
+Colormap.o: TU/v/TU/v/TU/v/Colormap.h
 Confirm.o: TU/v/Confirm.h TU/v/TU/v/ModalDialog.h TU/v/TU/v/TU/v/Dialog.h \
 	TU/v/CmdPane.h TU/v/TU/v/CmdWindow.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
-DC.o: TU/v/TU/v/TU/v/DC.h /home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h
-DC3.o: TU/v/TU/v/DC3.h /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Manip.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h
+DC.o: TU/v/TU/v/TU/v/DC.h
+DC3.o: TU/v/TU/v/DC3.h
 Dialog.o: TU/v/TU/v/TU/v/Dialog.h TU/v/CmdPane.h TU/v/TU/v/CmdWindow.h \
 	TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
 FileSelection.o: TU/v/FileSelection.h TU/v/TU/v/ModalDialog.h \
 	TU/v/TU/v/TU/v/Dialog.h TU/v/CmdPane.h TU/v/TU/v/CmdWindow.h \
 	TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/Notify.h TU/v/Confirm.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/Notify.h TU/v/Confirm.h
 FrameCmd.o: FrameCmd_.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
-Icon.o: TU/v/Icon.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
+Icon.o: TU/v/Icon.h TU/v/TU/v/TU/v/Colormap.h
 LabelCmd.o: LabelCmd_.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
 ListCmd.o: ListCmd_.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	vViewport_.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h vViewport_.h
 MemoryDC.o: TU/v/MemoryDC.h TU/v/TU/v/XDC.h TU/v/TU/v/TU/v/DC.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
 	TU/v/TU/v/TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TU/v/TUv++.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
 Menu.o: TU/v/TU/v/Menu.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/Bitmap.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/Bitmap.h
 MenuButtonCmd.o: MenuButtonCmd_.h TU/v/TU/v/Menu.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h
 ModalDialog.o: TU/v/TU/v/ModalDialog.h TU/v/TU/v/TU/v/Dialog.h \
 	TU/v/CmdPane.h TU/v/TU/v/CmdWindow.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h
 Notify.o: TU/v/Notify.h TU/v/TU/v/ModalDialog.h TU/v/TU/v/TU/v/Dialog.h \
 	TU/v/CmdPane.h TU/v/TU/v/CmdWindow.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h
 Object.o: TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
 Pane.o: TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	vGridbox_.h
-RadioButtonCmd.o: TU/v/Bitmap.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	RadioButtonCmd_.h TU/v/TU/v/TUv++.h /home/ueshiba/include/TU/List++.h \
 	TU/v/TU/v/TU/v/Widget-Xaw.h vGridbox_.h
+RadioButtonCmd.o: TU/v/Bitmap.h TU/v/TU/v/TU/v/Colormap.h \
+	RadioButtonCmd_.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
+	vGridbox_.h
 ShmDC.o: TU/v/ShmDC.h TU/v/CanvasPaneDC.h TU/v/TU/v/XDC.h \
-	TU/v/TU/v/TU/v/DC.h /home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
-	TU/v/TU/v/TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TU/v/TUv++.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/TU/v/Menu.h
+	TU/v/TU/v/TU/v/DC.h TU/v/TU/v/TU/v/Colormap.h TU/v/CanvasPane.h \
+	TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/TU/v/Menu.h
 SliderCmd.o: SliderCmd_.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	vSlider_.h vGridbox_.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h vSlider_.h vGridbox_.h
 TUv++.inst.o: TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	/home/ueshiba/include/TU/List++.cc
+	TU/v/TU/v/TU/v/Widget-Xaw.h
 TextInCmd.o: TextInCmd_.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	vTextField_.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h vTextField_.h
 Timer.o: TU/v/Timer.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/App.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/App.h
 ToggleButtonCmd.o: ToggleButtonCmd_.h TU/v/TU/v/TUv++.h \
-	TU/v/TU/v/TU/v/Colormap.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	TU/v/Bitmap.h
+	TU/v/TU/v/TU/v/Colormap.h TU/v/TU/v/TU/v/Widget-Xaw.h TU/v/Bitmap.h
 Widget-Xaw.o: TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h \
-	vGridbox_.h vTextField_.h vViewport_.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h vGridbox_.h vTextField_.h vViewport_.h
 Window.o: TU/v/App.h TU/v/TU/v/TUv++.h TU/v/TU/v/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h TU/v/TU/v/TU/v/Widget-Xaw.h
-XDC.o: TU/v/TU/v/XDC.h TU/v/TU/v/TU/v/DC.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
-	TU/v/TU/v/TU/v/Colormap.h
+	TU/v/TU/v/TU/v/Widget-Xaw.h
+XDC.o: TU/v/TU/v/XDC.h TU/v/TU/v/TU/v/DC.h TU/v/TU/v/TU/v/Colormap.h
 vCanvas.o: vCanvasP_.h vCanvas_.h
 vGridbox.o: vGridboxP_.h vGridbox_.h
 vScrollbar.o: vScrollbarP_.h vScrollbar_.h

@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: List++.h,v 1.7 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: List.h,v 1.1 2008-09-02 05:13:04 ueshiba Exp $
  */
-#ifndef __TUListPP_h
-#define __TUListPP_h
+#ifndef __TUList_h
+#define __TUList_h
 #include <iterator>
 
 namespace TU
@@ -174,6 +174,62 @@ class List
     friend class	Iterator;	// Allow access to _front.
 };
  
+/*
+ *  'i' の位置に 'x' を挿入し、その挿入された位置を返す。
+ */
+template <class T> typename List<T>::Iterator
+List<T>::insert(Iterator i, T& x)
+{
+    if (i == end())				// 末尾に挿入？
+	_back = &x;
+
+    if (i == begin())				// リストの先頭？
+    {
+	x._next = _front;			// 先頭に挿入
+	_front = &x;
+    }
+    else
+	i._prev->insertNext(&x);		// 「手前の次」に挿入
+
+    return i;
 }
 
-#endif	// !__TUListPP_h
+/*
+ *  'i' の位置にある要素を削除し、削除された要素への参照を返す。
+ */
+template <class T> typename List<T>::reference
+List<T>::erase(Iterator i)
+{
+    T&	x = *i;
+    if (&x == _back)				// リストの末尾？
+	_back = i._prev;			// 末尾の要素を削除
+    if (&x == _front)				// リストの先頭？
+	_front = _front->_next;			// 先頭の要素を削除
+    else
+	i._prev->eraseNext();			// 「手前の次」を削除
+    
+    return x;
+}
+
+/*
+ *  'x' と同じオブジェクト（高々１つしかないはず）を削除する。
+ */
+template <class T> void
+List<T>::remove(const T& x)
+{
+    for (Iterator i = begin(); i != end(); )
+    {
+	Iterator next = i;
+	++next;
+	if (i.operator ->() == &x)
+	{
+	    erase(i);
+	    return;
+	}
+	i = next;
+    }
+}
+
+}
+
+#endif	// !__TUList_h

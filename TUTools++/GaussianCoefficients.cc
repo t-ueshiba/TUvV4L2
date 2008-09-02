@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: GaussianCoefficients.cc,v 1.1 2008-08-11 07:09:34 ueshiba Exp $
+ *  $Id: GaussianCoefficients.cc,v 1.2 2008-09-02 05:13:00 ueshiba Exp $
  */
-#include "TU/GaussianConvolver++.h"
-#include "TU/Minimize++.h"
+#include "TU/GaussianConvolver.h"
+#include "TU/Minimize.h"
 
 namespace TU
 {

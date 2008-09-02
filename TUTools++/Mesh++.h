@@ -25,13 +25,13 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Mesh++.h,v 1.14 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.15 2008-09-02 05:13:05 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
 
 #include "TU/Vector++.h"
-#include "TU/Allocator++.h"
+#include "TU/Allocator.h"
 
 namespace TU
 {

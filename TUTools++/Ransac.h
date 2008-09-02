@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Ransac++.h,v 1.5 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.1 2008-09-02 05:13:08 ueshiba Exp $
  */
-#ifndef __TURansacPP_h
-#define __TURansacPP_h
+#ifndef __TURansac_h
+#define __TURansac_h
 
 #include <math.h>
 #include <stdexcept>
@@ -126,4 +126,4 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
     
 }
 
-#endif // !__TURansacPP_h
+#endif // !__TURansac_h

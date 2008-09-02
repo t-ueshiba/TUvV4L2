@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2008-08-07 08:17:40 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2008-09-02 05:13:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -22,8 +22,7 @@ LINKER		= $(CCC)
 #########################
 SUFFIX		= .cc:sC
 EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Heap++.cc \
-		/home/ueshiba/include/TU/Heap++.h \
+		/home/ueshiba/include/TU/Heap.h \
 		/home/ueshiba/include/TU/types.h
 HDRS		=
 SRCS		= heaptest.cc
@@ -32,7 +31,7 @@ OBJS		= heaptest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -44,6 +43,5 @@ REV		= $(shell echo $Revision: 1.3 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-heaptest.o: /home/ueshiba/include/TU/Heap++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Heap++.cc
+heaptest.o: /home/ueshiba/include/TU/Heap.h \
+	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h

@@ -20,14 +20,14 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.10 2007-01-31 05:42:44 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.11 2008-09-02 05:15:31 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
 
 #include "TU/Geometry++.h"
 #include "TU/BlockMatrix++.h"
-#include "TU/Minimize++.h"
+#include "TU/Minimize.h"
 
 /*!
   \mainpage	libTUCalib++ - カメラキャリブレーション用ライブラリ
