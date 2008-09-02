@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.6 2007-03-12 07:15:47 ueshiba Exp $
+#  $Id: Makefile,v 1.7 2008-09-02 05:13:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,9 +27,9 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Bezier++.h \
 		/home/ueshiba/include/TU/Geometry++.h \
 		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/List++.h \
+		/home/ueshiba/include/TU/List.h \
 		/home/ueshiba/include/TU/Manip.h \
-		/home/ueshiba/include/TU/Minimize++.h \
+		/home/ueshiba/include/TU/Minimize.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/types.h \
 		/home/ueshiba/include/TU/utility.h \
@@ -55,7 +55,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.6 $	|		\
+REV		= $(shell echo $Revision: 1.7 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -73,13 +73,13 @@ draw.o: draw.h /home/ueshiba/include/TU/v/OglDC.h \
 	/home/ueshiba/include/TU/v/XDC.h /home/ueshiba/include/TU/v/DC.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
+	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
 	/home/ueshiba/include/TU/v/Colormap.h \
 	/home/ueshiba/include/TU/v/CanvasPane.h \
-	/home/ueshiba/include/TU/v/TUv++.h /home/ueshiba/include/TU/List++.h \
+	/home/ueshiba/include/TU/v/TUv++.h /home/ueshiba/include/TU/List.h \
 	/home/ueshiba/include/TU/v/Widget-Xaw.h \
 	/home/ueshiba/include/TU/v/Menu.h /home/ueshiba/include/TU/v/DC3.h \
 	/home/ueshiba/include/TU/Bezier++.h
@@ -89,10 +89,10 @@ main.o: /home/ueshiba/include/TU/v/App.h \
 	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
+	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h \
+	/home/ueshiba/include/TU/List.h \
 	/home/ueshiba/include/TU/v/Widget-Xaw.h \
 	/home/ueshiba/include/TU/v/CmdWindow.h \
 	/home/ueshiba/include/TU/v/CanvasPane.h draw.h \

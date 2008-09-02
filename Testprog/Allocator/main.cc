@@ -1,12 +1,8 @@
 /*
- *  $Id: main.cc,v 1.3 2008-08-07 08:17:21 ueshiba Exp $
+ *  $Id: main.cc,v 1.4 2008-09-02 05:13:15 ueshiba Exp $
  */
 #include <iostream>
-#include "TU/Allocator++.h"
-#ifdef __GNUG__
-#  include "TU/Allocator++.cc"
-#  include "TU/List++.cc"
-#endif
+#include "TU/Allocator.h"
 
 namespace TU
 {

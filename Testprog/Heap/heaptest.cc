@@ -1,7 +1,7 @@
 /*
- *  $Id: heaptest.cc,v 1.1 2002-07-25 04:36:10 ueshiba Exp $
+ *  $Id: heaptest.cc,v 1.2 2008-09-02 05:13:16 ueshiba Exp $
  */
-#include "TU/Heap++.h"
+#include "TU/Heap.h"
 
 namespace TU
 {
@@ -27,7 +27,3 @@ main()
     TU::sort(a, ordered());
     cout << a;
 }
-
-#ifdef __GNUG__
-#  include "TU/Heap++.cc"
-#endif

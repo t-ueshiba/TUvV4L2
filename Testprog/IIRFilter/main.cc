@@ -1,10 +1,10 @@
 /*
- *  $Id: main.cc,v 1.9 2008-08-11 07:09:55 ueshiba Exp $
+ *  $Id: main.cc,v 1.10 2008-09-02 05:13:16 ueshiba Exp $
  */
 #include <stdlib.h>
 #include "TU/Image++.h"
-#include "TU/GaussianConvolver++.h"
-#include "TU/DericheConvolver++.h"
+#include "TU/GaussianConvolver.h"
+#include "TU/DericheConvolver.h"
 #include "TU/EdgeDetector.h"
 
 namespace TU

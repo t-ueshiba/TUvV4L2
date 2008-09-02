@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2007-03-12 07:15:58 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2008-09-02 05:13:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -21,8 +21,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/List++.cc \
-		/home/ueshiba/include/TU/List++.h
+EXTHDRS		= /home/ueshiba/include/TU/List.h
 HDRS		=
 SRCS		= slisttest.cc
 OBJS		= slisttest.o
@@ -30,7 +29,7 @@ OBJS		= slisttest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -42,5 +41,4 @@ REV		= $(shell echo $Revision: 1.3 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-slisttest.o: /home/ueshiba/include/TU/List++.h \
-	/home/ueshiba/include/TU/List++.cc
+slisttest.o: /home/ueshiba/include/TU/List.h

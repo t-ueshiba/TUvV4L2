@@ -25,18 +25,108 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Allocator++.cc,v 1.7 2007-11-29 07:06:35 ueshiba Exp $
+ *  $Id: Allocator.h,v 1.1 2008-09-02 05:12:59 ueshiba Exp $
  */
-#include "TU/Allocator++.h"
+#ifndef __TUAllocator_h
+#define __TUAllocator_h
 
-
-#define UintNBits	(8*sizeof(u_int))
+#include "TU/Array++.h"
+#include "TU/List.h"
 
 namespace TU
 {
 /************************************************************************
 *  class Allocator<T>							*
 ************************************************************************/
+template <class T>
+class Allocator
+{
+  public:
+    enum	{UintNBits = 8*sizeof(u_int)};
+    
+    class Page : public List<Page>::Node
+    {
+      public:
+	Page(u_int nelements)
+	    :_nelements(nelements),
+	     _p(new char[sizeof(T)*_nelements])	{}
+	~Page()					{delete [] _p;}
+
+	u_int		nelements()	const	{return _nelements;}
+	void*		nth(int i)	const	{return _p + sizeof(T)*i;}
+
+      private:
+	const u_int	_nelements;	// # of elements in this page.
+	char* const	_p;		// memory pool.
+    };
+
+    class PageList : public List<Page>
+    {
+      public:
+      	~PageList()					;
+
+	using		List<Page>::begin;
+	using		List<Page>::end;
+	using		List<Page>::empty;
+	using		List<Page>::front;
+	using		List<Page>::pop_front;
+    };
+
+    class Element : public List<Element>::Node
+    {
+    };
+
+    class FreeList : public List<Element>
+    {
+      public:
+	void		addPage(Page& page)		;
+
+	using		List<Element>::begin;
+	using		List<Element>::end;
+	using		List<Element>::empty;
+	using		List<Element>::front;
+	using		List<Element>::pop_front;
+    };
+
+    class Enumerator : public List<Enumerator>::Node
+    {
+      public:
+	Enumerator(const Allocator<T>& allocator)	;
+	~Enumerator()					;
+
+	void		head()				;
+			operator T*()			{return _p;}
+	T*		operator ->()			{return _p;}
+	Enumerator&	operator ++()			;
+	
+      private:
+	friend class	Allocator;
+	
+	void		unmark(const void* p)		;
+	
+	const Allocator<T>&			_allocator;
+	typename List<Page>::ConstIterator	_pageIter;
+	u_int					_page, _index, _bit;
+	T*					_p;
+	Array<Array<u_int> >	_mark;	// marked if not in freeList.
+    };
+
+  public:
+    Allocator(u_int nelmsPerPage=1024)		{setPageSize(nelmsPerPage);}
+
+    void*		alloc()			;
+    void		free(void* p)		;
+    void		setPageSize(u_int n)	;
+
+  private:
+    friend class	Enumerator;
+
+    PageList		_pageList;
+    FreeList		_freeList;
+    u_int		_nelmsPerPage;
+    List<Enumerator>	_enumeratorList;
+};
+ 
 template <class T> void*
 Allocator<T>::alloc()
 {
@@ -69,9 +159,9 @@ Allocator<T>::setPageSize(u_int n)
 	_nelmsPerPage = UintNBits * ((n - 1) / UintNBits + 1);
 }
 
-/************************************************************************
-*  class Allocator<T>::PageList						*
-************************************************************************/
+/*
+ *  class Allocator<T>::PageList
+ */
 template <class T>
 Allocator<T>::PageList::~PageList()
 {
@@ -79,9 +169,9 @@ Allocator<T>::PageList::~PageList()
 	delete &pop_front();
 }
 
-/************************************************************************
-*  class Allocator<T>::FreeList						*
-************************************************************************/
+/*
+ *  class Allocator<T>::FreeList
+ */
 template <class T> void
 Allocator<T>::FreeList::addPage(Page& page)
 {
@@ -89,9 +179,9 @@ Allocator<T>::FreeList::addPage(Page& page)
 	push_front(*(Element*)page.nth(i));
 }
 
-/************************************************************************
-*  class Allocator<T>::Enumerator					*
-************************************************************************/
+/*
+ *  class Allocator<T>::Enumerator
+ */
 template <class T>
 Allocator<T>::Enumerator::Enumerator(const Allocator<T>& allocator)
     :_allocator(allocator), _pageIter(_allocator._pageList.begin()),
@@ -187,3 +277,5 @@ Allocator<T>::Enumerator::unmark(const void* p)
 }
  
 }
+
+#endif	// !__TUAllocator_h

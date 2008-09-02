@@ -1,8 +1,8 @@
 /*
- *  $Id: pstreetest.cc,v 1.3 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: pstreetest.cc,v 1.4 2008-09-02 05:13:17 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
-#include "TU/PSTree++.h"
+#include "TU/PSTree.h"
 #include <fstream>
 
 namespace TU
@@ -81,9 +81,3 @@ main()
 	delete node;
     }
 }
-
-#ifdef __GNUG__
-#  include "TU/Heap++.cc"
-#  include "TU/List++.cc"
-#  include "TU/PSTree++.cc"
-#endif

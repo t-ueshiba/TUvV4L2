@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: GaussianConvolver++.h,v 1.1 2008-08-11 07:09:34 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.4 2008-09-02 05:13:01 ueshiba Exp $
  */
 #ifndef	__TUGaussianConvolver_h
 #define	__TUGaussianConvolver_h
