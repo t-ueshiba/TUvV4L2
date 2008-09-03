@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.11 2008-09-02 05:15:31 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.12 2008-09-03 23:33:30 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
@@ -191,7 +191,8 @@ class MeasurementMatrix : public Matrix<double>
 		operator >>(std::istream& in, MeasurementMatrix& Wt)	;
 
   private:
-    std::istream&	get(std::istream& in, int j, u_int nfrms)	;
+    std::istream&
+		get(std::istream& in, int j, u_int nfrms)		;
     Matrix<ET>	initializeCalibrationWithPlanes
 			    (Array<CanonicalCamera>& cameras)	  const	;
     void	initializeFocalLengthsEstimation(Matrix<ET>& P,
@@ -200,7 +201,7 @@ class MeasurementMatrix : public Matrix<double>
     class CostH		// cost function for homography estimation.
     {
       public:
-      	typedef double		ET;
+      	typedef ET		value_type;
 	typedef Vector<ET>	AT;
 
       public:
@@ -254,7 +255,7 @@ class MeasurementMatrix : public Matrix<double>
     class CostPM	// cost function for projective to metric conversion.
     {
       public:
-      	typedef double		ET;
+      	typedef ET		value_type;
 	typedef Vector<ET>	AT;
 
       public:
@@ -273,10 +274,10 @@ class MeasurementMatrix : public Matrix<double>
     class CostCP	// cost function for refining calibration
     {			//   using multiple planar patterns.
       public:
-      	typedef double			ET;
+      	typedef ET			value_type;
+	typedef Matrix<ET>		jacobian_type;
 	typedef CameraBase::Intrinsic	ATA;
 	typedef CanonicalCamera		ATB;
-	typedef Matrix<ET>		JT;
 
       public:
 	CostCP(const MeasurementMatrix& Wt, u_int adim)
@@ -284,7 +285,7 @@ class MeasurementMatrix : public Matrix<double>
 
 	Vector<ET>	operator ()(const ATA& K,
 				    const ATB& camera, int i)	const	;
-	JT		jacobianA(const ATA& K,
+	Matrix<ET>	jacobianA(const ATA& K,
 				  const ATB& camera, int i)	const	;
 	Matrix<ET>	jacobianB(const ATA& K,
 				  const ATB& camera, int i)	const	;
@@ -306,10 +307,10 @@ class MeasurementMatrix : public Matrix<double>
     class CostBA	// cost function for bundle adjustment.
     {
       public:
-      	typedef double			ET;
+      	typedef ET			value_type;
+	typedef BlockMatrix<ET>		jacobian_type;
 	typedef Array<CAMERA>		ATA;
 	typedef Vector<ET>		ATB;
-	typedef BlockMatrix<ET>		JT;
 
 	class CostCD	// cost function for keeping distance between 0th
 	{		//   and 1st cameras constant.
@@ -341,7 +342,7 @@ class MeasurementMatrix : public Matrix<double>
 
 	Vector<ET>	operator ()(const ATA& p,
 				    const ATB& x, int j)	const	;
-	JT		jacobianA(const ATA& p,
+	BlockMatrix<ET>	jacobianA(const ATA& p,
 				  const ATB& x, int j)		const	;
 	Matrix<ET>	jacobianB(const ATA& p,
 				  const ATB& x, int j)		const	;
@@ -363,8 +364,9 @@ class MeasurementMatrix : public Matrix<double>
     class CostBACI	// cost function for bundle adjustment
     {			//   with common intrinsic parameters estimation.
       public:
-      	typedef double			ET;
-
+	typedef ET			value_type;
+	typedef Matrix<ET>		jacobian_type;
+	
 	struct ATA : public Array<CanonicalCamera>
 	{
 	    ATA(const INTRINSIC& KK,
@@ -374,7 +376,6 @@ class MeasurementMatrix : public Matrix<double>
 	    INTRINSIC			K;	// common intrinsic parameters.
 	};
 	typedef Vector<ET>		ATB;
-	typedef Matrix<ET>		JT;
     
 	class CostCD	// cost function for keeping distance between 0th
 	{		//   and 1st cameras constant.

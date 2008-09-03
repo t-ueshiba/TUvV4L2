@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.16 2008-09-02 05:15:31 ueshiba Exp $
+#  $Id: Makefile,v 1.17 2008-09-03 23:33:30 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -28,7 +28,9 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= TU/Collection++.h
+EXTHDRS		= /home/ueshiba/include/TU/Object++.h \
+		/home/ueshiba/include/TU/types.h \
+		TU/Collection++.h
 HDRS		= Collection++.h
 SRCS		= Collection++.cc \
 		ObjTreeBase.cc \
@@ -40,7 +42,7 @@ OBJS		= Collection++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.16 $	|		\
+REV		= $(shell echo $Revision: 1.17 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -51,6 +53,9 @@ REV		= $(shell echo $Revision: 1.16 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Collection++.o: TU/Collection++.h
-ObjTreeBase.o: TU/Collection++.h
-TUCollection++.sa.o: TU/Collection++.h
+Collection++.o: TU/Collection++.h /home/ueshiba/include/TU/Object++.h \
+	/home/ueshiba/include/TU/types.h
+ObjTreeBase.o: TU/Collection++.h /home/ueshiba/include/TU/Object++.h \
+	/home/ueshiba/include/TU/types.h
+TUCollection++.sa.o: TU/Collection++.h /home/ueshiba/include/TU/Object++.h \
+	/home/ueshiba/include/TU/types.h

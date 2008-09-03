@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Minimize.h,v 1.1 2008-09-02 05:13:06 ueshiba Exp $
+ *  $Id: Minimize.h,v 1.2 2008-09-03 23:33:34 ueshiba Exp $
  */
 #ifndef __TUMinimize_h
 #define __TUMinimize_h
@@ -55,9 +55,10 @@ class NullConstraint
 template <class AT>
 class ConstNormConstraint
 {
-  public:
-    typedef typename AT::ET	ET;
+  private:
+    typedef typename AT::value_type	ET;
     
+  public:
     ConstNormConstraint(const AT& x) :_sqr(x.square())			{}
 
     Vector<ET>	operator ()(const AT& x) const
@@ -82,12 +83,12 @@ class ConstNormConstraint
 *  function minimizeSquare						*
 *    -- Compute x st. ||f(x)||^2 -> min under g(x) = 0.			*
 ************************************************************************/
-template <class F, class G, class AT> Matrix<typename F::ET>
+template <class F, class G, class AT> Matrix<typename F::value_type>
 minimizeSquare(const F& f, const G& g, AT& x,
 	       int niter_max=100, double tol=1.5e-8)
 {
-    using namespace		std;
-    typedef typename F::ET	ET;		// element type.
+    using namespace			std;
+    typedef typename F::value_type	ET;	// element type.
 
     Vector<ET>	fval   = f(x);			// function value.
     ET		sqr    = fval * fval;		// square value.
@@ -157,13 +158,13 @@ minimizeSquare(const F& f, const G& g, AT& x,
 *  function minimizeSquareSparse					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
-template <class F, class G, class ATA, class IB> Matrix<typename F::ET>
+template <class F, class G, class ATA, class IB> Matrix<typename F::value_type>
 minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		     int niter_max=100, double tol=1.5e-8)
 {
     using namespace					std;
-    typedef typename F::ET				ET;  // element type.
-    typedef typename F::JT				JT;  // Jacobian type.
+    typedef typename F::value_type			ET;  // element type.
+    typedef typename F::jacobian_type			JT;  // Jacobian type.
     typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
     
     const u_int			nb = distance(bbegin, bend);
@@ -313,7 +314,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 			  int niter_max=100, double tol=1.5e-8)
 {
     using namespace					std;
-    typedef typename F::ET				ET;  // element type.
+    typedef typename F::value_type			ET;  // element type.
     typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
 
     const u_int			nb = distance(bbegin, bend);

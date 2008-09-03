@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: GaussianCoefficients.cc,v 1.2 2008-09-02 05:13:00 ueshiba Exp $
+ *  $Id: GaussianCoefficients.cc,v 1.3 2008-09-03 23:33:33 ueshiba Exp $
  */
 #include "TU/GaussianConvolver.h"
 #include "TU/Minimize.h"
@@ -83,9 +83,11 @@ GaussianCoefficients::Params::operator -=(const Vector<double>& p)
 Vector<double>
 GaussianCoefficients::EvenConstraint::operator ()(const AT& params) const
 {
-    Vector<ET>	val(1);
-    const ET	as0 = params[0].alpha/_sigma, ts0 = params[0].theta/_sigma,
-		as1 = params[1].alpha/_sigma, ts1 = params[1].theta/_sigma;
+    Vector<double>	val(1);
+    const double	as0 = params[0].alpha/_sigma,
+			ts0 = params[0].theta/_sigma,
+			as1 = params[1].alpha/_sigma,
+			ts1 = params[1].theta/_sigma;
     val[0] = (params[0].a*sinh(as0) + params[0].b* sin(ts0)) *
 	     (cosh(as1) - cos(ts1))
 	   + (params[1].a*sinh(as1) + params[1].b* sin(ts1)) *
@@ -97,12 +99,16 @@ GaussianCoefficients::EvenConstraint::operator ()(const AT& params) const
 Matrix<double>
 GaussianCoefficients::EvenConstraint::jacobian(const AT& params) const
 {
-    ET	c0  = cos(params[0].theta/_sigma),  s0  = sin(params[0].theta/_sigma),
-	ch0 = cosh(params[0].alpha/_sigma), sh0 = sinh(params[0].alpha/_sigma),
-	c1  = cos(params[1].theta/_sigma),  s1  = sin(params[1].theta/_sigma),
-	ch1 = cosh(params[1].alpha/_sigma), sh1 = sinh(params[1].alpha/_sigma);
+    const double	c0  = cos(params[0].theta/_sigma),
+			s0  = sin(params[0].theta/_sigma),
+			ch0 = cosh(params[0].alpha/_sigma),
+			sh0 = sinh(params[0].alpha/_sigma),
+			c1  = cos(params[1].theta/_sigma),
+			s1  = sin(params[1].theta/_sigma),
+			ch1 = cosh(params[1].alpha/_sigma),
+			sh1 = sinh(params[1].alpha/_sigma);
 	
-    Matrix<ET>	val(1, 8);
+    Matrix<double>	val(1, 8);
     val[0][0] = sh0*(ch1 - c1);
     val[0][1] = s0 *(ch1 - c1);
     val[0][2] = (params[0].b*c0 *(ch1 - c1) +
@@ -125,10 +131,10 @@ GaussianCoefficients::EvenConstraint::jacobian(const AT& params) const
 Vector<double>
 GaussianCoefficients::CostFunction::operator ()(const AT& params) const
 {
-    Vector<ET>	val(_ndivisions+1);
+    Vector<double>	val(_ndivisions+1);
     for (int k = 0; k < val.dim(); ++k)
     {
-	ET	f = 0.0, x = k*_range/_ndivisions;
+	double	f = 0.0, x = k*_range/_ndivisions;
 	for (int i = 0; i < params.dim(); ++i)
 	{
 	    const Params&	p = params[i];
@@ -143,16 +149,16 @@ GaussianCoefficients::CostFunction::operator ()(const AT& params) const
 Matrix<double>
 GaussianCoefficients::CostFunction::jacobian(const AT& params) const
 {
-    Matrix<ET>	val(_ndivisions+1, 4*params.dim());
+    Matrix<double>	val(_ndivisions+1, 4*params.dim());
     for (int k = 0; k < val.nrow(); ++k)
     {
-	Vector<ET>&	row = val[k];
-	ET		x = k*_range/_ndivisions;
+	Vector<double>&	row = val[k];
+	double		x = k*_range/_ndivisions;
 	
 	for (int i = 0; i < params.dim(); ++i)
 	{
 	    const Params&	p = params[i];
-	    const ET		c = cos(x*p.theta), s = sin(x*p.theta),
+	    const double	c = cos(x*p.theta), s = sin(x*p.theta),
 				e = exp(-x*p.alpha);
 	    row[4*i]   = c * e;
 	    row[4*i+1] = s * e;
@@ -166,7 +172,7 @@ GaussianCoefficients::CostFunction::jacobian(const AT& params) const
 
 void
 GaussianCoefficients::CostFunction::update(AT& params,
-					   const Vector<ET>& dp) const
+					   const Vector<double>& dp) const
 {
     for (int i = 0; i < params.dim(); ++i)
 	params[i] -= dp(4*i, 4);

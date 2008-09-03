@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: IIRFilterMT++.h,v 1.1 2008-08-11 07:06:59 ueshiba Exp $
+ *  $Id: IIRFilterMT++.h,v 1.2 2008-09-03 23:33:32 ueshiba Exp $
  */
 #ifndef __TUIIRFilterMTPP_h
 #define __TUIIRFilterMTPP_h
@@ -47,8 +47,10 @@ class BilateralIIRFilterThreadArray
     typedef typename BIIRF::Order			Order;
 
   private:
-    typedef Array2<typename IN::RT,  typename IN::BT>	InArray2;
-    typedef Array2<typename OUT::RT, typename OUT::BT>	OutArray2;
+    typedef Array2<typename IN::row_type,  typename IN::buffer_type>
+								InArray2;
+    typedef Array2<typename OUT::row_type, typename OUT::buffer_type>
+								OutArray2;
 
     class FilterThread : public BIIRF, public Thread
     {

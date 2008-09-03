@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Bezier++.h,v 1.9 2007-11-29 07:06:35 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.10 2008-09-03 23:33:33 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -41,9 +41,8 @@ template <class C>
 class BezierCurve : private Array<C>
 {
   public:
-    typedef typename C::ET			T;
-    typedef typename Array<C>::ET		ET;
-    typedef C					Coord;
+    typedef C					value_type;
+    typedef typename value_type::value_type	T;
     
     BezierCurve(u_int p=0)	 :Array<C>(p+1)	{}
     BezierCurve(const Array<C>& b) :Array<C>(b)	{}
@@ -88,9 +87,8 @@ template <class C>
 class BezierSurface : private Array2<BezierCurve<C> >
 {
   public:
-    typedef typename C::ET				T;
-    typedef typename Array2<BezierCurve<C> >::ET	ET;
-    typedef C						Coord;
+    typedef C						value_type;
+    typedef typename value_type::value_type		T;
     typedef BezierCurve<C>				Curve;
 
     BezierSurface(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}

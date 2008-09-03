@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Nurbs++.h,v 1.10 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.11 2008-09-03 23:33:34 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -75,9 +75,8 @@ template <class C>
 class BSplineCurve : private Array<C>
 {
   public:
-    typedef typename C::ET			T;
-    typedef typename Array<C>::ET		ET;
-    typedef C					Coord;
+    typedef C					value_type;
+    typedef typename value_type::value_type	T;
     
     BSplineCurve(u_int degree, T us=0.0, T ue=1.0)	;
 
@@ -135,9 +134,8 @@ template <class C>
 class BSplineSurface : private Array2<Array<C> >
 {
   public:
-    typedef typename C::ET			T;
-    typedef typename Array2<Array<C> >::ET	ET;
-    typedef C					Coord;
+    typedef C					value_type;
+    typedef typename value_type::value_type	T;
     
     BSplineSurface(u_int uDegree, u_int vDegree,
 		   T us=0.0, T ue=1.0, T vs=0.0, T ve=1.0)	;

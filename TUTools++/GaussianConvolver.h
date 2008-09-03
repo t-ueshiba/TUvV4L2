@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.4 2008-09-02 05:13:01 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.5 2008-09-03 23:33:33 ueshiba Exp $
  */
 #ifndef	__TUGaussianConvolver_h
 #define	__TUGaussianConvolver_h
@@ -52,36 +52,37 @@ class GaussianCoefficients
     class EvenConstraint
     {
       public:
-	typedef double		ET;
+	typedef double		value_type;
 	typedef Array<Params>	AT;
 
-	EvenConstraint(ET sigma) :_sigma(sigma)				{}
+	EvenConstraint(double sigma) :_sigma(sigma)				{}
 	
-	Vector<ET>	operator ()(const AT& params)		const	;
-	Matrix<ET>	jacobian(const AT& params)		const	;
+	Vector<double>	operator ()(const AT& params)		const	;
+	Matrix<double>	jacobian(const AT& params)		const	;
 
       private:
-	ET		_sigma;
+	double	_sigma;
     };
 
     class CostFunction
     {
       public:
-	typedef double		ET;
+	typedef double		value_type;
 	typedef Array<Params>	AT;
     
 	enum			{D = 2};
 
-	CostFunction(int ndivisions, ET range)
+	CostFunction(int ndivisions, double range)
 	    :_ndivisions(ndivisions), _range(range)			{}
     
-	Vector<ET>	operator ()(const AT& params)		 const	;
-	Matrix<ET>	jacobian(const AT& params)		 const	;
-	void		update(AT& params, const Vector<ET>& dp) const	;
+	Vector<double>	operator ()(const AT& params)		const	;
+	Matrix<double>	jacobian(const AT& params)		const	;
+	void		update(AT& params,
+			       const Vector<double>& dp)	const	;
 
       private:
 	const int	_ndivisions;
-	const ET	_range;
+	const double	_range;
     };
 
   public:
