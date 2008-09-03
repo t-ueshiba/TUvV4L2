@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Ransac.h,v 1.1 2008-09-02 05:13:08 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.2 2008-09-03 23:33:34 ueshiba Exp $
  */
 #ifndef __TURansac_h
 #define __TURansac_h
@@ -50,7 +50,7 @@ namespace TU
 	double	Pointset::inlierRate() const;
      によって知ることができる．
   4. メンバ関数
-	PoinstSet::Container	Pointset::samle(u_int npoints) const;
+	PoinstSet::Container	Pointset::sample(u_int npoints) const;
      によってランダムにnpoints個の部分集合を取り出せる．
   \endverbatim
   テンプレートパラメータModelは当てはめるべきモデルを表すクラスであり，

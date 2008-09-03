@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Geometry++.h,v 1.24 2008-09-02 05:13:01 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.25 2008-09-03 23:33:34 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -306,7 +306,7 @@ Normalize::centroid() const
 class ProjectiveMapping
 {
   public:
-    typedef double	ET;
+    typedef double	value_type;
 
   public:
     ProjectiveMapping(u_int inDim=2, u_int outDim=2)			;
@@ -365,18 +365,17 @@ class ProjectiveMapping
 
   protected:
   //! 射影変換行列の最尤推定のためのコスト関数
-    template <class T, class Iterator>
+    template <class AT, class Iterator>
     class Cost
     {
       public:
-	typedef double	ET;
-	typedef T	AT;
+	typedef double	value_type;
 
 	Cost(Iterator first, Iterator last)				;
 
-	Vector<ET>	operator ()(const AT& map)		const	;
-	Matrix<ET>	jacobian(const AT& map)			const	;
-	static void	update(AT& map, const Vector<ET>& dm)		;
+	Vector<double>	operator ()(const AT& map)		const	;
+	Matrix<double>	jacobian(const AT& map)			const	;
+	static void	update(AT& map, const Vector<double>& dm)	;
 	u_int		npoints()				const	;
 
       private:
@@ -604,18 +603,18 @@ ProjectiveMapping::update(const Vector<double>& dt)
     (t -= dt).normalize() *= l;
 }
     
-template <class T, class Iterator>
-ProjectiveMapping::Cost<T, Iterator>::Cost(Iterator first, Iterator last)
+template <class AT, class Iterator>
+ProjectiveMapping::Cost<AT, Iterator>::Cost(Iterator first, Iterator last)
     :_first(first), _last(last), _npoints(std::distance(_first, _last))
 {
 }
     
-template <class T, class Iterator> Vector<double>
-ProjectiveMapping::Cost<T, Iterator>::operator ()(const AT& map) const
+template <class AT, class Iterator> Vector<double>
+ProjectiveMapping::Cost<AT, Iterator>::operator ()(const AT& map) const
 {
-    const u_int	outDim = map.outDim();
-    Vector<ET>	val(_npoints*outDim);
-    int	n = 0;
+    const u_int		outDim = map.outDim();
+    Vector<double>	val(_npoints*outDim);
+    int			n = 0;
     for (Iterator iter = _first; iter != _last; ++iter)
     {
 	val(n, outDim) = map(iter->first) - iter->second;
@@ -625,12 +624,12 @@ ProjectiveMapping::Cost<T, Iterator>::operator ()(const AT& map) const
     return val;
 }
     
-template <class T, class Iterator> Matrix<double>
-ProjectiveMapping::Cost<T, Iterator>::jacobian(const AT& map) const
+template <class AT, class Iterator> Matrix<double>
+ProjectiveMapping::Cost<AT, Iterator>::jacobian(const AT& map) const
 {
-    const u_int	outDim = map.outDim();
-    Matrix<ET>	J(_npoints*outDim, map.dof()+1);
-    int	n = 0;
+    const u_int		outDim = map.outDim();
+    Matrix<double>	J(_npoints*outDim, map.dof()+1);
+    int			n = 0;
     for (Iterator iter = _first; iter != _last; ++iter)
     {
 	J(n, 0, outDim, J.ncol()) = map.jacobian(iter->first);
@@ -640,8 +639,8 @@ ProjectiveMapping::Cost<T, Iterator>::jacobian(const AT& map) const
     return J;
 }
 
-template <class T, class Iterator> inline void
-ProjectiveMapping::Cost<T, Iterator>::update(AT& map, const Vector<ET>& dm)
+template <class AT, class Iterator> inline void
+ProjectiveMapping::Cost<AT, Iterator>::update(AT& map, const Vector<double>& dm)
 {
     map.update(dm);
 }
