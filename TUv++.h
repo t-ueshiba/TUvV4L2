@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: TUv++.h,v 1.10 2008-09-02 05:15:33 ueshiba Exp $
+ *  $Id: TUv++.h,v 1.11 2008-09-04 00:11:18 ueshiba Exp $
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
@@ -345,18 +345,6 @@ class CmdParent
     List<Cmd>	_cmdList;
 };
 
-inline void
-CmdParent::addCmd(Cmd* vcmd)
-{
-    _cmdList.push_front(*vcmd);
-}
-
-inline Cmd*
-CmdParent::detachCmd()
-{
-    return (_cmdList.empty() ? 0 : &_cmdList.pop_front());
-}
-
 /************************************************************************
 *  class Cmd								*
 ************************************************************************/
@@ -381,6 +369,18 @@ class Cmd : public Object, public CmdParent, public List<Cmd>::Node
   private:
     const CmdId		_id;			// unique ID for this command
 };
+
+inline void
+CmdParent::addCmd(Cmd* vcmd)
+{
+    _cmdList.push_front(*vcmd);
+}
+
+inline Cmd*
+CmdParent::detachCmd()
+{
+    return (_cmdList.empty() ? 0 : &_cmdList.pop_front());
+}
 
 }	// namespace v
 }	// namespace TU
