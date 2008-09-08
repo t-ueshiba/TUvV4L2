@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Image++.h,v 1.37 2008-08-07 07:26:49 ueshiba Exp $
+ *  $Id: Image++.h,v 1.38 2008-09-08 08:06:15 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -369,7 +369,7 @@ class ImageBase
     
   protected:
     ImageBase()
-	:P(3, 4), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
+	:P(), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
     virtual ~ImageBase()		;
     
     static u_int	type2depth(Type type)		;

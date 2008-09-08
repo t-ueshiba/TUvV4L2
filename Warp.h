@@ -25,12 +25,13 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Warp.h,v 1.1 2008-08-07 07:26:51 ueshiba Exp $
+ *  $Id: Warp.h,v 1.2 2008-09-08 08:06:23 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
 
 #include "TU/Image++.h"
+#include "TU/Camera.h"
 
 namespace TU
 {

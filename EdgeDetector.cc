@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.10 2008-08-07 07:26:47 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.11 2008-09-08 08:06:14 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
@@ -73,7 +73,7 @@ static inline mmInt	mmDir8(mmFlt eH, mmFlt eV)
   \return	接続していればtrue，そうでなければfalse
 */
 static inline bool
-isLink(const Image<u_char>& edge, const Point2<int>& p, int dir)
+isLink(const Image<u_char>& edge, const Point2i& p, int dir)
 {
   // (1) 近傍点が少なくとも強/弱エッジ点であり，かつ，(2a) 4近傍点であるか，
   // (2b) 両隣の近傍点が強/弱エッジ点でない場合に接続していると判定する．
@@ -88,7 +88,7 @@ isLink(const Image<u_char>& edge, const Point2<int>& p, int dir)
   \param p	エッジ点
 */
 static void
-trace(Image<u_char>& edge, const Point2<int>& p)
+trace(Image<u_char>& edge, const Point2i& p)
 {
     u_char&	e = edge(p);		// この点pの画素値
     
@@ -108,7 +108,7 @@ trace(Image<u_char>& edge, const Point2<int>& p)
   \return	結べるのであればtrue，そうでなければfalse
 */
 static bool
-canInterpolate(const Image<u_char>& edge, const Point2<int>& p)
+canInterpolate(const Image<u_char>& edge, const Point2i& p)
 {
     int	nedges = 0, nweaks = 0;
     
@@ -449,14 +449,14 @@ EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
     for (int v = 0; ++v < edge.height() - 1; )
 	for (int u = 0; ++u < edge.width() - 1; )
 	    if (edge[v][u] & EDGE)
-		trace(edge, Point2<int>(u, v));
+		trace(edge, Point2i(u, v));
 
   // EDGEラベルが付いておらず，かつ付いている点と付いていない弱いエッジ点の
   // 橋渡しになれる点に新たにEDGEラベルを付けて追跡を行う．
     for (int v = 0; ++v < edge.height() - 1; )
 	for (int u = 0; ++u < edge.width() - 1; )
 	{
-	    Point2<int>	p(u, v);
+	    Point2i	p(u, v);
 	    
 	    if (!(edge(p) & EDGE) && canInterpolate(edge, p))
 		trace(edge, p);

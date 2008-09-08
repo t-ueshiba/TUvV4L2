@@ -25,10 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanonicalCamera.cc,v 1.6 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: CanonicalCamera.cc,v 1.7 2008-09-08 08:06:13 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
-#include <stdexcept>
+#include "TU/Camera.h"
 
 namespace TU
 {
@@ -36,7 +35,7 @@ namespace TU
 *  class CanonicalCamera						*
 ************************************************************************/
 CameraBase&
-CanonicalCamera::setProjection(const Matrix<double>& PP)
+CanonicalCamera::setProjection(const Matrix34d& PP)
 {
     SVDecomposition<double>	svd(PP(0, 0, 3, 3));
     if (svd[2] < 0.0)

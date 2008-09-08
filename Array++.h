@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Array++.h,v 1.22 2008-09-03 23:33:33 ueshiba Exp $
+ *  $Id: Array++.h,v 1.23 2008-09-08 08:06:11 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -34,7 +34,7 @@
 #include <stdexcept>
 #include "TU/types.h"
 #ifdef __INTEL_COMPILER
-#  include <mmintrin.h>
+  #include <mmintrin.h>
 #endif
 
 namespace TU
@@ -290,7 +290,8 @@ class AlignedBuf : public Buf<T>
     
   private:
     static T*		memalign(u_int siz)			;
-
+    static void		memfree(T* p)				;
+    
     enum		{ALIGN = 16};
     class LCM		//! sizeof(T)とALIGNの最小公倍数
     {
@@ -317,7 +318,7 @@ AlignedBuf<T>::AlignedBuf(u_int siz)
 template <class T> inline
 AlignedBuf<T>::~AlignedBuf()
 {
-    _mm_free((T*)*this);
+    memfree((T*)*this);
 }
     
 //! バッファの要素数を変更する．
@@ -331,7 +332,7 @@ AlignedBuf<T>::resize(u_int siz)
     if (siz == size())
 	return false;
 
-    _mm_free((T*)*this);
+    memfree((T*)*this);
     Buf<T>::resize(memalign(siz), siz);
     return true;
 }
@@ -357,6 +358,13 @@ AlignedBuf<T>::memalign(u_int siz)
     if (p == 0)
 	throw std::runtime_error("AlignedBuf<T>::memalign(): failed to allocate memory!!");
     return (T*)p;
+}
+
+template <class T> inline void
+AlignedBuf<T>::memfree(T* p)
+{
+    if (p != 0)
+	_mm_free(p);
 }
 
 template <class T>
@@ -579,10 +587,10 @@ class Array : public B
     Array()								;
     explicit Array(u_int d)						;
     Array(pointer p, u_int d)						;
-    template <class B2>
-    Array(const Array<T, B2>& a, int i, u_int d)			;
     template <class T2, class B2>
     Array(const Array<T2, B2>& a)					;
+    template <class B2>
+    Array(const Array<T, B2>& a, int i, u_int d)			;
     template <class T2, class B2>
     Array&		operator =(const Array<T2, B2>& a)		;
     Array&		operator =(const_reference c)			;
@@ -647,18 +655,6 @@ Array<T, B>::Array(pointer p, u_int d)
 {
 }
 
-//! 記憶領域を元の配列と共有した部分配列を作る．
-/*!
-  \param a	配列
-  \param i	部分配列の第0要素を指定するindex
-  \param d	部分配列の次元(要素数)
-*/
-template <class T, class B> template <class B2> inline
-Array<T, B>::Array(const Array<T, B2>& a, int i, u_int d)
-    :B(pointer(&a[i]), partial_dim(i, d, a.dim()))
-{
-}
-
 //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
 /*!
   コピーコンストラクタは別個自動的に生成される．
@@ -672,6 +668,18 @@ Array<T, B>::Array(const Array<T2, B2>& a)
 	(*this)[i] = a[i];
 }
 	
+//! 記憶領域を元の配列と共有した部分配列を作る．
+/*!
+  \param a	配列
+  \param i	部分配列の第0要素を指定するindex
+  \param d	部分配列の次元(要素数)
+*/
+template <class T, class B> template <class B2> inline
+Array<T, B>::Array(const Array<T, B2>& a, int i, u_int d)
+    :B(pointer(&a[i]), partial_dim(i, d, a.dim()))
+{
+}
+
 //! 他の配列を自分に代入する（標準代入演算子の拡張）．
 /*!
   標準代入演算子は別個自動的に生成される．
@@ -958,18 +966,20 @@ operator <<(std::ostream& out, const Array<T, B>& a)
 }
 
 /************************************************************************
-*  class Array2<T, B>							*
+*  class Array2<T, B, R>						*
 ************************************************************************/
 //! 1次元配列Tの1次元配列として定義された2次元配列クラス
 /*!
   \param T	1次元配列の型
   \param B	バッファ
+  \param R	行バッファ
 */
-template <class T, class B=Buf<typename T::value_type> >
-class Array2 : public Array<T>
+template <class T, class B=Buf<typename T::value_type>, class R=Buf<T> >
+class Array2 : public Array<T, R>
 {
   public:
     typedef T				row_type;	//!< 行の型
+    typedef R				rowbuffer_type;	//!< 行バッファの型
     typedef B				buffer_type;	//!< バッファの型
     typedef typename T::value_type	value_type;	//!< 要素の型
     typedef ptrdiff_t			difference_type;//!< ポインタ間の差
@@ -979,22 +989,23 @@ class Array2 : public Array<T>
     typedef const value_type*		const_pointer;	//!< 定数要素へのポインタ
 
   public:
-    explicit Array2(u_int r=0, u_int c=0)				;
+    Array2()								;
+    Array2(u_int r, u_int c)						;
     Array2(pointer p, u_int r, u_int c)					;
-    template <class B2>
-    Array2(const Array2<T, B2>& a, int i, int j, u_int r, u_int c)	;
     Array2(const Array2& a)						;
-    template <class T2, class B2>
-    Array2(const Array2<T2, B2>& a)					;
+    template <class T2, class B2, class R2>
+    Array2(const Array2<T2, B2, R2>& a)					;
+    template <class B2, class R2>
+    Array2(const Array2<T, B2, R2>& a, int i, int j, u_int r, u_int c)	;
     Array2&		operator =(const Array2& a)			;
-    template <class T2, class B2>
-    Array2&		operator =(const Array2<T2, B2>& a)		;
+    template <class T2, class B2, class R2>
+    Array2&		operator =(const Array2<T2, B2, R2>& a)		;
     Array2&		operator =(const_reference c)			;
 
-    using		Array<T>::begin;
-    using		Array<T>::end;
-    using		Array<T>::size;
-    using		Array<T>::dim;
+    using		Array<T, R>::begin;
+    using		Array<T, R>::end;
+    using		Array<T, R>::size;
+    using		Array<T,R>::dim;
     
 			operator pointer()				;
 			operator const_pointer()		const	;
@@ -1014,14 +1025,24 @@ class Array2 : public Array<T>
     B			_buf;
 };
 
+//! 2次元配列を生成する．
+template <class T, class B, class R> inline
+Array2<T, B, R>::Array2()
+    :Array<T, R>(), _ncol(0), _buf()
+{
+    if (nrow() > 0)
+	_ncol = _buf.size() / nrow();
+    set_rows();
+}
+
 //! 行数と列数を指定して2次元配列を生成する．
 /*!
   \param r	行数
   \param c	列数
 */
-template <class T, class B> inline
-Array2<T, B>::Array2(u_int r, u_int c)
-    :Array<T>(r), _ncol(c), _buf(nrow()*B::align(ncol()))
+template <class T, class B, class R> inline
+Array2<T, B, R>::Array2(u_int r, u_int c)
+    :Array<T, R>(r), _ncol(c), _buf(nrow()*B::align(ncol()))
 {
     set_rows();
 }
@@ -1032,42 +1053,23 @@ Array2<T, B>::Array2(u_int r, u_int c)
   \param r	行数
   \param c	列数
 */
-template <class T, class B> inline
-Array2<T, B>::Array2(pointer p, u_int r, u_int c)
-    :Array<T>(r), _ncol(c), _buf(p, nrow()*B::align(ncol()))
+template <class T, class B, class R> inline
+Array2<T, B, R>::Array2(pointer p, u_int r, u_int c)
+    :Array<T, R>(r), _ncol(c), _buf(p, nrow()*B::align(ncol()))
 {
     set_rows();
 }
-
-//! 記憶領域を元の配列と共有した部分配列を作る
-/*!
-  \param a	配列
-  \param i	部分配列の左上隅要素の行を指定するindex
-  \param j	部分配列の左上隅要素の列を指定するindex
-  \param r	部分配列の行数
-  \param c	部分配列の列数
-*/
-template <class T, class B> template <class B2>
-Array2<T, B>::Array2(const Array2<T, B2>& a, int i, int j, u_int r, u_int c)
-    :Array<T>(Array<T>::partial_dim(i, r, a.nrow())),
-     _ncol(Array<T>::partial_dim(j, c, a.ncol())),
-     _buf((nrow() > 0 && ncol() > 0 ? pointer(&a[i][j]) : 0),
-	  nrow()*B::align(ncol()))
-{
-    for (int ii = 0; ii < nrow(); ++ii)
-	(*this)[ii].resize(pointer(&a[i+ii][j]), ncol());
-}    
 
 //! コピーコンストラクタ
 /*!
   \param a	コピー元の配列
 */
-template <class T, class B> inline
-Array2<T, B>::Array2(const Array2& a)
-    :Array<T>(a.nrow()), _ncol(a.ncol()), _buf(nrow()*B::align(ncol()))
+template <class T, class B, class R> inline
+Array2<T, B, R>::Array2(const Array2& a)
+    :Array<T, R>(a.nrow()), _ncol(a.ncol()), _buf(nrow()*B::align(ncol()))
 {
     set_rows();
-    Array<T>::operator =(a);
+    Array<T, R>::operator =(a);
 }    
 
 //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
@@ -1077,12 +1079,33 @@ Array2<T, B>::Array2(const Array2& a)
   しなければならない．
   \param a	コピー元の配列
 */
-template <class T, class B> template <class T2, class B2> inline
-Array2<T, B>::Array2(const Array2<T2, B2>& a)
-    :Array<T>(a.nrow()), _ncol(a.ncol()), _buf(nrow()*B::align(ncol()))
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline
+Array2<T, B, R>::Array2(const Array2<T2, B2, R2>& a)
+    :Array<T, R>(a.nrow()), _ncol(a.ncol()), _buf(nrow()*B::align(ncol()))
 {
     set_rows();
-    Array<T>::operator =(a);
+    Array<T, R>::operator =(a);
+}    
+
+//! 記憶領域を元の配列と共有した部分配列を作る
+/*!
+  \param a	配列
+  \param i	部分配列の左上隅要素の行を指定するindex
+  \param j	部分配列の左上隅要素の列を指定するindex
+  \param r	部分配列の行数
+  \param c	部分配列の列数
+*/
+template <class T, class B, class R> template <class B2, class R2>
+Array2<T, B, R>::Array2(const Array2<T, B2, R2>& a,
+			int i, int j, u_int r, u_int c)
+    :Array<T, R>(Array<T, R>::partial_dim(i, r, a.nrow())),
+     _ncol(Array<T, R>::partial_dim(j, c, a.ncol())),
+     _buf((nrow() > 0 && ncol() > 0 ? pointer(&a[i][j]) : 0),
+	  nrow()*B::align(ncol()))
+{
+    for (int ii = 0; ii < nrow(); ++ii)
+	(*this)[ii].resize(pointer(&a[i+ii][j]), ncol());
 }    
 
 //! 標準代入演算子
@@ -1090,11 +1113,11 @@ Array2<T, B>::Array2(const Array2<T2, B2>& a)
   \param a	コピー元の配列
   \return	この配列
 */
-template <class T, class B> inline Array2<T, B>&
-Array2<T, B>::operator =(const Array2& a)
+template <class T, class B, class R> inline Array2<T, B, R>&
+Array2<T, B, R>::operator =(const Array2& a)
 {
     resize(a.nrow(), a.ncol());
-    Array<T>::operator =(a);
+    Array<T, R>::operator =(a);
     return *this;
 }
 
@@ -1105,11 +1128,12 @@ Array2<T, B>::operator =(const Array2& a)
   \param a	コピー元の配列
   \return	この配列
 */
-template <class T, class B> template <class T2, class B2> inline Array2<T, B>&
-Array2<T, B>::operator =(const Array2<T2, B2>& a)
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline Array2<T, B, R>&
+Array2<T, B, R>::operator =(const Array2<T2, B2, R2>& a)
 {
     resize(a.nrow(), a.ncol());
-    Array<T>::operator =(a);
+    Array<T, R>::operator =(a);
     return *this;
 }
 
@@ -1118,8 +1142,8 @@ Array2<T, B>::operator =(const Array2<T2, B2>& a)
   \param c	代入する値
   \return	この配列
 */
-template <class T, class B> Array2<T, B>&
-Array2<T, B>::operator =(const_reference c)
+template <class T, class B, class R> Array2<T, B, R>&
+Array2<T, B, R>::operator =(const_reference c)
 {
     for (int i = 0; i < nrow(); )
 	(*this)[i++] = c;
@@ -1130,8 +1154,8 @@ Array2<T, B>::operator =(const_reference c)
 /*!
   \return	内部記憶領域へのポインタ
 */
-template <class T, class B> inline
-Array2<T, B>::operator typename Array2<T, B>::pointer()
+template <class T, class B, class R> inline
+Array2<T, B, R>::operator typename Array2<T, B, R>::pointer()
 {
     return _buf.operator pointer();
 }
@@ -1140,8 +1164,8 @@ Array2<T, B>::operator typename Array2<T, B>::pointer()
 /*!
   \return	内部記憶領域へのポインタ
 */
-template <class T, class B> inline
-Array2<T, B>::operator typename Array2<T, B>::const_pointer() const
+template <class T, class B, class R> inline
+Array2<T, B, R>::operator typename Array2<T, B, R>::const_pointer() const
 {
     return _buf.operator const_pointer();
 }
@@ -1150,8 +1174,8 @@ Array2<T, B>::operator typename Array2<T, B>::const_pointer() const
 /*!
   \return	行数
 */
-template <class T, class B> inline u_int
-Array2<T, B>::nrow() const
+template <class T, class B, class R> inline u_int
+Array2<T, B, R>::nrow() const
 {
     return size();
 }
@@ -1160,8 +1184,8 @@ Array2<T, B>::nrow() const
 /*!
   \return	列数
 */
-template <class T, class B> inline u_int
-Array2<T, B>::ncol() const
+template <class T, class B, class R> inline u_int
+Array2<T, B, R>::ncol() const
 {
     return _ncol;
 }
@@ -1173,10 +1197,10 @@ Array2<T, B>::ncol() const
   \return	rが元の行数より大きい又はcが元の列数と異なればtrue，
 		そうでなければfalse
 */
-template <class T, class B> bool
-Array2<T, B>::resize(u_int r, u_int c)
+template <class T, class B, class R> bool
+Array2<T, B, R>::resize(u_int r, u_int c)
 {
-    if (!Array<T>::resize(r) && ncol() == c)
+    if (!Array<T, R>::resize(r) && ncol() == c)
 	return false;
 
     _ncol = c;
@@ -1191,10 +1215,10 @@ Array2<T, B>::resize(u_int r, u_int c)
   \param r	新しい行数
   \param c	新しい列数
 */
-template <class T, class B> void
-Array2<T, B>::resize(pointer p, u_int r, u_int c)
+template <class T, class B, class R> void
+Array2<T, B, R>::resize(pointer p, u_int r, u_int c)
 {
-    Array<T>::resize(r);
+    Array<T, R>::resize(r);
     _ncol = c;
     _buf.resize(p, nrow()*B::align(ncol()));
     set_rows();
@@ -1205,8 +1229,8 @@ Array2<T, B>::resize(pointer p, u_int r, u_int c)
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-template <class T, class B> std::istream&
-Array2<T, B>::restore(std::istream& in)
+template <class T, class B, class R> std::istream&
+Array2<T, B, R>::restore(std::istream& in)
 {
     for (int i = 0; i < nrow(); )
 	(*this)[i++].restore(in);
@@ -1218,8 +1242,8 @@ Array2<T, B>::restore(std::istream& in)
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-template <class T, class B> std::ostream&
-Array2<T, B>::save(std::ostream& out) const
+template <class T, class B, class R> std::ostream&
+Array2<T, B, R>::save(std::ostream& out) const
 {
     for (int i = 0; i < nrow(); )
 	(*this)[i++].save(out);
@@ -1234,8 +1258,8 @@ Array2<T, B>::save(std::ostream& out) const
   \param jmax	これまでに読んできた要素の列番号の最大値
   \return	inで指定した入力ストリーム
 */
-template <class T, class B> std::istream&
-Array2<T, B>::get(std::istream& in, int i, int j, int jmax)
+template <class T, class B, class R> std::istream&
+Array2<T, B, R>::get(std::istream& in, int i, int j, int jmax)
 {
     char	c;
 
@@ -1268,8 +1292,8 @@ Array2<T, B>::get(std::istream& in, int i, int j, int jmax)
     return in;
 }    
 
-template <class T, class B> void
-Array2<T, B>::set_rows()
+template <class T, class B, class R> void
+Array2<T, B, R>::set_rows()
 {
     const u_int	stride = B::align(ncol());
     for (int i = 0; i < nrow(); ++i)
@@ -1282,8 +1306,8 @@ Array2<T, B>::set_rows()
   \param a	配列の読み込み先
   \return	inで指定した入力ストリーム
 */
-template <class T, class B> inline std::istream&
-operator >>(std::istream& in, Array2<T, B>& a)
+template <class T, class B, class R> inline std::istream&
+operator >>(std::istream& in, Array2<T, B, R>& a)
 {
     return a.get(in >> std::ws);
 }

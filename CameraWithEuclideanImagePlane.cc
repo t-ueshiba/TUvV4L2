@@ -25,10 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CameraWithEuclideanImagePlane.cc,v 1.9 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: CameraWithEuclideanImagePlane.cc,v 1.10 2008-09-08 08:06:13 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
-#include <stdexcept>
+#include "TU/Camera.h"
 
 namespace TU
 {
@@ -36,7 +35,7 @@ namespace TU
 *  class CameraWithEuclideanImagePlane					*
 ************************************************************************/
 CameraBase&
-CameraWithEuclideanImagePlane::setProjection(const Matrix<double>& PP)
+CameraWithEuclideanImagePlane::setProjection(const Matrix34d& PP)
 {
     throw std::runtime_error("CameraWithEuclideanImagePlane::setProjection: Not implemented!!");
     return *this;
@@ -60,17 +59,14 @@ CameraWithEuclideanImagePlane::intrinsic()
 /************************************************************************
 *  class CameraWithEuclideanImagePlane::Intrinsic			*
 ************************************************************************/
-Point2<double>
-CameraWithEuclideanImagePlane
-    ::Intrinsic::operator ()(const Point2<double>& xc) const
+Point2d
+CameraWithEuclideanImagePlane::Intrinsic::operator ()(const Point2d& xc) const
 {
-    return Point2<double>(k() * xc[0] + _principal[0],
-			  k() * xc[1] + _principal[1]);
+    return Point2d(k() * xc[0] + _principal[0], k() * xc[1] + _principal[1]);
 }
 
 Matrix<double>
-CameraWithEuclideanImagePlane
-    ::Intrinsic::jacobianK(const Point2<double>& xc) const
+CameraWithEuclideanImagePlane::Intrinsic::jacobianK(const Point2d& xc) const
 {
     Matrix<double>	J(2, 3);
     J[0][0] = xc[0];
@@ -80,17 +76,16 @@ CameraWithEuclideanImagePlane
     return J;
 }
 
-Point2<double>
-CameraWithEuclideanImagePlane::Intrinsic::xc(const Point2<double>& u) const
+Point2d
+CameraWithEuclideanImagePlane::Intrinsic::xcFromU(const Point2d& u) const
 {
-    return Point2<double>((u[0] - _principal[0]) / k(),
-			  (u[1] - _principal[1]) / k());
+    return Point2d((u[0] - _principal[0]) / k(), (u[1] - _principal[1]) / k());
 }
 
-Matrix<double>
+Matrix33d
 CameraWithEuclideanImagePlane::Intrinsic::K() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = k();
     mat[0][2] = _principal[0];
     mat[1][2] = _principal[1];
@@ -99,10 +94,10 @@ CameraWithEuclideanImagePlane::Intrinsic::K() const
     return mat;
 }
 
-Matrix<double>
+Matrix33d
 CameraWithEuclideanImagePlane::Intrinsic::Kt() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = k();
     mat[2][0] = _principal[0];
     mat[2][1] = _principal[1];
@@ -111,10 +106,10 @@ CameraWithEuclideanImagePlane::Intrinsic::Kt() const
     return mat;
 }
 
-Matrix<double>
+Matrix33d
 CameraWithEuclideanImagePlane::Intrinsic::Kinv() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = 1.0 / k();
     mat[0][2] = -_principal[0] / k();
     mat[1][2] = -_principal[1] / k();
@@ -123,10 +118,10 @@ CameraWithEuclideanImagePlane::Intrinsic::Kinv() const
     return mat;
 }
 
-Matrix<double>
+Matrix33d
 CameraWithEuclideanImagePlane::Intrinsic::Ktinv() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = 1.0 / k();
     mat[2][0] = -_principal[0] / k();
     mat[2][1] = -_principal[1] / k();
@@ -141,7 +136,7 @@ CameraWithEuclideanImagePlane::Intrinsic::dof() const
     return 3;
 }
 
-Point2<double>
+Point2d
 CameraWithEuclideanImagePlane::Intrinsic::principal() const
 {
     return _principal;

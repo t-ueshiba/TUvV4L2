@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Serial++.h,v 1.17 2008-08-13 06:05:34 ueshiba Exp $
+ *  $Id: Serial.h,v 1.1 2008-09-08 08:06:20 ueshiba Exp $
  */
-#ifndef __TUSerialPP_h
-#define __TUSerialPP_h
+#ifndef __TUSerial_h
+#define __TUSerial_h
 
 #if defined(__GNUC__) //&& !defined(__INTEL_COMPILER)
 #  define HAVE_STDIO_FILEBUF
@@ -233,4 +233,4 @@ class TriggerGenerator : public Serial
  
 }
 
-#endif	/* !__TUSerialPP_h		*/
+#endif	/* !__TUSerial_h		*/

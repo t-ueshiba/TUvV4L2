@@ -25,10 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CameraWithFocalLength.cc,v 1.8 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: CameraWithFocalLength.cc,v 1.9 2008-09-08 08:06:13 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
-#include <stdexcept>
+#include "TU/Camera.h"
 
 namespace TU
 {
@@ -36,17 +35,18 @@ namespace TU
 *  class CameraWithFocalLength						*
 ************************************************************************/
 CameraBase&
-CameraWithFocalLength::setProjection(const Matrix<double>& PP)
+CameraWithFocalLength::setProjection(const Matrix34d& PP)
 {
-    Matrix<double>	Nt = PP(0, 0, 3, 3);
+    Matrix33d			Nt = PP(0, 0, 3, 3);
     Nt[0] *= 0.5;
     Nt[1] *= 0.5;
     SVDecomposition<double>	svd(Nt);
     if (svd[2] < 0.0)
 	throw std::invalid_argument("CameraWithFocalLength::setProjection: cannot extract camera rotation due to nevative singular value!");
     const Matrix<double>&	RRt = svd.Vt().trns() * svd.Ut();
-    const double		p = RRt[0]*Nt[0] + RRt[1]*Nt[1], q = RRt[2]*Nt[2];
-    Vector<double>	tc(3);
+    const double		p = RRt[0]*Nt[0] + RRt[1]*Nt[1],
+				q = RRt[2]*Nt[2];
+    Vector3d			tc;
     tc[0] = -PP[0][3] / p;
     tc[1] = -PP[1][3] / p;
     tc[2] = -PP[2][3] / q;
@@ -73,15 +73,14 @@ CameraWithFocalLength::intrinsic()
 /************************************************************************
 *  class CameraWithFocalLength::Intrinsic				*
 ************************************************************************/
-Point2<double>
-CameraWithFocalLength::Intrinsic
-		       ::operator ()(const Point2<double>& xc) const
+Point2d
+CameraWithFocalLength::Intrinsic::operator ()(const Point2d& xc) const
 {
-    return Point2<double>(_k * xc[0], _k * xc[1]);
+    return Point2d(_k * xc[0], _k * xc[1]);
 }
 
 Matrix<double>
-CameraWithFocalLength::Intrinsic::jacobianK(const Point2<double>& xc) const
+CameraWithFocalLength::Intrinsic::jacobianK(const Point2d& xc) const
 {
     Matrix<double>	J(2, 1);
     J[0][0] = xc[0];
@@ -90,53 +89,53 @@ CameraWithFocalLength::Intrinsic::jacobianK(const Point2<double>& xc) const
     return J;
 }
 
-Matrix<double>
-CameraWithFocalLength::Intrinsic::jacobianXC(const Point2<double>& xc) const
+Matrix22d
+CameraWithFocalLength::Intrinsic::jacobianXC(const Point2d& xc) const
 {
-    Matrix<double>	J(2, 2);
+    Matrix22d	J;
     return J.diag(_k);
 }
     
-Point2<double>
-CameraWithFocalLength::Intrinsic::xc(const Point2<double>& u) const
+Point2d
+CameraWithFocalLength::Intrinsic::xcFromU(const Point2d& u) const
 {
-    return Point2<double>(u[0] / _k, u[1] / _k);
+    return Point2d(u[0] / _k, u[1] / _k);
 }
 
-Matrix<double>
+Matrix33d
 CameraWithFocalLength::Intrinsic::K() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = _k;
     mat[2][2] = 1.0;
 
     return mat;
 }
     
-Matrix<double>
+Matrix33d
 CameraWithFocalLength::Intrinsic::Kt() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = _k;
     mat[2][2] = 1.0;
 
     return mat;
 }
     
-Matrix<double>
+Matrix33d
 CameraWithFocalLength::Intrinsic::Kinv() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = 1.0 / _k;
     mat[2][2] = 1.0;
 
     return mat;
 }
     
-Matrix<double>
+Matrix33d
 CameraWithFocalLength::Intrinsic::Ktinv() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = mat[1][1] = 1.0 / _k;
     mat[2][2] = 1.0;
 

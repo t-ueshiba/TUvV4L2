@@ -25,11 +25,11 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: ImageBase.cc,v 1.21 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.22 2008-09-08 08:06:15 ueshiba Exp $
  */
 #include "TU/Image++.h"
+#include "TU/Camera.h"
 #include "TU/Manip.h"
-#include <stdexcept>
 
 namespace TU
 {

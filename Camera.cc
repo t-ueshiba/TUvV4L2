@@ -25,10 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Camera.cc,v 1.8 2007-11-29 07:06:35 ueshiba Exp $
+ *  $Id: Camera.cc,v 1.9 2008-09-08 08:06:12 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
-#include <stdexcept>
+#include "TU/Camera.h"
 
 namespace TU
 {
@@ -36,12 +35,9 @@ namespace TU
 *  class Camera								*
 ************************************************************************/
 CameraBase&
-Camera::setProjection(const Matrix<double>& PP)
+Camera::setProjection(const Matrix34d& PP)
 {
-    if (PP.nrow() != 3 || PP.ncol() != 4)
-	throw std::invalid_argument("Camera::setProjection: Illegal dimension of P!!");
-
-    Matrix<double>	KK(3, 3);	// camera intrinsic parameters.
+    Matrix33d	KK;		// camera intrinsic parameters.
     KK[0]    = PP[2](0, 3);
     KK[1]    = PP[1](0, 3);
     KK[2]    = PP[0](0, 3);
@@ -56,12 +52,12 @@ Camera::setProjection(const Matrix<double>& PP)
     KK[2][1] =  0.0;
     KK[2][2] = -qr.Rt()[0][0];
 
-    Matrix<double>	RRt(3, 3);	// camera rotation.
+    Matrix33d	RRt;		// camera rotation.
     RRt[0]   =  qr.Qt()[2];
     RRt[1]   =  qr.Qt()[1];
     RRt[2]   = -qr.Qt()[0];
 
-    Vector<double>	tt(3);		// camera translation.
+    Vector3d	tt;		// camera translation.
     tt[0]    = -PP[0][3];
     tt[1]    = -PP[1][3];
     tt[2]    = -PP[2][3];
@@ -116,15 +112,15 @@ Camera::intrinsic()
 /************************************************************************
 *  class Camera::Intrinsic						*
 ************************************************************************/
-Point2<double>
-Camera::Intrinsic::operator ()(const Point2<double>& xc) const
+Point2d
+Camera::Intrinsic::operator ()(const Point2d& xc) const
 {
-    return Point2<double>(_k00 * xc[0] + _k01 * xc[1] + principal()[0],
-					    k() * xc[1] + principal()[1]);
+    return Point2d(_k00 * xc[0] + _k01 * xc[1] + principal()[0],
+		   k() * xc[1] + principal()[1]);
 }
 
 Matrix<double>
-Camera::Intrinsic::jacobianK(const Point2<double>& xc) const
+Camera::Intrinsic::jacobianK(const Point2d& xc) const
 {
     Matrix<double>	J(2, 5);
     J[1][0] = J[0][4] = xc[1];
@@ -134,10 +130,10 @@ Camera::Intrinsic::jacobianK(const Point2<double>& xc) const
     return J;
 }
 
-Matrix<double>
-Camera::Intrinsic::jacobianXC(const Point2<double>& xc) const
+Matrix22d
+Camera::Intrinsic::jacobianXC(const Point2d& xc) const
 {
-    Matrix<double>	J(2, 2);
+    Matrix22d	J;
     J[0][0] = _k00;
     J[0][1] = _k01;
     J[1][1] = k();
@@ -145,18 +141,18 @@ Camera::Intrinsic::jacobianXC(const Point2<double>& xc) const
     return J;
 }
 
-Point2<double>
-Camera::Intrinsic::xc(const Point2<double>& u) const
+Point2d
+Camera::Intrinsic::xcFromU(const Point2d& u) const
 {
-    return Point2<double>((u[0] - principal()[0] -
-			   (u[1] - principal()[1]) * _k01 / k()) / _k00,
-			  (u[1] - principal()[1]) / k());
+    return Point2d((u[0] - principal()[0] -
+		    (u[1] - principal()[1]) * _k01 / k()) / _k00,
+		   (u[1] - principal()[1]) / k());
 }
 
-Matrix<double>
+Matrix33d
 Camera::Intrinsic::K() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = _k00;
     mat[0][1] = _k01;
     mat[0][2] = principal()[0];
@@ -167,10 +163,10 @@ Camera::Intrinsic::K() const
     return mat;
 }
 
-Matrix<double>
+Matrix33d
 Camera::Intrinsic::Kt() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = _k00;
     mat[1][0] = _k01;
     mat[2][0] = principal()[0];
@@ -181,10 +177,10 @@ Camera::Intrinsic::Kt() const
     return mat;
 }
 
-Matrix<double>
+Matrix33d
 Camera::Intrinsic::Kinv() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = 1.0 / _k00;
     mat[0][1] = -_k01 / (_k00 * k());
     mat[0][2] = -principal()[0] * mat[0][0] - principal()[1] * mat[0][1];
@@ -195,10 +191,10 @@ Camera::Intrinsic::Kinv() const
     return mat;
 }
 
-Matrix<double>
+Matrix33d
 Camera::Intrinsic::Ktinv() const
 {
-    Matrix<double>	mat(3, 3);
+    Matrix33d	mat;
     mat[0][0] = 1.0 / _k00;
     mat[1][0] = -_k01 / (_k00 * k());
     mat[2][0] = -principal()[0] * mat[0][0] - principal()[1] * mat[1][0];
@@ -236,7 +232,7 @@ Camera::Intrinsic::setFocalLength(double kk)
 }
 
 CameraBase::Intrinsic&
-Camera::Intrinsic::setIntrinsic(const Matrix<double>& K)
+Camera::Intrinsic::setIntrinsic(const Matrix33d& K)
 {
     setAspect(K[0][0] / K[1][1])
 	.setSkew(K[0][1] / K[1][1])

@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Vector++.inst.cc,v 1.9 2007-11-29 07:06:37 ueshiba Exp $
+ *  $Id: Vector++.inst.cc,v 1.10 2008-09-08 08:06:22 ueshiba Exp $
  */
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)
 
@@ -48,7 +48,26 @@ template class Vector<int,    FixedSizedBuf<int,    4> >;
 template class Vector<float,  FixedSizedBuf<float,  4> >;
 template class Vector<double, FixedSizedBuf<double, 4> >;
 
-template class Matrix<double, FixedSizedBuf<double, 9> >;
+template class Matrix<float,  FixedSizedBuf<float,   4>,
+		      FixedSizedBuf<Vector<float>,   2> >;
+template class Matrix<double, FixedSizedBuf<double,  4>,
+		      FixedSizedBuf<Vector<double>,  2> >;
+template class Matrix<float,  FixedSizedBuf<float,   6>,
+		      FixedSizedBuf<Vector<float>,   2> >;
+template class Matrix<double, FixedSizedBuf<double,  6>,
+		      FixedSizedBuf<Vector<double>,  2> >;
+template class Matrix<float,  FixedSizedBuf<float,   9>,
+		      FixedSizedBuf<Vector<float>,   3> >;
+template class Matrix<double, FixedSizedBuf<double,  9>,
+		      FixedSizedBuf<Vector<double>,  3> >;
+template class Matrix<float,  FixedSizedBuf<float,  12>,
+		      FixedSizedBuf<Vector<float>,   3> >;
+template class Matrix<double, FixedSizedBuf<double, 12>,
+		      FixedSizedBuf<Vector<double>,  3> >;
+template class Matrix<float,  FixedSizedBuf<float,  16>,
+		      FixedSizedBuf<Vector<float>,   4> >;
+template class Matrix<double, FixedSizedBuf<double, 16>,
+		      FixedSizedBuf<Vector<double>,  4> >;
 
 template class Vector<float>;
 template class Vector<double>;

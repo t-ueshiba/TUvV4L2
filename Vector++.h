@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Vector++.h,v 1.23 2007-11-29 07:06:37 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.24 2008-09-08 08:06:22 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -115,7 +115,7 @@ class Rotation
 /************************************************************************
 *  class Vector<T>							*
 ************************************************************************/
-template <class T, class B>	class Matrix;
+template <class T, class B, class R>	class Matrix;
 
 //! T型の要素を持つベクトルを表すクラス
 /*!
@@ -139,8 +139,8 @@ class Vector : public Array<T, B>
     Vector()								;
     explicit Vector(u_int d)						;
     Vector(T* p, u_int d)						;
-    template <class B2>
-    Vector(const Matrix<T, B2>& m)					;
+    template <class B2, class R2>
+    Vector(const Matrix<T, B2, R2>& m)					;
     template <class B2>
     Vector(const Vector<T, B2>& v, int i, u_int d)			;
     template <class T2, class B2>
@@ -166,8 +166,8 @@ class Vector : public Array<T, B>
     Vector&		operator -=(const Vector<T2, B2>& v)		;
     template <class T2, class B2>
     Vector&		operator ^=(const Vector<T2, B2>& V)		;
-    template <class T2, class B2>
-    Vector&		operator *=(const Matrix<T2, B2>& m)		;
+    template <class T2, class B2, class R2>
+    Vector&		operator *=(const Matrix<T2, B2, R2>& m)	;
     Vector		operator  -()				const	;
     T			square()				const	;
     double		length()				const	;
@@ -177,9 +177,12 @@ class Vector : public Array<T, B>
     double		dist(const Vector<T2, B2>& v)		const	;
     Vector&		normalize()					;
     Vector		normal()				const	;
-    template <class T2, class B2>
-    Vector&		solve(const Matrix<T2, B2>& m)			;
-    Matrix<T, Buf<T> >	skew()					const	;
+    template <class T2, class B2, class R2>
+    Vector&		solve(const Matrix<T2, B2, R2>& m)		;
+    Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+			skew()					const	;
+    Vector<T>		homogenize()				const	;
+    Vector<T>		inhomogenize()				const	;
     void		resize(u_int d)					;
     void		resize(T* p, u_int d)				;
 };
@@ -219,8 +222,8 @@ Vector<T, B>::Vector(T* p, u_int d)
   \param m	記憶領域を共有する行列．全行の記憶領域は連続していなければ
 		ならない．
 */
-template <class T, class B> template <class B2> inline
-Vector<T, B>::Vector(const Matrix<T, B2>& m)
+template <class T, class B> template <class B2, class R2> inline
+Vector<T, B>::Vector(const Matrix<T, B2, R2>& m)
     :Array<T, B>(const_cast<T*>((const T*)m), m.nrow()*m.ncol())
 {
 }
@@ -372,8 +375,9 @@ Vector<T, B>::operator ^=(const Vector<T2, B2>& v)	// outer product
   \return	このベクトル，すなわち
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUvec{M}{}\f$
 */
-template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
-Vector<T, B>::operator *=(const Matrix<T2, B2>& m)
+template <class T, class B> template <class T2, class B2, class R2>
+inline Vector<T, B>&
+Vector<T, B>::operator *=(const Matrix<T2, B2, R2>& m)
 {
     return *this = *this * m;
 }
@@ -456,6 +460,29 @@ Vector<T, B>::normal() const
     return Vector(*this).normalize();
 }
 
+//! 非同次座標を表すベクトルに対し，値1を持つ成分を最後に付加した同次座標ベクトルを返す．
+/*!
+  \return	同次化されたベクトル
+*/
+template <class T, class B> inline Vector<T>
+Vector<T, B>::homogenize() const
+{
+    Vector<T>	v(dim() + 1);
+    v(0, dim()) = *this;
+    v[dim()]	= 1.0;
+    return v;
+}
+
+//! 同次座標を表すベクトルに対し，各成分を最後の成分で割った非同次座標ベクトルを返す．
+/*!
+  \return	非同次化されたベクトル
+*/
+template <class T, class B> inline Vector<T>
+Vector<T, B>::inhomogenize() const
+{
+    return (*this)(0, dim()-1) / (*this)[dim()-1];
+}
+
 //! ベクトルの次元を変更し，全要素を0に初期化する．
 /*!
   ただし，他のオブジェクトと記憶領域を共有しているベクトルの次元を
@@ -481,45 +508,45 @@ Vector<T, B>::resize(T* p, u_int d)
 }
 
 /************************************************************************
-*  class Matrix<T, B>							*
+*  class Matrix<T, B, R>						*
 ************************************************************************/
 //! T型の要素を持つ行列を表すクラス
 /*!
   各行がT型の要素を持つベクトル#TU::Vector<T>になっている．
   \param T	要素の型
   \param B	バッファ
+  \param R	行バッファ
 */
-template <class T, class B=Buf<T> >
-class Matrix : public Array2<Vector<T>, B>
+template <class T, class B=Buf<T>, class R=Buf<Vector<T> > >
+class Matrix : public Array2<Vector<T>, B, R>
 {
   public:
-    typedef typename Array2<Vector<T>, B>::value_type		value_type;
-    typedef typename Array2<Vector<T>, B>::difference_type	difference_type;
-    typedef typename Array2<Vector<T>, B>::reference		reference;
-    typedef typename Array2<Vector<T>, B>::const_reference	const_reference;
-    typedef typename Array2<Vector<T>, B>::pointer		pointer;
-    typedef typename Array2<Vector<T>, B>::const_pointer	const_pointer;
-    typedef typename Array2<Vector<T>, B>::iterator		iterator;
-    typedef typename Array2<Vector<T>, B>::const_iterator	const_iterator;
+    typedef typename Array2<Vector<T>, B, R>::value_type	value_type;
+    typedef typename Array2<Vector<T>, B, R>::difference_type	difference_type;
+    typedef typename Array2<Vector<T>, B, R>::reference		reference;
+    typedef typename Array2<Vector<T>, B, R>::const_reference	const_reference;
+    typedef typename Array2<Vector<T>, B, R>::pointer		pointer;
+    typedef typename Array2<Vector<T>, B, R>::const_pointer	const_pointer;
+    typedef typename Array2<Vector<T>, B, R>::iterator		iterator;
+    typedef typename Array2<Vector<T>, B, R>::const_iterator	const_iterator;
     
   public:
-    explicit Matrix(u_int r=0, u_int c=0)				;
+    Matrix()								;
+    Matrix(u_int r, u_int c)						;
     Matrix(T* p, u_int r, u_int c)					;
-    template <class B2>
-    Matrix(const Matrix<T, B2>& m, int i, int j, u_int r, u_int c)	;
-    template <class T2, class B2>
-    Matrix(const Matrix<T2, B2>& m)					;
-    template <class T2, class B2>
-    Matrix&		operator =(const Matrix<T2, B2>& m)		;
+    template <class B2, class R2>
+    Matrix(const Matrix<T, B2, R2>& m, int i, int j, u_int r, u_int c)	;
+    template <class T2, class B2, class R2>
+    Matrix(const Matrix<T2, B2, R2>& m)					;
+    template <class T2, class B2, class R2>
+    Matrix&		operator =(const Matrix<T2, B2, R2>& m)		;
 
-    using		Array2<Vector<T>, B>::begin;
-    using		Array2<Vector<T>, B>::end;
-    using		Array2<Vector<T>, B>::size;
-    using		Array2<Vector<T>, B>::dim;
-    using		Array2<Vector<T>, B>::nrow;
-    using		Array2<Vector<T>, B>::ncol;
-  //    using		Array2<Vector<T>, B>::operator T*;
-  //    using		Array2<Vector<T>, B>::operator const T*;
+    using		Array2<Vector<T>, B, R>::begin;
+    using		Array2<Vector<T>, B, R>::end;
+    using		Array2<Vector<T>, B, R>::size;
+    using		Array2<Vector<T>, B, R>::dim;
+    using		Array2<Vector<T>, B, R>::nrow;
+    using		Array2<Vector<T>, B, R>::ncol;
     
     const Matrix<T>	operator ()(int i, int j,
 				    u_int r, u_int c)		const	;
@@ -528,20 +555,20 @@ class Matrix : public Array2<Vector<T>, B>
     Matrix&		operator  =(T c)				;
     Matrix&		operator *=(double c)				;
     Matrix&		operator /=(double c)				;
-    template <class T2, class B2>
-    Matrix&		operator +=(const Matrix<T2, B2>& m)		;
-    template <class T2, class B2>
-    Matrix&		operator -=(const Matrix<T2, B2>& m)		;
-    template <class T2, class B2>
-    Matrix&		operator *=(const Matrix<T2, B2>& m)		;
+    template <class T2, class B2, class R2>
+    Matrix&		operator +=(const Matrix<T2, B2, R2>& m)	;
+    template <class T2, class B2, class R2>
+    Matrix&		operator -=(const Matrix<T2, B2, R2>& m)	;
+    template <class T2, class B2, class R2>
+    Matrix&		operator *=(const Matrix<T2, B2, R2>& m)	;
     template <class T2, class B2>
     Matrix&		operator ^=(const Vector<T2, B2>& v)		;
     Matrix		operator  -()				const	;
     Matrix&		diag(T c)					;
     Matrix<T>		trns()					const	;
     Matrix		inv()					const	;
-    template <class T2, class B2>
-    Matrix&		solve(const Matrix<T2, B2>& m)			;
+    template <class T2, class B2, class R2>
+    Matrix&		solve(const Matrix<T2, B2, R2>& m)		;
     T			det()					const	;
     T			det(int p, int q)			const	;
     T			trace()					const	;
@@ -567,22 +594,32 @@ class Matrix : public Array2<Vector<T>, B>
 
     static Matrix	I(u_int d)					;
     template <class T2, class B2>
-    static Matrix<T>	Rt(const Vector<T2, B2>& n, T c, T s)		;
+    static Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+			Rt(const Vector<T2, B2>& n, T c, T s)		;
     template <class T2, class B2>
-    static Matrix<T>	Rt(const Vector<T2, B2>& axis)			;
+    static Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+			Rt(const Vector<T2, B2>& axis)			;
 
     void		resize(u_int r, u_int c)			;
     void		resize(T* p, u_int r, u_int c)			;
 };
+
+//! 行列を生成し，全要素を0で初期化する．
+template <class T, class B, class R> inline
+Matrix<T, B, R>::Matrix()
+    :Array2<Vector<T>, B, R>()
+{
+    *this = 0;
+}
 
 //! 指定されたサイズの行列を生成し，全要素を0で初期化する．
 /*!
   \param r	行列の行数
   \param c	行列の列数
 */
-template <class T, class B> inline
-Matrix<T, B>::Matrix(u_int r, u_int c)
-    :Array2<Vector<T>, B>(r, c)
+template <class T, class B, class R> inline
+Matrix<T, B, R>::Matrix(u_int r, u_int c)
+    :Array2<Vector<T>, B, R>(r, c)
 {
     *this = 0;
 }
@@ -593,9 +630,9 @@ Matrix<T, B>::Matrix(u_int r, u_int c)
   \param r	行列の行数
   \param c	行列の列数
 */
-template <class T, class B> inline
-Matrix<T, B>::Matrix(T* p, u_int r, u_int c)
-    :Array2<Vector<T>, B>(p, r, c)
+template <class T, class B, class R> inline
+Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
+    :Array2<Vector<T>, B, R>(p, r, c)
 {
 }
 
@@ -607,9 +644,10 @@ Matrix<T, B>::Matrix(T* p, u_int r, u_int c)
   \param r	部分行列の行数
   \param c	部分行列の列数
 */
-template <class T, class B> template <class B2> inline
-Matrix<T, B>::Matrix(const Matrix<T, B2>& m, int i, int j, u_int r, u_int c)
-    :Array2<Vector<T>, B>(m, i, j, r, c)
+template <class T, class B, class R> template <class B2, class R2> inline
+Matrix<T, B, R>::Matrix(const Matrix<T, B2, R2>& m,
+			int i, int j, u_int r, u_int c)
+    :Array2<Vector<T>, B, R>(m, i, j, r, c)
 {
 }
 
@@ -617,9 +655,10 @@ Matrix<T, B>::Matrix(const Matrix<T, B2>& m, int i, int j, u_int r, u_int c)
 /*!
   \param m	コピー元行列
 */
-template <class T, class B> template <class T2, class B2> inline
-Matrix<T, B>::Matrix(const Matrix<T2, B2>& m)
-    :Array2<Vector<T>, B>(m)
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline
+Matrix<T, B, R>::Matrix(const Matrix<T2, B2, R2>& m)
+    :Array2<Vector<T>, B, R>(m)
 {
 }
 
@@ -628,10 +667,11 @@ Matrix<T, B>::Matrix(const Matrix<T2, B2>& m)
   \param m	コピー元行列
   \return	この行列
 */
-template <class T, class B> template <class T2, class B2> inline Matrix<T, B>&
-Matrix<T, B>::operator =(const Matrix<T2, B2>& m)
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator =(const Matrix<T2, B2, R2>& m)
 {
-    Array2<Vector<T>, B>::operator =(m);
+    Array2<Vector<T>, B, R>::operator =(m);
     return *this;
 }
 
@@ -643,8 +683,8 @@ Matrix<T, B>::operator =(const Matrix<T2, B2>& m)
     \param c	部分行列の列数
     \return	生成された部分行列
 */
-template <class T, class B> inline Matrix<T>
-Matrix<T, B>::operator ()(int i, int j, u_int r, u_int c)
+template <class T, class B, class R> inline Matrix<T>
+Matrix<T, B, R>::operator ()(int i, int j, u_int r, u_int c)
 {
     return Matrix<T>(*this, i, j, r, c);
 }
@@ -657,8 +697,8 @@ Matrix<T, B>::operator ()(int i, int j, u_int r, u_int c)
     \param c	部分行列の列数
     \return	生成された部分行列
 */
-template <class T, class B> inline const Matrix<T>
-Matrix<T, B>::operator ()(int i, int j, u_int r, u_int c) const
+template <class T, class B, class R> inline const Matrix<T>
+Matrix<T, B, R>::operator ()(int i, int j, u_int r, u_int c) const
 {
     return Matrix<T>(*this, i, j, r, c);
 }
@@ -668,10 +708,10 @@ Matrix<T, B>::operator ()(int i, int j, u_int r, u_int c) const
   \param c	代入する数値
   \return	この行列
 */
-template <class T, class B> inline Matrix<T, B>&
-Matrix<T, B>::operator =(T c)
+template <class T, class B, class R> inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator =(T c)
 {
-    Array2<Vector<T>, B>::operator =(c);
+    Array2<Vector<T>, B, R>::operator =(c);
     return *this;
 }
 
@@ -680,10 +720,10 @@ Matrix<T, B>::operator =(T c)
   \param c	掛ける数値
   \return	この行列，すなわち\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
 */
-template <class T, class B> inline Matrix<T, B>&
-Matrix<T, B>::operator *=(double c)
+template <class T, class B, class R> inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator *=(double c)
 {
-    Array2<Vector<T>, B>::operator *=(c);
+    Array2<Vector<T>, B, R>::operator *=(c);
     return *this;
 }
 
@@ -693,10 +733,10 @@ Matrix<T, B>::operator *=(double c)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \frac{\TUvec{A}{}}{c}\f$
 */
-template <class T, class B> inline Matrix<T, B>&
-Matrix<T, B>::operator /=(double c)
+template <class T, class B, class R> inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator /=(double c)
 {
-    Array2<Vector<T>, B>::operator /=(c);
+    Array2<Vector<T>, B, R>::operator /=(c);
     return *this;
 }
 
@@ -706,10 +746,11 @@ Matrix<T, B>::operator /=(double c)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} + \TUvec{M}{}\f$
 */
-template <class T, class B> template <class T2, class B2> inline Matrix<T, B>&
-Matrix<T, B>::operator +=(const Matrix<T2, B2>& m)
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator +=(const Matrix<T2, B2, R2>& m)
 {
-    Array2<Vector<T>, B>::operator +=(m);
+    Array2<Vector<T>, B, R>::operator +=(m);
     return *this;
 }
 
@@ -719,10 +760,11 @@ Matrix<T, B>::operator +=(const Matrix<T2, B2>& m)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} - \TUvec{M}{}\f$
 */
-template <class T, class B> template <class T2, class B2> inline Matrix<T, B>&
-Matrix<T, B>::operator -=(const Matrix<T2, B2>& m)
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator -=(const Matrix<T2, B2, R2>& m)
 {
-    Array2<Vector<T>, B>::operator -=(m);
+    Array2<Vector<T>, B, R>::operator -=(m);
     return *this;
 }
 
@@ -732,8 +774,9 @@ Matrix<T, B>::operator -=(const Matrix<T2, B2>& m)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
 */
-template <class T, class B> template <class T2, class B2> inline Matrix<T, B>&
-Matrix<T, B>::operator *=(const Matrix<T2, B2>& m)
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator *=(const Matrix<T2, B2, R2>& m)
 {
     return *this = *this * m;
 }
@@ -744,8 +787,9 @@ Matrix<T, B>::operator *=(const Matrix<T2, B2>& m)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
-template <class T, class B> template <class T2, class B2> Matrix<T, B>&
-Matrix<T, B>::operator ^=(const Vector<T2, B2>& v)
+template <class T, class B, class R> template <class T2, class B2>
+Matrix<T, B, R>&
+Matrix<T, B, R>::operator ^=(const Vector<T2, B2>& v)
 {
     for (int i = 0; i < nrow(); ++i)
 	(*this)[i] ^= v;
@@ -756,8 +800,8 @@ Matrix<T, B>::operator ^=(const Vector<T2, B2>& v)
 /*!
   \return	符号を反転した行列，すなわち\f$-\TUvec{A}{}\f$
 */
-template <class T, class B> inline Matrix<T, B>
-Matrix<T, B>::operator -() const
+template <class T, class B, class R> inline Matrix<T, B, R>
+Matrix<T, B, R>::operator -() const
 {
     return Matrix(*this) *= -1;
 }
@@ -766,8 +810,8 @@ Matrix<T, B>::operator -() const
 /*!
   \return	逆行列，すなわち\f$\TUinv{A}{}\f$
 */
-template <class T, class B> inline Matrix<T, B>
-Matrix<T, B>::inv() const
+template <class T, class B, class R> inline Matrix<T, B, R>
+Matrix<T, B, R>::inv() const
 {
     return I(nrow()).solve(*this);
 }
@@ -776,8 +820,8 @@ Matrix<T, B>::inv() const
 /*!
   \return	行列の2乗ノルム，すなわち\f$\TUnorm{\TUvec{A}{}}\f$
 */
-template <class T, class B> inline double
-Matrix<T, B>::length() const
+template <class T, class B, class R> inline double
+Matrix<T, B, R>::length() const
 {
     return sqrt(square());
 }
@@ -787,10 +831,10 @@ Matrix<T, B>::length() const
   \param d	単位正方行列の次元
   \return	単位正方行列
 */
-template <class T, class B> inline Matrix<T, B>
-Matrix<T, B>::I(u_int d)
+template <class T, class B, class R> inline Matrix<T, B, R>
+Matrix<T, B, R>::I(u_int d)
 {
-    return Matrix<T, B>(d, d).diag(1.0);
+    return Matrix<T, B, R>(d, d).diag(1.0);
 }
 
 //! 3次元回転行列を生成する．
@@ -805,10 +849,13 @@ Matrix<T, B>::I(u_int d)
 		  - \TUskew{n}{}\sin\theta
 		\f]
 */
-template <class T, class B> template <class T2, class B2> Matrix<T>
-Matrix<T, B>::Rt(const Vector<T2, B2>& n, T c, T s)
+template <class T, class B, class R> template <class T2, class B2>
+Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
 {
-    Matrix<T>	Qt = n % n;
+    if (n.dim() != 3)
+	throw std::invalid_argument("TU::Matrix<T, B, R>::Rt: dimension of the argument \'n\' must be 3");
+    Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3 > > Qt = n % n;
     Qt *= (1.0 - c);
     Qt[0][0] += c;
     Qt[1][1] += c;
@@ -835,8 +882,9 @@ Matrix<T, B>::Rt(const Vector<T2, B2>& n, T c, T s)
 		  \TUvec{n}{} = \frac{\TUvec{a}{}}{\TUnorm{\TUvec{a}{}}}
 		\f]
 */
-template <class T, class B> template <class T2, class B2> Matrix<T>
-Matrix<T, B>::Rt(const Vector<T2, B2>& axis)
+template <class T, class B, class R> template <class T2, class B2>
+Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+Matrix<T, B, R>::Rt(const Vector<T2, B2>& axis)
 {
     const T	theta = axis.length();
     if (theta + 1.0 == 1.0)		// theta << 1 ?
@@ -853,10 +901,10 @@ Matrix<T, B>::Rt(const Vector<T2, B2>& axis)
   \param r	新しい行数
   \param c	新しい列数
 */
-template <class T, class B> inline void
-Matrix<T, B>::resize(u_int r, u_int c)
+template <class T, class B, class R> inline void
+Matrix<T, B, R>::resize(u_int r, u_int c)
 {
-    Array2<Vector<T>, B>::resize(r, c);
+    Array2<Vector<T>, B, R>::resize(r, c);
     *this = 0;
 }
 
@@ -866,10 +914,10 @@ Matrix<T, B>::resize(u_int r, u_int c)
   \param r	新しい行数
   \param c	新しい列数
 */
-template <class T, class B> inline void
-Matrix<T, B>::resize(T* p, u_int r, u_int c)
+template <class T, class B, class R> inline void
+Matrix<T, B, R>::resize(T* p, u_int r, u_int c)
 {
-    Array2<Vector<T>, B>::resize(p, r, c);
+    Array2<Vector<T>, B, R>::resize(p, r, c);
 }
 
 /************************************************************************
@@ -941,10 +989,11 @@ operator /(const Vector<T, B>& v, double c)
   \param n	第2引数
   \return	結果を格納した行列，すなわち\f$\TUvec{M}{}+\TUvec{N}{}\f$
 */
-template <class T1, class B1, class T2, class B2> inline Matrix<T1, B1>
-operator +(const Matrix<T1, B1>& m, const Matrix<T2, B2>& n)
+template <class T1, class R1, class B1, class T2, class B2, class R2>
+inline Matrix<T1, R1, B1>
+operator +(const Matrix<T1, R1, B1>& m, const Matrix<T2, B2, R2>& n)
 {
-    return Matrix<T1, B1>(m) += n;
+    return Matrix<T1, R1, B1>(m) += n;
 }
 
 //! 2つの行列の引き算
@@ -953,10 +1002,11 @@ operator +(const Matrix<T1, B1>& m, const Matrix<T2, B2>& n)
   \param n	第2引数
   \return	結果を格納した行列，すなわち\f$\TUvec{M}{}-\TUvec{N}{}\f$
 */
-template <class T1, class B1, class T2, class B2> inline Matrix<T1, B1>
-operator -(const Matrix<T1, B1>& m, const Matrix<T2, B2>& n)
+template <class T1, class R1, class B1, class T2, class B2, class R2>
+inline Matrix<T1, R1, B1>
+operator -(const Matrix<T1, R1, B1>& m, const Matrix<T2, B2, R2>& n)
 {
-    return Matrix<T1, B1>(m) -= n;
+    return Matrix<T1, R1, B1>(m) -= n;
 }
 
 //! 行列に定数を掛ける．
@@ -965,10 +1015,10 @@ operator -(const Matrix<T1, B1>& m, const Matrix<T2, B2>& n)
   \param m	行列
   \return	結果を格納した行列，すなわち\f$c\TUvec{M}{}\f$
 */
-template <class T, class B> inline Matrix<T, B>
-operator *(double c, const Matrix<T, B>& m)
+template <class T, class B, class R> inline Matrix<T, B, R>
+operator *(double c, const Matrix<T, B, R>& m)
 {
-    return Matrix<T, B>(m) *= c;
+    return Matrix<T, B, R>(m) *= c;
 }
 
 //! 行列に定数を掛ける．
@@ -977,10 +1027,10 @@ operator *(double c, const Matrix<T, B>& m)
   \param c	掛ける定数
   \return	結果を格納した行列，すなわち\f$c\TUvec{M}{}\f$
 */
-template <class T, class B> inline Matrix<T, B>
-operator *(const Matrix<T, B>& m, double c)
+template <class T, class B, class R> inline Matrix<T, B, R>
+operator *(const Matrix<T, B, R>& m, double c)
 {
-    return Matrix<T, B>(m) *= c;
+    return Matrix<T, B, R>(m) *= c;
 }
 
 //! 行列の各要素を定数で割る．
@@ -989,10 +1039,10 @@ operator *(const Matrix<T, B>& m, double c)
   \param c	割る定数
   \return	結果を格納した行列，すなわち\f$\frac{1}{c}\TUvec{M}{}\f$
 */
-template <class T, class B> inline Matrix<T, B>
-operator /(const Matrix<T, B>& m, double c)
+template <class T, class B, class R> inline Matrix<T, B, R>
+operator /(const Matrix<T, B, R>& m, double c)
 {
-    return Matrix<T, B>(m) /= c;
+    return Matrix<T, B, R>(m) /= c;
 }
 
 //! 2つの3次元ベクトルのベクトル積
@@ -1029,8 +1079,8 @@ operator *(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
   \param m	行列
   \return	結果のベクトル，すなわち\f$\TUtvec{v}{}\TUvec{M}{}\f$
 */
-template <class T1, class B1, class T2, class B2> Vector<T1, B1>
-operator *(const Vector<T1, B1>& v, const Matrix<T2, B2>& m)
+template <class T1, class B1, class T2, class B2, class R2> Vector<T1, B1>
+operator *(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
 {
     v.check_dim(m.nrow());
     Vector<T1, B1> val(m.ncol());
@@ -1065,13 +1115,13 @@ operator %(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
   \throw std::invalid_argument	vが3次元ベクトルでないかmが3x?行列でない場合に
 				送出
 */
-template <class T, class B, class T2> Matrix<T, B>
+template <class T, class B, class T2> Matrix<T>
 operator ^(const Vector<T, B>& v, const Matrix<T2>& m)
 {
     v.check_dim(m.nrow());
     if (v.dim() != 3)
-	throw std::invalid_argument("operator ^(const Vecotr<T>&, const Matrix<T, B>&): dimension of vector must be 3!!");
-    Matrix<T, B>	val(m.nrow(), m.ncol());
+	throw std::invalid_argument("operator ^(const Vecotr<T>&, const Matrix<T, B, R>&): dimension of vector must be 3!!");
+    Matrix<T>	val(m.nrow(), m.ncol());
     for (int j = 0; j < val.ncol(); ++j)
     {
 	val[0][j] = v[1] * m[2][j] - v[2] * m[1][j];
@@ -1087,8 +1137,9 @@ operator ^(const Vector<T, B>& v, const Matrix<T2>& m)
   \param n	第2引数
   \return	結果の行列，すなわち\f$\TUvec{M}{}\TUvec{N}{}\f$
 */
-template <class T1, class B1, class T2, class B2> Matrix<T1>
-operator *(const Matrix<T1, B1>& m, const Matrix<T2, B2>& n)
+template <class T1, class R1, class B1, class T2, class B2, class R2>
+Matrix<T1>
+operator *(const Matrix<T1, R1, B1>& m, const Matrix<T2, B2, R2>& n)
 {
     n.check_dim(m.ncol());
     Matrix<T1>	val(m.nrow(), n.ncol());
@@ -1105,8 +1156,8 @@ operator *(const Matrix<T1, B1>& m, const Matrix<T2, B2>& n)
   \param v	ベクトル
   \return	結果のベクトル，すなわち\f$\TUvec{M}{}\TUvec{v}{}\f$
 */
-template <class T1, class B1, class T2, class B2> Vector<T1>
-operator *(const Matrix<T1, B1>& m, const Vector<T2, B2>& v)
+template <class T1, class R1, class B1, class T2, class B2> Vector<T1>
+operator *(const Matrix<T1, R1, B1>& m, const Vector<T2, B2>& v)
 {
     Vector<T1>	val(m.nrow());
     for (int i = 0; i < m.nrow(); ++i)
@@ -1120,10 +1171,11 @@ operator *(const Matrix<T1, B1>& m, const Vector<T2, B2>& v)
   \param v	3次元ベクトル
   \return	結果の行列，すなわち\f$(\TUtvec{M}{}\times\TUvec{v}{})^\top\f$
 */
-template <class T1, class B1, class T2, class B2> inline Matrix<T1, B1>
+template <class T1, class R1, class B1, class T2, class B2>
+inline Matrix<T1, R1, B1>
 operator ^(const Matrix<T1, B1>& m, const Vector<T2, B2>& v)
 {
-    return Matrix<T1, B1>(m) ^= v;
+    return Matrix<T1, R1, B1>(m) ^= v;
 }
 
 /************************************************************************
@@ -1134,8 +1186,8 @@ template <class T>
 class LUDecomposition : private Array2<Vector<T> >
 {
   public:
-    template <class T2, class B2>
-    LUDecomposition(const Matrix<T2, B2>&)		;
+    template <class T2, class B2, class R2>
+    LUDecomposition(const Matrix<T2, B2, R2>&)		;
 
     template <class T2, class B2>
     void	substitute(Vector<T2, B2>&)	const	;
@@ -1159,8 +1211,8 @@ class LUDecomposition : private Array2<Vector<T> >
  \param m			LU分解する正方行列
  \throw std::invalid_argument	mが正方行列でない場合に送出
 */
-template <class T> template <class T2, class B2>
-LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2>& m)
+template <class T> template <class T2, class B2, class R2>
+LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
     :Array2<Vector<T> >(m), _index(ncol()), _det(1.0)
 {
     using namespace	std;
@@ -1267,8 +1319,9 @@ LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
 		の解を納めたこのベクトル，すなわち
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
 */
-template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
-Vector<T, B>::solve(const Matrix<T2, B2>& m)
+template <class T, class B> template <class T2, class B2, class R2>
+inline Vector<T, B>&
+Vector<T, B>::solve(const Matrix<T2, B2, R2>& m)
 {
     LUDecomposition<T2>(m).substitute(*this);
     return *this;
@@ -1281,8 +1334,9 @@ Vector<T, B>::solve(const Matrix<T2, B2>& m)
 		の解を納めたこの行列，すなわち
 		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
 */
-template <class T, class B> template <class T2, class B2> Matrix<T, B>&
-Matrix<T, B>::solve(const Matrix<T2, B2>& m)
+template <class T, class B, class R> template <class T2, class B2, class R2>
+Matrix<T, B, R>&
+Matrix<T, B, R>::solve(const Matrix<T2, B2, R2>& m)
 {
     LUDecomposition<T2>	lu(m);
     
@@ -1295,8 +1349,8 @@ Matrix<T, B>::solve(const Matrix<T2, B2>& m)
 /*!
   \return	行列式，すなわち\f$\det\TUvec{A}{}\f$
 */
-template <class T, class B> inline T
-Matrix<T, B>::det() const
+template <class T, class B, class R> inline T
+Matrix<T, B, R>::det() const
 {
     return LUDecomposition<T>(*this).det();
 }
@@ -1315,8 +1369,8 @@ class Householder : public Matrix<T>
   private:
     Householder(u_int dd, u_int d)
 	:Matrix<T>(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
-    template <class T2, class B2>
-    Householder(const Matrix<T2, B2>& a, u_int d)		;
+    template <class T2, class B2, class R2>
+    Householder(const Matrix<T2, B2, R2>& a, u_int d)		;
 
     using		Matrix<T>::dim;
     
@@ -1337,8 +1391,8 @@ class Householder : public Matrix<T>
     friend class	BiDiagonal<T>;
 };
 
-template <class T> template <class T2, class B2>
-Householder<T>::Householder(const Matrix<T2, B2>& a, u_int d)
+template <class T> template <class T2, class B2, class R2>
+Householder<T>::Householder(const Matrix<T2, B2, R2>& a, u_int d)
     :Matrix<T>(a), _d(d), _sigma(dim())
 {
     if (a.nrow() != a.ncol())
@@ -1361,8 +1415,8 @@ template <class T>
 class QRDecomposition : private Matrix<T>
 {
   public:
-    template <class T2, class B2>
-    QRDecomposition(const Matrix<T2, B2>&)		;
+    template <class T2, class B2, class R2>
+    QRDecomposition(const Matrix<T2, B2, R2>&)		;
 
   //! QR分解の下半三角行列を返す．
   /*!
@@ -1387,8 +1441,8 @@ class QRDecomposition : private Matrix<T>
 /*!
  \param m	QR分解する一般行列
 */
-template <class T> template <class T2, class B2>
-QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2>& m)
+template <class T> template <class T2, class B2, class R2>
+QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2, R2>& m)
     :Matrix<T>(m), _Qt(m.ncol(), 0)
 {
     u_int	n = std::min(nrow(), ncol());
@@ -1416,8 +1470,8 @@ template <class T>
 class TriDiagonal
 {
   public:
-    template <class T2, class B2>
-    TriDiagonal(const Matrix<T2, B2>&)			;
+    template <class T2, class B2, class R2>
+    TriDiagonal(const Matrix<T2, B2, R2>&)		;
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す．
   /*!
@@ -1461,8 +1515,8 @@ class TriDiagonal
   \param a			3重対角化する対称行列
   \throw std::invalid_argument	aが正方行列でない場合に送出
 */
-template <class T> template <class T2, class B2>
-TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2>& a)
+template <class T> template <class T2, class B2, class R2>
+TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2, R2>& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
 {
     if (_Ut.nrow() != _Ut.ncol())
@@ -1493,8 +1547,8 @@ template <class T>
 class BiDiagonal
 {
   public:
-    template <class T2, class B2>
-    BiDiagonal(const Matrix<T2, B2>&)		;
+    template <class T2, class B2, class R2>
+    BiDiagonal(const Matrix<T2, B2, R2>&)	;
 
   //! 2重対角化される行列の行数を返す．
   /*!
@@ -1555,8 +1609,8 @@ class BiDiagonal
 /*!
   \param a	2重対角化する一般行列
 */
-template <class T> template <class T2, class B2>
-BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2>& a)
+template <class T> template <class T2, class B2, class R2>
+BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
     :_Dt((a.nrow() < a.ncol() ? a.ncol() : a.nrow()), 0),
      _Et((a.nrow() < a.ncol() ? a.nrow() : a.ncol()), 1),
      _diagonal(_Dt.sigma()), _off_diagonal(_Et.sigma()), _anorm(0),
@@ -1608,8 +1662,8 @@ class SVDecomposition : private BiDiagonal<T>
   /*!
     \param a	特異値分解する一般行列
   */
-    template <class T2, class B2>
-    SVDecomposition(const Matrix<T2, B2>& a)
+    template <class T2, class B2, class R2>
+    SVDecomposition(const Matrix<T2, B2, R2>& a)
 	:BiDiagonal<T>(a)		{BiDiagonal<T>::diagonalize();}
 
     using	BiDiagonal<T>::nrow;
@@ -1641,14 +1695,26 @@ typedef Vector<short,  FixedSizedBuf<short,   4> >	Vector4s;
 typedef Vector<int,    FixedSizedBuf<int,     4> >	Vector4i;
 typedef Vector<float,  FixedSizedBuf<float,   4> >	Vector4f;
 typedef Vector<double, FixedSizedBuf<double,  4> >	Vector4d;
-typedef Matrix<float,  FixedSizedBuf<float,   4> >	Matrix22f;
-typedef Matrix<double, FixedSizedBuf<double,  4> >	Matrix22d;
-typedef Matrix<float,  FixedSizedBuf<float,   9> >	Matrix33f;
-typedef Matrix<double, FixedSizedBuf<double,  9> >	Matrix33d;
-typedef Matrix<float,  FixedSizedBuf<float,  12> >	Matrix34f;
-typedef Matrix<double, FixedSizedBuf<double, 12> >	Matrix34d;
-typedef Matrix<float,  FixedSizedBuf<float,  16> >	Matrix44f;
-typedef Matrix<double, FixedSizedBuf<double, 16> >	Matrix44d;
+typedef Matrix<float,  FixedSizedBuf<float,   4>,
+	       FixedSizedBuf<Vector<float>,   2> >	Matrix22f;
+typedef Matrix<double, FixedSizedBuf<double,  4>,
+	       FixedSizedBuf<Vector<double>,  2> >	Matrix22d;
+typedef Matrix<float,  FixedSizedBuf<float,   6>,
+	       FixedSizedBuf<Vector<float>,   2> >	Matrix23f;
+typedef Matrix<double, FixedSizedBuf<double,  6>,
+	       FixedSizedBuf<Vector<double>,  2> >	Matrix23d;
+typedef Matrix<float,  FixedSizedBuf<float,   9>,
+	       FixedSizedBuf<Vector<float>,   3> >	Matrix33f;
+typedef Matrix<double, FixedSizedBuf<double,  9>,
+	       FixedSizedBuf<Vector<double>,  3> >	Matrix33d;
+typedef Matrix<float,  FixedSizedBuf<float,  12>,
+	       FixedSizedBuf<Vector<float>,   3> >	Matrix34f;
+typedef Matrix<double, FixedSizedBuf<double, 12>,
+	       FixedSizedBuf<Vector<double>,  3> >	Matrix34d;
+typedef Matrix<float,  FixedSizedBuf<float,  16>,
+	       FixedSizedBuf<Vector<float>,   4> >	Matrix44f;
+typedef Matrix<double, FixedSizedBuf<double, 16>,
+	       FixedSizedBuf<Vector<double>,  4> >	Matrix44d;
 
 /************************************************************************
 *  class Minimization1<S>						*
