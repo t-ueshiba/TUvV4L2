@@ -20,12 +20,12 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.12 2008-09-03 23:33:30 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.13 2008-09-08 08:15:08 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
 
-#include "TU/Geometry++.h"
+#include "TU/Camera.h"
 #include "TU/BlockMatrix++.h"
 #include "TU/Minimize.h"
 
