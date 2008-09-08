@@ -25,9 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Pata.cc,v 1.8 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Pata.cc,v 1.9 2008-09-08 08:06:19 ueshiba Exp $
  */
-#include "TU/Serial++.h"
+#include "TU/Serial.h"
 
 namespace TU
 {

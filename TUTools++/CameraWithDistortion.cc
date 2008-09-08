@@ -25,10 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CameraWithDistortion.cc,v 1.10 2007-11-29 07:06:35 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.11 2008-09-08 08:06:12 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
-#include <stdexcept>
+#include "TU/Camera.h"
 
 namespace TU
 {
@@ -36,15 +35,9 @@ namespace TU
 *  class CameraWithDistortion						*
 ************************************************************************/
 CameraBase&
-CameraWithDistortion::setProjection(const Matrix<double>& PP)
+CameraWithDistortion::setProjection(const Matrix34d& PP)
 {
-  /*    throw std::runtime_error("CameraWithDistortion::setProjection: Not implemented!!");
-	return *this;*/
-
-    if (PP.nrow() != 3 || PP.ncol() != 4)
-	throw std::invalid_argument("CameraWithDistortion::setProjection: Illegal dimension of P!!");
-
-    Matrix<double>	KK(3, 3);	// camera intrinsic parameters.
+    Matrix33d	KK;		// camera intrinsic parameters.
     KK[0]    = PP[2](0, 3);
     KK[1]    = PP[1](0, 3);
     KK[2]    = PP[0](0, 3);
@@ -59,12 +52,12 @@ CameraWithDistortion::setProjection(const Matrix<double>& PP)
     KK[2][1] =  0.0;
     KK[2][2] = -qr.Rt()[0][0];
 
-    Matrix<double>	RRt(3, 3);	// camera rotation.
+    Matrix33d	RRt;		// camera rotation.
     RRt[0]   =  qr.Qt()[2];
     RRt[1]   =  qr.Qt()[1];
     RRt[2]   = -qr.Qt()[0];
 
-    Vector<double>	tt(3);		// camera translation.
+    Vector3d	tt;		// camera translation.
     tt[0]    = -PP[0][3];
     tt[1]    = -PP[1][3];
     tt[2]    = -PP[2][3];
@@ -119,24 +112,24 @@ CameraWithDistortion::intrinsic()
 /************************************************************************
 *  class CameraWithDistortion::Intrinsic				*
 ************************************************************************/
-Point2<double>
-CameraWithDistortion::Intrinsic::operator ()(const Point2<double>& xc) const
+Point2d
+CameraWithDistortion::Intrinsic::operator ()(const Point2d& xc) const
 {
     return Camera::Intrinsic::operator ()(xd(xc));
 }
 
-Point2<double>
-CameraWithDistortion::Intrinsic::xd(const Point2<double>& xc) const
+Point2d
+CameraWithDistortion::Intrinsic::xd(const Point2d& xc) const
 {
     const double	sqr = xc * xc, tmp = 1.0 + sqr*(_d1 + sqr*_d2);
-    return Point2<double>(tmp * xc[0], tmp * xc[1]);
+    return Point2d(tmp * xc[0], tmp * xc[1]);
 }
 
-Matrix<double>
-CameraWithDistortion::Intrinsic::jacobianXC(const Point2<double>& xc) const
+Matrix22d
+CameraWithDistortion::Intrinsic::jacobianXC(const Point2d& xc) const
 {
     const double	sqr = xc * xc, tmp = 2.0*(_d1 + 2.0*sqr*_d2);
-    Matrix<double>	J(2, 2);
+    Matrix22d		J;
     J[0][0] = J[1][1] = 1.0 + sqr*(_d1 + sqr*_d2);
     J[0][0] += tmp * xc[0] * xc[0];
     J[1][1] += tmp * xc[1] * xc[1];
@@ -148,14 +141,14 @@ CameraWithDistortion::Intrinsic::jacobianXC(const Point2<double>& xc) const
 }
 
 Matrix<double>
-CameraWithDistortion::Intrinsic::jacobianK(const Point2<double>& xc) const
+CameraWithDistortion::Intrinsic::jacobianK(const Point2d& xc) const
 {
-    const Point2<double>	xxd = xd(xc);
-    Matrix<double>		J(2, 7);
+    const Point2d&	xxd = xd(xc);
+    Matrix<double>	J(2, 7);
     J[1][0] = J[0][4] = xxd[1];
     J[0][1] = J[1][2] = 1.0;
     J[0][3] = xxd[0];
-    const double		sqr = xc * xc;
+    const double	sqr = xc * xc;
     J[0][5] = sqr * (k00() * xc[0] + k01() * xc[1]);
     J[1][5] = sqr * (		       k() * xc[1]);
     J[0][6] = sqr * J[0][5];
@@ -164,12 +157,12 @@ CameraWithDistortion::Intrinsic::jacobianK(const Point2<double>& xc) const
     return J;
 }
 
-Point2<double>
-CameraWithDistortion::Intrinsic::xc(const Point2<double>& u) const
+Point2d
+CameraWithDistortion::Intrinsic::xcFromU(const Point2d& u) const
 {
-    Point2<double>	xd = Camera::Intrinsic::xc(u);
+    const Point2d&	xd = Camera::Intrinsic::xcFromU(u);
     const double	sqr = xd * xd, tmp = 1.0 - sqr*(_d1 + sqr*_d2);
-    return Point2<double>(tmp * xd[0], tmp * xd[1]);
+    return Point2d(tmp * xd[0], tmp * xd[1]);
 }
 
 CameraBase::Intrinsic&

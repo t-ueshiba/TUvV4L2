@@ -25,9 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CameraBase.cc,v 1.11 2007-11-29 07:06:35 ueshiba Exp $
+ *  $Id: CameraBase.cc,v 1.12 2008-09-08 08:06:12 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
+#include "TU/Camera.h"
 
 namespace TU
 {
@@ -42,10 +42,10 @@ CameraBase::~CameraBase()
 /*!
   \return	canonical画像平面への投影行列．
 */
-Matrix<double>
+Matrix34d
 CameraBase::Pc() const
 {
-    Matrix<double>	PP(3, 4);
+    Matrix34d	PP;
     PP(0, 0, 3, 3) = _Rt;
     PP[0][3] = -(_Rt[0] * _t);
     PP[1][3] = -(_Rt[1] * _t);
@@ -60,9 +60,9 @@ CameraBase::Pc() const
   \return	xにおける投影点のcanonical座標の1次微分．
 */
 Matrix<double>
-CameraBase::jacobianPc(const Vector<double>& x) const
+CameraBase::jacobianPc(const Point3d& x) const
 {
-    const Vector<double>&	dx = x - _t;
+    const Vector3d&		dx = x - _t;
     const Vector<double>&	xx = _Rt * dx;
     Matrix<double>		J(2, 6);
     (J[0](0, 3) = (xx[0] / xx[2] * _Rt[2] - _Rt[0])) /= xx[2];
@@ -74,11 +74,11 @@ CameraBase::jacobianPc(const Vector<double>& x) const
 }
 
 //! 点の3次元位置に関する投影点のcanonical座標の1次微分を求める
-Matrix<double>
-CameraBase::jacobianXc(const Vector<double>& x) const
+Matrix23d
+CameraBase::jacobianXc(const Point3d& x) const
 {
     const Vector<double>&	xx = _Rt * (x - _t);
-    Matrix<double>		J(2, 3);
+    Matrix23d			J;
     (J[0] = (_Rt[0] - xx[0] / xx[2] * _Rt[2])) /= xx[2];
     (J[1] = (_Rt[1] - xx[1] / xx[2] * _Rt[2])) /= xx[2];
 
@@ -87,33 +87,35 @@ CameraBase::jacobianXc(const Vector<double>& x) const
  
 //! カメラパラメータに関する投影点の画像座標の1次微分を求める
 Matrix<double>
-CameraBase::jacobianP(const Vector<double>& x) const
+CameraBase::jacobianP(const Point3d& x) const
 {
-    const Point2<double>&	xx = xc(x);
+    const Point2d&		xx = xc(x);
     const Matrix<double>&	JK = intrinsic().jacobianK(xx);
     Matrix<double>		J(2, 6 + JK.ncol());
     J(0, 0, 2, 6) = intrinsic().jacobianXC(xx) * jacobianPc(x);
     J(0, 6, 2, JK.ncol()) = JK;
+
     return J;
 }
 	
 std::istream&
 CameraBase::get(std::istream& in)
 {
-    Vector<double>	axis;
+    const double	RAD = M_PI / 180.0;
+    Vector3d		axis;
     in >> _t >> axis;
-    _Rt = Matrix<double>::Rt(axis);
+    _Rt = Matrix33d::Rt(RAD*axis);
     return intrinsic().get(in);
 }
 
 std::ostream&
 CameraBase::put(std::ostream& out) const
 {
+    const double	DEG = 180.0 / M_PI;
     std::cerr << "Position:       ";    out << _t;
-    std::cerr << "Rotation:       ";    out << _Rt.rot2axis() << std::endl;
+    std::cerr << "Rotation(deg.): ";    out << DEG*_Rt.rot2axis() << std::endl;
     return intrinsic().put(out);
 }
-
 
 /************************************************************************
 *  class CameraBase::Intrinsic						*
@@ -122,58 +124,58 @@ CameraBase::Intrinsic::~Intrinsic()
 {
 }
 
-Point2<double>
-CameraBase::Intrinsic::operator ()(const Point2<double>& xc) const
+Point2d
+CameraBase::Intrinsic::operator ()(const Point2d& xc) const
 {
     return xc;
 }
 
-Point2<double>
-CameraBase::Intrinsic::xd(const Point2<double>& xc) const
+Point2d
+CameraBase::Intrinsic::xd(const Point2d& xc) const
 {
     return xc;
 }
 
 Matrix<double>
-CameraBase::Intrinsic::jacobianK(const Point2<double>& xc) const
+CameraBase::Intrinsic::jacobianK(const Point2d& xc) const
 {
     return Matrix<double>(2, 0);
 }
 
-Matrix<double>
-CameraBase::Intrinsic::jacobianXC(const Point2<double>& xc) const
+Matrix22d
+CameraBase::Intrinsic::jacobianXC(const Point2d& xc) const
 {
-    return Matrix<double>::I(2);
+    return Matrix22d::I(2);
 }
     
-Point2<double>
-CameraBase::Intrinsic::xc(const Point2<double>& u) const
+Point2d
+CameraBase::Intrinsic::xcFromU(const Point2d& u) const
 {
     return u;
 }
 
-Matrix<double>
+Matrix33d
 CameraBase::Intrinsic::K() const
 {
-    return Matrix<double>::I(3);
+    return Matrix33d::I(3);
 }
     
-Matrix<double>
+Matrix33d
 CameraBase::Intrinsic::Kt() const
 {
-    return Matrix<double>::I(3);
+    return Matrix33d::I(3);
 }
     
-Matrix<double>
+Matrix33d
 CameraBase::Intrinsic::Kinv() const
 {
-    return Matrix<double>::I(3);
+    return Matrix33d::I(3);
 }
     
-Matrix<double>
+Matrix33d
 CameraBase::Intrinsic::Ktinv() const
 {
-    return Matrix<double>::I(3);
+    return Matrix33d::I(3);
 }
 
 u_int
@@ -188,10 +190,10 @@ CameraBase::Intrinsic::k() const
     return 1.0;
 }
 
-Point2<double>
+Point2d
 CameraBase::Intrinsic::principal() const
 {
-    return Point2<double>(0.0, 0.0);
+    return Point2d(0.0, 0.0);
 }
 
 double
@@ -243,7 +245,7 @@ CameraBase::Intrinsic::setSkew(double skew)
 }
 
 CameraBase::Intrinsic&
-CameraBase::Intrinsic::setIntrinsic(const Matrix<double>& K)
+CameraBase::Intrinsic::setIntrinsic(const Matrix33d& K)
 {
     return *this;				// Do nothing.
 }

@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Warp.cc,v 1.3 2008-08-08 08:03:43 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.4 2008-09-08 08:06:23 ueshiba Exp $
  */
 #include "TU/Warp.h"
 #if defined(__INTEL_COMPILER)
@@ -232,8 +232,8 @@ Warp::initialize(const Matrix<double>& Htinv,
 	int		n = 0;
 	for (int u = 0; u < width(); ++u)
 	{
-	    const Point2<double>&
-		m = intrinsic(Point2<double>(xc[0]/xc[2], xc[1]/xc[2]));
+	    const Point2d&
+		m = intrinsic(Point2d(xc[0]/xc[2], xc[1]/xc[2]));
 	    if (0.0 <= m[0] && m[0] <= inWidth - 2 &&
 		0.0 <= m[1] && m[1] <= inHeight - 2)
 	    {

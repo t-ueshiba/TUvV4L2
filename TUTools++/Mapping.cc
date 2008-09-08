@@ -25,9 +25,9 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: LinearMapping.cc,v 1.5 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: Mapping.cc,v 1.1 2008-09-08 08:06:17 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
+#include "TU/Mapping.h"
 
 namespace TU
 {

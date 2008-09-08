@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Vector++.cc,v 1.23 2007-11-29 07:06:37 ueshiba Exp $
+ *  $Id: Vector++.cc,v 1.24 2008-09-08 08:06:22 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -47,12 +47,13 @@ namespace TU
   \f]
   \throw std::invalid_argument	3次元ベクトルでない場合に送出
 */
-template <class T, class B> Matrix<T, Buf<T> >
+template <class T, class B>
+Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
 Vector<T, B>::skew() const
 {
     if (dim() != 3)
 	throw std::invalid_argument("TU::Vector<T, B>::skew: dimension must be 3");
-    Matrix<T>	r(3, 3);
+    Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3 > >	r;
     r[2][1] = (*this)[0];
     r[0][2] = (*this)[1];
     r[1][0] = (*this)[2];
@@ -63,15 +64,15 @@ Vector<T, B>::skew() const
 }
 
 /************************************************************************
-*  class Matrix<T, B>							*
+*  class Matrix<T, B, R>						*
 ************************************************************************/
 //! この正方行列を全て同一の対角成分値を持つ対角行列にする．
 /*!
   \param c	対角成分の値
   \return	この行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
 */
-template <class T, class B> Matrix<T, B>&
-Matrix<T, B>::diag(T c)
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::diag(T c)
 {
     check_dim(ncol());
     *this = 0;
@@ -84,8 +85,8 @@ Matrix<T, B>::diag(T c)
 /*!
   \return	転置行列，すなわち\f$\TUtvec{A}{}\f$
 */
-template <class T, class B> Matrix<T>
-Matrix<T, B>::trns() const
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::trns() const
 {
     Matrix<T> val(ncol(), nrow());
     for (int i = 0; i < nrow(); ++i)
@@ -100,8 +101,8 @@ Matrix<T, B>::trns() const
   \param q	元の行列から取り除く列を指定するindex
   \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
 */
-template <class T, class B> T
-Matrix<T, B>::det(int p, int q) const
+template <class T, class B, class R> T
+Matrix<T, B, R>::det(int p, int q) const
 {
     Matrix<T>		d(nrow()-1, ncol()-1);
     for (int i = 0; i < p; ++i)
@@ -126,8 +127,8 @@ Matrix<T, B>::det(int p, int q) const
   \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
   \throw std::invalid_argument	正方行列でない場合に送出
 */
-template <class T, class B> T
-Matrix<T, B>::trace() const
+template <class T, class B, class R> T
+Matrix<T, B, R>::trace() const
 {
     if (nrow() != ncol())
         throw
@@ -143,10 +144,10 @@ Matrix<T, B>::trace() const
   \return	余因子行列，すなわち
 		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
 */
-template <class T, class B> Matrix<T, B>
-Matrix<T, B>::adj() const
+template <class T, class B, class R> Matrix<T, B, R>
+Matrix<T, B, R>::adj() const
 {
-    Matrix<T, B>	val(nrow(), ncol());
+    Matrix<T, B, R>	val(nrow(), ncol());
     for (int i = 0; i < val.nrow(); ++i)
 	for (int j = 0; j < val.ncol(); ++j)
 	    val[i][j] = ((i + j) % 2 ? -det(j, i) : det(j, i));
@@ -167,8 +168,8 @@ Matrix<T, B>::adj() const
 		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
 		\f]
 */
-template <class T, class B> Matrix<T>
-Matrix<T, B>::pinv(T cndnum) const
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::pinv(T cndnum) const
 {
     SVDecomposition<T>	svd(*this);
     Matrix<T>		val(svd.ncol(), svd.nrow());
@@ -192,8 +193,8 @@ Matrix<T, B>::pinv(T cndnum) const
 		\f]
 		なる\f$\TUtvec{U}{}\f$
 */
-template <class T, class B> Matrix<T>
-Matrix<T, B>::eigen(Vector<T>& eval) const
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::eigen(Vector<T>& eval) const
 {
     TriDiagonal<T>	tri(*this);
 
@@ -217,8 +218,8 @@ Matrix<T, B>::eigen(Vector<T>& eval) const
 		\f]
 		なる\f$\TUtvec{U}{}\f$
 */
-template <class T, class B> Matrix<T>
-Matrix<T, B>::geigen(const Matrix<T>& BB, Vector<T>& eval) const
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::geigen(const Matrix<T>& BB, Vector<T>& eval) const
 {
     Matrix<T>	Ltinv = BB.cholesky().inv(), Linv = Ltinv.trns();
     Matrix<T>	Ut = (Linv * (*this) * Ltinv).eigen(eval);
@@ -234,14 +235,14 @@ Matrix<T, B>::geigen(const Matrix<T>& BB, Vector<T>& eval) const
   \throw std::invalid_argument	正方行列でない場合に送出
   \throw std::runtime_error	正値でない場合に送出
 */
-template <class T, class B> Matrix<T, B>
-Matrix<T, B>::cholesky() const
+template <class T, class B, class R> Matrix<T, B, R>
+Matrix<T, B, R>::cholesky() const
 {
     if (nrow() != ncol())
         throw
 	    std::invalid_argument("TU::Matrix<T>::cholesky(): not square matrix!!");
 
-    Matrix<T, B>	Lt(*this);
+    Matrix<T, B, R>	Lt(*this);
     for (int i = 0; i < nrow(); ++i)
     {
 	T d = Lt[i][i];
@@ -267,8 +268,8 @@ Matrix<T, B>::cholesky() const
 		  \TUvec{A}{}\leftarrow\frac{\TUvec{A}{}}{\TUnorm{\TUvec{A}{}}}
 		\f$
 */
-template <class T, class B> Matrix<T, B>&
-Matrix<T, B>::normalize()
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::normalize()
 {
     T	sum = 0.0;
     for (int i = 0; i < nrow(); ++i)
@@ -281,8 +282,8 @@ Matrix<T, B>::normalize()
     \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
 */
-template <class T, class B> Matrix<T, B>&
-Matrix<T, B>::rotate_from_left(const Rotation& r)
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::rotate_from_left(const Rotation& r)
 {
     for (int j = 0; j < ncol(); ++j)
     {
@@ -299,8 +300,8 @@ Matrix<T, B>::rotate_from_left(const Rotation& r)
     \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
 */
-template <class T, class B> Matrix<T, B>&
-Matrix<T, B>::rotate_from_right(const Rotation& r)
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::rotate_from_right(const Rotation& r)
 {
     for (int i = 0; i < nrow(); ++i)
     {
@@ -316,8 +317,8 @@ Matrix<T, B>::rotate_from_right(const Rotation& r)
 /*!
     \return	行列の2乗ノルムの2乗，すなわち\f$\TUnorm{\TUvec{A}{}}^2\f$
 */
-template <class T, class B> T
-Matrix<T, B>::square() const
+template <class T, class B, class R> T
+Matrix<T, B, R>::square() const
 {
     T	val = 0.0;
     for (int i = 0; i < nrow(); ++i)
@@ -329,8 +330,8 @@ Matrix<T, B>::square() const
 /*!
     \return	この行列
 */
-template <class T, class B> Matrix<T, B>&
-Matrix<T, B>::symmetrize()
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::symmetrize()
 {
     for (int i = 0; i < nrow(); ++i)
 	for (int j = 0; j < i; ++j)
@@ -342,8 +343,8 @@ Matrix<T, B>::symmetrize()
 /*!
     \return	この行列
 */
-template <class T, class B> Matrix<T, B>&
-Matrix<T, B>::antisymmetrize()
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::antisymmetrize()
 {
     for (int i = 0; i < nrow(); ++i)
     {
@@ -382,8 +383,8 @@ Matrix<T, B>::antisymmetrize()
  \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す．
  \throw invalid_argument	3次元正方行列でない場合に送出
 */
-template <class T, class B> void
-Matrix<T, B>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
+template <class T, class B, class R> void
+Matrix<T, B, R>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
 {
     using namespace	std;
     
@@ -418,8 +419,8 @@ Matrix<T, B>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
  \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
  \throw std::invalid_argument	3x3行列でない場合に送出
 */
-template <class T, class B> Vector<T, FixedSizedBuf<T, 3> >
-Matrix<T, B>::rot2axis(T& c, T& s) const
+template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3> >
+Matrix<T, B, R>::rot2axis(T& c, T& s) const
 {
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
@@ -452,8 +453,8 @@ Matrix<T, B>::rot2axis(T& c, T& s) const
 				\f$\theta\TUvec{n}{}\f$
  \throw invalid_argument	3x3行列でない場合に送出
 */
-template <class T, class B> Vector<T, FixedSizedBuf<T, 3u> >
-Matrix<T, B>::rot2axis() const
+template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3u> >
+Matrix<T, B, R>::rot2axis() const
 {
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");

@@ -25,10 +25,10 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: TUTools++.sa.cc,v 1.9 2007-11-29 07:06:36 ueshiba Exp $
+ *  $Id: TUTools++.sa.cc,v 1.10 2008-09-08 08:06:21 ueshiba Exp $
  */
 #include "TU/Image++.h"
-#include "TU/Serial++.h"
+#include "TU/Serial.h"
 
 namespace TU
 {
