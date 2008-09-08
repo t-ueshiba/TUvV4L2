@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.22 2008-09-03 23:33:31 ueshiba Exp $
+#  $Id: Makefile,v 1.23 2008-09-08 08:16:30 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -31,10 +31,8 @@ SUFFIX		= .cc:sC
 EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Geometry++.h \
 		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/Minimize.h \
 		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/utility.h
+		/home/ueshiba/include/TU/types.h
 HDRS		= Ieee1394++.h
 SRCS		= Ieee1394Camera.cc \
 		Ieee1394Node.cc
@@ -44,7 +42,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.22 $	|		\
+REV		= $(shell echo $Revision: 1.23 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -57,13 +55,9 @@ include $(PROJECT)/lib/l.mk
 ###
 Ieee1394Camera.o: Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
 Ieee1394Node.o: Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h

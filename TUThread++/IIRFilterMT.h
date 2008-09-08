@@ -25,12 +25,12 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: IIRFilterMT++.h,v 1.2 2008-09-03 23:33:32 ueshiba Exp $
+ *  $Id: IIRFilterMT.h,v 1.1 2008-09-08 08:15:55 ueshiba Exp $
  */
-#ifndef __TUIIRFilterMTPP_h
-#define __TUIIRFilterMTPP_h
+#ifndef __TUIIRFilterMT_h
+#define __TUIIRFilterMT_h
 
-#include "TU/IIRFilter++.h"
+#include "TU/IIRFilter.h"
 #include "TU/Thread++.h"
 
 namespace TU
@@ -47,10 +47,10 @@ class BilateralIIRFilterThreadArray
     typedef typename BIIRF::Order			Order;
 
   private:
-    typedef Array2<typename IN::row_type,  typename IN::buffer_type>
-								InArray2;
-    typedef Array2<typename OUT::row_type, typename OUT::buffer_type>
-								OutArray2;
+    typedef Array2<typename IN::row_type,  typename IN::buffer_type,
+		   typename IN::rowbuffer_type>			InArray2;
+    typedef Array2<typename OUT::row_type, typename OUT::buffer_type,
+		   typename OUT::rowbuffer_type>		OutArray2;
 
     class FilterThread : public BIIRF, public Thread
     {
@@ -144,4 +144,4 @@ BilateralIIRFilterThreadArray<ORD, IN, OUT>::FilterThread::doJob()
 }
 
 }
-#endif	// !__TUIIRFilterMTPP_h
+#endif	// !__TUIIRFilterMT_h

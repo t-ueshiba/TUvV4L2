@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.18 2008-09-03 23:33:24 ueshiba Exp $
+#  $Id: Makefile,v 1.19 2008-09-08 08:16:23 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -30,12 +30,10 @@ LINKER		= $(CCC)
 SUFFIX		= .cc:sC
 EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Minimize.h \
 		/home/ueshiba/include/TU/Object++.cc \
 		/home/ueshiba/include/TU/Object++.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/utility.h \
 		TU/Brep/Brep++.h
 HDRS		= Brep++.h
 SRCS		= Geometry.cc \
@@ -56,7 +54,7 @@ OBJS		= Geometry.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.18 $	|		\
+REV		= $(shell echo $Revision: 1.19 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -70,50 +68,36 @@ include $(PROJECT)/lib/l.mk
 Geometry.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h
 HalfEdge.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h
 Loop.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h
 Neighbor.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h
 PointB.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h
 TUBrep++.inst.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h \
 	/home/ueshiba/include/TU/Object++.cc
 TUBrep++.sa.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h

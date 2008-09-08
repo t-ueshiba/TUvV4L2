@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2008-09-03 23:33:32 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2008-09-08 08:15:55 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -29,15 +29,14 @@ LINKER		= $(CCC)
 #########################
 SUFFIX		= .cc:sC
 EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
+		/home/ueshiba/include/TU/Camera.h \
 		/home/ueshiba/include/TU/Geometry++.h \
 		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/Minimize.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/Warp.h \
 		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/utility.h \
 		TU/Thread++.h
-HDRS		= IIRFilterMT++.h \
+HDRS		= IIRFilterMT.h \
 		Thread++.h
 SRCS		= Thread.cc \
 		WarpMT.cc
@@ -47,7 +46,7 @@ OBJS		= Thread.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -64,6 +63,4 @@ WarpMT.o: TU/Thread++.h /home/ueshiba/include/TU/Array++.h \
 	/home/ueshiba/include/TU/types.h /home/ueshiba/include/TU/Warp.h \
 	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize.h \
-	/home/ueshiba/include/TU/Vector++.h
+	/home/ueshiba/include/TU/Vector++.h /home/ueshiba/include/TU/Camera.h
