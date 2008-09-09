@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: CanvasPaneDC3.cc,v 1.6 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: CanvasPaneDC3.cc,v 1.7 2008-09-09 01:45:57 ueshiba Exp $
  */
 #include "TU/v/CanvasPaneDC3.h"
 #include <X11/keysym.h>
@@ -121,10 +121,10 @@ CanvasPaneDC3::initializeGraphics()
     
   // Set initial internal and external parameters.
     setInternal(width() / 2, height() / 2, 800.0, 800.0, 1.0, 1000.0);
-    Matrix<double>	Rt(3, 3);
+    Matrix33d	Rt;
     Rt[0][0] = Rt[2][1] = 1.0;
     Rt[1][2] = -1.0;
-    setExternal(Vector<double>(3), Rt);
+    setExternal(Point3d(), Rt);
 }
 
 }
