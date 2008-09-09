@@ -25,12 +25,12 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: DC3.h,v 1.6 2008-08-13 06:06:35 ueshiba Exp $
+ *  $Id: DC3.h,v 1.7 2008-09-09 01:45:57 ueshiba Exp $
  */
 #ifndef __TUvDC3_h
 #define __TUvDC3_h
 
-#include "TU/Vector++.h"
+#include "TU/Geometry++.h"
 #include "TU/Manip.h"
 
 namespace TU
@@ -52,13 +52,12 @@ class DC3
     virtual DC3&	setInternal(int	   u0,	 int	v0,
 				    double ku,	 double kv,
 				    double near, double far=0.0)	= 0;
-    virtual DC3&	setExternal(const Vector<double>& t,
-				    const Matrix<double>& Rt)		= 0;
+    virtual DC3&	setExternal(const Point3d& t,
+				    const Matrix33d& Rt)		= 0;
     virtual const DC3&	getInternal(int&    u0,	  int&	  v0,
 				    double& ku,	  double& kv,
 				    double& near, double& far)	const	= 0;
-    virtual const DC3&	getExternal(Vector<double>& t,
-				    Matrix<double>& Rt)		const	= 0;
+    virtual const DC3&	getExternal(Point3d& t, Matrix33d& Rt)	const	= 0;
     virtual DC3&	translate(double d)				;
     virtual DC3&	rotate(double angle)				= 0;
 
