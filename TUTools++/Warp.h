@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Warp.h,v 1.2 2008-09-08 08:06:23 ueshiba Exp $
+ *  $Id: Warp.h,v 1.3 2008-09-09 01:44:46 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -67,10 +67,10 @@ class Warp
     int		lmost(int v)			const	;
     int		rmost(int v)			const	;
 
-    void	initialize(const Matrix<double>& Htinv,
+    void	initialize(const Matrix33d& Htinv,
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
-    void	initialize(const Matrix<double>& Htinv,
+    void	initialize(const Matrix33d& Htinv,
 			   const CameraBase::Intrinsic& intrinsic,
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
