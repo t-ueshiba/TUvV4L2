@@ -1,5 +1,5 @@
 /*
- *  $Id: SDLOglDC.cc,v 1.1 2008-05-15 09:03:17 ueshiba Exp $
+ *  $Id: SDLOglDC.cc,v 1.2 2008-09-09 01:42:18 ueshiba Exp $
  */
 #include "TU/SDLOglDC.h"
 
@@ -20,10 +20,10 @@ SDLOglDC::SDLOglDC(u_int w, u_int h, u_int d, bool fullScreen)
 
     setViewport();
     setInternal(width() / 2, height() / 2, 800.0, 800.0, 1.0, 1000.0);
-    Matrix<double>	Rt(3, 3);
+    Matrix33d	Rt;
     Rt[0][0] = Rt[2][1] = 1.0;
     Rt[1][2] = -1.0;
-    setExternal(Vector<double>(3), Rt);
+    setExternal(Point3d(), Rt);
 }
 
 SDLOglDC::~SDLOglDC()
@@ -62,7 +62,7 @@ SDLOglDC::setInternal(int u0, int v0, double ku, double kv,
 }
 
 v::DC3&
-SDLOglDC::setExternal(const Vector<double>& t, const Matrix<double>& Rt)
+SDLOglDC::setExternal(const Point3d& t, const Matrix33d& Rt)
 {
   /* set rotation */
     GLdouble	matrix[4][4];
@@ -99,11 +99,10 @@ SDLOglDC::getInternal(int& u0, int& v0, double& ku, double& kv,
 }
 
 const v::DC3&
-SDLOglDC::getExternal(Vector<double>& t, Matrix<double>& Rt) const
+SDLOglDC::getExternal(Point3d& t, Matrix33d& Rt) const
 {
     GLdouble	matrix[4][4];
     glGetDoublev(GL_MODELVIEW_MATRIX, matrix[0]);
-    Rt.resize(3, 3);
     Rt[0][0] = matrix[0][0];
     Rt[0][1] = matrix[1][0];
     Rt[0][2] = matrix[2][0];
@@ -113,7 +112,6 @@ SDLOglDC::getExternal(Vector<double>& t, Matrix<double>& Rt) const
     Rt[2][0] = matrix[0][2];
     Rt[2][1] = matrix[1][2];
     Rt[2][2] = matrix[2][2];
-    t.resize(3);
     t[0] = -matrix[3][0];
     t[1] = -matrix[3][1];
     t[2] = -matrix[3][2];
