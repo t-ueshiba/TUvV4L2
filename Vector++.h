@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Vector++.h,v 1.24 2008-09-08 08:06:22 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.25 2008-09-09 01:44:46 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -1051,10 +1051,11 @@ operator /(const Matrix<T, B, R>& m, double c)
   \param w	第2引数
   \return	ベクトル積，すなわち\f$\TUvec{v}{}\times\TUvec{w}{}\f$
 */
-template <class T1, class B1, class T2, class B2> inline Vector<T1, B1>
+template <class T1, class B1, class T2, class B2>
+inline Vector<T1, FixedSizedBuf<T1, 3> >
 operator ^(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
 {
-    return Vector<T1, B1>(v) ^= w;
+    return Vector<T1, FixedSizedBuf<T1, 3> >(v) ^= w;
 }
 
 //! 2つのベクトルの内積

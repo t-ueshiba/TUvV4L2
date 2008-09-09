@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: Warp.cc,v 1.4 2008-09-08 08:06:23 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.5 2008-09-09 01:44:46 ueshiba Exp $
  */
 #include "TU/Warp.h"
 #if defined(__INTEL_COMPILER)
@@ -140,7 +140,7 @@ namespace TU
 
   template <> inline mmInt
   mmBilinearInterpolate(const Image<u_char>& in, const short*& usp,
-			 const short*& vsp, mmInt du, mmInt dv)
+			const short*& vsp, mmInt du, mmInt dv)
   {
       int	us0 = *usp++, us1 = *usp++, us2 = *usp++, us3 = *usp++,
 		vs0 = *vsp++, vs1 = *vsp++, vs2 = *vsp++, vs3 = *vsp++;
@@ -205,7 +205,7 @@ bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
 *  class Warp								*
 ************************************************************************/
 void
-Warp::initialize(const Matrix<double>& Htinv,
+Warp::initialize(const Matrix33d& Htinv,
 		 u_int inWidth,  u_int inHeight,
 		 u_int outWidth, u_int outHeight)
 {
@@ -214,7 +214,7 @@ Warp::initialize(const Matrix<double>& Htinv,
 }
 
 void
-Warp::initialize(const Matrix<double>& Htinv,
+Warp::initialize(const Matrix33d& Htinv,
 		 const CameraBase::Intrinsic& intrinsic,
 		 u_int inWidth,  u_int inHeight,
 		 u_int outWidth, u_int outHeight)
