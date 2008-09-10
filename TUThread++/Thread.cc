@@ -4,9 +4,9 @@
  *  創作者：植芝俊夫
  *
  *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．創作者によ
- *  る許可なしに本プログラムを使用，複製，改変，第三者へ開示する等の著
- *  作権を侵害する行為を禁止します．
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
  *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
  *  よび創作者は責任を負いません。
@@ -19,13 +19,13 @@
  *  [AIST Confidential and all rights reserved.]
  *  This program is confidential. Any using, copying, changing or
  *  giving any information concerning with this program to others
- *  without permission by the creator are strictly prohibited.
+ *  without permission by the copyright holder are strictly prohibited.
  *
  *  [No Warranty.]
- *  The copyright holders or the creator are not responsible for any
- *  damages in the use of this program.
- *  
- *  $Id: Thread.cc,v 1.3 2008-08-22 20:59:34 ueshiba Exp $
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
+ *
+ *  $Id: Thread.cc,v 1.4 2008-09-10 05:11:51 ueshiba Exp $  
  */
 #include "TU/Thread++.h"
 #include <unistd.h>
