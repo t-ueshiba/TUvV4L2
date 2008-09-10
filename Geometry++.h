@@ -1,17 +1,17 @@
 /*
- *  平成9-19年（独）産業技術総合研究所 著作権所有
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
  *  創作者：植芝俊夫
  *
  *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．創作者によ
- *  る許可なしに本プログラムを使用，複製，改変，第三者へ開示する等の著
- *  作権を侵害する行為を禁止します．
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
  *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
  *  よび創作者は責任を負いません。
  *
- *  Copyright 1997-2007.
+ *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
  *
  *  Creator: Toshio UESHIBA
@@ -19,13 +19,13 @@
  *  [AIST Confidential and all rights reserved.]
  *  This program is confidential. Any using, copying, changing or
  *  giving any information concerning with this program to others
- *  without permission by the creator are strictly prohibited.
+ *  without permission by the copyright holder are strictly prohibited.
  *
  *  [No Warranty.]
- *  The copyright holders or the creator are not responsible for any
- *  damages in the use of this program.
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.26 2008-09-08 08:06:14 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.27 2008-09-10 05:10:38 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -187,6 +187,10 @@ Normalize::centroid() const
 /************************************************************************
 *  class Point2<T>							*
 ************************************************************************/
+//! T型の座標成分を持つ2次元点を表すクラス
+/*!
+  \param T	座標の型
+ */
 template <class T>
 class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
 {
@@ -195,8 +199,19 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     
   public:
     Point2(T u=0, T v=0)						;
+
+  //! 他の2次元ベクトルと同一要素を持つ2次元点を作る．
+  /*!
+    \param v	コピー元2次元ベクトル
+  */
     template <class T2, class B2>
     Point2(const Vector<T2, B2>& v) :array_type(v)			{}
+
+  //! 他の2次元ベクトルを自分に代入する．
+  /*!
+    \param v	コピー元2次元ベクトル
+    \return	この2次元点
+  */
     template <class T2, class B2>
     Point2&	operator =(const Vector<T2, B2>& v)
 		{
@@ -210,6 +225,11 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     int		angle(const Point2&, const Point2&)		const	;
 };
 
+//! 指定された座標成分を持つ2次元点を作る．
+/*!
+  \param u	u座標
+  \param v	v座標
+*/
 template <class T> inline
 Point2<T>::Point2(T u, T v)
     :array_type()
@@ -218,12 +238,22 @@ Point2<T>::Point2(T u, T v)
     (*this)[1] = v;
 }
 
+//! 指定された方向の8近傍点を返す．
+/*!
+  \param dir	8近傍点の方向(mod 8で解釈．右隣を0とし，時計回りに1づつ増加)
+  \return	8近傍点
+*/
 template <class T> inline Point2<T>
 Point2<T>::neighbor(int dir) const
 {
     return Point2(*this).move(dir);
 }
 
+//! 指定された方向の8近傍点に自身を移動する．
+/*!
+  \param dir	8近傍点の方向(mod 8で解釈．右隣を0とし，時計回りに1づつ増加)
+  \return	移動後のこの点
+*/
 template <class T> Point2<T>&
 Point2<T>::move(int dir)
 {
@@ -268,6 +298,11 @@ Point2<T>::move(int dir)
     return *this;
 }
 
+//! この3次元点と指定された3次元点が8隣接しているか調べる．
+/*!
+  \param p	3次元点
+  \return	pと一致していれば-1，8隣接していれば1，いずれでもなければ0
+*/
 template <class T> int
 Point2<T>::adj(const Point2<T>& p) const
 {
@@ -294,6 +329,12 @@ Point2<T>::adj(const Point2<T>& p) const
     return 0;
 }
 
+//! この3次元点から指定された3次元点への向きを返す．
+/*!
+  \param p	3次元点
+  \return	-180degから180degまでを8等分した区間を表す-4から3までの整数値．
+		特に，pがこの点に一致するならば4
+*/
 template <class T> int
 Point2<T>::dir(const Point2<T>& p) const
 {
@@ -323,6 +364,14 @@ Point2<T>::dir(const Point2<T>& p) const
             return -4;
 }
 
+//! この3次元点と指定された2つの3次元点がなす角度を返す．
+/*!
+  \param pp	3次元点
+  \param pn	3次元点
+  \return	pp->*this->pnがなす角度を-180degから180degまでを8等分した区間で
+		表した-4から3までの整数値．特に，pp, pnの少なくとも一方がこの点に
+		一致するならば4
+*/
 template <class T> int
 Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
 {
@@ -346,6 +395,10 @@ typedef Point2<double>	Point2d;
 /************************************************************************
 *  class Point3<T>							*
 ************************************************************************/
+//! T型の座標成分を持つ3次元点を表すクラス
+/*!
+  \param T	座標の型
+ */
 template <class T>
 class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 {
@@ -354,8 +407,19 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
     
   public:
     Point3(T x=0, T y=0, T z=0)						;
+
+  //! 他の3次元ベクトルと同一要素を持つ3次元点を作る．
+  /*!
+    \param v	コピー元3次元ベクトル
+  */
     template <class T2, class B2>
     Point3(const Vector<T2, B2>& v) :array_type(v)			{}
+
+  //! 他の3次元ベクトルを自分に代入する．
+  /*!
+    \param v	コピー元3次元ベクトル
+    \return	この3次元点
+  */
     template <class T2, class B2>
     Point3&	operator =(const Vector<T2, B2>& v)
 		{
@@ -364,6 +428,12 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 		}
 };
 
+//! 指定された座標成分を持つ3次元点を作る．
+/*!
+  \param x	x座標
+  \param y	y座標
+  \param z	z座標
+*/
 template <class T> inline
 Point3<T>::Point3(T x, T y, T z)
     :array_type()

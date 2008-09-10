@@ -1,17 +1,17 @@
 /*
- *  •½¬9-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
  *  
- *  ‘nìÒFAÅr•v
+ *  $BAO:n<T!'?"<G=SIW(B
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D‘nìÒ‚É‚æ
- *  ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é“™‚Ì’˜
- *  ìŒ ‚ğNŠQ‚·‚ésˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
+ *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
+ *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
+ *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
+ *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
  *
- *  Copyright 1997-2007.
+ *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
  *
  *  Creator: Toshio UESHIBA
@@ -19,13 +19,13 @@
  *  [AIST Confidential and all rights reserved.]
  *  This program is confidential. Any using, copying, changing or
  *  giving any information concerning with this program to others
- *  without permission by the creator are strictly prohibited.
+ *  without permission by the copyright holder are strictly prohibited.
  *
  *  [No Warranty.]
- *  The copyright holders or the creator are not responsible for any
- *  damages in the use of this program.
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
  *  
- *  $Id: Mapping.h,v 1.1 2008-09-08 08:06:18 ueshiba Exp $
+ *  $Id: Mapping.h,v 1.2 2008-09-10 05:10:41 ueshiba Exp $
  */
 #ifndef __TUMapping_h
 #define __TUMapping_h
@@ -38,12 +38,12 @@ namespace TU
 /************************************************************************
 *  class ProjectiveMapping						*
 ************************************************************************/
-//! Ë‰e•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+//! $B<M1FJQ49$r9T$&%/%i%9(B
 /*!
-  \f$\TUvec{T}{} \in \TUspace{R}{(n+1)\times(m+1)}\f$‚ğ—p‚¢‚ÄmŸŒ³‹óŠÔ‚Ì“_
-  \f$\TUud{x}{} \in \TUspace{R}{m+1}\f$‚ğnŸŒ³‹óŠÔ‚Ì“_
+  \f$\TUvec{T}{} \in \TUspace{R}{(n+1)\times(m+1)}\f$$B$rMQ$$$F(Bm$B<!856u4V$NE@(B
+  \f$\TUud{x}{} \in \TUspace{R}{m+1}\f$$B$r(Bn$B<!856u4V$NE@(B
   \f$\TUud{y}{} \simeq \TUvec{T}{}\TUud{x}{} \in \TUspace{R}{n+1}\f$
-  ‚ÉÊ‚·i\f$m \neq n\f$‚Å‚à\‚í‚È‚¢jD
+  $B$K<L$9!J(B\f$m \neq n\f$$B$G$b9=$o$J$$!K!%(B
 */
 class ProjectiveMapping
 {
@@ -53,9 +53,9 @@ class ProjectiveMapping
   public:
     ProjectiveMapping(u_int inDim=2, u_int outDim=2)			;
 
-  //! •ÏŠ·s—ñ‚ğw’è‚µ‚ÄË‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+  //! $BJQ499TNs$r;XDj$7$F<M1FJQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
   /*!
-    \param T			(m+1)x(n+1)s—ñim, n‚Í“ü—Í^o—Í‹óŠÔ‚ÌŸŒ³j
+    \param T			(m+1)x(n+1)$B9TNs!J(Bm, n$B$OF~NO!?=PNO6u4V$N<!85!K(B
   */
     ProjectiveMapping(const Matrix<double>& T)	:_T(T)			{}
 
@@ -66,23 +66,23 @@ class ProjectiveMapping
     void		fit(Iterator first, Iterator last,
 			    bool refine=false)				;
 
-  //! ‚±‚ÌË‰e•ÏŠ·‚Ì“ü—Í‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
+  //! $B$3$N<M1FJQ49$NF~NO6u4V$N<!85$rJV$9!%(B
   /*! 
-    \return	“ü—Í‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í#inDim()+1)
+    \return	$BF~NO6u4V$N<!85(B($BF1<!:BI8$N%Y%/%H%k$H$7$F$N<!85$O(B#inDim()+1)
   */
     u_int		inDim()			const	{return _T.ncol()-1;}
 
-  //! ‚±‚ÌË‰e•ÏŠ·‚Ìo—Í‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
+  //! $B$3$N<M1FJQ49$N=PNO6u4V$N<!85$rJV$9!%(B
   /*! 
-    \return	o—Í‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í#outDim()+1)
+    \return	$B=PNO6u4V$N<!85(B($BF1<!:BI8$N%Y%/%H%k$H$7$F$N<!85$O(B#outDim()+1)
   */
     u_int		outDim()		const	{return _T.nrow()-1;}
 
     u_int		ndataMin()		const	;
     
-  //! ‚±‚ÌË‰e•ÏŠ·‚ğ•\Œ»‚·‚és—ñ‚ğ•Ô‚·D
+  //! $B$3$N<M1FJQ49$rI=8=$9$k9TNs$rJV$9!%(B
   /*! 
-    \return	(#outDim()+1)x(#inDim()+1)s—ñ
+    \return	(#outDim()+1)x(#inDim()+1)$B9TNs(B
   */
     const Matrix<double>&	T()		const	{return _T;}
 
@@ -103,10 +103,10 @@ class ProjectiveMapping
     void		update(const Vector<double>& dt)		;
     
   protected:
-    Matrix<double>	_T;			//!< Ë‰e•ÏŠ·‚ğ•\Œ»‚·‚és—ñ
+    Matrix<double>	_T;			//!< $B<M1FJQ49$rI=8=$9$k9TNs(B
 
   protected:
-  //! Ë‰e•ÏŠ·s—ñ‚ÌÅ–Ş„’è‚Ì‚½‚ß‚ÌƒRƒXƒgŠÖ”
+  //! $B<M1FJQ499TNs$N:GL`?dDj$N$?$a$N%3%9%H4X?t(B
     template <class AT, class Iterator>
     class Cost
     {
@@ -126,12 +126,12 @@ class ProjectiveMapping
     };
 };
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çË‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! $BM?$($i$l$?E@BPNs$NHsF1<!:BI8$+$i<M1FJQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
 /*!
-  \param first			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param last			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \param refine			”ñüŒ^Å“K‰»‚Ì—L(true)^–³(false)‚ğw’è
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª#ndataMin()‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param first			$BE@BPNs$N@hF,$r<($9H?I|;R(B
+  \param last			$BE@BPNs$NKvHx$r<($9H?I|;R(B
+  \param refine			$BHs@~7?:GE,2=$NM-(B(true)$B!?L5(B(false)$B$r;XDj(B
+  \throw std::invalid_argument	$BE@BP$N?t$,(B#ndataMin()$B$KK~$?$J$$>l9g$KAw=P(B
 */
 template <class Iterator> inline
 ProjectiveMapping::ProjectiveMapping(Iterator first, Iterator last,
@@ -140,31 +140,31 @@ ProjectiveMapping::ProjectiveMapping(Iterator first, Iterator last,
     fit(first, last, refine);
 }
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çË‰e•ÏŠ·‚ğŒvZ‚·‚éD
+//! $BM?$($i$l$?E@BPNs$NHsF1<!:BI8$+$i<M1FJQ49$r7W;;$9$k!%(B
 /*!
-  \param first			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param last			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \param refine			”ñüŒ^Å“K‰»‚Ì—L(true)^–³(false)‚ğw’è
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª#ndataMin()‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param first			$BE@BPNs$N@hF,$r<($9H?I|;R(B
+  \param last			$BE@BPNs$NKvHx$r<($9H?I|;R(B
+  \param refine			$BHs@~7?:GE,2=$NM-(B(true)$B!?L5(B(false)$B$r;XDj(B
+  \throw std::invalid_argument	$BE@BP$N?t$,(B#ndataMin()$B$KK~$?$J$$>l9g$KAw=P(B
 */
 template <class Iterator> void
 ProjectiveMapping::fit(Iterator first, Iterator last, bool refine)
 {
-  // “_—ñ‚Ì³‹K‰»
+  // $BE@Ns$N@55,2=(B
     const Normalize	xNormalize(make_const_first_iterator(first),
 				   make_const_first_iterator(last)),
 			yNormalize(make_const_second_iterator(first),
 				   make_const_second_iterator(last));
 
-  // [•ª‚ÈŒÂ”‚Ì“_‘Î‚ª‚ ‚é‚©H
+  // $B=<J,$J8D?t$NE@BP$,$"$k$+!)(B
     const u_int		ndata = std::distance(first, last);
     const u_int		xdim1 = xNormalize.spaceDim() + 1,
 			ydim  = yNormalize.spaceDim();
-    if (ndata*ydim < xdim1*(ydim + 1) - 1)	// _T‚ÌƒTƒCƒY‚ª–¢’è‚È‚Ì‚Å
-						// ndataMin()‚Í–³Œø
+    if (ndata*ydim < xdim1*(ydim + 1) - 1)	// _T$B$N%5%$%:$,L$Dj$J$N$G(B
+						// ndataMin()$B$OL58z(B
 	throw std::invalid_argument("ProjectiveMapping::fit(): not enough input data!!");
 
-  // ƒf[ƒ^s—ñ‚ÌŒvZ
+  // $B%G!<%?9TNs$N7W;;(B
     Matrix<double>	A(xdim1*(ydim + 1), xdim1*(ydim + 1));
     for (Iterator iter = first; iter != last; ++iter)
     {
@@ -180,15 +180,15 @@ ProjectiveMapping::fit(Iterator first, Iterator last, bool refine)
 	A(j*xdim1, j*xdim1, xdim1, xdim1) = A(0, 0, xdim1, xdim1);
     A.symmetrize();
 
-  // ƒf[ƒ^s—ñ‚ÌÅ¬ŒÅ—L’l‚É‘Î‰‚·‚éŒÅ—LƒxƒNƒgƒ‹‚©‚ç•ÏŠ·s—ñ‚ğŒvZ‚µC
-  // ³‹K‰»‚ğƒLƒƒƒ“ƒZƒ‹‚·‚éD
+  // $B%G!<%?9TNs$N:G>.8GM-CM$KBP1~$9$k8GM-%Y%/%H%k$+$iJQ499TNs$r7W;;$7!$(B
+  // $B@55,2=$r%-%c%s%;%k$9$k!%(B
     Vector<double>	eval;
     Matrix<double>	Ut = A.eigen(eval);
     _T = yNormalize.Tinv()
        * Matrix<double>((double*)Ut[Ut.nrow()-1], ydim + 1, xdim1)
        * xNormalize.T();
 
-  // •ÏŠ·s—ñ‚ª³•û‚È‚ç‚ÎC‚»‚Ìs—ñ®‚ª‚P‚É‚È‚é‚æ‚¤‚É³‹K‰»‚·‚éD
+  // $BJQ499TNs$,@5J}$J$i$P!$$=$N9TNs<0$,#1$K$J$k$h$&$K@55,2=$9$k!%(B
     if (_T.nrow() == _T.ncol())
     {
 	double	det = _T.det();
@@ -198,7 +198,7 @@ ProjectiveMapping::fit(Iterator first, Iterator last, bool refine)
 	    _T /= -pow(-det, 1.0/_T.nrow());
     }
 
-  // ”ñüŒ^Å“K‰»‚ğs‚¤D
+  // $BHs@~7?:GE,2=$r9T$&!%(B
     if (refine)
     {
 	Cost<ProjectiveMapping, Iterator>	cost(first, last);
@@ -207,11 +207,11 @@ ProjectiveMapping::fit(Iterator first, Iterator last, bool refine)
     }
 }
 
-//! Ë‰e•ÏŠ·‚ğ‹‚ß‚é‚½‚ß‚É•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚ğ•Ô‚·D
+//! $B<M1FJQ49$r5a$a$k$?$a$KI,MW$JE@BP$N:G>.8D?t$rJV$9!%(B
 /*!
-  Œ»İİ’è‚³‚ê‚Ä‚¢‚é“üo—Í‹óŠÔ‚ÌŸŒ³‚ğ‚à‚Æ‚ÉŒvZ‚³‚ê‚éD
-  \return	•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚·‚È‚í‚¿“ü—Í‹óŠÔ‚ÌŸŒ³mCo—Í‹óŠÔ‚ÌŸŒ³n
-		‚É‘Î‚µ‚Ä m + 1 + m/n
+  $B8=:_@_Dj$5$l$F$$$kF~=PNO6u4V$N<!85$r$b$H$K7W;;$5$l$k!%(B
+  \return	$BI,MW$JE@BP$N:G>.8D?t$9$J$o$AF~NO6u4V$N<!85(Bm$B!$=PNO6u4V$N<!85(Bn
+		$B$KBP$7$F(B m + 1 + m/n
 */
 inline u_int
 ProjectiveMapping::ndataMin() const
@@ -219,10 +219,10 @@ ProjectiveMapping::ndataMin() const
     return inDim() + 1 + u_int(ceil(double(inDim())/double(outDim())));
 }
     
-//! —^‚¦‚ç‚ê‚½“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì”ñ“¯ŸÀ•W‚ğ•Ô‚·D
+//! $BM?$($i$l$?E@$K<M1FJQ49$rE,MQ$7$F$=$NHsF1<!:BI8$rJV$9!%(B
 /*!
-  \param x	“_‚Ì”ñ“¯ŸÀ•Wi#inDim()ŸŒ³j‚Ü‚½‚Í“¯ŸÀ•Wi#inDim()+1ŸŒ³j
-  \return	Ë‰e•ÏŠ·‚³‚ê‚½“_‚Ì”ñ“¯ŸÀ•Wi#outDim()ŸŒ³j
+  \param x	$BE@$NHsF1<!:BI8!J(B#inDim()$B<!85!K$^$?$OF1<!:BI8!J(B#inDim()+1$B<!85!K(B
+  \return	$B<M1FJQ49$5$l$?E@$NHsF1<!:BI8!J(B#outDim()$B<!85!K(B
 */
 template <class S, class B> inline Vector<double>
 ProjectiveMapping::operator ()(const Vector<S, B>& x) const
@@ -230,10 +230,10 @@ ProjectiveMapping::operator ()(const Vector<S, B>& x) const
     return mapP(x).inhomogenize();
 }
 
-//! —^‚¦‚ç‚ê‚½“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì“¯ŸÀ•W‚ğ•Ô‚·D
+//! $BM?$($i$l$?E@$K<M1FJQ49$rE,MQ$7$F$=$NF1<!:BI8$rJV$9!%(B
 /*!
-  \param x	“_‚Ì”ñ“¯ŸÀ•Wi#inDim()ŸŒ³j‚Ü‚½‚Í“¯ŸÀ•Wi#inDim()+1ŸŒ³j
-  \return	Ë‰e•ÏŠ·‚³‚ê‚½“_‚Ì“¯ŸÀ•Wi#outDim()+1ŸŒ³j
+  \param x	$BE@$NHsF1<!:BI8!J(B#inDim()$B<!85!K$^$?$OF1<!:BI8!J(B#inDim()+1$B<!85!K(B
+  \return	$B<M1FJQ49$5$l$?E@$NF1<!:BI8!J(B#outDim()+1$B<!85!K(B
 */
 template <class S, class B> inline Vector<double>
 ProjectiveMapping::mapP(const Vector<S, B>& x) const
@@ -244,11 +244,11 @@ ProjectiveMapping::mapP(const Vector<S, B>& x) const
 	return _T * x;
 }
 
-//! —^‚¦‚ç‚ê‚½“_‚É‚¨‚¯‚éJacobian‚ğ•Ô‚·D
+//! $BM?$($i$l$?E@$K$*$1$k(BJacobian$B$rJV$9!%(B
 /*!
-  Jacobian‚Æ‚ÍË‰e•ÏŠ·s—ñ¬•ª‚ÉŠÖ‚·‚é1ŠK”÷•ª‚Ì‚±‚Æ‚Å‚ ‚éD
-  \param x	“_‚Ì”ñ“¯ŸÀ•Wi#inDim()ŸŒ³j‚Ü‚½‚Í“¯ŸÀ•Wi#inDim()+1ŸŒ³j
-  \return	Jacobiani#outDim() x (#outDim()+1)x(#inDim()+1)s—ñj
+  Jacobian$B$H$O<M1FJQ499TNs@.J,$K4X$9$k(B1$B3,HyJ,$N$3$H$G$"$k!%(B
+  \param x	$BE@$NHsF1<!:BI8!J(B#inDim()$B<!85!K$^$?$OF1<!:BI8!J(B#inDim()+1$B<!85!K(B
+  \return	Jacobian$B!J(B#outDim() x (#outDim()+1)x(#inDim()+1)$B9TNs!K(B
 */
 template <class S, class B> Matrix<double>
 ProjectiveMapping::jacobian(const Vector<S, B>& x) const
@@ -270,11 +270,11 @@ ProjectiveMapping::jacobian(const Vector<S, B>& x) const
     return J;
 }
     
-//! “ü—Í“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚½“_‚Æo—Í“_‚Ì‹——£‚Ì2æ‚ğ•Ô‚·D
+//! $BF~NOE@$K<M1FJQ49$rE,MQ$7$?E@$H=PNOE@$N5wN%$N(B2$B>h$rJV$9!%(B
 /*!
-  \param pair	“ü—Í“_‚Ì”ñ“¯ŸÀ•Wi#inDim()ŸŒ³j‚Æo—Í“_‚Ì”ñ“¯ŸÀ•W
-		i#outDim()ŸŒ³j‚Ì‘Î
-  \return	•ÏŠ·‚³‚ê‚½“ü—Í“_‚Æo—Í“_‚Ì‹——£‚Ì2æ
+  \param pair	$BF~NOE@$NHsF1<!:BI8!J(B#inDim()$B<!85!K$H=PNOE@$NHsF1<!:BI8(B
+		$B!J(B#outDim()$B<!85!K$NBP(B
+  \return	$BJQ49$5$l$?F~NOE@$H=PNOE@$N5wN%$N(B2$B>h(B
 */
 template <class In, class Out> inline double
 ProjectiveMapping::sqdist(const std::pair<In, Out>& pair) const
@@ -282,11 +282,11 @@ ProjectiveMapping::sqdist(const std::pair<In, Out>& pair) const
     return (*this)(pair.first).sqdist(pair.second);
 }
     
-//! “ü—Í“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚½“_‚Æo—Í“_‚Ì‹——£‚ğ•Ô‚·D
+//! $BF~NOE@$K<M1FJQ49$rE,MQ$7$?E@$H=PNOE@$N5wN%$rJV$9!%(B
 /*!
-  \param pair	“ü—Í“_‚Ì”ñ“¯ŸÀ•Wi#inDim()ŸŒ³j‚Æo—Í“_‚Ì”ñ“¯ŸÀ•W
-		i#outDim()ŸŒ³j‚Ì‘Î
-  \return	•ÏŠ·‚³‚ê‚½“ü—Í“_‚Æo—Í“_‚Ì‹——£
+  \param pair	$BF~NOE@$NHsF1<!:BI8!J(B#inDim()$B<!85!K$H=PNOE@$NHsF1<!:BI8(B
+		$B!J(B#outDim()$B<!85!K$NBP(B
+  \return	$BJQ49$5$l$?F~NOE@$H=PNOE@$N5wN%(B
 */
 template <class In, class Out> inline double
 ProjectiveMapping::dist(const std::pair<In, Out>& pair) const
@@ -294,9 +294,9 @@ ProjectiveMapping::dist(const std::pair<In, Out>& pair) const
     return sqrt(sqdist(pair));
 }
 
-//! Ë‰e•ÏŠ·s—ñ‚Ìƒmƒ‹ƒ€‚Ì2æ‚ğ•Ô‚·D
+//! $B<M1FJQ499TNs$N%N%k%`$N(B2$B>h$rJV$9!%(B
 /*!
-  \return	Ë‰e•ÏŠ·s—ñ‚Ìƒmƒ‹ƒ€‚Ì2æ
+  \return	$B<M1FJQ499TNs$N%N%k%`$N(B2$B>h(B
 */
 inline double
 ProjectiveMapping::square() const
@@ -304,9 +304,9 @@ ProjectiveMapping::square() const
     return _T.square();
 }
 
-//! Ë‰e•ÏŠ·s—ñ‚ÌŠes‚ğ‡”Ô‚É•À‚×‚½ƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! $B<M1FJQ499TNs$N3F9T$r=gHV$KJB$Y$?%Y%/%H%k$rJV$9!%(B
 /*!
-  \return	#T()‚Ì¬•ª‚ğ•À‚×‚½ƒxƒNƒgƒ‹i(#outDim()+1)x(#inDim()+1)ŸŒ³j
+  \return	#T()$B$N@.J,$rJB$Y$?%Y%/%H%k!J(B(#outDim()+1)x(#inDim()+1)$B<!85!K(B
 */
 inline
 ProjectiveMapping::operator const Vector<double>() const
@@ -314,9 +314,9 @@ ProjectiveMapping::operator const Vector<double>() const
     return Vector<double>(const_cast<Matrix<double>&>(_T));
 }
 
-//! ‚±‚ÌË‰e•ÏŠ·‚Ì©—R“x‚ğ•Ô‚·D
+//! $B$3$N<M1FJQ49$N<+M3EY$rJV$9!%(B
 /*!
-  \return	Ë‰e•ÏŠ·‚Ì©—R“xi(#outDim()+1)x(#inDim()+1)-1j
+  \return	$B<M1FJQ49$N<+M3EY!J(B(#outDim()+1)x(#inDim()+1)-1$B!K(B
 */
 inline u_int
 ProjectiveMapping::dof() const
@@ -324,9 +324,9 @@ ProjectiveMapping::dof() const
     return (outDim() + 1)*(inDim() + 1)-1;
 }
 
-//! Ë‰e•ÏŠ·s—ñ‚ğ—^‚¦‚ç‚ê‚½—Ê‚¾‚¯C³‚·‚éD
+//! $B<M1FJQ499TNs$rM?$($i$l$?NL$@$1=$@5$9$k!%(B
 /*!
-  \param dt	C³—Ê‚ğ•\‚·ƒxƒNƒgƒ‹i(#outDim()+1)x(#inDim()+1)ŸŒ³j
+  \param dt	$B=$@5NL$rI=$9%Y%/%H%k!J(B(#outDim()+1)x(#inDim()+1)$B<!85!K(B
 */
 inline void
 ProjectiveMapping::update(const Vector<double>& dt)
@@ -381,22 +381,22 @@ ProjectiveMapping::Cost<AT, Iterator>::update(AT& map, const Vector<double>& dm)
 /************************************************************************
 *  class AffineMapping							*
 ************************************************************************/
-//! ƒAƒtƒBƒ“•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+//! $B%"%U%#%sJQ49$r9T$&%/%i%9(B
 /*!
-  \f$\TUvec{A}{} \in \TUspace{R}{n\times m}\f$‚Æ
-  \f$\TUvec{b}{} \in \TUspace{R}{n}\f$‚ğ—p‚¢‚ÄmŸŒ³‹óŠÔ‚Ì“_
-  \f$\TUvec{x}{} \in \TUspace{R}{m}\f$‚ğnŸŒ³‹óŠÔ‚Ì“_
+  \f$\TUvec{A}{} \in \TUspace{R}{n\times m}\f$$B$H(B
+  \f$\TUvec{b}{} \in \TUspace{R}{n}\f$$B$rMQ$$$F(Bm$B<!856u4V$NE@(B
+  \f$\TUvec{x}{} \in \TUspace{R}{m}\f$$B$r(Bn$B<!856u4V$NE@(B
   \f$\TUvec{y}{} \simeq \TUvec{A}{}\TUvec{x}{} + \TUvec{b}{}
-  \in \TUspace{R}{n}\f$‚ÉÊ‚·i\f$m \neq n\f$‚Å‚à\‚í‚È‚¢jD
+  \in \TUspace{R}{n}\f$$B$K<L$9!J(B\f$m \neq n\f$$B$G$b9=$o$J$$!K!%(B
 */
 class AffineMapping : public ProjectiveMapping
 {
   public:
-  //! “ü—Í‹óŠÔ‚Æo—Í‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚ÄƒAƒtƒBƒ“•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+  //! $BF~NO6u4V$H=PNO6u4V$N<!85$r;XDj$7$F%"%U%#%sJQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
   /*!
-    P“™•ÏŠ·‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
-    \param inDim	“ü—Í‹óŠÔ‚ÌŸŒ³
-    \param outDim	o—Í‹óŠÔ‚ÌŸŒ³
+    $B91EyJQ49$H$7$F=i4|2=$5$l$k!%(B
+    \param inDim	$BF~NO6u4V$N<!85(B
+    \param outDim	$B=PNO6u4V$N<!85(B
   */
     AffineMapping(u_int inDim=2, u_int outDim=2)
 	:ProjectiveMapping(inDim, outDim)				{}
@@ -409,9 +409,9 @@ class AffineMapping : public ProjectiveMapping
     void	fit(Iterator first, Iterator last)		;
     u_int	ndataMin()					const	;
     
-  //! ‚±‚ÌƒAƒtƒBƒ“•ÏŠ·‚Ì•ÏŒ`•”•ª‚ğ•\Œ»‚·‚és—ñ‚ğ•Ô‚·D
+  //! $B$3$N%"%U%#%sJQ49$NJQ7AItJ,$rI=8=$9$k9TNs$rJV$9!%(B
   /*! 
-    \return	#outDim() x #inDim()s—ñ
+    \return	#outDim() x #inDim()$B9TNs(B
   */
     const Matrix<double>
 			A()	const	{return _T(0, 0, outDim(), inDim());}
@@ -419,10 +419,10 @@ class AffineMapping : public ProjectiveMapping
     Vector<double>	b()	const	;
 };
 
-//! •ÏŠ·s—ñ‚ğw’è‚µ‚ÄƒAƒtƒBƒ“•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! $BJQ499TNs$r;XDj$7$F%"%U%#%sJQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
 /*!
-  •ÏŠ·s—ñ‚Ì‰º’[s‚Í‹­§“I‚É 0,0,...,0,1 ‚Éİ’è‚³‚ê‚éD
-  \param T			(m+1)x(n+1)s—ñim, n‚Í“ü—Í^o—Í‹óŠÔ‚ÌŸŒ³j
+  $BJQ499TNs$N2<C<9T$O6/@)E*$K(B 0,0,...,0,1 $B$K@_Dj$5$l$k!%(B
+  \param T			(m+1)x(n+1)$B9TNs!J(Bm, n$B$OF~NO!?=PNO6u4V$N<!85!K(B
 */
 inline
 AffineMapping::AffineMapping(const Matrix<double>& T)
@@ -432,11 +432,11 @@ AffineMapping::AffineMapping(const Matrix<double>& T)
     _T[outDim()][inDim()] = 1.0;
 }
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çƒAƒtƒBƒ“•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! $BM?$($i$l$?E@BPNs$NHsF1<!:BI8$+$i%"%U%#%sJQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
 /*!
-  \param first			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param last			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª#ndataMin()‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param first			$BE@BPNs$N@hF,$r<($9H?I|;R(B
+  \param last			$BE@BPNs$NKvHx$r<($9H?I|;R(B
+  \throw std::invalid_argument	$BE@BP$N?t$,(B#ndataMin()$B$KK~$?$J$$>l9g$KAw=P(B
 */
 template <class Iterator> inline
 AffineMapping::AffineMapping(Iterator first, Iterator last)
@@ -444,24 +444,24 @@ AffineMapping::AffineMapping(Iterator first, Iterator last)
     fit(first, last);
 }
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çƒAƒtƒBƒ“•ÏŠ·‚ğŒvZ‚·‚éD
+//! $BM?$($i$l$?E@BPNs$NHsF1<!:BI8$+$i%"%U%#%sJQ49$r7W;;$9$k!%(B
 /*!
-  \param first			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param last			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª#ndataMin()‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param first			$BE@BPNs$N@hF,$r<($9H?I|;R(B
+  \param last			$BE@BPNs$NKvHx$r<($9H?I|;R(B
+  \throw std::invalid_argument	$BE@BP$N?t$,(B#ndataMin()$B$KK~$?$J$$>l9g$KAw=P(B
 */
 template <class Iterator> void
 AffineMapping::fit(Iterator first, Iterator last)
 {
-  // [•ª‚ÈŒÂ”‚Ì“_‘Î‚ª‚ ‚é‚©H
+  // $B=<J,$J8D?t$NE@BP$,$"$k$+!)(B
     const u_int		ndata = std::distance(first, last);
-    if (ndata == 0)		// first‚ª—LŒø‚©H
+    if (ndata == 0)		// first$B$,M-8z$+!)(B
 	throw std::invalid_argument("AffineMapping::fit(): 0-length input data!!");
     const u_int		xdim = first->first.dim();
-    if (ndata < xdim + 1)	// _T‚ÌƒTƒCƒY‚ª–¢’è‚È‚Ì‚ÅndataMin()‚Í–³Œø
+    if (ndata < xdim + 1)	// _T$B$N%5%$%:$,L$Dj$J$N$G(BndataMin()$B$OL58z(B
 	throw std::invalid_argument("AffineMapping::fit(): not enough input data!!");
 
-  // ƒf[ƒ^s—ñ‚ÌŒvZ
+  // $B%G!<%?9TNs$N7W;;(B
     const u_int		ydim = first->second.dim(), xydim2 = xdim*ydim;
     Matrix<double>	M(xdim, xdim);
     Vector<double>	c(xdim), v(xydim2 + ydim);
@@ -485,10 +485,10 @@ AffineMapping::fit(Iterator first, Iterator last)
     }
     W.symmetrize();
 
-  // W*u = v‚ğ‰ğ‚¢‚Ä•ÏŠ·ƒpƒ‰ƒ[ƒ^‚ğ‹‚ß‚éD
+  // W*u = v$B$r2r$$$FJQ49%Q%i%a!<%?$r5a$a$k!%(B
     v.solve(W);
 
-  // •ÏŠ·s—ñ‚ğƒZƒbƒg‚·‚éD
+  // $BJQ499TNs$r%;%C%H$9$k!%(B
     _T.resize(ydim + 1, xdim + 1);
     _T(0, 0, ydim, xdim) = Matrix<double>((double*)v, ydim, xdim);
     for (int j = 0; j < ydim; ++j)
@@ -496,10 +496,10 @@ AffineMapping::fit(Iterator first, Iterator last)
     _T[ydim][xdim] = 1.0;
 }
 
-//! ƒAƒtƒBƒ“•ÏŠ·‚ğ‹‚ß‚é‚½‚ß‚É•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚ğ•Ô‚·D
+//! $B%"%U%#%sJQ49$r5a$a$k$?$a$KI,MW$JE@BP$N:G>.8D?t$rJV$9!%(B
 /*!
-  Œ»İİ’è‚³‚ê‚Ä‚¢‚é“üo—Í‹óŠÔ‚ÌŸŒ³‚ğ‚à‚Æ‚ÉŒvZ‚³‚ê‚éD
-  \return	•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚·‚È‚í‚¿“ü—Í‹óŠÔ‚ÌŸŒ³m‚É‘Î‚µ‚Ä m + 1
+  $B8=:_@_Dj$5$l$F$$$kF~=PNO6u4V$N<!85$r$b$H$K7W;;$5$l$k!%(B
+  \return	$BI,MW$JE@BP$N:G>.8D?t$9$J$o$AF~NO6u4V$N<!85(Bm$B$KBP$7$F(B m + 1
 */
 inline u_int
 AffineMapping::ndataMin() const
