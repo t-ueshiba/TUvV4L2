@@ -1,17 +1,17 @@
 /*
- *  •½¬9-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
  *  
- *  ‘nìÒFAÅr•v
+ *  $BAO:n<T!'?"<G=SIW(B
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D‘nìÒ‚É‚æ
- *  ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é“™‚Ì’˜
- *  ìŒ ‚ğNŠQ‚·‚ésˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
+ *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
+ *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
+ *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
+ *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
  *
- *  Copyright 1997-2007.
+ *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
  *
  *  Creator: Toshio UESHIBA
@@ -19,13 +19,13 @@
  *  [AIST Confidential and all rights reserved.]
  *  This program is confidential. Any using, copying, changing or
  *  giving any information concerning with this program to others
- *  without permission by the creator are strictly prohibited.
+ *  without permission by the copyright holder are strictly prohibited.
  *
  *  [No Warranty.]
- *  The copyright holders or the creator are not responsible for any
- *  damages in the use of this program.
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
  *  
- *  $Id: Camera.h,v 1.1 2008-09-08 08:06:12 ueshiba Exp $
+ *  $Id: Camera.h,v 1.2 2008-09-10 05:10:32 ueshiba Exp $
  */
 #ifndef __TUCamera_h
 #define __TUCamera_h
@@ -37,11 +37,11 @@ namespace TU
 /************************************************************************
 *  class CameraBase							*
 ************************************************************************/
-//! ‚·‚×‚Ä‚Ì“§‹“Š‰eƒJƒƒ‰‚ÌŠî’ê‚Æ‚È‚éƒNƒ‰ƒX
+//! $B$9$Y$F$NF);kEj1F%+%a%i$N4pDl$H$J$k%/%i%9(B
 class CameraBase
 {
   public:
-  //! ƒJƒƒ‰‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğ•\‚·ƒNƒ‰ƒX
+  //! $B%+%a%i$NFbIt%Q%i%a!<%?$rI=$9%/%i%9(B
     class Intrinsic
     {
       public:
@@ -84,12 +84,12 @@ class CameraBase
     };
     
   public:
-  //! ˆÊ’u‚ğŒ´“_‚ÉCp¨‚ğ’PˆÊs—ñ‚ÉƒZƒbƒg‚µ‚Ä‰Šú‰»
+  //! $B0LCV$r86E@$K!$;Q@*$rC10L9TNs$K%;%C%H$7$F=i4|2=(B
     CameraBase() :_t(), _Rt()	{_Rt[0][0] = _Rt[1][1] = _Rt[2][2] = 1.0;}
-  //! ˆÊ’u‚Æp¨‚ğ’PˆÊs—ñ‚ÉƒZƒbƒg‚µ‚Ä‰Šú‰»
+  //! $B0LCV$H;Q@*$rC10L9TNs$K%;%C%H$7$F=i4|2=(B
   /*!
-    \param t	ƒJƒƒ‰ˆÊ’u‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹D
-    \param Rt	ƒJƒƒ‰p¨‚ğ•\‚·3x3‰ñ“]s—ñD
+    \param t	$B%+%a%i0LCV$rI=$9(B3$B<!85%Y%/%H%k!%(B
+    \param Rt	$B%+%a%i;Q@*$rI=$9(B3x3$B2sE>9TNs!%(B
   */
     CameraBase(const Point3d& t, const Matrix33d& Rt)	:_t(t), _Rt(Rt)	{}
     virtual ~CameraBase()						;
@@ -155,9 +155,9 @@ class CameraBase
     Matrix33d		_Rt;			// camera orientation.
 };
 
-//! 3ŸŒ³‹óŠÔ’†‚Ì“_‚Ì‘œ‚ÌcanonicalƒJƒƒ‰À•WŒn‚É‚¨‚¯‚éˆÊ’u‚ğ‹‚ß‚é
+//! 3$B<!856u4VCf$NE@$NA|$N(Bcanonical$B%+%a%i:BI87O$K$*$1$k0LCV$r5a$a$k(B
 /*!
-  ‘œ‚ÍˆÈ‰º‚Ì‚æ‚¤‚ÉŒvZ‚³‚ê‚éD
+  $BA|$O0J2<$N$h$&$K7W;;$5$l$k!%(B
   \f[
     \TUbeginarray{c} x_c \\ y_c \TUendarray = 
     \frac{1}{\TUtvec{r}{z}(\TUvec{x}{} - \TUvec{t}{})}
@@ -166,8 +166,8 @@ class CameraBase
       \TUtvec{r}{y}(\TUvec{x}{} - \TUvec{t}{})
     \TUendarray
   \f]
-  \param x	3ŸŒ³‹óŠÔ’†‚Ì“_‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹D
-  \return	x‚Ì‘œ‚ÌcanonicalƒJƒƒ‰À•WŒn‚É‚¨‚¯‚éˆÊ’uD
+  \param x	3$B<!856u4VCf$NE@$rI=$9(B3$B<!85%Y%/%H%k!%(B
+  \return	x$B$NA|$N(Bcanonical$B%+%a%i:BI87O$K$*$1$k0LCV!%(B
 */
 inline Point2d
 CameraBase::xc(const Point3d& x) const
@@ -176,10 +176,10 @@ CameraBase::xc(const Point3d& x) const
     return Point2d(xx[0] / xx[2], xx[1] / xx[2]);
 }
 
-//! ‰æ‘œÀ•W‚É‚¨‚¯‚é“_‚Ì2ŸŒ³ˆÊ’u‚ğcanonicalƒJƒƒ‰À•WŒn‚É’¼‚·
+//! $B2hA|:BI8$K$*$1$kE@$N(B2$B<!850LCV$r(Bcanonical$B%+%a%i:BI87O$KD>$9(B
 /*!
-  \param u	‰æ‘œÀ•WŒn‚É‚¨‚¯‚é“_‚Ì2ŸŒ³ˆÊ’uD
-  \return	canonicalƒJƒƒ‰À•WŒn‚É‚¨‚¯‚éu‚Ì2ŸŒ³ˆÊ’uD
+  \param u	$B2hA|:BI87O$K$*$1$kE@$N(B2$B<!850LCV!%(B
+  \return	canonical$B%+%a%i:BI87O$K$*$1$k(Bu$B$N(B2$B<!850LCV!%(B
 */
 inline Point2d
 CameraBase::xcFromU(const Point2d& u) const
@@ -187,10 +187,10 @@ CameraBase::xcFromU(const Point2d& u) const
     return intrinsic().xcFromU(u);
 }
 
-//! 3ŸŒ³‹óŠÔ’†‚Ì“_‚Ì‘œ‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’u‚ğ‹‚ß‚é
+//! 3$B<!856u4VCf$NE@$NA|$N2hA|:BI87O$K$*$1$k0LCV$r5a$a$k(B
 /*!
-  \param x	3ŸŒ³‹óŠÔ’†‚Ì“_‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹D
-  \return	x‚Ì‘œ‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’uD
+  \param x	3$B<!856u4VCf$NE@$rI=$9(B3$B<!85%Y%/%H%k!%(B
+  \return	x$B$NA|$N2hA|:BI87O$K$*$1$k0LCV!%(B
 */
 inline Point2d
 CameraBase::operator ()(const Point3d& x) const
@@ -198,9 +198,9 @@ CameraBase::operator ()(const Point3d& x) const
     return intrinsic()(xc(x));
 }
 
-//! 3ŸŒ³ƒ†[ƒNƒŠƒbƒh‹óŠÔ‚©‚ç‰æ‘œ•½–Ê‚Ö‚Ì“Š‰es—ñ‚ğ‹‚ß‚é
+//! 3$B<!85%f!<%/%j%C%I6u4V$+$i2hA|J?LL$X$NEj1F9TNs$r5a$a$k(B
 /*!
-  \return	“Š‰es—ñD
+  \return	$BEj1F9TNs!%(B
 */
 inline Matrix34d
 CameraBase::P() const
@@ -208,7 +208,7 @@ CameraBase::P() const
     return K() * Pc();
 }
 
-//! ˆÊ’u‚ğŒÅ’è‚µ‚½‚Æ‚«‚Ì“à•”/ŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚éJacobian‚ğ‹‚ß‚é
+//! $B0LCV$r8GDj$7$?$H$-$NFbIt(B/$B30It%Q%i%a!<%?$K4X$9$k(BJacobian$B$r5a$a$k(B
 /*!
   \return	
 */

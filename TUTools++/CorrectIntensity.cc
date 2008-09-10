@@ -1,17 +1,17 @@
 /*
- *  •½¬9-19”Ni“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
  *  
- *  ‘nìŽÒFAŽÅr•v
+ *  $BAO:n<T!'?"<G=SIW(B
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAŽÅr•v‚ª‘nì‚µC
- *  i“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ðŠ—L‚·‚é”é–§î•ñ‚Å‚·D‘nìŽÒ‚É‚æ
- *  ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ðŽg—pC•¡»C‰ü•ÏC‘æŽOŽÒ‚ÖŠJŽ¦‚·‚é“™‚Ì’˜
- *  ìŒ ‚ðNŠQ‚·‚ésˆ×‚ð‹ÖŽ~‚µ‚Ü‚·D
+ *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
+ *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
+ *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
+ *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LŽÒ‚¨
- *  ‚æ‚Ñ‘nìŽÒ‚ÍÓ”C‚ð•‰‚¢‚Ü‚¹‚ñB
+ *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
+ *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
  *
- *  Copyright 1997-2007.
+ *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
  *
  *  Creator: Toshio UESHIBA
@@ -19,13 +19,13 @@
  *  [AIST Confidential and all rights reserved.]
  *  This program is confidential. Any using, copying, changing or
  *  giving any information concerning with this program to others
- *  without permission by the creator are strictly prohibited.
+ *  without permission by the copyright holder are strictly prohibited.
  *
  *  [No Warranty.]
- *  The copyright holders or the creator are not responsible for any
- *  damages in the use of this program.
- *
- *  $Id: CorrectIntensity.cc,v 1.2 2008-08-07 07:26:46 ueshiba Exp $
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
+ *  
+ *  $Id: CorrectIntensity.cc,v 1.3 2008-09-10 05:10:34 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"

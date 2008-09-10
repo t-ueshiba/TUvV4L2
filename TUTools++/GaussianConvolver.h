@@ -1,17 +1,17 @@
 /*
- *  Ê¿À®9-19Ç¯¡ÊÆÈ¡Ë»º¶Èµ»½ÑÁí¹ç¸¦µæ½ê Ãøºî¸¢½êÍ­
+ *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
  *  
- *  ÁÏºî¼Ô¡§¿¢¼Ç½ÓÉ×
+ *  $BAO:n<T!'?"<G=SIW(B
  *
- *  ËÜ¥×¥í¥°¥é¥à¤Ï¡ÊÆÈ¡Ë»º¶Èµ»½ÑÁí¹ç¸¦µæ½ê¤Î¿¦°÷¤Ç¤¢¤ë¿¢¼Ç½ÓÉ×¤¬ÁÏºî¤·¡¤
- *  ¡ÊÆÈ¡Ë»º¶Èµ»½ÑÁí¹ç¸¦µæ½ê¤¬Ãøºî¸¢¤ò½êÍ­¤¹¤ëÈëÌ©¾ğÊó¤Ç¤¹¡¥ÁÏºî¼Ô¤Ë¤è
- *  ¤ëµö²Ä¤Ê¤·¤ËËÜ¥×¥í¥°¥é¥à¤ò»ÈÍÑ¡¤Ê£À½¡¤²şÊÑ¡¤Âè»°¼Ô¤Ø³«¼¨¤¹¤ëÅù¤ÎÃø
- *  ºî¸¢¤ò¿¯³²¤¹¤ë¹Ô°Ù¤ò¶Ø»ß¤·¤Ş¤¹¡¥
+ *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
+ *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
+ *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
+ *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
  *  
- *  ¤³¤Î¥×¥í¥°¥é¥à¤Ë¤è¤Ã¤ÆÀ¸¤¸¤ë¤¤¤«¤Ê¤ëÂ»³²¤ËÂĞ¤·¤Æ¤â¡¤Ãøºî¸¢½êÍ­¼Ô¤ª
- *  ¤è¤ÓÁÏºî¼Ô¤ÏÀÕÇ¤¤òÉé¤¤¤Ş¤»¤ó¡£
+ *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
+ *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
  *
- *  Copyright 1997-2007.
+ *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
  *
  *  Creator: Toshio UESHIBA
@@ -19,13 +19,13 @@
  *  [AIST Confidential and all rights reserved.]
  *  This program is confidential. Any using, copying, changing or
  *  giving any information concerning with this program to others
- *  without permission by the creator are strictly prohibited.
+ *  without permission by the copyright holder are strictly prohibited.
  *
  *  [No Warranty.]
- *  The copyright holders or the creator are not responsible for any
- *  damages in the use of this program.
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.6 2008-09-08 08:06:14 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.7 2008-09-10 05:10:36 ueshiba Exp $
  */
 #ifndef	__TUGaussianConvolver_h
 #define	__TUGaussianConvolver_h
@@ -100,7 +100,7 @@ class GaussianCoefficients
 /************************************************************************
 *  class GaussianConvoler						*
 ************************************************************************/
-//! Gauss³Ë¤Ë¤è¤ë1¼¡¸µÇÛÎó¾ö¤ß¹ş¤ß¤ò¹Ô¤¦¥¯¥é¥¹
+//! Gauss$B3K$K$h$k(B1$B<!85G[Ns>v$_9~$_$r9T$&%/%i%9(B
 class GaussianConvolver
     : public GaussianCoefficients, private BilateralIIRFilter<4u>
 {
@@ -117,11 +117,11 @@ class GaussianConvolver
 	diff2(const Array<T1, B1>& in, Array<T2, B2>& out)		;
 };
 
-//! Gauss³Ë¤Ë¤è¤ë¥¹¥à¡¼¥·¥ó¥°
+//! Gauss$B3K$K$h$k%9%`!<%7%s%0(B
 /*!
-  \param in	ÆşÎÏ1¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ1¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B1$B<!85G[Ns(B
+  \param out	$B=PNO(B1$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class T1, class B1, class T2, class B2>
 inline GaussianConvolver&
@@ -132,11 +132,11 @@ GaussianConvolver::smooth(const Array<T1, B1>& in, Array<T2, B2>& out)
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë1³¬ÈùÊ¬
+//! Gauss$B3K$K$h$k(B1$B3,HyJ,(B
 /*!
-  \param in	ÆşÎÏ1¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ1¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B1$B<!85G[Ns(B
+  \param out	$B=PNO(B1$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class T1, class B1, class T2, class B2>
 inline GaussianConvolver&
@@ -147,11 +147,11 @@ GaussianConvolver::diff(const Array<T1, B1>& in, Array<T2, B2>& out)
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë2³¬ÈùÊ¬
+//! Gauss$B3K$K$h$k(B2$B3,HyJ,(B
 /*!
-  \param in	ÆşÎÏ1¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ1¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B1$B<!85G[Ns(B
+  \param out	$B=PNO(B1$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class T1, class B1, class T2, class B2>
 inline GaussianConvolver&
@@ -165,7 +165,7 @@ GaussianConvolver::diff2(const Array<T1, B1>& in, Array<T2, B2>& out)
 /************************************************************************
 *  class GaussianConvoler2<BIIRH, BIIRV>				*
 ************************************************************************/
-//! Gauss³Ë¤Ë¤è¤ë2¼¡¸µÇÛÎó¾ö¤ß¹ş¤ß¤ò¹Ô¤¦¥¯¥é¥¹
+//! Gauss$B3K$K$h$k(B2$B<!85G[Ns>v$_9~$_$r9T$&%/%i%9(B
 template <class BIIRH=BilateralIIRFilter<4u>, class BIIRV=BIIRH>
 class GaussianConvolver2
     : public GaussianCoefficients, private BilateralIIRFilter2<BIIRH, BIIRV>
@@ -204,11 +204,11 @@ class GaussianConvolver2
     Array2<Array<float> >	_tmp;	// buffer for computing Laplacian
 };
 
-//! Gauss³Ë¤Ë¤è¤ë¥¹¥à¡¼¥·¥ó¥°
+//! Gauss$B3K$K$h$k%9%`!<%7%s%0(B
 /*!
-  \param in	ÆşÎÏ2¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ2¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B2$B<!85G[Ns(B
+  \param out	$B=PNO(B2$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
@@ -222,11 +222,11 @@ GaussianConvolver2<BIIRH, BIIRV>::smooth(const Array2<T1, B1, R1>& in,
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë²£Êı¸ş1³¬ÈùÊ¬(DOG)
+//! Gauss$B3K$K$h$k2#J}8~(B1$B3,HyJ,(B(DOG)
 /*!
-  \param in	ÆşÎÏ2¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ2¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B2$B<!85G[Ns(B
+  \param out	$B=PNO(B2$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
@@ -240,11 +240,11 @@ GaussianConvolver2<BIIRH, BIIRV>::diffH(const Array2<T1, B1, R1>& in,
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë½ÄÊı¸ş1³¬ÈùÊ¬(DOG)
+//! Gauss$B3K$K$h$k=DJ}8~(B1$B3,HyJ,(B(DOG)
 /*!
-  \param in	ÆşÎÏ2¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ2¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B2$B<!85G[Ns(B
+  \param out	$B=PNO(B2$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
@@ -258,11 +258,11 @@ GaussianConvolver2<BIIRH, BIIRV>::diffV(const Array2<T1, B1, R1>& in,
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë²£Êı¸ş2³¬ÈùÊ¬
+//! Gauss$B3K$K$h$k2#J}8~(B2$B3,HyJ,(B
 /*!
-  \param in	ÆşÎÏ2¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ2¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B2$B<!85G[Ns(B
+  \param out	$B=PNO(B2$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
@@ -276,11 +276,11 @@ GaussianConvolver2<BIIRH, BIIRV>::diffHH(const Array2<T1, B1, R1>& in,
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë½Ä²£Î¾Êı¸ş2³¬ÈùÊ¬
+//! Gauss$B3K$K$h$k=D2#N>J}8~(B2$B3,HyJ,(B
 /*!
-  \param in	ÆşÎÏ2¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ2¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B2$B<!85G[Ns(B
+  \param out	$B=PNO(B2$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
@@ -294,11 +294,11 @@ GaussianConvolver2<BIIRH, BIIRV>::diffHV(const Array2<T1, B1, R1>& in,
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë½ÄÊı¸ş2³¬ÈùÊ¬
+//! Gauss$B3K$K$h$k=DJ}8~(B2$B3,HyJ,(B
 /*!
-  \param in	ÆşÎÏ2¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ2¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B2$B<!85G[Ns(B
+  \param out	$B=PNO(B2$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
@@ -312,11 +312,11 @@ GaussianConvolver2<BIIRH, BIIRV>::diffVV(const Array2<T1, B1, R1>& in,
     return *this;
 }
 
-//! Gauss³Ë¤Ë¤è¤ë¥é¥×¥é¥·¥¢¥ó(LOG)
+//! Gauss$B3K$K$h$k%i%W%i%7%"%s(B(LOG)
 /*!
-  \param in	ÆşÎÏ2¼¡¸µÇÛÎó
-  \param out	½ĞÎÏ2¼¡¸µÇÛÎó
-  \return	¤³¤ÎGauss³Ë¼«¿È
+  \param in	$BF~NO(B2$B<!85G[Ns(B
+  \param out	$B=PNO(B2$B<!85G[Ns(B
+  \return	$B$3$N(BGauss$B3K<+?H(B
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
