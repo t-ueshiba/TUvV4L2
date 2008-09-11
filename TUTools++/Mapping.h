@@ -25,12 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mapping.h,v 1.2 2008-09-10 05:10:41 ueshiba Exp $
+ *  $Id: Mapping.h,v 1.3 2008-09-11 00:14:16 ueshiba Exp $
  */
 #ifndef __TUMapping_h
 #define __TUMapping_h
 
 #include "TU/utility.h"
+#include "TU/Normalize.h"
 #include "TU/Minimize.h"
 
 namespace TU
@@ -91,7 +92,7 @@ class ProjectiveMapping
     template <class S, class B>
     Vector<double>	mapP(const Vector<S, B>& x)		const	;
     template <class S, class B>
-    Matrix<double>	jacobian(const Vector<S, B>& x)	const	;
+    Matrix<double>	jacobian(const Vector<S, B>& x)		const	;
 
     template <class In, class Out>
     double		sqdist(const std::pair<In, Out>& pair)	const	;

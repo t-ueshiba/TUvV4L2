@@ -25,13 +25,18 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ConversionFromYUV.cc,v 1.7 2008-09-10 05:10:34 ueshiba Exp $
+ *  $Id: ConversionFromYUV.cc,v 1.8 2008-09-11 00:14:14 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
 namespace TU
 {
 static inline int	flt2fix(float flt)	{return int(flt * (1 << 10));}
+
+/************************************************************************
+*  global variables							*
+************************************************************************/
+const ConversionFromYUV	conversionFromYUV;
 
 /************************************************************************
 *  class ConversionFromYUV						*
