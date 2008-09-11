@@ -25,9 +25,9 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Normalize.cc,v 1.5 2008-09-10 05:10:42 ueshiba Exp $
+ *  $Id: Normalize.cc,v 1.6 2008-09-11 00:14:16 ueshiba Exp $
  */
-#include "TU/Geometry++.h"
+#include "TU/Normalize.h"
 
 namespace TU
 {

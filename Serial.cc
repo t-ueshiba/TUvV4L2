@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.cc,v 1.14 2008-09-10 05:10:46 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.15 2008-09-11 00:14:16 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
@@ -332,6 +332,13 @@ csize(int cs)
 {
     return OManip1<Serial, int>(&Serial::c_csize, cs);
 }
- 
+
+IOManip<Serial>	nl2cr	  (&Serial::i_nl2cr, &Serial::o_nl2crnl);
+#ifndef __APPLE__
+IOManip<Serial>	cr2nl	  (&Serial::i_cr2nl, &Serial::o_cr2nl);
+IOManip<Serial>	upperlower(&Serial::i_upper2lower, &Serial::o_lower2upper);
+#endif
+IOManip<Serial>	through	  (&Serial::i_through, &Serial::o_through);
+
 }
 
