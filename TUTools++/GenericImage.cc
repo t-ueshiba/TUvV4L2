@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GenericImage.cc,v 1.2 2008-09-10 05:10:37 ueshiba Exp $
+ *  $Id: GenericImage.cc,v 1.3 2008-10-03 04:23:37 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
@@ -34,6 +34,11 @@ namespace TU
 /************************************************************************
 *  class GenericImage							*
 ************************************************************************/
+//! 入力ストリームから画像の画素データを読み込む．
+/*!
+  \param in	入力ストリーム
+  \return	inで指定した入力ストリーム
+*/
 std::istream&
 GenericImage::restoreData(std::istream& in)
 {
@@ -43,6 +48,11 @@ GenericImage::restoreData(std::istream& in)
     return in;
 }
 
+//! 出力ストリームに画像の画素データを書き出す．
+/*!
+  \param out	出力ストリーム
+  \return	outで指定した出力ストリーム
+*/
 std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.h,v 1.2 2008-09-10 05:10:32 ueshiba Exp $
+ *  $Id: Camera.h,v 1.3 2008-10-03 04:23:37 ueshiba Exp $
  */
 #ifndef __TUCamera_h
 #define __TUCamera_h
@@ -84,12 +84,13 @@ class CameraBase
     };
     
   public:
-  //! 位置を原点に，姿勢を単位行列にセットして初期化
+  //! 位置を原点に，姿勢を単位行列にセットして初期化する．
     CameraBase() :_t(), _Rt()	{_Rt[0][0] = _Rt[1][1] = _Rt[2][2] = 1.0;}
-  //! 位置と姿勢を単位行列にセットして初期化
+
+  //! 位置と姿勢をセットして初期化する．
   /*!
-    \param t	カメラ位置を表す3次元ベクトル．
-    \param Rt	カメラ姿勢を表す3x3回転行列．
+    \param t	カメラ位置を表す3次元ベクトル
+    \param Rt	カメラ姿勢を表す3x3回転行列
   */
     CameraBase(const Point3d& t, const Matrix33d& Rt)	:_t(t), _Rt(Rt)	{}
     virtual ~CameraBase()						;
@@ -109,6 +110,12 @@ class CameraBase
     Matrix23d		jacobianX(const Point3d& x)		const	;
     Matrix<double>	jacobianK(const Point3d& x)		const	;
     Matrix22d		jacobianXC(const Point3d& x)		const	;
+
+  //! 投影行列をセットする．
+  /*!
+    \param P	3x4投影行列
+    \return	このカメラ
+  */
     virtual CameraBase& setProjection(const Matrix34d& P)		=0;
 
   // parameter updating functions.
@@ -117,27 +124,99 @@ class CameraBase
     void		updateIntrinsic(const Vector<double>& dp)	;
     
   // calibration matrices.
+  //! 内部パラメータ行列を返す．
+  /*!
+    \return	3x3内部パラメータ行列
+  */
     Matrix33d		K()		const	{return intrinsic().K();}
+
+  //! 内部パラメータ行列の転置を返す．
+  /*!
+    \return	3x3内部パラメータ行列の転置
+  */
     Matrix33d		Kt()		const	{return intrinsic().Kt();}
+
+  //! 内部パラメータ行列の逆行列を返す．
+  /*!
+    \return	3x3内部パラメータ行列の逆行列
+  */
     Matrix33d		Kinv()		const	{return intrinsic().Kinv();}
+
+  //! 内部パラメータ行列の転置の逆行列を返す．
+  /*!
+    \return	3x3内部パラメータ行列の転置の逆行列
+  */
     Matrix33d		Ktinv()		const	{return intrinsic().Ktinv();}
 
   // extrinsic parameters.
+  //! カメラの位置を返す．
+  /*!
+    \return	カメラの3次元位置
+  */
     const Point3d&	t()		const	{return _t;}
+
+  //! カメラの姿勢を返す．
+  /*!
+    \return	カメラの姿勢を表す3x3回転行列
+  */
     const Matrix33d&	Rt()		const	{return _Rt;}
     CameraBase&		setTranslation(const Point3d& t)	;
     CameraBase&		setRotation(const Matrix33d& Rt)	;
 
   // intrinsic parameters.
+  //! 内部パラメータを返す．
+  /*!
+    \return	内部パラメータ
+  */
     virtual const Intrinsic&
 			intrinsic()	const	= 0;
+
+  //! 内部パラメータを返す．
+  /*!
+    \return	内部パラメータ
+  */
     virtual Intrinsic&	intrinsic()		= 0;
+
+  //! 内部パラメータの自由度を返す．
+  /*!
+    \return	内部パラメータの自由度
+  */
     u_int		dofIntrinsic()	const	{return intrinsic().dof();}
+
+  //! 焦点距離を返す．
+  /*!
+    \return	焦点距離
+  */
     double		k()		const	{return intrinsic().k();}
+
+  //! 画像主点を返す．
+  /*!
+    \return	画像主点
+  */
     Point2d		principal()	const	{return intrinsic().principal();}
+
+  //! アスペクト比を返す．
+  /*!
+    \return	アスペクト比
+  */
     double		aspect()	const	{return intrinsic().aspect();}
+
+  //! 非直交歪みを返す．
+  /*!
+    \return	非直交歪み
+  */
     double		skew()		const	{return intrinsic().skew();}
+
+  //! 放射歪曲の第1係数を返す．
+  /*!
+    \return	放射歪曲の第1係数
+  */
     double		d1()		const	{return intrinsic().d1();}
+
+  //! 放射歪曲の第2係数を返す．
+  /*!
+    \return	放射歪曲の第2係数
+  */
     double		d2()		const	{return intrinsic().d2();}
     CameraBase&		setFocalLength(double k)		;
     CameraBase&		setPrincipal(double u0, double v0)	;
@@ -155,19 +234,18 @@ class CameraBase
     Matrix33d		_Rt;			// camera orientation.
 };
 
-//! 3次元空間中の点の像のcanonicalカメラ座標系における位置を求める
+//! 3次元空間中の点の投影点のcanonical画像座標系における位置を求める．
 /*!
-  像は以下のように計算される．
-  \f[
-    \TUbeginarray{c} x_c \\ y_c \TUendarray = 
-    \frac{1}{\TUtvec{r}{z}(\TUvec{x}{} - \TUvec{t}{})}
-    \TUbeginarray{c}
-      \TUtvec{r}{x}(\TUvec{x}{} - \TUvec{t}{}) \\
-      \TUtvec{r}{y}(\TUvec{x}{} - \TUvec{t}{})
-    \TUendarray
-  \f]
-  \param x	3次元空間中の点を表す3次元ベクトル．
-  \return	xの像のcanonicalカメラ座標系における位置．
+  \param x	対象点の3次元位置
+  \return	canonical画像座標系におけるxの投影点の位置，すなわち
+		\f$
+		\TUbeginarray{c} x_c \\ y_c \TUendarray = 
+		\frac{1}{\TUtvec{r}{z}(\TUvec{x}{} - \TUvec{t}{})}
+		\TUbeginarray{c}
+		\TUtvec{r}{x}(\TUvec{x}{} - \TUvec{t}{}) \\
+		\TUtvec{r}{y}(\TUvec{x}{} - \TUvec{t}{})
+		\TUendarray
+		\f$
 */
 inline Point2d
 CameraBase::xc(const Point3d& x) const
@@ -176,10 +254,11 @@ CameraBase::xc(const Point3d& x) const
     return Point2d(xx[0] / xx[2], xx[1] / xx[2]);
 }
 
-//! 画像座標における点の2次元位置をcanonicalカメラ座標系に直す
+//! 画像座標における投影点の2次元位置をcanonical画像座標系に直す．
 /*!
-  \param u	画像座標系における点の2次元位置．
-  \return	canonicalカメラ座標系におけるuの2次元位置．
+  \param u	画像座標系における投影点の2次元位置
+  \return	canonical画像カメラ座標系におけるuの2次元位置，すなわち
+		\f$\TUvec{x}{c} = {\cal K}^{-1}(\TUvec{u}{})\f$
 */
 inline Point2d
 CameraBase::xcFromU(const Point2d& u) const
@@ -187,10 +266,11 @@ CameraBase::xcFromU(const Point2d& u) const
     return intrinsic().xcFromU(u);
 }
 
-//! 3次元空間中の点の像の画像座標系における位置を求める
+//! 3次元空間中の点の投影点の画像座標系における位置を求める．
 /*!
-  \param x	3次元空間中の点を表す3次元ベクトル．
-  \return	xの像の画像座標系における位置．
+  \param x	対象点の3次元位置
+  \return	xの投影点の画像座標系における位置，すなわち
+		\f$\TUvec{u}{} = {\cal K}(\TUvec{x}{c}(\TUvec{x}{}))\f$
 */
 inline Point2d
 CameraBase::operator ()(const Point3d& x) const
@@ -198,9 +278,13 @@ CameraBase::operator ()(const Point3d& x) const
     return intrinsic()(xc(x));
 }
 
-//! 3次元ユークリッド空間から画像平面への投影行列を求める
+//! 3次元ユークリッド空間から画像平面への投影行列を求める．
 /*!
-  \return	投影行列．
+  \return	画像平面への投影行列，すなわち
+  \f$
+    \TUvec{P}{} = \TUvec{K}{}\TUtvec{R}{}
+    \TUbeginarray{cc} \TUvec{I}{3\times 3} & -\TUvec{t}{} \TUendarray
+  \f$
 */
 inline Matrix34d
 CameraBase::P() const
@@ -208,9 +292,22 @@ CameraBase::P() const
     return K() * Pc();
 }
 
-//! 位置を固定したときの内部/外部パラメータに関するJacobianを求める
+//! カメラ位置以外の全カメラパラメータに関する投影点の画像座標の1階微分を求める．
 /*!
-  \return	
+  \param x	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x(3+#dofIntrinsic()) Jacobi行列，
+		すなわち
+		\f$
+		\TUbeginarray{ccc}
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{\theta}{}} &
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
+		\TUendarray =
+		\TUbeginarray{ccc}
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
+		\TUdisppartial{\TUvec{x}{c}}{\TUvec{\theta}{}} &
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
+		\TUendarray
+		\f$
 */
 inline Matrix<double>
 CameraBase::jacobianFCC(const Point3d& x) const
@@ -219,30 +316,78 @@ CameraBase::jacobianFCC(const Point3d& x) const
     return Matrix<double>(J, 0, 3, J.nrow(), J.ncol() - 3);
 }
 
+//! 点の3次元位置に関する投影点の画像座標の1階微分を求める．
+/*!
+  \param x	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x3 Jacobi行列，すなわち
+		\f$
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}} =
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
+		\TUdisppartial{\TUvec{x}{c}}{\TUvec{x}{}}
+		\f$
+*/
 inline Matrix23d
 CameraBase::jacobianX(const Point3d& x) const
 {
     return intrinsic().jacobianXC(xc(x)) * jacobianXc(x);
 }
 
+//! 内部パラメータに関する投影点の画像座標の1階微分を求める
+/*!
+  \param x	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x#dofIntrinsic() Jacobi行列，
+		すなわち
+		\f$
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
+		\f$
+*/
 inline Matrix<double>
 CameraBase::jacobianK(const Point3d& x) const
 {
     return intrinsic().jacobianK(xc(x));
 }
 
+//! canonical画像座標に関する投影点の画像座標の1階微分を求める
+/*!
+  \param x	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x2 Jacobi行列，すなわち
+		\f$
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
+		\f$
+*/
 inline Matrix22d
 CameraBase::jacobianXC(const Point3d& x) const
 {
     return intrinsic().jacobianXC(xc(x));
 }
 
+//! 内部パラメータを指定された量だけ更新する．
+/*!
+  \f$\Delta\TUvec{p}{} = \Delta\TUvec{\kappa}{}\f$に対して
+  \f$\TUvec{\kappa}{} \leftarrow \TUvec{\kappa}{} - \Delta\TUvec{\kappa}{}\f$
+  と更新する．
+  \param dp	更新量を表す#dofIntrinsic()次元ベクトル
+  \return	この内部パラメータ
+*/
 inline void
 CameraBase::updateIntrinsic(const Vector<double>& dp)
 {
     intrinsic().update(dp);			// update intrinsic parameters.
 }
 
+//! カメラの姿勢と内部パラメータを指定された量だけ更新する．
+/*!
+  \f$\Delta\TUvec{p}{} = [\Delta\TUtvec{\theta}{},
+  ~\Delta\TUtvec{\kappa}{}]^\top\f$に対して
+  \f{eqnarray*}
+  \TUtvec{R}{} & \leftarrow &
+  \TUtvec{R}{}\TUtvec{R}{}(\Delta\TUvec{\theta}{}) \\
+  \TUvec{\kappa}{} & \leftarrow & \TUvec{\kappa}{} - \Delta\TUvec{\kappa}{}
+  \f}
+  と更新する．カメラの位置は更新されない．
+  \param dp	更新量を表す3+#dofIntrinsic()次元ベクトル
+  \return	この内部パラメータ
+*/
 inline void
 CameraBase::updateFCC(const Vector<double>& dp)
 {
@@ -250,6 +395,20 @@ CameraBase::updateFCC(const Vector<double>& dp)
     updateIntrinsic(dp(3, dp.dim() - 3));	// update intrinsic parameters.
 }
 
+//! カメラの外部／内部パラメータを指定された量だけ更新する．
+/*!
+  \f$\Delta\TUvec{p}{} = [\Delta\TUtvec{t}{},~\Delta\TUtvec{\theta}{},
+  ~\Delta\TUtvec{\kappa}{}]^\top\f$に対して
+  \f{eqnarray*}
+  \TUvec{t}{} & \leftarrow & \TUvec{t}{} - \Delta\TUvec{t}{} \\
+  \TUtvec{R}{} & \leftarrow &
+  \TUtvec{R}{}\TUtvec{R}{}(\Delta\TUvec{\theta}{}) \\
+  \TUvec{\kappa}{} & \leftarrow & \TUvec{\kappa}{} - \Delta\TUvec{\kappa}{}
+  \f}
+  と更新する．
+  \param dp	更新量を表す6+#dofIntrinsic()次元ベクトル
+  \return	この内部パラメータ
+*/
 inline void
 CameraBase::update(const Vector<double>& dp)
 {
@@ -257,6 +416,11 @@ CameraBase::update(const Vector<double>& dp)
     updateFCC(dp(3, dp.dim() - 3));		// update other prameters.
 }
 
+//! カメラの位置を設定する．
+/*!
+  \param t	カメラの3次元位置
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setTranslation(const Point3d& t)
 {
@@ -264,6 +428,11 @@ CameraBase::setTranslation(const Point3d& t)
     return *this;
 }
 
+//! カメラの姿勢を設定する．
+/*!
+  \param Rt	カメラの姿勢を表す3x3回転行列
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setRotation(const Matrix33d& Rt)
 {
@@ -271,6 +440,11 @@ CameraBase::setRotation(const Matrix33d& Rt)
     return *this;
 }
 
+//! 焦点距離を設定する．
+/*!
+  \param k	焦点距離
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setFocalLength(double k)
 {
@@ -278,6 +452,12 @@ CameraBase::setFocalLength(double k)
     return *this;
 }
 
+//! 画像主点を設定する．
+/*!
+  \param u0	画像主点の横座標
+  \param v0	画像主点の縦座標
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setPrincipal(double u0, double v0)
 {
@@ -285,6 +465,11 @@ CameraBase::setPrincipal(double u0, double v0)
     return *this;
 }
 
+//! アスペクト比を設定する．
+/*!
+  \param aspect	アスペクト比
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setAspect(double aspect)
 {
@@ -292,6 +477,11 @@ CameraBase::setAspect(double aspect)
     return *this;
 }
 
+//! 非直交性歪みを設定する．
+/*!
+  \param skew	非直交性歪み
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setSkew(double skew)
 {
@@ -299,6 +489,11 @@ CameraBase::setSkew(double skew)
     return *this;
 }
 
+//! 放射歪曲係数以外の内部パラメータを設定する．
+/*!
+  \param K	3x3内部パラメータ行列
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setIntrinsic(const Matrix33d& K)
 {
@@ -306,6 +501,12 @@ CameraBase::setIntrinsic(const Matrix33d& K)
     return *this;
 }
 
+//! 放射歪曲係数を設定する．
+/*!
+  \param d1	放射歪曲の第1係数
+  \param d2	放射歪曲の第2係数
+  \return	このカメラ
+*/
 inline CameraBase&
 CameraBase::setDistortion(double d1, double d2)
 {
@@ -313,24 +514,48 @@ CameraBase::setDistortion(double d1, double d2)
     return *this;
 }
 
+//! 入力ストリームからカメラの外部／内部パラメータを読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \param camera	外部／内部パラメータの読み込み先
+  \return	inで指定した入力ストリーム
+*/
 inline std::istream&
 operator >>(std::istream& in, CameraBase& camera)
 {
     return camera.get(in);
 }
 
+//! 出力ストリームにカメラの外部／内部パラメータを書き出す(ASCII)．
+/*!
+  \param out	出力ストリーム
+  \param camera	外部／内部パラメータの書き出し元
+  \return	outで指定した出力ストリーム
+*/
 inline std::ostream&
 operator <<(std::ostream& out, const CameraBase& camera)
 {
     return camera.put(out);
 }
 
+//! 入力ストリームからカメラの内部パラメータを読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \param camera	内部パラメータの読み込み先
+  \return	inで指定した入力ストリーム
+*/
 inline std::istream&
 operator >>(std::istream& in, CameraBase::Intrinsic& intrinsic)
 {
     return intrinsic.get(in);
 }
 
+//! 出力ストリームにカメラの内部パラメータを書き出す(ASCII)．
+/*!
+  \param out	出力ストリーム
+  \param camera	内部パラメータの書き出し元
+  \return	outで指定した出力ストリーム
+*/
 inline std::ostream&
 operator <<(std::ostream& out, const CameraBase::Intrinsic& intrinsic)
 {
@@ -340,12 +565,25 @@ operator <<(std::ostream& out, const CameraBase::Intrinsic& intrinsic)
 /************************************************************************
 *  class CanonicalCamera						*
 ************************************************************************/
+//! すべての内部パラメータが標準既定値(焦点距離とアスペクト比が1, 非直交歪みと放射歪曲係数が0, 画像主点が原点に一致)となる透視投影カメラを表すクラス
 class CanonicalCamera : public CameraBase
 {
   public:
+  //! 位置を原点に，姿勢を単位行列にセットして初期化する．
     CanonicalCamera()	:CameraBase(), _intrinsic()	{}
+
+  //! 位置と姿勢をセットして初期化する．
+  /*!
+    \param t	カメラの3次元位置
+    \param Rt	カメラの姿勢を表す3x3回転行列
+  */
     CanonicalCamera(const Point3d& t, const Matrix33d& Rt)
 	:CameraBase(t, Rt), _intrinsic()		{}
+
+  //! 投影行列をセットして初期化する．
+  /*!
+    \param P	3x4投影行列
+  */
     CanonicalCamera(const Matrix34d& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
     
@@ -360,12 +598,18 @@ class CanonicalCamera : public CameraBase
 /************************************************************************
 *  class CameraWithFocalLength						*
 ************************************************************************/
+//! 焦点距離以外の内部パラメータが標準既定値となる透視投影カメラを表すクラス
 class CameraWithFocalLength : public CameraBase
 {
   public:
+  //! 焦点距離のみから成る内部パラメータを表すクラス
     class Intrinsic : public CanonicalCamera::Intrinsic
     {
       public:
+      //! 内部パラメータをセットして初期化する．
+      /*!
+	\param k	焦点距離
+      */
 	Intrinsic(double k=1.0)	:_k(k)					{}
 
       // various operations.
@@ -399,10 +643,23 @@ class CameraWithFocalLength : public CameraBase
     };
     
   public:
+  //! 位置を原点に，姿勢を単位行列に，内部パラメータをデフォルト値にセットして初期化する．
     CameraWithFocalLength()	:CameraBase(), _intrinsic()	{}
+
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param t	カメラの3次元位置
+    \param Rt	カメラの姿勢を表す3x3回転行列
+    \param k	焦点距離
+  */
     CameraWithFocalLength(const Point3d& t,
 			  const Matrix33d& Rt, double k=1.0)
 	:CameraBase(t, Rt), _intrinsic(k)			{}
+
+  //! 投影行列をセットして初期化する．
+  /*!
+    \param P	3x4投影行列
+  */
     CameraWithFocalLength(const Matrix34d& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
 
@@ -417,14 +674,28 @@ class CameraWithFocalLength : public CameraBase
 /************************************************************************
 *  class CameraWithEuclideanImagePlane					*
 ************************************************************************/
+//! 焦点距離と画像主点以外の内部パラメータが標準既定値となる透視投影カメラを表すクラス
 class CameraWithEuclideanImagePlane : public CameraBase
 {
   public:
+  //! 焦点距離と画像主点から成る内部パラメータを表すクラス
     class Intrinsic : public CameraWithFocalLength::Intrinsic
     {
       public:
+      //! 内部パラメータをセットして初期化する．
+      /*!
+	\param k	焦点距離
+	\param u0	画像主点の横座標
+	\param v0	画像主点の縦座標
+      */
 	Intrinsic(double k=1.0, double u0=0.0, double v0=0.0)
 	    :CameraWithFocalLength::Intrinsic(k), _principal(u0, v0)	{}
+
+      //! #CameraWithFocalLength型カメラの内部パラメータをセットして初期化する．
+      /*!
+	画像主点は(0, 0)に初期化される．
+	\param intrinsic	#CameraWithFocalLengthの内部パラメータ
+      */
 	Intrinsic(const CameraWithFocalLength::Intrinsic& intrinsic)
 	    :CameraWithFocalLength::Intrinsic(intrinsic),
 	     _principal(0.0, 0.0)					{}
@@ -459,13 +730,28 @@ class CameraWithEuclideanImagePlane : public CameraBase
     };
     
   public:
+  //! 位置を原点に，姿勢を単位行列に，内部パラメータをデフォルト値にセットして初期化する．
     CameraWithEuclideanImagePlane()	:CameraBase(), _intrinsic()	{}
+
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param t	カメラの3次元位置
+    \param Rt	カメラの姿勢を表す3x3回転行列
+    \param k	焦点距離
+    \param u0	画像主点の横座標
+    \param v0	画像主点の縦座標
+  */
     CameraWithEuclideanImagePlane(const Point3d&	t,
 				  const Matrix33d&	Rt,
 				  double		k=1.0,
 				  double		u0=0,
 				  double		v0=0)
 	:CameraBase(t, Rt), _intrinsic(k, u0, v0)			{}
+
+  //! 投影行列をセットして初期化する．
+  /*!
+    \param P	3x4投影行列
+  */
     CameraWithEuclideanImagePlane(const Matrix34d& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
 
@@ -480,19 +766,40 @@ class CameraWithEuclideanImagePlane : public CameraBase
 /************************************************************************
 *  class Camera								*
 ************************************************************************/
+//! 放射歪曲係数のみが標準既定値(0)となる透視投影カメラを表すクラス
 class Camera : public CameraBase
 {
   public:
+  //! 放射歪曲係数意外の全内部パラメータを表すクラス
     class Intrinsic : public CameraWithEuclideanImagePlane::Intrinsic
     {
       public:
+      //! 内部パラメータをセットして初期化する．
+      /*!
+	\param k	焦点距離
+	\param u0	画像主点の横座標
+	\param v0	画像主点の縦座標
+	\param aspect	アスペクト比
+	\param skew	非直交性歪み
+      */
 	Intrinsic(double k=1.0, double u0=0.0, double v0=0.0,
 		  double aspect=1.0, double skew=0.0)
 	    :CameraWithEuclideanImagePlane::Intrinsic(k, u0, v0),
 	     _k00(aspect * k), _k01(skew * k)				{}
+
+      //! #CameraWithEuclideanImagePlane型カメラの内部パラメータをセットして初期化する．
+      /*!
+	アスペクト比と非直交歪みは0に初期化される．
+	\param intrinsic	#CameraWithEuclideanImagePlaneの内部パラメータ
+      */
 	Intrinsic(const CameraWithEuclideanImagePlane::Intrinsic& intrinsic)
 	    :CameraWithEuclideanImagePlane::Intrinsic(intrinsic),
 	     _k00(k()), _k01(0.0)					{}
+
+      //! 内部パラメータをセットして初期化する．
+      /*!
+	\param K	3x3内部パラメータ行列
+      */
 	Intrinsic(const Matrix33d& K)
 	    :CameraWithEuclideanImagePlane::Intrinsic(),
 	     _k00(k()), _k01(0.0)			{setIntrinsic(K);}
@@ -531,7 +838,16 @@ class Camera : public CameraBase
 	virtual std::ostream&	put(std::ostream& out)		const	;
 
       protected:
+      //! 焦点距離とアスペクト比の積を返す．
+      /*!
+	\return		焦点距離kとアスペクト比aの積ak
+      */
 		double		k00()			const	{return _k00;}
+
+      //! 焦点距離と非直交歪みの積を返す．
+      /*!
+	\return		焦点距離kと非直交歪みsの積sk
+      */
 		double		k01()			const	{return _k01;}
 	
       private:
@@ -539,7 +855,19 @@ class Camera : public CameraBase
     };
     
   public:
+  //! 位置を原点に，姿勢を単位行列に，内部パラメータをデフォルト値にセットして初期化する．
     Camera()	:CameraBase(), _intrinsic()			{}
+
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param t	カメラの3次元位置
+    \param Rt	カメラの姿勢を表す3x3回転行列
+    \param k	焦点距離
+    \param u0	画像主点の横座標
+    \param v0	画像主点の縦座標
+    \param a	アスペクト比
+    \param s	非直交歪み
+  */
     Camera(const Point3d&	t,
 	   const Matrix33d&	Rt,
 	   double		k=1.0,
@@ -548,6 +876,11 @@ class Camera : public CameraBase
 	   double		aspect=1.0,
 	   double		skew=0.0)
 	:CameraBase(t, Rt), _intrinsic(k, u0, v0, aspect, skew)	{}
+
+  //! 投影行列をセットして初期化する．
+  /*!
+    \param P	3x4投影行列
+  */
     Camera(const Matrix34d& P)
 	:CameraBase(), _intrinsic()			{setProjection(P);}
 
@@ -562,19 +895,43 @@ class Camera : public CameraBase
 /************************************************************************
 *  class CameraWithDistortion						*
 ************************************************************************/
+//! 放射歪曲係数を含む全内部パラメータが可変となる透視投影カメラを表すクラス
 class CameraWithDistortion : public CameraBase
 {
   public:
+  //! 放射歪曲係数を含む全内部パラメータを表すクラス
     class Intrinsic : public Camera::Intrinsic
     {
       public:
+      //! 内部パラメータをセットして初期化する．
+      /*!
+	\param k	焦点距離
+	\param u0	画像主点の横座標
+	\param v0	画像主点の縦座標
+	\param aspect	アスペクト比
+	\param skew	非直交性歪み
+	\param d1	放射歪曲の第1係数
+	\param d2	放射歪曲の第2係数
+      */
 	Intrinsic(double k=1.0, double u0=0.0, double v0=0.0,
 		  double aspect=1.0, double skew=0.0,
 		  double d1=0.0, double d2=0.0)
 	    :Camera::Intrinsic(k, u0, v0, aspect, skew),
 	     _d1(d1), _d2(d2)						{}
+
+      //! #Camera型カメラの内部パラメータをセットして初期化する．
+      /*!
+	2つの放射歪曲係数は0に初期化される．
+	\param intrinsic	#Cameraの内部パラメータ
+      */
 	Intrinsic(const Camera::Intrinsic& intrinsic)
 	    :Camera::Intrinsic(intrinsic), _d1(0.0), _d2(0.0)		{}
+
+      //! 内部パラメータをセットして初期化する．
+      /*!
+	2つの放射歪曲係数は0に初期化される．
+	\param K	3x3内部パラメータ行列
+      */
 	Intrinsic(const Matrix33d& K)
 	    :Camera::Intrinsic(), _d1(0.0), _d2(0.0)	{setIntrinsic(K);}
 	
@@ -583,9 +940,9 @@ class CameraWithDistortion : public CameraBase
 	virtual Point2d		xd(const Point2d& xc)		const	;
 	virtual Matrix<double>	jacobianK(const Point2d& xc)	const	;
 	virtual Matrix22d	jacobianXC(const Point2d& xc)	const	;
+	virtual Point2d		xcFromU(const Point2d& u)	const	;
 	virtual CameraBase::Intrinsic&
 				update(const Vector<double>& dp)	;
-	virtual Point2d		xcFromU(const Point2d& u)	const	;
 
       // intrinsic parameters.
 	virtual u_int		dof()				const	;
@@ -603,7 +960,21 @@ class CameraWithDistortion : public CameraBase
     };
     
   public:
+  //! 位置を原点に，姿勢を単位行列に，内部パラメータをデフォルト値にセットして初期化する．
     CameraWithDistortion()	:CameraBase(), _intrinsic()		{}
+
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param t	カメラの3次元位置
+    \param Rt	カメラの姿勢を表す3x3回転行列
+    \param k	焦点距離
+    \param u0	画像主点の横座標
+    \param v0	画像主点の縦座標
+    \param a	アスペクト比
+    \param s	非直交歪み
+    \param d1	放射歪曲の第1係数
+    \param d2	放射歪曲の第2係数
+  */
     CameraWithDistortion(const Point3d&		t,
 			 const Matrix33d&	Rt,
 			 double			k=1.0,
@@ -614,6 +985,7 @@ class CameraWithDistortion : public CameraBase
 			 double			d1=0.0,
 			 double			d2=0.0)
 	:CameraBase(t, Rt), _intrinsic(k, u0, v0, aspect, skew, d1, d2)	{}
+
     CameraWithDistortion(const Matrix34d& P,
 			 double d1=0.0, double d2=0.0)			;
 
@@ -625,6 +997,12 @@ class CameraWithDistortion : public CameraBase
     Intrinsic	_intrinsic;
 };
  
+//! 投影行列と放射歪曲係数をセットして初期化する．
+/*!
+  \param P	3x4投影行列
+  \param d1	放射歪曲の第1係数
+  \param d2	放射歪曲の第2係数
+*/
 inline
 CameraWithDistortion::CameraWithDistortion(const Matrix34d& P,
 					   double d1, double d2)

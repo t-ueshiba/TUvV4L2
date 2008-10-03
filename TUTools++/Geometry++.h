@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.28 2008-09-11 00:14:15 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.29 2008-10-03 04:23:37 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -238,10 +238,10 @@ Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
         return ang;
 }
 
-typedef Point2<short>	Point2s;
-typedef Point2<int>	Point2i;
-typedef Point2<float>	Point2f;
-typedef Point2<double>	Point2d;
+typedef Point2<short>	Point2s;		//!< short型座標を持つ2次元点
+typedef Point2<int>	Point2i;		//!< int型座標を持つ2次元点
+typedef Point2<float>	Point2f;		//!< float型座標を持つ2次元点
+typedef Point2<double>	Point2d;		//!< double型座標を持つ2次元点
 
 /************************************************************************
 *  class Point3<T>							*
@@ -294,10 +294,10 @@ Point3<T>::Point3(T x, T y, T z)
     (*this)[2] = z;
 }
 
-typedef Point3<short>	Point3s;
-typedef Point3<int>	Point3i;
-typedef Point3<float>	Point3f;
-typedef Point3<double>	Point3d;
+typedef Point3<short>	Point3s;		//!< short型座標を持つ3次元点
+typedef Point3<int>	Point3i;		//!< int型座標を持つ3次元点
+typedef Point3<float>	Point3f;		//!< float型座標を持つ3次元点
+typedef Point3<double>	Point3d;		//!< double型座標を持つ3次元点
 
 /************************************************************************
 *  class HyperPlane							*
@@ -456,10 +456,13 @@ HyperPlane<T, B>::dist(const Vector<T2, B2>& x) const
     return 0;
 }
 
-typedef HyperPlane<float,  FixedSizedBuf<float,  3> >	LineP2f;
-typedef HyperPlane<double, FixedSizedBuf<double, 3> >	LineP2d;
-typedef HyperPlane<float,  FixedSizedBuf<float,  4> >	PlaneP3f;
-typedef HyperPlane<double, FixedSizedBuf<double, 4> >	PlaneP3d;
-
+typedef HyperPlane<float,  FixedSizedBuf<float,  3> >
+	LineP2f;			//!< float型座標を持つ2次元空間中の直線
+typedef HyperPlane<double, FixedSizedBuf<double, 3> >
+	LineP2d;			//!< double型座標を持つ2次元空間中の直線
+typedef HyperPlane<float,  FixedSizedBuf<float,  4> >
+	PlaneP3f;			//!< float型座標を持つ3次元空間中の平面
+typedef HyperPlane<double, FixedSizedBuf<double, 4> >
+	PlaneP3d;			//!< double型座標を持つ3次元空間中の平面
 }
 #endif	/* !__TUGeometryPP_h */

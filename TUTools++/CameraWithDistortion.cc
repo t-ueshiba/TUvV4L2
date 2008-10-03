@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CameraWithDistortion.cc,v 1.12 2008-09-10 05:10:32 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.13 2008-10-03 04:23:37 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -94,9 +94,6 @@ CameraWithDistortion::setProjection(const Matrix34d& PP)
     return *this;
 }
 
-/*
- *  private members
- */
 const CameraBase::Intrinsic&
 CameraWithDistortion::intrinsic() const
 {
@@ -112,12 +109,32 @@ CameraWithDistortion::intrinsic()
 /************************************************************************
 *  class CameraWithDistortion::Intrinsic				*
 ************************************************************************/
+//! canonical座標系において表現された投影点の画像座標系における位置を求める．
+/*!
+  \param xc	投影点のcanonical座標における位置を表す2次元ベクトル
+  \return	xcの画像座標系における位置，すなわち
+		\f$
+		\TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray =
+		\TUbeginarray{c} {\cal K}(\TUvec{x}{c}) \\ 1 \TUendarray =
+		\TUvec{K}{}
+		\TUbeginarray{c} \TUbreve{x}{}(\TUvec{x}{c}) \\ 1 \TUendarray
+		\f$
+*/
 Point2d
 CameraWithDistortion::Intrinsic::operator ()(const Point2d& xc) const
 {
     return Camera::Intrinsic::operator ()(xd(xc));
 }
 
+//! canonical座標系において表現された投影点に放射歪曲を付加する．
+/*!
+  \param xc	投影点のcanonical座標における位置を表す2次元ベクトル
+  \return	放射歪曲付加後のcanonical座標系における位置，すなわち
+		\f$
+		\TUbreve{x}{} = (1 + d_1 r^2 + d_2 r^4)\TUvec{x}{c},~~
+		r = \TUnorm{\TUvec{x}{c}}
+		\f$
+*/
 Point2d
 CameraWithDistortion::Intrinsic::xd(const Point2d& xc) const
 {
@@ -125,6 +142,12 @@ CameraWithDistortion::Intrinsic::xd(const Point2d& xc) const
     return Point2d(tmp * xc[0], tmp * xc[1]);
 }
 
+//! canonical画像座標に関する投影点の画像座標の1階微分を求める
+/*!
+  \param x	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x2 Jacobi行列，すなわち
+		\f$\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}\f$
+*/
 Matrix22d
 CameraWithDistortion::Intrinsic::jacobianXC(const Point2d& xc) const
 {
@@ -140,6 +163,22 @@ CameraWithDistortion::Intrinsic::jacobianXC(const Point2d& xc) const
     return J;
 }
 
+//! 内部パラメータに関する投影点の画像座標の1階微分を求める
+/*!
+  ただし，アスペクト比aと焦点距離kの積ak, 非直交歪みsと焦点距離kの積skをそれぞれ
+  第4, 第5番目の内部パラメータとして扱い，k, u0, v0, ak, sk, d1, d2の7パラメータに
+  関する1階微分としてJacobianを計算する．
+  \param xc	canonical画像座標における投影点の2次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x7	Jacobi行列，すなわち
+		\f$
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}} =
+		\TUbeginarray{ccccccc}
+		& 1 & & \breve{x} & \breve{y} &
+		r^2(a k x_c + s k y_c) & r^4(a k x_c + s k y_c) \\
+		\breve{y} & & 1 & & & r^2 k y_c & r^4 k y_c
+		\TUendarray,~~ r = \TUnorm{\TUvec{x}{c}}
+		\f$
+*/
 Matrix<double>
 CameraWithDistortion::Intrinsic::jacobianK(const Point2d& xc) const
 {
@@ -157,6 +196,12 @@ CameraWithDistortion::Intrinsic::jacobianK(const Point2d& xc) const
     return J;
 }
 
+//! 画像座標における投影点の2次元位置をcanonical画像座標系に直す．
+/*!
+  \param u	画像座標系における投影点の2次元位置
+  \return	canonical画像カメラ座標系におけるuの2次元位置，すなわち
+		\f$\TUvec{x}{c} = {\cal K}^{-1}(\TUvec{u}{})\f$
+*/
 Point2d
 CameraWithDistortion::Intrinsic::xcFromU(const Point2d& u) const
 {
@@ -165,6 +210,11 @@ CameraWithDistortion::Intrinsic::xcFromU(const Point2d& u) const
     return Point2d(tmp * xd[0], tmp * xd[1]);
 }
 
+//! 内部パラメータを指定された量だけ更新する．
+/*!
+  \param dp	更新量を表す#dof()次元ベクトル
+  \return	この内部パラメータ
+*/
 CameraBase::Intrinsic&
 CameraWithDistortion::Intrinsic::update(const Vector<double>& dp)
 {
@@ -174,24 +224,42 @@ CameraWithDistortion::Intrinsic::update(const Vector<double>& dp)
     return *this;
 }
 
+//! 内部パラメータの自由度を返す．
+/*!
+  \return	内部パラメータの自由度，すなわち7
+*/
 u_int
 CameraWithDistortion::Intrinsic::dof() const
 {
     return 7;
 }
 
+//! 放射歪曲の第1係数を返す．
+/*!
+  \return	放射歪曲の第1係数
+*/
 double
 CameraWithDistortion::Intrinsic::d1() const
 {
     return _d1;
 }
 
+//! 放射歪曲の第2係数を返す．
+/*!
+  \return	放射歪曲の第2係数
+*/
 double
 CameraWithDistortion::Intrinsic::d2() const
 {
     return _d2;
 }
 
+//! 放射歪曲係数を設定する．
+/*!
+  \param d1	放射歪曲の第1係数
+  \param d2	放射歪曲の第2係数
+  \return	この内部パラメータ
+*/
 CameraBase::Intrinsic&
 CameraWithDistortion::Intrinsic::setDistortion(double d1, double d2)
 {
@@ -200,6 +268,11 @@ CameraWithDistortion::Intrinsic::setDistortion(double d1, double d2)
     return *this;
 }
 
+//! 入力ストリームからカメラの内部パラメータを読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \return	inで指定した入力ストリーム
+*/
 std::istream&
 CameraWithDistortion::Intrinsic::get(std::istream& in)
 {
@@ -209,6 +282,11 @@ CameraWithDistortion::Intrinsic::get(std::istream& in)
     return in;
 }
 
+//! 出力ストリームにカメラの内部パラメータを書き出す(ASCII)．
+/*!
+  \param out	出力ストリーム
+  \return	outで指定した出力ストリーム
+*/
 std::ostream&
 CameraWithDistortion::Intrinsic::put(std::ostream& out) const
 {

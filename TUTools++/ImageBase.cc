@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.23 2008-09-10 05:10:39 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.24 2008-10-03 04:23:37 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -45,6 +45,11 @@ ImageBase::~ImageBase()
 {
 }
 
+//! 入力ストリームから画像のヘッダを読み込む．
+/*!
+  \param in	入力ストリーム
+  \return	読み込まれた画像の画素のタイプ
+*/
 ImageBase::Type
 ImageBase::restoreHeader(std::istream& in)
 {
@@ -184,6 +189,12 @@ ImageBase::restoreHeader(std::istream& in)
     return type;
 }
 
+//! 指定した画素タイプで出力ストリームに画像のヘッダを書き出す．
+/*!
+  \param out	出力ストリーム
+  \param type	画素タイプ
+  \return	outで指定した出力ストリーム
+*/
 std::ostream&
 ImageBase::saveHeader(std::ostream& out, Type type) const
 {
@@ -272,6 +283,11 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     return out;
 }
 
+//! 指定されたタイプの画素のビット数を返す．
+/*!
+  \param type	画素のタイプ
+  \return	画素のビット数
+*/
 u_int
 ImageBase::type2depth(Type type)
 {

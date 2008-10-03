@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BlockMatrix++.cc,v 1.8 2008-09-10 05:10:30 ueshiba Exp $
+ *  $Id: BlockMatrix++.cc,v 1.9 2008-10-03 04:23:37 ueshiba Exp $
  */
 #include "TU/BlockMatrix++.h"
 #include <stdexcept>
@@ -35,6 +35,11 @@ namespace TU
 /************************************************************************
 *  class BlockMatrix<T>							*
 ************************************************************************/
+//! 各小行列のサイズを指定してブロック対角行列を生成し，全要素を0で初期化する．
+/*!
+  \param nrows	各小行列の行数を順に収めた配列
+  \param ncols	各小行列の列数を順に収めた配列
+*/
 template <class T>
 BlockMatrix<T>::BlockMatrix(const Array<u_int>& nrows,
 			    const Array<u_int>& ncols)
@@ -49,6 +54,10 @@ BlockMatrix<T>::BlockMatrix(const Array<u_int>& nrows,
     }
 }
 
+//! ブロック対角行列の総行数を返す．
+/*!
+  \return	総行数
+*/
 template <class T> u_int
 BlockMatrix<T>::nrow() const
 {
@@ -58,6 +67,10 @@ BlockMatrix<T>::nrow() const
     return r;
 }
 
+//! ブロック対角行列の総列数を返す．
+/*!
+  \return	総列数
+*/
 template <class T> u_int
 BlockMatrix<T>::ncol() const
 {
@@ -67,6 +80,17 @@ BlockMatrix<T>::ncol() const
     return c;
 }
 
+//! このブロック対角行列の転置行列を返す．
+/*!
+  \return	転置行列，すなわち
+  \f$
+  \TUtvec{B}{} =
+  \TUbeginarray{cccc}
+  \TUtvec{B}{1} & & & \\ & \TUtvec{B}{2} & & \\ & & \ddots & \\
+  & & & \TUtvec{B}{d}
+  \TUendarray
+  \f$
+*/
 template <class T> BlockMatrix<T>
 BlockMatrix<T>::trns() const
 {
@@ -76,14 +100,23 @@ BlockMatrix<T>::trns() const
     return val;
 }
 
+//! このブロック対角行列の全ての小行列の全要素に同一の数値を代入する．
+/*!
+  \param c	代入する数値
+  \return	このブロック対角行列
+*/
 template <class T> BlockMatrix<T>&
-BlockMatrix<T>::operator =(T c)
+BlockMatrix<T>::operator =(const T& c)
 {
     for (int i = 0; i < dim(); ++i)
 	(*this)[i] = c;
     return *this;
 }
-    
+
+//! このブロック対角行列を通常の行列に変換する．
+/*!
+  \return	変換された行列
+*/
 template <class T>
 BlockMatrix<T>::operator Matrix<T>() const
 {
@@ -100,6 +133,12 @@ BlockMatrix<T>::operator Matrix<T>() const
 /************************************************************************
 *  numeric operators							*
 ************************************************************************/
+//! 2つのブロック対角行列の積
+/*!
+  \param a	第1引数
+  \param b	第2引数
+  \return	結果のブロック対角行列
+*/
 template <class T> BlockMatrix<T>
 operator *(const BlockMatrix<T>& a, const BlockMatrix<T>& b)
 {
@@ -110,6 +149,12 @@ operator *(const BlockMatrix<T>& a, const BlockMatrix<T>& b)
     return val;
 }
 
+//! ブロック対角行列と通常の行列の積
+/*!
+  \param b	第1引数(ブロック対角行列)
+  \param m	第2引数(通常行列)
+  \return	結果の通常行列
+*/
 template <class T> Matrix<T>
 operator *(const BlockMatrix<T>& b, const Matrix<T>& m)
 {
@@ -127,6 +172,12 @@ operator *(const BlockMatrix<T>& b, const Matrix<T>& m)
     return val;
 }
 
+//! 通常の行列とブロック対角行列の積
+/*!
+  \param m	第1引数(通常行列)
+  \param b	第2引数(ブロック対角行列)
+  \return	結果の通常行列
+*/
 template <class T> Matrix<T>
 operator *(const Matrix<T>& m, const BlockMatrix<T>& b)
 {
@@ -144,6 +195,12 @@ operator *(const Matrix<T>& m, const BlockMatrix<T>& b)
     return val;
 }
 
+//! ブロック対角行列とベクトルの積
+/*!
+  \param b	ブロック対角行列
+  \param v	ベクトル
+  \return	結果のベクトル
+*/
 template <class T> Vector<T>
 operator *(const BlockMatrix<T>& b, const Vector<T>& v)
 {
@@ -160,6 +217,12 @@ operator *(const BlockMatrix<T>& b, const Vector<T>& v)
     return val;
 }
 
+//! ベクトルとブロック対角行列の積
+/*!
+  \param v	ベクトル
+  \param b	ブロック対角行列
+  \return	結果のベクトル
+*/
 template <class T> Vector<T>
 operator *(const Vector<T>& v, const BlockMatrix<T>& b)
 {
