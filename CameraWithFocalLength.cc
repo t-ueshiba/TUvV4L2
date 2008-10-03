@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CameraWithFocalLength.cc,v 1.10 2008-09-10 05:10:33 ueshiba Exp $
+ *  $Id: CameraWithFocalLength.cc,v 1.11 2008-10-03 04:23:37 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -61,9 +61,6 @@ CameraWithFocalLength::intrinsic() const
     return _intrinsic;
 }
 
-/*
- *  private members
- */
 CameraBase::Intrinsic&
 CameraWithFocalLength::intrinsic()
 {
@@ -73,12 +70,26 @@ CameraWithFocalLength::intrinsic()
 /************************************************************************
 *  class CameraWithFocalLength::Intrinsic				*
 ************************************************************************/
+//! canonical画像座標系において表現された投影点の画像座標系における位置を求める．
+/*!
+  \param xc	canonical画像座標における投影点の2次元位置
+  \return	xcの画像座標系における2次元位置，すなわち
+		\f$\TUvec{u}{} = k\TUvec{x}{c}\f$
+*/
 Point2d
 CameraWithFocalLength::Intrinsic::operator ()(const Point2d& xc) const
 {
     return Point2d(_k * xc[0], _k * xc[1]);
 }
 
+//! 内部パラメータに関する投影点の画像座標の1階微分を求める
+/*!
+  \param xc	canonical画像座標における投影点の2次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x1 Jacobi行列，すなわち
+		\f$
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}} = \TUvec{x}{c}
+		\f$
+*/
 Matrix<double>
 CameraWithFocalLength::Intrinsic::jacobianK(const Point2d& xc) const
 {
@@ -89,6 +100,15 @@ CameraWithFocalLength::Intrinsic::jacobianK(const Point2d& xc) const
     return J;
 }
 
+//! canonical画像座標に関する投影点の画像座標の1階微分を求める
+/*!
+  \param xc	canonical画像座標における投影点の2次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x2 Jacobi行列，すなわち
+		\f$
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}} =
+		k\TUvec{I}{2\times 2}
+		\f$
+*/
 Matrix22d
 CameraWithFocalLength::Intrinsic::jacobianXC(const Point2d& xc) const
 {
@@ -96,12 +116,26 @@ CameraWithFocalLength::Intrinsic::jacobianXC(const Point2d& xc) const
     return J.diag(_k);
 }
     
+//! 画像座標における投影点の2次元位置をcanonical画像座標系に直す．
+/*!
+  \param u	画像座標系における投影点の2次元位置
+  \return	canonical画像座標系におけるuの2次元位置，すなわち
+		\f$\TUvec{x}{c} = k^{-1}\TUvec{u}{}\f$
+*/
 Point2d
 CameraWithFocalLength::Intrinsic::xcFromU(const Point2d& u) const
 {
     return Point2d(u[0] / _k, u[1] / _k);
 }
 
+//! 内部パラメータ行列を返す．
+/*!
+  \return	3x3内部パラメータ行列，すなわち
+		\f$
+		\TUvec{K}{} =
+		\TUbeginarray{ccc} k & & \\ & k & \\ & & 1 \TUendarray
+		\f$
+*/
 Matrix33d
 CameraWithFocalLength::Intrinsic::K() const
 {
@@ -112,6 +146,14 @@ CameraWithFocalLength::Intrinsic::K() const
     return mat;
 }
     
+//! 内部パラメータ行列の転置を返す．
+/*!
+  \return	3x3内部パラメータ行列の転置，すなわち
+		\f$
+		\TUtvec{K}{} =
+		\TUbeginarray{ccc} k & & \\ & k & \\ & & 1 \TUendarray
+		\f$
+*/
 Matrix33d
 CameraWithFocalLength::Intrinsic::Kt() const
 {
@@ -122,6 +164,14 @@ CameraWithFocalLength::Intrinsic::Kt() const
     return mat;
 }
     
+//! 内部パラメータ行列の逆行列を返す．
+/*!
+  \return	3x3内部パラメータ行列の逆行列，すなわち
+		\f$
+		\TUinv{K}{} =
+		\TUbeginarray{ccc} k^{-1} & & \\ & k^{-1} & \\ & & 1 \TUendarray
+		\f$
+*/
 Matrix33d
 CameraWithFocalLength::Intrinsic::Kinv() const
 {
@@ -132,6 +182,14 @@ CameraWithFocalLength::Intrinsic::Kinv() const
     return mat;
 }
     
+//! 内部パラメータ行列の転置の逆行列を返す．
+/*!
+  \return	3x3内部パラメータ行列の転置の逆行列，すなわち
+		\f$
+		\TUtinv{K}{} =
+		\TUbeginarray{ccc} k^{-1} & & \\ & k^{-1} & \\ & & 1 \TUendarray
+		\f$
+*/
 Matrix33d
 CameraWithFocalLength::Intrinsic::Ktinv() const
 {
@@ -142,18 +200,31 @@ CameraWithFocalLength::Intrinsic::Ktinv() const
     return mat;
 }
 
+//! 内部パラメータの自由度を返す．
+/*!
+  \return	内部パラメータの自由度，すなわち1
+*/
 u_int
 CameraWithFocalLength::Intrinsic::dof() const
 {
     return 1;
 }
 
+//! 焦点距離を返す．
+/*!
+  \return	焦点距離
+*/
 double
 CameraWithFocalLength::Intrinsic::k() const
 {
     return _k;
 }
 
+//! 焦点距離を設定する．
+/*!
+  \param k	焦点距離
+  \return	この内部パラメータ
+*/
 CameraBase::Intrinsic&
 CameraWithFocalLength::Intrinsic::setFocalLength(double k)
 {
@@ -161,6 +232,11 @@ CameraWithFocalLength::Intrinsic::setFocalLength(double k)
     return *this;
 }    
 
+//! 内部パラメータを指定された量だけ更新する．
+/*!
+  \param dp	更新量を表す#dof()次元ベクトル
+  \return	この内部パラメータ
+*/
 CameraBase::Intrinsic&
 CameraWithFocalLength::Intrinsic::update(const Vector<double>& dp)
 {
@@ -168,6 +244,11 @@ CameraWithFocalLength::Intrinsic::update(const Vector<double>& dp)
     return *this;
 }
 
+//! 入力ストリームからカメラの内部パラメータを読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \return	inで指定した入力ストリーム
+*/
 std::istream&
 CameraWithFocalLength::Intrinsic::get(std::istream& in)
 {
@@ -175,6 +256,11 @@ CameraWithFocalLength::Intrinsic::get(std::istream& in)
     return in >> _k;
 }
 
+//! 出力ストリームにカメラの内部パラメータを書き出す(ASCII)．
+/*!
+  \param out	出力ストリーム
+  \return	outで指定した出力ストリーム
+*/
 std::ostream&
 CameraWithFocalLength::Intrinsic::put(std::ostream& out) const
 {

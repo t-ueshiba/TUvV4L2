@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BlockMatrix++.h,v 1.8 2008-09-10 05:10:31 ueshiba Exp $
+ *  $Id: BlockMatrix++.h,v 1.9 2008-10-03 04:23:37 ueshiba Exp $
  */
 #ifndef __TUBlockMatrixPP_h
 #define __TUBlockMatrixPP_h
@@ -37,10 +37,28 @@ namespace TU
 /************************************************************************
 *  class BlockMatrix<T>							*
 ************************************************************************/
+//! T型の要素を持つ小行列から成るブロック対角行列を表すクラス
+/*!
+  具体的にはd個の小行列\f$\TUvec{B}{1}, \TUvec{B}{2},\ldots, \TUvec{B}{d}\f$
+  (同一サイズとは限らない)から成る
+  \f$
+  \TUvec{B}{} =
+  \TUbeginarray{cccc}
+  \TUvec{B}{1} & & & \\ & \TUvec{B}{2} & & \\ & & \ddots & \\
+  & & & \TUvec{B}{d}
+  \TUendarray
+  \f$
+  なる形の行列．
+  \param T	要素の型
+*/
 template <class T>
 class BlockMatrix : public Array<Matrix<T> >
 {
   public:
+  //! 指定された個数の小行列から成るブロック対角行列を生成する．
+  /*!
+    \param d	小行列の個数
+  */
     explicit BlockMatrix(u_int d=0)	:Array<Matrix<T> >(d)	{}
     BlockMatrix(const Array<u_int>& nrows,
 		const Array<u_int>& ncols)			;
@@ -49,15 +67,28 @@ class BlockMatrix : public Array<Matrix<T> >
     u_int		nrow()				const	;
     u_int		ncol()				const	;
     BlockMatrix		trns()				const	;
-    BlockMatrix&	operator  =(T c)			;
+    BlockMatrix&	operator  =(const T& c)			;
     BlockMatrix&	operator *=(double c)
 			{Array<Matrix<T> >::operator *=(c); return *this;}
     BlockMatrix&	operator /=(double c)
 			{Array<Matrix<T> >::operator /=(c); return *this;}
+
+  //! このブロック対角行列に他のブロック対角行列を足す．
+  /*!
+    \param b	足すブロック対角行列
+    \return	このブロック対角行列
+  */
     BlockMatrix&	operator +=(const BlockMatrix& b)
 			{Array<Matrix<T> >::operator +=(b); return *this;}
+
+  //! このブロック対角行列から他のブロック対角行列を引く．
+  /*!
+    \param b	引くブロック対角行列
+    \return	このブロック対角行列
+  */
     BlockMatrix&	operator -=(const BlockMatrix& b)
 			{Array<Matrix<T> >::operator -=(b); return *this;}
+
 			operator Matrix<T>()		const	;
 };
 

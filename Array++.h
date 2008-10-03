@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.24 2008-09-10 05:10:29 ueshiba Exp $
+ *  $Id: Array++.h,v 1.25 2008-10-03 04:23:37 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -875,7 +875,7 @@ Array<T, B>::operator -=(const Array<T2, B2>& a)
 //! 2つの配列を要素毎に比較し，同じであるか調べる．
 /*!
   \param a	比較対象となる配列
-  \return	全ての要素が同じならばtrueを，そうでなければfalse
+  \return	全ての要素が同じならばtrue，そうでなければfalse
 */
 template <class T, class B> template <class T2, class B2> bool
 Array<T, B>::operator ==(const Array<T2, B2>& a) const
@@ -891,7 +891,7 @@ Array<T, B>::operator ==(const Array<T2, B2>& a) const
 //! 2つの配列を要素毎に比較し，異なるものが存在するか調べる．
 /*!
   \param a	比較対象となる配列
-  \return	異なる要素が存在すればtrueを，そうでなければfalse
+  \return	異なる要素が存在すればtrue，そうでなければfalse
 */
 template <class T, class B> template <class T2, class B2> inline bool
 Array<T, B>::operator !=(const Array<T2, B2>& a) const

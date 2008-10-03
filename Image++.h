@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.39 2008-09-10 05:10:38 ueshiba Exp $
+ *  $Id: Image++.h,v 1.40 2008-10-03 04:23:37 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -130,6 +130,7 @@ operator <<(std::ostream& out, const BGR& p)
     return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b;
 }
 
+//! カラー画素のalphaチャンネル
 struct Alpha
 {
     Alpha(u_char aa=255)	:a(aa)			{}
@@ -363,23 +364,55 @@ BGR::BGR(const YUV444& p)
 class ImageBase
 {
   public:
-    enum Type		{END = 0, U_CHAR = 5, RGB_24 = 6,
-			 SHORT, INT, FLOAT, DOUBLE,
-			 YUV_444, YUV_422, YUV_411};
+  //! 画素のタイプ
+    enum Type
+    {
+	END	= 0,	//!< 
+	U_CHAR	= 5,	//!< unsigned mono  8bit/pixel
+	RGB_24	= 6,	//!< RGB	   24bit/pixel	
+	SHORT,		//!< signed mono   16bit/pixel
+	INT,		//!< signed mono   32bit/pixel	
+	FLOAT,		//!< float mono	   32bit/pixel 
+	DOUBLE,		//!< double mono   64bit/pixel
+	YUV_444,	//!< YUV444	   24bit/pixel
+	YUV_422,	//!< YUV422	   16bit/pixel
+	YUV_411		//!< YUV411	   12bit/pixel
+    };
     
   protected:
+  //! 画像を生成し投影行列と放射歪曲係数を初期化する．
+  /*!
+    投影行列は
+    \f$\TUbeginarray{cc} \TUvec{I}{3\times 3} & \TUvec{0}{} \TUendarray\f$に，
+    2つの放射歪曲係数はいずれも0に初期化される．
+  */
     ImageBase()
 	:P(), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
     virtual ~ImageBase()		;
-    
+
     static u_int	type2depth(Type type)		;
     
   public:
     Type		restoreHeader(std::istream& in)			;
     std::ostream&	saveHeader(std::ostream& out, Type type) const	;
 
+  //! 画像の幅を返す．
+  /*!
+    \return	画像の幅
+  */
     u_int		width()			const	{return _width();}
+
+  //! 画像の高さを返す．
+  /*!
+    \return	画像の高さ
+  */
     u_int		height()		const	{return _height();}
+
+  //! 画像のサイズを変更する．
+  /*!
+    \param h	新しい幅
+    \param w	新しい高さ
+  */
     void		resize(u_int h, u_int w)	{_resize(h, w, END);}
 	
   private:
@@ -388,8 +421,9 @@ class ImageBase
     virtual void	_resize(u_int h, u_int w, Type type)	= 0;
 
   public:
-    Matrix34d		P;			//!< 3x4カメラ行列
-    double		d1, d2;			//!< レンズ歪み係数
+    Matrix34d		P;			//!< カメラの3x4投影行列
+    double		d1;			//!< 放射歪曲の第1係数
+    double		d2;			//!< 放射歪曲の第2係数
 };
 
 /************************************************************************
@@ -403,11 +437,27 @@ template <class T>
 class ImageLine : public Array<T>
 {
   public:
+  //! 指定した画素数のスキャンラインを生成する．
+  /*!
+    \param d	画素数
+  */
     explicit ImageLine(u_int d=0)
         :Array<T>(d), _lmost(0), _rmost(d)		{*this = 0;}
+
+  //! 外部の領域と画素数を指定してスキャンラインを生成する．
+  /*!
+    \param p	外部領域へのポインタ
+    \param d	画素数
+  */
     ImageLine(T* p, u_int d)
         :Array<T>(p, d), _lmost(0), _rmost(d)		{}
-    ImageLine&		operator =(T c)
+
+  //! 全ての画素に同一の値を代入する．
+  /*!
+    \param c	代入する画素値
+    \return	このスキャンライン
+  */
+    ImageLine&		operator =(const T& c)
 			{
 			    Array<T>::operator =(c);
 			    return *this;
@@ -421,10 +471,31 @@ class ImageLine : public Array<T>
     const T*		fill(const T* src)		;
     template <class S>
     const S*		fill(const S* src)		;
+
+  //! 左端の有効画素の位置を返す．
+  /*!
+    \return	左端の有効画素の位置
+  */
     int			lmost()			const	{return _lmost;}
+
+  //! 右端の有効画素の次の位置を返す．
+  /*!
+    \return	右端の有効画素の次の位置
+  */
     int			rmost()			const	{return _rmost;}
+
+  //! 有効画素の範囲を設定する．
+  /*!
+    \param l	有効画素の左端
+    \param r	有効画素の右端の次
+  */
     void		setLimits(int l, int r)		{_lmost = l;
 							 _rmost = r;}
+  //! 指定された位置の画素が有効か判定する．
+  /*!
+    \param u	画素の位置
+    \return	有効ならばtrue，無効ならばfalse
+  */
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
 	
@@ -436,6 +507,12 @@ class ImageLine : public Array<T>
     int			_rmost;
 };
 
+//! サブピクセル位置の画素値を線形補間で求める．
+/*!
+  指定された位置の両側の画素値をT2型に変換し，それらを線形補間してT2型の値として出力する．
+  \param uf	サブピクセルで指定された位置
+  \return	線形補間された画素値
+*/
 template <class T> template <class T2, class S> inline T2
 ImageLine<T>::at(S uf) const
 {
@@ -445,6 +522,11 @@ ImageLine<T>::at(S uf) const
     return T2(*in) + du*(T2(*(in + 1)) - T2(*in));
 }
 
+//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
+/*!
+  \param src	読み込み元の先頭を指すポインタ
+  \return	最後に読み込まれた画素の次の画素へのポインタ
+*/
 template <class T> const YUV422*
 ImageLine<T>::fill(const YUV422* src)
 {
@@ -458,6 +540,11 @@ ImageLine<T>::fill(const YUV422* src)
     return src;
 }
 
+//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
+/*!
+  \param src	読み込み元の先頭を指すポインタ
+  \return	最後に読み込まれた画素の次の画素へのポインタ
+*/
 template <class T> const YUV411*
 ImageLine<T>::fill(const YUV411* src)
 {
@@ -473,6 +560,11 @@ ImageLine<T>::fill(const YUV411* src)
     return src;
 }
 
+//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
+/*!
+  \param src	読み込み元の先頭を指すポインタ
+  \return	最後に読み込まれた画素の次の画素へのポインタ
+*/
 template <class T> template <class S> const S*
 ImageLine<T>::fill(const S* src)
 {
@@ -482,6 +574,11 @@ ImageLine<T>::fill(const S* src)
     return src;
 }
 
+//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
+/*!
+  \param src	読み込み元の先頭を指すポインタ
+  \return	最後に読み込まれた画素の次の画素へのポインタ
+*/
 template <class T> inline const T*
 ImageLine<T>::fill(const T* src)
 {
@@ -489,6 +586,16 @@ ImageLine<T>::fill(const T* src)
     return src + dim();
 }
 
+//! スキャンラインの画素数を変更する．
+/*!
+  ただし，他のオブジェクトと記憶領域を共有しているスキャンラインの画素数を
+  変更することはできない．
+  \param d			新しい画素数
+  \return			dが元の画素数よりも大きければtrue，そう
+				でなければfalse
+  \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
+				に送出
+*/
 template <class T> inline bool
 ImageLine<T>::resize(u_int d)
 {
@@ -497,6 +604,11 @@ ImageLine<T>::resize(u_int d)
     return Array<T>::resize(d);
 }
 
+//! スキャンラインが内部で使用する記憶領域を指定したものに変更する．
+/*!
+  \param p	新しい記憶領域へのポインタ
+  \param d	新しい画素数
+*/
 template <class T> inline void
 ImageLine<T>::resize(T* p, u_int d)
 {
@@ -647,10 +759,31 @@ template <class T, class B=Buf<T> >
 class Image : public Array2<ImageLine<T>, B>, public ImageBase
 {
   public:
+  //! 幅と高さを指定して画像を生成する．
+  /*!
+    \param w	画像の幅
+    \param h	画像の高さ
+  */
     explicit Image(u_int w=0, u_int h=0)
 	:Array2<ImageLine<T>, B>(h, w), ImageBase()		{*this = 0;}
+
+  //! 外部の領域と幅および高さを指定して画像を生成する．
+  /*!
+    \param p	外部領域へのポインタ
+    \param w	画像の幅
+    \param h	画像の高さ
+  */
     Image(T* p, u_int w, u_int h)			
 	:Array2<ImageLine<T>, B>(p, h, w), ImageBase()		{}
+
+  //! 指定された画像の部分画像を生成する．
+  /*!
+    \param i	元の画像
+    \param u	部分画像の左上端の横座標
+    \param v	部分画像の左上端の縦座標
+    \param w	部分画像の幅
+    \param h	部分画像の高さ
+  */
     template <class B2>
     Image(const Image<T, B2>& i, int u, int v, u_int w, u_int h)
 	:Array2<ImageLine<T>, B>(i, v, u, h, w), ImageBase(i)	{}
@@ -662,17 +795,35 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     
     template <class T2, class S>
     T2		at(const Point2<S>& p)			const	;
+
+  //! 指定された位置の画素にアクセスする．
+  /*!
+    \param p	画素の位置
+    \return	指定された画素
+  */
     template <class S>
     const T&	operator ()(const Point2<S>& p)
 					const	{return (*this)[p[1]][p[0]];}
+
+  //! 指定された位置の画素にアクセスする．
+  /*!
+    \param p	画素の位置
+    \return	指定された画素
+  */
     template <class S>
     T&		operator ()(const Point2<S>& p)	{return (*this)[p[1]][p[0]];}
+    
     u_int	width()			const	{return
 						 Array2<ImageLine<T> >::ncol();}
     u_int	height()		const	{return
 						 Array2<ImageLine<T> >::nrow();}
     
-    Image&	operator = (T c)		{Array2<ImageLine<T> >::
+  //! 全ての画素に同一の値を代入する．
+  /*!
+    \param c	代入する画素値
+    \return	この画像
+  */
+    Image&	operator = (const T& c)		{Array2<ImageLine<T> >::
 						 operator =(c); return *this;}
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out, Type type)	const	;
@@ -692,18 +843,41 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     virtual void	_resize(u_int h, u_int w, Type)			;
 };
 
+//! この画像の部分画像を生成する．
+/*!
+  \param u	部分画像の左上端の横座標
+  \param v	部分画像の左上端の縦座標
+  \param w	部分画像の幅
+  \param h	部分画像の高さ
+  \return	生成された部分画像
+*/
 template <class T, class B> inline const Image<T>
 Image<T, B>::operator ()(int u, int v, u_int w, u_int h) const
 {
     return Image<T>(*this, u, v, w, h);
 }
     
+//! この画像の部分画像を生成する．
+/*!
+  \param u	部分画像の左上端の横座標
+  \param v	部分画像の左上端の縦座標
+  \param w	部分画像の幅
+  \param h	部分画像の高さ
+  \return	生成された部分画像
+*/
 template <class T, class B> inline Image<T>
 Image<T, B>::operator ()(int u, int v, u_int w, u_int h)
 {
     return Image<T>(*this, u, v, w, h);
 }
     
+//! サブピクセル位置の画素値を双線形補間で求める．
+/*!
+  指定された位置を囲む4つの画素値をT2型に変換し，それらを双線形補間してT2型の値として
+  出力する．
+  \param p	サブピクセルで指定された位置
+  \return	双線形補間された画素値
+*/
 template <class T, class B> template <class T2, class S> inline T2
 Image<T, B>::at(const Point2<S>& p) const
 {
@@ -714,12 +888,23 @@ Image<T, B>::at(const Point2<S>& p) const
     return out0 + dv*(out1 - out0);
 }
 
+//! 入力ストリームから画像を読み込む．
+/*!
+  \param in	入力ストリーム
+  \return	inで指定した入力ストリーム
+*/
 template <class T, class B> inline std::istream&
 Image<T, B>::restore(std::istream& in)
 {
     return restoreData(in, restoreHeader(in));
 }
 
+//! 指定した画素タイプで出力ストリームに画像を書き出す．
+/*!
+  \param out	出力ストリーム
+  \param type	画素タイプ
+  \return	outで指定した出力ストリーム
+*/
 template <class T, class B> inline std::ostream&
 Image<T, B>::save(std::ostream& out, Type type) const
 {
@@ -727,6 +912,12 @@ Image<T, B>::save(std::ostream& out, Type type) const
     return saveData(out, type);
 }
 
+//! 入力ストリームから画像の画素データを読み込む．
+/*!
+  \param in	入力ストリーム
+  \param type	ストリーム中のデータの画素タイプ(読み込み先の画像の画素タイプではない)
+  \return	inで指定した入力ストリーム
+*/
 template <class T, class B> std::istream&
 Image<T, B>::restoreData(std::istream& in, Type type)
 {
@@ -754,6 +945,12 @@ Image<T, B>::restoreData(std::istream& in, Type type)
     return in;
 }
 
+//! 指定した画素タイプで出力ストリームに画像の画素データを書き出す．
+/*!
+  \param out	出力ストリーム
+  \param type	画素タイプ
+  \return	outで指定した出力ストリーム
+*/
 template <class T, class B> std::ostream&
 Image<T, B>::saveData(std::ostream& out, Type type) const
 {
@@ -781,12 +978,23 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
     return out;
 }
 
+//! 画像のサイズを変更する．
+/*!
+  \param h	新しい高さ
+  \param w	新しい幅
+*/
 template <class T, class B> inline void
 Image<T, B>::resize(u_int h, u_int w)
 {
     Array2<ImageLine<T>, B>::resize(h, w);
 }
 
+//! 外部の領域を指定して画像のサイズを変更する．
+/*!
+  \param p	外部領域へのポインタ
+  \param h	画像の高さ
+  \param w	画像の幅
+  */
 template <class T, class B> inline void
 Image<T, B>::resize(T* p, u_int h, u_int w)
 {
@@ -879,6 +1087,7 @@ Image<YUV411, Buf<YUV411> >::resize(YUV411* p, u_int h, u_int w)
 class GenericImage : public Array2<Array<u_char> >, public ImageBase
 {
   public:
+  //! 総称画像を生成する．
     GenericImage() :_type(U_CHAR)					{}
     
     std::istream&	restore(std::istream& in)			;
@@ -895,6 +1104,11 @@ class GenericImage : public Array2<Array<u_char> >, public ImageBase
     ImageBase::Type	_type;
 };
 
+//! 入力ストリームから画像を読み込む．
+/*!
+  \param in	入力ストリーム
+  \return	inで指定した入力ストリーム
+*/
 inline std::istream&
 GenericImage::restore(std::istream& in)
 {
@@ -902,6 +1116,11 @@ GenericImage::restore(std::istream& in)
     return restoreData(in);
 }
 
+//! 出力ストリームに画像を書き出す．
+/*!
+  \param out	出力ストリーム
+  \return	outで指定した出力ストリーム
+*/
 inline std::ostream&
 GenericImage::save(std::ostream& out) const
 {

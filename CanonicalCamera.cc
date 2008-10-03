@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CanonicalCamera.cc,v 1.8 2008-09-10 05:10:33 ueshiba Exp $
+ *  $Id: CanonicalCamera.cc,v 1.9 2008-10-03 04:23:37 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -56,13 +56,10 @@ CanonicalCamera::intrinsic() const
     return _intrinsic;
 }
 
-/*
- *  private members
- */
 CameraBase::Intrinsic&
 CanonicalCamera::intrinsic()
 {
     return _intrinsic;
 }
- 
+    
 }
