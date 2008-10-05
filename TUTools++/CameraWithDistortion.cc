@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CameraWithDistortion.cc,v 1.13 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: CameraWithDistortion.cc,v 1.14 2008-10-05 23:25:16 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -111,85 +111,89 @@ CameraWithDistortion::intrinsic()
 ************************************************************************/
 //! canonical座標系において表現された投影点の画像座標系における位置を求める．
 /*!
-  \param xc	投影点のcanonical座標における位置を表す2次元ベクトル
-  \return	xcの画像座標系における位置，すなわち
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	xの画像座標系における位置，すなわち
 		\f$
 		\TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray =
-		\TUbeginarray{c} {\cal K}(\TUvec{x}{c}) \\ 1 \TUendarray =
+		\TUbeginarray{c} {\cal K}(\TUvec{x}{}) \\ 1 \TUendarray =
 		\TUvec{K}{}
-		\TUbeginarray{c} \TUbreve{x}{}(\TUvec{x}{c}) \\ 1 \TUendarray
+		\TUbeginarray{c} \TUbreve{x}{}(\TUvec{x}{}) \\ 1 \TUendarray
 		\f$
 */
 Point2d
-CameraWithDistortion::Intrinsic::operator ()(const Point2d& xc) const
+CameraWithDistortion::Intrinsic::operator ()(const Point2d& x) const
 {
-    return Camera::Intrinsic::operator ()(xd(xc));
+    return Camera::Intrinsic::operator ()(xd(x));
 }
 
 //! canonical座標系において表現された投影点に放射歪曲を付加する．
 /*!
-  \param xc	投影点のcanonical座標における位置を表す2次元ベクトル
+  \param x	canonical画像座標における投影点の2次元位置
   \return	放射歪曲付加後のcanonical座標系における位置，すなわち
 		\f$
-		\TUbreve{x}{} = (1 + d_1 r^2 + d_2 r^4)\TUvec{x}{c},~~
-		r = \TUnorm{\TUvec{x}{c}}
+		\TUbreve{x}{} = (1 + d_1 r^2 + d_2 r^4)\TUvec{x}{},~~
+		r = \TUnorm{\TUvec{x}{}}
 		\f$
 */
 Point2d
-CameraWithDistortion::Intrinsic::xd(const Point2d& xc) const
+CameraWithDistortion::Intrinsic::xd(const Point2d& x) const
 {
-    const double	sqr = xc * xc, tmp = 1.0 + sqr*(_d1 + sqr*_d2);
-    return Point2d(tmp * xc[0], tmp * xc[1]);
+    const double	sqr = x * x, tmp = 1.0 + sqr*(_d1 + sqr*_d2);
+    return Point2d(tmp * x[0], tmp * x[1]);
 }
 
-//! canonical画像座標に関する投影点の画像座標の1階微分を求める
+//! canonical画像座標に関する投影点の画像座標の1階微分を求める．
 /*!
-  \param x	対象点の3次元位置
-  \return	投影点の画像座標の1階微分を表す2x2 Jacobi行列，すなわち
-		\f$\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}\f$
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	投影点の画像座標の1階微分を表す2x2ヤコビ行列，すなわち
+		\f$
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}} = 
+		\TUdisppartial{\TUvec{u}{}}{\TUbreve{x}{}}
+		\TUdisppartial{\TUbreve{x}{}}{\TUvec{x}{}}
+		\f$
 */
 Matrix22d
-CameraWithDistortion::Intrinsic::jacobianXC(const Point2d& xc) const
+CameraWithDistortion::Intrinsic::jacobianXC(const Point2d& x) const
 {
-    const double	sqr = xc * xc, tmp = 2.0*(_d1 + 2.0*sqr*_d2);
+    const double	sqr = x * x, tmp = 2.0*(_d1 + 2.0*sqr*_d2);
     Matrix22d		J;
     J[0][0] = J[1][1] = 1.0 + sqr*(_d1 + sqr*_d2);
-    J[0][0] += tmp * xc[0] * xc[0];
-    J[1][1] += tmp * xc[1] * xc[1];
-    J[0][1] = J[1][0] = tmp * xc[0] * xc[1];
+    J[0][0] += tmp * x[0] * x[0];
+    J[1][1] += tmp * x[1] * x[1];
+    J[0][1] = J[1][0] = tmp * x[0] * x[1];
     (J[0] *= k00()) += k01() * J[1];
     J[1] *= k();
 
     return J;
 }
 
-//! 内部パラメータに関する投影点の画像座標の1階微分を求める
+//! 内部パラメータに関する投影点の画像座標の1階微分を求める．
 /*!
   ただし，アスペクト比aと焦点距離kの積ak, 非直交歪みsと焦点距離kの積skをそれぞれ
   第4, 第5番目の内部パラメータとして扱い，k, u0, v0, ak, sk, d1, d2の7パラメータに
-  関する1階微分としてJacobianを計算する．
-  \param xc	canonical画像座標における投影点の2次元位置
-  \return	投影点のcanonical画像座標の1階微分を表す2x7	Jacobi行列，すなわち
+  関する1階微分としてヤコビ行列を計算する．
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x7ヤコビ行列，すなわち
 		\f$
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}} =
 		\TUbeginarray{ccccccc}
 		& 1 & & \breve{x} & \breve{y} &
-		r^2(a k x_c + s k y_c) & r^4(a k x_c + s k y_c) \\
-		\breve{y} & & 1 & & & r^2 k y_c & r^4 k y_c
-		\TUendarray,~~ r = \TUnorm{\TUvec{x}{c}}
+		r^2(a k x + s k y) & r^4(a k x + s k y) \\
+		\breve{y} & & 1 & & & r^2 k y & r^4 k y
+		\TUendarray,~~ r = \TUnorm{\TUvec{x}{}}
 		\f$
 */
 Matrix<double>
-CameraWithDistortion::Intrinsic::jacobianK(const Point2d& xc) const
+CameraWithDistortion::Intrinsic::jacobianK(const Point2d& x) const
 {
-    const Point2d&	xxd = xd(xc);
+    const Point2d&	xxd = xd(x);
     Matrix<double>	J(2, 7);
     J[1][0] = J[0][4] = xxd[1];
     J[0][1] = J[1][2] = 1.0;
     J[0][3] = xxd[0];
-    const double	sqr = xc * xc;
-    J[0][5] = sqr * (k00() * xc[0] + k01() * xc[1]);
-    J[1][5] = sqr * (		       k() * xc[1]);
+    const double	sqr = x * x;
+    J[0][5] = sqr * (k00() * x[0] + k01() * x[1]);
+    J[1][5] = sqr * (		      k() * x[1]);
     J[0][6] = sqr * J[0][5];
     J[1][6] = sqr * J[1][5];
 
@@ -200,7 +204,7 @@ CameraWithDistortion::Intrinsic::jacobianK(const Point2d& xc) const
 /*!
   \param u	画像座標系における投影点の2次元位置
   \return	canonical画像カメラ座標系におけるuの2次元位置，すなわち
-		\f$\TUvec{x}{c} = {\cal K}^{-1}(\TUvec{u}{})\f$
+		\f$\TUvec{x}{} = {\cal K}^{-1}(\TUvec{u}{})\f$
 */
 Point2d
 CameraWithDistortion::Intrinsic::xcFromU(const Point2d& u) const

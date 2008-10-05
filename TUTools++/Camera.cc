@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.cc,v 1.11 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: Camera.cc,v 1.12 2008-10-05 23:25:16 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -111,57 +111,57 @@ Camera::intrinsic()
 ************************************************************************/
 //! canonical座標系において表現された投影点の画像座標系における位置を求める．
 /*!
-  \param xc	投影点のcanonical座標における位置を表す2次元ベクトル
-  \return	xcの画像座標系における位置，すなわち
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	xの画像座標系における位置，すなわち
 		\f$
 		\TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray =
 		\TUvec{K}{}
-		\TUbeginarray{c} \TUvec{x}{c} \\ 1 \TUendarray
+		\TUbeginarray{c} \TUvec{x}{} \\ 1 \TUendarray
 		\f$
 */
 Point2d
-Camera::Intrinsic::operator ()(const Point2d& xc) const
+Camera::Intrinsic::operator ()(const Point2d& x) const
 {
-    return Point2d(_k00 * xc[0] + _k01 * xc[1] + principal()[0],
-		   k() * xc[1] + principal()[1]);
+    return Point2d(_k00 * x[0] + _k01 * x[1] + principal()[0],
+		   k() * x[1] + principal()[1]);
 }
 
-//! 内部パラメータに関する投影点の画像座標の1階微分を求める
+//! 内部パラメータに関する投影点の画像座標の1階微分を求める．
 /*!
   ただし，アスペクト比aと焦点距離kの積ak, 非直交歪みsと焦点距離kの積skをそれぞれ
   第4, 第5番目の内部パラメータとして扱い，k, u0, v0, ak, skの5パラメータに関する
-  1階微分としてJacobianを計算する．
-  \param xc	canonical画像座標における投影点の2次元位置
-  \return	投影点のcanonical画像座標の1階微分を表す2x5	Jacobi行列，すなわち
+  1階微分としてヤコビ行列を計算する．
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x5ヤコビ行列，すなわち
 		\f$
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}} =
 		\TUbeginarray{ccccc}
-		& 1 & & x_c & y_c \\ y_c & & 1 & &
+		& 1 & & x & y \\ y & & 1 & &
 		\TUendarray
 		\f$
 */
 Matrix<double>
-Camera::Intrinsic::jacobianK(const Point2d& xc) const
+Camera::Intrinsic::jacobianK(const Point2d& x) const
 {
     Matrix<double>	J(2, 5);
-    J[1][0] = J[0][4] = xc[1];
+    J[1][0] = J[0][4] = x[1];
     J[0][1] = J[1][2] = 1.0;
-    J[0][3] = xc[0];
+    J[0][3] = x[0];
 
     return J;
 }
 
-//! canonical画像座標に関する投影点の画像座標の1階微分を求める
+//! canonical画像座標に関する投影点の画像座標の1階微分を求める．
 /*!
-  \param x	対象点の3次元位置
-  \return	投影点の画像座標の1階微分を表す2x2 Jacobi行列，すなわち
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	投影点の画像座標の1階微分を表す2x2ヤコビ行列，すなわち
 		\f$
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}} =
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}} =
 		\TUbeginarray{cc} ak & sk \\ & k \TUendarray
 		\f$
 */
 Matrix22d
-Camera::Intrinsic::jacobianXC(const Point2d& xc) const
+Camera::Intrinsic::jacobianXC(const Point2d& x) const
 {
     Matrix22d	J;
     J[0][0] = _k00;

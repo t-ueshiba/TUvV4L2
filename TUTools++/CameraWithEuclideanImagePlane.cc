@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CameraWithEuclideanImagePlane.cc,v 1.12 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: CameraWithEuclideanImagePlane.cc,v 1.13 2008-10-05 23:25:17 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -58,31 +58,31 @@ CameraWithEuclideanImagePlane::intrinsic()
 ************************************************************************/
 //! canonical画像座標系において表現された投影点の画像座標系における位置を求める．
 /*!
-  \param xc	canonical画像座標における投影点の2次元位置
-  \return	xcの画像座標系における2次元位置，すなわち
-		\f$\TUvec{u}{} = k\TUvec{x}{c} + \TUvec{u}{0}\f$
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	xの画像座標系における2次元位置，すなわち
+		\f$\TUvec{u}{} = k\TUvec{x}{} + \TUvec{u}{0}\f$
 */
 Point2d
-CameraWithEuclideanImagePlane::Intrinsic::operator ()(const Point2d& xc) const
+CameraWithEuclideanImagePlane::Intrinsic::operator ()(const Point2d& x) const
 {
-    return Point2d(k() * xc[0] + _principal[0], k() * xc[1] + _principal[1]);
+    return Point2d(k() * x[0] + _principal[0], k() * x[1] + _principal[1]);
 }
 
 //! 内部パラメータに関する投影点の画像座標の1階微分を求める
 /*!
-  \param xc	canonical画像座標における投影点の2次元位置
-  \return	投影点のcanonical画像座標の1階微分を表す2x3	Jacobi行列，すなわち
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x3ヤコビ行列，すなわち
 		\f$
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}} =
-		\TUbeginarray{ccc} x_c & 1 &  \\ y_c & & 1 \TUendarray
+		\TUbeginarray{ccc} x & 1 &  \\ y & & 1 \TUendarray
 		\f$
 */
 Matrix<double>
-CameraWithEuclideanImagePlane::Intrinsic::jacobianK(const Point2d& xc) const
+CameraWithEuclideanImagePlane::Intrinsic::jacobianK(const Point2d& x) const
 {
     Matrix<double>	J(2, 3);
-    J[0][0] = xc[0];
-    J[1][0] = xc[1];
+    J[0][0] = x[0];
+    J[1][0] = x[1];
     J[0][1] = J[1][2] = 1.0;
 
     return J;
@@ -92,7 +92,7 @@ CameraWithEuclideanImagePlane::Intrinsic::jacobianK(const Point2d& xc) const
 /*!
   \param u	画像座標系における投影点の2次元位置
   \return	canonical画像座標系におけるuの2次元位置，すなわち
-		\f$\TUvec{x}{c} = k^{-1}(\TUvec{u}{} - \TUvec{u}{0})\f$
+		\f$\TUvec{x}{} = k^{-1}(\TUvec{u}{} - \TUvec{u}{0})\f$
 */
 Point2d
 CameraWithEuclideanImagePlane::Intrinsic::xcFromU(const Point2d& u) const

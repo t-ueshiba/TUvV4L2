@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.h,v 1.3 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: Camera.h,v 1.4 2008-10-05 23:25:16 ueshiba Exp $
  */
 #ifndef __TUCamera_h
 #define __TUCamera_h
@@ -48,10 +48,10 @@ class CameraBase
 	virtual ~Intrinsic()						;
 	
       // various operations.
-	virtual Point2d		operator ()(const Point2d& xc)	const	;
-	virtual Point2d		xd(const Point2d& xc)		const	;
-	virtual Matrix<double>	jacobianK(const Point2d& xc)	const	;
-	virtual Matrix22d	jacobianXC(const Point2d& xc)	const	;
+	virtual Point2d		operator ()(const Point2d& x)	const	;
+	virtual Point2d		xd(const Point2d& x)		const	;
+	virtual Matrix<double>	jacobianK(const Point2d& x)	const	;
+	virtual Matrix22d	jacobianXC(const Point2d& x)	const	;
 	virtual Point2d		xcFromU(const Point2d& u)	const	;
 
       // calibration matrices.    
@@ -96,20 +96,20 @@ class CameraBase
     virtual ~CameraBase()						;
     
   // various operations in canonical coordinates.
-    Point2d		xc(const Point3d& x)			const	;
+    Point2d		xc(const Point3d& X)			const	;
     Point2d		xcFromU(const Point2d& u)		const	;
     Matrix34d		Pc()					const	;
-    Matrix<double>	jacobianPc(const Point3d& x)		const	;
-    Matrix23d		jacobianXc(const Point3d& x)		const	;
+    Matrix<double>	jacobianPc(const Point3d& X)		const	;
+    Matrix23d		jacobianXc(const Point3d& X)		const	;
 
   // various oeprations in image coordinates.
-    Point2d		operator ()(const Point3d& x)		const	;
+    Point2d		operator ()(const Point3d& X)		const	;
     Matrix34d		P()					const	;
-    Matrix<double>	jacobianP(const Point3d& x)		const	;
-    Matrix<double>	jacobianFCC(const Point3d& x)		const	;
-    Matrix23d		jacobianX(const Point3d& x)		const	;
-    Matrix<double>	jacobianK(const Point3d& x)		const	;
-    Matrix22d		jacobianXC(const Point3d& x)		const	;
+    Matrix<double>	jacobianP(const Point3d& X)		const	;
+    Matrix<double>	jacobianFCC(const Point3d& X)		const	;
+    Matrix23d		jacobianX(const Point3d& X)		const	;
+    Matrix<double>	jacobianK(const Point3d& X)		const	;
+    Matrix22d		jacobianXC(const Point3d& X)		const	;
 
   //! 投影行列をセットする．
   /*!
@@ -236,29 +236,29 @@ class CameraBase
 
 //! 3次元空間中の点の投影点のcanonical画像座標系における位置を求める．
 /*!
-  \param x	対象点の3次元位置
+  \param X	対象点の3次元位置
   \return	canonical画像座標系におけるxの投影点の位置，すなわち
 		\f$
-		\TUbeginarray{c} x_c \\ y_c \TUendarray = 
-		\frac{1}{\TUtvec{r}{z}(\TUvec{x}{} - \TUvec{t}{})}
+		\TUvec{x}{} = 
+		\frac{1}{\TUtvec{r}{z}(\TUvec{X}{} - \TUvec{t}{})}
 		\TUbeginarray{c}
-		\TUtvec{r}{x}(\TUvec{x}{} - \TUvec{t}{}) \\
-		\TUtvec{r}{y}(\TUvec{x}{} - \TUvec{t}{})
+		\TUtvec{r}{x}(\TUvec{X}{} - \TUvec{t}{}) \\
+		\TUtvec{r}{y}(\TUvec{X}{} - \TUvec{t}{})
 		\TUendarray
 		\f$
 */
 inline Point2d
-CameraBase::xc(const Point3d& x) const
+CameraBase::xc(const Point3d& X) const
 {
-    const Vector<double>&	xx = _Rt * (x - _t);
-    return Point2d(xx[0] / xx[2], xx[1] / xx[2]);
+    const Vector<double>&	x = _Rt * (X - _t);
+    return Point2d(x[0] / x[2], x[1] / x[2]);
 }
 
 //! 画像座標における投影点の2次元位置をcanonical画像座標系に直す．
 /*!
   \param u	画像座標系における投影点の2次元位置
   \return	canonical画像カメラ座標系におけるuの2次元位置，すなわち
-		\f$\TUvec{x}{c} = {\cal K}^{-1}(\TUvec{u}{})\f$
+		\f$\TUvec{x}{} = {\cal K}^{-1}(\TUvec{u}{})\f$
 */
 inline Point2d
 CameraBase::xcFromU(const Point2d& u) const
@@ -268,14 +268,14 @@ CameraBase::xcFromU(const Point2d& u) const
 
 //! 3次元空間中の点の投影点の画像座標系における位置を求める．
 /*!
-  \param x	対象点の3次元位置
-  \return	xの投影点の画像座標系における位置，すなわち
-		\f$\TUvec{u}{} = {\cal K}(\TUvec{x}{c}(\TUvec{x}{}))\f$
+  \param X	対象点の3次元位置
+  \return	Xの投影点の画像座標系における位置，すなわち
+		\f$\TUvec{u}{} = {\cal K}(\TUvec{x}{}(\TUvec{X}{}))\f$
 */
 inline Point2d
-CameraBase::operator ()(const Point3d& x) const
+CameraBase::operator ()(const Point3d& X) const
 {
-    return intrinsic()(xc(x));
+    return intrinsic()(xc(X));
 }
 
 //! 3次元ユークリッド空間から画像平面への投影行列を求める．
@@ -294,8 +294,8 @@ CameraBase::P() const
 
 //! カメラ位置以外の全カメラパラメータに関する投影点の画像座標の1階微分を求める．
 /*!
-  \param x	対象点の3次元位置
-  \return	投影点の画像座標の1階微分を表す2x(3+#dofIntrinsic()) Jacobi行列，
+  \param X	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x(3+#dofIntrinsic())ヤコビ行列，
 		すなわち
 		\f$
 		\TUbeginarray{ccc}
@@ -303,62 +303,58 @@ CameraBase::P() const
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
 		\TUendarray =
 		\TUbeginarray{ccc}
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
-		\TUdisppartial{\TUvec{x}{c}}{\TUvec{\theta}{}} &
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}}
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{\theta}{}} &
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
 		\TUendarray
 		\f$
 */
 inline Matrix<double>
-CameraBase::jacobianFCC(const Point3d& x) const
+CameraBase::jacobianFCC(const Point3d& X) const
 {
-    const Matrix<double>&	J = jacobianP(x);
+    const Matrix<double>&	J = jacobianP(X);
     return Matrix<double>(J, 0, 3, J.nrow(), J.ncol() - 3);
 }
 
 //! 点の3次元位置に関する投影点の画像座標の1階微分を求める．
 /*!
-  \param x	対象点の3次元位置
-  \return	投影点の画像座標の1階微分を表す2x3 Jacobi行列，すなわち
+  \param X	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x3ヤコビ行列，すなわち
 		\f$
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}} =
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
-		\TUdisppartial{\TUvec{x}{c}}{\TUvec{x}{}}
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{X}{}} =
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}}
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{X}{}}
 		\f$
 */
 inline Matrix23d
-CameraBase::jacobianX(const Point3d& x) const
+CameraBase::jacobianX(const Point3d& X) const
 {
-    return intrinsic().jacobianXC(xc(x)) * jacobianXc(x);
+    return intrinsic().jacobianXC(xc(X)) * jacobianXc(X);
 }
 
 //! 内部パラメータに関する投影点の画像座標の1階微分を求める
 /*!
-  \param x	対象点の3次元位置
-  \return	投影点の画像座標の1階微分を表す2x#dofIntrinsic() Jacobi行列，
+  \param X	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x#dofIntrinsic()ヤコビ行列，
 		すなわち
-		\f$
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
-		\f$
+		\f$\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}\f$
 */
 inline Matrix<double>
-CameraBase::jacobianK(const Point3d& x) const
+CameraBase::jacobianK(const Point3d& X) const
 {
-    return intrinsic().jacobianK(xc(x));
+    return intrinsic().jacobianK(xc(X));
 }
 
 //! canonical画像座標に関する投影点の画像座標の1階微分を求める
 /*!
-  \param x	対象点の3次元位置
-  \return	投影点の画像座標の1階微分を表す2x2 Jacobi行列，すなわち
-		\f$
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
-		\f$
+  \param X	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x2ヤコビ行列，すなわち
+		\f$\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}}\f$
 */
 inline Matrix22d
-CameraBase::jacobianXC(const Point3d& x) const
+CameraBase::jacobianXC(const Point3d& X) const
 {
-    return intrinsic().jacobianXC(xc(x));
+    return intrinsic().jacobianXC(xc(X));
 }
 
 //! 内部パラメータを指定された量だけ更新する．
@@ -613,9 +609,9 @@ class CameraWithFocalLength : public CameraBase
 	Intrinsic(double k=1.0)	:_k(k)					{}
 
       // various operations.
-	virtual Point2d		operator ()(const Point2d& xc)	const	;
-	virtual Matrix<double>	jacobianK(const Point2d& xc)	const	;
-	virtual Matrix22d	jacobianXC(const Point2d& xc)	const	;
+	virtual Point2d		operator ()(const Point2d& x)	const	;
+	virtual Matrix<double>	jacobianK(const Point2d& x)	const	;
+	virtual Matrix22d	jacobianXC(const Point2d& x)	const	;
 	virtual Point2d		xcFromU(const Point2d& u)	const	;
 
       // calibration matrices.
@@ -701,8 +697,8 @@ class CameraWithEuclideanImagePlane : public CameraBase
 	     _principal(0.0, 0.0)					{}
 	
       // various operations.	
-	virtual Point2d		operator ()(const Point2d& xc)	const	;
-	virtual Matrix<double>	jacobianK(const Point2d& xc)	const	;
+	virtual Point2d		operator ()(const Point2d& x)	const	;
+	virtual Matrix<double>	jacobianK(const Point2d& x)	const	;
 	virtual Point2d		xcFromU(const Point2d& u)	const	;
     
       // calibration matrices.	
@@ -805,9 +801,9 @@ class Camera : public CameraBase
 	     _k00(k()), _k01(0.0)			{setIntrinsic(K);}
 	
       // various operations.
-	virtual Point2d		operator ()(const Point2d& xc)	const	;
-	virtual Matrix<double>	jacobianK(const Point2d& xc)	const	;
-	virtual Matrix22d	jacobianXC(const Point2d& xc)	const	;
+	virtual Point2d		operator ()(const Point2d& x)	const	;
+	virtual Matrix<double>	jacobianK(const Point2d& x)	const	;
+	virtual Matrix22d	jacobianXC(const Point2d& x)	const	;
 	virtual Point2d		xcFromU(const Point2d& u)	const	;
 
       // calibration matrices.
@@ -936,10 +932,10 @@ class CameraWithDistortion : public CameraBase
 	    :Camera::Intrinsic(), _d1(0.0), _d2(0.0)	{setIntrinsic(K);}
 	
       // various operations.
-	virtual Point2d		operator ()(const Point2d& xc)	const	;
-	virtual Point2d		xd(const Point2d& xc)		const	;
-	virtual Matrix<double>	jacobianK(const Point2d& xc)	const	;
-	virtual Matrix22d	jacobianXC(const Point2d& xc)	const	;
+	virtual Point2d		operator ()(const Point2d& x)	const	;
+	virtual Point2d		xd(const Point2d& x)		const	;
+	virtual Matrix<double>	jacobianK(const Point2d& x)	const	;
+	virtual Matrix22d	jacobianXC(const Point2d& x)	const	;
 	virtual Point2d		xcFromU(const Point2d& u)	const	;
 	virtual CameraBase::Intrinsic&
 				update(const Vector<double>& dp)	;
