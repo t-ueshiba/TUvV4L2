@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CameraBase.cc,v 1.14 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: CameraBase.cc,v 1.15 2008-10-05 23:25:16 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -62,25 +62,25 @@ CameraBase::Pc() const
 
 //! カメラパラメータに関する投影点のcanonical画像座標の1階微分を求める．
 /*!
-  \param x	対象点の3次元位置
-  \return	投影点のcanonical画像座標の1階微分を表す2x6 Jacobi行列，すなわち
+  \param X	対象点の3次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x6ヤコビ行列，すなわち
 		\f$
 		\TUbeginarray{cc}
-		\TUdisppartial{\TUvec{x}{c}}{\TUvec{t}{}} &
-		\TUdisppartial{\TUvec{x}{c}}{\TUvec{\theta}{}}
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{t}{}} &
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{\theta}{}}
 		\TUendarray
 		\f$
 */
 Matrix<double>
-CameraBase::jacobianPc(const Point3d& x) const
+CameraBase::jacobianPc(const Point3d& X) const
 {
-    const Vector3d&		dx = x - _t;
-    const Vector<double>&	xx = _Rt * dx;
+    const Vector3d&		dX = X - _t;
+    const Vector<double>&	x  = _Rt * dX;
     Matrix<double>		J(2, 6);
-    (J[0](0, 3) = (xx[0] / xx[2] * _Rt[2] - _Rt[0])) /= xx[2];
-    (J[1](0, 3) = (xx[1] / xx[2] * _Rt[2] - _Rt[1])) /= xx[2];
-    J[0](3, 3) = J[0](0, 3) ^ dx;
-    J[1](3, 3) = J[1](0, 3) ^ dx;
+    (J[0](0, 3) = (x[0] / x[2] * _Rt[2] - _Rt[0])) /= x[2];
+    (J[1](0, 3) = (x[1] / x[2] * _Rt[2] - _Rt[1])) /= x[2];
+    J[0](3, 3) = J[0](0, 3) ^ dX;
+    J[1](3, 3) = J[1](0, 3) ^ dX;
 
     return J;
 }
@@ -88,16 +88,16 @@ CameraBase::jacobianPc(const Point3d& x) const
 //! 点の3次元位置に関する投影点のcanonical画像座標の1階微分を求める．
 /*!
   \param x	対象点の3次元位置
-  \return	投影点のcanonical画像座標の1階微分を表す2x3 Jacobi行列，すなわち
-		\f$\TUdisppartial{\TUvec{x}{c}}{\TUvec{x}{}}\f$
+  \return	投影点のcanonical画像座標の1階微分を表す2x3ヤコビ行列，すなわち
+		\f$\TUdisppartial{\TUvec{x}{}}{\TUvec{X}{}}\f$
 */
 Matrix23d
-CameraBase::jacobianXc(const Point3d& x) const
+CameraBase::jacobianXc(const Point3d& X) const
 {
-    const Vector<double>&	xx = _Rt * (x - _t);
+    const Vector<double>&	x = _Rt * (X - _t);
     Matrix23d			J;
-    (J[0] = (_Rt[0] - xx[0] / xx[2] * _Rt[2])) /= xx[2];
-    (J[1] = (_Rt[1] - xx[1] / xx[2] * _Rt[2])) /= xx[2];
+    (J[0] = (_Rt[0] - x[0] / x[2] * _Rt[2])) /= x[2];
+    (J[1] = (_Rt[1] - x[1] / x[2] * _Rt[2])) /= x[2];
 
     return J;
 }
@@ -105,7 +105,7 @@ CameraBase::jacobianXc(const Point3d& x) const
 //! 全カメラパラメータに関する投影点の画像座標の1階微分を求める．
 /*!
   \param x	対象点の3次元位置
-  \return	投影点の画像座標の1階微分を表す2x(6+#dofIntrinsic()) Jacobi行列，
+  \return	投影点の画像座標の1階微分を表す2x(6+#dofIntrinsic())ヤコビ行列，
 		すなわち
 		\f$
 		\TUbeginarray{ccc}
@@ -114,22 +114,22 @@ CameraBase::jacobianXc(const Point3d& x) const
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
 		\TUendarray =
 		\TUbeginarray{cc}
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}}
 		\TUbeginarray{cc}
-		\TUdisppartial{\TUvec{x}{c}}{\TUvec{t}{}} &
-		\TUdisppartial{\TUvec{x}{c}}{\TUvec{\theta}{}}
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{t}{}} &
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{\theta}{}}
 		\TUendarray &
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
 		\TUendarray
 		\f$
 */
 Matrix<double>
-CameraBase::jacobianP(const Point3d& x) const
+CameraBase::jacobianP(const Point3d& X) const
 {
-    const Point2d&		xx = xc(x);
-    const Matrix<double>&	JK = intrinsic().jacobianK(xx);
+    const Point2d&		x  = xc(X);
+    const Matrix<double>&	JK = intrinsic().jacobianK(x);
     Matrix<double>		J(2, 6 + JK.ncol());
-    J(0, 0, 2, 6) = intrinsic().jacobianXC(xx) * jacobianPc(x);
+    J(0, 0, 2, 6) = intrinsic().jacobianXC(x) * jacobianPc(X);
     J(0, 6, 2, JK.ncol()) = JK;
 
     return J;
@@ -173,52 +173,48 @@ CameraBase::Intrinsic::~Intrinsic()
 
 //! canonical画像座標系において表現された投影点の画像座標系における位置を求める．
 /*!
-  \param xc	canonical画像座標における投影点の2次元位置
-  \return	xcの画像座標系における2次元位置，すなわち
-		\f$\TUvec{u}{} = {\cal K}(\TUvec{x}{c})\f$
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	xの画像座標系における2次元位置，すなわち
+		\f$\TUvec{u}{} = {\cal K}(\TUvec{x}{})\f$
 */
 Point2d
-CameraBase::Intrinsic::operator ()(const Point2d& xc) const
+CameraBase::Intrinsic::operator ()(const Point2d& x) const
 {
-    return xc;
+    return x;
 }
 
 //! canonical画像座標系において表現された投影点の画像座標系に放射歪曲を付加する．
 /*!
-  \param xc	canonical画像座標における投影点の2次元位置
+  \param x	canonical画像座標における投影点の2次元位置
   \return	放射歪曲付加後の投影点の2次元位置
 */
 Point2d
-CameraBase::Intrinsic::xd(const Point2d& xc) const
+CameraBase::Intrinsic::xd(const Point2d& x) const
 {
-    return xc;
+    return x;
 }
 
-//! 内部パラメータに関する投影点の画像座標の1階微分を求める
+//! 内部パラメータに関する投影点の画像座標の1階微分を求める．
 /*!
-  \param xc	canonical画像座標における投影点の2次元位置
+  \param x	canonical画像座標における投影点の2次元位置
   \return	投影点のcanonical画像座標の1階微分を表す2x#dofIntrinsic()
-		Jacobi行列，すなわち
-		\f$
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
-		\f$
+		ヤコビ行列，すなわち
+		\f$\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}\f$
 */
 Matrix<double>
-CameraBase::Intrinsic::jacobianK(const Point2d& xc) const
+CameraBase::Intrinsic::jacobianK(const Point2d& x) const
 {
     return Matrix<double>(2, 0);
 }
 
-//! canonical画像座標に関する投影点の画像座標の1階微分を求める
+//! canonical画像座標に関する投影点の画像座標の1階微分を求める．
 /*!
-  \param xc	canonical画像座標における投影点の2次元位置
-  \return	投影点のcanonical画像座標の1階微分を表す2x2 Jacobi行列，すなわち
-		\f$
-		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{c}}
-		\f$
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	投影点のcanonical画像座標の1階微分を表す2x2ヤコビ行列，すなわち
+		\f$\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}}\f$
 */
 Matrix22d
-CameraBase::Intrinsic::jacobianXC(const Point2d& xc) const
+CameraBase::Intrinsic::jacobianXC(const Point2d& x) const
 {
     return Matrix22d::I(2);
 }
@@ -227,7 +223,7 @@ CameraBase::Intrinsic::jacobianXC(const Point2d& xc) const
 /*!
   \param u	画像座標系における投影点の2次元位置
   \return	canonical画像座標系におけるuの2次元位置，すなわち
-		\f$\TUvec{x}{c} = {\cal K}^{-1}(\TUvec{u}{})\f$
+		\f$\TUvec{x}{} = {\cal K}^{-1}(\TUvec{u}{})\f$
 */
 Point2d
 CameraBase::Intrinsic::xcFromU(const Point2d& u) const

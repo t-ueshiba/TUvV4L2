@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mapping.h,v 1.3 2008-09-11 00:14:16 ueshiba Exp $
+ *  $Id: Mapping.h,v 1.4 2008-10-05 23:25:17 ueshiba Exp $
  */
 #ifndef __TUMapping_h
 #define __TUMapping_h
@@ -245,11 +245,11 @@ ProjectiveMapping::mapP(const Vector<S, B>& x) const
 	return _T * x;
 }
 
-//! 与えられた点におけるJacobianを返す．
+//! 与えられた点におけるヤコビ行列を返す．
 /*!
-  Jacobianとは射影変換行列成分に関する1階微分のことである．
+  ヤコビ行列とは射影変換行列成分に関する1階微分のことである．
   \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
-  \return	Jacobian（#outDim() x (#outDim()+1)x(#inDim()+1)行列）
+  \return	#outDim() x (#outDim()+1)x(#inDim()+1)ヤコビ行列
 */
 template <class S, class B> Matrix<double>
 ProjectiveMapping::jacobian(const Vector<S, B>& x) const
