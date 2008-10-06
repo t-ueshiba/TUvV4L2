@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: utility.h,v 1.16 2008-09-10 05:10:51 ueshiba Exp $
+ *  $Id: utility.h,v 1.17 2008-10-06 01:41:25 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -33,6 +33,10 @@
 #include <algorithm>
 #include <iterator>
 
+/*!
+  \namespace	std
+  \brief	いくつかの基本的な関数を名前空間stdに追加
+*/
 namespace std
 {
 /************************************************************************
