@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Ransac.h,v 1.3 2008-09-10 05:10:46 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.4 2008-10-06 01:41:25 ueshiba Exp $
  */
 #ifndef __TURansac_h
 #define __TURansac_h
@@ -43,34 +43,33 @@ namespace TU
 /*!
   テンプレートパラメータPointSetは点集合を表すクラスであり，以下の条件を
   満たすこと：
-  \verbatim
-  1. forward_iteratorをサポートするコンテナである．
-  2. このコンテナの型をPointSet::Containerという名前でtypedefしている．
-  3. inlierの割合をメンバ関数
+  -# forward_iteratorをサポートするコンテナである．
+  -# このコンテナの型を
+	PointSet::Container
+     という名前でtypedefしている．
+  -# inlierの割合をメンバ関数
 	double	Pointset::inlierRate() const;
      によって知ることができる．
-  4. メンバ関数
+  -# メンバ関数
 	PoinstSet::Container	Pointset::sample(u_int npoints) const;
      によってランダムにnpoints個の部分集合を取り出せる．
-  \endverbatim
+
   テンプレートパラメータModelは当てはめるべきモデルを表すクラスであり，
   以下の条件を満たすこと：
-  \verbatim
-  1. メンバ関数
+  -# メンバ関数
 	template <class Iterator>
 	void	Model::fit(Iterator first, Iterator last);
      によって点集合にモデルを当てはめることができる．
-  2. 1.に必要な最少点数をメンバ関数
+  -# 1.に必要な最少点数をメンバ関数
 	u_int	Model::ndataMin() const;
      によって知ることができる．
-  \endverbatim
+
   テンプレートパラメータConformは点のモデルへの適合性を判定する関数
   オブジェクトであり，
-  \verbatim
 	bool	Conform::operator()(const PointSet::Container::valu_type& p,
 				    const Model& model);
-  \endverbatim
   なるインタフェースによってpがmodelに適合しているか判定できること．
+
   \param pointSet	inlierとoutlierを含む点集合
   \param model		pointSetに含まれるinlierを当てはめるモデル．
   \param hitRate	RANSACによって正しくinlierを引き当てる確率．

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Minimize.h,v 1.4 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: Minimize.h,v 1.5 2008-10-06 01:41:24 ueshiba Exp $
  */
 #ifndef __TUMinimize_h
 #define __TUMinimize_h
@@ -67,14 +67,16 @@ class NullConstraint
   関数であり，#minimizeSquare()や#minimizeSquareSparce()のテンプレートパラメータG
   として利用することを想定している．
   \param AT	引数の型．以下の条件を満たすこと：
-  \verbatim
-  1. ベクトルや行列である場合，その要素の型をAT::value_typeという名前でtypedefしている．
-  2. メンバ関数
+  -# ベクトルや行列である場合，その要素の型を
+	AT::value_type
+     という名前でtypedefしている．
+  -# メンバ関数
 	AT::value_type	AT::square() const
      によって，その2乗ノルム値を知ることができる．
-  3. Vector<AT::value_type>型に変換できる(例：Matrix<AT::value_type>型は
-     その要素を行優先順に1列に並べたベクトルに変換可能)．
-  \endverbatim  
+  -# Vector<AT::value_type>
+     型に変換できる(例：
+     Matrix<AT::value_type>
+     型はその要素を行優先順に1列に並べたベクトルに変換可能)．
 */
 template <class AT>
 class ConstNormConstraint
@@ -132,34 +134,37 @@ class ConstNormConstraint
   
   テンプレートパラメータATは，ベクトル値関数および拘束条件関数の引数を表す型であり，
   以下の条件を満たすこと：
-  \verbatim
-  引数がベクトルや行列である場合，その要素の型をAT::value_typeという名前でtypedefしている．
-  \endverbatim  
+  -# 引数がベクトルや行列である場合，その要素の型を
+	AT::value_type
+     という名前でtypedefしている．
+
   テンプレートパラメータFは，AT型の引数を入力してベクトル値を出力する関数を表す型であり，
   以下の条件を満たすこと：
-  \verbatim
-  1. 出力ベクトルの要素の型をF::value_typeという名前でtypedefしている．
-  2. 引数xを与えたときの関数値は，メンバ関数
+  -# 出力ベクトルの要素の型を
+	F::value_type
+     という名前でtypedefしている．
+  -# 引数xを与えたときの関数値は，メンバ関数
 	Vector<F:value_type>	F::operator ()(const AT& x) const
      によって与えられる．
-  3. 引数xを与えたときのヤコビアンは，メンバ関数
+  -# 引数xを与えたときのヤコビアンは，メンバ関数
 	Matrix<F:value_type>	F::jacobian(const AT& x) const
      によって与えられる．
-  4. メンバ関数
+  -# メンバ関数
 	void	F::update(const AT& x, const Vector<F::value_type>& dx) const
      によって引数xを微少量dxだけ更新することができる．
-  \endverbatim
+
   テンプレートパラメータGは，AT型の引数を入力してベクトル値を出力する関数を表す型であり，
   以下の条件を満たすこと：
-  \verbatim
-  1. 出力ベクトルの要素の型をG::value_typeという名前でtypedefしている．
-  2. 引数xを与えたときの関数値は，メンバ関数
+  -# 出力ベクトルの要素の型を
+	G::value_type
+     という名前でtypedefしている．
+  -# 引数xを与えたときの関数値は，メンバ関数
 	Vector<G:value_type>	G::operator ()(const AT& x) const
      によって与えられる．
-  3. 引数xを与えたときのヤコビアンは，メンバ関数
+  -# 引数xを与えたときのヤコビアンは，メンバ関数
 	Matrix<G::value_type>	G::jacobian(const AT& x) const
      によって与えられる．
-  \endverbatim
+
   \param f		その2乗ノルムを最小化すべきベクトル値関数
   \param g		拘束条件を表すベクトル値関数
   \param x		初期値を与えると，gが零ベクトルとなるという拘束条件の下で
@@ -260,49 +265,58 @@ minimizeSquare(const F& f, const G& g, AT& x,
   
   テンプレートパラメータATAは，ベクトル値関数fの第1引数および拘束条件関数gの引数aを
   表す型であり，以下の条件を満たすこと：
-  \verbatim
-  引数がベクトルや行列である場合，その要素の型をATA::value_typeという名前でtypedefしている．
-  \endverbatim  
+  -# 引数がベクトルや行列である場合，その要素の型を
+	ATA::value_type
+     という名前でtypedefしている．
+
   テンプレートパラメータIBは，個々のベクトル値関数f_jの第2引数b_jを指す反復子を表す型
   であり，以下の条件を満たすこと：
-  \verbatim
-  iterator_traits<IB>::value_typeでこの反復子が指す引数の型(以下，ATBとする)を知ることができる．
-  \endverbatim  
+  -# iterator_traits<IB>::value_type
+     でこの反復子が指す引数の型(以下，ATBとする)を知ることができる．
+
   テンプレートパラメータFは，ATA型の引数aとATB型の引数b_jを入力してベクトル値を出力する
   関数を表す型であり，以下の条件を満たすこと：
-  \verbatim
-  1. 出力ベクトルの要素の型をF::value_typeという名前でtypedefしている．
-  2. ヤコビアンの型をF::jacobian_typeという名前でtypedefしている．
-  3. ATA型の引数aが持つ自由度を
+  -# 出力ベクトルの要素の型を
+	F::value_type
+     という名前でtypedefしている．
+  -# ヤコビアンの型を
+	F::jacobian_type
+     という名前でtypedefしている．
+  -# ATA型の引数aが持つ自由度を
 	u_int	F::adim() const
      によって知ることができる．
-  4. 引数aをa_1, a_2,..., a_Iに分割した場合の各a_iが持つ自由度を
+  -# 引数aをa_1, a_2,..., a_Iに分割した場合の各a_iが持つ自由度を
 	const Array<u_int>&	F::adims() const;
-     によって知ることができる．この配列の要素の総和はF::adim()に等しい．aが分割できない場合長さ1の配列が返され，その唯一の要素の値はF::adim()に等しい．
-  5. 引数a, b_jを与えたときのf_jの関数値は，メンバ関数
+     によって知ることができる．この配列の要素の総和は
+	F::adim()
+     に等しい．aが分割できない場合長さ1の配列が返され，その唯一の要素の値は
+	F::adim()
+     に等しい．
+  -# 引数a, b_jを与えたときのf_jの関数値は，メンバ関数
 	Vector<F:value_type>	F::operator ()(const ATA& a, const ATB& b, int j) const
      によって与えられる．
-  6. 引数a, b_jを与えたときのaで微分したヤコビアンは，メンバ関数
+  -# 引数a, b_jを与えたときのaで微分したヤコビアンは，メンバ関数
 	F::jacobian_type	F::jacobianA(const ATA& a, const ATB& b, int j) const
      によって与えられる．
-  7. メンバ関数
+  -# メンバ関数
 	void	F::updateA(const ATA& a, const Vector<F::value_type>& da) const
      によって引数aを微少量daだけ更新することができる．
-  8. メンバ関数
+  -# メンバ関数
 	void	F::updateB(const ATB& b_j, const Vector<F::value_type>& db_j) const
      によって引数bを微少量db_jだけ更新することができる．
-  \endverbatim
+
   テンプレートパラメータGは，ATA型の引数を入力してベクトル値を出力する関数を表す型であり，
   以下の条件を満たすこと：
-  \verbatim
-  1. 出力ベクトルの要素の型をG::value_typeという名前でtypedefしている．
-  2. 引数aを与えたときの関数値は，メンバ関数
+  -# 出力ベクトルの要素の型を
+	G::value_type
+     という名前でtypedefしている．
+  -# 引数aを与えたときの関数値は，メンバ関数
 	Vector<G:value_type>	G::operator ()(const ATA& a) const
      によって与えられる．
-  3. 引数aを与えたときのヤコビアンは，メンバ関数
+  -# 引数aを与えたときのヤコビアンは，メンバ関数
 	Matrix<G::value_type>	G::jacobian(const ATA& a) const
      によって与えられる．
-  \endverbatim
+
   \param f		その2乗ノルムを最小化すべきベクトル値関数
   \param g		拘束条件を表すベクトル値関数
   \param a		各f_jの第1引数であり，かつgの引数．初期値を与えると最適解が
