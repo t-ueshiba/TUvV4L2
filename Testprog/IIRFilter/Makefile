@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.16 2008-09-08 08:06:36 ueshiba Exp $
+#  $Id: Makefile,v 1.17 2008-10-09 05:52:29 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -28,6 +28,7 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Geometry++.h \
 		/home/ueshiba/include/TU/IIRFilter.h \
 		/home/ueshiba/include/TU/Image++.h \
+		/home/ueshiba/include/TU/Normalize.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/mmInstructions.h \
 		/home/ueshiba/include/TU/types.h
@@ -38,7 +39,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.16 $	|		\
+REV		= $(shell echo $Revision: 1.17 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -54,6 +55,7 @@ main.o: /home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
+	/home/ueshiba/include/TU/Normalize.h \
 	/home/ueshiba/include/TU/GaussianConvolver.h \
 	/home/ueshiba/include/TU/IIRFilter.h \
 	/home/ueshiba/include/TU/mmInstructions.h \
