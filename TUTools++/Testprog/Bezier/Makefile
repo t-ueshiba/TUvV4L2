@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2008-09-08 08:06:30 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2008-10-09 05:52:29 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -29,6 +29,7 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Image++.h \
 		/home/ueshiba/include/TU/List.h \
 		/home/ueshiba/include/TU/Manip.h \
+		/home/ueshiba/include/TU/Normalize.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/types.h \
 		/home/ueshiba/include/TU/v/App.h \
@@ -53,7 +54,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -72,6 +73,7 @@ draw.o: draw.h /home/ueshiba/include/TU/v/OglDC.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
+	/home/ueshiba/include/TU/Normalize.h \
 	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
 	/home/ueshiba/include/TU/v/Colormap.h \
 	/home/ueshiba/include/TU/v/CanvasPane.h \
@@ -86,7 +88,7 @@ main.o: /home/ueshiba/include/TU/v/App.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List.h \
+	/home/ueshiba/include/TU/Normalize.h /home/ueshiba/include/TU/List.h \
 	/home/ueshiba/include/TU/v/Widget-Xaw.h \
 	/home/ueshiba/include/TU/v/CmdWindow.h \
 	/home/ueshiba/include/TU/v/CanvasPane.h draw.h \
