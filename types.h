@@ -1,8 +1,8 @@
 /*
- *  $Id: types.h,v 1.9 2008-10-06 01:41:25 ueshiba Exp $
+ *  $Id: types.h,v 1.10 2008-10-14 00:42:56 ueshiba Exp $
  */
 /*!
-  \mainpage	libTUTools++ - 配列，ベクトル，行列，画像など基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
+  \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
   \anchor	libTUTools
 
   \section copyright 著作権
@@ -34,8 +34,119 @@
 
   \section abstract 概要
   libTUTools++は，配列，ベクトル，行列，画像等の基本的なデータ型とそれ
-  に付随したアルゴリズムを収めたライブラリである．
+  に付随したアルゴリズムを収めたライブラリである．現在実装されている主
+  要なクラスおよび関数はおおまかに以下の分野に分類される．
 
+  <b>1次元および2次元配列</b>
+  - #TU::Array
+  - #TU::Array2
+
+  <b>ベクトルと行列および線形計算</b>
+  - #TU::Vector
+  - #TU::Matrix
+  - #TU::LUDecomposition
+  - #TU::Householder
+  - #TU::QRDecomposition
+  - #TU::TriDiagonal
+  - #TU::BiDiagonal
+  - #TU::SVDecomposition
+  - #TU::BlockMatrix
+
+  <b>非線形最適化</b>
+  - #TU::NullConstraint
+  - #TU::ConstNormConstraint
+  - #Matrix<typename F::value_type> TU::minimizeSquare(const F&, const G&, AT&, int, double)
+  - #Matrix<typename F::value_type> TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, int, double)
+
+  <b>RANSAC</b>
+  - #typename Pointset::Container TU::ransac(const PointSet&, Model&, Conform, double)
+
+  <b>点，直線，平面等の幾何要素とその変換</b>
+  - #TU::Point2
+  - #TU::Point3
+  - #TU::HyperPlane
+  - #TU::Normalize
+  - #TU::ProjectiveMapping
+  - #TU::AffineMapping
+
+  <b>投影の幾何</b>
+  - #TU::CanonicalCamera
+  - #TU::CameraWithFocalLength
+  - #TU::CameraWithEuclideanImagePlane
+  - #TU::Camera
+  - #TU::CameraWithDistortion
+  
+  <b>画素と画像</b>
+  - #TU::RGB
+  - #TU::BGR
+  - #TU::RGBA
+  - #TU::ABGR
+  - #TU::YUV444
+  - #TU::YUV422
+  - #TU::YUV411
+  - #TU::ImageLine
+  - #TU::Image
+  - #TU::GenericImage
+
+  <b>画像処理</b>
+  - #TU::EdgeDetector
+  - #TU::CorrectIntensity
+  - #TU::Warp
+  - #TU::IntegralImage
+  - #TU::DiagonalIntegralImage
+  
+  <b>画像に限らない信号処理</b>
+  - #TU::IIRFilter
+  - #TU::BilateralIIRFilter
+  - #TU::BilateralIIRFilter2
+  - #TU::DericheConvolver
+  - #TU::DericheConvolver2
+  - #TU::GaussianConvolver
+  - #TU::GaussianConvolver2
+  
+  <b>特殊データ構造</b>
+  - #TU::List
+  - #TU::Heap
+  - #TU::PSTree
+
+  <b>Bezier曲線とBezier曲面</b>
+  - #TU::BezierCurve
+  - #TU::BezierSurface
+  
+  <b>B-Spline曲線とB-Spline曲面</b>
+  - #TU::BSplineCurve
+  - #TU::BSplineSurface
+  
+  <b>メッシュ</b>
+  - #TU::Mesh
+
+  <b>標準ライブラリの補強</b>
+  - #const T& std::min(const T&, const T&, const T&)
+  - #const T& std::min(const T&, const T&, const T&, const T&)
+  - #const T& std::max(const T&, const T&, const T&)
+  - #const T& std::max(const T&, const T&, const T&, const T&)
+  - #Iter TU::pull_if(Iter, Iter, Pred)
+  - #T TU::diff(const T&, const T&)
+  - #TU::mbr_iterator
+  - #std::istream& TU::ign(std::istream&)
+  - #std::istream& TU::skipl(std::istream&)
+  - #TU::IOManip
+  - #TU::IManip1
+  - #TU::OManip1
+  - #TU::IOManip1
+  - #TU::IManip2
+  - #TU::OManip2
+
+  <b>メモリ管理</b>
+  - #TU::Allocator
+
+  <b>シリアルインタフェース</b>
+  - #TU::Serial
+  - #TU::Puma
+  - #TU::Pata
+  - #TU::Microscope
+  - #TU::TriggerGenerator
+  
   \file		types.h
   \brief	基本的なデータ型をグローバルな名前空間に追加
 */

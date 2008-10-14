@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: utility.h,v 1.17 2008-10-06 01:41:25 ueshiba Exp $
+ *  $Id: utility.h,v 1.18 2008-10-14 00:42:56 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -105,7 +105,7 @@ diff(const T& a, const T& b)
 }
 
 /************************************************************************
-*  class mem_iterator							*
+*  class mbr_iterator							*
 ************************************************************************/
 //! コンテナの要素の特定のメンバにアクセスする反復子
 /*!
