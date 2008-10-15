@@ -1,26 +1,115 @@
 /*
- * libTUIeee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
- * Copyright (C) 2003-2006 Toshio UESHIBA
- *   National Institute of Advanced Industrial Science and Technology (AIST)
- *
- * Written by Toshio UESHIBA <t.ueshiba@aist.go.jp>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *  $Id: Ieee1394++.h,v 1.21 2008-06-30 00:27:04 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.22 2008-10-15 00:23:03 ueshiba Exp $
  */
+/*!
+  \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
+  \anchor	libTUIeee1394
+
+  \section copyright 著作権
+  Copyright (C) 2003-2006 Toshio UESHIBA
+  National Institute of Advanced Industrial Science and Technology (AIST)
+ 
+  Written by Toshio UESHIBA <t.ueshiba@aist.go.jp>
+ 
+  This library is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of the
+  License, or (at your option) any later version.  This library is
+  distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details.
+ 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+  USA
+
+  \section abstract 概要
+  libTUIeee1394++は，
+  <a href="http://www.1394ta.com/Technology/Specifications/specifications.htm">
+  IIDC 1394ベースのデジタルカメラ</a>を制御するC++ライブラリである．同
+  一または異なるIEEE1394バスに接続された複数のカメラを，それぞれ独立に
+  コントロールすることができる．
+
+  実装されている主要なクラスおよびそのpublicなメンバ関数は，おおまかに
+  以下のように分類される．
+
+  #TU::Ieee1394Node - IEEE1394バスに接続される様々な機器のベースとなるクラス
+  - #TU::Ieee1394Node::nodeId()
+  - #TU::Ieee1394Node::globalUniqueId()
+  - #TU::Ieee1394Node::filltime()
+  - #TU::Ieee1394Node::channel()
+  - #TU::Ieee1394Node::delay()
+
+  #TU::Ieee1394Camera - IEEE1394デジタルカメラを表すクラス
+
+  - <b>基本機能</b>
+    - #TU::Ieee1394Camera::inquireBasicFunction()
+    - #TU::Ieee1394Camera::powerOn()
+    - #TU::Ieee1394Camera::powerOff()
+    - #TU::Ieee1394Camera::bayerTileMapping()
+    - #TU::Ieee1394Camera::isLittleEndian()
+  
+  - <b>画像フォーマットとフレームレート</b>
+    - #TU::Ieee1394Camera::inquireFrameRate()
+    - #TU::Ieee1394Camera::setFormatAndFrameRate()
+    - #TU::Ieee1394Camera::getFormat()
+    - #TU::Ieee1394Camera::getFrameRate()
+    - #TU::Ieee1394Camera::width()
+    - #TU::Ieee1394Camera::height()
+    - #TU::Ieee1394Camera::pixelFormat()
+
+  - <b>特殊フォーマット(Format_7)</b>
+    - #TU::Ieee1394Camera::getFormat_7_Info()
+    - #TU::Ieee1394Camera::setFormat_7_ROI()
+    - #TU::Ieee1394Camera::setFormat_7_PixelFormat()
+
+  - <b>画像の撮影モードの設定</b>
+    - #TU::Ieee1394Camera::continuousShot()
+    - #TU::Ieee1394Camera::stopContinuousShot()
+    - #TU::Ieee1394Camera::inContinuousShot()
+    - #TU::Ieee1394Camera::oneShot()
+    - #TU::Ieee1394Camera::multiShot()
+
+  - <b>画像の撮影</b>
+    - #TU::Ieee1394Camera::snap()
+
+  - <b>画像の取り込み</b>
+    - #Ieee1394Camera& TU::Ieee1394Camera::operator >>(Image<T>&) const
+    - #TU::Ieee1394Camera::captureRGBImage()
+    - #TU::Ieee1394Camera::captureDirectly()
+    - #TU::Ieee1394Camera::captureRaw()
+    - #TU::Ieee1394Camera::captureBayerRaw()
+
+  - <b>カメラの様々な機能の制御</b>
+    - #TU::Ieee1394Camera::inquireFeatureFunction()
+    - #TU::Ieee1394Camera::onePush()
+    - #TU::Ieee1394Camera::inOnePushOperation()
+    - #TU::Ieee1394Camera::turnOn()
+    - #TU::Ieee1394Camera::turnOff()
+    - #TU::Ieee1394Camera::isTurnedOn()
+    - #TU::Ieee1394Camera::setAutoMode()
+    - #TU::Ieee1394Camera::setManualMode()
+    - #TU::Ieee1394Camera::isAuto()
+    - #TU::Ieee1394Camera::setValue()
+    - #TU::Ieee1394Camera::getValue()
+    - #TU::Ieee1394Camera::getMinMax()
+    - #TU::Ieee1394Camera::setWhiteBalance()
+    - #TU::Ieee1394Camera::getWhiteBalance()
+    - #TU::Ieee1394Camera::getAimedTemperature()
+
+  - <b>トリガモード</b>
+    - #TU::Ieee1394Camera::setTriggerMode()
+    - #TU::Ieee1394Camera::getTriggerMode()
+    - #TU::Ieee1394Camera::setTriggerPolarity()
+    - #TU::Ieee1394Camera::getTriggerPolarity()
+
+  - <b>カメラ設定の保存</b>
+    - #TU::Ieee1394Camera::saveConfig()
+    - #TU::Ieee1394Camera::restoreConfig()
+    - #TU::Ieee1394Camera::getMemoryChannelMax()
+*/
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
 

@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.24 2008-08-07 08:16:43 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.25 2008-10-15 00:23:03 ueshiba Exp $
  */
 #include "Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -1278,7 +1278,7 @@ Ieee1394Camera::getMemoryChannelMax() const
 //! IEEE1394カメラから出力された画像1枚分のデータを適当な形式に変換して取り込む
 /*!
   テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
-  呼び出す前にsnap()によってカメラからの画像を保持しておかなければならない．
+  呼び出す前に#snap()によってカメラからの画像を保持しておかなければならない．
   \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．また，カメラに設定されたフォーマットの画素形式
@@ -1380,10 +1380,11 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 
 //! IEEE1394カメラから出力された画像をRGB形式カラー画像として取り込む
 /*!
-  #operator >>()との違いは，カメラがBayerパターンをサポートしたカメラで
-  ある場合，BayerパターンからRGB形式への変換を行うことである．
-  テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
-  呼び出す前に#snap()によってカメラからの画像を保持しておかなければならない．
+  #Ieee1394Camera& operator >>(Image<T>&) constとの違いは，カメラが
+  #Bayerパターンをサポートしたカメラである場合，#BayerパターンからRGB形式
+  への変換を行うことである．テンプレートパラメータTは，格納先の画像の画
+  素形式を表す．なお，本関数を呼び出す前に#snap()によってカメラからの画
+  像を保持しておかなければならない．
   \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
 		現在カメラに設定されている画像サイズに合わせて自動的に
 		設定される．サポートされている画素形式Tは，RGB, RGBA,
