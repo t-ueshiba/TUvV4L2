@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.18 2008-09-08 08:16:43 ueshiba Exp $
+#  $Id: Makefile,v 1.19 2008-10-15 00:50:41 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -33,6 +33,7 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Image++.h \
 		/home/ueshiba/include/TU/List.h \
 		/home/ueshiba/include/TU/Manip.h \
+		/home/ueshiba/include/TU/Normalize.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/types.h \
 		/home/ueshiba/include/TU/v/CanvasPane.h \
@@ -54,7 +55,7 @@ OBJS		= TUXv++.sa.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.18 $	|		\
+REV		= $(shell echo $Revision: 1.19 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -71,6 +72,7 @@ TUXv++.sa.o: TU/v/XvDC.h /home/ueshiba/include/TU/v/ShmDC.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
+	/home/ueshiba/include/TU/Normalize.h \
 	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
 	/home/ueshiba/include/TU/v/Colormap.h \
 	/home/ueshiba/include/TU/v/CanvasPane.h \
@@ -83,6 +85,7 @@ XvDC.o: TU/v/XvDC.h /home/ueshiba/include/TU/v/ShmDC.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
+	/home/ueshiba/include/TU/Normalize.h \
 	/home/ueshiba/include/TU/Image++.h /home/ueshiba/include/TU/Manip.h \
 	/home/ueshiba/include/TU/v/Colormap.h \
 	/home/ueshiba/include/TU/v/CanvasPane.h \

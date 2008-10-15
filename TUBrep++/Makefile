@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.19 2008-09-08 08:16:23 ueshiba Exp $
+#  $Id: Makefile,v 1.20 2008-10-15 00:50:32 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -30,6 +30,7 @@ LINKER		= $(CCC)
 SUFFIX		= .cc:sC
 EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Geometry++.h \
+		/home/ueshiba/include/TU/Normalize.h \
 		/home/ueshiba/include/TU/Object++.cc \
 		/home/ueshiba/include/TU/Object++.h \
 		/home/ueshiba/include/TU/Vector++.h \
@@ -54,7 +55,7 @@ OBJS		= Geometry.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.19 $	|		\
+REV		= $(shell echo $Revision: 1.20 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -69,35 +70,42 @@ Geometry.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h
+	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h
 HalfEdge.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h
+	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h
 Loop.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h
+	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h
 Neighbor.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h
+	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h
 PointB.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h
+	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h
 TUBrep++.inst.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h \
 	/home/ueshiba/include/TU/Object++.cc
 TUBrep++.sa.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
 	/home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h
+	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h

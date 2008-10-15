@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.19 2008-09-08 08:16:39 ueshiba Exp $
+#  $Id: Makefile,v 1.20 2008-10-15 00:50:40 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -34,6 +34,7 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Image++.h \
 		/home/ueshiba/include/TU/List.h \
 		/home/ueshiba/include/TU/Manip.h \
+		/home/ueshiba/include/TU/Normalize.h \
 		/home/ueshiba/include/TU/Object++.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/types.h \
@@ -57,7 +58,7 @@ OBJS		= BrepCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.19 $	|		\
+REV		= $(shell echo $Revision: 1.20 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -73,6 +74,7 @@ BrepCanvasPane.o: TU/v/Vision++.h /home/ueshiba/include/TU/Brep/Brep++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h \
 	/home/ueshiba/include/TU/v/CmdPane.h \
 	/home/ueshiba/include/TU/v/CmdWindow.h \
 	/home/ueshiba/include/TU/v/TUv++.h \
@@ -89,6 +91,7 @@ BrepCmdPane.o: TU/v/Vision++.h /home/ueshiba/include/TU/Brep/Brep++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h \
+	/home/ueshiba/include/TU/Normalize.h \
 	/home/ueshiba/include/TU/v/CmdPane.h \
 	/home/ueshiba/include/TU/v/CmdWindow.h \
 	/home/ueshiba/include/TU/v/TUv++.h \
