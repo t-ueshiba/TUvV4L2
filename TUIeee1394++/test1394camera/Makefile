@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.7 2008-10-15 00:22:28 ueshiba Exp $
+#  $Id: Makefile,v 1.8 2008-10-16 00:52:49 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include -I/usr/local/include
+INCDIRS		= -I/usr/local/include -I..
 
 PROGRAM		= test1394camera
 #LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell gtk-config --libs)
@@ -26,13 +26,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Ieee1394++.h \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/Normalize.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= ../TU/Ieee1394++.h
 HDRS		= My1394Camera.h \
 		MyDialog.h
 SRCS		= My1394Camera.cc \
@@ -49,7 +43,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.7 $	|		\
+REV		= $(shell echo $Revision: 1.8 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -60,33 +54,8 @@ REV		= $(shell echo $Revision: 1.7 $	|		\
 
 include $(PROJECT)/lib/p.mk
 ###
-My1394Camera.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h
-MyDialog.o: MyDialog.h /home/ueshiba/include/TU/Ieee1394++.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h
-createCommands.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h
-createMenubar.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h MyDialog.h
-main.o: My1394Camera.h /home/ueshiba/include/TU/Ieee1394++.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h
+My1394Camera.o: My1394Camera.h ../TU/Ieee1394++.h
+MyDialog.o: MyDialog.h ../TU/Ieee1394++.h
+createCommands.o: My1394Camera.h ../TU/Ieee1394++.h
+createMenubar.o: My1394Camera.h ../TU/Ieee1394++.h MyDialog.h
+main.o: My1394Camera.h ../TU/Ieee1394++.h

@@ -19,9 +19,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.25 2008-10-15 00:23:03 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.26 2008-10-16 00:52:22 ueshiba Exp $
  */
-#include "Ieee1394++.h"
+#include "TU/Ieee1394++.h"
 #include <libraw1394/csr.h>
 
 #define XY_YZ(X, Y, Z)						\

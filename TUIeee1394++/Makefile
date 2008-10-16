@@ -1,12 +1,12 @@
 #
-#  $Id: Makefile,v 1.25 2008-10-15 01:34:53 ueshiba Exp $
+#  $Id: Makefile,v 1.26 2008-10-16 00:52:22 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU
-INCDIRS		= -I. -I$(HOME)/include
+INCDIRS		= -I/usr/local/include -I. -I$(HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
@@ -33,7 +33,8 @@ EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Image++.h \
 		/home/ueshiba/include/TU/Normalize.h \
 		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h
+		/home/ueshiba/include/TU/types.h \
+		TU/Ieee1394++.h
 HDRS		= Ieee1394++.h
 SRCS		= Ieee1394Camera.cc \
 		Ieee1394Node.cc
@@ -43,7 +44,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.25 $	|		\
+REV		= $(shell echo $Revision: 1.26 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -54,12 +55,12 @@ REV		= $(shell echo $Revision: 1.25 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Ieee1394Camera.o: Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
+Ieee1394Camera.o: TU/Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
 	/home/ueshiba/include/TU/Normalize.h
-Ieee1394Node.o: Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
+Ieee1394Node.o: TU/Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
