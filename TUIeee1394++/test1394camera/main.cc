@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.5 2008-10-15 00:22:30 ueshiba Exp $
+ *  $Id: main.cc,v 1.6 2008-10-17 00:25:15 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera - program for testing an IIDC 1394-based Digital Camera
@@ -48,13 +48,6 @@
 #include <stdexcept>
 #include <iostream>
 #include "My1394Camera.h"
-
-#ifdef __INTEL_COMPILER
-extern "C"
-{
-    unsigned long long	strtoull(const char*, char**, int);
-}
-#endif
 
 namespace TU
 {

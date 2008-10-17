@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2008-10-16 00:52:49 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2008-10-17 00:25:14 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,7 +14,7 @@ ifeq ($(OSTYPE), darwin)
   LIBS	       += -framework IOKit -framework CoreFoundation
 endif
 
-CPPFLAGS	= #-DRAWISO
+CPPFLAGS	= #-DUSE_RAWISO
 CFLAGS		= -O
 #CCFLAGS		= -O $(shell gtk-config --cflags)
 CCFLAGS		= -O $(shell pkg-config --cflags gtk+-2.0)
@@ -43,7 +43,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

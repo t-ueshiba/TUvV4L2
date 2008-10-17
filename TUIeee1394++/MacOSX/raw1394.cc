@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.1 2008-10-16 00:52:40 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.9 2008-10-17 00:24:48 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
