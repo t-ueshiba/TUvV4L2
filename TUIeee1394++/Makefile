@@ -1,16 +1,16 @@
 #
-#  $Id: Makefile,v 1.26 2008-10-16 00:52:22 ueshiba Exp $
+#  $Id: Makefile,v 1.27 2008-10-17 00:24:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(LIBDIR)
 INCDIR		= $(HOME)/include/TU
-INCDIRS		= -I/usr/local/include -I. -I$(HOME)/include
+INCDIRS		= -I/usr/local/include -I$(HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	= -DHAVE_TUToolsPP
+CPPFLAGS	= -DHAVE_TUToolsPP #-DUSE_RAWISO
 CFLAGS		= -g
 ifeq ($(CCC), icpc)
   CFLAGS	= -O3
@@ -44,7 +44,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.26 $	|		\
+REV		= $(shell echo $Revision: 1.27 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.26 2008-10-16 00:52:22 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.27 2008-10-17 00:24:26 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <libraw1394/csr.h>
@@ -346,7 +346,7 @@ static const u_int	NBUFFERS		= 4;
 Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
 			       u_int64 uniqId, u_int delay)
     :Ieee1394Node(type, uniqId, delay
-#if defined(USE_VIDEO1394)
+#if !defined(USE_RAWISO)
 		  , 1, VIDEO1394_SYNC_FRAMES
 #endif
 		  ),
@@ -1284,14 +1284,14 @@ Ieee1394Camera::getMemoryChannelMax() const
 		設定される．また，カメラに設定されたフォーマットの画素形式
 		が画像のそれに一致しない場合は，自動的に変換が行われる．
 		サポートされている画素形式Tは，u_char, short, float, double,
-		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUV411のいずれかである．
+		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUV411 のいずれかである．
 		また，サポートされている変換は以下のとおりであり，カメラの
 		画素形式がこれ以外に設定されている場合はstd::domain_error
 		例外が送出される．
 		    -# #YUV_444 -> T
 		    -# #YUV_422 -> T
 		    -# #YUV_411 -> T
-		    -# #RGB_24 -> T (YUV444, YUV422, YUV411を除く) 
+		    -# #RGB_24 -> T (YUV444, YUV422, YUV411 を除く) 
 		    -# #MONO_8 -> T
 		    -# #MONO_16 -> T
   \return	このIEEE1394カメラオブジェクト
@@ -1387,8 +1387,8 @@ Ieee1394Camera::operator >>(Image<T>& image) const
   像を保持しておかなければならない．
   \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
 		現在カメラに設定されている画像サイズに合わせて自動的に
-		設定される．サポートされている画素形式Tは，RGB, RGBA,
-		BGR, ABGRのいずれかである．
+		設定される．サポートされている画素形式Tは RGB, RGBA,
+		BGR, ABGR のいずれかである．
   \return	このIEEE1394カメラオブジェクト
 */
 template <class T> const Ieee1394Camera&
