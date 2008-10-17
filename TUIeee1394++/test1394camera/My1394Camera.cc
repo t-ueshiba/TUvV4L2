@@ -19,8 +19,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: My1394Camera.cc,v 1.9 2008-10-15 00:22:28 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.10 2008-10-17 06:31:42 ueshiba Exp $
  */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include <sys/time.h>
 #include <stdexcept>
 #include <iostream>

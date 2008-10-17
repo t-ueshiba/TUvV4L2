@@ -19,8 +19,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: createCommands.cc,v 1.7 2008-10-15 00:22:30 ueshiba Exp $
+ *  $Id: createCommands.cc,v 1.8 2008-10-17 06:31:43 ueshiba Exp $
  */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include "My1394Camera.h"
 
 namespace TU

@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.6 2008-10-17 00:25:15 ueshiba Exp $
+ *  $Id: main.cc,v 1.7 2008-10-17 06:31:43 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera - program for testing an IIDC 1394-based Digital Camera
@@ -43,6 +43,9 @@
 
   プログラム終了時に，カメラのglobal unique IDと設定値が標準出力に出力される．	
 */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdexcept>

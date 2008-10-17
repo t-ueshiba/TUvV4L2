@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.9 2008-10-17 00:25:14 ueshiba Exp $
+#  $Id: Makefile,v 1.10 2008-10-17 06:31:42 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -9,7 +9,7 @@ INCDIRS		= -I/usr/local/include -I..
 
 PROGRAM		= test1394camera
 #LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell gtk-config --libs)
-LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell pkg-config --libs gtk+-2.0)
+LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell pkg-config gtk+-2.0 --libs)
 ifeq ($(OSTYPE), darwin)
   LIBS	       += -framework IOKit -framework CoreFoundation
 endif
@@ -17,7 +17,7 @@ endif
 CPPFLAGS	= #-DUSE_RAWISO
 CFLAGS		= -O
 #CCFLAGS		= -O $(shell gtk-config --cflags)
-CCFLAGS		= -O $(shell pkg-config --cflags gtk+-2.0)
+CCFLAGS		= -O $(shell pkg-config gtk+-2.0 --cflags)
 #CCFLAGS	= -O3 -parallel
 LDFLAGS		= $(CCFLAGS) -L$(LIBDIR)
 LINKER		= $(CCC)
@@ -43,7 +43,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.9 $	|		\
+REV		= $(shell echo $Revision: 1.10 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

@@ -19,8 +19,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: MyDialog.cc,v 1.3 2008-10-15 00:22:29 ueshiba Exp $
+ *  $Id: MyDialog.cc,v 1.4 2008-10-17 06:31:42 ueshiba Exp $
  */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include "MyDialog.h"
 
 namespace TU
