@@ -19,8 +19,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.27 2008-10-17 00:24:26 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.28 2008-10-17 06:31:31 ueshiba Exp $
  */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include "TU/Ieee1394++.h"
 #include <libraw1394/csr.h>
 
@@ -1274,7 +1277,7 @@ Ieee1394Camera::getMemoryChannelMax() const
 /*
  *  Capture stuffs.
  */
-#ifdef HAVE_TUToolsPP
+#ifdef HAVE_LIBTUTOOLS__
 //! IEEE1394カメラから出力された画像1枚分のデータを適当な形式に変換して取り込む
 /*!
   テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
@@ -1590,7 +1593,7 @@ struct RGB
 {
     u_char	r, g, b;
 };
-#endif	// HAVE_TUToolsPP
+#endif	// HAVE_LIBTUTOOLS__
 
 //! IEEE1394カメラから出力された画像1枚分のデータをなんら変換を行わずに取り込む
 /*!
@@ -2667,7 +2670,7 @@ operator >>(std::istream& in, Ieee1394Camera& camera)
 }
  
 }
-#ifdef HAVE_TUToolsPP
+#ifdef HAVE_LIBTUTOOLS__
 #  if defined(__GNUG__) || defined(__INTEL_COMPILER)
 namespace TU
 {
@@ -2703,4 +2706,4 @@ template const Ieee1394Camera&
 Ieee1394Camera::captureRGBImage(Image<ABGR>& image)	const	;
 }
 #  endif	// __GNUG__
-#endif		// HAVE_TUToolsPP
+#endif		// HAVE_LIBTUTOOLS__

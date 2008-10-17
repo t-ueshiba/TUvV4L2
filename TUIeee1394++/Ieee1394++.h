@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.23 2008-10-17 00:24:25 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.24 2008-10-17 06:31:31 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -126,7 +126,7 @@
 #include <netinet/in.h>
 #include <stdexcept>
 #include <sstream>
-#if defined(HAVE_TUToolsPP)
+#if defined(HAVE_LIBTUTOOLS__)
 #  include "TU/Image++.h"
 #else
   typedef unsigned long long	u_int64;
@@ -551,7 +551,7 @@ class Ieee1394Camera : public Ieee1394Node
 
   // Capture stuffs.
     Ieee1394Camera&	snap()						;
-#ifdef HAVE_TUToolsPP
+#ifdef HAVE_LIBTUTOOLS__
     template <class T> const Ieee1394Camera&
 			operator >>(Image<T>& image)		const	;
     template <class T> const Ieee1394Camera&
@@ -654,7 +654,7 @@ Ieee1394Camera::snap()
     return *this;
 }
 
-#ifdef HAVE_TUToolsPP
+#ifdef HAVE_LIBTUTOOLS__
 //! IEEE1394カメラから出力された画像を直接的に取り込む
 /*!
   #operator >>()との違いは，画像形式の変換を行わないことと，Image<T>構造体
