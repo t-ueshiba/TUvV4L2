@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.27 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.28 2008-10-19 23:29:34 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -1080,11 +1080,11 @@ operator *(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
   \param m	行列
   \return	結果のベクトル，すなわち\f$\TUtvec{v}{}\TUvec{M}{}\f$
 */
-template <class T1, class B1, class T2, class B2, class R2> Vector<T1, B1>
+template <class T1, class B1, class T2, class B2, class R2> Vector<T1>
 operator *(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
 {
     v.check_dim(m.nrow());
-    Vector<T1, B1> val(m.ncol());
+    Vector<T1> val(m.ncol());
     for (int j = 0; j < m.ncol(); ++j)
 	for (int i = 0; i < m.nrow(); ++i)
 	    val[j] += v[i] * m[i][j];

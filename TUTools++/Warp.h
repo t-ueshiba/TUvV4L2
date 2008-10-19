@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.4 2008-09-10 05:10:49 ueshiba Exp $
+ *  $Id: Warp.h,v 1.5 2008-10-19 23:29:34 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -38,7 +38,7 @@ namespace TU
 /************************************************************************
 *  class Warp								*
 ************************************************************************/
-//! 画像を変形するためのクラス．
+//! 画像を変形するためのクラス
 class Warp
 {
   private:
@@ -60,10 +60,21 @@ class Warp
     };
     
   public:
+  //! 画像変形オブジェクトを生成する．
     Warp()	:_fracs(), _width(0)			{}
 
+  //! 出力画像の幅を返す．
+  /*!
+    return	出力画像の幅
+  */
     u_int	width()				const	{return _width;}
+
+  //! 出力画像の高さを返す．
+  /*!
+    return	出力画像の高さ
+  */
     u_int	height()			const	{return _fracs.dim();}
+    
     int		lmost(int v)			const	;
     int		rmost(int v)			const	;
 
@@ -93,18 +104,40 @@ Warp::FracArray::resize(u_int d)
     dv.resize(d);
 }
 
+//! 出力画像における指定された行の有効左端位置を返す．
+/*!
+  入力画像が矩形でも出力画像も矩形とは限らないので，出力画像の一部しか
+  入力画像の値域(有効領域)とならない．本関数は，出力画像の指定された行
+  について，その有効領域の左端となる画素位置を返す．
+  \param v	行を指定するintex
+  \return	左端位置
+*/
 inline int
 Warp::lmost(int v) const
 {
     return _fracs[v].lmost;
 }
 
+//! 出力画像における指定された行の有効右端位置の次を返す．
+/*!
+  入力画像が矩形でも出力画像も矩形とは限らないので，出力画像の一部しか
+  入力画像の値域(有効領域)とならない．本関数は，出力画像の指定された行
+  について，その有効領域の右端の右隣となる画素位置を返す．
+  \param v	行を指定するintex
+  \return	右端位置の次
+*/
 inline int
 Warp::rmost(int v) const
 {
     return _fracs[v].lmost + _fracs[v].width();
 }
 
+//! 出力画像点を指定してそれにマップされる入力画像点の2次元座標を返す．
+/*!
+  \param u	出力画像点の横座標
+  \param v	出力画像点の縦座標
+  \return	出力画像点(u, v)にマップされる入力画像点の2次元座標
+*/
 inline Vector2f
 Warp::operator ()(int u, int v) const
 {

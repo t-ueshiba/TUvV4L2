@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.h,v 1.2 2008-09-10 05:10:35 ueshiba Exp $
+ *  $Id: EdgeDetector.h,v 1.3 2008-10-19 23:29:33 ueshiba Exp $
  */
 #ifndef	__TUEdgeDetector_h
 #define	__TUEdgeDetector_h
@@ -43,9 +43,9 @@ class EdgeDetector
   public:
     enum
     {
-	TRACED	= 0x04,
-	EDGE	= 0x02,					//!< 強いエッジ点
-	WEAK	= 0x01					//!< 弱いエッジ点
+	TRACED	= 0x04,			//!< トレース済みのエッジ点(内部的使用のみ)
+	EDGE	= 0x02,			//!< 強いエッジ点
+	WEAK	= 0x01			//!< 弱いエッジ点
     };
     
     EdgeDetector(float th_low=2.0, float th_high=5.0)			;
