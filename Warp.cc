@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.6 2008-09-10 05:10:49 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.7 2008-10-19 23:29:34 ueshiba Exp $
  */
 #include "TU/Warp.h"
 #if defined(__INTEL_COMPILER)
@@ -204,6 +204,21 @@ bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
 /************************************************************************
 *  class Warp								*
 ************************************************************************/
+//! 画像を射影変換するための行列を設定する．
+/*!
+  入力画像点uは射影変換
+  \f[
+    \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
+    \TUvec{H}{} \TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray
+  \f]
+  によって出力画像点vに写される．
+  \param Htinv		変形を指定する3x3射影変換行列の逆行列の転置，すなわち
+			\f$\TUtinv{H}{}\f$
+  \param inWidth	入力画像の幅
+  \param inHeight	入力画像の高さ
+  \param outWidth	出力画像の幅
+  \param outWidth	出力画像の高さ
+*/
 void
 Warp::initialize(const Matrix33d& Htinv,
 		 u_int inWidth,  u_int inHeight,
@@ -213,6 +228,33 @@ Warp::initialize(const Matrix33d& Htinv,
 	       inWidth, inHeight, outWidth, outHeight);
 }
 
+//! 画像の非線形歪みを除去した後に射影変換を行うための行列とカメラ内部パラメータを設定する．
+/*!
+
+  canonical座標xから画像座標uへの変換が\f$\TUvec{u}{} = {\cal
+  K}(\TUvec{x}{})\f$ と表されるカメラ内部パラメータについて，その線形変
+  換部分を表す3x3上半三角行列をKとすると，
+  \f[
+    \TUbeginarray{c} \TUbar{u}{} \\ 1 \TUendarray =
+    \TUvec{K}{}
+    \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
+  \f]
+  によって画像の非線形歪みだけを除去できる．本関数は，この歪みを除去した画像点を
+  射影変換Hによって出力画像点vに写すように変形パラメータを設定する．すなわち，
+  全体の変形は
+  \f[
+    \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
+    \TUvec{H}{}\TUvec{K}{}
+    \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
+  \f]
+  となる．
+  \param Htinv		変形を指定する3x3射影変換行列の逆行列の転置
+  \param Intrinsic	入力画像に加えれられている放射歪曲を表すカメラ内部パラメータ
+  \param inWidth	入力画像の幅
+  \param inHeight	入力画像の高さ
+  \param outWidth	出力画像の幅
+  \param outWidth	出力画像の高さ
+*/
 void
 Warp::initialize(const Matrix33d& Htinv,
 		 const CameraBase::Intrinsic& intrinsic,
@@ -262,6 +304,14 @@ Warp::initialize(const Matrix33d& Htinv,
     }
 }
 
+//! 出力画像の範囲を指定して画像を変形する．
+/*!
+  \param in	入力画像
+  \param out	出力画像
+  \param vs	変形結果となる領域の最初の行を指定するindex
+  \param ve	変形結果となる領域の最後の行の次を指定するindex．0ならば出力画像の
+		最後の行まで変形結果によって埋められる
+*/
 template <class T> void
 Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 {
@@ -323,6 +373,14 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 #endif	
 }
 
+//! 出力画像の範囲を指定して画像を変形する．
+/*!
+  \param in	入力画像
+  \param out	出力画像
+  \param vs	変形結果となる領域の最初の行を指定するindex
+  \param ve	変形結果となる領域の最後の行の次を指定するindex．0ならば出力画像の
+		最後の行まで変形結果によって埋められる
+*/
 template <> void
 Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 		  int vs, int ve) const
