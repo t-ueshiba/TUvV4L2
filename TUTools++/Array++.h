@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.25 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: Array++.h,v 1.26 2008-10-22 06:31:35 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -1280,7 +1280,8 @@ Array2<T, B, R>::get(std::istream& in, int i, int j, int jmax)
 
 	if (!in || c == '\n')
 	{
-	    resize(i, jmax);
+	    if (jmax > 0)
+		resize(i, jmax);
 	    return in;
 	}
     }
