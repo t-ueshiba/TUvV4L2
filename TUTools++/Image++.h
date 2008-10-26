@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.40 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: Image++.h,v 1.41 2008-10-26 23:26:34 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -464,8 +464,8 @@ class ImageLine : public Array<T>
 			}
 
     using		Array<T>::dim;
-    template <class T2, class S>
-    T2			at(S uf)		const	;
+    template <class S>
+    T			at(S uf)		const	;
     const YUV422*	fill(const YUV422* src)		;
     const YUV411*	fill(const YUV411* src)		;
     const T*		fill(const T* src)		;
@@ -509,17 +509,17 @@ class ImageLine : public Array<T>
 
 //! サブピクセル位置の画素値を線形補間で求める．
 /*!
-  指定された位置の両側の画素値をT2型に変換し，それらを線形補間してT2型の値として出力する．
+  指定された位置の両側の画素値を線形補間して出力する．
   \param uf	サブピクセルで指定された位置
   \return	線形補間された画素値
 */
-template <class T> template <class T2, class S> inline T2
+template <class T> template <class S> inline T
 ImageLine<T>::at(S uf) const
 {
     const int	u   = floor(uf);
     const S	du  = uf - u;
     const T*	in = &(*this)[u];
-    return T2(*in) + du*(T2(*(in + 1)) - T2(*in));
+    return *in + du*(*(in + 1) - *in);
 }
 
 //! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
@@ -793,8 +793,8 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     Image<T>		operator ()(int u, int v,
 				    u_int w, u_int h)		;
     
-    template <class T2, class S>
-    T2		at(const Point2<S>& p)			const	;
+    template <class S>
+    T		at(const Point2<S>& p)			const	;
 
   //! 指定された位置の画素にアクセスする．
   /*!
@@ -873,18 +873,17 @@ Image<T, B>::operator ()(int u, int v, u_int w, u_int h)
     
 //! サブピクセル位置の画素値を双線形補間で求める．
 /*!
-  指定された位置を囲む4つの画素値をT2型に変換し，それらを双線形補間してT2型の値として
-  出力する．
+  指定された位置を囲む4つの画素値を双線形補間して出力する．
   \param p	サブピクセルで指定された位置
   \return	双線形補間された画素値
 */
-template <class T, class B> template <class T2, class S> inline T2
+template <class T, class B> template <class S> inline T
 Image<T, B>::at(const Point2<S>& p) const
 {
     const int	v  = floor(p[1]);
     const S	dv = p[1] - v;
-    const T2	out0 = (*this)[v  ].at<T2, S>(p[0]),
-		out1 = (*this)[v+1].at<T2, S>(p[0]);
+    const T	out0 = (*this)[v  ].at(p[0]),
+		out1 = (*this)[v+1].at(p[0]);
     return out0 + dv*(out1 - out0);
 }
 
