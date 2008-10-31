@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.41 2008-10-26 23:26:34 ueshiba Exp $
+ *  $Id: Image++.h,v 1.42 2008-10-31 06:36:48 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -516,10 +516,10 @@ class ImageLine : public Array<T>
 template <class T> template <class S> inline T
 ImageLine<T>::at(S uf) const
 {
-    const int	u   = floor(uf);
-    const S	du  = uf - u;
+    const int	u  = floor(uf);
     const T*	in = &(*this)[u];
-    return *in + du*(*(in + 1) - *in);
+    const S	du = uf - u;
+    return (du ? *in + du*(*(in + 1) - *in) : *in);
 }
 
 //! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
@@ -881,10 +881,9 @@ template <class T, class B> template <class S> inline T
 Image<T, B>::at(const Point2<S>& p) const
 {
     const int	v  = floor(p[1]);
+    const T	out0 = (*this)[v  ].at(p[0]);
     const S	dv = p[1] - v;
-    const T	out0 = (*this)[v  ].at(p[0]),
-		out1 = (*this)[v+1].at(p[0]);
-    return out0 + dv*(out1 - out0);
+    return (dv ? out0 + dv*((*this)[v+1].at(p[0]) - out0) : out0);
 }
 
 //! 入力ストリームから画像を読み込む．
