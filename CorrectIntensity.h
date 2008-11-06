@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.h,v 1.2 2008-09-10 05:10:35 ueshiba Exp $
+ *  $Id: CorrectIntensity.h,v 1.3 2008-11-06 23:21:12 ueshiba Exp $
  */
 #ifndef	__TUCorrectIntensity_h
 #define	__TUCorrectIntensity_h
@@ -37,13 +37,19 @@ namespace TU
 /************************************************************************
 *  class CorrectIntensity						*
 ************************************************************************/
+//! 画像の線形輝度補正を行うクラス
 class CorrectIntensity
 {
   public:
-    CorrectIntensity(float gain=1.0, float offset=0.0)
-	:_gain(gain), _offset(offset)					{}
+  //! オフセットとゲインを指定して輝度補正オブジェクトを生成する．
+  /*!
+    \param offset	オフセット
+    \param gain		ゲイン
+  */
+    CorrectIntensity(float offset=0.0, float gain=1.0)
+	:_offset(offset), _gain(gain) 					{}
 
-    void	initialize(float gain, float offset)			;
+    void	initialize(float offset, float gain)			;
     template <class T>
     void	operator()(Image<T>& image, int vs=0, int ve=0)	const	;
     
@@ -51,14 +57,20 @@ class CorrectIntensity
     template <class T>
     T		val(T pixel)					const	;
     
-    float	_gain, _offset;
+    float	_offset;
+    float	_gain;
 };
 
+//! オフセットとゲインを指定して輝度補正オブジェクトを初期化する．
+/*!
+  \param offset		オフセット
+  \param gain		ゲイン
+*/
 inline void
-CorrectIntensity::initialize(float gain, float offset)
+CorrectIntensity::initialize(float offset, float gain)
 {
-    _gain   = gain;
     _offset = offset;
+    _gain   = gain;
 }
 
 }

@@ -25,13 +25,16 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.cc,v 1.3 2008-09-10 05:10:34 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.4 2008-11-06 23:21:11 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
 
 namespace TU
 {
+/************************************************************************
+*  static functions							*
+************************************************************************/
 #if defined(SSE)
 template <class T> static inline void
 mmCorrect(T* p, mmFlt a, mmFlt b)
@@ -39,18 +42,18 @@ mmCorrect(T* p, mmFlt a, mmFlt b)
     const mmInt	val = mmLoadU((mmInt*)p);
 #  if defined(SSE2)
     mmStoreU((mmInt*)p,
-	     mmPackUS(mmPack32(mmToInt32F(mmAddF(mmMulF(mmToFlt0(val),
-							a), b)),
-			       mmToInt32F(mmAddF(mmMulF(mmToFlt1(val),
-							a), b))),
-		      mmPack32(mmToInt32F(mmAddF(mmMulF(mmToFlt2(val),
-							a), b)),
-			       mmToInt32F(mmAddF(mmMulF(mmToFlt3(val),
-							a), b)))));
+	     mmPackUS(mmPack32(mmToInt32F(mmAddF(a,
+						 mmMulF(b, mmToFlt0(val)))),
+			       mmToInt32F(mmAddF(a,
+						 mmMulF(b, mmToFlt1(val))))),
+		      mmPack32(mmToInt32F(mmAddF(a,
+						 mmMulF(b, mmToFlt2(val)))),
+			       mmToInt32F(mmAddF(a,
+						 mmMulF(b, mmToFlt3(val)))))));
 #  else
     mmStoreU((mmInt*)p,
-	     mmPackUS(mmToIntF(mmAddF(mmMulF(mmToFlt0(val), a), b)),
-		      mmToIntF(mmAddF(mmMulF(mmToFlt1(val), a), b))));
+	     mmPackUS(mmToIntF(mmAddF(a, mmMulF(b, mmToFlt0(val)))),
+		      mmToIntF(mmAddF(a, mmMulF(b, mmToFlt1(val))))));
 #  endif
 }
 
@@ -60,23 +63,42 @@ mmCorrect(short* p, mmFlt a, mmFlt b)
 #  if defined(SSE2)
     const mmInt	val = mmLoadU((mmInt*)p);
     mmStoreU((mmInt*)p,
-	     mmPack32(mmToInt32F(mmAddF(mmMulF(mmToFltL(val), a), b)),
-		      mmToInt32F(mmAddF(mmMulF(mmToFltH(val), a), b))));
+	     mmPack32(mmToInt32F(mmAddF(a, mmMulF(b, mmToFltL(val)))),
+		      mmToInt32F(mmAddF(a, mmMulF(b, mmToFltH(val))))));
 #  else
     mmStoreU((mmInt*)p,
-	     mmToIntF(mmAddF(mmMulF(mmToFlt(mmLoadU((mmInt*)p)), a), b)));
+	     mmToIntF(mmAddF(a, mmMulF(b, mmToFlt(mmLoadU((mmInt*)p))))));
 #  endif
 }
 
 template <> inline void
 mmCorrect(float* p, mmFlt a, mmFlt b)
 {
-    mmStoreFU(p, mmAddF(mmMulF(mmLoadF(p), a), b));
+    mmStoreFU(p, mmAddF(a, mmMulF(b, mmLoadF(p))));
 }
 #endif
+
+static inline u_char
+toUChar(float val)
+{
+    return (val < 0.0 ? 0 : val > 255.0 ? 255 : u_char(val));
+}
+    
+static inline short
+toShort(float val)
+{
+    return (val < -32768.0 ? -32768 : val > 32767.0 ? 32767 : short(val));
+}
+    
 /************************************************************************
 *  class CorrectIntensity						*
 ************************************************************************/
+//! 与えられた画像の輝度を補正する．
+/*!
+  \param image		入力画像を与え，補正結果もこれに返される
+  \param vs		輝度を補正する領域の最初の行を指定するindex
+  \param ve		輝度を補正する領域の最後の行の次を指定するindex
+*/ 
 template <class T> void
 CorrectIntensity::operator()(Image<T>& image, int vs, int ve) const
 {
@@ -88,7 +110,7 @@ CorrectIntensity::operator()(Image<T>& image, int vs, int ve) const
 	T*		p = image[v];
 	T* const	q = p + image.width();
 #if defined(SSE)
-	const mmFlt	a = mmSetF(_gain), b = mmSetF(_offset);
+	const mmFlt	a = mmSetF(_offset), b = mmSetF(_gain);
 	for (T* const r = q - mmNBytes/sizeof(T);
 	     p <= r; p += mmNBytes/sizeof(T))
 	    mmCorrect(p, a, b);
@@ -98,37 +120,36 @@ CorrectIntensity::operator()(Image<T>& image, int vs, int ve) const
 	    *p = val(*p);
     }
 }
-    
+
+//! 与えられた画素値に対する輝度補正結果を返す．
+/*!
+  \param pixel	画素値
+  \return	輝度補正結果
+*/
 template <class T> inline T
 CorrectIntensity::val(T pixel) const
 {
-    float	r = _gain * pixel.r + _offset;
-    r = (r < 0.0 ? 0 : r > 255.0 ? 255 : u_char(r));
-    float	g = _gain * pixel.g + _offset;
-    g = (g < 0.0 ? 0 : g > 255.0 ? 255 : u_char(g));
-    float	b = _gain * pixel.b + _offset;
-    b = (b < 0.0 ? 0 : b > 255.0 ? 255 : u_char(b));
-    return T(r, g, b);
+    return T(toUChar(_offset + _gain * pixel.r),
+	     toUChar(_offset + _gain * pixel.g),
+	     toUChar(_offset + _gain * pixel.b));
 }
 
 template <> inline u_char
 CorrectIntensity::val(u_char pixel) const
 {
-    const float	val = _gain * pixel + _offset;
-    return (val < 0.0 ? 0 : val > 255.0 ? 255 : u_char(val));
+    return toUChar(_offset + _gain * pixel);
 }
     
 template <> inline short
 CorrectIntensity::val(short pixel) const
 {
-    const float	val = _gain * pixel + _offset;
-    return (val < 0.0 ? 0 : val > 65535.0 ? 65535 : short(val));
+    return toShort(_offset + _gain * pixel);
 }
     
 template <> inline float
 CorrectIntensity::val(float pixel) const
 {
-    return pixel;
+    return _offset + _gain * pixel;
 }
 
 template void
