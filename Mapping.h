@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mapping.h,v 1.4 2008-10-05 23:25:17 ueshiba Exp $
+ *  $Id: Mapping.h,v 1.5 2008-11-16 23:44:30 ueshiba Exp $
  */
 #ifndef __TUMapping_h
 #define __TUMapping_h
@@ -63,6 +63,12 @@ class ProjectiveMapping
     template <class Iterator>
     ProjectiveMapping(Iterator first, Iterator last, bool refine=false)	;
 
+  //! 変換行列を指定する．
+  /*!
+    \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+  */
+    void		set(const Matrix<double>& T)	{_T = T;}
+    
     template <class Iterator>
     void		fit(Iterator first, Iterator last,
 			    bool refine=false)				;
@@ -406,8 +412,9 @@ class AffineMapping : public ProjectiveMapping
     template <class Iterator>
     AffineMapping(Iterator first, Iterator last)			;
 
+    void	set(const Matrix<double>& T)				;
     template <class Iterator>
-    void	fit(Iterator first, Iterator last)		;
+    void	fit(Iterator first, Iterator last)			;
     u_int	ndataMin()					const	;
     
   //! このアフィン変換の変形部分を表現する行列を返す．
@@ -445,6 +452,19 @@ AffineMapping::AffineMapping(Iterator first, Iterator last)
     fit(first, last);
 }
 
+//! 変換行列を指定する．
+/*!
+  変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
+  \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+*/
+inline void
+AffineMapping::set(const Matrix<double>& T)
+{
+    ProjectiveMapping::set(T);
+    _T[outDim()]	  = 0.0;
+    _T[outDim()][inDim()] = 1.0;
+}
+    
 //! 与えられた点対列の非同次座標からアフィン変換を計算する．
 /*!
   \param first			点対列の先頭を示す反復子
