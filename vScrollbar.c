@@ -67,7 +67,7 @@ SOFTWARE.
 
 /* Private definitions. */
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
 static char defaultTranslations[] =
     "<Btn1Down>:   NotifyScroll()\n\
      <Btn2Down>:   MoveThumb() NotifyThumb() \n\
@@ -95,7 +95,7 @@ static float floatZero = 0.0;
 #define Offset(field) XtOffsetOf(VScrollbarRec, field)
 
 static XtResource resources[] = {
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
 /*  {XtNscrollCursor, XtCCursor, XtRCursor, sizeof(Cursor),
        Offset(scrollbar.cursor), XtRString, "crosshair"},*/
 #else
@@ -147,7 +147,7 @@ static void Resize();
 static void Redisplay();
 static Boolean SetValues();
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
 static void HandleThumb();
 #else
 static void StartScroll();
@@ -158,7 +158,7 @@ static void NotifyScroll();
 static void EndScroll();
 
 static XtActionsRec actions[] = {
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     {"HandleThumb",	HandleThumb},
 #else
     {"StartScroll",     StartScroll},
@@ -233,7 +233,7 @@ static void ClassInitialize()
 		    (XtConvertArgList)NULL, (Cardinal)0 );
 }
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
 /* CHECKIT #define MARGIN(sbw) (sbw)->scrollbar.thickness + (sbw)->threeD.shadow_width */
 #define MARGIN(sbw) (sbw)->scrollbar.thickness
 #else
@@ -241,7 +241,7 @@ static void ClassInitialize()
 #endif
 
 /* 
- The original Xaw VScrollbar's FillArea *really* relied on the fact that the 
+ The original Xaw Scrollbar's FillArea *really* relied on the fact that the 
  server was going to clip at the window boundaries; so the logic was really
  rather sloppy.  To avoid drawing over the shadows and the arrows requires 
  some extra care...  Hope I didn't make any mistakes.
@@ -287,99 +287,6 @@ static void FillArea (sbw, top, bottom, fill)
     }
 }
 
-
-
-/* _ShadowSurroundedBoxLocal is somewhat redundant with 
-     _Xaw3dDrawShadows (gw, event, region, out)
-  in ThreeD.c; however, it is more general and allows to
-  specify the boxsize of the shawdowbox explicitely. In order
-  to keep the changes in other parts of Xaw3d to Kaleb's distribution
-  minimal, we define it here instead of as a method in the ThreeD class.
-
- -gustaf */
-
-/* ARGSUSED */
-static void
-_ShadowSurroundedBoxLocal (gw, event, region, xtl, ytl, xbr, ybr, out)
-    Widget gw;
-    XEvent *event;
-    Region region;
-    Dimension xtl, ytl, xbr, ybr; /* INNER corners */
-    Boolean out;
-{
-    XPoint       pt[6];
-    ThreeDWidget tdw = (ThreeDWidget) gw;
-    Dimension    s   = tdw->threeD.shadow_width;
-
-    /* 
-     *  no point to do anything if the shadow_width is 0 or the
-     *  widget has not been realized.
-     */ 
-    if((s > 0) && XtIsRealized (gw)){
-
-        Dimension       xms = xtl - s;
-        Dimension       yms = ytl - s;
-        Dimension       xps = xbr + s;
-        Dimension       yps = ybr + s;
-        Display         *dpy = XtDisplay (gw);
-        Window          win = XtWindow (gw);
-        GC              top, bot;
-
-        if (out) {
-            top = tdw->threeD.top_shadow_GC;
-            bot = tdw->threeD.bot_shadow_GC;
-        } else {
-            top = tdw->threeD.bot_shadow_GC;
-            bot = tdw->threeD.top_shadow_GC;
-        }
-        /* Draw shadows. Points are numbered as follows:
-         *
-         *   1_________________________________ 2
-         *   |                               / /|
-         *   |                              / / |
-         *   |   4_________________________/ /  |
-         *   |   |                         3|   |
-
-         *   |   |                          |   |
-         *   |   |                          |   |
-         *   |   |                          |   |
-         *   |   |5_________________________|   |
-         *   |  / /                         4   |
-         *   | / /                              |
-         *   |/ /_______________________________|
-         *   3                                  1
-         */
-
-        /* points common to top and bottom shadow */
-        pt[0].x = xms;  pt[0].y = yps;
-        pt[2].x = xps;  pt[2].y = yms;
-        pt[3].x = xbr;  pt[3].y = ytl;
-        pt[5].x = xtl;  pt[5].y = ybr;
-
-        /* top-left shadow */
-        if ((region == NULL) ||
-            (XRectInRegion (region, xms, yms, xps, ytl) != RectangleOut) ||
-            (XRectInRegion (region, xms, yms, xtl, yps) != RectangleOut)) {
-
-            pt[1].x = xms;      pt[1].y = yms;
-            pt[4].x = xtl;      pt[4].y = ytl;
-            XFillPolygon (dpy, win, top, pt, 6,Complex,CoordModeOrigin);
-        }
-
-        /* bottom-right shadow */
-        if ((region == NULL) ||
-            (XRectInRegion (region, xms, ybr, xps, yps) != RectangleOut) ||
-            (XRectInRegion (region, xbr, yms, xps, yps) != RectangleOut)) {
-
-            /* swap points from top left to bottom right */
-            pt[1].x = xps;      pt[1].y = yps;
-            pt[4].x = xbr;      pt[4].y = ybr;
-            XFillPolygon (dpy, win, bot, pt,6, Complex,CoordModeOrigin);
-        }
-    }
-}
-
-
 /* Paint the thumb in the area specified by sbw->top and
    sbw->shown.  The old area is erased.  The painting and
    erasing is done cleverly so that no flickering will occur. */
@@ -422,20 +329,15 @@ static void PaintThumb (sbw, event)
 
           if (sbw->scrollbar.orientation == XtorientHorizontal) 
 	      {
-	      _ShadowSurroundedBoxLocal(
-		  (Widget)sbw, event,
-		  (Region)NULL,
-		  newtop + s, 2 * s,
-		  newbot - s, sbw->core.height - 2 * s, TRUE);
+	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
+		  newtop, s, newbot, sbw->core.height - s,
+		  sbw->threeD.relief, TRUE);
 	      }
 	  else 
 	      {
-	      _ShadowSurroundedBoxLocal(
-		  (Widget)sbw, event,
-		  (Region)NULL,
-		  2 * s, newtop + s,
-		  sbw->core.width - 2 * s, newbot - s,
-		  TRUE);
+	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
+		  s, newtop, sbw->core.width - s, newbot,
+		  sbw->threeD.relief, TRUE);
 	      }
 	  }
       else 
@@ -453,7 +355,7 @@ static void PaintThumb (sbw, event)
     }
 }
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
 static void PaintArrows (sbw)
     VScrollbarWidget sbw;
 {
@@ -560,7 +462,7 @@ static void Destroy (w)
     Widget w;
 {
     VScrollbarWidget sbw = (VScrollbarWidget) w;
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     if(sbw->scrollbar.timer_id != (XtIntervalId) 0)
 	XtRemoveTimeOut (sbw->scrollbar.timer_id);
 #endif
@@ -648,9 +550,11 @@ static void Initialize( request, new, args, num_args )
 	    ? sbw->scrollbar.thickness : sbw->scrollbar.length;
 
     SetDimensions (sbw);
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     sbw->scrollbar.scroll_mode = 0;
     sbw->scrollbar.timer_id = (XtIntervalId)0;
+#else
+    sbw->scrollbar.direction = 0;
 #endif
     sbw->scrollbar.topLoc = 0;
     sbw->scrollbar.shownLength = sbw->scrollbar.min_thumb;
@@ -662,7 +566,7 @@ static void Realize (w, valueMask, attributes)
     XSetWindowAttributes *attributes;
 {
     VScrollbarWidget sbw = (VScrollbarWidget) w;
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     if(sbw->simple.cursor_name == NULL)
 	XtVaSetValues(w, XtNcursorName, "crosshair", NULL);
     /* dont set the cursor of the window to anything */
@@ -744,7 +648,7 @@ static void Redisplay (w, event, region)
     int x, y;
     unsigned int width, height;
 
-    (*swclass->threeD_class.shadowdraw) (w, event, region, FALSE);
+    (*swclass->threeD_class.shadowdraw) (w, event, region, sbw->threeD.relief, FALSE);
 
     if (sbw->scrollbar.orientation == XtorientHorizontal) {
 	x = sbw->scrollbar.topLoc;
@@ -763,7 +667,7 @@ static void Redisplay (w, event, region)
 	sbw->scrollbar.topLoc = -(sbw->scrollbar.length + 1);
 	PaintThumb (sbw, event); 
     }
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     /* we'd like to be region aware here!!!! */
     PaintArrows (sbw);
 #endif
@@ -870,7 +774,7 @@ static void ExtractPosition (event, x, y)
     }
 }
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
 /* ARGSUSED */
 static void HandleThumb (w, event, params, num_params)
     Widget w;
@@ -914,7 +818,7 @@ static void RepeatNotify (client_data, idp)
 		    client_data);
 }
 
-#else /* ARROW_SCROLLBAR */
+#else /* XAW_ARROW_SCROLLBARS */
 /* ARGSUSED */
 static void StartScroll (w, event, params, num_params )
     Widget w;
@@ -959,14 +863,14 @@ static void StartScroll (w, event, params, num_params )
     XtVaSetValues (w, XtNcursor, cursor, NULL);
     XFlush (XtDisplay (w));
 }
-#endif /* ARROW_SCROLLBAR */
+#endif /* XAW_ARROW_SCROLLBARS */
 
 /*
  * Make sure the first number is within the range specified by the other
  * two numbers.
  */
 
-#ifndef ARROW_SCROLLBAR
+#ifndef XAW_ARROW_SCROLLBARS
 static int InRange(num, small, big)
     int num, small, big;
 {
@@ -985,7 +889,7 @@ static float FloatInRange(num, small, big)
 }
 
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
 static void NotifyScroll (w, event, params, num_params)
     Widget w;
     XEvent *event;
@@ -1034,7 +938,7 @@ static void NotifyScroll (w, event, params, num_params)
 	}
     return;
 }
-#else /* ARROW_SCROLLBAR */
+#else /* XAW_ARROW_SCROLLBARS */
 static void NotifyScroll (w, event, params, num_params)
     Widget w;
     XEvent *event;
@@ -1083,7 +987,7 @@ static void NotifyScroll (w, event, params, num_params)
 	break;
     }
 }
-#endif /* ARROW_SCROLLBAR */
+#endif /* XAW_ARROW_SCROLLBARS */
 
 /* ARGSUSED */
 static void EndScroll(w, event, params, num_params )
@@ -1094,7 +998,7 @@ static void EndScroll(w, event, params, num_params )
 {
     VScrollbarWidget sbw = (VScrollbarWidget) w;
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     sbw->scrollbar.scroll_mode = 0;
     /* no need to remove any autoscroll timeout; it will no-op */
     /* because the scroll_mode is 0 */
@@ -1134,7 +1038,7 @@ static void MoveThumb (w, event, params, num_params)
     Position x, y;
     float loc, t, s;
 
-#ifndef ARROW_SCROLLBAR
+#ifndef XAW_ARROW_SCROLLBARS
     if (sbw->scrollbar.direction == 0) return; /* if no StartScroll */
 #endif
 
@@ -1143,10 +1047,11 @@ static void MoveThumb (w, event, params, num_params)
     if (!event->xmotion.same_screen) return;
 
     ExtractPosition (event, &x, &y);
+    
     loc = FractionLoc (sbw, x, y);
     t = sbw->scrollbar.top;
     s = sbw->scrollbar.shown;
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     if (sbw->scrollbar.scroll_mode != 2 )
       /* initialize picked position */
       sbw->scrollbar.picked = (FloatInRange( loc, t, t + s ) - t);
@@ -1160,9 +1065,12 @@ static void MoveThumb (w, event, params, num_params)
       if (sbw->scrollbar.top < 0.0) sbw->scrollbar.top = 0.0;
     }
 
+#if 0
+    /* this breaks many text-line scrolls */
     if (sbw->scrollbar.top + sbw->scrollbar.shown > 1.0)
       sbw->scrollbar.top = 1.0 - sbw->scrollbar.shown;
-#ifdef ARROW_SCROLLBAR
+#endif
+#ifdef XAW_ARROW_SCROLLBARS
     sbw->scrollbar.scroll_mode = 2; /* indicate continuous scroll */
 #endif
     PaintThumb (sbw, event);
@@ -1180,7 +1088,7 @@ static void NotifyThumb (w, event, params, num_params )
     register VScrollbarWidget sbw = (VScrollbarWidget) w;
     float top = sbw->scrollbar.top;
 
-#ifndef ARROW_SCROLLBAR
+#ifndef XAW_ARROW_SCROLLBARS
     if (sbw->scrollbar.direction == 0) return; /* if no StartScroll */
 #endif
 
@@ -1189,7 +1097,7 @@ static void NotifyThumb (w, event, params, num_params )
     /* thumbProc is not pretty, but is necessary for backwards
        compatibility on those architectures for which it work{s,ed};
        the intent is to pass a (truncated) float by value. */
-#ifdef ARROW_SCROLLBAR
+/* #ifdef XAW_ARROW_SCROLLBARS */
     /* This corrects for rounding errors: If the thumb is moved to the end of
        the scrollable area sometimes the last line/column is not displayed.
        This can happen when the integer number of the top line or leftmost
@@ -1204,8 +1112,11 @@ static void NotifyThumb (w, event, params, num_params )
        there is no problem since in this case there is always a constant
        integer number of pixels the thumb must be moved in order to scroll
        to the next line/column. */
+    /* Removed the dependancy on scrollbar arrows. Xterm as distributed in
+       X11R6.6 by The XFree86 Project wants this correction, with or without
+       the arrows. */
     top += 0.0001;
-#endif
+/* #endif */
     XtCallCallbacks (w, XtNthumbProc, *(XtPointer*)&top);
     XtCallCallbacks (w, XtNjumpProc, (XtPointer)&top);
 }
@@ -1240,7 +1151,7 @@ void vScrollbarSetThumb (w, top, shown)
 	    w,top,shown);
 #endif
 
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     if (sbw->scrollbar.scroll_mode == (char) 2) return; /* if still thumbing */
 #else
     if (sbw->scrollbar.direction == 'c') return; /* if still thumbing */
