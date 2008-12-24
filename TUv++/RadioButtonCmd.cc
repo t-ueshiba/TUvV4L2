@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: RadioButtonCmd.cc,v 1.5 2008-09-10 05:12:15 ueshiba Exp $  
+ *  $Id: RadioButtonCmd.cc,v 1.6 2008-12-24 01:01:57 ueshiba Exp $  
  */
 #include "TU/v/Bitmap.h"
 #include "RadioButtonCmd_.h"
@@ -73,7 +73,11 @@ RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
 				     _widget,
 				     XtNbackground,
 				     parent().widget().background(),
+#ifdef XtNrelief
+				     XtNrelief,			XtReliefNone,
+#else
 				     XtNshadowWidth,		0,
+#endif
 				     XtNborderWidth,		0,
 				     NULL)),
      _label(XtVaCreateManagedWidget("TUvRadioButtonCmd-label",

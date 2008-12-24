@@ -59,9 +59,10 @@ SOFTWARE.
 #define _vScrollbarP_h
 
 #include "vScrollbar_.h"
+#include <X11/Xaw3d/Xaw3dP.h>
 #include <X11/Xaw3d/ThreeDP.h>
 
-#define ARROW_SCROLLBAR
+#define XAW_ARROW_SCROLLBARS
 
 typedef struct {
      /* public */
@@ -71,7 +72,7 @@ typedef struct {
     XtCallbackList thumbProc;	/* jump (to position) scroll */
     XtCallbackList jumpProc;	/* same as thumbProc but pass data by ref */
     Pixmap	  thumb;	/* thumb color */
-#ifndef ARROW_SCROLLBAR
+#ifndef XAW_ARROW_SCROLLBARS
     Cursor        upCursor;	/* scroll up cursor */
     Cursor        downCursor;	/* scroll down cursor */
     Cursor        leftCursor;	/* scroll left cursor */
@@ -88,7 +89,7 @@ typedef struct {
 				 * when scrolling starts */
 
      /* private */
-#ifdef ARROW_SCROLLBAR
+#ifdef XAW_ARROW_SCROLLBARS
     XtIntervalId  timer_id;     /* autorepeat timer; remove on destruction */
     char	  scroll_mode;	/* 0:none 1:up/back 2:track 3:down/forward */
 #else
