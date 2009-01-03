@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SliderCmd.cc,v 1.6 2008-09-10 05:12:16 ueshiba Exp $  
+ *  $Id: SliderCmd.cc,v 1.7 2009-01-03 08:51:41 ueshiba Exp $  
  */
 #include "SliderCmd_.h"
 #include "vSlider_.h"
@@ -74,7 +74,7 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				       (cmd.attrs & CA_Vertical ?
 					XtorientVertical : XtorientHorizontal),
 				     XtNlength,
-				       (cmd.size != 0 ?	cmd.size : 100),
+				       (cmd.size != 0 ? cmd.size : 100),
 				     XtNtopOfThumb,	0.0,
 				     XtNshown,		0.0,
 				     XtNfill,		"none",

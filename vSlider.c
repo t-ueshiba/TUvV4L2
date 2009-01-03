@@ -1,9 +1,8 @@
-
-/* MODIFIED ATHENA SCROLLBAR (USING ARROWHEADS AT ENDS OF TRAVEL) */
+/* MODIFIED ATHENA SLIDER (USING ARROWHEADS AT ENDS OF TRAVEL) */
 /* Modifications Copyright 1992 by Mitch Trachtenberg             */
 /* Rights, permissions, and disclaimer of warranty are as in the  */
 /* DEC and MIT notice below.                                      */
-/* $XConsortium: Scrollbar.c,v 1.70 91/10/16 21:39:40 eswu Exp $ */
+/* $XConsortium: Slider.c,v 1.70 91/10/16 21:39:40 eswu Exp $ */
 
 /***********************************************************
 
@@ -53,7 +52,7 @@ SOFTWARE.
 
 ******************************************************************/
 
-/* ScrollBar.c */
+/* Slider.c */
 /* created by weissman, Mon Jul  7 13:20:03 1986 */
 /* converted by swick, Thu Aug 27 1987 */
 
@@ -68,8 +67,16 @@ SOFTWARE.
 /* Private definitions. */
 
 static char defaultTranslations[] =
-    "<BtnDown>:   StartScroll(Forward) \n\
-     <BtnUp>:     NotifyScroll(Proportional) EndScroll()";
+    "<Btn1Down>:   StartScroll(Forward) \n\
+     <Btn2Down>:   StartScroll(Continuous) MoveThumb() NotifyThumb() \n\
+     <Btn3Down>:   StartScroll(Backward) \n\
+     <Btn2Motion>: MoveThumb() NotifyThumb() \n\
+     <BtnUp>:      NotifyScroll(Proportional) EndScroll()";
+#ifdef bogusScrollKeys
+    /* examples */
+    "<KeyPress>f:  StartScroll(Forward) NotifyScroll(FullLength) EndScroll()"
+    "<KeyPress>b:  StartScroll(Backward) NotifyScroll(FullLength) EndScroll()"
+#endif
 
 static float floatZero = 0.0;
 
@@ -242,101 +249,6 @@ static void FillArea (sbw, top, bottom, fill)
     }
 }
 
-
-
-/* _ShadowSurroundedBoxLocal is somewhat redundant with 
-     _Xaw3dDrawShadows (gw, event, region, out)
-  in ThreeD.c; however, it is more general and allows to
-  specify the boxsize of the shawdowbox explicitely. In order
-  to keep the changes in other parts of Xaw3d to Kaleb's distribution
-  minimal, we define it here instead of as a method in the ThreeD class.
-
- -gustaf */
-
-/* ARGSUSED */
-static void
-_ShadowSurroundedBoxLocal (gw, event, region, xtl, ytl, xbr, ybr,
-		      xts, yts, xbs, ybs, out)
-    Widget gw;
-    XEvent *event;
-    Region region;
-    Dimension  xtl, ytl, xbr, ybr; /* INNER corners */
-    Dimension  xts, yts, xbs, ybs; /* Top/Bottom shadow width */
-    Boolean out;
-{
-    XPoint       pt[6];
-    ThreeDWidget tdw = (ThreeDWidget) gw;
-    Dimension    s   = tdw->threeD.shadow_width;
-
-    /* 
-     *  no point to do anything if the shadow_width is 0 or the
-     *  widget has not been realized.
-     */ 
-    if((s > 0) && XtIsRealized (gw)){
-
-        Dimension       xms = xtl - xts;
-        Dimension       yms = ytl - yts;
-        Dimension       xps = xbr + xbs;
-        Dimension       yps = ybr + ybs;
-        Display         *dpy = XtDisplay (gw);
-        Window          win = XtWindow (gw);
-        GC              top, bot;
-
-        if (out) {
-            top = tdw->threeD.top_shadow_GC;
-            bot = tdw->threeD.bot_shadow_GC;
-        } else {
-            top = tdw->threeD.bot_shadow_GC;
-            bot = tdw->threeD.top_shadow_GC;
-        }
-        /* Draw shadows. Points are numbered as follows:
-         *
-         *   1_________________________________ 2
-         *   |                               / /|
-         *   |                              / / |
-         *   |   4_________________________/ /  |
-         *   |   |                         3|   |
-
-         *   |   |                          |   |
-         *   |   |                          |   |
-         *   |   |                          |   |
-         *   |   |5_________________________|   |
-         *   |  / /                         4   |
-         *   | / /                              |
-         *   |/ /_______________________________|
-         *   3                                  1
-         */
-
-        /* points common to top and bottom shadow */
-        pt[0].x = xms;  pt[0].y = yps;
-        pt[2].x = xps;  pt[2].y = yms;
-        pt[3].x = xbr;  pt[3].y = ytl;
-        pt[5].x = xtl;  pt[5].y = ybr;
-
-        /* top-left shadow */
-        if ((region == NULL) ||
-            (XRectInRegion (region, xms, yms, xps, ytl) != RectangleOut) ||
-            (XRectInRegion (region, xms, yms, xtl, yps) != RectangleOut)) {
-
-            pt[1].x = xms;      pt[1].y = yms;
-            pt[4].x = xtl;      pt[4].y = ytl;
-            XFillPolygon (dpy, win, top, pt, 6,Complex,CoordModeOrigin);
-        }
-
-        /* bottom-right shadow */
-        if ((region == NULL) ||
-            (XRectInRegion (region, xms, ybr, xps, yps) != RectangleOut) ||
-            (XRectInRegion (region, xbr, yms, xps, yps) != RectangleOut)) {
-
-            /* swap points from top left to bottom right */
-            pt[1].x = xps;      pt[1].y = yps;
-            pt[4].x = xbr;      pt[4].y = ybr;
-            XFillPolygon (dpy, win, bot, pt,6, Complex,CoordModeOrigin);
-        }
-    }
-}
-
-
 /* Paint the thumb in the area specified by sbw->top and
    sbw->shown.  The old area is erased.  The painting and
    erasing is done cleverly so that no flickering will occur. */
@@ -350,7 +262,7 @@ static void PaintThumb (sbw, event)
     Position  oldbot              = oldtop + sbw->slider.shownLength;
     Dimension margin              = MARGIN (sbw);
     Dimension tzl                 = sbw->slider.length - margin - margin;
-    Position newtop, newbot;    
+    Position  newtop, newbot;    
     Position  floor               = sbw->slider.length - margin;
 
     newtop = margin + (int)(tzl * sbw->slider.top);
@@ -374,55 +286,39 @@ static void PaintThumb (sbw, event)
 	  {
 	  Position	oldmid = (oldtop + oldbot) / 2;
 	  Position	newmid = (newtop + newbot) / 2;
-
-          if (newtop < oldtop) FillArea(sbw, oldtop, oldtop + s, 0);
+	      
+	  if (newtop < oldtop) FillArea(sbw, oldtop, oldtop + s, 0);
           if (newtop > oldtop) FillArea(sbw, oldtop, MIN(newtop, oldmid), 0);
 	  if (newmid < oldmid)
 	  {
-	      FillArea(sbw, oldmid, oldmid + 1, 0);
+	      FillArea(sbw, oldmid, oldmid + s, 0);
 	      FillArea(sbw, MAX(newmid, oldtop), oldmid, 0);
 	  }
 	  if (newmid > oldmid)
 	  {
 	      FillArea(sbw, oldmid, MIN(newmid, oldbot), 0);
-	      FillArea(sbw, oldmid - 1, oldmid, 0);
+	      FillArea(sbw, oldmid - s, oldmid, 0);
 	  }
           if (newbot < oldbot) FillArea(sbw, MAX(newbot, oldmid), oldbot, 0);
-          if (newbot > oldbot) FillArea(sbw, oldbot - s, oldbot, 0);
+	  if (newbot > oldbot) FillArea(sbw, oldbot - s, oldbot, 0);
 
           if (sbw->slider.orientation == XtorientHorizontal) 
 	      {
-	      _ShadowSurroundedBoxLocal(
-		  (Widget)sbw, event,
-		  (Region)NULL,
-		  newtop + s, 2 * s,
-		  newmid - 1, sbw->core.height - 2 * s,
-		  s, s, 1, s,
-	          TRUE);
-	      _ShadowSurroundedBoxLocal(
-		  (Widget)sbw, event,
-		  (Region)NULL,
-		  newmid + 1, 2 * s,
-		  newbot - s, sbw->core.height - 2 * s,
-		  1, s, s, s,
-		  TRUE);
+	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
+		  newtop, s, newmid, sbw->core.height - s,
+		  sbw->threeD.relief, TRUE);
+	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
+		  newmid, s, newbot, sbw->core.height - s,
+		  sbw->threeD.relief, TRUE);
 	      }
 	  else 
 	      {
-	      _ShadowSurroundedBoxLocal(
-		  (Widget)sbw, event,
-		  (Region)NULL,
-		  2 * s, newtop + s,
-		  sbw->core.width - 2 * s, newmid - 1,
-		  s, s, s, 1,
-		  TRUE);
-	      _ShadowSurroundedBoxLocal(
-		  (Widget)sbw, event,
-		  (Region)NULL,
-		  2 * s, newmid + 1,
-		  sbw->core.width - 2 * s, newbot - s,
-		  s, 1, s, s,
-		  TRUE);
+	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
+		  s, newtop, sbw->core.width - s, newmid,
+		  sbw->threeD.relief, TRUE);
+	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
+		  s, newmid, sbw->core.width - s, newbot,
+		  sbw->threeD.relief, TRUE);
 	      }
 	  }
       else 
@@ -439,6 +335,7 @@ static void PaintThumb (sbw, event)
 	  }
     }
 }
+
 
 /*	Function Name: Destroy
  *	Description: Called as the slider is going away...
@@ -532,7 +429,10 @@ static void Initialize( request, new, args, num_args )
 	sbw->core.height = (sbw->slider.orientation == XtorientHorizontal)
 	    ? sbw->slider.thickness : sbw->slider.length;
 
+  //sbw->threeD.shadow_width = 1;
+    
     SetDimensions (sbw);
+    sbw->slider.direction = 0;
     sbw->slider.topLoc = 0;
     sbw->slider.shownLength = sbw->slider.min_thumb;
 }
@@ -618,7 +518,7 @@ static void Redisplay (w, event, region)
     int x, y;
     unsigned int width, height;
 
-    (*swclass->threeD_class.shadowdraw) (w, event, region, FALSE);
+    (*swclass->threeD_class.shadowdraw) (w, event, region, sbw->threeD.relief, FALSE);
 
     if (sbw->slider.orientation == XtorientHorizontal) {
 	x = sbw->slider.topLoc;
@@ -739,7 +639,6 @@ static void ExtractPosition (event, x, y)
     }
 }
 
-
 /* ARGSUSED */
 static void StartScroll (w, event, params, num_params )
     Widget w;
@@ -786,6 +685,7 @@ static float FloatInRange(num, small, big)
 {
     return (num < small) ? small : ((num > big) ? big : num);
 }
+
 
 static void NotifyScroll (w, event, params, num_params)
     Widget w;
@@ -879,12 +779,13 @@ static void MoveThumb (w, event, params, num_params)
     float loc, t, s;
 
     if (sbw->slider.direction == 0) return; /* if no StartScroll */
-
+    
     if (LookAhead (w, event)) return;
 
     if (!event->xmotion.same_screen) return;
 
     ExtractPosition (event, &x, &y);
+    
     loc = FractionLoc (sbw, x, y);
     t = sbw->slider.top;
     s = sbw->slider.shown;
@@ -897,8 +798,11 @@ static void MoveThumb (w, event, params, num_params)
       if (sbw->slider.top < 0.0) sbw->slider.top = 0.0;
     }
 
+#if 0
+    /* this breaks many text-line scrolls */
     if (sbw->slider.top + sbw->slider.shown > 1.0)
-      sbw->slider.top = 1.0 - sbw->slider.shown + 0.001;
+      sbw->slider.top = 1.0 - sbw->slider.shown;
+#endif
     PaintThumb (sbw, event);
     XFlush (XtDisplay (w));	/* re-draw it before Notifying */
 }
@@ -920,12 +824,32 @@ static void NotifyThumb (w, event, params, num_params )
     top = FloatInRange(top, 0.0, 1.0);
     
     if (sbw->slider.direction == 0) return; /* if no StartScroll */
-
+    
     if (LookAhead (w, event)) return;
 
     /* thumbProc is not pretty, but is necessary for backwards
        compatibility on those architectures for which it work{s,ed};
        the intent is to pass a (truncated) float by value. */
+/* #ifdef XAW_ARROW_SLIDERS */
+    /* This corrects for rounding errors: If the thumb is moved to the end of
+       the scrollable area sometimes the last line/column is not displayed.
+       This can happen when the integer number of the top line or leftmost
+       column to be be displayed is calculated from the float value
+       sbw->slider.top. The numerical error of this rounding problem is
+       very small. We therefore add a small value which then forces the
+       next line/column (the correct one) to be used. Since we can expect
+       that the resolution of display screens will not be higher then
+       10000 text lines/columns we add 1/10000 to the top position. The
+       intermediate variable `top' is used to avoid erroneous summing up
+       corrections (can this happen at all?). If the arrows are not displayed
+       there is no problem since in this case there is always a constant
+       integer number of pixels the thumb must be moved in order to scroll
+       to the next line/column. */
+    /* Removed the dependancy on slider arrows. Xterm as distributed in
+       X11R6.6 by The XFree86 Project wants this correction, with or without
+       the arrows. */
+    top += 0.0001;
+/* #endif */
     XtCallCallbacks (w, XtNthumbProc, *(XtPointer*)&top);
     XtCallCallbacks (w, XtNjumpProc, (XtPointer)&top);
 }
@@ -958,9 +882,9 @@ void XawSliderSetThumb (w, top, shown)
     float tzl = sbw->slider.length - 2*margin;
 
     top *= (tzl - sbw->slider.shownLength) / tzl;
-
+    
 #ifdef WIERD
-    fprintf(stderr,"< XawSliderSetThumb w=%p, top=%f, shown=%f\n", 
+    fprintf(stderr,"< vSliderSetThumb w=%p, top=%f, shown=%f\n", 
 	    w,top,shown);
 #endif
 

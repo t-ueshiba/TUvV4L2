@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: FileSelection.cc,v 1.8 2008-09-10 05:12:07 ueshiba Exp $  
+ *  $Id: FileSelection.cc,v 1.9 2009-01-03 08:51:41 ueshiba Exp $  
  */
 #include <unistd.h>
 #include <sys/types.h>
@@ -81,9 +81,8 @@ FileSelection::FileSelection(Window& parentWindow)
     if (_dirname[_dirname.length()-1] != '/')
 	_dirname += '/';
 
-  // Set file names in current working directory to _filenames.
+  // Set null pointer to the tail of the file name list.
     _filenames[0] = 0;
-    changeDirectory(_dirname);
 }
 
 FileSelection::~FileSelection()
@@ -95,6 +94,8 @@ FileSelection::~FileSelection()
 bool
 FileSelection::open(std::ifstream& in)
 {
+    changeDirectory(_dirname);
+
     for (;;)
     {
 	show();
@@ -113,6 +114,8 @@ FileSelection::open(std::ifstream& in)
 bool
 FileSelection::open(std::ofstream& out)
 {
+    changeDirectory(_dirname);
+
     for (;;)
     {
 	show();
@@ -161,8 +164,6 @@ FileSelection::callback(CmdId id, CmdVal val)
 	}
       }
 	break;
-
-	
     }
 }
 

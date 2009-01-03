@@ -1,4 +1,4 @@
-/* MODIFIED ATHENA SCROLLBAR (USING ARROWHEADS AT ENDS OF TRAVEL) */
+/* MODIFIED ATHENA SLIDER (USING ARROWHEADS AT ENDS OF TRAVEL) */
 /* Modifications Copyright 1992 by Mitch Trachtenberg             */
 /* Rights, permissions, and disclaimer of warranty are as in the  */
 /* DEC and MIT notice below.  See usage warning in .c file.       */
@@ -59,6 +59,7 @@ SOFTWARE.
 #define _vSliderP_h
 
 #include "vSlider_.h"
+#include <X11/Xaw3d/Xaw3dP.h>
 #include <X11/Xaw3d/ThreeDP.h>
 
 typedef struct {
