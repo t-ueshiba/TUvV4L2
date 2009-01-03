@@ -121,8 +121,8 @@ SOFTWARE.
 #define XtNtopOfThumb "topOfThumb"
 #define XtNpickTop "pickTop"
 
-typedef struct _SliderRec	*SliderWidget;
-typedef struct _SliderClassRec	*SliderWidgetClass;
+typedef struct _SliderRec	  *SliderWidget;
+typedef struct _SliderClassRec *SliderWidgetClass;
 
 extern WidgetClass sliderWidgetClass;
 

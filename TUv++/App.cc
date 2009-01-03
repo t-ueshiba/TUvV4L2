@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: App.cc,v 1.8 2008-09-10 05:11:56 ueshiba Exp $  
+ *  $Id: App.cc,v 1.9 2009-01-03 08:51:41 ueshiba Exp $  
  */
 #include "TU/v/App.h"
 #include <stdexcept>
@@ -121,7 +121,8 @@ static String	fallback[] =
     "*topShadowPixel:			#DEDEDEDEDEDE",
     "*bottomShadowPixel:		#7F7F7F7F7F7F",
     "*borderColor:			white",
-
+    "*shadowWidth:			2",
+    
   // Following corresponds to both vControlBG and vControlFace.
     "*background:			#B3B3B3B3B3B3",
 

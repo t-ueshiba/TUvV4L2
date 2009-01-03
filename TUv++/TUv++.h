@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: TUv++.h,v 1.12 2008-09-10 05:12:17 ueshiba Exp $  
+ *  $Id: TUv++.h,v 1.13 2009-01-03 08:51:41 ueshiba Exp $  
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
