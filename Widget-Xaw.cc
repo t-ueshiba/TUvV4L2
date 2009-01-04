@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Widget-Xaw.cc,v 1.7 2009-01-03 08:51:41 ueshiba Exp $  
+ *  $Id: Widget-Xaw.cc,v 1.8 2009-01-04 23:49:37 ueshiba Exp $  
  */
 #include "TU/v/TUv++.h"
 #include <X11/Xaw3d/ThreeD.h>
@@ -137,26 +137,13 @@ Object::Widget::Widget(const Widget& parentWidget,
 	
       case C_Label:
       {
-#ifdef XtNrelief
 	XtVaSetValues(_widget,
-		      XtNborderWidth,	 0,
+		      XtNborderWidth,	0,
 		      XtNrelief,	(cmd.attrs & CA_NoBorder ?
 					 XtReliefNone : XtReliefSunken),
-		      XtNshadowWidth,	(cmd.attrs & CA_NoBorder ? 0 : 2),
+		      XtNshadowWidth,	2,
 		      XtNlabel, (cmd.prop != 0 ? (char*)cmd.prop : cmd.title),
 		      NULL);
-#else
-	Pixel	top, bottom;
-	XtVaGetValues(_widget,
-		      XtNtopShadowPixel, &top, XtNbottomShadowPixel, &bottom,
-		      NULL);
-	XtVaSetValues(_widget,
-		      XtNtopShadowPixel, bottom, XtNbottomShadowPixel, top,
-		      XtNborderWidth,	 0,
-		      XtNshadowWidth,	(cmd.attrs & CA_NoBorder ? 0 : 2),
-		      XtNlabel, (cmd.prop != 0 ? (char*)cmd.prop : cmd.title),
-		      NULL);
-#endif
       }
 	break;
 	
@@ -171,12 +158,8 @@ Object::Widget::Widget(const Widget& parentWidget,
       case C_ToggleButton:
 	XtVaSetValues(_widget,
 		      XtNborderWidth,	0,
-#ifdef XtNrelief
 		      XtNrelief,	(cmd.attrs & CA_NoBorder ?
 					 XtReliefNone : XtReliefRaised),
-#else
-		      XtNshadowWidth,	(cmd.attrs & CA_NoBorder ? 0 : 2),
-#endif
 		      XtNlabel,		cmd.title,
 		      NULL);
 	break;
@@ -221,12 +204,8 @@ Object::Widget::Widget(const Widget& parentWidget,
       case C_ChoiceMenuButton:
 	XtVaSetValues(_widget,
 		      XtNborderWidth,	0,
-#ifdef XtNrelief
 		      XtNrelief,	(cmd.attrs & CA_NoBorder ?
 					 XtReliefNone : XtReliefRaised),
-#else
-		      XtNshadowWidth,	(cmd.attrs & CA_NoBorder ? 0 : 2),
-#endif
 		      XtNlabel,		cmd.title,
 		      XtNmenuName,	"TUvMenu",
 		      NULL);
