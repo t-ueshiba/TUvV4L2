@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.65 2008-10-19 23:29:34 ueshiba Exp $
+#  $Id: Makefile,v 1.66 2009-01-28 01:24:22 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -157,7 +157,7 @@ OBJS		= Bezier++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.65 $	|		\
+REV		= $(shell echo $Revision: 1.66 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

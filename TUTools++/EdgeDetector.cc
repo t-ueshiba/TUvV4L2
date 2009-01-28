@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.12 2008-09-10 05:10:35 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.13 2009-01-28 01:24:22 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
@@ -37,32 +37,29 @@ static const float	slant = 0.414214;	// tan(M_PI/8)
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-#ifdef SSE2
-static inline mmInt	mmDir4(mmFlt eH, mmFlt eV)
-			{
-			    mmInt  l0 = mmCastToInt(mmCmpLEF(eH, eV)),
-				   l1 = mmCastToInt(
-					  mmCmpLEF(eH, mmSubF(mmZeroF(), eV)));
-			    return mmOr(mmAnd(mmXor(l0, l1), mmSet32(0x2)),
-					mmAnd(l1, mmSet32(0x4)));
-			}
-static inline mmInt	mmDir8(mmFlt eH, mmFlt eV)
-			{
-			    mmFlt  sH = mmMulF(mmSetF(slant), eH),
-				   sV = mmMulF(mmSetF(slant), eV);
-			    mmInt  l0 = mmCastToInt(mmCmpLEF(sH, eV)),
-				   l1 = mmCastToInt(mmCmpLEF(eH, sV)),
-				   l2 = mmCastToInt(
-					  mmCmpLEF(eH, mmSubF(mmZeroF(), sV))),
-				   l3 = mmCastToInt(
-					  mmCmpLEF(sH, mmSubF(mmZeroF(), eV)));
-			    return mmOr(mmOr(mmAnd(mmOr(mmXor(l0, l1),
-							mmXor(l2, l3)),
-						   mmSet32(0x1)),
-					     mmAnd(mmXor(l1, l3),
-						   mmSet32(0x2))),
-					mmAnd(l3, mmSet32(0x4)));
-			}
+#if defined(SSE2)
+static inline mmInt32
+mmDir4(mmFlt eH, mmFlt eV)
+{
+    mmInt32	l0 = mmCast<mmInt32>(eH < eV),
+		l1 = mmCast<mmInt32>(eH < -eV);
+    return ((l0 ^ l1) & mmSetAll<mmInt32>(0x2)) |
+	   (l1 & mmSetAll<mmInt32>(0x4));
+}
+
+static inline mmInt32
+mmDir8(mmFlt eH, mmFlt eV)
+{
+    mmFlt	sH = mmSetAll<mmFlt>(slant) * eH,
+		sV = mmSetAll<mmFlt>(slant) * eV;
+    mmInt32	l0 = mmCast<mmInt32>(sH < eV),
+		l1 = mmCast<mmInt32>(eH < sV),
+		l2 = mmCast<mmInt32>(eH < -sV),
+		l3 = mmCast<mmInt32>(sH < -eV);
+    return (((l0 ^ l1) | (l2 ^ l3)) & mmSetAll<mmInt32>(0x1)) |
+	   ((l1 ^ l3) & mmSetAll<mmInt32>(0x2)) |
+	   (l3 & mmSetAll<mmInt32>(0x4));
+}
 #endif
 
 //! あるエッジ点と指定された方向の近傍点が接続しているか調べる
@@ -147,15 +144,15 @@ EdgeDetector::strength(const Image<float>& edgeH,
 	const float		*eH = edgeH[v], *eV = edgeV[v];
 	float*			dst = out[v];
 	const float* const	end = dst + out.width();
-#ifdef SSE
+#if defined(SSE)
 	for (const float* const end2 = dst + 4*(out.width()/4); dst < end2; )
 	{
-	    const mmFlt	fH = mmLoadFU(eH), fV = mmLoadFU(eV);
+	    const mmFlt	fH = mmLoadU(eH), fV = mmLoadU(eV);
 	    
-	    mmStoreFU(dst, mmSqrtF(mmAddF(mmMulF(fH, fH), mmMulF(fV, fV))));
-	    eH  += 4;
-	    eV  += 4;
-	    dst += 4;
+	    mmStoreU(dst, mmSqrt(fH * fH + fV * fV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    dst += mmFlt::NElms;
 	}
 #endif
 	while (dst < end)
@@ -186,23 +183,24 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 	const float		*eH = edgeH[v], *eV = edgeV[v];
 	u_char*			dst = out[v];
 	const u_char* const	end = dst + out.width();
-#ifdef SSE2
-	for (const u_char* const end2 = dst + mmNBytes*(out.width()/mmNBytes);
-	     dst < end2; dst += mmNBytes)
+#if defined(SSE2)
+	for (const u_char* const end2 = dst + mmUInt8::floor(out.width());
+	     dst < end2; dst += mmUInt8::NElms)
 	{
-	    const mmInt	d0 = mmDir4(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    const mmInt	d1 = mmDir4(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    const mmInt	d2 = mmDir4(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    const mmInt	d3 = mmDir4(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    mmStoreU((mmInt*)dst, mmPack(mmPack32(d0, d1), mmPack32(d2, d3)));
+	    const mmInt32	d0 = mmDir4(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    const mmInt32	d1 = mmDir4(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    const mmInt32	d2 = mmDir4(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    const mmInt32	d3 = mmDir4(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    mmStoreU(dst, mmCvt<mmUInt8>(mmCvt<mmInt16>(d0, d1),
+					 mmCvt<mmInt16>(d2, d3)));
 	}
 #endif
 	while (dst < end)
@@ -234,23 +232,24 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 	const float		*eH = edgeH[v], *eV = edgeV[v];
 	u_char*			dst = out[v];
 	const u_char* const	end = dst + out.width();
-#ifdef SSE2
-	for (const u_char* const end2 = dst + mmNBytes*(out.width()/mmNBytes);
-	     dst < end2; dst += mmNBytes)
+#if defined(SSE2)
+	for (const u_char* const end2 = dst + mmUInt8::floor(out.width());
+	     dst < end2; dst += mmUInt8::NElms)
 	{
-	    const mmInt	d0 = mmDir8(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    const mmInt	d1 = mmDir8(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    const mmInt	d2 = mmDir8(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    const mmInt	d3 = mmDir8(mmLoadFU(eH), mmLoadFU(eV));
-	    eH  += 4;
-	    eV  += 4;
-	    mmStoreU((mmInt*)dst, mmPack(mmPack32(d0, d1), mmPack32(d2, d3)));
+	    const mmInt32	d0 = mmDir8(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    const mmInt32	d1 = mmDir8(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    const mmInt32	d2 = mmDir8(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    const mmInt32	d3 = mmDir8(mmLoadU(eH), mmLoadU(eV));
+	    eH  += mmFlt::NElms;
+	    eV  += mmFlt::NElms;
+	    mmStoreU(dst, mmCvt<mmUInt8>(mmCvt<mmInt16>(d0, d1),
+					 mmCvt<mmInt16>(d2, d3)));
 	}
 #endif
 	while (dst < end)
