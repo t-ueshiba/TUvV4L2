@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.cc,v 1.4 2008-11-06 23:21:11 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.5 2009-01-28 01:24:22 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
@@ -39,21 +39,25 @@ namespace TU
 template <class T> static inline void
 mmCorrect(T* p, mmFlt a, mmFlt b)
 {
-    const mmInt	val = mmLoadU((mmInt*)p);
+    const mmUInt8	val = mmLoadU((const u_char*)p);
 #  if defined(SSE2)
-    mmStoreU((mmInt*)p,
-	     mmPackUS(mmPack32(mmToInt32F(mmAddF(a,
-						 mmMulF(b, mmToFlt0(val)))),
-			       mmToInt32F(mmAddF(a,
-						 mmMulF(b, mmToFlt1(val))))),
-		      mmPack32(mmToInt32F(mmAddF(a,
-						 mmMulF(b, mmToFlt2(val)))),
-			       mmToInt32F(mmAddF(a,
-						 mmMulF(b, mmToFlt3(val)))))));
+    mmStoreU((u_char*)p,
+	     mmCvt<mmUInt8>(
+		 mmCvt<mmInt16>(
+		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(val)),
+		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
+					mmShiftElmR(val, mmFlt::NElms)))),
+		 mmCvt<mmInt16>(
+		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
+					mmShiftElmR(val, 2*mmFlt::NElms))),
+		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
+					mmShiftElmR(val, 3*mmFlt::NElms))))));
 #  else
-    mmStoreU((mmInt*)p,
-	     mmPackUS(mmToIntF(mmAddF(a, mmMulF(b, mmToFlt0(val)))),
-		      mmToIntF(mmAddF(a, mmMulF(b, mmToFlt1(val))))));
+    mmStoreU((u_char*)p,
+	     mmCvt<mmUInt8>(
+		 mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(val)),
+		 mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(
+				    mmShiftElmR(val, mmFlt::NElms)))));
 #  endif
 }
 
@@ -61,20 +65,20 @@ template <> inline void
 mmCorrect(short* p, mmFlt a, mmFlt b)
 {
 #  if defined(SSE2)
-    const mmInt	val = mmLoadU((mmInt*)p);
-    mmStoreU((mmInt*)p,
-	     mmPack32(mmToInt32F(mmAddF(a, mmMulF(b, mmToFltL(val)))),
-		      mmToInt32F(mmAddF(a, mmMulF(b, mmToFltH(val))))));
+    const mmInt16	val = mmLoadU(p);
+    mmStoreU(p, mmCvt<mmInt16>(
+		 mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(val)),
+		 mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
+				    mmShiftElmR(val, mmFlt::NElms)))));
 #  else
-    mmStoreU((mmInt*)p,
-	     mmToIntF(mmAddF(a, mmMulF(b, mmToFlt(mmLoadU((mmInt*)p))))));
+    mmStoreU(p, mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(mmLoadU(p))));
 #  endif
 }
 
 template <> inline void
 mmCorrect(float* p, mmFlt a, mmFlt b)
 {
-    mmStoreFU(p, mmAddF(a, mmMulF(b, mmLoadF(p))));
+    mmStoreU(p, a + b * mmLoadU(p));
 }
 #endif
 
@@ -110,11 +114,12 @@ CorrectIntensity::operator()(Image<T>& image, int vs, int ve) const
 	T*		p = image[v];
 	T* const	q = p + image.width();
 #if defined(SSE)
-	const mmFlt	a = mmSetF(_offset), b = mmSetF(_gain);
+	const mmFlt	a = mmSetAll<mmFlt>(_offset),
+			b = mmSetAll<mmFlt>(_gain);
 	for (T* const r = q - mmNBytes/sizeof(T);
 	     p <= r; p += mmNBytes/sizeof(T))
 	    mmCorrect(p, a, b);
-	_mm_empty();
+	mmEmpty();
 #endif
 	for (; p < q; ++p)
 	    *p = val(*p);
