@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.9 2009-01-28 01:24:22 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.10 2009-02-01 23:26:35 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -85,7 +85,9 @@ namespace TU
       operator const mmBase&()	const	{return _val;}
       operator mmBase&()		{return _val;}
 
-      static u_int	floor(u_int n)	{return NElms*(n / NElms);}
+      static u_int	floor(u_int n)	{return NElms*(n/NElms);}
+      static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
+						 NElms*((n - 1)/NElms + 1));}
       
     private:
       mmBase		_val;
@@ -115,7 +117,9 @@ namespace TU
       operator const __m128&()	const	{return _val;}
       operator __m128&()		{return _val;}
 
-      static u_int	floor(u_int n)	{return NElms*(n / NElms);}
+      static u_int	floor(u_int n)	{return NElms*(n/NElms);}
+      static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
+						 NElms*((n - 1)/NElms + 1));}
 
     private:
       __m128		_val;
@@ -132,7 +136,9 @@ namespace TU
       operator const __m128d&()	const	{return _val;}
       operator __m128d&()		{return _val;}
 
-      static u_int	floor(u_int n)	{return NElms*(n / NElms);}
+      static u_int	floor(u_int n)	{return NElms*(n/NElms);}
+      static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
+						 NElms*((n - 1)/NElms + 1));}
 
     private:
       __m128d		_val;
