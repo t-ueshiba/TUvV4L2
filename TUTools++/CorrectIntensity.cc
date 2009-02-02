@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.cc,v 1.5 2009-01-28 01:24:22 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.6 2009-02-02 08:09:24 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
@@ -46,18 +46,18 @@ mmCorrect(T* p, mmFlt a, mmFlt b)
 		 mmCvt<mmInt16>(
 		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(val)),
 		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-					mmShiftElmR(val, mmFlt::NElms)))),
+					mmShiftElmR<mmFlt::NElms>(val)))),
 		 mmCvt<mmInt16>(
 		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-					mmShiftElmR(val, 2*mmFlt::NElms))),
+					mmShiftElmR<2*mmFlt::NElms>(val))),
 		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-					mmShiftElmR(val, 3*mmFlt::NElms))))));
+					mmShiftElmR<3*mmFlt::NElms>(val))))));
 #  else
     mmStoreU((u_char*)p,
 	     mmCvt<mmUInt8>(
 		 mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(val)),
 		 mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(
-				    mmShiftElmR(val, mmFlt::NElms)))));
+				    mmShiftElmR<mmFlt::NElms>(val)))));
 #  endif
 }
 
@@ -69,7 +69,7 @@ mmCorrect(short* p, mmFlt a, mmFlt b)
     mmStoreU(p, mmCvt<mmInt16>(
 		 mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(val)),
 		 mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-				    mmShiftElmR(val, mmFlt::NElms)))));
+				    mmShiftElmR<mmFlt::NElms>(val)))));
 #  else
     mmStoreU(p, mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(mmLoadU(p))));
 #  endif

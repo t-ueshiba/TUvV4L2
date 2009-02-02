@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.3 2009-01-28 01:24:22 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.4 2009-02-02 08:09:24 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -42,35 +42,35 @@ namespace TU
 static inline mmFlt
 mmForward2(mmFlt in3210, mmFlt c0123, mmFlt& tmp)
 {
-    tmp = mmShiftElmR(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(0,0,0,0));
+    tmp = mmShiftElmR<1>(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(0,0,0,0));
     mmFlt	out0123 = tmp;
-    tmp = mmShiftElmR(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(1,1,0,0));
-    out0123 = mmReplaceRMost(mmShiftElmL(out0123), tmp);
-    tmp = mmShiftElmR(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(2,2,0,0));
-    out0123 = mmReplaceRMost(mmShiftElmL(out0123), tmp);
-    tmp = mmShiftElmR(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(3,3,0,0));
-    return mmReverseElm(mmReplaceRMost(mmShiftElmL(out0123), tmp));
+    tmp = mmShiftElmR<1>(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(1,1,0,0));
+    out0123 = mmReplaceRMost(mmShiftElmL<1>(out0123), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(2,2,0,0));
+    out0123 = mmReplaceRMost(mmShiftElmL<1>(out0123), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c0123 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(3,3,0,0));
+    return mmReverseElm(mmReplaceRMost(mmShiftElmL<1>(out0123), tmp));
 }
 
 static inline mmFlt
 mmBackward2(mmFlt in3210, mmFlt c1032, mmFlt& tmp)
 {
-    tmp = mmShiftElmR(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(3,3,0,0));
+    tmp = mmShiftElmR<1>(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(3,3,0,0));
     mmFlt	out3210 = tmp;
-    tmp = mmShiftElmR(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(2,2,0,0));
-    out3210 = mmReplaceRMost(mmShiftElmL(out3210), tmp);
-    tmp = mmShiftElmR(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(1,1,0,0));
-    out3210 = mmReplaceRMost(mmShiftElmL(out3210), tmp);
-    tmp = mmShiftElmR(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
-						    _MM_SHUFFLE(0,0,0,0));
-    return mmReplaceRMost(mmShiftElmL(out3210), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(2,2,0,0));
+    out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(1,1,0,0));
+    out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
+						       _MM_SHUFFLE(0,0,0,0));
+    return mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
 }
 
 template <class S> static void
@@ -82,13 +82,13 @@ mmForward2(const u_char*& src, float*& dst, mmFlt c0123, mmFlt& tmp)
     mmUInt8	in8 = mmLoadU(src);
     mmStoreU(dst, mmForward2(mmCvt<mmFlt>(in8), c0123, tmp));
     dst += mmFlt::NElms;
-    mmStoreU(dst, mmForward2(mmCvt<mmFlt>(mmShiftElmR(in8, mmFlt::NElms)),
+    mmStoreU(dst, mmForward2(mmCvt<mmFlt>(mmShiftElmR<mmFlt::NElms>(in8)),
 			     c0123, tmp));
     dst += mmFlt::NElms;
-    mmStoreU(dst, mmForward2(mmCvt<mmFlt>(mmShiftElmR(in8, 2*mmFlt::NElms)),
+    mmStoreU(dst, mmForward2(mmCvt<mmFlt>(mmShiftElmR<2*mmFlt::NElms>(in8)),
 			     c0123, tmp));
     dst += mmFlt::NElms;
-    mmStoreU(dst, mmForward2(mmCvt<mmFlt>(mmShiftElmR(in8, 3*mmFlt::NElms)),
+    mmStoreU(dst, mmForward2(mmCvt<mmFlt>(mmShiftElmR<3*mmFlt::NElms>(in8)),
 			     c0123, tmp));
     dst += mmFlt::NElms;
     src += mmUInt8::NElms;
@@ -111,13 +111,13 @@ mmBackward2(const u_char*& src, float*& dst, mmFlt c1032, mmFlt& tmp)
     src -= mmUInt8::NElms;
     mmUInt8	in8 = mmLoadU(src);
     dst -= mmFlt::NElms;
-    mmStoreU(dst, mmBackward2(mmCvt<mmFlt>(mmShiftElmR(in8, 3*mmFlt::NElms)),
+    mmStoreU(dst, mmBackward2(mmCvt<mmFlt>(mmShiftElmR<3*mmFlt::NElms>(in8)),
 			      c1032, tmp));
     dst -= mmFlt::NElms;
-    mmStoreU(dst, mmBackward2(mmCvt<mmFlt>(mmShiftElmR(in8, 2*mmFlt::NElms)),
+    mmStoreU(dst, mmBackward2(mmCvt<mmFlt>(mmShiftElmR<2*mmFlt::NElms>(in8)),
 			      c1032, tmp));
     dst -= mmFlt::NElms;
-    mmStoreU(dst, mmBackward2(mmCvt<mmFlt>(mmShiftElmR(in8, mmFlt::NElms)),
+    mmStoreU(dst, mmBackward2(mmCvt<mmFlt>(mmShiftElmR<mmFlt::NElms>(in8)),
 			      c1032, tmp));
     dst -= mmFlt::NElms;
     mmStoreU(dst, mmBackward2(mmCvt<mmFlt>(in8), c1032, tmp));
@@ -134,35 +134,35 @@ mmBackward2(const float*& src, float*& dst, mmFlt c1032, mmFlt& tmp)
 static inline mmFlt
 mmForward4(mmFlt in3210, mmFlt c0123, mmFlt c4567, mmFlt& tmp)
 {
-    tmp = mmShiftElmR(tmp) + c0123 * mmSetAll<0>(in3210)
+    tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<0>(in3210)
 			   + c4567 * mmSetAll<0>(tmp);
     mmFlt	out0123 = tmp;
-    tmp = mmShiftElmR(tmp) + c0123 * mmSetAll<1>(in3210)
+    tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<1>(in3210)
 			   + c4567 * mmSetAll<0>(tmp);
-    out0123 = mmReplaceRMost(mmShiftElmL(out0123), tmp);
-    tmp = mmShiftElmR(tmp) + c0123 * mmSetAll<2>(in3210)
+    out0123 = mmReplaceRMost(mmShiftElmL<1>(out0123), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<2>(in3210)
 			   + c4567 * mmSetAll<0>(tmp);
-    out0123 = mmReplaceRMost(mmShiftElmL(out0123), tmp);
-    tmp = mmShiftElmR(tmp) + c0123 * mmSetAll<3>(in3210)
+    out0123 = mmReplaceRMost(mmShiftElmL<1>(out0123), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<3>(in3210)
 			   + c4567 * mmSetAll<0>(tmp);
-    return mmReverseElm(mmReplaceRMost(mmShiftElmL(out0123), tmp));
+    return mmReverseElm(mmReplaceRMost(mmShiftElmL<1>(out0123), tmp));
 }
 
 static inline mmFlt
 mmBackward4(mmFlt in3210, mmFlt c3210, mmFlt c7654, mmFlt& tmp)
 {
-    tmp = mmShiftElmR(tmp) + c3210 * mmSetAll<3>(in3210)
+    tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<3>(in3210)
 			   + c7654 * mmSetAll<0>(tmp);
     mmFlt	out3210 = tmp;
-    tmp = mmShiftElmR(tmp) + c3210 * mmSetAll<2>(in3210)
+    tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<2>(in3210)
 			   + c7654 * mmSetAll<0>(tmp);
-    out3210 = mmReplaceRMost(mmShiftElmL(out3210), tmp);
-    tmp = mmShiftElmR(tmp) + c3210 * mmSetAll<1>(in3210)
+    out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<1>(in3210)
 			   + c7654 * mmSetAll<0>(tmp);
-    out3210 = mmReplaceRMost(mmShiftElmL(out3210), tmp);
-    tmp = mmShiftElmR(tmp) + c3210 * mmSetAll<0>(in3210)
+    out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
+    tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<0>(in3210)
 			   + c7654 * mmSetAll<0>(tmp);
-    return mmReplaceRMost(mmShiftElmL(out3210), tmp);
+    return mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
 }
 
 template <class S> static void
@@ -175,13 +175,13 @@ mmForward4(const u_char*& src, float*& dst,
     mmUInt8	in8 = mmLoadU(src);
     mmStoreU(dst, mmForward4(mmCvt<mmFlt>(in8), c0123, c4567, tmp));
     dst += mmFlt::NElms;
-    mmStoreU(dst, mmForward4(mmCvt<mmFlt>(mmShiftElmR(in8, mmFlt::NElms)),
+    mmStoreU(dst, mmForward4(mmCvt<mmFlt>(mmShiftElmR<mmFlt::NElms>(in8)),
 			     c0123, c4567, tmp));
     dst += mmFlt::NElms;
-    mmStoreU(dst, mmForward4(mmCvt<mmFlt>(mmShiftElmR(in8, 2*mmFlt::NElms)),
+    mmStoreU(dst, mmForward4(mmCvt<mmFlt>(mmShiftElmR<2*mmFlt::NElms>(in8)),
 			     c0123, c4567, tmp));
     dst += mmFlt::NElms;
-    mmStoreU(dst, mmForward4(mmCvt<mmFlt>(mmShiftElmR(in8, 3*mmFlt::NElms)),
+    mmStoreU(dst, mmForward4(mmCvt<mmFlt>(mmShiftElmR<3*mmFlt::NElms>(in8)),
 			     c0123, c4567, tmp));
     dst += mmFlt::NElms;
     src += mmUInt8::NElms;
@@ -206,13 +206,13 @@ mmBackward4(const u_char*& src, float*& dst,
     src -= mmUInt8::NElms;
     mmUInt8	in8 = mmLoadU(src);
     dst -= mmFlt::NElms;
-    mmStoreU(dst, mmBackward4(mmCvt<mmFlt>(mmShiftElmR(in8, 3*mmFlt::NElms)),
+    mmStoreU(dst, mmBackward4(mmCvt<mmFlt>(mmShiftElmR<3*mmFlt::NElms>(in8)),
 			      c3210, c7654, tmp));
     dst -= mmFlt::NElms;
-    mmStoreU(dst, mmBackward4(mmCvt<mmFlt>(mmShiftElmR(in8, 2*mmFlt::NElms)),
+    mmStoreU(dst, mmBackward4(mmCvt<mmFlt>(mmShiftElmR<2*mmFlt::NElms>(in8)),
 			      c3210, c7654, tmp));
     dst -= mmFlt::NElms;
-    mmStoreU(dst, mmBackward4(mmCvt<mmFlt>(mmShiftElmR(in8, mmFlt::NElms)),
+    mmStoreU(dst, mmBackward4(mmCvt<mmFlt>(mmShiftElmR<mmFlt::NElms>(in8)),
 			      c3210, c7654, tmp));
     dst -= mmFlt::NElms;
     mmStoreU(dst, mmBackward4(mmCvt<mmFlt>(in8), c3210, c7654, tmp));
