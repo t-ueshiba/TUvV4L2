@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.10 2009-02-01 23:26:35 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.11 2009-02-02 08:09:24 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -401,7 +401,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  右端に指定された値を，それ以外の要素に0をセット				*
+*  右端に指定された値を，それ以外の要素に0をセット			*
 ************************************************************************/
   template <class T> static T	mmSetRMost(typename T::ElmType x);
 #if defined(SSE2)
@@ -455,46 +455,46 @@ namespace TU
 *  要素のシフト								*
 ************************************************************************/
 #if defined(SSE2)
-  template <class T> static inline mmInt<T>
-  mmShiftElmL(mmInt<T> x, u_int N=1)	{return _mm_slli_si128(
+  template <u_int N, class T> static inline mmInt<T>
+  mmShiftElmL(mmInt<T> x)		{return _mm_slli_si128(
 						  x, N*mmInt<T>::ElmSiz);}
-  template <class T> static inline mmInt<T>
-  mmShiftElmR(mmInt<T> x, u_int N=1)	{return _mm_srli_si128(
+  template <u_int N, class T> static inline mmInt<T>
+  mmShiftElmR(mmInt<T> x)		{return _mm_srli_si128(
 						  x, N*mmInt<T>::ElmSiz);}
-  static inline mmFlt
-  mmShiftElmL(mmFlt x, u_int N=1)	{return _mm_castsi128_ps(
+  template <u_int N> static inline mmFlt
+  mmShiftElmL(mmFlt x)			{return _mm_castsi128_ps(
 						  _mm_slli_si128(
 						    _mm_castps_si128(x),
 						    N*mmFlt::ElmSiz));}
-  static inline mmFlt
-  mmShiftElmR(mmFlt x, u_int N=1)	{return _mm_castsi128_ps(
+  template <u_int N> static inline mmFlt
+  mmShiftElmR(mmFlt x)			{return _mm_castsi128_ps(
 						  _mm_srli_si128(
 						    _mm_castps_si128(x),
 						    N*mmFlt::ElmSiz));}
-  static inline mmDbl
-  mmShiftElmL(mmDbl x, u_int N=1)	{return _mm_castsi128_pd(
+  template <u_int N> static inline mmDbl
+  mmShiftElmL(mmDbl x)			{return _mm_castsi128_pd(
 						  _mm_slli_si128(
 						    _mm_castpd_si128(x),
 						    N*mmDbl::ElmSiz));}
-  static inline mmDbl
+  template <u_int N> static inline mmDbl
   mmShiftElmR(mmDbl x, u_int N=1)	{return _mm_castsi128_pd(
 						  _mm_srli_si128(
 						    _mm_castpd_si128(x),
 						    N*mmDbl::ElmSiz));}
 #else
-  template <class T> static inline mmInt<T>
-  mmShiftElmL(mmInt<T> x, u_int N=1)	{return _mm_slli_si64(
+  template <u_int N, class T> static inline mmInt<T>
+  mmShiftElmL(mmInt<T> x)		{return _mm_slli_si64(
 						  x, 8*N*mmInt<T>::ElmSiz);}
-  template <class T> static inline mmInt<T>
-  mmShiftElmR(mmInt<T> x, u_int N=1)	{return _mm_srli_si64(
+  template <u_int N, class T> static inline mmInt<T>
+  mmShiftElmR(mmInt<T> x)		{return _mm_srli_si64(
 						  x, 8*N*mmInt<T>::ElmSiz);}
 #endif
 
 /************************************************************************
-*  左端の要素が右端に来るまでシフト						*
+*  左端の要素が右端に来るまでシフト					*
 ************************************************************************/
   template <class T> static inline T
-  mmShiftLMostToRMost(T x)		{return mmShiftElmR(x, T::NElms - 1);}
+  mmShiftLMostToRMost(T x)		{return mmShiftElmR<T::NElms - 1>(x);}
 
 /************************************************************************
 *  回転と逆転								*
@@ -618,7 +618,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  1/4ずつのそれぞれについて要素を4つ複製					*
+*  1/4ずつのそれぞれについて要素を4つ複製				*
 ************************************************************************/
 #if defined(SSE2)
   static inline mmInt8
@@ -1012,7 +1012,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  マスクの型変換								*
+*  マスクの型変換							*
 ************************************************************************/
   template <class S, class T> static S	mmCvtMask(T x);
   template <class S, class T> static S	mmCvtMaskH(T x);
