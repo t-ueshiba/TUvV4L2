@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.11 2009-02-02 08:09:24 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.12 2009-02-08 23:31:22 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -1476,7 +1476,7 @@ namespace TU
 // 等しい
   static inline mmInt8
   operator ==(mmInt8 x, mmInt8 y)	{return _mm_cmpeq_epi8(x, y);}
-  static inline mmInt8
+  static inline mmUInt8
   operator ==(mmUInt8 x, mmUInt8 y)	{return _mm_cmpeq_epi8(x, y);}
   static inline mmInt16
   operator ==(mmInt16 x, mmInt16 y)	{return _mm_cmpeq_epi16(x, y);}
@@ -1565,28 +1565,28 @@ namespace TU
 /************************************************************************
 *  Min/Max								*
 ************************************************************************/
-  template <class T> static inline T
-  mmMin(T x, T y)			{return mmSelect(x, y, x < y);}
-  template <class T> static inline T
-  mmMax(T x, T y)			{return mmSelect(x, y, x > y);}
+  template <class T> static inline mmInt<T>
+  mmMin(mmInt<T> x, mmInt<T> y)		{return mmSelect(x, y, x < y);}
+  template <class T> static inline mmInt<T>
+  mmMax(mmInt<T> x, mmInt<T> y)		{return mmSelect(x, y, x > y);}
 #if defined(SSE)
 #  if defined(SSE2)
 #    if defined(SSE4)
-  static inline mmInt8
+  template <> inline mmInt8
   mmMin(mmInt8 x, mmInt8 y)		{return _mm_min_epi8(x, y);}
-  static inline mmInt8
+  template <> inline mmInt8
   mmMax(mmInt8 x, mmInt8 y)		{return _mm_max_epi8(x, y);}
-  static inline mmUInt16
+  template <> inline mmUInt16
   mmMin(mmUInt16 x, mmUInt16 y)		{return _mm_min_epu16(x, y);}
-  static inline mmUInt16
+  template <> inline mmUInt16
   mmMax(mmUInt16 x, mmUInt16 y)		{return _mm_max_epu16(x, y);}
-  static inline mmInt32
+  template <> inline mmInt32
   mmMin(mmInt32 x, mmInt32 y)		{return _mm_min_epi32(x, y);}
-  static inline mmInt32
+  template <> inline mmInt32
   mmMax(mmInt32 x, mmInt32 y)		{return _mm_max_epi32(x, y);}
-  static inline mmUInt32
+  template <> inline mmUInt32
   mmMin(mmUInt32 x, mmUInt32 y)		{return _mm_min_epu32(x, y);}
-  static inline mmUInt32
+  template <> inline mmUInt32
   mmMax(mmUInt32 x, mmUInt32 y)		{return _mm_max_epu32(x, y);}
 #    endif
   template <> inline mmUInt8
@@ -1609,18 +1609,26 @@ namespace TU
 #  endif
 #endif    
 #if defined(SSE)
-  template <> inline mmFlt
+  static inline mmFlt
   mmMin(mmFlt x, mmFlt y)		{return _mm_min_ps(x, y);}
-  template <> inline mmFlt
+  static inline mmFlt
   mmMax(mmFlt x, mmFlt y)		{return _mm_max_ps(x, y);}
 #endif
 #if defined(SSE2)
-  template <> inline mmDbl
+  static inline mmDbl
   mmMin(mmDbl x, mmDbl y)		{return _mm_min_pd(x, y);}
-  template <> inline mmDbl
+  static inline mmDbl
   mmMax(mmDbl x, mmDbl y)		{return _mm_max_pd(x, y);}
 #endif
   
+/************************************************************************
+*  より小さいか等しい／より大きいか等しい					*
+************************************************************************/
+  template <class T> static inline mmInt<T>
+  operator >=(mmInt<T> x, mmInt<T> y)	{return mmMax(x, y) == x;}
+  template <class T> static inline mmInt<T>
+  operator <=(mmInt<T> x, mmInt<T> y)	{return mmMin(x, y) == x;}
+    
 /************************************************************************
 *  絶対値								*
 ************************************************************************/
