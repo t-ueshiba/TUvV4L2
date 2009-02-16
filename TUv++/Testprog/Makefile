@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2008-05-27 11:38:27 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2009-02-16 06:35:29 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -23,12 +23,11 @@ SUFFIX		= .cc:sC
 EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
 		/home/ueshiba/include/TU/Geometry++.h \
 		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/List++.h \
+		/home/ueshiba/include/TU/List.h \
 		/home/ueshiba/include/TU/Manip.h \
-		/home/ueshiba/include/TU/Minimize++.h \
+		/home/ueshiba/include/TU/Normalize.h \
 		/home/ueshiba/include/TU/Vector++.h \
 		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/utility.h \
 		/home/ueshiba/include/TU/v/App.h \
 		/home/ueshiba/include/TU/v/CanvasPane.h \
 		/home/ueshiba/include/TU/v/CanvasPaneDC.h \
@@ -50,7 +49,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -66,11 +65,9 @@ main.o: /home/ueshiba/include/TU/v/App.h \
 	/home/ueshiba/include/TU/v/Colormap.h \
 	/home/ueshiba/include/TU/Image++.h \
 	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/utility.h \
-	/home/ueshiba/include/TU/Minimize++.h \
 	/home/ueshiba/include/TU/Vector++.h \
 	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/List++.h \
+	/home/ueshiba/include/TU/Normalize.h /home/ueshiba/include/TU/List.h \
 	/home/ueshiba/include/TU/v/Widget-Xaw.h \
 	/home/ueshiba/include/TU/v/ModalDialog.h \
 	/home/ueshiba/include/TU/v/Dialog.h \
