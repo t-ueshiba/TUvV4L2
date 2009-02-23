@@ -25,9 +25,8 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.8 2009-01-28 01:24:22 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.9 2009-02-23 00:09:19 ueshiba Exp $
  */
-#include "TU/Warp.h"
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
 #  undef SSSE3
@@ -39,7 +38,7 @@
 //#  define SSE2
 //#  define SSE3
 #endif
-#include "TU/mmInstructions.h"
+#include "TU/Warp.h"
 
 namespace TU
 {
