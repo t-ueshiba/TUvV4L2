@@ -25,13 +25,14 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.5 2008-10-19 23:29:34 ueshiba Exp $
+ *  $Id: Warp.h,v 1.6 2009-02-23 00:09:19 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
 
 #include "TU/Image++.h"
 #include "TU/Camera.h"
+#include "TU/mmInstructions.h"
 
 namespace TU
 {
@@ -51,7 +52,7 @@ class Warp
 	void		resize(u_int d)			;
 
 	Array<short>				us, vs;
-#ifdef __INTEL_COMPILER	
+#if defined(__INTEL_COMPILER)
 	Array<u_char, AlignedBuf<u_char> >	du, dv;
 #else
 	Array<u_char>				du, dv;
@@ -89,6 +90,9 @@ class Warp
     void	operator ()(const Image<T>& in, Image<T>& out,
 			    int vs=0, int ve=0)			const	;
     Vector2f	operator ()(int u, int v)			const	;
+#if defined(SSE2)
+    mmFlt	src(int u, int v)				const	;
+#endif
 
   private:
     Array<FracArray>	_fracs;
@@ -148,6 +152,27 @@ Warp::operator ()(int u, int v) const
     return val;
 }
 
+#if defined(SSE2)
+//! 2つの出力画像点を指定してそれぞれにマップされる2つの入力画像点の2次元座標を返す．
+/*!
+  指定された2次元座標(u, v)に対し，2点(u, v-1), (u, v)にマップされる入力画像点の
+  2次元座標が返される．
+  \param u	出力画像点の横座標
+  \param v	出力画像点の縦座標
+  \return	出力画像点(u, v-1), (u, v)にマップされる入力画像点の2次元座標
+*/
+inline mmFlt
+Warp::src(int u, int v) const
+{
+    const FracArray	&fp = _fracs[v-1], &fc = _fracs[v];
+    const mmInt16	tmp = mmSet<mmInt16>(fc.dv[u], fc.du[u],
+					     fp.dv[u], fp.du[u],
+					     fc.vs[u], fc.us[u],
+					     fp.vs[u], fp.us[u]);
+    return mmCvt<mmFlt>(tmp) +
+	   mmCvt<mmFlt>(mmShiftElmR<4>(tmp)) / mmSetAll<mmFlt>(128.0);
+}
+#endif
 }
 
 #endif	/* !__TUWarp_h */
