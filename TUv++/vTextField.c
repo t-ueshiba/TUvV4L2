@@ -340,7 +340,7 @@ Redisplay(Widget aw, XExposeEvent * event, Region region)
   if (!XtIsRealized(aw))
     return;
   if (w->threeD.shadow_width > 0)
-    (*wclass->threeD_class.shadowdraw)(w, event, region, False);
+    (*wclass->threeD_class.shadowdraw)(w, event, region, w->threeD.relief, False);
   
   Draw(w);
 }
@@ -562,8 +562,7 @@ Activate(Widget aw, XEvent * event, String * params, Cardinal * num_params)
   ret.event = event;
   ret.string = w->text.Text;
 
-  if (XtNactivateCallback)
-    XtCallCallbacks(aw, XtNactivateCallback, &ret);
+  XtCallCallbacks(aw, XtNactivateCallback, &ret);
 }
 
 /* ARGSUSED */

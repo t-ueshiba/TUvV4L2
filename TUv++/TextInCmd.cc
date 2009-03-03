@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: TextInCmd.cc,v 1.5 2008-09-10 05:12:18 ueshiba Exp $  
+ *  $Id: TextInCmd.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TextInCmd_.h"
 #include "vTextField_.h"
@@ -67,14 +67,14 @@ TextInCmd::widget() const
 void
 TextInCmd::setString(const char* str)
 {
-    XtVaSetValues(_widget, XtNstring, str, NULL);
+    XtVaSetValues(_widget, XtNstring, str, Null);
 }
 
 const char*
 TextInCmd::getString() const
 {
     const char*	str;
-    XtVaGetValues(_widget, XtNstring, &str, NULL);
+    XtVaGetValues(_widget, XtNstring, &str, Null);
     return str;
 }
 

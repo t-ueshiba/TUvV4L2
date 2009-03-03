@@ -1163,6 +1163,6 @@ void vScrollbarSetThumb (w, top, shown)
     sbw->scrollbar.shown = (shown > 1.0) ? 1.0 :
 				(shown >= 0.0) ? shown : sbw->scrollbar.shown;
 
-    PaintThumb (sbw, NULL);
+    PaintThumb (sbw, (XEvent*)NULL);
 }
 

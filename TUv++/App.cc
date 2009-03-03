@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: App.cc,v 1.9 2009-01-03 08:51:41 ueshiba Exp $  
+ *  $Id: App.cc,v 1.10 2009-03-03 00:59:46 ueshiba Exp $  
  */
 #include "TU/v/App.h"
 #include <stdexcept>
@@ -43,7 +43,7 @@ static XVisualInfo
 vinfoOfWidget(Widget widget)
 {
     Visual*		visual;
-    XtVaGetValues(widget, XtNvisual, &visual, NULL);
+    XtVaGetValues(widget, XtNvisual, &visual, Null);
     XVisualInfo		vinfo_template;
     vinfo_template.visualid
 	= XVisualIDFromVisual(visual != 0 ? visual :
@@ -75,20 +75,20 @@ submenuPopup(Widget menu, XEvent* event, String*, Cardinal*)
 
   /* Check current mouse position relative to the above item. */
     Dimension	width;
-    XtVaGetValues(menuItem, XtNwidth, &width, NULL);
+    XtVaGetValues(menuItem, XtNwidth, &width, Null);
 
     if (event->xmotion.x < width - (width / 3) || event->xmotion.x >= width)
 	return;
 
   /* Get submenu widget and pop it up. */
     char*	name;
-    XtVaGetValues(menuItem, XtNlabel, &name, NULL);
+    XtVaGetValues(menuItem, XtNlabel, &name, Null);
     Widget	submenu = XtNameToWidget(menu, name);
     if (submenu != 0)
     {
 	Position	x, y;
 	XtTranslateCoords(menuItem, event->xmotion.x - 10, 0, &x, &y);
-	XtVaSetValues(submenu, XtNx, x, XtNy, y, NULL);
+	XtVaSetValues(submenu, XtNx, x, XtNy, y, Null);
 	XtPopup(submenu, XtGrabExclusive);
     }
 }
@@ -160,11 +160,11 @@ App::App(int& argc, char* argv[])
 			       XtNmappedWhenManaged,	FALSE,	// invisible
 			       XtNwidth,		1,
 			       XtNheight,		1,	// very small
-			       NULL)),
+			       Null)),
      _colormap(XtDisplay(_widget), vinfoOfWidget(_widget)),
      _active(0)
 {
-    XtVaSetValues(_widget, XtNcolormap, (::Colormap)_colormap, NULL);
+    XtVaSetValues(_widget, XtNcolormap, (::Colormap)_colormap, Null);
     XtRealizeWidget(_widget);
     
   // Add the delete protocol.

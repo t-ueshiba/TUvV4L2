@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC.cc,v 1.9 2008-09-10 05:11:59 ueshiba Exp $  
+ *  $Id: CanvasPaneDC.cc,v 1.10 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/CanvasPaneDC.h"
 #include "vCanvas_.h"
@@ -171,7 +171,7 @@ CanvasPaneDC::CanvasPaneDC(CanvasPane& parentCanvasPane,
 				     XtNbackground,
 				         colormap().getUnderlayPixel(u_char(0),
 								     0, 0),
-				     NULL)),
+				     Null)),
      _popup(*this, zoomMenu),
      _u_last(0), _v_last(0)
 {
@@ -289,7 +289,7 @@ CanvasPaneDC::setDeviceSize()
     XtVaSetValues(canvasPane().widget(),
 		  XtNchildMinWidth,	deviceWidth(),
 		  XtNchildMinHeight,	deviceHeight(),
-		  NULL);
+		  Null);
 }
 
 u_int

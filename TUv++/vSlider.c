@@ -896,6 +896,6 @@ void XawSliderSetThumb (w, top, shown)
     sbw->slider.shown = (shown > 1.0) ? 1.0 :
 				(shown >= 0.0) ? shown : sbw->slider.shown;
 
-    PaintThumb (sbw, NULL);
+    PaintThumb (sbw, (XEvent*)NULL);
 }
 

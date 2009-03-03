@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Window.cc,v 1.7 2008-09-10 05:12:21 ueshiba Exp $  
+ *  $Id: Window.cc,v 1.8 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/App.h"
 #include <X11/Shell.h>
@@ -73,7 +73,7 @@ bool
 Window::isFullScreen() const
 {
     Boolean	overrideRedirect;
-    XtVaGetValues(widget(), XtNoverrideRedirect, &overrideRedirect, NULL);
+    XtVaGetValues(widget(), XtNoverrideRedirect, &overrideRedirect, Null);
     return (overrideRedirect == TRUE);
 }
 

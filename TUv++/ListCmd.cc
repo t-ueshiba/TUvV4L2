@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ListCmd.cc,v 1.5 2008-09-10 05:12:10 ueshiba Exp $  
+ *  $Id: ListCmd.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "ListCmd_.h"
 #include "vViewport_.h"
@@ -70,7 +70,7 @@ ListCmd::ListCmd(Object& parentObject, const CmdDef& cmd)
 				   XtNforceColumns,	TRUE,
 				   XtNverticalList,	TRUE,
 				   XtNinternalHeight,	0,
-				   NULL)),
+				   Null)),
      _top(0),
      _nitems(0),
      _nitemsShown(cmd.size > 0 ? cmd.size : 10)
@@ -120,11 +120,11 @@ ListCmd::setProp(void* prop)
 	XawListChange(_list, (String*)prop, 0, 0, TRUE);
 
 	Dimension	height;
-	XtVaGetValues(_list, XtNheight, &height, NULL);
+	XtVaGetValues(_list, XtNheight, &height, Null);
 	XtVaSetValues(_widget,
 		      XtNheight, (_nitems > _nitemsShown ?
 				  height * _nitemsShown / _nitems : height),
-		      NULL);
+		      Null);
     }
 }
 
@@ -132,8 +132,8 @@ void
 ListCmd::setPercent(float percent)
 {
     Dimension	viewportHeight, listHeight;
-    XtVaGetValues(_widget, XtNheight, &viewportHeight, NULL);
-    XtVaGetValues(_list, XtNheight, &listHeight, NULL);
+    XtVaGetValues(_widget, XtNheight, &viewportHeight, Null);
+    XtVaGetValues(_list, XtNheight, &listHeight, Null);
     u_int	nshown = _nitems * viewportHeight / listHeight;
     _top = int(_nitems * percent + 0.5);
     if (_top < 0)
