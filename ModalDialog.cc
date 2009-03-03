@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ModalDialog.cc,v 1.5 2008-09-10 05:12:13 ueshiba Exp $  
+ *  $Id: ModalDialog.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/ModalDialog.h"
 
@@ -52,7 +52,7 @@ ModalDialog::show()
     Point2<int>	p = parent().widget().position();
     p[0] += 10;
     p[1] += 10;
-    XtVaSetValues(widget(), XtNx, p[0], XtNy, p[1], NULL);
+    XtVaSetValues(widget(), XtNx, p[0], XtNy, p[1], Null);
     XtPopup(widget(), XtGrabExclusive);
 
     XtAppContext	appContext = XtWidgetToApplicationContext(widget());

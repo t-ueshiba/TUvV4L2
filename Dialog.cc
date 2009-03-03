@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Dialog.cc,v 1.6 2008-09-10 05:12:06 ueshiba Exp $  
+ *  $Id: Dialog.cc,v 1.7 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/Dialog.h"
 #include "TU/v/Colormap.h"
@@ -49,7 +49,7 @@ Dialog::Dialog(Window& parentWindow, const char* myName, const CmdDef cmd[])
 				  XtNvisual,	colormap().vinfo().visual,
 				  XtNdepth,	colormap().vinfo().depth,
 				  XtNcolormap,	(::Colormap)colormap(),
-				  NULL)),
+				  Null)),
      _pane(*this, cmd)
 {
 }

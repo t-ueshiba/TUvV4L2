@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CmdWindow.cc,v 1.8 2008-09-10 05:12:03 ueshiba Exp $  
+ *  $Id: CmdWindow.cc,v 1.9 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/CmdWindow.h"
 #include "TU/v/App.h"
@@ -170,7 +170,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 				  XtNvisual,	_colormap.vinfo().visual,
 				  XtNdepth,	_colormap.vinfo().depth,
 				  XtNcolormap,	(::Colormap)_colormap,
-				  NULL)),
+				  Null)),
      _paned(*this)
 {
     if (fullScreen)
@@ -182,7 +182,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		      XtNwidth,		    WidthOfScreen(XtScreen(_widget)),
 		      XtNheight,	    HeightOfScreen(XtScreen(_widget)),
 		      XtNoverrideRedirect,  TRUE,
-		      NULL);
+		      Null);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }
 
@@ -209,7 +209,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 				  XtNvisual,	_colormap.vinfo().visual,
 				  XtNdepth,	_colormap.vinfo().depth,
 				  XtNcolormap,	(::Colormap)_colormap,
-				  NULL)),
+				  Null)),
      _paned(*this)
 {
     if (fullScreen)
@@ -221,7 +221,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		      XtNwidth,		    WidthOfScreen(XtScreen(_widget)),
 		      XtNheight,	    HeightOfScreen(XtScreen(_widget)),
 		      XtNoverrideRedirect,  TRUE,
-		      NULL);
+		      Null);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }
 
@@ -301,7 +301,7 @@ CmdWindow::Paned::Paned(CmdWindow& parentCmdWindow)
 				     gridboxWidgetClass,
 				     parent().widget(),
 				     XtNdefaultDistance,	0,
-				     NULL))
+				     Null))
 {
     XtAddEventHandler(_widget, KeyPressMask, FALSE, EVkeyPress,
 		      (XtPointer)this);

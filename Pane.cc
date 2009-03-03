@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Pane.cc,v 1.5 2008-09-10 05:12:15 ueshiba Exp $  
+ *  $Id: Pane.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/TUv++.h"
 #include "vGridbox_.h"
@@ -52,7 +52,7 @@ void
 Pane::place(u_int left, u_int top, u_int width, u_int height)
 {
     XtVaSetValues(widget(), XtNgridx, left, XtNgridy, top,
-		  XtNgridWidth, width, XtNgridHeight, height, NULL);
+		  XtNgridWidth, width, XtNgridHeight, height, Null);
 }
 
 }

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Widget-Xaw.h,v 1.6 2008-09-10 05:12:20 ueshiba Exp $  
+ *  $Id: Widget-Xaw.h,v 1.7 2009-03-03 00:59:47 ueshiba Exp $  
  */
 class Widget
 {

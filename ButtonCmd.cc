@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ButtonCmd.cc,v 1.5 2008-09-10 05:11:57 ueshiba Exp $  
+ *  $Id: ButtonCmd.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "ButtonCmd_.h"
 
@@ -44,7 +44,7 @@ ButtonCmd::ButtonCmd(Object& parentObject, const CmdDef& cmd)
 {
     setDefaultCallback(_widget);
     if (_bitmap != 0)
-	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), NULL);
+	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), Null);
 }
 
 ButtonCmd::~ButtonCmd()

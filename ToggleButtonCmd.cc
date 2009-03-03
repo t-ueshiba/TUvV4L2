@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ToggleButtonCmd.cc,v 1.5 2008-09-10 05:12:19 ueshiba Exp $  
+ *  $Id: ToggleButtonCmd.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "ToggleButtonCmd_.h"
 #include <X11/Xaw3d/Toggle.h>
@@ -46,7 +46,7 @@ ToggleButtonCmd::ToggleButtonCmd(Object& parentObject, const CmdDef& cmd)
     setValue(cmd.val);
     setDefaultCallback(_widget);
     if (_bitmap != 0)
-	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), NULL);
+	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), Null);
 }
 
 ToggleButtonCmd::~ToggleButtonCmd()
@@ -64,14 +64,14 @@ CmdVal
 ToggleButtonCmd::getValue() const
 {
     Boolean	state;
-    XtVaGetValues(_widget, XtNstate, &state, NULL);
+    XtVaGetValues(_widget, XtNstate, &state, Null);
     return (state == TRUE ? 1 : 0);
 }
 
 void
 ToggleButtonCmd::setValue(CmdVal val)
 {
-    XtVaSetValues(_widget, XtNstate, (val != 0 ? TRUE : FALSE), NULL);
+    XtVaSetValues(_widget, XtNstate, (val != 0 ? TRUE : FALSE), Null);
 }
 
 }

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: RadioButtonCmd.cc,v 1.7 2009-01-04 23:49:37 ueshiba Exp $  
+ *  $Id: RadioButtonCmd.cc,v 1.8 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/Bitmap.h"
 #include "RadioButtonCmd_.h"
@@ -75,7 +75,7 @@ RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
 				     parent().widget().background(),
 				     XtNrelief,			XtReliefNone,
 				     XtNborderWidth,		0,
-				     NULL)),
+				     Null)),
      _label(XtVaCreateManagedWidget("TUvRadioButtonCmd-label",
 				    labelWidgetClass,
 				    _widget,
@@ -87,7 +87,7 @@ RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
 				    XtNborderWidth,		0,
 				    XtNhighlightThickness,	0,
 				    XtNgridx,			1,
-				    NULL))
+				    Null))
 {
     if (_nitems++ == 0)
     {
@@ -118,7 +118,7 @@ CmdVal
 RadioButtonCmd::getValue() const
 {
     Pixmap	bitmap;
-    XtVaGetValues(_button, XtNbitmap, &bitmap, NULL);
+    XtVaGetValues(_button, XtNbitmap, &bitmap, Null);
     return (bitmap == onBitmap->xpixmap() ? 1 : 0);
 }
 
@@ -128,7 +128,7 @@ RadioButtonCmd::setValue(CmdVal val)
     XtVaSetValues(_button,
 		  XtNbitmap,	(val != 0 ?
 				 onBitmap->xpixmap() : offBitmap->xpixmap()),
-		  NULL);
+		  Null);
 }
 
 }

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPane.cc,v 1.7 2008-09-10 05:11:58 ueshiba Exp $  
+ *  $Id: CanvasPane.cc,v 1.8 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/CanvasPane.h"
 #include "vViewport_.h"
@@ -56,10 +56,10 @@ CanvasPane::CanvasPane(Window& parentWin, u_int devWidth, u_int devHeight)
 				   // height of Paned.
 				     XtNweightx,	1,
 				     XtNweighty,	1,
-				     NULL))
+				     Null))
 {
     if (window().isFullScreen())
-	XtVaSetValues(_widget, XtNborderWidth, 0, NULL);
+	XtVaSetValues(_widget, XtNborderWidth, 0, Null);
 }
 
 CanvasPane::~CanvasPane()

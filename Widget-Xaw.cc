@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Widget-Xaw.cc,v 1.8 2009-01-04 23:49:37 ueshiba Exp $  
+ *  $Id: Widget-Xaw.cc,v 1.9 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/TUv++.h"
 #include <X11/Xaw3d/ThreeD.h>
@@ -82,7 +82,7 @@ cmdWidgetClass(CmdType type)
 }
 
 /************************************************************************
-*  class Object::Widget						*
+*  class Object::Widget							*
 ************************************************************************/
 Object::Widget::Widget(::Widget widget)
     :_widget(widget)
@@ -103,7 +103,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 				     parentWidget,
 	/* for vViewportWidget */    XtNforceBars,	TRUE,
 	/* for vViewportWidget */    XtNallowVert,	TRUE,
-				     NULL))
+				     Null))
 {
 #ifdef DEBUG
     using namespace	std;
@@ -123,7 +123,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 		  XtNgridy,		cmd.gridy,
                   XtNgridWidth,		cmd.gridWidth,
 		  XtNgridHeight,	cmd.gridHeight,
-                  NULL);
+                  Null);
 
     switch (cmd.type)
     {
@@ -132,7 +132,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNinternalWidth,		0,
 		      XtNinternalHeight,	0,
 		      XtNbitmap,		cmd.prop,
-		      NULL);
+		      Null);
 	break;
 	
       case C_Label:
@@ -143,7 +143,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 					 XtReliefNone : XtReliefSunken),
 		      XtNshadowWidth,	2,
 		      XtNlabel, (cmd.prop != 0 ? (char*)cmd.prop : cmd.title),
-		      NULL);
+		      Null);
       }
 	break;
 	
@@ -152,7 +152,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 	{
 	    XtAccelerators	button = XtParseAcceleratorTable
 		("<Key>Return: set() notify() unset()\n");
-	    XtVaSetValues(_widget, XtNaccelerators, button, NULL);
+	    XtVaSetValues(_widget, XtNaccelerators, button, Null);
 	}
       // Fall through to the next case block.
       case C_ToggleButton:
@@ -161,7 +161,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNrelief,	(cmd.attrs & CA_NoBorder ?
 					 XtReliefNone : XtReliefRaised),
 		      XtNlabel,		cmd.title,
-		      NULL);
+		      Null);
 	break;
 
       case C_Frame:
@@ -169,7 +169,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 	XtVaSetValues(_widget,
 		      XtNdefaultDistance,   (cmd.attrs & CA_NoSpace  ? 0 : 4),
 		      XtNbackground,	    parentWidget.background(),
-		      NULL);
+		      Null);
 	break;
 
       case C_RadioButton:
@@ -177,27 +177,24 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNbackground,		parentWidget.background(),
 		      XtNborderWidth,		0,
 		      XtNdefaultDistance,	0,
-		      NULL);
+		      Null);
 	break;
 	
       case C_Slider:
 	XtVaSetValues(_widget,
 		      XtNdefaultDistance,	2,
-		      NULL);
+		      Null);
 	break;
 	
       case C_TextIn:
 	XtVaSetValues(_widget,
-#ifdef XtNrelief
-		      XtNborderWidth,	1,
-#else
 		      XtNborderWidth,	0,
-		      XtNshadowWidth,	(cmd.attrs & CA_NoBorder ? 0 : 2),
-#endif
+		      XtNrelief,	(cmd.attrs & CA_NoBorder ?
+					 XtReliefNone : XtReliefRaised),
 		      XtNstring,	cmd.title,
 		      XtNinsertPosition,0,
 		    //XtNecho,		!(cmd.attrs & CA_Password),
-		      NULL);
+		      Null);
 	break;
 
       case C_MenuButton:
@@ -208,7 +205,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 					 XtReliefNone : XtReliefRaised),
 		      XtNlabel,		cmd.title,
 		      XtNmenuName,	"TUvMenu",
-		      NULL);
+		      Null);
 	break;
 
       case C_List:
@@ -216,12 +213,12 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNwidth,		60,
 		      XtNuseBottom,	TRUE,
 		      XtNuseRight,	TRUE,
-		      NULL);
+		      Null);
 	break;
     }
 
     if (cmd.size > 0)
-	XtVaSetValues(_widget, XtNwidth, cmd.size, NULL);
+	XtVaSetValues(_widget, XtNwidth, cmd.size, Null);
 }
 
 Object::Widget::~Widget()
@@ -242,7 +239,7 @@ u_int
 Object::Widget::width() const
 {
     Dimension	w;
-    XtVaGetValues(_widget, XtNwidth, &w, NULL);
+    XtVaGetValues(_widget, XtNwidth, &w, Null);
     return w;
 }
 
@@ -250,7 +247,7 @@ u_int
 Object::Widget::height() const
 {
     Dimension	h;
-    XtVaGetValues(_widget, XtNheight, &h, NULL);
+    XtVaGetValues(_widget, XtNheight, &h, Null);
     return h;
 }
 
@@ -258,7 +255,7 @@ Point2<int>
 Object::Widget::position() const
 {
     Position	x, y;
-    XtVaGetValues(_widget, XtNx, &x, XtNy, &y, NULL);
+    XtVaGetValues(_widget, XtNx, &x, XtNy, &y, Null);
     return Point2<int>(x, y);
 }
 
@@ -266,21 +263,21 @@ u_long
 Object::Widget::background() const
 {
     Pixel	bg;
-    XtVaGetValues(_widget, XtNbackground, &bg, NULL);
+    XtVaGetValues(_widget, XtNbackground, &bg, Null);
     return bg;
 }
 
 Object::Widget&
 Object::Widget::setWidth(u_int w)
 {
-    XtVaSetValues(_widget, XtNwidth, (Dimension)w, NULL);
+    XtVaSetValues(_widget, XtNwidth, (Dimension)w, Null);
     return *this;
 }
 
 Object::Widget&
 Object::Widget::setHeight(u_int h)
 {
-    XtVaSetValues(_widget, XtNheight, (Dimension)h, NULL);
+    XtVaSetValues(_widget, XtNheight, (Dimension)h, Null);
     return *this;
 }
 
@@ -288,7 +285,7 @@ Object::Widget&
 Object::Widget::setPosition(const Point2<int>& p)
 {
     Position	x = p[0], y = p[1];
-    XtVaSetValues(_widget, XtNx, x, XtNy, y, NULL);
+    XtVaSetValues(_widget, XtNx, x, XtNy, y, Null);
     return *this;
 }
 

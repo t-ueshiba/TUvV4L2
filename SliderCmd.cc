@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SliderCmd.cc,v 1.7 2009-01-03 08:51:41 ueshiba Exp $  
+ *  $Id: SliderCmd.cc,v 1.8 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "SliderCmd_.h"
 #include "vSlider_.h"
@@ -64,7 +64,7 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				    XtNfill,		"none",
 				    XtNgravity,		WestGravity,
 				    XtNgridx,		0,
-				    NULL)),
+				    Null)),
      _slider(XtVaCreateManagedWidget("TUvSliderCmd-slider",
 				     sliderWidgetClass,
 				     _widget,
@@ -80,7 +80,7 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				     XtNfill,		"none",
 				     XtNgravity,	WestGravity,
 				     XtNgridx,		1,
-				     NULL)),
+				     Null)),
      _text(XtVaCreateManagedWidget("TUvSliderCmd-text",
 				   labelWidgetClass,
 				   _widget,
@@ -88,13 +88,13 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				   XtNfill,		"none",
 				   XtNgravity,		WestGravity,
 				   XtNgridx,		2,
-				   NULL)),
+				   Null)),
      _min  (cmd.prop != 0 ? ((int*)cmd.prop)[0] :   0),
      _range(cmd.prop != 0 ? ((int*)cmd.prop)[1] : 100),
      _div  (cmd.prop != 0 ? ((int*)cmd.prop)[2] : 100),
      _val(cmd.val)
 {
-    XtVaSetValues(_slider, XtNgridx, 1, NULL);
+    XtVaSetValues(_slider, XtNgridx, 1, Null);
     XtAddCallback(_slider, XtNjumpProc, CBsliderCmdJumpProc, this);
     
     setValue(CmdVal(_val, _div));
@@ -157,7 +157,7 @@ SliderCmd::setValueInternal(CmdVal val)
 	s << std::setw(4) << _val;
     else
 	s << std::setw(4) << (float)_val / (float)_div;
-    XtVaSetValues(_text, XtNlabel, s.str().c_str(), NULL);
+    XtVaSetValues(_text, XtNlabel, s.str().c_str(), Null);
 }
 
 }

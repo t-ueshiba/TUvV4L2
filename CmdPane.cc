@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CmdPane.cc,v 1.5 2008-09-10 05:12:02 ueshiba Exp $  
+ *  $Id: CmdPane.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/CmdPane.h"
 #include "vGridbox_.h"
@@ -45,7 +45,7 @@ CmdPane::CmdPane(Window& parentWindow, const CmdDef cmd[])
 				   // Expand/shrink according to the width
 				   // of Paned.
 				     XtNweightx,		1,
-				     NULL))
+				     Null))
 {
     for (int i = 0; cmd[i].type != C_EndOfList; ++i)
 	addCmd(Cmd::newCmd(*this, cmd[i]));

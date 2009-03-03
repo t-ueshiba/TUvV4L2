@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Menu.cc,v 1.5 2008-09-10 05:12:11 ueshiba Exp $  
+ *  $Id: Menu.cc,v 1.6 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #include "TU/v/Menu.h"
 #include "TU/v/Colormap.h"
@@ -53,7 +53,7 @@ Menu::Menu(Object& parentObject, const MenuDef menu[])
 				// This resource setting cannot be ommited.
 				  XtNvisual,
 				      window().colormap().vinfo().visual,
-				  NULL))
+				  Null))
 {
     for (int i = 0; menu[i].label != 0; ++i)
 	addCmd(new Item(*this, menu[i]));
@@ -70,7 +70,7 @@ Menu::Menu(Object& parentObject, const MenuDef menu[],
 				// This resource setting cannot be ommited.
 				  XtNvisual,
 				      window().colormap().vinfo().visual,
-				  NULL))
+				  Null))
 {
     for (int i = 0; menu[i].label != 0; ++i)
 	addCmd(new Item(*this, menu[i]));
@@ -129,7 +129,7 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
 				     XtNrightMargin,	15,
 				     XtNbackground,
 				     parent().widget().background(), 
-				     NULL) :
+				     Null) :
 	     XtVaCreateManagedWidget("TUvMenu-Item",	//menuItem.label,
 				     smeBSBObjectClass,
 				     parent().widget(),
@@ -139,7 +139,7 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
 				     XtNrightMargin,	15,
 				     XtNbackground,
 				     parent().widget().background(), 
-				     NULL))
+				     Null))
 {
     if (_nitems++ == 0)
     {
@@ -159,7 +159,7 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
 		addCmd(new Menu(*this, menuItem.submenu,
 				menuItem.label, parent().widget()));
 	    XtVaSetValues(_widget, XtNrightBitmap, arrowBitmap->xpixmap(),
-			  NULL);
+			  Null);
 	}
 	else
 	{
@@ -207,7 +207,7 @@ Menu::Item::getValue() const
     else
     {
 	Pixmap	bitmap;
-	XtVaGetValues(_widget, XtNleftBitmap, &bitmap, NULL);
+	XtVaGetValues(_widget, XtNleftBitmap, &bitmap, Null);
 	return (bitmap == checkBitmap->xpixmap() ? 1 : 0);
     }
 }
@@ -222,7 +222,7 @@ Menu::Item::setValue(CmdVal val)
 	XtVaSetValues(_widget,
 		      XtNleftBitmap, (val != 0 ? checkBitmap->xpixmap() :
 						 clearBitmap->xpixmap()),
-		      NULL);
+		      Null);
 }
 
 /************************************************************************

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: TUv++.h,v 1.13 2009-01-03 08:51:41 ueshiba Exp $  
+ *  $Id: TUv++.h,v 1.14 2009-03-03 00:59:47 ueshiba Exp $  
  */
 #ifndef __TUvPP_h
 #define __TUvPP_h
@@ -200,9 +200,12 @@ const CmdId	Id_MouseLeaveFocus	= 32211;  // mouse leaved the window
 const CmdId	Id_KeyPress		= 32300;  // mouse leaved the window
 
 // key modifiers
-const int	VKM_Ctrl	= 0x100;
-const int	VKM_Alt		= 0x200;
+const int	VKM_Ctrl		= 0x100;
+const int	VKM_Alt			= 0x200;
 
+// null pointer
+const void* const	Null = 0;
+    
 /************************************************************************
 *  class Object								*
 ************************************************************************/
@@ -226,7 +229,7 @@ class Object
     virtual void		tick()				;
     
   protected:
-    Object(Object& parentObject)	:_parent(parentObject)	{}
+    Object(Object& parentObject) :_parent(parentObject)	{}
     virtual ~Object()					;
 
 	    Object&	parent()			{return _parent;}
