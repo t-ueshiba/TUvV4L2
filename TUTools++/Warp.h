@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.6 2009-02-23 00:09:19 ueshiba Exp $
+ *  $Id: Warp.h,v 1.7 2009-03-06 02:55:24 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -51,10 +51,11 @@ class Warp
 	u_int		width()			const	{return us.dim();}
 	void		resize(u_int d)			;
 
-	Array<short>				us, vs;
 #if defined(__INTEL_COMPILER)
+	Array<short,  AlignedBuf<short> >	us, vs;
 	Array<u_char, AlignedBuf<u_char> >	du, dv;
 #else
+	Array<short>				us, vs;
 	Array<u_char>				du, dv;
 #endif
 	int					lmost;

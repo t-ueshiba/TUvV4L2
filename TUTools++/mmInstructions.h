@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.12 2009-02-08 23:31:22 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.13 2009-03-06 02:55:24 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -752,6 +752,23 @@ namespace TU
   mmQuad2(mmFlt x)			{return mmSetAll<2>(x);}
   static inline mmFlt
   mmQuad3(mmFlt x)			{return mmSetAll<3>(x);}
+#endif
+    
+/************************************************************************
+*  N番目の要素の取り出し						*
+************************************************************************/
+#if defined(SSE)
+#  if defined(SSE2)
+  template <u_int N> static inline int
+  mmNth(mmInt16 x)			{return _mm_extract_epi16(x, N);}
+  template <u_int N> static inline int
+  mmNth(mmUInt16 x)			{return _mm_extract_epi16(x, N);}
+#  else
+  template <u_int N> static inline int
+  mmNth(mmInt16 x)			{return _mm_extract_pi16(x, N);}
+  template <u_int N> static inline int
+  mmNth(mmUInt16 x)			{return _mm_extract_pi16(x, N);}
+#  endif
 #endif
     
 /************************************************************************
