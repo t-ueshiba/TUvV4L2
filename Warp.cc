@@ -25,16 +25,15 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.9 2009-02-23 00:09:19 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.10 2009-03-06 02:55:24 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
 #  undef SSSE3
 #  undef SSE3
 #  undef SSE2
-#  undef SSE
-#  define MMX
-//#  define SSE
+
+#  define SSE
 //#  define SSE2
 //#  define SSE3
 #endif
@@ -42,7 +41,7 @@
 
 namespace TU
 {
-#if defined(MMX)
+#if defined(SSE)
   static inline mmInt16
   mmLinearInterpolate(mmInt16 x, mmInt16 y, mmInt16 d)
   {
@@ -84,49 +83,66 @@ namespace TU
   mmBilinearInterpolate(const Image<u_char>& in, const short*& usp,
 			const short*& vsp, mmInt16 du, mmInt16 dv)
   {
-      int	us0 = *usp++, us1 = *usp++, us2 = *usp++, us3 = *usp++,
-		vs0 = *vsp++, vs1 = *vsp++, vs2 = *vsp++, vs3 = *vsp++;
+      const mmInt16	us = mmLoad(usp), ue = us + mmSetAll<mmInt16>(1);
+      mmInt16		vs = mmLoad(vsp);
+      usp += mmInt16::NElms;
+      vsp += mmInt16::NElms;
 #  if defined(SSE2)
-      int	us4 = *usp++, us5 = *usp++, us6 = *usp++, us7 = *usp++,
-		vs4 = *vsp++, vs5 = *vsp++, vs6 = *vsp++, vs7 = *vsp++;
-      mmUInt8	uc = mmSet<mmUInt8>(in[vs7][us7+1], in[vs6][us6+1],
-				    in[vs5][us5+1], in[vs4][us4+1],
-				    in[vs3][us3+1], in[vs2][us2+1],
-				    in[vs1][us1+1], in[vs0][us0+1],
-				    in[vs7][us7],   in[vs6][us6],
-				    in[vs5][us5],   in[vs4][us4],
-				    in[vs3][us3],   in[vs2][us2],
-				    in[vs1][us1],   in[vs0][us0]);
+      mmUInt8	uc = mmSet<mmUInt8>(in[mmNth<7>(vs)][mmNth<7>(ue)],
+				    in[mmNth<6>(vs)][mmNth<6>(ue)],
+				    in[mmNth<5>(vs)][mmNth<5>(ue)],
+				    in[mmNth<4>(vs)][mmNth<4>(ue)],
+				    in[mmNth<3>(vs)][mmNth<3>(ue)],
+				    in[mmNth<2>(vs)][mmNth<2>(ue)],
+				    in[mmNth<1>(vs)][mmNth<1>(ue)],
+				    in[mmNth<0>(vs)][mmNth<0>(ue)],
+				    in[mmNth<7>(vs)][mmNth<7>(us)],
+				    in[mmNth<6>(vs)][mmNth<6>(us)],
+				    in[mmNth<5>(vs)][mmNth<5>(us)],
+				    in[mmNth<4>(vs)][mmNth<4>(us)],
+				    in[mmNth<3>(vs)][mmNth<3>(us)],
+				    in[mmNth<2>(vs)][mmNth<2>(us)],
+				    in[mmNth<1>(vs)][mmNth<1>(us)],
+				    in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  else
-      mmUInt8	uc = mmSet<mmUInt8>(in[vs3][us3+1], in[vs2][us2+1],
-				    in[vs1][us1+1], in[vs0][us0+1],
-				    in[vs3][us3],   in[vs2][us2],
-				    in[vs1][us1],   in[vs0][us0]);
+      mmUInt8	uc = mmSet<mmUInt8>(in[mmNth<3>(vs)][mmNth<3>(ue)],
+				    in[mmNth<2>(vs)][mmNth<2>(ue)],
+				    in[mmNth<1>(vs)][mmNth<1>(ue)],
+				    in[mmNth<0>(vs)][mmNth<0>(ue)],
+				    in[mmNth<3>(vs)][mmNth<3>(us)],
+				    in[mmNth<2>(vs)][mmNth<2>(us)],
+				    in[mmNth<1>(vs)][mmNth<1>(us)],
+				    in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  endif
       mmInt16	ss = mmLinearInterpolate(mmCvt<mmInt16>(uc),
 					 mmCvtH<mmInt16>(uc), du);
-      ++vs0;
-      ++vs1;
-      ++vs2;
-      ++vs3;
+      vs = vs + mmSetAll<mmInt16>(1);
 #  if defined(SSE2)
-      ++vs4;
-      ++vs5;
-      ++vs6;
-      ++vs7;
-      uc = mmSet<mmUInt8>(in[vs7][us7+1], in[vs6][us6+1],
-			  in[vs5][us5+1], in[vs4][us4+1],
-			  in[vs3][us3+1], in[vs2][us2+1],
-			  in[vs1][us1+1], in[vs0][us0+1],
-			  in[vs7][us7],   in[vs6][us6],
-			  in[vs5][us5],   in[vs4][us4],
-			  in[vs3][us3],   in[vs2][us2],
-			  in[vs1][us1],   in[vs0][us0]);
+      uc = mmSet<mmUInt8>(in[mmNth<7>(vs)][mmNth<7>(ue)],
+			  in[mmNth<6>(vs)][mmNth<6>(ue)],
+			  in[mmNth<5>(vs)][mmNth<5>(ue)],
+			  in[mmNth<4>(vs)][mmNth<4>(ue)],
+			  in[mmNth<3>(vs)][mmNth<3>(ue)],
+			  in[mmNth<2>(vs)][mmNth<2>(ue)],
+			  in[mmNth<1>(vs)][mmNth<1>(ue)],
+			  in[mmNth<0>(vs)][mmNth<0>(ue)],
+			  in[mmNth<7>(vs)][mmNth<7>(us)],
+			  in[mmNth<6>(vs)][mmNth<6>(us)],
+			  in[mmNth<5>(vs)][mmNth<5>(us)],
+			  in[mmNth<4>(vs)][mmNth<4>(us)],
+			  in[mmNth<3>(vs)][mmNth<3>(us)],
+			  in[mmNth<2>(vs)][mmNth<2>(us)],
+			  in[mmNth<1>(vs)][mmNth<1>(us)],
+			  in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  else
-      uc = mmSet<mmUInt8>(in[vs3][us3+1], in[vs2][us2+1],
-			  in[vs1][us1+1], in[vs0][us0+1],
-			  in[vs3][us3],   in[vs2][us2],
-			  in[vs1][us1],   in[vs0][us0]);
+      uc = mmSet<mmUInt8>(in[mmNth<3>(vs)][mmNth<3>(ue)],
+			  in[mmNth<2>(vs)][mmNth<2>(ue)],
+			  in[mmNth<1>(vs)][mmNth<1>(ue)],
+			  in[mmNth<0>(vs)][mmNth<0>(ue)],
+			  in[mmNth<3>(vs)][mmNth<3>(us)],
+			  in[mmNth<2>(vs)][mmNth<2>(us)],
+			  in[mmNth<1>(vs)][mmNth<1>(us)],
+			  in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  endif
       return mmLinearInterpolate(ss,
 				 mmLinearInterpolate(mmCvt<mmInt16>(uc),
@@ -296,7 +312,7 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 	const u_char	*dup  = _fracs[v].du, *dvp  = _fracs[v].dv;
 	T		*outp = out[v] + _fracs[v].lmost;
 	T* const	outq  = outp + _fracs[v].width();
-#if defined(MMX)
+#if defined(SSE)
 	for (T* const outr = outq - mmUInt8::NElms; outp <= outr; )
 	{
 	    mmUInt8	du = mmLoad(dup), dv = mmLoad(dvp);
@@ -345,7 +361,7 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 	    *outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
 	out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
     }
-#if defined(MMX)
+#if defined(SSE)
     mmEmpty();
 #endif	
 }
@@ -372,7 +388,7 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 	const u_char	*dup  = _fracs[v].du, *dvp  = _fracs[v].dv;
 	u_char		*outp = out[v] + _fracs[v].lmost;
 	u_char* const	outq  = outp + _fracs[v].width();
-#if defined(MMX)
+#if defined(SSE)
 	for (u_char* const outr = outq - mmUInt8::NElms; outp <= outr; )
 	{
 	    mmUInt8	du = mmLoad(dup), dv = mmLoad(dvp);
@@ -393,7 +409,7 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 	    *outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
 	out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
     }
-#if defined(MMX)
+#if defined(SSE)
     mmEmpty();
 #endif	
 }
