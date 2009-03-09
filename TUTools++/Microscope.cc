@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Microscope.cc,v 1.11 2008-09-10 05:10:42 ueshiba Exp $
+ *  $Id: Microscope.cc,v 1.12 2009-03-09 05:12:32 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
@@ -33,6 +33,7 @@
 
 namespace TU
 {
+#if defined(__GNUC__)
 /************************************************************************
 *  Static functions							*
 ************************************************************************/ 
@@ -214,5 +215,6 @@ ready(Microscope& ms)
 	      << Microscope::Y << "RT" << endc
 	      << Microscope::Z << "RT" << endc;
 }
- 
+
+#endif
 }

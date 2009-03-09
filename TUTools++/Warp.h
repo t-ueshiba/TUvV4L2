@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.7 2009-03-06 02:55:24 ueshiba Exp $
+ *  $Id: Warp.h,v 1.8 2009-03-09 05:12:32 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h

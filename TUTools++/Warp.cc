@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.10 2009-03-06 02:55:24 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.11 2009-03-09 05:12:32 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -49,29 +49,30 @@ namespace TU
   }
 
   template <class T> static inline mmInt16
-  mmBilinearInterpolate(const Image<T>& in, const short*& usp,
-			const short*& vsp, mmInt16 du, mmInt16 dv)
+  mmBilinearInterpolate(const Image<T>& in,
+			mmInt16 us, mmInt16 vs, mmInt16 du, mmInt16 dv)
   {
-      int	us0 = *usp++, vs0 = *vsp++;
+      const mmInt16	ue = us + mmSetAll<mmInt16>(1);
 #  if defined(SSE2)
-      int	us1 = *usp++, vs1 = *vsp++;
-      mmUInt8	uc = mmSet<mmUInt8>(*(int*)&in[vs1][us1+1],
-				    *(int*)&in[vs0][us0+1],
-				    *(int*)&in[vs1][us1],
-				    *(int*)&in[vs0][us0]);
+      mmUInt8	uc = mmSet<mmUInt8>(*(int*)&in[mmNth<1>(vs)][mmNth<1>(ue)],
+				    *(int*)&in[mmNth<0>(vs)][mmNth<0>(ue)],
+				    *(int*)&in[mmNth<1>(vs)][mmNth<1>(us)],
+				    *(int*)&in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  else
-      mmUInt8	uc = mmSet<mmUInt8>(*(int*)&in[vs0][us0+1],
-				    *(int*)&in[vs0][us0]);
+      mmUInt8	uc = mmSet<mmUInt8>(*(int*)&in[mmNth<0>(vs)][mmNth<0>(ue)],
+				    *(int*)&in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  endif
       mmInt16	ss = mmLinearInterpolate(mmCvt<mmInt16>(uc),
 					 mmCvtH<mmInt16>(uc), du);
-      ++vs0;
+      vs = vs + mmSetAll<mmInt16>(1);
 #  if defined(SSE2)
-      ++vs1;
-      uc = mmSet<mmUInt8>(*(int*)&in[vs1][us1+1], *(int*)&in[vs0][us0+1],
-			  *(int*)&in[vs1][us1],   *(int*)&in[vs0][us0]);
+      uc = mmSet<mmUInt8>(*(int*)&in[mmNth<1>(vs)][mmNth<1>(ue)],
+			  *(int*)&in[mmNth<0>(vs)][mmNth<0>(ue)],
+			  *(int*)&in[mmNth<1>(vs)][mmNth<1>(us)],
+			  *(int*)&in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  else
-      uc = mmSet<mmUInt8>(*(int*)&in[vs0][us0+1], *(int*)&in[vs0][us0]);
+      uc = mmSet<mmUInt8>(*(int*)&in[mmNth<0>(vs)][mmNth<0>(ue)],
+			  *(int*)&in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  endif
       return mmLinearInterpolate(ss,
 				 mmLinearInterpolate(mmCvt<mmInt16>(uc),
@@ -80,13 +81,10 @@ namespace TU
   }
     
   template <> inline mmInt16
-  mmBilinearInterpolate(const Image<u_char>& in, const short*& usp,
-			const short*& vsp, mmInt16 du, mmInt16 dv)
+  mmBilinearInterpolate(const Image<u_char>& in,
+			mmInt16 us, mmInt16 vs, mmInt16 du, mmInt16 dv)
   {
-      const mmInt16	us = mmLoad(usp), ue = us + mmSetAll<mmInt16>(1);
-      mmInt16		vs = mmLoad(vsp);
-      usp += mmInt16::NElms;
-      vsp += mmInt16::NElms;
+      const mmInt16	ue = us + mmSetAll<mmInt16>(1);
 #  if defined(SSE2)
       mmUInt8	uc = mmSet<mmUInt8>(in[mmNth<7>(vs)][mmNth<7>(ue)],
 				    in[mmNth<6>(vs)][mmNth<6>(ue)],
@@ -315,46 +313,76 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 #if defined(SSE)
 	for (T* const outr = outq - mmUInt8::NElms; outp <= outr; )
 	{
+	    const u_int	NClrs16 = mmUInt16::NElms/4;
+	    mmInt16	uu = mmLoad(usp), vv = mmLoad(vsp);
 	    mmUInt8	du = mmLoad(dup), dv = mmLoad(dvp);
 	    mmUInt8	du4 = mmQuad0(du), dv4 = mmQuad0(dv);
-	    mmInt16	out0 = mmBilinearInterpolate(in, usp, vsp,
-						     mmCvt<mmInt16>(du4),
-						     mmCvt<mmInt16>(dv4)),
-			out1 = mmBilinearInterpolate(in, usp, vsp,
-						     mmCvtH<mmInt16>(du4),
-						     mmCvtH<mmInt16>(dv4));
-	    mmStoreU((u_char*)outp, mmCvt<mmUInt8>(out0, out1));
-	    outp += mmUInt8::NElms/4;
-	    du4 = mmQuad1(du), dv4 = mmQuad1(dv);
-	    out0 = mmBilinearInterpolate(in, usp, vsp,
-					 mmCvt<mmInt16>(du4),
-					 mmCvt<mmInt16>(dv4));
-	    out1 = mmBilinearInterpolate(in, usp, vsp,
-					 mmCvtH<mmInt16>(du4),
-					 mmCvtH<mmInt16>(dv4));
-	    mmStoreU((u_char*)outp, mmCvt<mmUInt8>(out0, out1));
-	    outp += mmUInt8::NElms/4;
-	    du4 = mmQuad2(du), dv4 = mmQuad2(dv);
-	    out0 = mmBilinearInterpolate(in, usp, vsp,
-					 mmCvt<mmInt16>(du4),
-					 mmCvt<mmInt16>(dv4));
-	    out1 = mmBilinearInterpolate(in, usp, vsp,
-					 mmCvtH<mmInt16>(du4),
-					 mmCvtH<mmInt16>(dv4));
-	    mmStoreU((u_char*)outp, mmCvt<mmUInt8>(out0, out1));
-	    outp += mmUInt8::NElms/4;
-	    du4 = mmQuad3(du), dv4 = mmQuad3(dv);
-	    out0 = mmBilinearInterpolate(in, usp, vsp,
-					 mmCvt<mmInt16>(du4),
-					 mmCvt<mmInt16>(dv4));
-	    out1 = mmBilinearInterpolate(in, usp, vsp,
-					 mmCvtH<mmInt16>(du4),
-					 mmCvtH<mmInt16>(dv4));
-	    mmStoreU((u_char*)outp, mmCvt<mmUInt8>(out0, out1));
+	    mmStoreU((u_char*)outp,
+		     mmCvt<mmUInt8>(
+			 mmBilinearInterpolate(
+			     in, uu, vv,
+			     mmCvt<mmInt16>(du4), mmCvt<mmInt16>(dv4)),
+			 mmBilinearInterpolate(
+			     in,
+			     mmShiftElmR<NClrs16>(uu),
+			     mmShiftElmR<NClrs16>(vv),
+			     mmCvtH<mmInt16>(du4), mmCvtH<mmInt16>(dv4))));
 	    outp += mmUInt8::NElms/4;
 
-	    dup += mmUInt8::NElms;
-	    dvp += mmUInt8::NElms;
+	    du4 = mmQuad1(du);
+	    dv4 = mmQuad1(dv);
+	    mmStoreU((u_char*)outp,
+		     mmCvt<mmUInt8>(
+			 mmBilinearInterpolate(
+			     in,
+			     mmShiftElmR<2*NClrs16>(uu),
+			     mmShiftElmR<2*NClrs16>(vv),
+			     mmCvt<mmInt16>(du4), mmCvt<mmInt16>(dv4)),
+			 mmBilinearInterpolate(
+			     in,
+			     mmShiftElmR<3*NClrs16>(uu),
+			     mmShiftElmR<3*NClrs16>(vv),
+			     mmCvtH<mmInt16>(du4), mmCvtH<mmInt16>(dv4))));
+	    outp += mmUInt8::NElms/4;
+	    usp  += mmInt16::NElms;
+	    vsp  += mmInt16::NElms;
+	    
+	    uu  = mmLoad(usp);
+	    vv  = mmLoad(vsp);
+	    du4 = mmQuad2(du);
+	    dv4 = mmQuad2(dv);
+	    mmStoreU((u_char*)outp,
+		     mmCvt<mmUInt8>(
+			 mmBilinearInterpolate(
+			     in, uu, vv,
+			     mmCvt<mmInt16>(du4), mmCvt<mmInt16>(dv4)),
+			 mmBilinearInterpolate(
+			     in,
+			     mmShiftElmR<NClrs16>(uu),
+			     mmShiftElmR<NClrs16>(vv),
+			     mmCvtH<mmInt16>(du4), mmCvtH<mmInt16>(dv4))));
+	    outp += mmUInt8::NElms/4;
+	    
+	    du4 = mmQuad3(du);
+	    dv4 = mmQuad3(dv);
+	    mmStoreU((u_char*)outp,
+		     mmCvt<mmUInt8>(
+			 mmBilinearInterpolate(
+			     in,
+			     mmShiftElmR<2*NClrs16>(uu),
+			     mmShiftElmR<2*NClrs16>(vv),
+			     mmCvt<mmInt16>(du4), mmCvt<mmInt16>(dv4)),
+			 mmBilinearInterpolate(
+			     in,
+			     mmShiftElmR<3*NClrs16>(uu),
+			     mmShiftElmR<3*NClrs16>(vv),
+			     mmCvtH<mmInt16>(du4), mmCvtH<mmInt16>(dv4))));
+	    outp += mmUInt8::NElms/4;
+	    usp  += mmInt16::NElms;
+	    vsp  += mmInt16::NElms;
+
+	    dup  += mmUInt8::NElms;
+	    dvp  += mmUInt8::NElms;
 	}
 #endif
       	while (outp < outq)
@@ -384,25 +412,30 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
     
     for (int v = vs; v < ve; ++v)
     {
-	const short	*usp  = _fracs[v].us, *vsp  = _fracs[v].vs;
-	const u_char	*dup  = _fracs[v].du, *dvp  = _fracs[v].dv;
+	const short	*usp  = _fracs[v].us, *vsp = _fracs[v].vs;
+	const u_char	*dup  = _fracs[v].du, *dvp = _fracs[v].dv;
 	u_char		*outp = out[v] + _fracs[v].lmost;
 	u_char* const	outq  = outp + _fracs[v].width();
 #if defined(SSE)
 	for (u_char* const outr = outq - mmUInt8::NElms; outp <= outr; )
 	{
-	    mmUInt8	du = mmLoad(dup), dv = mmLoad(dvp);
-	    mmInt16	out0 = mmBilinearInterpolate(in, usp, vsp,
+	    mmUInt8	du = mmLoad(dup), dv = mmLoad(dup);
+	    mmInt16	out0 = mmBilinearInterpolate(in,
+						     mmLoad(usp), mmLoad(vsp),
 						     mmCvt<mmInt16>(du),
-						     mmCvt<mmInt16>(dv)),
-			out1 = mmBilinearInterpolate(in, usp, vsp,
-						     mmCvtH<mmInt16>(du),
-						     mmCvtH<mmInt16>(dv));
-	    mmStoreU(outp, mmCvt<mmUInt8>(out0, out1));
-
-	    outp += mmUInt8::NElms;
+						     mmCvt<mmInt16>(dv));
+	    usp += mmInt16::NElms;
+	    vsp += mmInt16::NElms;
+	    mmStoreU(outp, mmCvt<mmUInt8>(out0,
+					  mmBilinearInterpolate(in,
+					      mmLoad(usp), mmLoad(vsp),
+					      mmCvtH<mmInt16>(du),
+					      mmCvtH<mmInt16>(dv))));
+	    usp  += mmInt16::NElms;
+	    vsp  += mmInt16::NElms;
 	    dup  += mmUInt8::NElms;
 	    dvp  += mmUInt8::NElms;
+	    outp += mmUInt8::NElms;
 	}
 #endif
       	while (outp < outq)

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.12 2008-09-10 05:10:48 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.13 2009-03-09 05:12:32 ueshiba Exp $
  */
 #include <iomanip>
 #include <cstdlib>
@@ -33,6 +33,7 @@
 
 namespace TU
 {
+#if defined(__GNUC__)
 /************************************************************************
 *  class TriggerGenerator						*
 ************************************************************************/
@@ -141,5 +142,6 @@ TriggerGenerator::getConfiguration(u_int& channel, u_int& interval)
     return !strcmp(token, "RUN");
 }
 
+#endif
 }
 

@@ -25,55 +25,43 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.cc,v 1.15 2008-09-11 00:14:16 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.16 2009-03-09 05:12:32 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
 #include <string>
 #include <errno.h>
-#ifdef HAVE_STDIO_FILEBUF
-#  include <fcntl.h>
-#endif
+#include <fcntl.h>
 
 namespace TU
 {
-#ifdef HAVE_STDIO_FILEBUF
+#if defined(__GNUC__)
 /************************************************************************
 *  static functions							*
 ************************************************************************/
 static int
 get_fd(const char* ttyname)
 {
-    int	fd = ::open(ttyname, O_RDWR,
-		    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+    int	fd = ::open(ttyname, O_RDWR);
     if (fd < 0)
 	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open tty; ")
 				 + strerror(errno));
     return fd;
 }
-#endif
+
 /************************************************************************
 *  Public member functions						*
 ************************************************************************/
 Serial::Serial(const char* ttyname)
-#ifdef HAVE_STDIO_FILEBUF
-    :std::basic_iostream<char>(NULL),
-     _fd(get_fd(ttyname)), _filebuf(_fd, ios_base::in|ios_base::out
+    :filebuf_type(get_fd(ttyname), ios_base::in | ios_base::out
 #  if (__GNUC__ < 4)
-	      , true, BUFSIZ
+			 , true, BUFSIZ
 #  endif
-	     )
-#else
-    :std::fstream(ttyname, ios_base::in|ios_base::out)
-#endif
+			),
+     std::basic_iostream<char>(this)
 {
-#ifdef HAVE_STDIO_FILEBUF
-    init(&_filebuf);
-  /*    if (fd() < 0)
-	setstate(ios_base::failbit);
-    else
-    clear();*/
-#endif
+    clear();
+
     if (!*this)
 	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open fstream; ")
 				 + strerror(errno));
@@ -125,7 +113,7 @@ Serial::i_cr2nl()		// '\r' -> '\n'
     return set_flag(&termios::c_iflag, INLCR, ICRNL);
 }
 
-#ifndef __APPLE__
+#if !defined(__APPLE__)
 Serial&
 Serial::i_upper2lower()		// upper -> lower
 {
@@ -136,7 +124,7 @@ Serial::i_upper2lower()		// upper -> lower
 Serial&
 Serial::i_through()		// read transparently
 {
-#ifndef __APPLE__
+#if !defined(__APPLE__)
     return set_flag(&termios::c_iflag, INLCR|IGNCR|ICRNL|IUCLC, 0);
 #else
     return set_flag(&termios::c_iflag, INLCR|IGNCR|ICRNL, 0);
@@ -149,14 +137,14 @@ Serial::i_through()		// read transparently
 Serial&
 Serial::o_nl2crnl()		// '\r\n' <- "\n"
 {
-#ifndef __APPLE__
+#if !defined(__APPLE__)
     return set_flag(&termios::c_oflag, OCRNL, OPOST|ONLCR);
 #else
     return set_flag(&termios::c_oflag, 0, OPOST|ONLCR);
 #endif
 }
 
-#ifndef __APPLE__
+#if !defined(__APPLE__)
 Serial&
 Serial::o_cr2nl()		// '\n' <- '\r'
 {
@@ -182,7 +170,7 @@ Serial::o_through()		// write transparently
 Serial&
 Serial::c_baud(int baud)	// set baud rate
 {
-#ifndef __APPLE__
+#if !defined(__APPLE__)
     switch (baud)
     {
       case 50:
@@ -334,11 +322,12 @@ csize(int cs)
 }
 
 IOManip<Serial>	nl2cr	  (&Serial::i_nl2cr, &Serial::o_nl2crnl);
-#ifndef __APPLE__
+#if !defined(__APPLE__)
 IOManip<Serial>	cr2nl	  (&Serial::i_cr2nl, &Serial::o_cr2nl);
 IOManip<Serial>	upperlower(&Serial::i_upper2lower, &Serial::o_lower2upper);
 #endif
 IOManip<Serial>	through	  (&Serial::i_through, &Serial::o_through);
 
+#endif
 }
 
