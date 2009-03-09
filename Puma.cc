@@ -25,12 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Puma.cc,v 1.13 2008-09-10 05:10:45 ueshiba Exp $
+ *  $Id: Puma.cc,v 1.14 2009-03-09 05:12:32 ueshiba Exp $
  */
 #include "TU/Serial.h"
 
 namespace TU
 {
+#if defined(__GNUC__)
 /************************************************************************
 *  Static functions							*
 ************************************************************************/ 
@@ -186,5 +187,6 @@ Puma&	nest   (Puma& puma)	{return puma << "do nest" << endc;}
 Puma&	echo   (Puma& puma)	{puma._echo = Puma::DoEcho; return puma;}
 Puma&	no_echo(Puma& puma)	{puma._echo = Puma::NoEcho; return puma;}
 
+#endif
 }
 

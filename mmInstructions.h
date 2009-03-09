@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.13 2009-03-06 02:55:24 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.14 2009-03-09 05:12:32 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -495,6 +495,12 @@ namespace TU
 ************************************************************************/
   template <class T> static inline T
   mmShiftLMostToRMost(T x)		{return mmShiftElmR<T::NElms - 1>(x);}
+
+/************************************************************************
+*  右端の要素が左端に来るまでシフト					*
+************************************************************************/
+  template <class T> static inline T
+  mmShiftRMostToLMost(T x)		{return mmShiftElmL<T::NElms - 1>(x);}
 
 /************************************************************************
 *  回転と逆転								*
@@ -1639,7 +1645,7 @@ namespace TU
 #endif
   
 /************************************************************************
-*  より小さいか等しい／より大きいか等しい					*
+*  より小さいか等しい／より大きいか等しい				*
 ************************************************************************/
   template <class T> static inline mmInt<T>
   operator >=(mmInt<T> x, mmInt<T> y)	{return mmMax(x, y) == x;}

@@ -25,12 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Pata.cc,v 1.10 2008-09-10 05:10:43 ueshiba Exp $
+ *  $Id: Pata.cc,v 1.11 2009-03-09 05:12:32 ueshiba Exp $
  */
 #include "TU/Serial.h"
 
 namespace TU
 {
+#if defined(__GNUC__)
 /************************************************************************
 *  class Pata								*
 ************************************************************************/
@@ -39,6 +40,7 @@ Pata::Pata(const char* ttyname)
 {
     o_through().i_through();
 }
- 
+
+#endif
 }
 

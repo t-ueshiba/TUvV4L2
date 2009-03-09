@@ -25,21 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.h,v 1.2 2008-09-10 05:10:47 ueshiba Exp $
+ *  $Id: Serial.h,v 1.3 2009-03-09 05:12:32 ueshiba Exp $
  */
-#ifndef __TUSerial_h
+#if !defined(__TUSerial_h) && defined(__GNUC__)
 #define __TUSerial_h
 
-#if defined(__GNUC__) //&& !defined(__INTEL_COMPILER)
-#  define HAVE_STDIO_FILEBUF
-#endif
-
 #include <termios.h>
-#ifdef HAVE_STDIO_FILEBUF
-#  include <ext/stdio_filebuf.h>
-#else
-#  include <fstream>
-#endif
+#include <ext/stdio_filebuf.h>
 #include "TU/Manip.h"
 #include "TU/Vector++.h"
 
@@ -48,12 +40,8 @@ namespace TU
 /************************************************************************
 *  class Serial								*
 ************************************************************************/
-class Serial
-#ifdef HAVE_STDIO_FILEBUF
-    : public std::basic_iostream<char>
-#else
-    : public std::fstream
-#endif
+class Serial : private __gnu_cxx::stdio_filebuf<char>,
+	       public std::basic_iostream<char>
 {
   public:
 		Serial(const char*)			;
@@ -62,12 +50,12 @@ class Serial
     Serial&	i_nl2cr()				;
     Serial&	i_igncr()				;
     Serial&	i_cr2nl()				;
-#ifndef __APPLE__
+#if !defined(__APPLE__)
     Serial&	i_upper2lower()				;
 #endif
     Serial&	i_through()				;
     Serial&	o_nl2crnl()				;
-#ifndef __APPLE__
+#if !defined(__APPLE__)
     Serial&	o_cr2nl()				;
     Serial&	o_lower2upper()				;
 #endif
@@ -81,16 +69,14 @@ class Serial
     Serial&	c_stop2()				;
     
   private:
+    typedef __gnu_cxx::stdio_filebuf<char>		filebuf_type;
+    
     Serial&	set_flag(tcflag_t termios::* flag,
 			 unsigned long clearbits,
 			 unsigned long setbits)		;
-#ifdef HAVE_STDIO_FILEBUF
-    int		fd()					{return _fd;}
-    const int	_fd;
-    __gnu_cxx::stdio_filebuf<char>	_filebuf;
-#else
-    int		fd()					{return rdbuf()->fd();}
-#endif
+
+    int		fd()				{return filebuf_type::fd();}
+
     termios	_termios_bak;
 };
 
@@ -107,7 +93,7 @@ operator <<(Serial& serial, Serial& (*f)(Serial&))
 }
 
 extern IOManip<Serial>	nl2cr;
-#ifndef __APPLE__
+#if defined(__APPLE__)
 extern IOManip<Serial>	cr2nl;
 extern IOManip<Serial>	upperlower;
 #endif
