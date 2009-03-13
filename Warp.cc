@@ -25,14 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.11 2009-03-09 05:12:32 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.12 2009-03-13 03:15:22 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
 #  undef SSSE3
 #  undef SSE3
 #  undef SSE2
-
 #  define SSE
 //#  define SSE2
 //#  define SSE3
@@ -62,8 +61,8 @@ namespace TU
       mmUInt8	uc = mmSet<mmUInt8>(*(int*)&in[mmNth<0>(vs)][mmNth<0>(ue)],
 				    *(int*)&in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  endif
-      mmInt16	ss = mmLinearInterpolate(mmCvt<mmInt16>(uc),
-					 mmCvtH<mmInt16>(uc), du);
+      const mmInt16	ss = mmLinearInterpolate(mmCvt<mmInt16>(uc),
+						 mmCvtH<mmInt16>(uc), du);
       vs = vs + mmSetAll<mmInt16>(1);
 #  if defined(SSE2)
       uc = mmSet<mmUInt8>(*(int*)&in[mmNth<1>(vs)][mmNth<1>(ue)],
@@ -86,34 +85,34 @@ namespace TU
   {
       const mmInt16	ue = us + mmSetAll<mmInt16>(1);
 #  if defined(SSE2)
-      mmUInt8	uc = mmSet<mmUInt8>(in[mmNth<7>(vs)][mmNth<7>(ue)],
-				    in[mmNth<6>(vs)][mmNth<6>(ue)],
-				    in[mmNth<5>(vs)][mmNth<5>(ue)],
-				    in[mmNth<4>(vs)][mmNth<4>(ue)],
-				    in[mmNth<3>(vs)][mmNth<3>(ue)],
-				    in[mmNth<2>(vs)][mmNth<2>(ue)],
-				    in[mmNth<1>(vs)][mmNth<1>(ue)],
-				    in[mmNth<0>(vs)][mmNth<0>(ue)],
-				    in[mmNth<7>(vs)][mmNth<7>(us)],
-				    in[mmNth<6>(vs)][mmNth<6>(us)],
-				    in[mmNth<5>(vs)][mmNth<5>(us)],
-				    in[mmNth<4>(vs)][mmNth<4>(us)],
-				    in[mmNth<3>(vs)][mmNth<3>(us)],
-				    in[mmNth<2>(vs)][mmNth<2>(us)],
-				    in[mmNth<1>(vs)][mmNth<1>(us)],
-				    in[mmNth<0>(vs)][mmNth<0>(us)]);
+      mmUInt8		uc = mmSet<mmUInt8>(in[mmNth<7>(vs)][mmNth<7>(ue)],
+					    in[mmNth<6>(vs)][mmNth<6>(ue)],
+					    in[mmNth<5>(vs)][mmNth<5>(ue)],
+					    in[mmNth<4>(vs)][mmNth<4>(ue)],
+					    in[mmNth<3>(vs)][mmNth<3>(ue)],
+					    in[mmNth<2>(vs)][mmNth<2>(ue)],
+					    in[mmNth<1>(vs)][mmNth<1>(ue)],
+					    in[mmNth<0>(vs)][mmNth<0>(ue)],
+					    in[mmNth<7>(vs)][mmNth<7>(us)],
+					    in[mmNth<6>(vs)][mmNth<6>(us)],
+					    in[mmNth<5>(vs)][mmNth<5>(us)],
+					    in[mmNth<4>(vs)][mmNth<4>(us)],
+					    in[mmNth<3>(vs)][mmNth<3>(us)],
+					    in[mmNth<2>(vs)][mmNth<2>(us)],
+					    in[mmNth<1>(vs)][mmNth<1>(us)],
+					    in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  else
-      mmUInt8	uc = mmSet<mmUInt8>(in[mmNth<3>(vs)][mmNth<3>(ue)],
-				    in[mmNth<2>(vs)][mmNth<2>(ue)],
-				    in[mmNth<1>(vs)][mmNth<1>(ue)],
-				    in[mmNth<0>(vs)][mmNth<0>(ue)],
-				    in[mmNth<3>(vs)][mmNth<3>(us)],
-				    in[mmNth<2>(vs)][mmNth<2>(us)],
-				    in[mmNth<1>(vs)][mmNth<1>(us)],
-				    in[mmNth<0>(vs)][mmNth<0>(us)]);
+      mmUInt8		uc = mmSet<mmUInt8>(in[mmNth<3>(vs)][mmNth<3>(ue)],
+					    in[mmNth<2>(vs)][mmNth<2>(ue)],
+					    in[mmNth<1>(vs)][mmNth<1>(ue)],
+					    in[mmNth<0>(vs)][mmNth<0>(ue)],
+					    in[mmNth<3>(vs)][mmNth<3>(us)],
+					    in[mmNth<2>(vs)][mmNth<2>(us)],
+					    in[mmNth<1>(vs)][mmNth<1>(us)],
+					    in[mmNth<0>(vs)][mmNth<0>(us)]);
 #  endif
-      mmInt16	ss = mmLinearInterpolate(mmCvt<mmInt16>(uc),
-					 mmCvtH<mmInt16>(uc), du);
+      const mmInt16	ss = mmLinearInterpolate(mmCvt<mmInt16>(uc),
+						 mmCvtH<mmInt16>(uc), du);
       vs = vs + mmSetAll<mmInt16>(1);
 #  if defined(SSE2)
       uc = mmSet<mmUInt8>(in[mmNth<7>(vs)][mmNth<7>(ue)],
@@ -419,7 +418,7 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 #if defined(SSE)
 	for (u_char* const outr = outq - mmUInt8::NElms; outp <= outr; )
 	{
-	    mmUInt8	du = mmLoad(dup), dv = mmLoad(dup);
+	    mmUInt8	du = mmLoad(dup), dv = mmLoad(dvp);
 	    mmInt16	out0 = mmBilinearInterpolate(in,
 						     mmLoad(usp), mmLoad(vsp),
 						     mmCvt<mmInt16>(du),
@@ -427,7 +426,8 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 	    usp += mmInt16::NElms;
 	    vsp += mmInt16::NElms;
 	    mmStoreU(outp, mmCvt<mmUInt8>(out0,
-					  mmBilinearInterpolate(in,
+					  mmBilinearInterpolate(
+					      in,
 					      mmLoad(usp), mmLoad(vsp),
 					      mmCvtH<mmInt16>(du),
 					      mmCvtH<mmInt16>(dv))));
