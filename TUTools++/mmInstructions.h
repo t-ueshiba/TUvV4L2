@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.14 2009-03-09 05:12:32 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.15 2009-03-17 00:42:11 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -1529,7 +1529,7 @@ namespace TU
 // 等しい
   static inline mmInt8
   operator ==(mmInt8 x, mmInt8 y)	{return _mm_cmpeq_pi8(x, y);}
-  static inline mmInt8
+  static inline mmUInt8
   operator ==(mmUInt8 x, mmUInt8 y)	{return _mm_cmpeq_pi8(x, y);}
   static inline mmInt16
   operator ==(mmInt16 x, mmInt16 y)	{return _mm_cmpeq_pi16(x, y);}
