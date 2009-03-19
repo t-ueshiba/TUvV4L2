@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.14 2009-03-19 05:11:03 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.15 2009-03-19 08:08:29 ueshiba Exp $
  */
 #include <cstdlib>
 #include "TU/Serial.h"
@@ -50,7 +50,10 @@ TriggerGenerator::TriggerGenerator(const char* ttyname)
     :Serial(ttyname)
 {
     i_through()
-	.o_through().o_lower2upper()
+	.o_through()
+#if !defined(__APPLE__)
+	.o_lower2upper()
+#endif
 	.c_baud(9600).c_csize(8).c_noparity().c_stop1();
 }
 
