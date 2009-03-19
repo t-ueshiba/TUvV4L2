@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.cc,v 1.16 2009-03-09 05:12:32 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.17 2009-03-19 05:11:03 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
@@ -35,63 +35,81 @@
 
 namespace TU
 {
-#if defined(__GNUC__)
 /************************************************************************
 *  static functions							*
 ************************************************************************/
 static int
 get_fd(const char* ttyname)
 {
+    using namespace	std;
+    
     int	fd = ::open(ttyname, O_RDWR);
     if (fd < 0)
-	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open tty; ")
-				 + strerror(errno));
+	throw runtime_error(string("TU::Serial::Serial: cannot open tty; ")
+			    + strerror(errno));
     return fd;
 }
-
+    
 /************************************************************************
 *  Public member functions						*
 ************************************************************************/
 Serial::Serial(const char* ttyname)
-    :filebuf_type(get_fd(ttyname), ios_base::in | ios_base::out
-#  if (__GNUC__ < 4)
-			 , true, BUFSIZ
-#  endif
-			),
-     std::basic_iostream<char>(this)
+    :_fd(get_fd(ttyname)), _fp(::fdopen(_fd, "r+"))
 {
-    clear();
+    using namespace	std;
 
-    if (!*this)
-	throw std::runtime_error(std::string("TU::Serial::Serial: cannot open fstream; ")
-				 + strerror(errno));
-    
+  // Check if I/O FILE is properly opened.
+    if (_fp == NULL)
+	throw runtime_error(string("TU::Serial::Serial: cannot open FILE; ")
+			    + strerror(errno));
+
+  // Flush everything in the buffer.
+    if (::tcflush(_fd, TCIOFLUSH))
+	throw runtime_error(string("TU::Serial::Serial: cannot flush tty; ")
+			    + strerror(errno));
+
+  // Keep the original termios settings.
     termios	termios;
-    if (::tcgetattr(fd(), &termios) == -1)
-    {
-	clear(ios_base::badbit|rdstate());
-	throw std::runtime_error(std::string("TU::Serial::Serial: tcgetattr; ")
-				 + strerror(errno));
-    }
-
+    if (::tcgetattr(_fd, &termios) == -1)
+	throw runtime_error(string("TU::Serial::Serial: tcgetattr; ")
+			    + strerror(errno));
     _termios_bak = termios;		// backup termios structure
+
+  // Set local modes and control characters.
     termios.c_lflag &= ~(ICANON | ECHO | ISIG);
     termios.c_cc[VMIN]  = 1;
     termios.c_cc[VTIME] = 0;
-    if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
-    {
-	clear(ios_base::badbit|rdstate());
-	throw std::runtime_error(std::string("TU::Serial::Serial: tcsetattr; ")
-				 + strerror(errno));
-    }
+    if (::tcsetattr(_fd, TCSANOW, &termios) == -1)
+	throw runtime_error(string("TU::Serial::Serial: tcsetattr; ")
+			    + strerror(errno));
 }
 
 Serial::~Serial()
 {
-    if (*this)
-	tcsetattr(fd(), TCSANOW, &_termios_bak);
+    if (_fd >= 0)
+    {
+	::tcsetattr(_fd, TCSANOW, &_termios_bak);
+	if (_fp != NULL)
+	    ::fclose(_fp);
+	else
+	    ::close(_fd);
+    }
 }
 
+const Serial&
+Serial::put(const char* s) const
+{
+    ::fputs(s, _fp);
+    return *this;
+}
+    
+const Serial&
+Serial::get(char* s, u_int size) const
+{
+    ::fgets(s, size, _fp);
+    return *this;
+}
+    
 /*
  *  input flags
  */
@@ -152,7 +170,7 @@ Serial::o_cr2nl()		// '\n' <- '\r'
 }
 
 Serial&
-Serial::o_lower2upper()	// upper <- lower
+Serial::o_lower2upper()		// upper <- lower
 {
     return set_flag(&termios::c_oflag, 0, OPOST|OLCUC);
 }
@@ -170,6 +188,8 @@ Serial::o_through()		// write transparently
 Serial&
 Serial::c_baud(int baud)	// set baud rate
 {
+    using namespace	std;
+
 #if !defined(__APPLE__)
     switch (baud)
     {
@@ -206,20 +226,13 @@ Serial::c_baud(int baud)	// set baud rate
     }
 #else
     termios		termios;
-
-    if (::tcgetattr(fd(), &termios) == -1)
-    {
-	clear(ios_base::badbit|rdstate());
-	throw std::runtime_error(std::string("TU::Serial::c_baud: tcgetattr; ")
-				 + strerror(errno));
-    }
+    if (::tcgetattr(_fd, &termios) == -1)
+	throw runtime_error(string("TU::Serial::c_baud: tcgetattr; ")
+			    + strerror(errno));
     termios.c_ispeed = termios.c_ospeed = baud;
-    if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
-    {
-	clear(ios_base::badbit|rdstate());
-	throw std::runtime_error(std::string("TU::Serial::c_baud: tcsetattr; ")
-				 + strerror(errno));
-    }
+    if (::tcsetattr(_fd, TCSANOW, &termios) == -1)
+	throw runtime_error(string("TU::Serial::c_baud: tcsetattr; ")
+			    + strerror(errno));
 #endif
     return *this;
 }
@@ -278,56 +291,19 @@ Serial&
 Serial::set_flag(tcflag_t termios::* flag,
 		 unsigned long clearbits, unsigned long setbits)
 {
+    using namespace	std;
+    
     termios		termios;
-
-    if (::tcgetattr(fd(), &termios) == -1)
-    {
-	clear(ios_base::badbit|rdstate());
-	throw
-	    std::runtime_error(std::string("TU::Serial::set_flag: tcgetattr; ")
-			       + strerror(errno));
-    }
+    if (::tcgetattr(_fd, &termios) == -1)
+	throw runtime_error(string("TU::Serial::set_flag: tcgetattr; ")
+			    + strerror(errno));
     termios.*flag &= ~clearbits;
     termios.*flag |= setbits;
-    if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
-    {
-	clear(ios_base::badbit|rdstate());
-	throw
-	    std::runtime_error(std::string("TU::Serial::set_flag: tcsetattr; ")
-			       + strerror(errno));
-    }
+    if (::tcsetattr(_fd, TCSANOW, &termios) == -1)
+	throw runtime_error(string("TU::Serial::set_flag: tcsetattr; ")
+			    + strerror(errno));
     return *this;
 }
 
-/************************************************************************
-*  Manipulators for Serial						*
-************************************************************************/
-Serial&	igncr	(Serial& s)	{return s.i_igncr();}
-Serial&	even	(Serial& s)	{return s.c_even();}
-Serial&	odd	(Serial& s)	{return s.c_odd();}
-Serial&	noparity(Serial& s)	{return s.c_noparity();}
-Serial&	stop1	(Serial& s)	{return s.c_stop1();}
-Serial&	stop2	(Serial& s)	{return s.c_stop2();}
-
-OManip1<Serial, int>
-baud(int bps)
-{
-    return OManip1<Serial, int>(&Serial::c_baud, bps);
-}
-
-OManip1<Serial, int>
-csize(int cs)
-{
-    return OManip1<Serial, int>(&Serial::c_csize, cs);
-}
-
-IOManip<Serial>	nl2cr	  (&Serial::i_nl2cr, &Serial::o_nl2crnl);
-#if !defined(__APPLE__)
-IOManip<Serial>	cr2nl	  (&Serial::i_cr2nl, &Serial::o_cr2nl);
-IOManip<Serial>	upperlower(&Serial::i_upper2lower, &Serial::o_lower2upper);
-#endif
-IOManip<Serial>	through	  (&Serial::i_through, &Serial::o_through);
-
-#endif
 }
 

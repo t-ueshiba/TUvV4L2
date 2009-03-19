@@ -25,14 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.h,v 1.3 2009-03-09 05:12:32 ueshiba Exp $
+ *  $Id: Serial.h,v 1.4 2009-03-19 05:11:03 ueshiba Exp $
  */
-#if !defined(__TUSerial_h) && defined(__GNUC__)
+#if !defined(__TUSerial_h)
 #define __TUSerial_h
 
 #include <termios.h>
-#include <ext/stdio_filebuf.h>
-#include "TU/Manip.h"
+#include <cstdio>
 #include "TU/Vector++.h"
 
 namespace TU
@@ -40,164 +39,48 @@ namespace TU
 /************************************************************************
 *  class Serial								*
 ************************************************************************/
-class Serial : private __gnu_cxx::stdio_filebuf<char>,
-	       public std::basic_iostream<char>
+class Serial
 {
   public:
-		Serial(const char*)			;
-    virtual	~Serial()				;
+			Serial(const char*)			;
+    virtual		~Serial()				;
 
-    Serial&	i_nl2cr()				;
-    Serial&	i_igncr()				;
-    Serial&	i_cr2nl()				;
+    const Serial&	put(const char* s)		const	;
+    const Serial&	get(char* s, u_int size)	const	;
+    
+    Serial&		i_nl2cr()				;
+    Serial&		i_igncr()				;
+    Serial&		i_cr2nl()				;
 #if !defined(__APPLE__)
-    Serial&	i_upper2lower()				;
+    Serial&		i_upper2lower()				;
 #endif
-    Serial&	i_through()				;
-    Serial&	o_nl2crnl()				;
+    Serial&		i_through()				;
+    Serial&		o_nl2crnl()				;
 #if !defined(__APPLE__)
-    Serial&	o_cr2nl()				;
-    Serial&	o_lower2upper()				;
+    Serial&		o_cr2nl()				;
+    Serial&		o_lower2upper()				;
 #endif
-    Serial&	o_through()				;
-    Serial&	c_baud(int)				;
-    Serial&	c_csize(int)				;
-    Serial&	c_even()				;
-    Serial&	c_odd()					;
-    Serial&	c_noparity()				;
-    Serial&	c_stop1()				;
-    Serial&	c_stop2()				;
+    Serial&		o_through()				;
+    Serial&		c_baud(int)				;
+    Serial&		c_csize(int)				;
+    Serial&		c_even()				;
+    Serial&		c_odd()					;
+    Serial&		c_noparity()				;
+    Serial&		c_stop1()				;
+    Serial&		c_stop2()				;
+
+  protected:
+    FILE*		fp()				const	{return _fp;}
     
   private:
-    typedef __gnu_cxx::stdio_filebuf<char>		filebuf_type;
-    
-    Serial&	set_flag(tcflag_t termios::* flag,
-			 unsigned long clearbits,
-			 unsigned long setbits)		;
+    Serial&		set_flag(tcflag_t termios::* flag,
+				 unsigned long clearbits,
+				 unsigned long setbits)		;
 
-    int		fd()				{return filebuf_type::fd();}
-
-    termios	_termios_bak;
+    const int		_fd;
+    FILE* const		_fp;
+    termios		_termios_bak;
 };
-
-inline Serial&
-operator >>(Serial& serial, Serial& (*f)(Serial&))
-{
-    return f(serial);
-}
-
-inline Serial&
-operator <<(Serial& serial, Serial& (*f)(Serial&))
-{
-    return f(serial);
-}
-
-extern IOManip<Serial>	nl2cr;
-#if defined(__APPLE__)
-extern IOManip<Serial>	cr2nl;
-extern IOManip<Serial>	upperlower;
-#endif
-extern IOManip<Serial>	through;
-Serial&			igncr	(Serial&)		;
-Serial&			even	(Serial&)		;
-Serial&			odd	(Serial&)		;
-Serial&			noparity(Serial&)		;
-Serial&			stop1	(Serial&)		;
-Serial&			stop2	(Serial&)		;
-OManip1<Serial, int>	baud	(int)			;
-OManip1<Serial, int>	csize	(int)			;
-
-/************************************************************************
-*  class Puma								*
-************************************************************************/
-class Puma : public Serial
-{
-  public:
-    typedef Vector<float, FixedSizedBuf<float, 6> >	Position;
-	
-    enum Axis		{Jt1=1, Jt2=2, Jt3=3, Jt4=4, Jt5=5, Jt6=6};
-    
-			Puma(const char*)			;
-    
-    Puma&		operator +=(int)			;
-    Puma&		operator -=(int)			;
-    
-    friend Puma&	wait(Puma&)				;
-    friend Puma&	echo(Puma&)				;
-    friend Puma&	no_echo(Puma&)				;
-    friend OManip1<Puma, Axis>	axis(Puma::Axis)		;
-    
-  private:
-    enum Echo		{NoEcho = 0, DoEcho = 1};
-
-    Puma&		set_axis(Puma::Axis)			;
-    int			wait()					;
-
-    Axis		_axis;
-    Echo		_echo;
-};
-
-inline Puma&
-operator <<(Puma& puma, Puma& (*f)(Puma&))
-{
-    return (*f)(puma);
-}
-
-Puma&	operator <<(Puma&, const Puma::Position)		;
-Puma&	operator >>(Puma&, Puma::Position&)			;
-Puma&	wait   (Puma&)						;
-Puma&	calib  (Puma&)						;
-Puma&	ready  (Puma&)						;
-Puma&	nest   (Puma&)						;
-Puma&	echo   (Puma&)						;
-Puma&	no_echo(Puma&)						;
-
-/************************************************************************
-*  class Pata								*
-************************************************************************/ 
-class Pata : public Serial
-{
-  public:
-		Pata(const char*)				;
-
-  private:
-    enum	{SX=2, EX=3};
-};
-
-/************************************************************************
-*  class Microscope							*
-************************************************************************/ 
-class Microscope : public Serial
-{
-  public:
-    enum Axis	{X = 'X', Y = 'Y', Z = 'Z'};
-
-		Microscope(const char*)				;
-
-    Microscope&	operator +=(int)				;
-    Microscope&	operator -=(int)				;
-    Microscope&	operator ++()					;
-    Microscope&	operator --()					;
-    
-    friend OManip1<Microscope, Microscope::Axis>
-		axis(Microscope::Axis)				;
-    
-  private:
-    Microscope&	set_axis(Microscope::Axis)			;
-    
-    Axis	_axis;
-};
-
-inline Microscope&
-operator <<(Microscope& ms, Microscope& (*f)(Microscope&))
-{
-    return (*f)(ms);
-}
-
-Microscope&	operator <<(Microscope&, const Array<int>&)	;
-Microscope&	operator >>(Microscope&, Array<int>&)		;
-Microscope&	calib(Microscope&)				;
-Microscope&	ready(Microscope&)				;
 
 /************************************************************************
 *  class TriggerGenerator						*
@@ -213,10 +96,10 @@ class TriggerGenerator : public Serial
     TriggerGenerator&	oneShot()				;
     TriggerGenerator&	continuousShot()			;
     TriggerGenerator&	stopContinuousShot()			;
-    int			getConfiguration(u_int& channel,
-					 u_int& interval)	;
+    bool		getStatus(u_int& channel,
+				  u_int& interval)	const	;
 };
  
 }
 
-#endif	/* !__TUSerial_h		*/
+#endif	/* !__TUSerial_h	*/
