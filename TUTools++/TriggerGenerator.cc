@@ -25,37 +25,44 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.13 2009-03-09 05:12:32 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.14 2009-03-19 05:11:03 ueshiba Exp $
  */
-#include <iomanip>
 #include <cstdlib>
 #include "TU/Serial.h"
 
 namespace TU
 {
-#if defined(__GNUC__)
+/************************************************************************
+*  static functions							*
+************************************************************************/
+static void
+skipl(FILE* fp)
+{
+    for (int c; (c = fgetc(fp)) != EOF; )
+	if (c == '\n')
+	    break;
+}
+    
 /************************************************************************
 *  class TriggerGenerator						*
 ************************************************************************/
 TriggerGenerator::TriggerGenerator(const char* ttyname)
     :Serial(ttyname)
 {
-    using namespace	std;
-
-    *this >> through << through
-	  << baud(9600) << csize(8) << noparity << stop1;
-    setf(ios::uppercase);
+    i_through()
+	.o_through().o_lower2upper()
+	.c_baud(9600).c_csize(8).c_noparity().c_stop1();
 }
 
 TriggerGenerator&
-TriggerGenerator::showId(std::ostream& o)
+TriggerGenerator::showId(std::ostream& out)
 {
     using namespace	std;
     
-    *this << 'V' << endl;
-    for (char c; get(c); )
+    fputs("V\n", fp());
+    for (int c; (c = fgetc(fp())) != EOF; )
     {
-	o << c;
+	out << char(c);
 	if (c == '\n')
 	    break;
     }
@@ -65,27 +72,18 @@ TriggerGenerator::showId(std::ostream& o)
 TriggerGenerator&
 TriggerGenerator::selectChannel(u_int channel)
 {
-    using namespace	std;
-    
-    setf(ios::hex, ios::basefield);
-    *this << 'A';
-    width(8);
-    fill('0');
-    *this << channel << endl;
-    *this >> ign;
+    fprintf(fp(), "A%0.8x\n", channel);
+    skipl(fp());
     return *this;
 }
 
 TriggerGenerator&
 TriggerGenerator::setInterval(u_int interval)
 {
-    using namespace	std;
-    
     if (10 <= interval && interval <= 255)
     {
-	setf(ios::dec, ios::basefield);
-	*this << 'F' << interval << endl;
-	*this >> ign;
+	fprintf(fp(), "F%d\n", interval);
+	skipl(fp());
     }
     return *this;
 }
@@ -93,55 +91,53 @@ TriggerGenerator::setInterval(u_int interval)
 TriggerGenerator&
 TriggerGenerator::oneShot()
 {
-    *this << 'T' << std::endl;
-    *this >> ign;
+    fputs("T\n", fp());
+    skipl(fp());
     return *this;
 }
 
 TriggerGenerator&
 TriggerGenerator::continuousShot()
 {
-    *this << 'R' << std::endl;
-    *this >> ign;
+    fputs("R\n", fp());
+    skipl(fp());
     return *this;
 }
 
 TriggerGenerator&
 TriggerGenerator::stopContinuousShot()
 {
-    *this << 'S' << std::endl;
-    *this >> ign;
+    fputs("S\n", fp());
+    skipl(fp());
     return *this;
 }
 
-int
-TriggerGenerator::getConfiguration(u_int& channel, u_int& interval)
+bool
+TriggerGenerator::getStatus(u_int& channel, u_int& interval) const
 {
-    *this << 'I' << std::endl;
-    char	token[64];
-    for (char c, *p = token; get(c); )
+    fputs("I\n", fp());
+
+    char	token[64], *p = token;
+    for (int c; (c = fgetc(fp())) != EOF; )
     {
 	if (c == '\n')
-	{
-	    *p = '\0';
 	    break;
-	}
 	else if (c == ',')
 	{
 	    *p = '\0';
-	    p = token;
 	    if (token[0] == 'A')
 		channel = strtoul(token + 1, NULL, 16);
 	    else
 		interval = strtoul(token + 1, NULL, 10);
+	    p = token;
 	}
 	else
 	    *p++ = c;
     }
+    *p = '\0';
     
     return !strcmp(token, "RUN");
 }
 
-#endif
 }
 
