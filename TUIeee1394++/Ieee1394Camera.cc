@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.28 2008-10-17 06:31:31 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.29 2009-03-22 23:50:05 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -2450,8 +2450,8 @@ Ieee1394Camera::unlockAdvancedFeature(u_int64 featureId, u_int timeout)
 ************************************************************************/
 static const struct
 {
-    const Ieee1394Camera::Format	format;
-    const char* const			name;
+    Ieee1394Camera::Format	format;
+    const char*			name;
 } formats[] =
 {
     {Ieee1394Camera::YUV444_160x120,	"160x120-YUV(4:4:4)"},
@@ -2498,8 +2498,8 @@ static const int	NFORMATS = sizeof(formats) / sizeof(formats[0]);
 
 static const struct
 {
-    const Ieee1394Camera::FrameRate	rate;
-    const char* const			name;
+    Ieee1394Camera::FrameRate	rate;
+    const char*			name;
 } rates[] =
 {
     {Ieee1394Camera::FrameRate_1_875,	"1.875fps"},
@@ -2516,8 +2516,8 @@ static const int	NRATES = sizeof(rates) / sizeof(rates[0]);
 
 static const struct
 {
-    const Ieee1394Camera::Feature	feature;
-    const char* const			name;
+    Ieee1394Camera::Feature	feature;
+    const char*			name;
 } features[] =
 {
     {Ieee1394Camera::BRIGHTNESS,	"BRIGHTNESS"},

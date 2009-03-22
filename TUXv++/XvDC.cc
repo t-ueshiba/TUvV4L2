@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.cc,v 1.7 2008-09-02 05:15:33 ueshiba Exp $
+ *  $Id: XvDC.cc,v 1.8 2009-03-22 23:50:51 ueshiba Exp $
  */
 #include "TU/v/XvDC.h"
 #include <stdexcept>
@@ -146,43 +146,61 @@ XvDC::~XvDC()
 DC&
 XvDC::operator <<(const Point2<int>& p)
 {
-    ShmDC::operator <<(p);
-    return *this;
+    return ShmDC::operator <<(p);
+}
+
+DC&
+XvDC::operator <<(const LineP2f& l)
+{
+    return ShmDC::operator <<(l);
 }
 
 DC&
 XvDC::operator <<(const LineP2d& l)
 {
-    ShmDC::operator <<(l);
-    return *this;
+    return ShmDC::operator <<(l);
 }
 
 DC&
 XvDC::operator <<(const Image<u_char>& image)
 {
-    ShmDC::operator <<(image);
-    return *this;
+    return ShmDC::operator <<(image);
+}
+
+DC&
+XvDC::operator <<(const Image<s_char>& image)
+{
+    return ShmDC::operator <<(image);
 }
 
 DC&
 XvDC::operator <<(const Image<short>& image)
 {
-    ShmDC::operator <<(image);
-    return *this;
+    return ShmDC::operator <<(image);
 }
 
 DC&
 XvDC::operator <<(const Image<BGR>& image)
 {
-    ShmDC::operator <<(image);
-    return *this;
+    return ShmDC::operator <<(image);
 }
 
 DC&
 XvDC::operator <<(const Image<ABGR>& image)
 {
-    ShmDC::operator <<(image);
-    return *this;
+    return ShmDC::operator <<(image);
+}
+
+DC&
+XvDC::operator <<(const Image<RGB>& image)
+{
+    return ShmDC::operator <<(image);
+}
+
+DC&
+XvDC::operator <<(const Image<RGBA>& image)
+{
+    return ShmDC::operator <<(image);
 }
 
 DC&
