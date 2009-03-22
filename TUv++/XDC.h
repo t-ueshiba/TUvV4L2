@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.h,v 1.10 2008-09-10 05:12:21 ueshiba Exp $  
+ *  $Id: XDC.h,v 1.11 2009-03-22 23:38:29 ueshiba Exp $  
  */
 #ifndef __TUvXDC_h
 #define __TUvXDC_h
@@ -114,11 +114,11 @@ class XDC : public DC
     virtual DC&		operator <<(const LineP2d& l)			;
     virtual DC&		operator <<(const Image<u_char>& image)		;
     virtual DC&		operator <<(const Image<s_char>& image)		;
-    virtual DC&		operator <<(const Image<short>& image)		;
-    virtual DC&		operator <<(const Image<BGR>&  image)		;
-    virtual DC&		operator <<(const Image<ABGR>& image)		;
-    virtual DC&		operator <<(const Image<RGB>&  image)		;
-    virtual DC&		operator <<(const Image<RGBA>& image)		;
+    virtual DC&		operator <<(const Image<short>&  image)		;
+    virtual DC&		operator <<(const Image<BGR>&    image)		;
+    virtual DC&		operator <<(const Image<ABGR>&   image)		;
+    virtual DC&		operator <<(const Image<RGB>&    image)		;
+    virtual DC&		operator <<(const Image<RGBA>&   image)		;
     virtual DC&		operator <<(const Image<YUV444>& image)		;
     virtual DC&		operator <<(const Image<YUV422>& image)		;
     virtual DC&		operator <<(const Image<YUV411>& image)		;
