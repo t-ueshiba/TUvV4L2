@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.28 2008-10-19 23:29:34 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.29 2009-04-13 07:47:58 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -575,7 +575,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix		adj()					const	;
     Matrix<T>		pinv(T cndnum=1.0e5)			const	;
     Matrix<T>		eigen(Vector<T>& eval)			const	;
-    Matrix<T>		geigen(const Matrix<T>& B,
+    Matrix<T>		geigen(const Matrix<T>& BB,
 			       Vector<T>& eval)			const	;
     Matrix		cholesky()				const	;
     Matrix&		normalize()					;
