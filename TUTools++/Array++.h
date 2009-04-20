@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.26 2008-10-22 06:31:35 ueshiba Exp $
+ *  $Id: Array++.h,v 1.27 2009-04-20 02:21:07 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -44,7 +44,7 @@ namespace TU
 ************************************************************************/
 //! 可変長バッファクラス
 /*!
-  単独で使用することはなく，#TU::Array<T, B>または#TU::Array2<T, B>の
+  単独で使用することはなく，#TU::Array<T, B>または#TU::Array2<T, B, R>の
   第2テンプレート引数に指定することによって，それらの基底クラスとして使う．
   \param T	要素の型
 */
@@ -61,7 +61,6 @@ class Buf
 			operator T*()				;
 			operator const T*()		const	;
     size_t		size()				const	;
-    u_int		dim()				const	;
     bool		resize(u_int siz)			;
     void		resize(T* p, u_int siz)			;
     static u_int	align(u_int siz)			;
@@ -140,16 +139,9 @@ Buf<T>::operator const T*() const
     return _p;
 }
     
-//! バッファの要素数（次元 dim() に等しい）を返す．
+//! バッファの要素数を返す．
 template <class T> inline size_t
 Buf<T>::size() const
-{
-    return _size;
-}
-    
-//! バッファの次元（要素数 size() に等しい）を返す．
-template <class T> inline u_int
-Buf<T>::dim() const
 {
     return _size;
 }
@@ -171,10 +163,11 @@ Buf<T>::resize(u_int siz)
 	return false;
     
     if (_shared)
-	throw std::logic_error("Buf<T>::resize: cannot change dimension of shared array!");
+	throw std::logic_error("Buf<T>::resize: cannot change size of shared buffer!");
 
     const u_int	old_size = _size;
-    if (_capacity < (_size = siz))
+    _size = siz;
+    if (_capacity < _size)
     {
 	delete [] _p;
 	_p = new T[_size];
@@ -278,12 +271,13 @@ class AlignedBuf : public Buf<T>
 {
   public:
     explicit AlignedBuf(u_int siz=0)				;
+    AlignedBuf(const AlignedBuf& b)				;
+    AlignedBuf&		operator =(const AlignedBuf& b)		;
     ~AlignedBuf()						;
 
     using		Buf<T>::operator T*;
     using		Buf<T>::operator const T*;
     using		Buf<T>::size;
-    using		Buf<T>::dim;
     
     bool		resize(u_int siz)			;
     static u_int	align(u_int siz)			;
@@ -312,6 +306,23 @@ template <class T> inline
 AlignedBuf<T>::AlignedBuf(u_int siz)
     :Buf<T>(memalign(siz), siz)
 {
+}
+
+//! コピーコンストラクタ
+template <class T>
+AlignedBuf<T>::AlignedBuf(const AlignedBuf<T>& b)
+    :Buf<T>(memalign(b.size()), b.size())
+{
+    Buf<T>::operator =(b);
+}
+
+//! 標準代入演算子
+template <class T> AlignedBuf<T>&
+AlignedBuf<T>::operator =(const AlignedBuf<T>& b)
+{
+    resize(b.size());		// Buf<T>::resize(u_int)は使えない．
+    Buf<T>::operator =(b);
+    return *this;
 }
 
 //! デストラクタ
@@ -406,7 +417,6 @@ class FixedSizedBuf
 			operator T*()				;
 			operator const T*()		const	;
     static size_t	size()					;
-    static u_int	dim()					;
     static bool		resize(u_int siz)			;
     void		resize(T* p, u_int siz)			;
     static u_int	align(u_int siz)			;
@@ -473,16 +483,9 @@ FixedSizedBuf<T, D>::operator const T*() const
     return _p;
 }
     
-//! バッファの要素数（次元 dim() に等しい）を返す．
+//! バッファの要素数を返す．
 template <class T, size_t D> inline size_t
 FixedSizedBuf<T, D>::size()
-{
-    return D;
-}
-    
-//! バッファの次元（要素数 size() に等しい）を返す．
-template <class T, size_t D> inline u_int
-FixedSizedBuf<T, D>::dim()
 {
     return D;
 }
@@ -601,10 +604,10 @@ class Array : public B
     const_iterator	end()					const	;
 
     using		B::size;
-    using		B::dim;
-    
-  			operator pointer()				;
+
+			operator pointer()				;
   			operator const_pointer()		const	;
+    u_int		dim()					const	;
     T&			at(int i)					;
     const T&		at(int i)				const	;
     T&			operator [](int i)				;
@@ -708,32 +711,6 @@ Array<T, B>::operator =(const_reference c)
     return *this;
 }
 
-//! 全ての要素に同一の数値を掛ける．
-/*!
-  \param c	掛ける数値
-  \return	この配列
-*/
-template <class T, class B> Array<T, B>&
-Array<T, B>::operator *=(double c)
-{
-    for (int i = 0; i < dim(); )
-	(*this)[i++] *= c;
-    return *this;
-}
-
-//! 全ての要素を同一の数値で割る．
-/*!
-  \param c	割る数値
-  \return	この配列
-*/
-template <class T, class B> Array<T, B>&
-Array<T, B>::operator /=(double c)
-{
-    for (int i = 0; i < dim(); )
-	(*this)[i++] /= c;
-    return *this;
-}
-
 //! 配列の先頭要素を指す反復子を返す．
 /*!
   \return	先頭要素を指す反復子
@@ -794,6 +771,13 @@ Array<T, B>::operator typename Array<T, B>::const_pointer() const
     return B::operator const_pointer();
 }
 
+//! 配列の次元（要素数）を返す．
+template <class T, class B> inline u_int
+Array<T, B>::dim() const
+{
+    return size();
+}
+    
 //! 配列の要素へアクセスする（indexのチェックあり）．
 /*!
   \param i			要素を指定するindex
@@ -842,6 +826,30 @@ template <class T, class B> inline const T&
 Array<T, B>::operator [](int i) const
 {
     return Array::operator const_pointer()[i];
+}
+
+//! 全ての要素に同一の数値を掛ける．
+/*!
+  \param c	掛ける数値
+  \return	この配列
+*/
+template <class T, class B> Array<T, B>&
+Array<T, B>::operator *=(double c)
+{
+    for (int i = 0; i < dim(); )
+	(*this)[i++] *= c;
+    return *this;
+}
+
+//! 全ての要素を同一の数値で割る．
+/*!
+  \param c	割る数値
+  \return	この配列
+*/
+template <class T, class B> inline Array<T, B>&
+Array<T, B>::operator /=(double c)
+{
+    return operator *=(1.0 / c);
 }
 
 //! この配列に他の配列を足す．
