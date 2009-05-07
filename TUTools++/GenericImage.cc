@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GenericImage.cc,v 1.3 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: GenericImage.cc,v 1.4 2009-05-07 04:22:35 ueshiba Exp $
  */
 #include "TU/Image++.h"
 

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.42 2008-10-31 06:36:48 ueshiba Exp $
+ *  $Id: Image++.h,v 1.43 2009-05-07 04:22:35 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -1090,6 +1090,7 @@ class GenericImage : public Array2<Array<u_char> >, public ImageBase
     
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out)			const	;
+    ImageBase::Type	restoreHeader(std::istream& in)			;
     std::istream&	restoreData(std::istream& in)			;
     std::ostream&	saveData(std::ostream& out)		const	;
     
@@ -1110,7 +1111,7 @@ class GenericImage : public Array2<Array<u_char> >, public ImageBase
 inline std::istream&
 GenericImage::restore(std::istream& in)
 {
-    _type = restoreHeader(in);
+    restoreHeader(in);
     return restoreData(in);
 }
 
@@ -1124,6 +1125,18 @@ GenericImage::save(std::ostream& out) const
 {
     saveHeader(out, _type);
     return saveData(out);
+}
+
+//! 入力ストリームから画像のヘッダを読み込む．
+/*!
+  \param in	入力ストリーム
+  \return	読み込まれた画像の画素のタイプ
+*/
+inline ImageBase::Type
+GenericImage::restoreHeader(std::istream& in)
+{
+    _type = ImageBase::restoreHeader(in);
+    return _type;
 }
 
 }
