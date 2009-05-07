@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.43 2009-05-07 04:22:35 ueshiba Exp $
+ *  $Id: Image++.h,v 1.44 2009-05-07 05:55:11 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -1067,6 +1067,12 @@ template <> inline u_int
 Image<YUV411, Buf<YUV411> >::width() const
 {
     return 2 * ncol();
+}
+
+template <> inline void
+Image<YUV411, Buf<YUV411> >::resize(u_int h, u_int w)
+{
+    Array2<ImageLine<YUV411>, Buf<YUV411> >::resize(h, w/2);
 }
 
 template <> inline void
