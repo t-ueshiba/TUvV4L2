@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.44 2009-05-07 05:55:11 ueshiba Exp $
+ *  $Id: Image++.h,v 1.45 2009-05-10 23:33:22 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -364,10 +364,10 @@ BGR::BGR(const YUV444& p)
 class ImageBase
 {
   public:
-  //! 画素のタイプ
+  //! 外部記憶に読み書きする際の画素のタイプ
     enum Type
     {
-	END	= 0,	//!< 
+	DEFAULT = 0,	//!< same as internal type
 	U_CHAR	= 5,	//!< unsigned mono  8bit/pixel
 	RGB_24	= 6,	//!< RGB	   24bit/pixel	
 	SHORT,		//!< signed mono   16bit/pixel
@@ -390,11 +390,12 @@ class ImageBase
 	:P(), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
     virtual ~ImageBase()		;
 
-    static u_int	type2depth(Type type)		;
+    static u_int	type2depth(Type type)			;
     
   public:
-    Type		restoreHeader(std::istream& in)			;
-    std::ostream&	saveHeader(std::ostream& out, Type type) const	;
+    Type		restoreHeader(std::istream& in)		;
+    Type		saveHeader(std::ostream& out,
+				   Type type=DEFAULT)	const	;
 
   //! 画像の幅を返す．
   /*!
@@ -413,11 +414,13 @@ class ImageBase
     \param h	新しい幅
     \param w	新しい高さ
   */
-    void		resize(u_int h, u_int w)	{_resize(h, w, END);}
+    void		resize(u_int h, u_int w)	{_resize(h, w,
+								 DEFAULT);}
 	
   private:
     virtual u_int	_width()			const	= 0;
     virtual u_int	_height()			const	= 0;
+    virtual Type	_defaultType()			const	= 0;
     virtual void	_resize(u_int h, u_int w, Type type)	= 0;
 
   public:
@@ -826,9 +829,12 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     Image&	operator = (const T& c)		{Array2<ImageLine<T> >::
 						 operator =(c); return *this;}
     std::istream&	restore(std::istream& in)			;
-    std::ostream&	save(std::ostream& out, Type type)	const	;
-    std::istream&	restoreData(std::istream& in, Type type)	;
-    std::ostream&	saveData(std::ostream& out, Type type)	const	;
+    std::ostream&	save(std::ostream& out,
+			     Type type=DEFAULT)			const	;
+    std::istream&	restoreData(std::istream& in,
+				    Type type=DEFAULT)			;
+    std::ostream&	saveData(std::ostream& out,
+				 Type type=DEFAULT)		const	;
     void		resize(u_int h, u_int w)			;
     void		resize(T* p, u_int h, u_int w)			;
 
@@ -837,9 +843,11 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     std::istream&	restoreRows(std::istream& in)			;
     template <class D>
     std::ostream&	saveRows(std::ostream& out)		const	;
-
+    Type		defaultType()				const	;
+    
     virtual u_int	_width()				const	;
     virtual u_int	_height()				const	;
+    virtual Type	_defaultType()				const	;
     virtual void	_resize(u_int h, u_int w, Type)			;
 };
 
@@ -900,14 +908,14 @@ Image<T, B>::restore(std::istream& in)
 //! 指定した画素タイプで出力ストリームに画像を書き出す．
 /*!
   \param out	出力ストリーム
-  \param type	画素タイプ
+  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
+		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */
 template <class T, class B> inline std::ostream&
 Image<T, B>::save(std::ostream& out, Type type) const
 {
-    saveHeader(out, type);
-    return saveData(out, type);
+    return saveData(out, saveHeader(out, type));
 }
 
 //! 入力ストリームから画像の画素データを読み込む．
@@ -919,6 +927,9 @@ Image<T, B>::save(std::ostream& out, Type type) const
 template <class T, class B> std::istream&
 Image<T, B>::restoreData(std::istream& in, Type type)
 {
+    if (type == DEFAULT)
+	type = defaultType();
+    
     switch (type)
     {
       case U_CHAR:
@@ -939,6 +950,9 @@ Image<T, B>::restoreData(std::istream& in, Type type)
 	return restoreRows<YUV422>(in);
       case YUV_411:
 	return restoreRows<YUV411>(in);
+      default:
+	throw std::runtime_error("Image<T, B>::restoreData(): unknown pixel type!!");
+	break;
     }
     return in;
 }
@@ -946,12 +960,16 @@ Image<T, B>::restoreData(std::istream& in, Type type)
 //! 指定した画素タイプで出力ストリームに画像の画素データを書き出す．
 /*!
   \param out	出力ストリーム
-  \param type	画素タイプ
+  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
+		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */
 template <class T, class B> std::ostream&
 Image<T, B>::saveData(std::ostream& out, Type type) const
 {
+    if (type == DEFAULT)
+	type = defaultType();
+    
     switch (type)
     {
       case U_CHAR:
@@ -972,6 +990,8 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
 	return saveRows<YUV422>(out);
       case YUV_411:
 	return saveRows<YUV411>(out);
+      default:
+	throw std::runtime_error("Image<T, B>::saveData(): unknown pixel type!!");
     }
     return out;
 }
@@ -1037,6 +1057,66 @@ Image<T, B>::_height() const
     return Image<T, B>::height();	// Don't call ImageBase::height!
 }
 
+template <class T, class B> ImageBase::Type
+Image<T, B>::_defaultType() const
+{
+    return Image<T, B>::defaultType();
+}
+
+template <class T, class B> inline ImageBase::Type
+Image<T, B>::defaultType() const
+{
+    return RGB_24;
+}
+
+template <> inline ImageBase::Type
+Image<u_char, Buf<u_char> >::defaultType() const
+{
+    return U_CHAR;
+}
+
+template <> inline ImageBase::Type
+Image<short, Buf<short> >::defaultType() const
+{
+    return SHORT;
+}
+
+template <> inline ImageBase::Type
+Image<int, Buf<int> >::defaultType() const
+{
+    return INT;
+}
+
+template <> inline ImageBase::Type
+Image<float, Buf<float> >::defaultType() const
+{
+    return FLOAT;
+}
+
+template <> inline ImageBase::Type
+Image<double, Buf<double> >::defaultType() const
+{
+    return DOUBLE;
+}
+
+template <> inline ImageBase::Type
+Image<YUV444, Buf<YUV444> >::defaultType() const
+{
+    return YUV_444;
+}
+
+template <> inline ImageBase::Type
+Image<YUV422, Buf<YUV422> >::defaultType() const
+{
+    return YUV_422;
+}
+
+template <> inline ImageBase::Type
+Image<YUV411, Buf<YUV411> >::defaultType() const
+{
+    return YUV_411;
+}
+
 template <class T, class B> void
 Image<T, B>::_resize(u_int h, u_int w, Type)
 {
@@ -1093,21 +1173,32 @@ class GenericImage : public Array2<Array<u_char> >, public ImageBase
   public:
   //! 総称画像を生成する．
     GenericImage() :_type(U_CHAR)					{}
-    
+
+    Type		type()					const	;
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out)			const	;
-    ImageBase::Type	restoreHeader(std::istream& in)			;
     std::istream&	restoreData(std::istream& in)			;
     std::ostream&	saveData(std::ostream& out)		const	;
     
   private:
     virtual u_int	_width()				const	;
     virtual u_int	_height()				const	;
+    virtual Type	_defaultType()				const	;
     virtual void	_resize(u_int h, u_int w,
 				ImageBase::Type type)			;
 
-    ImageBase::Type	_type;
+    Type		_type;
 };
+
+//! 現在保持している画像の画素タイプを返す．
+/*!
+  \return	画素タイプ
+*/
+inline ImageBase::Type
+GenericImage::type() const
+{
+    return _type;
+}
 
 //! 入力ストリームから画像を読み込む．
 /*!
@@ -1133,18 +1224,5 @@ GenericImage::save(std::ostream& out) const
     return saveData(out);
 }
 
-//! 入力ストリームから画像のヘッダを読み込む．
-/*!
-  \param in	入力ストリーム
-  \return	読み込まれた画像の画素のタイプ
-*/
-inline ImageBase::Type
-GenericImage::restoreHeader(std::istream& in)
-{
-    _type = ImageBase::restoreHeader(in);
-    return _type;
 }
-
-}
-
 #endif	/* !__TUImagePP_h */
