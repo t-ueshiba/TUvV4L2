@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.24 2008-10-17 06:31:31 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.25 2009-05-10 23:34:26 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -109,6 +109,9 @@
     - #TU::Ieee1394Camera::saveConfig()
     - #TU::Ieee1394Camera::restoreConfig()
     - #TU::Ieee1394Camera::getMemoryChannelMax()
+
+  #TU::Ieee1394CameraArray - IEEE1394デジタルカメラの配列を表すクラス
+    - #TU::Ieee1394CameraArray::Ieee1394CameraArray()
 */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h

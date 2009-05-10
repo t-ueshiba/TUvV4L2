@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.29 2009-03-22 23:50:05 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.30 2009-05-10 23:34:26 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -331,7 +331,7 @@ static const u_int	NBUFFERS		= 4;
 //! IEEE1394カメラノードを生成する
 /*!
   \param type		カメラのタイプ
-  \param 1394b		IEEE1394bモード (800Mbps)で動作
+  \param i1394b		IEEE1394bモード (800Mbps)で動作
   \param uniqId		個々のカメラ固有の64bit ID．同一のIEEE1394 busに
 			複数のカメラが接続されている場合，これによって
 			同定を行う．0が与えられると，まだ#Ieee1394Camera
