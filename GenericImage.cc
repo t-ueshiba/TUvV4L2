@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GenericImage.cc,v 1.4 2009-05-07 04:22:35 ueshiba Exp $
+ *  $Id: GenericImage.cc,v 1.5 2009-05-10 23:33:22 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
@@ -74,10 +74,17 @@ GenericImage::_height() const
     return nrow();
 }
 
+ImageBase::Type
+GenericImage::_defaultType() const
+{
+    return type();
+}
+
 void
 GenericImage::_resize(u_int h, u_int w, ImageBase::Type type)
 {
-    w = (type2depth(type)*w - 1)/8 + 1;
+    _type = type;
+    w = (type2depth(_type)*w - 1)/8 + 1;
     Array2<Array<u_char> >::resize(h, w);
 }
 

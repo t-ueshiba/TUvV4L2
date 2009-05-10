@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.24 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.25 2009-05-10 23:33:22 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -63,7 +63,7 @@ ImageBase::restoreHeader(std::istream& in)
   // Read the magic number.
     int	c = in.get();
     if (c == EOF)
-	return END;
+	return DEFAULT;
     if (c != 'P')
 	throw runtime_error("TU::ImageBase::restoreHeader: not a pbm file!!");
 
@@ -192,13 +192,17 @@ ImageBase::restoreHeader(std::istream& in)
 //! 指定した画素タイプで出力ストリームに画像のヘッダを書き出す．
 /*!
   \param out	出力ストリーム
-  \param type	画素タイプ
-  \return	outで指定した出力ストリーム
+  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
+		この画像オブジェクトの画素タイプで書き出される．
+  \return	実際に書き出す場合の画素タイプ．
 */
-std::ostream&
+ImageBase::Type
 ImageBase::saveHeader(std::ostream& out, Type type) const
 {
     using namespace	std;
+
+    if (type == DEFAULT)
+	type = _defaultType();
     
     out << 'P';
     switch (type)
@@ -280,7 +284,7 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     out << _width() << ' ' << _height() << '\n'
 	<< 255 << endl;
     
-    return out;
+    return type;
 }
 
 //! 指定されたタイプの画素のビット数を返す．
