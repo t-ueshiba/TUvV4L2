@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.7 2008-10-17 06:31:43 ueshiba Exp $
+ *  $Id: main.cc,v 1.8 2009-05-13 01:15:01 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera - program for testing an IIDC 1394-based Digital Camera

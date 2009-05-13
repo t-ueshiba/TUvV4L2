@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.30 2009-05-10 23:34:26 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.31 2009-05-13 01:14:39 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -1175,7 +1175,8 @@ Ieee1394Camera::stopContinuousShot()
 	writeQuadletToRegister(ISO_EN, 0x0);
 	flushListenBuffer();
 	_img = 0;
-	_img_size = 0;
+      // 再び continuoutShot() した時に	captureRaw()で使用するので，
+      // _img_size の値は0にせずに保持する．
     }
     return *this;
 }
