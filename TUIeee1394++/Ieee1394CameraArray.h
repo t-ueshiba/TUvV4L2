@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.1 2009-05-10 23:34:27 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.2 2009-05-17 23:36:38 ueshiba Exp $
  */
 #ifndef __TUIeee1394CameraArray_h
 #define __TUIeee1394CameraArray_h
@@ -13,9 +13,9 @@ namespace TU
 /************************************************************************
 *  class Ieee1394CameraArray						*
 ************************************************************************/
-//! IEEE1394ƒfƒWƒ^ƒ‹ƒJƒƒ‰‚Ì”z—ñ‚ğ•\‚·ƒNƒ‰ƒX
+//! IEEE1394$B%G%8%?%k%+%a%i$NG[Ns$rI=$9%/%i%9(B
 /*!
-  TU::Ieee1394Camera‚Ö‚Ìƒ|ƒCƒ“ƒ^‚Ì”z—ñ‚Æ‚µ‚Ä’è‹`‚³‚ê‚éD
+  TU::Ieee1394Camera$B$X$N%]%$%s%?$NG[Ns$H$7$FDj5A$5$l$k!%(B
 */
 class Ieee1394CameraArray : public Array<Ieee1394Camera*>
 {

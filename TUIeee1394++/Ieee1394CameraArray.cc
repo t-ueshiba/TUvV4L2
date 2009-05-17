@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.1 2009-05-10 23:34:27 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.2 2009-05-17 23:36:38 ueshiba Exp $
  */
 #include "TU/Ieee1394CameraArray.h"
 
@@ -9,13 +9,13 @@ namespace TU
 /************************************************************************
 *  class Ieee1394CameraArray						*
 ************************************************************************/
-//! IEEE1394ƒfƒWƒ^ƒ‹ƒJƒƒ‰‚Ì”z—ñ‚ğ¶¬‚·‚éD
+//! IEEE1394$B%G%8%?%k%+%a%i$NG[Ns$r@8@.$9$k!%(B
 /*!
-  \param in		ƒJƒƒ‰‚Ìİ’èƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş“ü—ÍƒXƒgƒŠ[ƒ€
-  \param i1394b		IEEE1394bƒ‚[ƒh (800Mbps)‚Å“®ì
-  \param ncameras	¶¬‚·‚éƒJƒƒ‰‘ä”Dİ’èƒtƒ@ƒCƒ‹‚É‹L‚³‚ê‚Ä‚¢‚éÅ‰‚Ì
-			ncameras‘ä‚ª¶¬‚³‚ê‚éD-1‚ğw’è‚·‚é‚ÆCİ’èƒtƒ@ƒCƒ‹
-			’†‚Ì‘SƒJƒƒ‰‚ª¶¬‚³‚ê‚éD
+  \param in		$B%+%a%i$N@_Dj%U%!%$%k$rFI$_9~$`F~NO%9%H%j!<%`(B
+  \param i1394b		IEEE1394b$B%b!<%I(B (800Mbps)$B$GF0:n(B
+  \param ncameras	$B@8@.$9$k%+%a%iBf?t!%@_Dj%U%!%$%k$K5-$5$l$F$$$k:G=i$N(B
+			ncameras$BBf$,@8@.$5$l$k!%(B-1$B$r;XDj$9$k$H!$@_Dj%U%!%$%k(B
+			$BCf$NA4%+%a%i$,@8@.$5$l$k!%(B
 */
 Ieee1394CameraArray::Ieee1394CameraArray(std::istream& in, bool i1394b,
 					 int ncameras)
@@ -23,26 +23,26 @@ Ieee1394CameraArray::Ieee1394CameraArray(std::istream& in, bool i1394b,
 {
     using namespace	std;
 
-  // İ’èƒtƒ@ƒCƒ‹‚©‚ç’x‰„ƒpƒ‰ƒ[ƒ^‚ÆƒJƒƒ‰”‚ğ“Ç‚İ‚ŞD
+  // $B@_Dj%U%!%$%k$+$iCY1d%Q%i%a!<%?$H%+%a%i?t$rFI$_9~$`!%(B
     int	delay, n;
     in >> delay >> n;
     if ((ncameras < 0) || (ncameras > n))
 	ncameras = n;
     resize(ncameras);
     
-  // İ’èƒtƒ@ƒCƒ‹‚É‹L‚³‚ê‚½‘SƒJƒƒ‰‚ğ¶¬‚·‚éD
+  // $B@_Dj%U%!%$%k$K5-$5$l$?A4%+%a%i$r@8@.$9$k!%(B
     for (int i = 0; i < dim(); ++i)
     {
 	string	s;
-	in >> s;			// global unique ID‚Ì“Ç‚İ‚İ
+	in >> s;			// global unique ID$B$NFI$_9~$_(B
 	u_int64	uniqId = strtoull(s.c_str(), 0, 0);
 	(*this)[i] = new Ieee1394Camera(Ieee1394Camera::Monocular,
 					i1394b, uniqId, delay);
-	in >> *(*this)[i];		// ƒJƒƒ‰ƒpƒ‰ƒ[ƒ^‚Ì“Ç‚İ‚İ‚Æİ’è
+	in >> *(*this)[i];		// $B%+%a%i%Q%i%a!<%?$NFI$_9~$_$H@_Dj(B
     }
 }
 
-//! IEEE1394ƒfƒWƒ^ƒ‹ƒJƒƒ‰‚Ì”z—ñ‚ğ”j‰ó‚·‚éD
+//! IEEE1394$B%G%8%?%k%+%a%i$NG[Ns$rGK2u$9$k!%(B
 Ieee1394CameraArray::~Ieee1394CameraArray()
 {
     for (int i = 0; i < dim(); ++i)
