@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.4 2009-02-02 08:09:24 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.5 2009-06-08 05:14:44 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -59,9 +59,10 @@ mmForward2(mmFlt in3210, mmFlt c0123, mmFlt& tmp)
 static inline mmFlt
 mmBackward2(mmFlt in3210, mmFlt c1032, mmFlt& tmp)
 {
+    mmFlt	out3210 = tmp;
     tmp = mmShiftElmR<1>(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
 						       _MM_SHUFFLE(3,3,0,0));
-    mmFlt	out3210 = tmp;
+    out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
     tmp = mmShiftElmR<1>(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
 						       _MM_SHUFFLE(2,2,0,0));
     out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
@@ -70,7 +71,7 @@ mmBackward2(mmFlt in3210, mmFlt c1032, mmFlt& tmp)
     out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
     tmp = mmShiftElmR<1>(tmp) + c1032 * _mm_shuffle_ps(tmp, in3210,
 						       _MM_SHUFFLE(0,0,0,0));
-    return mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
+    return out3210;
 }
 
 template <class S> static void
@@ -135,34 +136,35 @@ static inline mmFlt
 mmForward4(mmFlt in3210, mmFlt c0123, mmFlt c4567, mmFlt& tmp)
 {
     tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<0>(in3210)
-			   + c4567 * mmSetAll<0>(tmp);
+			      + c4567 * mmSetAll<0>(tmp);
     mmFlt	out0123 = tmp;
     tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<1>(in3210)
-			   + c4567 * mmSetAll<0>(tmp);
+			      + c4567 * mmSetAll<0>(tmp);
     out0123 = mmReplaceRMost(mmShiftElmL<1>(out0123), tmp);
     tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<2>(in3210)
-			   + c4567 * mmSetAll<0>(tmp);
+			      + c4567 * mmSetAll<0>(tmp);
     out0123 = mmReplaceRMost(mmShiftElmL<1>(out0123), tmp);
     tmp = mmShiftElmR<1>(tmp) + c0123 * mmSetAll<3>(in3210)
-			   + c4567 * mmSetAll<0>(tmp);
+			      + c4567 * mmSetAll<0>(tmp);
     return mmReverseElm(mmReplaceRMost(mmShiftElmL<1>(out0123), tmp));
 }
 
 static inline mmFlt
 mmBackward4(mmFlt in3210, mmFlt c3210, mmFlt c7654, mmFlt& tmp)
 {
-    tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<3>(in3210)
-			   + c7654 * mmSetAll<0>(tmp);
     mmFlt	out3210 = tmp;
+    tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<3>(in3210)
+			      + c7654 * mmSetAll<0>(tmp);
+    out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
     tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<2>(in3210)
-			   + c7654 * mmSetAll<0>(tmp);
+			      + c7654 * mmSetAll<0>(tmp);
     out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
     tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<1>(in3210)
-			   + c7654 * mmSetAll<0>(tmp);
+			      + c7654 * mmSetAll<0>(tmp);
     out3210 = mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
     tmp = mmShiftElmR<1>(tmp) + c3210 * mmSetAll<0>(in3210)
-			   + c7654 * mmSetAll<0>(tmp);
-    return mmReplaceRMost(mmShiftElmL<1>(out3210), tmp);
+			      + c7654 * mmSetAll<0>(tmp);
+    return out3210;
 }
 
 template <class S> static void
@@ -288,21 +290,21 @@ IIRFilter<D>::forward(const Array<T, B>& in, Array<float, B2>& out) const
 {
     out.resize(in.dim());
 
-    const T*	src = in;
-    float*	dst = out;
-    for (const T* const	tail = &in[in.dim()]; src < tail; ++src)
+    const T*	src = in.begin();
+    for (float* dst = out.begin(); dst < out.end(); ++dst)
     {
-	const int	d = std::min(int(D), src - (const T*)in);
-	
-	if (d == 0)
-	    *dst = _c[1] * src[0];
+	int	d = dst - out.begin();
+
+	if (d < D)
+	    *dst = _c[D-1-d]*src[-d];
 	else
 	{
+	    d = D;
 	    *dst = 0;
-	    for (int i = -d; i++ < 0; )
-		*dst += (_c[D-1+i]*src[i] + _c[D+D-1+i]*dst[i-1]);
 	}
-	++dst;
+	for (int i = -d; i++ < 0; )
+	    *dst += (_c[D-1+i]*src[i] + _c[D+D-1+i]*dst[i-1]);
+	++src;
     }
 
     return *this;
@@ -320,12 +322,12 @@ IIRFilter<D>::backward(const Array<T, B>& in, Array<float, B2>& out) const
 {
     out.resize(in.dim());
 
-    const T*	src = &in[in.dim()];
-    float*	dst = &out[out.dim()];
-    for (const T* const	head = in; src > head; )
+    const T*	src = in.end();
+    for (float* dst = out.end(); dst > out.begin(); )
     {
-	const int	d = std::min(int(D), &in[in.dim()] - src--);
+	const int	d = std::min(int(D), out.end() - dst);
 
+	--src;
       	*--dst = 0;
 	for (int i = 0; i < d; ++i)
 	    *dst += (_c[i]*src[i+1] + _c[D+i]*dst[i+1]);
@@ -341,29 +343,29 @@ IIRFilter<2u>::forward(const Array<T, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    const T*		src = in;
-    float*		dst = out;
-    const T* const	tail = &in[in.dim()];
+    const T*	src = in.begin();
+    float*	dst = out.begin();
 #if defined(SSE2)
     const mmFlt	c0123 = mmSet(_c[0], _c[1], _c[2], _c[3]);
     mmFlt	tmp = mmSet(_c[0]*src[1], _c[0]*src[0] + _c[1]*src[1],
-			    _c[0]*src[0] + _c[1]*src[0], 0.0);
+			    _c[1]*src[0], 0.0);
     src += 2;
-    for (const T* const tail2 = tail - mmNBytes/sizeof(T); src <= tail2; )
+    for (const float* const tail2 = out.end() - mmNBytes/sizeof(T);
+	 dst <= tail2; )
 	mmForward2(src, dst, c0123, tmp);
     mmEmpty();
 #else
-    *dst = (_c[0] + _c[1])*src[0];
+    *dst = _c[1]*src[0];
     ++src;
     ++dst;
-    *dst = _c[0]*src[-1] + _c[1]*src[0] + (_c[2] + _c[3])*dst[-1];
+    *dst = _c[0]*src[-1] + _c[1]*src[0] + _c[3]*dst[-1];
     ++src;
     ++dst;
 #endif
-    for (; src < tail; ++src)
+    for (; dst < out.end(); ++dst)
     {
 	*dst = _c[0]*src[-1] + _c[1]*src[0] + _c[2]*dst[-2] + _c[3]*dst[-1];
-	++dst;
+	++src;
     }
 
     return *this;
@@ -376,28 +378,29 @@ IIRFilter<2u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    float*		dst = &out[out.dim()];
-    const T*		src = &in[in.dim()];
-    const T* const	head = &in[0];
+    float*		dst = out.end();
+    const T*		src = in.end();
 #if defined(SSE2)
     const mmFlt		c1032 = mmSet(_c[1], _c[0], _c[3], _c[2]);
-    mmFlt		tmp   = mmSet(_c[1]*src[-1], (_c[0] + _c[1])*src[-1],
-				      (_c[0] + _c[1])*src[-1], 0.0);
+    mmFlt		tmp   = mmSet(_c[1]*src[-2],
+				      _c[1]*src[-1] + _c[0]*src[-2],
+				      _c[0]*src[-1], 0.0);
     src -= 2;
-    for (const T* const head2 = head + mmNBytes/sizeof(T); src >= head2; )
+    for (const float* const head2 = out.begin() + mmNBytes/sizeof(T);
+	 dst >= head2; )
 	mmBackward2(src, dst, c1032, tmp);
     mmEmpty();
 #else
     --src;
     --dst;
-    *dst = (_c[0] + _c[1])*src[0];
+    *dst = 0.0;
     --src;
     --dst;
-    *dst = (_c[0] + _c[1])*src[1] + (_c[2] + _c[3])*dst[1];
+    *dst = _c[0]*src[1] + _c[2]*dst[1];
 #endif
-    for (const T* const head = in; --src >= head; )
+    while (--dst >= out.begin())
     {
-	--dst;
+	--src;
 	*dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*dst[1] + _c[3]*dst[2];
     }
 
@@ -411,27 +414,26 @@ IIRFilter<4u>::forward(const Array<T, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    const T*		src = in;
-    float*		dst = out;
-    const T* const	tail = &in[in.dim()];
+    const T*		src = in.begin();
+    float*		dst = out.begin();
 #if defined(SSE2)
     const mmFlt		c0123 = mmSet(_c[0], _c[1], _c[2], _c[3]),
 			c4567 = mmSet(_c[4], _c[5], _c[6], _c[7]);
-    mmFlt		tmp   = mmSet(_c[0]*src[0], (_c[0] + _c[1])*src[0],
-				      (_c[0] + _c[1] + _c[2])*src[0], 0.0);
-    for (const T* const tail2 = tail - mmNBytes/sizeof(T); src <= tail2; )
+    mmFlt		tmp   = mmZero<mmFlt>();
+    for (const float* const tail2 = out.end() - mmNBytes/sizeof(T);
+	 dst <= tail2; )
 	mmForward4(src, dst, c0123, c4567, tmp);
     mmEmpty();
 #else
-    *dst = (_c[0] + _c[1] + _c[2] + _c[3])*src[0];
+    *dst = _c[3]*src[0];
     ++src;
     ++dst;
-    *dst = (_c[0] + _c[1] + _c[2])*src[-1] + _c[3]*src[0]
-					   + _c[7]*dst[-1];
+    *dst = _c[2]*src[-1] + _c[3]*src[0]
+			 + _c[7]*dst[-1];
     ++src;
     ++dst;
-    *dst = (_c[0] + _c[1])*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
-				   + _c[6]*dst[-2] + _c[7]*dst[-1];
+    *dst = _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
+			 + _c[6]*dst[-2] + _c[7]*dst[-1];
     ++src;
     ++dst;
     *dst = _c[0]*src[-3] + _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
@@ -439,9 +441,12 @@ IIRFilter<4u>::forward(const Array<T, B>& in, Array<float, B2>& out) const
     ++src;
     ++dst;
 #endif
-    for (; src < tail; ++src)
-	*dst++ = _c[0]*src[-3] + _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
-	       + _c[4]*dst[-4] + _c[5]*dst[-3] + _c[6]*dst[-2] + _c[7]*dst[-1];
+    for (; dst < out.end(); ++dst)
+    {
+	*dst = _c[0]*src[-3] + _c[1]*src[-2] + _c[2]*src[-1] + _c[3]*src[0]
+	     + _c[4]*dst[-4] + _c[5]*dst[-3] + _c[6]*dst[-2] + _c[7]*dst[-1];
+	++src;
+    }
 
     return *this;
 }
@@ -453,37 +458,36 @@ IIRFilter<4u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    float*		dst = &out[out.dim()];
-    const T*		src = &in[in.dim()];
-    const T* const	head = &in[0];
+    float*		dst = out.end();
+    const T*		src = in.end();
 #if defined(SSE2)
     const mmFlt		c3210 = mmSet(_c[3], _c[2], _c[1], _c[0]),
 			c7654 = mmSet(_c[7], _c[6], _c[5], _c[4]);
-    mmFlt		tmp   = mmSet(_c[3]*src[-1], (_c[3] + _c[2])*src[-1],
-				      (_c[3] + _c[2] + _c[1])*src[-1], 0.0);
-    for (const T* const head2 = head + mmNBytes/sizeof(T); src >= head2; )
+    mmFlt		tmp   = mmZero<mmFlt>();
+    for (const float* const head2 = out.begin() + mmNBytes/sizeof(T);
+	 dst >= head2; )
 	mmBackward4(src, dst, c3210, c7654, tmp);
     mmEmpty();
 #else
     --src;
     --dst;
-    *dst = (_c[0] + _c[1] + _c[2] + _c[3])*src[0];
+    *dst = 0.0;
     --src;
     --dst;
-    *dst = (_c[0] + _c[1] + _c[2] + _c[3])*src[1];
+    *dst = _c[0]*src[1];
 	 + _c[4]*dst[1];
     --src;
     --dst;
-    *dst = _c[0]*src[1] + (_c[1] + _c[2] + _c[3])*src[2]
+    *dst = _c[0]*src[1] + _c[1]*src[2]
 	 + _c[4]*dst[1] + _c[5]*dst[2];
     --src;
     --dst;
-    *dst = _c[0]*src[1] + _c[1]*src[2] + (_c[2] + _c[3])*src[3]
+    *dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*src[3]
 	 + _c[4]*dst[1] + _c[5]*dst[2] + _c[6]*dst[3];
 #endif
-    for (const T* const head = in; --src >= head; )
+    while (--dst >= out.begin())
     {
-	--dst;
+	--src;
 	*dst = _c[0]*src[1] + _c[1]*src[2] + _c[2]*src[3] + _c[3]*src[4]
 	     + _c[4]*dst[1] + _c[5]*dst[2] + _c[6]*dst[3] + _c[7]*dst[4];
     }
