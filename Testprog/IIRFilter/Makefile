@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.17 2008-10-09 05:52:29 ueshiba Exp $
+#  $Id: Makefile,v 1.18 2009-06-08 05:14:57 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,7 +10,7 @@ INCDIRS		= -I. -I$(HOME)/include
 PROGRAM		= EdgeDetector
 LIBS		= -lTUTools++
 
-CPPFLAGS	= -DDEBUG
+CPPFLAGS	= -DDEBUG -DSSE2
 CFLAGS		= -g
 CCFLAGS		= -g
 LDFLAGS		= -L$(LIBDIR)
@@ -39,7 +39,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.17 $	|		\
+REV		= $(shell echo $Revision: 1.18 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
