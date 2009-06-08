@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.5 2009-06-08 05:14:44 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.6 2009-06-08 23:45:55 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -349,11 +349,12 @@ IIRFilter<2u>::forward(const Array<T, B>& in, Array<float, B2>& out) const
     const mmFlt	c0123 = mmSet(_c[0], _c[1], _c[2], _c[3]);
     mmFlt	tmp = mmSet(_c[0]*src[1], _c[0]*src[0] + _c[1]*src[1],
 			    _c[1]*src[0], 0.0);
-    src += 2;
-    for (const float* const tail2 = out.end() - mmNBytes/sizeof(T);
-	 dst <= tail2; )
+    src += 2;			// mmForward2()のために2つ前進．
+    for (const float* const tail2 = out.end() - mmNBytes/sizeof(T) - 2;
+	 dst <= tail2; )	// srcがdstよりも2つ前進しているのでoverrunに注意．
 	mmForward2(src, dst, c0123, tmp);
     mmEmpty();
+    src -= 2;			// 2つ前進していた分を元に戻す．
 #else
     *dst = _c[1]*src[0];
     ++src;
@@ -378,18 +379,18 @@ IIRFilter<2u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    float*		dst = out.end();
-    const T*		src = in.end();
+    float*	dst = out.end();
+    const T*	src = in.end();
 #if defined(SSE2)
-    const mmFlt		c1032 = mmSet(_c[1], _c[0], _c[3], _c[2]);
-    mmFlt		tmp   = mmSet(_c[1]*src[-2],
-				      _c[1]*src[-1] + _c[0]*src[-2],
-				      _c[0]*src[-1], 0.0);
-    src -= 2;
-    for (const float* const head2 = out.begin() + mmNBytes/sizeof(T);
-	 dst >= head2; )
+    const mmFlt	c1032 = mmSet(_c[1], _c[0], _c[3], _c[2]);
+    mmFlt	tmp   = mmSet(_c[1]*src[-2], _c[1]*src[-1] + _c[0]*src[-2],
+			      _c[0]*src[-1], 0.0);
+    src -= 2;			// mmBackward2()のために2つ後退．
+    for (const float* const head2 = out.begin() + mmNBytes/sizeof(T) + 2;
+	 dst >= head2; )	// srcがdstよりも2つ後退しているのでoverrunに注意．
 	mmBackward2(src, dst, c1032, tmp);
     mmEmpty();
+    src += 2;			// 2つ後退していた分を元に戻す．
 #else
     --src;
     --dst;
@@ -414,12 +415,12 @@ IIRFilter<4u>::forward(const Array<T, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    const T*		src = in.begin();
-    float*		dst = out.begin();
+    const T*	src = in.begin();
+    float*	dst = out.begin();
 #if defined(SSE2)
-    const mmFlt		c0123 = mmSet(_c[0], _c[1], _c[2], _c[3]),
-			c4567 = mmSet(_c[4], _c[5], _c[6], _c[7]);
-    mmFlt		tmp   = mmZero<mmFlt>();
+    const mmFlt	c0123 = mmSet(_c[0], _c[1], _c[2], _c[3]),
+		c4567 = mmSet(_c[4], _c[5], _c[6], _c[7]);
+    mmFlt	tmp   = mmZero<mmFlt>();
     for (const float* const tail2 = out.end() - mmNBytes/sizeof(T);
 	 dst <= tail2; )
 	mmForward4(src, dst, c0123, c4567, tmp);
@@ -458,12 +459,12 @@ IIRFilter<4u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
 	return *this;
 
     out.resize(in.dim());
-    float*		dst = out.end();
-    const T*		src = in.end();
+    float*	dst = out.end();
+    const T*	src = in.end();
 #if defined(SSE2)
-    const mmFlt		c3210 = mmSet(_c[3], _c[2], _c[1], _c[0]),
-			c7654 = mmSet(_c[7], _c[6], _c[5], _c[4]);
-    mmFlt		tmp   = mmZero<mmFlt>();
+    const mmFlt	c3210 = mmSet(_c[3], _c[2], _c[1], _c[0]),
+		c7654 = mmSet(_c[7], _c[6], _c[5], _c[4]);
+    mmFlt	tmp   = mmZero<mmFlt>();
     for (const float* const head2 = out.begin() + mmNBytes/sizeof(T);
 	 dst >= head2; )
 	mmBackward4(src, dst, c3210, c7654, tmp);
