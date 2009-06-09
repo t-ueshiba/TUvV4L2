@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.73 2009-05-07 04:22:35 ueshiba Exp $
+#  $Id: Makefile,v 1.74 2009-06-09 00:47:25 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -12,13 +12,16 @@ NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
 CFLAGS		= -g
+NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   ifeq ($(OSTYPE), darwin)
     CPPFLAGS   += -DSSE3
-    CFLAGS	= -O3 -axP -ip
+    CFLAGS     += -axP
   else
     CPPFLAGS   += -DSSSE3
-    CFLAGS	= -O3 -xN -ip
+    CFLAGS     += -xN
   endif
 endif
 CCFLAGS		= $(CFLAGS)
@@ -28,7 +31,8 @@ LINKER		= $(CCC)
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= TU/Bezier++.h \
 		TU/BlockMatrix++.cc \
 		TU/BlockMatrix++.h \
@@ -152,7 +156,7 @@ OBJS		= Bezier++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.73 $	|		\
+REV		= $(shell echo $Revision: 1.74 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
