@@ -1,12 +1,12 @@
 #
-#  $Id: Makefile,v 1.22 2009-02-16 06:36:00 ueshiba Exp $
+#  $Id: Makefile,v 1.23 2009-07-08 01:10:18 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(LIBDIR)
-INCDIR		= $(HOME)/include/TU/Brep
-INCDIRS		= -I. -I$(HOME)/include
+DEST		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include/TU/Brep
+INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
@@ -29,13 +29,13 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Normalize.h \
-		/home/ueshiba/include/TU/Object++.cc \
-		/home/ueshiba/include/TU/Object++.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Object++.cc \
+		/usr/local/include/TU/Object++.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h \
 		TU/Brep/Brep++.h
 HDRS		= Brep++.h
 SRCS		= Geometry.cc \
@@ -56,7 +56,7 @@ OBJS		= Geometry.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.22 $	|		\
+REV		= $(shell echo $Revision: 1.23 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -67,46 +67,31 @@ REV		= $(shell echo $Revision: 1.22 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Geometry.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/Normalize.h
-HalfEdge.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/Normalize.h
-Loop.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/Normalize.h
-Neighbor.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/Normalize.h
-PointB.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/Normalize.h
-TUBrep++.inst.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/Object++.cc
-TUBrep++.sa.o: TU/Brep/Brep++.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/Normalize.h
+Geometry.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Normalize.h
+HalfEdge.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Normalize.h
+Loop.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Normalize.h
+Neighbor.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Normalize.h
+PointB.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Normalize.h
+TUBrep++.inst.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Normalize.h /usr/local/include/TU/Object++.cc
+TUBrep++.sa.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Normalize.h

@@ -1,12 +1,12 @@
 #
-#  $Id: Makefile,v 1.30 2009-05-10 23:34:27 ueshiba Exp $
+#  $Id: Makefile,v 1.31 2009-07-08 01:10:18 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(LIBDIR)
-INCDIR		= $(HOME)/include/TU
-INCDIRS		= -I. -I$(HOME)/include
+DEST		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include/TU
+INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
@@ -29,12 +29,12 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/Normalize.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h \
 		TU/Ieee1394++.h \
 		TU/Ieee1394CameraArray.h
 HDRS		= Ieee1394++.h \
@@ -49,7 +49,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.30 $	|		\
+REV		= $(shell echo $Revision: 1.31 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -60,19 +60,16 @@ REV		= $(shell echo $Revision: 1.30 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Ieee1394Camera.o: TU/Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h
+Ieee1394Camera.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h
 Ieee1394CameraArray.o: TU/Ieee1394CameraArray.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	TU/Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Normalize.h
-Ieee1394Node.o: TU/Ieee1394++.h /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Normalize.h
+Ieee1394Node.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h

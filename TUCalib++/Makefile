@@ -1,12 +1,12 @@
 #
-#  $Id: Makefile,v 1.25 2009-02-16 06:36:12 ueshiba Exp $
+#  $Id: Makefile,v 1.26 2009-07-08 01:10:18 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(LIBDIR)
-INCDIR		= $(HOME)/include/TU
-INCDIRS		= -I. -I$(HOME)/include
+DEST		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include/TU
+INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
@@ -29,14 +29,14 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/BlockMatrix++.h \
-		/home/ueshiba/include/TU/Camera.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Minimize.h \
-		/home/ueshiba/include/TU/Normalize.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/BlockMatrix++.h \
+		/usr/local/include/TU/Camera.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Minimize.h \
+		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h \
 		TU/Calib++.cc \
 		TU/Calib++.h
 HDRS		= Calib++.h
@@ -72,7 +72,7 @@ OBJS		= Calib++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.25 $	|		\
+REV		= $(shell echo $Revision: 1.26 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -83,71 +83,63 @@ REV		= $(shell echo $Revision: 1.25 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Calib++.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h
-MeasurementMatrix.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h TU/Calib++.cc
-Normalization.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h
-affine_registration.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
-assess_projection.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h
-decompose_essential.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h
-decompose_homography.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
-euclidean_registration.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
-get_flengths.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
-get_principal.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
-io.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h
-plane_motion.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h
-projection.o: TU/Calib++.h /home/ueshiba/include/TU/Camera.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/BlockMatrix++.h \
-	/home/ueshiba/include/TU/Minimize.h
-similarity_registration.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+Calib++.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h
+MeasurementMatrix.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h TU/Calib++.cc
+Normalization.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h
+affine_registration.o: /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
+assess_projection.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h
+decompose_essential.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h
+decompose_homography.o: /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
+euclidean_registration.o: /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
+get_flengths.o: /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
+get_principal.o: /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
+io.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h
+plane_motion.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h
+projection.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/BlockMatrix++.h \
+	/usr/local/include/TU/Minimize.h
+similarity_registration.o: /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
