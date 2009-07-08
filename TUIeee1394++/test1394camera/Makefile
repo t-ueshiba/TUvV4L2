@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.11 2009-05-13 01:15:01 ueshiba Exp $
+#  $Id: Makefile,v 1.12 2009-07-08 06:37:32 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I/usr/local/include -I..
+DEST		= $(PREFIX)/bin
+INCDIRS		= -I$(LOCALDIR)/include -I..
 
 PROGRAM		= test1394camera
 #LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell gtk-config --libs)
@@ -26,7 +26,13 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= ../TU/Ieee1394++.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Ieee1394++.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h
 HDRS		= My1394Camera.h \
 		MyDialog.h
 SRCS		= My1394Camera.cc \
@@ -43,7 +49,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.11 $	|		\
+REV		= $(shell echo $Revision: 1.12 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -54,8 +60,24 @@ REV		= $(shell echo $Revision: 1.11 $	|		\
 
 include $(PROJECT)/lib/p.mk
 ###
-My1394Camera.o: My1394Camera.h ../TU/Ieee1394++.h
-MyDialog.o: MyDialog.h ../TU/Ieee1394++.h
-createCommands.o: My1394Camera.h ../TU/Ieee1394++.h
-createMenubar.o: My1394Camera.h ../TU/Ieee1394++.h MyDialog.h
-main.o: My1394Camera.h ../TU/Ieee1394++.h
+My1394Camera.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h
+MyDialog.o: MyDialog.h /usr/local/include/TU/Ieee1394++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h
+createCommands.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h
+createMenubar.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
+	MyDialog.h
+main.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h
