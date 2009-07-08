@@ -1,12 +1,12 @@
 #
-#  $Id: Makefile,v 1.74 2009-06-09 00:47:25 ueshiba Exp $
+#  $Id: Makefile,v 1.75 2009-07-08 01:09:00 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(LIBDIR)
-INCDIR		= $(HOME)/include/TU
-INCDIRS		= -I. -I$(HOME)/include
+DEST		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include/TU
+INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
@@ -156,7 +156,7 @@ OBJS		= Bezier++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.74 $	|		\
+REV		= $(shell echo $Revision: 1.75 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
