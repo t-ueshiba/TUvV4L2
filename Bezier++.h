@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Bezier++.h,v 1.11 2008-09-10 05:10:30 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.12 2009-07-09 04:18:48 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -47,7 +47,7 @@ class BezierCurve : private Array<C>
     BezierCurve(u_int p=0)	 :Array<C>(p+1)	{}
     BezierCurve(const Array<C>& b) :Array<C>(b)	{}
 
-    static u_int	dim()			{return C::dim();}
+    static u_int	dim()			{return C::size();}
 
     u_int	degree()		  const	{return Array<C>::dim()-1;}
     C		operator ()(T t)	  const	;
@@ -94,7 +94,7 @@ class BezierSurface : private Array2<BezierCurve<C> >
     BezierSurface(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}
     BezierSurface(const Array2<Array<C> >& b)			;
 
-    static u_int	dim()				{return C::dim();}
+    static u_int	dim()				{return C::size();}
 
     u_int	uDegree()			const	{return ncol()-1;}
     u_int	vDegree()			const	{return nrow()-1;}

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Nurbs++.h,v 1.12 2008-09-10 05:10:43 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.13 2009-07-09 04:18:48 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -80,7 +80,7 @@ class BSplineCurve : private Array<C>
     
     BSplineCurve(u_int degree, T us=0.0, T ue=1.0)	;
 
-    static u_int	dim()			{return C::dim();}
+    static u_int	dim()			{return C::size();}
 
     u_int	degree()		  const	{return _knots.degree();}
     u_int	M()			  const	{return _knots.M();}
@@ -140,7 +140,7 @@ class BSplineSurface : private Array2<Array<C> >
     BSplineSurface(u_int uDegree, u_int vDegree,
 		   T us=0.0, T ue=1.0, T vs=0.0, T ve=1.0)	;
 
-    static u_int	dim()			{return C::dim();}
+    static u_int	dim()			{return C::size();}
 
     u_int	uDegree()		const	{return _uKnots.degree();}
     u_int	uM()			const	{return _uKnots.M();}
