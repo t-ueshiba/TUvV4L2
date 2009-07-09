@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2009-07-09 04:58:26 ueshiba Exp $
  */
 /*!
   \mainpage	manustest
@@ -140,7 +140,3 @@ main(int argc, char* argv[])
     
     return 0;
 }
-
-#ifdef __GNUG__
-#  include "TU/Geometry++.cc"
-#endif

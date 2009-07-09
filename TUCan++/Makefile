@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.10 2009-07-08 01:10:18 ueshiba Exp $
+#  $Id: Makefile,v 1.11 2009-07-09 04:58:21 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -29,9 +29,9 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h \
 		TU/Can++.h
 HDRS		= Can++.h
 SRCS		= Can.cc \
@@ -42,7 +42,7 @@ OBJS		= Can.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.10 $	|		\
+REV		= $(shell echo $Revision: 1.11 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -53,7 +53,7 @@ REV		= $(shell echo $Revision: 1.10 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Can.o: TU/Can++.h /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
-Manus.o: TU/Can++.h /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+Can.o: TU/Can++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
+Manus.o: TU/Can++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h

@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.5 2009-07-08 01:10:19 ueshiba Exp $
+#  $Id: Makefile,v 1.6 2009-07-09 04:58:28 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include -I$(X11HOME)/include
+DEST		= $(PREFIX)/bin
+INCDIRS		= -I$(PREFIX)/include -I$(X11HOME)/include
 
 PROGRAM		= vtest
 LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11
@@ -13,7 +13,7 @@ LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11
 CPPFLAGS	= -DTUArrayPP_RangeCheck
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR) -L$(X11HOME)/lib
+LDFLAGS		=
 
 LINKER		= $(CCC)
 
@@ -21,26 +21,26 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/List.h \
-		/home/ueshiba/include/TU/Manip.h \
-		/home/ueshiba/include/TU/Normalize.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h \
-		/home/ueshiba/include/TU/v/App.h \
-		/home/ueshiba/include/TU/v/CanvasPane.h \
-		/home/ueshiba/include/TU/v/CanvasPaneDC.h \
-		/home/ueshiba/include/TU/v/CmdPane.h \
-		/home/ueshiba/include/TU/v/CmdWindow.h \
-		/home/ueshiba/include/TU/v/Colormap.h \
-		/home/ueshiba/include/TU/v/DC.h \
-		/home/ueshiba/include/TU/v/Menu.h \
-		/home/ueshiba/include/TU/v/ShmDC.h \
-		/home/ueshiba/include/TU/v/TUv++.h \
-		/home/ueshiba/include/TU/v/Widget-Xaw.h \
-		/home/ueshiba/include/TU/v/XDC.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/List.h \
+		/usr/local/include/TU/Manip.h \
+		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/v/App.h \
+		/usr/local/include/TU/v/CanvasPane.h \
+		/usr/local/include/TU/v/CanvasPaneDC.h \
+		/usr/local/include/TU/v/CmdPane.h \
+		/usr/local/include/TU/v/CmdWindow.h \
+		/usr/local/include/TU/v/Colormap.h \
+		/usr/local/include/TU/v/DC.h \
+		/usr/local/include/TU/v/Menu.h \
+		/usr/local/include/TU/v/ShmDC.h \
+		/usr/local/include/TU/v/TUv++.h \
+		/usr/local/include/TU/v/Widget-Xaw.h \
+		/usr/local/include/TU/v/XDC.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -48,7 +48,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.5 $	|		\
+REV		= $(shell echo $Revision: 1.6 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -60,19 +60,14 @@ REV		= $(shell echo $Revision: 1.5 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-main.o: /home/ueshiba/include/TU/v/App.h \
-	/home/ueshiba/include/TU/v/TUv++.h \
-	/home/ueshiba/include/TU/v/Colormap.h \
-	/home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h /home/ueshiba/include/TU/List.h \
-	/home/ueshiba/include/TU/v/Widget-Xaw.h \
-	/home/ueshiba/include/TU/v/CmdWindow.h \
-	/home/ueshiba/include/TU/v/CmdPane.h \
-	/home/ueshiba/include/TU/v/CanvasPane.h \
-	/home/ueshiba/include/TU/v/CanvasPaneDC.h \
-	/home/ueshiba/include/TU/v/XDC.h /home/ueshiba/include/TU/v/DC.h \
-	/home/ueshiba/include/TU/Manip.h /home/ueshiba/include/TU/v/Menu.h \
-	/home/ueshiba/include/TU/v/ShmDC.h
+main.o: /usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Normalize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/CanvasPane.h \
+	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
+	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h

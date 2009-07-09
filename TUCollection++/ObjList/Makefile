@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.5 2005-05-10 05:20:24 ueshiba Exp $
+#  $Id: Makefile,v 1.6 2009-07-09 04:58:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include
+DEST		= $(PREFIX)/bin
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= listtest
 LIBS		= -lTUCollection++ -lTUObject++
@@ -13,17 +13,17 @@ LIBS		= -lTUCollection++ -lTUObject++
 CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR)
+LDFLAGS		=
 LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Collection++.cc \
-		/home/ueshiba/include/TU/Collection++.h \
-		/home/ueshiba/include/TU/Object++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= /usr/local/include/TU/Collection++.cc \
+		/usr/local/include/TU/Collection++.h \
+		/usr/local/include/TU/Object++.h \
+		/usr/local/include/TU/types.h
 HDRS		= Int.h
 SRCS		= Int.cc \
 		listtest.cc
@@ -33,7 +33,7 @@ OBJS		= Int.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.5 $	|		\
+REV		= $(shell echo $Revision: 1.6 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -44,9 +44,8 @@ REV		= $(shell echo $Revision: 1.5 $	|		\
 
 include $(PROJECT)/lib/p.mk
 ###
-Int.o: Int.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h
-listtest.o: Int.h /home/ueshiba/include/TU/Object++.h \
-	/home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Collection++.h \
-	/home/ueshiba/include/TU/Collection++.cc
+Int.o: Int.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h
+listtest.o: Int.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Collection++.h \
+	/usr/local/include/TU/Collection++.cc
