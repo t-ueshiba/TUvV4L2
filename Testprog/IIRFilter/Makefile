@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.18 2009-06-08 05:14:57 ueshiba Exp $
+#  $Id: Makefile,v 1.19 2009-07-09 04:19:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I. -I$(HOME)/include
+DEST		= $(PREFIX)
+INCDIRS		= -I. -I$(PREFIX)/include
 
 PROGRAM		= EdgeDetector
 LIBS		= -lTUTools++
@@ -13,7 +13,7 @@ LIBS		= -lTUTools++
 CPPFLAGS	= -DDEBUG -DSSE2
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR)
+LDFLAGS		=
 
 LINKER		= $(CCC)
 
@@ -21,17 +21,17 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/DericheConvolver.h \
-		/home/ueshiba/include/TU/EdgeDetector.h \
-		/home/ueshiba/include/TU/GaussianConvolver.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/IIRFilter.h \
-		/home/ueshiba/include/TU/Image++.h \
-		/home/ueshiba/include/TU/Normalize.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/mmInstructions.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/DericheConvolver.h \
+		/usr/local/include/TU/EdgeDetector.h \
+		/usr/local/include/TU/GaussianConvolver.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/IIRFilter.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -39,7 +39,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.18 $	|		\
+REV		= $(shell echo $Revision: 1.19 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -51,13 +51,11 @@ REV		= $(shell echo $Revision: 1.18 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: /home/ueshiba/include/TU/Image++.h \
-	/home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/GaussianConvolver.h \
-	/home/ueshiba/include/TU/IIRFilter.h \
-	/home/ueshiba/include/TU/mmInstructions.h \
-	/home/ueshiba/include/TU/DericheConvolver.h \
-	/home/ueshiba/include/TU/EdgeDetector.h
+main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/GaussianConvolver.h \
+	/usr/local/include/TU/IIRFilter.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/DericheConvolver.h \
+	/usr/local/include/TU/EdgeDetector.h
