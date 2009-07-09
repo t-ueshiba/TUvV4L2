@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.3 2008-08-07 08:17:39 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2009-07-09 04:19:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)			# destination of the program
-INCDIRS		= -I$(HOME)/include
+DEST		= $(PREFIX)/bin			# destination of the program
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= test2
 LIBS		= -lTUTools++
@@ -13,7 +13,7 @@ LIBS		= -lTUTools++
 CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR)
+LDFLAGS		=
 
 LINKER		= $(CCC)
 
@@ -21,8 +21,8 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= test2.cc
 OBJS		= test2.o
@@ -30,7 +30,7 @@ OBJS		= test2.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= `echo $Revision: 1.3 $	|			\
+REV		= `echo $Revision: 1.4 $	|			\
 		  sed 's/evision://'	|			\
 		  awk -F"."					\
 		  '{						\
@@ -42,5 +42,4 @@ REV		= `echo $Revision: 1.3 $	|			\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-test2.o: /home/ueshiba/include/TU/Array++.h \
-	/home/ueshiba/include/TU/types.h
+test2.o: /usr/local/include/TU/Array++.h /usr/local/include/TU/types.h

@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.4 2007-03-12 07:15:58 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2009-07-09 04:19:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include
+DEST		= $(PREFIX)/bin
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= mtest
 LIBS		= -lTUTools++
@@ -13,16 +13,16 @@ LIBS		= -lTUTools++
 CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR)
+LDFLAGS		=
 LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= mtest.cc
 OBJS		= mtest.o
@@ -30,7 +30,7 @@ OBJS		= mtest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -41,5 +41,5 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 
 include $(PROJECT)/lib/p.mk
 ###
-mtest.o: /home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+mtest.o: /usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h

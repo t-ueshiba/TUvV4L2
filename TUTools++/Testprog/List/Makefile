@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.4 2008-09-02 05:13:16 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2009-07-09 04:19:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include
+DEST		= $(PREFIX)
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= slisttest
 LIBS		=
@@ -13,7 +13,7 @@ LIBS		=
 CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR)
+LDFLAGS		=
 
 LINKER		= $(CCC)
 
@@ -21,7 +21,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/List.h
+EXTHDRS		= /usr/local/include/TU/List.h
 HDRS		=
 SRCS		= slisttest.cc
 OBJS		= slisttest.o
@@ -29,7 +29,7 @@ OBJS		= slisttest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -41,4 +41,4 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-slisttest.o: /home/ueshiba/include/TU/List.h
+slisttest.o: /usr/local/include/TU/List.h

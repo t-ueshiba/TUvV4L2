@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.4 2008-09-02 05:13:16 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2009-07-09 04:19:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include
+DEST		= $(PREFIX)/bin
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= heaptest
 LIBS		= -lTUTools++
@@ -13,7 +13,7 @@ LIBS		= -lTUTools++
 CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR)
+LDFLAGS		=
 
 LINKER		= $(CCC)
 
@@ -21,9 +21,9 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Heap.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Heap.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= heaptest.cc
 OBJS		= heaptest.o
@@ -31,7 +31,7 @@ OBJS		= heaptest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -43,5 +43,5 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-heaptest.o: /home/ueshiba/include/TU/Heap.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h
+heaptest.o: /usr/local/include/TU/Heap.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h

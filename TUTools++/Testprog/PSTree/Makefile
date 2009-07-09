@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.8 2008-10-09 05:52:29 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2009-07-09 04:19:26 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(BINDIR)
-INCDIRS		= -I$(HOME)/include
+DEST		= $(PREFIX)
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= pstreetest
 LIBS		= -lTUTools++
@@ -13,7 +13,7 @@ LIBS		= -lTUTools++
 CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
-LDFLAGS		= -L$(LIBDIR)
+LDFLAGS		=
 
 LINKER		= $(CCC)
 
@@ -36,7 +36,7 @@ OBJS		= pstreetest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
