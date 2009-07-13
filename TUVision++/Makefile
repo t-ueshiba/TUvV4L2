@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.24 2009-07-09 04:58:27 ueshiba Exp $
+#  $Id: Makefile,v 1.25 2009-07-13 01:15:15 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -12,13 +12,16 @@ NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	= -DTUBrepPP_DEBUG
 CFLAGS		= -g
+NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   ifeq ($(OSTYPE), darwin)
     CPPFLAGS   += -DSSE3
-    CFLAGS	= -O3 -axP
+    CFLAGS     += -xSSE3
   else
-    CPPFLAGS   += -DSSSE3
-    CFLAGS	= -O3 -xN
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
   endif
 endif
 CCFLAGS		= $(CFLAGS)
@@ -28,7 +31,8 @@ LINKER		= $(CCC)
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Brep/Brep++.h \
 		/usr/local/include/TU/Geometry++.h \
@@ -59,7 +63,7 @@ OBJS		= BrepCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.24 $	|		\
+REV		= $(shell echo $Revision: 1.25 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
