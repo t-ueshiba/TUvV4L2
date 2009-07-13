@@ -1,24 +1,27 @@
 #
-#  $Id: Makefile,v 1.30 2009-07-08 01:10:18 ueshiba Exp $
+#  $Id: Makefile,v 1.31 2009-07-13 01:14:50 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include/TU/v
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I. -I$(PREFIX)/include -I$(X11HOME)/include
 
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
 CFLAGS		= -g
+NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   ifeq ($(OSTYPE), darwin)
     CPPFLAGS   += -DSSE3
-    CFLAGS	= -O3 -axP
+    CFLAGS     += -xSSE3
   else
-    CPPFLAGS   += -DSSSE3
-    CFLAGS	= -O3 -xN
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
   endif
 endif
 CCFLAGS		= $(CFLAGS)
@@ -28,7 +31,8 @@ LINKER		= $(CCC)
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -200,7 +204,7 @@ OBJS		= App.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.30 $	|		\
+REV		= $(shell echo $Revision: 1.31 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
