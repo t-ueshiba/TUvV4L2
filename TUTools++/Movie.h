@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.2 2009-07-27 07:32:05 ueshiba Exp $
+ *  $Id: Movie.h,v 1.3 2009-07-27 23:25:44 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -47,10 +47,10 @@ namespace TU
 template <class T> class Movie
 {
   private:
-    class ImageWithOffset : public Image<T>
+    class View : public Image<T>
     {
       public:
-	ImageWithOffset()	:Image<T>(), offset(0)			{}
+	View()	:Image<T>(), offset(0)			{}
 	
 	u_int	offset;
     };
@@ -99,20 +99,20 @@ template <class T> class Movie
     static u_int	nelements(u_int npixels)			;
     
   private:
-    Array<ImageWithOffset>	_images;
-    u_int			_nelements;	// # of elements per frame.
-    u_int			_cView;		// current view #.
-    Array<Array<T> >		_frames;
-    u_int			_cFrame;	// current frame #.
+    Array<View>		_views;
+    u_int		_cView;			// current view #.
+    u_int		_nelements;		// # of elements per frame.
+    Array<Array<T> >	_frames;
+    u_int		_cFrame;		// current frame #.
 #ifdef DEBUG
-    std::ofstream		_log;
+    std::ofstream	_log;
 #endif
 };
 
 //! ムービーを生成する．
 template <class T> inline
 Movie<T>::Movie()
-    :_images(0), _nelements(0), _cView(0), _frames(0), _cFrame(0)
+    :_views(0), _cView(0), _nelements(0), _frames(0), _cFrame(0)
 {
 #ifdef DEBUG
     _log.open("Movie.log");
@@ -128,11 +128,14 @@ Movie<T>::~Movie()
 #endif
 }
 
-//! 
+//! ムービーの状態が正常であるか調べる．
+/*!
+  \return	現在のフレームが「末尾の次」に達していればfalse, そうでなければtrue
+*/
 template <class T> inline
 Movie<T>::operator bool() const
 {
-    return (_cFrame < nframes() && _cView < nviews());
+    return (_cView < nviews() && _cFrame < nframes());
 }
 
 //! フレーム数を返す．
@@ -152,7 +155,7 @@ Movie<T>::nframes() const
 template <class T> inline u_int
 Movie<T>::nviews() const
 {
-    return _images.dim();
+    return _views.dim();
 }
 
 //! 現在のフレーム番号を返す．
@@ -182,7 +185,7 @@ Movie<T>::currentView() const
 template <class T> inline u_int
 Movie<T>::width() const
 {
-    return (_cView < nviews() ? _images[_cView].width() : 0);
+    return (_cView < nviews() ? _views[_cView].width() : 0);
 }
     
 //! 現在のviewの画像の高さを返す．
@@ -192,7 +195,7 @@ Movie<T>::width() const
 template <class T> inline u_int
 Movie<T>::height() const
 {
-    return (_cView < nviews() ? _images[_cView].height() : 0);
+    return (_cView < nviews() ? _views[_cView].height() : 0);
 }
 
 //! 現在のviewとframeに対応する画像を返す．
@@ -202,7 +205,7 @@ Movie<T>::height() const
 template <class T> inline const Image<T>&
 Movie<T>::image() const
 {
-    return _images[_cView];
+    return _views[_cView];
 }
 
 //! 現在のviewとframeに対応する画像を返す．
@@ -212,7 +215,7 @@ Movie<T>::image() const
 template <class T> inline Image<T>&
 Movie<T>::image()
 {
-    return _images[_cView];
+    return _views[_cView];
 }
 
 //! 現在のフレームを指定する．
@@ -236,8 +239,8 @@ Movie<T>::setFrame(u_int frame)
 	    _cFrame = frame;
 
 	    for (int i = 0; i < nviews(); ++i)
-		_images[i].resize((T*)_frames[_cFrame] + _images[i].offset,
-				  _images[i].height(), _images[i].width());
+		_views[i].resize((T*)_frames[_cFrame] + _views[i].offset,
+				 _views[i].height(), _views[i].width());
 	}
 	else
 	    _cFrame = nframes();
@@ -305,6 +308,13 @@ Movie<T>::operator --()
     return *this;
 }
 
+//! 各viewのサイズとフレーム数を指定してムービーの記憶領域を確保する．
+/*!
+  確保後は，現在のviewとフレームを共に0に設定する．
+  \param sizes	各viewの幅と高さのペアを収めた配列．配列のサイズがview数となる．
+  \param nf	フレーム数
+  \return	実際に確保されたフレーム数
+*/
 template <class T> u_int
 Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 {
@@ -315,11 +325,11 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 	 << ")" << endl;
 #endif
   // 各viewのオフセットと1フレームあたりの画素数を設定．
-    _images.resize(sizes.dim());
+    _views.resize(sizes.dim());
     _nelements = 0;
     for (int i = 0; i < nviews(); ++i)
     {
-	_images[i].offset = _nelements;
+	_views[i].offset = _nelements;
 	_nelements += nelements(sizes[i].first * sizes[i].second);
     }
 	     
@@ -347,8 +357,8 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
   // 指定された個数のviewとその大きさを設定．
     if (nframes() > 0)
 	for (int i = 0; i < nviews(); ++i)
-	    _images[i].resize((T*)_frames[0] + _images[i].offset,
-			      sizes[i].second, sizes[i].first);
+	    _views[i].resize((T*)_frames[0] + _views[i].offset,
+			     sizes[i].second, sizes[i].first);
     
     _cFrame = 0;
     _cView  = 0;
@@ -375,15 +385,15 @@ Movie<T>::restoreHeader(std::istream& in)
 {
     u_int	nv;
     in >> nv >> skipl;
-    _images.resize(nv);
+    _views.resize(nv);
 
     ImageBase::Type	type = ImageBase::DEFAULT;
     _nelements = 0;
     for (int i = 0; i < nviews(); ++i)
     {
-	type = _images[i].restoreHeader(in);
-	_images[i].offset = _nelements;
-	_nelements += nelements(_images[i].width() * _images[i].height());
+	type = _views[i].restoreHeader(in);
+	_views[i].offset = _nelements;
+	_nelements += nelements(_views[i].width() * _views[i].height());
     }
 
     return type;
@@ -405,9 +415,9 @@ Movie<T>::restoreFrames(std::istream& in, ImageBase::Type type, int m)
 	Array<T>	frame(_nelements);
 	for (int i = 0; i < nviews(); ++i)
 	{
-	    _images[i].resize((T*)frame + _images[i].offset,
-			      _images[i].height(), _images[i].width());
-	    _images[i].restoreData(in, type);
+	    _views[i].resize((T*)frame + _views[i].offset,
+			      _views[i].height(), _views[i].width());
+	    _views[i].restoreData(in, type);
 	}
 	restoreFrames(in, type, m + 1);
 	_frames[m] = frame;
@@ -454,7 +464,7 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
     
     out << nviews() << endl;
     for (int i = 0; i < nviews(); ++i)
-	type = _images[i].saveHeader(out, type);
+	type = _views[i].saveHeader(out, type);
     return type;
 }
 
@@ -469,7 +479,7 @@ template <class T> std::ostream&
 Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
 {
     for (int i = 0; i < nviews(); ++i)
-	_images[i].saveData(out, type);
+	_views[i].saveData(out, type);
     return out;
 }
 
