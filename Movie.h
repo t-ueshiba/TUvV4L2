@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.1 2009-07-27 06:47:47 ueshiba Exp $
+ *  $Id: Movie.h,v 1.2 2009-07-27 07:32:05 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -217,7 +217,7 @@ Movie<T>::image()
 
 //! 現在のフレームを指定する．
 /*!
-  frame < #\nframes() でない場合は現在フレームは #nframes() となり，
+  frame < #nframes() でない場合は現在フレームは #nframes() となり，
   #operator ()でfalseが返される状態になる．
   \param frame	フレーム番号
   \return	このムービーオブジェクト
@@ -250,7 +250,7 @@ Movie<T>::setFrame(u_int frame)
 
 //! 現在のviewを指定する．
 /*!
-  view < #\nviews() でない場合は何も変更しない．
+  view < #nviews() でない場合は何も変更しない．
   \param view	view番号
   \return	このムービーオブジェクト
 */
