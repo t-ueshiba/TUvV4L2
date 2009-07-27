@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.10 2008-10-14 00:42:56 ueshiba Exp $
+ *  $Id: types.h,v 1.11 2009-07-27 07:32:05 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -87,6 +87,7 @@
   - #TU::ImageLine
   - #TU::Image
   - #TU::GenericImage
+  - #TU::Movie
 
   <b>画像処理</b>
   - #TU::EdgeDetector
