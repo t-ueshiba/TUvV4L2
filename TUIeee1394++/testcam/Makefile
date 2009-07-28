@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1 2009-07-28 00:00:48 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2009-07-28 00:15:53 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -7,23 +7,36 @@
 DEST		= $(PREFIX)/bin
 INCDIRS		= -I../../../multicam/server -I$(PREFIX)/include -I$(X11HOME)/include
 
-PROGRAM		= testcam
-
+PROGRAM		= $(shell basename $(PWD))
 LIBS		= -lTUIeee1394++ -lTUXv++ -lTUv++ -lTUTools++ \
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
+ifeq ($(OSTYPE), darwin)
+  LIBS	       += -framework IOKit -framework CoreFoundation
+endif
 
-#CCC		= g++
-CPPFLAGS	= -DHAVE_LIBTUTOOLS__ -DMONO_IMAGE -DDEBUG #-DUseXvDC
-CFLAGS		= -O
-CCFLAGS		= -O
-LDFLAGS		=
+CPPFLAGS	= -DHAVE_LIBTUTOOLS__ -DMONO_IMAGE #-DDEBUG #-DUseXvDC
+CFLAGS		= -g
+NVCCFLAGS	= -g
+ifeq ($(CCC), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  ifeq ($(OSTYPE), darwin)
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
+  else
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
+  endif
+endif
+CCFLAGS		= $(CFLAGS)
 
 LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= ../../../multicam/server/multicam.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
@@ -74,7 +87,7 @@ OBJS		= MyCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -84,7 +97,7 @@ REV		= $(shell echo $Revision: 1.1 $	|		\
 		  }')
 
 include $(PROJECT)/lib/p.mk
-include $(PROJECT)/lib/RCS.mk
+
 ###
 MyCanvasPane.o: MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
