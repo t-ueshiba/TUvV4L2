@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.5 2009-07-09 04:19:26 ueshiba Exp $
+#  $Id: Makefile,v 1.6 2009-07-31 07:05:24 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -9,17 +9,34 @@ INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= mtest
 LIBS		= -lTUTools++
+ifeq ($(OSTYPE), darwin)
+  LIBS	       +=
+#  LIBS	       += -framework IOKit -framework CoreFoundation
+endif
 
 CPPFLAGS	=
-CFLAGS		= -g
-CCFLAGS		= -g
-LDFLAGS		=
+CFLAGS		= -g -Wextra
+NVCCFLAGS	= -g
+ifeq ($(CCC), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  ifeq ($(OSTYPE), darwin)
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
+  else
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
+  endif
+endif
+CCFLAGS		= $(CFLAGS)
+
 LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/types.h
@@ -30,7 +47,7 @@ OBJS		= mtest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.5 $	|		\
+REV		= $(shell echo $Revision: 1.6 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -40,6 +57,7 @@ REV		= $(shell echo $Revision: 1.5 $	|		\
 		  }')
 
 include $(PROJECT)/lib/p.mk
+
 ###
 mtest.o: /usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/types.h

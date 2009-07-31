@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: List.h,v 1.2 2008-09-10 05:10:40 ueshiba Exp $
+ *  $Id: List.h,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
  */
 #ifndef __TUList_h
 #define __TUList_h
@@ -175,44 +175,44 @@ class List
 };
  
 /*
- *  'i' $B$N0LCV$K(B 'x' $B$rA^F~$7!"$=$NA^F~$5$l$?0LCV$rJV$9!#(B
+ *  'i' ‚ÌˆÊ’u‚É 'x' ‚ğ‘}“ü‚µA‚»‚Ì‘}“ü‚³‚ê‚½ˆÊ’u‚ğ•Ô‚·B
  */
 template <class T> typename List<T>::Iterator
 List<T>::insert(Iterator i, T& x)
 {
-    if (i == end())				// $BKvHx$KA^F~!)(B
+    if (i == end())				// ––”ö‚É‘}“üH
 	_back = &x;
 
-    if (i == begin())				// $B%j%9%H$N@hF,!)(B
+    if (i == begin())				// ƒŠƒXƒg‚Ìæ“ªH
     {
-	x._next = _front;			// $B@hF,$KA^F~(B
+	x._next = _front;			// æ“ª‚É‘}“ü
 	_front = &x;
     }
     else
-	i._prev->insertNext(&x);		// $B!V<jA0$N<!!W$KA^F~(B
+	i._prev->insertNext(&x);		// uè‘O‚ÌŸv‚É‘}“ü
 
     return i;
 }
 
 /*
- *  'i' $B$N0LCV$K$"$kMWAG$r:o=|$7!":o=|$5$l$?MWAG$X$N;2>H$rJV$9!#(B
+ *  'i' ‚ÌˆÊ’u‚É‚ ‚é—v‘f‚ğíœ‚µAíœ‚³‚ê‚½—v‘f‚Ö‚ÌQÆ‚ğ•Ô‚·B
  */
 template <class T> typename List<T>::reference
 List<T>::erase(Iterator i)
 {
     T&	x = *i;
-    if (&x == _back)				// $B%j%9%H$NKvHx!)(B
-	_back = i._prev;			// $BKvHx$NMWAG$r:o=|(B
-    if (&x == _front)				// $B%j%9%H$N@hF,!)(B
-	_front = _front->_next;			// $B@hF,$NMWAG$r:o=|(B
+    if (&x == _back)				// ƒŠƒXƒg‚Ì––”öH
+	_back = i._prev;			// ––”ö‚Ì—v‘f‚ğíœ
+    if (&x == _front)				// ƒŠƒXƒg‚Ìæ“ªH
+	_front = _front->_next;			// æ“ª‚Ì—v‘f‚ğíœ
     else
-	i._prev->eraseNext();			// $B!V<jA0$N<!!W$r:o=|(B
+	i._prev->eraseNext();			// uè‘O‚ÌŸv‚ğíœ
     
     return x;
 }
 
 /*
- *  'x' $B$HF1$8%*%V%8%'%/%H!J9b!9#1$D$7$+$J$$$O$:!K$r:o=|$9$k!#(B
+ *  'x' ‚Æ“¯‚¶ƒIƒuƒWƒFƒNƒgi‚X‚P‚Â‚µ‚©‚È‚¢‚Í‚¸j‚ğíœ‚·‚éB
  */
 template <class T> void
 List<T>::remove(const T& x)

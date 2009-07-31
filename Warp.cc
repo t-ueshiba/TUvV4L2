@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.12 2009-03-13 03:15:22 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.13 2009-07-31 07:04:45 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -188,20 +188,20 @@ bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
 /************************************************************************
 *  class Warp								*
 ************************************************************************/
-//! $B2hA|$r<M1FJQ49$9$k$?$a$N9TNs$r@_Dj$9$k!%(B
+//! ‰æ‘œ‚ğË‰e•ÏŠ·‚·‚é‚½‚ß‚Ìs—ñ‚ğİ’è‚·‚éD
 /*!
-  $BF~NO2hA|E@(Bu$B$O<M1FJQ49(B
+  “ü—Í‰æ‘œ“_u‚ÍË‰e•ÏŠ·
   \f[
     \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
     \TUvec{H}{} \TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray
   \f]
-  $B$K$h$C$F=PNO2hA|E@(Bv$B$K<L$5$l$k!%(B
-  \param Htinv		$BJQ7A$r;XDj$9$k(B3x3$B<M1FJQ499TNs$N5U9TNs$NE>CV!$$9$J$o$A(B
+  ‚É‚æ‚Á‚Äo—Í‰æ‘œ“_v‚ÉÊ‚³‚ê‚éD
+  \param Htinv		•ÏŒ`‚ğw’è‚·‚é3x3Ë‰e•ÏŠ·s—ñ‚Ì‹ts—ñ‚Ì“]’uC‚·‚È‚í‚¿
 			\f$\TUtinv{H}{}\f$
-  \param inWidth	$BF~NO2hA|$NI}(B
-  \param inHeight	$BF~NO2hA|$N9b$5(B
-  \param outWidth	$B=PNO2hA|$NI}(B
-  \param outWidth	$B=PNO2hA|$N9b$5(B
+  \param inWidth	“ü—Í‰æ‘œ‚Ì•
+  \param inHeight	“ü—Í‰æ‘œ‚Ì‚‚³
+  \param outWidth	o—Í‰æ‘œ‚Ì•
+  \param outWidth	o—Í‰æ‘œ‚Ì‚‚³
 */
 void
 Warp::initialize(const Matrix33d& Htinv,
@@ -212,32 +212,32 @@ Warp::initialize(const Matrix33d& Htinv,
 	       inWidth, inHeight, outWidth, outHeight);
 }
 
-//! $B2hA|$NHs@~7AOD$_$r=|5n$7$?8e$K<M1FJQ49$r9T$&$?$a$N9TNs$H%+%a%iFbIt%Q%i%a!<%?$r@_Dj$9$k!%(B
+//! ‰æ‘œ‚Ì”ñüŒ`˜c‚İ‚ğœ‹‚µ‚½Œã‚ÉË‰e•ÏŠ·‚ğs‚¤‚½‚ß‚Ìs—ñ‚ÆƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚ğİ’è‚·‚éD
 /*!
 
-  canonical$B:BI8(Bx$B$+$i2hA|:BI8(Bu$B$X$NJQ49$,(B\f$\TUvec{u}{} = {\cal
-  K}(\TUvec{x}{})\f$ $B$HI=$5$l$k%+%a%iFbIt%Q%i%a!<%?$K$D$$$F!$$=$N@~7AJQ(B
-  $B49ItJ,$rI=$9(B3x3$B>eH>;03Q9TNs$r(BK$B$H$9$k$H!$(B
+  canonicalÀ•Wx‚©‚ç‰æ‘œÀ•Wu‚Ö‚Ì•ÏŠ·‚ª\f$\TUvec{u}{} = {\cal
+  K}(\TUvec{x}{})\f$ ‚Æ•\‚³‚ê‚éƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚É‚Â‚¢‚ÄC‚»‚ÌüŒ`•Ï
+  Š·•”•ª‚ğ•\‚·3x3ã”¼OŠps—ñ‚ğK‚Æ‚·‚é‚ÆC
   \f[
     \TUbeginarray{c} \TUbar{u}{} \\ 1 \TUendarray =
     \TUvec{K}{}
     \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
   \f]
-  $B$K$h$C$F2hA|$NHs@~7AOD$_$@$1$r=|5n$G$-$k!%K\4X?t$O!$$3$NOD$_$r=|5n$7$?2hA|E@$r(B
-  $B<M1FJQ49(BH$B$K$h$C$F=PNO2hA|E@(Bv$B$K<L$9$h$&$KJQ7A%Q%i%a!<%?$r@_Dj$9$k!%$9$J$o$A!$(B
-  $BA4BN$NJQ7A$O(B
+  ‚É‚æ‚Á‚Ä‰æ‘œ‚Ì”ñüŒ`˜c‚İ‚¾‚¯‚ğœ‹‚Å‚«‚éD–{ŠÖ”‚ÍC‚±‚Ì˜c‚İ‚ğœ‹‚µ‚½‰æ‘œ“_‚ğ
+  Ë‰e•ÏŠ·H‚É‚æ‚Á‚Äo—Í‰æ‘œ“_v‚ÉÊ‚·‚æ‚¤‚É•ÏŒ`ƒpƒ‰ƒ[ƒ^‚ğİ’è‚·‚éD‚·‚È‚í‚¿C
+  ‘S‘Ì‚Ì•ÏŒ`‚Í
   \f[
     \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
     \TUvec{H}{}\TUvec{K}{}
     \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
   \f]
-  $B$H$J$k!%(B
-  \param Htinv		$BJQ7A$r;XDj$9$k(B3x3$B<M1FJQ499TNs$N5U9TNs$NE>CV(B
-  \param Intrinsic	$BF~NO2hA|$K2C$($l$i$l$F$$$kJ|<MOD6J$rI=$9%+%a%iFbIt%Q%i%a!<%?(B
-  \param inWidth	$BF~NO2hA|$NI}(B
-  \param inHeight	$BF~NO2hA|$N9b$5(B
-  \param outWidth	$B=PNO2hA|$NI}(B
-  \param outWidth	$B=PNO2hA|$N9b$5(B
+  ‚Æ‚È‚éD
+  \param Htinv		•ÏŒ`‚ğw’è‚·‚é3x3Ë‰e•ÏŠ·s—ñ‚Ì‹ts—ñ‚Ì“]’u
+  \param Intrinsic	“ü—Í‰æ‘œ‚É‰Á‚¦‚ê‚ç‚ê‚Ä‚¢‚é•úË˜c‹È‚ğ•\‚·ƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^
+  \param inWidth	“ü—Í‰æ‘œ‚Ì•
+  \param inHeight	“ü—Í‰æ‘œ‚Ì‚‚³
+  \param outWidth	o—Í‰æ‘œ‚Ì•
+  \param outWidth	o—Í‰æ‘œ‚Ì‚‚³
 */
 void
 Warp::initialize(const Matrix33d& Htinv,
@@ -251,12 +251,12 @@ Warp::initialize(const Matrix33d& Htinv,
   /* Compute frac for each pixel. */
     const Matrix<double>&	HKtinv = Htinv * intrinsic.Ktinv();
     Vector<double>		leftmost = HKtinv[2];
-    for (int v = 0; v < height(); ++v)
+    for (u_int v = 0; v < height(); ++v)
     {
 	Vector<double>	xc = leftmost;
 	FracArray	frac(width());
-	int		n = 0;
-	for (int u = 0; u < width(); ++u)
+	u_int		n = 0;
+	for (u_int u = 0; u < width(); ++u)
 	{
 	    const Point2d&
 		m = intrinsic(Point2d(xc[0]/xc[2], xc[1]/xc[2]));
@@ -276,7 +276,7 @@ Warp::initialize(const Matrix33d& Htinv,
 
 	_fracs[v].resize(n);
 	_fracs[v].lmost = frac.lmost;
-	for (int u = 0; u < n; ++u)
+	for (u_int u = 0; u < n; ++u)
 	{
 	    _fracs[v].us[u] = frac.us[u];
 	    _fracs[v].vs[u] = frac.vs[u];
@@ -288,13 +288,13 @@ Warp::initialize(const Matrix33d& Htinv,
     }
 }
 
-//! $B=PNO2hA|$NHO0O$r;XDj$7$F2hA|$rJQ7A$9$k!%(B
+//! o—Í‰æ‘œ‚Ì”ÍˆÍ‚ğw’è‚µ‚Ä‰æ‘œ‚ğ•ÏŒ`‚·‚éD
 /*!
-  \param in	$BF~NO2hA|(B
-  \param out	$B=PNO2hA|(B
-  \param vs	$BJQ7A7k2L$H$J$kNN0h$N:G=i$N9T$r;XDj$9$k(Bindex
-  \param ve	$BJQ7A7k2L$H$J$kNN0h$N:G8e$N9T$N<!$r;XDj$9$k(Bindex$B!%(B0$B$J$i$P=PNO2hA|$N(B
-		$B:G8e$N9T$^$GJQ7A7k2L$K$h$C$FKd$a$i$l$k(B
+  \param in	“ü—Í‰æ‘œ
+  \param out	o—Í‰æ‘œ
+  \param vs	•ÏŒ`Œ‹‰Ê‚Æ‚È‚é—Ìˆæ‚ÌÅ‰‚Ìs‚ğw’è‚·‚éindex
+  \param ve	•ÏŒ`Œ‹‰Ê‚Æ‚È‚é—Ìˆæ‚ÌÅŒã‚Ìs‚ÌŸ‚ğw’è‚·‚éindexD0‚È‚ç‚Îo—Í‰æ‘œ‚Ì
+		ÅŒã‚Ìs‚Ü‚Å•ÏŒ`Œ‹‰Ê‚É‚æ‚Á‚Ä–„‚ß‚ç‚ê‚é
 */
 template <class T> void
 Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
@@ -393,13 +393,13 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 #endif	
 }
 
-//! $B=PNO2hA|$NHO0O$r;XDj$7$F2hA|$rJQ7A$9$k!%(B
+//! o—Í‰æ‘œ‚Ì”ÍˆÍ‚ğw’è‚µ‚Ä‰æ‘œ‚ğ•ÏŒ`‚·‚éD
 /*!
-  \param in	$BF~NO2hA|(B
-  \param out	$B=PNO2hA|(B
-  \param vs	$BJQ7A7k2L$H$J$kNN0h$N:G=i$N9T$r;XDj$9$k(Bindex
-  \param ve	$BJQ7A7k2L$H$J$kNN0h$N:G8e$N9T$N<!$r;XDj$9$k(Bindex$B!%(B0$B$J$i$P=PNO2hA|$N(B
-		$B:G8e$N9T$^$GJQ7A7k2L$K$h$C$FKd$a$i$l$k(B
+  \param in	“ü—Í‰æ‘œ
+  \param out	o—Í‰æ‘œ
+  \param vs	•ÏŒ`Œ‹‰Ê‚Æ‚È‚é—Ìˆæ‚ÌÅ‰‚Ìs‚ğw’è‚·‚éindex
+  \param ve	•ÏŒ`Œ‹‰Ê‚Æ‚È‚é—Ìˆæ‚ÌÅŒã‚Ìs‚ÌŸ‚ğw’è‚·‚éindexD0‚È‚ç‚Îo—Í‰æ‘œ‚Ì
+		ÅŒã‚Ìs‚Ü‚Å•ÏŒ`Œ‹‰Ê‚É‚æ‚Á‚Ä–„‚ß‚ç‚ê‚é
 */
 template <> void
 Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,

@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PSTree.h,v 1.2 2008-09-10 05:10:43 ueshiba Exp $
+ *  $Id: PSTree.h,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
  */
 #ifndef __TUPSTree_h
 #define __TUPSTree_h
@@ -39,14 +39,14 @@ namespace TU
 *  class PSTree<S, T, CompareX, CompareY>				*
 ************************************************************************/
 /*
- *  PSTree $B$O!"#2$D$N6/A4=g=x(B compareX, compareY$B!JG$0U$N(B p, q $B$KBP$7$F(B
- *  compareX(p, q), compareX(q, p), p == q $B$N$I$l$+#1$D$@$1$,@.$jN)$A!"(B
- *  $B$+$D?d0\N'$rK~$?$9!#$h$C$F!"(BcompareX(p, p) $B$O>o$K56!#!K$,M?$($i$l(B
- *  $B$?$H$-(B,
- *	1. $B?F%N!<%I(B _p $B$H;R%N!<%I(B _q $B$KBP$7$F(B !compareX(_q, _p)
- *	2. $B:8ItJ,LZ(B _l $B$H1&ItJ,LZ(B _r $B$KBP$7$F(B !compareY(_r, _l)
- *  $B$,K~$?$5$l$k$h$&$K9=@.$5$l$k!#?F%N!<%I$H;R%N!<%I$N4V$K$O(B compareY
- *  $B$K$D$$$F2?$i7h$^$C$?4X78$OL5$$!#(B
+ *  PSTree ‚ÍA‚Q‚Â‚Ì‹­‘S‡˜ compareX, compareYi”CˆÓ‚Ì p, q ‚É‘Î‚µ‚Ä
+ *  compareX(p, q), compareX(q, p), p == q ‚Ì‚Ç‚ê‚©‚P‚Â‚¾‚¯‚ª¬‚è—§‚¿A
+ *  ‚©‚Â„ˆÚ—¥‚ğ–‚½‚·B‚æ‚Á‚ÄAcompareX(p, p) ‚Íí‚É‹UBj‚ª—^‚¦‚ç‚ê
+ *  ‚½‚Æ‚«,
+ *	1. eƒm[ƒh _p ‚Æqƒm[ƒh _q ‚É‘Î‚µ‚Ä !compareX(_q, _p)
+ *	2. ¶•”•ª–Ø _l ‚Æ‰E•”•ª–Ø _r ‚É‘Î‚µ‚Ä !compareY(_r, _l)
+ *  ‚ª–‚½‚³‚ê‚é‚æ‚¤‚É\¬‚³‚ê‚éBeƒm[ƒh‚Æqƒm[ƒh‚ÌŠÔ‚É‚Í compareY
+ *  ‚É‚Â‚¢‚Ä‰½‚çŒˆ‚Ü‚Á‚½ŠÖŒW‚Í–³‚¢B
  */
 template <class S, class T, class CompareX, class CompareY>
 class PSTree
@@ -100,19 +100,19 @@ class PSTree
     ~PSTree()						{delete _root;}
 
   /*
-   *  compareX(_p, q) && compareY(_p, q) $B$rK~$?$9%N!<%I(B _p $B$N$&$A!"(B
-   *  $BB>$N$I$N(B _p' $B$KBP$7$F$b(B !compareY(_p, _p') $B$H$J$k$b$N$rJV$9!#(B
+   *  compareX(_p, q) && compareY(_p, q) ‚ğ–‚½‚·ƒm[ƒh _p ‚Ì‚¤‚¿A
+   *  ‘¼‚Ì‚Ç‚Ì _p' ‚É‘Î‚µ‚Ä‚à !compareY(_p, _p') ‚Æ‚È‚é‚à‚Ì‚ğ•Ô‚·B
    */
     const T*	closestY(const S& q)		 const	;
   /*
-   *  compareX(_p, q) && compareY(_p, q) $B$rK~$?$9%N!<%I(B _p $BA4$F$r(B
-   *  $BNs5s$7$F(B list $B$KJV$9!#(B
+   *  compareX(_p, q) && compareY(_p, q) ‚ğ–‚½‚·ƒm[ƒh _p ‘S‚Ä‚ğ
+   *  —ñ‹“‚µ‚Ä list ‚É•Ô‚·B
    */
     void	inRegion(const S& q, List& list) const	;
   /*
    *  !compareX(_p, p) && !compareY(_p, p) &&
-   *   compareX(_p, q) &&  compareY(_p, q) $B$rK~$?$9%N!<%I(B _p $BA4$F$r(B
-   *  $BNs5s$7$F(B list $B$KJV$9!#(B
+   *   compareX(_p, q) &&  compareY(_p, q) ‚ğ–‚½‚·ƒm[ƒh _p ‘S‚Ä‚ğ
+   *  —ñ‹“‚µ‚Ä list ‚É•Ô‚·B
    */
     void	inRegion(const S& p,
 			 const S& q,
@@ -202,8 +202,8 @@ PSTree<S, T, CompareX, CompareY>::Node::middle(int il, int ir)
 }
  
 /*
- *  compareX(_p, q) && compareY(_p, q) $B$rK~$?$9%N!<%I(B _p $B$N$&$A!"(B
- *  $BB>$N$I$N(B _p' $B$KBP$7$F$b(B !compareY(_p, _p') $B$H$J$k$b$N$rJV$9!#(B
+ *  compareX(_p, q) && compareY(_p, q) ‚ğ–‚½‚·ƒm[ƒh _p ‚Ì‚¤‚¿A
+ *  ‘¼‚Ì‚Ç‚Ì _p' ‚É‘Î‚µ‚Ä‚à !compareY(_p, _p') ‚Æ‚È‚é‚à‚Ì‚ğ•Ô‚·B
  */
 template <class S, class T, class CompareX, class CompareY>
 const typename PSTree<S, T, CompareX, CompareY>::Node*
@@ -224,8 +224,8 @@ PSTree<S, T, CompareX, CompareY>::Node::closestY(const S& q,
 }
 
 /*
- *  compareX(_p, q) && compareY(_p, q) $B$rK~$?$9%N!<%I(B _p $BA4$F$r(B
- *  $BNs5s$7$F(B list $B$KJV$9!#(B
+ *  compareX(_p, q) && compareY(_p, q) ‚ğ–‚½‚·ƒm[ƒh _p ‘S‚Ä‚ğ
+ *  —ñ‹“‚µ‚Ä list ‚É•Ô‚·B
  */
 template <class S, class T, class CompareX, class CompareY> void
 PSTree<S, T, CompareX, CompareY>::Node::inRegion(const S& q, List& list,
@@ -245,8 +245,8 @@ PSTree<S, T, CompareX, CompareY>::Node::inRegion(const S& q, List& list,
 
 /*
  *  !compareX(_p, p) && !compareY(_p, p) &&
- *   compareX(_p, q) &&  compareY(_p, q) $B$rK~$?$9%N!<%I(B _p $BA4$F$r(B
- *  $BNs5s$7$F(B list $B$KJV$9!#(B
+ *   compareX(_p, q) &&  compareY(_p, q) ‚ğ–‚½‚·ƒm[ƒh _p ‘S‚Ä‚ğ
+ *  —ñ‹“‚µ‚Ä list ‚É•Ô‚·B
  */
 template <class S, class T, class CompareX, class CompareY> void
 PSTree<S, T, CompareX, CompareY>::Node::inRegion(const S& p, const S& q,

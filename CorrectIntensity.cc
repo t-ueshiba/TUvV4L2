@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.cc,v 1.6 2009-02-02 08:09:24 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.7 2009-07-31 07:04:44 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
@@ -97,11 +97,11 @@ toShort(float val)
 /************************************************************************
 *  class CorrectIntensity						*
 ************************************************************************/
-//! $BM?$($i$l$?2hA|$N51EY$rJd@5$9$k!%(B
+//! —^‚¦‚ç‚ê‚½‰æ‘œ‚Ì‹P“x‚ğ•â³‚·‚éD
 /*!
-  \param image		$BF~NO2hA|$rM?$(!$Jd@57k2L$b$3$l$KJV$5$l$k(B
-  \param vs		$B51EY$rJd@5$9$kNN0h$N:G=i$N9T$r;XDj$9$k(Bindex
-  \param ve		$B51EY$rJd@5$9$kNN0h$N:G8e$N9T$N<!$r;XDj$9$k(Bindex
+  \param image		“ü—Í‰æ‘œ‚ğ—^‚¦C•â³Œ‹‰Ê‚à‚±‚ê‚É•Ô‚³‚ê‚é
+  \param vs		‹P“x‚ğ•â³‚·‚é—Ìˆæ‚ÌÅ‰‚Ìs‚ğw’è‚·‚éindex
+  \param ve		‹P“x‚ğ•â³‚·‚é—Ìˆæ‚ÌÅŒã‚Ìs‚ÌŸ‚ğw’è‚·‚éindex
 */ 
 template <class T> void
 CorrectIntensity::operator()(Image<T>& image, int vs, int ve) const
@@ -126,10 +126,10 @@ CorrectIntensity::operator()(Image<T>& image, int vs, int ve) const
     }
 }
 
-//! $BM?$($i$l$?2hAGCM$KBP$9$k51EYJd@57k2L$rJV$9!%(B
+//! —^‚¦‚ç‚ê‚½‰æ‘f’l‚É‘Î‚·‚é‹P“x•â³Œ‹‰Ê‚ğ•Ô‚·D
 /*!
-  \param pixel	$B2hAGCM(B
-  \return	$B51EYJd@57k2L(B
+  \param pixel	‰æ‘f’l
+  \return	‹P“x•â³Œ‹‰Ê
 */
 template <class T> inline T
 CorrectIntensity::val(T pixel) const

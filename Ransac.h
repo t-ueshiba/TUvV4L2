@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Ransac.h,v 1.4 2008-10-06 01:41:25 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.5 2009-07-31 07:04:45 ueshiba Exp $
  */
 #ifndef __TURansac_h
 #define __TURansac_h
@@ -39,42 +39,42 @@ namespace TU
 /************************************************************************
 *  function ransac							*
 ************************************************************************/
-//! RANSAC$B$K$h$C$F(Boutlier$B$r4^$`E@=89g$K%b%G%k$rEv$F$O$a$k!%(B
+//! RANSAC‚É‚æ‚Á‚Äoutlier‚ğŠÜ‚Ş“_W‡‚Éƒ‚ƒfƒ‹‚ğ“–‚Ä‚Í‚ß‚éD
 /*!
-  $B%F%s%W%l!<%H%Q%i%a!<%?(BPointSet$B$OE@=89g$rI=$9%/%i%9$G$"$j!$0J2<$N>r7o$r(B
-  $BK~$?$9$3$H!'(B
-  -# forward_iterator$B$r%5%]!<%H$9$k%3%s%F%J$G$"$k!%(B
-  -# $B$3$N%3%s%F%J$N7?$r(B
+  ƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^PointSet‚Í“_W‡‚ğ•\‚·ƒNƒ‰ƒX‚Å‚ ‚èCˆÈ‰º‚ÌğŒ‚ğ
+  –‚½‚·‚±‚ÆF
+  -# forward_iterator‚ğƒTƒ|[ƒg‚·‚éƒRƒ“ƒeƒi‚Å‚ ‚éD
+  -# ‚±‚ÌƒRƒ“ƒeƒi‚ÌŒ^‚ğ
 	PointSet::Container
-     $B$H$$$&L>A0$G(Btypedef$B$7$F$$$k!%(B
-  -# inlier$B$N3d9g$r%a%s%P4X?t(B
+     ‚Æ‚¢‚¤–¼‘O‚Åtypedef‚µ‚Ä‚¢‚éD
+  -# inlier‚ÌŠ„‡‚ğƒƒ“ƒoŠÖ”
 	double	Pointset::inlierRate() const;
-     $B$K$h$C$FCN$k$3$H$,$G$-$k!%(B
-  -# $B%a%s%P4X?t(B
+     ‚É‚æ‚Á‚Ä’m‚é‚±‚Æ‚ª‚Å‚«‚éD
+  -# ƒƒ“ƒoŠÖ”
 	PoinstSet::Container	Pointset::sample(u_int npoints) const;
-     $B$K$h$C$F%i%s%@%`$K(Bnpoints$B8D$NItJ,=89g$r<h$j=P$;$k!%(B
+     ‚É‚æ‚Á‚Äƒ‰ƒ“ƒ_ƒ€‚ÉnpointsŒÂ‚Ì•”•ªW‡‚ğæ‚èo‚¹‚éD
 
-  $B%F%s%W%l!<%H%Q%i%a!<%?(BModel$B$OEv$F$O$a$k$Y$-%b%G%k$rI=$9%/%i%9$G$"$j!$(B
-  $B0J2<$N>r7o$rK~$?$9$3$H!'(B
-  -# $B%a%s%P4X?t(B
+  ƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^Model‚Í“–‚Ä‚Í‚ß‚é‚×‚«ƒ‚ƒfƒ‹‚ğ•\‚·ƒNƒ‰ƒX‚Å‚ ‚èC
+  ˆÈ‰º‚ÌğŒ‚ğ–‚½‚·‚±‚ÆF
+  -# ƒƒ“ƒoŠÖ”
 	template <class Iterator>
 	void	Model::fit(Iterator first, Iterator last);
-     $B$K$h$C$FE@=89g$K%b%G%k$rEv$F$O$a$k$3$H$,$G$-$k!%(B
-  -# 1.$B$KI,MW$J:G>/E@?t$r%a%s%P4X?t(B
+     ‚É‚æ‚Á‚Ä“_W‡‚Éƒ‚ƒfƒ‹‚ğ“–‚Ä‚Í‚ß‚é‚±‚Æ‚ª‚Å‚«‚éD
+  -# 1.‚É•K—v‚ÈÅ­“_”‚ğƒƒ“ƒoŠÖ”
 	u_int	Model::ndataMin() const;
-     $B$K$h$C$FCN$k$3$H$,$G$-$k!%(B
+     ‚É‚æ‚Á‚Ä’m‚é‚±‚Æ‚ª‚Å‚«‚éD
 
-  $B%F%s%W%l!<%H%Q%i%a!<%?(BConform$B$OE@$N%b%G%k$X$NE,9g@-$rH=Dj$9$k4X?t(B
-  $B%*%V%8%'%/%H$G$"$j!$(B
+  ƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^Conform‚Í“_‚Ìƒ‚ƒfƒ‹‚Ö‚Ì“K‡«‚ğ”»’è‚·‚éŠÖ”
+  ƒIƒuƒWƒFƒNƒg‚Å‚ ‚èC
 	bool	Conform::operator()(const PointSet::Container::valu_type& p,
 				    const Model& model);
-  $B$J$k%$%s%?%U%'!<%9$K$h$C$F(Bp$B$,(Bmodel$B$KE,9g$7$F$$$k$+H=Dj$G$-$k$3$H!%(B
+  ‚È‚éƒCƒ“ƒ^ƒtƒF[ƒX‚É‚æ‚Á‚Äp‚ªmodel‚É“K‡‚µ‚Ä‚¢‚é‚©”»’è‚Å‚«‚é‚±‚ÆD
 
-  \param pointSet	inlier$B$H(Boutlier$B$r4^$`E@=89g(B
-  \param model		pointSet$B$K4^$^$l$k(Binlier$B$rEv$F$O$a$k%b%G%k!%(B
-  \param hitRate	RANSAC$B$K$h$C$F@5$7$/(Binlier$B$r0z$-Ev$F$k3NN(!%(B
-			0 <= hitRate < 1$B$G$J$1$l$P$J$i$J$$!%(B
-  \return		pointSet$B$K4^$^$l$k(Binlier
+  \param pointSet	inlier‚Æoutlier‚ğŠÜ‚Ş“_W‡
+  \param model		pointSet‚ÉŠÜ‚Ü‚ê‚éinlier‚ğ“–‚Ä‚Í‚ß‚éƒ‚ƒfƒ‹D
+  \param hitRate	RANSAC‚É‚æ‚Á‚Ä³‚µ‚­inlier‚ğˆø‚«“–‚Ä‚éŠm—¦D
+			0 <= hitRate < 1‚Å‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
+  \return		pointSet‚ÉŠÜ‚Ü‚ê‚éinlier
 */
 template <class PointSet, class Model, class Conform>
 typename PointSet::Container
@@ -83,8 +83,8 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 {
     typedef typename PointSet::Container	Container;
     
-  // $BM?$($i$l$?(BhitRate$B!$(BPointSet$B$K4^$^$l$k(Binlier$B$N3d9g$*$h$S(BModel$B$N@8@.$K(B
-  // $BMW$9$k:G>/E@?t$+$i!$%5%s%W%j%s%0$NI,MW2s?t$r5a$a$k!%(B
+  // —^‚¦‚ç‚ê‚½hitRateCPointSet‚ÉŠÜ‚Ü‚ê‚éinlier‚ÌŠ„‡‚¨‚æ‚ÑModel‚Ì¶¬‚É
+  // —v‚·‚éÅ­“_”‚©‚çCƒTƒ“ƒvƒŠƒ“ƒO‚Ì•K—v‰ñ”‚ğ‹‚ß‚éD
     if (hitRate < 0.0 || hitRate >= 1.0)
 	throw std::invalid_argument("ransac<PointSet, Model>: given hit rate is not within [0, 1)!!");
     const double	inlierRate = pointSet.inlierRate();
@@ -95,29 +95,29 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 	tmp *= inlierRate;
     const u_int	ntrials = u_int(ceil(log(1.0 - hitRate) / log(1.0 - tmp)));
 
-  // $B;n9T!J:G>.8D?t$NE@$r%5%s%W%k!$%b%G%k@8@.!$(Binlier$B8!=P!K$r(Bntrials$B2s9T$&!%(B
+  // siÅ¬ŒÂ”‚Ì“_‚ğƒTƒ“ƒvƒ‹Cƒ‚ƒfƒ‹¶¬CinlierŒŸoj‚ğntrials‰ñs‚¤D
     Container	inlierSetA, inlierSetB;
     Container	*inliers = &inlierSetA, *inliersMax = &inlierSetB;
     for (int n = 0; n < ntrials; ++n)
     {
-      // $BE@=89g$+$i%b%G%k$N7W;;$KI,MW$J:G>.8D?t$NE@$r%5%s%W%k$9$k!%(B
+      // “_W‡‚©‚çƒ‚ƒfƒ‹‚ÌŒvZ‚É•K—v‚ÈÅ¬ŒÂ”‚Ì“_‚ğƒTƒ“ƒvƒ‹‚·‚éD
 	const Container&	minimalSet = pointSet.sample(model.ndataMin());
 
-      // $B%5%s%W%k$7$?E@$+$i%b%G%k$r@8@.$9$k!%(B
+      // ƒTƒ“ƒvƒ‹‚µ‚½“_‚©‚çƒ‚ƒfƒ‹‚ğ¶¬‚·‚éD
 	model.fit(minimalSet.begin(), minimalSet.end());
 
-      // $BA4E@$NCf$G@8@.$7$?%b%G%k$KE,9g$9$k(B(inlier)$B$b$N$r=8$a$k!%(B
+      // ‘S“_‚Ì’†‚Å¶¬‚µ‚½ƒ‚ƒfƒ‹‚É“K‡‚·‚é(inlier)‚à‚Ì‚ğW‚ß‚éD
 	inliers->clear();
 	for (typename PointSet::const_iterator iter = pointSet.begin();
 	     iter != pointSet.end(); ++iter)
 	    if (conform(*iter, model))
 		inliers->push_back(*iter);
 
-      // $B$3$l$^$G$N$I$N%b%G%k$h$j$b(Binlier$B$N?t$,B?$1$l$P$=$N=89g$r5-O?$9$k!%(B
+      // ‚±‚ê‚Ü‚Å‚Ì‚Ç‚Ìƒ‚ƒfƒ‹‚æ‚è‚àinlier‚Ì”‚ª‘½‚¯‚ê‚Î‚»‚ÌW‡‚ğ‹L˜^‚·‚éD
 	if (inliers->size() > inliersMax->size())
 	    std::swap(inliers, inliersMax);
     }
-  // $B:GBg=89g$K4^$^$l$kE@$r??$N(Binlier$B$H$7!$$=$l$iA4$F$+$i%b%G%k$r@8@.$9$k!%(B
+  // Å‘åW‡‚ÉŠÜ‚Ü‚ê‚é“_‚ğ^‚Ìinlier‚Æ‚µC‚»‚ê‚ç‘S‚Ä‚©‚çƒ‚ƒfƒ‹‚ğ¶¬‚·‚éD
     model.fit(inliersMax->begin(), inliersMax->end());
 
     return *inliersMax;

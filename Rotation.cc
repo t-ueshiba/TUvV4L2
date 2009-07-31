@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Rotation.cc,v 1.11 2008-09-10 05:10:46 ueshiba Exp $
+ *  $Id: Rotation.cc,v 1.12 2009-07-31 07:04:45 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
@@ -33,18 +33,18 @@ namespace TU
 {
 static inline double	sqr(double x)	{return x * x;}
     
-//! 2$B<!85D6J?LLFb$G$N2sE>$r@8@.$9$k(B
+//! 2ŸŒ³’´•½–Ê“à‚Å‚Ì‰ñ“]‚ğ¶¬‚·‚é
 /*!
-  \param p	p$B<4$r;XDj$9$k(Bindex
-  \param q	q$B<4$r;XDj$9$k(Bindex
-  \param x	$B2sE>3Q$r@8@.$9$k:]$N(Bx$BCM(B
-  \param y	$B2sE>3Q$r@8@.$9$k:]$N(By$BCM(B
+  \param p	p²‚ğw’è‚·‚éindex
+  \param q	q²‚ğw’è‚·‚éindex
+  \param x	‰ñ“]Šp‚ğ¶¬‚·‚éÛ‚Ìx’l
+  \param y	‰ñ“]Šp‚ğ¶¬‚·‚éÛ‚Ìy’l
 		\f[
 		  \cos\theta = \frac{x}{\sqrt{x^2+y^2}},{\hskip 1em}
 		  \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
 		\f]
 */
-Rotation::Rotation(int p, int q, double x, double y)
+Rotation::Rotation(u_int p, u_int q, double x, double y)
     :_p(p), _q(q), _l(1.0), _c(1.0), _s(0.0)
 {
     const double	absx = fabs(x), absy = fabs(y);
@@ -57,13 +57,13 @@ Rotation::Rotation(int p, int q, double x, double y)
     }
 }
 
-//! 2$B<!85D6J?LLFb$G$N2sE>$r@8@.$9$k(B
+//! 2ŸŒ³’´•½–Ê“à‚Å‚Ì‰ñ“]‚ğ¶¬‚·‚é
 /*!
-  \param p	p$B<4$r;XDj$9$k(Bindex
-  \param q	q$B<4$r;XDj$9$k(Bindex
-  \param theta	$B2sE>3Q(B
+  \param p	p²‚ğw’è‚·‚éindex
+  \param q	q²‚ğw’è‚·‚éindex
+  \param theta	‰ñ“]Šp
 */
-Rotation::Rotation(int p, int q, double theta)
+Rotation::Rotation(u_int p, u_int q, double theta)
     :_p(p), _q(q), _l(1.0), _c(::cos(theta)), _s(::sin(theta))
 {
 }

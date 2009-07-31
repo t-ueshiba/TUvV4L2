@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.79 2009-07-27 06:47:47 ueshiba Exp $
+#  $Id: Makefile,v 1.80 2009-07-31 07:04:45 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,7 +11,7 @@ INCDIRS		= -I. -I$(PREFIX)/include
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
-CFLAGS		= -g
+CFLAGS		= -g -Wextra
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
   CFLAGS	= -O3
@@ -33,9 +33,7 @@ LINKER		= $(CCC)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC
-EXTHDRS		= TU/Bezier++.h \
-		TU/BlockMatrix++.cc \
-		TU/BlockMatrix++.h \
+EXTHDRS		= TU/BlockMatrix++.h \
 		TU/Camera.h \
 		TU/CorrectIntensity.h \
 		TU/EdgeDetector.h \
@@ -43,22 +41,17 @@ EXTHDRS		= TU/Bezier++.h \
 		TU/Image++.h \
 		TU/Manip.h \
 		TU/Mapping.h \
-		TU/Mesh++.h \
 		TU/Minimize.h \
-		TU/Nurbs++.h \
 		TU/Profiler.h \
 		TU/Random.h \
 		TU/Serial.h \
-		TU/TU/Allocator.h \
 		TU/TU/Geometry++.h \
 		TU/TU/IIRFilter.h \
 		TU/TU/TU/Array++.h \
-		TU/TU/TU/List.h \
 		TU/TU/TU/Normalize.h \
 		TU/TU/TU/TU/types.h \
 		TU/TU/Vector++.h \
 		TU/TU/utility.h \
-		TU/Vector++.cc \
 		TU/Warp.h \
 		TU/mmInstructions.h
 HDRS		= Allocator.h \
@@ -93,9 +86,7 @@ HDRS		= Allocator.h \
 		mmInstructions.h \
 		types.h \
 		utility.h
-SRCS		= Bezier++.cc \
-		BlockMatrix++.cc \
-		BlockMatrix++.inst.cc \
+SRCS		= BlockMatrix++.inst.cc \
 		Camera.cc \
 		CameraBase.cc \
 		CameraWithDistortion.cc \
@@ -111,21 +102,16 @@ SRCS		= Bezier++.cc \
 		ImageBase.cc \
 		ImageLine.cc \
 		Mapping.cc \
-		Mesh++.cc \
 		Normalize.cc \
-		Nurbs++.cc \
 		Profiler.cc \
 		Random.cc \
 		Rotation.cc \
 		Serial.cc \
 		TriggerGenerator.cc \
-		Vector++.cc \
 		Vector++.inst.cc \
 		Warp.cc \
 		manipulators.cc
-OBJS		= Bezier++.o \
-		BlockMatrix++.o \
-		BlockMatrix++.inst.o \
+OBJS		= BlockMatrix++.inst.o \
 		Camera.o \
 		CameraBase.o \
 		CameraWithDistortion.o \
@@ -141,15 +127,12 @@ OBJS		= Bezier++.o \
 		ImageBase.o \
 		ImageLine.o \
 		Mapping.o \
-		Mesh++.o \
 		Normalize.o \
-		Nurbs++.o \
 		Profiler.o \
 		Random.o \
 		Rotation.o \
 		Serial.o \
 		TriggerGenerator.o \
-		Vector++.o \
 		Vector++.inst.o \
 		Warp.o \
 		manipulators.o
@@ -157,7 +140,7 @@ OBJS		= Bezier++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.79 $	|		\
+REV		= $(shell echo $Revision: 1.80 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -168,12 +151,8 @@ REV		= $(shell echo $Revision: 1.79 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Bezier++.o: TU/Bezier++.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h
-BlockMatrix++.o: TU/BlockMatrix++.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h
-BlockMatrix++.inst.o: TU/BlockMatrix++.cc TU/BlockMatrix++.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
+BlockMatrix++.inst.o: TU/BlockMatrix++.h TU/TU/Vector++.h \
+	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Camera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
 CameraBase.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/Vector++.h \
@@ -209,12 +188,8 @@ ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
 Mapping.o: TU/Mapping.h TU/TU/utility.h TU/TU/TU/Normalize.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/Minimize.h
-Mesh++.o: TU/Mesh++.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/Allocator.h TU/TU/TU/List.h
 Normalize.o: TU/TU/TU/Normalize.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
-Nurbs++.o: TU/TU/utility.h TU/Nurbs++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Random.o: TU/Random.h
 Rotation.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
@@ -222,9 +197,7 @@ Serial.o: TU/Serial.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
 TriggerGenerator.o: TU/Serial.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
-Vector++.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Vector++.inst.o: TU/Vector++.cc TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h
+Vector++.inst.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h \
 	TU/Camera.h TU/mmInstructions.h

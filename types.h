@@ -1,22 +1,22 @@
 /*
- *  $Id: types.h,v 1.11 2009-07-27 07:32:05 ueshiba Exp $
+ *  $Id: types.h,v 1.12 2009-07-31 07:04:46 ueshiba Exp $
  */
 /*!
-  \mainpage	libTUTools++ - $BG[Ns!$%Y%/%H%k!$9TNs!$2hA|Ey$N4pK\E*$J%G!<%?7?$H$=$l$KIU?o$7$?%"%k%4%j%:%`$r<}$a$?%i%$%V%i%j(B
+  \mainpage	libTUTools++ - ”z—ñCƒxƒNƒgƒ‹Cs—ñC‰æ‘œ“™‚ÌŠî–{“I‚Èƒf[ƒ^Œ^‚Æ‚»‚ê‚É•t‚µ‚½ƒAƒ‹ƒSƒŠƒYƒ€‚ğû‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠ
   \anchor	libTUTools
 
-  \section copyright $BCx:n8"(B
-  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+  \section copyright ’˜ìŒ 
+  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
 
-  $BAO:n<T!'?"<G=SIW(B
+  ‘nìÒFAÅr•v
 
-  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
-  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
-  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
-  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
    
-  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
-  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
 
   Copyright 2002-2007.
   National Institute of Advanced Industrial Science and Technology (AIST)
@@ -32,16 +32,16 @@
   The copyright holder or the creator are not responsible for any
   damages caused by using this program.
 
-  \section abstract $B35MW(B
-  libTUTools++$B$O!$G[Ns!$%Y%/%H%k!$9TNs!$2hA|Ey$N4pK\E*$J%G!<%?7?$H$=$l(B
-  $B$KIU?o$7$?%"%k%4%j%:%`$r<}$a$?%i%$%V%i%j$G$"$k!%8=:_<BAu$5$l$F$$$k<g(B
-  $BMW$J%/%i%9$*$h$S4X?t$O$*$*$^$+$K0J2<$NJ,Ln$KJ,N`$5$l$k!%(B
+  \section abstract ŠT—v
+  libTUTools++‚ÍC”z—ñCƒxƒNƒgƒ‹Cs—ñC‰æ‘œ“™‚ÌŠî–{“I‚Èƒf[ƒ^Œ^‚Æ‚»‚ê
+  ‚É•t‚µ‚½ƒAƒ‹ƒSƒŠƒYƒ€‚ğû‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠ‚Å‚ ‚éDŒ»İÀ‘•‚³‚ê‚Ä‚¢‚éå
+  —v‚ÈƒNƒ‰ƒX‚¨‚æ‚ÑŠÖ”‚Í‚¨‚¨‚Ü‚©‚ÉˆÈ‰º‚Ì•ª–ì‚É•ª—Ş‚³‚ê‚éD
 
-  <b>1$B<!85$*$h$S(B2$B<!85G[Ns(B</b>
+  <b>1ŸŒ³‚¨‚æ‚Ñ2ŸŒ³”z—ñ</b>
   - #TU::Array
   - #TU::Array2
 
-  <b>$B%Y%/%H%k$H9TNs$*$h$S@~7A7W;;(B</b>
+  <b>ƒxƒNƒgƒ‹‚Æs—ñ‚¨‚æ‚ÑüŒ`ŒvZ</b>
   - #TU::Vector
   - #TU::Matrix
   - #TU::LUDecomposition
@@ -52,7 +52,7 @@
   - #TU::SVDecomposition
   - #TU::BlockMatrix
 
-  <b>$BHs@~7A:GE,2=(B</b>
+  <b>”ñüŒ`Å“K‰»</b>
   - #TU::NullConstraint
   - #TU::ConstNormConstraint
   - #Matrix<typename F::value_type> TU::minimizeSquare(const F&, const G&, AT&, int, double)
@@ -61,7 +61,7 @@
   <b>RANSAC</b>
   - #typename Pointset::Container TU::ransac(const PointSet&, Model&, Conform, double)
 
-  <b>$BE@!$D>@~!$J?LLEy$N4v2?MWAG$H$=$NJQ49(B</b>
+  <b>“_C’¼üC•½–Ê“™‚ÌŠô‰½—v‘f‚Æ‚»‚Ì•ÏŠ·</b>
   - #TU::Point2
   - #TU::Point3
   - #TU::HyperPlane
@@ -69,14 +69,14 @@
   - #TU::ProjectiveMapping
   - #TU::AffineMapping
 
-  <b>$BEj1F$N4v2?(B</b>
+  <b>“Š‰e‚ÌŠô‰½</b>
   - #TU::CanonicalCamera
   - #TU::CameraWithFocalLength
   - #TU::CameraWithEuclideanImagePlane
   - #TU::Camera
   - #TU::CameraWithDistortion
   
-  <b>$B2hAG$H2hA|(B</b>
+  <b>‰æ‘f‚Æ‰æ‘œ</b>
   - #TU::RGB
   - #TU::BGR
   - #TU::RGBA
@@ -89,14 +89,14 @@
   - #TU::GenericImage
   - #TU::Movie
 
-  <b>$B2hA|=hM}(B</b>
+  <b>‰æ‘œˆ—</b>
   - #TU::EdgeDetector
   - #TU::CorrectIntensity
   - #TU::Warp
   - #TU::IntegralImage
   - #TU::DiagonalIntegralImage
   
-  <b>$B2hA|$K8B$i$J$$?.9f=hM}(B</b>
+  <b>‰æ‘œ‚ÉŒÀ‚ç‚È‚¢M†ˆ—</b>
   - #TU::IIRFilter
   - #TU::BilateralIIRFilter
   - #TU::BilateralIIRFilter2
@@ -105,23 +105,23 @@
   - #TU::GaussianConvolver
   - #TU::GaussianConvolver2
   
-  <b>$BFC<l%G!<%?9=B$(B</b>
+  <b>“Áêƒf[ƒ^\‘¢</b>
   - #TU::List
   - #TU::Heap
   - #TU::PSTree
 
-  <b>Bezier$B6J@~$H(BBezier$B6JLL(B</b>
+  <b>Bezier‹Èü‚ÆBezier‹È–Ê</b>
   - #TU::BezierCurve
   - #TU::BezierSurface
   
-  <b>B-Spline$B6J@~$H(BB-Spline$B6JLL(B</b>
+  <b>B-Spline‹Èü‚ÆB-Spline‹È–Ê</b>
   - #TU::BSplineCurve
   - #TU::BSplineSurface
   
-  <b>$B%a%C%7%e(B</b>
+  <b>ƒƒbƒVƒ…</b>
   - #TU::Mesh
 
-  <b>$BI8=`%i%$%V%i%j$NJd6/(B</b>
+  <b>•W€ƒ‰ƒCƒuƒ‰ƒŠ‚Ì•â‹­</b>
   - #const T& std::min(const T&, const T&, const T&)
   - #const T& std::min(const T&, const T&, const T&, const T&)
   - #const T& std::max(const T&, const T&, const T&)
@@ -138,10 +138,10 @@
   - #TU::IManip2
   - #TU::OManip2
 
-  <b>$B%a%b%j4IM}(B</b>
+  <b>ƒƒ‚ƒŠŠÇ—</b>
   - #TU::Allocator
 
-  <b>$B%7%j%"%k%$%s%?%U%'!<%9(B</b>
+  <b>ƒVƒŠƒAƒ‹ƒCƒ“ƒ^ƒtƒF[ƒX</b>
   - #TU::Serial
   - #TU::Puma
   - #TU::Pata
@@ -149,23 +149,23 @@
   - #TU::TriggerGenerator
   
   \file		types.h
-  \brief	$B4pK\E*$J%G!<%?7?$r%0%m!<%P%k$JL>A06u4V$KDI2C(B
+  \brief	Šî–{“I‚Èƒf[ƒ^Œ^‚ğƒOƒ[ƒoƒ‹‚È–¼‘O‹óŠÔ‚É’Ç‰Á
 */
 #ifndef __TUtypes_h
 #define __TUtypes_h
 
 #ifdef WIN32
-typedef unsigned int	size_t;			//!< $BG[NsEy$N%5%$%:$rI=$97?(B
-typedef unsigned char	u_char;			//!< $BId9f$J$7(B8bit$B@0?t(B
-typedef unsigned short	u_short;		//!< $BId9f$J$7(B16bit$B@0?t(B
-typedef unsigned int	u_int;			//!< $BId9f$J$7(B32bit$B@0?t(B
-typedef unsigned long	u_long;			//!< $BId9f$J$7(B32/64bit$B@0?t(B
+typedef unsigned int	size_t;			//!< ”z—ñ“™‚ÌƒTƒCƒY‚ğ•\‚·Œ^
+typedef unsigned char	u_char;			//!< •„†‚È‚µ8bit®”
+typedef unsigned short	u_short;		//!< •„†‚È‚µ16bit®”
+typedef unsigned int	u_int;			//!< •„†‚È‚µ32bit®”
+typedef unsigned long	u_long;			//!< •„†‚È‚µ32/64bit®”
 #else
 #  include <sys/types.h>
 #endif
 
-typedef signed char		s_char;		//!< $BId9fIU$-(B8bit$B@0?t(B
-typedef long long		int64;		//!< $BId9fIU$-(B64bit$B@0?t(B
-typedef unsigned long long	u_int64;	//!< $BId9f$J$7(B64bit$B@0?t(B
+typedef signed char		s_char;		//!< •„†•t‚«8bit®”
+typedef long long		int64;		//!< •„†•t‚«64bit®”
+typedef unsigned long long	u_int64;	//!< •„†‚È‚µ64bit®”
 
 #endif	/*  !__TUtypes_h	*/

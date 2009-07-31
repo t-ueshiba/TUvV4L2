@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  ïΩê¨14-19îNÅiì∆ÅjéYã∆ãZèpëççáå§ãÜèä íòçÏå†èäóL
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ënçÏé“ÅFêAé≈èrïv
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  ñ{ÉvÉçÉOÉâÉÄÇÕÅiì∆ÅjéYã∆ãZèpëççáå§ãÜèäÇÃêEàıÇ≈Ç†ÇÈêAé≈èrïvÇ™ënçÏÇµÅC
+ *  Åiì∆ÅjéYã∆ãZèpëççáå§ãÜèäÇ™íòçÏå†ÇèäóLÇ∑ÇÈîÈñßèÓïÒÇ≈Ç∑ÅDíòçÏå†èäóL
+ *  é“Ç…ÇÊÇÈãñâ¬Ç»ÇµÇ…ñ{ÉvÉçÉOÉâÉÄÇégópÅCï°êªÅCâ¸ïœÅCëÊéOé“Ç÷äJé¶Ç∑ÇÈ
+ *  ìôÇÃçsà◊Çã÷é~ÇµÇ‹Ç∑ÅD
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  Ç±ÇÃÉvÉçÉOÉâÉÄÇ…ÇÊÇ¡Çƒê∂Ç∂ÇÈÇ¢Ç©Ç»ÇÈëπäQÇ…ëŒÇµÇƒÇ‡ÅCíòçÏå†èäóLé“Ç®
+ *  ÇÊÇ—ënçÏé“ÇÕê”îCÇïâÇ¢Ç‹ÇπÇÒÅB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Profiler.h,v 1.2 2008-09-10 05:10:44 ueshiba Exp $
+ *  $Id: Profiler.h,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
  */
 #include <iostream>
 #include <sys/time.h>
@@ -36,7 +36,7 @@ namespace TU
 /************************************************************************
 *  clsss Profiler							*
 ************************************************************************/
-//! $B%W%m%0%i%`$N3F%9%F%C%WKh$K<B9T;~4V$rB,Dj$9$k$?$a$N%/%i%9!%(B
+//! ÉvÉçÉOÉâÉÄÇÃäeÉXÉeÉbÉvñàÇ…é¿çséûä‘Çë™íËÇ∑ÇÈÇΩÇﬂÇÃÉNÉâÉXÅD
 class Profiler
 {
   private:
@@ -56,9 +56,9 @@ class Profiler
     };
 
   public:
-  //! $B;XDj$5$l$?8D?t$N%?%$%^$r;}$D%W%m%U%!%$%i$r:n@.$9$k!%(B
+  //! éwíËÇ≥ÇÍÇΩå¬êîÇÃÉ^ÉCÉ}ÇéùÇ¬ÉvÉçÉtÉ@ÉCÉâÇçÏê¨Ç∑ÇÈÅD
   /*!
-    \param ntimers	$B%?%$%^$N8D?t(B
+    \param ntimers	É^ÉCÉ}ÇÃå¬êî
    */
     Profiler(u_int ntimers)
 	:_active(0), _timers(ntimers), _nframes(0)		{}
@@ -76,9 +76,9 @@ class Profiler
     mutable u_int		_nframes;
 };
     
-//! $B$3$l$^$G$K=hM}$5$l$?%U%l!<%`?t$rJV$9!%(B
+//! Ç±ÇÍÇ‹Ç≈Ç…èàóùÇ≥ÇÍÇΩÉtÉåÅ[ÉÄêîÇï‘Ç∑ÅD
 /*!
-  \return	$B%U%l!<%`?t(B
+  \return	ÉtÉåÅ[ÉÄêî
  */
 inline u_int
 Profiler::nframes() const
@@ -86,9 +86,9 @@ Profiler::nframes() const
     return _nframes;
 }
 
-//! $B;XDj$5$l$?%?%$%^$r5/F0$9$k!%(B
+//! éwíËÇ≥ÇÍÇΩÉ^ÉCÉ}ÇãNìÆÇ∑ÇÈÅD
 /*!
-  \param n	$B%?%$%^$NHV9f(B
+  \param n	É^ÉCÉ}ÇÃî‘çÜ
  */
 inline const Profiler&
 Profiler::start(int n) const
@@ -98,7 +98,7 @@ Profiler::start(int n) const
     return *this;
 }
 
-//! $B8=:_5/F0Cf$N%?%$%^$rDd;_$9$k!%(B
+//! åªç›ãNìÆíÜÇÃÉ^ÉCÉ}Çí‚é~Ç∑ÇÈÅD
 inline const Profiler&
 Profiler::stop() const
 {
@@ -106,7 +106,7 @@ Profiler::stop() const
     return *this;
 }
 
-//! $B%U%l!<%`HV9f$r0l$D?J$a$k!%(B
+//! ÉtÉåÅ[ÉÄî‘çÜÇàÍÇ¬êiÇﬂÇÈÅD
 inline const Profiler&
 Profiler::nextFrame() const
 {

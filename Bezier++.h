@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Bezier++.h,v 1.12 2009-07-09 04:18:48 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.13 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -70,6 +70,56 @@ class BezierCurve : private Array<C>
     operator <<(std::ostream& out, const BezierCurve<C>& b)
 	{return out << (const Array<C>&)b;}
 };
+
+template <class C> C
+BezierCurve<C>::operator ()(T t) const
+{
+    T		s = 1.0 - t, fact = 1.0;
+    int		nCi = 1;
+    C		b((*this)[0] * s);
+    for (int i = 1; i < degree(); ++i)
+    {
+	fact *= t;
+      /* 
+       * Be careful! We cannot use operator "*=" here, because operator "/"
+       * must not produce remainder
+       */
+	nCi = nCi * (degree() - i + 1) / i;
+	(b += fact * nCi * (*this)[i]) *= s;
+    }
+    b += fact * t * (*this)[degree()];
+    return b;
+}
+
+template <class C> Array<C>
+BezierCurve<C>::deCasteljau(T t, u_int r) const
+{
+    if (r > degree())
+	r = degree();
+
+    const T	s = 1.0 - t;
+    Array<C>	b_tmp(*this);
+    for (int k = 1; k <= r; ++k)
+	for (int i = 0; i <= degree() - k; ++i)
+	    (b_tmp[i] *= s) += t * b_tmp[i+1];
+    b_tmp.resize(degree() - r + 1);
+    return b_tmp;
+}
+
+template <class C> void
+BezierCurve<C>::elevateDegree()
+{
+    Array<C>	b_tmp(*this);
+    Array<C>::resize(degree() + 2);
+    (*this)[0] = b_tmp[0];
+    for (int i = 1; i < degree(); ++i)
+    {
+	T	alpha = T(i) / T(degree());
+	
+	(*this)[i] = alpha * b_tmp[i-1] + (1.0 - alpha) * b_tmp[i];
+    }
+    (*this)[degree()] = b_tmp[degree()-1];
+}
 
 typedef BezierCurve<Vector2f>	BezierCurve2f;
 typedef BezierCurve<Vector3f>	RationalBezierCurve2f;
@@ -121,6 +171,24 @@ class BezierSurface : private Array2<BezierCurve<C> >
 	{return out << (const Array2<Curve>&)b;}
 };
 
+template <class C>
+BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
+    :Array2<Curve>(b.nrow(), b.ncol())
+{
+    for (int j = 0; j <= vDegree(); ++j)
+	for (int i = 0; i <= uDegree(); ++i)
+	    (*this)[j][i] = b[j][i];
+}
+
+template <class C> C
+BezierSurface<C>::operator ()(T u, T v) const
+{
+    BezierCurve<C>	vCurve(vDegree());
+    for (int j = 0; j <= vDegree(); ++j)
+	vCurve[j] = (*this)[j](u);
+    return vCurve(v);
+}
+ 
 typedef BezierSurface<Vector3f>	BezierSurface3f;
 typedef BezierSurface<Vector4f>	RationalBezierSurface3f;
 typedef BezierSurface<Vector3d>	BezierSurface3d;

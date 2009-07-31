@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mapping.cc,v 1.2 2008-09-10 05:10:40 ueshiba Exp $
+ *  $Id: Mapping.cc,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
  */
 #include "TU/Mapping.h"
 
@@ -34,17 +34,17 @@ namespace TU
 /************************************************************************
 *  class ProjectiveMapping						*
 ************************************************************************/
-//! $BF~NO6u4V$H=PNO6u4V$N<!85$r;XDj$7$F<M1FJQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
+//! “ü—Í‹óŠÔ‚Æo—Í‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚ÄË‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
 /*!
-  $B91EyJQ49$H$7$F=i4|2=$5$l$k!%(B
-  \param inDim	$BF~NO6u4V$N<!85(B
-  \param outDim	$B=PNO6u4V$N<!85(B
+  P“™•ÏŠ·‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
+  \param inDim	“ü—Í‹óŠÔ‚ÌŸŒ³
+  \param outDim	o—Í‹óŠÔ‚ÌŸŒ³
 */
 ProjectiveMapping::ProjectiveMapping(u_int inDim, u_int outDim)
     :_T(outDim + 1, inDim + 1)
 {
     u_int	n = std::min(inDim, outDim);
-    for (int i = 0; i < n; ++i)
+    for (u_int i = 0; i < n; ++i)
 	_T[i][i] = 1.0;
     _T[outDim][inDim] = 1.0;
 }
@@ -52,15 +52,15 @@ ProjectiveMapping::ProjectiveMapping(u_int inDim, u_int outDim)
 /************************************************************************
 *  class AffineMapping							*
 ************************************************************************/
-//! $B$3$N%"%U%#%sJQ49$NJB9T0\F0ItJ,$rI=8=$9$k%Y%/%H%k$rJV$9!%(B
+//! ‚±‚ÌƒAƒtƒBƒ“•ÏŠ·‚Ì•ÀsˆÚ“®•”•ª‚ğ•\Œ»‚·‚éƒxƒNƒgƒ‹‚ğ•Ô‚·D
 /*! 
-  \return	#outDim()$B<!85%Y%/%H%k(B
+  \return	#outDim()ŸŒ³ƒxƒNƒgƒ‹
 */
 Vector<double>
 AffineMapping::b() const
 {
     Vector<double>	bb(outDim());
-    for (int j = 0; j < bb.dim(); ++j)
+    for (u_int j = 0; j < bb.dim(); ++j)
 	bb[j] = _T[j][inDim()];
 
     return bb;

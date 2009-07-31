@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GaussianCoefficients.cc,v 1.4 2008-09-10 05:10:36 ueshiba Exp $
+ *  $Id: GaussianCoefficients.cc,v 1.5 2009-07-31 07:04:44 ueshiba Exp $
  */
 #include "TU/GaussianConvolver.h"
 #include "TU/Minimize.h"
@@ -132,10 +132,10 @@ Vector<double>
 GaussianCoefficients::CostFunction::operator ()(const AT& params) const
 {
     Vector<double>	val(_ndivisions+1);
-    for (int k = 0; k < val.dim(); ++k)
+    for (u_int k = 0; k < val.dim(); ++k)
     {
 	double	f = 0.0, x = k*_range/_ndivisions;
-	for (int i = 0; i < params.dim(); ++i)
+	for (u_int i = 0; i < params.dim(); ++i)
 	{
 	    const Params&	p = params[i];
 	    f += (p.a*cos(x*p.theta) + p.b*sin(x*p.theta))*exp(-x*p.alpha);
@@ -150,12 +150,12 @@ Matrix<double>
 GaussianCoefficients::CostFunction::jacobian(const AT& params) const
 {
     Matrix<double>	val(_ndivisions+1, 4*params.dim());
-    for (int k = 0; k < val.nrow(); ++k)
+    for (u_int k = 0; k < val.nrow(); ++k)
     {
 	Vector<double>&	row = val[k];
 	double		x = k*_range/_ndivisions;
 	
-	for (int i = 0; i < params.dim(); ++i)
+	for (u_int i = 0; i < params.dim(); ++i)
 	{
 	    const Params&	p = params[i];
 	    const double	c = cos(x*p.theta), s = sin(x*p.theta),
@@ -174,17 +174,17 @@ void
 GaussianCoefficients::CostFunction::update(AT& params,
 					   const Vector<double>& dp) const
 {
-    for (int i = 0; i < params.dim(); ++i)
+    for (u_int i = 0; i < params.dim(); ++i)
 	params[i] -= dp(4*i, 4);
 }
 
 /************************************************************************
 *  class GaussianCoefficients						*
 ************************************************************************/
-//! $B$3$N(BGauss$B3K$N=i4|2=$r9T$&(B
+//! ‚±‚ÌGaussŠj‚Ì‰Šú‰»‚ğs‚¤
 /*!
-  \param sigma	$B%U%#%k%?%5%$%:$rI=$9@5?t!JBg$-$$$[$I9-$,$j$,Bg$-$$!K(B
-  \return	$B$3$N(BGauss$B3K<+?H(B
+  \param sigma	ƒtƒBƒ‹ƒ^ƒTƒCƒY‚ğ•\‚·³”i‘å‚«‚¢‚Ù‚ÇL‚ª‚è‚ª‘å‚«‚¢j
+  \return	‚±‚ÌGaussŠj©g
 */
 void
 GaussianCoefficients::initialize(float sigma)

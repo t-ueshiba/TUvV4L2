@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.3 2009-07-27 23:25:44 ueshiba Exp $
+ *  $Id: Movie.h,v 1.4 2009-07-31 07:04:45 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -39,10 +39,10 @@ namespace TU
 /************************************************************************
 *  class Movie<T>							*
 ************************************************************************/
-//! $B%`!<%S!<$rI=$9%/%i%9(B
+//! ƒ€[ƒr[‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $BJ#?t$N(Bview$B$r;}$D$3$H$,$G$-!$$=$N%5%$%:$O3F(Bview$BKh$KJL8D$K;XDj$G$-$k!%(B
-  \param T	$B2hAG$N7?(B
+  •¡”‚Ìview‚ğ‚Â‚±‚Æ‚ª‚Å‚«C‚»‚ÌƒTƒCƒY‚ÍŠeview–ˆ‚É•ÊŒÂ‚Éw’è‚Å‚«‚éD
+  \param T	‰æ‘f‚ÌŒ^
 */
 template <class T> class Movie
 {
@@ -109,7 +109,7 @@ template <class T> class Movie
 #endif
 };
 
-//! $B%`!<%S!<$r@8@.$9$k!%(B
+//! ƒ€[ƒr[‚ğ¶¬‚·‚éD
 template <class T> inline
 Movie<T>::Movie()
     :_views(0), _cView(0), _nelements(0), _frames(0), _cFrame(0)
@@ -119,7 +119,7 @@ Movie<T>::Movie()
 #endif
 }
 
-//! $B%`!<%S!<$rGK2u$9$k!%(B
+//! ƒ€[ƒr[‚ğ”j‰ó‚·‚éD
 template <class T> inline
 Movie<T>::~Movie()
 {
@@ -128,9 +128,9 @@ Movie<T>::~Movie()
 #endif
 }
 
-//! $B%`!<%S!<$N>uBV$,@5>o$G$"$k$+D4$Y$k!%(B
+//! ƒ€[ƒr[‚Ìó‘Ô‚ª³í‚Å‚ ‚é‚©’²‚×‚éD
 /*!
-  \return	$B8=:_$N%U%l!<%`$,!VKvHx$N<!!W$KC#$7$F$$$l$P(Bfalse, $B$=$&$G$J$1$l$P(Btrue
+  \return	Œ»İ‚ÌƒtƒŒ[ƒ€‚ªu––”ö‚ÌŸv‚É’B‚µ‚Ä‚¢‚ê‚Îfalse, ‚»‚¤‚Å‚È‚¯‚ê‚Îtrue
 */
 template <class T> inline
 Movie<T>::operator bool() const
@@ -138,9 +138,9 @@ Movie<T>::operator bool() const
     return (_cView < nviews() && _cFrame < nframes());
 }
 
-//! $B%U%l!<%`?t$rJV$9!%(B
+//! ƒtƒŒ[ƒ€”‚ğ•Ô‚·D
 /*!
-  \return	$B%U%l!<%`?t(B
+  \return	ƒtƒŒ[ƒ€”
 */
 template <class T> inline u_int
 Movie<T>::nframes() const
@@ -148,9 +148,9 @@ Movie<T>::nframes() const
     return _frames.dim();
 }
 
-//! view$B?t$rJV$9!%(B
+//! view”‚ğ•Ô‚·D
 /*!
-  \return	view$B?t(B
+  \return	view”
 */
 template <class T> inline u_int
 Movie<T>::nviews() const
@@ -158,9 +158,9 @@ Movie<T>::nviews() const
     return _views.dim();
 }
 
-//! $B8=:_$N%U%l!<%`HV9f$rJV$9!%(B
+//! Œ»İ‚ÌƒtƒŒ[ƒ€”Ô†‚ğ•Ô‚·D
 /*!
-  \return	$B%U%l!<%`HV9f(B
+  \return	ƒtƒŒ[ƒ€”Ô†
 */
 template <class T> inline u_int
 Movie<T>::currentFrame() const
@@ -168,9 +168,9 @@ Movie<T>::currentFrame() const
     return _cFrame;
 }
 
-//! $B8=:_$N(Bview$BHV9f$rJV$9!%(B
+//! Œ»İ‚Ìview”Ô†‚ğ•Ô‚·D
 /*!
-  \return	view$BHV9f(B
+  \return	view”Ô†
 */
 template <class T> inline u_int
 Movie<T>::currentView() const
@@ -178,9 +178,9 @@ Movie<T>::currentView() const
     return _cView;
 }
 
-//! $B8=:_$N(Bview$B$N2hA|$NI}$rJV$9!%(B
+//! Œ»İ‚Ìview‚Ì‰æ‘œ‚Ì•‚ğ•Ô‚·D
 /*!
-  \return	$B2hA|$NI}(B
+  \return	‰æ‘œ‚Ì•
 */
 template <class T> inline u_int
 Movie<T>::width() const
@@ -188,9 +188,9 @@ Movie<T>::width() const
     return (_cView < nviews() ? _views[_cView].width() : 0);
 }
     
-//! $B8=:_$N(Bview$B$N2hA|$N9b$5$rJV$9!%(B
+//! Œ»İ‚Ìview‚Ì‰æ‘œ‚Ì‚‚³‚ğ•Ô‚·D
 /*!
-  \return	$B2hA|$N9b$5(B
+  \return	‰æ‘œ‚Ì‚‚³
 */
 template <class T> inline u_int
 Movie<T>::height() const
@@ -198,9 +198,9 @@ Movie<T>::height() const
     return (_cView < nviews() ? _views[_cView].height() : 0);
 }
 
-//! $B8=:_$N(Bview$B$H(Bframe$B$KBP1~$9$k2hA|$rJV$9!%(B
+//! Œ»İ‚Ìview‚Æframe‚É‘Î‰‚·‚é‰æ‘œ‚ğ•Ô‚·D
 /*!
-  \return	$B2hA|(B
+  \return	‰æ‘œ
 */
 template <class T> inline const Image<T>&
 Movie<T>::image() const
@@ -208,9 +208,9 @@ Movie<T>::image() const
     return _views[_cView];
 }
 
-//! $B8=:_$N(Bview$B$H(Bframe$B$KBP1~$9$k2hA|$rJV$9!%(B
+//! Œ»İ‚Ìview‚Æframe‚É‘Î‰‚·‚é‰æ‘œ‚ğ•Ô‚·D
 /*!
-  \return	$B2hA|(B
+  \return	‰æ‘œ
 */
 template <class T> inline Image<T>&
 Movie<T>::image()
@@ -218,12 +218,12 @@ Movie<T>::image()
     return _views[_cView];
 }
 
-//! $B8=:_$N%U%l!<%`$r;XDj$9$k!%(B
+//! Œ»İ‚ÌƒtƒŒ[ƒ€‚ğw’è‚·‚éD
 /*!
-  frame < #nframes() $B$G$J$$>l9g$O8=:_%U%l!<%`$O(B #nframes() $B$H$J$j!$(B
-  #operator ()$B$G(Bfalse$B$,JV$5$l$k>uBV$K$J$k!%(B
-  \param frame	$B%U%l!<%`HV9f(B
-  \return	$B$3$N%`!<%S!<%*%V%8%'%/%H(B
+  frame < #nframes() ‚Å‚È‚¢ê‡‚ÍŒ»İƒtƒŒ[ƒ€‚Í #nframes() ‚Æ‚È‚èC
+  #operator ()‚Åfalse‚ª•Ô‚³‚ê‚éó‘Ô‚É‚È‚éD
+  \param frame	ƒtƒŒ[ƒ€”Ô†
+  \return	‚±‚Ìƒ€[ƒr[ƒIƒuƒWƒFƒNƒg
 */
 template <class T> Movie<T>&
 Movie<T>::setFrame(u_int frame)
@@ -251,11 +251,11 @@ Movie<T>::setFrame(u_int frame)
     return *this;
 }
 
-//! $B8=:_$N(Bview$B$r;XDj$9$k!%(B
+//! Œ»İ‚Ìview‚ğw’è‚·‚éD
 /*!
-  view < #nviews() $B$G$J$$>l9g$O2?$bJQ99$7$J$$!%(B
-  \param view	view$BHV9f(B
-  \return	$B$3$N%`!<%S!<%*%V%8%'%/%H(B
+  view < #nviews() ‚Å‚È‚¢ê‡‚Í‰½‚à•ÏX‚µ‚È‚¢D
+  \param view	view”Ô†
+  \return	‚±‚Ìƒ€[ƒr[ƒIƒuƒWƒFƒNƒg
 */
 template <class T> inline Movie<T>&
 Movie<T>::setView(u_int view)
@@ -272,9 +272,9 @@ Movie<T>::setView(u_int view)
     return *this;
 }
 
-//! $B8=:_$N%U%l!<%`$r:G=i(B(0)$B$KLa$9!%(B
+//! Œ»İ‚ÌƒtƒŒ[ƒ€‚ğÅ‰(0)‚É–ß‚·D
 /*!
-  \return	$B$3$N%`!<%S!<%*%V%8%'%/%H(B
+  \return	‚±‚Ìƒ€[ƒr[ƒIƒuƒWƒFƒNƒg
 */
 template <class T> inline Movie<T>&
 Movie<T>::rewind()
@@ -282,10 +282,10 @@ Movie<T>::rewind()
     return setFrame(0);
 }
 
-//! $B8=:_$N%U%l!<%`$r(B1$B$D@h$K?J$a$k!%(B
+//! Œ»İ‚ÌƒtƒŒ[ƒ€‚ğ1‚Âæ‚Éi‚ß‚éD
 /*!
-  $B4{$K:G8e$N%U%l!<%`$KC#$7$F$$$k>l9g$O%U%l!<%`HV9f$r(B#nframes()$B$K$9$k!%(B
-  \return	$B$3$N%`!<%S!<%*%V%8%'%/%H(B
+  Šù‚ÉÅŒã‚ÌƒtƒŒ[ƒ€‚É’B‚µ‚Ä‚¢‚éê‡‚ÍƒtƒŒ[ƒ€”Ô†‚ğ#nframes()‚É‚·‚éD
+  \return	‚±‚Ìƒ€[ƒr[ƒIƒuƒWƒFƒNƒg
 */
 template <class T> inline Movie<T>&
 Movie<T>::operator ++()
@@ -295,10 +295,10 @@ Movie<T>::operator ++()
     return *this;
 }
 
-//! $B8=:_$N%U%l!<%`$r(B1$B$DLa$9!%(B
+//! Œ»İ‚ÌƒtƒŒ[ƒ€‚ğ1‚Â–ß‚·D
 /*!
-  $B4{$K:G=i$N%U%l!<%`$KC#$7$F$$$k>l9g$O2?$b$7$J$$!%(B
-  \return	$B$3$N%`!<%S!<%*%V%8%'%/%H(B
+  Šù‚ÉÅ‰‚ÌƒtƒŒ[ƒ€‚É’B‚µ‚Ä‚¢‚éê‡‚Í‰½‚à‚µ‚È‚¢D
+  \return	‚±‚Ìƒ€[ƒr[ƒIƒuƒWƒFƒNƒg
 */
 template <class T> inline Movie<T>&
 Movie<T>::operator --()
@@ -308,12 +308,12 @@ Movie<T>::operator --()
     return *this;
 }
 
-//! $B3F(Bview$B$N%5%$%:$H%U%l!<%`?t$r;XDj$7$F%`!<%S!<$N5-21NN0h$r3NJ]$9$k!%(B
+//! Šeview‚ÌƒTƒCƒY‚ÆƒtƒŒ[ƒ€”‚ğw’è‚µ‚Äƒ€[ƒr[‚Ì‹L‰¯—Ìˆæ‚ğŠm•Û‚·‚éD
 /*!
-  $B3NJ]8e$O!$8=:_$N(Bview$B$H%U%l!<%`$r6&$K(B0$B$K@_Dj$9$k!%(B
-  \param sizes	$B3F(Bview$B$NI}$H9b$5$N%Z%"$r<}$a$?G[Ns!%G[Ns$N%5%$%:$,(Bview$B?t$H$J$k!%(B
-  \param nf	$B%U%l!<%`?t(B
-  \return	$B<B:]$K3NJ]$5$l$?%U%l!<%`?t(B
+  Šm•ÛŒã‚ÍCŒ»İ‚Ìview‚ÆƒtƒŒ[ƒ€‚ğ‹¤‚É0‚Éİ’è‚·‚éD
+  \param sizes	Šeview‚Ì•‚Æ‚‚³‚ÌƒyƒA‚ğû‚ß‚½”z—ñD”z—ñ‚ÌƒTƒCƒY‚ªview”‚Æ‚È‚éD
+  \param nf	ƒtƒŒ[ƒ€”
+  \return	ÀÛ‚ÉŠm•Û‚³‚ê‚½ƒtƒŒ[ƒ€”
 */
 template <class T> u_int
 Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
@@ -324,7 +324,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 	 << ", nviews = " << sizes.dim()
 	 << ")" << endl;
 #endif
-  // $B3F(Bview$B$N%*%U%;%C%H$H(B1$B%U%l!<%`$"$?$j$N2hAG?t$r@_Dj!%(B
+  // Šeview‚ÌƒIƒtƒZƒbƒg‚Æ1ƒtƒŒ[ƒ€‚ ‚½‚è‚Ì‰æ‘f”‚ğİ’èD
     _views.resize(sizes.dim());
     _nelements = 0;
     for (int i = 0; i < nviews(); ++i)
@@ -333,7 +333,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 	_nelements += nelements(sizes[i].first * sizes[i].second);
     }
 	     
-  // $B;XDj$5$l$?Kg?t$N%U%l!<%`$r@_Dj!%(B
+  // w’è‚³‚ê‚½–‡”‚ÌƒtƒŒ[ƒ€‚ğİ’èD
     _frames.resize(nf);
     for (int j = 0; j < _frames.dim(); ++j)
     {
@@ -354,7 +354,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 	}
     }
     
-  // $B;XDj$5$l$?8D?t$N(Bview$B$H$=$NBg$-$5$r@_Dj!%(B
+  // w’è‚³‚ê‚½ŒÂ”‚Ìview‚Æ‚»‚Ì‘å‚«‚³‚ğİ’èD
     if (nframes() > 0)
 	for (int i = 0; i < nviews(); ++i)
 	    _views[i].resize((T*)_frames[0] + _views[i].offset,
@@ -368,11 +368,11 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
     return nframes();			// Return #frames allocated correctly.
 }
 
-//! $BF~NO%9%H%j!<%`$+$i%`!<%S!<$rFI$_9~$`!%(B
+//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒ€[ƒr[‚ğ“Ç‚İ‚ŞD
 /*!
-  $BF~NO%9%H%j!<%`$NKvHx$KC#$9$k$^$G%U%l!<%`$rFI$_B3$1$k!%(B
-  \param in	$BF~NO%9%H%j!<%`(B
-  \return	in$B$G;XDj$7$?F~NO%9%H%j!<%`(B
+  “ü—ÍƒXƒgƒŠ[ƒ€‚Ì––”ö‚É’B‚·‚é‚Ü‚ÅƒtƒŒ[ƒ€‚ğ“Ç‚İ‘±‚¯‚éD
+  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
+  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
 */
 template <class T> inline std::istream&
 Movie<T>::restore(std::istream& in)
@@ -430,12 +430,12 @@ Movie<T>::restoreFrames(std::istream& in, ImageBase::Type type, int m)
     return in;
 }
 
-//! $B%`!<%S!<$r;XDj$7$?2hAG%?%$%W$G=PNO%9%H%j!<%`$K=q$-=P$9!%(B
+//! ƒ€[ƒr[‚ğw’è‚µ‚½‰æ‘fƒ^ƒCƒv‚Åo—ÍƒXƒgƒŠ[ƒ€‚É‘‚«o‚·D
 /*!
- \param out	$B=PNO%9%H%j!<%`(B
- \param type	$B2hAG%?%$%W!%$?$@$7!$(B#DEFAULT$B$r;XDj$7$?>l9g$O!$$3$N%`!<%S!<$N(B
-		$B2hAG%?%$%W$G=q$-=P$5$l$k!%(B   
- \return	out$B$G;XDj$7$?=PNO%9%H%j!<%`(B
+ \param out	o—ÍƒXƒgƒŠ[ƒ€
+ \param type	‰æ‘fƒ^ƒCƒvD‚½‚¾‚µC#DEFAULT‚ğw’è‚µ‚½ê‡‚ÍC‚±‚Ìƒ€[ƒr[‚Ì
+		‰æ‘fƒ^ƒCƒv‚Å‘‚«o‚³‚ê‚éD   
+ \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
 */
 template <class T> std::ostream&
 Movie<T>::save(std::ostream& out, ImageBase::Type type)
@@ -450,12 +450,12 @@ Movie<T>::save(std::ostream& out, ImageBase::Type type)
     return out;
 }
 
-//! $B%`!<%S!<$N%X%C%@$r;XDj$7$?2hAG%?%$%W$G=PNO%9%H%j!<%`$K=q$-=P$9!%(B
+//! ƒ€[ƒr[‚Ìƒwƒbƒ_‚ğw’è‚µ‚½‰æ‘fƒ^ƒCƒv‚Åo—ÍƒXƒgƒŠ[ƒ€‚É‘‚«o‚·D
 /*!
- \param out	$B=PNO%9%H%j!<%`(B
- \param type	$B2hAG%?%$%W!%$?$@$7!$(B#DEFAULT$B$r;XDj$7$?>l9g$O!$$3$N%`!<%S!<$N(B
-		$B2hAG%?%$%W$G=q$-=P$5$l$k!%(B   
- \return	$B<B:]$K=q$-=P$9>l9g$N2hAG%?%$%W(B
+ \param out	o—ÍƒXƒgƒŠ[ƒ€
+ \param type	‰æ‘fƒ^ƒCƒvD‚½‚¾‚µC#DEFAULT‚ğw’è‚µ‚½ê‡‚ÍC‚±‚Ìƒ€[ƒr[‚Ì
+		‰æ‘fƒ^ƒCƒv‚Å‘‚«o‚³‚ê‚éD   
+ \return	ÀÛ‚É‘‚«o‚·ê‡‚Ì‰æ‘fƒ^ƒCƒv
 */
 template <class T> ImageBase::Type
 Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
@@ -468,12 +468,12 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
     return type;
 }
 
-//! $B8=:_$N%U%l!<%`$r;XDj$7$?2hAG%?%$%W$G=PNO%9%H%j!<%`$K=q$-=P$9!%(B
+//! Œ»İ‚ÌƒtƒŒ[ƒ€‚ğw’è‚µ‚½‰æ‘fƒ^ƒCƒv‚Åo—ÍƒXƒgƒŠ[ƒ€‚É‘‚«o‚·D
 /*!
- \param out	$B=PNO%9%H%j!<%`(B
- \param type	$B2hAG%?%$%W!%$?$@$7!$(B#DEFAULT$B$r;XDj$7$?>l9g$O!$$3$N%`!<%S!<$N(B
-		$B2hAG%?%$%W$G=q$-=P$5$l$k!%(B   
- \return	out$B$G;XDj$7$?=PNO%9%H%j!<%`(B
+ \param out	o—ÍƒXƒgƒŠ[ƒ€
+ \param type	‰æ‘fƒ^ƒCƒvD‚½‚¾‚µC#DEFAULT‚ğw’è‚µ‚½ê‡‚ÍC‚±‚Ìƒ€[ƒr[‚Ì
+		‰æ‘fƒ^ƒCƒv‚Å‘‚«o‚³‚ê‚éD   
+ \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
 */
 template <class T> std::ostream&
 Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const

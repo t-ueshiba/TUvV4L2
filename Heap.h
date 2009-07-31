@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Heap.h,v 1.2 2008-09-10 05:10:38 ueshiba Exp $
+ *  $Id: Heap.h,v 1.3 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef __TUHeap_h
 #define __TUHeap_h
@@ -37,11 +37,11 @@ namespace TU
 /************************************************************************
 *  class Heap<T, Compare>						*
 ************************************************************************/
-//! $BJ#?t$NMWAG$r%=!<%H$9$k%R!<%W$rI=$9%/%i%9(B
+//! •¡”‚Ì—v‘f‚ğƒ\[ƒg‚·‚éƒq[ƒv‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $B%F%s%W%l!<%H%Q%i%a!<%?(BT$B$OMWAG$N7?$r;XDj$9$k!%%F%s%W%l!<%H%Q%i%a!<%?(BCompare
-  $B$O(B2$B$D$N(BT$B7?MWAG$,>:=g$KJB$s$G$$$k;~$K(Btrue$B$rJV$94X?t%*%V%8%'%/%H7?$G$"$k!%(B
-  $B$?$H$($P!$(B2$B$D$N(Bint$B7?$rHf3S$9$k>l9g$O(B
+  ƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^T‚Í—v‘f‚ÌŒ^‚ğw’è‚·‚éDƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^Compare
+  ‚Í2‚Â‚ÌTŒ^—v‘f‚ª¸‡‚É•À‚ñ‚Å‚¢‚é‚Étrue‚ğ•Ô‚·ŠÖ”ƒIƒuƒWƒFƒNƒgŒ^‚Å‚ ‚éD
+  ‚½‚Æ‚¦‚ÎC2‚Â‚ÌintŒ^‚ğ”äŠr‚·‚éê‡‚Í
   \verbatim
   struct ordered
   {
@@ -51,7 +51,7 @@ namespace TU
 		}
   };
   \endverbatim
-  $B$HDj5A$9$k!%(B
+  ‚Æ’è‹`‚·‚éD
 */
 template <class T, class Compare>
 class Heap
@@ -60,15 +60,15 @@ class Heap
     Heap(u_int d, Compare compare)	;
     Heap(Array<T>& a, Compare compare)	;
 
-  //! $B8=:_$NMWAG?t$rJV$9(B
+  //! Œ»İ‚Ì—v‘f”‚ğ•Ô‚·
   /*!
-    \return	$BMWAG?t(B
+    \return	—v‘f”
   */
     u_int	nelements()	const	{return _n;}
 
-  //! $B%R!<%W@hF,$NMWAG$rJV$9(B
+  //! ƒq[ƒvæ“ª‚Ì—v‘f‚ğ•Ô‚·
   /*!
-    \return	$B@hF,$NMWAG(B
+    \return	æ“ª‚Ì—v‘f
   */
     T		head()		const	{return (_n != 0 ? _array[0] : 0);}
 
@@ -84,10 +84,10 @@ class Heap
     const Compare	_compare;	// function for comparing two items.
 };
 
-//! $B6u$N%R!<%W$r:n$k(B
+//! ‹ó‚Ìƒq[ƒv‚ğì‚é
 /*!
-  \param d		$B%R!<%W$N:GBgMWAG?t(B
-  \param compare	$BHf3S4X?t%*%V%8%'%/%H(B
+  \param d		ƒq[ƒv‚ÌÅ‘å—v‘f”
+  \param compare	”äŠrŠÖ”ƒIƒuƒWƒFƒNƒg
 */
 template <class T, class Compare>
 Heap<T, Compare>::Heap(u_int d, Compare compare)
@@ -95,10 +95,10 @@ Heap<T, Compare>::Heap(u_int d, Compare compare)
 {
 }
 
-//! 1$B<!85G[Ns$+$i%R!<%W$r:n$k(B
+//! 1ŸŒ³”z—ñ‚©‚çƒq[ƒv‚ğì‚é
 /*!
-  \param a		1$B<!85G[Ns(B
-  \param compare	$BHf3S4X?t%*%V%8%'%/%H(B
+  \param a		1ŸŒ³”z—ñ
+  \param compare	”äŠrŠÖ”ƒIƒuƒWƒFƒNƒg
 */
 template <class T, class Compare>
 Heap<T, Compare>::Heap(Array<T>& a, Compare compare)
@@ -108,9 +108,9 @@ Heap<T, Compare>::Heap(Array<T>& a, Compare compare)
 	downheap(i);
 }
 
-//! $B%R!<%W$KMWAG$rDI2C$9$k(B
+//! ƒq[ƒv‚É—v‘f‚ğ’Ç‰Á‚·‚é
 /*!
-  \param item	$BDI2C$9$kMWAG(B
+  \param item	’Ç‰Á‚·‚é—v‘f
 */
 template <class T, class Compare> void
 Heap<T, Compare>::add(T item)
@@ -122,9 +122,9 @@ Heap<T, Compare>::add(T item)
     upheap(_n++);
 }
 
-//! $B%R!<%W@hF,$NMWAG$r<h$j=|$/(B
+//! ƒq[ƒvæ“ª‚Ì—v‘f‚ğæ‚èœ‚­
 /*!
-  \return	$B<h$j=|$+$l$?MWAG(B
+  \return	æ‚èœ‚©‚ê‚½—v‘f
 */
 template <class T, class Compare> T
 Heap<T, Compare>::detach()
@@ -176,10 +176,10 @@ Heap<T, Compare>::downheap(int current)
 /************************************************************************
 *  Global functions							*
 ************************************************************************/
-//! 1$B<!85G[Ns$N%R!<%W%=!<%H$r9T$&(B
+//! 1ŸŒ³”z—ñ‚Ìƒq[ƒvƒ\[ƒg‚ğs‚¤
 /*!
-  \param a		$B%=!<%H$9$kG[Ns(B
-  \param compare	$BHf3S4X?t%*%V%8%'%/%H(B
+  \param a		ƒ\[ƒg‚·‚é”z—ñ
+  \param compare	”äŠrŠÖ”ƒIƒuƒWƒFƒNƒg
 */
 template <class T, class Compare> void
 sort(Array<T>& a, Compare compare)

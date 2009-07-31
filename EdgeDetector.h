@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìŽÒFAŽÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAŽÅr•v‚ª‘nì‚µC
+ *  i“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ðŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  ŽÒ‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ðŽg—pC•¡»C‰ü•ÏC‘æŽOŽÒ‚ÖŠJŽ¦‚·‚é
+ *  “™‚Ìsˆ×‚ð‹ÖŽ~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LŽÒ‚¨
+ *  ‚æ‚Ñ‘nìŽÒ‚ÍÓ”C‚ð•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.h,v 1.3 2008-10-19 23:29:33 ueshiba Exp $
+ *  $Id: EdgeDetector.h,v 1.4 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef	__TUEdgeDetector_h
 #define	__TUEdgeDetector_h
@@ -37,15 +37,15 @@ namespace TU
 /************************************************************************
 *  class EdgeDetector							*
 ************************************************************************/
-//! $B%(%C%88!=P$r9T$&%/%i%9(B
+//! ƒGƒbƒWŒŸo‚ðs‚¤ƒNƒ‰ƒX
 class EdgeDetector
 {
   public:
     enum
     {
-	TRACED	= 0x04,			//!< $B%H%l!<%9:Q$_$N%(%C%8E@(B($BFbItE*;HMQ$N$_(B)
-	EDGE	= 0x02,			//!< $B6/$$%(%C%8E@(B
-	WEAK	= 0x01			//!< $B<e$$%(%C%8E@(B
+	TRACED	= 0x04,			//!< ƒgƒŒ[ƒXÏ‚Ý‚ÌƒGƒbƒW“_(“à•”“IŽg—p‚Ì‚Ý)
+	EDGE	= 0x02,			//!< ‹­‚¢ƒGƒbƒW“_
+	WEAK	= 0x01			//!< Žã‚¢ƒGƒbƒW“_
     };
     
     EdgeDetector(float th_low=2.0, float th_high=5.0)			;
@@ -77,10 +77,10 @@ class EdgeDetector
     float		_th_low, _th_high;
 };
 
-//! $B%(%C%88!=P4o$r@8@.$9$k(B
+//! ƒGƒbƒWŒŸoŠí‚ð¶¬‚·‚é
 /*!
-  \param th_low		$B<e$$%(%C%8$NogCM(B
-  \param th_low		$B6/$$%(%C%8$NogCM(B
+  \param th_low		Žã‚¢ƒGƒbƒW‚Ìè‡’l
+  \param th_low		‹­‚¢ƒGƒbƒW‚Ìè‡’l
 */
 inline
 EdgeDetector::EdgeDetector(float th_low, float th_high)
@@ -88,11 +88,11 @@ EdgeDetector::EdgeDetector(float th_low, float th_high)
     initialize(th_low, th_high);
 }
 
-//! $B%(%C%88!=P$NogCM$r@_Dj$9$k(B
+//! ƒGƒbƒWŒŸo‚Ìè‡’l‚ðÝ’è‚·‚é
 /*!
-  \param th_low		$B<e$$%(%C%8$NogCM(B
-  \param th_low		$B6/$$%(%C%8$NogCM(B
-  \return		$B$3$N%(%C%88!=P4o<+?H(B
+  \param th_low		Žã‚¢ƒGƒbƒW‚Ìè‡’l
+  \param th_low		‹­‚¢ƒGƒbƒW‚Ìè‡’l
+  \return		‚±‚ÌƒGƒbƒWŒŸoŠíŽ©g
 */
 inline EdgeDetector&
 EdgeDetector::initialize(float th_low, float th_high)

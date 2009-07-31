@@ -1,5 +1,5 @@
 /*
- *  $Id: draw.cc,v 1.2 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: draw.cc,v 1.3 2009-07-31 07:05:24 ueshiba Exp $
  */
 #include "draw.h"
 
@@ -24,12 +24,12 @@ operator <<(OglDC& dc, const BSplineCurve3f& c)
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
-      for (int i = 0; i <= c.N(); ++i)
+      for (u_int i = 0; i <= c.N(); ++i)
 	  glVertex3fv((const float*)c[i]);
     glEnd();
     glPointSize(3.0);
     glBegin(GL_POINTS);
-      for (int i = 0; i <= c.N(); ++i)
+      for (u_int i = 0; i <= c.N(); ++i)
 	  glVertex3fv((const float*)c[i]);
     glEnd();
 
@@ -56,12 +56,12 @@ operator <<(OglDC& dc, const RationalBSplineCurve3f& c)
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
-      for (int i = 0; i <= c.N(); ++i)
+      for (u_int i = 0; i <= c.N(); ++i)
 	  glVertex4fv((const float*)c[i]);
     glEnd();
     glPointSize(3.0);
     glBegin(GL_POINTS);
-      for (int i = 0; i <= c.N(); ++i)
+      for (u_int i = 0; i <= c.N(); ++i)
 	  glVertex4fv((const float*)c[i]);
     glEnd();
 
@@ -89,29 +89,29 @@ operator <<(OglDC& dc, const BSplineSurface3f& s)
 
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(2, 0xaaaa);
-    for (int j = 0; j <= s.vN(); ++j)
+    for (u_int j = 0; j <= s.vN(); ++j)
     {
 	glBegin(GL_LINE_STRIP);
 	glColor3f(1.0, 1.0, 1.0);
-	for (int i = 0; i <= s.uN(); ++i)
+	for (u_int i = 0; i <= s.uN(); ++i)
 	    glVertex3fv((const float*)s[j][i]);
 	glEnd();
 	glPointSize(3.0);
 	glBegin(GL_POINTS);
-	for (int i = 0; i <= s.uN(); ++i)
+	for (u_int i = 0; i <= s.uN(); ++i)
 	    glVertex3fv((const float*)s[j][i]);
 	glEnd();
     }
-    for (int i = 0; i <= s.uN(); ++i)
+    for (u_int i = 0; i <= s.uN(); ++i)
     {
 	glBegin(GL_LINE_STRIP);
 	glColor3f(1.0, 1.0, 1.0);
-	for (int j = 0; j <= s.vN(); ++j)
+	for (u_int j = 0; j <= s.vN(); ++j)
 	    glVertex3fv((const float*)s[j][i]);
 	glEnd();
 	glPointSize(3.0);
 	glBegin(GL_POINTS);
-	for (int j = 0; j <= s.vN(); ++j)
+	for (u_int j = 0; j <= s.vN(); ++j)
 	    glVertex3fv((const float*)s[j][i]);
 	glEnd();
     }

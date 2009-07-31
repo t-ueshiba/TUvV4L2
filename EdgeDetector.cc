@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.13 2009-01-28 01:24:22 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.14 2009-07-31 07:04:44 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
@@ -62,84 +62,84 @@ mmDir8(mmFlt eH, mmFlt eV)
 }
 #endif
 
-//! $B$"$k%(%C%8E@$H;XDj$5$l$?J}8~$N6aK5E@$,@\B3$7$F$$$k$+D4$Y$k(B
+//! ‚ ‚éƒGƒbƒW“_‚Æw’è‚³‚ê‚½•ûŒü‚Ì‹ß–T“_‚ªÚ‘±‚µ‚Ä‚¢‚é‚©’²‚×‚é
 /*!
-  \param edge	$B%(%C%82hA|(B
-  \param p	$B%(%C%8E@(B
-  \param dir	$B6aK5E@$NJ}8~(B
-  \return	$B@\B3$7$F$$$l$P(Btrue$B!$$=$&$G$J$1$l$P(Bfalse
+  \param edge	ƒGƒbƒW‰æ‘œ
+  \param p	ƒGƒbƒW“_
+  \param dir	‹ß–T“_‚Ì•ûŒü
+  \return	Ú‘±‚µ‚Ä‚¢‚ê‚ÎtrueC‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
 */
 static inline bool
 isLink(const Image<u_char>& edge, const Point2i& p, int dir)
 {
-  // (1) $B6aK5E@$,>/$J$/$H$b6/(B/$B<e%(%C%8E@$G$"$j!$$+$D!$(B(2a) 4$B6aK5E@$G$"$k$+!$(B
-  // (2b) $BN>NY$N6aK5E@$,6/(B/$B<e%(%C%8E@$G$J$$>l9g$K@\B3$7$F$$$k$HH=Dj$9$k!%(B
+  // (1) ‹ß–T“_‚ª­‚È‚­‚Æ‚à‹­/ãƒGƒbƒW“_‚Å‚ ‚èC‚©‚ÂC(2a) 4‹ß–T“_‚Å‚ ‚é‚©C
+  // (2b) —¼—×‚Ì‹ß–T“_‚ª‹­/ãƒGƒbƒW“_‚Å‚È‚¢ê‡‚ÉÚ‘±‚µ‚Ä‚¢‚é‚Æ”»’è‚·‚éD
     return (edge(p.neighbor(dir)) &&
 	    (!(dir & 0x1) ||
 	     (!edge(p.neighbor(dir-1)) && !edge(p.neighbor(dir+1)))));
 }
     
-//! $B$"$k%(%C%8E@$r5/E@$K$7$F!$@\B3$9$k%(%C%8E@$rDI@W$9$k(B
+//! ‚ ‚éƒGƒbƒW“_‚ğ‹N“_‚É‚µ‚ÄCÚ‘±‚·‚éƒGƒbƒW“_‚ğ’ÇÕ‚·‚é
 /*!
-  \param edge	$B%(%C%82hA|(B
-  \param p	$B%(%C%8E@(B
+  \param edge	ƒGƒbƒW‰æ‘œ
+  \param p	ƒGƒbƒW“_
 */
 static void
 trace(Image<u_char>& edge, const Point2i& p)
 {
-    u_char&	e = edge(p);		// $B$3$NE@(Bp$B$N2hAGCM(B
+    u_char&	e = edge(p);		// ‚±‚Ì“_p‚Ì‰æ‘f’l
     
-    if (e & EdgeDetector::TRACED)	// $B4{$K$3$NE@$,K,Ld:Q$_$J$i$P!$(B
-	return;				// $BD>$A$KLa$k!%(B
+    if (e & EdgeDetector::TRACED)	// Šù‚É‚±‚Ì“_‚ª–K–âÏ‚İ‚È‚ç‚ÎC
+	return;				// ’¼‚¿‚É–ß‚éD
 
-    e |= (EdgeDetector::TRACED | EdgeDetector::EDGE);	// $BK,Ld:Q$_$+$D%(%C%8E@(B
-    for (int dir = 0; dir < 8; ++dir)	// p$B$N(B8$B$D$N6aK5E@$=$l$>$l$K$D$$$F(B
-	if (isLink(edge, p, dir))	// p$B$H@\B3$7$F$$$l$P(B
-	    trace(edge, p.neighbor(dir));	// $B$5$i$KDI@W$rB3$1$k!%(B
+    e |= (EdgeDetector::TRACED | EdgeDetector::EDGE);	// –K–âÏ‚İ‚©‚ÂƒGƒbƒW“_
+    for (int dir = 0; dir < 8; ++dir)	// p‚Ì8‚Â‚Ì‹ß–T“_‚»‚ê‚¼‚ê‚É‚Â‚¢‚Ä
+	if (isLink(edge, p, dir))	// p‚ÆÚ‘±‚µ‚Ä‚¢‚ê‚Î
+	    trace(edge, p.neighbor(dir));	// ‚³‚ç‚É’ÇÕ‚ğ‘±‚¯‚éD
 }
 
-//! $B$"$kE@$rBG$F$P(BEDGE$B%i%Y%k$,IU$$$F$$$kE@$H$=$&$G$J$$E@$r7k$Y$k$+D4$Y$k(B
+//! ‚ ‚é“_‚ğ‘Å‚Ä‚ÎEDGEƒ‰ƒxƒ‹‚ª•t‚¢‚Ä‚¢‚é“_‚Æ‚»‚¤‚Å‚È‚¢“_‚ğŒ‹‚×‚é‚©’²‚×‚é
 /*!
-  \param edge	$B%(%C%82hA|(B
-  \param p	$BBG$H$&$H$9$kE@(B
-  \return	$B7k$Y$k$N$G$"$l$P(Btrue$B!$$=$&$G$J$1$l$P(Bfalse
+  \param edge	ƒGƒbƒW‰æ‘œ
+  \param p	‘Å‚Æ‚¤‚Æ‚·‚é“_
+  \return	Œ‹‚×‚é‚Ì‚Å‚ ‚ê‚ÎtrueC‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
 */
 static bool
 canInterpolate(const Image<u_char>& edge, const Point2i& p)
 {
     int	nedges = 0, nweaks = 0;
     
-    for (int dir = 0; dir < 8; ++dir)	// p$B$N(B8$B$D$N6aK5E@$=$l$>$l$K$D$$$F(B
+    for (int dir = 0; dir < 8; ++dir)	// p‚Ì8‚Â‚Ì‹ß–T“_‚»‚ê‚¼‚ê‚É‚Â‚¢‚Ä
     {
 	u_char	e = edge(p.neighbor(dir));
 	
 	if (e & EdgeDetector::EDGE)
-	    ++nedges;			// EDGE$B%i%Y%k$,IU$$$F$$$kE@(B
+	    ++nedges;			// EDGEƒ‰ƒxƒ‹‚ª•t‚¢‚Ä‚¢‚é“_
 	else if (e & EdgeDetector::WEAK)
-	    ++nweaks;			// EDGE$B%i%Y%k$,IU$$$F$$$J$$<e$$%(%C%8E@(B
+	    ++nweaks;			// EDGEƒ‰ƒxƒ‹‚ª•t‚¢‚Ä‚¢‚È‚¢ã‚¢ƒGƒbƒW“_
     }
 
-  // p$B$N6aK5$K!$4{$K(BEDGE$B%i%Y%k$,IU$$$F$$$kE@$,>/$J$/$H$b(B1$B$D!$$*$h$S(B
-  // $BIU$$$F$$$J$$<e$$%(%C%8E@$,(B1$B$D$@$1$"$l$P!$(Btrue$B$rJV$9!%(B
+  // p‚Ì‹ß–T‚ÉCŠù‚ÉEDGEƒ‰ƒxƒ‹‚ª•t‚¢‚Ä‚¢‚é“_‚ª­‚È‚­‚Æ‚à1‚ÂC‚¨‚æ‚Ñ
+  // •t‚¢‚Ä‚¢‚È‚¢ã‚¢ƒGƒbƒW“_‚ª1‚Â‚¾‚¯‚ ‚ê‚ÎCtrue‚ğ•Ô‚·D
     return (nedges != 0 && nweaks == 1);
 }
     
 /************************************************************************
 *  class EdgeDetector							*
 ************************************************************************/
-//! $B%(%C%86/EY$r5a$a$k(B
+//! ƒGƒbƒW‹­“x‚ğ‹‚ß‚é
 /*!
-  \param edgeH	$B2#J}8~(B1$B3,HyJ,F~NO2hA|(B
-  \param edgeV	$B=DJ}8~(B1$B3,HyJ,F~NO2hA|(B
-  \param out	$B%(%C%86/EY=PNO2hA|(B
-  \return	$B$3$N%(%C%88!=P4o<+?H(B
+  \param edgeH	‰¡•ûŒü1ŠK”÷•ª“ü—Í‰æ‘œ
+  \param edgeV	c•ûŒü1ŠK”÷•ª“ü—Í‰æ‘œ
+  \param out	ƒGƒbƒW‹­“xo—Í‰æ‘œ
+  \return	‚±‚ÌƒGƒbƒWŒŸoŠí©g
 */
 const EdgeDetector&
 EdgeDetector::strength(const Image<float>& edgeH,
 		       const Image<float>& edgeV, Image<float>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (int v = 0; v < out.height(); ++v)
+    for (u_int v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v], *eV = edgeV[v];
 	float*			dst = out[v];
@@ -166,19 +166,19 @@ EdgeDetector::strength(const Image<float>& edgeH,
     return *this;
 }
     
-//! 4$B6aK5$K$h$k%(%C%8J}8~$r5a$a$k(B
+//! 4‹ß–T‚É‚æ‚éƒGƒbƒW•ûŒü‚ğ‹‚ß‚é
 /*!
-  \param edgeH	$B2#J}8~(B1$B3,HyJ,F~NO2hA|(B
-  \param edgeV	$B=DJ}8~(B1$B3,HyJ,F~NO2hA|(B
-  \param out	$B%(%C%8J}8~=PNO2hA|(B
-  \return	$B$3$N%(%C%88!=P4o<+?H(B
+  \param edgeH	‰¡•ûŒü1ŠK”÷•ª“ü—Í‰æ‘œ
+  \param edgeV	c•ûŒü1ŠK”÷•ª“ü—Í‰æ‘œ
+  \param out	ƒGƒbƒW•ûŒüo—Í‰æ‘œ
+  \return	‚±‚ÌƒGƒbƒWŒŸoŠí©g
 */
 const EdgeDetector&
 EdgeDetector::direction4(const Image<float>& edgeH,
 			 const Image<float>& edgeV, Image<u_char>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (int v = 0; v < out.height(); ++v)
+    for (u_int v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v], *eV = edgeV[v];
 	u_char*			dst = out[v];
@@ -215,19 +215,19 @@ EdgeDetector::direction4(const Image<float>& edgeH,
     return *this;
 }
     
-//! 8$B6aK5$K$h$k%(%C%8J}8~$r5a$a$k(B
+//! 8‹ß–T‚É‚æ‚éƒGƒbƒW•ûŒü‚ğ‹‚ß‚é
 /*!
-  \param edgeH	$B2#J}8~(B1$B3,HyJ,F~NO2hA|(B
-  \param edgeV	$B=DJ}8~(B1$B3,HyJ,F~NO2hA|(B
-  \param out	$B%(%C%8J}8~=PNO2hA|(B
-  \return	$B$3$N%(%C%88!=P4o<+?H(B
+  \param edgeH	‰¡•ûŒü1ŠK”÷•ª“ü—Í‰æ‘œ
+  \param edgeV	c•ûŒü1ŠK”÷•ª“ü—Í‰æ‘œ
+  \param out	ƒGƒbƒW•ûŒüo—Í‰æ‘œ
+  \return	‚±‚ÌƒGƒbƒWŒŸoŠí©g
 */
 const EdgeDetector&
 EdgeDetector::direction8(const Image<float>& edgeH,
 			 const Image<float>& edgeV, Image<u_char>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (int v = 0; v < out.height(); ++v)
+    for (u_int v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v], *eV = edgeV[v];
 	u_char*			dst = out[v];
@@ -271,13 +271,13 @@ EdgeDetector::direction8(const Image<float>& edgeH,
     return *this;
 }
     
-//! $BHs6KBgCMM^@)=hM}$K$h$j:Y@~2=$r9T$&(B
+//! ”ñ‹É‘å’l—}§ˆ—‚É‚æ‚è×ü‰»‚ğs‚¤
 /*!
-  \param strength	$B%(%C%86/EYF~NO2hA|(B
-  \param direction	$B%(%C%8J}8~F~NO2hA|(B
-  \param out		$B6/$$%(%C%8E@$H<e$$%(%C%8E@$K$=$l$>$l(B#EDGE$B%i%Y%k$H(B
-			#WEAK$B%i%Y%k$rIU$1$?=PNO2hA|(B
-  \return		$B$3$N%(%C%88!=P4o<+?H(B
+  \param strength	ƒGƒbƒW‹­“x“ü—Í‰æ‘œ
+  \param direction	ƒGƒbƒW•ûŒü“ü—Í‰æ‘œ
+  \param out		‹­‚¢ƒGƒbƒW“_‚Æã‚¢ƒGƒbƒW“_‚É‚»‚ê‚¼‚ê#EDGEƒ‰ƒxƒ‹‚Æ
+			#WEAKƒ‰ƒxƒ‹‚ğ•t‚¯‚½o—Í‰æ‘œ
+  \return		‚±‚ÌƒGƒbƒWŒŸoŠí©g
 */
 const EdgeDetector&
 EdgeDetector::suppressNonmaxima(const Image<float>& strength,
@@ -286,18 +286,18 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
 {
     out.resize(strength.height(), strength.width());
 
-  // $B=PNO2hA|$N30<~$r(B0$B$K$9$k!%(B
+  // o—Í‰æ‘œ‚ÌŠOü‚ğ0‚É‚·‚éD
     if (out.height() > 0)
-	for (int u = 0; u < out.width(); ++u)
+	for (u_int u = 0; u < out.width(); ++u)
 	    out[0][u] = out[out.height()-1][u] = 0;
     if (out.width() > 0)
-	for (int v = 0; v < out.height(); ++v)
+	for (u_int v = 0; v < out.height(); ++v)
 	    out[v][0] = out[v][out.width()-1] = 0;
 
-  // $B3FE@$N%(%C%86/EY$,(B (1) $B$=$NE@$N%(%C%8J}8~$K1h$C$?N>NY$HHf3S$7$F6KBg$K(B
-  // $B$J$C$F$*$j!$$+$D!$(B(2a) $B6/$$ogCM0J>e$J$i$P(BEDGE$B%i%Y%k$r!$(B(2b) $B<e$$ogCM(B
-  // $B0J>e$J$i$P(BWEAK$B%i%Y%k$r$=$l$>$l=q$-9~$`!%$=$&$G$J$1$l$P(B0$B$r=q$-9~$`!%(B
-    for (int v = 0; ++v < out.height() - 1; )
+  // Še“_‚ÌƒGƒbƒW‹­“x‚ª (1) ‚»‚Ì“_‚ÌƒGƒbƒW•ûŒü‚É‰ˆ‚Á‚½—¼—×‚Æ”äŠr‚µ‚Ä‹É‘å‚É
+  // ‚È‚Á‚Ä‚¨‚èC‚©‚ÂC(2a) ‹­‚¢è‡’lˆÈã‚È‚ç‚ÎEDGEƒ‰ƒxƒ‹‚ğC(2b) ã‚¢è‡’l
+  // ˆÈã‚È‚ç‚ÎWEAKƒ‰ƒxƒ‹‚ğ‚»‚ê‚¼‚ê‘‚«‚ŞD‚»‚¤‚Å‚È‚¯‚ê‚Î0‚ğ‘‚«‚ŞD
+    for (u_int v = 0; ++v < out.height() - 1; )
     {
 	const float		*prv = strength[v-1],
 				*str = strength[v],
@@ -311,8 +311,8 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
 	    ++nxt;
 	    ++dir;
 	    
-	    if (*str >= _th_low)	// $B<e$$ogCM0J>e$J$i(B
-		switch (*dir)		// $B%(%C%8J}8~$r8+$k!%(B
+	    if (*str >= _th_low)	// ã‚¢è‡’lˆÈã‚È‚ç
+		switch (*dir)		// ƒGƒbƒW•ûŒü‚ğŒ©‚éD
 		{
 		  case 0:
 		  case 4:
@@ -335,34 +335,34 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
 		    break;
 		}
 	    else
-		*dst = 0;		// $B<e$$ogCML$K~$J$i(B 0
+		*dst = 0;		// ã‚¢è‡’l–¢–‚È‚ç 0
 	}
     }
 
     return *this;
 }
 
-//! 2$B<!HyJ,2hA|$N%<%m8r:9E@$r8!=P$9$k(B
+//! 2Ÿ”÷•ª‰æ‘œ‚Ìƒ[ƒŒğ·“_‚ğŒŸo‚·‚é
 /*!
-  \param in		$BF~NO(B2$B<!HyJ,2hA|(B
-  \param out		$B%<%m8r:9E@$r(B255$B!$$=$&$G$J$$E@$r(B0$B$H$7$?=PNO2hA|(B
-  \return		$B$3$N%(%C%88!=P4o<+?H(B
+  \param in		“ü—Í2Ÿ”÷•ª‰æ‘œ
+  \param out		ƒ[ƒŒğ·“_‚ğ255C‚»‚¤‚Å‚È‚¢“_‚ğ0‚Æ‚µ‚½o—Í‰æ‘œ
+  \return		‚±‚ÌƒGƒbƒWŒŸoŠí©g
 */
 const EdgeDetector&
 EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
 {
     out.resize(in.height(), in.width());
 
-  // $B=PNO2hA|$N2<C<$H1&C<$r(B0$B$K$9$k!%(B
+  // o—Í‰æ‘œ‚Ì‰º’[‚Æ‰E’[‚ğ0‚É‚·‚éD
     if (out.height() > 0)
-	for (int u = 0; u < out.width(); ++u)
+	for (u_int u = 0; u < out.width(); ++u)
 	    out[out.height()-1][u] = 0;
     if (out.width() > 0)
-	for (int v = 0; v < out.height(); ++v)
+	for (u_int v = 0; v < out.height(); ++v)
 	    out[v][out.width()-1] = 0;
 
-  // $B8=:_E@$r:8>e6y$H$9$k(B2x2$B%&%#%s%I%&Cf$N2hAG$,0[Id9f$J$i%(%C%8E@$H$9$k!%(B
-    for (int v = 0; v < out.height() - 1; ++v)
+  // Œ»İ“_‚ğ¶ã‹÷‚Æ‚·‚é2x2ƒEƒBƒ“ƒhƒE’†‚Ì‰æ‘f‚ªˆÙ•„†‚È‚çƒGƒbƒW“_‚Æ‚·‚éD
+    for (u_int v = 0; v < out.height() - 1; ++v)
     {
 	const float		*cur = in[v],
 				*nxt = in[v+1];
@@ -384,13 +384,13 @@ EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
     return *this;
 }
     
-//! 2$B<!HyJ,2hA|$N%<%m8r:9E@$r8!=P$7!$%(%C%86/EY$K$h$C$FJ,N`$9$k(B
+//! 2Ÿ”÷•ª‰æ‘œ‚Ìƒ[ƒŒğ·“_‚ğŒŸo‚µCƒGƒbƒW‹­“x‚É‚æ‚Á‚Ä•ª—Ş‚·‚é
 /*!
-  \param in		$BF~NO(B2$B<!HyJ,2hA|(B
-  \param strength	$BF~NO%(%C%86/EY2hA|(B
-  \param out		$B6/$$%(%C%8E@$H<e$$%(%C%8E@$K$=$l$>$l(B#EDGE$B%i%Y%k$H(B
-			#WEAK$B%i%Y%k$rIU$1$?=PNO2hA|(B
-  \return		$B$3$N%(%C%88!=P4o<+?H(B
+  \param in		“ü—Í2Ÿ”÷•ª‰æ‘œ
+  \param strength	“ü—ÍƒGƒbƒW‹­“x‰æ‘œ
+  \param out		‹­‚¢ƒGƒbƒW“_‚Æã‚¢ƒGƒbƒW“_‚É‚»‚ê‚¼‚ê#EDGEƒ‰ƒxƒ‹‚Æ
+			#WEAKƒ‰ƒxƒ‹‚ğ•t‚¯‚½o—Í‰æ‘œ
+  \return		‚±‚ÌƒGƒbƒWŒŸoŠí©g
 */
 const EdgeDetector&
 EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
@@ -398,16 +398,16 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
 {
     out.resize(in.height(), in.width());
 
-  // $B=PNO2hA|$N30<~$r(B0$B$K$9$k!%(B
+  // o—Í‰æ‘œ‚ÌŠOü‚ğ0‚É‚·‚éD
     if (out.height() > 0)
-	for (int u = 0; u < out.width(); ++u)
+	for (u_int u = 0; u < out.width(); ++u)
 	    out[0][u] = out[out.height()-1][u] = 0;
     if (out.width() > 0)
-	for (int v = 0; v < out.height(); ++v)
+	for (u_int v = 0; v < out.height(); ++v)
 	    out[v][0] = out[v][out.width()-1] = 0;
 
-  // $B8=:_E@$r:8>e6y$H$9$k(B2x2$B%&%#%s%I%&Cf$N2hAG$,0[Id9f$J$i%(%C%8E@$H$9$k!%(B
-    for (int v = 0; ++v < out.height() - 1; )
+  // Œ»İ“_‚ğ¶ã‹÷‚Æ‚·‚é2x2ƒEƒBƒ“ƒhƒE’†‚Ì‰æ‘f‚ªˆÙ•„†‚È‚çƒGƒbƒW“_‚Æ‚·‚éD
+    for (u_int v = 0; ++v < out.height() - 1; )
     {
 	const float		*cur = in[v],
 				*nxt = in[v+1],
@@ -433,27 +433,27 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
     return *this;
 }
 
-//! $B6/$$%(%C%8E@$r5/E@$K<e$$%(%C%8$rDI@W$9$k$3$H$K$h$j%R%9%F%j%7%9ogCM=hM}$r9T$&(B
+//! ‹­‚¢ƒGƒbƒW“_‚ğ‹N“_‚Éã‚¢ƒGƒbƒW‚ğ’ÇÕ‚·‚é‚±‚Æ‚É‚æ‚èƒqƒXƒeƒŠƒVƒXè‡’lˆ—‚ğs‚¤
 /*!
-  \param edge		$B6/$$%(%C%8E@$H<e$$%(%C%8E@$K$=$l$>$l(B#EDGE$B%i%Y%k$H(B
-			#WEAK$B%i%Y%k$rIU$1$?2hA|!%=hM}$,=*$o$k$H:G=*E*$J%(%C%8(B
-			$BE@$K(B255$B$r!$$=$&$G$J$$E@$K$O(B0$B$r=q$-9~$s$GJV$5$l$k!%(B
-  \return		$B$3$N%(%C%88!=P4o<+?H(B
+  \param edge		‹­‚¢ƒGƒbƒW“_‚Æã‚¢ƒGƒbƒW“_‚É‚»‚ê‚¼‚ê#EDGEƒ‰ƒxƒ‹‚Æ
+			#WEAKƒ‰ƒxƒ‹‚ğ•t‚¯‚½‰æ‘œDˆ—‚ªI‚í‚é‚ÆÅI“I‚ÈƒGƒbƒW
+			“_‚É255‚ğC‚»‚¤‚Å‚È‚¢“_‚É‚Í0‚ğ‘‚«‚ñ‚Å•Ô‚³‚ê‚éD
+  \return		‚±‚ÌƒGƒbƒWŒŸoŠí©g
 */
 const EdgeDetector&
 EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
 {
     
-  // $B6/$$%(%C%8E@$r5/E@$K$7$F!$@\B3$9$k<e$$%(%C%8E@$rDI@W$7(BEDGE$B%i%Y%k$rIU$1$k!%(B
-    for (int v = 0; ++v < edge.height() - 1; )
-	for (int u = 0; ++u < edge.width() - 1; )
+  // ‹­‚¢ƒGƒbƒW“_‚ğ‹N“_‚É‚µ‚ÄCÚ‘±‚·‚éã‚¢ƒGƒbƒW“_‚ğ’ÇÕ‚µEDGEƒ‰ƒxƒ‹‚ğ•t‚¯‚éD
+    for (u_int v = 0; ++v < edge.height() - 1; )
+	for (u_int u = 0; ++u < edge.width() - 1; )
 	    if (edge[v][u] & EDGE)
 		trace(edge, Point2i(u, v));
 
-  // EDGE$B%i%Y%k$,IU$$$F$*$i$:!$$+$DIU$$$F$$$kE@$HIU$$$F$$$J$$<e$$%(%C%8E@$N(B
-  // $B66EO$7$K$J$l$kE@$K?7$?$K(BEDGE$B%i%Y%k$rIU$1$FDI@W$r9T$&!%(B
-    for (int v = 0; ++v < edge.height() - 1; )
-	for (int u = 0; ++u < edge.width() - 1; )
+  // EDGEƒ‰ƒxƒ‹‚ª•t‚¢‚Ä‚¨‚ç‚¸C‚©‚Â•t‚¢‚Ä‚¢‚é“_‚Æ•t‚¢‚Ä‚¢‚È‚¢ã‚¢ƒGƒbƒW“_‚Ì
+  // ‹´“n‚µ‚É‚È‚ê‚é“_‚ÉV‚½‚ÉEDGEƒ‰ƒxƒ‹‚ğ•t‚¯‚Ä’ÇÕ‚ğs‚¤D
+    for (u_int v = 0; ++v < edge.height() - 1; )
+	for (u_int u = 0; ++u < edge.width() - 1; )
 	{
 	    Point2i	p(u, v);
 	    
@@ -461,8 +461,8 @@ EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
 		trace(edge, p);
 	}
 
-  // EDGE$BE@$K$O(B255$B$r!$$=$&$G$J$$E@$K$O(B0$B$r=q$-9~$`!%(B
-    for (int v = 0; v < edge.height(); )
+  // EDGE“_‚É‚Í255‚ğC‚»‚¤‚Å‚È‚¢“_‚É‚Í0‚ğ‘‚«‚ŞD
+    for (u_int v = 0; v < edge.height(); )
     {
 	u_char*	dst = edge[v++];
 	for (const u_char* const end = dst + edge.width(); dst < end; ++dst)

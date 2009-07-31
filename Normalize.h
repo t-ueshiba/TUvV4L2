@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Normalize.h,v 1.1 2008-09-11 00:14:16 ueshiba Exp $  
+ *  $Id: Normalize.h,v 1.2 2009-07-31 07:04:45 ueshiba Exp $  
  */
 #ifndef __TUNormalize_h
 #define __TUNormalize_h
@@ -37,11 +37,11 @@ namespace TU
 /************************************************************************
 *  class Normalize							*
 ************************************************************************/
-//! $BE@$NHsF1<!:BI8$N@55,2=JQ49$r9T$&%/%i%9(B
+//! “_‚Ì”ñ“¯ŸÀ•W‚Ì³‹K‰»•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
 /*!
   \f$\TUud{x}{}=[\TUtvec{x}{}, 1]^\top~
-  (\TUvec{x}{} \in \TUspace{R}{d})\f$$B$KBP$7$F!$0J2<$N$h$&$JJ?9T0\F0$H(B
-  $B%9%1!<%j%s%0$r9T$&(B:
+  (\TUvec{x}{} \in \TUspace{R}{d})\f$‚É‘Î‚µ‚ÄCˆÈ‰º‚Ì‚æ‚¤‚È•½sˆÚ“®‚Æ
+  ƒXƒP[ƒŠƒ“ƒO‚ğs‚¤:
   \f[
 	\TUud{y}{} =
 	\TUbeginarray{c} s^{-1}(\TUvec{x}{} - \TUvec{c}{}) \\ 1	\TUendarray =
@@ -51,16 +51,16 @@ namespace TU
 	\TUbeginarray{c} \TUvec{x}{} \\ 1 \TUendarray =
 	\TUvec{T}{}\TUud{x}{}
   \f]
-  \f$s\f$$B$H(B\f$\TUvec{c}{}\f$$B$O!$?6I}$N(B2$B>hJ?6QCM$,6u4V$N<!85(B\f$d\f$$B$K(B,
-  $B=E?4$,86E@$K$J$k$h$&7hDj$5$l$k!%(B
+  \f$s\f$‚Æ\f$\TUvec{c}{}\f$‚ÍCU•‚Ì2æ•½‹Ï’l‚ª‹óŠÔ‚ÌŸŒ³\f$d\f$‚É,
+  dS‚ªŒ´“_‚É‚È‚é‚æ‚¤Œˆ’è‚³‚ê‚éD
 */
 class Normalize
 {
   public:
-  //! $B6u4V$N<!85$r;XDj$7$F@55,2=JQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
+  //! ‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚Ä³‹K‰»•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
   /*!
-    $B91EyJQ49$H$7$F=i4|2=$5$l$k!%(B
-    \param d	$B6u4V$N<!85(B
+    P“™•ÏŠ·‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
+    \param d	‹óŠÔ‚ÌŸŒ³
   */
     Normalize(u_int d=2) :_npoints(0), _scale(1.0), _centroid(d)	{}
 
@@ -84,16 +84,16 @@ class Normalize
     const Vector<double>&	centroid()			const	;
     
   private:
-    u_int		_npoints;	//!< $B$3$l$^$G$KM?$($?E@$NAm?t(B
-    double		_scale;		//!< $B$3$l$^$G$KM?$($?E@$N?6I}$N(BRMS$BCM(B
-    Vector<double>	_centroid;	//!< $B$3$l$^$G$KM?$($?E@72$N=E?4(B
+    u_int		_npoints;	//!< ‚±‚ê‚Ü‚Å‚É—^‚¦‚½“_‚Ì‘”
+    double		_scale;		//!< ‚±‚ê‚Ü‚Å‚É—^‚¦‚½“_‚ÌU•‚ÌRMS’l
+    Vector<double>	_centroid;	//!< ‚±‚ê‚Ü‚Å‚É—^‚¦‚½“_ŒQ‚ÌdS
 };
 
-//! $BM?$($i$l$?E@72$NHsF1<!:BI8$+$i@55,2=JQ49%*%V%8%'%/%H$r@8@.$9$k!%(B
+//! —^‚¦‚ç‚ê‚½“_ŒQ‚Ì”ñ“¯ŸÀ•W‚©‚ç³‹K‰»•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
 /*!
-  $B?6I}$N(B2$B>hJ?6QCM$,(B#spaceDim(), $B=E?4$,86E@$K$J$k$h$&$J@55,2=JQ49$,7W;;$5$l$k!%(B
-  \param first	$BE@72$N@hF,$r<($9H?I|;R(B
-  \param last	$BE@72$NKvHx$r<($9H?I|;R(B
+  U•‚Ì2æ•½‹Ï’l‚ª#spaceDim(), dS‚ªŒ´“_‚É‚È‚é‚æ‚¤‚È³‹K‰»•ÏŠ·‚ªŒvZ‚³‚ê‚éD
+  \param first	“_ŒQ‚Ìæ“ª‚ğ¦‚·”½•œq
+  \param last	“_ŒQ‚Ì––”ö‚ğ¦‚·”½•œq
 */
 template <class Iterator> inline
 Normalize::Normalize(Iterator first, Iterator last)
@@ -102,12 +102,12 @@ Normalize::Normalize(Iterator first, Iterator last)
     update(first, last);
 }
     
-//! $B?7$?$KE@72$rDI2C$7$F$=$NHsF1<!:BI8$+$i8=:_$N@55,2=JQ49$r99?7$9$k!%(B
+//! V‚½‚É“_ŒQ‚ğ’Ç‰Á‚µ‚Ä‚»‚Ì”ñ“¯ŸÀ•W‚©‚çŒ»İ‚Ì³‹K‰»•ÏŠ·‚ğXV‚·‚éD
 /*!
-  $B?6I}$N(B2$B>hJ?6QCM$,(B#spaceDim(), $B=E?4$,86E@$K$J$k$h$&$J@55,2=JQ49$,7W;;$5$l$k!%(B
-  \param first			$BE@72$N@hF,$r<($9H?I|;R(B
-  \param last			$BE@72$NKvHx$r<($9H?I|;R(B
-  \throw std::invalid_argument	$B$3$l$^$G$KM?$($i$l$?E@$NAm?t$,(B0$B$N>l9g$KAw=P(B
+  U•‚Ì2æ•½‹Ï’l‚ª#spaceDim(), dS‚ªŒ´“_‚É‚È‚é‚æ‚¤‚È³‹K‰»•ÏŠ·‚ªŒvZ‚³‚ê‚éD
+  \param first			“_ŒQ‚Ìæ“ª‚ğ¦‚·”½•œq
+  \param last			“_ŒQ‚Ì––”ö‚ğ¦‚·”½•œq
+  \throw std::invalid_argument	‚±‚ê‚Ü‚Å‚É—^‚¦‚ç‚ê‚½“_‚Ì‘”‚ª0‚Ìê‡‚É‘—o
 */
 template <class Iterator> void
 Normalize::update(Iterator first, Iterator last)
@@ -132,9 +132,9 @@ Normalize::update(Iterator first, Iterator last)
     _scale = sqrt((_scale / _npoints - _centroid * _centroid) / spaceDim());
 }
 
-//! $B$3$N@55,2=JQ49$,E,MQ$5$l$k6u4V$N<!85$rJV$9!%(B
+//! ‚±‚Ì³‹K‰»•ÏŠ·‚ª“K—p‚³‚ê‚é‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
 /*! 
-  \return	$B6u4V$N<!85(B($BF1<!:BI8$N%Y%/%H%k$H$7$F$N<!85$O(B#spaceDim()+1)
+  \return	‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í#spaceDim()+1)
 */
 inline u_int
 Normalize::spaceDim() const
@@ -142,10 +142,10 @@ Normalize::spaceDim() const
     return _centroid.dim();
 }
     
-//! $BM?$($i$l$?E@$K@55,2=JQ49$rE,MQ$7$F$=$NHsF1<!:BI8$rJV$9!%(B
+//! —^‚¦‚ç‚ê‚½“_‚É³‹K‰»•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì”ñ“¯ŸÀ•W‚ğ•Ô‚·D
 /*!
-  \param x	$BE@$NHsF1<!:BI8!J(B#spaceDim()$B<!85!K(B
-  \return	$B@55,2=$5$l$?E@$NHsF1<!:BI8!J(B#spaceDim()$B<!85!K(B
+  \param x	“_‚Ì”ñ“¯ŸÀ•Wi#spaceDim()ŸŒ³j
+  \return	³‹K‰»‚³‚ê‚½“_‚Ì”ñ“¯ŸÀ•Wi#spaceDim()ŸŒ³j
 */
 template <class T2, class B2> inline Vector<double>
 Normalize::operator ()(const Vector<T2, B2>& x) const
@@ -153,10 +153,10 @@ Normalize::operator ()(const Vector<T2, B2>& x) const
     return (Vector<double>(x) -= _centroid) /= _scale;
 }
 
-//! $BM?$($i$l$?E@$K@55,2=JQ49$rE,MQ$7$F$=$NF1<!:BI8$rJV$9!%(B
+//! —^‚¦‚ç‚ê‚½“_‚É³‹K‰»•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì“¯ŸÀ•W‚ğ•Ô‚·D
 /*!
-  \param x	$BE@$NHsF1<!:BI8!J(B#spaceDim()$B<!85!K(B
-  \return	$B@55,2=$5$l$?E@$NF1<!:BI8!J(B#spaceDim()+1$B<!85!K(B
+  \param x	“_‚Ì”ñ“¯ŸÀ•Wi#spaceDim()ŸŒ³j
+  \return	³‹K‰»‚³‚ê‚½“_‚Ì“¯ŸÀ•Wi#spaceDim()+1ŸŒ³j
 */
 template <class T2, class B2> inline Vector<double>
 Normalize::normalizeP(const Vector<T2, B2>& x) const
@@ -164,9 +164,9 @@ Normalize::normalizeP(const Vector<T2, B2>& x) const
     return (*this)(x).homogenize();
 }
 
-//! $B@55,2=JQ49$N%9%1!<%j%s%0Dj?t$rJV$9!%(B
+//! ³‹K‰»•ÏŠ·‚ÌƒXƒP[ƒŠƒ“ƒO’è”‚ğ•Ô‚·D
 /*!
-  \return	$B%9%1!<%j%s%0Dj?t!JM?$($i$l$?E@Ns$N?6I}$N(B2$B>hJ?6QCM!K(B
+  \return	ƒXƒP[ƒŠƒ“ƒO’è”i—^‚¦‚ç‚ê‚½“_—ñ‚ÌU•‚Ì2æ•½‹Ï’lj
 */
 inline double
 Normalize::scale() const
@@ -174,9 +174,9 @@ Normalize::scale() const
     return _scale;
 }
 
-//! $B@55,2=JQ49$NJ?9T0\F0@.J,$rJV$9!%(B
+//! ³‹K‰»•ÏŠ·‚Ì•½sˆÚ“®¬•ª‚ğ•Ô‚·D
 /*!
-  \return	$BJ?9T0\F0@.J,!JM?$($i$l$?E@Ns$N=E?4!K(B
+  \return	•½sˆÚ“®¬•ªi—^‚¦‚ç‚ê‚½“_—ñ‚ÌdSj
 */
 inline const Vector<double>&
 Normalize::centroid() const
