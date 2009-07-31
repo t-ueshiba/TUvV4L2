@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.4 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Movie.h,v 1.5 2009-07-31 07:54:19 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -95,7 +95,7 @@ template <class T> class Movie
   private:
     ImageBase::Type	restoreHeader(std::istream& in)			;
     std::istream&	restoreFrames(std::istream& in,
-				      ImageBase::Type type, int m)	;
+				      ImageBase::Type type, u_int m)	;
     static u_int	nelements(u_int npixels)			;
     
   private:
@@ -238,7 +238,7 @@ Movie<T>::setFrame(u_int frame)
 	{
 	    _cFrame = frame;
 
-	    for (int i = 0; i < nviews(); ++i)
+	    for (u_int i = 0; i < nviews(); ++i)
 		_views[i].resize((T*)_frames[_cFrame] + _views[i].offset,
 				 _views[i].height(), _views[i].width());
 	}
@@ -327,7 +327,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
   // 各viewのオフセットと1フレームあたりの画素数を設定．
     _views.resize(sizes.dim());
     _nelements = 0;
-    for (int i = 0; i < nviews(); ++i)
+    for (u_int i = 0; i < nviews(); ++i)
     {
 	_views[i].offset = _nelements;
 	_nelements += nelements(sizes[i].first * sizes[i].second);
@@ -335,7 +335,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 	     
   // 指定された枚数のフレームを設定．
     _frames.resize(nf);
-    for (int j = 0; j < _frames.dim(); ++j)
+    for (u_int j = 0; j < _frames.dim(); ++j)
     {
 	try
 	{
@@ -356,7 +356,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
     
   // 指定された個数のviewとその大きさを設定．
     if (nframes() > 0)
-	for (int i = 0; i < nviews(); ++i)
+	for (u_int i = 0; i < nviews(); ++i)
 	    _views[i].resize((T*)_frames[0] + _views[i].offset,
 			     sizes[i].second, sizes[i].first);
     
@@ -389,7 +389,7 @@ Movie<T>::restoreHeader(std::istream& in)
 
     ImageBase::Type	type = ImageBase::DEFAULT;
     _nelements = 0;
-    for (int i = 0; i < nviews(); ++i)
+    for (u_int i = 0; i < nviews(); ++i)
     {
 	type = _views[i].restoreHeader(in);
 	_views[i].offset = _nelements;
@@ -400,7 +400,7 @@ Movie<T>::restoreHeader(std::istream& in)
 }
 
 template <class T> std::istream&
-Movie<T>::restoreFrames(std::istream& in, ImageBase::Type type, int m)
+Movie<T>::restoreFrames(std::istream& in, ImageBase::Type type, u_int m)
 {
     char	c;
     if (!in.get(c))
@@ -413,7 +413,7 @@ Movie<T>::restoreFrames(std::istream& in, ImageBase::Type type, int m)
     try
     {
 	Array<T>	frame(_nelements);
-	for (int i = 0; i < nviews(); ++i)
+	for (u_int i = 0; i < nviews(); ++i)
 	{
 	    _views[i].resize((T*)frame + _views[i].offset,
 			      _views[i].height(), _views[i].width());
@@ -463,7 +463,7 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
     using namespace	std;
     
     out << nviews() << endl;
-    for (int i = 0; i < nviews(); ++i)
+    for (u_int i = 0; i < nviews(); ++i)
 	type = _views[i].saveHeader(out, type);
     return type;
 }
@@ -478,7 +478,7 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
 template <class T> std::ostream&
 Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
 {
-    for (int i = 0; i < nviews(); ++i)
+    for (u_int i = 0; i < nviews(); ++i)
 	_views[i].saveData(out, type);
     return out;
 }
