@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.10 2008-09-02 05:13:16 ueshiba Exp $
+ *  $Id: main.cc,v 1.11 2009-07-31 07:05:24 ueshiba Exp $
  */
 #include <stdlib.h>
 #include "TU/Image++.h"
@@ -14,8 +14,8 @@ superImpose(const Image<u_char>& in, const Image<u_char>& edge,
 	    Image<RGB>& out)
 {
     out.resize(in.height(), in.width());
-    for (int v = 0; v < out.height(); ++v)
-	for (int u = 0; u < out.width(); ++u)
+    for (u_int v = 0; v < out.height(); ++v)
+	for (u_int u = 0; u < out.width(); ++u)
 	    if (edge[v][u])
 		out[v][u] = RGB(255, 255, 0);
 	    else

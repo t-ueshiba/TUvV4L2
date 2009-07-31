@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.6 2009-06-08 23:45:55 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.7 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -233,7 +233,7 @@ mmBackward4(const float*& src, float*& dst,
 /************************************************************************
 *  class IIRFilter<D>							*
 ************************************************************************/
-//! $BJRB&(BInfinite Inpulse Response Filter$B$rI=$9%/%i%9(B
+//! •Ğ‘¤Infinite Inpulse Response Filter‚ğ•\‚·ƒNƒ‰ƒX
 template <u_int D> class IIRFilter
 {
   public:
@@ -253,21 +253,21 @@ template <u_int D> class IIRFilter
     float	_c[D+D];	// coefficients
 };
 
-//! $B%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
+//! ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
 /*!
-  \param c	z$BJQ4978?t(B. z$BJQ494X?t$O!$A0?J%U%#%k%?$N>l9g$O(B
+  \param c	z•ÏŠ·ŒW”. z•ÏŠ·ŠÖ”‚ÍC‘OiƒtƒBƒ‹ƒ^‚Ìê‡‚Í
 		\f[
 		  H(z^{-1}) = \frac{c_{D-1} + c_{D-2}z^{-1} + c_{D-3}z^{-2} +
 		  \cdots
 		  + c_{0}z^{-(D-1)}}{1 - c_{2D-1}z^{-1} - c_{2D-2}z^{-2} -
 		  \cdots - c_{D}z^{-D}}
 		\f]
-		$B8eB`%U%#%k%?$N>l9g$O(B
+		Œã‘ŞƒtƒBƒ‹ƒ^‚Ìê‡‚Í
 		\f[
 		  H(z) = \frac{c_{0}z + c_{1}z^2 + \cdots + c_{D-1}z^D}
 		       {1 - c_{D}z - c_{D+1}z^2 - \cdots - c_{2D-1}z^D}
 		\f]
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <u_int D> IIRFilter<D>&
 IIRFilter<D>::initialize(const float c[D+D])
@@ -278,11 +278,11 @@ IIRFilter<D>::initialize(const float c[D+D])
     return *this;
 }
 
-//! $BA0?JJ}8~$K%U%#%k%?$rE,MQ$9$k(B
+//! ‘Oi•ûŒü‚ÉƒtƒBƒ‹ƒ^‚ğ“K—p‚·‚é
 /*!
-  \param in	$BF~NO%G!<%?Ns(B
-  \param out	$B=PNO%G!<%?Ns(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param in	“ü—Íƒf[ƒ^—ñ
+  \param out	o—Íƒf[ƒ^—ñ
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <u_int D> template <class T, class B, class B2>
 const IIRFilter<D>&
@@ -310,11 +310,11 @@ IIRFilter<D>::forward(const Array<T, B>& in, Array<float, B2>& out) const
     return *this;
 }
     
-//! $B8eB`J}8~$K%U%#%k%?$rE,MQ$9$k(B
+//! Œã‘Ş•ûŒü‚ÉƒtƒBƒ‹ƒ^‚ğ“K—p‚·‚é
 /*!
-  \param in	$BF~NO%G!<%?Ns(B
-  \param out	$B=PNO%G!<%?Ns(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param in	“ü—Íƒf[ƒ^—ñ
+  \param out	o—Íƒf[ƒ^—ñ
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <u_int D> template <class T, class B, class B2>
 const IIRFilter<D>&
@@ -349,12 +349,12 @@ IIRFilter<2u>::forward(const Array<T, B>& in, Array<float, B2>& out) const
     const mmFlt	c0123 = mmSet(_c[0], _c[1], _c[2], _c[3]);
     mmFlt	tmp = mmSet(_c[0]*src[1], _c[0]*src[0] + _c[1]*src[1],
 			    _c[1]*src[0], 0.0);
-    src += 2;			// mmForward2()$B$N$?$a$K(B2$B$DA0?J!%(B
+    src += 2;			// mmForward2()‚Ì‚½‚ß‚É2‚Â‘OiD
     for (const float* const tail2 = out.end() - mmNBytes/sizeof(T) - 2;
-	 dst <= tail2; )	// src$B$,(Bdst$B$h$j$b(B2$B$DA0?J$7$F$$$k$N$G(Boverrun$B$KCm0U!%(B
+	 dst <= tail2; )	// src‚ªdst‚æ‚è‚à2‚Â‘Oi‚µ‚Ä‚¢‚é‚Ì‚Åoverrun‚É’ˆÓD
 	mmForward2(src, dst, c0123, tmp);
     mmEmpty();
-    src -= 2;			// 2$B$DA0?J$7$F$$$?J,$r85$KLa$9!%(B
+    src -= 2;			// 2‚Â‘Oi‚µ‚Ä‚¢‚½•ª‚ğŒ³‚É–ß‚·D
 #else
     *dst = _c[1]*src[0];
     ++src;
@@ -385,12 +385,12 @@ IIRFilter<2u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
     const mmFlt	c1032 = mmSet(_c[1], _c[0], _c[3], _c[2]);
     mmFlt	tmp   = mmSet(_c[1]*src[-2], _c[1]*src[-1] + _c[0]*src[-2],
 			      _c[0]*src[-1], 0.0);
-    src -= 2;			// mmBackward2()$B$N$?$a$K(B2$B$D8eB`!%(B
+    src -= 2;			// mmBackward2()‚Ì‚½‚ß‚É2‚ÂŒã‘ŞD
     for (const float* const head2 = out.begin() + mmNBytes/sizeof(T) + 2;
-	 dst >= head2; )	// src$B$,(Bdst$B$h$j$b(B2$B$D8eB`$7$F$$$k$N$G(Boverrun$B$KCm0U!%(B
+	 dst >= head2; )	// src‚ªdst‚æ‚è‚à2‚ÂŒã‘Ş‚µ‚Ä‚¢‚é‚Ì‚Åoverrun‚É’ˆÓD
 	mmBackward2(src, dst, c1032, tmp);
     mmEmpty();
-    src += 2;			// 2$B$D8eB`$7$F$$$?J,$r85$KLa$9!%(B
+    src += 2;			// 2‚ÂŒã‘Ş‚µ‚Ä‚¢‚½•ª‚ğŒ³‚É–ß‚·D
 #else
     --src;
     --dst;
@@ -496,11 +496,11 @@ IIRFilter<4u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
     return *this;
 }
 
-//! $BFCDj$NF~NO%G!<%?Ns$KBP$7$FA0?JJ}8~$K%U%#%k%?$rE,MQ$7$?>l9g$N6K8BCM$r5a$a$k(B
+//! “Á’è‚Ì“ü—Íƒf[ƒ^—ñ‚É‘Î‚µ‚Ä‘Oi•ûŒü‚ÉƒtƒBƒ‹ƒ^‚ğ“K—p‚µ‚½ê‡‚Ì‹ÉŒÀ’l‚ğ‹‚ß‚é
 /*!
-  \param limit0F	$B0lDjF~NO(B in(n) = 1 $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
-  \param limit1F	$B79$-0lDjF~NO(B in(n) = n $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
-  \param limit1F	2$B<!F~NO(B in(n) = n^2 $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
+  \param limit0F	ˆê’è“ü—Í in(n) = 1 ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
+  \param limit1F	ŒX‚«ˆê’è“ü—Í in(n) = n ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
+  \param limit1F	2Ÿ“ü—Í in(n) = n^2 ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
 */
 template <u_int D> void
 IIRFilter<D>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
@@ -522,11 +522,11 @@ IIRFilter<D>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
     limit2F =  x1 + x2;
 }
 
-//! $BFCDj$NF~NO%G!<%?Ns$KBP$7$F8eB`J}8~$K%U%#%k%?$rE,MQ$7$?>l9g$N6K8BCM$r5a$a$k(B
+//! “Á’è‚Ì“ü—Íƒf[ƒ^—ñ‚É‘Î‚µ‚ÄŒã‘Ş•ûŒü‚ÉƒtƒBƒ‹ƒ^‚ğ“K—p‚µ‚½ê‡‚Ì‹ÉŒÀ’l‚ğ‹‚ß‚é
 /*!
-  \param limit0B	$B0lDjF~NO(B in(n) = 1 $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
-  \param limit1B	$B79$-0lDjF~NO(B in(n) = n $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
-  \param limit1B	2$B<!F~NO(B in(n) = n^2 $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
+  \param limit0B	ˆê’è“ü—Í in(n) = 1 ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
+  \param limit1B	ŒX‚«ˆê’è“ü—Í in(n) = n ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
+  \param limit1B	2Ÿ“ü—Í in(n) = n^2 ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
 */
 template <u_int D> void
 IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
@@ -551,23 +551,23 @@ IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
 /************************************************************************
 *  class BilateralIIRFilterBase						*
 ************************************************************************/
-//! $BN>B&(BInfinite Inpulse Response Filter$B$N%Y!<%9$H$J$k%/%i%9(B
+//! —¼‘¤Infinite Inpulse Response Filter‚Ìƒx[ƒX‚Æ‚È‚éƒNƒ‰ƒX
 class BilateralIIRFilterBase
 {
   public:
-  //! $BHyJ,$N3,?t(B
+  //! ”÷•ª‚ÌŠK”
     enum Order
     {
-	Zeroth,						//!< 0$B3,HyJ,(B
-	First,						//!< 1$B3,HyJ,(B
-	Second						//!< 2$B3,HyJ,(B
+	Zeroth,						//!< 0ŠK”÷•ª
+	First,						//!< 1ŠK”÷•ª
+	Second						//!< 2ŠK”÷•ª
     };
 };
 
 /************************************************************************
 *  class BilateralIIRFilter<D>						*
 ************************************************************************/
-//! $BN>B&(BInfinite Inpulse Response Filter$B$rI=$9%/%i%9(B
+//! —¼‘¤Infinite Inpulse Response Filter‚ğ•\‚·ƒNƒ‰ƒX
 template <u_int D> class BilateralIIRFilter : public BilateralIIRFilterBase
 {
   public:
@@ -599,22 +599,22 @@ template <u_int D> class BilateralIIRFilter : public BilateralIIRFilterBase
     mutable Array<float>	_bufB;
 };
 
-//! $B%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
+//! ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
 /*!
-  \param cF	$BA0?J(Bz$BJQ4978?t(B. z$BJQ49$O(B 
+  \param cF	‘Oiz•ÏŠ·ŒW”. z•ÏŠ·‚Í 
 		\f[
 		  H^F(z^{-1}) = \frac{c^F_{D-1} + c^F_{D-2}z^{-1}
 		  + c^F_{D-3}z^{-2} + \cdots
 		  + c^F_{0}z^{-(D-1)}}{1 - c^F_{2D-1}z^{-1}
 		  - c^F_{2D-2}z^{-2} - \cdots - c^F_{D}z^{-D}}
 		\f]
-		$B$H$J$k(B. 
-  \param cB	$B8eB`(Bz$BJQ4978?t(B. z$BJQ49$O(B
+		‚Æ‚È‚é. 
+  \param cB	Œã‘Şz•ÏŠ·ŒW”. z•ÏŠ·‚Í
 		\f[
 		  H^B(z) = \frac{c^B_{0}z + c^B_{1}z^2 + \cdots + c^B_{D-1}z^D}
 		       {1 - c^B_{D}z - c^B_{D+1}z^2 - \cdots - c^B_{2D-1}z^D}
 		\f]
-		$B$H$J$k(B.
+		‚Æ‚È‚é.
 */
 template <u_int D> inline BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
@@ -630,21 +630,21 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
     return *this;
 }
 
-//! $BN>B&%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
+//! —¼‘¤ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
 /*!
-  \param c	$BA0?JJ}8~(Bz$BJQ4978?t(B. z$BJQ494X?t$O(B
+  \param c	‘Oi•ûŒüz•ÏŠ·ŒW”. z•ÏŠ·ŠÖ”‚Í
 		\f[
 		  H(z^{-1}) = \frac{c_{D-1} + c_{D-2}z^{-1} + c_{D-3}z^{-2} +
 		  \cdots
 		  + c_{0}z^{-(D-1)}}{1 - c_{2D-1}z^{-1} - c_{2D-2}z^{-2} -
 		  \cdots - c_{D}z^{-D}}
 		\f]
-  \param order	$B%U%#%k%?$NHyJ,3,?t(B. #Zeroth$B$^$?$O(B#Second$B$J$i$PBP>N%U%#%k%?(B
-		$B$H$7$F!$(B#First$B$J$i$PH?BP>N%U%#%k%?$H$7$F<+F0E*$K8eB`J}8~$N(B
-		z$BJQ4978?t$r7W;;$9$k!%(B#Zeroth, #First, #Second$B$N$H$-$K!$$=$l(B
-		$B$>$l(B in(n) = 1, in(n) = n, in(n) = n^2 $B$KBP$9$k=PNO$,(B
-		1, 1, 2$B$K$J$k$h$&!$A4BN$N%9%1!<%k$bD4@0$5$l$k!%(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param order	ƒtƒBƒ‹ƒ^‚Ì”÷•ªŠK”. #Zeroth‚Ü‚½‚Í#Second‚È‚ç‚Î‘ÎÌƒtƒBƒ‹ƒ^
+		‚Æ‚µ‚ÄC#First‚È‚ç‚Î”½‘ÎÌƒtƒBƒ‹ƒ^‚Æ‚µ‚Ä©“®“I‚ÉŒã‘Ş•ûŒü‚Ì
+		z•ÏŠ·ŒW”‚ğŒvZ‚·‚éD#Zeroth, #First, #Second‚Ì‚Æ‚«‚ÉC‚»‚ê
+		‚¼‚ê in(n) = 1, in(n) = n, in(n) = n^2 ‚É‘Î‚·‚éo—Í‚ª
+		1, 1, 2‚É‚È‚é‚æ‚¤C‘S‘Ì‚ÌƒXƒP[ƒ‹‚à’²®‚³‚ê‚éD
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <u_int D> BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
@@ -696,10 +696,10 @@ BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
     return initialize(cF, cB);
 }
     
-//! $B%U%#%k%?$K$h$k>v$_9~$_$r9T$&(B. $B=PNO$O(B operator [](int) $B$G<h$j=P$9(B
+//! ƒtƒBƒ‹ƒ^‚É‚æ‚éô‚İ‚İ‚ğs‚¤. o—Í‚Í operator [](int) ‚Åæ‚èo‚·
 /*!
-  \param in	$BF~NO%G!<%?Ns(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param in	“ü—Íƒf[ƒ^—ñ
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <u_int D> template <class T, class B>
 inline const BilateralIIRFilter<D>&
@@ -711,11 +711,11 @@ BilateralIIRFilter<D>::convolve(const Array<T, B>& in) const
     return *this;
 }
 
-//! $B%U%#%k%?$K$h$k>v$_9~$_$r9T$&(B. 
+//! ƒtƒBƒ‹ƒ^‚É‚æ‚éô‚İ‚İ‚ğs‚¤. 
 /*!
-  \param in	$BF~NO%G!<%?Ns(B
-  \param out	$B=PNO%G!<%?Ns(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param in	“ü—Íƒf[ƒ^—ñ
+  \param out	o—Íƒf[ƒ^—ñ
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <u_int D> template <class T1, class B1, class T2, class B2>
 inline const BilateralIIRFilter<D>&
@@ -730,13 +730,13 @@ BilateralIIRFilter<D>::convolve(const Array<T1, B1>& in,
     return *this;
 }
 
-//! 2$B<!85G[Ns$N3F9T$KBP$7$F%U%#%k%?$K$h$k>v$_9~$_$r9T$&(B.
+//! 2ŸŒ³”z—ñ‚ÌŠes‚É‘Î‚µ‚ÄƒtƒBƒ‹ƒ^‚É‚æ‚éô‚İ‚İ‚ğs‚¤.
 /*!
-  \param in	$BF~NO(B2$B<!85G[Ns(B
-  \param out	$B=PNO(B2$B<!85G[Ns(B
-  \param is	$B=hM}$r3+;O$9$k9T(B
-  \param ie	$B=hM}$r=*N;$9$k<!$N9T!%(B0$B$rM?$($k$H:G8e$N9T$^$G=hM}$9$k!%(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param in	“ü—Í2ŸŒ³”z—ñ
+  \param out	o—Í2ŸŒ³”z—ñ
+  \param is	ˆ—‚ğŠJn‚·‚és
+  \param ie	ˆ—‚ğI—¹‚·‚éŸ‚ÌsD0‚ğ—^‚¦‚é‚ÆÅŒã‚Ìs‚Ü‚Åˆ—‚·‚éD
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <u_int D>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
@@ -760,9 +760,9 @@ BilateralIIRFilter<D>::operator ()(const Array2<T1, B1, R1>& in,
     return *this;
 }
 
-//! $B>v$_9~$_$N=PNO%G!<%?Ns$N<!85$rJV$9(B
+//! ô‚İ‚İ‚Ìo—Íƒf[ƒ^—ñ‚ÌŸŒ³‚ğ•Ô‚·
 /*!
-  \return	$B=PNO%G!<%?Ns$N<!85(B
+  \return	o—Íƒf[ƒ^—ñ‚ÌŸŒ³
 */
 template <u_int D> inline u_int
 BilateralIIRFilter<D>::dim() const
@@ -770,10 +770,10 @@ BilateralIIRFilter<D>::dim() const
     return _bufF.dim();
 }
 
-//! $B>v$_9~$_$N=PNO%G!<%?$NFCDj$NMWAG$rJV$9(B
+//! ô‚İ‚İ‚Ìo—Íƒf[ƒ^‚Ì“Á’è‚Ì—v‘f‚ğ•Ô‚·
 /*!
-  \param i	$BMWAG$N(Bindex
-  \return	$BMWAG$NCM(B
+  \param i	—v‘f‚Ìindex
+  \return	—v‘f‚Ì’l
 */
 template <u_int D> inline float
 BilateralIIRFilter<D>::operator [](int i) const
@@ -781,11 +781,11 @@ BilateralIIRFilter<D>::operator [](int i) const
     return _bufF[i] + _bufB[i];
 }
 
-//! $BFCDj$NF~NO%G!<%?Ns$KBP$7$F%U%#%k%?$rE,MQ$7$?>l9g$N6K8BCM$r5a$a$k(B
+//! “Á’è‚Ì“ü—Íƒf[ƒ^—ñ‚É‘Î‚µ‚ÄƒtƒBƒ‹ƒ^‚ğ“K—p‚µ‚½ê‡‚Ì‹ÉŒÀ’l‚ğ‹‚ß‚é
 /*!
-  \param limit0		$B0lDjF~NO(B in(n) = 1 $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
-  \param limit1		$B79$-0lDjF~NO(B in(n) = n $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
-  \param limit2		2$B<!F~NO(B in(n) = n^2 $B$rM?$($?$H$-$N=PNO6K8BCM$rJV$9!%(B
+  \param limit0		ˆê’è“ü—Í in(n) = 1 ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
+  \param limit1		ŒX‚«ˆê’è“ü—Í in(n) = n ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
+  \param limit2		2Ÿ“ü—Í in(n) = n^2 ‚ğ—^‚¦‚½‚Æ‚«‚Ìo—Í‹ÉŒÀ’l‚ğ•Ô‚·D
 */
 template <u_int D> void
 BilateralIIRFilter<D>::limits(float& limit0,
@@ -805,7 +805,7 @@ BilateralIIRFilter<D>::limits(float& limit0,
 /************************************************************************
 *  class BilateralIIRFilter2						*
 ************************************************************************/
-//! 2$B<!85N>B&(BInfinite Inpulse Response Filter$B$rI=$9%/%i%9(B
+//! 2ŸŒ³—¼‘¤Infinite Inpulse Response Filter‚ğ•\‚·ƒNƒ‰ƒX
 template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
 {
   public:
@@ -832,13 +832,13 @@ template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
     mutable Array2<Array<float> >	_buf;
 };
     
-//! $B%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
+//! ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
 /*!
-  \param cHF	$B2#J}8~A0?J(Bz$BJQ4978?t(B
-  \param cHB	$B2#J}8~8eB`(Bz$BJQ4978?t(B
-  \param cHV	$B=DJ}8~A0?J(Bz$BJQ4978?t(B
-  \param cHV	$B=DJ}8~8eB`(Bz$BJQ4978?t(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param cHF	‰¡•ûŒü‘Oiz•ÏŠ·ŒW”
+  \param cHB	‰¡•ûŒüŒã‘Şz•ÏŠ·ŒW”
+  \param cHV	c•ûŒü‘Oiz•ÏŠ·ŒW”
+  \param cHV	c•ûŒüŒã‘Şz•ÏŠ·ŒW”
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <class BIIRH, class BIIRV> inline BilateralIIRFilter2<BIIRH, BIIRV>&
 BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], float cHB[],
@@ -850,13 +850,13 @@ BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], float cHB[],
     return *this;
 }
 
-//! $B%U%#%k%?$N(Bz$BJQ4978?t$r%;%C%H$9$k(B
+//! ƒtƒBƒ‹ƒ^‚Ìz•ÏŠ·ŒW”‚ğƒZƒbƒg‚·‚é
 /*!
-  \param cHF	$B2#J}8~A0?J(Bz$BJQ4978?t(B
-  \param orderH $B2#J}8~HyJ,3,?t(B
-  \param cHV	$B=DJ}8~A0?J(Bz$BJQ4978?t(B
-  \param orderV	$B=DJ}8~HyJ,3,?t(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param cHF	‰¡•ûŒü‘Oiz•ÏŠ·ŒW”
+  \param orderH ‰¡•ûŒü”÷•ªŠK”
+  \param cHV	c•ûŒü‘Oiz•ÏŠ·ŒW”
+  \param orderV	c•ûŒü”÷•ªŠK”
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <class BIIRH, class BIIRV> inline BilateralIIRFilter2<BIIRH, BIIRV>&
 BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], Order orderH,
@@ -868,11 +868,11 @@ BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], Order orderH,
     return *this;
 }
 
-//! $BM?$($i$l$?(B2$B<!85G[Ns$H$3$N%U%#%k%?$N>v$_9~$_$r9T$&(B
+//! —^‚¦‚ç‚ê‚½2ŸŒ³”z—ñ‚Æ‚±‚ÌƒtƒBƒ‹ƒ^‚Ìô‚İ‚İ‚ğs‚¤
 /*!
-  \param in	$BF~NO(B2$B<!85G[Ns(B
-  \param out	$B=PNO(B2$B<!85G[Ns(B
-  \return	$B$3$N%U%#%k%?<+?H(B
+  \param in	“ü—Í2ŸŒ³”z—ñ
+  \param out	o—Í2ŸŒ³”z—ñ
+  \return	‚±‚ÌƒtƒBƒ‹ƒ^©g
 */
 template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>

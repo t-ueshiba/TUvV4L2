@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìŽÒFAŽÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAŽÅr•v‚ª‘nì‚µC
+ *  i“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ðŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  ŽÒ‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ðŽg—pC•¡»C‰ü•ÏC‘æŽOŽÒ‚ÖŠJŽ¦‚·‚é
+ *  “™‚Ìsˆ×‚ð‹ÖŽ~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LŽÒ‚¨
+ *  ‚æ‚Ñ‘nìŽÒ‚ÍÓ”C‚ð•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.h,v 1.3 2008-11-06 23:21:12 ueshiba Exp $
+ *  $Id: CorrectIntensity.h,v 1.4 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef	__TUCorrectIntensity_h
 #define	__TUCorrectIntensity_h
@@ -37,14 +37,14 @@ namespace TU
 /************************************************************************
 *  class CorrectIntensity						*
 ************************************************************************/
-//! $B2hA|$N@~7A51EYJd@5$r9T$&%/%i%9(B
+//! ‰æ‘œ‚ÌüŒ`‹P“x•â³‚ðs‚¤ƒNƒ‰ƒX
 class CorrectIntensity
 {
   public:
-  //! $B%*%U%;%C%H$H%2%$%s$r;XDj$7$F51EYJd@5%*%V%8%'%/%H$r@8@.$9$k!%(B
+  //! ƒIƒtƒZƒbƒg‚ÆƒQƒCƒ“‚ðŽw’è‚µ‚Ä‹P“x•â³ƒIƒuƒWƒFƒNƒg‚ð¶¬‚·‚éD
   /*!
-    \param offset	$B%*%U%;%C%H(B
-    \param gain		$B%2%$%s(B
+    \param offset	ƒIƒtƒZƒbƒg
+    \param gain		ƒQƒCƒ“
   */
     CorrectIntensity(float offset=0.0, float gain=1.0)
 	:_offset(offset), _gain(gain) 					{}
@@ -61,10 +61,10 @@ class CorrectIntensity
     float	_gain;
 };
 
-//! $B%*%U%;%C%H$H%2%$%s$r;XDj$7$F51EYJd@5%*%V%8%'%/%H$r=i4|2=$9$k!%(B
+//! ƒIƒtƒZƒbƒg‚ÆƒQƒCƒ“‚ðŽw’è‚µ‚Ä‹P“x•â³ƒIƒuƒWƒFƒNƒg‚ð‰Šú‰»‚·‚éD
 /*!
-  \param offset		$B%*%U%;%C%H(B
-  \param gain		$B%2%$%s(B
+  \param offset		ƒIƒtƒZƒbƒg
+  \param gain		ƒQƒCƒ“
 */
 inline void
 CorrectIntensity::initialize(float offset, float gain)

@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  ïΩê¨14-19îNÅiì∆ÅjéYã∆ãZèpëççáå§ãÜèä íòçÏå†èäóL
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ënçÏé“ÅFêAé≈èrïv
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  ñ{ÉvÉçÉOÉâÉÄÇÕÅiì∆ÅjéYã∆ãZèpëççáå§ãÜèäÇÃêEàıÇ≈Ç†ÇÈêAé≈èrïvÇ™ënçÏÇµÅC
+ *  Åiì∆ÅjéYã∆ãZèpëççáå§ãÜèäÇ™íòçÏå†ÇèäóLÇ∑ÇÈîÈñßèÓïÒÇ≈Ç∑ÅDíòçÏå†èäóL
+ *  é“Ç…ÇÊÇÈãñâ¬Ç»ÇµÇ…ñ{ÉvÉçÉOÉâÉÄÇégópÅCï°êªÅCâ¸ïœÅCëÊéOé“Ç÷äJé¶Ç∑ÇÈ
+ *  ìôÇÃçsà◊Çã÷é~ÇµÇ‹Ç∑ÅD
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  Ç±ÇÃÉvÉçÉOÉâÉÄÇ…ÇÊÇ¡Çƒê∂Ç∂ÇÈÇ¢Ç©Ç»ÇÈëπäQÇ…ëŒÇµÇƒÇ‡ÅCíòçÏå†èäóLé“Ç®
+ *  ÇÊÇ—ënçÏé“ÇÕê”îCÇïâÇ¢Ç‹ÇπÇÒÅB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Profiler.cc,v 1.2 2008-09-10 05:10:44 ueshiba Exp $
+ *  $Id: Profiler.cc,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
  */
 #include <iomanip>
 #include "TU/Profiler.h"
@@ -35,22 +35,22 @@ namespace TU
 /************************************************************************
 *  clsss Profiler							*
 ************************************************************************/
-//! $BA4$F$N%?%$%^$r%j%;%C%H$9$k!JC_@Q;~4V$r6u$K$7!$%U%l!<%`HV9f$r(B0$B$KLa$9!K!%(B
+//! ëSÇƒÇÃÉ^ÉCÉ}ÇÉäÉZÉbÉgÇ∑ÇÈÅií~êœéûä‘ÇãÛÇ…ÇµÅCÉtÉåÅ[ÉÄî‘çÜÇ0Ç…ñﬂÇ∑ÅjÅD
 const Profiler&
 Profiler::reset() const
 {
     _active = 0;
-    for (int n = 0; n < _timers.dim(); ++n)
+    for (u_int n = 0; n < _timers.dim(); ++n)
 	_timers[n].reset();
     _nframes = 0;
     return *this;
 }
 
-//! 1$B%U%l!<%`$"$?$j$N<B9T;~4V$H(B1$BIC$"$?$j$N=hM}%U%l!<%`?t$rI=<($9$k!%(B
+//! 1ÉtÉåÅ[ÉÄÇ†ÇΩÇËÇÃé¿çséûä‘Ç∆1ïbÇ†ÇΩÇËÇÃèàóùÉtÉåÅ[ÉÄêîÇï\é¶Ç∑ÇÈÅD
 /*!
-  $B=hM}B.EY$O!$3F%?%$%^Kh$NC_@Q;~4V$+$i7W;;$5$l$?$b$N$H!$A4%?%$%^$NC_@Q;~4V$N(B
-  $BAm7W$+$i7W;;$5$l$?$b$N$NN>J}$,I=<($5$l$k!%(B
-  \param out	$B=PNO%9%H%j!<%`(B
+  èàóùë¨ìxÇÕÅCäeÉ^ÉCÉ}ñàÇÃí~êœéûä‘Ç©ÇÁåvéZÇ≥ÇÍÇΩÇ‡ÇÃÇ∆ÅCëSÉ^ÉCÉ}ÇÃí~êœéûä‘ÇÃ
+  ëçåvÇ©ÇÁåvéZÇ≥ÇÍÇΩÇ‡ÇÃÇÃóºï˚Ç™ï\é¶Ç≥ÇÍÇÈÅD
+  \param out	èoóÕÉXÉgÉäÅ[ÉÄ
  */
 std::ostream&
 Profiler::print(std::ostream& out) const
@@ -59,7 +59,7 @@ Profiler::print(std::ostream& out) const
     timeval		sum_accum;
     sum_accum.tv_sec = sum_accum.tv_usec = 0;
 
-    for (int n = 0; n < _timers.dim(); ++n)
+    for (u_int n = 0; n < _timers.dim(); ++n)
     {
 	timeval	accum = _timers[n].print(out, _nframes);
 	sum_accum.tv_sec  += accum.tv_sec;

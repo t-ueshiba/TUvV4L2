@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìŽÒFAŽÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAŽÅr•v‚ª‘nì‚µC
+ *  i“ÆjŽY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ðŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  ŽÒ‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ðŽg—pC•¡»C‰ü•ÏC‘æŽOŽÒ‚ÖŠJŽ¦‚·‚é
+ *  “™‚Ìsˆ×‚ð‹ÖŽ~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LŽÒ‚¨
+ *  ‚æ‚Ñ‘nìŽÒ‚ÍÓ”C‚ð•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.8 2009-03-09 05:12:32 ueshiba Exp $
+ *  $Id: Warp.h,v 1.9 2009-07-31 07:04:46 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -39,7 +39,7 @@ namespace TU
 /************************************************************************
 *  class Warp								*
 ************************************************************************/
-//! $B2hA|$rJQ7A$9$k$?$a$N%/%i%9(B
+//! ‰æ‘œ‚ð•ÏŒ`‚·‚é‚½‚ß‚ÌƒNƒ‰ƒX
 class Warp
 {
   private:
@@ -62,18 +62,18 @@ class Warp
     };
     
   public:
-  //! $B2hA|JQ7A%*%V%8%'%/%H$r@8@.$9$k!%(B
+  //! ‰æ‘œ•ÏŒ`ƒIƒuƒWƒFƒNƒg‚ð¶¬‚·‚éD
     Warp()	:_fracs(), _width(0)			{}
 
-  //! $B=PNO2hA|$NI}$rJV$9!%(B
+  //! o—Í‰æ‘œ‚Ì•‚ð•Ô‚·D
   /*!
-    return	$B=PNO2hA|$NI}(B
+    return	o—Í‰æ‘œ‚Ì•
   */
     u_int	width()				const	{return _width;}
 
-  //! $B=PNO2hA|$N9b$5$rJV$9!%(B
+  //! o—Í‰æ‘œ‚Ì‚‚³‚ð•Ô‚·D
   /*!
-    return	$B=PNO2hA|$N9b$5(B
+    return	o—Í‰æ‘œ‚Ì‚‚³
   */
     u_int	height()			const	{return _fracs.dim();}
     
@@ -109,13 +109,13 @@ Warp::FracArray::resize(u_int d)
     dv.resize(d);
 }
 
-//! $B=PNO2hA|$K$*$1$k;XDj$5$l$?9T$NM-8z:8C<0LCV$rJV$9!%(B
+//! o—Í‰æ‘œ‚É‚¨‚¯‚éŽw’è‚³‚ê‚½s‚Ì—LŒø¶’[ˆÊ’u‚ð•Ô‚·D
 /*!
-  $BF~NO2hA|$,6k7A$G$b=PNO2hA|$b6k7A$H$O8B$i$J$$$N$G!$=PNO2hA|$N0lIt$7$+(B
-  $BF~NO2hA|$NCM0h(B($BM-8zNN0h(B)$B$H$J$i$J$$!%K\4X?t$O!$=PNO2hA|$N;XDj$5$l$?9T(B
-  $B$K$D$$$F!$$=$NM-8zNN0h$N:8C<$H$J$k2hAG0LCV$rJV$9!%(B
-  \param v	$B9T$r;XDj$9$k(Bintex
-  \return	$B:8C<0LCV(B
+  “ü—Í‰æ‘œ‚ª‹éŒ`‚Å‚ào—Í‰æ‘œ‚à‹éŒ`‚Æ‚ÍŒÀ‚ç‚È‚¢‚Ì‚ÅCo—Í‰æ‘œ‚Ìˆê•”‚µ‚©
+  “ü—Í‰æ‘œ‚Ì’lˆæ(—LŒø—Ìˆæ)‚Æ‚È‚ç‚È‚¢D–{ŠÖ”‚ÍCo—Í‰æ‘œ‚ÌŽw’è‚³‚ê‚½s
+  ‚É‚Â‚¢‚ÄC‚»‚Ì—LŒø—Ìˆæ‚Ì¶’[‚Æ‚È‚é‰æ‘fˆÊ’u‚ð•Ô‚·D
+  \param v	s‚ðŽw’è‚·‚éintex
+  \return	¶’[ˆÊ’u
 */
 inline int
 Warp::lmost(int v) const
@@ -123,13 +123,13 @@ Warp::lmost(int v) const
     return _fracs[v].lmost;
 }
 
-//! $B=PNO2hA|$K$*$1$k;XDj$5$l$?9T$NM-8z1&C<0LCV$N<!$rJV$9!%(B
+//! o—Í‰æ‘œ‚É‚¨‚¯‚éŽw’è‚³‚ê‚½s‚Ì—LŒø‰E’[ˆÊ’u‚ÌŽŸ‚ð•Ô‚·D
 /*!
-  $BF~NO2hA|$,6k7A$G$b=PNO2hA|$b6k7A$H$O8B$i$J$$$N$G!$=PNO2hA|$N0lIt$7$+(B
-  $BF~NO2hA|$NCM0h(B($BM-8zNN0h(B)$B$H$J$i$J$$!%K\4X?t$O!$=PNO2hA|$N;XDj$5$l$?9T(B
-  $B$K$D$$$F!$$=$NM-8zNN0h$N1&C<$N1&NY$H$J$k2hAG0LCV$rJV$9!%(B
-  \param v	$B9T$r;XDj$9$k(Bintex
-  \return	$B1&C<0LCV$N<!(B
+  “ü—Í‰æ‘œ‚ª‹éŒ`‚Å‚ào—Í‰æ‘œ‚à‹éŒ`‚Æ‚ÍŒÀ‚ç‚È‚¢‚Ì‚ÅCo—Í‰æ‘œ‚Ìˆê•”‚µ‚©
+  “ü—Í‰æ‘œ‚Ì’lˆæ(—LŒø—Ìˆæ)‚Æ‚È‚ç‚È‚¢D–{ŠÖ”‚ÍCo—Í‰æ‘œ‚ÌŽw’è‚³‚ê‚½s
+  ‚É‚Â‚¢‚ÄC‚»‚Ì—LŒø—Ìˆæ‚Ì‰E’[‚Ì‰E—×‚Æ‚È‚é‰æ‘fˆÊ’u‚ð•Ô‚·D
+  \param v	s‚ðŽw’è‚·‚éintex
+  \return	‰E’[ˆÊ’u‚ÌŽŸ
 */
 inline int
 Warp::rmost(int v) const
@@ -137,30 +137,30 @@ Warp::rmost(int v) const
     return _fracs[v].lmost + _fracs[v].width();
 }
 
-//! $B=PNO2hA|E@$r;XDj$7$F$=$l$K%^%C%W$5$l$kF~NO2hA|E@$N(B2$B<!85:BI8$rJV$9!%(B
+//! o—Í‰æ‘œ“_‚ðŽw’è‚µ‚Ä‚»‚ê‚Éƒ}ƒbƒv‚³‚ê‚é“ü—Í‰æ‘œ“_‚Ì2ŽŸŒ³À•W‚ð•Ô‚·D
 /*!
-  \param u	$B=PNO2hA|E@$N2#:BI8(B
-  \param v	$B=PNO2hA|E@$N=D:BI8(B
-  \return	$B=PNO2hA|E@(B(u, v)$B$K%^%C%W$5$l$kF~NO2hA|E@$N(B2$B<!85:BI8(B
+  \param u	o—Í‰æ‘œ“_‚Ì‰¡À•W
+  \param v	o—Í‰æ‘œ“_‚ÌcÀ•W
+  \return	o—Í‰æ‘œ“_(u, v)‚Éƒ}ƒbƒv‚³‚ê‚é“ü—Í‰æ‘œ“_‚Ì2ŽŸŒ³À•W
 */
 inline Vector2f
 Warp::operator ()(int u, int v) const
 {
     Vector2f		val;
     const FracArray&	fracs = _fracs[v];
-    val[0] = float(fracs.us[u]) + float(fracs.du[u]) / 128.0;
-    val[1] = float(fracs.vs[u]) + float(fracs.dv[u]) / 128.0;
+    val[0] = float(fracs.us[u]) + float(fracs.du[u]) / 128.0f;
+    val[1] = float(fracs.vs[u]) + float(fracs.dv[u]) / 128.0f;
     return val;
 }
 
 #if defined(SSE2)
-//! 2$B$D$N=PNO2hA|E@$r;XDj$7$F$=$l$>$l$K%^%C%W$5$l$k(B2$B$D$NF~NO2hA|E@$N(B2$B<!85:BI8$rJV$9!%(B
+//! 2‚Â‚Ìo—Í‰æ‘œ“_‚ðŽw’è‚µ‚Ä‚»‚ê‚¼‚ê‚Éƒ}ƒbƒv‚³‚ê‚é2‚Â‚Ì“ü—Í‰æ‘œ“_‚Ì2ŽŸŒ³À•W‚ð•Ô‚·D
 /*!
-  $B;XDj$5$l$?(B2$B<!85:BI8(B(u, v)$B$KBP$7!$(B2$BE@(B(u, v-1), (u, v)$B$K%^%C%W$5$l$kF~NO2hA|E@$N(B
-  2$B<!85:BI8$,JV$5$l$k!%(B
-  \param u	$B=PNO2hA|E@$N2#:BI8(B
-  \param v	$B=PNO2hA|E@$N=D:BI8(B
-  \return	$B=PNO2hA|E@(B(u, v-1), (u, v)$B$K%^%C%W$5$l$kF~NO2hA|E@$N(B2$B<!85:BI8(B
+  Žw’è‚³‚ê‚½2ŽŸŒ³À•W(u, v)‚É‘Î‚µC2“_(u, v-1), (u, v)‚Éƒ}ƒbƒv‚³‚ê‚é“ü—Í‰æ‘œ“_‚Ì
+  2ŽŸŒ³À•W‚ª•Ô‚³‚ê‚éD
+  \param u	o—Í‰æ‘œ“_‚Ì‰¡À•W
+  \param v	o—Í‰æ‘œ“_‚ÌcÀ•W
+  \return	o—Í‰æ‘œ“_(u, v-1), (u, v)‚Éƒ}ƒbƒv‚³‚ê‚é“ü—Í‰æ‘œ“_‚Ì2ŽŸŒ³À•W
 */
 inline mmFlt
 Warp::src(int u, int v) const

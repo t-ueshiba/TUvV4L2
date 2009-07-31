@@ -1,13 +1,10 @@
 /*
- *  $Id: main.cc,v 1.4 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: main.cc,v 1.5 2009-07-31 07:05:15 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CanvasPane.h"
 #include "draw.h"
-#ifdef __GNUG__
-#  include "TU/Bezier++.cc"
-#endif
 
 namespace TU
 {

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.10 2009-07-09 04:19:26 ueshiba Exp $
+#  $Id: Makefile,v 1.11 2009-07-31 07:05:15 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -23,7 +23,6 @@ LINKER		= $(CCC)
 #########################
 SUFFIX		= .cc:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Bezier++.cc \
 		/usr/local/include/TU/Bezier++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -54,7 +53,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.10 $	|		\
+REV		= $(shell echo $Revision: 1.11 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -91,4 +90,4 @@ main.o: /usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	/usr/local/include/TU/Bezier++.h /usr/local/include/TU/Bezier++.cc
+	/usr/local/include/TU/Bezier++.h

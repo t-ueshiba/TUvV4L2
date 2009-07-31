@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: utility.h,v 1.18 2008-10-14 00:42:56 ueshiba Exp $
+ *  $Id: utility.h,v 1.19 2009-07-31 07:04:46 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -35,35 +35,35 @@
 
 /*!
   \namespace	std
-  \brief	$B$$$/$D$+$N4pK\E*$J4X?t$rL>A06u4V(Bstd$B$KDI2C(B
+  \brief	‚¢‚­‚Â‚©‚ÌŠî–{“I‚ÈŠÖ”‚ğ–¼‘O‹óŠÔstd‚É’Ç‰Á
 */
 namespace std
 {
 /************************************************************************
 *  generic algorithms							*
 ************************************************************************/
-//! 3$B$D$N0z?t$N$&$A:G>.$N$b$N$rJV$9!%(B
+//! 3‚Â‚Ìˆø”‚Ì‚¤‚¿Å¬‚Ì‚à‚Ì‚ğ•Ô‚·D
 template <class T> inline const T&
 min(const T& a, const T& b, const T& c)
 {
     return min(min(a, b), c);
 }
 
-//! 3$B$D$N0z?t$N$&$A:GBg$N$b$N$rJV$9!%(B
+//! 3‚Â‚Ìˆø”‚Ì‚¤‚¿Å‘å‚Ì‚à‚Ì‚ğ•Ô‚·D
 template <class T> inline const T&
 max(const T& a, const T& b, const T& c)
 {
     return max(max(a, b), c);
 }
     
-//! 4$B$D$N0z?t$N$&$A:G>.$N$b$N$rJV$9!%(B
+//! 4‚Â‚Ìˆø”‚Ì‚¤‚¿Å¬‚Ì‚à‚Ì‚ğ•Ô‚·D
 template <class T> inline const T&
 min(const T& a, const T& b, const T& c, const T& d)
 {
     return min(min(a, b, c), d);
 }
 
-//! 4$B$D$N0z?t$N$&$A:GBg$N$b$N$rJV$9!%(B
+//! 4‚Â‚Ìˆø”‚Ì‚¤‚¿Å‘å‚Ì‚à‚Ì‚ğ•Ô‚·D
 template <class T> inline const T&
 max(const T& a, const T& b, const T& c, const T& d)
 {
@@ -74,19 +74,19 @@ max(const T& a, const T& b, const T& c, const T& d)
 
 /*!
   \namespace	TU
-  \brief	$BK\%i%$%V%i%j$GDj5A$5$l$?%/%i%9$*$h$S4X?t$rG<$a$kL>A06u4V(B
+  \brief	–{ƒ‰ƒCƒuƒ‰ƒŠ‚Å’è‹`‚³‚ê‚½ƒNƒ‰ƒX‚¨‚æ‚ÑŠÖ”‚ğ”[‚ß‚é–¼‘O‹óŠÔ
 */
 namespace TU
 {
 /************************************************************************
 *  generic algorithms							*
 ************************************************************************/
-//! $B>r7o$rK~$?$9MWAG$,A0H>$K!$$=$&$G$J$$$b$N$,8eH>$K$J$k$h$&$KJB$YBX$($k!%(B
+//! ğŒ‚ğ–‚½‚·—v‘f‚ª‘O”¼‚ÉC‚»‚¤‚Å‚È‚¢‚à‚Ì‚ªŒã”¼‚É‚È‚é‚æ‚¤‚É•À‚×‘Ö‚¦‚éD
 /*!
-  \param first	$B%G!<%?Ns$N@hF,$r<($9H?I|;R(B
-  \param last	$B%G!<%?Ns$NKvHx$r<($9H?I|;R(B
-  \param pred	$B>r7o$r;XDj$9$kC19`1i;;;R(B
-  \return	$B>r7o$rK~$?$5$J$$MWAG$N@hF,$r<($9H?I|;R(B
+  \param first	ƒf[ƒ^—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
+  \param last	ƒf[ƒ^—ñ‚Ì––”ö‚ğ¦‚·”½•œq
+  \param pred	ğŒ‚ğw’è‚·‚é’P€‰‰Zq
+  \return	ğŒ‚ğ–‚½‚³‚È‚¢—v‘f‚Ìæ“ª‚ğ¦‚·”½•œq
 */
 template <class Iter, class Pred> Iter
 pull_if(Iter first, Iter last, Pred pred)
@@ -97,7 +97,7 @@ pull_if(Iter first, Iter last, Pred pred)
     return first;
 }
 
-//! 2$B$D$N0z?t$N:9$N@dBPCM$rJV$9!%(B
+//! 2‚Â‚Ìˆø”‚Ì·‚Ìâ‘Î’l‚ğ•Ô‚·D
 template <class T> inline T
 diff(const T& a, const T& b)
 {
@@ -107,9 +107,9 @@ diff(const T& a, const T& b)
 /************************************************************************
 *  class mbr_iterator							*
 ************************************************************************/
-//! $B%3%s%F%J$NMWAG$NFCDj$N%a%s%P$K%"%/%;%9$9$kH?I|;R(B
+//! ƒRƒ“ƒeƒi‚Ì—v‘f‚Ì“Á’è‚Ìƒƒ“ƒo‚ÉƒAƒNƒZƒX‚·‚é”½•œq
 /*!
-  \param Iterator	$BK\H?I|;R$N%Y!<%9$H$J$kH?I|;R(B
+  \param Iterator	–{”½•œq‚Ìƒx[ƒX‚Æ‚È‚é”½•œq
 */
 template <class Iterator, class T>
 class mbr_iterator
@@ -253,14 +253,14 @@ operator +(typename mbr_iterator<Iterator, T>::difference_type n,
     return x + n;
 }
 
-//! T$B7?$N%a%s%P$r;}$D%*%V%8%'%/%H$rMWAG$H$9$k%3%s%F%J$K$D$$$F$=$N%a%s%P$K%"%/%;%9(B(R/W)$B$9$kH?I|;R$r:n$k!%(B
+//! TŒ^‚Ìƒƒ“ƒo‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğ—v‘f‚Æ‚·‚éƒRƒ“ƒeƒi‚É‚Â‚¢‚Ä‚»‚Ìƒƒ“ƒo‚ÉƒAƒNƒZƒX(R/W)‚·‚é”½•œq‚ğì‚éD
 template <class Iterator, class T> inline mbr_iterator<Iterator, T>
 make_mbr_iterator(Iterator i, T std::iterator_traits<Iterator>::value_type::* m)
 {
     return mbr_iterator<Iterator, T>(i, m);
 }
     
-//! T$B7?$N%a%s%P$r;}$D%*%V%8%'%/%H$rMWAG$H$9$k%3%s%F%J$K$D$$$F$=$N%a%s%P$K%"%/%;%9(B(R)$B$9$kH?I|;R$r:n$k!%(B
+//! TŒ^‚Ìƒƒ“ƒo‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğ—v‘f‚Æ‚·‚éƒRƒ“ƒeƒi‚É‚Â‚¢‚Ä‚»‚Ìƒƒ“ƒo‚ÉƒAƒNƒZƒX(R)‚·‚é”½•œq‚ğì‚éD
 template <class Iterator, class T> inline mbr_iterator<Iterator, const T>
 make_const_mbr_iterator(Iterator i,
 			const T std::iterator_traits<Iterator>::value_type::* m)
@@ -268,9 +268,9 @@ make_const_mbr_iterator(Iterator i,
     return mbr_iterator<Iterator, const T>(i, m);
 }
 
-//! std::pair$B$rMWAG$H$9$k%3%s%F%J$K$D$$$F(Bpair$B$NBh(B1$BMWAG$K%"%/%;%9(B(R/W)$B$9$kH?I|;R$r:n$k!%(B
+//! std::pair‚ğ—v‘f‚Æ‚·‚éƒRƒ“ƒeƒi‚É‚Â‚¢‚Äpair‚Ì‘æ1—v‘f‚ÉƒAƒNƒZƒX(R/W)‚·‚é”½•œq‚ğì‚éD
 /*!
-  \param i	$B%Y!<%9$H$J$kH?I|;R(B
+  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
 */
 template <class Iterator>
 inline mbr_iterator<Iterator, typename std::iterator_traits<Iterator>
@@ -281,9 +281,9 @@ make_first_iterator(Iterator i)
 				    ::value_type::first);
 }
     
-//! std::pair$B$rMWAG$H$9$k%3%s%F%J$K$D$$$F(Bpair$B$NBh(B1$BMWAG$K%"%/%;%9(B(R)$B$9$kH?I|;R$r:n$k!%(B
+//! std::pair‚ğ—v‘f‚Æ‚·‚éƒRƒ“ƒeƒi‚É‚Â‚¢‚Äpair‚Ì‘æ1—v‘f‚ÉƒAƒNƒZƒX(R)‚·‚é”½•œq‚ğì‚éD
 /*!
-  \param i	$B%Y!<%9$H$J$kH?I|;R(B
+  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
 */
 template <class Iterator>
 inline mbr_iterator<Iterator, const typename std::iterator_traits<Iterator>
@@ -294,9 +294,9 @@ make_const_first_iterator(Iterator i)
 					  ::value_type::first);
 }
     
-//! std::pair$B$rMWAG$H$9$k%3%s%F%J$K$D$$$F(Bpair$B$NBh(B2$BMWAG$K%"%/%;%9(B(R/W)$B$9$kH?I|;R$r:n$k!%(B
+//! std::pair‚ğ—v‘f‚Æ‚·‚éƒRƒ“ƒeƒi‚É‚Â‚¢‚Äpair‚Ì‘æ2—v‘f‚ÉƒAƒNƒZƒX(R/W)‚·‚é”½•œq‚ğì‚éD
 /*!
-  \param i	$B%Y!<%9$H$J$kH?I|;R(B
+  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
 */
 template <class Iterator>
 inline mbr_iterator<Iterator, typename std::iterator_traits<Iterator>
@@ -307,9 +307,9 @@ make_second_iterator(Iterator i)
 				    ::value_type::second);
 }
 
-//! std::pair$B$rMWAG$H$9$k%3%s%F%J$K$D$$$F(Bpair$B$NBh(B2$BMWAG$K%"%/%;%9(B(R)$B$9$kH?I|;R$r:n$k!%(B
+//! std::pair‚ğ—v‘f‚Æ‚·‚éƒRƒ“ƒeƒi‚É‚Â‚¢‚Äpair‚Ì‘æ2—v‘f‚ÉƒAƒNƒZƒX(R)‚·‚é”½•œq‚ğì‚éD
 /*!
-  \param i	$B%Y!<%9$H$J$kH?I|;R(B
+  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
 */
 template <class Iterator>
 inline mbr_iterator<Iterator, const typename std::iterator_traits<Iterator>

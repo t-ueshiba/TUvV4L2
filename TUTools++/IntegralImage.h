@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IntegralImage.h,v 1.2 2008-09-10 05:10:40 ueshiba Exp $
+ *  $Id: IntegralImage.h,v 1.3 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef	__TUIntegralImage_h
 #define	__TUIntegralImage_h
@@ -37,7 +37,7 @@ namespace TU
 /************************************************************************
 *  class IntegralImage<T>						*
 ************************************************************************/
-//! $B@QJ,2hA|(B(integral image)$B$rI=$9%/%i%9(B
+//! Ï•ª‰æ‘œ(integral image)‚ğ•\‚·ƒNƒ‰ƒX
 template <class T>
 class IntegralImage : public Image<T>
 {
@@ -57,15 +57,15 @@ class IntegralImage : public Image<T>
     using	Image<T>::height;
 };
 
-//! $B6u$N@QJ,2hA|$r:n$k(B
+//! ‹ó‚ÌÏ•ª‰æ‘œ‚ğì‚é
 template <class T> inline
 IntegralImage<T>::IntegralImage()
 {
 }
     
-//! $BM?$($i$l$?2hA|$+$i@QJ,2hA|$r:n$k(B
+//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚çÏ•ª‰æ‘œ‚ğì‚é
 /*!
-  \param image		$BF~NO2hA|(B
+  \param image		“ü—Í‰æ‘œ
 */
 template <class T> template <class S, class B> inline
 IntegralImage<T>::IntegralImage(const Image<S, B>& image)
@@ -73,10 +73,10 @@ IntegralImage<T>::IntegralImage(const Image<S, B>& image)
     initialize(image);
 }
     
-//! $BM?$($i$l$?2hA|$+$i@QJ,2hA|$r:n$k(B
+//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚çÏ•ª‰æ‘œ‚ğì‚é
 /*!
-  \param image		$BF~NO2hA|(B
-  \return		$B$3$N@QJ,2hA|(B
+  \param image		“ü—Í‰æ‘œ
+  \return		‚±‚ÌÏ•ª‰æ‘œ
 */
 template <class T> template <class S, class B> IntegralImage<T>&
 IntegralImage<T>::initialize(const Image<S, B>& image)
@@ -103,13 +103,13 @@ IntegralImage<T>::initialize(const Image<S, B>& image)
     return *this;
 }
 
-//! $B862hA|$K@_Dj$7$?D9J}7A%&%#%s%I%&Fb$N2hAGCM$NAmOB$rJV$9(B
+//! Œ´‰æ‘œ‚Éİ’è‚µ‚½’·•ûŒ`ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a‚ğ•Ô‚·
 /*!
-  \param u		$B%&%#%s%I%&$N:8>e6y$N2#:BI8(B
-  \param v		$B%&%#%s%I%&$N:8>e6y$N=D:BI8(B
-  \param w		$B%&%#%s%I%&$NI}(B
-  \param h		$B%&%#%s%I%&$N9b$5(B
-  \return		$B%&%#%s%I%&Fb$N2hAGCM$NAmOB(B
+  \param u		ƒEƒBƒ“ƒhƒE‚Ì¶ã‹÷‚Ì‰¡À•W
+  \param v		ƒEƒBƒ“ƒhƒE‚Ì¶ã‹÷‚ÌcÀ•W
+  \param w		ƒEƒBƒ“ƒhƒE‚Ì•
+  \param h		ƒEƒBƒ“ƒhƒE‚Ì‚‚³
+  \return		ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a
 */
 template <class T> T
 IntegralImage<T>::crop(int u, int v, int w, int h) const
@@ -137,12 +137,12 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
     return (*this)[v1][u1] + a - b - c;
 }
 
-//! $B862hA|$K@5J}7A$NFsCM==;z%F%s%W%l!<%H$rE,MQ$7$?CM$rJV$9(B
+//! Œ´‰æ‘œ‚É³•ûŒ`‚Ì“ñ’l\šƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l‚ğ•Ô‚·
 /*!
-  \param u		$B%F%s%W%l!<%HCf?4$N2#:BI8(B
-  \param v		$B%F%s%W%l!<%HCf?4$N=D:BI8(B
-  \param cropSize	$B%F%s%W%l!<%H$O0lJU(B 2*cropSize + 1 $B$N@5J}7A(B
-  \return		$B%F%s%W%l!<%H$rE,MQ$7$?CM(B
+  \param u		ƒeƒ“ƒvƒŒ[ƒg’†S‚Ì‰¡À•W
+  \param v		ƒeƒ“ƒvƒŒ[ƒg’†S‚ÌcÀ•W
+  \param cropSize	ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize + 1 ‚Ì³•ûŒ`
+  \return		ƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l
 */
 template <class T> inline T
 IntegralImage<T>::crossVal(int u, int v, int cropSize) const
@@ -153,12 +153,12 @@ IntegralImage<T>::crossVal(int u, int v, int cropSize) const
 	 - crop(u+1,	    v-cropSize, cropSize, cropSize);
 }
     
-//! $B862hA|$NA4$F$NE@$K@5J}7A$NFsCM==;z%F%s%W%l!<%H$rE,MQ$7$?2hA|$r5a$a$k(B
+//! Œ´‰æ‘œ‚Ì‘S‚Ä‚Ì“_‚É³•ûŒ`‚Ì“ñ’l\šƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½‰æ‘œ‚ğ‹‚ß‚é
 /*!
-  \param out		$B862hA|$K%F%s%W%l!<%H$rE,MQ$7$?=PNO2hA|(B
-  \param cropSize	$B%F%s%W%l!<%H%5%$%:$r;XDj$9$k%Q%i%a!<%?(B
-			$B%F%s%W%l!<%H$O0lJU(B 2*cropSize+1 $B$N@5J}7A(B
-  \return		$B$3$N@QJ,2hA|(B
+  \param out		Œ´‰æ‘œ‚Éƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½o—Í‰æ‘œ
+  \param cropSize	ƒeƒ“ƒvƒŒ[ƒgƒTƒCƒY‚ğw’è‚·‚éƒpƒ‰ƒ[ƒ^
+			ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize+1 ‚Ì³•ûŒ`
+  \return		‚±‚ÌÏ•ª‰æ‘œ
 */
 template <class T> template <class S, class B> const IntegralImage<T>&
 IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
@@ -174,7 +174,7 @@ IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 /************************************************************************
 *  class DiagonalIntegralImage<T>					*
 ************************************************************************/
-//! $BBP3Q@QJ,2hA|(B(diagonal integral image)$B$rI=$9%/%i%9(B
+//! ‘ÎŠpÏ•ª‰æ‘œ(diagonal integral image)‚ğ•\‚·ƒNƒ‰ƒX
 template <class T>
 class DiagonalIntegralImage : public Image<T>
 {
@@ -197,15 +197,15 @@ class DiagonalIntegralImage : public Image<T>
     void	correct(int& u, int& v)				const	;
 };
 
-//! $B6u$NBP3Q@QJ,2hA|$r:n$k(B
+//! ‹ó‚Ì‘ÎŠpÏ•ª‰æ‘œ‚ğì‚é
 template <class T> inline
 DiagonalIntegralImage<T>::DiagonalIntegralImage()
 {
 }
     
-//! $BM?$($i$l$?2hA|$+$iBP3Q@QJ,2hA|$r:n$k(B
+//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚ç‘ÎŠpÏ•ª‰æ‘œ‚ğì‚é
 /*!
-  \param image		$BF~NO2hA|(B
+  \param image		“ü—Í‰æ‘œ
 */
 template <class T> template <class S, class B> inline
 DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
@@ -213,10 +213,10 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
     initialize(image);
 }
     
-//! $BM?$($i$l$?2hA|$+$iBP3Q@QJ,2hA|$r:n$k(B
+//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚ç‘ÎŠpÏ•ª‰æ‘œ‚ğì‚é
 /*!
-  \param image		$BF~NO2hA|(B
-  \return		$B$3$NBP3Q@QJ,2hA|(B
+  \param image		“ü—Í‰æ‘œ
+  \return		‚±‚Ì‘ÎŠpÏ•ª‰æ‘œ
 */
 template <class T> template <class S, class B> DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
@@ -250,13 +250,13 @@ DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
     return *this;
 }
 
-//! $B862hA|$K(B45$BEY79$1$F@_Dj$7$?D9J}7A%&%#%s%I%&Fb$N2hAGCM$NAmOB$rJV$9(B
+//! Œ´‰æ‘œ‚É45“xŒX‚¯‚Äİ’è‚µ‚½’·•ûŒ`ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a‚ğ•Ô‚·
 /*!
-  \param u		$B%&%#%s%I%&$N>e6y$N2#:BI8(B
-  \param v		$B%&%#%s%I%&$N>e6y$N=D:BI8(B
-  \param w		$B%&%#%s%I%&$NI}(B
-  \param h		$B%&%#%s%I%&$N9b$5(B
-  \return		$B%&%#%s%I%&Fb$N2hAGCM$NAmOB(B
+  \param u		ƒEƒBƒ“ƒhƒE‚Ìã‹÷‚Ì‰¡À•W
+  \param v		ƒEƒBƒ“ƒhƒE‚Ìã‹÷‚ÌcÀ•W
+  \param w		ƒEƒBƒ“ƒhƒE‚Ì•
+  \param h		ƒEƒBƒ“ƒhƒE‚Ì‚‚³
+  \return		ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a
 */
 template <class T> T
 DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
@@ -276,12 +276,12 @@ DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
 	 - (vr >= 0 ? (*this)[vr][ur] : 0);
 }
 
-//! $B862hA|$K@5J}7A$NFsCM%/%m%9%F%s%W%l!<%H$rE,MQ$7$?CM$rJV$9(B
+//! Œ´‰æ‘œ‚É³•ûŒ`‚Ì“ñ’lƒNƒƒXƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l‚ğ•Ô‚·
 /*!
-  \param u		$B%F%s%W%l!<%HCf?4$N2#:BI8(B
-  \param v		$B%F%s%W%l!<%HCf?4$N=D:BI8(B
-  \param cropSize	$B%F%s%W%l!<%H$O0lJU(B 2*cropSize + 1 $B$N@5J}7A(B
-  \return		$B%F%s%W%l!<%H$rE,MQ$7$?CM(B
+  \param u		ƒeƒ“ƒvƒŒ[ƒg’†S‚Ì‰¡À•W
+  \param v		ƒeƒ“ƒvƒŒ[ƒg’†S‚ÌcÀ•W
+  \param cropSize	ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize + 1 ‚Ì³•ûŒ`
+  \return		ƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l
 */
 template <class T> inline T
 DiagonalIntegralImage<T>::crossVal(int u, int v, int cropSize) const
@@ -292,12 +292,12 @@ DiagonalIntegralImage<T>::crossVal(int u, int v, int cropSize) const
 	 - crop(u,	      v-2*cropSize, cropSize, cropSize);
 }
 
-//! $B862hA|$NA4$F$NE@$K@5J}7A$NFsCM%/%m%9%F%s%W%l!<%H$rE,MQ$7$?2hA|$r5a$a$k(B
+//! Œ´‰æ‘œ‚Ì‘S‚Ä‚Ì“_‚É³•ûŒ`‚Ì“ñ’lƒNƒƒXƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½‰æ‘œ‚ğ‹‚ß‚é
 /*!
-  \param out		$B862hA|$K%F%s%W%l!<%H$rE,MQ$7$?=PNO2hA|(B
-  \param cropSize	$B%F%s%W%l!<%H%5%$%:$r;XDj$9$k%Q%i%a!<%?(B
-			$B%F%s%W%l!<%H$O0lJU(B 2*cropSize+1 $B$N@5J}7A(B
-  \return		$B$3$NBP3Q@QJ,2hA|(B
+  \param out		Œ´‰æ‘œ‚Éƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½o—Í‰æ‘œ
+  \param cropSize	ƒeƒ“ƒvƒŒ[ƒgƒTƒCƒY‚ğw’è‚·‚éƒpƒ‰ƒ[ƒ^
+			ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize+1 ‚Ì³•ûŒ`
+  \return		‚±‚Ì‘ÎŠpÏ•ª‰æ‘œ
 */
 template <class T> template <class S, class B> const DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const

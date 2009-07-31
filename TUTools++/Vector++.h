@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,12 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.29 2009-04-13 07:47:58 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.30 2009-07-31 07:04:45 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
 
 #include <cmath>
+#include <iomanip>
 #ifdef WIN32
 #  define M_PI	3.14159265358979323846
 #endif
@@ -41,9 +42,9 @@ namespace TU
 /************************************************************************
 *  class Rotation							*
 ************************************************************************/
-//! 2$B<!85D6J?LLFb$G$N2sE>$rI=$9%/%i%9(B
+//! 2ŸŒ³’´•½–Ê“à‚Å‚Ì‰ñ“]‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $B6qBNE*$K$O(B
+  ‹ï‘Ì“I‚É‚Í
   \f[
     \TUvec{R}{}(p, q; \theta) \equiv
     \begin{array}{r@{}l}
@@ -68,46 +69,46 @@ namespace TU
       \TUendarray
     \end{array}
   \f]
-  $B$J$k2sE>9TNs$GI=$5$l$k!%(B
+  ‚È‚é‰ñ“]s—ñ‚Å•\‚³‚ê‚éD
 */
 class Rotation
 {
   public:
-    Rotation(int p, int q, double x, double y)		;
-    Rotation(int p, int q, double theta)		;
+    Rotation(u_int p, u_int q, double x, double y)	;
+    Rotation(u_int p, u_int q, double theta)		;
 
-  //! p$B<4$rJV$9!%(B
+  //! p²‚ğ•Ô‚·D
   /*!
-    \return	p$B<4$N(Bindex
+    \return	p²‚Ìindex
   */
-    int		p()				const	{return _p;}
+    u_int	p()				const	{return _p;}
 
-  //! q$B<4$rJV$9!%(B
+  //! q²‚ğ•Ô‚·D
   /*!
-    \return	q$B<4$N(Bindex
+    \return	q²‚Ìindex
   */
-    int		q()				const	{return _q;}
+    u_int	q()				const	{return _q;}
 
-  //! $B2sE>3Q@8@.%Y%/%H%k$ND9$5$rJV$9!%(B
+  //! ‰ñ“]Šp¶¬ƒxƒNƒgƒ‹‚Ì’·‚³‚ğ•Ô‚·D
   /*!
-    \return	$B2sE>3Q@8@.%Y%/%H%k(B(x, y)$B$KBP$7$F(B\f$\sqrt{x^2 + y^2}\f$
+    \return	‰ñ“]Šp¶¬ƒxƒNƒgƒ‹(x, y)‚É‘Î‚µ‚Ä\f$\sqrt{x^2 + y^2}\f$
   */
     double	length()			const	{return _l;}
 
-  //! $B2sE>3Q$N(Bcos$BCM$rJV$9!%(B
+  //! ‰ñ“]Šp‚Ìcos’l‚ğ•Ô‚·D
   /*!
-    \return	$B2sE>3Q$N(Bcos$BCM(B
+    \return	‰ñ“]Šp‚Ìcos’l
   */
     double	cos()				const	{return _c;}
 
-  //! $B2sE>3Q$N(Bsin$BCM$rJV$9!%(B
+  //! ‰ñ“]Šp‚Ìsin’l‚ğ•Ô‚·D
   /*!
-    \return	$B2sE>3Q$N(Bsin$BCM(B
+    \return	‰ñ“]Šp‚Ìsin’l
   */
     double	sin()				const	{return _s;}
     
   private:
-    const int	_p, _q;				// rotation axis
+    const u_int	_p, _q;				// rotation axis
     double	_l;				// length of (x, y)
     double	_c, _s;				// cos & sin
 };
@@ -117,10 +118,10 @@ class Rotation
 ************************************************************************/
 template <class T, class B, class R>	class Matrix;
 
-//! T$B7?$NMWAG$r;}$D%Y%/%H%k$rI=$9%/%i%9(B
+//! TŒ^‚Ì—v‘f‚ğ‚ÂƒxƒNƒgƒ‹‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  \param T	$BMWAG$N7?(B
-  \param B	$B%P%C%U%!(B
+  \param T	—v‘f‚ÌŒ^
+  \param B	ƒoƒbƒtƒ@
 */
 template <class T, class B=Buf<T> >
 class Vector : public Array<T, B>
@@ -142,7 +143,7 @@ class Vector : public Array<T, B>
     template <class B2, class R2>
     Vector(const Matrix<T, B2, R2>& m)					;
     template <class B2>
-    Vector(const Vector<T, B2>& v, int i, u_int d)			;
+    Vector(const Vector<T, B2>& v, u_int i, u_int d)			;
     template <class T2, class B2>
     Vector(const Vector<T2, B2>& v)					;
     template <class T2, class B2>
@@ -155,8 +156,8 @@ class Vector : public Array<T, B>
   //    using		Array<T, B>::operator pointer;
   //    using		Array<T, B>::operator const_pointer;
 
-    const Vector<T>	operator ()(int i, u_int d)		const	;
-    Vector<T>		operator ()(int i, u_int d)			;
+    const Vector<T>	operator ()(u_int i, u_int d)		const	;
+    Vector<T>		operator ()(u_int i, u_int d)			;
     Vector&		operator  =(const T& c)				;
     Vector&		operator *=(double c)				;
     Vector&		operator /=(double c)				;
@@ -187,7 +188,7 @@ class Vector : public Array<T, B>
     void		resize(T* p, u_int d)				;
 };
 
-//! $B%Y%/%H%k$r@8@.$7!$A4MWAG$r(B0$B$G=i4|2=$9$k!%(B
+//! ƒxƒNƒgƒ‹‚ğ¶¬‚µC‘S—v‘f‚ğ0‚Å‰Šú‰»‚·‚éD
 template <class T, class B>
 Vector<T, B>::Vector()
     :Array<T, B>()
@@ -195,9 +196,9 @@ Vector<T, B>::Vector()
     *this = 0;
 }
 
-//! $B;XDj$5$l$?<!85$N%Y%/%H%k$r@8@.$7!$A4MWAG$r(B0$B$G=i4|2=$9$k!%(B
+//! w’è‚³‚ê‚½ŸŒ³‚ÌƒxƒNƒgƒ‹‚ğ¶¬‚µC‘S—v‘f‚ğ0‚Å‰Šú‰»‚·‚éD
 /*!
-  \param d	$B%Y%/%H%k$N<!85(B
+  \param d	ƒxƒNƒgƒ‹‚ÌŸŒ³
 */
 template <class T, class B> inline
 Vector<T, B>::Vector(u_int d)
@@ -206,10 +207,10 @@ Vector<T, B>::Vector(u_int d)
     *this = 0;
 }
 
-//! $B30It5-21NN0h$H<!85$r;XDj$7$F%Y%/%H%k$r@8@.$9$k!%(B
+//! ŠO•”‹L‰¯—Ìˆæ‚ÆŸŒ³‚ğw’è‚µ‚ÄƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
 /*!
-  \param p	$B30It5-21NN0h$X$N%]%$%s%?(B
-  \param d	$B%Y%/%H%k$N<!85(B
+  \param p	ŠO•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param d	ƒxƒNƒgƒ‹‚ÌŸŒ³
 */
 template <class T, class B> inline
 Vector<T, B>::Vector(T* p, u_int d)
@@ -217,10 +218,10 @@ Vector<T, B>::Vector(T* p, u_int d)
 {
 }
 
-//! $BM?$($i$l$?9TNs$N9T$rJB$Y$F5-21NN0h$r6&M-$9$k%Y%/%H%k$r@8@.$9$k!%(B
+//! —^‚¦‚ç‚ê‚½s—ñ‚Ìs‚ğ•À‚×‚Ä‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚éƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
 /*!
-  \param m	$B5-21NN0h$r6&M-$9$k9TNs!%A49T$N5-21NN0h$OO"B3$7$F$$$J$1$l$P(B
-		$B$J$i$J$$!%(B
+  \param m	‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚és—ñD‘Ss‚Ì‹L‰¯—Ìˆæ‚Í˜A‘±‚µ‚Ä‚¢‚È‚¯‚ê‚Î
+		‚È‚ç‚È‚¢D
 */
 template <class T, class B> template <class B2, class R2> inline
 Vector<T, B>::Vector(const Matrix<T, B2, R2>& m)
@@ -228,21 +229,21 @@ Vector<T, B>::Vector(const Matrix<T, B2, R2>& m)
 {
 }
 
-//! $BM?$($i$l$?%Y%/%H%k$H5-21NN0h$r6&M-$9$kItJ,%Y%/%H%k$r@8@.$9$k!%(B
+//! —^‚¦‚ç‚ê‚½ƒxƒNƒgƒ‹‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚é•”•ªƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
 /*!
-  \param v	$B85$N%Y%/%H%k(B
-  \param i	$BItJ,%Y%/%H%k$NBh(B0$BMWAG$r;XDj$9$k(Bindex
-  \param d	$BItJ,%Y%/%H%k$N<!85(B
+  \param v	Œ³‚ÌƒxƒNƒgƒ‹
+  \param i	•”•ªƒxƒNƒgƒ‹‚Ì‘æ0—v‘f‚ğw’è‚·‚éindex
+  \param d	•”•ªƒxƒNƒgƒ‹‚ÌŸŒ³
 */
 template <class T, class B> template <class B2> inline
-Vector<T, B>::Vector(const Vector<T, B2>& v, int i, u_int d)
+Vector<T, B>::Vector(const Vector<T, B2>& v, u_int i, u_int d)
     :Array<T, B>(v, i, d)
 {
 }
 
-//! $BB>$N%Y%/%H%k$HF10lMWAG$r;}$D%Y%/%H%k$r:n$k(B($B%3%T!<%3%s%9%H%i%/%?$N3HD%(B)$B!%(B
+//! ‘¼‚ÌƒxƒNƒgƒ‹‚Æ“¯ˆê—v‘f‚ğ‚ÂƒxƒNƒgƒ‹‚ğì‚é(ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÌŠg’£)D
 /*!
-  \param v	$B%3%T!<85%Y%/%H%k(B
+  \param v	ƒRƒs[Œ³ƒxƒNƒgƒ‹
 */
 template <class T, class B> template <class T2, class B2> inline
 Vector<T, B>::Vector(const Vector<T2, B2>& v)
@@ -250,10 +251,10 @@ Vector<T, B>::Vector(const Vector<T2, B2>& v)
 {
 }
     
-//! $BB>$N%Y%/%H%k$r<+J,$KBeF~$9$k(B($BBeF~1i;;;R$N3HD%(B)$B!%(B
+//! ‘¼‚ÌƒxƒNƒgƒ‹‚ğ©•ª‚É‘ã“ü‚·‚é(‘ã“ü‰‰Zq‚ÌŠg’£)D
 /*!
-  \param v	$B%3%T!<85%Y%/%H%k(B
-  \return	$B$3$N%Y%/%H%k(B
+  \param v	ƒRƒs[Œ³ƒxƒNƒgƒ‹
+  \return	‚±‚ÌƒxƒNƒgƒ‹
 */
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
 Vector<T, B>::operator =(const Vector<T2, B2>& v)
@@ -262,34 +263,34 @@ Vector<T, B>::operator =(const Vector<T2, B2>& v)
     return *this;
 }
 
-//! $B$3$N%Y%/%H%k$H5-21NN0h$r6&M-$7$?ItJ,%Y%/%H%k$r@8@.$9$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
 /*!
-    \param i	$BItJ,%Y%/%H%k$NBh(B0$BMWAG$r;XDj$9$k(Bindex
-    \param d	$BItJ,%Y%/%H%k$N<!85(B
-    \return	$B@8@.$5$l$?ItJ,%Y%/%H%k(B
+    \param i	•”•ªƒxƒNƒgƒ‹‚Ì‘æ0—v‘f‚ğw’è‚·‚éindex
+    \param d	•”•ªƒxƒNƒgƒ‹‚ÌŸŒ³
+    \return	¶¬‚³‚ê‚½•”•ªƒxƒNƒgƒ‹
 */
 template <class T, class B> inline Vector<T>
-Vector<T, B>::operator ()(int i, u_int d)
+Vector<T, B>::operator ()(u_int i, u_int d)
 {
     return Vector<T>(*this, i, d);
 }
 
-//! $B$3$N%Y%/%H%k$H5-21NN0h$r6&M-$7$?ItJ,%Y%/%H%k$r@8@.$9$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
 /*!
-    \param i	$BItJ,%Y%/%H%k$NBh(B0$BMWAG$r;XDj$9$k(Bindex
-    \param d	$BItJ,%Y%/%H%k$N<!85(B
-    \return	$B@8@.$5$l$?ItJ,%Y%/%H%k(B
+    \param i	•”•ªƒxƒNƒgƒ‹‚Ì‘æ0—v‘f‚ğw’è‚·‚éindex
+    \param d	•”•ªƒxƒNƒgƒ‹‚ÌŸŒ³
+    \return	¶¬‚³‚ê‚½•”•ªƒxƒNƒgƒ‹
 */
 template <class T, class B> inline const Vector<T>
-Vector<T, B>::operator ()(int i, u_int d) const
+Vector<T, B>::operator ()(u_int i, u_int d) const
 {
     return Vector<T>(*this, i, d);
 }
 
-//! $B$3$N%Y%/%H%k$NA4$F$NMWAG$KF10l$N?tCM$rBeF~$9$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì‘S‚Ä‚Ì—v‘f‚É“¯ˆê‚Ì”’l‚ğ‘ã“ü‚·‚éD
 /*!
-  \param c	$BBeF~$9$k?tCM(B
-  \return	$B$3$N%Y%/%H%k(B
+  \param c	‘ã“ü‚·‚é”’l
+  \return	‚±‚ÌƒxƒNƒgƒ‹
 */
 template <class T, class B> inline Vector<T, B>&
 Vector<T, B>::operator =(const T& c)
@@ -298,10 +299,10 @@ Vector<T, B>::operator =(const T& c)
     return *this;
 }
 
-//! $B$3$N%Y%/%H%k$K;XDj$5$l$??tCM$r3]$1$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Éw’è‚³‚ê‚½”’l‚ğŠ|‚¯‚éD
 /*!
-  \param c	$B3]$1$k?tCM(B
-  \return	$B$3$N%Y%/%H%k!$$9$J$o$A(B\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$
+  \param c	Š|‚¯‚é”’l
+  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$
 */
 template <class T, class B> inline Vector<T, B>&
 Vector<T, B>::operator *=(double c)
@@ -310,10 +311,10 @@ Vector<T, B>::operator *=(double c)
     return *this;
 }
 
-//! $B$3$N%Y%/%H%k$r;XDj$5$l$??tCM$G3d$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚ğw’è‚³‚ê‚½”’l‚ÅŠ„‚éD
 /*!
-  \param c	$B3d$k?tCM(B
-  \return	$B$3$N%Y%/%H%k!$$9$J$o$A(B
+  \param c	Š„‚é”’l
+  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$\TUvec{u}{}\leftarrow \frac{\TUvec{u}{}}{c}\f$
 */
 template <class T, class B> inline Vector<T, B>&
@@ -323,10 +324,10 @@ Vector<T, B>::operator /=(double c)
     return *this;
 }
 
-//! $B$3$N%Y%/%H%k$KB>$N%Y%/%H%k$rB-$9!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚É‘¼‚ÌƒxƒNƒgƒ‹‚ğ‘«‚·D
 /*!
-  \param v	$BB-$9%Y%/%H%k(B
-  \return	$B$3$N%Y%/%H%k!$$9$J$o$A(B
+  \param v	‘«‚·ƒxƒNƒgƒ‹
+  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} + \TUvec{v}{}\f$
 */
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
@@ -336,10 +337,10 @@ Vector<T, B>::operator +=(const Vector<T2, B2>& v)
     return *this;
 }
 
-//! $B$3$N%Y%/%H%k$+$iB>$N%Y%/%H%k$r0z$/!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚©‚ç‘¼‚ÌƒxƒNƒgƒ‹‚ğˆø‚­D
 /*!
-  \param v	$B0z$/%Y%/%H%k(B
-  \return	$B$3$N%Y%/%H%k!$$9$J$o$A(B
+  \param v	ˆø‚­ƒxƒNƒgƒ‹
+  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} - \TUvec{v}{}\f$
 */
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
@@ -349,12 +350,12 @@ Vector<T, B>::operator -=(const Vector<T2, B2>& v)
     return *this;
 }
 
-//! $B$3$N%Y%/%H%k$HB>$N(B3$B<!85%Y%/%H%k$H$N%Y%/%H%k@Q$r$H$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‘¼‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚Æ‚ÌƒxƒNƒgƒ‹Ï‚ğ‚Æ‚éD
 /*!
-    \param v	$BB>$N%Y%/%H%k(B
-    \return	$B$3$N%Y%/%H%k!$$9$J$o$A(B
+    \param v	‘¼‚ÌƒxƒNƒgƒ‹
+    \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\times\TUvec{v}{}\f$
-    \throw std::invalid_argument	$B$3$N%Y%/%H%k$H(Bv$B$,(B3$B<!85$G$J$$>l9g$KAw=P(B
+    \throw std::invalid_argument	‚±‚ÌƒxƒNƒgƒ‹‚Æv‚ª3ŸŒ³‚Å‚È‚¢ê‡‚É‘—o
 */
 template <class T, class B> template <class T2, class B2> Vector<T, B>&
 Vector<T, B>::operator ^=(const Vector<T2, B2>& v)	// outer product
@@ -369,10 +370,10 @@ Vector<T, B>::operator ^=(const Vector<T2, B2>& v)	// outer product
     return *this;
 }
 
-//! $B$3$N%Y%/%H%k$N1&$+$i9TNs$r3]$1$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì‰E‚©‚çs—ñ‚ğŠ|‚¯‚éD
 /*!
-  \param m	$B3]$1$k9TNs(B
-  \return	$B$3$N%Y%/%H%k!$$9$J$o$A(B
+  \param m	Š|‚¯‚és—ñ
+  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUvec{M}{}\f$
 */
 template <class T, class B> template <class T2, class B2, class R2>
@@ -382,9 +383,9 @@ Vector<T, B>::operator *=(const Matrix<T2, B2, R2>& m)
     return *this = *this * m;
 }
 
-//! $B$3$N%Y%/%H%k$NId9f$rH?E>$7$?%Y%/%H%k$rJV$9!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì•„†‚ğ”½“]‚µ‚½ƒxƒNƒgƒ‹‚ğ•Ô‚·D
 /*!
-  \return	$BId9f$rH?E>$7$?%Y%/%H%k!$$9$J$o$A(B\f$-\TUvec{u}{}\f$
+  \return	•„†‚ğ”½“]‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$-\TUvec{u}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 Vector<T, B>::operator -() const
@@ -392,9 +393,9 @@ Vector<T, B>::operator -() const
     return Vector(*this) *= -1;
 }
 
-//! $B$3$N%Y%/%H%k$ND9$5$N(B2$B>h$rJV$9!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚Ì2æ‚ğ•Ô‚·D
 /*!
-  \return	$B%Y%/%H%k$ND9$5$N(B2$B>h!$$9$J$o$A(B\f$\TUnorm{\TUvec{u}{}}^2\f$
+  \return	ƒxƒNƒgƒ‹‚Ì’·‚³‚Ì2æC‚·‚È‚í‚¿\f$\TUnorm{\TUvec{u}{}}^2\f$
 */
 template <class T, class B> inline T
 Vector<T, B>::square() const
@@ -402,20 +403,20 @@ Vector<T, B>::square() const
     return *this * *this;
 }
 
-//! $B$3$N%Y%/%H%k$ND9$5$rJV$9!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚ğ•Ô‚·D
 /*!
-  \return	$B%Y%/%H%k$ND9$5!$$9$J$o$A(B\f$\TUnorm{\TUvec{u}{}}\f$
+  \return	ƒxƒNƒgƒ‹‚Ì’·‚³C‚·‚È‚í‚¿\f$\TUnorm{\TUvec{u}{}}\f$
 */
 template <class T, class B> inline double
 Vector<T, B>::length() const
 {
-    return sqrt(square());
+    return sqrt(double(square()));
 }
 
-//! $B$3$N%Y%/%H%k$HB>$N%Y%/%H%k$N:9$ND9$5$N(B2$B>h$rJV$9!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‘¼‚ÌƒxƒNƒgƒ‹‚Ì·‚Ì’·‚³‚Ì2æ‚ğ•Ô‚·D
 /*!
-  \param v	$BHf3SBP>]$H$J$k%Y%/%H%k(B
-  \return	$B%Y%/%H%k4V$N:9$N(B2$B>h!$$9$J$o$A(B
+  \param v	”äŠr‘ÎÛ‚Æ‚È‚éƒxƒNƒgƒ‹
+  \return	ƒxƒNƒgƒ‹ŠÔ‚Ì·‚Ì2æC‚·‚È‚í‚¿
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
 */
 template <class T, class B> template <class T2, class B2> inline T
@@ -424,10 +425,10 @@ Vector<T, B>::sqdist(const Vector<T2, B2>& v) const
     return (*this - v).square();
 }
 
-//! $B$3$N%Y%/%H%k$HB>$N%Y%/%H%k$N:9$ND9$5$rJV$9!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‘¼‚ÌƒxƒNƒgƒ‹‚Ì·‚Ì’·‚³‚ğ•Ô‚·D
 /*!
-  \param v	$BHf3SBP>]$H$J$k%Y%/%H%k(B
-  \return	$B%Y%/%H%k4V$N:9!$$9$J$o$A(B
+  \param v	”äŠr‘ÎÛ‚Æ‚È‚éƒxƒNƒgƒ‹
+  \return	ƒxƒNƒgƒ‹ŠÔ‚Ì·C‚·‚È‚í‚¿
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
 template <class T, class B> template <class T2, class B2> inline double
@@ -436,9 +437,9 @@ Vector<T, B>::dist(const Vector<T2, B2>& v) const
     return sqrt(sqdist(v));
 }
 
-//! $B$3$N%Y%/%H%k$ND9$5$r(B1$B$K@55,2=$9$k!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚ğ1‚É³‹K‰»‚·‚éD
 /*!
-  \return	$B$3$N%Y%/%H%k!$$9$J$o$A(B
+  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$
 		  \TUvec{u}{}\leftarrow\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}
 		\f$
@@ -449,9 +450,9 @@ Vector<T, B>::normalize()
     return *this /= length();
 }
 
-//! $B$3$N%Y%/%H%k$ND9$5$r(B1$B$K@55,2=$7$?%Y%/%H%k$rJV$9!%(B
+//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚ğ1‚É³‹K‰»‚µ‚½ƒxƒNƒgƒ‹‚ğ•Ô‚·D
 /*!
-  \return	$BD9$5$r@55,2=$7$?%Y%/%H%k!$$9$J$o$A(B
+  \return	’·‚³‚ğ³‹K‰»‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}\f$
 */
 template <class T, class B> inline Vector<T, B>
@@ -460,22 +461,49 @@ Vector<T, B>::normal() const
     return Vector(*this).normalize();
 }
 
-//! $BHsF1<!:BI8$rI=$9%Y%/%H%k$KBP$7!$CM(B1$B$r;}$D@.J,$r:G8e$KIU2C$7$?F1<!:BI8%Y%/%H%k$rJV$9!%(B
+//! ‚±‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚©‚ç3x3”½‘ÎÌs—ñ‚ğ¶¬‚·‚éD
 /*!
-  \return	$BF1<!2=$5$l$?%Y%/%H%k(B
+  \return	¶¬‚³‚ê‚½”½‘ÎÌs—ñC‚·‚È‚í‚¿
+  \f[
+    \TUskew{u}{} \equiv
+    \TUbeginarray{ccc}
+      & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
+    \TUendarray
+  \f]
+  \throw std::invalid_argument	3ŸŒ³ƒxƒNƒgƒ‹‚Å‚È‚¢ê‡‚É‘—o
+*/
+template <class T, class B>
+Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+Vector<T, B>::skew() const
+{
+    if (dim() != 3)
+	throw std::invalid_argument("TU::Vector<T, B>::skew: dimension must be 3");
+    Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3 > >	r;
+    r[2][1] = (*this)[0];
+    r[0][2] = (*this)[1];
+    r[1][0] = (*this)[2];
+    r[1][2] = -r[2][1];
+    r[2][0] = -r[0][2];
+    r[0][1] = -r[1][0];
+    return r;
+}
+
+//! ”ñ“¯ŸÀ•W‚ğ•\‚·ƒxƒNƒgƒ‹‚É‘Î‚µC’l1‚ğ‚Â¬•ª‚ğÅŒã‚É•t‰Á‚µ‚½“¯ŸÀ•WƒxƒNƒgƒ‹‚ğ•Ô‚·D
+/*!
+  \return	“¯Ÿ‰»‚³‚ê‚½ƒxƒNƒgƒ‹
 */
 template <class T, class B> inline Vector<T>
 Vector<T, B>::homogenize() const
 {
     Vector<T>	v(dim() + 1);
     v(0, dim()) = *this;
-    v[dim()]	= 1.0;
+    v[dim()]	= 1;
     return v;
 }
 
-//! $BF1<!:BI8$rI=$9%Y%/%H%k$KBP$7!$3F@.J,$r:G8e$N@.J,$G3d$C$?HsF1<!:BI8%Y%/%H%k$rJV$9!%(B
+//! “¯ŸÀ•W‚ğ•\‚·ƒxƒNƒgƒ‹‚É‘Î‚µCŠe¬•ª‚ğÅŒã‚Ì¬•ª‚ÅŠ„‚Á‚½”ñ“¯ŸÀ•WƒxƒNƒgƒ‹‚ğ•Ô‚·D
 /*!
-  \return	$BHsF1<!2=$5$l$?%Y%/%H%k(B
+  \return	”ñ“¯Ÿ‰»‚³‚ê‚½ƒxƒNƒgƒ‹
 */
 template <class T, class B> inline Vector<T>
 Vector<T, B>::inhomogenize() const
@@ -483,11 +511,11 @@ Vector<T, B>::inhomogenize() const
     return (*this)(0, dim()-1) / (*this)[dim()-1];
 }
 
-//! $B%Y%/%H%k$N<!85$rJQ99$7!$A4MWAG$r(B0$B$K=i4|2=$9$k!%(B
+//! ƒxƒNƒgƒ‹‚ÌŸŒ³‚ğ•ÏX‚µC‘S—v‘f‚ğ0‚É‰Šú‰»‚·‚éD
 /*!
-  $B$?$@$7!$B>$N%*%V%8%'%/%H$H5-21NN0h$r6&M-$7$F$$$k%Y%/%H%k$N<!85$r(B
-  $BJQ99$9$k$3$H$O$G$-$J$$!%(B
-  \param d	$B?7$7$$<!85(B
+  ‚½‚¾‚µC‘¼‚ÌƒIƒuƒWƒFƒNƒg‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚Ä‚¢‚éƒxƒNƒgƒ‹‚ÌŸŒ³‚ğ
+  •ÏX‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢D
+  \param d	V‚µ‚¢ŸŒ³
 */
 template <class T, class B> inline void
 Vector<T, B>::resize(u_int d)
@@ -496,10 +524,10 @@ Vector<T, B>::resize(u_int d)
     *this = 0;
 }
 
-//! $B%Y%/%H%k$,FbIt$G;HMQ$9$k5-21NN0h$r;XDj$7$?$b$N$KJQ99$9$k!%(B
+//! ƒxƒNƒgƒ‹‚ª“à•”‚Åg—p‚·‚é‹L‰¯—Ìˆæ‚ğw’è‚µ‚½‚à‚Ì‚É•ÏX‚·‚éD
 /*!
-  \param p	$B?7$7$$5-21NN0h$X$N%]%$%s%?(B
-  \param siz	$B?7$7$$<!85(B
+  \param p	V‚µ‚¢‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param siz	V‚µ‚¢ŸŒ³
 */
 template <class T, class B> inline void
 Vector<T, B>::resize(T* p, u_int d)
@@ -510,12 +538,15 @@ Vector<T, B>::resize(T* p, u_int d)
 /************************************************************************
 *  class Matrix<T, B, R>						*
 ************************************************************************/
-//! T$B7?$NMWAG$r;}$D9TNs$rI=$9%/%i%9(B
+template <class T>	class TriDiagonal;
+template <class T>	class SVDecomposition;
+
+//! TŒ^‚Ì—v‘f‚ğ‚Âs—ñ‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $B3F9T$,(BT$B7?$NMWAG$r;}$D%Y%/%H%k(B#TU::Vector<T>$B$K$J$C$F$$$k!%(B
-  \param T	$BMWAG$N7?(B
-  \param B	$B%P%C%U%!(B
-  \param R	$B9T%P%C%U%!(B
+  Šes‚ªTŒ^‚Ì—v‘f‚ğ‚ÂƒxƒNƒgƒ‹#TU::Vector<T>‚É‚È‚Á‚Ä‚¢‚éD
+  \param T	—v‘f‚ÌŒ^
+  \param B	ƒoƒbƒtƒ@
+  \param R	sƒoƒbƒtƒ@
 */
 template <class T, class B=Buf<T>, class R=Buf<Vector<T> > >
 class Matrix : public Array2<Vector<T>, B, R>
@@ -535,7 +566,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix(u_int r, u_int c)						;
     Matrix(T* p, u_int r, u_int c)					;
     template <class B2, class R2>
-    Matrix(const Matrix<T, B2, R2>& m, int i, int j, u_int r, u_int c)	;
+    Matrix(const Matrix<T, B2, R2>& m, u_int i, u_int j, u_int r, u_int c)	;
     template <class T2, class B2, class R2>
     Matrix(const Matrix<T2, B2, R2>& m)					;
     template <class T2, class B2, class R2>
@@ -548,9 +579,9 @@ class Matrix : public Array2<Vector<T>, B, R>
     using		Array2<Vector<T>, B, R>::nrow;
     using		Array2<Vector<T>, B, R>::ncol;
     
-    const Matrix<T>	operator ()(int i, int j,
+    const Matrix<T>	operator ()(u_int i, u_int j,
 				    u_int r, u_int c)		const	;
-    Matrix<T>		operator ()(int i, int j,
+    Matrix<T>		operator ()(u_int i, u_int j,
 				    u_int r, u_int c)			;
     Matrix&		operator  =(const T& c)				;
     Matrix&		operator *=(double c)				;
@@ -570,7 +601,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class T2, class B2, class R2>
     Matrix&		solve(const Matrix<T2, B2, R2>& m)		;
     T			det()					const	;
-    T			det(int p, int q)			const	;
+    T			det(u_int p, u_int q)			const	;
     T			trace()					const	;
     Matrix		adj()					const	;
     Matrix<T>		pinv(T cndnum=1.0e5)			const	;
@@ -604,7 +635,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     void		resize(T* p, u_int r, u_int c)			;
 };
 
-//! $B9TNs$r@8@.$7!$A4MWAG$r(B0$B$G=i4|2=$9$k!%(B
+//! s—ñ‚ğ¶¬‚µC‘S—v‘f‚ğ0‚Å‰Šú‰»‚·‚éD
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix()
     :Array2<Vector<T>, B, R>()
@@ -612,10 +643,10 @@ Matrix<T, B, R>::Matrix()
     *this = 0;
 }
 
-//! $B;XDj$5$l$?%5%$%:$N9TNs$r@8@.$7!$A4MWAG$r(B0$B$G=i4|2=$9$k!%(B
+//! w’è‚³‚ê‚½ƒTƒCƒY‚Ìs—ñ‚ğ¶¬‚µC‘S—v‘f‚ğ0‚Å‰Šú‰»‚·‚éD
 /*!
-  \param r	$B9TNs$N9T?t(B
-  \param c	$B9TNs$NNs?t(B
+  \param r	s—ñ‚Ìs”
+  \param c	s—ñ‚Ì—ñ”
 */
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix(u_int r, u_int c)
@@ -624,11 +655,11 @@ Matrix<T, B, R>::Matrix(u_int r, u_int c)
     *this = 0;
 }
 
-//! $B30It5-21NN0h$H%5%$%:$r;XDj$7$F9TNs$r@8@.$9$k!%(B
+//! ŠO•”‹L‰¯—Ìˆæ‚ÆƒTƒCƒY‚ğw’è‚µ‚Äs—ñ‚ğ¶¬‚·‚éD
 /*!
-  \param p	$B30It5-21NN0h$X$N%]%$%s%?(B
-  \param r	$B9TNs$N9T?t(B
-  \param c	$B9TNs$NNs?t(B
+  \param p	ŠO•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param r	s—ñ‚Ìs”
+  \param c	s—ñ‚Ì—ñ”
 */
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
@@ -636,24 +667,24 @@ Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
 {
 }
 
-//! $BM?$($i$l$?9TNs$H5-21NN0h$r6&M-$9$kItJ,9TNs$r@8@.$9$k!%(B
+//! —^‚¦‚ç‚ê‚½s—ñ‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚é•”•ªs—ñ‚ğ¶¬‚·‚éD
 /*!
-  \param m	$B85$N9TNs(B
-  \param i	$BItJ,9TNs$NBh(B0$B9T$r;XDj$9$k(Bindex
-  \param j	$BItJ,9TNs$NBh(B0$BNs$r;XDj$9$k(Bindex
-  \param r	$BItJ,9TNs$N9T?t(B
-  \param c	$BItJ,9TNs$NNs?t(B
+  \param m	Œ³‚Ìs—ñ
+  \param i	•”•ªs—ñ‚Ì‘æ0s‚ğw’è‚·‚éindex
+  \param j	•”•ªs—ñ‚Ì‘æ0—ñ‚ğw’è‚·‚éindex
+  \param r	•”•ªs—ñ‚Ìs”
+  \param c	•”•ªs—ñ‚Ì—ñ”
 */
 template <class T, class B, class R> template <class B2, class R2> inline
 Matrix<T, B, R>::Matrix(const Matrix<T, B2, R2>& m,
-			int i, int j, u_int r, u_int c)
+			u_int i, u_int j, u_int r, u_int c)
     :Array2<Vector<T>, B, R>(m, i, j, r, c)
 {
 }
 
-//! $BB>$N9TNs$HF10lMWAG$r;}$D9TNs$r:n$k(B($B%3%T!<%3%s%9%H%i%/%?$N3HD%(B)$B!%(B
+//! ‘¼‚Ìs—ñ‚Æ“¯ˆê—v‘f‚ğ‚Âs—ñ‚ğì‚é(ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÌŠg’£)D
 /*!
-  \param m	$B%3%T!<859TNs(B
+  \param m	ƒRƒs[Œ³s—ñ
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
 inline
@@ -662,10 +693,10 @@ Matrix<T, B, R>::Matrix(const Matrix<T2, B2, R2>& m)
 {
 }
 
-//! $BB>$N9TNs$r<+J,$KBeF~$9$k(B($BBeF~1i;;;R$N3HD%(B)$B!%(B
+//! ‘¼‚Ìs—ñ‚ğ©•ª‚É‘ã“ü‚·‚é(‘ã“ü‰‰Zq‚ÌŠg’£)D
 /*!
-  \param m	$B%3%T!<859TNs(B
-  \return	$B$3$N9TNs(B
+  \param m	ƒRƒs[Œ³s—ñ
+  \return	‚±‚Ìs—ñ
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
 inline Matrix<T, B, R>&
@@ -675,38 +706,38 @@ Matrix<T, B, R>::operator =(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! $B$3$N9TNs$H5-21NN0h$r6&M-$7$?ItJ,9TNs$r@8@.$9$k!%(B
+//! ‚±‚Ìs—ñ‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªs—ñ‚ğ¶¬‚·‚éD
 /*!
-    \param i	$BItJ,9TNs$N:8>e6yMWAG$H$J$k9T$r;XDj$9$k(Bindex
-    \param j	$BItJ,9TNs$N:8>e6yMWAG$H$J$kNs$r;XDj$9$k(Bindex
-    \param r	$BItJ,9TNs$N9T?t(B
-    \param c	$BItJ,9TNs$NNs?t(B
-    \return	$B@8@.$5$l$?ItJ,9TNs(B
+    \param i	•”•ªs—ñ‚Ì¶ã‹÷—v‘f‚Æ‚È‚és‚ğw’è‚·‚éindex
+    \param j	•”•ªs—ñ‚Ì¶ã‹÷—v‘f‚Æ‚È‚é—ñ‚ğw’è‚·‚éindex
+    \param r	•”•ªs—ñ‚Ìs”
+    \param c	•”•ªs—ñ‚Ì—ñ”
+    \return	¶¬‚³‚ê‚½•”•ªs—ñ
 */
 template <class T, class B, class R> inline Matrix<T>
-Matrix<T, B, R>::operator ()(int i, int j, u_int r, u_int c)
+Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c)
 {
     return Matrix<T>(*this, i, j, r, c);
 }
 
-//! $B$3$N9TNs$H5-21NN0h$r6&M-$7$?ItJ,9TNs$r@8@.$9$k!%(B
+//! ‚±‚Ìs—ñ‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªs—ñ‚ğ¶¬‚·‚éD
 /*!
-    \param i	$BItJ,9TNs$N:8>e6yMWAG$H$J$k9T$r;XDj$9$k(Bindex
-    \param j	$BItJ,9TNs$N:8>e6yMWAG$H$J$kNs$r;XDj$9$k(Bindex
-    \param r	$BItJ,9TNs$N9T?t(B
-    \param c	$BItJ,9TNs$NNs?t(B
-    \return	$B@8@.$5$l$?ItJ,9TNs(B
+    \param i	•”•ªs—ñ‚Ì¶ã‹÷—v‘f‚Æ‚È‚és‚ğw’è‚·‚éindex
+    \param j	•”•ªs—ñ‚Ì¶ã‹÷—v‘f‚Æ‚È‚é—ñ‚ğw’è‚·‚éindex
+    \param r	•”•ªs—ñ‚Ìs”
+    \param c	•”•ªs—ñ‚Ì—ñ”
+    \return	¶¬‚³‚ê‚½•”•ªs—ñ
 */
 template <class T, class B, class R> inline const Matrix<T>
-Matrix<T, B, R>::operator ()(int i, int j, u_int r, u_int c) const
+Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c) const
 {
     return Matrix<T>(*this, i, j, r, c);
 }
 
-//! $B$3$N9TNs$NA4$F$NMWAG$KF10l$N?tCM$rBeF~$9$k!%(B
+//! ‚±‚Ìs—ñ‚Ì‘S‚Ä‚Ì—v‘f‚É“¯ˆê‚Ì”’l‚ğ‘ã“ü‚·‚éD
 /*!
-  \param c	$BBeF~$9$k?tCM(B
-  \return	$B$3$N9TNs(B
+  \param c	‘ã“ü‚·‚é”’l
+  \return	‚±‚Ìs—ñ
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator =(const T& c)
@@ -715,10 +746,10 @@ Matrix<T, B, R>::operator =(const T& c)
     return *this;
 }
 
-//! $B$3$N9TNs$K;XDj$5$l$??tCM$r3]$1$k!%(B
+//! ‚±‚Ìs—ñ‚Éw’è‚³‚ê‚½”’l‚ğŠ|‚¯‚éD
 /*!
-  \param c	$B3]$1$k?tCM(B
-  \return	$B$3$N9TNs!$$9$J$o$A(B\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
+  \param c	Š|‚¯‚é”’l
+  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator *=(double c)
@@ -727,10 +758,10 @@ Matrix<T, B, R>::operator *=(double c)
     return *this;
 }
 
-//! $B$3$N9TNs$r;XDj$5$l$??tCM$G3d$k!%(B
+//! ‚±‚Ìs—ñ‚ğw’è‚³‚ê‚½”’l‚ÅŠ„‚éD
 /*!
-  \param c	$B3d$k?tCM(B
-  \return	$B$3$N9TNs!$$9$J$o$A(B
+  \param c	Š„‚é”’l
+  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
 		\f$\TUvec{A}{}\leftarrow \frac{\TUvec{A}{}}{c}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
@@ -740,10 +771,10 @@ Matrix<T, B, R>::operator /=(double c)
     return *this;
 }
 
-//! $B$3$N9TNs$KB>$N9TNs$rB-$9!%(B
+//! ‚±‚Ìs—ñ‚É‘¼‚Ìs—ñ‚ğ‘«‚·D
 /*!
-  \param m	$BB-$99TNs(B
-  \return	$B$3$N9TNs!$$9$J$o$A(B
+  \param m	‘«‚·s—ñ
+  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} + \TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -754,10 +785,10 @@ Matrix<T, B, R>::operator +=(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! $B$3$N9TNs$+$iB>$N9TNs$r0z$/!%(B
+//! ‚±‚Ìs—ñ‚©‚ç‘¼‚Ìs—ñ‚ğˆø‚­D
 /*!
-  \param m	$B0z$/9TNs(B
-  \return	$B$3$N9TNs!$$9$J$o$A(B
+  \param m	ˆø‚­s—ñ
+  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} - \TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -768,10 +799,10 @@ Matrix<T, B, R>::operator -=(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! $B$3$N9TNs$KB>$N9TNs$r3]$1$k!%(B
+//! ‚±‚Ìs—ñ‚É‘¼‚Ìs—ñ‚ğŠ|‚¯‚éD
 /*!
-  \param m	$B3]$1$k9TNs(B
-  \return	$B$3$N9TNs!$$9$J$o$A(B
+  \param m	Š|‚¯‚és—ñ
+  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -781,24 +812,24 @@ Matrix<T, B, R>::operator *=(const Matrix<T2, B2, R2>& m)
     return *this = *this * m;
 }
 
-//! $B$3$N(B?x3$B9TNs$N3F9T$H(B3$B<!85%Y%/%H%k$H$N%Y%/%H%k@Q$r$H$k!%(B
+//! ‚±‚Ì?x3s—ñ‚ÌŠes‚Æ3ŸŒ³ƒxƒNƒgƒ‹‚Æ‚ÌƒxƒNƒgƒ‹Ï‚ğ‚Æ‚éD
 /*!
-  \param v	3$B<!85%Y%/%H%k(B
-  \return	$B$3$N9TNs!$$9$J$o$A(B
+  \param v	3ŸŒ³ƒxƒNƒgƒ‹
+  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
 		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
 template <class T, class B, class R> template <class T2, class B2>
 Matrix<T, B, R>&
 Matrix<T, B, R>::operator ^=(const Vector<T2, B2>& v)
 {
-    for (int i = 0; i < nrow(); ++i)
+    for (u_int i = 0; i < nrow(); ++i)
 	(*this)[i] ^= v;
     return *this;
 }
 
-//! $B$3$N9TNs$NId9f$rH?E>$7$?9TNs$rJV$9!%(B
+//! ‚±‚Ìs—ñ‚Ì•„†‚ğ”½“]‚µ‚½s—ñ‚ğ•Ô‚·D
 /*!
-  \return	$BId9f$rH?E>$7$?9TNs!$$9$J$o$A(B\f$-\TUvec{A}{}\f$
+  \return	•„†‚ğ”½“]‚µ‚½s—ñC‚·‚È‚í‚¿\f$-\TUvec{A}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 Matrix<T, B, R>::operator -() const
@@ -806,9 +837,38 @@ Matrix<T, B, R>::operator -() const
     return Matrix(*this) *= -1;
 }
 
-//! $B$3$N9TNs$N5U9TNs$rJV$9!%(B
+//! ‚±‚Ì³•ûs—ñ‚ğ‘S‚Ä“¯ˆê‚Ì‘ÎŠp¬•ª’l‚ğ‚Â‘ÎŠps—ñ‚É‚·‚éD
 /*!
-  \return	$B5U9TNs!$$9$J$o$A(B\f$\TUinv{A}{}\f$
+  \param c	‘ÎŠp¬•ª‚Ì’l
+  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
+*/
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::diag(T c)
+{
+    check_dim(ncol());
+    *this = 0;
+    for (u_int i = 0; i < nrow(); ++i)
+	(*this)[i][i] = c;
+    return *this;
+}
+
+//! ‚±‚Ìs—ñ‚Ì“]’us—ñ‚ğ•Ô‚·D
+/*!
+  \return	“]’us—ñC‚·‚È‚í‚¿\f$\TUtvec{A}{}\f$
+*/
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::trns() const
+{
+    Matrix<T> val(ncol(), nrow());
+    for (u_int i = 0; i < nrow(); ++i)
+	for (u_int j = 0; j < ncol(); ++j)
+	    val[j][i] = (*this)[i][j];
+    return val;
+}
+
+//! ‚±‚Ìs—ñ‚Ì‹ts—ñ‚ğ•Ô‚·D
+/*!
+  \return	‹ts—ñC‚·‚È‚í‚¿\f$\TUinv{A}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 Matrix<T, B, R>::inv() const
@@ -816,9 +876,240 @@ Matrix<T, B, R>::inv() const
     return I(nrow()).solve(*this);
 }
 
-//! $B$3$N9TNs$N(B2$B>h%N%k%`$rJV$9!%(B
+//! ‚±‚Ìs—ñ‚Ì¬s—ñ®‚ğ•Ô‚·D
 /*!
-  \return	$B9TNs$N(B2$B>h%N%k%`!$$9$J$o$A(B\f$\TUnorm{\TUvec{A}{}}\f$
+  \param p	Œ³‚Ìs—ñ‚©‚çæ‚èœ‚­s‚ğw’è‚·‚éindex
+  \param q	Œ³‚Ìs—ñ‚©‚çæ‚èœ‚­—ñ‚ğw’è‚·‚éindex
+  \return	¬s—ñ®C‚·‚È‚í‚¿\f$\det\TUvec{A}{pq}\f$
+*/
+template <class T, class B, class R> T
+Matrix<T, B, R>::det(u_int p, u_int q) const
+{
+    Matrix<T>		d(nrow()-1, ncol()-1);
+    for (u_int i = 0; i < p; ++i)
+    {
+	for (u_int j = 0; j < q; ++j)
+	    d[i][j] = (*this)[i][j];
+	for (u_int j = q; j < d.ncol(); ++j)
+	    d[i][j] = (*this)[i][j+1];
+    }
+    for (u_int i = p; i < d.nrow(); ++i)
+    {
+	for (u_int j = 0; j < q; ++j)
+	    d[i][j] = (*this)[i+1][j];
+	for (u_int j = q; j < d.ncol(); ++j)
+	    d[i][j] = (*this)[i+1][j+1];
+    }
+    return d.det();
+}
+
+//! ‚±‚Ì³•ûs—ñ‚Ìtrace‚ğ•Ô‚·D
+/*!
+  \return			trace, ‚·‚È‚í‚¿\f$\trace\TUvec{A}{}\f$
+  \throw std::invalid_argument	³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
+*/
+template <class T, class B, class R> T
+Matrix<T, B, R>::trace() const
+{
+    if (nrow() != ncol())
+        throw
+	  std::invalid_argument("TU::Matrix<T>::trace(): not square matrix!!");
+    T	val = 0.0;
+    for (u_int i = 0; i < nrow(); ++i)
+	val += (*this)[i][i];
+    return val;
+}
+
+//! ‚±‚Ìs—ñ‚Ì—]ˆöqs—ñ‚ğ•Ô‚·D
+/*!
+  \return	—]ˆöqs—ñC‚·‚È‚í‚¿
+		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
+*/
+template <class T, class B, class R> Matrix<T, B, R>
+Matrix<T, B, R>::adj() const
+{
+    Matrix<T, B, R>	val(nrow(), ncol());
+    for (u_int i = 0; i < val.nrow(); ++i)
+	for (u_int j = 0; j < val.ncol(); ++j)
+	    val[i][j] = ((i + j) % 2 ? -det(j, i) : det(j, i));
+    return val;
+}
+
+//! ‚±‚Ìs—ñ‚Ì‹^—‹ts—ñ‚ğ•Ô‚·D
+/*!
+  \param cndnum	Å‘å“ÁˆÙ’l‚É‘Î‚·‚éâ‘Î’l‚ÌŠ„‡‚ª‚±‚ê‚É’B‚µ‚È‚¢Šî’ê‚Í–³‹
+  \return	‹^—‹ts—ñC‚·‚È‚í‚¿—^‚¦‚ç‚ê‚½s—ñ‚Ì“ÁˆÙ’l•ª‰ğ‚ğ
+		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
+		\TUtvec{U}{}\f$‚Æ‚·‚é‚Æ
+		\f[
+		  \TUvec{u}{0}\sigma_0^{-1}\TUtvec{v}{0} + \cdots +
+		  \TUvec{u}{r}\sigma_{r-1}^{-1}\TUtvec{v}{r-1},
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUabs{\sigma_1} > \epsilon\TUabs{\sigma_0},\ldots,
+		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
+		\f]
+*/
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::pinv(T cndnum) const
+{
+    SVDecomposition<T>	svd(*this);
+    Matrix<T>		val(svd.ncol(), svd.nrow());
+    
+    for (u_int i = 0; i < svd.diagonal().dim(); ++i)
+	if (fabs(svd[i]) * cndnum > fabs(svd[0]))
+	    val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
+
+    return val;
+}
+
+//! ‚±‚Ì‘ÎÌs—ñ‚ÌŒÅ—L’l‚ÆŒÅ—LƒxƒNƒgƒ‹‚ğ•Ô‚·D
+/*!
+    \param eval	â‘Î’l‚Ì‘å‚«‚¢‡‚É•À‚×‚ç‚ê‚½ŒÅ—L’l
+    \return	Šes‚ªŒÅ—LƒxƒNƒgƒ‹‚©‚ç¬‚é‰ñ“]s—ñC‚·‚È‚í‚¿
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
+		\f]
+		‚È‚é\f$\TUtvec{U}{}\f$
+*/
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::eigen(Vector<T>& eval) const
+{
+    TriDiagonal<T>	tri(*this);
+
+    tri.diagonalize();
+    eval = tri.diagonal();
+
+    return tri.Ut();
+}
+
+//! ‚±‚Ì‘ÎÌs—ñ‚Ìˆê”ÊŒÅ—L’l‚Æˆê”ÊŒÅ—LƒxƒNƒgƒ‹‚ğ•Ô‚·D
+/*!
+    \param B	‚à‚Æ‚Ìs—ñ‚Æ“¯ˆêƒTƒCƒY‚Ì³’l‘ÎÌs—ñ
+    \param eval	â‘Î’l‚Ì‘å‚«‚¢‡‚É•À‚×‚ç‚ê‚½ˆê”ÊŒÅ—L’l
+    \return	Šes‚ªˆê”ÊŒÅ—LƒxƒNƒgƒ‹‚©‚ç¬‚é³‘¥s—ñ
+		i‚½‚¾‚µ’¼Œğs—ñ‚Å‚Í‚È‚¢jC‚·‚È‚í‚¿
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{B}{}\TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
+		\f]
+		‚È‚é\f$\TUtvec{U}{}\f$
+*/
+template <class T, class B, class R> Matrix<T>
+Matrix<T, B, R>::geigen(const Matrix<T>& BB, Vector<T>& eval) const
+{
+    Matrix<T>	Ltinv = BB.cholesky().inv(), Linv = Ltinv.trns();
+    Matrix<T>	Ut = (Linv * (*this) * Ltinv).eigen(eval);
+    
+    return Ut * Linv;
+}
+
+//! ‚±‚Ì³’l‘ÎÌs—ñ‚ÌCholesky•ª‰ğiã”¼OŠps—ñj‚ğ•Ô‚·D
+/*!
+  ŒvZ‚É‚¨‚¢‚Ä‚ÍC‚à‚Æ‚Ìs—ñ‚Ìã”¼•”•ª‚µ‚©g‚í‚È‚¢
+  \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$‚È‚é
+		\f$\TUtvec{L}{}\f$iã”¼OŠps—ñj
+  \throw std::invalid_argument	³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
+  \throw std::runtime_error	³’l‚Å‚È‚¢ê‡‚É‘—o
+*/
+template <class T, class B, class R> Matrix<T, B, R>
+Matrix<T, B, R>::cholesky() const
+{
+    if (nrow() != ncol())
+        throw
+	    std::invalid_argument("TU::Matrix<T>::cholesky(): not square matrix!!");
+
+    Matrix<T, B, R>	Lt(*this);
+    for (u_int i = 0; i < nrow(); ++i)
+    {
+	T d = Lt[i][i];
+	if (d <= 0)
+	    throw std::runtime_error("TU::Matrix<T>::cholesky(): not positive definite matrix!!");
+	for (u_int j = 0; j < i; ++j)
+	    Lt[i][j] = 0;
+	Lt[i][i] = d = sqrt(d);
+	for (u_int j = i + 1; j < ncol(); ++j)
+	    Lt[i][j] /= d;
+	for (u_int j = i + 1; j < nrow(); ++j)
+	    for (u_int k = j; k < ncol(); ++k)
+		Lt[j][k] -= (Lt[i][j] * Lt[i][k]);
+    }
+    
+    return Lt;
+}
+
+//! ‚±‚Ìs—ñ‚Ìƒmƒ‹ƒ€‚ğ1‚É³‹K‰»‚·‚éD
+/*!
+    \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+		\f$
+		  \TUvec{A}{}\leftarrow\frac{\TUvec{A}{}}{\TUnorm{\TUvec{A}{}}}
+		\f$
+*/
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::normalize()
+{
+    T	sum = 0.0;
+    for (u_int i = 0; i < nrow(); ++i)
+	sum += (*this)[i] * (*this)[i];
+    return *this /= sqrt(sum);
+}
+
+//! ‚±‚Ìs—ñ‚Ì¶‚©‚çi“]’u‚³‚ê‚½j‰ñ“]s—ñ‚ğŠ|‚¯‚éD
+/*!
+    \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
+*/
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::rotate_from_left(const Rotation& r)
+{
+    for (u_int j = 0; j < ncol(); ++j)
+    {
+	const T	tmp = (*this)[r.p()][j];
+	
+	(*this)[r.p()][j] =  r.cos()*tmp + r.sin()*(*this)[r.q()][j];
+	(*this)[r.q()][j] = -r.sin()*tmp + r.cos()*(*this)[r.q()][j];
+    }
+    return *this;
+}
+
+//! ‚±‚Ìs—ñ‚Ì‰E‚©‚ç‰ñ“]s—ñ‚ğŠ|‚¯‚éD
+/*!
+    \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
+*/
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::rotate_from_right(const Rotation& r)
+{
+    for (u_int i = 0; i < nrow(); ++i)
+    {
+	const T	tmp = (*this)[i][r.p()];
+	
+	(*this)[i][r.p()] =  tmp*r.cos() + (*this)[i][r.q()]*r.sin();
+	(*this)[i][r.q()] = -tmp*r.sin() + (*this)[i][r.q()]*r.cos();
+    }
+    return *this;
+}
+
+//! ‚±‚Ìs—ñ‚Ì2æƒmƒ‹ƒ€‚Ì2æ‚ğ•Ô‚·D
+/*!
+    \return	s—ñ‚Ì2æƒmƒ‹ƒ€‚Ì2æC‚·‚È‚í‚¿\f$\TUnorm{\TUvec{A}{}}^2\f$
+*/
+template <class T, class B, class R> T
+Matrix<T, B, R>::square() const
+{
+    T	val = 0.0;
+    for (u_int i = 0; i < nrow(); ++i)
+	val += (*this)[i] * (*this)[i];
+    return val;
+}
+
+//! ‚±‚Ìs—ñ‚Ì2æƒmƒ‹ƒ€‚ğ•Ô‚·D
+/*!
+  \return	s—ñ‚Ì2æƒmƒ‹ƒ€C‚·‚È‚í‚¿\f$\TUnorm{\TUvec{A}{}}\f$
 */
 template <class T, class B, class R> inline double
 Matrix<T, B, R>::length() const
@@ -826,10 +1117,157 @@ Matrix<T, B, R>::length() const
     return sqrt(square());
 }
 
-//! $BC10L@5J}9TNs$r@8@.$9$k!%(B
+//! ‚±‚Ìs—ñ‚Ì‰º”¼OŠp•”•ª‚ğã”¼OŠp•”•ª‚ÉƒRƒs[‚µ‚Ä‘ÎÌ‰»‚·‚éD
 /*!
-  \param d	$BC10L@5J}9TNs$N<!85(B
-  \return	$BC10L@5J}9TNs(B
+    \return	‚±‚Ìs—ñ
+*/
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::symmetrize()
+{
+    for (u_int i = 0; i < nrow(); ++i)
+	for (u_int j = 0; j < i; ++j)
+	    (*this)[j][i] = (*this)[i][j];
+    return *this;
+}
+
+//! ‚±‚Ìs—ñ‚Ì‰º”¼OŠp•”•ª‚Ì•„†‚ğ”½“]‚µCã”¼OŠp•”•ª‚ÉƒRƒs[‚µ‚Ä”½‘ÎÌ‰»‚·‚éD
+/*!
+    \return	‚±‚Ìs—ñ
+*/
+template <class T, class B, class R> Matrix<T, B, R>&
+Matrix<T, B, R>::antisymmetrize()
+{
+    for (u_int i = 0; i < nrow(); ++i)
+    {
+	(*this)[i][i] = 0.0;
+	for (u_int j = 0; j < i; ++j)
+	    (*this)[j][i] = -(*this)[i][j];
+    }
+    return *this;
+}
+
+//! ‚±‚Ì3ŸŒ³‰ñ“]s—ñ‚©‚çŠe²ü‚è‚Ì‰ñ“]Šp‚ğæ‚èo‚·D
+/*!
+  ‚±‚Ìs—ñ‚ğ\f$\TUtvec{R}{}\f$‚Æ‚·‚é‚ÆC
+  \f[
+    \TUvec{R}{} =
+    \TUbeginarray{ccc}
+      \cos\theta_z & -\sin\theta_z & \\
+      \sin\theta_z &  \cos\theta_z & \\
+      & & 1
+    \TUendarray
+    \TUbeginarray{ccc}
+       \cos\theta_y & & \sin\theta_y \\
+       & 1 & \\
+      -\sin\theta_y & & \cos\theta_y
+    \TUendarray
+    \TUbeginarray{ccc}
+      1 & & \\
+      & \cos\theta_x & -\sin\theta_x \\
+      & \sin\theta_x &  \cos\theta_x
+    \TUendarray
+  \f]
+  ‚È‚é\f$\theta_x, \theta_y, \theta_z\f$‚ª‰ñ“]Šp‚Æ‚È‚éD
+ \param theta_x	x²ü‚è‚Ì‰ñ“]Šp(\f$ -\pi \le \theta_x \le \pi\f$)‚ğ•Ô‚·D
+ \param theta_y	y²ü‚è‚Ì‰ñ“]Šp
+	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)‚ğ•Ô‚·D
+ \param theta_z	z²ü‚è‚Ì‰ñ“]Šp(\f$ -\pi \le \theta_z \le \pi\f$)‚ğ•Ô‚·D
+ \throw invalid_argument	3ŸŒ³³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
+*/
+template <class T, class B, class R> void
+Matrix<T, B, R>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
+{
+    using namespace	std;
+    
+    if (nrow() != 3 || ncol() != 3)
+	throw invalid_argument("TU::Matrix<T>::rot2angle: input matrix must be 3x3!!");
+
+    if ((*this)[0][0] == 0.0 && (*this)[0][1] == 0.0)
+    {
+	theta_x = atan2(-(*this)[2][1], (*this)[1][1]);
+	theta_y = ((*this)[0][2] < 0.0 ? M_PI / 2.0 : -M_PI / 2.0);
+	theta_z = 0.0;
+    }
+    else
+    {
+	theta_x = atan2((*this)[1][2], (*this)[2][2]);
+	theta_y = -asin((*this)[0][2]);
+	theta_z = atan2((*this)[0][1], (*this)[0][0]);
+    }
+}
+
+//! ‚±‚Ì3ŸŒ³‰ñ“]s—ñ‚©‚ç‰ñ“]Šp‚Æ‰ñ“]²‚ğæ‚èo‚·D
+/*!
+  ‚±‚Ìs—ñ‚ğ\f$\TUtvec{R}{}\f$‚Æ‚·‚é‚ÆC
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  ‚È‚é\f$\theta\f$‚Æ\f$\TUvec{n}{}\f$‚ª‚»‚ê‚¼‚ê‰ñ“]Šp‚Æ‰ñ“]²‚Æ‚È‚éD
+ \param c	‰ñ“]Šp‚Ìcos’lC‚·‚È‚í‚¿\f$\cos\theta\f$‚ğ•Ô‚·D
+ \param s	‰ñ“]Šp‚Ìsin’lC‚·‚È‚í‚¿\f$\sin\theta\f$‚ğ•Ô‚·D
+ \return	‰ñ“]²‚ğ•\‚·3ŸŒ³’PˆÊƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{n}{}\f$
+ \throw std::invalid_argument	3x3s—ñ‚Å‚È‚¢ê‡‚É‘—o
+*/
+template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3> >
+Matrix<T, B, R>::rot2axis(T& c, T& s) const
+{
+    if (nrow() != 3 || ncol() != 3)
+	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
+
+  // Compute cosine and sine of rotation angle.
+    const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
+    c = (trace - 1.0) / 2.0;
+    s = sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
+
+  // Compute rotation axis.
+    Vector<T, FixedSizedBuf<T, 3> >	n;
+    n[0] = (*this)[1][2] - (*this)[2][1];
+    n[1] = (*this)[2][0] - (*this)[0][2];
+    n[2] = (*this)[0][1] - (*this)[1][0];
+    n.normalize();
+
+    return n;
+}
+
+//! ‚±‚Ì3ŸŒ³‰ñ“]s—ñ‚©‚ç‰ñ“]Šp‚Æ‰ñ“]²‚ğæ‚èo‚·D
+/*!
+  ‚±‚Ìs—ñ‚ğ\f$\TUtvec{R}{}\f$‚Æ‚·‚é‚ÆC
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  ‚È‚é\f$\theta\f$‚Æ\f$\TUvec{n}{}\f$‚ª‚»‚ê‚¼‚ê‰ñ“]Šp‚Æ‰ñ“]²‚Æ‚È‚éD
+ \return			‰ñ“]Šp‚Æ‰ñ“]²‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+				\f$\theta\TUvec{n}{}\f$
+ \throw invalid_argument	3x3s—ñ‚Å‚È‚¢ê‡‚É‘—o
+*/
+template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3u> >
+Matrix<T, B, R>::rot2axis() const
+{
+    if (nrow() != 3 || ncol() != 3)
+	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
+
+    Vector<T, FixedSizedBuf<T, 3u> >	axis;
+    axis[0] = ((*this)[1][2] - (*this)[2][1]) * 0.5;
+    axis[1] = ((*this)[2][0] - (*this)[0][2]) * 0.5;
+    axis[2] = ((*this)[0][1] - (*this)[1][0]) * 0.5;
+    const T	s = sqrt(axis.square());
+    if (s + 1.0 == 1.0)		// s << 1 ?
+	return axis;
+    const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
+    if (trace > 1.0)		// cos > 0 ?
+	return  axis *= ( asin(s) / s);
+    else
+	return  axis *= (-asin(s) / s);
+}
+
+//! ’PˆÊ³•ûs—ñ‚ğ¶¬‚·‚éD
+/*!
+  \param d	’PˆÊ³•ûs—ñ‚ÌŸŒ³
+  \return	’PˆÊ³•ûs—ñ
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 Matrix<T, B, R>::I(u_int d)
@@ -837,12 +1275,12 @@ Matrix<T, B, R>::I(u_int d)
     return Matrix<T, B, R>(d, d).diag(1.0);
 }
 
-//! 3$B<!852sE>9TNs$r@8@.$9$k!%(B
+//! 3ŸŒ³‰ñ“]s—ñ‚ğ¶¬‚·‚éD
 /*!
-  \param n	$B2sE><4$rI=$9(B3$B<!85C10L%Y%/%H%k(B
-  \param c	$B2sE>3Q$N(Bcos$BCM(B
-  \param s	$B2sE>3Q$N(Bsin$BCM(B
-  \return	$B@8@.$5$l$?2sE>9TNs!$$9$J$o$A(B
+  \param n	‰ñ“]²‚ğ•\‚·3ŸŒ³’PˆÊƒxƒNƒgƒ‹
+  \param c	‰ñ“]Šp‚Ìcos’l
+  \param s	‰ñ“]Šp‚Ìsin’l
+  \return	¶¬‚³‚ê‚½‰ñ“]s—ñC‚·‚È‚í‚¿
 		\f[
 		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
 		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
@@ -870,10 +1308,10 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
     return Qt;
 }
 
-//! 3$B<!852sE>9TNs$r@8@.$9$k!%(B
+//! 3ŸŒ³‰ñ“]s—ñ‚ğ¶¬‚·‚éD
 /*!
-  \param axis	$B2sE>3Q$H2sE><4$rI=$9(B3$B<!85%Y%/%H%k(B
-  \return	$B@8@.$5$l$?2sE>9TNs!$$9$J$o$A(B
+  \param axis	‰ñ“]Šp‚Æ‰ñ“]²‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹
+  \return	¶¬‚³‚ê‚½‰ñ“]s—ñC‚·‚È‚í‚¿
 		\f[
 		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
 		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
@@ -896,10 +1334,10 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& axis)
     }
 }
 
-//! $B9TNs$N%5%$%:$rJQ99$7!$(B0$B$K=i4|2=$9$k!%(B
+//! s—ñ‚ÌƒTƒCƒY‚ğ•ÏX‚µC0‚É‰Šú‰»‚·‚éD
 /*!
-  \param r	$B?7$7$$9T?t(B
-  \param c	$B?7$7$$Ns?t(B
+  \param r	V‚µ‚¢s”
+  \param c	V‚µ‚¢—ñ”
 */
 template <class T, class B, class R> inline void
 Matrix<T, B, R>::resize(u_int r, u_int c)
@@ -908,11 +1346,11 @@ Matrix<T, B, R>::resize(u_int r, u_int c)
     *this = 0;
 }
 
-//! $B9TNs$NFbIt5-21NN0h$H%5%$%:$rJQ99$9$k!%(B
+//! s—ñ‚Ì“à•”‹L‰¯—Ìˆæ‚ÆƒTƒCƒY‚ğ•ÏX‚·‚éD
 /*!
-  \param p	$B?7$7$$FbIt5-21NN0h$X$N%]%$%s%?(B
-  \param r	$B?7$7$$9T?t(B
-  \param c	$B?7$7$$Ns?t(B
+  \param p	V‚µ‚¢“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param r	V‚µ‚¢s”
+  \param c	V‚µ‚¢—ñ”
 */
 template <class T, class B, class R> inline void
 Matrix<T, B, R>::resize(T* p, u_int r, u_int c)
@@ -923,11 +1361,11 @@ Matrix<T, B, R>::resize(T* p, u_int r, u_int c)
 /************************************************************************
 *  numerical operators							*
 ************************************************************************/
-//! 2$B$D$N%Y%/%H%k$NB-$7;;(B
+//! 2‚Â‚ÌƒxƒNƒgƒ‹‚Ì‘«‚µZ
 /*!
-  \param v	$BBh(B1$B0z?t(B
-  \param w	$BBh(B2$B0z?t(B
-  \return	$B7k2L$r3JG<$7$?%Y%/%H%k!$$9$J$o$A(B\f$\TUvec{v}{}+\TUvec{w}{}\f$
+  \param v	‘æ1ˆø”
+  \param w	‘æ2ˆø”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{v}{}+\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> inline Vector<T1, B1>
 operator +(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
@@ -935,11 +1373,11 @@ operator +(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return Vector<T1, B1>(v) += w;
 }
 
-//! 2$B$D$N%Y%/%H%k$N0z$-;;(B
+//! 2‚Â‚ÌƒxƒNƒgƒ‹‚Ìˆø‚«Z
 /*!
-  \param v	$BBh(B1$B0z?t(B
-  \param w	$BBh(B2$B0z?t(B
-  \return	$B7k2L$r3JG<$7$?%Y%/%H%k!$$9$J$o$A(B\f$\TUvec{v}{}-\TUvec{w}{}\f$
+  \param v	‘æ1ˆø”
+  \param w	‘æ2ˆø”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{v}{}-\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> inline Vector<T1, B1>
 operator -(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
@@ -947,11 +1385,11 @@ operator -(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return Vector<T1, B1>(v) -= w;
 }
 
-//! $B%Y%/%H%k$KDj?t$r3]$1$k!%(B
+//! ƒxƒNƒgƒ‹‚É’è”‚ğŠ|‚¯‚éD
 /*!
-  \param c	$B3]$1$kDj?t(B
-  \param v	$B%Y%/%H%k(B
-  \return	$B7k2L$r3JG<$7$?%Y%/%H%k!$$9$J$o$A(B\f$c\TUvec{v}{}\f$
+  \param c	Š|‚¯‚é’è”
+  \param v	ƒxƒNƒgƒ‹
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$c\TUvec{v}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 operator *(double c, const Vector<T, B>& v)
@@ -959,11 +1397,11 @@ operator *(double c, const Vector<T, B>& v)
     return Vector<T, B>(v) *= c;
 }
 
-//! $B%Y%/%H%k$KDj?t$r3]$1$k!%(B
+//! ƒxƒNƒgƒ‹‚É’è”‚ğŠ|‚¯‚éD
 /*!
-  \param v	$B%Y%/%H%k(B
-  \param c	$B3]$1$kDj?t(B
-  \return	$B7k2L$r3JG<$7$?%Y%/%H%k!$$9$J$o$A(B\f$c\TUvec{v}{}\f$
+  \param v	ƒxƒNƒgƒ‹
+  \param c	Š|‚¯‚é’è”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$c\TUvec{v}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 operator *(const Vector<T, B>& v, double c)
@@ -971,11 +1409,11 @@ operator *(const Vector<T, B>& v, double c)
     return Vector<T, B>(v) *= c;
 }
 
-//! $B%Y%/%H%k$N3FMWAG$rDj?t$G3d$k!%(B
+//! ƒxƒNƒgƒ‹‚ÌŠe—v‘f‚ğ’è”‚ÅŠ„‚éD
 /*!
-  \param v	$B%Y%/%H%k(B
-  \param c	$B3d$kDj?t(B
-  \return	$B7k2L$r3JG<$7$?%Y%/%H%k!$$9$J$o$A(B\f$\frac{1}{c}\TUvec{v}{}\f$
+  \param v	ƒxƒNƒgƒ‹
+  \param c	Š„‚é’è”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\frac{1}{c}\TUvec{v}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 operator /(const Vector<T, B>& v, double c)
@@ -983,11 +1421,11 @@ operator /(const Vector<T, B>& v, double c)
     return Vector<T, B>(v) /= c;
 }
 
-//! 2$B$D$N9TNs$NB-$7;;(B
+//! 2‚Â‚Ìs—ñ‚Ì‘«‚µZ
 /*!
-  \param m	$BBh(B1$B0z?t(B
-  \param n	$BBh(B2$B0z?t(B
-  \return	$B7k2L$r3JG<$7$?9TNs!$$9$J$o$A(B\f$\TUvec{M}{}+\TUvec{N}{}\f$
+  \param m	‘æ1ˆø”
+  \param n	‘æ2ˆø”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$\TUvec{M}{}+\TUvec{N}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2, class R2>
 inline Matrix<T1, B1, R1>
@@ -996,11 +1434,11 @@ operator +(const Matrix<T1, B1, R1>& m, const Matrix<T2, B2, R2>& n)
     return Matrix<T1, B1, R1>(m) += n;
 }
 
-//! 2$B$D$N9TNs$N0z$-;;(B
+//! 2‚Â‚Ìs—ñ‚Ìˆø‚«Z
 /*!
-  \param m	$BBh(B1$B0z?t(B
-  \param n	$BBh(B2$B0z?t(B
-  \return	$B7k2L$r3JG<$7$?9TNs!$$9$J$o$A(B\f$\TUvec{M}{}-\TUvec{N}{}\f$
+  \param m	‘æ1ˆø”
+  \param n	‘æ2ˆø”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$\TUvec{M}{}-\TUvec{N}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2, class R2>
 inline Matrix<T1, B1, R1>
@@ -1009,11 +1447,11 @@ operator -(const Matrix<T1, B1, R1>& m, const Matrix<T2, B2, R2>& n)
     return Matrix<T1, B1, R1>(m) -= n;
 }
 
-//! $B9TNs$KDj?t$r3]$1$k!%(B
+//! s—ñ‚É’è”‚ğŠ|‚¯‚éD
 /*!
-  \param c	$B3]$1$kDj?t(B
-  \param m	$B9TNs(B
-  \return	$B7k2L$r3JG<$7$?9TNs!$$9$J$o$A(B\f$c\TUvec{M}{}\f$
+  \param c	Š|‚¯‚é’è”
+  \param m	s—ñ
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$c\TUvec{M}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 operator *(double c, const Matrix<T, B, R>& m)
@@ -1021,11 +1459,11 @@ operator *(double c, const Matrix<T, B, R>& m)
     return Matrix<T, B, R>(m) *= c;
 }
 
-//! $B9TNs$KDj?t$r3]$1$k!%(B
+//! s—ñ‚É’è”‚ğŠ|‚¯‚éD
 /*!
-  \param m	$B9TNs(B
-  \param c	$B3]$1$kDj?t(B
-  \return	$B7k2L$r3JG<$7$?9TNs!$$9$J$o$A(B\f$c\TUvec{M}{}\f$
+  \param m	s—ñ
+  \param c	Š|‚¯‚é’è”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$c\TUvec{M}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 operator *(const Matrix<T, B, R>& m, double c)
@@ -1033,11 +1471,11 @@ operator *(const Matrix<T, B, R>& m, double c)
     return Matrix<T, B, R>(m) *= c;
 }
 
-//! $B9TNs$N3FMWAG$rDj?t$G3d$k!%(B
+//! s—ñ‚ÌŠe—v‘f‚ğ’è”‚ÅŠ„‚éD
 /*!
-  \param m	$B9TNs(B
-  \param c	$B3d$kDj?t(B
-  \return	$B7k2L$r3JG<$7$?9TNs!$$9$J$o$A(B\f$\frac{1}{c}\TUvec{M}{}\f$
+  \param m	s—ñ
+  \param c	Š„‚é’è”
+  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$\frac{1}{c}\TUvec{M}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 operator /(const Matrix<T, B, R>& m, double c)
@@ -1045,11 +1483,11 @@ operator /(const Matrix<T, B, R>& m, double c)
     return Matrix<T, B, R>(m) /= c;
 }
 
-//! 2$B$D$N(B3$B<!85%Y%/%H%k$N%Y%/%H%k@Q(B
+//! 2‚Â‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚ÌƒxƒNƒgƒ‹Ï
 /*!
-  \param v	$BBh(B1$B0z?t(B
-  \param w	$BBh(B2$B0z?t(B
-  \return	$B%Y%/%H%k@Q!$$9$J$o$A(B\f$\TUvec{v}{}\times\TUvec{w}{}\f$
+  \param v	‘æ1ˆø”
+  \param w	‘æ2ˆø”
+  \return	ƒxƒNƒgƒ‹ÏC‚·‚È‚í‚¿\f$\TUvec{v}{}\times\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2>
 inline Vector<T1, FixedSizedBuf<T1, 3> >
@@ -1058,63 +1496,63 @@ operator ^(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return Vector<T1, FixedSizedBuf<T1, 3> >(v) ^= w;
 }
 
-//! 2$B$D$N%Y%/%H%k$NFb@Q(B
+//! 2‚Â‚ÌƒxƒNƒgƒ‹‚Ì“àÏ
 /*!
-  \param v	$BBh(B1$B0z?t(B
-  \param w	$BBh(B2$B0z?t(B
-  \return	$BFb@Q!$$9$J$o$A(B\f$\TUtvec{v}{}\TUvec{w}{}\f$
+  \param v	‘æ1ˆø”
+  \param w	‘æ2ˆø”
+  \return	“àÏC‚·‚È‚í‚¿\f$\TUtvec{v}{}\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> T1
 operator *(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
 {
     v.check_dim(w.dim());
     T1	val = 0;
-    for (int i = 0; i < v.dim(); ++i)
+    for (u_int i = 0; i < v.dim(); ++i)
 	val += v[i] * w[i];
     return val;
 }
 
-//! $B%Y%/%H%k$H9TNs$N@Q(B
+//! ƒxƒNƒgƒ‹‚Æs—ñ‚ÌÏ
 /*!
-  \param v	$B%Y%/%H%k(B
-  \param m	$B9TNs(B
-  \return	$B7k2L$N%Y%/%H%k!$$9$J$o$A(B\f$\TUtvec{v}{}\TUvec{M}{}\f$
+  \param v	ƒxƒNƒgƒ‹
+  \param m	s—ñ
+  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUtvec{v}{}\TUvec{M}{}\f$
 */
 template <class T1, class B1, class T2, class B2, class R2> Vector<T1>
 operator *(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
 {
     v.check_dim(m.nrow());
     Vector<T1> val(m.ncol());
-    for (int j = 0; j < m.ncol(); ++j)
-	for (int i = 0; i < m.nrow(); ++i)
+    for (u_int j = 0; j < m.ncol(); ++j)
+	for (u_int i = 0; i < m.nrow(); ++i)
 	    val[j] += v[i] * m[i][j];
     return val;
 }
 
-//! 2$B$D$N%Y%/%H%k$N30@Q(B
+//! 2‚Â‚ÌƒxƒNƒgƒ‹‚ÌŠOÏ
 /*!
-  \param v	$BBh(B1$B0z?t(B
-  \param w	$BBh(B2$B0z?t(B
-  \return	$B7k2L$N9TNs!$$9$J$o$A(B\f$\TUvec{v}{}\TUtvec{w}{}\f$
+  \param v	‘æ1ˆø”
+  \param w	‘æ2ˆø”
+  \return	Œ‹‰Ê‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{v}{}\TUtvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> Matrix<T1>
 operator %(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
 {
     Matrix<T1>	val(v.dim(), w.dim());
-    for (int i = 0; i < v.dim(); ++i)
-	for (int j = 0; j < w.dim(); ++j)
+    for (u_int i = 0; i < v.dim(); ++i)
+	for (u_int j = 0; j < w.dim(); ++j)
 	    val[i][j] = v[i] * w[j];
     return val;
 }
 
-//! 3$B<!85%Y%/%H%k$H(B3x?$B9TNs$N3FNs$H$N%Y%/%H%k@Q(B
+//! 3ŸŒ³ƒxƒNƒgƒ‹‚Æ3x?s—ñ‚ÌŠe—ñ‚Æ‚ÌƒxƒNƒgƒ‹Ï
 /*!
-  \param v			3$B<!85%Y%/%H%k(B
-  \param m			3x?$B9TNs(B
-  \return			$B7k2L$N(B3x?$B9TNs!$$9$J$o$A(B
+  \param v			3ŸŒ³ƒxƒNƒgƒ‹
+  \param m			3x?s—ñ
+  \return			Œ‹‰Ê‚Ì3x?s—ñC‚·‚È‚í‚¿
 				\f$\TUvec{v}{}\times\TUvec{M}{}\f$
-  \throw std::invalid_argument	v$B$,(B3$B<!85%Y%/%H%k$G$J$$$+(Bm$B$,(B3x?$B9TNs$G$J$$>l9g$K(B
-				$BAw=P(B
+  \throw std::invalid_argument	v‚ª3ŸŒ³ƒxƒNƒgƒ‹‚Å‚È‚¢‚©m‚ª3x?s—ñ‚Å‚È‚¢ê‡‚É
+				‘—o
 */
 template <class T1, class B1, class T2, class B2, class R2> Matrix<T2, B2, R2>
 operator ^(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
@@ -1123,7 +1561,7 @@ operator ^(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
     if (v.dim() != 3)
 	throw std::invalid_argument("operator ^(const Vecotr<T>&, const Matrix<T, B, R>&): dimension of vector must be 3!!");
     Matrix<T2, B2, R2>	val(m.nrow(), m.ncol());
-    for (int j = 0; j < val.ncol(); ++j)
+    for (u_int j = 0; j < val.ncol(); ++j)
     {
 	val[0][j] = v[1] * m[2][j] - v[2] * m[1][j];
 	val[1][j] = v[2] * m[0][j] - v[0] * m[2][j];
@@ -1132,11 +1570,11 @@ operator ^(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
     return val;
 }
 
-//! 2$B$D$N9TNs$N@Q(B
+//! 2‚Â‚Ìs—ñ‚ÌÏ
 /*!
-  \param m	$BBh(B1$B0z?t(B
-  \param n	$BBh(B2$B0z?t(B
-  \return	$B7k2L$N9TNs!$$9$J$o$A(B\f$\TUvec{M}{}\TUvec{N}{}\f$
+  \param m	‘æ1ˆø”
+  \param n	‘æ2ˆø”
+  \return	Œ‹‰Ê‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{M}{}\TUvec{N}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2, class R2>
 Matrix<T1>
@@ -1144,33 +1582,33 @@ operator *(const Matrix<T1, B1, R1>& m, const Matrix<T2, B2, R2>& n)
 {
     n.check_dim(m.ncol());
     Matrix<T1>	val(m.nrow(), n.ncol());
-    for (int i = 0; i < m.nrow(); ++i)
-	for (int j = 0; j < n.ncol(); ++j)
-	    for (int k = 0; k < m.ncol(); ++k)
+    for (u_int i = 0; i < m.nrow(); ++i)
+	for (u_int j = 0; j < n.ncol(); ++j)
+	    for (u_int k = 0; k < m.ncol(); ++k)
 		val[i][j] += m[i][k] * n[k][j];
     return val;
 }
 
-//! $B9TNs$H%Y%/%H%k$N@Q(B
+//! s—ñ‚ÆƒxƒNƒgƒ‹‚ÌÏ
 /*!
-  \param m	$B9TNs(B
-  \param v	$B%Y%/%H%k(B
-  \return	$B7k2L$N%Y%/%H%k!$$9$J$o$A(B\f$\TUvec{M}{}\TUvec{v}{}\f$
+  \param m	s—ñ
+  \param v	ƒxƒNƒgƒ‹
+  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{M}{}\TUvec{v}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2> Vector<T1>
 operator *(const Matrix<T1, B1, R1>& m, const Vector<T2, B2>& v)
 {
     Vector<T1>	val(m.nrow());
-    for (int i = 0; i < m.nrow(); ++i)
+    for (u_int i = 0; i < m.nrow(); ++i)
 	val[i] = m[i] * v;
     return val;
 }
 
-//! ?x3$B9TNs$N3F9T$H(B3$B<!85%Y%/%H%k$N%Y%/%H%k@Q(B
+//! ?x3s—ñ‚ÌŠes‚Æ3ŸŒ³ƒxƒNƒgƒ‹‚ÌƒxƒNƒgƒ‹Ï
 /*!
-  \param m	?x3$B9TNs(B
-  \param v	3$B<!85%Y%/%H%k(B
-  \return	$B7k2L$N9TNs!$$9$J$o$A(B\f$(\TUtvec{M}{}\times\TUvec{v}{})^\top\f$
+  \param m	?x3s—ñ
+  \param v	3ŸŒ³ƒxƒNƒgƒ‹
+  \return	Œ‹‰Ê‚Ìs—ñC‚·‚È‚í‚¿\f$(\TUtvec{M}{}\times\TUvec{v}{})^\top\f$
 */
 template <class T1, class B1, class R1, class T2, class B2>
 inline Matrix<T1, B1, R1>
@@ -1182,7 +1620,7 @@ operator ^(const Matrix<T1, B1, R1>& m, const Vector<T2, B2>& v)
 /************************************************************************
 *  class LUDecomposition<T>						*
 ************************************************************************/
-//! $B@5J}9TNs$N(BLU$BJ,2r$rI=$9%/%i%9(B
+//! ³•ûs—ñ‚ÌLU•ª‰ğ‚ğ•\‚·ƒNƒ‰ƒX
 template <class T>
 class LUDecomposition : private Array2<Vector<T> >
 {
@@ -1193,9 +1631,9 @@ class LUDecomposition : private Array2<Vector<T> >
     template <class T2, class B2>
     void	substitute(Vector<T2, B2>&)	const	;
 
-  //! $B$b$H$N@5J}9TNs$N9TNs<0$rJV$9!%(B
+  //! ‚à‚Æ‚Ì³•ûs—ñ‚Ìs—ñ®‚ğ•Ô‚·D
   /*!
-    \return	$B$b$H$N@5J}9TNs$N9TNs<0(B
+    \return	‚à‚Æ‚Ì³•ûs—ñ‚Ìs—ñ®
   */
     T		det()				const	{return _det;}
     
@@ -1207,10 +1645,10 @@ class LUDecomposition : private Array2<Vector<T> >
     T		_det;
 };
 
-//! $BM?$($i$l$?@5J}9TNs$N(BLU$BJ,2r$r@8@.$9$k!%(B
+//! —^‚¦‚ç‚ê‚½³•ûs—ñ‚ÌLU•ª‰ğ‚ğ¶¬‚·‚éD
 /*!
- \param m			LU$BJ,2r$9$k@5J}9TNs(B
- \throw std::invalid_argument	m$B$,@5J}9TNs$G$J$$>l9g$KAw=P(B
+ \param m			LU•ª‰ğ‚·‚é³•ûs—ñ
+ \throw std::invalid_argument	m‚ª³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
 */
 template <class T> template <class T2, class B2, class R2>
 LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
@@ -1221,15 +1659,15 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
     if (nrow() != ncol())
         throw invalid_argument("TU::LUDecomposition<T>::LUDecomposition: not square matrix!!");
 
-    for (int j = 0; j < ncol(); ++j)	// initialize column index
+    for (u_int j = 0; j < ncol(); ++j)	// initialize column index
 	_index[j] = j;			// for explicit pivotting
 
     Vector<T>	scale(ncol());
-    for (int j = 0; j < ncol(); ++j)	// find maximum abs. value in each col.
+    for (u_int j = 0; j < ncol(); ++j)	// find maximum abs. value in each col.
     {					// for implicit pivotting
 	T max = 0.0;
 
-	for (int i = 0; i < nrow(); ++i)
+	for (u_int i = 0; i < nrow(); ++i)
 	{
 	    const T tmp = fabs((*this)[i][j]);
 	    if (tmp > max)
@@ -1238,21 +1676,21 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
 	scale[j] = (max != 0.0 ? 1.0 / max : 1.0);
     }
 
-    for (int i = 0; i < nrow(); ++i)
+    for (u_int i = 0; i < nrow(); ++i)
     {
-	for (int j = 0; j < i; ++j)		// left part (j < i)
+	for (u_int j = 0; j < i; ++j)		// left part (j < i)
 	{
 	    T& sum = (*this)[i][j];
-	    for (int k = 0; k < j; ++k)
+	    for (u_int k = 0; k < j; ++k)
 		sum -= (*this)[i][k] * (*this)[k][j];
 	}
 
-	int	jmax;
+	u_int	jmax;
 	T	max = 0.0;
-	for (int j = i; j < ncol(); ++j)  // diagonal and right part (i <= j)
+	for (u_int j = i; j < ncol(); ++j)  // diagonal and right part (i <= j)
 	{
 	    T& sum = (*this)[i][j];
-	    for (int k = 0; k < i; ++k)
+	    for (u_int k = 0; k < i; ++k)
 		sum -= (*this)[i][k] * (*this)[k][j];
 	    const T tmp = fabs(sum) * scale[j];
 	    if (tmp >= max)
@@ -1263,7 +1701,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
 	}
 	if (jmax != i)			// pivotting required ?
 	{
-	    for (int k = 0; k < nrow(); ++k)	// swap i-th and jmax-th column
+	    for (u_int k = 0; k < nrow(); ++k)	// swap i-th and jmax-th column
 		swap((*this)[k][i], (*this)[k][jmax]);
 	    swap(_index[i], _index[jmax]);	// swap column index
 	    swap(scale[i], scale[jmax]);	// swap colum-wise scale factor
@@ -1275,20 +1713,20 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
 	if ((*this)[i][i] == 0.0)	// singular matrix ?
 	    break;
 
-	for (int j = i + 1; j < nrow(); ++j)
+	for (u_int j = i + 1; j < nrow(); ++j)
 	    (*this)[i][j] /= (*this)[i][i];
     }
 }
 
-//! $B$b$H$N@5J}9TNs$r78?t9TNs$H$7$?O"N)(B1$B<!J}Dx<0$r2r$/!%(B
+//! ‚à‚Æ‚Ì³•ûs—ñ‚ğŒW”s—ñ‚Æ‚µ‚½˜A—§1Ÿ•û’ö®‚ğ‰ğ‚­D
 /*!
-  \param b			$B$b$H$N@5J}9TNs(B\f$\TUvec{M}{}\f$$B$HF1$8<!(B
-				$B85$r;}$D%Y%/%H%k!%(B\f$\TUtvec{b}{} =
-				\TUtvec{x}{}\TUvec{M}{}\f$$B$N2r$KJQ49$5(B
-				$B$l$k!%(B
-  \throw std::invalid_argument	$B%Y%/%H%k(Bb$B$N<!85$,$b$H$N@5J}9TNs$N<!85$K0lCW(B
-				$B$7$J$$>l9g$KAw=P(B
-  \throw std::runtime_error	$B$b$H$N@5J}9TNs$,@5B'$G$J$$>l9g$KAw=P(B
+  \param b			‚à‚Æ‚Ì³•ûs—ñ\f$\TUvec{M}{}\f$‚Æ“¯‚¶Ÿ
+				Œ³‚ğ‚ÂƒxƒNƒgƒ‹D\f$\TUtvec{b}{} =
+				\TUtvec{x}{}\TUvec{M}{}\f$‚Ì‰ğ‚É•ÏŠ·‚³
+				‚ê‚éD
+  \throw std::invalid_argument	ƒxƒNƒgƒ‹b‚ÌŸŒ³‚ª‚à‚Æ‚Ì³•ûs—ñ‚ÌŸŒ³‚Éˆê’v
+				‚µ‚È‚¢ê‡‚É‘—o
+  \throw std::runtime_error	‚à‚Æ‚Ì³•ûs—ñ‚ª³‘¥‚Å‚È‚¢ê‡‚É‘—o
 */
 template <class T> template <class T2, class B2> void
 LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
@@ -1297,15 +1735,15 @@ LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
 	throw std::invalid_argument("TU::LUDecomposition<T>::substitute: Dimension of given vector is not equal to mine!!");
     
     Vector<T2, B2>	tmp(b);
-    for (int j = 0; j < b.dim(); ++j)
+    for (u_int j = 0; j < b.dim(); ++j)
 	b[j] = tmp[_index[j]];
 
-    for (int j = 0; j < b.dim(); ++j)		// forward substitution
-	for (int i = 0; i < j; ++i)
+    for (u_int j = 0; j < b.dim(); ++j)		// forward substitution
+	for (u_int i = 0; i < j; ++i)
 	    b[j] -= b[i] * (*this)[i][j];
-    for (int j = b.dim(); --j >= 0; )		// backward substitution
+    for (u_int j = b.dim(); j-- > 0; )		// backward substitution
     {
-	for (int i = b.dim(); --i > j; )
+	for (u_int i = b.dim(); --i > j; )
 	    b[j] -= b[i] * (*this)[i][j];
 	if ((*this)[j][j] == 0.0)		// singular matrix ?
 	    throw std::runtime_error("TU::LUDecomposition<T>::substitute: singular matrix !!");
@@ -1313,11 +1751,11 @@ LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
     }
 }
 
-//! $BO"N)(B1$B<!J}Dx<0$r2r$/!%(B
+//! ˜A—§1Ÿ•û’ö®‚ğ‰ğ‚­D
 /*!
-  \param m	$B@5B'$J@5J}9TNs(B
+  \param m	³‘¥‚È³•ûs—ñ
   \return	\f$\TUtvec{u}{} = \TUtvec{x}{}\TUvec{M}{}\f$
-		$B$N2r$rG<$a$?$3$N%Y%/%H%k!$$9$J$o$A(B
+		‚Ì‰ğ‚ğ”[‚ß‚½‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
 */
 template <class T, class B> template <class T2, class B2, class R2>
@@ -1328,11 +1766,11 @@ Vector<T, B>::solve(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! $BO"N)(B1$B<!J}Dx<0$r2r$/!%(B
+//! ˜A—§1Ÿ•û’ö®‚ğ‰ğ‚­D
 /*!
-  \param m	$B@5B'$J@5J}9TNs(B
+  \param m	³‘¥‚È³•ûs—ñ
   \return	\f$\TUvec{A}{} = \TUvec{X}{}\TUvec{M}{}\f$
-		$B$N2r$rG<$a$?$3$N9TNs!$$9$J$o$A(B
+		‚Ì‰ğ‚ğ”[‚ß‚½‚±‚Ìs—ñC‚·‚È‚í‚¿
 		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -1341,14 +1779,14 @@ Matrix<T, B, R>::solve(const Matrix<T2, B2, R2>& m)
 {
     LUDecomposition<T2>	lu(m);
     
-    for (int i = 0; i < nrow(); ++i)
+    for (u_int i = 0; i < nrow(); ++i)
 	lu.substitute((*this)[i]);
     return *this;
 }
 
-//! $B$3$N9TNs$N9TNs<0$rJV$9!%(B
+//! ‚±‚Ìs—ñ‚Ìs—ñ®‚ğ•Ô‚·D
 /*!
-  \return	$B9TNs<0!$$9$J$o$A(B\f$\det\TUvec{A}{}\f$
+  \return	s—ñ®C‚·‚È‚í‚¿\f$\det\TUvec{A}{}\f$
 */
 template <class T, class B, class R> inline T
 Matrix<T, B, R>::det() const
@@ -1360,10 +1798,9 @@ Matrix<T, B, R>::det() const
 *  class Householder<T>							*
 ************************************************************************/
 template <class T>	class QRDecomposition;
-template <class T>	class TriDiagonal;
 template <class T>	class BiDiagonal;
 
-//! Householder$BJQ49$rI=$9%/%i%9(B
+//! Householder•ÏŠ·‚ğ•\‚·ƒNƒ‰ƒX
 template <class T>
 class Householder : public Matrix<T>
 {
@@ -1375,13 +1812,13 @@ class Householder : public Matrix<T>
 
     using		Matrix<T>::dim;
     
-    void		apply_from_left(Matrix<T>&, int)	;
-    void		apply_from_right(Matrix<T>&, int)	;
-    void		apply_from_both(Matrix<T>&, int)	;
+    void		apply_from_left(Matrix<T>& a, u_int m)	;
+    void		apply_from_right(Matrix<T>& a, u_int m)	;
+    void		apply_from_both(Matrix<T>& a, u_int m)	;
     void		make_transformation()			;
     const Vector<T>&	sigma()				const	{return _sigma;}
     Vector<T>&		sigma()					{return _sigma;}
-    bool		sigma_is_zero(int, T)		const	;
+    bool		sigma_is_zero(u_int m, T comp)	const	;
 
   private:
     const u_int		_d;		// deviation from diagonal element
@@ -1400,34 +1837,190 @@ Householder<T>::Householder(const Matrix<T2, B2, R2>& a, u_int d)
 	throw std::invalid_argument("TU::Householder<T>::Householder: Given matrix must be square !!");
 }
 
+template <class T> void
+Householder<T>::apply_from_left(Matrix<T>& a, u_int m)
+{
+    if (a.nrow() < dim())
+	throw std::invalid_argument("TU::Householder<T>::apply_from_left: # of rows of given matrix is smaller than my dimension !!");
+    
+    T	scale = 0.0;
+    for (u_int i = m+_d; i < dim(); ++i)
+	scale += fabs(a[i][m]);
+	
+    if (scale != 0.0)
+    {
+	T	h = 0.0;
+	for (u_int i = m+_d; i < dim(); ++i)
+	{
+	    a[i][m] /= scale;
+	    h += a[i][m] * a[i][m];
+	}
+
+	const T	s = (a[m+_d][m] > 0.0 ? sqrt(h) : -sqrt(h));
+	h	     += s * a[m+_d][m];			// H = u^2 / 2
+	a[m+_d][m]   += s;				// m-th col <== u
+	    
+	for (u_int j = m+1; j < a.ncol(); ++j)
+	{
+	    T	p = 0.0;
+	    for (u_int i = m+_d; i < dim(); ++i)
+		p += a[i][m] * a[i][j];
+	    p /= h;					// p[j] (p' = u'A / H)
+	    for (u_int i = m+_d; i < dim(); ++i)
+		a[i][j] -= a[i][m] * p;			// A = A - u*p'
+	    a[m+_d][j] = -a[m+_d][j];
+	}
+	    
+	for (u_int i = m+_d; i < dim(); ++i)
+	    (*this)[m][i] = scale * a[i][m];		// copy u
+	_sigma[m+_d] = scale * s;
+    }
+}
+
+template <class T> void
+Householder<T>::apply_from_right(Matrix<T>& a, u_int m)
+{
+    if (a.ncol() < dim())
+	throw std::invalid_argument("Householder<T>::apply_from_right: # of column of given matrix is smaller than my dimension !!");
+    
+    T	scale = 0.0;
+    for (u_int j = m+_d; j < dim(); ++j)
+	scale += fabs(a[m][j]);
+	
+    if (scale != 0.0)
+    {
+	T	h = 0.0;
+	for (u_int j = m+_d; j < dim(); ++j)
+	{
+	    a[m][j] /= scale;
+	    h += a[m][j] * a[m][j];
+	}
+
+	const T	s = (a[m][m+_d] > 0.0 ? sqrt(h) : -sqrt(h));
+	h	     += s * a[m][m+_d];			// H = u^2 / 2
+	a[m][m+_d]   += s;				// m-th row <== u
+
+	for (u_int i = m+1; i < a.nrow(); ++i)
+	{
+	    T	p = 0.0;
+	    for (u_int j = m+_d; j < dim(); ++j)
+		p += a[i][j] * a[m][j];
+	    p /= h;					// p[i] (p = Au / H)
+	    for (u_int j = m+_d; j < dim(); ++j)
+		a[i][j] -= p * a[m][j];			// A = A - p*u'
+	    a[i][m+_d] = -a[i][m+_d];
+	}
+	    
+	for (u_int j = m+_d; j < dim(); ++j)
+	    (*this)[m][j] = scale * a[m][j];		// copy u
+	_sigma[m+_d] = scale * s;
+    }
+}
+
+template <class T> void
+Householder<T>::apply_from_both(Matrix<T>& a, u_int m)
+{
+    Vector<T>		u = a[m](m+_d, a.ncol()-m-_d);
+    T		scale = 0.0;
+    for (u_int j = 0; j < u.dim(); ++j)
+	scale += fabs(u[j]);
+	
+    if (scale != 0.0)
+    {
+	u /= scale;
+
+	T		h = u * u;
+	const T	s = (u[0] > 0.0 ? sqrt(h) : -sqrt(h));
+	h	     += s * u[0];			// H = u^2 / 2
+	u[0]	     += s;				// m-th row <== u
+
+	Matrix<T>	A = a(m+_d, m+_d, a.nrow()-m-_d, a.ncol()-m-_d);
+	Vector<T>	p = _sigma(m+_d, dim()-m-_d);
+	for (u_int i = 0; i < A.nrow(); ++i)
+	    p[i] = (A[i] * u) / h;			// p = Au / H
+
+	const T	k = (u * p) / (h + h);		// K = u*p / 2H
+	for (u_int i = 0; i < A.nrow(); ++i)
+	{				// m-th col of 'a' is used as 'q'
+	    a[m+_d+i][m] = p[i] - k * u[i];		// q = p - Ku
+	    for (u_int j = 0; j <= i; ++j)		// A = A - uq' - qu'
+		A[j][i] = (A[i][j] -= (u[i]*a[m+_d+j][m] + a[m+_d+i][m]*u[j]));
+	}
+	for (u_int j = 1; j < A.nrow(); ++j)
+	    A[j][0] = A[0][j] = -A[0][j];
+
+	for (u_int j = m+_d; j < a.ncol(); ++j)
+	    (*this)[m][j] = scale * a[m][j];		// copy u
+	_sigma[m+_d] = scale * s;
+    }
+}
+
+template <class T> void
+Householder<T>::make_transformation()
+{
+    for (u_int m = dim(); m-- > 0; )
+    {
+	for (u_int i = m+1; i < dim(); ++i)
+	    (*this)[i][m] = 0.0;
+
+	if (_sigma[m] != 0.0)
+	{
+	    for (u_int i = m+1; i < dim(); ++i)
+	    {
+		T	g = 0.0;
+		for (u_int j = m+1; j < dim(); ++j)
+		    g += (*this)[i][j] * (*this)[m-_d][j];
+		g /= (_sigma[m] * (*this)[m-_d][m]);	// g[i] (g = Uu / H)
+		for (u_int j = m; j < dim(); ++j)
+		    (*this)[i][j] -= g * (*this)[m-_d][j];	// U = U - gu'
+	    }
+	    for (u_int j = m; j < dim(); ++j)
+		(*this)[m][j] = (*this)[m-_d][j] / _sigma[m];
+	    (*this)[m][m] -= 1.0;
+	}
+	else
+	{
+	    for (u_int j = m+1; j < dim(); ++j)
+		(*this)[m][j] = 0.0;
+	    (*this)[m][m] = 1.0;
+	}
+    }
+}
+
+template <class T> bool
+Householder<T>::sigma_is_zero(u_int m, T comp) const
+{
+    return (T(fabs(_sigma[m])) + comp == comp);
+}
+
 /************************************************************************
 *  class QRDecomposition<T>						*
 ************************************************************************/
-//! $B0lHL9TNs$N(BQR$BJ,2r$rI=$9%/%i%9(B
+//! ˆê”Ês—ñ‚ÌQR•ª‰ğ‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $BM?$($i$l$?9TNs(B\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$$B$KBP$7$F(B
-  \f$\TUvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$$B$J$k2<H>;03Q9TNs(B
-  \f$\TUtvec{R}{} \in \TUspace{R}{m\times n}\f$$B$H2sE>9TNs(B
-  \f$\TUtvec{Q}{} \in \TUspace{R}{n\times n}\f$$B$r5a$a$k(B
-  $B!J(B\f$\TUvec{A}{}\f$$B$N3F9T$r(B\f$\TUtvec{Q}{}\f$$B$N9T$N@~7?7k9g$GI=8=$9(B
-  $B$k!K!%(B
+  —^‚¦‚ç‚ê‚½s—ñ\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$‚É‘Î‚µ‚Ä
+  \f$\TUvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$‚È‚é‰º”¼OŠps—ñ
+  \f$\TUtvec{R}{} \in \TUspace{R}{m\times n}\f$‚Æ‰ñ“]s—ñ
+  \f$\TUtvec{Q}{} \in \TUspace{R}{n\times n}\f$‚ğ‹‚ß‚é
+  i\f$\TUvec{A}{}\f$‚ÌŠes‚ğ\f$\TUtvec{Q}{}\f$‚Ìs‚ÌüŒ^Œ‹‡‚Å•\Œ»‚·
+  ‚éjD
  */
 template <class T>
 class QRDecomposition : private Matrix<T>
 {
   public:
     template <class T2, class B2, class R2>
-    QRDecomposition(const Matrix<T2, B2, R2>&)		;
+    QRDecomposition(const Matrix<T2, B2, R2>& m)	;
 
-  //! QR$BJ,2r$N2<H>;03Q9TNs$rJV$9!%(B
+  //! QR•ª‰ğ‚Ì‰º”¼OŠps—ñ‚ğ•Ô‚·D
   /*!
-    \return	$B2<H>;03Q9TNs(B\f$\TUtvec{R}{}\f$
+    \return	‰º”¼OŠps—ñ\f$\TUtvec{R}{}\f$
   */
     const Matrix<T>&	Rt()			const	{return *this;}
 
-  //! QR$BJ,2r$N2sE>9TNs$rJV$9!%(B
+  //! QR•ª‰ğ‚Ì‰ñ“]s—ñ‚ğ•Ô‚·D
   /*!
-    \return	$B2sE>9TNs(B\f$\TUtvec{Q}{}\f$
+    \return	‰ñ“]s—ñ\f$\TUtvec{Q}{}\f$
   */
     const Matrix<T>&	Qt()			const	{return _Qt;}
     
@@ -1438,22 +2031,22 @@ class QRDecomposition : private Matrix<T>
     Householder<T>	_Qt;			// rotation matrix
 };
 
-//! $BM?$($i$l$?0lHL9TNs$N(BQR$BJ,2r$r@8@.$9$k!%(B
+//! —^‚¦‚ç‚ê‚½ˆê”Ês—ñ‚ÌQR•ª‰ğ‚ğ¶¬‚·‚éD
 /*!
- \param m	QR$BJ,2r$9$k0lHL9TNs(B
+ \param m	QR•ª‰ğ‚·‚éˆê”Ês—ñ
 */
 template <class T> template <class T2, class B2, class R2>
 QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2, R2>& m)
     :Matrix<T>(m), _Qt(m.ncol(), 0)
 {
     u_int	n = std::min(nrow(), ncol());
-    for (int j = 0; j < n; ++j)
+    for (u_int j = 0; j < n; ++j)
 	_Qt.apply_from_right(*this, j);
     _Qt.make_transformation();
-    for (int i = 0; i < n; ++i)
+    for (u_int i = 0; i < n; ++i)
     {
 	(*this)[i][i] = _Qt.sigma()[i];
-	for (int j = i + 1; j < ncol(); ++j)
+	for (u_int j = i + 1; j < ncol(); ++j)
 	    (*this)[i][j] = 0.0;
     }
 }
@@ -1461,40 +2054,40 @@ QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2, R2>& m)
 /************************************************************************
 *  class TriDiagonal<T>							*
 ************************************************************************/
-//! $BBP>N9TNs$N(B3$B=EBP3Q2=$rI=$9%/%i%9(B
+//! ‘ÎÌs—ñ‚Ì3d‘ÎŠp‰»‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $BM?$($i$l$?BP>N9TNs(B\f$\TUvec{A}{} \in \TUspace{R}{d\times d}\f$$B$KBP$7(B
-  $B$F(B\f$\TUtvec{U}{}\TUvec{A}{}\TUvec{U}{}\f$$B$,(B3$B=EBP3Q9TNs$H$J$k$h$&$J2s(B
-  $BE>9TNs(B\f$\TUtvec{U}{} \in \TUspace{R}{d\times d}\f$$B$r5a$a$k!%(B
+  —^‚¦‚ç‚ê‚½‘ÎÌs—ñ\f$\TUvec{A}{} \in \TUspace{R}{d\times d}\f$‚É‘Î‚µ
+  ‚Ä\f$\TUtvec{U}{}\TUvec{A}{}\TUvec{U}{}\f$‚ª3d‘ÎŠps—ñ‚Æ‚È‚é‚æ‚¤‚È‰ñ
+  “]s—ñ\f$\TUtvec{U}{} \in \TUspace{R}{d\times d}\f$‚ğ‹‚ß‚éD
  */
 template <class T>
 class TriDiagonal
 {
   public:
     template <class T2, class B2, class R2>
-    TriDiagonal(const Matrix<T2, B2, R2>&)		;
+    TriDiagonal(const Matrix<T2, B2, R2>& a)		;
 
-  //! 3$B=EBP3Q2=$5$l$kBP>N9TNs$N<!85(B(= $B9T?t(B = $BNs?t(B)$B$rJV$9!%(B
+  //! 3d‘ÎŠp‰»‚³‚ê‚é‘ÎÌs—ñ‚ÌŸŒ³(= s” = —ñ”)‚ğ•Ô‚·D
   /*!
-    \return	$BBP>N9TNs$N<!85(B
+    \return	‘ÎÌs—ñ‚ÌŸŒ³
   */
     u_int		dim()			const	{return _Ut.nrow();}
 
-  //! 3$B=EBP3Q2=$r9T$&2sE>9TNs$rJV$9!%(B
+  //! 3d‘ÎŠp‰»‚ğs‚¤‰ñ“]s—ñ‚ğ•Ô‚·D
   /*!
-    \return	$B2sE>9TNs(B
+    \return	‰ñ“]s—ñ
   */
     const Matrix<T>&	Ut()			const	{return _Ut;}
 
-  //! 3$B=EBP3Q9TNs$NBP3Q@.J,$rJV$9!%(B
+  //! 3d‘ÎŠps—ñ‚Ì‘ÎŠp¬•ª‚ğ•Ô‚·D
   /*!
-    \return	$BBP3Q@.J,(B
+    \return	‘ÎŠp¬•ª
   */
     const Vector<T>&	diagonal()		const	{return _diagonal;}
 
-  //! 3$B=EBP3Q9TNs$NHsBP3Q@.J,$rJV$9!%(B
+  //! 3d‘ÎŠps—ñ‚Ì”ñ‘ÎŠp¬•ª‚ğ•Ô‚·D
   /*!
-    \return	$BHsBP3Q@.J,(B
+    \return	”ñ‘ÎŠp¬•ª
   */
     const Vector<T>&	off_diagonal()		const	{return _Ut.sigma();}
 
@@ -1503,18 +2096,19 @@ class TriDiagonal
   private:
     enum		{NITER_MAX = 30};
 
-    bool		off_diagonal_is_zero(int)		const	;
-    void		initialize_rotation(int, int, T&, T&)	const	;
+    bool		off_diagonal_is_zero(u_int n)		const	;
+    void		initialize_rotation(u_int m, u_int n,
+					    T& x, T& y)		const	;
     
     Householder<T>	_Ut;
     Vector<T>		_diagonal;
     Vector<T>&		_off_diagonal;
 };
 
-//! $BM?$($i$l$?BP>N9TNs$r(B3$B=EBP3Q2=$9$k!%(B
+//! —^‚¦‚ç‚ê‚½‘ÎÌs—ñ‚ğ3d‘ÎŠp‰»‚·‚éD
 /*!
-  \param a			3$B=EBP3Q2=$9$kBP>N9TNs(B
-  \throw std::invalid_argument	a$B$,@5J}9TNs$G$J$$>l9g$KAw=P(B
+  \param a			3d‘ÎŠp‰»‚·‚é‘ÎÌs—ñ
+  \throw std::invalid_argument	a‚ª³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
 */
 template <class T> template <class T2, class B2, class R2>
 TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2, R2>& a)
@@ -1523,7 +2117,7 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2, R2>& a)
     if (_Ut.nrow() != _Ut.ncol())
         throw std::invalid_argument("TU::TriDiagonal<T>::TriDiagonal: not square matrix!!");
 
-    for (int m = 0; m < dim(); ++m)
+    for (u_int m = 0; m < dim(); ++m)
     {
 	_Ut.apply_from_both(_Ut, m);
 	_diagonal[m] = _Ut[m][m];
@@ -1532,58 +2126,152 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2, R2>& a)
     _Ut.make_transformation();
 }
 
+//! 3d‘ÎŠps—ñ‚ğ‘ÎŠp‰»‚·‚éiŒÅ—L’lCŒÅ—LƒxƒNƒgƒ‹‚ÌŒvZjD
+/*!
+  ‘ÎŠp¬•ª‚ÍŒÅ—L’l‚Æ‚È‚èC\f$\TUtvec{U}{}\f$‚ÌŠes‚ÍŒÅ—LƒxƒNƒgƒ‹‚ğ—^‚¦‚éD
+  \throw std::runtime_error	w’è‚µ‚½ŒJ‚è•Ô‚µ‰ñ”‚ğ‰z‚¦‚½ê‡‚É‘—o
+*/ 
+template <class T> void
+TriDiagonal<T>::diagonalize()
+{
+    using namespace	std;
+    
+    for (u_int n = dim(); n-- > 0; )
+    {
+	int	niter = 0;
+	
+#ifdef TUVectorPP_DEBUG
+	cerr << "******** n = " << n << " ********" << endl;
+#endif
+	while (!off_diagonal_is_zero(n))
+	{					// n > 0 here
+	    if (niter++ > NITER_MAX)
+		throw runtime_error("TU::TriDiagonal::diagonalize(): Number of iteration exceeded maximum value!!");
+
+	  /* Find first m (< n) whose off-diagonal element is 0 */
+	    u_int	m = n;
+	    while (!off_diagonal_is_zero(--m));	// 0 <= m < n < dim() here
+
+	  /* Set x and y which determine initial(i = m+1) plane rotation */
+	    T	x, y;
+	    initialize_rotation(m, n, x, y);
+	  /* Apply rotation P(i-1, i) for each i (i = m+1, n+2, ... , n) */
+	    for (u_int i = m; ++i <= n; )
+	    {
+		Rotation	rot(i-1, i, x, y);
+		
+		_Ut.rotate_from_left(rot);
+
+		if (i > m+1)
+		    _off_diagonal[i-1] = rot.length();
+		const T w = _diagonal[i] - _diagonal[i-1];
+		const T d = rot.sin()*(rot.sin()*w
+			       + 2.0*rot.cos()*_off_diagonal[i]);
+		_diagonal[i-1]	 += d;
+		_diagonal[i]	 -= d;
+		_off_diagonal[i] += rot.sin()*(rot.cos()*w
+				  - 2.0*rot.sin()*_off_diagonal[i]);
+		if (i < n)
+		{
+		    x = _off_diagonal[i];
+		    y = rot.sin()*_off_diagonal[i+1];
+		    _off_diagonal[i+1] *= rot.cos();
+		}
+	    }
+#ifdef TUVectorPP_DEBUG
+	    cerr << "  niter = " << niter << ": " << off_diagonal();
+#endif	    
+	}
+    }
+
+    for (u_int m = 0; m < dim(); ++m)	// sort eigen values and eigen vectors
+	for (u_int n = m+1; n < dim(); ++n)
+	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
+	    {
+		swap(_diagonal[m], _diagonal[n]);
+		for (u_int j = 0; j < dim(); ++j)
+		{
+		    const T	tmp = _Ut[m][j];
+		    _Ut[m][j] = _Ut[n][j];
+		    _Ut[n][j] = -tmp;
+		}
+	    }
+}
+
+template <class T> bool
+TriDiagonal<T>::off_diagonal_is_zero(u_int n) const
+{
+    return (n == 0 || _Ut.sigma_is_zero(n, fabs(_diagonal[n-1]) +
+					   fabs(_diagonal[n])));
+}
+
+template <class T> void
+TriDiagonal<T>::initialize_rotation(u_int m, u_int n, T& x, T& y) const
+{
+    const T	g = (_diagonal[n] - _diagonal[n-1]) /
+			    (2.0*_off_diagonal[n]),
+			absg = fabs(g),
+			gg1 = (absg > 1.0 ?
+			       absg * sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
+			       sqrt(1.0 + absg*absg)),
+			t = (g > 0.0 ? g + gg1 : g - gg1);
+    x = _diagonal[m] - _diagonal[n] - _off_diagonal[n]/t;
+  //x = _diagonal[m];					// without shifting
+    y = _off_diagonal[m+1];
+}
+
 /************************************************************************
 *  class BiDiagonal<T>							*
 ************************************************************************/
-//! $B0lHL9TNs$N(B2$B=EBP3Q2=$rI=$9%/%i%9(B
+//! ˆê”Ês—ñ‚Ì2d‘ÎŠp‰»‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $BM?$($i$l$?0lHL9TNs(B\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$$B$KBP$7(B
-  $B$F(B\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$$B$,(B2$B=EBP3Q9TNs$H$J$k$h$&$J(B2
-  $B$D$N2sE>9TNs(B\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
-  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$$B$r5a$a$k!%(B\f$m \le n\f$
-  $B$N>l9g$O2<H>;03Q$J(B2$B=EBP3Q9TNs$K!$(B\f$m > n\f$$B$N>l9g$O>eH>;03Q$J(B2$B=EBP3Q(B
-  $B9TNs$K$J$k!%(B
+  —^‚¦‚ç‚ê‚½ˆê”Ês—ñ\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$‚É‘Î‚µ
+  ‚Ä\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$‚ª2d‘ÎŠps—ñ‚Æ‚È‚é‚æ‚¤‚È2
+  ‚Â‚Ì‰ñ“]s—ñ\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
+  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$‚ğ‹‚ß‚éD\f$m \le n\f$
+  ‚Ìê‡‚Í‰º”¼OŠp‚È2d‘ÎŠps—ñ‚ÉC\f$m > n\f$‚Ìê‡‚Íã”¼OŠp‚È2d‘ÎŠp
+  s—ñ‚É‚È‚éD
  */
 template <class T>
 class BiDiagonal
 {
   public:
     template <class T2, class B2, class R2>
-    BiDiagonal(const Matrix<T2, B2, R2>&)	;
+    BiDiagonal(const Matrix<T2, B2, R2>& a)	;
 
-  //! 2$B=EBP3Q2=$5$l$k9TNs$N9T?t$rJV$9!%(B
+  //! 2d‘ÎŠp‰»‚³‚ê‚és—ñ‚Ìs”‚ğ•Ô‚·D
   /*!
-    \return	$B9TNs$N9T?t(B
+    \return	s—ñ‚Ìs”
   */
     u_int		nrow()		const	{return _Vt.nrow();}
 
-  //! 2$B=EBP3Q2=$5$l$k9TNs$NNs?t$rJV$9!%(B
+  //! 2d‘ÎŠp‰»‚³‚ê‚és—ñ‚Ì—ñ”‚ğ•Ô‚·D
   /*!
-    \return	$B9TNs$NNs?t(B
+    \return	s—ñ‚Ì—ñ”
   */
     u_int		ncol()		const	{return _Ut.nrow();}
 
-  //! 2$B=EBP3Q2=$r9T$&$?$a$K1&$+$i3]$1$k2sE>9TNs$NE>CV$rJV$9!%(B
+  //! 2d‘ÎŠp‰»‚ğs‚¤‚½‚ß‚É‰E‚©‚çŠ|‚¯‚é‰ñ“]s—ñ‚Ì“]’u‚ğ•Ô‚·D
   /*!
-    \return	$B1&$+$i3]$1$k2sE>9TNs$NE>CV(B
+    \return	‰E‚©‚çŠ|‚¯‚é‰ñ“]s—ñ‚Ì“]’u
   */
     const Matrix<T>&	Ut()		const	{return _Ut;}
 
-  //! 2$B=EBP3Q2=$r9T$&$?$a$K:8$+$i3]$1$k2sE>9TNs$rJV$9!%(B
+  //! 2d‘ÎŠp‰»‚ğs‚¤‚½‚ß‚É¶‚©‚çŠ|‚¯‚é‰ñ“]s—ñ‚ğ•Ô‚·D
   /*!
-    \return	$B:8$+$i3]$1$k2sE>9TNs(B
+    \return	¶‚©‚çŠ|‚¯‚é‰ñ“]s—ñ
   */
     const Matrix<T>&	Vt()		const	{return _Vt;}
 
-  //! 2$B=EBP3Q9TNs$NBP3Q@.J,$rJV$9!%(B
+  //! 2d‘ÎŠps—ñ‚Ì‘ÎŠp¬•ª‚ğ•Ô‚·D
   /*!
-    \return	$BBP3Q@.J,(B
+    \return	‘ÎŠp¬•ª
   */
     const Vector<T>&	diagonal()	const	{return _Dt.sigma();}
 
-  //! 2$B=EBP3Q9TNs$NHsBP3Q@.J,$rJV$9!%(B
+  //! 2d‘ÎŠps—ñ‚Ì”ñ‘ÎŠp¬•ª‚ğ•Ô‚·D
   /*!
-    \return	$BHsBP3Q@.J,(B
+    \return	”ñ‘ÎŠp¬•ª
   */
     const Vector<T>&	off_diagonal()	const	{return _Et.sigma();}
 
@@ -1592,10 +2280,10 @@ class BiDiagonal
   private:
     enum		{NITER_MAX = 30};
     
-    bool		diagonal_is_zero(int)			const	;
-    bool		off_diagonal_is_zero(int)		const	;
-    void		initialize_rotation(int, int,
-					    T&, T&)	const	;
+    bool		diagonal_is_zero(u_int n)		const	;
+    bool		off_diagonal_is_zero(u_int n)		const	;
+    void		initialize_rotation(u_int m, u_int n,
+					    T& x, T& y)		const	;
 
     Householder<T>	_Dt;
     Householder<T>	_Et;
@@ -1606,9 +2294,9 @@ class BiDiagonal
     const Matrix<T>&	_Vt;
 };
 
-//! $BM?$($i$l$?0lHL9TNs$r(B2$B=EBP3Q2=$9$k!%(B
+//! —^‚¦‚ç‚ê‚½ˆê”Ês—ñ‚ğ2d‘ÎŠp‰»‚·‚éD
 /*!
-  \param a	2$B=EBP3Q2=$9$k0lHL9TNs(B
+  \param a	2d‘ÎŠp‰»‚·‚éˆê”Ês—ñ
 */
 template <class T> template <class T2, class B2, class R2>
 BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
@@ -1619,16 +2307,16 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
      _Vt(a.nrow() < a.ncol() ? _Et : _Dt)
 {
     if (nrow() < ncol())
-	for (int i = 0; i < nrow(); ++i)
-	    for (int j = 0; j < ncol(); ++j)
+	for (u_int i = 0; i < nrow(); ++i)
+	    for (u_int j = 0; j < ncol(); ++j)
 		_Dt[i][j] = a[i][j];
     else
-	for (int i = 0; i < nrow(); ++i)
-	    for (int j = 0; j < ncol(); ++j)
+	for (u_int i = 0; i < nrow(); ++i)
+	    for (u_int j = 0; j < ncol(); ++j)
 		_Dt[j][i] = a[i][j];
 
   /* Householder reduction to bi-diagonal (off-diagonal in lower part) form */
-    for (int m = 0; m < _Et.dim(); ++m)
+    for (u_int m = 0; m < _Et.dim(); ++m)
     {
 	_Dt.apply_from_right(_Dt, m);
 	_Et.apply_from_left(_Dt, m);
@@ -1637,7 +2325,7 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
     _Dt.make_transformation();	// Accumulate right-hand transformation: V
     _Et.make_transformation();	// Accumulate left-hand transformation: U
 
-    for (int m = 0; m < _Et.dim(); ++m)
+    for (u_int m = 0; m < _Et.dim(); ++m)
     {
 	T	anorm = fabs(_diagonal[m]) + fabs(_off_diagonal[m]);
 	if (anorm > _anorm)
@@ -1645,23 +2333,197 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
     }
 }
 
+//! 2d‘ÎŠps—ñ‚ğ‘ÎŠp‰»‚·‚éi“ÁˆÙ’l•ª‰ğjD
+/*!
+  ‘ÎŠp¬•ª‚Í“ÁˆÙ’l‚Æ‚È‚èC\f$\TUtvec{U}{}\f$‚Æ\f$\TUtvec{V}{}\f$
+  ‚ÌŠes‚Í‚»‚ê‚¼‚ê‰E“ÁˆÙƒxƒNƒgƒ‹‚Æ¶“ÁˆÙƒxƒNƒgƒ‹‚ğ—^‚¦‚éD
+  \throw std::runtime_error	w’è‚µ‚½ŒJ‚è•Ô‚µ‰ñ”‚ğ‰z‚¦‚½ê‡‚É‘—o
+*/ 
+template <class T> void
+BiDiagonal<T>::diagonalize()
+{
+    using namespace	std;
+    
+    for (u_int n = _Et.dim(); n-- > 0; )
+    {
+	u_int	niter = 0;
+	
+#ifdef TUVectorPP_DEBUG
+	cerr << "******** n = " << n << " ********" << endl;
+#endif
+	while (!off_diagonal_is_zero(n))	// n > 0 here
+	{
+	    if (niter++ > NITER_MAX)
+		throw runtime_error("TU::BiDiagonal::diagonalize(): Number of iteration exceeded maximum value");
+	    
+	  /* Find first m (< n) whose off-diagonal element is 0 */
+	    u_int m = n;
+	    do
+	    {
+		if (diagonal_is_zero(m-1))
+		{ // If _diagonal[m-1] is zero, make _off_diagonal[m] zero.
+		    T	x = _diagonal[m], y = _off_diagonal[m];
+		    _off_diagonal[m] = 0.0;
+		    for (u_int i = m; i <= n; ++i)
+		    {
+			Rotation	rotD(m-1, i, x, -y);
+
+			_Dt.rotate_from_left(rotD);
+			
+			_diagonal[i] = -y*rotD.sin()
+				     + _diagonal[i]*rotD.cos();
+			if (i < n)
+			{
+			    x = _diagonal[i+1];
+			    y = _off_diagonal[i+1]*rotD.sin();
+			    _off_diagonal[i+1] *= rotD.cos();
+			}
+		    }
+		    break;	// if _diagonal[n-1] is zero, m == n here.
+		}
+	    } while (!off_diagonal_is_zero(--m)); // 0 <= m < n < nrow() here.
+	    if (m == n)
+		break;		// _off_diagonal[n] has been made 0. Retry!
+
+	  /* Set x and y which determine initial(i = m+1) plane rotation */
+	    T	x, y;
+	    initialize_rotation(m, n, x, y);
+#ifdef TUBiDiagonal_DEBUG
+	    cerr << "--- m = " << m << ", n = " << n << "---"
+		 << endl;
+	    cerr << "  diagonal:     " << diagonal();
+	    cerr << "  off-diagonal: " << off_diagonal();
+#endif
+	  /* Apply rotation P(i-1, i) for each i (i = m+1, n+2, ... , n) */
+	    for (u_int i = m; ++i <= n; )
+	    {
+	      /* Apply rotation from left */
+		Rotation	rotE(i-1, i, x, y);
+		
+		_Et.rotate_from_left(rotE);
+
+		if (i > m+1)
+		    _off_diagonal[i-1] = rotE.length();
+		T	tmp = _diagonal[i-1];
+		_diagonal[i-1]	 =  rotE.cos()*tmp
+				 +  rotE.sin()*_off_diagonal[i];
+		_off_diagonal[i] = -rotE.sin()*tmp
+				 +  rotE.cos()*_off_diagonal[i];
+		if (diagonal_is_zero(i))
+		    break;		// No more Given's rotation needed.
+		y		 =  rotE.sin()*_diagonal[i];
+		_diagonal[i]	*=  rotE.cos();
+
+		x = _diagonal[i-1];
+		
+	      /* Apply rotation from right to recover bi-diagonality */
+		Rotation	rotD(i-1, i, x, y);
+
+		_Dt.rotate_from_left(rotD);
+
+		_diagonal[i-1] = rotD.length();
+		tmp = _off_diagonal[i];
+		_off_diagonal[i] =  tmp*rotD.cos() + _diagonal[i]*rotD.sin();
+		_diagonal[i]	 = -tmp*rotD.sin() + _diagonal[i]*rotD.cos();
+		if (i < n)
+		{
+		    if (off_diagonal_is_zero(i+1))
+			break;		// No more Given's rotation needed.
+		    y		        = _off_diagonal[i+1]*rotD.sin();
+		    _off_diagonal[i+1] *= rotD.cos();
+
+		    x		        = _off_diagonal[i];
+		}
+	    }
+#ifdef TUVectorPP_DEBUG
+	    cerr << "  niter = " << niter << ": " << off_diagonal();
+#endif
+	}
+    }
+
+    for (u_int m = 0; m < _Et.dim(); ++m)  // sort singular values and vectors
+	for (u_int n = m+1; n < _Et.dim(); ++n)
+	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
+	    {
+		swap(_diagonal[m], _diagonal[n]);
+		for (u_int j = 0; j < _Et.dim(); ++j)
+		{
+		    const T	tmp = _Et[m][j];
+		    _Et[m][j] = _Et[n][j];
+		    _Et[n][j] = -tmp;
+		}
+		for (u_int j = 0; j < _Dt.dim(); ++j)
+		{
+		    const T	tmp = _Dt[m][j];
+		    _Dt[m][j] = _Dt[n][j];
+		    _Dt[n][j] = -tmp;
+		}
+	    }
+
+    u_int l = _Et.dim() - 1;		// last index
+    for (u_int m = 0; m < l; ++m)	// ensure positivity of all singular
+	if (_diagonal[m] < 0.0)		// values except for the last one.
+	{
+	    _diagonal[m] = -_diagonal[m];
+	    _diagonal[l] = -_diagonal[l];
+	    for (u_int j = 0; j < _Et.dim(); ++j)
+	    {
+		_Et[m][j] = -_Et[m][j];
+		_Et[l][j] = -_Et[l][j];
+	    }
+	}
+}
+
+template <class T> bool
+BiDiagonal<T>::diagonal_is_zero(u_int n) const
+{
+    return _Dt.sigma_is_zero(n, _anorm);
+}
+
+template <class T> bool
+BiDiagonal<T>::off_diagonal_is_zero(u_int n) const
+{
+    return _Et.sigma_is_zero(n, _anorm);
+}
+
+template <class T> void
+BiDiagonal<T>::initialize_rotation(u_int m, u_int n, T& x, T& y) const
+{
+    const T	g = ((_diagonal[n]     + _diagonal[n-1])*
+		     (_diagonal[n]     - _diagonal[n-1])+
+		     (_off_diagonal[n] + _off_diagonal[n-1])*
+		     (_off_diagonal[n] - _off_diagonal[n-1]))
+		  / (2.0*_diagonal[n-1]*_off_diagonal[n]),
+      // Caution!! You have to ensure that _diagonal[n-1] != 0
+      // as well as _off_diagonal[n].
+		absg = fabs(g),
+		gg1 = (absg > 1.0 ?
+		       absg * sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
+		       sqrt(1.0 + absg*absg)),
+		t = (g > 0.0 ? g + gg1 : g - gg1);
+    x = ((_diagonal[m] + _diagonal[n])*(_diagonal[m] - _diagonal[n]) -
+	 _off_diagonal[n]*(_off_diagonal[n] + _diagonal[n-1]/t)) / _diagonal[m];
+  //x = _diagonal[m];				// without shifting
+    y = _off_diagonal[m+1];
+}
+
 /************************************************************************
 *  class SVDecomposition<T>						*
 ************************************************************************/
-//! $B0lHL9TNs$NFC0[CMJ,2r$rI=$9%/%i%9(B
+//! ˆê”Ês—ñ‚Ì“ÁˆÙ’l•ª‰ğ‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $BM?$($i$l$?0lHL9TNs(B\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$$B$KBP$7(B
-  $B$F(B\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$$B$,BP3Q9TNs$H$J$k$h$&$J(B2$B$D$N(B
-  $B2sE>9TNs(B\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
-  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$$B$r5a$a$k!%(B
+  —^‚¦‚ç‚ê‚½ˆê”Ês—ñ\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$‚É‘Î‚µ
+  ‚Ä\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$‚ª‘ÎŠps—ñ‚Æ‚È‚é‚æ‚¤‚È2‚Â‚Ì
+  ‰ñ“]s—ñ\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
+  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$‚ğ‹‚ß‚éD
  */
 template <class T>
 class SVDecomposition : private BiDiagonal<T>
 {
   public:
-  //! $BM?$($i$l$?0lHL9TNs$NFC0[CMJ,2r$r5a$a$k!%(B
+  //! —^‚¦‚ç‚ê‚½ˆê”Ês—ñ‚Ì“ÁˆÙ’l•ª‰ğ‚ğ‹‚ß‚éD
   /*!
-    \param a	$BFC0[CMJ,2r$9$k0lHL9TNs(B
+    \param a	“ÁˆÙ’l•ª‰ğ‚·‚éˆê”Ês—ñ
   */
     template <class T2, class B2, class R2>
     SVDecomposition(const Matrix<T2, B2, R2>& a)
@@ -1673,10 +2535,10 @@ class SVDecomposition : private BiDiagonal<T>
     using	BiDiagonal<T>::Vt;
     using	BiDiagonal<T>::diagonal;
 
-  //! $BFC0[CM$r5a$a$k!%(B
+  //! “ÁˆÙ’l‚ğ‹‚ß‚éD
   /*!
-    \param i	$B@dBPCM$NBg$-$$=g$KJB$s$@FC0[CM$N(B1$B$D$r;XDj$9$k(Bindex
-    \return	$B;XDj$5$l$?(Bindex$B$KBP1~$9$kFC0[CM(B
+    \param i	â‘Î’l‚Ì‘å‚«‚¢‡‚É•À‚ñ‚¾“ÁˆÙ’l‚Ì1‚Â‚ğw’è‚·‚éindex
+    \return	w’è‚³‚ê‚½index‚É‘Î‰‚·‚é“ÁˆÙ’l
   */
     const T&	operator [](int i)	const	{return diagonal()[i];}
 };
@@ -1685,59 +2547,59 @@ class SVDecomposition : private BiDiagonal<T>
 *  typedefs								*
 ************************************************************************/
 typedef Vector<short,  FixedSizedBuf<short,   2> >
-	Vector2s;			//!< short$B7?MWAG$r;}$D(B2$B<!85%Y%/%H%k(B
+	Vector2s;			//!< shortŒ^—v‘f‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<int,    FixedSizedBuf<int,     2> >
-	Vector2i;			//!< int$B7?MWAG$r;}$D(B2$B<!85%Y%/%H%k(B
+	Vector2i;			//!< intŒ^—v‘f‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<float,  FixedSizedBuf<float,   2> >
-	Vector2f;			//!< float$B7?MWAG$r;}$D(B2$B<!85%Y%/%H%k(B
+	Vector2f;			//!< floatŒ^—v‘f‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<double, FixedSizedBuf<double,  2> >
-	Vector2d;			//!< double$B7?MWAG$r;}$D(B2$B<!85%Y%/%H%k(B
+	Vector2d;			//!< doubleŒ^—v‘f‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<short,  FixedSizedBuf<short,   3> >
-	Vector3s;			//!< short$B7?MWAG$r;}$D(B3$B<!85%Y%/%H%k(B
+	Vector3s;			//!< shortŒ^—v‘f‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<int,    FixedSizedBuf<int,     3> >
-	Vector3i;			//!< int$B7?MWAG$r;}$D(B3$B<!85%Y%/%H%k(B
+	Vector3i;			//!< intŒ^—v‘f‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<float,  FixedSizedBuf<float,   3> >
-	Vector3f;			//!< float$B7?MWAG$r;}$D(B3$B<!85%Y%/%H%k(B
+	Vector3f;			//!< floatŒ^—v‘f‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<double, FixedSizedBuf<double,  3> >
-	Vector3d;			//!< double$B7?MWAG$r;}$D(B3$B<!85%Y%/%H%k(B
+	Vector3d;			//!< doubleŒ^—v‘f‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<short,  FixedSizedBuf<short,   4> >
-	Vector4s;			//!< short$B7?MWAG$r;}$D(B4$B<!85%Y%/%H%k(B
+	Vector4s;			//!< shortŒ^—v‘f‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<int,    FixedSizedBuf<int,     4> >
-	Vector4i;			//!< int$B7?MWAG$r;}$D(B4$B<!85%Y%/%H%k(B
+	Vector4i;			//!< intŒ^—v‘f‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<float,  FixedSizedBuf<float,   4> >
-	Vector4f;			//!< float$B7?MWAG$r;}$D(B4$B<!85%Y%/%H%k(B
+	Vector4f;			//!< floatŒ^—v‘f‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
 typedef Vector<double, FixedSizedBuf<double,  4> >
-	Vector4d;			//!< double$B7?MWAG$r;}$D(B4$B<!85%Y%/%H%k(B
+	Vector4d;			//!< doubleŒ^—v‘f‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
 typedef Matrix<float,  FixedSizedBuf<float,   4>,
 	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix22f;			//!< float$B7?MWAG$r;}$D(B2x2$B9TNs(B
+	Matrix22f;			//!< floatŒ^—v‘f‚ğ‚Â2x2s—ñ
 typedef Matrix<double, FixedSizedBuf<double,  4>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix22d;			//!< double$B7?MWAG$r;}$D(B2x2$B9TNs(B
+	Matrix22d;			//!< doubleŒ^—v‘f‚ğ‚Â2x2s—ñ
 typedef Matrix<float,  FixedSizedBuf<float,   6>,
 	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix23f;			//!< float$B7?MWAG$r;}$D(B2x3$B9TNs(B
+	Matrix23f;			//!< floatŒ^—v‘f‚ğ‚Â2x3s—ñ
 typedef Matrix<double, FixedSizedBuf<double,  6>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix23d;			//!< double$B7?MWAG$r;}$D(B2x3$B9TNs(B
+	Matrix23d;			//!< doubleŒ^—v‘f‚ğ‚Â2x3s—ñ
 typedef Matrix<float,  FixedSizedBuf<float,   9>,
 	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix33f;			//!< float$B7?MWAG$r;}$D(B3x3$B9TNs(B
+	Matrix33f;			//!< floatŒ^—v‘f‚ğ‚Â3x3s—ñ
 typedef Matrix<double, FixedSizedBuf<double,  9>,
 	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix33d;			//!< double$B7?MWAG$r;}$D(B3x3$B9TNs(B
+	Matrix33d;			//!< doubleŒ^—v‘f‚ğ‚Â3x3s—ñ
 typedef Matrix<float,  FixedSizedBuf<float,  12>,
 	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix34f;			//!< float$B7?MWAG$r;}$D(B3x4$B9TNs(B
+	Matrix34f;			//!< floatŒ^—v‘f‚ğ‚Â3x4s—ñ
 typedef Matrix<double, FixedSizedBuf<double, 12>,
 	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix34d;			//!< double$B7?MWAG$r;}$D(B3x4$B9TNs(B
+	Matrix34d;			//!< doubleŒ^—v‘f‚ğ‚Â3x4s—ñ
 typedef Matrix<float,  FixedSizedBuf<float,  16>,
 	       FixedSizedBuf<Vector<float>,   4> >
-	Matrix44f;			//!< float$B7?MWAG$r;}$D(B4x4$B9TNs(B
+	Matrix44f;			//!< floatŒ^—v‘f‚ğ‚Â4x4s—ñ
 typedef Matrix<double, FixedSizedBuf<double, 16>,
 	       FixedSizedBuf<Vector<double>,  4> >
-	Matrix44d;			//!< double$B7?MWAG$r;}$D(B4x4$B9TNs(B
+	Matrix44d;			//!< doubleŒ^—v‘f‚ğ‚Â4x4s—ñ
 
 /************************************************************************
 *  class Minimization1<S>						*
@@ -1761,6 +2623,106 @@ class Minimization1
     const S		_tol;
     const int		_niter_max;
 };
+
+/*
+ *  Minimize 1-dimensional function using golden section search and minima
+ *  is returned in x. Minimum value of the func is also returned as a return
+ *  value.
+ */
+template <class S> S
+Minimization1<S>::minimize(S& x, S w) const
+{
+    using namespace	std;
+
+    const double	W = 0.38197;
+    S			x1 = x, x2 = x + w,
+			f1 = (*this)(x1), f2 = (*this)(x2);
+    
+    if (f1 < f2)			// guarantee that f1 >= f2
+    {
+	S	tmp = x1;		// swap x1 & x2
+	x1  = x2;
+	x2  = tmp;
+	tmp = f1;			// swap f1 & f2
+	f1  = f2;
+	f2  = tmp;
+    }
+    S	x0;
+    do
+    {
+	x0  = x1;
+	x1  = x2;
+	x2 += (1.0 / W - 1.0) * (x1 - x0);	// elongate to right
+#ifdef MIN1_DEBUG
+	S	f0 = f1;
+#endif
+	f1  = f2;
+	f2  = (*this)(x2);
+#ifdef MIN1_DEBUG
+	std::cerr << "Bracketting: [" << x0 << ", " << x1 << ", " << x2
+		  << "], (" << f0 << ", " << f1 << ", " << f2 << ")"
+		  << std::endl;
+#endif
+    } while (f1 > f2);
+    
+  /* Golden section search */
+    S	x3 = x2;
+    if (fabs(x1 - x0) > fabs(x2 - x1))
+    {
+	x2  = x1;
+	x1 -= W * (x2 - x0);		// insert new x1 between x0 & x2
+	f2  = f1;
+	f1  = (*this)(x1);
+    }
+    else
+    {
+	x2 -= (1.0 - W) * (x3 - x1);	// insert new x2 between x1 & x3
+	f2  = (*this)(x2);
+    }
+#ifdef MIN1_DEBUG
+    std::cerr << "Initial:     [" << x0 << ", " << x1 << ", " << x2
+	      << ", " << x3 << "], (" << f1 << ", " << f2 << ")" << std::endl;
+#endif
+    int	i;
+    for (i = 0;
+	 i < _niter_max && fabs(x3 - x0) > _tol * (fabs(x1) + fabs(x2)); ++i)
+    {
+	if (f1 < f2)
+	{
+	    x3  = x2;			// shift x2 & x3 to left
+	    x2  = x1;
+	    x1 -= W * (x2 - x0);	// insert new x1 between x0 & x2
+	    f2  = f1;
+	    f1  = (*this)(x1);
+	}
+	else
+	{
+	    x0  = x1;			// shift x0 & x1 to right
+	    x1  = x2;
+	    x2 += W * (x3 - x1);	// insert new x2 between x1 & x3
+	    f1  = f2;
+	    f2  = (*this)(x2);
+	}
+#ifdef MIN1_DEBUG
+	std::cerr << "Golden:      [" << x0 << ", " << x1 << ", " << x2
+		  << ", " << x3 << "], (" << f1 << ", " << f2 << ")"
+		  << std::endl;
+#endif
+    }
+    if (i == _niter_max)
+	throw std::runtime_error("TU::Minimization1<S>::minimize(): Too many iterations!!");
+
+    if (f1 < f2)
+    {
+	x = x1;
+	return f1;
+    }
+    else
+    {
+	x = x2;
+	return f2;
+    }
+}
 
 /************************************************************************
 *  class Minimization<S, T>						*
@@ -1791,8 +2753,8 @@ class Minimization
     enum		{DEFAULT_NITER_MAX = 1000};
 		 
   public:
-    Minimization(S tol = DEFAULT_TOL, int niter_max = DEFAULT_NITER_MAX,
-		 int pr = 0)
+    Minimization(S tol = DEFAULT_TOL, int niter_max=DEFAULT_NITER_MAX,
+		 bool pr=false)
       :_tol(tol), _niter_max(niter_max), _print(pr)			{}
     
     virtual S		operator ()(const T&)			const	= 0;
@@ -1811,13 +2773,113 @@ class Minimization
  
     const S		_tol;
     const int		_niter_max;
-    const int		_print;
+    const bool		_print;
 };
+
+/*
+ *  Minimize multi-dimensional function using conjugate gradient method and
+ *  minima is returned in x. Minimum value of the func is also returned as
+ *  a return value.
+ */
+template <class S, class T> S
+Minimization<S, T>::minimize(T& x)
+{
+    S		val = (*this)(x);
+    Vector<S>	g   = ngrad(x), h = g;
+    
+    for (int i = 0; i < _niter_max; ++i)
+    {
+	if (_print)
+	    print(i, val, x);
+
+	const S		g_sqr = g * g;
+	if (g_sqr == 0.0)
+	    return val;
+
+	const S		val_next = line_minimize(x, h);
+	if (near_enough(val, val_next))
+	    return val_next;
+	val = val_next;
+
+	const Vector<S>	g_next = ngrad(x);
+	h = g_next + (((g_next - g) * g_next) / g_sqr) * h;
+	g = g_next;
+	update(x);
+    }
+
+    std::cerr << "TU::Minimization<S, T>::minimize(): Too many iterations!!"
+	      << std::endl;
+    return val;
+}
+
+/*
+ *  Minimize multi-dimensional function using steepest descent method and
+ *  minima is returned in x. Minimum value of the func is also returned as
+ *  a return value.
+ */
+template <class S, class T> S
+Minimization<S, T>::steepest_descent(T& x)
+{
+    S		val = (*this)(x);
+    Vector<S>	g   = ngrad(x);
+    
+    for (int i = 0; i < _niter_max; ++i)
+    {
+	if (_print)
+	    print(i, val, x);
+	
+	const S		g_sqr = g * g;
+	if (g_sqr == 0.0)
+	    return val;
+
+	const S		val_next = line_minimize(x, g);
+	if (near_enough(val, val_next))
+	    return val_next;
+	val = val_next;
+
+	g = ngrad(x);
+	update(x);
+    }
+
+    std::cerr << "TU::Minimization<S, T>::steepest_descent(): Too many iterations!!"
+	      << std::endl;
+    return val;
+}
+
+/*
+ *  Minimize function along direction h and minima is returned in x.
+ *  Minimum value of the function is also returned as a return value.
+ */
+template <class S, class T> S
+Minimization<S, T>::line_minimize(T &x, const Vector<S>& h) const
+{
+    LineFunction	lfunc(*this, x, h, _tol, _niter_max);
+    S			d = 0.0, val = lfunc.minimize(d, 1.0);
+    x = proceed(x, d * h);
+    return val;
+}
+
+/*
+ *  Update the status of the function to be minimized.
+ */
+template <class S, class T> void
+Minimization<S, T>::update(const T&)
+{
+}
+
+/*
+ *  Print intermediate values
+ */
+template <class S, class T> void
+Minimization<S, T>::print(int i, S val, const T& x) const
+{
+    std::cerr << std::setw(3) << i << ": (" << val << ')' << x;
+}
 
 template <class S, class T> inline int
 Minimization<S, T>::near_enough(S a, S b) const
 {
-#define EPS	1.0e-10
+    const double	EPS = 1.0e-10;
     return 2.0*fabs(a - b) <= _tol*(fabs(a) + fabs(b) + EPS);
 }
  

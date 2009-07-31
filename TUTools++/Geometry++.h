@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.29 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.30 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -38,9 +38,9 @@ namespace TU
 /************************************************************************
 *  class Point2<T>							*
 ************************************************************************/
-//! T$B7?$N:BI8@.J,$r;}$D(B2$B<!85E@$rI=$9%/%i%9(B
+//! TŒ^‚ÌÀ•W¬•ª‚ğ‚Â2ŸŒ³“_‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  \param T	$B:BI8$N7?(B
+  \param T	À•W‚ÌŒ^
  */
 template <class T>
 class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
@@ -51,17 +51,17 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
   public:
     Point2(T u=0, T v=0)						;
 
-  //! $BB>$N(B2$B<!85%Y%/%H%k$HF10lMWAG$r;}$D(B2$B<!85E@$r:n$k!%(B
+  //! ‘¼‚Ì2ŸŒ³ƒxƒNƒgƒ‹‚Æ“¯ˆê—v‘f‚ğ‚Â2ŸŒ³“_‚ğì‚éD
   /*!
-    \param v	$B%3%T!<85(B2$B<!85%Y%/%H%k(B
+    \param v	ƒRƒs[Œ³2ŸŒ³ƒxƒNƒgƒ‹
   */
     template <class T2, class B2>
     Point2(const Vector<T2, B2>& v) :array_type(v)			{}
 
-  //! $BB>$N(B2$B<!85%Y%/%H%k$r<+J,$KBeF~$9$k!%(B
+  //! ‘¼‚Ì2ŸŒ³ƒxƒNƒgƒ‹‚ğ©•ª‚É‘ã“ü‚·‚éD
   /*!
-    \param v	$B%3%T!<85(B2$B<!85%Y%/%H%k(B
-    \return	$B$3$N(B2$B<!85E@(B
+    \param v	ƒRƒs[Œ³2ŸŒ³ƒxƒNƒgƒ‹
+    \return	‚±‚Ì2ŸŒ³“_
   */
     template <class T2, class B2>
     Point2&	operator =(const Vector<T2, B2>& v)
@@ -76,10 +76,10 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     int		angle(const Point2&, const Point2&)		const	;
 };
 
-//! $B;XDj$5$l$?:BI8@.J,$r;}$D(B2$B<!85E@$r:n$k!%(B
+//! w’è‚³‚ê‚½À•W¬•ª‚ğ‚Â2ŸŒ³“_‚ğì‚éD
 /*!
-  \param u	u$B:BI8(B
-  \param v	v$B:BI8(B
+  \param u	uÀ•W
+  \param v	vÀ•W
 */
 template <class T> inline
 Point2<T>::Point2(T u, T v)
@@ -89,10 +89,10 @@ Point2<T>::Point2(T u, T v)
     (*this)[1] = v;
 }
 
-//! $B;XDj$5$l$?J}8~$N(B8$B6aK5E@$rJV$9!%(B
+//! w’è‚³‚ê‚½•ûŒü‚Ì8‹ß–T“_‚ğ•Ô‚·D
 /*!
-  \param dir	8$B6aK5E@$NJ}8~(B(mod 8$B$G2r<a!%1&NY$r(B0$B$H$7!$;~7W2s$j$K(B1$B$E$DA}2C(B)
-  \return	8$B6aK5E@(B
+  \param dir	8‹ß–T“_‚Ì•ûŒü(mod 8‚Å‰ğßD‰E—×‚ğ0‚Æ‚µCŒv‰ñ‚è‚É1‚Ã‚Â‘‰Á)
+  \return	8‹ß–T“_
 */
 template <class T> inline Point2<T>
 Point2<T>::neighbor(int dir) const
@@ -100,10 +100,10 @@ Point2<T>::neighbor(int dir) const
     return Point2(*this).move(dir);
 }
 
-//! $B;XDj$5$l$?J}8~$N(B8$B6aK5E@$K<+?H$r0\F0$9$k!%(B
+//! w’è‚³‚ê‚½•ûŒü‚Ì8‹ß–T“_‚É©g‚ğˆÚ“®‚·‚éD
 /*!
-  \param dir	8$B6aK5E@$NJ}8~(B(mod 8$B$G2r<a!%1&NY$r(B0$B$H$7!$;~7W2s$j$K(B1$B$E$DA}2C(B)
-  \return	$B0\F08e$N$3$NE@(B
+  \param dir	8‹ß–T“_‚Ì•ûŒü(mod 8‚Å‰ğßD‰E—×‚ğ0‚Æ‚µCŒv‰ñ‚è‚É1‚Ã‚Â‘‰Á)
+  \return	ˆÚ“®Œã‚Ì‚±‚Ì“_
 */
 template <class T> Point2<T>&
 Point2<T>::move(int dir)
@@ -149,10 +149,10 @@ Point2<T>::move(int dir)
     return *this;
 }
 
-//! $B$3$N(B3$B<!85E@$H;XDj$5$l$?(B3$B<!85E@$,(B8$BNY@\$7$F$$$k$+D4$Y$k!%(B
+//! ‚±‚Ì3ŸŒ³“_‚Æw’è‚³‚ê‚½3ŸŒ³“_‚ª8—×Ú‚µ‚Ä‚¢‚é‚©’²‚×‚éD
 /*!
-  \param p	3$B<!85E@(B
-  \return	p$B$H0lCW$7$F$$$l$P(B-1$B!$(B8$BNY@\$7$F$$$l$P(B1$B!$$$$:$l$G$b$J$1$l$P(B0
+  \param p	3ŸŒ³“_
+  \return	p‚Æˆê’v‚µ‚Ä‚¢‚ê‚Î-1C8—×Ú‚µ‚Ä‚¢‚ê‚Î1C‚¢‚¸‚ê‚Å‚à‚È‚¯‚ê‚Î0
 */
 template <class T> int
 Point2<T>::adj(const Point2<T>& p) const
@@ -180,11 +180,11 @@ Point2<T>::adj(const Point2<T>& p) const
     return 0;
 }
 
-//! $B$3$N(B3$B<!85E@$+$i;XDj$5$l$?(B3$B<!85E@$X$N8~$-$rJV$9!%(B
+//! ‚±‚Ì3ŸŒ³“_‚©‚çw’è‚³‚ê‚½3ŸŒ³“_‚Ö‚ÌŒü‚«‚ğ•Ô‚·D
 /*!
-  \param p	3$B<!85E@(B
-  \return	-180deg$B$+$i(B180deg$B$^$G$r(B8$BEyJ,$7$?6h4V$rI=$9(B-4$B$+$i(B3$B$^$G$N@0?tCM!%(B
-		$BFC$K!$(Bp$B$,$3$NE@$K0lCW$9$k$J$i$P(B4
+  \param p	3ŸŒ³“_
+  \return	-180deg‚©‚ç180deg‚Ü‚Å‚ğ8“™•ª‚µ‚½‹æŠÔ‚ğ•\‚·-4‚©‚ç3‚Ü‚Å‚Ì®”’lD
+		“Á‚ÉCp‚ª‚±‚Ì“_‚Éˆê’v‚·‚é‚È‚ç‚Î4
 */
 template <class T> int
 Point2<T>::dir(const Point2<T>& p) const
@@ -215,13 +215,13 @@ Point2<T>::dir(const Point2<T>& p) const
             return -4;
 }
 
-//! $B$3$N(B3$B<!85E@$H;XDj$5$l$?(B2$B$D$N(B3$B<!85E@$,$J$93QEY$rJV$9!%(B
+//! ‚±‚Ì3ŸŒ³“_‚Æw’è‚³‚ê‚½2‚Â‚Ì3ŸŒ³“_‚ª‚È‚·Šp“x‚ğ•Ô‚·D
 /*!
-  \param pp	3$B<!85E@(B
-  \param pn	3$B<!85E@(B
-  \return	pp->*this->pn$B$,$J$93QEY$r(B-180deg$B$+$i(B180deg$B$^$G$r(B8$BEyJ,$7$?6h4V$G(B
-		$BI=$7$?(B-4$B$+$i(B3$B$^$G$N@0?tCM!%FC$K!$(Bpp, pn$B$N>/$J$/$H$b0lJ}$,$3$NE@$K(B
-		$B0lCW$9$k$J$i$P(B4
+  \param pp	3ŸŒ³“_
+  \param pn	3ŸŒ³“_
+  \return	pp->*this->pn‚ª‚È‚·Šp“x‚ğ-180deg‚©‚ç180deg‚Ü‚Å‚ğ8“™•ª‚µ‚½‹æŠÔ‚Å
+		•\‚µ‚½-4‚©‚ç3‚Ü‚Å‚Ì®”’lD“Á‚ÉCpp, pn‚Ì­‚È‚­‚Æ‚àˆê•û‚ª‚±‚Ì“_‚É
+		ˆê’v‚·‚é‚È‚ç‚Î4
 */
 template <class T> int
 Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
@@ -238,17 +238,17 @@ Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
         return ang;
 }
 
-typedef Point2<short>	Point2s;		//!< short$B7?:BI8$r;}$D(B2$B<!85E@(B
-typedef Point2<int>	Point2i;		//!< int$B7?:BI8$r;}$D(B2$B<!85E@(B
-typedef Point2<float>	Point2f;		//!< float$B7?:BI8$r;}$D(B2$B<!85E@(B
-typedef Point2<double>	Point2d;		//!< double$B7?:BI8$r;}$D(B2$B<!85E@(B
+typedef Point2<short>	Point2s;		//!< shortŒ^À•W‚ğ‚Â2ŸŒ³“_
+typedef Point2<int>	Point2i;		//!< intŒ^À•W‚ğ‚Â2ŸŒ³“_
+typedef Point2<float>	Point2f;		//!< floatŒ^À•W‚ğ‚Â2ŸŒ³“_
+typedef Point2<double>	Point2d;		//!< doubleŒ^À•W‚ğ‚Â2ŸŒ³“_
 
 /************************************************************************
 *  class Point3<T>							*
 ************************************************************************/
-//! T$B7?$N:BI8@.J,$r;}$D(B3$B<!85E@$rI=$9%/%i%9(B
+//! TŒ^‚ÌÀ•W¬•ª‚ğ‚Â3ŸŒ³“_‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  \param T	$B:BI8$N7?(B
+  \param T	À•W‚ÌŒ^
  */
 template <class T>
 class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
@@ -259,17 +259,17 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
   public:
     Point3(T x=0, T y=0, T z=0)						;
 
-  //! $BB>$N(B3$B<!85%Y%/%H%k$HF10lMWAG$r;}$D(B3$B<!85E@$r:n$k!%(B
+  //! ‘¼‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚Æ“¯ˆê—v‘f‚ğ‚Â3ŸŒ³“_‚ğì‚éD
   /*!
-    \param v	$B%3%T!<85(B3$B<!85%Y%/%H%k(B
+    \param v	ƒRƒs[Œ³3ŸŒ³ƒxƒNƒgƒ‹
   */
     template <class T2, class B2>
     Point3(const Vector<T2, B2>& v) :array_type(v)			{}
 
-  //! $BB>$N(B3$B<!85%Y%/%H%k$r<+J,$KBeF~$9$k!%(B
+  //! ‘¼‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚ğ©•ª‚É‘ã“ü‚·‚éD
   /*!
-    \param v	$B%3%T!<85(B3$B<!85%Y%/%H%k(B
-    \return	$B$3$N(B3$B<!85E@(B
+    \param v	ƒRƒs[Œ³3ŸŒ³ƒxƒNƒgƒ‹
+    \return	‚±‚Ì3ŸŒ³“_
   */
     template <class T2, class B2>
     Point3&	operator =(const Vector<T2, B2>& v)
@@ -279,11 +279,11 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 		}
 };
 
-//! $B;XDj$5$l$?:BI8@.J,$r;}$D(B3$B<!85E@$r:n$k!%(B
+//! w’è‚³‚ê‚½À•W¬•ª‚ğ‚Â3ŸŒ³“_‚ğì‚éD
 /*!
-  \param x	x$B:BI8(B
-  \param y	y$B:BI8(B
-  \param z	z$B:BI8(B
+  \param x	xÀ•W
+  \param y	yÀ•W
+  \param z	zÀ•W
 */
 template <class T> inline
 Point3<T>::Point3(T x, T y, T z)
@@ -294,19 +294,19 @@ Point3<T>::Point3(T x, T y, T z)
     (*this)[2] = z;
 }
 
-typedef Point3<short>	Point3s;		//!< short$B7?:BI8$r;}$D(B3$B<!85E@(B
-typedef Point3<int>	Point3i;		//!< int$B7?:BI8$r;}$D(B3$B<!85E@(B
-typedef Point3<float>	Point3f;		//!< float$B7?:BI8$r;}$D(B3$B<!85E@(B
-typedef Point3<double>	Point3d;		//!< double$B7?:BI8$r;}$D(B3$B<!85E@(B
+typedef Point3<short>	Point3s;		//!< shortŒ^À•W‚ğ‚Â3ŸŒ³“_
+typedef Point3<int>	Point3i;		//!< intŒ^À•W‚ğ‚Â3ŸŒ³“_
+typedef Point3<float>	Point3f;		//!< floatŒ^À•W‚ğ‚Â3ŸŒ³“_
+typedef Point3<double>	Point3d;		//!< doubleŒ^À•W‚ğ‚Â3ŸŒ³“_
 
 /************************************************************************
 *  class HyperPlane							*
 ************************************************************************/
-//! d$B<!85<M1F6u4VCf$ND6J?LL$rI=8=$9$k%/%i%9(B
+//! dŸŒ³Ë‰e‹óŠÔ’†‚Ì’´•½–Ê‚ğ•\Œ»‚·‚éƒNƒ‰ƒX
 /*!
-  d$B<!85<M1F6u4V$NE@(B\f$\TUud{x}{} \in \TUspace{R}{d+1}\f$$B$KBP$7$F(B
+  dŸŒ³Ë‰e‹óŠÔ‚Ì“_\f$\TUud{x}{} \in \TUspace{R}{d+1}\f$‚É‘Î‚µ‚Ä
   \f$\TUtud{p}{}\TUud{x}{} = 0,~\TUud{p}{} \in \TUspace{R}{d+1}\f$
-  $B$K$h$C$FI=$5$l$k!%(B
+  ‚É‚æ‚Á‚Ä•\‚³‚ê‚éD
 */
 template <class T, class B=Buf<T> >
 class HyperPlane : public Vector<T, B>
@@ -314,9 +314,9 @@ class HyperPlane : public Vector<T, B>
   public:
     HyperPlane(u_int d=2)						;
 
-  //! $BF1<!:BI8%Y%/%H%k$r;XDj$7$FD6J?LL%*%V%8%'%/%H$r@8@.$9$k!%(B
+  //! “¯ŸÀ•WƒxƒNƒgƒ‹‚ğw’è‚µ‚Ä’´•½–ÊƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
   /*!
-    \param p	(d+1)$B<!85%Y%/%H%k!J(Bd$B$OD6J?LL$,B8:_$9$k<M1F6u4V$N<!85!K(B
+    \param p	(d+1)ŸŒ³ƒxƒNƒgƒ‹id‚Í’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³j
   */
     template <class T2, class B2>
     HyperPlane(const Vector<T2, B2>& p)	:Vector<T, B>(p)		{}
@@ -324,10 +324,10 @@ class HyperPlane : public Vector<T, B>
     template <class Iterator>
     HyperPlane(Iterator first, Iterator last)				;
 
-  //! $BD6J?LL%*%V%8%'%/%H$NF1<!:BI8%Y%/%H%k$r;XDj$9$k!%(B
+  //! ’´•½–ÊƒIƒuƒWƒFƒNƒg‚Ì“¯ŸÀ•WƒxƒNƒgƒ‹‚ğw’è‚·‚éD
   /*!
-    \param v	(d+1)$B<!85%Y%/%H%k!J(Bd$B$OD6J?LL$,B8:_$9$k<M1F6u4V$N<!85!K(B
-    \return	$B$3$ND6J?LL%*%V%8%'%/%H(B
+    \param v	(d+1)ŸŒ³ƒxƒNƒgƒ‹id‚Í’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³j
+    \return	‚±‚Ì’´•½–ÊƒIƒuƒWƒFƒNƒg
   */
     template <class T2, class B2>
     HyperPlane&	operator =(const Vector<T2, B2>& v)
@@ -336,16 +336,16 @@ class HyperPlane : public Vector<T, B>
     template <class Iterator>
     void	fit(Iterator first, Iterator last)			;
 
-  //! $B$3$ND6J?LL$,B8:_$9$k<M1F6u4V$N<!85$rJV$9!%(B
+  //! ‚±‚Ì’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
   /*! 
-    \return	$B<M1F6u4V$N<!85(B($BF1<!:BI8$N%Y%/%H%k$H$7$F$N<!85$O(B#spaceDim()+1)
+    \return	Ë‰e‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í#spaceDim()+1)
   */
     u_int	spaceDim()		const	{return Vector<T, B>::dim()-1;}
 
-  //! $BD6J?LL$r5a$a$k$?$a$KI,MW$JE@$N:G>.8D?t$rJV$9!%(B
+  //! ’´•½–Ê‚ğ‹‚ß‚é‚½‚ß‚É•K—v‚È“_‚ÌÅ¬ŒÂ”‚ğ•Ô‚·D
   /*!
-    $B8=:_@_Dj$5$l$F$$$k<M1F6u4V$N<!85$r$b$H$K7W;;$5$l$k!%(B
-    \return	$BI,MW$JE@$N:G>.8D?t$9$J$o$AF~NO6u4V$N<!85(B#spaceDim()
+    Œ»İİ’è‚³‚ê‚Ä‚¢‚éË‰e‹óŠÔ‚ÌŸŒ³‚ğ‚à‚Æ‚ÉŒvZ‚³‚ê‚éD
+    \return	•K—v‚È“_‚ÌÅ¬ŒÂ”‚·‚È‚í‚¿“ü—Í‹óŠÔ‚ÌŸŒ³#spaceDim()
   */
     u_int	ndataMin()		const	{return spaceDim();}
 
@@ -355,10 +355,10 @@ class HyperPlane : public Vector<T, B>
     dist(const Vector<T2, B2>& x)		const	;
 };
 
-//! $B6u4V$N<!85$r;XDj$7$FD6J?LL%*%V%8%'%/%H$r@8@.$9$k!%(B
+//! ‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚Ä’´•½–ÊƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
 /*!
-  $BL58B1sD6J?LL(B([0, 0,..., 0, 1])$B$K=i4|2=$5$l$k!%(B
-  \param d	$B$3$ND6J?LL$,B8:_$9$k<M1F6u4V$N<!85(B
+  –³ŒÀ‰“’´•½–Ê([0, 0,..., 0, 1])‚É‰Šú‰»‚³‚ê‚éD
+  \param d	‚±‚Ì’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³
 */
 template <class T, class B> inline
 HyperPlane<T, B>::HyperPlane(u_int d)
@@ -367,11 +367,11 @@ HyperPlane<T, B>::HyperPlane(u_int d)
     (*this)[d] = 1;
 }
     
-//! $BM?$($i$l$?E@Ns$NHsF1<!:BI8$KEv$F$O$a$i$l$?D6J?LL%*%V%8%'%/%H$r@8@.$9$k!%(B
+//! —^‚¦‚ç‚ê‚½“_—ñ‚Ì”ñ“¯ŸÀ•W‚É“–‚Ä‚Í‚ß‚ç‚ê‚½’´•½–ÊƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
 /*!
-  \param first			$BE@Ns$N@hF,$r<($9H?I|;R(B
-  \param last			$BE@Ns$NKvHx$r<($9H?I|;R(B
-  \throw std::invalid_argument	$BE@$N?t$,(B#ndataMin()$B$KK~$?$J$$>l9g$KAw=P(B
+  \param first			“_—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
+  \param last			“_—ñ‚Ì––”ö‚ğ¦‚·”½•œq
+  \throw std::invalid_argument	“_‚Ì”‚ª#ndataMin()‚É–‚½‚È‚¢ê‡‚É‘—o
 */
 template <class T, class B> template <class Iterator> inline
 HyperPlane<T, B>::HyperPlane(Iterator first, Iterator last)
@@ -379,25 +379,25 @@ HyperPlane<T, B>::HyperPlane(Iterator first, Iterator last)
     fit(first, last);
 }
 
-//! $BM?$($i$l$?E@Ns$NHsF1<!:BI8$KD6J?LL$rEv$F$O$a$k!%(B
+//! —^‚¦‚ç‚ê‚½“_—ñ‚Ì”ñ“¯ŸÀ•W‚É’´•½–Ê‚ğ“–‚Ä‚Í‚ß‚éD
 /*!
-  \param first			$BE@Ns$N@hF,$r<($9H?I|;R(B
-  \param last			$BE@Ns$NKvHx$r<($9H?I|;R(B
-  \throw std::invalid_argument	$BE@$N?t$,(B#ndataMin()$B$KK~$?$J$$>l9g$KAw=P(B
+  \param first			“_—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
+  \param last			“_—ñ‚Ì––”ö‚ğ¦‚·”½•œq
+  \throw std::invalid_argument	“_‚Ì”‚ª#ndataMin()‚É–‚½‚È‚¢ê‡‚É‘—o
 */
 template <class T, class B> template <class Iterator> void
 HyperPlane<T, B>::fit(Iterator first, Iterator last)
 {
-  // $BE@Ns$N@55,2=(B
+  // “_—ñ‚Ì³‹K‰»
     const Normalize	normalize(first, last);
 
-  // $B=<J,$J8D?t$NE@$,$"$k$+!)(B
+  // [•ª‚ÈŒÂ”‚Ì“_‚ª‚ ‚é‚©H
     const u_int		ndata = std::distance(first, last),
 			d     = normalize.spaceDim();
-    if (ndata < d)	// Vector<T, B>$B$N%5%$%:$,L$Dj$J$N$G(BndataMin()$B$OL58z(B
+    if (ndata < d)	// Vector<T, B>‚ÌƒTƒCƒY‚ª–¢’è‚È‚Ì‚ÅndataMin()‚Í–³Œø
 	throw std::invalid_argument("Hyperplane::initialize(): not enough input data!!");
 
-  // $B%G!<%?9TNs$N7W;;(B
+  // ƒf[ƒ^s—ñ‚ÌŒvZ
     Matrix<T>	A(d, d);
     while (first != last)
     {
@@ -405,8 +405,8 @@ HyperPlane<T, B>::fit(Iterator first, Iterator last)
 	A += x % x;
     }
 
-  // $B%G!<%?9TNs$N:G>.8GM-CM$KBP1~$9$k8GM-%Y%/%H%k$+$iK!@~%Y%/%H%k$r7W;;$7!$(B
-  // $B$5$i$KE@Ns$N=E?4$h$j86E@$+$i$N5wN%$r7W;;$9$k!%(B
+  // ƒf[ƒ^s—ñ‚ÌÅ¬ŒÅ—L’l‚É‘Î‰‚·‚éŒÅ—LƒxƒNƒgƒ‹‚©‚ç–@üƒxƒNƒgƒ‹‚ğŒvZ‚µC
+  // ‚³‚ç‚É“_—ñ‚ÌdS‚æ‚èŒ´“_‚©‚ç‚Ì‹——£‚ğŒvZ‚·‚éD
     Vector<T>		eval;
     const Matrix<T>&	Ut = A.eigen(eval);
     Vector<T, B>::resize(d+1);
@@ -416,11 +416,11 @@ HyperPlane<T, B>::fit(Iterator first, Iterator last)
 	Vector<T, B>::operator *=(-1.0);
 }
 
-//! $BM?$($i$l$?E@$HD6J?LL$N5wN%$N(B2$B>h$rJV$9!%(B
+//! —^‚¦‚ç‚ê‚½“_‚Æ’´•½–Ê‚Ì‹——£‚Ì2æ‚ğ•Ô‚·D
 /*!
-  \param x	$BE@$NHsF1<!:BI8!J(B#spaceDim()$B<!85!K$^$?$OF1<!:BI8(B
-		$B!J(B#spaceDim()+1$B<!85!K(B
-  \return	$BE@$HD6J?LL$N5wN%$N(B2$B>h(B
+  \param x	“_‚Ì”ñ“¯ŸÀ•Wi#spaceDim()ŸŒ³j‚Ü‚½‚Í“¯ŸÀ•W
+		i#spaceDim()+1ŸŒ³j
+  \return	“_‚Æ’´•½–Ê‚Ì‹——£‚Ì2æ
 */
 template <class T, class B> template <class T2, class B2> inline T
 HyperPlane<T, B>::sqdist(const Vector<T2, B2>& x) const
@@ -429,14 +429,14 @@ HyperPlane<T, B>::sqdist(const Vector<T2, B2>& x) const
     return d*d;
 }
 
-//! $BM?$($i$l$?E@$HD6J?LL$N5wN%$rJV$9!%(B
+//! —^‚¦‚ç‚ê‚½“_‚Æ’´•½–Ê‚Ì‹——£‚ğ•Ô‚·D
 /*!
-  \param x			$BE@$NHsF1<!:BI8!J(B#spaceDim()$B<!85!K$^$?$O(B
-				$BF1<!:BI8!J(B#spaceDim()+1$B<!85!K(B
-  \return			$BE@$HD6J?LL$N5wN%!JHsIi!K(B
-  \throw std::invalid_argument	$BE@$N%Y%/%H%k$H$7$F$N<!85$,(B#spaceDim()$B!$(B
-				#spaceDim()+1$B$N$$$:$l$G$b$J$$>l9g!$$b$7$/$O(B
-				$B$3$NE@$,L58B1sE@$G$"$k>l9g$KAw=P!%(B
+  \param x			“_‚Ì”ñ“¯ŸÀ•Wi#spaceDim()ŸŒ³j‚Ü‚½‚Í
+				“¯ŸÀ•Wi#spaceDim()+1ŸŒ³j
+  \return			“_‚Æ’´•½–Ê‚Ì‹——£i”ñ•‰j
+  \throw std::invalid_argument	“_‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚ª#spaceDim()C
+				#spaceDim()+1‚Ì‚¢‚¸‚ê‚Å‚à‚È‚¢ê‡C‚à‚µ‚­‚Í
+				‚±‚Ì“_‚ª–³ŒÀ‰““_‚Å‚ ‚éê‡‚É‘—oD
 */
 template <class T, class B> template <class T2, class B2> double
 HyperPlane<T, B>::dist(const Vector<T2, B2>& x) const
@@ -457,12 +457,12 @@ HyperPlane<T, B>::dist(const Vector<T2, B2>& x) const
 }
 
 typedef HyperPlane<float,  FixedSizedBuf<float,  3> >
-	LineP2f;			//!< float$B7?:BI8$r;}$D(B2$B<!856u4VCf$ND>@~(B
+	LineP2f;			//!< floatŒ^À•W‚ğ‚Â2ŸŒ³‹óŠÔ’†‚Ì’¼ü
 typedef HyperPlane<double, FixedSizedBuf<double, 3> >
-	LineP2d;			//!< double$B7?:BI8$r;}$D(B2$B<!856u4VCf$ND>@~(B
+	LineP2d;			//!< doubleŒ^À•W‚ğ‚Â2ŸŒ³‹óŠÔ’†‚Ì’¼ü
 typedef HyperPlane<float,  FixedSizedBuf<float,  4> >
-	PlaneP3f;			//!< float$B7?:BI8$r;}$D(B3$B<!856u4VCf$NJ?LL(B
+	PlaneP3f;			//!< floatŒ^À•W‚ğ‚Â3ŸŒ³‹óŠÔ’†‚Ì•½–Ê
 typedef HyperPlane<double, FixedSizedBuf<double, 4> >
-	PlaneP3d;			//!< double$B7?:BI8$r;}$D(B3$B<!856u4VCf$NJ?LL(B
+	PlaneP3d;			//!< doubleŒ^À•W‚ğ‚Â3ŸŒ³‹óŠÔ’†‚Ì•½–Ê
 }
 #endif	/* !__TUGeometryPP_h */

@@ -1,13 +1,10 @@
 /*
- *  $Id: main.cc,v 1.4 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: main.cc,v 1.5 2009-07-31 07:05:24 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CanvasPane.h"
 #include "draw.h"
-#ifdef __GNUG__
-#  include "TU/Nurbs++.cc"
-#endif
 
 namespace TU
 {
@@ -90,7 +87,7 @@ MyCanvasPane::initializeGraphics()
       glColor3f(1.0, 1.0, 1.0);
       glPointSize(3.0);
       glBegin(GL_POINTS);
-	for (int i = _b.degree(); i <= _b.M() - _b.degree(); ++i)
+	for (u_int i = _b.degree(); i <= _b.M() - _b.degree(); ++i)
 	{
 	    Vector3f	p = _b(_b.knots(i));
 	    glVertex3fv((const float*)p);
@@ -111,7 +108,7 @@ MyCanvasPane::initializeGraphics()
       glColor3f(1.0, 1.0, 1.0);
       glPointSize(3.0);
       glBegin(GL_POINTS);
-	for (int i = _bb.degree(); i <= _bb.M() - _bb.degree(); ++i)
+	for (u_int i = _bb.degree(); i <= _bb.M() - _bb.degree(); ++i)
 	{
 	    Vector3f	p = _bb(_bb.knots(i));
 	    glVertex3fv((const float*)p);
@@ -125,7 +122,7 @@ MyCanvasPane::initializeGraphics()
       glColor3f(1.0, 1.0, 1.0);
       glPointSize(3.0);
       glBegin(GL_POINTS);
-	for (int i = _c.degree(); i <= _c.M() - _c.degree(); ++i)
+	for (u_int i = _c.degree(); i <= _c.M() - _c.degree(); ++i)
 	{
 	    Vector4f	p = _c(_c.knots()[i]);
 	    glVertex4fv((const float*)p);
@@ -139,8 +136,8 @@ MyCanvasPane::initializeGraphics()
       glColor3f(1.0, 1.0, 1.0);
       glPointSize(3.0);
       glBegin(GL_POINTS);
-	for (int j = _s.vDegree(); j <= _s.vM() - _s.vDegree(); ++j)
-	    for (int i = _s.uDegree(); i <= _s.uM() - _s.uDegree(); ++i)
+	for (u_int j = _s.vDegree(); j <= _s.vM() - _s.vDegree(); ++j)
+	    for (u_int i = _s.uDegree(); i <= _s.uM() - _s.uDegree(); ++i)
 	    {
 		Vector3f	p = _s(_s.uKnots(i), _s.vKnots(j));
 		glVertex3fv((const float*)p);
@@ -154,8 +151,8 @@ MyCanvasPane::initializeGraphics()
       glColor3f(1.0, 1.0, 1.0);
       glPointSize(3.0);
       glBegin(GL_POINTS);
-	for (int j = _ss.vDegree(); j <= _ss.vM() - _ss.vDegree(); ++j)
-	    for (int i = _ss.uDegree(); i <= _ss.uM() - _ss.uDegree(); ++i)
+	for (u_int j = _ss.vDegree(); j <= _ss.vM() - _ss.vDegree(); ++j)
+	    for (u_int i = _ss.uDegree(); i <= _ss.uM() - _ss.uDegree(); ++i)
 	    {
 		Vector3f	p = _ss(_ss.uKnots(i), _ss.vKnots(j));
 		glVertex3fv((const float*)p);

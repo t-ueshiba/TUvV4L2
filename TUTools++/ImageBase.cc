@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.25 2009-05-10 23:33:22 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.26 2009-07-31 07:04:44 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -45,10 +45,10 @@ ImageBase::~ImageBase()
 {
 }
 
-//! $BF~NO%9%H%j!<%`$+$i2hA|$N%X%C%@$rFI$_9~$`!%(B
+//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç‰æ‘œ‚Ìƒwƒbƒ_‚ğ“Ç‚İ‚ŞD
 /*!
-  \param in	$BF~NO%9%H%j!<%`(B
-  \return	$BFI$_9~$^$l$?2hA|$N2hAG$N%?%$%W(B
+  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
+  \return	“Ç‚İ‚Ü‚ê‚½‰æ‘œ‚Ì‰æ‘f‚Ìƒ^ƒCƒv
 */
 ImageBase::Type
 ImageBase::restoreHeader(std::istream& in)
@@ -189,12 +189,12 @@ ImageBase::restoreHeader(std::istream& in)
     return type;
 }
 
-//! $B;XDj$7$?2hAG%?%$%W$G=PNO%9%H%j!<%`$K2hA|$N%X%C%@$r=q$-=P$9!%(B
+//! w’è‚µ‚½‰æ‘fƒ^ƒCƒv‚Åo—ÍƒXƒgƒŠ[ƒ€‚É‰æ‘œ‚Ìƒwƒbƒ_‚ğ‘‚«o‚·D
 /*!
-  \param out	$B=PNO%9%H%j!<%`(B
-  \param type	$B2hAG%?%$%W!%$?$@$7!$(B#DEFAULT$B$r;XDj$7$?>l9g$O!$(B
-		$B$3$N2hA|%*%V%8%'%/%H$N2hAG%?%$%W$G=q$-=P$5$l$k!%(B
-  \return	$B<B:]$K=q$-=P$9>l9g$N2hAG%?%$%W!%(B
+  \param out	o—ÍƒXƒgƒŠ[ƒ€
+  \param type	‰æ‘fƒ^ƒCƒvD‚½‚¾‚µC#DEFAULT‚ğw’è‚µ‚½ê‡‚ÍC
+		‚±‚Ì‰æ‘œƒIƒuƒWƒFƒNƒg‚Ì‰æ‘fƒ^ƒCƒv‚Å‘‚«o‚³‚ê‚éD
+  \return	ÀÛ‚É‘‚«o‚·ê‡‚Ì‰æ‘fƒ^ƒCƒvD
 */
 ImageBase::Type
 ImageBase::saveHeader(std::ostream& out, Type type) const
@@ -287,10 +287,10 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     return type;
 }
 
-//! $B;XDj$5$l$?%?%$%W$N2hAG$N%S%C%H?t$rJV$9!%(B
+//! w’è‚³‚ê‚½ƒ^ƒCƒv‚Ì‰æ‘f‚Ìƒrƒbƒg”‚ğ•Ô‚·D
 /*!
-  \param type	$B2hAG$N%?%$%W(B
-  \return	$B2hAG$N%S%C%H?t(B
+  \param type	‰æ‘f‚Ìƒ^ƒCƒv
+  \return	‰æ‘f‚Ìƒrƒbƒg”
 */
 u_int
 ImageBase::type2depth(Type type)

@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BlockMatrix++.h,v 1.9 2008-10-03 04:23:37 ueshiba Exp $
+ *  $Id: BlockMatrix++.h,v 1.10 2009-07-31 07:04:44 ueshiba Exp $
  */
 #ifndef __TUBlockMatrixPP_h
 #define __TUBlockMatrixPP_h
@@ -37,10 +37,10 @@ namespace TU
 /************************************************************************
 *  class BlockMatrix<T>							*
 ************************************************************************/
-//! T$B7?$NMWAG$r;}$D>.9TNs$+$i@.$k%V%m%C%/BP3Q9TNs$rI=$9%/%i%9(B
+//! TŒ^‚Ì—v‘f‚ğ‚Â¬s—ñ‚©‚ç¬‚éƒuƒƒbƒN‘ÎŠps—ñ‚ğ•\‚·ƒNƒ‰ƒX
 /*!
-  $B6qBNE*$K$O(Bd$B8D$N>.9TNs(B\f$\TUvec{B}{1}, \TUvec{B}{2},\ldots, \TUvec{B}{d}\f$
-  ($BF10l%5%$%:$H$O8B$i$J$$(B)$B$+$i@.$k(B
+  ‹ï‘Ì“I‚É‚ÍdŒÂ‚Ì¬s—ñ\f$\TUvec{B}{1}, \TUvec{B}{2},\ldots, \TUvec{B}{d}\f$
+  (“¯ˆêƒTƒCƒY‚Æ‚ÍŒÀ‚ç‚È‚¢)‚©‚ç¬‚é
   \f$
   \TUvec{B}{} =
   \TUbeginarray{cccc}
@@ -48,16 +48,16 @@ namespace TU
   & & & \TUvec{B}{d}
   \TUendarray
   \f$
-  $B$J$k7A$N9TNs!%(B
-  \param T	$BMWAG$N7?(B
+  ‚È‚éŒ`‚Ìs—ñD
+  \param T	—v‘f‚ÌŒ^
 */
 template <class T>
 class BlockMatrix : public Array<Matrix<T> >
 {
   public:
-  //! $B;XDj$5$l$?8D?t$N>.9TNs$+$i@.$k%V%m%C%/BP3Q9TNs$r@8@.$9$k!%(B
+  //! w’è‚³‚ê‚½ŒÂ”‚Ì¬s—ñ‚©‚ç¬‚éƒuƒƒbƒN‘ÎŠps—ñ‚ğ¶¬‚·‚éD
   /*!
-    \param d	$B>.9TNs$N8D?t(B
+    \param d	¬s—ñ‚ÌŒÂ”
   */
     explicit BlockMatrix(u_int d=0)	:Array<Matrix<T> >(d)	{}
     BlockMatrix(const Array<u_int>& nrows,
@@ -73,18 +73,18 @@ class BlockMatrix : public Array<Matrix<T> >
     BlockMatrix&	operator /=(double c)
 			{Array<Matrix<T> >::operator /=(c); return *this;}
 
-  //! $B$3$N%V%m%C%/BP3Q9TNs$KB>$N%V%m%C%/BP3Q9TNs$rB-$9!%(B
+  //! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚É‘¼‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ğ‘«‚·D
   /*!
-    \param b	$BB-$9%V%m%C%/BP3Q9TNs(B
-    \return	$B$3$N%V%m%C%/BP3Q9TNs(B
+    \param b	‘«‚·ƒuƒƒbƒN‘ÎŠps—ñ
+    \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
   */
     BlockMatrix&	operator +=(const BlockMatrix& b)
 			{Array<Matrix<T> >::operator +=(b); return *this;}
 
-  //! $B$3$N%V%m%C%/BP3Q9TNs$+$iB>$N%V%m%C%/BP3Q9TNs$r0z$/!%(B
+  //! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚©‚ç‘¼‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ğˆø‚­D
   /*!
-    \param b	$B0z$/%V%m%C%/BP3Q9TNs(B
-    \return	$B$3$N%V%m%C%/BP3Q9TNs(B
+    \param b	ˆø‚­ƒuƒƒbƒN‘ÎŠps—ñ
+    \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
   */
     BlockMatrix&	operator -=(const BlockMatrix& b)
 			{Array<Matrix<T> >::operator -=(b); return *this;}
@@ -92,23 +92,210 @@ class BlockMatrix : public Array<Matrix<T> >
 			operator Matrix<T>()		const	;
 };
 
+//! Še¬s—ñ‚ÌƒTƒCƒY‚ğw’è‚µ‚ÄƒuƒƒbƒN‘ÎŠps—ñ‚ğ¶¬‚µC‘S—v‘f‚ğ0‚Å‰Šú‰»‚·‚éD
+/*!
+  \param nrows	Še¬s—ñ‚Ìs”‚ğ‡‚Éû‚ß‚½”z—ñ
+  \param ncols	Še¬s—ñ‚Ì—ñ”‚ğ‡‚Éû‚ß‚½”z—ñ
+*/
+template <class T>
+BlockMatrix<T>::BlockMatrix(const Array<u_int>& nrows,
+			    const Array<u_int>& ncols)
+    :Array<Matrix<T> >(nrows.dim())
+{
+    if (nrows.dim() != ncols.dim())
+	throw std::invalid_argument("TU::BlockMatrix<T>::BlockMatrix: dimension mismatch between nrows and ncols!!");
+    for (u_int i = 0; i < dim(); ++i)
+    {
+	(*this)[i].resize(nrows[i], ncols[i]);
+	(*this)[i] = 0.0;
+    }
+}
+
+//! ƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘s”‚ğ•Ô‚·D
+/*!
+  \return	‘s”
+*/
+template <class T> u_int
+BlockMatrix<T>::nrow() const
+{
+    size_t	r = 0;
+    for (u_int i = 0; i < dim(); ++i)
+	r += (*this)[i].nrow();
+    return r;
+}
+
+//! ƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘—ñ”‚ğ•Ô‚·D
+/*!
+  \return	‘—ñ”
+*/
+template <class T> u_int
+BlockMatrix<T>::ncol() const
+{
+    size_t	c = 0;
+    for (u_int i = 0; i < dim(); ++i)
+	c += (*this)[i].ncol();
+    return c;
+}
+
+//! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚Ì“]’us—ñ‚ğ•Ô‚·D
+/*!
+  \return	“]’us—ñC‚·‚È‚í‚¿
+  \f$
+  \TUtvec{B}{} =
+  \TUbeginarray{cccc}
+  \TUtvec{B}{1} & & & \\ & \TUtvec{B}{2} & & \\ & & \ddots & \\
+  & & & \TUtvec{B}{d}
+  \TUendarray
+  \f$
+*/
+template <class T> BlockMatrix<T>
+BlockMatrix<T>::trns() const
+{
+    BlockMatrix	val(dim());
+    for (u_int i = 0; i < val.dim(); ++i)
+	val[i] = (*this)[i].trns();
+    return val;
+}
+
+//! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘S‚Ä‚Ì¬s—ñ‚Ì‘S—v‘f‚É“¯ˆê‚Ì”’l‚ğ‘ã“ü‚·‚éD
+/*!
+  \param c	‘ã“ü‚·‚é”’l
+  \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+*/
+template <class T> BlockMatrix<T>&
+BlockMatrix<T>::operator =(const T& c)
+{
+    for (u_int i = 0; i < dim(); ++i)
+	(*this)[i] = c;
+    return *this;
+}
+
+//! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ğ’Êí‚Ìs—ñ‚É•ÏŠ·‚·‚éD
+/*!
+  \return	•ÏŠ·‚³‚ê‚½s—ñ
+*/
+template <class T>
+BlockMatrix<T>::operator Matrix<T>() const
+{
+    Matrix<T>	val(nrow(), ncol());
+    int		r = 0, c = 0;
+    for (u_int i = 0; i < dim(); ++i)
+    {
+	val(r, c, (*this)[i].nrow(), (*this)[i].ncol()) = (*this)[i];
+	r += (*this)[i].nrow();
+	c += (*this)[i].ncol();
+    }
+    return val;
+}
+
 /************************************************************************
 *  numeric operators							*
 ************************************************************************/
+//! 2‚Â‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ÌÏ
+/*!
+  \param a	‘æ1ˆø”
+  \param b	‘æ2ˆø”
+  \return	Œ‹‰Ê‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+*/
 template <class T> BlockMatrix<T>
-operator *(const BlockMatrix<T>& a, const BlockMatrix<T>& b)	;
+operator *(const BlockMatrix<T>& a, const BlockMatrix<T>& b)
+{
+    a.check_dim(b.dim());
+    BlockMatrix<T>	val(a.dim());
+    for (u_int i = 0; i < val.dim(); ++i)
+	val[i] = a[i] * b[i];
+    return val;
+}
 
+//! ƒuƒƒbƒN‘ÎŠps—ñ‚Æ’Êí‚Ìs—ñ‚ÌÏ
+/*!
+  \param b	‘æ1ˆø”(ƒuƒƒbƒN‘ÎŠps—ñ)
+  \param m	‘æ2ˆø”(’Êís—ñ)
+  \return	Œ‹‰Ê‚Ì’Êís—ñ
+*/
 template <class T> Matrix<T>
-operator *(const BlockMatrix<T>& b, const Matrix<T>& m)		;
+operator *(const BlockMatrix<T>& b, const Matrix<T>& m)
+{
+    Matrix<T>	val(b.nrow(), m.ncol());
+    u_int	r = 0, c = 0;
+    for (u_int i = 0; i < b.dim(); ++i)
+    {
+	val(r, 0, b[i].nrow(), m.ncol())
+	    = b[i] * m(c, 0, b[i].ncol(), m.ncol());
+	r += b[i].nrow();
+	c += b[i].ncol();
+    }
+    if (c != m.nrow())
+	throw std::invalid_argument("TU::operaotr *(const BlockMatrix<T>&, const Matrix<T>&): dimension mismatch!!");
+    return val;
+}
 
+//! ’Êí‚Ìs—ñ‚ÆƒuƒƒbƒN‘ÎŠps—ñ‚ÌÏ
+/*!
+  \param m	‘æ1ˆø”(’Êís—ñ)
+  \param b	‘æ2ˆø”(ƒuƒƒbƒN‘ÎŠps—ñ)
+  \return	Œ‹‰Ê‚Ì’Êís—ñ
+*/
 template <class T> Matrix<T>
-operator *(const Matrix<T>& m, const BlockMatrix<T>& b)		;
+operator *(const Matrix<T>& m, const BlockMatrix<T>& b)
+{
+    Matrix<T>	val(m.nrow(), b.ncol());
+    u_int	r = 0, c = 0;
+    for (u_int i = 0; i < b.dim(); ++i)
+    {
+	val(0, c, m.nrow(), b[i].ncol())
+	    = m(0, r, m.nrow(), b[i].nrow()) * b[i];
+	r += b[i].nrow();
+	c += b[i].ncol();
+    }
+    if (r != m.ncol())
+	throw std::invalid_argument("TU::operaotr *(const Matrix<T>&, const BlockMatrix<T>&): dimension mismatch!!");
+    return val;
+}
 
+//! ƒuƒƒbƒN‘ÎŠps—ñ‚ÆƒxƒNƒgƒ‹‚ÌÏ
+/*!
+  \param b	ƒuƒƒbƒN‘ÎŠps—ñ
+  \param v	ƒxƒNƒgƒ‹
+  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹
+*/
 template <class T> Vector<T>
-operator *(const BlockMatrix<T>& b, const Vector<T>& v)		;
+operator *(const BlockMatrix<T>& b, const Vector<T>& v)
+{
+    Vector<T>	val(b.nrow());
+    u_int	r = 0, c = 0;
+    for (u_int i = 0; i < b.dim(); ++i)
+    {
+	val(r, b[i].nrow()) = b[i] * v(c, b[i].ncol());
+	r += b[i].nrow();
+	c += b[i].ncol();
+    }
+    if (c != v.dim())
+	throw std::invalid_argument("TU::operaotr *(const BlockMatrix<T>&, const Vector<T>&): dimension mismatch!!");
+    return val;
+}
 
+//! ƒxƒNƒgƒ‹‚ÆƒuƒƒbƒN‘ÎŠps—ñ‚ÌÏ
+/*!
+  \param v	ƒxƒNƒgƒ‹
+  \param b	ƒuƒƒbƒN‘ÎŠps—ñ
+  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹
+*/
 template <class T> Vector<T>
-operator *(const Vector<T>& v, const BlockMatrix<T>& b)		;
+operator *(const Vector<T>& v, const BlockMatrix<T>& b)
+{
+    Vector<T>	val(b.ncol());
+    u_int	r = 0, c = 0;
+    for (u_int i = 0; i < b.dim(); ++i)
+    {
+	val(c, b[i].ncol()) = v(r, b[i].nrow()) * b[i];
+	r += b[i].nrow();
+	c += b[i].ncol();
+    }
+    if (r != v.dim())
+	throw std::invalid_argument("TU::operaotr *(const Vector<T>&, const BlockMatrix<T>&): dimension mismatch!!");
+    return val;
+}
  
 }
 

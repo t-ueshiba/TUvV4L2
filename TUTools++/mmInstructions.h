@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  ïΩê¨14-19îNÅiì∆ÅjéYã∆ãZèpëççáå§ãÜèä íòçÏå†èäóL
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ënçÏé“ÅFêAé≈èrïv
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  ñ{ÉvÉçÉOÉâÉÄÇÕÅiì∆ÅjéYã∆ãZèpëççáå§ãÜèäÇÃêEàıÇ≈Ç†ÇÈêAé≈èrïvÇ™ënçÏÇµÅC
+ *  Åiì∆ÅjéYã∆ãZèpëççáå§ãÜèäÇ™íòçÏå†ÇèäóLÇ∑ÇÈîÈñßèÓïÒÇ≈Ç∑ÅDíòçÏå†èäóL
+ *  é“Ç…ÇÊÇÈãñâ¬Ç»ÇµÇ…ñ{ÉvÉçÉOÉâÉÄÇégópÅCï°êªÅCâ¸ïœÅCëÊéOé“Ç÷äJé¶Ç∑ÇÈ
+ *  ìôÇÃçsà◊Çã÷é~ÇµÇ‹Ç∑ÅD
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  Ç±ÇÃÉvÉçÉOÉâÉÄÇ…ÇÊÇ¡Çƒê∂Ç∂ÇÈÇ¢Ç©Ç»ÇÈëπäQÇ…ëŒÇµÇƒÇ‡ÅCíòçÏå†èäóLé“Ç®
+ *  ÇÊÇ—ënçÏé“ÇÕê”îCÇïâÇ¢Ç‹ÇπÇÒÅB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.15 2009-03-17 00:42:11 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.16 2009-07-31 07:04:46 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -67,7 +67,7 @@
 namespace TU
 {
 /************************************************************************
-*  $B7?Dj5A(B								*
+*  å^íËã`								*
 ************************************************************************/
 #if defined(SSE2)
   typedef __m128i	mmBase;
@@ -146,7 +146,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $B@)8fL?Na(B								*
+*  êßå‰ñΩóﬂ								*
 ************************************************************************/
   static inline void	mmEmpty()	{_mm_empty();}
     
@@ -278,7 +278,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $BA4MWAG$K(B0$B$r%;%C%H(B							*
+*  ëSóvëfÇ…0ÇÉZÉbÉg							*
 ************************************************************************/
 #if defined(SSE2)
   template <class T> static inline T
@@ -297,7 +297,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $B3FMWAG$r8DJL$K%;%C%H(B							*
+*  äeóvëfÇå¬ï Ç…ÉZÉbÉg							*
 ************************************************************************/
 #if defined(SSE2)
   template <class T> static inline T
@@ -340,7 +340,7 @@ namespace TU
 #endif
 	      
 /************************************************************************
-*  $BA4MWAG$KF10l$NCM$r%;%C%H(B						*
+*  ëSóvëfÇ…ìØàÍÇÃílÇÉZÉbÉg						*
 ************************************************************************/
   template <class T> static T	mmSetAll(typename T::ElmType x);
 #if defined(SSE2)
@@ -380,7 +380,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $BA4MWAG$K(BN$BHVL\$NMWAG$r%;%C%H(B						*
+*  ëSóvëfÇ…Nî‘ñ⁄ÇÃóvëfÇÉZÉbÉg						*
 ************************************************************************/
   template <class T, u_int N> static T	mmSetAll(T x);
 #if defined(SSE)
@@ -401,7 +401,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $B1&C<$K;XDj$5$l$?CM$r!$$=$l0J30$NMWAG$K(B0$B$r%;%C%H(B			*
+*  âEí[Ç…éwíËÇ≥ÇÍÇΩílÇÅCÇªÇÍà»äOÇÃóvëfÇ…0ÇÉZÉbÉg			*
 ************************************************************************/
   template <class T> static T	mmSetRMost(typename T::ElmType x);
 #if defined(SSE2)
@@ -452,7 +452,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $BMWAG$N%7%U%H(B								*
+*  óvëfÇÃÉVÉtÉg								*
 ************************************************************************/
 #if defined(SSE2)
   template <u_int N, class T> static inline mmInt<T>
@@ -491,19 +491,19 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $B:8C<$NMWAG$,1&C<$KMh$k$^$G%7%U%H(B					*
+*  ç∂í[ÇÃóvëfÇ™âEí[Ç…óàÇÈÇ‹Ç≈ÉVÉtÉg					*
 ************************************************************************/
   template <class T> static inline T
   mmShiftLMostToRMost(T x)		{return mmShiftElmR<T::NElms - 1>(x);}
 
 /************************************************************************
-*  $B1&C<$NMWAG$,:8C<$KMh$k$^$G%7%U%H(B					*
+*  âEí[ÇÃóvëfÇ™ç∂í[Ç…óàÇÈÇ‹Ç≈ÉVÉtÉg					*
 ************************************************************************/
   template <class T> static inline T
   mmShiftRMostToLMost(T x)		{return mmShiftElmL<T::NElms - 1>(x);}
 
 /************************************************************************
-*  $B2sE>$H5UE>(B								*
+*  âÒì]Ç∆ãtì]								*
 ************************************************************************/
 #if defined(SSE)
   static inline mmFlt
@@ -545,7 +545,7 @@ namespace TU
 #endif
   
 /************************************************************************
-*  x$B$N1&C<MWAG$r(By$B$N1&C<MWAG$KCV$-49$((B					*
+*  xÇÃâEí[óvëfÇyÇÃâEí[óvëfÇ…íuÇ´ä∑Ç¶					*
 ************************************************************************/
 #if defined(SSE)
   static inline mmFlt
@@ -557,7 +557,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  $B2<H>J,!?>eH>J,$K$D$$$FMWAG$r(B2$B$DJ#@=(B					*
+*  â∫îºï™Å^è„îºï™Ç…Ç¬Ç¢ÇƒóvëfÇ2Ç¬ï°êª					*
 ************************************************************************/
 #if defined(SSE2)
   static inline mmInt8
@@ -624,7 +624,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  1/4$B$:$D$N$=$l$>$l$K$D$$$FMWAG$r(B4$B$DJ#@=(B				*
+*  1/4Ç∏Ç¬ÇÃÇªÇÍÇºÇÍÇ…Ç¬Ç¢ÇƒóvëfÇ4Ç¬ï°êª				*
 ************************************************************************/
 #if defined(SSE2)
   static inline mmInt8
@@ -761,7 +761,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  N$BHVL\$NMWAG$N<h$j=P$7(B						*
+*  Nî‘ñ⁄ÇÃóvëfÇÃéÊÇËèoÇµ						*
 ************************************************************************/
 #if defined(SSE)
 #  if defined(SSE2)
@@ -778,7 +778,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  $B7?JQ49(B								*
+*  å^ïœä∑								*
 ************************************************************************/
   template <class S, class T> static S	mmCvt(T x);
   template <class S, class T> static S	mmCvtH(T x);
@@ -1021,7 +1021,7 @@ namespace TU
 #endif
 
 /************************************************************************
-*  $B%-%c%9%H(B								*
+*  ÉLÉÉÉXÉg								*
 ************************************************************************/
 #if defined(SSE2)
   template <class T> static inline T
@@ -1035,7 +1035,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  $B%^%9%/$N7?JQ49(B							*
+*  É}ÉXÉNÇÃå^ïœä∑							*
 ************************************************************************/
   template <class S, class T> static S	mmCvtMask(T x);
   template <class S, class T> static S	mmCvtMaskH(T x);
@@ -1278,7 +1278,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  $BO@M}1i;;(B								*
+*  ò_óùââéZ								*
 ************************************************************************/
 #if defined(SSE2)
   template <class T> static inline mmInt<T>
@@ -1321,7 +1321,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  $BA*Br(B									*
+*  ëIë									*
 ************************************************************************/
   template <class T> static inline T
   mmSelect(T x, T y, T mask)		{return (mask & x) | mmAndNot(mask, y);}
@@ -1329,7 +1329,7 @@ namespace TU
   mmSelectNot(T x, T y, T mask)		{return mmAndNot(mask, x) | (mask & y);}
 
 /************************************************************************
-*  $B%7%U%H1i;;(B								*
+*  ÉVÉtÉgââéZ								*
 ************************************************************************/
 #if defined(SSE2)
   static inline mmInt16
@@ -1376,7 +1376,7 @@ namespace TU
 #endif
   
 /************************************************************************
-*  $B;MB'1i;;(B								*
+*  élë•ââéZ								*
 ************************************************************************/
 #if defined(SSE2)
   static inline mmInt8
@@ -1479,7 +1479,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  $BC19`%^%$%J%91i;;(B							*
+*  íPçÄÉ}ÉCÉiÉXââéZ							*
 ************************************************************************/
   template <class T> static inline mmInt<T>
   operator -(mmInt<T> x)		{return mmZero<mmInt<T> >() - x;}
@@ -1493,10 +1493,10 @@ namespace TU
 #endif
     
 /************************************************************************
-*  $BHf3S1i;;(B								*
+*  î‰ärââéZ								*
 ************************************************************************/
 #if defined(SSE2)
-// $BEy$7$$(B
+// ìôÇµÇ¢
   static inline mmInt8
   operator ==(mmInt8 x, mmInt8 y)	{return _mm_cmpeq_epi8(x, y);}
   static inline mmUInt8
@@ -1510,7 +1510,7 @@ namespace TU
   static inline mmUInt32
   operator ==(mmUInt32 x, mmUInt32 y)	{return _mm_cmpeq_epi32(x, y);}
 
-// $B$h$jBg$-$$(B
+// ÇÊÇËëÂÇ´Ç¢
   static inline mmInt8
   operator >(mmInt8 x, mmInt8 y)	{return _mm_cmpgt_epi8(x, y);}
   static inline mmInt16
@@ -1518,7 +1518,7 @@ namespace TU
   static inline mmInt32
   operator >(mmInt32 x, mmInt32 y)	{return _mm_cmpgt_epi32(x, y);}
 
-// $B$h$j>.$5$$(B
+// ÇÊÇËè¨Ç≥Ç¢
   static inline mmInt8
   operator <(mmInt8 x, mmInt8 y)	{return _mm_cmplt_epi8(x, y);}
   static inline mmInt16
@@ -1526,7 +1526,7 @@ namespace TU
   static inline mmInt32
   operator <(mmInt32 x, mmInt32 y)	{return _mm_cmplt_epi32(x, y);}
 #else
-// $BEy$7$$(B
+// ìôÇµÇ¢
   static inline mmInt8
   operator ==(mmInt8 x, mmInt8 y)	{return _mm_cmpeq_pi8(x, y);}
   static inline mmUInt8
@@ -1540,7 +1540,7 @@ namespace TU
   static inline mmUInt32
   operator ==(mmUInt32 x, mmUInt32 y)	{return _mm_cmpeq_pi32(x, y);}
 
-// $B$h$jBg$-$$(B
+// ÇÊÇËëÂÇ´Ç¢
   static inline mmInt8
   operator >(mmInt8 x, mmInt8 y)	{return _mm_cmpgt_pi8(x, y);}
   static inline mmInt16
@@ -1548,7 +1548,7 @@ namespace TU
   static inline mmInt32
   operator >(mmInt32 x, mmInt32 y)	{return _mm_cmpgt_pi32(x, y);}
 
-// $B$h$j>.$5$$(B
+// ÇÊÇËè¨Ç≥Ç¢
   static inline mmInt8
   operator <(mmInt8 x, mmInt8 y)	{return _mm_cmpgt_pi8(y, x);}
   static inline mmInt16
@@ -1645,7 +1645,7 @@ namespace TU
 #endif
   
 /************************************************************************
-*  $B$h$j>.$5$$$+Ey$7$$!?$h$jBg$-$$$+Ey$7$$(B				*
+*  ÇÊÇËè¨Ç≥Ç¢Ç©ìôÇµÇ¢Å^ÇÊÇËëÂÇ´Ç¢Ç©ìôÇµÇ¢				*
 ************************************************************************/
   template <class T> static inline mmInt<T>
   operator >=(mmInt<T> x, mmInt<T> y)	{return mmMax(x, y) == x;}
@@ -1653,7 +1653,7 @@ namespace TU
   operator <=(mmInt<T> x, mmInt<T> y)	{return mmMin(x, y) == x;}
     
 /************************************************************************
-*  $B@dBPCM(B								*
+*  ê‚ëŒíl								*
 ************************************************************************/
   template <class T> static inline T
   mmAbs(T x)				{return mmMax(x, -x);}
@@ -1667,7 +1667,7 @@ namespace TU
 #endif
   
 /************************************************************************
-*  $B:9$N@dBPCM(B								*
+*  ç∑ÇÃê‚ëŒíl								*
 ************************************************************************/
   template <class T> static inline T
   mmDiff(T x, T y)			{return mmAbs(x - y);}
@@ -1677,7 +1677,7 @@ namespace TU
   mmDiff(mmUInt16 x, mmUInt16 y)	{return (x - y) | (y - x);}
   
 /************************************************************************
-*  $BJ?6Q(B									*
+*  ïΩãœ									*
 ************************************************************************/
   template <class T> static inline mmInt<T>
   mmAvg(mmInt<T> x, mmInt<T> y)		{return (x + y) >> 1;}
@@ -1694,13 +1694,13 @@ namespace TU
 #endif
   
 /************************************************************************
-*  $B:9$NH>J,(B								*
+*  ç∑ÇÃîºï™								*
 ************************************************************************/
   template <class T> static inline mmInt<T>
   mmSubAvg(mmInt<T> x, mmInt<T> y)	{return (x - y) >> 1;}
   
 /************************************************************************
-*  $BFb@Q(B									*
+*  ì‡êœ									*
 ************************************************************************/
 #if defined(SSE3)
   static inline mmFlt

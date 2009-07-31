@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.cc,v 1.12 2008-10-05 23:25:16 ueshiba Exp $
+ *  $Id: Camera.cc,v 1.13 2009-07-31 07:04:44 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -109,10 +109,10 @@ Camera::intrinsic()
 /************************************************************************
 *  class Camera::Intrinsic						*
 ************************************************************************/
-//! canonical$B:BI87O$K$*$$$FI=8=$5$l$?Ej1FE@$N2hA|:BI87O$K$*$1$k0LCV$r5a$a$k!%(B
+//! canonicalÀ•WŒn‚É‚¨‚¢‚Ä•\Œ»‚³‚ê‚½“Š‰e“_‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’u‚ğ‹‚ß‚éD
 /*!
-  \param x	canonical$B2hA|:BI8$K$*$1$kEj1FE@$N(B2$B<!850LCV(B
-  \return	x$B$N2hA|:BI87O$K$*$1$k0LCV!$$9$J$o$A(B
+  \param x	canonical‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
+  \return	x‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’uC‚·‚È‚í‚¿
 		\f$
 		\TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray =
 		\TUvec{K}{}
@@ -126,13 +126,13 @@ Camera::Intrinsic::operator ()(const Point2d& x) const
 		   k() * x[1] + principal()[1]);
 }
 
-//! $BFbIt%Q%i%a!<%?$K4X$9$kEj1FE@$N2hA|:BI8$N(B1$B3,HyJ,$r5a$a$k!%(B
+//! “à•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é“Š‰e“_‚Ì‰æ‘œÀ•W‚Ì1ŠK”÷•ª‚ğ‹‚ß‚éD
 /*!
-  $B$?$@$7!$%"%9%Z%/%HHf(Ba$B$H>GE@5wN%(Bk$B$N@Q(Bak, $BHsD>8rOD$_(Bs$B$H>GE@5wN%(Bk$B$N@Q(Bsk$B$r$=$l$>$l(B
-  $BBh(B4, $BBh(B5$BHVL\$NFbIt%Q%i%a!<%?$H$7$F07$$!$(Bk, u0, v0, ak, sk$B$N(B5$B%Q%i%a!<%?$K4X$9$k(B
-  1$B3,HyJ,$H$7$F%d%3%S9TNs$r7W;;$9$k!%(B
-  \param x	canonical$B2hA|:BI8$K$*$1$kEj1FE@$N(B2$B<!850LCV(B
-  \return	$BEj1FE@$N(Bcanonical$B2hA|:BI8$N(B1$B3,HyJ,$rI=$9(B2x5$B%d%3%S9TNs!$$9$J$o$A(B
+  ‚½‚¾‚µCƒAƒXƒyƒNƒg”äa‚ÆÅ“_‹——£k‚ÌÏak, ”ñ’¼Œğ˜c‚İs‚ÆÅ“_‹——£k‚ÌÏsk‚ğ‚»‚ê‚¼‚ê
+  ‘æ4, ‘æ5”Ô–Ú‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚Æ‚µ‚Äˆµ‚¢Ck, u0, v0, ak, sk‚Ì5ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é
+  1ŠK”÷•ª‚Æ‚µ‚Äƒ„ƒRƒrs—ñ‚ğŒvZ‚·‚éD
+  \param x	canonical‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
+  \return	“Š‰e“_‚Ìcanonical‰æ‘œÀ•W‚Ì1ŠK”÷•ª‚ğ•\‚·2x5ƒ„ƒRƒrs—ñC‚·‚È‚í‚¿
 		\f$
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}} =
 		\TUbeginarray{ccccc}
@@ -151,10 +151,10 @@ Camera::Intrinsic::jacobianK(const Point2d& x) const
     return J;
 }
 
-//! canonical$B2hA|:BI8$K4X$9$kEj1FE@$N2hA|:BI8$N(B1$B3,HyJ,$r5a$a$k!%(B
+//! canonical‰æ‘œÀ•W‚ÉŠÖ‚·‚é“Š‰e“_‚Ì‰æ‘œÀ•W‚Ì1ŠK”÷•ª‚ğ‹‚ß‚éD
 /*!
-  \param x	canonical$B2hA|:BI8$K$*$1$kEj1FE@$N(B2$B<!850LCV(B
-  \return	$BEj1FE@$N2hA|:BI8$N(B1$B3,HyJ,$rI=$9(B2x2$B%d%3%S9TNs!$$9$J$o$A(B
+  \param x	canonical‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
+  \return	“Š‰e“_‚Ì‰æ‘œÀ•W‚Ì1ŠK”÷•ª‚ğ•\‚·2x2ƒ„ƒRƒrs—ñC‚·‚È‚í‚¿
 		\f$
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}} =
 		\TUbeginarray{cc} ak & sk \\ & k \TUendarray
@@ -171,10 +171,10 @@ Camera::Intrinsic::jacobianXC(const Point2d& x) const
     return J;
 }
 
-//! $B2hA|:BI8$K$*$1$kEj1FE@$N(B2$B<!850LCV$r(Bcanonical$B2hA|:BI87O$KD>$9!%(B
+//! ‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u‚ğcanonical‰æ‘œÀ•WŒn‚É’¼‚·D
 /*!
-  \param u	$B2hA|:BI87O$K$*$1$kEj1FE@$N(B2$B<!850LCV(B
-  \return	canonical$B2hA|:BI87O$K$*$1$k(Bu$B$N(B2$B<!850LCV!$$9$J$o$A(B
+  \param u	‰æ‘œÀ•WŒn‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
+  \return	canonical‰æ‘œÀ•WŒn‚É‚¨‚¯‚éu‚Ì2ŸŒ³ˆÊ’uC‚·‚È‚í‚¿
 		\f$
 		\TUbeginarray{c} \TUvec{x}{c} \\ 1 \TUendarray =
 		\TUinv{K}{}
@@ -189,9 +189,9 @@ Camera::Intrinsic::xcFromU(const Point2d& u) const
 		   (u[1] - principal()[1]) / k());
 }
 
-//! $BFbIt%Q%i%a!<%?9TNs$rJV$9!%(B
+//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚ğ•Ô‚·D
 /*!
-  \return	3x3$BFbIt%Q%i%a!<%?9TNs!$$9$J$o$A(B
+  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñC‚·‚È‚í‚¿
 		\f$
 		\TUvec{K}{} =
 		\TUbeginarray{ccc}
@@ -213,9 +213,9 @@ Camera::Intrinsic::K() const
     return mat;
 }
 
-//! $BFbIt%Q%i%a!<%?9TNs$NE>CV$rJV$9!%(B
+//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’u‚ğ•Ô‚·D
 /*!
-  \return	3x3$BFbIt%Q%i%a!<%?9TNs$NE>CV!$$9$J$o$A(B
+  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’uC‚·‚È‚í‚¿
 		\f$
 		\TUtvec{K}{} =
 		\TUbeginarray{ccc}
@@ -237,9 +237,9 @@ Camera::Intrinsic::Kt() const
     return mat;
 }
 
-//! $BFbIt%Q%i%a!<%?9TNs$N5U9TNs$rJV$9!%(B
+//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì‹ts—ñ‚ğ•Ô‚·D
 /*!
-  \return	3x3$BFbIt%Q%i%a!<%?9TNs$N5U9TNs!$$9$J$o$A(B
+  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì‹ts—ñC‚·‚È‚í‚¿
 		\f$
 		\TUinv{K}{} =
 		\TUbeginarray{ccc}
@@ -262,9 +262,9 @@ Camera::Intrinsic::Kinv() const
     return mat;
 }
 
-//! $BFbIt%Q%i%a!<%?9TNs$NE>CV$N5U9TNs$rJV$9!%(B
+//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’u‚Ì‹ts—ñ‚ğ•Ô‚·D
 /*!
-  \return	3x3$BFbIt%Q%i%a!<%?9TNs$NE>CV$N5U9TNs!$$9$J$o$A(B
+  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’u‚Ì‹ts—ñC‚·‚È‚í‚¿
 		\f$
 		\TUtinv{K}{} =
 		\TUbeginarray{ccc}
@@ -287,9 +287,9 @@ Camera::Intrinsic::Ktinv() const
     return mat;
 }
 
-//! $BFbIt%Q%i%a!<%?$N<+M3EY$rJV$9!%(B
+//! “à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
 /*!
-  \return	$BFbIt%Q%i%a!<%?$N<+M3EY!$$9$J$o$A(B5
+  \return	“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“xC‚·‚È‚í‚¿5
 */
 u_int
 Camera::Intrinsic::dof() const
@@ -297,9 +297,9 @@ Camera::Intrinsic::dof() const
     return 5;
 }
 
-//! $B%"%9%Z%/%HHf$rJV$9!%(B
+//! ƒAƒXƒyƒNƒg”ä‚ğ•Ô‚·D
 /*!
-  \return	$B%"%9%Z%/%HHf(B
+  \return	ƒAƒXƒyƒNƒg”ä
 */
 double
 Camera::Intrinsic::aspect() const
@@ -307,9 +307,9 @@ Camera::Intrinsic::aspect() const
     return _k00 / k();
 }
 
-//! $BHsD>8rOD$_$rJV$9!%(B
+//! ”ñ’¼Œğ˜c‚İ‚ğ•Ô‚·D
 /*!
-  \return	$BHsD>8rOD$_(B
+  \return	”ñ’¼Œğ˜c‚İ
 */
 double
 Camera::Intrinsic::skew() const
@@ -317,10 +317,10 @@ Camera::Intrinsic::skew() const
     return _k01 / k();
 }
 
-//! $B>GE@5wN%$r@_Dj$9$k!%(B
+//! Å“_‹——£‚ğİ’è‚·‚éD
 /*!
-  \param kk	$B>GE@5wN%(B
-  \return	$B$3$NFbIt%Q%i%a!<%?(B
+  \param kk	Å“_‹——£
+  \return	‚±‚Ì“à•”ƒpƒ‰ƒ[ƒ^
 */
 CameraBase::Intrinsic&
 Camera::Intrinsic::setFocalLength(double kk)
@@ -330,10 +330,10 @@ Camera::Intrinsic::setFocalLength(double kk)
     return CameraWithFocalLength::Intrinsic::setFocalLength(kk);
 }
 
-//! $BM?$($i$l$?FbIt%Q%i%a!<%?9TNs$+$iFbIt%Q%i%a!<%?$r@_Dj$9$k!%(B
+//! —^‚¦‚ç‚ê‚½“à•”ƒpƒ‰ƒ[ƒ^s—ñ‚©‚ç“à•”ƒpƒ‰ƒ[ƒ^‚ğİ’è‚·‚éD
 /*!
-  \param K	3x3$BFbIt%Q%i%a!<%?9TNs(B
-  \return	$B$3$NFbIt%Q%i%a!<%?(B
+  \param K	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ
+  \return	‚±‚Ì“à•”ƒpƒ‰ƒ[ƒ^
 */
 CameraBase::Intrinsic&
 Camera::Intrinsic::setIntrinsic(const Matrix33d& K)
@@ -346,10 +346,10 @@ Camera::Intrinsic::setIntrinsic(const Matrix33d& K)
     return *this;
 }
 
-//! $B%"%9%Z%/%HHf$r@_Dj$9$k!%(B
+//! ƒAƒXƒyƒNƒg”ä‚ğİ’è‚·‚éD
 /*!
-  \param aspect	$B%"%9%Z%/%HHf(B
-  \return	$B$3$NFbIt%Q%i%a!<%?(B
+  \param aspect	ƒAƒXƒyƒNƒg”ä
+  \return	‚±‚Ì“à•”ƒpƒ‰ƒ[ƒ^
 */
 CameraBase::Intrinsic&
 Camera::Intrinsic::setAspect(double aspect)
@@ -358,10 +358,10 @@ Camera::Intrinsic::setAspect(double aspect)
     return *this;
 }
 
-//! $BHsD>8r@-OD$_$r@_Dj$9$k!%(B
+//! ”ñ’¼Œğ«˜c‚İ‚ğİ’è‚·‚éD
 /*!
-  \param skew	$BHsD>8r@-OD$_(B
-  \return	$B$3$NFbIt%Q%i%a!<%?(B
+  \param skew	”ñ’¼Œğ«˜c‚İ
+  \return	‚±‚Ì“à•”ƒpƒ‰ƒ[ƒ^
 */
 CameraBase::Intrinsic&
 Camera::Intrinsic::setSkew(double skew)
@@ -370,10 +370,10 @@ Camera::Intrinsic::setSkew(double skew)
     return *this;
 }
 
-//! $BFbIt%Q%i%a!<%?$r;XDj$5$l$?NL$@$199?7$9$k!%(B
+//! “à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
 /*!
-  \param dp	$B99?7NL$rI=$9(B#dof()$B<!85%Y%/%H%k(B
-  \return	$B$3$NFbIt%Q%i%a!<%?(B
+  \param dp	XV—Ê‚ğ•\‚·#dof()ŸŒ³ƒxƒNƒgƒ‹
+  \return	‚±‚Ì“à•”ƒpƒ‰ƒ[ƒ^
 */
 CameraBase::Intrinsic&
 Camera::Intrinsic::update(const Vector<double>& dp)
@@ -384,10 +384,10 @@ Camera::Intrinsic::update(const Vector<double>& dp)
     return *this;
 }
 
-//! $BF~NO%9%H%j!<%`$+$i%+%a%i$NFbIt%Q%i%a!<%?$rFI$_9~$`(B(ASCII)$B!%(B
+//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒJƒƒ‰‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚Ş(ASCII)D
 /*!
-  \param in	$BF~NO%9%H%j!<%`(B
-  \return	in$B$G;XDj$7$?F~NO%9%H%j!<%`(B
+  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
+  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
 */
 std::istream&
 Camera::Intrinsic::get(std::istream& in)
@@ -400,10 +400,10 @@ Camera::Intrinsic::get(std::istream& in)
     return in;
 }
 
-//! $B=PNO%9%H%j!<%`$K%+%a%i$NFbIt%Q%i%a!<%?$r=q$-=P$9(B(ASCII)$B!%(B
+//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒJƒƒ‰‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğ‘‚«o‚·(ASCII)D
 /*!
-  \param out	$B=PNO%9%H%j!<%`(B
-  \return	out$B$G;XDj$7$?=PNO%9%H%j!<%`(B
+  \param out	o—ÍƒXƒgƒŠ[ƒ€
+  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
 */
 std::ostream&
 Camera::Intrinsic::put(std::ostream& out) const
