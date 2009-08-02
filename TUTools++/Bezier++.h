@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Bezier++.h,v 1.13 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.14 2009-08-02 23:38:22 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -77,7 +77,7 @@ BezierCurve<C>::operator ()(T t) const
     T		s = 1.0 - t, fact = 1.0;
     int		nCi = 1;
     C		b((*this)[0] * s);
-    for (int i = 1; i < degree(); ++i)
+    for (u_int i = 1; i < degree(); ++i)
     {
 	fact *= t;
       /* 
@@ -99,8 +99,8 @@ BezierCurve<C>::deCasteljau(T t, u_int r) const
 
     const T	s = 1.0 - t;
     Array<C>	b_tmp(*this);
-    for (int k = 1; k <= r; ++k)
-	for (int i = 0; i <= degree() - k; ++i)
+    for (u_int k = 1; k <= r; ++k)
+	for (u_int i = 0; i <= degree() - k; ++i)
 	    (b_tmp[i] *= s) += t * b_tmp[i+1];
     b_tmp.resize(degree() - r + 1);
     return b_tmp;
@@ -112,7 +112,7 @@ BezierCurve<C>::elevateDegree()
     Array<C>	b_tmp(*this);
     Array<C>::resize(degree() + 2);
     (*this)[0] = b_tmp[0];
-    for (int i = 1; i < degree(); ++i)
+    for (u_int i = 1; i < degree(); ++i)
     {
 	T	alpha = T(i) / T(degree());
 	
@@ -175,8 +175,8 @@ template <class C>
 BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
     :Array2<Curve>(b.nrow(), b.ncol())
 {
-    for (int j = 0; j <= vDegree(); ++j)
-	for (int i = 0; i <= uDegree(); ++i)
+    for (u_int j = 0; j <= vDegree(); ++j)
+	for (u_int i = 0; i <= uDegree(); ++i)
 	    (*this)[j][i] = b[j][i];
 }
 
@@ -184,7 +184,7 @@ template <class C> C
 BezierSurface<C>::operator ()(T u, T v) const
 {
     BezierCurve<C>	vCurve(vDegree());
-    for (int j = 0; j <= vDegree(); ++j)
+    for (u_int j = 0; j <= vDegree(); ++j)
 	vCurve[j] = (*this)[j](u);
     return vCurve(v);
 }
