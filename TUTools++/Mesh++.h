@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mesh++.h,v 1.17 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.18 2009-08-04 23:27:14 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
@@ -95,9 +95,9 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 
 	F&	f()				const	{return *_f;}
 	V&	v()				const	{return _f->v(_e);}
-	int	operator ==(const Edge& edge)	const	;
-	int	operator !=(const Edge& edge)	const	;
-	int	commonVertex(const Edge& edge)	const	;
+	bool	operator ==(const Edge& edge)	const	;
+	bool	operator !=(const Edge& edge)	const	;
+	bool	commonVertex(const Edge& edge)	const	;
 	u_int	valence()			const	;
 	Edge&	operator ++()				;
 	Edge&	operator --()				;
@@ -107,7 +107,7 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 	E	conj()				const	;
 
       protected:
-	int	e()				const	{return _e;}
+	u_int	e()				const	{return _e;}
 	
       private:
 	friend class 	Topology;	// Allow access to pair().
@@ -118,7 +118,7 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 	void	replaceVertex(V* v)			const	;
 	
 	F*	_f;		// parent face
-	int	_e;		// my edge number
+	u_int	_e;		// my edge number
     };
 
     class Face
@@ -127,12 +127,12 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 #ifndef TUMeshPP_DEBUG
 	Face(V* v[])					;
 #else
-	Face(V* v[], int fn)				;
+	Face(V* v[], u_int fn)				;
 #endif
 	~Face()						{}
 
-	F&		f(int e)		const	{return *_f[e];}
-	V&		v(int e)		const	{return *_v[e];}
+	F&		f(u_int e)		const	{return *_f[e];}
+	V&		v(u_int e)		const	{return *_v[e];}
 	Vector3f	centroid()		const	;
 	
 	void*		operator new(size_t, void* p)	{return p;}
@@ -144,7 +144,7 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 	V*		_v[M];		// _v[e] : starting vertex of e
 #ifdef TUMeshPP_DEBUG
       public:
-	const int	fnum;
+	const u_int	fnum;
 #endif
     };
 
@@ -347,12 +347,12 @@ Mesh<V, E, F, M>::get(std::istream& in)
     while (in >> c && c == 'F')		// Read faces.
     {
 	char	token[64];
-	int	fnum;
+	u_int	fnum;
 	in.width(sizeof(token));
 	in >> token >> fnum;		// Skip face number.
 
 	V*	v[M];
-	int	e, vnum[M];
+	u_int	e, vnum[M];
 	for (e = 0; e < M; ++e)
 	{
 	    in >> vnum[e];		// Read vertex numbers of this face.
@@ -367,7 +367,7 @@ Mesh<V, E, F, M>::get(std::istream& in)
 	    topology[vnum[e]].push_front(*new FaceNode(f));
     }
     
-    for (int n = 0; n < topology.dim(); ++n)
+    for (u_int n = 0; n < topology.dim(); ++n)
     {
 	topology[n].pair();
 	while (!topology[n].empty())
@@ -382,18 +382,18 @@ Mesh<V, E, F, M>::get(std::istream& in)
 template <class V, class E, class F, u_int M> std::ostream&
 Mesh<V, E, F, M>::put(std::ostream& out) const
 {
-    std::map<V*, int>	dict;
-    int					vnum = 1;
+    std::map<V*, u_int>	dict;
+    u_int		vnum = 1;
     for (typename Allocator<V>::Enumerator vertices(_v); vertices; ++vertices)
     {
 	dict[vertices] = vnum;
 	out << "Vertex " << vnum++ << ' ' << *vertices;
     }
-    int		fnum = 1;
+    u_int		fnum = 1;
     for (typename Allocator<F>::Enumerator faces(_f); faces; ++faces)
     {
 	out << "Face " << fnum++;
-	for (int e = 0; e < M; ++e)
+	for (u_int e = 0; e < M; ++e)
 	    out << ' ' << dict[&(faces->v(e))];
 	out << std::endl;
     }
@@ -410,7 +410,7 @@ Mesh<V, E, F, M>::boundingBox() const
     bbox.xmax = bbox.ymax = bbox.zmax = FLT_MIN;
     
     for (typename Allocator<F>::Enumerator faces(_f); faces; ++faces)
-	for (int e = 0; e < M; ++e)
+	for (u_int e = 0; e < M; ++e)
 	{
 	    if (faces->v(e)[0] <= bbox.xmin)
 		bbox.xmin = faces->v(e)[0];
@@ -436,7 +436,7 @@ Mesh<V, E, F, M>::clean()
     
     set<V*>	verticesUsed;
     for (typename Allocator<F>::Enumerator faces(_f); faces; ++faces)
-	for (int e = 0; e < M; ++e)
+	for (u_int e = 0; e < M; ++e)
 	    verticesUsed.insert(&(faces->v(e)));
     for (typename Allocator<V>::Enumerator vertices(_v); vertices; ++vertices)
     {
@@ -505,29 +505,29 @@ Mesh<V, E, F, M>::Topology::get(std::istream& in)
 /************************************************************************
 *  class Mesh<V, E, F, M>::Edge						*
 ************************************************************************/
-template <class V, class E, class F, u_int M> inline int
+template <class V, class E, class F, u_int M> inline bool
 Mesh<V, E, F, M>::Edge::operator ==(const Edge& edge) const
 {
     return (_e == edge._e) && (_f == edge._f);
 }
 
-template <class V, class E, class F, u_int M> inline int
+template <class V, class E, class F, u_int M> inline bool
 Mesh<V, E, F, M>::Edge::operator !=(const Edge& edge) const
 {
     return !(*this == edge);
 }
 
-template <class V, class E, class F, u_int M> int
+template <class V, class E, class F, u_int M> bool
 Mesh<V, E, F, M>::Edge::commonVertex(const Edge& edge) const
 {
     Edge	tmp(*this);
     do
     {
 	if (tmp == edge)
-	    return 1;
+	    return true;
     } while (~(--tmp) != *this);
     
-    return 0;
+    return false;
 }
 
 template <class V, class E, class F, u_int M> u_int
@@ -547,8 +547,10 @@ template <class V, class E, class F, u_int M>
 inline typename Mesh<V, E, F, M>::Edge&
 Mesh<V, E, F, M>::Edge::operator ++()
 {
-    if (++_e >= M)
-	_e -= M;
+    if (_e == M - 1)
+	_e = 0;
+    else
+	++_e;
     return *this;
 }
 
@@ -556,8 +558,10 @@ template <class V, class E, class F, u_int M>
 inline typename Mesh<V, E, F, M>::Edge&
 Mesh<V, E, F, M>::Edge::operator --()
 {
-    if (--_e < 0)
-	_e += M;
+    if (_e == 0)
+	_e = M - 1;
+    else
+	--_e;
     return *this;
 }
 
@@ -621,7 +625,7 @@ template <class V, class E, class F, u_int M>
 #ifndef TUMeshPP_DEBUG
 Mesh<V, E, F, M>::Face::Face(V* v[])
 #else
-Mesh<V, E, F, M>::Face::Face(V* v[], int fn)
+Mesh<V, E, F, M>::Face::Face(V* v[], u_int fn)
     :fnum(fn)
 #endif
 {
