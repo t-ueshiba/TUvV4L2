@@ -1,31 +1,43 @@
 #
-#  $Id: Makefile,v 1.12 2009-07-08 06:37:32 ueshiba Exp $
+#  $Id: Makefile,v 1.13 2009-08-06 02:15:15 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(LOCALDIR)/include -I..
+INCDIRS		= -I$(PREFIX)/include
 
-PROGRAM		= test1394camera
-#LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell gtk-config --libs)
+PROGRAM		= $(shell basename $(PWD))
 LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell pkg-config gtk+-2.0 --libs)
 ifeq ($(OSTYPE), darwin)
-  LIBS	       += -framework IOKit -framework CoreFoundation
+  LIBS	       +=
+#  LIBS	       += -framework IOKit -framework CoreFoundation
 endif
 
-CPPFLAGS	= #-DUSE_RAWISO
-CFLAGS		= -O
-#CCFLAGS		= -O $(shell gtk-config --cflags)
-CCFLAGS		= -O $(shell pkg-config gtk+-2.0 --cflags)
-#CCFLAGS	= -O3 -parallel
-LDFLAGS		= $(CCFLAGS) -L$(LIBDIR)
+CPPFLAGS	=
+CFLAGS		= -g
+NVCCFLAGS	= -g
+ifeq ($(CCC), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  ifeq ($(OSTYPE), darwin)
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
+  else
+    CPPFLAGS   += -DSSE3
+    CFLAGS     += -xSSE3
+  endif
+endif
+CFLAGS	       += $(shell pkg-config gtk+-2.0 --cflags)
+CCFLAGS		= $(CFLAGS)
+
 LINKER		= $(CCC)
 
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Ieee1394++.h \
@@ -49,7 +61,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.12 $	|		\
+REV		= $(shell echo $Revision: 1.13 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -59,6 +71,7 @@ REV		= $(shell echo $Revision: 1.12 $	|		\
 		  }')
 
 include $(PROJECT)/lib/p.mk
+
 ###
 My1394Camera.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
