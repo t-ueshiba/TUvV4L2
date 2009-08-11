@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.5 2009-07-31 07:54:19 ueshiba Exp $
+ *  $Id: Movie.h,v 1.6 2009-08-11 00:44:57 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -383,6 +383,14 @@ Movie<T>::restore(std::istream& in)
 template <class T> ImageBase::Type
 Movie<T>::restoreHeader(std::istream& in)
 {
+    using namespace	std;
+    
+    char	c;
+    if (!in.get(c))
+	return ImageBase::DEFAULT;
+    if (c != 'M')
+	throw runtime_error("TU::Movie<T>::restoreHeader: not a movie file!!");
+    
     u_int	nv;
     in >> nv >> skipl;
     _views.resize(nv);
@@ -462,7 +470,7 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
 {
     using namespace	std;
     
-    out << nviews() << endl;
+    out << 'M' << nviews() << endl;
     for (u_int i = 0; i < nviews(); ++i)
 	type = _views[i].saveHeader(out, type);
     return type;
