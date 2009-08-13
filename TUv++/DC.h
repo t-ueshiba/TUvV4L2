@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: DC.h,v 1.12 2009-03-22 23:38:29 ueshiba Exp $  
+ *  $Id: DC.h,v 1.13 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -48,9 +48,9 @@ class DC
     enum PointStyle	{DOT, CROSS, CIRCLE};
     
   public:
-    DC(u_int width, u_int height)
+    DC(u_int width, u_int height, u_int mul, u_int div)
 	:_width(width), _height(height),
-	 _mul(1), _div(1), _offset(0, 0),
+	 _mul(mul), _div(div), _offset(0, 0),
 	_layer(UNDERLAY), _pointStyle(DOT)		{}
     virtual		~DC()				;
     

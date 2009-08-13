@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.cc,v 1.8 2009-03-22 23:50:51 ueshiba Exp $
+ *  $Id: XvDC.cc,v 1.9 2009-08-13 23:03:37 ueshiba Exp $
  */
 #include "TU/v/XvDC.h"
 #include <stdexcept>
@@ -79,8 +79,9 @@ XvDC::createXvImage(const Image<S>& image)
     }
 }
 
-XvDC::XvDC(CanvasPane& parentCanvasPane, u_int width, u_int height)
-    :ShmDC(parentCanvasPane, width, height),
+XvDC::XvDC(CanvasPane& parentCanvasPane,
+	   u_int width, u_int height, u_int mul, u_int div)
+    :ShmDC(parentCanvasPane, width, height, mul, div),
      _port(~0), _xvimage(0)
 {
     u_int		nadaptors;

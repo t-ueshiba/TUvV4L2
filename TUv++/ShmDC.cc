@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ShmDC.cc,v 1.5 2008-09-10 05:12:16 ueshiba Exp $  
+ *  $Id: ShmDC.cc,v 1.6 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #include "TU/v/ShmDC.h"
 #include <stdexcept>
@@ -40,8 +40,9 @@ namespace v
 /************************************************************************
 *  class ShmDC								*
 ************************************************************************/
-ShmDC::ShmDC(CanvasPane& parentCanvasPane, u_int width, u_int height)
-    :CanvasPaneDC(parentCanvasPane, width, height),
+ShmDC::ShmDC(CanvasPane& parentCanvasPane, u_int width, u_int height,
+	     u_int mul, u_int div)
+    :CanvasPaneDC(parentCanvasPane, width, height, mul, div),
      _xShmInfo(), _xShmSize(0), _xShmAvailable(true)
 {
     int	ignore;

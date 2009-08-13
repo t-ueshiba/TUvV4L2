@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC3.h,v 1.5 2008-09-10 05:12:00 ueshiba Exp $  
+ *  $Id: CanvasPaneDC3.h,v 1.6 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #ifndef __TUvCanvasPaneDC3_h
 #define __TUvCanvasPaneDC3_h
@@ -44,7 +44,8 @@ class CanvasPaneDC3 : virtual public CanvasPaneDC, public DC3
 {
   public:
     CanvasPaneDC3(CanvasPane& parentCanvasPane,
-		  u_int width=0, u_int height=0)			;
+		  u_int width=0, u_int height=0,
+		  u_int mul=1, u_int div=1)				;
     virtual		~CanvasPaneDC3()				;
     virtual void	callback(CmdId id, CmdVal val)			;
 

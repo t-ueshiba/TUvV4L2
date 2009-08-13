@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.h,v 1.5 2009-03-22 23:50:51 ueshiba Exp $
+ *  $Id: XvDC.h,v 1.6 2009-08-13 23:03:37 ueshiba Exp $
  */
 #ifndef __TUvXvDC_h
 #define __TUvXvDC_h
@@ -43,7 +43,8 @@ namespace v
 class XvDC : public ShmDC, public List<XvDC>::Node
 {
   public:
-    XvDC(CanvasPane& parentCanvasPane, u_int width=0, u_int height=0)	;
+    XvDC(CanvasPane& parentCanvasPane,
+	 u_int width=0, u_int height=0, u_int mul=1, u_int div=1)	;
     virtual		~XvDC()						;
 
     virtual DC&		operator <<(const Point2<int>& p)		;

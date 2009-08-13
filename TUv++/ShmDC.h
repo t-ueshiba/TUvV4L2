@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ShmDC.h,v 1.5 2008-09-10 05:12:16 ueshiba Exp $  
+ *  $Id: ShmDC.h,v 1.6 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #ifndef __TUvShmDC_h
 #define __TUvShmDC_h
@@ -43,7 +43,8 @@ namespace v
 class ShmDC : public CanvasPaneDC
 {
   public:
-    ShmDC(CanvasPane& parentCanvasPane, u_int width=0, u_int height=0)	;
+    ShmDC(CanvasPane& parentCanvasPane, u_int width=0, u_int height=0,
+	  u_int mul=1, u_int div=1)					;
     virtual		~ShmDC()					;
 
   protected:

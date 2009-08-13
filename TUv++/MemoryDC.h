@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: MemoryDC.h,v 1.6 2008-09-10 05:12:11 ueshiba Exp $  
+ *  $Id: MemoryDC.h,v 1.7 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #ifndef __TUvMemoryDC_h
 #define __TUvMemoryDC_h
@@ -43,7 +43,8 @@ namespace v
 class MemoryDC : public XDC
 {
   public:
-    MemoryDC(Colormap& colormap, u_int width, u_int height)		;
+    MemoryDC(Colormap& colormap,
+	     u_int width, u_int height, u_int mul=1, u_int div=1)	;
     virtual		~MemoryDC()					;
 
     DC&			setSize(u_int width, u_int height,

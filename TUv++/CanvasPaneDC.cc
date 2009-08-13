@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC.cc,v 1.10 2009-03-03 00:59:47 ueshiba Exp $  
+ *  $Id: CanvasPaneDC.cc,v 1.11 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #include "TU/v/CanvasPaneDC.h"
 #include "vCanvas_.h"
@@ -155,10 +155,11 @@ CBcanvasPaneDC(::Widget, XtPointer client_data, XtPointer)
  *  Public member functions
  */
 CanvasPaneDC::CanvasPaneDC(CanvasPane& parentCanvasPane,
-			   u_int w, u_int h)
+			   u_int w, u_int h, u_int mul, u_int div)
     :Object(parentCanvasPane),
      XDC(w != 0 ? w : parentCanvasPane.widget().width(),
 	 h != 0 ? h : parentCanvasPane.widget().height(),
+	 mul, div,
 	 window().colormap(),
 	 XtAllocateGC(window().widget(), 0, 0, 0, 0, 0)),
      _widget(XtVaCreateManagedWidget("TUvCanvasPaneDC",	   // widget name

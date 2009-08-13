@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC3.cc,v 1.8 2008-09-10 05:11:59 ueshiba Exp $  
+ *  $Id: CanvasPaneDC3.cc,v 1.9 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #include "TU/v/CanvasPaneDC3.h"
 #include <X11/keysym.h>
@@ -40,8 +40,9 @@ namespace v
 /*
  *  Public member functions
  */
-CanvasPaneDC3::CanvasPaneDC3(CanvasPane& parentCanvasPane, u_int w, u_int h)
-    :CanvasPaneDC(parentCanvasPane, w, h),
+CanvasPaneDC3::CanvasPaneDC3(CanvasPane& parentCanvasPane, u_int w, u_int h,
+			     u_int mul, u_int div)
+    :CanvasPaneDC(parentCanvasPane, w, h, mul, div),
      DC3(DC3::X, 128.0)
 {
 }
