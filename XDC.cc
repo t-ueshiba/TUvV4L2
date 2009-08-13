@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.cc,v 1.11 2008-09-10 05:12:21 ueshiba Exp $  
+ *  $Id: XDC.cc,v 1.12 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -554,8 +554,9 @@ XDC::dump(std::ostream& out) const
 /*
  *  Protected member functions
  */
-XDC::XDC(u_int width, u_int height, Colormap& colormap, GC gc)
-    :DC(width, height),
+XDC::XDC(u_int width, u_int height, u_int mul, u_int div,
+	 Colormap& colormap, GC gc)
+    :DC(width, height, mul, div),
      _colormap(colormap), _gc(gc), _buff(0), _ximage(0)
 {
     setLayer(getLayer());	// Set plane mask of GC correctly.

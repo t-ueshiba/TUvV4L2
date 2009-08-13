@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC.h,v 1.6 2008-09-10 05:11:59 ueshiba Exp $  
+ *  $Id: CanvasPaneDC.h,v 1.7 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #ifndef __TUvCanvasPaneDC_h
 #define __TUvCanvasPaneDC_h
@@ -45,7 +45,8 @@ class CanvasPaneDC : public Object, public XDC
 {
   public:
     CanvasPaneDC(CanvasPane& parentCanvasPane,
-		 u_int width=0, u_int height=0)				;
+		 u_int width=0, u_int height=0,
+		 u_int mul=1, u_int div=1)				;
     virtual		~CanvasPaneDC()					;
     
     virtual const Widget&	widget()			const	;

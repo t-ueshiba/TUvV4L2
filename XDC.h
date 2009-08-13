@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.h,v 1.11 2009-03-22 23:38:29 ueshiba Exp $  
+ *  $Id: XDC.h,v 1.12 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #ifndef __TUvXDC_h
 #define __TUvXDC_h
@@ -129,7 +129,8 @@ class XDC : public DC
     void		dump(std::ostream& out)			const	;
 
   protected:
-    XDC(u_int width, u_int height, Colormap& colormap, GC gc)		;
+    XDC(u_int width, u_int height, u_int mul, u_int div,
+	Colormap& colormap, GC gc)					;
     virtual		~XDC()						;
 
     virtual Drawable	drawable()				const	= 0;

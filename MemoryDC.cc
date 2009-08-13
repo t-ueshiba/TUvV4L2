@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: MemoryDC.cc,v 1.4 2008-09-10 05:12:11 ueshiba Exp $  
+ *  $Id: MemoryDC.cc,v 1.5 2009-08-13 23:04:17 ueshiba Exp $  
  */
 #include "TU/v/MemoryDC.h"
 
@@ -39,8 +39,8 @@ namespace v
 /*
  *  Public member functions
  */
-MemoryDC::MemoryDC(Colormap& cmap, u_int w, u_int h)
-    :XDC(w, h, cmap, XDefaultGC(cmap.display(), cmap.vinfo().screen)),
+MemoryDC::MemoryDC(Colormap& cmap, u_int w, u_int h, u_int mul, u_int div)
+    :XDC(w, h, mul, div, cmap, XDefaultGC(cmap.display(), cmap.vinfo().screen)),
      _pixmap(XCreatePixmap(colormap().display(),
 			   DefaultRootWindow(colormap().display()), w, h,
 			   colormap().vinfo().depth))
