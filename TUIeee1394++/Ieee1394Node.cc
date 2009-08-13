@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.14 2008-10-17 06:31:31 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.15 2009-08-13 23:02:23 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
