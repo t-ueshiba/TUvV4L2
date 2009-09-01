@@ -25,16 +25,16 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.30 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.31 2009-09-01 02:56:06 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
 
+#ifdef WIN32
+#  define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <iomanip>
-#ifdef WIN32
-#  define M_PI	3.14159265358979323846
-#endif
 #include "TU/Array++.h"
 
 namespace TU

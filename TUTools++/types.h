@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.12 2009-07-31 07:04:46 ueshiba Exp $
+ *  $Id: types.h,v 1.13 2009-09-01 02:56:06 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -55,8 +55,8 @@
   <b>非線形最適化</b>
   - #TU::NullConstraint
   - #TU::ConstNormConstraint
-  - #Matrix<typename F::value_type> TU::minimizeSquare(const F&, const G&, AT&, int, double)
-  - #Matrix<typename F::value_type> TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, int, double)
+  - #Matrix<typename F::value_type> TU::minimizeSquare(const F&, const G&, AT&, u_int, double)
+  - #Matrix<typename F::value_type> TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, u_int, double)
 
   <b>RANSAC</b>
   - #typename Pointset::Container TU::ransac(const PointSet&, Model&, Conform, double)
@@ -143,9 +143,6 @@
 
   <b>シリアルインタフェース</b>
   - #TU::Serial
-  - #TU::Puma
-  - #TU::Pata
-  - #TU::Microscope
   - #TU::TriggerGenerator
   
   \file		types.h
