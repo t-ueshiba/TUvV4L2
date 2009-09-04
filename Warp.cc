@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.13 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.14 2009-09-04 05:47:36 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -401,7 +401,7 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
   \param ve	変形結果となる領域の最後の行の次を指定するindex．0ならば出力画像の
 		最後の行まで変形結果によって埋められる
 */
-template <> void
+template <> __PORT void
 Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 		  int vs, int ve) const
 {
@@ -447,8 +447,10 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 #endif	
 }
 
-template void	Warp::operator ()(const Image<RGBA>& in,
-				  Image<RGBA>& out, int vs, int ve) const;
-template void	Warp::operator ()(const Image<ABGR>& in,
-				  Image<ABGR>& out, int vs, int ve) const;
+template __PORT void
+Warp::operator ()(const Image<RGBA>& in,
+		  Image<RGBA>& out, int vs, int ve) const;
+template __PORT void
+Warp::operator ()(const Image<ABGR>& in,
+		  Image<ABGR>& out, int vs, int ve) const;
 }
