@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GenericImage.cc,v 1.6 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: GenericImage.cc,v 1.7 2009-09-04 05:47:36 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
@@ -39,7 +39,7 @@ namespace TU
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-std::istream&
+__PORT std::istream&
 GenericImage::restoreData(std::istream& in)
 {
     for (u_int v = 0; v < height(); )
@@ -53,7 +53,7 @@ GenericImage::restoreData(std::istream& in)
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-std::ostream&
+__PORT std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {
     for (u_int v = 0; v < height(); )
@@ -62,25 +62,25 @@ GenericImage::saveData(std::ostream& out) const
     return out;
 }
 
-u_int
+__PORT u_int
 GenericImage::_width() const
 {
     return (ncol()*8) / type2depth(_type);
 }
 
-u_int
+__PORT u_int
 GenericImage::_height() const
 {
     return nrow();
 }
 
-ImageBase::Type
+__PORT ImageBase::Type
 GenericImage::_defaultType() const
 {
     return type();
 }
 
-void
+__PORT void
 GenericImage::_resize(u_int h, u_int w, ImageBase::Type type)
 {
     _type = type;

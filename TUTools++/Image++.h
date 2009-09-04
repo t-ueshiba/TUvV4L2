@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.47 2009-09-04 04:01:05 ueshiba Exp $
+ *  $Id: Image++.h,v 1.48 2009-09-04 05:47:36 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -1174,18 +1174,18 @@ class GenericImage : public Array2<Array<u_char> >, public ImageBase
   //! ‘Ì‰æ‘œ‚ğ¶¬‚·‚éD
     GenericImage() :_type(U_CHAR)					{}
 
-    Type		type()					const	;
-    std::istream&	restore(std::istream& in)			;
-    std::ostream&	save(std::ostream& out)			const	;
-    std::istream&	restoreData(std::istream& in)			;
-    std::ostream&	saveData(std::ostream& out)		const	;
+    Type			type()				const	;
+    std::istream&		restore(std::istream& in)		;
+    std::ostream&		save(std::ostream& out)		const	;
+    __PORT std::istream&	restoreData(std::istream& in)		;
+    __PORT std::ostream&	saveData(std::ostream& out)	const	;
     
   private:
-    virtual u_int	_width()				const	;
-    virtual u_int	_height()				const	;
-    virtual Type	_defaultType()				const	;
-    virtual void	_resize(u_int h, u_int w,
-				ImageBase::Type type)			;
+    __PORT virtual u_int	_width()			const	;
+    __PORT virtual u_int	_height()			const	;
+    __PORT virtual Type		_defaultType()			const	;
+    __PORT virtual void		_resize(u_int h, u_int w,
+					ImageBase::Type type)		;
 
     Type		_type;
 };
