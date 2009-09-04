@@ -1,7 +1,8 @@
 /*
- *  $Id: slisttest.cc,v 1.2 2008-09-02 05:13:17 ueshiba Exp $
+ *  $Id: slisttest.cc,v 1.3 2009-09-04 05:48:39 ueshiba Exp $
  */
 #include <iostream>
+#include <algorithm>
 #include "TU/List.h"
 
 namespace TU
@@ -18,6 +19,7 @@ class Int : public List<Int>::Node
 };
 }
 
+int
 main()
 {
     using namespace	std;
@@ -57,4 +59,6 @@ main()
     for (ci = list.begin(); ci != list.end(); ++ci)
 	cout << ' ' << *ci;
     cout << endl;
+
+	return 0;
 }

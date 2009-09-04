@@ -1,7 +1,7 @@
 /*
- *  $Id: main.cc,v 1.11 2009-07-31 07:05:24 ueshiba Exp $
+ *  $Id: main.cc,v 1.12 2009-09-04 05:48:39 ueshiba Exp $
  */
-#include <stdlib.h>
+#include <unistd.h>
 #include "TU/Image++.h"
 #include "TU/GaussianConvolver.h"
 #include "TU/DericheConvolver.h"

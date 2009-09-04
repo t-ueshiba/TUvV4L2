@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.9 2009-07-09 04:19:26 ueshiba Exp $
+#  $Id: Makefile,v 1.10 2009-09-04 05:48:39 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -21,14 +21,14 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /home/ueshiba/include/TU/Array++.h \
-		/home/ueshiba/include/TU/Geometry++.h \
-		/home/ueshiba/include/TU/Heap.h \
-		/home/ueshiba/include/TU/List.h \
-		/home/ueshiba/include/TU/Normalize.h \
-		/home/ueshiba/include/TU/PSTree.h \
-		/home/ueshiba/include/TU/Vector++.h \
-		/home/ueshiba/include/TU/types.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Heap.h \
+		/usr/local/include/TU/List.h \
+		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/PSTree.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= pstreetest.cc
 OBJS		= pstreetest.o
@@ -36,7 +36,7 @@ OBJS		= pstreetest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.9 $	|		\
+REV		= $(shell echo $Revision: 1.10 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -48,9 +48,8 @@ REV		= $(shell echo $Revision: 1.9 $	|		\
 include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
-pstreetest.o: /home/ueshiba/include/TU/Geometry++.h \
-	/home/ueshiba/include/TU/Vector++.h \
-	/home/ueshiba/include/TU/Array++.h /home/ueshiba/include/TU/types.h \
-	/home/ueshiba/include/TU/Normalize.h \
-	/home/ueshiba/include/TU/PSTree.h /home/ueshiba/include/TU/Heap.h \
-	/home/ueshiba/include/TU/List.h
+pstreetest.o: /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/PSTree.h /usr/local/include/TU/Heap.h \
+	/usr/local/include/TU/List.h
