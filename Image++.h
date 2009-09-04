@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.46 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: Image++.h,v 1.47 2009-09-04 04:01:05 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -281,7 +281,7 @@ operator <<(std::ostream& out, const YUV411& yuv)
 *  function fromYUV<T>()						*
 ************************************************************************/
 //! カラーのY, U, V値を与えて他のカラー表現に変換するクラス
-class ConversionFromYUV
+class __PORT ConversionFromYUV
 {
   public:
     ConversionFromYUV()					;
@@ -293,7 +293,7 @@ class ConversionFromYUV
     int		_r[256], _g0[256], _g1[256], _b[256];
 };
 
-extern const ConversionFromYUV	conversionFromYUV;
+__PORT extern const ConversionFromYUV	conversionFromYUV;
 
 template <class T> inline T
 fromYUV(u_char y, u_char u, u_char v)
@@ -361,7 +361,7 @@ BGR::BGR(const YUV444& p)
 *  class ImageBase:	basic image class				*
 ************************************************************************/
 //! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
-class ImageBase
+class __PORT ImageBase
 {
   public:
   //! 外部記憶に読み書きする際の画素のタイプ

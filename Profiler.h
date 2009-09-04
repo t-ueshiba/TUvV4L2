@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Profiler.h,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Profiler.h,v 1.4 2009-09-04 04:01:06 ueshiba Exp $
  */
 #include <iostream>
 #include <sys/time.h>
@@ -37,7 +37,7 @@ namespace TU
 *  clsss Profiler							*
 ************************************************************************/
 //! プログラムの各ステップ毎に実行時間を測定するためのクラス．
-class Profiler
+class __PORT Profiler
 {
   private:
     class Timer

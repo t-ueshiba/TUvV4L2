@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mapping.h,v 1.6 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Mapping.h,v 1.7 2009-09-04 04:01:06 ueshiba Exp $
  */
 #ifndef __TUMapping_h
 #define __TUMapping_h
@@ -46,7 +46,7 @@ namespace TU
   \f$\TUud{y}{} \simeq \TUvec{T}{}\TUud{x}{} \in \TUspace{R}{n+1}\f$
   に写す（\f$m \neq n\f$でも構わない）．
 */
-class ProjectiveMapping
+class __PORT ProjectiveMapping
 {
   public:
     typedef double	value_type;
@@ -396,7 +396,7 @@ ProjectiveMapping::Cost<AT, Iterator>::update(AT& map, const Vector<double>& dm)
   \f$\TUvec{y}{} \simeq \TUvec{A}{}\TUvec{x}{} + \TUvec{b}{}
   \in \TUspace{R}{n}\f$に写す（\f$m \neq n\f$でも構わない）．
 */
-class AffineMapping : public ProjectiveMapping
+class __PORT AffineMapping : public ProjectiveMapping
 {
   public:
   //! 入力空間と出力空間の次元を指定してアフィン変換オブジェクトを生成する．

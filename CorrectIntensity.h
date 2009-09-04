@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.h,v 1.4 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: CorrectIntensity.h,v 1.5 2009-09-04 04:01:05 ueshiba Exp $
  */
 #ifndef	__TUCorrectIntensity_h
 #define	__TUCorrectIntensity_h
@@ -38,7 +38,7 @@ namespace TU
 *  class CorrectIntensity						*
 ************************************************************************/
 //! 画像の線形輝度補正を行うクラス
-class CorrectIntensity
+class __PORT CorrectIntensity
 {
   public:
   //! オフセットとゲインを指定して輝度補正オブジェクトを生成する．

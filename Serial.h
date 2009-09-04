@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.h,v 1.5 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Serial.h,v 1.6 2009-09-04 04:01:06 ueshiba Exp $
  */
 #if !defined(__TUSerial_h)
 #define __TUSerial_h
@@ -39,7 +39,7 @@ namespace TU
 /************************************************************************
 *  class Serial								*
 ************************************************************************/
-class Serial
+class __PORT Serial
 {
   public:
 			Serial(const char*)			;
@@ -85,7 +85,7 @@ class Serial
 /************************************************************************
 *  class TriggerGenerator						*
 ************************************************************************/
-class TriggerGenerator : public Serial
+class __PORT TriggerGenerator : public Serial
 {
   public:
     TriggerGenerator(const char* ttyname)			;

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.h,v 1.5 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: Camera.h,v 1.6 2009-09-04 04:01:05 ueshiba Exp $
  */
 #ifndef __TUCamera_h
 #define __TUCamera_h
@@ -38,11 +38,11 @@ namespace TU
 *  class CameraBase							*
 ************************************************************************/
 //! すべての透視投影カメラの基底となるクラス
-class CameraBase
+class __PORT CameraBase
 {
   public:
   //! カメラの内部パラメータを表すクラス
-    class Intrinsic
+    class __PORT Intrinsic
     {
       public:
 	virtual ~Intrinsic()						;
@@ -562,7 +562,7 @@ operator <<(std::ostream& out, const CameraBase::Intrinsic& intrinsic)
 *  class CanonicalCamera						*
 ************************************************************************/
 //! すべての内部パラメータが標準既定値(焦点距離とアスペクト比が1, 非直交歪みと放射歪曲係数が0, 画像主点が原点に一致)となる透視投影カメラを表すクラス
-class CanonicalCamera : public CameraBase
+class __PORT CanonicalCamera : public CameraBase
 {
   public:
   //! 位置を原点に，姿勢を単位行列にセットして初期化する．
@@ -595,11 +595,11 @@ class CanonicalCamera : public CameraBase
 *  class CameraWithFocalLength						*
 ************************************************************************/
 //! 焦点距離以外の内部パラメータが標準既定値となる透視投影カメラを表すクラス
-class CameraWithFocalLength : public CameraBase
+class __PORT CameraWithFocalLength : public CameraBase
 {
   public:
   //! 焦点距離のみから成る内部パラメータを表すクラス
-    class Intrinsic : public CanonicalCamera::Intrinsic
+    class __PORT Intrinsic : public CanonicalCamera::Intrinsic
     {
       public:
       //! 内部パラメータをセットして初期化する．
@@ -671,11 +671,11 @@ class CameraWithFocalLength : public CameraBase
 *  class CameraWithEuclideanImagePlane					*
 ************************************************************************/
 //! 焦点距離と画像主点以外の内部パラメータが標準既定値となる透視投影カメラを表すクラス
-class CameraWithEuclideanImagePlane : public CameraBase
+class __PORT CameraWithEuclideanImagePlane : public CameraBase
 {
   public:
   //! 焦点距離と画像主点から成る内部パラメータを表すクラス
-    class Intrinsic : public CameraWithFocalLength::Intrinsic
+    class __PORT Intrinsic : public CameraWithFocalLength::Intrinsic
     {
       public:
       //! 内部パラメータをセットして初期化する．
@@ -763,11 +763,11 @@ class CameraWithEuclideanImagePlane : public CameraBase
 *  class Camera								*
 ************************************************************************/
 //! 放射歪曲係数のみが標準既定値(0)となる透視投影カメラを表すクラス
-class Camera : public CameraBase
+class __PORT Camera : public CameraBase
 {
   public:
   //! 放射歪曲係数意外の全内部パラメータを表すクラス
-    class Intrinsic : public CameraWithEuclideanImagePlane::Intrinsic
+    class __PORT Intrinsic : public CameraWithEuclideanImagePlane::Intrinsic
     {
       public:
       //! 内部パラメータをセットして初期化する．
@@ -892,11 +892,11 @@ class Camera : public CameraBase
 *  class CameraWithDistortion						*
 ************************************************************************/
 //! 放射歪曲係数を含む全内部パラメータが可変となる透視投影カメラを表すクラス
-class CameraWithDistortion : public CameraBase
+class __PORT CameraWithDistortion : public CameraBase
 {
   public:
   //! 放射歪曲係数を含む全内部パラメータを表すクラス
-    class Intrinsic : public Camera::Intrinsic
+    class __PORT Intrinsic : public Camera::Intrinsic
     {
       public:
       //! 内部パラメータをセットして初期化する．
