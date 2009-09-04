@@ -25,14 +25,16 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Random.h,v 1.7 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Random.h,v 1.8 2009-09-04 04:01:06 ueshiba Exp $
  */
+#include "TU/types.h"
+
 namespace TU
 {
 /************************************************************************
 *  class Random								*
 ************************************************************************/
-class Random
+class __PORT Random
 {
   public:
     Random()						;

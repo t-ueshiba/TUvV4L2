@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Normalize.h,v 1.2 2009-07-31 07:04:45 ueshiba Exp $  
+ *  $Id: Normalize.h,v 1.3 2009-09-04 04:01:06 ueshiba Exp $  
  */
 #ifndef __TUNormalize_h
 #define __TUNormalize_h
@@ -54,7 +54,7 @@ namespace TU
   \f$s\f$と\f$\TUvec{c}{}\f$は，振幅の2乗平均値が空間の次元\f$d\f$に,
   重心が原点になるよう決定される．
 */
-class Normalize
+class __PORT Normalize
 {
   public:
   //! 空間の次元を指定して正規化変換オブジェクトを生成する．

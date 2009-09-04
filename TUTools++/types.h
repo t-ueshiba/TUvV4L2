@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.13 2009-09-01 02:56:06 ueshiba Exp $
+ *  $Id: types.h,v 1.14 2009-09-04 04:01:06 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -152,12 +152,20 @@
 #define __TUtypes_h
 
 #ifdef WIN32
+#  ifdef _USRDLL
+#    define __PORT	__declspec(dllexport)
+#  else
+#    define __PORT	__declspec(dllimport)
+#  endif
+#  define _USE_MATH_DEFINES
+
 typedef unsigned int	size_t;			//!< 配列等のサイズを表す型
 typedef unsigned char	u_char;			//!< 符号なし8bit整数
 typedef unsigned short	u_short;		//!< 符号なし16bit整数
 typedef unsigned int	u_int;			//!< 符号なし32bit整数
 typedef unsigned long	u_long;			//!< 符号なし32/64bit整数
 #else
+#  define __PORT
 #  include <sys/types.h>
 #endif
 

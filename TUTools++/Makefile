@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.81 2009-09-01 02:56:06 ueshiba Exp $
+#  $Id: Makefile,v 1.82 2009-09-04 04:01:05 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -140,7 +140,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.81 $	|		\
+REV		= $(shell echo $Revision: 1.82 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -191,7 +191,7 @@ Mapping.o: TU/Mapping.h TU/TU/utility.h TU/TU/TU/Normalize.h \
 Normalize.o: TU/TU/TU/Normalize.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
 Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Random.o: TU/Random.h
+Random.o: TU/Random.h TU/TU/TU/TU/types.h
 Rotation.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Serial.o: TU/Serial.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
@@ -201,3 +201,4 @@ Vector++.inst.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h \
 	TU/Camera.h TU/mmInstructions.h
+manipulators.o: TU/Manip.h TU/TU/TU/TU/types.h

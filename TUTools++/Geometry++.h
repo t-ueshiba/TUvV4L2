@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.30 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.31 2009-09-04 04:01:05 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -300,7 +300,7 @@ typedef Point3<float>	Point3f;		//!< float型座標を持つ3次元点
 typedef Point3<double>	Point3d;		//!< double型座標を持つ3次元点
 
 /************************************************************************
-*  class HyperPlane							*
+*  class HyperPlane<T, B>						*
 ************************************************************************/
 //! d次元射影空間中の超平面を表現するクラス
 /*!

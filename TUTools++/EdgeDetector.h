@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.h,v 1.4 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: EdgeDetector.h,v 1.5 2009-09-04 04:01:05 ueshiba Exp $
  */
 #ifndef	__TUEdgeDetector_h
 #define	__TUEdgeDetector_h
@@ -38,7 +38,7 @@ namespace TU
 *  class EdgeDetector							*
 ************************************************************************/
 //! エッジ検出を行うクラス
-class EdgeDetector
+class __PORT EdgeDetector
 {
   public:
     enum

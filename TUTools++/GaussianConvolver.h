@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.8 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.9 2009-09-04 04:01:05 ueshiba Exp $
  */
 #ifndef	__TUGaussianConvolver_h
 #define	__TUGaussianConvolver_h
@@ -38,7 +38,7 @@ namespace TU
 /************************************************************************
 *  class GaussianCoefficients						*
 ************************************************************************/
-class GaussianCoefficients
+class __PORT GaussianCoefficients
 {
   private:
     struct Params
@@ -101,7 +101,7 @@ class GaussianCoefficients
 *  class GaussianConvoler						*
 ************************************************************************/
 //! Gauss核による1次元配列畳み込みを行うクラス
-class GaussianConvolver
+class __PORT GaussianConvolver
     : public GaussianCoefficients, private BilateralIIRFilter<4u>
 {
   public:

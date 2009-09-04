@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.9 2009-07-31 07:04:46 ueshiba Exp $
+ *  $Id: Warp.h,v 1.10 2009-09-04 04:01:06 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -40,7 +40,7 @@ namespace TU
 *  class Warp								*
 ************************************************************************/
 //! ‰æ‘œ‚ð•ÏŒ`‚·‚é‚½‚ß‚ÌƒNƒ‰ƒX
-class Warp
+class __PORT Warp
 {
   private:
     struct FracArray

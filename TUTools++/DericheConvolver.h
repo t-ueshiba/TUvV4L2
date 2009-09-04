@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: DericheConvolver.h,v 1.7 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.8 2009-09-04 04:01:05 ueshiba Exp $
  */
 #ifndef	__TUDericheConvolver_h
 #define	__TUDericheConvolver_h
@@ -37,7 +37,7 @@ namespace TU
 /************************************************************************
 *  class DericheCoefficients						*
 ************************************************************************/
-class DericheCoefficients
+class __PORT DericheCoefficients
 {
   public:
     void	initialize(float alpha)			;
@@ -79,7 +79,7 @@ DericheCoefficients::initialize(float alpha)
 *  class DericheConvoler						*
 ************************************************************************/
 //! Canny-Deriche核による1次元配列畳み込みを行うクラス
-class DericheConvolver
+class __PORT DericheConvolver
     : public DericheCoefficients, private BilateralIIRFilter<2u>
 {
   public:

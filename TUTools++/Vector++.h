@@ -25,17 +25,14 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.31 2009-09-01 02:56:06 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.32 2009-09-04 04:01:06 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
 
-#ifdef WIN32
-#  define _USE_MATH_DEFINES
-#endif
+#include "TU/Array++.h"
 #include <cmath>
 #include <iomanip>
-#include "TU/Array++.h"
 
 namespace TU
 {
@@ -71,7 +68,7 @@ namespace TU
   \f]
   Ç»ÇÈâÒì]çsóÒÇ≈ï\Ç≥ÇÍÇÈÅD
 */
-class Rotation
+class __PORT Rotation
 {
   public:
     Rotation(u_int p, u_int q, double x, double y)	;
