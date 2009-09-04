@@ -1,5 +1,5 @@
 /*
- *  $Id: heaptest.cc,v 1.2 2008-09-02 05:13:16 ueshiba Exp $
+ *  $Id: heaptest.cc,v 1.3 2009-09-04 05:48:19 ueshiba Exp $
  */
 #include "TU/Heap.h"
 
@@ -15,6 +15,7 @@ struct ordered
 };
 }
 
+int
 main()
 {
     using namespace	std;
@@ -26,4 +27,6 @@ main()
 
     TU::sort(a, ordered());
     cout << a;
+
+	return 0;
 }

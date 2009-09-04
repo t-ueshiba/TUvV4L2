@@ -1,5 +1,5 @@
 /*
- *  $Id: pstreetest.cc,v 1.4 2008-09-02 05:13:17 ueshiba Exp $
+ *  $Id: pstreetest.cc,v 1.5 2009-09-04 05:48:39 ueshiba Exp $
  */
 #include "TU/Geometry++.h"
 #include "TU/PSTree.h"
@@ -31,6 +31,7 @@ typedef PSTree<P2, P2, orderedX, orderedY>	MyPSTree;
 }
 
 
+int
 main()
 {
     using namespace	std;
@@ -80,4 +81,6 @@ main()
 	cerr << node->p;
 	delete node;
     }
+
+	return 0;
 }
