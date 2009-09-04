@@ -1,8 +1,9 @@
 /*
- *  $Id: mtest.cc,v 1.2 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: mtest.cc,v 1.3 2009-09-04 04:01:41 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
+int
 main()
 {
     using namespace	std;
@@ -215,4 +216,6 @@ main()
 	    cerr << err.what() << endl;
 	}
     }
+
+	return 0;
 }
