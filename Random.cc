@@ -25,12 +25,17 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Random.cc,v 1.10 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Random.cc,v 1.11 2009-09-07 05:13:28 ueshiba Exp $
  */
-#include <time.h>
+#include "TU/Random.h"
+#ifdef WIN32
+#  include "windows/fakeWindows.h"
+#  include <windows.h>
+#else
+#  include <sys/time.h>
+#endif
 #include <cmath>
 #include <cstdlib>
-#include "TU/Random.h"
 #include <stdexcept>
 
 namespace TU
@@ -50,17 +55,25 @@ static const int	M3  = 243000;
 static const int	A3  = 4561;
 static const int	C3  = 51349;
 
-inline long
+static inline long
+seed()
+{
+    timeval tv;
+    gettimeofday(&tv, 0);
+    return -tv.tv_sec;
+}
+
+static inline long
 congruence(long x, long a, long c, long m)
 {
     return (a * x + c) % m;
 }
 
 /************************************************************************
-*  class Random							*
+*  class Random								*
 ************************************************************************/
 Random::Random()
-    :_seed(-int(time(0))), _x1(0), _x2(0), _x3(0), _ff(0),
+    :_seed(seed()), _x1(0), _x2(0), _x3(0), _ff(0),
      _has_extra(0), _extra(0.0)
 {
     srand48(-_seed);
