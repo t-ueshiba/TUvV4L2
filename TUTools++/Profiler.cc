@@ -25,10 +25,10 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Profiler.cc,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Profiler.cc,v 1.4 2009-09-07 05:13:28 ueshiba Exp $
  */
-#include <iomanip>
 #include "TU/Profiler.h"
+#include <iomanip>
 
 namespace TU
 {

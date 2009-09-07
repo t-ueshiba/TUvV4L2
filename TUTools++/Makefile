@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.82 2009-09-04 04:01:05 ueshiba Exp $
+#  $Id: Makefile,v 1.83 2009-09-07 05:13:28 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -53,7 +53,8 @@ EXTHDRS		= TU/BlockMatrix++.h \
 		TU/TU/Vector++.h \
 		TU/TU/utility.h \
 		TU/Warp.h \
-		TU/mmInstructions.h
+		TU/mmInstructions.h \
+		TU/windows/fakeWindows.h
 HDRS		= Allocator.h \
 		Array++.h \
 		Bezier++.h \
@@ -140,7 +141,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.82 $	|		\
+REV		= $(shell echo $Revision: 1.83 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -190,8 +191,9 @@ Mapping.o: TU/Mapping.h TU/TU/utility.h TU/TU/TU/Normalize.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/Minimize.h
 Normalize.o: TU/TU/TU/Normalize.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
-Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Random.o: TU/Random.h TU/TU/TU/TU/types.h
+Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/windows/fakeWindows.h
+Random.o: TU/Random.h TU/TU/TU/TU/types.h TU/windows/fakeWindows.h
 Rotation.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Serial.o: TU/Serial.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h

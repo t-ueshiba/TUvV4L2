@@ -25,11 +25,16 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Profiler.h,v 1.4 2009-09-04 04:01:06 ueshiba Exp $
+ *  $Id: Profiler.h,v 1.5 2009-09-07 05:13:28 ueshiba Exp $
  */
-#include <iostream>
-#include <sys/time.h>
 #include "TU/Array++.h"
+#include <iostream>
+#ifdef WIN32
+#  include "windows/fakeWindows.h"
+#  include <windows.h>
+#else
+#  include <sys/time.h>
+#endif
 
 namespace TU
 {
