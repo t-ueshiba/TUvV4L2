@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IntegralImage.h,v 1.3 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: IntegralImage.h,v 1.4 2009-09-09 07:06:31 ueshiba Exp $
  */
 #ifndef	__TUIntegralImage_h
 #define	__TUIntegralImage_h
@@ -83,7 +83,7 @@ IntegralImage<T>::initialize(const Image<S, B>& image)
 {
     resize(image.height(), image.width());
     
-    for (int v = 0; v < height(); ++v)
+    for (u_int v = 0; v < height(); ++v)
     {
 	const S*	src = image[v];
 	T*		dst = (*this)[v];
@@ -164,8 +164,8 @@ template <class T> template <class S, class B> const IntegralImage<T>&
 IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(height(), width());
-    for (int v = 0; v < out.height(); ++v)
-	for (int u = 0; u < out.width(); ++u)
+    for (u_int v = 0; v < out.height(); ++v)
+	for (u_int u = 0; u < out.width(); ++u)
 	    out[v][u] = crossVal(u, v, cropSize);
 
     return *this;
@@ -224,10 +224,10 @@ DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
     resize(image.height(), image.width());
     
     Array<T>	K(width() + height() - 1), L(width() + height() - 1);
-    for (int i = 0; i < K.dim(); ++i)
+    for (u_int i = 0; i < K.dim(); ++i)
 	K[i] = L[i] = 0;
     
-    for (int v = 0; v < height(); ++v)
+    for (u_int v = 0; v < height(); ++v)
     {
 	const S*	src = image[v];
 	T		*dst = (*this)[v],
@@ -268,7 +268,7 @@ DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
     correct(ul, vl);
     correct(ur, vr);
     correct(ut, vt);
-    if (vt >= height())
+    if (vt >= int(height()))
 	return 0;
     return (v  >= 0 ? (*this)[v][u]   : 0)
 	 + (vt >= 0 ? (*this)[vt][ut] : 0)
@@ -303,8 +303,8 @@ template <class T> template <class S, class B> const DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(height(), width());
-    for (int v = 0; v < out.height() - 2*cropSize - 1; ++v)
-	for (int u = 0; u < out.width(); ++u)
+    for (u_int v = 0; v < out.height() - 2*cropSize - 1; ++v)
+	for (u_int u = 0; u < out.width(); ++u)
 	    out[v][u] = crossVal(u, v, cropSize);
 
     return *this;
@@ -318,7 +318,7 @@ DiagonalIntegralImage<T>::correct(int& u, int& v) const
 	v += u;
 	u  = 0;
     }
-    else if (u >= width())
+    else if (u >= int(width()))
     {
 	v += (int(width()) - 1 - u);
 	u  = width() - 1;

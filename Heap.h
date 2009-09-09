@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Heap.h,v 1.3 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: Heap.h,v 1.4 2009-09-09 07:06:31 ueshiba Exp $
  */
 #ifndef __TUHeap_h
 #define __TUHeap_h
@@ -76,8 +76,8 @@ class Heap
     T		detach()		;
     
   private:
-    void	upheap(int current)	;
-    void	downheap(int current)	;
+    void	upheap(u_int current)	;
+    void	downheap(u_int current)	;
     
     Array<T>		_array;
     u_int		_n;		// # of items in the heap.
@@ -104,8 +104,8 @@ template <class T, class Compare>
 Heap<T, Compare>::Heap(Array<T>& a, Compare compare)
     :_array((T*)a, a.dim()), _n(a.dim()), _compare(compare)
 {
-    for (int i = _n / 2; --i >= 0; )
-	downheap(i);
+    for (u_int i = _n / 2; i > 0; )
+	downheap(--i);
 }
 
 //! ƒq[ƒv‚É—v‘f‚ğ’Ç‰Á‚·‚é
@@ -140,12 +140,12 @@ Heap<T, Compare>::detach()
 }
 
 template <class T, class Compare> void
-Heap<T, Compare>::upheap(int current)
+Heap<T, Compare>::upheap(u_int current)
 {
     T	val = _array[current];
     while (current > 0)				// While having a parent...
     {
-	int	parent = (current - 1) / 2;	// Index of the parent node.
+	u_int	parent = (current - 1) / 2;	// Index of the parent node.
 	if (_compare(val, _array[parent]))
 	    break;
 	
@@ -156,10 +156,10 @@ Heap<T, Compare>::upheap(int current)
 }
 
 template <class T, class Compare> void
-Heap<T, Compare>::downheap(int current)
+Heap<T, Compare>::downheap(u_int current)
 {
     T	val = _array[current];
-    for (int child; (child = 2 * current + 1) < _n; )
+    for (u_int child; (child = 2 * current + 1) < _n; )
     {
 	if (child + 1 < _n && _compare(_array[child], _array[child + 1]))
 	    ++child;				// Choose larger child.
@@ -185,7 +185,7 @@ template <class T, class Compare> void
 sort(Array<T>& a, Compare compare)
 {
     Heap<T, Compare>	heap(a, compare);
-    for (int i = a.dim(); i > 0; )
+    for (u_int i = a.dim(); i > 0; )
 	a[--i] = heap.detach();
 }
  

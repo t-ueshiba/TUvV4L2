@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.7 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.8 2009-09-09 07:06:31 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -475,7 +475,7 @@ IIRFilter<4u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
     *dst = 0.0;
     --src;
     --dst;
-    *dst = _c[0]*src[1];
+    *dst = _c[0]*src[1]
 	 + _c[4]*dst[1];
     --src;
     --dst;
@@ -586,7 +586,7 @@ template <u_int D> class BilateralIIRFilter : public BilateralIIRFilterBase
     const BilateralIIRFilter&
 		operator ()(const Array2<T1, B1, R1>& in,
 			    Array2<T2, B2, R2>& out,
-			    int is=0, int ie=0)			const	;
+			    u_int is=0, u_int ie=0)			const	;
     u_int	dim()						const	;
     float	operator [](int i)				const	;
     void	limits(float& limit0,
@@ -743,17 +743,17 @@ template <class T1, class B1, class R1, class T2, class B2, class R2>
 const BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::operator ()(const Array2<T1, B1, R1>& in,
 				   Array2<T2, B2, R2>& out,
-				   int is, int ie) const
+				   u_int is, u_int ie) const
 {
     out.resize(in.ncol(), in.nrow());
     if (ie == 0)
 	ie = in.nrow();
 
-    for (int i = is; i < ie; ++i)
+    for (u_int i = is; i < ie; ++i)
     {
 	convolve(in[i]);
 	T2*	col = &out[0];
-	for (int j = 0; j < dim(); ++j)
+	for (u_int j = 0; j < dim(); ++j)
 	    (*col++)[i] = (*this)[j];
     }
 
