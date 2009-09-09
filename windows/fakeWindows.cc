@@ -10,11 +10,10 @@
  * of any kind. I shall in no event be liable for anything that happens
  * to anyone/anything when using this software.
  *  
- *  $Id: fakeWindows.cc,v 1.1 2009-09-07 05:14:29 ueshiba Exp $
+ *  $Id: fakeWindows.cc,v 1.2 2009-09-09 07:09:32 ueshiba Exp $
  */
 #ifdef WIN32
 #include "fakeWindows.h"
-#include <windows.h>
 #include <time.h>
 #include <stdio.h>
 #include <math.h>
@@ -1183,6 +1182,14 @@ _srand48_r(struct _rand48* r, long seed)
     __rand48_add     = _RAND48_ADD;
 }
 
+static long
+_lrand48_r(struct _rand48* r)
+{
+  __dorand48(r, __rand48_seed);
+  return (long)((unsigned long) __rand48_seed[2] << 15) +
+	       ((unsigned long) __rand48_seed[1] >> 1);
+}
+
 static double
 _erand48_r(struct _rand48* r, unsigned short xseed[3])
 {
@@ -1202,6 +1209,13 @@ extern "C" __PORT void
 srand48(long seed)
 {
     _srand48_r(&__RAND48, seed);
+}
+
+
+extern "C" __PORT long
+lrand48()
+{
+    return _lrand48_r(&__RAND48);
 }
 
 extern "C" __PORT double
