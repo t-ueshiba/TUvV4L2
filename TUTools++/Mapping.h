@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mapping.h,v 1.7 2009-09-04 04:01:06 ueshiba Exp $
+ *  $Id: Mapping.h,v 1.8 2009-09-09 07:06:31 ueshiba Exp $
  */
 #ifndef __TUMapping_h
 #define __TUMapping_h
@@ -179,11 +179,11 @@ ProjectiveMapping::fit(Iterator first, Iterator last, bool refine)
 	const Vector<double>&	y  = yNormalize(iter->second);
 	const Matrix<double>&	xx = x % x;
 	A(0, 0, xdim1, xdim1) += xx;
-	for (int j = 0; j < ydim; ++j)
+	for (u_int j = 0; j < ydim; ++j)
 	    A(ydim*xdim1, j*xdim1, xdim1, xdim1) -= y[j] * xx;
 	A(ydim*xdim1, ydim*xdim1, xdim1, xdim1) += (y*y) * xx;
     }
-    for (int j = 1; j < ydim; ++j)
+    for (u_int j = 1; j < ydim; ++j)
 	A(j*xdim1, j*xdim1, xdim1, xdim1) = A(0, 0, xdim1, xdim1);
     A.symmetrize();
 
@@ -267,7 +267,7 @@ ProjectiveMapping::jacobian(const Vector<S, B>& x) const
 	xP = x;
     const Vector<double>&	y  = mapP(xP);
     Matrix<double>		J(outDim(), (outDim() + 1)*xP.dim());
-    for (int i = 0; i < J.nrow(); ++i)
+    for (u_int i = 0; i < J.nrow(); ++i)
     {
 	J[i](i*xP.dim(), xP.dim()) = xP;
 	(J[i](outDim()*xP.dim(), xP.dim()) = xP) *= (-y[i]/y[outDim()]);

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.14 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.15 2009-09-09 07:06:30 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
@@ -443,7 +443,6 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
 const EdgeDetector&
 EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
 {
-    
   // 強いエッジ点を起点にして，接続する弱いエッジ点を追跡しEDGEラベルを付ける．
     for (u_int v = 0; ++v < edge.height() - 1; )
 	for (u_int u = 0; ++u < edge.width() - 1; )
@@ -468,7 +467,7 @@ EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
 	for (const u_char* const end = dst + edge.width(); dst < end; ++dst)
 	    *dst = (*dst & EDGE ? 255 : 0);
     }
-
+ 
     return *this;
 }
     

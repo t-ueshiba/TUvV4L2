@@ -25,18 +25,17 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Random.cc,v 1.11 2009-09-07 05:13:28 ueshiba Exp $
+ *  $Id: Random.cc,v 1.12 2009-09-09 07:06:31 ueshiba Exp $
  */
 #include "TU/Random.h"
-#ifdef WIN32
-#  include "windows/fakeWindows.h"
-#  include <windows.h>
-#else
-#  include <sys/time.h>
-#endif
 #include <cmath>
 #include <cstdlib>
 #include <stdexcept>
+#ifdef WIN32
+#  include "windows/fakeWindows.h"
+#else
+#  include <sys/time.h>
+#endif
 
 namespace TU
 {

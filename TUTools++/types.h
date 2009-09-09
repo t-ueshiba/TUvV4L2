@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.14 2009-09-04 04:01:06 ueshiba Exp $
+ *  $Id: types.h,v 1.15 2009-09-09 07:06:31 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -157,7 +157,10 @@
 #  else
 #    define __PORT	__declspec(dllimport)
 #  endif
-#  define _USE_MATH_DEFINES
+#  define _USE_MATH_DEFINES	    // <math.h>のM_PI等の定義を有効化
+#  define _CRT_SECURE_NO_WARNINGS   // C標準関数使用時の警告を抑制
+#  define _CRT_NONSTDC_NO_DEPRECATE // POSIX関数使用時の警告を抑制
+#  define _SCL_SECURE_NO_WARNINGS   // C++標準関数使用時の警告を抑制
 
 typedef unsigned int	size_t;			//!< 配列等のサイズを表す型
 typedef unsigned char	u_char;			//!< 符号なし8bit整数

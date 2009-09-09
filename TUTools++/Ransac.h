@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Ransac.h,v 1.5 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.6 2009-09-09 07:06:31 ueshiba Exp $
  */
 #ifndef __TURansac_h
 #define __TURansac_h
@@ -98,7 +98,7 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
   // 試行（最小個数の点をサンプル，モデル生成，inlier検出）をntrials回行う．
     Container	inlierSetA, inlierSetB;
     Container	*inliers = &inlierSetA, *inliersMax = &inlierSetB;
-    for (int n = 0; n < ntrials; ++n)
+    for (u_int n = 0; n < ntrials; ++n)
     {
       // 点集合からモデルの計算に必要な最小個数の点をサンプルする．
 	const Container&	minimalSet = pointSet.sample(model.ndataMin());
