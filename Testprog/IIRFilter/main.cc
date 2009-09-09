@@ -1,7 +1,11 @@
 /*
- *  $Id: main.cc,v 1.12 2009-09-04 05:48:39 ueshiba Exp $
+ *  $Id: main.cc,v 1.13 2009-09-09 07:07:40 ueshiba Exp $
  */
 #include <unistd.h>
+#ifdef WIN32
+#  include <io.h>
+#  include <fcntl.h>
+#endif
 #include "TU/Image++.h"
 #include "TU/GaussianConvolver.h"
 #include "TU/DericheConvolver.h"
@@ -53,48 +57,63 @@ main(int argc, char* argv[])
 	    break;
 	}
 
-    Image<u_char>	in, edge;
-    in.restore(cin);
+    try
+    {
+#ifdef WIN32
+	if (_setmode(_fileno(stdin), _O_BINARY) == -1)
+	    throw runtime_error("Cannot set stdin to binary mode!!"); 
+	if (_setmode(_fileno(stdout), _O_BINARY) == -1)
+	    throw runtime_error("Cannot set stdout to binary mode!!"); 
+#endif
+	Image<u_char>	in, edge;
+	in.restore(cin);
 
-    if (laplacian)
-    {
-	Image<float>	lap, edgeH, edgeV;
-	if (gaussian)
-	    GaussianConvolver2<>(alpha).laplacian(in, lap)
-				       .diffH(in, edgeH).diffV(in, edgeV);
+	if (laplacian)
+	{
+	    Image<float>	lap, edgeH, edgeV;
+	    if (gaussian)
+		GaussianConvolver2<>(alpha).laplacian(in, lap)
+					   .diffH(in, edgeH).diffV(in, edgeV);
+	    else
+		DericheConvolver2<>(alpha).laplacian(in, lap)
+					  .diffH(in, edgeH).diffV(in, edgeV);
+	    Image<float>	str;
+	    EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
+					 .zeroCrossing(lap, str, edge)
+					 .hysteresisThresholding(edge);
+	  //EdgeDetector(th_low, th_high).zeroCrossing(lap, edge);
+	}
 	else
-	    DericheConvolver2<>(alpha).laplacian(in, lap)
-				      .diffH(in, edgeH).diffV(in, edgeV);
-	Image<float>	str;
-      	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
-				     .zeroCrossing(lap, str, edge)
-				     .hysteresisThresholding(edge);
-      //EdgeDetector(th_low, th_high).zeroCrossing(lap, edge);
+	{
+	    Image<float>    edgeH, edgeV;
+	    if (gaussian)
+		GaussianConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	    else
+		DericheConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	    Image<float>    str;
+	    Image<u_char>   dir;
+	    EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
+					 .direction4(edgeH, edgeV, dir)
+					 .suppressNonmaxima(str, dir, edge)
+					 .suppressNonmaxima(str, dir, edge)
+					 .hysteresisThresholding(edge);
+	}
+
+	Image<RGB>		out;
+	superImpose(in, edge, out);
+	out.save(cout, ImageBase::RGB_24);
+    
+      //convolver.laplacian(in, out);
+      //convolver.smooth(in, out);
+      //edgeH.save(cout, ImageBase::FLOAT);
+      //edgeV.save(cout, ImageBase::FLOAT);
+      //out.save(cout, ImageBase::U_CHAR);
     }
-    else
+    catch (exception& err)
     {
-	Image<float>	edgeH, edgeV;
-	if (gaussian)
-	    GaussianConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
-	else
-	    DericheConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
-	Image<float>	str;
-	Image<u_char>	dir;
-	EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
-				     .direction4(edgeH, edgeV, dir)
-				     .suppressNonmaxima(str, dir, edge)
-				     .hysteresisThresholding(edge);
+	cerr << err.what() << endl;
+	return 1;
     }
-    
-    Image<RGB>		out;
-    superImpose(in, edge, out);
-    out.save(cout, ImageBase::RGB_24);
-    
-  //convolver.laplacian(in, out);
-  //convolver.smooth(in, out);
-  //edgeH.save(cout, ImageBase::FLOAT);
-  //edgeV.save(cout, ImageBase::FLOAT);
-  //out.save(cout, ImageBase::U_CHAR);
     
     return 0;
 }
