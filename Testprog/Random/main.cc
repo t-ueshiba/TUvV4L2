@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2002-09-02 02:43:44 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2009-09-09 07:08:11 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iostream>
@@ -22,7 +22,7 @@ main(int argc, char* argv[])
     for (int i = 0; i < n; ++i)
     {
 	double	val = random.gaussian48();
-	int	index = floor(10.0*val) + m/2;
+	int	index = int(floor(10.0*val)) + m/2;
 	if (index >= 0 && index < m)
 	    ++histogram[index];
     }
