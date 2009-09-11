@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.10 2009-09-04 04:01:06 ueshiba Exp $
+ *  $Id: Warp.h,v 1.11 2009-09-11 05:56:13 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -89,7 +89,7 @@ class __PORT Warp
 			   u_int outWidth, u_int outHeight)		;
     template <class T>
     void	operator ()(const Image<T>& in, Image<T>& out,
-			    int vs=0, int ve=0)			const	;
+			    u_int vs=0, u_int ve=0)		const	;
     Vector2f	operator ()(int u, int v)			const	;
 #if defined(SSE2)
     mmFlt	src(int u, int v)				const	;

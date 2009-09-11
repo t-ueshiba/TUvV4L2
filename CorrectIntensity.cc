@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.cc,v 1.7 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.8 2009-09-11 05:56:13 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
@@ -104,12 +104,12 @@ toShort(float val)
   \param ve		‹P“x‚ğ•â³‚·‚é—Ìˆæ‚ÌÅŒã‚Ìs‚ÌŸ‚ğw’è‚·‚éindex
 */ 
 template <class T> void
-CorrectIntensity::operator()(Image<T>& image, int vs, int ve) const
+CorrectIntensity::operator()(Image<T>& image, u_int vs, u_int ve) const
 {
     if (ve == 0)
 	ve = image.height();
     
-    for (int v = vs; v < ve; ++v)
+    for (u_int v = vs; v < ve; ++v)
     {
 	T*		p = image[v];
 	T* const	q = p + image.width();
@@ -157,15 +157,15 @@ CorrectIntensity::val(float pixel) const
     return _offset + _gain * pixel;
 }
 
-template void
-CorrectIntensity::operator ()(Image<u_char>& image, int vs, int ve) const;
-template void
-CorrectIntensity::operator ()(Image<short>& image,  int vs, int ve) const;
-template void
-CorrectIntensity::operator ()(Image<float>& image,  int vs, int ve) const;
-template void
-CorrectIntensity::operator ()(Image<RGBA>& image,   int vs, int ve) const;
-template void
-CorrectIntensity::operator ()(Image<ABGR>& image,   int vs, int ve) const;
+template __PORT void
+CorrectIntensity::operator ()(Image<u_char>& image, u_int vs, u_int ve) const;
+template __PORT void
+CorrectIntensity::operator ()(Image<short>& image,  u_int vs, u_int ve) const;
+template __PORT void
+CorrectIntensity::operator ()(Image<float>& image,  u_int vs, u_int ve) const;
+template __PORT void
+CorrectIntensity::operator ()(Image<RGBA>& image,   u_int vs, u_int ve) const;
+template __PORT void
+CorrectIntensity::operator ()(Image<ABGR>& image,   u_int vs, u_int ve) const;
     
 }

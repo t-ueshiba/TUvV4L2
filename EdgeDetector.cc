@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.15 2009-09-09 07:06:30 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.16 2009-09-11 05:56:13 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
@@ -87,6 +87,10 @@ isLink(const Image<u_char>& edge, const Point2i& p, int dir)
 static void
 trace(Image<u_char>& edge, const Point2i& p)
 {
+#ifdef _DEBUG
+    static int	depth = 0;
+    std::cerr << "depth: " << depth << std::endl;
+#endif
     u_char&	e = edge(p);		// この点pの画素値
     
     if (e & EdgeDetector::TRACED)	// 既にこの点が訪問済みならば，
@@ -95,7 +99,15 @@ trace(Image<u_char>& edge, const Point2i& p)
     e |= (EdgeDetector::TRACED | EdgeDetector::EDGE);	// 訪問済みかつエッジ点
     for (int dir = 0; dir < 8; ++dir)	// pの8つの近傍点それぞれについて
 	if (isLink(edge, p, dir))	// pと接続していれば
+	{
+#ifdef _DEBUG
+	    ++depth;
+#endif
 	    trace(edge, p.neighbor(dir));	// さらに追跡を続ける．
+#ifdef _DEBUG
+	    --depth;
+#endif
+	}
 }
 
 //! ある点を打てばEDGEラベルが付いている点とそうでない点を結べるか調べる
