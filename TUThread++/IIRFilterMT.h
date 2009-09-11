@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: IIRFilterMT.h,v 1.2 2008-09-10 05:11:50 ueshiba Exp $  
+ *  $Id: IIRFilterMT.h,v 1.3 2009-09-11 05:57:13 ueshiba Exp $  
  */
 #ifndef __TUIIRFilterMT_h
 #define __TUIIRFilterMT_h
@@ -57,16 +57,16 @@ class BilateralIIRFilterThreadArray
       public:
 	FilterThread()	:_in(0), _out(0), _is(0), _ie(0)		{}
     
-	void		raise(const InArray2& in,
-			      OutArray2& out, int is, int ie)	const	;
+	void		raise(const InArray2& in, OutArray2& out,
+			      u_int is, u_int ie)		const	;
 
       private:
 	virtual void	doJob()						;
 
 	mutable const InArray2*		_in;
 	mutable OutArray2*		_out;
-	mutable int			_is;
-	mutable int			_ie;
+	mutable u_int			_is;
+	mutable u_int			_ie;
     };
     
   public:
@@ -88,7 +88,7 @@ inline BilateralIIRFilterThreadArray<ORD, IN, OUT>&
 BilateralIIRFilterThreadArray<ORD, IN, OUT>::
 initialize(const float cF[D+D], const float cB[D+D])
 {
-    for (int i = 0; i < _threads.dim(); ++i)
+    for (u_int i = 0; i < _threads.dim(); ++i)
 	_threads[i].initialize(cF, cB);
 
     return *this;
@@ -99,7 +99,7 @@ inline BilateralIIRFilterThreadArray<ORD, IN, OUT>&
 BilateralIIRFilterThreadArray<ORD, IN, OUT>::
 initialize(const float cF[D+D], Order order)
 {
-    for (int i = 0; i < _threads.dim(); ++i)
+    for (u_int i = 0; i < _threads.dim(); ++i)
 	_threads[i].initialize(cF, order);
 
     return *this;
@@ -112,14 +112,14 @@ operator ()(const InArray2& in, OutArray2& out) const
 {
     out.resize(in.ncol(), in.nrow());
     
-    const int	d = out.ncol() / _threads.dim();
-    for (int is = 0, n = 0; n < _threads.dim(); ++n)
+    const u_int	d = out.ncol() / _threads.dim();
+    for (u_int is = 0, n = 0; n < _threads.dim(); ++n)
     {
-	const int	ie = (n < _threads.dim() - 1 ? is + d : out.ncol());
+	const u_int	ie = (n < _threads.dim() - 1 ? is + d : out.ncol());
 	_threads[n].raise(in, out, is, ie);
 	is = ie;
     }
-    for (int n = 0; n < _threads.dim(); ++n)
+    for (u_int n = 0; n < _threads.dim(); ++n)
 	_threads[n].wait();
     
     return *this;
@@ -127,7 +127,7 @@ operator ()(const InArray2& in, OutArray2& out) const
     
 template <u_int ORD, class IN, class OUT> inline void
 BilateralIIRFilterThreadArray<ORD, IN, OUT>::FilterThread::
-raise(const InArray2& in, OutArray2& out, int is, int ie) const
+raise(const InArray2& in, OutArray2& out, u_int is, u_int ie) const
 {
     preRaise();
     _in	     = &in;

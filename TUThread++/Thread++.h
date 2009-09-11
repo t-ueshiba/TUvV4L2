@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Thread++.h,v 1.7 2008-09-10 05:11:50 ueshiba Exp $  
+ *  $Id: Thread++.h,v 1.8 2009-09-11 05:57:13 ueshiba Exp $  
  */
 #ifndef __TUThreadPP_h
 #define __TUThreadPP_h
@@ -90,14 +90,14 @@ class MultiThread : public OP
 	    :Thread(), _op(0), _data(0), _is(0), _ie(0)			{}
 
 	void		raise(const OP& op, DATA& data,
-			      int is, int ie)			const	;
+			      u_int is, u_int ie)		const	;
 
       private:
 	virtual void	doJob()						;
 
 	mutable const OP*	_op;
 	mutable DATA*		_data;
-	mutable int		_is, _ie;
+	mutable u_int		_is, _ie;
     };
 
   public:
@@ -119,20 +119,20 @@ MultiThread<OP, DATA>::createThreads(u_int nthreads)
 template <class OP, class DATA> inline void
 MultiThread<OP, DATA>::operator ()(DATA& data) const
 {
-    const int	d = data.dim() / _threads.dim();
-    for (int is = 0, n = 0; n < _threads.dim(); ++n)
+    const u_int	d = data.dim() / _threads.dim();
+    for (u_int is = 0, n = 0; n < _threads.dim(); ++n)
     {
-	const int	ie = (n < _threads.dim() - 1 ? is + d : data.dim());
+	const u_int	ie = (n < _threads.dim() - 1 ? is + d : data.dim());
 	_threads[n].raise(*this, data, is, ie);
 	is = ie;
     }
-    for (int n = 0; n < _threads.dim(); ++n)
+    for (u_int n = 0; n < _threads.dim(); ++n)
 	_threads[n].wait();
 }
 
 template <class OP, class DATA> inline void
 MultiThread<OP, DATA>::OperatorThread::raise(const OP& op, DATA& data,
-					     int is, int ie) const
+					     u_int is, u_int ie) const
 {
     preRaise();
     _op	  = &op;
@@ -162,7 +162,7 @@ class MultiThread2 : public OP
 	    :Thread(), _op(0), _in(0), _out(0), _is(0), _ie(0)		{}
 
 	void		raise(const OP& op, const IN& in,
-			      OUT& out, int is, int ie)		const	;
+			      OUT& out, u_int is, u_int ie)	const	;
 
       private:
 	virtual void	doJob()						;
@@ -170,7 +170,7 @@ class MultiThread2 : public OP
 	mutable const OP*	_op;
 	mutable const IN*	_in;
 	mutable OUT*		_out;
-	mutable int		_is, _ie;
+	mutable u_int		_is, _ie;
     };
 
   public:
@@ -194,21 +194,21 @@ MultiThread2<OP, IN, OUT>::createThreads(u_int nthreads)
 template <class OP, class IN, class OUT> void
 MultiThread2<OP, IN, OUT>::raiseThreads(const IN& in, OUT& out) const
 {
-    const int	d = out.dim() / _threads.dim();
-    for (int is = 0, n = 0; n < _threads.dim(); ++n)
+    const u_int	d = out.dim() / _threads.dim();
+    for (u_int is = 0, n = 0; n < _threads.dim(); ++n)
     {
-	const int	ie = (n < _threads.dim() - 1 ? is + d : out.dim());
+	const u_int	ie = (n < _threads.dim() - 1 ? is + d : out.dim());
 	_threads[n].raise(*this, in, out, is, ie);
 	is = ie;
     }
-    for (int n = 0; n < _threads.dim(); ++n)
+    for (u_int n = 0; n < _threads.dim(); ++n)
 	_threads[n].wait();
 }
 
 template <class OP, class IN, class OUT> inline void
 MultiThread2<OP, IN, OUT>::OperatorThread::raise(const OP& op,
 						const IN& in, OUT& out,
-						int is, int ie) const
+						u_int is, u_int ie) const
 {
     preRaise();
     _op  = &op;
