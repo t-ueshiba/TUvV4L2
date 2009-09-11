@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.8 2009-09-09 07:06:31 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.9 2009-09-11 05:56:13 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -586,7 +586,7 @@ template <u_int D> class BilateralIIRFilter : public BilateralIIRFilterBase
     const BilateralIIRFilter&
 		operator ()(const Array2<T1, B1, R1>& in,
 			    Array2<T2, B2, R2>& out,
-			    u_int is=0, u_int ie=0)			const	;
+			    u_int is=0, u_int ie=0)		const	;
     u_int	dim()						const	;
     float	operator [](int i)				const	;
     void	limits(float& limit0,
@@ -621,7 +621,7 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
 {
     _iirF.initialize(cF);
     _iirB.initialize(cB);
-#ifdef DEBUG
+#ifdef _DEBUG
     float	limit0, limit1, limit2;
     limits(limit0, limit1, limit2);
     std::cerr << "limit0 = " << limit0 << ", limit1 = " << limit1

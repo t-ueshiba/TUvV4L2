@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.h,v 1.5 2009-09-04 04:01:05 ueshiba Exp $
+ *  $Id: CorrectIntensity.h,v 1.6 2009-09-11 05:56:13 ueshiba Exp $
  */
 #ifndef	__TUCorrectIntensity_h
 #define	__TUCorrectIntensity_h
@@ -51,7 +51,8 @@ class __PORT CorrectIntensity
 
     void	initialize(float offset, float gain)			;
     template <class T>
-    void	operator()(Image<T>& image, int vs=0, int ve=0)	const	;
+    void	operator()(Image<T>& image,
+			   u_int vs=0, u_int ve=0)		const	;
     
   private:
     template <class T>

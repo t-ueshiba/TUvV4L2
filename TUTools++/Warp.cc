@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.14 2009-09-04 05:47:36 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.15 2009-09-11 05:56:13 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -297,13 +297,13 @@ Warp::initialize(const Matrix33d& Htinv,
 		ç≈å„ÇÃçsÇ‹Ç≈ïœå`åãâ Ç…ÇÊÇ¡ÇƒñÑÇﬂÇÁÇÍÇÈ
 */
 template <class T> void
-Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
+Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
 {
     out.resize(height(), width());
     if (ve == 0)
 	ve = out.height();
     
-    for (int v = vs; v < ve; ++v)
+    for (u_int v = vs; v < ve; ++v)
     {
 	const short	*usp  = _fracs[v].us, *vsp  = _fracs[v].vs;
 	const u_char	*dup  = _fracs[v].du, *dvp  = _fracs[v].dv;
@@ -403,13 +403,13 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, int vs, int ve) const
 */
 template <> __PORT void
 Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
-		  int vs, int ve) const
+		  u_int vs, u_int ve) const
 {
     out.resize(height(), width());
     if (ve == 0)
 	ve = out.height();
     
-    for (int v = vs; v < ve; ++v)
+    for (u_int v = vs; v < ve; ++v)
     {
 	const short	*usp  = _fracs[v].us, *vsp = _fracs[v].vs;
 	const u_char	*dup  = _fracs[v].du, *dvp = _fracs[v].dv;
@@ -449,8 +449,8 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 
 template __PORT void
 Warp::operator ()(const Image<RGBA>& in,
-		  Image<RGBA>& out, int vs, int ve) const;
+		  Image<RGBA>& out, u_int vs, u_int ve) const;
 template __PORT void
 Warp::operator ()(const Image<ABGR>& in,
-		  Image<ABGR>& out, int vs, int ve) const;
+		  Image<ABGR>& out, u_int vs, u_int ve) const;
 }

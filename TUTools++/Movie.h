@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.6 2009-08-11 00:44:57 ueshiba Exp $
+ *  $Id: Movie.h,v 1.7 2009-09-11 05:56:13 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -104,7 +104,7 @@ template <class T> class Movie
     u_int		_nelements;		// # of elements per frame.
     Array<Array<T> >	_frames;
     u_int		_cFrame;		// current frame #.
-#ifdef DEBUG
+#ifdef _DEBUG
     std::ofstream	_log;
 #endif
 };
@@ -114,7 +114,7 @@ template <class T> inline
 Movie<T>::Movie()
     :_views(0), _cView(0), _nelements(0), _frames(0), _cFrame(0)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
     _log.open("Movie.log");
 #endif
 }
@@ -123,7 +123,7 @@ Movie<T>::Movie()
 template <class T> inline
 Movie<T>::~Movie()
 {
-#ifdef DEBUG
+#ifdef _DEBUG
     _log.close();
 #endif
 }
@@ -228,7 +228,7 @@ Movie<T>::image()
 template <class T> Movie<T>&
 Movie<T>::setFrame(u_int frame)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
     using namespace	std;
     _log << "  Begin: Movie<T>::setFrame(frame = " << frame << ")" << endl;
 #endif
@@ -245,7 +245,7 @@ Movie<T>::setFrame(u_int frame)
 	else
 	    _cFrame = nframes();
     }
-#ifdef DEBUG
+#ifdef _DEBUG
     _log << "  End:   Movie<T>::setFrame()" << endl;
 #endif
     return *this;
@@ -260,13 +260,13 @@ Movie<T>::setFrame(u_int frame)
 template <class T> inline Movie<T>&
 Movie<T>::setView(u_int view)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
     using namespace	std;
     _log << "  Begin: Movie<T>::setView(view = " << view << ")" << endl;
 #endif
     if (view < nviews())
 	_cView = view;
-#ifdef DEBUG
+#ifdef _DEBUG
     _log << "  End:   Movie<T>::setView()" << endl;
 #endif
     return *this;
@@ -318,7 +318,7 @@ Movie<T>::operator --()
 template <class T> u_int
 Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
     using namespace	std;
     _log << "  Begin: Movie<T>::alloc(nframes = " << nf
 	 << ", nviews = " << sizes.dim()
@@ -340,14 +340,14 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 	try
 	{
 	    _frames[j].resize(_nelements);
-#ifdef DEBUG
+#ifdef _DEBUG
 	    _log << "    " << j << "-th frame allocated..." << endl;
 #endif
 	}
 	catch (...)
 	{
 	    _frames.resize(j);
-#ifdef DEBUG
+#ifdef _DEBUG
 	    _log << "    " << j << "-th frame cannot be allocated!" << endl;
 #endif
 	    break;
@@ -362,7 +362,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
     
     _cFrame = 0;
     _cView  = 0;
-#ifdef DEBUG
+#ifdef _DEBUG
     _log << "  End:   Movie<T>::alloc()" << endl;
 #endif
     return nframes();			// Return #frames allocated correctly.
