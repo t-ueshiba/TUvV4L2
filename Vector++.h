@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.32 2009-09-04 04:01:06 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.33 2009-09-17 23:26:15 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -2147,7 +2147,9 @@ TriDiagonal<T>::diagonalize()
 
 	  /* Find first m (< n) whose off-diagonal element is 0 */
 	    u_int	m = n;
-	    while (!off_diagonal_is_zero(--m));	// 0 <= m < n < dim() here
+	    while (!off_diagonal_is_zero(--m))	// 0 <= m < n < dim() here
+	    {
+	    }
 
 	  /* Set x and y which determine initial(i = m+1) plane rotation */
 	    T	x, y;
