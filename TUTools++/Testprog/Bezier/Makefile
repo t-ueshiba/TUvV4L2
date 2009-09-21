@@ -1,20 +1,28 @@
 #
-#  $Id: Makefile,v 1.11 2009-07-31 07:05:15 ueshiba Exp $
+#  $Id: Makefile,v 1.12 2009-09-21 07:09:05 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include -I$(X11HOME)/include
+INCDIRS		= -I$(PREFIX)/include -I$(X11HOME)/include -I$(OGLHOME)/include
 
 PROGRAM		= beziertest
 LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11
 
-CPPFLAGS	= -DUseXaw -DTUArrayPP_RangeCheck
-CFLAGS		= -g
-CCFLAGS		= -g
-LDFLAGS		= -L$(X11HOME)/lib
+CPPFLAGS	=
+CFLAGS		= -g -Wextra
+ifeq ($(CCC), icpc)
+  CFLAGS	= -O3
+  ifeq ($(OSTYPE), darwin)
+    CPPFLAGS   += -DSSE3
+  else
+    CPPFLAGS   += -DSSE2 -xN
+  endif
+endif
+CCFLAGS		= $(CFLAGS)
+LDFLAGS		=
 
 LINKER		= $(CCC)
 
@@ -53,7 +61,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.11 $	|		\
+REV		= $(shell echo $Revision: 1.12 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -63,7 +71,7 @@ REV		= $(shell echo $Revision: 1.11 $	|		\
 		  }')
 
 include $(PROJECT)/lib/p.mk
-include $(PROJECT)/lib/RCS.mk
+
 ###
 draw.o: draw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
