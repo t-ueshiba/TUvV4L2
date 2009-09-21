@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Nurbs++.h,v 1.15 2009-08-02 23:38:22 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.16 2009-09-21 07:09:05 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -892,14 +892,10 @@ BSplineSurface<C>::vElevateDegree()
 	    vRemoveKnot(l);
 }
 
-typedef BSplineSurface<Vector<float, FixedSizedBuf<float, 3> > >
-BSplineSurface3f;
-typedef BSplineSurface<Vector<float, FixedSizedBuf<float, 4> > >
-RationalBSplineSurface3f;
-typedef BSplineSurface<Vector<double, FixedSizedBuf<double, 3> > >
-BSplineSurface3d;
-typedef BSplineSurface<Vector<double, FixedSizedBuf<double, 4> > >
-RationalBSplineSurface3d;
+typedef BSplineSurface<Vector3f>	BSplineSurface3f;
+typedef BSplineSurface<Vector4f>	RationalBSplineSurface3f;
+typedef BSplineSurface<Vector3d>	BSplineSurface3d;
+typedef BSplineSurface<Vector4d>	RationalBSplineSurface3d;
 
 }
 #endif
