@@ -67,16 +67,9 @@ SOFTWARE.
 /* Private definitions. */
 
 static char defaultTranslations[] =
-    "<Btn1Down>:   StartScroll(Forward) \n\
-     <Btn2Down>:   StartScroll(Continuous) MoveThumb() NotifyThumb() \n\
-     <Btn3Down>:   StartScroll(Backward) \n\
-     <Btn2Motion>: MoveThumb() NotifyThumb() \n\
-     <BtnUp>:      NotifyScroll(Proportional) EndScroll()";
-#ifdef bogusScrollKeys
-    /* examples */
-    "<KeyPress>f:  StartScroll(Forward) NotifyScroll(FullLength) EndScroll()"
-    "<KeyPress>b:  StartScroll(Backward) NotifyScroll(FullLength) EndScroll()"
-#endif
+    "<BtnDown>:	   StartScroll(Continuous) MoveThumb() NotifyThumb()	\n\
+     <BtnMotion>:  MoveThumb() NotifyThumb()				\n\
+     <BtnUp>:	   NotifyScroll(Proportional) EndScroll()";
 
 static float floatZero = 0.0;
 
@@ -694,7 +687,7 @@ static void NotifyScroll (w, event, params, num_params)
     Cardinal *num_params;	/* we only support 1 */
 {
     SliderWidget sbw = (SliderWidget) w;
-    int call_data;
+    long call_data;
     char style;
     Position x, y;
 
@@ -725,7 +718,7 @@ static void NotifyScroll (w, event, params, num_params)
 	/* fall through */
 
     case 'F':
-    case 'f':    
+    case 'f':
 	XtCallCallbacks (w, XtNscrollProc, (XtPointer)call_data);
 	break;
 

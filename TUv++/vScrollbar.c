@@ -802,7 +802,7 @@ static void RepeatNotify (client_data, idp)
 {
 #define A_FEW_PIXELS 5
     VScrollbarWidget sbw = (VScrollbarWidget) client_data;
-    int call_data;
+    long call_data;
     if (sbw->scrollbar.scroll_mode != 1 && sbw->scrollbar.scroll_mode != 3) {
 	sbw->scrollbar.timer_id = (XtIntervalId) 0;
 	return;
@@ -897,7 +897,7 @@ static void NotifyScroll (w, event, params, num_params)
     Cardinal *num_params;	
 {
     VScrollbarWidget sbw = (VScrollbarWidget) w;
-    int call_data;
+    long call_data;
     Position x, y;
 
     if (sbw->scrollbar.scroll_mode == 2  /* if scroll continuous */
