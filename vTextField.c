@@ -908,7 +908,7 @@ RequestSelection(Widget aw, XtPointer client, Atom * selection, Atom * type,
 
     ClearHighlight(w);
     savex = w->text.OldCursorX;
-    w->text.CursorPos = (int) client;
+    w->text.CursorPos = (long) client;
 #ifdef DEBUG_TF
     printf("RequestSelection: inserting %s length=%d at pos: %d\n",
       (char *) value, (int) (*length), w->text.CursorPos);

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: App.cc,v 1.10 2009-03-03 00:59:46 ueshiba Exp $  
+ *  $Id: App.cc,v 1.11 2009-09-21 07:15:53 ueshiba Exp $  
  */
 #include "TU/v/App.h"
 #include <stdexcept>
@@ -134,10 +134,6 @@ static String	fallback[] =
 	<LeaveWindow>:	unhighlight() MenuPopdown()		\\n\
 	<BtnMotion>:	highlight() SubmenuPopup()		\\n\
 	<BtnUp>:	MenuPopdown() notify() unhighlight()",
-    "*Slider.translations:\
-	<BtnDown>:	StartScroll(Continuous) MoveThumb() NotifyThumb()\\n\
-	<BtnMotion>:	MoveThumb() NotifyThumb()			\\n\
-	<BtnUp>:	NotifyScroll(Proportional) EndScroll()",
     NULL
 };
 static XrmOptionDescRec	desc[] =
@@ -178,7 +174,7 @@ App::App(int& argc, char* argv[])
 			    {"SubmenuPopup", (XtActionProc)submenuPopup}
 			};
     XtAppAddActions(_appContext, actions, XtNumber(actions));
-
+    
   // Add error handlers.
     XSetErrorHandler((XErrorHandler)xerrorHandler);
 }

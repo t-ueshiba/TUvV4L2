@@ -791,7 +791,7 @@ static void ScrollUpDownProc(widget, closure, call_data)
 {
     VViewportWidget w = (VViewportWidget)closure;
     Widget child = w->viewport.child;
-    int pix = (int)call_data;
+    long pix = (long)call_data;
     Position x, y;
 
     if (child == NULL) return;	/* no child to scroll. */
