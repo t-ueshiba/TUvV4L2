@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.4 2008-05-27 11:38:27 ueshiba Exp $
+ *  $Id: main.cc,v 1.5 2009-09-25 00:23:27 ueshiba Exp $
  */
 #include <iomanip>
 #include <fstream>
@@ -102,12 +102,13 @@ class MyCanvasPane : public CanvasPane
 		 const IntArray2& points)
 	:CanvasPane(parentWin, image.width(), image.height()),
 	 _dc(*this),
-	 _image(image), _points(points), _underlay(1), _overlay(1)	{}
+	 _image(image), _points(points),
+	 _underlay(true), _overlay(true)			{}
 
     CanvasPaneDC&	dc()					{return _dc;}
     
-    virtual void	repaintUnderlay()				;
-    virtual void	repaintOverlay()				;
+    virtual void	repaintUnderlay()			;
+    virtual void	repaintOverlay()			;
 
   private:
     CanvasPaneDC		_dc;
@@ -116,7 +117,7 @@ class MyCanvasPane : public CanvasPane
     const IntArray2&		_points;
 
   public:
-    int				_underlay, _overlay;
+    bool			_underlay, _overlay;
 };
 
 void
@@ -331,7 +332,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	break;
 
       case c_Underlay:
-	_canvas0._underlay = val;
+	_canvas0._underlay = (val ? true : false);
 	if (val)
 	    _canvas0.dc() << repaint;
 	else
@@ -339,7 +340,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	break;
 
       case c_Overlay:
-	_canvas0._overlay = val;
+	_canvas0._overlay = (val ? true : false);
 	if (val)
 	    _canvas0.dc() << overlay << repaint << underlay;
 	else
@@ -380,12 +381,14 @@ main(int argc, char* argv[])
     using namespace	std;
 
     v::App		vapp(argc, argv);
-    Image<u_char>	image;
-    ifstream		in("/home/ueshiba/data/pbm/ALV.pgm", ios::in);
-    image.restore(in);
-
     try
     {
+	Image<u_char>	image;
+	ifstream	in("ALV.pgm", ios::in);
+	if (!in)
+	    throw runtime_error("Failed to open PGM file!!");
+	image.restore(in);
+
 	IntArray2	points;
 	cerr << "Points >> " << flush;
 	cin >> points;
