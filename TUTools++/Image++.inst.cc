@@ -25,13 +25,14 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.inst.cc,v 1.15 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: Image++.inst.cc,v 1.16 2009-10-05 23:28:21 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
 namespace TU
 {
 template class Image<u_char>;
+template class Image<s_char>;
 template class Image<short>;
 template class Image<int>;
 template class Image<float>;

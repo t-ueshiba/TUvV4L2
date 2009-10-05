@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.48 2009-09-04 05:47:36 ueshiba Exp $
+ *  $Id: Image++.h,v 1.49 2009-10-05 23:28:21 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -56,6 +56,7 @@ struct RGB
     RGB(const T& p)	:r(u_char(p)), g(u_char(p)), b(u_char(p))	{}
 
 		operator u_char()	const	{return u_char(double(*this));}
+		operator s_char()	const	{return s_char(double(*this));}
 		operator short()	const	{return short(double(*this));}
 		operator int()		const	{return int(double(*this));}
 		operator float()	const	{return float(double(*this));}
@@ -98,6 +99,7 @@ struct BGR
     BGR(const T& c)	:b(u_char(c)), g(u_char(c)), r(u_char(c))	{}
 
 		operator u_char()	const	{return u_char(double(*this));}
+		operator s_char()	const	{return s_char(double(*this));}
 		operator short()	const	{return short(double(*this));}
 		operator int()		const	{return int(double(*this));}
 		operator float()	const	{return float(double(*this));}
@@ -193,6 +195,7 @@ struct YUV444
     YUV444(const T& p)	:u(128), y(u_char(p)), v(128)	{}
 
 		operator u_char()		const	{return u_char(y);}
+		operator s_char()		const	{return s_char(y);}
 		operator short()		const	{return short(y);}
 		operator int()			const	{return int(y);}
 		operator float()		const	{return float(y);}
@@ -226,6 +229,7 @@ struct YUV422
     YUV422(const T& p)		:x(128), y(u_char(p))	{}
 
 		operator u_char()		const	{return u_char(y);}
+		operator s_char()		const	{return s_char(y);}
 		operator short()		const	{return short(y);}
 		operator int()			const	{return int(y);}
 		operator float()		const	{return float(y);}
@@ -311,6 +315,12 @@ fromYUV(u_char y, u_char u, u_char v)
 
 template <> inline u_char
 fromYUV<u_char>(u_char y, u_char, u_char)
+{
+    return y;
+}
+
+template <> inline s_char
+fromYUV<s_char>(u_char y, u_char, u_char)
 {
     return y;
 }
