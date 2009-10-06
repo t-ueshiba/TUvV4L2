@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.h,v 1.12 2009-08-13 23:04:17 ueshiba Exp $  
+ *  $Id: XDC.h,v 1.13 2009-10-06 12:11:45 ueshiba Exp $  
  */
 #ifndef __TUvXDC_h
 #define __TUvXDC_h
@@ -104,6 +104,7 @@ class XDC : public DC
     virtual DC&		setForeground(u_int fg)				;
     virtual DC&		setBackground(u_int bg)				;
     virtual DC&		setSaturation(u_int saturation)			;
+    virtual DC&		setSaturationF(float saturation)		;
     
     virtual DC&		clear()						;
     virtual DC&		sync()						;
@@ -115,6 +116,7 @@ class XDC : public DC
     virtual DC&		operator <<(const Image<u_char>& image)		;
     virtual DC&		operator <<(const Image<s_char>& image)		;
     virtual DC&		operator <<(const Image<short>&  image)		;
+    virtual DC&		operator <<(const Image<float>&  image)		;
     virtual DC&		operator <<(const Image<BGR>&    image)		;
     virtual DC&		operator <<(const Image<ABGR>&   image)		;
     virtual DC&		operator <<(const Image<RGB>&    image)		;

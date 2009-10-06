@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: DC.h,v 1.13 2009-08-13 23:04:17 ueshiba Exp $  
+ *  $Id: DC.h,v 1.14 2009-10-06 12:11:45 ueshiba Exp $  
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -72,6 +72,7 @@ class DC
     virtual DC&		setForeground(u_int index)		= 0;
     virtual DC&		setBackground(u_int index)		= 0;
     virtual DC&		setSaturation(u_int saturation)		= 0;
+    virtual DC&		setSaturationF(float saturation)	= 0;
     
     virtual DC&		clear()					= 0;
 	    DC&		repaint()				;
@@ -86,6 +87,7 @@ class DC
     virtual DC&		operator <<(const Image<u_char>& image)	= 0;
     virtual DC&		operator <<(const Image<s_char>& image)	= 0;
     virtual DC&		operator <<(const Image<short>&  image)	= 0;
+    virtual DC&		operator <<(const Image<float>&  image)	= 0;
     virtual DC&		operator <<(const Image<BGR>&    image)	= 0;
     virtual DC&		operator <<(const Image<ABGR>&   image)	= 0;
     virtual DC&		operator <<(const Image<RGB>&    image)	= 0;
@@ -231,6 +233,7 @@ extern OManip1<DC, u_int>	foreground(u_int)	;
 extern OManip1<DC, u_int>	background(u_int)	;
 extern OManip1<DC, u_int>	thickness(u_int)	;
 extern OManip1<DC, u_int>	saturation(u_int)	;
+extern OManip1<DC, float>	saturationF(float)	;
 extern OManip2<DC, int, int>	offset(int, int)	;
 
 template <class S> inline S&

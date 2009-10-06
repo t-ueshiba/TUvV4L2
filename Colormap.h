@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Colormap.h,v 1.5 2008-09-10 05:12:03 ueshiba Exp $  
+ *  $Id: Colormap.h,v 1.6 2009-10-06 12:11:45 ueshiba Exp $  
  */
 #ifndef __TUvColormap_h
 #define __TUvColormap_h
@@ -33,6 +33,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "TU/Image++.h"
+#include <stdexcept>
+#include <algorithm>
 
 namespace TU
 {
@@ -67,6 +69,8 @@ class Colormap
     void		setColorcube()					;
     u_int		getSaturation()				const	;
     void		setSaturation(u_int saturation)			;
+    float		getSaturationF()			const	;
+    void		setSaturationF(float saturation)		;
     
   // underlay stuffs
     template <class T>
@@ -111,13 +115,16 @@ class Colormap
     
   // X stuffs
     Display* const	_display;		// X server
-    const XVisualInfo	_vinfo;
+    XVisualInfo		_vinfo;
     const ::Colormap	_colormap;
 
   // underlay stuffs
+    enum		{UnderlayTableSize = 65536};
+    
     const u_int		_resolution;
     u_int		_saturation;
-    u_long		_underlayTable[256];
+    float		_gain;
+    u_long		_underlayTable[UnderlayTableSize];
 
   // overlay stuffs
     u_long		_overlayPlanes;		// mask for overlay planes
@@ -128,8 +135,8 @@ class Colormap
 
     const u_int		_colorcubeNPixels;
     const u_int		_gStride, _bStride;
-    const double	_rMul, _gMul, _bMul;
-    double		_dithermask[DITHERMASK_SIZE][DITHERMASK_SIZE];
+    const float		_rMul, _gMul, _bMul;
+    float		_dithermask[DITHERMASK_SIZE][DITHERMASK_SIZE];
 
   // general stuffs
     enum Map		{Graymap, Signedmap, Colorcube};
@@ -169,6 +176,23 @@ Colormap::getSaturation() const
     return _saturation;
 }
 
+inline float
+Colormap::getSaturationF() const
+{
+    return (_vinfo.c_class == PseudoColor ? _resolution / (2.0*_gain)
+					  : _resolution / _gain);
+}
+
+inline void
+Colormap::setSaturationF(float saturation)
+{
+    if (saturation <= 0.0)
+	throw std::out_of_range("TU::v::Colormap::setSaturationF: saturation value must be positive!!");
+    _gain = (_vinfo.c_class == PseudoColor ?
+	     _gain = _resolution / (2.0*saturation) :
+	     _gain = _resolution / saturation);
+}
+
 template <> inline u_long
 Colormap::getUnderlayPixel<u_char>(u_char val, u_int, u_int) const
 {
@@ -178,32 +202,41 @@ Colormap::getUnderlayPixel<u_char>(u_char val, u_int, u_int) const
 template <> inline u_long
 Colormap::getUnderlayPixel<s_char>(s_char val, u_int, u_int) const
 {
-    switch (_vinfo.c_class)
-    {
-      case TrueColor:
-      case DirectColor:
-	return (val < 0 ? _underlayTable[val+256] & _vinfo.green_mask :
-			  _underlayTable[val]	  & _vinfo.red_mask);
-    }
-    return (val < 0 ? _underlayTable[val+256] : _underlayTable[val]);
+    return (val < 0 ?
+	    _underlayTable[val+UnderlayTableSize] & _vinfo.red_mask :
+	    _underlayTable[val]			  & _vinfo.green_mask);
 }
 
 template <> inline u_long
 Colormap::getUnderlayPixel<short>(short val, u_int, u_int) const
 {
-    if (val > 127)
-	val = 127;
-    else if (val < -128)
-	val = -128;
-    
-    switch (_vinfo.c_class)
+    return (val < 0 ?
+	    _underlayTable[val+UnderlayTableSize] & _vinfo.red_mask :
+	    _underlayTable[val]			  & _vinfo.green_mask);
+}
+
+template <> inline u_long
+Colormap::getUnderlayPixel<float>(float val, u_int, u_int) const
+{
+    int		idx = int(_gain * val + 0.5);
+    bool	positive = true;
+    if (idx < 0)
     {
-      case TrueColor:
-      case DirectColor:
-	return (val < 0 ? _underlayTable[val+256] & _vinfo.green_mask :
-			  _underlayTable[val]	  & _vinfo.red_mask);
+	idx = -idx;
+	positive = false;
     }
-    return (val < 0 ? _underlayTable[val+256] : _underlayTable[val]);
+    
+    if (_vinfo.c_class == PseudoColor)
+    {
+	idx = std::min(idx, int(_resolution - 1) / 2);
+	return (positive ? _pixels[0][idx] : _pixels[0][_resolution - idx]);
+    }
+    else
+    {
+	idx = std::min(idx, int(_resolution - 1));
+	return (positive ? _pixels[0][idx] & _vinfo.green_mask
+			 : _pixels[0][idx] & _vinfo.red_mask);
+    }
 }
 
 template <class T> inline u_long
@@ -213,14 +246,14 @@ Colormap::getUnderlayPixel(T val, u_int u, u_int v) const
     {
       case PseudoColor:
       {
-	double		r = val.r * _rMul, g = val.g * _gMul,
+	float		r = val.r * _rMul, g = val.g * _gMul,
 			b = val.b * _bMul;
 	const u_int	rIndex = u_int(r), gIndex = u_int(g),
 			bIndex = u_int(b);
 	r -= rIndex;
 	g -= gIndex;
 	b -= bIndex;
-	const double mask = _dithermask[v%DITHERMASK_SIZE][u%DITHERMASK_SIZE];
+	const float mask = _dithermask[v%DITHERMASK_SIZE][u%DITHERMASK_SIZE];
 	return _pixels[0][(r > mask ? rIndex + 1 : rIndex) +
 			  (g > mask ? gIndex + 1 : gIndex) * _gStride +
 			  (b > mask ? bIndex + 1 : bIndex) * _bStride];

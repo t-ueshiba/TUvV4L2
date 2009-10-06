@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.cc,v 1.12 2009-08-13 23:04:17 ueshiba Exp $  
+ *  $Id: XDC.cc,v 1.13 2009-10-06 12:11:45 ueshiba Exp $  
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -230,6 +230,13 @@ XDC::setSaturation(u_int saturation)
 }
 
 DC&
+XDC::setSaturationF(float saturation)
+{
+    _colormap.setSaturationF(saturation);
+    return *this;
+}
+
+DC&
 XDC::clear()
 {
     if (getLayer() == DC::UNDERLAY)
@@ -358,6 +365,16 @@ XDC::operator <<(const Image<s_char>& image)
 
 DC&
 XDC::operator <<(const Image<short>& image)
+{
+    setSignedmap();
+    createXImage(image);
+    putXImage();
+
+    return *this;
+}
+
+DC&
+XDC::operator <<(const Image<float>& image)
 {
     setSignedmap();
     createXImage(image);
