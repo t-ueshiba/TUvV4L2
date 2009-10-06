@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: DC.cc,v 1.5 2008-09-10 05:12:05 ueshiba Exp $  
+ *  $Id: DC.cc,v 1.6 2009-10-06 12:11:45 ueshiba Exp $  
  */
 #include "TU/v/DC.h"
 
@@ -211,6 +211,12 @@ OManip1<DC, u_int>
 saturation(u_int s)
 {
     return OManip1<DC, u_int>(&DC::setSaturation, s);
+}
+
+OManip1<DC, float>
+saturationF(float s)
+{
+    return OManip1<DC, float>(&DC::setSaturationF, s);
 }
 
 OManip2<DC, int, int>
