@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Colormap.cc,v 1.6 2009-10-06 12:11:44 ueshiba Exp $  
+ *  $Id: Colormap.cc,v 1.7 2009-10-08 06:32:15 ueshiba Exp $  
  */
 #include "TU/v/Colormap.h"
 #include <sstream>
@@ -122,6 +122,8 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
      _mode(mode),
      _map(Graymap)
 {
+    using namespace	std;
+    
     if (_vinfo.c_class != TrueColor && _vinfo.c_class != DirectColor)
 	_vinfo.red_mask = _vinfo.green_mask = _vinfo.blue_mask = ~0x0L;
 
@@ -155,7 +157,7 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
 	if (!XAllocColorCells(_display, _colormap, False, planes, overlayDepth,
 			      _pixels[0], _pixels.ncol()))
 	{
-	    throw std::runtime_error("TU::v::Colormap::Colormap(): failed to allocate private colors.");
+	    throw runtime_error("TU::v::Colormap::Colormap(): failed to allocate private colors.");
 	}
 
       // Set overlay pixel values by ORing planes obtained.
@@ -234,59 +236,41 @@ Colormap::setColorcube()
 void
 Colormap::setSaturation(u_int saturation)
 {
-    switch (_map)
-    {
-      case Graymap:
-      {
-	_saturation = std::min(saturation, u_int(UnderlayTableSize));
+    using namespace	std;
+    
+    if (_resolution == 0)
+	throw out_of_range("TU::v::Colormap::setSaturation: resolution must be positive!!");
+    
+    _saturation = min(saturation, u_int(UnderlayTableSize / 2));
 
-	u_int	range = _resolution - 1;
-	float	delta = slant(range, _saturation - 1);
-	u_int	val = 0;
+    if (_map == Signedmap && _vinfo.c_class == PseudoColor)
+    {
+	const u_int	range = (_resolution + 1) / 2;
+	float		delta = slant(range - 1, _saturation - 1);
+	u_int		val = 0;
 	for (; val < _saturation; ++val)
 	    _underlayTable[val] = _pixels[0][u_int(0.5 + val*delta)];
-	for (; val < UnderlayTableSize; ++val)
+	for (; val < UnderlayTableSize / 2; ++val)
+	    _underlayTable[val] = _pixels[0][range - 1];
+	for (; val < UnderlayTableSize - _saturation; ++val)
 	    _underlayTable[val] = _pixels[0][range];
-      }
-        break;
-
-      case Signedmap:
-	if (_vinfo.c_class == PseudoColor)
-	{
-	    _saturation = std::min(saturation, u_int(UnderlayTableSize / 2));
-
-	    u_int	range = (_resolution - 1) / 2;
-	    float	delta = slant(range, _saturation - 1);
-	    u_int	val = 0;
-	    for (; val < _saturation; ++val)
-		_underlayTable[val] = _pixels[0][u_int(0.5 + val*delta)];
-	    for (; val < UnderlayTableSize / 2; ++val)
-		_underlayTable[val] = _pixels[0][range];
-	    for (; val < UnderlayTableSize - _saturation; ++val)
-		_underlayTable[val] = _pixels[0][range + 1];
-	    for (; val < UnderlayTableSize; ++val)
-		_underlayTable[val]
-		    = _pixels[0][_resolution - 1 -
-				 u_int(0.5 +
-				       (UnderlayTableSize - 1 - val)*delta)];
-	}
-	else
-	{
-	    _saturation = std::min(saturation, u_int(UnderlayTableSize));
-	    
-	    u_int	range = _resolution - 1;
-	    float	delta = slant(range, _saturation - 1);
-	    u_int	val = 0;
-	    for (; val < _saturation; ++val)
-		_underlayTable[val] = _pixels[0][u_int(0.5 + val*delta)];
-	    for (; val < UnderlayTableSize - _saturation; ++val)
-		_underlayTable[val] = _pixels[0][range];
-	    for (; val < UnderlayTableSize; ++val)
-		_underlayTable[val]
-		    = _pixels[0][u_int(0.5 +
-				       (UnderlayTableSize - 1 - val)*delta)];
-	}
-        break;
+	delta = slant(_resolution - 1 - range, _saturation - 1);
+	for (; val < UnderlayTableSize; ++val)
+	    _underlayTable[val]
+		= _pixels[0][_resolution - 1 - 
+			     u_int(0.5 + (UnderlayTableSize - 1 - val)*delta)];
+    }
+    else
+    {
+	const float	delta = slant(_resolution - 1, _saturation - 1);
+	u_int		val = 0;
+	for (; val < _saturation; ++val)
+	    _underlayTable[val] = _pixels[0][u_int(0.5 + val*delta)];
+	for (; val <= UnderlayTableSize - _saturation; ++val)
+	    _underlayTable[val] = _pixels[0][_resolution - 1];
+	for (; val < UnderlayTableSize; ++val)
+	    _underlayTable[val]
+		= _pixels[0][u_int(0.5 + (UnderlayTableSize - val)*delta)];
     }
 }
 
@@ -296,17 +280,19 @@ Colormap::setSaturation(u_int saturation)
 u_long
 Colormap::getUnderlayPixel(u_int index) const
 {
+    using namespace	std;
+    
     if (_mode != IndexedColor)
     {
-	throw std::runtime_error("TU::v::Colormap::getUnderlayPixel: Not in IndexedColor mode!!");
+	throw runtime_error("TU::v::Colormap::getUnderlayPixel: Not in IndexedColor mode!!");
     }
     if (_resolution + index >= _pixels.ncol())
     {
-        std::ostringstream	msg;
+        ostringstream	msg;
 	msg << "TU::v::Colormap::getUnderlayPixel: Index (" << index
 	    << ") is not within the range [" << 0 << ", "
-	    << _pixels.ncol() - _resolution << ")!" << std::endl;
-	throw std::out_of_range(msg.str());
+	    << _pixels.ncol() - _resolution << ")!" << endl;
+	throw out_of_range(msg.str());
     }
     return _pixels[0][_resolution + index];
 }
@@ -327,18 +313,20 @@ Colormap::getUnderlayValue(u_int index) const
 void
 Colormap::setUnderlayValue(u_int index, BGR bgr)
 {
+    using namespace	std;
+    
     if (_mode != IndexedColor)
     {
-	throw std::runtime_error("TU::v::Colormap::setUnderlayValue: Not in IndexedColor mode!!");
+	throw runtime_error("TU::v::Colormap::setUnderlayValue: Not in IndexedColor mode!!");
     }
     if (_resolution + index >= _pixels.ncol())
     {
-	std::ostringstream	msg;
+	ostringstream	msg;
 	msg << "TU::v::Colormap::setUnderlayValue: Index (" << index
 	    << ") is not within the range [" << 0 << ", "
 	    << _pixels.ncol() - _resolution
-	    << ")!" << std::endl;
-	throw std::out_of_range(msg.str());
+	    << ")!" << endl;
+	throw out_of_range(msg.str());
     }
 
     XColor	color;
@@ -376,17 +364,19 @@ Colormap::getUnderlayPixels() const
 u_long
 Colormap::getOverlayPixel(u_int index) const
 {
+    using namespace	std;
+    
     if (_mode != IndexedColor)
     {
-	throw std::runtime_error("TU::v::Colormap::getOverlayPixel: Not in IndexedColor mode!!");
+	throw runtime_error("TU::v::Colormap::getOverlayPixel: Not in IndexedColor mode!!");
     }
     if (index >= _pixels.nrow())
     {
-	std::ostringstream	msg;
+	ostringstream	msg;
 	msg << "TU::v::Colormap::getOverlayPixel: Index (" << index
 	    << ") is not within the range [" << 0 << ", " << _pixels.nrow()
-	    << ")!" << std::endl;
-	throw std::out_of_range(msg.str());
+	    << ")!" << endl;
+	throw out_of_range(msg.str());
     }
     return _pixels[index][0];
 }
@@ -407,17 +397,19 @@ Colormap::getOverlayValue(u_int index) const
 void
 Colormap::setOverlayValue(u_int index, BGR bgr)
 {
+    using namespace	std;
+    
     if (_mode != IndexedColor)
     {
-	throw std::runtime_error("TU::v::Colormap::setOverlayValue: Not in IndexedColor mode!!");
+	throw runtime_error("TU::v::Colormap::setOverlayValue: Not in IndexedColor mode!!");
     }
     if (index < 1 || index >= _pixels.nrow())
     {
-	std::ostringstream	msg;
+	ostringstream	msg;
 	msg << "TU::v::Colormap::setOverlayValue: Index (" << index
 	    << ") is not within the range [" << 1 << ", " << _pixels.nrow()
-	    << ")!" << std::endl;
-	throw std::out_of_range(msg.str());
+	    << ")!" << endl;
+	throw out_of_range(msg.str());
     }
 
     XColor	color;
@@ -447,6 +439,8 @@ Colormap::getOverlayPixels() const
 void
 Colormap::setGraymapInternal()
 {
+    using namespace	std;
+
   // Set underlay gray map.
     float	delta = slant(USHRT_MAX, _resolution - 1);
     switch (_vinfo.c_class)
@@ -472,7 +466,7 @@ Colormap::setGraymapInternal()
 	    color.flags = DoRed | DoGreen | DoBlue;
 	    if (!XAllocColor(_display, _colormap, &color))
 	    {
-		throw std::runtime_error("TU::v::Colormap::setGraymapInternal: Failed to allocate shared color!!");
+		throw runtime_error("TU::v::Colormap::setGraymapInternal: Failed to allocate shared color!!");
 	    }
 	    _pixels[0][i] = color.pixel;
 	}
@@ -499,14 +493,14 @@ Colormap::setSignedmapInternal()
 {
     if (_vinfo.c_class == PseudoColor)
     {
-      // Set underlay signed map.
-	float	delta  = slant(USHRT_MAX, (_resolution - 1)/2),
-		delta2 = slant(USHRT_MAX, _resolution/2 - 1);
+	const u_int	range  = (_resolution + 1) / 2;
+	const float	delta  = slant(USHRT_MAX, range - 1),
+			delta2 = slant(USHRT_MAX, _resolution - 1 - range);
 	for (u_int i = 0; i < _resolution; ++i)
 	{
 	    XColor	color;
 	    color.red = color.green = color.blue = 0;
-	    if (i < (_resolution + 1)/2)
+	    if (i < range)
 		color.green = u_short(0.5 + i*delta);
 	    else
 		color.red = u_short(0.5 + (_resolution - 1 - i)*delta2);
@@ -522,7 +516,7 @@ Colormap::setSignedmapInternal()
 void
 Colormap::setColorcubeInternal()
 {
-    float	rStep = (rDim() > 1 ? float(USHRT_MAX) / (rDim()-1) : 0.0),
+    const float	rStep = (rDim() > 1 ? float(USHRT_MAX) / (rDim()-1) : 0.0),
 		gStep = (gDim() > 1 ? float(USHRT_MAX) / (gDim()-1) : 0.0),
 		bStep = (bDim() > 1 ? float(USHRT_MAX) / (bDim()-1) : 0.0);
     for (u_int b = 0; b < bDim(); ++b)
