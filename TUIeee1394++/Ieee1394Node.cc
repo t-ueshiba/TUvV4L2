@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.15 2009-08-13 23:02:23 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.16 2009-10-16 02:47:25 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -380,6 +380,9 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
     _end = _buf + buf_size;
 
     const u_int	npackets = (buf_size - 1) / packet_size + 1;
+#  if defined(DEBUG)
+    cerr << "mapListenBuffer: npackets = " << dec << npackets << endl;
+#  endif
     if (raw1394_iso_recv_init(_handle, &Ieee1394Node::receive,
 			      nb_buffers * npackets, packet_size, _channel,
 			      RAW1394_DMA_BUFFERFILL, npackets) < 0)

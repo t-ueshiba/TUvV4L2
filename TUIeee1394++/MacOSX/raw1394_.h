@@ -19,11 +19,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.8 2008-10-17 00:24:49 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.9 2009-10-16 02:47:25 ueshiba Exp $
  */
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
-#include <mach/mach.h>
+#include <CoreServices/CoreServices.h>
+
 /************************************************************************
 *  struct raw1394							*
 ************************************************************************/
@@ -31,35 +32,35 @@
 struct raw1394
 {
   private:
-    class Interval
+    class Buffer
     {
       public:
-	Interval()					;
-	~Interval()					;
+	Buffer()					;
+	~Buffer()					;
 
+	const Buffer*	prev()			const	{return _prev;}
+	const Buffer*	next()			const	{return _next;}
 	UInt32		nPackets()		const	{return _nPackets;}
-	const NuDCLRef& operator [](int i)	const	{return _packet[i];}
-	NuDCLRef&	operator [](int i)		{return _packet[i];}
-	const NuDCLRef&	first()			const	{return _packet[0];}
+	const NuDCLRef& operator [](int i)	const	{return _packets[i];}
+	NuDCLRef&	operator [](int i)		{return _packets[i];}
+	const NuDCLRef&	first()			const	{return _packets[0];}
 	const NuDCLRef&	last()			const	{return
-							 _packet[_nPackets-1];}
-	const Interval*	prev()			const	{return _prev;}
+							 _packets[_nPackets-1];}
 	raw1394*	parent()		const	{return _parent;}
 	
-	void		resize(UInt32 n, const Interval& prv, raw1394* prnt);
+	void		resize(UInt32 n, const Buffer& prv,
+			       const Buffer& nxt, raw1394* prnt)	;
 
       private:
-	Interval(const Interval&)			;
-	Interval&	operator =(const Interval&)	;
+	Buffer(const Buffer&)						;
+	Buffer&	operator =(const Buffer&)				;
 	
       private:
 	UInt32		_nPackets;
-	NuDCLRef*	_packet;
-	const Interval*	_prev;
+	NuDCLRef*	_packets;
+	const Buffer*	_prev;
+	const Buffer*	_next;
 	raw1394*	_parent;
-
-      public:
-	UInt32		nPacketsDropped;
     };
     
   public:
@@ -82,13 +83,13 @@ struct raw1394
     IOReturn	isoRecvStart()						;
     IOReturn	isoStop()						;
     IOReturn	isoRecvFlush()						;
-    SInt32	loopIterate()						;
+    IOReturn	loopIterate()						;
     
   private:
     raw1394(const raw1394&)						;
     raw1394&	operator =(const raw1394&)				;
     
-    static void	receiveHandler(void* refcon, NuDCLRef dcl)		;
+    static void	dclCallback(void* refcon, NuDCLRef dcl)			;
     static IOReturn
 		getSupportedHandler(IOFireWireLibIsochPortRef isochPort,
 				    IOFWSpeed*		      speed,
@@ -103,23 +104,25 @@ struct raw1394
   private:
     IOCFPlugInInterface**		_cfPlugInInterface;
     IOFireWireLibDeviceRef		_fwDeviceInterface;
-    CFStringRef				_runLoopMode;
 
     IOFireWireLibNuDCLPoolRef		_dclPool;
-    vm_address_t			_vm;
-    vm_size_t				_vmSize;
+    IOVirtualAddress			_vm;
+    size_t				_vmSize;
     raw1394_iso_recv_handler_t		_recvHandlerExt;
-    UInt32				_nIntervals;
-    Interval*				_interval;
+    UInt32				_nBuffers;
+    Buffer*				_buffers;
     IOFireWireLibLocalIsochPortRef	_localIsochPort;
     
     UInt32				_channel;
     IOFireWireLibRemoteIsochPortRef	_remoteIsochPort;
     IOFireWireLibIsochChannelRef	_isochChannel;
-
+#ifndef SINGLE_THREAD
+    MPCriticalRegionID			_mutex;
+    const Buffer*			_ready;
+#endif
+    UInt32				_dropped;
+    
     void*				_userData;
-
-    static UInt32			_nnodes;
 };
 
 //! ::raw1394構造体にユーザが指定したデータへのポインタを貼付ける
@@ -228,15 +231,5 @@ inline IOReturn
 raw1394::isoStop()
 {
     return (*_isochChannel)->Stop(_isochChannel);
-}
-
-//! isochronous転送のループを1回実行する
-/*!
-  \return	ループの実行が終了した原因を示すコード
-*/
-inline SInt32
-raw1394::loopIterate()
-{
-    return CFRunLoopRunInMode(_runLoopMode, (CFTimeInterval)0, true);
 }
 

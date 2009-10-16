@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.31 2009-05-13 01:14:39 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.32 2009-10-16 02:47:25 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -441,6 +441,11 @@ Ieee1394Camera::powerOff()
 Ieee1394Camera&
 Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 {
+#ifdef DEBUG
+    using namespace	std;
+    
+    cerr << "*** BEGIN [setFormatAndFrameRate] ***" << endl;
+#endif
     checkAvailability(format, rate);
     const u_int	fmt  = (u_int(format) - u_int(YUV444_160x120)) / 0x20,
 		mode = (u_int(format) - u_int(YUV444_160x120)) % 0x20 / 4;
@@ -451,6 +456,9 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
     u_int	rt = 0;
     for (u_int bit = FrameRate_1_875; bit != rate; bit >>= 1)
 	++rt;
+#ifdef DEBUG
+    cerr << "  rt = " << dec << rt << endl;
+#endif
     writeQuadletToRegister(Cur_V_Frm_Rate, rt   << 29);
     writeQuadletToRegister(Cur_V_Mode,	   mode << 29);
     writeQuadletToRegister(Cur_V_Format,   fmt  << 29);
@@ -648,6 +656,10 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
     }
   // buf_sizeをpacket_sizeの整数倍にしてからmapする．
     const u_int	 buf_size = packet_size * ((_img_size - 1) / packet_size + 1);
+#ifdef DEBUG
+    cerr << "  packetsize = " << packet_size << ", buf_size = " << buf_size
+	 << endl;
+#endif
     const u_char ch = mapListenBuffer(packet_size, buf_size, NBUFFERS);
 
   // map時に割り当てられたチャンネル番号をカメラに設定する．
@@ -658,6 +670,9 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
     if (cont)
 	continuousShot();
     
+#ifdef DEBUG
+    cerr << "*** END [setFormatAndFrameRate] ***" << endl;
+#endif
     return *this;
 }
 
@@ -745,14 +760,15 @@ Ieee1394Camera::getFormat_7_Info(Format format7)
     fmt7info.pixelFormat = uintToPixelFormat(0x1u << (31 - colorCodingID));
     quad = readQuadlet(base + COLOR_CODING_INQ);
     fmt7info.availablePixelFormats = quad;
-
-  /*    std::cerr <<   "max size:    " << fmt7info.maxWidth	 << 'x' << fmt7info.maxHeight
+#ifdef DEBUG
+    std::cerr << hex
+	      <<   "max size:    " << fmt7info.maxWidth	 << 'x' << fmt7info.maxHeight
 	      << "\nunit size:   " << fmt7info.unitWidth << 'x' << fmt7info.unitHeight
 	      << "\norigin unit: " << fmt7info.unitU0	 << 'x' << fmt7info.unitV0
 	      << "\norigin:      " << fmt7info.u0	 << ',' << fmt7info.v0
 	      << "\nsize:        " << fmt7info.width	 << 'x' << fmt7info.height
-	      << std::endl;*/
-    
+	      << std::endl;
+#endif
     return fmt7info;
 }
 

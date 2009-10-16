@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.25 2009-05-10 23:34:26 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.26 2009-10-16 02:47:25 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ

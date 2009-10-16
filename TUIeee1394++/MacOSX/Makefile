@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.4 2008-10-17 00:24:47 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2009-10-16 02:47:25 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,9 +10,9 @@ INCDIRS		= -I.
 
 NAME		= raw1394
 
-CPPFLAGS	= #-DUSE_THREAD
-CFLAGS		= -O -g
-CCFLAGS		= -O -g
+CPPFLAGS	= #-DSINGLE_THREAD #-DDEBUG
+CFLAGS		= -g
+CCFLAGS		= -g
 ifeq ($(CCC), icpc)
   CFLAGS	= -O3
   CCFLAGS	= $(CFLAGS)
@@ -34,7 +34,7 @@ OBJS		= raw1394.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

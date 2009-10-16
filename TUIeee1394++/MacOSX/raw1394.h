@@ -1,5 +1,5 @@
 /*
- *  $Id: raw1394.h,v 1.10 2008-10-17 00:24:48 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.11 2009-10-16 02:47:25 ueshiba Exp $
  */
 /*!
   \mainpage	libraw1394 - Linux上のlibraw1394に互換な機能をMacOS X上で提供するエミュレーションライブラリ
@@ -59,11 +59,11 @@ extern "C" {
 /*! ::raw1394構造体へのハンドル */
 typedef struct raw1394*		raw1394handle_t;
 
-typedef unsigned short		nodeid_t;
-typedef unsigned long long	nodeaddr_t;
+typedef u_int16_t		nodeid_t;
+typedef u_int64_t		nodeaddr_t;
 
 /*! asynchronous転送データの単位(4 bytes) */
-typedef unsigned long		quadlet_t;
+typedef u_int32_t		quadlet_t;
 
 /*! ishochronous送/受信ハンドラの終了状態を表し，さらにこれを呼んだ
     raw1394_loop_iterate()にどのような処理をさせるかを指定するコード
@@ -123,8 +123,7 @@ typedef raw1394_iso_disposition	(*raw1394_iso_recv_handler_t)(
   \return		生成された::raw1394構造体へのハンドル
 */
 raw1394handle_t
-	raw1394_new_handle(unsigned int unit_spec_ID,
-			   unsigned long long uniqId);
+	raw1394_new_handle(u_int32_t unit_spec_ID, u_int64_t uniqId);
 
 //! IEEE1394インターフェースである::raw1394構造体を破壊する
 /*!
