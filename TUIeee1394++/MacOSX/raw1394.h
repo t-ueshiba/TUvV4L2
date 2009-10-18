@@ -1,5 +1,5 @@
 /*
- *  $Id: raw1394.h,v 1.11 2009-10-16 02:47:25 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.12 2009-10-18 23:38:27 ueshiba Exp $
  */
 /*!
   \mainpage	libraw1394 - Linux上のlibraw1394に互換な機能をMacOS X上で提供するエミュレーションライブラリ

@@ -1,5 +1,5 @@
 /*
- * libTUIeee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
+ * libraw1394: Transplanation of Linux version to MacOS X
  * Copyright (C) 2003-2006 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
  *
@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.10 2009-10-16 02:47:25 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.11 2009-10-18 23:38:27 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -32,7 +32,7 @@
 *  class raw1394::Buffer						*
 ************************************************************************/
 raw1394::Buffer::Buffer()
-    :_nPackets(0), _packets(0), _prev(0), _next(0), _parent(0)
+    :_nPackets(0), _packets(0), _prev(0), _next(0), _parent(0), valid(false)
 {
 }
 
@@ -42,8 +42,7 @@ raw1394::Buffer::~Buffer()
 }
     
 void
-raw1394::Buffer::resize(UInt32 n, const Buffer& prv,
-			const Buffer& nxt, raw1394* prnt)
+raw1394::Buffer::resize(UInt32 n, const Buffer& prv, Buffer& nxt, raw1394* prnt)
 {
     delete [] _packets;
     _nPackets = n;
@@ -51,6 +50,7 @@ raw1394::Buffer::resize(UInt32 n, const Buffer& prv,
     _prev     = &prv;
     _next     = &nxt;
     _parent   = prnt;
+    valid     = false;
 }
 
 /************************************************************************
@@ -66,10 +66,8 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
      _dclPool(0), _vm(0), _vmSize(0), _recvHandlerExt(0),
      _nBuffers(0), _buffers(0), _localIsochPort(0),
      _channel(0), _remoteIsochPort(0), _isochChannel(0),
-#ifndef SINGLE_THREAD
-     _mutex(), _ready(0),
-#endif
-      _dropped(0), _userData(0)
+     _mutex(), _lastProcessed(0), _lastReceived(0), _dropped(0),
+     _userData(0)
 {
     using namespace	std;
     
@@ -121,10 +119,10 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
     IOObjectRelease(iterator);
     if (!_fwDeviceInterface)
 	throw runtime_error("raw1394::raw1394: no specified service(=device) found!!");
-#ifndef SINGLE_THREAD
+
   // Create mutex.
-    MPCreateCriticalRegion (&_mutex);
-#endif    
+    MPCreateCriticalRegion(&_mutex);
+
   // Add a callback dispatcher to RunLoop with a specific mode.
     if ((*_fwDeviceInterface)->AddCallbackDispatcherToRunLoopForMode(
 	    _fwDeviceInterface, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode)
@@ -150,9 +148,9 @@ raw1394::~raw1394()
 		->RemoveIsochCallbackDispatcherFromRunLoop(_fwDeviceInterface);
 	    (*_fwDeviceInterface)
 		->RemoveCallbackDispatcherFromRunLoop(_fwDeviceInterface);
-#ifndef SINGLE_THREAD
+
 	    MPDeleteCriticalRegion (_mutex);
-#endif
+
 	    (*_fwDeviceInterface)->Close(_fwDeviceInterface);
 	    (*_fwDeviceInterface)->Release(_fwDeviceInterface);
 	}
@@ -277,8 +275,9 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 	cerr << i << ": dcl = " << hex << dcl << endl;
 #endif
     }
+  // Set the last buffer self-loop.
     (*_dclPool)->SetDCLBranch(_buffers[_nBuffers-1].last(),
-			      _buffers[0].first());
+			      _buffers[_nBuffers-1].first());
 
   // [Step 1.4] Create a local isochronous port and bind it the DCL program.
     ranges[0].address = _vm;
@@ -320,15 +319,14 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 	!= kIOReturnSuccess)
 	return err;
     channel = _channel;		// Return the assinged channel number.
-#ifndef SINGLE_THREAD
+
   // [Step 4] Reset pointer to the ready buffer.
     MPEnterCriticalRegion(_mutex, kDurationForever);
-    _ready   = 0;
-    _dropped = 0;
+    _lastProcessed = &_buffers[_nBuffers-1];
+    _lastReceived  = &_buffers[_nBuffers-1];
+    _dropped	   = 0;
     MPExitCriticalRegion(_mutex);
-#else
-    _dropped = 0;
-#endif
+
 #ifdef DEBUG
     cerr << "*** END [isoRecvInit] ***" << endl;
 #endif
@@ -385,72 +383,86 @@ raw1394::isoRecvFlush()
 
 //! isochronous転送のループを1回実行する
 /*!
-  \return		ループの実行が成功すればkIOReturnSuccess,
-			そうでなければ原因を示すエラーコード
+  \return		データが壊れていなければユーザハンドラが返す値,
+			壊れていれば-1
 */
-IOReturn
+SInt32
 raw1394::loopIterate()
 {
-#ifndef SINGLE_THREAD
-#  ifdef DEBUG
+  // 受信済みだが処理されていないデータは，バッファ
+  // (_lastProcessed, _lastReceived] に収められる．dclCallback() は，
+  // データを受信するたびにそのバッファを _lastReceived に記録する．
+  // loopIterate() は，dclCallback() によって _lastReceived が更新されて
+  // _lastProcessed < _lastReceived となるのを待ち，_lastProcessed を
+  // 1つ先に進めてその内容が有効であればユーザ側に転送する．
+#ifdef DEBUG
     using namespace	std;
     
     cerr << "*** BEGIN [loopIterate] ***" << endl;
-#  endif
-  // いずれかのバッファにデータ読み込まれるまで待機
-    while (!_ready)
-	CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true);
-#  ifdef DEBUG
-    cerr << "  ready buffer = " << hex << _ready << endl;
-#  endif
-  // 最新のデータが読み込まれたバッファ:_readyと取りこぼしたパケット数:
-  // _droppedはdclCallback()によって変えられる可能性があるので排他制御
-    MPEnterCriticalRegion(_mutex, kDurationForever);
-    const Buffer* const	ready	= _ready;
-    const UInt32	dropped	= _dropped;
-    _ready = 0;
-    _dropped = 0;
-    MPExitCriticalRegion(_mutex);
-
-  // バッファをリングから取り出す
-    (*_dclPool)->SetDCLBranch(ready->prev()->last(), ready->next()->first());
-    (*_dclPool)->SetDCLBranch(ready->last(), ready->first());
-    void*	dcls[] = {ready->prev()->last(), ready->last()};
-    (*_localIsochPort)->Notify(_localIsochPort,
-			       kFWNuDCLModifyJumpNotification, dcls, 2);
-
-  // 先頭パケットのヘッダとデータアドレスを取り出す
-    IOVirtualRange	ranges[2];
-    (*_dclPool)->GetDCLRanges(ready->first(), 2, ranges);
-    UInt32		header = *((UInt32*)ranges[0].address);
-
-  // ユーザハンドラを介してデータを転送する
-    raw1394_iso_disposition	ret =
-	_recvHandlerExt(this,
-			(UInt8*)ranges[1].address,
-			ready->nPackets() * ranges[1].length,
-			(header & kFWIsochChanNum) >> kFWIsochChanNumPhase,
-			(header & kFWIsochTag)     >> kFWIsochTagPhase,
-			(header & kFWIsochSy)      >> kFWIsochSyPhase,
-			(header & kFWIsochTCode)   >> kFWIsochTCodePhase,
-			dropped);
-
-  // バッファをリングに挿入する
-    (*_dclPool)->SetDCLBranch(ready->last(), ready->next()->first());
-    (*_dclPool)->SetDCLBranch(ready->prev()->last(), ready->first());
-    dcls[0] = ready->last();
-    dcls[1] = ready->prev()->last();
-    (*_localIsochPort)->Notify(_localIsochPort,
-			       kFWNuDCLModifyJumpNotification, dcls, 2);
-#  ifdef DEBUG
-    cerr << "*** END [loopIterate] ***" << endl;
-#  endif
-    return ((ret == RAW1394_ISO_OK) || (ret == RAW1394_ISO_DEFER) ?
-	    kIOReturnSuccess : kIOReturnError);
-#else
-    return (CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true)
-	    == kCFRunLoopRunHandledSource ? kIOReturnSuccess : kIOReturnError);
 #endif
+  // dclCallback() によって新たなデータ読み込まれ，_lastReceived が更新される
+  // まで待機
+    while (_lastProcessed == _lastReceived)
+	CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true);
+    _lastProcessed = _lastProcessed->next();
+
+    Buffer*	buffer = _lastProcessed;  // 未処理の最初のバッファ
+#ifdef DEBUG
+    cerr << "  buffer[" << hex << buffer << "]: " << endl;
+#endif
+
+  // バッファデータの有効性を記憶し，次の受信に備えて無効化しておく
+    MPEnterCriticalRegion(_mutex, kDurationForever);
+    const bool	valid = buffer->valid;
+    buffer->valid = false;
+    MPExitCriticalRegion(_mutex);
+	
+    SInt32	ret = -1;
+    if (valid)	// データが有効（壊れていない）なら
+    {
+      // これまでに取りこぼしたパケット数を記憶し，次の受信に備えて0にしておく
+	MPEnterCriticalRegion(_mutex, kDurationForever);
+	const UInt32	dropped = _dropped;
+	_dropped = 0;
+	MPExitCriticalRegion(_mutex);
+
+      // 先頭パケットのヘッダとデータアドレスを取り出し，ユーザハンドラを介して
+      // 全パケットのデータを転送する
+	IOVirtualRange	ranges[2];
+	(*_dclPool)->GetDCLRanges(buffer->first(), 2, ranges);
+	const UInt32	header = *((UInt32*)ranges[0].address),
+			length = buffer->nPackets() * ranges[1].length;
+	ret = _recvHandlerExt(this, (UInt8*)ranges[1].address, length,
+			      (header & kFWIsochChanNum) >> kFWIsochChanNumPhase,
+			      (header & kFWIsochTag)     >> kFWIsochTagPhase,
+			      (header & kFWIsochSy)      >> kFWIsochSyPhase,
+			      (header & kFWIsochTCode)   >> kFWIsochTCodePhase,
+			      dropped);
+#ifdef DEBUG
+	cerr << "  " << dec << buffer->nPackets() << " pkts sent, "
+	     << dropped << " pkts dropped..." << endl;
+#endif
+    }
+#ifdef DEBUG
+    else
+    {
+	cerr << "CORRUPTED." << endl;
+    }
+#endif
+    
+  // 最後の処理済みバッファ _lastProcessed のDCLは，以降の未処理バッファ
+  // への上書きを防ぐために常に自己ループでなければならない．よって，この
+  // バッファを自己ループにし，1つ前のバッファをこのバッファに接続する．
+    (*_dclPool)->SetDCLBranch(buffer->last(), buffer->first());
+    (*_dclPool)->SetDCLBranch(buffer->prev()->last(), buffer->first());
+    void*	dcls[] = {buffer->last(), buffer->prev()->last()};
+    (*_localIsochPort)->Notify(_localIsochPort,
+			       kFWNuDCLModifyJumpNotification, dcls, 2);
+
+#ifdef DEBUG
+    cerr << "*** END [loopIterate] ***" << endl;
+#endif
+    return ret;
 }
 
 /************************************************************************
@@ -476,68 +488,38 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 						UInt32(30)));
 
   // 最初のパケットのみヘッダにsyビットが立っていることを確認
-    UInt32	dropped = 0;
+    bool	valid = true;
     for (UInt32 j = 0; j < buffer->nPackets(); ++j)
     {
 	IOVirtualRange	ranges[2];
 	(*me->_dclPool)->GetDCLRanges((*buffer)[j], 2, ranges);
-	UInt32	header  = *((UInt32*)ranges[0].address),
-		sy	= (header & kFWIsochSy) >> kFWIsochSyPhase;
+	const UInt32	header = *((UInt32*)ranges[0].address),
+			sy     = (header & kFWIsochSy) >> kFWIsochSyPhase;
 	if ((j == 0) ^ (sy != 0))
 	{
-	    dropped = buffer->nPackets();
+	    valid = false;
 	    break;
 	}
     }
-#ifndef SINGLE_THREAD
-  // _readyと_droppedはloopIterate()によって変えられる可能性があるので排他制御
+
+  // このバッファが既に受信済みであるか今回のデータが壊れているなら，今回の
+  // データを取りこぼしたものとして扱う．（_dropped と Buffer::valid
+  // は loopIterate() によって変えられる可能性があるので排他制御が必要）
     MPEnterCriticalRegion(me->_mutex, kDurationForever);
-    if (me->_ready != 0)	// 前回のデータがユーザハンドラに未渡しだったら
-    {				// これを取りこぼしたデータとしてカウントする
-	me->_dropped += me->_ready->nPackets();
-	me->_ready    = 0;
-    }
-    if (dropped == 0)			// 今回のデータが壊れていなければ
-	me->_ready = buffer;		// これを最新のバッファとする
-    else				// 壊れていれば
-	me->_dropped += dropped;	// 取りこぼしたデータとしてカウントする
+    if (buffer->valid || !valid)
+	me->_dropped += buffer->nPackets(); // 今回とりこぼしたパケット数を加算
+    buffer->valid = valid;		    // 今回のデータの有効性をセット
     MPExitCriticalRegion(me->_mutex);
-#else
-    if (dropped == 0)
-    {
-      // バッファをリングから取り出す
-	(*me->_dclPool)->SetDCLBranch(buffer->prev()->last(),
-				      buffer->next()->first());
-	(*me->_dclPool)->SetDCLBranch(buffer->last(), buffer->first());
-	void*	dcls[] = {buffer->prev()->last(), buffer->last()};
-	(*me->_localIsochPort)->Notify(me->_localIsochPort,
-				       kFWNuDCLModifyJumpNotification, dcls, 2);
 
-      // 先頭パケットのヘッダを取り出し，ユーザハンドラを介してデータを転送する
-	IOVirtualRange	ranges[2];
-	(*me->_dclPool)->GetDCLRanges(buffer->first(), 2, ranges);
-	UInt32		header = *((UInt32*)ranges[0].address);
-	me->_recvHandlerExt(me, (UInt8*)ranges[1].address,
-			    buffer->nPackets() * ranges[1].length,
-			    (header & kFWIsochChanNum) >> kFWIsochChanNumPhase,
-			    (header & kFWIsochTag)     >> kFWIsochTagPhase,
-			    (header & kFWIsochSy)      >> kFWIsochSyPhase,
-			    (header & kFWIsochTCode)   >> kFWIsochTCodePhase,
-			    me->_dropped);
-	me->_dropped = 0;
+  // このバッファを，データを受信した最新のバッファとする
+    me->_lastReceived = buffer;
 
-      // バッファをリングに挿入する
-	(*me->_dclPool)->SetDCLBranch(buffer->last(), buffer->next()->first());
-	(*me->_dclPool)->SetDCLBranch(buffer->prev()->last(), buffer->first());
-	dcls[0] = buffer->last();
-	dcls[1] = buffer->prev()->last();
-	(*me->_localIsochPort)->Notify(me->_localIsochPort,
-				       kFWNuDCLModifyJumpNotification, dcls, 2);
-    }
-    else
-	me->_dropped += dropped;
-#endif    
 #ifdef DEBUG
+    cerr << "  buffer[" << hex << buffer << "]: ";
+    if (buffer->valid)
+	cerr << "valid." << endl;
+    else
+	cerr << "CURRUPTED." << endl;
     cerr << "*** END [dclCallback] ***" << endl;
 #endif
 }
@@ -560,8 +542,8 @@ raw1394::allocatePortHandler(IOFireWireLibIsochPortRef	isochPort,
     raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
     me->_channel = channel;
 #ifdef DEBUG
-    std::cerr << "raw1394::allocatePortHandler: channel[" << dec << channel
-	      << "] assigned." << std::endl;
+    std::cerr << "raw1394::allocatePortHandler: channel["
+	      << std::dec << channel << "] assigned." << std::endl;
 #endif
     return kIOReturnSuccess;
 }
@@ -629,7 +611,7 @@ raw1394_write(raw1394handle_t handle, nodeid_t node,
 extern "C" int
 raw1394_loop_iterate(raw1394handle_t handle)
 {
-    return (handle->loopIterate() == kIOReturnSuccess ? 0 : -1);
+    return handle->loopIterate();
 }
 
 extern "C" int

@@ -1,5 +1,5 @@
 /*
- * libTUIeee1394++: C++ Library for Controlling IIDC 1394-based Digital Cameras
+ * libraw1394: Transplanation of Linux version to MacOS X
  * Copyright (C) 2003-2006 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
  *
@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.9 2009-10-16 02:47:25 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.10 2009-10-18 23:38:27 ueshiba Exp $
  */
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
@@ -39,7 +39,7 @@ struct raw1394
 	~Buffer()					;
 
 	const Buffer*	prev()			const	{return _prev;}
-	const Buffer*	next()			const	{return _next;}
+	Buffer*		next()			const	{return _next;}
 	UInt32		nPackets()		const	{return _nPackets;}
 	const NuDCLRef& operator [](int i)	const	{return _packets[i];}
 	NuDCLRef&	operator [](int i)		{return _packets[i];}
@@ -49,7 +49,7 @@ struct raw1394
 	raw1394*	parent()		const	{return _parent;}
 	
 	void		resize(UInt32 n, const Buffer& prv,
-			       const Buffer& nxt, raw1394* prnt)	;
+			       Buffer& nxt, raw1394* prnt)		;
 
       private:
 	Buffer(const Buffer&)						;
@@ -59,8 +59,11 @@ struct raw1394
 	UInt32		_nPackets;
 	NuDCLRef*	_packets;
 	const Buffer*	_prev;
-	const Buffer*	_next;
+	Buffer*		_next;
 	raw1394*	_parent;
+
+      public:
+	bool		valid;
     };
     
   public:
@@ -83,7 +86,7 @@ struct raw1394
     IOReturn	isoRecvStart()						;
     IOReturn	isoStop()						;
     IOReturn	isoRecvFlush()						;
-    IOReturn	loopIterate()						;
+    SInt32	loopIterate()						;
     
   private:
     raw1394(const raw1394&)						;
@@ -116,10 +119,10 @@ struct raw1394
     UInt32				_channel;
     IOFireWireLibRemoteIsochPortRef	_remoteIsochPort;
     IOFireWireLibIsochChannelRef	_isochChannel;
-#ifndef SINGLE_THREAD
+
     MPCriticalRegionID			_mutex;
-    const Buffer*			_ready;
-#endif
+    Buffer*				_lastProcessed;
+    const Buffer*			_lastReceived;
     UInt32				_dropped;
     
     void*				_userData;
