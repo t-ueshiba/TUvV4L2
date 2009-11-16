@@ -25,13 +25,15 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.31 2009-09-04 04:01:05 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.32 2009-11-16 23:38:38 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
 
+#include "TU/utility.h"
 #include "TU/Vector++.h"
 #include "TU/Normalize.h"
+#include "TU/Minimize.h"
 
 namespace TU
 {
@@ -300,7 +302,7 @@ typedef Point3<float>	Point3f;		//!< float型座標を持つ3次元点
 typedef Point3<double>	Point3d;		//!< double型座標を持つ3次元点
 
 /************************************************************************
-*  class HyperPlane<T, B>						*
+*  class HyperPlane<V>							*
 ************************************************************************/
 //! d次元射影空間中の超平面を表現するクラス
 /*!
@@ -308,51 +310,54 @@ typedef Point3<double>	Point3d;		//!< double型座標を持つ3次元点
   \f$\TUtud{p}{}\TUud{x}{} = 0,~\TUud{p}{} \in \TUspace{R}{d+1}\f$
   によって表される．
 */
-template <class T, class B=Buf<T> >
-class HyperPlane : public Vector<T, B>
+template <class V>
+class HyperPlane : public V
 {
   public:
-    HyperPlane(u_int d=2)						;
+    typedef typename V::value_type			value_type;
+    
+  public:
+    HyperPlane(u_int d=2)				;
 
   //! 同次座標ベクトルを指定して超平面オブジェクトを生成する．
   /*!
     \param p	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
   */
-    template <class T2, class B2>
-    HyperPlane(const Vector<T2, B2>& p)	:Vector<T, B>(p)		{}
+    template <class T, class B>
+    HyperPlane(const Vector<T, B>& p)	:V(p)		{}
 
     template <class Iterator>
-    HyperPlane(Iterator first, Iterator last)				;
+    HyperPlane(Iterator begin, Iterator end)		;
 
   //! 超平面オブジェクトの同次座標ベクトルを指定する．
   /*!
     \param v	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
     \return	この超平面オブジェクト
   */
-    template <class T2, class B2>
-    HyperPlane&	operator =(const Vector<T2, B2>& v)
-				{Vector<T, B>::operator =(v); return *this;}
+    template <class T, class B>
+    HyperPlane&	operator =(const Vector<T, B>& v)
+					{V::operator =(v); return *this;}
 
     template <class Iterator>
-    void	fit(Iterator first, Iterator last)			;
+    void	fit(Iterator begin, Iterator end)	;
 
   //! この超平面が存在する射影空間の次元を返す．
   /*! 
     \return	射影空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
   */
-    u_int	spaceDim()		const	{return Vector<T, B>::dim()-1;}
+    u_int	spaceDim()			const	{return V::dim()-1;}
 
   //! 超平面を求めるために必要な点の最小個数を返す．
   /*!
     現在設定されている射影空間の次元をもとに計算される．
     \return	必要な点の最小個数すなわち入力空間の次元#spaceDim()
   */
-    u_int	ndataMin()		const	{return spaceDim();}
+    u_int	ndataMin()			const	{return spaceDim();}
 
-    template <class T2, class B2> inline T
-    sqdist(const Vector<T2, B2>& x)		const	;
-    template <class T2, class B2> inline double
-    dist(const Vector<T2, B2>& x)		const	;
+    template <class T, class B> inline value_type
+    sqdist(const Vector<T, B>& x)		const	;
+    template <class T, class B> inline value_type
+    dist(const Vector<T, B>& x)			const	;
 };
 
 //! 空間の次元を指定して超平面オブジェクトを生成する．
@@ -360,60 +365,60 @@ class HyperPlane : public Vector<T, B>
   無限遠超平面([0, 0,..., 0, 1])に初期化される．
   \param d	この超平面が存在する射影空間の次元
 */
-template <class T, class B> inline
-HyperPlane<T, B>::HyperPlane(u_int d)
-    :Vector<T, B>(d + 1)
+template <class V> inline
+HyperPlane<V>::HyperPlane(u_int d)
+    :V(d + 1)
 {
     (*this)[d] = 1;
 }
     
 //! 与えられた点列の非同次座標に当てはめられた超平面オブジェクトを生成する．
 /*!
-  \param first			点列の先頭を示す反復子
-  \param last			点列の末尾を示す反復子
+  \param begin			点列の先頭を示す反復子
+  \param end			点列の末尾を示す反復子
   \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
 */
-template <class T, class B> template <class Iterator> inline
-HyperPlane<T, B>::HyperPlane(Iterator first, Iterator last)
+template <class V> template <class Iterator> inline
+HyperPlane<V>::HyperPlane(Iterator begin, Iterator end)
 {
-    fit(first, last);
+    fit(begin, end);
 }
 
 //! 与えられた点列の非同次座標に超平面を当てはめる．
 /*!
-  \param first			点列の先頭を示す反復子
-  \param last			点列の末尾を示す反復子
+  \param begin			点列の先頭を示す反復子
+  \param end			点列の末尾を示す反復子
   \throw std::invalid_argument	点の数が#ndataMin()に満たない場合に送出
 */
-template <class T, class B> template <class Iterator> void
-HyperPlane<T, B>::fit(Iterator first, Iterator last)
+template <class V> template <class Iterator> void
+HyperPlane<V>::fit(Iterator begin, Iterator end)
 {
   // 点列の正規化
-    const Normalize	normalize(first, last);
+    const Normalize	normalize(begin, end);
 
   // 充分な個数の点があるか？
-    const u_int		ndata = std::distance(first, last),
+    const u_int		ndata = std::distance(begin, end),
 			d     = normalize.spaceDim();
-    if (ndata < d)	// Vector<T, B>のサイズが未定なのでndataMin()は無効
+    if (ndata < d)	// Vのサイズが未定なのでndataMin()は無効
 	throw std::invalid_argument("Hyperplane::initialize(): not enough input data!!");
 
   // データ行列の計算
-    Matrix<T>	A(d, d);
-    while (first != last)
+    Matrix<value_type>	A(d, d);
+    while (begin != end)
     {
-	const Vector<T>&	x = normalize(*first++);
+	const Vector<double>&	x = normalize(*begin++);
 	A += x % x;
     }
 
   // データ行列の最小固有値に対応する固有ベクトルから法線ベクトルを計算し，
   // さらに点列の重心より原点からの距離を計算する．
-    Vector<T>		eval;
-    const Matrix<T>&	Ut = A.eigen(eval);
-    Vector<T, B>::resize(d+1);
+    Vector<value_type>		eval;
+    const Matrix<value_type>&	Ut = A.eigen(eval);
+    V::resize(d+1);
     (*this)(0, d) = Ut[Ut.nrow()-1];
     (*this)[d] = -((*this)(0, d)*normalize.centroid());
     if ((*this)[d] > 0.0)
-	Vector<T, B>::operator *=(-1.0);
+	*this *= -1.0;
 }
 
 //! 与えられた点と超平面の距離の2乗を返す．
@@ -422,10 +427,11 @@ HyperPlane<T, B>::fit(Iterator first, Iterator last)
 		（#spaceDim()+1次元）
   \return	点と超平面の距離の2乗
 */
-template <class T, class B> template <class T2, class B2> inline T
-HyperPlane<T, B>::sqdist(const Vector<T2, B2>& x) const
+template <class V> template <class T, class B>
+inline typename HyperPlane<V>::value_type
+HyperPlane<V>::sqdist(const Vector<T, B>& x) const
 {
-    const double	d = dist(x);
+    const value_type	d = dist(x);
     return d*d;
 }
 
@@ -438,10 +444,11 @@ HyperPlane<T, B>::sqdist(const Vector<T2, B2>& x) const
 				#spaceDim()+1のいずれでもない場合，もしくは
 				この点が無限遠点である場合に送出．
 */
-template <class T, class B> template <class T2, class B2> double
-HyperPlane<T, B>::dist(const Vector<T2, B2>& x) const
+template <class V> template <class T, class B>
+typename HyperPlane<V>::value_type
+HyperPlane<V>::dist(const Vector<T, B>& x) const
 {
-    const Vector<T2>&	p = (*this)(0, spaceDim());
+    const Vector<value_type>&	p = (*this)(0, spaceDim());
     if (x.dim() == spaceDim())
 	return (p * x + (*this)[spaceDim()]) / p.length();
     else if (x.dim() == spaceDim() + 1)
@@ -456,13 +463,583 @@ HyperPlane<T, B>::dist(const Vector<T2, B2>& x) const
     return 0;
 }
 
-typedef HyperPlane<float,  FixedSizedBuf<float,  3> >
-	LineP2f;			//!< float型座標を持つ2次元空間中の直線
-typedef HyperPlane<double, FixedSizedBuf<double, 3> >
-	LineP2d;			//!< double型座標を持つ2次元空間中の直線
-typedef HyperPlane<float,  FixedSizedBuf<float,  4> >
-	PlaneP3f;			//!< float型座標を持つ3次元空間中の平面
-typedef HyperPlane<double, FixedSizedBuf<double, 4> >
-	PlaneP3d;			//!< double型座標を持つ3次元空間中の平面
+typedef HyperPlane<Vector3f>	LineP2f;
+typedef HyperPlane<Vector3d>	LineP2d;
+typedef HyperPlane<Vector4f>	PlaneP3f;
+typedef HyperPlane<Vector4d>	PlaneP3d;
+
+/************************************************************************
+*  class MapCost<Map, Iterator>						*
+************************************************************************/
+//! 射影変換行列の最尤推定のためのコスト関数
+template <class Map, class Iterator>
+class MapCost
+{
+  public:
+    typedef typename Map::value_type	value_type;
+
+    MapCost(Iterator begin, Iterator end)				;
+
+    Vector<value_type>	operator ()(const Map& map)		const	;
+    Matrix<value_type>	jacobian(const Map& map)		const	;
+    static void		update(Map& map, const Vector<value_type>& dm)	;
+
+  private:
+    const Iterator	_begin, _end;
+    const u_int		_npoints;
+};
+    
+template <class Map, class Iterator>
+MapCost<Map, Iterator>::MapCost(Iterator begin, Iterator end)
+    :_begin(begin), _end(end), _npoints(std::distance(_begin, _end))
+{
+}
+    
+template <class Map, class Iterator>
+Vector<typename Map::value_type>
+MapCost<Map, Iterator>::operator ()(const Map& map) const
+{
+    const u_int		outDim = map.outDim();
+    Vector<value_type>	val(_npoints*outDim);
+    u_int		n = 0;
+    for (Iterator iter = _begin; iter != _end; ++iter)
+    {
+	val(n, outDim) = map(iter->first) - iter->second;
+	n += outDim;
+    }
+    
+    return val;
+}
+    
+template <class Map, class Iterator>
+Matrix<typename Map::value_type>
+MapCost<Map, Iterator>::jacobian(const Map& map) const
+{
+    const u_int		outDim = map.outDim();
+    Matrix<value_type>	J(_npoints*outDim, map.dof()+1);
+    u_int		n = 0;
+    for (Iterator iter = _begin; iter != _end; ++iter)
+    {
+	J(n, 0, outDim, J.ncol()) = map.jacobian(iter->first);
+	n += outDim;
+    }
+
+    return J;
+}
+
+template <class Map, class Iterator> inline void
+MapCost<Map, Iterator>::update(Map& map, const Vector<value_type>& dm)
+{
+    map.update(dm);
+}
+
+/************************************************************************
+*  class Projectivity<M>						*
+************************************************************************/
+//! 射影変換を行うクラス
+/*!
+  \f$\TUvec{T}{} \in \TUspace{R}{(n+1)\times(m+1)}\f$を用いてm次元空間の点
+  \f$\TUud{x}{} \in \TUspace{R}{m+1}\f$をn次元空間の点
+  \f$\TUud{y}{} \simeq \TUvec{T}{}\TUud{x}{} \in \TUspace{R}{n+1}\f$
+  に写す（\f$m \neq n\f$でも構わない）．
+*/
+template <class M>
+class Projectivity : public M
+{
+  public:
+    typedef typename M::value_type	value_type;
+
+    Projectivity()							;
+    Projectivity(u_int inDim, u_int outDim)				;
+
+  //! 変換行列を指定して射影変換オブジェクトを生成する．
+  /*!
+    \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+  */
+    template <class S, class B, class R>
+    Projectivity(const Matrix<S, B, R>& T) :M(T)			{}
+
+    template <class Iterator>
+    Projectivity(Iterator begin, Iterator end, bool refine=false)	;
+
+    using	M::nrow;
+    using	M::ncol;
+
+  //! 変換行列を指定する．
+  /*!
+    \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+  */
+    template <class S, class B, class R>
+    void	set(const Matrix<S, B, R>& T)		{M::operator =(T);}
+    
+    template <class Iterator>
+    void	fit(Iterator begin, Iterator end, bool refine=false)	;
+
+  //! この射影変換の入力空間の次元を返す．
+  /*! 
+    \return	入力空間の次元(同次座標のベクトルとしての次元は#inDim()+1)
+  */
+    u_int	inDim()				const	{return ncol()-1;}
+
+  //! この射影変換の出力空間の次元を返す．
+  /*! 
+    \return	出力空間の次元(同次座標のベクトルとしての次元は#outDim()+1)
+  */
+    u_int	outDim()			const	{return nrow()-1;}
+
+    u_int	ndataMin()			const	;
+    
+    template <class S, class B>
+    Vector<value_type>	operator ()(const Vector<S, B>& x)	const	;
+    template <class S, class B>
+    Vector<value_type>	mapP(const Vector<S, B>& x)		const	;
+    template <class S, class B>
+    Matrix<value_type>	jacobian(const Vector<S, B>& x)		const	;
+
+    template <class In, class Out>
+    value_type	sqdist(const std::pair<In, Out>& pair)		const	;
+    template <class In, class Out>
+    value_type	dist(const std::pair<In, Out>& pair)		const	;
+    u_int	dof()						const	;
+    void	update(const Vector<value_type>& dt)			;
+};
+
+//! 射影変換オブジェクトを生成する．
+/*!
+  恒等変換として初期化される．
+*/
+template <class M>
+Projectivity<M>::Projectivity()
+    :M()
+{
+    if (nrow() > 0 && ncol() > 0)
+    {
+	u_int	n = std::min(ncol() - 1, nrow() - 1);
+	for (u_int i = 0; i < n; ++i)
+	    (*this)[i][i] = 1.0;
+	(*this)[nrow() - 1][ncol() - 1] = 1.0;
+    }
+}
+    
+//! 入力空間と出力空間の次元を指定して射影変換オブジェクトを生成する．
+/*!
+  恒等変換として初期化される．
+  \param inDim	入力空間の次元
+  \param outDim	出力空間の次元
+*/
+template <class M>
+Projectivity<M>::Projectivity(u_int inDim, u_int outDim)
+    :M(outDim + 1, inDim + 1)
+{
+    u_int	n = std::min(inDim, outDim);
+    for (u_int i = 0; i < n; ++i)
+	(*this)[i][i] = 1.0;
+    (*this)[outDim][inDim] = 1.0;
+}
+    
+//! 与えられた点対列の非同次座標から射影変換オブジェクトを生成する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \param refine			非線型最適化の有(true)／無(false)を指定
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template <class M> template <class Iterator> inline
+Projectivity<M>::Projectivity(Iterator begin, Iterator end, bool refine)
+{
+    fit(begin, end, refine);
+}
+
+//! 与えられた点対列の非同次座標から射影変換を計算する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \param refine			非線型最適化の有(true)／無(false)を指定
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template <class M> template <class Iterator> void
+Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
+{
+  // 点列の正規化
+    const Normalize	xNormalize(make_const_first_iterator(begin),
+				   make_const_first_iterator(end)),
+			yNormalize(make_const_second_iterator(begin),
+				   make_const_second_iterator(end));
+
+  // 充分な個数の点対があるか？
+    const u_int		ndata = std::distance(begin, end);
+    const u_int		xdim1 = xNormalize.spaceDim() + 1,
+			ydim  = yNormalize.spaceDim();
+    if (ndata*ydim < xdim1*(ydim + 1) - 1)	// 行列のサイズが未定なので
+						// ndataMin()は無効
+	throw std::invalid_argument("Projectivity::fit(): not enough input data!!");
+
+  // データ行列の計算
+    Matrix<value_type>	A(xdim1*(ydim + 1), xdim1*(ydim + 1));
+    for (Iterator iter = begin; iter != end; ++iter)
+    {
+	const Vector<double>&	x  = xNormalize.normalizeP(iter->first);
+	const Vector<double>&	y  = yNormalize(iter->second);
+	const Matrix<double>&	xx = x % x;
+	A(0, 0, xdim1, xdim1) += xx;
+	for (u_int j = 0; j < ydim; ++j)
+	    A(ydim*xdim1, j*xdim1, xdim1, xdim1) -= y[j] * xx;
+	A(ydim*xdim1, ydim*xdim1, xdim1, xdim1) += (y*y) * xx;
+    }
+    for (u_int j = 1; j < ydim; ++j)
+	A(j*xdim1, j*xdim1, xdim1, xdim1) = A(0, 0, xdim1, xdim1);
+    A.symmetrize();
+
+  // データ行列の最小固有値に対応する固有ベクトルから変換行列を計算し，
+  // 正規化をキャンセルする．
+    Vector<value_type>	eval;
+    Matrix<value_type>	Ut = A.eigen(eval);
+    *this = yNormalize.Tinv()
+	  * Matrix<value_type>((value_type*)Ut[Ut.nrow()-1], ydim + 1, xdim1)
+	  * xNormalize.T();
+
+  // 変換行列が正方ならば，その行列式が１になるように正規化する．
+    if (nrow() == ncol())
+    {
+	value_type	d = M::det();
+	if (d > 0)
+	    *this /=  pow( d, 1.0/nrow());
+	else
+	    *this /= -pow(-d, 1.0/nrow());
+    }
+
+  // 非線型最適化を行う．
+    if (refine)
+    {
+	MapCost<Projectivity<M>, Iterator>	cost(begin, end);
+	ConstNormConstraint<Projectivity<M> >	constraint(*this);
+	minimizeSquare(cost, constraint, *this);
+    }
+}
+
+//! 射影変換を求めるために必要な点対の最小個数を返す．
+/*!
+  現在設定されている入出力空間の次元をもとに計算される．
+  \return	必要な点対の最小個数すなわち入力空間の次元m，出力空間の次元n
+		に対して m + 1 + m/n
+*/
+template <class M> inline u_int
+Projectivity<M>::ndataMin() const
+{
+    return inDim() + 1 + u_int(ceil(double(inDim())/double(outDim())));
+}
+    
+//! 与えられた点に射影変換を適用してその非同次座標を返す．
+/*!
+  \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
+  \return	射影変換された点の非同次座標（#outDim()次元）
+*/
+template <class M> template <class S, class B>
+inline Vector<typename Projectivity<M>::value_type>
+Projectivity<M>::operator ()(const Vector<S, B>& x) const
+{
+    if (x.dim() == inDim())
+    {
+	Vector<value_type>	y(outDim());
+	u_int			j;
+	for (j = 0; j < y.dim(); ++j)
+	{
+	    y[j] = (*this)[j][x.dim()];
+	    for (u_int i = 0; i < x.dim(); ++i)
+		y[j] += (*this)[j][i] * x[i];
+	}
+	value_type	w = (*this)[j][x.dim()];
+	for (u_int i = 0; i < x.dim(); ++i)
+	    w += (*this)[j][i] * x[i];
+	return y /= w;
+    }
+    else
+	return (*this * x).inhomogeneous();
+}
+
+//! 与えられた点に射影変換を適用してその同次座標を返す．
+/*!
+  \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
+  \return	射影変換された点の同次座標（#outDim()+1次元）
+*/
+template <class M> template <class S, class B>
+inline Vector<typename Projectivity<M>::value_type>
+Projectivity<M>::mapP(const Vector<S, B>& x) const
+{
+    if (x.dim() == inDim())
+    {
+	Vector<value_type>	y(nrow());
+	for (u_int j = 0; j < y.dim(); ++j)
+	{
+	    y[j] = (*this)[j][x.dim()];
+	    for (u_int i = 0; i < x.dim(); ++i)
+		y[j] += (*this)[j][i] * x[i];
+	}
+	return y;
+    }
+    else
+	return *this * x;
+}
+
+//! 与えられた点におけるヤコビ行列を返す．
+/*!
+  ヤコビ行列とは射影変換行列成分に関する1階微分のことである．
+  \param x	点の非同次座標（#inDim()次元）または同次座標（#inDim()+1次元）
+  \return	#outDim() x (#outDim()+1)x(#inDim()+1)ヤコビ行列
+*/
+template <class M> template <class S, class B>
+Matrix<typename Projectivity<M>::value_type>
+Projectivity<M>::jacobian(const Vector<S, B>& x) const
+{
+    Vector<value_type>		xP;
+    if (x.dim() == inDim())
+	xP = x.homogeneous();
+    else
+	xP = x;
+    const Vector<value_type>&	y  = mapP(xP);
+    Matrix<value_type>		J(outDim(), (outDim() + 1)*xP.dim());
+    for (u_int i = 0; i < J.nrow(); ++i)
+    {
+	J[i](i*xP.dim(), xP.dim()) = xP;
+	(J[i](outDim()*xP.dim(), xP.dim()) = xP) *= (-y[i]/y[outDim()]);
+    }
+    J /= y[outDim()];
+
+    return J;
+}
+    
+//! 入力点に射影変換を適用した点と出力点の距離の2乗を返す．
+/*!
+  \param pair	入力点の非同次座標（#inDim()次元）と出力点の非同次座標
+		（#outDim()次元）の対
+  \return	変換された入力点と出力点の距離の2乗
+*/
+template <class M> template <class In, class Out>
+inline typename Projectivity<M>::value_type
+Projectivity<M>::sqdist(const std::pair<In, Out>& pair) const
+{
+    return (*this)(pair.first).sqdist(pair.second);
+}
+    
+//! 入力点に射影変換を適用した点と出力点の距離を返す．
+/*!
+  \param pair	入力点の非同次座標（#inDim()次元）と出力点の非同次座標
+		（#outDim()次元）の対
+  \return	変換された入力点と出力点の距離
+*/
+template <class M> template <class In, class Out>
+inline typename Projectivity<M>::value_type
+Projectivity<M>::dist(const std::pair<In, Out>& pair) const
+{
+    return sqrt(sqdist(pair));
+}
+
+//! この射影変換の自由度を返す．
+/*!
+  \return	射影変換の自由度（(#outDim()+1)x(#inDim()+1)-1）
+*/
+template <class M> inline u_int
+Projectivity<M>::dof() const
+{
+    return (outDim() + 1)*(inDim() + 1)-1;
+}
+
+//! 射影変換行列を与えられた量だけ修正する．
+/*!
+  \param dt	修正量を表すベクトル（(#outDim()+1)x(#inDim()+1)次元）
+*/
+template <class M> inline void
+Projectivity<M>::update(const Vector<value_type>& dt)
+{
+    Vector<value_type>	t(*this);
+    value_type		l = t.length();
+    t -= dt;
+    t *= (l / t.length());
+}
+    
+typedef Projectivity<Matrix22f>	Projectivity11f;
+typedef Projectivity<Matrix22d>	Projectivity11d;
+typedef Projectivity<Matrix33f>	Projectivity22f;
+typedef Projectivity<Matrix33d>	Projectivity22d;
+typedef Projectivity<Matrix44f>	Projectivity33f;
+typedef Projectivity<Matrix44d>	Projectivity33d;
+typedef Projectivity<Matrix34f>	Projectivity23f;
+typedef Projectivity<Matrix34d>	Projectivity23d;
+
+/************************************************************************
+*  class Affinity<M>							*
+************************************************************************/
+//! アフィン変換を行うクラス
+/*!
+  \f$\TUvec{A}{} \in \TUspace{R}{n\times m}\f$と
+  \f$\TUvec{b}{} \in \TUspace{R}{n}\f$を用いてm次元空間の点
+  \f$\TUvec{x}{} \in \TUspace{R}{m}\f$をn次元空間の点
+  \f$\TUvec{y}{} \simeq \TUvec{A}{}\TUvec{x}{} + \TUvec{b}{}
+  \in \TUspace{R}{n}\f$に写す（\f$m \neq n\f$でも構わない）．
+*/
+template <class M>
+class Affinity : public Projectivity<M>
+{
+  public:
+    typedef typename Projectivity<M>::value_type	value_type;
+    
+  //! 入力空間と出力空間の次元を指定してアフィン変換オブジェクトを生成する．
+  /*!
+    恒等変換として初期化される．
+    \param inDim	入力空間の次元
+    \param outDim	出力空間の次元
+  */
+    Affinity(u_int inDim=2, u_int outDim=2)
+	:Projectivity<M>(inDim, outDim)					{}
+
+    template <class S, class B, class R>
+    Affinity(const Matrix<S, B, R>& T)					;
+    template <class Iterator>
+    Affinity(Iterator begin, Iterator end)				;
+
+    using	Projectivity<M>::inDim;
+    using	Projectivity<M>::outDim;
+    
+    template <class S, class B, class R>
+    void	set(const Matrix<S, B, R>& T)				;
+    template <class Iterator>
+    void	fit(Iterator begin, Iterator end)			;
+    u_int	ndataMin()					const	;
+    
+  //! このアフィン変換の変形部分を表現する行列を返す．
+  /*! 
+    \return	#outDim() x #inDim()行列
+  */
+    const Matrix<value_type>
+		A()	const	{return M::operator ()(0, 0, outDim(), inDim());}
+    
+    Vector<value_type>
+		b()	const	;
+};
+
+//! 変換行列を指定してアフィン変換オブジェクトを生成する．
+/*!
+  変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
+  \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+*/
+template<class M> template <class S, class B, class R> inline
+Affinity<M>::Affinity(const Matrix<S, B, R>& T)
+    :Projectivity<M>(T)
+{
+    (*this)[outDim()]	  = 0.0;
+    (*this)[outDim()][inDim()] = 1.0;
+}
+
+//! 与えられた点対列の非同次座標からアフィン変換オブジェクトを生成する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template<class M> template <class Iterator> inline
+Affinity<M>::Affinity(Iterator begin, Iterator end)
+{
+    fit(begin, end);
+}
+
+//! 変換行列を指定する．
+/*!
+  変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
+  \param T			(m+1)x(n+1)行列（m, nは入力／出力空間の次元）
+*/
+template<class M> template <class S, class B, class R> inline void
+Affinity<M>::set(const Matrix<S, B, R>& T)
+{
+    Projectivity<M>::set(T);
+    (*this)[outDim()]	       = 0.0;
+    (*this)[outDim()][inDim()] = 1.0;
+}
+    
+//! 与えられた点対列の非同次座標からアフィン変換を計算する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template<class M> template <class Iterator> void
+Affinity<M>::fit(Iterator begin, Iterator end)
+{
+  // 充分な個数の点対があるか？
+    const u_int	ndata = std::distance(begin, end);
+    if (ndata == 0)		// beginが有効か？
+	throw std::invalid_argument("Affinity::fit(): 0-length input data!!");
+    const u_int	xdim = begin->first.dim();
+    if (ndata < xdim + 1)	// 行列のサイズが未定なのでndataMin()は無効
+	throw std::invalid_argument("Affinity::fit(): not enough input data!!");
+
+  // データ行列の計算
+    const u_int	ydim = begin->second.dim(), xydim2 = xdim*ydim;
+    Matrix<value_type>	N(xdim, xdim);
+    Vector<value_type>	c(xdim), v(xydim2 + ydim);
+    for (Iterator iter = begin; iter != end; ++iter)
+    {
+	const Vector<value_type>&	x = iter->first;
+	const Vector<value_type>&	y = iter->second;
+
+	N += x % x;
+	c += x;
+	for (u_int j = 0; j < ydim; ++j)
+	    v(j*xdim, xdim) += y[j]*x;
+	v(xydim2, ydim) += y;
+    }
+    Matrix<value_type>	W(xydim2 + ydim, xydim2 + ydim);
+    for (u_int j = 0; j < ydim; ++j)
+    {
+	W(j*xdim, j*xdim, xdim, xdim) = N;
+	W[xydim2 + j](j*xdim, xdim)   = c;
+	W[xydim2 + j][xydim2 + j]     = ndata;
+    }
+    W.symmetrize();
+
+  // W*u = vを解いて変換パラメータを求める．
+    v.solve(W);
+
+  // 変換行列をセットする．
+    M::resize(ydim + 1, xdim + 1);
+    M::operator ()(0, 0, ydim, xdim)
+	= Matrix<value_type>((value_type*)v, ydim, xdim);
+    for (u_int j = 0; j < ydim; ++j)
+	(*this)[j][xdim] = v[xydim2 + j];
+    (*this)[ydim][xdim] = 1.0;
+}
+
+//! このアフィン変換の並行移動部分を表現するベクトルを返す．
+/*! 
+  \return	#outDim()次元ベクトル
+*/
+template <class M> Vector<typename Affinity<M>::value_type>
+Affinity<M>::b() const
+{
+    Vector<value_type>	bb(outDim());
+    for (u_int j = 0; j < bb.dim(); ++j)
+	bb[j] = (*this)[j][inDim()];
+
+    return bb;
+}
+
+//! アフィン変換を求めるために必要な点対の最小個数を返す．
+/*!
+  現在設定されている入出力空間の次元をもとに計算される．
+  \return	必要な点対の最小個数すなわち入力空間の次元mに対して m + 1
+*/
+template<class M> inline u_int
+Affinity<M>::ndataMin() const
+{
+    return inDim() + 1;
+}
+
+typedef Affinity<Matrix22f>	Affinity11f;
+typedef Affinity<Matrix22d>	Affinity11d;
+typedef Affinity<Matrix33f>	Affinity22f;
+typedef Affinity<Matrix33d>	Affinity22d;
+typedef Affinity<Matrix44f>	Affinity33f;
+typedef Affinity<Matrix44d>	Affinity33d;
+typedef Affinity<Matrix34f>	Affinity23f;
+typedef Affinity<Matrix34d>	Affinity23d;
 }
 #endif	/* !__TUGeometryPP_h */

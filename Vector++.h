@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.33 2009-09-17 23:26:15 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.34 2009-11-16 23:38:38 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -137,8 +137,6 @@ class Vector : public Array<T, B>
     Vector()								;
     explicit Vector(u_int d)						;
     Vector(T* p, u_int d)						;
-    template <class B2, class R2>
-    Vector(const Matrix<T, B2, R2>& m)					;
     template <class B2>
     Vector(const Vector<T, B2>& v, u_int i, u_int d)			;
     template <class T2, class B2>
@@ -179,8 +177,8 @@ class Vector : public Array<T, B>
     Vector&		solve(const Matrix<T2, B2, R2>& m)		;
     Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
 			skew()					const	;
-    Vector<T>		homogenize()				const	;
-    Vector<T>		inhomogenize()				const	;
+    Vector<T>		homogeneous()				const	;
+    Vector<T>		inhomogeneous()				const	;
     void		resize(u_int d)					;
     void		resize(T* p, u_int d)				;
 };
@@ -212,17 +210,6 @@ Vector<T, B>::Vector(u_int d)
 template <class T, class B> inline
 Vector<T, B>::Vector(T* p, u_int d)
     :Array<T, B>(p, d)
-{
-}
-
-//! 与えられた行列の行を並べて記憶領域を共有するベクトルを生成する．
-/*!
-  \param m	記憶領域を共有する行列．全行の記憶領域は連続していなければ
-		ならない．
-*/
-template <class T, class B> template <class B2, class R2> inline
-Vector<T, B>::Vector(const Matrix<T, B2, R2>& m)
-    :Array<T, B>(const_cast<T*>((const T*)m), m.nrow()*m.ncol())
 {
 }
 
@@ -490,7 +477,7 @@ Vector<T, B>::skew() const
   \return	同次化されたベクトル
 */
 template <class T, class B> inline Vector<T>
-Vector<T, B>::homogenize() const
+Vector<T, B>::homogeneous() const
 {
     Vector<T>	v(dim() + 1);
     v(0, dim()) = *this;
@@ -503,7 +490,7 @@ Vector<T, B>::homogenize() const
   \return	非同次化されたベクトル
 */
 template <class T, class B> inline Vector<T>
-Vector<T, B>::inhomogenize() const
+Vector<T, B>::inhomogeneous() const
 {
     return (*this)(0, dim()-1) / (*this)[dim()-1];
 }
@@ -575,7 +562,8 @@ class Matrix : public Array2<Vector<T>, B, R>
     using		Array2<Vector<T>, B, R>::dim;
     using		Array2<Vector<T>, B, R>::nrow;
     using		Array2<Vector<T>, B, R>::ncol;
-    
+
+			operator const Vector<T>()		const	;
     const Matrix<T>	operator ()(u_int i, u_int j,
 				    u_int r, u_int c)		const	;
     Matrix<T>		operator ()(u_int i, u_int j,
@@ -701,6 +689,17 @@ Matrix<T, B, R>::operator =(const Matrix<T2, B2, R2>& m)
 {
     Array2<Vector<T>, B, R>::operator =(m);
     return *this;
+}
+
+//! この行列の行を並べて記憶領域を共有するベクトルを生成する．
+/*!
+  全行の記憶領域は連続していなければならない．
+  \return	記憶領域を共有するベクトル
+*/
+template <class T, class B, class R> inline
+Matrix<T, B, R>::operator const Vector<T>() const
+{
+    return Vector<T>(const_cast<T*>((const T*)*this), nrow()*ncol());
 }
 
 //! この行列と記憶領域を共有した部分行列を生成する．
