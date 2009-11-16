@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.84 2009-09-21 07:09:05 ueshiba Exp $
+#  $Id: Makefile,v 1.85 2009-11-16 08:13:44 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -39,7 +39,6 @@ EXTHDRS		= TU/BlockMatrix++.h \
 		TU/GaussianConvolver.h \
 		TU/Image++.h \
 		TU/Manip.h \
-		TU/Mapping.h \
 		TU/Minimize.h \
 		TU/Profiler.h \
 		TU/Random.h \
@@ -50,7 +49,6 @@ EXTHDRS		= TU/BlockMatrix++.h \
 		TU/TU/TU/Normalize.h \
 		TU/TU/TU/TU/types.h \
 		TU/TU/Vector++.h \
-		TU/TU/utility.h \
 		TU/Warp.h \
 		TU/mmInstructions.h \
 		TU/windows/fakeWindows.h
@@ -70,7 +68,6 @@ HDRS		= Allocator.h \
 		IntegralImage.h \
 		List.h \
 		Manip.h \
-		Mapping.h \
 		Mesh++.h \
 		Minimize.h \
 		Movie.h \
@@ -101,7 +98,6 @@ SRCS		= BlockMatrix++.inst.cc \
 		Image++.inst.cc \
 		ImageBase.cc \
 		ImageLine.cc \
-		Mapping.cc \
 		Normalize.cc \
 		Profiler.cc \
 		Random.cc \
@@ -126,7 +122,6 @@ OBJS		= BlockMatrix++.inst.o \
 		Image++.inst.o \
 		ImageBase.o \
 		ImageLine.o \
-		Mapping.o \
 		Normalize.o \
 		Profiler.o \
 		Random.o \
@@ -140,7 +135,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.84 $	|		\
+REV		= $(shell echo $Revision: 1.85 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -186,8 +181,6 @@ ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
 	TU/Camera.h TU/Manip.h
 ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
-Mapping.o: TU/Mapping.h TU/TU/utility.h TU/TU/TU/Normalize.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/Minimize.h
 Normalize.o: TU/TU/TU/Normalize.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
 Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
