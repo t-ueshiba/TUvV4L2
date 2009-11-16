@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.15 2009-09-09 07:06:31 ueshiba Exp $
+ *  $Id: types.h,v 1.16 2009-11-16 23:38:39 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -66,8 +66,8 @@
   - #TU::Point3
   - #TU::HyperPlane
   - #TU::Normalize
-  - #TU::ProjectiveMapping
-  - #TU::AffineMapping
+  - #TU::Projectivity
+  - #TU::Affinity
 
   <b>投影の幾何</b>
   - #TU::CanonicalCamera

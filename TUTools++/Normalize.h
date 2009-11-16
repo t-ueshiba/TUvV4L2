@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Normalize.h,v 1.3 2009-09-04 04:01:06 ueshiba Exp $  
+ *  $Id: Normalize.h,v 1.4 2009-11-16 23:38:38 ueshiba Exp $  
  */
 #ifndef __TUNormalize_h
 #define __TUNormalize_h
@@ -161,7 +161,7 @@ Normalize::operator ()(const Vector<T2, B2>& x) const
 template <class T2, class B2> inline Vector<double>
 Normalize::normalizeP(const Vector<T2, B2>& x) const
 {
-    return (*this)(x).homogenize();
+    return (*this)(x).homogeneous();
 }
 
 //! 正規化変換のスケーリング定数を返す．
