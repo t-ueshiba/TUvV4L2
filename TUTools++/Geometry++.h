@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.32 2009-11-16 23:38:38 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.33 2009-11-29 23:35:01 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -48,7 +48,7 @@ template <class T>
 class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
 {
   private:
-    typedef Vector<T, FixedSizedBuf<T, 2> >	array_type;
+    typedef Vector<T, FixedSizedBuf<T, 2> >	vector_type;
     
   public:
     Point2(T u=0, T v=0)						;
@@ -58,7 +58,7 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     \param v	コピー元2次元ベクトル
   */
     template <class T2, class B2>
-    Point2(const Vector<T2, B2>& v) :array_type(v)			{}
+    Point2(const Vector<T2, B2>& v) :vector_type(v)			{}
 
   //! 他の2次元ベクトルを自分に代入する．
   /*!
@@ -68,7 +68,7 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     template <class T2, class B2>
     Point2&	operator =(const Vector<T2, B2>& v)
 		{
-		    array_type::operator =(v);
+		    vector_type::operator =(v);
 		    return *this;
 		}
     Point2	neighbor(int)					const	;
@@ -85,7 +85,7 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
 */
 template <class T> inline
 Point2<T>::Point2(T u, T v)
-    :array_type()
+    :vector_type()
 {
     (*this)[0] = u;
     (*this)[1] = v;
@@ -256,7 +256,7 @@ template <class T>
 class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 {
   private:
-    typedef Vector<T, FixedSizedBuf<T, 3> >	array_type;
+    typedef Vector<T, FixedSizedBuf<T, 3> >	vector_type;
     
   public:
     Point3(T x=0, T y=0, T z=0)						;
@@ -266,7 +266,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
     \param v	コピー元3次元ベクトル
   */
     template <class T2, class B2>
-    Point3(const Vector<T2, B2>& v) :array_type(v)			{}
+    Point3(const Vector<T2, B2>& v) :vector_type(v)			{}
 
   //! 他の3次元ベクトルを自分に代入する．
   /*!
@@ -276,7 +276,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
     template <class T2, class B2>
     Point3&	operator =(const Vector<T2, B2>& v)
 		{
-		    array_type::operator =(v);
+		    vector_type::operator =(v);
 		    return *this;
 		}
 };
@@ -289,7 +289,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 */
 template <class T> inline
 Point3<T>::Point3(T x, T y, T z)
-    :array_type()
+    :vector_type()
 {
     (*this)[0] = x;
     (*this)[1] = y;
@@ -314,6 +314,7 @@ template <class V>
 class HyperPlane : public V
 {
   public:
+    typedef V						vector_type;
     typedef typename V::value_type			value_type;
     
   public:
@@ -329,14 +330,16 @@ class HyperPlane : public V
     template <class Iterator>
     HyperPlane(Iterator begin, Iterator end)		;
 
+    using	V::dim;
+
   //! 超平面オブジェクトの同次座標ベクトルを指定する．
   /*!
     \param v	(d+1)次元ベクトル（dは超平面が存在する射影空間の次元）
     \return	この超平面オブジェクト
   */
     template <class T, class B>
-    HyperPlane&	operator =(const Vector<T, B>& v)
-					{V::operator =(v); return *this;}
+    HyperPlane&	operator =(const Vector<T, B>& v)	{V::operator =(v);
+							 return *this;}
 
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)	;
@@ -345,7 +348,7 @@ class HyperPlane : public V
   /*! 
     \return	射影空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
   */
-    u_int	spaceDim()			const	{return V::dim()-1;}
+    u_int	spaceDim()			const	{return dim()-1;}
 
   //! 超平面を求めるために必要な点の最小個数を返す．
   /*!
@@ -469,71 +472,6 @@ typedef HyperPlane<Vector4f>	PlaneP3f;
 typedef HyperPlane<Vector4d>	PlaneP3d;
 
 /************************************************************************
-*  class MapCost<Map, Iterator>						*
-************************************************************************/
-//! 射影変換行列の最尤推定のためのコスト関数
-template <class Map, class Iterator>
-class MapCost
-{
-  public:
-    typedef typename Map::value_type	value_type;
-
-    MapCost(Iterator begin, Iterator end)				;
-
-    Vector<value_type>	operator ()(const Map& map)		const	;
-    Matrix<value_type>	jacobian(const Map& map)		const	;
-    static void		update(Map& map, const Vector<value_type>& dm)	;
-
-  private:
-    const Iterator	_begin, _end;
-    const u_int		_npoints;
-};
-    
-template <class Map, class Iterator>
-MapCost<Map, Iterator>::MapCost(Iterator begin, Iterator end)
-    :_begin(begin), _end(end), _npoints(std::distance(_begin, _end))
-{
-}
-    
-template <class Map, class Iterator>
-Vector<typename Map::value_type>
-MapCost<Map, Iterator>::operator ()(const Map& map) const
-{
-    const u_int		outDim = map.outDim();
-    Vector<value_type>	val(_npoints*outDim);
-    u_int		n = 0;
-    for (Iterator iter = _begin; iter != _end; ++iter)
-    {
-	val(n, outDim) = map(iter->first) - iter->second;
-	n += outDim;
-    }
-    
-    return val;
-}
-    
-template <class Map, class Iterator>
-Matrix<typename Map::value_type>
-MapCost<Map, Iterator>::jacobian(const Map& map) const
-{
-    const u_int		outDim = map.outDim();
-    Matrix<value_type>	J(_npoints*outDim, map.dof()+1);
-    u_int		n = 0;
-    for (Iterator iter = _begin; iter != _end; ++iter)
-    {
-	J(n, 0, outDim, J.ncol()) = map.jacobian(iter->first);
-	n += outDim;
-    }
-
-    return J;
-}
-
-template <class Map, class Iterator> inline void
-MapCost<Map, Iterator>::update(Map& map, const Vector<value_type>& dm)
-{
-    map.update(dm);
-}
-
-/************************************************************************
 *  class Projectivity<M>						*
 ************************************************************************/
 //! 射影変換を行うクラス
@@ -547,6 +485,7 @@ template <class M>
 class Projectivity : public M
 {
   public:
+    typedef M				matrix_type;
     typedef typename M::value_type	value_type;
 
     Projectivity()							;
@@ -600,8 +539,27 @@ class Projectivity : public M
     value_type	sqdist(const std::pair<In, Out>& pair)		const	;
     template <class In, class Out>
     value_type	dist(const std::pair<In, Out>& pair)		const	;
-    u_int	dof()						const	;
+    u_int	nparams()					const	;
     void	update(const Vector<value_type>& dt)			;
+
+  protected:
+  //! 射影変換行列の最尤推定のためのコスト関数
+    template <class Map, class Iterator>
+    class Cost
+    {
+      public:
+	typedef typename Map::value_type	value_type;
+	
+	Cost(Iterator begin, Iterator end)					;
+
+	Vector<value_type>	operator ()(const Map& map)		const	;
+	Matrix<value_type>	jacobian(const Map& map)		const	;
+	static void		update(Map& map, const Vector<value_type>& dm)	;
+
+      private:
+	const Iterator	_begin, _end;
+	const u_int	_npoints;
+    };
 };
 
 //! 射影変換オブジェクトを生成する．
@@ -711,7 +669,7 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
   // 非線型最適化を行う．
     if (refine)
     {
-	MapCost<Projectivity<M>, Iterator>	cost(begin, end);
+	Cost<Projectivity<M>, Iterator>		cost(begin, end);
 	ConstNormConstraint<Projectivity<M> >	constraint(*this);
 	minimizeSquare(cost, constraint, *this);
     }
@@ -834,14 +792,15 @@ Projectivity<M>::dist(const std::pair<In, Out>& pair) const
     return sqrt(sqdist(pair));
 }
 
-//! この射影変換の自由度を返す．
+//! この射影変換のパラメータ数を返す．
 /*!
-  \return	射影変換の自由度（(#outDim()+1)x(#inDim()+1)-1）
+  射影変換行列の要素数であり，変換の自由度数とは異なる．
+  \return	射影変換のパラメータ数（(#outDim()+1)x(#inDim()+1)）
 */
 template <class M> inline u_int
-Projectivity<M>::dof() const
+Projectivity<M>::nparams() const
 {
-    return (outDim() + 1)*(inDim() + 1)-1;
+    return (outDim() + 1)*(inDim() + 1);
 }
 
 //! 射影変換行列を与えられた量だけ修正する．
@@ -857,6 +816,51 @@ Projectivity<M>::update(const Vector<value_type>& dt)
     t *= (l / t.length());
 }
     
+template <class M> template <class Map, class Iterator>
+Projectivity<M>::Cost<Map, Iterator>::Cost(Iterator begin, Iterator end)
+    :_begin(begin), _end(end), _npoints(std::distance(_begin, _end))
+{
+}
+    
+template <class M> template <class Map, class Iterator>
+Vector<typename Map::value_type>
+Projectivity<M>::Cost<Map, Iterator>::operator ()(const Map& map) const
+{
+    const u_int		outDim = map.outDim();
+    Vector<value_type>	val(_npoints*outDim);
+    u_int		n = 0;
+    for (Iterator iter = _begin; iter != _end; ++iter)
+    {
+	val(n, outDim) = map(iter->first) - iter->second;
+	n += outDim;
+    }
+    
+    return val;
+}
+    
+template <class M> template <class Map, class Iterator>
+Matrix<typename Map::value_type>
+Projectivity<M>::Cost<Map, Iterator>::jacobian(const Map& map) const
+{
+    const u_int		outDim = map.outDim();
+    Matrix<value_type>	J(_npoints*outDim, map.nparams());
+    u_int		n = 0;
+    for (Iterator iter = _begin; iter != _end; ++iter)
+    {
+	J(n, 0, outDim, J.ncol()) = map.jacobian(iter->first);
+	n += outDim;
+    }
+
+    return J;
+}
+
+template <class M> template <class Map, class Iterator> inline void
+Projectivity<M>::Cost<Map, Iterator>::update(Map& map,
+					     const Vector<value_type>& dm)
+{
+    map.update(dm);
+}
+
 typedef Projectivity<Matrix22f>	Projectivity11f;
 typedef Projectivity<Matrix22d>	Projectivity11d;
 typedef Projectivity<Matrix33f>	Projectivity22f;
@@ -1041,5 +1045,186 @@ typedef Affinity<Matrix44f>	Affinity33f;
 typedef Affinity<Matrix44d>	Affinity33d;
 typedef Affinity<Matrix34f>	Affinity23f;
 typedef Affinity<Matrix34d>	Affinity23d;
+
+/************************************************************************
+*  class Homography<T>							*
+************************************************************************/
+//! 2次元射影変換を行うクラス
+/*!
+  \f$\TUvec{H}{} = \in \TUspace{R}{3\times 3}\f$を用いて2次元空間の点
+  \f$\TUud{x}{} \in \TUspace{R}{3}\f$を2次元空間の点
+  \f$\TUud{y}{} \simeq \TUvec{H}{}\TUud{x}{} \in \TUspace{R}{3}\f$
+  に写す．
+*/
+template <class T>
+class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
+					      FixedSizedBuf<Vector<T>, 3> > >
+{
+  private:
+    typedef Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
+				FixedSizedBuf<Vector<T>, 3> > >	super;
+    
+  public:
+    enum	{DOF=8};
+    
+    typedef typename super::matrix_type				matrix_type;
+    typedef typename super::value_type				value_type;
+    typedef Point2<value_type>					point_type;
+    typedef Vector<value_type, FixedSizedBuf<value_type, DOF> >	param_type;
+    typedef Matrix<value_type, FixedSizedBuf<value_type, 2*DOF>,
+		   FixedSizedBuf<Vector<value_type>, 2> >	jacobian_type;
+
+  public:
+    Homography()			 :super()		{}
+    template <class S, class B, class R>
+    Homography(const Matrix<S, B, R>& H) :super(H)		{}
+
+    using	super::operator ();
+    using	super::inDim;
+    using	super::outDim;
+    using	super::ndataMin;
+    using	super::nparams;
+    
+    point_type	operator ()(int u, int v)		const	;
+    static jacobian_type
+		jacobian0(int u, int v)				;
+    
+    void	compose(const param_type& dt)			;
+};
+
+template <class T> inline typename Homography<T>::point_type
+Homography<T>::operator ()(int u, int v) const
+{
+    value_type	w = 1.0 / ((*this)[2][0]*u + (*this)[2][1]*v + (*this)[2][2]);
+    return point_type(w * ((*this)[0][0]*u + (*this)[0][1]*v + (*this)[0][2]),
+		      w * ((*this)[1][0]*u + (*this)[1][1]*v + (*this)[1][2]));
+}
+
+template <class T> inline typename Homography<T>::jacobian_type
+Homography<T>::jacobian0(int u, int v)
+{
+    jacobian_type	J(2, 8);
+    J[0][0] = J[1][3] = u;
+    J[0][1] = J[1][4] = v;
+    J[0][2] = J[1][5] = 1.0;
+    J[0][3] = J[0][4] = J[0][5] = J[1][0] = J[1][1] = J[1][2] = 0.0;
+    J[0][6]	      = -u * u;
+    J[0][7] = J[1][6] = -u * v;
+    J[1][7]	      = -v * v;
+
+    return J;
+}
+
+template <class T> inline void
+Homography<T>::compose(const param_type& dt)
+{
+    value_type	t0 = (*this)[0][0], t1 = (*this)[0][1], t2 = (*this)[0][2];
+    (*this)[0][0] -= (t0*dt[0] + t1*dt[3] + t2*dt[6]);
+    (*this)[0][1] -= (t0*dt[1] + t1*dt[4] + t2*dt[7]);
+    (*this)[0][2] -= (t0*dt[2] + t1*dt[5]);
+    
+    t0 = (*this)[1][0];
+    t1 = (*this)[1][1];
+    t2 = (*this)[1][2];
+    (*this)[1][0] -= (t0*dt[0] + t1*dt[3] + t2*dt[6]);
+    (*this)[1][1] -= (t0*dt[1] + t1*dt[4] + t2*dt[7]);
+    (*this)[1][2] -= (t0*dt[2] + t1*dt[5]);
+
+    t0 = (*this)[2][0];
+    t1 = (*this)[2][1];
+    t2 = (*this)[2][2];
+    (*this)[2][0] -= (t0*dt[0] + t1*dt[3] + t2*dt[6]);
+    (*this)[2][1] -= (t0*dt[1] + t1*dt[4] + t2*dt[7]);
+    (*this)[2][2] -= (t0*dt[2] + t1*dt[5]);
+}
+
+/************************************************************************
+*  class Affinity2<T>							*
+************************************************************************/
+//! 2次元アフィン変換を行うクラス
+/*!
+  \f$\TUvec{A}{} = \in \TUspace{R}{3\times 3}\f$を用いて2次元空間の点
+  \f$\TUud{x}{} \in \TUspace{R}{3}\f$を2次元空間の点
+  \f$\TUud{y}{} \simeq \TUvec{A}{}\TUud{x}{} \in \TUspace{R}{3}\f$
+  に写す．
+*/
+template <class T>
+class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
+					 FixedSizedBuf<Vector<T>, 3> > >
+{
+  private:
+    typedef Affinity<Matrix<T, FixedSizedBuf<T, 9>,
+			    FixedSizedBuf<Vector<T>, 3> > >	super;
+    
+  public:
+    enum	{DOF=6};
+    
+    typedef typename super::matrix_type				matrix_type;
+    typedef typename super::value_type				value_type;
+    typedef Vector<value_type, FixedSizedBuf<value_type, DOF> >	param_type;
+    typedef Point2<value_type>					point_type;
+    typedef Matrix<value_type, FixedSizedBuf<value_type, 2*DOF>,
+		   FixedSizedBuf<Vector<value_type>, 2> >	jacobian_type;
+
+  public:
+    Affinity2()				:super()		{}
+    template <class S, class B, class R>
+    Affinity2(const Matrix<S, B, R>& A)				;
+
+    using	super::operator ();
+    using	super::inDim;
+    using	super::outDim;
+    using	super::ndataMin;
+    using	super::nparams;
+    
+    point_type	operator ()(int u, int v)		const	;
+    static jacobian_type
+		jacobian0(int u, int v)				;
+    
+    void	compose(const param_type& dt)			;
+};
+
+template <class T> template <class S, class B, class R> inline
+Affinity2<T>::Affinity2(const Matrix<S, B, R>& A)
+    :super(A)
+{
+    (*this)[2][0] = (*this)[2][1] = 0.0;
+    (*this)[2][2] = 1.0;
+}
+    
+template <class T> inline typename Affinity2<T>::point_type
+Affinity2<T>::operator ()(int u, int v) const
+{
+    return point_type((*this)[0][0]*u + (*this)[0][1]*v + (*this)[0][2],
+		      (*this)[1][0]*u + (*this)[1][1]*v + (*this)[1][2]);
+}
+
+template <class T> inline typename Affinity2<T>::jacobian_type
+Affinity2<T>::jacobian0(int u, int v)
+{
+    jacobian_type	J;
+    J[0][0] = J[1][3] = u;
+    J[0][1] = J[1][4] = v;
+    J[0][2] = J[1][5] = 1.0;
+    J[0][3] = J[0][4] = J[0][5] = J[1][0] = J[1][1] = J[1][2] = 0.0;
+
+    return J;
+}
+    
+template <class T> inline void
+Affinity2<T>::compose(const param_type& dt)
+{
+    value_type	t0 = (*this)[0][0], t1 = (*this)[0][1];
+    (*this)[0][0] -= (t0*dt[0] + t1*dt[3]);
+    (*this)[0][1] -= (t0*dt[1] + t1*dt[4]);
+    (*this)[0][2] -= (t0*dt[2] + t1*dt[5]);
+    
+    t0 = (*this)[1][0];
+    t1 = (*this)[1][1];
+    (*this)[1][0] -= (t0*dt[0] + t1*dt[3]);
+    (*this)[1][1] -= (t0*dt[1] + t1*dt[4]);
+    (*this)[1][2] -= (t0*dt[2] + t1*dt[5]);
+}
+    
 }
 #endif	/* !__TUGeometryPP_h */
