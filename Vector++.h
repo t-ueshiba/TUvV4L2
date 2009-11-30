@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.34 2009-11-16 23:38:38 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.35 2009-11-30 00:05:31 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h

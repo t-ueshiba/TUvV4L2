@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.85 2009-11-16 08:13:44 ueshiba Exp $
+#  $Id: Makefile,v 1.86 2009-11-30 00:05:31 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -135,7 +135,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.85 $	|		\
+REV		= $(shell echo $Revision: 1.86 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
