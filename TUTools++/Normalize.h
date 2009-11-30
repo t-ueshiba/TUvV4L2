@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Normalize.h,v 1.4 2009-11-16 23:38:38 ueshiba Exp $  
+ *  $Id: Normalize.h,v 1.5 2009-11-30 00:05:31 ueshiba Exp $  
  */
 #ifndef __TUNormalize_h
 #define __TUNormalize_h

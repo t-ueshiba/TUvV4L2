@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.33 2009-11-29 23:35:01 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.34 2009-11-30 00:05:31 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h

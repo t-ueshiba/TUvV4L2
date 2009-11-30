@@ -1,8 +1,8 @@
 /*
 <<<<<<< types.h
- *  $Id: types.h,v 1.17 2009-11-29 23:35:02 ueshiba Exp $
+ *  $Id: types.h,v 1.18 2009-11-30 00:05:31 ueshiba Exp $
 =======
- *  $Id: types.h,v 1.17 2009-11-29 23:35:02 ueshiba Exp $
+ *  $Id: types.h,v 1.18 2009-11-30 00:05:31 ueshiba Exp $
 >>>>>>> 1.16
  */
 /*!
