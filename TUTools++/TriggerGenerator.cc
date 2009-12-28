@@ -25,10 +25,10 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.16 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.17 2009-12-28 01:40:22 ueshiba Exp $
  */
 #include <cstdlib>
-#include "TU/Serial.h"
+#include "TU/TriggerGenerator.h"
 
 namespace TU
 {
@@ -57,8 +57,8 @@ TriggerGenerator::TriggerGenerator(const char* ttyname)
 	.c_baud(9600).c_csize(8).c_noparity().c_stop1();
 }
 
-TriggerGenerator&
-TriggerGenerator::showId(std::ostream& out)
+void
+TriggerGenerator::showId(std::ostream& out) const
 {
     using namespace	std;
     
@@ -69,7 +69,6 @@ TriggerGenerator::showId(std::ostream& out)
 	if (c == '\n')
 	    break;
     }
-    return *this;
 }
 
 TriggerGenerator&

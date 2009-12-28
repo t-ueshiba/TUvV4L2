@@ -25,64 +25,33 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.h,v 1.7 2009-12-28 01:40:22 ueshiba Exp $
+ *  $Id: TriggerGenerator.h,v 1.1 2009-12-28 01:40:22 ueshiba Exp $
  */
 #if !defined(__TUSerial_h)
-#define __TUSerial_h
+#define __TUTriggerGenerator_h
 
-#include "TU/types.h"
-#include <termios.h>
-#include <iostream>
-#include <cstdio>
+#include "TU/Serial.h"
 
 namespace TU
 {
 /************************************************************************
-*  class Serial								*
+*  class TriggerGenerator						*
 ************************************************************************/
-class __PORT Serial
+class __PORT TriggerGenerator : public Serial
 {
   public:
-			Serial(const char*)			;
-    virtual		~Serial()				;
+    TriggerGenerator(const char* ttyname)			;
 
-    const Serial&	put(const char* s)		const	;
-    const Serial&	get(char* s, u_int size)	const	;
-    
-    Serial&		i_nl2cr()				;
-    Serial&		i_igncr()				;
-    Serial&		i_cr2nl()				;
-#if !defined(__APPLE__)
-    Serial&		i_upper2lower()				;
-#endif
-    Serial&		i_through()				;
-    Serial&		o_nl2crnl()				;
-#if !defined(__APPLE__)
-    Serial&		o_cr2nl()				;
-    Serial&		o_lower2upper()				;
-#endif
-    Serial&		o_through()				;
-    Serial&		c_baud(int)				;
-    Serial&		c_csize(int)				;
-    Serial&		c_even()				;
-    Serial&		c_odd()					;
-    Serial&		c_noparity()				;
-    Serial&		c_stop1()				;
-    Serial&		c_stop2()				;
-
-  protected:
-    FILE*		fp()				const	{return _fp;}
-    
-  private:
-    Serial&		set_flag(tcflag_t termios::* flag,
-				 unsigned long clearbits,
-				 unsigned long setbits)		;
-
-    const int		_fd;
-    FILE* const		_fp;
-    termios		_termios_bak;
+    void		showId(std::ostream& out)	const	;
+    TriggerGenerator&	selectChannel(u_int channel)		;
+    TriggerGenerator&	setInterval(u_int interval)		;
+    TriggerGenerator&	oneShot()				;
+    TriggerGenerator&	continuousShot()			;
+    TriggerGenerator&	stopContinuousShot()			;
+    bool		getStatus(u_int& channel,
+				  u_int& interval)	const	;
 };
 
 }
 
-#endif	/* !__TUSerial_h	*/
+#endif	/* !__TUTriggerGenerator_h	*/
