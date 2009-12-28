@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.86 2009-11-30 00:05:31 ueshiba Exp $
+#  $Id: Makefile,v 1.87 2009-12-28 01:40:22 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -39,16 +39,18 @@ EXTHDRS		= TU/BlockMatrix++.h \
 		TU/GaussianConvolver.h \
 		TU/Image++.h \
 		TU/Manip.h \
-		TU/Minimize.h \
 		TU/Profiler.h \
 		TU/Random.h \
 		TU/Serial.h \
 		TU/TU/Geometry++.h \
 		TU/TU/IIRFilter.h \
 		TU/TU/TU/Array++.h \
+		TU/TU/TU/Minimize.h \
 		TU/TU/TU/Normalize.h \
 		TU/TU/TU/TU/types.h \
+		TU/TU/TU/utility.h \
 		TU/TU/Vector++.h \
+		TU/TriggerGenerator.h \
 		TU/Warp.h \
 		TU/mmInstructions.h \
 		TU/windows/fakeWindows.h
@@ -78,6 +80,7 @@ HDRS		= Allocator.h \
 		Random.h \
 		Ransac.h \
 		Serial.h \
+		TriggerGenerator.h \
 		Vector++.h \
 		Warp.h \
 		mmInstructions.h \
@@ -135,7 +138,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.86 $	|		\
+REV		= $(shell echo $Revision: 1.87 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -148,51 +151,61 @@ include $(PROJECT)/lib/l.mk
 ###
 BlockMatrix++.inst.o: TU/BlockMatrix++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Camera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
-CameraBase.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
-CameraWithDistortion.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
+Camera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
+CameraBase.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
+CameraWithDistortion.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
 CameraWithEuclideanImagePlane.o: TU/Camera.h TU/TU/Geometry++.h \
+	TU/TU/TU/utility.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
+CameraWithFocalLength.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Normalize.h
-CameraWithFocalLength.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
-CanonicalCamera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
-ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
+CanonicalCamera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
+ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
 CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Normalize.h TU/mmInstructions.h
+	TU/TU/TU/utility.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h \
+	TU/mmInstructions.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Normalize.h TU/mmInstructions.h
+	TU/TU/TU/utility.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h \
+	TU/mmInstructions.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/IIRFilter.h \
-	TU/mmInstructions.h TU/Minimize.h
-GenericImage.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
-Image++.inst.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
-ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h \
-	TU/Camera.h TU/Manip.h
-ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h
+	TU/mmInstructions.h TU/TU/TU/Minimize.h
+GenericImage.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
+Image++.inst.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
+ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h TU/Camera.h TU/Manip.h
+ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
 Normalize.o: TU/TU/TU/Normalize.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
 Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
 	TU/windows/fakeWindows.h
 Random.o: TU/Random.h TU/TU/TU/TU/types.h TU/windows/fakeWindows.h
 Rotation.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Serial.o: TU/Serial.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h
-TriggerGenerator.o: TU/Serial.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h
+Serial.o: TU/Serial.h TU/TU/TU/TU/types.h
+TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/TU/TU/TU/types.h
 Vector++.inst.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Normalize.h \
-	TU/Camera.h TU/mmInstructions.h
+Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
+	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h TU/Camera.h \
+	TU/mmInstructions.h
 manipulators.o: TU/Manip.h TU/TU/TU/TU/types.h
