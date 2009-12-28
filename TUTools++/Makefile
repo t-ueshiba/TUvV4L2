@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.87 2009-12-28 01:40:22 ueshiba Exp $
+#  $Id: Makefile,v 1.88 2009-12-28 21:06:58 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -39,11 +39,12 @@ EXTHDRS		= TU/BlockMatrix++.h \
 		TU/GaussianConvolver.h \
 		TU/Image++.h \
 		TU/Manip.h \
+		TU/PM16C_04.h \
 		TU/Profiler.h \
 		TU/Random.h \
-		TU/Serial.h \
 		TU/TU/Geometry++.h \
 		TU/TU/IIRFilter.h \
+		TU/TU/Serial.h \
 		TU/TU/TU/Array++.h \
 		TU/TU/TU/Minimize.h \
 		TU/TU/TU/Normalize.h \
@@ -75,6 +76,7 @@ HDRS		= Allocator.h \
 		Movie.h \
 		Normalize.h \
 		Nurbs++.h \
+		PM16C_04.h \
 		PSTree.h \
 		Profiler.h \
 		Random.h \
@@ -102,6 +104,7 @@ SRCS		= BlockMatrix++.inst.cc \
 		ImageBase.cc \
 		ImageLine.cc \
 		Normalize.cc \
+		PM16C_04.cc \
 		Profiler.cc \
 		Random.cc \
 		Rotation.cc \
@@ -126,6 +129,7 @@ OBJS		= BlockMatrix++.inst.o \
 		ImageBase.o \
 		ImageLine.o \
 		Normalize.o \
+		PM16C_04.o \
 		Profiler.o \
 		Random.o \
 		Rotation.o \
@@ -138,7 +142,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.87 $	|		\
+REV		= $(shell echo $Revision: 1.88 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -197,12 +201,14 @@ ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h
 Normalize.o: TU/TU/TU/Normalize.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
 	TU/TU/TU/TU/types.h
+PM16C_04.o: TU/PM16C_04.h TU/TU/Serial.h TU/TU/TU/TU/types.h
 Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
 	TU/windows/fakeWindows.h
 Random.o: TU/Random.h TU/TU/TU/TU/types.h TU/windows/fakeWindows.h
 Rotation.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Serial.o: TU/Serial.h TU/TU/TU/TU/types.h
-TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/TU/TU/TU/types.h
+Serial.o: TU/TU/Serial.h TU/TU/TU/TU/types.h
+TriggerGenerator.o: TU/TriggerGenerator.h TU/TU/Serial.h \
+	TU/TU/TU/TU/types.h
 Vector++.inst.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
