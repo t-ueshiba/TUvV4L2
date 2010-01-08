@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.1 2009-12-28 01:40:22 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.2 2010-01-08 06:47:35 ueshiba Exp $
  */
 #include <cstdlib>
 #include <stdarg.h>
@@ -61,13 +61,13 @@ PM16C_04::PM16C_04(const char* ttyname, bool echo)
 }
     
 void
-PM16C_04::showId() const
+PM16C_04::showId(std::ostream& out) const
 {
     using namespace	std;
 
     put("VER?\n");
     Serial::get(_response, BUFFER_SIZE);
-    cerr << _response;
+    out << _response;
 }
 
 /*

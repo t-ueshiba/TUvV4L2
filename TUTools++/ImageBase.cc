@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.26 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.27 2010-01-08 06:47:35 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -84,7 +84,7 @@ ImageBase::restoreHeader(std::istream& in)
 
   // Process comment lines.
     bool	legacy = false;	// legacy style of dist. param. representation
-    for (; (c = in.get()) == '#'; in >> ign)
+    for (; (c = in.get()) == '#'; in >> skipl)
     {
 	char	key[256], val[256];
 	in >> key;
@@ -184,7 +184,7 @@ ImageBase::restoreHeader(std::istream& in)
     in >> w;
     in >> h;
     _resize(h, w, type);			// set width & height
-    in >> w >> ign;				// skip MaxValue
+    in >> w >> skipl;				// skip MaxValue
 
     return type;
 }

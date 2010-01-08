@@ -25,10 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.17 2009-12-28 01:40:22 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.18 2010-01-08 06:47:35 ueshiba Exp $
  */
 #include <cstdlib>
 #include "TU/TriggerGenerator.h"
+
+#define DOUBLE_NL
 
 namespace TU
 {
@@ -41,6 +43,9 @@ skipl(FILE* fp)
     for (int c; (c = fgetc(fp)) != EOF; )
 	if (c == '\n')
 	    break;
+#ifdef DOUBLE_NL
+    fgetc(fp);
+#endif
 }
     
 /************************************************************************
@@ -69,6 +74,9 @@ TriggerGenerator::showId(std::ostream& out) const
 	if (c == '\n')
 	    break;
     }
+#ifdef DOUBLE_NL
+    fgetc(fp());
+#endif
 }
 
 TriggerGenerator&
@@ -119,27 +127,11 @@ TriggerGenerator::getStatus(u_int& channel, u_int& interval) const
 {
     fputs("I\n", fp());
 
-    char	token[64], *p = token;
-    for (int c; (c = fgetc(fp())) != EOF; )
-    {
-	if (c == '\n')
-	    break;
-	else if (c == ',')
-	{
-	    *p = '\0';
-	    if (token[0] == 'A')
-		channel = strtoul(token + 1, NULL, 16);
-	    else
-		interval = strtoul(token + 1, NULL, 10);
-	    p = token;
-	}
-	else
-	    *p++ = c;
-    }
-    *p = '\0';
+    char	state[5];
+    fscanf(fp(), "A%x,F%d,%4s", &channel, &interval, state);
+    skipl(fp());
     
-    return !strcmp(token, "RUN");
+    return !strcmp(state, "RUN");
 }
 
 }
-
