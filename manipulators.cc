@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: manipulators.cc,v 1.8 2009-09-04 04:01:06 ueshiba Exp $
+ *  $Id: manipulators.cc,v 1.9 2010-01-08 06:47:35 ueshiba Exp $
  */
 #include <iostream>
 #include "TU/Manip.h"
@@ -36,22 +36,10 @@ namespace TU
 *  Manipulators for std::istream					*
 ************************************************************************/
 __PORT std::istream&
-ign(std::istream& in)	// manipulator for skipping the rest of a line
+skipl(std::istream& in)	// manipulator for skipping the rest of a line
 {
-    char	c;
-    while (in.get(c))
+    for (char c; in.get(c); )
 	if (c == '\n')
-	    break;
-    return in;
-}
-
-__PORT std::istream&
-skipl(std::istream& in)
-{
-    char	c;
-    
-    while (in.get(c))
-	if (c == '\n' || c == '\r')
 	    break;
     return in;
 }

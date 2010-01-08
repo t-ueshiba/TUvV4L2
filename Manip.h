@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Manip.h,v 1.8 2009-09-04 04:01:05 ueshiba Exp $
+ *  $Id: Manip.h,v 1.9 2010-01-08 06:47:35 ueshiba Exp $
  */
 #ifndef __TUManip_h
 #define __TUManip_h
@@ -38,8 +38,7 @@ namespace TU
 /************************************************************************
 *  Manipulators								*
 ************************************************************************/
-__PORT std::istream&	ign(std::istream& in)		;
-__PORT std::istream&	skipl(std::istream&)		;
+__PORT std::istream&	skipl(std::istream& in)			;
 
 /************************************************************************
 *  class IOManip							*

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.cc,v 1.18 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.19 2010-01-08 06:47:35 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
@@ -223,6 +223,8 @@ Serial::c_baud(int baud)	// set baud rate
 	return set_flag(&termios::c_cflag, CBAUD, B19200);
       case 38400:
 	return set_flag(&termios::c_cflag, CBAUD, B38400);
+      default:
+	throw runtime_error("TU::Serial::c_baud: unknown baud rate!");
     }
 #else
     termios		termios;
@@ -240,6 +242,8 @@ Serial::c_baud(int baud)	// set baud rate
 Serial&
 Serial::c_csize(int csize)	// set character size
 {
+    using namespace	std;
+    
     switch (csize)
     {
       case 5:
@@ -250,6 +254,8 @@ Serial::c_csize(int csize)	// set character size
 	return set_flag(&termios::c_cflag, CSIZE, CS7);
       case 8:
 	return set_flag(&termios::c_cflag, CSIZE, CS8);
+      default:
+	throw runtime_error("TU::Serial::c_baud: unknown character size!");
     }
     return *this;
 }

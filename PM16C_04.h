@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.h,v 1.1 2009-12-28 01:40:22 ueshiba Exp $
+ *  $Id: PM16C_04.h,v 1.2 2010-01-08 06:47:35 ueshiba Exp $
  */
 #if !defined(__PM16C_04_h)
 #define __PM16C_04_h
@@ -48,7 +48,7 @@ class __PORT PM16C_04 : public Serial
     PM16C_04(const char* ttyname, bool echo=false)			;
 
   // ファームウェアバージョン
-    void	showId()					const	;
+    void	showId(std::ostream&)				const	;
 
   // Local/Remoteモード
     PM16C_04&	setMode(bool remote)					;
