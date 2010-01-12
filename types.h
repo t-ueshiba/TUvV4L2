@@ -1,9 +1,5 @@
 /*
-<<<<<<< types.h
- *  $Id: types.h,v 1.18 2009-11-30 00:05:31 ueshiba Exp $
-=======
- *  $Id: types.h,v 1.18 2009-11-30 00:05:31 ueshiba Exp $
->>>>>>> 1.16
+ *  $Id: types.h,v 1.19 2010-01-12 01:44:55 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -120,7 +116,8 @@
   - #TU::BezierCurve
   - #TU::BezierSurface
   
-  <b>B-Spline曲線とB-Spline曲面</b>
+  <b>B-spline曲線とB-spline曲面</b>
+  - #TU::BSplineKnots
   - #TU::BSplineCurve
   - #TU::BSplineSurface
   
@@ -135,7 +132,6 @@
   - #Iter TU::pull_if(Iter, Iter, Pred)
   - #T TU::diff(const T&, const T&)
   - #TU::mbr_iterator
-  - #std::istream& TU::ign(std::istream&)
   - #std::istream& TU::skipl(std::istream&)
   - #TU::IOManip
   - #TU::IManip1
@@ -147,9 +143,15 @@
   <b>メモリ管理</b>
   - #TU::Allocator
 
+  <b>ストリーム
+  - #TU::fdistream
+  - #TU::fdostream
+  - #TU::fdstream
+  
   <b>シリアルインタフェース</b>
   - #TU::Serial
   - #TU::TriggerGenerator
+  - #TU::PM16C_04
   
   \file		types.h
   \brief	基本的なデータ型をグローバルな名前空間に追加

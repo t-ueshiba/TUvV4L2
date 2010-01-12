@@ -25,52 +25,34 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.cc,v 1.19 2010-01-08 06:47:35 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.20 2010-01-12 01:44:55 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
-#include <string>
 #include <errno.h>
-#include <fcntl.h>
 
 namespace TU
 {
 /************************************************************************
-*  static functions							*
-************************************************************************/
-static int
-get_fd(const char* ttyname)
-{
-    using namespace	std;
-    
-    int	fd = ::open(ttyname, O_RDWR);
-    if (fd < 0)
-	throw runtime_error(string("TU::Serial::Serial: cannot open tty; ")
-			    + strerror(errno));
-    return fd;
-}
-    
-/************************************************************************
 *  Public member functions						*
 ************************************************************************/
+//! 指定されたttyをopenしてシリアルポートを作る．
+/*!
+  \param ttyname	tty名
+*/
 Serial::Serial(const char* ttyname)
-    :_fd(get_fd(ttyname)), _fp(::fdopen(_fd, "r+"))
+    :fdstream(ttyname)
 {
     using namespace	std;
 
-  // Check if I/O FILE is properly opened.
-    if (_fp == NULL)
-	throw runtime_error(string("TU::Serial::Serial: cannot open FILE; ")
-			    + strerror(errno));
-
   // Flush everything in the buffer.
-    if (::tcflush(_fd, TCIOFLUSH))
+    if (::tcflush(fd(), TCIOFLUSH))
 	throw runtime_error(string("TU::Serial::Serial: cannot flush tty; ")
 			    + strerror(errno));
 
   // Keep the original termios settings.
     termios	termios;
-    if (::tcgetattr(_fd, &termios) == -1)
+    if (::tcgetattr(fd(), &termios) == -1)
 	throw runtime_error(string("TU::Serial::Serial: tcgetattr; ")
 			    + strerror(errno));
     _termios_bak = termios;		// backup termios structure
@@ -79,52 +61,48 @@ Serial::Serial(const char* ttyname)
     termios.c_lflag &= ~(ICANON | ECHO | ISIG);
     termios.c_cc[VMIN]  = 1;
     termios.c_cc[VTIME] = 0;
-    if (::tcsetattr(_fd, TCSANOW, &termios) == -1)
+    if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
 	throw runtime_error(string("TU::Serial::Serial: tcsetattr; ")
 			    + strerror(errno));
 }
 
+//! シリアルポートを破壊する．
+/*!
+  シリアルポートハードウェアはポート生成前の状態に戻される．
+*/
 Serial::~Serial()
 {
-    if (_fd >= 0)
+    if (fd() >= 0)
     {
-	::tcsetattr(_fd, TCSANOW, &_termios_bak);
-	if (_fp != NULL)
-	    ::fclose(_fp);
-	else
-	    ::close(_fd);
+	::tcsetattr(fd(), TCSANOW, &_termios_bak);
+	::close(fd());
     }
 }
 
-const Serial&
-Serial::put(const char* s) const
-{
-    ::fputs(s, _fp);
-    return *this;
-}
-    
-const Serial&
-Serial::get(char* s, u_int size) const
-{
-    ::fgets(s, size, _fp);
-    return *this;
-}
-    
-/*
- *  input flags
- */
+//! NLをCRに変換して入力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::i_nl2cr()		// '\n' -> '\r'
 {
     return set_flag(&termios::c_iflag, ICRNL, INLCR);
 }
 
+//! 入力されるCRを無視する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::i_igncr()		// don't read '\r'
 {
     return set_flag(&termios::c_iflag, INLCR|ICRNL, IGNCR);
 }
 
+//! CRをNLに変換して入力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::i_cr2nl()		// '\r' -> '\n'
 {
@@ -132,6 +110,10 @@ Serial::i_cr2nl()		// '\r' -> '\n'
 }
 
 #if !defined(__APPLE__)
+//! 大文字を小文字に変換して入力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::i_upper2lower()		// upper -> lower
 {
@@ -139,6 +121,10 @@ Serial::i_upper2lower()		// upper -> lower
 }
 #endif
 
+//! 何も変換せずに入力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::i_through()		// read transparently
 {
@@ -149,9 +135,10 @@ Serial::i_through()		// read transparently
 #endif
 }
 
-/*
- *  output flags
- */
+//! NLをCR+NLに変換して出力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::o_nl2crnl()		// '\r\n' <- "\n"
 {
@@ -163,12 +150,20 @@ Serial::o_nl2crnl()		// '\r\n' <- "\n"
 }
 
 #if !defined(__APPLE__)
+//! NLをCR+NLに変換して出力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::o_cr2nl()		// '\n' <- '\r'
 {
     return set_flag(&termios::c_oflag, ONLCR, OPOST|OCRNL);
 }
 
+//! 小文字を大文字に変換して出力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::o_lower2upper()		// upper <- lower
 {
@@ -176,15 +171,22 @@ Serial::o_lower2upper()		// upper <- lower
 }
 #endif
 
+//! 何も変換せずに出力する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::o_through()		// write transparently
 {
     return set_flag(&termios::c_oflag, OPOST, 0);
 }
 
-/*
- *  control flags
- */
+//! ボーレートを設定する．
+/*!
+  \param baud	ボーレート．50, 75, 110, 134, 150, 200, 300, 600,
+		1200, 1800, 2400, 4800. 9600, 19200, 38400のいずれか．
+  \return	このシリアルポート
+*/
 Serial&
 Serial::c_baud(int baud)	// set baud rate
 {
@@ -228,17 +230,22 @@ Serial::c_baud(int baud)	// set baud rate
     }
 #else
     termios		termios;
-    if (::tcgetattr(_fd, &termios) == -1)
+    if (::tcgetattr(fd(), &termios) == -1)
 	throw runtime_error(string("TU::Serial::c_baud: tcgetattr; ")
 			    + strerror(errno));
     termios.c_ispeed = termios.c_ospeed = baud;
-    if (::tcsetattr(_fd, TCSANOW, &termios) == -1)
+    if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
 	throw runtime_error(string("TU::Serial::c_baud: tcsetattr; ")
 			    + strerror(errno));
 #endif
     return *this;
 }
 
+//! 文字サイズを設定する．
+/*!
+  \param csize	文字サイズ．5, 6, 7, 8のいずれか．
+  \return	このシリアルポート
+*/
 Serial&
 Serial::c_csize(int csize)	// set character size
 {
@@ -260,30 +267,50 @@ Serial::c_csize(int csize)	// set character size
     return *this;
 }
 
+//! パリティチェックを偶数に設定する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::c_even()		// even parity
 {
     return set_flag(&termios::c_cflag, PARODD, PARENB);
 }
 
+//! パリティチェックを奇数に設定する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::c_odd()			// odd parity
 {
     return set_flag(&termios::c_cflag, 0, PARENB|PARODD);
 }
 
+//! パリティチェックなしに設定する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::c_noparity()		// no parity
 {
     return set_flag(&termios::c_cflag, PARENB, 0);
 }
 
+//! ストップビットを1に設定する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::c_stop1()		// 1 stop bit
 {
     return set_flag(&termios::c_cflag, CSTOPB, 0);
 }
 
+//! ストップビットを2に設定する．
+/*!
+  \return	このシリアルポート
+*/
 Serial&
 Serial::c_stop2()		// 2 stop bits
 {
@@ -300,12 +327,12 @@ Serial::set_flag(tcflag_t termios::* flag,
     using namespace	std;
     
     termios		termios;
-    if (::tcgetattr(_fd, &termios) == -1)
+    if (::tcgetattr(fd(), &termios) == -1)
 	throw runtime_error(string("TU::Serial::set_flag: tcgetattr; ")
 			    + strerror(errno));
     termios.*flag &= ~clearbits;
     termios.*flag |= setbits;
-    if (::tcsetattr(_fd, TCSANOW, &termios) == -1)
+    if (::tcsetattr(fd(), TCSANOW, &termios) == -1)
 	throw runtime_error(string("TU::Serial::set_flag: tcsetattr; ")
 			    + strerror(errno));
     return *this;

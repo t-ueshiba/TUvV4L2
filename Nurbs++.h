@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Nurbs++.h,v 1.16 2009-09-21 07:09:05 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.17 2010-01-12 01:44:55 ueshiba Exp $
  */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -39,11 +39,15 @@ namespace TU
 /************************************************************************
 *  class BSplineKnots<T>						*
 ************************************************************************/
+//! B-spline曲線または曲面のノットを表すクラス
+/*!
+  \param T	ノットの値の型
+*/
 template <class T>
 class BSplineKnots : private Array<T>
 {
   public:
-    BSplineKnots(u_int degree, T us, T ue)	;
+    BSplineKnots(u_int deg, T us, T ue)		;
     
     u_int	degree()		const	{return _degree;}
     u_int	M()			const	{return dim()-1;}
@@ -294,6 +298,11 @@ BSplineKnots<T>::removeKnot(u_int k)
 /************************************************************************
 *  class BSplineCurve<C>						*
 ************************************************************************/
+//! 非有理または有理B-spline曲線を表すクラス
+/*!
+  \param C	制御点の型．d次元空間中の非有理曲線であればd次元ベクトル，
+		有理曲線であれば(d+1)次元ベクトル．
+*/
 template <class C>
 class BSplineCurve : private Array<C>
 {
@@ -508,6 +517,11 @@ RationalBSplineCurve3d;
 /************************************************************************
 *  class BSplineSurface<C>						*
 ************************************************************************/
+//! 非有理または有理B-spline曲面を表すクラス
+/*!
+  \param C	制御点の型．d次元空間中の非有理曲面であればd次元ベクトル，
+		有理曲面であれば(d+1)次元ベクトル．
+*/
 template <class C>
 class BSplineSurface : private Array2<Array<C> >
 {

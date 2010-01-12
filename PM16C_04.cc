@@ -25,14 +25,16 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.2 2010-01-08 06:47:35 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.3 2010-01-12 01:44:55 ueshiba Exp $
  */
-#include <cstdlib>
-#include <stdarg.h>
 #include "TU/PM16C_04.h"
+#include "TU/Manip.h"
+#include <iomanip>
 
 namespace TU
 {
+using namespace	std;
+    
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -40,14 +42,18 @@ static void
 checkChannel(u_int channel)
 {
     if (channel >= 16)
-	throw std::runtime_error("channel# must be less than 16!");
+	throw runtime_error("channel# must be less than 16!");
 }
     
 /************************************************************************
 *  class PM16C_04							*
 ************************************************************************/
-PM16C_04::PM16C_04(const char* ttyname, bool echo)
-    :Serial(ttyname), _echo(echo)
+//! 指定されたttyをopenしてパルスモータコントローラを作る．
+/*!
+  \param ttyname	tty名
+*/
+PM16C_04::PM16C_04(const char* ttyname)
+    :Serial(ttyname)
 {
     i_igncr()
 	.o_nl2crnl()
@@ -60,29 +66,45 @@ PM16C_04::PM16C_04(const char* ttyname, bool echo)
     usleep(DELAY);
 }
     
+//! ファームウェアのIDを出力ストリームに書き出す．
+/*!
+  \param out	出力ストリーム
+*/
 void
-PM16C_04::showId(std::ostream& out) const
+PM16C_04::showId(std::ostream& out)
 {
-    using namespace	std;
-
-    put("VER?\n");
-    Serial::get(_response, BUFFER_SIZE);
-    out << _response;
+    *this << "VER?" << endl;
+    *this >> skipl;
+    for (char c; fdstream::get(c); )
+    {
+	if (c == '\n')
+	    break;
+	out << c;
+    }
+    out << endl;
 }
 
 /*
  *  Local/Remoteモード
  */
+//! コントローラのLOCAL/REMOTEモードを設定する．
+/*!
+  \param remote	trueならREMOTEモードに，falseならLOCALモードに設定
+*/
 PM16C_04&
 PM16C_04::setMode(bool remote)
 {
-    put(remote ? "S1R\n" : "S1L\n");
+    *this << "S1" << (remote ? 'R' : 'L') << endl;
 
     return *this;
 }
 
+//! コントローラがREMOTEモードであるか調べる．
+/*!
+  \return	REMOTEモードならtrue，LOCALモードならfalse
+*/
 bool
-PM16C_04::isRemoteMode() const
+PM16C_04::isRemoteMode()
 {
     return getHardwareLimitSwitchStatus(Axis_A) & 0x8;
 }
@@ -90,125 +112,192 @@ PM16C_04::isRemoteMode() const
 /*
  *  位置
  */
+//! 指定されたチャンネルの位置を設定する．
+/*!
+  \param channel	チャンネル
+  \param position	位置
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::setPosition(u_int channel, int position)
 {
     checkChannel(channel);
-    put("S5%XPS%+08d\n", channel, position);
+    *this << "S5" << std::hex << channel << "PS"
+	  << setfill('0') << setw(8)
+	  << std::showpos << std::internal << std::dec << position
+	  << endl;
     usleep(DELAY);
 
     return *this;
 }
 
+//! 指定されたチャンネルの現在位置を調べる．
+/*!
+  \param channel	チャンネル
+  \return		現在位置
+*/
 int
-PM16C_04::getPosition(u_int channel) const
+PM16C_04::getPosition(u_int channel)
 {
     checkChannel(channel);
-    return put("S4%XPS\n", channel).get<int>("%d");
+    *this << "S4" << std::hex << channel << "PS" << endl;
+    int	position;
+    *this >> std::dec >> position;
+    
+    return position;
 }
     
 /*
  *  スピード
  */
+//! すべての軸のスピードモード(LOW/MEDIUM/HIGH)を設定する．
+/*!
+  \param speed		スピードモード
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::setSpeed(Speed speed)
 {
-    switch (speed)
-    {
-      case Speed_Low:
-	put("S34\n");
-	break;
-      case Speed_Medium:
-	put("S35\n");
-	break;
-      default:
-	put("S36\n");
-	break;
-    }
+    *this << "S3"
+	  << (speed == Speed_Low ? '4' : speed == Speed_Medium ? '5' : '6')
+	  << endl;
 
     return *this;
 }
 
+//! 指定されたチャネルのスピードの値を設定する．
+/*!
+  \param channel	チャンネル
+  \param speed		スピードモード
+  \param val		スピードの値
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::setSpeedValue(u_int channel, Speed speed, u_int val)
 {
     checkChannel(channel);
-
-    switch (speed)
-    {
-      case Speed_Low:
-	put("SPL%X%06d\n", channel, val);
-	break;
-      case Speed_Medium:
-	put("SPM%X%06d\n", channel, val);
-	break;
-      default:
-	put("SPH%X%06d\n", channel, val);
-	break;
-    }
-
+    *this << "SP"
+	  << (speed == Speed_Low ? 'L' : speed == Speed_Medium ? 'M' : 'H')
+	  << std::hex << channel
+	  << setfill('0') << setw(6) << std::noshowpos << std::dec << val
+	  << endl;
+    
     return *this;
 }
     
+//! 指定されたチャネルのスピードの値を調べる．
+/*!
+  \param channel	チャンネル
+  \param speed		スピードモード
+  \return		スピードの値
+*/
 u_int
-PM16C_04::getSpeedValue(u_int channel, Speed speed) const
+PM16C_04::getSpeedValue(u_int channel, Speed speed)
 {
     checkChannel(channel);
+    *this << "SP"
+	  << (speed == Speed_Low ? 'L' : speed == Speed_Medium ? 'M' : 'H')
+	  << '?' << std::hex << channel << endl;
+    char	c;
+    u_int	val;
+    *this >> c >> std::dec >> val;
 
-    switch (speed)
-    {
-      case Speed_Low:
-	return put("SPL?%X\n", channel).get<u_int>("%d");
-      case Speed_Medium:
-	return put("SPM?%X\n", channel).get<u_int>("%d");
-    }
-    return put("SPH?%X\n", channel).get<u_int>("%d");
+    return val;
 }
 
 /*
  *  ソフトウェアリミットスイッチ
  */
+//! ソフトウェアリミットスイッチを有効化し．その位置を指定する．
+/*!
+  \param channel	チャンネル
+  \param PositionP	正方向リミットスイッチの位置
+  \param PositionN	負方向リミットスイッチの位置
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::enableSoftwareLimitSwitch(u_int channel,
 				    int positionP, int positionN)
 {
-    setLimitSwitchConf(channel, getLimitSwitchConf(channel) | 0x20)
-	.put("S5%XFL%+08d\n", channel, positionP)
-	.put("S5%XBL%+08d\n", channel, positionN);
+    setLimitSwitchConf(channel, getLimitSwitchConf(channel) | 0x20);
+    *this << "S5" << std::hex << channel << "FL"
+	  << setfill('0') << setw(8)
+	  << std::showpos << std::internal << std::dec << positionP
+	  << endl;
+    *this << "S5" << std::hex << channel << "BL"
+	  << setfill('0') << setw(8)
+	  << std::showpos << std::internal << std::dec << positionN
+	  << endl;
     usleep(DELAY);
 
     return *this;
 }
     
+//! ソフトウェアリミットスイッチを無効化する．
+/*!
+  \param channel	チャンネル
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::disableSoftwareLimitSwitch(u_int channel)
 {
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) & 0xdf);
 }
     
+//! ソフトウェアリミットスイッチが有効か調べる．
+/*!
+  \param channel	チャンネル
+  \return		有効であればtrue, 無効であればfalse
+*/
 bool
-PM16C_04::isEnabledSoftwareLimitSwitch(u_int channel) const
+PM16C_04::isEnabledSoftwareLimitSwitch(u_int channel)
 {
     return getLimitSwitchConf(channel) & 0x20;
 }
 
+//! 正方向ソフトウェアリミットスイッチの位置を調べる．
+/*!
+  \param channel	チャンネル
+  \return		正方向リミットスイッチの位置
+*/
 int
-PM16C_04::getSoftwareLimitSwitchPositionP(u_int channel) const
+PM16C_04::getSoftwareLimitSwitchPositionP(u_int channel)
 {
     checkChannel(channel);
-    return put("S4%XFL\n", channel).get<int>("%d");
+    *this <<"S4" << std::hex << channel << "FL" << endl;
+    int	position;
+    *this >> std::dec >> position;
+
+    return position;
 }
     
+//! 負方向ソフトウェアリミットスイッチの位置を調べる．
+/*!
+  \param channel	チャンネル
+  \return		負方向リミットスイッチの位置
+*/
 int
-PM16C_04::getSoftwareLimitSwitchPositionN(u_int channel) const
+PM16C_04::getSoftwareLimitSwitchPositionN(u_int channel)
 {
     checkChannel(channel);
-    return put("S4%XBL\n", channel).get<int>("%d");
+    *this <<"S4" << std::hex << channel << "BL" << endl;
+    int	position;
+    *this >> std::dec >> position;
+
+    return position;
 }
     
 /*
  *  ハードウェアリミットスイッチ
- */  
+ */
+//! ハードウェアリミットスイッチを有効化し．その極性を設定する．
+/*!
+  \param channel	チャンネル
+  \param dir		正方向リミットスイッチならtrue，
+			負方向リミットスイッチならfalse
+  \param normallyClose	スイッチが働いていないときにcloseならtrue，openならtrue
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::enableHardwareLimitSwitch(u_int channel, bool dir,
 				    bool normallyClose)
@@ -220,6 +309,13 @@ PM16C_04::enableHardwareLimitSwitch(u_int channel, bool dir,
 	return setLimitSwitchConf(channel, conf & (dir ? 0xfe : 0xfd));
 }
 
+//! ハードウェアリミットスイッチを無効化する．
+/*!
+  \param channel	チャンネル
+  \param dir		正方向リミットスイッチならtrue，
+			負方向リミットスイッチならfalse
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::disableHardwareLimitSwitch(u_int channel, bool dir)
 {
@@ -227,26 +323,51 @@ PM16C_04::disableHardwareLimitSwitch(u_int channel, bool dir)
 				       (dir ? 0xf7 : 0xef));
 }
 
+//! ハードウェアリミットスイッチが有効であるか調べる．
+/*!
+  \param channel	チャンネル
+  \param dir		正方向リミットスイッチならtrue，
+			負方向リミットスイッチならfalse
+  \return		有効ならtrue, 無効ならfalse
+*/
 bool
-PM16C_04::isEnabledHardwareLimitSwitch(u_int channel, bool dir) const
+PM16C_04::isEnabledHardwareLimitSwitch(u_int channel, bool dir)
 {
     return getLimitSwitchConf(channel) & (dir ? 0x08 : 0x10);
 }
 
+//! ハードウェアリミットスイッチの極性を調べる．
+/*!
+  \param channel	チャンネル
+  \param dir		正方向リミットスイッチならtrue，
+			負方向リミットスイッチならfalse
+  \return		スイッチが働いていないときcloseならtrue, openならfalse
+*/
 bool
-PM16C_04::getHardwareLimitSwitchPolarity(u_int channel, bool dir) const
+PM16C_04::getHardwareLimitSwitchPolarity(u_int channel, bool dir)
 {
     return getLimitSwitchConf(channel) & (dir ? 0x01 : 0x02);
 }
 
+//! ハードウェアホームポジションスイッチの極性を設定する．
+/*!
+  \param channel	チャンネル
+  \param normallyClose	スイッチが働いていないときにcloseならtrue，openならtrue
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::setHomeSwitchPolarity(u_int channel, bool normallyClose)
 {
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) | 0x04);
 }
 
+//! ハードウェアホームポジションスイッチの極性を調べる．
+/*!
+  \param channel	チャンネル
+  \return		スイッチが働いていないときcloseならtrue, openならfalse
+*/
 bool
-PM16C_04::getHomeSwitchPolarity(u_int channel) const
+PM16C_04::getHomeSwitchPolarity(u_int channel)
 {
     return getLimitSwitchConf(channel) & 0x04;
 }
@@ -254,120 +375,194 @@ PM16C_04::getHomeSwitchPolarity(u_int channel) const
 /*
  *  バックラッシュ補正
  */
+//! バックラッシュ補正のステップ数を設定する．
+/*!
+  \param channel	チャンネル
+  \param steps		ステップ数
+  \return		このコントローラ
+*/
 PM16C_04&
-PM16C_04::setBacklashCorrectionStep(u_int channel, u_int val)
+PM16C_04::setBacklashCorrectionStep(u_int channel, u_int steps)
 {
     checkChannel(channel);
-    put("B%X%+05d\n", channel, val);
+    *this << 'B' << std::hex << channel
+	  << setfill('0') << setw(8)
+	  << std::showpos << std::internal << std::dec << steps
+	  << endl;
 
     return *this;
 }
 
+//! バックラッシュ補正のステップ数を調べる．
+/*!
+  \param channel	チャンネル
+  \return		ステップ数
+*/
 u_int
-PM16C_04::getBacklashCorrectionStep(u_int channel) const
+PM16C_04::getBacklashCorrectionStep(u_int channel)
 {
     checkChannel(channel);
-    return put("B%X?\n", channel).get<u_int>("%d");
+    *this << 'B' << std::hex << channel << '?' << endl;
+    char	c;
+    u_int	val;
+    *this >> c >> std::dec >> val;
+
+    return val;
 }
 
 /*
  *  Hold off機能（停止時の非通電）
  */
+//! Hold off機能（停止時の非通電）を有効化する．
+/*!
+  \param channel	チャンネル
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::enableHoldOff(u_int channel)
 {
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) & 0xbf);
 }
 
+//! Hold off機能（停止時の非通電）を無効化する．
+/*!
+  \param channel	チャンネル
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::disableHoldOff(u_int channel)
 {
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) | 0x40);
 }
 
+//! Hold off機能（停止時の非通電）が有効か調べる．
+/*!
+  \param channel	チャンネル
+  \return		有効ならtrue, 無効ならfalse
+*/
 bool
-PM16C_04::isEnabledHoldOff(u_int channel) const
+PM16C_04::isEnabledHoldOff(u_int channel)
 {
     return getLimitSwitchConf(channel) & 0x40;
 }
 
 /*
- *  原点検出
+ *  ホームポジション検出
  */
+//! どちら側からホームポジション検出を行うかを設定する．
+/*!
+  \param channel	チャンネル
+  \param dir		正方向からであればtrue, 負方向からであればfalse
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::setHomeSearchDirection(u_int channel, bool dir)
 {
     checkChannel(channel);
-    put("D%c%X\n", (dir ? 'P' : 'N'), channel);
+    *this << 'D' << (dir ? 'P' : 'N') << std::hex << channel << endl;
 
     return *this;
 }
     
+//! どちら側からホームポジション検出を行うのか調べる．
+/*!
+  \param channel	チャンネル
+  \return		正方向からであればtrue, 負方向からであればfalse
+*/
 bool
-PM16C_04::getHomeSearchDirection(u_int channel) const
+PM16C_04::getHomeSearchDirection(u_int channel)
 {
     return getHomeStatus(channel) & 0x1;
 }
     
+//! ホームポジション検出時のオフセット値を設定する．
+/*!
+  \param channel	チャンネル
+  \param offset		オフセット値
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::setHomeOffset(u_int channel, u_int offset)
 {
     checkChannel(channel);
-    put("GF%X%04d\n", channel, offset);
+    *this << "GF" << std::hex << channel
+	  << setfill('0') << setw(4) << std::noshowpos << std::dec << offset
+	  << endl;
 
     return *this;
 }
     
+//! ホームポジション検出時のオフセット値を調べる．
+/*!
+  \param channel	チャンネル
+  \return		オフセット値
+*/
 u_int
-PM16C_04::getHomeOffset(u_int channel) const
+PM16C_04::getHomeOffset(u_int channel)
 {
     checkChannel(channel);
-    return put("GF?%X\n", channel).get<u_int>("%d");
+    *this << "GF?" << std::hex << channel << endl;
+    char	c;
+    u_int	offset;
+    *this >> c >> std::dec >> offset;
+
+    return offset;
 }
     
+//! ホームポジションが検出済みか調べる．
+/*!
+  \param channel	チャンネル
+  \return		検出済みならtrue, 未検出ならfalse
+*/
 bool
-PM16C_04::isHomeFound(u_int channel) const
+PM16C_04::isHomeFound(u_int channel)
 {
     return getHomeStatus(channel) & 0x4;
 }
     
+//! 検出済みのホームポジションがどちらから検出されたのか調べる．
+/*!
+  \param channel	チャンネル
+  \return		正方向からならtrue, 負方向からならfalse
+*/
 bool
-PM16C_04::isHomeFoundFromFront(u_int channel) const
+PM16C_04::isHomeFoundFromFront(u_int channel)
 {
     return getHomeStatus(channel) & 0x2;
 }
 
+//! 検出済みのホームポジションの位置を調べる．
+/*!
+  \param channel	チャンネル
+  \return		ホームポジション位置
+*/
 int
-PM16C_04::getHomePosition(u_int channel) const
+PM16C_04::getHomePosition(u_int channel)
 {
     checkChannel(channel);
-    return put("HP?%X\n", channel).get<int>("%d");
+    *this << "HP?" << std::hex << channel << endl;
+    int	position;
+    *this >> std::dec >> position;
+
+    return position;
 }
-    
+
+//! ホームポジションを検出する（高精度だが長時間を要す）．
+/*
+  \param axis	ホームポジション検出を実行する軸
+  \return	このコントローラ
+*/
 PM16C_04&
 PM16C_04::findHome(Axis axis)
 {
-    using namespace	std;
-
     const u_int	channel = getChannel(axis);
     if (!isEnabledHardwareLimitSwitch(channel, getHomeSearchDirection(channel)))
 	throw runtime_error("PM16C_04::findHome(): hardware limit switch is disabled!");
-    
-    switch (axis)
-    {
-      case Axis_A:
-	put("FHPA\n");
-	break;
-      case Axis_B:
-	put("FHPB\n");
-	break;
-      case Axis_C:
-	put("FHPC\n");
-	break;
-      default:
-	put("FHPD\n");
-	break;
-    }
+
+    *this << "FHP" << (axis == Axis_A ? 'A' :
+		       axis == Axis_B ? 'B' :
+		       axis == Axis_C ? 'C' : 'D')
+	  << endl;
 
     while (isBusy(axis))
 	;
@@ -375,29 +570,21 @@ PM16C_04::findHome(Axis axis)
     return *this;
 }
     
+//! ホームポジションに移動する．
+/*
+  \param axis	ホームポジションに移動する軸
+  \return	このコントローラ
+*/
 PM16C_04&
 PM16C_04::goHome(Axis axis)
 {
-    using namespace	std;
-
     if (!isHomeFound(getChannel(axis)))
 	throw runtime_error("PM16C_04::goHome(): home position is not found yet!");
-    
-    switch (axis)
-    {
-      case Axis_A:
-	put("RTHPA\n");
-	break;
-      case Axis_B:
-	put("RTHPB\n");
-	break;
-      case Axis_C:
-	put("RTHPC\n");
-	break;
-      default:
-	put("RTHPD\n");
-	break;
-    }
+
+    *this << "RTHP" << (axis == Axis_A ? 'A' :
+			axis == Axis_B ? 'B' :
+			axis == Axis_C ? 'C' : 'D')
+	  << endl;
 
     while (isBusy(axis))
 	;
@@ -408,55 +595,57 @@ PM16C_04::goHome(Axis axis)
 /*
  *  軸とチャンネルの関係
  */
+//! 指定した軸に指定したチャンネルを結びつける．
+/*!
+  \param axis		軸
+  \param channel	チャンネル
+  \return		このコントローラ
+*/
 PM16C_04&
 PM16C_04::setChannel(Axis axis, u_int channel)
 {
     checkChannel(channel);
-
-    switch (axis)
-    {
-      case Axis_A:
-	put("S11%X\n", channel);
-	break;
-      case Axis_B:
-	put("S12%X\n", channel);
-	break;
-      case Axis_C:
-	put("S15%X\n", channel);
-	break;
-      default:
-	put("S16%X\n", channel);
-	break;
-    }
+    *this << "S1" << (axis == Axis_A ? '1' :
+		      axis == Axis_B ? '2' :
+		      axis == Axis_C ? '5' : '6')
+	  << std::hex << channel
+	  << endl;
     usleep(DELAY);
     
     return *this;
 }
 
+//! 指定した軸にどのチャンネルが結びつけられているか調べる．
+/*!
+  \param axis		軸
+  \return		チャンネル
+*/
 u_int
-PM16C_04::getChannel(Axis axis) const
+PM16C_04::getChannel(Axis axis)
 {
     u_int	channel_A, channel_B, channel_C, channel_D;
     getChannel(channel_A, channel_B, channel_C, channel_D);
 
-    switch(axis)
-    {
-      case Axis_A:
-	return channel_A;
-      case Axis_B:
-	return channel_B;
-      case Axis_C:
-	return channel_C;
-    }
-
-    return channel_D;
+    return (axis == Axis_A ? channel_A :
+	    axis == Axis_B ? channel_B :
+	    axis == Axis_C ? channel_C : channel_D);
 }
     
+//! 4つの軸にそれぞれどのチャンネルが結びつけられているか調べる．
+/*!
+  \param channel_A	#Axis_Aに結びつけられたチャンネルが返される
+  \param channel_B	#Axis_Bに結びつけられたチャンネルが返される
+  \param channel_C	#Axis_Cに結びつけられたチャンネルが返される
+  \param channel_D	#Axis_Dに結びつけられたチャンネルが返される
+*/
 void
 PM16C_04::getChannel(u_int& channel_A, u_int& channel_B,
-		     u_int& channel_C, u_int& channel_D) const
+		     u_int& channel_C, u_int& channel_D)
 {
-    u_int	channel = put("S10\n").get<u_int>("%x");
+    *this << "S10" << endl;
+    char	c;
+    u_int	channel;
+    *this >> c >> std::hex >> channel;
     channel_A = (channel >> 12) & 0xf;
     channel_B = (channel >>  8) & 0xf;
     channel_C = (channel >>  4) & 0xf;
@@ -466,47 +655,77 @@ PM16C_04::getChannel(u_int& channel_A, u_int& channel_B,
 /*
  *  軸の状態
  */
+//! 指定した軸の現在位置を調べる．
+/*!
+  \param axis	軸
+  \return	現在位置
+*/
 int
-PM16C_04::where(Axis axis) const
+PM16C_04::where(Axis axis)
 {
-    switch (axis)
-    {
-      case Axis_A:
-	return put("S20D\n").get<int>("%d");
-      case Axis_B:
-	return put("S22D\n").get<int>("%d");
-      case Axis_C:
-	return put("S24D\n").get<int>("%d");
-    }
-    return put("S26D\n").get<int>("%d");
+    *this << "S2" << (axis == Axis_A ? '0' :
+		      axis == Axis_B ? '2' :
+		      axis == Axis_C ? '4' : '6')
+	  << 'D'
+	  << endl;
+    int	position;
+    *this >> std::dec >> position;
+
+    return position;
 }
 
+//! 指定した軸において何らかのコマンドが実行中か調べる．
+/*!
+  \param axis	軸
+  \return	実行中ならtrue, そうでなければfalse
+*/
 bool
-PM16C_04::isBusy(Axis axis) const
+PM16C_04::isBusy(Axis axis)
 {
     return getControllerStatus(axis) & 0x1;
 }
 
+//! 指定した軸においてパルスが発生中か調べる．
+/*!
+  \param axis	軸
+  \return	発生中ならtrue, そうでなければfalse
+*/
 bool
-PM16C_04::isPulseEmitted(Axis axis) const
+PM16C_04::isPulseEmitted(Axis axis)
 {
     return getControllerStatus(axis) & 0x2;
 }
 
+//! 指定した軸において発生中であったパルスが停止したか調べる．
+/*!
+  \param axis	軸
+  \return	停止したならtrue, そうでなければfalse
+*/
 bool
-PM16C_04::isPulseStopped(Axis axis) const
+PM16C_04::isPulseStopped(Axis axis)
 {
     return getControllerStatus(axis) & 0x4;
 }
 
+//! 指定した軸においてリミットスイッチがONであるか調べる．
+/*!
+  \param axis	軸
+  \param dir	正方向リミットスイッチならtrue, 負方向リミットスイッチならfalse
+  \return	ONならtrue, OFFならfalse
+*/
 bool
-PM16C_04::atLimit(Axis axis, bool dir) const
+PM16C_04::atLimit(Axis axis, bool dir)
 {
     return !(getHardwareLimitSwitchStatus(axis) & (dir ? 0x1 : 0x2));
 }
 
+//! 指定した軸においてホームポジションスイッチがONであるか調べる．
+/*!
+  \param axis	軸
+  \return	ONならtrue, OFFならfalse
+*/
 bool
-PM16C_04::atHome(Axis axis) const
+PM16C_04::atHome(Axis axis)
 {
     return !(getHardwareLimitSwitchStatus(axis) & 0x4);
 }
@@ -514,69 +733,111 @@ PM16C_04::atHome(Axis axis) const
 /*
  *  移動
  */
+//! 指定した軸を減速停止する．
+/*!
+  \param axis	軸
+  \return	このコントローラ　
+*/
 PM16C_04&
 PM16C_04::stop(Axis axis)
 {
     return move(axis, "40");
 }
     
+//! 指定した軸をjog動作させる．
+/*!
+  \param axis	軸
+  \param dir	正方向ならtrue, 負方向ならfalse
+  \return	このコントローラ　
+*/
 PM16C_04&
 PM16C_04::jog(Axis axis, bool dir)
 {
    return move(axis, (dir ? "08" : "09"));
 }
     
+//! 指定した軸を一定速度でスキャンする．
+/*!
+  \param axis	軸
+  \param dir	正方向ならtrue, 負方向ならfalse
+  \return	このコントローラ　
+*/
 PM16C_04&
 PM16C_04::scanWithConstantSpeed(Axis axis, bool dir)
 {
     return move(axis, (dir ? "0C" : "0D"));
 }
     
+//! 指定した軸を台形速度パターンでスキャンする．
+/*!
+  \param axis	軸
+  \param dir	正方向ならtrue, 負方向ならfalse
+  \return	このコントローラ　
+*/
 PM16C_04&
 PM16C_04::scan(Axis axis, bool dir)
 {
     return move(axis, (dir ? "0E" : "0F"));
 }
     
+//! 指定した軸を一時停止する．
+/*!
+  \param axis	軸
+  \param on	
+  \return	このコントローラ　
+*/
 PM16C_04&
 PM16C_04::pause(Axis axis, bool on)
 {
     return move(axis, (on ? "16" : "17"));
 }
     
+//! 指定した軸のHold off機能（停止時の非通電）を設定する．
+/*!
+  \param axis	軸
+  \param set	機能を使用するならtrue, 使用しないならfalsse	
+  \return	このコントローラ
+*/
 PM16C_04&
 PM16C_04::holdOff(Axis axis, bool set)
 {
     return move(axis, (set ? "18" : "19"));
 }
-    
+
+//! 指定した軸をスキャンしながらホームポジションを検出する（高速だが低精度）．
+/*!
+  \param axis	軸
+  \param dir	正方向にスキャンするならtrue, 負方向ならfalse
+  \return	このコントローラ
+*/
 PM16C_04&
 PM16C_04::scanAndStopAtHome(Axis axis, bool dir)
 {
     return move(axis, (dir ? "1E" : "1F"));
 }
-    
+
+//! 指定した軸を移動する．
+/*!
+  \param axis			軸
+  \param relative		相対的な移動ならtrue, 絶対的な移動ならfalse
+  \param val			移動量（相対的な移動）
+				または目標位置（絶対的な移動）
+  \param correctBacklash	停止時にバックラッシュ補正を行うならtrue,
+				行わないならfase
+  \return			このコントローラ
+*/
 PM16C_04&
 PM16C_04::move(Axis axis, bool relative, int val, bool correctBacklash)
 {
-    const char	rel   = (relative ? 'R' : 'A');
-    const char*	rmbkl = (correctBacklash ? "B" : "");
-    
-    switch (axis)
-    {
-      case Axis_A:
-	put("S32%c%+08d%s\n", rel, val, rmbkl);
-	break;
-      case Axis_B:
-	put("S33%c%+08d%s\n", rel, val, rmbkl);
-	break;
-      case Axis_C:
-	put("S3A%c%+08d%s\n", rel, val, rmbkl);
-	break;
-      default:
-	put("S3B%c%+08d%s\n", rel, val, rmbkl);
-	break;
-    }
+    *this << "S3" << (axis == Axis_A ? '2' :
+		      axis == Axis_B ? '3' :
+		      axis == Axis_C ? 'A' : 'B')
+	  << (relative ? 'R' : 'A')
+	  << setw(8) << setfill('0')
+	  << std::showpos << std::internal << std::dec << val;
+    if (correctBacklash)
+	*this << 'B';
+    *this << endl;
 
     return *this;
 }
@@ -584,40 +845,69 @@ PM16C_04::move(Axis axis, bool relative, int val, bool correctBacklash)
 /*
  *  Parallel I/Oポート
  */
+//! パラレルI/Oポートを有効化する．
+/*!
+  \return	このコントローラ
+*/
 PM16C_04&
 PM16C_04::enableParallelIO()
 {
-    put("PIO\n");
+    *this << "PIO" << endl;
 
     return *this;
 }
     
+//! パラレルI/Oポートを無効化する．
+/*!
+  \return	このコントローラ
+*/
 PM16C_04&
 PM16C_04::disableParallelIO()
 {
-    put("COM\n");
+    *this << "COM" << endl;
 
     return *this;
 }
-    
+
+//! パラレルI/Oポートが有効か調べる．
+/*!
+  \return	有効ならtrue, 無効ならfalse
+*/
 bool
-PM16C_04::isEnabledParallelIO() const
+PM16C_04::isEnabledParallelIO()
 {
-    put("PIO?\n");
-    Serial::get(_response, BUFFER_SIZE);
-    return !strncmp(_response, "PIO", 3);
+    *this << "PIO?" << endl;
+    char	response[4];
+    getline(response, sizeof(response));
+
+    return !strncmp(response, "PIO", 3);
 }
-    
+
+//! パラレルI/Oポートから読み込む．
+/*!
+  \return	読み込んだ値
+*/
 u_int
-PM16C_04::readParallelIO() const
+PM16C_04::readParallelIO()
 {
-    return put("RD\n").get<u_int>("%x");
+    *this << "RD" << endl;
+    char	c;
+    u_int	val;
+    *this >> c >> std::hex >> val;
+
+    return val;
 }
     
+//! パラレルI/Oポートに書き出す．
+/*!
+  \param val	書き出す値
+  \return	このコントローラ
+*/
 PM16C_04&
 PM16C_04::writeParallelIO(u_int val)
 {
-    put("W%04X", val & 0xffff);
+    *this << 'W' << setfill('0') << setw(4) << std::hex << (val & 0xffff)
+	  << endl;
 
     return *this;
 }
@@ -626,92 +916,75 @@ PM16C_04::writeParallelIO(u_int val)
  *  private member functions
  */
 u_int
-PM16C_04::getLimitSwitchConf(u_int channel) const
+PM16C_04::getLimitSwitchConf(u_int channel)
 {
     checkChannel(channel);
-    return put("S4%XD\n", channel).get<u_int>("%x") >> 16;
+    *this << "S4" << std::hex << channel << 'D' << endl;
+    char	c;
+    u_int	conf;
+    *this >> c >> std::hex >> conf;
+
+    return conf >> 16;
 }
 
 PM16C_04&
 PM16C_04::setLimitSwitchConf(u_int channel, u_int conf)
 {
     checkChannel(channel);
-    put("S5%XD%02X\n", channel, conf);
+    *this << "S5" << std::hex << channel << 'D'
+	  << setfill('0') << setw(2) << std::hex << conf
+	  << endl;
     usleep(DELAY);
 
     return *this;
 }
 
 u_int
-PM16C_04::getHardwareLimitSwitchStatus(Axis axis) const
+PM16C_04::getHardwareLimitSwitchStatus(Axis axis)
 {
-    u_int	status = put("S6\n").get<u_int>("%x");
+    *this << "S6" << endl;
+    char	c;
+    u_int	status;
+    *this >> c >> std::hex >> status;
 
-    switch (axis)
-    {
-      case Axis_A:
-	return (status >>  8) & 0xf;
-      case Axis_B:
-	return (status >> 12) & 0xf;
-      case Axis_C:
-	return status & 0xf;
-    }
-    return (status >> 4) & 0xf;
+    return (status >> (axis == Axis_A ?  8 :
+		       axis == Axis_B ? 12 :
+		       axis == Axis_C ?  0 : 4)) & 0xf;
 }
     
 u_int
-PM16C_04::getHomeStatus(u_int channel) const
+PM16C_04::getHomeStatus(u_int channel)
 {
     checkChannel(channel);
-    return put("G?%X\n", channel).get<u_int>("%x");
+    *this << "G?" << std::hex << channel << endl;
+    char	c;
+    u_int	status;
+    *this >> c >> std::hex >> status;
+
+    return status;
 }
     
 u_int
-PM16C_04::getControllerStatus(Axis axis) const
+PM16C_04::getControllerStatus(Axis axis)
 {
-    switch (axis)
-    {
-      case Axis_A:
-	return put("S21\n").get<u_int>("%x");
-      case Axis_B:
-	return put("S23\n").get<u_int>("%x");
-      case Axis_C:
-	return put("S25\n").get<u_int>("%x");
-    }
-    return put("S27\n").get<u_int>("%x");
+    *this << "S2" << (axis == Axis_A ? '1' :
+		      axis == Axis_B ? '3' :
+		      axis == Axis_C ? '5' : '7')
+	  << endl;
+    char	c;
+    u_int	status;
+    *this >> c >> std::hex >> status;
+
+    return status;
 }
     
 PM16C_04&
 PM16C_04::move(Axis axis, const char* motion)
 {
-    switch (axis)
-    {
-      case Axis_A:
-	put("S30%s\n", motion);
-	break;
-      case Axis_B:
-	put("S31%s\n", motion);
-	break;
-      case Axis_C:
-	put("S38%s\n", motion);
-	break;
-      default:
-	put("S39%s\n", motion);
-	break;
-    }
-
-    return *this;
-}
-    
-const PM16C_04&
-PM16C_04::put(const char* format, ...) const
-{
-    va_list	args;
-    va_start(args, format);
-    if (_echo)
-	vfprintf(stderr, format, args);
-    vfprintf(fp(), format, args);
-    va_end(args);
+    *this << "S3" << (axis == Axis_A ? '0' :
+		      axis == Axis_B ? '1' :
+		      axis == Axis_C ? '8' : '9')
+	  << motion << endl;
 
     return *this;
 }

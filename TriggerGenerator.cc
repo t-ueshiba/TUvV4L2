@@ -25,32 +25,21 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.18 2010-01-08 06:47:35 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.19 2010-01-12 01:44:55 ueshiba Exp $
  */
-#include <cstdlib>
 #include "TU/TriggerGenerator.h"
-
-#define DOUBLE_NL
+#include "TU/Manip.h"
+#include <iomanip>
 
 namespace TU
 {
 /************************************************************************
-*  static functions							*
-************************************************************************/
-static void
-skipl(FILE* fp)
-{
-    for (int c; (c = fgetc(fp)) != EOF; )
-	if (c == '\n')
-	    break;
-#ifdef DOUBLE_NL
-    fgetc(fp);
-#endif
-}
-    
-/************************************************************************
 *  class TriggerGenerator						*
 ************************************************************************/
+//! 指定されたttyをopenしてトリガ信号発生器を作る．
+/*!
+  \param ttyname	tty名
+*/
 TriggerGenerator::TriggerGenerator(const char* ttyname)
     :Serial(ttyname)
 {
@@ -62,76 +51,122 @@ TriggerGenerator::TriggerGenerator(const char* ttyname)
 	.c_baud(9600).c_csize(8).c_noparity().c_stop1();
 }
 
+//! ファームウェアのIDを出力ストリームに書き出す．
+/*!
+  \param out	出力ストリーム
+*/
 void
-TriggerGenerator::showId(std::ostream& out) const
+TriggerGenerator::showId(std::ostream& out)
 {
     using namespace	std;
     
-    fputs("V\n", fp());
-    for (int c; (c = fgetc(fp())) != EOF; )
+    *this << 'V' << endl;
+    for (char c; get(c); )
     {
-	out << char(c);
 	if (c == '\n')
 	    break;
+	out << c;
     }
-#ifdef DOUBLE_NL
-    fgetc(fp());
-#endif
+    out << endl;
+
+    *this >> skipl;
 }
 
+//! トリガ信号を出力するチャンネルを指定する．
+/*!
+  \param channel	出力チャンネルに対応するビットに1を立てたビットマップ
+  \return		このトリガ信号発生器
+*/
 TriggerGenerator&
 TriggerGenerator::selectChannel(u_int channel)
 {
-    fprintf(fp(), "A%0.8x\n", channel);
-    skipl(fp());
+    using namespace	std;
+
+    *this << 'A' << setw(8) << setfill('0') << std::hex << channel << endl;
+    *this >> skipl >> skipl;
     return *this;
 }
 
+//! トリガ信号の出力間隔を指定する．
+/*!
+  \param interval	出力間隔(msec)．10 <= interval <=
+  \return		このトリガ信号発生器
+*/
 TriggerGenerator&
 TriggerGenerator::setInterval(u_int interval)
 {
+    using namespace	std;
+    
     if (10 <= interval && interval <= 255)
     {
-	fprintf(fp(), "F%d\n", interval);
-	skipl(fp());
+	*this << 'F' << std::dec << interval << endl;
+	*this >> skipl >> skipl;
     }
     return *this;
 }
 
+//! トリガ信号を1つだけ出力する．
+/*!
+  \return		このトリガ信号発生器
+*/
 TriggerGenerator&
 TriggerGenerator::oneShot()
 {
-    fputs("T\n", fp());
-    skipl(fp());
+    using namespace	std;
+    
+    *this << 'T' << endl;
+    *this >> skipl >> skipl;
     return *this;
 }
 
+//! トリガ信号を連続的に出力する．
+/*!
+  \return		このトリガ信号発生器
+*/
 TriggerGenerator&
 TriggerGenerator::continuousShot()
 {
-    fputs("R\n", fp());
-    skipl(fp());
+    using namespace	std;
+    
+    *this << 'R' << endl;
+    *this >> skipl >> skipl;
     return *this;
 }
 
+//! トリガ信号を停止する．
+/*!
+  \return		このトリガ信号発生器
+*/
 TriggerGenerator&
 TriggerGenerator::stopContinuousShot()
 {
-    fputs("S\n", fp());
-    skipl(fp());
+    using namespace	std;
+    
+    *this << 'S' << endl;
+    *this >> skipl >> skipl;
     return *this;
 }
 
+//! トリガ信号発生器の状態を取得する．
+/*!
+  \param channel	トリガ信号を出力するチャンネルに1を立てたビットマップ
+			が返される
+  \param interval	トリガ信号の出力間隔(msec)が返される
+  \return		トリガ信号が出力中ならばtrue，そうでなければfalse
+*/
 bool
-TriggerGenerator::getStatus(u_int& channel, u_int& interval) const
+TriggerGenerator::getStatus(u_int& channel, u_int& interval)
 {
-    fputs("I\n", fp());
-
-    char	state[5];
-    fscanf(fp(), "A%x,F%d,%4s", &channel, &interval, state);
-    skipl(fp());
+    using namespace	std;
     
-    return !strcmp(state, "RUN");
+    *this << 'I' << endl;
+
+    char	c, token[5];
+    *this >> c >> std::hex >> channel >> c;
+    *this >> c >> std::dec >> interval >> c >> token >> skipl;
+    
+    return !strcmp(token, "RUN");
 }
 
 }
+
