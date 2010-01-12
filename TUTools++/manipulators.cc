@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: manipulators.cc,v 1.9 2010-01-08 06:47:35 ueshiba Exp $
+ *  $Id: manipulators.cc,v 1.10 2010-01-12 01:44:55 ueshiba Exp $
  */
 #include <iostream>
 #include "TU/Manip.h"
@@ -35,6 +35,12 @@ namespace TU
 /************************************************************************
 *  Manipulators for std::istream					*
 ************************************************************************/
+//! 行の終わりまで読み飛ばす．
+/*!
+  NLが読み込まれるまでストリームからの入力を続ける．NLはストリームに残されない．
+  \param in	入力ストリーム
+  \return	inで指定した入力ストリーム
+*/
 __PORT std::istream&
 skipl(std::istream& in)	// manipulator for skipping the rest of a line
 {

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Bezier++.h,v 1.14 2009-08-02 23:38:22 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.15 2010-01-12 01:44:55 ueshiba Exp $
  */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -37,22 +37,50 @@ namespace TU
 /************************************************************************
 *  class BezierCurve<C>							*
 ************************************************************************/
+//! 非有理または有理Bezier曲線を表すクラス
+/*!
+  \param C	制御点の型．d次元空間中の非有理曲線であればd次元ベクトル，
+		有理曲線であれば(d+1)次元ベクトル．
+*/
 template <class C>
 class BezierCurve : private Array<C>
 {
   public:
     typedef C					value_type;
     typedef typename value_type::value_type	T;
-    
+
+  //! 指定した次数のBezier曲線を作る．
+  /*!
+    \param p	次数
+  */
     BezierCurve(u_int p=0)	 :Array<C>(p+1)	{}
+
+  //! 指定した制御点を持つBezier曲線を作る．
+  /*!
+    \param b	サイズが(次数+1)個である制御点の1次元配列
+  */
     BezierCurve(const Array<C>& b) :Array<C>(b)	{}
 
+  //! 曲線が属す空間の次元を調べる．
+  /*!
+    \return	空間の次元
+  */
     static u_int	dim()			{return C::size();}
 
+  //! 曲線の次数(= 制御点数-1)を調べる．
+  /*!
+    \return	次数
+  */
     u_int	degree()		  const	{return Array<C>::dim()-1;}
+
     C		operator ()(T t)	  const	;
     Array<C>	deCasteljau(T t, u_int r) const	;
     void	elevateDegree()			;
+
+  //! 制御点の1次元配列へのポインタを返す．
+  /*!
+    \return	制御点の配列へのポインタ
+  */
 		operator const T*()	  const	{return (*this)[0];}
 
     friend	class Array2<BezierCurve<C> >;	// allow access to resize.
@@ -63,14 +91,32 @@ class BezierCurve : private Array<C>
     using	Array<C>::save;
     using	Array<C>::restore;
 
+  //! ストリームからBezier曲線を読み込む．
+  /*!
+    \param in	入力ストリーム
+    \param b	Bezier曲線
+    \return	inで指定した入力ストリーム
+  */
     friend std::istream&
     operator >>(std::istream& in, BezierCurve<C>& b)
 	{return in >> (Array<C>&)b;}
+
+  //! ストリームにBezier曲線を書き出す．
+  /*!
+    \param out	出力ストリーム
+    \param b	Bezier曲線
+    \return	outで指定した出力ストリーム
+  */
     friend std::ostream&
     operator <<(std::ostream& out, const BezierCurve<C>& b)
 	{return out << (const Array<C>&)b;}
 };
 
+//! 指定したパラメータ値に対応する曲線上の点を調べる．
+/*!
+  \param t	曲線上の位置を指定するパラメータ値
+  \return	パラメータ値に対応する曲線上の点
+*/
 template <class C> C
 BezierCurve<C>::operator ()(T t) const
 {
@@ -91,6 +137,11 @@ BezierCurve<C>::operator ()(T t) const
     return b;
 }
 
+//! de Casteljauアルゴリズムを実行する．
+/*!
+  \param t	曲線上の位置を指定するパラメータ値
+  \param r
+*/
 template <class C> Array<C>
 BezierCurve<C>::deCasteljau(T t, u_int r) const
 {
@@ -106,6 +157,7 @@ BezierCurve<C>::deCasteljau(T t, u_int r) const
     return b_tmp;
 }
 
+//! 曲線の形状を変えずに次数を1だけ上げる．
 template <class C> void
 BezierCurve<C>::elevateDegree()
 {
@@ -133,6 +185,11 @@ typedef BezierCurve<Vector4d>	RationalBezierCurve3d;
 /************************************************************************
 *  class BezierSurface<C>						*
 ************************************************************************/
+//! 非有理または有理Bezier曲面を表すクラス
+/*!
+  \param C	制御点の型．d次元空間中の非有理曲面であればd次元ベクトル，
+		有理曲面であれば(d+1)次元ベクトル．
+*/
 template <class C>
 class BezierSurface : private Array2<BezierCurve<C> >
 {
@@ -141,18 +198,43 @@ class BezierSurface : private Array2<BezierCurve<C> >
     typedef typename value_type::value_type		T;
     typedef BezierCurve<C>				Curve;
 
+  //! 指定した次数のBezier曲面を作る．
+  /*!
+    \param p	横方向次数
+    \param q	縦方向次数
+  */
     BezierSurface(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}
+
     BezierSurface(const Array2<Array<C> >& b)			;
 
+  //! 曲面が属す空間の次元を調べる．
+  /*!
+    \return	空間の次元
+  */
     static u_int	dim()				{return C::size();}
 
+  //! 曲面の横方向次数を調べる．
+  /*!
+    \return	横方向次数
+  */
     u_int	uDegree()			const	{return ncol()-1;}
+
+  //! 曲面の縦方向次数を調べる．
+  /*!
+    \return	縦方向次数
+  */
     u_int	vDegree()			const	{return nrow()-1;}
+
     C		operator ()(T u, T v)		const	;
     Array2<Array<C> >
 		deCasteljau(T u, T v, u_int r)	const	;
     void	uElevateDegree()			;
     void	vElevateDegree()			;
+
+  //! 制御点の2次元配列へのポインタを返す．
+  /*!
+    \return	制御点の配列へのポインタ
+  */
 		operator const T*()		const	{return (*this)[0][0];}
 
     using	Array2<Curve>::operator [];
@@ -163,14 +245,31 @@ class BezierSurface : private Array2<BezierCurve<C> >
     using	Array2<Curve>::save;
     using	Array2<Curve>::restore;
     
+  //! ストリームからBezier曲面を読み込む．
+  /*!
+    \param in	入力ストリーム
+    \param b	Bezier曲面
+    \return	inで指定した入力ストリーム
+  */
     friend std::istream&
     operator >>(std::istream& in, BezierSurface<C>& b)
 	{return in >> (Array2<Curve>&)b;}
+
+  //! ストリームにBezier曲面を書き出す．
+  /*!
+    \param out	出力ストリーム
+    \param b	Bezier曲面
+    \return	outで指定した出力ストリーム
+  */
     friend std::ostream&
     operator <<(std::ostream& out, const BezierSurface<C>& b)
 	{return out << (const Array2<Curve>&)b;}
 };
 
+//! 指定した制御点を持つBezier曲面を作る．
+/*!
+  \param b	サイズが(横方向次数+1)x(縦方向次数+1)である制御点の2次元配列
+*/
 template <class C>
 BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
     :Array2<Curve>(b.nrow(), b.ncol())
@@ -180,6 +279,12 @@ BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
 	    (*this)[j][i] = b[j][i];
 }
 
+//! 指定したパラメータ値に対応する曲面上の点を調べる．
+/*!
+  \param t	曲面上の位置を指定する横方向パラメータ値
+  \param t	曲面上の位置を指定する縦方向パラメータ値
+  \return	パラメータ値に対応する曲面上の点
+*/
 template <class C> C
 BezierSurface<C>::operator ()(T u, T v) const
 {

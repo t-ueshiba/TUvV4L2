@@ -25,96 +25,111 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.h,v 1.2 2010-01-08 06:47:35 ueshiba Exp $
+ *  $Id: PM16C_04.h,v 1.3 2010-01-12 01:44:55 ueshiba Exp $
  */
-#if !defined(__PM16C_04_h)
-#define __PM16C_04_h
+#ifndef __TUPM16C_04_h
+#define __TUPM16C_04_h
 
-#include <stdexcept>
 #include "TU/Serial.h"
+#include <stdexcept>
 
 namespace TU
 {
 /************************************************************************
 *  class PM16C_04							*
 ************************************************************************/
+//! ツジ電子製パルスモータコントローラPM16C_04を制御するクラス
 class __PORT PM16C_04 : public Serial
 {
   public:
-    enum Axis	{Axis_A, Axis_B, Axis_C, Axis_D};
-    enum Speed	{Speed_Low, Speed_Medium, Speed_High};
+  //! 軸
+    enum Axis
+    {
+	Axis_A,		//!< A軸
+	Axis_B,		//!< B軸
+	Axis_C,		//!< C軸
+	Axis_D		//!< D軸
+    };
+
+  //! スピードモード
+    enum Speed
+    {
+	Speed_Low,	//!< 低速
+	Speed_Medium,	//!< 中速
+	Speed_High	//!< 高速
+    };
 
   public:
-    PM16C_04(const char* ttyname, bool echo=false)			;
+    PM16C_04(const char* ttyname)					;
 
   // ファームウェアバージョン
-    void	showId(std::ostream&)				const	;
+    void	showId(std::ostream& out)				;
 
   // Local/Remoteモード
     PM16C_04&	setMode(bool remote)					;
-    bool	isRemoteMode()					const	;
+    bool	isRemoteMode()						;
 
   // 位置
     PM16C_04&	setPosition(u_int channel, int position)		;
-    int		getPosition(u_int channel)			const	;
+    int		getPosition(u_int channel)				;
     
   // スピード
     PM16C_04&	setSpeed(Speed speed)					;
     PM16C_04&	setSpeedValue(u_int channel, Speed speed, u_int val)	;
-    u_int	getSpeedValue(u_int channel, Speed speed)	const	;
+    u_int	getSpeedValue(u_int channel, Speed speed)		;
 
   // ソフトウェアリミットスイッチ
     PM16C_04&	enableSoftwareLimitSwitch(u_int channel,
 					  int positionP, int positionN)	;
     PM16C_04&	disableSoftwareLimitSwitch(u_int channel)		;
-    bool	isEnabledSoftwareLimitSwitch(u_int channel)	const	;
-    int		getSoftwareLimitSwitchPositionP(u_int channel)	const	;
-    int		getSoftwareLimitSwitchPositionN(u_int channel)	const	;
+    bool	isEnabledSoftwareLimitSwitch(u_int channel)		;
+    int		getSoftwareLimitSwitchPositionP(u_int channel)		;
+    int		getSoftwareLimitSwitchPositionN(u_int channel)		;
     
   // ハードウェアリミットスイッチ，ホームスイッチ
     PM16C_04&	enableHardwareLimitSwitch(u_int channel, bool dir,
 					  bool normallyClose)		;
     PM16C_04&	disableHardwareLimitSwitch(u_int channel, bool dir)	;
     bool	isEnabledHardwareLimitSwitch(u_int channel,
-					     bool dir)		const	;
+					     bool dir)			;
     bool	getHardwareLimitSwitchPolarity(u_int channel,
-					       bool dir)	const	;
+					       bool dir)		;
     PM16C_04&	setHomeSwitchPolarity(u_int channel, bool normallyClose);
-    bool	getHomeSwitchPolarity(u_int channel)		const	;
+    bool	getHomeSwitchPolarity(u_int channel)			;
 
   // バックラッシュ補正
-    PM16C_04&	setBacklashCorrectionStep(u_int channel, u_int val)	;
-    u_int	getBacklashCorrectionStep(u_int channel)	const	;
+    PM16C_04&	setBacklashCorrectionStep(u_int channel, u_int steps)	;
+    u_int	getBacklashCorrectionStep(u_int channel)		;
 
   // Hold off機能（停止時の非通電）
     PM16C_04&	enableHoldOff(u_int channel)				;
     PM16C_04&	disableHoldOff(u_int channel)				;
-    bool	isEnabledHoldOff(u_int channel)			const	;
+    bool	isEnabledHoldOff(u_int channel)				;
 
-  // 原点検出
+  // ホームポジション検出
     PM16C_04&	setHomeSearchDirection(u_int channel, bool dir)		;
-    bool	getHomeSearchDirection(u_int channel)		const	;
+    bool	getHomeSearchDirection(u_int channel)			;
     PM16C_04&	setHomeOffset(u_int channel, u_int offset)		;
-    u_int	getHomeOffset(u_int channel)			const	;
-    bool	isHomeFound(u_int channel)			const	;
-    bool	isHomeFoundFromFront(u_int channel)		const	;
-    int		getHomePosition(u_int channel)			const	;
+    u_int	getHomeOffset(u_int channel)				;
+    bool	isHomeFound(u_int channel)				;
+    bool	isHomeFoundFromFront(u_int channel)			;
+    int		getHomePosition(u_int channel)				;
     PM16C_04&	findHome(Axis axis)					;
     PM16C_04&	goHome(Axis axis)					;
     
   // 軸とチャンネルの関係
     PM16C_04&	setChannel(Axis axis, u_int channel)			;
-    u_int	getChannel(Axis axis)				const	;
+    u_int	getChannel(Axis axis)					;
     void	getChannel(u_int& channel_A, u_int& channel_B,
-			   u_int& channel_C, u_int& channel_D)	const	;
+			   u_int& channel_C, u_int& channel_D)		;
 
   // 軸の状態
-    int		where(Axis axis)				const	;
-    bool	isBusy(Axis axis)				const	;
-    bool	isPulseEmitted(Axis axis)			const	;
-    bool	isPulseStopped(Axis axis)			const	;
-    bool	atLimit(Axis axis, bool dir)			const	;
-    bool	atHome(Axis axis)				const	;
+    int		where(Axis axis)					;
+    bool	isBusy(Axis axis)					;
+    bool	isPulseEmitted(Axis axis)				;
+    bool	isPulseStopped(Axis axis)				;
+    bool	atLimit(Axis axis, bool dir)				;
+    bool	atHome(Axis axis)					;
     
   // 移動
     PM16C_04&	stop(Axis axis)						;
@@ -130,68 +145,22 @@ class __PORT PM16C_04 : public Serial
   // Parallel I/Oポート
     PM16C_04&	enableParallelIO()					;
     PM16C_04&	disableParallelIO()					;
-    bool	isEnabledParallelIO()				const	;
-    u_int	readParallelIO()				const	;
+    bool	isEnabledParallelIO()					;
+    u_int	readParallelIO()					;
     PM16C_04&	writeParallelIO(u_int val)				;
     
   private:
-    PM16C_04&		setLimitSwitchConf(u_int channel, u_int conf)	;
-    u_int		getLimitSwitchConf(u_int channel)	const	;
-    u_int		getHomeStatus(u_int channel)		const	;
-    u_int		getHardwareLimitSwitchStatus(Axis axis)	const	;
-    u_int		getControllerStatus(Axis axis)		const	;
-    PM16C_04&		move(Axis axis, const char* motion)		;
-    const PM16C_04&	put(const char* format, ...)		const	;
-    template <class T>
-    T			get(const char* format)			const	;
+    PM16C_04&	setLimitSwitchConf(u_int channel, u_int conf)		;
+    u_int	getLimitSwitchConf(u_int channel)			;
+    u_int	getHomeStatus(u_int channel)				;
+    u_int	getHardwareLimitSwitchStatus(Axis axis)			;
+    u_int	getControllerStatus(Axis axis)				;
+    PM16C_04&	move(Axis axis, const char* motion)			;
 
   private:
-    enum		{BUFFER_SIZE = 256, DELAY = 50000};
-
-    mutable char	_response[BUFFER_SIZE];
-    bool		_echo;
+    enum	{DELAY = 50000};
 };
- 
-template <class T> T
-PM16C_04::get(const char* format) const
-{
-    using namespace	std;
-    
-    Serial::get(_response, BUFFER_SIZE);
-    if (_echo)
-	cerr << _response;
-
-    T	val;
-    switch (_response[0])
-    {
-      case 'R':
-	sscanf(_response + 1, format, &val);
-	break;
-      case '+':
-      case '-':
-	sscanf(_response, format, &val);
-	break;
-      default:
-	throw runtime_error("PM16C_04::get(): unexpected response!");
-    }
-
-  /*T		val;
-    int		c = getc(fp());
-    switch (c)
-    {
-      case '+':
-      case '-':
-	ungetc(c, fp());
-      case 'R':
-	fscanf(fp(), format, &val);
-	break;
-      default:
-	throw runtime_error("PM16C_04::get(): unexpected response!");
-	}*/
-    
-    return val;
-}
     
 }
 
-#endif	/* !__PM16C_04_h	*/
+#endif	// !__TUPM16C_04_h

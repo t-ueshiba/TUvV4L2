@@ -25,9 +25,9 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.h,v 1.1 2009-12-28 01:40:22 ueshiba Exp $
+ *  $Id: TriggerGenerator.h,v 1.2 2010-01-12 01:44:55 ueshiba Exp $
  */
-#if !defined(__TUSerial_h)
+#ifndef __TUTriggerGenerator_h
 #define __TUTriggerGenerator_h
 
 #include "TU/Serial.h"
@@ -37,21 +37,21 @@ namespace TU
 /************************************************************************
 *  class TriggerGenerator						*
 ************************************************************************/
+//! 東通産業製トリガ信号発生器を表すクラス
 class __PORT TriggerGenerator : public Serial
 {
   public:
-    TriggerGenerator(const char* ttyname)			;
+    TriggerGenerator(const char* ttyname)				;
 
-    void		showId(std::ostream& out)	const	;
-    TriggerGenerator&	selectChannel(u_int channel)		;
-    TriggerGenerator&	setInterval(u_int interval)		;
-    TriggerGenerator&	oneShot()				;
-    TriggerGenerator&	continuousShot()			;
-    TriggerGenerator&	stopContinuousShot()			;
-    bool		getStatus(u_int& channel,
-				  u_int& interval)	const	;
+    void		showId(std::ostream& out)			;
+    TriggerGenerator&	selectChannel(u_int channel)			;
+    TriggerGenerator&	setInterval(u_int interval)			;
+    TriggerGenerator&	oneShot()					;
+    TriggerGenerator&	continuousShot()				;
+    TriggerGenerator&	stopContinuousShot()				;
+    bool		getStatus(u_int& channel, u_int& interval)	;
 };
 
 }
 
-#endif	/* !__TUTriggerGenerator_h	*/
+#endif	// !__TUTriggerGenerator_h
