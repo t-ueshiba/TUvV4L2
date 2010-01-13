@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.3 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.4 2010-01-13 00:40:28 ueshiba Exp $
  */
 #include "TU/PM16C_04.h"
 #include "TU/Manip.h"
@@ -64,6 +64,10 @@ PM16C_04::PM16C_04(const char* ttyname)
 
     setMode(true);
     usleep(DELAY);
+
+  // paddingとして符号と数値の間に'0'を出力
+    fill('0');
+    setf(ios_base::internal, ios_base::adjustfield);
 }
     
 //! ファームウェアのIDを出力ストリームに書き出す．
@@ -123,8 +127,7 @@ PM16C_04::setPosition(u_int channel, int position)
 {
     checkChannel(channel);
     *this << "S5" << std::hex << channel << "PS"
-	  << setfill('0') << setw(8)
-	  << std::showpos << std::internal << std::dec << position
+	  << setw(8) << std::showpos << std::dec << position
 	  << endl;
     usleep(DELAY);
 
@@ -179,7 +182,7 @@ PM16C_04::setSpeedValue(u_int channel, Speed speed, u_int val)
     *this << "SP"
 	  << (speed == Speed_Low ? 'L' : speed == Speed_Medium ? 'M' : 'H')
 	  << std::hex << channel
-	  << setfill('0') << setw(6) << std::noshowpos << std::dec << val
+	  << setw(6) << std::noshowpos << std::dec << val
 	  << endl;
     
     return *this;
@@ -221,12 +224,10 @@ PM16C_04::enableSoftwareLimitSwitch(u_int channel,
 {
     setLimitSwitchConf(channel, getLimitSwitchConf(channel) | 0x20);
     *this << "S5" << std::hex << channel << "FL"
-	  << setfill('0') << setw(8)
-	  << std::showpos << std::internal << std::dec << positionP
+	  << setw(8) << std::showpos << std::dec << positionP
 	  << endl;
     *this << "S5" << std::hex << channel << "BL"
-	  << setfill('0') << setw(8)
-	  << std::showpos << std::internal << std::dec << positionN
+	  << setw(8) << std::showpos << std::dec << positionN
 	  << endl;
     usleep(DELAY);
 
@@ -386,8 +387,7 @@ PM16C_04::setBacklashCorrectionStep(u_int channel, u_int steps)
 {
     checkChannel(channel);
     *this << 'B' << std::hex << channel
-	  << setfill('0') << setw(8)
-	  << std::showpos << std::internal << std::dec << steps
+	  << setw(8) << std::showpos << std::dec << steps
 	  << endl;
 
     return *this;
@@ -486,7 +486,7 @@ PM16C_04::setHomeOffset(u_int channel, u_int offset)
 {
     checkChannel(channel);
     *this << "GF" << std::hex << channel
-	  << setfill('0') << setw(4) << std::noshowpos << std::dec << offset
+	  << setw(4) << std::noshowpos << std::dec << offset
 	  << endl;
 
     return *this;
@@ -833,8 +833,7 @@ PM16C_04::move(Axis axis, bool relative, int val, bool correctBacklash)
 		      axis == Axis_B ? '3' :
 		      axis == Axis_C ? 'A' : 'B')
 	  << (relative ? 'R' : 'A')
-	  << setw(8) << setfill('0')
-	  << std::showpos << std::internal << std::dec << val;
+	  << setw(8) << std::showpos << std::dec << val;
     if (correctBacklash)
 	*this << 'B';
     *this << endl;
@@ -906,7 +905,7 @@ PM16C_04::readParallelIO()
 PM16C_04&
 PM16C_04::writeParallelIO(u_int val)
 {
-    *this << 'W' << setfill('0') << setw(4) << std::hex << (val & 0xffff)
+    *this << 'W'  << setw(4) << std::hex << (val & 0xffff)
 	  << endl;
 
     return *this;
@@ -932,7 +931,7 @@ PM16C_04::setLimitSwitchConf(u_int channel, u_int conf)
 {
     checkChannel(channel);
     *this << "S5" << std::hex << channel << 'D'
-	  << setfill('0') << setw(2) << std::hex << conf
+	  << setw(2) << std::hex << conf
 	  << endl;
     usleep(DELAY);
 
