@@ -25,13 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.h,v 1.3 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: PM16C_04.h,v 1.4 2010-01-13 02:08:19 ueshiba Exp $
  */
 #ifndef __TUPM16C_04_h
 #define __TUPM16C_04_h
 
 #include "TU/Serial.h"
-#include <stdexcept>
 
 namespace TU
 {
