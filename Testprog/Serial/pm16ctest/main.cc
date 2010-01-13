@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2010-01-12 01:45:21 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2010-01-13 00:40:42 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -262,7 +262,7 @@ main(int argc, char* argv[])
 		     << "  S:       show value of the current speed.\n"
 		     << "  S<val>:  set <val> to the current speed.\n"
 		     << "  w:       show position of the current axis.\n"
-		     << "  w<val>:  set <val> to the current channel.\n"
+		     << "  w<val>:  set <val> to the position of the current channel.\n"
 		     << "  h[fb]:   find home position from front/back.\n"
 		     << "  g:       go back to home.\n"
 		     << "  s:       stop.\n"
