@@ -25,12 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.6 2010-01-14 07:03:58 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.7 2010-01-14 11:13:09 ueshiba Exp $
  */
 #include "TU/PM16C_04.h"
 #include "TU/Manip.h"
 #include <iomanip>
 #include <stdexcept>
+#include <cstring>
 
 namespace TU
 {

@@ -25,10 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.cc,v 1.20 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.21 2010-01-14 11:13:09 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
+#include <cstring>
 #include <errno.h>
 
 namespace TU

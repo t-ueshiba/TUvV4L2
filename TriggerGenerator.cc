@@ -25,11 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.20 2010-01-14 07:03:58 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.21 2010-01-14 11:13:09 ueshiba Exp $
  */
 #include "TU/TriggerGenerator.h"
 #include "TU/Manip.h"
 #include <iomanip>
+#include <cstring>
 
 namespace TU
 {
