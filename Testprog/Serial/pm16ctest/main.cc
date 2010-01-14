@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2010-01-13 00:40:42 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2010-01-14 07:04:20 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -271,6 +271,8 @@ main(int argc, char* argv[])
 		     << "  A<pos>   move to <pos> with backlash removal.\n"
 		     << "  r<inc>   move by <inc>.\n"
 		     << "  R<inc>   move by <inc> with backlash removal.\n"
+		     << "  B:       show backlash correction step.\n"
+		     << "  B<val>:  set <val> to the backlash correction step.\n"
 		     << endl;
 		break;
 	    }
