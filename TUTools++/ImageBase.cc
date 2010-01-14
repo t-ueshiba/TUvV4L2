@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.27 2010-01-08 06:47:35 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.28 2010-01-14 11:13:09 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -62,7 +62,7 @@ ImageBase::restoreHeader(std::istream& in)
     
   // Read the magic number.
     int	c = in.get();
-    if (c == EOF)
+    if (c == istream::traits_type::eof())
 	return DEFAULT;
     if (c != 'P')
 	throw runtime_error("TU::ImageBase::restoreHeader: not a pbm file!!");
