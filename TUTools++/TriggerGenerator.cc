@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.19 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.20 2010-01-14 07:03:58 ueshiba Exp $
  */
 #include "TU/TriggerGenerator.h"
 #include "TU/Manip.h"
@@ -161,7 +161,7 @@ TriggerGenerator::getStatus(u_int& channel, u_int& interval)
     
     *this << 'I' << endl;
 
-    char	c, token[5];
+    char	c, token[5];	// token‚Í"STOP"‚Ü‚½‚Í"RUN"‚Ì‚¢‚¸‚ê‚©
     *this >> c >> std::hex >> channel >> c;
     *this >> c >> std::dec >> interval >> c >> token >> skipl;
     

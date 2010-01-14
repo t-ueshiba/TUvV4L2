@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.5 2010-01-13 02:08:19 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.6 2010-01-14 07:03:58 ueshiba Exp $
  */
 #include "TU/PM16C_04.h"
 #include "TU/Manip.h"
@@ -79,7 +79,6 @@ void
 PM16C_04::showId(std::ostream& out)
 {
     *this << "VER?" << endl;
-    *this >> skipl;
     for (char c; fdstream::get(c); )
     {
 	if (c == '\n')
@@ -146,7 +145,7 @@ PM16C_04::getPosition(u_int channel)
     checkChannel(channel);
     *this << "S4" << std::hex << channel << "PS" << endl;
     int	position;
-    *this >> std::dec >> position;
+    *this >> std::dec >> position >> skipl;
     
     return position;
 }
@@ -204,7 +203,7 @@ PM16C_04::getSpeedValue(u_int channel, Speed speed)
 	  << '?' << std::hex << channel << endl;
     char	c;
     u_int	val;
-    *this >> c >> std::dec >> val;
+    *this >> c >> std::dec >> val >> skipl;
 
     return val;
 }
@@ -268,7 +267,7 @@ PM16C_04::getSoftwareLimitSwitchPositionP(u_int channel)
     checkChannel(channel);
     *this <<"S4" << std::hex << channel << "FL" << endl;
     int	position;
-    *this >> std::dec >> position;
+    *this >> std::dec >> position >> skipl;
 
     return position;
 }
@@ -284,7 +283,7 @@ PM16C_04::getSoftwareLimitSwitchPositionN(u_int channel)
     checkChannel(channel);
     *this <<"S4" << std::hex << channel << "BL" << endl;
     int	position;
-    *this >> std::dec >> position;
+    *this >> std::dec >> position >> skipl;
 
     return position;
 }
@@ -406,7 +405,7 @@ PM16C_04::getBacklashCorrectionStep(u_int channel)
     *this << 'B' << std::hex << channel << '?' << endl;
     char	c;
     u_int	val;
-    *this >> c >> std::dec >> val;
+    *this >> c >> std::dec >> val >> skipl;
 
     return val;
 }
@@ -505,7 +504,7 @@ PM16C_04::getHomeOffset(u_int channel)
     *this << "GF?" << std::hex << channel << endl;
     char	c;
     u_int	offset;
-    *this >> c >> std::dec >> offset;
+    *this >> c >> std::dec >> offset >> skipl;
 
     return offset;
 }
@@ -543,7 +542,7 @@ PM16C_04::getHomePosition(u_int channel)
     checkChannel(channel);
     *this << "HP?" << std::hex << channel << endl;
     int	position;
-    *this >> std::dec >> position;
+    *this >> std::dec >> position >> skipl;
 
     return position;
 }
@@ -646,7 +645,7 @@ PM16C_04::getChannel(u_int& channel_A, u_int& channel_B,
     *this << "S10" << endl;
     char	c;
     u_int	channel;
-    *this >> c >> std::hex >> channel;
+    *this >> c >> std::hex >> channel >> skipl;
     channel_A = (channel >> 12) & 0xf;
     channel_B = (channel >>  8) & 0xf;
     channel_C = (channel >>  4) & 0xf;
@@ -670,7 +669,7 @@ PM16C_04::where(Axis axis)
 	  << 'D'
 	  << endl;
     int	position;
-    *this >> std::dec >> position;
+    *this >> std::dec >> position >> skipl;
 
     return position;
 }
@@ -893,7 +892,7 @@ PM16C_04::readParallelIO()
     *this << "RD" << endl;
     char	c;
     u_int	val;
-    *this >> c >> std::hex >> val;
+    *this >> c >> std::hex >> val >> skipl;
 
     return val;
 }
@@ -906,7 +905,7 @@ PM16C_04::readParallelIO()
 PM16C_04&
 PM16C_04::writeParallelIO(u_int val)
 {
-    *this << 'W'  << setw(4) << std::hex << (val & 0xffff)
+    *this << 'W' << setw(4) << std::hex << (val & 0xffff)
 	  << endl;
 
     return *this;
@@ -922,7 +921,7 @@ PM16C_04::getLimitSwitchConf(u_int channel)
     *this << "S4" << std::hex << channel << 'D' << endl;
     char	c;
     u_int	conf;
-    *this >> c >> std::hex >> conf;
+    *this >> c >> std::hex >> conf >> skipl;
 
     return conf >> 16;
 }
@@ -945,7 +944,7 @@ PM16C_04::getHardwareLimitSwitchStatus(Axis axis)
     *this << "S6" << endl;
     char	c;
     u_int	status;
-    *this >> c >> std::hex >> status;
+    *this >> c >> std::hex >> status >> skipl;
 
     return (status >> (axis == Axis_A ?  8 :
 		       axis == Axis_B ? 12 :
@@ -959,7 +958,7 @@ PM16C_04::getHomeStatus(u_int channel)
     *this << "G?" << std::hex << channel << endl;
     char	c;
     u_int	status;
-    *this >> c >> std::hex >> status;
+    *this >> c >> std::hex >> status >> skipl;
 
     return status;
 }
@@ -973,7 +972,7 @@ PM16C_04::getControllerStatus(Axis axis)
 	  << endl;
     char	c;
     u_int	status;
-    *this >> c >> std::hex >> status;
+    *this >> c >> std::hex >> status >> skipl;
 
     return status;
 }
