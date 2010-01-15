@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.21 2010-01-14 11:13:09 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.22 2010-01-15 01:21:12 ueshiba Exp $
  */
 #include "TU/TriggerGenerator.h"
 #include "TU/Manip.h"
@@ -50,6 +50,9 @@ TriggerGenerator::TriggerGenerator(const char* ttyname)
 	.o_lower2upper()
 #endif
 	.c_baud(9600).c_csize(8).c_noparity().c_stop1();
+
+    fill('0');
+    setf(ios_base::internal, ios_base::adjustfield);
 }
 
 //! ファームウェアのIDを出力ストリームに書き出す．
@@ -83,7 +86,7 @@ TriggerGenerator::selectChannel(u_int channel)
 {
     using namespace	std;
 
-    *this << 'A' << setw(8) << setfill('0') << std::hex << channel << endl;
+    *this << 'A' << setw(8) << std::hex << channel << endl;
     *this >> skipl >> skipl;
     return *this;
 }
@@ -164,7 +167,7 @@ TriggerGenerator::getStatus(u_int& channel, u_int& interval)
 
     char	c, token[5];	// tokenは"STOP"または"RUN"のいずれか
     *this >> c >> std::hex >> channel >> c;
-    *this >> c >> std::dec >> interval >> c >> token >> skipl;
+    *this >> c >> std::dec >> interval >> c >> token >> skipl >> skipl;
     
     return !strcmp(token, "RUN");
 }
