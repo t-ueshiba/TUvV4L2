@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: utility.h,v 1.19 2009-07-31 07:04:46 ueshiba Exp $
+ *  $Id: utility.h,v 1.20 2010-01-19 00:08:00 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
@@ -83,18 +83,18 @@ namespace TU
 ************************************************************************/
 //! 条件を満たす要素が前半に，そうでないものが後半になるように並べ替える．
 /*!
-  \param first	データ列の先頭を示す反復子
-  \param last	データ列の末尾を示す反復子
+  \param begin	データ列の先頭を示す反復子
+  \param end	データ列の末尾を示す反復子
   \param pred	条件を指定する単項演算子
   \return	条件を満たさない要素の先頭を示す反復子
 */
 template <class Iter, class Pred> Iter
-pull_if(Iter first, Iter last, Pred pred)
+pull_if(Iter begin, Iter end, Pred pred)
 {
-    for (Iter iter = first; iter != last; ++iter)
+    for (Iter iter = begin; iter != end; ++iter)
 	if (pred(*iter))
-	    std::iter_swap(first++, iter);
-    return first;
+	    std::iter_swap(begin++, iter);
+    return begin;
 }
 
 //! 2つの引数の差の絶対値を返す．
@@ -102,6 +102,42 @@ template <class T> inline T
 diff(const T& a, const T& b)
 {
     return (a > b ? a - b : b - a);
+}
+
+//! 2次元データに対して3x3ウィンドウを走査して近傍処理を行う．
+/*!
+  \param begin	最初の行を示す反復子
+  \param end	最後の行の次を示す反復子
+  \param op	3x3ウィンドウを定義域とする演算子
+*/
+template <class Iterator, class OP> void
+op3x3(Iterator begin, Iterator end, OP op)
+{
+    typedef typename std::iterator_traits<Iterator>::value_type	Row;
+    typedef typename Row::iterator				RowIter;
+    typedef typename std::iterator_traits<RowIter>::value_type	RowVal;
+    
+    Row	buf = *begin;			// 一つ前の行
+    --end;
+    for (Iterator iter = ++begin; iter != end; )
+    {
+	RowIter	p    = buf.begin();	// 左上画素
+	RowIter	q    = iter->begin();	// 左画素	
+	RowVal	val  = *q;		// 左画素における結果
+	RowIter	rend = (++iter)->end();
+	--rend;
+	--rend;				// 左下画素の右端
+	for (RowIter r = iter->begin(); r != rend; )  // 左下画素についてループ
+	{
+	    RowVal tmp = op(p, q, r++);	// 注目画素における結果
+	    *p++ = *q;			// 次行の左上画素 = 左画素
+	    *q++ = val;			// 左画素における結果を書き込む
+	    val	 = tmp;			// 次ウィンドウの左画素における結果を保存
+	}
+	*p++ = *q;			// 次行の左上画素 = 左画素
+	*q++ = val;			// 左画素における結果を書き込む
+	*p   = *q;			// 次行の上画素 = 注目画素
+    }
 }
 
 /************************************************************************

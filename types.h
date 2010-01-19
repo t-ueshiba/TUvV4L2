@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.19 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: types.h,v 1.20 2010-01-19 00:08:00 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -131,6 +131,7 @@
   - #const T& std::max(const T&, const T&, const T&, const T&)
   - #Iter TU::pull_if(Iter, Iter, Pred)
   - #T TU::diff(const T&, const T&)
+  - #void TU::op3x3(Iterator begin, Iterator end, OP op)
   - #TU::mbr_iterator
   - #std::istream& TU::skipl(std::istream&)
   - #TU::IOManip
