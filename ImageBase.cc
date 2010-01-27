@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.28 2010-01-14 11:13:09 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.29 2010-01-27 06:05:08 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -37,6 +37,50 @@ namespace TU
 *  static functions							*
 ************************************************************************/
 inline static u_int	bit2byte(u_int i)	{return ((i - 1)/8 + 1);}
+
+inline static bool
+isBigEndian()
+{
+    u_short	val = 0x0001;
+    return ((*(u_char*)&val) != 0x01);
+}
+
+template <class T> static T	get(std::istream& in)			;
+
+template <> inline short
+get<short>(std::istream& in)
+{
+    u_int	c0 = in.get(), c1 = in.get();
+    return c0 + (c1 << 8);
+}
+    
+template <> inline int
+get<int>(std::istream& in)
+{
+    u_int	c0 = in.get(), c1 = in.get(), c2 = in.get(), c3 = in.get();
+    return c0 + (c1 << 8) + (c2 << 16) + (c3 << 24);
+}
+
+template <class T> static void	put(std::ostream& out, int val)		;
+
+template <> inline void
+put<short>(std::ostream& out, int val)
+{
+    char	c0 = u_int(val) & 0xff, c1 = (u_int(val) >> 8) & 0xff;
+    out.put(c0);
+    out.put(c1);
+}
+    
+template <> inline void
+put<int>(std::ostream& out, int val)
+{
+    char	c0 = u_int(val)		& 0xff, c1 = (u_int(val) >>  8) & 0xff,
+		c2 = (u_int(val) >> 16) & 0xff, c3 = (u_int(val) >> 24) & 0xff;
+    out.put(c0);
+    out.put(c1);
+    out.put(c2);
+    out.put(c3);
+}
 
 /************************************************************************
 *  class ImageBase							*
@@ -50,7 +94,7 @@ ImageBase::~ImageBase()
   \param in	入力ストリーム
   \return	読み込まれた画像の画素のタイプ
 */
-ImageBase::Type
+ImageBase::TypeInfo
 ImageBase::restoreHeader(std::istream& in)
 {
     using namespace	std;
@@ -60,28 +104,107 @@ ImageBase::restoreHeader(std::istream& in)
     P[0][0] = P[1][1] = P[2][2] = 1.0;
     d1 = d2 = 0.0;
     
-  // Read the magic number.
-    int	c = in.get();
-    if (c == istream::traits_type::eof())
-	return DEFAULT;
-    if (c != 'P')
-	throw runtime_error("TU::ImageBase::restoreHeader: not a pbm file!!");
+  // Read the first magic character.
+    char	c;
+    if (!in.get(c))
+	return TypeInfo(DEFAULT);
 
+  // Read image header.
+    switch (c)
+    {
+      case 'P':
+	break;
+      case 'B':
+	return restoreBMPHeader(in);
+      default:
+	throw runtime_error("TU::ImageBase::restoreHeader: neighter PBM nor BMP file!!");
+	break;
+    }
+    return restorePBMHeader(in);
+}
+
+//! 指定した画素タイプで出力ストリームに画像のヘッダを書き出す．
+/*!
+  \param out	出力ストリーム
+  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
+		この画像オブジェクトの画素タイプで書き出される．
+  \return	実際に書き出す場合の画素タイプ．
+*/
+ImageBase::Type
+ImageBase::saveHeader(std::ostream& out, Type type) const
+{
+    using namespace	std;
+
+    if (type == DEFAULT)
+	type = _defaultType();
+
+    switch (type)
+    {
+      case BMP_8:
+      case BMP_24:
+      case BMP_32:
+	return saveBMPHeader(out, type);
+    }
+    return savePBMHeader(out, type);
+}
+
+//! 指定されたタイプの画素のビット数を返す．
+/*!
+  \param type	画素のタイプ
+  \return	画素のビット数
+*/
+u_int
+ImageBase::type2depth(Type type)
+{
+    switch (type)
+    {
+      case SHORT:
+	return 8*sizeof(short);
+      case INT:
+	return 8*sizeof(int);
+      case FLOAT:
+	return 8*sizeof(float);
+      case DOUBLE:
+	return 8*sizeof(double);
+      case RGB_24:
+      case YUV_444:
+      case BMP_24:
+	return 24;
+      case YUV_422:
+	return 16;
+      case YUV_411:
+	return 12;
+      case BMP_32:
+	return 32;
+    }
+
+    return 8;
+}
+ 
+/*
+ *  private members
+ */
+ImageBase::TypeInfo
+ImageBase::restorePBMHeader(std::istream& in)
+{
+    using namespace	std;
+    
   // Read pbm type.
-    in >> c >> ws;	// Read pbm type and trailing white spaces.
-    Type	type;
+    int		c;
+    TypeInfo	typeInfo;
+    in >> c >> ws;		// Read pbm type and skip trailing white spaces.
     switch (c)
     {
       case U_CHAR:
-	type = U_CHAR;
+	typeInfo.type = U_CHAR;
 	break;
       case RGB_24:
-	type = RGB_24;
+	typeInfo.type = RGB_24;
 	break;
       default:
-	throw runtime_error("TU::ImageBase::restoreHeader: unknown pbm type!!");
+	throw runtime_error("TU::ImageBase::restorePBMHeader: unknown pbm type!!");
     }
-
+    
   // Process comment lines.
     bool	legacy = false;	// legacy style of dist. param. representation
     for (; (c = in.get()) == '#'; in >> skipl)
@@ -92,36 +215,39 @@ ImageBase::restoreHeader(std::istream& in)
 	{
 	    in >> val;
 	    if (!strcmp(val, "Short"))
-		type = SHORT;
+		typeInfo.type = SHORT;
 	    else if (!strcmp(val, "Int"))
-		type = INT;
+		typeInfo.type = INT;
 	    else if (!strcmp(val, "Float"))
-		type = FLOAT;
+		typeInfo.type = FLOAT;
 	    else if (!strcmp(val, "Double"))
-		type = DOUBLE;
+		typeInfo.type = DOUBLE;
 	    else if (!strcmp(val, "YUV444"))
-		type = YUV_444;
+		typeInfo.type = YUV_444;
 	    else if (!strcmp(val, "YUV422"))
-		type = YUV_422;
+		typeInfo.type = YUV_422;
 	    else if (!strcmp(val, "YUV411"))
-		type = YUV_411;
+		typeInfo.type = YUV_411;
 	}
 	else if (!strcmp(key, "Endian:"))	// big- or little-endian
 	{
 	    in >> val;
-	    switch (type)
+	    switch (typeInfo.type)
 	    {
 	      case SHORT:
 	      case INT:
 	      case FLOAT:
 	      case DOUBLE:
-#ifdef TU_BIG_ENDIAN
-		if (!strcmp(val, "Little"))
-		    throw runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
-#else
-		if (!strcmp(val, "Big"))
-		    throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
-#endif
+		if (isBigEndian())
+		{
+		    if (!strcmp(val, "Little"))
+			throw runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
+		}
+		else
+		{
+		    if (!strcmp(val, "Big"))
+			throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
+		}
 		break;
 	    }
 	}
@@ -181,28 +307,103 @@ ImageBase::restoreHeader(std::istream& in)
     }
 
     u_int	w, h;
-    in >> w;
-    in >> h;
-    _resize(h, w, type);			// set width & height
+    in >> w >> h;
+    _resize(h, w, typeInfo.type);		// set width & height
     in >> w >> skipl;				// skip MaxValue
 
-    return type;
+    return typeInfo;
 }
 
-//! 指定した画素タイプで出力ストリームに画像のヘッダを書き出す．
-/*!
-  \param out	出力ストリーム
-  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
-		この画像オブジェクトの画素タイプで書き出される．
-  \return	実際に書き出す場合の画素タイプ．
-*/
-ImageBase::Type
-ImageBase::saveHeader(std::ostream& out, Type type) const
+ImageBase::TypeInfo
+ImageBase::restoreBMPHeader(std::istream& in)
 {
     using namespace	std;
+    
+  // Read pbm type.
+    int	c = in.get();				// Read second magic character.
+    if (c != 'M')
+	throw runtime_error("TU::ImageBase::restoreBMPHeader: not a BMP file!!");
 
-    if (type == DEFAULT)
-	type = _defaultType();
+  // Read file header.
+    get<int>(in);				// Skip bfSize.
+    get<short>(in);				// Skip bfReserved1.
+    get<short>(in);				// Skip bfReserved2.
+    get<int>(in);				// Skip bfOffBits.
+
+  // Read information header.
+    TypeInfo	typeInfo(DEFAULT, true);
+    int		w = 0, h = 0, d = 0;
+    switch (c = get<int>(in))			// Read bcSize or biSize.
+    {
+      case 12:	// BMPCoreHeader:
+	w = get<short>(in);			// Read bcWidth.
+	h = get<short>(in);			// Read bcHeight.
+	if (h < 0)
+	{
+	    h = -h;
+	    typeInfo.bottomToTop = false;
+	}
+	get<short>(in);				// Skip bcPlanes.
+	switch (d = get<short>(in))		// Read bcBitCount.
+	{
+	  case 1:
+	  case 4:
+	  case 8:
+	    typeInfo.ncolors = (1 << d);
+	    break;
+	}
+	break;
+
+      case 40:	// BMPInfoHeader:
+	w = get<int>(in);			// Read biWidth.
+	h = get<int>(in);			// Read biHeight.
+	if (h < 0)
+	{
+	    h = -h;
+	    typeInfo.bottomToTop = false;
+	}
+	get<short>(in);				// Skip biPlanes.
+	d = get<short>(in);			// Read biBitCount.
+	if (get<int>(in) != 0)			// Read biCompression.
+	    throw runtime_error("TUImabeBase::restoreBMPHeader: compressed BMP file not supported!!");
+	get<int>(in);				// Skip biSizeImage.
+	get<int>(in);				// Skip biXPixPerMeter.
+	get<int>(in);				// Skip biYPixPerMeter.
+	typeInfo.ncolors = get<int>(in);	// Read biClrUsed.
+	get<int>(in);				// Read biClrImportant.
+	break;
+
+      default:	// Illegal information header size:
+	throw runtime_error("TU::ImageBase::restoreBMPHeader: information header corrupted!!");
+	break;
+    }
+
+  // Set type of the image.
+    switch (d)
+    {
+      case 8:
+	typeInfo.type = BMP_8;
+	break;
+      case 24:
+	typeInfo.type = BMP_24;
+	break;
+      case 32:
+	typeInfo.type = BMP_32;
+	break;
+      default:
+	throw runtime_error("TU::ImageBase::restoreBMPHeader: unsuppored detph!!");
+	break;
+    }
+
+    _resize(h, w, typeInfo.type);	// Allocate image area of w*h size.
+    
+    return typeInfo;
+}
+
+ImageBase::Type
+ImageBase::savePBMHeader(std::ostream& out, Type type) const
+{
+    using namespace	std;
     
     out << 'P';
     switch (type)
@@ -261,11 +462,10 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
 	out << "Unsigned" << endl;
 	break;
     }
-#ifdef TU_BIG_ENDIAN
-    out << "# Endian: Big" << endl;
-#else
-    out << "# Endian: Little" << endl;
-#endif
+    if (isBigEndian())
+	out << "# Endian: Big" << endl;
+    else
+	out << "# Endian: Little" << endl;
     out << "# PinHoleParameterH11: " << P[0][0] << endl
 	<< "# PinHoleParameterH12: " << P[0][1] << endl
 	<< "# PinHoleParameterH13: " << P[0][2] << endl
@@ -287,34 +487,63 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     return type;
 }
 
-//! 指定されたタイプの画素のビット数を返す．
-/*!
-  \param type	画素のタイプ
-  \return	画素のビット数
-*/
-u_int
-ImageBase::type2depth(Type type)
+ImageBase::Type
+ImageBase::saveBMPHeader(std::ostream& out, Type type) const
 {
+    using namespace	std;
+    
+  // Write BMP magic characters.
+    out << "BM";
+
+  // Compute the number of bytes per line.
+    u_int	nbytesPerLine = 0;
     switch (type)
     {
-      case SHORT:
-	return 8*sizeof(short);
-      case INT:
-	return 8*sizeof(int);
-      case FLOAT:
-	return 8*sizeof(float);
-      case DOUBLE:
-	return 8*sizeof(double);
-      case RGB_24:
-      case YUV_444:
-	return 24;
-      case YUV_422:
-	return 16;
-      case YUV_411:
-	return 12;
+      /*case BMP_8:
+	nbytesPerLine = 4 * ((_width() + 3) / 4);
+	break;*/
+      case BMP_24:
+	nbytesPerLine = 4 * ((3*_width() + 3) / 4);
+	break;
+      case BMP_32:
+	nbytesPerLine = 4 * _width();
+	break;
+      default:
+	throw runtime_error("TU::ImageBase::saveBMPHeader: unsuppored type!!");
+	break;
     }
 
-    return 8;
+  // Write file header.
+    put<int>(out, 14 + 40 + nbytesPerLine * _height());	// Write bfSize.
+    put<short>(out, 0);					// Write bfReserved1.
+    put<short>(out, 0);					// Write bfReserved2.
+    put<int>(out, 14 + 40);				// Write bfOffBits.
+
+  // Write information header.
+    put<int>(out, 40);					// Write biSize.
+    put<int>(out, _width());				// Write biWidth.
+    put<int>(out, _height());				// Write biHeight.
+    put<short>(out, 1);					// Write biPlanes.
+    switch (type)
+    {
+      case BMP_8:
+	put<short>(out, 8);				// Write biBitCount.
+	break;
+      case BMP_24:
+	put<short>(out, 24);				// Write biBitCount.
+	break;
+      default:
+	put<short>(out, 32);				// Write biBitCount.
+	break;
+    }
+    put<int>(out, 0);				// Write biCompression.
+    put<int>(out, nbytesPerLine * _height());	// Write biSizeImage.
+    put<int>(out, 0);				// Write biXPixPerMeter.
+    put<int>(out, 0);				// Write biYPixPerMeter.
+    put<int>(out, 0);				// Write biClrUsed.
+    put<int>(out, 0);				// Write biClrImportant.
+    
+    return type;
 }
- 
+
 }
