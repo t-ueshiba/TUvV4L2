@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.20 2010-01-19 00:08:00 ueshiba Exp $
+ *  $Id: types.h,v 1.21 2010-01-27 06:05:08 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -83,6 +83,7 @@
   - #TU::BGR
   - #TU::RGBA
   - #TU::ABGR
+  - #TU::BGRA
   - #TU::YUV444
   - #TU::YUV422
   - #TU::YUV411

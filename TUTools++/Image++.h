@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.49 2009-10-05 23:28:21 ueshiba Exp $
+ *  $Id: Image++.h,v 1.50 2010-01-27 06:05:07 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -36,11 +36,12 @@
 namespace TU
 {
 /************************************************************************
-*  struct RGB, BGR, RGBA & ABGR						*
+*  struct RGB, BGR, RGBA, ABGR & BGRA					*
 ************************************************************************/
 struct BGR;
 struct RGBA;
 struct ABGR;
+struct BGRA;
 struct YUV444;
 
 //! Red, Green, Blue（各8bit）の順で並んだカラー画素
@@ -51,6 +52,7 @@ struct RGB
     RGB(const BGR& p)							;
     RGB(const RGBA& p)							;
     RGB(const ABGR& p)							;
+    RGB(const BGRA& p)							;
     RGB(const YUV444& p)						;
     template <class T>
     RGB(const T& p)	:r(u_char(p)), g(u_char(p)), b(u_char(p))	{}
@@ -94,6 +96,7 @@ struct BGR
     BGR(const RGB& p)				:b(p.b), g(p.g), r(p.r)	{}
     BGR(const RGBA& p)							;
     BGR(const ABGR& p)							;
+    BGR(const BGRA& p)							;
     BGR(const YUV444& p)						;
     template <class T>
     BGR(const T& c)	:b(u_char(c)), g(u_char(c)), r(u_char(c))	{}
@@ -171,6 +174,20 @@ struct ABGR : public Alpha, public BGR
     bool	operator !=(const ABGR& p) const	{return !(*this != p);}
 };
 
+//! Blue, Green, Red, Alpha（各8bit）の順で並んだカラー画素
+struct BGRA : public BGR, public Alpha
+{
+    BGRA()		:BGR(), Alpha()  		{}
+    BGRA(u_char r, u_char g, u_char b, u_char a=255)
+			:BGR(r, g, b), Alpha(a)   	{}
+    template <class T>
+    BGRA(const T& p)	:BGR(p), Alpha()		{}
+
+    bool	operator ==(const BGRA& p) const
+		{return (Alpha::operator ==(p) && BGR::operator ==(p));}
+    bool	operator !=(const BGRA& p) const	{return !(*this != p);}
+};
+
 inline
 RGB::RGB(const RGBA& p)	:r(p.r), g(p.g), b(p.b)	{}
 
@@ -178,10 +195,16 @@ inline
 RGB::RGB(const ABGR& p)	:r(p.r), g(p.g), b(p.b)	{}
 
 inline
+RGB::RGB(const BGRA& p)	:r(p.r), g(p.g), b(p.b)	{}
+
+inline
 BGR::BGR(const RGBA& p)	:r(p.r), g(p.g), b(p.b)	{}
 
 inline
 BGR::BGR(const ABGR& p)	:r(p.r), g(p.g), b(p.b)	{}
+
+inline
+BGR::BGR(const BGRA& p)	:r(p.r), g(p.g), b(p.b)	{}
 
 /************************************************************************
 *  struct YUV444, YUV422, YUV411					*
@@ -378,15 +401,31 @@ class __PORT ImageBase
     enum Type
     {
 	DEFAULT = 0,	//!< same as internal type
-	U_CHAR	= 5,	//!< unsigned mono  8bit/pixel
-	RGB_24	= 6,	//!< RGB	   24bit/pixel	
-	SHORT,		//!< signed mono   16bit/pixel
-	INT,		//!< signed mono   32bit/pixel	
-	FLOAT,		//!< float mono	   32bit/pixel 
-	DOUBLE,		//!< double mono   64bit/pixel
-	YUV_444,	//!< YUV444	   24bit/pixel
-	YUV_422,	//!< YUV422	   16bit/pixel
-	YUV_411		//!< YUV411	   12bit/pixel
+	U_CHAR	= 5,	//!< unsigned mono	 8bit/pixel
+	RGB_24	= 6,	//!< RGB		24bit/pixel	
+	SHORT,		//!< signed mono	16bit/pixel
+	INT,		//!< signed mono	32bit/pixel	
+	FLOAT,		//!< float mono		32bit/pixel 
+	DOUBLE,		//!< double mono	64bit/pixel
+	YUV_444,	//!< YUV444		24bit/pixel
+	YUV_422,	//!< YUV422		16bit/pixel
+	YUV_411,	//!< YUV411		12bit/pixel
+	BMP_8,		//!< BMP indexed color   8bit/pixel
+	BMP_24,		//!< BMP BGR		24bit/pixel
+	BMP_32		//!< BMP BGRA		32bit/pixel
+    };
+
+  //! 外部記憶に読み書きする際の付加情報
+    struct TypeInfo
+    {
+	TypeInfo(Type ty=DEFAULT, bool botToTop=false)
+	    :type(ty), bottomToTop(botToTop), ncolors(0)	{}
+
+		operator Type()				const	{return type;}
+	
+	Type	type;		//!< 画素の型 #Type 
+	bool	bottomToTop;	//!< 行が下から上へ収められているならtrue
+	u_int	ncolors;	//!< カラーパレットの色数
     };
     
   protected:
@@ -403,7 +442,7 @@ class __PORT ImageBase
     static u_int	type2depth(Type type)			;
     
   public:
-    Type		restoreHeader(std::istream& in)		;
+    TypeInfo		restoreHeader(std::istream& in)		;
     Type		saveHeader(std::ostream& out,
 				   Type type=DEFAULT)	const	;
 
@@ -428,6 +467,12 @@ class __PORT ImageBase
 								 DEFAULT);}
 	
   private:
+    TypeInfo		restorePBMHeader(std::istream& in)	;
+    TypeInfo		restoreBMPHeader(std::istream& in)	;
+    Type		savePBMHeader(std::ostream& out,
+				      Type type)	const	;
+    Type		saveBMPHeader(std::ostream& out,
+				      Type type)	const	;
     virtual u_int	_width()			const	= 0;
     virtual u_int	_height()			const	= 0;
     virtual Type	_defaultType()			const	= 0;
@@ -842,7 +887,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     std::ostream&	save(std::ostream& out,
 			     Type type=DEFAULT)			const	;
     std::istream&	restoreData(std::istream& in,
-				    Type type=DEFAULT)			;
+				    const TypeInfo& typeInfo)		;
     std::ostream&	saveData(std::ostream& out,
 				 Type type=DEFAULT)		const	;
     void		resize(u_int h, u_int w)			;
@@ -850,9 +895,13 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
 
   private:
     template <class S>
-    std::istream&	restoreRows(std::istream& in)			;
+    std::istream&	restoreRows(std::istream& in,
+				    bool bottomToTop=false,
+				    u_int align=0)			;
     template <class D>
-    std::ostream&	saveRows(std::ostream& out)		const	;
+    std::ostream&	saveRows(std::ostream& out,
+				 bool bottomToTop=false,
+				 u_int align=0)			const	;
     Type		defaultType()				const	;
     
     virtual u_int	_width()				const	;
@@ -935,8 +984,9 @@ Image<T, B>::save(std::ostream& out, Type type) const
   \return	inで指定した入力ストリーム
 */
 template <class T, class B> std::istream&
-Image<T, B>::restoreData(std::istream& in, Type type)
+Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 {
+    Type	type = typeInfo.type;
     if (type == DEFAULT)
 	type = defaultType();
     
@@ -960,6 +1010,10 @@ Image<T, B>::restoreData(std::istream& in, Type type)
 	return restoreRows<YUV422>(in);
       case YUV_411:
 	return restoreRows<YUV411>(in);
+      case BMP_24:
+	return restoreRows<BGR>(in, typeInfo.bottomToTop, 4);
+      case BMP_32:
+	return restoreRows<BGRA>(in, typeInfo.bottomToTop, 4);
       default:
 	throw std::runtime_error("Image<T, B>::restoreData(): unknown pixel type!!");
 	break;
@@ -1000,6 +1054,10 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
 	return saveRows<YUV422>(out);
       case YUV_411:
 	return saveRows<YUV411>(out);
+      case BMP_24:
+	return saveRows<BGR>(out, true, 4);
+      case BMP_32:
+	return saveRows<BGRA>(out, true, 4);
       default:
 	throw std::runtime_error("Image<T, B>::saveData(): unknown pixel type!!");
     }
@@ -1030,27 +1088,65 @@ Image<T, B>::resize(T* p, u_int h, u_int w)
 }
  
 template <class T, class B> template <class S> std::istream&
-Image<T, B>::restoreRows(std::istream& in)
+Image<T, B>::restoreRows(std::istream& in, bool bottomToTop, u_int align)
 {
+    u_int	npads = 0;
+    if (align > 0)
+	npads = align * ((sizeof(S)*width() + align - 1) / align)
+	      - sizeof(S)*width();
+	
     ImageLine<S>	buf(width());
-    for (u_int v = 0; v < height(); )
+    if (bottomToTop)
     {
-	if (!buf.restore(in))
-	    break;
-	(*this)[v++].fill((S*)buf);
+	for (u_int v = height(); v > 0; )
+	{
+	    if (!buf.restore(in))
+		break;
+	    in.ignore(npads);
+	    (*this)[--v].fill((S*)buf);
+	}
+    }
+    else
+    {
+	for (u_int v = 0; v < height(); )
+	{
+	    if (!buf.restore(in))
+		break;
+	    in.ignore(npads);
+	    (*this)[v++].fill((S*)buf);
+	}
     }
     return in;
 }
 
 template <class T, class B> template <class D> std::ostream&
-Image<T, B>::saveRows(std::ostream& out) const
+Image<T, B>::saveRows(std::ostream& out, bool bottomToTop, u_int align) const
 {
+    ImageLine<u_char>	pad(0);
+    if (align > 0)
+	pad.resize(align * ((sizeof(D)*width() + align - 1) / align) -
+		   sizeof(D)*width());
+    
     ImageLine<D>	buf(width());
-    for (u_int v = 0; v < height(); )
+    if (bottomToTop)
     {
-	buf.fill((const T*)(*this)[v++]);
-	if (!buf.save(out))
-	    break;
+	for (u_int v = height(); v > 0; )
+	{
+	    buf.fill((const T*)(*this)[--v]);
+	    buf.save(out);
+	    if (!pad.save(out))
+		break;
+	}
+    }
+    else
+    {
+	for (u_int v = 0; v < height(); )
+	{
+	    buf.fill((const T*)(*this)[v++]);
+	    buf.save(out);
+	    if (!pad.save(out))
+		break;
+	}
     }
     return out;
 }
