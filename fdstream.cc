@@ -25,13 +25,14 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: fdstream.cc,v 1.1 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: fdstream.cc,v 1.2 2010-01-27 08:08:43 ueshiba Exp $
  */
 #include "TU/fdstream.h"
 #include <stdexcept>
 #include <cstring>	// for memmove()
 #ifdef WIN32
 #  include <io.h>	// for read() and write()
+#  include <fcntl.h>
 #else
 #  include <unistd.h>	// for read() and write()
 #  include <fcntl.h>
