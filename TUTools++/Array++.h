@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.28 2009-07-31 07:04:43 ueshiba Exp $
+ *  $Id: Array++.h,v 1.29 2010-01-28 08:16:14 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -559,8 +559,8 @@ FixedSizedBuf<T, D>::get(std::istream& in)
 template <class T, size_t D> std::ostream&
 FixedSizedBuf<T, D>::put(std::ostream& out) const
 {
-    for (u_int i = 0; i < D; )
-	out << ' ' << _p[i++];
+    for (u_int i = 0; i < D; ++i)
+	out << ' ' << _p[i];
     return out;
 }
 

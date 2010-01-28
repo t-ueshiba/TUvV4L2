@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.29 2010-01-27 06:05:08 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.30 2010-01-28 08:16:14 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -36,7 +36,7 @@ namespace TU
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-inline static u_int	bit2byte(u_int i)	{return ((i - 1)/8 + 1);}
+inline static u_int	bit2byte(u_int i)	{return (i + 7)/8;}
 
 inline static bool
 isBigEndian()
@@ -308,7 +308,7 @@ ImageBase::restorePBMHeader(std::istream& in)
 
     u_int	w, h;
     in >> w >> h;
-    _resize(h, w, typeInfo.type);		// set width & height
+    _resize(h, w, typeInfo);			// set width & height
     in >> w >> skipl;				// skip MaxValue
 
     return typeInfo;
@@ -391,11 +391,11 @@ ImageBase::restoreBMPHeader(std::istream& in)
 	typeInfo.type = BMP_32;
 	break;
       default:
-	throw runtime_error("TU::ImageBase::restoreBMPHeader: unsuppored detph!!");
+	throw runtime_error("TU::ImageBase::restoreBMPHeader: unsupported depth!!");
 	break;
     }
 
-    _resize(h, w, typeInfo.type);	// Allocate image area of w*h size.
+    _resize(h, w, typeInfo);		// Allocate image area of w*h size.
     
     return typeInfo;
 }
@@ -499,9 +499,9 @@ ImageBase::saveBMPHeader(std::ostream& out, Type type) const
     u_int	nbytesPerLine = 0;
     switch (type)
     {
-      /*case BMP_8:
+      case BMP_8:
 	nbytesPerLine = 4 * ((_width() + 3) / 4);
-	break;*/
+	break;
       case BMP_24:
 	nbytesPerLine = 4 * ((3*_width() + 3) / 4);
 	break;
@@ -520,27 +520,30 @@ ImageBase::saveBMPHeader(std::ostream& out, Type type) const
     put<int>(out, 14 + 40);				// Write bfOffBits.
 
   // Write information header.
-    put<int>(out, 40);					// Write biSize.
-    put<int>(out, _width());				// Write biWidth.
-    put<int>(out, _height());				// Write biHeight.
-    put<short>(out, 1);					// Write biPlanes.
+    put<int>(out, 40);				// Write biSize.
+    put<int>(out, _width());			// Write biWidth.
+    put<int>(out, _height());			// Write biHeight.
+    put<short>(out, 1);				// Write biPlanes.
     switch (type)
     {
       case BMP_8:
-	put<short>(out, 8);				// Write biBitCount.
+	put<short>(out, 8);			// Write biBitCount.
 	break;
       case BMP_24:
-	put<short>(out, 24);				// Write biBitCount.
+	put<short>(out, 24);			// Write biBitCount.
 	break;
       default:
-	put<short>(out, 32);				// Write biBitCount.
+	put<short>(out, 32);			// Write biBitCount.
 	break;
     }
     put<int>(out, 0);				// Write biCompression.
     put<int>(out, nbytesPerLine * _height());	// Write biSizeImage.
     put<int>(out, 0);				// Write biXPixPerMeter.
     put<int>(out, 0);				// Write biYPixPerMeter.
-    put<int>(out, 0);				// Write biClrUsed.
+    if (type == BMP_8)
+	put<int>(out, 256);			// Write biClrUsed.
+    else
+	put<int>(out, 0);			// Write biClrUsed.
     put<int>(out, 0);				// Write biClrImportant.
     
     return type;
