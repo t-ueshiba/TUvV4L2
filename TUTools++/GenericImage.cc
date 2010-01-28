@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GenericImage.cc,v 1.8 2010-01-28 08:16:14 ueshiba Exp $
+ *  $Id: GenericImage.cc,v 1.9 2010-01-28 23:48:29 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
@@ -42,22 +42,10 @@ namespace TU
 __PORT std::istream&
 GenericImage::restoreData(std::istream& in)
 {
-    u_int	npads = 0;
-    switch (_typeInfo.type)
-    {
-      case BMP_8:
-	npads = 4 * ((width() + 3) / 4) - width();
-	_colormap.resize(_typeInfo.ncolors);
-	_colormap.restore(in);
-	break;
-      case BMP_24:
-	npads = 4 * ((3*width() + 3) / 4) - 3*width();
-      // fall back to the next case.
-      default:
-	_colormap.resize(0);
-	break;
-    }
+    _colormap.resize(_typeInfo.ncolors);
+    _colormap.restore(in);
 
+    u_int	npads = type2nbytes(_typeInfo.type, true);
     if (_typeInfo.bottomToTop)
     {
 	for (u_int v = height(); v > 0; )
@@ -82,19 +70,11 @@ GenericImage::restoreData(std::istream& in)
 __PORT std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {
-    Array<u_char>	pad(0);
-    switch (_typeInfo.type)
-    {
-      case BMP_8:
-	pad.resize(4 * ((width() + 3) / 4) - width());
-	_colormap.save(out);
-	for (u_int i = _colormap.dim(); i < 256; ++i)
-	    out.put(0).put(0).put(0).put(0);
-	break;
-      case BMP_24:
-	pad.resize(4 * ((3*width() + 3) / 4) - 3*width());
-	break;
-    }
+    _colormap.save(out);
+    for (u_int i = _colormap.dim(); i < 256; ++i)
+	out.put(0).put(0).put(0).put(0);
+    
+    Array<u_char>	pad(type2nbytes(_typeInfo.type, true));
     pad = 0;
 
     if (_typeInfo.bottomToTop)
