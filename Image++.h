@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.51 2010-01-28 08:16:14 ueshiba Exp $
+ *  $Id: Image++.h,v 1.52 2010-01-28 23:48:29 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -435,8 +435,7 @@ class __PORT ImageBase
   //! 外部記憶に読み書きする際の付加情報
     struct TypeInfo
     {
-	TypeInfo(Type ty=DEFAULT, bool botToTop=false)
-	    :type(ty), bottomToTop(botToTop), ncolors(0)	{}
+	TypeInfo(Type ty=DEFAULT)	;
 
 	Type	type;		//!< 画素の型 #Type 
 	bool	bottomToTop;	//!< 行が下から上へ収められているならtrue
@@ -454,12 +453,13 @@ class __PORT ImageBase
 	:P(), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
     virtual ~ImageBase()		;
 
-    static u_int	type2depth(Type type)			;
+    u_int		type2nbytes(Type type, bool padding)	const	;
+    static u_int	type2depth(Type type)				;
     
   public:
-    TypeInfo		restoreHeader(std::istream& in)		;
+    TypeInfo		restoreHeader(std::istream& in)			;
     Type		saveHeader(std::ostream& out,
-				   Type type=DEFAULT)	const	;
+				   Type type=DEFAULT)		const	;
 
   //! 画像の幅を返す．
   /*!
@@ -546,7 +546,8 @@ class ImageLine : public Array<T>
     template <class S>
     const S*		fill(const S* src)		;
     template <class S, class L>
-    const S*		fill(const S* src, const L* tbl);
+    const S*		lookup(const S* src,
+			       const L* tbl)		;
 
   //! 左端の有効画素の位置を返す．
   /*!
@@ -657,7 +658,7 @@ ImageLine<T>::fill(const S* src)
   \return	最後に読み込まれた画素の次の画素へのポインタ
 */
 template <class T> template <class S, class L> const S*
-ImageLine<T>::fill(const S* src, const L* tbl)
+ImageLine<T>::lookup(const S* src, const L* tbl)
 {
     T* dst = *this;
     for (u_int n = dim() + 1; --n; )
@@ -727,7 +728,8 @@ class ImageLine<YUV422> : public Array<YUV422>
     template <class S>
     const S*		fill(const S* src)		;
     template <class S, class L>
-    const S*		fill(const S* src, const L* tbl);
+    const S*		lookup(const S* src,
+			       const L* tbl)		;
     int			lmost()			const	{return _lmost;}
     int			rmost()			const	{return _rmost;}
     void		setLimits(int l, int r)		{_lmost = l;
@@ -760,7 +762,7 @@ ImageLine<YUV422>::fill(const S* src)
 }
 
 template <class S, class L> const S*
-ImageLine<YUV422>::fill(const S* src, const L* tbl)
+ImageLine<YUV422>::lookup(const S* src, const L* tbl)
 {
     YUV422* dst = *this;
     for (u_int n = dim() + 1; --n; )
@@ -803,7 +805,8 @@ class ImageLine<YUV411> : public Array<YUV411>
     template <class S>
     const S*		fill(const S* src)		;
     template <class S, class L>
-    const S*		fill(const S* src, const L* tbl);
+    const S*		lookup(const S* src,
+			       const L* tbl)		;
     int			lmost()			const	{return _lmost;}
     int			rmost()			const	{return _rmost;}
     void		setLimits(int l, int r)		{_lmost = l;
@@ -836,7 +839,7 @@ ImageLine<YUV411>::fill(const S* src)
 }
 
 template <class S, class L> const S*
-ImageLine<YUV411>::fill(const S* src, const L* tbl)
+ImageLine<YUV411>::lookup(const S* src, const L* tbl)
 {
     YUV411* dst = *this;
     for (u_int n = dim() + 1; --n; )
@@ -860,7 +863,7 @@ ImageLine<YUV411>::resize(YUV411* p, u_int d)
     Array<YUV411>::resize(p, d);
 }
 
-/************************************************************************
+/********st****************************************************************
 *  class Image<T>:	Generic image class				*
 ************************************************************************/
 //! T型の画素を持つ画像を表すクラス
@@ -952,9 +955,10 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     template <class S>
     std::istream&	restoreRows(std::istream& in,
 				    const TypeInfo& typeInfo)		;
+    template <class S, class L>
     std::istream&	restoreAndLookupRows(std::istream& in,
 					     const TypeInfo& typeInfo)	;
-    template <class D>
+    template <class D, class L>
     std::ostream&	saveRows(std::ostream& out, Type type)	const	;
     Type		defaultType()				const	;
     
@@ -1061,7 +1065,7 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
       case YUV_411:
 	return restoreRows<YUV411>(in, typeInfo);
       case BMP_8:
-	return restoreAndLookupRows(in, typeInfo);
+	return restoreAndLookupRows<u_char, BGRA>(in, typeInfo);
       case BMP_24:
 	return restoreRows<BGR>(in, typeInfo);
       case BMP_32:
@@ -1089,29 +1093,29 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
     switch (type)
     {
       case U_CHAR:
-	return saveRows<u_char>(out, type);
+	return saveRows<u_char, RGB>(out, type);
       case SHORT:
-	return saveRows<short>(out, type);
+	return saveRows<short, RGB>(out, type);
       case INT:
-	return saveRows<int>(out, type);
+	return saveRows<int, RGB>(out, type);
       case FLOAT:
-	return saveRows<float>(out, type);
+	return saveRows<float, RGB>(out, type);
       case DOUBLE:
-	return saveRows<double>(out, type);
+	return saveRows<double, RGB>(out, type);
       case RGB_24:
-	return saveRows<RGB>(out, type);
+	return saveRows<RGB, RGB>(out, type);
       case YUV_444:
-	return saveRows<YUV444>(out, type);
+	return saveRows<YUV444, RGB>(out, type);
       case YUV_422:
-	return saveRows<YUV422>(out, type);
+	return saveRows<YUV422, RGB>(out, type);
       case YUV_411:
-	return saveRows<YUV411>(out, type);
+	return saveRows<YUV411, RGB>(out, type);
       case BMP_8:
-	return saveRows<u_char>(out, type);
+	return saveRows<u_char, BGRA>(out, type);
       case BMP_24:
-	return saveRows<BGR>(out, type);
+	return saveRows<BGR, BGRA>(out, type);
       case BMP_32:
-	return saveRows<BGRA>(out, type);
+	return saveRows<BGRA, BGRA>(out, type);
       default:
 	throw std::runtime_error("Image<T, B>::saveData(): unknown pixel type!!");
     }
@@ -1144,9 +1148,7 @@ Image<T, B>::resize(T* p, u_int h, u_int w)
 template <class T, class B> template <class S> std::istream&
 Image<T, B>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
 {
-    u_int		npads = (typeInfo.type != BMP_24 ? 0 :
-				 4 * ((sizeof(S)*width() + 3) / 4)
-				 - sizeof(S)*width());
+    const u_int		npads = type2nbytes(typeInfo.type, true);
     ImageLine<S>	buf(width());
     if (typeInfo.bottomToTop)
     {
@@ -1170,22 +1172,21 @@ Image<T, B>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
     return in;
 }
 
-template <class T, class B> std::istream&
+template <class T, class B> template <class S, class L> std::istream&
 Image<T, B>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
 {
-    Array<BGRA>		colormap(typeInfo.ncolors);
+    Array<L>	colormap(typeInfo.ncolors);
     colormap.restore(in);
 	
-    u_int		npads = (typeInfo.type != BMP_8 ? 0 :
-				 4 * ((width() + 3) / 4) - width());
-    ImageLine<u_char>	buf(width());
+    const u_int		npads = type2nbytes(typeInfo.type, true);
+    ImageLine<S>	buf(width());
     if (typeInfo.bottomToTop)
     {
 	for (u_int v = height(); v > 0; )
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    (*this)[--v].fill((u_char*)buf, (BGRA*)colormap);
+	    (*this)[--v].lookup((S*)buf, (L*)colormap);
 	}
     }
     else
@@ -1194,45 +1195,28 @@ Image<T, B>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    (*this)[v++].fill((u_char*)buf, (BGRA*)colormap);
+	    (*this)[v++].lookup((S*)buf, (L*)colormap);
 	}
     }
 
     return in;
 }
 
-template <class T, class B> template <class D> std::ostream&
+template <class T, class B> template <class D, class L> std::ostream&
 Image<T, B>::saveRows(std::ostream& out, Type type) const
 {
-    bool	bottomToTop = false;
-    u_int	align = 0;
-    switch (type)
-    {
-      case BMP_8:
-      {
-	Array<BGRA>	colormap(256);
-	for (u_int i = 0; i < colormap.dim(); ++i)
-	    colormap[i] = i;
-	colormap.save(out);
-	bottomToTop = true;
-	align = 4;
-      }
-	break;
-      case BMP_24:
-      case BMP_32:
-	bottomToTop = true;
-	align = 4;
-	break;
-    }
+    TypeInfo	typeInfo(type);
+
+    Array<L>	colormap(typeInfo.ncolors);
+    for (u_int i = 0; i < colormap.dim(); ++i)
+	colormap[i] = i;
+    colormap.save(out);
     
-    Array<u_char>	pad(0);
-    if (align > 0)
-	pad.resize(align * ((sizeof(D)*width() + align - 1) / align) -
-		   sizeof(D)*width());
+    Array<u_char>	pad(type2nbytes(type, true));
     pad = 0;
     
     ImageLine<D>	buf(width());
-    if (bottomToTop)
+    if (typeInfo.bottomToTop)
     {
 	for (u_int v = height(); v > 0; )
 	{

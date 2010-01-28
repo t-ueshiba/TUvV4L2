@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.30 2010-01-28 08:16:14 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.31 2010-01-28 23:48:29 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -113,14 +113,15 @@ ImageBase::restoreHeader(std::istream& in)
     switch (c)
     {
       case 'P':
-	break;
+	return restorePBMHeader(in);
       case 'B':
 	return restoreBMPHeader(in);
       default:
 	throw runtime_error("TU::ImageBase::restoreHeader: neighter PBM nor BMP file!!");
 	break;
     }
-    return restorePBMHeader(in);
+
+    return TypeInfo(DEFAULT);
 }
 
 //! 指定した画素タイプで出力ストリームに画像のヘッダを書き出す．
@@ -133,8 +134,6 @@ ImageBase::restoreHeader(std::istream& in)
 ImageBase::Type
 ImageBase::saveHeader(std::ostream& out, Type type) const
 {
-    using namespace	std;
-
     if (type == DEFAULT)
 	type = _defaultType();
 
@@ -144,8 +143,64 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
       case BMP_24:
       case BMP_32:
 	return saveBMPHeader(out, type);
+      default:
+	return savePBMHeader(out, type);
     }
-    return savePBMHeader(out, type);
+
+    return DEFAULT;
+}
+
+//! 指定されたタイプの1行あたりのデータバイト数またはpaddingバイト数を返す．
+/*!
+  \param type		画素のタイプ
+  \param padding	falseならデータバイト数, trueならpaddingバイト数
+  \return		1行あたりのデータバイト数またはpaddingバイト数
+*/
+u_int
+ImageBase::type2nbytes(Type type, bool padding) const
+{
+    u_int	nbytes = _width(), align = 1;
+    switch (type)
+    {
+      case SHORT:
+	nbytes *= sizeof(short);
+	break;
+      case INT:
+	nbytes *= sizeof(int);
+	break;
+      case FLOAT:
+	nbytes *= sizeof(float);
+	break;
+      case DOUBLE:
+	nbytes *= sizeof(double);
+	break;
+      case RGB_24:
+	nbytes *= sizeof(RGB);
+	break;
+      case YUV_444:
+	nbytes *= sizeof(YUV444);
+	break;
+      case YUV_422:
+	nbytes *= sizeof(YUV422);
+	break;
+      case YUV_411:
+	(nbytes *= 3) /= 2;
+	break;
+      case BMP_8:
+	align = 4;
+	break;
+      case BMP_24:
+	nbytes *= sizeof(BGR);
+	align = 4;
+	break;
+      case BMP_32:
+	nbytes *= sizeof(BGRA);
+	align = 4;
+	break;
+    }
+    u_int	nbytesPerLine = align * ((nbytes + align - 1) / align);
+
+    return (padding ? nbytesPerLine - nbytes : nbytesPerLine);
 }
 
 //! 指定されたタイプの画素のビット数を返す．
@@ -331,14 +386,16 @@ ImageBase::restoreBMPHeader(std::istream& in)
     get<int>(in);				// Skip bfOffBits.
 
   // Read information header.
-    TypeInfo	typeInfo(DEFAULT, true);
+    TypeInfo	typeInfo;
     int		w = 0, h = 0, d = 0;
     switch (c = get<int>(in))			// Read bcSize or biSize.
     {
       case 12:	// BMPCoreHeader:
 	w = get<short>(in);			// Read bcWidth.
 	h = get<short>(in);			// Read bcHeight.
-	if (h < 0)
+	if (h > 0)
+	    typeInfo.bottomToTop = true;
+	else
 	{
 	    h = -h;
 	    typeInfo.bottomToTop = false;
@@ -357,7 +414,9 @@ ImageBase::restoreBMPHeader(std::istream& in)
       case 40:	// BMPInfoHeader:
 	w = get<int>(in);			// Read biWidth.
 	h = get<int>(in);			// Read biHeight.
-	if (h < 0)
+	if (h > 0)
+	    typeInfo.bottomToTop = true;
+	else
 	{
 	    h = -h;
 	    typeInfo.bottomToTop = false;
@@ -490,63 +549,54 @@ ImageBase::savePBMHeader(std::ostream& out, Type type) const
 ImageBase::Type
 ImageBase::saveBMPHeader(std::ostream& out, Type type) const
 {
-    using namespace	std;
-    
   // Write BMP magic characters.
     out << "BM";
 
-  // Compute the number of bytes per line.
-    u_int	nbytesPerLine = 0;
-    switch (type)
-    {
-      case BMP_8:
-	nbytesPerLine = 4 * ((_width() + 3) / 4);
-	break;
-      case BMP_24:
-	nbytesPerLine = 4 * ((3*_width() + 3) / 4);
-	break;
-      case BMP_32:
-	nbytesPerLine = 4 * _width();
-	break;
-      default:
-	throw runtime_error("TU::ImageBase::saveBMPHeader: unsuppored type!!");
-	break;
-    }
-
   // Write file header.
-    put<int>(out, 14 + 40 + nbytesPerLine * _height());	// Write bfSize.
+    u_int	ncolors = (type == BMP_8 ? 256 : 0);
+    put<int>(out, 14 + 40 + 4*ncolors
+	     + type2nbytes(type, false)*_height());	// Write bfSize.
     put<short>(out, 0);					// Write bfReserved1.
     put<short>(out, 0);					// Write bfReserved2.
-    put<int>(out, 14 + 40);				// Write bfOffBits.
+    put<int>(out, 14 + 40 + 4*ncolors);			// Write bfOffBits.
 
   // Write information header.
-    put<int>(out, 40);				// Write biSize.
-    put<int>(out, _width());			// Write biWidth.
-    put<int>(out, _height());			// Write biHeight.
-    put<short>(out, 1);				// Write biPlanes.
+    put<int>(out, 40);					// Write biSize.
+    put<int>(out, _width());				// Write biWidth.
+    put<int>(out, _height());				// Write biHeight.
+    put<short>(out, 1);					// Write biPlanes.
+    put<short>(out, type2depth(type));			// Write biBitCount.
+    put<int>(out, 0);					// Write biCompression.
+    put<int>(out, type2nbytes(type, false)*_height());	// Write biSizeImage.
+    put<int>(out, 0);					// Write biXPixPerMeter.
+    put<int>(out, 0);					// Write biYPixPerMeter.
+    put<int>(out, ncolors);				// Write biClrUsed.
+    put<int>(out, 0);					// Write biClrImportant.
+    
+    return type;
+}
+
+/************************************************************************
+*  class ImageBase::TypeInfo						*
+************************************************************************/
+//! 与えられた画素タイプに対して外部記憶へのデフォルト付加情報を作る．
+/*!
+  \param ty	画素タイプ
+*/
+ImageBase::TypeInfo::TypeInfo(Type ty)
+    :type(ty), bottomToTop(false), ncolors(0)
+{
     switch (type)
     {
       case BMP_8:
-	put<short>(out, 8);			// Write biBitCount.
+	bottomToTop = true;
+	ncolors = 256;
 	break;
       case BMP_24:
-	put<short>(out, 24);			// Write biBitCount.
-	break;
-      default:
-	put<short>(out, 32);			// Write biBitCount.
+      case BMP_32:
+	bottomToTop = true;
 	break;
     }
-    put<int>(out, 0);				// Write biCompression.
-    put<int>(out, nbytesPerLine * _height());	// Write biSizeImage.
-    put<int>(out, 0);				// Write biXPixPerMeter.
-    put<int>(out, 0);				// Write biYPixPerMeter.
-    if (type == BMP_8)
-	put<int>(out, 256);			// Write biClrUsed.
-    else
-	put<int>(out, 0);			// Write biClrUsed.
-    put<int>(out, 0);				// Write biClrImportant.
-    
-    return type;
 }
 
 }
