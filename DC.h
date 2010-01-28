@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: DC.h,v 1.14 2009-10-06 12:11:45 ueshiba Exp $  
+ *  $Id: DC.h,v 1.15 2010-01-28 08:17:43 ueshiba Exp $  
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -90,8 +90,10 @@ class DC
     virtual DC&		operator <<(const Image<float>&  image)	= 0;
     virtual DC&		operator <<(const Image<BGR>&    image)	= 0;
     virtual DC&		operator <<(const Image<ABGR>&   image)	= 0;
+    virtual DC&		operator <<(const Image<BGRA>&   image)	= 0;
     virtual DC&		operator <<(const Image<RGB>&    image)	= 0;
     virtual DC&		operator <<(const Image<RGBA>&   image)	= 0;
+    virtual DC&		operator <<(const Image<ARGB>&   image)	= 0;
     virtual DC&		operator <<(const Image<YUV444>& image)	= 0;
     virtual DC&		operator <<(const Image<YUV422>& image)	= 0;
     virtual DC&		operator <<(const Image<YUV411>& image)	= 0;

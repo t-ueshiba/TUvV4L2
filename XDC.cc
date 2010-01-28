@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.cc,v 1.13 2009-10-06 12:11:45 ueshiba Exp $  
+ *  $Id: XDC.cc,v 1.14 2010-01-28 08:17:44 ueshiba Exp $  
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -404,6 +404,16 @@ XDC::operator <<(const Image<ABGR>& image)
 }
 
 DC&
+XDC::operator <<(const Image<BGRA>& image)
+{
+    setColorcube();
+    createXImage(image);
+    putXImage();
+
+    return *this;
+}
+
+DC&
 XDC::operator <<(const Image<RGB>& image)
 {
     setColorcube();
@@ -415,6 +425,16 @@ XDC::operator <<(const Image<RGB>& image)
 
 DC&
 XDC::operator <<(const Image<RGBA>& image)
+{
+    setColorcube();
+    createXImage(image);
+    putXImage();
+
+    return *this;
+}
+
+DC&
+XDC::operator <<(const Image<ARGB>& image)
 {
     setColorcube();
     createXImage(image);
