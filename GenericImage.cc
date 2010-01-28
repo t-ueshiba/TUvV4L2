@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GenericImage.cc,v 1.7 2009-09-04 05:47:36 ueshiba Exp $
+ *  $Id: GenericImage.cc,v 1.8 2010-01-28 08:16:14 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
@@ -42,9 +42,35 @@ namespace TU
 __PORT std::istream&
 GenericImage::restoreData(std::istream& in)
 {
-    for (u_int v = 0; v < height(); )
-  	if (!(*this)[v++].restore(in))
-	    break;
+    u_int	npads = 0;
+    switch (_typeInfo.type)
+    {
+      case BMP_8:
+	npads = 4 * ((width() + 3) / 4) - width();
+	_colormap.resize(_typeInfo.ncolors);
+	_colormap.restore(in);
+	break;
+      case BMP_24:
+	npads = 4 * ((3*width() + 3) / 4) - 3*width();
+      // fall back to the next case.
+      default:
+	_colormap.resize(0);
+	break;
+    }
+
+    if (_typeInfo.bottomToTop)
+    {
+	for (u_int v = height(); v > 0; )
+	    if (!(*this)[--v].restore(in) || !in.ignore(npads))
+		break;
+    }
+    else
+    {
+	for (u_int v = 0; v < height(); )
+	    if (!(*this)[v++].restore(in) || !in.ignore(npads))
+		break;
+    }
+
     return in;
 }
 
@@ -56,16 +82,41 @@ GenericImage::restoreData(std::istream& in)
 __PORT std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {
-    for (u_int v = 0; v < height(); )
-	if (!(*this)[v++].save(out))
-	    break;
+    Array<u_char>	pad(0);
+    switch (_typeInfo.type)
+    {
+      case BMP_8:
+	pad.resize(4 * ((width() + 3) / 4) - width());
+	_colormap.save(out);
+	for (u_int i = _colormap.dim(); i < 256; ++i)
+	    out.put(0).put(0).put(0).put(0);
+	break;
+      case BMP_24:
+	pad.resize(4 * ((3*width() + 3) / 4) - 3*width());
+	break;
+    }
+    pad = 0;
+
+    if (_typeInfo.bottomToTop)
+    {
+	for (u_int v = height(); v > 0; )
+	    if (!(*this)[--v].save(out) || !pad.save(out))
+		break;
+    }
+    else
+    {
+	for (u_int v = 0; v < height(); )
+	    if (!(*this)[v++].save(out) || !pad.save(out))
+		break;
+    }
+    
     return out;
 }
 
 __PORT u_int
 GenericImage::_width() const
 {
-    return (ncol()*8) / type2depth(_type);
+    return (ncol()*8) / type2depth(_typeInfo.type);
 }
 
 __PORT u_int
@@ -77,14 +128,14 @@ GenericImage::_height() const
 __PORT ImageBase::Type
 GenericImage::_defaultType() const
 {
-    return type();
+    return _typeInfo.type;
 }
 
 __PORT void
-GenericImage::_resize(u_int h, u_int w, ImageBase::Type type)
+GenericImage::_resize(u_int h, u_int w, const TypeInfo& typeInfo)
 {
-    _type = type;
-    w = (type2depth(_type)*w - 1)/8 + 1;
+    _typeInfo = typeInfo;
+    w = (type2depth(_typeInfo.type)*w + 7) / 8;
     Array2<Array<u_char> >::resize(h, w);
 }
 
