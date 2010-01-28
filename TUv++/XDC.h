@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.h,v 1.13 2009-10-06 12:11:45 ueshiba Exp $  
+ *  $Id: XDC.h,v 1.14 2010-01-28 08:17:44 ueshiba Exp $  
  */
 #ifndef __TUvXDC_h
 #define __TUvXDC_h
@@ -119,8 +119,10 @@ class XDC : public DC
     virtual DC&		operator <<(const Image<float>&  image)		;
     virtual DC&		operator <<(const Image<BGR>&    image)		;
     virtual DC&		operator <<(const Image<ABGR>&   image)		;
+    virtual DC&		operator <<(const Image<BGRA>&   image)		;
     virtual DC&		operator <<(const Image<RGB>&    image)		;
     virtual DC&		operator <<(const Image<RGBA>&   image)		;
+    virtual DC&		operator <<(const Image<ARGB>&   image)		;
     virtual DC&		operator <<(const Image<YUV444>& image)		;
     virtual DC&		operator <<(const Image<YUV422>& image)		;
     virtual DC&		operator <<(const Image<YUV411>& image)		;
