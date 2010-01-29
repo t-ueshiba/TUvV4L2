@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.52 2010-01-28 23:48:29 ueshiba Exp $
+ *  $Id: Image++.h,v 1.53 2010-01-29 00:57:58 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -435,7 +435,7 @@ class __PORT ImageBase
   //! 外部記憶に読み書きする際の付加情報
     struct TypeInfo
     {
-	TypeInfo(Type ty=DEFAULT)	;
+	__PORT	TypeInfo(Type ty=DEFAULT)	;
 
 	Type	type;		//!< 画素の型 #Type 
 	bool	bottomToTop;	//!< 行が下から上へ収められているならtrue

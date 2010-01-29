@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.31 2010-01-28 23:48:29 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.32 2010-01-29 00:57:58 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera.h"
@@ -583,6 +583,7 @@ ImageBase::saveBMPHeader(std::ostream& out, Type type) const
 /*!
   \param ty	‰æ‘fƒ^ƒCƒv
 */
+__PORT
 ImageBase::TypeInfo::TypeInfo(Type ty)
     :type(ty), bottomToTop(false), ncolors(0)
 {
