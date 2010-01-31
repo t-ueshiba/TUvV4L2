@@ -25,15 +25,14 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mesh++.h,v 1.18 2009-08-04 23:27:14 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.19 2010-01-31 23:35:07 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
 
-#include <float.h>
 #include <map>
 #include <set>
-#include "TU/Vector++.h"
+#include "TU/Geometry++.h"
 #include "TU/Allocator.h"
 
 namespace TU
@@ -148,17 +147,6 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 #endif
     };
 
-    struct BoundingBox
-    {
-	float	xlength()		const	{return xmax - xmin;}
-	float	ylength()		const	{return ymax - ymin;}
-	float	zlength()		const	{return zmax - zmin;}
-	float	maxlength()		const	;
-	float	minlength()		const	;
-	
-	float	xmin, xmax, ymin, ymax, zmin, zmax;
-    };
-
     class FaceEnumerator : public Allocator<F>::Enumerator
     {
       private:
@@ -187,7 +175,7 @@ class Mesh		// Mesh with M-sided faces of type F, edges of type E
 			     const Edge& edge1,
 			     const V& v)		;
     E			swap(const Edge& edge)		;
-    BoundingBox		boundingBox()		const	;
+    BoundingBox<V>	boundingBox()		const	;
     void		clean()				;
     
   private:
@@ -401,30 +389,14 @@ Mesh<V, E, F, M>::put(std::ostream& out) const
     return out;
 }
 
-template <class V, class E, class F, u_int M> 
-typename Mesh<V, E, F, M>::BoundingBox
+template <class V, class E, class F, u_int M> BoundingBox<V>
 Mesh<V, E, F, M>::boundingBox() const
 {
-    BoundingBox	bbox;
-    bbox.xmin = bbox.ymin = bbox.zmin = FLT_MAX;
-    bbox.xmax = bbox.ymax = bbox.zmax = FLT_MIN;
+    BoundingBox<V>	bbox;
     
     for (typename Allocator<F>::Enumerator faces(_f); faces; ++faces)
 	for (u_int e = 0; e < M; ++e)
-	{
-	    if (faces->v(e)[0] <= bbox.xmin)
-		bbox.xmin = faces->v(e)[0];
-	    if (faces->v(e)[0] >= bbox.xmax)
-		bbox.xmax = faces->v(e)[0];
-	    if (faces->v(e)[1] <= bbox.ymin)
-		bbox.ymin = faces->v(e)[1];
-	    if (faces->v(e)[1] >= bbox.ymax)
-		bbox.ymax = faces->v(e)[1];
-	    if (faces->v(e)[2] <= bbox.zmin)
-		bbox.zmin = faces->v(e)[2];
-	    if (faces->v(e)[2] >= bbox.zmax)
-		bbox.zmax = faces->v(e)[2];
-	}
+	    bbox.expand(faces->v(e));
     
     return bbox;
 }
@@ -644,39 +616,6 @@ Mesh<V, E, F, M>::Face::centroid() const
 	c += *_v[i];
     c /= M;
     return c;
-}
-
-/************************************************************************
-*  class Mesh<V, E, F, M>::BoundingBox					*
-************************************************************************/
-template <class V, class E, class F, u_int M> float
-Mesh<V, E, F, M>::BoundingBox::maxlength() const
-{
-    if (xlength() > ylength())
-	if (xlength() > zlength())
-	    return xlength();
-	else
-	    return zlength();
-    else
-	if (ylength() > zlength())
-	    return ylength();
-	else
-	    return zlength();
-}
-
-template <class V, class E, class F, u_int M> float
-Mesh<V, E, F, M>::BoundingBox::minlength() const
-{
-    if (xlength() < ylength())
-	if (xlength() < zlength())
-	    return xlength();
-	else
-	    return zlength();
-    else
-	if (ylength() < zlength())
-	    return ylength();
-	else
-	    return zlength();
 }
 
 }
