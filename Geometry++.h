@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.34 2009-11-30 00:05:31 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.35 2010-01-31 23:35:07 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -34,6 +34,7 @@
 #include "TU/Vector++.h"
 #include "TU/Normalize.h"
 #include "TU/Minimize.h"
+#include <limits>
 
 namespace TU
 {
@@ -1224,6 +1225,294 @@ Affinity2<T>::compose(const param_type& dt)
     (*this)[1][0] -= (t0*dt[0] + t1*dt[3]);
     (*this)[1][1] -= (t0*dt[1] + t1*dt[4]);
     (*this)[1][2] -= (t0*dt[2] + t1*dt[5]);
+}
+    
+/************************************************************************
+*   class BoundingBox<P>						*
+************************************************************************/
+//! P型の点に対するbounding boxを表すクラス
+/*!
+  \param P	点の型（次元は自由）
+*/
+template <class P>
+class BoundingBox
+{
+  public:
+  //! 点の要素の型
+    typedef typename P::value_type		value_type;
+
+  public:
+    BoundingBox()				;
+    explicit BoundingBox(u_int d)		;
+
+    bool		operator !()	const	;
+  //! このbounding boxが属する空間の次元を返す．
+  /*!
+    \return	空間の次元
+  */
+    u_int		dim()		const	{return _min.dim();}
+
+  //! このbounding boxの最小点を返す．
+  /*!
+    \return	最小点
+  */
+    const P&		min()		const	{return _min;}
+
+  //! このbounding boxの最大点を返す．
+  /*!
+    \return	最大点
+  */
+    const P&		max()		const	{return _max;}
+
+  //! このbounding boxの最小点の指定された軸の座標値を返す．
+  /*!
+    \param i	軸を指定するindex
+    \return	軸の座標値
+  */
+    value_type		min(int i)	const	{return _min[i];}
+
+  //! このbounding boxの最大点の指定された軸の座標値を返す．
+  /*!
+    \param i	軸を指定するindex
+    \return	軸の座標値
+  */
+    value_type		max(int i)	const	{return _max[i];}
+
+  //! このbounding boxの指定された軸に沿った長さを返す．
+  /*!
+    \param i	軸を指定するindex
+    \return	軸に沿った長さ
+  */
+    value_type		length(int i)	const	{return _max[i] - _min[i];}
+
+  //! このbounding boxの幅を返す．
+  /*!
+    \return	幅 (#TU::BoundingBox::length (0)に等しい)
+  */
+    value_type		width()		const	{return length(0);}
+
+  //! このbounding boxの高さを返す．
+  /*!
+    \return	高さ (#TU::BoundingBox::length (1)に等しい)
+  */
+    value_type		height()	const	{return length(1);}
+
+  //! このbounding boxの奥行きを返す．
+  /*!
+    \return	奥行き (#TU::BoundingBox::length (2)に等しい)
+  */
+    value_type		depth()		const	{return length(2);}
+
+    BoundingBox&	clear()						;
+    template <class S, class B>
+    BoundingBox&	expand(const Vector<S, B>& p)			;
+    template <class S, class B>
+    BoundingBox&	operator +=(const Vector<S, B>& dt)		;
+    template <class S, class B>
+    BoundingBox&	operator -=(const Vector<S, B>& dt)		;
+    BoundingBox&	operator *=(double c)				;
+    BoundingBox&	operator |=(const BoundingBox& bbox)		;
+    BoundingBox&	operator &=(const BoundingBox& bbox)		;
+    
+  private:
+  //! 入力ストリームからbounding boxを成す2つの点の座標を入力する(ASCII)．
+  /*!
+    \param in	入力ストリーム
+    \param bbox	bounding box
+    \return	inで指定した入力ストリーム
+  */
+    friend std::istream&
+    operator >>(std::istream& in, BoundingBox<P>& bbox)
+    {
+	return in >> bbox._min >> bbox._max;
+    }
+    
+    P	_min;
+    P	_max;
+};
+
+//! 空のbounding boxを作る．
+template <class P> inline
+BoundingBox<P>::BoundingBox()
+    :_min(), _max()
+{
+    clear();
+}
+
+//! 指定した次元の空間において空のbounding boxを作る．
+/*!
+  \param d	空間の次元
+*/
+template <class P> inline
+BoundingBox<P>::BoundingBox(u_int d)
+    :_min(d), _max(d)
+{
+    clear();
+}
+
+//! bounding boxが空であるか調べる．
+/*!
+  \return	空であればtrue, そうでなければfalse
+*/
+template <class P> bool
+BoundingBox<P>::operator !() const
+{
+    for (u_int i = 0; i < dim(); ++i)
+	if (_min[i] > _max[i])
+	    return true;
+    return false;
+}
+
+//! bounding boxを空にする．
+/*!
+  \return	空にされたこのbounding box
+*/
+template <class P> BoundingBox<P>&
+BoundingBox<P>::clear()
+{
+    typedef std::numeric_limits<value_type>	Limits;
+    
+    for (u_int i = 0; i < dim(); ++i)
+    {
+	_min[i] = Limits::max();
+	_max[i] = (Limits::is_integer ? Limits::min() : -Limits::max());
+    }
+    return *this;
+}
+
+//! bounding boxを与えられた点を含むように拡張する．
+/*!
+  \param p	点の座標
+  \return	拡張されたこのbounding box
+*/
+template <class P> template <class S, class B> BoundingBox<P>&
+BoundingBox<P>::expand(const Vector<S, B>& p)
+{
+    for (int i = 0; i < dim(); ++i)
+    {
+	_min[i] = std::min(_min[i], p[i]);
+	_max[i] = std::max(_max[i], p[i]);
+    }
+    return *this;
+}
+
+//! bounding boxを与えられた変位だけ正方向に平行移動する．
+/*!
+  \param dt	変位
+  \return	平行移動されたこのbounding box
+*/
+template <class P> template <class S, class B> inline BoundingBox<P>&
+BoundingBox<P>::operator +=(const Vector<S, B>& dt)
+{
+    _min += dt;
+    _max += dt;
+    return *this;
+}
+    
+//! bounding boxを与えられた変位だけ負方向に平行移動する．
+/*!
+  \param dt	変位
+  \return	平行移動されたこのbounding box
+*/
+template <class P> template <class S, class B> inline BoundingBox<P>&
+BoundingBox<P>::operator -=(const Vector<S, B>& dt)
+{
+    _min -= dt;
+    _max -= dt;
+    return *this;
+}
+    
+//! bounding boxを与えられたスケールだけ拡大／縮小する．
+/*!
+  負のスケールを与えるとbounding boxが反転する．
+  \param c	スケール
+  \return	平行移動されたこのbounding box
+*/
+template <class P> inline BoundingBox<P>&
+BoundingBox<P>::operator *=(double c)
+{
+    if (c < 0.0)
+	std::swap(_min, _max);
+    _min *= c;
+    _max *= c;
+    return *this;
+}
+
+//! このbounding boxと指定されたbounding boxとの結びをとる．
+/*!
+  \param bbox	bounding box
+  \return	結びをとった後のこのbounding box
+*/
+template <class P> inline BoundingBox<P>&
+BoundingBox<P>::operator |=(const BoundingBox<P>& bbox)
+{
+    return expand(bbox.min()).expand(bbox.max());
+}
+    
+//! このbounding boxと指定されたbounding boxとの交わりをとる．
+/*!
+  与えられたbounding boxとの間に共通部分がなければ空のbounding boxとなる．
+  \param bbox	bounding box
+  \return	交わりをとった後のこのbounding box
+*/
+template <class P> BoundingBox<P>&
+BoundingBox<P>::operator &=(const BoundingBox<P>& bbox)
+{
+    for (int i = 0; i < dim(); ++i)
+    {
+	_min[i] = std::max(_min[i], bbox.min(i));
+	_max[i] = std::min(_max[i], bbox.max(i));
+    }
+    return *this;
+}
+    
+//! 2つのbounding boxの結びをとる．
+/*!
+  \param a	bounding box
+  \param b	bounding box
+  \return	aとbの結びとなるbounding box
+*/
+template <class P> inline BoundingBox<P>
+operator |(const BoundingBox<P>& a, const BoundingBox<P>& b)
+{
+    BoundingBox<P>	c(a);
+    return c |= b;
+}
+    
+//! 2つのbounding boxの交わりをとる．
+/*!
+  与えられたbounding boxに共通部分がなければ空のbounding boxを返す．
+  \param a	bounding box
+  \param b	bounding box
+  \return	aとbの交わりとなるbounding box
+*/
+template <class P> inline BoundingBox<P>
+operator &(const BoundingBox<P>& a, const BoundingBox<P>& b)
+{
+    BoundingBox<P>	c(a);
+    return c &= b;
+}
+
+//! 出力ストリームにbounding boxを成す2つの点の座標を出力する(ASCII)．
+/*!
+  \param out	出力ストリーム
+  \param bbox	bounding box
+  \return	outで指定した出力ストリーム
+*/
+template <class P> std::ostream&
+operator <<(std::ostream& out, const BoundingBox<P>& bbox)
+{
+#ifdef _DEBUG
+    for (u_int i = 0; i < bbox.dim(); ++i)
+    {
+	if (i != 0)
+	    out << 'x';
+	out << '[' << bbox.min(i) << ", " << bbox.max(i) << ']';
+    }
+    return out << std::endl;
+#else
+    return out << bbox.min() << bbox.max() << std::endl;
+#endif
 }
     
 }

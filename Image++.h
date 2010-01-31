@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.53 2010-01-29 00:57:58 ueshiba Exp $
+ *  $Id: Image++.h,v 1.54 2010-01-31 23:35:07 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -1046,6 +1046,8 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 {
     switch (typeInfo.type)
     {
+      case DEFAULT:
+	break;
       case U_CHAR:
 	return restoreRows<u_char>(in, typeInfo);
       case SHORT:
@@ -1072,7 +1074,6 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 	return restoreRows<BGRA>(in, typeInfo);
       default:
 	throw std::runtime_error("Image<T, B>::restoreData(): unknown pixel type!!");
-	break;
     }
     return in;
 }

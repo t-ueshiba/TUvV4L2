@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: utility.h,v 1.20 2010-01-19 00:08:00 ueshiba Exp $
+ *  $Id: utility.h,v 1.21 2010-01-31 23:35:08 ueshiba Exp $
  */
 #ifndef __TUutility_h
 #define __TUutility_h
