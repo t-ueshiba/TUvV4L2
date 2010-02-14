@@ -1,32 +1,54 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
- *  
- *  ‘nìÒFAÅr•v
- *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
- *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id: Random.h,v 1.8 2009-09-04 04:01:06 ueshiba Exp $
- */
+   A C-program for MT19937, with initialization improved 2002/1/26.
+   Coded by Takuji Nishimura and Makoto Matsumoto.
+
+   Before using, initialize the state by using init_genrand(seed)  
+   or init_by_array(init_key, key_length).
+
+   Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
+   All rights reserved.                          
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+     3. The names of its contributors may not be used to endorse or promote 
+        products derived from this software without specific prior written 
+        permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+   Any feedback is very welcome.
+   http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
+   email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
+
+   [Feb.14, 2010] Incorporated into libTUTools++ class library by:
+      Toshio UESHIBA
+	National Institute of Advanced Industrial Science and Technology (AIST)
+   
+   $Id: Random.h,v 1.9 2010-02-14 23:29:09 ueshiba Exp $
+*/
+#ifndef __TURandom_h
+#define __TURandom_h
+
 #include "TU/types.h"
 
 namespace TU
@@ -34,37 +56,71 @@ namespace TU
 /************************************************************************
 *  class Random								*
 ************************************************************************/
-class __PORT Random
+//! Mersenne Twister‚É‚æ‚é—””­¶Ší
+class Random
 {
   public:
-    Random()						;
+    Random()								;
+
+    void	initialize()						;
+    void	initialize(u_long seed)					;
+    void	initializeByArray(const u_long keys[], int nkeys)	;
     
-    double	uniform()				;
-    double	gaussian()				;
-    double	uniform48()				;
-    double	gaussian48()				;
+    u_long	generateInt32()						;
+    long	generateInt31()						;
+    double	generateClosedReal()					;
+    double	generateHalfOpenReal()					;
+    double	generateOpenReal()					;
+    double	generateRes53()						;
+    double	gaussian()						;
     
   private:
-    double	gaussian(double (Random::*uni)())	;
-    
-    int		_seed;
-    long	_x1, _x2, _x3;
-    double	_r[97];
-    int		_ff;
-    int		_has_extra;	// flag showing existence of _extra.
-    double	_extra;		// extra gaussian noise value.
+    enum	{N = 624, M = 397};
+
+    u_long	_mt[N];
+    int		_mti;
+    bool	_hasExtra;
+    double	_extra;
 };
-
-inline double
-Random::gaussian()
+    
+//! ‹æŠÔ [0,0x7fffffff] “à‚Ì31bit’·‚Ì®”‚ğ”­¶‚·‚éD
+inline long
+Random::generateInt31()
 {
-    return gaussian(&Random::uniform);
+    return (long)(generateInt32() >> 1);
 }
 
+//! ‹æŠÔ [0,1] “à‚ÌÀ”‚ğ”­¶‚·‚éD
 inline double
-Random::gaussian48()
+Random::generateClosedReal()
 {
-    return gaussian(&Random::uniform48);
+    return generateInt32()*(1.0/4294967295.0);     // divided by 2^32-1
 }
- 
+
+//! ‹æŠÔ [0,1) “à‚ÌÀ”‚ğ”­¶‚·‚éD
+inline double
+Random::generateHalfOpenReal()
+{
+    return generateInt32()*(1.0/4294967296.0);     // divided by 2^32
 }
+
+//! ‹æŠÔ (0,1) “à‚ÌÀ”‚ğ”­¶‚·‚éD
+inline double
+Random::generateOpenReal()
+{
+  // divided by 2^32
+    return (((double)generateInt32()) + 0.5)*(1.0/4294967296.0);
+}
+
+//! ‹æŠÔ [0,1) “à‚Ì53bit’·‚ÌÀ”‚ğ”­¶‚·‚éD
+inline double
+Random::generateRes53() 
+{ 
+    u_long	a = generateInt32() >> 5,
+		b = generateInt32() >> 6; 
+    return(a*67108864.0 + b)*(1.0/9007199254740992.0); 
+} 
+
+}
+
+#endif	// !__TURandom_h

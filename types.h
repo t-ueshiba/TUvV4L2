@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.22 2010-01-31 23:35:08 ueshiba Exp $
+ *  $Id: types.h,v 1.23 2010-02-14 23:29:09 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -84,6 +84,7 @@
   - #TU::BGR
   - #TU::RGBA
   - #TU::ABGR
+  - #TU::ARGB
   - #TU::BGRA
   - #TU::YUV444
   - #TU::YUV422
@@ -155,6 +156,9 @@
   - #TU::Serial
   - #TU::TriggerGenerator
   - #TU::PM16C_04
+
+  <b>乱数発生器</b>
+  - #TU::Random
   
   \file		types.h
   \brief	基本的なデータ型をグローバルな名前空間に追加
