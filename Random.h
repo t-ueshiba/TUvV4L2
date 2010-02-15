@@ -44,7 +44,7 @@
       Toshio UESHIBA
 	National Institute of Advanced Industrial Science and Technology (AIST)
    
-   $Id: Random.h,v 1.9 2010-02-14 23:29:09 ueshiba Exp $
+   $Id: Random.h,v 1.10 2010-02-15 00:53:19 ueshiba Exp $
 */
 #ifndef __TURandom_h
 #define __TURandom_h
@@ -57,7 +57,7 @@ namespace TU
 *  class Random								*
 ************************************************************************/
 //! Mersenne Twister‚É‚æ‚é—””­¶Ší
-class Random
+class __PORT Random
 {
   public:
     Random()								;
