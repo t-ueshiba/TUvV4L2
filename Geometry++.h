@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.35 2010-01-31 23:35:07 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.36 2010-02-17 03:30:25 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -38,6 +38,58 @@
 
 namespace TU
 {
+/************************************************************************
+*  class Point1<T>							*
+************************************************************************/
+//! T型の座標成分を持つ1次元点を表すクラス
+/*!
+  \param T	座標の型
+ */
+template <class T>
+class Point1 : public Vector<T, FixedSizedBuf<T, 1> >
+{
+  private:
+    typedef Vector<T, FixedSizedBuf<T, 1> >	vector_type;
+    
+  public:
+    Point1(T u=0)							;
+
+  //! 他の1次元ベクトルと同一要素を持つ1次元点を作る．
+  /*!
+    \param v	コピー元1次元ベクトル
+  */
+    template <class T2, class B2>
+    Point1(const Vector<T2, B2>& v) :vector_type(v)			{}
+
+  //! 他の1次元ベクトルを自分に代入する．
+  /*!
+    \param v	コピー元1次元ベクトル
+    \return	この1次元点
+  */
+    template <class T2, class B2>
+    Point1&	operator =(const Vector<T2, B2>& v)
+		{
+		    vector_type::operator =(v);
+		    return *this;
+		}
+};
+
+//! 指定された座標成分を持つ1次元点を作る．
+/*!
+  \param u	u座標
+*/
+template <class T> inline
+Point1<T>::Point1(T u)
+    :vector_type()
+{
+    (*this)[0] = u;
+}
+
+typedef Point1<short>	Point1s;		//!< short型座標を持つ1次元点
+typedef Point1<int>	Point1i;		//!< int型座標を持つ1次元点
+typedef Point1<float>	Point1f;		//!< float型座標を持つ1次元点
+typedef Point1<double>	Point1d;		//!< double型座標を持つ1次元点
+
 /************************************************************************
 *  class Point2<T>							*
 ************************************************************************/
@@ -152,9 +204,9 @@ Point2<T>::move(int dir)
     return *this;
 }
 
-//! この3次元点と指定された3次元点が8隣接しているか調べる．
+//! この2次元点と指定された2次元点が8隣接しているか調べる．
 /*!
-  \param p	3次元点
+  \param p	2次元点
   \return	pと一致していれば-1，8隣接していれば1，いずれでもなければ0
 */
 template <class T> int
@@ -183,9 +235,9 @@ Point2<T>::adj(const Point2<T>& p) const
     return 0;
 }
 
-//! この3次元点から指定された3次元点への向きを返す．
+//! この2次元点から指定された2次元点への向きを返す．
 /*!
-  \param p	3次元点
+  \param p	2次元点
   \return	-180degから180degまでを8等分した区間を表す-4から3までの整数値．
 		特に，pがこの点に一致するならば4
 */
@@ -218,10 +270,10 @@ Point2<T>::dir(const Point2<T>& p) const
             return -4;
 }
 
-//! この3次元点と指定された2つの3次元点がなす角度を返す．
+//! この2次元点と指定された2つの2次元点がなす角度を返す．
 /*!
-  \param pp	3次元点
-  \param pn	3次元点
+  \param pp	2次元点
+  \param pn	2次元点
   \return	pp->*this->pnがなす角度を-180degから180degまでを8等分した区間で
 		表した-4から3までの整数値．特に，pp, pnの少なくとも一方がこの点に
 		一致するならば4
@@ -1303,6 +1355,8 @@ class BoundingBox
   */
     value_type		depth()		const	{return length(2);}
 
+    template <class S, class B>
+    bool		include(const Vector<S, B>& p)			;
     BoundingBox&	clear()						;
     template <class S, class B>
     BoundingBox&	expand(const Vector<S, B>& p)			;
@@ -1361,6 +1415,20 @@ BoundingBox<P>::operator !() const
 	if (_min[i] > _max[i])
 	    return true;
     return false;
+}
+
+//! bounding boxが与えられた点を含むか調べる．
+/*!
+  \param p	点の座標
+  \return	含めばtrue, そうでなければfalse
+*/
+template <class P> template <class S, class B> bool
+BoundingBox<P>::include(const Vector<S, B>& p)
+{
+    for (u_int i = 0; i < dim(); ++i)
+	if (p[i] < _min[i] || p[i] > _max[i])
+	    return false;
+    return true;
 }
 
 //! bounding boxを空にする．
