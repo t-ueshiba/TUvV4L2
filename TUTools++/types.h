@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.23 2010-02-14 23:29:09 ueshiba Exp $
+ *  $Id: types.h,v 1.24 2010-02-17 03:30:25 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -62,6 +62,7 @@
   - #typename Pointset::Container TU::ransac(const PointSet&, Model&, Conform, double)
 
   <b>点，直線，平面等の幾何要素とその変換</b>
+  - #TU::Point1
   - #TU::Point2
   - #TU::Point3
   - #TU::HyperPlane
