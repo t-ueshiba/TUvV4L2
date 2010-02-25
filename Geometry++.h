@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.36 2010-02-17 03:30:25 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.37 2010-02-25 23:42:00 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -595,6 +595,9 @@ class Projectivity : public M
     u_int	nparams()					const	;
     void	update(const Vector<value_type>& dt)			;
 
+    template <class Iterator>
+    value_type	reprojectionError(Iterator begin, Iterator end)	const	;
+    
   protected:
   //! 射影変換行列の最尤推定のためのコスト関数
     template <class Map, class Iterator>
@@ -868,7 +871,29 @@ Projectivity<M>::update(const Vector<value_type>& dt)
     t -= dt;
     t *= (l / t.length());
 }
-    
+
+//! 与えられた点対列の平均再投影誤差を返す．
+/*!
+  \param begin	点対列の先頭を示す反復子
+  \param end	点対列の末尾を示す反復子
+  \return	平均再投影誤差
+*/
+template <class M> template <class Iterator>
+typename Projectivity<M>::value_type
+Projectivity<M>::reprojectionError(Iterator begin, Iterator end) const
+{
+    value_type	sqrerr_sum = 0.0;
+    u_int	npoints = 0;
+    for (Iterator iter = begin; iter != end; ++iter)
+    {
+	const Vector<value_type>&	err = (*this)(iter->first) - iter->second;
+	sqrerr_sum += err.square();
+	++npoints;
+    }
+
+    return (npoints > 0 ? sqrt(sqrerr_sum / npoints) : 0.0);
+}
+
 template <class M> template <class Map, class Iterator>
 Projectivity<M>::Cost<Map, Iterator>::Cost(Iterator begin, Iterator end)
     :_begin(begin), _end(end), _npoints(std::distance(_begin, _end))
