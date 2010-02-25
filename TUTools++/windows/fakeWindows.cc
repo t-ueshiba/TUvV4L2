@@ -10,7 +10,7 @@
  * of any kind. I shall in no event be liable for anything that happens
  * to anyone/anything when using this software.
  *  
- *  $Id: fakeWindows.cc,v 1.2 2009-09-09 07:09:32 ueshiba Exp $
+ *  $Id: fakeWindows.cc,v 1.3 2010-02-25 23:42:56 ueshiba Exp $
  */
 #ifdef WIN32
 #include "fakeWindows.h"
@@ -1083,7 +1083,7 @@ getopt (int argc, char *const *argv, const char* optstring)
 #define EPOCHFILETIME	(116444736000000000i64)
 
 extern "C" __PORT int
-gettimeofday(struct timeval* tv, struct timezone* tz)
+gettimeofday(struct timeval* tv, struct timeZone* tz)
 {
     static int		tzflag;
 

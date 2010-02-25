@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: fakeWindows.h,v 1.2 2009-09-09 07:09:32 ueshiba Exp $
+ *  $Id: fakeWindows.h,v 1.3 2010-02-25 23:42:56 ueshiba Exp $
  */
 #ifndef __FAKEWINDOWS_H
 #define __FAKEWINDOWS_H
@@ -103,13 +103,13 @@ __PORT int  getopt_long_only(int ___argc, char* const* ___argv,
 /************************************************************************
 *  gettimeofday()							*
 ************************************************************************/
-typedef struct timezone
+typedef struct timeZone
 {
     int		tz_minuteswest;
     int		tz_dsttime;
-} timezone;
+} timeZone;
 
-__PORT int	gettimeofday(struct timeval* tv, struct timezone* tz)	;
+__PORT int	gettimeofday(struct timeval* tv, struct timeZone* tz)	;
 
 /************************************************************************
 *  srand48(), lrand48(), erand48(), drand48()				*
