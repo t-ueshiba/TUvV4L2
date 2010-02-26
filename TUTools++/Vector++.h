@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.35 2009-11-30 00:05:31 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.36 2010-02-26 07:56:10 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -2458,16 +2458,19 @@ BiDiagonal<T>::diagonalize()
 		}
 	    }
 
-    u_int l = _Et.dim() - 1;		// last index
+    u_int l = min(_Dt.dim() - 1, _Et.dim());	// last index
     for (u_int m = 0; m < l; ++m)	// ensure positivity of all singular
 	if (_diagonal[m] < 0.0)		// values except for the last one.
 	{
 	    _diagonal[m] = -_diagonal[m];
-	    _diagonal[l] = -_diagonal[l];
 	    for (u_int j = 0; j < _Et.dim(); ++j)
-	    {
 		_Et[m][j] = -_Et[m][j];
-		_Et[l][j] = -_Et[l][j];
+
+	    if (l < _Et.dim())
+	    {
+		_diagonal[l] = -_diagonal[l];
+		for (u_int j = 0; j < _Et.dim(); ++j)
+		    _Et[l][j] = -_Et[l][j];
 	    }
 	}
 }
