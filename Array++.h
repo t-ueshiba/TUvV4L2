@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.29 2010-01-28 08:16:14 ueshiba Exp $
+ *  $Id: Array++.h,v 1.30 2010-03-01 06:37:44 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -215,7 +215,7 @@ template <class T> std::istream&
 Buf<T>::get(std::istream& in, u_int m)
 {
     const u_int	BufSiz = 2048;
-    T		tmp[BufSiz];
+    T* const	tmp = new T[BufSiz];
     u_int	n = 0;
     
     while (n < BufSiz)
@@ -240,6 +240,8 @@ Buf<T>::get(std::istream& in, u_int m)
     for (u_int i = 0; i < n; ++i)
 	_p[m + i] = tmp[i];
 
+    delete [] tmp;
+    
     return in;
 }
 
