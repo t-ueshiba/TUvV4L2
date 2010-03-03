@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.36 2010-02-26 07:56:10 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.37 2010-03-03 01:36:50 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -590,9 +590,9 @@ class Matrix : public Array2<Vector<T>, B, R>
     T			trace()					const	;
     Matrix		adj()					const	;
     Matrix<T>		pinv(T cndnum=1.0e5)			const	;
-    Matrix<T>		eigen(Vector<T>& eval)			const	;
+    Matrix<T>		eigen(Vector<T>& eval, bool abs=true)	const	;
     Matrix<T>		geigen(const Matrix<T>& BB,
-			       Vector<T>& eval)			const	;
+			       Vector<T>& eval, bool abs=true)	const	;
     Matrix		cholesky()				const	;
     Matrix&		normalize()					;
     Matrix&		rotate_from_left(const Rotation& r)		;
@@ -960,7 +960,9 @@ Matrix<T, B, R>::pinv(T cndnum) const
 
 //! この対称行列の固有値と固有ベクトルを返す．
 /*!
-    \param eval	絶対値の大きい順に並べられた固有値
+    \param eval	固有値が返される
+    \param abs	固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
+		並べるならfalse
     \return	各行が固有ベクトルから成る回転行列，すなわち
 		\f[
 		  \TUvec{A}{}\TUvec{U}{} =
@@ -971,11 +973,11 @@ Matrix<T, B, R>::pinv(T cndnum) const
 		なる\f$\TUtvec{U}{}\f$
 */
 template <class T, class B, class R> Matrix<T>
-Matrix<T, B, R>::eigen(Vector<T>& eval) const
+Matrix<T, B, R>::eigen(Vector<T>& eval, bool abs) const
 {
     TriDiagonal<T>	tri(*this);
 
-    tri.diagonalize();
+    tri.diagonalize(abs);
     eval = tri.diagonal();
 
     return tri.Ut();
@@ -984,7 +986,9 @@ Matrix<T, B, R>::eigen(Vector<T>& eval) const
 //! この対称行列の一般固有値と一般固有ベクトルを返す．
 /*!
     \param B	もとの行列と同一サイズの正値対称行列
-    \param eval	絶対値の大きい順に並べられた一般固有値
+    \param eval	一般固有値が返される
+    \param abs	一般固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
+		並べるならfalse
     \return	各行が一般固有ベクトルから成る正則行列
 		（ただし直交行列ではない），すなわち
 		\f[
@@ -996,10 +1000,10 @@ Matrix<T, B, R>::eigen(Vector<T>& eval) const
 		なる\f$\TUtvec{U}{}\f$
 */
 template <class T, class B, class R> Matrix<T>
-Matrix<T, B, R>::geigen(const Matrix<T>& BB, Vector<T>& eval) const
+Matrix<T, B, R>::geigen(const Matrix<T>& BB, Vector<T>& eval, bool abs) const
 {
     Matrix<T>	Ltinv = BB.cholesky().inv(), Linv = Ltinv.trns();
-    Matrix<T>	Ut = (Linv * (*this) * Ltinv).eigen(eval);
+    Matrix<T>	Ut = (Linv * (*this) * Ltinv).eigen(eval, abs);
     
     return Ut * Linv;
 }
@@ -2087,7 +2091,7 @@ class TriDiagonal
   */
     const Vector<T>&	off_diagonal()		const	{return _Ut.sigma();}
 
-    void		diagonalize()			;
+    void		diagonalize(bool abs=true)	;
     
   private:
     enum		{NITER_MAX = 30};
@@ -2126,9 +2130,11 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2, R2>& a)
 /*!
   対角成分は固有値となり，\f$\TUtvec{U}{}\f$の各行は固有ベクトルを与える．
   \throw std::runtime_error	指定した繰り返し回数を越えた場合に送出
+  \param abs	固有値をその絶対値の大きい順に並べるのであればtrue,
+		その値の大きい順に並べるのであればfalse
 */ 
 template <class T> void
-TriDiagonal<T>::diagonalize()
+TriDiagonal<T>::diagonalize(bool abs)
 {
     using namespace	std;
     
@@ -2182,18 +2188,37 @@ TriDiagonal<T>::diagonalize()
 	}
     }
 
-    for (u_int m = 0; m < dim(); ++m)	// sort eigen values and eigen vectors
-	for (u_int n = m+1; n < dim(); ++n)
-	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
-	    {
-		swap(_diagonal[m], _diagonal[n]);
-		for (u_int j = 0; j < dim(); ++j)
+  // Sort eigen values and eigen vectors.
+    if (abs)
+    {
+	for (u_int m = 0; m < dim(); ++m)
+	    for (u_int n = m+1; n < dim(); ++n)
+		if (fabs(_diagonal[n]) > fabs(_diagonal[m]))	// abs. values
 		{
-		    const T	tmp = _Ut[m][j];
-		    _Ut[m][j] = _Ut[n][j];
-		    _Ut[n][j] = -tmp;
+		    swap(_diagonal[m], _diagonal[n]);
+		    for (u_int j = 0; j < dim(); ++j)
+		    {
+			const T	tmp = _Ut[m][j];
+			_Ut[m][j] = _Ut[n][j];
+			_Ut[n][j] = -tmp;
+		    }
 		}
-	    }
+    }
+    else
+    {
+	for (u_int m = 0; m < dim(); ++m)
+	    for (u_int n = m+1; n < dim(); ++n)
+		if (_diagonal[n] > _diagonal[m])		// raw values
+		{
+		    swap(_diagonal[m], _diagonal[n]);
+		    for (u_int j = 0; j < dim(); ++j)
+		    {
+			const T	tmp = _Ut[m][j];
+			_Ut[m][j] = _Ut[n][j];
+			_Ut[n][j] = -tmp;
+		    }
+		}
+    }
 }
 
 template <class T> bool

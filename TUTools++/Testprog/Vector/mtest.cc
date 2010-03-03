@@ -1,5 +1,5 @@
 /*
- *  $Id: mtest.cc,v 1.3 2009-09-04 04:01:41 ueshiba Exp $
+ *  $Id: mtest.cc,v 1.4 2010-03-03 01:36:57 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
@@ -109,7 +109,7 @@ main()
 	  case 'E':
 	    cerr << " A >> ";
 	    cin >> A;
-	    B = A.eigen(u);
+	    B = A.eigen(u, true);
 	    cout << "--- A ---\n"	   << A
 		 << "--- Ut * U ---\n"	   << B * B.trns()
 		 << "--- Ut * A * U ---\n" << B * A * B.trns()
