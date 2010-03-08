@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.54 2010-01-31 23:35:07 ueshiba Exp $
+ *  $Id: Image++.h,v 1.55 2010-03-08 00:13:37 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -64,11 +64,14 @@ struct RGB
 		operator short()	const	{return short(double(*this));}
 		operator int()		const	{return int(double(*this));}
 		operator float()	const	{return float(double(*this));}
-		operator double()	const	{return 0.3*r+0.59*g+0.11*b+0.5;}
+		operator double()	const	{return 0.3*r+0.59*g+0.11*b;}
     
     RGB&	operator +=(const RGB& p)	{r += p.r; g += p.g; b += p.b;
 						 return *this;}
     RGB&	operator -=(const RGB& p)	{r -= p.r; g -= p.g; b -= p.b;
+						 return *this;}
+    template <class T>
+    RGB&	operator *=(T c)		{r *= c; g *= c; b *= c;
 						 return *this;}
     bool	operator ==(const RGB& p) const	{return (r == p.r &&
 							 g == p.g &&
@@ -109,11 +112,14 @@ struct BGR
 		operator short()	const	{return short(double(*this));}
 		operator int()		const	{return int(double(*this));}
 		operator float()	const	{return float(double(*this));}
-		operator double()	const	{return 0.3*r+0.59*g+0.11*b+0.5;}
+		operator double()	const	{return 0.3*r+0.59*g+0.11*b;}
 
     BGR&	operator +=(const BGR& p)	{r += p.r; g += p.g; b += p.b;
 						 return *this;}
     BGR&	operator -=(const BGR& p)	{r -= p.r; g -= p.g; b -= p.b;
+						 return *this;}
+    template <class T>
+    BGR&	operator *=(T c)		{r *= c; g *= c; b *= c;
 						 return *this;}
     bool	operator ==(const BGR& p) const	{return (r == p.r &&
 							 g == p.g &&
@@ -596,7 +602,7 @@ ImageLine<T>::at(S uf) const
     const int	u  = floor(uf);
     const T*	in = &(*this)[u];
     const S	du = uf - u;
-    return (du ? *in + du*(*(in + 1) - *in) : *in);
+    return (du ? (1 - du) * *in + du * *(in + 1) : *in);
 }
 
 //! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
@@ -1006,9 +1012,9 @@ template <class T, class B> template <class S> inline T
 Image<T, B>::at(const Point2<S>& p) const
 {
     const int	v  = floor(p[1]);
-    const T	out0 = (*this)[v  ].at(p[0]);
+    const T	out0 = (*this)[v].at(p[0]);
     const S	dv = p[1] - v;
-    return (dv ? out0 + dv*((*this)[v+1].at(p[0]) - out0) : out0);
+    return (dv ? (1 - dv)*out0 + dv*(*this)[v+1].at(p[0]) : out0);
 }
 
 //! 入力ストリームから画像を読み込む．
