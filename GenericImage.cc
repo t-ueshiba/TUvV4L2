@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GenericImage.cc,v 1.9 2010-01-28 23:48:29 ueshiba Exp $
+ *  $Id: GenericImage.cc,v 1.10 2010-03-26 06:25:40 ueshiba Exp $
  */
 #include "TU/Image++.h"
 
@@ -70,9 +70,12 @@ GenericImage::restoreData(std::istream& in)
 __PORT std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {
-    _colormap.save(out);
-    for (u_int i = _colormap.dim(); i < 256; ++i)
-	out.put(0).put(0).put(0).put(0);
+    if (_colormap.dim() > 0)
+    {
+	_colormap.save(out);
+	for (u_int i = _colormap.dim(); i < 256; ++i)
+	    out.put(0).put(0).put(0).put(0);
+    }
     
     Array<u_char>	pad(type2nbytes(_typeInfo.type, true));
     pad = 0;
