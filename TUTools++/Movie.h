@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.7 2009-09-11 05:56:13 ueshiba Exp $
+ *  $Id: Movie.h,v 1.8 2010-03-31 02:24:20 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -93,9 +93,10 @@ template <class T> class Movie
 				      type=ImageBase::DEFAULT)	const	;
 
   private:
-    ImageBase::Type	restoreHeader(std::istream& in)			;
+    ImageBase::TypeInfo	restoreHeader(std::istream& in)			;
     std::istream&	restoreFrames(std::istream& in,
-				      ImageBase::Type type, u_int m)	;
+				      ImageBase::TypeInfo typeInfo,
+				      u_int m)				;
     static u_int	nelements(u_int npixels)			;
     
   private:
@@ -380,14 +381,14 @@ Movie<T>::restore(std::istream& in)
     return restoreFrames(in, restoreHeader(in), 0);
 }
 
-template <class T> ImageBase::Type
+template <class T> ImageBase::TypeInfo
 Movie<T>::restoreHeader(std::istream& in)
 {
     using namespace	std;
     
     char	c;
     if (!in.get(c))
-	return ImageBase::DEFAULT;
+	return ImageBase::TypeInfo(ImageBase::DEFAULT);
     if (c != 'M')
 	throw runtime_error("TU::Movie<T>::restoreHeader: not a movie file!!");
     
@@ -395,20 +396,20 @@ Movie<T>::restoreHeader(std::istream& in)
     in >> nv >> skipl;
     _views.resize(nv);
 
-    ImageBase::Type	type = ImageBase::DEFAULT;
+    ImageBase::TypeInfo	typeInfo(ImageBase::DEFAULT);
     _nelements = 0;
     for (u_int i = 0; i < nviews(); ++i)
     {
-	type = _views[i].restoreHeader(in);
+	typeInfo = _views[i].restoreHeader(in);
 	_views[i].offset = _nelements;
 	_nelements += nelements(_views[i].width() * _views[i].height());
     }
 
-    return type;
+    return typeInfo;
 }
 
 template <class T> std::istream&
-Movie<T>::restoreFrames(std::istream& in, ImageBase::Type type, u_int m)
+Movie<T>::restoreFrames(std::istream& in, ImageBase::TypeInfo typeInfo, u_int m)
 {
     char	c;
     if (!in.get(c))
@@ -425,9 +426,9 @@ Movie<T>::restoreFrames(std::istream& in, ImageBase::Type type, u_int m)
 	{
 	    _views[i].resize((T*)frame + _views[i].offset,
 			      _views[i].height(), _views[i].width());
-	    _views[i].restoreData(in, type);
+	    _views[i].restoreData(in, typeInfo);
 	}
-	restoreFrames(in, type, m + 1);
+	restoreFrames(in, typeInfo, m + 1);
 	_frames[m] = frame;
     }
     catch (...)
