@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.32 2009-10-16 02:47:25 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.33 2010-06-02 00:12:12 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -347,7 +347,7 @@ static const u_int	NBUFFERS		= 4;
 			付属のボードでは0)
 */
 Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
-			       u_int64 uniqId, u_int delay)
+			       u_int64_t uniqId, u_int delay)
     :Ieee1394Node(type, uniqId, delay
 #if !defined(USE_RAWISO)
 		  , 1, VIDEO1394_SYNC_FRAMES
@@ -372,7 +372,7 @@ Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
 	_acr = CSR_REGISTER_BASE + readQuadletFromRegister(0x480) * 4;
     
   // Get Bayer pattern supported by this camera.
-    const u_int64	PointGrey_Feature_ID = 0x00b09d000004ull;
+    const u_int64_t	PointGrey_Feature_ID = 0x00b09d000004ull;
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
 	switch (readQuadlet(_acr + 0x40))
@@ -2448,7 +2448,7 @@ Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
 			存在しなければfalseを返す．
 */
 bool
-Ieee1394Camera::unlockAdvancedFeature(u_int64 featureId, u_int timeout)
+Ieee1394Camera::unlockAdvancedFeature(u_int64_t featureId, u_int timeout)
 {
     if (_acr == 0)
 	return false;

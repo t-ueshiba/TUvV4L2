@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.16 2009-10-16 02:47:25 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.17 2010-06-02 00:12:12 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -144,7 +144,7 @@ std::map<int, Ieee1394Node::Port*>	Ieee1394Node::_portMap;
 			VIDEO1394_INCLUDE_ISO_HEADERS,
 			VIDEO1394_VARIABLE_PACKET_SIZEの組合わせ．
 */
-Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int delay
+Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 #if !defined(USE_RAWISO)
 			   , int sync_tag, int flags
 #endif
@@ -246,10 +246,10 @@ Ieee1394Node::cmdRegBase() const
 #endif
 
 //! このノードに結び付けられている機器固有の64bit IDを返す
-u_int64
+u_int64_t
 Ieee1394Node::globalUniqueId() const
 {
-    u_int64	hi = readQuadletFromConfigROM(0x0c),
+    u_int64_t	hi = readQuadletFromConfigROM(0x0c),
 		lo = readQuadletFromConfigROM(0x10);
     return (hi << 32) | lo;
 }

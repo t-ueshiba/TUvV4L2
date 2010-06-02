@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.2 2009-05-17 23:36:38 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.3 2010-06-02 00:12:12 ueshiba Exp $
  */
 #include "TU/Ieee1394CameraArray.h"
 
@@ -33,9 +33,9 @@ Ieee1394CameraArray::Ieee1394CameraArray(std::istream& in, bool i1394b,
   // 設定ファイルに記された全カメラを生成する．
     for (int i = 0; i < dim(); ++i)
     {
-	string	s;
+	string		s;
 	in >> s;			// global unique IDの読み込み
-	u_int64	uniqId = strtoull(s.c_str(), 0, 0);
+	u_int64_t	uniqId = strtoull(s.c_str(), 0, 0);
 	(*this)[i] = new Ieee1394Camera(Ieee1394Camera::Monocular,
 					i1394b, uniqId, delay);
 	in >> *(*this)[i];		// カメラパラメータの読み込みと設定

@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.26 2009-10-16 02:47:25 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.27 2010-06-02 00:12:11 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -132,7 +132,7 @@
 #if defined(HAVE_LIBTUTOOLS__)
 #  include "TU/Image++.h"
 #else
-  typedef unsigned long long	u_int64;
+  typedef unsigned long long	u_int64_t;
 #endif
 
 /*!
@@ -173,7 +173,7 @@ class Ieee1394Node
 	const int	_fd;		// file desc. for video1394 device.
 #  endif
 	const int	_portNumber;
-	u_int64		_nodes;		// a bitmap for the registered nodes
+	u_int64_t	_nodes;		// a bitmap for the registered nodes
     };
 #endif	// !__APPLE__
   protected:
@@ -195,7 +195,7 @@ class Ieee1394Node
    */
     nodeid_t	nodeId()			const	{return _nodeId;}
 
-    u_int64	globalUniqueId()		const	;
+    u_int64_t	globalUniqueId()		const	;
 
   //! このノードに割り当てられたisochronous受信用バッファが満たされた時刻を返す
   /*!
@@ -220,7 +220,7 @@ class Ieee1394Node
     u_int	delay()				const	{return _delay;}
     
   protected:
-    Ieee1394Node(u_int unit_spec_ID, u_int64 uniqId, u_int delay
+    Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 #if !defined(USE_RAWISO)
 		 , int sync_tag, int flag
 #endif
@@ -484,7 +484,7 @@ class Ieee1394Camera : public Ieee1394Node
 
   public:
     Ieee1394Camera(Type type=Monocular, bool i1394b=false,
-		   u_int64 uniqId=0, u_int delay=0)			;
+		   u_int64_t uniqId=0, u_int delay=0)			;
     ~Ieee1394Camera()							;
 
   // Basic function stuffs.
@@ -578,7 +578,8 @@ class Ieee1394Camera : public Ieee1394Node
     nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
     u_int	setFormat_7_PacketSize(Format format7)			;
     quadlet_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
-    bool	unlockAdvancedFeature(u_int64 featureId, u_int timeout)	;
+    bool	unlockAdvancedFeature(u_int64_t featureId,
+				      u_int timeout)			;
     void	checkAvailability(Format format, FrameRate rate) const	;
     quadlet_t	checkAvailability(Feature feature, u_int inq)	 const	;
     void	checkAvailability(BasicFunction func)		 const	;
