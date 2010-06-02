@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: My1394Camera.h,v 1.5 2008-10-15 00:22:29 ueshiba Exp $
+ *  $Id: My1394Camera.h,v 1.6 2010-06-02 01:07:14 ueshiba Exp $
  */
 #include <gtk/gtk.h>
 #include "TU/Ieee1394++.h"
@@ -47,7 +47,7 @@ struct MyRGB
 class My1394Camera : public Ieee1394Camera
 {
   public:
-    My1394Camera(bool i1394b, u_int64 uniqId)				;
+    My1394Camera(bool i1394b, u_int64_t uniqId)				;
     ~My1394Camera()							;
 
   //! 画像の表示領域となるキャンバスを返す．

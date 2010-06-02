@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: My1394Camera.cc,v 1.11 2009-05-13 01:15:01 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.12 2010-06-02 01:07:14 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -116,7 +116,7 @@ CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
 		複数のカメラが接続されている場合，これによって
 		同定を行う．
 */
-My1394Camera::My1394Camera(bool i1394b, u_int64 uniqId)
+My1394Camera::My1394Camera(bool i1394b, u_int64_t uniqId)
     :Ieee1394Camera(Ieee1394Camera::Monocular, i1394b, uniqId, 1),
      _canvas(gtk_drawing_area_new()),
      _buf(0),

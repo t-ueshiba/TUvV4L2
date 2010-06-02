@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.8 2009-05-13 01:15:01 ueshiba Exp $
+ *  $Id: main.cc,v 1.9 2010-06-02 01:07:14 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera - program for testing an IIDC 1394-based Digital Camera
@@ -112,7 +112,7 @@ main(int argc, char* argv[])
 	    return 1;
 	}
     extern int	optind;
-    u_int64	uniqId = 0;
+    u_int64_t	uniqId = 0;
     if (optind < argc)
 	uniqId = strtoull(argv[optind], 0, 0);
     
