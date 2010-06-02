@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.16 2009-07-31 07:04:46 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.17 2010-06-02 00:10:49 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -99,8 +99,8 @@ namespace TU
   typedef mmInt<u_short>	mmUInt16;
   typedef mmInt<int>		mmInt32;
   typedef mmInt<u_int>		mmUInt32;
-  typedef mmInt<int64>		mmInt64;
-  typedef mmInt<u_int64>	mmUInt64;
+  typedef mmInt<int64_t>	mmInt64;
+  typedef mmInt<u_int64_t>	mmUInt64;
 
   static const int		mmNBytes  = mmInt8::NElms,
 				mmNWords  = mmInt16::NElms,
@@ -168,9 +168,9 @@ namespace TU
   static inline mmUInt32
   mmLoad(const u_int* p)		{return _mm_load_si128((mmBase*)p);}
   static inline mmInt64
-  mmLoad(const int64* p)		{return _mm_load_si128((mmBase*)p);}
+  mmLoad(const int64_t* p)		{return _mm_load_si128((mmBase*)p);}
   static inline mmUInt64
-  mmLoad(const u_int64* p)		{return _mm_load_si128((mmBase*)p);}
+  mmLoad(const u_int64_t* p)		{return _mm_load_si128((mmBase*)p);}
 #  if defined(SSE3)
   static inline mmInt8
   mmLoadU(const s_char* p)		{return _mm_lddqu_si128((mmBase*)p);}
@@ -185,9 +185,9 @@ namespace TU
   static inline mmUInt32
   mmLoadU(const u_int* p)		{return _mm_lddqu_si128((mmBase*)p);}
   static inline mmInt64
-  mmLoadU(const int64* p)		{return _mm_lddqu_si128((mmBase*)p);}
+  mmLoadU(const int64_t* p)		{return _mm_lddqu_si128((mmBase*)p);}
   static inline mmUInt64
-  mmLoadU(const u_int64* p)		{return _mm_lddqu_si128((mmBase*)p);}
+  mmLoadU(const u_int64_t* p)		{return _mm_lddqu_si128((mmBase*)p);}
 #  else
   static inline mmInt8
   mmLoadU(const s_char* p)		{return _mm_loadu_si128((mmBase*)p);}
@@ -202,9 +202,9 @@ namespace TU
   static inline mmUInt32
   mmLoadU(const u_int* p)		{return _mm_loadu_si128((mmBase*)p);}
   static inline mmInt64
-  mmLoadU(const int64* p)		{return _mm_loadu_si128((mmBase*)p);}
+  mmLoadU(const int64_t* p)		{return _mm_loadu_si128((mmBase*)p);}
   static inline mmUInt64
-  mmLoadU(const u_int64* p)		{return _mm_loadu_si128((mmBase*)p);}
+  mmLoadU(const u_int64_t* p)		{return _mm_loadu_si128((mmBase*)p);}
 #  endif
   template <class T> static inline void
   mmStore(typename T::ElmType* p, T x)	{_mm_store_si128((mmBase*)p, x);}
@@ -224,9 +224,9 @@ namespace TU
   static inline mmUInt32
   mmLoad(const u_int* p)		{return *((mmBase*)p);}
   static inline mmInt64
-  mmLoad(const int64* p)		{return *((mmBase*)p);}
+  mmLoad(const int64_t* p)		{return *((mmBase*)p);}
   static inline mmUInt64
-  mmLoad(const u_int64* p)		{return *((mmBase*)p);}
+  mmLoad(const u_int64_t* p)		{return *((mmBase*)p);}
   static inline mmInt8
   mmLoadU(const s_char* p)		{return *((mmBase*)p);}
   static inline mmUInt8
@@ -240,9 +240,9 @@ namespace TU
   static inline mmUInt32
   mmLoadU(const u_int* p)		{return *((mmBase*)p);}
   static inline mmInt64
-  mmLoadU(const int64* p)		{return *((mmBase*)p);}
+  mmLoadU(const int64_t* p)		{return *((mmBase*)p);}
   static inline mmUInt64
-  mmLoadU(const u_int64* p)		{return *((mmBase*)p);}
+  mmLoadU(const u_int64_t* p)		{return *((mmBase*)p);}
   template <class T> static inline void
   mmStore(typename T::ElmType* p, T x)	{*((mmBase*)p) = x;}
   template <class T> static inline void
@@ -785,7 +785,7 @@ namespace TU
   template <class S, class T> static S	mmCvt(T x, T y);
 #if defined(SSE2)
 #  if defined(SSE4)
-// s_char -> short, int, int64
+// s_char -> short, int, int64_t
   template <> inline mmInt16
   mmCvt<mmInt16>(mmInt8 x)		{return _mm_cvtepi8_epi16(x);}
   template <> inline mmInt32
@@ -793,7 +793,7 @@ namespace TU
   template <> inline mmInt64
   mmCvt<mmInt64>(mmInt8 x)		{return _mm_cvtepi8_epi64(x);}
 
-// u_char -> short, u_short, int, u_int, int64, u_int64
+// u_char -> short, u_short, int, u_int, int64_t, u_int64_t
   template <> inline mmInt16
   mmCvt<mmInt16>(mmUInt8 x)		{return _mm_cvtepu8_epi16(x);}
   template <> inline mmUInt16
@@ -807,13 +807,13 @@ namespace TU
   template <> inline mmUInt64
   mmCvt<mmUInt64>(mmUInt8 x)		{return _mm_cvtepu8_epi64(x);}
 
-// short -> int, int64
+// short -> int, int64_t
   template <> inline mmInt32
   mmCvt<mmInt32>(mmInt16 x)		{return _mm_cvtepi16_epi32(x);}
   template <> inline mmInt64
   mmCvt<mmInt64>(mmInt16 x)		{return _mm_cvtepi16_epi64(x);}
 
-// u_short -> int, u_int, int64, u_int64
+// u_short -> int, u_int, int64_t, u_int64_t
   template <> inline mmInt32
   mmCvt<mmInt32>(mmUInt16 x)		{return _mm_cvtepu16_epi32(x);}
   template <> inline mmUInt32
@@ -823,11 +823,11 @@ namespace TU
   template <> inline mmUInt64
   mmCvt<mmUInt64>(mmUInt16 x)		{return _mm_cvtepu16_epi64(x);}
 
-// int -> int64
+// int -> int64_t
   template <> inline mmInt64
   mmCvt<mmInt64>(mmInt32 x)		{return _mm_cvtepi32_epi64(x);}
     
-// u_int -> int64, u_int64
+// u_int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvt<mmInt64>(mmUInt32 x)		{return _mm_cvtepu32_epi64(x);}
   template <> inline mmUInt64
@@ -849,7 +849,7 @@ namespace TU
   mmCvt<mmUInt32>(mmUInt16 x)		{return _mm_unpacklo_epi16(
 						  x, mmZero<mmUInt16>());}
 
-// u_int -> int64, u_int64
+// u_int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvt<mmInt64>(mmUInt32 x)		{return _mm_unpacklo_epi32(
 						  x, mmZero<mmUInt32>());}
@@ -873,7 +873,7 @@ namespace TU
   mmCvtH<mmUInt32>(mmUInt16 x)		{return _mm_unpackhi_epi16(
 						  x, mmZero<mmUInt16>());}
 
-// u_int -> int64, u_int64
+// u_int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvtH<mmInt64>(mmUInt32 x)		{return _mm_unpackhi_epi32(
 						  x, mmZero<mmUInt16>());}
@@ -927,7 +927,7 @@ namespace TU
   mmCvtH<mmUInt32>(mmUInt16 x)		{return _mm_unpackhi_pi16(
 						  x, mmZero<mmUInt16>());}
 
-// u_int -> int64, u_int64
+// u_int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvt<mmInt64>(mmUInt32 x)		{return _mm_unpacklo_pi32(
 						  x, mmZero<mmUInt32>());}
@@ -998,7 +998,7 @@ namespace TU
   template <> inline mmFlt
   mmCvt<mmFlt>(mmDbl x)			{return _mm_cvtpd_ps(x);}
 #elif defined(SSE)
-// s_char, u_char, short, u_short, int, int64 -> float
+// s_char, u_char, short, u_short, int, int64_t -> float
   template <> inline mmFlt
   mmCvt<mmFlt>(mmInt8 x)		{return _mm_cvtpi8_ps(x);}
   template <> inline mmFlt
@@ -1011,7 +1011,7 @@ namespace TU
   mmCvt<mmFlt>(mmInt32 x)		{return
 					   _mm_cvtpi32_ps(mmZero<mmFlt>(), x);}
 
-// float -> s_char, short, int, int64
+// float -> s_char, short, int, int64_t
   template <> inline mmInt8
   mmCvt<mmInt8>(mmFlt x)		{return _mm_cvtps_pi8(x);}
   template <> inline mmInt16
@@ -1081,7 +1081,7 @@ namespace TU
   template <> inline mmUInt32
   mmCvtMaskH<mmUInt32>(mmInt16 x)	{return _mm_unpackhi_epi16(x, x);}
 
-// int -> int64, u_int64
+// int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvtMask<mmInt64>(mmInt32 x)		{return _mm_unpacklo_epi32(x, x);}
   template <> inline mmUInt64
@@ -1091,7 +1091,7 @@ namespace TU
   template <> inline mmUInt64
   mmCvtMaskH<mmUInt64>(mmInt32 x)	{return _mm_unpackhi_epi32(x, x);}
 
-// u_int -> int64, u_int64
+// u_int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvtMask<mmInt64>(mmUInt32 x)	{return _mm_unpacklo_epi32(x, x);}
   template <> inline mmUInt64
@@ -1173,7 +1173,7 @@ namespace TU
   template <> inline mmUInt32
   mmCvtMaskH<mmUInt32>(mmUInt16 x)	{return _mm_unpackhi_pi16(x, x);}
 
-// int -> int64, u_int64
+// int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvtMask<mmInt64>(mmInt32 x)		{return _mm_unpacklo_pi32(x, x);}
   template <> inline mmUInt64
@@ -1183,7 +1183,7 @@ namespace TU
   template <> inline mmUInt64
   mmCvtMaskH<mmUInt64>(mmInt32 x)	{return _mm_unpackhi_pi32(x, x);}
 
-// u_int -> int64, u_int64
+// u_int -> int64_t, u_int64_t
   template <> inline mmInt64
   mmCvtMask<mmInt64>(mmUInt32 x)	{return _mm_unpacklo_pi32(x, x);}
   template <> inline mmUInt64
@@ -1248,7 +1248,7 @@ namespace TU
   template <> inline mmInt32
   mmCvtMask<mmInt32>(mmFlt x)		{return mmCast<mmInt32>(x);}
 
-// int64, float -> double
+// int64_t, float -> double
   template <> inline mmDbl
   mmCvtMask<mmDbl>(mmInt64 x)		{return mmCastToDbl(x);}
   template <> inline mmDbl
@@ -1272,7 +1272,7 @@ namespace TU
   mmCvtMask<mmDbl>(mmUInt8 x)		{return mmCvtMask<mmDbl>(
 						  mmCvtMask<mmInt16>(x));}
 
-// double -> int64
+// double -> int64_t
   template <> inline mmInt64
   mmCvtMask<mmInt64>(mmDbl x)		{return mmCast<mmInt64>(x);}
 #endif
