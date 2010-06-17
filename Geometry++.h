@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.38 2010-06-17 05:23:35 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.39 2010-06-17 23:21:53 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -1156,6 +1156,8 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
     Homography()			 :super()		{}
     template <class S, class B, class R>
     Homography(const Matrix<S, B, R>& H) :super(H)		{}
+    template <class Iterator>
+    Homography(Iterator begin, Iterator end, bool refine=false)	;
 
     using	super::operator ();
     using	super::inDim;
@@ -1169,6 +1171,20 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
     
     void	compose(const param_type& dt)			;
 };
+
+//! 与えられた点対列の非同次座標から2次元射影変換オブジェクトを生成する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \param refine			非線型最適化の有(true)／無(false)を指定
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template<class T> template <class Iterator> inline
+Homography<T>::Homography(Iterator begin, Iterator end, bool refine)
+    :super()
+{
+    fit(begin, end, refine);
+}
 
 template <class T> inline typename Homography<T>::point_type
 Homography<T>::operator ()(int u, int v) const
@@ -1248,6 +1264,8 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
     Affinity2()				:super()		{}
     template <class S, class B, class R>
     Affinity2(const Matrix<S, B, R>& A)				;
+    template <class Iterator>
+    Affinity2(Iterator begin, Iterator end)			;
 
     using	super::operator ();
     using	super::inDim;
@@ -1270,6 +1288,18 @@ Affinity2<T>::Affinity2(const Matrix<S, B, R>& A)
     (*this)[2][2] = 1.0;
 }
     
+//! 与えられた点対列の非同次座標から2次元アフィン変換オブジェクトを生成する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \throw std::invalid_argument	点対の数が#ndataMin()に満たない場合に送出
+*/
+template<class T> template <class Iterator> inline
+Affinity2<T>::Affinity2(Iterator begin, Iterator end)
+{
+    fit(begin, end);
+}
+
 template <class T> inline typename Affinity2<T>::point_type
 Affinity2<T>::operator ()(int u, int v) const
 {
