@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.37 2010-02-25 23:42:00 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.38 2010-06-17 05:23:35 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -717,9 +717,9 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
     {
 	value_type	d = M::det();
 	if (d > 0)
-	    *this /=  pow( d, 1.0/nrow());
+	    *this /=  pow( d, value_type(1.0/nrow()));
 	else
-	    *this /= -pow(-d, 1.0/nrow());
+	    *this /= -pow(-d, value_type(1.0/nrow()));
     }
 
   // îÒê¸å^ç≈ìKâªÇçsÇ§ÅD
