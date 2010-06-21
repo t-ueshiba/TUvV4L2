@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.39 2010-06-17 23:21:53 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.40 2010-06-21 02:38:52 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -580,7 +580,8 @@ class Projectivity : public M
     u_int	outDim()			const	{return nrow()-1;}
 
     u_int	ndataMin()			const	;
-    
+
+    Projectivity	inv()			const	;
     template <class S, class B>
     Vector<value_type>	operator ()(const Vector<S, B>& x)	const	;
     template <class S, class B>
@@ -731,6 +732,16 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
     }
 }
 
+//! この射影変換の逆変換を返す．
+/*!
+  \return	逆変換
+*/
+template <class M> inline Projectivity<M>
+Projectivity<M>::inv() const
+{
+    return Projectivity(M::inv());
+}
+    
 //! 射影変換を求めるために必要な点対の最小個数を返す．
 /*!
   現在設定されている入出力空間の次元をもとに計算される．
@@ -986,6 +997,7 @@ class Affinity : public Projectivity<M>
     void	set(const Matrix<S, B, R>& T)				;
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)			;
+    Affinity	inv()						const	;
     u_int	ndataMin()					const	;
     
   //! このアフィン変換の変形部分を表現する行列を返す．
@@ -1104,6 +1116,16 @@ Affinity<M>::b() const
     return bb;
 }
 
+//! このアフィン変換の逆変換を返す．
+/*!
+  \return	逆変換
+*/
+template <class M> inline Affinity<M>
+Affinity<M>::inv() const
+{
+    return Affinity(M::inv());
+}
+    
 //! アフィン変換を求めるために必要な点対の最小個数を返す．
 /*!
   現在設定されている入出力空間の次元をもとに計算される．
@@ -1164,7 +1186,8 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
     using	super::outDim;
     using	super::ndataMin;
     using	super::nparams;
-    
+
+    Homography	inv()					const	;
     point_type	operator ()(int u, int v)		const	;
     static jacobian_type
 		jacobian0(int u, int v)				;
@@ -1184,6 +1207,16 @@ Homography<T>::Homography(Iterator begin, Iterator end, bool refine)
     :super()
 {
     fit(begin, end, refine);
+}
+
+//! この2次元射影変換の逆変換を返す．
+/*!
+  \return	逆変換
+*/
+template <class T> Homography<T>
+Homography<T>::inv() const
+{
+    return Homography(matrix_type::inv());
 }
 
 template <class T> inline typename Homography<T>::point_type
@@ -1272,7 +1305,8 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
     using	super::outDim;
     using	super::ndataMin;
     using	super::nparams;
-    
+
+    Affinity2	inv()					const	;
     point_type	operator ()(int u, int v)		const	;
     static jacobian_type
 		jacobian0(int u, int v)				;
@@ -1300,6 +1334,16 @@ Affinity2<T>::Affinity2(Iterator begin, Iterator end)
     fit(begin, end);
 }
 
+//! この2次元アフィン変換の逆変換を返す．
+/*!
+  \return	逆変換
+*/
+template <class T> inline Affinity2<T>
+Affinity2<T>::inv() const
+{
+    return Affinity2(matrix_type::inv());
+}
+    
 template <class T> inline typename Affinity2<T>::point_type
 Affinity2<T>::operator ()(int u, int v) const
 {
