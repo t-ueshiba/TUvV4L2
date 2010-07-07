@@ -10,7 +10,7 @@
  * of any kind. I shall in no event be liable for anything that happens
  * to anyone/anything when using this software.
  *  
- *  $Id: fakeWindows.cc,v 1.3 2010-02-25 23:42:56 ueshiba Exp $
+ *  $Id: fakeWindows.cc,v 1.4 2010-07-07 06:23:21 ueshiba Exp $
  */
 #ifdef WIN32
 #include "fakeWindows.h"
@@ -1228,6 +1228,20 @@ extern "C" __PORT double
 drand48()
 {
     return _drand48_r(&__RAND48);
+}
+
+/************************************************************************
+*  usleep()								*
+************************************************************************/
+extern "C" __PORT int
+usleep(unsigned int usec)
+{
+    unsinged int	msec = usec / 1000;
+    if (msec == 0)
+	msec = 1;
+    Sleep(msec);
+
+    return 0;
 }
 
 #endif	/* WIN32	*/

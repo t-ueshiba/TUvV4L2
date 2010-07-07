@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: fakeWindows.h,v 1.3 2010-02-25 23:42:56 ueshiba Exp $
+ *  $Id: fakeWindows.h,v 1.4 2010-07-07 06:23:21 ueshiba Exp $
  */
 #ifndef __FAKEWINDOWS_H
 #define __FAKEWINDOWS_H
@@ -118,6 +118,11 @@ __PORT void	srand48(long seed)					;
 __PORT long	lrand48()						;
 __PORT double	erand48(unsigned short xseed[3])			;
 __PORT double	drand48()						;
+
+/************************************************************************
+*  usleep()								*
+************************************************************************/
+__PORT int	usleep(unsigned int)					;
 
 #ifdef  __cplusplus
 }
