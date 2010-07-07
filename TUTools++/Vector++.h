@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.37 2010-03-03 01:36:50 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.38 2010-07-07 03:02:40 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -132,6 +132,9 @@ class Vector : public Array<T, B>
     typedef typename Array<T, B>::const_pointer		const_pointer;
     typedef typename Array<T, B>::iterator		iterator;
     typedef typename Array<T, B>::const_iterator	const_iterator;
+    typedef typename Array<T, B>::reverse_iterator	reverse_iterator;
+    typedef typename Array<T, B>::const_reverse_iterator
+							const_reverse_iterator;
     
   public:
     Vector()								;
