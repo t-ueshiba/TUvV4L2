@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.14 2009-07-13 01:15:15 ueshiba Exp $
+#  $Id: Makefile,v 1.15 2010-07-07 07:33:33 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,7 +11,7 @@ INCDIRS		= -I. -I$(PREFIX)/include
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
-CFLAGS		= -g
+CFLAGS		= -g -O
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
   CFLAGS	= -O3
@@ -53,7 +53,7 @@ OBJS		= Thread.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.14 $	|		\
+REV		= $(shell echo $Revision: 1.15 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

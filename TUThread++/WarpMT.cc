@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  ‘nìÒFAÅr•v
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
+ *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
+ *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
+ *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
+ *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: WarpMT.cc,v 1.3 2008-09-10 05:11:51 ueshiba Exp $  
+ *  $Id: WarpMT.cc,v 1.4 2010-07-07 07:33:39 ueshiba Exp $  
  */
 #include "TU/Thread++.h"
 #include "TU/Warp.h"
@@ -35,7 +35,7 @@ namespace TU
 /************************************************************************
 *  class MultiThread2<Warp, Image<T> >					*
 ************************************************************************/
-template <> void
+template <> __PORT void
 MultiThread2<Warp, Image<u_char> >::
   operator ()(const Image<u_char>& in, Image<u_char>& out) const
 {
@@ -43,7 +43,7 @@ MultiThread2<Warp, Image<u_char> >::
     raiseThreads(in, out);
 }
     
-template <> void
+template <> __PORT void
 MultiThread2<Warp, Image<RGBA> >::
   operator ()(const Image<RGBA>& in, Image<RGBA>& out) const
 {
@@ -51,7 +51,7 @@ MultiThread2<Warp, Image<RGBA> >::
     raiseThreads(in, out);
 }
     
-template <> void
+template <> __PORT void
 MultiThread2<Warp, Image<ABGR> >::
   operator ()(const Image<ABGR>& in, Image<ABGR>& out) const
 {
