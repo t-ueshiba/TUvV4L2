@@ -25,11 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.30 2010-03-01 06:37:44 ueshiba Exp $
+ *  $Id: Array++.h,v 1.31 2010-07-07 03:02:39 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
 
+#include <iterator>
 #include <iostream>
 #include <stdexcept>
 #include "TU/types.h"
@@ -578,15 +579,19 @@ template <class T, class B=Buf<T> >
 class Array : public B
 {
   public:
-    typedef B			buffer_type;	  //!< バッファの型
-    typedef T			value_type;	  //!< 要素の型
-    typedef ptrdiff_t		difference_type;  //!< ポインタ間の差
-    typedef value_type&		reference;	  //!< 要素への参照
-    typedef const value_type&	const_reference;  //!< 定数要素への参照
-    typedef value_type*		pointer;	  //!< 要素へのポインタ
-    typedef const value_type*	const_pointer;	  //!< 定数要素へのポインタ
-    typedef pointer		iterator;	  //!< 反復子
-    typedef const_pointer	const_iterator;	  //!< 定数反復子
+    typedef B			buffer_type;		//!< バッファの型
+    typedef T			value_type;		//!< 要素の型
+    typedef ptrdiff_t		difference_type;	//!< ポインタ間の差
+    typedef value_type&		reference;		//!< 要素への参照
+    typedef const value_type&	const_reference;	//!< 定数要素への参照
+    typedef value_type*		pointer;		//!< 要素へのポインタ
+    typedef const value_type*	const_pointer;		//!< 定数要素へのポインタ
+    typedef pointer		iterator;		//!< 反復子
+    typedef const_pointer	const_iterator;		//!< 定数反復子
+    typedef std::reverse_iterator<iterator>
+				reverse_iterator;	//!< 逆反復子 	
+    typedef std::reverse_iterator<const_iterator>
+				const_reverse_iterator;	//!< 定数逆反復子
     
   public:
     Array()								;
@@ -600,10 +605,14 @@ class Array : public B
     Array&		operator =(const Array<T2, B2>& a)		;
     Array&		operator =(const_reference c)			;
 
-    iterator		begin()						;
-    const_iterator	begin()					const	;
-    iterator		end()						;
-    const_iterator	end()					const	;
+    iterator			begin()					;
+    const_iterator		begin()				const	;
+    iterator			end()					;
+    const_iterator		end()				const	;
+    reverse_iterator		rbegin()				;
+    const_reverse_iterator	rbegin()			const	;
+    reverse_iterator		rend()					;
+    const_reverse_iterator	rend()				const	;
 
     using		B::size;
 
@@ -751,6 +760,46 @@ template <class T, class B> inline typename Array<T, B>::const_iterator
 Array<T, B>::end() const
 {
     return begin() + size();
+}
+
+//! 配列の末尾要素を指す逆反復子を返す．
+/*!
+  \return	末尾要素を指す逆反復子
+*/
+template <class T, class B> inline typename Array<T, B>::reverse_iterator
+Array<T, B>::rbegin()
+{
+    return reverse_iterator(end());
+}
+
+//! 配列の末尾要素を指す逆反復子を返す．
+/*!
+  \return	末尾要素を指す逆反復子
+*/
+template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
+Array<T, B>::rbegin() const
+{
+    return const_reverse_iterator(end());
+}
+
+//! 配列の先頭を指す逆反復子を返す．
+/*!
+  \return	先頭を指す逆反復子
+*/
+template <class T, class B> inline typename Array<T, B>::reverse_iterator
+Array<T, B>::rend()
+{
+    return reverse_iterator(begin());
+}
+
+//! 配列の先頭を指す逆反復子を返す．
+/*!
+  \return	先頭を指す逆反復子
+*/
+template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
+Array<T, B>::rend() const
+{
+    return const_reverse_iterator(begin());
 }
 
 //! 配列の内部記憶領域へのポインタを返す．
