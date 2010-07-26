@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.55 2010-03-08 00:13:37 ueshiba Exp $
+ *  $Id: Image++.h,v 1.56 2010-07-26 08:18:37 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -522,7 +522,7 @@ class ImageLine : public Array<T>
     \param d	画素数
   */
     explicit ImageLine(u_int d=0)
-        :Array<T>(d), _lmost(0), _rmost(d)		{*this = 0;}
+        :Array<T>(d), _lmost(0), _rmost(d)			{*this = 0;}
 
   //! 外部の領域と画素数を指定してスキャンラインを生成する．
   /*!
@@ -530,8 +530,20 @@ class ImageLine : public Array<T>
     \param d	画素数
   */
     ImageLine(T* p, u_int d)
-        :Array<T>(p, d), _lmost(0), _rmost(d)		{}
+        :Array<T>(p, d), _lmost(0), _rmost(d)			{}
 
+  //! 指定されたスキャンラインの部分スキャンラインを生成する．
+  /*!
+    \param i	元のスキャンライン
+    \param u	部分スキャンラインの左端の座標
+    \param d	部分スキャンラインの画素数
+  */
+    ImageLine(const ImageLine<T>& l, u_int u, u_int d)
+	:Array<T>(l, u, d), _lmost(0), _rmost(d)		{}
+
+    const ImageLine	operator ()(u_int u, u_int d)	const	;
+    ImageLine		operator ()(u_int u, u_int d)		;
+    
   //! 全ての画素に同一の値を代入する．
   /*!
     \param c	代入する画素値
@@ -590,6 +602,30 @@ class ImageLine : public Array<T>
     int			_rmost;
 };
 
+//! このスキャンラインの部分スキャンラインを生成する．
+/*!
+  \param u	部分スキャンラインの左端の座標
+  \param d	部分スキャンラインの画素数
+  \return	生成された部分スキャンライン
+*/
+template <class T> inline const ImageLine<T>
+ImageLine<T>::operator ()(u_int u, u_int d) const
+{
+    return ImageLine<T>(*this, u, d);
+}
+
+//! このスキャンラインの部分スキャンラインを生成する．
+/*!
+  \param u	部分スキャンラインの左端の座標
+  \param d	部分スキャンラインの画素数
+  \return	生成された部分スキャンライン
+*/
+template <class T> inline ImageLine<T>
+ImageLine<T>::operator ()(u_int u, u_int d)
+{
+    return ImageLine<T>(*this, u, d);
+}
+    
 //! サブピクセル位置の画素値を線形補間で求める．
 /*!
   指定された位置の両側の画素値を線形補間して出力する．
@@ -720,9 +756,13 @@ class ImageLine<YUV422> : public Array<YUV422>
 {
   public:
     explicit ImageLine(u_int d=0)
-	:Array<YUV422>(d), _lmost(0), _rmost(d)		{*this = 0;}
+	:Array<YUV422>(d), _lmost(0), _rmost(d)			{*this = 0;}
     ImageLine(YUV422* p, u_int d)
-	:Array<YUV422>(p, d), _lmost(0), _rmost(d)	{}
+	:Array<YUV422>(p, d), _lmost(0), _rmost(d)		{}
+    ImageLine(const ImageLine<YUV422>& l, u_int u, u_int d)
+	:Array<YUV422>(l, u, d), _lmost(0), _rmost(d)		{}
+    const ImageLine	operator ()(u_int u, u_int d)	const	;
+    ImageLine		operator ()(u_int u, u_int d)		;
     ImageLine&		operator =(YUV422 c)
 			{
 			    Array<YUV422>::operator =(c);
@@ -751,6 +791,18 @@ class ImageLine<YUV422> : public Array<YUV422>
     int			_rmost;
 };
 
+inline const ImageLine<YUV422>
+ImageLine<YUV422>::operator ()(u_int u, u_int d) const
+{
+    return ImageLine<YUV422>(*this, u, d);
+}
+    
+inline ImageLine<YUV422>
+ImageLine<YUV422>::operator ()(u_int u, u_int d)
+{
+    return ImageLine<YUV422>(*this, u, d);
+}
+    
 inline const YUV422*
 ImageLine<YUV422>::fill(const YUV422* src)
 {
@@ -797,9 +849,13 @@ class ImageLine<YUV411> : public Array<YUV411>
 {
   public:
     explicit ImageLine(u_int d=0)
-	:Array<YUV411>(d), _lmost(0), _rmost(d)		{*this = 0;}
+	:Array<YUV411>(d), _lmost(0), _rmost(d)			{*this = 0;}
     ImageLine(YUV411* p, u_int d)
-	:Array<YUV411>(p, d), _lmost(0), _rmost(d)	{}
+	:Array<YUV411>(p, d), _lmost(0), _rmost(d)		{}
+    ImageLine(const ImageLine<YUV411>& l, u_int u, u_int d)
+	:Array<YUV411>(l, u, d), _lmost(0), _rmost(d)		{}
+    const ImageLine	operator ()(u_int u, u_int d)	const	;
+    ImageLine		operator ()(u_int u, u_int d)		;
     ImageLine&		operator =(YUV411 c)
 			{
 			    Array<YUV411>::operator =(c);
@@ -828,6 +884,18 @@ class ImageLine<YUV411> : public Array<YUV411>
     int			_rmost;
 };
 
+inline const ImageLine<YUV411>
+ImageLine<YUV411>::operator ()(u_int u, u_int d) const
+{
+    return ImageLine<YUV411>(*this, u, d);
+}
+    
+inline ImageLine<YUV411>
+ImageLine<YUV411>::operator ()(u_int u, u_int d)
+{
+    return ImageLine<YUV411>(*this, u, d);
+}
+    
 inline const YUV411*
 ImageLine<YUV411>::fill(const YUV411* src)
 {
