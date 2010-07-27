@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Thread++.h,v 1.9 2010-07-07 07:33:33 ueshiba Exp $  
+ *  $Id: Thread++.h,v 1.10 2010-07-27 05:30:13 ueshiba Exp $  
  */
 #ifndef __TUThreadPP_h
 #define __TUThreadPP_h
@@ -149,9 +149,9 @@ MultiThread<OP, DATA>::OperatorThread::doJob()
 }
 
 /************************************************************************
-*  class MultiThread2<OP, IN, OUT>					*
+*  class MultiThread2<OP, INPUT, OUTPUT>				*
 ************************************************************************/
-template <class OP, class IN, class OUT=IN>
+template <class OP, class INPUT, class OUTPUT=INPUT>
 class MultiThread2 : public OP
 {
   private:
@@ -161,15 +161,15 @@ class MultiThread2 : public OP
 	OperatorThread()
 	    :Thread(), _op(0), _in(0), _out(0), _is(0), _ie(0)		{}
 
-	void		raise(const OP& op, const IN& in,
-			      OUT& out, u_int is, u_int ie)	const	;
+	void		raise(const OP& op, const INPUT& in,
+			      OUTPUT& out, u_int is, u_int ie)	const	;
 
       private:
 	virtual void	doJob()						;
 
 	mutable const OP*	_op;
-	mutable const IN*	_in;
-	mutable OUT*		_out;
+	mutable const INPUT*	_in;
+	mutable OUTPUT*		_out;
 	mutable u_int		_is, _ie;
     };
 
@@ -177,22 +177,23 @@ class MultiThread2 : public OP
     MultiThread2(u_int nthreads=1)	:OP(), _threads(nthreads)	{}
 
     void	createThreads(u_int nthreads)				;
-    void	operator ()(const IN& in, OUT& out)		const	;
+    void	operator ()(const INPUT& in, OUTPUT& out)	const	;
     
   private:
-    void	raiseThreads(const IN& in, OUT& out)		const	;
+    void	raiseThreads(const INPUT& in, OUTPUT& out)	const	;
     
     Array<OperatorThread>	_threads;
 };
 
-template <class OP, class IN, class OUT> inline void
-MultiThread2<OP, IN, OUT>::createThreads(u_int nthreads)
+template <class OP, class INPUT, class OUTPUT> inline void
+MultiThread2<OP, INPUT, OUTPUT>::createThreads(u_int nthreads)
 {
     _threads.resize(nthreads);
 }
 
-template <class OP, class IN, class OUT> void
-MultiThread2<OP, IN, OUT>::raiseThreads(const IN& in, OUT& out) const
+template <class OP, class INPUT, class OUTPUT> void
+MultiThread2<OP, INPUT, OUTPUT>::raiseThreads(const INPUT& in,
+					      OUTPUT& out) const
 {
     const u_int	d = out.dim() / _threads.dim();
     for (u_int is = 0, n = 0; n < _threads.dim(); ++n)
@@ -205,10 +206,11 @@ MultiThread2<OP, IN, OUT>::raiseThreads(const IN& in, OUT& out) const
 	_threads[n].wait();
 }
 
-template <class OP, class IN, class OUT> inline void
-MultiThread2<OP, IN, OUT>::OperatorThread::raise(const OP& op,
-						const IN& in, OUT& out,
-						u_int is, u_int ie) const
+template <class OP, class INPUT, class OUTPUT> inline void
+MultiThread2<OP, INPUT, OUTPUT>::OperatorThread::raise(const OP& op,
+						       const INPUT& in,
+						       OUTPUT& out,
+						       u_int is, u_int ie) const
 {
     preRaise();
     _op  = &op;
@@ -219,8 +221,8 @@ MultiThread2<OP, IN, OUT>::OperatorThread::raise(const OP& op,
     postRaise();
 }
 
-template <class OP, class IN, class OUT> void
-MultiThread2<OP, IN, OUT>::OperatorThread::doJob()
+template <class OP, class INPUT, class OUTPUT> void
+MultiThread2<OP, INPUT, OUTPUT>::OperatorThread::doJob()
 {
     (*_op)(*_in, *_out, _is, _ie);
 }
