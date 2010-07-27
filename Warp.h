@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.11 2009-09-11 05:56:13 ueshiba Exp $
+ *  $Id: Warp.h,v 1.12 2010-07-27 06:17:31 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -40,7 +40,7 @@ namespace TU
 *  class Warp								*
 ************************************************************************/
 //! ‰æ‘œ‚ð•ÏŒ`‚·‚é‚½‚ß‚ÌƒNƒ‰ƒX
-class __PORT Warp
+class Warp
 {
   private:
     struct FracArray
@@ -80,10 +80,10 @@ class __PORT Warp
     int		lmost(int v)			const	;
     int		rmost(int v)			const	;
 
-    void	initialize(const Matrix33d& Htinv,
+    __PORT void	initialize(const Matrix33d& Htinv,
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
-    void	initialize(const Matrix33d& Htinv,
+    __PORT void	initialize(const Matrix33d& Htinv,
 			   const CameraBase::Intrinsic& intrinsic,
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
