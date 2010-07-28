@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Colormap.h,v 1.6 2009-10-06 12:11:45 ueshiba Exp $  
+ *  $Id: Colormap.h,v 1.7 2010-07-28 04:16:41 ueshiba Exp $  
  */
 #ifndef __TUvColormap_h
 #define __TUvColormap_h
@@ -35,6 +35,7 @@
 #include "TU/Image++.h"
 #include <stdexcept>
 #include <algorithm>
+#include <limits.h>
 
 namespace TU
 {
@@ -218,7 +219,9 @@ Colormap::getUnderlayPixel<short>(short val, u_int, u_int) const
 template <> inline u_long
 Colormap::getUnderlayPixel<float>(float val, u_int, u_int) const
 {
-    int		idx = int(_gain * val + 0.5);
+    float	fidx = _gain * val;
+    int		idx = (fidx > float(INT_MAX) ? INT_MAX :
+		       fidx < float(INT_MIN) ? INT_MIN + 1 : int(fidx + 0.5));
     bool	positive = true;
     if (idx < 0)
     {

@@ -25,11 +25,10 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Colormap.cc,v 1.7 2009-10-08 06:32:15 ueshiba Exp $  
+ *  $Id: Colormap.cc,v 1.8 2010-07-28 04:16:41 ueshiba Exp $  
  */
 #include "TU/v/Colormap.h"
 #include <sstream>
-#include <limits.h>
 
 namespace TU
 {
