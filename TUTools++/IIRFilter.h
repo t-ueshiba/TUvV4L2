@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.9 2009-09-11 05:56:13 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.10 2010-08-19 04:55:13 ueshiba Exp $
  */
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
@@ -622,10 +622,10 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
     _iirF.initialize(cF);
     _iirB.initialize(cB);
 #ifdef _DEBUG
-    float	limit0, limit1, limit2;
+  /*float	limit0, limit1, limit2;
     limits(limit0, limit1, limit2);
     std::cerr << "limit0 = " << limit0 << ", limit1 = " << limit1
-	      << ", limit2 = " << limit2 << std::endl;
+    << ", limit2 = " << limit2 << std::endl;*/
 #endif
     return *this;
 }
