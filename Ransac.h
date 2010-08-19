@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Ransac.h,v 1.6 2009-09-09 07:06:31 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.7 2010-08-19 04:55:14 ueshiba Exp $
  */
 #ifndef __TURansac_h
 #define __TURansac_h
@@ -81,15 +81,20 @@ typename PointSet::Container
 ransac(const PointSet& pointSet, Model& model, Conform conform,
        double hitRate=0.99)
 {
+    using namespace	std;
+    
     typedef typename PointSet::Container	Container;
+
+    if (distance(pointSet.begin(), pointSet.end()) < model.ndataMin())
+	throw runtime_error("ransac<PointSet, Model>: not enough points in the given point set!!");
     
   // 与えられたhitRate，PointSetに含まれるinlierの割合およびModelの生成に
   // 要する最少点数から，サンプリングの必要回数を求める．
     if (hitRate < 0.0 || hitRate >= 1.0)
-	throw std::invalid_argument("ransac<PointSet, Model>: given hit rate is not within [0, 1)!!");
+	throw invalid_argument("ransac<PointSet, Model>: given hit rate is not within [0, 1)!!");
     const double	inlierRate = pointSet.inlierRate();
     if (inlierRate < 0.0 || inlierRate >= 1.0)
-	throw std::invalid_argument("ransac<PointSet, Model>: inlier rate is not within [0, 1)!!");
+	throw invalid_argument("ransac<PointSet, Model>: inlier rate is not within [0, 1)!!");
     double	tmp = 1.0;
     for (u_int n = model.ndataMin(); n-- > 0; )
 	tmp *= inlierRate;
@@ -115,9 +120,13 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 
       // これまでのどのモデルよりもinlierの数が多ければその集合を記録する．
 	if (inliers->size() > inliersMax->size())
-	    std::swap(inliers, inliersMax);
+	    swap(inliers, inliersMax);
     }
   // 最大集合に含まれる点を真のinlierとし，それら全てからモデルを生成する．
+  // サンプルされた点（minimalSetに含まれる点）が持つ自由度がモデルの自由度
+  // よりも大きい場合は，これらに誤差0でモデルを当てはめられるとは限らないので，
+  // これらの点が必ずinlierに含まれる保証はない．よって，inlierが足りなくて
+  // 次の当てはめが失敗することもあり得る．
     model.fit(inliersMax->begin(), inliersMax->end());
 
     return *inliersMax;
