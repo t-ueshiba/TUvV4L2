@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IntegralImage.h,v 1.4 2009-09-09 07:06:31 ueshiba Exp $
+ *  $Id: IntegralImage.h,v 1.5 2010-09-26 23:30:11 ueshiba Exp $
  */
 #ifndef	__TUIntegralImage_h
 #define	__TUIntegralImage_h
@@ -49,6 +49,7 @@ class IntegralImage : public Image<T>
     template <class S, class B> IntegralImage&
 		initialize(const Image<S, B>& image)			;
     T		crop(int u, int v, int w, int h)		const	;
+    T		crop2(int umin, int umax, int vmin, int vmax)	const	;
     T		crossVal(int u, int v, int cropSize)		const	;
     template <class S, class B> const IntegralImage&
 		crossVal(Image<S, B>& out, int cropSize)	const	;
@@ -135,6 +136,36 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
 	b = (*this)[v][u1];
     
     return (*this)[v1][u1] + a - b - c;
+}
+
+//! 原画像に設定した長方形ウィンドウ内の画素値の総和を返す
+/*!
+  \param umin		ウィンドウの左上隅の横座標
+  \param umax		ウィンドウの右下隅の横座標
+  \param vmin		ウィンドウの左上隅の縦座標
+  \param vmax		ウィンドウの右下隅の縦座標
+  \return		ウィンドウ内の画素値の総和
+*/
+template <class T> T
+IntegralImage<T>::crop2(int umin, int umax, int vmin, int vmax) const
+{
+    --umin;
+    --vmin;
+    
+    T	a = 0, b = 0, c = 0;
+    if (umin >= 0)
+    {
+	c = (*this)[vmax][umin];
+	if (vmin >= 0)
+	{
+	    a = (*this)[vmin][umin];
+	    b = (*this)[vmin][umax];
+	}
+    }
+    else if (vmin >= 0)
+	b = (*this)[vmin][umax];
+    
+    return (*this)[vmax][umax] + a - b - c;
 }
 
 //! 原画像に正方形の二値十字テンプレートを適用した値を返す
