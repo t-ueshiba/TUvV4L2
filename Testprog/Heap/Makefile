@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.5 2009-07-09 04:19:26 ueshiba Exp $
+#  $Id: Makefile,v 1.6 2010-10-07 00:26:10 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,6 +10,7 @@ INCDIRS		= -I$(PREFIX)/include
 PROGRAM		= heaptest
 LIBS		= -lTUTools++
 
+CCC		= g++
 CPPFLAGS	=
 CFLAGS		= -g
 CCFLAGS		= -g
@@ -31,7 +32,7 @@ OBJS		= heaptest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.5 $	|		\
+REV		= $(shell echo $Revision: 1.6 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
