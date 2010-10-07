@@ -1,5 +1,5 @@
 /*
- *  $Id: heaptest.cc,v 1.3 2009-09-04 05:48:19 ueshiba Exp $
+ *  $Id: heaptest.cc,v 1.4 2010-10-07 00:26:10 ueshiba Exp $
  */
 #include "TU/Heap.h"
 
@@ -25,8 +25,9 @@ main()
     cerr << ">> ";
     cin >> a;
 
-    TU::sort(a, ordered());
+    TU::sort(a, std::less<int>());
+  //TU::sort(a, ordered());
     cout << a;
 
-	return 0;
+    return 0;
 }
