@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IntegralImage.h,v 1.5 2010-09-26 23:30:11 ueshiba Exp $
+ *  $Id: IntegralImage.h,v 1.6 2010-10-08 00:05:39 ueshiba Exp $
  */
 #ifndef	__TUIntegralImage_h
 #define	__TUIntegralImage_h
@@ -54,6 +54,9 @@ class IntegralImage : public Image<T>
     template <class S, class B> const IntegralImage&
 		crossVal(Image<S, B>& out, int cropSize)	const	;
 
+    u_int	originalWidth()					const	;
+    u_int	originalHeight()				const	;
+    
     using	Image<T>::width;
     using	Image<T>::height;
 };
@@ -82,23 +85,22 @@ IntegralImage<T>::IntegralImage(const Image<S, B>& image)
 template <class T> template <class S, class B> IntegralImage<T>&
 IntegralImage<T>::initialize(const Image<S, B>& image)
 {
-    resize(image.height(), image.width());
-    
-    for (u_int v = 0; v < height(); ++v)
-    {
-	const S*	src = image[v];
-	T*		dst = (*this)[v];
-	T		val = 0;
+  // 原画像よりも上と左に１ピクセルずつ大きいサイズを用意
+    resize(image.height() + 1, image.width() + 1);
 
-	if (v == 0)
-	    for (const T* const end = dst + width(); dst < end; )
-		*dst++ = (val += *src++);
-	else
-	{
-	    const T*	prv = (*this)[v-1];
-	    for (const T* const end = dst + width(); dst < end; )
-		*dst++ = (val += *src++) + *prv++;
-	}
+  // 上と左に余白を入れる
+    (*this)[0] = 0;				// 0行目はすべて0
+    for (u_int v = 1; v < height(); ++v)
+    {
+	T*		dst = (*this)[v];
+	*dst = 0;				// 0列目は0
+
+	const S*	src = image[v-1];
+	T		val = 0;		// この行のこの画素までの和
+	const T*	prv = (*this)[v-1];	// 1行上
+	const T* const	end = dst + width();
+	while (++dst < end)
+	    *dst = (val += *src++) + *(++prv);
     }
 
     return *this;
@@ -112,30 +114,20 @@ IntegralImage<T>::initialize(const Image<S, B>& image)
   \param h		ウィンドウの高さ
   \return		ウィンドウ内の画素値の総和
 */
-template <class T> T
+template <class T> inline T
 IntegralImage<T>::crop(int u, int v, int w, int h) const
 {
-    --u;
-    --v;
-    const int	u1 = std::min(u+w, int(width())-1),
-		v1 = std::min(v+h, int(height())-1);
+    const int	u1 = std::min(u + w, int(width())  - 1),
+		v1 = std::min(v + h, int(height()) - 1);
     if (u >= int(width()) || v >= int(height()) || u1 < 0 || v1 < 0)
 	return 0;
+    if (u < 0)
+	u = 0;
+    if (v < 0)
+	v = 0;
     
-    T	a = 0, b = 0, c = 0;
-    if (u >= 0)
-    {
-	c = (*this)[v1][u];
-	if (v >= 0)
-	{
-	    a = (*this)[v][u];
-	    b = (*this)[v][u1];
-	}
-    }
-    else if (v >= 0)
-	b = (*this)[v][u1];
-    
-    return (*this)[v1][u1] + a - b - c;
+    return (*this)[v1][u1] + (*this)[v ][u]
+	 - (*this)[v ][u1] - (*this)[v1][u];
 }
 
 //! 原画像に設定した長方形ウィンドウ内の画素値の総和を返す
@@ -146,26 +138,14 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
   \param vmax		ウィンドウの右下隅の縦座標
   \return		ウィンドウ内の画素値の総和
 */
-template <class T> T
+template <class T> inline T
 IntegralImage<T>::crop2(int umin, int umax, int vmin, int vmax) const
 {
-    --umin;
-    --vmin;
-    
-    T	a = 0, b = 0, c = 0;
-    if (umin >= 0)
-    {
-	c = (*this)[vmax][umin];
-	if (vmin >= 0)
-	{
-	    a = (*this)[vmin][umin];
-	    b = (*this)[vmin][umax];
-	}
-    }
-    else if (vmin >= 0)
-	b = (*this)[vmin][umax];
-    
-    return (*this)[vmax][umax] + a - b - c;
+    ++umax;
+    ++vmax;
+
+    return (*this)[vmax][umax] + (*this)[vmin][umin]
+	 - (*this)[vmin][umax] - (*this)[vmax][umin];
 }
 
 //! 原画像に正方形の二値十字テンプレートを適用した値を返す
@@ -194,12 +174,34 @@ IntegralImage<T>::crossVal(int u, int v, int cropSize) const
 template <class T> template <class S, class B> const IntegralImage<T>&
 IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
-    out.resize(height(), width());
+    out.resize(originalHeight(), originalWidth());
     for (u_int v = 0; v < out.height(); ++v)
 	for (u_int u = 0; u < out.width(); ++u)
 	    out[v][u] = crossVal(u, v, cropSize);
 
     return *this;
+}
+
+//! 原画像の幅を返す
+/*!
+  積分画像自体の幅と高さはそれぞれ原画像よりも1だけ大きいのでこの分を減じた値を返す．
+  \return	原画像の幅
+*/
+template <class T> u_int
+IntegralImage<T>::originalWidth() const
+{
+    return width() - 1;
+}
+
+//! 原画像の高さを返す
+/*!
+  積分画像自体の幅と高さはそれぞれ原画像よりも1だけ大きいのでこの分を減じた値を返す．
+  \return	原画像の高さ
+*/
+template <class T> u_int
+IntegralImage<T>::originalHeight() const
+{
+    return height() - 1;
 }
 
 /************************************************************************
@@ -221,6 +223,9 @@ class DiagonalIntegralImage : public Image<T>
     template <class S, class B> const DiagonalIntegralImage&
 		crossVal(Image<S, B>& out, int cropSize)	const	;
 
+    u_int	originalWidth()					const	;
+    u_int	originalHeight()				const	;
+    
     using	Image<T>::width;
     using	Image<T>::height;
 
@@ -339,6 +344,28 @@ DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 	    out[v][u] = crossVal(u, v, cropSize);
 
     return *this;
+}
+
+//! 原画像の幅を返す
+/*!
+  対角積分画像自体の幅と高さは原画像と同じである．
+  \return	原画像の幅
+*/
+template <class T> u_int
+DiagonalIntegralImage<T>::originalWidth() const
+{
+    return width();
+}
+
+//! 原画像の高さを返す
+/*!
+  対角積分画像自体の幅と高さは原画像と同じである．
+  \return	原画像の高さ
+*/
+template <class T> u_int
+DiagonalIntegralImage<T>::originalHeight() const
+{
+    return height();
 }
 
 template <class T> inline void
