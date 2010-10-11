@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.17 2010-06-02 00:10:49 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.18 2010-10-11 23:48:08 ueshiba Exp $
  */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -277,6 +277,39 @@ namespace TU
   mmStoreRMost(double* p, mmDbl x)	{_mm_store_sd(p, x);}
 #endif
 
+/************************************************************************
+*  シャッフル								*
+************************************************************************/
+#if defined(SSE)
+  template <u_int Yh, u_int Yl, u_int Xh, u_int Xl> static inline mmFlt
+  mmShuffle(mmFlt x, mmFlt y)
+  {
+      return _mm_shuffle_ps(x, y, _MM_SHUFFLE(Yh, Yl, Xh, Xl));
+  }
+#endif
+#if defined(SSE2)
+  template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static inline T
+  mmShuffleLo(T x)
+  {
+      return _mm_shufflelo_epi16(x, _MM_SHUFFLE(I3, I2, I1, I0));
+  }
+  template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static inline T
+  mmShuffleHi(T x)
+  {
+      return _mm_shufflehi_epi16(x, _MM_SHUFFLE(I3, I2, I1, I0));
+  }
+  template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static inline T
+  mmShuffle(T x)
+  {
+      return _mm_shufflehi_epi32(x, _MM_SHUFFLE(I3, I2, I1, I0));
+  }
+  template <u_int Iy, u_int Ix> static inline mmDbl
+  mmShuffle(mmDbl x, mmDbl y)
+  {
+      return _mm_shuffle_pd(x, y, _MM_SHUFFLE2(Iy, Ix));
+  }
+#endif
+    
 /************************************************************************
 *  全要素に0をセット							*
 ************************************************************************/
@@ -601,26 +634,32 @@ namespace TU
   mmDupL(mmUInt16 x)			{return _mm_unpacklo_pi16(x, x);}
   static inline mmUInt16
   mmDupH(mmUInt16 x)			{return _mm_unpackhi_pi16(x, x);}
-  static inline mmInt32
+  static inline mmInt32		// (x3, x2, x1, x0) -> (x1, x1, x0, x0)
   mmDupL(mmInt32 x)			{return _mm_unpacklo_pi32(x, x);}
-  static inline mmInt32
+  static inline mmInt32		// (x3, x2, x1, x0) -> (x3, x3, x2, x2)
   mmDupH(mmInt32 x)			{return _mm_unpackhi_pi32(x, x);}
-  static inline mmUInt32
+  static inline mmUInt32	// (x3, x2, x1, x0) -> (x1, x1, x0, x0)
   mmDupL(mmUInt32 x)			{return _mm_unpacklo_pi32(x, x);}
-  static inline mmUInt32
+  static inline mmUInt32	// (x3, x2, x1, x0) -> (x3, x3, x2, x2)
   mmDupH(mmUInt32 x)			{return _mm_unpackhi_pi32(x, x);}
 #endif
 #if defined(SSE)
-  static inline mmFlt
+  static inline mmFlt		// (x3, x2, x1, x0) -> (x1, x1, x0, x0)
   mmDupL(mmFlt x)			{return _mm_unpacklo_ps(x, x);}
-  static inline mmFlt
+  static inline mmFlt		// (x3, x2, x1, x0) -> (x3, x3, x2, x2)
   mmDupH(mmFlt x)			{return _mm_unpackhi_ps(x, x);}
 #endif
 #if defined(SSE2)
-  static inline mmDbl
+  static inline mmDbl		// (x1, x0) -> (x0, x0)
   mmDupL(mmDbl x)			{return _mm_unpacklo_pd(x, x);}
-  static inline mmDbl
+  static inline mmDbl		// (x1, x0) -> (x1, x1)
   mmDupH(mmDbl x)			{return _mm_unpackhi_pd(x, x);}
+#endif
+#if defined(SSE3)
+    static inline mmFlt		// (x3, x2, x1, x0) -> (x2, x2, x0, x0)
+  mmDupE(mmFlt x)			{return _mm_moveldup_ps(x);}
+  static inline mmFlt		// (x3, x2, x1, x0) -> (x3, x3, x1, x1)
+  mmDupO(mmFlt x)			{return _mm_movehdup_ps(x);}
 #endif
     
 /************************************************************************
