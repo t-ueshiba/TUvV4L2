@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2009-07-28 00:15:17 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2010-11-19 02:14:45 ueshiba Exp $
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@ main(int argc, char* argv[])
 	    break;
 	}
     extern int	optind;
-    u_int64	uniqId = 0;
+    u_int64_t	uniqId = 0;
     if (optind < argc)
 	uniqId = strtoull(argv[optind], 0, 0);
     

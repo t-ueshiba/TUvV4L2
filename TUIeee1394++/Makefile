@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.35 2010-06-02 00:12:12 ueshiba Exp $
+#  $Id: Makefile,v 1.36 2010-11-19 02:14:24 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,7 +14,7 @@ CPPFLAGS	= -DHAVE_LIBTUTOOLS__ #-DUSE_RAWISO #-DDEBUG
 CFLAGS		= -g -O
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
-  CFLAGS	= -O3
+  CFLAGS	= -O
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   ifeq ($(OSTYPE), darwin)
     CPPFLAGS   += -DSSE3
@@ -53,7 +53,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.35 $	|		\
+REV		= $(shell echo $Revision: 1.36 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

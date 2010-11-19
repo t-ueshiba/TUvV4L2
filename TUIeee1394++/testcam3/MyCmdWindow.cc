@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.1 2009-07-28 00:15:16 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.2 2010-11-19 02:14:45 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -46,10 +46,10 @@ displayTime(const timeval& time)
 	 << setw(3) << time.tv_usec / 1000;
 }
 
-inline u_int64
+inline u_int64_t
 timeval2u_int64(const timeval& time)
 {
-    return u_int64(time.tv_sec) * 1000000LL + u_int64(time.tv_usec);
+    return u_int64_t(time.tv_sec) * 1000000LL + u_int64_t(time.tv_usec);
 }
 
 namespace v
