@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.31 2010-07-07 03:02:39 ueshiba Exp $
+ *  $Id: Array++.h,v 1.32 2010-11-25 08:03:17 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -619,8 +619,6 @@ class Array : public B
 			operator pointer()				;
   			operator const_pointer()		const	;
     u_int		dim()					const	;
-    T&			at(int i)					;
-    const T&		at(int i)				const	;
     T&			operator [](int i)				;
     const T&		operator [](int i)			const	;
     Array&		operator *=(double c)				;
@@ -829,53 +827,35 @@ Array<T, B>::dim() const
     return size();
 }
     
-//! 配列の要素へアクセスする（indexのチェックあり）．
+//! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）．
 /*!
   \param i			要素を指定するindex
   \return			indexによって指定された要素
   \throw std::out_of_range	0 <= i < dim()でない場合に送出
-*/
-template <class T, class B> inline T&
-Array<T, B>::at(int i)
-{
-    if (i < 0 || u_int(i) >= dim())
-	throw std::out_of_range("TU::Array<T, B>::at: invalid index!");
-    return (*this)[i];
-}
-
-//! 配列の要素へアクセスする（indexのチェックあり）．
-/*!
-  \param i			要素を指定するindex
-  \return			indexによって指定された要素
-  \throw std::out_of_range	0 <= i < dim()でない場合に送出
-*/
-template <class T, class B> inline const T&
-Array<T, B>::at(int i) const
-{
-    if (i < 0 || u_int(i) >= dim())
-	throw std::out_of_range("TU::Array<T, B>::at: invalid index!");
-    return (*this)[i];
-}
-
-//! 配列の要素へアクセスする（indexのチェックなし）．
-/*!
-  \param i	要素を指定するindex
-  \return	indexによって指定された要素
 */
 template <class T, class B> inline T&
 Array<T, B>::operator [](int i)
 {
+#ifdef LIBTUTOOLS_DEBUG
+    if (i < 0 || u_int(i) >= dim())
+	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
+#endif
     return Array::operator pointer()[i];
 }
 
-//! 配列の要素へアクセスする（indexのチェックなし）．
+//! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
 /*!
-  \param i	要素を指定するindex
-  \return	indexによって指定された要素
+  \param i			要素を指定するindex
+  \return			indexによって指定された要素
+  \throw std::out_of_range	0 <= i < dim()でない場合に送出
 */
 template <class T, class B> inline const T&
 Array<T, B>::operator [](int i) const
 {
+#ifdef LIBTUTOOLS_DEBUG
+    if (i < 0 || u_int(i) >= dim())
+	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
+#endif
     return Array::operator const_pointer()[i];
 }
 
