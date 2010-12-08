@@ -25,14 +25,14 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SparseSymmetricMatrix.h,v 1.1 2010-12-02 07:26:36 ueshiba Exp $
+ *  $Id: SparseSymmetricMatrix++.h,v 1.1 2010-12-08 01:22:21 ueshiba Exp $
  */
 /*!
   \file		SparseMatrix.h
   \brief	ƒNƒ‰ƒX#TU::SparseSymmetricMatrix‚Ì’è‹`‚ÆŽÀ‘•
 */
-#ifndef __SPARSESYMMETRICMATRIX_H
-#define __SPARSESYMMETRICMATRIX_H
+#ifndef __TUSparseSymmetricMatrixPP_h
+#define __TUSparseSymmetricMatrixPP_h
 
 #include "TU/Vector++.h"
 #include <algorithm>
@@ -410,4 +410,4 @@ operator <<(std::ostream& out, const SparseSymmetricMatrix<T>& A)
 
 }
 
-#endif	// ! __SPARSESYMMETRICMATRIX_H
+#endif	// ! __TUSparseSymmetricMatrixPP_h
