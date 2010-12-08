@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.25 2010-06-02 00:10:49 ueshiba Exp $
+ *  $Id: types.h,v 1.26 2010-12-08 01:22:21 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -51,6 +51,7 @@
   - #TU::BiDiagonal
   - #TU::SVDecomposition
   - #TU::BlockMatrix
+  - #TU::SparseSymmetricMatrix
 
   <b>非線形最適化</b>
   - #TU::NullConstraint
