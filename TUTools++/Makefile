@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.93 2010-12-08 01:22:21 ueshiba Exp $
+#  $Id: Makefile,v 1.94 2010-12-15 03:55:56 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -42,6 +42,7 @@ EXTHDRS		= TU/BlockMatrix++.h \
 		TU/PM16C_04.h \
 		TU/Profiler.h \
 		TU/Random.h \
+		TU/SHOT602.h \
 		TU/TU/Geometry++.h \
 		TU/TU/IIRFilter.h \
 		TU/TU/Serial.h \
@@ -82,6 +83,7 @@ HDRS		= Allocator.h \
 		Profiler.h \
 		Random.h \
 		Ransac.h \
+		SHOT602.h \
 		Serial.h \
 		SparseSymmetricMatrix++.h \
 		TriggerGenerator.h \
@@ -111,6 +113,7 @@ SRCS		= BlockMatrix++.inst.cc \
 		Profiler.cc \
 		Random.cc \
 		Rotation.cc \
+		SHOT602.cc \
 		Serial.cc \
 		TriggerGenerator.cc \
 		Vector++.inst.cc \
@@ -137,6 +140,7 @@ OBJS		= BlockMatrix++.inst.o \
 		Profiler.o \
 		Random.o \
 		Rotation.o \
+		SHOT602.o \
 		Serial.o \
 		TriggerGenerator.o \
 		Vector++.inst.o \
@@ -147,7 +151,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.93 $	|		\
+REV		= $(shell echo $Revision: 1.94 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -212,6 +216,8 @@ Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
 	TU/windows/fakeWindows.h
 Random.o: TU/Random.h TU/TU/TU/TU/types.h TU/windows/fakeWindows.h
 Rotation.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
+SHOT602.o: TU/SHOT602.h TU/TU/Serial.h TU/TU/TU/fdstream.h \
+	TU/TU/TU/TU/types.h TU/Manip.h
 Serial.o: TU/TU/Serial.h TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/TU/Serial.h \
 	TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h TU/Manip.h
