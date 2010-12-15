@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.26 2010-12-08 01:22:21 ueshiba Exp $
+ *  $Id: types.h,v 1.27 2010-12-15 03:55:57 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -158,6 +158,7 @@
   - #TU::Serial
   - #TU::TriggerGenerator
   - #TU::PM16C_04
+  - #TU::SHOT602
 
   <b>乱数発生器</b>
   - #TU::Random

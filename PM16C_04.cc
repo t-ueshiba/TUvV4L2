@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.7 2010-01-14 11:13:09 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.8 2010-12-15 03:55:56 ueshiba Exp $
  */
 #include "TU/PM16C_04.h"
 #include "TU/Manip.h"
@@ -796,7 +796,7 @@ PM16C_04::pause(Axis axis, bool on)
 //! 指定した軸のHold off機能（停止時の非通電）を設定する．
 /*!
   \param axis	軸
-  \param set	機能を使用するならtrue, 使用しないならfalsse	
+  \param set	機能を使用するならtrue, 使用しないならfalse	
   \return	このコントローラ
 */
 PM16C_04&
