@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: SHOT602.h,v 1.1 2010-12-15 03:55:57 ueshiba Exp $
+ *  $Id: SHOT602.h,v 1.2 2010-12-17 00:53:28 ueshiba Exp $
  */
 #ifndef __TUSHOT602_h
 #define __TUSHOT602_h
@@ -83,7 +83,7 @@ class __PORT SHOT602 : public Serial
     SHOT602&	stop(Axis axis)						;
     SHOT602&	emergencyStop()						;
     SHOT602&	jog(Axis axis, bool dir, bool dir2=true)		;
-    SHOT602&	move(Axis axis, int val, int val2=0)			;
+    SHOT602&	move(Axis axis, int val, int val2=0, bool block=false)	;
 
   // ó„é•
     SHOT602&	setHold(Axis axis, bool on1, bool on2=true)		;
