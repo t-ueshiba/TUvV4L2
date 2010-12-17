@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2010-12-15 03:53:49 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2010-12-17 00:53:43 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -144,6 +144,9 @@ main(int argc, char* argv[])
 	      case 'r':
 		stage.move(axis, atoi(command + 1));
 		break;
+	      case 'R':
+		stage.move(axis, atoi(command + 1), 0, true);
+		break;
 
 	      case '?':
 	      default:
@@ -155,6 +158,7 @@ main(int argc, char* argv[])
 		     << "  s:       stop.\n"
 		     << "  j[+-]:   jog.\n"
 		     << "  r<inc>   move by <inc>.\n"
+		     << "  R<inc>   move by <inc> and wait completion.\n"
 		     << endl;
 		break;
 	    }
