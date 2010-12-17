@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.8 2010-03-31 02:24:20 ueshiba Exp $
+ *  $Id: Movie.h,v 1.9 2010-12-17 00:53:28 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -56,7 +56,7 @@ template <class T> class Movie
     };
     
   public:
-    Movie()								;
+    Movie(u_int nviews=0)						;
     ~Movie()								;
 
   // Inquire movie status.
@@ -93,16 +93,17 @@ template <class T> class Movie
 				      type=ImageBase::DEFAULT)	const	;
 
   private:
+    void		allocViews(u_int nviews)			;
     ImageBase::TypeInfo	restoreHeader(std::istream& in)			;
     std::istream&	restoreFrames(std::istream& in,
 				      ImageBase::TypeInfo typeInfo,
 				      u_int m)				;
-    static u_int	nelements(u_int npixels)			;
+    static u_int	npixels(u_int n)				;
     
   private:
     Array<View>		_views;
     u_int		_cView;			// current view #.
-    u_int		_nelements;		// # of elements per frame.
+    u_int		_npixels;		// # of pixels per frame.
     Array<Array<T> >	_frames;
     u_int		_cFrame;		// current frame #.
 #ifdef _DEBUG
@@ -112,8 +113,8 @@ template <class T> class Movie
 
 //! ムービーを生成する．
 template <class T> inline
-Movie<T>::Movie()
-    :_views(0), _cView(0), _nelements(0), _frames(0), _cFrame(0)
+Movie<T>::Movie(u_int nviews)
+    :_views(nviews), _cView(0), _npixels(0), _frames(0), _cFrame(0)
 {
 #ifdef _DEBUG
     _log.open("Movie.log");
@@ -327,11 +328,11 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
 #endif
   // 各viewのオフセットと1フレームあたりの画素数を設定．
     _views.resize(sizes.dim());
-    _nelements = 0;
+    _npixels = 0;
     for (u_int i = 0; i < nviews(); ++i)
     {
-	_views[i].offset = _nelements;
-	_nelements += nelements(sizes[i].first * sizes[i].second);
+	_views[i].offset = _npixels;
+	_npixels += npixels(sizes[i].first * sizes[i].second);
     }
 	     
   // 指定された枚数のフレームを設定．
@@ -340,7 +341,7 @@ Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
     {
 	try
 	{
-	    _frames[j].resize(_nelements);
+	    _frames[j].resize(_npixels);
 #ifdef _DEBUG
 	    _log << "    " << j << "-th frame allocated..." << endl;
 #endif
@@ -397,12 +398,12 @@ Movie<T>::restoreHeader(std::istream& in)
     _views.resize(nv);
 
     ImageBase::TypeInfo	typeInfo(ImageBase::DEFAULT);
-    _nelements = 0;
+    _npixels = 0;
     for (u_int i = 0; i < nviews(); ++i)
     {
 	typeInfo = _views[i].restoreHeader(in);
-	_views[i].offset = _nelements;
-	_nelements += nelements(_views[i].width() * _views[i].height());
+	_views[i].offset = _npixels;
+	_npixels += npixels(_views[i].width() * _views[i].height());
     }
 
     return typeInfo;
@@ -421,7 +422,7 @@ Movie<T>::restoreFrames(std::istream& in, ImageBase::TypeInfo typeInfo, u_int m)
 
     try
     {
-	Array<T>	frame(_nelements);
+	Array<T>	frame(_npixels);
 	for (u_int i = 0; i < nviews(); ++i)
 	{
 	    _views[i].resize((T*)frame + _views[i].offset,
@@ -493,15 +494,15 @@ Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
 }
 
 template <class T> inline u_int
-Movie<T>::nelements(u_int npixels)
+Movie<T>::npixels(u_int n)
 {
-    return npixels;
+    return n;
 }
 
 template <> inline u_int
-Movie<YUV411>::nelements(u_int npixels)
+Movie<YUV411>::npixels(u_int n)
 {
-    return npixels / 2;
+    return n / 2;
 }
 
 }

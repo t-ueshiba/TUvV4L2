@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: SHOT602.cc,v 1.1 2010-12-15 03:55:57 ueshiba Exp $
+ *  $Id: SHOT602.cc,v 1.2 2010-12-17 00:53:28 ueshiba Exp $
  */
 #include "TU/SHOT602.h"
 #include "TU/Manip.h"
@@ -354,10 +354,11 @@ SHOT602::jog(Axis axis, bool dir, bool dir2)
   \param axis	軸
   \param val	移動量
   \param val2	axisが#Axis_Bothの場合の第2軸の移動量
+  \param block	移動が完了するまでリターンしないならtrue, 直ちにリターンするならfalse
   \return	このコントローラ
 */
 SHOT602&
-SHOT602::move(Axis axis, int val, int val2)
+SHOT602::move(Axis axis, int val, int val2, bool block)
 {
     putCommand(axis, 'M', "", "", false);
 
@@ -375,7 +376,10 @@ SHOT602::move(Axis axis, int val, int val2)
     }
 
     *this << endl << 'G' << endl;
-
+    if (block)
+	while (isBusy())
+	    ;
+    
     return *this;
 }
 
