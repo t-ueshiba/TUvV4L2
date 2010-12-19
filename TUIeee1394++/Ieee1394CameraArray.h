@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.2 2009-05-17 23:36:38 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.3 2010-12-19 20:04:04 ueshiba Exp $
  */
 #ifndef __TUIeee1394CameraArray_h
 #define __TUIeee1394CameraArray_h
@@ -20,8 +20,12 @@ namespace TU
 class Ieee1394CameraArray : public Array<Ieee1394Camera*>
 {
   public:
+    Ieee1394CameraArray()						;
     Ieee1394CameraArray(std::istream& in, bool i1394b, int ncameras=-1)	;
     ~Ieee1394CameraArray()						;
+
+    void	initialize(std::istream& in,
+			   bool i1394b, int ncameras=-1)		;
 };
 
 }
