@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: SHOT602.cc,v 1.2 2010-12-17 00:53:28 ueshiba Exp $
+ *  $Id: SHOT602.cc,v 1.3 2010-12-21 00:03:53 ueshiba Exp $
  */
 #include "TU/SHOT602.h"
 #include "TU/Manip.h"
@@ -77,7 +77,7 @@ SHOT602::showId(std::ostream& out)
  *  ホームポジション検出
  */
 //! ホームポジションを検出する．
-/*
+/*!
   ホームポジションが検出されるまでホスト側に制御を返さない．
   \param axis	ホームポジション検出を実行する軸
   \param dir	正方向からであればtrue, 負方向からであればfalse

@@ -25,12 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.9 2010-12-17 00:53:28 ueshiba Exp $
+ *  $Id: Movie.h,v 1.10 2010-12-21 00:03:53 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
 
 #include <utility>
+#include <list>
 #include "TU/Image++.h"
 #include "TU/Manip.h"
 
@@ -41,46 +42,63 @@ namespace TU
 ************************************************************************/
 //! ムービーを表すクラス
 /*!
-  複数のviewを持つことができ，そのサイズは各view毎に別個に指定できる．
+  複数のビューを持つことができ，そのサイズは各ビュー毎に個別に指定できる．
   \param T	画素の型
 */
 template <class T> class Movie
 {
+  public:
+  //! 各ビューの幅と高さのペア
+    typedef std::pair<u_int, u_int>			Size;
+
   private:
-    class View : public Image<T>
+    typedef Array<T>					Frame;
+    typedef std::list<Frame>				Frames;
+    typedef typename Frames::iterator			iterator;
+
+  //! ビュー
+    struct View : public Image<T>
     {
-      public:
-	View()	:Image<T>(), offset(0)			{}
+	View()	:Image<T>(), offset(0)					{}
 	
-	u_int	offset;
+	u_int	offset;		//!< フレームの先頭からの画像データ領域のオフセット
     };
     
   public:
     Movie(u_int nviews=0)						;
-    ~Movie()								;
 
-  // Inquire movie status.
-			operator bool()				const	;
-    u_int		nframes()				const	;
-    u_int		nviews()				const	;
-    u_int		currentFrame()				const	;
-    u_int		currentView()				const	;
+  // Set sizes for each view.
+    Movie<T>&		setSizes(const Array<Size>& sizes)		;
+
+  // General information.
+    bool		isCircularMode()			const	;
+    Movie<T>&		setCircularMode(bool circular)			;
     u_int		width()					const	;
     u_int		height()				const	;
     const Image<T>&	image()					const	;
     Image<T>&		image()						;
 
-  // Change movie status.
-    Movie&		setFrame(u_int frame)				;
-    Movie&		setView(u_int view)				;
-    Movie&		rewind()					;
-    Movie&		operator ++()					;
-    Movie&		operator --()					;
+  // Handling views.
+    u_int		nviews()				const	;
+    u_int		currentView()				const	;
+    Movie<T>&		setView(u_int view)				;
 
-  // Allocate frames.
-    u_int		alloc(const Array<std::pair<u_int, u_int> >& sizes,
-			      u_int nf)					;
-
+  // Handling frames.
+			operator bool()				const	;
+    u_int		nframes()				const	;
+    u_int		currentFrame()				const	;
+    Movie<T>&		setFrame(u_int frame)				;
+    Movie<T>&		rewind()					;
+    Movie<T>&		operator ++()					;
+    Movie<T>&		operator --()					;
+    
+  // Edit movie.
+    Movie<T>&		insert(u_int n)					;
+    const Movie<T>&	copy(u_int n)				const	;
+    Movie<T>&		cut(u_int n)					;
+    u_int		paste()						;
+    Movie<T>&		rotate()					;
+    
   // Restore/Save movie.
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out,
@@ -93,7 +111,7 @@ template <class T> class Movie
 				      type=ImageBase::DEFAULT)	const	;
 
   private:
-    void		allocViews(u_int nviews)			;
+    Movie<T>&		setFrameToViews()				;
     ImageBase::TypeInfo	restoreHeader(std::istream& in)			;
     std::istream&	restoreFrames(std::istream& in,
 				      ImageBase::TypeInfo typeInfo,
@@ -101,43 +119,174 @@ template <class T> class Movie
     static u_int	npixels(u_int n)				;
     
   private:
-    Array<View>		_views;
-    u_int		_cView;			// current view #.
-    u_int		_npixels;		// # of pixels per frame.
-    Array<Array<T> >	_frames;
-    u_int		_cFrame;		// current frame #.
-#ifdef _DEBUG
-    std::ofstream	_log;
-#endif
+    bool		_circular;	//!< 循環モード/非循環モード
+    Array<View>		_views;		//!< ビューの並び
+    u_int		_cView;		//!< 現ビューの番号
+    Frames		_frames;	//!< フレームの並び
+    iterator		_dummy;		//!< フレームの末尾を表すダミーフレーム
+    iterator		_current;	//!< 現フレーム
+    u_int		_cFrame;	//!< 現フレームの番号
+    mutable Frames	_buf;		//!< 編集用バッファ
 };
 
-//! ムービーを生成する．
+//! ビュー数を指定してムービーを生成する．
+/*!
+  \param nviews		ビュー数
+*/
 template <class T> inline
 Movie<T>::Movie(u_int nviews)
-    :_views(nviews), _cView(0), _npixels(0), _frames(0), _cFrame(0)
+    :_circular(false), _views(nviews), _cView(0), _frames(1),
+     _dummy(_frames.begin()), _current(_dummy), _cFrame(0), _buf()
 {
-#ifdef _DEBUG
-    _log.open("Movie.log");
-#endif
 }
 
-//! ムービーを破壊する．
-template <class T> inline
-Movie<T>::~Movie()
-{
-#ifdef _DEBUG
-    _log.close();
-#endif
-}
-
-//! ムービーの状態が正常であるか調べる．
+//! 各ビューのサイズを指定する．
 /*!
-  \return	現在のフレームが「末尾の次」に達していればfalse, そうでなければtrue
+  指定後は，現在のビューとフレームを共に0に設定する．
+  \param sizes	各ビューの幅と高さのペアを収めた配列．配列のサイズがビュー数となる．
+  \return	このムービー
+*/
+template <class T> Movie<T>&
+Movie<T>::setSizes(const Array<Size>& sizes)
+{
+  // ビュー数と各ビューのオフセットを設定．
+    _views.resize(sizes.dim());
+    u_int	n = 0;
+    for (u_int i = 0; i < nviews(); ++i)
+    {
+	_views[i].offset = n;
+	n += npixels(sizes[i].first * sizes[i].second);
+    }
+    _cView   = 0;
+
+  // 大きさが1フレームあたりの画素数に等しいダミーフレームを確保して0に初期化．
+    _frames.clear();			// 全フレームを廃棄
+    _frames.push_front(Frame(n));	// ダミーフレームを確保
+    _dummy  = _frames.begin();
+    *_dummy = 0;			// 0に初期化
+
+  // 各ビューにダミーフレームを設定．
+    for (u_int i = 0; i < nviews(); ++i)
+	_views[i].resize((T*)*_dummy + _views[i].offset,
+			 sizes[i].second, sizes[i].first);
+
+  // 現フレームをダミーフレームに設定．
+    _current = _dummy;
+    _cFrame  = 0;
+    
+    return *this;
+}
+
+//! 循環モードであるか調べる．
+/*!
+  \return	循環モードであればtrue, そうでなければfalse
+*/
+template <class T> inline bool
+Movie<T>::isCircularMode() const
+{
+    return _circular;
+}
+    
+//! 循環/非循環モードを設定する．
+/*!
+  循環モードに設定する場合は，現フレームがムービーの末尾であれば先頭に設定する．
+  \param circular	循環モードであればtrue, そうでなければfalse
+  \return		このムービー
+*/
+template <class T> Movie<T>&
+Movie<T>::setCircularMode(bool circular)
+{
+    _circular = circular;
+
+    if (_circular && _current == _dummy)
+	return rewind();
+    else
+	return *this;
+}
+    
+//! 現在のビューとフレームに対応する画像の幅を返す．
+/*!
+  \return	画像の幅
+*/
+template <class T> inline u_int
+Movie<T>::width() const
+{
+    return (_cView < nviews() ? _views[_cView].width() : 0);
+}
+    
+//! 現在のビューとフレームに対応する画像の高さを返す．
+/*!
+  \return	画像の高さ
+*/
+template <class T> inline u_int
+Movie<T>::height() const
+{
+    return (_cView < nviews() ? _views[_cView].height() : 0);
+}
+
+//! 現在のビューとフレームに対応する画像を返す．
+/*!
+  \return	画像
+*/
+template <class T> inline const Image<T>&
+Movie<T>::image() const
+{
+    return _views[_cView];
+}
+
+//! 現在のビューとフレームに対応する画像を返す．
+/*!
+  \return	画像
+*/
+template <class T> inline Image<T>&
+Movie<T>::image()
+{
+    return _views[_cView];
+}
+
+//! ビュー数を返す．
+/*!
+  \return	view数
+*/
+template <class T> inline u_int
+Movie<T>::nviews() const
+{
+    return _views.dim();
+}
+
+//! 現在のビュー番号を返す．
+/*!
+  \return	view番号
+*/
+template <class T> inline u_int
+Movie<T>::currentView() const
+{
+    return _cView;
+}
+
+//! 現在のビューを指定する．
+/*!
+  view < #nviews() でない場合は何も変更しない．
+  \param view	view番号
+  \return	このムービー
+*/
+template <class T> inline Movie<T>&
+Movie<T>::setView(u_int view)
+{
+    if (view < nviews())
+	_cView = view;
+
+    return *this;
+}
+
+//! 現フレームの状態を調べる．
+/*!
+  \return	現フレームが最後のフレームの次に達していればfalse, そうでなければtrue
 */
 template <class T> inline
 Movie<T>::operator bool() const
 {
-    return (_cView < nviews() && _cFrame < nframes());
+    return (_current != _dummy);
 }
 
 //! フレーム数を返す．
@@ -147,17 +296,7 @@ Movie<T>::operator bool() const
 template <class T> inline u_int
 Movie<T>::nframes() const
 {
-    return _frames.dim();
-}
-
-//! view数を返す．
-/*!
-  \return	view数
-*/
-template <class T> inline u_int
-Movie<T>::nviews() const
-{
-    return _views.dim();
+    return _frames.size() - 1;		// ダミーフレームはカウントしない．
 }
 
 //! 現在のフレーム番号を返す．
@@ -170,113 +309,28 @@ Movie<T>::currentFrame() const
     return _cFrame;
 }
 
-//! 現在のview番号を返す．
+//! 現フレームを指定する．
 /*!
-  \return	view番号
-*/
-template <class T> inline u_int
-Movie<T>::currentView() const
-{
-    return _cView;
-}
-
-//! 現在のviewの画像の幅を返す．
-/*!
-  \return	画像の幅
-*/
-template <class T> inline u_int
-Movie<T>::width() const
-{
-    return (_cView < nviews() ? _views[_cView].width() : 0);
-}
-    
-//! 現在のviewの画像の高さを返す．
-/*!
-  \return	画像の高さ
-*/
-template <class T> inline u_int
-Movie<T>::height() const
-{
-    return (_cView < nviews() ? _views[_cView].height() : 0);
-}
-
-//! 現在のviewとframeに対応する画像を返す．
-/*!
-  \return	画像
-*/
-template <class T> inline const Image<T>&
-Movie<T>::image() const
-{
-    return _views[_cView];
-}
-
-//! 現在のviewとframeに対応する画像を返す．
-/*!
-  \return	画像
-*/
-template <class T> inline Image<T>&
-Movie<T>::image()
-{
-    return _views[_cView];
-}
-
-//! 現在のフレームを指定する．
-/*!
-  frame < #nframes() でない場合は現在フレームは #nframes() となり，
-  #operator ()でfalseが返される状態になる．
+  frame >= #nframes() の場合は現フレームは #nframes() が返す値に設定され，
+  #operator bool()でfalseが返される状態になる．
   \param frame	フレーム番号
-  \return	このムービーオブジェクト
-*/
-template <class T> Movie<T>&
-Movie<T>::setFrame(u_int frame)
-{
-#ifdef _DEBUG
-    using namespace	std;
-    _log << "  Begin: Movie<T>::setFrame(frame = " << frame << ")" << endl;
-#endif
-    if (frame != _cFrame)
-    {
-	if (frame < nframes())
-	{
-	    _cFrame = frame;
-
-	    for (u_int i = 0; i < nviews(); ++i)
-		_views[i].resize((T*)_frames[_cFrame] + _views[i].offset,
-				 _views[i].height(), _views[i].width());
-	}
-	else
-	    _cFrame = nframes();
-    }
-#ifdef _DEBUG
-    _log << "  End:   Movie<T>::setFrame()" << endl;
-#endif
-    return *this;
-}
-
-//! 現在のviewを指定する．
-/*!
-  view < #nviews() でない場合は何も変更しない．
-  \param view	view番号
-  \return	このムービーオブジェクト
+  \return	このムービー
 */
 template <class T> inline Movie<T>&
-Movie<T>::setView(u_int view)
+Movie<T>::setFrame(u_int frame)
 {
-#ifdef _DEBUG
     using namespace	std;
-    _log << "  Begin: Movie<T>::setView(view = " << view << ")" << endl;
-#endif
-    if (view < nviews())
-	_cView = view;
-#ifdef _DEBUG
-    _log << "  End:   Movie<T>::setView()" << endl;
-#endif
-    return *this;
-}
 
-//! 現在のフレームを最初(0)に戻す．
+    _cFrame  = min(frame, nframes());
+    _current = _frames.begin();
+    advance(_current, _cFrame);
+
+    return setFrameToViews();
+}
+    
+//! 現フレームをムービーの先頭に戻す．
 /*!
-  \return	このムービーオブジェクト
+  \return	このムービー
 */
 template <class T> inline Movie<T>&
 Movie<T>::rewind()
@@ -284,92 +338,189 @@ Movie<T>::rewind()
     return setFrame(0);
 }
 
-//! 現在のフレームを1つ先に進める．
+//! 現フレームを1つ先に進める．
 /*!
-  既に最後のフレームに達している場合はフレーム番号を#nframes()にする．
-  \return	このムービーオブジェクト
+  現フレームが既に最後のフレームの次に達していたら（#operator bool()で
+  falseが返される状態になっていたら），何もせずにリターンする．
+  現フレームが最後のフレームである場合，循環モードでないならばさらに
+  最後のフレームの次に進み，#operator bool()でfalseが返される状態になる．
+  循環モードならば先頭フレームに移動する．
+  \return	このムービー
 */
 template <class T> inline Movie<T>&
 Movie<T>::operator ++()
 {
-    if (_cFrame < nframes())
-	setFrame(_cFrame + 1);
-    return *this;
+    if (_current == _dummy)
+	return *this;
+
+    ++_current;
+    ++_cFrame;
+    if (_current == _dummy && _circular)	// 末尾に達し，
+    {						// かつ循環モードならば...
+	_current = _frames.begin();		// 先頭に移動する．
+	_cFrame  = 0;
+    }
+
+    return setFrameToViews();
 }
 
-//! 現在のフレームを1つ戻す．
+//! 現在のフレームを1つ前に戻す．
 /*!
-  既に最初のフレームに達している場合は何もしない．
-  \return	このムービーオブジェクト
+  現フレームがムービーの先頭の場合，循環モードでないならばムービーの
+  最後のフレームの次に移動し，#operator bool()でfalseが返される状態になる．
+  循環モードならば最後のフレームに移動する．
+  \return	このムービー
 */
 template <class T> inline Movie<T>&
 Movie<T>::operator --()
 {
-    if (_cFrame > 0)
-	setFrame(_cFrame - 1);
+    if (_current == _frames.begin())	// ムービーの先頭ならば...
+    {
+	_current = _dummy;		// 最後のフレームの次に移動する．
+	_cFrame  = nframes();
+	
+	if (_circular)			// さらに循環モードならば...
+	{
+	    --_current;			// 最後のフレームに戻る．
+	    --_cFrame;
+	}
+    }
+    else
+    {
+	--_current;
+	--_cFrame;
+    }
+
+    return setFrameToViews();
+}
+
+//! 現フレームの直前に指定した枚数のフレームを挿入する．
+/*!
+  現フレームは挿入した最初のフレームとなる．
+  \param n	挿入する枚数
+  \return	このムービー
+*/
+template <class T> Movie<T>&
+Movie<T>::insert(u_int n)
+{
+    iterator	cur = _current;		// 現フレームを記憶する．
+
+  // 挿入後の _current の再設定に備える．
+    if (_current == _frames.begin())	// 先頭に挿入するなら...
+	_current = _frames.end();	// 一時的に無効化．
+    else				// そうでなければ...
+	--_current;			// 挿入位置の1つ前．
+
+  // 現フレームの直前に挿入
+    _frames.insert(cur, n, Frame(_dummy->dim()));
+
+  // _current に挿入された領域の先頭を再設定する．
+  // 先頭からの _current のオフセット _cFrame は変化しない．
+    if (_current == _frames.end())	// 先頭に挿入した場合は...
+	_current = _frames.begin();	// ムービーの先頭．
+    else				// そうでなければ...
+	++_current;			// 挿入位置の1つ前の次．
+
+    return setFrameToViews();
+}
+    
+//! 現フレームから指定された枚数のフレームを編集用バッファにコピーする．
+/*!
+  編集用バッファの内容は上書きされる．現フレームは変化しない．
+  \param n	コピーされる枚数
+  \return	このムービー
+ */
+template <class T> const Movie<T>&
+Movie<T>::copy(u_int n) const
+{
+  // コピーされる領域の末尾を検出する．
+    iterator	tail = _current;
+    std::advance(tail, std::min(n, nframes() - _cFrame));
+
+  // [_current, tail) を _buf にコピーする．
+    _buf.assign(_current, tail);
+
     return *this;
 }
 
-//! 各viewのサイズとフレーム数を指定してムービーの記憶領域を確保する．
+//! 現フレームから指定されたフレーム数をカットして編集用バッファに移す．
 /*!
-  確保後は，現在のviewとフレームを共に0に設定する．
-  \param sizes	各viewの幅と高さのペアを収めた配列．配列のサイズがview数となる．
-  \param nf	フレーム数
-  \return	実際に確保されたフレーム数
-*/
-template <class T> u_int
-Movie<T>::alloc(const Array<std::pair<u_int, u_int> >& sizes, u_int nf)
+  編集用バッファの内容は上書きされる．現フレームはカットされた領域の直後となる．
+  \param n	カットされるフレーム数
+  \return	このムービー
+ */
+template <class T> Movie<T>&
+Movie<T>::cut(u_int n)
 {
-#ifdef _DEBUG
-    using namespace	std;
-    _log << "  Begin: Movie<T>::alloc(nframes = " << nf
-	 << ", nviews = " << sizes.dim()
-	 << ")" << endl;
-#endif
-  // 各viewのオフセットと1フレームあたりの画素数を設定．
-    _views.resize(sizes.dim());
-    _npixels = 0;
-    for (u_int i = 0; i < nviews(); ++i)
-    {
-	_views[i].offset = _npixels;
-	_npixels += npixels(sizes[i].first * sizes[i].second);
-    }
-	     
-  // 指定された枚数のフレームを設定．
-    _frames.resize(nf);
-    for (u_int j = 0; j < _frames.dim(); ++j)
-    {
-	try
-	{
-	    _frames[j].resize(_npixels);
-#ifdef _DEBUG
-	    _log << "    " << j << "-th frame allocated..." << endl;
-#endif
-	}
-	catch (...)
-	{
-	    _frames.resize(j);
-#ifdef _DEBUG
-	    _log << "    " << j << "-th frame cannot be allocated!" << endl;
-#endif
-	    break;
-	}
-    }
+  // カットされる領域の末尾を検出する．
+    n = std::min(n, nframes() - _cFrame);
+    iterator	tail = _current;
+    std::advance(tail, n);
+
+  // [_current, tail) を _buf に移す．
+    _buf.clear();
+    _buf.splice(_buf.begin(), _frames, _current, tail);
     
-  // 指定された個数のviewとその大きさを設定．
-    if (nframes() > 0)
-	for (u_int i = 0; i < nviews(); ++i)
-	    _views[i].resize((T*)_frames[0] + _views[i].offset,
-			     sizes[i].second, sizes[i].first);
-    
-    _cFrame = 0;
-    _cView  = 0;
-#ifdef _DEBUG
-    _log << "  End:   Movie<T>::alloc()" << endl;
-#endif
-    return nframes();			// Return #frames allocated correctly.
+  // _currentをカットされた領域の直後に再設定する．
+  // 先頭からの _current のオフセット _cFrame は変化しない．
+    _current = tail;
+
+    if (_current == _dummy && _circular)  // 末尾までカットかつ循環モードならば...
+	return rewind();		  // 先頭に戻る．
+    else				  // そうでなければ...
+	return setFrameToViews();	  // _current を各ビューに設定する．
 }
 
+//! 現フレームの直前に編集用バッファの内容を挿入する．
+/*!
+  編集用バッファは空になる．現フレームは挿入された領域の先頭になる．
+  \return	挿入されたフレーム数
+ */
+template <class T> u_int
+Movie<T>::paste()
+{
+    iterator	cur = _current;		// 現フレームを記憶する．
+    u_int	n = _buf.size();	// 編集用バッファ中のフレーム数
+    
+  // 挿入後の _current の再設定に備える．
+    if (_current == _frames.begin())	// 先頭に挿入するなら...
+	_current = _frames.end();	// 一時的に無効化．
+    else				// そうでなければ...
+	--_current;			// 挿入位置の1つ前．
+
+  // _bufの内容を現フレームの直前に挿入する．
+    _frames.splice(cur, _buf);
+
+  // _current に挿入された領域の先頭を再設定する．
+  // 先頭からの _current のオフセット _cFrame は変化しない．
+    if (_current == _frames.end())	// 先頭に挿入した場合は...
+	_current = _frames.begin();	// ムービーの先頭．
+    else				// そうでなければ...
+	++_current;			// 挿入位置の1つ前の次．
+
+    setFrameToViews();
+
+    return n;
+}
+
+//! 現フレームの前後を交換する．
+/*!
+  現フレームは交換前のムービーの先頭になる．
+  \return	このムービー
+ */
+template <class T> inline Movie<T>&
+Movie<T>::rotate()
+{
+    iterator	tmp = _frames.begin();	// 交換前の先頭を記憶
+
+    _frames.splice(_frames.begin(), _frames, _current, _dummy);
+
+    _current = tmp;			// 交換前の先頭を現フレームとする
+    _cFrame  = nframes() - _cFrame;	// 交換後の前半の長さ = 交換前の後半の長さ
+    
+    return setFrameToViews();
+}
+    
 //! 入力ストリームからムービーを読み込む．
 /*!
   入力ストリームの末尾に達するまでフレームを読み続ける．
@@ -382,80 +533,20 @@ Movie<T>::restore(std::istream& in)
     return restoreFrames(in, restoreHeader(in), 0);
 }
 
-template <class T> ImageBase::TypeInfo
-Movie<T>::restoreHeader(std::istream& in)
-{
-    using namespace	std;
-    
-    char	c;
-    if (!in.get(c))
-	return ImageBase::TypeInfo(ImageBase::DEFAULT);
-    if (c != 'M')
-	throw runtime_error("TU::Movie<T>::restoreHeader: not a movie file!!");
-    
-    u_int	nv;
-    in >> nv >> skipl;
-    _views.resize(nv);
-
-    ImageBase::TypeInfo	typeInfo(ImageBase::DEFAULT);
-    _npixels = 0;
-    for (u_int i = 0; i < nviews(); ++i)
-    {
-	typeInfo = _views[i].restoreHeader(in);
-	_views[i].offset = _npixels;
-	_npixels += npixels(_views[i].width() * _views[i].height());
-    }
-
-    return typeInfo;
-}
-
-template <class T> std::istream&
-Movie<T>::restoreFrames(std::istream& in, ImageBase::TypeInfo typeInfo, u_int m)
-{
-    char	c;
-    if (!in.get(c))
-    {
-	_frames.resize(m);
-	return in;
-    }
-    in.putback(c);
-
-    try
-    {
-	Array<T>	frame(_npixels);
-	for (u_int i = 0; i < nviews(); ++i)
-	{
-	    _views[i].resize((T*)frame + _views[i].offset,
-			      _views[i].height(), _views[i].width());
-	    _views[i].restoreData(in, typeInfo);
-	}
-	restoreFrames(in, typeInfo, m + 1);
-	_frames[m] = frame;
-    }
-    catch (...)
-    {
-	_frames.resize(m);
-    }
-        
-    return in;
-}
-
 //! ムービーを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，このムービーの
-		画素タイプで書き出される．   
+ \param type	画素タイプ．ただし，#ImageBase::DEFAULTを指定した場合は，
+		このムービーの画素タイプで書き出される．   
  \return	outで指定した出力ストリーム
 */
 template <class T> std::ostream&
 Movie<T>::save(std::ostream& out, ImageBase::Type type)
 {
-    u_int	cFrame = _cFrame;
-
     saveHeader(out, type);
     for (rewind(); *this; ++(*this))
 	saveFrame(out, type);
-    setFrame(_cFrame);
+    rewind();
     
     return out;
 }
@@ -463,8 +554,8 @@ Movie<T>::save(std::ostream& out, ImageBase::Type type)
 //! ムービーのヘッダを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，このムービーの
-		画素タイプで書き出される．   
+ \param type	画素タイプ．ただし，#ImageBase::DEFAULTを指定した場合は，
+		このムービーの画素タイプで書き出される．   
  \return	実際に書き出す場合の画素タイプ
 */
 template <class T> ImageBase::Type
@@ -481,8 +572,8 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
 //! 現在のフレームを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，このムービーの
-		画素タイプで書き出される．   
+ \param type	画素タイプ．ただし，#ImageBase::DEFAULTを指定した場合は，
+		このムービーの画素タイプで書き出される．   
  \return	outで指定した出力ストリーム
 */
 template <class T> std::ostream&
@@ -491,6 +582,72 @@ Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
     for (u_int i = 0; i < nviews(); ++i)
 	_views[i].saveData(out, type);
     return out;
+}
+
+/*
+ *  private member functions
+ */
+//! 現フレームを個々のビューにセットする．
+/*!
+  \return	このムービー
+*/ 
+template <class T> Movie<T>&
+Movie<T>::setFrameToViews()
+{
+    for (u_int i = 0; i < _views.dim(); ++i)
+	_views[i].resize((T*)*_current + _views[i].offset,
+			 _views[i].height(), _views[i].width());
+    return *this;
+}
+    
+template <class T> ImageBase::TypeInfo
+Movie<T>::restoreHeader(std::istream& in)
+{
+    using namespace	std;
+
+  // ファイルの先頭文字が'M'であることを確認する．
+    char	c;
+    if (!in.get(c))
+	return ImageBase::TypeInfo(ImageBase::DEFAULT);
+    if (c != 'M')
+	throw runtime_error("TU::Movie<T>::restoreHeader: not a movie file!!");
+
+  // ビュー数を読み込み，そのための領域を確保する．
+    u_int	nv;
+    in >> nv >> skipl;
+    _views.resize(nv);
+
+  // 各ビューのヘッダを読み込み，その画像サイズをセットする．
+    ImageBase::TypeInfo	typeInfo(ImageBase::DEFAULT);
+    Array<Size>		sizes(nviews());
+    for (u_int i = 0; i < nviews(); ++i)
+    {
+	typeInfo = _views[i].restoreHeader(in);
+	sizes[i] = make_pair(_views[i].width(), _views[i].height());
+    }
+    setSizes(sizes);
+    
+    return typeInfo;
+}
+
+template <class T> std::istream&
+Movie<T>::restoreFrames(std::istream& in, ImageBase::TypeInfo typeInfo, u_int m)
+{
+    for (;;)
+    {
+      // とりあえずダミーフレームに読み込む．
+	for (u_int i = 0; i < nviews(); ++i)
+	    if (!_views[i].restoreData(in, typeInfo))
+		goto finish;
+
+      // コピーしてダミーフレームの直前に挿入
+	_frames.insert(_dummy, *_dummy);
+    }
+
+  finish:
+    rewind();	// 先頭フレームを現フレームとする．
+    
+    return in;
 }
 
 template <class T> inline u_int
