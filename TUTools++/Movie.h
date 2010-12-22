@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.10 2010-12-21 00:03:53 ueshiba Exp $
+ *  $Id: Movie.h,v 1.11 2010-12-22 01:44:52 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -52,10 +52,6 @@ template <class T> class Movie
     typedef std::pair<u_int, u_int>			Size;
 
   private:
-    typedef Array<T>					Frame;
-    typedef std::list<Frame>				Frames;
-    typedef typename Frames::iterator			iterator;
-
   //! ビュー
     struct View : public Image<T>
     {
@@ -63,7 +59,20 @@ template <class T> class Movie
 	
 	u_int	offset;		//!< フレームの先頭からの画像データ領域のオフセット
     };
-    
+
+  //! フレーム
+    class Frame : public Array<T>
+    {
+      private:
+	typedef Array<T>				super;
+
+      public:
+	explicit Frame(u_int n=0)	:super(n)	{super::operator =(0);}
+    };
+
+    typedef std::list<Frame>				Frames;
+    typedef typename Frames::iterator			iterator;
+
   public:
     Movie(u_int nviews=0)						;
 
@@ -158,12 +167,11 @@ Movie<T>::setSizes(const Array<Size>& sizes)
 	n += npixels(sizes[i].first * sizes[i].second);
     }
     _cView   = 0;
-
-  // 大きさが1フレームあたりの画素数に等しいダミーフレームを確保して0に初期化．
+    
+  // 大きさが1フレームあたりの画素数に等しいダミーフレームを確保．
     _frames.clear();			// 全フレームを廃棄
     _frames.push_front(Frame(n));	// ダミーフレームを確保
     _dummy  = _frames.begin();
-    *_dummy = 0;			// 0に初期化
 
   // 各ビューにダミーフレームを設定．
     for (u_int i = 0; i < nviews(); ++i)
