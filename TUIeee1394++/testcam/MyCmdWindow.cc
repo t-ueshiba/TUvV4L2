@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.1 2009-07-28 00:00:48 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.2 2010-12-28 11:47:48 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -54,13 +54,12 @@ MyCmdWindow::MyCmdWindow(App&			parentApp,
 #ifdef UseTrigger
      _trigger(trigger),
 #endif
-     _movie(),
+     _movie(1),
+     _canvas(*this, _camera.width(), _camera.height(), _movie.image()),
      _menuCmd(*this, createMenuCmds(_camera)),
      _captureCmd(*this, createCaptureCmds()),
      _featureCmd(*this, createFeatureCmds(_camera)),
      _fileSelection(*this),
-     _image(),
-     _canvas(*this, _camera.width(), _camera.height(), _image),
      _timer(*this, 0)
 {
     _camera.turnOff(Ieee1394Camera::TRIGGER_MODE)
@@ -72,6 +71,9 @@ MyCmdWindow::MyCmdWindow(App&			parentApp,
     _canvas.place(0, 2, 2, 1);
 
     show();
+
+    initializeMovie();
+    _movie.setCircularMode(true);
 }
 
 void
@@ -89,15 +91,12 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 
 	  case M_Save:
 	  {
+	    stopContinuousShotIfRunning();
+	    setFrame();
+	    
 	    ofstream	out;
 	    if (_fileSelection.open(out))
-	    {
-#ifdef MONO_IMAGE
-		_image.save(out, ImageBase::U_CHAR);
-#else
-		_image.save(out, ImageBase::YUV_422);
-#endif
-	    }
+		_movie.image().save(out);
 	  }
 	    break;
 	
@@ -126,7 +125,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	  case c_MONO16_1600x1200:
 	    _camera.setFormatAndFrameRate(Ieee1394Camera::uintToFormat(id),
 					  Ieee1394Camera::uintToFrameRate(val));
-	    _canvas.resize(_camera.width(), _camera.height());
+	    initializeMovie();
 	    break;
 
 	  case c_Format_7_0:
@@ -149,7 +148,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 		   .setFormat_7_PixelFormat(format7, pixelFormat)
 		   .setFormatAndFrameRate(format7,
 					  Ieee1394Camera::uintToFrameRate(val));
-	    _canvas.resize(_camera.width(), _camera.height());
+	    initializeMovie();
 	  }
 	    break;
 	
@@ -245,8 +244,8 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	
 	  case c_OneShot:
 	    stopContinuousShotIfRunning();
-	    _camera.oneShot().snap() >> _image;
-	    _canvas.repaintUnderlay();
+	    _camera.oneShot();
+	    tick();
 	    break;
 
 	  case c_Trigger:
@@ -261,98 +260,36 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 		_camera.turnOff(Ieee1394Camera::TRIGGER_MODE);
 	    break;
 
+	  case c_NFrames:
+	    stopContinuousShotIfRunning();
+	    initializeMovie();
+	    break;
+	    
 	  case c_PlayMovie:
 	    stopContinuousShotIfRunning();
-	    _canvas.resize(_movie.width(), _movie.height());
-	    for (_movie.rewind(); _movie; ++_movie)
-	    {
-		static int		nframes = 0;
-		static struct timeval	start;
-		countTime(nframes, start);
-
-		_image = _movie.image();
-		_canvas.repaintUnderlay();
-		_captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
-	    }
-	    break;
-	
-	  case c_RecordMovie:
-	  {
-	    stopContinuousShotIfRunning();
-#ifdef MONO_IMAGE
-	    if (_camera.pixelFormat() != Ieee1394Camera::MONO_8)
-	    {
-		cerr << "Only MONO(8 bits) format is supported for movie!" << endl;
-		break;
-	    }
-#else
-	    if (_camera.pixelFormat() != Ieee1394Camera::YUV_422)
-	    {
-		cerr << "Only YUV(4:2:2) format is supported for movie!" << endl;
-		break;
-	    }
-#endif
-	    Array<pair<u_int, u_int> >	sizes(1);
-	    sizes[0] = make_pair<u_int, u_int>(_camera.width(),
-					       _camera.height());
-	    _movie.alloc(sizes, _menuCmd.getValue(c_NFrames));
-	    movieProp[0] = 0;
-	    movieProp[1] = _movie.nframes() - 1;
-	    movieProp[2] = 1;
-	    _captureCmd.setProp(c_StatusMovie, movieProp);
-	    _camera.continuousShot();
-	    for (_movie.rewind(); _movie; ++_movie)
-	    {
-		cerr << _movie.currentFrame() << "-th frame captured!" << endl;
-		static int		nframes = 0;
-		static struct timeval	start;
-		countTime(nframes, start);
-#ifdef UseTrigger
-		if (_captureCmd.getValue(c_Trigger))
-		    _trigger.oneShot();
-#endif
-		_camera.snap() >> _movie.image();
-		_captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
-	    }
-	    _camera.stopContinuousShot();
-	  }
+	    if (val)
+		_timer.start(10);
+	    else
+		_timer.stop();
 	    break;
 
 	  case c_ForwardMovie:
-	  {
-	    int	frame = _captureCmd.getValue(c_StatusMovie) + 1;
-	    if (frame < _movie.nframes())
-	    {
-		stopContinuousShotIfRunning();
-		_movie.setFrame(frame);
-		_canvas.resize(_movie.width(), _movie.height());
-		_image = _movie.image();
-		_canvas.repaintUnderlay();
-		_captureCmd.setValue(c_StatusMovie, frame);
-	    }
-	  }
+	    stopContinuousShotIfRunning();
+	    if (!++_movie)
+		--_movie;
+	    repaintCanvas();
 	    break;
 	
 	  case c_BackwardMovie:
-	  {
-	    int	frame = _captureCmd.getValue(c_StatusMovie) - 1;
-	    if (frame >= 0)
-	    {
-		stopContinuousShotIfRunning();
-		_movie.setFrame(frame);
-		_canvas.resize(_movie.width(), _movie.height());
-		_image = _movie.image();
-		_canvas.repaintUnderlay();
-		_captureCmd.setValue(c_StatusMovie, frame);
-	    }
-	  }
+	    stopContinuousShotIfRunning();
+	    if (!--_movie)
+		_movie.rewind();
+	    repaintCanvas();
 	    break;
 	
 	  case c_StatusMovie:
 	    stopContinuousShotIfRunning();
 	    _movie.setFrame(val);
-	    _canvas.resize(_movie.width(), _movie.height());
-	    _image = _movie.image();
 	    _canvas.repaintUnderlay();
 	    break;
 	}
@@ -369,11 +306,50 @@ MyCmdWindow::tick()
     static int			nframes = 0;
     static struct timeval	start;
     countTime(nframes, start);
+
+    if (!_captureCmd.getValue(c_PlayMovie))
+    {
 #ifdef UseTrigger
-    if (_captureCmd.getValue(c_Trigger))
-	_trigger.oneShot();
+	if (_captureCmd.getValue(c_Trigger))
+	    _trigger.oneShot();
 #endif
-    _camera.snap() >> _image;
+	_camera.snap() >> _movie.image();
+    }
+    
+    repaintCanvas();
+
+    ++_movie;
+}
+
+void
+MyCmdWindow::initializeMovie()
+{
+    Array<Movie<PixelType>::Size >	sizes(1);
+    sizes[0] = std::make_pair(_camera.width(), _camera.height());
+    _movie.setSizes(sizes);
+    _movie.insert(_menuCmd.getValue(c_NFrames));
+
+    _canvas.resize();
+
+    movieProp[0] = 0;
+    movieProp[1] = _movie.nframes() - 1;
+    movieProp[2] = 1;
+    _captureCmd.setProp(c_StatusMovie, movieProp);
+    
+    repaintCanvas();
+}
+    
+void
+MyCmdWindow::repaintCanvas()
+{
+    _canvas.repaintUnderlay();
+    _captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
+}
+
+void
+MyCmdWindow::setFrame()
+{
+    _movie.setFrame(_captureCmd.getValue(c_StatusMovie));
     _canvas.repaintUnderlay();
 }
 

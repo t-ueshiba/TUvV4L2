@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.h,v 1.1 2009-07-28 00:15:43 ueshiba Exp $
+ *  $Id: MyCmdWindow.h,v 1.2 2010-12-28 11:48:41 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
@@ -33,9 +33,11 @@ class MyCmdWindow : public CmdWindow
     virtual void	tick()					;
     
   private:
+    void		initializeMovie()			;
+    void		repaintCanvases()			;
+    void		setFrame()				;
     void		stopContinuousShotIfRunning()		;
-    void		showMovieFrames()			;
-    void		snapMulti()				;
+    void		syncronizedSnap()			;
     
     const Array<Ieee1394Camera*>&	_cameras;
     bool				_sync;
@@ -43,14 +45,11 @@ class MyCmdWindow : public CmdWindow
     TriggerGenerator&			_trigger;
 #endif
     Movie<PixelType>			_movie;
+    Array<MyCanvasPane*>		_canvases;
     CmdPane				_menuCmd;
     CmdPane				_captureCmd;
     CmdPane				_featureCmd;
     FileSelection			_fileSelection;
-    Array<Image<PixelType> >		_images;
-    MyCanvasPane			_canvasC;
-    MyCanvasPane			_canvasH;
-    MyCanvasPane			_canvasV;
     Timer				_timer;
 };
  

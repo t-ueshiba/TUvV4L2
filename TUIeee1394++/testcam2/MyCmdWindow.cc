@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.2 2010-11-19 02:14:36 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.3 2010-12-28 11:48:41 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -79,15 +79,12 @@ MyCmdWindow::MyCmdWindow(App&				parentApp,
 #ifdef UseTrigger
      _trigger(trigger),
 #endif
-     _movie(),
+     _movie(_cameras.dim()),
+     _canvases(0),
      _menuCmd(*this, createMenuCmds(*_cameras[0])),
      _captureCmd(*this, createCaptureCmds()),
      _featureCmd(*this, createFeatureCmds(*_cameras[0])),
      _fileSelection(*this),
-     _images(_cameras.dim() > 3 ? _cameras.dim() : 3),
-     _canvasC(*this, 320, 240, _images[0]),
-     _canvasH(*this, 320, 240, _images[1]),
-     _canvasV(*this, 320, 240, _images[2]),
      _timer(*this, 0)
 {
     for (int i = 0; i < cameras.dim(); ++i)
@@ -96,336 +93,258 @@ MyCmdWindow::MyCmdWindow(App&				parentApp,
 
     _menuCmd.place(0, 0, 2, 1);
     _captureCmd.place(0, 1, 1, 1);
-    _featureCmd.place(1, 1, 1, 2);
-    _canvasC.place(0, 3, 1, 1);
-    _canvasH.place(1, 3, 1, 1);
-    _canvasV.place(0, 2, 1, 1);
+    _featureCmd.place(1, 1, 1, 1);
 
     show();
+
+    initializeMovie();
+    _movie.setCircularMode(true);
 }
 
 void
 MyCmdWindow::callback(CmdId id, CmdVal val)
 {
     using namespace	std;
-    
-    switch (id)
+
+    try
     {
-      case M_Exit:
-	app().exit();
-	break;
-
-      case M_Save:
-      {
-	ofstream	out;
-	if (_fileSelection.open(out))
+	switch (id)
 	{
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_images[i].save(out);
-	}
-      }
-        break;
-      
-      case c_YUV444_160x120:
-      case c_YUV422_320x240:
-      case c_YUV411_640x480:
-      case c_YUV422_640x480:
-      case c_RGB24_640x480:
-      case c_MONO8_640x480:
-      case c_MONO16_640x480:
-      case c_YUV422_800x600:
-      case c_RGB24_800x600:
-      case c_MONO8_800x600:
-      case c_YUV422_1024x768:
-      case c_RGB24_1024x768:
-      case c_MONO8_1024x768:
-      case c_MONO16_800x600:
-      case c_MONO16_1024x768:
-      case c_YUV422_1280x960:
-      case c_RGB24_1280x960:
-      case c_MONO8_1280x960:
-      case c_YUV422_1600x1200:
-      case c_RGB24_1600x1200:
-      case c_MONO8_1600x1200:
-      case c_MONO16_1280x960:
-      case c_MONO16_1600x1200:
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]
-	      ->setFormatAndFrameRate(Ieee1394Camera::uintToFormat(id),
-				      Ieee1394Camera::uintToFrameRate(val));
-	_canvasC.resize(_cameras[0]->width(), _cameras[0]->height());
-	_canvasH.resize(_cameras[0]->width(), _cameras[0]->height());
-	_canvasV.resize(_cameras[0]->width(), _cameras[0]->height());
-	break;
+	  case M_Exit:
+	    app().exit();
+	    break;
 
-      case c_Format_7_0:
-      case c_Format_7_1:
-      case c_Format_7_2:
-      case c_Format_7_3:
-      case c_Format_7_4:
-      case c_Format_7_5:
-      case c_Format_7_6:
-      case c_Format_7_7:
-      {
-	Ieee1394Camera::Format	format7 = Ieee1394Camera::uintToFormat(id);
-	Ieee1394Camera::Format_7_Info
-			fmt7info = _cameras[0]->getFormat_7_Info(format7);
-	MyModalDialog	modalDialog(*this, fmt7info);
-	u_int		u0, v0, width, height;
-	Ieee1394Camera::PixelFormat
-		pixelFormat = modalDialog.getROI(u0, v0, width, height);
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->setFormat_7_ROI(format7, u0, v0, width, height)
-		.setFormat_7_PixelFormat(format7, pixelFormat)
-		.setFormatAndFrameRate(format7,
-				       Ieee1394Camera::uintToFrameRate(val));
-      }
-	_canvasC.resize(_cameras[0]->width(), _cameras[0]->height());
-	_canvasH.resize(_cameras[0]->width(), _cameras[0]->height());
-	_canvasV.resize(_cameras[0]->width(), _cameras[0]->height());
-	break;
-	
-      case c_Brightness:
-      case c_AutoExposure:
-      case c_Sharpness:
-      case c_Hue:
-      case c_Saturation:
-      case c_Gamma:
-      case c_Shutter:
-      case c_Gain:
-      case c_Iris:
-      case c_Focus:
-      case c_Zoom:
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->setValue(id2feature(id), val);
-        break;
-      
-      case c_WhiteBalance_UB:
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]
-	      ->setWhiteBalance(val, _featureCmd.getValue(c_WhiteBalance_VR));
-	break;
-      case c_WhiteBalance_VR:
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]
-	      ->setWhiteBalance(_featureCmd.getValue(c_WhiteBalance_UB), val);
-	break;
-      
-      case c_Brightness	     + OFFSET_ONOFF:
-      case c_AutoExposure    + OFFSET_ONOFF:
-      case c_Sharpness	     + OFFSET_ONOFF:
-      case c_WhiteBalance_UB + OFFSET_ONOFF:
-      case c_WhiteBalance_VR + OFFSET_ONOFF:
-      case c_Hue	     + OFFSET_ONOFF:
-      case c_Saturation	     + OFFSET_ONOFF:
-      case c_Gamma	     + OFFSET_ONOFF:
-      case c_Shutter	     + OFFSET_ONOFF:
-      case c_Gain	     + OFFSET_ONOFF:
-      case c_Iris	     + OFFSET_ONOFF:
-      case c_Focus	     + OFFSET_ONOFF:
-      case c_Zoom	     + OFFSET_ONOFF:
-      {
-	Ieee1394Camera::Feature feature = id2feature(id - OFFSET_ONOFF);
-	if (val)
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->turnOn(feature);
-	else
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->turnOff(feature);
-      }
-        break;
-      
-      case c_Brightness	     + OFFSET_AUTO:
-      case c_AutoExposure    + OFFSET_AUTO:
-      case c_Sharpness	     + OFFSET_AUTO:
-      case c_WhiteBalance_UB + OFFSET_AUTO:
-      case c_WhiteBalance_VR + OFFSET_AUTO:
-      case c_Hue	     + OFFSET_AUTO:
-      case c_Saturation	     + OFFSET_AUTO:
-      case c_Gamma	     + OFFSET_AUTO:
-      case c_Shutter	     + OFFSET_AUTO:
-      case c_Gain	     + OFFSET_AUTO:
-      case c_Iris	     + OFFSET_AUTO:
-      case c_Focus	     + OFFSET_AUTO:
-      case c_Zoom	     + OFFSET_AUTO:
-      {
-	Ieee1394Camera::Feature feature = id2feature(id - OFFSET_AUTO);
-	if (val)
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->setAutoMode(feature);
-	else
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	  case M_Save:
+	  {
+	    stopContinuousShotIfRunning();
+	    setFrame();
+	    
+	    ofstream	out;
+	    if (_fileSelection.open(out))
 	    {
-		_cameras[i]->setManualMode(feature);
-		if (feature == Ieee1394Camera::WHITE_BALANCE)
-		    _cameras[i]->
-		      setWhiteBalance(_featureCmd.getValue(c_WhiteBalance_UB),
-				      _featureCmd.getValue(c_WhiteBalance_VR));
-		else
-		    _cameras[i]->
-		      setValue(feature,
-			       _featureCmd.getValue(id - OFFSET_AUTO));
+		for (int i = 0; i < _movie.nviews(); ++i)
+		    _movie.setView(i).image().save(out);
 	    }
-      }
-        break;
-
-      case c_ContinuousShot:
-	if (val)
-	{
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->continuousShot();
-	    _timer.start(1);
-	}
-	else
-	{
-	    _timer.stop();
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->stopContinuousShot();
-	}
-	break;
-	
-      case c_OneShot:
-	stopContinuousShotIfRunning();
-#ifdef UseTrigger
-	if (_captureCmd.getValue(c_Trigger))
-	    _trigger.oneShot();
-#endif
-	snapMulti();
-	for (int i = 0; i < _cameras.dim(); ++i)
-	{
-	    MyCanvasPane&	canvas = (i == 0 ? _canvasC :
-					  i == 1 ? _canvasH : _canvasV);
-	    *_cameras[i] >> _images[i];
-	    canvas.repaintUnderlay();
-	}
-	break;
-
-      case c_Trigger:
-	if (val)
-	{
-#ifdef UseTrigger
-	    _trigger.selectChannel(0xffffffff);
-#endif
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->turnOn(Ieee1394Camera::TRIGGER_MODE);
-	}
-	else
-	    for (int i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->turnOff(Ieee1394Camera::TRIGGER_MODE);
-	break;
-	
-      case c_PlayMovie:
-	stopContinuousShotIfRunning();
-	_canvasC.resize(_movie.width(), _movie.height());
-	_canvasH.resize(_movie.width(), _movie.height());
-	_canvasV.resize(_movie.width(), _movie.height());
-	for (_movie.rewind(); _movie; ++_movie)
-	{
-	    static int			nframes = 0;
-	    static struct timeval	start;
-	    countTime(nframes, start);
-
-	    showMovieFrames();
-	    _captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
-	}
-	break;
-	
-      case c_RecordMovie:
-      {
-	stopContinuousShotIfRunning();
-#ifdef MONO_IMAGE
-	if (_cameras[0]->pixelFormat() != Ieee1394Camera::MONO_8)
-	{
-	    cerr << "Only MONO(8 bits) format is supported for movie!" << endl;
+	  }
 	    break;
-	}
-#else
-	if (_cameras[0]->pixelFormat() != Ieee1394Camera::YUV_422)
-	{
-	    cerr << "Only YUV(4:2:2) format is supported for movie!" << endl;
+      
+	  case c_YUV444_160x120:
+	  case c_YUV422_320x240:
+	  case c_YUV411_640x480:
+	  case c_YUV422_640x480:
+	  case c_RGB24_640x480:
+	  case c_MONO8_640x480:
+	  case c_MONO16_640x480:
+	  case c_YUV422_800x600:
+	  case c_RGB24_800x600:
+	  case c_MONO8_800x600:
+	  case c_YUV422_1024x768:
+	  case c_RGB24_1024x768:
+	  case c_MONO8_1024x768:
+	  case c_MONO16_800x600:
+	  case c_MONO16_1024x768:
+	  case c_YUV422_1280x960:
+	  case c_RGB24_1280x960:
+	  case c_MONO8_1280x960:
+	  case c_YUV422_1600x1200:
+	  case c_RGB24_1600x1200:
+	  case c_MONO8_1600x1200:
+	  case c_MONO16_1280x960:
+	  case c_MONO16_1600x1200:
+	    for (int i = 0; i < _cameras.dim(); ++i)
+		_cameras[i]
+		  ->setFormatAndFrameRate(Ieee1394Camera::uintToFormat(id),
+					  Ieee1394Camera::uintToFrameRate(val));
+	    initializeMovie();
 	    break;
-	}
-#endif
-	Array<pair<u_int, u_int> >	sizes(_cameras.dim());
-	for (int i = 0; i < sizes.dim(); ++i)
-	    sizes[i] = make_pair<u_int, u_int>(_cameras[i]->width(),
-					       _cameras[i]->height());
-	_movie.alloc(sizes, _menuCmd.getValue(c_NFrames));
-	movieProp[0] = 0;
-	movieProp[1] = _movie.nframes() - 1;
-	movieProp[2] = 1;
-	_captureCmd.setProp(c_StatusMovie, movieProp);
-      	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->continuousShot();
-	for (_movie.rewind(); _movie; ++_movie)
-	{
-	    static int			nframes = 0;
-	    static struct timeval	start;
-	    countTime(nframes, start);
+
+	  case c_Format_7_0:
+	  case c_Format_7_1:
+	  case c_Format_7_2:
+	  case c_Format_7_3:
+	  case c_Format_7_4:
+	  case c_Format_7_5:
+	  case c_Format_7_6:
+	  case c_Format_7_7:
+	  {
+	    Ieee1394Camera::Format
+			format7 = Ieee1394Camera::uintToFormat(id);
+	    Ieee1394Camera::Format_7_Info
+			fmt7info = _cameras[0]->getFormat_7_Info(format7);
+	    MyModalDialog	modalDialog(*this, fmt7info);
+	    u_int		u0, v0, width, height;
+	    Ieee1394Camera::PixelFormat
+		pixelFormat = modalDialog.getROI(u0, v0, width, height);
+	    for (int i = 0; i < _cameras.dim(); ++i)
+		_cameras[i]->setFormat_7_ROI(format7, u0, v0, width, height)
+		  .setFormat_7_PixelFormat(format7, pixelFormat)
+		  .setFormatAndFrameRate(format7,
+					 Ieee1394Camera::uintToFrameRate(val));
+	    initializeMovie();
+	  }
+	    break;
+	
+	  case c_Brightness:
+	  case c_AutoExposure:
+	  case c_Sharpness:
+	  case c_Hue:
+	  case c_Saturation:
+	  case c_Gamma:
+	  case c_Shutter:
+	  case c_Gain:
+	  case c_Iris:
+	  case c_Focus:
+	  case c_Zoom:
+	    for (int i = 0; i < _cameras.dim(); ++i)
+		_cameras[i]->setValue(id2feature(id), val);
+	    break;
+      
+	  case c_WhiteBalance_UB:
+	    for (int i = 0; i < _cameras.dim(); ++i)
+		_cameras[i]->setWhiteBalance(
+		    val, _featureCmd.getValue(c_WhiteBalance_VR));
+	    break;
+	  case c_WhiteBalance_VR:
+	    for (int i = 0; i < _cameras.dim(); ++i)
+		_cameras[i]->setWhiteBalance(
+		    _featureCmd.getValue(c_WhiteBalance_UB), val);
+	    break;
+      
+	  case c_Brightness	 + OFFSET_ONOFF:
+	  case c_AutoExposure    + OFFSET_ONOFF:
+	  case c_Sharpness	 + OFFSET_ONOFF:
+	  case c_WhiteBalance_UB + OFFSET_ONOFF:
+	  case c_WhiteBalance_VR + OFFSET_ONOFF:
+	  case c_Hue		 + OFFSET_ONOFF:
+	  case c_Saturation	 + OFFSET_ONOFF:
+	  case c_Gamma		 + OFFSET_ONOFF:
+	  case c_Shutter	 + OFFSET_ONOFF:
+	  case c_Gain		 + OFFSET_ONOFF:
+	  case c_Iris		 + OFFSET_ONOFF:
+	  case c_Focus		 + OFFSET_ONOFF:
+	  case c_Zoom		 + OFFSET_ONOFF:
+	  {
+	    Ieee1394Camera::Feature feature = id2feature(id - OFFSET_ONOFF);
+	    if (val)
+		for (int i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->turnOn(feature);
+	    else
+		for (int i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->turnOff(feature);
+	  }
+	    break;
+      
+	  case c_Brightness	 + OFFSET_AUTO:
+	  case c_AutoExposure    + OFFSET_AUTO:
+	  case c_Sharpness	 + OFFSET_AUTO:
+	  case c_WhiteBalance_UB + OFFSET_AUTO:
+	  case c_WhiteBalance_VR + OFFSET_AUTO:
+	  case c_Hue		 + OFFSET_AUTO:
+	  case c_Saturation	 + OFFSET_AUTO:
+	  case c_Gamma		 + OFFSET_AUTO:
+	  case c_Shutter	 + OFFSET_AUTO:
+	  case c_Gain		 + OFFSET_AUTO:
+	  case c_Iris		 + OFFSET_AUTO:
+	  case c_Focus		 + OFFSET_AUTO:
+	  case c_Zoom		 + OFFSET_AUTO:
+	  {
+	    Ieee1394Camera::Feature feature = id2feature(id - OFFSET_AUTO);
+	    if (val)
+		for (int i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->setAutoMode(feature);
+	    else
+		for (int i = 0; i < _cameras.dim(); ++i)
+		{
+		    _cameras[i]->setManualMode(feature);
+		    if (feature == Ieee1394Camera::WHITE_BALANCE)
+			_cameras[i]->setWhiteBalance(
+			    _featureCmd.getValue(c_WhiteBalance_UB),
+			    _featureCmd.getValue(c_WhiteBalance_VR));
+		    else
+			_cameras[i]->setValue(
+			    feature, _featureCmd.getValue(id - OFFSET_AUTO));
+		}
+	  }
+	    break;
+
+	  case c_ContinuousShot:
+	    if (val)
+	    {
+		for (int i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->continuousShot();
+		_timer.start(1);
+	    }
+	    else
+	    {
+		_timer.stop();
+		for (int i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->stopContinuousShot();
+	    }
+	    break;
+	
+	  case c_OneShot:
+	    stopContinuousShotIfRunning();
+	    for (int i = 0; i < _cameras.dim(); ++i)
+		_cameras[i]->oneShot();
 #ifdef UseTrigger
 	    if (_captureCmd.getValue(c_Trigger))
 		_trigger.oneShot();
 #endif
-	    snapMulti();
-	    for (int i = 0; i < _cameras.dim(); ++i)
-	    {
-		timeval	filltime = _cameras[i]->filltime();
-		cerr << ' ';
-		displayTime(filltime);
-	    }
-	    cerr << endl;
-	    for (int i = 0; i < _cameras.dim(); ++i)
-	    {
-		_movie.setView(i);
-		*_cameras[i] >> _movie.image();
-	    }
-	    _captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
-	}
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->stopContinuousShot();
-      }
-	break;
+	    tick();
+	    break;
 
-      case c_ForwardMovie:
-      {
-	int	frame = _captureCmd.getValue(c_StatusMovie) + 1;
-	if (frame < _movie.nframes())
-	{
-	    stopContinuousShotIfRunning();
-	    _canvasC.resize(_movie.width(), _movie.height());
-	    _canvasH.resize(_movie.width(), _movie.height());
-	    _canvasV.resize(_movie.width(), _movie.height());
-	    _movie.setFrame(frame);
-	    showMovieFrames();
-	    _captureCmd.setValue(c_StatusMovie, frame);
-	}
-      }
-        break;
+	  case c_Trigger:
+	    if (val)
+	    {
+#ifdef UseTrigger
+		_trigger.selectChannel(0xffffffff);
+#endif
+		for (int i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->turnOn(Ieee1394Camera::TRIGGER_MODE);
+	    }
+	    else
+		for (int i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->turnOff(Ieee1394Camera::TRIGGER_MODE);
+	    break;
 	
-      case c_BackwardMovie:
-      {
-	int	frame = _captureCmd.getValue(c_StatusMovie) - 1;
-	if (frame >= 0)
-	{
+	  case c_NFrames:
 	    stopContinuousShotIfRunning();
-	    _canvasC.resize(_movie.width(), _movie.height());
-	    _canvasH.resize(_movie.width(), _movie.height());
-	    _canvasV.resize(_movie.width(), _movie.height());
-	    _movie.setFrame(frame);
-	    showMovieFrames();
-	    _captureCmd.setValue(c_StatusMovie, frame);
-	}
-      }
-        break;
+	    initializeMovie();
+	    break;
+	    
+	  case c_PlayMovie:
+	    stopContinuousShotIfRunning();
+	    if (val)
+		_timer.start(10);
+	    else
+		_timer.stop();
+	    break;
+	    
+	  case c_ForwardMovie:
+	    stopContinuousShotIfRunning();
+	    if (!++_movie)
+		--_movie;
+	    repaintCanvases();
+	    break;
 	
-      case c_StatusMovie:
-	stopContinuousShotIfRunning();
-	_canvasC.resize(_movie.width(), _movie.height());
-	_canvasH.resize(_movie.width(), _movie.height());
-	_canvasV.resize(_movie.width(), _movie.height());
-	_movie.setFrame(val);
-	showMovieFrames();
-	break;
+	  case c_BackwardMovie:
+	    stopContinuousShotIfRunning();
+	    if (!--_movie)
+		_movie.rewind();
+	    repaintCanvases();
+	    break;
+	
+	  case c_StatusMovie:
+	    stopContinuousShotIfRunning();
+	    _movie.setFrame(val);
+	    for (u_int i = 0; i < _canvases.dim(); ++i)
+		_canvases[i]->repaintUnderlay();
+	    break;
+	}
+    }
+    catch (exception& err)
+    {
+	cerr << err.what();
     }
 }
 
@@ -435,22 +354,81 @@ MyCmdWindow::tick()
     static int			nframes = 0;
     static struct timeval	start;
     countTime(nframes, start);
-#ifdef UseTrigger
-    if (_captureCmd.getValue(c_Trigger))
-	_trigger.oneShot();
-#endif
-    snapMulti();
-    for (int i = 0; i < _cameras.dim(); ++i)
+
+    if (!_captureCmd.getValue(c_PlayMovie))
     {
-	MyCanvasPane&	canvas = (i == 0 ? _canvasC :
-				  i == 1 ? _canvasH : _canvasV);
-	*_cameras[i] >> _images[i];
-	canvas.repaintUnderlay();
-/*	timeval	filltime = _cameras[i]->filltime();
-	std::cerr << ' ';
-	displayTime(filltime);*/
+#ifdef UseTrigger
+	if (_captureCmd.getValue(c_Trigger))
+	    _trigger.oneShot();
+#endif
+	syncronizedSnap();
+	for (int i = 0; i < _cameras.dim(); ++i)
+	{
+	    _movie.setView(i);
+	    *_cameras[i] >> _movie.image();
+	  /*	timeval	filltime = _cameras[i]->filltime();
+		std::cerr << ' ';
+		displayTime(filltime);*/
+	}
     }
-//    std::cerr << std::endl;
+
+    repaintCanvases();
+
+    ++_movie;
+}
+
+void
+MyCmdWindow::initializeMovie()
+{
+    Array<Movie<PixelType>::Size >	sizes(_cameras.dim());
+    for (u_int i = 0; i < sizes.dim(); ++i)
+	sizes[i] = std::make_pair(_cameras[i]->width(), _cameras[i]->height());
+    _movie.setSizes(sizes);
+    _movie.insert(_menuCmd.getValue(c_NFrames));
+
+    if (_canvases.dim() != _movie.nviews())
+    {
+	for (u_int i = 0; i < _canvases.dim(); ++i)
+	    delete _canvases[i];
+
+	_canvases.resize(_movie.nviews());
+	for (u_int i = 0; i < _canvases.dim(); ++i)
+	{
+	    Image<PixelType>&	image = _movie.setView(i).image();
+	    _canvases[i] = new MyCanvasPane(*this,
+					    image.width(), image.height(),
+					    image);
+	    _canvases[i]->place(i % 2, 2 + i / 2, 1, 1);
+	}
+    }
+    else
+    {
+	for (u_int i = 0; i < _canvases.dim(); ++i)
+	    _canvases[i]->resize();
+    }
+
+    movieProp[0] = 0;
+    movieProp[1] = _movie.nframes() - 1;
+    movieProp[2] = 1;
+    _captureCmd.setProp(c_StatusMovie, movieProp);
+    
+    repaintCanvases();
+}
+    
+void
+MyCmdWindow::repaintCanvases()
+{
+    for (u_int i = 0; i < _canvases.dim(); ++i)
+	_canvases[i]->repaintUnderlay();
+    _captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
+}
+
+void
+MyCmdWindow::setFrame()
+{
+    _movie.setFrame(_captureCmd.getValue(c_StatusMovie));
+    for (u_int i = 0; i < _canvases.dim(); ++i)
+	_canvases[i]->repaintUnderlay();
 }
 
 void
@@ -466,49 +444,34 @@ MyCmdWindow::stopContinuousShotIfRunning()
 }
 
 void
-MyCmdWindow::showMovieFrames()
+MyCmdWindow::syncronizedSnap()
 {
-    for (int i = 0; i < _movie.nviews(); ++i)
+#if defined(USE_VIDEO1394)
+    const u_int64_t	margin = 2000;
+    u_int64_t		last = 0;
+    for (u_int i = 0; i < _cameras.dim(); ++i)
     {
-	MyCanvasPane&	canvas = (i == 0 ? _canvasC :
-				  i == 1 ? _canvasH : _canvasV);
-	_movie.setView(i);
-	_images[i] = _movie.image();
-	canvas.repaintUnderlay();
-    }
-}
-
-void
-MyCmdWindow::snapMulti()
-{
-    if (_sync)
-    {
-	const u_int64_t	margin = 2000;
-	u_int64_t		last = 0;
-	for (int i = 0; i < _cameras.dim(); ++i)
+	u_int64_t	filltime
+			    = timeval2u_int64(_cameras[i]->snap().filltime());
+	if (last + margin < filltime)
 	{
-	    u_int64_t	filltime = timeval2u_int64(_cameras[i]
-						   ->snap().filltime());
-	    if (last + margin < filltime)
-	    {
-		last = filltime;
-		for (int j = 0; j < i; ++j)
-		    do
-		    {
-			filltime = timeval2u_int64(_cameras[j]
-						   ->snap().filltime());
-		    } while (filltime + margin < last);
-	    }
-	    else if (filltime + margin < last)
+	    last = filltime;
+	    for (u_int j = 0; j < i; ++j)
 		do
 		{
-		    filltime = timeval2u_int64(_cameras[i]->snap().filltime());
+		    filltime = timeval2u_int64(_cameras[j]->snap().filltime());
 		} while (filltime + margin < last);
 	}
+	else if (filltime + margin < last)
+	    do
+	    {
+		filltime = timeval2u_int64(_cameras[i]->snap().filltime());
+	    } while (filltime + margin < last);
     }
-    else
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->snap();
+#else
+    for (int i = 0; i < _cameras.dim(); ++i)
+	_cameras[i]->snap();
+#endif
 }
 
 }

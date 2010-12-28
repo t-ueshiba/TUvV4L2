@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2010-11-19 02:11:48 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2010-12-28 11:47:48 ueshiba Exp $
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -49,9 +49,6 @@ main(int argc, char* argv[])
 	Ieee1394Camera		camera(Ieee1394Camera::Monocular,
 				       i1394b, uniqId, delay);
 
-	cerr << "0x" << hex << setw(16) << setfill('0')
-	     << camera.globalUniqueId() << dec << endl;
-	
 	v::MyCmdWindow	myWin(vapp, camera
 #if defined(UseTrigger)
 			      , trigger
@@ -61,6 +58,8 @@ main(int argc, char* argv[])
 
 	camera.stopContinuousShot();
 
+	cerr << "0x" << hex << setw(16) << setfill('0')
+	     << camera.globalUniqueId() << dec << ' ' << camera;
     }
     catch (exception& err)
     {

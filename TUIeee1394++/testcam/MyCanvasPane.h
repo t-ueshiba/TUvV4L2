@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCanvasPane.h,v 1.1 2009-07-28 00:00:48 ueshiba Exp $
+ *  $Id: MyCanvasPane.h,v 1.2 2010-12-28 11:47:48 ueshiba Exp $
  */
 #include "TU/v/CanvasPane.h"
 #include "TU/v/CanvasPaneDC.h"
@@ -28,9 +28,9 @@ class MyCanvasPane : public CanvasPane
     MyCanvasPane(Window& parentWin, u_int width, u_int height,
 		 const Image<PixelType>& image)
 	:CanvasPane(parentWin, width, height),
-	_dc(*this, 640, 480), _image(image)				{}
+	 _dc(*this, image.width(), image.height()), _image(image)	{}
     
-    void		resize(u_int w, u_int h)			;
+    void		resize()					;
     virtual void	repaintUnderlay()				;
     
   private:
@@ -45,9 +45,9 @@ class MyCanvasPane : public CanvasPane
 };
 
 inline void
-MyCanvasPane::resize(u_int w, u_int h)
+MyCanvasPane::resize()
 {
-    _dc.setSize(w, h, _dc.mul(), _dc.div());
+    _dc.setSize(_image.width(), _image.height(), _dc.mul(), _dc.div());
 }
 
 }
