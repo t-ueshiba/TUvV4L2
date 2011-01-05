@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.h,v 1.1 2009-07-28 00:15:17 ueshiba Exp $
+ *  $Id: MyCmdWindow.h,v 1.2 2011-01-05 02:05:22 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
@@ -8,14 +8,11 @@
 #include "TU/v/Timer.h"
 #include "MyCanvasPane.h"
 #include "TU/Ieee1394++.h"
-#include "TU/Serial.h"
+#include "TU/TriggerGenerator.h"
 #include "TU/Movie.h"
 
 namespace TU
 {
-typedef YUV422	BinocularPixelType;
-typedef RGB	TrinocularPixelType;
-    
 namespace v
 {
 /************************************************************************
@@ -24,11 +21,11 @@ namespace v
 class MyCmdWindow : public CmdWindow
 {
   public:
-    MyCmdWindow(App&				parentApp,
-		Ieee1394Camera&			camera,
-		Ieee1394Camera::Type		type
+    MyCmdWindow(App&			parentApp,
+		Ieee1394Camera&		camera,
+		Ieee1394Camera::Type	type
 #ifdef UseTrigger
-		, TriggerGenerator&		trigger
+		, TriggerGenerator&	trigger
 #endif
 	       )							;
 
@@ -36,27 +33,24 @@ class MyCmdWindow : public CmdWindow
     virtual void	tick()						;
     
   private:
+    void	initializeMovie()					;
+    void	repaintCanvases()					;
+    void	setFrame()						;
     void	stopContinuousShotIfRunning()				;
-    void	separateAndDisplay(const Image<BinocularPixelType>&)	;
-    void	separateAndDisplay(const Image<TrinocularPixelType>&)	;
+    void	separateChannels(const Image<YUV422>& image)		;
+    void	separateChannels(const Image<RGB>& image)		;
     
-    Ieee1394Camera&			_camera;
-    const u_int				_nviews;
-    bool				_sync;
+    Ieee1394Camera&		_camera;
 #ifdef UseTrigger
-    TriggerGenerator&			_trigger;
+    TriggerGenerator&		_trigger;
 #endif
-    Movie<BinocularPixelType>		_movie;
-    CmdPane				_menuCmd;
-    CmdPane				_captureCmd;
-    CmdPane				_featureCmd;
-    FileSelection			_fileSelection;
-    Image<BinocularPixelType>		_binocularImage;
-    Image<PixelType>			_images[3];
-    MyCanvasPane			_canvasC;
-    MyCanvasPane			_canvasH;
-    MyCanvasPane			_canvasV;
-    Timer				_timer;
+    Movie<PixelType>		_movie;
+    Array<MyCanvasPane*>	_canvases;
+    CmdPane			_menuCmd;
+    CmdPane			_captureCmd;
+    CmdPane			_featureCmd;
+    FileSelection		_fileSelection;
+    Timer			_timer;
 };
  
 }

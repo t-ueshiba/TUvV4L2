@@ -1,8 +1,7 @@
 /*
- *  $Id: main.cc,v 1.2 2010-11-19 02:14:45 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2011-01-05 02:05:22 ueshiba Exp $
  */
-#include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iomanip>
 #include "MyCmdWindow.h"
 
@@ -23,7 +22,7 @@ main(int argc, char* argv[])
 
   // Parse command line.
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "bd:t:")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "bd:t:123")) != -1; )
 	switch (c)
 	{
 	  case 'b':
@@ -34,6 +33,12 @@ main(int argc, char* argv[])
 	    break;
 	  case 't':
 	    triggerDev = optarg;
+	    break;
+	  case '1':
+	    type = Ieee1394Camera::Monocular;
+	    break;
+	  case '2':
+	    type = Ieee1394Camera::Binocular;
 	    break;
 	}
     extern int	optind;
