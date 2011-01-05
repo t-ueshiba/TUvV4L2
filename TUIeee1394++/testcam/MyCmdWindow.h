@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.h,v 1.2 2010-12-28 11:47:48 ueshiba Exp $
+ *  $Id: MyCmdWindow.h,v 1.3 2011-01-05 02:06:09 ueshiba Exp $
  */
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
@@ -8,7 +8,7 @@
 #include "TU/v/Timer.h"
 #include "MyCanvasPane.h"
 #include "TU/Ieee1394++.h"
-#include "TU/Serial.h"
+#include "TU/TriggerGenerator.h"
 #include "TU/Movie.h"
 
 namespace TU
