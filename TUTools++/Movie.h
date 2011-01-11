@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.11 2010-12-22 01:44:52 ueshiba Exp $
+ *  $Id: Movie.h,v 1.12 2011-01-11 23:24:47 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -82,15 +82,11 @@ template <class T> class Movie
   // General information.
     bool		isCircularMode()			const	;
     Movie<T>&		setCircularMode(bool circular)			;
-    u_int		width()					const	;
-    u_int		height()				const	;
-    const Image<T>&	image()					const	;
-    Image<T>&		image()						;
-
-  // Handling views.
     u_int		nviews()				const	;
-    u_int		currentView()				const	;
-    Movie<T>&		setView(u_int view)				;
+    u_int		width(u_int view)			const	;
+    u_int		height(u_int view)			const	;
+    const Image<T>&	image(u_int view)			const	;
+    Image<T>&		image(u_int view)			;
 
   // Handling frames.
 			operator bool()				const	;
@@ -106,7 +102,7 @@ template <class T> class Movie
     const Movie<T>&	copy(u_int n)				const	;
     Movie<T>&		cut(u_int n)					;
     u_int		paste()						;
-    Movie<T>&		rotate()					;
+    Movie<T>&		swap()						;
     
   // Restore/Save movie.
     std::istream&	restore(std::istream& in)			;
@@ -130,7 +126,6 @@ template <class T> class Movie
   private:
     bool		_circular;	//!< 循環モード/非循環モード
     Array<View>		_views;		//!< ビューの並び
-    u_int		_cView;		//!< 現ビューの番号
     Frames		_frames;	//!< フレームの並び
     iterator		_dummy;		//!< フレームの末尾を表すダミーフレーム
     iterator		_current;	//!< 現フレーム
@@ -144,7 +139,7 @@ template <class T> class Movie
 */
 template <class T> inline
 Movie<T>::Movie(u_int nviews)
-    :_circular(false), _views(nviews), _cView(0), _frames(1),
+    :_circular(false), _views(nviews), _frames(1),
      _dummy(_frames.begin()), _current(_dummy), _cFrame(0), _buf()
 {
 }
@@ -166,7 +161,6 @@ Movie<T>::setSizes(const Array<Size>& sizes)
 	_views[i].offset = n;
 	n += npixels(sizes[i].first * sizes[i].second);
     }
-    _cView   = 0;
     
   // 大きさが1フレームあたりの画素数に等しいダミーフレームを確保．
     _frames.clear();			// 全フレームを廃棄
@@ -212,46 +206,6 @@ Movie<T>::setCircularMode(bool circular)
 	return *this;
 }
     
-//! 現在のビューとフレームに対応する画像の幅を返す．
-/*!
-  \return	画像の幅
-*/
-template <class T> inline u_int
-Movie<T>::width() const
-{
-    return (_cView < nviews() ? _views[_cView].width() : 0);
-}
-    
-//! 現在のビューとフレームに対応する画像の高さを返す．
-/*!
-  \return	画像の高さ
-*/
-template <class T> inline u_int
-Movie<T>::height() const
-{
-    return (_cView < nviews() ? _views[_cView].height() : 0);
-}
-
-//! 現在のビューとフレームに対応する画像を返す．
-/*!
-  \return	画像
-*/
-template <class T> inline const Image<T>&
-Movie<T>::image() const
-{
-    return _views[_cView];
-}
-
-//! 現在のビューとフレームに対応する画像を返す．
-/*!
-  \return	画像
-*/
-template <class T> inline Image<T>&
-Movie<T>::image()
-{
-    return _views[_cView];
-}
-
 //! ビュー数を返す．
 /*!
   \return	view数
@@ -262,29 +216,48 @@ Movie<T>::nviews() const
     return _views.dim();
 }
 
-//! 現在のビュー番号を返す．
+//! 指定されたビューに対応する画像の幅を返す．
 /*!
-  \return	view番号
+  \param view	ビュー番号
+  \return	画像の幅
 */
 template <class T> inline u_int
-Movie<T>::currentView() const
+Movie<T>::width(u_int view) const
 {
-    return _cView;
+    return _views[view].width();
+}
+    
+//! 指定されたビューに対応する画像の高さを返す．
+/*!
+  \param view	ビュー番号
+  \return	画像の高さ
+*/
+template <class T> inline u_int
+Movie<T>::height(u_int view) const
+{
+    return _views[view].height();
 }
 
-//! 現在のビューを指定する．
+//! 現在のフレームの指定されたビューに対応する画像を返す．
 /*!
-  view < #nviews() でない場合は何も変更しない．
-  \param view	view番号
-  \return	このムービー
+  \param view	ビュー番号
+  \return	画像
 */
-template <class T> inline Movie<T>&
-Movie<T>::setView(u_int view)
+template <class T> inline const Image<T>&
+Movie<T>::image(u_int view) const
 {
-    if (view < nviews())
-	_cView = view;
+    return _views[view];
+}
 
-    return *this;
+//! 現在のフレームの指定されたビューに対応する画像を返す．
+/*!
+  \param view	ビュー番号
+  \return	画像
+*/
+template <class T> inline Image<T>&
+Movie<T>::image(u_int view)
+{
+    return _views[view];
 }
 
 //! 現フレームの状態を調べる．
@@ -517,7 +490,7 @@ Movie<T>::paste()
   \return	このムービー
  */
 template <class T> inline Movie<T>&
-Movie<T>::rotate()
+Movie<T>::swap()
 {
     iterator	tmp = _frames.begin();	// 交換前の先頭を記憶
 
