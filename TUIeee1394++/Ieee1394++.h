@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.27 2010-06-02 00:12:11 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.28 2011-01-11 02:01:26 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -201,7 +201,7 @@ class Ieee1394Node
   /*!
     \return	受信用バッファが満たされた時刻
    */
-    timeval	filltime()			const	{return _filltime;}
+    u_int64_t	filltime()			const	{return _filltime;}
 
   //! このノードに割り当てられたisochronousチャンネルを返す
   /*!
@@ -265,15 +265,17 @@ class Ieee1394Node
     nodeid_t			_nodeId;
 #if defined(USE_RAWISO)
     u_char			_channel;	// iso receive channel.
-    u_char*			_current;	// current buffer head.
-    u_char*			_end;		// end of the buffer.
+    u_char*			_current;	// current insertion point.
+    u_char*			_end;		// the end of the buffer.
+    bool			_ready;		// buffer is ready.
+    u_int64_t			_filltime_next;
 #else
     video1394_mmap		_mmap;		// mmap structure for video1394.
     u_int			_current;	// index of current ready buffer.
     u_int			_buf_size;	// buffer size excluding header.
 #endif
     u_char*			_buf;		// mapped buffer.
-    timeval			_filltime;	// time of buffer filled.
+    u_int64_t			_filltime;	// time of buffer filled.
     const u_int			_delay;
 };
     

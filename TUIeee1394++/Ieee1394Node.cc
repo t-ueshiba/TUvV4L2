@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.17 2010-06-02 00:12:12 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.18 2011-01-11 02:01:27 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -50,10 +50,43 @@
 
 namespace TU
 {
-#if !defined(USE_RAWISO)
 /************************************************************************
 *  static functions							*
 ************************************************************************/
+#if defined(USE_RAWISO)
+static u_int32_t
+cycleTimer_to_usec(u_int32_t cycleTimer)  // from juju/capture.c of libdc1394
+{
+    u_int32_t	sec	 = (cycleTimer & 0xe000000) >> 25;
+    u_int32_t	cycles	 = (cycleTimer & 0x1fff000) >> 12;
+    u_int32_t	subcycle = (cycleTimer & 0x0000fff);
+
+    return 1000000 * sec + 125 * cycles + (125 * subcycle) / 3072;
+}
+
+static u_int64_t
+cycle_to_filltime(raw1394handle_t handle, u_int cycle)
+{
+#if !defined(__APPLE__)
+  // 現在時刻を獲得する．
+    u_int32_t	busTime;
+    u_int64_t	localTime;
+    raw1394_read_cycle_timer(handle, &busTime, &localTime);
+    busTime = cycleTimer_to_usec(busTime);
+
+  // packet取り込み時刻を獲得する．
+    u_int32_t	dmaTime = cycleTimer_to_usec(cycle << 12);
+
+  // 現在時刻とpacket取り込み時刻のずれを求める．
+    u_int32_t	diff = (busTime + 8000000 - dmaTime) % 8000000;
+
+  // ずれを差し引く．
+    return localTime - u_int64_t(diff);
+#else
+    return 0;
+#endif
+}
+#else
 static int
 video1394_get_fd_and_check(int port_number)
 {
@@ -156,11 +189,11 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 #endif
      _nodeId(0),
 #if defined(USE_RAWISO)
-     _channel(0), _current(0), _end(0),
+     _channel(0), _current(0), _end(0), _ready(false), _filltime_next(0),
 #else
      _mmap(), _current(0), _buf_size(0),
 #endif
-     _buf(0), _filltime(), _delay(delay)
+     _buf(0), _filltime(0), _delay(delay)
 {
     using namespace	std;
 
@@ -219,7 +252,6 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
     _mmap.flags	      = flags;
 #  endif
 #endif	// !__APPLE__
-    _filltime.tv_sec = _filltime.tv_usec = 0;
     raw1394_set_userdata(_handle, this);
 }
 	     
@@ -376,13 +408,14 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
     unmapListenBuffer();
 
 #if defined(USE_RAWISO)
-    _buf = _current = new u_char[buf_size];
-    _end = _buf + buf_size;
-
     const u_int	npackets = (buf_size - 1) / packet_size + 1;
 #  if defined(DEBUG)
     cerr << "mapListenBuffer: npackets = " << dec << npackets << endl;
 #  endif
+    _buf = _current = new u_char[buf_size + npackets * packet_size];
+    _end = _buf + buf_size;
+    _ready = false;
+
     if (raw1394_iso_recv_init(_handle, &Ieee1394Node::receive,
 			      nb_buffers * npackets, packet_size, _channel,
 			      RAW1394_DMA_BUFFERFILL, npackets) < 0)
@@ -432,9 +465,29 @@ Ieee1394Node::waitListenBuffer()
     using namespace	std;
 
 #if defined(USE_RAWISO)
-    while (_current < _end)
+#  if defined(DEBUG)
+    cerr << "*** begin ***" << endl;
+#  endif
+    while (!_ready)
+    {
+      // (_buf, _end] に sy packet がない場合は sy packet を取りこぼしているので
+      // [_buf, _current)を廃棄する．
+	if (_current > _end)
+	    _current = _buf;
+	
 	raw1394_loop_iterate(_handle);
-    gettimeofday(&_filltime, NULL);
+
+	if (_current == _end)
+	    _ready = true;
+
+#  if defined(DEBUG)
+	cerr << (_ready ? "  ready:     " : "  not-ready: ")
+	     << "current = " << _current - _buf << endl;
+#  endif
+    }
+#  if defined(DEBUG)
+    cerr << "*** end ***" << endl;
+#  endif
 
     return _buf;
 #else
@@ -443,21 +496,33 @@ Ieee1394Node::waitListenBuffer()
     wait.buffer  = _current;
     if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_WAIT_BUFFER, &wait) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::waitListenBuffer: VIDEO1394_IOC_LISTEN_WAIT_BUFFER failed!! ") + strerror(errno));
-    _filltime = wait.filltime;	// time of buffer full.	
+    _filltime = u_int64_t(wait.filltime.tv_sec) * 1000000LL
+	      + u_int64_t(wait.filltime.tv_usec);  // time of buffer filled.	
 
     return _buf + _current * _mmap.buf_size;
-#endif    
+#endif
 }
 
 //! データ受信済みのバッファを再びキューイングして次の受信データに備える
 void
 Ieee1394Node::requeueListenBuffer()
 {
-#if defined(USE_RAWISO)
-    _current = _buf;
-#else
     using namespace	std;
-
+    
+#if defined(USE_RAWISO)
+    if (_ready)
+    {
+      // [_buf, _end) を廃棄し [_end, _current)をバッファ領域の先頭に移す
+	const size_t	len = _current - _end;
+	memcpy(_buf, _end, len);
+	_current  = _buf + len;
+	_ready	  = false;
+	_filltime = _filltime_next;
+#  if defined(DEBUG)
+	cerr << "  " << len << " bytes moved..." << endl;
+#  endif
+    }
+#else
     video1394_wait	wait;
     wait.channel = _mmap.channel;
     wait.buffer	 = _current;
@@ -477,6 +542,7 @@ Ieee1394Node::flushListenBuffer()
     if (raw1394_iso_recv_flush(_handle) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::flushListenBuffer: failed to flush iso receive buffer!! ") + strerror(errno));
     _current = _buf;
+    _ready   = false;
 #else
   // Force flushing by doing unmap and then map buffer.
     if (_buf != 0)
@@ -512,9 +578,10 @@ Ieee1394Node::unmapListenBuffer()
 #if defined(USE_RAWISO)
 	raw1394_iso_stop(_handle);
 	raw1394_iso_shutdown(_handle);
-    
+
 	delete [] _buf;
 	_buf = _current = _end = 0;
+	_ready = false;
 #else
 	munmap(_buf, _mmap.nb_buffers * _mmap.buf_size);
 	_buf = 0;				// Reset buffer status.
@@ -538,18 +605,39 @@ Ieee1394Node::receive(raw1394handle_t handle,
 		      u_char channel, u_char tag, u_char sy,
 		      u_int cycle, u_int dropped)
 {
-    Ieee1394Node*	node = (Ieee1394Node*)raw1394_get_userdata(handle);
+    using namespace	std;
+
+    Ieee1394Node* const	node = (Ieee1394Node*)raw1394_get_userdata(handle);
+
     if (sy)
-	node->_current = node->_buf;
-    u_char* const	next = node->_current + len;
-    if (next <= node->_end)
     {
-	memcpy(node->_current, data, len);
-	node->_current = next;
+#  if defined(DEBUG)
+	cerr << "    (sy!     current = "
+	     << node->_current - node->_buf
+	     << ", cycle = " << cycle;
+#  endif	
+	if (node->_current == node->_end)
+	{
+	    node->_ready = true;
+	    node->_filltime_next = cycle_to_filltime(handle, cycle);
+	}
+	else
+	{
+	  // 直前のsy packetとの間隔がバッファサイズに等しくない場合はpacketを
+	  // 取りこぼしているので [_buf, _current) を廃棄する．
+	    node->_current = node->_buf;
+	    node->_ready = false;
+	    node->_filltime = cycle_to_filltime(handle, cycle);
+	}
+#  if defined(DEBUG)
+	cerr << (node->_ready ? ", ready)" : ", not-ready)") << endl;
+#  endif
     }
-    return RAW1394_ISO_DEFER;
-  /*    return (node->_current < node->_end ? RAW1394_ISO_DEFER
-	: RAW1394_ISO_ERROR);*/
+
+    memcpy(node->_current, data, len);
+    node->_current += len;
+
+    return RAW1394_ISO_OK;
 }
 #endif
  

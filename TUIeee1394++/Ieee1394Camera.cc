@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.33 2010-06-02 00:12:12 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.34 2011-01-11 02:01:26 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -761,13 +761,15 @@ Ieee1394Camera::getFormat_7_Info(Format format7)
     quad = readQuadlet(base + COLOR_CODING_INQ);
     fmt7info.availablePixelFormats = quad;
 #ifdef DEBUG
-    std::cerr << hex
-	      <<   "max size:    " << fmt7info.maxWidth	 << 'x' << fmt7info.maxHeight
-	      << "\nunit size:   " << fmt7info.unitWidth << 'x' << fmt7info.unitHeight
-	      << "\norigin unit: " << fmt7info.unitU0	 << 'x' << fmt7info.unitV0
-	      << "\norigin:      " << fmt7info.u0	 << ',' << fmt7info.v0
-	      << "\nsize:        " << fmt7info.width	 << 'x' << fmt7info.height
-	      << std::endl;
+    using namespace	std;
+    
+    cerr << hex
+	 <<   "max size:    " << fmt7info.maxWidth  << 'x' << fmt7info.maxHeight
+	 << "\nunit size:   " << fmt7info.unitWidth << 'x' << fmt7info.unitHeight
+	 << "\norigin unit: " << fmt7info.unitU0 << 'x' << fmt7info.unitV0
+	 << "\norigin:      " << fmt7info.u0	 << ',' << fmt7info.v0
+	 << "\nsize:        " << fmt7info.width	 << 'x' << fmt7info.height
+	 << endl;
 #endif
     return fmt7info;
 }

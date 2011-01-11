@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.3 2010-12-28 11:48:41 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.4 2011-01-11 02:01:38 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -44,12 +44,6 @@ displayTime(const timeval& time)
 	 << setw(2) << tm->tm_min  << ':'
 	 << setw(2) << tm->tm_sec  << '.'
 	 << setw(3) << time.tv_usec / 1000;
-}
-
-inline u_int64_t
-timeval2u_int64(const timeval& time)
-{
-    return u_int64_t(time.tv_sec) * 1000000LL + u_int64_t(time.tv_usec);
 }
 
 namespace v
@@ -446,26 +440,25 @@ MyCmdWindow::stopContinuousShotIfRunning()
 void
 MyCmdWindow::syncronizedSnap()
 {
-#if defined(USE_VIDEO1394)
+#if !defined(__APPLE__)
     const u_int64_t	margin = 2000;
     u_int64_t		last = 0;
     for (u_int i = 0; i < _cameras.dim(); ++i)
     {
-	u_int64_t	filltime
-			    = timeval2u_int64(_cameras[i]->snap().filltime());
+	u_int64_t	filltime = _cameras[i]->snap().filltime();
 	if (last + margin < filltime)
 	{
 	    last = filltime;
 	    for (u_int j = 0; j < i; ++j)
 		do
 		{
-		    filltime = timeval2u_int64(_cameras[j]->snap().filltime());
+		    filltime = _cameras[j]->snap().filltime();
 		} while (filltime + margin < last);
 	}
 	else if (filltime + margin < last)
 	    do
 	    {
-		filltime = timeval2u_int64(_cameras[i]->snap().filltime());
+		filltime = _cameras[i]->snap().filltime();
 	    } while (filltime + margin < last);
     }
 #else
