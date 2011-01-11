@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.2 2010-12-28 11:47:48 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.3 2011-01-11 23:27:46 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -55,7 +55,7 @@ MyCmdWindow::MyCmdWindow(App&			parentApp,
      _trigger(trigger),
 #endif
      _movie(1),
-     _canvas(*this, _camera.width(), _camera.height(), _movie.image()),
+     _canvas(*this, _camera.width(), _camera.height(), _movie.image(0)),
      _menuCmd(*this, createMenuCmds(_camera)),
      _captureCmd(*this, createCaptureCmds()),
      _featureCmd(*this, createFeatureCmds(_camera)),
@@ -96,7 +96,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	    
 	    ofstream	out;
 	    if (_fileSelection.open(out))
-		_movie.image().save(out);
+		_movie.image(0).save(out);
 	  }
 	    break;
 	
@@ -313,7 +313,7 @@ MyCmdWindow::tick()
 	if (_captureCmd.getValue(c_Trigger))
 	    _trigger.oneShot();
 #endif
-	_camera.snap() >> _movie.image();
+	_camera.snap() >> _movie.image(0);
     }
     
     repaintCanvas();

@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.4 2011-01-11 02:01:38 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.5 2011-01-11 23:27:12 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -117,7 +117,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	    if (_fileSelection.open(out))
 	    {
 		for (int i = 0; i < _movie.nviews(); ++i)
-		    _movie.setView(i).image().save(out);
+		    _movie.image(i).save(out);
 	    }
 	  }
 	    break;
@@ -357,13 +357,7 @@ MyCmdWindow::tick()
 #endif
 	syncronizedSnap();
 	for (int i = 0; i < _cameras.dim(); ++i)
-	{
-	    _movie.setView(i);
-	    *_cameras[i] >> _movie.image();
-	  /*	timeval	filltime = _cameras[i]->filltime();
-		std::cerr << ' ';
-		displayTime(filltime);*/
-	}
+	    *_cameras[i] >> _movie.image(i);
     }
 
     repaintCanvases();
@@ -388,7 +382,7 @@ MyCmdWindow::initializeMovie()
 	_canvases.resize(_movie.nviews());
 	for (u_int i = 0; i < _canvases.dim(); ++i)
 	{
-	    Image<PixelType>&	image = _movie.setView(i).image();
+	    Image<PixelType>&	image = _movie.image(i);
 	    _canvases[i] = new MyCanvasPane(*this,
 					    image.width(), image.height(),
 					    image);

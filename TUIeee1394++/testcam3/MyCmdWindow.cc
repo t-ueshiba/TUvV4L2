@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.4 2011-01-11 02:01:45 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.5 2011-01-11 23:27:22 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -117,7 +117,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	    if (_fileSelection.open(out))
 	    {
 		for (int i = 0; i < _movie.nviews(); ++i)
-		    _movie.setView(i).image().save(out);
+		    _movie.image(i).save(out);
 	    }
 	  }
 	    break;
@@ -359,8 +359,7 @@ MyCmdWindow::tick()
 	  }
 	    break;
 	  default:
-	    _movie.setView(0);
-	    _camera >> _movie.image();
+	    _camera >> _movie.image(0);
 	    break;
 	}
     }
@@ -387,7 +386,7 @@ MyCmdWindow::initializeMovie()
 	_canvases.resize(_movie.nviews());
 	for (u_int i = 0; i < _canvases.dim(); ++i)
 	{
-	    Image<PixelType>&	image = _movie.setView(i).image();
+	    Image<PixelType>&	image = _movie.image(i);
 	    _canvases[i] = new MyCanvasPane(*this,
 					    image.width(), image.height(),
 					    image);
@@ -427,8 +426,8 @@ MyCmdWindow::setFrame()
 void
 MyCmdWindow::separateChannels(const Image<YUV422>& image)
 {
-    Image<PixelType>&	imageL = _movie.setView(0).image();
-    Image<PixelType>&	imageR = _movie.setView(1).image();
+    Image<PixelType>&	imageL = _movie.image(0);
+    Image<PixelType>&	imageR = _movie.image(1);
     
     for (int v = 0; v < image.height(); ++v)
     {
@@ -447,9 +446,9 @@ MyCmdWindow::separateChannels(const Image<YUV422>& image)
 void
 MyCmdWindow::separateChannels(const Image<RGB>& image)
 {
-    Image<PixelType>&	imageC = _movie.setView(0).image();
-    Image<PixelType>&	imageH = _movie.setView(1).image();
-    Image<PixelType>&	imageV = _movie.setView(2).image();
+    Image<PixelType>&	imageC = _movie.image(0);
+    Image<PixelType>&	imageH = _movie.image(1);
+    Image<PixelType>&	imageV = _movie.image(2);
 
     for (int v = 0; v < image.height(); ++v)
     {
