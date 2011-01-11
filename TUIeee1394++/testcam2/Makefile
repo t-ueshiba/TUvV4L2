@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2011-01-11 02:01:38 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2011-01-11 02:07:13 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,7 +14,7 @@ ifeq ($(OSTYPE), darwin)
   LIBS	       += -framework IOKit -framework CoreFoundation
 endif
 
-CPPFLAGS	= -DUseXaw -DHAVE_LIBTUTOOLS__ -DUseShmDC -DMONO_IMAGE -DUSE_RAWISO
+CPPFLAGS	= -DUseXaw -DHAVE_LIBTUTOOLS__ -DUseShmDC -DMONO_IMAGE #-DUSE_RAWISO
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
@@ -92,7 +92,7 @@ OBJS		= MyCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
