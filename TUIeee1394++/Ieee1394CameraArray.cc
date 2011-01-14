@@ -1,11 +1,41 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.4 2010-12-19 20:04:04 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.5 2011-01-14 01:53:50 ueshiba Exp $
  */
 #include "TU/Ieee1394CameraArray.h"
+#include <fstream>
+#include <algorithm>
 
 #ifdef HAVE_LIBTUTOOLS__
+#  define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
+#  define DEFAULT_CAMERA_NAME	"IEEE1394Camera"
+
 namespace TU
 {
+/************************************************************************
+*  static functions							*
+************************************************************************/
+static std::string
+openConfigFile(std::ifstream& in,
+	       const std::string& name, const std::string& dirs)
+{
+    using namespace		std;
+
+    string::const_iterator	p = dirs.begin();
+    do
+    {
+	string::const_iterator	q = find(p, dirs.end(), ':');
+	string			fullName = string(p, q) + '/' + name;
+	in.open((fullName + ".conf").c_str());
+	if (in)
+	    return fullName;
+	p = q;
+    } while (p++ != dirs.end());
+
+    throw runtime_error("Cannot open configuration file \"" + name +
+			".conf\" in \"" + dirs + "\"!!");
+    return string();
+}
+
 /************************************************************************
 *  class Ieee1394CameraArray						*
 ************************************************************************/
@@ -17,29 +47,32 @@ Ieee1394CameraArray::Ieee1394CameraArray()
     
 //! IEEE1394デジタルカメラの配列を生成する．
 /*!
-  \param in		カメラの設定ファイルを読み込む入力ストリーム
+  \param name		カメラ名
+  \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
   \param i1394b		IEEE1394bモード (800Mbps)で動作
   \param ncameras	生成するカメラ台数．設定ファイルに記されている最初の
 			ncameras台が生成される．-1を指定すると，設定ファイル
 			中の全カメラが生成される．
 */
-Ieee1394CameraArray::Ieee1394CameraArray(std::istream& in, bool i1394b,
-					 int ncameras)
-    :Array<Ieee1394Camera*>()
+Ieee1394CameraArray::Ieee1394CameraArray(const char* name, const char* dirs,
+					 bool i1394b, int ncameras)
+    :Array<Ieee1394Camera*>(), _fullName()
 {
-    initialize(in, i1394b, ncameras);
+    initialize(name, dirs, i1394b, ncameras);
 }
     
 //! IEEE1394デジタルカメラの配列を初期化する．
 /*!
-  \param in		カメラの設定ファイルを読み込む入力ストリーム
+  \param name		カメラ名
+  \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
   \param i1394b		IEEE1394bモード (800Mbps)で動作
   \param ncameras	生成するカメラ台数．設定ファイルに記されている最初の
 			ncameras台が生成される．-1を指定すると，設定ファイル
 			中の全カメラが生成される．
 */
 void
-Ieee1394CameraArray::initialize(std::istream& in, bool i1394b, int ncameras)
+Ieee1394CameraArray::initialize(const char* name, const char* dirs,
+				bool i1394b, int ncameras)
 {
     using namespace	std;
 
@@ -47,6 +80,12 @@ Ieee1394CameraArray::initialize(std::istream& in, bool i1394b, int ncameras)
     for (int i = 0; i < dim(); ++i)
 	delete (*this)[i];
 
+  // 設定ファイルのfull path名を生成し，ファイルをオープンする．
+    ifstream	in;
+    _fullName = openConfigFile(in,
+			       string(name != 0 ? name : DEFAULT_CAMERA_NAME),
+			       string(dirs != 0 ? dirs : DEFAULT_CONFIG_DIRS));
+    
   // 設定ファイルから遅延パラメータとカメラ数を読み込む．
     int	delay, n;
     in >> delay >> n;

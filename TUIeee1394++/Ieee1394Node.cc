@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.18 2011-01-11 02:01:27 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.19 2011-01-14 01:53:51 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -218,21 +218,28 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 	    throw runtime_error(string("TU::Ieee1394Node::Ieee1394Node: failed to get raw1394handle and set it to the port!! ") + strerror(errno));
 	nodeid_t	localId = raw1394_get_local_id(_handle);
 	const int	nnodes  = raw1394_get_nodecount(_handle);
-	for (int j  = 0; j < nnodes; ++j)	// for each node....
+	for (int j = 0; j < nnodes; ++j)	// for each node....
 	{
 	    _nodeId = (j | 0xffc0);
-	    if (_nodeId != localId				 &&
-		readValueFromUnitDirectory(0x12) == unit_spec_ID &&
-		(uniqId == 0 || globalUniqueId() == uniqId))
+
+	    try
 	    {
-		if (_port == 0)			// If i-th port is not present,
-		{				//
-		    _port = new Port(i);	// create
-		    _portMap[i] = _port;	// and insert it to the map.
-		    goto ok;
+		if (_nodeId != localId				     &&
+		    readValueFromUnitDirectory(0x12) == unit_spec_ID &&
+		    (uniqId == 0 || globalUniqueId() == uniqId))
+		{
+		    if (_port == 0)		// If i-th port is not present,
+		    {				//
+			_port = new Port(i);	// create
+			_portMap[i] = _port;	// and insert it to the map.
+			goto ok;
+		    }
+		    else if (!_port->isRegisteredNode(*this))
+			goto ok;
 		}
-		else if (!_port->isRegisteredNode(*this))
-		    goto ok;
+	    }
+	    catch (exception& err)
+	    {
 	    }
 	}
 	raw1394_destroy_handle(_handle);
