@@ -1,8 +1,7 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.5 2011-01-14 01:53:50 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.6 2011-01-16 23:19:24 ueshiba Exp $
  */
 #include "TU/Ieee1394CameraArray.h"
-#include <fstream>
 #include <algorithm>
 
 #ifdef HAVE_LIBTUTOOLS__
@@ -11,31 +10,6 @@
 
 namespace TU
 {
-/************************************************************************
-*  static functions							*
-************************************************************************/
-static std::string
-openConfigFile(std::ifstream& in,
-	       const std::string& name, const std::string& dirs)
-{
-    using namespace		std;
-
-    string::const_iterator	p = dirs.begin();
-    do
-    {
-	string::const_iterator	q = find(p, dirs.end(), ':');
-	string			fullName = string(p, q) + '/' + name;
-	in.open((fullName + ".conf").c_str());
-	if (in)
-	    return fullName;
-	p = q;
-    } while (p++ != dirs.end());
-
-    throw runtime_error("Cannot open configuration file \"" + name +
-			".conf\" in \"" + dirs + "\"!!");
-    return string();
-}
-
 /************************************************************************
 *  class Ieee1394CameraArray						*
 ************************************************************************/
@@ -82,9 +56,10 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
 
   // 設定ファイルのfull path名を生成し，ファイルをオープンする．
     ifstream	in;
-    _fullName = openConfigFile(in,
-			       string(name != 0 ? name : DEFAULT_CAMERA_NAME),
-			       string(dirs != 0 ? dirs : DEFAULT_CONFIG_DIRS));
+    _fullName = openFile(in,
+			 string(name != 0 ? name : DEFAULT_CAMERA_NAME),
+			 string(dirs != 0 ? dirs : DEFAULT_CONFIG_DIRS),
+			 ".conf");
     
   // 設定ファイルから遅延パラメータとカメラ数を読み込む．
     int	delay, n;
@@ -111,6 +86,31 @@ Ieee1394CameraArray::~Ieee1394CameraArray()
     for (int i = 0; i < dim(); ++i)
 	delete (*this)[i];
 }
- 
+
+/************************************************************************
+*  global functions							*
+************************************************************************/
+std::string
+openFile(std::ifstream& in, const std::string& name,
+	 const std::string& dirs, const char* ext)
+{
+    using namespace		std;
+
+    string::const_iterator	p = dirs.begin();
+    do
+    {
+	string::const_iterator	q = find(p, dirs.end(), ':');
+	string			fullName = string(p, q) + '/' + name;
+	in.open((fullName + ext).c_str());
+	if (in)
+	    return fullName;
+	p = q;
+    } while (p++ != dirs.end());
+
+    throw runtime_error("Cannot open file \"" + name + ext +
+			"\" in \"" + dirs + "\"!!");
+    return string();
+}
+
 }
 #endif	/* HAVE_LIBTUTOOLS__	*/    

@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.4 2011-01-14 01:53:50 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.5 2011-01-16 23:19:24 ueshiba Exp $
  */
 #ifndef __TUIeee1394CameraArray_h
 #define __TUIeee1394CameraArray_h
@@ -8,6 +8,10 @@
 #  include "TU/Array++.h"
 #  include "TU/Ieee1394++.h"
 #  include <string>
+#  include <fstream>
+
+#  define DEFAULT_CAMERA_NAME	"IEEE1394Camera"
+#  define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
 
 namespace TU
 {
@@ -66,6 +70,11 @@ Ieee1394CameraArray::calibFile() const
     return _fullName + ".calib";
 }
     
+/************************************************************************
+*  global functions							*
+************************************************************************/
+std::string	openFile(std::ifstream& in, const std::string& name,
+			 const std::string& dirs, const char* ext)	;
 }
 #endif	/* HAVE_LIBTUTOOLS__		*/    
 #endif	/* !__TUIeeeCameraArray_h	*/
