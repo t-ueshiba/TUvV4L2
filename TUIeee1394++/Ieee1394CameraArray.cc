@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.6 2011-01-16 23:19:24 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.7 2011-01-16 23:43:47 ueshiba Exp $
  */
 #include "TU/Ieee1394CameraArray.h"
 #include <algorithm>
@@ -90,6 +90,14 @@ Ieee1394CameraArray::~Ieee1394CameraArray()
 /************************************************************************
 *  global functions							*
 ************************************************************************/
+//! 指定した入力ファイルをオープンする．
+/*!
+  \param in	オープンされたファイルが結びつけられる入力ストリーム
+  \param name	ファイル名(拡張子を含まず)
+  \param dirs	':'で区切られたファイル探索ディレクトリの並び
+  \param ext	ファイルの拡張子，0を指定すれば拡張子なし
+  \return	オープンされたファイルのfull path名(拡張子を含まず)
+*/
 std::string
 openFile(std::ifstream& in, const std::string& name,
 	 const std::string& dirs, const char* ext)
@@ -101,7 +109,7 @@ openFile(std::ifstream& in, const std::string& name,
     {
 	string::const_iterator	q = find(p, dirs.end(), ':');
 	string			fullName = string(p, q) + '/' + name;
-	in.open((fullName + ext).c_str());
+	in.open((ext ? fullName + ext : fullName).c_str());
 	if (in)
 	    return fullName;
 	p = q;
