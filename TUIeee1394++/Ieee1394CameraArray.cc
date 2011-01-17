@@ -1,12 +1,9 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.7 2011-01-16 23:43:47 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.8 2011-01-17 00:07:05 ueshiba Exp $
  */
 #include "TU/Ieee1394CameraArray.h"
-#include <algorithm>
 
 #ifdef HAVE_LIBTUTOOLS__
-#  define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
-#  define DEFAULT_CAMERA_NAME	"IEEE1394Camera"
 
 namespace TU
 {
@@ -85,39 +82,6 @@ Ieee1394CameraArray::~Ieee1394CameraArray()
 {
     for (int i = 0; i < dim(); ++i)
 	delete (*this)[i];
-}
-
-/************************************************************************
-*  global functions							*
-************************************************************************/
-//! 指定した入力ファイルをオープンする．
-/*!
-  \param in	オープンされたファイルが結びつけられる入力ストリーム
-  \param name	ファイル名(拡張子を含まず)
-  \param dirs	':'で区切られたファイル探索ディレクトリの並び
-  \param ext	ファイルの拡張子，0を指定すれば拡張子なし
-  \return	オープンされたファイルのfull path名(拡張子を含まず)
-*/
-std::string
-openFile(std::ifstream& in, const std::string& name,
-	 const std::string& dirs, const char* ext)
-{
-    using namespace		std;
-
-    string::const_iterator	p = dirs.begin();
-    do
-    {
-	string::const_iterator	q = find(p, dirs.end(), ':');
-	string			fullName = string(p, q) + '/' + name;
-	in.open((ext ? fullName + ext : fullName).c_str());
-	if (in)
-	    return fullName;
-	p = q;
-    } while (p++ != dirs.end());
-
-    throw runtime_error("Cannot open file \"" + name + ext +
-			"\" in \"" + dirs + "\"!!");
-    return string();
 }
 
 }
