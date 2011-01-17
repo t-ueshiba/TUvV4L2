@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.94 2010-12-15 03:55:56 ueshiba Exp $
+#  $Id: Makefile,v 1.95 2011-01-17 01:03:33 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -55,6 +55,7 @@ EXTHDRS		= TU/BlockMatrix++.h \
 		TU/TU/Vector++.h \
 		TU/TriggerGenerator.h \
 		TU/Warp.h \
+		TU/io.h \
 		TU/mmInstructions.h \
 		TU/windows/fakeWindows.h
 HDRS		= Allocator.h \
@@ -90,6 +91,7 @@ HDRS		= Allocator.h \
 		Vector++.h \
 		Warp.h \
 		fdstream.h \
+		io.h \
 		mmInstructions.h \
 		types.h \
 		utility.h
@@ -119,6 +121,7 @@ SRCS		= BlockMatrix++.inst.cc \
 		Vector++.inst.cc \
 		Warp.cc \
 		fdstream.cc \
+		io.cc \
 		manipulators.cc
 OBJS		= BlockMatrix++.inst.o \
 		Camera.o \
@@ -146,12 +149,13 @@ OBJS		= BlockMatrix++.inst.o \
 		Vector++.inst.o \
 		Warp.o \
 		fdstream.o \
+		io.o \
 		manipulators.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.94 $	|		\
+REV		= $(shell echo $Revision: 1.95 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -227,4 +231,5 @@ Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/TU/Normalize.h TU/TU/TU/Minimize.h TU/Camera.h \
 	TU/mmInstructions.h
 fdstream.o: TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h
+io.o: TU/io.h
 manipulators.o: TU/Manip.h TU/TU/TU/TU/types.h
