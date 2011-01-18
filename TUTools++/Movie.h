@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.12 2011-01-11 23:24:47 ueshiba Exp $
+ *  $Id: Movie.h,v 1.13 2011-01-18 02:29:23 ueshiba Exp $
  */
 #ifndef __TUMovie_h
 #define __TUMovie_h
@@ -525,9 +525,15 @@ template <class T> std::ostream&
 Movie<T>::save(std::ostream& out, ImageBase::Type type)
 {
     saveHeader(out, type);
+
+    bool	circular = isCircularMode();
+    setCircularMode(false);
+
     for (rewind(); *this; ++(*this))
 	saveFrame(out, type);
     rewind();
+
+    setCircularMode(circular);
     
     return out;
 }
