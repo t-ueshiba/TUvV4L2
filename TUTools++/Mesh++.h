@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mesh++.h,v 1.20 2011-01-30 23:34:50 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.21 2011-02-08 19:53:01 ueshiba Exp $
  */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
@@ -57,6 +57,11 @@ class Mesh
     typedef typename std::list<F>::iterator		fiterator;
     typedef typename std::list<F>::const_iterator	const_fiterator;
 
+    enum
+    {
+	NSides = M			//!< 1つの面が持つ辺の数
+    };
+    
   //! 多角形メッシュの面の基底となるクラス
     class Face
     {
@@ -77,8 +82,8 @@ class Mesh
 	fiterator	self()					const	;
 
       private:
-	viterator	_v[M];		//!< この面の頂点を指す反復子
-	fiterator	_f[M];		//!< この面に隣接する面を指す反復子
+	viterator	_v[NSides];	//!< この面の頂点を指す反復子
+	fiterator	_f[NSides];	//!< この面に隣接する面を指す反復子
 #ifdef TUMeshPP_DEBUG
       public:
 	const u_int	fnum;
@@ -126,6 +131,9 @@ class Mesh
     };
 
   public:
+    Edge		initialize(const V vertex[])			;
+    void		clear()						;
+    
     Edge		kill(Edge& edge)				;
     Edge		make(const Edge& edge0,
 			     const Edge& edge1, const V& v)		;
@@ -176,7 +184,46 @@ class Mesh
     std::list<F>	_faces;				//!< 面のリスト
 };
 
-// 3角形メッシュについて，指定された辺を消去する．
+//! 指定された頂点から背中合わせの2つの面を生成してメッシュを初期化する．
+/*!
+  \param vertex	M個の頂点
+  \return	v[0] を始点とする辺
+*/
+template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
+Mesh<V, F, M>::initialize(const V vertex[])
+{
+  // 表の面を生成する．
+    viterator	v[NSides];
+    for (u_int e = 0; e < NSides; ++e)
+	v[e] = newVertex(vertex[e]);
+    fiterator	f = newFace(F(v));
+
+  // 裏の面を生成する．
+    viterator	vC[NSides];
+    for (u_int e = 0; e < NSides; ++e)
+	vC[e] = v[NSides-1-e];
+    fiterator	fC = newFace(F(vC));
+
+  // 表と裏を貼り合わせる．
+    Edge	edge0(f), edge(edge0), edgeC(fC);
+    --edgeC;
+    do
+    {
+	edge.pair(--edgeC);
+    } while (++edge != edge0);
+
+    return edge0;
+}
+
+//! メッシュの全ての頂点と面を消去して空にする．
+template <class V, class F, u_int M> inline void
+Mesh<V, F, M>::clear()
+{
+    _vertices.clear();
+    _faces.clear();
+}
+    
+//! 3角形メッシュについて，指定された辺を消去する．
 /*!
   指定された辺の両側の面および辺の始点も消去される．
   \param edge	消去する辺．
@@ -228,7 +275,7 @@ Mesh<V, F, M>::kill(Edge& edge)
     return edgeCPC;
 }
 
-// 3角形メッシュについて，指定された2つの辺の始点間に新たに辺を作る．
+//! 3角形メッシュについて，指定された2つの辺の始点間に新たに辺を作る．
 /*!
   1つの頂点と2つの面が生成される．
   \param edge0	新たな辺と始点を共有する辺
@@ -330,7 +377,7 @@ Mesh<V, F, M>::boundingBox() const
     BoundingBox<V>	bbox;
     
     for (const_fiterator f = _faces.begin(); f != _faces.end(); ++f)
-	for (u_int e = 0; e < M; ++e)
+	for (u_int e = 0; e < NSides; ++e)
 	    bbox.expand(f->v(e));
     
     return bbox;
@@ -432,7 +479,7 @@ Mesh<V, F, M>::showTopology(std::ostream& out) const
     for (const_fiterator f = _faces.begin(); f != _faces.end(); ++f)
     {
 	out << "Face[" << f->fnum << "]:";
-	for (u_int e = 0; e < M; ++e)
+	for (u_int e = 0; e < NSides; ++e)
 	    out << ' ' << f->f(e).fnum;
 	out << std::endl;
     }
@@ -458,8 +505,7 @@ Mesh<V, F, M>::get(std::istream& in)
 						VerticesWithFacesIterator;
 
   // 頂点と面のリストを空にする．
-    _vertices.clear();
-    _faces.clear();
+    clear();
     
   // 全ての頂点を読み込む．
     VerticesWithFaces	verticesWithFaces;
@@ -484,9 +530,9 @@ Mesh<V, F, M>::get(std::istream& in)
 	u_int	fnum;
 	in >> dummy >> fnum;		// 面番号をスキップ．
 
-	viterator	v[M];		// この面の頂点を指す全反復子
-	u_int		vnum[M];	// この面の頂点の全番号
-	for (u_int e = 0; e < M; ++e)
+	viterator	v[NSides];	// この面の頂点を指す全反復子
+	u_int		vnum[NSides];	// この面の頂点の全番号
+	for (u_int e = 0; e < NSides; ++e)
 	{
 	    in >> vnum[e];		// この面の頂点の番号を読み込む．
 	    --vnum[e];			// 頂点番号は1から始まるのでデクリメント
@@ -498,7 +544,7 @@ Mesh<V, F, M>::get(std::istream& in)
 	fiterator	f = newFace(F(v, fnum));	// 新しい面を生成
 #endif
       // 個々の頂点に自身の親としてこの面を登録する．
-	for (u_int e = 0; e < M; ++e)
+	for (u_int e = 0; e < NSides; ++e)
 	    verticesWithFaces[vnum[e]].second.push_back(f);
     }
     if (in)
@@ -567,7 +613,7 @@ Mesh<V, F, M>::put(std::ostream& out) const
     for (const_fiterator f = fbegin(); f != fend(); ++f)
     {
 	out << "Face " << fnum++;
-	for (u_int e = 0; e < M; ++e)
+	for (u_int e = 0; e < NSides; ++e)
 	    out << ' ' << dict[&(f->v(e))];
 	out << std::endl;
     }
@@ -634,7 +680,7 @@ Mesh<V, F, M>::Face::Face(viterator v[], u_int fn)
     :fnum(fn)
 #endif
 {
-    for (u_int e = 0; e < M; ++e)
+    for (u_int e = 0; e < NSides; ++e)
     {
       //_f[e] = 0;
 	_v[e] = v[e];
@@ -673,7 +719,7 @@ Mesh<V, F, M>::Face::self() const
     using namespace	std;
     
     fiterator	fC = _f[0];		// 0番目の辺を介して隣接する面
-    for (u_int e = 0; e < M; ++e)
+    for (u_int e = 0; e < NSides; ++e)
     {					// fCのe番目の辺を
 	fiterator	f = fC->_f[e];	// 介して隣接する面への反復子fが
 	if (&(*f) == this)		// この面を指していたら
@@ -792,7 +838,7 @@ Mesh<V, F, M>::Edge::valence() const
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator ++()
 {
-    if (_e == M - 1)
+    if (_e == NSides - 1)
 	_e = 0;
     else
 	++_e;
@@ -807,7 +853,7 @@ template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator --()
 {
     if (_e == 0)
-	_e = M - 1;
+	_e = NSides - 1;
     else
 	--_e;
     return *this;
