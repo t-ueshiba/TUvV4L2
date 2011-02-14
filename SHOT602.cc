@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: SHOT602.cc,v 1.3 2010-12-21 00:03:53 ueshiba Exp $
+ *  $Id: SHOT602.cc,v 1.4 2011-02-14 00:10:10 ueshiba Exp $
  */
 #include "TU/SHOT602.h"
 #include "TU/Manip.h"
@@ -63,7 +63,7 @@ SHOT602::SHOT602(const char* ttyname)
 void
 SHOT602::showId(std::ostream& out)
 {
-    *this << "?:" << endl;
+    *this << "?:V" << endl;
     for (char c; fdstream::get(c); )
     {
 	if (c == '\n')
