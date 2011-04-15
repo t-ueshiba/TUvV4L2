@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.56 2010-07-26 08:18:37 ueshiba Exp $
+ *  $Id: Image++.h,v 1.57 2011-04-15 04:56:05 ueshiba Exp $
  */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -538,7 +538,7 @@ class ImageLine : public Array<T>
     \param u	部分スキャンラインの左端の座標
     \param d	部分スキャンラインの画素数
   */
-    ImageLine(const ImageLine<T>& l, u_int u, u_int d)
+    ImageLine(ImageLine<T>& l, u_int u, u_int d)
 	:Array<T>(l, u, d), _lmost(0), _rmost(d)		{}
 
     const ImageLine	operator ()(u_int u, u_int d)	const	;
@@ -611,7 +611,7 @@ class ImageLine : public Array<T>
 template <class T> inline const ImageLine<T>
 ImageLine<T>::operator ()(u_int u, u_int d) const
 {
-    return ImageLine<T>(*this, u, d);
+    return ImageLine<T>(const_cast<ImageLine<T>&>(*this), u, d);
 }
 
 //! このスキャンラインの部分スキャンラインを生成する．
@@ -759,7 +759,7 @@ class ImageLine<YUV422> : public Array<YUV422>
 	:Array<YUV422>(d), _lmost(0), _rmost(d)			{*this = 0;}
     ImageLine(YUV422* p, u_int d)
 	:Array<YUV422>(p, d), _lmost(0), _rmost(d)		{}
-    ImageLine(const ImageLine<YUV422>& l, u_int u, u_int d)
+    ImageLine(ImageLine<YUV422>& l, u_int u, u_int d)
 	:Array<YUV422>(l, u, d), _lmost(0), _rmost(d)		{}
     const ImageLine	operator ()(u_int u, u_int d)	const	;
     ImageLine		operator ()(u_int u, u_int d)		;
@@ -794,7 +794,7 @@ class ImageLine<YUV422> : public Array<YUV422>
 inline const ImageLine<YUV422>
 ImageLine<YUV422>::operator ()(u_int u, u_int d) const
 {
-    return ImageLine<YUV422>(*this, u, d);
+    return ImageLine<YUV422>(const_cast<ImageLine<YUV422>&>(*this), u, d);
 }
     
 inline ImageLine<YUV422>
@@ -852,7 +852,7 @@ class ImageLine<YUV411> : public Array<YUV411>
 	:Array<YUV411>(d), _lmost(0), _rmost(d)			{*this = 0;}
     ImageLine(YUV411* p, u_int d)
 	:Array<YUV411>(p, d), _lmost(0), _rmost(d)		{}
-    ImageLine(const ImageLine<YUV411>& l, u_int u, u_int d)
+    ImageLine(ImageLine<YUV411>& l, u_int u, u_int d)
 	:Array<YUV411>(l, u, d), _lmost(0), _rmost(d)		{}
     const ImageLine	operator ()(u_int u, u_int d)	const	;
     ImageLine		operator ()(u_int u, u_int d)		;
@@ -887,7 +887,7 @@ class ImageLine<YUV411> : public Array<YUV411>
 inline const ImageLine<YUV411>
 ImageLine<YUV411>::operator ()(u_int u, u_int d) const
 {
-    return ImageLine<YUV411>(*this, u, d);
+    return ImageLine<YUV411>(const_cast<ImageLine<YUV411>&>(*this), u, d);
 }
     
 inline ImageLine<YUV411>
@@ -975,7 +975,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     \param h	部分画像の高さ
   */
     template <class B2>
-    Image(const Image<T, B2>& i, u_int u, u_int v, u_int w, u_int h)
+    Image(Image<T, B2>& i, u_int u, u_int v, u_int w, u_int h)
 	:Array2<ImageLine<T>, B>(i, v, u, h, w), ImageBase(i)	{}
 
     const Image<T>	operator ()(u_int u, u_int v,
@@ -1053,7 +1053,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
 template <class T, class B> inline const Image<T>
 Image<T, B>::operator ()(u_int u, u_int v, u_int w, u_int h) const
 {
-    return Image<T>(*this, u, v, w, h);
+    return Image<T>(const_cast<Image<T>&>(*this), u, v, w, h);
 }
     
 //! この画像の部分画像を生成する．
@@ -1405,7 +1405,7 @@ Image<YUV411, Buf<YUV411> >::Image(YUV411* p, u_int w, u_int h)
 }
 
 template <> template <class B2> inline
-Image<YUV411, Buf<YUV411> >::Image(const Image<YUV411, B2>& i,
+Image<YUV411, Buf<YUV411> >::Image(Image<YUV411, B2>& i,
 				   u_int u, u_int v, u_int w, u_int h)
     :Array2<ImageLine<YUV411>, Buf<YUV411> >(i, v, u/2, h, w/2), ImageBase(i)
 {

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.h,v 1.6 2009-09-04 04:01:05 ueshiba Exp $
+ *  $Id: Camera.h,v 1.7 2011-04-15 04:56:05 ueshiba Exp $
  */
 #ifndef __TUCamera_h
 #define __TUCamera_h
@@ -312,7 +312,7 @@ CameraBase::P() const
 inline Matrix<double>
 CameraBase::jacobianFCC(const Point3d& X) const
 {
-    const Matrix<double>&	J = jacobianP(X);
+    Matrix<double>	J = jacobianP(X);
     return Matrix<double>(J, 0, 3, J.nrow(), J.ncol() - 3);
 }
 
