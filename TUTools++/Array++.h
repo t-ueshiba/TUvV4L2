@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.33 2011-04-11 06:04:21 ueshiba Exp $
+ *  $Id: Array++.h,v 1.34 2011-04-15 04:56:05 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -637,7 +637,7 @@ class Array : public B
     template <class T2, class B2>
     Array(const Array<T2, B2>& a)					;
     template <class B2>
-    Array(const Array<T, B2>& a, u_int i, u_int d)			;
+    Array(Array<T, B2>& a, u_int i, u_int d)				;
     template <class T2, class B2>
     Array&		operator =(const Array<T2, B2>& a)		;
     Array&		operator =(const value_type& c)			;
@@ -724,7 +724,7 @@ Array<T, B>::Array(const Array<T2, B2>& a)
   \param d	•”•ª”z—ñ‚ÌŸŒ³(—v‘f”)
 */
 template <class T, class B> template <class B2> inline
-Array<T, B>::Array(const Array<T, B2>& a, u_int i, u_int d)
+Array<T, B>::Array(Array<T, B2>& a, u_int i, u_int d)
     :buf_type(pointer(&a[i]), partial_dim(i, d, a.dim()))
 {
 }
@@ -1101,8 +1101,7 @@ class Array2 : public Array<T, R>
     template <class T2, class B2, class R2>
     Array2(const Array2<T2, B2, R2>& a)					;
     template <class B2, class R2>
-    Array2(const Array2<T, B2, R2>& a,
-	   u_int i, u_int j, u_int r, u_int c)				;
+    Array2(Array2<T, B2, R2>& a, u_int i, u_int j, u_int r, u_int c)	;
     Array2&		operator =(const Array2& a)			;
     template <class T2, class B2, class R2>
     Array2&		operator =(const Array2<T2, B2, R2>& a)		;
@@ -1206,11 +1205,12 @@ Array2<T, B, R>::Array2(const Array2<T2, B2, R2>& a)
   \param c	•”•ª”z—ñ‚Ì—ñ”
 */
 template <class T, class B, class R> template <class B2, class R2>
-Array2<T, B, R>::Array2(const Array2<T, B2, R2>& a,
+Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
 			u_int i, u_int j, u_int r, u_int c)
     :super(super::partial_dim(i, r, a.nrow())),
      _ncol(super::partial_dim(j, c, a.ncol())),
-     _buf((nrow() > 0 && ncol() > 0 ? pointer(&a[i][j]) : 0),
+     _buf((nrow() > 0 && ncol() > 0 ? pointer(&a[i][j])
+				    : pointer((value_type*)0)),
 	  nrow()*buf_type::stride(ncol()))
 {
     for (u_int ii = 0; ii < nrow(); ++ii)

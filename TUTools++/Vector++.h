@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.38 2010-07-07 03:02:40 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.39 2011-04-15 04:56:05 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -141,7 +141,7 @@ class Vector : public Array<T, B>
     explicit Vector(u_int d)						;
     Vector(T* p, u_int d)						;
     template <class B2>
-    Vector(const Vector<T, B2>& v, u_int i, u_int d)			;
+    Vector(Vector<T, B2>& v, u_int i, u_int d)				;
     template <class T2, class B2>
     Vector(const Vector<T2, B2>& v)					;
     template <class T2, class B2>
@@ -223,7 +223,7 @@ Vector<T, B>::Vector(T* p, u_int d)
   \param d	部分ベクトルの次元
 */
 template <class T, class B> template <class B2> inline
-Vector<T, B>::Vector(const Vector<T, B2>& v, u_int i, u_int d)
+Vector<T, B>::Vector(Vector<T, B2>& v, u_int i, u_int d)
     :Array<T, B>(v, i, d)
 {
 }
@@ -271,7 +271,7 @@ Vector<T, B>::operator ()(u_int i, u_int d)
 template <class T, class B> inline const Vector<T>
 Vector<T, B>::operator ()(u_int i, u_int d) const
 {
-    return Vector<T>(*this, i, d);
+    return Vector<T>(const_cast<Vector<T, B>&>(*this), i, d);
 }
 
 //! このベクトルの全ての要素に同一の数値を代入する．
@@ -553,7 +553,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix(u_int r, u_int c)						;
     Matrix(T* p, u_int r, u_int c)					;
     template <class B2, class R2>
-    Matrix(const Matrix<T, B2, R2>& m, u_int i, u_int j, u_int r, u_int c)	;
+    Matrix(Matrix<T, B2, R2>& m, u_int i, u_int j, u_int r, u_int c)	;
     template <class T2, class B2, class R2>
     Matrix(const Matrix<T2, B2, R2>& m)					;
     template <class T2, class B2, class R2>
@@ -664,7 +664,7 @@ Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
   \param c	部分行列の列数
 */
 template <class T, class B, class R> template <class B2, class R2> inline
-Matrix<T, B, R>::Matrix(const Matrix<T, B2, R2>& m,
+Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
 			u_int i, u_int j, u_int r, u_int c)
     :Array2<Vector<T>, B, R>(m, i, j, r, c)
 {
@@ -730,7 +730,7 @@ Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c)
 template <class T, class B, class R> inline const Matrix<T>
 Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c) const
 {
-    return Matrix<T>(*this, i, j, r, c);
+    return Matrix<T>(const_cast<Matrix<T, B, R>&>(*this), i, j, r, c);
 }
 
 //! この行列の全ての要素に同一の数値を代入する．
