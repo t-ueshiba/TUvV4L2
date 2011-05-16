@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.95 2011-01-17 01:03:33 ueshiba Exp $
+#  $Id: Makefile,v 1.96 2011-05-16 05:33:38 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -32,7 +32,7 @@ LINKER		= $(CCC)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC
-EXTHDRS		= TU/BlockMatrix++.h \
+EXTHDRS		= TU/BlockDiagonalMatrix++.h \
 		TU/Camera.h \
 		TU/CorrectIntensity.h \
 		TU/EdgeDetector.h \
@@ -61,7 +61,7 @@ EXTHDRS		= TU/BlockMatrix++.h \
 HDRS		= Allocator.h \
 		Array++.h \
 		Bezier++.h \
-		BlockMatrix++.h \
+		BlockDiagonalMatrix++.h \
 		Camera.h \
 		CorrectIntensity.h \
 		DericheConvolver.h \
@@ -95,7 +95,7 @@ HDRS		= Allocator.h \
 		mmInstructions.h \
 		types.h \
 		utility.h
-SRCS		= BlockMatrix++.inst.cc \
+SRCS		= BlockDiagonalMatrix++.inst.cc \
 		Camera.cc \
 		CameraBase.cc \
 		CameraWithDistortion.cc \
@@ -123,7 +123,7 @@ SRCS		= BlockMatrix++.inst.cc \
 		fdstream.cc \
 		io.cc \
 		manipulators.cc
-OBJS		= BlockMatrix++.inst.o \
+OBJS		= BlockDiagonalMatrix++.inst.o \
 		Camera.o \
 		CameraBase.o \
 		CameraWithDistortion.o \
@@ -155,7 +155,7 @@ OBJS		= BlockMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.95 $	|		\
+REV		= $(shell echo $Revision: 1.96 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -166,7 +166,7 @@ REV		= $(shell echo $Revision: 1.95 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-BlockMatrix++.inst.o: TU/BlockMatrix++.h TU/TU/Vector++.h \
+BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Camera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \

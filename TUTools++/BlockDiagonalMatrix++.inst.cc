@@ -25,44 +25,46 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BlockMatrix++.inst.cc,v 1.10 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: BlockDiagonalMatrix++.inst.cc,v 1.1 2011-05-16 05:33:38 ueshiba Exp $
  */
-#include "TU/BlockMatrix++.h"
+#include "TU/BlockDiagonalMatrix++.h"
 
 namespace TU
 {
 template class Array<Matrix<float> >;
 template class Array<Matrix<double> >;
-template class BlockMatrix<float>;
-template class BlockMatrix<double>;
+template class BlockDiagonalMatrix<float>;
+template class BlockDiagonalMatrix<double>;
 
-template BlockMatrix<float>
-operator *(const BlockMatrix<float>&, const BlockMatrix<float>&);
+template BlockDiagonalMatrix<float>
+operator *(const BlockDiagonalMatrix<float>&,
+	   const BlockDiagonalMatrix<float>&);
 
-template BlockMatrix<double>
-operator *(const BlockMatrix<double>&, const BlockMatrix<double>&);
-
-template Matrix<float>
-operator *(const BlockMatrix<float>&, const Matrix<float>&);
-
-template Matrix<double>
-operator *(const BlockMatrix<double>&, const Matrix<double>&);
+template BlockDiagonalMatrix<double>
+operator *(const BlockDiagonalMatrix<double>&,
+	   const BlockDiagonalMatrix<double>&);
 
 template Matrix<float>
-operator *(const Matrix<float>&, const BlockMatrix<float>&);
+operator *(const BlockDiagonalMatrix<float>&, const Matrix<float>&);
 
 template Matrix<double>
-operator *(const Matrix<double>&, const BlockMatrix<double>&);
+operator *(const BlockDiagonalMatrix<double>&, const Matrix<double>&);
+
+template Matrix<float>
+operator *(const Matrix<float>&, const BlockDiagonalMatrix<float>&);
+
+template Matrix<double>
+operator *(const Matrix<double>&, const BlockDiagonalMatrix<double>&);
 
 template Vector<float>
-operator *(const BlockMatrix<float>&, const Vector<float>& v);
+operator *(const BlockDiagonalMatrix<float>&, const Vector<float>& v);
 
 template Vector<double>
-operator *(const BlockMatrix<double>&, const Vector<double>& v);
+operator *(const BlockDiagonalMatrix<double>&, const Vector<double>& v);
 
 template Vector<float>
-operator *(const Vector<float>&, const BlockMatrix<float>&);
+operator *(const Vector<float>&, const BlockDiagonalMatrix<float>&);
 
 template Vector<double>
-operator *(const Vector<double>&, const BlockMatrix<double>&);
+operator *(const Vector<double>&, const BlockDiagonalMatrix<double>&);
 }
