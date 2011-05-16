@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.39 2011-01-14 01:53:51 ueshiba Exp $
+#  $Id: Makefile,v 1.40 2011-05-16 06:09:20 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -36,9 +36,12 @@ SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Normalize.h \
 		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/utility.h \
 		TU/Ieee1394++.h \
 		TU/Ieee1394CameraArray.h
 HDRS		= Ieee1394++.h \
@@ -53,7 +56,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.39 $	|		\
+REV		= $(shell echo $Revision: 1.40 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -65,15 +68,18 @@ REV		= $(shell echo $Revision: 1.39 $	|		\
 include $(PROJECT)/lib/l.mk
 ###
 Ieee1394Camera.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/Minimize.h
 Ieee1394CameraArray.o: TU/Ieee1394CameraArray.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
 	TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/io.h
 Ieee1394Node.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/Minimize.h

@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.6 2011-01-17 00:07:06 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.7 2011-05-16 06:09:20 ueshiba Exp $
  */
 #ifndef __TUIeee1394CameraArray_h
 #define __TUIeee1394CameraArray_h
@@ -29,7 +29,7 @@ class Ieee1394CameraArray : public Array<Ieee1394Camera*>
 			bool i1394b=false, int ncameras=-1)		;
     ~Ieee1394CameraArray()						;
 
-    void		initialize(const char* dirs, const char* name,
+    void		initialize(const char* name, const char* dirs,
 				   bool i1394b, int ncameras=-1)	;
     const std::string&	fullName()				const	;
     std::string		configFile()				const	;
