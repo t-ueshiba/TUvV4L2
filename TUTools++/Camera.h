@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.h,v 1.7 2011-04-15 04:56:05 ueshiba Exp $
+ *  $Id: Camera.h,v 1.8 2011-05-23 03:27:21 ueshiba Exp $
  */
 #ifndef __TUCamera_h
 #define __TUCamera_h
@@ -652,6 +652,15 @@ class __PORT CameraWithFocalLength : public CameraBase
 			  const Matrix33d& Rt, double k=1.0)
 	:CameraBase(t, Rt), _intrinsic(k)			{}
 
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param extrinsic	カメラの外部パラメータ
+    \param intrinsic	カメラの内部パラメータ
+  */
+    CameraWithFocalLength(const CameraBase& extrinsic,
+			  const Intrinsic& intrinsic)
+	:CameraBase(extrinsic), _intrinsic(intrinsic)		{}
+
   //! 投影行列をセットして初期化する．
   /*!
     \param P	3x4投影行列
@@ -743,6 +752,15 @@ class __PORT CameraWithEuclideanImagePlane : public CameraBase
 				  double		u0=0,
 				  double		v0=0)
 	:CameraBase(t, Rt), _intrinsic(k, u0, v0)			{}
+
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param extrinsic	カメラの外部パラメータ
+    \param intrinsic	カメラの内部パラメータ
+  */
+    CameraWithEuclideanImagePlane(const CameraBase& extrinsic,
+				  const Intrinsic& intrinsic)
+	:CameraBase(extrinsic), _intrinsic(intrinsic)			{}
 
   //! 投影行列をセットして初期化する．
   /*!
@@ -852,7 +870,7 @@ class __PORT Camera : public CameraBase
     
   public:
   //! 位置を原点に，姿勢を単位行列に，内部パラメータをデフォルト値にセットして初期化する．
-    Camera()	:CameraBase(), _intrinsic()			{}
+    Camera()	:CameraBase(), _intrinsic()				{}
 
   //! 外部／内部パラメータをセットして初期化する．
   /*!
@@ -871,7 +889,15 @@ class __PORT Camera : public CameraBase
 	   double		v0=0,
 	   double		aspect=1.0,
 	   double		skew=0.0)
-	:CameraBase(t, Rt), _intrinsic(k, u0, v0, aspect, skew)	{}
+	:CameraBase(t, Rt), _intrinsic(k, u0, v0, aspect, skew)		{}
+
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param extrinsic	カメラの外部パラメータ
+    \param intrinsic	カメラの内部パラメータ
+  */
+    Camera(const CameraBase& extrinsic, const Intrinsic& intrinsic)
+	:CameraBase(extrinsic), _intrinsic(intrinsic)			{}
 
   //! 投影行列をセットして初期化する．
   /*!
@@ -981,6 +1007,15 @@ class __PORT CameraWithDistortion : public CameraBase
 			 double			d1=0.0,
 			 double			d2=0.0)
 	:CameraBase(t, Rt), _intrinsic(k, u0, v0, aspect, skew, d1, d2)	{}
+
+  //! 外部／内部パラメータをセットして初期化する．
+  /*!
+    \param extrinsic	カメラの外部パラメータ
+    \param intrinsic	カメラの内部パラメータ
+  */
+    CameraWithDistortion(const CameraBase& extrinsic,
+			 const Intrinsic& intrinsic)
+	:CameraBase(extrinsic), _intrinsic(intrinsic)			{}
 
     CameraWithDistortion(const Matrix34d& P,
 			 double d1=0.0, double d2=0.0)			;
