@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CameraBase.cc,v 1.16 2009-07-31 07:04:44 ueshiba Exp $
+ *  $Id: CameraBase.cc,v 1.17 2011-05-24 00:05:19 ueshiba Exp $
  */
 #include "TU/Camera.h"
 
@@ -71,12 +71,12 @@ CameraBase::Pc() const
 		\TUendarray
 		\f$
 */
-Matrix<double>
+Matrix26d
 CameraBase::jacobianPc(const Point3d& X) const
 {
     const Vector3d&		dX = X - _t;
     const Vector<double>&	x  = _Rt * dX;
-    Matrix<double>		J(2, 6);
+    Matrix26d			J;
     (J[0](0, 3) = (x[0] / x[2] * _Rt[2] - _Rt[0])) /= x[2];
     (J[1](0, 3) = (x[1] / x[2] * _Rt[2] - _Rt[1])) /= x[2];
     J[0](3, 3) = J[0](0, 3) ^ dX;
@@ -87,7 +87,7 @@ CameraBase::jacobianPc(const Point3d& X) const
 
 //! 点の3次元位置に関する投影点のcanonical画像座標の1階微分を求める．
 /*!
-  \param x	対象点の3次元位置
+  \param X	対象点の3次元位置
   \return	投影点のcanonical画像座標の1階微分を表す2x3ヤコビ行列，すなわち
 		\f$\TUdisppartial{\TUvec{x}{}}{\TUvec{X}{}}\f$
 */
@@ -104,7 +104,7 @@ CameraBase::jacobianXc(const Point3d& X) const
  
 //! 全カメラパラメータに関する投影点の画像座標の1階微分を求める．
 /*!
-  \param x	対象点の3次元位置
+  \param X	対象点の3次元位置
   \return	投影点の画像座標の1階微分を表す2x(6+#dofIntrinsic())ヤコビ行列，
 		すなわち
 		\f$

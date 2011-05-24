@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera.h,v 1.8 2011-05-23 03:27:21 ueshiba Exp $
+ *  $Id: Camera.h,v 1.9 2011-05-24 00:05:19 ueshiba Exp $
  */
 #ifndef __TUCamera_h
 #define __TUCamera_h
@@ -99,12 +99,13 @@ class __PORT CameraBase
     Point2d		xc(const Point3d& X)			const	;
     Point2d		xcFromU(const Point2d& u)		const	;
     Matrix34d		Pc()					const	;
-    Matrix<double>	jacobianPc(const Point3d& X)		const	;
+    Matrix26d		jacobianPc(const Point3d& X)		const	;
     Matrix23d		jacobianXc(const Point3d& X)		const	;
 
   // various oeprations in image coordinates.
     Point2d		operator ()(const Point3d& X)		const	;
     Matrix34d		P()					const	;
+    Matrix26d		jacobianD(const Point3d& X)		const	;
     Matrix<double>	jacobianP(const Point3d& X)		const	;
     Matrix<double>	jacobianFCC(const Point3d& X)		const	;
     Matrix23d		jacobianX(const Point3d& X)		const	;
@@ -292,6 +293,29 @@ CameraBase::P() const
     return K() * Pc();
 }
 
+//! 外部カメラパラメータに関する投影点の画像座標の1階微分を求める．
+/*!
+  \param X	対象点の3次元位置
+  \return	投影点の画像座標の1階微分を表す2x6ヤコビ行列，
+		すなわち
+		\f$
+		\TUbeginarray{ccc}
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{t}{}} &
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{\theta}{}}
+		\TUendarray =
+		\TUdisppartial{\TUvec{u}{}}{\TUvec{x}{}}
+		\TUbeginarray{cc}
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{t}{}} &
+		\TUdisppartial{\TUvec{x}{}}{\TUvec{\theta}{}}
+		\TUendarray
+		\f$
+*/
+inline Matrix26d
+CameraBase::jacobianD(const Point3d& X) const
+{
+    return intrinsic().jacobianXC(xc(X)) * jacobianPc(X);
+}
+	
 //! カメラ位置以外の全カメラパラメータに関する投影点の画像座標の1階微分を求める．
 /*!
   \param X	対象点の3次元位置
