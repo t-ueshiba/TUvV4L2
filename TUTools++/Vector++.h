@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.39 2011-04-15 04:56:05 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.40 2011-05-24 00:05:19 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -2629,6 +2629,12 @@ typedef Matrix<float,  FixedSizedBuf<float,  16>,
 typedef Matrix<double, FixedSizedBuf<double, 16>,
 	       FixedSizedBuf<Vector<double>,  4> >
 	Matrix44d;			//!< doubleŒ^—v‘f‚ðŽ‚Â4x4s—ñ
+typedef Matrix<float, FixedSizedBuf<float, 12>,
+	       FixedSizedBuf<Vector<float>,  2> >
+	Matrix26f;			//!< floatŒ^—v‘f‚ðŽ‚Â2x6s—ñ
+typedef Matrix<double, FixedSizedBuf<double, 12>,
+	       FixedSizedBuf<Vector<double>,  2> >
+	Matrix26d;			//!< doubleŒ^—v‘f‚ðŽ‚Â2x6s—ñ
 
 /************************************************************************
 *  class Minimization1<S>						*
