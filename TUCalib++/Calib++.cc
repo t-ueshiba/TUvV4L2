@@ -1,5 +1,5 @@
 /*
- *  $Id: Calib++.cc,v 1.4 2007-06-28 23:59:20 ueshiba Exp $
+ *  $Id: Calib++.cc,v 1.5 2011-06-24 00:32:26 ueshiba Exp $
  */
 #include "TU/Calib++.h"
 
@@ -168,11 +168,11 @@ MeasurementMatrix::CostBA<CAMERA>::operator ()(const ATA& p,
     return val;
 }
 
-template <class CAMERA> BlockMatrix<double>
+template <class CAMERA> BlockDiagonalMatrix<double>
 MeasurementMatrix::CostBA<CAMERA>::jacobianA(const ATA& p,
 					     const ATB& x, int j) const
 {
-    BlockMatrix<ET>	J(nframes());
+    BlockDiagonalMatrix<ET>	J(nframes());
     J[0] = (_fcc ? p[0].jacobianFCC(x) : p[0].jacobianK(x));
     for (int i = 1; i < nframes(); ++i)
 	J[i] = (_fcc ? p[i].jacobianFCC(x) : p[i].jacobianP(x));

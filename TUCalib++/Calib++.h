@@ -20,13 +20,13 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.13 2008-09-08 08:15:08 ueshiba Exp $
+ *  $Id: Calib++.h,v 1.14 2011-06-24 00:32:26 ueshiba Exp $
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h
 
 #include "TU/Camera.h"
-#include "TU/BlockMatrix++.h"
+#include "TU/BlockDiagonalMatrix++.h"
 #include "TU/Minimize.h"
 
 /*!
@@ -308,7 +308,7 @@ class MeasurementMatrix : public Matrix<double>
     {
       public:
       	typedef ET			value_type;
-	typedef BlockMatrix<ET>		jacobian_type;
+	typedef BlockDiagonalMatrix<ET>	jacobian_type;
 	typedef Array<CAMERA>		ATA;
 	typedef Vector<ET>		ATB;
 
@@ -342,7 +342,8 @@ class MeasurementMatrix : public Matrix<double>
 
 	Vector<ET>	operator ()(const ATA& p,
 				    const ATB& x, int j)	const	;
-	BlockMatrix<ET>	jacobianA(const ATA& p,
+	BlockDiagonalMatrix<ET>
+			jacobianA(const ATA& p,
 				  const ATB& x, int j)		const	;
 	Matrix<ET>	jacobianB(const ATA& p,
 				  const ATB& x, int j)		const	;
