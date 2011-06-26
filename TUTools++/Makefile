@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.96 2011-05-16 05:33:38 ueshiba Exp $
+#  $Id: Makefile,v 1.97 2011-06-26 23:33:23 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -77,6 +77,7 @@ HDRS		= Allocator.h \
 		Mesh++.h \
 		Minimize.h \
 		Movie.h \
+		NDTree++.h \
 		Normalize.h \
 		Nurbs++.h \
 		PM16C_04.h \
@@ -155,7 +156,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.96 $	|		\
+REV		= $(shell echo $Revision: 1.97 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
