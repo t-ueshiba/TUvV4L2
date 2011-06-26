@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.28 2011-05-16 05:33:38 ueshiba Exp $
+ *  $Id: types.h,v 1.29 2011-06-26 23:27:21 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -116,7 +116,8 @@
   - #TU::List
   - #TU::Heap
   - #TU::PSTree
-
+  - #TU::NDTree
+  
   <b>Bezier曲線とBezier曲面</b>
   - #TU::BezierCurve
   - #TU::BezierSurface
