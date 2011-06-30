@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2011-06-26 23:32:51 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2011-06-30 02:46:48 ueshiba Exp $
  */
 #include <cstdlib>
 #include <stdexcept>
@@ -77,6 +77,9 @@ main(int argc, char* argv[])
 	      case 's':
 		cerr << "tree size is " << tree.size() << "." << endl;
 		break;
+	      case 'o':
+		cerr << "root origin is " << tree.origin();
+		break;
 	      case 'l':
 		cerr << "root cell length is " << tree.length0() << '.'
 		     << endl;
@@ -84,10 +87,13 @@ main(int argc, char* argv[])
 	      case 'c':
 		tree.clear();
 		break;
-	      case 'd':
+	      case 'p':
 		tree.put(cerr);
 		break;
-	      case 'p':
+	      case 'q':
+		tree.print(cerr);
+		break;
+	      case 'P':
 	      {
 		ofstream	out(treeFileName);
 		if (!out)
@@ -95,16 +101,13 @@ main(int argc, char* argv[])
 		tree.put(out);
 	      }
 		break;
-	      case 'g':
+	      case 'G':
 	      {
 		ifstream	in(treeFileName);
 		if (!in)
 		    throw runtime_error("Failed to open the input file!");
 		tree.get(in);
 	      }
-		break;
-	      case 'P':
-		tree.print(cerr);
 		break;
 	      default:
 		cerr << "unknown command: \'" << c << '\'' << endl;

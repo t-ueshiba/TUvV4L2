@@ -1,5 +1,5 @@
 /*
- *  $Id: NDTree++.h,v 1.1 2011-06-26 23:27:21 ueshiba Exp $
+ *  $Id: NDTree++.h,v 1.2 2011-06-30 02:46:38 ueshiba Exp $
  */
 #ifndef __TUNDTreePP_h
 #define __TUNDTreePP_h
@@ -88,7 +88,9 @@ class NDTree
 			NDTree(const NDTree& tree)			;
 			~NDTree()					;
     NDTree&		operator =(const NDTree& tree)			;
-	   
+
+    const position_type&
+			origin()				const	;
     u_int		length0()				const	;
     u_int		size()					const	;
     bool		empty()					const	;
@@ -237,6 +239,16 @@ NDTree<T, D>::operator =(const NDTree& tree)
     }
     
     return *this;
+}
+
+//! この2^D分木のrootセルの原点位置を返す．
+/*!
+  \return	rootセルの原点位置
+*/
+template <class T, u_int D> inline const typename NDTree<T, D>::position_type&
+NDTree<T, D>::origin() const
+{
+    return _org;
 }
 
 //! この2^D分木のrootセルの一辺の長さを返す．
@@ -423,8 +435,6 @@ NDTree<T, D>::put(std::ostream& out) const
 {
     using namespace	std;
     
-    out << _len0 << endl;			// _rootのセル長を書き出す．
-    
     for (const_iterator iter = begin(); iter != end(); ++iter)
 	iter.position().put(out) << '\t' << iter.length() << '\t'
 				 << *iter << endl;
@@ -441,7 +451,6 @@ template <class T, u_int D> std::istream&
 NDTree<T, D>::get(std::istream& in)
 {
     clear();					// 既存の全セルを廃棄
-    in >> _len0;				// _rootのセル長を読み込む．
 
     for (position_type pos; in >> pos; )	// 葉の位置を読み込み
     {
@@ -833,7 +842,7 @@ NDTree<T, D>::Leaf::find(const position_type&, u_int len) const
 }
 
 template <class T, u_int D> void
-NDTree<T, D>::Leaf::insert(const position_type&,
+NDTree<T, D>::Leaf::insert(const position_type& pos,
 			   const_reference val, u_int len)
 {
     if (len != 1)
@@ -866,6 +875,33 @@ template <class T, u_int D> void
 NDTree<T, D>::Leaf::print(std::ostream& out, u_int nindents) const
 {
     out << _val << std::endl;
+}
+
+/************************************************************************
+*  global fucntions							*
+************************************************************************/
+//! 入力ストリームから2^D分木を読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \param tree	2^D分木の読み込み先
+  \return	inで指定した入力ストリーム
+*/
+template <class T, u_int D> inline std::istream&
+operator >>(std::istream& in, NDTree<T, D>& tree)
+{
+    return tree.get(in);
+}
+
+//! 出力ストリームへ2^D分木を書き出す(ASCII)．
+/*!
+  \param out	出力ストリーム
+  \param tree	書き出す2^D分木
+  \return	outで指定した出力ストリーム
+*/
+template <class T, u_int D> inline std::ostream&
+operator <<(std::ostream& out, const NDTree<T, D>& tree)
+{
+    return tree.put(out);
 }
 
 }
