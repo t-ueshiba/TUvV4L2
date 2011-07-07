@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.34 2011-04-15 04:56:05 ueshiba Exp $
+ *  $Id: Array++.h,v 1.35 2011-07-07 07:51:04 ueshiba Exp $
  */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -725,7 +725,8 @@ Array<T, B>::Array(const Array<T2, B2>& a)
 */
 template <class T, class B> template <class B2> inline
 Array<T, B>::Array(Array<T, B2>& a, u_int i, u_int d)
-    :buf_type(pointer(&a[i]), partial_dim(i, d, a.dim()))
+    :buf_type(i < a.dim() ? pointer(&a[i]) : pointer((value_type*)0),
+	      partial_dim(i, d, a.dim()))
 {
 }
 
