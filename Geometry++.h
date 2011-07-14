@@ -25,14 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.40 2010-06-21 02:38:52 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.41 2011-07-14 23:41:44 ueshiba Exp $
  */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
 
 #include "TU/utility.h"
 #include "TU/Vector++.h"
-#include "TU/Normalize.h"
 #include "TU/Minimize.h"
 #include <limits>
 
@@ -355,6 +354,260 @@ typedef Point3<float>	Point3f;		//!< float型座標を持つ3次元点
 typedef Point3<double>	Point3d;		//!< double型座標を持つ3次元点
 
 /************************************************************************
+*  class Normalize<S>							*
+************************************************************************/
+//! 点の非同次座標の正規化変換を行うクラス
+/*!
+  \f$\TUud{x}{}=[\TUtvec{x}{}, 1]^\top~
+  (\TUvec{x}{} \in \TUspace{R}{d})\f$に対して，以下のような平行移動と
+  スケーリングを行う:
+  \f[
+	\TUud{y}{} =
+	\TUbeginarray{c} s^{-1}(\TUvec{x}{} - \TUvec{c}{}) \\ 1	\TUendarray =
+	\TUbeginarray{ccc}
+	  s^{-1} \TUvec{I}{d} & -s^{-1}\TUvec{c}{} \\ \TUtvec{0}{d} & 1
+	\TUendarray
+	\TUbeginarray{c} \TUvec{x}{} \\ 1 \TUendarray =
+	\TUvec{T}{}\TUud{x}{}
+  \f]
+  \f$s\f$と\f$\TUvec{c}{}\f$は，振幅の2乗平均値が空間の次元\f$d\f$に,
+  重心が原点になるよう決定される．
+*/
+template <class S>
+class Normalize
+{
+  public:
+    typedef S					value_type;
+    typedef Vector<value_type>			vector_type;
+    typedef Matrix<value_type>			matrix_type;
+    
+  public:
+  //! 空間の次元を指定して正規化変換オブジェクトを生成する．
+  /*!
+    恒等変換として初期化される．
+    \param d	空間の次元
+  */
+    Normalize(u_int d=2) :_npoints(0), _scale(1.0), _centroid(d)	{}
+
+    template <class Iterator>
+    Normalize(Iterator first, Iterator last)				;
+    
+    template <class Iterator>
+    void		update(Iterator first, Iterator last)		;
+
+    u_int		spaceDim()				const	;
+    template <class S2, class B2>
+    vector_type		operator ()(const Vector<S2, B2>& x)	const	;
+    template <class S2, class B2>
+    vector_type		normalizeP(const Vector<S2, B2>& x)	const	;
+    
+    matrix_type		T()					const	;
+    matrix_type		Tt()					const	;
+    matrix_type		Tinv()					const	;
+    matrix_type		Ttinv()					const	;
+    value_type		scale()					const	;
+    const vector_type&	centroid()				const	;
+    
+  private:
+    u_int		_npoints;	//!< これまでに与えた点の総数
+    value_type		_scale;		//!< これまでに与えた点の振幅のRMS値
+    vector_type		_centroid;	//!< これまでに与えた点群の重心
+};
+
+//! 与えられた点群の非同次座標から正規化変換オブジェクトを生成する．
+/*!
+  振幅の2乗平均値が#spaceDim(), 重心が原点になるような正規化変換が計算される．
+  \param first	点群の先頭を示す反復子
+  \param last	点群の末尾を示す反復子
+*/
+template <class S> template <class Iterator> inline
+Normalize<S>::Normalize(Iterator first, Iterator last)
+    :_npoints(0), _scale(1.0), _centroid()
+{
+    update(first, last);
+}
+    
+//! 新たに点群を追加してその非同次座標から現在の正規化変換を更新する．
+/*!
+  振幅の2乗平均値が#spaceDim(), 重心が原点になるような正規化変換が計算される．
+  \param first			点群の先頭を示す反復子
+  \param last			点群の末尾を示す反復子
+  \throw std::invalid_argument	これまでに与えられた点の総数が0の場合に送出
+*/
+template <class S> template <class Iterator> void
+Normalize<S>::update(Iterator first, Iterator last)
+{
+    if (_npoints == 0)
+    {
+	if (first == last)
+	    throw std::invalid_argument("Normalize::update(): 0-length input data!!");
+	_centroid.resize(first->dim());
+    }
+    _scale = _npoints * (spaceDim() * _scale * _scale + _centroid * _centroid);
+    _centroid *= _npoints;
+    while (first != last)
+    {
+	_scale += first->square();
+	_centroid += *first++;
+	++_npoints;
+    }
+    if (_npoints == 0)
+	throw std::invalid_argument("Normalize::update(): no input data accumulated!!");
+    _centroid /= _npoints;
+    _scale = sqrt((_scale / _npoints - _centroid * _centroid) / spaceDim());
+}
+
+//! この正規化変換が適用される空間の次元を返す．
+/*! 
+  \return	空間の次元(同次座標のベクトルとしての次元は#spaceDim()+1)
+*/
+template <class S> inline u_int
+Normalize<S>::spaceDim() const
+{
+    return _centroid.dim();
+}
+    
+//! 与えられた点に正規化変換を適用してその非同次座標を返す．
+/*!
+  \param x	点の非同次座標（#spaceDim()次元）
+  \return	正規化された点の非同次座標（#spaceDim()次元）
+*/
+template <class S>
+template <class S2, class B2> inline typename Normalize<S>::vector_type
+Normalize<S>::operator ()(const Vector<S2, B2>& x) const
+{
+    return (vector_type(x) -= _centroid) /= _scale;
+}
+
+//! 与えられた点に正規化変換を適用してその同次座標を返す．
+/*!
+  \param x	点の非同次座標（#spaceDim()次元）
+  \return	正規化された点の同次座標（#spaceDim()+1次元）
+*/
+template <class S>
+template <class S2, class B2> inline typename Normalize<S>::vector_type
+Normalize<S>::normalizeP(const Vector<S2, B2>& x) const
+{
+    return (*this)(x).homogeneous();
+}
+
+//! 正規化変換のスケーリング定数を返す．
+/*!
+  \return	スケーリング定数（与えられた点列の振幅の2乗平均値）
+*/
+template <class S> inline typename Normalize<S>::value_type
+Normalize<S>::scale() const
+{
+    return _scale;
+}
+
+//! 正規化変換の平行移動成分を返す．
+/*!
+  \return	平行移動成分（与えられた点列の重心）
+*/
+template <class S> inline const typename Normalize<S>::vector_type&
+Normalize<S>::centroid() const
+{
+    return _centroid;
+}
+
+//! 正規化変換行列を返す．
+/*!
+  \return	変換行列:
+		\f$
+		\TUvec{T}{} = 
+		\TUbeginarray{ccc}
+		 s^{-1} \TUvec{I}{d} & -s^{-1}\TUvec{c}{} \\ \TUtvec{0}{d} & 1
+		\TUendarray
+		\f$
+*/
+template <class S> typename Normalize<S>::matrix_type
+Normalize<S>::T() const
+{
+    matrix_type	TT(spaceDim()+1, spaceDim()+1);
+    for (u_int i = 0; i < spaceDim(); ++i)
+    {
+	TT[i][i] = 1.0 / _scale;
+	TT[i][spaceDim()] = -_centroid[i] / _scale;
+    }
+    TT[spaceDim()][spaceDim()] = 1.0;
+
+    return TT;
+}
+
+//! 正規化変換の転置行列を返す．
+/*!
+  \return	変換の転置行列:
+		\f$
+		\TUtvec{T}{} = 
+		\TUbeginarray{ccc}
+		 s^{-1} \TUvec{I}{d} & \TUvec{0}{d} \\ -s^{-1}\TUtvec{c}{} & 1
+		\TUendarray
+		\f$
+*/
+template <class S> typename Normalize<S>::matrix_type
+Normalize<S>::Tt() const
+{
+    matrix_type	TTt(spaceDim()+1, spaceDim()+1);
+    for (u_int i = 0; i < spaceDim(); ++i)
+    {
+	TTt[i][i] = 1.0 / _scale;
+	TTt[spaceDim()][i] = -_centroid[i] / _scale;
+    }
+    TTt[spaceDim()][spaceDim()] = 1.0;
+
+    return TTt;
+}
+
+//! 正規化変換の逆行列を返す．
+/*!
+  \return	変換の逆行列:
+		\f$
+		\TUinv{T}{} = 
+		\TUbeginarray{ccc}
+		 s \TUvec{I}{d} & \TUvec{c}{} \\ \TUtvec{0}{d} & 1
+		\TUendarray
+		\f$
+*/
+template <class S> typename Normalize<S>::matrix_type
+Normalize<S>::Tinv() const
+{
+    matrix_type	TTinv(spaceDim()+1, spaceDim()+1);
+    for (u_int i = 0; i < spaceDim(); ++i)
+    {
+	TTinv[i][i] = _scale;
+	TTinv[i][spaceDim()] = _centroid[i];
+    }
+    TTinv[spaceDim()][spaceDim()] = 1.0;
+
+    return TTinv;
+}
+
+//! 正規化変換の逆行列の転置を返す．
+/*!
+  \return	変換の逆行列の転置:
+		\f$
+		\TUtinv{T}{} = 
+		\TUbeginarray{ccc}
+		 s \TUvec{I}{d} & \TUvec{0}{d} \\ \TUtvec{c}{} & 1
+		\TUendarray
+		\f$
+*/
+template <class S> typename Normalize<S>::matrix_type
+Normalize<S>::Ttinv() const
+{
+    matrix_type	TTtinv(spaceDim()+1, spaceDim()+1);
+    for (u_int i = 0; i < spaceDim(); ++i)
+    {
+	TTtinv[i][i] = _scale;
+	TTtinv[spaceDim()][i] = _centroid[i];
+    }
+    TTtinv[spaceDim()][spaceDim()] = 1.0;
+
+    return TTtinv;
+}
+
+/************************************************************************
 *  class HyperPlane<V>							*
 ************************************************************************/
 //! d次元射影空間中の超平面を表現するクラス
@@ -450,7 +703,7 @@ template <class V> template <class Iterator> void
 HyperPlane<V>::fit(Iterator begin, Iterator end)
 {
   // 点列の正規化
-    const Normalize	normalize(begin, end);
+    const Normalize<value_type>	normalize(begin, end);
 
   // 充分な個数の点があるか？
     const u_int		ndata = std::distance(begin, end),
@@ -676,10 +929,10 @@ template <class M> template <class Iterator> void
 Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
 {
   // 点列の正規化
-    const Normalize	xNormalize(make_const_first_iterator(begin),
-				   make_const_first_iterator(end)),
-			yNormalize(make_const_second_iterator(begin),
-				   make_const_second_iterator(end));
+    const Normalize<value_type>	xNormalize(make_const_first_iterator(begin),
+					   make_const_first_iterator(end)),
+				yNormalize(make_const_second_iterator(begin),
+					   make_const_second_iterator(end));
 
   // 充分な個数の点対があるか？
     const u_int		ndata = std::distance(begin, end);
