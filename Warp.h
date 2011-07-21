@@ -25,13 +25,13 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.12 2010-07-27 06:17:31 ueshiba Exp $
+ *  $Id: Warp.h,v 1.13 2011-07-21 23:39:35 ueshiba Exp $
  */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
 
 #include "TU/Image++.h"
-#include "TU/Camera.h"
+#include "TU/Camera++.h"
 #include "TU/mmInstructions.h"
 
 namespace TU
@@ -80,11 +80,14 @@ class Warp
     int		lmost(int v)			const	;
     int		rmost(int v)			const	;
 
-    __PORT void	initialize(const Matrix33d& Htinv,
+    template <class T>
+    void	initialize(const Matrix<T, FixedSizedBuf<T, 9>,
+					FixedSizedBuf<Vector<T>, 3> >& Htinv,
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
-    __PORT void	initialize(const Matrix33d& Htinv,
-			   const CameraBase::Intrinsic& intrinsic,
+    template <class I>
+    void	initialize(const typename I::matrix33_type& Htinv,
+			   const I& intrinsic,
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
     template <class T>
@@ -135,6 +138,111 @@ inline int
 Warp::rmost(int v) const
 {
     return _fracs[v].lmost + _fracs[v].width();
+}
+
+//! 画像を射影変換するための行列を設定する．
+/*!
+  入力画像点uは射影変換
+  \f[
+    \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
+    \TUvec{H}{} \TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray
+  \f]
+  によって出力画像点vに写される．
+  \param Htinv		変形を指定する3x3射影変換行列の逆行列の転置，すなわち
+			\f$\TUtinv{H}{}\f$
+  \param inWidth	入力画像の幅
+  \param inHeight	入力画像の高さ
+  \param outWidth	出力画像の幅
+  \param outWidth	出力画像の高さ
+*/
+template <class T> inline void
+Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
+			      FixedSizedBuf<Vector<T>, 3> >& Htinv,
+		 u_int inWidth,  u_int inHeight,
+		 u_int outWidth, u_int outHeight)
+{
+    initialize(Htinv, IntrinsicBase<T>(),
+	       inWidth, inHeight, outWidth, outHeight);
+}
+
+//! 画像の非線形歪みを除去した後に射影変換を行うための行列とカメラ内部パラメータを設定する．
+/*!
+
+  canonical座標xから画像座標uへの変換が\f$\TUvec{u}{} = {\cal
+  K}(\TUvec{x}{})\f$ と表されるカメラ内部パラメータについて，その線形変
+  換部分を表す3x3上半三角行列をKとすると，
+  \f[
+    \TUbeginarray{c} \TUbar{u}{} \\ 1 \TUendarray =
+    \TUvec{K}{}
+    \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
+  \f]
+  によって画像の非線形歪みだけを除去できる．本関数は，この歪みを除去した画像点を
+  射影変換Hによって出力画像点vに写すように変形パラメータを設定する．すなわち，
+  全体の変形は
+  \f[
+    \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
+    \TUvec{H}{}\TUvec{K}{}
+    \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
+  \f]
+  となる．
+  \param Htinv		変形を指定する3x3射影変換行列の逆行列の転置
+  \param Intrinsic	入力画像に加えれられている放射歪曲を表すカメラ内部パラメータ
+  \param inWidth	入力画像の幅
+  \param inHeight	入力画像の高さ
+  \param outWidth	出力画像の幅
+  \param outWidth	出力画像の高さ
+*/
+template <class I> void
+Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
+		 u_int inWidth,  u_int inHeight,
+		 u_int outWidth, u_int outHeight)
+{
+    typedef I						intrinsic_type;
+    typedef typename intrinsic_type::point2_type	point2_type;
+    typedef typename intrinsic_type::vector_type	vector_type;
+    typedef typename intrinsic_type::matrix_type	matrix_type;
+    
+    _fracs.resize(outHeight);
+    _width = outWidth;
+    
+  /* Compute frac for each pixel. */
+    const matrix_type&	HKtinv = Htinv * intrinsic.Ktinv();
+    vector_type		leftmost = HKtinv[2];
+    for (u_int v = 0; v < height(); ++v)
+    {
+	vector_type	x = leftmost;
+	FracArray	frac(width());
+	u_int		n = 0;
+	for (u_int u = 0; u < width(); ++u)
+	{
+	    const point2_type&	m = intrinsic.u(point2_type(x[0]/x[2],
+							    x[1]/x[2]));
+	    if (0.0 <= m[0] && m[0] <= inWidth - 2 &&
+		0.0 <= m[1] && m[1] <= inHeight - 2)
+	    {
+		if (n == 0)
+		    frac.lmost = u;
+		frac.us[n] = (short)floor(m[0]);
+		frac.vs[n] = (short)floor(m[1]);
+		frac.du[n] = (u_char)floor((m[0] - floor(m[0])) * 128.0);
+		frac.dv[n] = (u_char)floor((m[1] - floor(m[1])) * 128.0);
+		++n;
+	    }
+	    x += HKtinv[0];
+	}
+
+	_fracs[v].resize(n);
+	_fracs[v].lmost = frac.lmost;
+	for (u_int u = 0; u < n; ++u)
+	{
+	    _fracs[v].us[u] = frac.us[u];
+	    _fracs[v].vs[u] = frac.vs[u];
+	    _fracs[v].du[u] = frac.du[u];
+	    _fracs[v].dv[u] = frac.dv[u];
+	}
+
+	leftmost += HKtinv[1];
+    }
 }
 
 //! 出力画像点を指定してそれにマップされる入力画像点の2次元座標を返す．

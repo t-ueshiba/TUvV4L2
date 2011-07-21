@@ -25,10 +25,10 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.32 2010-01-29 00:57:58 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.33 2011-07-21 23:39:34 ueshiba Exp $
  */
 #include "TU/Image++.h"
-#include "TU/Camera.h"
+#include "TU/Camera++.h"
 #include "TU/Manip.h"
 
 namespace TU
@@ -355,7 +355,7 @@ ImageBase::restorePBMHeader(std::istream& in)
 
     if (legacy)
     {
-	Camera	camera(P);
+	Camera<Intrinsic<double> >	camera(P);
 	double	k = camera.k();
 	d1 *= (k * k);
 	d2 *= (k * k * k * k);
