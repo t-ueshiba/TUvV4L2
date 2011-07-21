@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.25 2009-07-13 01:15:15 ueshiba Exp $
+#  $Id: Makefile,v 1.26 2011-07-21 23:41:13 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -11,7 +11,7 @@ INCDIRS		= -I. -I$(PREFIX)/include
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	= -DTUBrepPP_DEBUG
-CFLAGS		= -g
+CFLAGS		= -g -O
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
   CFLAGS	= -O3
@@ -39,10 +39,11 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/List.h \
 		/usr/local/include/TU/Manip.h \
-		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Object++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/utility.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
 		/usr/local/include/TU/v/CmdPane.h \
@@ -63,7 +64,7 @@ OBJS		= BrepCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.25 $	|		\
+REV		= $(shell echo $Revision: 1.26 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -76,23 +77,23 @@ include $(PROJECT)/lib/l.mk
 ###
 BrepCanvasPane.o: TU/v/Vision++.h /usr/local/include/TU/Brep/Brep++.h \
 	/usr/local/include/TU/Object++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/Menu.h
 BrepCmdPane.o: TU/v/Vision++.h /usr/local/include/TU/Brep/Brep++.h \
 	/usr/local/include/TU/Object++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/Menu.h

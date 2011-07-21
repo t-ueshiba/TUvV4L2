@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.24 2009-07-13 01:15:07 ueshiba Exp $
+#  $Id: Makefile,v 1.25 2011-07-21 23:40:50 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -35,11 +35,12 @@ LINKER		= $(CCC)
 SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Object++.cc \
 		/usr/local/include/TU/Object++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/utility.h \
 		TU/Brep/Brep++.h
 HDRS		= Brep++.h
 SRCS		= Geometry.cc \
@@ -60,7 +61,7 @@ OBJS		= Geometry.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.24 $	|		\
+REV		= $(shell echo $Revision: 1.25 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -73,29 +74,30 @@ include $(PROJECT)/lib/l.mk
 ###
 Geometry.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
 HalfEdge.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
 Loop.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
 Neighbor.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
 PointB.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
 TUBrep++.inst.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/Normalize.h /usr/local/include/TU/Object++.cc
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/Object++.cc
 TUBrep++.sa.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/Normalize.h
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h

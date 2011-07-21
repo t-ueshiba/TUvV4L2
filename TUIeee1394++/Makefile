@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.40 2011-05-16 06:09:20 ueshiba Exp $
+#  $Id: Makefile,v 1.41 2011-07-21 23:41:13 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -37,7 +37,6 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Normalize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/types.h \
@@ -56,7 +55,7 @@ OBJS		= Ieee1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.40 $	|		\
+REV		= $(shell echo $Revision: 1.41 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -70,16 +69,14 @@ include $(PROJECT)/lib/l.mk
 Ieee1394Camera.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 Ieee1394CameraArray.o: TU/Ieee1394CameraArray.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
 	TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/io.h
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/io.h
 Ieee1394Node.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h

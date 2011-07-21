@@ -1,15 +1,15 @@
 SUBDIR	= TUTools++		\
 	  TUThread++		\
 	  TUv++			\
-	  TUCalib++		\
 	  TUOgl++		\
 	  TUIeee1394++		\
 	  TUObject++		\
 	  TUBrep++		\
 	  TUCollection++	\
 	  TUVision++		\
-	  TUXv++
-#	  TUCuda++
+	  TUXv++		\
+	  TUCuda++
+#	  TUCalib++		\
 #	  Kanatani		\
 #	  TUXgl++		\
 #	  TUXil++		\

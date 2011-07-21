@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.28 2011-06-24 00:32:26 ueshiba Exp $
+#  $Id: Makefile,v 1.29 2011-07-21 23:40:56 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -35,13 +35,9 @@ LINKER		= $(CCC)
 SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/BlockDiagonalMatrix++.h \
-		/usr/local/include/TU/Camera.h \
-		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Normalize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h \
 		TU/Calib++.cc \
 		TU/Calib++.h
 HDRS		= Calib++.h
@@ -77,7 +73,7 @@ OBJS		= Calib++.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.28 $	|		\
+REV		= $(shell echo $Revision: 1.29 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -88,38 +84,28 @@ REV		= $(shell echo $Revision: 1.28 $	|		\
 
 include $(PROJECT)/lib/l.mk
 ###
-Calib++.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+Calib++.o: TU/Calib++.h /usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h
-MeasurementMatrix.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
+MeasurementMatrix.o: TU/Calib++.h \
+	/usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h TU/Calib++.cc
-Normalization.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	TU/Calib++.cc
+Normalization.o: TU/Calib++.h \
+	/usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 affine_registration.o: /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
-assess_projection.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+assess_projection.o: TU/Calib++.h \
+	/usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h
-decompose_essential.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
+decompose_essential.o: TU/Calib++.h \
+	/usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 decompose_homography.o: /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
 euclidean_registration.o: /usr/local/include/TU/Vector++.h \
@@ -128,23 +114,14 @@ get_flengths.o: /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
 get_principal.o: /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
-io.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+io.o: TU/Calib++.h /usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h
-plane_motion.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
+plane_motion.o: TU/Calib++.h /usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h
-projection.o: TU/Calib++.h /usr/local/include/TU/Camera.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
+projection.o: TU/Calib++.h /usr/local/include/TU/BlockDiagonalMatrix++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/BlockDiagonalMatrix++.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 similarity_registration.o: /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h

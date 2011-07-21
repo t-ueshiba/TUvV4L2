@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.21 2009-07-13 01:15:14 ueshiba Exp $
+#  $Id: Makefile,v 1.22 2011-07-21 23:41:13 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -32,7 +32,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 .SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/types.h \
 		TU/Object++.h
 HDRS		= Object++.h \
@@ -51,7 +51,7 @@ OBJS		= Desc.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.21 $	|		\
+REV		= $(shell echo $Revision: 1.22 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
