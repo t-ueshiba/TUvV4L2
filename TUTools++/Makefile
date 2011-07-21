@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.98 2011-07-14 23:41:44 ueshiba Exp $
+#  $Id: Makefile,v 1.99 2011-07-21 23:39:34 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -33,7 +33,7 @@ LINKER		= $(CCC)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= TU/BlockDiagonalMatrix++.h \
-		TU/Camera.h \
+		TU/Camera++.h \
 		TU/CorrectIntensity.h \
 		TU/EdgeDetector.h \
 		TU/GaussianConvolver.h \
@@ -57,11 +57,10 @@ EXTHDRS		= TU/BlockDiagonalMatrix++.h \
 		TU/io.h \
 		TU/mmInstructions.h \
 		TU/windows/fakeWindows.h
-HDRS		= Allocator.h \
-		Array++.h \
+HDRS		= Array++.h \
 		Bezier++.h \
 		BlockDiagonalMatrix++.h \
-		Camera.h \
+		Camera++.h \
 		CorrectIntensity.h \
 		DericheConvolver.h \
 		EdgeDetector.h \
@@ -95,12 +94,6 @@ HDRS		= Allocator.h \
 		types.h \
 		utility.h
 SRCS		= BlockDiagonalMatrix++.inst.cc \
-		Camera.cc \
-		CameraBase.cc \
-		CameraWithDistortion.cc \
-		CameraWithEuclideanImagePlane.cc \
-		CameraWithFocalLength.cc \
-		CanonicalCamera.cc \
 		ConversionFromYUV.cc \
 		CorrectIntensity.cc \
 		EdgeDetector.cc \
@@ -122,12 +115,6 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		io.cc \
 		manipulators.cc
 OBJS		= BlockDiagonalMatrix++.inst.o \
-		Camera.o \
-		CameraBase.o \
-		CameraWithDistortion.o \
-		CameraWithEuclideanImagePlane.o \
-		CameraWithFocalLength.o \
-		CanonicalCamera.o \
 		ConversionFromYUV.o \
 		CorrectIntensity.o \
 		EdgeDetector.o \
@@ -152,7 +139,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.98 $	|		\
+REV		= $(shell echo $Revision: 1.99 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -165,24 +152,6 @@ include $(PROJECT)/lib/l.mk
 ###
 BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Camera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
-CameraBase.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
-CameraWithDistortion.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
-CameraWithEuclideanImagePlane.o: TU/Camera.h TU/TU/Geometry++.h \
-	TU/TU/TU/utility.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
-CameraWithFocalLength.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
-CanonicalCamera.o: TU/Camera.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
 ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
 	TU/TU/TU/Minimize.h
@@ -203,7 +172,7 @@ Image++.inst.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/TU/Minimize.h
 ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h TU/Camera.h TU/Manip.h
+	TU/TU/TU/Minimize.h TU/Camera++.h TU/Manip.h
 ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
 	TU/TU/TU/Minimize.h
@@ -221,7 +190,7 @@ TriggerGenerator.o: TU/TriggerGenerator.h TU/TU/Serial.h \
 Vector++.inst.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
 Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
 	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h TU/Camera.h TU/mmInstructions.h
+	TU/TU/TU/Minimize.h TU/Camera++.h TU/mmInstructions.h
 fdstream.o: TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h
 io.o: TU/io.h
 manipulators.o: TU/Manip.h TU/TU/TU/TU/types.h

@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.29 2011-06-26 23:27:21 ueshiba Exp $
+ *  $Id: types.h,v 1.30 2011-07-21 23:39:35 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -75,11 +75,12 @@
   - #TU::BoundingBox
   
   <b>投影の幾何</b>
+  - #TU::IntrinsicBase
+  - #TU::IntrinsicWithFocalLength
+  - #TU::IntrinsicWithEuclideanImagePlane
+  - #TU::IntrinsicWithDistortion
   - #TU::CanonicalCamera
-  - #TU::CameraWithFocalLength
-  - #TU::CameraWithEuclideanImagePlane
   - #TU::Camera
-  - #TU::CameraWithDistortion
   
   <b>画素と画像</b>
   - #TU::RGB
