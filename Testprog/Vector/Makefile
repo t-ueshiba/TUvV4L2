@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2011-07-07 07:51:12 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2011-08-04 04:56:22 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -40,15 +40,13 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= Rotation.cc \
-		mtest.cc
-OBJS		= Rotation.o \
-		mtest.o
+SRCS		= mtest.cc
+OBJS		= mtest.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.8 $	|		\
+REV		= $(shell echo $Revision: 1.9 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -60,7 +58,5 @@ REV		= $(shell echo $Revision: 1.8 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-Rotation.o: /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h
 mtest.o: /usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/types.h

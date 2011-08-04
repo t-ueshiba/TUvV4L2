@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.41 2011-08-04 04:24:51 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.42 2011-08-04 04:56:13 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -37,7 +37,7 @@
 namespace TU
 {
 /************************************************************************
-*  class Rotation							*
+*  class Rotation<T>							*
 ************************************************************************/
 //! 2éüå≥í¥ïΩñ ì‡Ç≈ÇÃâÒì]Çï\Ç∑ÉNÉâÉX
 /*!
@@ -68,11 +68,15 @@ namespace TU
   \f]
   Ç»ÇÈâÒì]çsóÒÇ≈ï\Ç≥ÇÍÇÈÅD
 */
-class __PORT Rotation
+template <class T>
+class Rotation
 {
   public:
-    Rotation(u_int p, u_int q, double x, double y)	;
-    Rotation(u_int p, u_int q, double theta)		;
+    typedef T						value_type;
+    
+  public:
+    Rotation(u_int p, u_int q, value_type x, value_type y)	;
+    Rotation(u_int p, u_int q, value_type theta)		;
 
   //! pé≤Çï‘Ç∑ÅD
   /*!
@@ -90,25 +94,62 @@ class __PORT Rotation
   /*!
     \return	âÒì]äpê∂ê¨ÉxÉNÉgÉã(x, y)Ç…ëŒÇµÇƒ\f$\sqrt{x^2 + y^2}\f$
   */
-    double	length()			const	{return _l;}
+    value_type	length()			const	{return _l;}
 
   //! âÒì]äpÇÃcosílÇï‘Ç∑ÅD
   /*!
     \return	âÒì]äpÇÃcosíl
   */
-    double	cos()				const	{return _c;}
+    value_type	cos()				const	{return _c;}
 
   //! âÒì]äpÇÃsinílÇï‘Ç∑ÅD
   /*!
     \return	âÒì]äpÇÃsiníl
   */
-    double	sin()				const	{return _s;}
+    value_type	sin()				const	{return _s;}
     
   private:
     const u_int	_p, _q;				// rotation axis
-    double	_l;				// length of (x, y)
-    double	_c, _s;				// cos & sin
+    value_type	_l;				// length of (x, y)
+    value_type	_c, _s;				// cos & sin
 };
+
+//! 2éüå≥í¥ïΩñ ì‡Ç≈ÇÃâÒì]Çê∂ê¨Ç∑ÇÈ
+/*!
+  \param p	pé≤ÇéwíËÇ∑ÇÈindex
+  \param q	qé≤ÇéwíËÇ∑ÇÈindex
+  \param x	âÒì]äpÇê∂ê¨Ç∑ÇÈç€ÇÃxíl
+  \param y	âÒì]äpÇê∂ê¨Ç∑ÇÈç€ÇÃyíl
+		\f[
+		  \cos\theta = \frac{x}{\sqrt{x^2+y^2}},{\hskip 1em}
+		  \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
+		\f]
+*/
+template <class T> inline
+Rotation<T>::Rotation(u_int p, u_int q, value_type x, value_type y)
+    :_p(p), _q(q), _l(1.0), _c(1.0), _s(0.0)
+{
+    const value_type	absx = std::fabs(x), absy = std::fabs(y);
+    _l = (absx > absy ? absx * sqrt(1.0 + (absy*absy)/(absx*absx))
+		      : absy * sqrt(1.0 + (absx*absx)/(absy*absy)));
+    if (_l != 0.0)
+    {
+	_c = x / _l;
+	_s = y / _l;
+    }
+}
+
+//! 2éüå≥í¥ïΩñ ì‡Ç≈ÇÃâÒì]Çê∂ê¨Ç∑ÇÈ
+/*!
+  \param p	pé≤ÇéwíËÇ∑ÇÈindex
+  \param q	qé≤ÇéwíËÇ∑ÇÈindex
+  \param theta	âÒì]äp
+*/
+template <class T> inline
+Rotation<T>::Rotation(u_int p, u_int q, value_type theta)
+    :_p(p), _q(q), _l(1.0), _c(std::cos(theta)), _s(std::sin(theta))
+{
+}
 
 /************************************************************************
 *  class Vector<T>							*
@@ -135,6 +176,9 @@ class Vector : public Array<T, B>
     typedef typename Array<T, B>::reverse_iterator	reverse_iterator;
     typedef typename Array<T, B>::const_reverse_iterator
 							const_reverse_iterator;
+    typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
+    typedef Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+							matrix33_type;
     
   public:
     Vector()								;
@@ -178,8 +222,7 @@ class Vector : public Array<T, B>
     Vector		normal()				const	;
     template <class T2, class B2, class R2>
     Vector&		solve(const Matrix<T2, B2, R2>& m)		;
-    Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
-			skew()					const	;
+    matrix33_type	skew()					const	;
     Vector<T>		homogeneous()				const	;
     Vector<T>		inhomogeneous()				const	;
     void		resize(u_int d)					;
@@ -350,7 +393,7 @@ Vector<T, B>::operator ^=(const Vector<T2, B2>& v)	// outer product
     check_dim(v.dim());
     if (dim() != 3)
 	throw std::invalid_argument("TU::Vector<T, B>::operator ^=: dimension must be 3");
-    Vector<T, FixedSizedBuf<T, 3u> > tmp(*this);
+    vector3_type	tmp(*this);
     (*this)[0] = tmp[1] * v[2] - tmp[2] * v[1];
     (*this)[1] = tmp[2] * v[0] - tmp[0] * v[2];
     (*this)[2] = tmp[0] * v[1] - tmp[1] * v[0];
@@ -465,7 +508,7 @@ Vector<T, B>::skew() const
 {
     if (dim() != 3)
 	throw std::invalid_argument("TU::Vector<T, B>::skew: dimension must be 3");
-    Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3 > >	r;
+    matrix33_type	r;
     r[2][1] = (*this)[0];
     r[0][2] = (*this)[1];
     r[1][0] = (*this)[2];
@@ -547,6 +590,10 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef typename Array2<Vector<T>, B, R>::const_pointer	const_pointer;
     typedef typename Array2<Vector<T>, B, R>::iterator		iterator;
     typedef typename Array2<Vector<T>, B, R>::const_iterator	const_iterator;
+    typedef Vector<T, FixedSizedBuf<T, 3> >			vector3_type;
+    typedef Vector<T, FixedSizedBuf<T, 4> >			vector4_type;
+    typedef Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+								matrix33_type;
     
   public:
     Matrix()								;
@@ -598,28 +645,25 @@ class Matrix : public Array2<Vector<T>, B, R>
 			       Vector<T>& eval, bool abs=true)	const	;
     Matrix		cholesky()				const	;
     Matrix&		normalize()					;
-    Matrix&		rotate_from_left(const Rotation& r)		;
-    Matrix&		rotate_from_right(const Rotation& r)		;
+    Matrix&		rotate_from_left(const Rotation<T>& r)		;
+    Matrix&		rotate_from_right(const Rotation<T>& r)		;
     T			square()				const	;
     double		length()				const	;
     Matrix&		symmetrize()					;
     Matrix&		antisymmetrize()				;
     void		rot2angle(T& theta_x,
 				  T& theta_y, T& theta_z)	const	;
-    Vector<T, FixedSizedBuf<T, 3> >
-			rot2axis(T& c, T& s)			const	;
-    Vector<T, FixedSizedBuf<T, 3> >
-			rot2axis()				const	;
-    Vector<T, FixedSizedBuf<T, 4> >
-			rot2quaternion()			const	;
+    vector3_type	rot2axis(T& c, T& s)			const	;
+    vector3_type	rot2axis()				const	;
+    vector4_type	rot2quaternion()			const	;
 
     static Matrix	I(u_int d)					;
     template <class T2, class B2>
-    static Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+    static matrix33_type
 			Rt(const Vector<T2, B2>& n, T c, T s)		;
     template <class T2, class B2>
-    static Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
-			Rt(const Vector<T2, B2>& axis)			;
+    static matrix33_type
+			Rt(const Vector<T2, B2>& v)			;
 
     void		resize(u_int r, u_int c)			;
     void		resize(T* p, u_int r, u_int c)			;
@@ -1069,7 +1113,7 @@ Matrix<T, B, R>::normalize()
 		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
 */
 template <class T, class B, class R> Matrix<T, B, R>&
-Matrix<T, B, R>::rotate_from_left(const Rotation& r)
+Matrix<T, B, R>::rotate_from_left(const Rotation<T>& r)
 {
     for (u_int j = 0; j < ncol(); ++j)
     {
@@ -1087,7 +1131,7 @@ Matrix<T, B, R>::rotate_from_left(const Rotation& r)
 		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
 */
 template <class T, class B, class R> Matrix<T, B, R>&
-Matrix<T, B, R>::rotate_from_right(const Rotation& r)
+Matrix<T, B, R>::rotate_from_right(const Rotation<T>& r)
 {
     for (u_int i = 0; i < nrow(); ++i)
     {
@@ -1227,7 +1271,7 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
     s = std::sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
 
   // Compute rotation axis.
-    Vector<T, FixedSizedBuf<T, 3> >	n;
+    vector3_type	n;
     n[0] = (*this)[1][2] - (*this)[2][1];
     n[1] = (*this)[2][0] - (*this)[0][2];
     n[2] = (*this)[0][1] - (*this)[1][0];
@@ -1249,13 +1293,13 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
 				\f$\theta\TUvec{n}{}\f$
  \throw invalid_argument	3x3çsóÒÇ≈Ç»Ç¢èÍçáÇ…ëóèo
 */
-template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3u> >
+template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3> >
 Matrix<T, B, R>::rot2axis() const
 {
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
 
-    Vector<T, FixedSizedBuf<T, 3u> >	axis;
+    vector3_type	axis;
     axis[0] = ((*this)[1][2] - (*this)[2][1]) * 0.5;
     axis[1] = ((*this)[2][0] - (*this)[0][2]) * 0.5;
     axis[2] = ((*this)[0][1] - (*this)[1][0]) * 0.5;
@@ -1294,7 +1338,7 @@ Matrix<T, B, R>::rot2quaternion() const
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2quaternion: input matrix must be 3x3!!");
 
-    Vector<T, FixedSizedBuf<T, 4u> >	q;
+    vector4_type	q;
     q[0] = 0.5 * std::sqrt(trace() + 1);
     if (q[0] + T(1) != T(1))	// q[0] != 0 ?
     {
@@ -1336,7 +1380,7 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
 {
     if (n.dim() != 3)
 	throw std::invalid_argument("TU::Matrix<T, B, R>::Rt: dimension of the argument \'n\' must be 3");
-    Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3 > > Qt = n % n;
+    matrix33_type	Qt = n % n;
     Qt *= (1.0 - c);
     Qt[0][0] += c;
     Qt[1][1] += c;
@@ -1380,12 +1424,12 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& v)
 {
     if (v.dim() == 4)
     {
-	const T				q0 = v[0];
-	Vector<T, FixedSizedBuf<T, 3> >	q;
+	const T		q0 = v[0];
+	vector3_type	q;
 	q[0] = v[1];
 	q[1] = v[2];
 	q[2] = v[3];
-	Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >	Qt;
+	matrix33_type	Qt;
 	Qt = (2.0 * q) % q;
 	const T		c = q0*q0 - q.square();
 	Qt[0][0] += c;
@@ -2240,7 +2284,7 @@ TriDiagonal<T>::diagonalize(bool abs)
 	  /* Apply rotation P(i-1, i) for each i (i = m+1, n+2, ... , n) */
 	    for (u_int i = m; ++i <= n; )
 	    {
-		Rotation	rot(i-1, i, x, y);
+		Rotation<T>	rot(i-1, i, x, y);
 		
 		_Ut.rotate_from_left(rot);
 
@@ -2467,7 +2511,7 @@ BiDiagonal<T>::diagonalize()
 		    _off_diagonal[m] = 0.0;
 		    for (u_int i = m; i <= n; ++i)
 		    {
-			Rotation	rotD(m-1, i, x, -y);
+			Rotation<T>	rotD(m-1, i, x, -y);
 
 			_Dt.rotate_from_left(rotD);
 			
@@ -2499,7 +2543,7 @@ BiDiagonal<T>::diagonalize()
 	    for (u_int i = m; ++i <= n; )
 	    {
 	      /* Apply rotation from left */
-		Rotation	rotE(i-1, i, x, y);
+		Rotation<T>	rotE(i-1, i, x, y);
 		
 		_Et.rotate_from_left(rotE);
 
@@ -2518,7 +2562,7 @@ BiDiagonal<T>::diagonalize()
 		x = _diagonal[i-1];
 		
 	      /* Apply rotation from right to recover bi-diagonality */
-		Rotation	rotD(i-1, i, x, y);
+		Rotation<T>	rotD(i-1, i, x, y);
 
 		_Dt.rotate_from_left(rotD);
 
