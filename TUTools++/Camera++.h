@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera++.h,v 1.1 2011-07-21 23:39:34 ueshiba Exp $
+ *  $Id: Camera++.h,v 1.2 2011-08-04 04:24:51 ueshiba Exp $
  */
 #ifndef __TUCameraPP_h
 #define __TUCameraPP_h
@@ -930,6 +930,9 @@ IntrinsicWithDistortion<I>::u(const point2_type& x,
 	(*J)[1][i+1] = sqr * (*J)[1][i];
 
 	matrix_type		Dxd = ((2*_d1 + 4*sqr*_d2) * x) % x;
+	const value_type	tmp = value_type(1) + sqr*(_d1 + sqr*_d2);
+	Dxd[0][0] += tmp;
+	Dxd[1][1] += tmp;
 
 	if (H)
 	{
@@ -955,16 +958,15 @@ IntrinsicWithDistortion<I>::u(const point2_type& x,
 	    H[1](i, 0, 2, 6) = (super::k() * DDyd) * (*J)(0, 0, 2, 6);
 
 	  // [放射歪曲と内部パラメータに関する2階微分]
+	    (H[0][i  ](6, super::dofIntrinsic()) = DDu(x)) *= sqr;
 	    (H[0][i+1](6, super::dofIntrinsic()) =
-	     ((H[0][i](6, super::dofIntrinsic()) = DDu(x)) *= sqr)) *= sqr;
-	    H[1][i+1][6] = sqr * (H[1][i][6] = sqr * x[1]);
+	     H[0][i  ](6, super::dofIntrinsic())	 ) *= sqr;
+	    H[1][i  ][6] = sqr * x[1];
+	    H[1][i+1][6] = sqr * H[1][i][6];
 	}
 
       // [外部パラメータに関する1階微分]
       //   canonical座標系から放射歪曲を付加されたcanonical座標系に変換
-	const value_type	tmp = value_type(1) + sqr*(_d1 + sqr*_d2);
-	Dxd[0][0] += tmp;
-	Dxd[1][1] += tmp;
 	(*J)(0, 0, 2, 6) = Dxd * (*J)(0, 0, 2, 6);
     }
     
@@ -1134,20 +1136,12 @@ CanonicalCamera<T>::x(const point3_type& X,
 		matrix_type&	HH = H[n];		// 第n軸のヘッセ行列
 		if (HH.nrow() < 6 || HH.ncol() < 6)
 		    HH.resize(6, 6);			// ヘッセ行列は6x6
-		const matrix33_type&	S = dX.skew();
-		
-		HH(3, 3, 3, 3) = (HH(3, 0, 3, 3) =
-				  -S * ((HH(0, 0, 3, 3) =
-					 _Rt[2] % Dx + Dx % _Rt[2]) /= Xc[2]))
-			       * S;
-		HH(3, 0, 3, 3) -= Dx.skew();
-		HH(3, 3, 3, 3) -= 0.5*(dX % Dx + Dx % dX);
-		const value_type	dXDx = dX * Dx;
-		HH[3][3] += dXDx;
-		HH[4][4] += dXDx;
-		HH[5][5] += dXDx;
 
-		HH(0, 0, 6, 6).symmetrize();  // 上半三角部分にコピーして対称化
+		(HH(0, 0, 3, 3) = _Rt[2] % Dx + Dx % _Rt[2]) /= Xc[2];
+		HH(0, 3, 3, 3) = Dx.skew() + HH(0, 0, 3, 3) ^ dX;
+		HH(3, 0, 3, 3) = HH(0, 3, 3, 3).trns();
+		HH(3, 3, 3, 3) = -dX ^ HH(0, 3, 3, 3);
+		(HH(3, 3, 3, 3) += HH(3, 3, 3, 3).trns()) *= value_type(0.5);
 	    }
 	}
     }

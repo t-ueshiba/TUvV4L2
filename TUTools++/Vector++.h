@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.40 2011-05-24 00:05:19 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.41 2011-08-04 04:24:51 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -397,7 +397,7 @@ Vector<T, B>::square() const
 template <class T, class B> inline double
 Vector<T, B>::length() const
 {
-    return sqrt(double(square()));
+    return std::sqrt(double(square()));
 }
 
 //! このベクトルと他のベクトルの差の長さの2乗を返す．
@@ -421,7 +421,7 @@ Vector<T, B>::sqdist(const Vector<T2, B2>& v) const
 template <class T, class B> template <class T2, class B2> inline double
 Vector<T, B>::dist(const Vector<T2, B2>& v) const
 {
-    return sqrt(sqdist(v));
+    return std::sqrt(sqdist(v));
 }
 
 //! このベクトルの長さを1に正規化する．
@@ -610,6 +610,8 @@ class Matrix : public Array2<Vector<T>, B, R>
 			rot2axis(T& c, T& s)			const	;
     Vector<T, FixedSizedBuf<T, 3> >
 			rot2axis()				const	;
+    Vector<T, FixedSizedBuf<T, 4> >
+			rot2quaternion()			const	;
 
     static Matrix	I(u_int d)					;
     template <class T2, class B2>
@@ -1034,7 +1036,7 @@ Matrix<T, B, R>::cholesky() const
 	    throw std::runtime_error("TU::Matrix<T>::cholesky(): not positive definite matrix!!");
 	for (u_int j = 0; j < i; ++j)
 	    Lt[i][j] = 0;
-	Lt[i][i] = d = sqrt(d);
+	Lt[i][i] = d = std::sqrt(d);
 	for (u_int j = i + 1; j < ncol(); ++j)
 	    Lt[i][j] /= d;
 	for (u_int j = i + 1; j < nrow(); ++j)
@@ -1058,7 +1060,7 @@ Matrix<T, B, R>::normalize()
     T	sum = 0.0;
     for (u_int i = 0; i < nrow(); ++i)
 	sum += (*this)[i] * (*this)[i];
-    return *this /= sqrt(sum);
+    return *this /= std::sqrt(sum);
 }
 
 //! この行列の左から（転置された）回転行列を掛ける．
@@ -1117,7 +1119,7 @@ Matrix<T, B, R>::square() const
 template <class T, class B, class R> inline double
 Matrix<T, B, R>::length() const
 {
-    return sqrt(square());
+    return std::sqrt(square());
 }
 
 //! この行列の下半三角部分を上半三角部分にコピーして対称化する．
@@ -1222,7 +1224,7 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
   // Compute cosine and sine of rotation angle.
     const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
     c = (trace - 1.0) / 2.0;
-    s = sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
+    s = std::sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
 
   // Compute rotation axis.
     Vector<T, FixedSizedBuf<T, 3> >	n;
@@ -1257,14 +1259,52 @@ Matrix<T, B, R>::rot2axis() const
     axis[0] = ((*this)[1][2] - (*this)[2][1]) * 0.5;
     axis[1] = ((*this)[2][0] - (*this)[0][2]) * 0.5;
     axis[2] = ((*this)[0][1] - (*this)[1][0]) * 0.5;
-    const T	s = sqrt(axis.square());
-    if (s + 1.0 == 1.0)		// s << 1 ?
+    const T	s = std::sqrt(axis.square());
+    if (s + T(1) == T(1))		// s << 1 ?
 	return axis;
     const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
     if (trace > 1.0)		// cos > 0 ?
 	return  axis *= ( asin(s) / s);
     else
 	return  axis *= (-asin(s) / s);
+}
+
+//! この3次元回転行列から四元数を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta\f$と\f$\TUvec{n}{}\f$に対して，四元数は
+  \f[
+    \TUvec{q}{} \equiv
+    \TUbeginarray{c}
+      \cos\frac{\theta}{2} \\ \TUvec{n}{}\sin\frac{\theta}{2}
+    \TUendarray
+  \f]
+  と定義される．
+ \return			四元数を表す4次元単位ベクトル
+ \throw invalid_argument	3x3行列でない場合に送出
+*/
+template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 4u> >
+Matrix<T, B, R>::rot2quaternion() const
+{
+    if (nrow() != 3 || ncol() != 3)
+	throw std::invalid_argument("TU::Matrix<T>::rot2quaternion: input matrix must be 3x3!!");
+
+    Vector<T, FixedSizedBuf<T, 4u> >	q;
+    q[0] = 0.5 * std::sqrt(trace() + 1);
+    if (q[0] + T(1) != T(1))	// q[0] != 0 ?
+    {
+	const Matrix<T>&	S = trns() - *this;
+	q[1] = 0.25 * S[2][1] / q[0];
+	q[2] = 0.25 * S[0][2] / q[0];
+	q[3] = 0.25 * S[1][0] / q[0];
+    }
+
+    return q;
 }
 
 //! 単位正方行列を生成する．
@@ -1313,27 +1353,62 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
 
 //! 3次元回転行列を生成する．
 /*!
-  \param axis	回転角と回転軸を表す3次元ベクトル
-  \return	生成された回転行列，すなわち
+  \param v	回転角と回転軸を表す3次元ベクトルまたは四元数を表す4次元単位ベクトル
+  \return	生成された回転行列，すなわち3次元ベクトルの場合は
 		\f[
 		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
 		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
-		  - \TUskew{n}{}\sin\theta,{\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \theta = \TUnorm{\TUvec{a}{}},~
-		  \TUvec{n}{} = \frac{\TUvec{a}{}}{\TUnorm{\TUvec{a}{}}}
+		  - \TUskew{n}{}\sin\theta,
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \theta \equiv \TUnorm{\TUvec{v}{}},~
+		  \TUvec{n}{} \equiv \frac{\TUvec{v}{}}{\TUnorm{\TUvec{v}{}}}
+		\f]
+		4次元単位ベクトルの場合は
+		\f[
+		  \TUtvec{R}{} \equiv
+		  \TUvec{I}{3}(q_0^2 - \TUtvec{q}{}\TUvec{q}{})
+		  + 2\TUvec{q}{}\TUtvec{q}{}
+		  - 2q_0\TUskew{q}{},
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  q_0 \equiv v_0,~
+		  \TUvec{q}{} \equiv [v_1,~v_2,~v_3]^\top
 		\f]
 */
 template <class T, class B, class R> template <class T2, class B2>
 Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
-Matrix<T, B, R>::Rt(const Vector<T2, B2>& axis)
+Matrix<T, B, R>::Rt(const Vector<T2, B2>& v)
 {
-    const T	theta = axis.length();
-    if (theta + 1.0 == 1.0)		// theta << 1 ?
+    if (v.dim() == 4)
+    {
+	const T				q0 = v[0];
+	Vector<T, FixedSizedBuf<T, 3> >	q;
+	q[0] = v[1];
+	q[1] = v[2];
+	q[2] = v[3];
+	Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >	Qt;
+	Qt = (2.0 * q) % q;
+	const T		c = q0*q0 - q.square();
+	Qt[0][0] += c;
+	Qt[1][1] += c;
+	Qt[2][2] += c;
+	q *= (2.0 * q0);
+	Qt[0][1] += q[2];
+	Qt[0][2] -= q[1];
+	Qt[1][0] -= q[2];
+	Qt[1][2] += q[0];
+	Qt[2][0] += q[1];
+	Qt[2][1] -= q[0];
+
+	return Qt;
+    }
+
+    const T	theta = v.length();
+    if (theta + T(1) == T(1))		// theta << 1 ?
 	return I(3);
     else
     {
-	T	c = cos(theta), s = sin(theta);
-	return Rt(axis / theta, c, s);
+	T	c = std::cos(theta), s = std::sin(theta);
+	return Rt(v / theta, c, s);
     }
 }
 
