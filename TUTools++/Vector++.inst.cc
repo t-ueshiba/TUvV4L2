@@ -25,24 +25,18 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.inst.cc,v 1.12 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Vector++.inst.cc,v 1.13 2011-08-05 07:15:13 ueshiba Exp $
  */
 #include "TU/Vector++.h"
 
 namespace TU
 {
-template class Vector<short,  FixedSizedBuf<short,  2> >;
-template class Vector<int,    FixedSizedBuf<int,    2> >;
 template class Vector<float,  FixedSizedBuf<float,  2> >;
 template class Vector<double, FixedSizedBuf<double, 2> >;
 
-template class Vector<short,  FixedSizedBuf<short,  3> >;
-template class Vector<int,    FixedSizedBuf<int,    3> >;
 template class Vector<float,  FixedSizedBuf<float,  3> >;
 template class Vector<double, FixedSizedBuf<double, 3> >;
 
-template class Vector<short,  FixedSizedBuf<short,  4> >;
-template class Vector<int,    FixedSizedBuf<int,    4> >;
 template class Vector<float,  FixedSizedBuf<float,  4> >;
 template class Vector<double, FixedSizedBuf<double, 4> >;
 
