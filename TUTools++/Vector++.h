@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.42 2011-08-04 04:56:13 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.43 2011-08-05 06:45:38 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -72,7 +72,7 @@ template <class T>
 class Rotation
 {
   public:
-    typedef T						value_type;
+    typedef T	value_type;	//!< 要素の型
     
   public:
     Rotation(u_int p, u_int q, value_type x, value_type y)	;
@@ -130,8 +130,8 @@ Rotation<T>::Rotation(u_int p, u_int q, value_type x, value_type y)
     :_p(p), _q(q), _l(1.0), _c(1.0), _s(0.0)
 {
     const value_type	absx = std::fabs(x), absy = std::fabs(y);
-    _l = (absx > absy ? absx * sqrt(1.0 + (absy*absy)/(absx*absx))
-		      : absy * sqrt(1.0 + (absx*absx)/(absy*absy)));
+    _l = (absx > absy ? absx * std::sqrt(1 + (absy*absy)/(absx*absx))
+		      : absy * std::sqrt(1 + (absx*absx)/(absy*absy)));
     if (_l != 0.0)
     {
 	_c = x / _l;
@@ -164,21 +164,23 @@ template <class T, class B, class R>	class Matrix;
 template <class T, class B=Buf<T> >
 class Vector : public Array<T, B>
 {
+  private:
+    typedef Array<T, B>					super;
+    
   public:
-    typedef typename Array<T, B>::value_type		value_type;
-    typedef typename Array<T, B>::difference_type	difference_type;
-    typedef typename Array<T, B>::reference		reference;
-    typedef typename Array<T, B>::const_reference	const_reference;
-    typedef typename Array<T, B>::pointer		pointer;
-    typedef typename Array<T, B>::const_pointer		const_pointer;
-    typedef typename Array<T, B>::iterator		iterator;
-    typedef typename Array<T, B>::const_iterator	const_iterator;
-    typedef typename Array<T, B>::reverse_iterator	reverse_iterator;
-    typedef typename Array<T, B>::const_reverse_iterator
-							const_reverse_iterator;
+    typedef typename super::value_type			value_type;
+    typedef typename super::difference_type		difference_type;
+    typedef typename super::reference			reference;
+    typedef typename super::const_reference		const_reference;
+    typedef typename super::pointer			pointer;
+    typedef typename super::const_pointer		const_pointer;
+    typedef typename super::iterator			iterator;
+    typedef typename super::const_iterator		const_iterator;
+    typedef typename super::reverse_iterator		reverse_iterator;
+    typedef typename super::const_reverse_iterator	const_reverse_iterator;
     typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
-    typedef Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
-							matrix33_type;
+    typedef Matrix<T, FixedSizedBuf<T, 9>,
+		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
     
   public:
     Vector()								;
@@ -191,12 +193,12 @@ class Vector : public Array<T, B>
     template <class T2, class B2>
     Vector&		operator =(const Vector<T2, B2>& v)		;
 
-    using		Array<T, B>::begin;
-    using		Array<T, B>::end;
-    using		Array<T, B>::size;
-    using		Array<T, B>::dim;
-  //    using		Array<T, B>::operator pointer;
-  //    using		Array<T, B>::operator const_pointer;
+    using		super::begin;
+    using		super::end;
+    using		super::size;
+    using		super::dim;
+  //using		super::operator pointer;
+  //using		super::operator const_pointer;
 
     const Vector<T>	operator ()(u_int i, u_int d)		const	;
     Vector<T>		operator ()(u_int i, u_int d)			;
@@ -213,11 +215,11 @@ class Vector : public Array<T, B>
     Vector&		operator *=(const Matrix<T2, B2, R2>& m)	;
     Vector		operator  -()				const	;
     T			square()				const	;
-    double		length()				const	;
+    T			length()				const	;
     template <class T2, class B2>
     T			sqdist(const Vector<T2, B2>& v)		const	;
     template <class T2, class B2>
-    double		dist(const Vector<T2, B2>& v)		const	;
+    T			dist(const Vector<T2, B2>& v)		const	;
     Vector&		normalize()					;
     Vector		normal()				const	;
     template <class T2, class B2, class R2>
@@ -232,7 +234,7 @@ class Vector : public Array<T, B>
 //! ベクトルを生成し，全要素を0で初期化する．
 template <class T, class B>
 Vector<T, B>::Vector()
-    :Array<T, B>()
+    :super()
 {
     *this = 0;
 }
@@ -243,7 +245,7 @@ Vector<T, B>::Vector()
 */
 template <class T, class B> inline
 Vector<T, B>::Vector(u_int d)
-    :Array<T, B>(d)
+    :super(d)
 {
     *this = 0;
 }
@@ -255,7 +257,7 @@ Vector<T, B>::Vector(u_int d)
 */
 template <class T, class B> inline
 Vector<T, B>::Vector(T* p, u_int d)
-    :Array<T, B>(p, d)
+    :super(p, d)
 {
 }
 
@@ -267,7 +269,7 @@ Vector<T, B>::Vector(T* p, u_int d)
 */
 template <class T, class B> template <class B2> inline
 Vector<T, B>::Vector(Vector<T, B2>& v, u_int i, u_int d)
-    :Array<T, B>(v, i, d)
+    :super(v, i, d)
 {
 }
 
@@ -277,7 +279,7 @@ Vector<T, B>::Vector(Vector<T, B2>& v, u_int i, u_int d)
 */
 template <class T, class B> template <class T2, class B2> inline
 Vector<T, B>::Vector(const Vector<T2, B2>& v)
-    :Array<T, B>(v)
+    :super(v)
 {
 }
     
@@ -289,7 +291,7 @@ Vector<T, B>::Vector(const Vector<T2, B2>& v)
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
 Vector<T, B>::operator =(const Vector<T2, B2>& v)
 {
-    Array<T, B>::operator =(v);
+    super::operator =(v);
     return *this;
 }
 
@@ -325,7 +327,7 @@ Vector<T, B>::operator ()(u_int i, u_int d) const
 template <class T, class B> inline Vector<T, B>&
 Vector<T, B>::operator =(const T& c)
 {
-    Array<T, B>::operator =(c);
+    super::operator =(c);
     return *this;
 }
 
@@ -337,7 +339,7 @@ Vector<T, B>::operator =(const T& c)
 template <class T, class B> inline Vector<T, B>&
 Vector<T, B>::operator *=(double c)
 {
-    Array<T, B>::operator *=(c);
+    super::operator *=(c);
     return *this;
 }
 
@@ -350,7 +352,7 @@ Vector<T, B>::operator *=(double c)
 template <class T, class B> inline Vector<T, B>&
 Vector<T, B>::operator /=(double c)
 {
-    Array<T, B>::operator /=(c);
+    super::operator /=(c);
     return *this;
 }
 
@@ -363,7 +365,7 @@ Vector<T, B>::operator /=(double c)
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
 Vector<T, B>::operator +=(const Vector<T2, B2>& v)
 {
-    Array<T, B>::operator +=(v);
+    super::operator +=(v);
     return *this;
 }
 
@@ -376,7 +378,7 @@ Vector<T, B>::operator +=(const Vector<T2, B2>& v)
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
 Vector<T, B>::operator -=(const Vector<T2, B2>& v)
 {
-    Array<T, B>::operator -=(v);
+    super::operator -=(v);
     return *this;
 }
 
@@ -437,10 +439,10 @@ Vector<T, B>::square() const
 /*!
   \return	ベクトルの長さ，すなわち\f$\TUnorm{\TUvec{u}{}}\f$
 */
-template <class T, class B> inline double
+template <class T, class B> inline T
 Vector<T, B>::length() const
 {
-    return std::sqrt(double(square()));
+    return std::sqrt(square());
 }
 
 //! このベクトルと他のベクトルの差の長さの2乗を返す．
@@ -461,7 +463,7 @@ Vector<T, B>::sqdist(const Vector<T2, B2>& v) const
   \return	ベクトル間の差，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
-template <class T, class B> template <class T2, class B2> inline double
+template <class T, class B> template <class T2, class B2> inline T
 Vector<T, B>::dist(const Vector<T2, B2>& v) const
 {
     return std::sqrt(sqdist(v));
@@ -550,7 +552,7 @@ Vector<T, B>::inhomogeneous() const
 template <class T, class B> inline void
 Vector<T, B>::resize(u_int d)
 {
-    Array<T, B>::resize(d);
+    super::resize(d);
     *this = 0;
 }
 
@@ -562,7 +564,7 @@ Vector<T, B>::resize(u_int d)
 template <class T, class B> inline void
 Vector<T, B>::resize(T* p, u_int d)
 {
-    Array<T, B>::resize(p, d);
+    super::resize(p, d);
 }
 
 /************************************************************************
@@ -581,19 +583,22 @@ template <class T>	class SVDecomposition;
 template <class T, class B=Buf<T>, class R=Buf<Vector<T> > >
 class Matrix : public Array2<Vector<T>, B, R>
 {
+  private:
+    typedef Array2<Vector<T>, B, R>			super;
+    
   public:
-    typedef typename Array2<Vector<T>, B, R>::value_type	value_type;
-    typedef typename Array2<Vector<T>, B, R>::difference_type	difference_type;
-    typedef typename Array2<Vector<T>, B, R>::reference		reference;
-    typedef typename Array2<Vector<T>, B, R>::const_reference	const_reference;
-    typedef typename Array2<Vector<T>, B, R>::pointer		pointer;
-    typedef typename Array2<Vector<T>, B, R>::const_pointer	const_pointer;
-    typedef typename Array2<Vector<T>, B, R>::iterator		iterator;
-    typedef typename Array2<Vector<T>, B, R>::const_iterator	const_iterator;
-    typedef Vector<T, FixedSizedBuf<T, 3> >			vector3_type;
-    typedef Vector<T, FixedSizedBuf<T, 4> >			vector4_type;
-    typedef Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
-								matrix33_type;
+    typedef typename super::value_type			value_type;
+    typedef typename super::difference_type		difference_type;
+    typedef typename super::reference			reference;
+    typedef typename super::const_reference		const_reference;
+    typedef typename super::pointer			pointer;
+    typedef typename super::const_pointer		const_pointer;
+    typedef typename super::iterator			iterator;
+    typedef typename super::const_iterator		const_iterator;
+    typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
+    typedef Vector<T, FixedSizedBuf<T, 4> >		vector4_type;
+    typedef Matrix<T, FixedSizedBuf<T, 9>,
+		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
     
   public:
     Matrix()								;
@@ -606,12 +611,12 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class T2, class B2, class R2>
     Matrix&		operator =(const Matrix<T2, B2, R2>& m)		;
 
-    using		Array2<Vector<T>, B, R>::begin;
-    using		Array2<Vector<T>, B, R>::end;
-    using		Array2<Vector<T>, B, R>::size;
-    using		Array2<Vector<T>, B, R>::dim;
-    using		Array2<Vector<T>, B, R>::nrow;
-    using		Array2<Vector<T>, B, R>::ncol;
+    using		super::begin;
+    using		super::end;
+    using		super::size;
+    using		super::dim;
+    using		super::nrow;
+    using		super::ncol;
 
 			operator const Vector<T>()		const	;
     const Matrix<T>	operator ()(u_int i, u_int j,
@@ -648,7 +653,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix&		rotate_from_left(const Rotation<T>& r)		;
     Matrix&		rotate_from_right(const Rotation<T>& r)		;
     T			square()				const	;
-    double		length()				const	;
+    T			length()				const	;
     Matrix&		symmetrize()					;
     Matrix&		antisymmetrize()				;
     void		rot2angle(T& theta_x,
@@ -672,7 +677,7 @@ class Matrix : public Array2<Vector<T>, B, R>
 //! 行列を生成し，全要素を0で初期化する．
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix()
-    :Array2<Vector<T>, B, R>()
+    :super()
 {
     *this = 0;
 }
@@ -684,7 +689,7 @@ Matrix<T, B, R>::Matrix()
 */
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix(u_int r, u_int c)
-    :Array2<Vector<T>, B, R>(r, c)
+    :super(r, c)
 {
     *this = 0;
 }
@@ -697,7 +702,7 @@ Matrix<T, B, R>::Matrix(u_int r, u_int c)
 */
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
-    :Array2<Vector<T>, B, R>(p, r, c)
+    :super(p, r, c)
 {
 }
 
@@ -712,7 +717,7 @@ Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
 template <class T, class B, class R> template <class B2, class R2> inline
 Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
 			u_int i, u_int j, u_int r, u_int c)
-    :Array2<Vector<T>, B, R>(m, i, j, r, c)
+    :super(m, i, j, r, c)
 {
 }
 
@@ -723,7 +728,7 @@ Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
 template <class T, class B, class R> template <class T2, class B2, class R2>
 inline
 Matrix<T, B, R>::Matrix(const Matrix<T2, B2, R2>& m)
-    :Array2<Vector<T>, B, R>(m)
+    :super(m)
 {
 }
 
@@ -736,7 +741,7 @@ template <class T, class B, class R> template <class T2, class B2, class R2>
 inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator =(const Matrix<T2, B2, R2>& m)
 {
-    Array2<Vector<T>, B, R>::operator =(m);
+    super::operator =(m);
     return *this;
 }
 
@@ -787,7 +792,7 @@ Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c) const
 template <class T, class B, class R> inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator =(const T& c)
 {
-    Array2<Vector<T>, B, R>::operator =(c);
+    super::operator =(c);
     return *this;
 }
 
@@ -799,7 +804,7 @@ Matrix<T, B, R>::operator =(const T& c)
 template <class T, class B, class R> inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator *=(double c)
 {
-    Array2<Vector<T>, B, R>::operator *=(c);
+    super::operator *=(c);
     return *this;
 }
 
@@ -812,7 +817,7 @@ Matrix<T, B, R>::operator *=(double c)
 template <class T, class B, class R> inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator /=(double c)
 {
-    Array2<Vector<T>, B, R>::operator /=(c);
+    super::operator /=(c);
     return *this;
 }
 
@@ -826,7 +831,7 @@ template <class T, class B, class R> template <class T2, class B2, class R2>
 inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator +=(const Matrix<T2, B2, R2>& m)
 {
-    Array2<Vector<T>, B, R>::operator +=(m);
+    super::operator +=(m);
     return *this;
 }
 
@@ -840,7 +845,7 @@ template <class T, class B, class R> template <class T2, class B2, class R2>
 inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator -=(const Matrix<T2, B2, R2>& m)
 {
-    Array2<Vector<T>, B, R>::operator -=(m);
+    super::operator -=(m);
     return *this;
 }
 
@@ -1001,7 +1006,7 @@ Matrix<T, B, R>::pinv(T cndnum) const
     Matrix<T>		val(svd.ncol(), svd.nrow());
     
     for (u_int i = 0; i < svd.diagonal().dim(); ++i)
-	if (fabs(svd[i]) * cndnum > fabs(svd[0]))
+	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
 	    val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
 
     return val;
@@ -1160,7 +1165,7 @@ Matrix<T, B, R>::square() const
 /*!
   \return	行列の2乗ノルム，すなわち\f$\TUnorm{\TUvec{A}{}}\f$
 */
-template <class T, class B, class R> inline double
+template <class T, class B, class R> inline T
 Matrix<T, B, R>::length() const
 {
     return std::sqrt(square());
@@ -1233,15 +1238,15 @@ Matrix<T, B, R>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
 
     if ((*this)[0][0] == 0.0 && (*this)[0][1] == 0.0)
     {
-	theta_x = atan2(-(*this)[2][1], (*this)[1][1]);
+	theta_x = std::atan2(-(*this)[2][1], (*this)[1][1]);
 	theta_y = ((*this)[0][2] < 0.0 ? M_PI / 2.0 : -M_PI / 2.0);
 	theta_z = 0.0;
     }
     else
     {
-	theta_x = atan2((*this)[1][2], (*this)[2][2]);
-	theta_y = -asin((*this)[0][2]);
-	theta_z = atan2((*this)[0][1], (*this)[0][0]);
+	theta_x =  std::atan2((*this)[1][2], (*this)[2][2]);
+	theta_y = -std::asin((*this)[0][2]);
+	theta_z =  std::atan2((*this)[0][1], (*this)[0][0]);
     }
 }
 
@@ -1308,9 +1313,9 @@ Matrix<T, B, R>::rot2axis() const
 	return axis;
     const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
     if (trace > 1.0)		// cos > 0 ?
-	return  axis *= ( asin(s) / s);
+	return  axis *= ( std::asin(s) / s);
     else
-	return  axis *= (-asin(s) / s);
+	return  axis *= (-std::asin(s) / s);
 }
 
 //! この3次元回転行列から四元数を取り出す．
@@ -1464,7 +1469,7 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& v)
 template <class T, class B, class R> inline void
 Matrix<T, B, R>::resize(u_int r, u_int c)
 {
-    Array2<Vector<T>, B, R>::resize(r, c);
+    super::resize(r, c);
     *this = 0;
 }
 
@@ -1477,7 +1482,7 @@ Matrix<T, B, R>::resize(u_int r, u_int c)
 template <class T, class B, class R> inline void
 Matrix<T, B, R>::resize(T* p, u_int r, u_int c)
 {
-    Array2<Vector<T>, B, R>::resize(p, r, c);
+    super::resize(p, r, c);
 }
 
 /************************************************************************
@@ -1746,6 +1751,10 @@ operator ^(const Matrix<T1, B1, R1>& m, const Vector<T2, B2>& v)
 template <class T>
 class LUDecomposition : private Array2<Vector<T> >
 {
+  private:
+    typedef T						value_type;
+    typedef Array2<Vector<T> >				super;
+    
   public:
     template <class T2, class B2, class R2>
     LUDecomposition(const Matrix<T2, B2, R2>&)		;
@@ -1760,8 +1769,8 @@ class LUDecomposition : private Array2<Vector<T> >
     T		det()				const	{return _det;}
     
   private:
-    using	Array2<Vector<T> >::nrow;
-    using	Array2<Vector<T> >::ncol;
+    using	super::nrow;
+    using	super::ncol;
     
     Array<int>	_index;
     T		_det;
@@ -1774,7 +1783,7 @@ class LUDecomposition : private Array2<Vector<T> >
 */
 template <class T> template <class T2, class B2, class R2>
 LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
-    :Array2<Vector<T> >(m), _index(ncol()), _det(1.0)
+    :super(m), _index(ncol()), _det(1.0)
 {
     using namespace	std;
     
@@ -1791,7 +1800,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
 
 	for (u_int i = 0; i < nrow(); ++i)
 	{
-	    const T tmp = fabs((*this)[i][j]);
+	    const T tmp = std::fabs((*this)[i][j]);
 	    if (tmp > max)
 		max = tmp;
 	}
@@ -1814,7 +1823,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
 	    T& sum = (*this)[i][j];
 	    for (u_int k = 0; k < i; ++k)
 		sum -= (*this)[i][k] * (*this)[k][j];
-	    const T tmp = fabs(sum) * scale[j];
+	    const T tmp = std::fabs(sum) * scale[j];
 	    if (tmp >= max)
 	    {
 		max  = tmp;
@@ -1926,13 +1935,19 @@ template <class T>	class BiDiagonal;
 template <class T>
 class Householder : public Matrix<T>
 {
+  public:
+    typedef T							value_type;
+    
+  private:
+    typedef Matrix<T>						super;
+    
   private:
     Householder(u_int dd, u_int d)
-	:Matrix<T>(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
+	:super(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
     template <class T2, class B2, class R2>
     Householder(const Matrix<T2, B2, R2>& a, u_int d)		;
 
-    using		Matrix<T>::dim;
+    using		super::dim;
     
     void		apply_from_left(Matrix<T>& a, u_int m)	;
     void		apply_from_right(Matrix<T>& a, u_int m)	;
@@ -1953,7 +1968,7 @@ class Householder : public Matrix<T>
 
 template <class T> template <class T2, class B2, class R2>
 Householder<T>::Householder(const Matrix<T2, B2, R2>& a, u_int d)
-    :Matrix<T>(a), _d(d), _sigma(dim())
+    :super(a), _d(d), _sigma(dim())
 {
     if (a.nrow() != a.ncol())
 	throw std::invalid_argument("TU::Householder<T>::Householder: Given matrix must be square !!");
@@ -1967,7 +1982,7 @@ Householder<T>::apply_from_left(Matrix<T>& a, u_int m)
     
     T	scale = 0.0;
     for (u_int i = m+_d; i < dim(); ++i)
-	scale += fabs(a[i][m]);
+	scale += std::fabs(a[i][m]);
 	
     if (scale != 0.0)
     {
@@ -1978,7 +1993,7 @@ Householder<T>::apply_from_left(Matrix<T>& a, u_int m)
 	    h += a[i][m] * a[i][m];
 	}
 
-	const T	s = (a[m+_d][m] > 0.0 ? sqrt(h) : -sqrt(h));
+	const T	s = (a[m+_d][m] > 0.0 ? std::sqrt(h) : -std::sqrt(h));
 	h	     += s * a[m+_d][m];			// H = u^2 / 2
 	a[m+_d][m]   += s;				// m-th col <== u
 	    
@@ -2007,7 +2022,7 @@ Householder<T>::apply_from_right(Matrix<T>& a, u_int m)
     
     T	scale = 0.0;
     for (u_int j = m+_d; j < dim(); ++j)
-	scale += fabs(a[m][j]);
+	scale += std::fabs(a[m][j]);
 	
     if (scale != 0.0)
     {
@@ -2018,7 +2033,7 @@ Householder<T>::apply_from_right(Matrix<T>& a, u_int m)
 	    h += a[m][j] * a[m][j];
 	}
 
-	const T	s = (a[m][m+_d] > 0.0 ? sqrt(h) : -sqrt(h));
+	const T	s = (a[m][m+_d] > 0.0 ? std::sqrt(h) : -std::sqrt(h));
 	h	     += s * a[m][m+_d];			// H = u^2 / 2
 	a[m][m+_d]   += s;				// m-th row <== u
 
@@ -2042,17 +2057,17 @@ Householder<T>::apply_from_right(Matrix<T>& a, u_int m)
 template <class T> void
 Householder<T>::apply_from_both(Matrix<T>& a, u_int m)
 {
-    Vector<T>		u = a[m](m+_d, a.ncol()-m-_d);
+    Vector<T>	u = a[m](m+_d, a.ncol()-m-_d);
     T		scale = 0.0;
     for (u_int j = 0; j < u.dim(); ++j)
-	scale += fabs(u[j]);
+	scale += std::fabs(u[j]);
 	
     if (scale != 0.0)
     {
 	u /= scale;
 
 	T		h = u * u;
-	const T	s = (u[0] > 0.0 ? sqrt(h) : -sqrt(h));
+	const T	s = (u[0] > 0.0 ? std::sqrt(h) : -std::sqrt(h));
 	h	     += s * u[0];			// H = u^2 / 2
 	u[0]	     += s;				// m-th row <== u
 
@@ -2112,7 +2127,7 @@ Householder<T>::make_transformation()
 template <class T> bool
 Householder<T>::sigma_is_zero(u_int m, T comp) const
 {
-    return (T(fabs(_sigma[m])) + comp == comp);
+    return (T(std::fabs(_sigma[m])) + comp == comp);
 }
 
 /************************************************************************
@@ -2131,6 +2146,12 @@ template <class T>
 class QRDecomposition : private Matrix<T>
 {
   public:
+    typedef T						value_type;
+    
+  private:
+    typedef Matrix<T>					super;
+    
+  public:
     template <class T2, class B2, class R2>
     QRDecomposition(const Matrix<T2, B2, R2>& m)	;
 
@@ -2147,8 +2168,8 @@ class QRDecomposition : private Matrix<T>
     const Matrix<T>&	Qt()			const	{return _Qt;}
     
   private:
-    using		Matrix<T>::nrow;
-    using		Matrix<T>::ncol;
+    using		super::nrow;
+    using		super::ncol;
     
     Householder<T>	_Qt;			// rotation matrix
 };
@@ -2159,7 +2180,7 @@ class QRDecomposition : private Matrix<T>
 */
 template <class T> template <class T2, class B2, class R2>
 QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2, R2>& m)
-    :Matrix<T>(m), _Qt(m.ncol(), 0)
+    :super(m), _Qt(m.ncol(), 0)
 {
     u_int	n = std::min(nrow(), ncol());
     for (u_int j = 0; j < n; ++j)
@@ -2185,6 +2206,9 @@ QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2, R2>& m)
 template <class T>
 class TriDiagonal
 {
+  public:
+    typedef T						value_type;
+    
   public:
     template <class T2, class B2, class R2>
     TriDiagonal(const Matrix<T2, B2, R2>& a)		;
@@ -2315,7 +2339,8 @@ TriDiagonal<T>::diagonalize(bool abs)
     {
 	for (u_int m = 0; m < dim(); ++m)
 	    for (u_int n = m+1; n < dim(); ++n)
-		if (fabs(_diagonal[n]) > fabs(_diagonal[m]))	// abs. values
+		if (std::fabs(_diagonal[n]) >
+		    std::fabs(_diagonal[m]))			// abs. values
 		{
 		    swap(_diagonal[m], _diagonal[n]);
 		    for (u_int j = 0; j < dim(); ++j)
@@ -2346,20 +2371,19 @@ TriDiagonal<T>::diagonalize(bool abs)
 template <class T> bool
 TriDiagonal<T>::off_diagonal_is_zero(u_int n) const
 {
-    return (n == 0 || _Ut.sigma_is_zero(n, fabs(_diagonal[n-1]) +
-					   fabs(_diagonal[n])));
+    return (n == 0 || _Ut.sigma_is_zero(n, std::fabs(_diagonal[n-1]) +
+					   std::fabs(_diagonal[n])));
 }
 
 template <class T> void
 TriDiagonal<T>::initialize_rotation(u_int m, u_int n, T& x, T& y) const
 {
-    const T	g = (_diagonal[n] - _diagonal[n-1]) /
-			    (2.0*_off_diagonal[n]),
-			absg = fabs(g),
-			gg1 = (absg > 1.0 ?
-			       absg * sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
-			       sqrt(1.0 + absg*absg)),
-			t = (g > 0.0 ? g + gg1 : g - gg1);
+    const T	g    = (_diagonal[n] - _diagonal[n-1]) / (2.0*_off_diagonal[n]),
+		absg = std::fabs(g),
+		gg1  = (absg > 1.0 ?
+			absg * std::sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
+			std::sqrt(1.0 + absg*absg)),
+		t    = (g > 0.0 ? g + gg1 : g - gg1);
     x = _diagonal[m] - _diagonal[n] - _off_diagonal[n]/t;
   //x = _diagonal[m];					// without shifting
     y = _off_diagonal[m+1];
@@ -2380,6 +2404,9 @@ TriDiagonal<T>::initialize_rotation(u_int m, u_int n, T& x, T& y) const
 template <class T>
 class BiDiagonal
 {
+  public:
+    typedef T					value_type;
+    
   public:
     template <class T2, class B2, class R2>
     BiDiagonal(const Matrix<T2, B2, R2>& a)	;
@@ -2472,7 +2499,7 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
 
     for (u_int m = 0; m < _Et.dim(); ++m)
     {
-	T	anorm = fabs(_diagonal[m]) + fabs(_off_diagonal[m]);
+	T	anorm = std::fabs(_diagonal[m]) + std::fabs(_off_diagonal[m]);
 	if (anorm > _anorm)
 	    _anorm = anorm;
     }
@@ -2588,7 +2615,7 @@ BiDiagonal<T>::diagonalize()
 
     for (u_int m = 0; m < _Et.dim(); ++m)  // sort singular values and vectors
 	for (u_int n = m+1; n < _Et.dim(); ++n)
-	    if (fabs(_diagonal[n]) > fabs(_diagonal[m]))
+	    if (std::fabs(_diagonal[n]) > std::fabs(_diagonal[m]))
 	    {
 		swap(_diagonal[m], _diagonal[n]);
 		for (u_int j = 0; j < _Et.dim(); ++j)
@@ -2637,18 +2664,18 @@ BiDiagonal<T>::off_diagonal_is_zero(u_int n) const
 template <class T> void
 BiDiagonal<T>::initialize_rotation(u_int m, u_int n, T& x, T& y) const
 {
-    const T	g = ((_diagonal[n]     + _diagonal[n-1])*
-		     (_diagonal[n]     - _diagonal[n-1])+
-		     (_off_diagonal[n] + _off_diagonal[n-1])*
-		     (_off_diagonal[n] - _off_diagonal[n-1]))
-		  / (2.0*_diagonal[n-1]*_off_diagonal[n]),
+    const T	g    = ((_diagonal[n]     + _diagonal[n-1])*
+			(_diagonal[n]     - _diagonal[n-1])+
+			(_off_diagonal[n] + _off_diagonal[n-1])*
+			(_off_diagonal[n] - _off_diagonal[n-1]))
+		     / (2.0*_diagonal[n-1]*_off_diagonal[n]),
       // Caution!! You have to ensure that _diagonal[n-1] != 0
       // as well as _off_diagonal[n].
-		absg = fabs(g),
-		gg1 = (absg > 1.0 ?
-		       absg * sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
-		       sqrt(1.0 + absg*absg)),
-		t = (g > 0.0 ? g + gg1 : g - gg1);
+		absg = std::fabs(g),
+		gg1  = (absg > 1.0 ?
+			absg * std::sqrt(1.0 + (1.0/absg)*(1.0/absg)) :
+			std::sqrt(1.0 + absg*absg)),
+		t    = (g > 0.0 ? g + gg1 : g - gg1);
     x = ((_diagonal[m] + _diagonal[n])*(_diagonal[m] - _diagonal[n]) -
 	 _off_diagonal[n]*(_off_diagonal[n] + _diagonal[n-1]/t)) / _diagonal[m];
   //x = _diagonal[m];				// without shifting
@@ -2669,19 +2696,25 @@ template <class T>
 class SVDecomposition : private BiDiagonal<T>
 {
   public:
+    typedef T					value_type;
+
+  private:
+    typedef BiDiagonal<T>			super;
+    
+  public:
   //! 与えられた一般行列の特異値分解を求める．
   /*!
     \param a	特異値分解する一般行列
   */
     template <class T2, class B2, class R2>
     SVDecomposition(const Matrix<T2, B2, R2>& a)
-	:BiDiagonal<T>(a)		{BiDiagonal<T>::diagonalize();}
+	:super(a)				{super::diagonalize();}
 
-    using	BiDiagonal<T>::nrow;
-    using	BiDiagonal<T>::ncol;
-    using	BiDiagonal<T>::Ut;
-    using	BiDiagonal<T>::Vt;
-    using	BiDiagonal<T>::diagonal;
+    using	super::nrow;
+    using	super::ncol;
+    using	super::Ut;
+    using	super::Vt;
+    using	super::diagonal;
 
   //! 特異値を求める．
   /*!
@@ -2754,289 +2787,6 @@ typedef Matrix<float, FixedSizedBuf<float, 12>,
 typedef Matrix<double, FixedSizedBuf<double, 12>,
 	       FixedSizedBuf<Vector<double>,  2> >
 	Matrix26d;			//!< double型要素を持つ2x6行列
-
-/************************************************************************
-*  class Minimization1<S>						*
-************************************************************************/
-static const double	DEFAULT_TOL = 3.0e-8;
-
-template <class S>
-class Minimization1
-{
-  private:
-    enum		{DEFAULT_NITER_MAX = 100};
-
-  public:
-    Minimization1(S tol = DEFAULT_TOL, int niter_max = DEFAULT_NITER_MAX)
-	:_tol(tol), _niter_max(niter_max)				{}
-    
-    virtual S		operator ()(const S&)			const	= 0;
-    S			minimize(S&, S)				const	;
-
-  private:
-    const S		_tol;
-    const int		_niter_max;
-};
-
-/*
- *  Minimize 1-dimensional function using golden section search and minima
- *  is returned in x. Minimum value of the func is also returned as a return
- *  value.
- */
-template <class S> S
-Minimization1<S>::minimize(S& x, S w) const
-{
-    using namespace	std;
-
-    const double	W = 0.38197;
-    S			x1 = x, x2 = x + w,
-			f1 = (*this)(x1), f2 = (*this)(x2);
-    
-    if (f1 < f2)			// guarantee that f1 >= f2
-    {
-	S	tmp = x1;		// swap x1 & x2
-	x1  = x2;
-	x2  = tmp;
-	tmp = f1;			// swap f1 & f2
-	f1  = f2;
-	f2  = tmp;
-    }
-    S	x0;
-    do
-    {
-	x0  = x1;
-	x1  = x2;
-	x2 += (1.0 / W - 1.0) * (x1 - x0);	// elongate to right
-#ifdef MIN1_DEBUG
-	S	f0 = f1;
-#endif
-	f1  = f2;
-	f2  = (*this)(x2);
-#ifdef MIN1_DEBUG
-	std::cerr << "Bracketting: [" << x0 << ", " << x1 << ", " << x2
-		  << "], (" << f0 << ", " << f1 << ", " << f2 << ")"
-		  << std::endl;
-#endif
-    } while (f1 > f2);
-    
-  /* Golden section search */
-    S	x3 = x2;
-    if (fabs(x1 - x0) > fabs(x2 - x1))
-    {
-	x2  = x1;
-	x1 -= W * (x2 - x0);		// insert new x1 between x0 & x2
-	f2  = f1;
-	f1  = (*this)(x1);
-    }
-    else
-    {
-	x2 -= (1.0 - W) * (x3 - x1);	// insert new x2 between x1 & x3
-	f2  = (*this)(x2);
-    }
-#ifdef MIN1_DEBUG
-    std::cerr << "Initial:     [" << x0 << ", " << x1 << ", " << x2
-	      << ", " << x3 << "], (" << f1 << ", " << f2 << ")" << std::endl;
-#endif
-    int	i;
-    for (i = 0;
-	 i < _niter_max && fabs(x3 - x0) > _tol * (fabs(x1) + fabs(x2)); ++i)
-    {
-	if (f1 < f2)
-	{
-	    x3  = x2;			// shift x2 & x3 to left
-	    x2  = x1;
-	    x1 -= W * (x2 - x0);	// insert new x1 between x0 & x2
-	    f2  = f1;
-	    f1  = (*this)(x1);
-	}
-	else
-	{
-	    x0  = x1;			// shift x0 & x1 to right
-	    x1  = x2;
-	    x2 += W * (x3 - x1);	// insert new x2 between x1 & x3
-	    f1  = f2;
-	    f2  = (*this)(x2);
-	}
-#ifdef MIN1_DEBUG
-	std::cerr << "Golden:      [" << x0 << ", " << x1 << ", " << x2
-		  << ", " << x3 << "], (" << f1 << ", " << f2 << ")"
-		  << std::endl;
-#endif
-    }
-    if (i == _niter_max)
-	throw std::runtime_error("TU::Minimization1<S>::minimize(): Too many iterations!!");
-
-    if (f1 < f2)
-    {
-	x = x1;
-	return f1;
-    }
-    else
-    {
-	x = x2;
-	return f2;
-    }
-}
-
-/************************************************************************
-*  class Minimization<S, T>						*
-************************************************************************/
-template <class S, class T>
-class Minimization
-{
-  private:
-    class LineFunction : public Minimization1<S>
-    {
-      public:
-	LineFunction(const Minimization<S, T>& func,
-		     const T& x, const Vector<S>& h,
-		     S tol, int niter_max)
-	  :Minimization1<S>(tol, niter_max),
-	   _func(func), _x(x), _h(h)		{}
-    
-	S	operator ()(const S& d)	const	{return _func(_func.proceed
-							      (_x, d * _h));}
-    
-      private:
-	const Minimization<S, T>&	_func;
-	const T&			_x;
-	const Vector<S>&		_h;
-    };
-
-  private:
-    enum		{DEFAULT_NITER_MAX = 1000};
-		 
-  public:
-    Minimization(S tol = DEFAULT_TOL, int niter_max=DEFAULT_NITER_MAX,
-		 bool pr=false)
-      :_tol(tol), _niter_max(niter_max), _print(pr)			{}
-    
-    virtual S		operator ()(const T&)			const	= 0;
-    virtual Vector<S>	ngrad(const T& x)			const	= 0;
-    virtual T		proceed(const T&, const Vector<S>&)	const	= 0;
-    S			minimize(T&)					;
-    S			steepest_descent(T&)				;
-    S			line_minimize(T&, const Vector<S>&)	const	;
-
-  protected:
-    virtual void	update(const T&)				;
-    virtual void	print(int, S, const T&)			const	;
-    
-  private:
-    int			near_enough(S, S)			const	;
- 
-    const S		_tol;
-    const int		_niter_max;
-    const bool		_print;
-};
-
-/*
- *  Minimize multi-dimensional function using conjugate gradient method and
- *  minima is returned in x. Minimum value of the func is also returned as
- *  a return value.
- */
-template <class S, class T> S
-Minimization<S, T>::minimize(T& x)
-{
-    S		val = (*this)(x);
-    Vector<S>	g   = ngrad(x), h = g;
-    
-    for (int i = 0; i < _niter_max; ++i)
-    {
-	if (_print)
-	    print(i, val, x);
-
-	const S		g_sqr = g * g;
-	if (g_sqr == 0.0)
-	    return val;
-
-	const S		val_next = line_minimize(x, h);
-	if (near_enough(val, val_next))
-	    return val_next;
-	val = val_next;
-
-	const Vector<S>	g_next = ngrad(x);
-	h = g_next + (((g_next - g) * g_next) / g_sqr) * h;
-	g = g_next;
-	update(x);
-    }
-
-    std::cerr << "TU::Minimization<S, T>::minimize(): Too many iterations!!"
-	      << std::endl;
-    return val;
-}
-
-/*
- *  Minimize multi-dimensional function using steepest descent method and
- *  minima is returned in x. Minimum value of the func is also returned as
- *  a return value.
- */
-template <class S, class T> S
-Minimization<S, T>::steepest_descent(T& x)
-{
-    S		val = (*this)(x);
-    Vector<S>	g   = ngrad(x);
-    
-    for (int i = 0; i < _niter_max; ++i)
-    {
-	if (_print)
-	    print(i, val, x);
-	
-	const S		g_sqr = g * g;
-	if (g_sqr == 0.0)
-	    return val;
-
-	const S		val_next = line_minimize(x, g);
-	if (near_enough(val, val_next))
-	    return val_next;
-	val = val_next;
-
-	g = ngrad(x);
-	update(x);
-    }
-
-    std::cerr << "TU::Minimization<S, T>::steepest_descent(): Too many iterations!!"
-	      << std::endl;
-    return val;
-}
-
-/*
- *  Minimize function along direction h and minima is returned in x.
- *  Minimum value of the function is also returned as a return value.
- */
-template <class S, class T> S
-Minimization<S, T>::line_minimize(T &x, const Vector<S>& h) const
-{
-    LineFunction	lfunc(*this, x, h, _tol, _niter_max);
-    S			d = 0.0, val = lfunc.minimize(d, 1.0);
-    x = proceed(x, d * h);
-    return val;
-}
-
-/*
- *  Update the status of the function to be minimized.
- */
-template <class S, class T> void
-Minimization<S, T>::update(const T&)
-{
-}
-
-/*
- *  Print intermediate values
- */
-template <class S, class T> void
-Minimization<S, T>::print(int i, S val, const T& x) const
-{
-    std::cerr << std::setw(3) << i << ": (" << val << ')' << x;
-}
-
-template <class S, class T> inline int
-Minimization<S, T>::near_enough(S a, S b) const
-{
-    const double	EPS = 1.0e-10;
-    return 2.0*fabs(a - b) <= _tol*(fabs(a) + fabs(b) + EPS);
-}
- 
 }
 
 #endif	/* !__TUVectorPP_h	*/
