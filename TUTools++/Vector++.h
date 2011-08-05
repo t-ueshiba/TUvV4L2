@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.43 2011-08-05 06:45:38 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.44 2011-08-05 12:12:33 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -215,11 +215,11 @@ class Vector : public Array<T, B>
     Vector&		operator *=(const Matrix<T2, B2, R2>& m)	;
     Vector		operator  -()				const	;
     T			square()				const	;
-    T			length()				const	;
+    double		length()				const	;
     template <class T2, class B2>
     T			sqdist(const Vector<T2, B2>& v)		const	;
     template <class T2, class B2>
-    T			dist(const Vector<T2, B2>& v)		const	;
+    double		dist(const Vector<T2, B2>& v)		const	;
     Vector&		normalize()					;
     Vector		normal()				const	;
     template <class T2, class B2, class R2>
@@ -439,10 +439,10 @@ Vector<T, B>::square() const
 /*!
   \return	ベクトルの長さ，すなわち\f$\TUnorm{\TUvec{u}{}}\f$
 */
-template <class T, class B> inline T
+template <class T, class B> inline double
 Vector<T, B>::length() const
 {
-    return std::sqrt(square());
+    return std::sqrt(double(square()));
 }
 
 //! このベクトルと他のベクトルの差の長さの2乗を返す．
@@ -463,10 +463,10 @@ Vector<T, B>::sqdist(const Vector<T2, B2>& v) const
   \return	ベクトル間の差，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
-template <class T, class B> template <class T2, class B2> inline T
+template <class T, class B> template <class T2, class B2> inline double
 Vector<T, B>::dist(const Vector<T2, B2>& v) const
 {
-    return std::sqrt(sqdist(v));
+    return std::sqrt(double(sqdist(v)));
 }
 
 //! このベクトルの長さを1に正規化する．
@@ -653,7 +653,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix&		rotate_from_left(const Rotation<T>& r)		;
     Matrix&		rotate_from_right(const Rotation<T>& r)		;
     T			square()				const	;
-    T			length()				const	;
+    double		length()				const	;
     Matrix&		symmetrize()					;
     Matrix&		antisymmetrize()				;
     void		rot2angle(T& theta_x,
@@ -1165,10 +1165,10 @@ Matrix<T, B, R>::square() const
 /*!
   \return	行列の2乗ノルム，すなわち\f$\TUnorm{\TUvec{A}{}}\f$
 */
-template <class T, class B, class R> inline T
+template <class T, class B, class R> inline double
 Matrix<T, B, R>::length() const
 {
-    return std::sqrt(square());
+    return std::sqrt(double(square()));
 }
 
 //! この行列の下半三角部分を上半三角部分にコピーして対称化する．
