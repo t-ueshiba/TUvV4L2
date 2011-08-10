@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.44 2011-08-05 12:12:33 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.45 2011-08-10 02:11:00 ueshiba Exp $
  */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -1345,7 +1345,12 @@ Matrix<T, B, R>::rot2quaternion() const
 
     vector4_type	q;
     q[0] = 0.5 * std::sqrt(trace() + 1);
-    if (q[0] + T(1) != T(1))	// q[0] != 0 ?
+    if (q[0] + T(1) == T(1))	// q[0] << 1 ?
+    {
+	Vector<T>	eval;
+	q(1, 3) = eigen(eval, false)[0];
+    }
+    else
     {
 	const Matrix<T>&	S = trns() - *this;
 	q[1] = 0.25 * S[2][1] / q[0];
@@ -1427,7 +1432,7 @@ template <class T, class B, class R> template <class T2, class B2>
 Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
 Matrix<T, B, R>::Rt(const Vector<T2, B2>& v)
 {
-    if (v.dim() == 4)
+    if (v.dim() == 4)			// quaternion ?
     {
 	const T		q0 = v[0];
 	vector3_type	q;
