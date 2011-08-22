@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: DericheConvolver.h,v 1.9 2009-09-04 05:47:36 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.10 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		DericheConvolver.h
+  \brief	Canny-Deriche核による畳み込みに関するクラスの定義と実装
+*/
 #ifndef	__TUDericheConvolver_h
 #define	__TUDericheConvolver_h
 
@@ -37,6 +41,7 @@ namespace TU
 /************************************************************************
 *  class DericheCoefficients						*
 ************************************************************************/
+//! Canny-Deriche核の係数を表すクラス
 class DericheCoefficients
 {
   public:
@@ -46,9 +51,9 @@ class DericheCoefficients
     DericheCoefficients(float alpha)			{initialize(alpha);}
     
   protected:
-    float	_c0[4];		// forward coefficients for smoothing
-    float	_c1[4];		// forward coefficients for 1st derivatives
-    float	_c2[4];		// forward coefficients for 2nd derivatives
+    float	_c0[4];		//!< forward coefficients for smoothing
+    float	_c1[4];		//!< forward coefficients for 1st derivatives
+    float	_c2[4];		//!< forward coefficients for 2nd derivatives
 };
 
 //! Canny-Deriche核の初期化を行う

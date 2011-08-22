@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.h,v 1.4 2010-01-13 02:08:19 ueshiba Exp $
+ *  $Id: PM16C_04.h,v 1.5 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		PM16C_04.h
+  \brief	ƒNƒ‰ƒX TU::PM16C_04 ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUPM16C_04_h
 #define __TUPM16C_04_h
 

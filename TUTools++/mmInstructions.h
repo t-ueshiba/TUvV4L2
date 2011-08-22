@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.18 2010-10-11 23:48:08 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.19 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		mmInstructions.h
+  \brief	Intel CPUのマルチメディア命令に関連するクラスと関数の定義と実装
+*/
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
 

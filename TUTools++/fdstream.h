@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: fdstream.h,v 1.1 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: fdstream.h,v 1.2 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		fdstream.h
+  \brief	ファイル記述子付きストリームバッファに関するクラスの定義と実装
+*/
 #ifndef __TUfdstream_h
 #define __TUfdstream_h
 
@@ -41,13 +45,13 @@ namespace TU
 ************************************************************************/
 //! ファイル記述子を持つストリームバッファクラス
 /*!
-  #TU::fdistream, #TU::fdostream, #TU::fdstreamの内部で使われる．
+  #TU::fdistream, #TU::fdostream, #TU::fdstream の内部で使われる．
 */
 class __PORT fdbuf : public std::streambuf
 {
   public:
-    typedef std::streambuf::traits_type			traits_type;
-    typedef traits_type::int_type			int_type;
+    typedef std::streambuf::traits_type	traits_type;	//!< 特性の型
+    typedef traits_type::int_type	int_type;	//!< 整数の型
 
   public:
     fdbuf(int fd, bool closeFdOnClosing)				;
@@ -95,7 +99,7 @@ class __PORT fdistream : public std::istream
     int		fd()						const	;
     
   protected:
-    fdbuf	_buf;
+    fdbuf	_buf;		//!< ファイル記述子を持つストリームバッファ
 };
 
 //! 指定したファイル記述子から入力ストリームを作る．
@@ -133,7 +137,7 @@ class __PORT fdostream : public std::ostream
     int		fd()						const	;
     
   protected:
-    fdbuf	_buf;
+    fdbuf	_buf;		//!< ファイル記述子を持つストリームバッファ
 };
 
 //! 指定したファイル記述子から出力ストリームを作る．
@@ -171,7 +175,7 @@ class __PORT fdstream : public std::iostream
     int		fd()						const	;
     
   protected:
-    fdbuf	_buf;
+    fdbuf	_buf;		//!< ファイル記述子を持つストリームバッファ
 };
 
 //! 指定したファイル記述子から入出力ストリームを作る．

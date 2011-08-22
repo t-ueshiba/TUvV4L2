@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Nurbs++.h,v 1.17 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.18 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Nurbs++.h
+  \brief	非有理/有理B-spline曲線/曲面に関連するクラスの定義と実装
+*/
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
 

@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Movie.h,v 1.13 2011-01-18 02:29:23 ueshiba Exp $
+ *  $Id: Movie.h,v 1.14 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Movie.h
+  \brief	クラス TU::Movie の定義と実装
+*/
 #ifndef __TUMovie_h
 #define __TUMovie_h
 
@@ -262,7 +266,8 @@ Movie<T>::image(u_int view)
 
 //! 現フレームの状態を調べる．
 /*!
-  \return	現フレームが最後のフレームの次に達していればfalse, そうでなければtrue
+  \return	現フレームが最後のフレームの次に達していればfalse,
+		そうでなければtrue
 */
 template <class T> inline
 Movie<T>::operator bool() const
@@ -292,8 +297,8 @@ Movie<T>::currentFrame() const
 
 //! 現フレームを指定する．
 /*!
-  frame >= #nframes() の場合は現フレームは #nframes() が返す値に設定され，
-  #operator bool()でfalseが返される状態になる．
+  frame >= nframes() の場合は現フレームは nframes() が返す値に設定され，
+  #operator bool() でfalseが返される状態になる．
   \param frame	フレーム番号
   \return	このムービー
 */
@@ -321,10 +326,10 @@ Movie<T>::rewind()
 
 //! 現フレームを1つ先に進める．
 /*!
-  現フレームが既に最後のフレームの次に達していたら（#operator bool()で
-  falseが返される状態になっていたら），何もせずにリターンする．
+  現フレームが既に最後のフレームの次に達していたら( #operator bool() で
+  falseが返される状態になっていたら)，何もせずにリターンする．
   現フレームが最後のフレームである場合，循環モードでないならばさらに
-  最後のフレームの次に進み，#operator bool()でfalseが返される状態になる．
+  最後のフレームの次に進み， #operator bool() でfalseが返される状態になる．
   循環モードならば先頭フレームに移動する．
   \return	このムービー
 */
@@ -348,7 +353,7 @@ Movie<T>::operator ++()
 //! 現在のフレームを1つ前に戻す．
 /*!
   現フレームがムービーの先頭の場合，循環モードでないならばムービーの
-  最後のフレームの次に移動し，#operator bool()でfalseが返される状態になる．
+  最後のフレームの次に移動し， #operator bool() でfalseが返される状態になる．
   循環モードならば最後のフレームに移動する．
   \return	このムービー
 */
@@ -517,7 +522,7 @@ Movie<T>::restore(std::istream& in)
 //! ムービーを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし，#ImageBase::DEFAULTを指定した場合は，
+ \param type	画素タイプ．ただし， #TU::ImageBase::DEFAULT を指定した場合は，
 		このムービーの画素タイプで書き出される．   
  \return	outで指定した出力ストリーム
 */
@@ -541,7 +546,7 @@ Movie<T>::save(std::ostream& out, ImageBase::Type type)
 //! ムービーのヘッダを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし，#ImageBase::DEFAULTを指定した場合は，
+ \param type	画素タイプ．ただし， #TU::ImageBase::DEFAULT を指定した場合は，
 		このムービーの画素タイプで書き出される．   
  \return	実際に書き出す場合の画素タイプ
 */
@@ -559,7 +564,7 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
 //! 現在のフレームを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし，#ImageBase::DEFAULTを指定した場合は，
+ \param type	画素タイプ．ただし， #TU::ImageBase::DEFAULT を指定した場合は，
 		このムービーの画素タイプで書き出される．   
  \return	outで指定した出力ストリーム
 */

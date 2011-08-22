@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: SHOT602.cc,v 1.4 2011-02-14 00:10:10 ueshiba Exp $
+ *  $Id: SHOT602.cc,v 1.5 2011-08-22 00:06:25 ueshiba Exp $
  */
 #include "TU/SHOT602.h"
 #include "TU/Manip.h"
@@ -81,7 +81,7 @@ SHOT602::showId(std::ostream& out)
   ホームポジションが検出されるまでホスト側に制御を返さない．
   \param axis	ホームポジション検出を実行する軸
   \param dir	正方向からであればtrue, 負方向からであればfalse
-  \param dir2	axisが#Axis_Bothの場合の第2軸について，
+  \param dir2	axisが #Axis_Both の場合の第2軸について，
 		正方向からであればtrue, 負方向からであればfalse
   \return	このコントローラ
 */
@@ -336,7 +336,7 @@ SHOT602::emergencyStop()
 /*!
   \param axis	軸
   \param dir	正方向ならtrue, 負方向ならfalse
-  \param dir2	axisが#Axis_Bothの場合の第2軸について，
+  \param dir2	axisが #Axis_Both の場合の第2軸について，
 		正方向ならtrue, 負方向ならfalse
   \return	このコントローラ　
 */
@@ -353,7 +353,7 @@ SHOT602::jog(Axis axis, bool dir, bool dir2)
 /*!
   \param axis	軸
   \param val	移動量
-  \param val2	axisが#Axis_Bothの場合の第2軸の移動量
+  \param val2	axisが #Axis_Both の場合の第2軸の移動量
   \param block	移動が完了するまでリターンしないならtrue, 直ちにリターンするならfalse
   \return	このコントローラ
 */
@@ -390,7 +390,7 @@ SHOT602::move(Axis axis, int val, int val2, bool block)
 /*!
   \param axis	軸
   \param on	励磁するならtrue, 励磁しないならfalse
-  \param on2	axisが#Axis_Bothの場合の第2軸について，
+  \param on2	axisが #Axis_Both の場合の第2軸について，
 		励磁するならtrue, 励磁しないならfalse
   \return	このコントローラ
 */

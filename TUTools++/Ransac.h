@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Ransac.h,v 1.7 2010-08-19 04:55:14 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.8 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Ransac.h
+  \brief	RANSACを行う関数の定義と実装
+*/
 #ifndef __TURansac_h
 #define __TURansac_h
 
@@ -71,9 +75,10 @@ namespace TU
   なるインタフェースによってpがmodelに適合しているか判定できること．
 
   \param pointSet	inlierとoutlierを含む点集合
-  \param model		pointSetに含まれるinlierを当てはめるモデル．
-  \param hitRate	RANSACによって正しくinlierを引き当てる確率．
-			0 <= hitRate < 1でなければならない．
+  \param model		pointSetに含まれるinlierを当てはめるモデル
+  \param conform	点のモデルへの適合性を判定する関数オブジェクト
+  \param hitRate	RANSACによって正しくinlierを引き当てる確率.
+			0 <= hitRate < 1でなければならない
   \return		pointSetに含まれるinlier
 */
 template <class PointSet, class Model, class Conform>

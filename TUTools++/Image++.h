@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.57 2011-04-15 04:56:05 ueshiba Exp $
+ *  $Id: Image++.h,v 1.58 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Image++.h
+  \brief	画素と画像に関連するクラスの定義と実装
+*/
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
 
@@ -443,7 +447,7 @@ class __PORT ImageBase
     {
 	__PORT	TypeInfo(Type ty=DEFAULT)	;
 
-	Type	type;		//!< 画素の型 #Type 
+	Type	type;		//!< 画素の型
 	bool	bottomToTop;	//!< 行が下から上へ収められているならtrue
 	u_int	ncolors;	//!< カラーパレットの色数
     };
@@ -534,7 +538,7 @@ class ImageLine : public Array<T>
 
   //! 指定されたスキャンラインの部分スキャンラインを生成する．
   /*!
-    \param i	元のスキャンライン
+    \param l	元のスキャンライン
     \param u	部分スキャンラインの左端の座標
     \param d	部分スキャンラインの画素数
   */
@@ -1099,7 +1103,7 @@ Image<T, B>::restore(std::istream& in)
 //! 指定した画素タイプで出力ストリームに画像を書き出す．
 /*!
   \param out	出力ストリーム
-  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
+  \param type	画素タイプ．ただし， #DEFAULT を指定した場合は，
 		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */
@@ -1111,9 +1115,10 @@ Image<T, B>::save(std::ostream& out, Type type) const
 
 //! 入力ストリームから画像の画素データを読み込む．
 /*!
-  \param in	入力ストリーム
-  \param type	ストリーム中のデータの画素タイプ(読み込み先の画像の画素タイプではない)
-  \return	inで指定した入力ストリーム
+  \param in		入力ストリーム
+  \param typeInfo	ストリーム中のデータの画素タイプ
+			(読み込み先の画像の画素タイプではない)
+  \return		inで指定した入力ストリーム
 */
 template <class T, class B> std::istream&
 Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
@@ -1155,7 +1160,7 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 //! 指定した画素タイプで出力ストリームに画像の画素データを書き出す．
 /*!
   \param out	出力ストリーム
-  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
+  \param type	画素タイプ．ただし， #DEFAULT を指定した場合は，
 		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */

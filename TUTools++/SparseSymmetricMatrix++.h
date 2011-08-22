@@ -25,16 +25,17 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SparseSymmetricMatrix++.h,v 1.1 2010-12-08 01:22:21 ueshiba Exp $
+ *  $Id: SparseSymmetricMatrix++.h,v 1.2 2011-08-22 00:06:25 ueshiba Exp $
  */
 /*!
-  \file		SparseMatrix.h
-  \brief	クラス#TU::SparseSymmetricMatrixの定義と実装
+  \file		SparseSymmetricMatrix++.h
+  \brief	クラス TU::SparseSymmetricMatrix の定義と実装
 */
 #ifndef __TUSparseSymmetricMatrixPP_h
 #define __TUSparseSymmetricMatrixPP_h
 
 #include "TU/Vector++.h"
+#include <vector>
 #include <algorithm>
 #include <mkl_pardiso.h>
 
@@ -49,10 +50,8 @@ class SparseSymmetricMatrix
 {
   public:
     typedef T	value_type;		//!< 成分の型
-    
-  public:
-    SparseSymmetricMatrix(u_int d, u_int nelms)				;
 
+  public:
     SparseSymmetricMatrix<T>&
 		operator =(value_type c)				;
     u_int	dim()						const	;
@@ -63,13 +62,21 @@ class SparseSymmetricMatrix
     T&		operator ()(u_int i, u_int j)				;
     const T&	operator ()(u_int i, u_int j)			const	;
     template <class F, class S, class B>
-    SparseSymmetricMatrix<T>&
+    SparseSymmetricMatrix&
 		apply(u_int i, u_int j, F f, const Vector<S, B>& v)	;
     template <class F, class S, class B, class R>
-    SparseSymmetricMatrix<T>&
+    SparseSymmetricMatrix&
 		apply(u_int i, u_int j, F f, const Matrix<S, B, R>& M)	;
     Vector<T>	solve(const Vector<T>& b)			const	;
-
+    SparseSymmetricMatrix&
+		operator *=(value_type c)				;
+    SparseSymmetricMatrix&
+		operator /=(value_type c)				;
+    SparseSymmetricMatrix&
+		operator +=(const SparseSymmetricMatrix& A)		;
+    SparseSymmetricMatrix&
+		operator -=(const SparseSymmetricMatrix& A)		;
+    
     template <class S> friend std::ostream&
 		operator <<(std::ostream& out,
 			    const SparseSymmetricMatrix<S>& A)		;
@@ -78,31 +85,22 @@ class SparseSymmetricMatrix
 			    SparseSymmetricMatrix<S>& A)		;
     
   protected:
-    u_int	index(u_int i, u_int j)				const	;
+    void	beginInit()						;
+    void	endInit()						;
+    void	setRow()						;
+    void	setCol(u_int col)					;
+    void	copyRow()						;
     
   private:
+    u_int	index(u_int i, u_int j)				const	;
     static int	pardiso_precision()					;
 
-  protected:
-    Array<u_int>	_rowIndex;	//!< 各行の先頭成分の通し番号(Fortran形式)
-    Array<u_int>	_columns;	//!< 各成分の列番号(Fortran形式)
+  private:
+    std::vector<u_int>	_rowIndex;	//!< 各行の先頭成分の通し番号(Fortran形式)
+    std::vector<u_int>	_columns;	//!< 各成分の列番号(Fortran形式)
     Vector<T>		_values;	//!< 各成分の値
 };
 
-//! 疎対称行列を生成する．
-/*!
-  \param d	行列の次元
-  \param nelms	行列の成分数
-*/
-template <class T> inline
-SparseSymmetricMatrix<T>::SparseSymmetricMatrix(u_int d, u_int nelms)
-    :_rowIndex(d + 1), _columns(nelms), _values(_columns.dim())
-{
-    _rowIndex = 0;
-    _rowIndex[dim()] = nelements() + 1;
-    _columns = 0;
-}
-    
 //! すべての0でない成分に定数を代入する．
 /*!
   \param c	代入する定数
@@ -123,17 +121,17 @@ SparseSymmetricMatrix<T>::operator =(value_type c)
 template <class T> inline u_int
 SparseSymmetricMatrix<T>::dim() const
 {
-    return _rowIndex.dim() - 1;
+    return _rowIndex.size() - 1;
 }
     
-//! 行列の全成分数を返す．
+//! 行列の非零成分数を返す．
 /*!
-  \return	行列の全成分数
+  \return	行列の非零成分数
 */
 template <class T> inline u_int
 SparseSymmetricMatrix<T>::nelements() const
 {
-    return _columns.dim();
+    return _columns.size();
 }
     
 //! 指定された行の成分数を返す．
@@ -303,7 +301,7 @@ SparseSymmetricMatrix<T>::solve(const Vector<T>& b) const
     using namespace	std;
 
     if (b.dim() != dim())
-	throw runtime_error("SparseSymmetricMatrix<T>::solve(): input vector with invalid dimension!");
+	throw runtime_error("TU::SparseSymmetricMatrix<T>::solve(): input vector with invalid dimension!");
 
   // pardiso の各種パラメータを設定する．
     _MKL_DSS_HANDLE_t	pt[64];		// pardisoの内部メモリへのポインタ
@@ -334,7 +332,7 @@ SparseSymmetricMatrix<T>::solve(const Vector<T>& b) const
 	    (_INTEGER_t*)&_rowIndex[0], (_INTEGER_t*)&_columns[0],
 	    &perm[0], &nrhs, iparm, &msglvl, (void*)&b[0], &x[0], &error);
     if (error != 0)
-	throw runtime_error("SparseSymmetricMatrix<T>::solve(): PARDISO failed!");
+	throw runtime_error("TU::SparseSymmetricMatrix<T>::solve(): PARDISO failed!");
 
   // pardiso 内で使用した全メモリを解放する．
     phase = -1;
@@ -342,18 +340,145 @@ SparseSymmetricMatrix<T>::solve(const Vector<T>& b) const
 	    (_INTEGER_t*)&_rowIndex[0], (_INTEGER_t*)&_columns[0],
 	    &perm[0], &nrhs, iparm, &msglvl, (void*)&b[0], &x[0], &error);
     if (error != 0)
-	throw runtime_error("SparseSymmetricMatrix<T>::solve(): PARDISO failed to release memory!");
+	throw runtime_error("TU::SparseSymmetricMatrix<T>::solve(): PARDISO failed to release memory!");
 
     return x;
 }
 
-//! 指定された行と列に対応する#_valuesのindexを返す．
+//! この疎対称行列に定数を掛ける．
 /*!
-  #_rowIndexと同様にFortran形式のindexを返すので，実際に#_valuesにアクセスする際には
-  返された値から1を引く必要がある．
+  \param c	掛ける定数
+  \return	この疎対称行列
+*/
+template <class T> SparseSymmetricMatrix<T>&
+SparseSymmetricMatrix<T>::operator *=(value_type c)
+{
+    _values *= c;
+    return *this;
+}
+    
+//! この疎対称行列を定数で割る．
+/*!
+  \param c	掛ける定数
+  \return	この疎対称行列
+*/
+template <class T> SparseSymmetricMatrix<T>&
+SparseSymmetricMatrix<T>::operator /=(value_type c)
+{
+    _values /= c;
+    return *this;
+}
+    
+//! この疎対称行列に他の疎対称行列を足す．
+/*!
+  2つの疎対称行列は同一の構造を持たねばならない．
+  \param A			足す疎対称行列
+  \return			この疎対称行列
+  \throw std::invalid_argument	2つの疎対称行列の構造が一致しない場合に送出
+*/
+template <class T> SparseSymmetricMatrix<T>&
+SparseSymmetricMatrix<T>::operator +=(const SparseSymmetricMatrix& A)
+{
+    using namespace	std;
+    
+    if (dim()	    != A.dim()						||
+	nelements() != A.nelements()					||
+	!equal(_rowIndex.begin(), _rowIndex.end(), A._rowIndex.begin())	||
+	!equal(_columns.begin(),  _columns.end(),  A._columns.begin()))
+	throw invalid_argument("TU::SparseSymmetricMatrix<T>::operator +=(): structure mismatch!");
+    _values += A._values;
+    return *this;
+}
+    
+//! この疎対称行列から他の疎対称行列を引く．
+/*!
+  2つの疎対称行列は同一の構造を持たねばならない．
+  \param A			引く疎対称行列
+  \return			この疎対称行列
+  \throw std::invalid_argument	2つの疎対称行列の構造が一致しない場合に送出
+*/
+template <class T> SparseSymmetricMatrix<T>&
+SparseSymmetricMatrix<T>::operator -=(const SparseSymmetricMatrix& A)
+{
+    using namespace	std;
+    
+    if (dim()	    != A.dim()						||
+	nelements() != A.nelements()					||
+	!equal(_rowIndex.begin(), _rowIndex.end(), A._rowIndex.begin())	||
+	!equal(_columns.begin(),  _columns.end(),  A._columns.begin()))
+	throw invalid_argument("TU::SparseSymmetricMatrix<T>::operator -=(): structure mismatch!");
+    _values -= A._values;
+    return *this;
+}
+    
+//! 初期化を開始する．
+template <class T> inline void
+SparseSymmetricMatrix<T>::beginInit()
+{
+    _rowIndex.clear();
+    _columns.clear();
+}
+
+//! 初期化を完了する．
+template <class T> inline void
+SparseSymmetricMatrix<T>::endInit()
+{
+    setRow();				// ダミーの行をセット
+    _values.resize(nelements());	// 成分を格納する領域を確保
+}
+
+//! 行の先頭位置をセットする．
+template <class T> inline void
+SparseSymmetricMatrix<T>::setRow()
+{
+  // この行の先頭成分の通し番号をセット(Fortran形式)
+    _rowIndex.push_back(nelements() + 1);
+}
+
+//! 成分の列番号をセットする．
+/*!
+  \param col	列番号
+*/
+template <class T> inline void
+SparseSymmetricMatrix<T>::setCol(u_int col)
+{
+    using namespace	std;
+
+    u_int	row = _rowIndex.size();	// 現在までにセットされた行数
+    if (row == 0)
+	throw runtime_error("TU::SparseSymmetricMatrix<T>::setCol(): _rowIndex is not set!");
+    if (col < --row)			// 与えられた列番号を現在の行番号と比較
+	throw invalid_argument("TU::SparseSymmetricMatrix<T>::setCol(): column index must not be less than row index!");
+
+  // この成分の列番号をセット(Fortran形式)
+    _columns.push_back(col + 1);
+}
+
+//! 直前の行と同じ位置に非零成分を持つような行をセットする．
+template <class T> inline void
+SparseSymmetricMatrix<T>::copyRow()
+{
+    using namespace	std;
+    
+    u_int	row = _rowIndex.size();	// 現在までにセットされた行数
+    if (row == 0)
+	throw runtime_error("TU::SparseSymmetricMatrix<T>::copyRow(): no previous rows!");
+
+  // 行の先頭成分の通し番号をセットする．rowが現在の行番号となる．
+    setRow();
+
+  // 直前の行の2番目以降の成分の列番号を現在の行にコピーする．
+    for (u_int n = _rowIndex[row - 1], ne = _rowIndex[row] - 1; n < ne; ++n)
+	_columns.push_back(_columns[n]);
+}
+
+//! 指定された行と列に対応する #_values のindexを返す．
+/*!
+  #_rowIndex と同様にFortran形式のindexを返すので，実際に #_values に
+  アクセスする際には返された値から1を引く必要がある．
   \param i			行を指定するindex
   \param j			列を指定するindex
-  \return			#_valuesのindex(Fortran形式)
+  \return			#_values のindex(Fortran形式)
   \throw std::out_of_range	この行列が(i, j)成分を持たない場合に送出
 */
 template <class T> inline u_int
@@ -381,11 +506,11 @@ SparseSymmetricMatrix<double>::pardiso_precision()	{return 0;}
 //! 出力ストリームへ疎対称行列を書き出し(ASCII)，さらに改行コードを出力する．
 /*!
   \param out	出力ストリーム
-  \param a	書き出す疎対称行列
+  \param A	書き出す疎対称行列
   \return	outで指定した出力ストリーム
 */
-template <class T> std::ostream&
-operator <<(std::ostream& out, const SparseSymmetricMatrix<T>& A)
+template <class S> std::ostream&
+operator <<(std::ostream& out, const SparseSymmetricMatrix<S>& A)
 {
     using namespace	std;
 

@@ -44,7 +44,11 @@
       Toshio UESHIBA
 	National Institute of Advanced Industrial Science and Technology (AIST)
    
-   $Id: Random.h,v 1.10 2010-02-15 00:53:19 ueshiba Exp $
+   $Id: Random.h,v 1.11 2011-08-22 00:06:25 ueshiba Exp $
+*/
+/*!
+  \file		Random.h
+  \brief	ƒNƒ‰ƒX TU::Random ‚Ì’è‹`‚ÆŽÀ‘•
 */
 #ifndef __TURandom_h
 #define __TURandom_h

@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Manip.h,v 1.9 2010-01-08 06:47:35 ueshiba Exp $
+ *  $Id: Manip.h,v 1.10 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Manip.h
+  \brief	各種マニピュレータの定義と実装
+*/
 #ifndef __TUManip_h
 #define __TUManip_h
 

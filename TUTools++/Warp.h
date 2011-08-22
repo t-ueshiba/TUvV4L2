@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.13 2011-07-21 23:39:35 ueshiba Exp $
+ *  $Id: Warp.h,v 1.14 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Warp.h
+  \brief	クラス TU::Warp の定義と実装
+*/
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
 
@@ -153,7 +157,7 @@ Warp::rmost(int v) const
   \param inWidth	入力画像の幅
   \param inHeight	入力画像の高さ
   \param outWidth	出力画像の幅
-  \param outWidth	出力画像の高さ
+  \param outHeight	出力画像の高さ
 */
 template <class T> inline void
 Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
@@ -186,11 +190,11 @@ Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
   \f]
   となる．
   \param Htinv		変形を指定する3x3射影変換行列の逆行列の転置
-  \param Intrinsic	入力画像に加えれられている放射歪曲を表すカメラ内部パラメータ
+  \param intrinsic	入力画像に加えれられている放射歪曲を表すカメラ内部パラメータ
   \param inWidth	入力画像の幅
   \param inHeight	入力画像の高さ
   \param outWidth	出力画像の幅
-  \param outWidth	出力画像の高さ
+  \param outHeight	出力画像の高さ
 */
 template <class I> void
 Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,

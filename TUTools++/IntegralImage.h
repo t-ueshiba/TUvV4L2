@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IntegralImage.h,v 1.6 2010-10-08 00:05:39 ueshiba Exp $
+ *  $Id: IntegralImage.h,v 1.7 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		IntegralImage.h
+  \brief	ƒNƒ‰ƒX TU::IntegralImage, TU::DiagonalIntegralImage ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef	__TUIntegralImage_h
 #define	__TUIntegralImage_h
 

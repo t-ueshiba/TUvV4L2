@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: List.h,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: List.h,v 1.4 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		List.h
+  \brief	ƒNƒ‰ƒX TU::List ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUList_h
 #define __TUList_h
 #include <iterator>

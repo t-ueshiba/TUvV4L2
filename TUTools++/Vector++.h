@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.45 2011-08-10 02:11:00 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.46 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Vector++.h
+  \brief	ベクトルと行列およびそれに関連するクラスの定義と実装
+*/
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
 
@@ -72,7 +76,7 @@ template <class T>
 class Rotation
 {
   public:
-    typedef T	value_type;	//!< 要素の型
+    typedef T	value_type;	//!< 成分の型
     
   public:
     Rotation(u_int p, u_int q, value_type x, value_type y)	;
@@ -156,9 +160,9 @@ Rotation<T>::Rotation(u_int p, u_int q, value_type theta)
 ************************************************************************/
 template <class T, class B, class R>	class Matrix;
 
-//! T型の要素を持つベクトルを表すクラス
+//! T型の成分を持つベクトルを表すクラス
 /*!
-  \param T	要素の型
+  \param T	成分の型
   \param B	バッファ
 */
 template <class T, class B=Buf<T> >
@@ -178,7 +182,9 @@ class Vector : public Array<T, B>
     typedef typename super::const_iterator		const_iterator;
     typedef typename super::reverse_iterator		reverse_iterator;
     typedef typename super::const_reverse_iterator	const_reverse_iterator;
+  //! 成分の型が等しい3次元ベクトルの型
     typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
+  //! 成分の型が等しい3x3行列の型
     typedef Matrix<T, FixedSizedBuf<T, 9>,
 		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
     
@@ -231,7 +237,7 @@ class Vector : public Array<T, B>
     void		resize(T* p, u_int d)				;
 };
 
-//! ベクトルを生成し，全要素を0で初期化する．
+//! ベクトルを生成し，全成分を0で初期化する．
 template <class T, class B>
 Vector<T, B>::Vector()
     :super()
@@ -239,7 +245,7 @@ Vector<T, B>::Vector()
     *this = 0;
 }
 
-//! 指定された次元のベクトルを生成し，全要素を0で初期化する．
+//! 指定された次元のベクトルを生成し，全成分を0で初期化する．
 /*!
   \param d	ベクトルの次元
 */
@@ -264,7 +270,7 @@ Vector<T, B>::Vector(T* p, u_int d)
 //! 与えられたベクトルと記憶領域を共有する部分ベクトルを生成する．
 /*!
   \param v	元のベクトル
-  \param i	部分ベクトルの第0要素を指定するindex
+  \param i	部分ベクトルの第0成分を指定するindex
   \param d	部分ベクトルの次元
 */
 template <class T, class B> template <class B2> inline
@@ -273,7 +279,7 @@ Vector<T, B>::Vector(Vector<T, B2>& v, u_int i, u_int d)
 {
 }
 
-//! 他のベクトルと同一要素を持つベクトルを作る(コピーコンストラクタの拡張)．
+//! 他のベクトルと同一成分を持つベクトルを作る(コピーコンストラクタの拡張)．
 /*!
   \param v	コピー元ベクトル
 */
@@ -297,7 +303,7 @@ Vector<T, B>::operator =(const Vector<T2, B2>& v)
 
 //! このベクトルと記憶領域を共有した部分ベクトルを生成する．
 /*!
-    \param i	部分ベクトルの第0要素を指定するindex
+    \param i	部分ベクトルの第0成分を指定するindex
     \param d	部分ベクトルの次元
     \return	生成された部分ベクトル
 */
@@ -309,7 +315,7 @@ Vector<T, B>::operator ()(u_int i, u_int d)
 
 //! このベクトルと記憶領域を共有した部分ベクトルを生成する．
 /*!
-    \param i	部分ベクトルの第0要素を指定するindex
+    \param i	部分ベクトルの第0成分を指定するindex
     \param d	部分ベクトルの次元
     \return	生成された部分ベクトル
 */
@@ -319,7 +325,7 @@ Vector<T, B>::operator ()(u_int i, u_int d) const
     return Vector<T>(const_cast<Vector<T, B>&>(*this), i, d);
 }
 
-//! このベクトルの全ての要素に同一の数値を代入する．
+//! このベクトルの全ての成分に同一の数値を代入する．
 /*!
   \param c	代入する数値
   \return	このベクトル
@@ -543,7 +549,7 @@ Vector<T, B>::inhomogeneous() const
     return (*this)(0, dim()-1) / (*this)[dim()-1];
 }
 
-//! ベクトルの次元を変更し，全要素を0に初期化する．
+//! ベクトルの次元を変更し，全成分を0に初期化する．
 /*!
   ただし，他のオブジェクトと記憶領域を共有しているベクトルの次元を
   変更することはできない．
@@ -559,7 +565,7 @@ Vector<T, B>::resize(u_int d)
 //! ベクトルが内部で使用する記憶領域を指定したものに変更する．
 /*!
   \param p	新しい記憶領域へのポインタ
-  \param siz	新しい次元
+  \param d	新しい次元
 */
 template <class T, class B> inline void
 Vector<T, B>::resize(T* p, u_int d)
@@ -573,10 +579,10 @@ Vector<T, B>::resize(T* p, u_int d)
 template <class T>	class TriDiagonal;
 template <class T>	class SVDecomposition;
 
-//! T型の要素を持つ行列を表すクラス
+//! T型の成分を持つ行列を表すクラス
 /*!
-  各行がT型の要素を持つベクトル#TU::Vector<T>になっている．
-  \param T	要素の型
+  各行がT型の成分を持つベクトル#TU::Vector<T>になっている．
+  \param T	成分の型
   \param B	バッファ
   \param R	行バッファ
 */
@@ -595,8 +601,11 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef typename super::const_pointer		const_pointer;
     typedef typename super::iterator			iterator;
     typedef typename super::const_iterator		const_iterator;
+  //! 成分の型が等しい3次元ベクトルの型
     typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
+  //! 成分の型が等しい4次元ベクトルの型
     typedef Vector<T, FixedSizedBuf<T, 4> >		vector4_type;
+  //! 成分の型が等しい3x3行列の型
     typedef Matrix<T, FixedSizedBuf<T, 9>,
 		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
     
@@ -674,7 +683,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     void		resize(T* p, u_int r, u_int c)			;
 };
 
-//! 行列を生成し，全要素を0で初期化する．
+//! 行列を生成し，全成分を0で初期化する．
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix()
     :super()
@@ -682,7 +691,7 @@ Matrix<T, B, R>::Matrix()
     *this = 0;
 }
 
-//! 指定されたサイズの行列を生成し，全要素を0で初期化する．
+//! 指定されたサイズの行列を生成し，全成分を0で初期化する．
 /*!
   \param r	行列の行数
   \param c	行列の列数
@@ -721,7 +730,7 @@ Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
 {
 }
 
-//! 他の行列と同一要素を持つ行列を作る(コピーコンストラクタの拡張)．
+//! 他の行列と同一成分を持つ行列を作る(コピーコンストラクタの拡張)．
 /*!
   \param m	コピー元行列
 */
@@ -758,8 +767,8 @@ Matrix<T, B, R>::operator const Vector<T>() const
 
 //! この行列と記憶領域を共有した部分行列を生成する．
 /*!
-    \param i	部分行列の左上隅要素となる行を指定するindex
-    \param j	部分行列の左上隅要素となる列を指定するindex
+    \param i	部分行列の左上隅成分となる行を指定するindex
+    \param j	部分行列の左上隅成分となる列を指定するindex
     \param r	部分行列の行数
     \param c	部分行列の列数
     \return	生成された部分行列
@@ -772,8 +781,8 @@ Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c)
 
 //! この行列と記憶領域を共有した部分行列を生成する．
 /*!
-    \param i	部分行列の左上隅要素となる行を指定するindex
-    \param j	部分行列の左上隅要素となる列を指定するindex
+    \param i	部分行列の左上隅成分となる行を指定するindex
+    \param j	部分行列の左上隅成分となる列を指定するindex
     \param r	部分行列の行数
     \param c	部分行列の列数
     \return	生成された部分行列
@@ -784,7 +793,7 @@ Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c) const
     return Matrix<T>(const_cast<Matrix<T, B, R>&>(*this), i, j, r, c);
 }
 
-//! この行列の全ての要素に同一の数値を代入する．
+//! この行列の全ての成分に同一の数値を代入する．
 /*!
   \param c	代入する数値
   \return	この行列
@@ -1039,7 +1048,7 @@ Matrix<T, B, R>::eigen(Vector<T>& eval, bool abs) const
 
 //! この対称行列の一般固有値と一般固有ベクトルを返す．
 /*!
-    \param B	もとの行列と同一サイズの正値対称行列
+    \param BB	もとの行列と同一サイズの正値対称行列
     \param eval	一般固有値が返される
     \param abs	一般固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
 		並べるならfalse
@@ -1541,7 +1550,7 @@ operator *(const Vector<T, B>& v, double c)
     return Vector<T, B>(v) *= c;
 }
 
-//! ベクトルの各要素を定数で割る．
+//! ベクトルの各成分を定数で割る．
 /*!
   \param v	ベクトル
   \param c	割る定数
@@ -1603,7 +1612,7 @@ operator *(const Matrix<T, B, R>& m, double c)
     return Matrix<T, B, R>(m) *= c;
 }
 
-//! 行列の各要素を定数で割る．
+//! 行列の各成分を定数で割る．
 /*!
   \param m	行列
   \param c	割る定数
@@ -2212,7 +2221,7 @@ template <class T>
 class TriDiagonal
 {
   public:
-    typedef T						value_type;
+    typedef T					value_type;	//!< 成分の型
     
   public:
     template <class T2, class B2, class R2>
@@ -2410,7 +2419,7 @@ template <class T>
 class BiDiagonal
 {
   public:
-    typedef T					value_type;
+    typedef T					value_type;	//!< 成分の型
     
   public:
     template <class T2, class B2, class R2>
@@ -2701,7 +2710,7 @@ template <class T>
 class SVDecomposition : private BiDiagonal<T>
 {
   public:
-    typedef T					value_type;
+    typedef T					value_type;	//!< 成分の型
 
   private:
     typedef BiDiagonal<T>			super;
@@ -2733,65 +2742,65 @@ class SVDecomposition : private BiDiagonal<T>
 *  typedefs								*
 ************************************************************************/
 typedef Vector<short,  FixedSizedBuf<short,   2> >
-	Vector2s;			//!< short型要素を持つ2次元ベクトル
+	Vector2s;			//!< short型成分を持つ2次元ベクトル
 typedef Vector<int,    FixedSizedBuf<int,     2> >
-	Vector2i;			//!< int型要素を持つ2次元ベクトル
+	Vector2i;			//!< int型成分を持つ2次元ベクトル
 typedef Vector<float,  FixedSizedBuf<float,   2> >
-	Vector2f;			//!< float型要素を持つ2次元ベクトル
+	Vector2f;			//!< float型成分を持つ2次元ベクトル
 typedef Vector<double, FixedSizedBuf<double,  2> >
-	Vector2d;			//!< double型要素を持つ2次元ベクトル
+	Vector2d;			//!< double型成分を持つ2次元ベクトル
 typedef Vector<short,  FixedSizedBuf<short,   3> >
-	Vector3s;			//!< short型要素を持つ3次元ベクトル
+	Vector3s;			//!< short型成分を持つ3次元ベクトル
 typedef Vector<int,    FixedSizedBuf<int,     3> >
-	Vector3i;			//!< int型要素を持つ3次元ベクトル
+	Vector3i;			//!< int型成分を持つ3次元ベクトル
 typedef Vector<float,  FixedSizedBuf<float,   3> >
-	Vector3f;			//!< float型要素を持つ3次元ベクトル
+	Vector3f;			//!< float型成分を持つ3次元ベクトル
 typedef Vector<double, FixedSizedBuf<double,  3> >
-	Vector3d;			//!< double型要素を持つ3次元ベクトル
+	Vector3d;			//!< double型成分を持つ3次元ベクトル
 typedef Vector<short,  FixedSizedBuf<short,   4> >
-	Vector4s;			//!< short型要素を持つ4次元ベクトル
+	Vector4s;			//!< short型成分を持つ4次元ベクトル
 typedef Vector<int,    FixedSizedBuf<int,     4> >
-	Vector4i;			//!< int型要素を持つ4次元ベクトル
+	Vector4i;			//!< int型成分を持つ4次元ベクトル
 typedef Vector<float,  FixedSizedBuf<float,   4> >
-	Vector4f;			//!< float型要素を持つ4次元ベクトル
+	Vector4f;			//!< float型成分を持つ4次元ベクトル
 typedef Vector<double, FixedSizedBuf<double,  4> >
-	Vector4d;			//!< double型要素を持つ4次元ベクトル
+	Vector4d;			//!< double型成分を持つ4次元ベクトル
 typedef Matrix<float,  FixedSizedBuf<float,   4>,
 	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix22f;			//!< float型要素を持つ2x2行列
+	Matrix22f;			//!< float型成分を持つ2x2行列
 typedef Matrix<double, FixedSizedBuf<double,  4>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix22d;			//!< double型要素を持つ2x2行列
+	Matrix22d;			//!< double型成分を持つ2x2行列
 typedef Matrix<float,  FixedSizedBuf<float,   6>,
 	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix23f;			//!< float型要素を持つ2x3行列
+	Matrix23f;			//!< float型成分を持つ2x3行列
 typedef Matrix<double, FixedSizedBuf<double,  6>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix23d;			//!< double型要素を持つ2x3行列
+	Matrix23d;			//!< double型成分を持つ2x3行列
 typedef Matrix<float,  FixedSizedBuf<float,   9>,
 	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix33f;			//!< float型要素を持つ3x3行列
+	Matrix33f;			//!< float型成分を持つ3x3行列
 typedef Matrix<double, FixedSizedBuf<double,  9>,
 	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix33d;			//!< double型要素を持つ3x3行列
+	Matrix33d;			//!< double型成分を持つ3x3行列
 typedef Matrix<float,  FixedSizedBuf<float,  12>,
 	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix34f;			//!< float型要素を持つ3x4行列
+	Matrix34f;			//!< float型成分を持つ3x4行列
 typedef Matrix<double, FixedSizedBuf<double, 12>,
 	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix34d;			//!< double型要素を持つ3x4行列
+	Matrix34d;			//!< double型成分を持つ3x4行列
 typedef Matrix<float,  FixedSizedBuf<float,  16>,
 	       FixedSizedBuf<Vector<float>,   4> >
-	Matrix44f;			//!< float型要素を持つ4x4行列
+	Matrix44f;			//!< float型成分を持つ4x4行列
 typedef Matrix<double, FixedSizedBuf<double, 16>,
 	       FixedSizedBuf<Vector<double>,  4> >
-	Matrix44d;			//!< double型要素を持つ4x4行列
+	Matrix44d;			//!< double型成分を持つ4x4行列
 typedef Matrix<float, FixedSizedBuf<float, 12>,
 	       FixedSizedBuf<Vector<float>,  2> >
-	Matrix26f;			//!< float型要素を持つ2x6行列
+	Matrix26f;			//!< float型成分を持つ2x6行列
 typedef Matrix<double, FixedSizedBuf<double, 12>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix26d;			//!< double型要素を持つ2x6行列
+	Matrix26d;			//!< double型成分を持つ2x6行列
 }
 
 #endif	/* !__TUVectorPP_h	*/

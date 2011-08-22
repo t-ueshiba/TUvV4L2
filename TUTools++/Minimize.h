@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Minimize.h,v 1.6 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: Minimize.h,v 1.7 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Minimize.h
+  \brief	汎用最小自乗法に関連する関数の定義と実装
+*/
 #ifndef __TUMinimize_h
 #define __TUMinimize_h
 
@@ -42,8 +46,8 @@ namespace TU
 //! 何の拘束も与えないというダミーの拘束条件を表すクラス
 /*!
   実体は任意の引数に対して0次元のベクトルを出力するベクトル値関数であり，
-  #minimizeSquare()や#minimizeSquareSparce()のテンプレートパラメータGとして
-  利用することを想定している．
+  #minimizeSquare() や #minimizeSquareSparse() のテンプレートパラメータG
+  として利用することを想定している．
   \param ET 出力ベクトルの要素の型
 */
 template <class ET>
@@ -63,9 +67,9 @@ class NullConstraint
 ************************************************************************/
 //! 引数の2乗ノルム値が一定という拘束条件を表すクラス
 /*!
-  実体は与えられた引数の2乗ノルム値と目標値との差を1次元ベクトルとして返すベクトル値
-  関数であり，#minimizeSquare()や#minimizeSquareSparce()のテンプレートパラメータG
-  として利用することを想定している．
+  実体は与えられた引数の2乗ノルム値と目標値との差を1次元ベクトルとして返す
+  ベクトル値関数であり， #minimizeSquare() や #minimizeSquareSparse() の
+  テンプレートパラメータGとして利用することを想定している．
   \param AT	引数の型．以下の条件を満たすこと：
   -# ベクトルや行列である場合，その要素の型を
 	AT::value_type
@@ -263,19 +267,19 @@ minimizeSquare(const F& f, const G& g, AT& x,
   \f$\TUvec{g}{}(\cdot)\f$は\f$\TUvec{a}{}\f$のみに依存する(すなわち
   \f$\TUvec{g}{}(\TUvec{x}{}) = \TUvec{g}{}(\TUvec{a}{})\f$)ものとする．
   
-  テンプレートパラメータATAは，ベクトル値関数fの第1引数および拘束条件関数gの引数aを
-  表す型であり，以下の条件を満たすこと：
+  テンプレートパラメータATAは，ベクトル値関数fの第1引数および拘束条件関数gの
+  引数aを表す型であり，以下の条件を満たすこと：
   -# 引数がベクトルや行列である場合，その要素の型を
 	ATA::value_type
      という名前でtypedefしている．
 
-  テンプレートパラメータIBは，個々のベクトル値関数f_jの第2引数b_jを指す反復子を表す型
-  であり，以下の条件を満たすこと：
+  テンプレートパラメータIBは，個々のベクトル値関数f_jの第2引数b_jを指す
+  反復子を表す型であり，以下の条件を満たすこと：
   -# iterator_traits<IB>::value_type
      でこの反復子が指す引数の型(以下，ATBとする)を知ることができる．
 
-  テンプレートパラメータFは，ATA型の引数aとATB型の引数b_jを入力してベクトル値を出力する
-  関数を表す型であり，以下の条件を満たすこと：
+  テンプレートパラメータFは，ATA型の引数aとATB型の引数b_jを入力して
+  ベクトル値を出力する関数を表す型であり，以下の条件を満たすこと：
   -# 出力ベクトルの要素の型を
 	F::value_type
      という名前でtypedefしている．
@@ -305,8 +309,8 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	void	F::updateB(const ATB& b_j, const Vector<F::value_type>& db_j) const
      によって引数bを微少量db_jだけ更新することができる．
 
-  テンプレートパラメータGは，ATA型の引数を入力してベクトル値を出力する関数を表す型であり，
-  以下の条件を満たすこと：
+  テンプレートパラメータGは，ATA型の引数を入力してベクトル値を出力する関数を
+  表す型であり，以下の条件を満たすこと：
   -# 出力ベクトルの要素の型を
 	G::value_type
      という名前でtypedefしている．
@@ -319,12 +323,13 @@ minimizeSquare(const F& f, const G& g, AT& x,
 
   \param f		その2乗ノルムを最小化すべきベクトル値関数
   \param g		拘束条件を表すベクトル値関数
-  \param a		各f_jの第1引数であり，かつgの引数．初期値を与えると最適解が
-			返される．
+  \param a		各f_jの第1引数であり，かつgの引数．初期値を与えると
+			最適解が返される．
   \param bbegin		各f_jに与える第2引数の並びの先頭を指す反復子
   \param bend		各f_jに与える第2引数の並びの末尾の次を指す反復子
   \param niter_max	最大繰り返し回数
-  \param tol		収束判定条件を表す閾値(更新量がこの値以下になれば収束と見なす)
+  \param tol		収束判定条件を表す閾値(更新量がこの値以下になれば
+			収束と見なす)
   \return		a, b_1, b_2,..., b_Jの推定値の共分散行列
 */
 template <class F, class G, class ATA, class IB> Matrix<typename F::value_type>

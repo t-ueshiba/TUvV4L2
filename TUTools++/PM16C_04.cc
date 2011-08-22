@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.8 2010-12-15 03:55:56 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.9 2011-08-22 00:06:25 ueshiba Exp $
  */
 #include "TU/PM16C_04.h"
 #include "TU/Manip.h"
@@ -215,8 +215,8 @@ PM16C_04::getSpeedValue(u_int channel, Speed speed)
 //! ソフトウェアリミットスイッチを有効化し．その位置を指定する．
 /*!
   \param channel	チャンネル
-  \param PositionP	正方向リミットスイッチの位置
-  \param PositionN	負方向リミットスイッチの位置
+  \param positionP	正方向リミットスイッチの位置
+  \param positionN	負方向リミットスイッチの位置
   \return		このコントローラ
 */
 PM16C_04&
@@ -634,10 +634,10 @@ PM16C_04::getChannel(Axis axis)
     
 //! 4つの軸にそれぞれどのチャンネルが結びつけられているか調べる．
 /*!
-  \param channel_A	#Axis_Aに結びつけられたチャンネルが返される
-  \param channel_B	#Axis_Bに結びつけられたチャンネルが返される
-  \param channel_C	#Axis_Cに結びつけられたチャンネルが返される
-  \param channel_D	#Axis_Dに結びつけられたチャンネルが返される
+  \param channel_A	#Axis_A に結びつけられたチャンネルが返される
+  \param channel_B	#Axis_B に結びつけられたチャンネルが返される
+  \param channel_C	#Axis_C に結びつけられたチャンネルが返される
+  \param channel_D	#Axis_D に結びつけられたチャンネルが返される
 */
 void
 PM16C_04::getChannel(u_int& channel_A, u_int& channel_B,

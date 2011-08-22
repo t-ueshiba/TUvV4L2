@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: io.h,v 1.1 2011-01-17 00:04:34 ueshiba Exp $
+ *  $Id: io.h,v 1.2 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		io.h
+  \brief	各種入出力関数の定義と実装
+*/
 #ifndef __TUio_h
 #define __TUio_h
 

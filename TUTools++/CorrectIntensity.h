@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.h,v 1.6 2009-09-11 05:56:13 ueshiba Exp $
+ *  $Id: CorrectIntensity.h,v 1.7 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		CorrectIntensity.h
+  \brief	ƒNƒ‰ƒX TU::CorrectIntensity ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef	__TUCorrectIntensity_h
 #define	__TUCorrectIntensity_h
 

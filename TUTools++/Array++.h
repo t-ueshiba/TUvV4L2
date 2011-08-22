@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.35 2011-07-07 07:51:04 ueshiba Exp $
+ *  $Id: Array++.h,v 1.36 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Array++.h
+  \brief	配列クラスの定義と実装
+*/
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
 
@@ -45,7 +49,7 @@ namespace TU
 ************************************************************************/
 //! 可変長バッファクラス
 /*!
-  単独で使用することはなく，#TU::Array<T, B>または#TU::Array2<T, B, R>の
+  単独で使用することはなく， TU::Array または TU::Array2 の
   第2テンプレート引数に指定することによって，それらの基底クラスとして使う．
   \param T	要素の型
 */
@@ -272,7 +276,7 @@ Buf<T>::put(std::ostream& out) const
 ************************************************************************/
 //! 記憶領域のアドレスが16byteの倍数になるようalignされた可変長バッファクラス
 /*!
-  単独で使用することはなく，#TU::Array<T, B>または#TU::Array2<T, B>の
+  単独で使用することはなく， TU::Array または TU::Array2 の
   第2テンプレート引数に指定することによって，それらの基底クラスとして使う．
   \param T	要素の型
 */
@@ -424,8 +428,8 @@ template <class T> const AlignedBuf<T>::LCM	AlignedBuf<T>::_lcm;
 ************************************************************************/
 //! 定数サイズのバッファクラス
 /*!
-  単独で使用することはなく，#TU::Array<T, B>の第2テンプレート引数に指定する
-  ことによって#TU::Array<T, B>の基底クラスとして使う．
+  単独で使用することはなく， TU::Array の第2テンプレート引数に指定する
+  ことによって TU::Array の基底クラスとして使う．
   \param T	要素の型
   \param D	バッファ中の要素数
 */

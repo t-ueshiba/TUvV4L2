@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PSTree.h,v 1.3 2009-07-31 07:04:45 ueshiba Exp $
+ *  $Id: PSTree.h,v 1.4 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		PSTree.h
+  \brief	ƒNƒ‰ƒX TU::PSTree ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUPSTree_h
 #define __TUPSTree_h
 
