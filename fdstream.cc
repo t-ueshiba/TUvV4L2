@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: fdstream.cc,v 1.3 2010-01-27 08:09:59 ueshiba Exp $
+ *  $Id: fdstream.cc,v 1.4 2011-08-22 00:06:25 ueshiba Exp $
  */
 #include "TU/fdstream.h"
 #include <stdexcept>
@@ -117,7 +117,8 @@ fdbuf::overflow(int_type c)
 //! ファイルに文字列を書き出す．
 /*!
   \param s	書き出す文字列
-  \return	書き出した文字数
+  \param n	書き出す文字数
+  \return	実際に書き出した文字数
 */
 std::streamsize
 fdbuf::xsputn(const char* s, std::streamsize n)

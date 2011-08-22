@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.16 2009-09-11 05:56:13 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.17 2011-08-22 00:06:25 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
@@ -287,8 +287,8 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 /*!
   \param strength	エッジ強度入力画像
   \param direction	エッジ方向入力画像
-  \param out		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
-			#WEAKラベルを付けた出力画像
+  \param out		強いエッジ点と弱いエッジ点にそれぞれ #EDGE ラベルと
+			#WEAK ラベルを付けた出力画像
   \return		このエッジ検出器自身
 */
 const EdgeDetector&
@@ -400,8 +400,8 @@ EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
 /*!
   \param in		入力2次微分画像
   \param strength	入力エッジ強度画像
-  \param out		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
-			#WEAKラベルを付けた出力画像
+  \param out		強いエッジ点と弱いエッジ点にそれぞれ #EDGE ラベルと
+			#WEAK ラベルを付けた出力画像
   \return		このエッジ検出器自身
 */
 const EdgeDetector&
@@ -447,8 +447,8 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
 
 //! 強いエッジ点を起点に弱いエッジを追跡することによりヒステリシス閾値処理を行う
 /*!
-  \param edge		強いエッジ点と弱いエッジ点にそれぞれ#EDGEラベルと
-			#WEAKラベルを付けた画像．処理が終わると最終的なエッジ
+  \param edge		強いエッジ点と弱いエッジ点にそれぞれ #EDGE ラベルと
+			#WEAK ラベルを付けた画像．処理が終わると最終的なエッジ
 			点に255を，そうでない点には0を書き込んで返される．
   \return		このエッジ検出器自身
 */

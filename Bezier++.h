@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Bezier++.h,v 1.15 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.16 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Bezier++.h
+  \brief	Bezier曲線およびBezier曲面に関連するクラスの定義と実装
+*/
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
 
@@ -281,8 +285,8 @@ BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
 
 //! 指定したパラメータ値に対応する曲面上の点を調べる．
 /*!
-  \param t	曲面上の位置を指定する横方向パラメータ値
-  \param t	曲面上の位置を指定する縦方向パラメータ値
+  \param u	曲面上の位置を指定する横方向パラメータ値
+  \param v	曲面上の位置を指定する縦方向パラメータ値
   \return	パラメータ値に対応する曲面上の点
 */
 template <class C> C

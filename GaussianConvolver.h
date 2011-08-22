@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.10 2009-09-04 05:47:36 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.11 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		GaussianConvolver.h
+  \brief	Gauss核による畳み込みに関するクラスの定義と実装
+*/
 #ifndef	__TUGaussianConvolver_h
 #define	__TUGaussianConvolver_h
 
@@ -38,6 +42,7 @@ namespace TU
 /************************************************************************
 *  class GaussianCoefficients						*
 ************************************************************************/
+//! Gauss核の係数を表すクラス
 class __PORT GaussianCoefficients
 {
   private:
@@ -55,7 +60,7 @@ class __PORT GaussianCoefficients
 	typedef double		value_type;
 	typedef Array<Params>	AT;
 
-	EvenConstraint(double sigma) :_sigma(sigma)				{}
+	EvenConstraint(double sigma) :_sigma(sigma)			{}
 	
 	Vector<double>	operator ()(const AT& params)		const	;
 	Matrix<double>	jacobian(const AT& params)		const	;
@@ -92,9 +97,9 @@ class __PORT GaussianCoefficients
     GaussianCoefficients(float sigma)			{initialize(sigma);}
     
   protected:
-    float	_c0[8];		// forward coefficients for smoothing
-    float	_c1[8];		// forward coefficients for 1st derivatives
-    float	_c2[8];		// forward coefficients for 2nd derivatives
+    float	_c0[8];		//!< forward coefficients for smoothing
+    float	_c1[8];		//!< forward coefficients for 1st derivatives
+    float	_c2[8];		//!< forward coefficients for 2nd derivatives
 };
     
 /************************************************************************

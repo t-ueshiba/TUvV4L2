@@ -1,6 +1,10 @@
 /*
- *  $Id: NDTree++.h,v 1.2 2011-06-30 02:46:38 ueshiba Exp $
+ *  $Id: NDTree++.h,v 1.3 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		NDTree++.h
+  \brief	ƒNƒ‰ƒX TU::NDTree ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUNDTreePP_h
 #define __TUNDTreePP_h
 

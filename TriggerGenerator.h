@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.h,v 1.2 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: TriggerGenerator.h,v 1.3 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		TriggerGenerator.h
+  \brief	ƒNƒ‰ƒX TU::TriggerGenerator ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUTriggerGenerator_h
 #define __TUTriggerGenerator_h
 

@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera++.h,v 1.2 2011-08-04 04:24:51 ueshiba Exp $
+ *  $Id: Camera++.h,v 1.3 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Camera++.h
+  \brief	カメラ内部パラメータおよびカメラ自身に関するクラスの定義と実装
+*/
 #ifndef __TUCameraPP_h
 #define __TUCameraPP_h
 
@@ -93,17 +97,16 @@ class IntrinsicBase
   protected:
     value_type		_k;		//!< 焦点距離
     point2_type		_u0;		//!< 画像主点
-    value_type		_k00;
-    value_type		_k01;
+    value_type		_k00;		//!< 焦点距離とアスペクト比の積
+    value_type		_k01;		//!< 焦点距離と非直交性歪みの積
 };
     
 //! 内部パラメータをセットして初期化する．
 /*!
   \param k	焦点距離
-  \param u0	画像主点の横座標
-  \param v0	画像主点の縦座標
-  \param aspect	アスペクト比
-  \param skew	非直交性歪み
+  \param u0	画像主点
+  \param a	アスペクト比
+  \param s	非直交性歪み
 */
 template <class T> inline
 IntrinsicBase<T>::IntrinsicBase(value_type k, const point2_type& u0,
@@ -178,9 +181,9 @@ IntrinsicBase<T>::aspect() const
     return _k00 / _k;
 }
     
-//! 非直交歪みを返す．
+//! 非直交性歪みを返す．
 /*!
-  \return	非直交歪み
+  \return	非直交性歪み
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::skew() const
@@ -373,7 +376,7 @@ IntrinsicBase<T>::dofIntrinsic()
     
 //! 内部パラメータを指定された量だけ更新する．
 /*!
-  \param dp	更新量を表す#dofIntrinsic()次元ベクトル
+  \param dp	更新量を表す dofIntrinsic() 次元ベクトル
 */
 template <class T> inline void
 IntrinsicBase<T>::updateIntrinsic(const vector_type& dp)
@@ -414,12 +417,20 @@ IntrinsicBase<T>::put(std::ostream& out) const
     return out << skew() << endl;
 }
 
+//! 焦点距離とアスペクト比の積を返す．
+/*!
+  \return	焦点距離とアスペクト比の積
+*/
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::k00() const
 {
     return _k00;
 }
     
+//! 焦点距離と非直交性歪みの積を返す．
+/*!
+  \return	焦点距離と非直交性歪みの積
+*/
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::k01() const
 {
@@ -486,8 +497,8 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
 /*!
   \param k	焦点距離
   \param u0	画像主点
-  \param aspect	アスペクト比
-  \param skew	非直交性歪み
+  \param a	アスペクト比
+  \param s	非直交性歪み
 */
 template <class T> inline
 IntrinsicWithFocalLength<T>::IntrinsicWithFocalLength(
@@ -508,7 +519,7 @@ IntrinsicWithFocalLength<T>::dofIntrinsic()
     
 //! 内部パラメータを指定された量だけ更新する．
 /*!
-  \param dp	更新量を表す#dofIntrinsic()次元ベクトル
+  \param dp	更新量を表す dofIntrinsic() 次元ベクトル
 */
 template <class T> inline void
 IntrinsicWithFocalLength<T>::updateIntrinsic(const vector_type& dp)
@@ -576,8 +587,8 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
 /*!
   \param k	焦点距離
   \param u0	画像主点
-  \param aspect	アスペクト比
-  \param skew	非直交性歪み
+  \param a	アスペクト比
+  \param s	非直交性歪み
 */
 template <class T> inline
 IntrinsicWithEuclideanImagePlane<T>::IntrinsicWithEuclideanImagePlane(
@@ -598,7 +609,7 @@ IntrinsicWithEuclideanImagePlane<T>::dofIntrinsic()
     
 //! 内部パラメータを指定された量だけ更新する．
 /*!
-  \param dp	更新量を表す#dofIntrinsic()次元ベクトル
+  \param dp	更新量を表す dofIntrinsic() 次元ベクトル
 */
 template <class T> inline void
 IntrinsicWithEuclideanImagePlane<T>::updateIntrinsic(const vector_type& dp)
@@ -657,8 +668,8 @@ class Intrinsic : public IntrinsicBase<T>
 /*!
   \param k	焦点距離
   \param u0	画像主点
-  \param aspect	アスペクト比
-  \param skew	非直交性歪み
+  \param a	アスペクト比
+  \param s	非直交性歪み
 */
 template <class T> inline
 Intrinsic<T>::Intrinsic(value_type k, const point2_type& u0,
@@ -679,7 +690,7 @@ Intrinsic<T>::dofIntrinsic()
     
 //! 内部パラメータを指定された量だけ更新する．
 /*!
-  \param dp	更新量を表す#dofIntrinsic()次元ベクトル
+  \param dp	更新量を表す dofIntrinsic() 次元ベクトル
 */
 template <class T> inline void
 Intrinsic<T>::updateIntrinsic(const vector_type& dp)
@@ -764,8 +775,8 @@ class IntrinsicWithDistortion : public I
 /*!
   \param k	焦点距離
   \param u0	画像主点
-  \param aspect	アスペクト比
-  \param skew	非直交性歪み
+  \param a	アスペクト比
+  \param s	非直交性歪み
   \param d1	放射歪曲の第1係数
   \param d2	放射歪曲の第2係数
 */
@@ -875,7 +886,7 @@ IntrinsicWithDistortion<I>::dofIntrinsic()
     
 //! 内部パラメータを指定された量だけ更新する．
 /*!
-  \param dp	更新量を表す#dofIntrinsic()次元ベクトル
+  \param dp	更新量を表す dofIntrinsic() 次元ベクトル
 */
 template <class I> inline void
 IntrinsicWithDistortion<I>::updateIntrinsic(const vector_type& dp)
@@ -1005,7 +1016,7 @@ IntrinsicWithDistortion<Intrinsic<double> >::DDu(const point2_type& x) const
 /************************************************************************
 *  class CanonicalCamera<T>						*
 ************************************************************************/
-//! すべての内部パラメータが標準既定値(焦点距離とアスペクト比が1, 非直交歪みと放射歪曲係数が0, 画像主点が原点に一致)となる透視投影カメラを表すクラス
+//! すべての内部パラメータが標準既定値(焦点距離とアスペクト比が1, 非直交性歪みと放射歪曲係数が0, 画像主点が原点に一致)となる透視投影カメラを表すクラス
 template <class T>
 class CanonicalCamera
 {
@@ -1399,9 +1410,9 @@ Camera<I>::Camera(const matrix34_type& P)
 //! 3次元空間中の点の投影点の画像座標系における位置を求める．
 /*!
   \param X	対象点の3次元位置
-  \param J	0でなければカメラの位置・姿勢および外部パラメターに関する
+  \param J	0でなければカメラの位置・姿勢および内部パラメターに関する
 		投影点の1階微分，
-		すなわち2x#dof()ヤコビ行列
+		すなわち2 x dof() ヤコビ行列
 		\f$
 		\TUbeginarray{ccc}
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{t}{}} &
@@ -1411,7 +1422,7 @@ Camera<I>::Camera(const matrix34_type& P)
 		\f$
 		が返される
   \param H	0でなければカメラの位置・姿勢に関する投影点の2階微分，
-		すなわち2つの#dof()x#dof()ヘッセ行列
+		すなわち2つの dof() x dof() ヘッセ行列
 		\f$
 		\TUbeginarray{ccc}
 		\frac{\partial^2 u}{\partial\TUvec{t}{}^2} &
@@ -1556,7 +1567,7 @@ Camera<I>::setProjection(const matrix34_type& P)
 
 //! カメラの外部／可変内部パラメータの自由度を返す．
 /*!
-  \return	外部／可変内部パラメータの自由度, すなわち 6 + #dofIntrinsic()
+  \return	外部／可変内部パラメータの自由度, すなわち 6 + dofIntrinsic()
 */
 template <class I> inline u_int
 Camera<I>::dof()
@@ -1575,7 +1586,7 @@ Camera<I>::dof()
   \TUvec{\kappa}{} & \leftarrow & \TUvec{\kappa}{} - \Delta\TUvec{\kappa}{}
   \f}
   と更新する．
-  \param dp	更新量を表す6+#dofIntrinsic()次元ベクトル
+  \param dp	更新量を表す6 + dofIntrinsic() 次元ベクトル
 */
 template <class I> inline void
 Camera<I>::update(const vector_type& dp)
@@ -1594,7 +1605,7 @@ Camera<I>::update(const vector_type& dp)
   \TUvec{\kappa}{} & \leftarrow & \TUvec{\kappa}{} - \Delta\TUvec{\kappa}{}
   \f}
   と更新する．カメラの位置は更新されない．
-  \param dp	更新量を表す3+#dofIntrinsic()次元ベクトル
+  \param dp	更新量を表す3 + dofIntrinsic() 次元ベクトル
 */
 template <class I> inline void
 Camera<I>::updateFCC(const vector_type& dp)

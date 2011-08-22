@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Profiler.h,v 1.6 2009-09-09 07:06:31 ueshiba Exp $
+ *  $Id: Profiler.h,v 1.7 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Profiler.h
+  \brief	ƒNƒ‰ƒX TU::Profiler ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #include "TU/Array++.h"
 #include <iostream>
 #ifdef WIN32

@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: utility.h,v 1.21 2010-01-31 23:35:08 ueshiba Exp $
+ *  $Id: utility.h,v 1.22 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		utility.h
+  \brief	各種ユーティリティクラスおよび関数の定義と実装
+*/
 #ifndef __TUutility_h
 #define __TUutility_h
 

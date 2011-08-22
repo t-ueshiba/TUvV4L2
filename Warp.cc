@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.16 2011-07-21 23:39:34 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.17 2011-08-22 00:06:25 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -193,8 +193,8 @@ bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
   \param in	入力画像
   \param out	出力画像
   \param vs	変形結果となる領域の最初の行を指定するindex
-  \param ve	変形結果となる領域の最後の行の次を指定するindex．0ならば出力画像の
-		最後の行まで変形結果によって埋められる
+  \param ve	変形結果となる領域の最後の行の次を指定するindex．
+		0ならば出力画像の最後の行まで変形結果によって埋められる
 */
 template <class T> void
 Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
@@ -298,8 +298,8 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
   \param in	入力画像
   \param out	出力画像
   \param vs	変形結果となる領域の最初の行を指定するindex
-  \param ve	変形結果となる領域の最後の行の次を指定するindex．0ならば出力画像の
-		最後の行まで変形結果によって埋められる
+  \param ve	変形結果となる領域の最後の行の次を指定するindex．
+		0ならば出力画像の最後の行まで変形結果によって埋められる
 */
 template <> __PORT void
 Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,

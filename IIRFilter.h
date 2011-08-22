@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.10 2010-08-19 04:55:13 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.11 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		IIRFilter.h
+  \brief	各種infinite impulse response filterに関するクラスの定義と実装
+*/
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
 
@@ -500,7 +504,7 @@ IIRFilter<4u>::backward(const Array<T, B>& in, Array<float, B2>& out) const
 /*!
   \param limit0F	一定入力 in(n) = 1 を与えたときの出力極限値を返す．
   \param limit1F	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
-  \param limit1F	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
+  \param limit2F	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
 template <u_int D> void
 IIRFilter<D>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
@@ -526,7 +530,7 @@ IIRFilter<D>::limitsF(float& limit0F, float& limit1F, float& limit2F) const
 /*!
   \param limit0B	一定入力 in(n) = 1 を与えたときの出力極限値を返す．
   \param limit1B	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
-  \param limit1B	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
+  \param limit2B	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
 template <u_int D> void
 IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
@@ -639,9 +643,9 @@ BilateralIIRFilter<D>::initialize(const float cF[D+D], const float cB[D+D])
 		  + c_{0}z^{-(D-1)}}{1 - c_{2D-1}z^{-1} - c_{2D-2}z^{-2} -
 		  \cdots - c_{D}z^{-D}}
 		\f]
-  \param order	フィルタの微分階数. #Zerothまたは#Secondならば対称フィルタ
-		として，#Firstならば反対称フィルタとして自動的に後退方向の
-		z変換係数を計算する．#Zeroth, #First, #Secondのときに，それ
+  \param order	フィルタの微分階数． #Zeroth または #Second ならば対称フィルタ
+		として， #First ならば反対称フィルタとして自動的に後退方向の
+		z変換係数を計算する． #Zeroth, #First, #Second のときに，それ
 		ぞれ in(n) = 1, in(n) = n, in(n) = n^2 に対する出力が
 		1, 1, 2になるよう，全体のスケールも調整される．
   \return	このフィルタ自身
@@ -696,7 +700,7 @@ BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
     return initialize(cF, cB);
 }
     
-//! フィルタによる畳み込みを行う. 出力は operator [](int) で取り出す
+//! フィルタによる畳み込みを行う. 出力は #operator []() で取り出す
 /*!
   \param in	入力データ列
   \return	このフィルタ自身
@@ -836,8 +840,8 @@ template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
 /*!
   \param cHF	横方向前進z変換係数
   \param cHB	横方向後退z変換係数
-  \param cHV	縦方向前進z変換係数
-  \param cHV	縦方向後退z変換係数
+  \param cVF	縦方向前進z変換係数
+  \param cVB	縦方向後退z変換係数
   \return	このフィルタ自身
 */
 template <class BIIRH, class BIIRV> inline BilateralIIRFilter2<BIIRH, BIIRV>&
@@ -854,7 +858,7 @@ BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], float cHB[],
 /*!
   \param cHF	横方向前進z変換係数
   \param orderH 横方向微分階数
-  \param cHV	縦方向前進z変換係数
+  \param cVF	縦方向前進z変換係数
   \param orderV	縦方向微分階数
   \return	このフィルタ自身
 */

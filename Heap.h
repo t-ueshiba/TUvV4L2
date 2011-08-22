@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Heap.h,v 1.5 2010-10-07 00:25:58 ueshiba Exp $
+ *  $Id: Heap.h,v 1.6 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Heap.h
+  \brief	ƒNƒ‰ƒX TU::Heap ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUHeap_h
 #define __TUHeap_h
 

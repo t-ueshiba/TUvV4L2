@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.h,v 1.8 2010-01-12 01:44:55 ueshiba Exp $
+ *  $Id: Serial.h,v 1.9 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Serial.h
+  \brief	ƒNƒ‰ƒX TU::Serial ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUSerial_h
 #define __TUSerial_h
 

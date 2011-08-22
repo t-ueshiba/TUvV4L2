@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.30 2011-07-21 23:39:35 ueshiba Exp $
+ *  $Id: types.h,v 1.31 2011-08-22 00:06:25 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -56,11 +56,11 @@
   <b>非線形最適化</b>
   - #TU::NullConstraint
   - #TU::ConstNormConstraint
-  - #Matrix<typename F::value_type> TU::minimizeSquare(const F&, const G&, AT&, u_int, double)
-  - #Matrix<typename F::value_type> TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, u_int, double)
+  - #TU::minimizeSquare(const F&, const G&, AT&, u_int, double)
+  - #TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, u_int, double)
 
   <b>RANSAC</b>
-  - #typename Pointset::Container TU::ransac(const PointSet&, Model&, Conform, double)
+  - #TU::ransac(const PointSet&, Model&, Conform, double)
 
   <b>点，直線，平面等の幾何要素とその変換</b>
   - #TU::Point1
@@ -78,6 +78,7 @@
   - #TU::IntrinsicBase
   - #TU::IntrinsicWithFocalLength
   - #TU::IntrinsicWithEuclideanImagePlane
+  - #TU::Intrinsic
   - #TU::IntrinsicWithDistortion
   - #TU::CanonicalCamera
   - #TU::Camera
@@ -132,24 +133,21 @@
   - #TU::Mesh
 
   <b>標準ライブラリの補強</b>
-  - #const T& std::min(const T&, const T&, const T&)
-  - #const T& std::min(const T&, const T&, const T&, const T&)
-  - #const T& std::max(const T&, const T&, const T&)
-  - #const T& std::max(const T&, const T&, const T&, const T&)
-  - #Iter TU::pull_if(Iter, Iter, Pred)
-  - #T TU::diff(const T&, const T&)
-  - #void TU::op3x3(Iterator begin, Iterator end, OP op)
+  - #std::min(const T&, const T&, const T&)
+  - #std::min(const T&, const T&, const T&, const T&)
+  - #std::max(const T&, const T&, const T&)
+  - #std::max(const T&, const T&, const T&, const T&)
+  - #TU::pull_if(Iter, Iter, Pred)
+  - #TU::diff(const T&, const T&)
+  - #TU::op3x3(Iterator begin, Iterator end, OP op)
   - #TU::mbr_iterator
-  - #std::istream& TU::skipl(std::istream&)
+  - #TU::skipl(std::istream&)
   - #TU::IOManip
   - #TU::IManip1
   - #TU::OManip1
   - #TU::IOManip1
   - #TU::IManip2
   - #TU::OManip2
-
-  <b>メモリ管理</b>
-  - #TU::Allocator
 
   <b>ストリーム
   - #TU::fdistream

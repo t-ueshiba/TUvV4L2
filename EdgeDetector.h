@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.h,v 1.5 2009-09-04 04:01:05 ueshiba Exp $
+ *  $Id: EdgeDetector.h,v 1.6 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		EdgeDetector.h
+  \brief	クラス TU::EdgeDetector の定義と実装
+*/
 #ifndef	__TUEdgeDetector_h
 #define	__TUEdgeDetector_h
 
@@ -43,9 +47,9 @@ class __PORT EdgeDetector
   public:
     enum
     {
-	TRACED	= 0x04,			//!< トレース済みのエッジ点(内部的使用のみ)
-	EDGE	= 0x02,			//!< 強いエッジ点
-	WEAK	= 0x01			//!< 弱いエッジ点
+	TRACED	= 0x04,		//!< トレース済みのエッジ点(内部的使用のみ)
+	EDGE	= 0x02,		//!< 強いエッジ点
+	WEAK	= 0x01		//!< 弱いエッジ点
     };
     
     EdgeDetector(float th_low=2.0, float th_high=5.0)			;
@@ -80,7 +84,7 @@ class __PORT EdgeDetector
 //! エッジ検出器を生成する
 /*!
   \param th_low		弱いエッジの閾値
-  \param th_low		強いエッジの閾値
+  \param th_high	強いエッジの閾値
 */
 inline
 EdgeDetector::EdgeDetector(float th_low, float th_high)
@@ -91,7 +95,7 @@ EdgeDetector::EdgeDetector(float th_low, float th_high)
 //! エッジ検出の閾値を設定する
 /*!
   \param th_low		弱いエッジの閾値
-  \param th_low		強いエッジの閾値
+  \param th_high	強いエッジの閾値
   \return		このエッジ検出器自身
 */
 inline EdgeDetector&

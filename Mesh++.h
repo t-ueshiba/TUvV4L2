@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mesh++.h,v 1.21 2011-02-08 19:53:01 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.22 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		Mesh++.h
+  \brief	ƒNƒ‰ƒX TU::Mesh ‚Ì’è‹`‚ÆŽÀ‘•
+*/
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
 

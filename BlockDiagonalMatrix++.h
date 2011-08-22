@@ -25,8 +25,12 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BlockDiagonalMatrix++.h,v 1.1 2011-05-16 05:33:38 ueshiba Exp $
+ *  $Id: BlockDiagonalMatrix++.h,v 1.2 2011-08-22 00:06:25 ueshiba Exp $
  */
+/*!
+  \file		BlockDiagonalMatrix++.h
+  \brief	クラス TU::BlockDiagonalMatrix の定義と実装
+*/
 #ifndef __TUBlockDiagonalMatrixPP_h
 #define __TUBlockDiagonalMatrixPP_h
 
@@ -71,11 +75,23 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
     u_int			ncol()				const	;
     BlockDiagonalMatrix		trns()				const	;
     BlockDiagonalMatrix&	operator  =(const T& c)			;
+
+  //! このブロック対角行列の全ての成分に同一の数値を掛ける．
+  /*!
+    \param c	掛ける数値
+    \return	このブロック対角行列
+  */
     BlockDiagonalMatrix&	operator *=(double c)
 				{
 				    Array<Matrix<T> >::operator *=(c);
 				    return *this;
 				}
+
+  //! このブロック対角行列の全ての成分を同一の数値で割る．
+  /*!
+    \param c	割る数値
+    \return	このブロック対角行列
+  */
     BlockDiagonalMatrix&	operator /=(double c)
 				{
 				    Array<Matrix<T> >::operator /=(c);
