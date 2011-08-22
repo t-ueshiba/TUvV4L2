@@ -1,6 +1,10 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.7 2011-05-16 06:09:20 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.8 2011-08-22 00:06:53 ueshiba Exp $
  */
+/*!
+  \file		Ieee1394CameraArray.h
+  \brief	クラス TU::Ieee1394CameraArray の定義と実装
+*/
 #ifndef __TUIeee1394CameraArray_h
 #define __TUIeee1394CameraArray_h
 

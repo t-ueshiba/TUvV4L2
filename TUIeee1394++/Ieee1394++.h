@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.28 2011-01-11 02:01:26 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.29 2011-08-22 00:06:53 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -112,6 +112,9 @@
 
   #TU::Ieee1394CameraArray - IEEE1394デジタルカメラの配列を表すクラス
     - #TU::Ieee1394CameraArray::Ieee1394CameraArray()
+
+  \file		Ieee1394++.h
+  \brief	IEEE1394デバイスに関連するクラスの定義と実装
 */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
