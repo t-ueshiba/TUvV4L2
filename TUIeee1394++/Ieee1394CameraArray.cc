@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.8 2011-01-17 00:07:05 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.9 2011-08-23 00:06:15 ueshiba Exp $
  */
 #include "TU/Ieee1394CameraArray.h"
 
@@ -10,20 +10,20 @@ namespace TU
 /************************************************************************
 *  class Ieee1394CameraArray						*
 ************************************************************************/
-//! 空のIEEE1394デジタルカメラの配列を生成する．
+//! 空のIEEE1394デジタルカメラの配列を生成する.
 Ieee1394CameraArray::Ieee1394CameraArray()
     :Array<Ieee1394Camera*>()
 {
 }
     
-//! IEEE1394デジタルカメラの配列を生成する．
+//! IEEE1394デジタルカメラの配列を生成する.
 /*!
   \param name		カメラ名
   \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
   \param i1394b		IEEE1394bモード (800Mbps)で動作
-  \param ncameras	生成するカメラ台数．設定ファイルに記されている最初の
-			ncameras台が生成される．-1を指定すると，設定ファイル
-			中の全カメラが生成される．
+  \param ncameras	生成するカメラ台数. 設定ファイルに記されている最初の
+			ncameras台が生成される. -1を指定すると, 設定ファイル
+			中の全カメラが生成される. 
 */
 Ieee1394CameraArray::Ieee1394CameraArray(const char* name, const char* dirs,
 					 bool i1394b, int ncameras)
@@ -32,14 +32,14 @@ Ieee1394CameraArray::Ieee1394CameraArray(const char* name, const char* dirs,
     initialize(name, dirs, i1394b, ncameras);
 }
     
-//! IEEE1394デジタルカメラの配列を初期化する．
+//! IEEE1394デジタルカメラの配列を初期化する.
 /*!
   \param name		カメラ名
   \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
   \param i1394b		IEEE1394bモード (800Mbps)で動作
-  \param ncameras	生成するカメラ台数．設定ファイルに記されている最初の
-			ncameras台が生成される．-1を指定すると，設定ファイル
-			中の全カメラが生成される．
+  \param ncameras	生成するカメラ台数. 設定ファイルに記されている最初の
+			ncameras台が生成される. -1を指定すると, 設定ファイル
+			中の全カメラが生成される. 
 */
 void
 Ieee1394CameraArray::initialize(const char* name, const char* dirs,
@@ -47,25 +47,25 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
 {
     using namespace	std;
 
-  // 現在設定されている全カメラを廃棄する．
+  // 現在設定されている全カメラを廃棄する.
     for (int i = 0; i < dim(); ++i)
 	delete (*this)[i];
 
-  // 設定ファイルのfull path名を生成し，ファイルをオープンする．
+  // 設定ファイルのfull path名を生成し, ファイルをオープンする.
     ifstream	in;
     _fullName = openFile(in,
 			 string(name != 0 ? name : DEFAULT_CAMERA_NAME),
 			 string(dirs != 0 ? dirs : DEFAULT_CONFIG_DIRS),
 			 ".conf");
     
-  // 設定ファイルから遅延パラメータとカメラ数を読み込む．
+  // 設定ファイルから遅延パラメータとカメラ数を読み込む.
     int	delay, n;
     in >> delay >> n;
     if ((ncameras < 0) || (ncameras > n))
 	ncameras = n;
     resize(ncameras);
     
-  // 設定ファイルに記された全カメラを生成する．
+  // 設定ファイルに記された全カメラを生成する.
     for (int i = 0; i < dim(); ++i)
     {
 	string		s;
@@ -77,7 +77,7 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
     }
 }
 
-//! IEEE1394デジタルカメラの配列を破壊する．
+//! IEEE1394デジタルカメラの配列を破壊する.
 Ieee1394CameraArray::~Ieee1394CameraArray()
 {
     for (int i = 0; i < dim(); ++i)

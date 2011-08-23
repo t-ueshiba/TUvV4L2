@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.34 2011-01-11 02:01:26 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.35 2011-08-23 00:06:15 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -79,7 +79,7 @@ namespace TU
 template <class S, class T> static const S*
 bayerRGGB2x2(const S* buf, T* rgb, int w)
 {
-    const S*	nxt = buf + w;			// next line.
+    const S*	nxt = buf + w;			// next line
     while ((w -= 2) > 0)
     {
 	XY_YZ(r, g, b)
@@ -96,17 +96,17 @@ bayerRGGB2x2(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerRGGBOdd3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    YX_ZY(b, g, r)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    YX_ZY(b, g, r)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 奇数行中間の列を処理
     {
 	XYX_YZY_XYX(r, g, b)
 	yXy_ZYZ_yXy(r, g, b)
     }
     --buf;
     --nxt;
-    YX_ZY(b, g, r)				// 右端の画素は2x2で処理．
+    YX_ZY(b, g, r)				// 右端の画素は2x2で処理
     
     return buf + 1;
 }
@@ -114,17 +114,17 @@ bayerRGGBOdd3x3(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerRGGBEven3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    XY_YZ(r, g, b)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    XY_YZ(r, g, b)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 偶数行中間の列を処理
     {
 	yXy_ZYZ_yXy(b, g, r)
 	XYX_YZY_XYX(b, g, r)
     }
     --buf;
     --nxt;
-    XY_YZ(r, g, b)				// 右端の画素は2x2で処理．
+    XY_YZ(r, g, b)				// 右端の画素は2x2で処理
 
     return buf + 1;
 }
@@ -132,7 +132,7 @@ bayerRGGBEven3x3(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerBGGR2x2(const S* buf, T* rgb, int w)
 {
-    const S*	nxt = buf + w;			// next line.
+    const S*	nxt = buf + w;			// next line
     while ((w -= 2) > 0)
     {
 	XY_YZ(b, g, r)
@@ -149,17 +149,17 @@ bayerBGGR2x2(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerBGGROdd3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    YX_ZY(r, g, b)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    YX_ZY(r, g, b)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 奇数行中間の列を処理
     {
 	XYX_YZY_XYX(b, g, r)
 	yXy_ZYZ_yXy(b, g, r)
     }
     --buf;
     --nxt;
-    YX_ZY(r, g, b)				// 右端の画素は2x2で処理．
+    YX_ZY(r, g, b)				// 右端の画素は2x2で処理
 
     return buf + 1;
 }
@@ -167,17 +167,17 @@ bayerBGGROdd3x3(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerBGGREven3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    XY_YZ(b, g, r)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    XY_YZ(b, g, r)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 偶数行中間の列を処理
     {
 	yXy_ZYZ_yXy(r, g, b)
 	XYX_YZY_XYX(r, g, b)
     }
     --buf;
     --nxt;
-    XY_YZ(b, g, r)				// 右端の画素は2x2で処理．
+    XY_YZ(b, g, r)				// 右端の画素は2x2で処理
 
     return buf + 1;
 }
@@ -185,7 +185,7 @@ bayerBGGREven3x3(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerGRBG2x2(const S* buf, T* rgb, int w)
 {
-    const S*	nxt = buf + w;			// next line.
+    const S*	nxt = buf + w;			// next line
     while ((w -= 2) > 0)
     {
 	YX_ZY(r, g, b)
@@ -202,17 +202,17 @@ bayerGRBG2x2(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerGRBGOdd3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    XY_YZ(b, g, r)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    XY_YZ(b, g, r)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 奇数行中間の列を処理
     {
 	yXy_ZYZ_yXy(r, g, b)
 	XYX_YZY_XYX(r, g, b)
     }
     --buf;
     --nxt;
-    XY_YZ(b, g, r)				// 右端の画素は2x2で処理．
+    XY_YZ(b, g, r)				// 右端の画素は2x2で処理
 
     return buf + 1;
 }
@@ -220,17 +220,17 @@ bayerGRBGOdd3x3(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerGRBGEven3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    YX_ZY(r, g, b)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    YX_ZY(r, g, b)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 偶数行中間の列を処理
     {
 	XYX_YZY_XYX(b, g, r)
 	yXy_ZYZ_yXy(b, g, r)
     }
     --buf;
     --nxt;
-    YX_ZY(r, g, b)				// 右端の画素は2x2で処理．
+    YX_ZY(r, g, b)				// 右端の画素は2x2で処理
 
     return buf + 1;
 }
@@ -238,7 +238,7 @@ bayerGRBGEven3x3(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerGBRG2x2(const S* buf, T* rgb, int w)
 {
-    const S*	nxt = buf + w;			// next line.
+    const S*	nxt = buf + w;			// next line
     while ((w -= 2) > 0)
     {
 	YX_ZY(b, g, r)
@@ -255,17 +255,17 @@ bayerGBRG2x2(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerGBRGOdd3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    XY_YZ(r, g, b)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    XY_YZ(r, g, b)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 奇数行中間の列を処理
     {
 	yXy_ZYZ_yXy(b, g, r)
 	XYX_YZY_XYX(b, g, r)
     }
     --buf;
     --nxt;
-    XY_YZ(r, g, b)				// 右端の画素は2x2で処理．
+    XY_YZ(r, g, b)				// 右端の画素は2x2で処理
 
     return buf + 1;
 }
@@ -273,17 +273,17 @@ bayerGBRGOdd3x3(const S* buf, T* rgb, int w)
 template <class S, class T> static const S*
 bayerGBRGEven3x3(const S* buf, T* rgb, int w)
 {
-    const S	*nxt = buf + w;			// next line.
-    YX_ZY(b, g, r)				// 左端の画素は2x2で処理．
-    const S	*prv = buf - w;			// previous line.
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理．
+    const S	*nxt = buf + w;			// next line
+    YX_ZY(b, g, r)				// 左端の画素は2x2で処理
+    const S	*prv = buf - w;			// previous line
+    while ((w -= 2) > 0)			// 偶数行中間の列を処理
     {
 	XYX_YZY_XYX(r, g, b)
 	yXy_ZYZ_yXy(r, g, b)
     }
     --buf;
     --nxt;
-    YX_ZY(b, g, r)				// 右端の画素は2x2で処理．
+    YX_ZY(b, g, r)				// 右端の画素は2x2で処理
 
     return buf + 1;
 }
@@ -332,18 +332,18 @@ static const u_int	NBUFFERS		= 4;
 /*!
   \param type		カメラのタイプ
   \param i1394b		IEEE1394bモード (800Mbps)で動作
-  \param uniqId		個々のカメラ固有の64bit ID．同一のIEEE1394 busに
-			複数のカメラが接続されている場合，これによって
-			同定を行う．0が与えられると，まだ#Ieee1394Camera
-			オブジェクトを割り当てられていないカメラのうち，
+  \param uniqId		個々のカメラ固有の64bit ID. 同一のIEEE1394 busに
+			複数のカメラが接続されている場合, これによって
+			同定を行う. 0が与えられると, まだ Ieee1394Camera
+			オブジェクトを割り当てられていないカメラのうち, 
 			一番最初にみつかったものがこのオブジェクトと結び
-			つけられる．オブジェクト生成後は，#globalUniqueId()
-			によってこの値を知ることができる．
-  \param delay		IEEE1394カードの種類によっては，レジスタの読み書き
+			つけられる. オブジェクト生成後は, globalUniqueId()
+			によってこの値を知ることができる.
+  \param delay		IEEE1394カードの種類によっては, レジスタの読み書き
 			(Ieee1394Node::readQuadlet(),
 			Ieee1394Node::writeQuadlet())時に遅延を入れないと
-			動作しないことがある．この遅延量をmicro second単位
-			で指定する．(例: メルコのIFC-ILP3では1, DragonFly
+			動作しないことがある. この遅延量をmicro second単位
+			で指定する. (例: メルコのIFC-ILP3では1, DragonFly
 			付属のボードでは0)
 */
 Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
@@ -399,7 +399,7 @@ Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
 
 //! IEEE1394カメラオブジェクトを破壊する
 /*!
-  画像データ出力中であった場合は，それを停止する．
+  画像データ出力中であった場合は, それを停止する. 
 */
 Ieee1394Camera::~Ieee1394Camera()
 {
@@ -420,7 +420,7 @@ Ieee1394Camera::powerOn()
 
 //! IEEE1394カメラの電源をoffにする
 /*!
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIEEE1394カメラオブジェクト. 
 */
 Ieee1394Camera&
 Ieee1394Camera::powerOff()
@@ -432,8 +432,8 @@ Ieee1394Camera::powerOff()
 
 //! 画像フォーマットとフレームレートを設定する
 /*!
-  画像データを出力中であった場合はそれを停止して設定を行うが，それが
-  完了すれば出力を再開する．
+  画像データを出力中であった場合はそれを停止して設定を行うが, それが
+  完了すれば出力を再開する.
   \param format	設定したい画像フォーマット
   \param rate	設定したいフレームレート
   \return	このIEEE1394カメラオブジェクト
@@ -625,14 +625,14 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 	_h	    = fmt7info.height;
 	_p	    = fmt7info.pixelFormat;
 	packet_size = setFormat_7_PacketSize(format);
-	rt = 7;		// frameRateによってpacket_sizeを変えないようにする．
+	rt = 7;		// frameRateによってpacket_sizeを変えないようにする.
       }
 	break;
       default:
 	throw std::invalid_argument("Ieee1394Camera::setFormat: not implemented format!!");
 	break;
     }
-    packet_size >>= (7 - rt);	// frameRateによってpacket_sizeを変える．
+    packet_size >>= (7 - rt);	// frameRateによってpacket_sizeを変える.
     _img_size = _w * _h;
     switch (_p)
     {
@@ -654,7 +654,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 	(_img_size *= 3) /= 2;
 	break;
     }
-  // buf_sizeをpacket_sizeの整数倍にしてからmapする．
+  // buf_sizeをpacket_sizeの整数倍にしてからmapする.
     const u_int	 buf_size = packet_size * ((_img_size - 1) / packet_size + 1);
 #ifdef DEBUG
     cerr << "  packetsize = " << packet_size << ", buf_size = " << buf_size
@@ -662,7 +662,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 #endif
     const u_char ch = mapListenBuffer(packet_size, buf_size, NBUFFERS);
 
-  // map時に割り当てられたチャンネル番号をカメラに設定する．
+  // map時に割り当てられたチャンネル番号をカメラに設定する.
     quadlet_t	 quad = readQuadletFromRegister(ISO_Channel);
     (quad &= 0x0fffc0ff) |= ((ch << 28) | (ch << 8));
     writeQuadletToRegister(ISO_Channel, quad);
@@ -716,9 +716,9 @@ Ieee1394Camera::getFrameRate() const
 
 //! 指定されたFormat_7タイプのフォーマットの内容を返す
 /*!
-  ただし，注目領域(ROI)の幅または高さが0の場合(カメラ電源投入直後など)は，
-  幅と高さをそれぞれの最小単位に設定し，その情報を返す．
-  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)
+  ただし, 注目領域(ROI)の幅または高さが0の場合(カメラ電源投入直後など)は, 
+  幅と高さをそれぞれの最小単位に設定し, その情報を返す. 
+  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7 のいずれか)
   \return	 指定されたフォーマットの内容
  */
 Ieee1394Camera::Format_7_Info
@@ -774,16 +774,16 @@ Ieee1394Camera::getFormat_7_Info(Format format7)
     return fmt7info;
 }
 
-//! 指定されたFormat_7タイプのフォーマットについて，注目領域(Region Of Interest)を設定する
+//! 指定されたFormat_7タイプのフォーマットについて, 注目領域(Region Of Interest)を設定する
 /*!
-  一般に，u0, v0, width, heightは，予め決められた最小単位
-  (#Format_7_Info::unitU0, #Format_7_Info::unitV0, #Format_7_Info::unitWidth,
-  #Format_7_Info::unitHeight)でしか指定できない．そこで，実際には注目領域は，
-  (u0, v0)と(u0 + width - 1, v0 + height - 1)を対角線とする矩形を含む最小領域
-  となるように設定される．また，widthもしくはheightに0を指定しても，ROIの幅
-  もしくは高さは，それぞれ#Format_7_Info::unitWidth, #Format_7_Info::unitHeight
-  以上に設定される．
-  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7のいずれか)
+  実際には, u0, v0, width, heightは, 予め決められた最小単位
+  (Format_7_Info::unitU0, Format_7_Info::unitV0, Format_7_Info::unitWidth,
+  Format_7_Info::unitHeight)の倍数となるように調整される. そこで, 注目領域は, 
+  (u0, v0)と(u0 + width - 1, v0 + height - 1)を対角線とする矩形を含む
+  最小領域となるように設定される. また, たとえwidthもしくはheightに0を指定
+  しても, ROIの幅もしくは高さは, それぞれ Format_7_Info::unitWidth,
+  Format_7_Info::unitHeight 以上に設定される.
+  \param format7 対象となるフォーマット(#Format_7_0 - #Format_7_7 のいずれか)
   \param u0	 注目領域の左上隅の横座標
   \param v0	 注目領域の左上隅の縦座標
   \param width	 注目領域の幅
@@ -814,12 +814,12 @@ Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
     while (v0 + height > fmt7info.maxHeight)
 	height -= fmt7info.unitHeight;	// 最大高さに収まるよう高さを修正
 
-  // 画像出力中はROIを変更できないので，もしそうであれば停止する．
+  // 画像出力中はROIを変更できないので, もしそうであれば停止する.
     const bool	cont = inContinuousShot();
     if (cont)
 	stopContinuousShot();
 
-  // ROIを指定する．
+  // ROIを指定する.
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
     writeQuadlet(base + IMAGE_POSITION,
 		 ((u0 << 16) & 0xffff0000) | (v0 & 0xffff));
@@ -834,9 +834,9 @@ Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
     return *this;
 }
 
-//! 指定されたFormat_7タイプのフォーマットについて，画素形式を設定する
+//! 指定されたFormat_7タイプのフォーマットについて, 画素形式を設定する
 /*!
-  \param format7	対象となるフォーマット(#Format_7_0 - #Format_7_7の
+  \param format7	対象となるフォーマット(#Format_7_0 - #Format_7_7 の
 			いずれか)
   \param pixelFormat	画素形式
   \return		このIEEE1394カメラオブジェクト
@@ -849,12 +849,12 @@ Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
     if (!(pixelFormat & fmt7info.availablePixelFormats))
 	throw std::invalid_argument("Ieee1394Camera::setFormat_7_pixelFormat: unsupported pixel format!!");
 
-  // 画像出力中はpixel formatを変更できないので，もしそうであれば停止する．
+  // 画像出力中はpixel formatを変更できないので, もしそうであれば停止する.
     const bool	cont = inContinuousShot();
     if (cont)
 	stopContinuousShot();
 
-  // pixel formatを指定する．
+  // pixel formatを指定する.
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
     u_int		colorCodingID = 0;
     while ((0x1u << (31 - colorCodingID)) != pixelFormat)
@@ -872,7 +872,7 @@ Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
 //! 指定された属性においてカメラがサポートする機能を返す
 /*!
   \param feature	対象となる属性
-  \return		サポートされている機能を#FeatureFunction型の列挙値
+  \return		サポートされている機能を #FeatureFunction 型の列挙値
 			のorとして返す
  */
 quadlet_t
@@ -897,10 +897,10 @@ Ieee1394Camera::inquireFeatureFunction(Feature feature) const
     return readQuadletFromRegister(feature - 0x300);
 }
 
-//! 指定された属性を1回だけ自動設定する．
+//! 指定された属性を1回だけ自動設定する.
 /*!
-  本関数を呼ぶと，指定した属性の自動設定が直ちに開始される．自動設定が終了
-  したかどうかは，#inOnePushOperation()で知ることができる．
+  本関数を呼ぶと, 指定した属性の自動設定が直ちに開始される. 自動設定が終了
+  したかどうかは, #inOnePushOperation() で知ることができる.
   \param feature	自動設定したい属性
   \return		このIEEE1394カメラオブジェクト
 */
@@ -942,8 +942,8 @@ Ieee1394Camera::turnOff(Feature feature)
 
 //! 指定された属性を自動設定モードにする
 /*!
-  自動設定にすると，この属性の値は環境の変化に追従して継続的に自動的に調整
-  される．
+  自動設定にすると, この属性の値は環境の変化に追従して継続的に自動的に調整
+  される.
   \param feature	自動設定モードにしたい属性
   \return		このIEEE1394カメラオブジェクト
 */
@@ -972,8 +972,8 @@ Ieee1394Camera::setManualMode(Feature feature)
 
 //! 指定された属性の値を設定する
 /*!
-  #WHITE_BALANCE, #TRIGGER_MODEの値を設定することはできない．代わりに
-  setWhiteBalance(), setTriggerMode(), setTriggerPolarity()を用いること．
+  #WHITE_BALANCE, #TRIGGER_MODE の値を設定することはできない. 代わりに
+  setWhiteBalance(), setTriggerMode(), setTriggerPolarity() を用いること.
   \param feature	値を設定したい属性
   \param value		設定する値
   \return		このIEEE1394カメラオブジェクト
@@ -998,8 +998,8 @@ Ieee1394Camera::setValue(Feature feature, u_int value)
 //! 指定された属性が1回だけの自動設定の最中であるか調べる
 /*!
   \param feature	対象となる属性
-  \return		#onePush()を行った属性値の自動設定が継続中であれば
-			trueを，終了していればfalseを返す．
+  \return		#onePush() を行った属性値の自動設定が継続中であれば
+			trueを, 終了していればfalseを返す.
 */
 bool
 Ieee1394Camera::inOnePushOperation(Feature feature) const
@@ -1011,7 +1011,7 @@ Ieee1394Camera::inOnePushOperation(Feature feature) const
 //! 指定された属性がonになっているか調べる
 /*!
   \param feature	対象となる属性
-  \return		onになっていればtrueを，そうでなければfalseを返す．
+  \return		onになっていればtrueを, そうでなければfalseを返す.
 */
 bool
 Ieee1394Camera::isTurnedOn(Feature feature) const
@@ -1023,8 +1023,8 @@ Ieee1394Camera::isTurnedOn(Feature feature) const
 //! 指定された属性が自動設定モードになっているか調べる
 /*!
   \param feature	対象となる属性
-  \return		自動設定モードになっていればtrueを，そうでなければ
-			falseを返す．
+  \return		自動設定モードになっていればtrueを, そうでなければ
+			falseを返す.
 */
 bool
 Ieee1394Camera::isAuto(Feature feature) const
@@ -1036,8 +1036,8 @@ Ieee1394Camera::isAuto(Feature feature) const
 //! 指定された属性がとり得る値の範囲を調べる
 /*!
   \param feature	対象となる属性
-  \param min		とり得る値の最小値が返される．
-  \param max		とり得る値の最大値が返される．
+  \param min		とり得る値の最小値が返される. 
+  \param max		とり得る値の最大値が返される. 
 */
 void
 Ieee1394Camera::getMinMax(Feature feature, u_int& min, u_int& max) const
@@ -1050,11 +1050,11 @@ Ieee1394Camera::getMinMax(Feature feature, u_int& min, u_int& max) const
 
 //! 指定された属性の現在の値を調べる
 /*!
-  feature = #TEMPERATUREの場合は，#setValue()で設定した目標値ではなく，
-  実際値が返される．目標値を得るには，#getAimedTemperature()を用いる．
-  また，#WHITE_BALANCE, #TRIGGER_MODEの値を知ることはできない．代わり
-  に#getWhiteBalance(), #getTriggerMode(), #getTriggerPolarity()を用いる
-  こと．
+  feature = #TEMPERATURE の場合は, #setValue() で設定した目標値ではなく, 
+  実際値が返される. 目標値を得るには, #getAimedTemperature() を用いる.
+  また, #WHITE_BALANCE, #TRIGGER_MODE の値を知ることはできない. 代わり
+  に #getWhiteBalance(), #getTriggerMode(), #getTriggerPolarity() を用いる
+  こと.
   \param feature	対象となる属性
   \return		現在の値
 */
@@ -1099,8 +1099,8 @@ Ieee1394Camera::getWhiteBalance(u_int &ub, u_int& vr) const
 
 //! 色温度の目標値を調べる
 /*!
-  色温度の実際値を知るには，代わりに#getValue()を用いよ．
-  \return	設定されている目標値が返される．
+  色温度の実際値を知るには, 代わりに #getValue() を用いよ.
+  \return	設定されている目標値が返される.
 */
 u_int
 Ieee1394Camera::getAimedTemperature() const
@@ -1111,8 +1111,8 @@ Ieee1394Camera::getAimedTemperature() const
 
 //! トリガモードを設定する
 /*!
-  実際にカメラが外部トリガによって駆動されるためには，この関数でモード設定
-  を行った後に#turnOn(#TRIGGER_MODE)を行わなければならない．
+  実際にカメラが外部トリガによって駆動されるためには, この関数でモード設定
+  を行った後に #turnOn(#TRIGGER_MODE) を行わなければならない.
   \param mode	設定したいトリガモード
   \return	このIEEE1394カメラオブジェクト
 */
@@ -1169,8 +1169,8 @@ Ieee1394Camera::getTriggerPolarity() const
 
 //! カメラからの画像の連続的出力を開始する
 /*!
-  #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
-  れる．
+  #TRIGGER_MODE がonであれば, 撮影のタイミングは外部トリガ信号によって制御さ
+  れる. 
   \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
@@ -1193,15 +1193,15 @@ Ieee1394Camera::stopContinuousShot()
 	writeQuadletToRegister(ISO_EN, 0x0);
 	flushListenBuffer();
 	_img = 0;
-      // 再び continuoutShot() した時に	captureRaw()で使用するので，
-      // _img_size の値は0にせずに保持する．
+      // 再び continuoutShot() した時に	captureRaw()で使用するので, 
+      // _img_size の値は0にせずに保持する.
     }
     return *this;
 }
 
 //! カメラから画像が出力中であるか調べる
 /*!
-  \return	画像出力中であればtrueを，そうでなければfalseを返す．
+  \return	画像出力中であればtrueを, そうでなければfalseを返す. 
 */
 bool
 Ieee1394Camera::inContinuousShot() const
@@ -1211,9 +1211,9 @@ Ieee1394Camera::inContinuousShot() const
 
 //! 画像を1枚だけ撮影してそれを出力する
 /*!
-  画像を連続的に出力中であれば，それを停止した後にあらためて1枚だけ撮影する．
-  #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
-  れる．
+  画像を連続的に出力中であれば, それを停止した後にあらためて1枚だけ撮影する. 
+  #TRIGGER_MODE がonであれば, 撮影のタイミングは外部トリガ信号によって制御さ
+  れる.
   \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
@@ -1227,9 +1227,9 @@ Ieee1394Camera::oneShot()
 
 //! 画像を指定された枚数だけ撮影してそれを出力する
 /*!
-  画像を連続的に出力中であれば，それを停止した後にあらためて撮影を開始する．
-  #TRIGGER_MODEがonであれば，撮影のタイミングは外部トリガ信号によって制御さ
-  れる．
+  画像を連続的に出力中であれば, それを停止した後にあらためて撮影を開始する. 
+  #TRIGGER_MODE がonであれば, 撮影のタイミングは外部トリガ信号によって制御さ
+  れる.
   \param nframes	撮影したい枚数
   \return		このIEEE1394カメラオブジェクト
 */
@@ -1244,10 +1244,10 @@ Ieee1394Camera::multiShot(u_short nframes)
 
 //! 現在のカメラの設定を指定されたメモリチャンネルに記憶する
 /*!
-  IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
-  カメラ内部のメモリチャンネルに記憶できるものがある．
-  \param mem_ch		値を記憶するメモリチャンネル番号．0以上の値をとり，
-			最大値は#getMemoryChannelMax()で調べられる．
+  IEEE1394カメラの一部には, カメラに設定した画像フォーマットや属性値などを
+  カメラ内部のメモリチャンネルに記憶できるものがある. 
+  \param mem_ch		値を記憶するメモリチャンネル番号. 0以上の値をとり, 
+			最大値は #getMemoryChannelMax() で調べられる. 
   \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
@@ -1265,10 +1265,11 @@ Ieee1394Camera::saveConfig(u_int mem_ch)
 
 //! 指定されたメモリチャンネルに記憶された値をカメラに設定する
 /*!
-  IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
-  カメラ内部のメモリチャンネルに記憶できるものがある．
-  \param mem_ch		設定したい値を記憶しているメモリチャンネル番号．0以上
-			の値をとり，最大値は#getMemoryChannelMax()で調べられる．
+  IEEE1394カメラの一部には, カメラに設定した画像フォーマットや属性値などを
+  カメラ内部のメモリチャンネルに記憶できるものがある.
+  \param mem_ch		設定したい値を記憶しているメモリチャンネル番号. 0以上
+			の値をとり, 最大値は #getMemoryChannelMax() で調べら
+			れる.
   \return		このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
@@ -1283,8 +1284,8 @@ Ieee1394Camera::restoreConfig(u_int mem_ch)
 
 //! メモリチャンネルの最大値を調べる
 /*!
-  IEEE1394カメラの一部には，カメラに設定した画像フォーマットや属性値などを
-  カメラ内部のメモリチャンネルに記憶できるものがある．
+  IEEE1394カメラの一部には, カメラに設定した画像フォーマットや属性値などを
+  カメラ内部のメモリチャンネルに記憶できるものがある. 
   \return 	メモリチャンネル番号の最大値
 */
 u_int
@@ -1299,17 +1300,17 @@ Ieee1394Camera::getMemoryChannelMax() const
 #ifdef HAVE_LIBTUTOOLS__
 //! IEEE1394カメラから出力された画像1枚分のデータを適当な形式に変換して取り込む
 /*!
-  テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
-  呼び出す前に#snap()によってカメラからの画像を保持しておかなければならない．
-  \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
+  テンプレートパラメータTは, 格納先の画像の画素形式を表す. なお, 本関数を
+  呼び出す前に #snap() によってカメラからの画像を保持しておかなければならない.
+  \param image	画像データを格納する画像オブジェクト. 画像の幅と高さは, 
 		現在カメラに設定されている画像サイズに合わせて自動的に
-		設定される．また，カメラに設定されたフォーマットの画素形式
-		が画像のそれに一致しない場合は，自動的に変換が行われる．
-		サポートされている画素形式Tは，u_char, short, float, double,
-		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUV411 のいずれかである．
-		また，サポートされている変換は以下のとおりであり，カメラの
+		設定される. また, カメラに設定されたフォーマットの画素形式
+		が画像のそれに一致しない場合は, 自動的に変換が行われる.
+		サポートされている画素形式Tは, u_char, short, float, double,
+		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUV411 のいずれかである.
+		また, サポートされている変換は以下のとおりであり, カメラの
 		画素形式がこれ以外に設定されている場合はstd::domain_error
-		例外が送出される．
+		例外が送出される.
 		    -# #YUV_444 -> T
 		    -# #YUV_422 -> T
 		    -# #YUV_411 -> T
@@ -1402,15 +1403,14 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 
 //! IEEE1394カメラから出力された画像をRGB形式カラー画像として取り込む
 /*!
-  #Ieee1394Camera& operator >>(Image<T>&) constとの違いは，カメラが
-  #Bayerパターンをサポートしたカメラである場合，#BayerパターンからRGB形式
-  への変換を行うことである．テンプレートパラメータTは，格納先の画像の画
-  素形式を表す．なお，本関数を呼び出す前に#snap()によってカメラからの画
-  像を保持しておかなければならない．
-  \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
+  #operator >>() との違いは, カメラが #Bayer パターンをサポートしたカメラで
+  ある場合, #Bayer パターンからRGB形式への変換を行うことである.
+  テンプレートパラメータTは, 格納先の画像の画素形式を表す. なお, 本関数を
+  呼び出す前に #snap() によってカメラからの画像を保持しておかなければならない.
+  \param image	画像データを格納する画像オブジェクト. 画像の幅と高さは,
 		現在カメラに設定されている画像サイズに合わせて自動的に
-		設定される．サポートされている画素形式Tは RGB, RGBA,
-		BGR, ABGR のいずれかである．
+		設定される. サポートされている画素形式Tは RGB, RGBA,
+		BGR, ABGR のいずれかである.
   \return	このIEEE1394カメラオブジェクト
 */
 template <class T> const Ieee1394Camera&
@@ -1429,7 +1429,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  {
 	    const u_char*	p = bayerRGGB2x2(_img, &image[0][0], width());
 	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理．
+	    while (v < image.height() - 1)	// 中間の行を処理
 	    {
 		p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
 		p = bayerRGGBEven3x3(p, &image[v++][0], width());
@@ -1442,7 +1442,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  {
 	    const u_char*	p = bayerBGGR2x2(_img, &image[0][0], width());
 	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理．
+	    while (v < image.height() - 1)	// 中間の行を処理
 	    {
 		p = bayerBGGROdd3x3 (p, &image[v++][0], width());
 		p = bayerBGGREven3x3(p, &image[v++][0], width());
@@ -1455,7 +1455,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  {
 	    const u_char*	p = bayerGRBG2x2(_img, &image[0][0], width());
 	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理．
+	    while (v < image.height() - 1)	// 中間の行を処理
 	    {
 		p = bayerGRBGOdd3x3 (p, &image[v++][0], width());
 		p = bayerGRBGEven3x3(p, &image[v++][0], width());
@@ -1468,7 +1468,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 	  {
 	    const u_char*	p = bayerGBRG2x2(_img, &image[0][0], width());
 	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理．
+	    while (v < image.height() - 1)	// 中間の行を処理
 	    {
 		p = bayerGBRGOdd3x3 (p, &image[v++][0], width());
 		p = bayerGBRGEven3x3(p, &image[v++][0], width());
@@ -1492,7 +1492,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const u_short*	p = bayerRGGB2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
 		    p = bayerRGGBEven3x3(p, &image[v++][0], width());
@@ -1504,7 +1504,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const Mono16*	p = bayerRGGB2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
 		    p = bayerRGGBEven3x3(p, &image[v++][0], width());
@@ -1519,7 +1519,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const u_short*	p = bayerBGGR2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
 		    p = bayerBGGREven3x3(p, &image[v++][0], width());
@@ -1531,7 +1531,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const Mono16*	p = bayerBGGR2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
 		    p = bayerBGGREven3x3(p, &image[v++][0], width());
@@ -1546,7 +1546,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const u_short*	p = bayerGRBG2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerGRBGOdd3x3 (p, &image[v++][0], width());
 		    p = bayerGRBGEven3x3(p, &image[v++][0], width());
@@ -1558,7 +1558,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const Mono16*	p = bayerGRBG2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerGRBGOdd3x3 (p, &image[v++][0], width());
 		    p = bayerGRBGEven3x3(p, &image[v++][0], width());
@@ -1573,7 +1573,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const u_short*	p = bayerGBRG2x2((const u_short*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerGBRGOdd3x3 (p, &image[v++][0], width());
 		    p = bayerGBRGEven3x3(p, &image[v++][0], width());
@@ -1585,7 +1585,7 @@ Ieee1394Camera::captureRGBImage(Image<T>& image) const
 		const Mono16*	p = bayerGBRG2x2((const Mono16*)_img,
 						 &image[0][0], width());
 		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理．
+		while (v < image.height() - 1)	// 中間の行を処理
 		{
 		    p = bayerGBRGOdd3x3 (p, &image[v++][0], width());
 		    p = bayerGBRGEven3x3(p, &image[v++][0], width());
@@ -1616,11 +1616,11 @@ struct RGB
 
 //! IEEE1394カメラから出力された画像1枚分のデータをなんら変換を行わずに取り込む
 /*!
-  本関数を呼び出す前に#snap()によってカメラからの画像を保持しておかなければ
-  ならない．
-  \param image	画像データの格納領域へのポインタ．#width(), #height()および
-		#pixelFormat()を用いて画像のサイズと画素の形式を調べて
-		画像1枚分の領域を確保しておくのは，ユーザの責任である．
+  本関数を呼び出す前に #snap() によってカメラからの画像を保持しておかなければ
+  ならない.
+  \param image	画像データの格納領域へのポインタ. #width(), #height() および
+		#pixelFormat() を用いて画像のサイズと画素の形式を調べて
+		画像1枚分の領域を確保しておくのは, ユーザの責任である.
   \return	このIEEE1394カメラオブジェクト
 */
 const Ieee1394Camera&
@@ -1636,14 +1636,14 @@ Ieee1394Camera::captureRaw(void* image) const
 
 //! IEEE1394カメラから出力されたBayerパターン画像1枚分のデータをRGB形式に変換して取り込む
 /*!
-  本関数を呼び出す前に#snap()によってカメラからの画像を保持しておかなければ
-  ならない．
-  \param image	画像データの格納領域へのポインタ．#width(), #height()および
-		#pixelFormat()を用いて画像のサイズと画素の形式を調べて
-		画像1枚分の領域を確保しておくのは，ユーザの責任である．
-		画像データは，各画素毎に R, G, B (各 1 byte)の順で格納され
-		る．カメラの画素形式が#MONO_8 または#MONO_16 以外に設定され
-		ている場合はstd::domain_error例外が送出される．
+  本関数を呼び出す前に #snap() によってカメラからの画像を保持しておかなければ
+  ならない.
+  \param image	画像データの格納領域へのポインタ. #width(), #height() および
+		#pixelFormat() を用いて画像のサイズと画素の形式を調べて
+		画像1枚分の領域を確保しておくのは, ユーザの責任である.
+		画像データは, 各画素毎に R, G, B (各 1 byte)の順で格納され
+		る. カメラの画素形式が #MONO_8 または #MONO_16 以外に設定され
+		ている場合はstd::domain_error例外が送出される.
   \return	このIEEE1394カメラオブジェクト
 */
 const Ieee1394Camera&
@@ -1663,7 +1663,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    RGB*		rgb = (RGB*)image;
 	    const u_char*	p = bayerRGGB2x2(_img, rgb, width());
 	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理 
 	    {
 		p = bayerRGGBOdd3x3 (p, rgb, width());
 		rgb += width();
@@ -1679,7 +1679,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    RGB*		rgb = (RGB*)image;
 	    const u_char*	p = bayerBGGR2x2(_img, rgb, width());
 	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 	    {
 		p = bayerBGGROdd3x3 (p, rgb, width());
 		rgb += width();
@@ -1695,7 +1695,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    RGB*		rgb = (RGB*)image;
 	    const u_char*	p = bayerGRBG2x2(_img, rgb, width());
 	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 	    {
 		p = bayerGRBGOdd3x3 (p, rgb, width());
 		rgb += width();
@@ -1711,7 +1711,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 	    RGB*		rgb = (RGB*)image;
 	    const u_char*	p = bayerGBRG2x2(_img, rgb, width());
 	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 	    {
 		p = bayerGBRGOdd3x3 (p, rgb, width());
 		rgb += width();
@@ -1745,7 +1745,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const u_short*	p = bayerRGGB2x2((const u_short*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerRGGBOdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1759,7 +1759,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const Mono16*	p = bayerRGGB2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerRGGBOdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1776,7 +1776,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const u_short*	p = bayerBGGR2x2((const u_short*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerBGGROdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1790,7 +1790,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const Mono16*	p = bayerBGGR2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerBGGROdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1807,7 +1807,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const u_short*	p = bayerGRBG2x2((const u_short*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerGRBGOdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1821,7 +1821,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const Mono16*	p = bayerGRBG2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerGRBGOdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1838,7 +1838,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const u_short*	p = bayerGBRG2x2((const u_short*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerGBRGOdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1852,7 +1852,7 @@ Ieee1394Camera::captureBayerRaw(void* image) const
 		RGB*		rgb = (RGB*)image;
 		const Mono16*	p = bayerGBRG2x2((const Mono16*)_img, rgb, width());
 		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理．
+		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
 		{
 		    p = bayerGBRGOdd3x3 (p, rgb, width());
 		    rgb += width();
@@ -1896,10 +1896,10 @@ Ieee1394Camera::captureBayerRaw(void* image) const
     return *this;
 }
 
-//! unsinged intの値を同じビットパターンを持つ#Formatに直す
+//! unsinged intの値を同じビットパターンを持つ #Format に直す
 /*!
-  \param format	#Formatに直したいunsigned int値
-  \return	#Format型のenum値
+  \param format	#Format に直したいunsigned int値
+  \return	#Format 型のenum値
  */
 Ieee1394Camera::Format
 Ieee1394Camera::uintToFormat(u_int format)
@@ -1991,10 +1991,10 @@ Ieee1394Camera::uintToFormat(u_int format)
     return YUV444_160x120;
 }
 
-//! unsinged intの値を同じビットパターンを持つ#FrameRateに直す
+//! unsinged intの値を同じビットパターンを持つ #FrameRate に直す
 /*!
-  \param rate	#FrameRateに直したいunsigned int値
-  \return	#FrameRate型のenum値
+  \param rate	#FrameRate に直したいunsigned int値
+  \return	#FrameRate 型のenum値
  */
 Ieee1394Camera::FrameRate
 Ieee1394Camera::uintToFrameRate(u_int rate)
@@ -2026,10 +2026,10 @@ Ieee1394Camera::uintToFrameRate(u_int rate)
     return FrameRate_1_875;
 }
 
-//! unsinged intの値を同じビットパターンを持つ#Featureに直す
+//! unsinged intの値を同じビットパターンを持つ #Feature に直す
 /*!
-  \param feature	#Featureに直したいunsigned int値
-  \return		#Feature型のenum値
+  \param feature	#Feature に直したいunsigned int値
+  \return		#Feature 型のenum値
  */
 Ieee1394Camera::Feature
 Ieee1394Camera::uintToFeature(u_int feature)
@@ -2081,10 +2081,10 @@ Ieee1394Camera::uintToFeature(u_int feature)
     return BRIGHTNESS;
 }
 
-//! unsinged intの値を同じビットパターンを持つ#TriggerModeに直す
+//! unsinged intの値を同じビットパターンを持つ #TriggerMode に直す
 /*!
-  \param triggerMode	#TriggerModeに直したいunsigned int値
-  \return		#TriggerMode型のenum値
+  \param triggerMode	#TriggerMode に直したいunsigned int値
+  \return		#TriggerMode 型のenum値
  */
 Ieee1394Camera::TriggerMode
 Ieee1394Camera::uintToTriggerMode(u_int triggerMode)
@@ -2112,10 +2112,10 @@ Ieee1394Camera::uintToTriggerMode(u_int triggerMode)
     return Trigger_Mode0;
 }
  
-//! unsinged intの値を同じビットパターンを持つ#PixelFormatに直す
+//! unsinged intの値を同じビットパターンを持つ #PixelFormat に直す
 /*!
-  \param pixelFormat	#PixelFormatに直したいunsigned int値
-  \return		#PixelFormat型のenum値
+  \param pixelFormat	#PixelFormat に直したいunsigned int値
+  \return		#PixelFormat 型のenum値
  */
 Ieee1394Camera::PixelFormat
 Ieee1394Camera::uintToPixelFormat(u_int pixelFormat)
@@ -2154,9 +2154,9 @@ Ieee1394Camera::uintToPixelFormat(u_int pixelFormat)
 //! 指定された画像フォーマットにおいてサポートされているフレームレートを調べる
 /*!
   \param format	対象となるフォーマット
-  \return	サポートされているフレームレートを#FrameRate型の列挙値
-		のorとして返す．指定されたフォーマット自体がこのカメラでサ
-		ポートされていなければ，0が返される．
+  \return	サポートされているフレームレートを #FrameRate 型の列挙値
+		のorとして返す. 指定されたフォーマット自体がこのカメラでサ
+		ポートされていなければ, 0が返される.
 */
 quadlet_t
 Ieee1394Camera::inquireFrameRate(Format format) const
@@ -2214,7 +2214,7 @@ Ieee1394Camera::setFormat_7_PacketSize(Format format7)
     }
     u_int	bytePerPacket = readQuadlet(base + BYTE_PER_PACKET) & 0xffff;
     if (bytePerPacket != 0)
-	writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);	// 推奨値を設定．
+	writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);	// 推奨値を設定. 
     else
     {
 	const quadlet_t	quad = readQuadlet(base + PACKET_PARA_INQ);
@@ -2443,11 +2443,11 @@ Ieee1394Camera::inquireFrameRate_or_Format_7_Offset(Format format) const
 
 //! カメラベンダー依存の機能へのアクセス制限を解除してそれを使えるようにする
 /*
-  \param featureId	アクセス制限を解除したい機能を表す48bitのID．
+  \param featureId	アクセス制限を解除したい機能を表す48bitのID. 
   \param timeout	解除してからまたロックされるまでのタイムアウト値
 			(単位: msec)
-  \return		解除に成功すればtrueを，失敗するかこの機能自体が
-			存在しなければfalseを返す．
+  \return		解除に成功すればtrueを, 失敗するかこの機能自体が
+			存在しなければfalseを返す.
 */
 bool
 Ieee1394Camera::unlockAdvancedFeature(u_int64_t featureId, u_int timeout)

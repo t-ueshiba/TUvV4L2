@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.11 2009-10-18 23:38:27 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.12 2011-08-23 00:06:38 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -56,7 +56,7 @@ raw1394::Buffer::resize(UInt32 n, const Buffer& prv, Buffer& nxt, raw1394* prnt)
 /************************************************************************
 *  class raw1394							*
 ************************************************************************/
-//! ::raw1394構造体を生成する
+//! ::raw1394 構造体を生成する
 /*!
   \param unit_spec_ID	この構造体が表すIEEE1394ノードの種類を示すID
   \param uniqId		個々の機器固有の64bit ID
@@ -136,7 +136,7 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
 	    throw runtime_error("raw1394::raw1394: failed to turn on notification!!");
 }
 
-//! ::raw1394構造体を破壊する
+//! ::raw1394 構造体を破壊する
 raw1394::~raw1394()
 {
     if (_cfPlugInInterface)
@@ -158,7 +158,7 @@ raw1394::~raw1394()
     }
 }
 
-//! この::raw1394構造体が表すノードのコマンドレジスタのベースアドレスを返す
+//! この ::raw1394 構造体が表すノードのコマンドレジスタのベースアドレスを返す
 /*!
   \return		コマンドレジスタのベースアドレス
 */
@@ -197,7 +197,7 @@ raw1394::cmdRegBase() const
   \param maxPacketSize	受信パケットの最大バイト数
   \param channel	ishochronous受信のチャンネル
   \param irqInterval	カーネルが割り込みをかける間隔を指定するパケット数
-  \return		初期設定が成功すればkIOReturnSuccess，そうでなければ
+  \return		初期設定が成功すればkIOReturnSuccess, そうでなければ
 			エラーの原因を示すコード
 */
 IOReturn
@@ -389,18 +389,18 @@ raw1394::isoRecvFlush()
 SInt32
 raw1394::loopIterate()
 {
-  // 受信済みだが処理されていないデータは，バッファ
-  // (_lastProcessed, _lastReceived] に収められる．dclCallback() は，
-  // データを受信するたびにそのバッファを _lastReceived に記録する．
-  // loopIterate() は，dclCallback() によって _lastReceived が更新されて
-  // _lastProcessed < _lastReceived となるのを待ち，_lastProcessed を
-  // 1つ先に進めてその内容が有効であればユーザ側に転送する．
+  // 受信済みだが処理されていないデータは, バッファ
+  // (_lastProcessed, _lastReceived] に収められる. dclCallback() は, 
+  // データを受信するたびにそのバッファを _lastReceived に記録する.
+  // loopIterate() は, dclCallback() によって _lastReceived が更新されて
+  // _lastProcessed < _lastReceived となるのを待ち, _lastProcessed を
+  // 1つ先に進めてその内容が有効であればユーザ側に転送する.
 #ifdef DEBUG
     using namespace	std;
     
     cerr << "*** BEGIN [loopIterate] ***" << endl;
 #endif
-  // dclCallback() によって新たなデータ読み込まれ，_lastReceived が更新される
+  // dclCallback() によって新たなデータ読み込まれ, _lastReceived が更新される
   // まで待機
     while (_lastProcessed == _lastReceived)
 	CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true);
@@ -411,22 +411,22 @@ raw1394::loopIterate()
     cerr << "  buffer[" << hex << buffer << "]: " << endl;
 #endif
 
-  // バッファデータの有効性を記憶し，次の受信に備えて無効化しておく
+  // バッファデータの有効性を記憶し, 次の受信に備えて無効化しておく
     MPEnterCriticalRegion(_mutex, kDurationForever);
     const bool	valid = buffer->valid;
     buffer->valid = false;
     MPExitCriticalRegion(_mutex);
 	
     SInt32	ret = -1;
-    if (valid)	// データが有効（壊れていない）なら
+    if (valid)	// データが有効(壊れていない)なら
     {
-      // これまでに取りこぼしたパケット数を記憶し，次の受信に備えて0にしておく
+      // これまでに取りこぼしたパケット数を記憶し, 次の受信に備えて0にしておく
 	MPEnterCriticalRegion(_mutex, kDurationForever);
 	const UInt32	dropped = _dropped;
 	_dropped = 0;
 	MPExitCriticalRegion(_mutex);
 
-      // 先頭パケットのヘッダとデータアドレスを取り出し，ユーザハンドラを介して
+      // 先頭パケットのヘッダとデータアドレスを取り出し, ユーザハンドラを介して
       // 全パケットのデータを転送する
 	IOVirtualRange	ranges[2];
 	(*_dclPool)->GetDCLRanges(buffer->first(), 2, ranges);
@@ -450,9 +450,9 @@ raw1394::loopIterate()
     }
 #endif
     
-  // 最後の処理済みバッファ _lastProcessed のDCLは，以降の未処理バッファ
-  // への上書きを防ぐために常に自己ループでなければならない．よって，この
-  // バッファを自己ループにし，1つ前のバッファをこのバッファに接続する．
+  // 最後の処理済みバッファ _lastProcessed のDCLは, 以降の未処理バッファ
+  // への上書きを防ぐために常に自己ループでなければならない. よって, この
+  // バッファを自己ループにし, 1つ前のバッファをこのバッファに接続する.
     (*_dclPool)->SetDCLBranch(buffer->last(), buffer->first());
     (*_dclPool)->SetDCLBranch(buffer->prev()->last(), buffer->first());
     void*	dcls[] = {buffer->last(), buffer->prev()->last()};
@@ -502,16 +502,16 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 	}
     }
 
-  // このバッファが既に受信済みであるか今回のデータが壊れているなら，今回の
-  // データを取りこぼしたものとして扱う．（_dropped と Buffer::valid
-  // は loopIterate() によって変えられる可能性があるので排他制御が必要）
+  // このバッファが既に受信済みであるか今回のデータが壊れているなら, 今回の
+  // データを取りこぼしたものとして扱う. (_dropped と Buffer::valid
+  // は loopIterate() によって変えられる可能性があるので排他制御が必要)
     MPEnterCriticalRegion(me->_mutex, kDurationForever);
     if (buffer->valid || !valid)
 	me->_dropped += buffer->nPackets(); // 今回とりこぼしたパケット数を加算
     buffer->valid = valid;		    // 今回のデータの有効性をセット
     MPExitCriticalRegion(me->_mutex);
 
-  // このバッファを，データを受信した最新のバッファとする
+  // このバッファを, データを受信した最新のバッファとする
     me->_lastReceived = buffer;
 
 #ifdef DEBUG

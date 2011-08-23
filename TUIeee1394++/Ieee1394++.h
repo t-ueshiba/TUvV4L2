@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.29 2011-08-22 00:06:53 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.30 2011-08-23 00:06:15 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -28,12 +28,12 @@
   \section abstract 概要
   libTUIeee1394++は，
   <a href="http://www.1394ta.com/Technology/Specifications/specifications.htm">
-  IIDC 1394ベースのデジタルカメラ</a>を制御するC++ライブラリである．同
+  IIDC 1394ベースのデジタルカメラ</a>を制御するC++ライブラリである. 同
   一または異なるIEEE1394バスに接続された複数のカメラを，それぞれ独立に
-  コントロールすることができる．
+  コントロールすることができる. 
 
   実装されている主要なクラスおよびそのpublicなメンバ関数は，おおまかに
-  以下のように分類される．
+  以下のように分類される. 
 
   #TU::Ieee1394Node - IEEE1394バスに接続される様々な機器のベースとなるクラス
   - #TU::Ieee1394Node::nodeId()
@@ -76,7 +76,7 @@
     - #TU::Ieee1394Camera::snap()
 
   - <b>画像の取り込み</b>
-    - #Ieee1394Camera& TU::Ieee1394Camera::operator >>(Image<T>&) const
+    - #TU::Ieee1394Camera::operator >>()
     - #TU::Ieee1394Camera::captureRGBImage()
     - #TU::Ieee1394Camera::captureDirectly()
     - #TU::Ieee1394Camera::captureRaw()
@@ -149,8 +149,8 @@ namespace TU
 ************************************************************************/
 //! IEEE1394のノードを表すクラス
 /*!
-  一般には，より具体的な機能を持ったノード(ex. デジタルカメラ)を表す
-  クラスの基底クラスとして用いられる．
+  一般には, より具体的な機能を持ったノード(ex. デジタルカメラ)を表す
+  クラスの基底クラスとして用いられる. 
 */
 class Ieee1394Node
 {
@@ -287,7 +287,7 @@ class Ieee1394Node
 ************************************************************************/
 //! IEEE1394デジタルカメラを表すクラス
 /*!
-  1394-based Digital Camera Specification ver. 1.30に準拠．
+  1394-based Digital Camera Specification ver. 1.30に準拠. 
 */
 class Ieee1394Camera : public Ieee1394Node
 {
@@ -300,8 +300,8 @@ class Ieee1394Camera : public Ieee1394Node
     };
 	
   //! カメラがサポートしている基本機能を表すビットマップ
-  /*! どのような基本機能がサポートされているかは，#inquireBasicFunction()に
-      よって知ることができる．*/
+  /*! どのような基本機能がサポートされているかは, inquireBasicFunction() に
+      よって知ることができる. */
     enum BasicFunction
     {
 	Advanced_Feature_Inq	= (0x1u << 31),	//!< カメラベンダ依存の機能
@@ -356,8 +356,8 @@ class Ieee1394Camera : public Ieee1394Node
     };
 
   //! カメラのフレームレートを表すビットマップ
-  /*! どのようなフレームレートがサポートされているかは，#inquireFrameRate()
-      によって知ることができる．*/
+  /*! どのようなフレームレートがサポートされているかは, inquireFrameRate()
+      によって知ることができる. */
     enum FrameRate
     {
 	FrameRate_1_875	= (0x1u << 31),	//!< 1.875fps
@@ -413,9 +413,9 @@ class Ieee1394Camera : public Ieee1394Node
 	CAPTURE_QUALITY	= 0x8c4
     };
 
-  //! 各属性(#Feature)についてカメラがサポートしている機能を表すビットマップ
-  /*! どのような機能がサポートされているかは，#inquireFeatureFunction()によっ
-      て知ることができる．*/
+  //! 各属性( Feature)についてカメラがサポートしている機能を表すビットマップ
+  /*! どのような機能がサポートされているかは, inquireFeatureFunction() に
+      よって知ることができる. */
     enum FeatureFunction
     {
 	Presence	= (0x1u << 31),	//!< この属性そのものをサポート
@@ -430,7 +430,7 @@ class Ieee1394Camera : public Ieee1394Node
   //! カメラの外部トリガーモード
     enum TriggerMode
     {
-	Trigger_Mode0	=  0,	//!< トリガonから#SHUTTERで指定した時間だけ蓄積
+	Trigger_Mode0	=  0,	//!< トリガonから #SHUTTER で指定した時間だけ蓄積
 	Trigger_Mode1	=  1,	//!< トリガonからトリガoffになるまで蓄積
 	Trigger_Mode2	=  2,
 	Trigger_Mode3	=  3,
@@ -446,7 +446,7 @@ class Ieee1394Camera : public Ieee1394Node
 	HighActiveInput	= (0x1u << 24)	//!< highでトリガon
     };
 
-  //! 本カメラがサポートするFormat_7に関する情報(#getFormat_7_Info()で得られる)
+  //! 本カメラがサポートするFormat_7に関する情報(getFormat_7_Info() で得られる)
     struct Format_7_Info
     {
 	u_int		maxWidth;		//!< 画像の最大幅
@@ -608,7 +608,7 @@ Ieee1394Camera::bayerTileMapping() const
     return _bayer;
 }
 
-//! このカメラの#MONO_16フォーマットがlittle endianであるかを調べる
+//! このカメラの#MONO_16 フォーマットがlittle endianであるかを調べる
 inline bool
 Ieee1394Camera::isLittleEndian() const
 {
@@ -638,7 +638,7 @@ Ieee1394Camera::pixelFormat() const
 
 //! カメラがサポートしている基本機能を返す
 /*!
-  \return	サポートされている機能を#BasicFunction型の列挙値のorとして
+  \return	サポートされている機能を #BasicFunction 型の列挙値のorとして
 		返す
  */
 inline quadlet_t
@@ -649,9 +649,9 @@ Ieee1394Camera::inquireBasicFunction() const
 
 //! カメラから出力される最初の画像を保持する
 /*!
-  カメラからの画像出力は，#continuousShot(), #oneShot(), #multiShot()のいずれか
-  によって行われる．実際に画像データが受信されるまで，本関数は呼び出し側に
-  制御を返さない．
+  カメラからの画像出力は, continuousShot(), oneShot(), multiShot() の
+  いずれかによって行われる. 実際に画像データが受信されるまで, 本関数は
+  呼び出し側に制御を返さない. 
   \return	このIEEE1394カメラオブジェクト
  */
 inline Ieee1394Camera&
@@ -666,14 +666,14 @@ Ieee1394Camera::snap()
 #ifdef HAVE_LIBTUTOOLS__
 //! IEEE1394カメラから出力された画像を直接的に取り込む
 /*!
-  #operator >>()との違いは，画像形式の変換を行わないことと，Image<T>構造体
+  #operator >>() との違いは, 画像形式の変換を行わないことと, Image<T> 構造体
   の中のデータ領域へのポインタをIEEE1394入力バッファへのポインタに書き換える
-  ことによって，実際にはデータのコピーを行わないことである．
-  テンプレートパラメータTは，格納先の画像の画素形式を表す．なお，本関数を
-  呼び出す前に#snap()によってカメラからの画像を保持しておかなければならない．
-  \param image	画像データを格納する画像オブジェクト．画像の幅と高さは，
+  ことによって, 実際にはデータのコピーを行わないことである. 
+  テンプレートパラメータTは, 格納先の画像の画素形式を表す. なお, 本関数を
+  呼び出す前に snap() によってカメラからの画像を保持しておかなければならない. 
+  \param image	画像データを格納する画像オブジェクト. 画像の幅と高さは, 
 		現在カメラに設定されている画像サイズに合わせて自動的に
-		設定される．
+		設定される. 
   \return	このIEEE1394カメラオブジェクト
 */
 template <class T> const Ieee1394Camera&

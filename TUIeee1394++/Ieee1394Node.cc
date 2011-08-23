@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.19 2011-01-14 01:53:51 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.20 2011-08-23 00:06:15 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -68,19 +68,19 @@ static u_int64_t
 cycle_to_filltime(raw1394handle_t handle, u_int cycle)
 {
 #if !defined(__APPLE__)
-  // 現在時刻を獲得する．
+  // 現在時刻を獲得する. 
     u_int32_t	busTime;
     u_int64_t	localTime;
     raw1394_read_cycle_timer(handle, &busTime, &localTime);
     busTime = cycleTimer_to_usec(busTime);
 
-  // packet取り込み時刻を獲得する．
+  // packet取り込み時刻を獲得する. 
     u_int32_t	dmaTime = cycleTimer_to_usec(cycle << 12);
 
-  // 現在時刻とpacket取り込み時刻のずれを求める．
+  // 現在時刻とpacket取り込み時刻のずれを求める. 
     u_int32_t	diff = (busTime + 8000000 - dmaTime) % 8000000;
 
-  // ずれを差し引く．
+  // ずれを差し引く. 
     return localTime - u_int64_t(diff);
 #else
     return 0;
@@ -155,27 +155,27 @@ std::map<int, Ieee1394Node::Port*>	Ieee1394Node::_portMap;
 //! IEEE1394ノードオブジェクトを生成する
 /*!
   \param unit_spec_ID	このノードの種類を示すID(ex. IEEE1394デジタルカメラ
-			であれば，0x00a02d)
-  \param uniqId		個々の機器固有の64bit ID．同一のIEEE1394 busに
+			であれば, 0x00a02d)
+  \param uniqId		個々の機器固有の64bit ID. 同一のIEEE1394 busに
 			同一のunit_spec_IDを持つ複数の機器が接続されて
-			いる場合，これによって同定を行う．
-			0が与えられると，指定されたunit_spec_IDを持ち
+			いる場合, これによって同定を行う. 
+			0が与えられると, 指定されたunit_spec_IDを持ち
 			まだ#Ieee1394Nodeオブジェクトを割り当てられて
-			いない機器のうち，一番最初にみつかったものがこの
-			オブジェクトと結びつけられる．
-  \param delay		IEEE1394カードの種類によっては，レジスタの読み書き
+			いない機器のうち, 一番最初にみつかったものがこの
+			オブジェクトと結びつけられる. 
+  \param delay		IEEE1394カードの種類によっては, レジスタの読み書き
 			(Ieee1394Node::readQuadlet(),
 			Ieee1394Node::writeQuadlet())時に遅延を入れないと
-			動作しないことがある．この遅延量をmicro second単位
-			で指定する．(例: メルコのIFC-ILP3では1, DragonFly
+			動作しないことがある. この遅延量をmicro second単位
+			で指定する. (例: メルコのIFC-ILP3では1, DragonFly
 			付属のボードでは0)
   \param sync_tag	1まとまりのデータを複数のパケットに分割して
-			isochronousモードで受信する際に，最初のパケットに
-			同期用のtagがついている場合は1を指定．そうでなけれ
-			ば0を指定．
-  \param flags		video1394のフラグ．VIDEO1394_SYNC_FRAMES, 
+			isochronousモードで受信する際に, 最初のパケットに
+			同期用のtagがついている場合は1を指定. そうでなけれ
+			ば0を指定. 
+  \param flags		video1394のフラグ. VIDEO1394_SYNC_FRAMES, 
 			VIDEO1394_INCLUDE_ISO_HEADERS,
-			VIDEO1394_VARIABLE_PACKET_SIZEの組合わせ．
+			VIDEO1394_VARIABLE_PACKET_SIZEの組合わせ. 
 */
 Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 #if !defined(USE_RAWISO)
@@ -463,8 +463,8 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 
 //! isochronousデータが受信されるのを待つ
 /*!
-  実際にデータが受信されるまで，本関数は呼び出し側に制御を返さない．
-  \return	データの入ったバッファの先頭アドレス．
+  実際にデータが受信されるまで, 本関数は呼び出し側に制御を返さない. 
+  \return	データの入ったバッファの先頭アドレス. 
  */
 const u_char*
 Ieee1394Node::waitListenBuffer()
@@ -478,7 +478,7 @@ Ieee1394Node::waitListenBuffer()
     while (!_ready)
     {
       // (_buf, _end] に sy packet がない場合は sy packet を取りこぼしているので
-      // [_buf, _current)を廃棄する．
+      // [_buf, _current)を廃棄する. 
 	if (_current > _end)
 	    _current = _buf;
 	
@@ -555,10 +555,10 @@ Ieee1394Node::flushListenBuffer()
     if (_buf != 0)
 	mapListenBuffer(_mmap.packet_size, _buf_size, _mmap.nb_buffers);
     
-  // POLL(kernel-2.4以降のみで有効)してREADY状態のバッファを全てrequeueする．
-  // 1つのバッファが一杯になる前にisochronous転送が停止されると，そのバッファ
-  // はREADY状態にはならずQUEUED状態のままなので，不完全なデータを持ったまま
-  // 残ってしまう．したがって，この方法は良くない．(2002.3.7)
+  // POLL(kernel-2.4以降のみで有効)してREADY状態のバッファを全てrequeueする. 
+  // 1つのバッファが一杯になる前にisochronous転送が停止されると, そのバッファ
+  // はREADY状態にはならずQUEUED状態のままなので, 不完全なデータを持ったまま
+  // 残ってしまう. したがって, この方法は良くない. (2002.3.7)
   /*    if (_buf != 0)
 	for (;;)
 	{
@@ -631,7 +631,7 @@ Ieee1394Node::receive(raw1394handle_t handle,
 	else
 	{
 	  // 直前のsy packetとの間隔がバッファサイズに等しくない場合はpacketを
-	  // 取りこぼしているので [_buf, _current) を廃棄する．
+	  // 取りこぼしているので [_buf, _current) を廃棄する. 
 	    node->_current = node->_buf;
 	    node->_ready = false;
 	    node->_filltime = cycle_to_filltime(handle, cycle);

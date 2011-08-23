@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.8 2011-08-22 00:06:53 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.9 2011-08-23 00:06:15 ueshiba Exp $
  */
 /*!
   \file		Ieee1394CameraArray.h
@@ -13,7 +13,9 @@
 #  include "TU/Ieee1394++.h"
 #  include "TU/io.h"
 
+//! デフォルトのカメラ名
 #  define DEFAULT_CAMERA_NAME	"IEEE1394Camera"
+//! カメラ設定ファイルを収めるデフォルトのディレクトリ名
 #  define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
 
 namespace TU
@@ -23,7 +25,7 @@ namespace TU
 ************************************************************************/
 //! IEEE1394デジタルカメラの配列を表すクラス
 /*!
-  TU::Ieee1394Cameraへのポインタの配列として定義される．
+  TU::Ieee1394Cameraへのポインタの配列として定義される.
 */
 class Ieee1394CameraArray : public Array<Ieee1394Camera*>
 {
@@ -43,7 +45,7 @@ class Ieee1394CameraArray : public Array<Ieee1394Camera*>
     std::string		_fullName;	//!< カメラのfull path名
 };
 
-//! カメラのfull path名を返す．
+//! カメラのfull path名を返す.
 /*!
   \return	カメラのfull path名
 */
@@ -53,7 +55,7 @@ Ieee1394CameraArray::fullName() const
     return _fullName;
 }
     
-//! カメラ設定ファイル名を返す．
+//! カメラ設定ファイル名を返す.
 /*!
   \return	カメラ設定ファイル名
 */
@@ -63,7 +65,7 @@ Ieee1394CameraArray::configFile() const
     return _fullName + ".conf";
 }
     
-//! キャリブレーションファイル名を返す．
+//! キャリブレーションファイル名を返す.
 /*!
   \return	キャリブレーションファイル名
 */

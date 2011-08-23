@@ -19,8 +19,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.10 2009-10-18 23:38:27 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.11 2011-08-23 00:06:38 ueshiba Exp $
  */
+/*!
+  \file		raw1394_.h
+  \brief	::raw1394 構造体の定義と実装
+*/ 
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
 #include <CoreServices/CoreServices.h>
@@ -128,7 +132,7 @@ struct raw1394
     void*				_userData;
 };
 
-//! ::raw1394構造体にユーザが指定したデータへのポインタを貼付ける
+//! ::raw1394 構造体にユーザが指定したデータへのポインタを貼付ける
 /*!
   \param data	貼付けたいデータへのポインタ
 */
@@ -138,7 +142,7 @@ raw1394::setUserData(void* data)
     _userData = data;
 }
     
-//! この::raw1394構造体に貼付けたデータへのポインタを得る
+//! この ::raw1394 構造体に貼付けたデータへのポインタを得る
 /*!
   \return	貼付けたデータへのポインタ
 */
@@ -153,7 +157,7 @@ raw1394::getUserData() const
   \param addr	読み込み元のFireWireアドレス
   \param buf	読み込み先のバッファアドレス
   \param size	読み込みデータのバイト数
-  \return	読み込みが成功すればkIOReturnSuccess，そうでなければ
+  \return	読み込みが成功すればkIOReturnSuccess, そうでなければ
 		エラーの原因を示すコード
 */
 inline IOReturn
@@ -169,7 +173,7 @@ raw1394::read(const FWAddress& addr, void* buf, UInt32 size) const
 /*!
   \param addr	読み込み元のFireWireアドレス
   \param quad	読み込み先のアドレス
-  \return	読み込みが成功すればkIOReturnSuccess，そうでなければ
+  \return	読み込みが成功すればkIOReturnSuccess, そうでなければ
 		エラーの原因を示すコード
 */
 inline IOReturn
@@ -186,7 +190,7 @@ raw1394::readQuadlet(const FWAddress& addr, UInt32* quad) const
   \param addr	書き込み先のFireWireアドレス
   \param buf	書き込み元のバッファアドレス
   \param size	書き込みデータのバイト数
-  \return	書き込みが成功すればkIOReturnSuccess，そうでなければ
+  \return	書き込みが成功すればkIOReturnSuccess, そうでなければ
 		エラーの原因を示すコード
 */
 inline IOReturn
@@ -202,7 +206,7 @@ raw1394::write(const FWAddress& addr, const void* buf, UInt32 size) const
 /*!
   \param addr	書き込み先のFireWireアドレス
   \param quad	書き込むデータ
-  \return	書き込みが成功すればkIOReturnSuccess，そうでなければ
+  \return	書き込みが成功すればkIOReturnSuccess, そうでなければ
 		エラーの原因を示すコード
 */
 inline IOReturn
@@ -216,7 +220,7 @@ raw1394::writeQuadlet(const FWAddress& addr, UInt32 quad) const
 
 //! isochronous受信を開始する
 /*!
-  \return	開始が成功すればkIOReturnSuccess，そうでなければ
+  \return	開始が成功すればkIOReturnSuccess, そうでなければ
 		エラーの原因を示すコード
 */
 inline IOReturn
@@ -227,7 +231,7 @@ raw1394::isoRecvStart()
     
 //! isochronous受信を停止する
 /*!
-  \return	停止が成功すればkIOReturnSuccess，そうでなければ
+  \return	停止が成功すればkIOReturnSuccess, そうでなければ
 		エラーの原因を示すコード
 */
 inline IOReturn
