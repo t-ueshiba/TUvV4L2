@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SparseMatrix++.h,v 1.1 2011-09-05 01:34:55 ueshiba Exp $
+ *  $Id: SparseMatrix++.h,v 1.2 2011-09-07 05:00:28 ueshiba Exp $
  */
 /*!
   \file		SparseMatrix++.h
@@ -55,13 +55,14 @@ class SparseMatrix
   public:
   // 構造生成
     void		beginInit()					;
-    void		endInit()					;
     void		setRow()					;
     void		setCol(u_int col)				;
     void		setCol(u_int col, value_type val)		;
     void		copyRow()					;
+    void		endInit()					;
     
   // 基本情報
+    u_int		dim()					const	;
     u_int		nrow()					const	;
     u_int		ncol()					const	;
     u_int		nelements()				const	;
@@ -75,6 +76,8 @@ class SparseMatrix
     SparseMatrix&	operator /=(value_type c)			;
     SparseMatrix&	operator +=(const SparseMatrix& A)		;
     SparseMatrix&	operator -=(const SparseMatrix& A)		;
+    SparseMatrix	operator  +(const SparseMatrix& A)	const	;
+    SparseMatrix	operator  -(const SparseMatrix& A)	const	;
     template <class S, class B>
     Vector<T>		operator  *(const Vector<S, B>& v)	const	;
     SparseMatrix<T, true>
@@ -86,12 +89,12 @@ class SparseMatrix
     Vector<T>		operator ()(u_int i, u_int j, u_int d)	const	;
     Matrix<T>		operator ()(u_int i, u_int j,
 				    u_int r, u_int c)		const	;
-    template <class F, class S, class B>
+    template <class OP, class S, class B>
     SparseMatrix&	apply(u_int i, u_int j,
-			      F f, const Vector<S, B>& v)		;
-    template <class F, class S, class B, class R>
+			      OP op, const Vector<S, B>& v)		;
+    template <class OP, class S, class B, class R>
     SparseMatrix&	apply(u_int i, u_int j,
-			      F f, const Matrix<S, B, R>& M)		;
+			      OP op, const Matrix<S, B, R>& M)		;
 
   // 連立一次方程式
     Vector<T>		solve(const Vector<T>& b)		const	;
@@ -107,8 +110,10 @@ class SparseMatrix
     friend class SparseMatrix<T, !SYM>;
     
   private:
+    template <class OP>
+    SparseMatrix	binary_op(const SparseMatrix& A, OP op)	const	;
     template <bool SYM2>
-    bool		inner_product(const SparseMatrix<T, SYM2>& A,
+    bool		inner_product(const SparseMatrix<T, SYM2>& S,
 				      u_int i, u_int j, T& val)	const	;
     int			index(u_int i, u_int j)			const	;
     static int		pardiso_precision()				;
@@ -131,24 +136,6 @@ SparseMatrix<T, SYM>::beginInit()
     _rowIndex.clear();
     _columns.clear();
     _values.clear();
-}
-
-//! 初期化を完了する．
-template <class T, bool SYM> inline void
-SparseMatrix<T, SYM>::endInit()
-{
-    setRow();				// ダミーの行をセット
-
-    if (SYM && (nrow() != ncol()))
-	throw std::runtime_error("SparseMatrix<T, true>::endInit(): the numbers of rows and columns must be equal!");
-    
-    if (_values.empty())
-    {
-	_values.resize(nelements());	// 成分を格納する領域を確保
-	operator =(T(0));
-    }
-    else if (_values.size() != _columns.size())
-	throw std::runtime_error("SparseMatrix<T, SYM>::endInit(): the number of values is inconsistent with the number of column indices!");
 }
 
 //! 行の先頭位置をセットする．
@@ -207,15 +194,43 @@ SparseMatrix<T, SYM>::copyRow()
   // 行の先頭成分の通し番号をセットする．rowが現在の行番号となる．
     setRow();
 
-  // 直前の行の2番目以降の成分の列番号を現在の行にコピーする．
+  // 直前の行の(対称行列の場合は2番目以降の)成分の列番号を現在の行にコピーする．
     for (u_int n  = _rowIndex[row - 1] - (SYM ? 0 : 1),
 	       ne = _rowIndex[row] - 1; n < ne; ++n)
 	_columns.push_back(_columns[n]);
 }
 
+//! 初期化を完了する．
+template <class T, bool SYM> inline void
+SparseMatrix<T, SYM>::endInit()
+{
+    setRow();				// ダミーの行をセット
+
+    if (SYM && (nrow() != ncol()))
+	throw std::runtime_error("SparseMatrix<T, true>::endInit(): the numbers of rows and columns must be equal!");
+    
+    if (_values.empty())
+    {
+	_values.resize(nelements());	// 成分を格納する領域を確保
+	operator =(T(0));
+    }
+    else if (_values.size() != _columns.size())
+	throw std::runtime_error("SparseMatrix<T, SYM>::endInit(): the number of values is inconsistent with the number of column indices!");
+}
+
 /*
  * ----------------------- 基本情報 ---------------------------------
  */
+//! 行列の次元すなわち行数を返す．
+/*!
+  \return	行列の次元(=行数)
+*/
+template <class T, bool SYM> inline u_int
+SparseMatrix<T, SYM>::dim() const
+{
+    return nrow();
+}
+    
 //! 行列の行数を返す．
 /*!
   \return	行列の行数
@@ -367,6 +382,30 @@ SparseMatrix<T, SYM>::operator -=(const SparseMatrix& A)
     return *this;
 }
 
+//! この疎行列と他の疎行列の和を計算する．
+/*!
+  2つの疎行列は同一のサイズを持たねばならない．
+  \param A	足す疎行列
+  \return	2つの疎行列の和
+*/
+template <class T, bool SYM> inline SparseMatrix<T, SYM>
+SparseMatrix<T, SYM>::operator +(const SparseMatrix& A) const
+{
+    return binary_op(A, std::plus<T>());
+}
+    
+//! この疎行列と他の疎行列の差を計算する．
+/*!
+  2つの疎行列は同一のサイズを持たねばならない．
+  \param A	引く疎行列
+  \return	2つの疎行列の差
+*/
+template <class T, bool SYM> inline SparseMatrix<T, SYM>
+SparseMatrix<T, SYM>::operator -(const SparseMatrix& A) const
+{
+    return binary_op(A, std::minus<T>());
+}
+    
 //! この疎行列に右からベクトルを掛ける．
 /*!
   \param v	掛けるベクトル
@@ -462,7 +501,7 @@ SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W) const
 		B.setCol(j, val);
 	}
     }
-    B.endInit(false);
+    B.endInit();
 
     return B;
 }
@@ -533,9 +572,9 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j,
   \param v	その各成分がfの第2引数となるベクトル
   \return	この疎対称行列
 */
-template <class T, bool SYM> template <class F, class S, class B>
+template <class T, bool SYM> template <class OP, class S, class B>
 SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::apply(u_int i, u_int j, F f, const Vector<S, B>& v)
+SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Vector<S, B>& v)
 {
     T*		p = &(*this)(i, j);
     u_int	dj = 0;
@@ -543,13 +582,13 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, F f, const Vector<S, B>& v)
     {
 	for (u_int je = std::min(i, j + v.dim()); j + dj < je; ++dj)
 	{
-	    *p = f(*p, v[dj]);
+	    *p = op(*p, v[dj]);
 	    p += (nelements(j + dj) - 1);
 	}
     }
     for (; dj < v.dim(); ++dj)
     {
-	*p = f(*p, v[dj]);
+	*p = op(*p, v[dj]);
 	++p;
     }
     
@@ -567,16 +606,16 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, F f, const Vector<S, B>& v)
   \param M	その各成分がfの第2引数となる行列
   \return	この疎対称行列
 */
-template <class T, bool SYM> template <class F, class S, class B, class R>
+template <class T, bool SYM> template <class OP, class S, class B, class R>
 SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::apply(u_int i, u_int j, F f, const Matrix<S, B, R>& M)
+SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Matrix<S, B, R>& M)
 {
     const Matrix<S, B, R>&	MM = (i > j ? std::swap(i, j), M.trns() : M);
     
     for (u_int di = 0; di < MM.nrow(); ++di)
     {
 	const u_int	dj = (SYM ? std::max(i + di, j) - j : 0);
-	apply(i + di, j + dj, f, MM[di](dj, MM.ncol() - dj));
+	apply(i + di, j + dj, op, MM[di](dj, MM.ncol() - dj));
     }
     
     return *this;
@@ -689,20 +728,72 @@ SparseMatrix<double, true> ::pardiso_precision()	{return 0;}
 /************************************************************************
 *  global functions							*
 ************************************************************************/
+//! この疎行列と他の疎行列の間で成分毎の2項演算を行う．
+/*!
+  \param A			もう一方の疎行列
+  \return			2つの疎行列間の成分毎の2項演算で得られる疎行列
+  \throw std::invalid_argument	2つの疎行列のサイズが一致しない場合に送出
+*/
+template <class T, bool SYM> template <class OP> SparseMatrix<T, SYM>
+SparseMatrix<T, SYM>::binary_op(const SparseMatrix& A, OP op) const
+{
+    if ((nrow() != A.nrow()) || (ncol() != A.ncol()))
+	throw std::invalid_argument("SparseMatrix<T, SYM>::binary_op(): two matrices must have equal sizes!");
+
+    SparseMatrix	S;
+
+    S.beginInit();
+    for (u_int i = 0; i < nrow(); ++i)
+    {
+	S.setRow();
+
+	for (u_int m = _rowIndex[i], n = A._rowIndex[i]; ; )
+	{
+	    const u_int	j = (m <   _rowIndex[i+1] ?   _columns[m-1] - 1
+						  :   ncol());
+	    const u_int	k = (n < A._rowIndex[i+1] ? A._columns[n-1] - 1
+						  : A.ncol());
+	    
+	    if (j == k)
+	    {
+		if (j == ncol())
+		    break;
+		
+		S.setCol(j, op(_values[m-1], A._values[n-1]));
+		++m;
+		++n;
+	    }
+	    else if (j < k)
+	    {
+		S.setCol(j, op(_values[m-1], T(0)));
+		++m;
+	    }
+	    else
+	    {
+		S.setCol(k, op(T(0), A._values[n-1]));
+		++n;
+	    }
+	}
+    }
+    S.endInit();
+
+    return S;
+}
+    
 //! この疎行列と与えられた疎行列からそれぞれ1行ずつ取り出し，それらの内積を求める．
 /*!
-  \param M	もう1つの疎行列
+  \param S	もう1つの疎行列
   \param i	この疎行列の行番号
-  \param j	M の行番号
+  \param j	S の行番号
   \param val	この疎行列の第i行と M の第j行の内積の値が返される
   \return	この疎行列の第i行と M の第j行が列番号を少なくとも
 		1つ共有すればtrue, そうでなければ false
 */
 template <class T, bool SYM> template <bool SYM2> bool
-SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& M,
+SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& S,
 				    u_int i, u_int j, T& val) const
 {
-    if (ncol() != M.ncol())
+    if (ncol() != S.ncol())
 	throw std::invalid_argument("inner_product(): mismatched dimension!");
     
     bool	exist = false;
@@ -713,21 +804,21 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& M,
 	for (u_int col = 0; col < i; ++col)
 	{
 	    int	m, n;
-	    if ((m = index(i, col)) >= 0 && (n = M.index(j, col)) >= 0)
+	    if ((m = index(i, col)) >= 0 && (n = S.index(j, col)) >= 0)
 	    {
 		exist = true;
-		val += _values[m] * M._values[n];
+		val += _values[m] * S._values[n];
 	    }
 	}
     }
 
     for (u_int m = _rowIndex[i] - 1; m < _rowIndex[i+1] - 1; ++m)
     {
-	const int	n = M.index(j, _columns[m] - 1);
+	const int	n = S.index(j, _columns[m] - 1);
 	if (n >= 0)
 	{
 	    exist = true;
-	    val += _values[m] * M._values[n];
+	    val += _values[m] * S._values[n];
 	}
     }
 
