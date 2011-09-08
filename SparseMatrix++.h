@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SparseMatrix++.h,v 1.2 2011-09-07 05:00:28 ueshiba Exp $
+ *  $Id: SparseMatrix++.h,v 1.3 2011-09-08 23:50:17 ueshiba Exp $
  */
 /*!
   \file		SparseMatrix++.h
@@ -83,7 +83,8 @@ class SparseMatrix
     SparseMatrix<T, true>
 			compose()				const	;
     SparseMatrix<T, true>
-			compose(const SparseMatrix<T, true>& W)	const	;
+			compose(const SparseMatrix<T, true>& W,
+				SparseMatrix<T, false>& AW)	const	;
 
   // ƒuƒƒbƒN‰‰Z
     Vector<T>		operator ()(u_int i, u_int j, u_int d)	const	;
@@ -111,9 +112,9 @@ class SparseMatrix
     
   private:
     template <class OP>
-    SparseMatrix	binary_op(const SparseMatrix& A, OP op)	const	;
+    SparseMatrix	binary_op(const SparseMatrix& B, OP op)	const	;
     template <bool SYM2>
-    bool		inner_product(const SparseMatrix<T, SYM2>& S,
+    bool		inner_product(const SparseMatrix<T, SYM2>& B,
 				      u_int i, u_int j, T& val)	const	;
     int			index(u_int i, u_int j)			const	;
     static int		pardiso_precision()				;
@@ -444,66 +445,67 @@ SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
 template <class T, bool SYM> SparseMatrix<T, true>
 SparseMatrix<T, SYM>::compose() const
 {
-    SparseMatrix<T, true>	A;	// Œ‹‰Ê‚ğŠi”[‚·‚é‘a‘ÎÌs—ñ
+    SparseMatrix<T, true>	AAt;	// Œ‹‰Ê‚ğŠi”[‚·‚é‘a‘ÎÌs—ñ
 
-    A.beginInit();
+    AAt.beginInit();
     for (u_int i = 0; i < nrow(); ++i)
     {
-	A.setRow();
+	AAt.setRow();
 	
 	for (u_int j = i; j < nrow(); ++j)
 	{
 	    T	val;
 	    if (inner_product(*this, i, j, val))
-		A.setCol(j, val);
+		AAt.setCol(j, val);
 	}
     }
-    A.endInit();
+    AAt.endInit();
     
-    return A;
+    return AAt;
 }
     
 //! ‚±‚Ì‘as—ñ‚É‰E‚©‚ç—^‚¦‚ç‚ê‚½‘a‘ÎÌs—ñ‚Æ©g‚Ì“]’u‚ğŠ|‚¯‚½s—ñ‚ğ•Ô‚·D
 /*!
+  \param W	‘a‘ÎÌs—ñ
   \return	Œ‹‰Ê‚ğŠi”[‚µ‚½‘a‘ÎÌs—ñ
 */
 template <class T, bool SYM> SparseMatrix<T, true>
-SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W) const
+SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W,
+			      SparseMatrix<T, false>& AW) const
 {
     if (ncol() != W.nrow())
 	throw std::runtime_error("TU::SparseMatrix<T, SYM>::compose(): mismatched dimension!");
 
-    SparseMatrix<T, false>	A;
-    A.beginInit();
+    AW.beginInit();
     for (u_int i = 0; i < nrow(); ++i)
     {
-	A.setRow();
+	AW.setRow();
 
 	for (u_int j = 0; j < W.nrow(); ++j)
 	{
 	    T	val;
 	    if (inner_product(W, i, j, val))
-		A.setCol(j, val);
+		AW.setCol(j, val);
 	}
     }
-    A.endInit();
+    AW.endInit();
 
-    SparseMatrix<T, true>	B;
-    B.beginInit();
-    for (u_int i = 0; i < A.nrow(); ++i)
+    SparseMatrix<T, true>	AWAt;
+    AWAt.beginInit();
+    for (u_int i = 0; i < AW.nrow(); ++i)
     {
-	B.setRow();
+	AWAt.setRow();
 
 	for (u_int j = i; j < nrow(); ++j)
 	{
 	    T	val;
-	    if (A.inner_product(*this, i, j, val))
-		B.setCol(j, val);
+	    if (AW.inner_product(*this, i, j, val))
+		AWAt.setCol(j, val);
 	}
     }
-    B.endInit();
+    AWAt.endInit();
 
-    return B;
+    return AWAt;
 }
 
 /*
@@ -730,14 +732,14 @@ SparseMatrix<double, true> ::pardiso_precision()	{return 0;}
 ************************************************************************/
 //! ‚±‚Ì‘as—ñ‚Æ‘¼‚Ì‘as—ñ‚ÌŠÔ‚Å¬•ª–ˆ‚Ì2€‰‰Z‚ğs‚¤D
 /*!
-  \param A			‚à‚¤ˆê•û‚Ì‘as—ñ
+  \param B			‚à‚¤ˆê•û‚Ì‘as—ñ
   \return			2‚Â‚Ì‘as—ñŠÔ‚Ì¬•ª–ˆ‚Ì2€‰‰Z‚Å“¾‚ç‚ê‚é‘as—ñ
   \throw std::invalid_argument	2‚Â‚Ì‘as—ñ‚ÌƒTƒCƒY‚ªˆê’v‚µ‚È‚¢ê‡‚É‘—o
 */
 template <class T, bool SYM> template <class OP> SparseMatrix<T, SYM>
-SparseMatrix<T, SYM>::binary_op(const SparseMatrix& A, OP op) const
+SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
 {
-    if ((nrow() != A.nrow()) || (ncol() != A.ncol()))
+    if ((nrow() != B.nrow()) || (ncol() != B.ncol()))
 	throw std::invalid_argument("SparseMatrix<T, SYM>::binary_op(): two matrices must have equal sizes!");
 
     SparseMatrix	S;
@@ -747,19 +749,19 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& A, OP op) const
     {
 	S.setRow();
 
-	for (u_int m = _rowIndex[i], n = A._rowIndex[i]; ; )
+	for (u_int m = _rowIndex[i], n = B._rowIndex[i]; ; )
 	{
 	    const u_int	j = (m <   _rowIndex[i+1] ?   _columns[m-1] - 1
 						  :   ncol());
-	    const u_int	k = (n < A._rowIndex[i+1] ? A._columns[n-1] - 1
-						  : A.ncol());
+	    const u_int	k = (n < B._rowIndex[i+1] ? B._columns[n-1] - 1
+						  : B.ncol());
 	    
 	    if (j == k)
 	    {
 		if (j == ncol())
 		    break;
 		
-		S.setCol(j, op(_values[m-1], A._values[n-1]));
+		S.setCol(j, op(_values[m-1], B._values[n-1]));
 		++m;
 		++n;
 	    }
@@ -770,7 +772,7 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& A, OP op) const
 	    }
 	    else
 	    {
-		S.setCol(k, op(T(0), A._values[n-1]));
+		S.setCol(k, op(T(0), B._values[n-1]));
 		++n;
 	    }
 	}
@@ -782,18 +784,18 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& A, OP op) const
     
 //! ‚±‚Ì‘as—ñ‚Æ—^‚¦‚ç‚ê‚½‘as—ñ‚©‚ç‚»‚ê‚¼‚ê1s‚¸‚Âæ‚èo‚µC‚»‚ê‚ç‚Ì“àÏ‚ğ‹‚ß‚éD
 /*!
-  \param S	‚à‚¤1‚Â‚Ì‘as—ñ
+  \param B	‚à‚¤1‚Â‚Ì‘as—ñ
   \param i	‚±‚Ì‘as—ñ‚Ìs”Ô†
-  \param j	S ‚Ìs”Ô†
-  \param val	‚±‚Ì‘as—ñ‚Ì‘æis‚Æ M ‚Ì‘æjs‚Ì“àÏ‚Ì’l‚ª•Ô‚³‚ê‚é
-  \return	‚±‚Ì‘as—ñ‚Ì‘æis‚Æ M ‚Ì‘æjs‚ª—ñ”Ô†‚ğ­‚È‚­‚Æ‚à
+  \param j	B ‚Ìs”Ô†
+  \param val	‚±‚Ì‘as—ñ‚Ì‘æis‚Æ B ‚Ì‘æjs‚Ì“àÏ‚Ì’l‚ª•Ô‚³‚ê‚é
+  \return	‚±‚Ì‘as—ñ‚Ì‘æis‚Æ B ‚Ì‘æjs‚ª—ñ”Ô†‚ğ­‚È‚­‚Æ‚à
 		1‚Â‹¤—L‚·‚ê‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Î false
 */
 template <class T, bool SYM> template <bool SYM2> bool
-SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& S,
+SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
 				    u_int i, u_int j, T& val) const
 {
-    if (ncol() != S.ncol())
+    if (ncol() != B.ncol())
 	throw std::invalid_argument("inner_product(): mismatched dimension!");
     
     bool	exist = false;
@@ -804,21 +806,21 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& S,
 	for (u_int col = 0; col < i; ++col)
 	{
 	    int	m, n;
-	    if ((m = index(i, col)) >= 0 && (n = S.index(j, col)) >= 0)
+	    if ((m = index(i, col)) >= 0 && (n = B.index(j, col)) >= 0)
 	    {
 		exist = true;
-		val += _values[m] * S._values[n];
+		val += _values[m] * B._values[n];
 	    }
 	}
     }
 
     for (u_int m = _rowIndex[i] - 1; m < _rowIndex[i+1] - 1; ++m)
     {
-	const int	n = S.index(j, _columns[m] - 1);
+	const int	n = B.index(j, _columns[m] - 1);
 	if (n >= 0)
 	{
 	    exist = true;
-	    val += _values[m] * S._values[n];
+	    val += _values[m] * B._values[n];
 	}
     }
 
