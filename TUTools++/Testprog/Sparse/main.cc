@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2011-09-08 23:50:22 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2011-09-14 04:41:20 ueshiba Exp $
  */
 #include "TU/SparseMatrix++.h"
 
@@ -54,8 +54,7 @@ composeTest()
     B.symmetrize();
     SparseMatrix<T, true>	W = makeSparseMatrix<true>(B);
     cerr << "--- W ---\n" << W;
-    SparseMatrix<T, false>	SW;
-    SparseMatrix<T, true>	SWSt = S.compose(W, SW);
+    SparseMatrix<T, true>	SWSt = S.compose(W);
     cerr << "--- S*W*St ---\n" << SWSt;
     cerr << "--- error ---\n" << makeDenseMatrix(SWSt) - A * B * A.trns();
 }
