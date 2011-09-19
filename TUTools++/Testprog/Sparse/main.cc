@@ -1,6 +1,7 @@
 /*
- *  $Id: main.cc,v 1.3 2011-09-14 04:41:20 ueshiba Exp $
+ *  $Id: main.cc,v 1.4 2011-09-19 18:26:19 ueshiba Exp $
  */
+#include <fstream>
 #include "TU/SparseMatrix++.h"
 
 namespace TU
@@ -83,6 +84,30 @@ addTest()
     cerr << "--- error ---\n" << makeDenseMatrix(U) - (A - B);
 }
 
+template <class T, bool SYM> void
+ioTest()
+{
+    using namespace	std;
+    
+    Matrix<T>	A;
+    cerr << "A>> " << flush;
+    cin >> A;
+    SparseMatrix<T, SYM>	Sa = makeSparseMatrix<SYM>(A);
+    cerr << "--- Sa ---\n" << Sa;
+
+    ofstream	out("tmp.dat");
+    if (!out)
+	throw runtime_error("Failed to open output file!");
+    out << Sa;
+    out.close();
+
+    ifstream	in("tmp.dat");
+    if (!in)
+	throw runtime_error("Failed to open input file!");
+    in >> Sa;
+    cerr << "--- Sa(restored) ---\n" << Sa;
+}
+
 }
 
 int
@@ -99,6 +124,8 @@ main()
 	     << "C: compose test(non-symmetric)\n"
 	     << "a: add test(symmetric)\n"
 	     << "A: add test(non-symmetric)\n"
+	     << "i: I/O test(symmetric)\n"
+	     << "I: I/O test(non-symmetric)\n"
 	     << "\n>> " << flush;
 
 	char	c;
@@ -121,6 +148,12 @@ main()
 		break;
 	      case 'A':
 		addTest<value_type, false>();
+		break;
+	      case 'i':
+		ioTest<value_type, true>();
+		break;
+	      case 'I':
+		ioTest<value_type, false>();
 		break;
 	    }
 	}
