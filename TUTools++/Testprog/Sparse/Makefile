@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1 2011-09-07 05:01:16 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2011-09-20 02:01:33 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,8 +10,8 @@ INCDIRS		= -I$(PREFIX)/include
 PROGRAM		= sparsetest
 LIBS		=
 
-#CCC		= c++
-CPPFLAGS	=
+CCC		= g++
+CPPFLAGS	= -DLIBTUTOOLS_DEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
@@ -44,7 +44,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
