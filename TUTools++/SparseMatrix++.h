@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SparseMatrix++.h,v 1.6 2011-09-20 02:00:48 ueshiba Exp $
+ *  $Id: SparseMatrix++.h,v 1.7 2011-09-30 01:06:39 ueshiba Exp $
  */
 /*!
   \file		SparseMatrix++.h
@@ -173,7 +173,11 @@ SparseMatrix<T, SYM>::setRow()
     }
 
   // この行の先頭成分の通し番号をセット
+#ifdef BASE1_INDEX
+    _rowIndex.push_back(nelements() + 1);
+#else
     _rowIndex.push_back(nelements());
+#endif
 }
 
 //! 成分の列番号とその値をセットする．
@@ -195,9 +199,11 @@ SparseMatrix<T, SYM>::setCol(u_int col, value_type val)
 	if (col < --row)		// 与えられた列番号を現在の行番号と比較
 	    throw std::invalid_argument("TU::SparseMatrix<T, SYM>::setCol(): column index must not be less than row index!");
     }
-
+#ifdef BASE1_INDEX
+    _rowmap.insert(std::make_pair(col + 1, val));
+#else
     _rowmap.insert(std::make_pair(col, val));
-
+#endif
     if (col >= _ncol)
 	_ncol = col + 1;		// 列数を更新
 }
@@ -218,8 +224,13 @@ SparseMatrix<T, SYM>::copyRow()
     setRow();
 
   // 直前の行の(対称行列の場合は2番目以降の)成分の列番号を現在の行にコピーする．
+#ifdef BASE1_INDEX
+    for (u_int n  = _rowIndex[row - 1] - (SYM ? 0 : 1),
+	       ne = _rowIndex[row] - 1; n < ne; ++n)
+#else
     for (u_int n  = _rowIndex[row - 1] + (SYM ? 1 : 0),
 	       ne = _rowIndex[row]; n < ne; ++n)
+#endif
     {
 	_columns.push_back(_columns[n]);
 	_values.push_back(T(0));
@@ -247,13 +258,21 @@ SparseMatrix<T, SYM>::endInit()
     {
       // 各行の先頭成分が対角成分であるか？
 	for (u_int i = 0; i < nrow(); ++i)
+#ifdef BASE1_INDEX
+	    if (i != _columns[_rowIndex[i]-1]-1)
+#else
 	    if (i != _columns[_rowIndex[i]])
+#endif
 		throw std::logic_error("SparseMatrix<T, true>::endInit(): the first entry of each row must be a diagonal element!");
     }
 
   // 各行内で列番号が狭義単調増加になっているか？
     for (u_int i = 0; i < nrow(); ++i)
+#ifdef BASE1_INDEX
+	for (int n = _rowIndex[i] - 1; n < _rowIndex[i+1] - 2; ++n)
+#else
 	for (int n = _rowIndex[i]; n < _rowIndex[i+1] - 1; ++n)
+#endif
 	    if (_columns[n] >= _columns[n+1])
 		throw std::logic_error("SparseMatrix<T, SYM>::endInit(): the column indices must be strictly increasing within each row!");
 #endif
@@ -469,7 +488,11 @@ SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
 	}
 	
 	for (u_int n = _rowIndex[i]; n < _rowIndex[i+1]; ++n)
+#ifdef BASE1_INDEX
+	    a[i] += _values[n-1] * v[_columns[n-1]-1];
+#else
 	    a[i] += _values[n] * v[_columns[n]];
+#endif
     }
 
     return a;
@@ -746,7 +769,9 @@ SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
     iparm[17] = -1;			// 分解の非零成分数をレポート
     iparm[20] =  1;			// Bunch and Kaufman pivoting
     iparm[27] = pardiso_precision();	// float または double を指定
+#ifndef BASE1_INDEX
     iparm[34] = 1;			// C形式のindexすなわち0ベース
+#endif
     _INTEGER_t		maxfct = 1;	// その分解を保持するべき行列の数
     _INTEGER_t		mnum   = 1;	// 何番目の行列について解くかを指定
     _INTEGER_t		mtype  = (SYM ? -2 : 11);	// 実対称／実非対称行列
@@ -851,7 +876,11 @@ SparseMatrix<T, SYM>::put(std::ostream& out) const
 
 	for (; j < ncol(); ++j)
 	{
+#ifdef BASE1_INDEX
+	    if ((n < _rowIndex[i+1]-1) && (j == _columns[n]-1))
+#else
 	    if ((n < _rowIndex[i+1]) && (j == _columns[n]))
+#endif
 		out << ' ' << _values[n++];
 	    else
 		out << " _";
@@ -883,19 +912,25 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
     for (u_int i = 0; i < nrow(); ++i)
     {
 	S.setRow();		// 第i行の先頭成分の通し番号をセット
-
+#ifdef BASE1_INDEX
+	for (u_int m = _rowIndex[i]-1, n = B._rowIndex[i]-1; ; )
+	{
+	    const u_int	j = (m <   _rowIndex[i+1]-1 ?   _columns[m]-1
+						    :   ncol());
+	    const u_int	k = (n < B._rowIndex[i+1]-1 ? B._columns[n]-1
+						    : B.ncol());
+#else
 	for (u_int m = _rowIndex[i], n = B._rowIndex[i]; ; )
 	{
 	    const u_int	j = (m <   _rowIndex[i+1] ?   _columns[m]
 						  :   ncol());
 	    const u_int	k = (n < B._rowIndex[i+1] ? B._columns[n]
 						  : B.ncol());
-	    
+#endif
 	    if (j == k)		// 両方の行列が(i, j(=k))成分を持つ？
 	    {
 		if (j == ncol())	// 両方の行列について調べ終えていれば...
 		    break;		// 脱出して次の行を処理
-		
 		S.setCol(j, op(_values[m], B._values[n]));
 		++m;
 		++n;
@@ -951,10 +986,15 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
 	    }
 	}
     }
-
+#ifdef BASE1_INDEX
+    for (u_int m = _rowIndex[i]-1; m < _rowIndex[i+1]-1; ++m)
+    {
+	const int	n = B.index(j, _columns[m]-1);
+#else
     for (u_int m = _rowIndex[i]; m < _rowIndex[i+1]; ++m)
     {
 	const int	n = B.index(j, _columns[m]);
+#endif
 	if (n >= 0)
 	{
 	    exist = true;
@@ -986,14 +1026,24 @@ SparseMatrix<T, SYM>::index(u_int i, u_int j, bool throwExcept) const
 	throw std::invalid_argument("TU::SparseMatrix<T, SYM>::index(): invalid row index!");
     
   // 指定された列番号に対応する成分がこの行にあるか2分法によって調べる．
+#ifdef BASE1_INDEX
+    for (u_int low = _rowIndex[i]-1, high = _rowIndex[i+1]-1; low != high; )
+#else
     for (u_int low = _rowIndex[i], high = _rowIndex[i+1]; low != high; )
+#endif
     {
 	u_int	mid = (low + high) / 2;
-
+#ifdef BASE1_INDEX
+	if (j < _columns[mid]-1)
+	    high = mid;
+	else if (j > _columns[mid]-1)
+	    low = mid + 1;
+#else
 	if (j < _columns[mid])
 	    high = mid;
 	else if (j > _columns[mid])
 	    low = mid + 1;
+#endif
 	else
 	    return mid;
     }
@@ -1056,7 +1106,11 @@ operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
 	if (SYM2)
 	{
 	    for (u_int n = A._rowIndex[j]; n < A._rowIndex[j+1]; ++n)
+#ifdef BASE1_INDEX
+		a[j] += v[A._columns[n-1]-1] * A._values[n-1];
+#else
 		a[j] += v[A._columns[n]] * A._values[n];
+#endif
 	}
     }
 
