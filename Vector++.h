@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.46 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.47 2011-11-11 02:04:51 ueshiba Exp $
  */
 /*!
   \file		Vector++.h
@@ -1267,9 +1267,10 @@ Matrix<T, B, R>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
     + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
     - \TUskew{n}{}\sin\theta
   \f]
-  なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
+  それぞれ回転角と回転軸となる．
  \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す．
- \param s	回転角のsin値，すなわち\f$\sin\theta\f$を返す．
+ \param s	回転角のsin値，すなわち\f$\sin\theta (\ge 0)\f$を返す．
  \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
  \throw std::invalid_argument	3x3行列でない場合に送出
 */
@@ -1281,8 +1282,8 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
 
   // Compute cosine and sine of rotation angle.
     const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
-    c = (trace - 1.0) / 2.0;
-    s = std::sqrt((trace + 1.0)*(3.0 - trace)) / 2.0;
+    c = (trace - T(1)) / T(2);
+    s = std::sqrt((trace + T(1))*(T(3) - trace)) / T(2);
 
   // Compute rotation axis.
     vector3_type	n;
@@ -1302,7 +1303,8 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
     + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
     - \TUskew{n}{}\sin\theta
   \f]
-  なる\f$\theta\f$と\f$\TUvec{n}{}\f$がそれぞれ回転角と回転軸となる．
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
+  それぞれ回転角と回転軸となる．
  \return			回転角と回転軸を表す3次元ベクトル，すなわち
 				\f$\theta\TUvec{n}{}\f$
  \throw invalid_argument	3x3行列でない場合に送出
@@ -1321,10 +1323,10 @@ Matrix<T, B, R>::rot2axis() const
     if (s + T(1) == T(1))		// s << 1 ?
 	return axis;
     const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
-    if (trace > 1.0)		// cos > 0 ?
-	return  axis *= ( std::asin(s) / s);
+    if (trace > T(1))			// cos > 0 ?
+	return  axis *= (std::asin(s) / s);
     else
-	return  axis *= (-std::asin(s) / s);
+	return  axis *= ((T(M_PI) - std::asin(s)) / s);
 }
 
 //! この3次元回転行列から四元数を取り出す．
@@ -1335,7 +1337,7 @@ Matrix<T, B, R>::rot2axis() const
     + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
     - \TUskew{n}{}\sin\theta
   \f]
-  なる\f$\theta\f$と\f$\TUvec{n}{}\f$に対して，四元数は
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$に対して，四元数は
   \f[
     \TUvec{q}{} \equiv
     \TUbeginarray{c}
@@ -1353,7 +1355,7 @@ Matrix<T, B, R>::rot2quaternion() const
 	throw std::invalid_argument("TU::Matrix<T>::rot2quaternion: input matrix must be 3x3!!");
 
     vector4_type	q;
-    q[0] = 0.5 * std::sqrt(trace() + 1);
+    q[0] = T(0.5) * std::sqrt(trace() + T(1));
     if (q[0] + T(1) == T(1))	// q[0] << 1 ?
     {
 	Vector<T>	eval;
@@ -1362,9 +1364,9 @@ Matrix<T, B, R>::rot2quaternion() const
     else
     {
 	const Matrix<T>&	S = trns() - *this;
-	q[1] = 0.25 * S[2][1] / q[0];
-	q[2] = 0.25 * S[0][2] / q[0];
-	q[3] = 0.25 * S[1][0] / q[0];
+	q[1] = T(0.25) * S[2][1] / q[0];
+	q[2] = T(0.25) * S[0][2] / q[0];
+	q[3] = T(0.25) * S[1][0] / q[0];
     }
 
     return q;
