@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.47 2011-11-11 02:04:51 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.48 2011-11-11 07:31:17 ueshiba Exp $
  */
 /*!
   \file		Vector++.h
@@ -1282,8 +1282,8 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
 
   // Compute cosine and sine of rotation angle.
     const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
-    c = (trace - T(1)) / T(2);
-    s = std::sqrt((trace + T(1))*(T(3) - trace)) / T(2);
+    c = T(0.5) * (trace - T(1));
+    s = T(0.5) * std::sqrt((T(1) + trace)*(T(3) - trace));
 
   // Compute rotation axis.
     vector3_type	n;
@@ -1315,18 +1315,17 @@ Matrix<T, B, R>::rot2axis() const
     if (nrow() != 3 || ncol() != 3)
 	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
 
+    const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2],
+		s2 = std::sqrt((T(1) + trace)*(T(3) - trace));	// 2*sin
+    if (s2 + T(1) == T(1))			// sin << 1 ?
+	return vector3_type();			// zero vector
+    
     vector3_type	axis;
-    axis[0] = ((*this)[1][2] - (*this)[2][1]) * 0.5;
-    axis[1] = ((*this)[2][0] - (*this)[0][2]) * 0.5;
-    axis[2] = ((*this)[0][1] - (*this)[1][0]) * 0.5;
-    const T	s = std::sqrt(axis.square());
-    if (s + T(1) == T(1))		// s << 1 ?
-	return axis;
-    const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
-    if (trace > T(1))			// cos > 0 ?
-	return  axis *= (std::asin(s) / s);
-    else
-	return  axis *= ((T(M_PI) - std::asin(s)) / s);
+    axis[0] = (*this)[1][2] - (*this)[2][1];
+    axis[1] = (*this)[2][0] - (*this)[0][2];
+    axis[2] = (*this)[0][1] - (*this)[1][0];
+
+    return axis * (std::atan2(s2, trace - T(1)) / s2);
 }
 
 //! この3次元回転行列から四元数を取り出す．
