@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.20 2011-11-22 07:09:35 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.21 2011-11-22 07:26:39 ueshiba Exp $
  */
 /*!
   \file		mmInstructions.h
@@ -82,7 +82,7 @@ namespace TU
 *  Œ^’è‹`								*
 ************************************************************************/
   template <class T, class B>
-  class mmType
+  class mmVector
   {
     public:
       typedef T		ElmType;
@@ -91,7 +91,7 @@ namespace TU
       enum		{ElmSiz = sizeof(ElmType),
 			 NElms  = sizeof(BaseType)/sizeof(ElmType)};
 
-      mmType(BaseType m) :_val(m)	{}
+      mmVector(BaseType m) :_val(m)	{}
       operator const BaseType&() const	{return _val;}
       operator BaseType&()		{return _val;}
 
@@ -111,10 +111,10 @@ namespace TU
   typedef __m64			mmBase;
 #endif
   template <class T>
-  class mmInt : public mmType<T, mmBase>
+  class mmInt : public mmVector<T, mmBase>
   {
     private:
-      typedef mmType<T, mmBase>		super;
+      typedef mmVector<T, mmBase>	super;
 
     public:
       typedef typename super::ElmType	ElmType;
@@ -141,12 +141,12 @@ namespace TU
 				mmNQWords = mmInt64::NElms;
 
 #if defined(AVX)
-  typedef mmType<float,  __m256>	mmFlt;
-  typedef mmType<double, __m256d>	mmDbl;
+  typedef mmVector<float,  __m256>	mmFlt;
+  typedef mmVector<double, __m256d>	mmDbl;
 #elif defined(SSE)
-  typedef mmType<float,  __m128>	mmFlt;
+  typedef mmVector<float,  __m128>	mmFlt;
 #  if defined(SSE2)    
-  typedef mmType<double, __m128d>	mmDbl;
+  typedef mmVector<double, __m128d>	mmDbl;
 #  endif
 #endif    
 
