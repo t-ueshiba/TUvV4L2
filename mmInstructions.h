@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.21 2011-11-22 07:26:39 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.22 2011-11-22 20:02:31 ueshiba Exp $
  */
 /*!
   \file		mmInstructions.h
@@ -82,7 +82,7 @@ namespace TU
 *  å^íËã`								*
 ************************************************************************/
   template <class T, class B>
-  class mmVector
+  class mmVecBase
   {
     public:
       typedef T		ElmType;
@@ -91,7 +91,7 @@ namespace TU
       enum		{ElmSiz = sizeof(ElmType),
 			 NElms  = sizeof(BaseType)/sizeof(ElmType)};
 
-      mmVector(BaseType m) :_val(m)	{}
+      mmVecBase(BaseType m) :_val(m)	{}
       operator const BaseType&() const	{return _val;}
       operator BaseType&()		{return _val;}
 
@@ -111,29 +111,29 @@ namespace TU
   typedef __m64			mmBase;
 #endif
   template <class T>
-  class mmInt : public mmVector<T, mmBase>
+  class mmVec : public mmVecBase<T, mmBase>
   {
     private:
-      typedef mmVector<T, mmBase>	super;
+      typedef mmVecBase<T, mmBase>	super;
 
     public:
       typedef typename super::ElmType	ElmType;
       typedef typename super::BaseType	BaseType;
       
-      mmInt(mmBase m) :super(m)		{}
+      mmVec(BaseType m)	:super(m)	{}
 
       using	super::operator BaseType&;
       using	super::operator const BaseType&;
   };
     
-  typedef mmInt<s_char>		mmInt8;
-  typedef mmInt<u_char>		mmUInt8;
-  typedef mmInt<short>		mmInt16;
-  typedef mmInt<u_short>	mmUInt16;
-  typedef mmInt<int>		mmInt32;
-  typedef mmInt<u_int>		mmUInt32;
-  typedef mmInt<int64_t>	mmInt64;
-  typedef mmInt<u_int64_t>	mmUInt64;
+  typedef mmVec<s_char>		mmInt8;
+  typedef mmVec<u_char>		mmUInt8;
+  typedef mmVec<short>		mmInt16;
+  typedef mmVec<u_short>	mmUInt16;
+  typedef mmVec<int>		mmInt32;
+  typedef mmVec<u_int>		mmUInt32;
+  typedef mmVec<int64_t>	mmInt64;
+  typedef mmVec<u_int64_t>	mmUInt64;
 
   static const int		mmNBytes  = mmInt8::NElms,
 				mmNWords  = mmInt16::NElms,
@@ -141,14 +141,51 @@ namespace TU
 				mmNQWords = mmInt64::NElms;
 
 #if defined(AVX)
-  typedef mmVector<float,  __m256>	mmFlt;
-  typedef mmVector<double, __m256d>	mmDbl;
+  typedef __m256d		mmDBase;
+  typedef __m256		mmFBase;
 #elif defined(SSE)
-  typedef mmVector<float,  __m128>	mmFlt;
+  typedef __m128		mmFBase;
 #  if defined(SSE2)    
-  typedef mmVector<double, __m128d>	mmDbl;
+  typedef __m128d		mmDBase;
+#  endif    
+#endif
+
+#if defined(SSE)
+  template <>
+  class mmVec<float> : public mmVecBase<float, mmFBase>
+  {
+    private:
+      typedef mmVecBase<float, mmFBase>		super;
+
+    public:
+      typedef typename super::ElmType		ElmType;
+      typedef typename super::BaseType		BaseType;
+      
+      mmVec(BaseType m) :super(m)		{}
+
+      using	super::operator BaseType&;
+      using	super::operator const BaseType&;
+  };
+  typedef mmVec<float>		mmFlt;
+#  if defined(SSE2)
+  template <>
+  class mmVec<double> : public mmVecBase<double, mmDBase>
+  {
+    private:
+      typedef mmVecBase<double, mmDBase>	super;
+
+    public:
+      typedef typename super::ElmType		ElmType;
+      typedef typename super::BaseType		BaseType;
+      
+      mmVec(BaseType m) :super(m)		{}
+
+      using	super::operator BaseType&;
+      using	super::operator const BaseType&;
+  };
+  typedef mmVec<double>		mmDbl;
 #  endif
-#endif    
+#endif
 
 /************************************************************************
 *  êßå‰ñΩóﬂ								*
@@ -158,105 +195,35 @@ namespace TU
 /************************************************************************
 *  Load/Store								*
 ************************************************************************/
-  template <class T> static void  mmStoreRMost(typename T::ElmType* p, T x);
 #if defined(SSE2)
-  static inline mmInt8
-  mmLoad(const s_char* p)		{return _mm_load_si128((mmBase*)p);}
-  static inline mmUInt8
-  mmLoad(const u_char* p)		{return _mm_load_si128((mmBase*)p);}
-  static inline mmInt16
-  mmLoad(const short* p)		{return _mm_load_si128((mmBase*)p);}
-  static inline mmUInt16
-  mmLoad(const u_short* p)		{return _mm_load_si128((mmBase*)p);}
-  static inline mmInt32
-  mmLoad(const int* p)			{return _mm_load_si128((mmBase*)p);}
-  static inline mmUInt32
-  mmLoad(const u_int* p)		{return _mm_load_si128((mmBase*)p);}
-  static inline mmInt64
-  mmLoad(const int64_t* p)		{return _mm_load_si128((mmBase*)p);}
-  static inline mmUInt64
-  mmLoad(const u_int64_t* p)		{return _mm_load_si128((mmBase*)p);}
+  template <class T> static inline mmVec<T>
+  mmLoad(const T* p)			{return _mm_load_si128((mmBase*)p);}
 #  if defined(SSE3)
-  static inline mmInt8
-  mmLoadU(const s_char* p)		{return _mm_lddqu_si128((mmBase*)p);}
-  static inline mmUInt8
-  mmLoadU(const u_char* p)		{return _mm_lddqu_si128((mmBase*)p);}
-  static inline mmInt16
-  mmLoadU(const short* p)		{return _mm_lddqu_si128((mmBase*)p);}
-  static inline mmUInt16
-  mmLoadU(const u_short* p)		{return _mm_lddqu_si128((mmBase*)p);}
-  static inline mmInt32
-  mmLoadU(const int* p)			{return _mm_lddqu_si128((mmBase*)p);}
-  static inline mmUInt32
-  mmLoadU(const u_int* p)		{return _mm_lddqu_si128((mmBase*)p);}
-  static inline mmInt64
-  mmLoadU(const int64_t* p)		{return _mm_lddqu_si128((mmBase*)p);}
-  static inline mmUInt64
-  mmLoadU(const u_int64_t* p)		{return _mm_lddqu_si128((mmBase*)p);}
-#  else
-  static inline mmInt8
-  mmLoadU(const s_char* p)		{return _mm_loadu_si128((mmBase*)p);}
-  static inline mmUInt8
-  mmLoadU(const u_char* p)		{return _mm_loadu_si128((mmBase*)p);}
-  static inline mmInt16
-  mmLoadU(const short* p)		{return _mm_loadu_si128((mmBase*)p);}
-  static inline mmUInt16
-  mmLoadU(const u_short* p)		{return _mm_loadu_si128((mmBase*)p);}
-  static inline mmInt32
-  mmLoadU(const int* p)			{return _mm_loadu_si128((mmBase*)p);}
-  static inline mmUInt32
-  mmLoadU(const u_int* p)		{return _mm_loadu_si128((mmBase*)p);}
-  static inline mmInt64
-  mmLoadU(const int64_t* p)		{return _mm_loadu_si128((mmBase*)p);}
-  static inline mmUInt64
-  mmLoadU(const u_int64_t* p)		{return _mm_loadu_si128((mmBase*)p);}
+  template <class T> static inline mmVec<T>
+  mmLoadU(const T* p)			{return _mm_lddqu_si128((mmBase*)p);}
+#  else	// !SSE3
+  template <class T> static inline mmVec<T>
+  mmLoadU(const T* p)			{return _mm_loadu_si128((mmBase*)p);}
 #  endif
-  template <class T> static inline void
-  mmStore(typename T::ElmType* p, T x)	{_mm_store_si128((mmBase*)p, x);}
-  template <class T> static inline void
-  mmStoreU(typename T::ElmType* p, T x)	{_mm_storeu_si128((mmBase*)p, x);}
-#else
-  static inline mmInt8
-  mmLoad(const s_char* p)		{return *((mmBase*)p);}
-  static inline mmUInt8
-  mmLoad(const u_char* p)		{return *((mmBase*)p);}
-  static inline mmInt16
-  mmLoad(const short* p)		{return *((mmBase*)p);}
-  static inline mmUInt16
-  mmLoad(const u_short* p)		{return *((mmBase*)p);}
-  static inline mmInt32
-  mmLoad(const int* p)			{return *((mmBase*)p);}
-  static inline mmUInt32
-  mmLoad(const u_int* p)		{return *((mmBase*)p);}
-  static inline mmInt64
-  mmLoad(const int64_t* p)		{return *((mmBase*)p);}
-  static inline mmUInt64
-  mmLoad(const u_int64_t* p)		{return *((mmBase*)p);}
-  static inline mmInt8
-  mmLoadU(const s_char* p)		{return *((mmBase*)p);}
-  static inline mmUInt8
-  mmLoadU(const u_char* p)		{return *((mmBase*)p);}
-  static inline mmInt16
-  mmLoadU(const short* p)		{return *((mmBase*)p);}
-  static inline mmUInt16
-  mmLoadU(const u_short* p)		{return *((mmBase*)p);}
-  static inline mmInt32
-  mmLoadU(const int* p)			{return *((mmBase*)p);}
-  static inline mmUInt32
-  mmLoadU(const u_int* p)		{return *((mmBase*)p);}
-  static inline mmInt64
-  mmLoadU(const int64_t* p)		{return *((mmBase*)p);}
-  static inline mmUInt64
-  mmLoadU(const u_int64_t* p)		{return *((mmBase*)p);}
-  template <class T> static inline void
-  mmStore(typename T::ElmType* p, T x)	{*((mmBase*)p) = x;}
-  template <class T> static inline void
-  mmStoreU(typename T::ElmType* p, T x)	{*((mmBase*)p) = x;}
+  template <class V> static inline void
+  mmStore(typename V::ElmType* p, V x)	{_mm_store_si128((mmBase*)p, x);}
+  template <class V> static inline void
+  mmStoreU(typename V::ElmType* p, V x)	{_mm_storeu_si128((mmBase*)p, x);}
+#else	// !SSE2
+  template <class T> static inline mmVec<T>
+  mmLoad(const T* p)			{return *((mmBase*)p);}
+  template <class T> static inline mmVec<T>
+  mmLoadU(const T* p)			{return *((mmBase*)p);}
+  template <class V> static inline void
+  mmStore(typename V::ElmType* p, V x)	{*((mmBase*)p) = x;}
+  template <class V> static inline void
+  mmStoreU(typename V::ElmType* p, V x)	{*((mmBase*)p) = x;}
 #endif
+
 #if defined(SSE)
-  static inline mmFlt
+  template <> inline mmFlt
   mmLoad(const float* p)		{return _mm_load_ps(p);}
-  static inline mmFlt
+  template <> inline mmFlt
   mmLoadU(const float* p)		{return _mm_loadu_ps(p);}
   static inline mmFlt
   mmLoadRMost(const float* p)		{return _mm_load_ss(p);}
@@ -264,21 +231,22 @@ namespace TU
   mmStore(float* p, mmFlt x)		{_mm_store_ps(p, x);}
   template <> inline void
   mmStoreU(float* p, mmFlt x)		{_mm_storeu_ps(p, x);}
-  template <> inline void
+  static inline void
   mmStoreRMost(float* p, mmFlt x)	{_mm_store_ss(p, x);}
 #endif
+
 #if defined(SSE2)
-  static inline mmDbl
+  template <> inline mmDbl
   mmLoad(const double* p)		{return _mm_load_pd(p);}
-  static inline mmDbl
+  template <> inline mmDbl
   mmLoadU(const double* p)		{return _mm_loadu_pd(p);}
   static inline mmDbl
   mmLoadRMost(const double* p)		{return _mm_load_sd(p);}
-  template <> inline void
+  template <> void
   mmStore(double* p, mmDbl x)		{_mm_store_pd(p, x);}
-  template <> inline void
+  template <> void
   mmStoreU(double* p, mmDbl x)		{_mm_storeu_pd(p, x);}
-  template <> inline void
+  inline void
   mmStoreRMost(double* p, mmDbl x)	{_mm_store_sd(p, x);}
 #endif
 
@@ -493,12 +461,12 @@ namespace TU
 *  óvëfÇÃÉVÉtÉg								*
 ************************************************************************/
 #if defined(SSE2)
-  template <u_int N, class T> static inline mmInt<T>
-  mmShiftElmL(mmInt<T> x)		{return _mm_slli_si128(
-						  x, N*mmInt<T>::ElmSiz);}
-  template <u_int N, class T> static inline mmInt<T>
-  mmShiftElmR(mmInt<T> x)		{return _mm_srli_si128(
-						  x, N*mmInt<T>::ElmSiz);}
+  template <u_int N, class T> static inline mmVec<T>
+  mmShiftElmL(mmVec<T> x)		{return _mm_slli_si128(
+						  x, N*mmVec<T>::ElmSiz);}
+  template <u_int N, class T> static inline mmVec<T>
+  mmShiftElmR(mmVec<T> x)		{return _mm_srli_si128(
+						  x, N*mmVec<T>::ElmSiz);}
   template <u_int N> static inline mmFlt
   mmShiftElmL(mmFlt x)			{return _mm_castsi128_ps(
 						  _mm_slli_si128(
@@ -520,12 +488,12 @@ namespace TU
 						    _mm_castpd_si128(x),
 						    N*mmDbl::ElmSiz));}
 #else
-  template <u_int N, class T> static inline mmInt<T>
-  mmShiftElmL(mmInt<T> x)		{return _mm_slli_si64(
-						  x, 8*N*mmInt<T>::ElmSiz);}
-  template <u_int N, class T> static inline mmInt<T>
-  mmShiftElmR(mmInt<T> x)		{return _mm_srli_si64(
-						  x, 8*N*mmInt<T>::ElmSiz);}
+  template <u_int N, class T> static inline mmVec<T>
+  mmShiftElmL(mmVec<T> x)		{return _mm_slli_si64(
+						  x, 8*N*mmVec<T>::ElmSiz);}
+  template <u_int N, class T> static inline mmVec<T>
+  mmShiftElmR(mmVec<T> x)		{return _mm_srli_si64(
+						  x, 8*N*mmVec<T>::ElmSiz);}
 #endif
 
 /************************************************************************
@@ -668,7 +636,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  1/4Ç∏Ç¬ÇÃÇªÇÍÇºÇÍÇ…Ç¬Ç¢ÇƒóvëfÇ4Ç¬ï°êª					*
+*  1/4Ç∏Ç¬ÇÃÇªÇÍÇºÇÍÇ…Ç¬Ç¢ÇƒóvëfÇ4Ç¬ï°êª				*
 ************************************************************************/
 #if defined(SSE2)
   static inline mmInt8
@@ -1073,9 +1041,9 @@ namespace TU
   template <class T> static inline T
   mmCast(mmDbl x)			{return _mm_castpd_si128(x);}
   template <class T> static inline mmFlt
-  mmCastToFlt(mmInt<T> x)		{return _mm_castsi128_ps(x);}
+  mmCastToFlt(mmVec<T> x)		{return _mm_castsi128_ps(x);}
   template <class T> static inline mmDbl
-  mmCastToDbl(mmInt<T> x)		{return _mm_castsi128_pd(x);}
+  mmCastToDbl(mmVec<T> x)		{return _mm_castsi128_pd(x);}
 #endif
     
 /************************************************************************
@@ -1325,23 +1293,23 @@ namespace TU
 *  ò_óùââéZ								*
 ************************************************************************/
 #if defined(SSE2)
-  template <class T> static inline mmInt<T>
-  operator &(mmInt<T> x, mmInt<T> y)	{return _mm_and_si128(x, y);}
-  template <class T> static inline mmInt<T>
-  operator |(mmInt<T> x, mmInt<T> y)	{return _mm_or_si128(x, y);}
-  template <class T> static inline mmInt<T>
-  mmAndNot(mmInt<T> x, mmInt<T> y)	{return _mm_andnot_si128(x, y);}
-  template <class T> static inline mmInt<T>
-  operator ^(mmInt<T> x, mmInt<T> y)	{return _mm_xor_si128(x, y);}
+  template <class T> static inline mmVec<T>
+  operator &(mmVec<T> x, mmVec<T> y)	{return _mm_and_si128(x, y);}
+  template <class T> static inline mmVec<T>
+  operator |(mmVec<T> x, mmVec<T> y)	{return _mm_or_si128(x, y);}
+  template <class T> static inline mmVec<T>
+  mmAndNot(mmVec<T> x, mmVec<T> y)	{return _mm_andnot_si128(x, y);}
+  template <class T> static inline mmVec<T>
+  operator ^(mmVec<T> x, mmVec<T> y)	{return _mm_xor_si128(x, y);}
 #else
-  template <class T> static inline mmInt<T>
-  operator &(mmInt<T> x, mmInt<T> y)	{return _mm_and_si64(x, y);}
-  template <class T> static inline mmInt<T>
-  operator |(mmInt<T> x, mmInt<T> y)	{return _mm_or_si64(x, y);}
-  template <class T> static inline mmInt<T>
-  mmAndNot(mmInt<T> x, mmInt<T> y)	{return _mm_andnot_si64(x, y);}
-  template <class T> static inline mmInt<T>
-  operator ^(mmInt<T> x, mmInt<T> y)	{return _mm_xor_si64(x, y);}
+  template <class T> static inline mmVec<T>
+  operator &(mmVec<T> x, mmVec<T> y)	{return _mm_and_si64(x, y);}
+  template <class T> static inline mmVec<T>
+  operator |(mmVec<T> x, mmVec<T> y)	{return _mm_or_si64(x, y);}
+  template <class T> static inline mmVec<T>
+  mmAndNot(mmVec<T> x, mmVec<T> y)	{return _mm_andnot_si64(x, y);}
+  template <class T> static inline mmVec<T>
+  operator ^(mmVec<T> x, mmVec<T> y)	{return _mm_xor_si64(x, y);}
 #endif
 #if defined(SSE)
   static inline mmFlt
@@ -1525,8 +1493,8 @@ namespace TU
 /************************************************************************
 *  íPçÄÉ}ÉCÉiÉXââéZ							*
 ************************************************************************/
-  template <class T> static inline mmInt<T>
-  operator -(mmInt<T> x)		{return mmZero<mmInt<T> >() - x;}
+  template <class T> static inline mmVec<T>
+  operator -(mmVec<T> x)		{return mmZero<mmVec<T> >() - x;}
 #if defined(SSE)
   static inline mmFlt
   operator -(mmFlt x)			{return mmZero<mmFlt>() - x;}
@@ -1632,10 +1600,10 @@ namespace TU
 /************************************************************************
 *  Min/Max								*
 ************************************************************************/
-  template <class T> static inline mmInt<T>
-  mmMin(mmInt<T> x, mmInt<T> y)	{return mmSelect(x, y, x < y);}
-  template <class T> static inline mmInt<T>
-  mmMax(mmInt<T> x, mmInt<T> y)		{return mmSelect(x, y, x > y);}
+  template <class T> static inline mmVec<T>
+  mmMin(mmVec<T> x, mmVec<T> y)	{return mmSelect(x, y, x < y);}
+  template <class T> static inline mmVec<T>
+  mmMax(mmVec<T> x, mmVec<T> y)		{return mmSelect(x, y, x > y);}
 #if defined(SSE)
 #  if defined(SSE2)
 #    if defined(SSE4)
@@ -1691,10 +1659,10 @@ namespace TU
 /************************************************************************
 *  ÇÊÇËè¨Ç≥Ç¢Ç©ìôÇµÇ¢Å^ÇÊÇËëÂÇ´Ç¢Ç©ìôÇµÇ¢				*
 ************************************************************************/
-  template <class T> static inline mmInt<T>
-  operator >=(mmInt<T> x, mmInt<T> y)	{return mmMax(x, y) == x;}
-  template <class T> static inline mmInt<T>
-  operator <=(mmInt<T> x, mmInt<T> y)	{return mmMin(x, y) == x;}
+  template <class T> static inline mmVec<T>
+  operator >=(mmVec<T> x, mmVec<T> y)	{return mmMax(x, y) == x;}
+  template <class T> static inline mmVec<T>
+  operator <=(mmVec<T> x, mmVec<T> y)	{return mmMin(x, y) == x;}
     
 /************************************************************************
 *  ê‚ëŒíl								*
@@ -1723,8 +1691,8 @@ namespace TU
 /************************************************************************
 *  ïΩãœ									*
 ************************************************************************/
-  template <class T> static inline mmInt<T>
-  mmAvg(mmInt<T> x, mmInt<T> y)		{return (x + y) >> 1;}
+  template <class T> static inline mmVec<T>
+  mmAvg(mmVec<T> x, mmVec<T> y)		{return (x + y) >> 1;}
 #if defined(SSE2)
   template <> inline mmUInt8
   mmAvg(mmUInt8 x, mmUInt8 y)		{return _mm_avg_epu8(x, y);}
@@ -1740,8 +1708,8 @@ namespace TU
 /************************************************************************
 *  ç∑ÇÃîºï™								*
 ************************************************************************/
-  template <class T> static inline mmInt<T>
-  mmSubAvg(mmInt<T> x, mmInt<T> y)	{return (x - y) >> 1;}
+  template <class T> static inline mmVec<T>
+  mmSubAvg(mmVec<T> x, mmVec<T> y)	{return (x - y) >> 1;}
   
 /************************************************************************
 *  ì‡êœ									*
