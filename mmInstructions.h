@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.19 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.20 2011-11-22 07:09:35 ueshiba Exp $
  */
 /*!
   \file		mmInstructions.h
@@ -36,6 +36,12 @@
 
 #include "TU/types.h"
 
+#if defined(AVX2)
+#  define AVX
+#endif
+#if defined(AVX)
+#  define SSE4
+#endif
 #if defined(SSE4)
 #  define SSSE3
 #endif
@@ -52,7 +58,9 @@
 #  define MMX
 #endif
 
-#if defined(SSE4)		// Core2 with Penryn core(45nm)
+#if defined(AVX)		// Core-i7 Ivy-Bridge (2012)
+#  include <immintrin.h>
+#elif defined(SSE4)		// Core2 with Penryn core(45nm)
 #  include <smmintrin.h>
 #  include <nmmintrin.h>
 #elif defined(SSSE3)		// Core2 (Jun. 2006)
@@ -73,28 +81,49 @@ namespace TU
 /************************************************************************
 *  å^íËã`								*
 ************************************************************************/
-#if defined(SSE2)
-  typedef __m128i	mmBase;
-#else
-  typedef __m64		mmBase;
-#endif
-  template <class T>
-  struct mmInt
+  template <class T, class B>
+  class mmType
   {
+    public:
       typedef T		ElmType;
+      typedef B		BaseType;
+      
       enum		{ElmSiz = sizeof(ElmType),
-			 NElms  = sizeof(mmBase)/sizeof(ElmType)};
+			 NElms  = sizeof(BaseType)/sizeof(ElmType)};
 
-      mmInt(mmBase m)	:_val(m)	{}
-      operator const mmBase&()	const	{return _val;}
-      operator mmBase&()		{return _val;}
+      mmType(BaseType m) :_val(m)	{}
+      operator const BaseType&() const	{return _val;}
+      operator BaseType&()		{return _val;}
 
       static u_int	floor(u_int n)	{return NElms*(n/NElms);}
       static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
 						 NElms*((n - 1)/NElms + 1));}
-      
+
     private:
-      mmBase		_val;
+      BaseType		_val;
+  };
+
+#if defined(AVX2)
+  typedef __m256i		mmBase;
+#elif defined(SSE2)
+  typedef __m128i		mmBase;
+#else
+  typedef __m64			mmBase;
+#endif
+  template <class T>
+  class mmInt : public mmType<T, mmBase>
+  {
+    private:
+      typedef mmType<T, mmBase>		super;
+
+    public:
+      typedef typename super::ElmType	ElmType;
+      typedef typename super::BaseType	BaseType;
+      
+      mmInt(mmBase m) :super(m)		{}
+
+      using	super::operator BaseType&;
+      using	super::operator const BaseType&;
   };
     
   typedef mmInt<s_char>		mmInt8;
@@ -110,44 +139,16 @@ namespace TU
 				mmNWords  = mmInt16::NElms,
 				mmNDWords = mmInt32::NElms,
 				mmNQWords = mmInt64::NElms;
-#if defined(SSE)
-  struct mmFlt
-  {
-      typedef float	ElmType;
-      enum		{ElmSiz = sizeof(ElmType),
-			 NElms  = sizeof(__m128)/sizeof(ElmType)};
 
-      mmFlt(__m128 m)	:_val(m)	{}
-      operator const __m128&()	const	{return _val;}
-      operator __m128&()		{return _val;}
-
-      static u_int	floor(u_int n)	{return NElms*(n/NElms);}
-      static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
-						 NElms*((n - 1)/NElms + 1));}
-
-    private:
-      __m128		_val;
-  };
-#endif
-#if defined(SSE2)
-  struct mmDbl
-  {
-      typedef double	ElmType;
-      enum		{ElmSiz = sizeof(ElmType),
-			 NElms  = sizeof(__m128)/sizeof(ElmType)};
-
-      mmDbl(__m128d m)	:_val(m)	{}
-      operator const __m128d&()	const	{return _val;}
-      operator __m128d&()		{return _val;}
-
-      static u_int	floor(u_int n)	{return NElms*(n/NElms);}
-      static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
-						 NElms*((n - 1)/NElms + 1));}
-
-    private:
-      __m128d		_val;
-  };
-#endif
+#if defined(AVX)
+  typedef mmType<float,  __m256>	mmFlt;
+  typedef mmType<double, __m256d>	mmDbl;
+#elif defined(SSE)
+  typedef mmType<float,  __m128>	mmFlt;
+#  if defined(SSE2)    
+  typedef mmType<double, __m128d>	mmDbl;
+#  endif
+#endif    
 
 /************************************************************************
 *  êßå‰ñΩóﬂ								*
@@ -667,7 +668,7 @@ namespace TU
 #endif
     
 /************************************************************************
-*  1/4Ç∏Ç¬ÇÃÇªÇÍÇºÇÍÇ…Ç¬Ç¢ÇƒóvëfÇ4Ç¬ï°êª				*
+*  1/4Ç∏Ç¬ÇÃÇªÇÍÇºÇÍÇ…Ç¬Ç¢ÇƒóvëfÇ4Ç¬ï°êª					*
 ************************************************************************/
 #if defined(SSE2)
   static inline mmInt8
@@ -1632,7 +1633,7 @@ namespace TU
 *  Min/Max								*
 ************************************************************************/
   template <class T> static inline mmInt<T>
-  mmMin(mmInt<T> x, mmInt<T> y)		{return mmSelect(x, y, x < y);}
+  mmMin(mmInt<T> x, mmInt<T> y)	{return mmSelect(x, y, x < y);}
   template <class T> static inline mmInt<T>
   mmMax(mmInt<T> x, mmInt<T> y)		{return mmSelect(x, y, x > y);}
 #if defined(SSE)
