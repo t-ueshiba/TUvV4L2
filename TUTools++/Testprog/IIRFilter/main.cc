@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.13 2009-09-09 07:07:40 ueshiba Exp $
+ *  $Id: main.cc,v 1.14 2011-12-07 08:06:41 ueshiba Exp $
  */
 #include <unistd.h>
 #ifdef WIN32
@@ -37,7 +37,7 @@ main(int argc, char* argv[])
     float		alpha = 1.0, th_low = 2.0, th_high = 5.0;
     bool		gaussian = false, laplacian = false;
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "a:l:h:GL")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "a:l:h:GL")) != -1; )
 	switch (c)
 	{
 	  case 'a':

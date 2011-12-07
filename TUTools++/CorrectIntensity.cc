@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.cc,v 1.8 2009-09-11 05:56:13 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.9 2011-12-07 08:06:31 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
@@ -36,49 +36,47 @@ namespace TU
 *  static functions							*
 ************************************************************************/
 #if defined(SSE)
+namespace mm
+{
 template <class T> static inline void
-mmCorrect(T* p, mmFlt a, mmFlt b)
+correct(T* p, F32vec a, F32vec b)
 {
-    const mmUInt8	val = mmLoadU((const u_char*)p);
+    const u_int		nelms = F32vec::size;
+    const Iu8vec	val = load((const u_char*)p);
 #  if defined(SSE2)
-    mmStoreU((u_char*)p,
-	     mmCvt<mmUInt8>(
-		 mmCvt<mmInt16>(
-		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(val)),
-		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-					mmShiftElmR<mmFlt::NElms>(val)))),
-		 mmCvt<mmInt16>(
-		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-					mmShiftElmR<2*mmFlt::NElms>(val))),
-		     mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-					mmShiftElmR<3*mmFlt::NElms>(val))))));
+    storeu((u_char*)p,
+	   cvt<u_char>(
+	       cvt<short>(
+		   cvt<int>(a + b * cvt<float>(val)),
+		   cvt<int>(a + b * cvt<float>(shift_r<nelms>(val)))),
+	       cvt<short>(
+		   cvt<int>(a + b * cvt<float>(shift_r<2*nelms>(val))),
+		   cvt<int>(a + b * cvt<float>(shift_r<3*nelms>(val))))));
 #  else
-    mmStoreU((u_char*)p,
-	     mmCvt<mmUInt8>(
-		 mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(val)),
-		 mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(
-				    mmShiftElmR<mmFlt::NElms>(val)))));
+    storeu((u_char*)p,
+	   cvt<u_char>(cvt<short>(a + b * cvt<float>(val)),
+		       cvt<short>(a + b * cvt<float>(shift_r<nelms>(val)))));
 #  endif
 }
 
 template <> inline void
-mmCorrect(short* p, mmFlt a, mmFlt b)
+correct(short* p, F32vec a, F32vec b)
 {
 #  if defined(SSE2)
-    const mmInt16	val = mmLoadU(p);
-    mmStoreU(p, mmCvt<mmInt16>(
-		 mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(val)),
-		 mmCvt<mmInt32>(a + b * mmCvt<mmFlt>(
-				    mmShiftElmR<mmFlt::NElms>(val)))));
+    const u_int		nelms = F32vec::size;
+    const Is16vec	val = loadu(p);
+    storeu(p, cvt<short>(cvt<int>(a + b * cvt<float>(val)),
+			 cvt<int>(a + b * cvt<float>(shift_r<nelms>(val)))));
 #  else
-    mmStoreU(p, mmCvt<mmInt16>(a + b * mmCvt<mmFlt>(mmLoadU(p))));
+    storeu(p, cvt<short>(a + b * cvt<float>(loadu(p))));
 #  endif
 }
 
 template <> inline void
-mmCorrect(float* p, mmFlt a, mmFlt b)
+correct(float* p, F32vec a, F32vec b)
 {
-    mmStoreU(p, a + b * mmLoadU(p));
+    storeu(p, a + b * loadu(p));
+}
 }
 #endif
 
@@ -114,12 +112,13 @@ CorrectIntensity::operator()(Image<T>& image, u_int vs, u_int ve) const
 	T*		p = image[v];
 	T* const	q = p + image.width();
 #if defined(SSE)
-	const mmFlt	a = mmSetAll<mmFlt>(_offset),
-			b = mmSetAll<mmFlt>(_gain);
-	for (T* const r = q - mmNBytes/sizeof(T);
-	     p <= r; p += mmNBytes/sizeof(T))
-	    mmCorrect(p, a, b);
-	mmEmpty();
+	using namespace	mm;
+
+	const u_int	nelms = vec<T>::size;
+	const F32vec	a(_offset), b(_gain);
+	for (T* const r = q - nelms; p <= r; p += nelms)
+	    correct(p, a, b);
+	empty();
 #endif
 	for (; p < q; ++p)
 	    *p = val(*p);

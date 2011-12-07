@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.2 2009-07-09 04:19:26 ueshiba Exp $
+#  $Id: Makefile,v 1.3 2011-12-07 08:06:48 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -26,10 +26,11 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/IIRFilter.h \
 		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/types.h
+		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/utility.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -37,7 +38,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.2 $	|		\
+REV		= $(shell echo $Revision: 1.3 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -50,8 +51,9 @@ include $(PROJECT)/lib/p.mk
 
 ###
 main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/DericheConvolver.h \
 	/usr/local/include/TU/IIRFilter.h \
 	/usr/local/include/TU/mmInstructions.h

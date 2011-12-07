@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.14 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Warp.h,v 1.15 2011-12-07 08:06:31 ueshiba Exp $
  */
 /*!
   \file		Warp.h
@@ -99,7 +99,7 @@ class Warp
 			    u_int vs=0, u_int ve=0)		const	;
     Vector2f	operator ()(int u, int v)			const	;
 #if defined(SSE2)
-    mmFlt	src(int u, int v)				const	;
+    mm::F32vec	src(int u, int v)				const	;
 #endif
 
   private:
@@ -274,16 +274,15 @@ Warp::operator ()(int u, int v) const
   \param v	出力画像点の縦座標
   \return	出力画像点(u, v-1), (u, v)にマップされる入力画像点の2次元座標
 */
-inline mmFlt
+inline mm::F32vec
 Warp::src(int u, int v) const
 {
+    using namespace	mm;
+    
     const FracArray	&fp = _fracs[v-1], &fc = _fracs[v];
-    const mmInt16	tmp = mmSet<mmInt16>(fc.dv[u], fc.du[u],
-					     fp.dv[u], fp.du[u],
-					     fc.vs[u], fc.us[u],
-					     fp.vs[u], fp.us[u]);
-    return mmCvt<mmFlt>(tmp) +
-	   mmCvt<mmFlt>(mmShiftElmR<4>(tmp)) / mmSetAll<mmFlt>(128.0);
+    const Is16vec	tmp(fc.dv[u], fc.du[u], fp.dv[u], fp.du[u],
+			    fc.vs[u], fc.us[u], fp.vs[u], fp.us[u]);
+    return cvt<float>(tmp) + cvt<float>(shift_r<4>(tmp)) / F32vec(128.0);
 }
 #endif
 }
