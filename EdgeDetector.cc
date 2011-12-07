@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.17 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.18 2011-12-07 08:06:31 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
@@ -38,27 +38,29 @@ static const float	slant = 0.414214;	// tan(M_PI/8)
 *  static functions							*
 ************************************************************************/
 #if defined(SSE2)
-static inline mmInt32
-mmDir4(mmFlt eH, mmFlt eV)
+namespace mm
 {
-    mmInt32	l0 = mmCast<mmInt32>(eH < eV),
-		l1 = mmCast<mmInt32>(eH < -eV);
-    return ((l0 ^ l1) & mmSetAll<mmInt32>(0x2)) |
-	   (l1 & mmSetAll<mmInt32>(0x4));
+static inline Is32vec
+dir4(F32vec eH, F32vec eV)
+{
+    Is32vec	l0 = cast<int>(eH < eV),
+		l1 = cast<int>(eH < -eV);
+    return ((l0 ^ l1) & vec<int>(0x2)) | (l1 & vec<int>(0x4));
 }
 
-static inline mmInt32
-mmDir8(mmFlt eH, mmFlt eV)
+static inline Is32vec
+dir8(F32vec eH, F32vec eV)
 {
-    mmFlt	sH = mmSetAll<mmFlt>(slant) * eH,
-		sV = mmSetAll<mmFlt>(slant) * eV;
-    mmInt32	l0 = mmCast<mmInt32>(sH < eV),
-		l1 = mmCast<mmInt32>(eH < sV),
-		l2 = mmCast<mmInt32>(eH < -sV),
-		l3 = mmCast<mmInt32>(sH < -eV);
-    return (((l0 ^ l1) | (l2 ^ l3)) & mmSetAll<mmInt32>(0x1)) |
-	   ((l1 ^ l3) & mmSetAll<mmInt32>(0x2)) |
-	   (l3 & mmSetAll<mmInt32>(0x4));
+    F32vec	sH = F32vec(slant) * eH,
+		sV = F32vec(slant) * eV;
+    Is32vec	l0 = cast<int>(sH <  eV),
+		l1 = cast<int>(eH <  sV),
+		l2 = cast<int>(eH < -sV),
+		l3 = cast<int>(sH < -eV);
+    return (((l0 ^ l1) | (l2 ^ l3)) & Is32vec(0x1)) |
+	   ((l1 ^ l3) & Is32vec(0x2)) |
+	   (l3 & Is32vec(0x4));
+}
 }
 #endif
 
@@ -157,14 +159,17 @@ EdgeDetector::strength(const Image<float>& edgeH,
 	float*			dst = out[v];
 	const float* const	end = dst + out.width();
 #if defined(SSE)
+	using namespace		mm;
+	
+	const u_int		nelms = F32vec::size;
 	for (const float* const end2 = dst + 4*(out.width()/4); dst < end2; )
 	{
-	    const mmFlt	fH = mmLoadU(eH), fV = mmLoadU(eV);
+	    const F32vec	fH = loadu(eH), fV = loadu(eV);
 	    
-	    mmStoreU(dst, mmSqrt(fH * fH + fV * fV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    dst += mmFlt::NElms;
+	    storeu(dst, sqrt(fH * fH + fV * fV));
+	    eH  += nelms;
+	    eV  += nelms;
+	    dst += nelms;
 	}
 #endif
 	while (dst < end)
@@ -196,23 +201,25 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 	u_char*			dst = out[v];
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
-	for (const u_char* const end2 = dst + mmUInt8::floor(out.width());
-	     dst < end2; dst += mmUInt8::NElms)
+	using namespace		mm;
+
+	const u_int		nelms = F32vec::size;
+	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
+	     dst < end2; dst += Iu8vec::size)
 	{
-	    const mmInt32	d0 = mmDir4(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    const mmInt32	d1 = mmDir4(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    const mmInt32	d2 = mmDir4(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    const mmInt32	d3 = mmDir4(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    mmStoreU(dst, mmCvt<mmUInt8>(mmCvt<mmInt16>(d0, d1),
-					 mmCvt<mmInt16>(d2, d3)));
+	    const Is32vec	d0 = dir4(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d1 = dir4(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d2 = dir4(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d3 = dir4(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
 	}
 #endif
 	while (dst < end)
@@ -245,23 +252,25 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 	u_char*			dst = out[v];
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
-	for (const u_char* const end2 = dst + mmUInt8::floor(out.width());
-	     dst < end2; dst += mmUInt8::NElms)
+	using namespace		mm;
+
+	const u_int		nelms = F32vec::size;
+	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
+	     dst < end2; dst += Iu8vec::size)
 	{
-	    const mmInt32	d0 = mmDir8(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    const mmInt32	d1 = mmDir8(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    const mmInt32	d2 = mmDir8(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    const mmInt32	d3 = mmDir8(mmLoadU(eH), mmLoadU(eV));
-	    eH  += mmFlt::NElms;
-	    eV  += mmFlt::NElms;
-	    mmStoreU(dst, mmCvt<mmUInt8>(mmCvt<mmInt16>(d0, d1),
-					 mmCvt<mmInt16>(d2, d3)));
+	    const Is32vec	d0 = dir8(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d1 = dir8(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d2 = dir8(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d3 = dir8(load(eH), load(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
 	}
 #endif
 	while (dst < end)
