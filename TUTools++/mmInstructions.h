@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.23 2011-12-07 08:06:31 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.24 2011-12-08 01:06:44 ueshiba Exp $
  */
 /*!
   \file		mmInstructions.h
@@ -121,7 +121,6 @@ class vec
     vec(base_type m)	:_base(m)			{}
 			operator base_type()		{return _base;}
 
-    vec<value_type>	operator -()		const	;
     vec<value_type>&	flip_sign()			;
     vec<value_type>&	operator +=(vec<value_type> x)	;
     vec<value_type>&	operator -=(vec<value_type> x)	;
@@ -189,7 +188,6 @@ class vec<float>
     vec(base_type m)	:_base(m)			{}
 			operator base_type()		{return _base;}
 
-    vec<value_type>	operator -()		const	;
     vec<value_type>&	flip_sign()			;
     vec<value_type>&	operator +=(vec<value_type> x)	;
     vec<value_type>&	operator -=(vec<value_type> x)	;
@@ -250,7 +248,6 @@ class vec<double>
     vec(base_type m)	:_base(m)			{}
 			operator base_type()		{return _base;}
 
-    vec<value_type>	operator -()		const	;
     vec<value_type>&	flip_sign()			;
     vec<value_type>&	operator +=(vec<value_type> x)	;
     vec<value_type>&	operator -=(vec<value_type> x)	;
@@ -702,7 +699,7 @@ shuffle(vec<T> x, vec<T> y)						;
 #elif defined(SSE)
   MM_SHUFFLE_F4(float)
 #  if defined(SSE2)
-    MM_SHUFFLE_F2(double)
+  MM_SHUFFLE_F2(double)
 #  endif
 #endif
 
@@ -821,8 +818,14 @@ template <u_int I, class T> static T	extract(vec<T> x)		;
 #if defined(SSE)
   MM_EXTRACT(int16_t,   int16_t)
   MM_EXTRACT(u_int16_t, int16_t)
+#  if defined(SSE4)
+  MM_EXTRACT(int8_t,    int8_t)
+  MM_EXTRACT(u_int8_t,  int8_t)
+  MM_EXTRACT(int32_t,   int32_t)
+  MM_EXTRACT(u_int32_t, int32_t)
+#  endif
 #endif
-
+  
 #undef MM_EXTRACT
 
 /************************************************************************
@@ -1058,7 +1061,7 @@ MM_CVTUP_UI(u_int16_t, u_int32_t)	// u_short -> u_int
 MM_CVTDOWN_I(int16_t,  int8_t)		// short -> s_char
 MM_CVTDOWN_I(int32_t,  int16_t)		// int   -> short
 MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
-#if defined(AVX2)
+#if defined(SSE4)
   MM_CVTDOWN_UI(int32_t, u_int16_t)	// int -> u_short
 #endif
 
@@ -1287,12 +1290,6 @@ select(vec<T> mask, vec<T> x, vec<T> y)
     return (mask & x) | andnot(mask, y);
 }
 
-template <class T> static inline vec<T>
-select_not(vec<T> mask, vec<T> x, vec<T> y)
-{
-    return andnot(mask, x) | (mask & y);
-}
-
 /************************************************************************
 *  Compare operators							*
 ************************************************************************/
@@ -1317,6 +1314,9 @@ template <class T> static vec<T>	operator <=(vec<T> x, vec<T> y)	;
 MM_FUNC_2(operator ==, cmpeq, u_int8_t,  int8_t)
 MM_FUNC_2(operator ==, cmpeq, u_int16_t, int16_t)
 MM_FUNC_2(operator ==, cmpeq, u_int32_t, int32_t)
+#if defined(SSE4)
+  MM_FUNC_2(operator ==, cmpeq, u_int64_t, u_int64_t)
+#endif
 
 MM_COMPARES(int8_t,  int8_t)
 MM_COMPARES(int16_t, int16_t)
@@ -1366,6 +1366,12 @@ max(vec<T> x, vec<T> y)
     return select(x > y, x, y);
 }
 
+template <class T> inline vec<T>
+operator -(vec<T> x)
+{
+    return zero<T>() - x;
+}
+
 #define MM_ADD_SUB(type)						\
     MM_FUNC_2(operator +, add, type, type)				\
     MM_FUNC_2(operator -, sub, type, type)
@@ -1395,7 +1401,7 @@ MM_SAT_ADD_SUB(int16_t)
 MM_SAT_ADD_SUB(u_int8_t)
 MM_SAT_ADD_SUB(u_int16_t)
 
-// èÊèúéZ
+// èÊéZ
 MM_FUNC_2(operator *, mullo, int16_t, int16_t)
 MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
 
@@ -1434,7 +1440,10 @@ MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
   MM_FUNC_1(sqrt, sqrt, double, double)
 #endif
 
-#if defined(AVX2)
+#if defined(SSE4)
+  // èÊéZ
+  MM_FUNC_2(operator *, mullo, int32_t, int32_t)
+
   // Min/Max
   MM_MIN_MAX(int8_t)
   MM_MIN_MAX(int32_t)
@@ -1517,7 +1526,7 @@ diff(Iu16vec x, Iu16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
 /************************************************************************
 *  SVML(Short Vector Math Library) functions				*
 ************************************************************************/
-#if defined(SSE)
+#if defined(SSE) && defined(USE_SVML)
 template <class T> static vec<T>	erf(vec<T> x)			;
 template <class T> static vec<T>	erfc(vec<T> x)			;
 
@@ -1624,10 +1633,8 @@ template <class T> static vec<T>	atanh(vec<T> x)			;
 *  Member funcsionts of vec<T>						*
 ************************************************************************/
 #define MM_MEMBERS(type)						\
-    inline vec<type>							\
-    vec<type>::operator -()	const	{return zero<type>() - *this;}	\
     inline vec<type>&							\
-    vec<type>::flip_sign()		{return *this = operator -();}	\
+    vec<type>::flip_sign()		{return *this = -*this;}	\
     inline vec<type>&							\
     vec<type>::operator +=(vec<type> x)	{return *this = *this + x;}	\
     inline vec<type>&							\
@@ -1643,12 +1650,10 @@ template <class T> static vec<T>	atanh(vec<T> x)			;
     inline vec<type>&							\
     vec<type>::operator ^=(vec<type> x)	{return *this = *this ^ x;}	\
     inline vec<type>&							\
-    vec<type>::andnot(vec<type> x)	{return *this = mm::andnot(*this, x);}
+    vec<type>::andnot(vec<type> x)	{return *this = mm::andnot(x, *this);}
 
-template <class T> inline vec<T>
-vec<T>::operator -()		const	{return zero<type>() - *this;}
 template <class T> inline vec<T>&
-vec<T>::flip_sign()			{return *this = operator -();}
+vec<T>::flip_sign()			{return *this = -*this;}
 template <class T> inline vec<T>&
 vec<T>::operator +=(vec<T> x)		{return *this = *this + x;}
 template <class T> inline vec<T>&
@@ -1662,7 +1667,7 @@ vec<T>::operator |=(vec<T> x)		{return *this = *this | x;}
 template <class T> inline vec<T>&
 vec<T>::operator ^=(vec<T> x)		{return *this = *this ^ x;}
 template <class T> inline vec<T>&
-vec<T>::andnot(vec<T> x)		{return *this = mm::andnot(*this, x);}
+vec<T>::andnot(vec<T> x)		{return *this = mm::andnot(x, *this);}
 
 #if defined(SSE)
   MM_MEMBERS(float)
