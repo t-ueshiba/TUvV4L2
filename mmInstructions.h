@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.24 2011-12-08 01:06:44 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.25 2011-12-08 01:40:46 ueshiba Exp $
  */
 /*!
   \file		mmInstructions.h
@@ -34,9 +34,9 @@
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
 
-#include <sys/types.h>
 #include <iostream>
 #include <cassert>
+#include "TU/types.h"
 
 #if defined(AVX2)		// Haswell (2013?)
 #  define AVX

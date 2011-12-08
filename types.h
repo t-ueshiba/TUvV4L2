@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.32 2011-09-05 01:34:55 ueshiba Exp $
+ *  $Id: types.h,v 1.33 2011-12-08 01:40:46 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -185,7 +185,13 @@ typedef unsigned char		u_char;		//!< 符号なし8bit整数
 typedef unsigned short		u_short;	//!< 符号なし16bit整数
 typedef unsigned int		u_int;		//!< 符号なし32bit整数
 typedef unsigned long		u_long;		//!< 符号なし32/64bit整数
+typedef signed char		int8_t;		//!< 符号付き8bit整数
+typedef short			int16_t;	//!< 符号付き16bit整数
+typedef int			int32_t;	//!< 符号付き32bit整数
 typedef long long		int64_t;	//!< 符号付き64bit整数
+typedef unsigned char		u_int8_t;	//!< 符号なし8bit整数
+typedef unsigned short		u_int16_t;	//!< 符号なし16bit整数
+typedef unsigned int		u_int32_t;	//!< 符号なし32bit整数
 typedef unsigned long long	u_int64_t;	//!< 符号なし64bit整数
 #else
 #  define __PORT
