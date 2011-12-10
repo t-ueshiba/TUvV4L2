@@ -25,18 +25,16 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.cc,v 1.18 2011-12-07 08:06:31 ueshiba Exp $
+ *  $Id: EdgeDetector.cc,v 1.19 2011-12-10 23:04:48 ueshiba Exp $
  */
 #include "TU/EdgeDetector.h"
 #include "TU/mmInstructions.h"
 
-namespace TU
-{
-static const float	slant = 0.414214;	// tan(M_PI/8)
-    
 /************************************************************************
 *  static functions							*
 ************************************************************************/
+static const float	slant = 0.414214;	// tan(M_PI/8)
+    
 #if defined(SSE2)
 namespace mm
 {
@@ -64,6 +62,8 @@ dir8(F32vec eH, F32vec eV)
 }
 #endif
 
+namespace TU
+{
 //! あるエッジ点と指定された方向の近傍点が接続しているか調べる
 /*!
   \param edge	エッジ画像

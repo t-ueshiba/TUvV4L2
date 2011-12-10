@@ -25,13 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: CorrectIntensity.cc,v 1.9 2011-12-07 08:06:31 ueshiba Exp $
+ *  $Id: CorrectIntensity.cc,v 1.10 2011-12-10 23:04:48 ueshiba Exp $
  */
 #include "TU/CorrectIntensity.h"
 #include "TU/mmInstructions.h"
 
-namespace TU
-{
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -80,6 +78,8 @@ correct(float* p, F32vec a, F32vec b)
 }
 #endif
 
+namespace TU
+{
 static inline u_char
 toUChar(float val)
 {
