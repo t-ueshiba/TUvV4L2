@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.18 2011-12-07 08:06:31 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.19 2011-12-10 23:04:48 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -38,8 +38,6 @@
 #endif
 #include "TU/Warp.h"
 
-namespace TU
-{
 #if defined(SSE)
 namespace mm
 {
@@ -50,30 +48,32 @@ namespace mm
   }
 
   template <class T> static inline Is16vec
-  bilinearInterpolate(const Image<T>& in,
+  bilinearInterpolate(const TU::Image<T>& in,
 		      Is16vec us, Is16vec vs, Is16vec du, Is16vec dv)
   {
       const Is16vec	ue = us + Is16vec(1);
 #  if defined(SSE2)
-      Iu8vec		uc(0, 0, 0, in[extract<1>(vs)][extract<1>(ue)],
-			   0, 0, 0, in[extract<0>(vs)][extract<0>(ue)],
-			   0, 0, 0, in[extract<1>(vs)][extract<1>(us)],
-			   0, 0, 0, in[extract<0>(vs)][extract<0>(us)]);
+      Iu8vec		uc = cast<u_char>(Iu32vec(
+				*(u_int*)&in[extract<1>(vs)][extract<1>(ue)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+				*(u_int*)&in[extract<1>(vs)][extract<1>(us)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
 #  else
-      Iu8vec		uc(0, 0, 0, in[extract<0>(vs)][extract<0>(ue)],
-			   0, 0, 0, in[extract<0>(vs)][extract<0>(us)]);
+      Iu8vec		uc = cast<u_char>(Iu32vec(
+				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
 #  endif
       const Is16vec	ss = linearInterpolate(cvt<short>(uc),
 					       cvt_high<short>(uc), du);
-      vs = vs + Is16vec(1);
+      vs += Is16vec(1);
 #  if defined(SSE2)
-      uc = Iu8vec(0, 0, 0, in[extract<1>(vs)][extract<1>(ue)],
-		  0, 0, 0, in[extract<0>(vs)][extract<0>(ue)],
-		  0, 0, 0, in[extract<1>(vs)][extract<1>(us)],
-		  0, 0, 0, in[extract<0>(vs)][extract<0>(us)]);
+      uc = cast<u_char>(Iu32vec(*(u_int*)&in[extract<1>(vs)][extract<1>(ue)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+				*(u_int*)&in[extract<1>(vs)][extract<1>(us)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
 #  else
-      uc = Iu8vec(0, 0, 0, in[extract<0>(vs)][extract<0>(ue)],
-		  0, 0, 0, in[extract<0>(vs)][extract<0>(us)]);
+      uc = cast<u_char>(Iu32vec(*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
 #  endif
       return linearInterpolate(ss,
 			       linearInterpolate(cvt<short>(uc),
@@ -82,7 +82,7 @@ namespace mm
   }
     
   template <> inline Is16vec
-  bilinearInterpolate(const Image<u_char>& in,
+  bilinearInterpolate(const TU::Image<u_char>& in,
 		      Is16vec us, Is16vec vs, Is16vec du, Is16vec dv)
   {
       const Is16vec	ue = us + Is16vec(1);
@@ -115,7 +115,7 @@ namespace mm
 #  endif
       const Is16vec	ss = linearInterpolate(cvt<short>(uc),
 					       cvt_high<short>(uc), du);
-      vs = vs + Is16vec(1);
+      vs += Is16vec(1);
 #  if defined(SSE2)
       uc = Iu8vec(in[extract<7>(vs)][extract<7>(ue)],
 		  in[extract<6>(vs)][extract<6>(ue)],
@@ -151,6 +151,8 @@ namespace mm
 }
 #endif
     
+namespace TU
+{
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -217,7 +219,9 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
 
 	for (T* const outr = outq - Iu8vec::size; outp <= outr; )
 	{
-	    const u_int	nelms16_4 = Is16vec::size/4;
+	    using namespace	std;
+
+	    const u_int	npixels = Is16vec::size/4;
 	    Is16vec	uu = load(usp), vv = load(vsp);
 	    Iu8vec	du = load(dup), dv = load(dvp);
 	    Iu8vec	du4 = quadup<0>(du), dv4 = quadup<0>(dv);
@@ -226,23 +230,23 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
 						   cvt<short>(du4),
 						   cvt<short>(dv4)),
 			       bilinearInterpolate(in,
-						   shift_r<nelms16_4>(uu),
-						   shift_r<nelms16_4>(vv),
+						   shift_r<npixels>(uu),
+						   shift_r<npixels>(vv),
 						   cvt_high<short>(du4),
 						   cvt_high<short>(dv4))));
 	    outp += Iu8vec::size/4;
-
+	    
 	    du4 = quadup<1>(du);
 	    dv4 = quadup<1>(dv);
 	    storeu((u_char*)outp,
 		   cvt<u_char>(bilinearInterpolate(in,
-						   shift_r<2*nelms16_4>(uu),
-						   shift_r<2*nelms16_4>(vv),
+						   shift_r<2*npixels>(uu),
+						   shift_r<2*npixels>(vv),
 						   cvt<short>(du4),
 						   cvt<short>(dv4)),
 			       bilinearInterpolate(in,
-						   shift_r<3*nelms16_4>(uu),
-						   shift_r<3*nelms16_4>(vv),
+						   shift_r<3*npixels>(uu),
+						   shift_r<3*npixels>(vv),
 						   cvt_high<short>(du4),
 						   cvt_high<short>(dv4))));
 	    outp += Iu8vec::size/4;
@@ -258,8 +262,8 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
 						   cvt<short>(du4),
 						   cvt<short>(dv4)),
 			       bilinearInterpolate(in,
-						   shift_r<nelms16_4>(uu),
-						   shift_r<nelms16_4>(vv),
+						   shift_r<npixels>(uu),
+						   shift_r<npixels>(vv),
 						   cvt_high<short>(du4),
 						   cvt_high<short>(dv4))));
 	    outp += Iu8vec::size/4;
@@ -268,13 +272,13 @@ Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
 	    dv4 = quadup<3>(dv);
 	    storeu((u_char*)outp,
 		   cvt<u_char>(bilinearInterpolate(in,
-						   shift_r<2*nelms16_4>(uu),
-						   shift_r<2*nelms16_4>(vv),
+						   shift_r<2*npixels>(uu),
+						   shift_r<2*npixels>(vv),
 						   cvt<short>(du4),
 						   cvt<short>(dv4)),
 			       bilinearInterpolate(in,
-						   shift_r<3*nelms16_4>(uu),
-						   shift_r<3*nelms16_4>(vv),
+						   shift_r<3*npixels>(uu),
+						   shift_r<3*npixels>(vv),
 						   cvt_high<short>(du4),
 						   cvt_high<short>(dv4))));
 	    outp += Iu8vec::size/4;
@@ -319,9 +323,7 @@ Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
 #if defined(SSE)
 	using namespace	mm;
 
-	const u_int	nelms8  = Iu8vec::size;
-	const u_int	nelms16 = Is16vec::size;
-	for (u_char* const outr = outq - nelms8; outp <= outr; )
+	for (u_char* const outr = outq - Iu8vec::size; outp <= outr; )
 	{
 	    Iu8vec	du = load(dup), dv = load(dvp);
 	    Is16vec	out0 = bilinearInterpolate(in,

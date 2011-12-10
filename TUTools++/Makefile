@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.102 2011-09-30 01:06:39 ueshiba Exp $
+#  $Id: Makefile,v 1.103 2011-12-10 23:04:48 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -83,6 +83,7 @@ HDRS		= Array++.h \
 		Profiler.h \
 		Random.h \
 		Ransac.h \
+		Rectify.h \
 		SHOT602.h \
 		Serial.h \
 		SparseMatrix++.h \
@@ -138,7 +139,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.102 $	|		\
+REV		= $(shell echo $Revision: 1.103 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

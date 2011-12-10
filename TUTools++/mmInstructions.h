@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.25 2011-12-08 01:40:46 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.26 2011-12-10 23:04:48 ueshiba Exp $
  */
 /*!
   \file		mmInstructions.h
@@ -63,28 +63,30 @@
 #include <immintrin.h>
 
 #if defined(MMX)
-namespace TU
-{
+/*!
+  \namespace	mm
+  \brief	Intel SIMD命令を利用するためのクラスおよび関数を納める名前空間
+*/
 namespace mm
 {
 /************************************************************************
 *  SIMD vector types							*
 ************************************************************************/
 #if defined(AVX2)
-  typedef __m256i	ivec_t;
+  typedef __m256i	ivec_t;		//!< 整数ベクトルのSIMD型
 #elif defined(SSE2)  
-  typedef __m128i	ivec_t;
+  typedef __m128i	ivec_t;		//!< 整数ベクトルのSIMD型
 #else
-  typedef __m64		ivec_t;
+  typedef __m64		ivec_t;		//!< 整数ベクトルのSIMD型
 #endif
     
 #if defined(AVX)
-  typedef __m256	fvec_t;
-  typedef __m256d	dvec_t;
+  typedef __m256	fvec_t;		//!< floatベクトルのSIMD型
+  typedef __m256d	dvec_t;		//!< doubleベクトルのSIMD型
 #elif defined(SSE)
-  typedef __m128	fvec_t;
+  typedef __m128	fvec_t;		//!< floatベクトルのSIMD型
 #  if defined(SSE2)  
-  typedef __m128d	dvec_t;
+  typedef __m128d	dvec_t;		//!< doubleベクトルのSIMD型
 #  endif
 #endif
 
@@ -130,7 +132,7 @@ class vec
     vec<value_type>&	operator ^=(vec<value_type> x)	;
     vec<value_type>&	andnot(vec<value_type> x)	;
 
-    const value_type&	operator [](int i)	const	;
+    int			operator [](int i)	const	;
     value_type&		operator [](int i)		;
     
     static u_int	floor(u_int n)	{return size*(n/size);}
@@ -141,7 +143,7 @@ class vec
       base_type		_base;
 };
 
-template <class T> inline const typename vec<T>::value_type&
+template <class T> inline int
 vec<T>::operator [](int i) const
 {
     assert((0 <= i) && (i < size));
@@ -155,13 +157,13 @@ vec<T>::operator [](int i)
     return *((value_type*)&_base + i);
 }
 
-typedef vec<int8_t>	Is8vec;
-typedef vec<u_int8_t>	Iu8vec;
-typedef vec<int16_t>	Is16vec;
-typedef vec<u_int16_t>	Iu16vec;
-typedef vec<int32_t>	Is32vec;
-typedef vec<u_int32_t>	Iu32vec;
-typedef vec<u_int64_t>	I64vec;
+typedef vec<int8_t>	Is8vec;		//!< 符号付き8bit整数ベクトル
+typedef vec<u_int8_t>	Iu8vec;		//!< 符号なし8bit整数ベクトル
+typedef vec<int16_t>	Is16vec;	//!< 符号付き16bit整数ベクトル
+typedef vec<u_int16_t>	Iu16vec;	//!< 符号なし16bit整数ベクトル
+typedef vec<int32_t>	Is32vec;	//!< 符号付き32bit整数ベクトル
+typedef vec<u_int32_t>	Iu32vec;	//!< 符号なし32bit整数ベクトル
+typedef vec<u_int64_t>	I64vec;		//!< 64bit整数ベクトル
     
 #if defined(SSE)
 //! float型の成分を持つSIMDベクトルを表すクラス
@@ -223,7 +225,7 @@ vec<float>::operator [](int i)
     return *((value_type*)&_base + i);
 }
 
-typedef vec<float>	F32vec;
+typedef vec<float>	F32vec;		//!< 32bit浮動小数点数ベクトル
 #endif
 
 #if defined(SSE2)
@@ -283,9 +285,15 @@ vec<double>::operator [](int i)
     return *((value_type*)&_base + i);
 }
 
-typedef vec<double>	F64vec;
+typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 #endif
 
+//! SIMDベクトルの内容をストリームに出力する．
+/*!
+  \param out	出力ストリーム
+  \param vec	SIMDベクトル
+  \return	outで指定した出力ストリーム
+*/
 template <class T> std::ostream&
 operator <<(std::ostream& out, const vec<T>& x)
 {
@@ -497,9 +505,32 @@ MM_CONSTRUCTOR_1(u_int32_t, int32_t)
 /************************************************************************
 *  Load/Store								*
 ************************************************************************/
+//! 16byteにalignされたメモリからベクトルをロードする．
+/*!
+  \param p	16byteにalignされたロード元のメモリアドレス
+  \return	ロードされたベクトル
+*/
 template <class T> static vec<T>	load(const T* p)		;
+
+//! メモリからベクトルをロードする．
+/*!
+  \param p	ロード元のメモリアドレス
+  \return	ロードされたベクトル
+*/
 template <class T> static vec<T>	loadu(const T* p)		;
+
+//! 16byteにalignされたメモリにベクトルをストアする．
+/*!
+  \param p	16byteにalignされたストア先のメモリアドレス
+  \param x	ストアされるベクトル
+*/
 template <class T> static void		store(T* p, vec<T> x)		;
+
+//! メモリにベクトルをストアする．
+/*!
+  \param p	ストア先のメモリアドレス
+  \param x	ストアされるベクトル
+*/
 template <class T> static void		storeu(T* p, vec<T> x)		;
 
 #define MM_LOAD_STORE(type, base)					\
@@ -555,6 +586,7 @@ template <class T> static void		storeu(T* p, vec<T> x)		;
 /************************************************************************
 *  Zero-vector generators						*
 ************************************************************************/
+//! 全成分が0であるベクトルを生成する．
 template <class T> static vec<T>	zero()				;
 
 #define MM_ZERO(type, base)						\
@@ -581,7 +613,8 @@ MM_ZERO(u_int64_t, ivec_t)
 *  Cast operators							*
 ************************************************************************/
 template <class S, class T> static S	cast_base(T x)			;
-    
+
+//! T型の成分を持つベクトルからS型の成分を持つベクトルへのキャストを行なう．
 template <class S, class T> static inline vec<S>
 cast(vec<T> x)
 {
@@ -640,11 +673,41 @@ cast_base(ivec_t x)
 /************************************************************************
 *  Shuffle operators							*
 ************************************************************************/
-// 整数のshuffleは1引数
+//! 8つの成分を持つ整数ベクトルの下位4成分をシャッフルする．
+/*!
+  上位4成分は変化しない．
+  \param I0	最下位に来る成分のindex (0 <= I0 < 4)
+  \param I1	下から2番目に来る成分のindex (0 <= I1 < 4)
+  \param I2	下から3番目に来る成分のindex (0 <= I2 < 4)
+  \param I3	下から4番目に来る成分のindex (0 <= I3 < 4)
+  \param x	シャッフルされるベクトル
+  \return	シャッフルされたベクトル
+*/
 template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
 shuffle_low(vec<T> x)							;
+
+//! 8つの成分を持つ整数ベクトルの上位4成分をシャッフルする．
+/*!
+  下位4成分は変化しない．
+  \param I0	下から5番目に来る成分のindex (0 <= I0 < 4)
+  \param I1	下から6番目に来る成分のindex (0 <= I1 < 4)
+  \param I2	下から7番目に来る成分のindex (0 <= I2 < 4)
+  \param I3	最上位に来る成分のindex (0 <= I3 < 4)
+  \param x	シャッフルされるベクトル
+  \return	シャッフルされたベクトル
+*/
 template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
 shuffle_high(vec<T> x)							;
+
+//! 4つの成分を持つ整数ベクトルの成分をシャッフルする．
+/*!
+  \param I0	最下位に来る成分のindex (0 <= I0 < 4)
+  \param I1	下から2番目に来る成分のindex (0 <= I1 < 4)
+  \param I2	下から3番目に来る成分のindex (0 <= I2 < 4)
+  \param I3	最上位に来る成分のindex (0 <= I3 < 4)
+  \param x	シャッフルされるベクトル
+  \return	シャッフルされたベクトル
+*/
 template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
 shuffle(vec<T> x)							;
 
@@ -678,9 +741,29 @@ shuffle(vec<T> x)							;
 #undef MM_SHUFFLE_LOW_HIGH_I4
 #undef MM_SHUFFLE_I4
 
-// 浮動小数点数のshuffleは2引数
+//! 4つの成分を持つ2つの浮動小数点数ベクトルの成分をシャッフルする．
+/*!
+  下位2成分はxから，上位2成分はyからそれぞれ選択される．
+  \param Xl	最下位に来るベクトルxの成分のindex (0 <= I0 < 4)
+  \param Xh	下から2番目に来るベクトルxの成分のindex (0 <= I1 < 4)
+  \param Yl	下から3番目に来るベクトルyの成分のindex (0 <= I2 < 4)
+  \param Yh	最上位に来るベクトルyの成分のindex (0 <= I3 < 4)
+  \param x	シャッフルされるベクトル
+  \param y	シャッフルされるベクトル
+  \return	シャッフルされたベクトル
+*/
 template <u_int Yh, u_int Yl, u_int Xh, u_int Xl, class T> static vec<T>
 shuffle(vec<T> x, vec<T> y)						;
+
+//! 2つの成分を持つ2つの浮動小数点数ベクトルの成分をシャッフルする．
+/*!
+  下位成分はxから，上位成分はyからそれぞれ選択される．
+  \param X	下位に来るベクトルxの成分のindex (0 <= I0 < 2)
+  \param Y	上位に来るベクトルyの成分のindex (0 <= I3 < 2)
+  \param x	シャッフルされるベクトル
+  \param y	シャッフルされるベクトル
+  \return	シャッフルされたベクトル
+*/
 template <u_int Y, u_int X, class T> static vec<T>
 shuffle(vec<T> x, vec<T> y)						;
 
@@ -707,8 +790,15 @@ shuffle(vec<T> x, vec<T> y)						;
 #undef MM_SHUFFLE_F4
 
 /************************************************************************
-*  全要素にN番目の要素をセット						*
+*  全成分にN番目の要素をセット						*
 ************************************************************************/
+//! 与えられたベクトルの指定された成分を全成分にセットしたベクトルを生成する．
+/*!
+  与えられたベクトルの成分数は2または4でなければならない．
+  \param N	セットするxのベクトルの成分を指定するindex (0 <= N < 4)
+  \param x	2つ，または4つの成分を持つベクトル
+  \return	生成されたベクトル
+*/
 template <u_int N, class T> static inline vec<T>
 set1(vec<T> x)
 {
@@ -730,7 +820,20 @@ set1(vec<T> x)
 /************************************************************************
 *  Unpack operators							*
 ************************************************************************/
+//! 2つのベクトルの下位半分の成分を交互に混合する．
+/*!
+  \param x	その成分を偶数番目に配置するベクトル
+  \param y	その成分を奇数番目に配置するベクトル
+  \return	生成されたベクトル
+*/
 template <class T> static vec<T>	unpack_low(vec<T> x, vec<T> y)	;
+
+//! 2つのベクトルの上位半分の成分を交互に混合する．
+/*!
+  \param x	その成分を偶数番目に配置するベクトル
+  \param y	その成分を奇数番目に配置するベクトル
+  \return	生成されたベクトル
+*/
 template <class T> static vec<T>	unpack_high(vec<T> x, vec<T> y)	;
 
 #define MM_UNPACK_LOW_HIGH(type, base)					\
@@ -809,6 +912,12 @@ MM_N_TUPLE(u_int32_t)
 /************************************************************************
 *  Extracting elements							*
 ************************************************************************/
+//! ベクトルから指定された成分を取り出す．
+/*!
+  \param I	取り出す成分を指定するindex
+  \param x	ベクトル
+  \return	取り出された成分
+*/
 template <u_int I, class T> static T	extract(vec<T> x)		;
 
 #define MM_EXTRACT(type, base)						\
@@ -831,17 +940,44 @@ template <u_int I, class T> static T	extract(vec<T> x)		;
 /************************************************************************
 *  Elementwise shift operators						*
 ************************************************************************/
-// 整数ベクトルの要素シフト
+//! ベクトルの要素を左シフトする．
+/*!
+  シフト後の下位には0が入る．
+  \param N	シフト数(成分単位)
+  \param x	シフトされるベクトル
+  \return	シフトされたベクトル
+*/
 template <u_int N, class T> static vec<T>	shift_l(vec<T> x)	;
+
+//! ベクトルの要素を右シフトする．
+/*!
+  シフト後の上位には0が入る．
+  \param N	シフト数(成分単位)
+  \param x	シフトされるベクトル
+  \return	シフトされたベクトル
+*/
 template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
 
-#define MM_ELM_SHIFTS_I(type)						\
+// 整数ベクトルの要素シフト（実装上の注意：MMXでは64bit整数のシフトは
+// bit単位だが，SSE2以上の128bit整数ではbyte単位である．また，AVX2では
+// 下位128bitしかシフトされない．）
+#if defined(SSE2)
+#  define MM_ELM_SHIFTS_I(type)						\
     template <u_int N>							\
     MM_TMPL_FUNC(vec<type> shift_l(vec<type> x),			\
 		 slli, (x, N*vec<type>::value_size), void, ivec_t)	\
     template <u_int N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> x),			\
 		 srli, (x, N*vec<type>::value_size), void, ivec_t)
+#else
+#  define MM_ELM_SHIFTS_I(type)						\
+    template <u_int N>							\
+    MM_TMPL_FUNC(vec<type> shift_l(vec<type> x),			\
+		 slli, (x, 8*N*vec<type>::value_size), void, ivec_t)	\
+    template <u_int N>							\
+    MM_TMPL_FUNC(vec<type> shift_r(vec<type> x),			\
+		 srli, (x, 8*N*vec<type>::value_size), void, ivec_t)
+#endif
 
 MM_ELM_SHIFTS_I(int8_t)
 MM_ELM_SHIFTS_I(int16_t)
@@ -884,18 +1020,35 @@ MM_ELM_SHIFTS_I(u_int64_t)
 /************************************************************************
 *  Element wise shift to left/right-most				*
 ************************************************************************/
+//! 左端の要素が右端に来るまで右シフトする．
+/*!
+  シフト後の上位には0が入る．
+  \param x	シフトされるベクトル
+  \return	シフトされたベクトル
+*/
 template <class T> static inline vec<T>
 shift_lmost_to_rmost(vec<T> x)
 {
     return shift_r<vec<T>::size-1>(x);
 }
 
+//! 右端の要素が左端に来るまで左シフトする．
+/*!
+  シフト後の下位には0が入る．
+  \param x	シフトされるベクトル
+  \return	シフトされたベクトル
+*/
 template <class T> static inline vec<T>
 shift_rmost_to_lmost(vec<T> x)
 {
     return shift_l<vec<T>::size-1>(x);
 }
 
+//! 与えられた値を右端の成分にセットし残りを0としたベクトルを生成する．
+/*!
+  \param x	セットされる値
+  \return	xを右端成分とするベクトル
+*/
 template <class T> static inline vec<T>
 set_rmost(typename vec<T>::value_type x)
 {
@@ -919,10 +1072,16 @@ set_rmost(typename vec<T>::value_type x)
 /************************************************************************
 *  Rotation and reverse operators					*
 ************************************************************************/
+// SSSE3以上では _mm[256]_alignr_epi8 を使って実装するのが簡単だが，
+// AVX2ではconcatinationに先立って128bit単位のunpackが行なわれてしまう．
+
+//! ベクトルの左回転を行なう．
 template <class T> static inline vec<T>
 rotate_l(vec<T> x)			{return shuffle<2, 1, 0, 3>(x);}
+//! ベクトルの右回転を行なう．
 template <class T> static inline vec<T>
 rotate_r(vec<T> x)			{return shuffle<0, 3, 2, 1>(x);}
+//! ベクトルの逆転を行なう．
 template <class T> static inline vec<T>
 reverse(vec<T> x)			{return shuffle<0, 1, 2, 3>(x);}
 
@@ -953,7 +1112,20 @@ reverse(vec<T> x)			{return shuffle<0, 1, 2, 3>(x);}
 /************************************************************************
 *  Bitwise shift operators						*
 ************************************************************************/
+//! 整数ベクトルの左シフトを行う．
+/*!
+  \param x	整数ベクトル
+  \param n	シフトするビット数
+  \return	シフト後の整数ベクトル
+*/
 template <class T> static vec<T>	operator <<(vec<T> x, int n)	;
+
+//! 整数ベクトルの算術右シフトを行なう．
+/*!
+  \param x	整数ベクトル
+  \param n	シフトするビット数
+  \return	シフト後の整数ベクトル
+*/
 template <class T> static vec<T>	operator >>(vec<T> x, int n)	;
 
 #define MM_LOGICAL_SHIFT_LEFT(type, base)				\
@@ -985,8 +1157,33 @@ MM_LOGICAL_SHIFT_RIGHT(u_int64_t, u_int64_t)
 /************************************************************************
 *  Type conversion operators						*
 ************************************************************************/
+//! T型ベクトルの下位半分をS型ベクトルに型変換する．
+/*!
+  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
+  符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
+  \param x	変換されるベクトル
+  \return	変換されたベクトル
+*/
 template <class S, class T> static vec<S>	cvt(vec<T> x)		;
+
+//! T型ベクトルの上位半分をS型ベクトルに型変換する．
+/*!
+  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
+  符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
+  \param x	変換されるベクトル
+  \return	変換されたベクトル
+*/
 template <class S, class T> static vec<S>	cvt_high(vec<T> x)	;
+
+//! 2つのT型整数ベクトルをより小さなS型整数ベクトルに型変換する．
+/*!
+  Tは符号付き整数型，SはTの半分のサイズを持つ符号付き／符号なし整数型
+  である．Sが符号付き／符号なしのいずれの場合も飽和処理が行われる．
+  \param x	変換されるベクトル
+  \param y	変換されるベクトル
+  \return	xが変換されたものを下位，yが変換されたものを上位に
+		配したベクトル
+*/
 template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 
 // intrinsicによって直接サポートされる変換
@@ -1172,10 +1369,34 @@ template <> F32vec			// double -> float
 /************************************************************************
 *  Mask conversion operators						*
 ************************************************************************/
+//! T型マスクベクトルの下位半分をS型マスクベクトルに型変換する．
+/*!
+  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
+  符号付き／符号なしのいずれでも良い．
+  \param x	変換されるマスクベクトル
+  \return	変換されたマスクベクトル
+*/
 template <class S, class T> static vec<S>
 cvt_mask(vec<T> x)							;
+
+//! T型マスクベクトルの上位半分をS型マスクベクトルに型変換する．
+/*!
+  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
+  符号付き／符号なしのいずれでも良い．
+  \param x	変換されるマスクベクトル
+  \return	変換されたマスクベクトル
+*/
 template <class S, class T> static vec<S>
 cvt_mask_high(vec<T> x)							;
+
+//! 2つのT型整数マスクベクトルをより小さなS型整数マスクベクトルに型変換する．
+/*!
+  SのサイズはTの倍である．また，S, Tは符号付き／符号なしのいずれでも良い．
+  \param x	変換されるマスクベクトル
+  \param y	変換されるマスクベクトル
+  \return	xが変換されたものを下位，yが変換されたものを上位に
+		配したマスクベクトル
+*/
 template <class S, class T> static vec<S>
 cvt_mask(vec<T> x, vec<T> y)						;
 
@@ -1284,6 +1505,14 @@ MM_LOGICALS(u_int64_t, ivec_t)
 /************************************************************************
 *  Selection								*
 ************************************************************************/
+//! 2つのベクトル中の成分のいずれかをマスク値に応じて選択する．
+/*!
+ \param mask	マスク
+ \param x	ベクトル
+ \param y	ベクトル
+ \return	maskにおいて1が立っている成分はxから，そうでない成分は
+		yからそれぞれ選択して生成されたベクトル
+*/
 template <class T> static inline vec<T>
 select(vec<T> mask, vec<T> x, vec<T> y)
 {
@@ -1730,7 +1959,6 @@ inline void	empty()			{_mm_empty();}
 #undef MM_FUNC_2
 #undef MM_FUNC_2R
 
-}
 }
 #endif
 

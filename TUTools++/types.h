@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.33 2011-12-08 01:40:46 ueshiba Exp $
+ *  $Id: types.h,v 1.34 2011-12-10 23:04:48 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -162,6 +162,9 @@
 
   <b>乱数発生器</b>
   - #TU::Random
+
+  <b>SIMD命令</b>
+  - #mm::vec
   
   \file		types.h
   \brief	基本的なデータ型をグローバルな名前空間に追加

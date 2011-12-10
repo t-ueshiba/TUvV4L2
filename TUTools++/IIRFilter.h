@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.12 2011-12-07 08:06:31 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.13 2011-12-10 23:04:48 ueshiba Exp $
  */
 /*!
   \file		IIRFilter.h
@@ -37,14 +37,12 @@
 #include "TU/Array++.h"
 #include "TU/mmInstructions.h"
 
-namespace TU
+#if defined(SSE2)
+namespace mm
 {
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-#if defined(SSE2)
-namespace mm
-{
 static inline F32vec
 forward2(F32vec in3210, F32vec c0123, F32vec& tmp)
 {
@@ -227,6 +225,8 @@ backward4(const float*& src, float*& dst,
 }
 #endif
 
+namespace TU
+{
 /************************************************************************
 *  class IIRFilter<D>							*
 ************************************************************************/
