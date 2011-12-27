@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.34 2011-12-10 23:04:48 ueshiba Exp $
+ *  $Id: types.h,v 1.35 2011-12-27 23:36:09 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -61,6 +61,9 @@
 
   <b>RANSAC</b>
   - #TU::ransac(const PointSet&, Model&, Conform, double)
+
+  <b>グラフカット</b>
+  - #boost::GraphCuts
 
   <b>点，直線，平面等の幾何要素とその変換</b>
   - #TU::Point1
