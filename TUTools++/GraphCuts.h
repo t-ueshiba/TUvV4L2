@@ -1,5 +1,5 @@
 /*
- *  $Id: GraphCuts.h,v 1.1 2011-12-27 23:36:09 ueshiba Exp $
+ *  $Id: GraphCuts.h,v 1.2 2012-01-03 23:32:16 ueshiba Exp $
  */
 #ifndef __GRAPHCUTS_H
 #define __GRAPHCUTS_H
@@ -213,17 +213,12 @@ GraphCuts<T, ID, L, EL>::createSmoothingTerm(site_type u, site_type v)
 }
     
 //! グラフの全ての辺および開始点と終端点を除く全ての頂点を除去する．
-template <class T, class ID, class L, class EL> void
+template <class T, class ID, class L, class EL> inline void
 GraphCuts<T, ID, L, EL>::clear()
 {
-    vertex_iterator	vi, ve;
-    for (tie(vi, ve) = vertices(_g); vi != ve; )
-    {
-	const vertex_t	v = *vi++;
-	clear_vertex(v, _g);
-	if (v != _s && v != _t)
-	    remove_vertex(v, _g);
-    }
+    _g.clear();
+    _s = add_vertex(_g);
+    _t = add_vertex(_g);
 }
 
 /*
@@ -634,9 +629,7 @@ template <class T, class ID, class L, class EL> std::istream&
 GraphCuts<T, ID, L, EL>::getDimacsMaxFlow(std::istream& in)
 {
   // 全ての辺と開始点と終端点を含む全ての頂点を除去する．
-    clear();
-    remove_vertex(_s, _g);
-    remove_vertex(_t, _g);
+    _g.clear();
 
     read_dimacs_max_flow(_g, get(edge_capacity, _g), get(edge_reverse, _g),
 			 _s, _t, in);
