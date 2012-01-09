@@ -1,5 +1,5 @@
 /*
- *  $Id: NDTree++.h,v 1.3 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: NDTree++.h,v 1.4 2012-01-09 23:24:09 ueshiba Exp $
  */
 /*!
   \file		NDTree++.h
@@ -99,6 +99,7 @@ class NDTree
     u_int		size()					const	;
     bool		empty()					const	;
     void		clear()						;
+    pointer		find(const position_type& pos)			;
     const_pointer	find(const position_type& pos)		const	;
     void		insert(const position_type& pos,
 			       const_reference val)			;
@@ -292,6 +293,21 @@ NDTree<T, D>::clear()
     delete _root;
     _root = 0;
     _len0 = 0;
+}
+
+//! D次元空間中の指定された位置における値を探す．
+/*!
+  \param pos	D次元空間中の位置
+  \return	posで指定された位置に葉が存在すればその値へのポインタ
+		を返す．存在しなければ0を返す．
+*/
+template <class T, u_int D> inline typename NDTree<T, D>::pointer
+NDTree<T, D>::find(const position_type& pos)
+{
+    if (!_root || out_of_range(pos))
+	return 0;
+    
+    return _root->find(position_type(pos) -= _org, _len0);
 }
 
 //! D次元空間中の指定された位置における値を探す．
