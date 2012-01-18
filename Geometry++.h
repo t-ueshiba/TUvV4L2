@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.42 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.43 2012-01-18 23:18:22 ueshiba Exp $
  */
 /*!
   \file		Geometry++.h
@@ -813,7 +813,8 @@ class Projectivity : public M
 
     using	M::nrow;
     using	M::ncol;
-
+    using	M::operator ();
+    
   //! 変換行列を指定する．
   /*!
     \param T			(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
