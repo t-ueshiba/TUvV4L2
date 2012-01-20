@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.33 2011-07-21 23:39:34 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.34 2012-01-20 20:01:03 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
@@ -424,11 +424,24 @@ ImageBase::restoreBMPHeader(std::istream& in)
 	get<short>(in);				// Skip biPlanes.
 	d = get<short>(in);			// Read biBitCount.
 	if (get<int>(in) != 0)			// Read biCompression.
-	    throw runtime_error("TUImabeBase::restoreBMPHeader: compressed BMP file not supported!!");
+	    throw runtime_error("TUImageBase::restoreBMPHeader: compressed BMP file not supported!!");
 	get<int>(in);				// Skip biSizeImage.
 	get<int>(in);				// Skip biXPixPerMeter.
 	get<int>(in);				// Skip biYPixPerMeter.
-	typeInfo.ncolors = get<int>(in);	// Read biClrUsed.
+	if ((typeInfo.ncolors = get<int>(in)) == 0)	// Read biClrUsed.
+	    switch (d)
+	    {
+	      case 1:
+		typeInfo.ncolors = 2;
+		break;
+	      case 4:
+		typeInfo.ncolors = 16;
+		break;
+	      case 8:
+		typeInfo.ncolors = 256;
+		break;
+	    }
+	
 	get<int>(in);				// Read biClrImportant.
 	break;
 
