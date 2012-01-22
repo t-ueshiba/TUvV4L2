@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.24 2012-01-22 10:52:47 ueshiba Exp $
+#  $Id: Makefile,v 1.1 2012-01-22 10:52:38 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -7,14 +7,14 @@
 DEST		= $(PREFIX)/bin
 INCDIRS		= -I$(PREFIX)/include
 
-PROGRAM		= iirfprof
-LIBS		= -lTUTools++ -ltbb
+PROGRAM		= edgeDetector
+LIBS		= -lTUTools++
 ifeq ($(OSTYPE), darwin)
   LIBS	       +=
 #  LIBS	       += -framework IOKit -framework CoreFoundation
 endif
 
-CPPFLAGS	= -DUSE_TBB
+CPPFLAGS	=
 CFLAGS		= -g -Wextra
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
@@ -55,7 +55,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.24 $	|		\
+REV		= $(shell echo $Revision: 1.1 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

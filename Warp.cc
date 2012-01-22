@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.19 2011-12-10 23:04:48 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.20 2012-01-22 10:52:19 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -193,171 +193,129 @@ bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
 /************************************************************************
 *  class Warp								*
 ************************************************************************/
-//! 出力画像の範囲を指定して画像を変形する．
-/*!
-  \param in	入力画像
-  \param out	出力画像
-  \param vs	変形結果となる領域の最初の行を指定するindex
-  \param ve	変形結果となる領域の最後の行の次を指定するindex．
-		0ならば出力画像の最後の行まで変形結果によって埋められる
-*/
 template <class T> void
-Warp::operator ()(const Image<T>& in, Image<T>& out, u_int vs, u_int ve) const
+Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 {
-    out.resize(height(), width());
-    if (ve == 0)
-	ve = out.height();
-    
-    for (u_int v = vs; v < ve; ++v)
+    const short		*usp  = _fracs[v].us, *vsp = _fracs[v].vs;
+    const u_char	*dup  = _fracs[v].du, *dvp = _fracs[v].dv;
+    T			*outp = out[v] + _fracs[v].lmost;
+    T* const		outq  = outp + _fracs[v].width();
+#if defined(SSE)
+    using namespace	mm;
+
+    for (T* const outr = outq - Iu8vec::size; outp <= outr; )
     {
-	const short	*usp  = _fracs[v].us, *vsp  = _fracs[v].vs;
-	const u_char	*dup  = _fracs[v].du, *dvp  = _fracs[v].dv;
-	T		*outp = out[v] + _fracs[v].lmost;
-	T* const	outq  = outp + _fracs[v].width();
-#if defined(SSE)
-	using namespace	mm;
+	using namespace	std;
 
-	for (T* const outr = outq - Iu8vec::size; outp <= outr; )
-	{
-	    using namespace	std;
-
-	    const u_int	npixels = Is16vec::size/4;
-	    Is16vec	uu = load(usp), vv = load(vsp);
-	    Iu8vec	du = load(dup), dv = load(dvp);
-	    Iu8vec	du4 = quadup<0>(du), dv4 = quadup<0>(dv);
-	    storeu((u_char*)outp,
-		   cvt<u_char>(bilinearInterpolate(in, uu, vv,
-						   cvt<short>(du4),
-						   cvt<short>(dv4)),
-			       bilinearInterpolate(in,
-						   shift_r<npixels>(uu),
-						   shift_r<npixels>(vv),
-						   cvt_high<short>(du4),
-						   cvt_high<short>(dv4))));
-	    outp += Iu8vec::size/4;
+	const u_int	npixels = Is16vec::size/4;
+	Is16vec		uu = load(usp), vv = load(vsp);
+	Iu8vec		du = load(dup), dv = load(dvp);
+	Iu8vec		du4 = quadup<0>(du), dv4 = quadup<0>(dv);
+	storeu((u_char*)outp,
+	       cvt<u_char>(bilinearInterpolate(in, uu, vv,
+					       cvt<short>(du4),
+					       cvt<short>(dv4)),
+			   bilinearInterpolate(in,
+					       shift_r<npixels>(uu),
+					       shift_r<npixels>(vv),
+					       cvt_high<short>(du4),
+					       cvt_high<short>(dv4))));
+	outp += Iu8vec::size/4;
 	    
-	    du4 = quadup<1>(du);
-	    dv4 = quadup<1>(dv);
-	    storeu((u_char*)outp,
-		   cvt<u_char>(bilinearInterpolate(in,
-						   shift_r<2*npixels>(uu),
-						   shift_r<2*npixels>(vv),
-						   cvt<short>(du4),
-						   cvt<short>(dv4)),
-			       bilinearInterpolate(in,
-						   shift_r<3*npixels>(uu),
-						   shift_r<3*npixels>(vv),
-						   cvt_high<short>(du4),
-						   cvt_high<short>(dv4))));
-	    outp += Iu8vec::size/4;
-	    usp  += Is16vec::size;
-	    vsp  += Is16vec::size;
+	du4 = quadup<1>(du);
+	dv4 = quadup<1>(dv);
+	storeu((u_char*)outp,
+	       cvt<u_char>(bilinearInterpolate(in,
+					       shift_r<2*npixels>(uu),
+					       shift_r<2*npixels>(vv),
+					       cvt<short>(du4),
+					       cvt<short>(dv4)),
+			   bilinearInterpolate(in,
+					       shift_r<3*npixels>(uu),
+					       shift_r<3*npixels>(vv),
+					       cvt_high<short>(du4),
+					       cvt_high<short>(dv4))));
+	outp += Iu8vec::size/4;
+	usp  += Is16vec::size;
+	vsp  += Is16vec::size;
 	    
-	    uu  = load(usp);
-	    vv  = load(vsp);
-	    du4 = quadup<2>(du);
-	    dv4 = quadup<2>(dv);
-	    storeu((u_char*)outp,
-		   cvt<u_char>(bilinearInterpolate(in, uu, vv,
-						   cvt<short>(du4),
-						   cvt<short>(dv4)),
-			       bilinearInterpolate(in,
-						   shift_r<npixels>(uu),
-						   shift_r<npixels>(vv),
-						   cvt_high<short>(du4),
-						   cvt_high<short>(dv4))));
-	    outp += Iu8vec::size/4;
+	uu  = load(usp);
+	vv  = load(vsp);
+	du4 = quadup<2>(du);
+	dv4 = quadup<2>(dv);
+	storeu((u_char*)outp,
+	       cvt<u_char>(bilinearInterpolate(in, uu, vv,
+					       cvt<short>(du4),
+					       cvt<short>(dv4)),
+			   bilinearInterpolate(in,
+					       shift_r<npixels>(uu),
+					       shift_r<npixels>(vv),
+					       cvt_high<short>(du4),
+					       cvt_high<short>(dv4))));
+	outp += Iu8vec::size/4;
 	    
-	    du4 = quadup<3>(du);
-	    dv4 = quadup<3>(dv);
-	    storeu((u_char*)outp,
-		   cvt<u_char>(bilinearInterpolate(in,
-						   shift_r<2*npixels>(uu),
-						   shift_r<2*npixels>(vv),
-						   cvt<short>(du4),
-						   cvt<short>(dv4)),
-			       bilinearInterpolate(in,
-						   shift_r<3*npixels>(uu),
-						   shift_r<3*npixels>(vv),
-						   cvt_high<short>(du4),
-						   cvt_high<short>(dv4))));
-	    outp += Iu8vec::size/4;
-	    usp  += Is16vec::size;
-	    vsp  += Is16vec::size;
-
-	    dup  += Iu8vec::size;
-	    dvp  += Iu8vec::size;
-	}
-#endif
-      	while (outp < outq)
-	    *outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
-	out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
+	du4 = quadup<3>(du);
+	dv4 = quadup<3>(dv);
+	storeu((u_char*)outp,
+	       cvt<u_char>(bilinearInterpolate(in,
+					       shift_r<2*npixels>(uu),
+					       shift_r<2*npixels>(vv),
+					       cvt<short>(du4),
+					       cvt<short>(dv4)),
+			   bilinearInterpolate(in,
+					       shift_r<3*npixels>(uu),
+					       shift_r<3*npixels>(vv),
+					       cvt_high<short>(du4),
+					       cvt_high<short>(dv4))));
+	outp += Iu8vec::size/4;
+	usp  += Is16vec::size;
+	vsp  += Is16vec::size;
+	
+	dup  += Iu8vec::size;
+	dvp  += Iu8vec::size;
     }
-#if defined(SSE)
-    mm::empty();
-#endif	
+#endif
+    while (outp < outq)
+	*outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
+    out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
 }
 
-//! 出力画像の範囲を指定して画像を変形する．
-/*!
-  \param in	入力画像
-  \param out	出力画像
-  \param vs	変形結果となる領域の最初の行を指定するindex
-  \param ve	変形結果となる領域の最後の行の次を指定するindex．
-		0ならば出力画像の最後の行まで変形結果によって埋められる
-*/
 template <> __PORT void
-Warp::operator ()(const Image<u_char>& in, Image<u_char>& out,
-		  u_int vs, u_int ve) const
+Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
 {
-    out.resize(height(), width());
-    if (ve == 0)
-	ve = out.height();
-    
-    for (u_int v = vs; v < ve; ++v)
-    {
-	const short	*usp  = _fracs[v].us, *vsp = _fracs[v].vs;
-	const u_char	*dup  = _fracs[v].du, *dvp = _fracs[v].dv;
-	u_char		*outp = out[v] + _fracs[v].lmost;
-	u_char* const	outq  = outp + _fracs[v].width();
+    const short		*usp  = _fracs[v].us, *vsp = _fracs[v].vs;
+    const u_char	*dup  = _fracs[v].du, *dvp = _fracs[v].dv;
+    u_char		*outp = out[v] + _fracs[v].lmost;
+    u_char* const	outq  = outp + _fracs[v].width();
 #if defined(SSE)
-	using namespace	mm;
+    using namespace	mm;
 
-	for (u_char* const outr = outq - Iu8vec::size; outp <= outr; )
-	{
-	    Iu8vec	du = load(dup), dv = load(dvp);
-	    Is16vec	out0 = bilinearInterpolate(in,
-						   load(usp), load(vsp),
-						   cvt<short>(du),
-						   cvt<short>(dv));
-	    usp += Is16vec::size;
-	    vsp += Is16vec::size;
-	    storeu(outp,
-		   cvt<u_char>(out0,
-			       bilinearInterpolate(in,
-						   load(usp), load(vsp),
-						   cvt_high<short>(du),
-						   cvt_high<short>(dv))));
-	    usp  += Is16vec::size;
-	    vsp  += Is16vec::size;
-	    dup  += Iu8vec::size;
-	    dvp  += Iu8vec::size;
-	    outp += Iu8vec::size;
-	}
-#endif
-      	while (outp < outq)
-	    *outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
-	out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
+    for (u_char* const outr = outq - Iu8vec::size; outp <= outr; )
+    {
+	Iu8vec	du = load(dup), dv = load(dvp);
+	Is16vec	out0 = bilinearInterpolate(in, load(usp), load(vsp),
+					   cvt<short>(du), cvt<short>(dv));
+	usp += Is16vec::size;
+	vsp += Is16vec::size;
+	storeu(outp, cvt<u_char>(out0,
+				 bilinearInterpolate(in,
+						     load(usp), load(vsp),
+						     cvt_high<short>(du),
+						     cvt_high<short>(dv))));
+	usp  += Is16vec::size;
+	vsp  += Is16vec::size;
+	dup  += Iu8vec::size;
+	dvp  += Iu8vec::size;
+	outp += Iu8vec::size;
     }
-#if defined(SSE)
-    mm::empty();
-#endif	
+#endif
+    while (outp < outq)
+	*outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
+    out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
 }
 
 template __PORT void
-Warp::operator ()(const Image<RGBA>& in,
-		  Image<RGBA>& out, u_int vs, u_int ve) const;
+Warp::warpLine(const Image<RGBA>& in, Image<RGBA>& out, u_int v) const;
 template __PORT void
-Warp::operator ()(const Image<ABGR>& in,
-		  Image<ABGR>& out, u_int vs, u_int ve) const;
+Warp::warpLine(const Image<ABGR>& in, Image<ABGR>& out, u_int v) const;
 }

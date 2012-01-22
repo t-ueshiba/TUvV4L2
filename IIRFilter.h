@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.13 2011-12-10 23:04:48 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.14 2012-01-22 10:52:19 ueshiba Exp $
  */
 /*!
   \file		IIRFilter.h
@@ -36,6 +36,10 @@
 
 #include "TU/Array++.h"
 #include "TU/mmInstructions.h"
+#if defined(USE_TBB)
+#  include <tbb/parallel_for.h>
+#  include <tbb/blocked_range.h>
+#endif
 
 #if defined(SSE2)
 namespace mm
@@ -554,10 +558,10 @@ IIRFilter<D>::limitsB(float& limit0B, float& limit1B, float& limit2B) const
 }
 
 /************************************************************************
-*  class BilateralIIRFilterBase						*
+*  class BilateralIIRFilter<D>						*
 ************************************************************************/
-//! 両側Infinite Inpulse Response Filterのベースとなるクラス
-class BilateralIIRFilterBase
+//! 両側Infinite Inpulse Response Filterを表すクラス
+template <u_int D> class BilateralIIRFilter
 {
   public:
   //! 微分の階数
@@ -567,16 +571,6 @@ class BilateralIIRFilterBase
 	First,						//!< 1階微分
 	Second						//!< 2階微分
     };
-};
-
-/************************************************************************
-*  class BilateralIIRFilter<D>						*
-************************************************************************/
-//! 両側Infinite Inpulse Response Filterを表すクラス
-template <u_int D> class BilateralIIRFilter : public BilateralIIRFilterBase
-{
-  public:
-    typedef IIRFilter<D>	IIR;
     
     BilateralIIRFilter&
 		initialize(const float cF[D+D], const float cB[D+D])	;
@@ -596,11 +590,38 @@ template <u_int D> class BilateralIIRFilter : public BilateralIIRFilterBase
     float	operator [](int i)				const	;
     void	limits(float& limit0,
 		       float& limit1, float& limit2)		const	;
+
+  private:
+#if defined(USE_TBB)
+    template <class T1, class B1, class R1, class T2, class B2, class R2>
+    class ConvolveRow
+    {
+      public:
+	ConvolveRow(const BilateralIIRFilter& biir,
+		    const Array2<T1, B1, R1>& in,
+		    Array2<T2, B2, R2>& out)
+	    :_biir(biir), _in(in), _out(out)				{}
+
+	void	operator ()(const tbb::blocked_range<u_int>& r) const
+		{
+		    for (u_int i = r.begin(); i != r.end(); ++i)
+			_biir.convolveRow(_in[i], _out, i);
+		}
+
+      private:
+	BilateralIIRFilter		_biir;	// 参照ではなく実体
+	const Array2<T1, B1, R1>&	_in;
+	Array2<T2, B2, R2>&		_out;
+    };
+#endif
+    template <class T, class B, class T2, class B2, class R2>
+    void	convolveRow(const Array<T, B>& in,
+			    Array2<T2, B2, R2>& out, u_int i)	const	;
     
   private:
-    IIR				_iirF;
+    IIRFilter<D>		_iirF;
     mutable Array<float>	_bufF;
-    IIR				_iirB;
+    IIRFilter<D>		_iirB;
     mutable Array<float>	_bufB;
 };
 
@@ -754,14 +775,15 @@ BilateralIIRFilter<D>::operator ()(const Array2<T1, B1, R1>& in,
     if (ie == 0)
 	ie = in.nrow();
 
-    for (u_int i = is; i < ie; ++i)
-    {
-	convolve(in[i]);
-	T2*	col = &out[0];
-	for (u_int j = 0; j < dim(); ++j)
-	    (*col++)[i] = (*this)[j];
-    }
+#if defined(USE_TBB)
+    using namespace	tbb;
 
+    parallel_for(blocked_range<u_int>(is, ie, 1),
+		 ConvolveRow<T1, B1, R1, T2, B2, R2>(*this, in, out));
+#else
+    for (u_int i = is; i < ie; ++i)
+	convolveRow(in[i], out, i);
+#endif
     return *this;
 }
 
@@ -807,18 +829,27 @@ BilateralIIRFilter<D>::limits(float& limit0,
     limit2 = limit2F + limit2B;
 }
 
+template <u_int D>
+template <class T, class B, class T2, class B2, class R2> void
+BilateralIIRFilter<D>::convolveRow(const Array<T, B>& in,
+				   Array2<T2, B2, R2>& out, u_int i) const
+{
+    convolve(in);
+    T2*	col = &out[0];
+    for (u_int j = 0; j < dim(); ++j)
+	(*col++)[i] = (*this)[j];
+}
+    
 /************************************************************************
-*  class BilateralIIRFilter2						*
+*  class BilateralIIRFilter2<D>						*
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
-template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
+template <u_int D> class BilateralIIRFilter2
 {
   public:
-    typedef typename BIIRH::Order	Order;
+    typedef typename BilateralIIRFilter<D>::Order	Order;
     
     BilateralIIRFilter2()	:_biirH(), _biirV()			{}
-    BilateralIIRFilter2(u_int nthreads)
-    	:_biirH(nthreads), _biirV(nthreads)				{}
 
     BilateralIIRFilter2&
 		initialize(float cHF[], float cHB[],
@@ -832,8 +863,8 @@ template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
 			 Array2<T2, B2, R2>& out)		const	;
     
   private:
-    BIIRH				_biirH;
-    BIIRV				_biirV;
+    BilateralIIRFilter<D>		_biirH;
+    BilateralIIRFilter<D>		_biirV;
     mutable Array2<Array<float> >	_buf;
 };
     
@@ -845,9 +876,9 @@ template <class BIIRH, class BIIRV=BIIRH> class BilateralIIRFilter2
   \param cVB	縦方向後退z変換係数
   \return	このフィルタ自身
 */
-template <class BIIRH, class BIIRV> inline BilateralIIRFilter2<BIIRH, BIIRV>&
-BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], float cHB[],
-					      float cVF[], float cVB[])
+template <u_int D> inline BilateralIIRFilter2<D>&
+BilateralIIRFilter2<D>::initialize(float cHF[], float cHB[],
+				   float cVF[], float cVB[])
 {
     _biirH.initialize(cHF, cHB);
     _biirV.initialize(cVF, cVB);
@@ -863,9 +894,9 @@ BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], float cHB[],
   \param orderV	縦方向微分階数
   \return	このフィルタ自身
 */
-template <class BIIRH, class BIIRV> inline BilateralIIRFilter2<BIIRH, BIIRV>&
-BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], Order orderH,
-					      float cVF[], Order orderV)
+template <u_int D> inline BilateralIIRFilter2<D>&
+BilateralIIRFilter2<D>::initialize(float cHF[], Order orderH,
+				   float cVF[], Order orderV)
 {
     _biirH.initialize(cHF, orderH);
     _biirV.initialize(cVF, orderV);
@@ -879,11 +910,11 @@ BilateralIIRFilter2<BIIRH, BIIRV>::initialize(float cHF[], Order orderH,
   \param out	出力2次元配列
   \return	このフィルタ自身
 */
-template <class BIIRH, class BIIRV>
+template <u_int D>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline const BilateralIIRFilter2<BIIRH, BIIRV>&
-BilateralIIRFilter2<BIIRH, BIIRV>::convolve(const Array2<T1, B1, R1>& in,
-					    Array2<T2, B2, R2>& out) const
+inline const BilateralIIRFilter2<D>&
+BilateralIIRFilter2<D>::convolve(const Array2<T1, B1, R1>& in,
+				 Array2<T2, B2, R2>& out) const
 {
     _biirH(in, _buf);
     _biirV(_buf, out);
@@ -892,5 +923,4 @@ BilateralIIRFilter2<BIIRH, BIIRV>::convolve(const Array2<T1, B1, R1>& in,
 }
 
 }
-
 #endif	/* !__TUIIRFilterPP_h */

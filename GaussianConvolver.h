@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.11 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.12 2012-01-22 10:52:19 ueshiba Exp $
  */
 /*!
   \file		GaussianConvolver.h
@@ -109,9 +109,10 @@ class __PORT GaussianCoefficients
 class GaussianConvolver
     : public GaussianCoefficients, private BilateralIIRFilter<4u>
 {
+  private:
+    typedef BilateralIIRFilter<4u>		super;
+    
   public:
-    typedef BilateralIIRFilter<4u>		BIIRF;
-
     GaussianConvolver(float sigma=1.0)	:GaussianCoefficients(sigma)	{}
 
     template <class T1, class B1, class T2, class B2> GaussianConvolver&
@@ -132,7 +133,7 @@ template <class T1, class B1, class T2, class B2>
 inline GaussianConvolver&
 GaussianConvolver::smooth(const Array<T1, B1>& in, Array<T2, B2>& out)
 {
-    BIIRF::initialize(_c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c0, super::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -147,7 +148,7 @@ template <class T1, class B1, class T2, class B2>
 inline GaussianConvolver&
 GaussianConvolver::diff(const Array<T1, B1>& in, Array<T2, B2>& out)
 {
-    BIIRF::initialize(_c1, BIIRF::First).convolve(in, out);
+    super::initialize(_c1, super::First).convolve(in, out);
 
     return *this;
 }
@@ -162,26 +163,24 @@ template <class T1, class B1, class T2, class B2>
 inline GaussianConvolver&
 GaussianConvolver::diff2(const Array<T1, B1>& in, Array<T2, B2>& out)
 {
-    BIIRF::initialize(_c2, BIIRF::Second).convolve(in, out);
+    super::initialize(_c2, super::Second).convolve(in, out);
 
     return *this;
 }
 
 /************************************************************************
-*  class GaussianConvoler2<BIIRH, BIIRV>				*
+*  class GaussianConvoler2						*
 ************************************************************************/
 //! Gauss核による2次元配列畳み込みを行うクラス
-template <class BIIRH=BilateralIIRFilter<4u>, class BIIRV=BIIRH>
 class GaussianConvolver2
-    : public GaussianCoefficients, private BilateralIIRFilter2<BIIRH, BIIRV>
+    : public GaussianCoefficients, private BilateralIIRFilter2<4u>
 {
-  public:
-    typedef BilateralIIRFilter<4u>		BIIRF;
-    typedef BilateralIIRFilter2<BIIRH, BIIRV>	BIIRF2;
+  private:
+    typedef BilateralIIRFilter2<4u>		super;
+    typedef BilateralIIRFilter<4u>		IIRF;
 
+  public:
     GaussianConvolver2(float sigma=1.0)	:GaussianCoefficients(sigma) 	{}
-    GaussianConvolver2(float sigma, u_int nthreads)
-    	:GaussianCoefficients(sigma), BIIRF2(nthreads) 			{}
 
     template <class T1, class B1, class R1, class T2, class B2, class R2>
     GaussianConvolver2&
@@ -215,14 +214,13 @@ class GaussianConvolver2
   \param out	出力2次元配列
   \return	このGauss核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2<BIIRH, BIIRV>&
-GaussianConvolver2<BIIRH, BIIRV>::smooth(const Array2<T1, B1, R1>& in,
-					 Array2<T2, B2, R2>& out)
+inline GaussianConvolver2&
+GaussianConvolver2::smooth(const Array2<T1, B1, R1>& in,
+			   Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c0, BIIRF::Zeroth,
-		       _c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c0, IIRF::Zeroth,
+		      _c0, IIRF::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -233,14 +231,13 @@ GaussianConvolver2<BIIRH, BIIRV>::smooth(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このGauss核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2<BIIRH, BIIRV>&
-GaussianConvolver2<BIIRH, BIIRV>::diffH(const Array2<T1, B1, R1>& in,
-					Array2<T2, B2, R2>& out)
+inline GaussianConvolver2&
+GaussianConvolver2::diffH(const Array2<T1, B1, R1>& in,
+			  Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c1, BIIRF::First,
-		       _c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c1, IIRF::First,
+		      _c0, IIRF::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -251,14 +248,13 @@ GaussianConvolver2<BIIRH, BIIRV>::diffH(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このGauss核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2<BIIRH, BIIRV>&
-GaussianConvolver2<BIIRH, BIIRV>::diffV(const Array2<T1, B1, R1>& in,
-					Array2<T2, B2, R2>& out)
+inline GaussianConvolver2&
+GaussianConvolver2::diffV(const Array2<T1, B1, R1>& in,
+			  Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c0, BIIRF::Zeroth,
-		       _c1, BIIRF::First).convolve(in, out);
+    super::initialize(_c0, IIRF::Zeroth,
+		      _c1, IIRF::First).convolve(in, out);
 
     return *this;
 }
@@ -269,14 +265,13 @@ GaussianConvolver2<BIIRH, BIIRV>::diffV(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このGauss核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2<BIIRH, BIIRV>&
-GaussianConvolver2<BIIRH, BIIRV>::diffHH(const Array2<T1, B1, R1>& in,
-					 Array2<T2, B2, R2>& out)
+inline GaussianConvolver2&
+GaussianConvolver2::diffHH(const Array2<T1, B1, R1>& in,
+			   Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c2, BIIRF::Second,
-		       _c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c2, IIRF::Second,
+		      _c0, IIRF::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -287,14 +282,13 @@ GaussianConvolver2<BIIRH, BIIRV>::diffHH(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このGauss核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2<BIIRH, BIIRV>&
-GaussianConvolver2<BIIRH, BIIRV>::diffHV(const Array2<T1, B1, R1>& in,
-					 Array2<T2, B2, R2>& out)
+inline GaussianConvolver2&
+GaussianConvolver2::diffHV(const Array2<T1, B1, R1>& in,
+			   Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c1, BIIRF::First,
-		       _c1, BIIRF::First).convolve(in, out);
+    super::initialize(_c1, IIRF::First,
+		      _c1, IIRF::First).convolve(in, out);
 
     return *this;
 }
@@ -305,14 +299,13 @@ GaussianConvolver2<BIIRH, BIIRV>::diffHV(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このGauss核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2<BIIRH, BIIRV>&
-GaussianConvolver2<BIIRH, BIIRV>::diffVV(const Array2<T1, B1, R1>& in,
-					 Array2<T2, B2, R2>& out)
+inline GaussianConvolver2&
+GaussianConvolver2::diffVV(const Array2<T1, B1, R1>& in,
+			   Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c0, BIIRF::Zeroth,
-		       _c2, BIIRF::Second).convolve(in, out);
+    super::initialize(_c0, IIRF::Zeroth,
+		      _c2, IIRF::Second).convolve(in, out);
 
     return *this;
 }
@@ -323,11 +316,10 @@ GaussianConvolver2<BIIRH, BIIRV>::diffVV(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このGauss核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2<BIIRH, BIIRV>&
-GaussianConvolver2<BIIRH, BIIRV>::laplacian(const Array2<T1, B1, R1>& in,
-					    Array2<T2, B2, R2>& out)
+inline GaussianConvolver2&
+GaussianConvolver2::laplacian(const Array2<T1, B1, R1>& in,
+			      Array2<T2, B2, R2>& out)
 {
     diffHH(in, _tmp).diffVV(in, out);
     out += _tmp;
@@ -336,5 +328,4 @@ GaussianConvolver2<BIIRH, BIIRV>::laplacian(const Array2<T1, B1, R1>& in,
 }
 
 }
-
 #endif	/* !__TUGaussianConvolver_h */

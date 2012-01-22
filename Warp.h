@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.15 2011-12-07 08:06:31 ueshiba Exp $
+ *  $Id: Warp.h,v 1.16 2012-01-22 10:52:19 ueshiba Exp $
  */
 /*!
   \file		Warp.h
@@ -37,6 +37,10 @@
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
 #include "TU/mmInstructions.h"
+#if defined(USE_TBB)
+#  include <tbb/parallel_for.h>
+#  include <tbb/blocked_range.h>
+#endif
 
 namespace TU
 {
@@ -64,6 +68,27 @@ class Warp
 #endif
 	int					lmost;
     };
+
+#if defined(USE_TBB)
+    template <class T>
+    class WarpLine
+    {
+      public:
+	WarpLine(const Warp& warp, const Image<T>& in, Image<T>& out)
+	    :_warp(warp), _in(in), _out(out)				{}
+	
+	void	operator ()(const tbb::blocked_range<u_int>& r) const
+		{
+		    for (u_int v = r.begin(); v != r.end(); ++v)
+			_warp.warpLine(_in, _out, v);
+		}
+
+      private:
+	const Warp&	_warp;
+	const Image<T>&	_in;
+	Image<T>&	_out;
+    };
+#endif
     
   public:
   //! 画像変形オブジェクトを生成する．
@@ -86,7 +111,7 @@ class Warp
 
     template <class T>
     void	initialize(const Matrix<T, FixedSizedBuf<T, 9>,
-					FixedSizedBuf<Vector<T>, 3> >& Htinv,
+			   FixedSizedBuf<Vector<T>, 3> >& Htinv,
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
     template <class I>
@@ -95,13 +120,17 @@ class Warp
 			   u_int inWidth,  u_int inHeight,
 			   u_int outWidth, u_int outHeight)		;
     template <class T>
-    void	operator ()(const Image<T>& in, Image<T>& out,
-			    u_int vs=0, u_int ve=0)		const	;
+    void	operator ()(const Image<T>& in, Image<T>& out)	const	;
     Vector2f	operator ()(int u, int v)			const	;
 #if defined(SSE2)
     mm::F32vec	src(int u, int v)				const	;
 #endif
 
+  private:
+    template <class T>
+    void	warpLine(const Image<T>& in,
+			 Image<T>& out, u_int v)		const	;
+    
   private:
     Array<FracArray>	_fracs;
     u_int		_width;
@@ -249,6 +278,30 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
     }
 }
 
+//! 出力画像の範囲を指定して画像を変形する．
+/*!
+  \param in	入力画像
+  \param out	出力画像
+*/
+template <class T> void
+Warp::operator ()(const Image<T>& in, Image<T>& out) const
+{
+    out.resize(height(), width());
+
+#if defined(USE_TBB)
+    using namespace	tbb;
+
+    parallel_for(blocked_range<u_int>(0, out.height(), 1),
+		 WarpLine<T>(*this, in, out));
+#else
+    for (u_int v = 0; v < out.height(); ++v)
+	warpLine(in, out, v);
+#endif
+#if defined(SSE)
+    mm::empty();
+#endif	
+}
+    
 //! 出力画像点を指定してそれにマップされる入力画像点の2次元座標を返す．
 /*!
   \param u	出力画像点の横座標
