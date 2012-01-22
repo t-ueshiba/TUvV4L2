@@ -1,7 +1,7 @@
 /*
- *  $Id: main.cc,v 1.1 2012-01-22 10:52:38 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2012-01-22 10:56:27 ueshiba Exp $
  */
-#include <unistd.h>
+#include <stdlib.h>
 #ifdef WIN32
 #  include <io.h>
 #  include <fcntl.h>
@@ -72,11 +72,11 @@ main(int argc, char* argv[])
 	{
 	    Image<float>	lap, edgeH, edgeV;
 	    if (gaussian)
-		GaussianConvolver2<>(alpha).laplacian(in, lap)
-					   .diffH(in, edgeH).diffV(in, edgeV);
+		GaussianConvolver2(alpha).laplacian(in, lap)
+					 .diffH(in, edgeH).diffV(in, edgeV);
 	    else
-		DericheConvolver2<>(alpha).laplacian(in, lap)
-					  .diffH(in, edgeH).diffV(in, edgeV);
+		DericheConvolver2(alpha).laplacian(in, lap)
+					.diffH(in, edgeH).diffV(in, edgeV);
 	    Image<float>	str;
 	    EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
 					 .zeroCrossing(lap, str, edge)
@@ -87,9 +87,9 @@ main(int argc, char* argv[])
 	{
 	    Image<float>    edgeH, edgeV;
 	    if (gaussian)
-		GaussianConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
+		GaussianConvolver2(alpha).diffH(in, edgeH).diffV(in, edgeV);
 	    else
-		DericheConvolver2<>(alpha).diffH(in, edgeH).diffV(in, edgeV);
+		DericheConvolver2(alpha).diffH(in, edgeH).diffV(in, edgeV);
 	    Image<float>    str;
 	    Image<u_char>   dir;
 	    EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
