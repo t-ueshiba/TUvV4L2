@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: DericheConvolver.h,v 1.10 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.11 2012-01-22 10:52:19 ueshiba Exp $
  */
 /*!
   \file		DericheConvolver.h
@@ -87,9 +87,10 @@ DericheCoefficients::initialize(float alpha)
 class DericheConvolver
     : public DericheCoefficients, private BilateralIIRFilter<2u>
 {
-  public:
-    typedef BilateralIIRFilter<2u>		BIIRF;
+  private:
+    typedef BilateralIIRFilter<2u>		super;
     
+  public:
     DericheConvolver(float alpha=1.0)	:DericheCoefficients(alpha)	{}
 
     template <class T1, class B1, class T2, class B2> DericheConvolver&
@@ -106,11 +107,10 @@ class DericheConvolver
   \param out	出力1次元配列
   \return	このCanny-Deriche核自身
 */
-template <class T1, class B1, class T2, class B2>
-inline DericheConvolver&
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
 DericheConvolver::smooth(const Array<T1, B1>& in, Array<T2, B2>& out)
 {
-    BIIRF::initialize(_c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c0, super::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -121,11 +121,10 @@ DericheConvolver::smooth(const Array<T1, B1>& in, Array<T2, B2>& out)
   \param out	出力1次元配列
   \return	このCanny-Deriche核自身
 */
-template <class T1, class B1, class T2, class B2>
-inline DericheConvolver&
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
 DericheConvolver::diff(const Array<T1, B1>& in, Array<T2, B2>& out)
 {
-    BIIRF::initialize(_c1, BIIRF::First).convolve(in, out);
+    super::initialize(_c1, super::First).convolve(in, out);
 
     return *this;
 }
@@ -136,30 +135,27 @@ DericheConvolver::diff(const Array<T1, B1>& in, Array<T2, B2>& out)
   \param out	出力1次元配列
   \return	このCanny-Deriche核自身
 */
-template <class T1, class B1, class T2, class B2>
-inline DericheConvolver&
+template <class T1, class B1, class T2, class B2> inline DericheConvolver&
 DericheConvolver::diff2(const Array<T1, B1>& in, Array<T2, B2>& out)
 {
-    BIIRF::initialize(_c2, BIIRF::Second).convolve(in, out);
+    super::initialize(_c2, super::Second).convolve(in, out);
 
     return *this;
 }
 
 /************************************************************************
-*  class DericheConvoler2<BIIRH, BIIRV>					*
+*  class DericheConvoler2						*
 ************************************************************************/
 //! Canny-Deriche核による2次元配列畳み込みを行うクラス
-template <class BIIRH=BilateralIIRFilter<2u>, class BIIRV=BIIRH>
 class DericheConvolver2
-    : public DericheCoefficients, private BilateralIIRFilter2<BIIRH, BIIRV>
+    : public DericheCoefficients, private BilateralIIRFilter2<2u>
 {
-  public:
-    typedef BilateralIIRFilter<2u>		BIIRF;
-    typedef BilateralIIRFilter2<BIIRH, BIIRV>	BIIRF2;
+  private:
+    typedef BilateralIIRFilter2<2u>		super;
+    typedef BilateralIIRFilter<2u>		IIRF;
     
+  public:
     DericheConvolver2(float alpha=1.0)	:DericheCoefficients(alpha)	{}
-    DericheConvolver2(float alpha, u_int nthreads)
-    	:DericheCoefficients(alpha), BIIRF2(nthreads)			{}
 
     template <class T1, class B1, class R1, class T2, class B2, class R2>
     DericheConvolver2&
@@ -193,14 +189,13 @@ class DericheConvolver2
   \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2<BIIRH, BIIRV>&
-DericheConvolver2<BIIRH, BIIRV>::smooth(const Array2<T1, B1, R1>& in,
-					Array2<T2, B2, R2>& out)
+inline DericheConvolver2&
+DericheConvolver2::smooth(const Array2<T1, B1, R1>& in,
+			  Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c0, BIIRF::Zeroth,
-		       _c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c0, IIRF::Zeroth,
+		      _c0, IIRF::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -211,14 +206,13 @@ DericheConvolver2<BIIRH, BIIRV>::smooth(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2<BIIRH, BIIRV>&
-DericheConvolver2<BIIRH, BIIRV>::diffH(const Array2<T1, B1, R1>& in,
-				       Array2<T2, B2, R2>& out)
+inline DericheConvolver2&
+DericheConvolver2::diffH(const Array2<T1, B1, R1>& in,
+			 Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c1, BIIRF::First,
-		       _c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c1, IIRF::First,
+		      _c0, IIRF::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -229,14 +223,13 @@ DericheConvolver2<BIIRH, BIIRV>::diffH(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2<BIIRH, BIIRV>&
-DericheConvolver2<BIIRH, BIIRV>::diffV(const Array2<T1, B1, R1>& in,
-				       Array2<T2, B2, R2>& out)
+inline DericheConvolver2&
+DericheConvolver2::diffV(const Array2<T1, B1, R1>& in,
+			 Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c0, BIIRF::Zeroth,
-		       _c1, BIIRF::First).convolve(in, out);
+    super::initialize(_c0, IIRF::Zeroth,
+		      _c1, IIRF::First).convolve(in, out);
 
     return *this;
 }
@@ -247,14 +240,13 @@ DericheConvolver2<BIIRH, BIIRV>::diffV(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2<BIIRH, BIIRV>&
-DericheConvolver2<BIIRH, BIIRV>::diffHH(const Array2<T1, B1, R1>& in,
-					Array2<T2, B2, R2>& out)
+inline DericheConvolver2&
+DericheConvolver2::diffHH(const Array2<T1, B1, R1>& in,
+			  Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c2, BIIRF::Second,
-		       _c0, BIIRF::Zeroth).convolve(in, out);
+    super::initialize(_c2, IIRF::Second,
+		      _c0, IIRF::Zeroth).convolve(in, out);
 
     return *this;
 }
@@ -265,14 +257,13 @@ DericheConvolver2<BIIRH, BIIRV>::diffHH(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2<BIIRH, BIIRV>&
-DericheConvolver2<BIIRH, BIIRV>::diffHV(const Array2<T1, B1, R1>& in,
-					Array2<T2, B2, R2>& out)
+inline DericheConvolver2&
+DericheConvolver2::diffHV(const Array2<T1, B1, R1>& in,
+			  Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c1, BIIRF::First,
-		       _c1, BIIRF::First).convolve(in, out);
+    super::initialize(_c1, IIRF::First,
+		      _c1, IIRF::First).convolve(in, out);
 
     return *this;
 }
@@ -283,14 +274,13 @@ DericheConvolver2<BIIRH, BIIRV>::diffHV(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2<BIIRH, BIIRV>&
-DericheConvolver2<BIIRH, BIIRV>::diffVV(const Array2<T1, B1, R1>& in,
-					Array2<T2, B2, R2>& out)
+inline DericheConvolver2&
+DericheConvolver2::diffVV(const Array2<T1, B1, R1>& in,
+			  Array2<T2, B2, R2>& out)
 {
-    BIIRF2::initialize(_c0, BIIRF::Zeroth,
-		       _c2, BIIRF::Second).convolve(in, out);
+    super::initialize(_c0, IIRF::Zeroth,
+		      _c2, IIRF::Second).convolve(in, out);
 
     return *this;
 }
@@ -301,11 +291,10 @@ DericheConvolver2<BIIRH, BIIRV>::diffVV(const Array2<T1, B1, R1>& in,
   \param out	出力2次元配列
   \return	このCanny-Deriche核自身
 */
-template <class BIIRH, class BIIRV>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2<BIIRH, BIIRV>&
-DericheConvolver2<BIIRH, BIIRV>::laplacian(const Array2<T1, B1, R1>& in,
-					   Array2<T2, B2, R2>& out)
+inline DericheConvolver2&
+DericheConvolver2::laplacian(const Array2<T1, B1, R1>& in,
+			     Array2<T2, B2, R2>& out)
 {
     diffHH(in, _tmp).diffVV(in, out);
     out += _tmp;
@@ -314,5 +303,4 @@ DericheConvolver2<BIIRH, BIIRV>::laplacian(const Array2<T1, B1, R1>& in,
 }
 
 }
-
 #endif	/* !__TUDericheConvolver_h */
