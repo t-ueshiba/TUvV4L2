@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.16 2011-07-21 23:41:13 ueshiba Exp $
+#  $Id: Makefile,v 1.17 2012-01-23 01:05:08 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -34,27 +34,16 @@ LINKER		= $(CCC)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Camera++.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/Warp.h \
-		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h \
 		TU/Thread++.h
-HDRS		= IIRFilterMT.h \
-		Thread++.h
-SRCS		= Thread.cc \
-		WarpMT.cc
-OBJS		= Thread.o \
-		WarpMT.o
+HDRS		= Thread++.h
+SRCS		= Thread.cc
+OBJS		= Thread.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.16 $	|		\
+REV		= $(shell echo $Revision: 1.17 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -67,9 +56,3 @@ include $(PROJECT)/lib/l.mk
 ###
 Thread.o: TU/Thread++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/types.h
-WarpMT.o: TU/Thread++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Warp.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h \
-	/usr/local/include/TU/mmInstructions.h
