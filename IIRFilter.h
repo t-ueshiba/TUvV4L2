@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.14 2012-01-22 10:52:19 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.15 2012-01-24 08:07:55 ueshiba Exp $
  */
 /*!
   \file		IIRFilter.h
@@ -576,18 +576,14 @@ template <u_int D> class BilateralIIRFilter
 		initialize(const float cF[D+D], const float cB[D+D])	;
     BilateralIIRFilter&
 		initialize(const float c[D+D], Order order)		;
-    template <class T, class B> const BilateralIIRFilter&
-		convolve(const Array<T, B>& in)			const	;
-    template <class T1, class B1, class T2, class B2> const BilateralIIRFilter&
+    template <class T1, class B1, class T2, class B2>
+    const BilateralIIRFilter&
 		convolve(const Array<T1, B1>& in,
 			 Array<T2, B2>& out)			const	;
     template <class T1, class B1, class R1, class T2, class B2, class R2>
     const BilateralIIRFilter&
 		operator ()(const Array2<T1, B1, R1>& in,
-			    Array2<T2, B2, R2>& out,
-			    u_int is=0, u_int ie=0)		const	;
-    u_int	dim()						const	;
-    float	operator [](int i)				const	;
+			    Array2<T2, B2, R2>& out)		const	;
     void	limits(float& limit0,
 		       float& limit1, float& limit2)		const	;
 
@@ -722,21 +718,6 @@ BilateralIIRFilter<D>::initialize(const float c[D+D], Order order)
     return initialize(cF, cB);
 }
     
-//! フィルタによる畳み込みを行う. 出力は #operator []() で取り出す
-/*!
-  \param in	入力データ列
-  \return	このフィルタ自身
-*/
-template <u_int D> template <class T, class B>
-inline const BilateralIIRFilter<D>&
-BilateralIIRFilter<D>::convolve(const Array<T, B>& in) const
-{
-    _iirF.forward(in, _bufF);
-    _iirB.backward(in, _bufB);
-
-    return *this;
-}
-
 //! フィルタによる畳み込みを行う. 
 /*!
   \param in	入力データ列
@@ -748,10 +729,11 @@ inline const BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::convolve(const Array<T1, B1>& in,
 				Array<T2, B2>& out) const
 {
-    convolve(in);
-    out.resize(dim());
-    for (int i = 0; i < dim(); ++i)
-	out[i] = (*this)[i];
+    _iirF.forward(in, _bufF);
+    _iirB.backward(in, _bufB);
+    out.resize(in.dim());
+    for (int i = 0; i < out.dim(); ++i)
+	out[i] = _bufF[i] + _bufB[i];
 
     return *this;
 }
@@ -760,52 +742,25 @@ BilateralIIRFilter<D>::convolve(const Array<T1, B1>& in,
 /*!
   \param in	入力2次元配列
   \param out	出力2次元配列
-  \param is	処理を開始する行
-  \param ie	処理を終了する次の行．0を与えると最後の行まで処理する．
   \return	このフィルタ自身
 */
 template <u_int D>
 template <class T1, class B1, class R1, class T2, class B2, class R2>
 const BilateralIIRFilter<D>&
 BilateralIIRFilter<D>::operator ()(const Array2<T1, B1, R1>& in,
-				   Array2<T2, B2, R2>& out,
-				   u_int is, u_int ie) const
+				   Array2<T2, B2, R2>& out) const
 {
     out.resize(in.ncol(), in.nrow());
-    if (ie == 0)
-	ie = in.nrow();
-
 #if defined(USE_TBB)
     using namespace	tbb;
 
-    parallel_for(blocked_range<u_int>(is, ie, 1),
+    parallel_for(blocked_range<u_int>(0, in.nrow(), 1),
 		 ConvolveRow<T1, B1, R1, T2, B2, R2>(*this, in, out));
 #else
-    for (u_int i = is; i < ie; ++i)
+    for (u_int i = 0; i < in.nrow(); ++i)
 	convolveRow(in[i], out, i);
 #endif
     return *this;
-}
-
-//! 畳み込みの出力データ列の次元を返す
-/*!
-  \return	出力データ列の次元
-*/
-template <u_int D> inline u_int
-BilateralIIRFilter<D>::dim() const
-{
-    return _bufF.dim();
-}
-
-//! 畳み込みの出力データの特定の要素を返す
-/*!
-  \param i	要素のindex
-  \return	要素の値
-*/
-template <u_int D> inline float
-BilateralIIRFilter<D>::operator [](int i) const
-{
-    return _bufF[i] + _bufB[i];
 }
 
 //! 特定の入力データ列に対してフィルタを適用した場合の極限値を求める
@@ -834,10 +789,11 @@ template <class T, class B, class T2, class B2, class R2> void
 BilateralIIRFilter<D>::convolveRow(const Array<T, B>& in,
 				   Array2<T2, B2, R2>& out, u_int i) const
 {
-    convolve(in);
+    _iirF.forward(in, _bufF);
+    _iirB.backward(in, _bufB);
     T2*	col = &out[0];
-    for (u_int j = 0; j < dim(); ++j)
-	(*col++)[i] = (*this)[j];
+    for (u_int j = 0; j < in.dim(); ++j)
+	(*col++)[i] = _bufF[j] + _bufB[j];
 }
     
 /************************************************************************
