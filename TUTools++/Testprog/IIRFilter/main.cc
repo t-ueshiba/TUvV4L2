@@ -1,9 +1,8 @@
 /*
- *  $Id: main.cc,v 1.15 2012-01-22 10:52:47 ueshiba Exp $
+ *  $Id: main.cc,v 1.16 2012-01-24 08:08:35 ueshiba Exp $
  */
 #include <stdlib.h>
 #include "TU/Image++.h"
-#include "TU/IIRFilterMT.h"
 #include "TU/DericheConvolver.h"
 #include "TU/GaussianConvolver.h"
 #include "TU/Profiler.h"
@@ -30,7 +29,7 @@ doJob(float alpha, bool gaussian)
 
 	for (int i = 0; i < 10; ++i)
 	{
-	    for (int j = 0; j < 10; ++j)
+	    for (int j = 0; j < 100; ++j)
 	    {
 		profiler.start(0);
 		convolver.smooth(in, out);
@@ -46,7 +45,7 @@ doJob(float alpha, bool gaussian)
 
 	for (int i = 0; i < 10; ++i)
 	{
-	    for (int j = 0; j < 10; ++j)
+	    for (int j = 0; j < 100; ++j)
 	    {
 		profiler.start(0);
 		convolver.smooth(in, out);
