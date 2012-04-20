@@ -1,5 +1,5 @@
 /*
- *  $Id: GraphCuts.h,v 1.2 2012-01-03 23:32:16 ueshiba Exp $
+ *  $Id: GraphCuts.h,v 1.3 2012-04-20 00:47:07 ueshiba Exp $
  */
 #ifndef __GRAPHCUTS_H
 #define __GRAPHCUTS_H
@@ -20,6 +20,7 @@
 #include <boost/foreach.hpp>
 #include <iostream>
 #include <algorithm>
+#include <stack>
 #include <cassert>
 
 /*!
@@ -32,14 +33,12 @@ enum vertex_id_t	{vertex_id};		// サイトのID
 enum vertex_label_t	{vertex_label};		// サイトのラベル
 enum vertex_sedge_t	{vertex_sedge};		// 開始点からの辺
 enum vertex_tedge_t	{vertex_tedge};		// 終端点への辺
+enum edge_smooth_t	{edge_smooth};		// 平滑化項を表す辺
 BOOST_INSTALL_PROPERTY(vertex, id);
 BOOST_INSTALL_PROPERTY(vertex, label);
 BOOST_INSTALL_PROPERTY(vertex, sedge);
 BOOST_INSTALL_PROPERTY(vertex, tedge);
-#ifdef WITH_DUMMY_EDGES
-enum edge_dummy_t	{edge_dummy};		// ダミーの辺
-BOOST_INSTALL_PROPERTY(edge, dummy);
-#endif
+BOOST_INSTALL_PROPERTY(edge, smooth);
     
 /************************************************************************
 *  class GraphCuts<T, ID, L, EL>					*
@@ -61,9 +60,8 @@ class GraphCuts
     enum Algorithm			//<! 最大フローアルゴリズム
     {
 	BoykovKolmogorov		//!< Boykov-Kolmogorovアルゴリズム
-#ifdef WITH_DUMMY_EDGES
-	,
-	EdmondsKarp,			//!< Edmonds-Karpアルゴリズム
+#ifdef WITH_PARALLEL_EDGES
+	, EdmondsKarp,			//!< Edmonds-Karpアルゴリズム
 	PushRelabel			//!< Push-Relabelアルゴリズム
 #endif
     };
@@ -85,40 +83,15 @@ class GraphCuts
     typedef property<edge_index_t,		int,
 	    property<edge_capacity_t,		value_type,
 	    property<edge_residual_capacity_t,	value_type,
-	    property<edge_reverse_t,		edge_t
-#ifdef WITH_DUMMY_EDGES
-	  , property<edge_dummy_t,		bool>
-#endif
-		     > > > >				EdgeProps;
+	    property<edge_reverse_t,		edge_t,
+	    property<edge_smooth_t,		bool
+		     > > > > >				EdgeProps;
     typedef adjacency_list<EL, vecS, directedS,
 			   VertexProps, EdgeProps>	graph_t;
     typedef typename graph_traits<graph_t>::vertex_iterator
 							vertex_iterator;
     typedef typename graph_traits<graph_t>::out_edge_iterator
 							out_edge_iterator;
-
-  //! 最大フローを求めた後にそれに対応する最小カットを探索するクラス
-    class MinCutVisitor : public default_bfs_visitor
-    {
-      public:
-	MinCutVisitor(vertex_t s)					;
-
-	void		initialize_vertex(vertex_t v, const graph_t& g)	;
-	void		examine_vertex(vertex_t v, const graph_t& g)	;
-	void		examine_edge(edge_t e, const graph_t& g)	;
-#ifdef _DEBUG
-	void		discover_vertex(vertex_t v, const graph_t& g)	;
-	void		tree_edge(edge_t e, const graph_t& g)		;
-	void		non_tree_edge(edge_t e, const graph_t& g)	;
-	void		gray_target(edge_t e, const graph_t& g)		;
-	void		black_target(edge_t e, const graph_t& g)	;
-	void		finish_vertex(vertex_t v, const graph_t& g)	;
-#endif
-      private:
-	const vertex_t	_s;		//!< 開始点
-	color_t		_color;		//!< 現在調べている辺の始点のマーク
-	bool		_saturated;	//!< 現在調べている辺の飽和の有無
-    };
 
   public:
     typedef vertex_t			site_type;	//!< サイトの型
@@ -128,7 +101,7 @@ class GraphCuts
   public:
   // 構造の生成と破壊
     GraphCuts()								;
-    site_type		createDataTerm(const id_type id)		;
+    site_type		createDataTerm(const id_type& id)		;
     void		createSmoothingTerm(site_type u, site_type v)	;
     void		clear()						;
 
@@ -149,19 +122,25 @@ class GraphCuts
   // 最適化計算
     template <class F>
     value_type		value(F energyTerm)			const	;
+    template <class F>
+    value_type		value(label_type alpha, F energyTerm)	const	;
     value_type		maxFlow(label_type alpha, Algorithm alg)	;
     template <class F>
     value_type		alphaExpansion(label_type alpha, F energyTerm,
 				       Algorithm alg)			;
-
+    void		check()					const	;
+    
   // 入出力
     std::istream&	getDimacsMaxFlow(std::istream& in)		;
+    std::ostream&	putDimacsMaxFlow(std::ostream& out)	const	;
     std::ostream&	putCapacities(std::ostream& out)	const	;
     std::ostream&	putMaxFlow(std::ostream& out)		const	;
     std::ostream&	putMinCut(std::ostream& out)		const	;
     
   private:
     edge_t		createEdgePair(vertex_t u, vertex_t v)		;
+    void		computeMinCut()					;
+    value_type		flow(edge_t e)				const	;
     
   private:
     graph_t		_g;	//!< グラフ
@@ -188,7 +167,7 @@ GraphCuts<T, ID, L, EL>::GraphCuts()
 */ 
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::site_type
-GraphCuts<T, ID, L, EL>::createDataTerm(const id_type id)
+GraphCuts<T, ID, L, EL>::createDataTerm(const id_type& id)
 {
     const vertex_t	v = add_vertex(_g);	      // 頂点を生成
     put(vertex_id,    _g, v, id);		      // そのIDを登録
@@ -206,10 +185,16 @@ GraphCuts<T, ID, L, EL>::createDataTerm(const id_type id)
 template <class T, class ID, class L, class EL> inline void
 GraphCuts<T, ID, L, EL>::createSmoothingTerm(site_type u, site_type v)
 {
-    createEdgePair(u, v);
-#ifdef WITH_DUMMY_EDGES
-    createEdgePair(v, u);
+#ifdef WITH_PARALLEL_EDGES
+    edge_t	e = createEdgePair(u, v);
+#else
+    edge_t	e;
+    bool	exists;
+    tie(e, exists) = edge(u, v, _g);	// 既に(u, v)があれば，それをeにセットし，
+    if (!exists)			// なければ...
+	e = createEdgePair(u, v);	// 新たに作る．
 #endif
+    put(edge_smooth, _g, e, true);	// 平滑化項フラグをセット
 }
     
 //! グラフの全ての辺および開始点と終端点を除く全ての頂点を除去する．
@@ -305,14 +290,10 @@ GraphCuts<T, ID, L, EL>::operator ()(site_type v)
 template <class T, class ID, class L, class EL> inline bool
 GraphCuts<T, ID, L, EL>::haveSmoothingTerm(site_type u, site_type v) const
 {
-#ifdef WITH_DUMMY_EDGES
-    BOOST_FOREACH (edge_t e, edge_range(u, v, _g))
-	if (!get(edge_dummy, _g, e))
+    BOOST_FOREACH (edge_t e, out_edges(u, _g))
+	if (target(e, _g) == v && get(edge_smooth, _g, e))
 	    return true;
     return false;
-#else
-    return edge(u, v, _g).second;
-#endif
 }
     
 //! 指定されたサイトのデータエネルギー値を返す．
@@ -327,7 +308,7 @@ GraphCuts<T, ID, L, EL>::dataEnergy(site_type v, bool source) const
 {
     edge_t	e = (source ? get(vertex_sedge, _g, v)
 			    : get(vertex_tedge, _g, v));
-    return get(edge_capacity, _g)[e];
+    return get(edge_capacity, _g, e);
 }
 
 //! 指定されたサイトのデータエネルギー値への参照を返す．
@@ -342,7 +323,7 @@ GraphCuts<T, ID, L, EL>::dataEnergy(site_type v, bool source)
 {
     edge_t	e = (source ? get(vertex_sedge, _g, v)
 			    : get(vertex_tedge, _g, v));
-    return get(edge_capacity, _g)[e];
+    return get(edge_capacity, _g, e);
 }
 
 //! 指定された2つのサイト間の平滑化エネルギー値を返す．
@@ -356,16 +337,16 @@ template <class T, class ID, class L, class EL>
 typename GraphCuts<T, ID, L, EL>::value_type
 GraphCuts<T, ID, L, EL>::smoothingEnergy(site_type u, site_type v) const
 {
-#ifdef WITH_DUMMY_EDGES
+#ifdef WITH_PARALLEL_EDGES
     BOOST_FOREACH (edge_t e, out_edges(u, _g))
-	if (target(e, _g) == v && !get(edge_dummy, _g, e))
-	    return get(edge_capacity, _g)[e];
+	if (target(e, _g) == v && get(edge_smooth, _g, e))
+	    return get(edge_capacity, _g, e);
     return 0;
 #else
     edge_t	e;
     bool	exists;
     tie(e, exists) = edge(u, v, _g);
-    return (exists ? get(edge_capacity, _g)[e] : 0);
+    return (exists && get(edge_smooth, _g, e) ? get(edge_capacity, _g, e) : 0);
 #endif
 }
 
@@ -380,19 +361,19 @@ template <class T, class ID, class L, class EL>
 typename GraphCuts<T, ID, L, EL>::value_type&
 GraphCuts<T, ID, L, EL>::smoothingEnergy(site_type u, site_type v)
 {
-#ifdef WITH_DUMMY_EDGES
+#ifdef WITH_PARALLEL_EDGES
     BOOST_FOREACH (edge_t e, out_edges(u, _g))
-	if (target(e, _g) == v && !get(edge_dummy, _g, e))
-	    return get(edge_capacity, _g)[e];
+	if (target(e, _g) == v && !get(edge_smooth, _g, e))
+	    return get(edge_capacity, _g, e);
     throw std::runtime_error("GraphCuts<T, ID, L, EL>::energy(): non-existing smoothing term!");
-    return get(edge_capacity, _g)[get(vertex_sedge, _g, u)];  // ここには到達せず
+    return get(edge_capacity, _g, get(vertex_sedge, _g, u));  // ここには到達せず
 #else
     edge_t	e;
     bool	exists;
     tie(e, exists) = edge(u, v, _g);
-    if (!exists)
+    if (!exists || !get(edge_smooth, _g, e))
 	throw std::runtime_error("GraphCuts<T, ID, L, EL>::energy(): non-existing smoothing term!");
-    return get(edge_capacity, _g)[e];
+    return get(edge_capacity, _g, e);
 #endif
 }
 
@@ -411,29 +392,26 @@ template <class T, class ID, class L, class EL> template <class F>
 typename GraphCuts<T, ID, L, EL>::value_type
 GraphCuts<T, ID, L, EL>::value(F energyTerm) const
 {
-    value_type	val2 = 0;				// エネルギー値の2倍
+    value_type	val = 0;				// エネルギー値
     BOOST_FOREACH (vertex_t u, sites())
     {
-	const id_type		uid = get(vertex_id,	_g, u);
-	const label_type	Xu  = get(vertex_label, _g, u);
+	const id_type		uid = id(u);
+	const label_type	Xu  = (*this)(u);
 
+	val += energyTerm(uid, Xu);				// データ項
+	
 	BOOST_FOREACH (edge_t e, out_edges(u, _g))
 	{
-	    const vertex_t	v = target(e, _g);
+	    if (get(edge_smooth, _g, e))
+	    {
+		const vertex_t	v = target(e, _g);
 
-	    if (v == _s || v == _t)
-		val2 += energyTerm(uid, Xu);	// データ項は2回カウントされる．
-	    else
-#ifdef WITH_DUMMY_EDGES
-	    if (!get(edge_dummy, _g, e))
-#endif
-	      // 平滑化項: 全体では (u, v) と (v, u) の2回カウントされる．
-		val2 += energyTerm(uid, get(vertex_id,    _g, v),
-				   Xu,  get(vertex_label, _g, v));
+		val += energyTerm(uid, id(v), Xu, (*this)(v));	// 平滑化項
+	    }
 	}
     }
     
-    return val2 / 2;	// 1/2倍して本来のエネルギー値に戻す
+    return val;
 }
     
 //! 指定された最大フローアルゴリズムによってフローの最大値を求める．
@@ -446,44 +424,32 @@ template <class T, class ID, class L, class EL>
 typename GraphCuts<T, ID, L, EL>::value_type
 GraphCuts<T, ID, L, EL>::maxFlow(label_type alpha, Algorithm alg)
 {
-    value_type	flow;
+    value_type	f;
     switch (alg)
     {
-#ifdef WITH_DUMMY_EDGES
+#ifdef WITH_PARALLEL_EDGES
       case EdmondsKarp:
-	flow = edmonds_karp_max_flow(_g, _s, _t);
-	breadth_first_search(_g, _s, visitor(MinCutVisitor(_s)));
+	f = edmonds_karp_max_flow(_g, _s, _t,
+				  color_map(get(vertex_color, _g)).
+				  predecessor_map(get(vertex_predecessor, _g)));
 	break;
       case PushRelabel:
-	flow = push_relabel_max_flow(_g, _s, _t);
-	breadth_first_search(_g, _s, visitor(MinCutVisitor(_s)));
+	f = push_relabel_max_flow(_g, _s, _t);
+	computeMinCut();
 	break;
 #endif
       default:
-	flow = boykov_kolmogorov_max_flow(_g, _s, _t);
+	f = boykov_kolmogorov_max_flow(_g, _s, _t);
+	computeMinCut();
+	break;
     }
 
   // 終端点側の頂点にラベル値alphaを与える．
     BOOST_FOREACH (vertex_t v, sites())
-    {
-	if (get(vertex_color, _g, v) != color_traits_t::black())
-	    put(vertex_label, _g, v, alpha);
-    }
-#ifdef _DEBUG
-  // xxx_max_flow() が返す最大フロー値が正しいかチェックする．
-    value_type	computed_flow = 0;
-    BOOST_FOREACH (edge_t e, edges(_g))
-    {
-	if (get(vertex_color, _g, source(e, _g)) == color_traits_t::black() &&
-	    get(vertex_color, _g, target(e, _g)) != color_traits_t::black())
-	    computed_flow += (get(edge_capacity, _g, e) -
-			      get(edge_residual_capacity, _g, e));
-    }
+	if (get(vertex_color, _g, v) == color_traits_t::white())
+	    (*this)(v) = alpha;
 
-    std::cerr << "flow(diff) = " << flow
-	      << '(' << computed_flow - flow << "), ";
-#endif
-    return flow;
+    return f;
 }
 
 //! アルファ拡張を1回行う．
@@ -510,43 +476,34 @@ GraphCuts<T, ID, L, EL>::alphaExpansion(label_type alpha, F energyTerm,
 	put(edge_capacity, _g, e, 0);
 
   // alphaでないラベルを持つ頂点に接続する辺にエネルギー値を付与する．
-    value_type	bias2 = 0;		// バイアスの2倍
+    value_type	bias = 0;		// バイアス
     BOOST_FOREACH (vertex_t u, sites())
     {
-	const id_type		uid = get(vertex_id,	_g, u);
-	const label_type	Xu  = get(vertex_label, _g, u);
+	const id_type		uid = id(u);
+	const label_type	Xu  = (*this)(u);
 
 	if (Xu != alpha)		// u のラベルがalphaでなければ...
 	{
+	    const edge_t	es = get(vertex_sedge, _g, u),
+				et = get(vertex_tedge, _g, u);
+
+	    get(edge_capacity, _g)[es] += energyTerm(uid, alpha);
+	    get(edge_capacity, _g)[et] += energyTerm(uid, Xu);
+	    
 	    BOOST_FOREACH (edge_t e, out_edges(u, _g))
 	    {
-		const vertex_t	v = target(e, _g);
-		
-		if (v == _s)		// e = (u, _s), Xu != alpha
+		if (get(edge_smooth, _g, e))	// e が平滑化項を表すなら...
 		{
-		    const edge_t	er = get(edge_reverse, _g, e);
-		    get(edge_capacity, _g)[er] += 2*energyTerm(uid, alpha);
-		}
-		else if (v == _t)	// e = (u, _t), Xu != alpha
-		{
-		    get(edge_capacity, _g)[e] += 2*energyTerm(uid, Xu);
-		}
-		else			// e = (u, v), Xu != alpha
-#ifdef WITH_DUMMY_EDGES
-		if (!get(edge_dummy, _g, e))
-#endif
-		{
-		    const id_type	vid = get(vertex_id,	_g, v);
-		    const label_type	Xv  = get(vertex_label, _g, v);
-		    const edge_t	es  = get(vertex_sedge, _g, u);
-		    const edge_t	et  = get(vertex_tedge, _g, u);
+		    const vertex_t	v   = target(e, _g);
+		    const id_type	vid = id(v);
+		    const label_type	Xv  = (*this)(v);
 		    
 		    if (Xv == alpha)	// e = (u, v), Xu != alpha, Xv = alpha
 		    {
 			get(edge_capacity, _g)[es] +=
-			    2*energyTerm(uid, vid, alpha, alpha);
+			    energyTerm(uid, vid, alpha, alpha);
 			get(edge_capacity, _g)[et] +=
-			    2*energyTerm(uid, vid, Xu, alpha);
+			    energyTerm(uid, vid, Xu, alpha);
 		    }
 		    else		// e = (u, v), Xu != alpha, Xv != alpha
 		    {
@@ -560,65 +517,124 @@ GraphCuts<T, ID, L, EL>::alphaExpansion(label_type alpha, F energyTerm,
 			if (h < 0)
 			    throw std::runtime_error("boost::GraphCuts<T, ID, L, EL>::alphaExpansion(): submodularity constraint is violated!");
 
+			const edge_t	ev = get(vertex_tedge, _g, v);
+
 			get(edge_capacity, _g)[es] += (h10 - h00);
-			get(edge_capacity, _g)[et] += (h01 - h11);
+			get(edge_capacity, _g)[ev] += (h10 - h11);
 			get(edge_capacity, _g)[e ] += h;
 		    
-			bias2 -= (h - h00 - h11);
+			bias -= (h - h01);
 		    }
 		}
 	    }
 	}
 	else				// u のラベルがalphaならば...
 	{
+	    bias += energyTerm(uid, alpha);
+	    
 	    BOOST_FOREACH (edge_t e, out_edges(u, _g))
 	    {
-		const vertex_t	v = target(e, _g);
-
-		if (v == _s)		// e = (u, _s), Xu = alpha
+		if (get(edge_smooth, _g, e))
 		{
-		    bias2 += 4*energyTerm(uid, alpha);
-		}
-		else if (v != _t)	// e = (u, v),  Xu = alpha
-#ifdef WITH_DUMMY_EDGES
-		if (!get(edge_dummy, _g, e))
-#endif
-		{
-		    const id_type	vid = get(vertex_id,	_g, v);
-		    const label_type	Xv  = get(vertex_label, _g, v);
+		    const vertex_t	v   = target(e, _g);
+		    const id_type	vid = id(v);
+		    const label_type	Xv  = (*this)(v);
 
 		    if (Xv == alpha)	// e = (u, v), Xu = Xv = alpha
-			bias2 += 2*energyTerm(uid, vid, alpha, alpha);
+			bias += energyTerm(uid, vid, alpha, alpha);
+		    else		// e = (u, v), Xu = alpha, Xv != alpha
+		    {
+			const edge_t	es = get(vertex_sedge, _g, v),
+					et = get(vertex_tedge, _g, v);
+			
+			get(edge_capacity, _g)[es] +=
+			    energyTerm(uid, vid, alpha, alpha);
+			get(edge_capacity, _g)[et] +=
+			    energyTerm(uid, vid, alpha, Xv);
+		    }
 		}
 	    }
 	}
     }
 
   // _s から流れ出す辺と _t に流れ込む辺の容量が非負になるように調整する．
-    BOOST_FOREACH (edge_t es, out_edges(_s, _g))
+    BOOST_FOREACH (vertex_t v, sites())
     {
-	const edge_t	et = get(vertex_tedge, _g, target(es, _g));
+	const edge_t	es = get(vertex_sedge, _g, v),
+			et = get(vertex_tedge, _g, v);
 	value_type&	cs = get(edge_capacity, _g)[es];
 	value_type&	ct = get(edge_capacity, _g)[et];
 
 	if (cs < ct)
 	{
-	    bias2 += 2*cs;
+	    bias += cs;
 	    ct -= cs;
 	    cs  = 0;
 	}
 	else
 	{
-	    bias2 += 2*ct;
+	    bias += ct;
 	    cs -= ct;
 	    ct  = 0;
 	}
     }
-
-  // 最大フローと最小カットを求める．
-    value_type	flow = maxFlow(alpha, alg);
     
-    return (flow + bias2/2) / 2;
+  // 最大フローと最小カットを求める．
+    return bias + maxFlow(alpha, alg);
+}
+
+template <class T, class ID, class L, class EL> void
+GraphCuts<T, ID, L, EL>::check() const
+{
+    using namespace	std;
+    
+    BOOST_FOREACH (edge_t e, edges(_g))
+	if (get(edge_smooth, _g, e))
+	    if (flow(e) + flow(get(edge_reverse, _g, e)) != 0)
+		cerr << "Inconsistent flow!" << endl;
+    
+    value_type	f = 0;
+    BOOST_FOREACH (edge_t e, out_edges(_s, _g))
+	f += flow(e);
+    cerr << " s => " << f << ", ";
+    
+  // xxx_max_flow() が返す最大フロー値が正しいかチェックする．
+    f = 0;
+    BOOST_FOREACH (edge_t e, edges(_g))
+    {
+	vertex_t	u = source(e, _g), v = target(e, _g);
+
+#if 1
+	if (get(vertex_color, _g, u) == color_traits_t::black() &&
+	    get(vertex_color, _g, v) != color_traits_t::black())
+#else	
+	if (get(vertex_color, _g, u) != color_traits_t::white() &&
+	    get(vertex_color, _g, v) == color_traits_t::white())
+#endif
+	{
+	    f += get(edge_capacity, _g, e);
+
+	    if (get(edge_residual_capacity, _g, e) != 0)
+	    {
+		edge_t	er = get(edge_reverse, _g, e);
+		cerr << "\tc(" << u << ',' << v << ") = "
+		     << get(edge_capacity, _g, e)
+		     << ", r(" << u << ',' << v << ") = "
+		     << get(edge_residual_capacity, _g, e)
+		     << ", c(" << v << ',' << u << ") = "
+		     << get(edge_capacity, _g, er)
+		     << ", r(" << v << ',' << u << ") = "
+		     << get(edge_residual_capacity, _g, er)
+		     << endl;
+	    }
+	}
+    }
+    cerr << "cut = " << f << ", ";
+
+    f = 0;
+    BOOST_FOREACH (edge_t e, out_edges(_t, _g))
+	f += flow(get(edge_reverse, _g, e));
+    cerr << f << " => t" << endl;
 }
     
 /*
@@ -634,6 +650,70 @@ GraphCuts<T, ID, L, EL>::getDimacsMaxFlow(std::istream& in)
     read_dimacs_max_flow(_g, get(edge_capacity, _g), get(edge_reverse, _g),
 			 _s, _t, in);
     return in;
+}
+
+//! 出力ストリームに最大フロー問題を書き込む．
+template <class T, class ID, class L, class EL> std::ostream&
+GraphCuts<T, ID, L, EL>::putDimacsMaxFlow(std::ostream& out) const
+{
+    using namespace	std;
+
+#if 1
+    out << "p max\t" << num_vertices(_g) << '\t' << num_edges(_g)/2 << endl;
+
+    out << "n\t" << _s + 1 << " s" << endl;	// 開始点
+    out << "n\t" << _t + 1 << " t" << endl;	// 終端点
+
+    int	nedges = 0;
+    BOOST_FOREACH (vertex_t v, sites())
+    {
+	edge_t	es = get(vertex_sedge, _g, v),
+		et = get(vertex_tedge, _g, v);
+	
+	out << "a\t" << _s + 1 << '\t' << v + 1
+	    << '\t' << get(edge_capacity, _g, es) << endl;
+	out << "a\t" << v + 1 << '\t' << _t + 1
+	    << '\t' << get(edge_capacity, _g, et) << endl;
+	nedges += 2;
+	
+	BOOST_FOREACH (edge_t e, out_edges(v, _g))
+	{
+	    if (get(edge_smooth, _g, e))
+	    {
+		out << "a\t" << v + 1 << '\t' << target(e, _g) + 1
+		    << '\t' << get(edge_capacity, _g, e) << endl;
+		++nedges;
+	    }
+	}
+    }
+    cerr << "#v = " << num_vertices(_g)
+	 << ", #e(!zero)/#e = " << nedges << '/' << num_edges(_g)/2
+	 << endl;
+#else
+    int	nNonzeroEdges = 0;
+    BOOST_FOREACH (edge_t e, edges(_g))
+    {
+	if (get(edge_capacity, _g, e) > 0)
+	    ++nNonzeroEdges;
+    }
+
+    out << "p max\t" << num_vertices(_g) << '\t' << nNonzeroEdges << endl;
+
+    out << "n\t" << _s + 1 << " s" << endl;	// 開始点
+    out << "n\t" << _t + 1 << " t" << endl;	// 終端点
+
+    BOOST_FOREACH (edge_t e, edges(_g))
+    {
+	const value_type	c = get(edge_capacity, _g, e);
+	if (c > 0)
+	    out << "a\t" << source(e, _g) + 1 << '\t' << target(e, _g) + 1
+		<< '\t' << c << endl;
+    }
+    cerr << "#v = " << num_vertices(_g)
+	 << ", #e(!zero)/#e = " << nNonzeroEdges << '/' << num_edges(_g)
+	 << endl;
+#endif    
+    return out;
 }
 
 template <class T, class ID, class L, class EL> std::ostream&
@@ -689,7 +769,7 @@ GraphCuts<T, ID, L, EL>::putMinCut(std::ostream& out) const
     BOOST_FOREACH (vertex_t v, vertices(_g))
     {
 	out << "p[" << v << "] = "
-	    << (get(vertex_color, _g, v) == color_traits_t::black() ? 0 : 1)
+	    << (get(vertex_color, _g, v) == color_traits_t::white() ? 1 : 0)
 	    << endl;
     }
 
@@ -704,129 +784,57 @@ inline typename GraphCuts<T, ID, L, EL>::edge_t
 GraphCuts<T, ID, L, EL>::createEdgePair(vertex_t u, vertex_t v)
 {
     edge_t	e0 = add_edge(u, v, _g).first;
-    put(edge_capacity, _g, e0, 0);
     edge_t	e1 = add_edge(v, u, _g).first;
+    put(edge_capacity, _g, e0, 0);
     put(edge_capacity, _g, e1, 0);
-    put(edge_reverse, _g, e0, e1);
-    put(edge_reverse, _g, e1, e0);
-#ifdef WITH_DUMMY_EDGES
-    put(edge_dummy, _g, e0, false);
-    put(edge_dummy, _g, e1, true);
-#endif
+    put(edge_residual_capacity, _g, e0, 0);
+    put(edge_residual_capacity, _g, e1, 0);
+    put(edge_reverse,  _g, e0, e1);
+    put(edge_reverse,  _g, e1, e0);
+    put(edge_smooth,   _g, e0, false);
+    put(edge_smooth,   _g, e1, false);
+
     return e0;
 }
     
-/************************************************************************
-*  class GraphCuts<T, ID, L, EL>::MinCutVisitor				*
-************************************************************************/
-template <class T, class ID, class L, class EL> inline
-GraphCuts<T, ID, L, EL>::MinCutVisitor::MinCutVisitor(vertex_t s)
-    :_s(s), _color(color_traits_t::black()), _saturated(false)
-{
-}
-
 template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::initialize_vertex(vertex_t v,
-							  const graph_t& g)
+GraphCuts<T, ID, L, EL>::computeMinCut()
 {
-    put(vertex_color, const_cast<graph_t&>(g),
-	v, (v != _s ? color_traits_t::white() : color_traits_t::black()));
-}
+  // 全頂点を白に塗る．
+    BOOST_FOREACH (vertex_t v, vertices(_g))
+	put(vertex_color, _g, v, color_traits_t::white());
+
+  // 開始点から飽和していない辺を通って到達できる頂点を黒に塗る．
+    std::stack<vertex_t>	stack;	// 深さ優先探索のためのスタック
+    stack.push(_s);
     
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::examine_vertex(vertex_t v,
-						       const graph_t& g)
-{
-#ifdef _DEBUG
-    using namespace	std;
-    cerr << "examine vertex " << v << endl;
-#endif
-    _color = get(vertex_color, g, v);
-}
-
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::examine_edge(edge_t e,
-						     const graph_t& g)
-{
-#ifdef _DEBUG
-    using namespace	std;
-    cerr << " examine edge (" << source(e, g) << ' ' << target(e, g) << ')';
-#endif
-  // 始点のラベルが0でこの辺が飽和していなければ終点のラベルを0にする．
-    if (_color == color_traits_t::black() &&
-	get(edge_residual_capacity, g, e))
-#ifdef _DEBUG
+    while (!stack.empty())		// 深さ優先探索
     {
-	put(vertex_color, const_cast<graph_t&>(g),
-	    target(e, g), color_traits_t::black());
-	cerr << " *";
+	vertex_t	u = stack.top();
+	stack.pop();
+
+	if (get(vertex_color, _g, u) != color_traits_t::black())
+	{
+	    put(vertex_color, _g, u, color_traits_t::black());
+
+	    BOOST_FOREACH (edge_t e, out_edges(u, _g))
+	    {
+		vertex_t	v = target(e, _g);
+		
+		if ((get(vertex_color, _g, v) != color_traits_t::black()) &&
+		    (get(edge_residual_capacity, _g, e) > 0))
+		    stack.push(v);
+	    }
+	}
     }
-    cerr << endl;
-#else
-	put(vertex_color, const_cast<graph_t&>(g),
-	    target(e, g), color_traits_t::black());
-#endif
 }
 
-#ifdef _DEBUG
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::discover_vertex(vertex_t v,
-							const graph_t& g)
+template <class T, class ID, class L, class EL>
+inline typename GraphCuts<T, ID, L, EL>::value_type
+GraphCuts<T, ID, L, EL>::flow(edge_t e) const
 {
-    using namespace	std;
-    
-    cerr << "  discover vertex " << v << endl;
+    return get(edge_capacity, _g, e) - get(edge_residual_capacity, _g, e);
 }
-
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::tree_edge(edge_t e,
-						  const graph_t& g)
-{
-    using namespace	std;
-
-    cerr << "  tree edge (" << source(e, g) << ' ' << target(e, g) << ')'
-	 << endl;
-}
-
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::non_tree_edge(edge_t e,
-						      const graph_t& g)
-{
-    using namespace	std;
-
-    cerr << "  non-tree edge (" << source(e, g) << ' ' << target(e, g) << ')'
-	 << endl;
-}
-
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::gray_target(edge_t e,
-						    const graph_t& g)
-{
-    using namespace	std;
-    
-    cerr << "   gray target (" << source(e, g) << ' ' << target(e, g) << ')'
-	 << endl;
-}
-
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::black_target(edge_t e,
-						     const graph_t& g)
-{
-    using namespace	std;
-    
-    cerr << "   black target (" << source(e, g) << ' ' << target(e, g) << ')'
-	 << endl;
-}
-
-template <class T, class ID, class L, class EL> inline void
-GraphCuts<T, ID, L, EL>::MinCutVisitor::finish_vertex(vertex_t v,
-							const graph_t& g)
-{
-    using namespace	std;
-    
-    cerr << "finish vertex " << v << endl;
-}
-#endif
 
 }
 #endif	// !__GRAPHCUTS_H
