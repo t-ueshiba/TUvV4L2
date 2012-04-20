@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2010-01-12 01:45:40 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2012-04-20 00:54:21 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -15,7 +15,7 @@ main(int argc, char* argv[])
     char*		ttyname = "/dev/ttyS0";
     extern char*	optarg;
     
-    for (int c; (c = getopt(argc, argv, "d:")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "d:")) != -1; )
 	switch (c)
 	{
 	  case 'd':
