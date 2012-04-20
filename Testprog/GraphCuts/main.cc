@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2012-01-06 05:19:27 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2012-04-20 00:53:14 ueshiba Exp $
  */
 #include <cstdlib>
 #include <stdexcept>
@@ -61,7 +61,7 @@ main(int argc, char* argv[])
 	  case 'e':
 	    energy = true;
 	    break;
-#ifdef USE_DUMMY_EDGE
+#ifdef WITH_PARALLEL_EDGES
 	  case 'E':
 	    alg = gc_type::EdmondsKarp;
 	    break;
@@ -86,9 +86,13 @@ main(int argc, char* argv[])
 	    for (int i = 0; i < 5; ++i)
 		v[i] = gc.createDataTerm(i);
 	    gc.createSmoothingTerm(v[0], v[1]);
+	    gc.createSmoothingTerm(v[1], v[0]);
 	    gc.createSmoothingTerm(v[1], v[2]);
+	    gc.createSmoothingTerm(v[2], v[1]);
 	    gc.createSmoothingTerm(v[2], v[3]);
+	    gc.createSmoothingTerm(v[3], v[2]);
 	    gc.createSmoothingTerm(v[3], v[4]);
+	    gc.createSmoothingTerm(v[4], v[3]);
 
 	  // 初期ラベルを与える．
 	    for (int i = 0; i < 5; ++i)
