@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1 2012-01-06 05:19:27 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2012-04-20 00:53:14 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,7 +10,7 @@ INCDIRS		= -I$(PREFIX)/include -I$(PORTSHOME)/include
 PROGRAM		= gctest
 LIBS		=
 
-CPPFLAGS	= -DWITH_DUMMY_EDGES #-D_DEBUG
+CPPFLAGS	= -DWITH_PARALLEL_EDGES #-D_DEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
@@ -40,7 +40,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
