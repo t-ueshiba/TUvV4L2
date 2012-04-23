@@ -1,5 +1,5 @@
 /*
- *  $Id: GraphCuts.h,v 1.3 2012-04-20 00:47:07 ueshiba Exp $
+ *  $Id: GraphCuts.h,v 1.4 2012-04-23 07:03:18 ueshiba Exp $
  */
 #ifndef __GRAPHCUTS_H
 #define __GRAPHCUTS_H
@@ -122,8 +122,6 @@ class GraphCuts
   // ç≈ìKâªåvéZ
     template <class F>
     value_type		value(F energyTerm)			const	;
-    template <class F>
-    value_type		value(label_type alpha, F energyTerm)	const	;
     value_type		maxFlow(label_type alpha, Algorithm alg)	;
     template <class F>
     value_type		alphaExpansion(label_type alpha, F energyTerm,
