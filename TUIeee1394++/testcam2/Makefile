@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.4 2011-01-11 02:07:13 ueshiba Exp $
+#  $Id: Makefile,v 1.5 2012-05-08 02:31:44 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,7 +14,7 @@ ifeq ($(OSTYPE), darwin)
   LIBS	       += -framework IOKit -framework CoreFoundation
 endif
 
-CPPFLAGS	= -DUseXaw -DHAVE_LIBTUTOOLS__ -DUseShmDC -DMONO_IMAGE #-DUSE_RAWISO
+CPPFLAGS	= -DUseXaw -DHAVE_LIBTUTOOLS__ -DUseShmDC -DMONO_IMAGE #-DUSE_VIDEO1394
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
@@ -49,11 +49,11 @@ EXTHDRS		= ../../../multicam/server/multicam.h \
 		/usr/local/include/TU/Manip.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Movie.h \
-		/usr/local/include/TU/Normalize.h \
 		/usr/local/include/TU/Serial.h \
 		/usr/local/include/TU/TriggerGenerator.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/fdstream.h \
+		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/types.h \
 		/usr/local/include/TU/utility.h \
 		/usr/local/include/TU/v/App.h \
@@ -92,7 +92,7 @@ OBJS		= MyCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.4 $	|		\
+REV		= $(shell echo $Revision: 1.5 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -109,9 +109,8 @@ MyCanvasPane.o: ../testcam/MyCanvasPane.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
@@ -121,8 +120,8 @@ MyCmdWindow.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Normalize.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h MyCmdWindow.h \
 	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/CmdPane.h \
@@ -141,8 +140,7 @@ MyModalDialog.o: ../testcam/MyModalDialog.h \
 	/usr/local/include/TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
@@ -153,31 +151,31 @@ createCaptureCmds.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Normalize.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
 createFeatureCmds.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Normalize.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
 createMenuCmds.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Normalize.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
 main.o: /usr/local/include/TU/Ieee1394CameraArray.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Minimize.h MyCmdWindow.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/io.h MyCmdWindow.h \
 	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \

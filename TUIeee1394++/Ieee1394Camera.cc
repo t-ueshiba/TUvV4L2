@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.35 2011-08-23 00:06:15 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.36 2012-05-08 02:31:26 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -349,7 +349,7 @@ static const u_int	NBUFFERS		= 4;
 Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
 			       u_int64_t uniqId, u_int delay)
     :Ieee1394Node(type, uniqId, delay
-#if !defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
 		  , 1, VIDEO1394_SYNC_FRAMES
 #endif
 		  ),

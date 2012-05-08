@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.30 2011-08-23 00:06:15 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.31 2012-05-08 02:31:26 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -120,11 +120,9 @@
 #define __TUIeee1394PP_h
 
 #include <libraw1394/raw1394.h>
-#if defined(__APPLE__)
-#  define USE_RAWISO
-#else
+#if !defined(__APPLE__)
 #  include <map>
-#  if !defined(USE_RAWISO)
+#  if defined(USE_VIDEO1394)
 #    define __user
 #    include <video1394.h>
 #  endif
@@ -162,7 +160,7 @@ class Ieee1394Node
 	Port(int portNumber)				;
 	~Port()						;
 
-#  if !defined(USE_RAWISO)
+#  if defined(USE_VIDEO1394)
 	int	fd()				const	{return _fd;}
 #  endif
 	int	portNumber()			const	{return _portNumber;}
@@ -172,7 +170,7 @@ class Ieee1394Node
 	bool	isRegisteredNode(const Ieee1394Node& node) const;
     
       private:
-#  if !defined(USE_RAWISO)
+#  if defined(USE_VIDEO1394)
 	const int	_fd;		// file desc. for video1394 device.
 #  endif
 	const int	_portNumber;
@@ -210,10 +208,10 @@ class Ieee1394Node
   /*!
     \return	isochronousチャンネル
    */
-#if defined(USE_RAWISO)
-    u_char	channel()			const	{return _channel;}
-#else
+#if defined(USE_VIDEO1394)
     u_char	channel()			const	{return _mmap.channel;}
+#else
+    u_char	channel()			const	{return _channel;}
 #endif
 
   //! このノードに割り当てられたasynchronous通信の遅延量を返す
@@ -224,7 +222,7 @@ class Ieee1394Node
     
   protected:
     Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
-#if !defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
 		 , int sync_tag, int flag
 #endif
 		 )							;
@@ -252,7 +250,7 @@ class Ieee1394Node
     u_int		readValueFromDirectory(u_char key,
 					       u_int& offset)	const	;
     quadlet_t		readQuadletFromConfigROM(u_int offset)	const	;
-#if defined(USE_RAWISO)
+#if !defined(USE_VIDEO1394)
     static raw1394_iso_disposition
 			receive(raw1394handle_t handle, u_char* data,
 				u_int len, u_char channel,
@@ -266,19 +264,19 @@ class Ieee1394Node
 #endif
     raw1394handle_t		_handle;
     nodeid_t			_nodeId;
-#if defined(USE_RAWISO)
-    u_char			_channel;	// iso receive channel.
-    u_char*			_current;	// current insertion point.
-    u_char*			_end;		// the end of the buffer.
-    bool			_ready;		// buffer is ready.
-    u_int64_t			_filltime_next;
+#if defined(USE_VIDEO1394)
+    video1394_mmap		_mmap;		// mmap structure for video1394
+    u_int			_current;	// index of current ready buffer
+    u_int			_buf_size;	// buffer size excluding header
 #else
-    video1394_mmap		_mmap;		// mmap structure for video1394.
-    u_int			_current;	// index of current ready buffer.
-    u_int			_buf_size;	// buffer size excluding header.
+    u_char			_channel;	// iso receive channel
+    u_char*			_current;	// current insertion point
+    u_char*			_end;		// the end of the buffer
+    bool			_ready;		// buffer is ready
+    u_int64_t			_filltime_next;
 #endif
-    u_char*			_buf;		// mapped buffer.
-    u_int64_t			_filltime;	// time of buffer filled.
+    u_char*			_buf;		// mapped buffer
+    u_int64_t			_filltime;	// time of buffer filled
     const u_int			_delay;
 };
     

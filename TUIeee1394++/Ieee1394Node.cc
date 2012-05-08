@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.20 2011-08-23 00:06:15 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.21 2012-05-08 02:31:26 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -29,7 +29,7 @@
 #include <errno.h>
 #include <string>
 #include <libraw1394/csr.h>
-#if !defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
 #  include <fcntl.h>
 #  include <sys/ioctl.h>
 #  include <sys/mman.h>
@@ -53,7 +53,20 @@ namespace TU
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-#if defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
+static int
+video1394_get_fd_and_check(int port_number)
+{
+    using namespace	std;
+
+    char	dev[] = "/dev/video1394/x";
+    dev[strlen(dev)-1] = '0' + port_number;
+    int		fd = open(dev, O_RDWR);
+    if (fd < 0)
+	throw runtime_error(string("TU::raw1394_get_fd_and_check: failed to open video1394!! ") + strerror(errno));
+    return fd;
+}
+#else
 static u_int32_t
 cycleTimer_to_usec(u_int32_t cycleTimer)  // from juju/capture.c of libdc1394
 {
@@ -67,7 +80,7 @@ cycleTimer_to_usec(u_int32_t cycleTimer)  // from juju/capture.c of libdc1394
 static u_int64_t
 cycle_to_filltime(raw1394handle_t handle, u_int cycle)
 {
-#if !defined(__APPLE__)
+#  if !defined(__APPLE__)
   // 現在時刻を獲得する. 
     u_int32_t	busTime;
     u_int64_t	localTime;
@@ -82,22 +95,9 @@ cycle_to_filltime(raw1394handle_t handle, u_int cycle)
 
   // ずれを差し引く. 
     return localTime - u_int64_t(diff);
-#else
+#  else
     return 0;
-#endif
-}
-#else
-static int
-video1394_get_fd_and_check(int port_number)
-{
-    using namespace	std;
-
-    char	dev[] = "/dev/video1394/x";
-    dev[strlen(dev)-1] = '0' + port_number;
-    int		fd = open(dev, O_RDWR);
-    if (fd < 0)
-	throw runtime_error(string("TU::raw1394_get_fd_and_check: failed to open video1394!! ") + strerror(errno));
-    return fd;
+#  endif
 }
 #endif
 #if !defined(__APPLE__)
@@ -106,7 +106,7 @@ video1394_get_fd_and_check(int port_number)
 ************************************************************************/
 Ieee1394Node::Port::Port(int portNumber)
     :
-#  if !defined(USE_RAWISO)
+#  if defined(USE_VIDEO1394)
      _fd(video1394_get_fd_and_check(portNumber)),
 #  endif
      _portNumber(portNumber), _nodes(0)
@@ -115,7 +115,7 @@ Ieee1394Node::Port::Port(int portNumber)
 
 Ieee1394Node::Port::~Port()
 {
-#  if !defined(USE_RAWISO)
+#  if defined(USE_VIDEO1394)
     close(_fd);
 #  endif
 }
@@ -178,7 +178,7 @@ std::map<int, Ieee1394Node::Port*>	Ieee1394Node::_portMap;
 			VIDEO1394_VARIABLE_PACKET_SIZEの組合わせ. 
 */
 Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
-#if !defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
 			   , int sync_tag, int flags
 #endif
 			   )
@@ -188,10 +188,10 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
     :_port(0), _handle(raw1394_new_handle()),
 #endif
      _nodeId(0),
-#if defined(USE_RAWISO)
-     _channel(0), _current(0), _end(0), _ready(false), _filltime_next(0),
-#else
+#if defined(USE_VIDEO1394)
      _mmap(), _current(0), _buf_size(0),
+#else
+     _channel(0), _current(0), _end(0), _ready(false), _filltime_next(0),
 #endif
      _buf(0), _filltime(0), _delay(delay)
 {
@@ -247,9 +247,7 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
     throw runtime_error("TU::Ieee1394Node::Ieee1394Node: node with specified unit_spec_ID (and global_unique_ID) not found!!");
 
   ok:
-#  if defined(USE_RAWISO)
-    _channel = _port->registerNode(*this);  // Register this node to the port.
-#  else
+#  if defined(USE_VIDEO1394)
     _mmap.channel     = _port->registerNode(*this);
     _mmap.sync_tag    = sync_tag;
     _mmap.nb_buffers  = 0;
@@ -257,6 +255,8 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
     _mmap.packet_size = 0;
     _mmap.fps	      = 0;
     _mmap.flags	      = flags;
+#  else
+    _channel = _port->registerNode(*this);  // Register this node to the port.
 #  endif
 #endif	// !__APPLE__
     raw1394_set_userdata(_handle, this);
@@ -414,23 +414,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
   // Unmap previously mapped buffer and unlisten the channel.
     unmapListenBuffer();
 
-#if defined(USE_RAWISO)
-    const u_int	npackets = (buf_size - 1) / packet_size + 1;
-#  if defined(DEBUG)
-    cerr << "mapListenBuffer: npackets = " << dec << npackets << endl;
-#  endif
-    _buf = _current = new u_char[buf_size + npackets * packet_size];
-    _end = _buf + buf_size;
-    _ready = false;
-
-    if (raw1394_iso_recv_init(_handle, &Ieee1394Node::receive,
-			      nb_buffers * npackets, packet_size, _channel,
-			      RAW1394_DMA_BUFFERFILL, npackets) < 0)
-	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to initialize iso reception!! ") + strerror(errno));
-    if (raw1394_iso_recv_start(_handle, -1, -1, 0) < 0)
-	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to start iso reception!! ") + strerror(errno));
-    return _channel;
-#else
+#if defined(USE_VIDEO1394)
   // Change buffer size and listen to the channel.
   //   *Caution: _mmap.buf_size may be changed by VIDEO1394_LISTEN_CHANNEL.
     _mmap.nb_buffers  = nb_buffers;
@@ -458,6 +442,22 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 
     usleep(100000);
     return _mmap.channel;
+#else
+    const u_int	npackets = (buf_size - 1) / packet_size + 1;
+#  if defined(DEBUG)
+    cerr << "mapListenBuffer: npackets = " << dec << npackets << endl;
+#  endif
+    _buf = _current = new u_char[buf_size + npackets * packet_size];
+    _end = _buf + buf_size;
+    _ready = false;
+
+    if (raw1394_iso_recv_init(_handle, &Ieee1394Node::receive,
+			      nb_buffers * npackets, packet_size, _channel,
+			      RAW1394_DMA_BUFFERFILL, npackets) < 0)
+	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to initialize iso reception!! ") + strerror(errno));
+    if (raw1394_iso_recv_start(_handle, -1, -1, 0) < 0)
+	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to start iso reception!! ") + strerror(errno));
+    return _channel;
 #endif
 }
 
@@ -471,7 +471,17 @@ Ieee1394Node::waitListenBuffer()
 {
     using namespace	std;
 
-#if defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
+    video1394_wait	wait;
+    wait.channel = _mmap.channel;
+    wait.buffer  = _current;
+    if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_WAIT_BUFFER, &wait) < 0)
+	throw runtime_error(string("TU::Ieee1394Node::waitListenBuffer: VIDEO1394_IOC_LISTEN_WAIT_BUFFER failed!! ") + strerror(errno));
+    _filltime = u_int64_t(wait.filltime.tv_sec) * 1000000LL
+	      + u_int64_t(wait.filltime.tv_usec);  // time of buffer filled.	
+
+    return _buf + _current * _mmap.buf_size;
+#else
 #  if defined(DEBUG)
     cerr << "*** begin ***" << endl;
 #  endif
@@ -497,16 +507,6 @@ Ieee1394Node::waitListenBuffer()
 #  endif
 
     return _buf;
-#else
-    video1394_wait	wait;
-    wait.channel = _mmap.channel;
-    wait.buffer  = _current;
-    if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_WAIT_BUFFER, &wait) < 0)
-	throw runtime_error(string("TU::Ieee1394Node::waitListenBuffer: VIDEO1394_IOC_LISTEN_WAIT_BUFFER failed!! ") + strerror(errno));
-    _filltime = u_int64_t(wait.filltime.tv_sec) * 1000000LL
-	      + u_int64_t(wait.filltime.tv_usec);  // time of buffer filled.	
-
-    return _buf + _current * _mmap.buf_size;
 #endif
 }
 
@@ -516,7 +516,14 @@ Ieee1394Node::requeueListenBuffer()
 {
     using namespace	std;
     
-#if defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
+    video1394_wait	wait;
+    wait.channel = _mmap.channel;
+    wait.buffer	 = _current;
+    if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_QUEUE_BUFFER, &wait) < 0)
+	throw runtime_error(string("TU::Ieee1394Node::requeueListenBuffer: VIDEO1394_IOC_LISTEN_QUEUE_BUFFER failed!! ") + strerror(errno));
+    ++_current %= _mmap.nb_buffers;	// next buffer.
+#else
     if (_ready)
     {
       // [_buf, _end) を廃棄し [_end, _current)をバッファ領域の先頭に移す
@@ -529,13 +536,6 @@ Ieee1394Node::requeueListenBuffer()
 	cerr << "  " << len << " bytes moved..." << endl;
 #  endif
     }
-#else
-    video1394_wait	wait;
-    wait.channel = _mmap.channel;
-    wait.buffer	 = _current;
-    if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_QUEUE_BUFFER, &wait) < 0)
-	throw runtime_error(string("TU::Ieee1394Node::requeueListenBuffer: VIDEO1394_IOC_LISTEN_QUEUE_BUFFER failed!! ") + strerror(errno));
-    ++_current %= _mmap.nb_buffers;	// next buffer.
 #endif
 }
 
@@ -543,14 +543,7 @@ Ieee1394Node::requeueListenBuffer()
 void
 Ieee1394Node::flushListenBuffer()
 {
-#if defined(USE_RAWISO)
-    using namespace	std;
-
-    if (raw1394_iso_recv_flush(_handle) < 0)
-	throw runtime_error(string("TU::Ieee1394Node::flushListenBuffer: failed to flush iso receive buffer!! ") + strerror(errno));
-    _current = _buf;
-    _ready   = false;
-#else
+#if defined(USE_VIDEO1394)
   // Force flushing by doing unmap and then map buffer.
     if (_buf != 0)
 	mapListenBuffer(_mmap.packet_size, _buf_size, _mmap.nb_buffers);
@@ -571,6 +564,13 @@ Ieee1394Node::flushListenBuffer()
 	    requeueListenBuffer();
 	    }*/
   // "_nready" must be 0 here(no available buffers).
+#else
+    using namespace	std;
+
+    if (raw1394_iso_recv_flush(_handle) < 0)
+	throw runtime_error(string("TU::Ieee1394Node::flushListenBuffer: failed to flush iso receive buffer!! ") + strerror(errno));
+    _current = _buf;
+    _ready   = false;
 #endif
 }
 
@@ -582,24 +582,24 @@ Ieee1394Node::unmapListenBuffer()
 
     if (_buf != 0)
     {
-#if defined(USE_RAWISO)
+#if defined(USE_VIDEO1394)
+	munmap(_buf, _mmap.nb_buffers * _mmap.buf_size);
+	_buf = 0;				// Reset buffer status.
+	_buf_size = _current = 0;		// ibid.
+	if (ioctl(_port->fd(), VIDEO1394_IOC_UNLISTEN_CHANNEL, &_mmap.channel) < 0)
+	    throw runtime_error(string("TU::Ieee1394Node::unmapListenBuffer: VIDEO1394_IOC_UNLISTEN_CHANNEL failed!! ") + strerror(errno));
+#else
 	raw1394_iso_stop(_handle);
 	raw1394_iso_shutdown(_handle);
 
 	delete [] _buf;
 	_buf = _current = _end = 0;
 	_ready = false;
-#else
-	munmap(_buf, _mmap.nb_buffers * _mmap.buf_size);
-	_buf = 0;				// Reset buffer status.
-	_buf_size = _current = 0;		// ibid.
-	if (ioctl(_port->fd(), VIDEO1394_IOC_UNLISTEN_CHANNEL, &_mmap.channel) < 0)
-	    throw runtime_error(string("TU::Ieee1394Node::unmapListenBuffer: VIDEO1394_IOC_UNLISTEN_CHANNEL failed!! ") + strerror(errno));
 #endif
     }
 }
 
-#if defined(USE_RAWISO)
+#if !defined(USE_VIDEO1394)
 //! このノードに割り当てられたisochronous受信用バッファを満たす
 /*!
   \param data	受信用バッファにセーブするデータ
