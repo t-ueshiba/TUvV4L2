@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: List.h,v 1.4 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: List.h,v 1.5 2012-06-06 07:58:08 ueshiba Exp $
  */
 /*!
   \file		List.h
@@ -44,15 +44,15 @@ template <class T>
 class List
 {
   public:
-    typedef T		value_type;
-    typedef ptrdiff_t	difference_type;
-    typedef T*		pointer;
-    typedef T&		reference;
-    typedef const T*	const_pointer;
-    typedef const T&	const_reference;
+    typedef T			value_type;
+    typedef std::ptrdiff_t	difference_type;
+    typedef T*			pointer;
+    typedef T&			reference;
+    typedef const T*		const_pointer;
+    typedef const T&		const_reference;
 
-    class		Iterator;
-    class		ConstIterator;
+    class			Iterator;
+    class			ConstIterator;
     
     class Node
     {

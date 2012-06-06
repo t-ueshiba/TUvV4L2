@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.48 2011-11-11 07:31:17 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.49 2012-06-06 07:58:08 ueshiba Exp $
  */
 /*!
   \file		Vector++.h
@@ -1831,7 +1831,7 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
 		sum -= (*this)[i][k] * (*this)[k][j];
 	}
 
-	u_int	jmax;
+	u_int	jmax = i;
 	T	max = 0.0;
 	for (u_int j = i; j < ncol(); ++j)  // diagonal and right part (i <= j)
 	{
