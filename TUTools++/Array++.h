@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.36 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Array++.h,v 1.37 2012-06-06 07:58:08 ueshiba Exp $
  */
 /*!
   \file		Array++.h
@@ -632,7 +632,7 @@ class Array : public B
   //! 定数逆反復子    
     typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
   //! ポインタ間の差
-    typedef ptrdiff_t					difference_type;
+    typedef std::ptrdiff_t				difference_type;
     
   public:
     Array()								;
@@ -1096,7 +1096,7 @@ class Array2 : public Array<T, R>
   //! 定数要素へのポインタ    
     typedef typename row_type::const_pointer	const_pointer;
   //! ポインタ間の差    
-    typedef ptrdiff_t				difference_type;
+    typedef std::ptrdiff_t			difference_type;
 
   public:
     Array2()								;
