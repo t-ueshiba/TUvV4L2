@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.31 2012-05-08 02:31:26 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.32 2012-06-07 03:25:41 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -50,6 +50,8 @@
     - #TU::Ieee1394Camera::powerOff()
     - #TU::Ieee1394Camera::bayerTileMapping()
     - #TU::Ieee1394Camera::isLittleEndian()
+    - #TU::Ieee1394Camera::embedTimestamp()
+    - #TU::Ieee1394Camera::unembedTimestamp()
   
   - <b>画像フォーマットとフレームレート</b>
     - #TU::Ieee1394Camera::inquireFrameRate()
@@ -496,6 +498,8 @@ class Ieee1394Camera : public Ieee1394Node
     Ieee1394Camera&	powerOff()					;
     Bayer		bayerTileMapping()			const	;
     bool		isLittleEndian()			const	;
+    Ieee1394Camera&	embedTimestamp()				;
+    Ieee1394Camera&	unembedTimestamp()				;
     
   // Format and frame rate stuffs.
     quadlet_t		inquireFrameRate(Format format)		const	;

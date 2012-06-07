@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.36 2012-05-08 02:31:26 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.37 2012-06-07 03:25:41 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -325,6 +325,8 @@ static const u_int	VALUE_SETTING		= 0x07c;
 // NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
 static const u_int	NBUFFERS		= 4;
 
+static const u_int64_t	PointGrey_Feature_ID	= 0x00b09d000004ull;
+
 /************************************************************************
 *  class Ieee1394Camera							*
 ************************************************************************/
@@ -372,7 +374,6 @@ Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
 	_acr = CSR_REGISTER_BASE + readQuadletFromRegister(0x480) * 4;
     
   // Get Bayer pattern supported by this camera.
-    const u_int64_t	PointGrey_Feature_ID = 0x00b09d000004ull;
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
 	switch (readQuadlet(_acr + 0x40))
@@ -427,6 +428,40 @@ Ieee1394Camera::powerOff()
 {
     checkAvailability(Cam_Power_Cntl_Inq);
     writeQuadletToRegister(Camera_Power, 0x00000000);
+    return *this;
+}
+
+//! IEEE1394カメラからの画像の先頭4byteにタイムスタンプを埋め込む
+/*!
+  Point Grey社のカメラのみに有効．
+  \return	このIEEE1394カメラオブジェクト. 
+*/
+Ieee1394Camera&
+Ieee1394Camera::embedTimestamp()
+{
+    if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
+    {
+	quadlet_t	val = readQuadlet(_acr + 0x02f8);
+	if (val & (0x1u << 31))
+	    writeQuadlet(_acr + 0x02f8, val | 0x1u);
+    }
+    return *this;
+}
+
+//! IEEE1394カメラからの画像の先頭4byteへのタイムスタンプ埋め込みを解除する
+/*!
+  Point Grey社のカメラのみに有効．
+  \return	このIEEE1394カメラオブジェクト. 
+*/
+Ieee1394Camera&
+Ieee1394Camera::unembedTimestamp()
+{
+    if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
+    {
+	quadlet_t	val = readQuadlet(_acr + 0x02f8);
+	if (val & (0x1u << 31))
+	    writeQuadlet(_acr + 0x02f8, val & ~0x1u);
+    }
     return *this;
 }
 
