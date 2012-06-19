@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.1 2012-06-19 06:14:31 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.2 2012-06-19 08:54:04 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -85,6 +85,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	  case c_RGB32:
 	  case c_GREY:
 	  case c_Y16:
+	  case c_YUYV:
 	  case c_UYVY:
 	  case c_SBGGR8:
 	  case c_SGBRG8:
