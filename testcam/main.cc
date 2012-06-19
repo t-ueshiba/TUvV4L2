@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2012-06-19 06:14:32 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2012-06-19 08:54:04 ueshiba Exp $
  */
 #include <cstdlib>
 #include "MyCmdWindow.h"
@@ -34,7 +34,7 @@ main(int argc, char* argv[])
 	v::MyCmdWindow	myWin(vapp, camera);
 	vapp.run();
 
-	camera.stopContinuousShot();
+	cout << camera;
     }
     catch (exception& err)
     {
