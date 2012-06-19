@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Colormap.h,v 1.7 2010-07-28 04:16:41 ueshiba Exp $  
+ *  $Id: Colormap.h,v 1.8 2012-06-19 08:33:48 ueshiba Exp $  
  */
 #ifndef __TUvColormap_h
 #define __TUvColormap_h
@@ -78,6 +78,8 @@ class Colormap
     u_long		getUnderlayPixel(T val,
 					 u_int u, u_int v)	const	;
     u_long		getUnderlayPixel(const YUV422& yuv,
+					 u_int u, u_int v)	const	;
+    u_long		getUnderlayPixel(const YUYV422& yuv,
 					 u_int u, u_int v)	const	;
     u_long		getUnderlayPixel(const YUV411& yuv,
 					 u_int u, u_int v)	const	;
@@ -278,6 +280,21 @@ Colormap::getUnderlayPixel<YUV444>(YUV444 yuv, u_int u, u_int v) const
 
 inline u_long
 Colormap::getUnderlayPixel(const YUV422& yuv, u_int u, u_int v) const
+{
+    if (u & 0x1)
+    {
+	u_char	uu = (&yuv)[-1].x;
+	return getUnderlayPixel(fromYUV<BGR>(yuv.y, uu, yuv.x), u, v);
+    }
+    else
+    {
+	u_char	vv = (&yuv)[1].x;
+	return getUnderlayPixel(fromYUV<BGR>(yuv.y, yuv.x, vv), u, v);
+    }
+}
+
+inline u_long
+Colormap::getUnderlayPixel(const YUYV422& yuv, u_int u, u_int v) const
 {
     if (u & 0x1)
     {
