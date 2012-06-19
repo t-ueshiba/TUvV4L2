@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.3 2012-06-19 08:35:14 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.4 2012-06-19 11:15:00 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -1020,10 +1020,14 @@ V4L2Camera::enumerateFormats()
     for (fmtdesc.index = 0; ioctl(VIDIOC_ENUM_FMT, &fmtdesc) == 0;
 	 ++fmtdesc.index)
     {
+	PixelFormat	pixelFormat = uintToPixelFormat(fmtdesc.pixelformat);
+	if (pixelFormat == UNKNOWN_PIXEL_FORMAT)  // 未知のフォーマットならば...
+	    continue;				  // スキップする
+	
 	_formats.push_back(Format());
 	Format&	format = _formats.back();
 
-	format.pixelFormat = uintToPixelFormat(fmtdesc.pixelformat);
+	format.pixelFormat = pixelFormat;
 	format.name	   = (char*)fmtdesc.description;
 
       // この画素フォーマットのもとでサポートされる画像サイズを列挙
@@ -1116,7 +1120,7 @@ V4L2Camera::enumerateFormats()
 void
 V4L2Camera::enumerateControls()
 {
-  // このカメラがサポートするコントロールを列挙
+  // このカメラがサポートするコントロール(属性)を列挙
     v4l2_queryctrl	ctrl;
     memset(&ctrl, 0, sizeof(ctrl));
 
@@ -1135,13 +1139,15 @@ V4L2Camera::enumerateControls()
 	    
 	    id = ctrl.id;	// 次のidをセットする．
 
-	    if (ctrl.flags & V4L2_CTRL_FLAG_DISABLED)	// 無効化されていたら
+	    Feature	feature = uintToFeature(ctrl.id);
+	    if (ctrl.flags & V4L2_CTRL_FLAG_DISABLED ||	// 無効化されているか
+		feature == UNKNOWN_FEATURE)		// 未知の属性ならば...
 		continue;				// スキップして次へ
-	    
+
 	    _controls.push_back(Control());
 	    Control&	control = _controls.back();
 	    
-	    control.feature = uintToFeature(ctrl.id);
+	    control.feature = feature;
 	    control.name    = (char*)ctrl.name;
 
 	    switch (ctrl.type)
@@ -1205,7 +1211,7 @@ V4L2Camera::pixelFormatToFormat(PixelFormat pixelFormat) const
 	    format.pixelFormat == pixelFormat)
 	    return format;
 
-  //throw std::runtime_error("V4L2Camera::pixelFormatToFormat(): unknown pixel format!! ");
+    throw std::runtime_error("V4L2Camera::pixelFormatToFormat(): unknown pixel format!! ");
 
     return _formats[0];
 }
