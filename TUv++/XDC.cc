@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: XDC.cc,v 1.14 2010-01-28 08:17:44 ueshiba Exp $  
+ *  $Id: XDC.cc,v 1.15 2012-06-19 08:33:48 ueshiba Exp $  
  */
 #include "TU/v/XDC.h"
 #include <stdexcept>
@@ -455,6 +455,16 @@ XDC::operator <<(const Image<YUV444>& image)
 
 DC&
 XDC::operator <<(const Image<YUV422>& image)
+{
+    setColorcube();
+    createXImage(image);
+    putXImage();
+
+    return *this;
+}
+
+DC&
+XDC::operator <<(const Image<YUYV422>& image)
 {
     setColorcube();
     createXImage(image);

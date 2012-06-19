@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.34 2012-01-20 20:01:03 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.35 2012-06-19 08:32:40 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
@@ -183,6 +183,9 @@ ImageBase::type2nbytes(Type type, bool padding) const
       case YUV_422:
 	nbytes *= sizeof(YUV422);
 	break;
+      case YUYV_422:
+	nbytes *= sizeof(YUYV422);
+	break;
       case YUV_411:
 	(nbytes *= 3) /= 2;
 	break;
@@ -226,6 +229,8 @@ ImageBase::type2depth(Type type)
       case BMP_24:
 	return 24;
       case YUV_422:
+	return 16;
+      case YUYV_422:
 	return 16;
       case YUV_411:
 	return 12;
@@ -281,6 +286,8 @@ ImageBase::restorePBMHeader(std::istream& in)
 		typeInfo.type = YUV_444;
 	    else if (!strcmp(val, "YUV422"))
 		typeInfo.type = YUV_422;
+	    else if (!strcmp(val, "YUYV422"))
+		typeInfo.type = YUYV_422;
 	    else if (!strcmp(val, "YUV411"))
 		typeInfo.type = YUV_411;
 	}
@@ -516,6 +523,9 @@ ImageBase::savePBMHeader(std::ostream& out, Type type) const
 	break;
       case YUV_422:
 	out << "YUV422" << endl;
+	break;
+      case YUYV_422:
+	out << "YUYV422" << endl;
 	break;
       case YUV_411:
 	out << "YUV411" << endl;

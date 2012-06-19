@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.58 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Image++.h,v 1.59 2012-06-19 08:32:40 ueshiba Exp $
  */
 /*!
   \file		Image++.h
@@ -234,8 +234,10 @@ inline
 BGR::BGR(const BGRA& p)	:r(p.r), g(p.g), b(p.b)	{}
 
 /************************************************************************
-*  struct YUV444, YUV422, YUV411					*
+*  struct YUV444, YUV422, YUYV422, YUV411				*
 ************************************************************************/
+struct YUYV422;
+
 //! Y, U, V（各8bit）の順で並んだカラー画素
 struct YUV444
 {
@@ -275,6 +277,7 @@ operator <<(std::ostream& out, const YUV444& yuv)
 struct YUV422
 {
     YUV422(u_char yy=0, u_char xx=128)	:x(xx), y(yy)	{}
+    YUV422(const YUYV422& p)				;
     template <class T>
     YUV422(const T& p)		:x(128), y(u_char(p))	{}
 
@@ -299,6 +302,39 @@ operator >>(std::istream& in, YUV422& yuv)
 
 inline std::ostream&
 operator <<(std::ostream& out, const YUV422& yuv)
+{
+    return out << (u_int)yuv.y << ' ' << (u_int)yuv.x;
+}
+
+//! [Y0, U], [Y1, V]（各8bit）の順で並んだカラー画素(16bits/pixel)
+struct YUYV422
+{
+    YUYV422(u_char yy=0, u_char xx=128)	:y(yy), x(x)	{}
+    YUYV422(const YUV422& p)				;
+    template <class T>
+    YUYV422(const T& p)		:y(u_char(p)), x(128) 	{}
+
+		operator u_char()		const	{return u_char(y);}
+		operator s_char()		const	{return s_char(y);}
+		operator short()		const	{return short(y);}
+		operator int()			const	{return int(y);}
+		operator float()		const	{return float(y);}
+		operator double()		const	{return double(y);}
+    bool	operator ==(const YUYV422& p)	const	{return (y == p.y &&
+								 x == p.x);}
+    bool	operator !=(const YUYV422& p)	const	{return !(*this == p);}
+    
+    u_char	y, x;
+};
+
+inline std::istream&
+operator >>(std::istream& in, YUYV422& yuv)
+{
+    return in >> (u_int&)yuv.y >> (u_int&)yuv.x;
+}
+
+inline std::ostream&
+operator <<(std::ostream& out, const YUYV422& yuv)
 {
     return out << (u_int)yuv.y << ' ' << (u_int)yuv.x;
 }
@@ -330,6 +366,12 @@ operator <<(std::ostream& out, const YUV411& yuv)
 {
     return out << (u_int)yuv.y0 << ' ' << (u_int)yuv.y1 << ' ' << (u_int)yuv.x;
 }
+
+inline
+YUV422::YUV422(const YUYV422& p)  :x(p.x), y(p.y)	{}
+
+inline
+YUYV422::YUYV422(const YUV422& p) :y(p.y), x(p.x)	{}
 
 /************************************************************************
 *  function fromYUV<T>()						*
@@ -436,6 +478,7 @@ class __PORT ImageBase
 	DOUBLE,		//!< double mono	64bit/pixel
 	YUV_444,	//!< YUV444		24bit/pixel
 	YUV_422,	//!< YUV422		16bit/pixel
+	YUYV_422,	//!< YUYV422		16bit/pixel
 	YUV_411,	//!< YUV411		12bit/pixel
 	BMP_8,		//!< BMP indexed color   8bit/pixel
 	BMP_24,		//!< BMP BGR		24bit/pixel
@@ -563,6 +606,7 @@ class ImageLine : public Array<T>
     template <class S>
     T			at(S uf)		const	;
     const YUV422*	fill(const YUV422* src)		;
+    const YUYV422*	fill(const YUYV422* src)	;
     const YUV411*	fill(const YUV411* src)		;
     const T*		fill(const T* src)		;
     template <class S>
@@ -652,6 +696,24 @@ ImageLine<T>::at(S uf) const
 */
 template <class T> const YUV422*
 ImageLine<T>::fill(const YUV422* src)
+{
+    register T* dst = *this;
+    for (register u_int u = 0; u < dim(); u += 2)
+    {
+	*dst++ = fromYUV<T>(src[0].y, src[0].x, src[1].x);
+	*dst++ = fromYUV<T>(src[1].y, src[0].x, src[1].x);
+	src += 2;
+    }
+    return src;
+}
+
+//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
+/*!
+  \param src	読み込み元の先頭を指すポインタ
+  \return	最後に読み込まれた画素の次の画素へのポインタ
+*/
+template <class T> const YUYV422*
+ImageLine<T>::fill(const YUYV422* src)
 {
     register T* dst = *this;
     for (register u_int u = 0; u < dim(); u += 2)
@@ -849,6 +911,99 @@ ImageLine<YUV422>::resize(YUV422* p, u_int d)
 }
 
 template <>
+class ImageLine<YUYV422> : public Array<YUYV422>
+{
+  public:
+    explicit ImageLine(u_int d=0)
+	:Array<YUYV422>(d), _lmost(0), _rmost(d)		{*this = 0;}
+    ImageLine(YUYV422* p, u_int d)
+	:Array<YUYV422>(p, d), _lmost(0), _rmost(d)		{}
+    ImageLine(ImageLine<YUYV422>& l, u_int u, u_int d)
+	:Array<YUYV422>(l, u, d), _lmost(0), _rmost(d)		{}
+    const ImageLine	operator ()(u_int u, u_int d)	const	;
+    ImageLine		operator ()(u_int u, u_int d)		;
+    ImageLine&		operator =(YUYV422 c)
+			{
+			    Array<YUYV422>::operator =(c);
+			    return *this;
+			}
+    const YUV444*	fill(const YUV444* src)		;
+    const YUYV422*	fill(const YUYV422* src)	;
+    const YUV411*	fill(const YUV411* src)		;
+    template <class S>
+    const S*		fill(const S* src)		;
+    template <class S, class L>
+    const S*		lookup(const S* src,
+			       const L* tbl)		;
+    int			lmost()			const	{return _lmost;}
+    int			rmost()			const	{return _rmost;}
+    void		setLimits(int l, int r)		{_lmost = l;
+							 _rmost = r;}
+    bool		valid(int u)		const	{return (u >= _lmost &&
+								 u <  _rmost);}
+	
+    bool		resize(u_int d)			;
+    void		resize(YUYV422* p, u_int d)	;
+
+  private:
+    int			_lmost;
+    int			_rmost;
+};
+
+inline const ImageLine<YUYV422>
+ImageLine<YUYV422>::operator ()(u_int u, u_int d) const
+{
+    return ImageLine<YUYV422>(const_cast<ImageLine<YUYV422>&>(*this), u, d);
+}
+    
+inline ImageLine<YUYV422>
+ImageLine<YUYV422>::operator ()(u_int u, u_int d)
+{
+    return ImageLine<YUYV422>(*this, u, d);
+}
+    
+inline const YUYV422*
+ImageLine<YUYV422>::fill(const YUYV422* src)
+{
+    memcpy((YUYV422*)*this, src, dim() * sizeof(YUYV422));
+    return src + dim();
+}
+
+template <class S> const S*
+ImageLine<YUYV422>::fill(const S* src)
+{
+    YUYV422* dst = *this;
+    for (u_int n = dim() + 1; --n; )
+	*dst++ = YUYV422(*src++);
+    return src;
+}
+
+template <class S, class L> const S*
+ImageLine<YUYV422>::lookup(const S* src, const L* tbl)
+{
+    YUYV422* dst = *this;
+    for (u_int n = dim() + 1; --n; )
+	*dst++ = YUYV422(*(tbl + *src++));
+    return src;
+}
+
+inline bool
+ImageLine<YUYV422>::resize(u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    return Array<YUYV422>::resize(d);
+}
+
+inline void
+ImageLine<YUYV422>::resize(YUYV422* p, u_int d)
+{
+    _lmost = 0;
+    _rmost = d;
+    Array<YUYV422>::resize(p, d);
+}
+
+template <>
 class ImageLine<YUV411> : public Array<YUV411>
 {
   public:
@@ -867,6 +1022,7 @@ class ImageLine<YUV411> : public Array<YUV411>
 			}
     const YUV444*	fill(const YUV444* src)		;
     const YUV422*	fill(const YUV422* src)		;
+    const YUYV422*	fill(const YUYV422* src)	;
     const YUV411*	fill(const YUV411* src)		;
     template <class S>
     const S*		fill(const S* src)		;
@@ -1143,6 +1299,8 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 	return restoreRows<YUV444>(in, typeInfo);
       case YUV_422:
 	return restoreRows<YUV422>(in, typeInfo);
+      case YUYV_422:
+	return restoreRows<YUYV422>(in, typeInfo);
       case YUV_411:
 	return restoreRows<YUV411>(in, typeInfo);
       case BMP_8:
@@ -1188,6 +1346,8 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
 	return saveRows<YUV444, RGB>(out, type);
       case YUV_422:
 	return saveRows<YUV422, RGB>(out, type);
+      case YUYV_422:
+	return saveRows<YUYV422, RGB>(out, type);
       case YUV_411:
 	return saveRows<YUV411, RGB>(out, type);
       case BMP_8:
@@ -1382,6 +1542,12 @@ template <> inline ImageBase::Type
 Image<YUV422, Buf<YUV422> >::defaultType() const
 {
     return YUV_422;
+}
+
+template <> inline ImageBase::Type
+Image<YUYV422, Buf<YUYV422> >::defaultType() const
+{
+    return YUYV_422;
 }
 
 template <> inline ImageBase::Type

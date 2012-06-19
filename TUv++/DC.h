@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: DC.h,v 1.15 2010-01-28 08:17:43 ueshiba Exp $  
+ *  $Id: DC.h,v 1.16 2012-06-19 08:33:48 ueshiba Exp $  
  */
 #ifndef __TUvDC_h
 #define __TUvDC_h
@@ -96,6 +96,7 @@ class DC
     virtual DC&		operator <<(const Image<ARGB>&   image)	= 0;
     virtual DC&		operator <<(const Image<YUV444>& image)	= 0;
     virtual DC&		operator <<(const Image<YUV422>& image)	= 0;
+    virtual DC&		operator <<(const Image<YUYV422>& image)= 0;
     virtual DC&		operator <<(const Image<YUV411>& image)	= 0;
     virtual DC&		drawLine(const Point2<int>& p,
 				 const Point2<int>& q)		= 0;
