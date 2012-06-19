@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.2 2012-06-19 05:57:19 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.3 2012-06-19 08:35:14 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -619,16 +619,17 @@ V4L2Camera::stopContinuousShot()
 		設定される. また, カメラに設定されたフォーマットの画素形式
 		が画像のそれに一致しない場合は, 自動的に変換が行われる.
 		サポートされている画素形式Tは, u_char, short, float, double,
-		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUV411 のいずれかである.
-		また, サポートされている変換は以下のとおりであり, カメラの
-		画素形式がこれ以外に設定されている場合はstd::domain_error
+		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUYV422, YUV411
+		のいずれかである.	また, サポートされている変換は以下のとおりであり,
+		カメラの画素形式がこれ以外に設定されている場合はstd::domain_error
 		例外が送出される.
-		    -# #BGR24 -> T (YUV422, YUV411 を除く)
-		    -# #RGB24 -> T (YUV422, YUV411 を除く) 
-		    -# #BGR32 -> T (YUV422, YUV411 を除く) 
-		    -# #RGB32 -> T (YUV422, YUV411 を除く) 
+		    -# #BGR24 -> T (YUV422, YUYV422, YUV411 を除く)
+		    -# #RGB24 -> T (YUV422, YUYV422, YUV411 を除く) 
+		    -# #BGR32 -> T (YUV422, YUYV422, YUV411 を除く) 
+		    -# #RGB32 -> T (YUV422, YUYV422, YUV411 を除く) 
 		    -# #GREY -> T
 		    -# #Y16 -> T
+		    -# #YUYV -> T
 		    -# #UYVY -> T
   \return	このIEEE1394カメラオブジェクト
 */
@@ -686,6 +687,14 @@ V4L2Camera::operator >>(Image<T>& image) const
       case Y16:
       {
 	const u_short*	src = (const u_short*)img;
+	for (u_int v = 0; v < image.height(); ++v)
+	    src = image[v].fill(src);
+      }
+	break;
+
+      case YUYV:
+      {
+	const YUYV422*	src = (const YUYV422*)img;
 	for (u_int v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
@@ -911,6 +920,8 @@ V4L2Camera::uintToPixelFormat(u_int pixelFormat)
 	return GREY;
       case Y16:
 	return Y16;
+      case YUYV:
+	return YUYV;
       case UYVY:
 	return UYVY;
       case SBGGR8:
@@ -1620,6 +1631,8 @@ template const V4L2Camera&
 V4L2Camera::operator >>(Image<YUV444>& image)	const	;
 template const V4L2Camera&
 V4L2Camera::operator >>(Image<YUV422>& image)	const	;
+template const V4L2Camera&
+V4L2Camera::operator >>(Image<YUYV422>& image)	const	;
 template const V4L2Camera&
 V4L2Camera::operator >>(Image<YUV411>& image)	const	;
 template const V4L2Camera&

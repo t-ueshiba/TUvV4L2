@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2++.h,v 1.2 2012-06-19 05:57:19 ueshiba Exp $
+ *  $Id: V4L2++.h,v 1.3 2012-06-19 08:35:14 ueshiba Exp $
  */
 /*!
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
@@ -40,6 +40,7 @@ class V4L2Camera
 	GREY	= V4L2_PIX_FMT_GREY,	//!<  8 bits/pix, Greyscale
 	Y16	= V4L2_PIX_FMT_Y16,	//!< 16 bits/pix, Greyscale
 
+	YUYV	= V4L2_PIX_FMT_YUYV,	//!< 16 bits/pix, YUV 4:2:2
 	UYVY	= V4L2_PIX_FMT_UYVY,	//!< 16 bits/pix, YUV 4:2:2
 
 	SBGGR8	= V4L2_PIX_FMT_SBGGR8,	//!<  8 bits/pix, BGGR bayer pattern
