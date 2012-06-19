@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.4 2012-06-19 11:15:00 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.5 2012-06-19 21:49:38 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -1407,6 +1407,8 @@ V4L2Camera::Buffer::unmap()
     if (_p)
     {
 	::munmap(_p, _size);
+	_p = 0;
+	_size = 0;
 #ifdef _DEBUG
 	std::cerr << "Buffer::unmap(): munmap" << std::endl;
 #endif
