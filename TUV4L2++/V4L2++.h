@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2++.h,v 1.4 2012-06-19 10:45:42 ueshiba Exp $
+ *  $Id: V4L2++.h,v 1.5 2012-06-19 11:15:00 ueshiba Exp $
  */
 /*!
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
@@ -81,7 +81,7 @@ class V4L2Camera
 	TILT_RELATIVE			= V4L2_CID_TILT_RELATIVE,
 	TILT_RESET			= V4L2_CID_TILT_RESET,
 
-	UNKNOWN_FEATURE = (V4L2_CID_BASE + V4L2_CID_MAX_CTRLS)
+	UNKNOWN_FEATURE
     };
 
     template <class T>
