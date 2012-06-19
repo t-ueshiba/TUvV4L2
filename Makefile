@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.1 2012-06-18 08:21:22 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2012-06-19 05:57:19 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -48,7 +48,7 @@ OBJS		= V4L2Camera.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
