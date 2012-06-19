@@ -1,11 +1,12 @@
 /*
- *  $Id: V4L2++.h,v 1.1 2012-06-18 08:21:22 ueshiba Exp $
+ *  $Id: V4L2++.h,v 1.2 2012-06-19 05:57:19 ueshiba Exp $
  */
 /*!
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
   \anchor	libTUV4L2
 */
 #ifndef __TUV4L2PP_h
+#define __TUV4L2PP_h
 
 #include <asm/types.h>		// for videodev2.h
 #include <linux/videodev2.h>
@@ -102,17 +103,20 @@ class V4L2Camera
 	Range<u_int>		fps_d;		//!< 分母
     };
     typedef std::vector<FrameRate>::const_iterator	FrameRateIterator;
-
+    typedef std::pair<FrameRateIterator, FrameRateIterator>
+							FrameRateRange;
+    
     struct FrameSize		//! 画像の大きさ
     {
-	std::pair<FrameRateIterator, FrameRateIterator>
-				availableFrameRates()		const	;
+	FrameRateRange		availableFrameRates()		const	;
 	
 	Range<u_int>		width;		//!< 画像の幅
 	Range<u_int>		height;		//!< 画像の高さ
 	std::vector<FrameRate>	frameRates;	//!< フレーム間隔
     };
     typedef std::vector<FrameSize>::const_iterator	FrameSizeIterator;
+    typedef std::pair<FrameSizeIterator, FrameSizeIterator>
+							FrameSizeRange;
 
     struct MenuItem		//! メニュー項目
     {
@@ -120,6 +124,8 @@ class V4L2Camera
 	std::string		name;		//!< メニュー項目名
     };
     typedef std::vector<MenuItem>::const_iterator	MenuItemIterator;
+    typedef std::pair<MenuItemIterator, MenuItemIterator>
+							MenuItemRange;
     
   private:
     struct Format		//! 画像フォーマット
@@ -145,9 +151,10 @@ class V4L2Camera
     {
       public:
 	Buffer()	:_p(0), _size(0)		{}
-	~Buffer()					;
+	~Buffer()					{unmap();}
 
 	void		map(int fd, u_int index)	;
+	void		unmap()				;
 	const void*	p()			const	{return _p;}
 	u_int		size()			const	{return _size;}
 	
@@ -169,23 +176,25 @@ class V4L2Camera
 
   public:
     typedef MemberIterator<PixelFormat, Format>		PixelFormatIterator;
+    typedef std::pair<PixelFormatIterator, PixelFormatIterator>
+							PixelFormatRange;
     typedef MemberIterator<Feature, Control>		FeatureIterator;
+    typedef std::pair<FeatureIterator, FeatureIterator>	FeatureRange;
     
   public:
     V4L2Camera(const char* deviceName)					;
     ~V4L2Camera()							;
 
   // Format stuffs.
-    std::pair<PixelFormatIterator, PixelFormatIterator>
-			availablePixelFormats()			const	;
-    std::pair<FrameSizeIterator, FrameSizeIterator>
-			availableFrameSizes(PixelFormat pixelFormat)
+    PixelFormatRange	availablePixelFormats()			const	;
+    FrameSizeRange	availableFrameSizes(PixelFormat pixelFormat)
 								const	;
     bool		isAvailable(PixelFormat pixelFormat)	const	;
     V4L2Camera&		setFormat(PixelFormat pixelFormat,
 				  u_int width, u_int height,
 				  u_int fps_n, u_int fps_d)		;
     void		getFrameRate(u_int& fps_n, u_int& fps_d) const	;
+    const std::string&	getName(PixelFormat pixelFormat)	const	;
     u_int		width()					const	;
     u_int		height()				const	;
     PixelFormat		pixelFormat()				const	;
@@ -193,10 +202,8 @@ class V4L2Camera
 			    PixelFormat pixelFormat)		const	;
   
   // Feature stuffs.
-    std::pair<FeatureIterator, FeatureIterator>
-			availableFeatures()			const	;
-    std::pair<MenuItemIterator, MenuItemIterator>
-			availableMenuItems(Feature feature)	const	;
+    FeatureRange	availableFeatures()			const	;
+    MenuItemRange	availableMenuItems(Feature feature)	const	;
     bool		isAvailable(Feature feature)		const	;
     V4L2Camera&		setValue(Feature feature, int value)		;
     int			getValue(Feature feature)		const	;
@@ -209,6 +216,7 @@ class V4L2Camera
   // Capture stuffs.
     V4L2Camera&		continuousShot()				;
     V4L2Camera&		stopContinuousShot()				;
+    bool		inContinuousShot()			const	;
     V4L2Camera&		snap()						;
 #ifdef HAVE_LIBTUTOOLS__
     template <class T> const V4L2Camera&
@@ -224,7 +232,7 @@ class V4L2Camera
   // Utility functions.
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
     static Feature	uintToFeature(u_int feature)			;
-    
+
   private:
     void		enumerateFormats()				;
     void		enumerateControls()				;
@@ -258,14 +266,14 @@ class V4L2Camera
     PixelFormat			_pixelFormat;
     std::vector<Buffer>		_buffers;
     u_int			_current;	// キューから取り出されている
+    bool			_inContinuousShot;
 };
 
 //! このカメラで利用できる画素フォーマットの範囲を返す
 /*!
   \return	画素フォーマット(#PixelFormat)を指す定数反復子のペア
 */
-inline std::pair<V4L2Camera::PixelFormatIterator,
-		 V4L2Camera::PixelFormatIterator>
+inline V4L2Camera::PixelFormatRange
 V4L2Camera::availablePixelFormats() const
 {
     return std::make_pair(_formats.begin(), _formats.end());
@@ -276,14 +284,24 @@ V4L2Camera::availablePixelFormats() const
   \param pixelFormat	画素フォーマット
   \return		画像サイズ(#FrameSize)を指す定数反復子のペア
 */
-inline std::pair<V4L2Camera::FrameSizeIterator,
-		 V4L2Camera::FrameSizeIterator>
+inline V4L2Camera::FrameSizeRange
 V4L2Camera::availableFrameSizes(PixelFormat pixelFormat) const
 {
     const Format&	format = pixelFormatToFormat(pixelFormat);
     return std::make_pair(format.frameSizes.begin(), format.frameSizes.end());
 }
     
+//! 指定した画素フォーマットに付けられている名前を返す
+/*!
+  \param pixelFormat	画素フォーマット
+  \return		画素フォーマットの名前
+*/
+inline const std::string&
+V4L2Camera::getName(PixelFormat pixelFormat) const
+{
+    return pixelFormatToFormat(pixelFormat).name;
+}
+
 //! 現在設定されている画像幅を返す
 inline u_int
 V4L2Camera::width() const
@@ -306,7 +324,7 @@ V4L2Camera::pixelFormat() const
 }
 
 //! 指定された画素フォーマットの内容を出力する．
-/*
+/*!
   \param out		出力ストリーム
   \param pixelFormat	画素フォーマット
   \return		outで指定した出力ストリーム
@@ -321,7 +339,7 @@ V4L2Camera::put(std::ostream& out, PixelFormat pixelFormat) const
 /*!
   \return	属性(#Feature)を指す定数反復子のペア
 */
-inline std::pair<V4L2Camera::FeatureIterator, V4L2Camera::FeatureIterator>
+inline V4L2Camera::FeatureRange
 V4L2Camera::availableFeatures() const
 {
     return std::make_pair(_controls.begin(), _controls.end());
@@ -331,7 +349,7 @@ V4L2Camera::availableFeatures() const
 /*!
   \return	メニュー項目(#MenuItem)を指す定数反復子のペア
 */
-inline std::pair<V4L2Camera::MenuItemIterator, V4L2Camera::MenuItemIterator>
+inline V4L2Camera::MenuItemRange
 V4L2Camera::availableMenuItems(Feature feature) const
 {
     const Control&	control = featureToControl(feature);
@@ -339,7 +357,7 @@ V4L2Camera::availableMenuItems(Feature feature) const
 }
 
 //! 指定された属性の内容を出力する
-/*
+/*!
   \param out		出力ストリーム
   \param feature	属性
   \return		outで指定した出力ストリーム
@@ -361,12 +379,27 @@ V4L2Camera::getDefaultValue(Feature feature) const
     return featureToControl(feature).def;
 }
 
+//! 指定した属性に付けられている名前を返す
+/*!
+  \param pixelFormat	対象となる属性
+  \return		属性の名前
+*/
 inline const std::string&
 V4L2Camera::getName(Feature feature) const
 {
     return featureToControl(feature).name;
 }
 
+//! カメラから画像を出力中であるか調べる
+/*!
+  \return	画像を出力中であればtrue, そうでなければfalse
+*/
+inline bool
+V4L2Camera::inContinuousShot() const
+{
+    return _inContinuousShot;
+}
+    
 //! カメラから出力される最初の画像を保持する
 /*!
   カメラからの画像出力は, continuousShot() によって行われる. 実際に画像データが
@@ -376,9 +409,14 @@ V4L2Camera::getName(Feature feature) const
 inline V4L2Camera&
 V4L2Camera::snap()
 {
-  //if (_current != ~0)			// 以前に受信したバッファがあれば...
+#if 0
     _current = dequeueBuffer();		// データが受信されるのを待つ
-    enqueueBuffer(_current);	// キューに戻す
+    enqueueBuffer(_current);		// キューに戻す
+#else
+    if (_current != ~0)			// 以前に受信したバッファがあれば...
+	enqueueBuffer(_current);	// キューに戻す
+    _current = dequeueBuffer();		// データが受信されるのを待つ
+#endif
     return *this;
 }
 
@@ -424,8 +462,7 @@ V4L2Camera::MemberIterator<V4L2Camera::Feature,
 /*!
   \return		フレームレート(#FrameRate)を指す定数反復子のペア
 */
-inline std::pair<V4L2Camera::FrameRateIterator,
-		 V4L2Camera::FrameRateIterator>
+inline V4L2Camera::FrameRateRange
 V4L2Camera::FrameSize::availableFrameRates() const
 {
     return std::make_pair(frameRates.begin(), frameRates.end());
@@ -443,5 +480,7 @@ std::ostream&	operator <<(std::ostream& out,
 			    const V4L2Camera::FrameRate& frameRate)	;
 std::ostream&	operator <<(std::ostream& out,
 			    const V4L2Camera::MenuItem& menuItem)	;
+std::ostream&	operator <<(std::ostream& out, const V4L2Camera& camera);
+std::istream&	operator >>(std::istream& in, V4L2Camera& camera)	;
 }
 #endif //!__TUV4L2PP_h

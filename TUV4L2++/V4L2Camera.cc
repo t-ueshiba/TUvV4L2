@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.1 2012-06-18 08:21:22 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.2 2012-06-19 05:57:19 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -56,9 +56,48 @@
 
 namespace TU
 {
+/************************************************************************
+*  static data								*
+************************************************************************/
 static const int	CONTROL_IO_ERROR_RETRIES = 2;
 static const int	NB_BUFFERS		 = 4;
-    
+static const struct
+{
+    V4L2Camera::Feature	feature;
+    const char*		name;
+} features[] =
+{
+    {V4L2Camera::BRIGHTNESS,			"BRIGHTNESS"},
+    {V4L2Camera::BRIGHTNESS_AUTO,		"BRIGHTNESS_AUTO"},
+    {V4L2Camera::CONTRAST,			"CONTRAST"},
+    {V4L2Camera::GAIN,				"GAIN"},
+    {V4L2Camera::SATURATION,			"SATURATION"},
+    {V4L2Camera::HUE,				"HUE"},
+    {V4L2Camera::HUE_AUTO,			"HUE_AUTO"},
+    {V4L2Camera::GAMMA,				"GAMMA"},
+    {V4L2Camera::SHARPNESS,			"SHARPNESS"},
+    {V4L2Camera::WHITE_BALANCE_TEMPERATURE,	"WHITE_BALANCE_TEMPERATURE"},
+    {V4L2Camera::WHITE_BALANCE_AUTO,		"WHITE_BALANCE_AUTO"},
+    {V4L2Camera::BACKLIGHT_COMPENSATION,	"BACKLIGHT_COMPENSATION"},
+    {V4L2Camera::POWER_LINE_FREQUENCY,		"POWER_LINE_FREQUENCY"},
+    {V4L2Camera::EXPOSURE_AUTO,			"EXPOSURE_AUTO"},
+    {V4L2Camera::EXPOSURE_AUTO_PRIORITY,	"EXPOSURE_AUTO_PRIORITY"},
+    {V4L2Camera::EXPOSURE_ABSOLUTE,		"EXPOSURE_ABSOLUTE"},
+    {V4L2Camera::FOCUS_ABSOLUTE,		"FOCUS_ABSOLUTE"},
+    {V4L2Camera::FOCUS_RELATIVE,		"FOCUS_RELATIVE"},
+    {V4L2Camera::FOCUS_AUTO,			"FOCUS_AUTO"},
+    {V4L2Camera::ZOOM_ABSOLUTE,			"ZOOM_ABSOLUTE"},
+    {V4L2Camera::ZOOM_RELATIVE,			"ZOOM_RELATIVE"},
+    {V4L2Camera::ZOOM_CONTINUOUS,		"ZOOM_CONTINUOUS"},
+    {V4L2Camera::PAN_ABSOLUTE,			"PAN_ABSOLUTE"},
+    {V4L2Camera::PAN_RELATIVE,			"PAN_RELATIVE"},
+    {V4L2Camera::PAN_RESET,			"PAN_RESET"},
+    {V4L2Camera::TILT_ABSOLUTE,			"TILT_ABSOLUTE"},
+    {V4L2Camera::TILT_RELATIVE,			"TILT_RELATIVE"},
+    {V4L2Camera::TILT_RESET,			"TILT_RESET"}
+};
+static const int	NFEATURES = sizeof(features) / sizeof(features[0]);
+
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -281,7 +320,8 @@ v4l2_get_fd(const char* name)
     
     int		fd = open(name, O_RDWR);
     if (fd < 0)
-	throw runtime_error(string("TU::v4l2_get_fd(): failed to open v4l2!! ") + strerror(errno));
+	throw runtime_error(string("TU::v4l2_get_fd(): failed to open v4l2!! ")
+			    + strerror(errno));
     return fd;
 }
     
@@ -298,12 +338,12 @@ v4l2_get_fd(const char* name)
 V4L2Camera::V4L2Camera(const char* deviceName)
     :_fd(v4l2_get_fd(deviceName)), _formats(), _controls(),
      _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
-     _buffers(), _current(~0)
+     _buffers(), _current(~0), _inContinuousShot(false)
 {
     using namespace	std;
 
     enumerateFormats();		// 画素フォーマット，画像サイズ，フレームレート
-    enumerateControls();
+    enumerateControls();	// カメラのコントロール=属性
 
   // 画素フォーマットと画像サイズの現在値を取得してセット
     v4l2_format	fmt;
@@ -322,7 +362,7 @@ V4L2Camera::V4L2Camera(const char* deviceName)
 //! Video for Linux v.2カメラオブジェクトを破壊する
 V4L2Camera::~V4L2Camera()
 {
-    unmapBuffers();
+    stopContinuousShot();
     close(_fd);
 }
 
@@ -381,6 +421,10 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
 
   // 画素フォーマットと画像サイズを設定
   ok:
+    const bool	cont = inContinuousShot();
+    if (cont)			// 画像を出力中であれば...
+	stopContinuousShot();	// 止める
+
     unmapBuffers();
     
     v4l2_format	fmt;
@@ -406,6 +450,9 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
   // バッファをマップ
     mapBuffers(NB_BUFFERS);
     
+    if (cont)			// 画像を出力中だったなら...
+	continuousShot();	// 再び出力させる
+
     return *this;
 }
 
@@ -420,6 +467,7 @@ V4L2Camera::getFrameRate(u_int& fps_n, u_int& fps_d) const
     using namespace	std;
     
     v4l2_streamparm	streamparm;
+    streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(VIDIOC_G_PARM, &streamparm))
 	throw runtime_error(string("V4L2Camera::getFrameRate(): VIDIOC_G_PARM failed!! ") + strerror(errno));
     fps_n = streamparm.parm.capture.timeperframe.numerator;
@@ -525,12 +573,17 @@ V4L2Camera::getMinMaxStep(Feature feature, int& min, int& max, int& step) const
 V4L2Camera&
 V4L2Camera::continuousShot()
 {
-    using namespace	std;
+    if (!_inContinuousShot)
+    {
+	using namespace	std;
+    
+	int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	if (ioctl(VIDIOC_STREAMON, &type))
+	    throw runtime_error(string("V4L2Camera::continuousShot(): VIDIOC_STREAMON failed!! ") + strerror(errno));
 
-    int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (ioctl(VIDIOC_STREAMON, &type))
-	throw runtime_error(string("V4L2Camera::continuousShot(): VIDIOC_STREAMON failed!! ") + strerror(errno));
-
+	_inContinuousShot = true;
+    }
+    
     return *this;
 }
 
@@ -541,12 +594,18 @@ V4L2Camera::continuousShot()
 V4L2Camera&
 V4L2Camera::stopContinuousShot()
 {
-    using namespace	std;
+    if (_inContinuousShot)
+    {
+	using namespace	std;
 
-    int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (ioctl(VIDIOC_STREAMOFF, &type))
-	throw runtime_error(string("V4L2Camera::stopContinuousShot(): VIDIOC_STREAMOFF failed!! ") + strerror(errno));
-
+	int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	if (ioctl(VIDIOC_STREAMOFF, &type))
+	    throw runtime_error(string("V4L2Camera::stopContinuousShot(): VIDIOC_STREAMOFF failed!! ") + strerror(errno));
+	unmapBuffers();
+	mapBuffers(NB_BUFFERS);
+	_inContinuousShot = false;
+    }
+    
     return *this;
 }
 
@@ -1056,7 +1115,7 @@ V4L2Camera::enumerateControls()
 	    if (ctrl.id <= id)	// 次のctrl.idがセットされなかったら(v4l2のbug)
 		++id;		// 自分で次のidに進めなければならない
 	    else
-		id = ctrl.id;	// 次のidをセット
+		break;
 	}
 	else			// ioctlが正常に終了したなら...
 	{
@@ -1171,7 +1230,6 @@ V4L2Camera::mapBuffers(u_int n)
     if (n < 2)			// 充分な個数を確保できなかったら...
 	throw std::runtime_error("V4L2Camera::mapBuffer(): failed to allocate sufficient number of buffers!!");	// 脱出する
 
-    _buffers.clear();
     _buffers.resize(n);
     for (u_int i = 0; i < n; ++i)		// 確保された個数のバッファに
     {
@@ -1186,7 +1244,8 @@ V4L2Camera::mapBuffers(u_int n)
 void
 V4L2Camera::unmapBuffers()
 {
-    _buffers.clear();	// すべてのバッファをunmap
+    for (u_int i = 0; i < _buffers.size(); ++i)
+	_buffers[i].unmap();
     requestBuffers(0);	// 確保するバッファ数を0にすることによってキューをクリア
     _current = ~0;	// データが残っていないことを示す
 }
@@ -1313,8 +1372,8 @@ V4L2Camera::Buffer::map(int fd, u_int index)
 	throw runtime_error(string("V4L2Camera::Buffer::Buffer(): VIDIOC_QUERYBUF failed!! ") + strerror(errno));
 	
   // 得られた大きさとオフセットをもとにメモリ領域をバッファにマップする．
-    if ((_p = mmap(0, buf.length, PROT_READ | PROT_WRITE,
-		   MAP_SHARED, fd, buf.m.offset)) == MAP_FAILED)
+    if ((_p = ::mmap(0, buf.length, PROT_READ | PROT_WRITE,
+		     MAP_SHARED, fd, buf.m.offset)) == MAP_FAILED)
     {
 	_p = 0;
 	throw runtime_error(string("V4L2Camera::Buffer::Buffer(): mmap failed!! ") + strerror(errno));
@@ -1325,13 +1384,14 @@ V4L2Camera::Buffer::map(int fd, u_int index)
 #endif
 }
 
-V4L2Camera::Buffer::~Buffer()
+void
+V4L2Camera::Buffer::unmap()
 {
     if (_p)
     {
-	munmap(_p, _size);
+	::munmap(_p, _size);
 #ifdef _DEBUG
-	std::cerr << "Buffer::~Buffer(): munmap" << std::endl;
+	std::cerr << "Buffer::unmap(): munmap" << std::endl;
 #endif
     }
 }
@@ -1462,7 +1522,80 @@ operator <<(std::ostream& out, const V4L2Camera::MenuItem& menuItem)
 {
     return out << menuItem.index << ": " << menuItem.name;
 }
+
+//! 現在のカメラの設定をストリームに書き出す
+/*!
+  \param out		出力ストリーム
+  \param camera		対象となるカメラ
+  \return		outで指定した出力ストリーム
+*/
+std::ostream&
+operator <<(std::ostream& out, const V4L2Camera& camera)
+{
+  // 画素フォーマットと画像サイズを書き出す．
+    V4L2Camera::PixelFormat	pixelFormat = camera.pixelFormat();
+    char			fourcc[5];
+    fourcc[0] =	 pixelFormat	    & 0xff;
+    fourcc[1] = (pixelFormat >>  8) & 0xff;
+    fourcc[2] = (pixelFormat >> 16) & 0xff;
+    fourcc[3] = (pixelFormat >> 24) & 0xff;
+    fourcc[4] = '\0';
+    out << fourcc << ' ' << camera.width() << 'x' << camera.height();
+
+  // フレームレートを書き出す．
+    u_int	fps_n, fps_d;
+    camera.getFrameRate(fps_n, fps_d);
+    out << ' ' << fps_n << '/' << fps_d;
+
+  // 各カメラ属性の値を書き出す．
+    BOOST_FOREACH (V4L2Camera::Feature feature, camera.availableFeatures())
+	for (u_int i = 0; i < NFEATURES; ++i)
+	    if (feature == features[i].feature)
+	    {
+		out << ' ' << features[i].name
+		    << ' ' << camera.getValue(feature);
+		break;
+	    }
     
+    return out << std::endl;
+}
+
+//! ストリームから読み込んだ設定をカメラにセットする
+/*!
+  \param in		入力ストリーム
+  \param camera		対象となるカメラ
+  \return		inで指定した入力ストリーム
+*/
+std::istream&
+operator >>(std::istream& in, V4L2Camera& camera)
+{
+  // 画素フォーマット，画像サイズ，フレームレートを読み込んでカメラに設定する．
+    std::string	s;
+    in >> s;				// 画素フォーマット
+    V4L2Camera::PixelFormat	pixelFormat
+	= V4L2Camera::uintToPixelFormat( s[0]	     | (s[1] <<  8) |
+					(s[2] << 16) | (s[3] << 24));
+    char	c;
+    u_int	w, h;
+    in >> w >> c >> h;			// 画像の幅と高さ
+    u_int	fps_n, fps_d;
+    in >> fps_n >> c >> fps_d;		// フレームレートの分子と分母
+    camera.setFormat(pixelFormat, w, h, fps_n, fps_d);
+    
+  // 各カメラ属性を読み込んでカメラに設定する．
+    while (in >> s)
+	for (u_int i = 0; i < NFEATURES; ++i)
+	    if (s == features[i].name)
+	    {
+		int	val;
+		in >> val;
+		camera.setValue(features[i].feature, val);
+		break;
+	    }
+    
+    return in;
+}
+
 #ifdef HAVE_LIBTUTOOLS__
 /************************************************************************
 *  instantiations							*
