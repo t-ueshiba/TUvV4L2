@@ -1,5 +1,5 @@
 /*
- *  $Id: createFeatureCmds.cc,v 1.1 2009-07-28 00:00:48 ueshiba Exp $
+ *  $Id: createFeatureCmds.cc,v 1.2 2012-06-20 07:50:08 ueshiba Exp $
  */
 #include "multicam.h"
 
@@ -18,20 +18,20 @@ struct Feature
 };
 static Feature		feature[] =
 {
-    {Ieee1394Camera::BRIGHTNESS,	"Brightness     "},
-    {Ieee1394Camera::AUTO_EXPOSURE,	"Auto exposure  "},
-    {Ieee1394Camera::SHARPNESS,		"Sharpness      "},
+    {Ieee1394Camera::BRIGHTNESS,	"Brightness"	 },
+    {Ieee1394Camera::AUTO_EXPOSURE,	"Auto exposure"	 },
+    {Ieee1394Camera::SHARPNESS,		"Sharpness"	 },
     {Ieee1394Camera::WHITE_BALANCE,	"White bal.(U/B)"},
     {Ieee1394Camera::WHITE_BALANCE,	"White bal.(V/R)"},
-    {Ieee1394Camera::HUE,		"Hue            "},
-    {Ieee1394Camera::SATURATION,	"Saturation     "},
-    {Ieee1394Camera::GAMMA,		"Gamma          "},
-    {Ieee1394Camera::SHUTTER,		"Shutter        "},
-    {Ieee1394Camera::GAIN,		"Gain           "},
-    {Ieee1394Camera::IRIS,		"Iris           "},
-    {Ieee1394Camera::FOCUS,		"Focus          "},
-    {Ieee1394Camera::TEMPERATURE,	"Temperature    "},
-    {Ieee1394Camera::ZOOM,		"Zoom           "}
+    {Ieee1394Camera::HUE,		"Hue"		 },
+    {Ieee1394Camera::SATURATION,	"Saturation"	 },
+    {Ieee1394Camera::GAMMA,		"Gamma"		 },
+    {Ieee1394Camera::SHUTTER,		"Shutter"	 },
+    {Ieee1394Camera::GAIN,		"Gain"		 },
+    {Ieee1394Camera::IRIS,		"Iris"		 },
+    {Ieee1394Camera::FOCUS,		"Focus"		 },
+    {Ieee1394Camera::TEMPERATURE,	"Temperature"	 },
+    {Ieee1394Camera::ZOOM,		"Zoom"		 }
 };
 static const int	NFEATURES = sizeof(feature)/sizeof(feature[0]);
 static CmdDef		featureCmds[3*NFEATURES + 1];
