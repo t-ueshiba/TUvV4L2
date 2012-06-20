@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.2 2012-06-19 08:54:04 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.3 2012-06-20 00:04:52 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -78,21 +78,11 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 		_image.save(out);
 	  }
 	    break;
-	
-	  case c_BGR24:
-	  case c_RGB24:
-	  case c_BGR32:
-	  case c_RGB32:
-	  case c_GREY:
-	  case c_Y16:
-	  case c_YUYV:
-	  case c_UYVY:
-	  case c_SBGGR8:
-	  case c_SGBRG8:
-	  case c_SGRBG8:
+
+	  case c_PixelFormat:
 	  {
 	    V4L2Camera::PixelFormat
-		pixelFormat = V4L2Camera::uintToPixelFormat(id);
+		pixelFormat = V4L2Camera::uintToPixelFormat(val);
 	    V4L2Camera::FrameSizeRange
 		frameSizes = _camera.availableFrameSizes(pixelFormat);
 	    const V4L2Camera::FrameSize&	frameSize = *frameSizes.first;
