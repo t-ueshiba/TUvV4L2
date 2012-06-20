@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SliderCmd.cc,v 1.8 2009-03-03 00:59:47 ueshiba Exp $  
+ *  $Id: SliderCmd.cc,v 1.9 2012-06-20 07:42:45 ueshiba Exp $  
  */
 #include "SliderCmd_.h"
 #include "vSlider_.h"
@@ -62,8 +62,9 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				    XtNlabel,		cmd.title,
 				    XtNborderWidth,	0,
 				    XtNfill,		"none",
-				    XtNgravity,		WestGravity,
+				    XtNgravity,		EastGravity,
 				    XtNgridx,		0,
+				    XtNweightx,		1,
 				    Null)),
      _slider(XtVaCreateManagedWidget("TUvSliderCmd-slider",
 				     sliderWidgetClass,
@@ -78,16 +79,18 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				     XtNtopOfThumb,	0.0,
 				     XtNshown,		0.0,
 				     XtNfill,		"none",
-				     XtNgravity,	WestGravity,
+				     XtNgravity,	EastGravity,
 				     XtNgridx,		1,
+				     XtNweightx,	0,
 				     Null)),
      _text(XtVaCreateManagedWidget("TUvSliderCmd-text",
 				   labelWidgetClass,
 				   _widget,
 				   XtNborderWidth,	1,
 				   XtNfill,		"none",
-				   XtNgravity,		WestGravity,
+				   XtNgravity,		EastGravity,
 				   XtNgridx,		2,
+				   XtNweightx,		0,
 				   Null)),
      _min  (cmd.prop != 0 ? ((int*)cmd.prop)[0] :   0),
      _range(cmd.prop != 0 ? ((int*)cmd.prop)[1] : 100),
