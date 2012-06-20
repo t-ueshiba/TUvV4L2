@@ -1,5 +1,5 @@
 /*
- *  $Id: createMenuCmds.cc,v 1.1 2012-06-19 06:14:31 ueshiba Exp $
+ *  $Id: createMenuCmds.cc,v 1.2 2012-06-20 00:04:52 ueshiba Exp $
  */
 #include <vector>
 #include <boost/foreach.hpp>
@@ -27,7 +27,8 @@ static MenuDef fileMenu[] =
 static CmdDef MenuCmds[] =
 {
     {C_MenuButton, M_File, 0, "File", fileMenu,   CA_None, 0, 0, 1, 1, 0},
-    {C_MenuButton, c_PixelFormat, 0, "Pixel format", 0, CA_None, 1, 0, 1, 1, 0},
+    {C_ChoiceMenuButton, c_PixelFormat, 0, "Pixel format", 0, CA_None,
+     1, 0, 1, 1, 0},
     EndOfCmds
 };
 
@@ -45,9 +46,16 @@ createMenuCmds(const V4L2Camera& camera)
     int	i = 0;
     BOOST_FOREACH (V4L2Camera::PixelFormat pixelFormat, pixelFormats)
     {
+	if (pixelFormat == camera.pixelFormat())
+	{
+	    MenuCmds[1].val = i;
+	    pixelFormatMenus[i].checked = true;
+	}
+	else
+	    pixelFormatMenus[i].checked = false;
+	
 	pixelFormatMenus[i].label   = camera.getName(pixelFormat).c_str();
 	pixelFormatMenus[i].id	    = pixelFormat;
-	pixelFormatMenus[i].checked = false;
 	pixelFormatMenus[i].submenu = noSub;
 
 	++i;
