@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.20 2012-01-22 10:52:19 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.21 2012-06-21 10:15:02 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -274,6 +274,9 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 	dup  += Iu8vec::size;
 	dvp  += Iu8vec::size;
     }
+#  if !defined(SSE2)
+    empty();
+#  endif	
 #endif
     while (outp < outq)
 	*outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
@@ -308,6 +311,9 @@ Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
 	dvp  += Iu8vec::size;
 	outp += Iu8vec::size;
     }
+#  if !defined(SSE2)
+    empty();
+#  endif	
 #endif
     while (outp < outq)
 	*outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);

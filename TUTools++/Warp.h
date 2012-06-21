@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.16 2012-01-22 10:52:19 ueshiba Exp $
+ *  $Id: Warp.h,v 1.17 2012-06-21 10:15:02 ueshiba Exp $
  */
 /*!
   \file		Warp.h
@@ -297,9 +297,6 @@ Warp::operator ()(const Image<T>& in, Image<T>& out) const
     for (u_int v = 0; v < out.height(); ++v)
 	warpLine(in, out, v);
 #endif
-#if defined(SSE)
-    mm::empty();
-#endif	
 }
     
 //! 出力画像点を指定してそれにマップされる入力画像点の2次元座標を返す．
