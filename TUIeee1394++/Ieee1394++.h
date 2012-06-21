@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.32 2012-06-07 03:25:41 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.33 2012-06-21 01:00:15 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -243,6 +243,8 @@ class Ieee1394Node
     void		requeueListenBuffer()				;
     void		flushListenBuffer()				;
     void		unmapListenBuffer()				;
+    u_int64_t		cycleTimerToLocalTime(u_int32_t cycleTimer)
+								const	;
     
   private:
     Ieee1394Node(const Ieee1394Node&)					;
@@ -498,8 +500,6 @@ class Ieee1394Camera : public Ieee1394Node
     Ieee1394Camera&	powerOff()					;
     Bayer		bayerTileMapping()			const	;
     bool		isLittleEndian()			const	;
-    Ieee1394Camera&	embedTimestamp()				;
-    Ieee1394Camera&	unembedTimestamp()				;
     
   // Format and frame rate stuffs.
     quadlet_t		inquireFrameRate(Format format)		const	;
@@ -573,6 +573,9 @@ class Ieee1394Camera : public Ieee1394Node
 			captureRaw(void* image)			const	;
     const Ieee1394Camera&
 			captureBayerRaw(void* image)		const	;
+    Ieee1394Camera&	embedTimestamp()				;
+    Ieee1394Camera&	unembedTimestamp()				;
+    u_int64_t		getTimestamp()				const	;
 
   // Utility functions.
     static Format	uintToFormat(u_int format)			;
@@ -689,6 +692,17 @@ Ieee1394Camera::captureDirectly(Image<T>& image) const
 }
 #endif
 
+//! 画像の撮影時刻を得る．
+/*!
+  \return	micro second単位で表した画像の撮影時刻
+*/ 
+inline u_int64_t
+Ieee1394Camera::getTimestamp() const
+{
+    return (_img != 0 ? cycleTimerToLocalTime(ntohl(*((u_int32_t*)_img)))
+		      : 0);
+}
+    
 inline void
 Ieee1394Camera::checkAvailability(Format format, FrameRate rate) const
 {

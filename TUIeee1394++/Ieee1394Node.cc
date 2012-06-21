@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.21 2012-05-08 02:31:26 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.22 2012-06-21 01:00:15 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -66,8 +66,8 @@ video1394_get_fd_and_check(int port_number)
 	throw runtime_error(string("TU::raw1394_get_fd_and_check: failed to open video1394!! ") + strerror(errno));
     return fd;
 }
-#else
-static u_int32_t
+#endif
+static inline u_int32_t
 cycleTimer_to_usec(u_int32_t cycleTimer)  // from juju/capture.c of libdc1394
 {
     u_int32_t	sec	 = (cycleTimer & 0xe000000) >> 25;
@@ -77,29 +77,6 @@ cycleTimer_to_usec(u_int32_t cycleTimer)  // from juju/capture.c of libdc1394
     return 1000000 * sec + 125 * cycles + (125 * subcycle) / 3072;
 }
 
-static u_int64_t
-cycle_to_filltime(raw1394handle_t handle, u_int cycle)
-{
-#  if !defined(__APPLE__)
-  // 現在時刻を獲得する. 
-    u_int32_t	busTime;
-    u_int64_t	localTime;
-    raw1394_read_cycle_timer(handle, &busTime, &localTime);
-    busTime = cycleTimer_to_usec(busTime);
-
-  // packet取り込み時刻を獲得する. 
-    u_int32_t	dmaTime = cycleTimer_to_usec(cycle << 12);
-
-  // 現在時刻とpacket取り込み時刻のずれを求める. 
-    u_int32_t	diff = (busTime + 8000000 - dmaTime) % 8000000;
-
-  // ずれを差し引く. 
-    return localTime - u_int64_t(diff);
-#  else
-    return 0;
-#  endif
-}
-#endif
 #if !defined(__APPLE__)
 /************************************************************************
 *  class Ieee1394Node::Port						*
@@ -428,7 +405,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 	wait.channel = _mmap.channel;
 	wait.buffer  = i;
 	if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_QUEUE_BUFFER, &wait) < 0)
-	    throw runtime_error(string("Ieee1394Node::mapListenBuffer: VIDEO1394_IOC_LISTEN_QUEUE_BUFFER failed!! ") + strerror(errno));
+	    throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: VIDEO1394_IOC_LISTEN_QUEUE_BUFFER failed!! ") + strerror(errno));
     }
 
   // Reset buffer status and re-map new buffer.
@@ -437,7 +414,7 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 	== (u_char*)-1)
     {
 	_buf = 0;
-	throw runtime_error(string("Ieee1394Node::mapListenBuffer: mmap failed!! ") + strerror(errno));
+	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: mmap failed!! ") + strerror(errno));
     }
 
     usleep(100000);
@@ -599,6 +576,29 @@ Ieee1394Node::unmapListenBuffer()
     }
 }
 
+u_int64_t
+Ieee1394Node::cycleTimerToLocalTime(u_int32_t cycleTimer) const
+{
+#if !defined(__APPLE__)
+  // 現在のサイクルタイマー値と時刻を獲得する．
+    u_int32_t	cycleTimer0;
+    u_int64_t	localTime0;
+    raw1394_read_cycle_timer(_handle, &cycleTimer0, &localTime0);
+
+  // 現在および与えられたサイクルタイマー値をmicro sec単位に直す. 
+    u_int32_t	cycleUsec0 = cycleTimer_to_usec(cycleTimer0);
+    u_int32_t	cycleUsec  = cycleTimer_to_usec(cycleTimer);
+
+  // 現在時刻と与えられたサイクルタイマー値(周期: 8sec)に対応する時刻のずれを求める. 
+    u_int32_t	diff = (cycleUsec0 + 8000000 - cycleUsec) % 8000000;
+
+  // 現在時刻からずれを差し引く. 
+    return localTime0 - u_int64_t(diff);
+#else
+    return 0;
+#endif
+}
+
 #if !defined(USE_VIDEO1394)
 //! このノードに割り当てられたisochronous受信用バッファを満たす
 /*!
@@ -626,7 +626,7 @@ Ieee1394Node::receive(raw1394handle_t handle,
 	if (node->_current == node->_end)
 	{
 	    node->_ready = true;
-	    node->_filltime_next = cycle_to_filltime(handle, cycle);
+	    node->_filltime_next = node->cycleTimerToLocalTime(cycle << 12);
 	}
 	else
 	{
@@ -634,7 +634,7 @@ Ieee1394Node::receive(raw1394handle_t handle,
 	  // 取りこぼしているので [_buf, _current) を廃棄する. 
 	    node->_current = node->_buf;
 	    node->_ready = false;
-	    node->_filltime = cycle_to_filltime(handle, cycle);
+	    node->_filltime = node->cycleTimerToLocalTime(cycle << 12);
 	}
 #  if defined(DEBUG)
 	cerr << (node->_ready ? ", ready)" : ", not-ready)") << endl;
