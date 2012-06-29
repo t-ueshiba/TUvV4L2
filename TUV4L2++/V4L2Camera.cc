@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.5 2012-06-19 21:49:38 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.6 2012-06-29 03:08:51 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -314,17 +314,17 @@ bayerGBRGEven3x3(const S* buf, T* rgb, int w)
 }
 
 static int
-v4l2_get_fd(const char* name)
+v4l2_get_fd(const char* dev)
 {
     using namespace	std;
     
-    int		fd = open(name, O_RDWR);
+    int		fd = ::open(dev, O_RDWR);
     if (fd < 0)
-	throw runtime_error(string("TU::v4l2_get_fd(): failed to open v4l2!! ")
-			    + strerror(errno));
+	throw runtime_error(string("TU::v4l2_get_fd(): failed to open ")
+			    + dev + "!! " + strerror(errno));
     return fd;
 }
-    
+
 /************************************************************************
 *  class V4L2Camera							*
 ************************************************************************/
@@ -333,10 +333,10 @@ v4l2_get_fd(const char* name)
  */
 //! Video for Linux v.2 カメラノードを生成する
 /*!
-  \param deviceName	デバイス名
+  \param dev	デバイス名
 */
-V4L2Camera::V4L2Camera(const char* deviceName)
-    :_fd(v4l2_get_fd(deviceName)), _formats(), _controls(),
+V4L2Camera::V4L2Camera(const char* dev)
+    :_fd(v4l2_get_fd(dev)), _formats(), _controls(),
      _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
      _buffers(), _current(~0), _inContinuousShot(false)
 {
@@ -345,7 +345,12 @@ V4L2Camera::V4L2Camera(const char* deviceName)
     enumerateFormats();		// 画素フォーマット，画像サイズ，フレームレート
     enumerateControls();	// カメラのコントロール=属性
 
-  // 画素フォーマットと画像サイズの現在値を取得してセット
+  // このカメラのどの画素フォーマットも本ライブラリで未サポートならば例外を送出
+    PixelFormatRange	pixelFormats = availablePixelFormats();
+    if (pixelFormats.first == pixelFormats.second)
+	throw runtime_error("V4L2Camera::V4L2Camera(): no available pixel formats!");
+    
+  // 画素フォーマットと画像サイズおよびフレームレートの現在値を取得
     v4l2_format	fmt;
     memset(&fmt, 0, sizeof(fmt));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -354,9 +359,28 @@ V4L2Camera::V4L2Camera(const char* deviceName)
     _width	 = fmt.fmt.pix.width;
     _height	 = fmt.fmt.pix.height;
     _pixelFormat = uintToPixelFormat(fmt.fmt.pix.pixelformat);
+    u_int	fps_n, fps_d;
+    getFrameRate(fps_n, fps_d);
 
-  // 画素フォーマット，画像サイズ，フレームレートの現在値に応じてバッファをマップ
-    mapBuffers(NB_BUFFERS);
+  // カメラに現在セットされている画素フォーマットが本ライブラリで未サポートならば，
+  // サポートされている1番目の画素フォーマットにセットし，画像サイズをそのフォー
+  // マットにおける最大値にする．また，フレームレートをその画像サイズにおける最大値
+  // にする．
+    if (_pixelFormat == UNKNOWN_PIXEL_FORMAT)
+    {
+	_pixelFormat = *pixelFormats.first;
+	const FrameSize&
+	    frameSize = *availableFrameSizes(_pixelFormat).first;
+	_width  = frameSize.width.max;
+	_height = frameSize.height.max;
+	const FrameRate&
+	    frameRate = *frameSize.availableFrameRates().first;
+	fps_n = frameRate.fps_n.min;
+	fps_d = frameRate.fps_d.max;
+    }
+    
+  // 画素フォーマット，画像サイズ，フレームレートをセット
+    setFormat(_pixelFormat, _width, _height, fps_n, fps_d);
 }
 
 //! Video for Linux v.2カメラオブジェクトを破壊する
@@ -401,8 +425,8 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
     using namespace	std;
 
   // 指定された画素フォーマット，画像サイズ，フレーム間隔の組み合わせが有効かチェック
-    const Format&	format = pixelFormatToFormat(pixelFormat);
-    BOOST_FOREACH (const FrameSize& frameSize, format.frameSizes)
+    BOOST_FOREACH (const FrameSize& frameSize,
+		   availableFrameSizes(pixelFormat))
     {
 	if (frameSize.width .involves(width) &&
 	    frameSize.height.involves(height))
@@ -417,7 +441,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
 	}
     }
     
-    throw invalid_argument("V4L2Camera::setFormat() invalid arguments!! ");
+    throw invalid_argument("V4L2Camera::setFormat() illegal combination of pixel format, frame size and frame rate!! ");
 
   // 画素フォーマットと画像サイズを設定
   ok:
@@ -698,7 +722,7 @@ V4L2Camera::operator >>(Image<T>& image) const
 	for (u_int v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
-	break;
+        break;
 
       case UYVY:
       {
@@ -1070,7 +1094,8 @@ V4L2Camera::enumerateFormats()
 		}
 	    }
 
-	  // この画素フォーマットと画像サイズのもとでサポートされるフレームレートを列挙
+	  // この画素フォーマットと画像サイズのもとでサポートされる
+	  // フレームレートを列挙
 	    v4l2_frmivalenum	fival;
 	    memset(&fival, 0, sizeof(fival));
 	    fival.type	       = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1125,14 +1150,14 @@ V4L2Camera::enumerateControls()
     memset(&ctrl, 0, sizeof(ctrl));
 
     for (int id = 0, ret; (ret = ioctl(id, ctrl)) == 0 || errno != EINVAL; )
-	if (ret)		// ioctlがEINVAL以外のエラーを返したなら...
+	if (ret)		// ioctlがEINVALでないエラーを返したら...
 	{
 	    if (ctrl.id <= id)	// 次のctrl.idがセットされなかったら(v4l2のbug)
 		++id;		// 自分で次のidに進めなければならない
 	    else
 		break;
 	}
-	else			// ioctlが正常に終了したなら...
+	else			// ioctlが正常に終了したら...
 	{
 	    if (ctrl.id == id)	// ctrl.idが更新されなかったら...(v4l2のbug)
 		break;		// 列挙を中断
@@ -1248,7 +1273,7 @@ V4L2Camera::mapBuffers(u_int n)
 	throw std::runtime_error("V4L2Camera::mapBuffer(): failed to allocate sufficient number of buffers!!");	// 脱出する
 
     _buffers.resize(n);
-    for (u_int i = 0; i < n; ++i)		// 確保された個数のバッファに
+    for (u_int i = 0; i < _buffers.size(); ++i)	// 確保された個数のバッファに
     {
 	_buffers[i].map(_fd, i);		// メモリをマップして
 	enqueueBuffer(i);			// キューに入れる
@@ -1431,7 +1456,7 @@ operator <<(std::ostream& out, const V4L2Camera::Format& format)
     out << " [id:" << fourcc << ']' << std::endl;
     
     BOOST_FOREACH (const V4L2Camera::FrameSize& frameSize, format.frameSizes)
-	out << "  " << frameSize;
+	out << "  " << frameSize << std::endl;
 
     return out ;
 }
@@ -1515,7 +1540,7 @@ operator <<(std::ostream& out, const V4L2Camera::FrameSize& frameSize)
     BOOST_FOREACH (const V4L2Camera::FrameRate& frameRate,
 		   frameSize.availableFrameRates())
 	out << ' ' << frameRate;
-    return out << std::endl;
+    return out;
 }
     
 //! フレームレートを出力ストリームに出力する
