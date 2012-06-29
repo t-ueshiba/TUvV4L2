@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.3 2012-06-20 00:04:52 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.4 2012-06-29 03:10:04 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -79,18 +79,27 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	  }
 	    break;
 
-	  case c_PixelFormat:
+	  case c_BGR24:
+	  case c_RGB24:
+	  case c_BGR32:
+	  case c_RGB32:
+	  case c_GREY:
+	  case c_Y16:
+	  case c_YUYV:
+	  case c_UYVY:
+	  case c_SBGGR8:
+	  case c_SGBRG8:
+	  case c_SGRBG8:
 	  {
 	    V4L2Camera::PixelFormat
-		pixelFormat = V4L2Camera::uintToPixelFormat(val);
-	    V4L2Camera::FrameSizeRange
-		frameSizes = _camera.availableFrameSizes(pixelFormat);
-	    const V4L2Camera::FrameSize&	frameSize = *frameSizes.first;
+		pixelFormat = V4L2Camera::uintToPixelFormat(id);
+	    const V4L2Camera::FrameSize&
+		frameSize = _camera.availableFrameSizes(pixelFormat).first[val];
 	    u_int	w = frameSize.width.max, h = frameSize.height.max;
 	    V4L2Camera::FrameRateRange
 			frameRates = frameSize.availableFrameRates();
 	    const V4L2Camera::FrameRate&	frameRate = *frameRates.first;
-	    u_int	fps_n = frameRate.fps_n.max,
+	    u_int	fps_n = frameRate.fps_n.min,
 			fps_d = frameRate.fps_d.max;
 	    _camera.setFormat(pixelFormat, w, h, fps_n, fps_d);
 	    _canvas.resize(w, h);
