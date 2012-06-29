@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.1 2012-06-19 06:14:31 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2012-06-29 03:10:04 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
+INCDIRS		= -I$(PREFIX)/include -I$(HOME)/src/TUv++
 
 PROGRAM		= testcam
 LIBS		= -lTUV4L2++ -lTUXv++ -lTUv++ -lTUTools++ \
@@ -85,7 +85,7 @@ OBJS		= MyCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

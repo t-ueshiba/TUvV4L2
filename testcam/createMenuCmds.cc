@@ -1,8 +1,10 @@
 /*
- *  $Id: createMenuCmds.cc,v 1.2 2012-06-20 00:04:52 ueshiba Exp $
+ *  $Id: createMenuCmds.cc,v 1.3 2012-06-29 03:10:04 ueshiba Exp $
  */
 #include <vector>
+#include <list>
 #include <boost/foreach.hpp>
+#include <sstream>
 #include "multicam.h"
 
 namespace TU
@@ -12,8 +14,10 @@ namespace v
 /************************************************************************
 *  local data								*
 ************************************************************************/
-static std::vector<MenuDef>	pixelFormatMenus;
-
+static std::vector<MenuDef>			pixelFormatMenus;
+static std::list<std::vector<MenuDef> >		frameSizeMenusList;
+static std::list<std::vector<std::string> >	frameSizeLabelsList;
+    
 static MenuDef fileMenu[] =
 {
     {"Save",			M_Save,		 false, noSub},
@@ -26,8 +30,9 @@ static MenuDef fileMenu[] =
 
 static CmdDef MenuCmds[] =
 {
-    {C_MenuButton, M_File, 0, "File", fileMenu,   CA_None, 0, 0, 1, 1, 0},
-    {C_ChoiceMenuButton, c_PixelFormat, 0, "Pixel format", 0, CA_None,
+    {C_MenuButton,	  M_File, 0,	     "File", fileMenu, CA_None,
+     0, 0, 1, 1, 0},
+    {C_MenuButton, c_PixelFormat, 0, "Pixel format",	    0, CA_None,
      1, 0, 1, 1, 0},
     EndOfCmds
 };
@@ -38,31 +43,51 @@ static CmdDef MenuCmds[] =
 CmdDef*
 createMenuCmds(const V4L2Camera& camera)
 {
-     V4L2Camera::PixelFormatRange
-	pixelFormats = camera.availablePixelFormats();
-
-    pixelFormatMenus.resize(std::distance(pixelFormats.first,
-					  pixelFormats.second) + 1);
-    int	i = 0;
-    BOOST_FOREACH (V4L2Camera::PixelFormat pixelFormat, pixelFormats)
+    BOOST_FOREACH (V4L2Camera::PixelFormat pixelFormat,
+		   camera.availablePixelFormats())
     {
-	if (pixelFormat == camera.pixelFormat())
+      // この画素フォーマットに対応するメニュー項目を作る．
+	pixelFormatMenus.push_back(MenuDef());
+	MenuDef&	pixelFormatMenu = pixelFormatMenus.back();
+
+	pixelFormatMenu.label	= camera.getName(pixelFormat).c_str();
+	pixelFormatMenu.id	= pixelFormat;
+	pixelFormatMenu.checked = true;
+
+      // この画素フォーマットがサポートする各フレームサイズに対応するメニュー項目を作る．
+	frameSizeMenusList.push_back(std::vector<MenuDef>());
+	std::vector<MenuDef>&	frameSizeMenus = frameSizeMenusList.back();
+	frameSizeLabelsList.push_back(std::vector<std::string>());
+	std::vector<std::string>&
+	    frameSizeLabels = frameSizeLabelsList.back();
+	BOOST_FOREACH (const V4L2Camera::FrameSize& frameSize,
+		       camera.availableFrameSizes(pixelFormat))
 	{
-	    MenuCmds[1].val = i;
-	    pixelFormatMenus[i].checked = true;
+	  // このフレームサイズに対応するメニュー項目を作る．
+	    frameSizeMenus.push_back(MenuDef());
+	    MenuDef&		frameSizeMenu = frameSizeMenus.back();
+	    const size_t	j = frameSizeMenus.size() - 1;
+
+	    std::ostringstream	s;
+	    s << frameSize;
+	    frameSizeLabels.push_back(s.str());
+	    frameSizeMenu.label = frameSizeLabels.back().c_str();
+	    frameSizeMenu.id	= j;
+	    frameSizeMenu.checked
+		= (camera.pixelFormat() == pixelFormat	    &&
+		   frameSize.width.involves(camera.width()) &&
+		   frameSize.height.involves(camera.height()));
+	    frameSizeMenu.submenu = noSub;
 	}
-	else
-	    pixelFormatMenus[i].checked = false;
-	
-	pixelFormatMenus[i].label   = camera.getName(pixelFormat).c_str();
-	pixelFormatMenus[i].id	    = pixelFormat;
-	pixelFormatMenus[i].submenu = noSub;
+	frameSizeMenus.push_back(MenuDef());
+	frameSizeMenus.back().label = 0;
 
-	++i;
+	pixelFormatMenu.submenu = &frameSizeMenus.front();
     }
-    pixelFormatMenus[i].label = 0;
+    pixelFormatMenus.push_back(MenuDef());
+    pixelFormatMenus.back().label = 0;
 
-    MenuCmds[1].prop = &pixelFormatMenus[0];
+    MenuCmds[1].prop = &pixelFormatMenus.front();
 
     return MenuCmds;
 }

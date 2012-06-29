@@ -1,5 +1,5 @@
 /*
- *  $Id: multicam.h,v 1.3 2012-06-20 00:04:52 ueshiba Exp $
+ *  $Id: multicam.h,v 1.4 2012-06-29 03:10:04 ueshiba Exp $
  */
 #include "TU/v/TUv++.h"
 #include "TU/V4L2++.h"
@@ -22,6 +22,17 @@ enum
 
   // Camera video format.
     c_PixelFormat,
+    c_BGR24			= V4L2Camera::BGR24,
+    c_RGB24			= V4L2Camera::RGB24,
+    c_BGR32			= V4L2Camera::BGR32,
+    c_RGB32			= V4L2Camera::RGB32,
+    c_GREY			= V4L2Camera::GREY,
+    c_Y16			= V4L2Camera::Y16,
+    c_YUYV			= V4L2Camera::YUYV,
+    c_UYVY			= V4L2Camera::UYVY,
+    c_SBGGR8			= V4L2Camera::SBGGR8,
+    c_SGBRG8			= V4L2Camera::SGBRG8,
+    c_SGRBG8			= V4L2Camera::SGRBG8,
 
   // Camera control.
     c_ContinuousShot,

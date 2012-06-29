@@ -1,9 +1,8 @@
 /*
- *  $Id: main.cc,v 1.2 2012-06-19 08:54:04 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2012-06-29 03:10:04 ueshiba Exp $
  */
 #include <cstdlib>
 #include "MyCmdWindow.h"
-#include "TU/V4L2++.h"
 
 /************************************************************************
 *  global functions							*

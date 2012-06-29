@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCanvasPane.h,v 1.1 2012-06-19 06:14:31 ueshiba Exp $
+ *  $Id: MyCanvasPane.h,v 1.2 2012-06-29 03:10:04 ueshiba Exp $
  */
 #include "TU/v/CanvasPane.h"
 #include "TU/v/CanvasPaneDC.h"
@@ -48,6 +48,7 @@ inline void
 MyCanvasPane::resize(u_int w, u_int h)
 {
     _dc.setSize(w, h, _dc.mul(), _dc.div());
+    _dc.clear();
 }
 
 }
