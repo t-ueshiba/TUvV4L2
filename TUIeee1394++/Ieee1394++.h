@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.33 2012-06-21 01:00:15 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.34 2012-06-29 09:05:37 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -38,7 +38,7 @@
   #TU::Ieee1394Node - IEEE1394バスに接続される様々な機器のベースとなるクラス
   - #TU::Ieee1394Node::nodeId()
   - #TU::Ieee1394Node::globalUniqueId()
-  - #TU::Ieee1394Node::filltime()
+  - #TU::Ieee1394Node::arrivaltime()
   - #TU::Ieee1394Node::channel()
   - #TU::Ieee1394Node::delay()
 
@@ -50,8 +50,6 @@
     - #TU::Ieee1394Camera::powerOff()
     - #TU::Ieee1394Camera::bayerTileMapping()
     - #TU::Ieee1394Camera::isLittleEndian()
-    - #TU::Ieee1394Camera::embedTimestamp()
-    - #TU::Ieee1394Camera::unembedTimestamp()
   
   - <b>画像フォーマットとフレームレート</b>
     - #TU::Ieee1394Camera::inquireFrameRate()
@@ -83,6 +81,9 @@
     - #TU::Ieee1394Camera::captureDirectly()
     - #TU::Ieee1394Camera::captureRaw()
     - #TU::Ieee1394Camera::captureBayerRaw()
+    - #TU::Ieee1394Camera::embedTimestamp()
+    - #TU::Ieee1394Camera::unembedTimestamp()
+    - #TU::Ieee1394Camera::getTimestamp()
 
   - <b>カメラの様々な機能の制御</b>
     - #TU::Ieee1394Camera::inquireFeatureFunction()
@@ -200,11 +201,11 @@ class Ieee1394Node
 
     u_int64_t	globalUniqueId()		const	;
 
-  //! このノードに割り当てられたisochronous受信用バッファが満たされた時刻を返す
+  //! このノードのisochronous受信用バッファにフレームの先頭パケットが到着した時刻を返す
   /*!
-    \return	受信用バッファが満たされた時刻
+    \return	受信用バッファにフレームの先頭パケットが到着した時刻
    */
-    u_int64_t	filltime()			const	{return _filltime;}
+    u_int64_t	arrivaltime()			const	{return _arrivaltime;}
 
   //! このノードに割り当てられたisochronousチャンネルを返す
   /*!
@@ -243,8 +244,9 @@ class Ieee1394Node
     void		requeueListenBuffer()				;
     void		flushListenBuffer()				;
     void		unmapListenBuffer()				;
-    u_int64_t		cycleTimerToLocalTime(u_int32_t cycleTimer)
+    u_int64_t		cycletimeToLocaltime(u_int32_t cycletime)
 								const	;
+    u_int64_t		cycleToLocaltime(u_int32_t cycle)	const	;
     
   private:
     Ieee1394Node(const Ieee1394Node&)					;
@@ -264,24 +266,24 @@ class Ieee1394Node
 #if !defined(__APPLE__)    
     static std::map<int, Port*>	_portMap;
 
-    Port*			_port;
+    Port*		_port;
 #endif
-    raw1394handle_t		_handle;
-    nodeid_t			_nodeId;
+    raw1394handle_t	_handle;
+    nodeid_t		_nodeId;
+    const u_int		_delay;
+    u_char*		_buf;			// mapped buffer
+    u_int64_t		_arrivaltime;		// time of buffer captured
 #if defined(USE_VIDEO1394)
-    video1394_mmap		_mmap;		// mmap structure for video1394
-    u_int			_current;	// index of current ready buffer
-    u_int			_buf_size;	// buffer size excluding header
+    video1394_mmap	_mmap;			// mmap structure for video1394
+    u_int		_current;		// index of current ready buffer
+    u_int		_buf_size;		// buffer size excluding header
 #else
-    u_char			_channel;	// iso receive channel
-    u_char*			_current;	// current insertion point
-    u_char*			_end;		// the end of the buffer
-    bool			_ready;		// buffer is ready
-    u_int64_t			_filltime_next;
+    u_char		_channel;		// iso receive channel
+    u_char*		_mid;			// the middle of the buffer
+    u_char*		_end;			// the end of the buffer
+    u_char*		_current;		// current insertion point
+    u_int64_t		_arrivaltime_next;
 #endif
-    u_char*			_buf;		// mapped buffer
-    u_int64_t			_filltime;	// time of buffer filled
-    const u_int			_delay;
 };
     
 /************************************************************************
@@ -692,15 +694,15 @@ Ieee1394Camera::captureDirectly(Image<T>& image) const
 }
 #endif
 
-//! 画像の撮影時刻を得る．
+//! 画像に埋め込まれた撮影時刻を得る．
 /*!
+  予め embedTimestamp() によって画像への撮影時刻埋め込みを指示しなければならない．
   \return	micro second単位で表した画像の撮影時刻
 */ 
 inline u_int64_t
 Ieee1394Camera::getTimestamp() const
 {
-    return (_img != 0 ? cycleTimerToLocalTime(ntohl(*((u_int32_t*)_img)))
-		      : 0);
+    return (_img != 0 ? cycletimeToLocaltime(ntohl(*((u_int32_t*)_img))) : 0);
 }
     
 inline void

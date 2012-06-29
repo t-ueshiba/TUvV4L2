@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.22 2012-06-21 01:00:15 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.23 2012-06-29 09:05:37 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string>
+#include <algorithm>
 #include <libraw1394/csr.h>
 #if defined(USE_VIDEO1394)
 #  include <fcntl.h>
@@ -68,15 +69,26 @@ video1394_get_fd_and_check(int port_number)
 }
 #endif
 static inline u_int32_t
-cycleTimer_to_usec(u_int32_t cycleTimer)  // from juju/capture.c of libdc1394
+cycletime_to_subcycle(u_int32_t cycletime)
 {
-    u_int32_t	sec	 = (cycleTimer & 0xe000000) >> 25;
-    u_int32_t	cycles	 = (cycleTimer & 0x1fff000) >> 12;
-    u_int32_t	subcycle = (cycleTimer & 0x0000fff);
+    u_int32_t	sec	 = (cycletime & 0xe000000) >> 25;
+    u_int32_t	cycle	 = (cycletime & 0x1fff000) >> 12;
+    u_int32_t	subcycle = (cycletime & 0x0000fff);
 
-    return 1000000 * sec + 125 * cycles + (125 * subcycle) / 3072;
+    return subcycle + 3072*(cycle + 8000*sec);
 }
 
+#if defined(DEBUG)
+std::ostream&
+print_time(std::ostream& out, u_int64_t localtime)
+{
+    u_int32_t	usec = localtime % 1000;
+    u_int32_t	msec = (localtime / 1000) % 1000;
+    u_int32_t	sec  = localtime / 1000000;
+    return out << sec << '.' << msec << '.' << usec;
+}
+#endif
+    
 #if !defined(__APPLE__)
 /************************************************************************
 *  class Ieee1394Node::Port						*
@@ -164,13 +176,13 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 #else
     :_port(0), _handle(raw1394_new_handle()),
 #endif
-     _nodeId(0),
+     _nodeId(0), _delay(delay), _buf(0), _arrivaltime(0),
 #if defined(USE_VIDEO1394)
-     _mmap(), _current(0), _buf_size(0),
+     _mmap(), _current(0), _buf_size(0)
 #else
-     _channel(0), _current(0), _end(0), _ready(false), _filltime_next(0),
+     _channel(0), _mid(0), _end(0), _current(0), _arrivaltime_next(0)
 #endif
-     _buf(0), _filltime(0), _delay(delay)
+
 {
     using namespace	std;
 
@@ -420,17 +432,26 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
     usleep(100000);
     return _mmap.channel;
 #else
+  // バッファ1つ分のデータを転送するために必要なパケット数
     const u_int	npackets = (buf_size - 1) / packet_size + 1;
+
+  // raw1394_loop_iterate()は，interval個のパケットを受信するたびにユーザ側に
+  // 制御を返す．libraw1394ではこのデフォルト値はパケット数の1/4である．ただし，
+  // 512パケットを越える値を指定すると，raw1394_loop_iterate()から帰ってこなく
+  // なるようである．
+    const u_int	interval = std::min(npackets/4, 512U);
 #  if defined(DEBUG)
-    cerr << "mapListenBuffer: npackets = " << dec << npackets << endl;
+    cerr << "mapListenBuffer: npackets = " << dec << npackets
+	 << ", interval = " << interval << endl;
 #  endif
-    _buf = _current = new u_char[buf_size + npackets * packet_size];
-    _end = _buf + buf_size;
-    _ready = false;
+    _buf     = new u_char[buf_size + interval * packet_size];
+    _mid     = _buf + buf_size;
+    _end     = _mid + interval * packet_size;
+    _current = _buf;
 
     if (raw1394_iso_recv_init(_handle, &Ieee1394Node::receive,
 			      nb_buffers * npackets, packet_size, _channel,
-			      RAW1394_DMA_BUFFERFILL, npackets) < 0)
+			      RAW1394_DMA_BUFFERFILL, interval) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to initialize iso reception!! ") + strerror(errno));
     if (raw1394_iso_recv_start(_handle, -1, -1, 0) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::mapListenBuffer: failed to start iso reception!! ") + strerror(errno));
@@ -454,33 +475,28 @@ Ieee1394Node::waitListenBuffer()
     wait.buffer  = _current;
     if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_WAIT_BUFFER, &wait) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::waitListenBuffer: VIDEO1394_IOC_LISTEN_WAIT_BUFFER failed!! ") + strerror(errno));
-    _filltime = u_int64_t(wait.filltime.tv_sec) * 1000000LL
-	      + u_int64_t(wait.filltime.tv_usec);  // time of buffer filled.	
+
+  // wait.filltimeは，全パケットが到着してバッファが一杯になった時刻を表す．
+  // これから最初のパケットが到着した時刻を推定するために，バッファあたりの
+  // パケット数にパケット到着間隔(125 micro sec)を乗じた数を減じる．
+    _arrivaltime = u_int64_t(wait.filltime.tv_sec)*1000000LL
+		 + u_int64_t(wait.filltime.tv_usec)
+		 - u_int64_t(((_mmap.buf_size - 1)/_mmap.packet_size + 1)*125);
 
     return _buf + _current * _mmap.buf_size;
 #else
 #  if defined(DEBUG)
-    cerr << "*** begin ***" << endl;
+    cerr << "*** BEGIN [waitListenBuffer] ***" << endl;
 #  endif
-    while (!_ready)
+    while (_current < _mid)		// [_buf, _mid)が満たされるまで
     {
-      // (_buf, _end] に sy packet がない場合は sy packet を取りこぼしているので
-      // [_buf, _current)を廃棄する. 
-	if (_current > _end)
-	    _current = _buf;
-	
-	raw1394_loop_iterate(_handle);
-
-	if (_current == _end)
-	    _ready = true;
-
+	raw1394_loop_iterate(_handle);	// パケットを受信する．
 #  if defined(DEBUG)
-	cerr << (_ready ? "  ready:     " : "  not-ready: ")
-	     << "current = " << _current - _buf << endl;
+	cerr << "      current = " << _current - _buf << endl;
 #  endif
     }
 #  if defined(DEBUG)
-    cerr << "*** end ***" << endl;
+    cerr << "*** END   [waitListenBuffer] ***" << endl;
 #  endif
 
     return _buf;
@@ -501,16 +517,18 @@ Ieee1394Node::requeueListenBuffer()
 	throw runtime_error(string("TU::Ieee1394Node::requeueListenBuffer: VIDEO1394_IOC_LISTEN_QUEUE_BUFFER failed!! ") + strerror(errno));
     ++_current %= _mmap.nb_buffers;	// next buffer.
 #else
-    if (_ready)
+    if (_current != 0)
     {
-      // [_buf, _end) を廃棄し [_end, _current)をバッファ領域の先頭に移す
-	const size_t	len = _current - _end;
-	memcpy(_buf, _end, len);
-	_current  = _buf + len;
-	_ready	  = false;
-	_filltime = _filltime_next;
+      // [_buf, _mid) を廃棄し [_mid, _current)をバッファ領域の先頭に移す
+	const size_t	len = _current - _mid;
+	memcpy(_buf, _mid, len);
+	_current     = _buf + len;
+	_arrivaltime = _arrivaltime_next;
 #  if defined(DEBUG)
-	cerr << "  " << len << " bytes moved..." << endl;
+	cerr << "*** BEGIN [requeueListenBuffer] ***" << endl;
+	cerr << "      current = " << _current - _buf
+	     << " (" << len << " bytes moved...)" << endl;
+	cerr << "*** END   [requeueListenBuffer] ***" << endl;
 #  endif
     }
 #endif
@@ -524,31 +542,13 @@ Ieee1394Node::flushListenBuffer()
   // Force flushing by doing unmap and then map buffer.
     if (_buf != 0)
 	mapListenBuffer(_mmap.packet_size, _buf_size, _mmap.nb_buffers);
-    
-  // POLL(kernel-2.4以降のみで有効)してREADY状態のバッファを全てrequeueする. 
-  // 1つのバッファが一杯になる前にisochronous転送が停止されると, そのバッファ
-  // はREADY状態にはならずQUEUED状態のままなので, 不完全なデータを持ったまま
-  // 残ってしまう. したがって, この方法は良くない. (2002.3.7)
-  /*    if (_buf != 0)
-	for (;;)
-	{
-	    video1394_wait	wait;
-	    wait.channel = _mmap.channel;
-	    wait.buffer  = _current;
-	    if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_POLL_BUFFER, &wait) < 0)
-		break;
-	    _nready = 1 + wait.buffer;
-	    requeueListenBuffer();
-	    }*/
-  // "_nready" must be 0 here(no available buffers).
 #else
     using namespace	std;
 
     if (raw1394_iso_recv_flush(_handle) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::flushListenBuffer: failed to flush iso receive buffer!! ") + strerror(errno));
     _current = _buf;
-    _ready   = false;
-#endif
+#endif    
 }
 
 //! ノードに割り当てたすべての受信用バッファを廃棄する
@@ -570,41 +570,58 @@ Ieee1394Node::unmapListenBuffer()
 	raw1394_iso_shutdown(_handle);
 
 	delete [] _buf;
-	_buf = _current = _end = 0;
-	_ready = false;
+	_buf = _mid = _end = _current = 0;
 #endif
     }
 }
 
 u_int64_t
-Ieee1394Node::cycleTimerToLocalTime(u_int32_t cycleTimer) const
+Ieee1394Node::cycletimeToLocaltime(u_int32_t cycletime) const
 {
-#if !defined(__APPLE__)
-  // 現在のサイクルタイマー値と時刻を獲得する．
-    u_int32_t	cycleTimer0;
-    u_int64_t	localTime0;
-    raw1394_read_cycle_timer(_handle, &cycleTimer0, &localTime0);
+  // 現在のサイクル時刻と時刻を獲得する．
+    u_int32_t	cycletime0;
+    u_int64_t	localtime0;
+    raw1394_read_cycle_timer(_handle, &cycletime0, &localtime0);
 
-  // 現在および与えられたサイクルタイマー値をmicro sec単位に直す. 
-    u_int32_t	cycleUsec0 = cycleTimer_to_usec(cycleTimer0);
-    u_int32_t	cycleUsec  = cycleTimer_to_usec(cycleTimer);
+  // 現時刻と指定された時刻のサイクル時刻をサブサイクル値に直し，
+  // 両者のずれを求める．
+    u_int32_t	subcycle0 = cycletime_to_subcycle(cycletime0);
+    u_int32_t	subcycle  = cycletime_to_subcycle(cycletime);
+    u_int64_t	diff	  = (subcycle0 + (128LL*8000LL*3072LL) - subcycle)
+			  % (128LL*8000LL*3072LL);
 
-  // 現在時刻と与えられたサイクルタイマー値(周期: 8sec)に対応する時刻のずれを求める. 
-    u_int32_t	diff = (cycleUsec0 + 8000000 - cycleUsec) % 8000000;
+  // ずれをmicro sec単位に直して(1 subcycle = 125/3072 usec)現在時刻から差し引く. 
+    return localtime0 - (125LL*diff)/3072LL;
+}
 
-  // 現在時刻からずれを差し引く. 
-    return localTime0 - u_int64_t(diff);
-#else
-    return 0;
-#endif
+u_int64_t
+Ieee1394Node::cycleToLocaltime(u_int32_t cycle) const
+{
+  // 現在のサイクル時刻と時刻を獲得する．
+    u_int32_t	cycletime0;
+    u_int64_t	localtime0;
+    raw1394_read_cycle_timer(_handle, &cycletime0, &localtime0);
+
+  // 現在のサイクル時刻からサイクル値(周期：8000)を取り出し，与えられた
+  // サイクル値とのずれを求める．
+    u_int32_t	cycle0 = (cycletime0 & 0x1fff000) >> 12;
+    u_int32_t	diff   = (cycle0 + 8000 - cycle) % 8000;
+    
+  // ずれをmicro sec単位に直して(1 cycle = 125 micro sec)現在時刻から差し引く. 
+    return localtime0 - u_int64_t(125*diff);
 }
 
 #if !defined(USE_VIDEO1394)
-//! このノードに割り当てられたisochronous受信用バッファを満たす
+//! このノードに割り当てられたisochronous受信用バッファにパケットデータを転送する
 /*!
-  \param data	受信用バッファにセーブするデータ
-  \param len	データのバイト数
-  \param sy	先頭のデータであれば1, そうでなければ0
+  本ハンドラは，パケットが1つ受信されるたびに呼び出される．また，mapListenBuffer()
+  内の raw1394_iso_recv_init() を呼んだ時点で既にisochronous転送が始まっている
+  場合は，waitListenBuffer() 内で raw1394_loop_iterate() を呼ばなくてもこの
+  ハンドラが呼ばれることがあるため，buffer overrun を防ぐ方策はこのハンドラ内で
+  とっておかなければならない．
+  \param data	パケットデータ
+  \param len	パケットデータのバイト数
+  \param sy	フレームの先頭パケットであれば1, そうでなければ0
 */
 raw1394_iso_disposition
 Ieee1394Node::receive(raw1394handle_t handle,
@@ -616,34 +633,55 @@ Ieee1394Node::receive(raw1394handle_t handle,
 
     Ieee1394Node* const	node = (Ieee1394Node*)raw1394_get_userdata(handle);
 
-    if (sy)
+  // [_buf, _mid)の長さをフレームサイズにしてあるので，syパケットは必ず
+  // _buf, _midのいずれかに記録される．raw1394_loop_iterate() は，この
+  // ハンドラをinterval回呼ぶ．特にintervalが1フレームあたりのパケット数の
+  // 約数でない場合は，_bufにsyパケットを読み込んだ後にフレーム全体の受信が
+  // 完了した後に，さらに_midに次のフレームのsyパケットが読み込まれる．
+    if (sy)				// フレームの先頭パケットならば...
     {
+	node->_arrivaltime_next = node->cycleToLocaltime(cycle);
+	
+	if (node->_current != node->_mid)	// _midが読み込み先でなければ
+	{
+	    node->_current = node->_buf;	// _bufに読み込む
+	    node->_arrivaltime = node->_arrivaltime_next;
+	}
 #  if defined(DEBUG)
-	cerr << "    (sy!     current = "
-	     << node->_current - node->_buf
-	     << ", cycle = " << cycle;
+	u_int64_t
+	    timestamp = node->cycletimeToLocaltime(ntohl(*(u_int32_t*)data));
+	cerr << " (sy: current = " << node->_current - node->_buf
+	     << ", cycle = " << cycle << ')'
+	     << " diff: ";
+	print_time(cerr, node->_arrivaltime - timestamp);
+	cerr << ", captime: ";
+	print_time(cerr, node->_arrivaltime);
+	cerr << ", timestamp: ";
+	print_time(cerr, timestamp);
+	cerr << endl;
 #  endif	
-	if (node->_current == node->_end)
-	{
-	    node->_ready = true;
-	    node->_filltime_next = node->cycleTimerToLocalTime(cycle << 12);
-	}
-	else
-	{
-	  // 直前のsy packetとの間隔がバッファサイズに等しくない場合はpacketを
-	  // 取りこぼしているので [_buf, _current) を廃棄する. 
-	    node->_current = node->_buf;
-	    node->_ready = false;
-	    node->_filltime = node->cycleTimerToLocalTime(cycle << 12);
-	}
-#  if defined(DEBUG)
-	cerr << (node->_ready ? ", ready)" : ", not-ready)") << endl;
-#  endif
     }
-
-    memcpy(node->_current, data, len);
-    node->_current += len;
-
+#  if DEBUG==2
+    else
+    {
+	cerr << " (    current = ";
+	if (node->_current != 0)
+	    cerr << node->_current - node->_buf;
+	else
+	    cerr << "NULL";
+	cerr << ", cycle = " << cycle << ')';
+	u_int64_t	captime = node->cycleToLocaltime(cycle);
+	cerr << " captime: ";
+	print_time(cerr, captime);
+	cerr << endl;
+    }
+#  endif
+    if (node->_current + len <= node->_end)	// overrunが生じなければ...
+    {
+	memcpy(node->_current, data, len);	// パケットを読み込む
+	node->_current += len;			// 次の読み込み位置に進める
+    }
+    
     return RAW1394_ISO_OK;
 }
 #endif

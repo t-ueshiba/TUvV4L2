@@ -19,12 +19,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.12 2011-08-23 00:06:38 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.13 2012-06-29 09:06:03 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
 #include <algorithm>
 #include <sys/mman.h>
+#include <sys/time.h>
 #ifdef DEBUG
 #  include <iostream>
 #endif
@@ -216,6 +217,9 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 	irqInterval = 16;	// Default vlaue of IrqInterval.
     if (irqInterval > nPackets)
 	irqInterval = nPackets;
+#if OLD
+    irqInterval = nPackets;
+#endif
 #ifdef DEBUG
     cerr << "  nPackets = " << dec << nPackets
 	 << ", irqInterval = " << irqInterval
@@ -285,7 +289,12 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     if (!(_localIsochPort =
 	  (*_fwDeviceInterface)->CreateLocalIsochPortWithOptions(
 	      _fwDeviceInterface, false, (*_dclPool)->GetProgram(_dclPool),
-	      kFWDCLSyBitsEvent, 0x1, 0x1, nil, 0, ranges, 1,
+#if OLD
+	      kFWDCLSyBitsEvent, kFWDCLSyBitsEvent, kFWDCLSyBitsEvent,
+#else
+	      kFWDCLCycleEvent, kFWDCLCycleEvent, kFWDCLCycleEvent,
+#endif
+	      nil, 0, ranges, 1,
 	      kFWIsochPortUseSeparateKernelThread,
 	      CFUUIDGetUUIDBytes(kIOFireWireLocalIsochPortInterfaceID))))
 	return kIOReturnError;
@@ -381,6 +390,25 @@ raw1394::isoRecvFlush()
     return kIOReturnSuccess;
 }
 
+//! 現在のサイクル時刻とそれに対応する時刻を取得する
+/*!
+  \param cycleTimer	サイクル時刻が返される
+  \param localTime	サイクル時刻に対応する時刻(micro sec)が返される
+  \return		取得に成功すればkIOReturnSuccess, そうでなければ
+			原因を示すエラーコード
+*/
+IOReturn
+raw1394::readCycleTimer(UInt32* cycleTimer, UInt64* localTime) const
+{
+    timeval	localtime;
+    gettimeofday(&localtime, 0);
+    *localTime = localtime.tv_sec * 1000000 + localtime.tv_usec;
+
+    UInt32	busTime;
+    return (*_fwDeviceInterface)->GetBusCycleTime(_fwDeviceInterface,
+						  &busTime, cycleTimer);
+}
+
 //! isochronous転送のループを1回実行する
 /*!
   \return		データが壊れていなければユーザハンドラが返す値,
@@ -408,7 +436,7 @@ raw1394::loopIterate()
 
     Buffer*	buffer = _lastProcessed;  // 未処理の最初のバッファ
 #ifdef DEBUG
-    cerr << "  buffer[" << hex << buffer << "]: " << endl;
+    cerr << "  buffer[" << buffer << "]: " << endl;
 #endif
 
   // バッファデータの有効性を記憶し, 次の受信に備えて無効化しておく
@@ -425,19 +453,34 @@ raw1394::loopIterate()
 	const UInt32	dropped = _dropped;
 	_dropped = 0;
 	MPExitCriticalRegion(_mutex);
-
-      // 先頭パケットのヘッダとデータアドレスを取り出し, ユーザハンドラを介して
-      // 全パケットのデータを転送する
+#if OLD
 	IOVirtualRange	ranges[2];
 	(*_dclPool)->GetDCLRanges(buffer->first(), 2, ranges);
-	const UInt32	header = *((UInt32*)ranges[0].address),
-			length = buffer->nPackets() * ranges[1].length;
-	ret = _recvHandlerExt(this, (UInt8*)ranges[1].address, length,
-			      (header & kFWIsochChanNum) >> kFWIsochChanNumPhase,
-			      (header & kFWIsochTag)     >> kFWIsochTagPhase,
-			      (header & kFWIsochSy)      >> kFWIsochSyPhase,
-			      (header & kFWIsochTCode)   >> kFWIsochTCodePhase,
-			      dropped);
+	const UInt32	header = *((UInt32*)ranges[0].address);
+	ret = _recvHandlerExt(this, (UInt8*)ranges[1].address,
+		buffer->nPackets() * ranges[1].length,
+		(header & kFWIsochChanNum) >> kFWIsochChanNumPhase,
+		(header & kFWIsochTag)	   >> kFWIsochTagPhase,
+		(header & kFWIsochSy)	   >> kFWIsochSyPhase,
+		(header & kFWIsochTCode)   >> kFWIsochTCodePhase,
+		dropped);
+#else
+      // 先頭パケットのヘッダとデータアドレスを取り出し, ユーザハンドラを介して
+      // パケットを一つずつ転送する
+	for (UInt32 j = 0; j < buffer->nPackets(); ++j)
+	{
+	    IOVirtualRange	ranges[2];
+	    (*_dclPool)->GetDCLRanges((*buffer)[j], 2, ranges);
+	    const UInt32	header = *((UInt32*)ranges[0].address);
+	    ret = _recvHandlerExt(this, (UInt8*)ranges[1].address,
+		    (header & kFWIsochDataLength) >> kFWIsochDataLengthPhase,
+		    (header & kFWIsochChanNum)	  >> kFWIsochChanNumPhase,
+		    (header & kFWIsochTag)	  >> kFWIsochTagPhase,
+		    (header & kFWIsochSy)	  >> kFWIsochSyPhase,
+		    (header & kFWIsochTCode)	  >> kFWIsochTCodePhase,
+		    dropped);
+	}
+#endif
 #ifdef DEBUG
 	cerr << "  " << dec << buffer->nPackets() << " pkts sent, "
 	     << dropped << " pkts dropped..." << endl;
@@ -489,7 +532,7 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 
   // 最初のパケットのみヘッダにsyビットが立っていることを確認
     bool	valid = true;
-    for (UInt32 j = 0; j < buffer->nPackets(); ++j)
+  /*for (UInt32 j = 0; j < buffer->nPackets(); ++j)
     {
 	IOVirtualRange	ranges[2];
 	(*me->_dclPool)->GetDCLRanges((*buffer)[j], 2, ranges);
@@ -501,7 +544,7 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 	    break;
 	}
     }
-
+  */
   // このバッファが既に受信済みであるか今回のデータが壊れているなら, 今回の
   // データを取りこぼしたものとして扱う. (_dropped と Buffer::valid
   // は loopIterate() によって変えられる可能性があるので排他制御が必要)
@@ -515,7 +558,7 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
     me->_lastReceived = buffer;
 
 #ifdef DEBUG
-    cerr << "  buffer[" << hex << buffer << "]: ";
+    cerr << "  buffer[" << buffer << "]: ";
     if (buffer->valid)
 	cerr << "valid." << endl;
     else
@@ -650,4 +693,12 @@ extern "C" int
 raw1394_iso_recv_flush(raw1394handle_t handle)
 {
     return (handle->isoRecvFlush() == kIOReturnSuccess ? 0 : -1);
+}
+
+extern "C" int
+raw1394_read_cycle_timer(raw1394handle_t handle,
+			 u_int32_t* cycle_timer, u_int64_t* local_time)
+{
+    return (handle->readCycleTimer(cycle_timer, local_time)
+	    == kIOReturnSuccess ? 0 : -1);
 }

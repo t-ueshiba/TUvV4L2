@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.11 2011-08-23 00:06:38 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.12 2012-06-29 09:06:03 ueshiba Exp $
  */
 /*!
   \file		raw1394_.h
@@ -90,6 +90,8 @@ struct raw1394
     IOReturn	isoRecvStart()						;
     IOReturn	isoStop()						;
     IOReturn	isoRecvFlush()						;
+    IOReturn	readCycleTimer(UInt32* cycleTimer,
+			       UInt64* localTime)		const	;
     SInt32	loopIterate()						;
     
   private:

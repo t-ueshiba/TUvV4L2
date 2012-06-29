@@ -1,5 +1,5 @@
 /*
- *  $Id: raw1394.h,v 1.13 2011-08-23 00:06:38 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.14 2012-06-29 09:06:03 ueshiba Exp $
  */
 /*!
   \mainpage	libraw1394 - Linux上のlibraw1394に互換な機能をMacOS X上で提供するエミュレーションライブラリ
@@ -41,6 +41,7 @@
   - raw1394_iso_recv_start()
   - raw1394_iso_stop()
   - raw1394_iso_recv_flush()
+  - raw1394_read_cycle_timer()
   
   \file		raw1394.h
   \brief	グローバルな名前空間に置かれたC向けの型定義とインタフェース
@@ -234,6 +235,16 @@ void	raw1394_iso_stop(raw1394handle_t handle);
   \return		転送が成功すれば0, そうでなければ-1
 */
 int	raw1394_iso_recv_flush(raw1394handle_t handle);
+
+//! 現在のサイクル時刻とそれに対応する時刻を取得する
+/*!
+  \param handle		::raw1394 構造体へのハンドル
+  \param cycle_timer	サイクル時刻が返される
+  \param local_time	サイクル時刻に対応する時刻(micro sec)が返される
+  \return		取得に成功すれば0, そうでなければ-1
+*/
+int	raw1394_read_cycle_timer(raw1394handle_t handle,
+				 u_int32_t* cycle_timer, u_int64_t* local_time);
 
 #ifdef __cplusplus
 }

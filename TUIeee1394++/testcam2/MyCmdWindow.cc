@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.5 2011-01-11 23:27:12 ueshiba Exp $
+ *  $Id: MyCmdWindow.cc,v 1.6 2012-06-29 09:06:15 ueshiba Exp $
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -439,21 +439,21 @@ MyCmdWindow::syncronizedSnap()
     u_int64_t		last = 0;
     for (u_int i = 0; i < _cameras.dim(); ++i)
     {
-	u_int64_t	filltime = _cameras[i]->snap().filltime();
-	if (last + margin < filltime)
+	u_int64_t	captime = _cameras[i]->snap().captime();
+	if (last + margin < captime)
 	{
-	    last = filltime;
+	    last = captime;
 	    for (u_int j = 0; j < i; ++j)
 		do
 		{
-		    filltime = _cameras[j]->snap().filltime();
-		} while (filltime + margin < last);
+		    captime = _cameras[j]->snap().captime();
+		} while (captime + margin < last);
 	}
-	else if (filltime + margin < last)
+	else if (captime + margin < last)
 	    do
 	    {
-		filltime = _cameras[i]->snap().filltime();
-	    } while (filltime + margin < last);
+		captime = _cameras[i]->snap().captime();
+	    } while (captime + margin < last);
     }
 #else
     for (int i = 0; i < _cameras.dim(); ++i)
