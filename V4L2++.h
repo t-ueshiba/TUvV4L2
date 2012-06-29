@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2++.h,v 1.5 2012-06-19 11:15:00 ueshiba Exp $
+ *  $Id: V4L2++.h,v 1.6 2012-06-29 03:08:51 ueshiba Exp $
  */
 /*!
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
@@ -183,7 +183,7 @@ class V4L2Camera
     typedef std::pair<FeatureIterator, FeatureIterator>	FeatureRange;
     
   public:
-    V4L2Camera(const char* deviceName)					;
+    V4L2Camera(const char* dev)						;
     ~V4L2Camera()							;
 
   // Format stuffs.
