@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.13 2012-06-29 09:06:03 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.14 2012-06-30 20:00:33 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -29,29 +29,42 @@
 #ifdef DEBUG
 #  include <iostream>
 #endif
+
+#define USE_SY
+
 /************************************************************************
 *  class raw1394::Buffer						*
 ************************************************************************/
 raw1394::Buffer::Buffer()
-    :_nPackets(0), _packets(0), _prev(0), _next(0), _parent(0), valid(false)
+    :_nPackets(0), _dclList(nil), _packets(0), _timeStamps(0),
+     _prev(0), _next(0), _parent(0), valid(false)
 {
 }
 
 raw1394::Buffer::~Buffer()
 {
+    delete [] _timeStamps;
     delete [] _packets;
+    if (_dclList != nil)
+	CFRelease(_dclList);
 }
     
 void
 raw1394::Buffer::resize(UInt32 n, const Buffer& prv, Buffer& nxt, raw1394* prnt)
 {
+    delete [] _timeStamps;
     delete [] _packets;
-    _nPackets = n;
-    _packets  = new NuDCLRef[_nPackets];
-    _prev     = &prv;
-    _next     = &nxt;
-    _parent   = prnt;
-    valid     = false;
+    if (_dclList != nil)
+	CFRelease(_dclList);
+    
+    _nPackets	= n;
+    _dclList	= CFSetCreateMutable(NULL, 0, NULL);
+    _packets	= new NuDCLRef[_nPackets];
+    _timeStamps = new UInt32[_nPackets];
+    _prev	= &prv;
+    _next	= &nxt;
+    _parent	= prnt;
+    valid	= false;
 }
 
 /************************************************************************
@@ -217,11 +230,8 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 	irqInterval = 16;	// Default vlaue of IrqInterval.
     if (irqInterval > nPackets)
 	irqInterval = nPackets;
-#if OLD
-    irqInterval = nPackets;
-#endif
 #ifdef DEBUG
-    cerr << "  nPackets = " << dec << nPackets
+    cerr << "  nPackets = " << nPackets
 	 << ", irqInterval = " << irqInterval
 	 << ", maxPacketSize = " << maxPacketSize
 	 << endl;
@@ -260,10 +270,12 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 	for (UInt32 j = 0; j < buffer.nPackets(); ++j)
 	{
 	    dcl = (*_dclPool)->AllocateReceivePacket(_dclPool,
-						     NULL, 4, 2, ranges);
+						     buffer.dclList(),
+						     4, 2, ranges);
 	    if (j == 0)
 		(*_dclPool)->SetDCLWaitControl(dcl, true);
 	    (*_dclPool)->SetDCLFlags(dcl, kNuDCLDynamic);
+	    (*_dclPool)->SetDCLTimeStampPtr(dcl, &buffer.timeStamp(j));
 	    buffer[j] = dcl;
 	    ranges[0].address += ranges[0].length;
 	    ranges[1].address += ranges[1].length;
@@ -273,10 +285,11 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
 
       // Bind the buffer and set the isochronous receive handler
       // to the last ReceivePacket command.
+	(*_dclPool)->SetDCLUpdateList(dcl, buffer.dclList());
 	(*_dclPool)->SetDCLRefcon(dcl, &buffer);
 	(*_dclPool)->SetDCLCallback(dcl, dclCallback);
 #ifdef DEBUG
-	cerr << i << ": dcl = " << hex << dcl << endl;
+	cerr << i << ": dcl = " << dcl << endl;
 #endif
     }
   // Set the last buffer self-loop.
@@ -289,10 +302,10 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     if (!(_localIsochPort =
 	  (*_fwDeviceInterface)->CreateLocalIsochPortWithOptions(
 	      _fwDeviceInterface, false, (*_dclPool)->GetProgram(_dclPool),
-#if OLD
-	      kFWDCLSyBitsEvent, kFWDCLSyBitsEvent, kFWDCLSyBitsEvent,
+#ifdef USE_SY
+	      kFWDCLSyBitsEvent, 0x1, 0x1,
 #else
-	      kFWDCLCycleEvent, kFWDCLCycleEvent, kFWDCLCycleEvent,
+	      0, 0, 0,
 #endif
 	      nil, 0, ranges, 1,
 	      kFWIsochPortUseSeparateKernelThread,
@@ -337,7 +350,7 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     MPExitCriticalRegion(_mutex);
 
 #ifdef DEBUG
-    cerr << "*** END [isoRecvInit] ***" << endl;
+    cerr << "*** END   [isoRecvInit] ***" << endl;
 #endif
     return kIOReturnSuccess;
 }
@@ -392,21 +405,21 @@ raw1394::isoRecvFlush()
 
 //! 現在のサイクル時刻とそれに対応する時刻を取得する
 /*!
-  \param cycleTimer	サイクル時刻が返される
-  \param localTime	サイクル時刻に対応する時刻(micro sec)が返される
+  \param cycle_timer	サイクル時刻が返される
+  \param local_time	サイクル時刻に対応する時刻(micro sec)が返される
   \return		取得に成功すればkIOReturnSuccess, そうでなければ
 			原因を示すエラーコード
 */
 IOReturn
-raw1394::readCycleTimer(UInt32* cycleTimer, UInt64* localTime) const
+raw1394::readCycleTimer(UInt32* cycle_timer, UInt64* local_time) const
 {
-    timeval	localtime;
-    gettimeofday(&localtime, 0);
-    *localTime = localtime.tv_sec * 1000000 + localtime.tv_usec;
+  // gettimeofday() は不正確なので UpTime() を使う．
+    Nanoseconds	upTime = AbsoluteToNanoseconds(UpTime());
+    *local_time = ((UInt64(upTime.hi) << 32) | UInt64(upTime.lo)) / 1000LL;
 
     UInt32	busTime;
     return (*_fwDeviceInterface)->GetBusCycleTime(_fwDeviceInterface,
-						  &busTime, cycleTimer);
+						  &busTime, cycle_timer);
 }
 
 //! isochronous転送のループを1回実行する
@@ -453,7 +466,8 @@ raw1394::loopIterate()
 	const UInt32	dropped = _dropped;
 	_dropped = 0;
 	MPExitCriticalRegion(_mutex);
-#if OLD
+#ifdef USE_SY
+	UInt32		cycle = (buffer->timeStamp(0) & 0x1fff000) >> 12;
 	IOVirtualRange	ranges[2];
 	(*_dclPool)->GetDCLRanges(buffer->first(), 2, ranges);
 	const UInt32	header = *((UInt32*)ranges[0].address);
@@ -462,13 +476,13 @@ raw1394::loopIterate()
 		(header & kFWIsochChanNum) >> kFWIsochChanNumPhase,
 		(header & kFWIsochTag)	   >> kFWIsochTagPhase,
 		(header & kFWIsochSy)	   >> kFWIsochSyPhase,
-		(header & kFWIsochTCode)   >> kFWIsochTCodePhase,
-		dropped);
+		cycle, dropped);
 #else
       // 先頭パケットのヘッダとデータアドレスを取り出し, ユーザハンドラを介して
       // パケットを一つずつ転送する
 	for (UInt32 j = 0; j < buffer->nPackets(); ++j)
 	{
+	    UInt32		cycle = (buffer->timeStamp(j) & 0x1fff000)>> 12;
 	    IOVirtualRange	ranges[2];
 	    (*_dclPool)->GetDCLRanges((*buffer)[j], 2, ranges);
 	    const UInt32	header = *((UInt32*)ranges[0].address);
@@ -477,12 +491,11 @@ raw1394::loopIterate()
 		    (header & kFWIsochChanNum)	  >> kFWIsochChanNumPhase,
 		    (header & kFWIsochTag)	  >> kFWIsochTagPhase,
 		    (header & kFWIsochSy)	  >> kFWIsochSyPhase,
-		    (header & kFWIsochTCode)	  >> kFWIsochTCodePhase,
-		    dropped);
+		    cycle, dropped);
 	}
 #endif
 #ifdef DEBUG
-	cerr << "  " << dec << buffer->nPackets() << " pkts sent, "
+	cerr << "  " << buffer->nPackets() << " pkts sent, "
 	     << dropped << " pkts dropped..." << endl;
 #endif
     }
@@ -503,7 +516,7 @@ raw1394::loopIterate()
 			       kFWNuDCLModifyJumpNotification, dcls, 2);
 
 #ifdef DEBUG
-    cerr << "*** END [loopIterate] ***" << endl;
+    cerr << "*** END   [loopIterate] ***" << endl;
 #endif
     return ret;
 }
@@ -521,18 +534,11 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 #endif
     Buffer*	buffer = (Buffer*)refcon;
     raw1394*	me     = buffer->parent();
-    
-  // Notify() は一度に30個のDCLしか処理できない
-    for (UInt32 j = 0; j < buffer->nPackets(); j += 30)
-	(*me->_localIsochPort)->Notify(me->_localIsochPort,
-				       kFWNuDCLUpdateNotification,
-				       (void**)&(*buffer)[j],
-				       std::min(buffer->nPackets() - j,
-						UInt32(30)));
 
   // 最初のパケットのみヘッダにsyビットが立っていることを確認
     bool	valid = true;
-  /*for (UInt32 j = 0; j < buffer->nPackets(); ++j)
+#ifdef USE_SY
+    for (UInt32 j = 0; j < buffer->nPackets(); ++j)
     {
 	IOVirtualRange	ranges[2];
 	(*me->_dclPool)->GetDCLRanges((*buffer)[j], 2, ranges);
@@ -544,7 +550,7 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 	    break;
 	}
     }
-  */
+#endif
   // このバッファが既に受信済みであるか今回のデータが壊れているなら, 今回の
   // データを取りこぼしたものとして扱う. (_dropped と Buffer::valid
   // は loopIterate() によって変えられる可能性があるので排他制御が必要)
@@ -563,7 +569,7 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 	cerr << "valid." << endl;
     else
 	cerr << "CURRUPTED." << endl;
-    cerr << "*** END [dclCallback] ***" << endl;
+    cerr << "*** END   [dclCallback] ***" << endl;
 #endif
 }
 
@@ -586,7 +592,7 @@ raw1394::allocatePortHandler(IOFireWireLibIsochPortRef	isochPort,
     me->_channel = channel;
 #ifdef DEBUG
     std::cerr << "raw1394::allocatePortHandler: channel["
-	      << std::dec << channel << "] assigned." << std::endl;
+	      << channel << "] assigned." << std::endl;
 #endif
     return kIOReturnSuccess;
 }

@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.23 2012-06-29 09:05:37 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.24 2012-06-30 20:00:26 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -79,7 +79,7 @@ cycletime_to_subcycle(u_int32_t cycletime)
 }
 
 #if defined(DEBUG)
-std::ostream&
+static std::ostream&
 print_time(std::ostream& out, u_int64_t localtime)
 {
     u_int32_t	usec = localtime % 1000;
@@ -439,9 +439,13 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
   // 制御を返す．libraw1394ではこのデフォルト値はパケット数の1/4である．ただし，
   // 512パケットを越える値を指定すると，raw1394_loop_iterate()から帰ってこなく
   // なるようである．
+#  if defined(__APPLE__)
+    const u_int	interval = npackets;
+#  else
     const u_int	interval = std::min(npackets/4, 512U);
+#  endif
 #  if defined(DEBUG)
-    cerr << "mapListenBuffer: npackets = " << dec << npackets
+    cerr << "mapListenBuffer: npackets = " << npackets
 	 << ", interval = " << interval << endl;
 #  endif
     _buf     = new u_char[buf_size + interval * packet_size];
@@ -653,9 +657,9 @@ Ieee1394Node::receive(raw1394handle_t handle,
 	cerr << " (sy: current = " << node->_current - node->_buf
 	     << ", cycle = " << cycle << ')'
 	     << " diff: ";
-	print_time(cerr, node->_arrivaltime - timestamp);
-	cerr << ", captime: ";
-	print_time(cerr, node->_arrivaltime);
+	print_time(cerr, node->_arrivaltime_next - timestamp);
+	cerr << ", arrivaltime: ";
+	print_time(cerr, node->_arrivaltime_next);
 	cerr << ", timestamp: ";
 	print_time(cerr, timestamp);
 	cerr << endl;

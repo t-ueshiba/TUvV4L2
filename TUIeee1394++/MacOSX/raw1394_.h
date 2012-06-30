@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.12 2012-06-29 09:06:03 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.13 2012-06-30 20:00:33 ueshiba Exp $
  */
 /*!
   \file		raw1394_.h
@@ -47,9 +47,12 @@ struct raw1394
 	UInt32		nPackets()		const	{return _nPackets;}
 	const NuDCLRef& operator [](int i)	const	{return _packets[i];}
 	NuDCLRef&	operator [](int i)		{return _packets[i];}
+	UInt32		timeStamp(int i)	const	{return _timeStamps[i];}
+	UInt32&		timeStamp(int i)		{return _timeStamps[i];}
 	const NuDCLRef&	first()			const	{return _packets[0];}
 	const NuDCLRef&	last()			const	{return
 							 _packets[_nPackets-1];}
+	CFMutableSetRef	dclList()		const	{return _dclList;}
 	raw1394*	parent()		const	{return _parent;}
 	
 	void		resize(UInt32 n, const Buffer& prv,
@@ -61,7 +64,9 @@ struct raw1394
 	
       private:
 	UInt32		_nPackets;
+	CFMutableSetRef	_dclList;
 	NuDCLRef*	_packets;
+	UInt32*		_timeStamps;
 	const Buffer*	_prev;
 	Buffer*		_next;
 	raw1394*	_parent;
@@ -90,8 +95,8 @@ struct raw1394
     IOReturn	isoRecvStart()						;
     IOReturn	isoStop()						;
     IOReturn	isoRecvFlush()						;
-    IOReturn	readCycleTimer(UInt32* cycleTimer,
-			       UInt64* localTime)		const	;
+    IOReturn	readCycleTimer(UInt32* cycle_timer,
+			       UInt64* local_time)		const	;
     SInt32	loopIterate()						;
     
   private:
