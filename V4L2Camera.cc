@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.6 2012-06-29 03:08:51 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.7 2012-07-01 23:53:47 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -338,7 +338,7 @@ v4l2_get_fd(const char* dev)
 V4L2Camera::V4L2Camera(const char* dev)
     :_fd(v4l2_get_fd(dev)), _formats(), _controls(),
      _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
-     _buffers(), _current(~0), _inContinuousShot(false)
+     _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime(0)
 {
     using namespace	std;
 
@@ -1341,7 +1341,7 @@ V4L2Camera::enqueueBuffer(u_int index) const
   \return	データを受信したバッファのindex
  */
 u_int
-V4L2Camera::dequeueBuffer() const
+V4L2Camera::dequeueBuffer()
 {
     using namespace	std;
     
@@ -1350,6 +1350,7 @@ V4L2Camera::dequeueBuffer() const
     buf.memory = V4L2_MEMORY_MMAP;
     if (ioctl(VIDIOC_DQBUF, &buf))
 	throw runtime_error(string("TU::V4L2Camera::waitBuffer(): ioctl(VIDIOC_DQBUF) failed!! ") + strerror(errno));
+    _arrivaltime = buf.timestamp.tv_sec * 1000000 + buf.timestamp.tv_usec;
 #ifdef _DEBUG
     cerr << "VIDIOC_DQBUF(" << buf.index << ")" << endl;
 #endif
