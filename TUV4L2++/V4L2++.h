@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2++.h,v 1.6 2012-06-29 03:08:51 ueshiba Exp $
+ *  $Id: V4L2++.h,v 1.7 2012-07-01 23:53:47 ueshiba Exp $
  */
 /*!
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
@@ -229,6 +229,7 @@ class V4L2Camera
 #endif
     const V4L2Camera&	captureRaw(void* image)			const	;
     const V4L2Camera&	captureBayerRaw(void* image)		const	;
+    u_int64_t		arrivaltime()				const	;
 
   // Utility functions.
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
@@ -248,7 +249,7 @@ class V4L2Camera
     void		unmapBuffers()					;
     u_int		requestBuffers(u_int n)				;
     void		enqueueBuffer(u_int index)		const	;
-    u_int		dequeueBuffer()				const	;
+    u_int		dequeueBuffer()					;
     
     int			ioctl(int request, void* arg)		const	;
     int			ioctl(int id, v4l2_queryctrl& ctrl)	const	;
@@ -268,6 +269,7 @@ class V4L2Camera
     std::vector<Buffer>		_buffers;
     u_int			_current;	// キューから取り出されている
     bool			_inContinuousShot;
+    u_int64_t			_arrivaltime;
 };
 
 //! このカメラで利用できる画素フォーマットの範囲を返す
@@ -444,6 +446,16 @@ V4L2Camera::captureDirectly(Image<T>& image) const
     return *this;
 }
 #endif
+
+//! 画像データがホストに到着した時刻を返す
+/*!
+  \return	画像データがホストに到着した時刻
+*/
+inline u_int64_t
+V4L2Camera::arrivaltime() const
+{
+    return _arrivaltime;
+}
 
 template <> inline const V4L2Camera::PixelFormat&
 V4L2Camera::MemberIterator<V4L2Camera::PixelFormat,
