@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.24 2012-06-30 20:00:26 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.25 2012-07-02 01:35:19 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -496,7 +496,7 @@ Ieee1394Node::waitListenBuffer()
     {
 	raw1394_loop_iterate(_handle);	// パケットを受信する．
 #  if defined(DEBUG)
-	cerr << "      current = " << _current - _buf << endl;
+	cerr << "wait: current = " << _current - _buf << endl;
 #  endif
     }
 #  if defined(DEBUG)
