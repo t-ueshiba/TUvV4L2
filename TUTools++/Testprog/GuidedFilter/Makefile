@@ -1,13 +1,13 @@
 #
-#  $Id: Makefile,v 1.1 2012-07-23 00:45:48 ueshiba Exp $
+#  $Id: Makefile,v 1.2 2012-07-23 00:52:45 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
+INCDIRS		= -I$(PREFIX)/include -I$(PORTSHOME)/include
 
-PROGRAM		= a.out
+PROGRAM		= guidedFilterTest
 LIBS		=
 
 CPPFLAGS	=
@@ -33,16 +33,17 @@ LINKER		= $(CCC)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/BoxFilter.h \
+		/usr/local/include/TU/GuidedFilter.h \
 		/usr/local/include/TU/types.h
-HDRS		= BoxFilter.h \
-		GuidedFilter.h
+HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.1 $	|		\
+REV		= $(shell echo $Revision: 1.2 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -54,5 +55,6 @@ REV		= $(shell echo $Revision: 1.1 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: GuidedFilter.h BoxFilter.h /usr/local/include/TU/Array++.h \
+main.o: /usr/local/include/TU/GuidedFilter.h \
+	/usr/local/include/TU/BoxFilter.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/types.h
