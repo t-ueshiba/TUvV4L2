@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.104 2011-12-27 23:38:21 ueshiba Exp $
+#  $Id: Makefile,v 1.105 2012-07-23 00:52:02 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -61,6 +61,7 @@ EXTHDRS		= TU/BlockDiagonalMatrix++.h \
 HDRS		= Array++.h \
 		Bezier++.h \
 		BlockDiagonalMatrix++.h \
+		BoxFilter.h \
 		Camera++.h \
 		CorrectIntensity.h \
 		DericheConvolver.h \
@@ -68,6 +69,7 @@ HDRS		= Array++.h \
 		GaussianConvolver.h \
 		Geometry++.h \
 		GraphCuts.h \
+		GuidedFilter.h \
 		Heap.h \
 		IIRFilter.h \
 		Image++.h \
@@ -140,7 +142,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.104 $	|		\
+REV		= $(shell echo $Revision: 1.105 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\

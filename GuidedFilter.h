@@ -1,5 +1,5 @@
 /*
- *  $Id: GuidedFilter.h,v 1.1 2012-07-23 00:45:40 ueshiba Exp $
+ *  $Id: GuidedFilter.h,v 1.2 2012-07-23 00:52:02 ueshiba Exp $
  */
 #include "TU/BoxFilter.h"
 #include "TU/Array++.h"
@@ -201,7 +201,7 @@ class GFCoeffs
     {
       private:
 	typedef boost::zip_iterator<boost::tuple<GUIDE2,OUT2> >	ziterator2;
-	typedef typename std::<iterator_traits<GUIDE2>::value_type::iterator
+	typedef typename std::iterator_traits<GUIDE2>::value_type::iterator
 								guide_iterator;
 	typedef typename std::iterator_traits<OUT2>::value_type::iterator
 								out_iterator;
