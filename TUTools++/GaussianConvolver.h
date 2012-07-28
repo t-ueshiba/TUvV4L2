@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.12 2012-01-22 10:52:19 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.13 2012-07-28 09:10:11 ueshiba Exp $
  */
 /*!
   \file		GaussianConvolver.h
@@ -40,291 +40,244 @@
 namespace TU
 {
 /************************************************************************
-*  class GaussianCoefficients						*
+*  class GaussianCoefficients<T>					*
 ************************************************************************/
 //! Gauss核の係数を表すクラス
-class __PORT GaussianCoefficients
+template <class T> class __PORT GaussianCoefficients
 {
   private:
+    typedef double		value_type;
+    typedef Matrix<value_type>	matrix_type;
+    typedef Vector<value_type>	vector_type;
+
     struct Params
     {
-	void		set(double aa, double bb, double tt, double aaa);
-	Params&		operator -=(const Vector<double>& p)		;
+	void		set(value_type aa, value_type bb,
+			    value_type tt, value_type aaa);
+	Params&		operator -=(const vector_type& p)		;
     
-	double		a, b, theta, alpha;
+	value_type	a, b, theta, alpha;
     };
 
     class EvenConstraint
     {
       public:
-	typedef double		value_type;
 	typedef Array<Params>	AT;
 
-	EvenConstraint(double sigma) :_sigma(sigma)			{}
+	EvenConstraint(value_type sigma) :_sigma(sigma)			{}
 	
-	Vector<double>	operator ()(const AT& params)		const	;
-	Matrix<double>	jacobian(const AT& params)		const	;
+	vector_type	operator ()(const AT& params)		const	;
+	matrix_type	jacobian(const AT& params)		const	;
 
       private:
-	double	_sigma;
+	value_type	_sigma;
     };
 
     class CostFunction
     {
       public:
-	typedef double		value_type;
-	typedef Array<Params>	AT;
+	typedef typename GaussianCoefficients<T>::value_type	value_type;
+	typedef Array<Params>					AT;
     
-	enum			{D = 2};
+	enum		{D = 2};
 
-	CostFunction(int ndivisions, double range)
+	CostFunction(int ndivisions, value_type range)
 	    :_ndivisions(ndivisions), _range(range)			{}
     
-	Vector<double>	operator ()(const AT& params)		const	;
-	Matrix<double>	jacobian(const AT& params)		const	;
-	void		update(AT& params,
-			       const Vector<double>& dp)	const	;
+	vector_type	operator ()(const AT& params)		  const	;
+	matrix_type	jacobian(const AT& params)		  const	;
+	void		update(AT& params, const vector_type& dp) const	;
 
       private:
-	const int	_ndivisions;
-	const double	_range;
+	const int		_ndivisions;
+	const value_type	_range;
     };
 
   public:
-    void	initialize(float sigma)			;
+    void	initialize(T sigma)			;
     
   protected:
-    GaussianCoefficients(float sigma)			{initialize(sigma);}
+    GaussianCoefficients(T sigma)			{initialize(sigma);}
     
   protected:
-    float	_c0[8];		//!< forward coefficients for smoothing
-    float	_c1[8];		//!< forward coefficients for 1st derivatives
-    float	_c2[8];		//!< forward coefficients for 2nd derivatives
+    T		_c0[8];		//!< forward coefficients for smoothing
+    T		_c1[8];		//!< forward coefficients for 1st derivatives
+    T		_c2[8];		//!< forward coefficients for 2nd derivatives
 };
     
 /************************************************************************
-*  class GaussianConvoler						*
+*  class GaussianConvoler<T>						*
 ************************************************************************/
 //! Gauss核による1次元配列畳み込みを行うクラス
-class GaussianConvolver
-    : public GaussianCoefficients, private BilateralIIRFilter<4u>
+template <class T> class GaussianConvolver
+    : public GaussianCoefficients<T>, private BidirectionalIIRFilter<4u, T>
 {
   private:
-    typedef BilateralIIRFilter<4u>		super;
+    typedef GaussianCoefficients<T>			coeffs;
+    typedef BidirectionalIIRFilter<4u, T>		super;
     
   public:
-    GaussianConvolver(float sigma=1.0)	:GaussianCoefficients(sigma)	{}
+    GaussianConvolver(T sigma=1.0)	:GaussianCoefficients<T>(sigma)	{}
 
-    template <class T1, class B1, class T2, class B2> GaussianConvolver&
-	smooth(const Array<T1, B1>& in, Array<T2, B2>& out)		;
-    template <class T1, class B1, class T2, class B2> GaussianConvolver&
-	diff(const Array<T1, B1>& in, Array<T2, B2>& out)		;
-    template <class T1, class B1, class T2, class B2> GaussianConvolver&
-	diff2(const Array<T1, B1>& in, Array<T2, B2>& out)		;
+    template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diff  (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diff2 (IN ib, IN ie, OUT out)	;
+
+  protected:
+    using	coeffs::_c0;
+    using	coeffs::_c1;
+    using	coeffs::_c2;
 };
 
 //! Gauss核によるスムーシング
 /*!
-  \param in	入力1次元配列
-  \param out	出力1次元配列
-  \return	このGauss核自身
+  \param ib	入力データ列の先頭を指す反復子
+  \param ie	入力データ列の末尾の次を指す反復子
+  \param out	出力データ列の先頭を指す反復子
+  \return	出力データ列の末尾の次を指す反復子
 */
-template <class T1, class B1, class T2, class B2>
-inline GaussianConvolver&
-GaussianConvolver::smooth(const Array<T1, B1>& in, Array<T2, B2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, super::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c0, super::Zeroth)(ib, ie, out);
 }
 
 //! Gauss核による1階微分
 /*!
-  \param in	入力1次元配列
-  \param out	出力1次元配列
-  \return	このGauss核自身
+  \param ib	入力データ列の先頭を指す反復子
+  \param ie	入力データ列の末尾の次を指す反復子
+  \param out	出力データ列の先頭を指す反復子
+  \return	出力データ列の末尾の次を指す反復子
 */
-template <class T1, class B1, class T2, class B2>
-inline GaussianConvolver&
-GaussianConvolver::diff(const Array<T1, B1>& in, Array<T2, B2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver<T>::diff(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, super::First).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c1, super::First)(ib, ie, out);
 }
 
 //! Gauss核による2階微分
 /*!
-  \param in	入力1次元配列
-  \param out	出力1次元配列
-  \return	このGauss核自身
+  \param ib	入力データ列の先頭を指す反復子
+  \param ie	入力データ列の末尾の次を指す反復子
+  \param out	出力データ列の先頭を指す反復子
+  \return	出力データ列の末尾の次を指す反復子
 */
-template <class T1, class B1, class T2, class B2>
-inline GaussianConvolver&
-GaussianConvolver::diff2(const Array<T1, B1>& in, Array<T2, B2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver<T>::diff2(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, super::Second).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c2, super::Second)(ib, ie, out);
 }
 
 /************************************************************************
-*  class GaussianConvoler2						*
+*  class GaussianConvoler2<T>						*
 ************************************************************************/
 //! Gauss核による2次元配列畳み込みを行うクラス
-class GaussianConvolver2
-    : public GaussianCoefficients, private BilateralIIRFilter2<4u>
+template <class T> class GaussianConvolver2
+    : public GaussianCoefficients<T>, private BidirectionalIIRFilter2<4u, T>
 {
   private:
-    typedef BilateralIIRFilter2<4u>		super;
-    typedef BilateralIIRFilter<4u>		IIRF;
-
+    typedef GaussianCoefficients<T>			coeffs;
+    typedef BidirectionalIIRFilter2<4u, T>		super;
+    typedef BidirectionalIIRFilter<4u, T>		IIRF;
+    
   public:
-    GaussianConvolver2(float sigma=1.0)	:GaussianCoefficients(sigma) 	{}
+    GaussianConvolver2(T sigma=1.0)	:GaussianCoefficients<T>(sigma) {}
 
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    GaussianConvolver2&
-	smooth(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    GaussianConvolver2&
-	diffH(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    GaussianConvolver2&
-	diffV(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    GaussianConvolver2&
-	diffHH(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    GaussianConvolver2&
-	diffHV(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    GaussianConvolver2&
-	diffVV(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    GaussianConvolver2&
-	laplacian(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out);
+    template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffH (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffV (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffHH(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffHV(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffVV(IN ib, IN ie, OUT out)	;
 
-  private:
-    Array2<Array<float> >	_tmp;	// buffer for computing Laplacian
+  protected:
+    using	coeffs::_c0;
+    using	coeffs::_c1;
+    using	coeffs::_c2;
 };
 
 //! Gauss核によるスムーシング
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このGauss核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2&
-GaussianConvolver2::smooth(const Array2<T1, B1, R1>& in,
-			   Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth,
-		      _c0, IIRF::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c0, IIRF::Zeroth,
+			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
 //! Gauss核による横方向1階微分(DOG)
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このGauss核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2&
-GaussianConvolver2::diffH(const Array2<T1, B1, R1>& in,
-			  Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First,
-		      _c0, IIRF::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c1, IIRF::First,
+			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
 //! Gauss核による縦方向1階微分(DOG)
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このGauss核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2&
-GaussianConvolver2::diffV(const Array2<T1, B1, R1>& in,
-			  Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth,
-		      _c1, IIRF::First).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c0, IIRF::Zeroth,
+			     _c1, IIRF::First)(ib, ie, out);
 }
 
 //! Gauss核による横方向2階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このGauss核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2&
-GaussianConvolver2::diffHH(const Array2<T1, B1, R1>& in,
-			   Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, IIRF::Second,
-		      _c0, IIRF::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c2, IIRF::Second,
+			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
 //! Gauss核による縦横両方向2階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このGauss核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2&
-GaussianConvolver2::diffHV(const Array2<T1, B1, R1>& in,
-			   Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First,
-		      _c1, IIRF::First).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c1, IIRF::First,
+			     _c1, IIRF::First)(ib, ie, out);
 }
 
 //! Gauss核による縦方向2階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このGauss核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2&
-GaussianConvolver2::diffVV(const Array2<T1, B1, R1>& in,
-			   Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+GaussianConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth,
-		      _c2, IIRF::Second).convolve(in, out);
-
-    return *this;
-}
-
-//! Gauss核によるラプラシアン(LOG)
-/*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このGauss核自身
-*/
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline GaussianConvolver2&
-GaussianConvolver2::laplacian(const Array2<T1, B1, R1>& in,
-			      Array2<T2, B2, R2>& out)
-{
-    diffHH(in, _tmp).diffVV(in, out);
-    out += _tmp;
-    
-    return *this;
+    return super::initialize(_c0, IIRF::Zeroth,
+			     _c2, IIRF::Second)(ib, ie, out);
 }
 
 }
