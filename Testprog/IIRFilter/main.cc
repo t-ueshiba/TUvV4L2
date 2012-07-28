@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.16 2012-01-24 08:08:35 ueshiba Exp $
+ *  $Id: main.cc,v 1.17 2012-07-28 09:10:17 ueshiba Exp $
  */
 #include <stdlib.h>
 #include "TU/Image++.h"
@@ -20,19 +20,19 @@ doJob(float alpha, bool gaussian)
     Image<S>	in;
     in.restore(cin);
     
-    Image<T>	out;
+    Image<T>	out(in.width(), in.height());
     Profiler	profiler(1);
 
     if (gaussian)
     {
-	GaussianConvolver2	convolver(alpha);
+	GaussianConvolver2<T>	convolver(alpha);
 
 	for (int i = 0; i < 10; ++i)
 	{
 	    for (int j = 0; j < 100; ++j)
 	    {
 		profiler.start(0);
-		convolver.smooth(in, out);
+		convolver.smooth(in.begin(), in.end(), out.begin());
 		profiler.stop().nextFrame();
 	    }
 	    cerr << "---------------------------------------------" << endl;
@@ -41,14 +41,14 @@ doJob(float alpha, bool gaussian)
     }
     else
     {
-	DericheConvolver2	convolver(alpha);
+	DericheConvolver2<T>	convolver(alpha);
 
 	for (int i = 0; i < 10; ++i)
 	{
 	    for (int j = 0; j < 100; ++j)
 	    {
 		profiler.start(0);
-		convolver.smooth(in, out);
+		convolver.smooth(in.begin(), in.end(), out.begin());
 		profiler.stop().nextFrame();
 	    }
 	    cerr << "---------------------------------------------" << endl;
@@ -56,6 +56,51 @@ doJob(float alpha, bool gaussian)
 	}
     }
     out.save(cout, ImageBase::FLOAT);
+}
+ 
+template <class S, class T> void
+doJob1(float alpha, bool gaussian)
+{
+    using namespace	std;
+	
+    Image<S>	in;
+    in.restore(cin);
+    
+    ImageLine<T>	out(in.width());
+    Profiler		profiler(1);
+
+    if (gaussian)
+    {
+	GaussianConvolver<T>	convolver(alpha);
+
+	for (int i = 0; i < 10; ++i)
+	{
+	    for (int j = 0; j < 100; ++j)
+	    {
+		profiler.start(0);
+		convolver.smooth(in[0].begin(), in[0].end(), out.begin());
+		profiler.stop().nextFrame();
+	    }
+	    cerr << "---------------------------------------------" << endl;
+	    profiler.print(cerr);
+	}
+    }
+    else
+    {
+	DericheConvolver<T>	convolver(alpha);
+
+	for (int i = 0; i < 10; ++i)
+	{
+	    for (int j = 0; j < 100; ++j)
+	    {
+		profiler.start(0);
+		convolver.smooth(in[0].begin(), in[0].end(), out.begin());
+		profiler.stop().nextFrame();
+	    }
+	    cerr << "---------------------------------------------" << endl;
+	    profiler.print(cerr);
+	}
+    }
 }
  
 }
@@ -85,6 +130,8 @@ main(int argc, char* argv[])
 
     try
     {
+	doJob1<u_char, float>(alpha, gaussian);
+	cerr << endl;
 	doJob<u_char, float>(alpha, gaussian);
     }
     catch (exception& err)

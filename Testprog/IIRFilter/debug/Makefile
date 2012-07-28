@@ -1,17 +1,17 @@
 #
-#  $Id: Makefile,v 1.3 2011-12-07 08:06:48 ueshiba Exp $
+#  $Id: Makefile,v 1.4 2012-07-28 09:10:24 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
+INCDIRS		= 
 
 PROGRAM		= iirftest
-LIBS		= -lTUTools++
+LIBS		=
 
-CPPFLAGS	= -DDEBUG #-DSSE2
-CFLAGS		= -g
+CPPFLAGS	= -std=c++0x -DSSE2
+CFLAGS		= -O3
 CCFLAGS		= $(CFLAGS)
 LDFLAGS		=
 
@@ -21,16 +21,16 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/DericheConvolver.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/IIRFilter.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h
+EXTHDRS		= TU/DericheConvolver.h \
+		TU/Image++.h \
+		TU/TU/Geometry++.h \
+		TU/TU/IIRFilter.h \
+		TU/TU/TU/Minimize.h \
+		TU/TU/TU/TU/Array++.h \
+		TU/TU/TU/TU/TU/types.h \
+		TU/TU/TU/Vector++.h \
+		TU/TU/TU/mmInstructions.h \
+		TU/TU/TU/utility.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -38,7 +38,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.3 $	|		\
+REV		= $(shell echo $Revision: 1.4 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -50,10 +50,7 @@ REV		= $(shell echo $Revision: 1.3 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/DericheConvolver.h \
-	/usr/local/include/TU/IIRFilter.h \
-	/usr/local/include/TU/mmInstructions.h
+main.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
+	TU/TU/TU/Vector++.h TU/TU/TU/TU/Array++.h TU/TU/TU/TU/TU/types.h \
+	TU/TU/TU/Minimize.h TU/DericheConvolver.h TU/TU/IIRFilter.h \
+	TU/TU/TU/mmInstructions.h

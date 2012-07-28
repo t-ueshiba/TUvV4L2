@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: DericheConvolver.h,v 1.11 2012-01-22 10:52:19 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.12 2012-07-28 09:10:11 ueshiba Exp $
  */
 /*!
   \file		DericheConvolver.h
@@ -39,31 +39,31 @@
 namespace TU
 {
 /************************************************************************
-*  class DericheCoefficients						*
+*  class DericheCoefficients<T>						*
 ************************************************************************/
 //! Canny-Deriche核の係数を表すクラス
-class DericheCoefficients
+template <class T> class DericheCoefficients
 {
   public:
-    void	initialize(float alpha)			;
+    void	initialize(T alpha)			;
     
   protected:
-    DericheCoefficients(float alpha)			{initialize(alpha);}
+    DericheCoefficients(T alpha)			{initialize(alpha);}
     
   protected:
-    float	_c0[4];		//!< forward coefficients for smoothing
-    float	_c1[4];		//!< forward coefficients for 1st derivatives
-    float	_c2[4];		//!< forward coefficients for 2nd derivatives
+    T		_c0[4];		//!< forward coefficients for smoothing
+    T		_c1[4];		//!< forward coefficients for 1st derivatives
+    T		_c2[4];		//!< forward coefficients for 2nd derivatives
 };
 
 //! Canny-Deriche核の初期化を行う
 /*!
   \param alpha	フィルタサイズを表す正数（小さいほど広がりが大きい）
 */
-inline void
-DericheCoefficients::initialize(float alpha)
+template <class T> inline void
+DericheCoefficients<T>::initialize(T alpha)
 {
-    const float	e  = expf(-alpha), beta = sinhf(alpha);
+    const T	e  = expf(-alpha), beta = sinhf(alpha);
     _c0[0] =  (alpha - 1.0) * e;		// i(n-1)
     _c0[1] =  1.0;				// i(n)
     _c0[2] = -e * e;				// oF(n-2)
@@ -81,225 +81,178 @@ DericheCoefficients::initialize(float alpha)
 }
 
 /************************************************************************
-*  class DericheConvoler						*
+*  class DericheConvoler<T>						*
 ************************************************************************/
 //! Canny-Deriche核による1次元配列畳み込みを行うクラス
-class DericheConvolver
-    : public DericheCoefficients, private BilateralIIRFilter<2u>
+template <class T> class DericheConvolver
+    : public DericheCoefficients<T>, private BidirectionalIIRFilter<2u, T>
 {
   private:
-    typedef BilateralIIRFilter<2u>		super;
+    typedef DericheCoefficients<T>			coeffs;
+    typedef BidirectionalIIRFilter<2u, T>		super;
     
   public:
-    DericheConvolver(float alpha=1.0)	:DericheCoefficients(alpha)	{}
+    DericheConvolver(T alpha=1)	:DericheCoefficients<T>(alpha)		{}
 
-    template <class T1, class B1, class T2, class B2> DericheConvolver&
-	smooth(const Array<T1, B1>& in, Array<T2, B2>& out)		;
-    template <class T1, class B1, class T2, class B2> DericheConvolver&
-	diff(const Array<T1, B1>& in, Array<T2, B2>& out)		;
-    template <class T1, class B1, class T2, class B2> DericheConvolver&
-	diff2(const Array<T1, B1>& in, Array<T2, B2>& out)		;
+    template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diff  (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diff2 (IN ib, IN ie, OUT out)	;
+
+  protected:
+    using	coeffs::_c0;
+    using	coeffs::_c1;
+    using	coeffs::_c2;
 };
 
 //! Canny-Deriche核によるスムーシング
 /*!
-  \param in	入力1次元配列
-  \param out	出力1次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力データ列の先頭を指す反復子
+  \param ie	入力データ列の末尾の次を指す反復子
+  \param out	出力データ列の先頭を指す反復子
+  \return	出力データ列の末尾の次を指す反復子
 */
-template <class T1, class B1, class T2, class B2> inline DericheConvolver&
-DericheConvolver::smooth(const Array<T1, B1>& in, Array<T2, B2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, super::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c0, super::Zeroth)(ib, ie, out);
 }
 
 //! Canny-Deriche核による1階微分
 /*!
-  \param in	入力1次元配列
-  \param out	出力1次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力データ列の先頭を指す反復子
+  \param ie	入力データ列の末尾の次を指す反復子
+  \param out	出力データ列の先頭を指す反復子
+  \return	出力データ列の末尾の次を指す反復子
 */
-template <class T1, class B1, class T2, class B2> inline DericheConvolver&
-DericheConvolver::diff(const Array<T1, B1>& in, Array<T2, B2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver<T>::diff(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, super::First).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c1, super::First)(ib, ie, out);
 }
 
 //! Canny-Deriche核による2階微分
 /*!
-  \param in	入力1次元配列
-  \param out	出力1次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力データ列の先頭を指す反復子
+  \param ie	入力データ列の末尾の次を指す反復子
+  \param out	出力データ列の先頭を指す反復子
+  \return	出力データ列の末尾の次を指す反復子
 */
-template <class T1, class B1, class T2, class B2> inline DericheConvolver&
-DericheConvolver::diff2(const Array<T1, B1>& in, Array<T2, B2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver<T>::diff2(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, super::Second).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c2, super::Second)(ib, ie, out);
 }
 
 /************************************************************************
-*  class DericheConvoler2						*
+*  class DericheConvoler2<T>						*
 ************************************************************************/
 //! Canny-Deriche核による2次元配列畳み込みを行うクラス
-class DericheConvolver2
-    : public DericheCoefficients, private BilateralIIRFilter2<2u>
+template <class T> class DericheConvolver2
+    : public DericheCoefficients<T>, private BidirectionalIIRFilter2<2u, T>
 {
   private:
-    typedef BilateralIIRFilter2<2u>		super;
-    typedef BilateralIIRFilter<2u>		IIRF;
+    typedef DericheCoefficients<T>			coeffs;
+    typedef BidirectionalIIRFilter2<2u, T>		super;
+    typedef BidirectionalIIRFilter<2u, T>		IIRF;
     
   public:
-    DericheConvolver2(float alpha=1.0)	:DericheCoefficients(alpha)	{}
+    DericheConvolver2(T alpha=1)	:DericheCoefficients<T>(alpha)	{}
 
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    DericheConvolver2&
-	smooth(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    DericheConvolver2&
-	diffH(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    DericheConvolver2&
-	diffV(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    DericheConvolver2&
-	diffHH(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    DericheConvolver2&
-	diffHV(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    DericheConvolver2&
-	diffVV(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out)	;
-    template <class T1, class B1, class R1, class T2, class B2, class R2>
-    DericheConvolver2&
-	laplacian(const Array2<T1, B1, R1>& in, Array2<T2, B2, R2>& out);
+    template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffH (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffV (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffHH(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffHV(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> OUT	diffVV(IN ib, IN ie, OUT out)	;
 
-  private:
-    Array2<Array<float> >	_tmp;	// buffer for computing Laplacian
+  protected:
+    using	coeffs::_c0;
+    using	coeffs::_c1;
+    using	coeffs::_c2;
 };
 
 //! Canny-Deriche核によるスムーシング
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2&
-DericheConvolver2::smooth(const Array2<T1, B1, R1>& in,
-			  Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth,
-		      _c0, IIRF::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c0, IIRF::Zeroth,
+			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
 //! Canny-Deriche核による横方向1階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2&
-DericheConvolver2::diffH(const Array2<T1, B1, R1>& in,
-			 Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First,
-		      _c0, IIRF::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c1, IIRF::First,
+			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
 //! Canny-Deriche核による縦方向1階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2&
-DericheConvolver2::diffV(const Array2<T1, B1, R1>& in,
-			 Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth,
-		      _c1, IIRF::First).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c0, IIRF::Zeroth,
+			     _c1, IIRF::First)(ib, ie, out);
 }
 
 //! Canny-Deriche核による横方向2階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2&
-DericheConvolver2::diffHH(const Array2<T1, B1, R1>& in,
-			  Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, IIRF::Second,
-		      _c0, IIRF::Zeroth).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c2, IIRF::Second,
+			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
 //! Canny-Deriche核による縦横両方向2階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2&
-DericheConvolver2::diffHV(const Array2<T1, B1, R1>& in,
-			  Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First,
-		      _c1, IIRF::First).convolve(in, out);
-
-    return *this;
+    return super::initialize(_c1, IIRF::First,
+			     _c1, IIRF::First)(ib, ie, out);
 }
 
 //! Canny-Deriche核による縦方向2階微分
 /*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このCanny-Deriche核自身
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+  \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2&
-DericheConvolver2::diffVV(const Array2<T1, B1, R1>& in,
-			  Array2<T2, B2, R2>& out)
+template <class T> template <class IN, class OUT> inline OUT
+DericheConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth,
-		      _c2, IIRF::Second).convolve(in, out);
-
-    return *this;
-}
-
-//! Canny-Deriche核によるラプラシアン
-/*!
-  \param in	入力2次元配列
-  \param out	出力2次元配列
-  \return	このCanny-Deriche核自身
-*/
-template <class T1, class B1, class R1, class T2, class B2, class R2>
-inline DericheConvolver2&
-DericheConvolver2::laplacian(const Array2<T1, B1, R1>& in,
-			     Array2<T2, B2, R2>& out)
-{
-    diffHH(in, _tmp).diffVV(in, out);
-    out += _tmp;
-    
-    return *this;
+    return super::initialize(_c0, IIRF::Zeroth,
+			     _c2, IIRF::Second)(ib, ie, out);
 }
 
 }

@@ -1,10 +1,10 @@
 /*
- * $Id: main.cc,v 1.1 2009-06-08 23:46:21 ueshiba Exp $
+ * $Id: main.cc,v 1.2 2012-07-28 09:10:24 ueshiba Exp $
  */
 #include <stdlib.h>
 #include <fstream>
-#include "TU/Image++.h"
-#include "TU/DericheConvolver.h"
+#include "TU/Array++.h"
+#include "TU/IIRFilter.h"
 
 int
 main(int argc, char* argv[])
@@ -33,7 +33,7 @@ main(int argc, char* argv[])
     }
     src.restore(in);
 
-    Array<float>	dst;
+    Array<float>	dst(src.size());
     float		c[] = {0.1, -0.3, 0.2, -0.9,
 			       0.4, -0.7, 0.8, -0.6};
     if (quad)
@@ -42,9 +42,14 @@ main(int argc, char* argv[])
 	iir.initialize(c);
 	
 	if (backward)
-	    iir.backward(src, dst);
+#if 0
+	    iir.backward(src.rbegin(), src.rend(),
+			 std::reverse_iterator<float*>(dst.end()));
+#else
+	    iir.backward(src.begin(), src.end(), dst.end());
+#endif
 	else
-	    iir.forward(src, dst);
+	    iir.forward(src.begin(), src.end(), dst.begin());
     }
     else
     {
@@ -52,9 +57,14 @@ main(int argc, char* argv[])
 	iir.initialize(c);
 	
 	if (backward)
-	    iir.backward(src, dst);
+#if 0
+	    iir.backward(src.rbegin(), src.rend(),
+			 std::reverse_iterator<float*>(dst.end()));
+#else
+	    iir.backward(src.begin(), src.end(), dst.end());
+#endif
 	else
-	    iir.forward(src, dst);
+	    iir.forward(src.begin(), src.end(), dst.begin());
     }
     
     for (int i = 0; i < dst.dim(); ++i)
