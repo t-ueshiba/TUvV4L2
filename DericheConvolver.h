@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: DericheConvolver.h,v 1.12 2012-07-28 09:10:11 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.13 2012-07-29 21:19:58 ueshiba Exp $
  */
 /*!
   \file		DericheConvolver.h
@@ -94,6 +94,8 @@ template <class T> class DericheConvolver
   public:
     DericheConvolver(T alpha=1)	:DericheCoefficients<T>(alpha)		{}
 
+    DericheConvolver&	initialize(T alpha)				;
+    
     template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diff  (IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diff2 (IN ib, IN ie, OUT out)	;
@@ -104,6 +106,18 @@ template <class T> class DericheConvolver
     using	coeffs::_c2;
 };
 
+//! Canny-Deriche核のalpha値を設定する
+/*!
+  \param sigma	alpha値
+  \return	このガウス核
+*/
+template <class T> DericheConvolver<T>&
+DericheConvolver<T>::initialize(T alpha)
+{
+    coeffs::initialize(alpha);
+    return *this;
+}
+    
 //! Canny-Deriche核によるスムーシング
 /*!
   \param ib	入力データ列の先頭を指す反復子
@@ -158,6 +172,8 @@ template <class T> class DericheConvolver2
   public:
     DericheConvolver2(T alpha=1)	:DericheCoefficients<T>(alpha)	{}
 
+    DericheConvolver2	initialize(T alpha)				;
+    
     template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diffH (IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diffV (IN ib, IN ie, OUT out)	;
@@ -171,6 +187,18 @@ template <class T> class DericheConvolver2
     using	coeffs::_c2;
 };
 
+//! Canny-Deriche核のalpha値を設定する
+/*!
+  \param sigma	alpha値
+  \return	このガウス核
+*/
+template <class T> DericheConvolver2<T>&
+DericheConvolver2<T>::initialize(T alpha)
+{
+    coeffs::initialize(alpha);
+    return *this;
+}
+    
 //! Canny-Deriche核によるスムーシング
 /*!
   \param ib	入力2次元データ配列の先頭行を指す反復子
