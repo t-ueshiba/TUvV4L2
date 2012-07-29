@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.13 2012-07-28 09:10:11 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.14 2012-07-29 21:19:58 ueshiba Exp $
  */
 /*!
   \file		GaussianConvolver.h
@@ -106,7 +106,7 @@ template <class T> class __PORT GaussianCoefficients
 };
     
 /************************************************************************
-*  class GaussianConvoler<T>						*
+*  class GaussianConvolver<T>						*
 ************************************************************************/
 //! Gauss核による1次元配列畳み込みを行うクラス
 template <class T> class GaussianConvolver
@@ -119,6 +119,8 @@ template <class T> class GaussianConvolver
   public:
     GaussianConvolver(T sigma=1.0)	:GaussianCoefficients<T>(sigma)	{}
 
+    GaussianConvolver&	initialize(T sigma)				;
+
     template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diff  (IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diff2 (IN ib, IN ie, OUT out)	;
@@ -129,6 +131,18 @@ template <class T> class GaussianConvolver
     using	coeffs::_c2;
 };
 
+//! Gauss核のsigma値を設定する
+/*!
+  \param sigma	sigma値
+  \return	このガウス核
+*/
+template <class T> GaussianConvolver<T>&
+GaussianConvolver<T>::initialize(T sigma)
+{
+    coeffs::initialize(sigma);
+    return *this;
+}
+    
 //! Gauss核によるスムーシング
 /*!
   \param ib	入力データ列の先頭を指す反復子
@@ -169,7 +183,7 @@ GaussianConvolver<T>::diff2(IN ib, IN ie, OUT out)
 }
 
 /************************************************************************
-*  class GaussianConvoler2<T>						*
+*  class GaussianConvolver2<T>						*
 ************************************************************************/
 //! Gauss核による2次元配列畳み込みを行うクラス
 template <class T> class GaussianConvolver2
@@ -183,6 +197,8 @@ template <class T> class GaussianConvolver2
   public:
     GaussianConvolver2(T sigma=1.0)	:GaussianCoefficients<T>(sigma) {}
 
+    GaussianConvolver2&	initialize(T sigma)				;
+    
     template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diffH (IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diffV (IN ib, IN ie, OUT out)	;
@@ -196,6 +212,18 @@ template <class T> class GaussianConvolver2
     using	coeffs::_c2;
 };
 
+//! Gauss核のsigma値を設定する
+/*!
+  \param sigma	sigma値
+  \return	このガウス核
+*/
+template <class T> GaussianConvolver2<T>&
+GaussianConvolver2<T>::initialize(T sigma)
+{
+    coeffs::initialize(sigma);
+    return *this;
+}
+    
 //! Gauss核によるスムーシング
 /*!
   \param ib	入力2次元データ配列の先頭行を指す反復子
