@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: DericheConvolver.h,v 1.13 2012-07-29 21:19:58 ueshiba Exp $
+ *  $Id: DericheConvolver.h,v 1.14 2012-08-01 20:47:42 ueshiba Exp $
  */
 /*!
   \file		DericheConvolver.h
@@ -172,7 +172,7 @@ template <class T> class DericheConvolver2
   public:
     DericheConvolver2(T alpha=1)	:DericheCoefficients<T>(alpha)	{}
 
-    DericheConvolver2	initialize(T alpha)				;
+    DericheConvolver2&	initialize(T alpha)				;
     
     template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> OUT	diffH (IN ib, IN ie, OUT out)	;
