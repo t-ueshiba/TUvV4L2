@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2012-01-22 10:56:27 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2012-08-01 20:48:32 ueshiba Exp $
  */
 #include <stdlib.h>
 #ifdef WIN32
@@ -70,14 +70,33 @@ main(int argc, char* argv[])
 
 	if (laplacian)
 	{
-	    Image<float>	lap, edgeH, edgeV;
+	    Image<float>	edgeH(in.width(), in.height()),
+				edgeV(in.width(), in.height()),
+				lap  (in.width(), in.height());
+
 	    if (gaussian)
-		GaussianConvolver2(alpha).laplacian(in, lap)
-					 .diffH(in, edgeH).diffV(in, edgeV);
+	    {
+		Image<float>	edgeHH(in.width(), in.height()),
+				edgeVV(in.width(), in.height());
+		GaussianConvolver2<float>	convolver(alpha);
+		convolver.diffHH(in.begin(), in.end(), lap.begin());
+		convolver.diffVV(in.begin(), in.end(), edgeVV.begin());
+		convolver.diffH (in.begin(), in.end(), edgeH.begin());
+		convolver.diffV (in.begin(), in.end(), edgeV.begin());
+		lap += edgeVV;
+	    }
 	    else
-		DericheConvolver2(alpha).laplacian(in, lap)
-					.diffH(in, edgeH).diffV(in, edgeV);
-	    Image<float>	str;
+	    {
+		Image<float>	edgeHH(in.width(), in.height()),
+				edgeVV(in.width(), in.height());
+		DericheConvolver2<float>	convolver(alpha);
+		convolver.diffHH(in.begin(), in.end(), lap.begin());
+		convolver.diffVV(in.begin(), in.end(), edgeVV.begin());
+		convolver.diffH (in.begin(), in.end(), edgeH.begin());
+		convolver.diffV (in.begin(), in.end(), edgeV.begin());
+		lap += edgeVV;
+	    }
+	    Image<float>	str(in.width(), in.height());
 	    EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
 					 .zeroCrossing(lap, str, edge)
 					 .hysteresisThresholding(edge);
@@ -85,11 +104,20 @@ main(int argc, char* argv[])
 	}
 	else
 	{
-	    Image<float>    edgeH, edgeV;
+	    Image<float>	edgeH(in.width(), in.height()),
+				edgeV(in.width(), in.height());
 	    if (gaussian)
-		GaussianConvolver2(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	    {
+		GaussianConvolver2<float>	convolver(alpha);
+		convolver.diffH(in.begin(), in.end(), edgeH.begin());
+		convolver.diffV(in.begin(), in.end(), edgeV.begin());
+	    }
 	    else
-		DericheConvolver2(alpha).diffH(in, edgeH).diffV(in, edgeV);
+	    {
+		DericheConvolver2<float>	convolver(alpha);
+		convolver.diffH(in.begin(), in.end(), edgeH.begin());
+		convolver.diffV(in.begin(), in.end(), edgeV.begin());
+	    }
 	    Image<float>    str;
 	    Image<u_char>   dir;
 	    EdgeDetector(th_low, th_high).strength(edgeH, edgeV, str)
