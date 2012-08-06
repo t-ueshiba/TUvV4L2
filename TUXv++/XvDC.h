@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.h,v 1.7 2012-08-06 08:22:48 ueshiba Exp $
+ *  $Id: XvDC.h,v 1.8 2012-08-06 23:54:26 ueshiba Exp $
  */
 #ifndef __TUvXvDC_h
 #define __TUvXvDC_h
@@ -60,6 +60,7 @@ class XvDC : public ShmDC, public List<XvDC>::Node
     virtual DC&		operator <<(const Image<RGBA>&   image)		;
     virtual DC&		operator <<(const Image<YUV444>& image)		;
     virtual DC&		operator <<(const Image<YUV422>& image)		;
+    virtual DC&		operator <<(const Image<YUYV422>& image)	;
     virtual DC&		operator <<(const Image<YUV411>& image)		;
 
   protected:

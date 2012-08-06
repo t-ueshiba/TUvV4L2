@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.cc,v 1.9 2009-08-13 23:03:37 ueshiba Exp $
+ *  $Id: XvDC.cc,v 1.10 2012-08-06 23:54:26 ueshiba Exp $
  */
 #include "TU/v/XvDC.h"
 #include <stdexcept>
@@ -225,6 +225,25 @@ XvDC::operator <<(const Image<YUV444>& image)
 
 DC&
 XvDC::operator <<(const Image<YUV422>& image)
+{
+    createXvImage(image);
+    if (_xvimage != 0)
+    {
+	XvShmPutImage(colormap().display(), _port, drawable(), gc(), _xvimage,
+		      0, 0, _xvimage->width, _xvimage->height,
+		      log2devR(offset()[0]), log2devR(offset()[1]),
+		      log2devR(_xvimage->width), log2devR(_xvimage->height),
+		      True);
+	XFlush(colormap().display());
+    }
+    else
+	ShmDC::operator <<(image);
+    
+    return *this;
+}
+
+DC&
+XvDC::operator <<(const Image<YUYV422>& image)
 {
     createXvImage(image);
     if (_xvimage != 0)
