@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.h,v 1.6 2009-08-13 23:03:37 ueshiba Exp $
+ *  $Id: XvDC.h,v 1.7 2012-08-06 08:22:48 ueshiba Exp $
  */
 #ifndef __TUvXvDC_h
 #define __TUvXvDC_h
@@ -47,6 +47,7 @@ class XvDC : public ShmDC, public List<XvDC>::Node
 	 u_int width=0, u_int height=0, u_int mul=1, u_int div=1)	;
     virtual		~XvDC()						;
 
+    using		ShmDC::operator <<;
     virtual DC&		operator <<(const Point2<int>& p)		;
     virtual DC&		operator <<(const LineP2f& l)			;
     virtual DC&		operator <<(const LineP2d& l)			;
