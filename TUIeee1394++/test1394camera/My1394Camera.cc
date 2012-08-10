@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: My1394Camera.cc,v 1.12 2010-06-02 01:07:14 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.13 2012-08-10 02:55:04 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -111,13 +111,13 @@ CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
 ************************************************************************/
 //! IEEE1394カメラノードを生成する
 /*!
-  \param port	このカメラが接続されているポート．
   \param uniqId	個々のカメラ固有の64bit ID．同一のIEEE1394 busに
 		複数のカメラが接続されている場合，これによって
 		同定を行う．
+  \param speed	データ転送速度
 */
-My1394Camera::My1394Camera(bool i1394b, u_int64_t uniqId)
-    :Ieee1394Camera(Ieee1394Camera::Monocular, i1394b, uniqId, 1),
+My1394Camera::My1394Camera(u_int64_t uniqId, Speed speed)
+    :Ieee1394Camera(Ieee1394Camera::Monocular, uniqId, speed, 1),
      _canvas(gtk_drawing_area_new()),
      _buf(0),
      _rgb(0)

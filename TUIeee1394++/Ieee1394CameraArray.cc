@@ -1,6 +1,7 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.9 2011-08-23 00:06:15 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.cc,v 1.10 2012-08-10 02:54:48 ueshiba Exp $
  */
+#include <cstdlib>
 #include "TU/Ieee1394CameraArray.h"
 
 #ifdef HAVE_LIBTUTOOLS__
@@ -26,10 +27,11 @@ Ieee1394CameraArray::Ieee1394CameraArray()
 			中の全カメラが生成される. 
 */
 Ieee1394CameraArray::Ieee1394CameraArray(const char* name, const char* dirs,
-					 bool i1394b, int ncameras)
+					 Ieee1394Node::Speed speed,
+					 int ncameras)
     :Array<Ieee1394Camera*>(), _fullName()
 {
-    initialize(name, dirs, i1394b, ncameras);
+    initialize(name, dirs, speed, ncameras);
 }
     
 //! IEEE1394デジタルカメラの配列を初期化する.
@@ -43,7 +45,7 @@ Ieee1394CameraArray::Ieee1394CameraArray(const char* name, const char* dirs,
 */
 void
 Ieee1394CameraArray::initialize(const char* name, const char* dirs,
-				bool i1394b, int ncameras)
+				Ieee1394Node::Speed speed, int ncameras)
 {
     using namespace	std;
 
@@ -72,7 +74,7 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
 	in >> s;			// global unique IDの読み込み
 	u_int64_t	uniqId = strtoull(s.c_str(), 0, 0);
 	(*this)[i] = new Ieee1394Camera(Ieee1394Camera::Monocular,
-					i1394b, uniqId, delay);
+					uniqId, speed, delay);
 	in >> *(*this)[i];		// カメラパラメータの読み込みと設定
     }
 }

@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.38 2012-06-21 01:00:15 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.39 2012-08-10 02:54:48 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -333,7 +333,6 @@ static const u_int64_t	PointGrey_Feature_ID	= 0x00b09d000004ull;
 //! IEEE1394カメラノードを生成する
 /*!
   \param type		カメラのタイプ
-  \param i1394b		IEEE1394bモード (800Mbps)で動作
   \param uniqId		個々のカメラ固有の64bit ID. 同一のIEEE1394 busに
 			複数のカメラが接続されている場合, これによって
 			同定を行う. 0が与えられると, まだ Ieee1394Camera
@@ -341,6 +340,7 @@ static const u_int64_t	PointGrey_Feature_ID	= 0x00b09d000004ull;
 			一番最初にみつかったものがこのオブジェクトと結び
 			つけられる. オブジェクト生成後は, globalUniqueId()
 			によってこの値を知ることができる.
+  \param speed		IEEE1394バスの転送速度(1394bモードの場合は800Mbps)
   \param delay		IEEE1394カードの種類によっては, レジスタの読み書き
 			(Ieee1394Node::readQuadlet(),
 			Ieee1394Node::writeQuadlet())時に遅延を入れないと
@@ -348,8 +348,8 @@ static const u_int64_t	PointGrey_Feature_ID	= 0x00b09d000004ull;
 			で指定する. (例: メルコのIFC-ILP3では1, DragonFly
 			付属のボードでは0)
 */
-Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
-			       u_int64_t uniqId, u_int delay)
+Ieee1394Camera::Ieee1394Camera(Type type, u_int64_t uniqId,
+			       Speed speed, u_int delay)
     :Ieee1394Node(type, uniqId, delay
 #if defined(USE_VIDEO1394)
 		  , 1, VIDEO1394_SYNC_FRAMES
@@ -361,10 +361,7 @@ Ieee1394Camera::Ieee1394Camera(Type type, bool i1394b,
      _acr(0), _bayer(YYYY), _littleEndian(false)
 {
   // Set speed of isochronous transmission.
-    quadlet_t	quad = (Ieee1394Node::SPD_400M << 24);
-    if (i1394b && (inquireBasicFunction() & I1394b_mode_Capability))
-	quad |= ((0x1u << 15) | Ieee1394Node::SPD_800M);
-    writeQuadletToRegister(ISO_Channel, quad);
+    setSpeed(speed);
 
   // Map video1394 buffer according to current format and frame rate.
     setFormatAndFrameRate(getFormat(), getFrameRate());
@@ -430,6 +427,80 @@ Ieee1394Camera::powerOff()
     checkAvailability(Cam_Power_Cntl_Inq);
     writeQuadletToRegister(Camera_Power, 0x00000000);
     return *this;
+}
+
+//! IEEE1394カメラのデータ転送速度を設定する
+/*!
+  \param speed	データ転送速度
+  \return	このIEEE1394カメラオブジェクト
+*/
+Ieee1394Camera&
+Ieee1394Camera::setSpeed(Speed speed)
+{
+    quadlet_t	quad;
+    if (inquireBasicFunction() & I1394b_mode_Capability)
+    {
+	quad = ((0x1u << 15) | speed);
+    }
+    else
+    {
+	switch (speed)
+	{
+	  case SPD_100M:
+	  case SPD_200M:
+	  case SPD_400M:
+	    quad = (speed << 24);
+	    break;
+	  default:
+	    throw std::runtime_error("Ieee1394Caera::setSpeed: specified speed is not supported by non-IEEE1394b cameras!!");
+	    break;
+	}
+    }
+
+    const bool	cont = inContinuousShot();
+    if (cont)
+	stopContinuousShot();
+
+    writeQuadletToRegister(ISO_Channel,
+			   (readQuadletFromRegister(ISO_Channel)
+			    & 0xf0003f00) | quad);
+
+    if (cont)
+	continuousShot();
+    
+    return *this;
+}
+    
+//! IEEE1394カメラのデータ転送速度を返す
+/*!
+  \return	データ転送速度
+*/
+Ieee1394Node::Speed
+Ieee1394Camera::getSpeed() const
+{
+    quadlet_t	quad  = readQuadletFromRegister(ISO_Channel);
+    quadlet_t	speed = (quad & (0x1u << 15) ? quad & 0x7
+					     : (quad >> 24) & 0x3);
+    
+    switch (speed)
+    {
+      case SPD_100M:
+	return SPD_100M;
+      case SPD_200M:
+	return SPD_200M;
+      case SPD_400M:
+	return SPD_400M;
+      case SPD_800M:
+	return SPD_800M;
+      case SPD_1_6G:
+	return SPD_1_6G;
+      case SPD_3_2G:
+	return SPD_3_2G;
+    }
+
+    throw std::runtime_error("Unknown speed!!");
+
+    return SPD_100M;
 }
 
 //! 画像フォーマットとフレームレートを設定する

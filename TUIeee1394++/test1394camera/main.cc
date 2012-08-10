@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.9 2010-06-02 01:07:14 ueshiba Exp $
+ *  $Id: main.cc,v 1.10 2012-08-10 02:55:04 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera - program for testing an IIDC 1394-based Digital Camera
@@ -99,13 +99,13 @@ main(int argc, char* argv[])
     gtk_init(&argc, &argv);	// GTK+ の初期化.
 
   // IEEE1394ポート(インターフェースカード)の番号をコマンド行から読み込む．
-    bool		i1394b = false;		// default: 非IEEE1394bモード
+    Ieee1394Node::Speed	speed = Ieee1394Node::SPD_400M;
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "bh")) != EOF; )
 	switch (c)
 	{
 	  case 'b':
-	    i1394b = true;
+	    speed = Ieee1394Node::SPD_800M;
 	    break;
 	  case 'h':
 	    usage(argv[0]);
@@ -119,7 +119,7 @@ main(int argc, char* argv[])
   // 本業を行う．
     try
     {
-	My1394Camera	camera(i1394b, uniqId);		// カメラを開く．
+	My1394Camera	camera(uniqId, speed);		// カメラを開く．
 
 	GtkWidget*	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(window), "IEEE1394 camera controller");

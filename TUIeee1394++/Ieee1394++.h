@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.34 2012-06-29 09:05:37 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.35 2012-08-10 02:54:48 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -136,7 +136,7 @@
 #if defined(HAVE_LIBTUTOOLS__)
 #  include "TU/Image++.h"
 #else
-  typedef unsigned long long	u_int64_t;
+#  include <string.h>
 #endif
 
 /*!
@@ -180,16 +180,16 @@ class Ieee1394Node
 	u_int64_t	_nodes;		// a bitmap for the registered nodes
     };
 #endif	// !__APPLE__
-  protected:
+  public:
   //! isochronous転送の速度
     enum Speed
     {
-	SPD_100M = 0,				//!< 100Mbps
-	SPD_200M = 1,				//!< 200Mbps
-	SPD_400M = 2,				//!< 400Mbps
-	SPD_800M = 3,				//!< 800Mbps
-	SPD_1_6G = 4,				//!< 1.6Gbps
-	SPD_3_2G = 5				//!< 3.2Gbps
+	SPD_100M	= 0,			//!< 100Mbps
+	SPD_200M	= 1,			//!< 200Mbps
+	SPD_400M	= 2,			//!< 400Mbps
+	SPD_800M	= 3,			//!< 800Mbps
+	SPD_1_6G	= 4,			//!< 1.6Gbps
+	SPD_3_2G	= 5			//!< 3.2Gbps
     };
 
   public:
@@ -492,8 +492,8 @@ class Ieee1394Camera : public Ieee1394Node
     };
 
   public:
-    Ieee1394Camera(Type type=Monocular, bool i1394b=false,
-		   u_int64_t uniqId=0, u_int delay=0)			;
+    Ieee1394Camera(Type type=Monocular, u_int64_t uniqId=0,
+		   Speed speed=SPD_400M, u_int delay=0)			;
     ~Ieee1394Camera()							;
 
   // Basic function stuffs.
@@ -502,6 +502,8 @@ class Ieee1394Camera : public Ieee1394Node
     Ieee1394Camera&	powerOff()					;
     Bayer		bayerTileMapping()			const	;
     bool		isLittleEndian()			const	;
+    Ieee1394Camera&	setSpeed(Speed speed)				;
+    Speed		getSpeed()				const	;
     
   // Format and frame rate stuffs.
     quadlet_t		inquireFrameRate(Format format)		const	;

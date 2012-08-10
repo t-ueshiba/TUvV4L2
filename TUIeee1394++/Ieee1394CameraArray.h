@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.9 2011-08-23 00:06:15 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.10 2012-08-10 02:54:48 ueshiba Exp $
  */
 /*!
   \file		Ieee1394CameraArray.h
@@ -32,11 +32,14 @@ class Ieee1394CameraArray : public Array<Ieee1394Camera*>
   public:
     Ieee1394CameraArray()						;
     Ieee1394CameraArray(const char* name, const char* dirs=0,
-			bool i1394b=false, int ncameras=-1)		;
+			Ieee1394Node::Speed speed=Ieee1394Node::SPD_400M,
+			int ncameras=-1)				;
     ~Ieee1394CameraArray()						;
 
-    void		initialize(const char* name, const char* dirs,
-				   bool i1394b, int ncameras=-1)	;
+    void		initialize(const char* name, const char* dirs=0,
+				   Ieee1394Node::Speed
+				       speed=Ieee1394Node::SPD_400M,
+				   int ncameras=-1)			;
     const std::string&	fullName()				const	;
     std::string		configFile()				const	;
     std::string		calibFile()				const	;
