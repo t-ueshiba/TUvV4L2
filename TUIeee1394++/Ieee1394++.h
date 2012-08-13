@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394++.h,v 1.35 2012-08-10 02:54:48 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.36 2012-08-13 07:12:25 ueshiba Exp $
  */
 /*!
   \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
@@ -50,6 +50,8 @@
     - #TU::Ieee1394Camera::powerOff()
     - #TU::Ieee1394Camera::bayerTileMapping()
     - #TU::Ieee1394Camera::isLittleEndian()
+    - #TU::Ieee1394Camera::setSpeed()
+    - #TU::Ieee1394Camera::getSpeed()
   
   - <b>画像フォーマットとフレームレート</b>
     - #TU::Ieee1394Camera::inquireFrameRate()
@@ -122,6 +124,9 @@
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include <libraw1394/raw1394.h>
 #if !defined(__APPLE__)
 #  include <map>

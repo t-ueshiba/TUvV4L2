@@ -19,11 +19,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Camera.cc,v 1.39 2012-08-10 02:54:48 ueshiba Exp $
+ *  $Id: Ieee1394Camera.cc,v 1.40 2012-08-13 07:12:25 ueshiba Exp $
  */
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
 #include "TU/Ieee1394++.h"
 #include <libraw1394/csr.h>
 
