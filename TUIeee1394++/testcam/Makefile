@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.6 2012-06-20 07:50:08 ueshiba Exp $
+#  $Id: Makefile,v 1.7 2012-08-13 07:15:07 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -15,7 +15,7 @@ ifeq ($(OSTYPE), darwin)
 endif
 
 #CCC		= g++
-CPPFLAGS	= -DHAVE_LIBTUTOOLS__ #-DMONO_IMAGE #-DUSE_VIDEO1394 #-DDEBUG #-DUseXvDC
+CPPFLAGS	= -DHAVE_LIBTUTOOLS__ -DDEBUG=2 #-DMONO_IMAGE #-DUSE_VIDEO1394 #-DDEBUG #-DUseXvDC
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
@@ -73,14 +73,16 @@ EXTHDRS		= ../../../multicam/server/multicam.h \
 HDRS		= MyCanvasPane.h \
 		MyCmdWindow.h \
 		MyModalDialog.h
-SRCS		= MyCanvasPane.cc \
+SRCS		= Ieee1394Node.cc \
+		MyCanvasPane.cc \
 		MyCmdWindow.cc \
 		MyModalDialog.cc \
 		createCaptureCmds.cc \
 		createFeatureCmds.cc \
 		createMenuCmds.cc \
 		main.cc
-OBJS		= MyCanvasPane.o \
+OBJS		= Ieee1394Node.o \
+		MyCanvasPane.o \
 		MyCmdWindow.o \
 		MyModalDialog.o \
 		createCaptureCmds.o \
@@ -91,7 +93,7 @@ OBJS		= MyCanvasPane.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.6 $	|		\
+REV		= $(shell echo $Revision: 1.7 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -103,6 +105,11 @@ REV		= $(shell echo $Revision: 1.6 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
+Ieee1394Node.o: /usr/local/include/TU/Ieee1394++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Minimize.h
 MyCanvasPane.o: MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
