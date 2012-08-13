@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.3 2011-01-05 02:05:22 ueshiba Exp $
+ *  $Id: main.cc,v 1.4 2012-08-13 07:13:18 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -17,7 +17,7 @@ main(int argc, char* argv[])
     v::App			vapp(argc, argv);
     const char*			triggerDev = "/dev/ttyS0";
     Ieee1394Camera::Type	type = Ieee1394Camera::Binocular;
-    bool			i1394b = false;
+    Ieee1394Node::Speed		speed = Ieee1394Node::SPD_400M;
     u_int			delay = 1;
 
   // Parse command line.
@@ -26,7 +26,7 @@ main(int argc, char* argv[])
 	switch (c)
 	{
 	  case 'b':
-	    i1394b = true;
+	    speed = Ieee1394Node::SPD_800M;
 	    break;
 	  case 'd':
 	    delay = atoi(optarg);
@@ -51,7 +51,7 @@ main(int argc, char* argv[])
 #if defined(UseTrigger)
 	TriggerGenerator	trigger(triggerDev);
 #endif
-	Ieee1394Camera		camera(type, i1394b, uniqId, delay);
+	Ieee1394Camera		camera(type, uniqId, speed, delay);
 
 	cerr << "0x" << hex << setw(16) << setfill('0')
 	     << camera.globalUniqueId() << dec << endl;

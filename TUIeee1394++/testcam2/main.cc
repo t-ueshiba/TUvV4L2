@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2009-07-28 00:15:43 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2012-08-13 07:13:12 ueshiba Exp $
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -16,16 +16,18 @@ namespace TU
 class CameraArray : public Array<Ieee1394Camera*>
 {
   public:
-    CameraArray(char* argv[], int argc, bool i1394b, u_int delay)	;
+    CameraArray(char* argv[], int argc,
+		Ieee1394Node::Speed speed, u_int delay)			;
     ~CameraArray()							;
 };
 
-CameraArray::CameraArray(char* argv[], int argc, bool i1394b, u_int delay)
+CameraArray::CameraArray(char* argv[], int argc,
+			 Ieee1394Node::Speed speed, u_int delay)
     :Array<Ieee1394Camera*>(argc)
 {
     for (int i = 0; i < dim(); ++i)
-	(*this)[i] = new Ieee1394Camera(Ieee1394Camera::Monocular, i1394b,
-					strtoull(argv[i], 0, 0), delay);
+	(*this)[i] = new Ieee1394Camera(Ieee1394Camera::Monocular,
+					strtoull(argv[i], 0, 0), speed, delay);
 }
 
 CameraArray::~CameraArray()
@@ -46,7 +48,7 @@ main(int argc, char* argv[])
     
     v::App		vapp(argc, argv);
     char*		triggerDev = "/dev/ttyS0";
-    bool		i1394b = false;
+    Ieee1394Node::Speed	speed = Ieee1394Node::SPD_400M;
     u_int		delay = 1;
     bool		sync = false;
     
@@ -56,7 +58,7 @@ main(int argc, char* argv[])
 	switch (c)
 	{
 	  case 'b':
-	    i1394b = true;
+	    speed = Ieee1394Node::SPD_800M;
 	    break;
 	  case 'd':
 	    delay = atoi(optarg);
@@ -80,7 +82,7 @@ main(int argc, char* argv[])
     try
     {
 	CameraArray		cameras(argv + optind, argc - optind,
-					i1394b, delay);
+					speed, delay);
 #ifdef UseTrigger
 	TriggerGenerator	trigger(triggerDev);
 #endif
