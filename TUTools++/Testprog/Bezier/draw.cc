@@ -1,5 +1,5 @@
 /*
- *  $Id: draw.cc,v 1.2 2007-02-28 00:16:06 ueshiba Exp $
+ *  $Id: draw.cc,v 1.3 2012-08-15 07:58:34 ueshiba Exp $
  */
 #include "draw.h"
 
@@ -25,7 +25,7 @@ operator <<(OglDC& dc, const BezierCurve3d& b)
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
-      for (int i = 0; i <= b.degree(); ++i)
+      for (u_int i = 0; i <= b.degree(); ++i)
 	  glVertex3dv((const double*)b[i]);
     glEnd();
     glPopAttrib();
@@ -51,7 +51,7 @@ operator <<(OglDC& dc, const RationalBezierCurve3d& b)
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
-      for (int i = 0; i <= b.degree(); ++i)
+      for (u_int i = 0; i <= b.degree(); ++i)
 	  glVertex4dv((const double*)b[i]);
     glEnd();
     glPopAttrib();
@@ -122,17 +122,17 @@ operator <<(OglDC& dc, const BezierSurface3d& b)
     glPushAttrib(GL_LINE_BIT);
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(2, 0xaaaa);
-    for (int j = 0; j <= b.vDegree(); ++j)
+    for (u_int j = 0; j <= b.vDegree(); ++j)
     {
 	glBegin(GL_LINE_STRIP);
-	for (int i = 0; i <= b.uDegree(); ++i)
+	for (u_int i = 0; i <= b.uDegree(); ++i)
 	    glVertex3dv((const double*)b[j][i]);
 	glEnd();
     }
-    for (int i = 0; i <= b.uDegree(); ++i)
+    for (u_int i = 0; i <= b.uDegree(); ++i)
     {
 	glBegin(GL_LINE_STRIP);
-	for (int j = 0; j <= b.vDegree(); ++j)
+	for (u_int j = 0; j <= b.vDegree(); ++j)
 	    glVertex3dv((const double*)b[j][i]);
 	glEnd();
     }

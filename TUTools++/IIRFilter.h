@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.16 2012-07-28 09:10:11 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.17 2012-08-15 07:58:19 ueshiba Exp $
  */
 /*!
   \file		IIRFilter.h
@@ -271,7 +271,7 @@ template <u_int D, class T=float> class IIRFilter
 template <u_int D, class T> IIRFilter<D, T>&
 IIRFilter<D, T>::initialize(const T c[D+D])
 {
-    for (int i = 0; i < D+D; ++i)
+    for (u_int i = 0; i < D+D; ++i)
 	_c[i] = c[i];
 
     return *this;

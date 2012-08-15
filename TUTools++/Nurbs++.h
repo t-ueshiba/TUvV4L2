@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Nurbs++.h,v 1.18 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.19 2012-08-15 07:58:19 ueshiba Exp $
  */
 /*!
   \file		Nurbs++.h
@@ -50,6 +50,10 @@ namespace TU
 template <class T>
 class BSplineKnots : private Array<T>
 {
+  private:
+    typedef Array<T>				super;
+    typedef typename super::value_type		value_type;
+    
   public:
     BSplineKnots(u_int deg, T us, T ue)		;
     
@@ -69,10 +73,10 @@ class BSplineKnots : private Array<T>
     u_int	removeKnot(u_int k)		;
     void	elevateDegree()			{++_degree;}
 		operator const T*()	const	{return
-						  Array<T>::operator const T*();}
+						  super::operator const T*();}
 
-    using	Array<T>::dim;
-    using	Array<T>::operator [];		// knots
+    using	super::dim;
+    using	super::operator [];		// knots
     
   private:
     u_int	_degree;
@@ -87,7 +91,7 @@ class BSplineKnots : private Array<T>
  */
 template <class T>
 BSplineKnots<T>::BSplineKnots(u_int deg, T us, T ue)
-    :Array<T>(deg+1+deg+1), _degree(deg)
+    :super(deg+1+deg+1), _degree(deg)
 {
     for (u_int i = 0; i <= degree(); ++i)
 	(*this)[i] = us;
@@ -271,9 +275,9 @@ template <class T> u_int
 BSplineKnots<T>::insertKnot(T u)
 {
     u_int	l = findSpan(u) + 1;	// insertion point for the new knot
-    Array<T>	tmp(*this);
-    resize(dim() + 1);
-    for (u_int i = 0; i < l; ++i)		// copy unchanged knots
+    super	tmp(*this);
+    super::resize(dim() + 1);
+    for (u_int i = 0; i < l; ++i)	// copy unchanged knots
 	(*this)[i] = tmp[i];
     (*this)[l] = u;			// insert a new knot
     for (u_int i = M(); i > l; --i)	// shift unchanged knots
@@ -290,8 +294,8 @@ template <class T> u_int
 BSplineKnots<T>::removeKnot(u_int k)
 {
     k = rightmost(k);			// index of the knot to be removed
-    Array<T>	tmp(*this);
-    Array<T>::resize(dim() - 1);
+    super	tmp(*this);
+    super::resize(dim() - 1);
     for (u_int i = 0; i < k; ++i)	// copy unchanged knots
 	(*this)[i] = tmp[i];
     for (u_int i = M(); i >= k; --i)	// shift unchanged knots
@@ -310,6 +314,9 @@ BSplineKnots<T>::removeKnot(u_int k)
 template <class C>
 class BSplineCurve : private Array<C>
 {
+  private:
+    typedef Array<C>				super;
+    
   public:
     typedef C					value_type;
     typedef typename value_type::value_type	T;
@@ -336,11 +343,11 @@ class BSplineCurve : private Array<C>
     void	elevateDegree()			;
 		operator const T*()	  const	{return (*this)[0];}
 
-    using	Array<C>::operator [];
-    using	Array<C>::operator ==;
-    using	Array<C>::operator !=;
-    using	Array<C>::save;
-    using	Array<C>::restore;
+    using	super::operator [];
+    using	super::operator ==;
+    using	super::operator !=;
+    using	super::save;
+    using	super::restore;
 
   private:
     BSplineKnots<T>	_knots;
@@ -348,7 +355,7 @@ class BSplineCurve : private Array<C>
 
 template <class C>
 BSplineCurve<C>::BSplineCurve(u_int degree, T us, T ue)
-    :Array<C>(degree + 1), _knots(degree, us, ue)
+    :super(degree + 1), _knots(degree, us, ue)
 {
 }
 
@@ -398,8 +405,8 @@ template <class C> u_int
 BSplineCurve<C>::insertKnot(T u)
 {
     u_int	l = _knots.insertKnot(u);
-    Array<C>	tmp(*this);
-    resize(Array<C>::dim() + 1);	// cannot omit Array<C>:: specifier
+    super	tmp(*this);
+    super::resize(super::dim() + 1);	// cannot omit super:: specifier
     for (u_int i = 0; i < l-degree(); ++i)
 	(*this)[i] = tmp[i];		// copy unchanged control points
     for (u_int i = l-degree(); i < l; ++i)
@@ -429,8 +436,8 @@ BSplineCurve<C>::removeKnot(u_int k)
     u_int	s = multiplicity(k);
     T		u = knots(k);
     k = _knots.removeKnot(k);
-    Array<C>	tmp(*this);
-    resize(Array<C>::dim() - 1);	// cannot omit Array<C>:: specifier
+    super	tmp(*this);
+    super::resize(super::dim() - 1);	// cannot omit Array<C>:: specifier
     u_int	i, j;
     for (i = 0; i < k - degree(); ++i)
 	(*this)[i] = tmp[i];		// copy unchanged control points
@@ -473,13 +480,13 @@ BSplineCurve<C>::elevateDegree()
 	    insertKnot(knots(k));
 	++nsegments;
     }
-    Array<C>	tmp(*this);	// Save control points of Bezier segments.
+    super	tmp(*this);	// Save control points of Bezier segments.
 
   // Set knots and allocate area for control points.
     for (u_int k = 0; k <= M(); )  // Elevate multiplicity of each knot by one.
 	k = _knots.insertKnot(knots(k)) + 1;
     _knots.elevateDegree();
-    resize(Array<C>::dim() + nsegments);
+    super::resize(super::dim() + nsegments);
 
   // Elevate degree of each Bezier segment.
     for (u_int n = 0; n < nsegments; ++n)
@@ -529,6 +536,9 @@ RationalBSplineCurve3d;
 template <class C>
 class BSplineSurface : private Array2<Array<C> >
 {
+  private:
+    typedef Array2<Array<C> >			super;
+    
   public:
     typedef C					value_type;
     typedef typename value_type::value_type	T;
@@ -569,13 +579,13 @@ class BSplineSurface : private Array2<Array<C> >
     void	vElevateDegree()		;
 		operator const T*()	const	{return (*this)[0][0];}
 
-    using	Array2<Array<C> >::operator [];
-    using	Array2<Array<C> >::ncol;
-    using	Array2<Array<C> >::nrow;
-    using	Array2<Array<C> >::operator ==;
-    using	Array2<Array<C> >::operator !=;
-    using	Array2<Array<C> >::save;
-    using	Array2<Array<C> >::restore;
+    using	super::operator [];
+    using	super::ncol;
+    using	super::nrow;
+    using	super::operator ==;
+    using	super::operator !=;
+    using	super::save;
+    using	super::restore;
     
     friend std::istream&
     operator >>(std::istream& in, BSplineSurface<C>& b)
@@ -591,8 +601,7 @@ class BSplineSurface : private Array2<Array<C> >
 template <class C>
 BSplineSurface<C>::BSplineSurface(u_int uDeg, u_int vDeg,
 				  T us, T ue, T vs, T ve)
-    :Array2<Array<C> >(vDeg + 1, uDeg + 1),
-     _uKnots(uDeg, us, ue), _vKnots(vDeg, vs, ve)
+    :super(vDeg + 1, uDeg + 1), _uKnots(uDeg, us, ue), _vKnots(vDeg, vs, ve)
 {
 }
 
@@ -657,10 +666,10 @@ BSplineSurface<C>::derivatives(T u, T v, u_int D) const
 template <class C> u_int
 BSplineSurface<C>::uInsertKnot(T u)
 {
-    u_int		l = _uKnots.insertKnot(u);
-    Array2<Array<C> >	tmp(*this);
-    resize(nrow(), ncol()+1);
-    Array<T>		alpha(uDegree());
+    u_int	l = _uKnots.insertKnot(u);
+    super	tmp(*this);
+    super::resize(nrow(), ncol()+1);
+    Array<T>	alpha(uDegree());
     for (u_int i = l-uDegree(); i < l; ++i)
 	alpha[i-l+uDegree()] =
 	    (u - uKnots(i)) / (uKnots(i+uDegree()+1) - uKnots(i));
@@ -687,10 +696,10 @@ BSplineSurface<C>::uInsertKnot(T u)
 template <class C> u_int
 BSplineSurface<C>::vInsertKnot(T v)
 {
-    u_int		l = _vKnots.insertKnot(v);
-    Array2<Array<C> >	tmp(*this);
-    resize(nrow()+1, ncol());
-    Array<T>		alpha(vDegree());
+    u_int	l = _vKnots.insertKnot(v);
+    super	tmp(*this);
+    super::resize(nrow()+1, ncol());
+    Array<T>	alpha(vDegree());
     for (u_int j = l-vDegree(); j < l; ++j)
 	alpha[j-l+vDegree()] =
 	    (v - vKnots(j)) / (vKnots(j+vDegree()+1) - vKnots(j));
@@ -720,8 +729,8 @@ BSplineSurface<C>::uRemoveKnot(u_int k)
     u_int	s = uMultiplicity(k);
     T		u = uKnots(k);
     k = _uKnots.removeKnot(k);
-    Array2<Array<C> >	tmp(*this);
-    resize(nrow(), ncol()-1);
+    super	tmp(*this);
+    super::resize(nrow(), ncol()-1);
     for (u_int j = 0; j <= vN(); ++j)
     {
 	u_int	is, ie;
@@ -769,8 +778,8 @@ BSplineSurface<C>::vRemoveKnot(u_int l)
     u_int	s = vMultiplicity(l);
     T		v = vKnots(l);
     l = _vKnots.removeKnot(l);
-    Array2<Array<C> >	tmp(*this);
-    resize(nrow()-1, ncol());
+    super	tmp(*this);
+    super::resize(nrow()-1, ncol());
     for (u_int i = 0; i <= uN(); ++i)
     {
 	u_int	js, je;
@@ -825,13 +834,13 @@ BSplineSurface<C>::uElevateDegree()
 	    uInsertKnot(uKnots(k));
 	++nsegments;
     }
-    Array2<Array<C> >	tmp(*this);	// Save Bezier control points.
+    super	tmp(*this);	// Save Bezier control points.
 
   // Set knots and allocate area for control points.
     for (u_int k = 0; k <= uM(); )
 	k = _uKnots.insertKnot(uKnots(k)) + 1;
     _uKnots.elevateDegree();
-    resize(nrow(), ncol() + nsegments);
+    super::resize(nrow(), ncol() + nsegments);
     
   // Elevate degree of each Bezier segment.
     for (u_int j = 0; j <= vN(); ++j)
@@ -877,13 +886,13 @@ BSplineSurface<C>::vElevateDegree()
 	    vInsertKnot(vKnots(l));
 	++nsegments;
     }
-    Array2<Array<C> >	tmp(*this);	// Save Bezier control points.
+    super	tmp(*this);	// Save Bezier control points.
 
   // Set knots and allocate area for control points.
     for (u_int l = 0; l <= vM(); )
 	l = _vKnots.insertKnot(vKnots(l)) + 1;
     _vKnots.elevateDegree();
-    resize(nrow() + nsegments, ncol());
+    super::resize(nrow() + nsegments, ncol());
     
   // Elevate degree of each Bezier segment.
     for (u_int i = 0; i <= uN(); ++i)

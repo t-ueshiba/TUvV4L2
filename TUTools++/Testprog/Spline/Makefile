@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.14 2009-09-21 07:09:05 ueshiba Exp $
+#  $Id: Makefile,v 1.15 2012-08-15 07:58:34 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -42,7 +42,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/List.h \
 		/usr/local/include/TU/Manip.h \
-		/usr/local/include/TU/Normalize.h \
+		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Nurbs++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/types.h \
@@ -69,7 +69,7 @@ OBJS		= draw.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.14 $	|		\
+REV		= $(shell echo $Revision: 1.15 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -85,20 +85,20 @@ draw.o: draw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Normalize.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Colormap.h \
+	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/Manip.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	/usr/local/include/TU/Nurbs++.h /usr/local/include/TU/utility.h
+	/usr/local/include/TU/Nurbs++.h
 main.o: /usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Normalize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/CanvasPane.h draw.h \
 	/usr/local/include/TU/v/OglDC.h \
@@ -106,4 +106,4 @@ main.o: /usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	/usr/local/include/TU/Nurbs++.h /usr/local/include/TU/utility.h
+	/usr/local/include/TU/Nurbs++.h

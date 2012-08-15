@@ -12,6 +12,7 @@ operator <<(std::ostream& out , const Array2<T>& a)
 	
 }
 
+int
 main()
 {
     using namespace	std;
@@ -37,4 +38,6 @@ main()
 
     cout << a;
     cout << b;
+
+    return 0;
 }
