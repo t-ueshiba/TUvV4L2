@@ -1,5 +1,6 @@
 #include "TU/Array++.h"
 
+int
 main()
 {
     TU::Array<float>	f(10), f1;
@@ -9,4 +10,6 @@ main()
     f1 = f;
     
     std::cout << f1;
+
+    return 0;
 }

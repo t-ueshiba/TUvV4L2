@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.1 2010-01-12 01:45:32 ueshiba Exp $
+ *  $Id: main.cc,v 1.2 2012-08-15 07:58:34 ueshiba Exp $
  */
 #include <cstdlib>
 #include <exception>
@@ -59,7 +59,7 @@ main(int argc, char* argv[])
     bool		stop2 = false;
     extern char*	optarg;
     
-    for (int c; (c = getopt(argc, argv, "d:niNb:c:eo2h")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "d:niNb:c:eo2h")) != -1; )
 	switch (c)
 	{
 	  case 'd':

@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2010-12-17 00:53:43 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2012-08-15 07:58:34 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -72,7 +72,7 @@ main(int argc, char* argv[])
     SHOT602::Axis	axis	= SHOT602::Axis_1;
     extern char*	optarg;
     
-    for (int c; (c = getopt(argc, argv, "d:12W")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "d:12W")) != -1; )
 	switch (c)
 	{
 	  case 'd':

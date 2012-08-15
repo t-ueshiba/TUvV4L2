@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.27 2012-07-28 09:10:17 ueshiba Exp $
+#  $Id: Makefile,v 1.28 2012-08-15 07:58:34 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -14,7 +14,7 @@ ifeq ($(OSTYPE), darwin)
 #  LIBS	       += -framework IOKit -framework CoreFoundation
 endif
 
-CPPFLAGS	= -std=c++0x -DUSE_TBB
+CPPFLAGS	= -DUSE_TBB
 CFLAGS		= -g -Wextra
 NVCCFLAGS	= -g
 ifeq ($(CCC), icpc)
@@ -39,26 +39,24 @@ SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= ../../TU/DericheConvolver.h \
 		../../TU/GaussianConvolver.h \
 		../../TU/Image++.h \
-		../../TU/Minimize.h \
 		../../TU/Profiler.h \
 		../../TU/TU/Geometry++.h \
 		../../TU/TU/IIRFilter.h \
-		../../TU/TU/TU/Array++.h \
-		../../TU/TU/TU/TU/types.h \
+		../../TU/TU/TU/Minimize.h \
+		../../TU/TU/TU/TU/Array++.h \
+		../../TU/TU/TU/TU/TU/types.h \
+		../../TU/TU/TU/Vector++.h \
 		../../TU/TU/TU/mmInstructions.h \
 		../../TU/TU/TU/utility.h \
-		../../TU/TU/Vector++.h \
 		../../TU/windows/fakeWindows.h
 HDRS		=
-SRCS		= GaussianCoefficients.cc \
-		main.cc
-OBJS		= GaussianCoefficients.o \
-		main.o
+SRCS		= main.cc
+OBJS		= main.o
 
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.27 $	|		\
+REV		= $(shell echo $Revision: 1.28 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -70,14 +68,10 @@ REV		= $(shell echo $Revision: 1.27 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-GaussianCoefficients.o: ../../TU/GaussianConvolver.h \
-	../../TU/TU/Vector++.h ../../TU/TU/TU/Array++.h \
-	../../TU/TU/TU/TU/types.h ../../TU/TU/IIRFilter.h \
-	../../TU/TU/TU/mmInstructions.h ../../TU/Minimize.h
 main.o: ../../TU/Image++.h ../../TU/TU/Geometry++.h \
-	../../TU/TU/TU/utility.h ../../TU/TU/Vector++.h \
-	../../TU/TU/TU/Array++.h ../../TU/TU/TU/TU/types.h \
-	../../TU/Minimize.h ../../TU/DericheConvolver.h \
+	../../TU/TU/TU/utility.h ../../TU/TU/TU/Vector++.h \
+	../../TU/TU/TU/TU/Array++.h ../../TU/TU/TU/TU/TU/types.h \
+	../../TU/TU/TU/Minimize.h ../../TU/DericheConvolver.h \
 	../../TU/TU/IIRFilter.h ../../TU/TU/TU/mmInstructions.h \
 	../../TU/GaussianConvolver.h ../../TU/Profiler.h \
 	../../TU/windows/fakeWindows.h

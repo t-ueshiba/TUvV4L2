@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.3 2010-01-14 07:04:20 ueshiba Exp $
+ *  $Id: main.cc,v 1.4 2012-08-15 07:58:34 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -98,7 +98,7 @@ main(int argc, char* argv[])
     PM16C_04::Axis	axis	= PM16C_04::Axis_A;
     extern char*	optarg;
     
-    for (int c; (c = getopt(argc, argv, "d:ABCD")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "d:ABCD")) != -1; )
 	switch (c)
 	{
 	  case 'd':

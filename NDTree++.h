@@ -1,5 +1,5 @@
 /*
- *  $Id: NDTree++.h,v 1.4 2012-01-09 23:24:09 ueshiba Exp $
+ *  $Id: NDTree++.h,v 1.5 2012-08-15 07:58:19 ueshiba Exp $
  */
 /*!
   \file		NDTree++.h
@@ -125,6 +125,7 @@ class NDTree
 
 	virtual Node*	clone()					 const	= 0;
 	virtual u_int	size()					 const	= 0;
+	virtual pointer	find(const position_type& dp, u_int len)	= 0;
 	virtual const_pointer
 			find(const position_type& dp, u_int len) const	= 0;
 	virtual void	insert(const position_type& dp,
@@ -145,6 +146,7 @@ class NDTree
 
 	virtual Node*	clone()					 const	;
 	virtual u_int	size()					 const	;
+	virtual pointer	find(const position_type& dp, u_int len)	;
 	virtual const_pointer
 			find(const position_type& dp, u_int len) const	;
 	virtual void	insert(const position_type& dp,
@@ -177,6 +179,7 @@ class NDTree
 	
 	virtual Node*	clone()					 const	;
 	virtual u_int	size()					 const	;
+	virtual pointer	find(const position_type& dp, u_int len)	;
 	virtual const_pointer
 			find(const position_type& dp, u_int len) const	;
 	virtual void	insert(const position_type& dp,
@@ -716,6 +719,15 @@ NDTree<T, D>::Branch::size() const
     return n;
 }
 
+template <class T, u_int D> typename NDTree<T, D>::pointer
+NDTree<T, D>::Branch::find(const position_type& dp, u_int len)
+{
+    len >>= 1;						// 1つ下のレベルへ
+    Node*	child = _children[child_idx(dp, len)];	// 子
+    
+    return (child ? child->find(dp, len) : 0);
+}
+
 template <class T, u_int D> typename NDTree<T, D>::const_pointer
 NDTree<T, D>::Branch::find(const position_type& dp, u_int len) const
 {
@@ -735,7 +747,7 @@ NDTree<T, D>::Branch::insert(const position_type& dp,
     if (child)						// 子があれば...
 	child->insert(dp, val, len);			// 既存の子に挿入
     else						// 子がなければ...
-	child = create(dp, val, len);			// 新たに子を作って挿入
+	child = Node::create(dp, val, len);		// 新たに子を作って挿入
 }
 
 template <class T, u_int D> typename NDTree<T, D>::Node*
@@ -853,6 +865,14 @@ NDTree<T, D>::Leaf::size() const
     return 1;
 }
     
+template <class T, u_int D> typename NDTree<T, D>::pointer
+NDTree<T, D>::Leaf::find(const position_type&, u_int len)
+{
+    if (len != 1)
+	throw std::logic_error("NDTree<T, D>::Leaf::find: non-zero \'len\'!");
+    return &_val;
+}
+
 template <class T, u_int D> typename NDTree<T, D>::const_pointer
 NDTree<T, D>::Leaf::find(const position_type&, u_int len) const
 {

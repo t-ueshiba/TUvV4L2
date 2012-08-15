@@ -1,5 +1,5 @@
 /*
- *  $Id: main.cc,v 1.2 2012-04-20 00:54:21 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2012-08-15 07:58:34 ueshiba Exp $
  */
 #include <cstdlib>
 #include <iomanip>
@@ -12,7 +12,7 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
     
-    char*		ttyname = "/dev/ttyS0";
+    const char*		ttyname = "/dev/ttyS0";
     extern char*	optarg;
     
     for (int c; (c = getopt(argc, argv, "d:")) != -1; )
