@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IntegralImage.h,v 1.7 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: IntegralImage.h,v 1.8 2012-08-15 07:17:55 ueshiba Exp $
  */
 /*!
   \file		IntegralImage.h
@@ -45,6 +45,9 @@ namespace TU
 template <class T>
 class IntegralImage : public Image<T>
 {
+  private:
+    typedef Image<T>	super;
+    
   public:
     IntegralImage()							;
     template <class S, class B>
@@ -61,8 +64,8 @@ class IntegralImage : public Image<T>
     u_int	originalWidth()					const	;
     u_int	originalHeight()				const	;
     
-    using	Image<T>::width;
-    using	Image<T>::height;
+    using	super::width;
+    using	super::height;
 };
 
 //! 空の積分画像を作る
@@ -90,7 +93,7 @@ template <class T> template <class S, class B> IntegralImage<T>&
 IntegralImage<T>::initialize(const Image<S, B>& image)
 {
   // 原画像よりも上と左に１ピクセルずつ大きいサイズを用意
-    resize(image.height() + 1, image.width() + 1);
+    super::resize(image.height() + 1, image.width() + 1);
 
   // 上と左に余白を入れる
     (*this)[0] = 0;				// 0行目はすべて0
@@ -215,6 +218,8 @@ IntegralImage<T>::originalHeight() const
 template <class T>
 class DiagonalIntegralImage : public Image<T>
 {
+    typedef Image<T>	super;
+    
   public:
     DiagonalIntegralImage()						;
     template <class S, class B>
@@ -230,8 +235,8 @@ class DiagonalIntegralImage : public Image<T>
     u_int	originalWidth()					const	;
     u_int	originalHeight()				const	;
     
-    using	Image<T>::width;
-    using	Image<T>::height;
+    using	super::width;
+    using	super::height;
 
   private:
     void	correct(int& u, int& v)				const	;
@@ -261,7 +266,7 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
 template <class T> template <class S, class B> DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
 {
-    resize(image.height(), image.width());
+    super::resize(image.height(), image.width());
     
     Array<T>	K(width() + height() - 1), L(width() + height() - 1);
     for (u_int i = 0; i < K.dim(); ++i)
