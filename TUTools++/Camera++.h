@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera++.h,v 1.3 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Camera++.h,v 1.4 2012-08-15 07:17:55 ueshiba Exp $
  */
 /*!
   \file		Camera++.h
@@ -379,7 +379,7 @@ IntrinsicBase<T>::dofIntrinsic()
   \param dp	更新量を表す dofIntrinsic() 次元ベクトル
 */
 template <class T> inline void
-IntrinsicBase<T>::updateIntrinsic(const vector_type& dp)
+IntrinsicBase<T>::updateIntrinsic(const vector_type&)
 {
 }
     
@@ -484,7 +484,6 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
 			     const point2_type& u0=point2_type(0, 0),
 			     value_type a=1, value_type s=0)		;
     
-    using		super::u;
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
@@ -574,7 +573,6 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
 				     const point2_type& u0=point2_type(0, 0),
 				     value_type a=1, value_type s=0)	;
 
-    using		super::u;
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
@@ -655,7 +653,6 @@ class Intrinsic : public IntrinsicBase<T>
     Intrinsic(value_type k=1, const point2_type& u0=point2_type(0, 0),
 	      value_type a=1, value_type s=0)				;
 
-    using		super::u;
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
@@ -1479,7 +1476,7 @@ Camera<I>::operator ()(const point3_type& X,
 	}
     }
     
-    return intrinsic_type::u(x(X, J, H), J, H);
+    return intrinsic_type::u(extrinsic_type::x(X, J, H), J, H);
 }
 
 //! 3次元ユークリッド空間から画像平面への投影行列を求める．
@@ -1560,9 +1557,9 @@ Camera<I>::setProjection(const matrix34_type& P)
     }
     t = (K.inv() * t) * Rt;
 
-    setTranslation(t);
-    setRotation(Rt);
-    setK(K);    
+    extrinsic_type::setTranslation(t);
+    extrinsic_type::setRotation(Rt);
+    intrinsic_type::setK(K);    
 }
 
 //! カメラの外部／可変内部パラメータの自由度を返す．
@@ -1592,7 +1589,7 @@ template <class I> inline void
 Camera<I>::update(const vector_type& dp)
 {
     extrinsic_type::update(dp);
-    updateIntrinsic(dp(6, dp.dim() - 6));
+    intrinsic_type::updateIntrinsic(dp(6, dp.dim() - 6));
 }
     
 //! カメラの姿勢と内部パラメータを指定された量だけ更新する．

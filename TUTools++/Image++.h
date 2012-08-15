@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.59 2012-06-19 08:32:40 ueshiba Exp $
+ *  $Id: Image++.h,v 1.60 2012-08-15 07:17:55 ueshiba Exp $
  */
 /*!
   \file		Image++.h
@@ -309,7 +309,7 @@ operator <<(std::ostream& out, const YUV422& yuv)
 //! [Y0, U], [Y1, V]（各8bit）の順で並んだカラー画素(16bits/pixel)
 struct YUYV422
 {
-    YUYV422(u_char yy=0, u_char xx=128)	:y(yy), x(x)	{}
+    YUYV422(u_char yy=0, u_char xx=128)	:y(yy), x(xx)	{}
     YUYV422(const YUV422& p)				;
     template <class T>
     YUYV422(const T& p)		:y(u_char(p)), x(128) 	{}

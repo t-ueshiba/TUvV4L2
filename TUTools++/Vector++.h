@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.49 2012-06-06 07:58:08 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.50 2012-08-15 07:17:55 ueshiba Exp $
  */
 /*!
   \file		Vector++.h
@@ -205,7 +205,8 @@ class Vector : public Array<T, B>
     using		super::dim;
   //using		super::operator pointer;
   //using		super::operator const_pointer;
-
+    using		super::check_dim;
+    
     const Vector<T>	operator ()(u_int i, u_int d)		const	;
     Vector<T>		operator ()(u_int i, u_int d)			;
     Vector&		operator  =(const T& c)				;
@@ -626,7 +627,8 @@ class Matrix : public Array2<Vector<T>, B, R>
     using		super::dim;
     using		super::nrow;
     using		super::ncol;
-
+    using		super::check_dim;
+    
 			operator const Vector<T>()		const	;
     const Matrix<T>	operator ()(u_int i, u_int j,
 				    u_int r, u_int c)		const	;

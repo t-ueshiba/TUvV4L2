@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: utility.h,v 1.22 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: utility.h,v 1.23 2012-08-15 07:17:55 ueshiba Exp $
  */
 /*!
   \file		utility.h
@@ -35,7 +35,9 @@
 #define __TUutility_h
 
 #include <algorithm>
+#include <functional>
 #include <iterator>
+#include <boost/iterator/transform_iterator.hpp>
 
 /*!
   \namespace	std
@@ -145,219 +147,199 @@ op3x3(Iterator begin, Iterator end, OP op)
 }
 
 /************************************************************************
-*  class mbr_iterator							*
+*  class mem_var_t							*
 ************************************************************************/
-//! コンテナの要素の特定のメンバにアクセスする反復子
-/*!
-  \param Iterator	本反復子のベースとなる反復子
-*/
-template <class Iterator, class T>
-class mbr_iterator
-  : public
-      std::iterator<typename std::iterator_traits<Iterator>::iterator_category,
-		    T,
-		    typename std::iterator_traits<Iterator>::difference_type,
-		    T*, T&>
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R/W)する関数オブジェクト
+/*
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
+*/ 
+template <class S, class T>
+class mem_var_t : public std::unary_function<T*, S>
 {
   public:
-    typedef typename std::iterator_traits<Iterator>::iterator_category
-							iterator_categoty;
-    typedef T						value_type;
-    typedef typename std::iterator_traits<Iterator>::difference_type
-							difference_type;
-    typedef value_type*					pointer;
-    typedef value_type&					reference;
-    typedef value_type std::iterator_traits<Iterator>::value_type::*
-							mbr_pointer;
+    typedef S T::*	mem_ptr;
     
-    mbr_iterator(Iterator i, mbr_pointer m)	:_i(i), _m(m)	{}
+    explicit mem_var_t(mem_ptr m)	:_m(m)		{}
 
-    Iterator		base() const
-			{
-			    return _i;
-			}
-    reference		operator * () const
-			{
-			    return (*_i).*_m;
-			}
-    pointer		operator ->() const
-			{
-			    return &(operator *());
-			}
-    mbr_iterator&	operator ++()
-			{
-			    ++_i;
-			    return *this;
-			}
-    mbr_iterator	operator ++(int)
-			{
-			    mbr_iterator	tmp = *this;
-			    ++_i;
-			    return tmp;
-			}
-    mbr_iterator&	operator --()
-			{
-			    --_i;
-			    return *this;
-			}
-    mbr_iterator	operator --(int)
-			{
-			    mbr_iterator	tmp = *this;
-			    --_i;
-			    return tmp;
-			}
-    mbr_iterator&	operator +=(difference_type n)
-			{
-			    _i += n;
-			    return *this;
-			}
-    mbr_iterator&	operator -=(difference_type n)
-			{
-			    _i -= n;
-			    return *this;
-			}
-    mbr_iterator	operator +(difference_type n) const
-			{
-			    mbr_iterator	tmp = *this;
-			    return tmp += n;
-			}
-    mbr_iterator	operator -(difference_type n) const
-			{
-			    mbr_iterator	tmp = *this;
-			    return tmp -= n;
-			}
-    reference		operator [](difference_type n) const
-			{
-			    return *(*this + n);
-			}
-	
+    S&		operator ()(T* p)		const	{return p->*_m;}
+
   private:
-    Iterator		_i;
-    const mbr_pointer	_m;
+    const mem_ptr	_m;
 };
 
-template <class Iterator, class T> inline bool 
-operator ==(const mbr_iterator<Iterator, T>& x,
-	    const mbr_iterator<Iterator, T>& y) 
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R/W)する関数オブジェクトを生成する
+template <class S, class T> inline mem_var_t<S, T>
+mem_var(S T::*m)
 {
-    return x.base() == y.base();
+    return mem_var_t<S, T>(m);
 }
 
-template<class Iterator, class T> inline bool 
-operator !=(const mbr_iterator<Iterator, T>& x, 
-	    const mbr_iterator<Iterator, T>& y) 
+/************************************************************************
+*  class const_mem_var_t						*
+************************************************************************/
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R)する関数オブジェクト
+/*
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
+*/ 
+template <class S, class T>
+class const_mem_var_t : public std::unary_function<const T*, S>
 {
-    return !(x == y);
+  public:
+    typedef S T::*	mem_ptr;
+    
+    explicit const_mem_var_t(mem_ptr m)		:_m(m)	{}
+
+    const S&	operator ()(const T* p)		const	{return p->*_m;}
+
+  private:
+    const mem_ptr	_m;
+};
+
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R)する関数オブジェクトを生成する
+template <class S, class T> inline const_mem_var_t<S, T>
+const_mem_var(S const T::* m)
+{
+    return const_mem_var_t<S, T>(m);
 }
 
-template<class Iterator, class T> inline bool 
-operator <(const mbr_iterator<Iterator, T>& x, 
-	   const mbr_iterator<Iterator, T>& y) 
+/************************************************************************
+*  class mem_var_ref_t							*
+************************************************************************/
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R/W)する関数オブジェクト
+/*
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
+*/ 
+template <class S, class T>
+class mem_var_ref_t : public std::unary_function<T&, S>
 {
-    return x.base() < y.base();
+  public:
+    typedef S T::*	mem_ptr;
+    
+    explicit mem_var_ref_t(mem_ptr m)		:_m(m)	{}
+
+    S&		operator ()(T& p)		const	{return p.*_m;}
+
+  private:
+    const mem_ptr	_m;
+};
+    
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R/W)する関数オブジェクトを生成する
+template <class S, class T> inline mem_var_ref_t<S, T>
+mem_var_ref(S T::*m)
+{
+    return mem_var_ref_t<S, T>(m);
 }
 
-template<class Iterator, class T> inline bool 
-operator >(const mbr_iterator<Iterator, T>& x, 
-	   const mbr_iterator<Iterator, T>& y) 
+/************************************************************************
+*  class const_mem_var_ref_t						*
+************************************************************************/
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R)する関数オブジェクト
+/*
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
+*/ 
+template <class S, class T>
+class const_mem_var_ref_t : public std::unary_function<const T&, S>
 {
-    return y < x;
+  public:
+    typedef S const T::*	mem_ptr;
+    
+    explicit const_mem_var_ref_t(mem_ptr m)	:_m(m)	{}
+
+    const S&	operator ()(const T& p)		const	{return p.*_m;}
+
+  private:
+    const mem_ptr	_m;
+};
+    
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R)する関数オブジェクトを生成する
+template <class S, class T> inline const_mem_var_ref_t<S, T>
+mem_var_ref(S const T::* m)
+{
+    return const_mem_var_ref_t<S, T>(m);
 }
 
-template<class Iterator, class T> inline bool 
-operator <=(const mbr_iterator<Iterator, T>& x, 
-	    const mbr_iterator<Iterator, T>& y) 
+//! S型のメンバ変数を持つT型オブジェクトへの反復子からそのメンバに直接アクセス(R/W)する反復子を作る．
+template <class Iterator, class S, class T>
+inline boost::transform_iterator<mem_var_ref_t<S, T>, Iterator>
+make_mbr_iterator(Iterator i, S T::* m)
 {
-    return !(y < x);
-}
-
-template<class Iterator, class T> inline bool 
-operator >=(const mbr_iterator<Iterator, T>& x, 
-	    const mbr_iterator<Iterator, T>& y) 
-{
-    return !(x < y);
-}
-
-template<class Iterator, class T>
-inline typename mbr_iterator<Iterator, T>::difference_type
-operator -(const mbr_iterator<Iterator, T>& x, 
-	   const mbr_iterator<Iterator, T>& y) 
-{
-    return x.base() - y.base();
-}
-
-template<class Iterator, class T> inline mbr_iterator<Iterator, T> 
-operator +(typename mbr_iterator<Iterator, T>::difference_type n,
-	   const mbr_iterator<Iterator, T>& x) 
-{
-    return x + n;
-}
-
-//! T型のメンバを持つオブジェクトを要素とするコンテナについてそのメンバにアクセス(R/W)する反復子を作る．
-template <class Iterator, class T> inline mbr_iterator<Iterator, T>
-make_mbr_iterator(Iterator i, T std::iterator_traits<Iterator>::value_type::* m)
-{
-    return mbr_iterator<Iterator, T>(i, m);
+    return boost::make_transform_iterator(i, mem_var_ref(m));
 }
     
-//! T型のメンバを持つオブジェクトを要素とするコンテナについてそのメンバにアクセス(R)する反復子を作る．
-template <class Iterator, class T> inline mbr_iterator<Iterator, const T>
-make_const_mbr_iterator(Iterator i,
-			const T std::iterator_traits<Iterator>::value_type::* m)
+//! S型のメンバ変数を持つT型オブジェクトへの反復子からそのメンバに直接アクセス(R)する反復子を作る．
+template <class Iterator, class S, class T>
+inline boost::transform_iterator<const_mem_var_ref_t<S, T>, Iterator>
+make_const_mbr_iterator(Iterator i, S const T::* m)
 {
-    return mbr_iterator<Iterator, const T>(i, m);
+    return boost::make_transform_iterator(i, mem_var_ref(m));
 }
 
-//! std::pairを要素とするコンテナについてpairの第1要素にアクセス(R/W)する反復子を作る．
+//! std::pairへの反復子からその第1要素に直接アクセス(R/W)する反復子を作る．
 /*!
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mbr_iterator<Iterator, typename std::iterator_traits<Iterator>
-					  ::value_type::first_type>
+inline boost::transform_iterator<
+    mem_var_ref_t<
+	typename std::iterator_traits<Iterator>::value_type::first_type,
+	typename std::iterator_traits<Iterator>::value_type>,
+    Iterator>
 make_first_iterator(Iterator i)
 {
-    return make_mbr_iterator(i, &std::iterator_traits<Iterator>
-				    ::value_type::first);
+    return make_mbr_iterator(
+		i, &std::iterator_traits<Iterator>::value_type::first);
 }
     
-//! std::pairを要素とするコンテナについてpairの第1要素にアクセス(R)する反復子を作る．
+//! std::pairへの反復子からその第1要素に直接アクセス(R)する反復子を作る．
 /*!
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mbr_iterator<Iterator, const typename std::iterator_traits<Iterator>
-						::value_type::first_type>
+inline boost::transform_iterator<
+    const_mem_var_ref_t<
+	typename std::iterator_traits<Iterator>::value_type::first_type,
+	typename std::iterator_traits<Iterator>::value_type>,
+    Iterator>
 make_const_first_iterator(Iterator i)
 {
-    return make_const_mbr_iterator(i, &std::iterator_traits<Iterator>
-					  ::value_type::first);
+    return make_const_mbr_iterator(
+		i, &std::iterator_traits<Iterator>::value_type::first);
 }
     
-//! std::pairを要素とするコンテナについてpairの第2要素にアクセス(R/W)する反復子を作る．
+//! std::pairへの反復子からその第2要素に直接アクセス(R/W)する反復子を作る．
 /*!
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mbr_iterator<Iterator, typename std::iterator_traits<Iterator>
-					  ::value_type::second_type>
+inline boost::transform_iterator<
+    mem_var_ref_t<typename std::iterator_traits<Iterator>::value_type
+							 ::second_type,
+		  typename std::iterator_traits<Iterator>::value_type>,
+    Iterator>
 make_second_iterator(Iterator i)
 {
-    return make_mbr_iterator(i, &std::iterator_traits<Iterator>
-				    ::value_type::second);
+    return make_mbr_iterator(
+		i, &std::iterator_traits<Iterator>::value_type::second);
 }
-
-//! std::pairを要素とするコンテナについてpairの第2要素にアクセス(R)する反復子を作る．
+    
+//! std::pairへの反復子からその第2要素に直接アクセス(R)する反復子を作る．
 /*!
   \param i	ベースとなる反復子
 */
 template <class Iterator>
-inline mbr_iterator<Iterator, const typename std::iterator_traits<Iterator>
-						::value_type::second_type>
+inline boost::transform_iterator<
+    const_mem_var_ref_t<
+	typename std::iterator_traits<Iterator>::value_type::second_type,
+	typename std::iterator_traits<Iterator>::value_type>,
+    Iterator>
 make_const_second_iterator(Iterator i)
 {
-    return make_const_mbr_iterator(i, &std::iterator_traits<Iterator>
-					  ::value_type::second);
+    return make_const_mbr_iterator(
+		i, &std::iterator_traits<Iterator>::value_type::second);
 }
     
 }

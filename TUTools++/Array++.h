@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.37 2012-06-06 07:58:08 ueshiba Exp $
+ *  $Id: Array++.h,v 1.38 2012-08-15 07:17:55 ueshiba Exp $
  */
 /*!
   \file		Array++.h
@@ -445,7 +445,7 @@ class FixedSizedBuf
 
   public:
     explicit FixedSizedBuf(u_int siz=D)				;
-    FixedSizedBuf(pointer p, u_int siz)				;
+    FixedSizedBuf(pointer, u_int)				;
     FixedSizedBuf(const FixedSizedBuf& b)			;
     FixedSizedBuf&	operator =(const FixedSizedBuf& b)	;
     
@@ -481,7 +481,7 @@ FixedSizedBuf<T, D>::FixedSizedBuf(u_int siz)
   \throw std::logic_error	Ç±ÇÃä÷êîÇ™åƒÇŒÇÍÇΩÇÁïKÇ∏ëóèo
 */
 template <class T, size_t D> inline
-FixedSizedBuf<T, D>::FixedSizedBuf(pointer p, u_int siz)
+FixedSizedBuf<T, D>::FixedSizedBuf(pointer, u_int)
 {
     throw std::logic_error("FixedSizedBuf<T, D>::FixedSizedBuf(pointer, u_int): cannot specify a pointer to external storage!!");
 }
@@ -656,7 +656,8 @@ class Array : public B
     const_reverse_iterator	rend()				const	;
 
     using		buf_type::size;
-
+    using		buf_type::resize;
+    
 			operator pointer()				;
   			operator const_pointer()		const	;
     u_int		dim()					const	;

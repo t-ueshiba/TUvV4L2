@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.35 2011-12-27 23:36:09 ueshiba Exp $
+ *  $Id: types.h,v 1.36 2012-08-15 07:17:55 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -143,7 +143,10 @@
   - #TU::pull_if(Iter, Iter, Pred)
   - #TU::diff(const T&, const T&)
   - #TU::op3x3(Iterator begin, Iterator end, OP op)
-  - #TU::mbr_iterator
+  - #TU::mem_var_t
+  - #TU::const_mem_var_t
+  - #TU::mem_var_ref_t
+  - #TU::const_mem_var_ref_t
   - #TU::skipl(std::istream&)
   - #TU::IOManip
   - #TU::IManip1
