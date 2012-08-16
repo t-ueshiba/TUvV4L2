@@ -1,5 +1,5 @@
 /*
- *  $Id: algorithm.h,v 1.1 2012-08-16 01:30:37 ueshiba Exp $
+ *  $Id: algorithm.h,v 1.2 2012-08-16 02:20:20 ueshiba Exp $
  */
 /*!
   \file		algorithm.h
@@ -9,6 +9,7 @@
 #define __TUalgorithm_h
 
 #include <algorithm>
+#include "TU/types.h"
 
 /*!
   \namespace	std
