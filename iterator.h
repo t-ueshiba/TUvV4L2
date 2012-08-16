@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: iterator.h,v 1.2 2012-08-16 04:00:42 ueshiba Exp $
+ *  $Id: iterator.h,v 1.3 2012-08-16 18:59:59 ueshiba Exp $
  */
 /*!
   \file		iterator.h
@@ -129,13 +129,14 @@ make_const_second_iterator(Iterator i)
 */
 template <class Iterator>
 class box_filter_iterator
-    : public std::iterator<std::input_iterator_tag,
-			   typename std::iterator_traits<Iterator>::value_type>
+    : public std::iterator<
+		std::input_iterator_tag,
+		typename std::iterator_traits<Iterator>::value_type>
 {
   private:
-    typedef std::iterator<std::input_iterator_tag,
-			  typename std::iterator_traits<Iterator>::value_type>
-							super;
+    typedef std::iterator<
+		std::input_iterator_tag,
+		typename std::iterator_traits<Iterator>::value_type> super;
     
   public:
     typedef typename super::difference_type		difference_type;
@@ -207,6 +208,17 @@ class box_filter_iterator
     mutable bool	_valid;	//!< _val ‚ª [_head, _tail] ‚Ì‘˜a‚È‚çtrue
     mutable value_type	_val;	//!< [_head, _tail) ‚Ü‚½‚Í [_head, _tail] ‚Ì‘˜a
 };
+
+//! box filter”½•œŽq‚ð¶¬‚·‚é
+/*!
+  \param iter	ƒRƒ“ƒeƒi’†‚Ì—v‘f‚ðŽw‚·’è””½•œŽq‚ÌŒ^
+  \return	box filter”½•œŽq
+*/
+template <class Iterator> box_filter_iterator<Iterator>
+make_box_filter_iterator(Iterator iter)
+{
+    return box_filter_iterator<Iterator>(iter);
+}
 
 }
 #endif

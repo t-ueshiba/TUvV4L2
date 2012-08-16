@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BoxFilter.h,v 1.3 2012-08-16 04:00:42 ueshiba Exp $
+ *  $Id: BoxFilter.h,v 1.4 2012-08-16 18:59:59 ueshiba Exp $
  */
 /*!
   \file		BoxFilter.h
@@ -45,17 +45,6 @@ namespace TU
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! box filter反復子を生成する
-/*!
-  \param iter	コンテナ中の要素を指す定数反復子の型
-  \return	box filter反復子
-*/
-template <class Iterator> box_filter_iterator<Iterator>
-make_box_filter_iterator(Iterator iter)
-{
-    return box_filter_iterator<Iterator>(iter);
-}
-
 //! 1次元入力データ列にbox filterを適用する
 /*!
   \param ib	1次元入力データ列の先頭を示す反復子
