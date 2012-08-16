@@ -1,8 +1,9 @@
 /*
- *  $Id: GuidedFilter.h,v 1.2 2012-07-23 00:52:02 ueshiba Exp $
+ *  $Id: GuidedFilter.h,v 1.3 2012-08-16 01:30:37 ueshiba Exp $
  */
 #include "TU/BoxFilter.h"
 #include "TU/Array++.h"
+#include "TU/functional.h"
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/function_output_iterator.hpp>

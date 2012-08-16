@@ -1,5 +1,5 @@
 /*
- *  $Id: types.h,v 1.36 2012-08-15 07:17:55 ueshiba Exp $
+ *  $Id: types.h,v 1.37 2012-08-16 01:30:37 ueshiba Exp $
  */
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
@@ -110,8 +110,8 @@
   
   <b>画像に限らない信号処理</b>
   - #TU::IIRFilter
-  - #TU::BilateralIIRFilter
-  - #TU::BilateralIIRFilter2
+  - #TU::BidirectionalIIRFilter
+  - #TU::BidirectionalIIRFilter2
   - #TU::DericheConvolver
   - #TU::DericheConvolver2
   - #TU::GaussianConvolver
@@ -135,7 +135,7 @@
   <b>メッシュ</b>
   - #TU::Mesh
 
-  <b>標準ライブラリの補強</b>
+  <b>アルゴリズム</b>
   - #std::min(const T&, const T&, const T&)
   - #std::min(const T&, const T&, const T&, const T&)
   - #std::max(const T&, const T&, const T&)
@@ -143,10 +143,29 @@
   - #TU::pull_if(Iter, Iter, Pred)
   - #TU::diff(const T&, const T&)
   - #TU::op3x3(Iterator begin, Iterator end, OP op)
+  - #TU::max3x3(P p, P q, P r)
+  - #TU::min3x3(P p, P q, P r)
+  - #TU::mopOpen(Iterator begin, Iterator end, u_int niter)
+  - #TU::mopClose(Iterator begin, Iterator end, u_int niter)
+
+  <b>関数オブジェクト</b>
+  - #TU::unarize
+  - #TU::seq_transform
   - #TU::mem_var_t
   - #TU::const_mem_var_t
   - #TU::mem_var_ref_t
   - #TU::const_mem_var_ref_t
+
+  <b>反復子</b>
+  - #TU::make_mbr_iterator(Iterator i, S T::* m)
+  - #TU::make_const_mbr_iterator(Iterator i, S T::* m)
+  - #TU::make_first_iterator(Iterator i)
+  - #TU::make_const_first_iterator(Iterator i)
+  - #TU::make_second_iterator(Iterator i)
+  - #TU::make_const_second_iterator(Iterator i)
+  - #TU::box_filter_iterator
+  
+  <b>マニピュレータ</b>
   - #TU::skipl(std::istream&)
   - #TU::IOManip
   - #TU::IManip1

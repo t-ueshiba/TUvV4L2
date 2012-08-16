@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.28 2012-08-15 07:58:34 ueshiba Exp $
+#  $Id: Makefile,v 1.29 2012-08-16 01:31:04 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I../../
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= iirfprof
 LIBS		= -lTUTools++ -ltbb
@@ -36,19 +36,19 @@ LINKER		= $(CCC)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC
-EXTHDRS		= ../../TU/DericheConvolver.h \
-		../../TU/GaussianConvolver.h \
-		../../TU/Image++.h \
-		../../TU/Profiler.h \
-		../../TU/TU/Geometry++.h \
-		../../TU/TU/IIRFilter.h \
-		../../TU/TU/TU/Minimize.h \
-		../../TU/TU/TU/TU/Array++.h \
-		../../TU/TU/TU/TU/TU/types.h \
-		../../TU/TU/TU/Vector++.h \
-		../../TU/TU/TU/mmInstructions.h \
-		../../TU/TU/TU/utility.h \
-		../../TU/windows/fakeWindows.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/DericheConvolver.h \
+		/usr/local/include/TU/GaussianConvolver.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/IIRFilter.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Minimize.h \
+		/usr/local/include/TU/Profiler.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -56,7 +56,7 @@ OBJS		= main.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.28 $	|		\
+REV		= $(shell echo $Revision: 1.29 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -68,10 +68,12 @@ REV		= $(shell echo $Revision: 1.28 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: ../../TU/Image++.h ../../TU/TU/Geometry++.h \
-	../../TU/TU/TU/utility.h ../../TU/TU/TU/Vector++.h \
-	../../TU/TU/TU/TU/Array++.h ../../TU/TU/TU/TU/TU/types.h \
-	../../TU/TU/TU/Minimize.h ../../TU/DericheConvolver.h \
-	../../TU/TU/IIRFilter.h ../../TU/TU/TU/mmInstructions.h \
-	../../TU/GaussianConvolver.h ../../TU/Profiler.h \
-	../../TU/windows/fakeWindows.h
+main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/DericheConvolver.h \
+	/usr/local/include/TU/IIRFilter.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/GaussianConvolver.h \
+	/usr/local/include/TU/Profiler.h

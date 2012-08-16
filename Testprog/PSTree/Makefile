@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.11 2012-08-15 07:58:34 ueshiba Exp $
+#  $Id: Makefile,v 1.12 2012-08-16 01:31:07 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -28,8 +28,9 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/PSTree.h \
 		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= pstreetest.cc
 OBJS		= pstreetest.o
@@ -37,7 +38,7 @@ OBJS		= pstreetest.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.11 $	|		\
+REV		= $(shell echo $Revision: 1.12 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -50,7 +51,8 @@ include $(PROJECT)/lib/p.mk
 include $(PROJECT)/lib/RCS.mk
 ###
 pstreetest.o: /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/PSTree.h \
-	/usr/local/include/TU/Heap.h /usr/local/include/TU/List.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/PSTree.h /usr/local/include/TU/Heap.h \
+	/usr/local/include/TU/List.h
