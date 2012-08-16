@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.43 2012-01-18 23:18:22 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.44 2012-08-16 01:30:37 ueshiba Exp $
  */
 /*!
   \file		Geometry++.h
@@ -34,7 +34,7 @@
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
 
-#include "TU/utility.h"
+#include "TU/iterator.h"
 #include "TU/Vector++.h"
 #include "TU/Minimize.h"
 #include <limits>

@@ -1,5 +1,5 @@
 /*
- *  $Id: BoxFilter.h,v 1.1 2012-07-23 00:45:40 ueshiba Exp $
+ *  $Id: BoxFilter.h,v 1.2 2012-08-16 01:30:37 ueshiba Exp $
  */
 /*!
   \file		BoxFilter.h
@@ -8,9 +8,7 @@
 #ifndef	__TUBoxFilter_h
 #define	__TUBoxFilter_h
 
-#include <iterator>
-#include <algorithm>
-#include <boost/tuple/tuple.hpp>
+#include "TU/iterator.h"
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>
@@ -18,157 +16,6 @@
 
 namespace TU
 {
-/************************************************************************
-*  class unarize							*
-************************************************************************/
-//! 2変数関数を2つの引数のtupleを引数とする1変数関数に直す関数オブジェクト
-/*!
-  \param OP	2変数関数オブジェクトの型
-*/
-template <class OP>
-class unarize
-{
-  public:
-    typedef typename OP::result_type				result_type;
-
-    unarize(const OP& op=OP())	:_op(op)			{}
-    
-    template <class TUPLE>
-    result_type	operator ()(const TUPLE& t) const
-		{
-		    return _op(boost::get<0>(t), boost::get<1>(t));
-		}
-
-  private:
-    const OP	_op;
-};
-
-/************************************************************************
-*  class seq_transform							*
-************************************************************************/
-//! 1または2組のデータ列の各要素に対して1または2変数関数を適用して1組のデータ列を出力する関数オブジェクト
-/*!
-  \param RESULT	変換された要素を出力するデータ列の型
-  \param OP	個々の要素に適用される1変数/2変数関数オブジェクトの型
-*/
-template <class RESULT, class OP>
-class seq_transform
-{
-  public:
-    typedef const RESULT&					result_type;
-
-    seq_transform(const OP& op=OP())	:_op(op), _result()	{}
-
-    template <class ARG>
-    result_type	operator ()(const ARG& x) const
-		{
-		    _result.resize(x.size());
-		    std::transform(x.begin(), x.end(), _result.begin(), _op);
-		    return _result;
-		}
-    
-    template <class ARG0, class ARG1>
-    result_type	operator ()(const ARG0& x, const ARG1& y) const
-		{
-		    _result.resize(x.size());
-		    std::transform(x.begin(), x.end(), y.begin(),
-				   _result.begin(), _op);
-		    return _result;
-		}
-    
-  private:
-    const OP		_op;
-    mutable RESULT	_result;
-};
-
-/************************************************************************
-*  class box_filter_iterator						*
-************************************************************************/
-//! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
-/*!
-  \param Iterator	コンテナ中の要素を指す定数反復子の型
-*/
-template <class Iterator>
-class box_filter_iterator
-    : public std::iterator<std::input_iterator_tag,
-			   typename std::iterator_traits<Iterator>::value_type>
-{
-  private:
-    typedef std::iterator<std::input_iterator_tag,
-			  typename std::iterator_traits<Iterator>::value_type>
-							super;
-    
-  public:
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::value_type			value_type;
-    typedef typename super::reference			reference;
-    typedef typename super::pointer			pointer;
-
-  public:
-			box_filter_iterator(Iterator i, size_t w=0)
-			    :_head(i), _tail(_head), _valid(true), _val()
-			{
-			    if (w > 0)
-			    {
-				_val = *_tail;
-				
-				while (--w > 0)
-				    _val += *++_tail;
-			    }
-			}
-
-    reference		operator *() const
-			{
-			    if (!_valid)
-			    {
-				_val += *_tail;
-				_valid = true;
-			    }
-			    return _val;
-			}
-    
-    const pointer	operator ->() const
-			{
-			    return &operator *();
-			}
-    
-    box_filter_iterator&
-			operator ++()
-			{
-			    _val -= *_head;
-			    if (!_valid)
-				_val += *_tail;
-			    else
-				_valid = false;
-			    ++_head;
-			    ++_tail;
-			    return *this;
-			}
-    
-    box_filter_iterator	operator ++(int)
-			{
-			    box_filter_iterator	tmp = *this;
-			    operator ++();
-			    return tmp;
-			}
-    
-    bool		operator ==(const box_filter_iterator& a) const
-			{
-			    return _head == a._head;
-			}
-    
-    bool		operator !=(const box_filter_iterator& a) const
-			{
-			    return !operator ==(a);
-			}
-
-  private:
-    Iterator		_head;
-    Iterator		_tail;
-    mutable bool	_valid;	//!< _val が [_head, _tail] の総和ならtrue
-    mutable value_type	_val;	//!< [_head, _tail) または [_head, _tail] の総和
-};
-
 /************************************************************************
 *  global functions							*
 ************************************************************************/

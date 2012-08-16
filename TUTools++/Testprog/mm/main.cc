@@ -1,4 +1,7 @@
-#include "mmInstructions.h"
+/*
+ *  $Id: main.cc,v 1.2 2012-08-16 01:31:15 ueshiba Exp $
+ */
+#include "TU/mmInstructions.h"
 
 int
 main()

@@ -1,12 +1,12 @@
 #
-#  $Id: Makefile,v 1.107 2012-08-15 07:17:55 ueshiba Exp $
+#  $Id: Makefile,v 1.108 2012-08-16 01:30:37 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include/TU
-INCDIRS		= -I.
+INCDIRS		=
 
 NAME		= $(shell basename $(PWD))
 
@@ -49,9 +49,10 @@ EXTHDRS		= TU/BlockDiagonalMatrix++.h \
 		TU/TU/Serial.h \
 		TU/TU/TU/Array++.h \
 		TU/TU/TU/Minimize.h \
+		TU/TU/TU/TU/functional.h \
 		TU/TU/TU/TU/types.h \
 		TU/TU/TU/fdstream.h \
-		TU/TU/TU/utility.h \
+		TU/TU/TU/iterator.h \
 		TU/TU/Vector++.h \
 		TU/TriggerGenerator.h \
 		TU/Warp.h \
@@ -93,11 +94,13 @@ HDRS		= Array++.h \
 		TriggerGenerator.h \
 		Vector++.h \
 		Warp.h \
+		algorithm.h \
 		fdstream.h \
+		functional.h \
 		io.h \
+		iterator.h \
 		mmInstructions.h \
-		types.h \
-		utility.h
+		types.h
 SRCS		= BlockDiagonalMatrix++.inst.cc \
 		ConversionFromYUV.cc \
 		CorrectIntensity.cc \
@@ -142,7 +145,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.107 $	|		\
+REV		= $(shell echo $Revision: 1.108 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -155,30 +158,32 @@ include $(PROJECT)/lib/l.mk
 ###
 BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
+ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
+	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
 CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/TU/utility.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h TU/mmInstructions.h
+	TU/TU/TU/iterator.h TU/TU/TU/TU/functional.h TU/TU/Vector++.h \
+	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h \
+	TU/mmInstructions.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/TU/utility.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h TU/mmInstructions.h
+	TU/TU/TU/iterator.h TU/TU/TU/TU/functional.h TU/TU/Vector++.h \
+	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h \
+	TU/mmInstructions.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/TU/Vector++.h \
 	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/IIRFilter.h \
 	TU/mmInstructions.h TU/TU/TU/Minimize.h
-GenericImage.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
-Image++.inst.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
-ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h TU/Camera++.h TU/Manip.h
-ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h
+GenericImage.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
+	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
+Image++.inst.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
+	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
+ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
+	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h TU/Camera++.h TU/Manip.h
+ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
+	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
 PM16C_04.o: TU/PM16C_04.h TU/TU/Serial.h TU/TU/TU/fdstream.h \
 	TU/TU/TU/TU/types.h TU/Manip.h
 Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
@@ -190,9 +195,10 @@ Serial.o: TU/TU/Serial.h TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/TU/Serial.h \
 	TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h TU/Manip.h
 Vector++.inst.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h TU/Camera++.h TU/mmInstructions.h
+Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
+	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
+	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h TU/Camera++.h \
+	TU/mmInstructions.h
 fdstream.o: TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h
 io.o: TU/io.h
 manipulators.o: TU/Manip.h TU/TU/TU/TU/types.h

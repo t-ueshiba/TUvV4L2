@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Nurbs++.h,v 1.19 2012-08-15 07:58:19 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.20 2012-08-16 01:30:37 ueshiba Exp $
  */
 /*!
   \file		Nurbs++.h
@@ -34,9 +34,7 @@
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
 
-#include <algorithm>
 #include "TU/Vector++.h"
-#include "TU/utility.h"
 
 namespace TU
 {
