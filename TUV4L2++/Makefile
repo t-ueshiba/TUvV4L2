@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.2 2012-06-19 05:57:19 ueshiba Exp $
+#  $Id: Makefile,v 1.3 2012-08-16 02:39:25 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -38,8 +38,9 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h \
 		TU/V4L2++.h
 HDRS		= V4L2++.h
 SRCS		= V4L2Camera.cc
@@ -48,7 +49,7 @@ OBJS		= V4L2Camera.o
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.2 $	|		\
+REV		= $(shell echo $Revision: 1.3 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -60,6 +61,7 @@ REV		= $(shell echo $Revision: 1.2 $	|		\
 include $(PROJECT)/lib/l.mk
 ###
 V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/utility.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Minimize.h
