@@ -1,5 +1,5 @@
 /*
- *  $Id: Brep++.h,v 1.2 2002-07-25 02:37:35 ueshiba Exp $
+ *  $Id: Brep++.h,v 1.3 2012-08-29 21:16:44 ueshiba Exp $
  */
 #ifndef __TUBrepPP_h
 #define __TUBrepPP_h

@@ -1,46 +1,40 @@
 #
-#  $Id: Makefile,v 1.25 2011-07-21 23:40:50 ueshiba Exp $
+#  $Id: Makefile,v 1.26 2012-08-29 21:16:44 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include/TU/Brep
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	= -DTUBrepPP_DEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CCC), icpc)
+ifeq ($(CXX), icpc)
   CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2�ʾ�ˤ���ȥ���ѥ��륨�顼�ˤʤ롥
-  ifeq ($(OSTYPE), darwin)
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  else
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  endif
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#
 #########################
 .SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Object++.cc \
 		/usr/local/include/TU/Object++.h \
 		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h \
 		TU/Brep/Brep++.h
 HDRS		= Brep++.h
 SRCS		= Geometry.cc \
@@ -58,46 +52,40 @@ OBJS		= Geometry.o \
 		TUBrep++.inst.o \
 		TUBrep++.sa.o
 
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.25 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
-
 include $(PROJECT)/lib/l.mk
 ###
 Geometry.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h
 HalfEdge.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h
 Loop.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h
 Neighbor.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h
 PointB.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h
 TUBrep++.inst.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/Object++.cc
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h
 TUBrep++.sa.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/Minimize.h
