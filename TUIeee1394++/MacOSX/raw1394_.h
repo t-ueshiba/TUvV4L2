@@ -19,11 +19,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.13 2012-06-30 20:00:33 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.14 2012-08-29 19:33:23 ueshiba Exp $
  */
 /*!
   \file		raw1394_.h
-  \brief	::raw1394 $B9=B$BN$NDj5A$H<BAu(B
+  \brief	::raw1394 構造体の定義と実装
 */ 
 #include "raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
@@ -32,7 +32,7 @@
 /************************************************************************
 *  struct raw1394							*
 ************************************************************************/
-//! IEEE1394$B%G%P%$%9$X$N(Blibraw1394$B$K8_49$J%"%/%;%9$r(BMacOS X$B>e$GDs6!$9$k9=B$BN(B
+//! IEEE1394デバイスへのlibraw1394に互換なアクセスをMacOS X上で提供する構造体
 struct raw1394
 {
   private:
@@ -139,9 +139,9 @@ struct raw1394
     void*				_userData;
 };
 
-//! ::raw1394 $B9=B$BN$K%f!<%6$,;XDj$7$?%G!<%?$X$N%]%$%s%?$rE=IU$1$k(B
+//! ::raw1394 構造体にユーザが指定したデータへのポインタを貼付ける
 /*!
-  \param data	$BE=IU$1$?$$%G!<%?$X$N%]%$%s%?(B
+  \param data	貼付けたいデータへのポインタ
 */
 inline void
 raw1394::setUserData(void* data)
@@ -149,9 +149,9 @@ raw1394::setUserData(void* data)
     _userData = data;
 }
     
-//! $B$3$N(B ::raw1394 $B9=B$BN$KE=IU$1$?%G!<%?$X$N%]%$%s%?$rF@$k(B
+//! この ::raw1394 構造体に貼付けたデータへのポインタを得る
 /*!
-  \return	$BE=IU$1$?%G!<%?$X$N%]%$%s%?(B
+  \return	貼付けたデータへのポインタ
 */
 inline void*
 raw1394::getUserData() const
@@ -159,13 +159,13 @@ raw1394::getUserData() const
     return _userData;
 }
 
-//! $B;XDj$7$?(BFireWire$B%"%I%l%9$+$iG$0U%P%$%H?t$N%G!<%?$r(Basynchronous$BE>Aw$GFI$_9~$`(B
+//! 指定したFireWireアドレスから任意バイト数のデータをasynchronous転送で読み込む
 /*!
-  \param addr	$BFI$_9~$_85$N(BFireWire$B%"%I%l%9(B
-  \param buf	$BFI$_9~$_@h$N%P%C%U%!%"%I%l%9(B
-  \param size	$BFI$_9~$_%G!<%?$N%P%$%H?t(B
-  \return	$BFI$_9~$_$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-		$B%(%i!<$N860x$r<($9%3!<%I(B
+  \param addr	読み込み元のFireWireアドレス
+  \param buf	読み込み先のバッファアドレス
+  \param size	読み込みデータのバイト数
+  \return	読み込みが成功すればkIOReturnSuccess, そうでなければ
+		エラーの原因を示すコード
 */
 inline IOReturn
 raw1394::read(const FWAddress& addr, void* buf, UInt32 size) const
@@ -176,12 +176,12 @@ raw1394::read(const FWAddress& addr, void* buf, UInt32 size) const
 	       &addr, buf, &size, kFWDontFailOnReset, 0);
 }
 
-//! $B;XDj$7$?(BFireWire$B%"%I%l%9$+$i(B4$B%P%$%H$N%G!<%?$r(Basynchronous$BE>Aw$GFI$_9~$`(B
+//! 指定したFireWireアドレスから4バイトのデータをasynchronous転送で読み込む
 /*!
-  \param addr	$BFI$_9~$_85$N(BFireWire$B%"%I%l%9(B
-  \param quad	$BFI$_9~$_@h$N%"%I%l%9(B
-  \return	$BFI$_9~$_$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-		$B%(%i!<$N860x$r<($9%3!<%I(B
+  \param addr	読み込み元のFireWireアドレス
+  \param quad	読み込み先のアドレス
+  \return	読み込みが成功すればkIOReturnSuccess, そうでなければ
+		エラーの原因を示すコード
 */
 inline IOReturn
 raw1394::readQuadlet(const FWAddress& addr, UInt32* quad) const
@@ -192,13 +192,13 @@ raw1394::readQuadlet(const FWAddress& addr, UInt32* quad) const
 		      &addr, quad, kFWDontFailOnReset, 0);
 }
 
-//! $B;XDj$7$?(BFireWire$B%"%I%l%9$KG$0U%P%$%H?t$N%G!<%?$r(Basynchronous$BE>Aw$G=q$-9~$`(B
+//! 指定したFireWireアドレスに任意バイト数のデータをasynchronous転送で書き込む
 /*!
-  \param addr	$B=q$-9~$_@h$N(BFireWire$B%"%I%l%9(B
-  \param buf	$B=q$-9~$_85$N%P%C%U%!%"%I%l%9(B
-  \param size	$B=q$-9~$_%G!<%?$N%P%$%H?t(B
-  \return	$B=q$-9~$_$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-		$B%(%i!<$N860x$r<($9%3!<%I(B
+  \param addr	書き込み先のFireWireアドレス
+  \param buf	書き込み元のバッファアドレス
+  \param size	書き込みデータのバイト数
+  \return	書き込みが成功すればkIOReturnSuccess, そうでなければ
+		エラーの原因を示すコード
 */
 inline IOReturn
 raw1394::write(const FWAddress& addr, const void* buf, UInt32 size) const
@@ -209,12 +209,12 @@ raw1394::write(const FWAddress& addr, const void* buf, UInt32 size) const
 		&addr, buf, &size, kFWDontFailOnReset, 0);
 }
 	       
-//! $B;XDj$7$?(BFireWire$B%"%I%l%9$K(B4$B%P%$%H$N%G!<%?$r(Basynchronous$BE>Aw$G=q$-9~$`(B
+//! 指定したFireWireアドレスに4バイトのデータをasynchronous転送で書き込む
 /*!
-  \param addr	$B=q$-9~$_@h$N(BFireWire$B%"%I%l%9(B
-  \param quad	$B=q$-9~$`%G!<%?(B
-  \return	$B=q$-9~$_$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-		$B%(%i!<$N860x$r<($9%3!<%I(B
+  \param addr	書き込み先のFireWireアドレス
+  \param quad	書き込むデータ
+  \return	書き込みが成功すればkIOReturnSuccess, そうでなければ
+		エラーの原因を示すコード
 */
 inline IOReturn
 raw1394::writeQuadlet(const FWAddress& addr, UInt32 quad) const
@@ -225,10 +225,10 @@ raw1394::writeQuadlet(const FWAddress& addr, UInt32 quad) const
 		       &addr, quad, kFWDontFailOnReset, 0);
 }
 
-//! isochronous$B<u?.$r3+;O$9$k(B
+//! isochronous受信を開始する
 /*!
-  \return	$B3+;O$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-		$B%(%i!<$N860x$r<($9%3!<%I(B
+  \return	開始が成功すればkIOReturnSuccess, そうでなければ
+		エラーの原因を示すコード
 */
 inline IOReturn
 raw1394::isoRecvStart()
@@ -236,10 +236,10 @@ raw1394::isoRecvStart()
     return (*_isochChannel)->Start(_isochChannel);
 }
     
-//! isochronous$B<u?.$rDd;_$9$k(B
+//! isochronous受信を停止する
 /*!
-  \return	$BDd;_$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-		$B%(%i!<$N860x$r<($9%3!<%I(B
+  \return	停止が成功すればkIOReturnSuccess, そうでなければ
+		エラーの原因を示すコード
 */
 inline IOReturn
 raw1394::isoStop()

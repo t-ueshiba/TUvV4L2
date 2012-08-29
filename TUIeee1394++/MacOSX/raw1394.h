@@ -1,11 +1,11 @@
 /*
- *  $Id: raw1394.h,v 1.14 2012-06-29 09:06:03 ueshiba Exp $
+ *  $Id: raw1394.h,v 1.15 2012-08-29 19:33:23 ueshiba Exp $
  */
 /*!
-  \mainpage	libraw1394 - Linux$B>e$N(Blibraw1394$B$K8_49$J5!G=$r(BMacOS X$B>e$GDs6!$9$k%(%_%e%l!<%7%g%s%i%$%V%i%j(B
+  \mainpage	libraw1394 - Linux上のlibraw1394に互換な機能をMacOS X上で提供するエミュレーションライブラリ
   \anchor	libraw1394
 
-  \section copyright $BCx:n8"(B
+  \section copyright 著作権
   Copyright (C) 2003-2006 Toshio UESHIBA
   National Institute of Advanced Industrial Science and Technology (AIST)
  
@@ -26,8 +26,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
   USA
 
-  \section functions $B5!G=(B
-  $B<!$N%$%s%?%U%'!<%9$rDs6!$7$F$$$k(B. 
+  \section functions 機能
+  次のインタフェースを提供している. 
   - raw1394_new_handle()
   - raw1394_destroy_handle()
   - raw1394_set_userdata()
@@ -44,7 +44,7 @@
   - raw1394_read_cycle_timer()
   
   \file		raw1394.h
-  \brief	$B%0%m!<%P%k$JL>A06u4V$KCV$+$l$?(BC$B8~$1$N7?Dj5A$H%$%s%?%U%'!<%9(B
+  \brief	グローバルな名前空間に置かれたC向けの型定義とインタフェース
 */
 #ifndef _LIBRAW1394_RAW1394_H
 #define _LIBRAW1394_RAW1394_H
@@ -57,51 +57,51 @@ extern "C" {
 /************************************************************************
 *  type definitions							*
 ************************************************************************/
-/*! ::raw1394 $B9=B$BN$X$N%O%s%I%k(B */
+/*! ::raw1394 構造体へのハンドル */
 typedef struct raw1394*		raw1394handle_t;
 
-typedef u_int16_t		nodeid_t;	//!< $B%N!<%I$N(BID
-typedef u_int64_t		nodeaddr_t;	//!< $B%N!<%I$N(BFireWire$B%"%I%l%9(B
+typedef u_int16_t		nodeid_t;	//!< ノードのID
+typedef u_int64_t		nodeaddr_t;	//!< ノードのFireWireアドレス
 
-/*! asynchronous$BE>Aw%G!<%?$NC10L(B(4 bytes) */
+/*! asynchronous転送データの単位(4 bytes) */
 typedef u_int32_t		quadlet_t;
 
-/*! ishochronous$BAw(B/$B<u?.%O%s%I%i$N=*N;>uBV$rI=$7(B, $B$5$i$K$3$l$r8F$s$@(B
-    raw1394_loop_iterate() $B$K$I$N$h$&$J=hM}$r$5$;$k$+$r;XDj$9$k%3!<%I(B
+/*! ishochronous送/受信ハンドラの終了状態を表し, さらにこれを呼んだ
+    raw1394_loop_iterate() にどのような処理をさせるかを指定するコード
 */
 enum raw1394_iso_disposition
 {
-  /*! $B%O%s%I%i$O@5>o$K=*N;(B, $B<!$N%Q%1%C%H$r=hM}(B. */
+  /*! ハンドラは正常に終了, 次のパケットを処理. */
     RAW1394_ISO_OK		= 0,
-  /*! $B%O%s%I%i$O@5>o$K=*N;(B, #raw1394_loop_iterate() $B$+$iD>$A$K%j%?!<%s(B */
+  /*! ハンドラは正常に終了, #raw1394_loop_iterate() から直ちにリターン */
     RAW1394_ISO_DEFER		= 1,
-  /*! $B%O%s%I%i$K%(%i!<$,H/@8(B, #raw1394_loop_iterate() $B$+$iD>$A$K%j%?!<%s(B */
+  /*! ハンドラにエラーが発生, #raw1394_loop_iterate() から直ちにリターン */
     RAW1394_ISO_ERROR		= 2,
-  /*! #raw1394_loop_iterate() $B$+$iD>$A$K%j%?!<%s$7$F(Bisochronous$B<u?.$rDd;_(B */
+  /*! #raw1394_loop_iterate() から直ちにリターンしてisochronous受信を停止 */
     RAW1394_ISO_STOP		= 3,
-  /*! (isochronous$BAw?.;~$N$_;HMQ(B) */
+  /*! (isochronous送信時のみ使用) */
     RAW1394_ISO_STOP_NOSYNC	= 4,
-  /*! (isochronous$BAw?.;~$N$_;HMQ(B) */
+  /*! (isochronous送信時のみ使用) */
     RAW1394_ISO_AGAIN		= 5
 };
 
-/*! isochronous$B<u?.$N%b!<%I(B */    
+/*! isochronous受信のモード */    
 enum raw1394_iso_dma_recv_mode
 {
-    RAW1394_DMA_DEFAULT		  = -1,	/*!< $B%G%U%)%k%H%b!<%I(B */
-    RAW1394_DMA_BUFFERFILL	  =  1,	/*!< BUFFER_FILL$B%b!<%I(B */
-    RAW1394_DMA_PACKET_PER_BUFFER =  2	/*!< PACKET_PER_BUFFER$B%b!<%I(B */
+    RAW1394_DMA_DEFAULT		  = -1,	/*!< デフォルトモード */
+    RAW1394_DMA_BUFFERFILL	  =  1,	/*!< BUFFER_FILLモード */
+    RAW1394_DMA_PACKET_PER_BUFFER =  2	/*!< PACKET_PER_BUFFERモード */
 };
 
-/*! $B%+!<%M%k$,<u?.$7$?3F%Q%1%C%H$KBP$7$F<B9T$5$l$k%O%s%I%i(B
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \param data		$B%Q%1%C%HCf$N%G!<%?$X$N%]%$%s%?(B($B%X%C%@4^$^$:(B)
-  \param len		$B%Q%1%C%HCf$N%G!<%?$N%P%$%H?t(B($B%X%C%@4^$^$:(B)
-  \param channel	isochronous$B<u?.$N%A%c%s%M%k(B
-  \param tag		$B%Q%1%C%H$N%X%C%@Cf$N(Btag$B%S%C%H(B
-  \param sy		$B%Q%1%C%H$N%X%C%@Cf$N(Bsy$B%S%C%H(B
-  \param cycle		$B%Q%1%C%H$N(Bcycle$BHV9f(B
-  \param dropped	$B$H$j$3$\$7$?%Q%1%C%H?t(B
+/*! カーネルが受信した各パケットに対して実行されるハンドラ
+  \param handle		::raw1394 構造体へのハンドル
+  \param data		パケット中のデータへのポインタ(ヘッダ含まず)
+  \param len		パケット中のデータのバイト数(ヘッダ含まず)
+  \param channel	isochronous受信のチャンネル
+  \param tag		パケットのヘッダ中のtagビット
+  \param sy		パケットのヘッダ中のsyビット
+  \param cycle		パケットのcycle番号
+  \param dropped	とりこぼしたパケット数
   \return
 */
 typedef raw1394_iso_disposition	(*raw1394_iso_recv_handler_t)(
@@ -117,86 +117,86 @@ typedef raw1394_iso_disposition	(*raw1394_iso_recv_handler_t)(
 /************************************************************************
 *  wrapper C functions							*
 ************************************************************************/
-//! IEEE1394$B%$%s%?!<%U%'!<%9$G$"$k(B ::raw1394 $B9=B$BN$r@8@.$9$k(B
+//! IEEE1394インターフェースである ::raw1394 構造体を生成する
 /*!
-  \param unit_spec_ID	$B$3$N9=B$BN$,I=$9(BIEEE1394$B%N!<%I$N<oN`$r<($9(BID
-  \param uniqId		$B8D!9$N5!4o8GM-$N(B64bit ID
-  \return		$B@8@.$5$l$?(B ::raw1394 $B9=B$BN$X$N%O%s%I%k(B
+  \param unit_spec_ID	この構造体が表すIEEE1394ノードの種類を示すID
+  \param uniqId		個々の機器固有の64bit ID
+  \return		生成された ::raw1394 構造体へのハンドル
 */
 raw1394handle_t
 	raw1394_new_handle(u_int32_t unit_spec_ID, u_int64_t uniqId);
 
-//! IEEE1394$B%$%s%?!<%U%'!<%9$G$"$k(B ::raw1394 $B9=B$BN$rGK2u$9$k(B
+//! IEEE1394インターフェースである ::raw1394 構造体を破壊する
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
+  \param handle		::raw1394 構造体へのハンドル
 */
 void	raw1394_destroy_handle(raw1394handle_t handle);
 
-//! ::raw1394 $B9=B$BN$K%f!<%6$,;XDj$7$?%G!<%?$X$N%]%$%s%?$rE=IU$1$k(B
+//! ::raw1394 構造体にユーザが指定したデータへのポインタを貼付ける
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \param data		$BE=IU$1$?$$%G!<%?$X$N%]%$%s%?(B
+  \param handle		::raw1394 構造体へのハンドル
+  \param data		貼付けたいデータへのポインタ
 */
 void	raw1394_set_userdata(raw1394handle_t handle, void* data);
 
-//! ::raw1394 $B9=B$BN$KE=IU$1$?%G!<%?$X$N%]%$%s%?$rF@$k(B
+//! ::raw1394 構造体に貼付けたデータへのポインタを得る
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \return		$BE=IU$1$?%G!<%?$X$N%]%$%s%?(B
+  \param handle		::raw1394 構造体へのハンドル
+  \return		貼付けたデータへのポインタ
 */
 void*	raw1394_get_userdata(raw1394handle_t handle);
 
-//! ::raw1394 $B9=B$BN$,I=$9%N!<%I$N%3%^%s%I%l%8%9%?$N%Y!<%9%"%I%l%9$rJV$9(B
+//! ::raw1394 構造体が表すノードのコマンドレジスタのベースアドレスを返す
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \return		$B%3%^%s%I%l%8%9%?$N%Y!<%9%"%I%l%9(B
+  \param handle		::raw1394 構造体へのハンドル
+  \return		コマンドレジスタのベースアドレス
 */
 nodeaddr_t
 	raw1394_command_register_base(raw1394handle_t handle);
 
-//! $B;XDj$7$?(BFireWire$B%"%I%l%9$+$iG$0U%P%$%H?t$N%G!<%?$r(Basynchronous$BE>Aw$GFI$_9~$`(B
+//! 指定したFireWireアドレスから任意バイト数のデータをasynchronous転送で読み込む
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \param node		($B%@%_!<0z?t(B)
-  \param addr		$BFI$_9~$_85$N(BFireWire$B%"%I%l%9(B
-  \param length		$BFI$_9~$_%G!<%?$N%P%$%H?t(B
-  \param quad		$BFI$_9~$_@h$N%P%C%U%!%"%I%l%9(B
-  \return		$BFI$_9~$_$,@.8y$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
+  \param handle		::raw1394 構造体へのハンドル
+  \param node		(ダミー引数)
+  \param addr		読み込み元のFireWireアドレス
+  \param length		読み込みデータのバイト数
+  \param quad		読み込み先のバッファアドレス
+  \return		読み込みが成功すれば0, そうでなければ-1
 */
 int	raw1394_read(raw1394handle_t handle, nodeid_t node,
 		     nodeaddr_t addr, size_t length, quadlet_t* quad);
 
-//! $B;XDj$7$?(BFireWire$B%"%I%l%9$KG$0U%P%$%H?t$N%G!<%?$r(Basynchronous$BE>Aw$G=q$-9~$`(B
+//! 指定したFireWireアドレスに任意バイト数のデータをasynchronous転送で書き込む
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \param node		($B%@%_!<0z?t(B)
-  \param addr		$B=q$-9~$_@h$N(BFireWire$B%"%I%l%9(B
-  \param length		$B=q$-9~$_%G!<%?$N%P%$%H?t(B
-  \param quad		$B=q$-9~$_85$N%P%C%U%!%"%I%l%9(B
-  \return		$B=q$-9~$_$,@.8y$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
+  \param handle		::raw1394 構造体へのハンドル
+  \param node		(ダミー引数)
+  \param addr		書き込み先のFireWireアドレス
+  \param length		書き込みデータのバイト数
+  \param quad		書き込み元のバッファアドレス
+  \return		書き込みが成功すれば0, そうでなければ-1
 */
 int	raw1394_write(raw1394handle_t handle, nodeid_t node,
 		      nodeaddr_t addr, size_t length, quadlet_t* quad);
 
-//! isochronous$BE>Aw$N%k!<%W$r(B1$B2s<B9T$9$k(B
+//! isochronous転送のループを1回実行する
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \return		$B%k!<%W$N<B9T$,@5>o$K=*N;$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
+  \param handle		::raw1394 構造体へのハンドル
+  \return		ループの実行が正常に終了すれば0, そうでなければ-1
 */
 int	raw1394_loop_iterate(raw1394handle_t handle);
 
-//! isochronous$B<u?.$N=i4|@_Dj$r9T$&(B
+//! isochronous受信の初期設定を行う
 /*!
-  \param handle			::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \param handler		$B%+!<%M%k$,<u?.$7$?3F%Q%1%C%H$KBP$7$F<B9T$5$l$k(B
-				$B%O%s%I%i(B
-  \param buf_packets		$B<u?.$9$k%Q%1%C%H?t(B
-  \param max_packet_size	$B<u?.%Q%1%C%H$N:GBg%P%$%H?t(B
-  \param channel		ishochronous$B<u?.$N%A%c%s%M%k(B
-  \param mode			($B%@%_!<0z?t(B)
-  \param irq_interval		$B%+!<%M%k$,3d$j9~$_$r$+$1$k4V3V$r;XDj$9$k(B
-				$B%Q%1%C%H?t(B
-  \return			$B=i4|@_Dj$,@.8y$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
+  \param handle			::raw1394 構造体へのハンドル
+  \param handler		カーネルが受信した各パケットに対して実行される
+				ハンドラ
+  \param buf_packets		受信するパケット数
+  \param max_packet_size	受信パケットの最大バイト数
+  \param channel		ishochronous受信のチャンネル
+  \param mode			(ダミー引数)
+  \param irq_interval		カーネルが割り込みをかける間隔を指定する
+				パケット数
+  \return			初期設定が成功すれば0, そうでなければ-1
 */
 int	raw1394_iso_recv_init(raw1394handle_t		     handle,
 			      raw1394_iso_recv_handler_t     handler,
@@ -206,42 +206,42 @@ int	raw1394_iso_recv_init(raw1394handle_t		     handle,
 			      raw1394_iso_dma_recv_mode	     mode,
 			      int			     irq_interval);
 
-//! isochronous$BE>Aw$rDd;_$7$FI,MW$J%j%=!<%9$r2rJ|$9$k(B
+//! isochronous転送を停止して必要なリソースを解放する
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
+  \param handle		::raw1394 構造体へのハンドル
 */
 void	raw1394_iso_shutdown(raw1394handle_t handle);
 
-//! isochronous$B<u?.$r3+;O$9$k(B
+//! isochronous受信を開始する
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \param start_on_cycle	($B%@%_!<0z?t(B)
-  \param tag_mask	($B%@%_!<0z?t(B)
-  \param sync		($B%@%_!<0z?t(B)
-  \return		$B3+;O$,@.8y$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
+  \param handle		::raw1394 構造体へのハンドル
+  \param start_on_cycle	(ダミー引数)
+  \param tag_mask	(ダミー引数)
+  \param sync		(ダミー引数)
+  \return		開始が成功すれば0, そうでなければ-1
 */
 int	raw1394_iso_recv_start(raw1394handle_t handle,
 			       int start_on_cycle, int tag_mask,
 			       int sync);
-//! isochronous$B<u?.$rDd;_$9$k(B
+//! isochronous受信を停止する
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
+  \param handle		::raw1394 構造体へのハンドル
 */
 void	raw1394_iso_stop(raw1394handle_t handle);
 
-//! $B%+!<%M%k6u4V$KJ];}$5$l$F$$$k(Bisochronous$B<u?.%G!<%?$r%f!<%66u4V$KE>Aw$9$k(B
+//! カーネル空間に保持されているisochronous受信データをユーザ空間に転送する
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \return		$BE>Aw$,@.8y$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
+  \param handle		::raw1394 構造体へのハンドル
+  \return		転送が成功すれば0, そうでなければ-1
 */
 int	raw1394_iso_recv_flush(raw1394handle_t handle);
 
-//! $B8=:_$N%5%$%/%k;~9o$H$=$l$KBP1~$9$k;~9o$r<hF@$9$k(B
+//! 現在のサイクル時刻とそれに対応する時刻を取得する
 /*!
-  \param handle		::raw1394 $B9=B$BN$X$N%O%s%I%k(B
-  \param cycle_timer	$B%5%$%/%k;~9o$,JV$5$l$k(B
-  \param local_time	$B%5%$%/%k;~9o$KBP1~$9$k;~9o(B(micro sec)$B$,JV$5$l$k(B
-  \return		$B<hF@$K@.8y$9$l$P(B0, $B$=$&$G$J$1$l$P(B-1
+  \param handle		::raw1394 構造体へのハンドル
+  \param cycle_timer	サイクル時刻が返される
+  \param local_time	サイクル時刻に対応する時刻(micro sec)が返される
+  \return		取得に成功すれば0, そうでなければ-1
 */
 int	raw1394_read_cycle_timer(raw1394handle_t handle,
 				 u_int32_t* cycle_timer, u_int64_t* local_time);

@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394.cc,v 1.14 2012-06-30 20:00:33 ueshiba Exp $
+ *  $Id: raw1394.cc,v 1.15 2012-08-29 19:33:23 ueshiba Exp $
  */
 #include "raw1394_.h"
 #include <stdexcept>
@@ -70,10 +70,10 @@ raw1394::Buffer::resize(UInt32 n, const Buffer& prv, Buffer& nxt, raw1394* prnt)
 /************************************************************************
 *  class raw1394							*
 ************************************************************************/
-//! ::raw1394 $B9=B$BN$r@8@.$9$k(B
+//! ::raw1394 構造体を生成する
 /*!
-  \param unit_spec_ID	$B$3$N9=B$BN$,I=$9(BIEEE1394$B%N!<%I$N<oN`$r<($9(BID
-  \param uniqId		$B8D!9$N5!4o8GM-$N(B64bit ID
+  \param unit_spec_ID	この構造体が表すIEEE1394ノードの種類を示すID
+  \param uniqId		個々の機器固有の64bit ID
 */
 raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
     :_cfPlugInInterface(0), _fwDeviceInterface(0),
@@ -150,7 +150,7 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
 	    throw runtime_error("raw1394::raw1394: failed to turn on notification!!");
 }
 
-//! ::raw1394 $B9=B$BN$rGK2u$9$k(B
+//! ::raw1394 構造体を破壊する
 raw1394::~raw1394()
 {
     if (_cfPlugInInterface)
@@ -172,9 +172,9 @@ raw1394::~raw1394()
     }
 }
 
-//! $B$3$N(B ::raw1394 $B9=B$BN$,I=$9%N!<%I$N%3%^%s%I%l%8%9%?$N%Y!<%9%"%I%l%9$rJV$9(B
+//! この ::raw1394 構造体が表すノードのコマンドレジスタのベースアドレスを返す
 /*!
-  \return		$B%3%^%s%I%l%8%9%?$N%Y!<%9%"%I%l%9(B
+  \return		コマンドレジスタのベースアドレス
 */
 FWAddress
 raw1394::cmdRegBase() const
@@ -204,15 +204,15 @@ raw1394::cmdRegBase() const
     return addr;
 }
 
-//! isochronous$B<u?.$N=i4|@_Dj$r9T$&(B
+//! isochronous受信の初期設定を行う
 /*!
-  \param handler	$B%+!<%M%k$,<u?.$7$?3F%Q%1%C%H$KBP$7$F<B9T$5$l$k%O%s%I%i(B
-  \param nPackets	$B<u?.$9$k%Q%1%C%H?t(B
-  \param maxPacketSize	$B<u?.%Q%1%C%H$N:GBg%P%$%H?t(B
-  \param channel	ishochronous$B<u?.$N%A%c%s%M%k(B
-  \param irqInterval	$B%+!<%M%k$,3d$j9~$_$r$+$1$k4V3V$r;XDj$9$k%Q%1%C%H?t(B
-  \return		$B=i4|@_Dj$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-			$B%(%i!<$N860x$r<($9%3!<%I(B
+  \param handler	カーネルが受信した各パケットに対して実行されるハンドラ
+  \param nPackets	受信するパケット数
+  \param maxPacketSize	受信パケットの最大バイト数
+  \param channel	ishochronous受信のチャンネル
+  \param irqInterval	カーネルが割り込みをかける間隔を指定するパケット数
+  \return		初期設定が成功すればkIOReturnSuccess, そうでなければ
+			エラーの原因を示すコード
 */
 IOReturn
 raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
@@ -355,7 +355,7 @@ raw1394::isoRecvInit(raw1394_iso_recv_handler_t handler,
     return kIOReturnSuccess;
 }
 
-//! isochronous$BE>Aw$rDd;_$7$FI,MW$J%j%=!<%9$r2rJ|$9$k(B
+//! isochronous転送を停止して必要なリソースを解放する
 void
 raw1394::isoShutdown()
 {
@@ -392,10 +392,10 @@ raw1394::isoShutdown()
     }
 }
 
-//! $B%+!<%M%k6u4V$KJ];}$5$l$F$$$k(Bisochronous$B<u?.%G!<%?$r%f!<%66u4V$KE>Aw$9$k(B
+//! カーネル空間に保持されているisochronous受信データをユーザ空間に転送する
 /*!
-  \return		$BE>Aw$,@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-			$B860x$r<($9%(%i!<%3!<%I(B
+  \return		転送が成功すればkIOReturnSuccess, そうでなければ
+			原因を示すエラーコード
 */
 IOReturn
 raw1394::isoRecvFlush()
@@ -403,17 +403,17 @@ raw1394::isoRecvFlush()
     return kIOReturnSuccess;
 }
 
-//! $B8=:_$N%5%$%/%k;~9o$H$=$l$KBP1~$9$k;~9o$r<hF@$9$k(B
+//! 現在のサイクル時刻とそれに対応する時刻を取得する
 /*!
-  \param cycle_timer	$B%5%$%/%k;~9o$,JV$5$l$k(B
-  \param local_time	$B%5%$%/%k;~9o$KBP1~$9$k;~9o(B(micro sec)$B$,JV$5$l$k(B
-  \return		$B<hF@$K@.8y$9$l$P(BkIOReturnSuccess, $B$=$&$G$J$1$l$P(B
-			$B860x$r<($9%(%i!<%3!<%I(B
+  \param cycle_timer	サイクル時刻が返される
+  \param local_time	サイクル時刻に対応する時刻(micro sec)が返される
+  \return		取得に成功すればkIOReturnSuccess, そうでなければ
+			原因を示すエラーコード
 */
 IOReturn
 raw1394::readCycleTimer(UInt32* cycle_timer, UInt64* local_time) const
 {
-  // gettimeofday() $B$OIT@53N$J$N$G(B UpTime() $B$r;H$&!%(B
+  // gettimeofday() は不正確なので UpTime() を使う．
     Nanoseconds	upTime = AbsoluteToNanoseconds(UpTime());
     *local_time = ((UInt64(upTime.hi) << 32) | UInt64(upTime.lo)) / 1000LL;
 
@@ -422,46 +422,46 @@ raw1394::readCycleTimer(UInt32* cycle_timer, UInt64* local_time) const
 						  &busTime, cycle_timer);
 }
 
-//! isochronous$BE>Aw$N%k!<%W$r(B1$B2s<B9T$9$k(B
+//! isochronous転送のループを1回実行する
 /*!
-  \return		$B%G!<%?$,2u$l$F$$$J$1$l$P%f!<%6%O%s%I%i$,JV$9CM(B,
-			$B2u$l$F$$$l$P(B-1
+  \return		データが壊れていなければユーザハンドラが返す値,
+			壊れていれば-1
 */
 SInt32
 raw1394::loopIterate()
 {
-  // $B<u?.:Q$_$@$,=hM}$5$l$F$$$J$$%G!<%?$O(B, $B%P%C%U%!(B
-  // (_lastProcessed, _lastReceived] $B$K<}$a$i$l$k(B. dclCallback() $B$O(B, 
-  // $B%G!<%?$r<u?.$9$k$?$S$K$=$N%P%C%U%!$r(B _lastReceived $B$K5-O?$9$k(B.
-  // loopIterate() $B$O(B, dclCallback() $B$K$h$C$F(B _lastReceived $B$,99?7$5$l$F(B
-  // _lastProcessed < _lastReceived $B$H$J$k$N$rBT$A(B, _lastProcessed $B$r(B
-  // 1$B$D@h$K?J$a$F$=$NFbMF$,M-8z$G$"$l$P%f!<%6B&$KE>Aw$9$k(B.
+  // 受信済みだが処理されていないデータは, バッファ
+  // (_lastProcessed, _lastReceived] に収められる. dclCallback() は, 
+  // データを受信するたびにそのバッファを _lastReceived に記録する.
+  // loopIterate() は, dclCallback() によって _lastReceived が更新されて
+  // _lastProcessed < _lastReceived となるのを待ち, _lastProcessed を
+  // 1つ先に進めてその内容が有効であればユーザ側に転送する.
 #ifdef DEBUG
     using namespace	std;
     
     cerr << "*** BEGIN [loopIterate] ***" << endl;
 #endif
-  // dclCallback() $B$K$h$C$F?7$?$J%G!<%?FI$_9~$^$l(B, _lastReceived $B$,99?7$5$l$k(B
-  // $B$^$GBT5!(B
+  // dclCallback() によって新たなデータ読み込まれ, _lastReceived が更新される
+  // まで待機
     while (_lastProcessed == _lastReceived)
 	CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true);
     _lastProcessed = _lastProcessed->next();
 
-    Buffer*	buffer = _lastProcessed;  // $BL$=hM}$N:G=i$N%P%C%U%!(B
+    Buffer*	buffer = _lastProcessed;  // 未処理の最初のバッファ
 #ifdef DEBUG
     cerr << "  buffer[" << buffer << "]: " << endl;
 #endif
 
-  // $B%P%C%U%!%G!<%?$NM-8z@-$r5-21$7(B, $B<!$N<u?.$KHw$($FL58z2=$7$F$*$/(B
+  // バッファデータの有効性を記憶し, 次の受信に備えて無効化しておく
     MPEnterCriticalRegion(_mutex, kDurationForever);
     const bool	valid = buffer->valid;
     buffer->valid = false;
     MPExitCriticalRegion(_mutex);
 	
     SInt32	ret = -1;
-    if (valid)	// $B%G!<%?$,M-8z(B($B2u$l$F$$$J$$(B)$B$J$i(B
+    if (valid)	// データが有効(壊れていない)なら
     {
-      // $B$3$l$^$G$K<h$j$3$\$7$?%Q%1%C%H?t$r5-21$7(B, $B<!$N<u?.$KHw$($F(B0$B$K$7$F$*$/(B
+      // これまでに取りこぼしたパケット数を記憶し, 次の受信に備えて0にしておく
 	MPEnterCriticalRegion(_mutex, kDurationForever);
 	const UInt32	dropped = _dropped;
 	_dropped = 0;
@@ -478,8 +478,8 @@ raw1394::loopIterate()
 		(header & kFWIsochSy)	   >> kFWIsochSyPhase,
 		cycle, dropped);
 #else
-      // $B@hF,%Q%1%C%H$N%X%C%@$H%G!<%?%"%I%l%9$r<h$j=P$7(B, $B%f!<%6%O%s%I%i$r2p$7$F(B
-      // $B%Q%1%C%H$r0l$D$:$DE>Aw$9$k(B
+      // 先頭パケットのヘッダとデータアドレスを取り出し, ユーザハンドラを介して
+      // パケットを一つずつ転送する
 	for (UInt32 j = 0; j < buffer->nPackets(); ++j)
 	{
 	    UInt32		cycle = (buffer->timeStamp(j) & 0x1fff000)>> 12;
@@ -506,9 +506,9 @@ raw1394::loopIterate()
     }
 #endif
     
-  // $B:G8e$N=hM}:Q$_%P%C%U%!(B _lastProcessed $B$N(BDCL$B$O(B, $B0J9_$NL$=hM}%P%C%U%!(B
-  // $B$X$N>e=q$-$rKI$0$?$a$K>o$K<+8J%k!<%W$G$J$1$l$P$J$i$J$$(B. $B$h$C$F(B, $B$3$N(B
-  // $B%P%C%U%!$r<+8J%k!<%W$K$7(B, 1$B$DA0$N%P%C%U%!$r$3$N%P%C%U%!$K@\B3$9$k(B.
+  // 最後の処理済みバッファ _lastProcessed のDCLは, 以降の未処理バッファ
+  // への上書きを防ぐために常に自己ループでなければならない. よって, この
+  // バッファを自己ループにし, 1つ前のバッファをこのバッファに接続する.
     (*_dclPool)->SetDCLBranch(buffer->last(), buffer->first());
     (*_dclPool)->SetDCLBranch(buffer->prev()->last(), buffer->first());
     void*	dcls[] = {buffer->last(), buffer->prev()->last()};
@@ -535,7 +535,7 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
     Buffer*	buffer = (Buffer*)refcon;
     raw1394*	me     = buffer->parent();
 
-  // $B:G=i$N%Q%1%C%H$N$_%X%C%@$K(Bsy$B%S%C%H$,N)$C$F$$$k$3$H$r3NG'(B
+  // 最初のパケットのみヘッダにsyビットが立っていることを確認
     bool	valid = true;
 #ifdef USE_SY
     for (UInt32 j = 0; j < buffer->nPackets(); ++j)
@@ -551,16 +551,16 @@ raw1394::dclCallback(void* refcon, NuDCLRef dcl)
 	}
     }
 #endif
-  // $B$3$N%P%C%U%!$,4{$K<u?.:Q$_$G$"$k$+:#2s$N%G!<%?$,2u$l$F$$$k$J$i(B, $B:#2s$N(B
-  // $B%G!<%?$r<h$j$3$\$7$?$b$N$H$7$F07$&(B. (_dropped $B$H(B Buffer::valid
-  // $B$O(B loopIterate() $B$K$h$C$FJQ$($i$l$k2DG=@-$,$"$k$N$GGSB>@)8f$,I,MW(B)
+  // このバッファが既に受信済みであるか今回のデータが壊れているなら, 今回の
+  // データを取りこぼしたものとして扱う. (_dropped と Buffer::valid
+  // は loopIterate() によって変えられる可能性があるので排他制御が必要)
     MPEnterCriticalRegion(me->_mutex, kDurationForever);
     if (buffer->valid || !valid)
-	me->_dropped += buffer->nPackets(); // $B:#2s$H$j$3$\$7$?%Q%1%C%H?t$r2C;;(B
-    buffer->valid = valid;		    // $B:#2s$N%G!<%?$NM-8z@-$r%;%C%H(B
+	me->_dropped += buffer->nPackets(); // 今回とりこぼしたパケット数を加算
+    buffer->valid = valid;		    // 今回のデータの有効性をセット
     MPExitCriticalRegion(me->_mutex);
 
-  // $B$3$N%P%C%U%!$r(B, $B%G!<%?$r<u?.$7$?:G?7$N%P%C%U%!$H$9$k(B
+  // このバッファを, データを受信した最新のバッファとする
     me->_lastReceived = buffer;
 
 #ifdef DEBUG

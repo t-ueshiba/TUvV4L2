@@ -1,47 +1,38 @@
 #
-#  $Id: Makefile,v 1.6 2009-10-18 23:38:27 ueshiba Exp $
+#  $Id: Makefile,v 1.7 2012-08-29 19:33:23 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= /usr/local/lib
-INCDIR		= /usr/local/include/libraw1394
-INCDIRS		= -I.
+DEST		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include/libraw1394
+INCDIRS		= -I$(PREFIX)/include
 
 NAME		= raw1394
 
-CPPFLAGS	= #-DDEBUG
+CPPFLAGS	=
 CFLAGS		= -g
-CCFLAGS		= -g
-ifeq ($(CCC), icpc)
+NVCCFLAGS	= -g
+ifeq ($(CXX), icpc)
   CFLAGS	= -O3
-  CCFLAGS	= $(CFLAGS)
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  CPPFLAGS     += -DSSE3
 endif
+CCFLAGS		= $(CFLAGS)
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		=
 HDRS		= csr.h \
 		raw1394.h \
 		raw1394_.h
 SRCS		= raw1394.cc
 OBJS		= raw1394.o
-
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.6 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
 
 include $(PROJECT)/lib/l.mk
 ###
