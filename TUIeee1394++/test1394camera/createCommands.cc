@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: createCommands.cc,v 1.8 2008-10-17 06:31:43 ueshiba Exp $
+ *  $Id: createCommands.cc,v 1.9 2012-08-29 19:35:49 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -32,12 +32,12 @@ namespace TU
 *  local data								*
 ************************************************************************/
 /*!
-  $B%+%a%i$,%5%]!<%H$9$k5!G=$H$=$NL>>N!%(B
+  カメラがサポートする機能とその名称．
 */
 struct MyFeature
 {
-    const Ieee1394Camera::Feature	feature;	//!< $B%+%a%i$N5!G=(B
-    const char* const			name;		//!< $B$=$NL>>N(B
+    const Ieee1394Camera::Feature	feature;	//!< カメラの機能
+    const char* const			name;		//!< その名称
 };
 static const MyFeature	feature[] =
 {
@@ -59,24 +59,24 @@ static const MyFeature	feature[] =
 static const int		NFEATURES = sizeof(feature)/sizeof(feature[0]);
 
 /*!
-  $B%+%a%i$H$=$N5!G=$N(B2$B%DAH!%(B3$B$D$N%3!<%k%P%C%/4X?t(B: CBturnOnOff(),
-  CBsetAutoManual(), CBsetValue() $B$N0z?t$H$7$FEO$5$l$k!%(B
+  カメラとその機能の2ツ組．3つのコールバック関数: CBturnOnOff(),
+  CBsetAutoManual(), CBsetValue() の引数として渡される．
  */
 struct CameraAndFeature
 {
-    Ieee1394Camera*		camera;		//!< $B%+%a%i(B
-    Ieee1394Camera::Feature	feature;	//!< $BA`:n$7$?$$5!G=(B
+    Ieee1394Camera*		camera;		//!< カメラ
+    Ieee1394Camera::Feature	feature;	//!< 操作したい機能
 };
 static CameraAndFeature		cameraAndFeature[NFEATURES];
 
 /************************************************************************
 *  callback functions							*
 ************************************************************************/
-//! $B%-%c%W%A%c%\%?%s$,(Bon$B$N4VDj4|E*$K8F$P$l$k(Bidle$BMQ%3!<%k%P%C%/4X?t!%(B
+//! キャプチャボタンがonの間定期的に呼ばれるidle用コールバック関数．
 /*!
-  $B%+%a%i$+$i2hA|$r<h$j9~$s$G(Bcanvas$B$KI=<($9$k!%(B
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
-  \return		TRUE$B$rJV$9(B
+  カメラから画像を取り込んでcanvasに表示する．
+  \param userdata	My1394Camera (IEEE1394カメラ)
+  \return		TRUEを返す
 */
 static gint
 CBidle(gpointer userdata)
@@ -86,11 +86,11 @@ CBidle(gpointer userdata)
     return TRUE;
 }
 
-//! $B%-%c%W%A%c%\%?%s$N>uBV$,JQ99$5$l$k$H8F$P$l$k%3!<%k%P%C%/4X?t!%(B
+//! キャプチャボタンの状態が変更されると呼ばれるコールバック関数．
 /*!
-  timer$B$r(B activate/deactivate $B$9$k!%(B
-  \param toggle		$B%-%c%W%A%c%\%?%s(B
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
+  timerを activate/deactivate する．
+  \param toggle		キャプチャボタン
+  \param userdata	My1394Camera (IEEE1394カメラ)
 */
 static void
 CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
@@ -99,21 +99,21 @@ CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
     My1394Camera*	camera = (My1394Camera*)userdata;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
     {
-	idleTag = gtk_idle_add(CBidle, camera);	// idle$B=hM}$r3+;O$9$k!%(B
-	camera->continuousShot();	// $B%+%a%i$+$i$N2hA|=PNO$r3+;O$9$k!%(B
+	idleTag = gtk_idle_add(CBidle, camera);	// idle処理を開始する．
+	camera->continuousShot();	// カメラからの画像出力を開始する．
     }
     else
     {
-	gtk_idle_remove(idleTag);	// idle$B=hM}$rCf;_$9$k!%(B
-	camera->stopContinuousShot();	// $B%+%a%i$+$i$N2hA|=PNO$rDd;_$9$k!%(B
+	gtk_idle_remove(idleTag);	// idle処理を中止する．
+	camera->stopContinuousShot();	// カメラからの画像出力を停止する．
     }
 }
 
-//! $B%H%j%,%b!<%I%\%?%s$N>uBV$,JQ99$5$l$k$H8F$P$l$k%3!<%k%P%C%/4X?t!%(B
+//! トリガモードボタンの状態が変更されると呼ばれるコールバック関数．
 /*!
-  trigger mode$B$r(B on/off $B$9$k!%(B
-  \param toggle		$B%H%j%,%b!<%I%\%?%s(B
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
+  trigger modeを on/off する．
+  \param toggle		トリガモードボタン
+  \param userdata	My1394Camera (IEEE1394カメラ)
 */
 static void
 CBtriggerMode(GtkWidget* toggle, gpointer userdata)
@@ -126,12 +126,12 @@ CBtriggerMode(GtkWidget* toggle, gpointer userdata)
 	camera->turnOff(Ieee1394Camera::TRIGGER_MODE);
 }
 
-//! on/off $B%\%?%s$N>uBV$,JQ99$5$l$k$H8F$P$l$k%3!<%k%P%C%/4X?t!%(B
+//! on/off ボタンの状態が変更されると呼ばれるコールバック関数．
 /*!
-  $B$"$k%+%a%i5!G=$r(B on/off $B$9$k!%(B
-  \param toggle		on/off $B%\%?%s(B
-  \param userdata	CameraAndFeature (IEEE1394$B%+%a%i$H(B on/off
-			$B$7$?$$5!G=$N(B2$B%DAH(B)
+  あるカメラ機能を on/off する．
+  \param toggle		on/off ボタン
+  \param userdata	CameraAndFeature (IEEE1394カメラと on/off
+			したい機能の2ツ組)
 */
 static void
 CBturnOnOff(GtkWidget* toggle, gpointer userdata)
@@ -143,12 +143,12 @@ CBturnOnOff(GtkWidget* toggle, gpointer userdata)
 	cameraAndFeature->camera->turnOff(cameraAndFeature->feature);
 }
 
-//! auto/manual $B%\%?%s$N>uBV$,JQ99$5$l$k$H8F$P$l$k%3!<%k%P%C%/4X?t!%(B
+//! auto/manual ボタンの状態が変更されると呼ばれるコールバック関数．
 /*!
-  $B$"$k%+%a%i5!G=$r(B auto/manual $B%b!<%I$K$9$k!%(B
-  \param toggle		on/off $B%\%?%s(B
-  \param userdata	CameraAndFeature (IEEE1394$B%+%a%i$H(B auto/manual
-			$B%b!<%I$K$7$?$$5!G=$N(B2$B%DAH(B)
+  あるカメラ機能を auto/manual モードにする．
+  \param toggle		on/off ボタン
+  \param userdata	CameraAndFeature (IEEE1394カメラと auto/manual
+			モードにしたい機能の2ツ組)
 */
 static void
 CBsetAutoManual(GtkWidget* toggle, gpointer userdata)
@@ -160,12 +160,12 @@ CBsetAutoManual(GtkWidget* toggle, gpointer userdata)
 	cameraAndFeature->camera->setManualMode(cameraAndFeature->feature);
 }
 
-//! adjustment widget $B$,F0$+$5$l$k$H8F$P$l$k%3!<%k%P%C%/4X?t!%(B
+//! adjustment widget が動かされると呼ばれるコールバック関数．
 /*!
-  $B$"$k%+%a%i5!G=$NCM$r@_Dj$9$k!%(B
-  \param adj		$B@_DjCM$rM?$($k(B adjuster
-  \param userdata	CameraAndFeature (IEEE1394$B%+%a%i$HCM$r@_Dj$7$?$$(B
-			$B5!G=$N(B2$B%DAH(B)
+  あるカメラ機能の値を設定する．
+  \param adj		設定値を与える adjuster
+  \param userdata	CameraAndFeature (IEEE1394カメラと値を設定したい
+			機能の2ツ組)
 */
 static void
 CBsetValue(GtkAdjustment* adj, gpointer userdata)
@@ -174,11 +174,11 @@ CBsetValue(GtkAdjustment* adj, gpointer userdata)
     cameraAndFeature->camera->setValue(cameraAndFeature->feature, adj->value);
 }
 
-//! U/B$BCMMQ(B adjustment widget $B$,F0$+$5$l$k$H8F$P$l$k%3!<%k%P%C%/4X?t!%(B
+//! U/B値用 adjustment widget が動かされると呼ばれるコールバック関数．
 /*!
-  $B%[%o%$%H%P%i%s%9$N(BU/B$BCM$r@_Dj$9$k!%(B
-  \param adj		$B@_DjCM$rM?$($k(B adjuster
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
+  ホワイトバランスのU/B値を設定する．
+  \param adj		設定値を与える adjuster
+  \param userdata	My1394Camera (IEEE1394カメラ)
 */
 static void
 CBsetWhiteBalanceUB(GtkAdjustment* adj, gpointer userdata)
@@ -190,11 +190,11 @@ CBsetWhiteBalanceUB(GtkAdjustment* adj, gpointer userdata)
     camera->setWhiteBalance(ub, vr);
 }
 
-//! V/R$BCMMQ(B adjustment widget $B$,F0$+$5$l$k$H8F$P$l$k%3!<%k%P%C%/4X?t!%(B
+//! V/R値用 adjustment widget が動かされると呼ばれるコールバック関数．
 /*!
-  $B%[%o%$%H%P%i%s%9$N(BV/R$BCM$r@_Dj$9$k!%(B
-  \param adj		$B@_DjCM$rM?$($k(B adjuster
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
+  ホワイトバランスのV/R値を設定する．
+  \param adj		設定値を与える adjuster
+  \param userdata	My1394Camera (IEEE1394カメラ)
 */
 static void
 CBsetWhiteBalanceVR(GtkAdjustment* adj, gpointer userdata)
@@ -209,11 +209,11 @@ CBsetWhiteBalanceVR(GtkAdjustment* adj, gpointer userdata)
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! $B%+%a%i$N3F<o5!G=$K@_Dj$9$kCM$r;XDj$9$k$?$a$N%3%^%s%I72$r@8@.$9$k!%(B
+//! カメラの各種機能に設定する値を指定するためのコマンド群を生成する．
 /*!
-  IEEE1394$B%+%a%i$,%5%]!<%H$7$F$$$k5!G=$rD4$Y$F@8@.$9$k%3%^%s%I$r7hDj$9$k!%(B
-  \param camera		IEEE1394$B%+%a%i(B
-  \return		$B@8@.$5$l$?%3%^%s%I72$,E=$j$D$1$i$l$?%F!<%V%k(B
+  IEEE1394カメラがサポートしている機能を調べて生成するコマンドを決定する．
+  \param camera		IEEE1394カメラ
+  \return		生成されたコマンド群が貼りつけられたテーブル
 */
 GtkWidget*
 createCommands(My1394Camera& camera)
@@ -221,27 +221,27 @@ createCommands(My1394Camera& camera)
     GtkWidget*	commands = gtk_table_new(4, 2 + NFEATURES, FALSE);
     u_int	y = 0;
 
-  // $B%+%a%i$+$i$N2hA|<h$j9~$_$r(Bon/off$B$9$k(Btoggle button$B$r@8@.!%(B
+  // カメラからの画像取り込みをon/offするtoggle buttonを生成．
     GtkWidget* toggle = gtk_toggle_button_new_with_label("Capture");
-  // $B%3!<%k%P%C%/4X?t$NEPO?!%(B
+  // コールバック関数の登録．
     gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
 		       GTK_SIGNAL_FUNC(CBcontinuousShot), &camera);
-  // $B%+%a%i$N8=:_$N2hA|<h$j9~$_>uBV$r(Btoggle button$B$KH?1G!%(B
+  // カメラの現在の画像取り込み状態をtoggle buttonに反映．
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 				 (camera.inContinuousShot() ? TRUE : FALSE));
     gtk_table_attach_defaults(GTK_TABLE(commands), toggle, 1, 2, y, y+1);
     ++y;
 
-  // $B$b$7$b%+%a%i$,%H%j%,%b!<%I$r%5%]!<%H$7$F$$$l$P!%!%!%(B
+  // もしもカメラがトリガモードをサポートしていれば．．．
     if (camera.inquireFeatureFunction(Ieee1394Camera::TRIGGER_MODE) &
 	Ieee1394Camera::Presence)
     {
-      // $B%+%a%i$N(Btrigger mode$B$r(Bon/off$B$9$k(Btoggle button$B$r@8@.!%(B
+      // カメラのtrigger modeをon/offするtoggle buttonを生成．
 	toggle = gtk_toggle_button_new_with_label("Trigger mode");
-      // $B%3!<%k%P%C%/4X?t$NEPO?!%(B
+      // コールバック関数の登録．
 	gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
 			   GTK_SIGNAL_FUNC(CBtriggerMode), &camera);
-      // $B%+%a%i$N8=:_$N(Btrigger mode$B$r(Btoggle button$B$KH?1G!%(B
+      // カメラの現在のtrigger modeをtoggle buttonに反映．
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 	     (camera.isTurnedOn(Ieee1394Camera::TRIGGER_MODE) ? TRUE : FALSE));
 	gtk_table_attach_defaults(GTK_TABLE(commands), toggle, 1, 2, y, y+1);
@@ -251,21 +251,21 @@ createCommands(My1394Camera& camera)
     for (int i = 0; i < NFEATURES; ++i)
     {
 	u_int	inq = camera.inquireFeatureFunction(feature[i].feature);
-	if (inq & Ieee1394Camera::Presence)  // $B$3$N5!G=$,B8:_!)(B
+	if (inq & Ieee1394Camera::Presence)  // この機能が存在？
 	{
 	    u_int	x = 2;
 	    
-	    if (inq & Ieee1394Camera::OnOff)  // on/off$BA`:n$,2DG=!)(B
+	    if (inq & Ieee1394Camera::OnOff)  // on/off操作が可能？
 	    {
-	      // on/off$B$r@Z$jBX$($k(Btoggle button$B$r@8@.!%(B
+	      // on/offを切り替えるtoggle buttonを生成．
 		GtkWidget* toggle = gtk_toggle_button_new_with_label("On");
-	      // $B%3!<%k%P%C%/4X?t$NEPO?!%(B
+	      // コールバック関数の登録．
 		cameraAndFeature[i].camera = &camera;
 		cameraAndFeature[i].feature = feature[i].feature;
 		gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
 				   GTK_SIGNAL_FUNC(CBturnOnOff),
 				   (gpointer)&cameraAndFeature[i]);
-	      // $B%+%a%i$N8=:_$N(Bon/off$B>uBV$r(Btoggle button$B$KH?1G!%(B
+	      // カメラの現在のon/off状態をtoggle buttonに反映．
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 		    (camera.isTurnedOn(feature[i].feature) ? TRUE : FALSE));
 		gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
@@ -273,20 +273,20 @@ createCommands(My1394Camera& camera)
 		++x;
 	    }
 
-	    if (inq & Ieee1394Camera::Manual)  // manual$BA`:n$,2DG=!)(B
+	    if (inq & Ieee1394Camera::Manual)  // manual操作が可能？
 	    {
-		if (inq & Ieee1394Camera::Auto)  // $B<+F0@_Dj$,2DG=!)(B
+		if (inq & Ieee1394Camera::Auto)  // 自動設定が可能？
 		{
-		  // manual/auto$B$r@Z$jBX$($k(Btoggle button$B$r@8@.!%(B
+		  // manual/autoを切り替えるtoggle buttonを生成．
 		    GtkWidget*	toggle
 				  = gtk_toggle_button_new_with_label("Auto");
-		  // $B%3!<%k%P%C%/4X?t$NEPO?!%(B
+		  // コールバック関数の登録．
 		    cameraAndFeature[i].camera = &camera;
 		    cameraAndFeature[i].feature = feature[i].feature;
 		    gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
 				       GTK_SIGNAL_FUNC(CBsetAutoManual),
 				       (gpointer)&cameraAndFeature[i]);
-		  // $B%+%a%i$N8=:_$N(Bauto/manual$B>uBV$r(Btoggle button$B$KH?1G!%(B
+		  // カメラの現在のauto/manual状態をtoggle buttonに反映．
 		    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 			(camera.isAuto(feature[i].feature) ? TRUE : FALSE));
 		    gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
@@ -296,22 +296,22 @@ createCommands(My1394Camera& camera)
 		GtkWidget*	label = gtk_label_new(feature[i].name);
 		gtk_table_attach_defaults(GTK_TABLE(commands), label,
 					  0, 1, y, y+1);
-	      // $B$3$N5!G=$,<h$jF@$kCM$NHO0O$rD4$Y$k!%(B
+	      // この機能が取り得る値の範囲を調べる．
 		u_int	min, max;
 		camera.getMinMax(feature[i].feature, min, max);
 		if (feature[i].feature == Ieee1394Camera::WHITE_BALANCE)
 		{
-		  // white balance$B$N8=:_$NCM$rD4$Y$k!%(B
+		  // white balanceの現在の値を調べる．
 		    u_int	ub, vr;
 		    camera.getWhiteBalance(ub, vr);
-		  // white balance$B$N(BUB$BCM$rM?$($k$?$a$N(Badjustment widget$B$r@8@.!%(B
+		  // white balanceのUB値を与えるためのadjustment widgetを生成．
 		    GtkObject*	adj = gtk_adjustment_new(ub, min, max,
 							 1.0, 1.0, 0.0);
-		  // $B%3!<%k%P%C%/4X?t$NEPO?!%(B
+		  // コールバック関数の登録．
 		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
 				       GTK_SIGNAL_FUNC(CBsetWhiteBalanceUB),
 				       &camera);
-		  // adjustment$B$rA`:n$9$k$?$a$N(Bscale widget$B$r@8@.!%(B
+		  // adjustmentを操作するためのscale widgetを生成．
 		    GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
 		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
@@ -322,13 +322,13 @@ createCommands(My1394Camera& camera)
 		    GtkWidget*	label = gtk_label_new(feature[i].name);
 		    gtk_table_attach_defaults(GTK_TABLE(commands), label,
 					      0, 1, y, y+1);
-		  // white balance$B$N(BVR$BCM$rM?$($k$?$a$N(Badjustment widget$B$r@8@.!%(B
+		  // white balanceのVR値を与えるためのadjustment widgetを生成．
 		    adj = gtk_adjustment_new(vr, min, max, 1.0, 1.0, 0.0);
-		  // $B%3!<%k%P%C%/4X?t$NEPO?!%(B
+		  // コールバック関数の登録．
 		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
 				       GTK_SIGNAL_FUNC(CBsetWhiteBalanceVR),
 				       &camera);
-		  // adjustment$B$rA`:n$9$k$?$a$N(Bscale widget$B$r@8@.!%(B
+		  // adjustmentを操作するためのscale widgetを生成．
 		    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
 		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
@@ -337,18 +337,18 @@ createCommands(My1394Camera& camera)
 		}
 		else
 		{
-		  // $B$3$N5!G=$N8=:_$NCM$rD4$Y$k!%(B
+		  // この機能の現在の値を調べる．
 		    int		val = camera.getValue(feature[i].feature);
-		  // $B$3$N5!G=$KCM$rM?$($k$?$a$N(Badjustment widget$B$r@8@.!%(B
+		  // この機能に値を与えるためのadjustment widgetを生成．
 		    GtkObject*	adj = gtk_adjustment_new(val, min, max,
 							 1.0, 1.0, 0.0);
-		  // $B%3!<%k%P%C%/4X?t$NEPO?!%(B
+		  // コールバック関数の登録．
 		    cameraAndFeature[i].camera = &camera;
 		    cameraAndFeature[i].feature = feature[i].feature;
 		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
 				       GTK_SIGNAL_FUNC(CBsetValue),
 				       (gpointer)&cameraAndFeature[i]);
-		  // adjustment$B$rA`:n$9$k$?$a$N(Bscale widget$B$r@8@.!%(B
+		  // adjustmentを操作するためのscale widgetを生成．
 		    GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
 		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);

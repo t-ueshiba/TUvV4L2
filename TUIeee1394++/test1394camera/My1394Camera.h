@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: My1394Camera.h,v 1.7 2012-08-10 02:55:04 ueshiba Exp $
+ *  $Id: My1394Camera.h,v 1.8 2012-08-29 19:35:49 ueshiba Exp $
  */
 #include <gtk/gtk.h>
 #include "TU/Ieee1394++.h"
@@ -27,22 +27,22 @@
 namespace TU
 {
 /*!
-  RGB $B%+%i!<2hA|$N2hAG$rI=$99=B$BN!%(B
+  RGB カラー画像の画素を表す構造体．
 */
 struct MyRGB
 {
-    u_char	r;	//!< $B@V(B
-    u_char	g;	//!< $B@D(B
-    u_char	b;	//!< $BNP(B
+    u_char	r;	//!< 赤
+    u_char	g;	//!< 青
+    u_char	b;	//!< 緑
 };
 
 /************************************************************************
 *  class My1394Camera							*
 ************************************************************************/
 /*!
-  IEEE1394$B%G%8%?%k%+%a%i$rI=$9%/%i%9!%$5$i$K!$(BGTK+ $B$rMQ$$$?2hA|I=<($N$?$a$N(B
-  canvas (GTK+ $B$N(B drawing area widget)$B!$F~NO2hA|%P%C%U%!!$(BRGB $B%+%i!<2hA|(B
-  $BI=<(MQ$N%P%C%U%!$r3NJ]$9$k5!G=$r;}$D!%(B
+  IEEE1394デジタルカメラを表すクラス．さらに，GTK+ を用いた画像表示のための
+  canvas (GTK+ の drawing area widget)，入力画像バッファ，RGB カラー画像
+  表示用のバッファを確保する機能を持つ．
 */
 class My1394Camera : public Ieee1394Camera
 {
@@ -50,7 +50,7 @@ class My1394Camera : public Ieee1394Camera
     My1394Camera(u_int64_t uniqId, Speed speed)				;
     ~My1394Camera()							;
 
-  //! $B2hA|$NI=<(NN0h$H$J$k%-%c%s%P%9$rJV$9!%(B
+  //! 画像の表示領域となるキャンバスを返す．
     GtkWidget*		canvas()				const	;
     Ieee1394Camera&	setFormatAndFrameRate(Format format,
 					      FrameRate rate)		;
@@ -59,9 +59,9 @@ class My1394Camera : public Ieee1394Camera
     std::ostream&	save(std::ostream& out)			const	;
     
   private:
-    GtkWidget* const	_canvas;	// $B2hA|$rI=<($9$kNN0h(B
-    u_char*		_buf;		// $BF~NO2hA|MQ%P%C%U%!(B
-    MyRGB*		_rgb;		// RGB $B%+%i!<2hA|(B($BI=<(MQ(B)$B%P%C%U%!(B
+    GtkWidget* const	_canvas;	// 画像を表示する領域
+    u_char*		_buf;		// 入力画像用バッファ
+    MyRGB*		_rgb;		// RGB カラー画像(表示用)バッファ
 };
 
 inline GtkWidget*

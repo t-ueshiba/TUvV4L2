@@ -1,11 +1,11 @@
 /*
- *  $Id: main.cc,v 1.10 2012-08-10 02:55:04 ueshiba Exp $
+ *  $Id: main.cc,v 1.11 2012-08-29 19:35:49 ueshiba Exp $
  */
 /*!
   \mainpage	test1394camera - program for testing an IIDC 1394-based Digital Camera
   \anchor	test1394camera
 
-  \section copyright $BCx:n8"(B
+  \section copyright 著作権
   Copyright (C) 2003 Toshio UESHIBA
   National Institute of Advanced Industrial Science and Technology (AIST)
 
@@ -25,23 +25,23 @@
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-  \section functions $B5!G=(B
-  IEEE1394$B%G%8%?%k%+%a%i$N%F%9%H%W%m%0%i%`!%(B1$BBf$N%+%a%i$KBP$7$F(B
-  $B<o!9$N@_Dj$r9T$C$?$j!$;#1F$7$?2hA|%9%H%j!<%`$r%j%"%k%?%$%`$G(B
-  X window$B>e$KI=<($7$?$j$G$-$k!%(BLINUX$B>e$G(B
-  <a href="http://www.1394ta.com/">IEEE1394</a>$B%G%P%$%9$*$h$S(B
-  <a href="http://www.1394ta.com/Technology/Specifications/Descriptions/IIDC_Spec_v1_30.htm">IEEE1394$B%G%8%?%k%+%a%i(B</a>$B$r;HMQ$9$k$?$a$N%3%s%H%m!<%k%i%$%V%i%j(B:
-  \ref libTUIeee1394 "libTUIeee1394++"$B$rMQ$$$F$$$k!%(B
+  \section functions 機能
+  IEEE1394デジタルカメラのテストプログラム．1台のカメラに対して
+  種々の設定を行ったり，撮影した画像ストリームをリアルタイムで
+  X window上に表示したりできる．LINUX上で
+  <a href="http://www.1394ta.com/">IEEE1394</a>デバイスおよび
+  <a href="http://www.1394ta.com/Technology/Specifications/Descriptions/IIDC_Spec_v1_30.htm">IEEE1394デジタルカメラ</a>を使用するためのコントロールライブラリ:
+  \ref libTUIeee1394 "libTUIeee1394++"を用いている．
 
-  \section invocation $B%3%^%s%I8F$S=P$7$N7A<0(B
+  \section invocation コマンド呼び出しの形式
   \verbatim
   test1394camera [-b] [uniqueID]\endverbatim
 
-    - [<tt>-b</tt>] IEEE1394b (FireWire 800)$B%b!<%I$r;HMQ(B
-    - [<tt>uniqueID</tt>] $B%+%a%i$,J#?t$"$k>l9g$KFCDj$N%+%a%i$r;XDj$9$k$?$a$N(Bglobal
-	uniqne ID$B$r(B16$B?J7A<0(B(0x####)$B$GM?$($k(B
+    - [<tt>-b</tt>] IEEE1394b (FireWire 800)モードを使用
+    - [<tt>uniqueID</tt>] カメラが複数ある場合に特定のカメラを指定するためのglobal
+	uniqne IDを16進形式(0x####)で与える
 
-  $B%W%m%0%i%`=*N;;~$K!$%+%a%i$N(Bglobal unique ID$B$H@_DjCM$,I8=`=PNO$K=PNO$5$l$k!%(B	
+  プログラム終了時に，カメラのglobal unique IDと設定値が標準出力に出力される．	
 */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -60,9 +60,9 @@ GtkWidget*	createCommands(My1394Camera& camera)			;
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-//! $B;HMQK!$r@bL@$9$k(B
+//! 使用法を説明する
 /*!
-  \param s	$B%3%^%s%IL>(B
+  \param s	コマンド名
 */
 static void
 usage(const char* s)
@@ -84,11 +84,11 @@ usage(const char* s)
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! $B%a%$%s4X?t(B
+//! メイン関数
 /*!
-  "-p <port num>" $B$G(BIEEE1394$B%]!<%H(B($B%$%s%?!<%U%'!<%9%+!<%I(B)$B$NHV9f$r;XDj$9$k!%(B
-  \param argc	$B0z?t$N?t(B($B%3%^%s%IL>$r4^$`(B)
-  \param argv   $B0z?tJ8;zNs$NG[Ns(B
+  "-p <port num>" でIEEE1394ポート(インターフェースカード)の番号を指定する．
+  \param argc	引数の数(コマンド名を含む)
+  \param argv   引数文字列の配列
 */
 int
 main(int argc, char* argv[])
@@ -96,9 +96,9 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
     
-    gtk_init(&argc, &argv);	// GTK+ $B$N=i4|2=(B.
+    gtk_init(&argc, &argv);	// GTK+ の初期化.
 
-  // IEEE1394$B%]!<%H(B($B%$%s%?!<%U%'!<%9%+!<%I(B)$B$NHV9f$r%3%^%s%I9T$+$iFI$_9~$`!%(B
+  // IEEE1394ポート(インターフェースカード)の番号をコマンド行から読み込む．
     Ieee1394Node::Speed	speed = Ieee1394Node::SPD_400M;
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "bh")) != EOF; )
@@ -116,10 +116,10 @@ main(int argc, char* argv[])
     if (optind < argc)
 	uniqId = strtoull(argv[optind], 0, 0);
     
-  // $BK\6H$r9T$&!%(B
+  // 本業を行う．
     try
     {
-	My1394Camera	camera(uniqId, speed);		// $B%+%a%i$r3+$/!%(B
+	My1394Camera	camera(uniqId, speed);		// カメラを開く．
 
 	GtkWidget*	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(window), "IEEE1394 camera controller");

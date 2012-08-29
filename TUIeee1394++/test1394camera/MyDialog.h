@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: MyDialog.h,v 1.3 2008-10-15 00:22:29 ueshiba Exp $
+ *  $Id: MyDialog.h,v 1.4 2012-08-29 19:35:49 ueshiba Exp $
  */
 #include <gtk/gtk.h>
 #include "TU/Ieee1394++.h"
@@ -30,8 +30,8 @@ namespace TU
 *  class MyDialog							*
 ************************************************************************/
 /*!
-  Format_7_x$B7?$N(BIeee1394Camera::Format$B$K$D$$$F!$$=$NCmL\NN0h(B(ROI: Region
-  of Interest)$B$r;XDj$9$k$?$a$N(Bdialog$B!%(B
+  Format_7_x型のIeee1394Camera::Formatについて，その注目領域(ROI: Region
+  of Interest)を指定するためのdialog．
  */
 class MyDialog
 {

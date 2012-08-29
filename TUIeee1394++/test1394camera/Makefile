@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.18 2012-08-10 02:55:04 ueshiba Exp $
+#  $Id: Makefile,v 1.19 2012-08-29 19:35:49 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -45,8 +45,9 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/types.h
 HDRS		= My1394Camera.h \
 		MyDialog.h
 SRCS		= My1394Camera.cc \
@@ -63,7 +64,7 @@ OBJS		= My1394Camera.o \
 #########################
 #  Macros used by RCS	#
 #########################
-REV		= $(shell echo $Revision: 1.18 $	|		\
+REV		= $(shell echo $Revision: 1.19 $	|		\
 		  sed 's/evision://'		|		\
 		  awk -F"."					\
 		  '{						\
@@ -77,26 +78,27 @@ include $(PROJECT)/lib/p.mk
 ###
 My1394Camera.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 MyDialog.o: MyDialog.h /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 createCommands.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 createMenubar.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h MyDialog.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	MyDialog.h
 main.o: My1394Camera.h /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h

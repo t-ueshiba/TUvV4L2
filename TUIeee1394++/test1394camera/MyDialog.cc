@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: MyDialog.cc,v 1.4 2008-10-17 06:31:42 ueshiba Exp $
+ *  $Id: MyDialog.cc,v 1.5 2012-08-29 19:35:49 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -32,13 +32,13 @@ namespace TU
 *  local data								*
 ************************************************************************/
 /*!
-  Format_7_x$B$G%5%]!<%H$5$l$k2hAG%U%)!<%^%C%H$H$=$NL>>N!%(B
+  Format_7_xでサポートされる画素フォーマットとその名称．
 */
 struct MyPixelFormat
 {
-    const Ieee1394Camera::PixelFormat	pixelFormat;	//!< $B2hAG%U%)!<%^%C%H(B
-    const char* const			name;		//!< $B$=$NL>>N(B
-    Ieee1394Camera::PixelFormat*	pixelFormatDst;	//!< $B%U%)!<%^%C%H@_Dj@h(B
+    const Ieee1394Camera::PixelFormat	pixelFormat;	//!< 画素フォーマット
+    const char* const			name;		//!< その名称
+    Ieee1394Camera::PixelFormat*	pixelFormatDst;	//!< フォーマット設定先
 };
 static MyPixelFormat	pixelFormat[] =
 {
@@ -59,10 +59,10 @@ static const int NPIXELFORMATS = sizeof(pixelFormat)/sizeof(pixelFormat[0]);
 /************************************************************************
 *  callback functions							*
 ************************************************************************/
-//! ROI$B$N86E@$d%5%$%:$rM?$($i$l$?%9%F%C%WC10L$GJQ2=$5$;$k$?$a$N%3!<%k%P%C%/4X?t!%(B
+//! ROIの原点やサイズを与えられたステップ単位で変化させるためのコールバック関数．
 /*!
-  \param adj		ROI$B$N86E@$d%5%$%:$rJ];}$7$F$$$k(B adjuster
-  \param userdata	$BJQ2=$N%9%F%C%W(B
+  \param adj		ROIの原点やサイズを保持している adjuster
+  \param userdata	変化のステップ
 */
 static void
 CBadjust(GtkAdjustment* adj, gpointer userdata)
@@ -72,9 +72,9 @@ CBadjust(GtkAdjustment* adj, gpointer userdata)
     gtk_adjustment_set_value(adj, val);
 }
     
-//! $B2hAG7A<0$r;XDj$9$k$?$a$N%3!<%k%P%C%/4X?t!%(B
+//! 画素形式を指定するためのコールバック関数．
 /*!
-  \param userdata	SettingPixelFormat ($B2hAG7A<0$N@_DjCM$H@_Dj@h$N(B2$B%DAH(B)
+  \param userdata	SettingPixelFormat (画素形式の設定値と設定先の2ツ組)
 */
 static void
 CBmenuitem(GtkMenuItem*, gpointer userdata)
@@ -86,9 +86,9 @@ CBmenuitem(GtkMenuItem*, gpointer userdata)
 /************************************************************************
 *  class MyDialog							*
 ************************************************************************/
-//! ROI$B$r;XDj$9$k$?$a$N(Bdialog window$B$r@8@.$9$k(B
+//! ROIを指定するためのdialog windowを生成する
 /*!
-  \param fmt7info	ROI$B$r;XDj$7$?$$(BFormat_7_x$B$K4X$9$k>pJs!%(B
+  \param fmt7info	ROIを指定したいFormat_7_xに関する情報．
 */
 MyDialog::MyDialog(const Ieee1394Camera::Format_7_Info& fmt7info)
     :_fmt7info(fmt7info),
@@ -104,12 +104,12 @@ MyDialog::MyDialog(const Ieee1394Camera::Format_7_Info& fmt7info)
 				0.0)),
      _pixelFormat(_fmt7info.pixelFormat)
 {
-  // dialog$B$NB0@-$r@_Dj!%(B
+  // dialogの属性を設定．
     gtk_window_set_modal(GTK_WINDOW(_dialog), TRUE);
     gtk_window_set_title(GTK_WINDOW(_dialog), "Setting ROI for Format_7_x");
     gtk_window_set_policy(GTK_WINDOW(_dialog), FALSE, FALSE, TRUE);
     
-  // $BJQ2=$r%9%F%C%WC10L$K6/@)$9$k$?$a!$%3!<%k%P%C%/4X?t$rEPO?!%(B
+  // 変化をステップ単位に強制するため，コールバック関数を登録．
     gtk_signal_connect(GTK_OBJECT(_u0), "value_changed",
 		       GTK_SIGNAL_FUNC(CBadjust),
 		       (gpointer)&_fmt7info.unitU0);
@@ -123,10 +123,10 @@ MyDialog::MyDialog(const Ieee1394Camera::Format_7_Info& fmt7info)
 		       GTK_SIGNAL_FUNC(CBadjust),
 		       (gpointer)&_fmt7info.unitHeight);
     
-  // widget$B$rJB$Y$k$?$a$N(Btable$B!%(B
+  // widgetを並べるためのtable．
     GtkWidget*	table = gtk_table_new(2, 5, FALSE);
 
-  // 4$B$D$N(Badjustment$B$N$?$a$N(Blabel$B$HA`:nMQ(Bscale$B$r@8@.$7$F(Btable$B$K%Q%C%/!%(B
+  // 4つのadjustmentのためのlabelと操作用scaleを生成してtableにパック．
     GtkWidget*	label = gtk_label_new("u0:");
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
     GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(_u0));
@@ -155,7 +155,7 @@ MyDialog::MyDialog(const Ieee1394Camera::Format_7_Info& fmt7info)
     gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
     gtk_table_attach_defaults(GTK_TABLE(table), scale, 1, 2, 3, 4);
 
-  // PixelFormat$B@_DjMQ$N%*%W%7%g%s%a%K%e!<$r@8@.$7$F(Btable$B$K%Q%C%/!%(B
+  // PixelFormat設定用のオプションメニューを生成してtableにパック．
     GtkWidget*	menu = gtk_menu_new();
     guint	current = 0;
     for (int nitems = 0, i = 0; i < NPIXELFORMATS; ++i)
@@ -177,36 +177,36 @@ MyDialog::MyDialog(const Ieee1394Camera::Format_7_Info& fmt7info)
     gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), current);
     gtk_table_attach_defaults(GTK_TABLE(table), option_menu, 1, 2, 4, 5);
     
-  // ROI$B@_DjMQ$N%\%?%s$r@8@.$7$F(Btable$B$K%Q%C%/!%(B
+  // ROI設定用のボタンを生成してtableにパック．
     GtkWidget*	button = gtk_button_new_with_label("Set");
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(gtk_main_quit), _dialog);
     gtk_table_attach_defaults(GTK_TABLE(table), button, 0, 2, 5, 6);
 
-  // table$B$r(Bdialog$B$K<}$a$k!%(B
+  // tableをdialogに収める．
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(_dialog)->action_area), table);
 
-  // $B%a%C%;!<%8$r(Bdialog$B$K<}$a$k!%(B
+  // メッセージをdialogに収める．
     label = gtk_label_new("Set the Region of Interest(ROI).");
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(_dialog)->vbox), label);
     
     gtk_widget_show_all(_dialog);
 
-    gtk_main();			// ROI$B@_DjMQ$N%\%?%s$r2!$9$H%k!<%W$rH4$1=P$9!%(B
+    gtk_main();			// ROI設定用のボタンを押すとループを抜け出す．
 }
 
-//! ROI$B$r;XDj$9$k$?$a$N(Bdialog window$B$rGK2u$9$k(B
+//! ROIを指定するためのdialog windowを破壊する
 MyDialog::~MyDialog()
 {
     gtk_widget_destroy(_dialog);
 }
 
-//! $B;XDj$5$l$?(BROI$B$r(Bdialog window$B$+$iFI$_<h$k(B
+//! 指定されたROIをdialog windowから読み取る
 /*!
-  \param u0	ROI$B$N:8>e6y$N2#:BI8!%(B
-  \param v0	ROI$B$N:8>e6y$N=D:BI8!%(B
-  \param width	ROI$B$NI}!%(B
-  \param height	ROI$B$N9b$5!%(B
+  \param u0	ROIの左上隅の横座標．
+  \param v0	ROIの左上隅の縦座標．
+  \param width	ROIの幅．
+  \param height	ROIの高さ．
  */
 Ieee1394Camera::PixelFormat
 MyDialog::getROI(u_int& u0, u_int& v0, u_int& width, u_int& height)

@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: My1394Camera.cc,v 1.13 2012-08-10 02:55:04 ueshiba Exp $
+ *  $Id: My1394Camera.cc,v 1.14 2012-08-29 19:35:49 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -42,7 +42,7 @@ static int	tbl_b [256];
 inline int	flt2fix(float flt)	{return int(flt * (1 << 10));}
 inline int	fix2int(int fix)	{return fix >> 10;}
 
-//! YUV -> RGB $BJQ49%F!<%V%k$N=i4|2=!%(B
+//! YUV -> RGB 変換テーブルの初期化．
 static void
 initialize_tbl()
 {
@@ -55,7 +55,7 @@ initialize_tbl()
     }
 }
     
-//! YUV -> RGB $BJQ49$r9T$&!%(B
+//! YUV -> RGB 変換を行う．
 inline MyRGB
 yuv2rgb(u_char y, u_char u, u_char v)
 {
@@ -74,7 +74,7 @@ yuv2rgb(u_char y, u_char u, u_char v)
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-//! $B%k!<%W(B10$B2s$KMW$7$?;~4V$NJ?6Q$r$H$k$3$H$K$h$j!$%U%l!<%`%l!<%H$rB,Dj$9$k!%(B
+//! ループ10回に要した時間の平均をとることにより，フレームレートを測定する．
 static void
 countTime(int& nframes, struct timeval& start)
 {
@@ -91,12 +91,12 @@ countTime(int& nframes, struct timeval& start)
 	gettimeofday(&start, NULL);
 }
 
-//! $B:FIA2h$N$?$a$N%3!<%k%P%C%/4X?t!%(B
+//! 再描画のためのコールバック関数．
 /*!
   \param widget		DrawingArea widget
-  \param event		$B%$%Y%s%H(B
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
-  \return		TRUE$B$rJV$9(B
+  \param event		イベント
+  \param userdata	My1394Camera (IEEE1394カメラ)
+  \return		TRUEを返す
 */
 static gboolean
 CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
@@ -109,12 +109,12 @@ CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
 /************************************************************************
 *  class My1394Camera							*
 ************************************************************************/
-//! IEEE1394$B%+%a%i%N!<%I$r@8@.$9$k(B
+//! IEEE1394カメラノードを生成する
 /*!
-  \param uniqId	$B8D!9$N%+%a%i8GM-$N(B64bit ID$B!%F10l$N(BIEEE1394 bus$B$K(B
-		$BJ#?t$N%+%a%i$,@\B3$5$l$F$$$k>l9g!$$3$l$K$h$C$F(B
-		$BF1Dj$r9T$&!%(B
-  \param speed	$B%G!<%?E>AwB.EY(B
+  \param uniqId	個々のカメラ固有の64bit ID．同一のIEEE1394 busに
+		複数のカメラが接続されている場合，これによって
+		同定を行う．
+  \param speed	データ転送速度
 */
 My1394Camera::My1394Camera(u_int64_t uniqId, Speed speed)
     :Ieee1394Camera(Ieee1394Camera::Monocular, uniqId, speed, 1),
@@ -122,36 +122,36 @@ My1394Camera::My1394Camera(u_int64_t uniqId, Speed speed)
      _buf(0),
      _rgb(0)
 {
-    initialize_tbl();			// YUV -> RGB $BJQ49%F!<%V%k$N=i4|2=!%(B
+    initialize_tbl();			// YUV -> RGB 変換テーブルの初期化．
     gdk_rgb_init();
     gtk_signal_connect(GTK_OBJECT(_canvas), "expose_event",
 		       GTK_SIGNAL_FUNC(CBexpose), (gpointer)this);
     
-  // $B8=:_$N%+%a%i$N%U%)!<%^%C%H$K9g$o$;$F%P%C%U%!$N3NJ]$r9T$&!%(B
+  // 現在のカメラのフォーマットに合わせてバッファの確保を行う．
     setFormatAndFrameRate(getFormat(), getFrameRate());
 }
 
-//! IEEE1394$B%+%a%i%*%V%8%'%/%H$rGK2u$9$k(B
+//! IEEE1394カメラオブジェクトを破壊する
 My1394Camera::~My1394Camera()
 {
     delete [] _rgb;
     delete [] _buf;
 }
 
-//! $B2hA|%U%)!<%^%C%H$H%U%l!<%`%l!<%H$r;XDj$9$k!%(B
+//! 画像フォーマットとフレームレートを指定する．
 /*!
-  $B$5$i$KF~NO2hA|%P%C%U%!$H(BRGB$B%P%C%U%!$r3NJ]$7D>$7!$(Bcanvas$B$NBg$-$5$rJQ99$9$k!%(B
-  \param format	$B@_Dj$7$?$$2hA|%U%)!<%^%C%H!%(B
-  \param rate	$B@_Dj$7$?$$%U%l!<%`%l!<%H!%(B
-  \return	$B$3$N(BIEEE1394$B%+%a%i%*%V%8%'%/%H!%(B
+  さらに入力画像バッファとRGBバッファを確保し直し，canvasの大きさを変更する．
+  \param format	設定したい画像フォーマット．
+  \param rate	設定したいフレームレート．
+  \return	このIEEE1394カメラオブジェクト．
 */
 Ieee1394Camera&
 My1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 {
-  // IEEE1394$B%+%a%i$KBP$7$F2hA|%U%)!<%^%C%H$H%U%l!<%`%l!<%H$r;XDj$9$k!%(B
+  // IEEE1394カメラに対して画像フォーマットとフレームレートを指定する．
     Ieee1394Camera::setFormatAndFrameRate(format, rate);
 
-  // $B;XDj$7$?%U%)!<%^%C%H$K9g$o$;$FF~NO2hA|%P%C%U%!$H(BRGB$B%P%C%U%!$r:F3NJ]$9$k!%(B
+  // 指定したフォーマットに合わせて入力画像バッファとRGBバッファを再確保する．
     u_int	buffSize;
     switch (pixelFormat())
     {
@@ -181,44 +181,44 @@ My1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
     _buf = new u_char[buffSize];
     _rgb = new MyRGB[width() * height()];
 
-  // $B;XDj$7$?%U%)!<%^%C%H$K9g$o$;$F(Bcanvas$B$NBg$-$5$rJQ99$9$k!%(B
+  // 指定したフォーマットに合わせてcanvasの大きさを変更する．
     gtk_drawing_area_size(GTK_DRAWING_AREA(_canvas), width(), height());
     gtk_widget_show(_canvas);
     
     return *this;
 }
 
-//! $B%+%a%i$+$i2hA|$rFI$_9~$_!$(Bcanvas$B$KI=<($9$k!%(B
+//! カメラから画像を読み込み，canvasに表示する．
 /*!
-  $B2hA|%-%c%W%A%c%\%?%s$,2!$5$l$F$$$k4V$O!$(Bidle$B4X?t$H$7$FB>$K$d$k$3$H$,(B
-  $B$J$$;~$K$/$j$+$($78F$P$l$k!%(B
+  画像キャプチャボタンが押されている間は，idle関数として他にやることが
+  ない時にくりかえし呼ばれる．
 */
 void
 My1394Camera::idle()
 {
-  // $B%U%l!<%`%l!<%H$NB,Dj!%(B
+  // フレームレートの測定．
     static int			nframes = 0;
     static struct timeval	start;
     countTime(nframes, start);
 
-  // IEEE1394Camera $B$+$i2hA|%G!<%?$rFI$_9~$`!%(B
+  // IEEE1394Camera から画像データを読み込む．
     if (bayerTileMapping() != Ieee1394Camera::YYYY &&
 	((pixelFormat() == MONO_8)  ||
 	 (pixelFormat() == MONO_16) || (pixelFormat() == SIGNED_MONO_16)))
 	snap().captureBayerRaw(_rgb);
     else
 	snap().captureRaw(_buf);
-    draw();			// canvas$B$KI=<($9$k!%(B
+    draw();			// canvasに表示する．
 }
 
-//! $B%P%C%U%!Cf$N2hA|2hA|$r(Bcanvas$B$KI=<($9$k!%(B
+//! バッファ中の画像画像をcanvasに表示する．
 /*!
-  idle(), CBexpose()$B$+$i8F$P$l$k!%(B
+  idle(), CBexpose()から呼ばれる．
 */
 void
 My1394Camera::draw()
 {
-  // $BI,MQ$J$i(B YUV -> RGB $B$NJQ49$r9T$C$F$+$i2hA|$rI=<(!%(B
+  // 必用なら YUV -> RGB の変換を行ってから画像を表示．
     switch (pixelFormat())
     {
       case YUV_444:
@@ -325,11 +325,11 @@ My1394Camera::draw()
     }
 }
  
-//! $B%P%C%U%!Cf$N2hA|$r(Bsave$B$9$k!%(B
+//! バッファ中の画像をsaveする．
 /*!
-  $B%b%N%/%m2hA|$O(BPGM$B7A<0$G!"%+%i!<2hA|$O(BPPM$B7A<0$G(Bsave$B$5$l$k!%(B
-  \param out	$B2hA|$r=q$-=P$9=PNO%9%H%j!<%`!%(B
-  \return	out$B$G;XDj$7$?=PNO%9%H%j!<%`!%(B
+  モノクロ画像はPGM形式で、カラー画像はPPM形式でsaveされる．
+  \param out	画像を書き出す出力ストリーム．
+  \return	outで指定した出力ストリーム．
 */
 std::ostream&
 My1394Camera::save(std::ostream& out) const

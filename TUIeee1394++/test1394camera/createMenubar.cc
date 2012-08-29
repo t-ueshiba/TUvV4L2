@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- *  $Id: createMenubar.cc,v 1.10 2008-10-17 06:31:43 ueshiba Exp $
+ *  $Id: createMenubar.cc,v 1.11 2012-08-29 19:35:49 ueshiba Exp $
  */
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -38,12 +38,12 @@ namespace TU
 *  local data								*
 ************************************************************************/
 /*!
-  $B%+%a%i$,%5%]!<%H$9$k2hA|%U%)!<%^%C%H$H$=$NL>>N!%(B
+  カメラがサポートする画像フォーマットとその名称．
 */
 struct MyFormat
 {
-    const Ieee1394Camera::Format	format;		//!< $B2hA|%U%)!<%^%C%H(B
-    const char* const			name;		//!< $B$=$NL>>N(B
+    const Ieee1394Camera::Format	format;		//!< 画像フォーマット
+    const char* const			name;		//!< その名称
     
 };
 static const MyFormat	format[] =
@@ -83,12 +83,12 @@ static const MyFormat	format[] =
 static const int	NFORMATS = sizeof(format)/sizeof(format[0]);
 
 /*!
-  $B%+%a%i$,%5%]!<%H$9$k%U%l!<%`%l!<%H$H$=$NL>>N!%(B
+  カメラがサポートするフレームレートとその名称．
 */
 struct MyFrameRate
 {
-    const Ieee1394Camera::FrameRate	frameRate;	//!< $B%U%l!<%`%l!<%H(B
-    const char* const			name;		//!< $B$=$NL>>N(B
+    const Ieee1394Camera::FrameRate	frameRate;	//!< フレームレート
+    const char* const			name;		//!< その名称
 };
 static const MyFrameRate	frameRate[] =
 {
@@ -105,8 +105,8 @@ static const MyFrameRate	frameRate[] =
 static const int	NRATES=sizeof(frameRate)/sizeof(frameRate[0]);
 
 /*!
-  $B%+%a%i(B, $B2hA|%U%)!<%^%C%H(B, $B%U%l!<%`%l!<%H$N(B3$B%DAH!%%3!<%k%P%C%/4X?t(B:
-  CBmenuitem() $B$N0z?t$H$7$FEO$5$l$k!%(B
+  カメラ, 画像フォーマット, フレームレートの3ツ組．コールバック関数:
+  CBmenuitem() の引数として渡される．
  */
 struct FormatAndFrameRate
 {
@@ -117,8 +117,8 @@ struct FormatAndFrameRate
 static FormatAndFrameRate	fmtAndFRate[NFORMATS * NRATES];
 
 /*!
-  $B%+%a%i$H(Bfile selection widget$B$N(B2$B%DAH!%%3!<%k%P%C%/4X?t(B:
-  CBfileSelectionOK() $B$N0z?t$H$7$FEO$5$l$k!%(B
+  カメラとfile selection widgetの2ツ組．コールバック関数:
+  CBfileSelectionOK() の引数として渡される．
  */
 struct CameraAndFileSelection
 {
@@ -201,10 +201,10 @@ operator <<(std::ostream& out, const My1394Camera& camera)
 /************************************************************************
 *  callback functions							*
 ************************************************************************/
-//! $B%U%)!<%^%C%H$H%U%l!<%`%l!<%H$r@_Dj$9$k$?$a$N%3!<%k%P%C%/4X?t!%(B
+//! フォーマットとフレームレートを設定するためのコールバック関数．
 /*!
-  \param userdata	FormatAndFrameRate ($B%+%a%i(B, $B@_Dj$9$Y$-%U%)!<%^%C%H(B,
-			$B@_Dj$9$Y$-%U%l!<%`%l!<%H$N(B3$B%DAH(B)
+  \param userdata	FormatAndFrameRate (カメラ, 設定すべきフォーマット,
+			設定すべきフレームレートの3ツ組)
 */
 static void
 CBmenuitem(GtkMenuItem*, gpointer userdata)
@@ -225,9 +225,9 @@ CBmenuitem(GtkMenuItem*, gpointer userdata)
 					       fmtAndFRate->frameRate);
 }
 
-//! $BA*Br$5$l$?%U%!%$%k$K2hA|$r%;!<%V$9$k$?$a$N%3!<%k%P%C%/4X?t!%(B
+//! 選択されたファイルに画像をセーブするためのコールバック関数．
 /*!
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
+  \param userdata	My1394Camera (IEEE1394カメラ)
 */
 static void
 CBfileSelectionOK(GtkWidget* filesel, gpointer userdata)
@@ -240,9 +240,9 @@ CBfileSelectionOK(GtkWidget* filesel, gpointer userdata)
     gtk_widget_destroy(camAndFSel->filesel);
 }
 
-//! $B2hA|$r%;!<%V$9$k%U%!%$%k$rA*Br$9$k(Bdialog$B$rI=<($9$k$?$a$N%3!<%k%P%C%/4X?t!%(B
+//! 画像をセーブするファイルを選択するdialogを表示するためのコールバック関数．
 /*!
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
+  \param userdata	My1394Camera (IEEE1394カメラ)
 */
 static void
 CBsave(GtkMenuItem*, gpointer userdata)
@@ -265,9 +265,9 @@ CBsave(GtkMenuItem*, gpointer userdata)
     gtk_main();
 }
 
-//! $B%+%a%i$N@_DjCM$rI8=`=PNO$K=q$-=P$7$F=*N;$9$k$?$a$N%3!<%k%P%C%/4X?t!%(B
+//! カメラの設定値を標準出力に書き出して終了するためのコールバック関数．
 /*!
-  \param userdata	My1394Camera (IEEE1394$B%+%a%i(B)
+  \param userdata	My1394Camera (IEEE1394カメラ)
 */
 static void
 CBexit(GtkMenuItem*, gpointer userdata)
@@ -284,19 +284,19 @@ CBexit(GtkMenuItem*, gpointer userdata)
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! $B%a%K%e!<%P!<$r@8@.$9$k!%(B
+//! メニューバーを生成する．
 /*!
-  IEEE1394$B%+%a%i$,%5%]!<%H$7$F$$$k2hA|%U%)!<%^%C%H$H%U%l!<%`%l!<%H$rD4$Y$F(B
-  $B%a%K%e!<9`L\$r7hDj$9$k!%(B
-  \param camera		IEEE1394$B%+%a%i(B
-  \return		$B@8@.$5$l$?%a%K%e!<%P!<(B
+  IEEE1394カメラがサポートしている画像フォーマットとフレームレートを調べて
+  メニュー項目を決定する．
+  \param camera		IEEE1394カメラ
+  \return		生成されたメニューバー
 */
 GtkWidget*
 createMenubar(My1394Camera& camera)
 {
     GtkWidget*	menubar	= gtk_menu_bar_new();
 
-  // "File"$B%a%K%e!<$r@8@.!%(B
+  // "File"メニューを生成．
     GtkWidget*	menu = gtk_menu_new();
     GtkWidget*	item = gtk_menu_item_new_with_label("Save");
     gtk_signal_connect(GTK_OBJECT(item), "activate",
@@ -310,23 +310,23 @@ createMenubar(My1394Camera& camera)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
 
-  // "Format"$B%a%K%e!<$r@8@.!%(B
+  // "Format"メニューを生成．
     menu = gtk_menu_new();
-  // $B8=:_;XDj$5$l$F$$$k2hA|%U%)!<%^%C%H$*$h$S%U%l!<%`%l!<%H$rD4$Y$k!%(B
+  // 現在指定されている画像フォーマットおよびフレームレートを調べる．
     Ieee1394Camera::Format	current_format = camera.getFormat();
     Ieee1394Camera::FrameRate	current_rate   = camera.getFrameRate();
     int	nitems = 0;
-    for (int i = 0; i < NFORMATS; ++i)	// $BA4$F$N%U%)!<%^%C%H$K$D$$$F(B...
+    for (int i = 0; i < NFORMATS; ++i)	// 全てのフォーマットについて...
     {
-      // $B$3$N%U%)!<%^%C%H$,%5%]!<%H$5$l$F$$$k$+D4$Y$k!%(B
+      // このフォーマットがサポートされているか調べる．
 	u_int		inq = camera.inquireFrameRate(format[i].format);
 	GtkWidget*	submenu = 0;
-	for (int j = 0; j < NRATES; ++j) // $BA4$F$N%U%l!<%`%l!<%H$K$D$$$F(B...
+	for (int j = 0; j < NRATES; ++j) // 全てのフレームレートについて...
 	{
-	  // $B$3$N%U%l!<%`%l!<%H$,%5%]!<%H$5$l$F$$$k$+D4$Y$k!%(B
+	  // このフレームレートがサポートされているか調べる．
 	    if (inq & frameRate[j].frameRate)
 	    {
-	      // $B%U%l!<%`%l!<%H$r;XDj$9$k$?$a$N%5%V%a%K%e!<$r:n$k!%(B
+	      // フレームレートを指定するためのサブメニューを作る．
 		if (submenu == 0)
 		    submenu = gtk_menu_new();
 		GtkWidget* item
@@ -342,8 +342,8 @@ createMenubar(My1394Camera& camera)
 	    }
 	}
 	
-      // $B>/$J$/$H$b(B1$B$D$N%U%l!<%`%l!<%H$,%5%]!<%H$5$l$F$$$l$P!$$3$N(B
-      // $B%U%)!<%^%C%H$,%5%]!<%H$5$l$F$$$k$3$H$K$J$k!%(B
+      // 少なくとも1つのフレームレートがサポートされていれば，この
+      // フォーマットがサポートされていることになる．
 	if (submenu != 0)
 	{
 	    GtkWidget*	item = gtk_menu_item_new_with_label(format[i].name);
