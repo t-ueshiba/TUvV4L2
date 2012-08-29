@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  創作者：植芝俊夫
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Window.cc,v 1.8 2009-03-03 00:59:47 ueshiba Exp $  
+ *  $Id: Window.cc,v 1.9 2012-08-29 21:17:18 ueshiba Exp $  
  */
 #include "TU/v/App.h"
 #include <X11/Shell.h>

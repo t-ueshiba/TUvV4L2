@@ -1,15 +1,15 @@
 /*
- *  $BJ?@.(B14-19$BG/!JFH!K;:6H5;=QAm9g8&5f=j(B $BCx:n8"=jM-(B
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  $BAO:n<T!'?"<G=SIW(B
+ *  創作者：植芝俊夫
  *
- *  $BK\%W%m%0%i%`$O!JFH!K;:6H5;=QAm9g8&5f=j$N?&0w$G$"$k?"<G=SIW$,AO:n$7!$(B
- *  $B!JFH!K;:6H5;=QAm9g8&5f=j$,Cx:n8"$r=jM-$9$kHkL)>pJs$G$9!%Cx:n8"=jM-(B
- *  $B<T$K$h$k5v2D$J$7$KK\%W%m%0%i%`$r;HMQ!$J#@=!$2~JQ!$Bh;0<T$X3+<($9$k(B
- *  $BEy$N9T0Y$r6X;_$7$^$9!%(B
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  $B$3$N%W%m%0%i%`$K$h$C$F@8$8$k$$$+$J$kB;32$KBP$7$F$b!$Cx:n8"=jM-<T$*(B
- *  $B$h$SAO:n<T$O@UG$$rIi$$$^$;$s!#(B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: FileSelection.cc,v 1.9 2009-01-03 08:51:41 ueshiba Exp $  
+ *  $Id: FileSelection.cc,v 1.10 2012-08-29 21:17:18 ueshiba Exp $  
  */
 #include <unistd.h>
 #include <sys/types.h>
@@ -99,10 +99,10 @@ FileSelection::open(std::ifstream& in)
     for (;;)
     {
 	show();
-	if (_fullname.empty())		// $B%U%!%$%kL>$,A*Br$5$l$F$$$J$$!)(B
+	if (_fullname.empty())		// ファイル名が選択されていない？
 	    return false;
 	in.open(_fullname.c_str());
-	if (in)				// $B@5>o$K%*!<%W%s$5$l$?(B?
+	if (in)				// 正常にオープンされた?
 	    break;
 	Notify	notify(*this);
 	notify << "Cannot open " << _fullname << ": " << strerror(errno);
@@ -119,9 +119,9 @@ FileSelection::open(std::ofstream& out)
     for (;;)
     {
 	show();
-	if (_fullname.empty())		// $B%U%!%$%kL>$,A*Br$5$l$F$$$J$$!)(B
+	if (_fullname.empty())		// ファイル名が選択されていない？
 	    return false;
-	if (fileMode(_fullname))	// $B4{B8%U%!%$%k!)(B
+	if (fileMode(_fullname))	// 既存ファイル？
 	{
 	    Confirm	confirm(*this);
 	    confirm << _fullname << " already exists. Override?";
@@ -129,7 +129,7 @@ FileSelection::open(std::ofstream& out)
 		continue;
 	}
 	out.open(_fullname.c_str());
-	if (out)			// $B@5>o$K%*!<%W%s$5$l$?!)(B
+	if (out)			// 正常にオープンされた？
 	    break;
 	Notify	notify(*this);
 	notify << "Cannot open " << _fullname << ": " << strerror(errno);
@@ -167,9 +167,9 @@ FileSelection::callback(CmdId id, CmdVal val)
     }
 }
 
-// $B;XDj$7$?(Bdirectory$B$K0\F0$7!$$=$NCf$N%U%!%$%k$r(B_filenames$B$K%;%C%H$9$k!%(B
+// 指定したdirectoryに移動し，その中のファイルを_filenamesにセットする．
 /*!
-  \param dirname	$B0\F0@h$N(Bdirectory$BL>!%KvHx$O(B'\'$B$G$J$1$l$P$J$i$J$$!%(B
+  \param dirname	移動先のdirectory名．末尾は'\'でなければならない．
 */
 void
 FileSelection::changeDirectory(const std::string& dirname)
@@ -231,18 +231,18 @@ FileSelection::fullPathName(const char* name) const
     if (!strcmp(name, "./"))
 	return _dirname;
     else if (!strcmp(name, "../"))
-    {  // _dirname$B$NKvHx$,(B'/'$B$G=*$o$C$F$$$k$H2>Dj$7$F$$$k!%(B
+    {  // _dirnameの末尾が'/'で終わっていると仮定している．
 	std::string	fullname = _dirname;
-	fullname.erase(fullname.rfind('/'));	// $BKvHx$N(B'/'$B$r=|5n!%(B
+	fullname.erase(fullname.rfind('/'));	// 末尾の'/'を除去．
 	std::string::size_type	slash = fullname.rfind('/');
 	if (slash != std::string::npos)
-	    fullname.erase(slash + 1);		// $B:G8e$N(B'/'$B0J9_$r=|5n!%(B
+	    fullname.erase(slash + 1);		// 最後の'/'以降を除去．
 	else
-	    fullname = '/';	// $BKvHx0J30$K(B'/'$B$,;D$i$J$+$C$?$i(Broot$B!%(B
+	    fullname = '/';	// 末尾以外に'/'が残らなかったらroot．
 	return fullname;
     }
     else
-    {  // _dirname$B$NKvHx$,(B'/'$B$G=*$o$C$F$$$k$H2>Dj$7$F$$$k!%(B
+    {  // _dirnameの末尾が'/'で終わっていると仮定している．
 	std::string	fullname = _dirname + name;;
 	return fullname;
     }
