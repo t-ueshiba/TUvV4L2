@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.h,v 1.50 2012-08-15 07:17:55 ueshiba Exp $
+ *  $Id: Vector++.h,v 1.51 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Vector++.h
-  \brief	ƒxƒNƒgƒ‹‚Æs—ñ‚¨‚æ‚Ñ‚»‚ê‚ÉŠÖ˜A‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	ãƒ™ã‚¯ãƒˆãƒ«ã¨è¡Œåˆ—ãŠã‚ˆã³ãã‚Œã«é–¢é€£ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUVectorPP_h
 #define __TUVectorPP_h
@@ -43,9 +43,9 @@ namespace TU
 /************************************************************************
 *  class Rotation<T>							*
 ************************************************************************/
-//! 2ŸŒ³’´•½–Ê“à‚Å‚Ì‰ñ“]‚ğ•\‚·ƒNƒ‰ƒX
+//! 2æ¬¡å…ƒè¶…å¹³é¢å†…ã§ã®å›è»¢ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  ‹ï‘Ì“I‚É‚Í
+  å…·ä½“çš„ã«ã¯
   \f[
     \TUvec{R}{}(p, q; \theta) \equiv
     \begin{array}{r@{}l}
@@ -70,45 +70,45 @@ namespace TU
       \TUendarray
     \end{array}
   \f]
-  ‚È‚é‰ñ“]s—ñ‚Å•\‚³‚ê‚éD
+  ãªã‚‹å›è»¢è¡Œåˆ—ã§è¡¨ã•ã‚Œã‚‹ï¼
 */
 template <class T>
 class Rotation
 {
   public:
-    typedef T	value_type;	//!< ¬•ª‚ÌŒ^
+    typedef T	value_type;	//!< æˆåˆ†ã®å‹
     
   public:
     Rotation(u_int p, u_int q, value_type x, value_type y)	;
     Rotation(u_int p, u_int q, value_type theta)		;
 
-  //! p²‚ğ•Ô‚·D
+  //! pè»¸ã‚’è¿”ã™ï¼
   /*!
-    \return	p²‚Ìindex
+    \return	pè»¸ã®index
   */
     u_int	p()				const	{return _p;}
 
-  //! q²‚ğ•Ô‚·D
+  //! qè»¸ã‚’è¿”ã™ï¼
   /*!
-    \return	q²‚Ìindex
+    \return	qè»¸ã®index
   */
     u_int	q()				const	{return _q;}
 
-  //! ‰ñ“]Šp¶¬ƒxƒNƒgƒ‹‚Ì’·‚³‚ğ•Ô‚·D
+  //! å›è»¢è§’ç”Ÿæˆãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’è¿”ã™ï¼
   /*!
-    \return	‰ñ“]Šp¶¬ƒxƒNƒgƒ‹(x, y)‚É‘Î‚µ‚Ä\f$\sqrt{x^2 + y^2}\f$
+    \return	å›è»¢è§’ç”Ÿæˆãƒ™ã‚¯ãƒˆãƒ«(x, y)ã«å¯¾ã—ã¦\f$\sqrt{x^2 + y^2}\f$
   */
     value_type	length()			const	{return _l;}
 
-  //! ‰ñ“]Šp‚Ìcos’l‚ğ•Ô‚·D
+  //! å›è»¢è§’ã®coså€¤ã‚’è¿”ã™ï¼
   /*!
-    \return	‰ñ“]Šp‚Ìcos’l
+    \return	å›è»¢è§’ã®coså€¤
   */
     value_type	cos()				const	{return _c;}
 
-  //! ‰ñ“]Šp‚Ìsin’l‚ğ•Ô‚·D
+  //! å›è»¢è§’ã®sinå€¤ã‚’è¿”ã™ï¼
   /*!
-    \return	‰ñ“]Šp‚Ìsin’l
+    \return	å›è»¢è§’ã®sinå€¤
   */
     value_type	sin()				const	{return _s;}
     
@@ -118,12 +118,12 @@ class Rotation
     value_type	_c, _s;				// cos & sin
 };
 
-//! 2ŸŒ³’´•½–Ê“à‚Å‚Ì‰ñ“]‚ğ¶¬‚·‚é
+//! 2æ¬¡å…ƒè¶…å¹³é¢å†…ã§ã®å›è»¢ã‚’ç”Ÿæˆã™ã‚‹
 /*!
-  \param p	p²‚ğw’è‚·‚éindex
-  \param q	q²‚ğw’è‚·‚éindex
-  \param x	‰ñ“]Šp‚ğ¶¬‚·‚éÛ‚Ìx’l
-  \param y	‰ñ“]Šp‚ğ¶¬‚·‚éÛ‚Ìy’l
+  \param p	pè»¸ã‚’æŒ‡å®šã™ã‚‹index
+  \param q	qè»¸ã‚’æŒ‡å®šã™ã‚‹index
+  \param x	å›è»¢è§’ã‚’ç”Ÿæˆã™ã‚‹éš›ã®xå€¤
+  \param y	å›è»¢è§’ã‚’ç”Ÿæˆã™ã‚‹éš›ã®yå€¤
 		\f[
 		  \cos\theta = \frac{x}{\sqrt{x^2+y^2}},{\hskip 1em}
 		  \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
@@ -143,11 +143,11 @@ Rotation<T>::Rotation(u_int p, u_int q, value_type x, value_type y)
     }
 }
 
-//! 2ŸŒ³’´•½–Ê“à‚Å‚Ì‰ñ“]‚ğ¶¬‚·‚é
+//! 2æ¬¡å…ƒè¶…å¹³é¢å†…ã§ã®å›è»¢ã‚’ç”Ÿæˆã™ã‚‹
 /*!
-  \param p	p²‚ğw’è‚·‚éindex
-  \param q	q²‚ğw’è‚·‚éindex
-  \param theta	‰ñ“]Šp
+  \param p	pè»¸ã‚’æŒ‡å®šã™ã‚‹index
+  \param q	qè»¸ã‚’æŒ‡å®šã™ã‚‹index
+  \param theta	å›è»¢è§’
 */
 template <class T> inline
 Rotation<T>::Rotation(u_int p, u_int q, value_type theta)
@@ -160,10 +160,10 @@ Rotation<T>::Rotation(u_int p, u_int q, value_type theta)
 ************************************************************************/
 template <class T, class B, class R>	class Matrix;
 
-//! TŒ^‚Ì¬•ª‚ğ‚ÂƒxƒNƒgƒ‹‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®æˆåˆ†ã‚’æŒã¤ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	¬•ª‚ÌŒ^
-  \param B	ƒoƒbƒtƒ@
+  \param T	æˆåˆ†ã®å‹
+  \param B	ãƒãƒƒãƒ•ã‚¡
 */
 template <class T, class B=Buf<T> >
 class Vector : public Array<T, B>
@@ -182,9 +182,9 @@ class Vector : public Array<T, B>
     typedef typename super::const_iterator		const_iterator;
     typedef typename super::reverse_iterator		reverse_iterator;
     typedef typename super::const_reverse_iterator	const_reverse_iterator;
-  //! ¬•ª‚ÌŒ^‚ª“™‚µ‚¢3ŸŒ³ƒxƒNƒgƒ‹‚ÌŒ^
+  //! æˆåˆ†ã®å‹ãŒç­‰ã—ã„3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã®å‹
     typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
-  //! ¬•ª‚ÌŒ^‚ª“™‚µ‚¢3x3s—ñ‚ÌŒ^
+  //! æˆåˆ†ã®å‹ãŒç­‰ã—ã„3x3è¡Œåˆ—ã®å‹
     typedef Matrix<T, FixedSizedBuf<T, 9>,
 		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
     
@@ -238,7 +238,7 @@ class Vector : public Array<T, B>
     void		resize(T* p, u_int d)				;
 };
 
-//! ƒxƒNƒgƒ‹‚ğ¶¬‚µC‘S¬•ª‚ğ0‚Å‰Šú‰»‚·‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã—ï¼Œå…¨æˆåˆ†ã‚’0ã§åˆæœŸåŒ–ã™ã‚‹ï¼
 template <class T, class B>
 Vector<T, B>::Vector()
     :super()
@@ -246,9 +246,9 @@ Vector<T, B>::Vector()
     *this = 0;
 }
 
-//! w’è‚³‚ê‚½ŸŒ³‚ÌƒxƒNƒgƒ‹‚ğ¶¬‚µC‘S¬•ª‚ğ0‚Å‰Šú‰»‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸæ¬¡å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã—ï¼Œå…¨æˆåˆ†ã‚’0ã§åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param d	ƒxƒNƒgƒ‹‚ÌŸŒ³
+  \param d	ãƒ™ã‚¯ãƒˆãƒ«ã®æ¬¡å…ƒ
 */
 template <class T, class B> inline
 Vector<T, B>::Vector(u_int d)
@@ -257,10 +257,10 @@ Vector<T, B>::Vector(u_int d)
     *this = 0;
 }
 
-//! ŠO•”‹L‰¯—Ìˆæ‚ÆŸŒ³‚ğw’è‚µ‚ÄƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! å¤–éƒ¨è¨˜æ†¶é ˜åŸŸã¨æ¬¡å…ƒã‚’æŒ‡å®šã—ã¦ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param p	ŠO•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param d	ƒxƒNƒgƒ‹‚ÌŸŒ³
+  \param p	å¤–éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param d	ãƒ™ã‚¯ãƒˆãƒ«ã®æ¬¡å…ƒ
 */
 template <class T, class B> inline
 Vector<T, B>::Vector(T* p, u_int d)
@@ -268,11 +268,11 @@ Vector<T, B>::Vector(T* p, u_int d)
 {
 }
 
-//! —^‚¦‚ç‚ê‚½ƒxƒNƒgƒ‹‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚é•”•ªƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«ã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã™ã‚‹éƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param v	Œ³‚ÌƒxƒNƒgƒ‹
-  \param i	•”•ªƒxƒNƒgƒ‹‚Ì‘æ0¬•ª‚ğw’è‚·‚éindex
-  \param d	•”•ªƒxƒNƒgƒ‹‚ÌŸŒ³
+  \param v	å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«
+  \param i	éƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã®ç¬¬0æˆåˆ†ã‚’æŒ‡å®šã™ã‚‹index
+  \param d	éƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã®æ¬¡å…ƒ
 */
 template <class T, class B> template <class B2> inline
 Vector<T, B>::Vector(Vector<T, B2>& v, u_int i, u_int d)
@@ -280,9 +280,9 @@ Vector<T, B>::Vector(Vector<T, B2>& v, u_int i, u_int d)
 {
 }
 
-//! ‘¼‚ÌƒxƒNƒgƒ‹‚Æ“¯ˆê¬•ª‚ğ‚ÂƒxƒNƒgƒ‹‚ğì‚é(ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÌŠg’£)D
+//! ä»–ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨åŒä¸€æˆåˆ†ã‚’æŒã¤ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä½œã‚‹(ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®æ‹¡å¼µ)ï¼
 /*!
-  \param v	ƒRƒs[Œ³ƒxƒNƒgƒ‹
+  \param v	ã‚³ãƒ”ãƒ¼å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B> template <class T2, class B2> inline
 Vector<T, B>::Vector(const Vector<T2, B2>& v)
@@ -290,10 +290,10 @@ Vector<T, B>::Vector(const Vector<T2, B2>& v)
 {
 }
     
-//! ‘¼‚ÌƒxƒNƒgƒ‹‚ğ©•ª‚É‘ã“ü‚·‚é(‘ã“ü‰‰Zq‚ÌŠg’£)D
+//! ä»–ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è‡ªåˆ†ã«ä»£å…¥ã™ã‚‹(ä»£å…¥æ¼”ç®—å­ã®æ‹¡å¼µ)ï¼
 /*!
-  \param v	ƒRƒs[Œ³ƒxƒNƒgƒ‹
-  \return	‚±‚ÌƒxƒNƒgƒ‹
+  \param v	ã‚³ãƒ”ãƒ¼å…ƒãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
 Vector<T, B>::operator =(const Vector<T2, B2>& v)
@@ -302,11 +302,11 @@ Vector<T, B>::operator =(const Vector<T2, B2>& v)
     return *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã—ãŸéƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-    \param i	•”•ªƒxƒNƒgƒ‹‚Ì‘æ0¬•ª‚ğw’è‚·‚éindex
-    \param d	•”•ªƒxƒNƒgƒ‹‚ÌŸŒ³
-    \return	¶¬‚³‚ê‚½•”•ªƒxƒNƒgƒ‹
+    \param i	éƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã®ç¬¬0æˆåˆ†ã‚’æŒ‡å®šã™ã‚‹index
+    \param d	éƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã®æ¬¡å…ƒ
+    \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B> inline Vector<T>
 Vector<T, B>::operator ()(u_int i, u_int d)
@@ -314,11 +314,11 @@ Vector<T, B>::operator ()(u_int i, u_int d)
     return Vector<T>(*this, i, d);
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã—ãŸéƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-    \param i	•”•ªƒxƒNƒgƒ‹‚Ì‘æ0¬•ª‚ğw’è‚·‚éindex
-    \param d	•”•ªƒxƒNƒgƒ‹‚ÌŸŒ³
-    \return	¶¬‚³‚ê‚½•”•ªƒxƒNƒgƒ‹
+    \param i	éƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã®ç¬¬0æˆåˆ†ã‚’æŒ‡å®šã™ã‚‹index
+    \param d	éƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«ã®æ¬¡å…ƒ
+    \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B> inline const Vector<T>
 Vector<T, B>::operator ()(u_int i, u_int d) const
@@ -326,10 +326,10 @@ Vector<T, B>::operator ()(u_int i, u_int d) const
     return Vector<T>(const_cast<Vector<T, B>&>(*this), i, d);
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì‘S‚Ä‚Ì¬•ª‚É“¯ˆê‚Ì”’l‚ğ‘ã“ü‚·‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã®å…¨ã¦ã®æˆåˆ†ã«åŒä¸€ã®æ•°å€¤ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  \param c	‘ã“ü‚·‚é”’l
-  \return	‚±‚ÌƒxƒNƒgƒ‹
+  \param c	ä»£å…¥ã™ã‚‹æ•°å€¤
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B> inline Vector<T, B>&
 Vector<T, B>::operator =(const T& c)
@@ -338,10 +338,10 @@ Vector<T, B>::operator =(const T& c)
     return *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Éw’è‚³‚ê‚½”’l‚ğŠ|‚¯‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã«æŒ‡å®šã•ã‚ŒãŸæ•°å€¤ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param c	Š|‚¯‚é”’l
-  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$
+  \param c	æ›ã‘ã‚‹æ•°å€¤
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$
 */
 template <class T, class B> inline Vector<T, B>&
 Vector<T, B>::operator *=(double c)
@@ -350,10 +350,10 @@ Vector<T, B>::operator *=(double c)
     return *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚ğw’è‚³‚ê‚½”’l‚ÅŠ„‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’æŒ‡å®šã•ã‚ŒãŸæ•°å€¤ã§å‰²ã‚‹ï¼
 /*!
-  \param c	Š„‚é”’l
-  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+  \param c	å‰²ã‚‹æ•°å€¤
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{u}{}\leftarrow \frac{\TUvec{u}{}}{c}\f$
 */
 template <class T, class B> inline Vector<T, B>&
@@ -363,10 +363,10 @@ Vector<T, B>::operator /=(double c)
     return *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚É‘¼‚ÌƒxƒNƒgƒ‹‚ğ‘«‚·D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã«ä»–ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¶³ã™ï¼
 /*!
-  \param v	‘«‚·ƒxƒNƒgƒ‹
-  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+  \param v	è¶³ã™ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} + \TUvec{v}{}\f$
 */
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
@@ -376,10 +376,10 @@ Vector<T, B>::operator +=(const Vector<T2, B2>& v)
     return *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚©‚ç‘¼‚ÌƒxƒNƒgƒ‹‚ğˆø‚­D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰ä»–ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’å¼•ãï¼
 /*!
-  \param v	ˆø‚­ƒxƒNƒgƒ‹
-  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+  \param v	å¼•ããƒ™ã‚¯ãƒˆãƒ«
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} - \TUvec{v}{}\f$
 */
 template <class T, class B> template <class T2, class B2> inline Vector<T, B>&
@@ -389,12 +389,12 @@ Vector<T, B>::operator -=(const Vector<T2, B2>& v)
     return *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‘¼‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚Æ‚ÌƒxƒNƒgƒ‹Ï‚ğ‚Æ‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ä»–ã®3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã¨ã®ãƒ™ã‚¯ãƒˆãƒ«ç©ã‚’ã¨ã‚‹ï¼
 /*!
-    \param v	‘¼‚ÌƒxƒNƒgƒ‹
-    \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+    \param v	ä»–ã®ãƒ™ã‚¯ãƒˆãƒ«
+    \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\times\TUvec{v}{}\f$
-    \throw std::invalid_argument	‚±‚ÌƒxƒNƒgƒ‹‚Æv‚ª3ŸŒ³‚Å‚È‚¢ê‡‚É‘—o
+    \throw std::invalid_argument	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨vãŒ3æ¬¡å…ƒã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B> template <class T2, class B2> Vector<T, B>&
 Vector<T, B>::operator ^=(const Vector<T2, B2>& v)	// outer product
@@ -409,10 +409,10 @@ Vector<T, B>::operator ^=(const Vector<T2, B2>& v)	// outer product
     return *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì‰E‚©‚çs—ñ‚ğŠ|‚¯‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã®å³ã‹ã‚‰è¡Œåˆ—ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param m	Š|‚¯‚és—ñ
-  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+  \param m	æ›ã‘ã‚‹è¡Œåˆ—
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUvec{M}{}\f$
 */
 template <class T, class B> template <class T2, class B2, class R2>
@@ -422,9 +422,9 @@ Vector<T, B>::operator *=(const Matrix<T2, B2, R2>& m)
     return *this = *this * m;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì•„†‚ğ”½“]‚µ‚½ƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã®ç¬¦å·ã‚’åè»¢ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ï¼
 /*!
-  \return	•„†‚ğ”½“]‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$-\TUvec{u}{}\f$
+  \return	ç¬¦å·ã‚’åè»¢ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$-\TUvec{u}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 Vector<T, B>::operator -() const
@@ -432,9 +432,9 @@ Vector<T, B>::operator -() const
     return Vector(*this) *= -1;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚Ì2æ‚ğ•Ô‚·D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã®2ä¹—ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒxƒNƒgƒ‹‚Ì’·‚³‚Ì2æC‚·‚È‚í‚¿\f$\TUnorm{\TUvec{u}{}}^2\f$
+  \return	ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã®2ä¹—ï¼Œã™ãªã‚ã¡\f$\TUnorm{\TUvec{u}{}}^2\f$
 */
 template <class T, class B> inline T
 Vector<T, B>::square() const
@@ -442,9 +442,9 @@ Vector<T, B>::square() const
     return *this * *this;
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚ğ•Ô‚·D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒxƒNƒgƒ‹‚Ì’·‚³C‚·‚È‚í‚¿\f$\TUnorm{\TUvec{u}{}}\f$
+  \return	ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ï¼Œã™ãªã‚ã¡\f$\TUnorm{\TUvec{u}{}}\f$
 */
 template <class T, class B> inline double
 Vector<T, B>::length() const
@@ -452,10 +452,10 @@ Vector<T, B>::length() const
     return std::sqrt(double(square()));
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‘¼‚ÌƒxƒNƒgƒ‹‚Ì·‚Ì’·‚³‚Ì2æ‚ğ•Ô‚·D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ä»–ã®ãƒ™ã‚¯ãƒˆãƒ«ã®å·®ã®é•·ã•ã®2ä¹—ã‚’è¿”ã™ï¼
 /*!
-  \param v	”äŠr‘ÎÛ‚Æ‚È‚éƒxƒNƒgƒ‹
-  \return	ƒxƒNƒgƒ‹ŠÔ‚Ì·‚Ì2æC‚·‚È‚í‚¿
+  \param v	æ¯”è¼ƒå¯¾è±¡ã¨ãªã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å·®ã®2ä¹—ï¼Œã™ãªã‚ã¡
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
 */
 template <class T, class B> template <class T2, class B2> inline T
@@ -464,10 +464,10 @@ Vector<T, B>::sqdist(const Vector<T2, B2>& v) const
     return (*this - v).square();
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Æ‘¼‚ÌƒxƒNƒgƒ‹‚Ì·‚Ì’·‚³‚ğ•Ô‚·D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ä»–ã®ãƒ™ã‚¯ãƒˆãƒ«ã®å·®ã®é•·ã•ã‚’è¿”ã™ï¼
 /*!
-  \param v	”äŠr‘ÎÛ‚Æ‚È‚éƒxƒNƒgƒ‹
-  \return	ƒxƒNƒgƒ‹ŠÔ‚Ì·C‚·‚È‚í‚¿
+  \param v	æ¯”è¼ƒå¯¾è±¡ã¨ãªã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å·®ï¼Œã™ãªã‚ã¡
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
 template <class T, class B> template <class T2, class B2> inline double
@@ -476,9 +476,9 @@ Vector<T, B>::dist(const Vector<T2, B2>& v) const
     return std::sqrt(double(sqdist(v)));
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚ğ1‚É³‹K‰»‚·‚éD
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’1ã«æ­£è¦åŒ–ã™ã‚‹ï¼
 /*!
-  \return	‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+  \return	ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$
 		  \TUvec{u}{}\leftarrow\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}
 		\f$
@@ -489,9 +489,9 @@ Vector<T, B>::normalize()
     return *this /= length();
 }
 
-//! ‚±‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚ğ1‚É³‹K‰»‚µ‚½ƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! ã“ã®ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’1ã«æ­£è¦åŒ–ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ï¼
 /*!
-  \return	’·‚³‚ğ³‹K‰»‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+  \return	é•·ã•ã‚’æ­£è¦åŒ–ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}\f$
 */
 template <class T, class B> inline Vector<T, B>
@@ -500,16 +500,16 @@ Vector<T, B>::normal() const
     return Vector(*this).normalize();
 }
 
-//! ‚±‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚©‚ç3x3”½‘ÎÌs—ñ‚ğ¶¬‚·‚éD
+//! ã“ã®3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰3x3åå¯¾ç§°è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \return	¶¬‚³‚ê‚½”½‘ÎÌs—ñC‚·‚È‚í‚¿
+  \return	ç”Ÿæˆã•ã‚ŒãŸåå¯¾ç§°è¡Œåˆ—ï¼Œã™ãªã‚ã¡
   \f[
     \TUskew{u}{} \equiv
     \TUbeginarray{ccc}
       & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
     \TUendarray
   \f]
-  \throw std::invalid_argument	3ŸŒ³ƒxƒNƒgƒ‹‚Å‚È‚¢ê‡‚É‘—o
+  \throw std::invalid_argument	3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B>
 Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
@@ -527,9 +527,9 @@ Vector<T, B>::skew() const
     return r;
 }
 
-//! ”ñ“¯ŸÀ•W‚ğ•\‚·ƒxƒNƒgƒ‹‚É‘Î‚µC’l1‚ğ‚Â¬•ª‚ğÅŒã‚É•t‰Á‚µ‚½“¯ŸÀ•WƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! éåŒæ¬¡åº§æ¨™ã‚’è¡¨ã™ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ï¼Œå€¤1ã‚’æŒã¤æˆåˆ†ã‚’æœ€å¾Œã«ä»˜åŠ ã—ãŸåŒæ¬¡åº§æ¨™ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ï¼
 /*!
-  \return	“¯Ÿ‰»‚³‚ê‚½ƒxƒNƒgƒ‹
+  \return	åŒæ¬¡åŒ–ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B> inline Vector<T>
 Vector<T, B>::homogeneous() const
@@ -540,9 +540,9 @@ Vector<T, B>::homogeneous() const
     return v;
 }
 
-//! “¯ŸÀ•W‚ğ•\‚·ƒxƒNƒgƒ‹‚É‘Î‚µCŠe¬•ª‚ğÅŒã‚Ì¬•ª‚ÅŠ„‚Á‚½”ñ“¯ŸÀ•WƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! åŒæ¬¡åº§æ¨™ã‚’è¡¨ã™ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ï¼Œå„æˆåˆ†ã‚’æœ€å¾Œã®æˆåˆ†ã§å‰²ã£ãŸéåŒæ¬¡åº§æ¨™ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ï¼
 /*!
-  \return	”ñ“¯Ÿ‰»‚³‚ê‚½ƒxƒNƒgƒ‹
+  \return	éåŒæ¬¡åŒ–ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B> inline Vector<T>
 Vector<T, B>::inhomogeneous() const
@@ -550,11 +550,11 @@ Vector<T, B>::inhomogeneous() const
     return (*this)(0, dim()-1) / (*this)[dim()-1];
 }
 
-//! ƒxƒNƒgƒ‹‚ÌŸŒ³‚ğ•ÏX‚µC‘S¬•ª‚ğ0‚É‰Šú‰»‚·‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ã®æ¬¡å…ƒã‚’å¤‰æ›´ã—ï¼Œå…¨æˆåˆ†ã‚’0ã«åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  ‚½‚¾‚µC‘¼‚ÌƒIƒuƒWƒFƒNƒg‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚Ä‚¢‚éƒxƒNƒgƒ‹‚ÌŸŒ³‚ğ
-  •ÏX‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢D
-  \param d	V‚µ‚¢ŸŒ³
+  ãŸã ã—ï¼Œä»–ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã—ã¦ã„ã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã®æ¬¡å…ƒã‚’
+  å¤‰æ›´ã™ã‚‹ã“ã¨ã¯ã§ããªã„ï¼
+  \param d	æ–°ã—ã„æ¬¡å…ƒ
 */
 template <class T, class B> inline void
 Vector<T, B>::resize(u_int d)
@@ -563,10 +563,10 @@ Vector<T, B>::resize(u_int d)
     *this = 0;
 }
 
-//! ƒxƒNƒgƒ‹‚ª“à•”‚Åg—p‚·‚é‹L‰¯—Ìˆæ‚ğw’è‚µ‚½‚à‚Ì‚É•ÏX‚·‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ãŒå†…éƒ¨ã§ä½¿ç”¨ã™ã‚‹è¨˜æ†¶é ˜åŸŸã‚’æŒ‡å®šã—ãŸã‚‚ã®ã«å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param p	V‚µ‚¢‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param d	V‚µ‚¢ŸŒ³
+  \param p	æ–°ã—ã„è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param d	æ–°ã—ã„æ¬¡å…ƒ
 */
 template <class T, class B> inline void
 Vector<T, B>::resize(T* p, u_int d)
@@ -580,12 +580,12 @@ Vector<T, B>::resize(T* p, u_int d)
 template <class T>	class TriDiagonal;
 template <class T>	class SVDecomposition;
 
-//! TŒ^‚Ì¬•ª‚ğ‚Âs—ñ‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®æˆåˆ†ã‚’æŒã¤è¡Œåˆ—ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  Šes‚ªTŒ^‚Ì¬•ª‚ğ‚ÂƒxƒNƒgƒ‹#TU::Vector<T>‚É‚È‚Á‚Ä‚¢‚éD
-  \param T	¬•ª‚ÌŒ^
-  \param B	ƒoƒbƒtƒ@
-  \param R	sƒoƒbƒtƒ@
+  å„è¡ŒãŒTå‹ã®æˆåˆ†ã‚’æŒã¤ãƒ™ã‚¯ãƒˆãƒ«#TU::Vector<T>ã«ãªã£ã¦ã„ã‚‹ï¼
+  \param T	æˆåˆ†ã®å‹
+  \param B	ãƒãƒƒãƒ•ã‚¡
+  \param R	è¡Œãƒãƒƒãƒ•ã‚¡
 */
 template <class T, class B=Buf<T>, class R=Buf<Vector<T> > >
 class Matrix : public Array2<Vector<T>, B, R>
@@ -602,11 +602,11 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef typename super::const_pointer		const_pointer;
     typedef typename super::iterator			iterator;
     typedef typename super::const_iterator		const_iterator;
-  //! ¬•ª‚ÌŒ^‚ª“™‚µ‚¢3ŸŒ³ƒxƒNƒgƒ‹‚ÌŒ^
+  //! æˆåˆ†ã®å‹ãŒç­‰ã—ã„3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã®å‹
     typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
-  //! ¬•ª‚ÌŒ^‚ª“™‚µ‚¢4ŸŒ³ƒxƒNƒgƒ‹‚ÌŒ^
+  //! æˆåˆ†ã®å‹ãŒç­‰ã—ã„4æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã®å‹
     typedef Vector<T, FixedSizedBuf<T, 4> >		vector4_type;
-  //! ¬•ª‚ÌŒ^‚ª“™‚µ‚¢3x3s—ñ‚ÌŒ^
+  //! æˆåˆ†ã®å‹ãŒç­‰ã—ã„3x3è¡Œåˆ—ã®å‹
     typedef Matrix<T, FixedSizedBuf<T, 9>,
 		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
     
@@ -685,7 +685,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     void		resize(T* p, u_int r, u_int c)			;
 };
 
-//! s—ñ‚ğ¶¬‚µC‘S¬•ª‚ğ0‚Å‰Šú‰»‚·‚éD
+//! è¡Œåˆ—ã‚’ç”Ÿæˆã—ï¼Œå…¨æˆåˆ†ã‚’0ã§åˆæœŸåŒ–ã™ã‚‹ï¼
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix()
     :super()
@@ -693,10 +693,10 @@ Matrix<T, B, R>::Matrix()
     *this = 0;
 }
 
-//! w’è‚³‚ê‚½ƒTƒCƒY‚Ìs—ñ‚ğ¶¬‚µC‘S¬•ª‚ğ0‚Å‰Šú‰»‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸã‚µã‚¤ã‚ºã®è¡Œåˆ—ã‚’ç”Ÿæˆã—ï¼Œå…¨æˆåˆ†ã‚’0ã§åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param r	s—ñ‚Ìs”
-  \param c	s—ñ‚Ì—ñ”
+  \param r	è¡Œåˆ—ã®è¡Œæ•°
+  \param c	è¡Œåˆ—ã®åˆ—æ•°
 */
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix(u_int r, u_int c)
@@ -705,11 +705,11 @@ Matrix<T, B, R>::Matrix(u_int r, u_int c)
     *this = 0;
 }
 
-//! ŠO•”‹L‰¯—Ìˆæ‚ÆƒTƒCƒY‚ğw’è‚µ‚Äs—ñ‚ğ¶¬‚·‚éD
+//! å¤–éƒ¨è¨˜æ†¶é ˜åŸŸã¨ã‚µã‚¤ã‚ºã‚’æŒ‡å®šã—ã¦è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param p	ŠO•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param r	s—ñ‚Ìs”
-  \param c	s—ñ‚Ì—ñ”
+  \param p	å¤–éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param r	è¡Œåˆ—ã®è¡Œæ•°
+  \param c	è¡Œåˆ—ã®åˆ—æ•°
 */
 template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
@@ -717,13 +717,13 @@ Matrix<T, B, R>::Matrix(T* p, u_int r, u_int c)
 {
 }
 
-//! —^‚¦‚ç‚ê‚½s—ñ‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚é•”•ªs—ñ‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸè¡Œåˆ—ã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã™ã‚‹éƒ¨åˆ†è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param m	Œ³‚Ìs—ñ
-  \param i	•”•ªs—ñ‚Ì‘æ0s‚ğw’è‚·‚éindex
-  \param j	•”•ªs—ñ‚Ì‘æ0—ñ‚ğw’è‚·‚éindex
-  \param r	•”•ªs—ñ‚Ìs”
-  \param c	•”•ªs—ñ‚Ì—ñ”
+  \param m	å…ƒã®è¡Œåˆ—
+  \param i	éƒ¨åˆ†è¡Œåˆ—ã®ç¬¬0è¡Œã‚’æŒ‡å®šã™ã‚‹index
+  \param j	éƒ¨åˆ†è¡Œåˆ—ã®ç¬¬0åˆ—ã‚’æŒ‡å®šã™ã‚‹index
+  \param r	éƒ¨åˆ†è¡Œåˆ—ã®è¡Œæ•°
+  \param c	éƒ¨åˆ†è¡Œåˆ—ã®åˆ—æ•°
 */
 template <class T, class B, class R> template <class B2, class R2> inline
 Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
@@ -732,9 +732,9 @@ Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
 {
 }
 
-//! ‘¼‚Ìs—ñ‚Æ“¯ˆê¬•ª‚ğ‚Âs—ñ‚ğì‚é(ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÌŠg’£)D
+//! ä»–ã®è¡Œåˆ—ã¨åŒä¸€æˆåˆ†ã‚’æŒã¤è¡Œåˆ—ã‚’ä½œã‚‹(ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®æ‹¡å¼µ)ï¼
 /*!
-  \param m	ƒRƒs[Œ³s—ñ
+  \param m	ã‚³ãƒ”ãƒ¼å…ƒè¡Œåˆ—
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
 inline
@@ -743,10 +743,10 @@ Matrix<T, B, R>::Matrix(const Matrix<T2, B2, R2>& m)
 {
 }
 
-//! ‘¼‚Ìs—ñ‚ğ©•ª‚É‘ã“ü‚·‚é(‘ã“ü‰‰Zq‚ÌŠg’£)D
+//! ä»–ã®è¡Œåˆ—ã‚’è‡ªåˆ†ã«ä»£å…¥ã™ã‚‹(ä»£å…¥æ¼”ç®—å­ã®æ‹¡å¼µ)ï¼
 /*!
-  \param m	ƒRƒs[Œ³s—ñ
-  \return	‚±‚Ìs—ñ
+  \param m	ã‚³ãƒ”ãƒ¼å…ƒè¡Œåˆ—
+  \return	ã“ã®è¡Œåˆ—
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
 inline Matrix<T, B, R>&
@@ -756,10 +756,10 @@ Matrix<T, B, R>::operator =(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Ìs‚ğ•À‚×‚Ä‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚éƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! ã“ã®è¡Œåˆ—ã®è¡Œã‚’ä¸¦ã¹ã¦è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  ‘Ss‚Ì‹L‰¯—Ìˆæ‚Í˜A‘±‚µ‚Ä‚¢‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
-  \return	‹L‰¯—Ìˆæ‚ğ‹¤—L‚·‚éƒxƒNƒgƒ‹
+  å…¨è¡Œã®è¨˜æ†¶é ˜åŸŸã¯é€£ç¶šã—ã¦ã„ãªã‘ã‚Œã°ãªã‚‰ãªã„ï¼
+  \return	è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, class B, class R> inline
 Matrix<T, B, R>::operator const Vector<T>() const
@@ -767,13 +767,13 @@ Matrix<T, B, R>::operator const Vector<T>() const
     return Vector<T>(const_cast<T*>((const T*)*this), nrow()*ncol());
 }
 
-//! ‚±‚Ìs—ñ‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªs—ñ‚ğ¶¬‚·‚éD
+//! ã“ã®è¡Œåˆ—ã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã—ãŸéƒ¨åˆ†è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-    \param i	•”•ªs—ñ‚Ì¶ã‹÷¬•ª‚Æ‚È‚és‚ğw’è‚·‚éindex
-    \param j	•”•ªs—ñ‚Ì¶ã‹÷¬•ª‚Æ‚È‚é—ñ‚ğw’è‚·‚éindex
-    \param r	•”•ªs—ñ‚Ìs”
-    \param c	•”•ªs—ñ‚Ì—ñ”
-    \return	¶¬‚³‚ê‚½•”•ªs—ñ
+    \param i	éƒ¨åˆ†è¡Œåˆ—ã®å·¦ä¸Šéš…æˆåˆ†ã¨ãªã‚‹è¡Œã‚’æŒ‡å®šã™ã‚‹index
+    \param j	éƒ¨åˆ†è¡Œåˆ—ã®å·¦ä¸Šéš…æˆåˆ†ã¨ãªã‚‹åˆ—ã‚’æŒ‡å®šã™ã‚‹index
+    \param r	éƒ¨åˆ†è¡Œåˆ—ã®è¡Œæ•°
+    \param c	éƒ¨åˆ†è¡Œåˆ—ã®åˆ—æ•°
+    \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†è¡Œåˆ—
 */
 template <class T, class B, class R> inline Matrix<T>
 Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c)
@@ -781,13 +781,13 @@ Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c)
     return Matrix<T>(*this, i, j, r, c);
 }
 
-//! ‚±‚Ìs—ñ‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚½•”•ªs—ñ‚ğ¶¬‚·‚éD
+//! ã“ã®è¡Œåˆ—ã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã—ãŸéƒ¨åˆ†è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-    \param i	•”•ªs—ñ‚Ì¶ã‹÷¬•ª‚Æ‚È‚és‚ğw’è‚·‚éindex
-    \param j	•”•ªs—ñ‚Ì¶ã‹÷¬•ª‚Æ‚È‚é—ñ‚ğw’è‚·‚éindex
-    \param r	•”•ªs—ñ‚Ìs”
-    \param c	•”•ªs—ñ‚Ì—ñ”
-    \return	¶¬‚³‚ê‚½•”•ªs—ñ
+    \param i	éƒ¨åˆ†è¡Œåˆ—ã®å·¦ä¸Šéš…æˆåˆ†ã¨ãªã‚‹è¡Œã‚’æŒ‡å®šã™ã‚‹index
+    \param j	éƒ¨åˆ†è¡Œåˆ—ã®å·¦ä¸Šéš…æˆåˆ†ã¨ãªã‚‹åˆ—ã‚’æŒ‡å®šã™ã‚‹index
+    \param r	éƒ¨åˆ†è¡Œåˆ—ã®è¡Œæ•°
+    \param c	éƒ¨åˆ†è¡Œåˆ—ã®åˆ—æ•°
+    \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†è¡Œåˆ—
 */
 template <class T, class B, class R> inline const Matrix<T>
 Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c) const
@@ -795,10 +795,10 @@ Matrix<T, B, R>::operator ()(u_int i, u_int j, u_int r, u_int c) const
     return Matrix<T>(const_cast<Matrix<T, B, R>&>(*this), i, j, r, c);
 }
 
-//! ‚±‚Ìs—ñ‚Ì‘S‚Ä‚Ì¬•ª‚É“¯ˆê‚Ì”’l‚ğ‘ã“ü‚·‚éD
+//! ã“ã®è¡Œåˆ—ã®å…¨ã¦ã®æˆåˆ†ã«åŒä¸€ã®æ•°å€¤ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  \param c	‘ã“ü‚·‚é”’l
-  \return	‚±‚Ìs—ñ
+  \param c	ä»£å…¥ã™ã‚‹æ•°å€¤
+  \return	ã“ã®è¡Œåˆ—
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator =(const T& c)
@@ -807,10 +807,10 @@ Matrix<T, B, R>::operator =(const T& c)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Éw’è‚³‚ê‚½”’l‚ğŠ|‚¯‚éD
+//! ã“ã®è¡Œåˆ—ã«æŒ‡å®šã•ã‚ŒãŸæ•°å€¤ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param c	Š|‚¯‚é”’l
-  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
+  \param c	æ›ã‘ã‚‹æ•°å€¤
+  \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator *=(double c)
@@ -819,10 +819,10 @@ Matrix<T, B, R>::operator *=(double c)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚ğw’è‚³‚ê‚½”’l‚ÅŠ„‚éD
+//! ã“ã®è¡Œåˆ—ã‚’æŒ‡å®šã•ã‚ŒãŸæ•°å€¤ã§å‰²ã‚‹ï¼
 /*!
-  \param c	Š„‚é”’l
-  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+  \param c	å‰²ã‚‹æ•°å€¤
+  \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{}\leftarrow \frac{\TUvec{A}{}}{c}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
@@ -832,10 +832,10 @@ Matrix<T, B, R>::operator /=(double c)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚É‘¼‚Ìs—ñ‚ğ‘«‚·D
+//! ã“ã®è¡Œåˆ—ã«ä»–ã®è¡Œåˆ—ã‚’è¶³ã™ï¼
 /*!
-  \param m	‘«‚·s—ñ
-  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+  \param m	è¶³ã™è¡Œåˆ—
+  \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} + \TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -846,10 +846,10 @@ Matrix<T, B, R>::operator +=(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚©‚ç‘¼‚Ìs—ñ‚ğˆø‚­D
+//! ã“ã®è¡Œåˆ—ã‹ã‚‰ä»–ã®è¡Œåˆ—ã‚’å¼•ãï¼
 /*!
-  \param m	ˆø‚­s—ñ
-  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+  \param m	å¼•ãè¡Œåˆ—
+  \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} - \TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -860,10 +860,10 @@ Matrix<T, B, R>::operator -=(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚É‘¼‚Ìs—ñ‚ğŠ|‚¯‚éD
+//! ã“ã®è¡Œåˆ—ã«ä»–ã®è¡Œåˆ—ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param m	Š|‚¯‚és—ñ
-  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+  \param m	æ›ã‘ã‚‹è¡Œåˆ—
+  \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -873,10 +873,10 @@ Matrix<T, B, R>::operator *=(const Matrix<T2, B2, R2>& m)
     return *this = *this * m;
 }
 
-//! ‚±‚Ì?x3s—ñ‚ÌŠes‚Æ3ŸŒ³ƒxƒNƒgƒ‹‚Æ‚ÌƒxƒNƒgƒ‹Ï‚ğ‚Æ‚éD
+//! ã“ã®?x3è¡Œåˆ—ã®å„è¡Œã¨3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã¨ã®ãƒ™ã‚¯ãƒˆãƒ«ç©ã‚’ã¨ã‚‹ï¼
 /*!
-  \param v	3ŸŒ³ƒxƒNƒgƒ‹
-  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+  \param v	3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
 template <class T, class B, class R> template <class T2, class B2>
@@ -888,9 +888,9 @@ Matrix<T, B, R>::operator ^=(const Vector<T2, B2>& v)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Ì•„†‚ğ”½“]‚µ‚½s—ñ‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®ç¬¦å·ã‚’åè»¢ã—ãŸè¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	•„†‚ğ”½“]‚µ‚½s—ñC‚·‚È‚í‚¿\f$-\TUvec{A}{}\f$
+  \return	ç¬¦å·ã‚’åè»¢ã—ãŸè¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$-\TUvec{A}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 Matrix<T, B, R>::operator -() const
@@ -898,10 +898,10 @@ Matrix<T, B, R>::operator -() const
     return Matrix(*this) *= -1;
 }
 
-//! ‚±‚Ì³•ûs—ñ‚ğ‘S‚Ä“¯ˆê‚Ì‘ÎŠp¬•ª’l‚ğ‚Â‘ÎŠps—ñ‚É‚·‚éD
+//! ã“ã®æ­£æ–¹è¡Œåˆ—ã‚’å…¨ã¦åŒä¸€ã®å¯¾è§’æˆåˆ†å€¤ã‚’æŒã¤å¯¾è§’è¡Œåˆ—ã«ã™ã‚‹ï¼
 /*!
-  \param c	‘ÎŠp¬•ª‚Ì’l
-  \return	‚±‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
+  \param c	å¯¾è§’æˆåˆ†ã®å€¤
+  \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
 */
 template <class T, class B, class R> Matrix<T, B, R>&
 Matrix<T, B, R>::diag(T c)
@@ -913,9 +913,9 @@ Matrix<T, B, R>::diag(T c)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Ì“]’us—ñ‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®è»¢ç½®è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	“]’us—ñC‚·‚È‚í‚¿\f$\TUtvec{A}{}\f$
+  \return	è»¢ç½®è¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUtvec{A}{}\f$
 */
 template <class T, class B, class R> Matrix<T>
 Matrix<T, B, R>::trns() const
@@ -927,9 +927,9 @@ Matrix<T, B, R>::trns() const
     return val;
 }
 
-//! ‚±‚Ìs—ñ‚Ì‹ts—ñ‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®é€†è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	‹ts—ñC‚·‚È‚í‚¿\f$\TUinv{A}{}\f$
+  \return	é€†è¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUinv{A}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 Matrix<T, B, R>::inv() const
@@ -937,11 +937,11 @@ Matrix<T, B, R>::inv() const
     return I(nrow()).solve(*this);
 }
 
-//! ‚±‚Ìs—ñ‚Ì¬s—ñ®‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®å°è¡Œåˆ—å¼ã‚’è¿”ã™ï¼
 /*!
-  \param p	Œ³‚Ìs—ñ‚©‚çæ‚èœ‚­s‚ğw’è‚·‚éindex
-  \param q	Œ³‚Ìs—ñ‚©‚çæ‚èœ‚­—ñ‚ğw’è‚·‚éindex
-  \return	¬s—ñ®C‚·‚È‚í‚¿\f$\det\TUvec{A}{pq}\f$
+  \param p	å…ƒã®è¡Œåˆ—ã‹ã‚‰å–ã‚Šé™¤ãè¡Œã‚’æŒ‡å®šã™ã‚‹index
+  \param q	å…ƒã®è¡Œåˆ—ã‹ã‚‰å–ã‚Šé™¤ãåˆ—ã‚’æŒ‡å®šã™ã‚‹index
+  \return	å°è¡Œåˆ—å¼ï¼Œã™ãªã‚ã¡\f$\det\TUvec{A}{pq}\f$
 */
 template <class T, class B, class R> T
 Matrix<T, B, R>::det(u_int p, u_int q) const
@@ -964,10 +964,10 @@ Matrix<T, B, R>::det(u_int p, u_int q) const
     return d.det();
 }
 
-//! ‚±‚Ì³•ûs—ñ‚Ìtrace‚ğ•Ô‚·D
+//! ã“ã®æ­£æ–¹è¡Œåˆ—ã®traceã‚’è¿”ã™ï¼
 /*!
-  \return			trace, ‚·‚È‚í‚¿\f$\trace\TUvec{A}{}\f$
-  \throw std::invalid_argument	³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
+  \return			trace, ã™ãªã‚ã¡\f$\trace\TUvec{A}{}\f$
+  \throw std::invalid_argument	æ­£æ–¹è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B, class R> T
 Matrix<T, B, R>::trace() const
@@ -981,9 +981,9 @@ Matrix<T, B, R>::trace() const
     return val;
 }
 
-//! ‚±‚Ìs—ñ‚Ì—]ˆöqs—ñ‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®ä½™å› å­è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	—]ˆöqs—ñC‚·‚È‚í‚¿
+  \return	ä½™å› å­è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
 */
 template <class T, class B, class R> Matrix<T, B, R>
@@ -996,12 +996,12 @@ Matrix<T, B, R>::adj() const
     return val;
 }
 
-//! ‚±‚Ìs—ñ‚Ì‹^—‹ts—ñ‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®ç–‘ä¼¼é€†è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \param cndnum	Å‘å“ÁˆÙ’l‚É‘Î‚·‚éâ‘Î’l‚ÌŠ„‡‚ª‚±‚ê‚É’B‚µ‚È‚¢Šî’ê‚Í–³‹
-  \return	‹^—‹ts—ñC‚·‚È‚í‚¿—^‚¦‚ç‚ê‚½s—ñ‚Ì“ÁˆÙ’l•ª‰ğ‚ğ
+  \param cndnum	æœ€å¤§ç‰¹ç•°å€¤ã«å¯¾ã™ã‚‹çµ¶å¯¾å€¤ã®å‰²åˆãŒã“ã‚Œã«é”ã—ãªã„åŸºåº•ã¯ç„¡è¦–
+  \return	ç–‘ä¼¼é€†è¡Œåˆ—ï¼Œã™ãªã‚ã¡ä¸ãˆã‚‰ã‚ŒãŸè¡Œåˆ—ã®ç‰¹ç•°å€¤åˆ†è§£ã‚’
 		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
-		\TUtvec{U}{}\f$‚Æ‚·‚é‚Æ
+		\TUtvec{U}{}\f$ã¨ã™ã‚‹ã¨
 		\f[
 		  \TUvec{u}{0}\sigma_0^{-1}\TUtvec{v}{0} + \cdots +
 		  \TUvec{u}{r}\sigma_{r-1}^{-1}\TUtvec{v}{r-1},
@@ -1023,19 +1023,19 @@ Matrix<T, B, R>::pinv(T cndnum) const
     return val;
 }
 
-//! ‚±‚Ì‘ÎÌs—ñ‚ÌŒÅ—L’l‚ÆŒÅ—LƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! ã“ã®å¯¾ç§°è¡Œåˆ—ã®å›ºæœ‰å€¤ã¨å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ï¼
 /*!
-    \param eval	ŒÅ—L’l‚ª•Ô‚³‚ê‚é
-    \param abs	ŒÅ—L’l‚ğâ‘Î’l‚Ì‘å‚«‚¢‡‚É•À‚×‚é‚È‚çtrue, ’l‚Ì‘å‚«‚¢‡‚É
-		•À‚×‚é‚È‚çfalse
-    \return	Šes‚ªŒÅ—LƒxƒNƒgƒ‹‚©‚ç¬‚é‰ñ“]s—ñC‚·‚È‚í‚¿
+    \param eval	å›ºæœ‰å€¤ãŒè¿”ã•ã‚Œã‚‹
+    \param abs	å›ºæœ‰å€¤ã‚’çµ¶å¯¾å€¤ã®å¤§ãã„é †ã«ä¸¦ã¹ã‚‹ãªã‚‰true, å€¤ã®å¤§ãã„é †ã«
+		ä¸¦ã¹ã‚‹ãªã‚‰false
+    \return	å„è¡ŒãŒå›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰æˆã‚‹å›è»¢è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f[
 		  \TUvec{A}{}\TUvec{U}{} =
 		  \TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
 		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
 		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
 		\f]
-		‚È‚é\f$\TUtvec{U}{}\f$
+		ãªã‚‹\f$\TUtvec{U}{}\f$
 */
 template <class T, class B, class R> Matrix<T>
 Matrix<T, B, R>::eigen(Vector<T>& eval, bool abs) const
@@ -1048,21 +1048,21 @@ Matrix<T, B, R>::eigen(Vector<T>& eval, bool abs) const
     return tri.Ut();
 }
 
-//! ‚±‚Ì‘ÎÌs—ñ‚Ìˆê”ÊŒÅ—L’l‚Æˆê”ÊŒÅ—LƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! ã“ã®å¯¾ç§°è¡Œåˆ—ã®ä¸€èˆ¬å›ºæœ‰å€¤ã¨ä¸€èˆ¬å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ï¼
 /*!
-    \param BB	‚à‚Æ‚Ìs—ñ‚Æ“¯ˆêƒTƒCƒY‚Ì³’l‘ÎÌs—ñ
-    \param eval	ˆê”ÊŒÅ—L’l‚ª•Ô‚³‚ê‚é
-    \param abs	ˆê”ÊŒÅ—L’l‚ğâ‘Î’l‚Ì‘å‚«‚¢‡‚É•À‚×‚é‚È‚çtrue, ’l‚Ì‘å‚«‚¢‡‚É
-		•À‚×‚é‚È‚çfalse
-    \return	Šes‚ªˆê”ÊŒÅ—LƒxƒNƒgƒ‹‚©‚ç¬‚é³‘¥s—ñ
-		i‚½‚¾‚µ’¼Œğs—ñ‚Å‚Í‚È‚¢jC‚·‚È‚í‚¿
+    \param BB	ã‚‚ã¨ã®è¡Œåˆ—ã¨åŒä¸€ã‚µã‚¤ã‚ºã®æ­£å€¤å¯¾ç§°è¡Œåˆ—
+    \param eval	ä¸€èˆ¬å›ºæœ‰å€¤ãŒè¿”ã•ã‚Œã‚‹
+    \param abs	ä¸€èˆ¬å›ºæœ‰å€¤ã‚’çµ¶å¯¾å€¤ã®å¤§ãã„é †ã«ä¸¦ã¹ã‚‹ãªã‚‰true, å€¤ã®å¤§ãã„é †ã«
+		ä¸¦ã¹ã‚‹ãªã‚‰false
+    \return	å„è¡ŒãŒä¸€èˆ¬å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰æˆã‚‹æ­£å‰‡è¡Œåˆ—
+		ï¼ˆãŸã ã—ç›´äº¤è¡Œåˆ—ã§ã¯ãªã„ï¼‰ï¼Œã™ãªã‚ã¡
 		\f[
 		  \TUvec{A}{}\TUvec{U}{} =
 		  \TUvec{B}{}\TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
 		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
 		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
 		\f]
-		‚È‚é\f$\TUtvec{U}{}\f$
+		ãªã‚‹\f$\TUtvec{U}{}\f$
 */
 template <class T, class B, class R> Matrix<T>
 Matrix<T, B, R>::geigen(const Matrix<T>& BB, Vector<T>& eval, bool abs) const
@@ -1073,13 +1073,13 @@ Matrix<T, B, R>::geigen(const Matrix<T>& BB, Vector<T>& eval, bool abs) const
     return Ut * Linv;
 }
 
-//! ‚±‚Ì³’l‘ÎÌs—ñ‚ÌCholesky•ª‰ğiã”¼OŠps—ñj‚ğ•Ô‚·D
+//! ã“ã®æ­£å€¤å¯¾ç§°è¡Œåˆ—ã®Choleskyåˆ†è§£ï¼ˆä¸ŠåŠä¸‰è§’è¡Œåˆ—ï¼‰ã‚’è¿”ã™ï¼
 /*!
-  ŒvZ‚É‚¨‚¢‚Ä‚ÍC‚à‚Æ‚Ìs—ñ‚Ìã”¼•”•ª‚µ‚©g‚í‚È‚¢
-  \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$‚È‚é
-		\f$\TUtvec{L}{}\f$iã”¼OŠps—ñj
-  \throw std::invalid_argument	³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
-  \throw std::runtime_error	³’l‚Å‚È‚¢ê‡‚É‘—o
+  è¨ˆç®—ã«ãŠã„ã¦ã¯ï¼Œã‚‚ã¨ã®è¡Œåˆ—ã®ä¸ŠåŠéƒ¨åˆ†ã—ã‹ä½¿ã‚ãªã„
+  \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$ãªã‚‹
+		\f$\TUtvec{L}{}\f$ï¼ˆä¸ŠåŠä¸‰è§’è¡Œåˆ—ï¼‰
+  \throw std::invalid_argument	æ­£æ–¹è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
+  \throw std::runtime_error	æ­£å€¤ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B, class R> Matrix<T, B, R>
 Matrix<T, B, R>::cholesky() const
@@ -1107,9 +1107,9 @@ Matrix<T, B, R>::cholesky() const
     return Lt;
 }
 
-//! ‚±‚Ìs—ñ‚Ìƒmƒ‹ƒ€‚ğ1‚É³‹K‰»‚·‚éD
+//! ã“ã®è¡Œåˆ—ã®ãƒãƒ«ãƒ ã‚’1ã«æ­£è¦åŒ–ã™ã‚‹ï¼
 /*!
-    \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+    \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$
 		  \TUvec{A}{}\leftarrow\frac{\TUvec{A}{}}{\TUnorm{\TUvec{A}{}}}
 		\f$
@@ -1123,9 +1123,9 @@ Matrix<T, B, R>::normalize()
     return *this /= std::sqrt(sum);
 }
 
-//! ‚±‚Ìs—ñ‚Ì¶‚©‚çi“]’u‚³‚ê‚½j‰ñ“]s—ñ‚ğŠ|‚¯‚éD
+//! ã“ã®è¡Œåˆ—ã®å·¦ã‹ã‚‰ï¼ˆè»¢ç½®ã•ã‚ŒãŸï¼‰å›è»¢è¡Œåˆ—ã‚’æ›ã‘ã‚‹ï¼
 /*!
-    \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+    \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
 */
 template <class T, class B, class R> Matrix<T, B, R>&
@@ -1141,9 +1141,9 @@ Matrix<T, B, R>::rotate_from_left(const Rotation<T>& r)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Ì‰E‚©‚ç‰ñ“]s—ñ‚ğŠ|‚¯‚éD
+//! ã“ã®è¡Œåˆ—ã®å³ã‹ã‚‰å›è»¢è¡Œåˆ—ã‚’æ›ã‘ã‚‹ï¼
 /*!
-    \return	‚±‚Ìs—ñC‚·‚È‚í‚¿
+    \return	ã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
 */
 template <class T, class B, class R> Matrix<T, B, R>&
@@ -1159,9 +1159,9 @@ Matrix<T, B, R>::rotate_from_right(const Rotation<T>& r)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Ì2æƒmƒ‹ƒ€‚Ì2æ‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®2ä¹—ãƒãƒ«ãƒ ã®2ä¹—ã‚’è¿”ã™ï¼
 /*!
-    \return	s—ñ‚Ì2æƒmƒ‹ƒ€‚Ì2æC‚·‚È‚í‚¿\f$\TUnorm{\TUvec{A}{}}^2\f$
+    \return	è¡Œåˆ—ã®2ä¹—ãƒãƒ«ãƒ ã®2ä¹—ï¼Œã™ãªã‚ã¡\f$\TUnorm{\TUvec{A}{}}^2\f$
 */
 template <class T, class B, class R> T
 Matrix<T, B, R>::square() const
@@ -1172,9 +1172,9 @@ Matrix<T, B, R>::square() const
     return val;
 }
 
-//! ‚±‚Ìs—ñ‚Ì2æƒmƒ‹ƒ€‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®2ä¹—ãƒãƒ«ãƒ ã‚’è¿”ã™ï¼
 /*!
-  \return	s—ñ‚Ì2æƒmƒ‹ƒ€C‚·‚È‚í‚¿\f$\TUnorm{\TUvec{A}{}}\f$
+  \return	è¡Œåˆ—ã®2ä¹—ãƒãƒ«ãƒ ï¼Œã™ãªã‚ã¡\f$\TUnorm{\TUvec{A}{}}\f$
 */
 template <class T, class B, class R> inline double
 Matrix<T, B, R>::length() const
@@ -1182,9 +1182,9 @@ Matrix<T, B, R>::length() const
     return std::sqrt(double(square()));
 }
 
-//! ‚±‚Ìs—ñ‚Ì‰º”¼OŠp•”•ª‚ğã”¼OŠp•”•ª‚ÉƒRƒs[‚µ‚Ä‘ÎÌ‰»‚·‚éD
+//! ã“ã®è¡Œåˆ—ã®ä¸‹åŠä¸‰è§’éƒ¨åˆ†ã‚’ä¸ŠåŠä¸‰è§’éƒ¨åˆ†ã«ã‚³ãƒ”ãƒ¼ã—ã¦å¯¾ç§°åŒ–ã™ã‚‹ï¼
 /*!
-    \return	‚±‚Ìs—ñ
+    \return	ã“ã®è¡Œåˆ—
 */
 template <class T, class B, class R> Matrix<T, B, R>&
 Matrix<T, B, R>::symmetrize()
@@ -1195,9 +1195,9 @@ Matrix<T, B, R>::symmetrize()
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Ì‰º”¼OŠp•”•ª‚Ì•„†‚ğ”½“]‚µCã”¼OŠp•”•ª‚ÉƒRƒs[‚µ‚Ä”½‘ÎÌ‰»‚·‚éD
+//! ã“ã®è¡Œåˆ—ã®ä¸‹åŠä¸‰è§’éƒ¨åˆ†ã®ç¬¦å·ã‚’åè»¢ã—ï¼Œä¸ŠåŠä¸‰è§’éƒ¨åˆ†ã«ã‚³ãƒ”ãƒ¼ã—ã¦åå¯¾ç§°åŒ–ã™ã‚‹ï¼
 /*!
-    \return	‚±‚Ìs—ñ
+    \return	ã“ã®è¡Œåˆ—
 */
 template <class T, class B, class R> Matrix<T, B, R>&
 Matrix<T, B, R>::antisymmetrize()
@@ -1211,9 +1211,9 @@ Matrix<T, B, R>::antisymmetrize()
     return *this;
 }
 
-//! ‚±‚Ì3ŸŒ³‰ñ“]s—ñ‚©‚çŠe²ü‚è‚Ì‰ñ“]Šp‚ğæ‚èo‚·D
+//! ã“ã®3æ¬¡å…ƒå›è»¢è¡Œåˆ—ã‹ã‚‰å„è»¸å‘¨ã‚Šã®å›è»¢è§’ã‚’å–ã‚Šå‡ºã™ï¼
 /*!
-  ‚±‚Ìs—ñ‚ğ\f$\TUtvec{R}{}\f$‚Æ‚·‚é‚ÆC
+  ã“ã®è¡Œåˆ—ã‚’\f$\TUtvec{R}{}\f$ã¨ã™ã‚‹ã¨ï¼Œ
   \f[
     \TUvec{R}{} =
     \TUbeginarray{ccc}
@@ -1232,12 +1232,12 @@ Matrix<T, B, R>::antisymmetrize()
       & \sin\theta_x &  \cos\theta_x
     \TUendarray
   \f]
-  ‚È‚é\f$\theta_x, \theta_y, \theta_z\f$‚ª‰ñ“]Šp‚Æ‚È‚éD
- \param theta_x	x²ü‚è‚Ì‰ñ“]Šp(\f$ -\pi \le \theta_x \le \pi\f$)‚ğ•Ô‚·D
- \param theta_y	y²ü‚è‚Ì‰ñ“]Šp
-	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)‚ğ•Ô‚·D
- \param theta_z	z²ü‚è‚Ì‰ñ“]Šp(\f$ -\pi \le \theta_z \le \pi\f$)‚ğ•Ô‚·D
- \throw invalid_argument	3ŸŒ³³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
+  ãªã‚‹\f$\theta_x, \theta_y, \theta_z\f$ãŒå›è»¢è§’ã¨ãªã‚‹ï¼
+ \param theta_x	xè»¸å‘¨ã‚Šã®å›è»¢è§’(\f$ -\pi \le \theta_x \le \pi\f$)ã‚’è¿”ã™ï¼
+ \param theta_y	yè»¸å‘¨ã‚Šã®å›è»¢è§’
+	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)ã‚’è¿”ã™ï¼
+ \param theta_z	zè»¸å‘¨ã‚Šã®å›è»¢è§’(\f$ -\pi \le \theta_z \le \pi\f$)ã‚’è¿”ã™ï¼
+ \throw invalid_argument	3æ¬¡å…ƒæ­£æ–¹è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B, class R> void
 Matrix<T, B, R>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
@@ -1261,20 +1261,20 @@ Matrix<T, B, R>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
     }
 }
 
-//! ‚±‚Ì3ŸŒ³‰ñ“]s—ñ‚©‚ç‰ñ“]Šp‚Æ‰ñ“]²‚ğæ‚èo‚·D
+//! ã“ã®3æ¬¡å…ƒå›è»¢è¡Œåˆ—ã‹ã‚‰å›è»¢è§’ã¨å›è»¢è»¸ã‚’å–ã‚Šå‡ºã™ï¼
 /*!
-  ‚±‚Ìs—ñ‚ğ\f$\TUtvec{R}{}\f$‚Æ‚·‚é‚ÆC
+  ã“ã®è¡Œåˆ—ã‚’\f$\TUtvec{R}{}\f$ã¨ã™ã‚‹ã¨ï¼Œ
   \f[
     \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
     + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
     - \TUskew{n}{}\sin\theta
   \f]
-  ‚È‚é\f$\theta~(0 \le \theta \le \pi)\f$‚Æ\f$\TUvec{n}{}\f$‚ª
-  ‚»‚ê‚¼‚ê‰ñ“]Šp‚Æ‰ñ“]²‚Æ‚È‚éD
- \param c	‰ñ“]Šp‚Ìcos’lC‚·‚È‚í‚¿\f$\cos\theta\f$‚ğ•Ô‚·D
- \param s	‰ñ“]Šp‚Ìsin’lC‚·‚È‚í‚¿\f$\sin\theta (\ge 0)\f$‚ğ•Ô‚·D
- \return	‰ñ“]²‚ğ•\‚·3ŸŒ³’PˆÊƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{n}{}\f$
- \throw std::invalid_argument	3x3s—ñ‚Å‚È‚¢ê‡‚É‘—o
+  ãªã‚‹\f$\theta~(0 \le \theta \le \pi)\f$ã¨\f$\TUvec{n}{}\f$ãŒ
+  ãã‚Œãã‚Œå›è»¢è§’ã¨å›è»¢è»¸ã¨ãªã‚‹ï¼
+ \param c	å›è»¢è§’ã®coså€¤ï¼Œã™ãªã‚ã¡\f$\cos\theta\f$ã‚’è¿”ã™ï¼
+ \param s	å›è»¢è§’ã®sinå€¤ï¼Œã™ãªã‚ã¡\f$\sin\theta (\ge 0)\f$ã‚’è¿”ã™ï¼
+ \return	å›è»¢è»¸ã‚’è¡¨ã™3æ¬¡å…ƒå˜ä½ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$\TUvec{n}{}\f$
+ \throw std::invalid_argument	3x3è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3> >
 Matrix<T, B, R>::rot2axis(T& c, T& s) const
@@ -1297,19 +1297,19 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
     return n;
 }
 
-//! ‚±‚Ì3ŸŒ³‰ñ“]s—ñ‚©‚ç‰ñ“]Šp‚Æ‰ñ“]²‚ğæ‚èo‚·D
+//! ã“ã®3æ¬¡å…ƒå›è»¢è¡Œåˆ—ã‹ã‚‰å›è»¢è§’ã¨å›è»¢è»¸ã‚’å–ã‚Šå‡ºã™ï¼
 /*!
-  ‚±‚Ìs—ñ‚ğ\f$\TUtvec{R}{}\f$‚Æ‚·‚é‚ÆC
+  ã“ã®è¡Œåˆ—ã‚’\f$\TUtvec{R}{}\f$ã¨ã™ã‚‹ã¨ï¼Œ
   \f[
     \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
     + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
     - \TUskew{n}{}\sin\theta
   \f]
-  ‚È‚é\f$\theta~(0 \le \theta \le \pi)\f$‚Æ\f$\TUvec{n}{}\f$‚ª
-  ‚»‚ê‚¼‚ê‰ñ“]Šp‚Æ‰ñ“]²‚Æ‚È‚éD
- \return			‰ñ“]Šp‚Æ‰ñ“]²‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+  ãªã‚‹\f$\theta~(0 \le \theta \le \pi)\f$ã¨\f$\TUvec{n}{}\f$ãŒ
+  ãã‚Œãã‚Œå›è»¢è§’ã¨å›è»¢è»¸ã¨ãªã‚‹ï¼
+ \return			å›è»¢è§’ã¨å›è»¢è»¸ã‚’è¡¨ã™3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 				\f$\theta\TUvec{n}{}\f$
- \throw invalid_argument	3x3s—ñ‚Å‚È‚¢ê‡‚É‘—o
+ \throw invalid_argument	3x3è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3> >
 Matrix<T, B, R>::rot2axis() const
@@ -1330,24 +1330,24 @@ Matrix<T, B, R>::rot2axis() const
     return axis * (std::atan2(s2, trace - T(1)) / s2);
 }
 
-//! ‚±‚Ì3ŸŒ³‰ñ“]s—ñ‚©‚çlŒ³”‚ğæ‚èo‚·D
+//! ã“ã®3æ¬¡å…ƒå›è»¢è¡Œåˆ—ã‹ã‚‰å››å…ƒæ•°ã‚’å–ã‚Šå‡ºã™ï¼
 /*!
-  ‚±‚Ìs—ñ‚ğ\f$\TUtvec{R}{}\f$‚Æ‚·‚é‚ÆC
+  ã“ã®è¡Œåˆ—ã‚’\f$\TUtvec{R}{}\f$ã¨ã™ã‚‹ã¨ï¼Œ
   \f[
     \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
     + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
     - \TUskew{n}{}\sin\theta
   \f]
-  ‚È‚é\f$\theta~(0 \le \theta \le \pi)\f$‚Æ\f$\TUvec{n}{}\f$‚É‘Î‚µ‚ÄClŒ³”‚Í
+  ãªã‚‹\f$\theta~(0 \le \theta \le \pi)\f$ã¨\f$\TUvec{n}{}\f$ã«å¯¾ã—ã¦ï¼Œå››å…ƒæ•°ã¯
   \f[
     \TUvec{q}{} \equiv
     \TUbeginarray{c}
       \cos\frac{\theta}{2} \\ \TUvec{n}{}\sin\frac{\theta}{2}
     \TUendarray
   \f]
-  ‚Æ’è‹`‚³‚ê‚éD
- \return			lŒ³”‚ğ•\‚·4ŸŒ³’PˆÊƒxƒNƒgƒ‹
- \throw invalid_argument	3x3s—ñ‚Å‚È‚¢ê‡‚É‘—o
+  ã¨å®šç¾©ã•ã‚Œã‚‹ï¼
+ \return			å››å…ƒæ•°ã‚’è¡¨ã™4æ¬¡å…ƒå˜ä½ãƒ™ã‚¯ãƒˆãƒ«
+ \throw invalid_argument	3x3è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 4u> >
 Matrix<T, B, R>::rot2quaternion() const
@@ -1373,10 +1373,10 @@ Matrix<T, B, R>::rot2quaternion() const
     return q;
 }
 
-//! ’PˆÊ³•ûs—ñ‚ğ¶¬‚·‚éD
+//! å˜ä½æ­£æ–¹è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param d	’PˆÊ³•ûs—ñ‚ÌŸŒ³
-  \return	’PˆÊ³•ûs—ñ
+  \param d	å˜ä½æ­£æ–¹è¡Œåˆ—ã®æ¬¡å…ƒ
+  \return	å˜ä½æ­£æ–¹è¡Œåˆ—
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 Matrix<T, B, R>::I(u_int d)
@@ -1384,12 +1384,12 @@ Matrix<T, B, R>::I(u_int d)
     return Matrix<T, B, R>(d, d).diag(1.0);
 }
 
-//! 3ŸŒ³‰ñ“]s—ñ‚ğ¶¬‚·‚éD
+//! 3æ¬¡å…ƒå›è»¢è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param n	‰ñ“]²‚ğ•\‚·3ŸŒ³’PˆÊƒxƒNƒgƒ‹
-  \param c	‰ñ“]Šp‚Ìcos’l
-  \param s	‰ñ“]Šp‚Ìsin’l
-  \return	¶¬‚³‚ê‚½‰ñ“]s—ñC‚·‚È‚í‚¿
+  \param n	å›è»¢è»¸ã‚’è¡¨ã™3æ¬¡å…ƒå˜ä½ãƒ™ã‚¯ãƒˆãƒ«
+  \param c	å›è»¢è§’ã®coså€¤
+  \param s	å›è»¢è§’ã®sinå€¤
+  \return	ç”Ÿæˆã•ã‚ŒãŸå›è»¢è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f[
 		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
 		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
@@ -1417,10 +1417,10 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
     return Qt;
 }
 
-//! 3ŸŒ³‰ñ“]s—ñ‚ğ¶¬‚·‚éD
+//! 3æ¬¡å…ƒå›è»¢è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param v	‰ñ“]Šp‚Æ‰ñ“]²‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹‚Ü‚½‚ÍlŒ³”‚ğ•\‚·4ŸŒ³’PˆÊƒxƒNƒgƒ‹
-  \return	¶¬‚³‚ê‚½‰ñ“]s—ñC‚·‚È‚í‚¿3ŸŒ³ƒxƒNƒgƒ‹‚Ìê‡‚Í
+  \param v	å›è»¢è§’ã¨å›è»¢è»¸ã‚’è¡¨ã™3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã¾ãŸã¯å››å…ƒæ•°ã‚’è¡¨ã™4æ¬¡å…ƒå˜ä½ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ç”Ÿæˆã•ã‚ŒãŸå›è»¢è¡Œåˆ—ï¼Œã™ãªã‚ã¡3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã®å ´åˆã¯
 		\f[
 		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
 		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
@@ -1429,7 +1429,7 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
 		  \theta \equiv \TUnorm{\TUvec{v}{}},~
 		  \TUvec{n}{} \equiv \frac{\TUvec{v}{}}{\TUnorm{\TUvec{v}{}}}
 		\f]
-		4ŸŒ³’PˆÊƒxƒNƒgƒ‹‚Ìê‡‚Í
+		4æ¬¡å…ƒå˜ä½ãƒ™ã‚¯ãƒˆãƒ«ã®å ´åˆã¯
 		\f[
 		  \TUtvec{R}{} \equiv
 		  \TUvec{I}{3}(q_0^2 - \TUtvec{q}{}\TUvec{q}{})
@@ -1478,10 +1478,10 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& v)
     }
 }
 
-//! s—ñ‚ÌƒTƒCƒY‚ğ•ÏX‚µC0‚É‰Šú‰»‚·‚éD
+//! è¡Œåˆ—ã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã—ï¼Œ0ã«åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param r	V‚µ‚¢s”
-  \param c	V‚µ‚¢—ñ”
+  \param r	æ–°ã—ã„è¡Œæ•°
+  \param c	æ–°ã—ã„åˆ—æ•°
 */
 template <class T, class B, class R> inline void
 Matrix<T, B, R>::resize(u_int r, u_int c)
@@ -1490,11 +1490,11 @@ Matrix<T, B, R>::resize(u_int r, u_int c)
     *this = 0;
 }
 
-//! s—ñ‚Ì“à•”‹L‰¯—Ìˆæ‚ÆƒTƒCƒY‚ğ•ÏX‚·‚éD
+//! è¡Œåˆ—ã®å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¨ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param p	V‚µ‚¢“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param r	V‚µ‚¢s”
-  \param c	V‚µ‚¢—ñ”
+  \param p	æ–°ã—ã„å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param r	æ–°ã—ã„è¡Œæ•°
+  \param c	æ–°ã—ã„åˆ—æ•°
 */
 template <class T, class B, class R> inline void
 Matrix<T, B, R>::resize(T* p, u_int r, u_int c)
@@ -1505,11 +1505,11 @@ Matrix<T, B, R>::resize(T* p, u_int r, u_int c)
 /************************************************************************
 *  numerical operators							*
 ************************************************************************/
-//! 2‚Â‚ÌƒxƒNƒgƒ‹‚Ì‘«‚µZ
+//! 2ã¤ã®ãƒ™ã‚¯ãƒˆãƒ«ã®è¶³ã—ç®—
 /*!
-  \param v	‘æ1ˆø”
-  \param w	‘æ2ˆø”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{v}{}+\TUvec{w}{}\f$
+  \param v	ç¬¬1å¼•æ•°
+  \param w	ç¬¬2å¼•æ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$\TUvec{v}{}+\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> inline Vector<T1, B1>
 operator +(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
@@ -1517,11 +1517,11 @@ operator +(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return Vector<T1, B1>(v) += w;
 }
 
-//! 2‚Â‚ÌƒxƒNƒgƒ‹‚Ìˆø‚«Z
+//! 2ã¤ã®ãƒ™ã‚¯ãƒˆãƒ«ã®å¼•ãç®—
 /*!
-  \param v	‘æ1ˆø”
-  \param w	‘æ2ˆø”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{v}{}-\TUvec{w}{}\f$
+  \param v	ç¬¬1å¼•æ•°
+  \param w	ç¬¬2å¼•æ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$\TUvec{v}{}-\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> inline Vector<T1, B1>
 operator -(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
@@ -1529,11 +1529,11 @@ operator -(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return Vector<T1, B1>(v) -= w;
 }
 
-//! ƒxƒNƒgƒ‹‚É’è”‚ğŠ|‚¯‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ã«å®šæ•°ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param c	Š|‚¯‚é’è”
-  \param v	ƒxƒNƒgƒ‹
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$c\TUvec{v}{}\f$
+  \param c	æ›ã‘ã‚‹å®šæ•°
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \return	çµæœã‚’æ ¼ç´ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$c\TUvec{v}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 operator *(double c, const Vector<T, B>& v)
@@ -1541,11 +1541,11 @@ operator *(double c, const Vector<T, B>& v)
     return Vector<T, B>(v) *= c;
 }
 
-//! ƒxƒNƒgƒ‹‚É’è”‚ğŠ|‚¯‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ã«å®šæ•°ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param v	ƒxƒNƒgƒ‹
-  \param c	Š|‚¯‚é’è”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$c\TUvec{v}{}\f$
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \param c	æ›ã‘ã‚‹å®šæ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$c\TUvec{v}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 operator *(const Vector<T, B>& v, double c)
@@ -1553,11 +1553,11 @@ operator *(const Vector<T, B>& v, double c)
     return Vector<T, B>(v) *= c;
 }
 
-//! ƒxƒNƒgƒ‹‚ÌŠe¬•ª‚ğ’è”‚ÅŠ„‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ã®å„æˆåˆ†ã‚’å®šæ•°ã§å‰²ã‚‹ï¼
 /*!
-  \param v	ƒxƒNƒgƒ‹
-  \param c	Š„‚é’è”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½ƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\frac{1}{c}\TUvec{v}{}\f$
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \param c	å‰²ã‚‹å®šæ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$\frac{1}{c}\TUvec{v}{}\f$
 */
 template <class T, class B> inline Vector<T, B>
 operator /(const Vector<T, B>& v, double c)
@@ -1565,11 +1565,11 @@ operator /(const Vector<T, B>& v, double c)
     return Vector<T, B>(v) /= c;
 }
 
-//! 2‚Â‚Ìs—ñ‚Ì‘«‚µZ
+//! 2ã¤ã®è¡Œåˆ—ã®è¶³ã—ç®—
 /*!
-  \param m	‘æ1ˆø”
-  \param n	‘æ2ˆø”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$\TUvec{M}{}+\TUvec{N}{}\f$
+  \param m	ç¬¬1å¼•æ•°
+  \param n	ç¬¬2å¼•æ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸè¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUvec{M}{}+\TUvec{N}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2, class R2>
 inline Matrix<T1, B1, R1>
@@ -1578,11 +1578,11 @@ operator +(const Matrix<T1, B1, R1>& m, const Matrix<T2, B2, R2>& n)
     return Matrix<T1, B1, R1>(m) += n;
 }
 
-//! 2‚Â‚Ìs—ñ‚Ìˆø‚«Z
+//! 2ã¤ã®è¡Œåˆ—ã®å¼•ãç®—
 /*!
-  \param m	‘æ1ˆø”
-  \param n	‘æ2ˆø”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$\TUvec{M}{}-\TUvec{N}{}\f$
+  \param m	ç¬¬1å¼•æ•°
+  \param n	ç¬¬2å¼•æ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸè¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUvec{M}{}-\TUvec{N}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2, class R2>
 inline Matrix<T1, B1, R1>
@@ -1591,11 +1591,11 @@ operator -(const Matrix<T1, B1, R1>& m, const Matrix<T2, B2, R2>& n)
     return Matrix<T1, B1, R1>(m) -= n;
 }
 
-//! s—ñ‚É’è”‚ğŠ|‚¯‚éD
+//! è¡Œåˆ—ã«å®šæ•°ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param c	Š|‚¯‚é’è”
-  \param m	s—ñ
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$c\TUvec{M}{}\f$
+  \param c	æ›ã‘ã‚‹å®šæ•°
+  \param m	è¡Œåˆ—
+  \return	çµæœã‚’æ ¼ç´ã—ãŸè¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$c\TUvec{M}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 operator *(double c, const Matrix<T, B, R>& m)
@@ -1603,11 +1603,11 @@ operator *(double c, const Matrix<T, B, R>& m)
     return Matrix<T, B, R>(m) *= c;
 }
 
-//! s—ñ‚É’è”‚ğŠ|‚¯‚éD
+//! è¡Œåˆ—ã«å®šæ•°ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param m	s—ñ
-  \param c	Š|‚¯‚é’è”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$c\TUvec{M}{}\f$
+  \param m	è¡Œåˆ—
+  \param c	æ›ã‘ã‚‹å®šæ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸè¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$c\TUvec{M}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 operator *(const Matrix<T, B, R>& m, double c)
@@ -1615,11 +1615,11 @@ operator *(const Matrix<T, B, R>& m, double c)
     return Matrix<T, B, R>(m) *= c;
 }
 
-//! s—ñ‚ÌŠe¬•ª‚ğ’è”‚ÅŠ„‚éD
+//! è¡Œåˆ—ã®å„æˆåˆ†ã‚’å®šæ•°ã§å‰²ã‚‹ï¼
 /*!
-  \param m	s—ñ
-  \param c	Š„‚é’è”
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½s—ñC‚·‚È‚í‚¿\f$\frac{1}{c}\TUvec{M}{}\f$
+  \param m	è¡Œåˆ—
+  \param c	å‰²ã‚‹å®šæ•°
+  \return	çµæœã‚’æ ¼ç´ã—ãŸè¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\frac{1}{c}\TUvec{M}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>
 operator /(const Matrix<T, B, R>& m, double c)
@@ -1627,11 +1627,11 @@ operator /(const Matrix<T, B, R>& m, double c)
     return Matrix<T, B, R>(m) /= c;
 }
 
-//! 2‚Â‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚ÌƒxƒNƒgƒ‹Ï
+//! 2ã¤ã®3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã®ãƒ™ã‚¯ãƒˆãƒ«ç©
 /*!
-  \param v	‘æ1ˆø”
-  \param w	‘æ2ˆø”
-  \return	ƒxƒNƒgƒ‹ÏC‚·‚È‚í‚¿\f$\TUvec{v}{}\times\TUvec{w}{}\f$
+  \param v	ç¬¬1å¼•æ•°
+  \param w	ç¬¬2å¼•æ•°
+  \return	ãƒ™ã‚¯ãƒˆãƒ«ç©ï¼Œã™ãªã‚ã¡\f$\TUvec{v}{}\times\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2>
 inline Vector<T1, FixedSizedBuf<T1, 3> >
@@ -1640,11 +1640,11 @@ operator ^(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return Vector<T1, FixedSizedBuf<T1, 3> >(v) ^= w;
 }
 
-//! 2‚Â‚ÌƒxƒNƒgƒ‹‚Ì“àÏ
+//! 2ã¤ã®ãƒ™ã‚¯ãƒˆãƒ«ã®å†…ç©
 /*!
-  \param v	‘æ1ˆø”
-  \param w	‘æ2ˆø”
-  \return	“àÏC‚·‚È‚í‚¿\f$\TUtvec{v}{}\TUvec{w}{}\f$
+  \param v	ç¬¬1å¼•æ•°
+  \param w	ç¬¬2å¼•æ•°
+  \return	å†…ç©ï¼Œã™ãªã‚ã¡\f$\TUtvec{v}{}\TUvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> T1
 operator *(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
@@ -1656,11 +1656,11 @@ operator *(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return val;
 }
 
-//! ƒxƒNƒgƒ‹‚Æs—ñ‚ÌÏ
+//! ãƒ™ã‚¯ãƒˆãƒ«ã¨è¡Œåˆ—ã®ç©
 /*!
-  \param v	ƒxƒNƒgƒ‹
-  \param m	s—ñ
-  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUtvec{v}{}\TUvec{M}{}\f$
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \param m	è¡Œåˆ—
+  \return	çµæœã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$\TUtvec{v}{}\TUvec{M}{}\f$
 */
 template <class T1, class B1, class T2, class B2, class R2> Vector<T1>
 operator *(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
@@ -1673,11 +1673,11 @@ operator *(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
     return val;
 }
 
-//! 2‚Â‚ÌƒxƒNƒgƒ‹‚ÌŠOÏ
+//! 2ã¤ã®ãƒ™ã‚¯ãƒˆãƒ«ã®å¤–ç©
 /*!
-  \param v	‘æ1ˆø”
-  \param w	‘æ2ˆø”
-  \return	Œ‹‰Ê‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{v}{}\TUtvec{w}{}\f$
+  \param v	ç¬¬1å¼•æ•°
+  \param w	ç¬¬2å¼•æ•°
+  \return	çµæœã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUvec{v}{}\TUtvec{w}{}\f$
 */
 template <class T1, class B1, class T2, class B2> Matrix<T1>
 operator %(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
@@ -1689,14 +1689,14 @@ operator %(const Vector<T1, B1>& v, const Vector<T2, B2>& w)
     return val;
 }
 
-//! 3ŸŒ³ƒxƒNƒgƒ‹‚Æ3x?s—ñ‚ÌŠe—ñ‚Æ‚ÌƒxƒNƒgƒ‹Ï
+//! 3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã¨3x?è¡Œåˆ—ã®å„åˆ—ã¨ã®ãƒ™ã‚¯ãƒˆãƒ«ç©
 /*!
-  \param v			3ŸŒ³ƒxƒNƒgƒ‹
-  \param m			3x?s—ñ
-  \return			Œ‹‰Ê‚Ì3x?s—ñC‚·‚È‚í‚¿
+  \param v			3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+  \param m			3x?è¡Œåˆ—
+  \return			çµæœã®3x?è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 				\f$\TUvec{v}{}\times\TUvec{M}{}\f$
-  \throw std::invalid_argument	v‚ª3ŸŒ³ƒxƒNƒgƒ‹‚Å‚È‚¢‚©m‚ª3x?s—ñ‚Å‚È‚¢ê‡‚É
-				‘—o
+  \throw std::invalid_argument	vãŒ3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã§ãªã„ã‹mãŒ3x?è¡Œåˆ—ã§ãªã„å ´åˆã«
+				é€å‡º
 */
 template <class T1, class B1, class T2, class B2, class R2> Matrix<T2, B2, R2>
 operator ^(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
@@ -1714,11 +1714,11 @@ operator ^(const Vector<T1, B1>& v, const Matrix<T2, B2, R2>& m)
     return val;
 }
 
-//! 2‚Â‚Ìs—ñ‚ÌÏ
+//! 2ã¤ã®è¡Œåˆ—ã®ç©
 /*!
-  \param m	‘æ1ˆø”
-  \param n	‘æ2ˆø”
-  \return	Œ‹‰Ê‚Ìs—ñC‚·‚È‚í‚¿\f$\TUvec{M}{}\TUvec{N}{}\f$
+  \param m	ç¬¬1å¼•æ•°
+  \param n	ç¬¬2å¼•æ•°
+  \return	çµæœã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$\TUvec{M}{}\TUvec{N}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2, class R2>
 Matrix<T1>
@@ -1733,11 +1733,11 @@ operator *(const Matrix<T1, B1, R1>& m, const Matrix<T2, B2, R2>& n)
     return val;
 }
 
-//! s—ñ‚ÆƒxƒNƒgƒ‹‚ÌÏ
+//! è¡Œåˆ—ã¨ãƒ™ã‚¯ãƒˆãƒ«ã®ç©
 /*!
-  \param m	s—ñ
-  \param v	ƒxƒNƒgƒ‹
-  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿\f$\TUvec{M}{}\TUvec{v}{}\f$
+  \param m	è¡Œåˆ—
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \return	çµæœã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡\f$\TUvec{M}{}\TUvec{v}{}\f$
 */
 template <class T1, class B1, class R1, class T2, class B2> Vector<T1>
 operator *(const Matrix<T1, B1, R1>& m, const Vector<T2, B2>& v)
@@ -1748,11 +1748,11 @@ operator *(const Matrix<T1, B1, R1>& m, const Vector<T2, B2>& v)
     return val;
 }
 
-//! ?x3s—ñ‚ÌŠes‚Æ3ŸŒ³ƒxƒNƒgƒ‹‚ÌƒxƒNƒgƒ‹Ï
+//! ?x3è¡Œåˆ—ã®å„è¡Œã¨3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã®ãƒ™ã‚¯ãƒˆãƒ«ç©
 /*!
-  \param m	?x3s—ñ
-  \param v	3ŸŒ³ƒxƒNƒgƒ‹
-  \return	Œ‹‰Ê‚Ìs—ñC‚·‚È‚í‚¿\f$(\TUtvec{M}{}\times\TUvec{v}{})^\top\f$
+  \param m	?x3è¡Œåˆ—
+  \param v	3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+  \return	çµæœã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡\f$(\TUtvec{M}{}\times\TUvec{v}{})^\top\f$
 */
 template <class T1, class B1, class R1, class T2, class B2>
 inline Matrix<T1, B1, R1>
@@ -1764,7 +1764,7 @@ operator ^(const Matrix<T1, B1, R1>& m, const Vector<T2, B2>& v)
 /************************************************************************
 *  class LUDecomposition<T>						*
 ************************************************************************/
-//! ³•ûs—ñ‚ÌLU•ª‰ğ‚ğ•\‚·ƒNƒ‰ƒX
+//! æ­£æ–¹è¡Œåˆ—ã®LUåˆ†è§£ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class LUDecomposition : private Array2<Vector<T> >
 {
@@ -1779,9 +1779,9 @@ class LUDecomposition : private Array2<Vector<T> >
     template <class T2, class B2>
     void	substitute(Vector<T2, B2>&)	const	;
 
-  //! ‚à‚Æ‚Ì³•ûs—ñ‚Ìs—ñ®‚ğ•Ô‚·D
+  //! ã‚‚ã¨ã®æ­£æ–¹è¡Œåˆ—ã®è¡Œåˆ—å¼ã‚’è¿”ã™ï¼
   /*!
-    \return	‚à‚Æ‚Ì³•ûs—ñ‚Ìs—ñ®
+    \return	ã‚‚ã¨ã®æ­£æ–¹è¡Œåˆ—ã®è¡Œåˆ—å¼
   */
     T		det()				const	{return _det;}
     
@@ -1793,10 +1793,10 @@ class LUDecomposition : private Array2<Vector<T> >
     T		_det;
 };
 
-//! —^‚¦‚ç‚ê‚½³•ûs—ñ‚ÌLU•ª‰ğ‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸæ­£æ–¹è¡Œåˆ—ã®LUåˆ†è§£ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
- \param m			LU•ª‰ğ‚·‚é³•ûs—ñ
- \throw std::invalid_argument	m‚ª³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
+ \param m			LUåˆ†è§£ã™ã‚‹æ­£æ–¹è¡Œåˆ—
+ \throw std::invalid_argument	mãŒæ­£æ–¹è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T> template <class T2, class B2, class R2>
 LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
@@ -1866,15 +1866,15 @@ LUDecomposition<T>::LUDecomposition(const Matrix<T2, B2, R2>& m)
     }
 }
 
-//! ‚à‚Æ‚Ì³•ûs—ñ‚ğŒW”s—ñ‚Æ‚µ‚½˜A—§1Ÿ•û’ö®‚ğ‰ğ‚­D
+//! ã‚‚ã¨ã®æ­£æ–¹è¡Œåˆ—ã‚’ä¿‚æ•°è¡Œåˆ—ã¨ã—ãŸé€£ç«‹1æ¬¡æ–¹ç¨‹å¼ã‚’è§£ãï¼
 /*!
-  \param b			‚à‚Æ‚Ì³•ûs—ñ\f$\TUvec{M}{}\f$‚Æ“¯‚¶Ÿ
-				Œ³‚ğ‚ÂƒxƒNƒgƒ‹D\f$\TUtvec{b}{} =
-				\TUtvec{x}{}\TUvec{M}{}\f$‚Ì‰ğ‚É•ÏŠ·‚³
-				‚ê‚éD
-  \throw std::invalid_argument	ƒxƒNƒgƒ‹b‚ÌŸŒ³‚ª‚à‚Æ‚Ì³•ûs—ñ‚ÌŸŒ³‚Éˆê’v
-				‚µ‚È‚¢ê‡‚É‘—o
-  \throw std::runtime_error	‚à‚Æ‚Ì³•ûs—ñ‚ª³‘¥‚Å‚È‚¢ê‡‚É‘—o
+  \param b			ã‚‚ã¨ã®æ­£æ–¹è¡Œåˆ—\f$\TUvec{M}{}\f$ã¨åŒã˜æ¬¡
+				å…ƒã‚’æŒã¤ãƒ™ã‚¯ãƒˆãƒ«ï¼\f$\TUtvec{b}{} =
+				\TUtvec{x}{}\TUvec{M}{}\f$ã®è§£ã«å¤‰æ›ã•
+				ã‚Œã‚‹ï¼
+  \throw std::invalid_argument	ãƒ™ã‚¯ãƒˆãƒ«bã®æ¬¡å…ƒãŒã‚‚ã¨ã®æ­£æ–¹è¡Œåˆ—ã®æ¬¡å…ƒã«ä¸€è‡´
+				ã—ãªã„å ´åˆã«é€å‡º
+  \throw std::runtime_error	ã‚‚ã¨ã®æ­£æ–¹è¡Œåˆ—ãŒæ­£å‰‡ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T> template <class T2, class B2> void
 LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
@@ -1899,11 +1899,11 @@ LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
     }
 }
 
-//! ˜A—§1Ÿ•û’ö®‚ğ‰ğ‚­D
+//! é€£ç«‹1æ¬¡æ–¹ç¨‹å¼ã‚’è§£ãï¼
 /*!
-  \param m	³‘¥‚È³•ûs—ñ
+  \param m	æ­£å‰‡ãªæ­£æ–¹è¡Œåˆ—
   \return	\f$\TUtvec{u}{} = \TUtvec{x}{}\TUvec{M}{}\f$
-		‚Ì‰ğ‚ğ”[‚ß‚½‚±‚ÌƒxƒNƒgƒ‹C‚·‚È‚í‚¿
+		ã®è§£ã‚’ç´ã‚ãŸã“ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼Œã™ãªã‚ã¡
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
 */
 template <class T, class B> template <class T2, class B2, class R2>
@@ -1914,11 +1914,11 @@ Vector<T, B>::solve(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! ˜A—§1Ÿ•û’ö®‚ğ‰ğ‚­D
+//! é€£ç«‹1æ¬¡æ–¹ç¨‹å¼ã‚’è§£ãï¼
 /*!
-  \param m	³‘¥‚È³•ûs—ñ
+  \param m	æ­£å‰‡ãªæ­£æ–¹è¡Œåˆ—
   \return	\f$\TUvec{A}{} = \TUvec{X}{}\TUvec{M}{}\f$
-		‚Ì‰ğ‚ğ”[‚ß‚½‚±‚Ìs—ñC‚·‚È‚í‚¿
+		ã®è§£ã‚’ç´ã‚ãŸã“ã®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
@@ -1932,9 +1932,9 @@ Matrix<T, B, R>::solve(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-//! ‚±‚Ìs—ñ‚Ìs—ñ®‚ğ•Ô‚·D
+//! ã“ã®è¡Œåˆ—ã®è¡Œåˆ—å¼ã‚’è¿”ã™ï¼
 /*!
-  \return	s—ñ®C‚·‚È‚í‚¿\f$\det\TUvec{A}{}\f$
+  \return	è¡Œåˆ—å¼ï¼Œã™ãªã‚ã¡\f$\det\TUvec{A}{}\f$
 */
 template <class T, class B, class R> inline T
 Matrix<T, B, R>::det() const
@@ -1948,7 +1948,7 @@ Matrix<T, B, R>::det() const
 template <class T>	class QRDecomposition;
 template <class T>	class BiDiagonal;
 
-//! Householder•ÏŠ·‚ğ•\‚·ƒNƒ‰ƒX
+//! Householderå¤‰æ›ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class Householder : public Matrix<T>
 {
@@ -2150,14 +2150,14 @@ Householder<T>::sigma_is_zero(u_int m, T comp) const
 /************************************************************************
 *  class QRDecomposition<T>						*
 ************************************************************************/
-//! ˆê”Ês—ñ‚ÌQR•ª‰ğ‚ğ•\‚·ƒNƒ‰ƒX
+//! ä¸€èˆ¬è¡Œåˆ—ã®QRåˆ†è§£ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  —^‚¦‚ç‚ê‚½s—ñ\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$‚É‘Î‚µ‚Ä
-  \f$\TUvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$‚È‚é‰º”¼OŠps—ñ
-  \f$\TUtvec{R}{} \in \TUspace{R}{m\times n}\f$‚Æ‰ñ“]s—ñ
-  \f$\TUtvec{Q}{} \in \TUspace{R}{n\times n}\f$‚ğ‹‚ß‚é
-  i\f$\TUvec{A}{}\f$‚ÌŠes‚ğ\f$\TUtvec{Q}{}\f$‚Ìs‚ÌüŒ^Œ‹‡‚Å•\Œ»‚·
-  ‚éjD
+  ä¸ãˆã‚‰ã‚ŒãŸè¡Œåˆ—\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$ã«å¯¾ã—ã¦
+  \f$\TUvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$ãªã‚‹ä¸‹åŠä¸‰è§’è¡Œåˆ—
+  \f$\TUtvec{R}{} \in \TUspace{R}{m\times n}\f$ã¨å›è»¢è¡Œåˆ—
+  \f$\TUtvec{Q}{} \in \TUspace{R}{n\times n}\f$ã‚’æ±‚ã‚ã‚‹
+  ï¼ˆ\f$\TUvec{A}{}\f$ã®å„è¡Œã‚’\f$\TUtvec{Q}{}\f$ã®è¡Œã®ç·šå‹çµåˆã§è¡¨ç¾ã™
+  ã‚‹ï¼‰ï¼
  */
 template <class T>
 class QRDecomposition : private Matrix<T>
@@ -2172,15 +2172,15 @@ class QRDecomposition : private Matrix<T>
     template <class T2, class B2, class R2>
     QRDecomposition(const Matrix<T2, B2, R2>& m)	;
 
-  //! QR•ª‰ğ‚Ì‰º”¼OŠps—ñ‚ğ•Ô‚·D
+  //! QRåˆ†è§£ã®ä¸‹åŠä¸‰è§’è¡Œåˆ—ã‚’è¿”ã™ï¼
   /*!
-    \return	‰º”¼OŠps—ñ\f$\TUtvec{R}{}\f$
+    \return	ä¸‹åŠä¸‰è§’è¡Œåˆ—\f$\TUtvec{R}{}\f$
   */
     const Matrix<T>&	Rt()			const	{return *this;}
 
-  //! QR•ª‰ğ‚Ì‰ñ“]s—ñ‚ğ•Ô‚·D
+  //! QRåˆ†è§£ã®å›è»¢è¡Œåˆ—ã‚’è¿”ã™ï¼
   /*!
-    \return	‰ñ“]s—ñ\f$\TUtvec{Q}{}\f$
+    \return	å›è»¢è¡Œåˆ—\f$\TUtvec{Q}{}\f$
   */
     const Matrix<T>&	Qt()			const	{return _Qt;}
     
@@ -2191,9 +2191,9 @@ class QRDecomposition : private Matrix<T>
     Householder<T>	_Qt;			// rotation matrix
 };
 
-//! —^‚¦‚ç‚ê‚½ˆê”Ês—ñ‚ÌQR•ª‰ğ‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸä¸€èˆ¬è¡Œåˆ—ã®QRåˆ†è§£ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
- \param m	QR•ª‰ğ‚·‚éˆê”Ês—ñ
+ \param m	QRåˆ†è§£ã™ã‚‹ä¸€èˆ¬è¡Œåˆ—
 */
 template <class T> template <class T2, class B2, class R2>
 QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2, R2>& m)
@@ -2214,43 +2214,43 @@ QRDecomposition<T>::QRDecomposition(const Matrix<T2, B2, R2>& m)
 /************************************************************************
 *  class TriDiagonal<T>							*
 ************************************************************************/
-//! ‘ÎÌs—ñ‚Ì3d‘ÎŠp‰»‚ğ•\‚·ƒNƒ‰ƒX
+//! å¯¾ç§°è¡Œåˆ—ã®3é‡å¯¾è§’åŒ–ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  —^‚¦‚ç‚ê‚½‘ÎÌs—ñ\f$\TUvec{A}{} \in \TUspace{R}{d\times d}\f$‚É‘Î‚µ
-  ‚Ä\f$\TUtvec{U}{}\TUvec{A}{}\TUvec{U}{}\f$‚ª3d‘ÎŠps—ñ‚Æ‚È‚é‚æ‚¤‚È‰ñ
-  “]s—ñ\f$\TUtvec{U}{} \in \TUspace{R}{d\times d}\f$‚ğ‹‚ß‚éD
+  ä¸ãˆã‚‰ã‚ŒãŸå¯¾ç§°è¡Œåˆ—\f$\TUvec{A}{} \in \TUspace{R}{d\times d}\f$ã«å¯¾ã—
+  ã¦\f$\TUtvec{U}{}\TUvec{A}{}\TUvec{U}{}\f$ãŒ3é‡å¯¾è§’è¡Œåˆ—ã¨ãªã‚‹ã‚ˆã†ãªå›
+  è»¢è¡Œåˆ—\f$\TUtvec{U}{} \in \TUspace{R}{d\times d}\f$ã‚’æ±‚ã‚ã‚‹ï¼
  */
 template <class T>
 class TriDiagonal
 {
   public:
-    typedef T					value_type;	//!< ¬•ª‚ÌŒ^
+    typedef T					value_type;	//!< æˆåˆ†ã®å‹
     
   public:
     template <class T2, class B2, class R2>
     TriDiagonal(const Matrix<T2, B2, R2>& a)		;
 
-  //! 3d‘ÎŠp‰»‚³‚ê‚é‘ÎÌs—ñ‚ÌŸŒ³(= s” = —ñ”)‚ğ•Ô‚·D
+  //! 3é‡å¯¾è§’åŒ–ã•ã‚Œã‚‹å¯¾ç§°è¡Œåˆ—ã®æ¬¡å…ƒ(= è¡Œæ•° = åˆ—æ•°)ã‚’è¿”ã™ï¼
   /*!
-    \return	‘ÎÌs—ñ‚ÌŸŒ³
+    \return	å¯¾ç§°è¡Œåˆ—ã®æ¬¡å…ƒ
   */
     u_int		dim()			const	{return _Ut.nrow();}
 
-  //! 3d‘ÎŠp‰»‚ğs‚¤‰ñ“]s—ñ‚ğ•Ô‚·D
+  //! 3é‡å¯¾è§’åŒ–ã‚’è¡Œã†å›è»¢è¡Œåˆ—ã‚’è¿”ã™ï¼
   /*!
-    \return	‰ñ“]s—ñ
+    \return	å›è»¢è¡Œåˆ—
   */
     const Matrix<T>&	Ut()			const	{return _Ut;}
 
-  //! 3d‘ÎŠps—ñ‚Ì‘ÎŠp¬•ª‚ğ•Ô‚·D
+  //! 3é‡å¯¾è§’è¡Œåˆ—ã®å¯¾è§’æˆåˆ†ã‚’è¿”ã™ï¼
   /*!
-    \return	‘ÎŠp¬•ª
+    \return	å¯¾è§’æˆåˆ†
   */
     const Vector<T>&	diagonal()		const	{return _diagonal;}
 
-  //! 3d‘ÎŠps—ñ‚Ì”ñ‘ÎŠp¬•ª‚ğ•Ô‚·D
+  //! 3é‡å¯¾è§’è¡Œåˆ—ã®éå¯¾è§’æˆåˆ†ã‚’è¿”ã™ï¼
   /*!
-    \return	”ñ‘ÎŠp¬•ª
+    \return	éå¯¾è§’æˆåˆ†
   */
     const Vector<T>&	off_diagonal()		const	{return _Ut.sigma();}
 
@@ -2268,10 +2268,10 @@ class TriDiagonal
     Vector<T>&		_off_diagonal;
 };
 
-//! —^‚¦‚ç‚ê‚½‘ÎÌs—ñ‚ğ3d‘ÎŠp‰»‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸå¯¾ç§°è¡Œåˆ—ã‚’3é‡å¯¾è§’åŒ–ã™ã‚‹ï¼
 /*!
-  \param a			3d‘ÎŠp‰»‚·‚é‘ÎÌs—ñ
-  \throw std::invalid_argument	a‚ª³•ûs—ñ‚Å‚È‚¢ê‡‚É‘—o
+  \param a			3é‡å¯¾è§’åŒ–ã™ã‚‹å¯¾ç§°è¡Œåˆ—
+  \throw std::invalid_argument	aãŒæ­£æ–¹è¡Œåˆ—ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T> template <class T2, class B2, class R2>
 TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2, R2>& a)
@@ -2289,12 +2289,12 @@ TriDiagonal<T>::TriDiagonal(const Matrix<T2, B2, R2>& a)
     _Ut.make_transformation();
 }
 
-//! 3d‘ÎŠps—ñ‚ğ‘ÎŠp‰»‚·‚éiŒÅ—L’lCŒÅ—LƒxƒNƒgƒ‹‚ÌŒvZjD
+//! 3é‡å¯¾è§’è¡Œåˆ—ã‚’å¯¾è§’åŒ–ã™ã‚‹ï¼ˆå›ºæœ‰å€¤ï¼Œå›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã®è¨ˆç®—ï¼‰ï¼
 /*!
-  ‘ÎŠp¬•ª‚ÍŒÅ—L’l‚Æ‚È‚èC\f$\TUtvec{U}{}\f$‚ÌŠes‚ÍŒÅ—LƒxƒNƒgƒ‹‚ğ—^‚¦‚éD
-  \throw std::runtime_error	w’è‚µ‚½ŒJ‚è•Ô‚µ‰ñ”‚ğ‰z‚¦‚½ê‡‚É‘—o
-  \param abs	ŒÅ—L’l‚ğ‚»‚Ìâ‘Î’l‚Ì‘å‚«‚¢‡‚É•À‚×‚é‚Ì‚Å‚ ‚ê‚Îtrue,
-		‚»‚Ì’l‚Ì‘å‚«‚¢‡‚É•À‚×‚é‚Ì‚Å‚ ‚ê‚Îfalse
+  å¯¾è§’æˆåˆ†ã¯å›ºæœ‰å€¤ã¨ãªã‚Šï¼Œ\f$\TUtvec{U}{}\f$ã®å„è¡Œã¯å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä¸ãˆã‚‹ï¼
+  \throw std::runtime_error	æŒ‡å®šã—ãŸç¹°ã‚Šè¿”ã—å›æ•°ã‚’è¶ŠãˆãŸå ´åˆã«é€å‡º
+  \param abs	å›ºæœ‰å€¤ã‚’ãã®çµ¶å¯¾å€¤ã®å¤§ãã„é †ã«ä¸¦ã¹ã‚‹ã®ã§ã‚ã‚Œã°true,
+		ãã®å€¤ã®å¤§ãã„é †ã«ä¸¦ã¹ã‚‹ã®ã§ã‚ã‚Œã°false
 */ 
 template <class T> void
 TriDiagonal<T>::diagonalize(bool abs)
@@ -2409,58 +2409,58 @@ TriDiagonal<T>::initialize_rotation(u_int m, u_int n, T& x, T& y) const
 /************************************************************************
 *  class BiDiagonal<T>							*
 ************************************************************************/
-//! ˆê”Ês—ñ‚Ì2d‘ÎŠp‰»‚ğ•\‚·ƒNƒ‰ƒX
+//! ä¸€èˆ¬è¡Œåˆ—ã®2é‡å¯¾è§’åŒ–ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  —^‚¦‚ç‚ê‚½ˆê”Ês—ñ\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$‚É‘Î‚µ
-  ‚Ä\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$‚ª2d‘ÎŠps—ñ‚Æ‚È‚é‚æ‚¤‚È2
-  ‚Â‚Ì‰ñ“]s—ñ\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
-  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$‚ğ‹‚ß‚éD\f$m \le n\f$
-  ‚Ìê‡‚Í‰º”¼OŠp‚È2d‘ÎŠps—ñ‚ÉC\f$m > n\f$‚Ìê‡‚Íã”¼OŠp‚È2d‘ÎŠp
-  s—ñ‚É‚È‚éD
+  ä¸ãˆã‚‰ã‚ŒãŸä¸€èˆ¬è¡Œåˆ—\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$ã«å¯¾ã—
+  ã¦\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$ãŒ2é‡å¯¾è§’è¡Œåˆ—ã¨ãªã‚‹ã‚ˆã†ãª2
+  ã¤ã®å›è»¢è¡Œåˆ—\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
+  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$ã‚’æ±‚ã‚ã‚‹ï¼\f$m \le n\f$
+  ã®å ´åˆã¯ä¸‹åŠä¸‰è§’ãª2é‡å¯¾è§’è¡Œåˆ—ã«ï¼Œ\f$m > n\f$ã®å ´åˆã¯ä¸ŠåŠä¸‰è§’ãª2é‡å¯¾è§’
+  è¡Œåˆ—ã«ãªã‚‹ï¼
  */
 template <class T>
 class BiDiagonal
 {
   public:
-    typedef T					value_type;	//!< ¬•ª‚ÌŒ^
+    typedef T					value_type;	//!< æˆåˆ†ã®å‹
     
   public:
     template <class T2, class B2, class R2>
     BiDiagonal(const Matrix<T2, B2, R2>& a)	;
 
-  //! 2d‘ÎŠp‰»‚³‚ê‚és—ñ‚Ìs”‚ğ•Ô‚·D
+  //! 2é‡å¯¾è§’åŒ–ã•ã‚Œã‚‹è¡Œåˆ—ã®è¡Œæ•°ã‚’è¿”ã™ï¼
   /*!
-    \return	s—ñ‚Ìs”
+    \return	è¡Œåˆ—ã®è¡Œæ•°
   */
     u_int		nrow()		const	{return _Vt.nrow();}
 
-  //! 2d‘ÎŠp‰»‚³‚ê‚és—ñ‚Ì—ñ”‚ğ•Ô‚·D
+  //! 2é‡å¯¾è§’åŒ–ã•ã‚Œã‚‹è¡Œåˆ—ã®åˆ—æ•°ã‚’è¿”ã™ï¼
   /*!
-    \return	s—ñ‚Ì—ñ”
+    \return	è¡Œåˆ—ã®åˆ—æ•°
   */
     u_int		ncol()		const	{return _Ut.nrow();}
 
-  //! 2d‘ÎŠp‰»‚ğs‚¤‚½‚ß‚É‰E‚©‚çŠ|‚¯‚é‰ñ“]s—ñ‚Ì“]’u‚ğ•Ô‚·D
+  //! 2é‡å¯¾è§’åŒ–ã‚’è¡Œã†ãŸã‚ã«å³ã‹ã‚‰æ›ã‘ã‚‹å›è»¢è¡Œåˆ—ã®è»¢ç½®ã‚’è¿”ã™ï¼
   /*!
-    \return	‰E‚©‚çŠ|‚¯‚é‰ñ“]s—ñ‚Ì“]’u
+    \return	å³ã‹ã‚‰æ›ã‘ã‚‹å›è»¢è¡Œåˆ—ã®è»¢ç½®
   */
     const Matrix<T>&	Ut()		const	{return _Ut;}
 
-  //! 2d‘ÎŠp‰»‚ğs‚¤‚½‚ß‚É¶‚©‚çŠ|‚¯‚é‰ñ“]s—ñ‚ğ•Ô‚·D
+  //! 2é‡å¯¾è§’åŒ–ã‚’è¡Œã†ãŸã‚ã«å·¦ã‹ã‚‰æ›ã‘ã‚‹å›è»¢è¡Œåˆ—ã‚’è¿”ã™ï¼
   /*!
-    \return	¶‚©‚çŠ|‚¯‚é‰ñ“]s—ñ
+    \return	å·¦ã‹ã‚‰æ›ã‘ã‚‹å›è»¢è¡Œåˆ—
   */
     const Matrix<T>&	Vt()		const	{return _Vt;}
 
-  //! 2d‘ÎŠps—ñ‚Ì‘ÎŠp¬•ª‚ğ•Ô‚·D
+  //! 2é‡å¯¾è§’è¡Œåˆ—ã®å¯¾è§’æˆåˆ†ã‚’è¿”ã™ï¼
   /*!
-    \return	‘ÎŠp¬•ª
+    \return	å¯¾è§’æˆåˆ†
   */
     const Vector<T>&	diagonal()	const	{return _Dt.sigma();}
 
-  //! 2d‘ÎŠps—ñ‚Ì”ñ‘ÎŠp¬•ª‚ğ•Ô‚·D
+  //! 2é‡å¯¾è§’è¡Œåˆ—ã®éå¯¾è§’æˆåˆ†ã‚’è¿”ã™ï¼
   /*!
-    \return	”ñ‘ÎŠp¬•ª
+    \return	éå¯¾è§’æˆåˆ†
   */
     const Vector<T>&	off_diagonal()	const	{return _Et.sigma();}
 
@@ -2483,9 +2483,9 @@ class BiDiagonal
     const Matrix<T>&	_Vt;
 };
 
-//! —^‚¦‚ç‚ê‚½ˆê”Ês—ñ‚ğ2d‘ÎŠp‰»‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸä¸€èˆ¬è¡Œåˆ—ã‚’2é‡å¯¾è§’åŒ–ã™ã‚‹ï¼
 /*!
-  \param a	2d‘ÎŠp‰»‚·‚éˆê”Ês—ñ
+  \param a	2é‡å¯¾è§’åŒ–ã™ã‚‹ä¸€èˆ¬è¡Œåˆ—
 */
 template <class T> template <class T2, class B2, class R2>
 BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
@@ -2522,11 +2522,11 @@ BiDiagonal<T>::BiDiagonal(const Matrix<T2, B2, R2>& a)
     }
 }
 
-//! 2d‘ÎŠps—ñ‚ğ‘ÎŠp‰»‚·‚éi“ÁˆÙ’l•ª‰ğjD
+//! 2é‡å¯¾è§’è¡Œåˆ—ã‚’å¯¾è§’åŒ–ã™ã‚‹ï¼ˆç‰¹ç•°å€¤åˆ†è§£ï¼‰ï¼
 /*!
-  ‘ÎŠp¬•ª‚Í“ÁˆÙ’l‚Æ‚È‚èC\f$\TUtvec{U}{}\f$‚Æ\f$\TUtvec{V}{}\f$
-  ‚ÌŠes‚Í‚»‚ê‚¼‚ê‰E“ÁˆÙƒxƒNƒgƒ‹‚Æ¶“ÁˆÙƒxƒNƒgƒ‹‚ğ—^‚¦‚éD
-  \throw std::runtime_error	w’è‚µ‚½ŒJ‚è•Ô‚µ‰ñ”‚ğ‰z‚¦‚½ê‡‚É‘—o
+  å¯¾è§’æˆåˆ†ã¯ç‰¹ç•°å€¤ã¨ãªã‚Šï¼Œ\f$\TUtvec{U}{}\f$ã¨\f$\TUtvec{V}{}\f$
+  ã®å„è¡Œã¯ãã‚Œãã‚Œå³ç‰¹ç•°ãƒ™ã‚¯ãƒˆãƒ«ã¨å·¦ç‰¹ç•°ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä¸ãˆã‚‹ï¼
+  \throw std::runtime_error	æŒ‡å®šã—ãŸç¹°ã‚Šè¿”ã—å›æ•°ã‚’è¶ŠãˆãŸå ´åˆã«é€å‡º
 */ 
 template <class T> void
 BiDiagonal<T>::diagonalize()
@@ -2702,26 +2702,26 @@ BiDiagonal<T>::initialize_rotation(u_int m, u_int n, T& x, T& y) const
 /************************************************************************
 *  class SVDecomposition<T>						*
 ************************************************************************/
-//! ˆê”Ês—ñ‚Ì“ÁˆÙ’l•ª‰ğ‚ğ•\‚·ƒNƒ‰ƒX
+//! ä¸€èˆ¬è¡Œåˆ—ã®ç‰¹ç•°å€¤åˆ†è§£ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  —^‚¦‚ç‚ê‚½ˆê”Ês—ñ\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$‚É‘Î‚µ
-  ‚Ä\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$‚ª‘ÎŠps—ñ‚Æ‚È‚é‚æ‚¤‚È2‚Â‚Ì
-  ‰ñ“]s—ñ\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
-  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$‚ğ‹‚ß‚éD
+  ä¸ãˆã‚‰ã‚ŒãŸä¸€èˆ¬è¡Œåˆ—\f$\TUvec{A}{} \in \TUspace{R}{m\times n}\f$ã«å¯¾ã—
+  ã¦\f$\TUtvec{V}{}\TUvec{A}{}\TUvec{U}{}\f$ãŒå¯¾è§’è¡Œåˆ—ã¨ãªã‚‹ã‚ˆã†ãª2ã¤ã®
+  å›è»¢è¡Œåˆ—\f$\TUtvec{U}{} \in \TUspace{R}{n\times n}\f$,
+  \f$\TUtvec{V}{} \in \TUspace{R}{m\times m}\f$ã‚’æ±‚ã‚ã‚‹ï¼
  */
 template <class T>
 class SVDecomposition : private BiDiagonal<T>
 {
   public:
-    typedef T					value_type;	//!< ¬•ª‚ÌŒ^
+    typedef T					value_type;	//!< æˆåˆ†ã®å‹
 
   private:
     typedef BiDiagonal<T>			super;
     
   public:
-  //! —^‚¦‚ç‚ê‚½ˆê”Ês—ñ‚Ì“ÁˆÙ’l•ª‰ğ‚ğ‹‚ß‚éD
+  //! ä¸ãˆã‚‰ã‚ŒãŸä¸€èˆ¬è¡Œåˆ—ã®ç‰¹ç•°å€¤åˆ†è§£ã‚’æ±‚ã‚ã‚‹ï¼
   /*!
-    \param a	“ÁˆÙ’l•ª‰ğ‚·‚éˆê”Ês—ñ
+    \param a	ç‰¹ç•°å€¤åˆ†è§£ã™ã‚‹ä¸€èˆ¬è¡Œåˆ—
   */
     template <class T2, class B2, class R2>
     SVDecomposition(const Matrix<T2, B2, R2>& a)
@@ -2733,10 +2733,10 @@ class SVDecomposition : private BiDiagonal<T>
     using	super::Vt;
     using	super::diagonal;
 
-  //! “ÁˆÙ’l‚ğ‹‚ß‚éD
+  //! ç‰¹ç•°å€¤ã‚’æ±‚ã‚ã‚‹ï¼
   /*!
-    \param i	â‘Î’l‚Ì‘å‚«‚¢‡‚É•À‚ñ‚¾“ÁˆÙ’l‚Ì1‚Â‚ğw’è‚·‚éindex
-    \return	w’è‚³‚ê‚½index‚É‘Î‰‚·‚é“ÁˆÙ’l
+    \param i	çµ¶å¯¾å€¤ã®å¤§ãã„é †ã«ä¸¦ã‚“ã ç‰¹ç•°å€¤ã®1ã¤ã‚’æŒ‡å®šã™ã‚‹index
+    \return	æŒ‡å®šã•ã‚ŒãŸindexã«å¯¾å¿œã™ã‚‹ç‰¹ç•°å€¤
   */
     const T&	operator [](int i)	const	{return diagonal()[i];}
 };
@@ -2745,65 +2745,65 @@ class SVDecomposition : private BiDiagonal<T>
 *  typedefs								*
 ************************************************************************/
 typedef Vector<short,  FixedSizedBuf<short,   2> >
-	Vector2s;			//!< shortŒ^¬•ª‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
+	Vector2s;			//!< shortå‹æˆåˆ†ã‚’æŒã¤2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<int,    FixedSizedBuf<int,     2> >
-	Vector2i;			//!< intŒ^¬•ª‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
+	Vector2i;			//!< intå‹æˆåˆ†ã‚’æŒã¤2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<float,  FixedSizedBuf<float,   2> >
-	Vector2f;			//!< floatŒ^¬•ª‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
+	Vector2f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<double, FixedSizedBuf<double,  2> >
-	Vector2d;			//!< doubleŒ^¬•ª‚ğ‚Â2ŸŒ³ƒxƒNƒgƒ‹
+	Vector2d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<short,  FixedSizedBuf<short,   3> >
-	Vector3s;			//!< shortŒ^¬•ª‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
+	Vector3s;			//!< shortå‹æˆåˆ†ã‚’æŒã¤3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<int,    FixedSizedBuf<int,     3> >
-	Vector3i;			//!< intŒ^¬•ª‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
+	Vector3i;			//!< intå‹æˆåˆ†ã‚’æŒã¤3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<float,  FixedSizedBuf<float,   3> >
-	Vector3f;			//!< floatŒ^¬•ª‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
+	Vector3f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<double, FixedSizedBuf<double,  3> >
-	Vector3d;			//!< doubleŒ^¬•ª‚ğ‚Â3ŸŒ³ƒxƒNƒgƒ‹
+	Vector3d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<short,  FixedSizedBuf<short,   4> >
-	Vector4s;			//!< shortŒ^¬•ª‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
+	Vector4s;			//!< shortå‹æˆåˆ†ã‚’æŒã¤4æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<int,    FixedSizedBuf<int,     4> >
-	Vector4i;			//!< intŒ^¬•ª‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
+	Vector4i;			//!< intå‹æˆåˆ†ã‚’æŒã¤4æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<float,  FixedSizedBuf<float,   4> >
-	Vector4f;			//!< floatŒ^¬•ª‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
+	Vector4f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤4æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Vector<double, FixedSizedBuf<double,  4> >
-	Vector4d;			//!< doubleŒ^¬•ª‚ğ‚Â4ŸŒ³ƒxƒNƒgƒ‹
+	Vector4d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤4æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 typedef Matrix<float,  FixedSizedBuf<float,   4>,
 	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix22f;			//!< floatŒ^¬•ª‚ğ‚Â2x2s—ñ
+	Matrix22f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤2x2è¡Œåˆ—
 typedef Matrix<double, FixedSizedBuf<double,  4>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix22d;			//!< doubleŒ^¬•ª‚ğ‚Â2x2s—ñ
+	Matrix22d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤2x2è¡Œåˆ—
 typedef Matrix<float,  FixedSizedBuf<float,   6>,
 	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix23f;			//!< floatŒ^¬•ª‚ğ‚Â2x3s—ñ
+	Matrix23f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤2x3è¡Œåˆ—
 typedef Matrix<double, FixedSizedBuf<double,  6>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix23d;			//!< doubleŒ^¬•ª‚ğ‚Â2x3s—ñ
+	Matrix23d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤2x3è¡Œåˆ—
 typedef Matrix<float,  FixedSizedBuf<float,   9>,
 	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix33f;			//!< floatŒ^¬•ª‚ğ‚Â3x3s—ñ
+	Matrix33f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤3x3è¡Œåˆ—
 typedef Matrix<double, FixedSizedBuf<double,  9>,
 	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix33d;			//!< doubleŒ^¬•ª‚ğ‚Â3x3s—ñ
+	Matrix33d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤3x3è¡Œåˆ—
 typedef Matrix<float,  FixedSizedBuf<float,  12>,
 	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix34f;			//!< floatŒ^¬•ª‚ğ‚Â3x4s—ñ
+	Matrix34f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤3x4è¡Œåˆ—
 typedef Matrix<double, FixedSizedBuf<double, 12>,
 	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix34d;			//!< doubleŒ^¬•ª‚ğ‚Â3x4s—ñ
+	Matrix34d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤3x4è¡Œåˆ—
 typedef Matrix<float,  FixedSizedBuf<float,  16>,
 	       FixedSizedBuf<Vector<float>,   4> >
-	Matrix44f;			//!< floatŒ^¬•ª‚ğ‚Â4x4s—ñ
+	Matrix44f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤4x4è¡Œåˆ—
 typedef Matrix<double, FixedSizedBuf<double, 16>,
 	       FixedSizedBuf<Vector<double>,  4> >
-	Matrix44d;			//!< doubleŒ^¬•ª‚ğ‚Â4x4s—ñ
+	Matrix44d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤4x4è¡Œåˆ—
 typedef Matrix<float, FixedSizedBuf<float, 12>,
 	       FixedSizedBuf<Vector<float>,  2> >
-	Matrix26f;			//!< floatŒ^¬•ª‚ğ‚Â2x6s—ñ
+	Matrix26f;			//!< floatå‹æˆåˆ†ã‚’æŒã¤2x6è¡Œåˆ—
 typedef Matrix<double, FixedSizedBuf<double, 12>,
 	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix26d;			//!< doubleŒ^¬•ª‚ğ‚Â2x6s—ñ
+	Matrix26d;			//!< doubleå‹æˆåˆ†ã‚’æŒã¤2x6è¡Œåˆ—
 }
 
 #endif	/* !__TUVectorPP_h	*/

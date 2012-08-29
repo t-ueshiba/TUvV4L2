@@ -1,15 +1,15 @@
 /*
- *  •½¬14-24”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-24å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2012.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: NDTree++.h,v 1.6 2012-08-16 04:00:42 ueshiba Exp $
+ *  $Id: NDTree++.h,v 1.7 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		NDTree++.h
-  \brief	ƒNƒ‰ƒX TU::NDTree ‚Ì’è‹`‚ÆÀ‘•
+  \brief	ã‚¯ãƒ©ã‚¹ TU::NDTree ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUNDTreePP_h
 #define __TUNDTreePP_h
@@ -42,10 +42,10 @@ namespace TU
 /************************************************************************
 *  class NDTree<T, D>							*
 ************************************************************************/
-//! DŸŒ³‹óŠÔ‚ğ•\Œ»‚·‚é2^D•ª–Ø‚ğ•\‚·ƒNƒ‰ƒX
+//! Dæ¬¡å…ƒç©ºé–“ã‚’è¡¨ç¾ã™ã‚‹2^Dåˆ†æœ¨ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	—v‘f‚ÌŒ^
-  \param D	‹óŠÔ‚ÌŸŒ³CD=2‚Ì‚Æ‚«quad tree, D=3‚Ì‚Æ‚«octree‚Æ‚È‚é
+  \param T	è¦ç´ ã®å‹
+  \param D	ç©ºé–“ã®æ¬¡å…ƒï¼ŒD=2ã®ã¨ãquad tree, D=3ã®ã¨ãoctreeã¨ãªã‚‹
  */
 template <class T, u_int D>
 class NDTree
@@ -58,22 +58,22 @@ class NDTree
     class	Leaf;
     
   public:
-    typedef T			value_type;	//!< —v‘f‚ÌŒ^
-    typedef value_type&		reference;	//!< —v‘f‚Ö‚ÌQÆ
-    typedef const value_type&	const_reference;//!< ’è”—v‘f‚Ö‚ÌQÆ
-    typedef value_type*		pointer;	//!< —v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
-    typedef const value_type*	const_pointer;	//!< ’è”—v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+    typedef T			value_type;	//!< è¦ç´ ã®å‹
+    typedef value_type&		reference;	//!< è¦ç´ ã¸ã®å‚ç…§
+    typedef const value_type&	const_reference;//!< å®šæ•°è¦ç´ ã¸ã®å‚ç…§
+    typedef value_type*		pointer;	//!< è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+    typedef const value_type*	const_pointer;	//!< å®šæ•°è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
     typedef Array<int, FixedSizedBuf<int, D> >
-				position_type;	//!< ‹óŠÔ’†‚ÌˆÊ’u
+				position_type;	//!< ç©ºé–“ä¸­ã®ä½ç½®
 
-  //! 2^D•ª–Ø‚Ì‚½‚ß‚Ì‘Oi”½•œq
+  //! 2^Dåˆ†æœ¨ã®ãŸã‚ã®å‰é€²åå¾©å­
     template <class S>
     class Iterator : public std::iterator<std::forward_iterator_tag, S>
     {
       public:
-	typedef S		value_type;	//!< —v‘f‚ÌŒ^
-	typedef value_type&	reference;	//!< —v‘f‚Ö‚ÌQÆ
-	typedef value_type*	pointer;	//!< —v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	typedef S		value_type;	//!< è¦ç´ ã®å‹
+	typedef value_type&	reference;	//!< è¦ç´ ã¸ã®å‚ç…§
+	typedef value_type*	pointer;	//!< è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 
       private:
 	struct NodeInfo
@@ -81,9 +81,9 @@ class NDTree
 	    NodeInfo(Node* n, const position_type& p, u_int l)
 		:node(n), dp(p), len(l)					{}
 	    
-	    Node*		node;		//!< ƒm[ƒh‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	    position_type	dp;		//!< ƒm[ƒh‚Ì‘Š‘ÎˆÊ’u
-	    u_int		len;		//!< ƒm[ƒh‚ÌƒZƒ‹’·
+	    Node*		node;		//!< ãƒãƒ¼ãƒ‰ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	    position_type	dp;		//!< ãƒãƒ¼ãƒ‰ã®ç›¸å¯¾ä½ç½®
+	    u_int		len;		//!< ãƒãƒ¼ãƒ‰ã®ã‚»ãƒ«é•·
 	};
 	
       public:
@@ -103,15 +103,15 @@ class NDTree
 	position_type	new_dp(u_int idx)			const	;
 	
       private:
-	position_type		_org;		//!< 2^D•ª–Ø‚ÌŒ´“_‚ÌˆÊ’u
-	Leaf*			_leaf;		//!< ‚±‚Ì”½•œq‚ªw‚µ‚Ä‚¢‚é—t
-	position_type		_dp;		//!< —t‚Ì‘Š‘ÎˆÊ’u
-	u_int			_len;		//!< —t‚ÌƒZƒ‹’·
-	std::stack<NodeInfo>	_fringe;	//!< –¢–K–â‚Ìƒm[ƒh‚½‚¿
+	position_type		_org;		//!< 2^Dåˆ†æœ¨ã®åŸç‚¹ã®ä½ç½®
+	Leaf*			_leaf;		//!< ã“ã®åå¾©å­ãŒæŒ‡ã—ã¦ã„ã‚‹è‘‰
+	position_type		_dp;		//!< è‘‰ã®ç›¸å¯¾ä½ç½®
+	u_int			_len;		//!< è‘‰ã®ã‚»ãƒ«é•·
+	std::stack<NodeInfo>	_fringe;	//!< æœªè¨ªå•ã®ãƒãƒ¼ãƒ‰ãŸã¡
     };
 
-    typedef Iterator<value_type>	iterator;	//!< ”½•œq
-    typedef Iterator<const value_type>	const_iterator;	//!< ’è””½•œq
+    typedef Iterator<value_type>	iterator;	//!< åå¾©å­
+    typedef Iterator<const value_type>	const_iterator;	//!< å®šæ•°åå¾©å­
 
   public:
 			NDTree()					;
@@ -231,16 +231,16 @@ class NDTree
 /************************************************************************
 *  class NDTree<T, D>							*
 ************************************************************************/
-//! DŸŒ³‹óŠÔ‚ğ•\Œ»‚·‚é2^D•ª–Ø‚ğ¶¬‚·‚éD
+//! Dæ¬¡å…ƒç©ºé–“ã‚’è¡¨ç¾ã™ã‚‹2^Dåˆ†æœ¨ã‚’ç”Ÿæˆã™ã‚‹ï¼
 template <class T, u_int D> inline
 NDTree<T, D>::NDTree()
     :_org(), _len0(0), _root(0)
 {
 }
 
-//! ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 /*!
-  \param tree	ƒRƒs[Œ³‚Ì2^D•ª–Ø
+  \param tree	ã‚³ãƒ”ãƒ¼å…ƒã®2^Dåˆ†æœ¨
 */
 template <class T, u_int D> inline
 NDTree<T, D>::NDTree(const NDTree& tree)
@@ -250,17 +250,17 @@ NDTree<T, D>::NDTree(const NDTree& tree)
 	_root = tree._root->clone();
 }
 
-//! ƒfƒXƒgƒ‰ƒNƒ^
+//! ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 template <class T, u_int D> inline
 NDTree<T, D>::~NDTree()
 {
     delete _root;
 }
 
-//! ‘ã“ü‰‰Zq
+//! ä»£å…¥æ¼”ç®—å­
 /*!
-  \param tree	ƒRƒs[Œ³‚Ì2^D•ª–Ø
-  \return	‚±‚Ì2^D•ª–Ø
+  \param tree	ã‚³ãƒ”ãƒ¼å…ƒã®2^Dåˆ†æœ¨
+  \return	ã“ã®2^Dåˆ†æœ¨
 */
 template <class T, u_int D> inline NDTree<T, D>&
 NDTree<T, D>::operator =(const NDTree& tree)
@@ -275,9 +275,9 @@ NDTree<T, D>::operator =(const NDTree& tree)
     return *this;
 }
 
-//! ‚±‚Ì2^D•ª–Ø‚ÌrootƒZƒ‹‚ÌŒ´“_ˆÊ’u‚ğ•Ô‚·D
+//! ã“ã®2^Dåˆ†æœ¨ã®rootã‚»ãƒ«ã®åŸç‚¹ä½ç½®ã‚’è¿”ã™ï¼
 /*!
-  \return	rootƒZƒ‹‚ÌŒ´“_ˆÊ’u
+  \return	rootã‚»ãƒ«ã®åŸç‚¹ä½ç½®
 */
 template <class T, u_int D> inline const typename NDTree<T, D>::position_type&
 NDTree<T, D>::origin() const
@@ -285,9 +285,9 @@ NDTree<T, D>::origin() const
     return _org;
 }
 
-//! ‚±‚Ì2^D•ª–Ø‚ÌrootƒZƒ‹‚Ìˆê•Ó‚Ì’·‚³‚ğ•Ô‚·D
+//! ã“ã®2^Dåˆ†æœ¨ã®rootã‚»ãƒ«ã®ä¸€è¾ºã®é•·ã•ã‚’è¿”ã™ï¼
 /*!
-  \return	rootƒZƒ‹‚Ìˆê•Ó‚Ì’·‚³
+  \return	rootã‚»ãƒ«ã®ä¸€è¾ºã®é•·ã•
 */
 template <class T, u_int D> inline u_int
 NDTree<T, D>::length0() const
@@ -295,9 +295,9 @@ NDTree<T, D>::length0() const
     return _len0;
 }
 
-//! ‚±‚Ì2^D•ª–Ø’†‚Ì—t‚Ì”‚ğ•Ô‚·D
+//! ã“ã®2^Dåˆ†æœ¨ä¸­ã®è‘‰ã®æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	—t‚Ì”
+  \return	è‘‰ã®æ•°
 */
 template <class T, u_int D> inline u_int
 NDTree<T, D>::size() const
@@ -305,9 +305,9 @@ NDTree<T, D>::size() const
     return (_root ? _root->size() : 0);
 }
 
-//! ‚±‚Ì2^D•ª–Ø‚ª‹ó‚Å‚ ‚é‚©’²‚×‚éD
+//! ã“ã®2^Dåˆ†æœ¨ãŒç©ºã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \return	‹ó‚Å‚ ‚ê‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \return	ç©ºã§ã‚ã‚Œã°true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T, u_int D> inline bool
 NDTree<T, D>::empty() const
@@ -315,7 +315,7 @@ NDTree<T, D>::empty() const
     return !_root;
 }
 
-//! ‚±‚Ì2^D•ª–Ø‚ğ‹ó‚É‚·‚éD
+//! ã“ã®2^Dåˆ†æœ¨ã‚’ç©ºã«ã™ã‚‹ï¼
 template <class T, u_int D> inline void
 NDTree<T, D>::clear()
 {
@@ -324,11 +324,11 @@ NDTree<T, D>::clear()
     _len0 = 0;
 }
 
-//! DŸŒ³‹óŠÔ’†‚Ìw’è‚³‚ê‚½ˆÊ’u‚É‚¨‚¯‚é’l‚ğ’T‚·D
+//! Dæ¬¡å…ƒç©ºé–“ä¸­ã®æŒ‡å®šã•ã‚ŒãŸä½ç½®ã«ãŠã‘ã‚‹å€¤ã‚’æ¢ã™ï¼
 /*!
-  \param pos	DŸŒ³‹óŠÔ’†‚ÌˆÊ’u
-  \return	pos‚Åw’è‚³‚ê‚½ˆÊ’u‚É—t‚ª‘¶İ‚·‚ê‚Î‚»‚Ì’l‚Ö‚Ìƒ|ƒCƒ“ƒ^
-		‚ğ•Ô‚·D‘¶İ‚µ‚È‚¯‚ê‚Î0‚ğ•Ô‚·D
+  \param pos	Dæ¬¡å…ƒç©ºé–“ä¸­ã®ä½ç½®
+  \return	posã§æŒ‡å®šã•ã‚ŒãŸä½ç½®ã«è‘‰ãŒå­˜åœ¨ã™ã‚Œã°ãã®å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+		ã‚’è¿”ã™ï¼å­˜åœ¨ã—ãªã‘ã‚Œã°0ã‚’è¿”ã™ï¼
 */
 template <class T, u_int D> inline typename NDTree<T, D>::pointer
 NDTree<T, D>::find(const position_type& pos)
@@ -339,11 +339,11 @@ NDTree<T, D>::find(const position_type& pos)
     return _root->find(position_type(pos) -= _org, _len0);
 }
 
-//! DŸŒ³‹óŠÔ’†‚Ìw’è‚³‚ê‚½ˆÊ’u‚É‚¨‚¯‚é’l‚ğ’T‚·D
+//! Dæ¬¡å…ƒç©ºé–“ä¸­ã®æŒ‡å®šã•ã‚ŒãŸä½ç½®ã«ãŠã‘ã‚‹å€¤ã‚’æ¢ã™ï¼
 /*!
-  \param pos	DŸŒ³‹óŠÔ’†‚ÌˆÊ’u
-  \return	pos‚Åw’è‚³‚ê‚½ˆÊ’u‚É—t‚ª‘¶İ‚·‚ê‚Î‚»‚Ì’l‚Ö‚Ìƒ|ƒCƒ“ƒ^
-		‚ğ•Ô‚·D‘¶İ‚µ‚È‚¯‚ê‚Î0‚ğ•Ô‚·D
+  \param pos	Dæ¬¡å…ƒç©ºé–“ä¸­ã®ä½ç½®
+  \return	posã§æŒ‡å®šã•ã‚ŒãŸä½ç½®ã«è‘‰ãŒå­˜åœ¨ã™ã‚Œã°ãã®å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+		ã‚’è¿”ã™ï¼å­˜åœ¨ã—ãªã‘ã‚Œã°0ã‚’è¿”ã™ï¼
 */
 template <class T, u_int D> inline typename NDTree<T, D>::const_pointer
 NDTree<T, D>::find(const position_type& pos) const
@@ -354,11 +354,11 @@ NDTree<T, D>::find(const position_type& pos) const
     return _root->find(position_type(pos) -= _org, _len0);
 }
 
-//! DŸŒ³‹óŠÔ’†‚Ìw’è‚³‚ê‚½ˆÊ’u‚É’l‚ğŠi”[‚·‚éD
+//! Dæ¬¡å…ƒç©ºé–“ä¸­ã®æŒ‡å®šã•ã‚ŒãŸä½ç½®ã«å€¤ã‚’æ ¼ç´ã™ã‚‹ï¼
 /*!
-  w’è‚³‚ê‚½ˆÊ’u‚É—t‚ª‚È‚¯‚ê‚ÎV‚½‚É—t‚ªì‚ç‚êC‚»‚±‚É’l‚ªŠi”[‚³‚ê‚éD
-  \param pos	DŸŒ³‹óŠÔ’†‚ÌˆÊ’u
-  \param val	Ši”[‚·‚é’l
+  æŒ‡å®šã•ã‚ŒãŸä½ç½®ã«è‘‰ãŒãªã‘ã‚Œã°æ–°ãŸã«è‘‰ãŒä½œã‚‰ã‚Œï¼Œãã“ã«å€¤ãŒæ ¼ç´ã•ã‚Œã‚‹ï¼
+  \param pos	Dæ¬¡å…ƒç©ºé–“ä¸­ã®ä½ç½®
+  \param val	æ ¼ç´ã™ã‚‹å€¤
 */
 template <class T, u_int D> void
 NDTree<T, D>::insert(const position_type& pos, const_reference val)
@@ -370,20 +370,20 @@ NDTree<T, D>::insert(const position_type& pos, const_reference val)
 	    bool	ascend = false;
 	    u_int	idx = 0;
 	    for (u_int d = 0; d < Dim; ++d)
-		if (pos[d] < _org[d])		// •‰•ûŒü‚Éˆí’E‚È‚ç...
+		if (pos[d] < _org[d])		// è² æ–¹å‘ã«é€¸è„±ãªã‚‰...
 		{
-		    ascend = true;		// _root‚Ì¸ŠK‚ª•K—v
-		    _org[d] -= int(_len0);	// Œ´“_‚ğ•‰•ûŒü‚ÉˆÚ“®
+		    ascend = true;		// _rootã®æ˜‡éšãŒå¿…è¦
+		    _org[d] -= int(_len0);	// åŸç‚¹ã‚’è² æ–¹å‘ã«ç§»å‹•
 		    idx |= (1 << d);
 		}
-		else if (pos[d] >= _org[d] + int(_len0))  // ³•ûŒü‚Éˆí’E‚È‚ç...
-		    ascend = true;		// _root‚Ì¸ŠK‚ª•K—v
-	    if (!ascend)			// _root‚Ì¸ŠK‚ª•s—v‚È‚ç‚Î
-		break;				// ’¼‚¿‚É’Eo
+		else if (pos[d] >= _org[d] + int(_len0))  // æ­£æ–¹å‘ã«é€¸è„±ãªã‚‰...
+		    ascend = true;		// _rootã®æ˜‡éšãŒå¿…è¦
+	    if (!ascend)			// _rootã®æ˜‡éšãŒä¸è¦ãªã‚‰ã°
+		break;				// ç›´ã¡ã«è„±å‡º
 
-	    _len0 <<= 1;			// _root‚ÌƒZƒ‹’·‚ğ2”{‚É‚·‚éD
+	    _len0 <<= 1;			// _rootã®ã‚»ãƒ«é•·ã‚’2å€ã«ã™ã‚‹ï¼
 
-	    _root = Branch::ascend(_root, idx);	// _root‚ğ¸ŠK
+	    _root = Branch::ascend(_root, idx);	// _rootã‚’æ˜‡éš
 	}
 	
 	_root->insert(position_type(pos) -= _org, val, _len0);
@@ -397,9 +397,9 @@ NDTree<T, D>::insert(const position_type& pos, const_reference val)
     }
 }
 
-//! DŸŒ³‹óŠÔ’†‚Ìw’è‚³‚ê‚½ˆÊ’u‚Ì—t‚ğÁ‹‚·‚éD
+//! Dæ¬¡å…ƒç©ºé–“ä¸­ã®æŒ‡å®šã•ã‚ŒãŸä½ç½®ã®è‘‰ã‚’æ¶ˆå»ã™ã‚‹ï¼
 /*!
-  \param pos	DŸŒ³‹óŠÔ’†‚ÌˆÊ’u
+  \param pos	Dæ¬¡å…ƒç©ºé–“ä¸­ã®ä½ç½®
 */
 template <class T, u_int D> void
 NDTree<T, D>::erase(const position_type& pos)
@@ -407,36 +407,36 @@ NDTree<T, D>::erase(const position_type& pos)
     if (!_root || out_of_range(pos))
 	return;
     
-  // pos‚ÌˆÊ’u‚É‚ ‚é—t‚ğÁ‚·D	
+  // posã®ä½ç½®ã«ã‚ã‚‹è‘‰ã‚’æ¶ˆã™ï¼	
     _root = _root->erase(position_type(pos) -= _org, _len0);
 
-    if (!_root)					// ‹ó‚È‚ç‚Î...
+    if (!_root)					// ç©ºãªã‚‰ã°...
     {
-	_len0 = 0;				// _root‚ÌƒZƒ‹’·‚ğ0‚É‚µ‚Ä
-	return;					// ’¼‚¿‚ÉƒŠƒ^[ƒ“
+	_len0 = 0;				// _rootã®ã‚»ãƒ«é•·ã‚’0ã«ã—ã¦
+	return;					// ç›´ã¡ã«ãƒªã‚¿ãƒ¼ãƒ³
     }
 
-  // _root‚ªq‚ğ1‚Â‚¾‚¯‚Â}‚È‚ç‚ÎCq‚ğ_root‚É•t‚¯‘Ö‚¦‚é‚±‚Æ‚É‚æ‚è~ŠK‚·‚éD
-    for (Branch* b; b = _root->branch(); )	// _root‚ª}‚È‚ç‚Î...
+  // _rootãŒå­ã‚’1ã¤ã ã‘æŒã¤æãªã‚‰ã°ï¼Œå­ã‚’_rootã«ä»˜ã‘æ›¿ãˆã‚‹ã“ã¨ã«ã‚ˆã‚Šé™éšã™ã‚‹ï¼
+    for (Branch* b; b = _root->branch(); )	// _rootãŒæãªã‚‰ã°...
     {
 	u_int	idx;
-	Node*	child = b->descend(idx);	// 1’i•ª‚Ì~ŠK‚ğ‚İ‚éD
-	if (!child)				// ~ŠK‚Å‚«‚È‚¯‚ê‚Î...
-	    break;				// ’¼‚¿‚É’Eo
+	Node*	child = b->descend(idx);	// 1æ®µåˆ†ã®é™éšã‚’è©¦ã¿ã‚‹ï¼
+	if (!child)				// é™éšã§ããªã‘ã‚Œã°...
+	    break;				// ç›´ã¡ã«è„±å‡º
 
-	_root = child;				// q‚ğ_root‚É•t‚¯‘Ö‚¦‚é
+	_root = child;				// å­ã‚’_rootã«ä»˜ã‘æ›¿ãˆã‚‹
 		
-	_len0 >>= 1;				// _root‚ÌƒZƒ‹’·‚ğ”¼•ª‚É‚·‚éD
-	position_type	dp;			// ŒÃ‚¢root‚©‚çŒ©‚½q‚Ì‘Š‘ÎˆÊ’u
-	for (u_int d = 0; d < Dim; ++d)			// q‚Ìindex‚ğ
-	    dp[d] = (idx & (1 << d) ? _len0 : 0);	// ‘Š‘ÎˆÊ’u‚É•ÏŠ·
-	_org += dp;				// Œ´“_‚ğq‚ÌˆÊ’u‚ÉˆÚ‚·D
+	_len0 >>= 1;				// _rootã®ã‚»ãƒ«é•·ã‚’åŠåˆ†ã«ã™ã‚‹ï¼
+	position_type	dp;			// å¤ã„rootã‹ã‚‰è¦‹ãŸå­ã®ç›¸å¯¾ä½ç½®
+	for (u_int d = 0; d < Dim; ++d)			// å­ã®indexã‚’
+	    dp[d] = (idx & (1 << d) ? _len0 : 0);	// ç›¸å¯¾ä½ç½®ã«å¤‰æ›
+	_org += dp;				// åŸç‚¹ã‚’å­ã®ä½ç½®ã«ç§»ã™ï¼
     }
 }
 
-//! 2^D•ª–Ø‚Ìæ“ª—v‘f‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! 2^Dåˆ†æœ¨ã®å…ˆé ­è¦ç´ ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	æ“ª—v‘f‚ğw‚·”½•œq
+  \return	å…ˆé ­è¦ç´ ã‚’æŒ‡ã™åå¾©å­
 */
 template <class T, u_int D> inline typename NDTree<T, D>::iterator
 NDTree<T, D>::begin()
@@ -444,9 +444,9 @@ NDTree<T, D>::begin()
     return iterator(*this);
 }
 
-//! 2^D•ª–Ø‚Ìæ“ª—v‘f‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! 2^Dåˆ†æœ¨ã®å…ˆé ­è¦ç´ ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	æ“ª—v‘f‚ğw‚·’è””½•œq
+  \return	å…ˆé ­è¦ç´ ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class T, u_int D> inline typename NDTree<T, D>::const_iterator
 NDTree<T, D>::begin() const
@@ -454,9 +454,9 @@ NDTree<T, D>::begin() const
     return const_iterator(*this);
 }
 
-//! 2^D•ª–Ø‚Ì––”ö‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! 2^Dåˆ†æœ¨ã®æœ«å°¾ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	––”ö‚ğw‚·”½•œq
+  \return	æœ«å°¾ã‚’æŒ‡ã™åå¾©å­
 */
 template <class T, u_int D> inline typename NDTree<T, D>::iterator
 NDTree<T, D>::end()
@@ -464,9 +464,9 @@ NDTree<T, D>::end()
     return iterator();
 }
 
-//! 2^D•ª–Ø‚Ì––”ö‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! 2^Dåˆ†æœ¨ã®æœ«å°¾ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	––”ö‚ğw‚·’è””½•œq
+  \return	æœ«å°¾ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class T, u_int D> inline typename NDTree<T, D>::const_iterator
 NDTree<T, D>::end() const
@@ -474,10 +474,10 @@ NDTree<T, D>::end() const
     return const_iterator();
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚É2^D•ª–Ø‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«2^Dåˆ†æœ¨ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, u_int D> std::ostream&
 NDTree<T, D>::put(std::ostream& out) const
@@ -491,31 +491,31 @@ NDTree<T, D>::put(std::ostream& out) const
     return out;
 }
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç2^D•ª–Ø‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰2^Dåˆ†æœ¨ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, u_int D> std::istream&
 NDTree<T, D>::get(std::istream& in)
 {
-    clear();					// Šù‘¶‚Ì‘SƒZƒ‹‚ğ”pŠü
+    clear();					// æ—¢å­˜ã®å…¨ã‚»ãƒ«ã‚’å»ƒæ£„
 
-    for (position_type pos; in >> pos; )	// —t‚ÌˆÊ’u‚ğ“Ç‚İ‚İ
+    for (position_type pos; in >> pos; )	// è‘‰ã®ä½ç½®ã‚’èª­ã¿è¾¼ã¿
     {
 	u_int		len;
 	value_type	val;
-	in >> len >> val;			// —t‚ÌƒZƒ‹’·‚Æ’l‚ğ“Ç‚İ‚ŞD
-	insert(pos, val);			// w’è‚³‚ê‚½ˆÊ’u‚É’l‚ğ‘}“ü
+	in >> len >> val;			// è‘‰ã®ã‚»ãƒ«é•·ã¨å€¤ã‚’èª­ã¿è¾¼ã‚€ï¼
+	insert(pos, val);			// æŒ‡å®šã•ã‚ŒãŸä½ç½®ã«å€¤ã‚’æŒ¿å…¥
     }
 
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚É2^D•ª–Ø‚Ì\‘¢‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«2^Dåˆ†æœ¨ã®æ§‹é€ ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, u_int D> inline std::ostream&
 NDTree<T, D>::print(std::ostream& out) const
@@ -538,17 +538,17 @@ NDTree<T, D>::out_of_range(const position_type& pos) const
 /************************************************************************
 *  class NDTree<T, D>::Iterator<S>					*
 ************************************************************************/
-//! ‰½‚àw‚³‚È‚¢2^D•ª–Ø‚Ì‚½‚ß‚Ì”½•œq‚ğì‚éD
+//! ä½•ã‚‚æŒ‡ã•ãªã„2^Dåˆ†æœ¨ã®ãŸã‚ã®åå¾©å­ã‚’ä½œã‚‹ï¼
 template <class T, u_int D> template <class S> inline
 NDTree<T, D>::Iterator<S>::Iterator()
     :_org(), _leaf(0), _dp(), _len(0)
 {
 }
 
-//! 2^D•ª–Ø‚Ì‚½‚ß‚Ì”½•œq‚ğì‚éD
+//! 2^Dåˆ†æœ¨ã®ãŸã‚ã®åå¾©å­ã‚’ä½œã‚‹ï¼
 /*!
-  ”½•œq‚Í2^D•ª–Ø‚Ìæ“ª—v‘f‚ğw‚·‚æ‚¤‚É‰Šú‰»‚³‚ê‚éD
-  \param tree	2^D•ª–Ø
+  åå¾©å­ã¯2^Dåˆ†æœ¨ã®å…ˆé ­è¦ç´ ã‚’æŒ‡ã™ã‚ˆã†ã«åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
+  \param tree	2^Dåˆ†æœ¨
 */
 template <class T, u_int D> template <class S> inline
 NDTree<T, D>::Iterator<S>::Iterator(const NDTree& tree)
@@ -560,13 +560,13 @@ NDTree<T, D>::Iterator<S>::Iterator(const NDTree& tree)
 	_dp  = 0;
 	_len = tree._len0;
 	_fringe.push(NodeInfo(tree._root, _dp, _len));
-	++*this;			// Å‰‚Ì—t‚ğw‚·‚Ü‚Å”½•œq‚ği‚ß‚é
+	++*this;			// æœ€åˆã®è‘‰ã‚’æŒ‡ã™ã¾ã§åå¾©å­ã‚’é€²ã‚ã‚‹
     }
 }
 
-//! ‚±‚Ì”½•œq‚ªw‚·’l‚ªû‚ß‚ç‚ê‚Ä‚¢‚é—t‚ÌˆÊ’u‚ğ•Ô‚·D
+//! ã“ã®åå¾©å­ãŒæŒ‡ã™å€¤ãŒåã‚ã‚‰ã‚Œã¦ã„ã‚‹è‘‰ã®ä½ç½®ã‚’è¿”ã™ï¼
 /*!
-  \return	—t‚ÌˆÊ’u
+  \return	è‘‰ã®ä½ç½®
 */
 template <class T, u_int D> template <class S>
 inline typename NDTree<T, D>::position_type
@@ -575,9 +575,9 @@ NDTree<T, D>::Iterator<S>::position() const
     return position_type(_org) += _dp;
 }
 
-//! ‚±‚Ì”½•œq‚ªw‚·’l‚ªû‚ß‚ç‚ê‚Ä‚¢‚é—t‚ÌƒZƒ‹’·‚ğ•Ô‚·D
+//! ã“ã®åå¾©å­ãŒæŒ‡ã™å€¤ãŒåã‚ã‚‰ã‚Œã¦ã„ã‚‹è‘‰ã®ã‚»ãƒ«é•·ã‚’è¿”ã™ï¼
 /*!
-  \return	—t‚ÌƒZƒ‹’·
+  \return	è‘‰ã®ã‚»ãƒ«é•·
 */
 template <class T, u_int D> template <class S> inline u_int
 NDTree<T, D>::Iterator<S>::length() const
@@ -585,9 +585,9 @@ NDTree<T, D>::Iterator<S>::length() const
     return _len;
 }
 
-//! ‚±‚Ì”½•œq‚ªw‚·’l‚Ö‚ÌQÆ‚ğ•Ô‚·D
+//! ã“ã®åå¾©å­ãŒæŒ‡ã™å€¤ã¸ã®å‚ç…§ã‚’è¿”ã™ï¼
 /*!
-  \return	’l‚Ö‚ÌQÆ
+  \return	å€¤ã¸ã®å‚ç…§
 */
 template <class T, u_int D> template <class S> inline S&
 NDTree<T, D>::Iterator<S>::operator *() const
@@ -595,9 +595,9 @@ NDTree<T, D>::Iterator<S>::operator *() const
     return _leaf->_val;
 }
 
-//! ‚±‚Ì”½•œq‚ªw‚·’l‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! ã“ã®åå¾©å­ãŒæŒ‡ã™å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 /*!
-  \return	’l‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \return	å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T, u_int D> template <class S> inline S*
 NDTree<T, D>::Iterator<S>::operator ->() const
@@ -605,34 +605,34 @@ NDTree<T, D>::Iterator<S>::operator ->() const
     return &(operator *());
 }
 
-//! ‚±‚Ì”½•œq‚ğƒCƒ“ƒNƒŠƒƒ“ƒg‚·‚é(‘O’u)D
+//! ã“ã®åå¾©å­ã‚’ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã™ã‚‹(å‰ç½®)ï¼
 /*!
-  \return	ƒCƒ“ƒNƒŠƒƒ“ƒgŒã‚Ì‚±‚Ì”½•œq
+  \return	ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆå¾Œã®ã“ã®åå¾©å­
 */
 template <class T, u_int D> template <class S> NDTree<T, D>::Iterator<S>&
 NDTree<T, D>::Iterator<S>::operator ++()
 {
-  // 1. _leaf != 0			”½•œq‚ª‹ó‚Å‚È‚¢—t‚ğw‚µ‚Ä‚¢‚éó‘Ô
-  // 2. _leaf == 0 && _fringe.emtpy()	”½•œq‚ª––”ö‚É“’B‚µ‚Ä‚¢‚éó‘Ô
-  // 3. _leaf == 0 && !_fringe.empty()	‰º‹Lwhileƒ‹[ƒv‚Ì“r’†
+  // 1. _leaf != 0			åå¾©å­ãŒç©ºã§ãªã„è‘‰ã‚’æŒ‡ã—ã¦ã„ã‚‹çŠ¶æ…‹
+  // 2. _leaf == 0 && _fringe.emtpy()	åå¾©å­ãŒæœ«å°¾ã«åˆ°é”ã—ã¦ã„ã‚‹çŠ¶æ…‹
+  // 3. _leaf == 0 && !_fringe.empty()	ä¸‹è¨˜whileãƒ«ãƒ¼ãƒ—ã®é€”ä¸­
     
-    _leaf = 0;					// ‰ß‹‚Ì—t‚ğÌ‚Ä‚éD
+    _leaf = 0;					// éå»ã®è‘‰ã‚’æ¨ã¦ã‚‹ï¼
     
     while (!_fringe.empty())
     {
-	Node*	node = _fringe.top().node;	// æ“ªƒm[ƒhC
-	_dp  = _fringe.top().dp;		// ‚»‚ÌƒZƒ‹ˆÊ’u
-	_len = _fringe.top().len;		// ‚¨‚æ‚ÑƒZƒ‹’·‚ğ
-	_fringe.pop();				// pop‚·‚éD
+	Node*	node = _fringe.top().node;	// å…ˆé ­ãƒãƒ¼ãƒ‰ï¼Œ
+	_dp  = _fringe.top().dp;		// ãã®ã‚»ãƒ«ä½ç½®
+	_len = _fringe.top().len;		// ãŠã‚ˆã³ã‚»ãƒ«é•·ã‚’
+	_fringe.pop();				// popã™ã‚‹ï¼
 
-	if (_leaf = node->leaf())		// pop‚µ‚½ƒm[ƒh‚ª—t‚Å‚ ‚ê‚Î...
-	    break;				// ƒCƒ“ƒNƒŠƒƒ“ƒgŒã‚ÌˆÊ’u‚É“’B
+	if (_leaf = node->leaf())		// popã—ãŸãƒãƒ¼ãƒ‰ãŒè‘‰ã§ã‚ã‚Œã°...
+	    break;				// ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆå¾Œã®ä½ç½®ã«åˆ°é”
 	
-	Branch* branch = node->branch();	// pop‚µ‚½ƒm[ƒh‚Í}
-	_len >>= 1;				// q‚ÌƒŒƒxƒ‹‚É1’i~‰º
+	Branch* branch = node->branch();	// popã—ãŸãƒãƒ¼ãƒ‰ã¯æ
+	_len >>= 1;				// å­ã®ãƒ¬ãƒ™ãƒ«ã«1æ®µé™ä¸‹
 	    
 	for (int i = NChildren; --i >= 0; )
-	    if (branch->_children[i])		// ‹ó‚Å‚È‚¢q‚ğ‹t‡‚Épush
+	    if (branch->_children[i])		// ç©ºã§ãªã„å­ã‚’é€†é †ã«push
 		_fringe.push(NodeInfo(branch->_children[i],
 				      new_dp(i), _len));
     }
@@ -640,9 +640,9 @@ NDTree<T, D>::Iterator<S>::operator ++()
     return *this;
 }
 
-//! ‚±‚Ì”½•œq‚ğƒCƒ“ƒNƒŠƒƒ“ƒg‚·‚é(Œã’u)D
+//! ã“ã®åå¾©å­ã‚’ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã™ã‚‹(å¾Œç½®)ï¼
 /*!
-  \return	ƒCƒ“ƒNƒŠƒƒ“ƒg‘O‚Ì”½•œq
+  \return	ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆå‰ã®åå¾©å­
 */
 template <class T, u_int D> template <class S> inline NDTree<T, D>::Iterator<S>
 NDTree<T, D>::Iterator<S>::operator ++(int)
@@ -652,10 +652,10 @@ NDTree<T, D>::Iterator<S>::operator ++(int)
     return tmp;
 }
 
-//! ‚±‚Ì”½•œq‚Æ—^‚¦‚ç‚ê‚½”½•œq‚ª“¯ˆê‚Ì—v‘f‚ğw‚µ‚Ä‚¢‚é‚©’²‚×‚éD
+//! ã“ã®åå¾©å­ã¨ä¸ãˆã‚‰ã‚ŒãŸåå¾©å­ãŒåŒä¸€ã®è¦ç´ ã‚’æŒ‡ã—ã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param iter	”äŠr‘ÎÛ‚Ì”½•œq
-  \return	“¯ˆê‚Ì—v‘f‚ğw‚µ‚Ä‚¢‚ê‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param iter	æ¯”è¼ƒå¯¾è±¡ã®åå¾©å­
+  \return	åŒä¸€ã®è¦ç´ ã‚’æŒ‡ã—ã¦ã„ã‚Œã°true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T, u_int D> template <class S> inline bool
 NDTree<T, D>::Iterator<S>::operator ==(const Iterator& iter) const
@@ -663,10 +663,10 @@ NDTree<T, D>::Iterator<S>::operator ==(const Iterator& iter) const
     return _leaf == iter._leaf;
 }
 
-//! ‚±‚Ì”½•œq‚Æ—^‚¦‚ç‚ê‚½”½•œq‚ªˆÙ‚È‚é—v‘f‚ğw‚µ‚Ä‚¢‚é‚©’²‚×‚éD
+//! ã“ã®åå¾©å­ã¨ä¸ãˆã‚‰ã‚ŒãŸåå¾©å­ãŒç•°ãªã‚‹è¦ç´ ã‚’æŒ‡ã—ã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param iter	”äŠr‘ÎÛ‚Ì”½•œq
-  \return	ˆÙ‚È‚é—v‘f‚ğw‚µ‚Ä‚¢‚ê‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param iter	æ¯”è¼ƒå¯¾è±¡ã®åå¾©å­
+  \return	ç•°ãªã‚‹è¦ç´ ã‚’æŒ‡ã—ã¦ã„ã‚Œã°true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T, u_int D> template <class S> inline bool
 NDTree<T, D>::Iterator<S>::operator !=(const Iterator& iter) const
@@ -701,7 +701,7 @@ NDTree<T, D>::Node::create(const position_type& dp,
     if (len != 1)
     {
 	Branch*	b = new Branch;
-	b->insert(dp, val, len);	// V‚½‚É¶¬‚µ‚½ƒm[ƒh‚É‘}“ü‚·‚éD
+	b->insert(dp, val, len);	// æ–°ãŸã«ç”Ÿæˆã—ãŸãƒãƒ¼ãƒ‰ã«æŒ¿å…¥ã™ã‚‹ï¼
 	return b;
     }
     else
@@ -748,8 +748,8 @@ NDTree<T, D>::Branch::size() const
 template <class T, u_int D> typename NDTree<T, D>::pointer
 NDTree<T, D>::Branch::find(const position_type& dp, u_int len)
 {
-    len >>= 1;						// 1‚Â‰º‚ÌƒŒƒxƒ‹‚Ö
-    Node*	child = _children[child_idx(dp, len)];	// q
+    len >>= 1;						// 1ã¤ä¸‹ã®ãƒ¬ãƒ™ãƒ«ã¸
+    Node*	child = _children[child_idx(dp, len)];	// å­
     
     return (child ? child->find(dp, len) : 0);
 }
@@ -757,8 +757,8 @@ NDTree<T, D>::Branch::find(const position_type& dp, u_int len)
 template <class T, u_int D> typename NDTree<T, D>::const_pointer
 NDTree<T, D>::Branch::find(const position_type& dp, u_int len) const
 {
-    len >>= 1;						// 1‚Â‰º‚ÌƒŒƒxƒ‹‚Ö
-    const Node*	child = _children[child_idx(dp, len)];	// q
+    len >>= 1;						// 1ã¤ä¸‹ã®ãƒ¬ãƒ™ãƒ«ã¸
+    const Node*	child = _children[child_idx(dp, len)];	// å­
     
     return (child ? child->find(dp, len) : 0);
 }
@@ -767,31 +767,31 @@ template <class T, u_int D> void
 NDTree<T, D>::Branch::insert(const position_type& dp,
 			     const_reference val, u_int len)
 {
-    len >>= 1;						// 1‚Â‰º‚ÌƒŒƒxƒ‹‚Ö
-    Node*&	child = _children[child_idx(dp, len)];	// q
+    len >>= 1;						// 1ã¤ä¸‹ã®ãƒ¬ãƒ™ãƒ«ã¸
+    Node*&	child = _children[child_idx(dp, len)];	// å­
 
-    if (child)						// q‚ª‚ ‚ê‚Î...
-	child->insert(dp, val, len);			// Šù‘¶‚Ìq‚É‘}“ü
-    else						// q‚ª‚È‚¯‚ê‚Î...
-	child = Node::create(dp, val, len);		// V‚½‚Éq‚ğì‚Á‚Ä‘}“ü
+    if (child)						// å­ãŒã‚ã‚Œã°...
+	child->insert(dp, val, len);			// æ—¢å­˜ã®å­ã«æŒ¿å…¥
+    else						// å­ãŒãªã‘ã‚Œã°...
+	child = Node::create(dp, val, len);		// æ–°ãŸã«å­ã‚’ä½œã£ã¦æŒ¿å…¥
 }
 
 template <class T, u_int D> typename NDTree<T, D>::Node*
 NDTree<T, D>::Branch::erase(const position_type& dp, u_int len)
 {
-    len >>= 1;						// 1‚Â‰º‚ÌƒŒƒxƒ‹‚Ö
-    Node*&	child = _children[child_idx(dp, len)];	// q
+    len >>= 1;						// 1ã¤ä¸‹ã®ãƒ¬ãƒ™ãƒ«ã¸
+    Node*&	child = _children[child_idx(dp, len)];	// å­
 
-    if (!child)						// q‚ª‚È‚¯‚ê‚Î...
-	return this;					// ‚±‚Ì}©g‚ğ•Ô‚·
-    child = child->erase(dp, len);			// q‘·‚©‚çÁ‹
+    if (!child)						// å­ãŒãªã‘ã‚Œã°...
+	return this;					// ã“ã®æè‡ªèº«ã‚’è¿”ã™
+    child = child->erase(dp, len);			// å­å­«ã‹ã‚‰æ¶ˆå»
 
     for (u_int i = 0; i < NChildren; ++i)
-	if (_children[i])	// q‚ª1‚Â‚Å‚àc‚Á‚Ä‚¢‚ê‚Î...
-	    return this;	// ‚±‚Ì}©g‚ğ•Ô‚·
+	if (_children[i])	// å­ãŒ1ã¤ã§ã‚‚æ®‹ã£ã¦ã„ã‚Œã°...
+	    return this;	// ã“ã®æè‡ªèº«ã‚’è¿”ã™
 
-    delete this;		// ‘S‚Ä‚Ìq‚ª‹ó‚È‚Ì‚ÅC‚±‚Ì}©g‚ğ‰ğ•ú
-    return 0;			// 0‚ğ•Ô‚·
+    delete this;		// å…¨ã¦ã®å­ãŒç©ºãªã®ã§ï¼Œã“ã®æè‡ªèº«ã‚’è§£æ”¾
+    return 0;			// 0ã‚’è¿”ã™
 }
     
 template <class T, u_int D> typename NDTree<T, D>::Branch*
@@ -840,18 +840,18 @@ NDTree<T, D>::Branch::descend(u_int& idx)
     for (u_int i = 0; i < NChildren; ++i)
 	if (_children[i])
 	{
-	    ++nchildren;		// q‚Ì”‚Æ
-	    idx = i;			// ‚»‚Ìindex‚ğ’²‚×‚éD
+	    ++nchildren;		// å­ã®æ•°ã¨
+	    idx = i;			// ãã®indexã‚’èª¿ã¹ã‚‹ï¼
 	}
-    if (nchildren != 1)			// q‚ª1‚Â‚Å‚È‚¯‚ê‚Î...
-	return 0;			// ŠK‘w‚ÍŒ¸‚ç‚¹‚È‚¢‚Ì‚Å’Eo
+    if (nchildren != 1)			// å­ãŒ1ã¤ã§ãªã‘ã‚Œã°...
+	return 0;			// éšå±¤ã¯æ¸›ã‚‰ã›ãªã„ã®ã§è„±å‡º
 
-    Node*	root = _children[idx];	// ‚±‚Ìq‚ğV‚½‚Èroot‚É‚µ‚Ä1ŠK‘wíŒ¸
+    Node*	root = _children[idx];	// ã“ã®å­ã‚’æ–°ãŸãªrootã«ã—ã¦1éšå±¤å‰Šæ¸›
     
-    _children[idx] = 0;			// q‚Ö‚ÌƒŠƒ“ƒN‚ğÁ‚µ‚Ä‚©‚ç
-    delete this;			// ©g‚ğ‰ğ•ú‚·‚éD
+    _children[idx] = 0;			// å­ã¸ã®ãƒªãƒ³ã‚¯ã‚’æ¶ˆã—ã¦ã‹ã‚‰
+    delete this;			// è‡ªèº«ã‚’è§£æ”¾ã™ã‚‹ï¼
 
-    return root;			// V‚µ‚¢root‚ğ•Ô‚·D
+    return root;			// æ–°ã—ã„rootã‚’è¿”ã™ï¼
 }
     
 template <class T, u_int D> u_int
@@ -921,7 +921,7 @@ NDTree<T, D>::Leaf::erase(const position_type&, u_int len)
 {
     if (len != 1)
 	throw std::logic_error("NDTree<T, D>::Leaf::erase: non-zero \'len\'!");
-    delete this;				// ‚±‚Ì—t©g‚ğ‰ğ•ú
+    delete this;				// ã“ã®è‘‰è‡ªèº«ã‚’è§£æ”¾
     return 0;
 }
 
@@ -946,11 +946,11 @@ NDTree<T, D>::Leaf::print(std::ostream& out, u_int nindents) const
 /************************************************************************
 *  global fucntions							*
 ************************************************************************/
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç2^D•ª–Ø‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰2^Dåˆ†æœ¨ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param tree	2^D•ª–Ø‚Ì“Ç‚İ‚İæ
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param tree	2^Dåˆ†æœ¨ã®èª­ã¿è¾¼ã¿å…ˆ
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, u_int D> inline std::istream&
 operator >>(std::istream& in, NDTree<T, D>& tree)
@@ -958,11 +958,11 @@ operator >>(std::istream& in, NDTree<T, D>& tree)
     return tree.get(in);
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚Ö2^D•ª–Ø‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸2^Dåˆ†æœ¨ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param tree	‘‚«o‚·2^D•ª–Ø
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param tree	æ›¸ãå‡ºã™2^Dåˆ†æœ¨
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, u_int D> inline std::ostream&
 operator <<(std::ostream& out, const NDTree<T, D>& tree)

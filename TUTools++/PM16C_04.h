@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.h,v 1.5 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: PM16C_04.h,v 1.6 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		PM16C_04.h
-  \brief	�N���X TU::PM16C_04 �̒�`�Ǝ���
+  \brief	クラス TU::PM16C_04 の定義と実装
 */
 #ifndef __TUPM16C_04_h
 #define __TUPM16C_04_h
@@ -41,47 +41,47 @@ namespace TU
 /************************************************************************
 *  class PM16C_04							*
 ************************************************************************/
-//! �c�W�d�q���p���X���[�^�R���g���[��PM16C_04�𐧌䂷��N���X
+//! ツジ電子製パルスモータコントローラPM16C_04を制御するクラス
 class __PORT PM16C_04 : public Serial
 {
   public:
-  //! ��
+  //! 軸
     enum Axis
     {
-	Axis_A,		//!< A��
-	Axis_B,		//!< B��
-	Axis_C,		//!< C��
-	Axis_D		//!< D��
+	Axis_A,		//!< A軸
+	Axis_B,		//!< B軸
+	Axis_C,		//!< C軸
+	Axis_D		//!< D軸
     };
 
-  //! �X�s�[�h���[�h
+  //! スピードモード
     enum Speed
     {
-	Speed_Low,	//!< �ᑬ
-	Speed_Medium,	//!< ����
-	Speed_High	//!< ����
+	Speed_Low,	//!< 低速
+	Speed_Medium,	//!< 中速
+	Speed_High	//!< 高速
     };
 
   public:
     PM16C_04(const char* ttyname)					;
 
-  // �t�@�[���E�F�A�o�[�W����
+  // ファームウェアバージョン
     void	showId(std::ostream& out)				;
 
-  // Local/Remote���[�h
+  // Local/Remoteモード
     PM16C_04&	setMode(bool remote)					;
     bool	isRemoteMode()						;
 
-  // �ʒu
+  // 位置
     PM16C_04&	setPosition(u_int channel, int position)		;
     int		getPosition(u_int channel)				;
     
-  // �X�s�[�h
+  // スピード
     PM16C_04&	setSpeed(Speed speed)					;
     PM16C_04&	setSpeedValue(u_int channel, Speed speed, u_int val)	;
     u_int	getSpeedValue(u_int channel, Speed speed)		;
 
-  // �\�t�g�E�F�A���~�b�g�X�C�b�`
+  // ソフトウェアリミットスイッチ
     PM16C_04&	enableSoftwareLimitSwitch(u_int channel,
 					  int positionP, int positionN)	;
     PM16C_04&	disableSoftwareLimitSwitch(u_int channel)		;
@@ -89,7 +89,7 @@ class __PORT PM16C_04 : public Serial
     int		getSoftwareLimitSwitchPositionP(u_int channel)		;
     int		getSoftwareLimitSwitchPositionN(u_int channel)		;
     
-  // �n�[�h�E�F�A���~�b�g�X�C�b�`�C�z�[���X�C�b�`
+  // ハードウェアリミットスイッチ，ホームスイッチ
     PM16C_04&	enableHardwareLimitSwitch(u_int channel, bool dir,
 					  bool normallyClose)		;
     PM16C_04&	disableHardwareLimitSwitch(u_int channel, bool dir)	;
@@ -100,16 +100,16 @@ class __PORT PM16C_04 : public Serial
     PM16C_04&	setHomeSwitchPolarity(u_int channel, bool normallyClose);
     bool	getHomeSwitchPolarity(u_int channel)			;
 
-  // �o�b�N���b�V���␳
+  // バックラッシュ補正
     PM16C_04&	setBacklashCorrectionStep(u_int channel, u_int steps)	;
     u_int	getBacklashCorrectionStep(u_int channel)		;
 
-  // Hold off�@�\�i��~���̔�ʓd�j
+  // Hold off機能（停止時の非通電）
     PM16C_04&	enableHoldOff(u_int channel)				;
     PM16C_04&	disableHoldOff(u_int channel)				;
     bool	isEnabledHoldOff(u_int channel)				;
 
-  // �z�[���|�W�V�������o
+  // ホームポジション検出
     PM16C_04&	setHomeSearchDirection(u_int channel, bool dir)		;
     bool	getHomeSearchDirection(u_int channel)			;
     PM16C_04&	setHomeOffset(u_int channel, u_int offset)		;
@@ -120,13 +120,13 @@ class __PORT PM16C_04 : public Serial
     PM16C_04&	findHome(Axis axis)					;
     PM16C_04&	goHome(Axis axis)					;
     
-  // ���ƃ`�����l���̊֌W
+  // 軸とチャンネルの関係
     PM16C_04&	setChannel(Axis axis, u_int channel)			;
     u_int	getChannel(Axis axis)					;
     void	getChannel(u_int& channel_A, u_int& channel_B,
 			   u_int& channel_C, u_int& channel_D)		;
 
-  // ���̏��
+  // 軸の状態
     int		where(Axis axis)					;
     bool	isBusy(Axis axis)					;
     bool	isPulseEmitted(Axis axis)				;
@@ -134,7 +134,7 @@ class __PORT PM16C_04 : public Serial
     bool	atLimit(Axis axis, bool dir)				;
     bool	atHome(Axis axis)					;
     
-  // �ړ�
+  // 移動
     PM16C_04&	stop(Axis axis)						;
     PM16C_04&	jog(Axis axis, bool dir)				;
     PM16C_04&	scanWithConstantSpeed(Axis axis, bool dir)		;
@@ -145,7 +145,7 @@ class __PORT PM16C_04 : public Serial
     PM16C_04&	move(Axis axis, bool relative,
 		     int val, bool correctBacklash)			;
 
-  // Parallel I/O�|�[�g
+  // Parallel I/Oポート
     PM16C_04&	enableParallelIO()					;
     PM16C_04&	disableParallelIO()					;
     bool	isEnabledParallelIO()					;

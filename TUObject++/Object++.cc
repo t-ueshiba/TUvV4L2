@@ -1,5 +1,5 @@
 /*
- *  $Id: Object++.cc,v 1.2 2002-07-25 02:38:02 ueshiba Exp $
+ *  $Id: Object++.cc,v 1.3 2012-08-29 21:17:03 ueshiba Exp $
  */
 #include "TU/Object++.h"
 

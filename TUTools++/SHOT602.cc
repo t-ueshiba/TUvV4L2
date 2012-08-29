@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: SHOT602.cc,v 1.5 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: SHOT602.cc,v 1.6 2012-08-29 21:17:08 ueshiba Exp $
  */
 #include "TU/SHOT602.h"
 #include "TU/Manip.h"
@@ -39,9 +39,9 @@ using namespace	std;
 /************************************************************************
 *  class SHOT602							*
 ************************************************************************/
-//! w’è‚³‚ê‚½tty‚ğopen‚µ‚Äƒpƒ‹ƒXƒ‚[ƒ^ƒRƒ“ƒgƒ[ƒ‰‚ğì‚éD
+//! æŒ‡å®šã•ã‚ŒãŸttyã‚’openã—ã¦ãƒ‘ãƒ«ã‚¹ãƒ¢ãƒ¼ã‚¿ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã‚’ä½œã‚‹ï¼
 /*!
-  \param ttyname	tty–¼
+  \param ttyname	ttyå
 */
 SHOT602::SHOT602(const char* ttyname)
     :Serial(ttyname)
@@ -56,9 +56,9 @@ SHOT602::SHOT602(const char* ttyname)
     setSpeed(HighSpeed);
 }
     
-//! ƒtƒ@[ƒ€ƒEƒFƒA‚ÌID‚ğo—ÍƒXƒgƒŠ[ƒ€‚É‘‚«o‚·D
+//! ãƒ•ã‚¡ãƒ¼ãƒ ã‚¦ã‚§ã‚¢ã®IDã‚’å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 void
 SHOT602::showId(std::ostream& out)
@@ -74,16 +74,16 @@ SHOT602::showId(std::ostream& out)
 }
 
 /*
- *  ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo
+ *  ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡º
  */
-//! ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ğŒŸo‚·‚éD
+//! ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚’æ¤œå‡ºã™ã‚‹ï¼
 /*!
-  ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ªŒŸo‚³‚ê‚é‚Ü‚ÅƒzƒXƒg‘¤‚É§Œä‚ğ•Ô‚³‚È‚¢D
-  \param axis	ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo‚ğÀs‚·‚é²
-  \param dir	³•ûŒü‚©‚ç‚Å‚ ‚ê‚Îtrue, •‰•ûŒü‚©‚ç‚Å‚ ‚ê‚Îfalse
-  \param dir2	axis‚ª #Axis_Both ‚Ìê‡‚Ì‘æ2²‚É‚Â‚¢‚ÄC
-		³•ûŒü‚©‚ç‚Å‚ ‚ê‚Îtrue, •‰•ûŒü‚©‚ç‚Å‚ ‚ê‚Îfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ãŒæ¤œå‡ºã•ã‚Œã‚‹ã¾ã§ãƒ›ã‚¹ãƒˆå´ã«åˆ¶å¾¡ã‚’è¿”ã•ãªã„ï¼
+  \param axis	ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡ºã‚’å®Ÿè¡Œã™ã‚‹è»¸
+  \param dir	æ­£æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°true, è² æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°false
+  \param dir2	axisãŒ #Axis_Both ã®å ´åˆã®ç¬¬2è»¸ã«ã¤ã„ã¦ï¼Œ
+		æ­£æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°true, è² æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 SHOT602&
 SHOT602::findHome(Axis axis, bool dir, bool dir2)
@@ -95,10 +95,10 @@ SHOT602::findHome(Axis axis, bool dir, bool dir2)
     return *this;
 }
     
-//! Œ»İˆÊ’u‚ğÀ•WŒ´“_‚Éİ’è‚·‚éD
+//! ç¾åœ¨ä½ç½®ã‚’åº§æ¨™åŸç‚¹ã«è¨­å®šã™ã‚‹ï¼
 /*
-  \param axis	ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ÉˆÚ“®‚·‚é²
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis	ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã«ç§»å‹•ã™ã‚‹è»¸
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 SHOT602&
 SHOT602::setOrigin(Axis axis)
@@ -107,11 +107,11 @@ SHOT602::setOrigin(Axis axis)
 }
     
 /*
- *  ó‘ÔŒŸo
+ *  çŠ¶æ…‹æ¤œå‡º
  */
-//! ‰½‚ç‚©‚ÌƒRƒ}ƒ“ƒh‚ªÀs’†‚©’²‚×‚éD
+//! ä½•ã‚‰ã‹ã®ã‚³ãƒãƒ³ãƒ‰ãŒå®Ÿè¡Œä¸­ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \return	Às’†‚È‚çtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \return	å®Ÿè¡Œä¸­ãªã‚‰true, ãã†ã§ãªã‘ã‚Œã°false
 */
 bool
 SHOT602::isBusy()
@@ -123,10 +123,10 @@ SHOT602::isBusy()
     return (c == 'B');
 }
 
-//! Œ»İˆÊ’u‚ğ’²‚×‚éD
+//! ç¾åœ¨ä½ç½®ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	Œ»İˆÊ’u
+  \param axis	è»¸
+  \return	ç¾åœ¨ä½ç½®
 */
 int
 SHOT602::where(Axis axis)
@@ -148,10 +148,10 @@ SHOT602::where(Axis axis)
     return 0;
 }
 
-//! w’è‚µ‚½²‚É‚¨‚¢‚ÄƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ªON‚Å‚ ‚é‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«ãŠã„ã¦ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãŒONã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	ON‚È‚çtrue, OFF‚È‚çfalse
+  \param axis	è»¸
+  \return	ONãªã‚‰true, OFFãªã‚‰false
 */
 bool
 SHOT602::atLimit(Axis axis)
@@ -173,13 +173,13 @@ SHOT602::atLimit(Axis axis)
     return false;
 }
 
-//! ƒRƒ“ƒgƒ[ƒ‰‚Ìó‘Ô‚ğ’²‚×‚éD
+//! ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®çŠ¶æ…‹ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param position1	‘æ1²‚ÌŒ»İˆÊ’u‚ª•Ô‚³‚ê‚é
-  \param position2	‘æ2²‚ÌŒ»İˆÊ’u‚ª•Ô‚³‚ê‚é
-  \param limit1		‘æ1²‚ÌƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ªON‚È‚çtrue, OFF‚È‚çfalse‚ª•Ô‚³‚ê‚é
-  \param limit2		‘æ2²‚ÌƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ªON‚È‚çtrue, OFF‚È‚çfalse‚ª•Ô‚³‚ê‚é
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param position1	ç¬¬1è»¸ã®ç¾åœ¨ä½ç½®ãŒè¿”ã•ã‚Œã‚‹
+  \param position2	ç¬¬2è»¸ã®ç¾åœ¨ä½ç½®ãŒè¿”ã•ã‚Œã‚‹
+  \param limit1		ç¬¬1è»¸ã®ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãŒONãªã‚‰true, OFFãªã‚‰falseãŒè¿”ã•ã‚Œã‚‹
+  \param limit2		ç¬¬2è»¸ã®ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãŒONãªã‚‰true, OFFãªã‚‰falseãŒè¿”ã•ã‚Œã‚‹
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
  */
 bool
 SHOT602::getStatus(int& position1, int& position2, bool& limit1, bool& limit2)
@@ -187,20 +187,20 @@ SHOT602::getStatus(int& position1, int& position2, bool& limit1, bool& limit2)
     *this << "Q:" << endl;
 
     char	s[256];
-  // ‘æ1²‚ÌˆÊ’u
+  // ç¬¬1è»¸ã®ä½ç½®
     getline(s, sizeof(s), ',');
     position1 = (s[0] != '-' ? atoi(s) : -atoi(s + 1));
 
-  // ‘æ2²‚ÌˆÊ’u
+  // ç¬¬2è»¸ã®ä½ç½®
     getline(s, sizeof(s), ',');
     position2 = (s[0] != '-' ? atoi(s) : -atoi(s + 1));
 
-  // ƒRƒ}ƒ“ƒh‚Ü‚½‚Íƒpƒ‰ƒ[ƒ^‚ÌƒGƒ‰[
+  // ã‚³ãƒãƒ³ãƒ‰ã¾ãŸã¯ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ã‚¨ãƒ©ãƒ¼
     getline(s, sizeof(s), ',');
     if (s[0] == 'X')
 	throw runtime_error("SHOT602::getStatus(): command/parameter error!");
 
-  // ƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚Ìó‘Ô
+  // ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®çŠ¶æ…‹
     getline(s, sizeof(s), ',');
     switch (s[0])
     {
@@ -220,23 +220,23 @@ SHOT602::getStatus(int& position1, int& position2, bool& limit1, bool& limit2)
 	break;
     }
 
-  // BUSY/READYó‘Ô
+  // BUSY/READYçŠ¶æ…‹
     getline(s, sizeof(s));
     return (s[0] == 'B');
 }
 
 /*
- *  ‘¬“xİ’è
+ *  é€Ÿåº¦è¨­å®š
  */
-//! ‘¬“xƒ‚[ƒh‚Æƒpƒ‰ƒ[ƒ^‚ğİ’è‚·‚éD
+//! é€Ÿåº¦ãƒ¢ãƒ¼ãƒ‰ã¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param speed		’á‘¬/‚‘¬ƒ‚[ƒh
-  \param bottom1	‘æ1²‚Ì‹N“®‘¬“xC0‚ğ—^‚¦‚é‚ÆƒfƒtƒHƒ‹ƒg’l‚Éİ’è
-  \param top1		‘æ1²‚Ì„q‘¬“xC0‚ğ—^‚¦‚é‚ÆƒfƒtƒHƒ‹ƒg’l‚Éİ’è
-  \param duration1	‘æ1²‚Ì‰ÁŒ¸‘¬ŠÔC0‚ğ—^‚¦‚é‚ÆƒfƒtƒHƒ‹ƒg’l‚Éİ’è
-  \param bottom2	‘æ2²‚Ì‹N“®‘¬“xC0‚ğ—^‚¦‚é‚ÆƒfƒtƒHƒ‹ƒg’l‚Éİ’è
-  \param top2		‘æ2²‚Ì„q‘¬“xC0‚ğ—^‚¦‚é‚ÆƒfƒtƒHƒ‹ƒg’l‚Éİ’è
-  \param duration2	‘æ2²‚Ì‰ÁŒ¸‘¬ŠÔC0‚ğ—^‚¦‚é‚ÆƒfƒtƒHƒ‹ƒg’l‚Éİ’è
+  \param speed		ä½é€Ÿ/é«˜é€Ÿãƒ¢ãƒ¼ãƒ‰
+  \param bottom1	ç¬¬1è»¸ã®èµ·å‹•é€Ÿåº¦ï¼Œ0ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã«è¨­å®š
+  \param top1		ç¬¬1è»¸ã®å·¡èˆªé€Ÿåº¦ï¼Œ0ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã«è¨­å®š
+  \param duration1	ç¬¬1è»¸ã®åŠ æ¸›é€Ÿæ™‚é–“ï¼Œ0ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã«è¨­å®š
+  \param bottom2	ç¬¬2è»¸ã®èµ·å‹•é€Ÿåº¦ï¼Œ0ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã«è¨­å®š
+  \param top2		ç¬¬2è»¸ã®å·¡èˆªé€Ÿåº¦ï¼Œ0ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã«è¨­å®š
+  \param duration2	ç¬¬2è»¸ã®åŠ æ¸›é€Ÿæ™‚é–“ï¼Œ0ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã«è¨­å®š
 */
 SHOT602&
 SHOT602::setSpeed(Speed speed,
@@ -307,12 +307,12 @@ SHOT602::setSpeed(Speed speed,
 }
 
 /*
- *  ˆÚ“®
+ *  ç§»å‹•
  */
-//! w’è‚µ‚½²‚ğŒ¸‘¬’â~‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’æ¸›é€Ÿåœæ­¢ã™ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \param axis	è»¸
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 SHOT602&
 SHOT602::stop(Axis axis)
@@ -320,9 +320,9 @@ SHOT602::stop(Axis axis)
     return putCommand(axis, 'L', "", "");
 }
     
-//! ‘S²‚ğ”ñí’â~‚·‚éD
+//! å…¨è»¸ã‚’éå¸¸åœæ­¢ã™ã‚‹ï¼
 /*!
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 SHOT602&
 SHOT602::emergencyStop()
@@ -332,13 +332,13 @@ SHOT602::emergencyStop()
     return *this;
 }
     
-//! w’è‚µ‚½²‚ğjog“®ì‚³‚¹‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’jogå‹•ä½œã•ã›ã‚‹ï¼
 /*!
-  \param axis	²
-  \param dir	³•ûŒü‚È‚çtrue, •‰•ûŒü‚È‚çfalse
-  \param dir2	axis‚ª #Axis_Both ‚Ìê‡‚Ì‘æ2²‚É‚Â‚¢‚ÄC
-		³•ûŒü‚È‚çtrue, •‰•ûŒü‚È‚çfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \param axis	è»¸
+  \param dir	æ­£æ–¹å‘ãªã‚‰true, è² æ–¹å‘ãªã‚‰false
+  \param dir2	axisãŒ #Axis_Both ã®å ´åˆã®ç¬¬2è»¸ã«ã¤ã„ã¦ï¼Œ
+		æ­£æ–¹å‘ãªã‚‰true, è² æ–¹å‘ãªã‚‰false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 SHOT602&
 SHOT602::jog(Axis axis, bool dir, bool dir2)
@@ -349,13 +349,13 @@ SHOT602::jog(Axis axis, bool dir, bool dir2)
     return *this;
 }
     
-//! w’è‚µ‚½²‚ğˆÚ“®‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’ç§»å‹•ã™ã‚‹ï¼
 /*!
-  \param axis	²
-  \param val	ˆÚ“®—Ê
-  \param val2	axis‚ª #Axis_Both ‚Ìê‡‚Ì‘æ2²‚ÌˆÚ“®—Ê
-  \param block	ˆÚ“®‚ªŠ®—¹‚·‚é‚Ü‚ÅƒŠƒ^[ƒ“‚µ‚È‚¢‚È‚çtrue, ’¼‚¿‚ÉƒŠƒ^[ƒ“‚·‚é‚È‚çfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis	è»¸
+  \param val	ç§»å‹•é‡
+  \param val2	axisãŒ #Axis_Both ã®å ´åˆã®ç¬¬2è»¸ã®ç§»å‹•é‡
+  \param block	ç§»å‹•ãŒå®Œäº†ã™ã‚‹ã¾ã§ãƒªã‚¿ãƒ¼ãƒ³ã—ãªã„ãªã‚‰true, ç›´ã¡ã«ãƒªã‚¿ãƒ¼ãƒ³ã™ã‚‹ãªã‚‰false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 SHOT602&
 SHOT602::move(Axis axis, int val, int val2, bool block)
@@ -384,15 +384,15 @@ SHOT602::move(Axis axis, int val, int val2, bool block)
 }
 
 /*
- *  —ã¥
+ *  åŠ±ç£
  */
-//! w’è‚µ‚½²‚Ìholdi—ã¥j/freei”ñ—ã¥j‚ğİ’è‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã®holdï¼ˆåŠ±ç£ï¼‰/freeï¼ˆéåŠ±ç£ï¼‰ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param axis	²
-  \param on	—ã¥‚·‚é‚È‚çtrue, —ã¥‚µ‚È‚¢‚È‚çfalse
-  \param on2	axis‚ª #Axis_Both ‚Ìê‡‚Ì‘æ2²‚É‚Â‚¢‚ÄC
-		—ã¥‚·‚é‚È‚çtrue, —ã¥‚µ‚È‚¢‚È‚çfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis	è»¸
+  \param on	åŠ±ç£ã™ã‚‹ãªã‚‰true, åŠ±ç£ã—ãªã„ãªã‚‰false
+  \param on2	axisãŒ #Axis_Both ã®å ´åˆã®ç¬¬2è»¸ã«ã¤ã„ã¦ï¼Œ
+		åŠ±ç£ã™ã‚‹ãªã‚‰true, åŠ±ç£ã—ãªã„ãªã‚‰false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 SHOT602&
 SHOT602::setHold(Axis axis, bool on, bool on2)

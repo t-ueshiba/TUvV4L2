@@ -1,5 +1,5 @@
 /*
- *  $Id: TUCollection++.sa.cc,v 1.4 2002-07-26 08:57:37 ueshiba Exp $
+ *  $Id: TUCollection++.sa.cc,v 1.5 2012-08-29 21:16:57 ueshiba Exp $
  */
 #include "TU/Collection++.h"
 

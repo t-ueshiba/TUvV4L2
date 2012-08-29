@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IntegralImage.h,v 1.8 2012-08-15 07:17:55 ueshiba Exp $
+ *  $Id: IntegralImage.h,v 1.9 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		IntegralImage.h
-  \brief	ƒNƒ‰ƒX TU::IntegralImage, TU::DiagonalIntegralImage ‚Ì’è‹`‚ÆÀ‘•
+  \brief	ã‚¯ãƒ©ã‚¹ TU::IntegralImage, TU::DiagonalIntegralImage ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef	__TUIntegralImage_h
 #define	__TUIntegralImage_h
@@ -41,7 +41,7 @@ namespace TU
 /************************************************************************
 *  class IntegralImage<T>						*
 ************************************************************************/
-//! Ï•ª‰æ‘œ(integral image)‚ğ•\‚·ƒNƒ‰ƒX
+//! ç©åˆ†ç”»åƒ(integral image)ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class IntegralImage : public Image<T>
 {
@@ -68,15 +68,15 @@ class IntegralImage : public Image<T>
     using	super::height;
 };
 
-//! ‹ó‚ÌÏ•ª‰æ‘œ‚ğì‚é
+//! ç©ºã®ç©åˆ†ç”»åƒã‚’ä½œã‚‹
 template <class T> inline
 IntegralImage<T>::IntegralImage()
 {
 }
     
-//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚çÏ•ª‰æ‘œ‚ğì‚é
+//! ä¸ãˆã‚‰ã‚ŒãŸç”»åƒã‹ã‚‰ç©åˆ†ç”»åƒã‚’ä½œã‚‹
 /*!
-  \param image		“ü—Í‰æ‘œ
+  \param image		å…¥åŠ›ç”»åƒ
 */
 template <class T> template <class S, class B> inline
 IntegralImage<T>::IntegralImage(const Image<S, B>& image)
@@ -84,27 +84,27 @@ IntegralImage<T>::IntegralImage(const Image<S, B>& image)
     initialize(image);
 }
     
-//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚çÏ•ª‰æ‘œ‚ğì‚é
+//! ä¸ãˆã‚‰ã‚ŒãŸç”»åƒã‹ã‚‰ç©åˆ†ç”»åƒã‚’ä½œã‚‹
 /*!
-  \param image		“ü—Í‰æ‘œ
-  \return		‚±‚ÌÏ•ª‰æ‘œ
+  \param image		å…¥åŠ›ç”»åƒ
+  \return		ã“ã®ç©åˆ†ç”»åƒ
 */
 template <class T> template <class S, class B> IntegralImage<T>&
 IntegralImage<T>::initialize(const Image<S, B>& image)
 {
-  // Œ´‰æ‘œ‚æ‚è‚àã‚Æ¶‚É‚PƒsƒNƒZƒ‹‚¸‚Â‘å‚«‚¢ƒTƒCƒY‚ğ—pˆÓ
+  // åŸç”»åƒã‚ˆã‚Šã‚‚ä¸Šã¨å·¦ã«ï¼‘ãƒ”ã‚¯ã‚»ãƒ«ãšã¤å¤§ãã„ã‚µã‚¤ã‚ºã‚’ç”¨æ„
     super::resize(image.height() + 1, image.width() + 1);
 
-  // ã‚Æ¶‚É—]”’‚ğ“ü‚ê‚é
-    (*this)[0] = 0;				// 0s–Ú‚Í‚·‚×‚Ä0
+  // ä¸Šã¨å·¦ã«ä½™ç™½ã‚’å…¥ã‚Œã‚‹
+    (*this)[0] = 0;				// 0è¡Œç›®ã¯ã™ã¹ã¦0
     for (u_int v = 1; v < height(); ++v)
     {
 	T*		dst = (*this)[v];
-	*dst = 0;				// 0—ñ–Ú‚Í0
+	*dst = 0;				// 0åˆ—ç›®ã¯0
 
 	const S*	src = image[v-1];
-	T		val = 0;		// ‚±‚Ìs‚Ì‚±‚Ì‰æ‘f‚Ü‚Å‚Ì˜a
-	const T*	prv = (*this)[v-1];	// 1sã
+	T		val = 0;		// ã“ã®è¡Œã®ã“ã®ç”»ç´ ã¾ã§ã®å’Œ
+	const T*	prv = (*this)[v-1];	// 1è¡Œä¸Š
 	const T* const	end = dst + width();
 	while (++dst < end)
 	    *dst = (val += *src++) + *(++prv);
@@ -113,13 +113,13 @@ IntegralImage<T>::initialize(const Image<S, B>& image)
     return *this;
 }
 
-//! Œ´‰æ‘œ‚Éİ’è‚µ‚½’·•ûŒ`ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a‚ğ•Ô‚·
+//! åŸç”»åƒã«è¨­å®šã—ãŸé•·æ–¹å½¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®ç”»ç´ å€¤ã®ç·å’Œã‚’è¿”ã™
 /*!
-  \param u		ƒEƒBƒ“ƒhƒE‚Ì¶ã‹÷‚Ì‰¡À•W
-  \param v		ƒEƒBƒ“ƒhƒE‚Ì¶ã‹÷‚ÌcÀ•W
-  \param w		ƒEƒBƒ“ƒhƒE‚Ì•
-  \param h		ƒEƒBƒ“ƒhƒE‚Ì‚‚³
-  \return		ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a
+  \param u		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ä¸Šéš…ã®æ¨ªåº§æ¨™
+  \param v		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ä¸Šéš…ã®ç¸¦åº§æ¨™
+  \param w		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å¹…
+  \param h		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®é«˜ã•
+  \return		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®ç”»ç´ å€¤ã®ç·å’Œ
 */
 template <class T> inline T
 IntegralImage<T>::crop(int u, int v, int w, int h) const
@@ -137,13 +137,13 @@ IntegralImage<T>::crop(int u, int v, int w, int h) const
 	 - (*this)[v ][u1] - (*this)[v1][u];
 }
 
-//! Œ´‰æ‘œ‚Éİ’è‚µ‚½’·•ûŒ`ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a‚ğ•Ô‚·
+//! åŸç”»åƒã«è¨­å®šã—ãŸé•·æ–¹å½¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®ç”»ç´ å€¤ã®ç·å’Œã‚’è¿”ã™
 /*!
-  \param umin		ƒEƒBƒ“ƒhƒE‚Ì¶ã‹÷‚Ì‰¡À•W
-  \param umax		ƒEƒBƒ“ƒhƒE‚Ì‰E‰º‹÷‚Ì‰¡À•W
-  \param vmin		ƒEƒBƒ“ƒhƒE‚Ì¶ã‹÷‚ÌcÀ•W
-  \param vmax		ƒEƒBƒ“ƒhƒE‚Ì‰E‰º‹÷‚ÌcÀ•W
-  \return		ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a
+  \param umin		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ä¸Šéš…ã®æ¨ªåº§æ¨™
+  \param umax		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ä¸‹éš…ã®æ¨ªåº§æ¨™
+  \param vmin		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ä¸Šéš…ã®ç¸¦åº§æ¨™
+  \param vmax		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ä¸‹éš…ã®ç¸¦åº§æ¨™
+  \return		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®ç”»ç´ å€¤ã®ç·å’Œ
 */
 template <class T> inline T
 IntegralImage<T>::crop2(int umin, int umax, int vmin, int vmax) const
@@ -155,12 +155,12 @@ IntegralImage<T>::crop2(int umin, int umax, int vmin, int vmax) const
 	 - (*this)[vmin][umax] - (*this)[vmax][umin];
 }
 
-//! Œ´‰æ‘œ‚É³•ûŒ`‚Ì“ñ’l\šƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l‚ğ•Ô‚·
+//! åŸç”»åƒã«æ­£æ–¹å½¢ã®äºŒå€¤åå­—ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸå€¤ã‚’è¿”ã™
 /*!
-  \param u		ƒeƒ“ƒvƒŒ[ƒg’†S‚Ì‰¡À•W
-  \param v		ƒeƒ“ƒvƒŒ[ƒg’†S‚ÌcÀ•W
-  \param cropSize	ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize + 1 ‚Ì³•ûŒ`
-  \return		ƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l
+  \param u		ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆä¸­å¿ƒã®æ¨ªåº§æ¨™
+  \param v		ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆä¸­å¿ƒã®ç¸¦åº§æ¨™
+  \param cropSize	ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã¯ä¸€è¾º 2*cropSize + 1 ã®æ­£æ–¹å½¢
+  \return		ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸå€¤
 */
 template <class T> inline T
 IntegralImage<T>::crossVal(int u, int v, int cropSize) const
@@ -171,12 +171,12 @@ IntegralImage<T>::crossVal(int u, int v, int cropSize) const
 	 - crop(u+1,	    v-cropSize, cropSize, cropSize);
 }
     
-//! Œ´‰æ‘œ‚Ì‘S‚Ä‚Ì“_‚É³•ûŒ`‚Ì“ñ’l\šƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½‰æ‘œ‚ğ‹‚ß‚é
+//! åŸç”»åƒã®å…¨ã¦ã®ç‚¹ã«æ­£æ–¹å½¢ã®äºŒå€¤åå­—ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸç”»åƒã‚’æ±‚ã‚ã‚‹
 /*!
-  \param out		Œ´‰æ‘œ‚Éƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½o—Í‰æ‘œ
-  \param cropSize	ƒeƒ“ƒvƒŒ[ƒgƒTƒCƒY‚ğw’è‚·‚éƒpƒ‰ƒ[ƒ^
-			ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize+1 ‚Ì³•ûŒ`
-  \return		‚±‚ÌÏ•ª‰æ‘œ
+  \param out		åŸç”»åƒã«ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸå‡ºåŠ›ç”»åƒ
+  \param cropSize	ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚µã‚¤ã‚ºã‚’æŒ‡å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+			ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã¯ä¸€è¾º 2*cropSize+1 ã®æ­£æ–¹å½¢
+  \return		ã“ã®ç©åˆ†ç”»åƒ
 */
 template <class T> template <class S, class B> const IntegralImage<T>&
 IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
@@ -189,10 +189,10 @@ IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
     return *this;
 }
 
-//! Œ´‰æ‘œ‚Ì•‚ğ•Ô‚·
+//! åŸç”»åƒã®å¹…ã‚’è¿”ã™
 /*!
-  Ï•ª‰æ‘œ©‘Ì‚Ì•‚Æ‚‚³‚Í‚»‚ê‚¼‚êŒ´‰æ‘œ‚æ‚è‚à1‚¾‚¯‘å‚«‚¢‚Ì‚Å‚±‚Ì•ª‚ğŒ¸‚¶‚½’l‚ğ•Ô‚·D
-  \return	Œ´‰æ‘œ‚Ì•
+  ç©åˆ†ç”»åƒè‡ªä½“ã®å¹…ã¨é«˜ã•ã¯ãã‚Œãã‚ŒåŸç”»åƒã‚ˆã‚Šã‚‚1ã ã‘å¤§ãã„ã®ã§ã“ã®åˆ†ã‚’æ¸›ã˜ãŸå€¤ã‚’è¿”ã™ï¼
+  \return	åŸç”»åƒã®å¹…
 */
 template <class T> u_int
 IntegralImage<T>::originalWidth() const
@@ -200,10 +200,10 @@ IntegralImage<T>::originalWidth() const
     return width() - 1;
 }
 
-//! Œ´‰æ‘œ‚Ì‚‚³‚ğ•Ô‚·
+//! åŸç”»åƒã®é«˜ã•ã‚’è¿”ã™
 /*!
-  Ï•ª‰æ‘œ©‘Ì‚Ì•‚Æ‚‚³‚Í‚»‚ê‚¼‚êŒ´‰æ‘œ‚æ‚è‚à1‚¾‚¯‘å‚«‚¢‚Ì‚Å‚±‚Ì•ª‚ğŒ¸‚¶‚½’l‚ğ•Ô‚·D
-  \return	Œ´‰æ‘œ‚Ì‚‚³
+  ç©åˆ†ç”»åƒè‡ªä½“ã®å¹…ã¨é«˜ã•ã¯ãã‚Œãã‚ŒåŸç”»åƒã‚ˆã‚Šã‚‚1ã ã‘å¤§ãã„ã®ã§ã“ã®åˆ†ã‚’æ¸›ã˜ãŸå€¤ã‚’è¿”ã™ï¼
+  \return	åŸç”»åƒã®é«˜ã•
 */
 template <class T> u_int
 IntegralImage<T>::originalHeight() const
@@ -214,7 +214,7 @@ IntegralImage<T>::originalHeight() const
 /************************************************************************
 *  class DiagonalIntegralImage<T>					*
 ************************************************************************/
-//! ‘ÎŠpÏ•ª‰æ‘œ(diagonal integral image)‚ğ•\‚·ƒNƒ‰ƒX
+//! å¯¾è§’ç©åˆ†ç”»åƒ(diagonal integral image)ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class DiagonalIntegralImage : public Image<T>
 {
@@ -242,15 +242,15 @@ class DiagonalIntegralImage : public Image<T>
     void	correct(int& u, int& v)				const	;
 };
 
-//! ‹ó‚Ì‘ÎŠpÏ•ª‰æ‘œ‚ğì‚é
+//! ç©ºã®å¯¾è§’ç©åˆ†ç”»åƒã‚’ä½œã‚‹
 template <class T> inline
 DiagonalIntegralImage<T>::DiagonalIntegralImage()
 {
 }
     
-//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚ç‘ÎŠpÏ•ª‰æ‘œ‚ğì‚é
+//! ä¸ãˆã‚‰ã‚ŒãŸç”»åƒã‹ã‚‰å¯¾è§’ç©åˆ†ç”»åƒã‚’ä½œã‚‹
 /*!
-  \param image		“ü—Í‰æ‘œ
+  \param image		å…¥åŠ›ç”»åƒ
 */
 template <class T> template <class S, class B> inline
 DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
@@ -258,10 +258,10 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
     initialize(image);
 }
     
-//! —^‚¦‚ç‚ê‚½‰æ‘œ‚©‚ç‘ÎŠpÏ•ª‰æ‘œ‚ğì‚é
+//! ä¸ãˆã‚‰ã‚ŒãŸç”»åƒã‹ã‚‰å¯¾è§’ç©åˆ†ç”»åƒã‚’ä½œã‚‹
 /*!
-  \param image		“ü—Í‰æ‘œ
-  \return		‚±‚Ì‘ÎŠpÏ•ª‰æ‘œ
+  \param image		å…¥åŠ›ç”»åƒ
+  \return		ã“ã®å¯¾è§’ç©åˆ†ç”»åƒ
 */
 template <class T> template <class S, class B> DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
@@ -295,13 +295,13 @@ DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
     return *this;
 }
 
-//! Œ´‰æ‘œ‚É45“xŒX‚¯‚Äİ’è‚µ‚½’·•ûŒ`ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a‚ğ•Ô‚·
+//! åŸç”»åƒã«45åº¦å‚¾ã‘ã¦è¨­å®šã—ãŸé•·æ–¹å½¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®ç”»ç´ å€¤ã®ç·å’Œã‚’è¿”ã™
 /*!
-  \param u		ƒEƒBƒ“ƒhƒE‚Ìã‹÷‚Ì‰¡À•W
-  \param v		ƒEƒBƒ“ƒhƒE‚Ìã‹÷‚ÌcÀ•W
-  \param w		ƒEƒBƒ“ƒhƒE‚Ì•
-  \param h		ƒEƒBƒ“ƒhƒE‚Ì‚‚³
-  \return		ƒEƒBƒ“ƒhƒE“à‚Ì‰æ‘f’l‚Ì‘˜a
+  \param u		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šéš…ã®æ¨ªåº§æ¨™
+  \param v		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸Šéš…ã®ç¸¦åº§æ¨™
+  \param w		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å¹…
+  \param h		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®é«˜ã•
+  \return		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®ç”»ç´ å€¤ã®ç·å’Œ
 */
 template <class T> T
 DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
@@ -321,12 +321,12 @@ DiagonalIntegralImage<T>::crop(int u, int v, int w, int h) const
 	 - (vr >= 0 ? (*this)[vr][ur] : 0);
 }
 
-//! Œ´‰æ‘œ‚É³•ûŒ`‚Ì“ñ’lƒNƒƒXƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l‚ğ•Ô‚·
+//! åŸç”»åƒã«æ­£æ–¹å½¢ã®äºŒå€¤ã‚¯ãƒ­ã‚¹ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸå€¤ã‚’è¿”ã™
 /*!
-  \param u		ƒeƒ“ƒvƒŒ[ƒg’†S‚Ì‰¡À•W
-  \param v		ƒeƒ“ƒvƒŒ[ƒg’†S‚ÌcÀ•W
-  \param cropSize	ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize + 1 ‚Ì³•ûŒ`
-  \return		ƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½’l
+  \param u		ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆä¸­å¿ƒã®æ¨ªåº§æ¨™
+  \param v		ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆä¸­å¿ƒã®ç¸¦åº§æ¨™
+  \param cropSize	ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã¯ä¸€è¾º 2*cropSize + 1 ã®æ­£æ–¹å½¢
+  \return		ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸå€¤
 */
 template <class T> inline T
 DiagonalIntegralImage<T>::crossVal(int u, int v, int cropSize) const
@@ -337,12 +337,12 @@ DiagonalIntegralImage<T>::crossVal(int u, int v, int cropSize) const
 	 - crop(u,	      v-2*cropSize, cropSize, cropSize);
 }
 
-//! Œ´‰æ‘œ‚Ì‘S‚Ä‚Ì“_‚É³•ûŒ`‚Ì“ñ’lƒNƒƒXƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½‰æ‘œ‚ğ‹‚ß‚é
+//! åŸç”»åƒã®å…¨ã¦ã®ç‚¹ã«æ­£æ–¹å½¢ã®äºŒå€¤ã‚¯ãƒ­ã‚¹ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸç”»åƒã‚’æ±‚ã‚ã‚‹
 /*!
-  \param out		Œ´‰æ‘œ‚Éƒeƒ“ƒvƒŒ[ƒg‚ğ“K—p‚µ‚½o—Í‰æ‘œ
-  \param cropSize	ƒeƒ“ƒvƒŒ[ƒgƒTƒCƒY‚ğw’è‚·‚éƒpƒ‰ƒ[ƒ^
-			ƒeƒ“ƒvƒŒ[ƒg‚Íˆê•Ó 2*cropSize+1 ‚Ì³•ûŒ`
-  \return		‚±‚Ì‘ÎŠpÏ•ª‰æ‘œ
+  \param out		åŸç”»åƒã«ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’é©ç”¨ã—ãŸå‡ºåŠ›ç”»åƒ
+  \param cropSize	ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚µã‚¤ã‚ºã‚’æŒ‡å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+			ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã¯ä¸€è¾º 2*cropSize+1 ã®æ­£æ–¹å½¢
+  \return		ã“ã®å¯¾è§’ç©åˆ†ç”»åƒ
 */
 template <class T> template <class S, class B> const DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
@@ -355,10 +355,10 @@ DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
     return *this;
 }
 
-//! Œ´‰æ‘œ‚Ì•‚ğ•Ô‚·
+//! åŸç”»åƒã®å¹…ã‚’è¿”ã™
 /*!
-  ‘ÎŠpÏ•ª‰æ‘œ©‘Ì‚Ì•‚Æ‚‚³‚ÍŒ´‰æ‘œ‚Æ“¯‚¶‚Å‚ ‚éD
-  \return	Œ´‰æ‘œ‚Ì•
+  å¯¾è§’ç©åˆ†ç”»åƒè‡ªä½“ã®å¹…ã¨é«˜ã•ã¯åŸç”»åƒã¨åŒã˜ã§ã‚ã‚‹ï¼
+  \return	åŸç”»åƒã®å¹…
 */
 template <class T> u_int
 DiagonalIntegralImage<T>::originalWidth() const
@@ -366,10 +366,10 @@ DiagonalIntegralImage<T>::originalWidth() const
     return width();
 }
 
-//! Œ´‰æ‘œ‚Ì‚‚³‚ğ•Ô‚·
+//! åŸç”»åƒã®é«˜ã•ã‚’è¿”ã™
 /*!
-  ‘ÎŠpÏ•ª‰æ‘œ©‘Ì‚Ì•‚Æ‚‚³‚ÍŒ´‰æ‘œ‚Æ“¯‚¶‚Å‚ ‚éD
-  \return	Œ´‰æ‘œ‚Ì‚‚³
+  å¯¾è§’ç©åˆ†ç”»åƒè‡ªä½“ã®å¹…ã¨é«˜ã•ã¯åŸç”»åƒã¨åŒã˜ã§ã‚ã‚‹ï¼
+  \return	åŸç”»åƒã®é«˜ã•
 */
 template <class T> u_int
 DiagonalIntegralImage<T>::originalHeight() const

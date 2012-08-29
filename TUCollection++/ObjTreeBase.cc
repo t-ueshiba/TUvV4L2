@@ -1,5 +1,5 @@
 /*
- *  $Id: ObjTreeBase.cc,v 1.3 2005-05-10 02:51:13 ueshiba Exp $
+ *  $Id: ObjTreeBase.cc,v 1.4 2012-08-29 21:16:57 ueshiba Exp $
  */
 #include "TU/Collection++.h"
 

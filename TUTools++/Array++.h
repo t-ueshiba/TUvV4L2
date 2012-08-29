@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Array++.h,v 1.38 2012-08-15 07:17:55 ueshiba Exp $
+ *  $Id: Array++.h,v 1.39 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Array++.h
-  \brief	”z—ñƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	é…åˆ—ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
@@ -47,21 +47,21 @@ namespace TU
 /************************************************************************
 *  class Buf<T>								*
 ************************************************************************/
-//! ‰Â•Ï’·ƒoƒbƒtƒ@ƒNƒ‰ƒX
+//! å¯å¤‰é•·ãƒãƒƒãƒ•ã‚¡ã‚¯ãƒ©ã‚¹
 /*!
-  ’P“Æ‚Åg—p‚·‚é‚±‚Æ‚Í‚È‚­C TU::Array ‚Ü‚½‚Í TU::Array2 ‚Ì
-  ‘æ2ƒeƒ“ƒvƒŒ[ƒgˆø”‚Éw’è‚·‚é‚±‚Æ‚É‚æ‚Á‚ÄC‚»‚ê‚ç‚ÌŠî’êƒNƒ‰ƒX‚Æ‚µ‚Äg‚¤D
-  \param T	—v‘f‚ÌŒ^
+  å˜ç‹¬ã§ä½¿ç”¨ã™ã‚‹ã“ã¨ã¯ãªãï¼Œ TU::Array ã¾ãŸã¯ TU::Array2 ã®
+  ç¬¬2ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå¼•æ•°ã«æŒ‡å®šã™ã‚‹ã“ã¨ã«ã‚ˆã£ã¦ï¼Œãã‚Œã‚‰ã®åŸºåº•ã‚¯ãƒ©ã‚¹ã¨ã—ã¦ä½¿ã†ï¼
+  \param T	è¦ç´ ã®å‹
 */
 template <class T>
 class Buf
 {
   public:
-    typedef T			value_type;	//!< —v‘f‚ÌŒ^
-    typedef value_type&		reference;	//!< —v‘f‚Ö‚ÌQÆ
-    typedef const value_type&	const_reference;//!< ’è”—v‘f‚Ö‚ÌQÆ
-    typedef value_type*		pointer;	//!< —v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
-    typedef const value_type*	const_pointer;	//!< ’è”—v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+    typedef T			value_type;	//!< è¦ç´ ã®å‹
+    typedef value_type&		reference;	//!< è¦ç´ ã¸ã®å‚ç…§
+    typedef const value_type&	const_reference;//!< å®šæ•°è¦ç´ ã¸ã®å‚ç…§
+    typedef value_type*		pointer;	//!< è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+    typedef const value_type*	const_pointer;	//!< å®šæ•°è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
     
   public:
     explicit Buf(u_int siz=0)					;
@@ -86,9 +86,9 @@ class Buf
     u_int	_capacity : 31;	// buffer capacity (unit: element, >= _size)
 };
 
-//! w’è‚µ‚½—v‘f”‚Ìƒoƒbƒtƒ@‚ğ¶¬‚·‚éD
+//! æŒ‡å®šã—ãŸè¦ç´ æ•°ã®ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param siz	—v‘f”
+  \param siz	è¦ç´ æ•°
 */
 template <class T> inline
 Buf<T>::Buf(u_int siz)
@@ -96,10 +96,10 @@ Buf<T>::Buf(u_int siz)
 {
 }
 
-//! ŠO•”‚Ì—Ìˆæ‚Æ—v‘f”‚ğw’è‚µ‚Äƒoƒbƒtƒ@‚ğ¶¬‚·‚éD
+//! å¤–éƒ¨ã®é ˜åŸŸã¨è¦ç´ æ•°ã‚’æŒ‡å®šã—ã¦ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param p	ŠO•”—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param siz	—v‘f”
+  \param p	å¤–éƒ¨é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param siz	è¦ç´ æ•°
 */
 template <class T> inline
 Buf<T>::Buf(pointer p, u_int siz)
@@ -107,7 +107,7 @@ Buf<T>::Buf(pointer p, u_int siz)
 {
 }
     
-//! ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 template <class T>
 Buf<T>::Buf(const Buf<T>& b)
     :_size(b._size), _p(new T[_size]), _shared(0), _capacity(_size)
@@ -116,7 +116,7 @@ Buf<T>::Buf(const Buf<T>& b)
 	_p[i] = b._p[i];
 }
 
-//! •W€‘ã“ü‰‰Zq
+//! æ¨™æº–ä»£å…¥æ¼”ç®—å­
 template <class T> Buf<T>&
 Buf<T>::operator =(const Buf<T>& b)
 {
@@ -129,7 +129,7 @@ Buf<T>::operator =(const Buf<T>& b)
     return *this;
 }
 
-//! ƒfƒXƒgƒ‰ƒNƒ^
+//! ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 template <class T> inline
 Buf<T>::~Buf()
 {
@@ -137,36 +137,36 @@ Buf<T>::~Buf()
 	delete [] _p;
 }
     
-//! ƒoƒbƒtƒ@‚ªg—p‚·‚é“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! ãƒãƒƒãƒ•ã‚¡ãŒä½¿ç”¨ã™ã‚‹å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 template <class T> inline typename Buf<T>::pointer
 Buf<T>::ptr()
 {
     return _p;
 }
 
-//! ƒoƒbƒtƒ@‚ªg—p‚·‚é“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! ãƒãƒƒãƒ•ã‚¡ãŒä½¿ç”¨ã™ã‚‹å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 template <class T> inline typename Buf<T>::const_pointer
 Buf<T>::ptr() const
 {
     return _p;
 }
     
-//! ƒoƒbƒtƒ@‚Ì—v‘f”‚ğ•Ô‚·D
+//! ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã‚’è¿”ã™ï¼
 template <class T> inline size_t
 Buf<T>::size() const
 {
     return _size;
 }
     
-//! ƒoƒbƒtƒ@‚Ì—v‘f”‚ğ•ÏX‚·‚éD
+//! ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  ‚½‚¾‚µC‘¼‚ÌƒIƒuƒWƒFƒNƒg‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚Ä‚¢‚éƒoƒbƒtƒ@‚Ì—v‘f”‚ğ
-  •ÏX‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢D
-  \param siz			V‚µ‚¢—v‘f”
-  \return			siz‚ªŒ³‚Ì—v‘f”‚æ‚è‚à‘å‚«‚¯‚ê‚ÎtrueC‚»‚¤
-				‚Å‚È‚¯‚ê‚Îfalse
-  \throw std::logic_error	‹L‰¯—Ìˆæ‚ğ‘¼‚ÌƒIƒuƒWƒFƒNƒg‚Æ‹¤—L‚µ‚Ä‚¢‚éê‡
-				‚É‘—o
+  ãŸã ã—ï¼Œä»–ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã—ã¦ã„ã‚‹ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã‚’
+  å¤‰æ›´ã™ã‚‹ã“ã¨ã¯ã§ããªã„ï¼
+  \param siz			æ–°ã—ã„è¦ç´ æ•°
+  \return			sizãŒå…ƒã®è¦ç´ æ•°ã‚ˆã‚Šã‚‚å¤§ãã‘ã‚Œã°trueï¼Œãã†
+				ã§ãªã‘ã‚Œã°false
+  \throw std::logic_error	è¨˜æ†¶é ˜åŸŸã‚’ä»–ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨å…±æœ‰ã—ã¦ã„ã‚‹å ´åˆ
+				ã«é€å‡º
 */
 template <class T> bool
 Buf<T>::resize(u_int siz)
@@ -188,10 +188,10 @@ Buf<T>::resize(u_int siz)
     return _size > old_size;
 }
 
-//! ƒoƒbƒtƒ@‚ª“à•”‚Åg—p‚·‚é‹L‰¯—Ìˆæ‚ğw’è‚µ‚½‚à‚Ì‚É•ÏX‚·‚éD
+//! ãƒãƒƒãƒ•ã‚¡ãŒå†…éƒ¨ã§ä½¿ç”¨ã™ã‚‹è¨˜æ†¶é ˜åŸŸã‚’æŒ‡å®šã—ãŸã‚‚ã®ã«å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param p	V‚µ‚¢‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param siz	V‚µ‚¢—v‘f”
+  \param p	æ–°ã—ã„è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param siz	æ–°ã—ã„è¦ç´ æ•°
 */
 template <class T> inline void
 Buf<T>::resize(pointer p, u_int siz)
@@ -204,12 +204,12 @@ Buf<T>::resize(pointer p, u_int siz)
     _capacity = _size;
 }
 
-//! ‹L‰¯—Ìˆæ‚ğalign‚·‚é‚½‚ß‚É•K—v‚È—v‘f”‚ğ•Ô‚·D
+//! è¨˜æ†¶é ˜åŸŸã‚’alignã™ã‚‹ãŸã‚ã«å¿…è¦ãªè¦ç´ æ•°ã‚’è¿”ã™ï¼
 /*!
-  •K—v‚È‹L‰¯—e—Ê‚ªƒoƒbƒtƒ@‚É‚æ‚Á‚ÄŒˆ‚Ü‚é“Á’è‚Ì’l‚Ì”{”‚É‚È‚é‚æ‚¤C—^‚¦‚ç‚ê‚½
-  —v‘f”‚ğŒJ‚èã‚°‚éD
-  \param siz	—v‘f”
-  \return	align‚³‚ê‚½—v‘f”
+  å¿…è¦ãªè¨˜æ†¶å®¹é‡ãŒãƒãƒƒãƒ•ã‚¡ã«ã‚ˆã£ã¦æ±ºã¾ã‚‹ç‰¹å®šã®å€¤ã®å€æ•°ã«ãªã‚‹ã‚ˆã†ï¼Œä¸ãˆã‚‰ã‚ŒãŸ
+  è¦ç´ æ•°ã‚’ç¹°ã‚Šä¸Šã’ã‚‹ï¼
+  \param siz	è¦ç´ æ•°
+  \return	alignã•ã‚ŒãŸè¦ç´ æ•°
 */
 template <class T> inline u_int
 Buf<T>::stride(u_int siz)
@@ -217,11 +217,11 @@ Buf<T>::stride(u_int siz)
     return siz;
 }
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çw’è‚µ‚½‰ÓŠ‚É”z—ñ‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰æŒ‡å®šã—ãŸç®‡æ‰€ã«é…åˆ—ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param m	“Ç‚İ‚İæ‚Ìæ“ª‚ğw’è‚·‚éindex
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param m	èª­ã¿è¾¼ã¿å…ˆã®å…ˆé ­ã‚’æŒ‡å®šã™ã‚‹index
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> std::istream&
 Buf<T>::get(std::istream& in, u_int m)
@@ -257,10 +257,10 @@ Buf<T>::get(std::istream& in, u_int m)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚É”z—ñ‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«é…åˆ—ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> std::ostream&
 Buf<T>::put(std::ostream& out) const
@@ -274,11 +274,11 @@ Buf<T>::put(std::ostream& out) const
 /************************************************************************
 *  class AlignedBuf<T>							*
 ************************************************************************/
-//! ‹L‰¯—Ìˆæ‚ÌƒAƒhƒŒƒX‚ª16byte‚Ì”{”‚É‚È‚é‚æ‚¤align‚³‚ê‚½‰Â•Ï’·ƒoƒbƒtƒ@ƒNƒ‰ƒX
+//! è¨˜æ†¶é ˜åŸŸã®ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒ16byteã®å€æ•°ã«ãªã‚‹ã‚ˆã†alignã•ã‚ŒãŸå¯å¤‰é•·ãƒãƒƒãƒ•ã‚¡ã‚¯ãƒ©ã‚¹
 /*!
-  ’P“Æ‚Åg—p‚·‚é‚±‚Æ‚Í‚È‚­C TU::Array ‚Ü‚½‚Í TU::Array2 ‚Ì
-  ‘æ2ƒeƒ“ƒvƒŒ[ƒgˆø”‚Éw’è‚·‚é‚±‚Æ‚É‚æ‚Á‚ÄC‚»‚ê‚ç‚ÌŠî’êƒNƒ‰ƒX‚Æ‚µ‚Äg‚¤D
-  \param T	—v‘f‚ÌŒ^
+  å˜ç‹¬ã§ä½¿ç”¨ã™ã‚‹ã“ã¨ã¯ãªãï¼Œ TU::Array ã¾ãŸã¯ TU::Array2 ã®
+  ç¬¬2ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå¼•æ•°ã«æŒ‡å®šã™ã‚‹ã“ã¨ã«ã‚ˆã£ã¦ï¼Œãã‚Œã‚‰ã®åŸºåº•ã‚¯ãƒ©ã‚¹ã¨ã—ã¦ä½¿ã†ï¼
+  \param T	è¦ç´ ã®å‹
 */
 template <class T>
 class AlignedBuf : public Buf<T>
@@ -287,15 +287,15 @@ class AlignedBuf : public Buf<T>
     typedef Buf<T>				super;
 
   public:
-  //! —v‘f‚ÌŒ^
+  //! è¦ç´ ã®å‹
     typedef typename super::value_type		value_type;
-  //! —v‘f‚Ö‚ÌQÆ
+  //! è¦ç´ ã¸ã®å‚ç…§
     typedef typename super::reference		reference;
-  //! ’è”—v‘f‚Ö‚ÌQÆ
+  //! å®šæ•°è¦ç´ ã¸ã®å‚ç…§
     typedef typename super::const_reference	const_reference;
-  //! —v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  //! è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
     typedef typename super::pointer		pointer;
-  //! ’è”—v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^    
+  //! å®šæ•°è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿    
     typedef typename super::const_pointer	const_pointer;
 
   public:
@@ -315,7 +315,7 @@ class AlignedBuf : public Buf<T>
     static void		memfree(pointer p)			;
     
     enum		{ALIGN = 16};
-    class LCM		//! sizeof(T)‚ÆALIGN‚ÌÅ¬Œö”{”
+    class LCM		//! sizeof(T)ã¨ALIGNã®æœ€å°å…¬å€æ•°
     {
       public:
 	LCM()							;
@@ -326,9 +326,9 @@ class AlignedBuf : public Buf<T>
     static const LCM	_lcm;
 };
 
-//! w’è‚µ‚½—v‘f”‚Ìƒoƒbƒtƒ@‚ğ¶¬‚·‚éD
+//! æŒ‡å®šã—ãŸè¦ç´ æ•°ã®ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param siz	—v‘f”
+  \param siz	è¦ç´ æ•°
 */
 template <class T> inline
 AlignedBuf<T>::AlignedBuf(u_int siz)
@@ -336,7 +336,7 @@ AlignedBuf<T>::AlignedBuf(u_int siz)
 {
 }
 
-//! ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 template <class T>
 AlignedBuf<T>::AlignedBuf(const AlignedBuf<T>& b)
     :super(memalloc(b.size()), b.size())
@@ -344,26 +344,26 @@ AlignedBuf<T>::AlignedBuf(const AlignedBuf<T>& b)
     super::operator =(b);
 }
 
-//! •W€‘ã“ü‰‰Zq
+//! æ¨™æº–ä»£å…¥æ¼”ç®—å­
 template <class T> AlignedBuf<T>&
 AlignedBuf<T>::operator =(const AlignedBuf<T>& b)
 {
-    resize(b.size());		// Buf<T>::resize(u_int)‚Íg‚¦‚È‚¢D
+    resize(b.size());		// Buf<T>::resize(u_int)ã¯ä½¿ãˆãªã„ï¼
     super::operator =(b);
     return *this;
 }
 
-//! ƒfƒXƒgƒ‰ƒNƒ^
+//! ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 template <class T> inline
 AlignedBuf<T>::~AlignedBuf()
 {
     memfree(ptr());
 }
     
-//! ƒoƒbƒtƒ@‚Ì—v‘f”‚ğ•ÏX‚·‚éD
+//! ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param siz	V‚µ‚¢—v‘f”
-  \return	siz‚ªŒ³‚Ì—v‘f”‚Æ“™‚µ‚¯‚ê‚ÎtrueC‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param siz	æ–°ã—ã„è¦ç´ æ•°
+  \return	sizãŒå…ƒã®è¦ç´ æ•°ã¨ç­‰ã—ã‘ã‚Œã°trueï¼Œãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T> inline bool
 AlignedBuf<T>::resize(u_int siz)
@@ -376,16 +376,16 @@ AlignedBuf<T>::resize(u_int siz)
     return true;
 }
 
-//! ‹L‰¯—Ìˆæ‚ğalign‚·‚é‚½‚ß‚É•K—v‚È—v‘f”‚ğ•Ô‚·D
+//! è¨˜æ†¶é ˜åŸŸã‚’alignã™ã‚‹ãŸã‚ã«å¿…è¦ãªè¦ç´ æ•°ã‚’è¿”ã™ï¼
 /*!
-  •K—v‚È‹L‰¯—e—Ê‚ª16byte‚Ì”{”‚É‚È‚é‚æ‚¤C—^‚¦‚ç‚ê‚½—v‘f”‚ğŒJ‚èã‚°‚éD
-  \param siz	—v‘f”
-  \return	align‚³‚ê‚½—v‘f”
+  å¿…è¦ãªè¨˜æ†¶å®¹é‡ãŒ16byteã®å€æ•°ã«ãªã‚‹ã‚ˆã†ï¼Œä¸ãˆã‚‰ã‚ŒãŸè¦ç´ æ•°ã‚’ç¹°ã‚Šä¸Šã’ã‚‹ï¼
+  \param siz	è¦ç´ æ•°
+  \return	alignã•ã‚ŒãŸè¦ç´ æ•°
 */
 template <class T> inline u_int
 AlignedBuf<T>::stride(u_int siz)
 {
-  // _lcm * m >= sizeof(T) * siz ‚È‚éÅ¬‚Ì m ‚ğ‹‚ß‚éD
+  // _lcm * m >= sizeof(T) * siz ãªã‚‹æœ€å°ã® m ã‚’æ±‚ã‚ã‚‹ï¼
     const u_int	m = (sizeof(T)*siz + _lcm - 1) / _lcm;
     return (_lcm * m) / sizeof(T);
 }
@@ -410,13 +410,13 @@ template <class T>
 AlignedBuf<T>::LCM::LCM()
     :_val(ALIGN * sizeof(T))
 {
-  // sizeof(T)‚ÆALIGN‚ÌÅ‘åŒö–ñ”(GCD)‚ğ‹‚ß‚éD
+  // sizeof(T)ã¨ALIGNã®æœ€å¤§å…¬ç´„æ•°(GCD)ã‚’æ±‚ã‚ã‚‹ï¼
     u_int	gcd = ALIGN;
     for (u_int m = sizeof(T); m > 0; m -= gcd)
 	if (m < gcd)
 	    std::swap(m, gcd);
 
-  // sizeof(T)‚ÆALIGN‚ÌÅ¬Œö”{”(LCM)
+  // sizeof(T)ã¨ALIGNã®æœ€å°å…¬å€æ•°(LCM)
     _val /= gcd;
 }
 
@@ -426,22 +426,22 @@ template <class T> const AlignedBuf<T>::LCM	AlignedBuf<T>::_lcm;
 /************************************************************************
 *  class FixedSizedBuf<T, D>						*
 ************************************************************************/
-//! ’è”ƒTƒCƒY‚Ìƒoƒbƒtƒ@ƒNƒ‰ƒX
+//! å®šæ•°ã‚µã‚¤ã‚ºã®ãƒãƒƒãƒ•ã‚¡ã‚¯ãƒ©ã‚¹
 /*!
-  ’P“Æ‚Åg—p‚·‚é‚±‚Æ‚Í‚È‚­C TU::Array ‚Ì‘æ2ƒeƒ“ƒvƒŒ[ƒgˆø”‚Éw’è‚·‚é
-  ‚±‚Æ‚É‚æ‚Á‚Ä TU::Array ‚ÌŠî’êƒNƒ‰ƒX‚Æ‚µ‚Äg‚¤D
-  \param T	—v‘f‚ÌŒ^
-  \param D	ƒoƒbƒtƒ@’†‚Ì—v‘f”
+  å˜ç‹¬ã§ä½¿ç”¨ã™ã‚‹ã“ã¨ã¯ãªãï¼Œ TU::Array ã®ç¬¬2ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå¼•æ•°ã«æŒ‡å®šã™ã‚‹
+  ã“ã¨ã«ã‚ˆã£ã¦ TU::Array ã®åŸºåº•ã‚¯ãƒ©ã‚¹ã¨ã—ã¦ä½¿ã†ï¼
+  \param T	è¦ç´ ã®å‹
+  \param D	ãƒãƒƒãƒ•ã‚¡ä¸­ã®è¦ç´ æ•°
 */
 template <class T, size_t D>
 class FixedSizedBuf
 {
   public:
-    typedef T			value_type;	//!< —v‘f‚ÌŒ^
-    typedef value_type&		reference;	//!< —v‘f‚Ö‚ÌQÆ
-    typedef const value_type&	const_reference;//!< ’è”—v‘f‚Ö‚ÌQÆ
-    typedef value_type*		pointer;	//!< —v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
-    typedef const value_type*	const_pointer;	//!< ’è”—v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+    typedef T			value_type;	//!< è¦ç´ ã®å‹
+    typedef value_type&		reference;	//!< è¦ç´ ã¸ã®å‚ç…§
+    typedef const value_type&	const_reference;//!< å®šæ•°è¦ç´ ã¸ã®å‚ç…§
+    typedef value_type*		pointer;	//!< è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+    typedef const value_type*	const_pointer;	//!< å®šæ•°è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 
   public:
     explicit FixedSizedBuf(u_int siz=D)				;
@@ -462,11 +462,11 @@ class FixedSizedBuf
     T			_p[D];				// D-sized buffer
 };
 
-//! ƒoƒbƒtƒ@‚ğ¶¬‚·‚éD
+//! ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param siz			—v‘f”
-  \throw std::logic_error	siz‚ªƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^D‚Éˆê’v‚µ‚È‚¢ê‡‚É
-				‘—o
+  \param siz			è¦ç´ æ•°
+  \throw std::logic_error	sizãŒãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿Dã«ä¸€è‡´ã—ãªã„å ´åˆã«
+				é€å‡º
 */
 template <class T, size_t D> inline
 FixedSizedBuf<T, D>::FixedSizedBuf(u_int siz)
@@ -474,11 +474,11 @@ FixedSizedBuf<T, D>::FixedSizedBuf(u_int siz)
     resize(siz);
 }
 
-//! ŠO•”‚Ì—Ìˆæ‚Æ—v‘f”‚ğw’è‚µ‚Äƒoƒbƒtƒ@‚ğ¶¬‚·‚éiƒ_ƒ~[ŠÖ”jD
+//! å¤–éƒ¨ã®é ˜åŸŸã¨è¦ç´ æ•°ã‚’æŒ‡å®šã—ã¦ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã™ã‚‹ï¼ˆãƒ€ãƒŸãƒ¼é–¢æ•°ï¼‰ï¼
 /*!
-  ÀÛ‚Íƒoƒbƒtƒ@‚ªg—p‚·‚é‹L‰¯—Ìˆæ‚ÍŒÅ’è‚³‚ê‚Ä‚¢‚Ä•ÏX‚Å‚«‚È‚¢‚Ì‚ÅC
-  ‚±‚ÌŠÖ”‚Íí‚É—áŠO‚ğ‘—o‚·‚éD
-  \throw std::logic_error	‚±‚ÌŠÖ”‚ªŒÄ‚Î‚ê‚½‚ç•K‚¸‘—o
+  å®Ÿéš›ã¯ãƒãƒƒãƒ•ã‚¡ãŒä½¿ç”¨ã™ã‚‹è¨˜æ†¶é ˜åŸŸã¯å›ºå®šã•ã‚Œã¦ã„ã¦å¤‰æ›´ã§ããªã„ã®ã§ï¼Œ
+  ã“ã®é–¢æ•°ã¯å¸¸ã«ä¾‹å¤–ã‚’é€å‡ºã™ã‚‹ï¼
+  \throw std::logic_error	ã“ã®é–¢æ•°ãŒå‘¼ã°ã‚ŒãŸã‚‰å¿…ãšé€å‡º
 */
 template <class T, size_t D> inline
 FixedSizedBuf<T, D>::FixedSizedBuf(pointer, u_int)
@@ -486,7 +486,7 @@ FixedSizedBuf<T, D>::FixedSizedBuf(pointer, u_int)
     throw std::logic_error("FixedSizedBuf<T, D>::FixedSizedBuf(pointer, u_int): cannot specify a pointer to external storage!!");
 }
 
-//! ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 template <class T, size_t D>
 FixedSizedBuf<T, D>::FixedSizedBuf(const FixedSizedBuf<T, D>& b)
 {
@@ -494,7 +494,7 @@ FixedSizedBuf<T, D>::FixedSizedBuf(const FixedSizedBuf<T, D>& b)
 	_p[i] = b._p[i];
 }
 
-//! •W€‘ã“ü‰‰Zq
+//! æ¨™æº–ä»£å…¥æ¼”ç®—å­
 template <class T, size_t D> FixedSizedBuf<T, D>&
 FixedSizedBuf<T, D>::operator =(const FixedSizedBuf<T, D>& b)
 {
@@ -504,35 +504,35 @@ FixedSizedBuf<T, D>::operator =(const FixedSizedBuf<T, D>& b)
     return *this;
 }
 
-//! ƒoƒbƒtƒ@‚ªg—p‚·‚é“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! ãƒãƒƒãƒ•ã‚¡ãŒä½¿ç”¨ã™ã‚‹å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 template <class T, size_t D> inline typename FixedSizedBuf<T, D>::pointer
 FixedSizedBuf<T, D>::ptr()
 {
     return _p;
 }
 
-//! ƒoƒbƒtƒ@‚ªg—p‚·‚é“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! ãƒãƒƒãƒ•ã‚¡ãŒä½¿ç”¨ã™ã‚‹å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 template <class T, size_t D> inline typename FixedSizedBuf<T, D>::const_pointer
 FixedSizedBuf<T, D>::ptr() const
 {
     return _p;
 }
     
-//! ƒoƒbƒtƒ@‚Ì—v‘f”‚ğ•Ô‚·D
+//! ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã‚’è¿”ã™ï¼
 template <class T, size_t D> inline size_t
 FixedSizedBuf<T, D>::size()
 {
     return D;
 }
     
-//! ƒoƒbƒtƒ@‚Ì—v‘f”‚ğ•ÏX‚·‚éD
+//! ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  ÀÛ‚É‚Íƒoƒbƒtƒ@‚Ì—v‘f”‚ğ•ÏX‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢‚Ì‚ÅC—^‚¦‚ç‚ê‚½—v‘f”‚ª
-  ‚±‚Ìƒoƒbƒtƒ@‚Ì—v‘f”‚É“™‚µ‚¢ê‡‚Ì‚İC’Êí‚Ç‚¨‚è‚É‚±‚ÌŠÖ”‚©‚ç§Œä‚ª•Ô‚éD
-  \param siz			V‚µ‚¢—v‘f”
-  \return			í‚Éfalse
-  \throw std::logic_error	siz‚ªƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^D‚Éˆê’v‚µ‚È‚¢ê‡‚É
-				‘—o
+  å®Ÿéš›ã«ã¯ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã‚’å¤‰æ›´ã™ã‚‹ã“ã¨ã¯ã§ããªã„ã®ã§ï¼Œä¸ãˆã‚‰ã‚ŒãŸè¦ç´ æ•°ãŒ
+  ã“ã®ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ æ•°ã«ç­‰ã—ã„å ´åˆã®ã¿ï¼Œé€šå¸¸ã©ãŠã‚Šã«ã“ã®é–¢æ•°ã‹ã‚‰åˆ¶å¾¡ãŒè¿”ã‚‹ï¼
+  \param siz			æ–°ã—ã„è¦ç´ æ•°
+  \return			å¸¸ã«false
+  \throw std::logic_error	sizãŒãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿Dã«ä¸€è‡´ã—ãªã„å ´åˆã«
+				é€å‡º
 */
 template <class T, size_t D> inline bool
 FixedSizedBuf<T, D>::resize(u_int siz)
@@ -542,16 +542,16 @@ FixedSizedBuf<T, D>::resize(u_int siz)
     return false;
 }
     
-//! ƒoƒbƒtƒ@‚ª“à•”‚Åg—p‚·‚é‹L‰¯—Ìˆæ‚ğw’è‚µ‚½‚à‚Ì‚É•ÏX‚·‚éD
+//! ãƒãƒƒãƒ•ã‚¡ãŒå†…éƒ¨ã§ä½¿ç”¨ã™ã‚‹è¨˜æ†¶é ˜åŸŸã‚’æŒ‡å®šã—ãŸã‚‚ã®ã«å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  ÀÛ‚É‚Íƒoƒbƒtƒ@‚Ì‹L‰¯—Ìˆæ‚ğ•ÏX‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢‚Ì‚ÅC—^‚¦‚ç‚ê‚½ƒ|ƒCƒ“ƒ^
-  ‚Æ—v‘f”‚ª‚±‚Ìƒoƒbƒtƒ@‚Ì‚»‚ê‚ç‚É“™‚µ‚¢ê‡‚Ì‚İC’Êí‚Ç‚¨‚è‚É‚±‚ÌŠÖ”‚©‚ç§Œä
-  ‚ª•Ô‚éD
-  \param p			V‚µ‚¢‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param siz			V‚µ‚¢—v‘f”
-  \throw std::logic_error	p‚ª‚±‚Ìƒoƒbƒtƒ@‚Ì“à•”‹L‰¯—Ìˆæ‚Éˆê’v‚µ‚È‚¢‚©C
-				siz‚ªƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^D‚Éˆê’v‚µ‚È‚¢ê‡‚É
-				‘—o
+  å®Ÿéš›ã«ã¯ãƒãƒƒãƒ•ã‚¡ã®è¨˜æ†¶é ˜åŸŸã‚’å¤‰æ›´ã™ã‚‹ã“ã¨ã¯ã§ããªã„ã®ã§ï¼Œä¸ãˆã‚‰ã‚ŒãŸãƒã‚¤ãƒ³ã‚¿
+  ã¨è¦ç´ æ•°ãŒã“ã®ãƒãƒƒãƒ•ã‚¡ã®ãã‚Œã‚‰ã«ç­‰ã—ã„å ´åˆã®ã¿ï¼Œé€šå¸¸ã©ãŠã‚Šã«ã“ã®é–¢æ•°ã‹ã‚‰åˆ¶å¾¡
+  ãŒè¿”ã‚‹ï¼
+  \param p			æ–°ã—ã„è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param siz			æ–°ã—ã„è¦ç´ æ•°
+  \throw std::logic_error	pãŒã“ã®ãƒãƒƒãƒ•ã‚¡ã®å†…éƒ¨è¨˜æ†¶é ˜åŸŸã«ä¸€è‡´ã—ãªã„ã‹ï¼Œ
+				sizãŒãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿Dã«ä¸€è‡´ã—ãªã„å ´åˆã«
+				é€å‡º
 */
 template <class T, size_t D> inline void
 FixedSizedBuf<T, D>::resize(pointer p, u_int siz)
@@ -560,12 +560,12 @@ FixedSizedBuf<T, D>::resize(pointer p, u_int siz)
 	throw std::logic_error("FixedSizedBuf<T, D>::resize(pointer, u_int): cannot specify a potiner to external storage!!");
 }
     
-//! ‹L‰¯—Ìˆæ‚ğalign‚·‚é‚½‚ß‚É•K—v‚È—v‘f”‚ğ•Ô‚·D
+//! è¨˜æ†¶é ˜åŸŸã‚’alignã™ã‚‹ãŸã‚ã«å¿…è¦ãªè¦ç´ æ•°ã‚’è¿”ã™ï¼
 /*!
-  •K—v‚È‹L‰¯—e—Ê‚ªƒoƒbƒtƒ@‚É‚æ‚Á‚ÄŒˆ‚Ü‚é“Á’è‚Ì’l‚Ì”{”‚É‚È‚é‚æ‚¤C—^‚¦‚ç‚ê‚½
-  —v‘f”‚ğŒJ‚èã‚°‚éD
-  \param siz	—v‘f”
-  \return	align‚³‚ê‚½—v‘f”
+  å¿…è¦ãªè¨˜æ†¶å®¹é‡ãŒãƒãƒƒãƒ•ã‚¡ã«ã‚ˆã£ã¦æ±ºã¾ã‚‹ç‰¹å®šã®å€¤ã®å€æ•°ã«ãªã‚‹ã‚ˆã†ï¼Œä¸ãˆã‚‰ã‚ŒãŸ
+  è¦ç´ æ•°ã‚’ç¹°ã‚Šä¸Šã’ã‚‹ï¼
+  \param siz	è¦ç´ æ•°
+  \return	alignã•ã‚ŒãŸè¦ç´ æ•°
 */
 template <class T, size_t D> inline u_int
 FixedSizedBuf<T, D>::stride(u_int siz)
@@ -573,10 +573,10 @@ FixedSizedBuf<T, D>::stride(u_int siz)
     return siz;
 }
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç”z—ñ‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰é…åˆ—ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, size_t D> std::istream&
 FixedSizedBuf<T, D>::get(std::istream& in)
@@ -586,10 +586,10 @@ FixedSizedBuf<T, D>::get(std::istream& in)
     return in;
 }
     
-//! o—ÍƒXƒgƒŠ[ƒ€‚É”z—ñ‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«é…åˆ—ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, size_t D> std::ostream&
 FixedSizedBuf<T, D>::put(std::ostream& out) const
@@ -602,36 +602,36 @@ FixedSizedBuf<T, D>::put(std::ostream& out) const
 /************************************************************************
 *  class Array<T, B>							*
 ************************************************************************/
-//! BŒ^ƒoƒbƒtƒ@‚É‚æ‚Á‚ÄÀ‘•‚³‚ê‚éTŒ^ƒIƒuƒWƒFƒNƒg‚Ì1ŸŒ³”z—ñƒNƒ‰ƒX
+//! Bå‹ãƒãƒƒãƒ•ã‚¡ã«ã‚ˆã£ã¦å®Ÿè£…ã•ã‚Œã‚‹Tå‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®1æ¬¡å…ƒé…åˆ—ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	—v‘f‚ÌŒ^
-  \param B	ƒoƒbƒtƒ@
+  \param T	è¦ç´ ã®å‹
+  \param B	ãƒãƒƒãƒ•ã‚¡
 */
 template <class T, class B=Buf<T> >
 class Array : public B
 {
   public:
-  //! ƒoƒbƒtƒ@‚ÌŒ^
+  //! ãƒãƒƒãƒ•ã‚¡ã®å‹
     typedef B						buf_type;
-  //! —v‘f‚ÌŒ^    
+  //! è¦ç´ ã®å‹    
     typedef typename buf_type::value_type		value_type;
-  //! —v‘f‚Ö‚ÌQÆ
+  //! è¦ç´ ã¸ã®å‚ç…§
     typedef typename buf_type::reference		reference;
-  //! ’è”—v‘f‚Ö‚ÌQÆ
+  //! å®šæ•°è¦ç´ ã¸ã®å‚ç…§
     typedef typename buf_type::const_reference		const_reference;
-  //! —v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  //! è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
     typedef typename buf_type::pointer			pointer;
-  //! ’è”—v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  //! å®šæ•°è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
     typedef typename buf_type::const_pointer		const_pointer;
-  //! ”½•œq
+  //! åå¾©å­
     typedef pointer					iterator;
-  //! ’è””½•œq
+  //! å®šæ•°åå¾©å­
     typedef const_pointer				const_iterator;
-  //! ‹t”½•œq    
+  //! é€†åå¾©å­    
     typedef std::reverse_iterator<iterator>		reverse_iterator;
-  //! ’è”‹t”½•œq    
+  //! å®šæ•°é€†åå¾©å­    
     typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
-  //! ƒ|ƒCƒ“ƒ^ŠÔ‚Ì·
+  //! ãƒã‚¤ãƒ³ã‚¿é–“ã®å·®
     typedef std::ptrdiff_t				difference_type;
     
   public:
@@ -681,16 +681,16 @@ class Array : public B
     static u_int	partial_dim(u_int i, u_int d, u_int a)		;
 };
 
-//! ”z—ñ‚ğ¶¬‚·‚éD
+//! é…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 template <class T, class B> inline
 Array<T, B>::Array()
     :buf_type()
 {
 }
 
-//! w’è‚µ‚½—v‘f”‚Ì”z—ñ‚ğ¶¬‚·‚éD
+//! æŒ‡å®šã—ãŸè¦ç´ æ•°ã®é…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param d	”z—ñ‚Ì—v‘f”
+  \param d	é…åˆ—ã®è¦ç´ æ•°
 */
 template <class T, class B> inline
 Array<T, B>::Array(u_int d)
@@ -698,10 +698,10 @@ Array<T, B>::Array(u_int d)
 {
 }
 
-//! ŠO•”‚Ì—Ìˆæ‚Æ—v‘f”‚ğw’è‚µ‚Ä”z—ñ‚ğ¶¬‚·‚éD
+//! å¤–éƒ¨ã®é ˜åŸŸã¨è¦ç´ æ•°ã‚’æŒ‡å®šã—ã¦é…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param p	ŠO•”—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param d	”z—ñ‚Ì—v‘f”
+  \param p	å¤–éƒ¨é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param d	é…åˆ—ã®è¦ç´ æ•°
 */
 template <class T, class B> inline
 Array<T, B>::Array(pointer p, u_int d)
@@ -709,10 +709,10 @@ Array<T, B>::Array(pointer p, u_int d)
 {
 }
 
-//! ‘¼‚Ì”z—ñ‚Æ“¯ˆê—v‘f‚ğ‚Â”z—ñ‚ğì‚éiƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÌŠg’£jD
+//! ä»–ã®é…åˆ—ã¨åŒä¸€è¦ç´ ã‚’æŒã¤é…åˆ—ã‚’ä½œã‚‹ï¼ˆã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®æ‹¡å¼µï¼‰ï¼
 /*!
-  ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Í•ÊŒÂ©“®“I‚É¶¬‚³‚ê‚éD
-  \param a	ƒRƒs[Œ³‚Ì”z—ñ
+  ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã¯åˆ¥å€‹è‡ªå‹•çš„ã«ç”Ÿæˆã•ã‚Œã‚‹ï¼
+  \param a	ã‚³ãƒ”ãƒ¼å…ƒã®é…åˆ—
 */
 template <class T, class B> template <class T2, class B2>
 Array<T, B>::Array(const Array<T2, B2>& a)
@@ -722,11 +722,11 @@ Array<T, B>::Array(const Array<T2, B2>& a)
 	(*this)[i] = a[i];
 }
 	
-//! ‹L‰¯—Ìˆæ‚ğŒ³‚Ì”z—ñ‚Æ‹¤—L‚µ‚½•”•ª”z—ñ‚ğì‚éD
+//! è¨˜æ†¶é ˜åŸŸã‚’å…ƒã®é…åˆ—ã¨å…±æœ‰ã—ãŸéƒ¨åˆ†é…åˆ—ã‚’ä½œã‚‹ï¼
 /*!
-  \param a	”z—ñ
-  \param i	•”•ª”z—ñ‚Ì‘æ0—v‘f‚ğw’è‚·‚éindex
-  \param d	•”•ª”z—ñ‚ÌŸŒ³(—v‘f”)
+  \param a	é…åˆ—
+  \param i	éƒ¨åˆ†é…åˆ—ã®ç¬¬0è¦ç´ ã‚’æŒ‡å®šã™ã‚‹index
+  \param d	éƒ¨åˆ†é…åˆ—ã®æ¬¡å…ƒ(è¦ç´ æ•°)
 */
 template <class T, class B> template <class B2> inline
 Array<T, B>::Array(Array<T, B2>& a, u_int i, u_int d)
@@ -735,11 +735,11 @@ Array<T, B>::Array(Array<T, B2>& a, u_int i, u_int d)
 {
 }
 
-//! ‘¼‚Ì”z—ñ‚ğ©•ª‚É‘ã“ü‚·‚éi•W€‘ã“ü‰‰Zq‚ÌŠg’£jD
+//! ä»–ã®é…åˆ—ã‚’è‡ªåˆ†ã«ä»£å…¥ã™ã‚‹ï¼ˆæ¨™æº–ä»£å…¥æ¼”ç®—å­ã®æ‹¡å¼µï¼‰ï¼
 /*!
-  •W€‘ã“ü‰‰Zq‚Í•ÊŒÂ©“®“I‚É¶¬‚³‚ê‚éD
-  \param a	ƒRƒs[Œ³‚Ì”z—ñ
-  \return	‚±‚Ì”z—ñ
+  æ¨™æº–ä»£å…¥æ¼”ç®—å­ã¯åˆ¥å€‹è‡ªå‹•çš„ã«ç”Ÿæˆã•ã‚Œã‚‹ï¼
+  \param a	ã‚³ãƒ”ãƒ¼å…ƒã®é…åˆ—
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B> template <class T2, class B2> Array<T, B>&
 Array<T, B>::operator =(const Array<T2, B2>& a)
@@ -750,10 +750,10 @@ Array<T, B>::operator =(const Array<T2, B2>& a)
     return *this;
 }
     
-//! ‘S‚Ä‚Ì—v‘f‚É“¯ˆê‚Ì’l‚ğ‘ã“ü‚·‚éD
+//! å…¨ã¦ã®è¦ç´ ã«åŒä¸€ã®å€¤ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  \param c	‘ã“ü‚·‚é’l
-  \return	‚±‚Ì”z—ñ
+  \param c	ä»£å…¥ã™ã‚‹å€¤
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B> Array<T, B>&
 Array<T, B>::operator =(const value_type& c)
@@ -763,9 +763,9 @@ Array<T, B>::operator =(const value_type& c)
     return *this;
 }
 
-//! ”z—ñ‚Ìæ“ª—v‘f‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®å…ˆé ­è¦ç´ ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	æ“ª—v‘f‚ğw‚·”½•œq
+  \return	å…ˆé ­è¦ç´ ã‚’æŒ‡ã™åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::iterator
 Array<T, B>::begin()
@@ -773,9 +773,9 @@ Array<T, B>::begin()
     return buf_type::ptr();
 }
 
-//! ”z—ñ‚Ìæ“ª—v‘f‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®å…ˆé ­è¦ç´ ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	æ“ª—v‘f‚ğw‚·’è””½•œq
+  \return	å…ˆé ­è¦ç´ ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::const_iterator
 Array<T, B>::begin() const
@@ -783,9 +783,9 @@ Array<T, B>::begin() const
     return buf_type::ptr();
 }
 
-//! ”z—ñ‚Ì––”ö‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®æœ«å°¾ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	––”ö‚ğw‚·”½•œq
+  \return	æœ«å°¾ã‚’æŒ‡ã™åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::iterator
 Array<T, B>::end()
@@ -793,9 +793,9 @@ Array<T, B>::end()
     return begin() + size();
 }
 
-//! ”z—ñ‚Ì––”ö‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®æœ«å°¾ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	––”ö‚ğw‚·’è””½•œq
+  \return	æœ«å°¾ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::const_iterator
 Array<T, B>::end() const
@@ -803,9 +803,9 @@ Array<T, B>::end() const
     return begin() + size();
 }
 
-//! ”z—ñ‚Ì––”ö—v‘f‚ğw‚·‹t”½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®æœ«å°¾è¦ç´ ã‚’æŒ‡ã™é€†åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	––”ö—v‘f‚ğw‚·‹t”½•œq
+  \return	æœ«å°¾è¦ç´ ã‚’æŒ‡ã™é€†åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::reverse_iterator
 Array<T, B>::rbegin()
@@ -813,9 +813,9 @@ Array<T, B>::rbegin()
     return reverse_iterator(end());
 }
 
-//! ”z—ñ‚Ì––”ö—v‘f‚ğw‚·‹t”½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®æœ«å°¾è¦ç´ ã‚’æŒ‡ã™é€†åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	––”ö—v‘f‚ğw‚·‹t”½•œq
+  \return	æœ«å°¾è¦ç´ ã‚’æŒ‡ã™é€†åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
 Array<T, B>::rbegin() const
@@ -823,9 +823,9 @@ Array<T, B>::rbegin() const
     return const_reverse_iterator(end());
 }
 
-//! ”z—ñ‚Ìæ“ª‚ğw‚·‹t”½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™é€†åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	æ“ª‚ğw‚·‹t”½•œq
+  \return	å…ˆé ­ã‚’æŒ‡ã™é€†åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::reverse_iterator
 Array<T, B>::rend()
@@ -833,9 +833,9 @@ Array<T, B>::rend()
     return reverse_iterator(begin());
 }
 
-//! ”z—ñ‚Ìæ“ª‚ğw‚·‹t”½•œq‚ğ•Ô‚·D
+//! é…åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™é€†åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	æ“ª‚ğw‚·‹t”½•œq
+  \return	å…ˆé ­ã‚’æŒ‡ã™é€†åå¾©å­
 */
 template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
 Array<T, B>::rend() const
@@ -843,9 +843,9 @@ Array<T, B>::rend() const
     return const_reverse_iterator(begin());
 }
 
-//! ”z—ñ‚Ì“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! é…åˆ—ã®å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 /*!
-  \return	“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \return	å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T, class B> inline
 Array<T, B>::operator pointer()
@@ -853,9 +853,9 @@ Array<T, B>::operator pointer()
     return buf_type::ptr();
 }
 
-//! ”z—ñ‚Ì“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! é…åˆ—ã®å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 /*!
-  \return	“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \return	å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T, class B> inline
 Array<T, B>::operator const_pointer() const
@@ -863,18 +863,18 @@ Array<T, B>::operator const_pointer() const
     return buf_type::ptr();
 }
 
-//! ”z—ñ‚ÌŸŒ³i—v‘f”j‚ğ•Ô‚·D
+//! é…åˆ—ã®æ¬¡å…ƒï¼ˆè¦ç´ æ•°ï¼‰ã‚’è¿”ã™ï¼
 template <class T, class B> inline u_int
 Array<T, B>::dim() const
 {
     return size();
 }
     
-//! ”z—ñ‚Ì—v‘f‚ÖƒAƒNƒZƒX‚·‚éiLIBTUTOOLS_DEBUG‚ğw’è‚·‚é‚Æindex‚Ìƒ`ƒFƒbƒN‚ ‚èjD
+//! é…åˆ—ã®è¦ç´ ã¸ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ï¼ˆLIBTUTOOLS_DEBUGã‚’æŒ‡å®šã™ã‚‹ã¨indexã®ãƒã‚§ãƒƒã‚¯ã‚ã‚Šï¼‰ï¼
 /*!
-  \param i			—v‘f‚ğw’è‚·‚éindex
-  \return			index‚É‚æ‚Á‚Äw’è‚³‚ê‚½—v‘f
-  \throw std::out_of_range	0 <= i < dim()‚Å‚È‚¢ê‡‚É‘—o
+  \param i			è¦ç´ ã‚’æŒ‡å®šã™ã‚‹index
+  \return			indexã«ã‚ˆã£ã¦æŒ‡å®šã•ã‚ŒãŸè¦ç´ 
+  \throw std::out_of_range	0 <= i < dim()ã§ãªã„å ´åˆã«é€å‡º
 */
 template <class T, class B> inline typename Array<T, B>::reference
 Array<T, B>::operator [](int i)
@@ -886,11 +886,11 @@ Array<T, B>::operator [](int i)
     return begin()[i];
 }
 
-//! ”z—ñ‚Ì—v‘f‚ÖƒAƒNƒZƒX‚·‚éiLIBTUTOOLS_DEBUG‚ğw’è‚·‚é‚Æindex‚Ìƒ`ƒFƒbƒN‚ ‚èj
+//! é…åˆ—ã®è¦ç´ ã¸ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ï¼ˆLIBTUTOOLS_DEBUGã‚’æŒ‡å®šã™ã‚‹ã¨indexã®ãƒã‚§ãƒƒã‚¯ã‚ã‚Šï¼‰
 /*!
-  \param i			—v‘f‚ğw’è‚·‚éindex
-  \return			index‚É‚æ‚Á‚Äw’è‚³‚ê‚½—v‘f
-  \throw std::out_of_range	0 <= i < dim()‚Å‚È‚¢ê‡‚É‘—o
+  \param i			è¦ç´ ã‚’æŒ‡å®šã™ã‚‹index
+  \return			indexã«ã‚ˆã£ã¦æŒ‡å®šã•ã‚ŒãŸè¦ç´ 
+  \throw std::out_of_range	0 <= i < dim()ã§ãªã„å ´åˆã«é€å‡º
 */
     template <class T, class B> inline typename Array<T, B>::const_reference
 Array<T, B>::operator [](int i) const
@@ -902,10 +902,10 @@ Array<T, B>::operator [](int i) const
     return begin()[i];
 }
 
-//! ‘S‚Ä‚Ì—v‘f‚É“¯ˆê‚Ì”’l‚ğŠ|‚¯‚éD
+//! å…¨ã¦ã®è¦ç´ ã«åŒä¸€ã®æ•°å€¤ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param c	Š|‚¯‚é”’l
-  \return	‚±‚Ì”z—ñ
+  \param c	æ›ã‘ã‚‹æ•°å€¤
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B> Array<T, B>&
 Array<T, B>::operator *=(double c)
@@ -915,10 +915,10 @@ Array<T, B>::operator *=(double c)
     return *this;
 }
 
-//! ‘S‚Ä‚Ì—v‘f‚ğ“¯ˆê‚Ì”’l‚ÅŠ„‚éD
+//! å…¨ã¦ã®è¦ç´ ã‚’åŒä¸€ã®æ•°å€¤ã§å‰²ã‚‹ï¼
 /*!
-  \param c	Š„‚é”’l
-  \return	‚±‚Ì”z—ñ
+  \param c	å‰²ã‚‹æ•°å€¤
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B> inline Array<T, B>&
 Array<T, B>::operator /=(double c)
@@ -926,10 +926,10 @@ Array<T, B>::operator /=(double c)
     return operator *=(1.0 / c);
 }
 
-//! ‚±‚Ì”z—ñ‚É‘¼‚Ì”z—ñ‚ğ‘«‚·D
+//! ã“ã®é…åˆ—ã«ä»–ã®é…åˆ—ã‚’è¶³ã™ï¼
 /*!
-  \param a	‘«‚·”z—ñ
-  \return	‚±‚Ì”z—ñ
+  \param a	è¶³ã™é…åˆ—
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B> template <class T2, class B2> Array<T, B>&
 Array<T, B>::operator +=(const Array<T2, B2>& a)
@@ -940,10 +940,10 @@ Array<T, B>::operator +=(const Array<T2, B2>& a)
     return *this;
 }
 
-//! ‚±‚Ì”z—ñ‚©‚ç‘¼‚Ì”z—ñ‚ğˆø‚­D
+//! ã“ã®é…åˆ—ã‹ã‚‰ä»–ã®é…åˆ—ã‚’å¼•ãï¼
 /*!
-  \param a	ˆø‚­”z—ñ
-  \return	‚±‚Ì”z—ñ
+  \param a	å¼•ãé…åˆ—
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B> template <class T2, class B2> Array<T, B>&
 Array<T, B>::operator -=(const Array<T2, B2>& a)
@@ -954,10 +954,10 @@ Array<T, B>::operator -=(const Array<T2, B2>& a)
     return *this;
 }
 
-//! 2‚Â‚Ì”z—ñ‚ğ—v‘f–ˆ‚É”äŠr‚µC“¯‚¶‚Å‚ ‚é‚©’²‚×‚éD
+//! 2ã¤ã®é…åˆ—ã‚’è¦ç´ æ¯ã«æ¯”è¼ƒã—ï¼ŒåŒã˜ã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param a	”äŠr‘ÎÛ‚Æ‚È‚é”z—ñ
-  \return	‘S‚Ä‚Ì—v‘f‚ª“¯‚¶‚È‚ç‚ÎtrueC‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param a	æ¯”è¼ƒå¯¾è±¡ã¨ãªã‚‹é…åˆ—
+  \return	å…¨ã¦ã®è¦ç´ ãŒåŒã˜ãªã‚‰ã°trueï¼Œãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T, class B> template <class T2, class B2> bool
 Array<T, B>::operator ==(const Array<T2, B2>& a) const
@@ -970,10 +970,10 @@ Array<T, B>::operator ==(const Array<T2, B2>& a) const
     return true;
 }
 
-//! 2‚Â‚Ì”z—ñ‚ğ—v‘f–ˆ‚É”äŠr‚µCˆÙ‚È‚é‚à‚Ì‚ª‘¶İ‚·‚é‚©’²‚×‚éD
+//! 2ã¤ã®é…åˆ—ã‚’è¦ç´ æ¯ã«æ¯”è¼ƒã—ï¼Œç•°ãªã‚‹ã‚‚ã®ãŒå­˜åœ¨ã™ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param a	”äŠr‘ÎÛ‚Æ‚È‚é”z—ñ
-  \return	ˆÙ‚È‚é—v‘f‚ª‘¶İ‚·‚ê‚ÎtrueC‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param a	æ¯”è¼ƒå¯¾è±¡ã¨ãªã‚‹é…åˆ—
+  \return	ç•°ãªã‚‹è¦ç´ ãŒå­˜åœ¨ã™ã‚Œã°trueï¼Œãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T, class B> template <class T2, class B2> inline bool
 Array<T, B>::operator !=(const Array<T2, B2>& a) const
@@ -981,10 +981,10 @@ Array<T, B>::operator !=(const Array<T2, B2>& a) const
     return !(*this == a);
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç”z—ñ‚ğ“Ç‚İ‚Ş(binary)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰é…åˆ—ã‚’èª­ã¿è¾¼ã‚€(binary)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> inline std::istream&
 Array<T, B>::restore(std::istream& in)
@@ -993,10 +993,10 @@ Array<T, B>::restore(std::istream& in)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚É”z—ñ‚ğ‘‚«o‚·(binary)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«é…åˆ—ã‚’æ›¸ãå‡ºã™(binary)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> inline std::ostream&
 Array<T, B>::save(std::ostream& out) const
@@ -1005,10 +1005,10 @@ Array<T, B>::save(std::ostream& out) const
     return out;
 }
 
-//! w’è‚µ‚½’l‚ª‚±‚Ì”z—ñ‚Ì—v‘f”‚Éˆê’v‚·‚é‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸå€¤ãŒã“ã®é…åˆ—ã®è¦ç´ æ•°ã«ä¸€è‡´ã™ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param d			’²‚×‚½‚¢’l
-  \throw std::invalid_argument	d != dim()‚Ìê‡‚É‘—o
+  \param d			èª¿ã¹ãŸã„å€¤
+  \throw std::invalid_argument	d != dim()ã®å ´åˆã«é€å‡º
 */
 template <class T, class B> inline void
 Array<T, B>::check_dim(u_int d) const
@@ -1023,11 +1023,11 @@ Array<T, B>::partial_dim(u_int i, u_int d, u_int a)
     return (i+d <= a ? d : i < a ? a-i : 0);
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç”z—ñ‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰é…åˆ—ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param a	”z—ñ‚Ì“Ç‚İ‚İæ
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param a	é…åˆ—ã®èª­ã¿è¾¼ã¿å…ˆ
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> inline std::istream&
 operator >>(std::istream& in, Array<T, B>& a)
@@ -1035,11 +1035,11 @@ operator >>(std::istream& in, Array<T, B>& a)
     return a.get(in >> std::ws);
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚Ö”z—ñ‚ğ‘‚«o‚µ(ASCII)C‚³‚ç‚É‰üsƒR[ƒh‚ğo—Í‚·‚éD
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸é…åˆ—ã‚’æ›¸ãå‡ºã—(ASCII)ï¼Œã•ã‚‰ã«æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›ã™ã‚‹ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param a	‘‚«o‚·”z—ñ
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param a	æ›¸ãå‡ºã™é…åˆ—
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> inline std::ostream&
 operator <<(std::ostream& out, const Array<T, B>& a)
@@ -1050,11 +1050,11 @@ operator <<(std::ostream& out, const Array<T, B>& a)
 /************************************************************************
 *  class Array2<T, B, R>						*
 ************************************************************************/
-//! 1ŸŒ³”z—ñT‚Ì1ŸŒ³”z—ñ‚Æ‚µ‚Ä’è‹`‚³‚ê‚½2ŸŒ³”z—ñƒNƒ‰ƒX
+//! 1æ¬¡å…ƒé…åˆ—Tã®1æ¬¡å…ƒé…åˆ—ã¨ã—ã¦å®šç¾©ã•ã‚ŒãŸ2æ¬¡å…ƒé…åˆ—ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	1ŸŒ³”z—ñ‚ÌŒ^
-  \param B	ƒoƒbƒtƒ@
-  \param R	sƒoƒbƒtƒ@
+  \param T	1æ¬¡å…ƒé…åˆ—ã®å‹
+  \param B	ãƒãƒƒãƒ•ã‚¡
+  \param R	è¡Œãƒãƒƒãƒ•ã‚¡
 */
 template <class T, class B=Buf<typename T::value_type>, class R=Buf<T> >
 class Array2 : public Array<T, R>
@@ -1063,40 +1063,40 @@ class Array2 : public Array<T, R>
     typedef Array<T, R>				super;
     
   public:
-  //! sƒoƒbƒtƒ@‚ÌŒ^
+  //! è¡Œãƒãƒƒãƒ•ã‚¡ã®å‹
     typedef R					row_buf_type;
-  //! s‚ÌŒ^    
+  //! è¡Œã®å‹    
     typedef typename super::value_type		row_type;
-  //! s‚Ö‚ÌQÆ    
+  //! è¡Œã¸ã®å‚ç…§    
     typedef typename super::reference		row_reference;
-  //! ’è”s‚Ö‚ÌQÆ    
+  //! å®šæ•°è¡Œã¸ã®å‚ç…§    
     typedef typename super::const_reference	row_const_reference;
-  //! s‚Ö‚Ìƒ|ƒCƒ“ƒ^    
+  //! è¡Œã¸ã®ãƒã‚¤ãƒ³ã‚¿    
     typedef typename super::pointer		row_pointer;
-  //! ’è”s‚Ö‚Ìƒ|ƒCƒ“ƒ^    
+  //! å®šæ•°è¡Œã¸ã®ãƒã‚¤ãƒ³ã‚¿    
     typedef typename super::const_pointer	row_const_pointer;
-  //! s‚Ì”½•œq    
+  //! è¡Œã®åå¾©å­    
     typedef typename super::iterator		row_iterator;
-  //! s‚Ì’è””½•œq    
+  //! è¡Œã®å®šæ•°åå¾©å­    
     typedef typename super::const_iterator	row_const_iterator;
-  //! s‚Ì‹t”½•œq    
+  //! è¡Œã®é€†åå¾©å­    
     typedef typename super::reverse_iterator	row_reverse_iterator;
-  //! s‚Ì’è”‹t”½•œq    
+  //! è¡Œã®å®šæ•°é€†åå¾©å­    
     typedef typename super::const_reverse_iterator
 						row_const_reverse_iterator;
-  //! ƒoƒbƒtƒ@‚ÌŒ^    
+  //! ãƒãƒƒãƒ•ã‚¡ã®å‹    
     typedef B					buf_type;
-  //! —v‘f‚ÌŒ^    
+  //! è¦ç´ ã®å‹    
     typedef typename row_type::value_type	value_type;
-  //! —v‘f‚Ö‚ÌQÆ    
+  //! è¦ç´ ã¸ã®å‚ç…§    
     typedef typename row_type::reference	reference;
-  //! ’è”—v‘f‚Ö‚ÌQÆ    
+  //! å®šæ•°è¦ç´ ã¸ã®å‚ç…§    
     typedef typename row_type::const_reference	const_reference;
-  //! —v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^    
+  //! è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿    
     typedef typename row_type::pointer		pointer;
-  //! ’è”—v‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^    
+  //! å®šæ•°è¦ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿    
     typedef typename row_type::const_pointer	const_pointer;
-  //! ƒ|ƒCƒ“ƒ^ŠÔ‚Ì·    
+  //! ãƒã‚¤ãƒ³ã‚¿é–“ã®å·®    
     typedef std::ptrdiff_t			difference_type;
 
   public:
@@ -1139,7 +1139,7 @@ class Array2 : public Array<T, R>
     buf_type		_buf;
 };
 
-//! 2ŸŒ³”z—ñ‚ğ¶¬‚·‚éD
+//! 2æ¬¡å…ƒé…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 template <class T, class B, class R> inline
 Array2<T, B, R>::Array2()
     :super(), _ncol(0), _buf()
@@ -1149,10 +1149,10 @@ Array2<T, B, R>::Array2()
     set_rows();
 }
 
-//! s”‚Æ—ñ”‚ğw’è‚µ‚Ä2ŸŒ³”z—ñ‚ğ¶¬‚·‚éD
+//! è¡Œæ•°ã¨åˆ—æ•°ã‚’æŒ‡å®šã—ã¦2æ¬¡å…ƒé…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param r	s”
-  \param c	—ñ”
+  \param r	è¡Œæ•°
+  \param c	åˆ—æ•°
 */
 template <class T, class B, class R> inline
 Array2<T, B, R>::Array2(u_int r, u_int c)
@@ -1161,11 +1161,11 @@ Array2<T, B, R>::Array2(u_int r, u_int c)
     set_rows();
 }
 
-//! ŠO•”‚Ì—Ìˆæ‚Æs”‚¨‚æ‚Ñ—ñ”‚ğw’è‚µ‚Ä2ŸŒ³”z—ñ‚ğ¶¬‚·‚éD
+//! å¤–éƒ¨ã®é ˜åŸŸã¨è¡Œæ•°ãŠã‚ˆã³åˆ—æ•°ã‚’æŒ‡å®šã—ã¦2æ¬¡å…ƒé…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param p	ŠO•”—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param r	s”
-  \param c	—ñ”
+  \param p	å¤–éƒ¨é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param r	è¡Œæ•°
+  \param c	åˆ—æ•°
 */
 template <class T, class B, class R> inline
 Array2<T, B, R>::Array2(pointer p, u_int r, u_int c)
@@ -1174,9 +1174,9 @@ Array2<T, B, R>::Array2(pointer p, u_int r, u_int c)
     set_rows();
 }
 
-//! ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 /*!
-  \param a	ƒRƒs[Œ³‚Ì”z—ñ
+  \param a	ã‚³ãƒ”ãƒ¼å…ƒã®é…åˆ—
 */
 template <class T, class B, class R> inline
 Array2<T, B, R>::Array2(const Array2& a)
@@ -1186,12 +1186,12 @@ Array2<T, B, R>::Array2(const Array2& a)
     super::operator =(a);
 }    
 
-//! ‘¼‚Ì”z—ñ‚Æ“¯ˆê—v‘f‚ğ‚Â”z—ñ‚ğì‚éiƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÌŠg’£jD
+//! ä»–ã®é…åˆ—ã¨åŒä¸€è¦ç´ ã‚’æŒã¤é…åˆ—ã‚’ä½œã‚‹ï¼ˆã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®æ‹¡å¼µï¼‰ï¼
 /*!
-  ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ğ’è‹`‚µ‚È‚¢‚Æ©“®“I‚Éì‚ç‚ê‚Ä‚µ‚Ü‚¤‚Ì‚ÅC
-  ‚±‚ÌƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ª‚ ‚Á‚Ä‚àƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ğ•ÊŒÂ‚É’è‹`
-  ‚µ‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
-  \param a	ƒRƒs[Œ³‚Ì”z—ñ
+  ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’å®šç¾©ã—ãªã„ã¨è‡ªå‹•çš„ã«ä½œã‚‰ã‚Œã¦ã—ã¾ã†ã®ã§ï¼Œ
+  ã“ã®ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãŒã‚ã£ã¦ã‚‚ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’åˆ¥å€‹ã«å®šç¾©
+  ã—ãªã‘ã‚Œã°ãªã‚‰ãªã„ï¼
+  \param a	ã‚³ãƒ”ãƒ¼å…ƒã®é…åˆ—
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
 inline
@@ -1202,13 +1202,13 @@ Array2<T, B, R>::Array2(const Array2<T2, B2, R2>& a)
     super::operator =(a);
 }    
 
-//! ‹L‰¯—Ìˆæ‚ğŒ³‚Ì”z—ñ‚Æ‹¤—L‚µ‚½•”•ª”z—ñ‚ğì‚é
+//! è¨˜æ†¶é ˜åŸŸã‚’å…ƒã®é…åˆ—ã¨å…±æœ‰ã—ãŸéƒ¨åˆ†é…åˆ—ã‚’ä½œã‚‹
 /*!
-  \param a	”z—ñ
-  \param i	•”•ª”z—ñ‚Ì¶ã‹÷—v‘f‚Ìs‚ğw’è‚·‚éindex
-  \param j	•”•ª”z—ñ‚Ì¶ã‹÷—v‘f‚Ì—ñ‚ğw’è‚·‚éindex
-  \param r	•”•ª”z—ñ‚Ìs”
-  \param c	•”•ª”z—ñ‚Ì—ñ”
+  \param a	é…åˆ—
+  \param i	éƒ¨åˆ†é…åˆ—ã®å·¦ä¸Šéš…è¦ç´ ã®è¡Œã‚’æŒ‡å®šã™ã‚‹index
+  \param j	éƒ¨åˆ†é…åˆ—ã®å·¦ä¸Šéš…è¦ç´ ã®åˆ—ã‚’æŒ‡å®šã™ã‚‹index
+  \param r	éƒ¨åˆ†é…åˆ—ã®è¡Œæ•°
+  \param c	éƒ¨åˆ†é…åˆ—ã®åˆ—æ•°
 */
 template <class T, class B, class R> template <class B2, class R2>
 Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
@@ -1223,10 +1223,10 @@ Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
 	(*this)[ii].resize(pointer(&a[i+ii][j]), ncol());
 }    
 
-//! •W€‘ã“ü‰‰Zq
+//! æ¨™æº–ä»£å…¥æ¼”ç®—å­
 /*!
-  \param a	ƒRƒs[Œ³‚Ì”z—ñ
-  \return	‚±‚Ì”z—ñ
+  \param a	ã‚³ãƒ”ãƒ¼å…ƒã®é…åˆ—
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B, class R> inline Array2<T, B, R>&
 Array2<T, B, R>::operator =(const Array2& a)
@@ -1236,12 +1236,12 @@ Array2<T, B, R>::operator =(const Array2& a)
     return *this;
 }
 
-//! ‘¼‚Ì”z—ñ‚ğ©•ª‚É‘ã“ü‚·‚éi•W€‘ã“ü‰‰Zq‚ÌŠg’£jD
+//! ä»–ã®é…åˆ—ã‚’è‡ªåˆ†ã«ä»£å…¥ã™ã‚‹ï¼ˆæ¨™æº–ä»£å…¥æ¼”ç®—å­ã®æ‹¡å¼µï¼‰ï¼
 /*!
-  •W€‘ã“ü‰‰Zq‚ğ’è‹`‚µ‚È‚¢‚Æ©“®“I‚Éì‚ç‚ê‚Ä‚µ‚Ü‚¤‚Ì‚ÅC‚±‚Ì‘ã“ü‰‰Zq‚ª
-  ‚ ‚Á‚Ä‚à•W€‘ã“ü‰‰Zq‚ğ•ÊŒÂ‚É’è‹`‚µ‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
-  \param a	ƒRƒs[Œ³‚Ì”z—ñ
-  \return	‚±‚Ì”z—ñ
+  æ¨™æº–ä»£å…¥æ¼”ç®—å­ã‚’å®šç¾©ã—ãªã„ã¨è‡ªå‹•çš„ã«ä½œã‚‰ã‚Œã¦ã—ã¾ã†ã®ã§ï¼Œã“ã®ä»£å…¥æ¼”ç®—å­ãŒ
+  ã‚ã£ã¦ã‚‚æ¨™æº–ä»£å…¥æ¼”ç®—å­ã‚’åˆ¥å€‹ã«å®šç¾©ã—ãªã‘ã‚Œã°ãªã‚‰ãªã„ï¼
+  \param a	ã‚³ãƒ”ãƒ¼å…ƒã®é…åˆ—
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B, class R> template <class T2, class B2, class R2>
 inline Array2<T, B, R>&
@@ -1252,10 +1252,10 @@ Array2<T, B, R>::operator =(const Array2<T2, B2, R2>& a)
     return *this;
 }
 
-//! ‘S‚Ä‚Ì—v‘f‚É“¯ˆê‚Ì’l‚ğ‘ã“ü‚·‚éD
+//! å…¨ã¦ã®è¦ç´ ã«åŒä¸€ã®å€¤ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  \param c	‘ã“ü‚·‚é’l
-  \return	‚±‚Ì”z—ñ
+  \param c	ä»£å…¥ã™ã‚‹å€¤
+  \return	ã“ã®é…åˆ—
 */
 template <class T, class B, class R> Array2<T, B, R>&
 Array2<T, B, R>::operator =(const value_type& c)
@@ -1265,9 +1265,9 @@ Array2<T, B, R>::operator =(const value_type& c)
     return *this;
 }
 
-//! 2ŸŒ³”z—ñ‚Ì“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! 2æ¬¡å…ƒé…åˆ—ã®å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 /*!
-  \return	“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \return	å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T, class B, class R> inline
 Array2<T, B, R>::operator pointer()
@@ -1275,9 +1275,9 @@ Array2<T, B, R>::operator pointer()
     return _buf.ptr();
 }
 
-//! 2ŸŒ³”z—ñ‚Ì“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+//! 2æ¬¡å…ƒé…åˆ—ã®å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
 /*!
-  \return	“à•”‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \return	å†…éƒ¨è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T, class B, class R> inline
 Array2<T, B, R>::operator const_pointer() const
@@ -1285,9 +1285,9 @@ Array2<T, B, R>::operator const_pointer() const
     return _buf.ptr();
 }
 
-//! 2ŸŒ³”z—ñ‚Ìs”‚ğ•Ô‚·D
+//! 2æ¬¡å…ƒé…åˆ—ã®è¡Œæ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	s”
+  \return	è¡Œæ•°
 */
 template <class T, class B, class R> inline u_int
 Array2<T, B, R>::nrow() const
@@ -1295,9 +1295,9 @@ Array2<T, B, R>::nrow() const
     return size();
 }
 
-//! 2ŸŒ³”z—ñ‚Ì—ñ”‚ğ•Ô‚·D
+//! 2æ¬¡å…ƒé…åˆ—ã®åˆ—æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	—ñ”
+  \return	åˆ—æ•°
 */
 template <class T, class B, class R> inline u_int
 Array2<T, B, R>::ncol() const
@@ -1305,9 +1305,9 @@ Array2<T, B, R>::ncol() const
     return _ncol;
 }
 
-//! 2ŸŒ³”z—ñ‚Ì—×Ú‚·‚és‚ÌŠÔŠu‚ğ—v‘f”’PˆÊ‚Å•Ô‚·D
+//! 2æ¬¡å…ƒé…åˆ—ã®éš£æ¥ã™ã‚‹è¡Œã®é–“éš”ã‚’è¦ç´ æ•°å˜ä½ã§è¿”ã™ï¼
 /*!
-  \return	ŠÔŠu
+  \return	é–“éš”
 */
 template <class T, class B, class R> inline u_int
 Array2<T, B, R>::stride() const
@@ -1316,12 +1316,12 @@ Array2<T, B, R>::stride() const
 		       : _ncol);
 }
 
-//! ”z—ñ‚ÌƒTƒCƒY‚ğ•ÏX‚·‚éD
+//! é…åˆ—ã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param r	V‚µ‚¢s”
-  \param c	V‚µ‚¢—ñ”
-  \return	r‚ªŒ³‚Ìs”‚æ‚è‘å‚«‚¢–”‚Íc‚ªŒ³‚Ì—ñ”‚ÆˆÙ‚È‚ê‚ÎtrueC
-		‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param r	æ–°ã—ã„è¡Œæ•°
+  \param c	æ–°ã—ã„åˆ—æ•°
+  \return	rãŒå…ƒã®è¡Œæ•°ã‚ˆã‚Šå¤§ãã„åˆã¯cãŒå…ƒã®åˆ—æ•°ã¨ç•°ãªã‚Œã°trueï¼Œ
+		ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T, class B, class R> bool
 Array2<T, B, R>::resize(u_int r, u_int c)
@@ -1335,11 +1335,11 @@ Array2<T, B, R>::resize(u_int r, u_int c)
     return true;
 }
 
-//! ”z—ñ‚ª“à•”‚Åg—p‚·‚é‹L‰¯—Ìˆæ‚ğw’è‚µ‚½‚à‚Ì‚É•ÏX‚·‚éD
+//! é…åˆ—ãŒå†…éƒ¨ã§ä½¿ç”¨ã™ã‚‹è¨˜æ†¶é ˜åŸŸã‚’æŒ‡å®šã—ãŸã‚‚ã®ã«å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param p	V‚µ‚¢‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param r	V‚µ‚¢s”
-  \param c	V‚µ‚¢—ñ”
+  \param p	æ–°ã—ã„è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param r	æ–°ã—ã„è¡Œæ•°
+  \param c	æ–°ã—ã„åˆ—æ•°
 */
 template <class T, class B, class R> void
 Array2<T, B, R>::resize(pointer p, u_int r, u_int c)
@@ -1350,10 +1350,10 @@ Array2<T, B, R>::resize(pointer p, u_int r, u_int c)
     set_rows();
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç”z—ñ‚ğ“Ç‚İ‚Ş(binary)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰é…åˆ—ã‚’èª­ã¿è¾¼ã‚€(binary)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B, class R> std::istream&
 Array2<T, B, R>::restore(std::istream& in)
@@ -1363,10 +1363,10 @@ Array2<T, B, R>::restore(std::istream& in)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚É”z—ñ‚ğ‘‚«o‚·(binary)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«é…åˆ—ã‚’æ›¸ãå‡ºã™(binary)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B, class R> std::ostream&
 Array2<T, B, R>::save(std::ostream& out) const
@@ -1376,13 +1376,13 @@ Array2<T, B, R>::save(std::ostream& out) const
     return out;
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çw’è‚µ‚½‰ÓŠ‚É2ŸŒ³”z—ñ‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰æŒ‡å®šã—ãŸç®‡æ‰€ã«2æ¬¡å…ƒé…åˆ—ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param i	“Ç‚İ‚İæ‚Ìæ“ªs‚ğw’è‚·‚éindex
-  \param j	“Ç‚İ‚İæ‚Ìæ“ª—ñ‚ğw’è‚·‚éindex
-  \param jmax	‚±‚ê‚Ü‚Å‚É“Ç‚ñ‚Å‚«‚½—v‘f‚Ì—ñ”Ô†‚ÌÅ‘å’l
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param i	èª­ã¿è¾¼ã¿å…ˆã®å…ˆé ­è¡Œã‚’æŒ‡å®šã™ã‚‹index
+  \param j	èª­ã¿è¾¼ã¿å…ˆã®å…ˆé ­åˆ—ã‚’æŒ‡å®šã™ã‚‹index
+  \param jmax	ã“ã‚Œã¾ã§ã«èª­ã‚“ã§ããŸè¦ç´ ã®åˆ—ç•ªå·ã®æœ€å¤§å€¤
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B, class R> std::istream&
 Array2<T, B, R>::get(std::istream& in, u_int i, u_int j, u_int jmax)
@@ -1427,11 +1427,11 @@ Array2<T, B, R>::set_rows()
 	(*this)[i].resize(_buf.ptr() + i*stride, ncol());
 }
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç”z—ñ‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰é…åˆ—ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param a	”z—ñ‚Ì“Ç‚İ‚İæ
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param a	é…åˆ—ã®èª­ã¿è¾¼ã¿å…ˆ
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B, class R> inline std::istream&
 operator >>(std::istream& in, Array2<T, B, R>& a)

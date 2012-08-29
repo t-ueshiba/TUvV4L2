@@ -1,38 +1,32 @@
 #
-#  $Id: Makefile,v 1.21 2009-07-13 01:15:14 ueshiba Exp $
+#  $Id: Makefile,v 1.22 2012-08-29 21:16:57 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include/TU
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
 CPPFLAGS	=
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CCC), icpc)
+ifeq ($(CXX), icpc)
   CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2�ʾ�ˤ���ȥ���ѥ��륨�顼�ˤʤ롥
-  ifeq ($(OSTYPE), darwin)
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  else
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  endif
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#
 #########################
 .SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Object++.h \
 		/usr/local/include/TU/types.h \
 		TU/Collection++.h
@@ -43,18 +37,6 @@ SRCS		= Collection++.cc \
 OBJS		= Collection++.o \
 		ObjTreeBase.o \
 		TUCollection++.sa.o
-
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.21 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
 
 include $(PROJECT)/lib/l.mk
 ###

@@ -1,5 +1,5 @@
 /*
- *  $Id: BrepCmdPane.cc,v 1.3 2002-07-25 08:37:07 ueshiba Exp $
+ *  $Id: BrepCmdPane.cc,v 1.4 2012-08-29 21:17:14 ueshiba Exp $
  */
 #include "TU/v/Vision++.h"
 #include <iomanip>

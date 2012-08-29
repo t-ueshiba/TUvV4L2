@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.h,v 1.17 2012-06-21 10:15:02 ueshiba Exp $
+ *  $Id: Warp.h,v 1.18 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Warp.h
-  \brief	�N���X TU::Warp �̒�`�Ǝ���
+  \brief	クラス TU::Warp の定義と実装
 */
 #ifndef	__TUWarp_h
 #define	__TUWarp_h
@@ -47,7 +47,7 @@ namespace TU
 /************************************************************************
 *  class Warp								*
 ************************************************************************/
-//! �摜��ό`���邽�߂̃N���X
+//! 画像を変形するためのクラス
 class Warp
 {
   private:
@@ -91,18 +91,18 @@ class Warp
 #endif
     
   public:
-  //! �摜�ό`�I�u�W�F�N�g�𐶐�����D
+  //! 画像変形オブジェクトを生成する．
     Warp()	:_fracs(), _width(0)			{}
 
-  //! �o�͉摜�̕���Ԃ��D
+  //! 出力画像の幅を返す．
   /*!
-    return	�o�͉摜�̕�
+    return	出力画像の幅
   */
     u_int	width()				const	{return _width;}
 
-  //! �o�͉摜�̍�����Ԃ��D
+  //! 出力画像の高さを返す．
   /*!
-    return	�o�͉摜�̍���
+    return	出力画像の高さ
   */
     u_int	height()			const	{return _fracs.dim();}
     
@@ -145,13 +145,13 @@ Warp::FracArray::resize(u_int d)
     dv.resize(d);
 }
 
-//! �o�͉摜�ɂ�����w�肳�ꂽ�s�̗L�����[�ʒu��Ԃ��D
+//! 出力画像における指定された行の有効左端位置を返す．
 /*!
-  ���͉摜����`�ł��o�͉摜����`�Ƃ͌���Ȃ��̂ŁC�o�͉摜�̈ꕔ����
-  ���͉摜�̒l��(�L���̈�)�ƂȂ�Ȃ��D�{�֐��́C�o�͉摜�̎w�肳�ꂽ�s
-  �ɂ��āC���̗L���̈�̍��[�ƂȂ��f�ʒu��Ԃ��D
-  \param v	�s���w�肷��intex
-  \return	���[�ʒu
+  入力画像が矩形でも出力画像も矩形とは限らないので，出力画像の一部しか
+  入力画像の値域(有効領域)とならない．本関数は，出力画像の指定された行
+  について，その有効領域の左端となる画素位置を返す．
+  \param v	行を指定するintex
+  \return	左端位置
 */
 inline int
 Warp::lmost(int v) const
@@ -159,13 +159,13 @@ Warp::lmost(int v) const
     return _fracs[v].lmost;
 }
 
-//! �o�͉摜�ɂ�����w�肳�ꂽ�s�̗L���E�[�ʒu�̎���Ԃ��D
+//! 出力画像における指定された行の有効右端位置の次を返す．
 /*!
-  ���͉摜����`�ł��o�͉摜����`�Ƃ͌���Ȃ��̂ŁC�o�͉摜�̈ꕔ����
-  ���͉摜�̒l��(�L���̈�)�ƂȂ�Ȃ��D�{�֐��́C�o�͉摜�̎w�肳�ꂽ�s
-  �ɂ��āC���̗L���̈�̉E�[�̉E�ׂƂȂ��f�ʒu��Ԃ��D
-  \param v	�s���w�肷��intex
-  \return	�E�[�ʒu�̎�
+  入力画像が矩形でも出力画像も矩形とは限らないので，出力画像の一部しか
+  入力画像の値域(有効領域)とならない．本関数は，出力画像の指定された行
+  について，その有効領域の右端の右隣となる画素位置を返す．
+  \param v	行を指定するintex
+  \return	右端位置の次
 */
 inline int
 Warp::rmost(int v) const
@@ -173,20 +173,20 @@ Warp::rmost(int v) const
     return _fracs[v].lmost + _fracs[v].width();
 }
 
-//! �摜���ˉe�ϊ����邽�߂̍s���ݒ肷��D
+//! 画像を射影変換するための行列を設定する．
 /*!
-  ���͉摜�_u�͎ˉe�ϊ�
+  入力画像点uは射影変換
   \f[
     \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
     \TUvec{H}{} \TUbeginarray{c} \TUvec{u}{} \\ 1 \TUendarray
   \f]
-  �ɂ���ďo�͉摜�_v�Ɏʂ����D
-  \param Htinv		�ό`���w�肷��3x3�ˉe�ϊ��s��̋t�s��̓]�u�C���Ȃ킿
+  によって出力画像点vに写される．
+  \param Htinv		変形を指定する3x3射影変換行列の逆行列の転置，すなわち
 			\f$\TUtinv{H}{}\f$
-  \param inWidth	���͉摜�̕�
-  \param inHeight	���͉摜�̍���
-  \param outWidth	�o�͉摜�̕�
-  \param outHeight	�o�͉摜�̍���
+  \param inWidth	入力画像の幅
+  \param inHeight	入力画像の高さ
+  \param outWidth	出力画像の幅
+  \param outHeight	出力画像の高さ
 */
 template <class T> inline void
 Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
@@ -198,32 +198,32 @@ Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
 	       inWidth, inHeight, outWidth, outHeight);
 }
 
-//! �摜�̔���`�c�݂�����������Ɏˉe�ϊ����s�����߂̍s��ƃJ���������p�����[�^��ݒ肷��D
+//! 画像の非線形歪みを除去した後に射影変換を行うための行列とカメラ内部パラメータを設定する．
 /*!
 
-  canonical���Wx����摜���Wu�ւ̕ϊ���\f$\TUvec{u}{} = {\cal
-  K}(\TUvec{x}{})\f$ �ƕ\�����J���������p�����[�^�ɂ��āC���̐��`��
-  ��������\��3x3�㔼�O�p�s���K�Ƃ���ƁC
+  canonical座標xから画像座標uへの変換が\f$\TUvec{u}{} = {\cal
+  K}(\TUvec{x}{})\f$ と表されるカメラ内部パラメータについて，その線形変
+  換部分を表す3x3上半三角行列をKとすると，
   \f[
     \TUbeginarray{c} \TUbar{u}{} \\ 1 \TUendarray =
     \TUvec{K}{}
     \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
   \f]
-  �ɂ���ĉ摜�̔���`�c�݂����������ł���D�{�֐��́C���̘c�݂����������摜�_��
-  �ˉe�ϊ�H�ɂ���ďo�͉摜�_v�Ɏʂ��悤�ɕό`�p�����[�^��ݒ肷��D���Ȃ킿�C
-  �S�̂̕ό`��
+  によって画像の非線形歪みだけを除去できる．本関数は，この歪みを除去した画像点を
+  射影変換Hによって出力画像点vに写すように変形パラメータを設定する．すなわち，
+  全体の変形は
   \f[
     \TUbeginarray{c} \TUvec{v}{} \\ 1 \TUendarray \simeq
     \TUvec{H}{}\TUvec{K}{}
     \TUbeginarray{c} {\cal K}^{-1}(\TUvec{u}{}) \\ 1 \TUendarray
   \f]
-  �ƂȂ�D
-  \param Htinv		�ό`���w�肷��3x3�ˉe�ϊ��s��̋t�s��̓]�u
-  \param intrinsic	���͉摜�ɉ�������Ă�����˘c�Ȃ�\���J���������p�����[�^
-  \param inWidth	���͉摜�̕�
-  \param inHeight	���͉摜�̍���
-  \param outWidth	�o�͉摜�̕�
-  \param outHeight	�o�͉摜�̍���
+  となる．
+  \param Htinv		変形を指定する3x3射影変換行列の逆行列の転置
+  \param intrinsic	入力画像に加えれられている放射歪曲を表すカメラ内部パラメータ
+  \param inWidth	入力画像の幅
+  \param inHeight	入力画像の高さ
+  \param outWidth	出力画像の幅
+  \param outHeight	出力画像の高さ
 */
 template <class I> void
 Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
@@ -278,10 +278,10 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
     }
 }
 
-//! �o�͉摜�͈̔͂��w�肵�ĉ摜��ό`����D
+//! 出力画像の範囲を指定して画像を変形する．
 /*!
-  \param in	���͉摜
-  \param out	�o�͉摜
+  \param in	入力画像
+  \param out	出力画像
 */
 template <class T> void
 Warp::operator ()(const Image<T>& in, Image<T>& out) const
@@ -299,11 +299,11 @@ Warp::operator ()(const Image<T>& in, Image<T>& out) const
 #endif
 }
     
-//! �o�͉摜�_���w�肵�Ă���Ƀ}�b�v�������͉摜�_��2�������W��Ԃ��D
+//! 出力画像点を指定してそれにマップされる入力画像点の2次元座標を返す．
 /*!
-  \param u	�o�͉摜�_�̉����W
-  \param v	�o�͉摜�_�̏c���W
-  \return	�o�͉摜�_(u, v)�Ƀ}�b�v�������͉摜�_��2�������W
+  \param u	出力画像点の横座標
+  \param v	出力画像点の縦座標
+  \return	出力画像点(u, v)にマップされる入力画像点の2次元座標
 */
 inline Vector2f
 Warp::operator ()(int u, int v) const
@@ -316,13 +316,13 @@ Warp::operator ()(int u, int v) const
 }
 
 #if defined(SSE2)
-//! 2�̏o�͉摜�_���w�肵�Ă��ꂼ��Ƀ}�b�v�����2�̓��͉摜�_��2�������W��Ԃ��D
+//! 2つの出力画像点を指定してそれぞれにマップされる2つの入力画像点の2次元座標を返す．
 /*!
-  �w�肳�ꂽ2�������W(u, v)�ɑ΂��C2�_(u, v-1), (u, v)�Ƀ}�b�v�������͉摜�_��
-  2�������W���Ԃ����D
-  \param u	�o�͉摜�_�̉����W
-  \param v	�o�͉摜�_�̏c���W
-  \return	�o�͉摜�_(u, v-1), (u, v)�Ƀ}�b�v�������͉摜�_��2�������W
+  指定された2次元座標(u, v)に対し，2点(u, v-1), (u, v)にマップされる入力画像点の
+  2次元座標が返される．
+  \param u	出力画像点の横座標
+  \param v	出力画像点の縦座標
+  \return	出力画像点(u, v-1), (u, v)にマップされる入力画像点の2次元座標
 */
 inline mm::F32vec
 Warp::src(int u, int v) const

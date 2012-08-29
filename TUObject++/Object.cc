@@ -1,5 +1,5 @@
 /*
- *  $Id: Object.cc,v 1.3 2002-07-26 08:56:04 ueshiba Exp $
+ *  $Id: Object.cc,v 1.4 2012-08-29 21:17:03 ueshiba Exp $
  */
 #include "Object++_.h"
 #include <stdexcept>
@@ -36,9 +36,9 @@ void*
 Object::operator new(size_t size)
 {
     using namespace	std;
-  /* $BMW5a%5%$%:$r(Bbyte$BC10L$+$i(Bblock$BC10L$KJQ99$9$k!%(Bnblocks * sizeof(Block)
-     $B$O(B size $B0J>e$G$"$k$3$H$O$b$A$m$s!$%a%b%j%V%m%C%/$r(BCell$B$H$7$F4IM}$9$k(B
-     $B$3$H$+$i!$(Bsizeof(Cell) $B0J>e$G$J$1$l$P$J$i$J$$!%(B*/
+  /* 要求サイズをbyte単位からblock単位に変更する．nblocks * sizeof(Block)
+     は size 以上であることはもちろん，メモリブロックをCellとして管理する
+     ことから，sizeof(Cell) 以上でなければならない．*/
     const u_int	nblocks = Page::nbytes2nblocks(size);
     if (nblocks == 0)
 	throw std::domain_error("TU::Object::operator new\tToo large memory requirement!!");

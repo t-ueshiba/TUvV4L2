@@ -1,5 +1,5 @@
 /*
- *  $Id: Can++.h,v 1.3 2008-05-15 08:53:48 ueshiba Exp $
+ *  $Id: Can++.h,v 1.4 2012-08-29 21:16:49 ueshiba Exp $
  */
 #ifndef __TUCanPP_h
 #define __TUCanPP_h
@@ -15,12 +15,12 @@ namespace TU
 *  class Can								*
 ************************************************************************/
 /*!
-  CAN(Control Area Network)$B$N%N!<%I$rI=$9%/%i%9!%(B
+  CAN(Control Area Network)のノードを表すクラス．
 */
 class Can
 {
   public:
-  //! $BDL?.B.EY(B
+  //! 通信速度
     enum Baud
     {
 	B10k	=   10,		//!< 10k baud
@@ -45,13 +45,13 @@ class Can
     u_long		nreceive()			;
     u_long		receive()			;
     
-  //! $B%a%C%;!<%8$N(BID$B$rJV$9(B
+  //! メッセージのIDを返す
   /*!
-    \return $B8=:_FI$_9~$^$l$F$$$k%a%C%;!<%8$N(BID$B!%(B*/
+    \return 現在読み込まれているメッセージのID．*/
     u_long		id()			const	{return _msg.id;}
-  //! $B%a%C%;!<%8$K4^$^$l$k%G!<%?$N%P%$%H?t$rJV$9(B
+  //! メッセージに含まれるデータのバイト数を返す
   /*!
-    \return $B8=:_FI$_9~$^$l$F$$$k%a%C%;!<%8$K4^$^$l$k%G!<%?$N%P%$%H?t!%(B*/
+    \return 現在読み込まれているメッセージに含まれるデータのバイト数．*/
     u_int		nbytes()		const	{return _msg.length;}
     u_char		get(u_int i)		const	;
     
@@ -71,17 +71,17 @@ class Can
 *  class Manus								*
 ************************************************************************/
 /*!
-  Manus$B%^%K%T%e%l!<%?(B(Exact Dynamics$B<R(B)$B$rI=$9%/%i%9!%(B
+  Manusマニピュレータ(Exact Dynamics社)を表すクラス．
 */
 class Manus : public Can
 {
   public:
-  //! Manus$B$N8=:_0LCV(B
+  //! Manusの現在位置
     typedef Vector<int, FixedSizedBuf<int, 7> >	Position;
-  //! Manus$B$X$NB.EY;XNaCM(B
+  //! Manusへの速度指令値
     typedef Vector<int, FixedSizedBuf<int, 7> >	Speed;
 
-  //! Manus$B$NF0:n%b!<%I(B
+  //! Manusの動作モード
     enum Mode
     {
 	STILL	  = 0x370,	//!< control box 0: startup/initialization.
@@ -91,107 +91,107 @@ class Manus : public Can
 	FOLD_IN	  = 0x376	//!< control box 6: folding in.
     };
 
-  //! Manus$B$N>uBV(B
+  //! Manusの状態
     enum Status
     {
-	OK			= 0x00,	//!< $B@5>o(B
+	OK			= 0x00,	//!< 正常
 
       // Warnings.
-	STUCK_GRIPPER		= 0x40,	//!< $B%0%j%C%Q$,>c32J*$K>WFM(B
-	WRONG_AREA		= 0x41,	//!< $BJQ$J;Q@*$+$i(Bcartesian/fold$B$K0\9T(B
-	ARM_FOLDED_STRETCHED	= 0x42,	//!< $B%"!<%`$,1d$S$-$C$?(B
-	BLOCKED_DOF		= 0x43,	//!< $B2aIi2Y(B/$B>WFM(B
-	MAXIMUM_M1_ROTATION	= 0x44,	//!< $B2sE>3Q$N8BEY$r1[$($?(B
+	STUCK_GRIPPER		= 0x40,	//!< グリッパが障害物に衝突
+	WRONG_AREA		= 0x41,	//!< 変な姿勢からcartesian/foldに移行
+	ARM_FOLDED_STRETCHED	= 0x42,	//!< アームが延びきった
+	BLOCKED_DOF		= 0x43,	//!< 過負荷/衝突
+	MAXIMUM_M1_ROTATION	= 0x44,	//!< 回転角の限度を越えた
 
       // General messages.
-	FOLDED				= 0x80,	//!< fold$B>uBV(B
-	UNFOLDED			= 0x81,	//!< unfold$B>uBV(B
+	FOLDED				= 0x80,	//!< fold状態
+	UNFOLDED			= 0x81,	//!< unfold状態
 	GRIPPER_REDAY_INITIALISING	= 0x82,	//!< gripper ready
 	ABSOLUTE_MEASURING_READY	= 0x83,	//!< cartesian mode ready
 
       // Errors.
-	IO_80C552_ERROR			= 0xc1,	//!< user I/O$B$N%(%i!<(B
-	ABSOLUTE_ENCODER_ERROR		= 0xc4,	//!< $B%(%s%3!<%@$N%(%i!<(B
-	MOVE_WITHOUT_USER_INPUT_ERROR	= 0xcf,	//!< $BF~NO$,$J$$$N$KF0$$$?(B
-	UNKNOWN_ERROR			= 0xc5	//!< $B$=$NB>$N%(%i!<(B
+	IO_80C552_ERROR			= 0xc1,	//!< user I/Oのエラー
+	ABSOLUTE_ENCODER_ERROR		= 0xc4,	//!< エンコーダのエラー
+	MOVE_WITHOUT_USER_INPUT_ERROR	= 0xcf,	//!< 入力がないのに動いた
+	UNKNOWN_ERROR			= 0xc5	//!< その他のエラー
     };
 
-  //! Manus$B$X$NB.EY;XNa$N:GBgCM(B
+  //! Manusへの速度指令の最大値
     enum SpeedLimits
     {
-	MAX_SPEED_CART_XYZ	= 127,	//!< xyz$B<4$N:GBgB.EY(B(cartesian mode)
-	MAX_SPEED_CART_YPR	=  10,	//!< ypr$B<4$N:GBgB.EY(B(cartesian mode)
-	MAX_SPEED_CART_GRIP	=  15,	//!< $B%0%j%C%Q$N:GBgB.EY(B(cartesian mode)
-	MAX_SPEED_JOINT_012	=  10,	//!< 012$B<4$N:GBgB.EY(B(joint mode)
-	MAX_SPEED_JOINT_345	=  10,	//!< 345$B<4$N:GBgB.EY(B(joint mode)
-	MAX_SPEED_JOINT_GRIP	=  15	//!< $B%0%j%C%Q$N:GBgB.EY(B(joint mode)
+	MAX_SPEED_CART_XYZ	= 127,	//!< xyz軸の最大速度(cartesian mode)
+	MAX_SPEED_CART_YPR	=  10,	//!< ypr軸の最大速度(cartesian mode)
+	MAX_SPEED_CART_GRIP	=  15,	//!< グリッパの最大速度(cartesian mode)
+	MAX_SPEED_JOINT_012	=  10,	//!< 012軸の最大速度(joint mode)
+	MAX_SPEED_JOINT_345	=  10,	//!< 345軸の最大速度(joint mode)
+	MAX_SPEED_JOINT_GRIP	=  15	//!< グリッパの最大速度(joint mode)
     };
 
-  //! cartesian$B%b!<%I$G$N3F<4$N:BI8CM$N:GBg(B/$B:G>.CM(B
+  //! cartesianモードでの各軸の座標値の最大/最小値
     enum CartesianLimits
     {
-	MIN_CART_XYZ	=   -720,	//!< xyz$B<4$N:G>.CM(B
-	MAX_CART_XYZ	=    720,	//!< xyz$B<4$N:GBgCM(B
-	MIN_CART_YAW	=  -1800,	//!< yaw$B<4$N:G>.CM(B
-	MAX_CART_YAW	=   1800,	//!< yaw$B<4$N:GBgCM(B
-	MIN_CART_PITCH	=   -900,	//!< pitch$B<4$N:G>.CM(B
-	MAX_CART_PITCH	=    900,	//!< pitch$B<4$N:GBgCM(B
-	MIN_CART_ROLL	=  -1800,	//!< roll$B<4$N:G>.CM(B
-	MAX_CART_ROLL	=   1800,	//!< roll$B<4$N:GBgCM(B
-	MIN_CART_GRIP	=  28100,	//!< grip$B<4$N:GBgCM(B
-	MAX_CART_GRIP	=  54000	//!< grip$B<4$N:GBgCM(B
+	MIN_CART_XYZ	=   -720,	//!< xyz軸の最小値
+	MAX_CART_XYZ	=    720,	//!< xyz軸の最大値
+	MIN_CART_YAW	=  -1800,	//!< yaw軸の最小値
+	MAX_CART_YAW	=   1800,	//!< yaw軸の最大値
+	MIN_CART_PITCH	=   -900,	//!< pitch軸の最小値
+	MAX_CART_PITCH	=    900,	//!< pitch軸の最大値
+	MIN_CART_ROLL	=  -1800,	//!< roll軸の最小値
+	MAX_CART_ROLL	=   1800,	//!< roll軸の最大値
+	MIN_CART_GRIP	=  28100,	//!< grip軸の最大値
+	MAX_CART_GRIP	=  54000	//!< grip軸の最大値
     };
     
-  //! joint$B%b!<%I$G$N3F<4$N:BI8CM$N:GBg(B/$B:G>.CM(B
+  //! jointモードでの各軸の座標値の最大/最小値
     enum JointLimits
     {
-	MIN_JOINT_012	=  -1800,	//!< $BBh(B012$B<4$N:G>.CM(B
-	MAX_JOINT_012	=   1800,	//!< $BBh(B012$B<4$N:GBgCM(B
-	MIN_JOINT_3	=  -1800,	//!< $BBh(B3$B<4(B(yaw)$B$N:G>.CM(B
-	MAX_JOINT_3	=   1800,	//!< $BBh(B3$B<4(B(yaw)$B$N:GBgCM(B
-	MIN_JOINT_4	=      0,	//!< $BBh(B4$B<4$N:G>.CM(B
-	MAX_JOINT_4	=   1266,	//!< $BBh(B4$B<4$N:GBgCM(B
-	MIN_JOINT_5	=  -1800,	//!< $BBh(B5$B<4(B(roll)$B$N:G>.CM(B
-	MAX_JOINT_5	=   1800,	//!< $BBh(B5$B<4(B(roll)$B$N:GBgCM(B
-	MIN_JOINT_GRIP	=  28100,	//!< grip$B<4$N:G>.CM(B
-	MAX_JOINT_GRIP	=  54000	//!< grip$B<4$N:GBgCM(B
+	MIN_JOINT_012	=  -1800,	//!< 第012軸の最小値
+	MAX_JOINT_012	=   1800,	//!< 第012軸の最大値
+	MIN_JOINT_3	=  -1800,	//!< 第3軸(yaw)の最小値
+	MAX_JOINT_3	=   1800,	//!< 第3軸(yaw)の最大値
+	MIN_JOINT_4	=      0,	//!< 第4軸の最小値
+	MAX_JOINT_4	=   1266,	//!< 第4軸の最大値
+	MIN_JOINT_5	=  -1800,	//!< 第5軸(roll)の最小値
+	MAX_JOINT_5	=   1800,	//!< 第5軸(roll)の最大値
+	MIN_JOINT_GRIP	=  28100,	//!< grip軸の最小値
+	MAX_JOINT_GRIP	=  54000	//!< grip軸の最大値
     };
 
-  //! Manus$B$N%(%i!<(B
+  //! Manusのエラー
     class Error : public std::runtime_error
     {
       public:
-      //! $B%(%i!<%*%V%8%'%/%H$r@8@.$9$k(B
+      //! エラーオブジェクトを生成する
       /*!
-	\param stat $B%(%i!<$rI=$9(BManus$B$N>uBVJQ?t(B. */
+	\param stat エラーを表すManusの状態変数. */
 	Error(Status stat)
 	    :std::runtime_error(Manus::message(stat)), status(stat)	{}
 	
-      //! $B%(%i!<$rI=$9(BManus$B$N>uBVJQ?t(B
+      //! エラーを表すManusの状態変数
 	const Status	status;
     };
     
   public:
     Manus(const char* dev)				;
 
-  //! $B8=:_$N%^%K%T%e%l!<%?$NF0:n%b!<%I$rJV$9(B
+  //! 現在のマニピュレータの動作モードを返す
   /*!
-    \return $B8=:_$N%b!<%I!%(B*/
+    \return 現在のモード．*/
     Mode		mode()			const	{return _mode;}
-  //! $B8=:_$N%^%K%T%e%l!<%?$N>uBV$rJV$9(B
+  //! 現在のマニピュレータの状態を返す
   /*!
-    \return $B8=:_$N>uBV!%(B*/
+    \return 現在の状態．*/
     Status		status()		const	{return _status;}
 			operator bool()		const	;
-  //! $B8=:_$N%^%K%T%e%l!<%?$N0LCV$rJV$9(B
+  //! 現在のマニピュレータの位置を返す
   /*!
-    \return $B8=:_$N0LCV!%(B#CARTESIAN$B%b!<%I$N>l9g$O%O%s%I$N(Bcatesian$B:BI8!%(B
-    $B$=$&$G$J$$>l9g$O4X@a:BI8!%(B*/
+    \return 現在の位置．#CARTESIANモードの場合はハンドのcatesian座標．
+    そうでない場合は関節座標．*/
     const Position&	position()		const	{return _pos;}
-  //! $B8=:_$N%^%K%T%e%l!<%?$X$NB.EY;XNaCM$rJV$9(B
+  //! 現在のマニピュレータへの速度指令値を返す
   /*!
-    \return $B8=:_$NB.EY;XNaCM!%(B#CARTESIAN$B%b!<%I$N>l9g$O3F:BI8<4$NB.EY!%(B
-    $B$=$&$G$J$$>l9g$O4X@a3QB.EY!%(B*/
+    \return 現在の速度指令値．#CARTESIANモードの場合は各座標軸の速度．
+    そうでない場合は関節角速度．*/
     const Speed&	speed()			const	{return _speed;}
 
     Manus&		foldOut()			;
@@ -220,10 +220,10 @@ class Manus : public Can
     Speed	_speed;		// speed given to the manipulator.
 };
 
-//! $B8=:_$N%^%K%T%e%l!<%?$,(Bwarning$B$b$7$/$O(Berror$B>uBV$K$J$$$+D4$Y$k(B
+//! 現在のマニピュレータがwarningもしくはerror状態にないか調べる
 /*!
-  \return	warning$B>uBV$K$b(Berror$B>uBV$K$b$J$1$l$P(Btrue$B$rJV$9!%(B
-		$B$=$&$G$J$1$l$P(Bfalse$B$rJV$9!%(B
+  \return	warning状態にもerror状態にもなければtrueを返す．
+		そうでなければfalseを返す．
 */
 inline
 Manus::operator bool() const

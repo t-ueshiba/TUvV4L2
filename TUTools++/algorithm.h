@@ -1,15 +1,15 @@
 /*
- *  •½¬14-24”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-24å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2012.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: algorithm.h,v 1.3 2012-08-16 04:00:42 ueshiba Exp $
+ *  $Id: algorithm.h,v 1.4 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		algorithm.h
-  \brief	ŠeíƒAƒ‹ƒSƒŠƒYƒ€‚Ì’è‹`‚ÆÀ‘•
+  \brief	å„ç¨®ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUalgorithm_h
 #define __TUalgorithm_h
@@ -39,35 +39,35 @@
 
 /*!
   \namespace	std
-  \brief	‚¢‚­‚Â‚©‚ÌŠî–{“I‚ÈŠÖ”‚ğ–¼‘O‹óŠÔstd‚É’Ç‰Á
+  \brief	ã„ãã¤ã‹ã®åŸºæœ¬çš„ãªé–¢æ•°ã‚’åå‰ç©ºé–“stdã«è¿½åŠ 
 */
 namespace std
 {
 /************************************************************************
 *  generic algorithms							*
 ************************************************************************/
-//! 3‚Â‚Ìˆø”‚Ì‚¤‚¿Å¬‚Ì‚à‚Ì‚ğ•Ô‚·D
+//! 3ã¤ã®å¼•æ•°ã®ã†ã¡æœ€å°ã®ã‚‚ã®ã‚’è¿”ã™ï¼
 template <class T> inline const T&
 min(const T& a, const T& b, const T& c)
 {
     return min(min(a, b), c);
 }
 
-//! 3‚Â‚Ìˆø”‚Ì‚¤‚¿Å‘å‚Ì‚à‚Ì‚ğ•Ô‚·D
+//! 3ã¤ã®å¼•æ•°ã®ã†ã¡æœ€å¤§ã®ã‚‚ã®ã‚’è¿”ã™ï¼
 template <class T> inline const T&
 max(const T& a, const T& b, const T& c)
 {
     return max(max(a, b), c);
 }
     
-//! 4‚Â‚Ìˆø”‚Ì‚¤‚¿Å¬‚Ì‚à‚Ì‚ğ•Ô‚·D
+//! 4ã¤ã®å¼•æ•°ã®ã†ã¡æœ€å°ã®ã‚‚ã®ã‚’è¿”ã™ï¼
 template <class T> inline const T&
 min(const T& a, const T& b, const T& c, const T& d)
 {
     return min(min(a, b, c), d);
 }
 
-//! 4‚Â‚Ìˆø”‚Ì‚¤‚¿Å‘å‚Ì‚à‚Ì‚ğ•Ô‚·D
+//! 4ã¤ã®å¼•æ•°ã®ã†ã¡æœ€å¤§ã®ã‚‚ã®ã‚’è¿”ã™ï¼
 template <class T> inline const T&
 max(const T& a, const T& b, const T& c, const T& d)
 {
@@ -78,19 +78,19 @@ max(const T& a, const T& b, const T& c, const T& d)
 
 /*!
   \namespace	TU
-  \brief	–{ƒ‰ƒCƒuƒ‰ƒŠ‚Å’è‹`‚³‚ê‚½ƒNƒ‰ƒX‚¨‚æ‚ÑŠÖ”‚ğ”[‚ß‚é–¼‘O‹óŠÔ
+  \brief	æœ¬ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§å®šç¾©ã•ã‚ŒãŸã‚¯ãƒ©ã‚¹ãŠã‚ˆã³é–¢æ•°ã‚’ç´ã‚ã‚‹åå‰ç©ºé–“
 */
 namespace TU
 {
 /************************************************************************
 *  generic algorithms							*
 ************************************************************************/
-//! ğŒ‚ğ–‚½‚·—v‘f‚ª‘O”¼‚ÉC‚»‚¤‚Å‚È‚¢‚à‚Ì‚ªŒã”¼‚É‚È‚é‚æ‚¤‚É•À‚×‘Ö‚¦‚éD
+//! æ¡ä»¶ã‚’æº€ãŸã™è¦ç´ ãŒå‰åŠã«ï¼Œãã†ã§ãªã„ã‚‚ã®ãŒå¾ŒåŠã«ãªã‚‹ã‚ˆã†ã«ä¸¦ã¹æ›¿ãˆã‚‹ï¼
 /*!
-  \param begin	ƒf[ƒ^—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end	ƒf[ƒ^—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \param pred	ğŒ‚ğw’è‚·‚é’P€‰‰Zq
-  \return	ğŒ‚ğ–‚½‚³‚È‚¢—v‘f‚Ìæ“ª‚ğ¦‚·”½•œq
+  \param begin	ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end	ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \param pred	æ¡ä»¶ã‚’æŒ‡å®šã™ã‚‹å˜é …æ¼”ç®—å­
+  \return	æ¡ä»¶ã‚’æº€ãŸã•ãªã„è¦ç´ ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
 */
 template <class Iter, class Pred> Iter
 pull_if(Iter begin, Iter end, Pred pred)
@@ -101,18 +101,18 @@ pull_if(Iter begin, Iter end, Pred pred)
     return begin;
 }
 
-//! 2‚Â‚Ìˆø”‚Ì·‚Ìâ‘Î’l‚ğ•Ô‚·D
+//! 2ã¤ã®å¼•æ•°ã®å·®ã®çµ¶å¯¾å€¤ã‚’è¿”ã™ï¼
 template <class T> inline T
 diff(const T& a, const T& b)
 {
     return (a > b ? a - b : b - a);
 }
 
-//! 2ŸŒ³ƒf[ƒ^‚É‘Î‚µ‚Ä3x3ƒEƒBƒ“ƒhƒE‚ğ‘–¸‚µ‚Äin-place‹ß–T‰‰Z‚ğs‚¤D
+//! 2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿ã«å¯¾ã—ã¦3x3ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’èµ°æŸ»ã—ã¦in-placeè¿‘å‚æ¼”ç®—ã‚’è¡Œã†ï¼
 /*!
-  \param begin	Å‰‚Ìs‚ğ¦‚·”½•œq
-  \param end	ÅŒã‚Ìs‚ÌŸ‚ğ¦‚·”½•œq
-  \param op	3x3ƒEƒBƒ“ƒhƒE‚ğ’è‹`ˆæ‚Æ‚·‚é‰‰Zq
+  \param begin	æœ€åˆã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param end	æœ€å¾Œã®è¡Œã®æ¬¡ã‚’ç¤ºã™åå¾©å­
+  \param op	3x3ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’å®šç¾©åŸŸã¨ã™ã‚‹æ¼”ç®—å­
 */
 template <class Iterator, class OP> void
 op3x3(Iterator begin, Iterator end, OP op)
@@ -122,43 +122,43 @@ op3x3(Iterator begin, Iterator end, OP op)
     typedef typename std::iterator_traits<col_iterator>::value_type
 								value_type;
     
-    row_type	buf = *begin;		// ˆê‚Â‘O‚Ìs
+    row_type	buf = *begin;		// ä¸€ã¤å‰ã®è¡Œ
     --end;
     for (Iterator iter = ++begin; iter != end; )
     {
-	col_iterator	p    = buf.begin();	// ¶ã‰æ‘f
-	col_iterator	q    = iter->begin();	// ¶‰æ‘f	
-	value_type	val  = *q;		// ¶‰æ‘f‚É‚¨‚¯‚éŒ‹‰Ê
+	col_iterator	p    = buf.begin();	// å·¦ä¸Šç”»ç´ 
+	col_iterator	q    = iter->begin();	// å·¦ç”»ç´ 	
+	value_type	val  = *q;		// å·¦ç”»ç´ ã«ãŠã‘ã‚‹çµæœ
 	col_iterator	cend = (++iter)->end();
 	--cend;
-	--cend;				// ¶‰º‰æ‘f‚Ì‰E’[
-	for (col_iterator c = iter->begin(); c != cend; )   // ¶‰º‰æ‘f‚É‚Â‚¢‚Ä
-	{						    // ƒ‹[ƒv
-	    value_type	tmp = op(p, q, c);	// ’–Ú‰æ‘f‚É‚¨‚¯‚éŒ‹‰Ê
-	    *p  = *q;			// Ÿs‚Ì¶ã‰æ‘f = ¶‰æ‘f
-	    *q  = val;			// ¶‰æ‘f‚É‚¨‚¯‚éŒ‹‰Ê‚ğ‘‚«‚Ş
-	    val	= tmp;			// ŸƒEƒBƒ“ƒhƒE‚Ì¶‰æ‘f‚É‚¨‚¯‚éŒ‹‰Ê‚ğ•Û‘¶
+	--cend;				// å·¦ä¸‹ç”»ç´ ã®å³ç«¯
+	for (col_iterator c = iter->begin(); c != cend; )   // å·¦ä¸‹ç”»ç´ ã«ã¤ã„ã¦
+	{						    // ãƒ«ãƒ¼ãƒ—
+	    value_type	tmp = op(p, q, c);	// æ³¨ç›®ç”»ç´ ã«ãŠã‘ã‚‹çµæœ
+	    *p  = *q;			// æ¬¡è¡Œã®å·¦ä¸Šç”»ç´  = å·¦ç”»ç´ 
+	    *q  = val;			// å·¦ç”»ç´ ã«ãŠã‘ã‚‹çµæœã‚’æ›¸ãè¾¼ã‚€
+	    val	= tmp;			// æ¬¡ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ç”»ç´ ã«ãŠã‘ã‚‹çµæœã‚’ä¿å­˜
 	    ++c;
 	    ++p;
 	    ++q;
 	}
-	*p = *q;			// Ÿs‚Ì¶ã‰æ‘f = ¶‰æ‘f
-	*q = val;			// ¶‰æ‘f‚É‚¨‚¯‚éŒ‹‰Ê‚ğ‘‚«‚Ş
+	*p = *q;			// æ¬¡è¡Œã®å·¦ä¸Šç”»ç´  = å·¦ç”»ç´ 
+	*q = val;			// å·¦ç”»ç´ ã«ãŠã‘ã‚‹çµæœã‚’æ›¸ãè¾¼ã‚€
 	++p;
 	++q;
-	*p = *q;			// Ÿs‚Ìã‰æ‘f = ’–Ú‰æ‘f
+	*p = *q;			// æ¬¡è¡Œã®ä¸Šç”»ç´  = æ³¨ç›®ç”»ç´ 
     }
 }
     
 /************************************************************************
 *  morphological operations						*
 ************************************************************************/
-//! 3x3ƒEƒBƒ“ƒhƒE“à‚ÌÅ‘å’l‚ğ•Ô‚·D
+//! 3x3ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®æœ€å¤§å€¤ã‚’è¿”ã™ï¼
 /*!
-  \param p	’–Ú“_‚Ì¶ã“_‚ğw‚·”½•œq
-  \param q	’–Ú“_‚Ì¶‚Ì“_‚ğw‚·”½•œq
-  \param r	’–Ú“_‚Ì¶‰º“_‚ğw‚·”½•œq
-  \return	3x3ƒEƒBƒ“ƒhƒE“à‚ÌÅ‘å’l
+  \param p	æ³¨ç›®ç‚¹ã®å·¦ä¸Šç‚¹ã‚’æŒ‡ã™åå¾©å­
+  \param q	æ³¨ç›®ç‚¹ã®å·¦ã®ç‚¹ã‚’æŒ‡ã™åå¾©å­
+  \param r	æ³¨ç›®ç‚¹ã®å·¦ä¸‹ç‚¹ã‚’æŒ‡ã™åå¾©å­
+  \return	3x3ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®æœ€å¤§å€¤
 */
 template <class P> inline typename std::iterator_traits<P>::value_type
 max3x3(P p, P q, P r)
@@ -170,12 +170,12 @@ max3x3(P p, P q, P r)
 	       max(*r, *(r + 1), *(r + 2)));
 }
     
-//! 3x3ƒEƒBƒ“ƒhƒE“à‚ÌÅ¬’l‚ğ•Ô‚·D
+//! 3x3ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®æœ€å°å€¤ã‚’è¿”ã™ï¼
 /*!
-  \param p	’–Ú“_‚Ì¶ã“_‚ğw‚·”½•œq
-  \param q	’–Ú“_‚Ì¶‚Ì“_‚ğw‚·”½•œq
-  \param r	’–Ú“_‚Ì¶‰º“_‚ğw‚·”½•œq
-  \return	3x3ƒEƒBƒ“ƒhƒE“à‚ÌÅ¬’l
+  \param p	æ³¨ç›®ç‚¹ã®å·¦ä¸Šç‚¹ã‚’æŒ‡ã™åå¾©å­
+  \param q	æ³¨ç›®ç‚¹ã®å·¦ã®ç‚¹ã‚’æŒ‡ã™åå¾©å­
+  \param r	æ³¨ç›®ç‚¹ã®å·¦ä¸‹ç‚¹ã‚’æŒ‡ã™åå¾©å­
+  \return	3x3ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®æœ€å°å€¤
 */
 template <class P> inline typename std::iterator_traits<P>::value_type
 min3x3(P p, P q, P r)
@@ -187,12 +187,12 @@ min3x3(P p, P q, P r)
 	       min(*r, *(r + 1), *(r + 2)));
 }
 
-//! morphological open‰‰Z‚ğin-place‚Ås‚¤D
+//! morphological openæ¼”ç®—ã‚’in-placeã§è¡Œã†ï¼
 /*
-  w’è‚³‚ê‚½‰ñ”‚¾‚¯ûk(erosion)‚ğs‚Á‚½ŒãC“¯‚¶‰ñ”‚¾‚¯–c’£(dilation)‚ğs‚¤D
-  \param begin	Å‰‚Ìs‚ğ¦‚·”½•œq
-  \param end	ÅŒã‚Ìs‚ÌŸ‚ğ¦‚·”½•œq
-  \param niter	ûk‚Æ–c’£‚Ì‰ñ”
+  æŒ‡å®šã•ã‚ŒãŸå›æ•°ã ã‘åç¸®(erosion)ã‚’è¡Œã£ãŸå¾Œï¼ŒåŒã˜å›æ•°ã ã‘è†¨å¼µ(dilation)ã‚’è¡Œã†ï¼
+  \param begin	æœ€åˆã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param end	æœ€å¾Œã®è¡Œã®æ¬¡ã‚’ç¤ºã™åå¾©å­
+  \param niter	åç¸®ã¨è†¨å¼µã®å›æ•°
 */
 template <class Iterator> void
 mopOpen(Iterator begin, Iterator end, u_int niter=1)
@@ -201,17 +201,17 @@ mopOpen(Iterator begin, Iterator end, u_int niter=1)
 								col_iterator;
 
     for (u_int n = 0; n < niter; ++n)
-	op3x3(begin, end, min3x3<col_iterator>);	// ûk(erosion)
+	op3x3(begin, end, min3x3<col_iterator>);	// åç¸®(erosion)
     for (u_int n = 0; n < niter; ++n)
-	op3x3(begin, end, max3x3<col_iterator>);	// –c’£(dilation)
+	op3x3(begin, end, max3x3<col_iterator>);	// è†¨å¼µ(dilation)
 }
 
-//! morphological close‰‰Z‚ğin-place‚Ås‚¤D
+//! morphological closeæ¼”ç®—ã‚’in-placeã§è¡Œã†ï¼
 /*
-  w’è‚³‚ê‚½‰ñ”‚¾‚¯–c’£(dilation)‚ğs‚Á‚½ŒãC“¯‚¶‰ñ”‚¾‚¯ûk(erosion)‚ğs‚¤D
-  \param begin	Å‰‚Ìs‚ğ¦‚·”½•œq
-  \param end	ÅŒã‚Ìs‚ÌŸ‚ğ¦‚·”½•œq
-  \param niter	ûk‚Æ–c’£‚Ì‰ñ”
+  æŒ‡å®šã•ã‚ŒãŸå›æ•°ã ã‘è†¨å¼µ(dilation)ã‚’è¡Œã£ãŸå¾Œï¼ŒåŒã˜å›æ•°ã ã‘åç¸®(erosion)ã‚’è¡Œã†ï¼
+  \param begin	æœ€åˆã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param end	æœ€å¾Œã®è¡Œã®æ¬¡ã‚’ç¤ºã™åå¾©å­
+  \param niter	åç¸®ã¨è†¨å¼µã®å›æ•°
 */
 template <class Iterator> void
 mopClose(Iterator begin, Iterator end, u_int niter=1)
@@ -220,9 +220,9 @@ mopClose(Iterator begin, Iterator end, u_int niter=1)
 								col_iterator;
     
     for (u_int n = 0; n < niter; ++n)
-	op3x3(begin, end, max3x3<col_iterator>);	// –c’£(dilation)
+	op3x3(begin, end, max3x3<col_iterator>);	// è†¨å¼µ(dilation)
     for (u_int n = 0; n < niter; ++n)
-	op3x3(begin, end, min3x3<col_iterator>);	// ûk(erosion)
+	op3x3(begin, end, min3x3<col_iterator>);	// åç¸®(erosion)
 }
     
 }

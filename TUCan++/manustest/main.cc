@@ -1,14 +1,14 @@
 /*
- *  $Id: main.cc,v 1.2 2009-07-09 04:58:26 ueshiba Exp $
+ *  $Id: main.cc,v 1.3 2012-08-29 21:16:54 ueshiba Exp $
  */
 /*!
   \mainpage	manustest
   \anchor	manustest
-  $B%-!<%\!<%I%$%s%?!<%U%'!<%9$K$h$k(B
-  <a href="http://www.exactdynamics.nl/">Exact Dynamics$B<R(B</a>$B@=$N(BManus
-  $B%^%K%T%e%l!<%?$N$?$a$N%3%s%H%m!<%k%W%m%0%i%`$G$"$k!%(B
-  CAN(Control Area Network)$B%G%P%$%9$N$?$a$N%3%s%H%m!<%i%i%$%V%i%j(B:
-  \ref libTUCan "libTUCan++"$B$rMxMQ$7$F$$$k!%(B
+  キーボードインターフェースによる
+  <a href="http://www.exactdynamics.nl/">Exact Dynamics社</a>製のManus
+  マニピュレータのためのコントロールプログラムである．
+  CAN(Control Area Network)デバイスのためのコントローラライブラリ:
+  \ref libTUCan "libTUCan++"を利用している．
 */
 #include <signal.h>
 #include <unistd.h>
@@ -18,10 +18,10 @@ void	init_kbhit();
 void	term_kbhit();
 int	kbhit();
 
-//! $B%a%$%s4X?t(B
+//! メイン関数
 /*!
-  \param argc	$B%3%^%s%IL>$r4^$s$@0z?t$N?t(B
-  \param argv	$B0z?tJ8;zNs$NG[Ns(B
+  \param argc	コマンド名を含んだ引数の数
+  \param argv	引数文字列の配列
 */
 int
 main(int argc, char* argv[])
@@ -42,36 +42,36 @@ main(int argc, char* argv[])
 
     try
     {
-      // Manus$B%^%K%T%e%l!<%?%*%V%8%'%/%H$N@8@.(B
+      // Manusマニピュレータオブジェクトの生成
 	Manus		manus(dev);
 
 	init_kbhit();
 
-      // $B%a%$%s%k!<%W(B
+      // メインループ
 	for (int c; (c = kbhit()) != 'x'; )
 	{
-	    Manus::Speed	speed;	// $BB.EY;XNaCM(B($B$9$Y$F(B0$B$K=i4|2=(B)
+	    Manus::Speed	speed;	// 速度指令値(すべて0に初期化)
 
 	    switch (c)
 	    {
 	      case '0':
-		manus.stillMode();	// STILL$B%b!<%I$K0\9T(B
+		manus.stillMode();	// STILLモードに移行
 		continue;
 	      case '4':
-		manus.jointMode();	// JOINT$B%b!<%I$K0\9T(B
+		manus.jointMode();	// JOINTモードに移行
 		continue;
 	      case '5':
-		manus.foldOut();	// $B%^%K%T%e%l!<%?$r3H$2$k(B
+		manus.foldOut();	// マニピュレータを拡げる
 		continue;
 	      case '6':
-		manus.foldIn();		// $B%^%K%T%e%l!<%?$r@^$j>v$`(B
+		manus.foldIn();		// マニピュレータを折り畳む
 		continue;
 	    
 	      case 'q':
-		manus.setBaseUp().tick();	// $BBf:B$r>e$2$k(B
+		manus.setBaseUp().tick();	// 台座を上げる
 		continue;
 	      case 'a':
-		manus.setBaseDown().tick();	// $BBf:B$r2<$2$k(B
+		manus.setBaseDown().tick();	// 台座を下げる
 		continue;
 
 	      case 'w':
@@ -117,9 +117,9 @@ main(int argc, char* argv[])
 		speed[6] = -Manus::MAX_SPEED_JOINT_GRIP;
 		break;
 	    }
-	    speed *= 0.2;	// $B:G9bB.EY$N(B1/5$B$K$9$k(B
+	    speed *= 0.2;	// 最高速度の1/5にする
 	    
-	  // $BB.EY$r@_Dj$7$F%k!<%W$r(B1$B2s$^$o$9!%(B
+	  // 速度を設定してループを1回まわす．
 	    manus.setSpeed(speed).tick();
 
 	    if (manus.status() != Manus::OK)
@@ -127,7 +127,7 @@ main(int argc, char* argv[])
 	    cerr << "  Position: " << manus.position();
 	}
 	
-      // $B%W%m%0%i%`=*N;;~$K$O(BSTILL$B%b!<%I$K$9$k(B
+      // プログラム終了時にはSTILLモードにする
 	manus.stillMode();
 
 	term_kbhit();

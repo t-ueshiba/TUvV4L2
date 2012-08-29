@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.cc,v 1.9 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: PM16C_04.cc,v 1.10 2012-08-29 21:17:08 ueshiba Exp $
  */
 #include "TU/PM16C_04.h"
 #include "TU/Manip.h"
@@ -50,9 +50,9 @@ checkChannel(u_int channel)
 /************************************************************************
 *  class PM16C_04							*
 ************************************************************************/
-//! w’è‚³‚ê‚½tty‚ğopen‚µ‚Äƒpƒ‹ƒXƒ‚[ƒ^ƒRƒ“ƒgƒ[ƒ‰‚ğì‚éD
+//! æŒ‡å®šã•ã‚ŒãŸttyã‚’openã—ã¦ãƒ‘ãƒ«ã‚¹ãƒ¢ãƒ¼ã‚¿ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã‚’ä½œã‚‹ï¼
 /*!
-  \param ttyname	tty–¼
+  \param ttyname	ttyå
 */
 PM16C_04::PM16C_04(const char* ttyname)
     :Serial(ttyname)
@@ -67,14 +67,14 @@ PM16C_04::PM16C_04(const char* ttyname)
     setMode(true);
     usleep(DELAY);
 
-  // padding‚Æ‚µ‚Ä•„†‚Æ”’l‚ÌŠÔ‚É'0'‚ğo—Í
+  // paddingã¨ã—ã¦ç¬¦å·ã¨æ•°å€¤ã®é–“ã«'0'ã‚’å‡ºåŠ›
     fill('0');
     setf(ios_base::internal, ios_base::adjustfield);
 }
     
-//! ƒtƒ@[ƒ€ƒEƒFƒA‚ÌID‚ğo—ÍƒXƒgƒŠ[ƒ€‚É‘‚«o‚·D
+//! ãƒ•ã‚¡ãƒ¼ãƒ ã‚¦ã‚§ã‚¢ã®IDã‚’å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 void
 PM16C_04::showId(std::ostream& out)
@@ -90,11 +90,11 @@ PM16C_04::showId(std::ostream& out)
 }
 
 /*
- *  Local/Remoteƒ‚[ƒh
+ *  Local/Remoteãƒ¢ãƒ¼ãƒ‰
  */
-//! ƒRƒ“ƒgƒ[ƒ‰‚ÌLOCAL/REMOTEƒ‚[ƒh‚ğİ’è‚·‚éD
+//! ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®LOCAL/REMOTEãƒ¢ãƒ¼ãƒ‰ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param remote	true‚È‚çREMOTEƒ‚[ƒh‚ÉCfalse‚È‚çLOCALƒ‚[ƒh‚Éİ’è
+  \param remote	trueãªã‚‰REMOTEãƒ¢ãƒ¼ãƒ‰ã«ï¼Œfalseãªã‚‰LOCALãƒ¢ãƒ¼ãƒ‰ã«è¨­å®š
 */
 PM16C_04&
 PM16C_04::setMode(bool remote)
@@ -104,9 +104,9 @@ PM16C_04::setMode(bool remote)
     return *this;
 }
 
-//! ƒRƒ“ƒgƒ[ƒ‰‚ªREMOTEƒ‚[ƒh‚Å‚ ‚é‚©’²‚×‚éD
+//! ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãŒREMOTEãƒ¢ãƒ¼ãƒ‰ã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \return	REMOTEƒ‚[ƒh‚È‚çtrueCLOCALƒ‚[ƒh‚È‚çfalse
+  \return	REMOTEãƒ¢ãƒ¼ãƒ‰ãªã‚‰trueï¼ŒLOCALãƒ¢ãƒ¼ãƒ‰ãªã‚‰false
 */
 bool
 PM16C_04::isRemoteMode()
@@ -115,13 +115,13 @@ PM16C_04::isRemoteMode()
 }
 
 /*
- *  ˆÊ’u
+ *  ä½ç½®
  */
-//! w’è‚³‚ê‚½ƒ`ƒƒƒ“ƒlƒ‹‚ÌˆÊ’u‚ğİ’è‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸãƒãƒ£ãƒ³ãƒãƒ«ã®ä½ç½®ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param position	ˆÊ’u
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param position	ä½ç½®
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setPosition(u_int channel, int position)
@@ -135,10 +135,10 @@ PM16C_04::setPosition(u_int channel, int position)
     return *this;
 }
 
-//! w’è‚³‚ê‚½ƒ`ƒƒƒ“ƒlƒ‹‚ÌŒ»İˆÊ’u‚ğ’²‚×‚éD
+//! æŒ‡å®šã•ã‚ŒãŸãƒãƒ£ãƒ³ãƒãƒ«ã®ç¾åœ¨ä½ç½®ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		Œ»İˆÊ’u
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ç¾åœ¨ä½ç½®
 */
 int
 PM16C_04::getPosition(u_int channel)
@@ -152,12 +152,12 @@ PM16C_04::getPosition(u_int channel)
 }
     
 /*
- *  ƒXƒs[ƒh
+ *  ã‚¹ãƒ”ãƒ¼ãƒ‰
  */
-//! ‚·‚×‚Ä‚Ì²‚ÌƒXƒs[ƒhƒ‚[ƒh(LOW/MEDIUM/HIGH)‚ğİ’è‚·‚éD
+//! ã™ã¹ã¦ã®è»¸ã®ã‚¹ãƒ”ãƒ¼ãƒ‰ãƒ¢ãƒ¼ãƒ‰(LOW/MEDIUM/HIGH)ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param speed		ƒXƒs[ƒhƒ‚[ƒh
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param speed		ã‚¹ãƒ”ãƒ¼ãƒ‰ãƒ¢ãƒ¼ãƒ‰
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setSpeed(Speed speed)
@@ -169,12 +169,12 @@ PM16C_04::setSpeed(Speed speed)
     return *this;
 }
 
-//! w’è‚³‚ê‚½ƒ`ƒƒƒlƒ‹‚ÌƒXƒs[ƒh‚Ì’l‚ğİ’è‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸãƒãƒ£ãƒãƒ«ã®ã‚¹ãƒ”ãƒ¼ãƒ‰ã®å€¤ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param speed		ƒXƒs[ƒhƒ‚[ƒh
-  \param val		ƒXƒs[ƒh‚Ì’l
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param speed		ã‚¹ãƒ”ãƒ¼ãƒ‰ãƒ¢ãƒ¼ãƒ‰
+  \param val		ã‚¹ãƒ”ãƒ¼ãƒ‰ã®å€¤
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setSpeedValue(u_int channel, Speed speed, u_int val)
@@ -189,11 +189,11 @@ PM16C_04::setSpeedValue(u_int channel, Speed speed, u_int val)
     return *this;
 }
     
-//! w’è‚³‚ê‚½ƒ`ƒƒƒlƒ‹‚ÌƒXƒs[ƒh‚Ì’l‚ğ’²‚×‚éD
+//! æŒ‡å®šã•ã‚ŒãŸãƒãƒ£ãƒãƒ«ã®ã‚¹ãƒ”ãƒ¼ãƒ‰ã®å€¤ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param speed		ƒXƒs[ƒhƒ‚[ƒh
-  \return		ƒXƒs[ƒh‚Ì’l
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param speed		ã‚¹ãƒ”ãƒ¼ãƒ‰ãƒ¢ãƒ¼ãƒ‰
+  \return		ã‚¹ãƒ”ãƒ¼ãƒ‰ã®å€¤
 */
 u_int
 PM16C_04::getSpeedValue(u_int channel, Speed speed)
@@ -210,14 +210,14 @@ PM16C_04::getSpeedValue(u_int channel, Speed speed)
 }
 
 /*
- *  ƒ\ƒtƒgƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`
+ *  ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒ
  */
-//! ƒ\ƒtƒgƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ğ—LŒø‰»‚µD‚»‚ÌˆÊ’u‚ğw’è‚·‚éD
+//! ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã‚’æœ‰åŠ¹åŒ–ã—ï¼ãã®ä½ç½®ã‚’æŒ‡å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param positionP	³•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ÌˆÊ’u
-  \param positionN	•‰•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ÌˆÊ’u
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param positionP	æ­£æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®ä½ç½®
+  \param positionN	è² æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®ä½ç½®
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::enableSoftwareLimitSwitch(u_int channel,
@@ -235,10 +235,10 @@ PM16C_04::enableSoftwareLimitSwitch(u_int channel,
     return *this;
 }
     
-//! ƒ\ƒtƒgƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ğ–³Œø‰»‚·‚éD
+//! ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã‚’ç„¡åŠ¹åŒ–ã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::disableSoftwareLimitSwitch(u_int channel)
@@ -246,10 +246,10 @@ PM16C_04::disableSoftwareLimitSwitch(u_int channel)
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) & 0xdf);
 }
     
-//! ƒ\ƒtƒgƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ª—LŒø‚©’²‚×‚éD
+//! ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãŒæœ‰åŠ¹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		—LŒø‚Å‚ ‚ê‚Îtrue, –³Œø‚Å‚ ‚ê‚Îfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		æœ‰åŠ¹ã§ã‚ã‚Œã°true, ç„¡åŠ¹ã§ã‚ã‚Œã°false
 */
 bool
 PM16C_04::isEnabledSoftwareLimitSwitch(u_int channel)
@@ -257,10 +257,10 @@ PM16C_04::isEnabledSoftwareLimitSwitch(u_int channel)
     return getLimitSwitchConf(channel) & 0x20;
 }
 
-//! ³•ûŒüƒ\ƒtƒgƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ÌˆÊ’u‚ğ’²‚×‚éD
+//! æ­£æ–¹å‘ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®ä½ç½®ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		³•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ÌˆÊ’u
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		æ­£æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®ä½ç½®
 */
 int
 PM16C_04::getSoftwareLimitSwitchPositionP(u_int channel)
@@ -273,10 +273,10 @@ PM16C_04::getSoftwareLimitSwitchPositionP(u_int channel)
     return position;
 }
     
-//! •‰•ûŒüƒ\ƒtƒgƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ÌˆÊ’u‚ğ’²‚×‚éD
+//! è² æ–¹å‘ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®ä½ç½®ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		•‰•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ÌˆÊ’u
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		è² æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®ä½ç½®
 */
 int
 PM16C_04::getSoftwareLimitSwitchPositionN(u_int channel)
@@ -290,15 +290,15 @@ PM16C_04::getSoftwareLimitSwitchPositionN(u_int channel)
 }
     
 /*
- *  ƒn[ƒhƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`
+ *  ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒ
  */
-//! ƒn[ƒhƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ğ—LŒø‰»‚µD‚»‚Ì‹É«‚ğİ’è‚·‚éD
+//! ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã‚’æœ‰åŠ¹åŒ–ã—ï¼ãã®æ¥µæ€§ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param dir		³•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çtrueC
-			•‰•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çfalse
-  \param normallyClose	ƒXƒCƒbƒ`‚ª“­‚¢‚Ä‚¢‚È‚¢‚Æ‚«‚Éclose‚È‚çtrueCopen‚È‚çtrue
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param dir		æ­£æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰trueï¼Œ
+			è² æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰false
+  \param normallyClose	ã‚¹ã‚¤ãƒƒãƒãŒåƒã„ã¦ã„ãªã„ã¨ãã«closeãªã‚‰trueï¼Œopenãªã‚‰true
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::enableHardwareLimitSwitch(u_int channel, bool dir,
@@ -311,12 +311,12 @@ PM16C_04::enableHardwareLimitSwitch(u_int channel, bool dir,
 	return setLimitSwitchConf(channel, conf & (dir ? 0xfe : 0xfd));
 }
 
-//! ƒn[ƒhƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ğ–³Œø‰»‚·‚éD
+//! ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã‚’ç„¡åŠ¹åŒ–ã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param dir		³•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çtrueC
-			•‰•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çfalse
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param dir		æ­£æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰trueï¼Œ
+			è² æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰false
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::disableHardwareLimitSwitch(u_int channel, bool dir)
@@ -325,12 +325,12 @@ PM16C_04::disableHardwareLimitSwitch(u_int channel, bool dir)
 				       (dir ? 0xf7 : 0xef));
 }
 
-//! ƒn[ƒhƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ª—LŒø‚Å‚ ‚é‚©’²‚×‚éD
+//! ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãŒæœ‰åŠ¹ã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param dir		³•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çtrueC
-			•‰•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çfalse
-  \return		—LŒø‚È‚çtrue, –³Œø‚È‚çfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param dir		æ­£æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰trueï¼Œ
+			è² æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰false
+  \return		æœ‰åŠ¹ãªã‚‰true, ç„¡åŠ¹ãªã‚‰false
 */
 bool
 PM16C_04::isEnabledHardwareLimitSwitch(u_int channel, bool dir)
@@ -338,12 +338,12 @@ PM16C_04::isEnabledHardwareLimitSwitch(u_int channel, bool dir)
     return getLimitSwitchConf(channel) & (dir ? 0x08 : 0x10);
 }
 
-//! ƒn[ƒhƒEƒFƒAƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚Ì‹É«‚ğ’²‚×‚éD
+//! ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®æ¥µæ€§ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param dir		³•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çtrueC
-			•‰•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çfalse
-  \return		ƒXƒCƒbƒ`‚ª“­‚¢‚Ä‚¢‚È‚¢‚Æ‚«close‚È‚çtrue, open‚È‚çfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param dir		æ­£æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰trueï¼Œ
+			è² æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰false
+  \return		ã‚¹ã‚¤ãƒƒãƒãŒåƒã„ã¦ã„ãªã„ã¨ãcloseãªã‚‰true, openãªã‚‰false
 */
 bool
 PM16C_04::getHardwareLimitSwitchPolarity(u_int channel, bool dir)
@@ -351,11 +351,11 @@ PM16C_04::getHardwareLimitSwitchPolarity(u_int channel, bool dir)
     return getLimitSwitchConf(channel) & (dir ? 0x01 : 0x02);
 }
 
-//! ƒn[ƒhƒEƒFƒAƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ƒXƒCƒbƒ`‚Ì‹É«‚ğİ’è‚·‚éD
+//! ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚¹ã‚¤ãƒƒãƒã®æ¥µæ€§ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param normallyClose	ƒXƒCƒbƒ`‚ª“­‚¢‚Ä‚¢‚È‚¢‚Æ‚«‚Éclose‚È‚çtrueCopen‚È‚çtrue
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param normallyClose	ã‚¹ã‚¤ãƒƒãƒãŒåƒã„ã¦ã„ãªã„ã¨ãã«closeãªã‚‰trueï¼Œopenãªã‚‰true
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setHomeSwitchPolarity(u_int channel, bool normallyClose)
@@ -363,10 +363,10 @@ PM16C_04::setHomeSwitchPolarity(u_int channel, bool normallyClose)
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) | 0x04);
 }
 
-//! ƒn[ƒhƒEƒFƒAƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ƒXƒCƒbƒ`‚Ì‹É«‚ğ’²‚×‚éD
+//! ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚¹ã‚¤ãƒƒãƒã®æ¥µæ€§ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		ƒXƒCƒbƒ`‚ª“­‚¢‚Ä‚¢‚È‚¢‚Æ‚«close‚È‚çtrue, open‚È‚çfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ã‚¹ã‚¤ãƒƒãƒãŒåƒã„ã¦ã„ãªã„ã¨ãcloseãªã‚‰true, openãªã‚‰false
 */
 bool
 PM16C_04::getHomeSwitchPolarity(u_int channel)
@@ -375,13 +375,13 @@ PM16C_04::getHomeSwitchPolarity(u_int channel)
 }
 
 /*
- *  ƒoƒbƒNƒ‰ƒbƒVƒ…•â³
+ *  ãƒãƒƒã‚¯ãƒ©ãƒƒã‚·ãƒ¥è£œæ­£
  */
-//! ƒoƒbƒNƒ‰ƒbƒVƒ…•â³‚ÌƒXƒeƒbƒv”‚ğİ’è‚·‚éD
+//! ãƒãƒƒã‚¯ãƒ©ãƒƒã‚·ãƒ¥è£œæ­£ã®ã‚¹ãƒ†ãƒƒãƒ—æ•°ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param steps		ƒXƒeƒbƒv”
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param steps		ã‚¹ãƒ†ãƒƒãƒ—æ•°
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setBacklashCorrectionStep(u_int channel, u_int steps)
@@ -394,10 +394,10 @@ PM16C_04::setBacklashCorrectionStep(u_int channel, u_int steps)
     return *this;
 }
 
-//! ƒoƒbƒNƒ‰ƒbƒVƒ…•â³‚ÌƒXƒeƒbƒv”‚ğ’²‚×‚éD
+//! ãƒãƒƒã‚¯ãƒ©ãƒƒã‚·ãƒ¥è£œæ­£ã®ã‚¹ãƒ†ãƒƒãƒ—æ•°ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		ƒXƒeƒbƒv”
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ã‚¹ãƒ†ãƒƒãƒ—æ•°
 */
 u_int
 PM16C_04::getBacklashCorrectionStep(u_int channel)
@@ -412,12 +412,12 @@ PM16C_04::getBacklashCorrectionStep(u_int channel)
 }
 
 /*
- *  Hold off‹@”\i’â~‚Ì”ñ’Ê“dj
+ *  Hold offæ©Ÿèƒ½ï¼ˆåœæ­¢æ™‚ã®éé€šé›»ï¼‰
  */
-//! Hold off‹@”\i’â~‚Ì”ñ’Ê“dj‚ğ—LŒø‰»‚·‚éD
+//! Hold offæ©Ÿèƒ½ï¼ˆåœæ­¢æ™‚ã®éé€šé›»ï¼‰ã‚’æœ‰åŠ¹åŒ–ã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::enableHoldOff(u_int channel)
@@ -425,10 +425,10 @@ PM16C_04::enableHoldOff(u_int channel)
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) & 0xbf);
 }
 
-//! Hold off‹@”\i’â~‚Ì”ñ’Ê“dj‚ğ–³Œø‰»‚·‚éD
+//! Hold offæ©Ÿèƒ½ï¼ˆåœæ­¢æ™‚ã®éé€šé›»ï¼‰ã‚’ç„¡åŠ¹åŒ–ã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::disableHoldOff(u_int channel)
@@ -436,10 +436,10 @@ PM16C_04::disableHoldOff(u_int channel)
     return setLimitSwitchConf(channel, getLimitSwitchConf(channel) | 0x40);
 }
 
-//! Hold off‹@”\i’â~‚Ì”ñ’Ê“dj‚ª—LŒø‚©’²‚×‚éD
+//! Hold offæ©Ÿèƒ½ï¼ˆåœæ­¢æ™‚ã®éé€šé›»ï¼‰ãŒæœ‰åŠ¹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		—LŒø‚È‚çtrue, –³Œø‚È‚çfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		æœ‰åŠ¹ãªã‚‰true, ç„¡åŠ¹ãªã‚‰false
 */
 bool
 PM16C_04::isEnabledHoldOff(u_int channel)
@@ -448,13 +448,13 @@ PM16C_04::isEnabledHoldOff(u_int channel)
 }
 
 /*
- *  ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo
+ *  ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡º
  */
-//! ‚Ç‚¿‚ç‘¤‚©‚çƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo‚ğs‚¤‚©‚ğİ’è‚·‚éD
+//! ã©ã¡ã‚‰å´ã‹ã‚‰ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡ºã‚’è¡Œã†ã‹ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param dir		³•ûŒü‚©‚ç‚Å‚ ‚ê‚Îtrue, •‰•ûŒü‚©‚ç‚Å‚ ‚ê‚Îfalse
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param dir		æ­£æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°true, è² æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°false
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setHomeSearchDirection(u_int channel, bool dir)
@@ -465,10 +465,10 @@ PM16C_04::setHomeSearchDirection(u_int channel, bool dir)
     return *this;
 }
     
-//! ‚Ç‚¿‚ç‘¤‚©‚çƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo‚ğs‚¤‚Ì‚©’²‚×‚éD
+//! ã©ã¡ã‚‰å´ã‹ã‚‰ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡ºã‚’è¡Œã†ã®ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		³•ûŒü‚©‚ç‚Å‚ ‚ê‚Îtrue, •‰•ûŒü‚©‚ç‚Å‚ ‚ê‚Îfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		æ­£æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°true, è² æ–¹å‘ã‹ã‚‰ã§ã‚ã‚Œã°false
 */
 bool
 PM16C_04::getHomeSearchDirection(u_int channel)
@@ -476,11 +476,11 @@ PM16C_04::getHomeSearchDirection(u_int channel)
     return getHomeStatus(channel) & 0x1;
 }
     
-//! ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo‚ÌƒIƒtƒZƒbƒg’l‚ğİ’è‚·‚éD
+//! ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡ºæ™‚ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \param offset		ƒIƒtƒZƒbƒg’l
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \param offset		ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setHomeOffset(u_int channel, u_int offset)
@@ -493,10 +493,10 @@ PM16C_04::setHomeOffset(u_int channel, u_int offset)
     return *this;
 }
     
-//! ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo‚ÌƒIƒtƒZƒbƒg’l‚ğ’²‚×‚éD
+//! ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡ºæ™‚ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		ƒIƒtƒZƒbƒg’l
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
 */
 u_int
 PM16C_04::getHomeOffset(u_int channel)
@@ -510,10 +510,10 @@ PM16C_04::getHomeOffset(u_int channel)
     return offset;
 }
     
-//! ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ªŒŸoÏ‚İ‚©’²‚×‚éD
+//! ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ãŒæ¤œå‡ºæ¸ˆã¿ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		ŒŸoÏ‚İ‚È‚çtrue, –¢ŒŸo‚È‚çfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		æ¤œå‡ºæ¸ˆã¿ãªã‚‰true, æœªæ¤œå‡ºãªã‚‰false
 */
 bool
 PM16C_04::isHomeFound(u_int channel)
@@ -521,10 +521,10 @@ PM16C_04::isHomeFound(u_int channel)
     return getHomeStatus(channel) & 0x4;
 }
     
-//! ŒŸoÏ‚İ‚Ìƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ª‚Ç‚¿‚ç‚©‚çŒŸo‚³‚ê‚½‚Ì‚©’²‚×‚éD
+//! æ¤œå‡ºæ¸ˆã¿ã®ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ãŒã©ã¡ã‚‰ã‹ã‚‰æ¤œå‡ºã•ã‚ŒãŸã®ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		³•ûŒü‚©‚ç‚È‚çtrue, •‰•ûŒü‚©‚ç‚È‚çfalse
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		æ­£æ–¹å‘ã‹ã‚‰ãªã‚‰true, è² æ–¹å‘ã‹ã‚‰ãªã‚‰false
 */
 bool
 PM16C_04::isHomeFoundFromFront(u_int channel)
@@ -532,10 +532,10 @@ PM16C_04::isHomeFoundFromFront(u_int channel)
     return getHomeStatus(channel) & 0x2;
 }
 
-//! ŒŸoÏ‚İ‚Ìƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ÌˆÊ’u‚ğ’²‚×‚éD
+//! æ¤œå‡ºæ¸ˆã¿ã®ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã®ä½ç½®ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ˆÊ’u
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ä½ç½®
 */
 int
 PM16C_04::getHomePosition(u_int channel)
@@ -548,10 +548,10 @@ PM16C_04::getHomePosition(u_int channel)
     return position;
 }
 
-//! ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ğŒŸo‚·‚éi‚¸“x‚¾‚ª’·ŠÔ‚ğ—v‚·jD
+//! ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚’æ¤œå‡ºã™ã‚‹ï¼ˆé«˜ç²¾åº¦ã ãŒé•·æ™‚é–“ã‚’è¦ã™ï¼‰ï¼
 /*
-  \param axis	ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ŒŸo‚ğÀs‚·‚é²
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis	ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³æ¤œå‡ºã‚’å®Ÿè¡Œã™ã‚‹è»¸
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::findHome(Axis axis)
@@ -571,10 +571,10 @@ PM16C_04::findHome(Axis axis)
     return *this;
 }
     
-//! ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ÉˆÚ“®‚·‚éD
+//! ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã«ç§»å‹•ã™ã‚‹ï¼
 /*
-  \param axis	ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ÉˆÚ“®‚·‚é²
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis	ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã«ç§»å‹•ã™ã‚‹è»¸
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::goHome(Axis axis)
@@ -594,13 +594,13 @@ PM16C_04::goHome(Axis axis)
 }
     
 /*
- *  ²‚Æƒ`ƒƒƒ“ƒlƒ‹‚ÌŠÖŒW
+ *  è»¸ã¨ãƒãƒ£ãƒ³ãƒãƒ«ã®é–¢ä¿‚
  */
-//! w’è‚µ‚½²‚Éw’è‚µ‚½ƒ`ƒƒƒ“ƒlƒ‹‚ğŒ‹‚Ñ‚Â‚¯‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«æŒ‡å®šã—ãŸãƒãƒ£ãƒ³ãƒãƒ«ã‚’çµã³ã¤ã‘ã‚‹ï¼
 /*!
-  \param axis		²
-  \param channel	ƒ`ƒƒƒ“ƒlƒ‹
-  \return		‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis		è»¸
+  \param channel	ãƒãƒ£ãƒ³ãƒãƒ«
+  \return		ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::setChannel(Axis axis, u_int channel)
@@ -616,10 +616,10 @@ PM16C_04::setChannel(Axis axis, u_int channel)
     return *this;
 }
 
-//! w’è‚µ‚½²‚É‚Ç‚Ìƒ`ƒƒƒ“ƒlƒ‹‚ªŒ‹‚Ñ‚Â‚¯‚ç‚ê‚Ä‚¢‚é‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«ã©ã®ãƒãƒ£ãƒ³ãƒãƒ«ãŒçµã³ã¤ã‘ã‚‰ã‚Œã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis		²
-  \return		ƒ`ƒƒƒ“ƒlƒ‹
+  \param axis		è»¸
+  \return		ãƒãƒ£ãƒ³ãƒãƒ«
 */
 u_int
 PM16C_04::getChannel(Axis axis)
@@ -632,12 +632,12 @@ PM16C_04::getChannel(Axis axis)
 	    axis == Axis_C ? channel_C : channel_D);
 }
     
-//! 4‚Â‚Ì²‚É‚»‚ê‚¼‚ê‚Ç‚Ìƒ`ƒƒƒ“ƒlƒ‹‚ªŒ‹‚Ñ‚Â‚¯‚ç‚ê‚Ä‚¢‚é‚©’²‚×‚éD
+//! 4ã¤ã®è»¸ã«ãã‚Œãã‚Œã©ã®ãƒãƒ£ãƒ³ãƒãƒ«ãŒçµã³ã¤ã‘ã‚‰ã‚Œã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param channel_A	#Axis_A ‚ÉŒ‹‚Ñ‚Â‚¯‚ç‚ê‚½ƒ`ƒƒƒ“ƒlƒ‹‚ª•Ô‚³‚ê‚é
-  \param channel_B	#Axis_B ‚ÉŒ‹‚Ñ‚Â‚¯‚ç‚ê‚½ƒ`ƒƒƒ“ƒlƒ‹‚ª•Ô‚³‚ê‚é
-  \param channel_C	#Axis_C ‚ÉŒ‹‚Ñ‚Â‚¯‚ç‚ê‚½ƒ`ƒƒƒ“ƒlƒ‹‚ª•Ô‚³‚ê‚é
-  \param channel_D	#Axis_D ‚ÉŒ‹‚Ñ‚Â‚¯‚ç‚ê‚½ƒ`ƒƒƒ“ƒlƒ‹‚ª•Ô‚³‚ê‚é
+  \param channel_A	#Axis_A ã«çµã³ã¤ã‘ã‚‰ã‚ŒãŸãƒãƒ£ãƒ³ãƒãƒ«ãŒè¿”ã•ã‚Œã‚‹
+  \param channel_B	#Axis_B ã«çµã³ã¤ã‘ã‚‰ã‚ŒãŸãƒãƒ£ãƒ³ãƒãƒ«ãŒè¿”ã•ã‚Œã‚‹
+  \param channel_C	#Axis_C ã«çµã³ã¤ã‘ã‚‰ã‚ŒãŸãƒãƒ£ãƒ³ãƒãƒ«ãŒè¿”ã•ã‚Œã‚‹
+  \param channel_D	#Axis_D ã«çµã³ã¤ã‘ã‚‰ã‚ŒãŸãƒãƒ£ãƒ³ãƒãƒ«ãŒè¿”ã•ã‚Œã‚‹
 */
 void
 PM16C_04::getChannel(u_int& channel_A, u_int& channel_B,
@@ -654,12 +654,12 @@ PM16C_04::getChannel(u_int& channel_A, u_int& channel_B,
 }
 
 /*
- *  ²‚Ìó‘Ô
+ *  è»¸ã®çŠ¶æ…‹
  */
-//! w’è‚µ‚½²‚ÌŒ»İˆÊ’u‚ğ’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã®ç¾åœ¨ä½ç½®ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	Œ»İˆÊ’u
+  \param axis	è»¸
+  \return	ç¾åœ¨ä½ç½®
 */
 int
 PM16C_04::where(Axis axis)
@@ -675,10 +675,10 @@ PM16C_04::where(Axis axis)
     return position;
 }
 
-//! w’è‚µ‚½²‚É‚¨‚¢‚Ä‰½‚ç‚©‚ÌƒRƒ}ƒ“ƒh‚ªÀs’†‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«ãŠã„ã¦ä½•ã‚‰ã‹ã®ã‚³ãƒãƒ³ãƒ‰ãŒå®Ÿè¡Œä¸­ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	Às’†‚È‚çtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param axis	è»¸
+  \return	å®Ÿè¡Œä¸­ãªã‚‰true, ãã†ã§ãªã‘ã‚Œã°false
 */
 bool
 PM16C_04::isBusy(Axis axis)
@@ -686,10 +686,10 @@ PM16C_04::isBusy(Axis axis)
     return getControllerStatus(axis) & 0x1;
 }
 
-//! w’è‚µ‚½²‚É‚¨‚¢‚Äƒpƒ‹ƒX‚ª”­¶’†‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«ãŠã„ã¦ãƒ‘ãƒ«ã‚¹ãŒç™ºç”Ÿä¸­ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	”­¶’†‚È‚çtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param axis	è»¸
+  \return	ç™ºç”Ÿä¸­ãªã‚‰true, ãã†ã§ãªã‘ã‚Œã°false
 */
 bool
 PM16C_04::isPulseEmitted(Axis axis)
@@ -697,10 +697,10 @@ PM16C_04::isPulseEmitted(Axis axis)
     return getControllerStatus(axis) & 0x2;
 }
 
-//! w’è‚µ‚½²‚É‚¨‚¢‚Ä”­¶’†‚Å‚ ‚Á‚½ƒpƒ‹ƒX‚ª’â~‚µ‚½‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«ãŠã„ã¦ç™ºç”Ÿä¸­ã§ã‚ã£ãŸãƒ‘ãƒ«ã‚¹ãŒåœæ­¢ã—ãŸã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	’â~‚µ‚½‚È‚çtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param axis	è»¸
+  \return	åœæ­¢ã—ãŸãªã‚‰true, ãã†ã§ãªã‘ã‚Œã°false
 */
 bool
 PM16C_04::isPulseStopped(Axis axis)
@@ -708,11 +708,11 @@ PM16C_04::isPulseStopped(Axis axis)
     return getControllerStatus(axis) & 0x4;
 }
 
-//! w’è‚µ‚½²‚É‚¨‚¢‚ÄƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚ªON‚Å‚ ‚é‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«ãŠã„ã¦ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãŒONã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \param dir	³•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çtrue, •‰•ûŒüƒŠƒ~ƒbƒgƒXƒCƒbƒ`‚È‚çfalse
-  \return	ON‚È‚çtrue, OFF‚È‚çfalse
+  \param axis	è»¸
+  \param dir	æ­£æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰true, è² æ–¹å‘ãƒªãƒŸãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒãªã‚‰false
+  \return	ONãªã‚‰true, OFFãªã‚‰false
 */
 bool
 PM16C_04::atLimit(Axis axis, bool dir)
@@ -720,10 +720,10 @@ PM16C_04::atLimit(Axis axis, bool dir)
     return !(getHardwareLimitSwitchStatus(axis) & (dir ? 0x1 : 0x2));
 }
 
-//! w’è‚µ‚½²‚É‚¨‚¢‚Äƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“ƒXƒCƒbƒ`‚ªON‚Å‚ ‚é‚©’²‚×‚éD
+//! æŒ‡å®šã—ãŸè»¸ã«ãŠã„ã¦ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚¹ã‚¤ãƒƒãƒãŒONã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	ON‚È‚çtrue, OFF‚È‚çfalse
+  \param axis	è»¸
+  \return	ONãªã‚‰true, OFFãªã‚‰false
 */
 bool
 PM16C_04::atHome(Axis axis)
@@ -732,12 +732,12 @@ PM16C_04::atHome(Axis axis)
 }
 
 /*
- *  ˆÚ“®
+ *  ç§»å‹•
  */
-//! w’è‚µ‚½²‚ğŒ¸‘¬’â~‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’æ¸›é€Ÿåœæ­¢ã™ã‚‹ï¼
 /*!
-  \param axis	²
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \param axis	è»¸
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 PM16C_04&
 PM16C_04::stop(Axis axis)
@@ -745,11 +745,11 @@ PM16C_04::stop(Axis axis)
     return move(axis, "40");
 }
     
-//! w’è‚µ‚½²‚ğjog“®ì‚³‚¹‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’jogå‹•ä½œã•ã›ã‚‹ï¼
 /*!
-  \param axis	²
-  \param dir	³•ûŒü‚È‚çtrue, •‰•ûŒü‚È‚çfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \param axis	è»¸
+  \param dir	æ­£æ–¹å‘ãªã‚‰true, è² æ–¹å‘ãªã‚‰false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 PM16C_04&
 PM16C_04::jog(Axis axis, bool dir)
@@ -757,11 +757,11 @@ PM16C_04::jog(Axis axis, bool dir)
    return move(axis, (dir ? "08" : "09"));
 }
     
-//! w’è‚µ‚½²‚ğˆê’è‘¬“x‚ÅƒXƒLƒƒƒ“‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’ä¸€å®šé€Ÿåº¦ã§ã‚¹ã‚­ãƒ£ãƒ³ã™ã‚‹ï¼
 /*!
-  \param axis	²
-  \param dir	³•ûŒü‚È‚çtrue, •‰•ûŒü‚È‚çfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \param axis	è»¸
+  \param dir	æ­£æ–¹å‘ãªã‚‰true, è² æ–¹å‘ãªã‚‰false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 PM16C_04&
 PM16C_04::scanWithConstantSpeed(Axis axis, bool dir)
@@ -769,11 +769,11 @@ PM16C_04::scanWithConstantSpeed(Axis axis, bool dir)
     return move(axis, (dir ? "0C" : "0D"));
 }
     
-//! w’è‚µ‚½²‚ğ‘äŒ`‘¬“xƒpƒ^[ƒ“‚ÅƒXƒLƒƒƒ“‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’å°å½¢é€Ÿåº¦ãƒ‘ã‚¿ãƒ¼ãƒ³ã§ã‚¹ã‚­ãƒ£ãƒ³ã™ã‚‹ï¼
 /*!
-  \param axis	²
-  \param dir	³•ûŒü‚È‚çtrue, •‰•ûŒü‚È‚çfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \param axis	è»¸
+  \param dir	æ­£æ–¹å‘ãªã‚‰true, è² æ–¹å‘ãªã‚‰false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 PM16C_04&
 PM16C_04::scan(Axis axis, bool dir)
@@ -781,11 +781,11 @@ PM16C_04::scan(Axis axis, bool dir)
     return move(axis, (dir ? "0E" : "0F"));
 }
     
-//! w’è‚µ‚½²‚ğˆê’â~‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’ä¸€æ™‚åœæ­¢ã™ã‚‹ï¼
 /*!
-  \param axis	²
+  \param axis	è»¸
   \param on	
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰@
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã€€
 */
 PM16C_04&
 PM16C_04::pause(Axis axis, bool on)
@@ -793,11 +793,11 @@ PM16C_04::pause(Axis axis, bool on)
     return move(axis, (on ? "16" : "17"));
 }
     
-//! w’è‚µ‚½²‚ÌHold off‹@”\i’â~‚Ì”ñ’Ê“dj‚ğİ’è‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã®Hold offæ©Ÿèƒ½ï¼ˆåœæ­¢æ™‚ã®éé€šé›»ï¼‰ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param axis	²
-  \param set	‹@”\‚ğg—p‚·‚é‚È‚çtrue, g—p‚µ‚È‚¢‚È‚çfalse	
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis	è»¸
+  \param set	æ©Ÿèƒ½ã‚’ä½¿ç”¨ã™ã‚‹ãªã‚‰true, ä½¿ç”¨ã—ãªã„ãªã‚‰false	
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::holdOff(Axis axis, bool set)
@@ -805,11 +805,11 @@ PM16C_04::holdOff(Axis axis, bool set)
     return move(axis, (set ? "18" : "19"));
 }
 
-//! w’è‚µ‚½²‚ğƒXƒLƒƒƒ“‚µ‚È‚ª‚çƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“‚ğŒŸo‚·‚éi‚‘¬‚¾‚ª’á¸“xjD
+//! æŒ‡å®šã—ãŸè»¸ã‚’ã‚¹ã‚­ãƒ£ãƒ³ã—ãªãŒã‚‰ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚’æ¤œå‡ºã™ã‚‹ï¼ˆé«˜é€Ÿã ãŒä½ç²¾åº¦ï¼‰ï¼
 /*!
-  \param axis	²
-  \param dir	³•ûŒü‚ÉƒXƒLƒƒƒ“‚·‚é‚È‚çtrue, •‰•ûŒü‚È‚çfalse
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis	è»¸
+  \param dir	æ­£æ–¹å‘ã«ã‚¹ã‚­ãƒ£ãƒ³ã™ã‚‹ãªã‚‰true, è² æ–¹å‘ãªã‚‰false
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::scanAndStopAtHome(Axis axis, bool dir)
@@ -817,15 +817,15 @@ PM16C_04::scanAndStopAtHome(Axis axis, bool dir)
     return move(axis, (dir ? "1E" : "1F"));
 }
 
-//! w’è‚µ‚½²‚ğˆÚ“®‚·‚éD
+//! æŒ‡å®šã—ãŸè»¸ã‚’ç§»å‹•ã™ã‚‹ï¼
 /*!
-  \param axis			²
-  \param relative		‘Š‘Î“I‚ÈˆÚ“®‚È‚çtrue, â‘Î“I‚ÈˆÚ“®‚È‚çfalse
-  \param val			ˆÚ“®—Êi‘Š‘Î“I‚ÈˆÚ“®j
-				‚Ü‚½‚Í–Ú•WˆÊ’uiâ‘Î“I‚ÈˆÚ“®j
-  \param correctBacklash	’â~‚ÉƒoƒbƒNƒ‰ƒbƒVƒ…•â³‚ğs‚¤‚È‚çtrue,
-				s‚í‚È‚¢‚È‚çfase
-  \return			‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param axis			è»¸
+  \param relative		ç›¸å¯¾çš„ãªç§»å‹•ãªã‚‰true, çµ¶å¯¾çš„ãªç§»å‹•ãªã‚‰false
+  \param val			ç§»å‹•é‡ï¼ˆç›¸å¯¾çš„ãªç§»å‹•ï¼‰
+				ã¾ãŸã¯ç›®æ¨™ä½ç½®ï¼ˆçµ¶å¯¾çš„ãªç§»å‹•ï¼‰
+  \param correctBacklash	åœæ­¢æ™‚ã«ãƒãƒƒã‚¯ãƒ©ãƒƒã‚·ãƒ¥è£œæ­£ã‚’è¡Œã†ãªã‚‰true,
+				è¡Œã‚ãªã„ãªã‚‰fase
+  \return			ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::move(Axis axis, bool relative, int val, bool correctBacklash)
@@ -843,11 +843,11 @@ PM16C_04::move(Axis axis, bool relative, int val, bool correctBacklash)
 }
 
 /*
- *  Parallel I/Oƒ|[ƒg
+ *  Parallel I/Oãƒãƒ¼ãƒˆ
  */
-//! ƒpƒ‰ƒŒƒ‹I/Oƒ|[ƒg‚ğ—LŒø‰»‚·‚éD
+//! ãƒ‘ãƒ©ãƒ¬ãƒ«I/Oãƒãƒ¼ãƒˆã‚’æœ‰åŠ¹åŒ–ã™ã‚‹ï¼
 /*!
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::enableParallelIO()
@@ -857,9 +857,9 @@ PM16C_04::enableParallelIO()
     return *this;
 }
     
-//! ƒpƒ‰ƒŒƒ‹I/Oƒ|[ƒg‚ğ–³Œø‰»‚·‚éD
+//! ãƒ‘ãƒ©ãƒ¬ãƒ«I/Oãƒãƒ¼ãƒˆã‚’ç„¡åŠ¹åŒ–ã™ã‚‹ï¼
 /*!
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::disableParallelIO()
@@ -869,9 +869,9 @@ PM16C_04::disableParallelIO()
     return *this;
 }
 
-//! ƒpƒ‰ƒŒƒ‹I/Oƒ|[ƒg‚ª—LŒø‚©’²‚×‚éD
+//! ãƒ‘ãƒ©ãƒ¬ãƒ«I/Oãƒãƒ¼ãƒˆãŒæœ‰åŠ¹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \return	—LŒø‚È‚çtrue, –³Œø‚È‚çfalse
+  \return	æœ‰åŠ¹ãªã‚‰true, ç„¡åŠ¹ãªã‚‰false
 */
 bool
 PM16C_04::isEnabledParallelIO()
@@ -883,9 +883,9 @@ PM16C_04::isEnabledParallelIO()
     return !strncmp(response, "PIO", 3);
 }
 
-//! ƒpƒ‰ƒŒƒ‹I/Oƒ|[ƒg‚©‚ç“Ç‚İ‚ŞD
+//! ãƒ‘ãƒ©ãƒ¬ãƒ«I/Oãƒãƒ¼ãƒˆã‹ã‚‰èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \return	“Ç‚İ‚ñ‚¾’l
+  \return	èª­ã¿è¾¼ã‚“ã å€¤
 */
 u_int
 PM16C_04::readParallelIO()
@@ -898,10 +898,10 @@ PM16C_04::readParallelIO()
     return val;
 }
     
-//! ƒpƒ‰ƒŒƒ‹I/Oƒ|[ƒg‚É‘‚«o‚·D
+//! ãƒ‘ãƒ©ãƒ¬ãƒ«I/Oãƒãƒ¼ãƒˆã«æ›¸ãå‡ºã™ï¼
 /*!
-  \param val	‘‚«o‚·’l
-  \return	‚±‚ÌƒRƒ“ƒgƒ[ƒ‰
+  \param val	æ›¸ãå‡ºã™å€¤
+  \return	ã“ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
 */
 PM16C_04&
 PM16C_04::writeParallelIO(u_int val)

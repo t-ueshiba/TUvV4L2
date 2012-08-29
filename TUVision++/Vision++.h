@@ -1,5 +1,5 @@
 /*
- *  $Id: Vision++.h,v 1.5 2008-05-27 11:38:25 ueshiba Exp $
+ *  $Id: Vision++.h,v 1.6 2012-08-29 21:17:14 ueshiba Exp $
  */
 #ifndef __TUVisionPP_h
 #define __TUVisionPP_h

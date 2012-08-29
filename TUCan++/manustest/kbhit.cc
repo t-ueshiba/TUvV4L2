@@ -1,5 +1,5 @@
 /*
- *  $Id: kbhit.cc,v 1.1.1.1 2002-07-25 02:14:15 ueshiba Exp $
+ *  $Id: kbhit.cc,v 1.2 2012-08-29 21:16:54 ueshiba Exp $
  */
 #include <termios.h>
 #include <stdio.h>

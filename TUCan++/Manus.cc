@@ -1,5 +1,5 @@
 /*
- *  $Id: Manus.cc,v 1.3 2008-05-15 08:53:48 ueshiba Exp $
+ *  $Id: Manus.cc,v 1.4 2012-08-29 21:16:49 ueshiba Exp $
  */
 #include "TU/Can++.h"
 
@@ -74,10 +74,10 @@ isZero(const Manus::Speed& speed)
 /************************************************************************
 *  class Manus								*
 ************************************************************************/
-//! Manus$B%^%K%T%e%l!<%?%N!<%I$r@8@.$9$k(B
+//! Manusマニピュレータノードを生成する
 /*!
-  $B%^%K%T%e%l!<%?$O(B#STILL$B%b!<%I$K=i4|2=$5$l$k!%(B
-  \param dev	Manus$B%^%K%T%e%l!<%?$N%G%P%$%9L>(B(ex. /dev/can0)
+  マニピュレータは#STILLモードに初期化される．
+  \param dev	Manusマニピュレータのデバイス名(ex. /dev/can0)
 */
 Manus::Manus(const char* dev)
     :Can(dev), _mode(STILL), _status(OK), _pos(), _upDown(0), _speed()
@@ -85,11 +85,11 @@ Manus::Manus(const char* dev)
     stillMode();
 }
 
-//! $B@^$j>v$^$l$F$$$k%^%K%T%e%l!<%?$r3H$2$k(B
+//! 折り畳まれているマニピュレータを拡げる
 /*!
-  $B3H$2=*$o$k$H!$Bf:B$O@E;_$K!$$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K$=$l$>$l%j%;%C%H(B
-  $B$5$l$F<+F0E*$K(B#JOINT$B%b!<%I$K$J$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  拡げ終わると，台座は静止に，すべての軸の速度指令値は0にそれぞれリセット
+  されて自動的に#JOINTモードになる．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::foldOut()
@@ -105,11 +105,11 @@ Manus::foldOut()
     return jointMode();
 }
 
-//! $B%^%K%T%e%l!<%?$r3JG<0LCV$K@^$j>v$`(B
+//! マニピュレータを格納位置に折り畳む
 /*!
-  $B@^$j>v$_$,40N;$9$k$H!$Bf:B$O@E;_$K!$$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K$=$l$>$l(B
-  $B%j%;%C%H$5$l$F<+F0E*$K(B#JOINT$B%b!<%I$K$J$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  折り畳みが完了すると，台座は静止に，すべての軸の速度指令値は0にそれぞれ
+  リセットされて自動的に#JOINTモードになる．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::foldIn()
@@ -135,10 +135,10 @@ Manus::foldIn()
     return jointMode();
 }
 
-//! $B%^%K%T%e%l!<%?$r(B#STILL$B%b!<%I$K0\9T$9$k(B
+//! マニピュレータを#STILLモードに移行する
 /*!
-  $BBf:B$O@E;_$K!$$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K$=$l$>$l%j%;%C%H$5$l$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  台座は静止に，すべての軸の速度指令値は0にそれぞれリセットされる．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::stillMode()
@@ -149,11 +149,11 @@ Manus::stillMode()
     return tick();
 }
 
-//! $B%^%K%T%e%l!<%?$r(B#CARTESIAN$B%b!<%I$K0\9T$9$k(B
+//! マニピュレータを#CARTESIANモードに移行する
 /*!
-  $B0\9T$K<:GT$7$?>l9g$O!$(B#JOINT$B%b!<%I$K0\9T$9$k!%(B
-  $BBf:B$O@E;_$K!$$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K$=$l$>$l%j%;%C%H$5$l$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  移行に失敗した場合は，#JOINTモードに移行する．
+  台座は静止に，すべての軸の速度指令値は0にそれぞれリセットされる．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::cartesianMode()
@@ -167,10 +167,10 @@ Manus::cartesianMode()
     return *this;
 }
 
-//! $B%^%K%T%e%l!<%?$r(B#JOINT$B%b!<%I$K0\9T$9$k(B
+//! マニピュレータを#JOINTモードに移行する
 /*!
-  $BBf:B$O@E;_$K!$$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K$=$l$>$l%j%;%C%H$5$l$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  台座は静止に，すべての軸の速度指令値は0にそれぞれリセットされる．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::jointMode()
@@ -181,11 +181,11 @@ Manus::jointMode()
     return tick();
 }
 
-//! $BBf:B$r>e>:$5$;$k$h$&$K@_Dj$9$k(B
+//! 台座を上昇させるように設定する
 /*!
-  $B$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K%j%;%C%H$5$l$k!%(B
-  $B<!$N(Btick()$B$N8F$S=P$7$G<B:]$KBf:B$,>e>:$9$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  すべての軸の速度指令値は0にリセットされる．
+  次のtick()の呼び出しで実際に台座が上昇する．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::setBaseUp()
@@ -195,11 +195,11 @@ Manus::setBaseUp()
     return *this;
 }
 
-//! $BBf:B$r@E;_$5$;$k$h$&$K@_Dj$9$k(B
+//! 台座を静止させるように設定する
 /*!
-  $B$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K%j%;%C%H$5$l$k!%(B
-  $B<!$N(Btick()$B$N8F$S=P$7$G<B:]$KBf:B$,@E;_$9$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  すべての軸の速度指令値は0にリセットされる．
+  次のtick()の呼び出しで実際に台座が静止する．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::setBaseStill()
@@ -209,11 +209,11 @@ Manus::setBaseStill()
     return *this;
 }
 
-//! $BBf:B$r2<9_$5$;$k$h$&$K@_Dj$9$k(B
+//! 台座を下降させるように設定する
 /*!
-  $B$9$Y$F$N<4$NB.EY;XNaCM$O(B0$B$K%j%;%C%H$5$l$k!%(B
-  $B<!$N(Btick()$B$N8F$S=P$7$G<B:]$KBf:B$,2<9_$9$k!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  すべての軸の速度指令値は0にリセットされる．
+  次のtick()の呼び出しで実際に台座が下降する．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::setBaseDown()
@@ -223,16 +223,16 @@ Manus::setBaseDown()
     return *this;
 }
 
-//! $BB.EY;XNaCM$r@_Dj$9$k(B
+//! 速度指令値を設定する
 /*!
-  #CARTESIAN/#JOINT$B%b!<%I$N>l9g$O!$;XDj$5$l$?B.EYCM$,(B#SpeedLimits
-  $B$NHO0O$K<}$^$i$J$1$l$P!$<}$^$k$h$&$K:GBg(B/$B:G>.CM$,@_Dj$5$l$k!%(B
-  #CARTESIAN/#JOINT$B%b!<%I0J30$N>l9g$O!$B.EYCM$O(B0$B$K@_Dj$5$l$k!%$I$A$i$N>l9g$b(B
-  $BBf:B$O@E;_$K%j%;%C%H$5$l$k!%<!$N(Btick()$B$N8F$S=P$7$G<B:]$KB.EY;XNa$,%^%K(B
-  $B%T%e%l!<%?$KAw$i$l$k!%(B
-  \param speed	$BB.EY;XNaCM!%(B#CARTESIAN$B%b!<%I$N>l9g$O3F:BI8<4$NB.EY!%$=$&$G$J$$(B
-		$B>l9g$O4X@a3QB.EY!%(B
-  \return	$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
+  #CARTESIAN/#JOINTモードの場合は，指定された速度値が#SpeedLimits
+  の範囲に収まらなければ，収まるように最大/最小値が設定される．
+  #CARTESIAN/#JOINTモード以外の場合は，速度値は0に設定される．どちらの場合も
+  台座は静止にリセットされる．次のtick()の呼び出しで実際に速度指令がマニ
+  ピュレータに送られる．
+  \param speed	速度指令値．#CARTESIANモードの場合は各座標軸の速度．そうでない
+		場合は関節角速度．
+  \return	このManusマニピュレータオブジェクト．
 */
 Manus&
 Manus::setSpeed(const Speed& speed)
@@ -266,13 +266,13 @@ Manus::setSpeed(const Speed& speed)
     return *this;
 }
 
-//! $B%^%K%T%e%l!<%?$N@)8f%k!<%W$r(B1$B2s$@$12s$9(B
+//! マニピュレータの制御ループを1回だけ回す
 /*!
-  $B%^%K%T%e%l!<%?$N8=:_0LCV$rFI$_9~$`!%FI$_9~$s$@8=:_0LCV$O!$(Bposition()$B$GCN$k(B
-  $B$3$H$,$G$-$k!%$5$i$K!$(B#CARTESIAN/#JOINT$B%b!<%I$N(B
-  $B>l9g$O!$8=:_$NB.EY;XNaCM$r%^%K%T%e%l!<%?$KAw$k!%(B
-  \return		$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
-  \exception Error	$B%^%K%T%e%l!<%?$K%(%i!<$,@8$8$?!%(B
+  マニピュレータの現在位置を読み込む．読み込んだ現在位置は，position()で知る
+  ことができる．さらに，#CARTESIAN/#JOINTモードの
+  場合は，現在の速度指令値をマニピュレータに送る．
+  \return		このManusマニピュレータオブジェクト．
+  \exception Error	マニピュレータにエラーが生じた．
 */
 Manus&
 Manus::tick()
@@ -311,11 +311,11 @@ Manus::tick()
     return *this;
 }
 
-//! $B%^%K%T%e%l!<%?$NBf:B$r:G9bE@$^$G>e$2$k(B
+//! マニピュレータの台座を最高点まで上げる
 /*!
-  #CARTESIAN$B$^$?$O(B#JOINT$B%b!<%I$G$N$_M-8z!%(B
-  \return			$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
-  \exception std::runtime_error	#CARTESIAN$B$^$?$O(B#JOINT$B%b!<%I$G$J$$!%(B
+  #CARTESIANまたは#JOINTモードでのみ有効．
+  \return			このManusマニピュレータオブジェクト．
+  \exception std::runtime_error	#CARTESIANまたは#JOINTモードでない．
 */
 Manus&
 Manus::baseUp()
@@ -330,11 +330,11 @@ Manus::baseUp()
     return *this;
 }
 
-//! $B%^%K%T%e%l!<%?$NBf:B$r:GDcE@$^$G2<$2$k(B
+//! マニピュレータの台座を最低点まで下げる
 /*!
-  #CARTESIAN$B$^$?$O(B#JOINT$B%b!<%I$G$N$_M-8z!%(B
-  \return			$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
-  \exception std::runtime_error	#CARTESIAN$B$^$?$O(B#JOINT$B%b!<%I$G$J$$!%(B
+  #CARTESIANまたは#JOINTモードでのみ有効．
+  \return			このManusマニピュレータオブジェクト．
+  \exception std::runtime_error	#CARTESIANまたは#JOINTモードでない．
 */
 Manus&
 Manus::baseDown()
@@ -349,12 +349,12 @@ Manus::baseDown()
     return *this;
 }
 
-//! $B%^%K%T%e%l!<%?$rL\I80LCV$^$GF0$+$9(B
+//! マニピュレータを目標位置まで動かす
 /*!
-  #CARTESIAN$B$^$?$O(B#JOINT$B%b!<%I$G$N$_M-8z!%(B
-  \param ref			$BL\I80LCV(B
-  \return			$B$3$N(BManus$B%^%K%T%e%l!<%?%*%V%8%'%/%H!%(B
-  \exception std::runtime_error	#CARTESIAN$B$^$?$O(B#JOINT$B%b!<%I$G$J$$!%(B
+  #CARTESIANまたは#JOINTモードでのみ有効．
+  \param ref			目標位置
+  \return			このManusマニピュレータオブジェクト．
+  \exception std::runtime_error	#CARTESIANまたは#JOINTモードでない．
 */
 Manus&
 Manus::moveTo(const Position& ref)
@@ -398,10 +398,10 @@ Manus::moveTo(const Position& ref)
     return *this;
 }
 
-//! $B%^%K%T%e%l!<%?$N>uBV$r%a%C%;!<%8J8;zNs$KJQ49$9$k(B
+//! マニピュレータの状態をメッセージ文字列に変換する
 /*!
-  \param status	$B%^%K%T%e%l!<%?$N>uBV!%(B
-  \return	$B%a%C%;!<%8J8;zNs!%(B
+  \param status	マニピュレータの状態．
+  \return	メッセージ文字列．
 */
 const char*
 Manus::message(Status status)

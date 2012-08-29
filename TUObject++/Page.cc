@@ -1,5 +1,5 @@
 /*
- *  $Id: Page.cc,v 1.3 2002-07-26 08:56:04 ueshiba Exp $
+ *  $Id: Page.cc,v 1.4 2012-08-29 21:17:03 ueshiba Exp $
  */
 #include "Object++_.h"
 #include <stdexcept>
@@ -9,14 +9,14 @@ namespace TU
 /************************************************************************
 *  class Page::Cell:		memory cells assigned to the objects	*
 ************************************************************************/
-//! $B;XDj$5$l$?(Bblock$B?t0J>e$NBg$-$5$r;}$D(Bcell$B$r(Bfree list$B$+$iC5$9(B
+//! 指定されたblock数以上の大きさを持つcellをfree listから探す
 /*!
-  \param nblocks	block$B?t!%(B
-  \param addition	false$B$J$i$P!$;XDj$5$l$?(Bblock$B?t0J>e$N(Bcell$B$,$_$D$+$k(B
-			$B$^$GA4$F$N(Bfree list$B$rC5:w$9$k!%(Btrue$B$J$i$P!$;XDj$5$l(B
-			$B$?(Bblock$B?t$r3JG<$9$k$N$K$U$5$o$7$$(Bfree list$B$N$_$rC5:w(B
-			$B$7!$3JG<0LCV$ND>8e$N(Bcell$B$rJV$9!%(B
-  \return		$B$_$D$+$C$?(Bcell$B$rJV$9!%$_$D$+$i$J$1$l$P(B0$B$rJV$9!%(B
+  \param nblocks	block数．
+  \param addition	falseならば，指定されたblock数以上のcellがみつかる
+			まで全てのfree listを探索する．trueならば，指定され
+			たblock数を格納するのにふさわしいfree listのみを探索
+			し，格納位置の直後のcellを返す．
+  \return		みつかったcellを返す．みつからなければ0を返す．
 */
 Page::Cell*
 Page::Cell::find(u_int nblocks, bool addition)
@@ -39,12 +39,12 @@ Page::Cell::find(u_int nblocks, bool addition)
     return 0;
 }
 
-//! $B<+?H$r(Bfree list$B$K3JG<$9$k(B
+//! 自身をfree listに格納する
 /*!
-  $B3F(Bfree list$B$NCf$G(Bcell$B$O$=$NBg$-$5(B(block$B?t(B)$B$N>:=g$K3JG<$5$l$k!%(Bthis == 0
-  $B$b5v$5$l!$$b$A$m$s$3$N>l9g$O2?$b$7$J$$!%(B
-  \return	this != 0$B$N>l9g$O<+?H$N(Bblock$B?t$,JV$5$l$k!%(Bthis == 0$B$N>l9g(B
-		$B$O(B0$B$,JV$5$l$k!%(B
+  各free listの中でcellはその大きさ(block数)の昇順に格納される．this == 0
+  も許され，もちろんこの場合は何もしない．
+  \return	this != 0の場合は自身のblock数が返される．this == 0の場合
+		は0が返される．
 */
 u_int
 Page::Cell::add()
@@ -63,11 +63,11 @@ Page::Cell::add()
 	return 0;
 }
     
-//! $B<+?H$r(Bfree list$B$+$i<h$j=P$9(B
+//! 自身をfree listから取り出す
 /*!
-  free list$B$K3JG<$5$l$F$$$k$3$H$rI=$9%U%i%0(B_fr$B$,(B1$B$N;~$N$_!$<B:]$N<h$j=P$7(B
-  $B$,5/$3$j!$$b$A$m$s$3$N;~$O(B_fr$B$,(B0$B$K=q$-49$($i$l$k!%(B
-  \return	$B<+J,<+?H$,JV$5$l$k!%(B
+  free listに格納されていることを表すフラグ_frが1の時のみ，実際の取り出し
+  が起こり，もちろんこの時は_frが0に書き換えられる．
+  \return	自分自身が返される．
 */
 Page::Cell*
 Page::Cell::detach()
@@ -81,12 +81,12 @@ Page::Cell::detach()
     return this;
 }
     
-//! $B<+?H$r(B2$B$D$N(Bcell$B$KJ,3d$9$k(B
+//! 自身を2つのcellに分割する
 /*!
-  $B<+?H$N%5%$%:$r;XDj$5$l$?(Bblock$B?t$K@Z$j5M$a!$;D$j$r?7$?$J(Bcell$B$H$7$FJV$9!%(B
-  $B$b$7$b;D$j$N%5%$%:$,(Bcell$B$=$N$b$N$N%5%$%:$h$j>.$5$$>l9g$OJ,3d$O@8$8$J$$!%(B
-  \param blocks	$B;XDj(Bblock$B?t!%(B
-  \return	$BJ,3d$,@.8y$9$l$P?7$?$J(Bcell$B$,!$<:GT$9$l$P(B0$B$,!$$=$l$>$lJV$5$l$k!%(B
+  自身のサイズを指定されたblock数に切り詰め，残りを新たなcellとして返す．
+  もしも残りのサイズがcellそのもののサイズより小さい場合は分割は生じない．
+  \param blocks	指定block数．
+  \return	分割が成功すれば新たなcellが，失敗すれば0が，それぞれ返される．
 */
 Page::Cell*
 Page::Cell::split(u_int nblocks)
@@ -99,13 +99,13 @@ Page::Cell::split(u_int nblocks)
     return cell;
 }
 
-//! $B%f!<%6B&$KJV$5$l$k%a%b%j$r$-$l$$$K$9$k(B
+//! ユーザ側に返されるメモリをきれいにする
 /*!
-  Object::new$B$K$h$C$FF@$i$l$?%a%b%j$rMQ$$$F%f!<%6$,%*%V%8%'%/%H$r9=(B
-  $BC[$9$k:]$K!$$=$N%*%V%8%'%/%H$NFbIt$KB>$N%*%V%8%'%/%H$X$N%]%$%s%?$,$"(B
-  $B$k$H!$$=$N%]%$%s%?$N=i4|2=$,:Q$s$G$$$J$$;~E@$G(BGC$B$,@8$8$?>l9g$K%]%$%s(B
-  $B%?$K%4%_$NCM$,F~$C$F$$$k$?$a$K(Bmarking$B$,K=Av$9$k2DG=@-$,$"$k!%$3$l$r(B
-  $BKI$0$?$a$K!$(Bcell$B$NCf?HA4BN$r<+?H$X$N%]%$%s%?$GKd$a$F$*$/!%(B
+  Object::newによって得られたメモリを用いてユーザがオブジェクトを構
+  築する際に，そのオブジェクトの内部に他のオブジェクトへのポインタがあ
+  ると，そのポインタの初期化が済んでいない時点でGCが生じた場合にポイン
+  タにゴミの値が入っているためにmarkingが暴走する可能性がある．これを
+  防ぐために，cellの中身全体を自身へのポインタで埋めておく．
 */
 void*
 Page::Cell::clean()
@@ -124,10 +124,10 @@ Page::Cell::clean()
 /************************************************************************
 *  class Page:		memory page					*
 ************************************************************************/
-//! $B?7$?$J%a%b%j%Z!<%8$r3NJ]$9$k(B
+//! 新たなメモリページを確保する
 /*!
-  $B%Z!<%8$r3NJ]$7$?$i!$<+?H$r%Z!<%8%j%9%H$KEPO?$9$k$H6&$K!$Cf?H$N%V%m%C%/(B
-  $B$r(Bcell$B$H$7$F(Bfree list$B$K3JG<$9$k!%(B
+  ページを確保したら，自身をページリストに登録すると共に，中身のブロック
+  をcellとしてfree listに格納する．
 */
 Page::Page()
     :_nxt(_root)
@@ -138,9 +138,9 @@ Page::Page()
     cell->add();
 }
 
-//! $BA4$F$N%a%b%j%Z!<%8$r(Bsweep$B$7$F;HMQ$5$l$F$$$J$$(Bcell$B$r2s<}$9$k(B
+//! 全てのメモリページをsweepして使用されていないcellを回収する
 /*!
-  \return	$B2s<}$7$?(Bblock$B?t$rJV$9!%(B
+  \return	回収したblock数を返す．
 */
 u_int
 Page::sweep()
@@ -156,20 +156,20 @@ Page::sweep()
 	for (Cell *cell = (Cell*)(&page->_block[0]),
 		  *end  = (Cell*)(&page->_block[NBLOCKS]);
 	     cell < end; cell = cell->forward())
-	    if (cell->_gc)		// $B;HMQCf!%(B
+	    if (cell->_gc)		// 使用中．
 	    {
-		cell->_gc = 0;			// $B%^!<%/$r$O$:$9$@$1!%(B
-		nblocks += garbage->add();	// $B$3$l$^$G$K=8$a$?%4%_$r3JG<!%(B
+		cell->_gc = 0;			// マークをはずすだけ．
+		nblocks += garbage->add();	// これまでに集めたゴミを格納．
 		garbage = 0;
 	    }
-	    else			// free list$B$K$"$k$+Kt$O(Bdangling$B>uBV!%(B
+	    else			// free listにあるか又はdangling状態．
 	    {
 #ifdef TUObjectPP_DEBUG
 		if (cell->_nb == 0)
 		    std::cerr << "size 0 cell!!" << std::endl;
 #endif
-		cell->detach();			// free list$B$K$"$l$P<h$j=P$9!%(B
-	      // $B$3$l$^$G$K=8$a$?%4%_$H%^!<%8$9$k!%(B
+		cell->detach();			// free listにあれば取り出す．
+	      // これまでに集めたゴミとマージする．
 		garbage = (garbage ? garbage->merge() : cell);
 	    }
 	nblocks += garbage->add();

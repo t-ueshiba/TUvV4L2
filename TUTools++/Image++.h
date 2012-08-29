@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.60 2012-08-15 07:17:55 ueshiba Exp $
+ *  $Id: Image++.h,v 1.61 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Image++.h
-  \brief	‰æ‘f‚Æ‰æ‘œ‚ÉŠÖ˜A‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	ç”»ç´ ã¨ç”»åƒã«é–¢é€£ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef	__TUImagePP_h
 #define	__TUImagePP_h
@@ -49,7 +49,7 @@ struct ARGB;
 struct BGRA;
 struct YUV444;
 
-//! Red, Green, BlueiŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f
+//! Red, Green, Blueï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ 
 struct RGB
 {
     RGB()					:r(0),  g(0),  b(0)	{}
@@ -97,7 +97,7 @@ operator <<(std::ostream& out, const RGB& p)
     return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b;
 }
 
-//! Blue, Green, RediŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f
+//! Blue, Green, Redï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ 
 struct BGR
 {
     BGR()					:b(0),   g(0),   r(0)	{}
@@ -148,7 +148,7 @@ operator <<(std::ostream& out, const BGR& p)
     return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b;
 }
 
-//! ƒJƒ‰[‰æ‘f‚Ìalphaƒ`ƒƒƒ“ƒlƒ‹
+//! ã‚«ãƒ©ãƒ¼ç”»ç´ ã®alphaãƒãƒ£ãƒ³ãƒãƒ«
 struct Alpha
 {
     Alpha(u_char aa=255)	:a(aa)			{}
@@ -159,7 +159,7 @@ struct Alpha
     u_char	a;
 };
 
-//! Red, Green, Blue, AlphaiŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f
+//! Red, Green, Blue, Alphaï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ 
 struct RGBA : public RGB, public Alpha
 {
     RGBA()		:RGB(),        Alpha()		{}
@@ -173,7 +173,7 @@ struct RGBA : public RGB, public Alpha
     bool	operator !=(const RGBA& p)	const	{return !(*this != p);}
 };
 
-//! Alpha, Blue, Green, RediŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f
+//! Alpha, Blue, Green, Redï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ 
 struct ABGR : public Alpha, public BGR
 {
     ABGR()		:Alpha(),  BGR()		{}
@@ -187,7 +187,7 @@ struct ABGR : public Alpha, public BGR
     bool	operator !=(const ABGR& p) const	{return !(*this != p);}
 };
 
-//! Alpha, Red, Green, BlueiŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f
+//! Alpha, Red, Green, Blueï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ 
 struct ARGB : public Alpha, public RGB
 {
     ARGB()		:Alpha(),  RGB()		{}
@@ -201,7 +201,7 @@ struct ARGB : public Alpha, public RGB
     bool	operator !=(const ARGB& p) const	{return !(*this != p);}
 };
 
-//! Blue, Green, Red, AlphaiŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f
+//! Blue, Green, Red, Alphaï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ 
 struct BGRA : public BGR, public Alpha
 {
     BGRA()		:BGR(), Alpha()  		{}
@@ -238,7 +238,7 @@ BGR::BGR(const BGRA& p)	:r(p.r), g(p.g), b(p.b)	{}
 ************************************************************************/
 struct YUYV422;
 
-//! Y, U, ViŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f
+//! Y, U, Vï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ 
 struct YUV444
 {
     YUV444(u_char yy=0, u_char uu=128, u_char vv=128)
@@ -273,7 +273,7 @@ operator <<(std::ostream& out, const YUV444& yuv)
     return out << (u_int)yuv.y << ' ' << (u_int)yuv.u << ' ' << (u_int)yuv.v;
 }
 
-//! [U, Y0], [V, Y1]iŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f(16bits/pixel)
+//! [U, Y0], [V, Y1]ï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ (16bits/pixel)
 struct YUV422
 {
     YUV422(u_char yy=0, u_char xx=128)	:x(xx), y(yy)	{}
@@ -306,7 +306,7 @@ operator <<(std::ostream& out, const YUV422& yuv)
     return out << (u_int)yuv.y << ' ' << (u_int)yuv.x;
 }
 
-//! [Y0, U], [Y1, V]iŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f(16bits/pixel)
+//! [Y0, U], [Y1, V]ï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ (16bits/pixel)
 struct YUYV422
 {
     YUYV422(u_char yy=0, u_char xx=128)	:y(yy), x(xx)	{}
@@ -339,7 +339,7 @@ operator <<(std::ostream& out, const YUYV422& yuv)
     return out << (u_int)yuv.y << ' ' << (u_int)yuv.x;
 }
 
-//! [U, Y0, Y1], [V, Y2, Y3]iŠe8bitj‚Ì‡‚Å•À‚ñ‚¾ƒJƒ‰[‰æ‘f(12bits/pixel)
+//! [U, Y0, Y1], [V, Y2, Y3]ï¼ˆå„8bitï¼‰ã®é †ã§ä¸¦ã‚“ã ã‚«ãƒ©ãƒ¼ç”»ç´ (12bits/pixel)
 struct YUV411
 {
     YUV411(u_char yy0=0, u_char yy1=0, u_char xx=128)
@@ -376,7 +376,7 @@ YUYV422::YUYV422(const YUV422& p) :y(p.y), x(p.x)	{}
 /************************************************************************
 *  function fromYUV<T>()						*
 ************************************************************************/
-//! ƒJƒ‰[‚ÌY, U, V’l‚ğ—^‚¦‚Ä‘¼‚ÌƒJƒ‰[•\Œ»‚É•ÏŠ·‚·‚éƒNƒ‰ƒX
+//! ã‚«ãƒ©ãƒ¼ã®Y, U, Vå€¤ã‚’ä¸ãˆã¦ä»–ã®ã‚«ãƒ©ãƒ¼è¡¨ç¾ã«å¤‰æ›ã™ã‚‹ã‚¯ãƒ©ã‚¹
 class __PORT ConversionFromYUV
 {
   public:
@@ -462,11 +462,11 @@ BGR::BGR(const YUV444& p)
 /************************************************************************
 *  class ImageBase:	basic image class				*
 ************************************************************************/
-//! ‰æ‘f‚Ì2ŸŒ³”z—ñ‚Æ‚µ‚Ä’è‹`‚³‚ê‚½‚ ‚ç‚ä‚é‰æ‘œ‚ÌŠî’ê‚Æ‚È‚éƒNƒ‰ƒX
+//! ç”»ç´ ã®2æ¬¡å…ƒé…åˆ—ã¨ã—ã¦å®šç¾©ã•ã‚ŒãŸã‚ã‚‰ã‚†ã‚‹ç”»åƒã®åŸºåº•ã¨ãªã‚‹ã‚¯ãƒ©ã‚¹
 class __PORT ImageBase
 {
   public:
-  //! ŠO•”‹L‰¯‚É“Ç‚İ‘‚«‚·‚éÛ‚Ì‰æ‘f‚Ìƒ^ƒCƒv
+  //! å¤–éƒ¨è¨˜æ†¶ã«èª­ã¿æ›¸ãã™ã‚‹éš›ã®ç”»ç´ ã®ã‚¿ã‚¤ãƒ—
     enum Type
     {
 	DEFAULT = 0,	//!< same as internal type
@@ -485,22 +485,22 @@ class __PORT ImageBase
 	BMP_32		//!< BMP BGRA		32bit/pixel
     };
 
-  //! ŠO•”‹L‰¯‚É“Ç‚İ‘‚«‚·‚éÛ‚Ì•t‰Áî•ñ
+  //! å¤–éƒ¨è¨˜æ†¶ã«èª­ã¿æ›¸ãã™ã‚‹éš›ã®ä»˜åŠ æƒ…å ±
     struct TypeInfo
     {
 	__PORT	TypeInfo(Type ty=DEFAULT)	;
 
-	Type	type;		//!< ‰æ‘f‚ÌŒ^
-	bool	bottomToTop;	//!< s‚ª‰º‚©‚çã‚Öû‚ß‚ç‚ê‚Ä‚¢‚é‚È‚çtrue
-	u_int	ncolors;	//!< ƒJƒ‰[ƒpƒŒƒbƒg‚ÌF”
+	Type	type;		//!< ç”»ç´ ã®å‹
+	bool	bottomToTop;	//!< è¡ŒãŒä¸‹ã‹ã‚‰ä¸Šã¸åã‚ã‚‰ã‚Œã¦ã„ã‚‹ãªã‚‰true
+	u_int	ncolors;	//!< ã‚«ãƒ©ãƒ¼ãƒ‘ãƒ¬ãƒƒãƒˆã®è‰²æ•°
     };
     
   protected:
-  //! ‰æ‘œ‚ğ¶¬‚µ“Š‰es—ñ‚Æ•úË˜c‹ÈŒW”‚ğ‰Šú‰»‚·‚éD
+  //! ç”»åƒã‚’ç”Ÿæˆã—æŠ•å½±è¡Œåˆ—ã¨æ”¾å°„æ­ªæ›²ä¿‚æ•°ã‚’åˆæœŸåŒ–ã™ã‚‹ï¼
   /*!
-    “Š‰es—ñ‚Í
-    \f$\TUbeginarray{cc} \TUvec{I}{3\times 3} & \TUvec{0}{} \TUendarray\f$‚ÉC
-    2‚Â‚Ì•úË˜c‹ÈŒW”‚Í‚¢‚¸‚ê‚à0‚É‰Šú‰»‚³‚ê‚éD
+    æŠ•å½±è¡Œåˆ—ã¯
+    \f$\TUbeginarray{cc} \TUvec{I}{3\times 3} & \TUvec{0}{} \TUendarray\f$ã«ï¼Œ
+    2ã¤ã®æ”¾å°„æ­ªæ›²ä¿‚æ•°ã¯ã„ãšã‚Œã‚‚0ã«åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
   */
     ImageBase()
 	:P(), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
@@ -514,22 +514,22 @@ class __PORT ImageBase
     Type		saveHeader(std::ostream& out,
 				   Type type=DEFAULT)		const	;
 
-  //! ‰æ‘œ‚Ì•‚ğ•Ô‚·D
+  //! ç”»åƒã®å¹…ã‚’è¿”ã™ï¼
   /*!
-    \return	‰æ‘œ‚Ì•
+    \return	ç”»åƒã®å¹…
   */
     u_int		width()			const	{return _width();}
 
-  //! ‰æ‘œ‚Ì‚‚³‚ğ•Ô‚·D
+  //! ç”»åƒã®é«˜ã•ã‚’è¿”ã™ï¼
   /*!
-    \return	‰æ‘œ‚Ì‚‚³
+    \return	ç”»åƒã®é«˜ã•
   */
     u_int		height()		const	{return _height();}
 
-  //! ‰æ‘œ‚ÌƒTƒCƒY‚ğ•ÏX‚·‚éD
+  //! ç”»åƒã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ï¼
   /*!
-    \param h	V‚µ‚¢•
-    \param w	V‚µ‚¢‚‚³
+    \param h	æ–°ã—ã„å¹…
+    \param w	æ–°ã—ã„é«˜ã•
   */
     void		resize(u_int h, u_int w)	{_resize(h, w,
 								 DEFAULT);}
@@ -548,42 +548,42 @@ class __PORT ImageBase
 				const TypeInfo& typeInfo)	= 0;
 
   public:
-    Matrix34d		P;			//!< ƒJƒƒ‰‚Ì3x4“Š‰es—ñ
-    double		d1;			//!< •úË˜c‹È‚Ì‘æ1ŒW”
-    double		d2;			//!< •úË˜c‹È‚Ì‘æ2ŒW”
+    Matrix34d		P;			//!< ã‚«ãƒ¡ãƒ©ã®3x4æŠ•å½±è¡Œåˆ—
+    double		d1;			//!< æ”¾å°„æ­ªæ›²ã®ç¬¬1ä¿‚æ•°
+    double		d2;			//!< æ”¾å°„æ­ªæ›²ã®ç¬¬2ä¿‚æ•°
 };
 
 /************************************************************************
 *  class ImageLine<T>:	Generic image scanline class			*
 ************************************************************************/
-//! TŒ^‚Ì‰æ‘f‚ğ‚Â‰æ‘œ‚ÌƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®ç”»ç´ ã‚’æŒã¤ç”»åƒã®ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	‰æ‘f‚ÌŒ^
+  \param T	ç”»ç´ ã®å‹
 */
 template <class T>
 class ImageLine : public Array<T>
 {
   public:
-  //! w’è‚µ‚½‰æ‘f”‚ÌƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚ğ¶¬‚·‚éD
+  //! æŒ‡å®šã—ãŸç”»ç´ æ•°ã®ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param d	‰æ‘f”
+    \param d	ç”»ç´ æ•°
   */
     explicit ImageLine(u_int d=0)
         :Array<T>(d), _lmost(0), _rmost(d)			{*this = 0;}
 
-  //! ŠO•”‚Ì—Ìˆæ‚Æ‰æ‘f”‚ğw’è‚µ‚ÄƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚ğ¶¬‚·‚éD
+  //! å¤–éƒ¨ã®é ˜åŸŸã¨ç”»ç´ æ•°ã‚’æŒ‡å®šã—ã¦ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param p	ŠO•”—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-    \param d	‰æ‘f”
+    \param p	å¤–éƒ¨é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+    \param d	ç”»ç´ æ•°
   */
     ImageLine(T* p, u_int d)
         :Array<T>(p, d), _lmost(0), _rmost(d)			{}
 
-  //! w’è‚³‚ê‚½ƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚ğ¶¬‚·‚éD
+  //! æŒ‡å®šã•ã‚ŒãŸã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param l	Œ³‚ÌƒXƒLƒƒƒ“ƒ‰ƒCƒ“
-    \param u	•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì¶’[‚ÌÀ•W
-    \param d	•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”
+    \param l	å…ƒã®ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³
+    \param u	éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®å·¦ç«¯ã®åº§æ¨™
+    \param d	éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°
   */
     ImageLine(ImageLine<T>& l, u_int u, u_int d)
 	:Array<T>(l, u, d), _lmost(0), _rmost(d)		{}
@@ -591,10 +591,10 @@ class ImageLine : public Array<T>
     const ImageLine	operator ()(u_int u, u_int d)	const	;
     ImageLine		operator ()(u_int u, u_int d)		;
     
-  //! ‘S‚Ä‚Ì‰æ‘f‚É“¯ˆê‚Ì’l‚ğ‘ã“ü‚·‚éD
+  //! å…¨ã¦ã®ç”»ç´ ã«åŒä¸€ã®å€¤ã‚’ä»£å…¥ã™ã‚‹ï¼
   /*!
-    \param c	‘ã“ü‚·‚é‰æ‘f’l
-    \return	‚±‚ÌƒXƒLƒƒƒ“ƒ‰ƒCƒ“
+    \param c	ä»£å…¥ã™ã‚‹ç”»ç´ å€¤
+    \return	ã“ã®ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³
   */
     ImageLine&		operator =(const T& c)
 			{
@@ -615,29 +615,29 @@ class ImageLine : public Array<T>
     const S*		lookup(const S* src,
 			       const L* tbl)		;
 
-  //! ¶’[‚Ì—LŒø‰æ‘f‚ÌˆÊ’u‚ğ•Ô‚·D
+  //! å·¦ç«¯ã®æœ‰åŠ¹ç”»ç´ ã®ä½ç½®ã‚’è¿”ã™ï¼
   /*!
-    \return	¶’[‚Ì—LŒø‰æ‘f‚ÌˆÊ’u
+    \return	å·¦ç«¯ã®æœ‰åŠ¹ç”»ç´ ã®ä½ç½®
   */
     int			lmost()			const	{return _lmost;}
 
-  //! ‰E’[‚Ì—LŒø‰æ‘f‚ÌŸ‚ÌˆÊ’u‚ğ•Ô‚·D
+  //! å³ç«¯ã®æœ‰åŠ¹ç”»ç´ ã®æ¬¡ã®ä½ç½®ã‚’è¿”ã™ï¼
   /*!
-    \return	‰E’[‚Ì—LŒø‰æ‘f‚ÌŸ‚ÌˆÊ’u
+    \return	å³ç«¯ã®æœ‰åŠ¹ç”»ç´ ã®æ¬¡ã®ä½ç½®
   */
     int			rmost()			const	{return _rmost;}
 
-  //! —LŒø‰æ‘f‚Ì”ÍˆÍ‚ğİ’è‚·‚éD
+  //! æœ‰åŠ¹ç”»ç´ ã®ç¯„å›²ã‚’è¨­å®šã™ã‚‹ï¼
   /*!
-    \param l	—LŒø‰æ‘f‚Ì¶’[
-    \param r	—LŒø‰æ‘f‚Ì‰E’[‚ÌŸ
+    \param l	æœ‰åŠ¹ç”»ç´ ã®å·¦ç«¯
+    \param r	æœ‰åŠ¹ç”»ç´ ã®å³ç«¯ã®æ¬¡
   */
     void		setLimits(int l, int r)		{_lmost = l;
 							 _rmost = r;}
-  //! w’è‚³‚ê‚½ˆÊ’u‚Ì‰æ‘f‚ª—LŒø‚©”»’è‚·‚éD
+  //! æŒ‡å®šã•ã‚ŒãŸä½ç½®ã®ç”»ç´ ãŒæœ‰åŠ¹ã‹åˆ¤å®šã™ã‚‹ï¼
   /*!
-    \param u	‰æ‘f‚ÌˆÊ’u
-    \return	—LŒø‚È‚ç‚ÎtrueC–³Œø‚È‚ç‚Îfalse
+    \param u	ç”»ç´ ã®ä½ç½®
+    \return	æœ‰åŠ¹ãªã‚‰ã°trueï¼Œç„¡åŠ¹ãªã‚‰ã°false
   */
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
@@ -650,11 +650,11 @@ class ImageLine : public Array<T>
     int			_rmost;
 };
 
-//! ‚±‚ÌƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚ğ¶¬‚·‚éD
+//! ã“ã®ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param u	•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì¶’[‚ÌÀ•W
-  \param d	•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”
-  \return	¶¬‚³‚ê‚½•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“
+  \param u	éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®å·¦ç«¯ã®åº§æ¨™
+  \param d	éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°
+  \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³
 */
 template <class T> inline const ImageLine<T>
 ImageLine<T>::operator ()(u_int u, u_int d) const
@@ -662,11 +662,11 @@ ImageLine<T>::operator ()(u_int u, u_int d) const
     return ImageLine<T>(const_cast<ImageLine<T>&>(*this), u, d);
 }
 
-//! ‚±‚ÌƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚ğ¶¬‚·‚éD
+//! ã“ã®ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param u	•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì¶’[‚ÌÀ•W
-  \param d	•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”
-  \return	¶¬‚³‚ê‚½•”•ªƒXƒLƒƒƒ“ƒ‰ƒCƒ“
+  \param u	éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®å·¦ç«¯ã®åº§æ¨™
+  \param d	éƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°
+  \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³
 */
 template <class T> inline ImageLine<T>
 ImageLine<T>::operator ()(u_int u, u_int d)
@@ -674,11 +674,11 @@ ImageLine<T>::operator ()(u_int u, u_int d)
     return ImageLine<T>(*this, u, d);
 }
     
-//! ƒTƒuƒsƒNƒZƒ‹ˆÊ’u‚Ì‰æ‘f’l‚ğüŒ`•âŠÔ‚Å‹‚ß‚éD
+//! ã‚µãƒ–ãƒ”ã‚¯ã‚»ãƒ«ä½ç½®ã®ç”»ç´ å€¤ã‚’ç·šå½¢è£œé–“ã§æ±‚ã‚ã‚‹ï¼
 /*!
-  w’è‚³‚ê‚½ˆÊ’u‚Ì—¼‘¤‚Ì‰æ‘f’l‚ğüŒ`•âŠÔ‚µ‚Äo—Í‚·‚éD
-  \param uf	ƒTƒuƒsƒNƒZƒ‹‚Åw’è‚³‚ê‚½ˆÊ’u
-  \return	üŒ`•âŠÔ‚³‚ê‚½‰æ‘f’l
+  æŒ‡å®šã•ã‚ŒãŸä½ç½®ã®ä¸¡å´ã®ç”»ç´ å€¤ã‚’ç·šå½¢è£œé–“ã—ã¦å‡ºåŠ›ã™ã‚‹ï¼
+  \param uf	ã‚µãƒ–ãƒ”ã‚¯ã‚»ãƒ«ã§æŒ‡å®šã•ã‚ŒãŸä½ç½®
+  \return	ç·šå½¢è£œé–“ã•ã‚ŒãŸç”»ç´ å€¤
 */
 template <class T> template <class S> inline T
 ImageLine<T>::at(S uf) const
@@ -689,10 +689,10 @@ ImageLine<T>::at(S uf) const
     return (du ? (1 - du) * *in + du * *(in + 1) : *in);
 }
 
-//! ƒ|ƒCƒ“ƒ^‚Åw’è‚³‚ê‚½ˆÊ’u‚©‚çƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”•ª‚Ì‰æ‘f‚ğ“Ç‚İ‚ŞD
+//! ãƒã‚¤ãƒ³ã‚¿ã§æŒ‡å®šã•ã‚ŒãŸä½ç½®ã‹ã‚‰ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°åˆ†ã®ç”»ç´ ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param src	“Ç‚İ‚İŒ³‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
-  \return	ÅŒã‚É“Ç‚İ‚Ü‚ê‚½‰æ‘f‚ÌŸ‚Ì‰æ‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param src	èª­ã¿è¾¼ã¿å…ƒã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+  \return	æœ€å¾Œã«èª­ã¿è¾¼ã¾ã‚ŒãŸç”»ç´ ã®æ¬¡ã®ç”»ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T> const YUV422*
 ImageLine<T>::fill(const YUV422* src)
@@ -707,10 +707,10 @@ ImageLine<T>::fill(const YUV422* src)
     return src;
 }
 
-//! ƒ|ƒCƒ“ƒ^‚Åw’è‚³‚ê‚½ˆÊ’u‚©‚çƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”•ª‚Ì‰æ‘f‚ğ“Ç‚İ‚ŞD
+//! ãƒã‚¤ãƒ³ã‚¿ã§æŒ‡å®šã•ã‚ŒãŸä½ç½®ã‹ã‚‰ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°åˆ†ã®ç”»ç´ ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param src	“Ç‚İ‚İŒ³‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
-  \return	ÅŒã‚É“Ç‚İ‚Ü‚ê‚½‰æ‘f‚ÌŸ‚Ì‰æ‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param src	èª­ã¿è¾¼ã¿å…ƒã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+  \return	æœ€å¾Œã«èª­ã¿è¾¼ã¾ã‚ŒãŸç”»ç´ ã®æ¬¡ã®ç”»ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T> const YUYV422*
 ImageLine<T>::fill(const YUYV422* src)
@@ -725,10 +725,10 @@ ImageLine<T>::fill(const YUYV422* src)
     return src;
 }
 
-//! ƒ|ƒCƒ“ƒ^‚Åw’è‚³‚ê‚½ˆÊ’u‚©‚çƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”•ª‚Ì‰æ‘f‚ğ“Ç‚İ‚ŞD
+//! ãƒã‚¤ãƒ³ã‚¿ã§æŒ‡å®šã•ã‚ŒãŸä½ç½®ã‹ã‚‰ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°åˆ†ã®ç”»ç´ ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param src	“Ç‚İ‚İŒ³‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
-  \return	ÅŒã‚É“Ç‚İ‚Ü‚ê‚½‰æ‘f‚ÌŸ‚Ì‰æ‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param src	èª­ã¿è¾¼ã¿å…ƒã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+  \return	æœ€å¾Œã«èª­ã¿è¾¼ã¾ã‚ŒãŸç”»ç´ ã®æ¬¡ã®ç”»ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T> const YUV411*
 ImageLine<T>::fill(const YUV411* src)
@@ -745,10 +745,10 @@ ImageLine<T>::fill(const YUV411* src)
     return src;
 }
 
-//! ƒ|ƒCƒ“ƒ^‚Åw’è‚³‚ê‚½ˆÊ’u‚©‚çƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”•ª‚Ì‰æ‘f‚ğ“Ç‚İ‚ŞD
+//! ãƒã‚¤ãƒ³ã‚¿ã§æŒ‡å®šã•ã‚ŒãŸä½ç½®ã‹ã‚‰ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°åˆ†ã®ç”»ç´ ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param src	“Ç‚İ‚İŒ³‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
-  \return	ÅŒã‚É“Ç‚İ‚Ü‚ê‚½‰æ‘f‚ÌŸ‚Ì‰æ‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param src	èª­ã¿è¾¼ã¿å…ƒã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+  \return	æœ€å¾Œã«èª­ã¿è¾¼ã¾ã‚ŒãŸç”»ç´ ã®æ¬¡ã®ç”»ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T> template <class S> const S*
 ImageLine<T>::fill(const S* src)
@@ -759,11 +759,11 @@ ImageLine<T>::fill(const S* src)
     return src;
 }
 
-//! ƒCƒ“ƒfƒbƒNƒX‚ğ“Ç‚İ‚İCƒ‹ƒbƒNƒAƒbƒvƒe[ƒuƒ‹‚Å•ÏŠ·‚·‚éD
+//! ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’èª­ã¿è¾¼ã¿ï¼Œãƒ«ãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ†ãƒ¼ãƒ–ãƒ«ã§å¤‰æ›ã™ã‚‹ï¼
 /*!
-  \param src	“Ç‚İ‚İŒ³‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
-  \param tbl	ƒ‹ƒbƒNƒAƒbƒvƒe[ƒuƒ‹‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
-  \return	ÅŒã‚É“Ç‚İ‚Ü‚ê‚½‰æ‘f‚ÌŸ‚Ì‰æ‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param src	èª­ã¿è¾¼ã¿å…ƒã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+  \param tbl	ãƒ«ãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ†ãƒ¼ãƒ–ãƒ«ã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+  \return	æœ€å¾Œã«èª­ã¿è¾¼ã¾ã‚ŒãŸç”»ç´ ã®æ¬¡ã®ç”»ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T> template <class S, class L> const S*
 ImageLine<T>::lookup(const S* src, const L* tbl)
@@ -774,10 +774,10 @@ ImageLine<T>::lookup(const S* src, const L* tbl)
     return src;
 }
 
-//! ƒ|ƒCƒ“ƒ^‚Åw’è‚³‚ê‚½ˆÊ’u‚©‚çƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”•ª‚Ì‰æ‘f‚ğ“Ç‚İ‚ŞD
+//! ãƒã‚¤ãƒ³ã‚¿ã§æŒ‡å®šã•ã‚ŒãŸä½ç½®ã‹ã‚‰ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°åˆ†ã®ç”»ç´ ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param src	“Ç‚İ‚İŒ³‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
-  \return	ÅŒã‚É“Ç‚İ‚Ü‚ê‚½‰æ‘f‚ÌŸ‚Ì‰æ‘f‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  \param src	èª­ã¿è¾¼ã¿å…ƒã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+  \return	æœ€å¾Œã«èª­ã¿è¾¼ã¾ã‚ŒãŸç”»ç´ ã®æ¬¡ã®ç”»ç´ ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 */
 template <class T> inline const T*
 ImageLine<T>::fill(const T* src)
@@ -786,15 +786,15 @@ ImageLine<T>::fill(const T* src)
     return src + dim();
 }
 
-//! ƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”‚ğ•ÏX‚·‚éD
+//! ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°ã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  ‚½‚¾‚µC‘¼‚ÌƒIƒuƒWƒFƒNƒg‚Æ‹L‰¯—Ìˆæ‚ğ‹¤—L‚µ‚Ä‚¢‚éƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚Ì‰æ‘f”‚ğ
-  •ÏX‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢D
-  \param d			V‚µ‚¢‰æ‘f”
-  \return			d‚ªŒ³‚Ì‰æ‘f”‚æ‚è‚à‘å‚«‚¯‚ê‚ÎtrueC‚»‚¤
-				‚Å‚È‚¯‚ê‚Îfalse
-  \throw std::logic_error	‹L‰¯—Ìˆæ‚ğ‘¼‚ÌƒIƒuƒWƒFƒNƒg‚Æ‹¤—L‚µ‚Ä‚¢‚éê‡
-				‚É‘—o
+  ãŸã ã—ï¼Œä»–ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨è¨˜æ†¶é ˜åŸŸã‚’å…±æœ‰ã—ã¦ã„ã‚‹ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ã®ç”»ç´ æ•°ã‚’
+  å¤‰æ›´ã™ã‚‹ã“ã¨ã¯ã§ããªã„ï¼
+  \param d			æ–°ã—ã„ç”»ç´ æ•°
+  \return			dãŒå…ƒã®ç”»ç´ æ•°ã‚ˆã‚Šã‚‚å¤§ãã‘ã‚Œã°trueï¼Œãã†
+				ã§ãªã‘ã‚Œã°false
+  \throw std::logic_error	è¨˜æ†¶é ˜åŸŸã‚’ä»–ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨å…±æœ‰ã—ã¦ã„ã‚‹å ´åˆ
+				ã«é€å‡º
 */
 template <class T> inline bool
 ImageLine<T>::resize(u_int d)
@@ -804,10 +804,10 @@ ImageLine<T>::resize(u_int d)
     return Array<T>::resize(d);
 }
 
-//! ƒXƒLƒƒƒ“ƒ‰ƒCƒ“‚ª“à•”‚Åg—p‚·‚é‹L‰¯—Ìˆæ‚ğw’è‚µ‚½‚à‚Ì‚É•ÏX‚·‚éD
+//! ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³ãŒå†…éƒ¨ã§ä½¿ç”¨ã™ã‚‹è¨˜æ†¶é ˜åŸŸã‚’æŒ‡å®šã—ãŸã‚‚ã®ã«å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param p	V‚µ‚¢‹L‰¯—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param d	V‚µ‚¢‰æ‘f”
+  \param p	æ–°ã—ã„è¨˜æ†¶é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param d	æ–°ã—ã„ç”»ç´ æ•°
 */
 template <class T> inline void
 ImageLine<T>::resize(T* p, u_int d)
@@ -1100,39 +1100,39 @@ ImageLine<YUV411>::resize(YUV411* p, u_int d)
 /********st****************************************************************
 *  class Image<T>:	Generic image class				*
 ************************************************************************/
-//! TŒ^‚Ì‰æ‘f‚ğ‚Â‰æ‘œ‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®ç”»ç´ ã‚’æŒã¤ç”»åƒã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	‰æ‘f‚ÌŒ^
-  \param B	ƒoƒbƒtƒ@‚ÌŒ^
+  \param T	ç”»ç´ ã®å‹
+  \param B	ãƒãƒƒãƒ•ã‚¡ã®å‹
 */
 template <class T, class B=Buf<T> >
 class Image : public Array2<ImageLine<T>, B>, public ImageBase
 {
   public:
-  //! •‚Æ‚‚³‚ğw’è‚µ‚Ä‰æ‘œ‚ğ¶¬‚·‚éD
+  //! å¹…ã¨é«˜ã•ã‚’æŒ‡å®šã—ã¦ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param w	‰æ‘œ‚Ì•
-    \param h	‰æ‘œ‚Ì‚‚³
+    \param w	ç”»åƒã®å¹…
+    \param h	ç”»åƒã®é«˜ã•
   */
     explicit Image(u_int w=0, u_int h=0)
 	:Array2<ImageLine<T>, B>(h, w), ImageBase()		{*this = 0;}
 
-  //! ŠO•”‚Ì—Ìˆæ‚Æ•‚¨‚æ‚Ñ‚‚³‚ğw’è‚µ‚Ä‰æ‘œ‚ğ¶¬‚·‚éD
+  //! å¤–éƒ¨ã®é ˜åŸŸã¨å¹…ãŠã‚ˆã³é«˜ã•ã‚’æŒ‡å®šã—ã¦ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param p	ŠO•”—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-    \param w	‰æ‘œ‚Ì•
-    \param h	‰æ‘œ‚Ì‚‚³
+    \param p	å¤–éƒ¨é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+    \param w	ç”»åƒã®å¹…
+    \param h	ç”»åƒã®é«˜ã•
   */
     Image(T* p, u_int w, u_int h)			
 	:Array2<ImageLine<T>, B>(p, h, w), ImageBase()		{}
 
-  //! w’è‚³‚ê‚½‰æ‘œ‚Ì•”•ª‰æ‘œ‚ğ¶¬‚·‚éD
+  //! æŒ‡å®šã•ã‚ŒãŸç”»åƒã®éƒ¨åˆ†ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param i	Œ³‚Ì‰æ‘œ
-    \param u	•”•ª‰æ‘œ‚Ì¶ã’[‚Ì‰¡À•W
-    \param v	•”•ª‰æ‘œ‚Ì¶ã’[‚ÌcÀ•W
-    \param w	•”•ª‰æ‘œ‚Ì•
-    \param h	•”•ª‰æ‘œ‚Ì‚‚³
+    \param i	å…ƒã®ç”»åƒ
+    \param u	éƒ¨åˆ†ç”»åƒã®å·¦ä¸Šç«¯ã®æ¨ªåº§æ¨™
+    \param v	éƒ¨åˆ†ç”»åƒã®å·¦ä¸Šç«¯ã®ç¸¦åº§æ¨™
+    \param w	éƒ¨åˆ†ç”»åƒã®å¹…
+    \param h	éƒ¨åˆ†ç”»åƒã®é«˜ã•
   */
     template <class B2>
     Image(Image<T, B2>& i, u_int u, u_int v, u_int w, u_int h)
@@ -1146,19 +1146,19 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     template <class S>
     T		at(const Point2<S>& p)			const	;
 
-  //! w’è‚³‚ê‚½ˆÊ’u‚Ì‰æ‘f‚ÉƒAƒNƒZƒX‚·‚éD
+  //! æŒ‡å®šã•ã‚ŒãŸä½ç½®ã®ç”»ç´ ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ï¼
   /*!
-    \param p	‰æ‘f‚ÌˆÊ’u
-    \return	w’è‚³‚ê‚½‰æ‘f
+    \param p	ç”»ç´ ã®ä½ç½®
+    \return	æŒ‡å®šã•ã‚ŒãŸç”»ç´ 
   */
     template <class S>
     const T&	operator ()(const Point2<S>& p)
 					const	{return (*this)[p[1]][p[0]];}
 
-  //! w’è‚³‚ê‚½ˆÊ’u‚Ì‰æ‘f‚ÉƒAƒNƒZƒX‚·‚éD
+  //! æŒ‡å®šã•ã‚ŒãŸä½ç½®ã®ç”»ç´ ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ï¼
   /*!
-    \param p	‰æ‘f‚ÌˆÊ’u
-    \return	w’è‚³‚ê‚½‰æ‘f
+    \param p	ç”»ç´ ã®ä½ç½®
+    \return	æŒ‡å®šã•ã‚ŒãŸç”»ç´ 
   */
     template <class S>
     T&		operator ()(const Point2<S>& p)	{return (*this)[p[1]][p[0]];}
@@ -1168,10 +1168,10 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     u_int	height()		const	{return
 						 Array2<ImageLine<T> >::nrow();}
     
-  //! ‘S‚Ä‚Ì‰æ‘f‚É“¯ˆê‚Ì’l‚ğ‘ã“ü‚·‚éD
+  //! å…¨ã¦ã®ç”»ç´ ã«åŒä¸€ã®å€¤ã‚’ä»£å…¥ã™ã‚‹ï¼
   /*!
-    \param c	‘ã“ü‚·‚é‰æ‘f’l
-    \return	‚±‚Ì‰æ‘œ
+    \param c	ä»£å…¥ã™ã‚‹ç”»ç´ å€¤
+    \return	ã“ã®ç”»åƒ
   */
     Image&	operator = (const T& c)		{Array2<ImageLine<T> >::
 						 operator =(c); return *this;}
@@ -1202,13 +1202,13 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     virtual void	_resize(u_int h, u_int w, const TypeInfo&)	;
 };
 
-//! ‚±‚Ì‰æ‘œ‚Ì•”•ª‰æ‘œ‚ğ¶¬‚·‚éD
+//! ã“ã®ç”»åƒã®éƒ¨åˆ†ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param u	•”•ª‰æ‘œ‚Ì¶ã’[‚Ì‰¡À•W
-  \param v	•”•ª‰æ‘œ‚Ì¶ã’[‚ÌcÀ•W
-  \param w	•”•ª‰æ‘œ‚Ì•
-  \param h	•”•ª‰æ‘œ‚Ì‚‚³
-  \return	¶¬‚³‚ê‚½•”•ª‰æ‘œ
+  \param u	éƒ¨åˆ†ç”»åƒã®å·¦ä¸Šç«¯ã®æ¨ªåº§æ¨™
+  \param v	éƒ¨åˆ†ç”»åƒã®å·¦ä¸Šç«¯ã®ç¸¦åº§æ¨™
+  \param w	éƒ¨åˆ†ç”»åƒã®å¹…
+  \param h	éƒ¨åˆ†ç”»åƒã®é«˜ã•
+  \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†ç”»åƒ
 */
 template <class T, class B> inline const Image<T>
 Image<T, B>::operator ()(u_int u, u_int v, u_int w, u_int h) const
@@ -1216,13 +1216,13 @@ Image<T, B>::operator ()(u_int u, u_int v, u_int w, u_int h) const
     return Image<T>(const_cast<Image<T>&>(*this), u, v, w, h);
 }
     
-//! ‚±‚Ì‰æ‘œ‚Ì•”•ª‰æ‘œ‚ğ¶¬‚·‚éD
+//! ã“ã®ç”»åƒã®éƒ¨åˆ†ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param u	•”•ª‰æ‘œ‚Ì¶ã’[‚Ì‰¡À•W
-  \param v	•”•ª‰æ‘œ‚Ì¶ã’[‚ÌcÀ•W
-  \param w	•”•ª‰æ‘œ‚Ì•
-  \param h	•”•ª‰æ‘œ‚Ì‚‚³
-  \return	¶¬‚³‚ê‚½•”•ª‰æ‘œ
+  \param u	éƒ¨åˆ†ç”»åƒã®å·¦ä¸Šç«¯ã®æ¨ªåº§æ¨™
+  \param v	éƒ¨åˆ†ç”»åƒã®å·¦ä¸Šç«¯ã®ç¸¦åº§æ¨™
+  \param w	éƒ¨åˆ†ç”»åƒã®å¹…
+  \param h	éƒ¨åˆ†ç”»åƒã®é«˜ã•
+  \return	ç”Ÿæˆã•ã‚ŒãŸéƒ¨åˆ†ç”»åƒ
 */
 template <class T, class B> inline Image<T>
 Image<T, B>::operator ()(u_int u, u_int v, u_int w, u_int h)
@@ -1230,11 +1230,11 @@ Image<T, B>::operator ()(u_int u, u_int v, u_int w, u_int h)
     return Image<T>(*this, u, v, w, h);
 }
     
-//! ƒTƒuƒsƒNƒZƒ‹ˆÊ’u‚Ì‰æ‘f’l‚ğ‘oüŒ`•âŠÔ‚Å‹‚ß‚éD
+//! ã‚µãƒ–ãƒ”ã‚¯ã‚»ãƒ«ä½ç½®ã®ç”»ç´ å€¤ã‚’åŒç·šå½¢è£œé–“ã§æ±‚ã‚ã‚‹ï¼
 /*!
-  w’è‚³‚ê‚½ˆÊ’u‚ğˆÍ‚Ş4‚Â‚Ì‰æ‘f’l‚ğ‘oüŒ`•âŠÔ‚µ‚Äo—Í‚·‚éD
-  \param p	ƒTƒuƒsƒNƒZƒ‹‚Åw’è‚³‚ê‚½ˆÊ’u
-  \return	‘oüŒ`•âŠÔ‚³‚ê‚½‰æ‘f’l
+  æŒ‡å®šã•ã‚ŒãŸä½ç½®ã‚’å›²ã‚€4ã¤ã®ç”»ç´ å€¤ã‚’åŒç·šå½¢è£œé–“ã—ã¦å‡ºåŠ›ã™ã‚‹ï¼
+  \param p	ã‚µãƒ–ãƒ”ã‚¯ã‚»ãƒ«ã§æŒ‡å®šã•ã‚ŒãŸä½ç½®
+  \return	åŒç·šå½¢è£œé–“ã•ã‚ŒãŸç”»ç´ å€¤
 */
 template <class T, class B> template <class S> inline T
 Image<T, B>::at(const Point2<S>& p) const
@@ -1245,10 +1245,10 @@ Image<T, B>::at(const Point2<S>& p) const
     return (dv ? (1 - dv)*out0 + dv*(*this)[v+1].at(p[0]) : out0);
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç‰æ‘œ‚ğ“Ç‚İ‚ŞD
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ç”»åƒã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> inline std::istream&
 Image<T, B>::restore(std::istream& in)
@@ -1256,12 +1256,12 @@ Image<T, B>::restore(std::istream& in)
     return restoreData(in, restoreHeader(in));
 }
 
-//! w’è‚µ‚½‰æ‘fƒ^ƒCƒv‚Åo—ÍƒXƒgƒŠ[ƒ€‚É‰æ‘œ‚ğ‘‚«o‚·D
+//! æŒ‡å®šã—ãŸç”»ç´ ã‚¿ã‚¤ãƒ—ã§å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ç”»åƒã‚’æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param type	‰æ‘fƒ^ƒCƒvD‚½‚¾‚µC #DEFAULT ‚ğw’è‚µ‚½ê‡‚ÍC
-		‚±‚Ì‰æ‘œƒIƒuƒWƒFƒNƒg‚Ì‰æ‘fƒ^ƒCƒv‚Å‘‚«o‚³‚ê‚éD
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param type	ç”»ç´ ã‚¿ã‚¤ãƒ—ï¼ãŸã ã—ï¼Œ #DEFAULT ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ï¼Œ
+		ã“ã®ç”»åƒã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç”»ç´ ã‚¿ã‚¤ãƒ—ã§æ›¸ãå‡ºã•ã‚Œã‚‹ï¼
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> inline std::ostream&
 Image<T, B>::save(std::ostream& out, Type type) const
@@ -1269,12 +1269,12 @@ Image<T, B>::save(std::ostream& out, Type type) const
     return saveData(out, saveHeader(out, type));
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç‰æ‘œ‚Ì‰æ‘fƒf[ƒ^‚ğ“Ç‚İ‚ŞD
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ç”»åƒã®ç”»ç´ ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param in		“ü—ÍƒXƒgƒŠ[ƒ€
-  \param typeInfo	ƒXƒgƒŠ[ƒ€’†‚Ìƒf[ƒ^‚Ì‰æ‘fƒ^ƒCƒv
-			(“Ç‚İ‚İæ‚Ì‰æ‘œ‚Ì‰æ‘fƒ^ƒCƒv‚Å‚Í‚È‚¢)
-  \return		in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in		å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param typeInfo	ã‚¹ãƒˆãƒªãƒ¼ãƒ ä¸­ã®ãƒ‡ãƒ¼ã‚¿ã®ç”»ç´ ã‚¿ã‚¤ãƒ—
+			(èª­ã¿è¾¼ã¿å…ˆã®ç”»åƒã®ç”»ç´ ã‚¿ã‚¤ãƒ—ã§ã¯ãªã„)
+  \return		inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> std::istream&
 Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
@@ -1315,12 +1315,12 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
     return in;
 }
 
-//! w’è‚µ‚½‰æ‘fƒ^ƒCƒv‚Åo—ÍƒXƒgƒŠ[ƒ€‚É‰æ‘œ‚Ì‰æ‘fƒf[ƒ^‚ğ‘‚«o‚·D
+//! æŒ‡å®šã—ãŸç”»ç´ ã‚¿ã‚¤ãƒ—ã§å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ç”»åƒã®ç”»ç´ ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param type	‰æ‘fƒ^ƒCƒvD‚½‚¾‚µC #DEFAULT ‚ğw’è‚µ‚½ê‡‚ÍC
-		‚±‚Ì‰æ‘œƒIƒuƒWƒFƒNƒg‚Ì‰æ‘fƒ^ƒCƒv‚Å‘‚«o‚³‚ê‚éD
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param type	ç”»ç´ ã‚¿ã‚¤ãƒ—ï¼ãŸã ã—ï¼Œ #DEFAULT ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ï¼Œ
+		ã“ã®ç”»åƒã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç”»ç´ ã‚¿ã‚¤ãƒ—ã§æ›¸ãå‡ºã•ã‚Œã‚‹ï¼
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, class B> std::ostream&
 Image<T, B>::saveData(std::ostream& out, Type type) const
@@ -1362,10 +1362,10 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
     return out;
 }
 
-//! ‰æ‘œ‚ÌƒTƒCƒY‚ğ•ÏX‚·‚éD
+//! ç”»åƒã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param h	V‚µ‚¢‚‚³
-  \param w	V‚µ‚¢•
+  \param h	æ–°ã—ã„é«˜ã•
+  \param w	æ–°ã—ã„å¹…
 */
 template <class T, class B> inline void
 Image<T, B>::resize(u_int h, u_int w)
@@ -1373,11 +1373,11 @@ Image<T, B>::resize(u_int h, u_int w)
     Array2<ImageLine<T>, B>::resize(h, w);
 }
 
-//! ŠO•”‚Ì—Ìˆæ‚ğw’è‚µ‚Ä‰æ‘œ‚ÌƒTƒCƒY‚ğ•ÏX‚·‚éD
+//! å¤–éƒ¨ã®é ˜åŸŸã‚’æŒ‡å®šã—ã¦ç”»åƒã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ï¼
 /*!
-  \param p	ŠO•”—Ìˆæ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-  \param h	‰æ‘œ‚Ì‚‚³
-  \param w	‰æ‘œ‚Ì•
+  \param p	å¤–éƒ¨é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿
+  \param h	ç”»åƒã®é«˜ã•
+  \param w	ç”»åƒã®å¹…
   */
 template <class T, class B> inline void
 Image<T, B>::resize(T* p, u_int h, u_int w)
@@ -1603,14 +1603,14 @@ Image<YUV411, Buf<YUV411> >::resize(YUV411* p, u_int h, u_int w)
 /************************************************************************
 *  class GenericImage							*
 ************************************************************************/
-//! ‰æ‘f‚ÌŒ^‚ğ–â‚í‚È‚¢‘Ì‰æ‘œƒNƒ‰ƒX
+//! ç”»ç´ ã®å‹ã‚’å•ã‚ãªã„ç·ç§°ç”»åƒã‚¯ãƒ©ã‚¹
 /*!
-  ŒÂX‚Ìs‚â‰æ‘f‚ÉƒAƒNƒZƒX‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢D
+  å€‹ã€…ã®è¡Œã‚„ç”»ç´ ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ã“ã¨ã¯ã§ããªã„ï¼
 */
 class GenericImage : public Array2<Array<u_char> >, public ImageBase
 {
   public:
-  //! ‘Ì‰æ‘œ‚ğ¶¬‚·‚éD
+  //! ç·ç§°ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ï¼
     GenericImage() :_typeInfo(U_CHAR), _colormap(0)			{}
 
     const TypeInfo&		typeInfo()			const	;
@@ -1630,9 +1630,9 @@ class GenericImage : public Array2<Array<u_char> >, public ImageBase
     Array<BGRA>			_colormap;
 };
 
-//! Œ»İ•Û‚µ‚Ä‚¢‚é‰æ‘œ‚Ìƒ^ƒCƒvî•ñ‚ğ•Ô‚·D
+//! ç¾åœ¨ä¿æŒã—ã¦ã„ã‚‹ç”»åƒã®ã‚¿ã‚¤ãƒ—æƒ…å ±ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒ^ƒCƒvî•ñ
+  \return	ã‚¿ã‚¤ãƒ—æƒ…å ±
 */
 inline const ImageBase::TypeInfo&
 GenericImage::typeInfo() const
@@ -1640,10 +1640,10 @@ GenericImage::typeInfo() const
     return _typeInfo;
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç‰æ‘œ‚ğ“Ç‚İ‚ŞD
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ç”»åƒã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 inline std::istream&
 GenericImage::restore(std::istream& in)
@@ -1652,10 +1652,10 @@ GenericImage::restore(std::istream& in)
     return restoreData(in);
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚É‰æ‘œ‚ğ‘‚«o‚·D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ç”»åƒã‚’æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 inline std::ostream&
 GenericImage::save(std::ostream& out) const

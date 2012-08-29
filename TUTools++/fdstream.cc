@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: fdstream.cc,v 1.4 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: fdstream.cc,v 1.5 2012-08-29 21:17:08 ueshiba Exp $
  */
 #include "TU/fdstream.h"
 #include <stdexcept>
@@ -42,11 +42,11 @@ namespace TU
 /************************************************************************
 *  class fdbuf								*
 ************************************************************************/
-//! �w�肵���t�@�C���L�q�q����X�g���[���o�b�t�@�����D
+//! 指定したファイル記述子からストリームバッファを作る．
 /*!
-  \param fd			�t�@�C���L�q�q
-  \param closeFdOnClosing	true�Ȃ�΂��̃X�g���[���o�b�t�@�̔j�󎞂�
-				�t�@�C���L�q�q��close
+  \param fd			ファイル記述子
+  \param closeFdOnClosing	trueならばこのストリームバッファの破壊時に
+				ファイル記述子をclose
 */
 fdbuf::fdbuf(int fd, bool closeFdOnClosing)
     :_fd(fd), _closeFdOnClosing(closeFdOnClosing)
@@ -58,17 +58,17 @@ fdbuf::fdbuf(int fd, bool closeFdOnClosing)
     setg(_buf + pbSize, _buf + pbSize, _buf + pbSize);
 }
 
-//! �X�g���[���o�b�t�@��j�󂷂�D
+//! ストリームバッファを破壊する．
 fdbuf::~fdbuf()
 {
     if (_closeFdOnClosing && _fd >= 0)
 	::close(_fd);
 }
     
-//! �t�@�C�����當������o�b�t�@�ɓǂݍ��ށD
+//! ファイルから文字列をバッファに読み込む．
 /*!
-  \return	���[�U���ɕԂ���Ă��Ȃ�����������΁C���̍ŏ��̕����D
-		�Ȃ����EOF�D
+  \return	ユーザ側に返されていない文字があれば，その最初の文字．
+		なければEOF．
 */
 fdbuf::int_type
 fdbuf::underflow()
@@ -76,31 +76,31 @@ fdbuf::underflow()
 #ifndef WIN32
     using std::memmove;
 #endif
-    if (gptr() < egptr())		// ���݈ʒu�̓o�b�t�@�I�[�����O�H
+    if (gptr() < egptr())		// 現在位置はバッファ終端よりも前？
 	return traits_type::to_int_type(*gptr());
 
-    int	numPutback = gptr() - eback();	// �ȑO�ɓǂݍ��܂ꂽ������
+    int	numPutback = gptr() - eback();	// 以前に読み込まれた文字数
     if (numPutback > pbSize)
-	numPutback = pbSize;		// putback�̈�̃T�C�Y�ɐ؂�l��
+	numPutback = pbSize;		// putback領域のサイズに切り詰め
 
-  // �ȑO�ɓǂݍ��܂�Ă������������XpbSize����putback�̈�ɃR�s�[
+  // 以前に読み込まれていた文字を高々pbSize個だけputback領域にコピー
     memmove(_buf + (pbSize - numPutback), gptr() - numPutback, numPutback);
 
-  // ���XbufSize�̕�����V���ɓǂݍ���
+  // 高々bufSize個の文字を新たに読み込む
     int	num = read(_fd, _buf + pbSize, bufSize);
     if (num <= 0)
 	return traits_type::eof();
 
-  // �o�b�t�@�̃|�C���^���Z�b�g������
+  // バッファのポインタをセットし直す
     setg(_buf + (pbSize - numPutback), _buf + pbSize, _buf + pbSize + num);
 
-    return traits_type::to_int_type(*gptr());	// ���̕�����Ԃ�
+    return traits_type::to_int_type(*gptr());	// 次の文字を返す
 }
 
-//! �t�@�C���ɕ����������o���D
+//! ファイルに文字を書き出す．
 /*!
-  \param c	�����o������
-  \return	�����o���ɐ�������΂��̕����D���s�����EOF�D
+  \param c	書き出す文字
+  \return	書き出しに成功すればその文字．失敗すればEOF．
 */
 fdbuf::int_type
 fdbuf::overflow(int_type c)
@@ -114,11 +114,11 @@ fdbuf::overflow(int_type c)
     return c;
 }
 
-//! �t�@�C���ɕ�����������o���D
+//! ファイルに文字列を書き出す．
 /*!
-  \param s	�����o��������
-  \param n	�����o��������
-  \return	���ۂɏ����o����������
+  \param s	書き出す文字列
+  \param n	書き出す文字数
+  \return	実際に書き出した文字数
 */
 std::streamsize
 fdbuf::xsputn(const char* s, std::streamsize n)
@@ -129,10 +129,10 @@ fdbuf::xsputn(const char* s, std::streamsize n)
 /************************************************************************
 *  class fdistream							*
 ************************************************************************/
-//! �w�肵���t�@�C����������̓X�g���[�������D
+//! 指定したファイル名から入力ストリームを作る．
 /*!
-  ���̃X�g���[�����j�󂳂��ƃt�@�C����close�����D
-  \param path	�t�@�C����
+  このストリームが破壊されるとファイルもcloseされる．
+  \param path	ファイル名
 */
 fdistream::fdistream(const char* path)
     :std::istream(0), _buf(::open(path, O_RDONLY), true)
@@ -143,10 +143,10 @@ fdistream::fdistream(const char* path)
 /************************************************************************
 *  class fdostream							*
 ************************************************************************/
-//! �w�肵���t�@�C��������o�̓X�g���[�������D
+//! 指定したファイル名から出力ストリームを作る．
 /*!
-  ���̃X�g���[�����j�󂳂��ƃt�@�C����close�����D
-  \param path	�t�@�C����
+  このストリームが破壊されるとファイルもcloseされる．
+  \param path	ファイル名
 */
 fdostream::fdostream(const char* path)
     :std::ostream(0), _buf(::open(path, O_WRONLY), true)
@@ -157,10 +157,10 @@ fdostream::fdostream(const char* path)
 /************************************************************************
 *  class fdstream							*
 ************************************************************************/
-//! �w�肵���t�@�C����������o�̓X�g���[�������D
+//! 指定したファイル名から入出力ストリームを作る．
 /*!
-  ���̃X�g���[�����j�󂳂��ƃt�@�C����close�����D
-  \param path	�t�@�C����
+  このストリームが破壊されるとファイルもcloseされる．
+  \param path	ファイル名
 */
 fdstream::fdstream(const char* path)
     :std::iostream(0), _buf(::open(path, O_RDWR), true)
