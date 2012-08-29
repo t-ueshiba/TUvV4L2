@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: mmInstructions.h,v 1.26 2011-12-10 23:04:48 ueshiba Exp $
+ *  $Id: mmInstructions.h,v 1.27 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		mmInstructions.h
-  \brief	Intel CPU‚Ìƒ}ƒ‹ƒ`ƒƒfƒBƒA–½—ß‚ÉŠÖ˜A‚·‚éƒNƒ‰ƒX‚ÆŠÖ”‚Ì’è‹`‚ÆÀ‘•
+  \brief	Intel CPUã®ãƒãƒ«ãƒãƒ¡ãƒ‡ã‚£ã‚¢å‘½ä»¤ã«é–¢é€£ã™ã‚‹ã‚¯ãƒ©ã‚¹ã¨é–¢æ•°ã®å®šç¾©ã¨å®Ÿè£…
 */
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
@@ -65,7 +65,7 @@
 #if defined(MMX)
 /*!
   \namespace	mm
-  \brief	Intel SIMD–½—ß‚ğ—˜—p‚·‚é‚½‚ß‚ÌƒNƒ‰ƒX‚¨‚æ‚ÑŠÖ”‚ğ”[‚ß‚é–¼‘O‹óŠÔ
+  \brief	Intel SIMDå‘½ä»¤ã‚’åˆ©ç”¨ã™ã‚‹ãŸã‚ã®ã‚¯ãƒ©ã‚¹ãŠã‚ˆã³é–¢æ•°ã‚’ç´ã‚ã‚‹åå‰ç©ºé–“
 */
 namespace mm
 {
@@ -73,30 +73,30 @@ namespace mm
 *  SIMD vector types							*
 ************************************************************************/
 #if defined(AVX2)
-  typedef __m256i	ivec_t;		//!< ®”ƒxƒNƒgƒ‹‚ÌSIMDŒ^
+  typedef __m256i	ivec_t;		//!< æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®SIMDå‹
 #elif defined(SSE2)  
-  typedef __m128i	ivec_t;		//!< ®”ƒxƒNƒgƒ‹‚ÌSIMDŒ^
+  typedef __m128i	ivec_t;		//!< æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®SIMDå‹
 #else
-  typedef __m64		ivec_t;		//!< ®”ƒxƒNƒgƒ‹‚ÌSIMDŒ^
+  typedef __m64		ivec_t;		//!< æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®SIMDå‹
 #endif
     
 #if defined(AVX)
-  typedef __m256	fvec_t;		//!< floatƒxƒNƒgƒ‹‚ÌSIMDŒ^
-  typedef __m256d	dvec_t;		//!< doubleƒxƒNƒgƒ‹‚ÌSIMDŒ^
+  typedef __m256	fvec_t;		//!< floatãƒ™ã‚¯ãƒˆãƒ«ã®SIMDå‹
+  typedef __m256d	dvec_t;		//!< doubleãƒ™ã‚¯ãƒˆãƒ«ã®SIMDå‹
 #elif defined(SSE)
-  typedef __m128	fvec_t;		//!< floatƒxƒNƒgƒ‹‚ÌSIMDŒ^
+  typedef __m128	fvec_t;		//!< floatãƒ™ã‚¯ãƒˆãƒ«ã®SIMDå‹
 #  if defined(SSE2)  
-  typedef __m128d	dvec_t;		//!< doubleƒxƒNƒgƒ‹‚ÌSIMDŒ^
+  typedef __m128d	dvec_t;		//!< doubleãƒ™ã‚¯ãƒˆãƒ«ã®SIMDå‹
 #  endif
 #endif
 
-//! TŒ^‚Ì¬•ª‚ğ‚ÂSIMDƒxƒNƒgƒ‹‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®æˆåˆ†ã‚’æŒã¤SIMDãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class vec
 {
   public:
-    typedef T		value_type;	//!< ¬•ª‚ÌŒ^
-    typedef ivec_t	base_type;	//!< ƒx[ƒX‚Æ‚È‚éSIMDƒf[ƒ^Œ^
+    typedef T		value_type;	//!< æˆåˆ†ã®å‹
+    typedef ivec_t	base_type;	//!< ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹SIMDãƒ‡ãƒ¼ã‚¿å‹
       
     enum	{value_size = sizeof(value_type),
 		 size	    = sizeof(base_type)/sizeof(value_type)};
@@ -119,7 +119,7 @@ class vec
 	value_type a3,  value_type a2,
 	value_type a1,  value_type a0)			;
     
-  // ƒx[ƒXŒ^‚Æ‚ÌŠÔ‚ÌŒ^•ÏŠ·
+  // ãƒ™ãƒ¼ã‚¹å‹ã¨ã®é–“ã®å‹å¤‰æ›
     vec(base_type m)	:_base(m)			{}
 			operator base_type()		{return _base;}
 
@@ -157,22 +157,22 @@ vec<T>::operator [](int i)
     return *((value_type*)&_base + i);
 }
 
-typedef vec<int8_t>	Is8vec;		//!< •„†•t‚«8bit®”ƒxƒNƒgƒ‹
-typedef vec<u_int8_t>	Iu8vec;		//!< •„†‚È‚µ8bit®”ƒxƒNƒgƒ‹
-typedef vec<int16_t>	Is16vec;	//!< •„†•t‚«16bit®”ƒxƒNƒgƒ‹
-typedef vec<u_int16_t>	Iu16vec;	//!< •„†‚È‚µ16bit®”ƒxƒNƒgƒ‹
-typedef vec<int32_t>	Is32vec;	//!< •„†•t‚«32bit®”ƒxƒNƒgƒ‹
-typedef vec<u_int32_t>	Iu32vec;	//!< •„†‚È‚µ32bit®”ƒxƒNƒgƒ‹
-typedef vec<u_int64_t>	I64vec;		//!< 64bit®”ƒxƒNƒgƒ‹
+typedef vec<int8_t>	Is8vec;		//!< ç¬¦å·ä»˜ã8bitæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+typedef vec<u_int8_t>	Iu8vec;		//!< ç¬¦å·ãªã—8bitæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+typedef vec<int16_t>	Is16vec;	//!< ç¬¦å·ä»˜ã16bitæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+typedef vec<u_int16_t>	Iu16vec;	//!< ç¬¦å·ãªã—16bitæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+typedef vec<int32_t>	Is32vec;	//!< ç¬¦å·ä»˜ã32bitæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+typedef vec<u_int32_t>	Iu32vec;	//!< ç¬¦å·ãªã—32bitæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+typedef vec<u_int64_t>	I64vec;		//!< 64bitæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
     
 #if defined(SSE)
-//! floatŒ^‚Ì¬•ª‚ğ‚ÂSIMDƒxƒNƒgƒ‹‚ğ•\‚·ƒNƒ‰ƒX
+//! floatå‹ã®æˆåˆ†ã‚’æŒã¤SIMDãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <>
 class vec<float>
 {
   public:
-    typedef float	value_type;	//!< ¬•ª‚ÌŒ^
-    typedef fvec_t	base_type;	//!< ƒx[ƒX‚Æ‚È‚éSIMDƒf[ƒ^Œ^
+    typedef float	value_type;	//!< æˆåˆ†ã®å‹
+    typedef fvec_t	base_type;	//!< ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹SIMDãƒ‡ãƒ¼ã‚¿å‹
       
     enum	{value_size = sizeof(value_type),
 		 size	    = sizeof(base_type)/sizeof(value_type)};
@@ -186,7 +186,7 @@ class vec<float>
 	value_type a3, value_type a2,
 	value_type a1, value_type a0)			;
 
-  // ƒx[ƒXŒ^‚Æ‚ÌŠÔ‚ÌŒ^•ÏŠ·
+  // ãƒ™ãƒ¼ã‚¹å‹ã¨ã®é–“ã®å‹å¤‰æ›
     vec(base_type m)	:_base(m)			{}
 			operator base_type()		{return _base;}
 
@@ -225,17 +225,17 @@ vec<float>::operator [](int i)
     return *((value_type*)&_base + i);
 }
 
-typedef vec<float>	F32vec;		//!< 32bit•‚“®¬”“_”ƒxƒNƒgƒ‹
+typedef vec<float>	F32vec;		//!< 32bitæµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«
 #endif
 
 #if defined(SSE2)
-//! doubleŒ^‚Ì¬•ª‚ğ‚ÂSIMDƒxƒNƒgƒ‹‚ğ•\‚·ƒNƒ‰ƒX
+//! doubleå‹ã®æˆåˆ†ã‚’æŒã¤SIMDãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <>
 class vec<double>
 {
   public:
-    typedef double	value_type;	//!< ¬•ª‚ÌŒ^
-    typedef dvec_t	base_type;	//!< ƒx[ƒX‚Æ‚È‚éSIMDƒf[ƒ^Œ^
+    typedef double	value_type;	//!< æˆåˆ†ã®å‹
+    typedef dvec_t	base_type;	//!< ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹SIMDãƒ‡ãƒ¼ã‚¿å‹
       
     enum	{value_size = sizeof(value_type),
 		 size	    = sizeof(base_type)/sizeof(value_type)};
@@ -246,7 +246,7 @@ class vec<double>
     vec(value_type a3, value_type a2,
 	value_type a1, value_type a0)			;
 
-  // ƒx[ƒXŒ^‚Æ‚ÌŠÔ‚ÌŒ^•ÏŠ·
+  // ãƒ™ãƒ¼ã‚¹å‹ã¨ã®é–“ã®å‹å¤‰æ›
     vec(base_type m)	:_base(m)			{}
 			operator base_type()		{return _base;}
 
@@ -285,14 +285,14 @@ vec<double>::operator [](int i)
     return *((value_type*)&_base + i);
 }
 
-typedef vec<double>	F64vec;		//!< 64bit•‚“®¬”“_”ƒxƒNƒgƒ‹
+typedef vec<double>	F64vec;		//!< 64bitæµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«
 #endif
 
-//! SIMDƒxƒNƒgƒ‹‚Ì“à—e‚ğƒXƒgƒŠ[ƒ€‚Éo—Í‚·‚éD
+//! SIMDãƒ™ã‚¯ãƒˆãƒ«ã®å†…å®¹ã‚’ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«å‡ºåŠ›ã™ã‚‹ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param vec	SIMDƒxƒNƒgƒ‹
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param vec	SIMDãƒ™ã‚¯ãƒˆãƒ«
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> std::ostream&
 operator <<(std::ostream& out, const vec<T>& x)
@@ -505,31 +505,31 @@ MM_CONSTRUCTOR_1(u_int32_t, int32_t)
 /************************************************************************
 *  Load/Store								*
 ************************************************************************/
-//! 16byte‚Éalign‚³‚ê‚½ƒƒ‚ƒŠ‚©‚çƒxƒNƒgƒ‹‚ğƒ[ƒh‚·‚éD
+//! 16byteã«alignã•ã‚ŒãŸãƒ¡ãƒ¢ãƒªã‹ã‚‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ï¼
 /*!
-  \param p	16byte‚Éalign‚³‚ê‚½ƒ[ƒhŒ³‚Ìƒƒ‚ƒŠƒAƒhƒŒƒX
-  \return	ƒ[ƒh‚³‚ê‚½ƒxƒNƒgƒ‹
+  \param p	16byteã«alignã•ã‚ŒãŸãƒ­ãƒ¼ãƒ‰å…ƒã®ãƒ¡ãƒ¢ãƒªã‚¢ãƒ‰ãƒ¬ã‚¹
+  \return	ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static vec<T>	load(const T* p)		;
 
-//! ƒƒ‚ƒŠ‚©‚çƒxƒNƒgƒ‹‚ğƒ[ƒh‚·‚éD
+//! ãƒ¡ãƒ¢ãƒªã‹ã‚‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ï¼
 /*!
-  \param p	ƒ[ƒhŒ³‚Ìƒƒ‚ƒŠƒAƒhƒŒƒX
-  \return	ƒ[ƒh‚³‚ê‚½ƒxƒNƒgƒ‹
+  \param p	ãƒ­ãƒ¼ãƒ‰å…ƒã®ãƒ¡ãƒ¢ãƒªã‚¢ãƒ‰ãƒ¬ã‚¹
+  \return	ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static vec<T>	loadu(const T* p)		;
 
-//! 16byte‚Éalign‚³‚ê‚½ƒƒ‚ƒŠ‚ÉƒxƒNƒgƒ‹‚ğƒXƒgƒA‚·‚éD
+//! 16byteã«alignã•ã‚ŒãŸãƒ¡ãƒ¢ãƒªã«ãƒ™ã‚¯ãƒˆãƒ«ã‚’ã‚¹ãƒˆã‚¢ã™ã‚‹ï¼
 /*!
-  \param p	16byte‚Éalign‚³‚ê‚½ƒXƒgƒAæ‚Ìƒƒ‚ƒŠƒAƒhƒŒƒX
-  \param x	ƒXƒgƒA‚³‚ê‚éƒxƒNƒgƒ‹
+  \param p	16byteã«alignã•ã‚ŒãŸã‚¹ãƒˆã‚¢å…ˆã®ãƒ¡ãƒ¢ãƒªã‚¢ãƒ‰ãƒ¬ã‚¹
+  \param x	ã‚¹ãƒˆã‚¢ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static void		store(T* p, vec<T> x)		;
 
-//! ƒƒ‚ƒŠ‚ÉƒxƒNƒgƒ‹‚ğƒXƒgƒA‚·‚éD
+//! ãƒ¡ãƒ¢ãƒªã«ãƒ™ã‚¯ãƒˆãƒ«ã‚’ã‚¹ãƒˆã‚¢ã™ã‚‹ï¼
 /*!
-  \param p	ƒXƒgƒAæ‚Ìƒƒ‚ƒŠƒAƒhƒŒƒX
-  \param x	ƒXƒgƒA‚³‚ê‚éƒxƒNƒgƒ‹
+  \param p	ã‚¹ãƒˆã‚¢å…ˆã®ãƒ¡ãƒ¢ãƒªã‚¢ãƒ‰ãƒ¬ã‚¹
+  \param x	ã‚¹ãƒˆã‚¢ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static void		storeu(T* p, vec<T> x)		;
 
@@ -586,7 +586,7 @@ template <class T> static void		storeu(T* p, vec<T> x)		;
 /************************************************************************
 *  Zero-vector generators						*
 ************************************************************************/
-//! ‘S¬•ª‚ª0‚Å‚ ‚éƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! å…¨æˆåˆ†ãŒ0ã§ã‚ã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 template <class T> static vec<T>	zero()				;
 
 #define MM_ZERO(type, base)						\
@@ -614,7 +614,7 @@ MM_ZERO(u_int64_t, ivec_t)
 ************************************************************************/
 template <class S, class T> static S	cast_base(T x)			;
 
-//! TŒ^‚Ì¬•ª‚ğ‚ÂƒxƒNƒgƒ‹‚©‚çSŒ^‚Ì¬•ª‚ğ‚ÂƒxƒNƒgƒ‹‚Ö‚ÌƒLƒƒƒXƒg‚ğs‚È‚¤D
+//! Tå‹ã®æˆåˆ†ã‚’æŒã¤ãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰Så‹ã®æˆåˆ†ã‚’æŒã¤ãƒ™ã‚¯ãƒˆãƒ«ã¸ã®ã‚­ãƒ£ã‚¹ãƒˆã‚’è¡Œãªã†ï¼
 template <class S, class T> static inline vec<S>
 cast(vec<T> x)
 {
@@ -623,16 +623,16 @@ cast(vec<T> x)
 }
 
 /*
- *  cast_base() ‚ÌÀ‘•
+ *  cast_base() ã®å®Ÿè£…
  */
-// ®” <-> ®”
+// æ•´æ•° <-> æ•´æ•°
 template <> inline ivec_t
 cast_base(ivec_t x)
 {
     return x;
 }
 
-// ®” <-> float, double
+// æ•´æ•° <-> float, double
 #if !defined(AVX2) && defined(AVX)
   template <> fvec_t
   cast_base<fvec_t>(ivec_t x)
@@ -673,40 +673,40 @@ cast_base(ivec_t x)
 /************************************************************************
 *  Shuffle operators							*
 ************************************************************************/
-//! 8‚Â‚Ì¬•ª‚ğ‚Â®”ƒxƒNƒgƒ‹‚Ì‰ºˆÊ4¬•ª‚ğƒVƒƒƒbƒtƒ‹‚·‚éD
+//! 8ã¤ã®æˆåˆ†ã‚’æŒã¤æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸‹ä½4æˆåˆ†ã‚’ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã™ã‚‹ï¼
 /*!
-  ãˆÊ4¬•ª‚Í•Ï‰»‚µ‚È‚¢D
-  \param I0	Å‰ºˆÊ‚É—ˆ‚é¬•ª‚Ìindex (0 <= I0 < 4)
-  \param I1	‰º‚©‚ç2”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I1 < 4)
-  \param I2	‰º‚©‚ç3”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I2 < 4)
-  \param I3	‰º‚©‚ç4”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I3 < 4)
-  \param x	ƒVƒƒƒbƒtƒ‹‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒƒƒbƒtƒ‹‚³‚ê‚½ƒxƒNƒgƒ‹
+  ä¸Šä½4æˆåˆ†ã¯å¤‰åŒ–ã—ãªã„ï¼
+  \param I0	æœ€ä¸‹ä½ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I0 < 4)
+  \param I1	ä¸‹ã‹ã‚‰2ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I1 < 4)
+  \param I2	ä¸‹ã‹ã‚‰3ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I2 < 4)
+  \param I3	ä¸‹ã‹ã‚‰4ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I3 < 4)
+  \param x	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
 shuffle_low(vec<T> x)							;
 
-//! 8‚Â‚Ì¬•ª‚ğ‚Â®”ƒxƒNƒgƒ‹‚ÌãˆÊ4¬•ª‚ğƒVƒƒƒbƒtƒ‹‚·‚éD
+//! 8ã¤ã®æˆåˆ†ã‚’æŒã¤æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸Šä½4æˆåˆ†ã‚’ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã™ã‚‹ï¼
 /*!
-  ‰ºˆÊ4¬•ª‚Í•Ï‰»‚µ‚È‚¢D
-  \param I0	‰º‚©‚ç5”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I0 < 4)
-  \param I1	‰º‚©‚ç6”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I1 < 4)
-  \param I2	‰º‚©‚ç7”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I2 < 4)
-  \param I3	ÅãˆÊ‚É—ˆ‚é¬•ª‚Ìindex (0 <= I3 < 4)
-  \param x	ƒVƒƒƒbƒtƒ‹‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒƒƒbƒtƒ‹‚³‚ê‚½ƒxƒNƒgƒ‹
+  ä¸‹ä½4æˆåˆ†ã¯å¤‰åŒ–ã—ãªã„ï¼
+  \param I0	ä¸‹ã‹ã‚‰5ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I0 < 4)
+  \param I1	ä¸‹ã‹ã‚‰6ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I1 < 4)
+  \param I2	ä¸‹ã‹ã‚‰7ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I2 < 4)
+  \param I3	æœ€ä¸Šä½ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I3 < 4)
+  \param x	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
 shuffle_high(vec<T> x)							;
 
-//! 4‚Â‚Ì¬•ª‚ğ‚Â®”ƒxƒNƒgƒ‹‚Ì¬•ª‚ğƒVƒƒƒbƒtƒ‹‚·‚éD
+//! 4ã¤ã®æˆåˆ†ã‚’æŒã¤æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®æˆåˆ†ã‚’ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã™ã‚‹ï¼
 /*!
-  \param I0	Å‰ºˆÊ‚É—ˆ‚é¬•ª‚Ìindex (0 <= I0 < 4)
-  \param I1	‰º‚©‚ç2”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I1 < 4)
-  \param I2	‰º‚©‚ç3”Ô–Ú‚É—ˆ‚é¬•ª‚Ìindex (0 <= I2 < 4)
-  \param I3	ÅãˆÊ‚É—ˆ‚é¬•ª‚Ìindex (0 <= I3 < 4)
-  \param x	ƒVƒƒƒbƒtƒ‹‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒƒƒbƒtƒ‹‚³‚ê‚½ƒxƒNƒgƒ‹
+  \param I0	æœ€ä¸‹ä½ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I0 < 4)
+  \param I1	ä¸‹ã‹ã‚‰2ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I1 < 4)
+  \param I2	ä¸‹ã‹ã‚‰3ç•ªç›®ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I2 < 4)
+  \param I3	æœ€ä¸Šä½ã«æ¥ã‚‹æˆåˆ†ã®index (0 <= I3 < 4)
+  \param x	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
 shuffle(vec<T> x)							;
@@ -741,28 +741,28 @@ shuffle(vec<T> x)							;
 #undef MM_SHUFFLE_LOW_HIGH_I4
 #undef MM_SHUFFLE_I4
 
-//! 4‚Â‚Ì¬•ª‚ğ‚Â2‚Â‚Ì•‚“®¬”“_”ƒxƒNƒgƒ‹‚Ì¬•ª‚ğƒVƒƒƒbƒtƒ‹‚·‚éD
+//! 4ã¤ã®æˆåˆ†ã‚’æŒã¤2ã¤ã®æµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®æˆåˆ†ã‚’ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã™ã‚‹ï¼
 /*!
-  ‰ºˆÊ2¬•ª‚Íx‚©‚çCãˆÊ2¬•ª‚Íy‚©‚ç‚»‚ê‚¼‚ê‘I‘ğ‚³‚ê‚éD
-  \param Xl	Å‰ºˆÊ‚É—ˆ‚éƒxƒNƒgƒ‹x‚Ì¬•ª‚Ìindex (0 <= I0 < 4)
-  \param Xh	‰º‚©‚ç2”Ô–Ú‚É—ˆ‚éƒxƒNƒgƒ‹x‚Ì¬•ª‚Ìindex (0 <= I1 < 4)
-  \param Yl	‰º‚©‚ç3”Ô–Ú‚É—ˆ‚éƒxƒNƒgƒ‹y‚Ì¬•ª‚Ìindex (0 <= I2 < 4)
-  \param Yh	ÅãˆÊ‚É—ˆ‚éƒxƒNƒgƒ‹y‚Ì¬•ª‚Ìindex (0 <= I3 < 4)
-  \param x	ƒVƒƒƒbƒtƒ‹‚³‚ê‚éƒxƒNƒgƒ‹
-  \param y	ƒVƒƒƒbƒtƒ‹‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒƒƒbƒtƒ‹‚³‚ê‚½ƒxƒNƒgƒ‹
+  ä¸‹ä½2æˆåˆ†ã¯xã‹ã‚‰ï¼Œä¸Šä½2æˆåˆ†ã¯yã‹ã‚‰ãã‚Œãã‚Œé¸æŠã•ã‚Œã‚‹ï¼
+  \param Xl	æœ€ä¸‹ä½ã«æ¥ã‚‹ãƒ™ã‚¯ãƒˆãƒ«xã®æˆåˆ†ã®index (0 <= I0 < 4)
+  \param Xh	ä¸‹ã‹ã‚‰2ç•ªç›®ã«æ¥ã‚‹ãƒ™ã‚¯ãƒˆãƒ«xã®æˆåˆ†ã®index (0 <= I1 < 4)
+  \param Yl	ä¸‹ã‹ã‚‰3ç•ªç›®ã«æ¥ã‚‹ãƒ™ã‚¯ãƒˆãƒ«yã®æˆåˆ†ã®index (0 <= I2 < 4)
+  \param Yh	æœ€ä¸Šä½ã«æ¥ã‚‹ãƒ™ã‚¯ãƒˆãƒ«yã®æˆåˆ†ã®index (0 <= I3 < 4)
+  \param x	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \param y	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int Yh, u_int Yl, u_int Xh, u_int Xl, class T> static vec<T>
 shuffle(vec<T> x, vec<T> y)						;
 
-//! 2‚Â‚Ì¬•ª‚ğ‚Â2‚Â‚Ì•‚“®¬”“_”ƒxƒNƒgƒ‹‚Ì¬•ª‚ğƒVƒƒƒbƒtƒ‹‚·‚éD
+//! 2ã¤ã®æˆåˆ†ã‚’æŒã¤2ã¤ã®æµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®æˆåˆ†ã‚’ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã™ã‚‹ï¼
 /*!
-  ‰ºˆÊ¬•ª‚Íx‚©‚çCãˆÊ¬•ª‚Íy‚©‚ç‚»‚ê‚¼‚ê‘I‘ğ‚³‚ê‚éD
-  \param X	‰ºˆÊ‚É—ˆ‚éƒxƒNƒgƒ‹x‚Ì¬•ª‚Ìindex (0 <= I0 < 2)
-  \param Y	ãˆÊ‚É—ˆ‚éƒxƒNƒgƒ‹y‚Ì¬•ª‚Ìindex (0 <= I3 < 2)
-  \param x	ƒVƒƒƒbƒtƒ‹‚³‚ê‚éƒxƒNƒgƒ‹
-  \param y	ƒVƒƒƒbƒtƒ‹‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒƒƒbƒtƒ‹‚³‚ê‚½ƒxƒNƒgƒ‹
+  ä¸‹ä½æˆåˆ†ã¯xã‹ã‚‰ï¼Œä¸Šä½æˆåˆ†ã¯yã‹ã‚‰ãã‚Œãã‚Œé¸æŠã•ã‚Œã‚‹ï¼
+  \param X	ä¸‹ä½ã«æ¥ã‚‹ãƒ™ã‚¯ãƒˆãƒ«xã®æˆåˆ†ã®index (0 <= I0 < 2)
+  \param Y	ä¸Šä½ã«æ¥ã‚‹ãƒ™ã‚¯ãƒˆãƒ«yã®æˆåˆ†ã®index (0 <= I3 < 2)
+  \param x	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \param y	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int Y, u_int X, class T> static vec<T>
 shuffle(vec<T> x, vec<T> y)						;
@@ -790,14 +790,14 @@ shuffle(vec<T> x, vec<T> y)						;
 #undef MM_SHUFFLE_F4
 
 /************************************************************************
-*  ‘S¬•ª‚ÉN”Ô–Ú‚Ì—v‘f‚ğƒZƒbƒg						*
+*  å…¨æˆåˆ†ã«Nç•ªç›®ã®è¦ç´ ã‚’ã‚»ãƒƒãƒˆ						*
 ************************************************************************/
-//! —^‚¦‚ç‚ê‚½ƒxƒNƒgƒ‹‚Ìw’è‚³‚ê‚½¬•ª‚ğ‘S¬•ª‚ÉƒZƒbƒg‚µ‚½ƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«ã®æŒ‡å®šã•ã‚ŒãŸæˆåˆ†ã‚’å…¨æˆåˆ†ã«ã‚»ãƒƒãƒˆã—ãŸãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  —^‚¦‚ç‚ê‚½ƒxƒNƒgƒ‹‚Ì¬•ª”‚Í2‚Ü‚½‚Í4‚Å‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
-  \param N	ƒZƒbƒg‚·‚éx‚ÌƒxƒNƒgƒ‹‚Ì¬•ª‚ğw’è‚·‚éindex (0 <= N < 4)
-  \param x	2‚ÂC‚Ü‚½‚Í4‚Â‚Ì¬•ª‚ğ‚ÂƒxƒNƒgƒ‹
-  \return	¶¬‚³‚ê‚½ƒxƒNƒgƒ‹
+  ä¸ãˆã‚‰ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«ã®æˆåˆ†æ•°ã¯2ã¾ãŸã¯4ã§ãªã‘ã‚Œã°ãªã‚‰ãªã„ï¼
+  \param N	ã‚»ãƒƒãƒˆã™ã‚‹xã®ãƒ™ã‚¯ãƒˆãƒ«ã®æˆåˆ†ã‚’æŒ‡å®šã™ã‚‹index (0 <= N < 4)
+  \param x	2ã¤ï¼Œã¾ãŸã¯4ã¤ã®æˆåˆ†ã‚’æŒã¤ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ç”Ÿæˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int N, class T> static inline vec<T>
 set1(vec<T> x)
@@ -820,19 +820,19 @@ set1(vec<T> x)
 /************************************************************************
 *  Unpack operators							*
 ************************************************************************/
-//! 2‚Â‚ÌƒxƒNƒgƒ‹‚Ì‰ºˆÊ”¼•ª‚Ì¬•ª‚ğŒğŒİ‚É¬‡‚·‚éD
+//! 2ã¤ã®ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸‹ä½åŠåˆ†ã®æˆåˆ†ã‚’äº¤äº’ã«æ··åˆã™ã‚‹ï¼
 /*!
-  \param x	‚»‚Ì¬•ª‚ğ‹ô””Ô–Ú‚É”z’u‚·‚éƒxƒNƒgƒ‹
-  \param y	‚»‚Ì¬•ª‚ğŠï””Ô–Ú‚É”z’u‚·‚éƒxƒNƒgƒ‹
-  \return	¶¬‚³‚ê‚½ƒxƒNƒgƒ‹
+  \param x	ãã®æˆåˆ†ã‚’å¶æ•°ç•ªç›®ã«é…ç½®ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \param y	ãã®æˆåˆ†ã‚’å¥‡æ•°ç•ªç›®ã«é…ç½®ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ç”Ÿæˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static vec<T>	unpack_low(vec<T> x, vec<T> y)	;
 
-//! 2‚Â‚ÌƒxƒNƒgƒ‹‚ÌãˆÊ”¼•ª‚Ì¬•ª‚ğŒğŒİ‚É¬‡‚·‚éD
+//! 2ã¤ã®ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸Šä½åŠåˆ†ã®æˆåˆ†ã‚’äº¤äº’ã«æ··åˆã™ã‚‹ï¼
 /*!
-  \param x	‚»‚Ì¬•ª‚ğ‹ô””Ô–Ú‚É”z’u‚·‚éƒxƒNƒgƒ‹
-  \param y	‚»‚Ì¬•ª‚ğŠï””Ô–Ú‚É”z’u‚·‚éƒxƒNƒgƒ‹
-  \return	¶¬‚³‚ê‚½ƒxƒNƒgƒ‹
+  \param x	ãã®æˆåˆ†ã‚’å¶æ•°ç•ªç›®ã«é…ç½®ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \param y	ãã®æˆåˆ†ã‚’å¥‡æ•°ç•ªç›®ã«é…ç½®ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ç”Ÿæˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static vec<T>	unpack_high(vec<T> x, vec<T> y)	;
 
@@ -859,8 +859,8 @@ MM_UNPACK_LOW_HIGH(u_int32_t, int32_t)
 /************************************************************************
 *  N-tuple generators							*
 ************************************************************************/
-// •¡»”FN = 2, 4, 8, 16,...;
-// ‘S‘Ì‚ğNŒÂ‚Ì•”•ª‚É•ª‚¯‚½‚Æ‚«‚Ì•¡»‹æŠÔF0 <= I < N
+// è¤‡è£½æ•°ï¼šN = 2, 4, 8, 16,...;
+// å…¨ä½“ã‚’Nå€‹ã®éƒ¨åˆ†ã«åˆ†ã‘ãŸã¨ãã®è¤‡è£½åŒºé–“ï¼š0 <= I < N
 template <u_int N, u_int I, class T> static vec<T>	n_tuple(vec<T> x);
 
 template <u_int I, class T> static inline vec<T>
@@ -912,11 +912,11 @@ MM_N_TUPLE(u_int32_t)
 /************************************************************************
 *  Extracting elements							*
 ************************************************************************/
-//! ƒxƒNƒgƒ‹‚©‚çw’è‚³‚ê‚½¬•ª‚ğæ‚èo‚·D
+//! ãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰æŒ‡å®šã•ã‚ŒãŸæˆåˆ†ã‚’å–ã‚Šå‡ºã™ï¼
 /*!
-  \param I	æ‚èo‚·¬•ª‚ğw’è‚·‚éindex
-  \param x	ƒxƒNƒgƒ‹
-  \return	æ‚èo‚³‚ê‚½¬•ª
+  \param I	å–ã‚Šå‡ºã™æˆåˆ†ã‚’æŒ‡å®šã™ã‚‹index
+  \param x	ãƒ™ã‚¯ãƒˆãƒ«
+  \return	å–ã‚Šå‡ºã•ã‚ŒãŸæˆåˆ†
 */
 template <u_int I, class T> static T	extract(vec<T> x)		;
 
@@ -940,27 +940,27 @@ template <u_int I, class T> static T	extract(vec<T> x)		;
 /************************************************************************
 *  Elementwise shift operators						*
 ************************************************************************/
-//! ƒxƒNƒgƒ‹‚Ì—v‘f‚ğ¶ƒVƒtƒg‚·‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ã®è¦ç´ ã‚’å·¦ã‚·ãƒ•ãƒˆã™ã‚‹ï¼
 /*!
-  ƒVƒtƒgŒã‚Ì‰ºˆÊ‚É‚Í0‚ª“ü‚éD
-  \param N	ƒVƒtƒg”(¬•ª’PˆÊ)
-  \param x	ƒVƒtƒg‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒtƒg‚³‚ê‚½ƒxƒNƒgƒ‹
+  ã‚·ãƒ•ãƒˆå¾Œã®ä¸‹ä½ã«ã¯0ãŒå…¥ã‚‹ï¼
+  \param N	ã‚·ãƒ•ãƒˆæ•°(æˆåˆ†å˜ä½)
+  \param x	ã‚·ãƒ•ãƒˆã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ•ãƒˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int N, class T> static vec<T>	shift_l(vec<T> x)	;
 
-//! ƒxƒNƒgƒ‹‚Ì—v‘f‚ğ‰EƒVƒtƒg‚·‚éD
+//! ãƒ™ã‚¯ãƒˆãƒ«ã®è¦ç´ ã‚’å³ã‚·ãƒ•ãƒˆã™ã‚‹ï¼
 /*!
-  ƒVƒtƒgŒã‚ÌãˆÊ‚É‚Í0‚ª“ü‚éD
-  \param N	ƒVƒtƒg”(¬•ª’PˆÊ)
-  \param x	ƒVƒtƒg‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒtƒg‚³‚ê‚½ƒxƒNƒgƒ‹
+  ã‚·ãƒ•ãƒˆå¾Œã®ä¸Šä½ã«ã¯0ãŒå…¥ã‚‹ï¼
+  \param N	ã‚·ãƒ•ãƒˆæ•°(æˆåˆ†å˜ä½)
+  \param x	ã‚·ãƒ•ãƒˆã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ•ãƒˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
 
-// ®”ƒxƒNƒgƒ‹‚Ì—v‘fƒVƒtƒgiÀ‘•ã‚Ì’ˆÓFMMX‚Å‚Í64bit®”‚ÌƒVƒtƒg‚Í
-// bit’PˆÊ‚¾‚ªCSSE2ˆÈã‚Ì128bit®”‚Å‚Íbyte’PˆÊ‚Å‚ ‚éD‚Ü‚½CAVX2‚Å‚Í
-// ‰ºˆÊ128bit‚µ‚©ƒVƒtƒg‚³‚ê‚È‚¢Dj
+// æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®è¦ç´ ã‚·ãƒ•ãƒˆï¼ˆå®Ÿè£…ä¸Šã®æ³¨æ„ï¼šMMXã§ã¯64bitæ•´æ•°ã®ã‚·ãƒ•ãƒˆã¯
+// bitå˜ä½ã ãŒï¼ŒSSE2ä»¥ä¸Šã®128bitæ•´æ•°ã§ã¯byteå˜ä½ã§ã‚ã‚‹ï¼ã¾ãŸï¼ŒAVX2ã§ã¯
+// ä¸‹ä½128bitã—ã‹ã‚·ãƒ•ãƒˆã•ã‚Œãªã„ï¼ï¼‰
 #if defined(SSE2)
 #  define MM_ELM_SHIFTS_I(type)						\
     template <u_int N>							\
@@ -989,8 +989,8 @@ MM_ELM_SHIFTS_I(u_int64_t)
 
 #undef MM_ELM_SHIFTS_I
 
-// •‚“®¬”“_”ƒxƒNƒgƒ‹‚Ì—v‘fƒVƒtƒg
-// i®”ƒxƒNƒgƒ‹‚Æ“¯ˆêƒTƒCƒY‚Ìê‡‚Ì‚İ’è‹`‚Å‚«‚éj
+// æµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®è¦ç´ ã‚·ãƒ•ãƒˆ
+// ï¼ˆæ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã¨åŒä¸€ã‚µã‚¤ã‚ºã®å ´åˆã®ã¿å®šç¾©ã§ãã‚‹ï¼‰
 #if defined(AVX2) || (!defined(AVX) && defined(SSE2))
   template <u_int N> inline vec<float>
   shift_l(vec<float> x)
@@ -1020,11 +1020,11 @@ MM_ELM_SHIFTS_I(u_int64_t)
 /************************************************************************
 *  Element wise shift to left/right-most				*
 ************************************************************************/
-//! ¶’[‚Ì—v‘f‚ª‰E’[‚É—ˆ‚é‚Ü‚Å‰EƒVƒtƒg‚·‚éD
+//! å·¦ç«¯ã®è¦ç´ ãŒå³ç«¯ã«æ¥ã‚‹ã¾ã§å³ã‚·ãƒ•ãƒˆã™ã‚‹ï¼
 /*!
-  ƒVƒtƒgŒã‚ÌãˆÊ‚É‚Í0‚ª“ü‚éD
-  \param x	ƒVƒtƒg‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒtƒg‚³‚ê‚½ƒxƒNƒgƒ‹
+  ã‚·ãƒ•ãƒˆå¾Œã®ä¸Šä½ã«ã¯0ãŒå…¥ã‚‹ï¼
+  \param x	ã‚·ãƒ•ãƒˆã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ•ãƒˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static inline vec<T>
 shift_lmost_to_rmost(vec<T> x)
@@ -1032,11 +1032,11 @@ shift_lmost_to_rmost(vec<T> x)
     return shift_r<vec<T>::size-1>(x);
 }
 
-//! ‰E’[‚Ì—v‘f‚ª¶’[‚É—ˆ‚é‚Ü‚Å¶ƒVƒtƒg‚·‚éD
+//! å³ç«¯ã®è¦ç´ ãŒå·¦ç«¯ã«æ¥ã‚‹ã¾ã§å·¦ã‚·ãƒ•ãƒˆã™ã‚‹ï¼
 /*!
-  ƒVƒtƒgŒã‚Ì‰ºˆÊ‚É‚Í0‚ª“ü‚éD
-  \param x	ƒVƒtƒg‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	ƒVƒtƒg‚³‚ê‚½ƒxƒNƒgƒ‹
+  ã‚·ãƒ•ãƒˆå¾Œã®ä¸‹ä½ã«ã¯0ãŒå…¥ã‚‹ï¼
+  \param x	ã‚·ãƒ•ãƒˆã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã‚·ãƒ•ãƒˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static inline vec<T>
 shift_rmost_to_lmost(vec<T> x)
@@ -1044,10 +1044,10 @@ shift_rmost_to_lmost(vec<T> x)
     return shift_l<vec<T>::size-1>(x);
 }
 
-//! —^‚¦‚ç‚ê‚½’l‚ğ‰E’[‚Ì¬•ª‚ÉƒZƒbƒg‚µc‚è‚ğ0‚Æ‚µ‚½ƒxƒNƒgƒ‹‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸå€¤ã‚’å³ç«¯ã®æˆåˆ†ã«ã‚»ãƒƒãƒˆã—æ®‹ã‚Šã‚’0ã¨ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param x	ƒZƒbƒg‚³‚ê‚é’l
-  \return	x‚ğ‰E’[¬•ª‚Æ‚·‚éƒxƒNƒgƒ‹
+  \param x	ã‚»ãƒƒãƒˆã•ã‚Œã‚‹å€¤
+  \return	xã‚’å³ç«¯æˆåˆ†ã¨ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static inline vec<T>
 set_rmost(typename vec<T>::value_type x)
@@ -1072,16 +1072,16 @@ set_rmost(typename vec<T>::value_type x)
 /************************************************************************
 *  Rotation and reverse operators					*
 ************************************************************************/
-// SSSE3ˆÈã‚Å‚Í _mm[256]_alignr_epi8 ‚ğg‚Á‚ÄÀ‘•‚·‚é‚Ì‚ªŠÈ’P‚¾‚ªC
-// AVX2‚Å‚Íconcatination‚Éæ—§‚Á‚Ä128bit’PˆÊ‚Ìunpack‚ªs‚È‚í‚ê‚Ä‚µ‚Ü‚¤D
+// SSSE3ä»¥ä¸Šã§ã¯ _mm[256]_alignr_epi8 ã‚’ä½¿ã£ã¦å®Ÿè£…ã™ã‚‹ã®ãŒç°¡å˜ã ãŒï¼Œ
+// AVX2ã§ã¯concatinationã«å…ˆç«‹ã£ã¦128bitå˜ä½ã®unpackãŒè¡Œãªã‚ã‚Œã¦ã—ã¾ã†ï¼
 
-//! ƒxƒNƒgƒ‹‚Ì¶‰ñ“]‚ğs‚È‚¤D
+//! ãƒ™ã‚¯ãƒˆãƒ«ã®å·¦å›è»¢ã‚’è¡Œãªã†ï¼
 template <class T> static inline vec<T>
 rotate_l(vec<T> x)			{return shuffle<2, 1, 0, 3>(x);}
-//! ƒxƒNƒgƒ‹‚Ì‰E‰ñ“]‚ğs‚È‚¤D
+//! ãƒ™ã‚¯ãƒˆãƒ«ã®å³å›è»¢ã‚’è¡Œãªã†ï¼
 template <class T> static inline vec<T>
 rotate_r(vec<T> x)			{return shuffle<0, 3, 2, 1>(x);}
-//! ƒxƒNƒgƒ‹‚Ì‹t“]‚ğs‚È‚¤D
+//! ãƒ™ã‚¯ãƒˆãƒ«ã®é€†è»¢ã‚’è¡Œãªã†ï¼
 template <class T> static inline vec<T>
 reverse(vec<T> x)			{return shuffle<0, 1, 2, 3>(x);}
 
@@ -1112,19 +1112,19 @@ reverse(vec<T> x)			{return shuffle<0, 1, 2, 3>(x);}
 /************************************************************************
 *  Bitwise shift operators						*
 ************************************************************************/
-//! ®”ƒxƒNƒgƒ‹‚Ì¶ƒVƒtƒg‚ğs‚¤D
+//! æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®å·¦ã‚·ãƒ•ãƒˆã‚’è¡Œã†ï¼
 /*!
-  \param x	®”ƒxƒNƒgƒ‹
-  \param n	ƒVƒtƒg‚·‚éƒrƒbƒg”
-  \return	ƒVƒtƒgŒã‚Ì®”ƒxƒNƒgƒ‹
+  \param x	æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+  \param n	ã‚·ãƒ•ãƒˆã™ã‚‹ãƒ“ãƒƒãƒˆæ•°
+  \return	ã‚·ãƒ•ãƒˆå¾Œã®æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static vec<T>	operator <<(vec<T> x, int n)	;
 
-//! ®”ƒxƒNƒgƒ‹‚ÌZp‰EƒVƒtƒg‚ğs‚È‚¤D
+//! æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®ç®—è¡“å³ã‚·ãƒ•ãƒˆã‚’è¡Œãªã†ï¼
 /*!
-  \param x	®”ƒxƒNƒgƒ‹
-  \param n	ƒVƒtƒg‚·‚éƒrƒbƒg”
-  \return	ƒVƒtƒgŒã‚Ì®”ƒxƒNƒgƒ‹
+  \param x	æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
+  \param n	ã‚·ãƒ•ãƒˆã™ã‚‹ãƒ“ãƒƒãƒˆæ•°
+  \return	ã‚·ãƒ•ãƒˆå¾Œã®æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static vec<T>	operator >>(vec<T> x, int n)	;
 
@@ -1157,43 +1157,43 @@ MM_LOGICAL_SHIFT_RIGHT(u_int64_t, u_int64_t)
 /************************************************************************
 *  Type conversion operators						*
 ************************************************************************/
-//! TŒ^ƒxƒNƒgƒ‹‚Ì‰ºˆÊ”¼•ª‚ğSŒ^ƒxƒNƒgƒ‹‚ÉŒ^•ÏŠ·‚·‚éD
+//! Tå‹ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸‹ä½åŠåˆ†ã‚’Så‹ãƒ™ã‚¯ãƒˆãƒ«ã«å‹å¤‰æ›ã™ã‚‹ï¼
 /*!
-  ®”ƒxƒNƒgƒ‹ŠÔ‚Ì•ÏŠ·‚Ìê‡CS‚ÌƒTƒCƒY‚ÍT‚Ì”{‚Å‚ ‚éD‚Ü‚½CS, T‚Í
-  •„†•t‚«^•„†‚È‚µ‚Ì‚¢‚¸‚ê‚Å‚à—Ç‚¢‚ªC•„†•t‚« -> •„†‚È‚µ‚Ì•ÏŠ·‚Í‚Å‚«‚È‚¢D
-  \param x	•ÏŠ·‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	•ÏŠ·‚³‚ê‚½ƒxƒNƒgƒ‹
+  æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å¤‰æ›ã®å ´åˆï¼ŒSã®ã‚µã‚¤ã‚ºã¯Tã®å€ã§ã‚ã‚‹ï¼ã¾ãŸï¼ŒS, Tã¯
+  ç¬¦å·ä»˜ãï¼ç¬¦å·ãªã—ã®ã„ãšã‚Œã§ã‚‚è‰¯ã„ãŒï¼Œç¬¦å·ä»˜ã -> ç¬¦å·ãªã—ã®å¤‰æ›ã¯ã§ããªã„ï¼
+  \param x	å¤‰æ›ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	å¤‰æ›ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class S, class T> static vec<S>	cvt(vec<T> x)		;
 
-//! TŒ^ƒxƒNƒgƒ‹‚ÌãˆÊ”¼•ª‚ğSŒ^ƒxƒNƒgƒ‹‚ÉŒ^•ÏŠ·‚·‚éD
+//! Tå‹ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸Šä½åŠåˆ†ã‚’Så‹ãƒ™ã‚¯ãƒˆãƒ«ã«å‹å¤‰æ›ã™ã‚‹ï¼
 /*!
-  ®”ƒxƒNƒgƒ‹ŠÔ‚Ì•ÏŠ·‚Ìê‡CS‚ÌƒTƒCƒY‚ÍT‚Ì”{‚Å‚ ‚éD‚Ü‚½CS, T‚Í
-  •„†•t‚«^•„†‚È‚µ‚Ì‚¢‚¸‚ê‚Å‚à—Ç‚¢‚ªC•„†•t‚« -> •„†‚È‚µ‚Ì•ÏŠ·‚Í‚Å‚«‚È‚¢D
-  \param x	•ÏŠ·‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	•ÏŠ·‚³‚ê‚½ƒxƒNƒgƒ‹
+  æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å¤‰æ›ã®å ´åˆï¼ŒSã®ã‚µã‚¤ã‚ºã¯Tã®å€ã§ã‚ã‚‹ï¼ã¾ãŸï¼ŒS, Tã¯
+  ç¬¦å·ä»˜ãï¼ç¬¦å·ãªã—ã®ã„ãšã‚Œã§ã‚‚è‰¯ã„ãŒï¼Œç¬¦å·ä»˜ã -> ç¬¦å·ãªã—ã®å¤‰æ›ã¯ã§ããªã„ï¼
+  \param x	å¤‰æ›ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	å¤‰æ›ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class S, class T> static vec<S>	cvt_high(vec<T> x)	;
 
-//! 2‚Â‚ÌTŒ^®”ƒxƒNƒgƒ‹‚ğ‚æ‚è¬‚³‚ÈSŒ^®”ƒxƒNƒgƒ‹‚ÉŒ^•ÏŠ·‚·‚éD
+//! 2ã¤ã®Tå‹æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã‚’ã‚ˆã‚Šå°ã•ãªSå‹æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã«å‹å¤‰æ›ã™ã‚‹ï¼
 /*!
-  T‚Í•„†•t‚«®”Œ^CS‚ÍT‚Ì”¼•ª‚ÌƒTƒCƒY‚ğ‚Â•„†•t‚«^•„†‚È‚µ®”Œ^
-  ‚Å‚ ‚éDS‚ª•„†•t‚«^•„†‚È‚µ‚Ì‚¢‚¸‚ê‚Ìê‡‚à–O˜aˆ—‚ªs‚í‚ê‚éD
-  \param x	•ÏŠ·‚³‚ê‚éƒxƒNƒgƒ‹
-  \param y	•ÏŠ·‚³‚ê‚éƒxƒNƒgƒ‹
-  \return	x‚ª•ÏŠ·‚³‚ê‚½‚à‚Ì‚ğ‰ºˆÊCy‚ª•ÏŠ·‚³‚ê‚½‚à‚Ì‚ğãˆÊ‚É
-		”z‚µ‚½ƒxƒNƒgƒ‹
+  Tã¯ç¬¦å·ä»˜ãæ•´æ•°å‹ï¼ŒSã¯Tã®åŠåˆ†ã®ã‚µã‚¤ã‚ºã‚’æŒã¤ç¬¦å·ä»˜ãï¼ç¬¦å·ãªã—æ•´æ•°å‹
+  ã§ã‚ã‚‹ï¼SãŒç¬¦å·ä»˜ãï¼ç¬¦å·ãªã—ã®ã„ãšã‚Œã®å ´åˆã‚‚é£½å’Œå‡¦ç†ãŒè¡Œã‚ã‚Œã‚‹ï¼
+  \param x	å¤‰æ›ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \param y	å¤‰æ›ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	xãŒå¤‰æ›ã•ã‚ŒãŸã‚‚ã®ã‚’ä¸‹ä½ï¼ŒyãŒå¤‰æ›ã•ã‚ŒãŸã‚‚ã®ã‚’ä¸Šä½ã«
+		é…ã—ãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 
-// intrinsic‚É‚æ‚Á‚Ä’¼ÚƒTƒ|[ƒg‚³‚ê‚é•ÏŠ·
+// intrinsicã«ã‚ˆã£ã¦ç›´æ¥ã‚µãƒãƒ¼ãƒˆã•ã‚Œã‚‹å¤‰æ›
 #define MM_CVT(from, to)						\
     MM_FUNC(vec<to> cvt<to>(vec<from> x), cvt, (x), from, to)
 #define MM_CVT_2(type0, type1)						\
     MM_CVT(type0, type1)						\
     MM_CVT(type1, type0)
 
-// [1] ®”ƒxƒNƒgƒ‹ŠÔ‚Ì•ÏŠ·
+// [1] æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å¤‰æ›
 #define MM_CVTUP_I(from, to)						\
     template <> inline vec<to>						\
     cvt<to>(vec<from> x)						\
@@ -1223,7 +1223,7 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
     MM_FUNC(vec<to> cvt<to>(vec<from> x, vec<from> y),			\
 	    packus, (x, y), void, from)
 
-#define _mm_packus_pi16	_mm_packs_pu16	// •s“KØ‚È–½–¼‚ğSSE2‚É‡‚í‚¹‚ÄC³
+#define _mm_packus_pi16	_mm_packs_pu16	// ä¸é©åˆ‡ãªå‘½åã‚’SSE2ã«åˆã‚ã›ã¦ä¿®æ­£
 
 #if defined(SSE4) && !defined(AVX2)
   MM_CVT(int8_t,    int16_t)		// s_char -> short
@@ -1267,7 +1267,7 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 #undef MM_CVTDOWN_I
 #undef MM_CVTDOWN_UI
 
-// [2] ®”ƒxƒNƒgƒ‹‚Æ•‚“®¬”“_”ƒxƒNƒgƒ‹ŠÔ‚Ì•ÏŠ·
+// [2] æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã¨æµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å¤‰æ›
 #if defined(AVX)
 #  if defined(AVX2)
   MM_CVT_2(int32_t, float)		// int <-> float
@@ -1346,7 +1346,7 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
   MM_CVT(u_int16_t, float)		// u_short -> float
 #endif
   
-// [3] •‚“®¬”“_”ƒxƒNƒgƒ‹ŠÔ‚Ì•ÏŠ·
+// [3] æµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å¤‰æ›
 #if defined(AVX)
   template <> F64vec
   cvt<double>(F32vec x)			// float -> double
@@ -1369,38 +1369,38 @@ template <> F32vec			// double -> float
 /************************************************************************
 *  Mask conversion operators						*
 ************************************************************************/
-//! TŒ^ƒ}ƒXƒNƒxƒNƒgƒ‹‚Ì‰ºˆÊ”¼•ª‚ğSŒ^ƒ}ƒXƒNƒxƒNƒgƒ‹‚ÉŒ^•ÏŠ·‚·‚éD
+//! Tå‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸‹ä½åŠåˆ†ã‚’Så‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«ã«å‹å¤‰æ›ã™ã‚‹ï¼
 /*!
-  ®”ƒxƒNƒgƒ‹ŠÔ‚Ì•ÏŠ·‚Ìê‡CS‚ÌƒTƒCƒY‚ÍT‚Ì”{‚Å‚ ‚éD‚Ü‚½CS, T‚Í
-  •„†•t‚«^•„†‚È‚µ‚Ì‚¢‚¸‚ê‚Å‚à—Ç‚¢D
-  \param x	•ÏŠ·‚³‚ê‚éƒ}ƒXƒNƒxƒNƒgƒ‹
-  \return	•ÏŠ·‚³‚ê‚½ƒ}ƒXƒNƒxƒNƒgƒ‹
+  æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å¤‰æ›ã®å ´åˆï¼ŒSã®ã‚µã‚¤ã‚ºã¯Tã®å€ã§ã‚ã‚‹ï¼ã¾ãŸï¼ŒS, Tã¯
+  ç¬¦å·ä»˜ãï¼ç¬¦å·ãªã—ã®ã„ãšã‚Œã§ã‚‚è‰¯ã„ï¼
+  \param x	å¤‰æ›ã•ã‚Œã‚‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
+  \return	å¤‰æ›ã•ã‚ŒãŸãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class S, class T> static vec<S>
 cvt_mask(vec<T> x)							;
 
-//! TŒ^ƒ}ƒXƒNƒxƒNƒgƒ‹‚ÌãˆÊ”¼•ª‚ğSŒ^ƒ}ƒXƒNƒxƒNƒgƒ‹‚ÉŒ^•ÏŠ·‚·‚éD
+//! Tå‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«ã®ä¸Šä½åŠåˆ†ã‚’Så‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«ã«å‹å¤‰æ›ã™ã‚‹ï¼
 /*!
-  ®”ƒxƒNƒgƒ‹ŠÔ‚Ì•ÏŠ·‚Ìê‡CS‚ÌƒTƒCƒY‚ÍT‚Ì”{‚Å‚ ‚éD‚Ü‚½CS, T‚Í
-  •„†•t‚«^•„†‚È‚µ‚Ì‚¢‚¸‚ê‚Å‚à—Ç‚¢D
-  \param x	•ÏŠ·‚³‚ê‚éƒ}ƒXƒNƒxƒNƒgƒ‹
-  \return	•ÏŠ·‚³‚ê‚½ƒ}ƒXƒNƒxƒNƒgƒ‹
+  æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®å¤‰æ›ã®å ´åˆï¼ŒSã®ã‚µã‚¤ã‚ºã¯Tã®å€ã§ã‚ã‚‹ï¼ã¾ãŸï¼ŒS, Tã¯
+  ç¬¦å·ä»˜ãï¼ç¬¦å·ãªã—ã®ã„ãšã‚Œã§ã‚‚è‰¯ã„ï¼
+  \param x	å¤‰æ›ã•ã‚Œã‚‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
+  \return	å¤‰æ›ã•ã‚ŒãŸãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class S, class T> static vec<S>
 cvt_mask_high(vec<T> x)							;
 
-//! 2‚Â‚ÌTŒ^®”ƒ}ƒXƒNƒxƒNƒgƒ‹‚ğ‚æ‚è¬‚³‚ÈSŒ^®”ƒ}ƒXƒNƒxƒNƒgƒ‹‚ÉŒ^•ÏŠ·‚·‚éD
+//! 2ã¤ã®Tå‹æ•´æ•°ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«ã‚’ã‚ˆã‚Šå°ã•ãªSå‹æ•´æ•°ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«ã«å‹å¤‰æ›ã™ã‚‹ï¼
 /*!
-  S‚ÌƒTƒCƒY‚ÍT‚Ì”{‚Å‚ ‚éD‚Ü‚½CS, T‚Í•„†•t‚«^•„†‚È‚µ‚Ì‚¢‚¸‚ê‚Å‚à—Ç‚¢D
-  \param x	•ÏŠ·‚³‚ê‚éƒ}ƒXƒNƒxƒNƒgƒ‹
-  \param y	•ÏŠ·‚³‚ê‚éƒ}ƒXƒNƒxƒNƒgƒ‹
-  \return	x‚ª•ÏŠ·‚³‚ê‚½‚à‚Ì‚ğ‰ºˆÊCy‚ª•ÏŠ·‚³‚ê‚½‚à‚Ì‚ğãˆÊ‚É
-		”z‚µ‚½ƒ}ƒXƒNƒxƒNƒgƒ‹
+  Sã®ã‚µã‚¤ã‚ºã¯Tã®å€ã§ã‚ã‚‹ï¼ã¾ãŸï¼ŒS, Tã¯ç¬¦å·ä»˜ãï¼ç¬¦å·ãªã—ã®ã„ãšã‚Œã§ã‚‚è‰¯ã„ï¼
+  \param x	å¤‰æ›ã•ã‚Œã‚‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
+  \param y	å¤‰æ›ã•ã‚Œã‚‹ãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
+  \return	xãŒå¤‰æ›ã•ã‚ŒãŸã‚‚ã®ã‚’ä¸‹ä½ï¼ŒyãŒå¤‰æ›ã•ã‚ŒãŸã‚‚ã®ã‚’ä¸Šä½ã«
+		é…ã—ãŸãƒã‚¹ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class S, class T> static vec<S>
 cvt_mask(vec<T> x, vec<T> y)						;
 
-// [1] ®”ƒxƒNƒgƒ‹ŠÔ‚Ìƒ}ƒXƒN•ÏŠ·
+// [1] æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®ãƒã‚¹ã‚¯å¤‰æ›
 #define MM_CVTUP_MASK(from, to, base)					\
     MM_FUNC(vec<to> cvt_mask(vec<from> x),				\
 	    unpacklo, (x, x), void, base)				\
@@ -1428,7 +1428,7 @@ MM_CVTUP_MASK(u_int32_t, u_int64_t, int32_t)	     // u_int    -> u_long
 #undef MM_CVTDOWN_MASK
 #undef MM_CVT_MASK
     
-// [2] ®”ƒxƒNƒgƒ‹‚Æ•‚“®¬”“_”ƒxƒNƒgƒ‹ŠÔ‚Ìƒ}ƒXƒN•ÏŠ·
+// [2] æ•´æ•°ãƒ™ã‚¯ãƒˆãƒ«ã¨æµ®å‹•å°æ•°ç‚¹æ•°ãƒ™ã‚¯ãƒˆãƒ«é–“ã®ãƒã‚¹ã‚¯å¤‰æ›
 #if defined(SSE2)
 // int, u_int, short, u_short, s_char, u_char -> float
 template <> inline F32vec
@@ -1505,13 +1505,13 @@ MM_LOGICALS(u_int64_t, ivec_t)
 /************************************************************************
 *  Selection								*
 ************************************************************************/
-//! 2‚Â‚ÌƒxƒNƒgƒ‹’†‚Ì¬•ª‚Ì‚¢‚¸‚ê‚©‚ğƒ}ƒXƒN’l‚É‰‚¶‚Ä‘I‘ğ‚·‚éD
+//! 2ã¤ã®ãƒ™ã‚¯ãƒˆãƒ«ä¸­ã®æˆåˆ†ã®ã„ãšã‚Œã‹ã‚’ãƒã‚¹ã‚¯å€¤ã«å¿œã˜ã¦é¸æŠã™ã‚‹ï¼
 /*!
- \param mask	ƒ}ƒXƒN
- \param x	ƒxƒNƒgƒ‹
- \param y	ƒxƒNƒgƒ‹
- \return	mask‚É‚¨‚¢‚Ä1‚ª—§‚Á‚Ä‚¢‚é¬•ª‚Íx‚©‚çC‚»‚¤‚Å‚È‚¢¬•ª‚Í
-		y‚©‚ç‚»‚ê‚¼‚ê‘I‘ğ‚µ‚Ä¶¬‚³‚ê‚½ƒxƒNƒgƒ‹
+ \param mask	ãƒã‚¹ã‚¯
+ \param x	ãƒ™ã‚¯ãƒˆãƒ«
+ \param y	ãƒ™ã‚¯ãƒˆãƒ«
+ \return	maskã«ãŠã„ã¦1ãŒç«‹ã£ã¦ã„ã‚‹æˆåˆ†ã¯xã‹ã‚‰ï¼Œãã†ã§ãªã„æˆåˆ†ã¯
+		yã‹ã‚‰ãã‚Œãã‚Œé¸æŠã—ã¦ç”Ÿæˆã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> static inline vec<T>
 select(vec<T> mask, vec<T> x, vec<T> y)
@@ -1529,7 +1529,7 @@ template <class T> static vec<T>	operator !=(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator >=(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator <=(vec<T> x, vec<T> y)	;
 
-// MMX, SSE, AVX2 ‚É‚Í®”‚É‘Î‚·‚é cmplt ("less than") ‚ª‚È‚¢I
+// MMX, SSE, AVX2 ã«ã¯æ•´æ•°ã«å¯¾ã™ã‚‹ cmplt ("less than") ãŒãªã„ï¼
 #define MM_COMPARES(type, base)						\
     MM_FUNC_2( operator ==, cmpeq, type, base)				\
     MM_FUNC_2( operator >,  cmpgt, type, base)				\
@@ -1539,7 +1539,7 @@ template <class T> static vec<T>	operator <=(vec<T> x, vec<T> y)	;
     MM_FUNC_2( operator >=, cmpge,  type, base)				\
     MM_FUNC_2R(operator <=, cmpge,  type, base)
 
-// •„†‚È‚µ”‚É‘Î‚µ‚Ä‚Í“™’l«ƒ`ƒFƒbƒN‚µ‚©‚Å‚«‚È‚¢I
+// ç¬¦å·ãªã—æ•°ã«å¯¾ã—ã¦ã¯ç­‰å€¤æ€§ãƒã‚§ãƒƒã‚¯ã—ã‹ã§ããªã„ï¼
 MM_FUNC_2(operator ==, cmpeq, u_int8_t,  int8_t)
 MM_FUNC_2(operator ==, cmpeq, u_int16_t, int16_t)
 MM_FUNC_2(operator ==, cmpeq, u_int32_t, int32_t)
@@ -1551,7 +1551,7 @@ MM_COMPARES(int8_t,  int8_t)
 MM_COMPARES(int16_t, int16_t)
 MM_COMPARES(int32_t, int32_t)
 
-#if defined(AVX)	// AVX ‚Ì•‚“®¬”“_””äŠr‰‰Zq‚Íƒpƒ‰ƒ[ƒ^Œ`®
+#if defined(AVX)	// AVX ã®æµ®å‹•å°æ•°ç‚¹æ•°æ¯”è¼ƒæ¼”ç®—å­ã¯ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å½¢å¼
   // yet implemented.
 #elif defined(SSE)
   MM_COMPARES(float, float)
@@ -1605,12 +1605,12 @@ operator -(vec<T> x)
     MM_FUNC_2(operator +, add, type, type)				\
     MM_FUNC_2(operator -, sub, type, type)
 
-// •„†‚È‚µ”‚ÍC–O˜a‰‰Z‚É‚æ‚Á‚Ä operator [+|-] ‚ğ’è‹`‚·‚éD
+// ç¬¦å·ãªã—æ•°ã¯ï¼Œé£½å’Œæ¼”ç®—ã«ã‚ˆã£ã¦ operator [+|-] ã‚’å®šç¾©ã™ã‚‹ï¼
 #define MM_ADD_SUB_U(type)						\
     MM_FUNC_2(operator +, adds, type, type)				\
     MM_FUNC_2(operator -, subs, type, type)
 
-// •„†‚ ‚è”‚ÍC–O˜a‰‰Z‚É sat_[add|sub] ‚Æ‚¢‚¤–¼‘O‚ğ—^‚¦‚éD
+// ç¬¦å·ã‚ã‚Šæ•°ã¯ï¼Œé£½å’Œæ¼”ç®—ã« sat_[add|sub] ã¨ã„ã†åå‰ã‚’ä¸ãˆã‚‹ï¼
 #define MM_SAT_ADD_SUB(type)						\
     MM_FUNC_2(sat_add, adds, type, type)				\
     MM_FUNC_2(sat_sub, subs, type, type)
@@ -1619,7 +1619,7 @@ operator -(vec<T> x)
     MM_FUNC_2(min, min, type, type)					\
     MM_FUNC_2(max, max, type, type)
 
-// ‰ÁŒ¸Z
+// åŠ æ¸›ç®—
 MM_ADD_SUB(int8_t)
 MM_ADD_SUB(int16_t)
 MM_ADD_SUB(int32_t)
@@ -1630,15 +1630,15 @@ MM_SAT_ADD_SUB(int16_t)
 MM_SAT_ADD_SUB(u_int8_t)
 MM_SAT_ADD_SUB(u_int16_t)
 
-// æZ
+// ä¹—ç®—
 MM_FUNC_2(operator *, mullo, int16_t, int16_t)
 MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
 
 #if defined(SSE)
-  // ‰ÁŒ¸Z
+  // åŠ æ¸›ç®—
   MM_ADD_SUB(float)
 
-  // æœZ
+  // ä¹—é™¤ç®—
   MM_FUNC_2(operator *, mul, float, float)
   MM_FUNC_2(operator /, div, float, float)
 
@@ -1647,17 +1647,17 @@ MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
   MM_MIN_MAX(int16_t)
   MM_MIN_MAX(float)
 
-  // ‚»‚Ì‘¼
+  // ãã®ä»–
   MM_FUNC_1(sqrt,  sqrt,  float, float)
   MM_FUNC_1(rsqrt, rsqrt, float, float)
   MM_FUNC_1(rcp,   rcp,   float, float)
 #endif
 
 #if defined(SSE2)
-  // ‰ÁŒ¸Z
+  // åŠ æ¸›ç®—
   MM_ADD_SUB(double)
 
-  // æœZ
+  // ä¹—é™¤ç®—
   MM_FUNC_2(operator *, mul, u_int32_t, u_int32_t)
   MM_FUNC_2(operator *, mul, double, double)
   MM_FUNC_2(operator /, div, double, double)
@@ -1665,12 +1665,12 @@ MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
   // Min/Max
   MM_MIN_MAX(double)
 
-  // ‚»‚Ì‘¼
+  // ãã®ä»–
   MM_FUNC_1(sqrt, sqrt, double, double)
 #endif
 
 #if defined(SSE4)
-  // æZ
+  // ä¹—ç®—
   MM_FUNC_2(operator *, mullo, int32_t, int32_t)
 
   // Min/Max

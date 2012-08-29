@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Bezier++.h,v 1.16 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Bezier++.h,v 1.17 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Bezier++.h
-  \brief	Bezier‹Èü‚¨‚æ‚ÑBezier‹È–Ê‚ÉŠÖ˜A‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	Bezieræ›²ç·šãŠã‚ˆã³Bezieræ›²é¢ã«é–¢é€£ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUBezierPP_h
 #define __TUBezierPP_h
@@ -41,10 +41,10 @@ namespace TU
 /************************************************************************
 *  class BezierCurve<C>							*
 ************************************************************************/
-//! ”ñ—L—‚Ü‚½‚Í—L—Bezier‹Èü‚ğ•\‚·ƒNƒ‰ƒX
+//! éæœ‰ç†ã¾ãŸã¯æœ‰ç†Bezieræ›²ç·šã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param C	§Œä“_‚ÌŒ^DdŸŒ³‹óŠÔ’†‚Ì”ñ—L—‹Èü‚Å‚ ‚ê‚ÎdŸŒ³ƒxƒNƒgƒ‹C
-		—L—‹Èü‚Å‚ ‚ê‚Î(d+1)ŸŒ³ƒxƒNƒgƒ‹D
+  \param C	åˆ¶å¾¡ç‚¹ã®å‹ï¼dæ¬¡å…ƒç©ºé–“ä¸­ã®éæœ‰ç†æ›²ç·šã§ã‚ã‚Œã°dæ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ï¼Œ
+		æœ‰ç†æ›²ç·šã§ã‚ã‚Œã°(d+1)æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ï¼
 */
 template <class C>
 class BezierCurve : private Array<C>
@@ -53,27 +53,27 @@ class BezierCurve : private Array<C>
     typedef C					value_type;
     typedef typename value_type::value_type	T;
 
-  //! w’è‚µ‚½Ÿ”‚ÌBezier‹Èü‚ğì‚éD
+  //! æŒ‡å®šã—ãŸæ¬¡æ•°ã®Bezieræ›²ç·šã‚’ä½œã‚‹ï¼
   /*!
-    \param p	Ÿ”
+    \param p	æ¬¡æ•°
   */
     BezierCurve(u_int p=0)	 :Array<C>(p+1)	{}
 
-  //! w’è‚µ‚½§Œä“_‚ğ‚ÂBezier‹Èü‚ğì‚éD
+  //! æŒ‡å®šã—ãŸåˆ¶å¾¡ç‚¹ã‚’æŒã¤Bezieræ›²ç·šã‚’ä½œã‚‹ï¼
   /*!
-    \param b	ƒTƒCƒY‚ª(Ÿ”+1)ŒÂ‚Å‚ ‚é§Œä“_‚Ì1ŸŒ³”z—ñ
+    \param b	ã‚µã‚¤ã‚ºãŒ(æ¬¡æ•°+1)å€‹ã§ã‚ã‚‹åˆ¶å¾¡ç‚¹ã®1æ¬¡å…ƒé…åˆ—
   */
     BezierCurve(const Array<C>& b) :Array<C>(b)	{}
 
-  //! ‹Èü‚ª‘®‚·‹óŠÔ‚ÌŸŒ³‚ğ’²‚×‚éD
+  //! æ›²ç·šãŒå±ã™ç©ºé–“ã®æ¬¡å…ƒã‚’èª¿ã¹ã‚‹ï¼
   /*!
-    \return	‹óŠÔ‚ÌŸŒ³
+    \return	ç©ºé–“ã®æ¬¡å…ƒ
   */
     static u_int	dim()			{return C::size();}
 
-  //! ‹Èü‚ÌŸ”(= §Œä“_”-1)‚ğ’²‚×‚éD
+  //! æ›²ç·šã®æ¬¡æ•°(= åˆ¶å¾¡ç‚¹æ•°-1)ã‚’èª¿ã¹ã‚‹ï¼
   /*!
-    \return	Ÿ”
+    \return	æ¬¡æ•°
   */
     u_int	degree()		  const	{return Array<C>::dim()-1;}
 
@@ -81,9 +81,9 @@ class BezierCurve : private Array<C>
     Array<C>	deCasteljau(T t, u_int r) const	;
     void	elevateDegree()			;
 
-  //! §Œä“_‚Ì1ŸŒ³”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+  //! åˆ¶å¾¡ç‚¹ã®1æ¬¡å…ƒé…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
   /*!
-    \return	§Œä“_‚Ì”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+    \return	åˆ¶å¾¡ç‚¹ã®é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
   */
 		operator const T*()	  const	{return (*this)[0];}
 
@@ -95,31 +95,31 @@ class BezierCurve : private Array<C>
     using	Array<C>::save;
     using	Array<C>::restore;
 
-  //! ƒXƒgƒŠ[ƒ€‚©‚çBezier‹Èü‚ğ“Ç‚İ‚ŞD
+  //! ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰Bezieræ›²ç·šã‚’èª­ã¿è¾¼ã‚€ï¼
   /*!
-    \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-    \param b	Bezier‹Èü
-    \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+    \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+    \param b	Bezieræ›²ç·š
+    \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   */
     friend std::istream&
     operator >>(std::istream& in, BezierCurve<C>& b)
 	{return in >> (Array<C>&)b;}
 
-  //! ƒXƒgƒŠ[ƒ€‚ÉBezier‹Èü‚ğ‘‚«o‚·D
+  //! ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«Bezieræ›²ç·šã‚’æ›¸ãå‡ºã™ï¼
   /*!
-    \param out	o—ÍƒXƒgƒŠ[ƒ€
-    \param b	Bezier‹Èü
-    \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+    \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+    \param b	Bezieræ›²ç·š
+    \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   */
     friend std::ostream&
     operator <<(std::ostream& out, const BezierCurve<C>& b)
 	{return out << (const Array<C>&)b;}
 };
 
-//! w’è‚µ‚½ƒpƒ‰ƒ[ƒ^’l‚É‘Î‰‚·‚é‹Èüã‚Ì“_‚ğ’²‚×‚éD
+//! æŒ‡å®šã—ãŸãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤ã«å¯¾å¿œã™ã‚‹æ›²ç·šä¸Šã®ç‚¹ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param t	‹Èüã‚ÌˆÊ’u‚ğw’è‚·‚éƒpƒ‰ƒ[ƒ^’l
-  \return	ƒpƒ‰ƒ[ƒ^’l‚É‘Î‰‚·‚é‹Èüã‚Ì“_
+  \param t	æ›²ç·šä¸Šã®ä½ç½®ã‚’æŒ‡å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤
+  \return	ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤ã«å¯¾å¿œã™ã‚‹æ›²ç·šä¸Šã®ç‚¹
 */
 template <class C> C
 BezierCurve<C>::operator ()(T t) const
@@ -141,9 +141,9 @@ BezierCurve<C>::operator ()(T t) const
     return b;
 }
 
-//! de CasteljauƒAƒ‹ƒSƒŠƒYƒ€‚ğÀs‚·‚éD
+//! de Casteljauã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’å®Ÿè¡Œã™ã‚‹ï¼
 /*!
-  \param t	‹Èüã‚ÌˆÊ’u‚ğw’è‚·‚éƒpƒ‰ƒ[ƒ^’l
+  \param t	æ›²ç·šä¸Šã®ä½ç½®ã‚’æŒ‡å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤
   \param r
 */
 template <class C> Array<C>
@@ -161,7 +161,7 @@ BezierCurve<C>::deCasteljau(T t, u_int r) const
     return b_tmp;
 }
 
-//! ‹Èü‚ÌŒ`ó‚ğ•Ï‚¦‚¸‚ÉŸ”‚ğ1‚¾‚¯ã‚°‚éD
+//! æ›²ç·šã®å½¢çŠ¶ã‚’å¤‰ãˆãšã«æ¬¡æ•°ã‚’1ã ã‘ä¸Šã’ã‚‹ï¼
 template <class C> void
 BezierCurve<C>::elevateDegree()
 {
@@ -189,10 +189,10 @@ typedef BezierCurve<Vector4d>	RationalBezierCurve3d;
 /************************************************************************
 *  class BezierSurface<C>						*
 ************************************************************************/
-//! ”ñ—L—‚Ü‚½‚Í—L—Bezier‹È–Ê‚ğ•\‚·ƒNƒ‰ƒX
+//! éæœ‰ç†ã¾ãŸã¯æœ‰ç†Bezieræ›²é¢ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param C	§Œä“_‚ÌŒ^DdŸŒ³‹óŠÔ’†‚Ì”ñ—L—‹È–Ê‚Å‚ ‚ê‚ÎdŸŒ³ƒxƒNƒgƒ‹C
-		—L—‹È–Ê‚Å‚ ‚ê‚Î(d+1)ŸŒ³ƒxƒNƒgƒ‹D
+  \param C	åˆ¶å¾¡ç‚¹ã®å‹ï¼dæ¬¡å…ƒç©ºé–“ä¸­ã®éæœ‰ç†æ›²é¢ã§ã‚ã‚Œã°dæ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ï¼Œ
+		æœ‰ç†æ›²é¢ã§ã‚ã‚Œã°(d+1)æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ï¼
 */
 template <class C>
 class BezierSurface : private Array2<BezierCurve<C> >
@@ -202,30 +202,30 @@ class BezierSurface : private Array2<BezierCurve<C> >
     typedef typename value_type::value_type		T;
     typedef BezierCurve<C>				Curve;
 
-  //! w’è‚µ‚½Ÿ”‚ÌBezier‹È–Ê‚ğì‚éD
+  //! æŒ‡å®šã—ãŸæ¬¡æ•°ã®Bezieræ›²é¢ã‚’ä½œã‚‹ï¼
   /*!
-    \param p	‰¡•ûŒüŸ”
-    \param q	c•ûŒüŸ”
+    \param p	æ¨ªæ–¹å‘æ¬¡æ•°
+    \param q	ç¸¦æ–¹å‘æ¬¡æ•°
   */
     BezierSurface(u_int p, u_int q) :Array2<Curve>(q+1, p+1)	{}
 
     BezierSurface(const Array2<Array<C> >& b)			;
 
-  //! ‹È–Ê‚ª‘®‚·‹óŠÔ‚ÌŸŒ³‚ğ’²‚×‚éD
+  //! æ›²é¢ãŒå±ã™ç©ºé–“ã®æ¬¡å…ƒã‚’èª¿ã¹ã‚‹ï¼
   /*!
-    \return	‹óŠÔ‚ÌŸŒ³
+    \return	ç©ºé–“ã®æ¬¡å…ƒ
   */
     static u_int	dim()				{return C::size();}
 
-  //! ‹È–Ê‚Ì‰¡•ûŒüŸ”‚ğ’²‚×‚éD
+  //! æ›²é¢ã®æ¨ªæ–¹å‘æ¬¡æ•°ã‚’èª¿ã¹ã‚‹ï¼
   /*!
-    \return	‰¡•ûŒüŸ”
+    \return	æ¨ªæ–¹å‘æ¬¡æ•°
   */
     u_int	uDegree()			const	{return ncol()-1;}
 
-  //! ‹È–Ê‚Ìc•ûŒüŸ”‚ğ’²‚×‚éD
+  //! æ›²é¢ã®ç¸¦æ–¹å‘æ¬¡æ•°ã‚’èª¿ã¹ã‚‹ï¼
   /*!
-    \return	c•ûŒüŸ”
+    \return	ç¸¦æ–¹å‘æ¬¡æ•°
   */
     u_int	vDegree()			const	{return nrow()-1;}
 
@@ -235,9 +235,9 @@ class BezierSurface : private Array2<BezierCurve<C> >
     void	uElevateDegree()			;
     void	vElevateDegree()			;
 
-  //! §Œä“_‚Ì2ŸŒ³”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·D
+  //! åˆ¶å¾¡ç‚¹ã®2æ¬¡å…ƒé…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ï¼
   /*!
-    \return	§Œä“_‚Ì”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+    \return	åˆ¶å¾¡ç‚¹ã®é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
   */
 		operator const T*()		const	{return (*this)[0][0];}
 
@@ -249,30 +249,30 @@ class BezierSurface : private Array2<BezierCurve<C> >
     using	Array2<Curve>::save;
     using	Array2<Curve>::restore;
     
-  //! ƒXƒgƒŠ[ƒ€‚©‚çBezier‹È–Ê‚ğ“Ç‚İ‚ŞD
+  //! ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰Bezieræ›²é¢ã‚’èª­ã¿è¾¼ã‚€ï¼
   /*!
-    \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-    \param b	Bezier‹È–Ê
-    \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+    \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+    \param b	Bezieræ›²é¢
+    \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   */
     friend std::istream&
     operator >>(std::istream& in, BezierSurface<C>& b)
 	{return in >> (Array2<Curve>&)b;}
 
-  //! ƒXƒgƒŠ[ƒ€‚ÉBezier‹È–Ê‚ğ‘‚«o‚·D
+  //! ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«Bezieræ›²é¢ã‚’æ›¸ãå‡ºã™ï¼
   /*!
-    \param out	o—ÍƒXƒgƒŠ[ƒ€
-    \param b	Bezier‹È–Ê
-    \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+    \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+    \param b	Bezieræ›²é¢
+    \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   */
     friend std::ostream&
     operator <<(std::ostream& out, const BezierSurface<C>& b)
 	{return out << (const Array2<Curve>&)b;}
 };
 
-//! w’è‚µ‚½§Œä“_‚ğ‚ÂBezier‹È–Ê‚ğì‚éD
+//! æŒ‡å®šã—ãŸåˆ¶å¾¡ç‚¹ã‚’æŒã¤Bezieræ›²é¢ã‚’ä½œã‚‹ï¼
 /*!
-  \param b	ƒTƒCƒY‚ª(‰¡•ûŒüŸ”+1)x(c•ûŒüŸ”+1)‚Å‚ ‚é§Œä“_‚Ì2ŸŒ³”z—ñ
+  \param b	ã‚µã‚¤ã‚ºãŒ(æ¨ªæ–¹å‘æ¬¡æ•°+1)x(ç¸¦æ–¹å‘æ¬¡æ•°+1)ã§ã‚ã‚‹åˆ¶å¾¡ç‚¹ã®2æ¬¡å…ƒé…åˆ—
 */
 template <class C>
 BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
@@ -283,11 +283,11 @@ BezierSurface<C>::BezierSurface(const Array2<Array<C> >& b)
 	    (*this)[j][i] = b[j][i];
 }
 
-//! w’è‚µ‚½ƒpƒ‰ƒ[ƒ^’l‚É‘Î‰‚·‚é‹È–Êã‚Ì“_‚ğ’²‚×‚éD
+//! æŒ‡å®šã—ãŸãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤ã«å¯¾å¿œã™ã‚‹æ›²é¢ä¸Šã®ç‚¹ã‚’èª¿ã¹ã‚‹ï¼
 /*!
-  \param u	‹È–Êã‚ÌˆÊ’u‚ğw’è‚·‚é‰¡•ûŒüƒpƒ‰ƒ[ƒ^’l
-  \param v	‹È–Êã‚ÌˆÊ’u‚ğw’è‚·‚éc•ûŒüƒpƒ‰ƒ[ƒ^’l
-  \return	ƒpƒ‰ƒ[ƒ^’l‚É‘Î‰‚·‚é‹È–Êã‚Ì“_
+  \param u	æ›²é¢ä¸Šã®ä½ç½®ã‚’æŒ‡å®šã™ã‚‹æ¨ªæ–¹å‘ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤
+  \param v	æ›²é¢ä¸Šã®ä½ç½®ã‚’æŒ‡å®šã™ã‚‹ç¸¦æ–¹å‘ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤
+  \return	ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤ã«å¯¾å¿œã™ã‚‹æ›²é¢ä¸Šã®ç‚¹
 */
 template <class C> C
 BezierSurface<C>::operator ()(T u, T v) const

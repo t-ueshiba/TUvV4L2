@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GaussianConvolver.h,v 1.14 2012-07-29 21:19:58 ueshiba Exp $
+ *  $Id: GaussianConvolver.h,v 1.15 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		GaussianConvolver.h
-  \brief	GaussŠj‚É‚æ‚éô‚İ‚İ‚ÉŠÖ‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	Gaussæ ¸ã«ã‚ˆã‚‹ç•³ã¿è¾¼ã¿ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef	__TUGaussianConvolver_h
 #define	__TUGaussianConvolver_h
@@ -42,7 +42,7 @@ namespace TU
 /************************************************************************
 *  class GaussianCoefficients<T>					*
 ************************************************************************/
-//! GaussŠj‚ÌŒW”‚ğ•\‚·ƒNƒ‰ƒX
+//! Gaussæ ¸ã®ä¿‚æ•°ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T> class __PORT GaussianCoefficients
 {
   private:
@@ -108,7 +108,7 @@ template <class T> class __PORT GaussianCoefficients
 /************************************************************************
 *  class GaussianConvolver<T>						*
 ************************************************************************/
-//! GaussŠj‚É‚æ‚é1ŸŒ³”z—ñô‚İ‚İ‚ğs‚¤ƒNƒ‰ƒX
+//! Gaussæ ¸ã«ã‚ˆã‚‹1æ¬¡å…ƒé…åˆ—ç•³ã¿è¾¼ã¿ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 template <class T> class GaussianConvolver
     : public GaussianCoefficients<T>, private BidirectionalIIRFilter<4u, T>
 {
@@ -131,10 +131,10 @@ template <class T> class GaussianConvolver
     using	coeffs::_c2;
 };
 
-//! GaussŠj‚Ìsigma’l‚ğİ’è‚·‚é
+//! Gaussæ ¸ã®sigmaå€¤ã‚’è¨­å®šã™ã‚‹
 /*!
-  \param sigma	sigma’l
-  \return	‚±‚ÌƒKƒEƒXŠj
+  \param sigma	sigmaå€¤
+  \return	ã“ã®ã‚¬ã‚¦ã‚¹æ ¸
 */
 template <class T> GaussianConvolver<T>&
 GaussianConvolver<T>::initialize(T sigma)
@@ -143,12 +143,12 @@ GaussianConvolver<T>::initialize(T sigma)
     return *this;
 }
     
-//! GaussŠj‚É‚æ‚éƒXƒ€[ƒVƒ“ƒO
+//! Gaussæ ¸ã«ã‚ˆã‚‹ã‚¹ãƒ ãƒ¼ã‚·ãƒ³ã‚°
 /*!
-  \param ib	“ü—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğw‚·”½•œq
-  \param ie	“ü—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğw‚·”½•œq
-  \param out	o—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğw‚·”½•œq
-  \return	o—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver<T>::smooth(IN ib, IN ie, OUT out)
@@ -156,12 +156,12 @@ GaussianConvolver<T>::smooth(IN ib, IN ie, OUT out)
     return super::initialize(_c0, super::Zeroth)(ib, ie, out);
 }
 
-//! GaussŠj‚É‚æ‚é1ŠK”÷•ª
+//! Gaussæ ¸ã«ã‚ˆã‚‹1éšå¾®åˆ†
 /*!
-  \param ib	“ü—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğw‚·”½•œq
-  \param ie	“ü—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğw‚·”½•œq
-  \param out	o—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğw‚·”½•œq
-  \return	o—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver<T>::diff(IN ib, IN ie, OUT out)
@@ -169,12 +169,12 @@ GaussianConvolver<T>::diff(IN ib, IN ie, OUT out)
     return super::initialize(_c1, super::First)(ib, ie, out);
 }
 
-//! GaussŠj‚É‚æ‚é2ŠK”÷•ª
+//! Gaussæ ¸ã«ã‚ˆã‚‹2éšå¾®åˆ†
 /*!
-  \param ib	“ü—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğw‚·”½•œq
-  \param ie	“ü—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğw‚·”½•œq
-  \param out	o—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğw‚·”½•œq
-  \return	o—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver<T>::diff2(IN ib, IN ie, OUT out)
@@ -185,7 +185,7 @@ GaussianConvolver<T>::diff2(IN ib, IN ie, OUT out)
 /************************************************************************
 *  class GaussianConvolver2<T>						*
 ************************************************************************/
-//! GaussŠj‚É‚æ‚é2ŸŒ³”z—ñô‚İ‚İ‚ğs‚¤ƒNƒ‰ƒX
+//! Gaussæ ¸ã«ã‚ˆã‚‹2æ¬¡å…ƒé…åˆ—ç•³ã¿è¾¼ã¿ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 template <class T> class GaussianConvolver2
     : public GaussianCoefficients<T>, private BidirectionalIIRFilter2<4u, T>
 {
@@ -212,10 +212,10 @@ template <class T> class GaussianConvolver2
     using	coeffs::_c2;
 };
 
-//! GaussŠj‚Ìsigma’l‚ğİ’è‚·‚é
+//! Gaussæ ¸ã®sigmaå€¤ã‚’è¨­å®šã™ã‚‹
 /*!
-  \param sigma	sigma’l
-  \return	‚±‚ÌƒKƒEƒXŠj
+  \param sigma	sigmaå€¤
+  \return	ã“ã®ã‚¬ã‚¦ã‚¹æ ¸
 */
 template <class T> GaussianConvolver2<T>&
 GaussianConvolver2<T>::initialize(T sigma)
@@ -224,12 +224,12 @@ GaussianConvolver2<T>::initialize(T sigma)
     return *this;
 }
     
-//! GaussŠj‚É‚æ‚éƒXƒ€[ƒVƒ“ƒO
+//! Gaussæ ¸ã«ã‚ˆã‚‹ã‚¹ãƒ ãƒ¼ã‚·ãƒ³ã‚°
 /*!
-  \param ib	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \param ie	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
-  \param out	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \return	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver2<T>::smooth(IN ib, IN ie, OUT out)
@@ -238,12 +238,12 @@ GaussianConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
-//! GaussŠj‚É‚æ‚é‰¡•ûŒü1ŠK”÷•ª(DOG)
+//! Gaussæ ¸ã«ã‚ˆã‚‹æ¨ªæ–¹å‘1éšå¾®åˆ†(DOG)
 /*!
-  \param ib	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \param ie	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
-  \param out	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \return	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver2<T>::diffH(IN ib, IN ie, OUT out)
@@ -252,12 +252,12 @@ GaussianConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
-//! GaussŠj‚É‚æ‚éc•ûŒü1ŠK”÷•ª(DOG)
+//! Gaussæ ¸ã«ã‚ˆã‚‹ç¸¦æ–¹å‘1éšå¾®åˆ†(DOG)
 /*!
-  \param ib	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \param ie	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
-  \param out	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \return	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver2<T>::diffV(IN ib, IN ie, OUT out)
@@ -266,12 +266,12 @@ GaussianConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 			     _c1, IIRF::First)(ib, ie, out);
 }
 
-//! GaussŠj‚É‚æ‚é‰¡•ûŒü2ŠK”÷•ª
+//! Gaussæ ¸ã«ã‚ˆã‚‹æ¨ªæ–¹å‘2éšå¾®åˆ†
 /*!
-  \param ib	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \param ie	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
-  \param out	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \return	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
@@ -280,12 +280,12 @@ GaussianConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 			     _c0, IIRF::Zeroth)(ib, ie, out);
 }
 
-//! GaussŠj‚É‚æ‚éc‰¡—¼•ûŒü2ŠK”÷•ª
+//! Gaussæ ¸ã«ã‚ˆã‚‹ç¸¦æ¨ªä¸¡æ–¹å‘2éšå¾®åˆ†
 /*!
-  \param ib	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \param ie	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
-  \param out	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \return	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
@@ -294,12 +294,12 @@ GaussianConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 			     _c1, IIRF::First)(ib, ie, out);
 }
 
-//! GaussŠj‚É‚æ‚éc•ûŒü2ŠK”÷•ª
+//! Gaussæ ¸ã«ã‚ˆã‚‹ç¸¦æ–¹å‘2éšå¾®åˆ†
 /*!
-  \param ib	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \param ie	“ü—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
-  \param out	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ìæ“ªs‚ğw‚·”½•œq
-  \return	o—Í2ŸŒ³ƒf[ƒ^”z—ñ‚Ì––”ö‚ÌŸ‚Ìs‚ğw‚·”½•œq
+  \param ib	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param ie	å…¥åŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
+  \param out	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®å…ˆé ­è¡Œã‚’æŒ‡ã™åå¾©å­
+  \return	å‡ºåŠ›2æ¬¡å…ƒãƒ‡ãƒ¼ã‚¿é…åˆ—ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’æŒ‡ã™åå¾©å­
 */
 template <class T> template <class IN, class OUT> inline OUT
 GaussianConvolver2<T>::diffVV(IN ib, IN ie, OUT out)

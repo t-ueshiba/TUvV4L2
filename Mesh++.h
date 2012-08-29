@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Mesh++.h,v 1.22 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Mesh++.h,v 1.23 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Mesh++.h
-  \brief	ƒNƒ‰ƒX TU::Mesh ‚Ì’è‹`‚ÆÀ‘•
+  \brief	ã‚¯ãƒ©ã‚¹ TU::Mesh ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUMeshPP_h
 #define __TUMeshPP_h
@@ -44,11 +44,11 @@ namespace TU
 /************************************************************************
 *  class Mesh<V, F, M>							*
 ************************************************************************/
-//! ‘½ŠpŒ`ƒƒbƒVƒ…‚ğ•\‚·ƒNƒ‰ƒX
+//! å¤šè§’å½¢ãƒ¡ãƒƒã‚·ãƒ¥ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param V	’¸“_‚ÌŒ^
-  \param F	–Ê‚ÌŒ^DMesh<V, F, M>::Face‚Ì”h¶ƒNƒ‰ƒX‚Å‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
-  \param M	1‚Â‚Ì–Ê‚ª‚Â•Ó‚Ì”
+  \param V	é ‚ç‚¹ã®å‹
+  \param F	é¢ã®å‹ï¼Mesh<V, F, M>::Faceã®æ´¾ç”Ÿã‚¯ãƒ©ã‚¹ã§ãªã‘ã‚Œã°ãªã‚‰ãªã„ï¼
+  \param M	1ã¤ã®é¢ãŒæŒã¤è¾ºã®æ•°
 */
 template <class V, class F, u_int M=3u>
 class Mesh
@@ -63,10 +63,10 @@ class Mesh
 
     enum
     {
-	NSides = M			//!< 1‚Â‚Ì–Ê‚ª‚Â•Ó‚Ì”
+	NSides = M			//!< 1ã¤ã®é¢ãŒæŒã¤è¾ºã®æ•°
     };
     
-  //! ‘½ŠpŒ`ƒƒbƒVƒ…‚Ì–Ê‚ÌŠî’ê‚Æ‚È‚éƒNƒ‰ƒX
+  //! å¤šè§’å½¢ãƒ¡ãƒƒã‚·ãƒ¥ã®é¢ã®åŸºåº•ã¨ãªã‚‹ã‚¯ãƒ©ã‚¹
     class Face
     {
       public:
@@ -86,17 +86,17 @@ class Mesh
 	fiterator	self()					const	;
 
       private:
-	viterator	_v[NSides];	//!< ‚±‚Ì–Ê‚Ì’¸“_‚ğw‚·”½•œq
-	fiterator	_f[NSides];	//!< ‚±‚Ì–Ê‚É—×Ú‚·‚é–Ê‚ğw‚·”½•œq
+	viterator	_v[NSides];	//!< ã“ã®é¢ã®é ‚ç‚¹ã‚’æŒ‡ã™åå¾©å­
+	fiterator	_f[NSides];	//!< ã“ã®é¢ã«éš£æ¥ã™ã‚‹é¢ã‚’æŒ‡ã™åå¾©å­
 #ifdef TUMeshPP_DEBUG
       public:
 	const u_int	fnum;
 #endif
     };
 
-  //! ‘½ŠpŒ`ƒƒbƒVƒ…‚Ì•Ó‚ğ•\‚·ƒNƒ‰ƒX
+  //! å¤šè§’å½¢ãƒ¡ãƒƒã‚·ãƒ¥ã®è¾ºã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
   /*!
-    –Ê‚ğ¶‚ÉŒ©‚é‚æ‚¤‚ÉŒü‚«•t‚¯‚³‚ê‚Ä‚¢‚éD
+    é¢ã‚’å·¦ã«è¦‹ã‚‹ã‚ˆã†ã«å‘ãä»˜ã‘ã•ã‚Œã¦ã„ã‚‹ï¼
   */
     class Edge
     {
@@ -130,8 +130,8 @@ class Mesh
 	void		replaceVertex(viterator v)		const	;
 
       private:
-	fiterator	_f;		//!< e‚Ì–Ê‚ğw‚·”½•œq
-	u_int		_e;		//!< •Ó‚Ì”Ô†
+	fiterator	_f;		//!< è¦ªã®é¢ã‚’æŒ‡ã™åå¾©å­
+	u_int		_e;		//!< è¾ºã®ç•ªå·
     };
 
   public:
@@ -165,50 +165,50 @@ class Mesh
     void		deleteVertex(viterator v)			;
     void		deleteFace(fiterator f)				;
     
-  //! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒƒbƒVƒ…‚ğ“Ç‚İ‚ŞD
+  //! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ãƒ¡ãƒƒã‚·ãƒ¥ã‚’èª­ã¿è¾¼ã‚€ï¼
   /*!
-    \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-    \param mesh	“Ç‚İ‚İæ‚ÌƒƒbƒVƒ…
-    \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+    \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+    \param mesh	èª­ã¿è¾¼ã¿å…ˆã®ãƒ¡ãƒƒã‚·ãƒ¥
+    \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   */
     friend std::istream&
 	operator >>(std::istream& in, Mesh& mesh)	{return mesh.get(in);}
 
-  //! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒƒbƒVƒ…‚ğ‘‚«o‚·D
+  //! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ãƒ¡ãƒƒã‚·ãƒ¥ã‚’æ›¸ãå‡ºã™ï¼
   /*!
-    \param out	o—ÍƒXƒgƒŠ[ƒ€
-    \param mesh	‘‚«o‚µŒ³‚ÌƒƒbƒVƒ…
-    \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+    \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+    \param mesh	æ›¸ãå‡ºã—å…ƒã®ãƒ¡ãƒƒã‚·ãƒ¥
+    \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   */
     friend std::ostream&
 	operator <<(std::ostream& out, const Mesh& mesh){return mesh.put(out);}
 
   private:
-    std::list<V>	_vertices;			//!< ’¸“_‚ÌƒŠƒXƒg
-    std::list<F>	_faces;				//!< –Ê‚ÌƒŠƒXƒg
+    std::list<V>	_vertices;			//!< é ‚ç‚¹ã®ãƒªã‚¹ãƒˆ
+    std::list<F>	_faces;				//!< é¢ã®ãƒªã‚¹ãƒˆ
 };
 
-//! w’è‚³‚ê‚½’¸“_‚©‚ç”w’†‡‚í‚¹‚Ì2‚Â‚Ì–Ê‚ğ¶¬‚µ‚ÄƒƒbƒVƒ…‚ğ‰Šú‰»‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸé ‚ç‚¹ã‹ã‚‰èƒŒä¸­åˆã‚ã›ã®2ã¤ã®é¢ã‚’ç”Ÿæˆã—ã¦ãƒ¡ãƒƒã‚·ãƒ¥ã‚’åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param vertex	MŒÂ‚Ì’¸“_
-  \return	v[0] ‚ğn“_‚Æ‚·‚é•Ó
+  \param vertex	Må€‹ã®é ‚ç‚¹
+  \return	v[0] ã‚’å§‹ç‚¹ã¨ã™ã‚‹è¾º
 */
 template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::initialize(const V vertex[])
 {
-  // •\‚Ì–Ê‚ğ¶¬‚·‚éD
+  // è¡¨ã®é¢ã‚’ç”Ÿæˆã™ã‚‹ï¼
     viterator	v[NSides];
     for (u_int e = 0; e < NSides; ++e)
 	v[e] = newVertex(vertex[e]);
     fiterator	f = newFace(F(v));
 
-  // — ‚Ì–Ê‚ğ¶¬‚·‚éD
+  // è£ã®é¢ã‚’ç”Ÿæˆã™ã‚‹ï¼
     viterator	vC[NSides];
     for (u_int e = 0; e < NSides; ++e)
 	vC[e] = v[NSides-1-e];
     fiterator	fC = newFace(F(vC));
 
-  // •\‚Æ— ‚ğ“\‚è‡‚í‚¹‚éD
+  // è¡¨ã¨è£ã‚’è²¼ã‚Šåˆã‚ã›ã‚‹ï¼
     Edge	edge0(f), edge(edge0), edgeC(fC);
     --edgeC;
     do
@@ -219,7 +219,7 @@ Mesh<V, F, M>::initialize(const V vertex[])
     return edge0;
 }
 
-//! ƒƒbƒVƒ…‚Ì‘S‚Ä‚Ì’¸“_‚Æ–Ê‚ğÁ‹‚µ‚Ä‹ó‚É‚·‚éD
+//! ãƒ¡ãƒƒã‚·ãƒ¥ã®å…¨ã¦ã®é ‚ç‚¹ã¨é¢ã‚’æ¶ˆå»ã—ã¦ç©ºã«ã™ã‚‹ï¼
 template <class V, class F, u_int M> inline void
 Mesh<V, F, M>::clear()
 {
@@ -227,20 +227,20 @@ Mesh<V, F, M>::clear()
     _faces.clear();
 }
     
-//! 3ŠpŒ`ƒƒbƒVƒ…‚É‚Â‚¢‚ÄCw’è‚³‚ê‚½•Ó‚ğÁ‹‚·‚éD
+//! 3è§’å½¢ãƒ¡ãƒƒã‚·ãƒ¥ã«ã¤ã„ã¦ï¼ŒæŒ‡å®šã•ã‚ŒãŸè¾ºã‚’æ¶ˆå»ã™ã‚‹ï¼
 /*!
-  w’è‚³‚ê‚½•Ó‚Ì—¼‘¤‚Ì–Ê‚¨‚æ‚Ñ•Ó‚Ìn“_‚àÁ‹‚³‚ê‚éD
-  \param edge	Á‹‚·‚é•ÓD
-		ƒŠƒ^[ƒ“Œã‚Íedge‚Ìè‘O‚Ì— ‚Ì•Ó‚ğw‚·‚æ‚¤‚ÉXV‚³‚ê‚éD
-  \return	edge‚Ì— ‚Ìè‘O‚Ì— ‚Ì•Ó‚ğw‚·”½•œq
+  æŒ‡å®šã•ã‚ŒãŸè¾ºã®ä¸¡å´ã®é¢ãŠã‚ˆã³è¾ºã®å§‹ç‚¹ã‚‚æ¶ˆå»ã•ã‚Œã‚‹ï¼
+  \param edge	æ¶ˆå»ã™ã‚‹è¾ºï¼
+		ãƒªã‚¿ãƒ¼ãƒ³å¾Œã¯edgeã®æ‰‹å‰ã®è£ã®è¾ºã‚’æŒ‡ã™ã‚ˆã†ã«æ›´æ–°ã•ã‚Œã‚‹ï¼
+  \return	edgeã®è£ã®æ‰‹å‰ã®è£ã®è¾ºã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::kill(Edge& edge)
 {
     using namespace	std;
     
-  // edge‚ğŠÜ‚Ş–Ê‚Æ‚»‚Ì— ‚Ì•Ó‚ğŠÜ‚Ş–Ê‚Ì’¸“_(Œv4‚Â)‚É‚Â‚¢‚ÄC
-  // ‚»‚Ì‰¿”‚ª[•ª‚©’²‚×‚éD
+  // edgeã‚’å«ã‚€é¢ã¨ãã®è£ã®è¾ºã‚’å«ã‚€é¢ã®é ‚ç‚¹(è¨ˆ4ã¤)ã«ã¤ã„ã¦ï¼Œ
+  // ãã®ä¾¡æ•°ãŒå……åˆ†ã‹èª¿ã¹ã‚‹ï¼
     Edge	edgeNC(edge.next().conj()),
 		edgeCPC(edge.conj().prev().conj()),
 		edgeCNC(edge.conj().next().conj());
@@ -252,7 +252,7 @@ Mesh<V, F, M>::kill(Edge& edge)
     }
 
     Edge	edgeCN(edge.conj().next());
-    viterator	vn = edge.next().viter();		// edge‚ÌI“_
+    viterator	vn = edge.next().viter();		// edgeã®çµ‚ç‚¹
     for (Edge tmp(edge.prev().conj()); ~(--tmp) != edgeCN; )
 	for (Edge tmp1(tmp); --(~tmp1) != tmp; )
 	    if (tmp1.viter() == vn)
@@ -263,48 +263,48 @@ Mesh<V, F, M>::kill(Edge& edge)
 		return edge;
 	    }
     
-  // edge‚Ìn“_‚ğ’¸“_‚É‚Â‘S‚Ä‚Ì–Ê‚É‚Â‚¢‚ÄC‚»‚Ì’¸“_‚ğedge‚ÌI“_‚É’u‚«Š·‚¦‚éD
+  // edgeã®å§‹ç‚¹ã‚’é ‚ç‚¹ã«æŒã¤å…¨ã¦ã®é¢ã«ã¤ã„ã¦ï¼Œãã®é ‚ç‚¹ã‚’edgeã®çµ‚ç‚¹ã«ç½®ãæ›ãˆã‚‹ï¼
     viterator	v = edge.viter();
     edge.replaceVertex(vn, edge);
-    deleteVertex(v);					// ’¸“_v‚ğÁ‹
+    deleteVertex(v);					// é ‚ç‚¹vã‚’æ¶ˆå»
 
-  // edgePC, edgeCPC‚ğ‚»‚ê‚¼‚êedgeNC, edgeCNC‚Æ”w’†‡‚í‚¹‚É‚·‚éD
+  // edgePC, edgeCPCã‚’ãã‚Œãã‚ŒedgeNC, edgeCNCã¨èƒŒä¸­åˆã‚ã›ã«ã™ã‚‹ï¼
     fiterator	f = edge.fiter(), fC = edge.conj().fiter();
     ~(--edge);						// edgePC
     edge   .pair(edgeNC);
     edgeCPC.pair(edgeCNC);
-    deleteFace(f);					// –Êf‚ğÁ‹
-    deleteFace(fC);					// –ÊfC‚ğÁ‹
+    deleteFace(f);					// é¢fã‚’æ¶ˆå»
+    deleteFace(fC);					// é¢fCã‚’æ¶ˆå»
 
     return edgeCPC;
 }
 
-//! 3ŠpŒ`ƒƒbƒVƒ…‚É‚Â‚¢‚ÄCw’è‚³‚ê‚½2‚Â‚Ì•Ó‚Ìn“_ŠÔ‚ÉV‚½‚É•Ó‚ğì‚éD
+//! 3è§’å½¢ãƒ¡ãƒƒã‚·ãƒ¥ã«ã¤ã„ã¦ï¼ŒæŒ‡å®šã•ã‚ŒãŸ2ã¤ã®è¾ºã®å§‹ç‚¹é–“ã«æ–°ãŸã«è¾ºã‚’ä½œã‚‹ï¼
 /*!
-  1‚Â‚Ì’¸“_‚Æ2‚Â‚Ì–Ê‚ª¶¬‚³‚ê‚éD
-  \param edge0	V‚½‚È•Ó‚Æn“_‚ğ‹¤—L‚·‚é•Ó
-  \param edge1	V‚½‚È•Ó‚ÆI“_‚ğ‹¤—L‚·‚é•ÓD
-		edge0‚Æn“_‚ğ‹¤—L‚µ‚Ä‚¢‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
-  \param v	V‚½‚È•Ó‚¨‚æ‚Ñedge0‚Ìn“_‚Æ‚È‚é’¸“_
-  \return	V‚½‚È•Ó
+  1ã¤ã®é ‚ç‚¹ã¨2ã¤ã®é¢ãŒç”Ÿæˆã•ã‚Œã‚‹ï¼
+  \param edge0	æ–°ãŸãªè¾ºã¨å§‹ç‚¹ã‚’å…±æœ‰ã™ã‚‹è¾º
+  \param edge1	æ–°ãŸãªè¾ºã¨çµ‚ç‚¹ã‚’å…±æœ‰ã™ã‚‹è¾ºï¼
+		edge0ã¨å§‹ç‚¹ã‚’å…±æœ‰ã—ã¦ã„ãªã‘ã‚Œã°ãªã‚‰ãªã„ï¼
+  \param v	æ–°ãŸãªè¾ºãŠã‚ˆã³edge0ã®å§‹ç‚¹ã¨ãªã‚‹é ‚ç‚¹
+  \return	æ–°ãŸãªè¾º
 */
 template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::make(const Edge& edge0, const Edge& edge1, const V& v)
 {
     using namespace	std;
 
-  // edge0‚Æedge1‚ªn“_‚ğ‹¤—L‚µ‚Ä‚¢‚é‚©ƒ`ƒFƒbƒND
+  // edge0ã¨edge1ãŒå§‹ç‚¹ã‚’å…±æœ‰ã—ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ï¼
     if (!edge0.commonVertex(edge1))
 	throw domain_error("TU::Mesh<V, F, 3u>::make(): Given two edges have no common vertex!");
 
-  // edge0‚Æedge1‚ª“¯ˆê‚Å‚È‚¢‚©ƒ`ƒFƒbƒND
+  // edge0ã¨edge1ãŒåŒä¸€ã§ãªã„ã‹ãƒã‚§ãƒƒã‚¯ï¼
     if (edge0 == edge1)
 	throw domain_error("TU::Mesh<V, F, 3u>::make(): Given two edges are identical!");
 
-  // V‚µ‚¢’¸“_‚ğì‚éD
+  // æ–°ã—ã„é ‚ç‚¹ã‚’ä½œã‚‹ï¼
     viterator	vnew = newVertex(v);
 
-  // V‚µ‚¢–Ê‚ğ2‚Âì‚éD
+  // æ–°ã—ã„é¢ã‚’2ã¤ä½œã‚‹ï¼
     viterator	vp[3];
     vp[0] = vnew;
     vp[1] = edge0.viter();
@@ -315,13 +315,13 @@ Mesh<V, F, M>::make(const Edge& edge0, const Edge& edge1, const V& v)
     vp[2] = edge1.next().viter();
     fiterator	fC = newFace(F(vp));
 
-  // edge0‚Ìn“_‚ğ’u‚«Š·‚¦‚é‘O‚Éedge0‚Æedge1‚Ì— ‚ğ•Û‚µ‚Ä‚¨‚­D
+  // edge0ã®å§‹ç‚¹ã‚’ç½®ãæ›ãˆã‚‹å‰ã«edge0ã¨edge1ã®è£ã‚’ä¿æŒã—ã¦ãŠãï¼
     Edge	edge0C(edge0.conj()), edge1C(edge1.conj());
 
-  // [edge0, edge1)‚Ì”ÍˆÍ‚Ì•Ó‚Ìn“_‚ğV‚µ‚¢’¸“_‚É’u‚«Š·‚¦‚é.
+  // [edge0, edge1)ã®ç¯„å›²ã®è¾ºã®å§‹ç‚¹ã‚’æ–°ã—ã„é ‚ç‚¹ã«ç½®ãæ›ãˆã‚‹.
     edge0.replaceVertex(vnew, edge1);
 
-  // winged-edge\‘¢‚ğì‚éD
+  // winged-edgeæ§‹é€ ã‚’ä½œã‚‹ï¼
     Edge	edge(f), edgeC(fC);
     edge.pair(edgeC);
     (--edge ).pair(edge0);
@@ -332,17 +332,17 @@ Mesh<V, F, M>::make(const Edge& edge0, const Edge& edge1, const V& v)
     return --edge;
 }
 
-//! 3ŠpŒ`ƒƒbƒVƒ…‚Ìw’è‚³‚ê‚½•Ó‚ğÁ‹‚µC‚±‚ê‚É‚æ‚Á‚Ä‚Å‚«‚élŠpŒ`‚Ì‚à‚¤ˆê•û‚Ì‘ÎŠpü‚ğV‚½‚È•Ó‚Æ‚µ‚Ä¶¬‚·‚éD
+//! 3è§’å½¢ãƒ¡ãƒƒã‚·ãƒ¥ã®æŒ‡å®šã•ã‚ŒãŸè¾ºã‚’æ¶ˆå»ã—ï¼Œã“ã‚Œã«ã‚ˆã£ã¦ã§ãã‚‹å››è§’å½¢ã®ã‚‚ã†ä¸€æ–¹ã®å¯¾è§’ç·šã‚’æ–°ãŸãªè¾ºã¨ã—ã¦ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param edge	Á‹‚·‚é•Ó
-  \return	¶¬‚³‚ê‚½•Ó
+  \param edge	æ¶ˆå»ã™ã‚‹è¾º
+  \return	ç”Ÿæˆã•ã‚ŒãŸè¾º
 */
 template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::swap(const Edge& edge)
 {
     using namespace	std;
     
-  // edge‚Ìn“_‚ÆI“_‚Ì‰¿”‚ª1‚ÂŒ¸‚Á‚Ä‚à3ˆÈã‚É‚È‚é‚©’²‚×‚éD
+  // edgeã®å§‹ç‚¹ã¨çµ‚ç‚¹ã®ä¾¡æ•°ãŒ1ã¤æ¸›ã£ã¦ã‚‚3ä»¥ä¸Šã«ãªã‚‹ã‹èª¿ã¹ã‚‹ï¼
     Edge	edgePC(edge.prev().conj()),
 		edgeCPC(edge.conj().prev().conj());
     if (edgePC.valence() <= 3 || edgeCPC.valence() <= 3)
@@ -351,7 +351,7 @@ Mesh<V, F, M>::swap(const Edge& edge)
 	return edge;
     }
     
-  // edge‚Ìn“_‚ÆI“_‚ğ’u‚«Š·‚¦‚éD
+  // edgeã®å§‹ç‚¹ã¨çµ‚ç‚¹ã‚’ç½®ãæ›ãˆã‚‹ï¼
     Edge	edgeC(edge.conj()),
 		edgeNC(edge.next().conj()),
 		edgeCNC(edge.conj().next().conj());
@@ -362,7 +362,7 @@ Mesh<V, F, M>::swap(const Edge& edge)
     edgeC.next().replaceVertex(edgeCNC.viter());
     edgeC.prev().replaceVertex(edgeCPC.viter());
 
-  // •Ó‚ğ“ü‚ê‘Ö‚¦‚Äwinged-edge\‘¢‚ğì‚éD
+  // è¾ºã‚’å…¥ã‚Œæ›¿ãˆã¦winged-edgeæ§‹é€ ã‚’ä½œã‚‹ï¼
     edge.next().pair(edgePC);
     edge.prev().pair(edgeCNC);
     edgeC.next().pair(edgeCPC);
@@ -371,7 +371,7 @@ Mesh<V, F, M>::swap(const Edge& edge)
     return edge;
 }
 
-//! ƒƒbƒVƒ…‚Ìbounding box‚ğŒvZ‚·‚éD
+//! ãƒ¡ãƒƒã‚·ãƒ¥ã®bounding boxã‚’è¨ˆç®—ã™ã‚‹ï¼
 /*!
   \return	bounding box
 */
@@ -387,9 +387,9 @@ Mesh<V, F, M>::boundingBox() const
     return bbox;
 }
 
-//! ‚±‚ÌƒƒbƒVƒ…‚ÌÅ‰‚Ì’¸“_‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥ã®æœ€åˆã®é ‚ç‚¹ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	Å‰‚Ì’¸“_‚ğw‚·”½•œq
+  \return	æœ€åˆã®é ‚ç‚¹ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::vbegin()
@@ -397,9 +397,9 @@ Mesh<V, F, M>::vbegin()
     return _vertices.begin();
 }
     
-//! ‚±‚ÌƒƒbƒVƒ…‚ÌÅ‰‚Ì’¸“_‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥ã®æœ€åˆã®é ‚ç‚¹ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	Å‰‚Ì’¸“_‚ğw‚·’è””½•œq
+  \return	æœ€åˆã®é ‚ç‚¹ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class V, class F, u_int M>
 inline typename Mesh<V, F, M>::const_viterator
@@ -408,9 +408,9 @@ Mesh<V, F, M>::vbegin() const
     return _vertices.begin();
 }
     
-//! ‚±‚ÌƒƒbƒVƒ…ÅŒã‚Ì’¸“_‚ÌŸ‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥æœ€å¾Œã®é ‚ç‚¹ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	ÅŒã‚Ì’¸“_‚ÌŸ‚ğw‚·”½•œq
+  \return	æœ€å¾Œã®é ‚ç‚¹ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::vend()
@@ -418,9 +418,9 @@ Mesh<V, F, M>::vend()
     return _vertices.end();
 }
     
-//! ‚±‚ÌƒƒbƒVƒ…ÅŒã‚Ì’¸“_‚ÌŸ‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥æœ€å¾Œã®é ‚ç‚¹ã®æ¬¡ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	ÅŒã‚Ì’¸“_‚ÌŸ‚ğw‚·’è””½•œq
+  \return	æœ€å¾Œã®é ‚ç‚¹ã®æ¬¡ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class V, class F, u_int M>
 inline typename Mesh<V, F, M>::const_viterator
@@ -429,9 +429,9 @@ Mesh<V, F, M>::vend() const
     return _vertices.end();
 }
 
-//! ‚±‚ÌƒƒbƒVƒ…‚ÌÅ‰‚Ì–Ê‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥ã®æœ€åˆã®é¢ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	Å‰‚Ì–Ê‚ğw‚·”½•œq
+  \return	æœ€åˆã®é¢ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::fbegin()
@@ -439,9 +439,9 @@ Mesh<V, F, M>::fbegin()
     return _faces.begin();
 }
     
-//! ‚±‚ÌƒƒbƒVƒ…‚ÌÅ‰‚Ì–Ê‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥ã®æœ€åˆã®é¢ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	Å‰‚Ì–Ê‚ğw‚·’è””½•œq
+  \return	æœ€åˆã®é¢ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class V, class F, u_int M>
 inline typename Mesh<V, F, M>::const_fiterator
@@ -450,9 +450,9 @@ Mesh<V, F, M>::fbegin() const
     return _faces.begin();
 }
     
-//! ‚±‚ÌƒƒbƒVƒ…ÅŒã‚Ì–Ê‚ÌŸ‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥æœ€å¾Œã®é¢ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	ÅŒã‚Ì–Ê‚ÌŸ‚ğw‚·”½•œq
+  \return	æœ€å¾Œã®é¢ã®æ¬¡ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::fend()
@@ -460,9 +460,9 @@ Mesh<V, F, M>::fend()
     return _faces.end();
 }
     
-//! ‚±‚ÌƒƒbƒVƒ…ÅŒã‚Ì–Ê‚ÌŸ‚ğw‚·’è””½•œq‚ğ•Ô‚·D
+//! ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥æœ€å¾Œã®é¢ã®æ¬¡ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	ÅŒã‚Ì–Ê‚ÌŸ‚ğw‚·’è””½•œq
+  \return	æœ€å¾Œã®é¢ã®æ¬¡ã‚’æŒ‡ã™å®šæ•°åå¾©å­
 */
 template <class V, class F, u_int M>
 inline typename Mesh<V, F, M>::const_fiterator
@@ -472,10 +472,10 @@ Mesh<V, F, M>::fend() const
 }
 
 #ifdef TUMeshPP_DEBUG
-//! o—ÍƒXƒgƒŠ[ƒ€‚É‚±‚ÌƒƒbƒVƒ…‚ğ\¬‚·‚é–Ê‚ÌÚ‘±ŠÖŒW‚ğ‘‚«o‚·D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ã“ã®ãƒ¡ãƒƒã‚·ãƒ¥ã‚’æ§‹æˆã™ã‚‹é¢ã®æ¥ç¶šé–¢ä¿‚ã‚’æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class V, class F, u_int M> std::ostream&
 Mesh<V, F, M>::showTopology(std::ostream& out) const
@@ -492,10 +492,10 @@ Mesh<V, F, M>::showTopology(std::ostream& out) const
 }
 #endif
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒƒbƒVƒ…‚ğ“Ç‚İ‚ŞD
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ãƒ¡ãƒƒã‚·ãƒ¥ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class V, class F, u_int M> std::istream&
 Mesh<V, F, M>::get(std::istream& in)
@@ -508,10 +508,10 @@ Mesh<V, F, M>::get(std::istream& in)
     typedef typename VerticesWithFaces::const_iterator
 						VerticesWithFacesIterator;
 
-  // ’¸“_‚Æ–Ê‚ÌƒŠƒXƒg‚ğ‹ó‚É‚·‚éD
+  // é ‚ç‚¹ã¨é¢ã®ãƒªã‚¹ãƒˆã‚’ç©ºã«ã™ã‚‹ï¼
     clear();
     
-  // ‘S‚Ä‚Ì’¸“_‚ğ“Ç‚İ‚ŞD
+  // å…¨ã¦ã®é ‚ç‚¹ã‚’èª­ã¿è¾¼ã‚€ï¼
     VerticesWithFaces	verticesWithFaces;
     char		c;
     while (in >> c && c == 'V')
@@ -519,68 +519,68 @@ Mesh<V, F, M>::get(std::istream& in)
 	char		dummy[64];
 	u_int		vnum;
 	V		vertex;
-	in >> dummy >> vnum >> vertex;		// ’¸“_‚ğ“Ç‚İ‚ŞD
-	viterator	v = newVertex(vertex);	// V‚µ‚¢’¸“_‚ğ¶¬
+	in >> dummy >> vnum >> vertex;		// é ‚ç‚¹ã‚’èª­ã¿è¾¼ã‚€ï¼
+	viterator	v = newVertex(vertex);	// æ–°ã—ã„é ‚ç‚¹ã‚’ç”Ÿæˆ
 
-      // ’Ç‰Á‚µ‚½’¸“_‚Ö‚Ì”½•œq‚ğC‚±‚Ì’¸“_‚ğ‹¤—L‚·‚é–Ê‚Ì‹óƒŠƒXƒg‚Æˆê‚É“o˜^D
+      // è¿½åŠ ã—ãŸé ‚ç‚¹ã¸ã®åå¾©å­ã‚’ï¼Œã“ã®é ‚ç‚¹ã‚’å…±æœ‰ã™ã‚‹é¢ã®ç©ºãƒªã‚¹ãƒˆã¨ä¸€ç·’ã«ç™»éŒ²ï¼
 	verticesWithFaces.push_back(make_pair(v, Faces()));
     }
     in.putback(c);
 
-  // ‘S‚Ä‚Ì–Ê‚ğ“Ç‚İ‚ŞD
+  // å…¨ã¦ã®é¢ã‚’èª­ã¿è¾¼ã‚€ï¼
     while (in >> c && c == 'F')
     {
 	char	dummy[64];
 	u_int	fnum;
-	in >> dummy >> fnum;		// –Ê”Ô†‚ğƒXƒLƒbƒvD
+	in >> dummy >> fnum;		// é¢ç•ªå·ã‚’ã‚¹ã‚­ãƒƒãƒ—ï¼
 
-	viterator	v[NSides];	// ‚±‚Ì–Ê‚Ì’¸“_‚ğw‚·‘S”½•œq
-	u_int		vnum[NSides];	// ‚±‚Ì–Ê‚Ì’¸“_‚Ì‘S”Ô†
+	viterator	v[NSides];	// ã“ã®é¢ã®é ‚ç‚¹ã‚’æŒ‡ã™å…¨åå¾©å­
+	u_int		vnum[NSides];	// ã“ã®é¢ã®é ‚ç‚¹ã®å…¨ç•ªå·
 	for (u_int e = 0; e < NSides; ++e)
 	{
-	    in >> vnum[e];		// ‚±‚Ì–Ê‚Ì’¸“_‚Ì”Ô†‚ğ“Ç‚İ‚ŞD
-	    --vnum[e];			// ’¸“_”Ô†‚Í1‚©‚çn‚Ü‚é‚Ì‚ÅƒfƒNƒŠƒƒ“ƒg
-	    v[e] = verticesWithFaces[vnum[e]].first;	// ”½•œq‚ğæ‚èo‚·
+	    in >> vnum[e];		// ã“ã®é¢ã®é ‚ç‚¹ã®ç•ªå·ã‚’èª­ã¿è¾¼ã‚€ï¼
+	    --vnum[e];			// é ‚ç‚¹ç•ªå·ã¯1ã‹ã‚‰å§‹ã¾ã‚‹ã®ã§ãƒ‡ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ
+	    v[e] = verticesWithFaces[vnum[e]].first;	// åå¾©å­ã‚’å–ã‚Šå‡ºã™
 	}
 #ifndef TUMeshPP_DEBUG
-	fiterator	f = newFace(F(v));		// V‚µ‚¢–Ê‚ğ¶¬
+	fiterator	f = newFace(F(v));		// æ–°ã—ã„é¢ã‚’ç”Ÿæˆ
 #else
-	fiterator	f = newFace(F(v, fnum));	// V‚µ‚¢–Ê‚ğ¶¬
+	fiterator	f = newFace(F(v, fnum));	// æ–°ã—ã„é¢ã‚’ç”Ÿæˆ
 #endif
-      // ŒÂX‚Ì’¸“_‚É©g‚Ìe‚Æ‚µ‚Ä‚±‚Ì–Ê‚ğ“o˜^‚·‚éD
+      // å€‹ã€…ã®é ‚ç‚¹ã«è‡ªèº«ã®è¦ªã¨ã—ã¦ã“ã®é¢ã‚’ç™»éŒ²ã™ã‚‹ï¼
 	for (u_int e = 0; e < NSides; ++e)
 	    verticesWithFaces[vnum[e]].second.push_back(f);
     }
     if (in)
 	in.putback(c);
 
-  // ŒÂX‚Ì’¸“_‚É‚Â‚¢‚ÄC‚»‚ê‚ğˆÍ‚Ş2‚Â‚Ì—×Ú–ÊŠÔ‚Éwinged-edge\‘¢‚ğì‚éD
+  // å€‹ã€…ã®é ‚ç‚¹ã«ã¤ã„ã¦ï¼Œãã‚Œã‚’å›²ã‚€2ã¤ã®éš£æ¥é¢é–“ã«winged-edgeæ§‹é€ ã‚’ä½œã‚‹ï¼
     for (VerticesWithFacesIterator vertex  = verticesWithFaces.begin();
 	 vertex != verticesWithFaces.end(); ++vertex)
     {
 	viterator	v     = vertex->first;
-	const Faces&	faces = vertex->second;		// v‚ğˆÍ‚Ş–Ê‚ÌƒŠƒXƒg
+	const Faces&	faces = vertex->second;		// vã‚’å›²ã‚€é¢ã®ãƒªã‚¹ãƒˆ
 
-      // v‚ğˆÍ‚ŞŒÂX‚Ì–Êf‚É‚Â‚¢‚ÄDDD
+      // vã‚’å›²ã‚€å€‹ã€…ã®é¢fã«ã¤ã„ã¦ï¼ï¼ï¼
 	for (FacesIterator f = faces.begin(); f != faces.end(); ++f)
 	{
-	  // f‚É‚Â‚¢‚ÄCv‚ğn“_‚Æ‚·‚é•Óedge‚ğ’T‚·D
+	  // fã«ã¤ã„ã¦ï¼Œvã‚’å§‹ç‚¹ã¨ã™ã‚‹è¾ºedgeã‚’æ¢ã™ï¼
 	    Edge	edge(*f);
 	    while (edge.viter() != v)
 		++edge;
 
-	    viterator	vn = edge.next().viter();	// edge‚ÌI“_
+	    viterator	vn = edge.next().viter();	// edgeã®çµ‚ç‚¹
 	    
-	  // vertex‚ğˆÍ‚Ş•Ê‚Ì–Êf1‚É‚Â‚¢‚ÄDDD
+	  // vertexã‚’å›²ã‚€åˆ¥ã®é¢f1ã«ã¤ã„ã¦ï¼ï¼ï¼
 	    for (FacesIterator f1 = faces.begin(); f1 != f; ++f1)
 	    {
-	      // f1‚Ì‚Ü‚í‚è‚ğˆêü‚µ‚Äedge‚ÌI“_vn‚ğn“_‚Æ‚·‚é•Ó‚ğ’T‚·D
+	      // f1ã®ã¾ã‚ã‚Šã‚’ä¸€å‘¨ã—ã¦edgeã®çµ‚ç‚¹vnã‚’å§‹ç‚¹ã¨ã™ã‚‹è¾ºã‚’æ¢ã™ï¼
 		Edge	edgeF0(*f1), edgeF(edgeF0);
 		do
 		{
-		    if (edgeF.viter() == vn)		// n“_‚ªvn‚Å‚ ‚ê‚Î
+		    if (edgeF.viter() == vn)		// å§‹ç‚¹ãŒvnã§ã‚ã‚Œã°
 		    {
-			edge.pair(edgeF);		// ‚±‚Ì•Ó‚ªedge‚Ì— •Ó
+			edge.pair(edgeF);		// ã“ã®è¾ºãŒedgeã®è£è¾º
 			goto done;
 		    }
 		} while (++edgeF != edgeF0);
@@ -596,10 +596,10 @@ Mesh<V, F, M>::get(std::istream& in)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒƒbƒVƒ…‚ğ‘‚«o‚·D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ãƒ¡ãƒƒã‚·ãƒ¥ã‚’æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class V, class F, u_int M> std::ostream&
 Mesh<V, F, M>::put(std::ostream& out) const
@@ -625,10 +625,10 @@ Mesh<V, F, M>::put(std::ostream& out) const
     return out;
 }
 
-//! V‚µ‚¢’¸“_‚ğ¶¬‚µ‚Ä’¸“_ƒŠƒXƒg‚É“o˜^‚·‚éD
+//! æ–°ã—ã„é ‚ç‚¹ã‚’ç”Ÿæˆã—ã¦é ‚ç‚¹ãƒªã‚¹ãƒˆã«ç™»éŒ²ã™ã‚‹ï¼
 /*!
- \param f	¶¬‚·‚é’¸“_‚Ìƒvƒƒgƒ^ƒCƒv
- \return	¶¬‚³‚ê‚½’¸“_‚ğw‚·”½•œq
+ \param f	ç”Ÿæˆã™ã‚‹é ‚ç‚¹ã®ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—
+ \return	ç”Ÿæˆã•ã‚ŒãŸé ‚ç‚¹ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::newVertex(const V& v)
@@ -637,10 +637,10 @@ Mesh<V, F, M>::newVertex(const V& v)
     return _vertices.begin();
 }
     
-//! V‚µ‚¢–Ê‚ğ¶¬‚µ‚Ä–ÊƒŠƒXƒg‚É“o˜^‚·‚éD
+//! æ–°ã—ã„é¢ã‚’ç”Ÿæˆã—ã¦é¢ãƒªã‚¹ãƒˆã«ç™»éŒ²ã™ã‚‹ï¼
 /*!
- \param f	¶¬‚·‚é–Ê‚Ìƒvƒƒgƒ^ƒCƒv
- \return	¶¬‚³‚ê‚½–Ê‚ğw‚·”½•œq
+ \param f	ç”Ÿæˆã™ã‚‹é¢ã®ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—
+ \return	ç”Ÿæˆã•ã‚ŒãŸé¢ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::newFace(const F& f)
@@ -649,9 +649,9 @@ Mesh<V, F, M>::newFace(const F& f)
     return _faces.begin();
 }
     
-//! w’è‚³‚ê‚½’¸“_‚ğ”j‰ó‚µ‚Ä’¸“_ƒŠƒXƒg‚©‚çæ‚èœ‚­D
+//! æŒ‡å®šã•ã‚ŒãŸé ‚ç‚¹ã‚’ç ´å£Šã—ã¦é ‚ç‚¹ãƒªã‚¹ãƒˆã‹ã‚‰å–ã‚Šé™¤ãï¼
 /*!
- \param f	”j‰ó‚·‚é’¸“_‚ğw‚·”½•œq
+ \param f	ç ´å£Šã™ã‚‹é ‚ç‚¹ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline void
 Mesh<V, F, M>::deleteVertex(viterator v)
@@ -659,9 +659,9 @@ Mesh<V, F, M>::deleteVertex(viterator v)
     _vertices.erase(v);
 }
     
-//! w’è‚³‚ê‚½–Ê‚ğ”j‰ó‚µ‚Ä–ÊƒŠƒXƒg‚©‚çæ‚èœ‚­D
+//! æŒ‡å®šã•ã‚ŒãŸé¢ã‚’ç ´å£Šã—ã¦é¢ãƒªã‚¹ãƒˆã‹ã‚‰å–ã‚Šé™¤ãï¼
 /*!
- \param f	”j‰ó‚·‚é–Ê‚ğw‚·”½•œq
+ \param f	ç ´å£Šã™ã‚‹é¢ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline void
 Mesh<V, F, M>::deleteFace(fiterator f)
@@ -672,9 +672,9 @@ Mesh<V, F, M>::deleteFace(fiterator f)
 /************************************************************************
 *  class Mesh<V, F, M>::Face						*
 ************************************************************************/
-//! ’¸“_‚ğw’è‚µ‚Ä–Ê‚ğ¶¬‚·‚éD
+//! é ‚ç‚¹ã‚’æŒ‡å®šã—ã¦é¢ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param v	MŒÂ‚Ì’¸“_‚Ö‚Ì”½•œq
+  \param v	Må€‹ã®é ‚ç‚¹ã¸ã®åå¾©å­
 */
 template <class V, class F, u_int M>
 #ifndef TUMeshPP_DEBUG
@@ -691,10 +691,10 @@ Mesh<V, F, M>::Face::Face(viterator v[], u_int fn)
     }
 }
 
-//! w’è‚³‚ê‚½•Ó‚Ìn“_‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸè¾ºã®å§‹ç‚¹ã‚’è¿”ã™ï¼
 /*!
-    \param e	•Ó‚Ìindex, 0 <= e < M
-    \return	e”Ô–Ú‚Ì•Ó‚Ìn“_‚·‚È‚í‚¿‚±‚Ì–Ê‚Ìe”Ô–Ú‚Ì’¸“_
+    \param e	è¾ºã®index, 0 <= e < M
+    \return	eç•ªç›®ã®è¾ºã®å§‹ç‚¹ã™ãªã‚ã¡ã“ã®é¢ã®eç•ªç›®ã®é ‚ç‚¹
 */
 template <class V, class F, u_int M> inline V&
 Mesh<V, F, M>::Face::v(u_int e) const
@@ -702,10 +702,10 @@ Mesh<V, F, M>::Face::v(u_int e) const
     return *_v[e];
 }
 
-//! w’è‚³‚ê‚½•Ó‚ğ‰î‚µ‚Ä‚±‚Ì–Ê‚É—×Ú‚·‚é–Ê‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸè¾ºã‚’ä»‹ã—ã¦ã“ã®é¢ã«éš£æ¥ã™ã‚‹é¢ã‚’è¿”ã™ï¼
 /*!
-    \param e	•Ó‚Ìindex, 0 <= e < M
-    \return	e”Ô–Ú‚Ì•Ó‚ğ‰î‚µ‚Ä—×Ú‚·‚é–Ê
+    \param e	è¾ºã®index, 0 <= e < M
+    \return	eç•ªç›®ã®è¾ºã‚’ä»‹ã—ã¦éš£æ¥ã™ã‚‹é¢
 */
 template <class V, class F, u_int M> inline F&
 Mesh<V, F, M>::Face::f(u_int e) const
@@ -713,21 +713,21 @@ Mesh<V, F, M>::Face::f(u_int e) const
     return *_f[e];
 }
 
-//! ‚±‚Ì–Ê‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! ã“ã®é¢ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-    \return	‚±‚Ì–Ê‚ğw‚·”½•œq
+    \return	ã“ã®é¢ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::Face::self() const
 {
     using namespace	std;
     
-    fiterator	fC = _f[0];		// 0”Ô–Ú‚Ì•Ó‚ğ‰î‚µ‚Ä—×Ú‚·‚é–Ê
+    fiterator	fC = _f[0];		// 0ç•ªç›®ã®è¾ºã‚’ä»‹ã—ã¦éš£æ¥ã™ã‚‹é¢
     for (u_int e = 0; e < NSides; ++e)
-    {					// fC‚Ìe”Ô–Ú‚Ì•Ó‚ğ
-	fiterator	f = fC->_f[e];	// ‰î‚µ‚Ä—×Ú‚·‚é–Ê‚Ö‚Ì”½•œqf‚ª
-	if (&(*f) == this)		// ‚±‚Ì–Ê‚ğw‚µ‚Ä‚¢‚½‚ç
-	    return f;			// f‚ª‚±‚Ì–Ê‚Ö‚Ì”½•œq‚Å‚ ‚éD
+    {					// fCã®eç•ªç›®ã®è¾ºã‚’
+	fiterator	f = fC->_f[e];	// ä»‹ã—ã¦éš£æ¥ã™ã‚‹é¢ã¸ã®åå¾©å­fãŒ
+	if (&(*f) == this)		// ã“ã®é¢ã‚’æŒ‡ã—ã¦ã„ãŸã‚‰
+	    return f;			// fãŒã“ã®é¢ã¸ã®åå¾©å­ã§ã‚ã‚‹ï¼
     }
 
     throw runtime_error("TU::Mesh<V, F, M>::Face::self(): Internal error!");
@@ -738,9 +738,9 @@ Mesh<V, F, M>::Face::self() const
 /************************************************************************
 *  class Mesh<V, F, M>::Edge						*
 ************************************************************************/
-//! w’è‚³‚ê‚½–Ê‚ÌÅ‰‚Ì•Ó‚ğw‚·‚æ‚¤‚É‰Šú‰»‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸé¢ã®æœ€åˆã®è¾ºã‚’æŒ‡ã™ã‚ˆã†ã«åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param face	–Ê
+  \param face	é¢
 */
 template <class V, class F, u_int M> inline
 Mesh<V, F, M>::Edge::Edge(const Face& face)
@@ -748,9 +748,9 @@ Mesh<V, F, M>::Edge::Edge(const Face& face)
 {
 }
 
-//! ‚±‚Ì•Ó‚Ìn“_‚ğ•Ô‚·D
+//! ã“ã®è¾ºã®å§‹ç‚¹ã‚’è¿”ã™ï¼
 /*!
-  \return	‚±‚Ì•Ó‚Ìn“_
+  \return	ã“ã®è¾ºã®å§‹ç‚¹
 */
 template <class V, class F, u_int M> inline V&
 Mesh<V, F, M>::Edge::v() const
@@ -758,9 +758,9 @@ Mesh<V, F, M>::Edge::v() const
     return *viter();
 }
     
-//! ‚±‚Ì•Ó‚ğŠ—L‚·‚é–Ê‚ğ•Ô‚·D
+//! ã“ã®è¾ºã‚’æ‰€æœ‰ã™ã‚‹é¢ã‚’è¿”ã™ï¼
 /*!
-  \return	‚±‚Ì•Ó‚ğŠ—L‚·‚é–Ê
+  \return	ã“ã®è¾ºã‚’æ‰€æœ‰ã™ã‚‹é¢
 */
 template <class V, class F, u_int M> inline F&
 Mesh<V, F, M>::Edge::f() const
@@ -768,9 +768,9 @@ Mesh<V, F, M>::Edge::f() const
     return *fiter();
 }
     
-//! ‚±‚Ì•Ó‚Ì”Ô†‚ğ•Ô‚·D
+//! ã“ã®è¾ºã®ç•ªå·ã‚’è¿”ã™ï¼
 /*!
-  \return	•Ó‚Ì”Ô†
+  \return	è¾ºã®ç•ªå·
 */
 template <class V, class F, u_int M> inline u_int
 Mesh<V, F, M>::Edge::e() const
@@ -778,10 +778,10 @@ Mesh<V, F, M>::Edge::e() const
     return _e;
 }
 
-//! 2‚Â‚Ì•Ó‚ª“¯ˆê‚Å‚ ‚é‚©’²‚×‚éD
+//! 2ã¤ã®è¾ºãŒåŒä¸€ã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param edge	”äŠr‘ÎÛ‚Ì•Ó
-  \return	“¯ˆê‚È‚çtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param edge	æ¯”è¼ƒå¯¾è±¡ã®è¾º
+  \return	åŒä¸€ãªã‚‰true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class V, class F, u_int M> inline bool
 Mesh<V, F, M>::Edge::operator ==(const Edge& edge) const
@@ -789,10 +789,10 @@ Mesh<V, F, M>::Edge::operator ==(const Edge& edge) const
     return (_e == edge._e) && (_f == edge._f);
 }
 
-//! 2‚Â‚Ì•Ó‚ªˆÙ‚È‚é‚©’²‚×‚éD
+//! 2ã¤ã®è¾ºãŒç•°ãªã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param edge	”äŠr‘ÎÛ‚Ì•Ó
-  \return	ˆÙ‚È‚ê‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param edge	æ¯”è¼ƒå¯¾è±¡ã®è¾º
+  \return	ç•°ãªã‚Œã°true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class V, class F, u_int M> inline bool
 Mesh<V, F, M>::Edge::operator !=(const Edge& edge) const
@@ -800,10 +800,10 @@ Mesh<V, F, M>::Edge::operator !=(const Edge& edge) const
     return !(*this == edge);
 }
 
-//! 2‚Â‚Ì•Ó‚ªn“_‚ğ‹¤—L‚µ‚Ä‚¢‚é‚©’²‚×‚éD
+//! 2ã¤ã®è¾ºãŒå§‹ç‚¹ã‚’å…±æœ‰ã—ã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param edge	”äŠr‘ÎÛ‚Ì•Ó
-  \return	‹¤—L‚µ‚Ä‚¢‚ê‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param edge	æ¯”è¼ƒå¯¾è±¡ã®è¾º
+  \return	å…±æœ‰ã—ã¦ã„ã‚Œã°true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class V, class F, u_int M> bool
 Mesh<V, F, M>::Edge::commonVertex(const Edge& edge) const
@@ -818,9 +818,9 @@ Mesh<V, F, M>::Edge::commonVertex(const Edge& edge) const
     return false;
 }
 
-//! •Ó‚Ìn“_‚Ì‰¿”C‚·‚È‚í‚¿‚»‚Ì“_‚ğ‹¤—L‚·‚é–Ê(•Ó)‚Ì”‚ğ•Ô‚·D
+//! è¾ºã®å§‹ç‚¹ã®ä¾¡æ•°ï¼Œã™ãªã‚ã¡ãã®ç‚¹ã‚’å…±æœ‰ã™ã‚‹é¢(è¾º)ã®æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	•Ó‚Ìn“_‚Ì‰¿”
+  \return	è¾ºã®å§‹ç‚¹ã®ä¾¡æ•°
 */
 template <class V, class F, u_int M> u_int
 Mesh<V, F, M>::Edge::valence() const
@@ -835,9 +835,9 @@ Mesh<V, F, M>::Edge::valence() const
     return n;
 }
 
-//! Ÿ‚Ì•Ó‚É‘Oi‚·‚éD
+//! æ¬¡ã®è¾ºã«å‰é€²ã™ã‚‹ï¼
 /*!
-  \return	‘OiŒã‚Ì•Ó
+  \return	å‰é€²å¾Œã®è¾º
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator ++()
@@ -849,9 +849,9 @@ Mesh<V, F, M>::Edge::operator ++()
     return *this;
 }
 
-//! è‘O‚Ì•Ó‚ÉŒã‘Ş‚·‚éD
+//! æ‰‹å‰ã®è¾ºã«å¾Œé€€ã™ã‚‹ï¼
 /*!
-  \return	Œã‘ŞŒã‚Ì•Ó
+  \return	å¾Œé€€å¾Œã®è¾º
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator --()
@@ -863,9 +863,9 @@ Mesh<V, F, M>::Edge::operator --()
     return *this;
 }
 
-//! — ‘¤‚Ì•Ó‚ÉˆÚ“®‚·‚éD
+//! è£å´ã®è¾ºã«ç§»å‹•ã™ã‚‹ï¼
 /*!
-  \return	ˆÚ“®Œã‚Ì•Ó
+  \return	ç§»å‹•å¾Œã®è¾º
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator ~()
@@ -873,9 +873,9 @@ Mesh<V, F, M>::Edge::operator ~()
     return *this = conj();
 }
 
-//! ‚±‚Ì•Ó‚ÌŸ‚Ì•Ó‚ğ•Ô‚·D
+//! ã“ã®è¾ºã®æ¬¡ã®è¾ºã‚’è¿”ã™ï¼
 /*!
-  \return	Ÿ‚Ì•Ó
+  \return	æ¬¡ã®è¾º
 */
     template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::Edge::next() const
@@ -884,9 +884,9 @@ Mesh<V, F, M>::Edge::next() const
     return ++edge;
 }
 
-//! ‚±‚Ì•Ó‚Ìè‘O‚Ì•Ó‚ğ•Ô‚·D
+//! ã“ã®è¾ºã®æ‰‹å‰ã®è¾ºã‚’è¿”ã™ï¼
 /*!
-  \return	è‘O‚Ì•Ó
+  \return	æ‰‹å‰ã®è¾º
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::Edge::prev() const
@@ -895,23 +895,23 @@ Mesh<V, F, M>::Edge::prev() const
     return --edge;
 }
 
-//! ‚±‚Ì•Ó‚Ì— ‘¤‚Ì•Ó‚ğ•Ô‚·D
+//! ã“ã®è¾ºã®è£å´ã®è¾ºã‚’è¿”ã™ï¼
 /*!
-  \return	— ‘¤‚Ì•Ó
+  \return	è£å´ã®è¾º
 */
 template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::Edge::conj() const
 {
-    viterator	vn = next().viter();	// ‚±‚Ì•Ó‚ÌI“_
-    Edge	edge(_f->_f[_e]);	// ‚±‚Ì•Ó‚ğ‰î‚µ‚Ä—×Ú‚·‚é–Ê‚ÌÅ‰‚Ì•Ó
-    while (edge.viter() != vn)		// ‚±‚Ì•Ó‚ÌI“_‚ğn“_‚Æ‚·‚é•Ó‚ğ’T‚·
+    viterator	vn = next().viter();	// ã“ã®è¾ºã®çµ‚ç‚¹
+    Edge	edge(_f->_f[_e]);	// ã“ã®è¾ºã‚’ä»‹ã—ã¦éš£æ¥ã™ã‚‹é¢ã®æœ€åˆã®è¾º
+    while (edge.viter() != vn)		// ã“ã®è¾ºã®çµ‚ç‚¹ã‚’å§‹ç‚¹ã¨ã™ã‚‹è¾ºã‚’æ¢ã™
 	++edge;
     return edge;
 }
 
-//! ‚±‚Ì•Ó‚ğŠ—L‚·‚é–Ê‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! ã“ã®è¾ºã‚’æ‰€æœ‰ã™ã‚‹é¢ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	‚±‚Ì•Ó‚ğŠ—L‚·‚é–Ê‚ğw‚·”½•œq
+  \return	ã“ã®è¾ºã‚’æ‰€æœ‰ã™ã‚‹é¢ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::Edge::fiter() const
@@ -919,9 +919,9 @@ Mesh<V, F, M>::Edge::fiter() const
     return _f;
 }
     
-//! ‚±‚Ì•Ó‚Ìn“_‚ğw‚·”½•œq‚ğ•Ô‚·D
+//! ã“ã®è¾ºã®å§‹ç‚¹ã‚’æŒ‡ã™åå¾©å­ã‚’è¿”ã™ï¼
 /*!
-  \return	‚±‚Ì•Ó‚Ìn“_‚ğw‚·”½•œq
+  \return	ã“ã®è¾ºã®å§‹ç‚¹ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::Edge::viter() const
@@ -929,9 +929,9 @@ Mesh<V, F, M>::Edge::viter() const
     return _f->_v[_e];
 }
     
-//! w’è‚³‚ê‚½–Ê‚ÌÅ‰‚Ì•Ó‚ğw‚·‚æ‚¤‚É‰Šú‰»‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸé¢ã®æœ€åˆã®è¾ºã‚’æŒ‡ã™ã‚ˆã†ã«åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param f	–Ê‚ğw‚·”½•œq
+  \param f	é¢ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline
 Mesh<V, F, M>::Edge::Edge(fiterator f)
@@ -939,38 +939,38 @@ Mesh<V, F, M>::Edge::Edge(fiterator f)
 {
 }
 
-//! ‚±‚Ì•Ó‚Æw’è‚³‚ê‚½•Ó‚ğ”w’†‡‚í‚¹‚É‚·‚éD
+//! ã“ã®è¾ºã¨æŒ‡å®šã•ã‚ŒãŸè¾ºã‚’èƒŒä¸­åˆã‚ã›ã«ã™ã‚‹ï¼
 /*!
-  \param edge	”w’†‡‚í‚¹‚Ì‘ÎÛ‚Æ‚È‚é•Ó
+  \param edge	èƒŒä¸­åˆã‚ã›ã®å¯¾è±¡ã¨ãªã‚‹è¾º
 */
 template <class V, class F, u_int M> inline void
 Mesh<V, F, M>::Edge::pair(const Edge& edge) const
 {
-    _f->_f[_e] = edge._f;	// ‚±‚Ì•Ó‚Ì— –Ê‚ğedge‚Ìe–Ê‚É
-    edge._f->_f[edge._e] = _f;	// edge‚Ì— –Ê‚ğ‚±‚Ì•Ó‚Ìe–Ê‚É
+    _f->_f[_e] = edge._f;	// ã“ã®è¾ºã®è£é¢ã‚’edgeã®è¦ªé¢ã«
+    edge._f->_f[edge._e] = _f;	// edgeã®è£é¢ã‚’ã“ã®è¾ºã®è¦ªé¢ã«
 }
 
-//! ‚±‚Ì•Ó‚©‚çw’è‚³‚ê‚½•Ó‚Ìè‘O‚Ü‚Å‚Ì•Ó‚Ìn“_‚ğw’è‚³‚ê‚½’¸“_‚É’u‚«Š·‚¦‚éD
+//! ã“ã®è¾ºã‹ã‚‰æŒ‡å®šã•ã‚ŒãŸè¾ºã®æ‰‹å‰ã¾ã§ã®è¾ºã®å§‹ç‚¹ã‚’æŒ‡å®šã•ã‚ŒãŸé ‚ç‚¹ã«ç½®ãæ›ãˆã‚‹ï¼
 /*!
-  ‚±‚Ì•Ó‚Ìn“_‚ğ‹¤—L‚·‚é•Ó‚ğ”½Œv‰ñ‚è‚É‘–¸‚µ‚È‚ª‚çn“_‚ğ’u‚«Š·‚¦‚Ä‚ä‚­D
-  \param v	’¸“_‚ğw‚·”½•œq
-  \param edgeE	‘–¸‚ÌI“_‚Æ‚È‚é•Ó (‚±‚Ì•Ó‚Ìn“_‚Í’u‚«Š·‚¦‚ç‚ê‚È‚¢)
+  ã“ã®è¾ºã®å§‹ç‚¹ã‚’å…±æœ‰ã™ã‚‹è¾ºã‚’åæ™‚è¨ˆå›ã‚Šã«èµ°æŸ»ã—ãªãŒã‚‰å§‹ç‚¹ã‚’ç½®ãæ›ãˆã¦ã‚†ãï¼
+  \param v	é ‚ç‚¹ã‚’æŒ‡ã™åå¾©å­
+  \param edgeE	èµ°æŸ»ã®çµ‚ç‚¹ã¨ãªã‚‹è¾º (ã“ã®è¾ºã®å§‹ç‚¹ã¯ç½®ãæ›ãˆã‚‰ã‚Œãªã„)
 */
 template <class V, class F, u_int M> void
 Mesh<V, F, M>::Edge::replaceVertex(viterator v, const Edge& edgeE) const
 {
-  // æ‚Én“_‚ğ‘‚«Š·‚¦‚Ä‚µ‚Ü‚¤‚Æ— ‚ÉˆÚ‚ê‚È‚­‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅC
-  // Ä‹A“I‚Éˆ—‚·‚é‚±‚Æ‚É‚æ‚Á‚Ä‚Ü‚¸edgeE‚Ì1‚Âè‘O‚Ì•Ó‚Ü‚ÅˆÚ“®‚µC
-  // –ß‚è‚È‚ª‚ç‡Ÿ‘‚«Š·‚¦‚éD
+  // å…ˆã«å§‹ç‚¹ã‚’æ›¸ãæ›ãˆã¦ã—ã¾ã†ã¨è£ã«ç§»ã‚Œãªããªã£ã¦ã—ã¾ã†ã®ã§ï¼Œ
+  // å†å¸°çš„ã«å‡¦ç†ã™ã‚‹ã“ã¨ã«ã‚ˆã£ã¦ã¾ãšedgeEã®1ã¤æ‰‹å‰ã®è¾ºã¾ã§ç§»å‹•ã—ï¼Œ
+  // æˆ»ã‚ŠãªãŒã‚‰é †æ¬¡æ›¸ãæ›ãˆã‚‹ï¼
     Edge	edgePC(prev().conj());
     if (edgePC != edgeE)
-	edgePC.replaceVertex(v, edgeE);		// Ä‹A‚·‚éD
+	edgePC.replaceVertex(v, edgeE);		// å†å¸°ã™ã‚‹ï¼
     _f->_v[_e] = v;
 }
 
-//! ‚±‚Ì•Ó‚Ìn“_‚ğw’è‚³‚ê‚½’¸“_‚É’u‚«Š·‚¦‚éD
+//! ã“ã®è¾ºã®å§‹ç‚¹ã‚’æŒ‡å®šã•ã‚ŒãŸé ‚ç‚¹ã«ç½®ãæ›ãˆã‚‹ï¼
 /*!
-  \param v	’¸“_‚ğw‚·”½•œq
+  \param v	é ‚ç‚¹ã‚’æŒ‡ã™åå¾©å­
 */
 template <class V, class F, u_int M> inline void
 Mesh<V, F, M>::Edge::replaceVertex(viterator v) const

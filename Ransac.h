@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Ransac.h,v 1.8 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Ransac.h,v 1.9 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Ransac.h
-  \brief	RANSAC‚ğs‚¤ŠÖ”‚Ì’è‹`‚ÆÀ‘•
+  \brief	RANSACã‚’è¡Œã†é–¢æ•°ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TURansac_h
 #define __TURansac_h
@@ -43,43 +43,43 @@ namespace TU
 /************************************************************************
 *  function ransac							*
 ************************************************************************/
-//! RANSAC‚É‚æ‚Á‚Äoutlier‚ğŠÜ‚Ş“_W‡‚Éƒ‚ƒfƒ‹‚ğ“–‚Ä‚Í‚ß‚éD
+//! RANSACã«ã‚ˆã£ã¦outlierã‚’å«ã‚€ç‚¹é›†åˆã«ãƒ¢ãƒ‡ãƒ«ã‚’å½“ã¦ã¯ã‚ã‚‹ï¼
 /*!
-  ƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^PointSet‚Í“_W‡‚ğ•\‚·ƒNƒ‰ƒX‚Å‚ ‚èCˆÈ‰º‚ÌğŒ‚ğ
-  –‚½‚·‚±‚ÆF
-  -# forward_iterator‚ğƒTƒ|[ƒg‚·‚éƒRƒ“ƒeƒi‚Å‚ ‚éD
-  -# ‚±‚ÌƒRƒ“ƒeƒi‚ÌŒ^‚ğ
+  ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿PointSetã¯ç‚¹é›†åˆã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹ã§ã‚ã‚Šï¼Œä»¥ä¸‹ã®æ¡ä»¶ã‚’
+  æº€ãŸã™ã“ã¨ï¼š
+  -# forward_iteratorã‚’ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚³ãƒ³ãƒ†ãƒŠã§ã‚ã‚‹ï¼
+  -# ã“ã®ã‚³ãƒ³ãƒ†ãƒŠã®å‹ã‚’
 	PointSet::Container
-     ‚Æ‚¢‚¤–¼‘O‚Åtypedef‚µ‚Ä‚¢‚éD
-  -# inlier‚ÌŠ„‡‚ğƒƒ“ƒoŠÖ”
+     ã¨ã„ã†åå‰ã§typedefã—ã¦ã„ã‚‹ï¼
+  -# inlierã®å‰²åˆã‚’ãƒ¡ãƒ³ãƒé–¢æ•°
 	double	Pointset::inlierRate() const;
-     ‚É‚æ‚Á‚Ä’m‚é‚±‚Æ‚ª‚Å‚«‚éD
-  -# ƒƒ“ƒoŠÖ”
+     ã«ã‚ˆã£ã¦çŸ¥ã‚‹ã“ã¨ãŒã§ãã‚‹ï¼
+  -# ãƒ¡ãƒ³ãƒé–¢æ•°
 	PoinstSet::Container	Pointset::sample(u_int npoints) const;
-     ‚É‚æ‚Á‚Äƒ‰ƒ“ƒ_ƒ€‚ÉnpointsŒÂ‚Ì•”•ªW‡‚ğæ‚èo‚¹‚éD
+     ã«ã‚ˆã£ã¦ãƒ©ãƒ³ãƒ€ãƒ ã«npointså€‹ã®éƒ¨åˆ†é›†åˆã‚’å–ã‚Šå‡ºã›ã‚‹ï¼
 
-  ƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^Model‚Í“–‚Ä‚Í‚ß‚é‚×‚«ƒ‚ƒfƒ‹‚ğ•\‚·ƒNƒ‰ƒX‚Å‚ ‚èC
-  ˆÈ‰º‚ÌğŒ‚ğ–‚½‚·‚±‚ÆF
-  -# ƒƒ“ƒoŠÖ”
+  ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿Modelã¯å½“ã¦ã¯ã‚ã‚‹ã¹ããƒ¢ãƒ‡ãƒ«ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹ã§ã‚ã‚Šï¼Œ
+  ä»¥ä¸‹ã®æ¡ä»¶ã‚’æº€ãŸã™ã“ã¨ï¼š
+  -# ãƒ¡ãƒ³ãƒé–¢æ•°
 	template <class Iterator>
 	void	Model::fit(Iterator first, Iterator last);
-     ‚É‚æ‚Á‚Ä“_W‡‚Éƒ‚ƒfƒ‹‚ğ“–‚Ä‚Í‚ß‚é‚±‚Æ‚ª‚Å‚«‚éD
-  -# 1.‚É•K—v‚ÈÅ­“_”‚ğƒƒ“ƒoŠÖ”
+     ã«ã‚ˆã£ã¦ç‚¹é›†åˆã«ãƒ¢ãƒ‡ãƒ«ã‚’å½“ã¦ã¯ã‚ã‚‹ã“ã¨ãŒã§ãã‚‹ï¼
+  -# 1.ã«å¿…è¦ãªæœ€å°‘ç‚¹æ•°ã‚’ãƒ¡ãƒ³ãƒé–¢æ•°
 	u_int	Model::ndataMin() const;
-     ‚É‚æ‚Á‚Ä’m‚é‚±‚Æ‚ª‚Å‚«‚éD
+     ã«ã‚ˆã£ã¦çŸ¥ã‚‹ã“ã¨ãŒã§ãã‚‹ï¼
 
-  ƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^Conform‚Í“_‚Ìƒ‚ƒfƒ‹‚Ö‚Ì“K‡«‚ğ”»’è‚·‚éŠÖ”
-  ƒIƒuƒWƒFƒNƒg‚Å‚ ‚èC
+  ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿Conformã¯ç‚¹ã®ãƒ¢ãƒ‡ãƒ«ã¸ã®é©åˆæ€§ã‚’åˆ¤å®šã™ã‚‹é–¢æ•°
+  ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã§ã‚ã‚Šï¼Œ
 	bool	Conform::operator()(const PointSet::Container::valu_type& p,
 				    const Model& model);
-  ‚È‚éƒCƒ“ƒ^ƒtƒF[ƒX‚É‚æ‚Á‚Äp‚ªmodel‚É“K‡‚µ‚Ä‚¢‚é‚©”»’è‚Å‚«‚é‚±‚ÆD
+  ãªã‚‹ã‚¤ãƒ³ã‚¿ãƒ•ã‚§ãƒ¼ã‚¹ã«ã‚ˆã£ã¦pãŒmodelã«é©åˆã—ã¦ã„ã‚‹ã‹åˆ¤å®šã§ãã‚‹ã“ã¨ï¼
 
-  \param pointSet	inlier‚Æoutlier‚ğŠÜ‚Ş“_W‡
-  \param model		pointSet‚ÉŠÜ‚Ü‚ê‚éinlier‚ğ“–‚Ä‚Í‚ß‚éƒ‚ƒfƒ‹
-  \param conform	“_‚Ìƒ‚ƒfƒ‹‚Ö‚Ì“K‡«‚ğ”»’è‚·‚éŠÖ”ƒIƒuƒWƒFƒNƒg
-  \param hitRate	RANSAC‚É‚æ‚Á‚Ä³‚µ‚­inlier‚ğˆø‚«“–‚Ä‚éŠm—¦.
-			0 <= hitRate < 1‚Å‚È‚¯‚ê‚Î‚È‚ç‚È‚¢
-  \return		pointSet‚ÉŠÜ‚Ü‚ê‚éinlier
+  \param pointSet	inlierã¨outlierã‚’å«ã‚€ç‚¹é›†åˆ
+  \param model		pointSetã«å«ã¾ã‚Œã‚‹inlierã‚’å½“ã¦ã¯ã‚ã‚‹ãƒ¢ãƒ‡ãƒ«
+  \param conform	ç‚¹ã®ãƒ¢ãƒ‡ãƒ«ã¸ã®é©åˆæ€§ã‚’åˆ¤å®šã™ã‚‹é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+  \param hitRate	RANSACã«ã‚ˆã£ã¦æ­£ã—ãinlierã‚’å¼•ãå½“ã¦ã‚‹ç¢ºç‡.
+			0 <= hitRate < 1ã§ãªã‘ã‚Œã°ãªã‚‰ãªã„
+  \return		pointSetã«å«ã¾ã‚Œã‚‹inlier
 */
 template <class PointSet, class Model, class Conform>
 typename PointSet::Container
@@ -93,8 +93,8 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
     if (distance(pointSet.begin(), pointSet.end()) < model.ndataMin())
 	throw runtime_error("ransac<PointSet, Model>: not enough points in the given point set!!");
     
-  // —^‚¦‚ç‚ê‚½hitRateCPointSet‚ÉŠÜ‚Ü‚ê‚éinlier‚ÌŠ„‡‚¨‚æ‚ÑModel‚Ì¶¬‚É
-  // —v‚·‚éÅ­“_”‚©‚çCƒTƒ“ƒvƒŠƒ“ƒO‚Ì•K—v‰ñ”‚ğ‹‚ß‚éD
+  // ä¸ãˆã‚‰ã‚ŒãŸhitRateï¼ŒPointSetã«å«ã¾ã‚Œã‚‹inlierã®å‰²åˆãŠã‚ˆã³Modelã®ç”Ÿæˆã«
+  // è¦ã™ã‚‹æœ€å°‘ç‚¹æ•°ã‹ã‚‰ï¼Œã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã®å¿…è¦å›æ•°ã‚’æ±‚ã‚ã‚‹ï¼
     if (hitRate < 0.0 || hitRate >= 1.0)
 	throw invalid_argument("ransac<PointSet, Model>: given hit rate is not within [0, 1)!!");
     const double	inlierRate = pointSet.inlierRate();
@@ -105,33 +105,33 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 	tmp *= inlierRate;
     const u_int	ntrials = u_int(ceil(log(1.0 - hitRate) / log(1.0 - tmp)));
 
-  // siÅ¬ŒÂ”‚Ì“_‚ğƒTƒ“ƒvƒ‹Cƒ‚ƒfƒ‹¶¬CinlierŒŸoj‚ğntrials‰ñs‚¤D
+  // è©¦è¡Œï¼ˆæœ€å°å€‹æ•°ã®ç‚¹ã‚’ã‚µãƒ³ãƒ—ãƒ«ï¼Œãƒ¢ãƒ‡ãƒ«ç”Ÿæˆï¼Œinlieræ¤œå‡ºï¼‰ã‚’ntrialså›è¡Œã†ï¼
     Container	inlierSetA, inlierSetB;
     Container	*inliers = &inlierSetA, *inliersMax = &inlierSetB;
     for (u_int n = 0; n < ntrials; ++n)
     {
-      // “_W‡‚©‚çƒ‚ƒfƒ‹‚ÌŒvZ‚É•K—v‚ÈÅ¬ŒÂ”‚Ì“_‚ğƒTƒ“ƒvƒ‹‚·‚éD
+      // ç‚¹é›†åˆã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ã®è¨ˆç®—ã«å¿…è¦ãªæœ€å°å€‹æ•°ã®ç‚¹ã‚’ã‚µãƒ³ãƒ—ãƒ«ã™ã‚‹ï¼
 	const Container&	minimalSet = pointSet.sample(model.ndataMin());
 
-      // ƒTƒ“ƒvƒ‹‚µ‚½“_‚©‚çƒ‚ƒfƒ‹‚ğ¶¬‚·‚éD
+      // ã‚µãƒ³ãƒ—ãƒ«ã—ãŸç‚¹ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
 	model.fit(minimalSet.begin(), minimalSet.end());
 
-      // ‘S“_‚Ì’†‚Å¶¬‚µ‚½ƒ‚ƒfƒ‹‚É“K‡‚·‚é(inlier)‚à‚Ì‚ğW‚ß‚éD
+      // å…¨ç‚¹ã®ä¸­ã§ç”Ÿæˆã—ãŸãƒ¢ãƒ‡ãƒ«ã«é©åˆã™ã‚‹(inlier)ã‚‚ã®ã‚’é›†ã‚ã‚‹ï¼
 	inliers->clear();
 	for (typename PointSet::const_iterator iter = pointSet.begin();
 	     iter != pointSet.end(); ++iter)
 	    if (conform(*iter, model))
 		inliers->push_back(*iter);
 
-      // ‚±‚ê‚Ü‚Å‚Ì‚Ç‚Ìƒ‚ƒfƒ‹‚æ‚è‚àinlier‚Ì”‚ª‘½‚¯‚ê‚Î‚»‚ÌW‡‚ğ‹L˜^‚·‚éD
+      // ã“ã‚Œã¾ã§ã®ã©ã®ãƒ¢ãƒ‡ãƒ«ã‚ˆã‚Šã‚‚inlierã®æ•°ãŒå¤šã‘ã‚Œã°ãã®é›†åˆã‚’è¨˜éŒ²ã™ã‚‹ï¼
 	if (inliers->size() > inliersMax->size())
 	    swap(inliers, inliersMax);
     }
-  // Å‘åW‡‚ÉŠÜ‚Ü‚ê‚é“_‚ğ^‚Ìinlier‚Æ‚µC‚»‚ê‚ç‘S‚Ä‚©‚çƒ‚ƒfƒ‹‚ğ¶¬‚·‚éD
-  // ƒTƒ“ƒvƒ‹‚³‚ê‚½“_iminimalSet‚ÉŠÜ‚Ü‚ê‚é“_j‚ª‚Â©—R“x‚ªƒ‚ƒfƒ‹‚Ì©—R“x
-  // ‚æ‚è‚à‘å‚«‚¢ê‡‚ÍC‚±‚ê‚ç‚ÉŒë·0‚Åƒ‚ƒfƒ‹‚ğ“–‚Ä‚Í‚ß‚ç‚ê‚é‚Æ‚ÍŒÀ‚ç‚È‚¢‚Ì‚ÅC
-  // ‚±‚ê‚ç‚Ì“_‚ª•K‚¸inlier‚ÉŠÜ‚Ü‚ê‚é•ÛØ‚Í‚È‚¢D‚æ‚Á‚ÄCinlier‚ª‘«‚è‚È‚­‚Ä
-  // Ÿ‚Ì“–‚Ä‚Í‚ß‚ª¸”s‚·‚é‚±‚Æ‚à‚ ‚è“¾‚éD
+  // æœ€å¤§é›†åˆã«å«ã¾ã‚Œã‚‹ç‚¹ã‚’çœŸã®inlierã¨ã—ï¼Œãã‚Œã‚‰å…¨ã¦ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ã‚’ç”Ÿæˆã™ã‚‹ï¼
+  // ã‚µãƒ³ãƒ—ãƒ«ã•ã‚ŒãŸç‚¹ï¼ˆminimalSetã«å«ã¾ã‚Œã‚‹ç‚¹ï¼‰ãŒæŒã¤è‡ªç”±åº¦ãŒãƒ¢ãƒ‡ãƒ«ã®è‡ªç”±åº¦
+  // ã‚ˆã‚Šã‚‚å¤§ãã„å ´åˆã¯ï¼Œã“ã‚Œã‚‰ã«èª¤å·®0ã§ãƒ¢ãƒ‡ãƒ«ã‚’å½“ã¦ã¯ã‚ã‚‰ã‚Œã‚‹ã¨ã¯é™ã‚‰ãªã„ã®ã§ï¼Œ
+  // ã“ã‚Œã‚‰ã®ç‚¹ãŒå¿…ãšinlierã«å«ã¾ã‚Œã‚‹ä¿è¨¼ã¯ãªã„ï¼ã‚ˆã£ã¦ï¼ŒinlierãŒè¶³ã‚Šãªãã¦
+  // æ¬¡ã®å½“ã¦ã¯ã‚ãŒå¤±æ•—ã™ã‚‹ã“ã¨ã‚‚ã‚ã‚Šå¾—ã‚‹ï¼
     model.fit(inliersMax->begin(), inliersMax->end());
 
     return *inliersMax;

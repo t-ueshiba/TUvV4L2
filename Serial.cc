@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Serial.cc,v 1.21 2010-01-14 11:13:09 ueshiba Exp $
+ *  $Id: Serial.cc,v 1.22 2012-08-29 21:17:08 ueshiba Exp $
  */
 #include "TU/Serial.h"
 #include <stdexcept>
@@ -37,9 +37,9 @@ namespace TU
 /************************************************************************
 *  Public member functions						*
 ************************************************************************/
-//! �w�肳�ꂽtty��open���ăV���A���|�[�g�����D
+//! 指定されたttyをopenしてシリアルポートを作る．
 /*!
-  \param ttyname	tty��
+  \param ttyname	tty名
 */
 Serial::Serial(const char* ttyname)
     :fdstream(ttyname)
@@ -67,9 +67,9 @@ Serial::Serial(const char* ttyname)
 			    + strerror(errno));
 }
 
-//! �V���A���|�[�g��j�󂷂�D
+//! シリアルポートを破壊する．
 /*!
-  �V���A���|�[�g�n�[�h�E�F�A�̓|�[�g�����O�̏�Ԃɖ߂����D
+  シリアルポートハードウェアはポート生成前の状態に戻される．
 */
 Serial::~Serial()
 {
@@ -80,9 +80,9 @@ Serial::~Serial()
     }
 }
 
-//! NL��CR�ɕϊ����ē��͂���D
+//! NLをCRに変換して入力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::i_nl2cr()		// '\n' -> '\r'
@@ -90,9 +90,9 @@ Serial::i_nl2cr()		// '\n' -> '\r'
     return set_flag(&termios::c_iflag, ICRNL, INLCR);
 }
 
-//! ���͂����CR�𖳎�����D
+//! 入力されるCRを無視する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::i_igncr()		// don't read '\r'
@@ -100,9 +100,9 @@ Serial::i_igncr()		// don't read '\r'
     return set_flag(&termios::c_iflag, INLCR|ICRNL, IGNCR);
 }
 
-//! CR��NL�ɕϊ����ē��͂���D
+//! CRをNLに変換して入力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::i_cr2nl()		// '\r' -> '\n'
@@ -111,9 +111,9 @@ Serial::i_cr2nl()		// '\r' -> '\n'
 }
 
 #if !defined(__APPLE__)
-//! �啶�����������ɕϊ����ē��͂���D
+//! 大文字を小文字に変換して入力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::i_upper2lower()		// upper -> lower
@@ -122,9 +122,9 @@ Serial::i_upper2lower()		// upper -> lower
 }
 #endif
 
-//! �����ϊ������ɓ��͂���D
+//! 何も変換せずに入力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::i_through()		// read transparently
@@ -136,9 +136,9 @@ Serial::i_through()		// read transparently
 #endif
 }
 
-//! NL��CR+NL�ɕϊ����ďo�͂���D
+//! NLをCR+NLに変換して出力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::o_nl2crnl()		// '\r\n' <- "\n"
@@ -151,9 +151,9 @@ Serial::o_nl2crnl()		// '\r\n' <- "\n"
 }
 
 #if !defined(__APPLE__)
-//! NL��CR+NL�ɕϊ����ďo�͂���D
+//! NLをCR+NLに変換して出力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::o_cr2nl()		// '\n' <- '\r'
@@ -161,9 +161,9 @@ Serial::o_cr2nl()		// '\n' <- '\r'
     return set_flag(&termios::c_oflag, ONLCR, OPOST|OCRNL);
 }
 
-//! ��������啶���ɕϊ����ďo�͂���D
+//! 小文字を大文字に変換して出力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::o_lower2upper()		// upper <- lower
@@ -172,9 +172,9 @@ Serial::o_lower2upper()		// upper <- lower
 }
 #endif
 
-//! �����ϊ������ɏo�͂���D
+//! 何も変換せずに出力する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::o_through()		// write transparently
@@ -182,11 +182,11 @@ Serial::o_through()		// write transparently
     return set_flag(&termios::c_oflag, OPOST, 0);
 }
 
-//! �{�[���[�g��ݒ肷��D
+//! ボーレートを設定する．
 /*!
-  \param baud	�{�[���[�g�D50, 75, 110, 134, 150, 200, 300, 600,
-		1200, 1800, 2400, 4800. 9600, 19200, 38400�̂����ꂩ�D
-  \return	���̃V���A���|�[�g
+  \param baud	ボーレート．50, 75, 110, 134, 150, 200, 300, 600,
+		1200, 1800, 2400, 4800. 9600, 19200, 38400のいずれか．
+  \return	このシリアルポート
 */
 Serial&
 Serial::c_baud(int baud)	// set baud rate
@@ -242,10 +242,10 @@ Serial::c_baud(int baud)	// set baud rate
     return *this;
 }
 
-//! �����T�C�Y��ݒ肷��D
+//! 文字サイズを設定する．
 /*!
-  \param csize	�����T�C�Y�D5, 6, 7, 8�̂����ꂩ�D
-  \return	���̃V���A���|�[�g
+  \param csize	文字サイズ．5, 6, 7, 8のいずれか．
+  \return	このシリアルポート
 */
 Serial&
 Serial::c_csize(int csize)	// set character size
@@ -268,9 +268,9 @@ Serial::c_csize(int csize)	// set character size
     return *this;
 }
 
-//! �p���e�B�`�F�b�N�������ɐݒ肷��D
+//! パリティチェックを偶数に設定する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::c_even()		// even parity
@@ -278,9 +278,9 @@ Serial::c_even()		// even parity
     return set_flag(&termios::c_cflag, PARODD, PARENB);
 }
 
-//! �p���e�B�`�F�b�N����ɐݒ肷��D
+//! パリティチェックを奇数に設定する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::c_odd()			// odd parity
@@ -288,9 +288,9 @@ Serial::c_odd()			// odd parity
     return set_flag(&termios::c_cflag, 0, PARENB|PARODD);
 }
 
-//! �p���e�B�`�F�b�N�Ȃ��ɐݒ肷��D
+//! パリティチェックなしに設定する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::c_noparity()		// no parity
@@ -298,9 +298,9 @@ Serial::c_noparity()		// no parity
     return set_flag(&termios::c_cflag, PARENB, 0);
 }
 
-//! �X�g�b�v�r�b�g��1�ɐݒ肷��D
+//! ストップビットを1に設定する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::c_stop1()		// 1 stop bit
@@ -308,9 +308,9 @@ Serial::c_stop1()		// 1 stop bit
     return set_flag(&termios::c_cflag, CSTOPB, 0);
 }
 
-//! �X�g�b�v�r�b�g��2�ɐݒ肷��D
+//! ストップビットを2に設定する．
 /*!
-  \return	���̃V���A���|�[�g
+  \return	このシリアルポート
 */
 Serial&
 Serial::c_stop2()		// 2 stop bits

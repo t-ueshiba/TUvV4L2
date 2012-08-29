@@ -1,15 +1,15 @@
 /*
- *  ����14-24�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-24年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2012.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,16 +25,17 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: functional.h,v 1.2 2012-08-16 04:00:42 ueshiba Exp $
+ *  $Id: functional.h,v 1.3 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		functional.h
-  \brief	�֐��I�u�W�F�N�g�̒�`�Ǝ���
+  \brief	関数オブジェクトの定義と実装
 */
 #ifndef __TUfunctional_h
 #define __TUfunctional_h
 
 #include <functional>
+#include <algorithm>
 #include <boost/tuple/tuple.hpp>
 
 namespace TU
@@ -42,9 +43,9 @@ namespace TU
 /************************************************************************
 *  class unarize							*
 ************************************************************************/
-//! 2�ϐ��֐���2�ϐ�tuple�������Ƃ���1�ϐ��֐��ɒ����֐��I�u�W�F�N�g
+//! 2変数関数を2変数tupleを引数とする1変数関数に直す関数オブジェクト
 /*!
-  \param OP	2�ϐ��֐��I�u�W�F�N�g�̌^
+  \param OP	2変数関数オブジェクトの型
 */
 template <class OP>
 class unarize
@@ -67,10 +68,10 @@ class unarize
 /************************************************************************
 *  class seq_transform							*
 ************************************************************************/
-//! 1�܂���2�g�̃f�[�^��̊e�v�f�ɑ΂���1�܂���2�ϐ��֐���K�p����1�g�̃f�[�^����o�͂���֐��I�u�W�F�N�g
+//! 1または2組のデータ列の各要素に対して1または2変数関数を適用して1組のデータ列を出力する関数オブジェクト
 /*!
-  \param RESULT	�ϊ����ꂽ�v�f���o�͂���f�[�^��̌^
-  \param OP	�X�̗v�f�ɓK�p�����1�ϐ�/2�ϐ��֐��I�u�W�F�N�g�̌^
+  \param RESULT	変換された要素を出力するデータ列の型
+  \param OP	個々の要素に適用される1変数/2変数関数オブジェクトの型
 */
 template <class RESULT, class OP>
 class seq_transform
@@ -105,10 +106,10 @@ class seq_transform
 /************************************************************************
 *  class mem_var_t							*
 ************************************************************************/
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̃|�C���^���炻�̃����o�ɒ��ڃA�N�Z�X(R/W)����֐��I�u�W�F�N�g
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R/W)する関数オブジェクト
 /*
-  \param S	T�^�I�u�W�F�N�g�̃����o�ϐ��̌^
-  \param T	S�^�����o�ϐ������L����I�u�W�F�N�g�̌^
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
 */ 
 template <class S, class T>
 class mem_var_t : public std::unary_function<T*, S>
@@ -124,7 +125,7 @@ class mem_var_t : public std::unary_function<T*, S>
     const mem_ptr	_m;
 };
 
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̃|�C���^���炻�̃����o�ɒ��ڃA�N�Z�X(R/W)����֐��I�u�W�F�N�g�𐶐�����
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R/W)する関数オブジェクトを生成する
 template <class S, class T> inline mem_var_t<S, T>
 mem_var(S T::*m)
 {
@@ -134,10 +135,10 @@ mem_var(S T::*m)
 /************************************************************************
 *  class const_mem_var_t						*
 ************************************************************************/
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̃|�C���^���炻�̃����o�ɒ��ڃA�N�Z�X(R)����֐��I�u�W�F�N�g
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R)する関数オブジェクト
 /*
-  \param S	T�^�I�u�W�F�N�g�̃����o�ϐ��̌^
-  \param T	S�^�����o�ϐ������L����I�u�W�F�N�g�̌^
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
 */ 
 template <class S, class T>
 class const_mem_var_t : public std::unary_function<const T*, S>
@@ -153,7 +154,7 @@ class const_mem_var_t : public std::unary_function<const T*, S>
     const mem_ptr	_m;
 };
 
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̃|�C���^���炻�̃����o�ɒ��ڃA�N�Z�X(R)����֐��I�u�W�F�N�g�𐶐�����
+//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R)する関数オブジェクトを生成する
 template <class S, class T> inline const_mem_var_t<S, T>
 const_mem_var(S const T::* m)
 {
@@ -163,10 +164,10 @@ const_mem_var(S const T::* m)
 /************************************************************************
 *  class mem_var_ref_t							*
 ************************************************************************/
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̎Q�Ƃ��炻�̃����o�ɒ��ڃA�N�Z�X(R/W)����֐��I�u�W�F�N�g
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R/W)する関数オブジェクト
 /*
-  \param S	T�^�I�u�W�F�N�g�̃����o�ϐ��̌^
-  \param T	S�^�����o�ϐ������L����I�u�W�F�N�g�̌^
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
 */ 
 template <class S, class T>
 class mem_var_ref_t : public std::unary_function<T&, S>
@@ -182,7 +183,7 @@ class mem_var_ref_t : public std::unary_function<T&, S>
     const mem_ptr	_m;
 };
     
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̎Q�Ƃ��炻�̃����o�ɒ��ڃA�N�Z�X(R/W)����֐��I�u�W�F�N�g�𐶐�����
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R/W)する関数オブジェクトを生成する
 template <class S, class T> inline mem_var_ref_t<S, T>
 mem_var_ref(S T::*m)
 {
@@ -192,10 +193,10 @@ mem_var_ref(S T::*m)
 /************************************************************************
 *  class const_mem_var_ref_t						*
 ************************************************************************/
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̎Q�Ƃ��炻�̃����o�ɒ��ڃA�N�Z�X(R)����֐��I�u�W�F�N�g
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R)する関数オブジェクト
 /*
-  \param S	T�^�I�u�W�F�N�g�̃����o�ϐ��̌^
-  \param T	S�^�����o�ϐ������L����I�u�W�F�N�g�̌^
+  \param S	T型オブジェクトのメンバ変数の型
+  \param T	S型メンバ変数を所有するオブジェクトの型
 */ 
 template <class S, class T>
 class const_mem_var_ref_t : public std::unary_function<const T&, S>
@@ -211,7 +212,7 @@ class const_mem_var_ref_t : public std::unary_function<const T&, S>
     const mem_ptr	_m;
 };
     
-//! S�^�̃����o�ϐ�������T�^�I�u�W�F�N�g�ւ̎Q�Ƃ��炻�̃����o�ɒ��ڃA�N�Z�X(R)����֐��I�u�W�F�N�g�𐶐�����
+//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R)する関数オブジェクトを生成する
 template <class S, class T> inline const_mem_var_ref_t<S, T>
 mem_var_ref(S const T::* m)
 {

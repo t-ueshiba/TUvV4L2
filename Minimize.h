@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Minimize.h,v 1.7 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: Minimize.h,v 1.8 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Minimize.h
-  \brief	�ėp�ŏ�����@�Ɋ֘A����֐��̒�`�Ǝ���
+  \brief	汎用最小自乗法に関連する関数の定義と実装
 */
 #ifndef __TUMinimize_h
 #define __TUMinimize_h
@@ -43,21 +43,21 @@ namespace TU
 /************************************************************************
 *  class NullConstraint							*
 ************************************************************************/
-//! ���̍S�����^���Ȃ��Ƃ����_�~�[�̍S��������\���N���X
+//! 何の拘束も与えないというダミーの拘束条件を表すクラス
 /*!
-  ���͔̂C�ӂ̈����ɑ΂���0�����̃x�N�g�����o�͂���x�N�g���l�֐��ł���C
-  #minimizeSquare() �� #minimizeSquareSparse() �̃e���v���[�g�p�����[�^G
-  �Ƃ��ė��p���邱�Ƃ�z�肵�Ă���D
-  \param ET �o�̓x�N�g���̗v�f�̌^
+  実体は任意の引数に対して0次元のベクトルを出力するベクトル値関数であり，
+  #minimizeSquare() や #minimizeSquareSparse() のテンプレートパラメータG
+  として利用することを想定している．
+  \param ET 出力ベクトルの要素の型
 */
 template <class ET>
 class NullConstraint
 {
   public:
-  //! �C�ӂ̈����ɑ΂���0�����x�N�g�����o�͂���D
+  //! 任意の引数に対して0次元ベクトルを出力する．
     template <class AT>
     Vector<ET>	operator ()(const AT&)	const	{return Vector<ET>(0);}
-  //! �C�ӂ̈����ɑ΂���0x0�s����o�͂���D
+  //! 任意の引数に対して0x0行列を出力する．
     template <class AT>
     Matrix<ET>	jacobian(const AT&)	const	{return Matrix<ET>(0, 0);}
 };
@@ -65,22 +65,22 @@ class NullConstraint
 /************************************************************************
 *  class ConstNormConstraint						*
 ************************************************************************/
-//! ������2��m�����l�����Ƃ����S��������\���N���X
+//! 引数の2乗ノルム値が一定という拘束条件を表すクラス
 /*!
-  ���̂͗^����ꂽ������2��m�����l�ƖڕW�l�Ƃ̍���1�����x�N�g���Ƃ��ĕԂ�
-  �x�N�g���l�֐��ł���C #minimizeSquare() �� #minimizeSquareSparse() ��
-  �e���v���[�g�p�����[�^G�Ƃ��ė��p���邱�Ƃ�z�肵�Ă���D
-  \param AT	�����̌^�D�ȉ��̏����𖞂������ƁF
-  -# �x�N�g����s��ł���ꍇ�C���̗v�f�̌^��
+  実体は与えられた引数の2乗ノルム値と目標値との差を1次元ベクトルとして返す
+  ベクトル値関数であり， #minimizeSquare() や #minimizeSquareSparse() の
+  テンプレートパラメータGとして利用することを想定している．
+  \param AT	引数の型．以下の条件を満たすこと：
+  -# ベクトルや行列である場合，その要素の型を
 	AT::value_type
-     �Ƃ������O��typedef���Ă���D
-  -# �����o�֐�
+     という名前でtypedefしている．
+  -# メンバ関数
 	AT::value_type	AT::square() const
-     �ɂ���āC����2��m�����l��m�邱�Ƃ��ł���D
+     によって，その2乗ノルム値を知ることができる．
   -# Vector<AT::value_type>
-     �^�ɕϊ��ł���(��F
+     型に変換できる(例：
      Matrix<AT::value_type>
-     �^�͂��̗v�f���s�D�揇��1��ɕ��ׂ��x�N�g���ɕϊ��\)�D
+     型はその要素を行優先順に1列に並べたベクトルに変換可能)．
 */
 template <class AT>
 class ConstNormConstraint
@@ -89,16 +89,16 @@ class ConstNormConstraint
     typedef typename AT::value_type	ET;
     
   public:
-  //! �V���ȍS�������𐶐����C����2��m�����̖ڕW�l��ݒ肷��D
+  //! 新たな拘束条件を生成し，その2乗ノルムの目標値を設定する．
   /*!
-    \param x	����(����2��m�����l���ڕW�l�ƂȂ�)
+    \param x	引数(この2乗ノルム値が目標値となる)
   */
     ConstNormConstraint(const AT& x) :_sqr(x.square())			{}
 
-  //! �^����ꂽ������2��m�����l�ƖڕW�l�̍����o�͂���D
+  //! 与えられた引数の2乗ノルム値と目標値の差を出力する．
   /*!
-    \param x	����
-    \return	x��2��m�����l�ƖڕW�l�̍������߂�1�����x�N�g��
+    \param x	引数
+    \return	xの2乗ノルム値と目標値の差を収めた1次元ベクトル
   */
     Vector<ET>	operator ()(const AT& x) const
 		{
@@ -107,10 +107,10 @@ class ConstNormConstraint
 		    return val;
 		}
 
-  //! �^����ꂽ������2��m�����l�ɂ��āC���̈������g�ɂ��1�K�����l���o�͂���D
+  //! 与えられた引数の2乗ノルム値について，この引数自身による1階微分値を出力する．
   /*!
-    \param x	����
-    \return	1�K�����l�����߂�1xd�s��(d�̓x�N�g�������ꂽ�����̎���)
+    \param x	引数
+    \return	1階微分値を収めた1xd行列(dはベクトル化された引数の次元)
   */
     Matrix<ET>	jacobian(const AT& x) const
 		{
@@ -128,54 +128,54 @@ class ConstNormConstraint
 *  function minimizeSquare						*
 *    -- Compute x st. ||f(x)||^2 -> min under g(x) = 0.			*
 ************************************************************************/
-//! �^����ꂽ�x�N�g���l�֐���2��m������^����ꂽ�S�������̉��ōŏ���������������߂�D
+//! 与えられたベクトル値関数の2乗ノルムを与えられた拘束条件の下で最小化する引数を求める．
 /*!
-  �{�֐��́C2�̃x�N�g���֐�\f$\TUvec{f}{}(\TUvec{x}{})\f$,
-  \f$\TUvec{g}{}(\TUvec{x}{})\f$����я����l\f$\TUvec{x}{0}\f$���^����ꂽ�Ƃ��C
-  \f$\TUvec{g}{}(\TUvec{x}{}) = \TUvec{0}{}\f$�Ȃ�S���̂��Ƃ�
-  \f$\TUnorm{\TUvec{f}{}(\TUvec{x}{})}^2 \rightarrow \min\f$�Ƃ���
-  \f$\TUvec{x}{}\f$�����߂�D
+  本関数は，2つのベクトル関数\f$\TUvec{f}{}(\TUvec{x}{})\f$,
+  \f$\TUvec{g}{}(\TUvec{x}{})\f$および初期値\f$\TUvec{x}{0}\f$が与えられたとき，
+  \f$\TUvec{g}{}(\TUvec{x}{}) = \TUvec{0}{}\f$なる拘束のもとで
+  \f$\TUnorm{\TUvec{f}{}(\TUvec{x}{})}^2 \rightarrow \min\f$とする
+  \f$\TUvec{x}{}\f$を求める．
   
-  �e���v���[�g�p�����[�^AT�́C�x�N�g���l�֐�����эS�������֐��̈�����\���^�ł���C
-  �ȉ��̏����𖞂������ƁF
-  -# �������x�N�g����s��ł���ꍇ�C���̗v�f�̌^��
+  テンプレートパラメータATは，ベクトル値関数および拘束条件関数の引数を表す型であり，
+  以下の条件を満たすこと：
+  -# 引数がベクトルや行列である場合，その要素の型を
 	AT::value_type
-     �Ƃ������O��typedef���Ă���D
+     という名前でtypedefしている．
 
-  �e���v���[�g�p�����[�^F�́CAT�^�̈�������͂��ăx�N�g���l���o�͂���֐���\���^�ł���C
-  �ȉ��̏����𖞂������ƁF
-  -# �o�̓x�N�g���̗v�f�̌^��
+  テンプレートパラメータFは，AT型の引数を入力してベクトル値を出力する関数を表す型であり，
+  以下の条件を満たすこと：
+  -# 出力ベクトルの要素の型を
 	F::value_type
-     �Ƃ������O��typedef���Ă���D
-  -# ����x��^�����Ƃ��̊֐��l�́C�����o�֐�
+     という名前でtypedefしている．
+  -# 引数xを与えたときの関数値は，メンバ関数
 	Vector<F:value_type>	F::operator ()(const AT& x) const
-     �ɂ���ė^������D
-  -# ����x��^�����Ƃ��̃��R�r�A���́C�����o�֐�
+     によって与えられる．
+  -# 引数xを与えたときのヤコビアンは，メンバ関数
 	Matrix<F:value_type>	F::jacobian(const AT& x) const
-     �ɂ���ė^������D
-  -# �����o�֐�
+     によって与えられる．
+  -# メンバ関数
 	void	F::update(const AT& x, const Vector<F::value_type>& dx) const
-     �ɂ���Ĉ���x�������dx�����X�V���邱�Ƃ��ł���D
+     によって引数xを微少量dxだけ更新することができる．
 
-  �e���v���[�g�p�����[�^G�́CAT�^�̈�������͂��ăx�N�g���l���o�͂���֐���\���^�ł���C
-  �ȉ��̏����𖞂������ƁF
-  -# �o�̓x�N�g���̗v�f�̌^��
+  テンプレートパラメータGは，AT型の引数を入力してベクトル値を出力する関数を表す型であり，
+  以下の条件を満たすこと：
+  -# 出力ベクトルの要素の型を
 	G::value_type
-     �Ƃ������O��typedef���Ă���D
-  -# ����x��^�����Ƃ��̊֐��l�́C�����o�֐�
+     という名前でtypedefしている．
+  -# 引数xを与えたときの関数値は，メンバ関数
 	Vector<G:value_type>	G::operator ()(const AT& x) const
-     �ɂ���ė^������D
-  -# ����x��^�����Ƃ��̃��R�r�A���́C�����o�֐�
+     によって与えられる．
+  -# 引数xを与えたときのヤコビアンは，メンバ関数
 	Matrix<G::value_type>	G::jacobian(const AT& x) const
-     �ɂ���ė^������D
+     によって与えられる．
 
-  \param f		����2��m�������ŏ������ׂ��x�N�g���l�֐�
-  \param g		�S��������\���x�N�g���l�֐�
-  \param x		�����l��^����ƁCg����x�N�g���ƂȂ�Ƃ����S�������̉���
-			f��2��m�������ŏ�����������̒l���Ԃ����D
-  \param niter_max	�ő�J��Ԃ���
-  \param tol		�������������\��臒l(�X�V�ʂ����̒l�ȉ��ɂȂ�Ύ����ƌ��Ȃ�)
-  \return		x�̐���l�̋����U�s��
+  \param f		その2乗ノルムを最小化すべきベクトル値関数
+  \param g		拘束条件を表すベクトル値関数
+  \param x		初期値を与えると，gが零ベクトルとなるという拘束条件の下で
+			fの2乗ノルムを最小化する引数の値が返される．
+  \param niter_max	最大繰り返し回数
+  \param tol		収束判定条件を表す閾値(更新量がこの値以下になれば収束と見なす)
+  \return		xの推定値の共分散行列
 */
 template <class F, class G, class AT> Matrix<typename F::value_type>
 minimizeSquare(const F& f, const G& g, AT& x,
@@ -252,85 +252,85 @@ minimizeSquare(const F& f, const G& g, AT& x,
 *  function minimizeSquareSparse					*
 *    -- Compute a and b st. sum||f(a, b[j])||^2 -> min under g(a) = 0.	*
 ************************************************************************/
-//! �^����ꂽ�x�N�g���l�֐���2��m������^����ꂽ�S�������̉��ōŏ���������������߂�D
+//! 与えられたベクトル値関数の2乗ノルムを与えられた拘束条件の下で最小化する引数を求める．
 /*!
-  �{�֐��́C\f$\TUvec{x}{} = [\TUtvec{a}{}, \TUtvec{b}{1},
-  \TUtvec{b}{2}, \ldots, \TUtvec{b}{J}]^\top\f$����͂Ƃ���2�̃x�N�g
-  ���֐�\f$\TUvec{f}{}(\TUvec{x}{}) = [\TUtvec{f}{1}(\TUvec{a}{},
+  本関数は，\f$\TUvec{x}{} = [\TUtvec{a}{}, \TUtvec{b}{1},
+  \TUtvec{b}{2}, \ldots, \TUtvec{b}{J}]^\top\f$を入力とする2つのベクト
+  ル関数\f$\TUvec{f}{}(\TUvec{x}{}) = [\TUtvec{f}{1}(\TUvec{a}{},
   \TUvec{b}{1}), \TUtvec{f}{2}(\TUvec{a}{}, \TUvec{b}{2}),\ldots,
   \TUtvec{f}{J}(\TUvec{a}{}, \TUvec{b}{J})]^\top\f$,
-  \f$\TUvec{g}{}(\TUvec{x}{})\f$����я����l\f$\TUvec{x}{0}\f$���^����
-  �ꂽ�Ƃ��C\f$\TUvec{g}{}(\TUvec{x}{}) = \TUvec{0}{}\f$�Ȃ�S���̂���
-  ��\f$\TUnorm{\TUvec{f}{}(\TUvec{x}{})}^2 \rightarrow \min\f$�Ƃ���
-  \f$\TUvec{x}{}\f$�����߂�D�X��\f$\TUvec{f}{j}(\cdot)\f$��
-  \f$\TUvec{a}{}\f$��\f$\TUvec{b}{j}\f$�݂̂Ɉˑ����C
-  \f$\TUvec{g}{}(\cdot)\f$��\f$\TUvec{a}{}\f$�݂̂Ɉˑ�����(���Ȃ킿
-  \f$\TUvec{g}{}(\TUvec{x}{}) = \TUvec{g}{}(\TUvec{a}{})\f$)���̂Ƃ���D
+  \f$\TUvec{g}{}(\TUvec{x}{})\f$および初期値\f$\TUvec{x}{0}\f$が与えら
+  れたとき，\f$\TUvec{g}{}(\TUvec{x}{}) = \TUvec{0}{}\f$なる拘束のもと
+  で\f$\TUnorm{\TUvec{f}{}(\TUvec{x}{})}^2 \rightarrow \min\f$とする
+  \f$\TUvec{x}{}\f$を求める．個々の\f$\TUvec{f}{j}(\cdot)\f$は
+  \f$\TUvec{a}{}\f$と\f$\TUvec{b}{j}\f$のみに依存し，
+  \f$\TUvec{g}{}(\cdot)\f$は\f$\TUvec{a}{}\f$のみに依存する(すなわち
+  \f$\TUvec{g}{}(\TUvec{x}{}) = \TUvec{g}{}(\TUvec{a}{})\f$)ものとする．
   
-  �e���v���[�g�p�����[�^ATA�́C�x�N�g���l�֐�f�̑�1��������эS�������֐�g��
-  ����a��\���^�ł���C�ȉ��̏����𖞂������ƁF
-  -# �������x�N�g����s��ł���ꍇ�C���̗v�f�̌^��
+  テンプレートパラメータATAは，ベクトル値関数fの第1引数および拘束条件関数gの
+  引数aを表す型であり，以下の条件を満たすこと：
+  -# 引数がベクトルや行列である場合，その要素の型を
 	ATA::value_type
-     �Ƃ������O��typedef���Ă���D
+     という名前でtypedefしている．
 
-  �e���v���[�g�p�����[�^IB�́C�X�̃x�N�g���l�֐�f_j�̑�2����b_j���w��
-  �����q��\���^�ł���C�ȉ��̏����𖞂������ƁF
+  テンプレートパラメータIBは，個々のベクトル値関数f_jの第2引数b_jを指す
+  反復子を表す型であり，以下の条件を満たすこと：
   -# iterator_traits<IB>::value_type
-     �ł��̔����q���w�������̌^(�ȉ��CATB�Ƃ���)��m�邱�Ƃ��ł���D
+     でこの反復子が指す引数の型(以下，ATBとする)を知ることができる．
 
-  �e���v���[�g�p�����[�^F�́CATA�^�̈���a��ATB�^�̈���b_j����͂���
-  �x�N�g���l���o�͂���֐���\���^�ł���C�ȉ��̏����𖞂������ƁF
-  -# �o�̓x�N�g���̗v�f�̌^��
+  テンプレートパラメータFは，ATA型の引数aとATB型の引数b_jを入力して
+  ベクトル値を出力する関数を表す型であり，以下の条件を満たすこと：
+  -# 出力ベクトルの要素の型を
 	F::value_type
-     �Ƃ������O��typedef���Ă���D
-  -# ���R�r�A���̌^��
+     という名前でtypedefしている．
+  -# ヤコビアンの型を
 	F::jacobian_type
-     �Ƃ������O��typedef���Ă���D
-  -# ATA�^�̈���a�������R�x��
+     という名前でtypedefしている．
+  -# ATA型の引数aが持つ自由度を
 	u_int	F::adim() const
-     �ɂ���Ēm�邱�Ƃ��ł���D
-  -# ����a��a_1, a_2,..., a_I�ɕ��������ꍇ�̊ea_i�������R�x��
+     によって知ることができる．
+  -# 引数aをa_1, a_2,..., a_Iに分割した場合の各a_iが持つ自由度を
 	const Array<u_int>&	F::adims() const;
-     �ɂ���Ēm�邱�Ƃ��ł���D���̔z��̗v�f�̑��a��
+     によって知ることができる．この配列の要素の総和は
 	F::adim()
-     �ɓ������Da�������ł��Ȃ��ꍇ����1�̔z�񂪕Ԃ���C���̗B��̗v�f�̒l��
+     に等しい．aが分割できない場合長さ1の配列が返され，その唯一の要素の値は
 	F::adim()
-     �ɓ������D
-  -# ����a, b_j��^�����Ƃ���f_j�̊֐��l�́C�����o�֐�
+     に等しい．
+  -# 引数a, b_jを与えたときのf_jの関数値は，メンバ関数
 	Vector<F:value_type>	F::operator ()(const ATA& a, const ATB& b, int j) const
-     �ɂ���ė^������D
-  -# ����a, b_j��^�����Ƃ���a�Ŕ����������R�r�A���́C�����o�֐�
+     によって与えられる．
+  -# 引数a, b_jを与えたときのaで微分したヤコビアンは，メンバ関数
 	F::jacobian_type	F::jacobianA(const ATA& a, const ATB& b, int j) const
-     �ɂ���ė^������D
-  -# �����o�֐�
+     によって与えられる．
+  -# メンバ関数
 	void	F::updateA(const ATA& a, const Vector<F::value_type>& da) const
-     �ɂ���Ĉ���a�������da�����X�V���邱�Ƃ��ł���D
-  -# �����o�֐�
+     によって引数aを微少量daだけ更新することができる．
+  -# メンバ関数
 	void	F::updateB(const ATB& b_j, const Vector<F::value_type>& db_j) const
-     �ɂ���Ĉ���b�������db_j�����X�V���邱�Ƃ��ł���D
+     によって引数bを微少量db_jだけ更新することができる．
 
-  �e���v���[�g�p�����[�^G�́CATA�^�̈�������͂��ăx�N�g���l���o�͂���֐���
-  �\���^�ł���C�ȉ��̏����𖞂������ƁF
-  -# �o�̓x�N�g���̗v�f�̌^��
+  テンプレートパラメータGは，ATA型の引数を入力してベクトル値を出力する関数を
+  表す型であり，以下の条件を満たすこと：
+  -# 出力ベクトルの要素の型を
 	G::value_type
-     �Ƃ������O��typedef���Ă���D
-  -# ����a��^�����Ƃ��̊֐��l�́C�����o�֐�
+     という名前でtypedefしている．
+  -# 引数aを与えたときの関数値は，メンバ関数
 	Vector<G:value_type>	G::operator ()(const ATA& a) const
-     �ɂ���ė^������D
-  -# ����a��^�����Ƃ��̃��R�r�A���́C�����o�֐�
+     によって与えられる．
+  -# 引数aを与えたときのヤコビアンは，メンバ関数
 	Matrix<G::value_type>	G::jacobian(const ATA& a) const
-     �ɂ���ė^������D
+     によって与えられる．
 
-  \param f		����2��m�������ŏ������ׂ��x�N�g���l�֐�
-  \param g		�S��������\���x�N�g���l�֐�
-  \param a		�ef_j�̑�1�����ł���C����g�̈����D�����l��^�����
-			�œK�����Ԃ����D
-  \param bbegin		�ef_j�ɗ^�����2�����̕��т̐擪���w�������q
-  \param bend		�ef_j�ɗ^�����2�����̕��т̖����̎����w�������q
-  \param niter_max	�ő�J��Ԃ���
-  \param tol		�������������\��臒l(�X�V�ʂ����̒l�ȉ��ɂȂ��
-			�����ƌ��Ȃ�)
-  \return		a, b_1, b_2,..., b_J�̐���l�̋����U�s��
+  \param f		その2乗ノルムを最小化すべきベクトル値関数
+  \param g		拘束条件を表すベクトル値関数
+  \param a		各f_jの第1引数であり，かつgの引数．初期値を与えると
+			最適解が返される．
+  \param bbegin		各f_jに与える第2引数の並びの先頭を指す反復子
+  \param bend		各f_jに与える第2引数の並びの末尾の次を指す反復子
+  \param niter_max	最大繰り返し回数
+  \param tol		収束判定条件を表す閾値(更新量がこの値以下になれば
+			収束と見なす)
+  \return		a, b_1, b_2,..., b_Jの推定値の共分散行列
 */
 template <class F, class G, class ATA, class IB> Matrix<typename F::value_type>
 minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,

@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera++.h,v 1.4 2012-08-15 07:17:55 ueshiba Exp $
+ *  $Id: Camera++.h,v 1.5 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Camera++.h
-  \brief	ƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚¨‚æ‚ÑƒJƒƒ‰©g‚ÉŠÖ‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	ã‚«ãƒ¡ãƒ©å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãŠã‚ˆã³ã‚«ãƒ¡ãƒ©è‡ªèº«ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUCameraPP_h
 #define __TUCameraPP_h
@@ -41,20 +41,20 @@ namespace TU
 /************************************************************************
 *  class IntrinsicBase<T>						*
 ************************************************************************/
-//! ‘S¬•ª‚ªŒÅ’è‚³‚ê‚½ƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚ğ•\‚·ƒNƒ‰ƒX
+//! å…¨æˆåˆ†ãŒå›ºå®šã•ã‚ŒãŸã‚«ãƒ¡ãƒ©å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class IntrinsicBase
 {
   public:
-  //! ”’lŒvZ‘S”Ê‚Ìƒx[ƒX‚Æ‚È‚éŒ^
+  //! æ•°å€¤è¨ˆç®—å…¨èˆ¬ã®ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹å‹
     typedef T						value_type;
-  //! 2ŸŒ³“_‚ÌŒ^
+  //! 2æ¬¡å…ƒç‚¹ã®å‹
     typedef Point2<value_type>				point2_type;
-  //! ƒxƒNƒgƒ‹‚ÌŒ^
+  //! ãƒ™ã‚¯ãƒˆãƒ«ã®å‹
     typedef Vector<value_type>				vector_type;
-  //! s—ñ‚ÌŒ^
+  //! è¡Œåˆ—ã®å‹
     typedef Matrix<value_type>				matrix_type;
-  //! 3x3s—ñ‚ÌŒ^
+  //! 3x3è¡Œåˆ—ã®å‹
     typedef Matrix<value_type, FixedSizedBuf<value_type, 9>,
 		   FixedSizedBuf<vector_type, 3> >	matrix33_type;
 
@@ -95,18 +95,18 @@ class IntrinsicBase
 			  matrix_type* J,matrix_type* H)	const	;
 
   protected:
-    value_type		_k;		//!< Å“_‹——£
-    point2_type		_u0;		//!< ‰æ‘œå“_
-    value_type		_k00;		//!< Å“_‹——£‚ÆƒAƒXƒyƒNƒg”ä‚ÌÏ
-    value_type		_k01;		//!< Å“_‹——£‚Æ”ñ’¼Œğ«˜c‚İ‚ÌÏ
+    value_type		_k;		//!< ç„¦ç‚¹è·é›¢
+    point2_type		_u0;		//!< ç”»åƒä¸»ç‚¹
+    value_type		_k00;		//!< ç„¦ç‚¹è·é›¢ã¨ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã®ç©
+    value_type		_k01;		//!< ç„¦ç‚¹è·é›¢ã¨éç›´äº¤æ€§æ­ªã¿ã®ç©
 };
     
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param k	Å“_‹——£
-  \param u0	‰æ‘œå“_
-  \param a	ƒAƒXƒyƒNƒg”ä
-  \param s	”ñ’¼Œğ«˜c‚İ
+  \param k	ç„¦ç‚¹è·é›¢
+  \param u0	ç”»åƒä¸»ç‚¹
+  \param a	ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+  \param s	éç›´äº¤æ€§æ­ªã¿
 */
 template <class T> inline
 IntrinsicBase<T>::IntrinsicBase(value_type k, const point2_type& u0,
@@ -115,10 +115,10 @@ IntrinsicBase<T>::IntrinsicBase(value_type k, const point2_type& u0,
 {
 }
 
-//! canonical‰æ‘œÀ•WŒn‚É‚¨‚¢‚Ä•\Œ»‚³‚ê‚½“Š‰e“_‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’u‚ğ‹‚ß‚éD
+//! canonicalç”»åƒåº§æ¨™ç³»ã«ãŠã„ã¦è¡¨ç¾ã•ã‚ŒãŸæŠ•å½±ç‚¹ã®ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹ä½ç½®ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \param x	canonical‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
-  \return	x‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚é2ŸŒ³ˆÊ’uC‚·‚È‚í‚¿
+  \param x	canonicalç”»åƒåº§æ¨™ã«ãŠã‘ã‚‹æŠ•å½±ç‚¹ã®2æ¬¡å…ƒä½ç½®
+  \return	xã®ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹2æ¬¡å…ƒä½ç½®ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{u}{} =
 		\TUbeginarray{cc} ak & sk \\ & k \TUendarray \TUvec{x}{}
@@ -131,10 +131,10 @@ IntrinsicBase<T>::u(const point2_type& x) const
     return point2_type(_k00*x[0] + _k01*x[1] + _u0[0], _k*x[1] + _u0[1]);
 }
     
-//! ‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u‚ğcanonical‰æ‘œÀ•WŒn‚É’¼‚·D
+//! ç”»åƒåº§æ¨™ã«ãŠã‘ã‚‹æŠ•å½±ç‚¹ã®2æ¬¡å…ƒä½ç½®ã‚’canonicalç”»åƒåº§æ¨™ç³»ã«ç›´ã™ï¼
 /*!
-  \param u	‰æ‘œÀ•WŒn‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
-  \return	canonical‰æ‘œÀ•WŒn‚É‚¨‚¯‚éu‚Ì2ŸŒ³ˆÊ’uC‚·‚È‚í‚¿
+  \param u	ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹æŠ•å½±ç‚¹ã®2æ¬¡å…ƒä½ç½®
+  \return	canonicalç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹uã®2æ¬¡å…ƒä½ç½®ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{x}{} =
 		\TUbeginarray{cc}
@@ -150,9 +150,9 @@ IntrinsicBase<T>::xFromU(const point2_type& u) const
 		       (u[1] - _u0[1]) / _k);
 }
     
-//! Å“_‹——£‚ğ•Ô‚·D
+//! ç„¦ç‚¹è·é›¢ã‚’è¿”ã™ï¼
 /*!
-  \return	Å“_‹——£
+  \return	ç„¦ç‚¹è·é›¢
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::k() const
@@ -160,9 +160,9 @@ IntrinsicBase<T>::k() const
     return _k;
 }
     
-//! ‰æ‘œå“_‚ğ•Ô‚·D
+//! ç”»åƒä¸»ç‚¹ã‚’è¿”ã™ï¼
 /*!
-  \return	‰æ‘œå“_
+  \return	ç”»åƒä¸»ç‚¹
 */
 template <class T>
 inline const typename IntrinsicBase<T>::point2_type&
@@ -171,9 +171,9 @@ IntrinsicBase<T>::u0() const
     return _u0;
 }
 
-//! ƒAƒXƒyƒNƒg”ä‚ğ•Ô‚·D
+//! ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒAƒXƒyƒNƒg”ä
+  \return	ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::aspect() const
@@ -181,9 +181,9 @@ IntrinsicBase<T>::aspect() const
     return _k00 / _k;
 }
     
-//! ”ñ’¼Œğ«˜c‚İ‚ğ•Ô‚·D
+//! éç›´äº¤æ€§æ­ªã¿ã‚’è¿”ã™ï¼
 /*!
-  \return	”ñ’¼Œğ«˜c‚İ
+  \return	éç›´äº¤æ€§æ­ªã¿
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::skew() const
@@ -191,9 +191,9 @@ IntrinsicBase<T>::skew() const
     return _k01 / _k;
 }
     
-//! •úË˜c‹È‚Ì‘æ1ŒW”‚ğ•Ô‚·D
+//! æ”¾å°„æ­ªæ›²ã®ç¬¬1ä¿‚æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	•úË˜c‹È‚Ì‘æ1ŒW”
+  \return	æ”¾å°„æ­ªæ›²ã®ç¬¬1ä¿‚æ•°
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::d1() const
@@ -201,9 +201,9 @@ IntrinsicBase<T>::d1() const
     return 0;
 }
     
-//! •úË˜c‹È‚Ì‘æ2ŒW”‚ğ•Ô‚·D
+//! æ”¾å°„æ­ªæ›²ã®ç¬¬2ä¿‚æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	•úË˜c‹È‚Ì‘æ2ŒW”
+  \return	æ”¾å°„æ­ªæ›²ã®ç¬¬2ä¿‚æ•°
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::d2() const
@@ -211,9 +211,9 @@ IntrinsicBase<T>::d2() const
     return 0;
 }
     
-//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚ğ•Ô‚·D
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñC‚·‚È‚í‚¿
+  \return	3x3å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{K}{} =
 		\TUbeginarray{ccc}
@@ -235,9 +235,9 @@ IntrinsicBase<T>::K() const
     return mat;
 }
 
-//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’u‚ğ•Ô‚·D
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ã®è»¢ç½®ã‚’è¿”ã™ï¼
 /*!
-  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’uC‚·‚È‚í‚¿
+  \return	3x3å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ã®è»¢ç½®ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUtvec{K}{} =
 		\TUbeginarray{ccc}
@@ -259,9 +259,9 @@ IntrinsicBase<T>::Kt() const
     return mat;
 }
 
-//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì‹ts—ñ‚ğ•Ô‚·D
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ã®é€†è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì‹ts—ñC‚·‚È‚í‚¿
+  \return	3x3å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ã®é€†è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUinv{K}{} =
 		\TUbeginarray{ccc}
@@ -284,9 +284,9 @@ IntrinsicBase<T>::Kinv() const
     return mat;
 }
 
-//! “à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’u‚Ì‹ts—ñ‚ğ•Ô‚·D
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ã®è»¢ç½®ã®é€†è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ‚Ì“]’u‚Ì‹ts—ñC‚·‚È‚í‚¿
+  \return	3x3å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—ã®è»¢ç½®ã®é€†è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUtinv{K}{} =
 		\TUbeginarray{ccc}
@@ -309,9 +309,9 @@ IntrinsicBase<T>::Ktinv() const
     return mat;
 }
 
-//! Å“_‹——£‚ğİ’è‚·‚éD
+//! ç„¦ç‚¹è·é›¢ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param k	Å“_‹——£
+  \param k	ç„¦ç‚¹è·é›¢
 */
 template <class T> inline void
 IntrinsicBase<T>::setFocalLength(value_type k)
@@ -321,9 +321,9 @@ IntrinsicBase<T>::setFocalLength(value_type k)
     _k = k;
 }
 
-//! ‰æ‘œå“_‚ğİ’è‚·‚éD
+//! ç”»åƒä¸»ç‚¹ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param u0	‰æ‘œå“_
+  \param u0	ç”»åƒä¸»ç‚¹
 */
 template <class T> inline void
 IntrinsicBase<T>::setPrincipal(const point2_type& u0)
@@ -331,9 +331,9 @@ IntrinsicBase<T>::setPrincipal(const point2_type& u0)
     _u0 = u0;
 }
 
-//! ƒAƒXƒyƒNƒg”ä‚ğİ’è‚·‚éD
+//! ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param a	ƒAƒXƒyƒNƒg”ä
+  \param a	ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
 */
 template <class T> inline void
 IntrinsicBase<T>::setAspect(value_type a)
@@ -341,9 +341,9 @@ IntrinsicBase<T>::setAspect(value_type a)
     _k00 = a * _k;
 }
     
-//! ”ñ’¼Œğ«˜c‚İ‚ğİ’è‚·‚éD
+//! éç›´äº¤æ€§æ­ªã¿ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param s	”ñ’¼Œğ«˜c‚İ
+  \param s	éç›´äº¤æ€§æ­ªã¿
 */
 template <class T> inline void
 IntrinsicBase<T>::setSkew(value_type s)
@@ -351,9 +351,9 @@ IntrinsicBase<T>::setSkew(value_type s)
     _k01 = s * _k;
 }
     
-//! •úË˜c‹ÈŒW”ˆÈŠO‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğİ’è‚·‚éD
+//! æ”¾å°„æ­ªæ›²ä¿‚æ•°ä»¥å¤–ã®å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param K	3x3“à•”ƒpƒ‰ƒ[ƒ^s—ñ
+  \param K	3x3å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¡Œåˆ—
 */
 template <class T> inline void
 IntrinsicBase<T>::setK(const matrix33_type& K)
@@ -364,9 +364,9 @@ IntrinsicBase<T>::setK(const matrix33_type& K)
     setSkew(K[0][1] / K[1][1]);
 }
 
-//! ‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
+//! å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦ã‚’è¿”ã™ï¼
 /*!
-  \return	‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x, ‚·‚È‚í‚¿0
+  \return	å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦, ã™ãªã‚ã¡0
 */
 template <class T> inline u_int
 IntrinsicBase<T>::dofIntrinsic()
@@ -374,19 +374,19 @@ IntrinsicBase<T>::dofIntrinsic()
     return 0;
 }
     
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
-  \param dp	XV—Ê‚ğ•\‚· dofIntrinsic() ŸŒ³ƒxƒNƒgƒ‹
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™ dofIntrinsic() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> inline void
 IntrinsicBase<T>::updateIntrinsic(const vector_type&)
 {
 }
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒJƒƒ‰‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã®å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> inline std::istream&
 IntrinsicBase<T>::get(std::istream& in)
@@ -397,10 +397,10 @@ IntrinsicBase<T>::get(std::istream& in)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒJƒƒ‰‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ã‚«ãƒ¡ãƒ©ã®å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> inline std::ostream&
 IntrinsicBase<T>::put(std::ostream& out) const
@@ -417,9 +417,9 @@ IntrinsicBase<T>::put(std::ostream& out) const
     return out << skew() << endl;
 }
 
-//! Å“_‹——£‚ÆƒAƒXƒyƒNƒg”ä‚ÌÏ‚ğ•Ô‚·D
+//! ç„¦ç‚¹è·é›¢ã¨ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã®ç©ã‚’è¿”ã™ï¼
 /*!
-  \return	Å“_‹——£‚ÆƒAƒXƒyƒNƒg”ä‚ÌÏ
+  \return	ç„¦ç‚¹è·é›¢ã¨ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã®ç©
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::k00() const
@@ -427,9 +427,9 @@ IntrinsicBase<T>::k00() const
     return _k00;
 }
     
-//! Å“_‹——£‚Æ”ñ’¼Œğ«˜c‚İ‚ÌÏ‚ğ•Ô‚·D
+//! ç„¦ç‚¹è·é›¢ã¨éç›´äº¤æ€§æ­ªã¿ã®ç©ã‚’è¿”ã™ï¼
 /*!
-  \return	Å“_‹——£‚Æ”ñ’¼Œğ«˜c‚İ‚ÌÏ
+  \return	ç„¦ç‚¹è·é›¢ã¨éç›´äº¤æ€§æ­ªã¿ã®ç©
 */
 template <class T> inline typename IntrinsicBase<T>::value_type
 IntrinsicBase<T>::k01() const
@@ -442,15 +442,15 @@ IntrinsicBase<T>::u(const point2_type& x, matrix_type* J, matrix_type* H) const
 {
     if (J)
     {
-      // [ŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é1ŠK”÷•ª]
-      //   (•úË˜c‹È‚ğ•t‰Á‚³‚ê‚½)canonical‰æ‘œÀ•WŒn‚©‚ç‰æ‘œÀ•WŒn‚É•ÏŠ·
+      // [å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹1éšå¾®åˆ†]
+      //   (æ”¾å°„æ­ªæ›²ã‚’ä»˜åŠ ã•ã‚ŒãŸ)canonicalç”»åƒåº§æ¨™ç³»ã‹ã‚‰ç”»åƒåº§æ¨™ç³»ã«å¤‰æ›
 	((*J)[0](0, 6) *= _k00) += _k01 * (*J)[1](0, 6);
 	(*J)[1](0, 6) *= _k;
 
 	if (H)
 	{
-	  // [ŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é2ŠK”÷•ª]
-	  //   (•úË˜c‹È‚ğ•t‰Á‚³‚ê‚½)canonical‰æ‘œÀ•WŒn‚©‚ç‰æ‘œÀ•WŒn‚É•ÏŠ·
+	  // [å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹2éšå¾®åˆ†]
+	  //   (æ”¾å°„æ­ªæ›²ã‚’ä»˜åŠ ã•ã‚ŒãŸ)canonicalç”»åƒåº§æ¨™ç³»ã‹ã‚‰ç”»åƒåº§æ¨™ç³»ã«å¤‰æ›
 	    (H[0](0, 0, 6, 6) *= _k00) += _k01 * H[1](0, 0, 6, 6);
 	    H[1](0, 0, 6, 6) *= _k;
 
@@ -465,7 +465,7 @@ IntrinsicBase<T>::u(const point2_type& x, matrix_type* J, matrix_type* H) const
 /************************************************************************
 *  class IntrinsicWithFocalLength<T>					*
 ************************************************************************/
-//! Å“_‹——£‚Ì‚İ‚ª‰Â•Ï‚ÈƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚ğ•\‚·ƒNƒ‰ƒX
+//! ç„¦ç‚¹è·é›¢ã®ã¿ãŒå¯å¤‰ãªã‚«ãƒ¡ãƒ©å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class IntrinsicWithFocalLength : public IntrinsicBase<T>
 {
@@ -492,12 +492,12 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
 			  matrix_type* J, matrix_type* H)	const	;
 };
 
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param k	Å“_‹——£
-  \param u0	‰æ‘œå“_
-  \param a	ƒAƒXƒyƒNƒg”ä
-  \param s	”ñ’¼Œğ«˜c‚İ
+  \param k	ç„¦ç‚¹è·é›¢
+  \param u0	ç”»åƒä¸»ç‚¹
+  \param a	ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+  \param s	éç›´äº¤æ€§æ­ªã¿
 */
 template <class T> inline
 IntrinsicWithFocalLength<T>::IntrinsicWithFocalLength(
@@ -506,9 +506,9 @@ IntrinsicWithFocalLength<T>::IntrinsicWithFocalLength(
 {
 }
 
-//! ‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
+//! å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦ã‚’è¿”ã™ï¼
 /*!
-  \return	‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x, ‚·‚È‚í‚¿1
+  \return	å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦, ã™ãªã‚ã¡1
 */
 template <class T> inline u_int
 IntrinsicWithFocalLength<T>::dofIntrinsic()
@@ -516,9 +516,9 @@ IntrinsicWithFocalLength<T>::dofIntrinsic()
     return 1;
 }
     
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
-  \param dp	XV—Ê‚ğ•\‚· dofIntrinsic() ŸŒ³ƒxƒNƒgƒ‹
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™ dofIntrinsic() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> inline void
 IntrinsicWithFocalLength<T>::updateIntrinsic(const vector_type& dp)
@@ -535,13 +535,13 @@ IntrinsicWithFocalLength<T>::u(const point2_type& x,
 {
     if (J)
     {
-      // Å“_‹——£‚ÉŠÖ‚·‚é1ŠK”÷•ª
+      // ç„¦ç‚¹è·é›¢ã«é–¢ã™ã‚‹1éšå¾®åˆ†
 	(*J)[0][6] = super::aspect() * x[0] + super::skew() * x[1];
 	(*J)[1][6] =					      x[1];
 
 	if (H)
 	{
-	  // Å“_‹——£‚ÆŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é2ŠK”÷•ª
+	  // ç„¦ç‚¹è·é›¢ã¨å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹2éšå¾®åˆ†
 	    H[0][6](0, 6) = super::aspect() * (*J)[0](0, 6)
 			  + super::skew()   * (*J)[1](0, 6);
 	    H[1][6](0, 6) =		      (*J)[1](0, 6);
@@ -554,7 +554,7 @@ IntrinsicWithFocalLength<T>::u(const point2_type& x,
 /************************************************************************
 *  class IntrinsicWithEuclideanImagePlane<T>				*
 ************************************************************************/
-//! Å“_‹——£‚Æ‰æ‘œå“_‚Ì‚İ‚ª‰Â•Ï‚ÈƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚ğ•\‚·ƒNƒ‰ƒX
+//! ç„¦ç‚¹è·é›¢ã¨ç”»åƒä¸»ç‚¹ã®ã¿ãŒå¯å¤‰ãªã‚«ãƒ¡ãƒ©å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
 {
@@ -581,12 +581,12 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
 			  matrix_type* J, matrix_type* H)	const	;
 };
 
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param k	Å“_‹——£
-  \param u0	‰æ‘œå“_
-  \param a	ƒAƒXƒyƒNƒg”ä
-  \param s	”ñ’¼Œğ«˜c‚İ
+  \param k	ç„¦ç‚¹è·é›¢
+  \param u0	ç”»åƒä¸»ç‚¹
+  \param a	ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+  \param s	éç›´äº¤æ€§æ­ªã¿
 */
 template <class T> inline
 IntrinsicWithEuclideanImagePlane<T>::IntrinsicWithEuclideanImagePlane(
@@ -595,9 +595,9 @@ IntrinsicWithEuclideanImagePlane<T>::IntrinsicWithEuclideanImagePlane(
 {
 }
 
-//! ‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
+//! å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦ã‚’è¿”ã™ï¼
 /*!
-  \return	‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x, ‚·‚È‚í‚¿3
+  \return	å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦, ã™ãªã‚ã¡3
 */
 template <class T> inline u_int
 IntrinsicWithEuclideanImagePlane<T>::dofIntrinsic()
@@ -605,9 +605,9 @@ IntrinsicWithEuclideanImagePlane<T>::dofIntrinsic()
     return super::dofIntrinsic() + 2;
 }
     
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
-  \param dp	XV—Ê‚ğ•\‚· dofIntrinsic() ŸŒ³ƒxƒNƒgƒ‹
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™ dofIntrinsic() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> inline void
 IntrinsicWithEuclideanImagePlane<T>::updateIntrinsic(const vector_type& dp)
@@ -624,7 +624,7 @@ IntrinsicWithEuclideanImagePlane<T>::u(const point2_type& x,
 {
     if (J)
     {
-      // [‰æ‘œå“_‚ÉŠÖ‚·‚é1ŠK”÷•ª]
+      // [ç”»åƒä¸»ç‚¹ã«é–¢ã™ã‚‹1éšå¾®åˆ†]
 	const u_int	j = 6 + super::dofIntrinsic();
 	(*J)[0][j] = (*J)[1][j+1] = 1;
     }
@@ -635,7 +635,7 @@ IntrinsicWithEuclideanImagePlane<T>::u(const point2_type& x,
 /************************************************************************
 *  class Intrinsic<T>							*
 ************************************************************************/
-//! •úË˜c‹ÈŒW”ˆÈŠO‚Ì‘Sƒpƒ‰ƒ[ƒ^‚ª‰Â•Ï‚ÈƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚ğ•\‚·ƒNƒ‰ƒX
+//! æ”¾å°„æ­ªæ›²ä¿‚æ•°ä»¥å¤–ã®å…¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãŒå¯å¤‰ãªã‚«ãƒ¡ãƒ©å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class Intrinsic : public IntrinsicBase<T>
 {
@@ -661,12 +661,12 @@ class Intrinsic : public IntrinsicBase<T>
 			  matrix_type* J, matrix_type* H)	const	;
 };
 
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param k	Å“_‹——£
-  \param u0	‰æ‘œå“_
-  \param a	ƒAƒXƒyƒNƒg”ä
-  \param s	”ñ’¼Œğ«˜c‚İ
+  \param k	ç„¦ç‚¹è·é›¢
+  \param u0	ç”»åƒä¸»ç‚¹
+  \param a	ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+  \param s	éç›´äº¤æ€§æ­ªã¿
 */
 template <class T> inline
 Intrinsic<T>::Intrinsic(value_type k, const point2_type& u0,
@@ -675,9 +675,9 @@ Intrinsic<T>::Intrinsic(value_type k, const point2_type& u0,
 {
 }
 
-//! ‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
+//! å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦ã‚’è¿”ã™ï¼
 /*!
-  \return	‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x, ‚·‚È‚í‚¿5
+  \return	å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦, ã™ãªã‚ã¡5
 */
 template <class T> inline u_int
 Intrinsic<T>::dofIntrinsic()
@@ -685,9 +685,9 @@ Intrinsic<T>::dofIntrinsic()
     return 5;
 }
     
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
-  \param dp	XV—Ê‚ğ•\‚· dofIntrinsic() ŸŒ³ƒxƒNƒgƒ‹
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™ dofIntrinsic() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> inline void
 Intrinsic<T>::updateIntrinsic(const vector_type& dp)
@@ -704,14 +704,14 @@ Intrinsic<T>::u(const point2_type& x, matrix_type* J, matrix_type* H) const
 {
     if (J)
     {
-      // [“à•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é1ŠK”÷•ª]
+      // [å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹1éšå¾®åˆ†]
 	(*J)[0][7]  = (*J)[1][8] = 1;
 	(*J)[0][9]		 = x[0];
 	(*J)[0][10] = (*J)[1][6] = x[1];
 
 	if (H)
 	{
-	  // [“à•”ƒpƒ‰ƒ[ƒ^‚ÆŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é2ŠK”÷•ª]
+	  // [å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¨å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹2éšå¾®åˆ†]
 	    H[0](9, 0, 2, 6) = (*J)(0, 0, 2, 6);
 	    H[1][6](0, 6)    = (*J)[1](0, 6);
 	}
@@ -723,7 +723,7 @@ Intrinsic<T>::u(const point2_type& x, matrix_type* J, matrix_type* H) const
 /************************************************************************
 *  class IntrinsicWithDistortion<I>					*
 ************************************************************************/
-//! •úË˜c‹ÈŒW”‚ğŠÜ‚Ş‘Sƒpƒ‰ƒ[ƒ^‚ª‰Â•Ï‚ÈƒJƒƒ‰“à•”ƒpƒ‰ƒ[ƒ^‚ğ•\‚·ƒNƒ‰ƒX
+//! æ”¾å°„æ­ªæ›²ä¿‚æ•°ã‚’å«ã‚€å…¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãŒå¯å¤‰ãªã‚«ãƒ¡ãƒ©å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class I>
 class IntrinsicWithDistortion : public I
 {
@@ -768,14 +768,14 @@ class IntrinsicWithDistortion : public I
     value_type		_d2;
 };
 
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param k	Å“_‹——£
-  \param u0	‰æ‘œå“_
-  \param a	ƒAƒXƒyƒNƒg”ä
-  \param s	”ñ’¼Œğ«˜c‚İ
-  \param d1	•úË˜c‹È‚Ì‘æ1ŒW”
-  \param d2	•úË˜c‹È‚Ì‘æ2ŒW”
+  \param k	ç„¦ç‚¹è·é›¢
+  \param u0	ç”»åƒä¸»ç‚¹
+  \param a	ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+  \param s	éç›´äº¤æ€§æ­ªã¿
+  \param d1	æ”¾å°„æ­ªæ›²ã®ç¬¬1ä¿‚æ•°
+  \param d2	æ”¾å°„æ­ªæ›²ã®ç¬¬2ä¿‚æ•°
 */
 template <class I> inline
 IntrinsicWithDistortion<I>::IntrinsicWithDistortion(
@@ -785,10 +785,10 @@ IntrinsicWithDistortion<I>::IntrinsicWithDistortion(
 {
 }
     
-//! canonical‰æ‘œÀ•WŒn‚É‚¨‚¢‚Ä•\Œ»‚³‚ê‚½“Š‰e“_‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’u‚ğ‹‚ß‚éD
+//! canonicalç”»åƒåº§æ¨™ç³»ã«ãŠã„ã¦è¡¨ç¾ã•ã‚ŒãŸæŠ•å½±ç‚¹ã®ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹ä½ç½®ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \param x	canonical‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
-  \return	x‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚é2ŸŒ³ˆÊ’uC‚·‚È‚í‚¿
+  \param x	canonicalç”»åƒåº§æ¨™ã«ãŠã‘ã‚‹æŠ•å½±ç‚¹ã®2æ¬¡å…ƒä½ç½®
+  \return	xã®ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹2æ¬¡å…ƒä½ç½®ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{u}{} =
 		\TUbeginarray{cc} ak & sk \\ & k \TUendarray \TUbreve{x}{}
@@ -803,10 +803,10 @@ IntrinsicWithDistortion<I>::u(const point2_type& x) const
     return super::u(xd(x));
 }
     
-//! canonicalÀ•WŒn‚É‚¨‚¢‚Ä•\Œ»‚³‚ê‚½“Š‰e“_‚É•úË˜c‹È‚ğ•t‰Á‚·‚éD
+//! canonicalåº§æ¨™ç³»ã«ãŠã„ã¦è¡¨ç¾ã•ã‚ŒãŸæŠ•å½±ç‚¹ã«æ”¾å°„æ­ªæ›²ã‚’ä»˜åŠ ã™ã‚‹ï¼
 /*!
-  \param x	canonical‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
-  \return	•úË˜c‹È•t‰ÁŒã‚ÌcanonicalÀ•WŒn‚É‚¨‚¯‚éˆÊ’uC‚·‚È‚í‚¿
+  \param x	canonicalç”»åƒåº§æ¨™ã«ãŠã‘ã‚‹æŠ•å½±ç‚¹ã®2æ¬¡å…ƒä½ç½®
+  \return	æ”¾å°„æ­ªæ›²ä»˜åŠ å¾Œã®canonicalåº§æ¨™ç³»ã«ãŠã‘ã‚‹ä½ç½®ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUbreve{x}{} = (1 + d_1 r^2 + d_2 r^4)\TUvec{x}{},~~
 		r = \TUnorm{\TUvec{x}{}}
@@ -820,10 +820,10 @@ IntrinsicWithDistortion<I>::xd(const point2_type& x) const
     return point2_type(tmp * x[0], tmp * x[1]);
 }
     
-//! ‰æ‘œÀ•W‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u‚ğcanonical‰æ‘œÀ•WŒn‚É’¼‚·D
+//! ç”»åƒåº§æ¨™ã«ãŠã‘ã‚‹æŠ•å½±ç‚¹ã®2æ¬¡å…ƒä½ç½®ã‚’canonicalç”»åƒåº§æ¨™ç³»ã«ç›´ã™ï¼
 /*!
-  \param u	‰æ‘œÀ•WŒn‚É‚¨‚¯‚é“Š‰e“_‚Ì2ŸŒ³ˆÊ’u
-  \return	canonical‰æ‘œƒJƒƒ‰À•WŒn‚É‚¨‚¯‚éu‚Ì2ŸŒ³ˆÊ’uC‚·‚È‚í‚¿
+  \param u	ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹æŠ•å½±ç‚¹ã®2æ¬¡å…ƒä½ç½®
+  \return	canonicalç”»åƒã‚«ãƒ¡ãƒ©åº§æ¨™ç³»ã«ãŠã‘ã‚‹uã®2æ¬¡å…ƒä½ç½®ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{x}{} =
 		(1 - d_1 \breve{r}^2 - d_2 \breve{r}^4)\TUbreve{x}{},~~
@@ -839,9 +839,9 @@ IntrinsicWithDistortion<I>::xFromU(const point2_type& u) const
     return point2_type(tmp * xd[0], tmp * xd[1]);
 }
     
-//! •úË˜c‹È‚Ì‘æ1ŒW”‚ğ•Ô‚·D
+//! æ”¾å°„æ­ªæ›²ã®ç¬¬1ä¿‚æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	•úË˜c‹È‚Ì‘æ1ŒW”
+  \return	æ”¾å°„æ­ªæ›²ã®ç¬¬1ä¿‚æ•°
 */
 template <class I> inline typename IntrinsicWithDistortion<I>::value_type
 IntrinsicWithDistortion<I>::d1() const
@@ -849,9 +849,9 @@ IntrinsicWithDistortion<I>::d1() const
     return _d1;
 }
     
-//! •úË˜c‹È‚Ì‘æ2ŒW”‚ğ•Ô‚·D
+//! æ”¾å°„æ­ªæ›²ã®ç¬¬2ä¿‚æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	•úË˜c‹È‚Ì‘æ2ŒW”
+  \return	æ”¾å°„æ­ªæ›²ã®ç¬¬2ä¿‚æ•°
 */
 template <class I> inline typename IntrinsicWithDistortion<I>::value_type
 IntrinsicWithDistortion<I>::d2() const
@@ -859,10 +859,10 @@ IntrinsicWithDistortion<I>::d2() const
     return _d2;
 }
     
-//! •úË˜c‹ÈŒW”‚ğİ’è‚·‚éD
+//! æ”¾å°„æ­ªæ›²ä¿‚æ•°ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param d1	•úË˜c‹È‚Ì‘æ1ŒW”
-  \param d2	•úË˜c‹È‚Ì‘æ2ŒW”
+  \param d1	æ”¾å°„æ­ªæ›²ã®ç¬¬1ä¿‚æ•°
+  \param d2	æ”¾å°„æ­ªæ›²ã®ç¬¬2ä¿‚æ•°
 */
 template <class I> inline void
 IntrinsicWithDistortion<I>::setDistortion(value_type d1, value_type d2)
@@ -871,9 +871,9 @@ IntrinsicWithDistortion<I>::setDistortion(value_type d1, value_type d2)
     _d2 = d2;
 }
     
-//! ‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
+//! å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦ã‚’è¿”ã™ï¼
 /*!
-  \return	‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x
+  \return	å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦
 */
 template <class I> inline u_int
 IntrinsicWithDistortion<I>::dofIntrinsic()
@@ -881,9 +881,9 @@ IntrinsicWithDistortion<I>::dofIntrinsic()
     return super::dofIntrinsic() + 2;
 }
     
-//! “à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
-  \param dp	XV—Ê‚ğ•\‚· dofIntrinsic() ŸŒ³ƒxƒNƒgƒ‹
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™ dofIntrinsic() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class I> inline void
 IntrinsicWithDistortion<I>::updateIntrinsic(const vector_type& dp)
@@ -894,10 +894,10 @@ IntrinsicWithDistortion<I>::updateIntrinsic(const vector_type& dp)
     _d2 -= dp[j + 1];
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒJƒƒ‰‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã®å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class I> inline std::istream&
 IntrinsicWithDistortion<I>::get(std::istream& in)
@@ -906,10 +906,10 @@ IntrinsicWithDistortion<I>::get(std::istream& in)
     return in >> _d1 >> _d2;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒJƒƒ‰‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ã‚«ãƒ¡ãƒ©ã®å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class I> inline std::ostream&
 IntrinsicWithDistortion<I>::put(std::ostream& out) const
@@ -929,7 +929,7 @@ IntrinsicWithDistortion<I>::u(const point2_type& x,
 {
     if (J)
     {
-      // [•úË˜c‹Èƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é1ŠK”÷•ª]
+      // [æ”¾å°„æ­ªæ›²ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹1éšå¾®åˆ†]
 	const value_type	sqr = x * x;
 	const u_int		i = 6 + super::dofIntrinsic();
 	(*J)[0][i]   = sqr * (super::k00() * x[0] + super::k01() * x[1]);
@@ -944,13 +944,13 @@ IntrinsicWithDistortion<I>::u(const point2_type& x,
 
 	if (H)
 	{
-	  // [ŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é2ŠK”÷•ª]
-	  //   canonicalÀ•WŒn‚©‚ç•úË˜c‹È‚ğ•t‰Á‚³‚ê‚½canonicalÀ•WŒn‚É•ÏŠ·
+	  // [å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹2éšå¾®åˆ†]
+	  //   canonicalåº§æ¨™ç³»ã‹ã‚‰æ”¾å°„æ­ªæ›²ã‚’ä»˜åŠ ã•ã‚ŒãŸcanonicalåº§æ¨™ç³»ã«å¤‰æ›
 	    const matrix_type&	tmp = Dxd[1][0] * H[0](0, 0, 6, 6);
 	    (H[0](0, 0, 6, 6) *= Dxd[0][0]) += Dxd[0][1] * H[1](0, 0, 6, 6);
 	    (H[1](0, 0, 6, 6) *= Dxd[1][1]) += tmp;
 
-	  // [•úË˜c‹È‚ÆŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é2ŠK”÷•ª]
+	  // [æ”¾å°„æ­ªæ›²ã¨å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹2éšå¾®åˆ†]
 	    matrix_type	DDxd(2, 2);
 	    DDxd[0][0] = 2*x[0]*x[0] + sqr;
 	    DDxd[0][1] = 2*x[0]*x[1];
@@ -965,7 +965,7 @@ IntrinsicWithDistortion<I>::u(const point2_type& x,
 			     * (*J)(0, 0, 2, 6);
 	    H[1](i, 0, 2, 6) = (super::k() * DDyd) * (*J)(0, 0, 2, 6);
 
-	  // [•úË˜c‹È‚Æ“à•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é2ŠK”÷•ª]
+	  // [æ”¾å°„æ­ªæ›²ã¨å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹2éšå¾®åˆ†]
 	    (H[0][i  ](6, super::dofIntrinsic()) = DDu(x)) *= sqr;
 	    (H[0][i+1](6, super::dofIntrinsic()) =
 	     H[0][i  ](6, super::dofIntrinsic())	 ) *= sqr;
@@ -973,8 +973,8 @@ IntrinsicWithDistortion<I>::u(const point2_type& x,
 	    H[1][i+1][6] = sqr * H[1][i][6];
 	}
 
-      // [ŠO•”ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚é1ŠK”÷•ª]
-      //   canonicalÀ•WŒn‚©‚ç•úË˜c‹È‚ğ•t‰Á‚³‚ê‚½canonicalÀ•WŒn‚É•ÏŠ·
+      // [å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹1éšå¾®åˆ†]
+      //   canonicalåº§æ¨™ç³»ã‹ã‚‰æ”¾å°„æ­ªæ›²ã‚’ä»˜åŠ ã•ã‚ŒãŸcanonicalåº§æ¨™ç³»ã«å¤‰æ›
 	(*J)(0, 0, 2, 6) = Dxd * (*J)(0, 0, 2, 6);
     }
     
@@ -1013,25 +1013,25 @@ IntrinsicWithDistortion<Intrinsic<double> >::DDu(const point2_type& x) const
 /************************************************************************
 *  class CanonicalCamera<T>						*
 ************************************************************************/
-//! ‚·‚×‚Ä‚Ì“à•”ƒpƒ‰ƒ[ƒ^‚ª•W€Šù’è’l(Å“_‹——£‚ÆƒAƒXƒyƒNƒg”ä‚ª1, ”ñ’¼Œğ«˜c‚İ‚Æ•úË˜c‹ÈŒW”‚ª0, ‰æ‘œå“_‚ªŒ´“_‚Éˆê’v)‚Æ‚È‚é“§‹“Š‰eƒJƒƒ‰‚ğ•\‚·ƒNƒ‰ƒX
+//! ã™ã¹ã¦ã®å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãŒæ¨™æº–æ—¢å®šå€¤(ç„¦ç‚¹è·é›¢ã¨ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ãŒ1, éç›´äº¤æ€§æ­ªã¿ã¨æ”¾å°„æ­ªæ›²ä¿‚æ•°ãŒ0, ç”»åƒä¸»ç‚¹ãŒåŸç‚¹ã«ä¸€è‡´)ã¨ãªã‚‹é€è¦–æŠ•å½±ã‚«ãƒ¡ãƒ©ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class T>
 class CanonicalCamera
 {
   public:
-  //! ”’lŒvZ‘S”Ê‚Ìƒx[ƒX‚Æ‚È‚éŒ^
+  //! æ•°å€¤è¨ˆç®—å…¨èˆ¬ã®ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹å‹
     typedef T						value_type;
-  //! 2ŸŒ³“_‚ÌŒ^
+  //! 2æ¬¡å…ƒç‚¹ã®å‹
     typedef Point2<value_type>				point2_type;
-  //! 3ŸŒ³“_‚ÌŒ^
+  //! 3æ¬¡å…ƒç‚¹ã®å‹
     typedef Point3<value_type>				point3_type;
-  //! ƒxƒNƒgƒ‹‚ÌŒ^
+  //! ãƒ™ã‚¯ãƒˆãƒ«ã®å‹
     typedef Vector<value_type>				vector_type;
-  //! s—ñ‚ÌŒ^
+  //! è¡Œåˆ—ã®å‹
     typedef Matrix<value_type>				matrix_type;
-  //! 3x3s—ñ‚ÌŒ^
+  //! 3x3è¡Œåˆ—ã®å‹
     typedef Matrix<value_type, FixedSizedBuf<value_type, 9>,
 		   FixedSizedBuf<vector_type, 3> >	matrix33_type;
-  //! 3x4s—ñ‚ÌŒ^
+  //! 3x4è¡Œåˆ—ã®å‹
     typedef Matrix<value_type, FixedSizedBuf<value_type, 12>,
 		   FixedSizedBuf<vector_type, 3> >	matrix34_type;
 
@@ -1056,14 +1056,14 @@ class CanonicalCamera
     std::ostream&	put(std::ostream& out)			const	;
 
   private:
-    point3_type		_t;			//!< ƒJƒƒ‰‚Ì“Š‰e’†S
-    matrix33_type	_Rt;			//!< ƒJƒƒ‰‚Ì‰ñ“]
+    point3_type		_t;			//!< ã‚«ãƒ¡ãƒ©ã®æŠ•å½±ä¸­å¿ƒ
+    matrix33_type	_Rt;			//!< ã‚«ãƒ¡ãƒ©ã®å›è»¢
 };
 
-//! ˆÊ’u‚Æp¨‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! ä½ç½®ã¨å§¿å‹¢ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param t	ƒJƒƒ‰ˆÊ’u‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹
-  \param Rt	ƒJƒƒ‰p¨‚ğ•\‚·3x3‰ñ“]s—ñ
+  \param t	ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’è¡¨ã™3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+  \param Rt	ã‚«ãƒ¡ãƒ©å§¿å‹¢ã‚’è¡¨ã™3x3å›è»¢è¡Œåˆ—
 */
 template <class T> inline
 CanonicalCamera<T>::CanonicalCamera(const point3_type& t,
@@ -1072,20 +1072,20 @@ CanonicalCamera<T>::CanonicalCamera(const point3_type& t,
 {
 }
 
-//! 3ŸŒ³‹óŠÔ’†‚Ì“_‚Ì“Š‰e“_‚Ìcanonical‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’u‚ğ‹‚ß‚éD
+//! 3æ¬¡å…ƒç©ºé–“ä¸­ã®ç‚¹ã®æŠ•å½±ç‚¹ã®canonicalç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹ä½ç½®ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \param X	‘ÎÛ“_‚Ì3ŸŒ³ˆÊ’u
-  \param J	0‚Å‚È‚¯‚ê‚ÎƒJƒƒ‰‚ÌˆÊ’uEp¨‚ÉŠÖ‚·‚é“Š‰e“_‚Ì1ŠK”÷•ªC
-		‚·‚È‚í‚¿2x6ƒ„ƒRƒrs—ñ
+  \param X	å¯¾è±¡ç‚¹ã®3æ¬¡å…ƒä½ç½®
+  \param J	0ã§ãªã‘ã‚Œã°ã‚«ãƒ¡ãƒ©ã®ä½ç½®ãƒ»å§¿å‹¢ã«é–¢ã™ã‚‹æŠ•å½±ç‚¹ã®1éšå¾®åˆ†ï¼Œ
+		ã™ãªã‚ã¡2x6ãƒ¤ã‚³ãƒ“è¡Œåˆ—
 		\f$
 		\TUbeginarray{cc}
 		\TUdisppartial{\TUvec{x}{}}{\TUvec{t}{}} &
 		\TUdisppartial{\TUvec{x}{}}{\TUvec{\theta}{}}
 		\TUendarray
 		\f$
-		‚ª•Ô‚³‚ê‚é
-  \param H	0‚Å‚È‚¯‚ê‚ÎƒJƒƒ‰‚ÌˆÊ’uEp¨‚ÉŠÖ‚·‚é“Š‰e“_‚Ì2ŠK”÷•ªC
-		‚·‚È‚í‚¿2‚Â‚Ì6x6ƒwƒbƒZs—ñ
+		ãŒè¿”ã•ã‚Œã‚‹
+  \param H	0ã§ãªã‘ã‚Œã°ã‚«ãƒ¡ãƒ©ã®ä½ç½®ãƒ»å§¿å‹¢ã«é–¢ã™ã‚‹æŠ•å½±ç‚¹ã®2éšå¾®åˆ†ï¼Œ
+		ã™ãªã‚ã¡2ã¤ã®6x6ãƒ˜ãƒƒã‚»è¡Œåˆ—
 		\f$
 		\TUbeginarray{cc}
 		\frac{\partial^2 x}{\partial\TUvec{t}{}^2} &
@@ -1106,8 +1106,8 @@ CanonicalCamera<T>::CanonicalCamera(const point3_type& t,
 		\frac{\partial^2 y}{\partial\TUvec{\theta}{}^2}
 		\TUendarray
 		\f$
-		‚ª•Ô‚³‚ê‚é
-  \return	canonical‰æ‘œÀ•WŒn‚É‚¨‚¯‚éx‚Ì“Š‰e“_‚ÌˆÊ’uC‚·‚È‚í‚¿
+		ãŒè¿”ã•ã‚Œã‚‹
+  \return	canonicalç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹xã®æŠ•å½±ç‚¹ã®ä½ç½®ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{x}{} = 
 		\frac{1}{\TUtvec{r}{z}(\TUvec{X}{} - \TUvec{t}{})}
@@ -1127,23 +1127,23 @@ CanonicalCamera<T>::x(const point3_type& X,
     const vector_type&	Xc = _Rt * dX;
     point2_type		x(Xc[0] / Xc[2], Xc[1] / Xc[2]);
 
-    if (J)	// ƒ„ƒRƒrs—ñ‚ğŒvZ‚·‚é‚È‚ç...
+    if (J)	// ãƒ¤ã‚³ãƒ“è¡Œåˆ—ã‚’è¨ˆç®—ã™ã‚‹ãªã‚‰...
     {
 	if (J->nrow() < 2 || J->ncol() < 6)
-	    J->resize(2, 6);				// ƒ„ƒRƒrs—ñ‚Í2x6
+	    J->resize(2, 6);				// ãƒ¤ã‚³ãƒ“è¡Œåˆ—ã¯2x6
 	
 	for (int n = 0; n < 2; ++n)
 	{
 	    vector_type	Dx = (*J)[n](0, 3);
 	    
-	    (((Dx = _Rt[2]) *= x[n]) -= _Rt[n]) /= Xc[2];  // ˆÊ’u‚ÉŠÖ‚·‚é”÷•ª
-	    (*J)[n](3, 3) = Dx ^ dX;			   // ‰ñ“]‚ÉŠÖ‚·‚é”÷•ª
+	    (((Dx = _Rt[2]) *= x[n]) -= _Rt[n]) /= Xc[2];  // ä½ç½®ã«é–¢ã™ã‚‹å¾®åˆ†
+	    (*J)[n](3, 3) = Dx ^ dX;			   // å›è»¢ã«é–¢ã™ã‚‹å¾®åˆ†
 	
-	    if (H)	// ƒwƒbƒZs—ñ‚ğŒvZ‚·‚é‚È‚ç...
+	    if (H)	// ãƒ˜ãƒƒã‚»è¡Œåˆ—ã‚’è¨ˆç®—ã™ã‚‹ãªã‚‰...
 	    {
-		matrix_type&	HH = H[n];		// ‘æn²‚ÌƒwƒbƒZs—ñ
+		matrix_type&	HH = H[n];		// ç¬¬nè»¸ã®ãƒ˜ãƒƒã‚»è¡Œåˆ—
 		if (HH.nrow() < 6 || HH.ncol() < 6)
-		    HH.resize(6, 6);			// ƒwƒbƒZs—ñ‚Í6x6
+		    HH.resize(6, 6);			// ãƒ˜ãƒƒã‚»è¡Œåˆ—ã¯6x6
 
 		(HH(0, 0, 3, 3) = _Rt[2] % Dx + Dx % _Rt[2]) /= Xc[2];
 		HH(0, 3, 3, 3) = Dx.skew() + HH(0, 0, 3, 3) ^ dX;
@@ -1157,9 +1157,9 @@ CanonicalCamera<T>::x(const point3_type& X,
     return x;
 }
 
-//! 3ŸŒ³ƒ†[ƒNƒŠƒbƒh‹óŠÔ‚©‚çcanonical‰æ‘œ•½–Ê‚Ö‚Ì“Š‰es—ñ‚ğ‹‚ß‚éD
+//! 3æ¬¡å…ƒãƒ¦ãƒ¼ã‚¯ãƒªãƒƒãƒ‰ç©ºé–“ã‹ã‚‰canonicalç”»åƒå¹³é¢ã¸ã®æŠ•å½±è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \return	canonical‰æ‘œ•½–Ê‚Ö‚Ì“Š‰es—ñC‚·‚È‚í‚¿
+  \return	canonicalç”»åƒå¹³é¢ã¸ã®æŠ•å½±è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{P}{c} = \TUtvec{R}{}
 		\TUbeginarray{cc}
@@ -1179,9 +1179,9 @@ CanonicalCamera<T>::Pc() const
     return P;
 }
 
-//! ƒJƒƒ‰‚ÌˆÊ’u‚ğ•Ô‚·D
+//! ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒJƒƒ‰‚Ì3ŸŒ³ˆÊ’u
+  \return	ã‚«ãƒ¡ãƒ©ã®3æ¬¡å…ƒä½ç½®
 */
 template <class T> inline const typename CanonicalCamera<T>::point3_type&
 CanonicalCamera<T>::t() const
@@ -1189,9 +1189,9 @@ CanonicalCamera<T>::t() const
     return _t;
 }
 
-//! ƒJƒƒ‰‚Ìp¨‚ğ•Ô‚·D
+//! ã‚«ãƒ¡ãƒ©ã®å§¿å‹¢ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒJƒƒ‰‚Ìp¨‚ğ•\‚·3x3‰ñ“]s—ñ
+  \return	ã‚«ãƒ¡ãƒ©ã®å§¿å‹¢ã‚’è¡¨ã™3x3å›è»¢è¡Œåˆ—
 */
 template <class T> inline const typename CanonicalCamera<T>::matrix33_type&
 CanonicalCamera<T>::Rt() const
@@ -1199,10 +1199,10 @@ CanonicalCamera<T>::Rt() const
     return _Rt;
 }
     
-//! ƒJƒƒ‰‚ÌˆÊ’u‚ğİ’è‚·‚éD
+//! ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param t	ƒJƒƒ‰‚Ì3ŸŒ³ˆÊ’u
-  \return	‚±‚ÌƒJƒƒ‰
+  \param t	ã‚«ãƒ¡ãƒ©ã®3æ¬¡å…ƒä½ç½®
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©
 */
 template <class T> inline void
 CanonicalCamera<T>::setTranslation(const point3_type& t)
@@ -1210,10 +1210,10 @@ CanonicalCamera<T>::setTranslation(const point3_type& t)
     _t = t;
 }
 
-//! ƒJƒƒ‰‚Ìp¨‚ğİ’è‚·‚éD
+//! ã‚«ãƒ¡ãƒ©ã®å§¿å‹¢ã‚’è¨­å®šã™ã‚‹ï¼
 /*!
-  \param Rt	ƒJƒƒ‰‚Ìp¨‚ğ•\‚·3x3‰ñ“]s—ñ
-  \return	‚±‚ÌƒJƒƒ‰
+  \param Rt	ã‚«ãƒ¡ãƒ©ã®å§¿å‹¢ã‚’è¡¨ã™3x3å›è»¢è¡Œåˆ—
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©
 */
 template <class T> inline void
 CanonicalCamera<T>::setRotation(const matrix33_type& Rt)
@@ -1221,9 +1221,9 @@ CanonicalCamera<T>::setRotation(const matrix33_type& Rt)
     _Rt = Rt;
 }
 
-//! ƒJƒƒ‰ŠO•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
+//! ã‚«ãƒ¡ãƒ©å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦ã‚’è¿”ã™ï¼
 /*!
-  \return	ŠO•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x, ‚·‚È‚í‚¿6
+  \return	å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦, ã™ãªã‚ã¡6
 */
 template <class T> inline u_int
 CanonicalCamera<T>::dof()
@@ -1231,17 +1231,17 @@ CanonicalCamera<T>::dof()
     return 6;
 }
     
-//! ƒJƒƒ‰‚ÌŠO•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
   \f$\Delta\TUvec{p}{} =
-  [\Delta\TUtvec{t}{},~\Delta\TUtvec{\theta}{}]^\top\f$‚É‘Î‚µ‚Ä
+  [\Delta\TUtvec{t}{},~\Delta\TUtvec{\theta}{}]^\top\f$ã«å¯¾ã—ã¦
   \f{eqnarray*}
   \TUvec{t}{} & \leftarrow & \TUvec{t}{} - \Delta\TUvec{t}{} \\
   \TUtvec{R}{} & \leftarrow &
   \TUtvec{R}{}\TUtvec{R}{}(\Delta\TUvec{\theta}{})
   \f}
-  ‚ÆXV‚·‚éD
-  \param dp	XV—Ê‚ğ•\‚·6ŸŒ³ƒxƒNƒgƒ‹
+  ã¨æ›´æ–°ã™ã‚‹ï¼
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™6æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> inline void
 CanonicalCamera<T>::update(const vector_type& dp)
@@ -1250,14 +1250,14 @@ CanonicalCamera<T>::update(const vector_type& dp)
     updateFCC(dp(3, dp.dim() - 3));
 }
     
-//! ƒJƒƒ‰‚Ìp¨‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! ã‚«ãƒ¡ãƒ©ã®å§¿å‹¢ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
-  \f$\Delta\TUvec{p}{} = \Delta\TUvec{\theta}{}\f$‚É‘Î‚µ‚Ä
+  \f$\Delta\TUvec{p}{} = \Delta\TUvec{\theta}{}\f$ã«å¯¾ã—ã¦
   \f[
   \TUtvec{R}{} \leftarrow \TUtvec{R}{}\TUtvec{R}{}(\Delta\TUvec{\theta}{})
   \f]
-  ‚ÆXV‚·‚éDƒJƒƒ‰‚ÌˆÊ’u‚ÍXV‚³‚ê‚È‚¢D
-  \param dp	XV—Ê‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹
+  ã¨æ›´æ–°ã™ã‚‹ï¼ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã¯æ›´æ–°ã•ã‚Œãªã„ï¼
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> inline void
 CanonicalCamera<T>::updateFCC(const vector_type& dp)
@@ -1265,10 +1265,10 @@ CanonicalCamera<T>::updateFCC(const vector_type& dp)
     _Rt *= matrix_type::Rt(dp(0, 3));
 }
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒJƒƒ‰‚ÌŠO•”ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> inline std::istream&
 CanonicalCamera<T>::get(std::istream& in)
@@ -1283,10 +1283,10 @@ CanonicalCamera<T>::get(std::istream& in)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒJƒƒ‰‚ÌŠO•”ƒpƒ‰ƒ[ƒ^‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> inline std::ostream&
 CanonicalCamera<T>::put(std::ostream& out) const
@@ -1302,11 +1302,11 @@ CanonicalCamera<T>::put(std::ostream& out) const
     return out;
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒJƒƒ‰‚ÌŠO•”ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param camera	ŠO•”ƒpƒ‰ƒ[ƒ^‚Ì“Ç‚İ‚İæ
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param camera	å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿å…ˆ
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> inline std::istream&
 operator >>(std::istream& in, CanonicalCamera<T>& camera)
@@ -1314,11 +1314,11 @@ operator >>(std::istream& in, CanonicalCamera<T>& camera)
     return camera.get(in);
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒJƒƒ‰‚ÌŠO•”ƒpƒ‰ƒ[ƒ^‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param camera	ŠO•”ƒpƒ‰ƒ[ƒ^‚Ì‘‚«o‚µŒ³
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param camera	å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®æ›¸ãå‡ºã—å…ƒ
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T> inline std::ostream&
 operator <<(std::ostream& out, const CanonicalCamera<T>& camera)
@@ -1329,12 +1329,12 @@ operator <<(std::ostream& out, const CanonicalCamera<T>& camera)
 /************************************************************************
 *  class Camera<I>							*
 ************************************************************************/
-//! “§‹“Š‰eƒJƒƒ‰‚ğ•\‚·ƒNƒ‰ƒX
+//! é€è¦–æŠ•å½±ã‚«ãƒ¡ãƒ©ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 template <class I>
 class Camera : public CanonicalCamera<typename I::value_type>, public I
 {
   public:
-  //! ŠO•”ƒpƒ‰ƒ[ƒ^‚ÌŒ^
+  //! å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®å‹
     typedef CanonicalCamera<typename I::value_type>	extrinsic_type;
     typedef typename extrinsic_type::value_type		value_type;
     typedef typename extrinsic_type::point2_type	point2_type;
@@ -1343,7 +1343,7 @@ class Camera : public CanonicalCamera<typename I::value_type>, public I
     typedef typename extrinsic_type::matrix_type	matrix_type;
     typedef typename extrinsic_type::matrix33_type	matrix33_type;
     typedef typename extrinsic_type::matrix34_type	matrix34_type;
-  //! “à•”ƒpƒ‰ƒ[ƒ^‚ÌŒ^
+  //! å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®å‹
     typedef I						intrinsic_type;
     
   public:
@@ -1368,11 +1368,11 @@ class Camera : public CanonicalCamera<typename I::value_type>, public I
     std::ostream&	put(std::ostream& out)			const	;
 };
 
-//! ˆÊ’u‚Æp¨‚¨‚æ‚Ñ“à•”ƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! ä½ç½®ã¨å§¿å‹¢ãŠã‚ˆã³å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param t		ƒJƒƒ‰ˆÊ’u‚ğ•\‚·3ŸŒ³ƒxƒNƒgƒ‹
-  \param Rt		ƒJƒƒ‰p¨‚ğ•\‚·3x3‰ñ“]s—ñ
-  \param intrinsic	“à•”ƒpƒ‰ƒ[ƒ^
+  \param t		ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’è¡¨ã™3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+  \param Rt		ã‚«ãƒ¡ãƒ©å§¿å‹¢ã‚’è¡¨ã™3x3å›è»¢è¡Œåˆ—
+  \param intrinsic	å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 template <class I> inline
 Camera<I>::Camera(const point3_type& t, const matrix33_type& Rt,
@@ -1381,10 +1381,10 @@ Camera<I>::Camera(const point3_type& t, const matrix33_type& Rt,
 {
 }
 
-//! ŠO•”ƒpƒ‰ƒ[ƒ^‚Æ“à•”ƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¨å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param extrinsic	ŠO•”ƒpƒ‰ƒ[ƒ^
-  \param intrinsic	“à•”ƒpƒ‰ƒ[ƒ^
+  \param extrinsic	å¤–éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  \param intrinsic	å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 template <class I> inline
 Camera<I>::Camera(const extrinsic_type& extrinsic,
@@ -1393,9 +1393,9 @@ Camera<I>::Camera(const extrinsic_type& extrinsic,
 {
 }
 
-//! “Š‰es—ñ‚ğƒZƒbƒg‚µ‚Ä‰Šú‰»‚·‚éD
+//! æŠ•å½±è¡Œåˆ—ã‚’ã‚»ãƒƒãƒˆã—ã¦åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param P	3x4“Š‰es—ñ
+  \param P	3x4æŠ•å½±è¡Œåˆ—
 */
 template <class I> inline
 Camera<I>::Camera(const matrix34_type& P)
@@ -1404,12 +1404,12 @@ Camera<I>::Camera(const matrix34_type& P)
     setProjection(P);
 }
 
-//! 3ŸŒ³‹óŠÔ’†‚Ì“_‚Ì“Š‰e“_‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’u‚ğ‹‚ß‚éD
+//! 3æ¬¡å…ƒç©ºé–“ä¸­ã®ç‚¹ã®æŠ•å½±ç‚¹ã®ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹ä½ç½®ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \param X	‘ÎÛ“_‚Ì3ŸŒ³ˆÊ’u
-  \param J	0‚Å‚È‚¯‚ê‚ÎƒJƒƒ‰‚ÌˆÊ’uEp¨‚¨‚æ‚Ñ“à•”ƒpƒ‰ƒƒ^[‚ÉŠÖ‚·‚é
-		“Š‰e“_‚Ì1ŠK”÷•ªC
-		‚·‚È‚í‚¿2 x dof() ƒ„ƒRƒrs—ñ
+  \param X	å¯¾è±¡ç‚¹ã®3æ¬¡å…ƒä½ç½®
+  \param J	0ã§ãªã‘ã‚Œã°ã‚«ãƒ¡ãƒ©ã®ä½ç½®ãƒ»å§¿å‹¢ãŠã‚ˆã³å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ã‚¿ãƒ¼ã«é–¢ã™ã‚‹
+		æŠ•å½±ç‚¹ã®1éšå¾®åˆ†ï¼Œ
+		ã™ãªã‚ã¡2 x dof() ãƒ¤ã‚³ãƒ“è¡Œåˆ—
 		\f$
 		\TUbeginarray{ccc}
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{t}{}} &
@@ -1417,9 +1417,9 @@ Camera<I>::Camera(const matrix34_type& P)
 		\TUdisppartial{\TUvec{u}{}}{\TUvec{\kappa}{}}
 		\TUendarray
 		\f$
-		‚ª•Ô‚³‚ê‚é
-  \param H	0‚Å‚È‚¯‚ê‚ÎƒJƒƒ‰‚ÌˆÊ’uEp¨‚ÉŠÖ‚·‚é“Š‰e“_‚Ì2ŠK”÷•ªC
-		‚·‚È‚í‚¿2‚Â‚Ì dof() x dof() ƒwƒbƒZs—ñ
+		ãŒè¿”ã•ã‚Œã‚‹
+  \param H	0ã§ãªã‘ã‚Œã°ã‚«ãƒ¡ãƒ©ã®ä½ç½®ãƒ»å§¿å‹¢ã«é–¢ã™ã‚‹æŠ•å½±ç‚¹ã®2éšå¾®åˆ†ï¼Œ
+		ã™ãªã‚ã¡2ã¤ã® dof() x dof() ãƒ˜ãƒƒã‚»è¡Œåˆ—
 		\f$
 		\TUbeginarray{ccc}
 		\frac{\partial^2 u}{\partial\TUvec{t}{}^2} &
@@ -1458,8 +1458,8 @@ Camera<I>::Camera(const matrix34_type& P)
 		\TUvec{O}{}
 		\TUendarray
 		\f$
-		‚ª•Ô‚³‚ê‚é
-  \return	X‚Ì“Š‰e“_‚Ì‰æ‘œÀ•WŒn‚É‚¨‚¯‚éˆÊ’u
+		ãŒè¿”ã•ã‚Œã‚‹
+  \return	Xã®æŠ•å½±ç‚¹ã®ç”»åƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹ä½ç½®
 */
 template <class I> typename Camera<I>::point2_type
 Camera<I>::operator ()(const point3_type& X,
@@ -1479,9 +1479,9 @@ Camera<I>::operator ()(const point3_type& X,
     return intrinsic_type::u(extrinsic_type::x(X, J, H), J, H);
 }
 
-//! 3ŸŒ³ƒ†[ƒNƒŠƒbƒh‹óŠÔ‚©‚ç‰æ‘œ•½–Ê‚Ö‚Ì“Š‰es—ñ‚ğ‹‚ß‚éD
+//! 3æ¬¡å…ƒãƒ¦ãƒ¼ã‚¯ãƒªãƒƒãƒ‰ç©ºé–“ã‹ã‚‰ç”»åƒå¹³é¢ã¸ã®æŠ•å½±è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \return	‰æ‘œ•½–Ê‚Ö‚Ì“Š‰es—ñC‚·‚È‚í‚¿
+  \return	ç”»åƒå¹³é¢ã¸ã®æŠ•å½±è¡Œåˆ—ï¼Œã™ãªã‚ã¡
 		\f$
 		\TUvec{P}{} = \TUvec{K}{}\TUtvec{R}{}
 		\TUbeginarray{cc}
@@ -1495,10 +1495,10 @@ Camera<I>::P() const
     return intrinsic_type::K() * extrinsic_type::Pc();
 }
 
-//! “Š‰es—ñ‚ğƒZƒbƒg‚·‚éD
+//! æŠ•å½±è¡Œåˆ—ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
 /*!
-  \param P	3x4“Š‰es—ñ
-  \return	‚±‚ÌƒJƒƒ‰
+  \param P	3x4æŠ•å½±è¡Œåˆ—
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©
 */
 template <class I> void
 Camera<I>::setProjection(const matrix34_type& P)
@@ -1562,9 +1562,9 @@ Camera<I>::setProjection(const matrix34_type& P)
     intrinsic_type::setK(K);    
 }
 
-//! ƒJƒƒ‰‚ÌŠO•”^‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x‚ğ•Ô‚·D
+//! ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ï¼å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦ã‚’è¿”ã™ï¼
 /*!
-  \return	ŠO•”^‰Â•Ï“à•”ƒpƒ‰ƒ[ƒ^‚Ì©—R“x, ‚·‚È‚í‚¿ 6 + dofIntrinsic()
+  \return	å¤–éƒ¨ï¼å¯å¤‰å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è‡ªç”±åº¦, ã™ãªã‚ã¡ 6 + dofIntrinsic()
 */
 template <class I> inline u_int
 Camera<I>::dof()
@@ -1572,18 +1572,18 @@ Camera<I>::dof()
     return extrinsic_type::dof() + intrinsic_type::dofIntrinsic();
 }
     
-//! ƒJƒƒ‰‚ÌŠO•”^“à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ï¼å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
   \f$\Delta\TUvec{p}{} = [\Delta\TUtvec{t}{},~\Delta\TUtvec{\theta}{},
-  ~\Delta\TUtvec{\kappa}{}]^\top\f$‚É‘Î‚µ‚Ä
+  ~\Delta\TUtvec{\kappa}{}]^\top\f$ã«å¯¾ã—ã¦
   \f{eqnarray*}
   \TUvec{t}{} & \leftarrow & \TUvec{t}{} - \Delta\TUvec{t}{} \\
   \TUtvec{R}{} & \leftarrow &
   \TUtvec{R}{}\TUtvec{R}{}(\Delta\TUvec{\theta}{}) \\
   \TUvec{\kappa}{} & \leftarrow & \TUvec{\kappa}{} - \Delta\TUvec{\kappa}{}
   \f}
-  ‚ÆXV‚·‚éD
-  \param dp	XV—Ê‚ğ•\‚·6 + dofIntrinsic() ŸŒ³ƒxƒNƒgƒ‹
+  ã¨æ›´æ–°ã™ã‚‹ï¼
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™6 + dofIntrinsic() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class I> inline void
 Camera<I>::update(const vector_type& dp)
@@ -1592,17 +1592,17 @@ Camera<I>::update(const vector_type& dp)
     intrinsic_type::updateIntrinsic(dp(6, dp.dim() - 6));
 }
     
-//! ƒJƒƒ‰‚Ìp¨‚Æ“à•”ƒpƒ‰ƒ[ƒ^‚ğw’è‚³‚ê‚½—Ê‚¾‚¯XV‚·‚éD
+//! ã‚«ãƒ¡ãƒ©ã®å§¿å‹¢ã¨å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã•ã‚ŒãŸé‡ã ã‘æ›´æ–°ã™ã‚‹ï¼
 /*!
   \f$\Delta\TUvec{p}{} = [\Delta\TUtvec{\theta}{},
-  ~\Delta\TUtvec{\kappa}{}]^\top\f$‚É‘Î‚µ‚Ä
+  ~\Delta\TUtvec{\kappa}{}]^\top\f$ã«å¯¾ã—ã¦
   \f{eqnarray*}
   \TUtvec{R}{} & \leftarrow &
   \TUtvec{R}{}\TUtvec{R}{}(\Delta\TUvec{\theta}{}) \\
   \TUvec{\kappa}{} & \leftarrow & \TUvec{\kappa}{} - \Delta\TUvec{\kappa}{}
   \f}
-  ‚ÆXV‚·‚éDƒJƒƒ‰‚ÌˆÊ’u‚ÍXV‚³‚ê‚È‚¢D
-  \param dp	XV—Ê‚ğ•\‚·3 + dofIntrinsic() ŸŒ³ƒxƒNƒgƒ‹
+  ã¨æ›´æ–°ã™ã‚‹ï¼ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã¯æ›´æ–°ã•ã‚Œãªã„ï¼
+  \param dp	æ›´æ–°é‡ã‚’è¡¨ã™3 + dofIntrinsic() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class I> inline void
 Camera<I>::updateFCC(const vector_type& dp)
@@ -1611,10 +1611,10 @@ Camera<I>::updateFCC(const vector_type& dp)
     updateIntrinsic(dp(3, dp.dim() - 3));
 }
     
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒJƒƒ‰‚ÌŠO•”/“à•”ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨/å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class I> inline std::istream&
 Camera<I>::get(std::istream& in)
@@ -1623,10 +1623,10 @@ Camera<I>::get(std::istream& in)
     return intrinsic_type::get(in);
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒJƒƒ‰‚ÌŠO•”/“à•”ƒpƒ‰ƒ[ƒ^‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨/å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class I> inline std::ostream&
 Camera<I>::put(std::ostream& out) const
@@ -1635,11 +1635,11 @@ Camera<I>::put(std::ostream& out) const
     return intrinsic_type::put(out);
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çƒJƒƒ‰‚ÌŠO•”^“à•”ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ï¼å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param camera	ŠO•”^“à•”ƒpƒ‰ƒ[ƒ^‚Ì“Ç‚İ‚İæ
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param camera	å¤–éƒ¨ï¼å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿å…ˆ
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class I> inline std::istream&
 operator >>(std::istream& in, Camera<I>& camera)
@@ -1647,11 +1647,11 @@ operator >>(std::istream& in, Camera<I>& camera)
     return camera.get(in);
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉƒJƒƒ‰‚ÌŠO•”^“à•”ƒpƒ‰ƒ[ƒ^‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ã‚«ãƒ¡ãƒ©ã®å¤–éƒ¨ï¼å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param camera	ŠO•”^“à•”ƒpƒ‰ƒ[ƒ^‚Ì‘‚«o‚µŒ³
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param camera	å¤–éƒ¨ï¼å†…éƒ¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®æ›¸ãå‡ºã—å…ƒ
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class I> inline std::ostream&
 operator <<(std::ostream& out, const Camera<I>& camera)

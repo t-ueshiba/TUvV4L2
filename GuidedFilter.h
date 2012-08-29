@@ -1,15 +1,15 @@
 /*
- *  •½¬14-24”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-24å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2012.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GuidedFilter.h,v 1.4 2012-08-16 04:00:42 ueshiba Exp $
+ *  $Id: GuidedFilter.h,v 1.5 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		GuidedFilter.h
-  \brief	guided filter‚ÉŠÖ‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	guided filterã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #include "TU/BoxFilter.h"
 #include "TU/Array++.h"
@@ -42,7 +42,7 @@ namespace TU
 {
 /*!
   \namespace	detail
-  \brief	À‘•‚ÌÚ×‚ğ”[‚ß‚é–¼‘O‹óŠÔ
+  \brief	å®Ÿè£…ã®è©³ç´°ã‚’ç´ã‚ã‚‹åå‰ç©ºé–“
 */ 
 namespace detail
 {
@@ -308,15 +308,15 @@ class GFCoeffs
 
 }
 
-//! 1ŸŒ³“ü—Íƒf[ƒ^—ñ‚Æ1ŸŒ³ƒKƒCƒhƒf[ƒ^—ñ‚Éguided filter‚ğ“K—p‚·‚é
+//! 1æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã¨1æ¬¡å…ƒã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿åˆ—ã«guided filterã‚’é©ç”¨ã™ã‚‹
 /*!
-  \param ib	1ŸŒ³“ü—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param ie	1ŸŒ³“ü—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğ¦‚·”½•œq
-  \param gb	1ŸŒ³ƒKƒCƒhƒf[ƒ^—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param ge	1ŸŒ³ƒKƒCƒhƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğ¦‚·”½•œq
-  \param out	guided filter‚ğ“K—p‚µ‚½ƒf[ƒ^‚Ìo—Íæ‚ğ¦‚·”½•œq
-  \param w	box filter‚ÌƒEƒBƒ“ƒhƒE•
-  \param e	³‘¥‰»‚Ì‚½‚ß‚Ì”÷¬’è”
+  \param ib	1æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param ie	1æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’ç¤ºã™åå¾©å­
+  \param gb	1æ¬¡å…ƒã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param ge	1æ¬¡å…ƒã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’ç¤ºã™åå¾©å­
+  \param out	guided filterã‚’é©ç”¨ã—ãŸãƒ‡ãƒ¼ã‚¿ã®å‡ºåŠ›å…ˆã‚’ç¤ºã™åå¾©å­
+  \param w	box filterã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å¹…
+  \param e	æ­£å‰‡åŒ–ã®ãŸã‚ã®å¾®å°å®šæ•°
 */
 template <class IN, class GUIDE, class OUT> void
 guidedFilter(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out,
@@ -332,7 +332,7 @@ guidedFilter(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out,
 			typename carray_type::iterator>		coeff_init;
     typedef typename coeff_type::template Trans<GUIDE, OUT>	coeff_trans;
     
-  // guided filter‚Ì2ŸŒ³ŒW”ƒxƒNƒgƒ‹‚ğŒvZ‚·‚éD
+  // guided filterã®2æ¬¡å…ƒä¿‚æ•°ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—ã™ã‚‹ï¼
     carray_type	c(std::distance(ib, ie));
     boxFilter(make_transform_iterator<param_init>(
 		  make_zip_iterator(make_tuple(ib, gb))),
@@ -341,7 +341,7 @@ guidedFilter(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out,
 	      make_function_output_iterator(coeff_init(c.begin(), w, e)),
 	      w);
 
-  // ŒW”ƒxƒNƒgƒ‹‚Ì•½‹Ï’l‚ğ‹‚ßC‚»‚ê‚É‚æ‚Á‚ÄƒKƒCƒhƒf[ƒ^—ñ‚ğüŒ^•ÏŠ·‚·‚éD
+  // ä¿‚æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®å¹³å‡å€¤ã‚’æ±‚ã‚ï¼Œãã‚Œã«ã‚ˆã£ã¦ã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿åˆ—ã‚’ç·šå‹å¤‰æ›ã™ã‚‹ï¼
     std::advance(gb,  w - 1);
     std::advance(out, w - 1);
     boxFilter(c.begin(), c.end() + 1 - w,
@@ -350,14 +350,14 @@ guidedFilter(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out,
 	      w);
 }
 
-//! 1ŸŒ³“ü—Íƒf[ƒ^—ñ‚Éguided filter‚ğ“K—p‚·‚é
+//! 1æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã«guided filterã‚’é©ç”¨ã™ã‚‹
 /*!
-  ƒKƒCƒhƒf[ƒ^—ñ‚Í—^‚¦‚ç‚ê‚½1ŸŒ³“ü—Íƒf[ƒ^—ñ‚É“¯ˆê‚Æ‚·‚éD
-  \param ib	1ŸŒ³“ü—Íƒf[ƒ^—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param ie	1ŸŒ³“ü—Íƒf[ƒ^—ñ‚Ì––”ö‚ÌŸ‚ğ¦‚·”½•œq
-  \param out	guided filter‚ğ“K—p‚µ‚½ƒf[ƒ^‚Ìo—Íæ‚ğ¦‚·”½•œq
-  \param w	box filter‚ÌƒEƒBƒ“ƒhƒE•
-  \param e	³‘¥‰»‚Ì‚½‚ß‚Ì”÷¬’è”
+  ã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿åˆ—ã¯ä¸ãˆã‚‰ã‚ŒãŸ1æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã«åŒä¸€ã¨ã™ã‚‹ï¼
+  \param ib	1æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param ie	1æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã®æœ«å°¾ã®æ¬¡ã‚’ç¤ºã™åå¾©å­
+  \param out	guided filterã‚’é©ç”¨ã—ãŸãƒ‡ãƒ¼ã‚¿ã®å‡ºåŠ›å…ˆã‚’ç¤ºã™åå¾©å­
+  \param w	box filterã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å¹…
+  \param e	æ­£å‰‡åŒ–ã®ãŸã‚ã®å¾®å°å®šæ•°
 */
 template <class IN, class OUT> void
 guidedFilter(IN ib, IN ie, OUT out,
@@ -373,14 +373,14 @@ guidedFilter(IN ib, IN ie, OUT out,
 			typename carray_type::iterator>		coeff_init;
     typedef typename coeff_type::template Trans<IN, OUT>	coeff_trans;
 
-  // guided filter‚Ì2ŸŒ³ŒW”ƒxƒNƒgƒ‹‚ğŒvZ‚·‚éD
+  // guided filterã®2æ¬¡å…ƒä¿‚æ•°ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—ã™ã‚‹ï¼
     carray_type	c(std::distance(ib, ie));
     boxFilter(make_transform_iterator<param_init>(ib),
 	      make_transform_iterator<param_init>(ie),
 	      make_function_output_iterator(coeff_init(c.begin(), w, e)),
 	      w);
 
-  // ŒW”ƒxƒNƒgƒ‹‚Ì•½‹Ï’l‚ğ‹‚ßC‚»‚ê‚É‚æ‚Á‚Ä“ü—Íƒf[ƒ^—ñ‚ğüŒ^•ÏŠ·‚·‚éD
+  // ä¿‚æ•°ãƒ™ã‚¯ãƒˆãƒ«ã®å¹³å‡å€¤ã‚’æ±‚ã‚ï¼Œãã‚Œã«ã‚ˆã£ã¦å…¥åŠ›ãƒ‡ãƒ¼ã‚¿åˆ—ã‚’ç·šå‹å¤‰æ›ã™ã‚‹ï¼
     std::advance(ib,  w - 1);
     std::advance(out, w - 1);
     boxFilter(c.begin(), c.end() + 1 - w,
@@ -389,15 +389,15 @@ guidedFilter(IN ib, IN ie, OUT out,
 	      w);
 }
 
-//! 2ŸŒ³“ü—Íƒf[ƒ^‚Æ2ŸŒ³ƒKƒCƒhƒf[ƒ^‚Éguided filter‚ğ“K—p‚·‚é
+//! 2æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã¨2æ¬¡å…ƒã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿ã«guided filterã‚’é©ç”¨ã™ã‚‹
 /*!
-  \param ib	2ŸŒ³“ü—Íƒf[ƒ^‚Ìæ“ª‚Ìs‚ğ¦‚·”½•œq
-  \param ie	2ŸŒ³“ü—Íƒf[ƒ^‚Ì––”ö‚ÌŸ‚Ìs‚ğ¦‚·”½•œq
-  \param gb	2ŸŒ³ƒKƒCƒhƒf[ƒ^‚Ìæ“ª‚Ìs‚ğ¦‚·”½•œq
-  \param ge	2ŸŒ³ƒKƒCƒhƒf[ƒ^‚Ì––”ö‚ÌŸ‚Ìs‚ğ¦‚·”½•œq
-  \param out	guided filter‚ğ“K—p‚µ‚½ƒf[ƒ^‚Ìo—Íæ‚Ìæ“ªs‚ğ¦‚·”½•œq
-  \param w	box filter‚ÌƒEƒBƒ“ƒhƒE•
-  \param e	³‘¥‰»‚Ì‚½‚ß‚Ì”÷¬’è”
+  \param ib	2æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã®å…ˆé ­ã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param ie	2æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param gb	2æ¬¡å…ƒã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿ã®å…ˆé ­ã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param ge	2æ¬¡å…ƒã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param out	guided filterã‚’é©ç”¨ã—ãŸãƒ‡ãƒ¼ã‚¿ã®å‡ºåŠ›å…ˆã®å…ˆé ­è¡Œã‚’ç¤ºã™åå¾©å­
+  \param w	box filterã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å¹…
+  \param e	æ­£å‰‡åŒ–ã®ãŸã‚ã®å¾®å°å®šæ•°
 */
 template <class IN, class GUIDE, class OUT> void
 guidedFilter2(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out,
@@ -440,14 +440,14 @@ guidedFilter2(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out,
 	       wrow, wcol);
 }
 
-//! 2ŸŒ³“ü—Íƒf[ƒ^‚Éguided filter‚ğ“K—p‚·‚é
+//! 2æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã«guided filterã‚’é©ç”¨ã™ã‚‹
 /*!
-  ƒKƒCƒhƒf[ƒ^‚Í—^‚¦‚ç‚ê‚½2ŸŒ³“ü—Íƒf[ƒ^‚É“¯ˆê‚Æ‚·‚éD
-  \param ib	2ŸŒ³“ü—Íƒf[ƒ^‚Ìæ“ª‚Ìs‚ğ¦‚·”½•œq
-  \param ie	2ŸŒ³“ü—Íƒf[ƒ^‚Ì––”ö‚ÌŸ‚Ìs‚ğ¦‚·”½•œq
-  \param out	guided filter‚ğ“K—p‚µ‚½ƒf[ƒ^‚Ìo—Íæ‚Ìæ“ªs‚ğ¦‚·”½•œq
-  \param w	box filter‚ÌƒEƒBƒ“ƒhƒE•
-  \param e	³‘¥‰»‚Ì‚½‚ß‚Ì”÷¬’è”
+  ã‚¬ã‚¤ãƒ‰ãƒ‡ãƒ¼ã‚¿ã¯ä¸ãˆã‚‰ã‚ŒãŸ2æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã«åŒä¸€ã¨ã™ã‚‹ï¼
+  \param ib	2æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã®å…ˆé ­ã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param ie	2æ¬¡å…ƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã®æœ«å°¾ã®æ¬¡ã®è¡Œã‚’ç¤ºã™åå¾©å­
+  \param out	guided filterã‚’é©ç”¨ã—ãŸãƒ‡ãƒ¼ã‚¿ã®å‡ºåŠ›å…ˆã®å…ˆé ­è¡Œã‚’ç¤ºã™åå¾©å­
+  \param w	box filterã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å¹…
+  \param e	æ­£å‰‡åŒ–ã®ãŸã‚ã®å¾®å°å®šæ•°
 */
 template <class IN, class OUT> void
 guidedFilter2(IN ib, IN ie, OUT out, size_t wrow, size_t wcol,

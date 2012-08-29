@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.44 2012-08-16 01:30:37 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.45 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Geometry++.h
-  \brief	“_C’¼üC’´•½–Ê‚¨‚æ‚ÑŠeí‚ÌŠô‰½•ÏŠ·‚ÉŠÖ‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	ç‚¹ï¼Œç›´ç·šï¼Œè¶…å¹³é¢ãŠã‚ˆã³å„ç¨®ã®å¹¾ä½•å¤‰æ›ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
@@ -44,9 +44,9 @@ namespace TU
 /************************************************************************
 *  class Point1<T>							*
 ************************************************************************/
-//! TŒ^‚ÌÀ•W¬•ª‚ğ‚Â1ŸŒ³“_‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®åº§æ¨™æˆåˆ†ã‚’æŒã¤1æ¬¡å…ƒç‚¹ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	À•W‚ÌŒ^
+  \param T	åº§æ¨™ã®å‹
  */
 template <class T>
 class Point1 : public Vector<T, FixedSizedBuf<T, 1> >
@@ -57,17 +57,17 @@ class Point1 : public Vector<T, FixedSizedBuf<T, 1> >
   public:
     Point1(T u=0)							;
 
-  //! ‘¼‚Ì1ŸŒ³ƒxƒNƒgƒ‹‚Æ“¯ˆê—v‘f‚ğ‚Â1ŸŒ³“_‚ğì‚éD
+  //! ä»–ã®1æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã¨åŒä¸€è¦ç´ ã‚’æŒã¤1æ¬¡å…ƒç‚¹ã‚’ä½œã‚‹ï¼
   /*!
-    \param v	ƒRƒs[Œ³1ŸŒ³ƒxƒNƒgƒ‹
+    \param v	ã‚³ãƒ”ãƒ¼å…ƒ1æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
   */
     template <class T2, class B2>
     Point1(const Vector<T2, B2>& v) :vector_type(v)			{}
 
-  //! ‘¼‚Ì1ŸŒ³ƒxƒNƒgƒ‹‚ğ©•ª‚É‘ã“ü‚·‚éD
+  //! ä»–ã®1æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã‚’è‡ªåˆ†ã«ä»£å…¥ã™ã‚‹ï¼
   /*!
-    \param v	ƒRƒs[Œ³1ŸŒ³ƒxƒNƒgƒ‹
-    \return	‚±‚Ì1ŸŒ³“_
+    \param v	ã‚³ãƒ”ãƒ¼å…ƒ1æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+    \return	ã“ã®1æ¬¡å…ƒç‚¹
   */
     template <class T2, class B2>
     Point1&	operator =(const Vector<T2, B2>& v)
@@ -77,9 +77,9 @@ class Point1 : public Vector<T, FixedSizedBuf<T, 1> >
 		}
 };
 
-//! w’è‚³‚ê‚½À•W¬•ª‚ğ‚Â1ŸŒ³“_‚ğì‚éD
+//! æŒ‡å®šã•ã‚ŒãŸåº§æ¨™æˆåˆ†ã‚’æŒã¤1æ¬¡å…ƒç‚¹ã‚’ä½œã‚‹ï¼
 /*!
-  \param u	uÀ•W
+  \param u	uåº§æ¨™
 */
 template <class T> inline
 Point1<T>::Point1(T u)
@@ -88,17 +88,17 @@ Point1<T>::Point1(T u)
     (*this)[0] = u;
 }
 
-typedef Point1<short>	Point1s;		//!< shortŒ^À•W‚ğ‚Â1ŸŒ³“_
-typedef Point1<int>	Point1i;		//!< intŒ^À•W‚ğ‚Â1ŸŒ³“_
-typedef Point1<float>	Point1f;		//!< floatŒ^À•W‚ğ‚Â1ŸŒ³“_
-typedef Point1<double>	Point1d;		//!< doubleŒ^À•W‚ğ‚Â1ŸŒ³“_
+typedef Point1<short>	Point1s;		//!< shortå‹åº§æ¨™ã‚’æŒã¤1æ¬¡å…ƒç‚¹
+typedef Point1<int>	Point1i;		//!< intå‹åº§æ¨™ã‚’æŒã¤1æ¬¡å…ƒç‚¹
+typedef Point1<float>	Point1f;		//!< floatå‹åº§æ¨™ã‚’æŒã¤1æ¬¡å…ƒç‚¹
+typedef Point1<double>	Point1d;		//!< doubleå‹åº§æ¨™ã‚’æŒã¤1æ¬¡å…ƒç‚¹
 
 /************************************************************************
 *  class Point2<T>							*
 ************************************************************************/
-//! TŒ^‚ÌÀ•W¬•ª‚ğ‚Â2ŸŒ³“_‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®åº§æ¨™æˆåˆ†ã‚’æŒã¤2æ¬¡å…ƒç‚¹ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	À•W‚ÌŒ^
+  \param T	åº§æ¨™ã®å‹
  */
 template <class T>
 class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
@@ -109,17 +109,17 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
   public:
     Point2(T u=0, T v=0)						;
 
-  //! ‘¼‚Ì2ŸŒ³ƒxƒNƒgƒ‹‚Æ“¯ˆê—v‘f‚ğ‚Â2ŸŒ³“_‚ğì‚éD
+  //! ä»–ã®2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã¨åŒä¸€è¦ç´ ã‚’æŒã¤2æ¬¡å…ƒç‚¹ã‚’ä½œã‚‹ï¼
   /*!
-    \param v	ƒRƒs[Œ³2ŸŒ³ƒxƒNƒgƒ‹
+    \param v	ã‚³ãƒ”ãƒ¼å…ƒ2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
   */
     template <class T2, class B2>
     Point2(const Vector<T2, B2>& v) :vector_type(v)			{}
 
-  //! ‘¼‚Ì2ŸŒ³ƒxƒNƒgƒ‹‚ğ©•ª‚É‘ã“ü‚·‚éD
+  //! ä»–ã®2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã‚’è‡ªåˆ†ã«ä»£å…¥ã™ã‚‹ï¼
   /*!
-    \param v	ƒRƒs[Œ³2ŸŒ³ƒxƒNƒgƒ‹
-    \return	‚±‚Ì2ŸŒ³“_
+    \param v	ã‚³ãƒ”ãƒ¼å…ƒ2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+    \return	ã“ã®2æ¬¡å…ƒç‚¹
   */
     template <class T2, class B2>
     Point2&	operator =(const Vector<T2, B2>& v)
@@ -134,10 +134,10 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     int		angle(const Point2&, const Point2&)		const	;
 };
 
-//! w’è‚³‚ê‚½À•W¬•ª‚ğ‚Â2ŸŒ³“_‚ğì‚éD
+//! æŒ‡å®šã•ã‚ŒãŸåº§æ¨™æˆåˆ†ã‚’æŒã¤2æ¬¡å…ƒç‚¹ã‚’ä½œã‚‹ï¼
 /*!
-  \param u	uÀ•W
-  \param v	vÀ•W
+  \param u	uåº§æ¨™
+  \param v	våº§æ¨™
 */
 template <class T> inline
 Point2<T>::Point2(T u, T v)
@@ -147,10 +147,10 @@ Point2<T>::Point2(T u, T v)
     (*this)[1] = v;
 }
 
-//! w’è‚³‚ê‚½•ûŒü‚Ì8‹ß–T“_‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸæ–¹å‘ã®8è¿‘å‚ç‚¹ã‚’è¿”ã™ï¼
 /*!
-  \param dir	8‹ß–T“_‚Ì•ûŒü(mod 8‚Å‰ğßD‰E—×‚ğ0‚Æ‚µCŒv‰ñ‚è‚É1‚Ã‚Â‘‰Á)
-  \return	8‹ß–T“_
+  \param dir	8è¿‘å‚ç‚¹ã®æ–¹å‘(mod 8ã§è§£é‡ˆï¼å³éš£ã‚’0ã¨ã—ï¼Œæ™‚è¨ˆå›ã‚Šã«1ã¥ã¤å¢—åŠ )
+  \return	8è¿‘å‚ç‚¹
 */
 template <class T> inline Point2<T>
 Point2<T>::neighbor(int dir) const
@@ -158,10 +158,10 @@ Point2<T>::neighbor(int dir) const
     return Point2(*this).move(dir);
 }
 
-//! w’è‚³‚ê‚½•ûŒü‚Ì8‹ß–T“_‚É©g‚ğˆÚ“®‚·‚éD
+//! æŒ‡å®šã•ã‚ŒãŸæ–¹å‘ã®8è¿‘å‚ç‚¹ã«è‡ªèº«ã‚’ç§»å‹•ã™ã‚‹ï¼
 /*!
-  \param dir	8‹ß–T“_‚Ì•ûŒü(mod 8‚Å‰ğßD‰E—×‚ğ0‚Æ‚µCŒv‰ñ‚è‚É1‚Ã‚Â‘‰Á)
-  \return	ˆÚ“®Œã‚Ì‚±‚Ì“_
+  \param dir	8è¿‘å‚ç‚¹ã®æ–¹å‘(mod 8ã§è§£é‡ˆï¼å³éš£ã‚’0ã¨ã—ï¼Œæ™‚è¨ˆå›ã‚Šã«1ã¥ã¤å¢—åŠ )
+  \return	ç§»å‹•å¾Œã®ã“ã®ç‚¹
 */
 template <class T> Point2<T>&
 Point2<T>::move(int dir)
@@ -207,10 +207,10 @@ Point2<T>::move(int dir)
     return *this;
 }
 
-//! ‚±‚Ì2ŸŒ³“_‚Æw’è‚³‚ê‚½2ŸŒ³“_‚ª8—×Ú‚µ‚Ä‚¢‚é‚©’²‚×‚éD
+//! ã“ã®2æ¬¡å…ƒç‚¹ã¨æŒ‡å®šã•ã‚ŒãŸ2æ¬¡å…ƒç‚¹ãŒ8éš£æ¥ã—ã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param p	2ŸŒ³“_
-  \return	p‚Æˆê’v‚µ‚Ä‚¢‚ê‚Î-1C8—×Ú‚µ‚Ä‚¢‚ê‚Î1C‚¢‚¸‚ê‚Å‚à‚È‚¯‚ê‚Î0
+  \param p	2æ¬¡å…ƒç‚¹
+  \return	pã¨ä¸€è‡´ã—ã¦ã„ã‚Œã°-1ï¼Œ8éš£æ¥ã—ã¦ã„ã‚Œã°1ï¼Œã„ãšã‚Œã§ã‚‚ãªã‘ã‚Œã°0
 */
 template <class T> int
 Point2<T>::adj(const Point2<T>& p) const
@@ -238,11 +238,11 @@ Point2<T>::adj(const Point2<T>& p) const
     return 0;
 }
 
-//! ‚±‚Ì2ŸŒ³“_‚©‚çw’è‚³‚ê‚½2ŸŒ³“_‚Ö‚ÌŒü‚«‚ğ•Ô‚·D
+//! ã“ã®2æ¬¡å…ƒç‚¹ã‹ã‚‰æŒ‡å®šã•ã‚ŒãŸ2æ¬¡å…ƒç‚¹ã¸ã®å‘ãã‚’è¿”ã™ï¼
 /*!
-  \param p	2ŸŒ³“_
-  \return	-180deg‚©‚ç180deg‚Ü‚Å‚ğ8“™•ª‚µ‚½‹æŠÔ‚ğ•\‚·-4‚©‚ç3‚Ü‚Å‚Ì®”’lD
-		“Á‚ÉCp‚ª‚±‚Ì“_‚Éˆê’v‚·‚é‚È‚ç‚Î4
+  \param p	2æ¬¡å…ƒç‚¹
+  \return	-180degã‹ã‚‰180degã¾ã§ã‚’8ç­‰åˆ†ã—ãŸåŒºé–“ã‚’è¡¨ã™-4ã‹ã‚‰3ã¾ã§ã®æ•´æ•°å€¤ï¼
+		ç‰¹ã«ï¼ŒpãŒã“ã®ç‚¹ã«ä¸€è‡´ã™ã‚‹ãªã‚‰ã°4
 */
 template <class T> int
 Point2<T>::dir(const Point2<T>& p) const
@@ -273,13 +273,13 @@ Point2<T>::dir(const Point2<T>& p) const
             return -4;
 }
 
-//! ‚±‚Ì2ŸŒ³“_‚Æw’è‚³‚ê‚½2‚Â‚Ì2ŸŒ³“_‚ª‚È‚·Šp“x‚ğ•Ô‚·D
+//! ã“ã®2æ¬¡å…ƒç‚¹ã¨æŒ‡å®šã•ã‚ŒãŸ2ã¤ã®2æ¬¡å…ƒç‚¹ãŒãªã™è§’åº¦ã‚’è¿”ã™ï¼
 /*!
-  \param pp	2ŸŒ³“_
-  \param pn	2ŸŒ³“_
-  \return	pp->*this->pn‚ª‚È‚·Šp“x‚ğ-180deg‚©‚ç180deg‚Ü‚Å‚ğ8“™•ª‚µ‚½‹æŠÔ‚Å
-		•\‚µ‚½-4‚©‚ç3‚Ü‚Å‚Ì®”’lD“Á‚ÉCpp, pn‚Ì­‚È‚­‚Æ‚àˆê•û‚ª‚±‚Ì“_‚É
-		ˆê’v‚·‚é‚È‚ç‚Î4
+  \param pp	2æ¬¡å…ƒç‚¹
+  \param pn	2æ¬¡å…ƒç‚¹
+  \return	pp->*this->pnãŒãªã™è§’åº¦ã‚’-180degã‹ã‚‰180degã¾ã§ã‚’8ç­‰åˆ†ã—ãŸåŒºé–“ã§
+		è¡¨ã—ãŸ-4ã‹ã‚‰3ã¾ã§ã®æ•´æ•°å€¤ï¼ç‰¹ã«ï¼Œpp, pnã®å°‘ãªãã¨ã‚‚ä¸€æ–¹ãŒã“ã®ç‚¹ã«
+		ä¸€è‡´ã™ã‚‹ãªã‚‰ã°4
 */
 template <class T> int
 Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
@@ -296,17 +296,17 @@ Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
         return ang;
 }
 
-typedef Point2<short>	Point2s;		//!< shortŒ^À•W‚ğ‚Â2ŸŒ³“_
-typedef Point2<int>	Point2i;		//!< intŒ^À•W‚ğ‚Â2ŸŒ³“_
-typedef Point2<float>	Point2f;		//!< floatŒ^À•W‚ğ‚Â2ŸŒ³“_
-typedef Point2<double>	Point2d;		//!< doubleŒ^À•W‚ğ‚Â2ŸŒ³“_
+typedef Point2<short>	Point2s;		//!< shortå‹åº§æ¨™ã‚’æŒã¤2æ¬¡å…ƒç‚¹
+typedef Point2<int>	Point2i;		//!< intå‹åº§æ¨™ã‚’æŒã¤2æ¬¡å…ƒç‚¹
+typedef Point2<float>	Point2f;		//!< floatå‹åº§æ¨™ã‚’æŒã¤2æ¬¡å…ƒç‚¹
+typedef Point2<double>	Point2d;		//!< doubleå‹åº§æ¨™ã‚’æŒã¤2æ¬¡å…ƒç‚¹
 
 /************************************************************************
 *  class Point3<T>							*
 ************************************************************************/
-//! TŒ^‚ÌÀ•W¬•ª‚ğ‚Â3ŸŒ³“_‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®åº§æ¨™æˆåˆ†ã‚’æŒã¤3æ¬¡å…ƒç‚¹ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	À•W‚ÌŒ^
+  \param T	åº§æ¨™ã®å‹
  */
 template <class T>
 class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
@@ -317,17 +317,17 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
   public:
     Point3(T x=0, T y=0, T z=0)						;
 
-  //! ‘¼‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚Æ“¯ˆê—v‘f‚ğ‚Â3ŸŒ³“_‚ğì‚éD
+  //! ä»–ã®3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã¨åŒä¸€è¦ç´ ã‚’æŒã¤3æ¬¡å…ƒç‚¹ã‚’ä½œã‚‹ï¼
   /*!
-    \param v	ƒRƒs[Œ³3ŸŒ³ƒxƒNƒgƒ‹
+    \param v	ã‚³ãƒ”ãƒ¼å…ƒ3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
   */
     template <class T2, class B2>
     Point3(const Vector<T2, B2>& v) :vector_type(v)			{}
 
-  //! ‘¼‚Ì3ŸŒ³ƒxƒNƒgƒ‹‚ğ©•ª‚É‘ã“ü‚·‚éD
+  //! ä»–ã®3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã‚’è‡ªåˆ†ã«ä»£å…¥ã™ã‚‹ï¼
   /*!
-    \param v	ƒRƒs[Œ³3ŸŒ³ƒxƒNƒgƒ‹
-    \return	‚±‚Ì3ŸŒ³“_
+    \param v	ã‚³ãƒ”ãƒ¼å…ƒ3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
+    \return	ã“ã®3æ¬¡å…ƒç‚¹
   */
     template <class T2, class B2>
     Point3&	operator =(const Vector<T2, B2>& v)
@@ -337,11 +337,11 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
 		}
 };
 
-//! w’è‚³‚ê‚½À•W¬•ª‚ğ‚Â3ŸŒ³“_‚ğì‚éD
+//! æŒ‡å®šã•ã‚ŒãŸåº§æ¨™æˆåˆ†ã‚’æŒã¤3æ¬¡å…ƒç‚¹ã‚’ä½œã‚‹ï¼
 /*!
-  \param x	xÀ•W
-  \param y	yÀ•W
-  \param z	zÀ•W
+  \param x	xåº§æ¨™
+  \param y	yåº§æ¨™
+  \param z	zåº§æ¨™
 */
 template <class T> inline
 Point3<T>::Point3(T x, T y, T z)
@@ -352,19 +352,19 @@ Point3<T>::Point3(T x, T y, T z)
     (*this)[2] = z;
 }
 
-typedef Point3<short>	Point3s;		//!< shortŒ^À•W‚ğ‚Â3ŸŒ³“_
-typedef Point3<int>	Point3i;		//!< intŒ^À•W‚ğ‚Â3ŸŒ³“_
-typedef Point3<float>	Point3f;		//!< floatŒ^À•W‚ğ‚Â3ŸŒ³“_
-typedef Point3<double>	Point3d;		//!< doubleŒ^À•W‚ğ‚Â3ŸŒ³“_
+typedef Point3<short>	Point3s;		//!< shortå‹åº§æ¨™ã‚’æŒã¤3æ¬¡å…ƒç‚¹
+typedef Point3<int>	Point3i;		//!< intå‹åº§æ¨™ã‚’æŒã¤3æ¬¡å…ƒç‚¹
+typedef Point3<float>	Point3f;		//!< floatå‹åº§æ¨™ã‚’æŒã¤3æ¬¡å…ƒç‚¹
+typedef Point3<double>	Point3d;		//!< doubleå‹åº§æ¨™ã‚’æŒã¤3æ¬¡å…ƒç‚¹
 
 /************************************************************************
 *  class Normalize<S>							*
 ************************************************************************/
-//! “_‚Ì”ñ“¯ŸÀ•W‚Ì³‹K‰»•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+//! ç‚¹ã®éåŒæ¬¡åº§æ¨™ã®æ­£è¦åŒ–å¤‰æ›ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 /*!
   \f$\TUud{x}{}=[\TUtvec{x}{}, 1]^\top~
-  (\TUvec{x}{} \in \TUspace{R}{d})\f$‚É‘Î‚µ‚ÄCˆÈ‰º‚Ì‚æ‚¤‚È•½sˆÚ“®‚Æ
-  ƒXƒP[ƒŠƒ“ƒO‚ğs‚¤:
+  (\TUvec{x}{} \in \TUspace{R}{d})\f$ã«å¯¾ã—ã¦ï¼Œä»¥ä¸‹ã®ã‚ˆã†ãªå¹³è¡Œç§»å‹•ã¨
+  ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã‚’è¡Œã†:
   \f[
 	\TUud{y}{} =
 	\TUbeginarray{c} s^{-1}(\TUvec{x}{} - \TUvec{c}{}) \\ 1	\TUendarray =
@@ -374,8 +374,8 @@ typedef Point3<double>	Point3d;		//!< doubleŒ^À•W‚ğ‚Â3ŸŒ³“_
 	\TUbeginarray{c} \TUvec{x}{} \\ 1 \TUendarray =
 	\TUvec{T}{}\TUud{x}{}
   \f]
-  \f$s\f$‚Æ\f$\TUvec{c}{}\f$‚ÍCU•‚Ì2æ•½‹Ï’l‚ª‹óŠÔ‚ÌŸŒ³\f$d\f$‚É,
-  dS‚ªŒ´“_‚É‚È‚é‚æ‚¤Œˆ’è‚³‚ê‚éD
+  \f$s\f$ã¨\f$\TUvec{c}{}\f$ã¯ï¼ŒæŒ¯å¹…ã®2ä¹—å¹³å‡å€¤ãŒç©ºé–“ã®æ¬¡å…ƒ\f$d\f$ã«,
+  é‡å¿ƒãŒåŸç‚¹ã«ãªã‚‹ã‚ˆã†æ±ºå®šã•ã‚Œã‚‹ï¼
 */
 template <class S>
 class Normalize
@@ -386,10 +386,10 @@ class Normalize
     typedef Matrix<value_type>			matrix_type;
     
   public:
-  //! ‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚Ä³‹K‰»•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+  //! ç©ºé–“ã®æ¬¡å…ƒã‚’æŒ‡å®šã—ã¦æ­£è¦åŒ–å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    P“™•ÏŠ·‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
-    \param d	‹óŠÔ‚ÌŸŒ³
+    æ’ç­‰å¤‰æ›ã¨ã—ã¦åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
+    \param d	ç©ºé–“ã®æ¬¡å…ƒ
   */
     Normalize(u_int d=2) :_npoints(0), _scale(1.0), _centroid(d)	{}
 
@@ -413,16 +413,16 @@ class Normalize
     const vector_type&	centroid()				const	;
     
   private:
-    u_int		_npoints;	//!< ‚±‚ê‚Ü‚Å‚É—^‚¦‚½“_‚Ì‘”
-    value_type		_scale;		//!< ‚±‚ê‚Ü‚Å‚É—^‚¦‚½“_‚ÌU•‚ÌRMS’l
-    vector_type		_centroid;	//!< ‚±‚ê‚Ü‚Å‚É—^‚¦‚½“_ŒQ‚ÌdS
+    u_int		_npoints;	//!< ã“ã‚Œã¾ã§ã«ä¸ãˆãŸç‚¹ã®ç·æ•°
+    value_type		_scale;		//!< ã“ã‚Œã¾ã§ã«ä¸ãˆãŸç‚¹ã®æŒ¯å¹…ã®RMSå€¤
+    vector_type		_centroid;	//!< ã“ã‚Œã¾ã§ã«ä¸ãˆãŸç‚¹ç¾¤ã®é‡å¿ƒ
 };
 
-//! —^‚¦‚ç‚ê‚½“_ŒQ‚Ì”ñ“¯ŸÀ•W‚©‚ç³‹K‰»•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ç¾¤ã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰æ­£è¦åŒ–å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  U•‚Ì2æ•½‹Ï’l‚ª spaceDim(), dS‚ªŒ´“_‚É‚È‚é‚æ‚¤‚È³‹K‰»•ÏŠ·‚ªŒvZ‚³‚ê‚éD
-  \param first	“_ŒQ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param last	“_ŒQ‚Ì––”ö‚ğ¦‚·”½•œq
+  æŒ¯å¹…ã®2ä¹—å¹³å‡å€¤ãŒ spaceDim(), é‡å¿ƒãŒåŸç‚¹ã«ãªã‚‹ã‚ˆã†ãªæ­£è¦åŒ–å¤‰æ›ãŒè¨ˆç®—ã•ã‚Œã‚‹ï¼
+  \param first	ç‚¹ç¾¤ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param last	ç‚¹ç¾¤ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
 */
 template <class S> template <class Iterator> inline
 Normalize<S>::Normalize(Iterator first, Iterator last)
@@ -431,12 +431,12 @@ Normalize<S>::Normalize(Iterator first, Iterator last)
     update(first, last);
 }
     
-//! V‚½‚É“_ŒQ‚ğ’Ç‰Á‚µ‚Ä‚»‚Ì”ñ“¯ŸÀ•W‚©‚çŒ»İ‚Ì³‹K‰»•ÏŠ·‚ğXV‚·‚éD
+//! æ–°ãŸã«ç‚¹ç¾¤ã‚’è¿½åŠ ã—ã¦ãã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰ç¾åœ¨ã®æ­£è¦åŒ–å¤‰æ›ã‚’æ›´æ–°ã™ã‚‹ï¼
 /*!
-  U•‚Ì2æ•½‹Ï’l‚ª spaceDim(), dS‚ªŒ´“_‚É‚È‚é‚æ‚¤‚È³‹K‰»•ÏŠ·‚ªŒvZ‚³‚ê‚éD
-  \param first			“_ŒQ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param last			“_ŒQ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	‚±‚ê‚Ü‚Å‚É—^‚¦‚ç‚ê‚½“_‚Ì‘”‚ª0‚Ìê‡‚É‘—o
+  æŒ¯å¹…ã®2ä¹—å¹³å‡å€¤ãŒ spaceDim(), é‡å¿ƒãŒåŸç‚¹ã«ãªã‚‹ã‚ˆã†ãªæ­£è¦åŒ–å¤‰æ›ãŒè¨ˆç®—ã•ã‚Œã‚‹ï¼
+  \param first			ç‚¹ç¾¤ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param last			ç‚¹ç¾¤ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \throw std::invalid_argument	ã“ã‚Œã¾ã§ã«ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã®ç·æ•°ãŒ0ã®å ´åˆã«é€å‡º
 */
 template <class S> template <class Iterator> void
 Normalize<S>::update(Iterator first, Iterator last)
@@ -461,9 +461,9 @@ Normalize<S>::update(Iterator first, Iterator last)
     _scale = sqrt((_scale / _npoints - _centroid * _centroid) / spaceDim());
 }
 
-//! ‚±‚Ì³‹K‰»•ÏŠ·‚ª“K—p‚³‚ê‚é‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
+//! ã“ã®æ­£è¦åŒ–å¤‰æ›ãŒé©ç”¨ã•ã‚Œã‚‹ç©ºé–“ã®æ¬¡å…ƒã‚’è¿”ã™ï¼
 /*! 
-  \return	‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í spaceDim()+1)
+  \return	ç©ºé–“ã®æ¬¡å…ƒ(åŒæ¬¡åº§æ¨™ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ã—ã¦ã®æ¬¡å…ƒã¯ spaceDim()+1)
 */
 template <class S> inline u_int
 Normalize<S>::spaceDim() const
@@ -471,10 +471,10 @@ Normalize<S>::spaceDim() const
     return _centroid.dim();
 }
     
-//! —^‚¦‚ç‚ê‚½“_‚É³‹K‰»•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì”ñ“¯ŸÀ•W‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã«æ­£è¦åŒ–å¤‰æ›ã‚’é©ç”¨ã—ã¦ãã®éåŒæ¬¡åº§æ¨™ã‚’è¿”ã™ï¼
 /*!
-  \param x	“_‚Ì”ñ“¯ŸÀ•W(spaceDim() ŸŒ³)
-  \return	³‹K‰»‚³‚ê‚½“_‚Ì”ñ“¯ŸÀ•W(spaceDim() ŸŒ³)
+  \param x	ç‚¹ã®éåŒæ¬¡åº§æ¨™(spaceDim() æ¬¡å…ƒ)
+  \return	æ­£è¦åŒ–ã•ã‚ŒãŸç‚¹ã®éåŒæ¬¡åº§æ¨™(spaceDim() æ¬¡å…ƒ)
 */
 template <class S>
 template <class S2, class B2> inline typename Normalize<S>::vector_type
@@ -483,10 +483,10 @@ Normalize<S>::operator ()(const Vector<S2, B2>& x) const
     return (vector_type(x) -= _centroid) /= _scale;
 }
 
-//! —^‚¦‚ç‚ê‚½“_‚É³‹K‰»•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì“¯ŸÀ•W‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã«æ­£è¦åŒ–å¤‰æ›ã‚’é©ç”¨ã—ã¦ãã®åŒæ¬¡åº§æ¨™ã‚’è¿”ã™ï¼
 /*!
-  \param x	“_‚Ì”ñ“¯ŸÀ•W(spaceDim() ŸŒ³)
-  \return	³‹K‰»‚³‚ê‚½“_‚Ì“¯ŸÀ•W(spaceDim()+1ŸŒ³)
+  \param x	ç‚¹ã®éåŒæ¬¡åº§æ¨™(spaceDim() æ¬¡å…ƒ)
+  \return	æ­£è¦åŒ–ã•ã‚ŒãŸç‚¹ã®åŒæ¬¡åº§æ¨™(spaceDim()+1æ¬¡å…ƒ)
 */
 template <class S>
 template <class S2, class B2> inline typename Normalize<S>::vector_type
@@ -495,9 +495,9 @@ Normalize<S>::normalizeP(const Vector<S2, B2>& x) const
     return (*this)(x).homogeneous();
 }
 
-//! ³‹K‰»•ÏŠ·‚ÌƒXƒP[ƒŠƒ“ƒO’è”‚ğ•Ô‚·D
+//! æ­£è¦åŒ–å¤‰æ›ã®ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°å®šæ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒXƒP[ƒŠƒ“ƒO’è”(—^‚¦‚ç‚ê‚½“_—ñ‚ÌU•‚Ì2æ•½‹Ï’l)
+  \return	ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°å®šæ•°(ä¸ãˆã‚‰ã‚ŒãŸç‚¹åˆ—ã®æŒ¯å¹…ã®2ä¹—å¹³å‡å€¤)
 */
 template <class S> inline typename Normalize<S>::value_type
 Normalize<S>::scale() const
@@ -505,9 +505,9 @@ Normalize<S>::scale() const
     return _scale;
 }
 
-//! ³‹K‰»•ÏŠ·‚Ì•½sˆÚ“®¬•ª‚ğ•Ô‚·D
+//! æ­£è¦åŒ–å¤‰æ›ã®å¹³è¡Œç§»å‹•æˆåˆ†ã‚’è¿”ã™ï¼
 /*!
-  \return	•½sˆÚ“®¬•ª(—^‚¦‚ç‚ê‚½“_—ñ‚ÌdS)
+  \return	å¹³è¡Œç§»å‹•æˆåˆ†(ä¸ãˆã‚‰ã‚ŒãŸç‚¹åˆ—ã®é‡å¿ƒ)
 */
 template <class S> inline const typename Normalize<S>::vector_type&
 Normalize<S>::centroid() const
@@ -515,9 +515,9 @@ Normalize<S>::centroid() const
     return _centroid;
 }
 
-//! ³‹K‰»•ÏŠ·s—ñ‚ğ•Ô‚·D
+//! æ­£è¦åŒ–å¤‰æ›è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	•ÏŠ·s—ñ:
+  \return	å¤‰æ›è¡Œåˆ—:
 		\f$
 		\TUvec{T}{} = 
 		\TUbeginarray{ccc}
@@ -539,9 +539,9 @@ Normalize<S>::T() const
     return TT;
 }
 
-//! ³‹K‰»•ÏŠ·‚Ì“]’us—ñ‚ğ•Ô‚·D
+//! æ­£è¦åŒ–å¤‰æ›ã®è»¢ç½®è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	•ÏŠ·‚Ì“]’us—ñ:
+  \return	å¤‰æ›ã®è»¢ç½®è¡Œåˆ—:
 		\f$
 		\TUtvec{T}{} = 
 		\TUbeginarray{ccc}
@@ -563,9 +563,9 @@ Normalize<S>::Tt() const
     return TTt;
 }
 
-//! ³‹K‰»•ÏŠ·‚Ì‹ts—ñ‚ğ•Ô‚·D
+//! æ­£è¦åŒ–å¤‰æ›ã®é€†è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	•ÏŠ·‚Ì‹ts—ñ:
+  \return	å¤‰æ›ã®é€†è¡Œåˆ—:
 		\f$
 		\TUinv{T}{} = 
 		\TUbeginarray{ccc}
@@ -587,9 +587,9 @@ Normalize<S>::Tinv() const
     return TTinv;
 }
 
-//! ³‹K‰»•ÏŠ·‚Ì‹ts—ñ‚Ì“]’u‚ğ•Ô‚·D
+//! æ­£è¦åŒ–å¤‰æ›ã®é€†è¡Œåˆ—ã®è»¢ç½®ã‚’è¿”ã™ï¼
 /*!
-  \return	•ÏŠ·‚Ì‹ts—ñ‚Ì“]’u:
+  \return	å¤‰æ›ã®é€†è¡Œåˆ—ã®è»¢ç½®:
 		\f$
 		\TUtinv{T}{} = 
 		\TUbeginarray{ccc}
@@ -614,11 +614,11 @@ Normalize<S>::Ttinv() const
 /************************************************************************
 *  class HyperPlane<V>							*
 ************************************************************************/
-//! dŸŒ³Ë‰e‹óŠÔ’†‚Ì’´•½–Ê‚ğ•\Œ»‚·‚éƒNƒ‰ƒX
+//! dæ¬¡å…ƒå°„å½±ç©ºé–“ä¸­ã®è¶…å¹³é¢ã‚’è¡¨ç¾ã™ã‚‹ã‚¯ãƒ©ã‚¹
 /*!
-  dŸŒ³Ë‰e‹óŠÔ‚Ì“_\f$\TUud{x}{} \in \TUspace{R}{d+1}\f$‚É‘Î‚µ‚Ä
+  dæ¬¡å…ƒå°„å½±ç©ºé–“ã®ç‚¹\f$\TUud{x}{} \in \TUspace{R}{d+1}\f$ã«å¯¾ã—ã¦
   \f$\TUtud{p}{}\TUud{x}{} = 0,~\TUud{p}{} \in \TUspace{R}{d+1}\f$
-  ‚É‚æ‚Á‚Ä•\‚³‚ê‚éD
+  ã«ã‚ˆã£ã¦è¡¨ã•ã‚Œã‚‹ï¼
 */
 template <class V>
 class HyperPlane : public V
@@ -630,9 +630,9 @@ class HyperPlane : public V
   public:
     HyperPlane(u_int d=2)				;
 
-  //! “¯ŸÀ•WƒxƒNƒgƒ‹‚ğw’è‚µ‚Ä’´•½–ÊƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+  //! åŒæ¬¡åº§æ¨™ãƒ™ã‚¯ãƒˆãƒ«ã‚’æŒ‡å®šã—ã¦è¶…å¹³é¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param p	(d+1)ŸŒ³ƒxƒNƒgƒ‹(d‚Í’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³)
+    \param p	(d+1)æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«(dã¯è¶…å¹³é¢ãŒå­˜åœ¨ã™ã‚‹å°„å½±ç©ºé–“ã®æ¬¡å…ƒ)
   */
     template <class T, class B>
     HyperPlane(const Vector<T, B>& p)	:V(p)		{}
@@ -642,10 +642,10 @@ class HyperPlane : public V
 
     using	V::dim;
 
-  //! ’´•½–ÊƒIƒuƒWƒFƒNƒg‚Ì“¯ŸÀ•WƒxƒNƒgƒ‹‚ğw’è‚·‚éD
+  //! è¶…å¹³é¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åŒæ¬¡åº§æ¨™ãƒ™ã‚¯ãƒˆãƒ«ã‚’æŒ‡å®šã™ã‚‹ï¼
   /*!
-    \param v	(d+1)ŸŒ³ƒxƒNƒgƒ‹(d‚Í’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³)
-    \return	‚±‚Ì’´•½–ÊƒIƒuƒWƒFƒNƒg
+    \param v	(d+1)æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«(dã¯è¶…å¹³é¢ãŒå­˜åœ¨ã™ã‚‹å°„å½±ç©ºé–“ã®æ¬¡å…ƒ)
+    \return	ã“ã®è¶…å¹³é¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
   */
     template <class T, class B>
     HyperPlane&	operator =(const Vector<T, B>& v)	{V::operator =(v);
@@ -654,16 +654,16 @@ class HyperPlane : public V
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)	;
 
-  //! ‚±‚Ì’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
+  //! ã“ã®è¶…å¹³é¢ãŒå­˜åœ¨ã™ã‚‹å°„å½±ç©ºé–“ã®æ¬¡å…ƒã‚’è¿”ã™ï¼
   /*! 
-    \return	Ë‰e‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í spaceDim()+1)
+    \return	å°„å½±ç©ºé–“ã®æ¬¡å…ƒ(åŒæ¬¡åº§æ¨™ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ã—ã¦ã®æ¬¡å…ƒã¯ spaceDim()+1)
   */
     u_int	spaceDim()			const	{return dim()-1;}
 
-  //! ’´•½–Ê‚ğ‹‚ß‚é‚½‚ß‚É•K—v‚È“_‚ÌÅ¬ŒÂ”‚ğ•Ô‚·D
+  //! è¶…å¹³é¢ã‚’æ±‚ã‚ã‚‹ãŸã‚ã«å¿…è¦ãªç‚¹ã®æœ€å°å€‹æ•°ã‚’è¿”ã™ï¼
   /*!
-    Œ»İİ’è‚³‚ê‚Ä‚¢‚éË‰e‹óŠÔ‚ÌŸŒ³‚ğ‚à‚Æ‚ÉŒvZ‚³‚ê‚éD
-    \return	•K—v‚È“_‚ÌÅ¬ŒÂ”‚·‚È‚í‚¿“ü—Í‹óŠÔ‚ÌŸŒ³ spaceDim()
+    ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹å°„å½±ç©ºé–“ã®æ¬¡å…ƒã‚’ã‚‚ã¨ã«è¨ˆç®—ã•ã‚Œã‚‹ï¼
+    \return	å¿…è¦ãªç‚¹ã®æœ€å°å€‹æ•°ã™ãªã‚ã¡å…¥åŠ›ç©ºé–“ã®æ¬¡å…ƒ spaceDim()
   */
     u_int	ndataMin()			const	{return spaceDim();}
 
@@ -673,10 +673,10 @@ class HyperPlane : public V
     dist(const Vector<T, B>& x)			const	;
 };
 
-//! ‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚Ä’´•½–ÊƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! ç©ºé–“ã®æ¬¡å…ƒã‚’æŒ‡å®šã—ã¦è¶…å¹³é¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  –³ŒÀ‰“’´•½–Ê([0, 0,..., 0, 1])‚É‰Šú‰»‚³‚ê‚éD
-  \param d	‚±‚Ì’´•½–Ê‚ª‘¶İ‚·‚éË‰e‹óŠÔ‚ÌŸŒ³
+  ç„¡é™é è¶…å¹³é¢([0, 0,..., 0, 1])ã«åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
+  \param d	ã“ã®è¶…å¹³é¢ãŒå­˜åœ¨ã™ã‚‹å°„å½±ç©ºé–“ã®æ¬¡å…ƒ
 */
 template <class V> inline
 HyperPlane<V>::HyperPlane(u_int d)
@@ -685,11 +685,11 @@ HyperPlane<V>::HyperPlane(u_int d)
     (*this)[d] = 1;
 }
     
-//! —^‚¦‚ç‚ê‚½“_—ñ‚Ì”ñ“¯ŸÀ•W‚É“–‚Ä‚Í‚ß‚ç‚ê‚½’´•½–ÊƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹åˆ—ã®éåŒæ¬¡åº§æ¨™ã«å½“ã¦ã¯ã‚ã‚‰ã‚ŒãŸè¶…å¹³é¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param begin			“_—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	“_‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \throw std::invalid_argument	ç‚¹ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template <class V> template <class Iterator> inline
 HyperPlane<V>::HyperPlane(Iterator begin, Iterator end)
@@ -697,25 +697,25 @@ HyperPlane<V>::HyperPlane(Iterator begin, Iterator end)
     fit(begin, end);
 }
 
-//! —^‚¦‚ç‚ê‚½“_—ñ‚Ì”ñ“¯ŸÀ•W‚É’´•½–Ê‚ğ“–‚Ä‚Í‚ß‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹åˆ—ã®éåŒæ¬¡åº§æ¨™ã«è¶…å¹³é¢ã‚’å½“ã¦ã¯ã‚ã‚‹ï¼
 /*!
-  \param begin			“_—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	“_‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \throw std::invalid_argument	ç‚¹ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template <class V> template <class Iterator> void
 HyperPlane<V>::fit(Iterator begin, Iterator end)
 {
-  // “_—ñ‚Ì³‹K‰»
+  // ç‚¹åˆ—ã®æ­£è¦åŒ–
     const Normalize<value_type>	normalize(begin, end);
 
-  // [•ª‚ÈŒÂ”‚Ì“_‚ª‚ ‚é‚©H
+  // å……åˆ†ãªå€‹æ•°ã®ç‚¹ãŒã‚ã‚‹ã‹ï¼Ÿ
     const u_int		ndata = std::distance(begin, end),
 			d     = normalize.spaceDim();
-    if (ndata < d)	// V‚ÌƒTƒCƒY‚ª–¢’è‚È‚Ì‚ÅndataMin()‚Í–³Œø
+    if (ndata < d)	// Vã®ã‚µã‚¤ã‚ºãŒæœªå®šãªã®ã§ndataMin()ã¯ç„¡åŠ¹
 	throw std::invalid_argument("Hyperplane::initialize(): not enough input data!!");
 
-  // ƒf[ƒ^s—ñ‚ÌŒvZ
+  // ãƒ‡ãƒ¼ã‚¿è¡Œåˆ—ã®è¨ˆç®—
     Matrix<value_type>	A(d, d);
     while (begin != end)
     {
@@ -723,8 +723,8 @@ HyperPlane<V>::fit(Iterator begin, Iterator end)
 	A += x % x;
     }
 
-  // ƒf[ƒ^s—ñ‚ÌÅ¬ŒÅ—L’l‚É‘Î‰‚·‚éŒÅ—LƒxƒNƒgƒ‹‚©‚ç–@üƒxƒNƒgƒ‹‚ğŒvZ‚µC
-  // ‚³‚ç‚É“_—ñ‚ÌdS‚æ‚èŒ´“_‚©‚ç‚Ì‹——£‚ğŒvZ‚·‚éD
+  // ãƒ‡ãƒ¼ã‚¿è¡Œåˆ—ã®æœ€å°å›ºæœ‰å€¤ã«å¯¾å¿œã™ã‚‹å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—ã—ï¼Œ
+  // ã•ã‚‰ã«ç‚¹åˆ—ã®é‡å¿ƒã‚ˆã‚ŠåŸç‚¹ã‹ã‚‰ã®è·é›¢ã‚’è¨ˆç®—ã™ã‚‹ï¼
     Vector<value_type>		eval;
     const Matrix<value_type>&	Ut = A.eigen(eval);
     V::resize(d+1);
@@ -734,11 +734,11 @@ HyperPlane<V>::fit(Iterator begin, Iterator end)
 	*this *= -1.0;
 }
 
-//! —^‚¦‚ç‚ê‚½“_‚Æ’´•½–Ê‚Ì‹——£‚Ì2æ‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã¨è¶…å¹³é¢ã®è·é›¢ã®2ä¹—ã‚’è¿”ã™ï¼
 /*!
-  \param x	“_‚Ì”ñ“¯ŸÀ•W(spaceDim() ŸŒ³)‚Ü‚½‚Í“¯ŸÀ•W
-		(spaceDim()+1ŸŒ³)
-  \return	“_‚Æ’´•½–Ê‚Ì‹——£‚Ì2æ
+  \param x	ç‚¹ã®éåŒæ¬¡åº§æ¨™(spaceDim() æ¬¡å…ƒ)ã¾ãŸã¯åŒæ¬¡åº§æ¨™
+		(spaceDim()+1æ¬¡å…ƒ)
+  \return	ç‚¹ã¨è¶…å¹³é¢ã®è·é›¢ã®2ä¹—
 */
 template <class V> template <class T, class B>
 inline typename HyperPlane<V>::value_type
@@ -748,14 +748,14 @@ HyperPlane<V>::sqdist(const Vector<T, B>& x) const
     return d*d;
 }
 
-//! —^‚¦‚ç‚ê‚½“_‚Æ’´•½–Ê‚Ì‹——£‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã¨è¶…å¹³é¢ã®è·é›¢ã‚’è¿”ã™ï¼
 /*!
-  \param x			“_‚Ì”ñ“¯ŸÀ•W(spaceDim() ŸŒ³)‚Ü‚½‚Í
-				“¯ŸÀ•W(spaceDim()+1ŸŒ³)
-  \return			“_‚Æ’´•½–Ê‚Ì‹——£(”ñ•‰)
-  \throw std::invalid_argument	“_‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚ª spaceDim()C
-				spaceDim()+1‚Ì‚¢‚¸‚ê‚Å‚à‚È‚¢ê‡C‚à‚µ‚­‚Í
-				‚±‚Ì“_‚ª–³ŒÀ‰““_‚Å‚ ‚éê‡‚É‘—oD
+  \param x			ç‚¹ã®éåŒæ¬¡åº§æ¨™(spaceDim() æ¬¡å…ƒ)ã¾ãŸã¯
+				åŒæ¬¡åº§æ¨™(spaceDim()+1æ¬¡å…ƒ)
+  \return			ç‚¹ã¨è¶…å¹³é¢ã®è·é›¢(éè² )
+  \throw std::invalid_argument	ç‚¹ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ã—ã¦ã®æ¬¡å…ƒãŒ spaceDim()ï¼Œ
+				spaceDim()+1ã®ã„ãšã‚Œã§ã‚‚ãªã„å ´åˆï¼Œã‚‚ã—ãã¯
+				ã“ã®ç‚¹ãŒç„¡é™é ç‚¹ã§ã‚ã‚‹å ´åˆã«é€å‡ºï¼
 */
 template <class V> template <class T, class B>
 typename HyperPlane<V>::value_type
@@ -776,20 +776,20 @@ HyperPlane<V>::dist(const Vector<T, B>& x) const
     return 0;
 }
 
-typedef HyperPlane<Vector3f>	LineP2f;	//!< 2ŸŒ³‹óŠÔ’†‚ÌfloatŒ^’¼ü
-typedef HyperPlane<Vector3d>	LineP2d;	//!< 2ŸŒ³‹óŠÔ’†‚ÌdoubleŒ^’¼ü
-typedef HyperPlane<Vector4f>	PlaneP3f;	//!< 3ŸŒ³‹óŠÔ’†‚ÌfloatŒ^•½–Ê
-typedef HyperPlane<Vector4d>	PlaneP3d;	//!< 3ŸŒ³‹óŠÔ’†‚ÌdoubleŒ^•½–Ê
+typedef HyperPlane<Vector3f>	LineP2f;	//!< 2æ¬¡å…ƒç©ºé–“ä¸­ã®floatå‹ç›´ç·š
+typedef HyperPlane<Vector3d>	LineP2d;	//!< 2æ¬¡å…ƒç©ºé–“ä¸­ã®doubleå‹ç›´ç·š
+typedef HyperPlane<Vector4f>	PlaneP3f;	//!< 3æ¬¡å…ƒç©ºé–“ä¸­ã®floatå‹å¹³é¢
+typedef HyperPlane<Vector4d>	PlaneP3d;	//!< 3æ¬¡å…ƒç©ºé–“ä¸­ã®doubleå‹å¹³é¢
 
 /************************************************************************
 *  class Projectivity<M>						*
 ************************************************************************/
-//! Ë‰e•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+//! å°„å½±å¤‰æ›ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 /*!
-  \f$\TUvec{T}{} \in \TUspace{R}{(n+1)\times(m+1)}\f$‚ğ—p‚¢‚ÄmŸŒ³‹óŠÔ‚Ì“_
-  \f$\TUud{x}{} \in \TUspace{R}{m+1}\f$‚ğnŸŒ³‹óŠÔ‚Ì“_
+  \f$\TUvec{T}{} \in \TUspace{R}{(n+1)\times(m+1)}\f$ã‚’ç”¨ã„ã¦mæ¬¡å…ƒç©ºé–“ã®ç‚¹
+  \f$\TUud{x}{} \in \TUspace{R}{m+1}\f$ã‚’næ¬¡å…ƒç©ºé–“ã®ç‚¹
   \f$\TUud{y}{} \simeq \TUvec{T}{}\TUud{x}{} \in \TUspace{R}{n+1}\f$
-  ‚ÉÊ‚·(\f$m \neq n\f$‚Å‚à\‚í‚È‚¢)D
+  ã«å†™ã™(\f$m \neq n\f$ã§ã‚‚æ§‹ã‚ãªã„)ï¼
 */
 template <class M>
 class Projectivity : public M
@@ -801,9 +801,9 @@ class Projectivity : public M
     Projectivity()							;
     Projectivity(u_int inDim, u_int outDim)				;
 
-  //! •ÏŠ·s—ñ‚ğw’è‚µ‚ÄË‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+  //! å¤‰æ›è¡Œåˆ—ã‚’æŒ‡å®šã—ã¦å°„å½±å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param T			(m+1)x(n+1)s—ñ(m, n‚Í“ü—Í^o—Í‹óŠÔ‚ÌŸŒ³)
+    \param T			(m+1)x(n+1)è¡Œåˆ—(m, nã¯å…¥åŠ›ï¼å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒ)
   */
     template <class S, class B, class R>
     Projectivity(const Matrix<S, B, R>& T) :M(T)			{}
@@ -815,9 +815,9 @@ class Projectivity : public M
     using	M::ncol;
     using	M::operator ();
     
-  //! •ÏŠ·s—ñ‚ğw’è‚·‚éD
+  //! å¤‰æ›è¡Œåˆ—ã‚’æŒ‡å®šã™ã‚‹ï¼
   /*!
-    \param T			(m+1)x(n+1)s—ñ(m, n‚Í“ü—Í^o—Í‹óŠÔ‚ÌŸŒ³)
+    \param T			(m+1)x(n+1)è¡Œåˆ—(m, nã¯å…¥åŠ›ï¼å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒ)
   */
     template <class S, class B, class R>
     void	set(const Matrix<S, B, R>& T)		{M::operator =(T);}
@@ -825,15 +825,15 @@ class Projectivity : public M
     template <class Iterator>
     void	fit(Iterator begin, Iterator end, bool refine=false)	;
 
-  //! ‚±‚ÌË‰e•ÏŠ·‚Ì“ü—Í‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
+  //! ã“ã®å°„å½±å¤‰æ›ã®å…¥åŠ›ç©ºé–“ã®æ¬¡å…ƒã‚’è¿”ã™ï¼
   /*! 
-    \return	“ü—Í‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í inDim()+1)
+    \return	å…¥åŠ›ç©ºé–“ã®æ¬¡å…ƒ(åŒæ¬¡åº§æ¨™ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ã—ã¦ã®æ¬¡å…ƒã¯ inDim()+1)
   */
     u_int	inDim()				const	{return ncol()-1;}
 
-  //! ‚±‚ÌË‰e•ÏŠ·‚Ìo—Í‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
+  //! ã“ã®å°„å½±å¤‰æ›ã®å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒã‚’è¿”ã™ï¼
   /*! 
-    \return	o—Í‹óŠÔ‚ÌŸŒ³(“¯ŸÀ•W‚ÌƒxƒNƒgƒ‹‚Æ‚µ‚Ä‚ÌŸŒ³‚Í outDim()+1)
+    \return	å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒ(åŒæ¬¡åº§æ¨™ã®ãƒ™ã‚¯ãƒˆãƒ«ã¨ã—ã¦ã®æ¬¡å…ƒã¯ outDim()+1)
   */
     u_int	outDim()			const	{return nrow()-1;}
 
@@ -858,7 +858,7 @@ class Projectivity : public M
     value_type	reprojectionError(Iterator begin, Iterator end)	const	;
     
   protected:
-  //! Ë‰e•ÏŠ·s—ñ‚ÌÅ–Ş„’è‚Ì‚½‚ß‚ÌƒRƒXƒgŠÖ”
+  //! å°„å½±å¤‰æ›è¡Œåˆ—ã®æœ€å°¤æ¨å®šã®ãŸã‚ã®ã‚³ã‚¹ãƒˆé–¢æ•°
     template <class Map, class Iterator>
     class Cost
     {
@@ -878,9 +878,9 @@ class Projectivity : public M
     };
 };
 
-//! Ë‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! å°„å½±å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  P“™•ÏŠ·‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
+  æ’ç­‰å¤‰æ›ã¨ã—ã¦åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
 */
 template <class M>
 Projectivity<M>::Projectivity()
@@ -895,11 +895,11 @@ Projectivity<M>::Projectivity()
     }
 }
     
-//! “ü—Í‹óŠÔ‚Æo—Í‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚ÄË‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! å…¥åŠ›ç©ºé–“ã¨å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒã‚’æŒ‡å®šã—ã¦å°„å½±å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  P“™•ÏŠ·‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
-  \param inDim	“ü—Í‹óŠÔ‚ÌŸŒ³
-  \param outDim	o—Í‹óŠÔ‚ÌŸŒ³
+  æ’ç­‰å¤‰æ›ã¨ã—ã¦åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
+  \param inDim	å…¥åŠ›ç©ºé–“ã®æ¬¡å…ƒ
+  \param outDim	å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒ
 */
 template <class M>
 Projectivity<M>::Projectivity(u_int inDim, u_int outDim)
@@ -911,12 +911,12 @@ Projectivity<M>::Projectivity(u_int inDim, u_int outDim)
     (*this)[outDim][inDim] = 1.0;
 }
     
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çË‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹å¯¾åˆ—ã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰å°„å½±å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param begin			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \param refine			”ñüŒ^Å“K‰»‚Ì—L(true)^–³(false)‚ğw’è
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹å¯¾åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹å¯¾åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \param refine			éç·šå‹æœ€é©åŒ–ã®æœ‰(true)ï¼ç„¡(false)ã‚’æŒ‡å®š
+  \throw std::invalid_argument	ç‚¹å¯¾ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template <class M> template <class Iterator> inline
 Projectivity<M>::Projectivity(Iterator begin, Iterator end, bool refine)
@@ -924,31 +924,31 @@ Projectivity<M>::Projectivity(Iterator begin, Iterator end, bool refine)
     fit(begin, end, refine);
 }
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çË‰e•ÏŠ·‚ğŒvZ‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹å¯¾åˆ—ã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰å°„å½±å¤‰æ›ã‚’è¨ˆç®—ã™ã‚‹ï¼
 /*!
-  \param begin			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \param refine			”ñüŒ^Å“K‰»‚Ì—L(true)^–³(false)‚ğw’è
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹å¯¾åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹å¯¾åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \param refine			éç·šå‹æœ€é©åŒ–ã®æœ‰(true)ï¼ç„¡(false)ã‚’æŒ‡å®š
+  \throw std::invalid_argument	ç‚¹å¯¾ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template <class M> template <class Iterator> void
 Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
 {
-  // “_—ñ‚Ì³‹K‰»
+  // ç‚¹åˆ—ã®æ­£è¦åŒ–
     const Normalize<value_type>	xNormalize(make_const_first_iterator(begin),
 					   make_const_first_iterator(end)),
 				yNormalize(make_const_second_iterator(begin),
 					   make_const_second_iterator(end));
 
-  // [•ª‚ÈŒÂ”‚Ì“_‘Î‚ª‚ ‚é‚©H
+  // å……åˆ†ãªå€‹æ•°ã®ç‚¹å¯¾ãŒã‚ã‚‹ã‹ï¼Ÿ
     const u_int		ndata = std::distance(begin, end);
     const u_int		xdim1 = xNormalize.spaceDim() + 1,
 			ydim  = yNormalize.spaceDim();
-    if (ndata*ydim < xdim1*(ydim + 1) - 1)	// s—ñ‚ÌƒTƒCƒY‚ª–¢’è‚È‚Ì‚Å
-						// ndataMin()‚Í–³Œø
+    if (ndata*ydim < xdim1*(ydim + 1) - 1)	// è¡Œåˆ—ã®ã‚µã‚¤ã‚ºãŒæœªå®šãªã®ã§
+						// ndataMin()ã¯ç„¡åŠ¹
 	throw std::invalid_argument("Projectivity::fit(): not enough input data!!");
 
-  // ƒf[ƒ^s—ñ‚ÌŒvZ
+  // ãƒ‡ãƒ¼ã‚¿è¡Œåˆ—ã®è¨ˆç®—
     Matrix<value_type>	A(xdim1*(ydim + 1), xdim1*(ydim + 1));
     for (Iterator iter = begin; iter != end; ++iter)
     {
@@ -964,15 +964,15 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
 	A(j*xdim1, j*xdim1, xdim1, xdim1) = A(0, 0, xdim1, xdim1);
     A.symmetrize();
 
-  // ƒf[ƒ^s—ñ‚ÌÅ¬ŒÅ—L’l‚É‘Î‰‚·‚éŒÅ—LƒxƒNƒgƒ‹‚©‚ç•ÏŠ·s—ñ‚ğŒvZ‚µC
-  // ³‹K‰»‚ğƒLƒƒƒ“ƒZƒ‹‚·‚éD
+  // ãƒ‡ãƒ¼ã‚¿è¡Œåˆ—ã®æœ€å°å›ºæœ‰å€¤ã«å¯¾å¿œã™ã‚‹å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‹ã‚‰å¤‰æ›è¡Œåˆ—ã‚’è¨ˆç®—ã—ï¼Œ
+  // æ­£è¦åŒ–ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ï¼
     Vector<value_type>	eval;
     Matrix<value_type>	Ut = A.eigen(eval);
     *this = yNormalize.Tinv()
 	  * Matrix<value_type>((value_type*)Ut[Ut.nrow()-1], ydim + 1, xdim1)
 	  * xNormalize.T();
 
-  // •ÏŠ·s—ñ‚ª³•û‚È‚ç‚ÎC‚»‚Ìs—ñ®‚ª‚P‚É‚È‚é‚æ‚¤‚É³‹K‰»‚·‚éD
+  // å¤‰æ›è¡Œåˆ—ãŒæ­£æ–¹ãªã‚‰ã°ï¼Œãã®è¡Œåˆ—å¼ãŒï¼‘ã«ãªã‚‹ã‚ˆã†ã«æ­£è¦åŒ–ã™ã‚‹ï¼
     if (nrow() == ncol())
     {
 	value_type	d = M::det();
@@ -982,7 +982,7 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
 	    *this /= -pow(-d, value_type(1.0/nrow()));
     }
 
-  // ”ñüŒ^Å“K‰»‚ğs‚¤D
+  // éç·šå‹æœ€é©åŒ–ã‚’è¡Œã†ï¼
     if (refine)
     {
 	Cost<Projectivity<M>, Iterator>		cost(begin, end);
@@ -991,9 +991,9 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
     }
 }
 
-//! ‚±‚ÌË‰e•ÏŠ·‚Ì‹t•ÏŠ·‚ğ•Ô‚·D
+//! ã“ã®å°„å½±å¤‰æ›ã®é€†å¤‰æ›ã‚’è¿”ã™ï¼
 /*!
-  \return	‹t•ÏŠ·
+  \return	é€†å¤‰æ›
 */
 template <class M> inline Projectivity<M>
 Projectivity<M>::inv() const
@@ -1001,11 +1001,11 @@ Projectivity<M>::inv() const
     return Projectivity(M::inv());
 }
     
-//! Ë‰e•ÏŠ·‚ğ‹‚ß‚é‚½‚ß‚É•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚ğ•Ô‚·D
+//! å°„å½±å¤‰æ›ã‚’æ±‚ã‚ã‚‹ãŸã‚ã«å¿…è¦ãªç‚¹å¯¾ã®æœ€å°å€‹æ•°ã‚’è¿”ã™ï¼
 /*!
-  Œ»İİ’è‚³‚ê‚Ä‚¢‚é“üo—Í‹óŠÔ‚ÌŸŒ³‚ğ‚à‚Æ‚ÉŒvZ‚³‚ê‚éD
-  \return	•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚·‚È‚í‚¿“ü—Í‹óŠÔ‚ÌŸŒ³mCo—Í‹óŠÔ‚ÌŸŒ³n
-		‚É‘Î‚µ‚Ä m + 1 + m/n
+  ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹å…¥å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒã‚’ã‚‚ã¨ã«è¨ˆç®—ã•ã‚Œã‚‹ï¼
+  \return	å¿…è¦ãªç‚¹å¯¾ã®æœ€å°å€‹æ•°ã™ãªã‚ã¡å…¥åŠ›ç©ºé–“ã®æ¬¡å…ƒmï¼Œå‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒn
+		ã«å¯¾ã—ã¦ m + 1 + m/n
 */
 template <class M> inline u_int
 Projectivity<M>::ndataMin() const
@@ -1013,10 +1013,10 @@ Projectivity<M>::ndataMin() const
     return inDim() + 1 + u_int(ceil(double(inDim())/double(outDim())));
 }
     
-//! —^‚¦‚ç‚ê‚½“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì”ñ“¯ŸÀ•W‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã«å°„å½±å¤‰æ›ã‚’é©ç”¨ã—ã¦ãã®éåŒæ¬¡åº§æ¨™ã‚’è¿”ã™ï¼
 /*!
-  \param x	“_‚Ì”ñ“¯ŸÀ•W(inDim()ŸŒ³)‚Ü‚½‚Í“¯ŸÀ•W(inDim()+1ŸŒ³)
-  \return	Ë‰e•ÏŠ·‚³‚ê‚½“_‚Ì”ñ“¯ŸÀ•W(outDim() ŸŒ³)
+  \param x	ç‚¹ã®éåŒæ¬¡åº§æ¨™(inDim()æ¬¡å…ƒ)ã¾ãŸã¯åŒæ¬¡åº§æ¨™(inDim()+1æ¬¡å…ƒ)
+  \return	å°„å½±å¤‰æ›ã•ã‚ŒãŸç‚¹ã®éåŒæ¬¡åº§æ¨™(outDim() æ¬¡å…ƒ)
 */
 template <class M> template <class S, class B>
 inline Vector<typename Projectivity<M>::value_type>
@@ -1041,10 +1041,10 @@ Projectivity<M>::operator ()(const Vector<S, B>& x) const
 	return (*this * x).inhomogeneous();
 }
 
-//! —^‚¦‚ç‚ê‚½“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚Ä‚»‚Ì“¯ŸÀ•W‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã«å°„å½±å¤‰æ›ã‚’é©ç”¨ã—ã¦ãã®åŒæ¬¡åº§æ¨™ã‚’è¿”ã™ï¼
 /*!
-  \param x	“_‚Ì”ñ“¯ŸÀ•W(inDim() ŸŒ³)‚Ü‚½‚Í“¯ŸÀ•W(inDim()+1ŸŒ³)
-  \return	Ë‰e•ÏŠ·‚³‚ê‚½“_‚Ì“¯ŸÀ•W(outDim()+1ŸŒ³)
+  \param x	ç‚¹ã®éåŒæ¬¡åº§æ¨™(inDim() æ¬¡å…ƒ)ã¾ãŸã¯åŒæ¬¡åº§æ¨™(inDim()+1æ¬¡å…ƒ)
+  \return	å°„å½±å¤‰æ›ã•ã‚ŒãŸç‚¹ã®åŒæ¬¡åº§æ¨™(outDim()+1æ¬¡å…ƒ)
 */
 template <class M> template <class S, class B>
 inline Vector<typename Projectivity<M>::value_type>
@@ -1065,11 +1065,11 @@ Projectivity<M>::mapP(const Vector<S, B>& x) const
 	return *this * x;
 }
 
-//! —^‚¦‚ç‚ê‚½“_‚É‚¨‚¯‚éƒ„ƒRƒrs—ñ‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã«ãŠã‘ã‚‹ãƒ¤ã‚³ãƒ“è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  ƒ„ƒRƒrs—ñ‚Æ‚ÍË‰e•ÏŠ·s—ñ¬•ª‚ÉŠÖ‚·‚é1ŠK”÷•ª‚Ì‚±‚Æ‚Å‚ ‚éD
-  \param x	“_‚Ì”ñ“¯ŸÀ•W(inDim() ŸŒ³)‚Ü‚½‚Í“¯ŸÀ•W(inDim()+1ŸŒ³)
-  \return	outDim() x (outDim()+1)x(inDim()+1)ƒ„ƒRƒrs—ñ
+  ãƒ¤ã‚³ãƒ“è¡Œåˆ—ã¨ã¯å°„å½±å¤‰æ›è¡Œåˆ—æˆåˆ†ã«é–¢ã™ã‚‹1éšå¾®åˆ†ã®ã“ã¨ã§ã‚ã‚‹ï¼
+  \param x	ç‚¹ã®éåŒæ¬¡åº§æ¨™(inDim() æ¬¡å…ƒ)ã¾ãŸã¯åŒæ¬¡åº§æ¨™(inDim()+1æ¬¡å…ƒ)
+  \return	outDim() x (outDim()+1)x(inDim()+1)ãƒ¤ã‚³ãƒ“è¡Œåˆ—
 */
 template <class M> template <class S, class B>
 Matrix<typename Projectivity<M>::value_type>
@@ -1092,11 +1092,11 @@ Projectivity<M>::jacobian(const Vector<S, B>& x) const
     return J;
 }
     
-//! “ü—Í“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚½“_‚Æo—Í“_‚Ì‹——£‚Ì2æ‚ğ•Ô‚·D
+//! å…¥åŠ›ç‚¹ã«å°„å½±å¤‰æ›ã‚’é©ç”¨ã—ãŸç‚¹ã¨å‡ºåŠ›ç‚¹ã®è·é›¢ã®2ä¹—ã‚’è¿”ã™ï¼
 /*!
-  \param pair	“ü—Í“_‚Ì”ñ“¯ŸÀ•W(inDim() ŸŒ³)‚Æo—Í“_‚Ì”ñ“¯ŸÀ•W
-		(outDim() ŸŒ³)‚Ì‘Î
-  \return	•ÏŠ·‚³‚ê‚½“ü—Í“_‚Æo—Í“_‚Ì‹——£‚Ì2æ
+  \param pair	å…¥åŠ›ç‚¹ã®éåŒæ¬¡åº§æ¨™(inDim() æ¬¡å…ƒ)ã¨å‡ºåŠ›ç‚¹ã®éåŒæ¬¡åº§æ¨™
+		(outDim() æ¬¡å…ƒ)ã®å¯¾
+  \return	å¤‰æ›ã•ã‚ŒãŸå…¥åŠ›ç‚¹ã¨å‡ºåŠ›ç‚¹ã®è·é›¢ã®2ä¹—
 */
 template <class M> template <class In, class Out>
 inline typename Projectivity<M>::value_type
@@ -1105,11 +1105,11 @@ Projectivity<M>::sqdist(const std::pair<In, Out>& pair) const
     return (*this)(pair.first).sqdist(pair.second);
 }
     
-//! “ü—Í“_‚ÉË‰e•ÏŠ·‚ğ“K—p‚µ‚½“_‚Æo—Í“_‚Ì‹——£‚ğ•Ô‚·D
+//! å…¥åŠ›ç‚¹ã«å°„å½±å¤‰æ›ã‚’é©ç”¨ã—ãŸç‚¹ã¨å‡ºåŠ›ç‚¹ã®è·é›¢ã‚’è¿”ã™ï¼
 /*!
-  \param pair	“ü—Í“_‚Ì”ñ“¯ŸÀ•W(inDim() ŸŒ³)‚Æo—Í“_‚Ì”ñ“¯ŸÀ•W
-		(outDim() ŸŒ³)‚Ì‘Î
-  \return	•ÏŠ·‚³‚ê‚½“ü—Í“_‚Æo—Í“_‚Ì‹——£
+  \param pair	å…¥åŠ›ç‚¹ã®éåŒæ¬¡åº§æ¨™(inDim() æ¬¡å…ƒ)ã¨å‡ºåŠ›ç‚¹ã®éåŒæ¬¡åº§æ¨™
+		(outDim() æ¬¡å…ƒ)ã®å¯¾
+  \return	å¤‰æ›ã•ã‚ŒãŸå…¥åŠ›ç‚¹ã¨å‡ºåŠ›ç‚¹ã®è·é›¢
 */
 template <class M> template <class In, class Out>
 inline typename Projectivity<M>::value_type
@@ -1118,10 +1118,10 @@ Projectivity<M>::dist(const std::pair<In, Out>& pair) const
     return sqrt(sqdist(pair));
 }
 
-//! ‚±‚ÌË‰e•ÏŠ·‚Ìƒpƒ‰ƒ[ƒ^”‚ğ•Ô‚·D
+//! ã“ã®å°„å½±å¤‰æ›ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿æ•°ã‚’è¿”ã™ï¼
 /*!
-  Ë‰e•ÏŠ·s—ñ‚Ì—v‘f”‚Å‚ ‚èC•ÏŠ·‚Ì©—R“x”‚Æ‚ÍˆÙ‚È‚éD
-  \return	Ë‰e•ÏŠ·‚Ìƒpƒ‰ƒ[ƒ^”((outDim()+1)x(inDim()+1))
+  å°„å½±å¤‰æ›è¡Œåˆ—ã®è¦ç´ æ•°ã§ã‚ã‚Šï¼Œå¤‰æ›ã®è‡ªç”±åº¦æ•°ã¨ã¯ç•°ãªã‚‹ï¼
+  \return	å°„å½±å¤‰æ›ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿æ•°((outDim()+1)x(inDim()+1))
 */
 template <class M> inline u_int
 Projectivity<M>::nparams() const
@@ -1129,9 +1129,9 @@ Projectivity<M>::nparams() const
     return (outDim() + 1)*(inDim() + 1);
 }
 
-//! Ë‰e•ÏŠ·s—ñ‚ğ—^‚¦‚ç‚ê‚½—Ê‚¾‚¯C³‚·‚éD
+//! å°„å½±å¤‰æ›è¡Œåˆ—ã‚’ä¸ãˆã‚‰ã‚ŒãŸé‡ã ã‘ä¿®æ­£ã™ã‚‹ï¼
 /*!
-  \param dt	C³—Ê‚ğ•\‚·ƒxƒNƒgƒ‹((outDim()+1)x(inDim()+1)ŸŒ³)
+  \param dt	ä¿®æ­£é‡ã‚’è¡¨ã™ãƒ™ã‚¯ãƒˆãƒ«((outDim()+1)x(inDim()+1)æ¬¡å…ƒ)
 */
 template <class M> inline void
 Projectivity<M>::update(const Vector<value_type>& dt)
@@ -1142,11 +1142,11 @@ Projectivity<M>::update(const Vector<value_type>& dt)
     t *= (l / t.length());
 }
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì•½‹ÏÄ“Š‰eŒë·‚ğ•Ô‚·D
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹å¯¾åˆ—ã®å¹³å‡å†æŠ•å½±èª¤å·®ã‚’è¿”ã™ï¼
 /*!
-  \param begin	“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end	“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \return	•½‹ÏÄ“Š‰eŒë·
+  \param begin	ç‚¹å¯¾åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end	ç‚¹å¯¾åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \return	å¹³å‡å†æŠ•å½±èª¤å·®
 */
 template <class M> template <class Iterator>
 typename Projectivity<M>::value_type
@@ -1221,13 +1221,13 @@ typedef Projectivity<Matrix34d>	Projectivity23d;
 /************************************************************************
 *  class Affinity<M>							*
 ************************************************************************/
-//! ƒAƒtƒBƒ“•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+//! ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 /*!
-  \f$\TUvec{A}{} \in \TUspace{R}{n\times m}\f$‚Æ
-  \f$\TUvec{b}{} \in \TUspace{R}{n}\f$‚ğ—p‚¢‚ÄmŸŒ³‹óŠÔ‚Ì“_
-  \f$\TUvec{x}{} \in \TUspace{R}{m}\f$‚ğnŸŒ³‹óŠÔ‚Ì“_
+  \f$\TUvec{A}{} \in \TUspace{R}{n\times m}\f$ã¨
+  \f$\TUvec{b}{} \in \TUspace{R}{n}\f$ã‚’ç”¨ã„ã¦mæ¬¡å…ƒç©ºé–“ã®ç‚¹
+  \f$\TUvec{x}{} \in \TUspace{R}{m}\f$ã‚’næ¬¡å…ƒç©ºé–“ã®ç‚¹
   \f$\TUvec{y}{} \simeq \TUvec{A}{}\TUvec{x}{} + \TUvec{b}{}
-  \in \TUspace{R}{n}\f$‚ÉÊ‚·(\f$m \neq n\f$‚Å‚à\‚í‚È‚¢)D
+  \in \TUspace{R}{n}\f$ã«å†™ã™(\f$m \neq n\f$ã§ã‚‚æ§‹ã‚ãªã„)ï¼
 */
 template <class M>
 class Affinity : public Projectivity<M>
@@ -1235,11 +1235,11 @@ class Affinity : public Projectivity<M>
   public:
     typedef typename Projectivity<M>::value_type	value_type;
     
-  //! “ü—Í‹óŠÔ‚Æo—Í‹óŠÔ‚ÌŸŒ³‚ğw’è‚µ‚ÄƒAƒtƒBƒ“•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+  //! å…¥åŠ›ç©ºé–“ã¨å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒã‚’æŒ‡å®šã—ã¦ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    P“™•ÏŠ·‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
-    \param inDim	“ü—Í‹óŠÔ‚ÌŸŒ³
-    \param outDim	o—Í‹óŠÔ‚ÌŸŒ³
+    æ’ç­‰å¤‰æ›ã¨ã—ã¦åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
+    \param inDim	å…¥åŠ›ç©ºé–“ã®æ¬¡å…ƒ
+    \param outDim	å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒ
   */
     Affinity(u_int inDim=2, u_int outDim=2)
 	:Projectivity<M>(inDim, outDim)					{}
@@ -1259,9 +1259,9 @@ class Affinity : public Projectivity<M>
     Affinity	inv()						const	;
     u_int	ndataMin()					const	;
     
-  //! ‚±‚ÌƒAƒtƒBƒ“•ÏŠ·‚Ì•ÏŒ`•”•ª‚ğ•\Œ»‚·‚és—ñ‚ğ•Ô‚·D
+  //! ã“ã®ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã®å¤‰å½¢éƒ¨åˆ†ã‚’è¡¨ç¾ã™ã‚‹è¡Œåˆ—ã‚’è¿”ã™ï¼
   /*! 
-    \return	outDim() x inDim() s—ñ
+    \return	outDim() x inDim() è¡Œåˆ—
   */
     const Matrix<value_type>
 		A()	const	{return M::operator ()(0, 0, outDim(), inDim());}
@@ -1270,10 +1270,10 @@ class Affinity : public Projectivity<M>
 		b()	const	;
 };
 
-//! •ÏŠ·s—ñ‚ğw’è‚µ‚ÄƒAƒtƒBƒ“•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! å¤‰æ›è¡Œåˆ—ã‚’æŒ‡å®šã—ã¦ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  •ÏŠ·s—ñ‚Ì‰º’[s‚Í‹­§“I‚É 0,0,...,0,1 ‚Éİ’è‚³‚ê‚éD
-  \param T			(m+1)x(n+1)s—ñ(m, n‚Í“ü—Í^o—Í‹óŠÔ‚ÌŸŒ³)
+  å¤‰æ›è¡Œåˆ—ã®ä¸‹ç«¯è¡Œã¯å¼·åˆ¶çš„ã« 0,0,...,0,1 ã«è¨­å®šã•ã‚Œã‚‹ï¼
+  \param T			(m+1)x(n+1)è¡Œåˆ—(m, nã¯å…¥åŠ›ï¼å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒ)
 */
 template<class M> template <class S, class B, class R> inline
 Affinity<M>::Affinity(const Matrix<S, B, R>& T)
@@ -1283,11 +1283,11 @@ Affinity<M>::Affinity(const Matrix<S, B, R>& T)
     (*this)[outDim()][inDim()] = 1.0;
 }
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çƒAƒtƒBƒ“•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹å¯¾åˆ—ã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param begin			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹å¯¾åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹å¯¾åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \throw std::invalid_argument	ç‚¹å¯¾ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template<class M> template <class Iterator> inline
 Affinity<M>::Affinity(Iterator begin, Iterator end)
@@ -1295,10 +1295,10 @@ Affinity<M>::Affinity(Iterator begin, Iterator end)
     fit(begin, end);
 }
 
-//! •ÏŠ·s—ñ‚ğw’è‚·‚éD
+//! å¤‰æ›è¡Œåˆ—ã‚’æŒ‡å®šã™ã‚‹ï¼
 /*!
-  •ÏŠ·s—ñ‚Ì‰º’[s‚Í‹­§“I‚É 0,0,...,0,1 ‚Éİ’è‚³‚ê‚éD
-  \param T			(m+1)x(n+1)s—ñ(m, n‚Í“ü—Í^o—Í‹óŠÔ‚ÌŸŒ³)
+  å¤‰æ›è¡Œåˆ—ã®ä¸‹ç«¯è¡Œã¯å¼·åˆ¶çš„ã« 0,0,...,0,1 ã«è¨­å®šã•ã‚Œã‚‹ï¼
+  \param T			(m+1)x(n+1)è¡Œåˆ—(m, nã¯å…¥åŠ›ï¼å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒ)
 */
 template<class M> template <class S, class B, class R> inline void
 Affinity<M>::set(const Matrix<S, B, R>& T)
@@ -1308,24 +1308,24 @@ Affinity<M>::set(const Matrix<S, B, R>& T)
     (*this)[outDim()][inDim()] = 1.0;
 }
     
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚çƒAƒtƒBƒ“•ÏŠ·‚ğŒvZ‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹å¯¾åˆ—ã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚’è¨ˆç®—ã™ã‚‹ï¼
 /*!
-  \param begin			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹å¯¾åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹å¯¾åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \throw std::invalid_argument	ç‚¹å¯¾ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template<class M> template <class Iterator> void
 Affinity<M>::fit(Iterator begin, Iterator end)
 {
-  // [•ª‚ÈŒÂ”‚Ì“_‘Î‚ª‚ ‚é‚©H
+  // å……åˆ†ãªå€‹æ•°ã®ç‚¹å¯¾ãŒã‚ã‚‹ã‹ï¼Ÿ
     const u_int	ndata = std::distance(begin, end);
-    if (ndata == 0)		// begin‚ª—LŒø‚©H
+    if (ndata == 0)		// beginãŒæœ‰åŠ¹ã‹ï¼Ÿ
 	throw std::invalid_argument("Affinity::fit(): 0-length input data!!");
     const u_int	xdim = begin->first.dim();
-    if (ndata < xdim + 1)	// s—ñ‚ÌƒTƒCƒY‚ª–¢’è‚È‚Ì‚ÅndataMin()‚Í–³Œø
+    if (ndata < xdim + 1)	// è¡Œåˆ—ã®ã‚µã‚¤ã‚ºãŒæœªå®šãªã®ã§ndataMin()ã¯ç„¡åŠ¹
 	throw std::invalid_argument("Affinity::fit(): not enough input data!!");
 
-  // ƒf[ƒ^s—ñ‚ÌŒvZ
+  // ãƒ‡ãƒ¼ã‚¿è¡Œåˆ—ã®è¨ˆç®—
     const u_int	ydim = begin->second.dim(), xydim2 = xdim*ydim;
     Matrix<value_type>	N(xdim, xdim);
     Vector<value_type>	c(xdim), v(xydim2 + ydim);
@@ -1349,10 +1349,10 @@ Affinity<M>::fit(Iterator begin, Iterator end)
     }
     W.symmetrize();
 
-  // W*u = v‚ğ‰ğ‚¢‚Ä•ÏŠ·ƒpƒ‰ƒ[ƒ^‚ğ‹‚ß‚éD
+  // W*u = vã‚’è§£ã„ã¦å¤‰æ›ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ±‚ã‚ã‚‹ï¼
     v.solve(W);
 
-  // •ÏŠ·s—ñ‚ğƒZƒbƒg‚·‚éD
+  // å¤‰æ›è¡Œåˆ—ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
     M::resize(ydim + 1, xdim + 1);
     M::operator ()(0, 0, ydim, xdim)
 	= Matrix<value_type>((value_type*)v, ydim, xdim);
@@ -1361,9 +1361,9 @@ Affinity<M>::fit(Iterator begin, Iterator end)
     (*this)[ydim][xdim] = 1.0;
 }
 
-//! ‚±‚ÌƒAƒtƒBƒ“•ÏŠ·‚Ì•ÀsˆÚ“®•”•ª‚ğ•\Œ»‚·‚éƒxƒNƒgƒ‹‚ğ•Ô‚·D
+//! ã“ã®ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã®ä¸¦è¡Œç§»å‹•éƒ¨åˆ†ã‚’è¡¨ç¾ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ï¼
 /*! 
-  \return	outDim() ŸŒ³ƒxƒNƒgƒ‹
+  \return	outDim() æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class M> Vector<typename Affinity<M>::value_type>
 Affinity<M>::b() const
@@ -1375,9 +1375,9 @@ Affinity<M>::b() const
     return bb;
 }
 
-//! ‚±‚ÌƒAƒtƒBƒ“•ÏŠ·‚Ì‹t•ÏŠ·‚ğ•Ô‚·D
+//! ã“ã®ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã®é€†å¤‰æ›ã‚’è¿”ã™ï¼
 /*!
-  \return	‹t•ÏŠ·
+  \return	é€†å¤‰æ›
 */
 template <class M> inline Affinity<M>
 Affinity<M>::inv() const
@@ -1385,10 +1385,10 @@ Affinity<M>::inv() const
     return Affinity(M::inv());
 }
     
-//! ƒAƒtƒBƒ“•ÏŠ·‚ğ‹‚ß‚é‚½‚ß‚É•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚ğ•Ô‚·D
+//! ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚’æ±‚ã‚ã‚‹ãŸã‚ã«å¿…è¦ãªç‚¹å¯¾ã®æœ€å°å€‹æ•°ã‚’è¿”ã™ï¼
 /*!
-  Œ»İİ’è‚³‚ê‚Ä‚¢‚é“üo—Í‹óŠÔ‚ÌŸŒ³‚ğ‚à‚Æ‚ÉŒvZ‚³‚ê‚éD
-  \return	•K—v‚È“_‘Î‚ÌÅ¬ŒÂ”‚·‚È‚í‚¿“ü—Í‹óŠÔ‚ÌŸŒ³m‚É‘Î‚µ‚Ä m + 1
+  ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹å…¥å‡ºåŠ›ç©ºé–“ã®æ¬¡å…ƒã‚’ã‚‚ã¨ã«è¨ˆç®—ã•ã‚Œã‚‹ï¼
+  \return	å¿…è¦ãªç‚¹å¯¾ã®æœ€å°å€‹æ•°ã™ãªã‚ã¡å…¥åŠ›ç©ºé–“ã®æ¬¡å…ƒmã«å¯¾ã—ã¦ m + 1
 */
 template<class M> inline u_int
 Affinity<M>::ndataMin() const
@@ -1408,12 +1408,12 @@ typedef Affinity<Matrix34d>	Affinity23d;
 /************************************************************************
 *  class Homography<T>							*
 ************************************************************************/
-//! 2ŸŒ³Ë‰e•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+//! 2æ¬¡å…ƒå°„å½±å¤‰æ›ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 /*!
-  \f$\TUvec{H}{} = \in \TUspace{R}{3\times 3}\f$‚ğ—p‚¢‚Ä2ŸŒ³‹óŠÔ‚Ì“_
-  \f$\TUud{x}{} \in \TUspace{R}{3}\f$‚ğ2ŸŒ³‹óŠÔ‚Ì“_
+  \f$\TUvec{H}{} = \in \TUspace{R}{3\times 3}\f$ã‚’ç”¨ã„ã¦2æ¬¡å…ƒç©ºé–“ã®ç‚¹
+  \f$\TUud{x}{} \in \TUspace{R}{3}\f$ã‚’2æ¬¡å…ƒç©ºé–“ã®ç‚¹
   \f$\TUud{y}{} \simeq \TUvec{H}{}\TUud{x}{} \in \TUspace{R}{3}\f$
-  ‚ÉÊ‚·D
+  ã«å†™ã™ï¼
 */
 template <class T>
 class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
@@ -1454,12 +1454,12 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
     void	compose(const param_type& dt)			;
 };
 
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚ç2ŸŒ³Ë‰e•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹å¯¾åˆ—ã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰2æ¬¡å…ƒå°„å½±å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param begin			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \param refine			”ñüŒ^Å“K‰»‚Ì—L(true)^–³(false)‚ğw’è
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹å¯¾åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹å¯¾åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \param refine			éç·šå‹æœ€é©åŒ–ã®æœ‰(true)ï¼ç„¡(false)ã‚’æŒ‡å®š
+  \throw std::invalid_argument	ç‚¹å¯¾ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template<class T> template <class Iterator> inline
 Homography<T>::Homography(Iterator begin, Iterator end, bool refine)
@@ -1468,9 +1468,9 @@ Homography<T>::Homography(Iterator begin, Iterator end, bool refine)
     fit(begin, end, refine);
 }
 
-//! ‚±‚Ì2ŸŒ³Ë‰e•ÏŠ·‚Ì‹t•ÏŠ·‚ğ•Ô‚·D
+//! ã“ã®2æ¬¡å…ƒå°„å½±å¤‰æ›ã®é€†å¤‰æ›ã‚’è¿”ã™ï¼
 /*!
-  \return	‹t•ÏŠ·
+  \return	é€†å¤‰æ›
 */
 template <class T> Homography<T>
 Homography<T>::inv() const
@@ -1527,12 +1527,12 @@ Homography<T>::compose(const param_type& dt)
 /************************************************************************
 *  class Affinity2<T>							*
 ************************************************************************/
-//! 2ŸŒ³ƒAƒtƒBƒ“•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+//! 2æ¬¡å…ƒã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 /*!
-  \f$\TUvec{A}{} = \in \TUspace{R}{3\times 3}\f$‚ğ—p‚¢‚Ä2ŸŒ³‹óŠÔ‚Ì“_
-  \f$\TUud{x}{} \in \TUspace{R}{3}\f$‚ğ2ŸŒ³‹óŠÔ‚Ì“_
+  \f$\TUvec{A}{} = \in \TUspace{R}{3\times 3}\f$ã‚’ç”¨ã„ã¦2æ¬¡å…ƒç©ºé–“ã®ç‚¹
+  \f$\TUud{x}{} \in \TUspace{R}{3}\f$ã‚’2æ¬¡å…ƒç©ºé–“ã®ç‚¹
   \f$\TUud{y}{} \simeq \TUvec{A}{}\TUud{x}{} \in \TUspace{R}{3}\f$
-  ‚ÉÊ‚·D
+  ã«å†™ã™ï¼
 */
 template <class T>
 class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
@@ -1581,11 +1581,11 @@ Affinity2<T>::Affinity2(const Matrix<S, B, R>& A)
     (*this)[2][2] = 1.0;
 }
     
-//! —^‚¦‚ç‚ê‚½“_‘Î—ñ‚Ì”ñ“¯ŸÀ•W‚©‚ç2ŸŒ³ƒAƒtƒBƒ“•ÏŠ·ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç‚¹å¯¾åˆ—ã®éåŒæ¬¡åº§æ¨™ã‹ã‚‰2æ¬¡å…ƒã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param begin			“_‘Î—ñ‚Ìæ“ª‚ğ¦‚·”½•œq
-  \param end			“_‘Î—ñ‚Ì––”ö‚ğ¦‚·”½•œq
-  \throw std::invalid_argument	“_‘Î‚Ì”‚ª ndataMin() ‚É–‚½‚È‚¢ê‡‚É‘—o
+  \param begin			ç‚¹å¯¾åˆ—ã®å…ˆé ­ã‚’ç¤ºã™åå¾©å­
+  \param end			ç‚¹å¯¾åˆ—ã®æœ«å°¾ã‚’ç¤ºã™åå¾©å­
+  \throw std::invalid_argument	ç‚¹å¯¾ã®æ•°ãŒ ndataMin() ã«æº€ãŸãªã„å ´åˆã«é€å‡º
 */
 template<class T> template <class Iterator> inline
 Affinity2<T>::Affinity2(Iterator begin, Iterator end)
@@ -1593,9 +1593,9 @@ Affinity2<T>::Affinity2(Iterator begin, Iterator end)
     fit(begin, end);
 }
 
-//! ‚±‚Ì2ŸŒ³ƒAƒtƒBƒ“•ÏŠ·‚Ì‹t•ÏŠ·‚ğ•Ô‚·D
+//! ã“ã®2æ¬¡å…ƒã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã®é€†å¤‰æ›ã‚’è¿”ã™ï¼
 /*!
-  \return	‹t•ÏŠ·
+  \return	é€†å¤‰æ›
 */
 template <class T> inline Affinity2<T>
 Affinity2<T>::inv() const
@@ -1640,15 +1640,15 @@ Affinity2<T>::compose(const param_type& dt)
 /************************************************************************
 *   class BoundingBox<P>						*
 ************************************************************************/
-//! PŒ^‚Ì“_‚É‘Î‚·‚ébounding box‚ğ•\‚·ƒNƒ‰ƒX
+//! På‹ã®ç‚¹ã«å¯¾ã™ã‚‹bounding boxã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  \param P	“_‚ÌŒ^(ŸŒ³‚Í©—R)
+  \param P	ç‚¹ã®å‹(æ¬¡å…ƒã¯è‡ªç”±)
 */
 template <class P>
 class BoundingBox
 {
   public:
-  //! “_‚Ì—v‘f‚ÌŒ^
+  //! ç‚¹ã®è¦ç´ ã®å‹
     typedef typename P::value_type		value_type;
 
   public:
@@ -1656,60 +1656,60 @@ class BoundingBox
     explicit BoundingBox(u_int d)		;
 
     bool		operator !()	const	;
-  //! ‚±‚Ìbounding box‚ª‘®‚·‚é‹óŠÔ‚ÌŸŒ³‚ğ•Ô‚·D
+  //! ã“ã®bounding boxãŒå±ã™ã‚‹ç©ºé–“ã®æ¬¡å…ƒã‚’è¿”ã™ï¼
   /*!
-    \return	‹óŠÔ‚ÌŸŒ³
+    \return	ç©ºé–“ã®æ¬¡å…ƒ
   */
     u_int		dim()		const	{return _min.dim();}
 
-  //! ‚±‚Ìbounding box‚ÌÅ¬“_‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®æœ€å°ç‚¹ã‚’è¿”ã™ï¼
   /*!
-    \return	Å¬“_
+    \return	æœ€å°ç‚¹
   */
     const P&		min()		const	{return _min;}
 
-  //! ‚±‚Ìbounding box‚ÌÅ‘å“_‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®æœ€å¤§ç‚¹ã‚’è¿”ã™ï¼
   /*!
-    \return	Å‘å“_
+    \return	æœ€å¤§ç‚¹
   */
     const P&		max()		const	{return _max;}
 
-  //! ‚±‚Ìbounding box‚ÌÅ¬“_‚Ìw’è‚³‚ê‚½²‚ÌÀ•W’l‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®æœ€å°ç‚¹ã®æŒ‡å®šã•ã‚ŒãŸè»¸ã®åº§æ¨™å€¤ã‚’è¿”ã™ï¼
   /*!
-    \param i	²‚ğw’è‚·‚éindex
-    \return	²‚ÌÀ•W’l
+    \param i	è»¸ã‚’æŒ‡å®šã™ã‚‹index
+    \return	è»¸ã®åº§æ¨™å€¤
   */
     value_type		min(int i)	const	{return _min[i];}
 
-  //! ‚±‚Ìbounding box‚ÌÅ‘å“_‚Ìw’è‚³‚ê‚½²‚ÌÀ•W’l‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®æœ€å¤§ç‚¹ã®æŒ‡å®šã•ã‚ŒãŸè»¸ã®åº§æ¨™å€¤ã‚’è¿”ã™ï¼
   /*!
-    \param i	²‚ğw’è‚·‚éindex
-    \return	²‚ÌÀ•W’l
+    \param i	è»¸ã‚’æŒ‡å®šã™ã‚‹index
+    \return	è»¸ã®åº§æ¨™å€¤
   */
     value_type		max(int i)	const	{return _max[i];}
 
-  //! ‚±‚Ìbounding box‚Ìw’è‚³‚ê‚½²‚É‰ˆ‚Á‚½’·‚³‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®æŒ‡å®šã•ã‚ŒãŸè»¸ã«æ²¿ã£ãŸé•·ã•ã‚’è¿”ã™ï¼
   /*!
-    \param i	²‚ğw’è‚·‚éindex
-    \return	²‚É‰ˆ‚Á‚½’·‚³
+    \param i	è»¸ã‚’æŒ‡å®šã™ã‚‹index
+    \return	è»¸ã«æ²¿ã£ãŸé•·ã•
   */
     value_type		length(int i)	const	{return _max[i] - _min[i];}
 
-  //! ‚±‚Ìbounding box‚Ì•‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®å¹…ã‚’è¿”ã™ï¼
   /*!
-    \return	• (TU::BoundingBox::length (0)‚É“™‚µ‚¢)
+    \return	å¹… (TU::BoundingBox::length (0)ã«ç­‰ã—ã„)
   */
     value_type		width()		const	{return length(0);}
 
-  //! ‚±‚Ìbounding box‚Ì‚‚³‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®é«˜ã•ã‚’è¿”ã™ï¼
   /*!
-    \return	‚‚³ (TU::BoundingBox::length (1)‚É“™‚µ‚¢)
+    \return	é«˜ã• (TU::BoundingBox::length (1)ã«ç­‰ã—ã„)
   */
     value_type		height()	const	{return length(1);}
 
-  //! ‚±‚Ìbounding box‚Ì‰œs‚«‚ğ•Ô‚·D
+  //! ã“ã®bounding boxã®å¥¥è¡Œãã‚’è¿”ã™ï¼
   /*!
-    \return	‰œs‚« (TU::BoundingBox::length (2)‚É“™‚µ‚¢)
+    \return	å¥¥è¡Œã (TU::BoundingBox::length (2)ã«ç­‰ã—ã„)
   */
     value_type		depth()		const	{return length(2);}
 
@@ -1727,11 +1727,11 @@ class BoundingBox
     BoundingBox&	operator &=(const BoundingBox& bbox)		;
     
   private:
-  //! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çbounding box‚ğ¬‚·2‚Â‚Ì“_‚ÌÀ•W‚ğ“ü—Í‚·‚é(ASCII)D
+  //! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰bounding boxã‚’æˆã™2ã¤ã®ç‚¹ã®åº§æ¨™ã‚’å…¥åŠ›ã™ã‚‹(ASCII)ï¼
   /*!
-    \param in	“ü—ÍƒXƒgƒŠ[ƒ€
+    \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
     \param bbox	bounding box
-    \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+    \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   */
     friend std::istream&
     operator >>(std::istream& in, BoundingBox<P>& bbox)
@@ -1743,7 +1743,7 @@ class BoundingBox
     P	_max;
 };
 
-//! ‹ó‚Ìbounding box‚ğì‚éD
+//! ç©ºã®bounding boxã‚’ä½œã‚‹ï¼
 template <class P> inline
 BoundingBox<P>::BoundingBox()
     :_min(), _max()
@@ -1751,9 +1751,9 @@ BoundingBox<P>::BoundingBox()
     clear();
 }
 
-//! w’è‚µ‚½ŸŒ³‚Ì‹óŠÔ‚É‚¨‚¢‚Ä‹ó‚Ìbounding box‚ğì‚éD
+//! æŒ‡å®šã—ãŸæ¬¡å…ƒã®ç©ºé–“ã«ãŠã„ã¦ç©ºã®bounding boxã‚’ä½œã‚‹ï¼
 /*!
-  \param d	‹óŠÔ‚ÌŸŒ³
+  \param d	ç©ºé–“ã®æ¬¡å…ƒ
 */
 template <class P> inline
 BoundingBox<P>::BoundingBox(u_int d)
@@ -1762,9 +1762,9 @@ BoundingBox<P>::BoundingBox(u_int d)
     clear();
 }
 
-//! bounding box‚ª‹ó‚Å‚ ‚é‚©’²‚×‚éD
+//! bounding boxãŒç©ºã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \return	‹ó‚Å‚ ‚ê‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \return	ç©ºã§ã‚ã‚Œã°true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class P> bool
 BoundingBox<P>::operator !() const
@@ -1775,10 +1775,10 @@ BoundingBox<P>::operator !() const
     return false;
 }
 
-//! bounding box‚ª—^‚¦‚ç‚ê‚½“_‚ğŠÜ‚Ş‚©’²‚×‚éD
+//! bounding boxãŒä¸ãˆã‚‰ã‚ŒãŸç‚¹ã‚’å«ã‚€ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param p	“_‚ÌÀ•W
-  \return	ŠÜ‚ß‚Îtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param p	ç‚¹ã®åº§æ¨™
+  \return	å«ã‚ã°true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class P> template <class S, class B> bool
 BoundingBox<P>::include(const Vector<S, B>& p)
@@ -1789,9 +1789,9 @@ BoundingBox<P>::include(const Vector<S, B>& p)
     return true;
 }
 
-//! bounding box‚ğ‹ó‚É‚·‚éD
+//! bounding boxã‚’ç©ºã«ã™ã‚‹ï¼
 /*!
-  \return	‹ó‚É‚³‚ê‚½‚±‚Ìbounding box
+  \return	ç©ºã«ã•ã‚ŒãŸã“ã®bounding box
 */
 template <class P> BoundingBox<P>&
 BoundingBox<P>::clear()
@@ -1806,10 +1806,10 @@ BoundingBox<P>::clear()
     return *this;
 }
 
-//! bounding box‚ğ—^‚¦‚ç‚ê‚½“_‚ğŠÜ‚Ş‚æ‚¤‚ÉŠg’£‚·‚éD
+//! bounding boxã‚’ä¸ãˆã‚‰ã‚ŒãŸç‚¹ã‚’å«ã‚€ã‚ˆã†ã«æ‹¡å¼µã™ã‚‹ï¼
 /*!
-  \param p	“_‚ÌÀ•W
-  \return	Šg’£‚³‚ê‚½‚±‚Ìbounding box
+  \param p	ç‚¹ã®åº§æ¨™
+  \return	æ‹¡å¼µã•ã‚ŒãŸã“ã®bounding box
 */
 template <class P> template <class S, class B> BoundingBox<P>&
 BoundingBox<P>::expand(const Vector<S, B>& p)
@@ -1822,10 +1822,10 @@ BoundingBox<P>::expand(const Vector<S, B>& p)
     return *this;
 }
 
-//! bounding box‚ğ—^‚¦‚ç‚ê‚½•ÏˆÊ‚¾‚¯³•ûŒü‚É•½sˆÚ“®‚·‚éD
+//! bounding boxã‚’ä¸ãˆã‚‰ã‚ŒãŸå¤‰ä½ã ã‘æ­£æ–¹å‘ã«å¹³è¡Œç§»å‹•ã™ã‚‹ï¼
 /*!
-  \param dt	•ÏˆÊ
-  \return	•½sˆÚ“®‚³‚ê‚½‚±‚Ìbounding box
+  \param dt	å¤‰ä½
+  \return	å¹³è¡Œç§»å‹•ã•ã‚ŒãŸã“ã®bounding box
 */
 template <class P> template <class S, class B> inline BoundingBox<P>&
 BoundingBox<P>::operator +=(const Vector<S, B>& dt)
@@ -1835,10 +1835,10 @@ BoundingBox<P>::operator +=(const Vector<S, B>& dt)
     return *this;
 }
     
-//! bounding box‚ğ—^‚¦‚ç‚ê‚½•ÏˆÊ‚¾‚¯•‰•ûŒü‚É•½sˆÚ“®‚·‚éD
+//! bounding boxã‚’ä¸ãˆã‚‰ã‚ŒãŸå¤‰ä½ã ã‘è² æ–¹å‘ã«å¹³è¡Œç§»å‹•ã™ã‚‹ï¼
 /*!
-  \param dt	•ÏˆÊ
-  \return	•½sˆÚ“®‚³‚ê‚½‚±‚Ìbounding box
+  \param dt	å¤‰ä½
+  \return	å¹³è¡Œç§»å‹•ã•ã‚ŒãŸã“ã®bounding box
 */
 template <class P> template <class S, class B> inline BoundingBox<P>&
 BoundingBox<P>::operator -=(const Vector<S, B>& dt)
@@ -1848,11 +1848,11 @@ BoundingBox<P>::operator -=(const Vector<S, B>& dt)
     return *this;
 }
     
-//! bounding box‚ğ—^‚¦‚ç‚ê‚½ƒXƒP[ƒ‹‚¾‚¯Šg‘å^k¬‚·‚éD
+//! bounding boxã‚’ä¸ãˆã‚‰ã‚ŒãŸã‚¹ã‚±ãƒ¼ãƒ«ã ã‘æ‹¡å¤§ï¼ç¸®å°ã™ã‚‹ï¼
 /*!
-  •‰‚ÌƒXƒP[ƒ‹‚ğ—^‚¦‚é‚Æbounding box‚ª”½“]‚·‚éD
-  \param c	ƒXƒP[ƒ‹
-  \return	•½sˆÚ“®‚³‚ê‚½‚±‚Ìbounding box
+  è² ã®ã‚¹ã‚±ãƒ¼ãƒ«ã‚’ä¸ãˆã‚‹ã¨bounding boxãŒåè»¢ã™ã‚‹ï¼
+  \param c	ã‚¹ã‚±ãƒ¼ãƒ«
+  \return	å¹³è¡Œç§»å‹•ã•ã‚ŒãŸã“ã®bounding box
 */
 template <class P> inline BoundingBox<P>&
 BoundingBox<P>::operator *=(double c)
@@ -1864,10 +1864,10 @@ BoundingBox<P>::operator *=(double c)
     return *this;
 }
 
-//! ‚±‚Ìbounding box‚Æw’è‚³‚ê‚½bounding box‚Æ‚ÌŒ‹‚Ñ‚ğ‚Æ‚éD
+//! ã“ã®bounding boxã¨æŒ‡å®šã•ã‚ŒãŸbounding boxã¨ã®çµã³ã‚’ã¨ã‚‹ï¼
 /*!
   \param bbox	bounding box
-  \return	Œ‹‚Ñ‚ğ‚Æ‚Á‚½Œã‚Ì‚±‚Ìbounding box
+  \return	çµã³ã‚’ã¨ã£ãŸå¾Œã®ã“ã®bounding box
 */
 template <class P> inline BoundingBox<P>&
 BoundingBox<P>::operator |=(const BoundingBox<P>& bbox)
@@ -1875,11 +1875,11 @@ BoundingBox<P>::operator |=(const BoundingBox<P>& bbox)
     return expand(bbox.min()).expand(bbox.max());
 }
     
-//! ‚±‚Ìbounding box‚Æw’è‚³‚ê‚½bounding box‚Æ‚ÌŒğ‚í‚è‚ğ‚Æ‚éD
+//! ã“ã®bounding boxã¨æŒ‡å®šã•ã‚ŒãŸbounding boxã¨ã®äº¤ã‚ã‚Šã‚’ã¨ã‚‹ï¼
 /*!
-  —^‚¦‚ç‚ê‚½bounding box‚Æ‚ÌŠÔ‚É‹¤’Ê•”•ª‚ª‚È‚¯‚ê‚Î‹ó‚Ìbounding box‚Æ‚È‚éD
+  ä¸ãˆã‚‰ã‚ŒãŸbounding boxã¨ã®é–“ã«å…±é€šéƒ¨åˆ†ãŒãªã‘ã‚Œã°ç©ºã®bounding boxã¨ãªã‚‹ï¼
   \param bbox	bounding box
-  \return	Œğ‚í‚è‚ğ‚Æ‚Á‚½Œã‚Ì‚±‚Ìbounding box
+  \return	äº¤ã‚ã‚Šã‚’ã¨ã£ãŸå¾Œã®ã“ã®bounding box
 */
 template <class P> BoundingBox<P>&
 BoundingBox<P>::operator &=(const BoundingBox<P>& bbox)
@@ -1892,11 +1892,11 @@ BoundingBox<P>::operator &=(const BoundingBox<P>& bbox)
     return *this;
 }
     
-//! 2‚Â‚Ìbounding box‚ÌŒ‹‚Ñ‚ğ‚Æ‚éD
+//! 2ã¤ã®bounding boxã®çµã³ã‚’ã¨ã‚‹ï¼
 /*!
   \param a	bounding box
   \param b	bounding box
-  \return	a‚Æb‚ÌŒ‹‚Ñ‚Æ‚È‚ébounding box
+  \return	aã¨bã®çµã³ã¨ãªã‚‹bounding box
 */
 template <class P> inline BoundingBox<P>
 operator |(const BoundingBox<P>& a, const BoundingBox<P>& b)
@@ -1905,12 +1905,12 @@ operator |(const BoundingBox<P>& a, const BoundingBox<P>& b)
     return c |= b;
 }
     
-//! 2‚Â‚Ìbounding box‚ÌŒğ‚í‚è‚ğ‚Æ‚éD
+//! 2ã¤ã®bounding boxã®äº¤ã‚ã‚Šã‚’ã¨ã‚‹ï¼
 /*!
-  —^‚¦‚ç‚ê‚½bounding box‚É‹¤’Ê•”•ª‚ª‚È‚¯‚ê‚Î‹ó‚Ìbounding box‚ğ•Ô‚·D
+  ä¸ãˆã‚‰ã‚ŒãŸbounding boxã«å…±é€šéƒ¨åˆ†ãŒãªã‘ã‚Œã°ç©ºã®bounding boxã‚’è¿”ã™ï¼
   \param a	bounding box
   \param b	bounding box
-  \return	a‚Æb‚ÌŒğ‚í‚è‚Æ‚È‚ébounding box
+  \return	aã¨bã®äº¤ã‚ã‚Šã¨ãªã‚‹bounding box
 */
 template <class P> inline BoundingBox<P>
 operator &(const BoundingBox<P>& a, const BoundingBox<P>& b)
@@ -1919,11 +1919,11 @@ operator &(const BoundingBox<P>& a, const BoundingBox<P>& b)
     return c &= b;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚Ébounding box‚ğ¬‚·2‚Â‚Ì“_‚ÌÀ•W‚ğo—Í‚·‚é(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«bounding boxã‚’æˆã™2ã¤ã®ç‚¹ã®åº§æ¨™ã‚’å‡ºåŠ›ã™ã‚‹(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   \param bbox	bounding box
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class P> std::ostream&
 operator <<(std::ostream& out, const BoundingBox<P>& bbox)

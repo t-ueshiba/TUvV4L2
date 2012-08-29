@@ -1,15 +1,15 @@
 /*
- *  ����14-24�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-24年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2012.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BoxFilter.h,v 1.4 2012-08-16 18:59:59 ueshiba Exp $
+ *  $Id: BoxFilter.h,v 1.5 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		BoxFilter.h
-  \brief	box filter�Ɋւ���N���X�̒�`�Ǝ���
+  \brief	box filterに関するクラスの定義と実装
 */
 #ifndef	__TUBoxFilter_h
 #define	__TUBoxFilter_h
@@ -45,13 +45,13 @@ namespace TU
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! 1�������̓f�[�^���box filter��K�p����
+//! 1次元入力データ列にbox filterを適用する
 /*!
-  \param ib	1�������̓f�[�^��̐擪�����������q
-  \param ie	1�������̓f�[�^��̖����̎������������q
-  \param out	box filter��K�p�����o�̓f�[�^��̐擪�����������q
-  \param w	box filter�̃E�B���h�E��
-  \param shift	�o�̓f�[�^�̏������݈ʒu��out�Ŏw�肵���ʒu�������̗ʂ������炷
+  \param ib	1次元入力データ列の先頭を示す反復子
+  \param ie	1次元入力データ列の末尾の次を示す反復子
+  \param out	box filterを適用した出力データ列の先頭を示す反復子
+  \param w	box filterのウィンドウ幅
+  \param shift	出力データの書き込み位置をoutで指定した位置よりもこの量だけずらす
 */
 template <class IN, class OUT> void
 boxFilter(IN ib, IN ie, OUT out, size_t w, size_t shift=0)
@@ -115,16 +115,16 @@ namespace detail
 # endif
 }
 
-//! 2�������̓f�[�^��box filter��K�p����
+//! 2次元入力データにbox filterを適用する
 /*!
-  \param ib		2�������̓f�[�^�̐擪�̍s�����������q
-  \param ie		2�������̓f�[�^�̖����̎��̍s�����������q
-  \param out		box filter��K�p�����o�̓f�[�^�̐擪�̍s�����������q
-  \param wrow		box filter�̃E�B���h�E�̍s��
-  \param wcol		box filter�̃E�B���h�E�̗�
-  \param srow		�o�̓f�[�^�̏������݈ʒu�����̗ʂ����s�����ɂ��炷
-  \param scol		�o�̓f�[�^�̏������݈ʒu�����̗ʂ���������ɂ��炷
-  \param grainSize	�X���b�h�̗��x(TBB�g�p���̂ݗL��)
+  \param ib		2次元入力データの先頭の行を示す反復子
+  \param ie		2次元入力データの末尾の次の行を示す反復子
+  \param out		box filterを適用した出力データの先頭の行を示す反復子
+  \param wrow		box filterのウィンドウの行数
+  \param wcol		box filterのウィンドウの列数
+  \param srow		出力データの書き込み位置をこの量だけ行方向にずらす
+  \param scol		出力データの書き込み位置をこの量だけ列方向にずらす
+  \param grainSize	スレッドの粒度(TBB使用時のみ有効)
 */
 template <class IN, class OUT> void
 boxFilter2(IN ib, IN ie, OUT out, size_t wrow, size_t wcol,

@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: BlockDiagonalMatrix++.h,v 1.2 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: BlockDiagonalMatrix++.h,v 1.3 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		BlockDiagonalMatrix++.h
-  \brief	ƒNƒ‰ƒX TU::BlockDiagonalMatrix ‚Ì’è‹`‚ÆÀ‘•
+  \brief	ã‚¯ãƒ©ã‚¹ TU::BlockDiagonalMatrix ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUBlockDiagonalMatrixPP_h
 #define __TUBlockDiagonalMatrixPP_h
@@ -41,10 +41,10 @@ namespace TU
 /************************************************************************
 *  class BlockDiagonalMatrix<T>						*
 ************************************************************************/
-//! TŒ^‚Ì—v‘f‚ğ‚Â¬s—ñ‚©‚ç¬‚éƒuƒƒbƒN‘ÎŠps—ñ‚ğ•\‚·ƒNƒ‰ƒX
+//! Tå‹ã®è¦ç´ ã‚’æŒã¤å°è¡Œåˆ—ã‹ã‚‰æˆã‚‹ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
 /*!
-  ‹ï‘Ì“I‚É‚ÍdŒÂ‚Ì¬s—ñ\f$\TUvec{B}{1}, \TUvec{B}{2},\ldots, \TUvec{B}{d}\f$
-  (“¯ˆêƒTƒCƒY‚Æ‚ÍŒÀ‚ç‚È‚¢)‚©‚ç¬‚é
+  å…·ä½“çš„ã«ã¯då€‹ã®å°è¡Œåˆ—\f$\TUvec{B}{1}, \TUvec{B}{2},\ldots, \TUvec{B}{d}\f$
+  (åŒä¸€ã‚µã‚¤ã‚ºã¨ã¯é™ã‚‰ãªã„)ã‹ã‚‰æˆã‚‹
   \f$
   \TUvec{B}{} =
   \TUbeginarray{cccc}
@@ -52,8 +52,8 @@ namespace TU
   & & & \TUvec{B}{d}
   \TUendarray
   \f$
-  ‚È‚éŒ`‚Ìs—ñD
-  \param T	—v‘f‚ÌŒ^
+  ãªã‚‹å½¢ã®è¡Œåˆ—ï¼
+  \param T	è¦ç´ ã®å‹
 */
 template <class T>
 class BlockDiagonalMatrix : public Array<Matrix<T> >
@@ -62,9 +62,9 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
     typedef T						value_type;
     
   public:
-  //! w’è‚³‚ê‚½ŒÂ”‚Ì¬s—ñ‚©‚ç¬‚éƒuƒƒbƒN‘ÎŠps—ñ‚ğ¶¬‚·‚éD
+  //! æŒ‡å®šã•ã‚ŒãŸå€‹æ•°ã®å°è¡Œåˆ—ã‹ã‚‰æˆã‚‹ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param d	¬s—ñ‚ÌŒÂ”
+    \param d	å°è¡Œåˆ—ã®å€‹æ•°
   */
     explicit BlockDiagonalMatrix(u_int d=0)	:Array<Matrix<T> >(d)	{}
     BlockDiagonalMatrix(const Array<u_int>& nrows,
@@ -76,10 +76,10 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
     BlockDiagonalMatrix		trns()				const	;
     BlockDiagonalMatrix&	operator  =(const T& c)			;
 
-  //! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘S‚Ä‚Ì¬•ª‚É“¯ˆê‚Ì”’l‚ğŠ|‚¯‚éD
+  //! ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®å…¨ã¦ã®æˆåˆ†ã«åŒä¸€ã®æ•°å€¤ã‚’æ›ã‘ã‚‹ï¼
   /*!
-    \param c	Š|‚¯‚é”’l
-    \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+    \param c	æ›ã‘ã‚‹æ•°å€¤
+    \return	ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
   */
     BlockDiagonalMatrix&	operator *=(double c)
 				{
@@ -87,10 +87,10 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
 				    return *this;
 				}
 
-  //! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘S‚Ä‚Ì¬•ª‚ğ“¯ˆê‚Ì”’l‚ÅŠ„‚éD
+  //! ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®å…¨ã¦ã®æˆåˆ†ã‚’åŒä¸€ã®æ•°å€¤ã§å‰²ã‚‹ï¼
   /*!
-    \param c	Š„‚é”’l
-    \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+    \param c	å‰²ã‚‹æ•°å€¤
+    \return	ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
   */
     BlockDiagonalMatrix&	operator /=(double c)
 				{
@@ -98,10 +98,10 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
 				    return *this;
 				}
 
-  //! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚É‘¼‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ğ‘«‚·D
+  //! ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã«ä»–ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã‚’è¶³ã™ï¼
   /*!
-    \param b	‘«‚·ƒuƒƒbƒN‘ÎŠps—ñ
-    \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+    \param b	è¶³ã™ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
+    \return	ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
   */
     BlockDiagonalMatrix&	operator +=(const BlockDiagonalMatrix& b)
 				{
@@ -109,10 +109,10 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
 				    return *this;
 				}
 
-  //! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚©‚ç‘¼‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ğˆø‚­D
+  //! ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã‹ã‚‰ä»–ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã‚’å¼•ãï¼
   /*!
-    \param b	ˆø‚­ƒuƒƒbƒN‘ÎŠps—ñ
-    \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+    \param b	å¼•ããƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
+    \return	ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
   */
     BlockDiagonalMatrix&	operator -=(const BlockDiagonalMatrix& b)
 				{
@@ -123,10 +123,10 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
 				operator Matrix<T>()		const	;
 };
 
-//! Še¬s—ñ‚ÌƒTƒCƒY‚ğw’è‚µ‚ÄƒuƒƒbƒN‘ÎŠps—ñ‚ğ¶¬‚µC‘S—v‘f‚ğ0‚Å‰Šú‰»‚·‚éD
+//! å„å°è¡Œåˆ—ã®ã‚µã‚¤ã‚ºã‚’æŒ‡å®šã—ã¦ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã‚’ç”Ÿæˆã—ï¼Œå…¨è¦ç´ ã‚’0ã§åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param nrows	Še¬s—ñ‚Ìs”‚ğ‡‚Éû‚ß‚½”z—ñ
-  \param ncols	Še¬s—ñ‚Ì—ñ”‚ğ‡‚Éû‚ß‚½”z—ñ
+  \param nrows	å„å°è¡Œåˆ—ã®è¡Œæ•°ã‚’é †ã«åã‚ãŸé…åˆ—
+  \param ncols	å„å°è¡Œåˆ—ã®åˆ—æ•°ã‚’é †ã«åã‚ãŸé…åˆ—
 */
 template <class T>
 BlockDiagonalMatrix<T>::BlockDiagonalMatrix(const Array<u_int>& nrows,
@@ -142,9 +142,9 @@ BlockDiagonalMatrix<T>::BlockDiagonalMatrix(const Array<u_int>& nrows,
     }
 }
 
-//! ƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘s”‚ğ•Ô‚·D
+//! ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®ç·è¡Œæ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	‘s”
+  \return	ç·è¡Œæ•°
 */
 template <class T> u_int
 BlockDiagonalMatrix<T>::nrow() const
@@ -155,9 +155,9 @@ BlockDiagonalMatrix<T>::nrow() const
     return r;
 }
 
-//! ƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘—ñ”‚ğ•Ô‚·D
+//! ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®ç·åˆ—æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	‘—ñ”
+  \return	ç·åˆ—æ•°
 */
 template <class T> u_int
 BlockDiagonalMatrix<T>::ncol() const
@@ -168,9 +168,9 @@ BlockDiagonalMatrix<T>::ncol() const
     return c;
 }
 
-//! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚Ì“]’us—ñ‚ğ•Ô‚·D
+//! ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®è»¢ç½®è¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	“]’us—ñC‚·‚È‚í‚¿
+  \return	è»¢ç½®è¡Œåˆ—ï¼Œã™ãªã‚ã¡
   \f$
   \TUtvec{B}{} =
   \TUbeginarray{cccc}
@@ -188,10 +188,10 @@ BlockDiagonalMatrix<T>::trns() const
     return val;
 }
 
-//! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚Ì‘S‚Ä‚Ì¬s—ñ‚Ì‘S—v‘f‚É“¯ˆê‚Ì”’l‚ğ‘ã“ü‚·‚éD
+//! ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®å…¨ã¦ã®å°è¡Œåˆ—ã®å…¨è¦ç´ ã«åŒä¸€ã®æ•°å€¤ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  \param c	‘ã“ü‚·‚é”’l
-  \return	‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+  \param c	ä»£å…¥ã™ã‚‹æ•°å€¤
+  \return	ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
 */
 template <class T> BlockDiagonalMatrix<T>&
 BlockDiagonalMatrix<T>::operator =(const T& c)
@@ -201,9 +201,9 @@ BlockDiagonalMatrix<T>::operator =(const T& c)
     return *this;
 }
 
-//! ‚±‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ğ’Êí‚Ìs—ñ‚É•ÏŠ·‚·‚éD
+//! ã“ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã‚’é€šå¸¸ã®è¡Œåˆ—ã«å¤‰æ›ã™ã‚‹ï¼
 /*!
-  \return	•ÏŠ·‚³‚ê‚½s—ñ
+  \return	å¤‰æ›ã•ã‚ŒãŸè¡Œåˆ—
 */
 template <class T>
 BlockDiagonalMatrix<T>::operator Matrix<T>() const
@@ -222,11 +222,11 @@ BlockDiagonalMatrix<T>::operator Matrix<T>() const
 /************************************************************************
 *  numeric operators							*
 ************************************************************************/
-//! 2‚Â‚ÌƒuƒƒbƒN‘ÎŠps—ñ‚ÌÏ
+//! 2ã¤ã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®ç©
 /*!
-  \param a	‘æ1ˆø”
-  \param b	‘æ2ˆø”
-  \return	Œ‹‰Ê‚ÌƒuƒƒbƒN‘ÎŠps—ñ
+  \param a	ç¬¬1å¼•æ•°
+  \param b	ç¬¬2å¼•æ•°
+  \return	çµæœã®ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
 */
 template <class T> BlockDiagonalMatrix<T>
 operator *(const BlockDiagonalMatrix<T>& a, const BlockDiagonalMatrix<T>& b)
@@ -238,11 +238,11 @@ operator *(const BlockDiagonalMatrix<T>& a, const BlockDiagonalMatrix<T>& b)
     return val;
 }
 
-//! ƒuƒƒbƒN‘ÎŠps—ñ‚Æ’Êí‚Ìs—ñ‚ÌÏ
+//! ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã¨é€šå¸¸ã®è¡Œåˆ—ã®ç©
 /*!
-  \param b	‘æ1ˆø”(ƒuƒƒbƒN‘ÎŠps—ñ)
-  \param m	‘æ2ˆø”(’Êís—ñ)
-  \return	Œ‹‰Ê‚Ì’Êís—ñ
+  \param b	ç¬¬1å¼•æ•°(ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—)
+  \param m	ç¬¬2å¼•æ•°(é€šå¸¸è¡Œåˆ—)
+  \return	çµæœã®é€šå¸¸è¡Œåˆ—
 */
 template <class T> Matrix<T>
 operator *(const BlockDiagonalMatrix<T>& b, const Matrix<T>& m)
@@ -261,11 +261,11 @@ operator *(const BlockDiagonalMatrix<T>& b, const Matrix<T>& m)
     return val;
 }
 
-//! ’Êí‚Ìs—ñ‚ÆƒuƒƒbƒN‘ÎŠps—ñ‚ÌÏ
+//! é€šå¸¸ã®è¡Œåˆ—ã¨ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®ç©
 /*!
-  \param m	‘æ1ˆø”(’Êís—ñ)
-  \param b	‘æ2ˆø”(ƒuƒƒbƒN‘ÎŠps—ñ)
-  \return	Œ‹‰Ê‚Ì’Êís—ñ
+  \param m	ç¬¬1å¼•æ•°(é€šå¸¸è¡Œåˆ—)
+  \param b	ç¬¬2å¼•æ•°(ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—)
+  \return	çµæœã®é€šå¸¸è¡Œåˆ—
 */
 template <class T> Matrix<T>
 operator *(const Matrix<T>& m, const BlockDiagonalMatrix<T>& b)
@@ -284,11 +284,11 @@ operator *(const Matrix<T>& m, const BlockDiagonalMatrix<T>& b)
     return val;
 }
 
-//! ƒuƒƒbƒN‘ÎŠps—ñ‚ÆƒxƒNƒgƒ‹‚ÌÏ
+//! ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã¨ãƒ™ã‚¯ãƒˆãƒ«ã®ç©
 /*!
-  \param b	ƒuƒƒbƒN‘ÎŠps—ñ
-  \param v	ƒxƒNƒgƒ‹
-  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹
+  \param b	ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \return	çµæœã®ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> Vector<T>
 operator *(const BlockDiagonalMatrix<T>& b, const Vector<T>& v)
@@ -306,11 +306,11 @@ operator *(const BlockDiagonalMatrix<T>& b, const Vector<T>& v)
     return val;
 }
 
-//! ƒxƒNƒgƒ‹‚ÆƒuƒƒbƒN‘ÎŠps—ñ‚ÌÏ
+//! ãƒ™ã‚¯ãƒˆãƒ«ã¨ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—ã®ç©
 /*!
-  \param v	ƒxƒNƒgƒ‹
-  \param b	ƒuƒƒbƒN‘ÎŠps—ñ
-  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \param b	ãƒ–ãƒ­ãƒƒã‚¯å¯¾è§’è¡Œåˆ—
+  \return	çµæœã®ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T> Vector<T>
 operator *(const Vector<T>& v, const BlockDiagonalMatrix<T>& b)

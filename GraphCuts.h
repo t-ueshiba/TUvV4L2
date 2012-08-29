@@ -1,15 +1,15 @@
 /*
- *  •½¬14-24”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-24å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2012.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: GraphCuts.h,v 1.5 2012-08-16 04:00:42 ueshiba Exp $
+ *  $Id: GraphCuts.h,v 1.6 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		GraphCuts.h
-  \brief	graph cut‚ÉŠÖ‚·‚éƒNƒ‰ƒX‚Ì’è‹`‚ÆÀ‘•
+  \brief	graph cutã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __GRAPHCUTS_H
 #define __GRAPHCUTS_H
@@ -55,15 +55,15 @@
 
 /*!
   \namespace	boost
-  \brief	boostƒ‰ƒCƒuƒ‰ƒŠ‚ğ—˜—p‚µ‚½ƒNƒ‰ƒX‚âŠÖ”‚ğ–¼‘O‹óŠÔboost‚É’Ç‰Á
+  \brief	boostãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’åˆ©ç”¨ã—ãŸã‚¯ãƒ©ã‚¹ã‚„é–¢æ•°ã‚’åå‰ç©ºé–“boostã«è¿½åŠ 
 */
 namespace boost
 {
-enum vertex_id_t	{vertex_id};		// ƒTƒCƒg‚ÌID
-enum vertex_label_t	{vertex_label};		// ƒTƒCƒg‚Ìƒ‰ƒxƒ‹
-enum vertex_sedge_t	{vertex_sedge};		// ŠJn“_‚©‚ç‚Ì•Ó
-enum vertex_tedge_t	{vertex_tedge};		// I’[“_‚Ö‚Ì•Ó
-enum edge_smooth_t	{edge_smooth};		// •½ŠŠ‰»€‚ğ•\‚·•Ó
+enum vertex_id_t	{vertex_id};		// ã‚µã‚¤ãƒˆã®ID
+enum vertex_label_t	{vertex_label};		// ã‚µã‚¤ãƒˆã®ãƒ©ãƒ™ãƒ«
+enum vertex_sedge_t	{vertex_sedge};		// é–‹å§‹ç‚¹ã‹ã‚‰ã®è¾º
+enum vertex_tedge_t	{vertex_tedge};		// çµ‚ç«¯ç‚¹ã¸ã®è¾º
+enum edge_smooth_t	{edge_smooth};		// å¹³æ»‘åŒ–é …ã‚’è¡¨ã™è¾º
 BOOST_INSTALL_PROPERTY(vertex, id);
 BOOST_INSTALL_PROPERTY(vertex, label);
 BOOST_INSTALL_PROPERTY(vertex, sedge);
@@ -73,26 +73,26 @@ BOOST_INSTALL_PROPERTY(edge, smooth);
 /************************************************************************
 *  class GraphCuts<T, ID, L, EL>					*
 ************************************************************************/
-//! ƒOƒ‰ƒtƒJƒbƒg‚É‚æ‚Á‚ÄƒGƒlƒ‹ƒM[Å¬‰»‚ğs‚¤ƒNƒ‰ƒX
+//! ã‚°ãƒ©ãƒ•ã‚«ãƒƒãƒˆã«ã‚ˆã£ã¦ã‚¨ãƒãƒ«ã‚®ãƒ¼æœ€å°åŒ–ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 /*!
-  \param T	ƒGƒlƒ‹ƒM[’l‚ÌŒ^(•‰”‚ğ•\Œ»‚Å‚«‚È‚¯‚ê‚Î‚È‚ç‚È‚¢)
-  \param ID	ƒTƒCƒg‚ğ“Á’è‚·‚éID‚ÌŒ^
-  \param L	ƒTƒCƒg‚Ìƒ‰ƒxƒ‹‚ÌŒ^
-  \param EL	ƒOƒ‰ƒt‚Ì•Ó‚ÌÀ‘•(boost::vecS, boost::listS ‚Ì‚¢‚¸‚ê‚©)
+  \param T	ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã®å‹(è² æ•°ã‚’è¡¨ç¾ã§ããªã‘ã‚Œã°ãªã‚‰ãªã„)
+  \param ID	ã‚µã‚¤ãƒˆã‚’ç‰¹å®šã™ã‚‹IDã®å‹
+  \param L	ã‚µã‚¤ãƒˆã®ãƒ©ãƒ™ãƒ«ã®å‹
+  \param EL	ã‚°ãƒ©ãƒ•ã®è¾ºã®å®Ÿè£…(boost::vecS, boost::listS ã®ã„ãšã‚Œã‹)
 */
 template <class T, class ID=int, class L=bool, class EL=vecS>
 class GraphCuts
 {
   public:
-    typedef T	value_type;		//!< ƒGƒlƒ‹ƒM[’l‚ÌŒ^
-    typedef ID	id_type;		//!< ƒTƒCƒg‚ğ“Á’è‚·‚éID‚ÌŒ^
-    typedef L	label_type;		//!< ƒTƒCƒg‚Ìƒ‰ƒxƒ‹‚ÌŒ^
-    enum Algorithm			//<! Å‘åƒtƒ[ƒAƒ‹ƒSƒŠƒYƒ€
+    typedef T	value_type;		//!< ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã®å‹
+    typedef ID	id_type;		//!< ã‚µã‚¤ãƒˆã‚’ç‰¹å®šã™ã‚‹IDã®å‹
+    typedef L	label_type;		//!< ã‚µã‚¤ãƒˆã®ãƒ©ãƒ™ãƒ«ã®å‹
+    enum Algorithm			//<! æœ€å¤§ãƒ•ãƒ­ãƒ¼ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
     {
-	BoykovKolmogorov		//!< Boykov-KolmogorovƒAƒ‹ƒSƒŠƒYƒ€
+	BoykovKolmogorov		//!< Boykov-Kolmogorovã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
 #ifdef WITH_PARALLEL_EDGES
-	, EdmondsKarp,			//!< Edmonds-KarpƒAƒ‹ƒSƒŠƒYƒ€
-	PushRelabel			//!< Push-RelabelƒAƒ‹ƒSƒŠƒYƒ€
+	, EdmondsKarp,			//!< Edmonds-Karpã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
+	PushRelabel			//!< Push-Relabelã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
 #endif
     };
     
@@ -124,18 +124,18 @@ class GraphCuts
 							out_edge_iterator;
 
   public:
-    typedef vertex_t			site_type;	//!< ƒTƒCƒg‚ÌŒ^
+    typedef vertex_t			site_type;	//!< ã‚µã‚¤ãƒˆã®å‹
     typedef std::pair<vertex_iterator,
-		      vertex_iterator>	site_range;	//!< ƒTƒCƒg‚Ì”ÍˆÍ
+		      vertex_iterator>	site_range;	//!< ã‚µã‚¤ãƒˆã®ç¯„å›²
     
   public:
-  // \‘¢‚Ì¶¬‚Æ”j‰ó
+  // æ§‹é€ ã®ç”Ÿæˆã¨ç ´å£Š
     GraphCuts()								;
     site_type		createDataTerm(const id_type& id)		;
     void		createSmoothingTerm(site_type u, site_type v)	;
     void		clear()						;
 
-  // ƒTƒCƒgî•ñ‚Ìæ“¾‚Æİ’è
+  // ã‚µã‚¤ãƒˆæƒ…å ±ã®å–å¾—ã¨è¨­å®š
     static site_type	nullSite()					;
     site_range		sites()					const	;
     size_t		nsites()				const	;
@@ -149,7 +149,7 @@ class GraphCuts
     value_type		smoothingEnergy(site_type u, site_type v) const	;
     value_type&		smoothingEnergy(site_type u, site_type v)	;
     
-  // Å“K‰»ŒvZ
+  // æœ€é©åŒ–è¨ˆç®—
     template <class F>
     value_type		value(F energyTerm)			const	;
     value_type		maxFlow(label_type alpha, Algorithm alg)	;
@@ -158,7 +158,7 @@ class GraphCuts
 				       Algorithm alg)			;
     void		check()					const	;
     
-  // “üo—Í
+  // å…¥å‡ºåŠ›
     std::istream&	getDimacsMaxFlow(std::istream& in)		;
     std::ostream&	putDimacsMaxFlow(std::ostream& out)	const	;
     std::ostream&	putCapacities(std::ostream& out)	const	;
@@ -171,15 +171,15 @@ class GraphCuts
     value_type		flow(edge_t e)				const	;
     
   private:
-    graph_t		_g;	//!< ƒOƒ‰ƒt
-    vertex_t		_s;	//!< ŠJn“_
-    vertex_t		_t;	//!< I’[“_
+    graph_t		_g;	//!< ã‚°ãƒ©ãƒ•
+    vertex_t		_s;	//!< é–‹å§‹ç‚¹
+    vertex_t		_t;	//!< çµ‚ç«¯ç‚¹
 };
 
 /*
- * ----------------------- \‘¢‚Ì¶¬‚Æ”j‰ó ----------------------------
+ * ----------------------- æ§‹é€ ã®ç”Ÿæˆã¨ç ´å£Š ----------------------------
  */
-//! ƒOƒ‰ƒtƒJƒbƒgÀsŠí‚ğ¶¬‚·‚éD
+//! ã‚°ãƒ©ãƒ•ã‚«ãƒƒãƒˆå®Ÿè¡Œå™¨ã‚’ç”Ÿæˆã™ã‚‹ï¼
 template <class T, class ID, class L, class EL> inline
 GraphCuts<T, ID, L, EL>::GraphCuts()
     :_g(),
@@ -188,27 +188,27 @@ GraphCuts<T, ID, L, EL>::GraphCuts()
 {
 }
 
-//! ƒf[ƒ^€‚ğ¶¬‚·‚éD
+//! ãƒ‡ãƒ¼ã‚¿é …ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-  \param id	ƒTƒCƒg‚ÌID
-  \return	ƒTƒCƒg‚ğ•\‚·’¸“_
+  \param id	ã‚µã‚¤ãƒˆã®ID
+  \return	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
 */ 
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::site_type
 GraphCuts<T, ID, L, EL>::createDataTerm(const id_type& id)
 {
-    const vertex_t	v = add_vertex(_g);	      // ’¸“_‚ğ¶¬
-    put(vertex_id,    _g, v, id);		      // ‚»‚ÌID‚ğ“o˜^
-    put(vertex_sedge, _g, v, createEdgePair(_s, v));  // ŠJn“_‚Ö‚Ì•Ó‘Î‚ğ¶¬
-    put(vertex_tedge, _g, v, createEdgePair(v, _t));  // I’[“_‚Ö‚Ì•Ó‘Î‚ğ¶¬
+    const vertex_t	v = add_vertex(_g);	      // é ‚ç‚¹ã‚’ç”Ÿæˆ
+    put(vertex_id,    _g, v, id);		      // ãã®IDã‚’ç™»éŒ²
+    put(vertex_sedge, _g, v, createEdgePair(_s, v));  // é–‹å§‹ç‚¹ã¸ã®è¾ºå¯¾ã‚’ç”Ÿæˆ
+    put(vertex_tedge, _g, v, createEdgePair(v, _t));  // çµ‚ç«¯ç‚¹ã¸ã®è¾ºå¯¾ã‚’ç”Ÿæˆ
 
     return v;
 }
 
-//! •½ŠŠ‰»€‚ğƒZƒbƒg‚·‚éD
+//! å¹³æ»‘åŒ–é …ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
 /*!
-  \param u	•½ŠŠ‰»€‚ª‘ÎÛ‚Æ‚·‚éˆê•û‚ÌƒTƒCƒg
-  \param v	•½ŠŠ‰»€‚ª‘ÎÛ‚Æ‚·‚é‚à‚¤ˆê•û‚ÌƒTƒCƒg
+  \param u	å¹³æ»‘åŒ–é …ãŒå¯¾è±¡ã¨ã™ã‚‹ä¸€æ–¹ã®ã‚µã‚¤ãƒˆ
+  \param v	å¹³æ»‘åŒ–é …ãŒå¯¾è±¡ã¨ã™ã‚‹ã‚‚ã†ä¸€æ–¹ã®ã‚µã‚¤ãƒˆ
 */ 
 template <class T, class ID, class L, class EL> inline void
 GraphCuts<T, ID, L, EL>::createSmoothingTerm(site_type u, site_type v)
@@ -218,14 +218,14 @@ GraphCuts<T, ID, L, EL>::createSmoothingTerm(site_type u, site_type v)
 #else
     edge_t	e;
     bool	exists;
-    tie(e, exists) = edge(u, v, _g);	// Šù‚É(u, v)‚ª‚ ‚ê‚ÎC‚»‚ê‚ğe‚ÉƒZƒbƒg‚µC
-    if (!exists)			// ‚È‚¯‚ê‚Î...
-	e = createEdgePair(u, v);	// V‚½‚Éì‚éD
+    tie(e, exists) = edge(u, v, _g);	// æ—¢ã«(u, v)ãŒã‚ã‚Œã°ï¼Œãã‚Œã‚’eã«ã‚»ãƒƒãƒˆã—ï¼Œ
+    if (!exists)			// ãªã‘ã‚Œã°...
+	e = createEdgePair(u, v);	// æ–°ãŸã«ä½œã‚‹ï¼
 #endif
-    put(edge_smooth, _g, e, true);	// •½ŠŠ‰»€ƒtƒ‰ƒO‚ğƒZƒbƒg
+    put(edge_smooth, _g, e, true);	// å¹³æ»‘åŒ–é …ãƒ•ãƒ©ã‚°ã‚’ã‚»ãƒƒãƒˆ
 }
     
-//! ƒOƒ‰ƒt‚Ì‘S‚Ä‚Ì•Ó‚¨‚æ‚ÑŠJn“_‚ÆI’[“_‚ğœ‚­‘S‚Ä‚Ì’¸“_‚ğœ‹‚·‚éD
+//! ã‚°ãƒ©ãƒ•ã®å…¨ã¦ã®è¾ºãŠã‚ˆã³é–‹å§‹ç‚¹ã¨çµ‚ç«¯ç‚¹ã‚’é™¤ãå…¨ã¦ã®é ‚ç‚¹ã‚’é™¤å»ã™ã‚‹ï¼
 template <class T, class ID, class L, class EL> inline void
 GraphCuts<T, ID, L, EL>::clear()
 {
@@ -235,11 +235,11 @@ GraphCuts<T, ID, L, EL>::clear()
 }
 
 /*
- * ----------------------- ƒTƒCƒgî•ñ‚Ìæ“¾‚Æİ’è ----------------------
+ * ----------------------- ã‚µã‚¤ãƒˆæƒ…å ±ã®å–å¾—ã¨è¨­å®š ----------------------
  */
-//! ÀÛ‚É‚Í‘¶İ‚µ‚Ä‚¢‚È‚¢ƒ_ƒ~[ƒTƒCƒg‚ğ•Ô‚·D
+//! å®Ÿéš›ã«ã¯å­˜åœ¨ã—ã¦ã„ãªã„ãƒ€ãƒŸãƒ¼ã‚µã‚¤ãƒˆã‚’è¿”ã™ï¼
 /*!
-  \return	ƒ_ƒ~[ƒTƒCƒg
+  \return	ãƒ€ãƒŸãƒ¼ã‚µã‚¤ãƒˆ
 */
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::site_type
@@ -248,9 +248,9 @@ GraphCuts<T, ID, L, EL>::nullSite()
     return graph_traits<graph_t>::null_vertex();
 }
     
-//! ‘SƒTƒCƒg(ŠJn“_‚ÆI’[“_‚ğœ‚­‘S‚Ä‚Ì’¸“_)‚Ì”ÍˆÍ‚ğ¦‚·”½•œqƒyƒA‚ğ•Ô‚·D
+//! å…¨ã‚µã‚¤ãƒˆ(é–‹å§‹ç‚¹ã¨çµ‚ç«¯ç‚¹ã‚’é™¤ãå…¨ã¦ã®é ‚ç‚¹)ã®ç¯„å›²ã‚’ç¤ºã™åå¾©å­ãƒšã‚¢ã‚’è¿”ã™ï¼
 /*!
-  \return	‘SƒTƒCƒg‚Ì”ÍˆÍ
+  \return	å…¨ã‚µã‚¤ãƒˆã®ç¯„å›²
 */
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::site_range
@@ -263,9 +263,9 @@ GraphCuts<T, ID, L, EL>::sites() const
     return range;
 }
     
-//! ƒTƒCƒg”‚ğ•Ô‚·D
+//! ã‚µã‚¤ãƒˆæ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	ƒTƒCƒg”
+  \return	ã‚µã‚¤ãƒˆæ•°
 */
 template <class T, class ID, class L, class EL> inline size_t
 GraphCuts<T, ID, L, EL>::nsites() const
@@ -273,10 +273,10 @@ GraphCuts<T, ID, L, EL>::nsites() const
     return num_vertices(_g) - 2;
 }
     
-//! w’è‚³‚ê‚½ƒTƒCƒg‚ÌID‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸã‚µã‚¤ãƒˆã®IDã‚’è¿”ã™ï¼
 /*!
-  \param v	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \return	ƒTƒCƒg‚ÌID
+  \param v	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \return	ã‚µã‚¤ãƒˆã®ID
 */
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::id_type
@@ -285,10 +285,10 @@ GraphCuts<T, ID, L, EL>::id(site_type v) const
     return get(vertex_id, _g, v);
 }
     
-//! w’è‚³‚ê‚½ƒTƒCƒg‚Ìƒ‰ƒxƒ‹‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸã‚µã‚¤ãƒˆã®ãƒ©ãƒ™ãƒ«ã‚’è¿”ã™ï¼
 /*!
-  \param v	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \return	ƒTƒCƒg‚Ìƒ‰ƒxƒ‹
+  \param v	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \return	ã‚µã‚¤ãƒˆã®ãƒ©ãƒ™ãƒ«
 */
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::label_type
@@ -297,10 +297,10 @@ GraphCuts<T, ID, L, EL>::operator ()(site_type v) const
     return get(vertex_label, _g, v);
 }
 
-//! w’è‚³‚ê‚½ƒTƒCƒg‚Ìƒ‰ƒxƒ‹‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸã‚µã‚¤ãƒˆã®ãƒ©ãƒ™ãƒ«ã‚’è¿”ã™ï¼
 /*!
-  \param v	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \return	ƒTƒCƒg‚Ìƒ‰ƒxƒ‹
+  \param v	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \return	ã‚µã‚¤ãƒˆã®ãƒ©ãƒ™ãƒ«
 */
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::label_type&
@@ -309,11 +309,11 @@ GraphCuts<T, ID, L, EL>::operator ()(site_type v)
     return get(vertex_label, _g)[v];
 }
 
-//! w’è‚³‚ê‚½2‚Â‚ÌƒTƒCƒgŠÔ‚É•½ŠŠ‰»ƒGƒlƒ‹ƒM[€‚ª‚ ‚é‚©’²‚×‚éD
+//! æŒ‡å®šã•ã‚ŒãŸ2ã¤ã®ã‚µã‚¤ãƒˆé–“ã«å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼é …ãŒã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \param u	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \param v	‚à‚¤ˆê‚Â‚ÌƒTƒCƒg‚ğ•\‚·’¸“_
-  \return	•½ŠŠ‰»ƒGƒlƒ‹ƒM[€‚ª‚ ‚ê‚Îtrue, ‚È‚¯‚ê‚Îfalse
+  \param u	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \param v	ã‚‚ã†ä¸€ã¤ã®ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \return	å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼é …ãŒã‚ã‚Œã°true, ãªã‘ã‚Œã°false
 */
 template <class T, class ID, class L, class EL> inline bool
 GraphCuts<T, ID, L, EL>::haveSmoothingTerm(site_type u, site_type v) const
@@ -324,11 +324,11 @@ GraphCuts<T, ID, L, EL>::haveSmoothingTerm(site_type u, site_type v) const
     return false;
 }
     
-//! w’è‚³‚ê‚½ƒTƒCƒg‚Ìƒf[ƒ^ƒGƒlƒ‹ƒM[’l‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸã‚µã‚¤ãƒˆã®ãƒ‡ãƒ¼ã‚¿ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’è¿”ã™ï¼
 /*!
-  \param v	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \param source	true‚È‚ç‚ÎŠJn“_‘¤‚ğCfalse‚È‚ç‚ÎI’[“_‘¤‚ğ‚»‚ê‚¼‚êØ’f
-  \return	ƒf[ƒ^ƒGƒlƒ‹ƒM[’l
+  \param v	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \param source	trueãªã‚‰ã°é–‹å§‹ç‚¹å´ã‚’ï¼Œfalseãªã‚‰ã°çµ‚ç«¯ç‚¹å´ã‚’ãã‚Œãã‚Œåˆ‡æ–­
+  \return	ãƒ‡ãƒ¼ã‚¿ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤
 */
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::value_type
@@ -339,11 +339,11 @@ GraphCuts<T, ID, L, EL>::dataEnergy(site_type v, bool source) const
     return get(edge_capacity, _g, e);
 }
 
-//! w’è‚³‚ê‚½ƒTƒCƒg‚Ìƒf[ƒ^ƒGƒlƒ‹ƒM[’l‚Ö‚ÌQÆ‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸã‚µã‚¤ãƒˆã®ãƒ‡ãƒ¼ã‚¿ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã¸ã®å‚ç…§ã‚’è¿”ã™ï¼
 /*!
-  \param v	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \param source	true‚È‚ç‚ÎŠJn“_‘¤‚ğCfalse‚È‚ç‚ÎI’[“_‘¤‚ğ‚»‚ê‚¼‚êØ’f
-  \return	ƒf[ƒ^ƒGƒlƒ‹ƒM[’l‚Ö‚ÌQÆ
+  \param v	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \param source	trueãªã‚‰ã°é–‹å§‹ç‚¹å´ã‚’ï¼Œfalseãªã‚‰ã°çµ‚ç«¯ç‚¹å´ã‚’ãã‚Œãã‚Œåˆ‡æ–­
+  \return	ãƒ‡ãƒ¼ã‚¿ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã¸ã®å‚ç…§
 */
 template <class T, class ID, class L, class EL>
 inline typename GraphCuts<T, ID, L, EL>::value_type&
@@ -354,12 +354,12 @@ GraphCuts<T, ID, L, EL>::dataEnergy(site_type v, bool source)
     return get(edge_capacity, _g, e);
 }
 
-//! w’è‚³‚ê‚½2‚Â‚ÌƒTƒCƒgŠÔ‚Ì•½ŠŠ‰»ƒGƒlƒ‹ƒM[’l‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸ2ã¤ã®ã‚µã‚¤ãƒˆé–“ã®å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’è¿”ã™ï¼
 /*!
-  ‚±‚ê‚ç‚ÌƒTƒCƒgŠÔ‚É•½ŠŠ‰»ƒGƒlƒ‹ƒM[€‚ª‚È‚¯‚ê‚Î0‚ª•Ô‚³‚ê‚éD
-  \param u	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \param v	‚à‚¤ˆê‚Â‚ÌƒTƒCƒg‚ğ•\‚·’¸“_
-  \return	•½ŠŠ‰»ƒGƒlƒ‹ƒM[€‚ª‚ ‚ê‚Î‚»‚ÌƒGƒlƒ‹ƒM[’lC‚È‚¯‚ê‚Î0
+  ã“ã‚Œã‚‰ã®ã‚µã‚¤ãƒˆé–“ã«å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼é …ãŒãªã‘ã‚Œã°0ãŒè¿”ã•ã‚Œã‚‹ï¼
+  \param u	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \param v	ã‚‚ã†ä¸€ã¤ã®ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \return	å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼é …ãŒã‚ã‚Œã°ãã®ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ï¼Œãªã‘ã‚Œã°0
 */
 template <class T, class ID, class L, class EL>
 typename GraphCuts<T, ID, L, EL>::value_type
@@ -378,12 +378,12 @@ GraphCuts<T, ID, L, EL>::smoothingEnergy(site_type u, site_type v) const
 #endif
 }
 
-//! w’è‚³‚ê‚½2‚Â‚ÌƒTƒCƒgŠÔ‚Ì•½ŠŠ‰»ƒGƒlƒ‹ƒM[’l‚Ö‚ÌQÆ‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸ2ã¤ã®ã‚µã‚¤ãƒˆé–“ã®å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã¸ã®å‚ç…§ã‚’è¿”ã™ï¼
 /*!
-  ‚±‚ê‚ç‚ÌƒTƒCƒgŠÔ‚É•½ŠŠ‰»ƒGƒlƒ‹ƒM[€‚ª‚È‚¯‚ê‚ÎC—áŠO‚ª‘—o‚³‚ê‚éD
-  \param u	ƒTƒCƒg‚ğ•\‚·’¸“_
-  \param v	‚à‚¤ˆê‚Â‚ÌƒTƒCƒg‚ğ•\‚·’¸“_
-  \return	•½ŠŠ‰»ƒGƒlƒ‹ƒM[’l‚Ö‚ÌQÆ
+  ã“ã‚Œã‚‰ã®ã‚µã‚¤ãƒˆé–“ã«å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼é …ãŒãªã‘ã‚Œã°ï¼Œä¾‹å¤–ãŒé€å‡ºã•ã‚Œã‚‹ï¼
+  \param u	ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \param v	ã‚‚ã†ä¸€ã¤ã®ã‚µã‚¤ãƒˆã‚’è¡¨ã™é ‚ç‚¹
+  \return	å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã¸ã®å‚ç…§
 */
 template <class T, class ID, class L, class EL>
 typename GraphCuts<T, ID, L, EL>::value_type&
@@ -394,7 +394,7 @@ GraphCuts<T, ID, L, EL>::smoothingEnergy(site_type u, site_type v)
 	if (target(e, _g) == v && !get(edge_smooth, _g, e))
 	    return get(edge_capacity, _g, e);
     throw std::runtime_error("GraphCuts<T, ID, L, EL>::energy(): non-existing smoothing term!");
-    return get(edge_capacity, _g, get(vertex_sedge, _g, u));  // ‚±‚±‚É‚Í“’B‚¹‚¸
+    return get(edge_capacity, _g, get(vertex_sedge, _g, u));  // ã“ã“ã«ã¯åˆ°é”ã›ãš
 #else
     edge_t	e;
     bool	exists;
@@ -406,27 +406,27 @@ GraphCuts<T, ID, L, EL>::smoothingEnergy(site_type u, site_type v)
 }
 
 /*
- * ----------------------------- Å“K‰»ŒvZ -----------------------------
+ * ----------------------------- æœ€é©åŒ–è¨ˆç®— -----------------------------
  */
-//! Œ»İ‚Ìƒ‰ƒxƒ‹”z’u‚Ì‚à‚Æ‚Å‚ÌƒGƒlƒ‹ƒM[’l‚ğ‹‚ß‚éD
+//! ç¾åœ¨ã®ãƒ©ãƒ™ãƒ«é…ç½®ã®ã‚‚ã¨ã§ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \param energyTerm	ƒTƒCƒg‚ÌID‚Æ‚»‚Ìƒ‰ƒxƒ‹‚ğ—^‚¦‚é‚Æƒf[ƒ^ƒGƒlƒ‹ƒM[’l‚ğ
-			•Ô‚·ƒƒ“ƒo‚¨‚æ‚Ñ—×Ú‚·‚é2‚Â‚ÌƒTƒCƒg‚ÌID‚Æ‚»‚ê‚ç‚Ì
-			ƒ‰ƒxƒ‹‚ğ—^‚¦‚é‚Æ•½ŠŠ‰»ƒGƒlƒ‹ƒM[’l‚ğ•Ô‚·ƒƒ“ƒo‚Ì2‚Â
-			‚ğ‚ÂŠÖ”ƒIƒuƒWƒFƒNƒg
-  \return		ƒGƒlƒ‹ƒM[’l
+  \param energyTerm	ã‚µã‚¤ãƒˆã®IDã¨ãã®ãƒ©ãƒ™ãƒ«ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ¼ã‚¿ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’
+			è¿”ã™ãƒ¡ãƒ³ãƒãŠã‚ˆã³éš£æ¥ã™ã‚‹2ã¤ã®ã‚µã‚¤ãƒˆã®IDã¨ãã‚Œã‚‰ã®
+			ãƒ©ãƒ™ãƒ«ã‚’ä¸ãˆã‚‹ã¨å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’è¿”ã™ãƒ¡ãƒ³ãƒã®2ã¤
+			ã‚’æŒã¤é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+  \return		ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤
 */
 template <class T, class ID, class L, class EL> template <class F>
 typename GraphCuts<T, ID, L, EL>::value_type
 GraphCuts<T, ID, L, EL>::value(F energyTerm) const
 {
-    value_type	val = 0;				// ƒGƒlƒ‹ƒM[’l
+    value_type	val = 0;				// ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤
     BOOST_FOREACH (vertex_t u, sites())
     {
 	const id_type		uid = id(u);
 	const label_type	Xu  = (*this)(u);
 
-	val += energyTerm(uid, Xu);				// ƒf[ƒ^€
+	val += energyTerm(uid, Xu);				// ãƒ‡ãƒ¼ã‚¿é …
 	
 	BOOST_FOREACH (edge_t e, out_edges(u, _g))
 	{
@@ -434,7 +434,7 @@ GraphCuts<T, ID, L, EL>::value(F energyTerm) const
 	    {
 		const vertex_t	v = target(e, _g);
 
-		val += energyTerm(uid, id(v), Xu, (*this)(v));	// •½ŠŠ‰»€
+		val += energyTerm(uid, id(v), Xu, (*this)(v));	// å¹³æ»‘åŒ–é …
 	    }
 	}
     }
@@ -442,11 +442,11 @@ GraphCuts<T, ID, L, EL>::value(F energyTerm) const
     return val;
 }
     
-//! w’è‚³‚ê‚½Å‘åƒtƒ[ƒAƒ‹ƒSƒŠƒYƒ€‚É‚æ‚Á‚Äƒtƒ[‚ÌÅ‘å’l‚ğ‹‚ß‚éD
+//! æŒ‡å®šã•ã‚ŒãŸæœ€å¤§ãƒ•ãƒ­ãƒ¼ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã«ã‚ˆã£ã¦ãƒ•ãƒ­ãƒ¼ã®æœ€å¤§å€¤ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \param alpha	Å¬ƒJƒbƒg‚É‚æ‚èI’[“_‘¤‚É•ª—Ş‚³‚ê‚½ƒTƒCƒg‚É—^‚¦‚éƒ‰ƒxƒ‹
-  \param alg	g—p‚·‚éÅ‘åƒtƒ[ƒAƒ‹ƒSƒŠƒYƒ€
-  \return	ƒtƒ[‚ÌÅ‘å’l
+  \param alpha	æœ€å°ã‚«ãƒƒãƒˆã«ã‚ˆã‚Šçµ‚ç«¯ç‚¹å´ã«åˆ†é¡ã•ã‚ŒãŸã‚µã‚¤ãƒˆã«ä¸ãˆã‚‹ãƒ©ãƒ™ãƒ«
+  \param alg	ä½¿ç”¨ã™ã‚‹æœ€å¤§ãƒ•ãƒ­ãƒ¼ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
+  \return	ãƒ•ãƒ­ãƒ¼ã®æœ€å¤§å€¤
 */
 template <class T, class ID, class L, class EL>
 typename GraphCuts<T, ID, L, EL>::value_type
@@ -472,7 +472,7 @@ GraphCuts<T, ID, L, EL>::maxFlow(label_type alpha, Algorithm alg)
 	break;
     }
 
-  // I’[“_‘¤‚Ì’¸“_‚Éƒ‰ƒxƒ‹’lalpha‚ğ—^‚¦‚éD
+  // çµ‚ç«¯ç‚¹å´ã®é ‚ç‚¹ã«ãƒ©ãƒ™ãƒ«å€¤alphaã‚’ä¸ãˆã‚‹ï¼
     BOOST_FOREACH (vertex_t v, sites())
 	if (get(vertex_color, _g, v) == color_traits_t::white())
 	    (*this)(v) = alpha;
@@ -480,17 +480,17 @@ GraphCuts<T, ID, L, EL>::maxFlow(label_type alpha, Algorithm alg)
     return f;
 }
 
-//! ƒAƒ‹ƒtƒ@Šg’£‚ğ1‰ñs‚¤D
+//! ã‚¢ãƒ«ãƒ•ã‚¡æ‹¡å¼µã‚’1å›è¡Œã†ï¼
 /*!
-  alpha‚Å‚È‚¢ƒ‰ƒxƒ‹‚ğ‚ÂƒTƒCƒg‚É‚Â‚¢‚ÄC"ƒ‰ƒxƒ‹‚ğ•Ï‚¦‚È‚¢"/"alpha‚É•Ï‚¦‚é"‚Ì
-  2’l‚ÅÅ¬ƒJƒbƒg‚ğ‹‚ßC‚»‚ÌŒ‹‰Ê‚É‰‚¶‚Äƒ‰ƒxƒ‹‚ğ•t‚¯‘Ö‚¦‚éD
-  \param alpha		Šg’£æ‚Ìƒ‰ƒxƒ‹
-  \param energyTerm	ƒTƒCƒg‚ÌID‚Æ‚»‚Ìƒ‰ƒxƒ‹‚ğ—^‚¦‚é‚Æƒf[ƒ^ƒGƒlƒ‹ƒM[’l‚ğ
-			•Ô‚·ƒƒ“ƒo‚¨‚æ‚Ñ—×Ú‚·‚é2‚Â‚ÌƒTƒCƒg‚ÌID‚Æ‚»‚ê‚ç‚Ì
-			ƒ‰ƒxƒ‹‚ğ—^‚¦‚é‚Æ•½ŠŠ‰»ƒGƒlƒ‹ƒM[’l‚ğ•Ô‚·ƒƒ“ƒo‚Ì2‚Â
-			‚ğ‚ÂŠÖ”ƒIƒuƒWƒFƒNƒg
-  \param alg		Å‘åƒtƒ[ƒAƒ‹ƒSƒŠƒYƒ€
-  \return		ƒAƒ‹ƒtƒ@Šg’£‚Å’B¬‚³‚ê‚½Å¬ƒGƒlƒ‹ƒM[’l
+  alphaã§ãªã„ãƒ©ãƒ™ãƒ«ã‚’æŒã¤ã‚µã‚¤ãƒˆã«ã¤ã„ã¦ï¼Œ"ãƒ©ãƒ™ãƒ«ã‚’å¤‰ãˆãªã„"/"alphaã«å¤‰ãˆã‚‹"ã®
+  2å€¤ã§æœ€å°ã‚«ãƒƒãƒˆã‚’æ±‚ã‚ï¼Œãã®çµæœã«å¿œã˜ã¦ãƒ©ãƒ™ãƒ«ã‚’ä»˜ã‘æ›¿ãˆã‚‹ï¼
+  \param alpha		æ‹¡å¼µå…ˆã®ãƒ©ãƒ™ãƒ«
+  \param energyTerm	ã‚µã‚¤ãƒˆã®IDã¨ãã®ãƒ©ãƒ™ãƒ«ã‚’ä¸ãˆã‚‹ã¨ãƒ‡ãƒ¼ã‚¿ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’
+			è¿”ã™ãƒ¡ãƒ³ãƒãŠã‚ˆã³éš£æ¥ã™ã‚‹2ã¤ã®ã‚µã‚¤ãƒˆã®IDã¨ãã‚Œã‚‰ã®
+			ãƒ©ãƒ™ãƒ«ã‚’ä¸ãˆã‚‹ã¨å¹³æ»‘åŒ–ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’è¿”ã™ãƒ¡ãƒ³ãƒã®2ã¤
+			ã‚’æŒã¤é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+  \param alg		æœ€å¤§ãƒ•ãƒ­ãƒ¼ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
+  \return		ã‚¢ãƒ«ãƒ•ã‚¡æ‹¡å¼µã§é”æˆã•ã‚ŒãŸæœ€å°ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤
 */
 template <class T, class ID, class L, class EL> template <class F>
 typename GraphCuts<T, ID, L, EL>::value_type
@@ -499,18 +499,18 @@ GraphCuts<T, ID, L, EL>::alphaExpansion(label_type alpha, F energyTerm,
 {
     using namespace	std;
     
-  // ‚·‚×‚Ä‚Ì•Ó‚Ì—e—Ê‚ğ0‚É‚·‚éD
+  // ã™ã¹ã¦ã®è¾ºã®å®¹é‡ã‚’0ã«ã™ã‚‹ï¼
     BOOST_FOREACH (edge_t e, edges(_g))
 	put(edge_capacity, _g, e, 0);
 
-  // alpha‚Å‚È‚¢ƒ‰ƒxƒ‹‚ğ‚Â’¸“_‚ÉÚ‘±‚·‚é•Ó‚ÉƒGƒlƒ‹ƒM[’l‚ğ•t—^‚·‚éD
-    value_type	bias = 0;		// ƒoƒCƒAƒX
+  // alphaã§ãªã„ãƒ©ãƒ™ãƒ«ã‚’æŒã¤é ‚ç‚¹ã«æ¥ç¶šã™ã‚‹è¾ºã«ã‚¨ãƒãƒ«ã‚®ãƒ¼å€¤ã‚’ä»˜ä¸ã™ã‚‹ï¼
+    value_type	bias = 0;		// ãƒã‚¤ã‚¢ã‚¹
     BOOST_FOREACH (vertex_t u, sites())
     {
 	const id_type		uid = id(u);
 	const label_type	Xu  = (*this)(u);
 
-	if (Xu != alpha)		// u ‚Ìƒ‰ƒxƒ‹‚ªalpha‚Å‚È‚¯‚ê‚Î...
+	if (Xu != alpha)		// u ã®ãƒ©ãƒ™ãƒ«ãŒalphaã§ãªã‘ã‚Œã°...
 	{
 	    const edge_t	es = get(vertex_sedge, _g, u),
 				et = get(vertex_tedge, _g, u);
@@ -520,7 +520,7 @@ GraphCuts<T, ID, L, EL>::alphaExpansion(label_type alpha, F energyTerm,
 	    
 	    BOOST_FOREACH (edge_t e, out_edges(u, _g))
 	    {
-		if (get(edge_smooth, _g, e))	// e ‚ª•½ŠŠ‰»€‚ğ•\‚·‚È‚ç...
+		if (get(edge_smooth, _g, e))	// e ãŒå¹³æ»‘åŒ–é …ã‚’è¡¨ã™ãªã‚‰...
 		{
 		    const vertex_t	v   = target(e, _g);
 		    const id_type	vid = id(v);
@@ -556,7 +556,7 @@ GraphCuts<T, ID, L, EL>::alphaExpansion(label_type alpha, F energyTerm,
 		}
 	    }
 	}
-	else				// u ‚Ìƒ‰ƒxƒ‹‚ªalpha‚È‚ç‚Î...
+	else				// u ã®ãƒ©ãƒ™ãƒ«ãŒalphaãªã‚‰ã°...
 	{
 	    bias += energyTerm(uid, alpha);
 	    
@@ -585,7 +585,7 @@ GraphCuts<T, ID, L, EL>::alphaExpansion(label_type alpha, F energyTerm,
 	}
     }
 
-  // _s ‚©‚ç—¬‚êo‚·•Ó‚Æ _t ‚É—¬‚ê‚Ş•Ó‚Ì—e—Ê‚ª”ñ•‰‚É‚È‚é‚æ‚¤‚É’²®‚·‚éD
+  // _s ã‹ã‚‰æµã‚Œå‡ºã™è¾ºã¨ _t ã«æµã‚Œè¾¼ã‚€è¾ºã®å®¹é‡ãŒéè² ã«ãªã‚‹ã‚ˆã†ã«èª¿æ•´ã™ã‚‹ï¼
     BOOST_FOREACH (vertex_t v, sites())
     {
 	const edge_t	es = get(vertex_sedge, _g, v),
@@ -607,7 +607,7 @@ GraphCuts<T, ID, L, EL>::alphaExpansion(label_type alpha, F energyTerm,
 	}
     }
     
-  // Å‘åƒtƒ[‚ÆÅ¬ƒJƒbƒg‚ğ‹‚ß‚éD
+  // æœ€å¤§ãƒ•ãƒ­ãƒ¼ã¨æœ€å°ã‚«ãƒƒãƒˆã‚’æ±‚ã‚ã‚‹ï¼
     return bias + maxFlow(alpha, alg);
 }
 
@@ -626,7 +626,7 @@ GraphCuts<T, ID, L, EL>::check() const
 	f += flow(e);
     cerr << " s => " << f << ", ";
     
-  // xxx_max_flow() ‚ª•Ô‚·Å‘åƒtƒ[’l‚ª³‚µ‚¢‚©ƒ`ƒFƒbƒN‚·‚éD
+  // xxx_max_flow() ãŒè¿”ã™æœ€å¤§ãƒ•ãƒ­ãƒ¼å€¤ãŒæ­£ã—ã„ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹ï¼
     f = 0;
     BOOST_FOREACH (edge_t e, edges(_g))
     {
@@ -666,13 +666,13 @@ GraphCuts<T, ID, L, EL>::check() const
 }
     
 /*
- * ------------------------------- “üo—Í -------------------------------
+ * ------------------------------- å…¥å‡ºåŠ› -------------------------------
  */
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚çÅ‘åƒtƒ[–â‘è‚ğ“Ç‚İ‚ŞD
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰æœ€å¤§ãƒ•ãƒ­ãƒ¼å•é¡Œã‚’èª­ã¿è¾¼ã‚€ï¼
 template <class T, class ID, class L, class EL> std::istream&
 GraphCuts<T, ID, L, EL>::getDimacsMaxFlow(std::istream& in)
 {
-  // ‘S‚Ä‚Ì•Ó‚ÆŠJn“_‚ÆI’[“_‚ğŠÜ‚Ş‘S‚Ä‚Ì’¸“_‚ğœ‹‚·‚éD
+  // å…¨ã¦ã®è¾ºã¨é–‹å§‹ç‚¹ã¨çµ‚ç«¯ç‚¹ã‚’å«ã‚€å…¨ã¦ã®é ‚ç‚¹ã‚’é™¤å»ã™ã‚‹ï¼
     _g.clear();
 
     read_dimacs_max_flow(_g, get(edge_capacity, _g), get(edge_reverse, _g),
@@ -680,7 +680,7 @@ GraphCuts<T, ID, L, EL>::getDimacsMaxFlow(std::istream& in)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚ÉÅ‘åƒtƒ[–â‘è‚ğ‘‚«‚ŞD
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«æœ€å¤§ãƒ•ãƒ­ãƒ¼å•é¡Œã‚’æ›¸ãè¾¼ã‚€ï¼
 template <class T, class ID, class L, class EL> std::ostream&
 GraphCuts<T, ID, L, EL>::putDimacsMaxFlow(std::ostream& out) const
 {
@@ -689,8 +689,8 @@ GraphCuts<T, ID, L, EL>::putDimacsMaxFlow(std::ostream& out) const
 #if 1
     out << "p max\t" << num_vertices(_g) << '\t' << num_edges(_g)/2 << endl;
 
-    out << "n\t" << _s + 1 << " s" << endl;	// ŠJn“_
-    out << "n\t" << _t + 1 << " t" << endl;	// I’[“_
+    out << "n\t" << _s + 1 << " s" << endl;	// é–‹å§‹ç‚¹
+    out << "n\t" << _t + 1 << " t" << endl;	// çµ‚ç«¯ç‚¹
 
     int	nedges = 0;
     BOOST_FOREACH (vertex_t v, sites())
@@ -727,8 +727,8 @@ GraphCuts<T, ID, L, EL>::putDimacsMaxFlow(std::ostream& out) const
 
     out << "p max\t" << num_vertices(_g) << '\t' << nNonzeroEdges << endl;
 
-    out << "n\t" << _s + 1 << " s" << endl;	// ŠJn“_
-    out << "n\t" << _t + 1 << " t" << endl;	// I’[“_
+    out << "n\t" << _s + 1 << " s" << endl;	// é–‹å§‹ç‚¹
+    out << "n\t" << _t + 1 << " t" << endl;	// çµ‚ç«¯ç‚¹
 
     BOOST_FOREACH (edge_t e, edges(_g))
     {
@@ -828,15 +828,15 @@ GraphCuts<T, ID, L, EL>::createEdgePair(vertex_t u, vertex_t v)
 template <class T, class ID, class L, class EL> inline void
 GraphCuts<T, ID, L, EL>::computeMinCut()
 {
-  // ‘S’¸“_‚ğ”’‚É“h‚éD
+  // å…¨é ‚ç‚¹ã‚’ç™½ã«å¡—ã‚‹ï¼
     BOOST_FOREACH (vertex_t v, vertices(_g))
 	put(vertex_color, _g, v, color_traits_t::white());
 
-  // ŠJn“_‚©‚ç–O˜a‚µ‚Ä‚¢‚È‚¢•Ó‚ğ’Ê‚Á‚Ä“’B‚Å‚«‚é’¸“_‚ğ•‚É“h‚éD
-    std::stack<vertex_t>	stack;	// [‚³—Dæ’Tõ‚Ì‚½‚ß‚ÌƒXƒ^ƒbƒN
+  // é–‹å§‹ç‚¹ã‹ã‚‰é£½å’Œã—ã¦ã„ãªã„è¾ºã‚’é€šã£ã¦åˆ°é”ã§ãã‚‹é ‚ç‚¹ã‚’é»’ã«å¡—ã‚‹ï¼
+    std::stack<vertex_t>	stack;	// æ·±ã•å„ªå…ˆæ¢ç´¢ã®ãŸã‚ã®ã‚¹ã‚¿ãƒƒã‚¯
     stack.push(_s);
     
-    while (!stack.empty())		// [‚³—Dæ’Tõ
+    while (!stack.empty())		// æ·±ã•å„ªå…ˆæ¢ç´¢
     {
 	vertex_t	u = stack.top();
 	stack.pop();

@@ -1,15 +1,15 @@
 /*
- *  •½¬21-22”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ21-22å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2009-2010.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SparseMatrix++.h,v 1.7 2011-09-30 01:06:39 ueshiba Exp $
+ *  $Id: SparseMatrix++.h,v 1.8 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		SparseMatrix++.h
-  \brief	ƒNƒ‰ƒX TU::SparseMatrix ‚Ì’è‹`‚ÆÀ‘•
+  \brief	ã‚¯ãƒ©ã‚¹ TU::SparseMatrix ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUSparseMatrixPP_h
 #define __TUSparseMatrixPP_h
@@ -46,12 +46,12 @@ namespace TU
 /************************************************************************
 *  class SparseMatrix<T, SYM>						*
 ************************************************************************/
-//! Intel Math-Kernel Library(MKL)‚ÌƒtƒH[ƒ}ƒbƒg‚É‚æ‚é‘as—ñ
+//! Intel Math-Kernel Library(MKL)ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã«ã‚ˆã‚‹ç–è¡Œåˆ—
 template <class T, bool SYM=false>
 class SparseMatrix
 {
   public:
-    typedef T		value_type;		//!< ¬•ª‚ÌŒ^
+    typedef T		value_type;		//!< æˆåˆ†ã®å‹
 
   private:
     template <class S>
@@ -61,14 +61,14 @@ class SparseMatrix
     };
     
   public:
-  // \‘¢¶¬
+  // æ§‹é€ ç”Ÿæˆ
     void		beginInit()					;
     void		setRow()					;
     void		setCol(u_int col, value_type val=0)		;
     void		copyRow()					;
     void		endInit()					;
     
-  // Šî–{î•ñ
+  // åŸºæœ¬æƒ…å ±
     u_int		dim()					const	;
     u_int		nrow()					const	;
     u_int		ncol()					const	;
@@ -77,7 +77,7 @@ class SparseMatrix
     T			operator ()(u_int i, u_int j)		const	;
     T&			operator ()(u_int i, u_int j)			;
 
-  // Šî–{‰‰Z
+  // åŸºæœ¬æ¼”ç®—
     SparseMatrix&	operator  =(value_type c)			;
     SparseMatrix&	operator *=(value_type c)			;
     SparseMatrix&	operator /=(value_type c)			;
@@ -95,7 +95,7 @@ class SparseMatrix
     SparseMatrix<T, true>
 			compose(const SparseMatrix<T, true>& W)	const	;
 
-  // ƒuƒƒbƒN‰‰Z
+  // ãƒ–ãƒ­ãƒƒã‚¯æ¼”ç®—
     Vector<T>		operator ()(u_int i, u_int j, u_int d)	const	;
     Matrix<T>		operator ()(u_int i, u_int j,
 				    u_int r, u_int c)		const	;
@@ -111,13 +111,13 @@ class SparseMatrix
     SparseMatrix&	apply(u_int i, u_int j,
 			      OP op, const Matrix<S, B, R>& M)		;
 
-  // ˜A—§ˆêŸ•û’ö®
+  // é€£ç«‹ä¸€æ¬¡æ–¹ç¨‹å¼
     Vector<T>		solve(const Vector<T>& b)		const	;
 
-  // —LŒÀ«‚Ìƒ`ƒFƒbƒN
+  // æœ‰é™æ€§ã®ãƒã‚§ãƒƒã‚¯
     bool		isfinite()				const	;
     
-  // “üo—Í
+  // å…¥å‡ºåŠ›
     std::istream&	get(std::istream& in)				;
     std::ostream&	put(std::ostream& out)			const	;
     
@@ -135,17 +135,17 @@ class SparseMatrix
     static char		skipws(std::istream& in)			;
     
   private:
-    u_int		_ncol;		//!< —ñ‚Ì”
-    std::vector<u_int>	_rowIndex;	//!< Šes‚Ìæ“ª¬•ª‚Ì’Ê‚µ”Ô†
-    std::vector<u_int>	_columns;	//!< Še¬•ª‚Ì—ñ”Ô†
-    std::vector<T>	_values;	//!< Še¬•ª‚Ì’l
-    std::map<u_int, T>	_rowmap;	//!< 1s’†‚Ì—ñ”Ô†‚Æ’l‚Ìˆêƒoƒbƒtƒ@
+    u_int		_ncol;		//!< åˆ—ã®æ•°
+    std::vector<u_int>	_rowIndex;	//!< å„è¡Œã®å…ˆé ­æˆåˆ†ã®é€šã—ç•ªå·
+    std::vector<u_int>	_columns;	//!< å„æˆåˆ†ã®åˆ—ç•ªå·
+    std::vector<T>	_values;	//!< å„æˆåˆ†ã®å€¤
+    std::map<u_int, T>	_rowmap;	//!< 1è¡Œä¸­ã®åˆ—ç•ªå·ã¨å€¤ã®ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡
 };
 
 /*
- * ----------------------- \‘¢¶¬ -----------------------------
+ * ----------------------- æ§‹é€ ç”Ÿæˆ -----------------------------
  */
-//! ‰Šú‰»‚ğŠJn‚·‚éD
+//! åˆæœŸåŒ–ã‚’é–‹å§‹ã™ã‚‹ï¼
 template <class T, bool SYM> inline void
 SparseMatrix<T, SYM>::beginInit()
 {
@@ -156,11 +156,11 @@ SparseMatrix<T, SYM>::beginInit()
     _rowmap.clear();
 }
 
-//! s‚Ìæ“ªˆÊ’u‚ğƒZƒbƒg‚·‚éD
+//! è¡Œã®å…ˆé ­ä½ç½®ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
 template <class T, bool SYM> inline void
 SparseMatrix<T, SYM>::setRow()
 {
-  // ƒ\[ƒgÏ‚İ‚Ì1‚Â‘O‚Ìs‚Ì—ñ”Ô†‚ğ‚»‚ê‚¼‚ê_columns‚Æ_value‚ÉƒRƒs[
+  // ã‚½ãƒ¼ãƒˆæ¸ˆã¿ã®1ã¤å‰ã®è¡Œã®åˆ—ç•ªå·ã‚’ãã‚Œãã‚Œ_columnsã¨_valueã«ã‚³ãƒ”ãƒ¼
     if (!_rowIndex.empty())
     {
 	for (typename std::map<u_int, T>::const_iterator
@@ -172,7 +172,7 @@ SparseMatrix<T, SYM>::setRow()
 	_rowmap.clear();
     }
 
-  // ‚±‚Ìs‚Ìæ“ª¬•ª‚Ì’Ê‚µ”Ô†‚ğƒZƒbƒg
+  // ã“ã®è¡Œã®å…ˆé ­æˆåˆ†ã®é€šã—ç•ªå·ã‚’ã‚»ãƒƒãƒˆ
 #ifdef BASE1_INDEX
     _rowIndex.push_back(nelements() + 1);
 #else
@@ -180,23 +180,23 @@ SparseMatrix<T, SYM>::setRow()
 #endif
 }
 
-//! ¬•ª‚Ì—ñ”Ô†‚Æ‚»‚Ì’l‚ğƒZƒbƒg‚·‚éD
+//! æˆåˆ†ã®åˆ—ç•ªå·ã¨ãã®å€¤ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
 /*!
-  \param col			—ñ”Ô†
-  \param val			’l
-  \throw std::logic_error	setRow() ‚ğs‚¤‘O‚ÉŒÄ‚Ño‚·‚Æ‘—o
-  \throw std::invalid_argument	‘ÎÌs—ñ‚Ìê‡CŒ»İ‚Ìs”Ô†‚æ‚è¬‚³‚È—ñ”Ô†
-				‚ğw’è‚·‚é‚Æ‘—o
+  \param col			åˆ—ç•ªå·
+  \param val			å€¤
+  \throw std::logic_error	setRow() ã‚’è¡Œã†å‰ã«å‘¼ã³å‡ºã™ã¨é€å‡º
+  \throw std::invalid_argument	å¯¾ç§°è¡Œåˆ—ã®å ´åˆï¼Œç¾åœ¨ã®è¡Œç•ªå·ã‚ˆã‚Šå°ã•ãªåˆ—ç•ªå·
+				ã‚’æŒ‡å®šã™ã‚‹ã¨é€å‡º
 */
 template <class T, bool SYM> inline void
 SparseMatrix<T, SYM>::setCol(u_int col, value_type val)
 {
-    u_int	row = _rowIndex.size();	// Œ»İ‚Ü‚Å‚ÉƒZƒbƒg‚³‚ê‚½s”
+    u_int	row = _rowIndex.size();	// ç¾åœ¨ã¾ã§ã«ã‚»ãƒƒãƒˆã•ã‚ŒãŸè¡Œæ•°
     if (row == 0)
 	throw std::logic_error("TU::SparseMatrix<T, SYM>::setCol(): _rowIndex is not set!");
     if (SYM)
     {
-	if (col < --row)		// —^‚¦‚ç‚ê‚½—ñ”Ô†‚ğŒ»İ‚Ìs”Ô†‚Æ”äŠr
+	if (col < --row)		// ä¸ãˆã‚‰ã‚ŒãŸåˆ—ç•ªå·ã‚’ç¾åœ¨ã®è¡Œç•ªå·ã¨æ¯”è¼ƒ
 	    throw std::invalid_argument("TU::SparseMatrix<T, SYM>::setCol(): column index must not be less than row index!");
     }
 #ifdef BASE1_INDEX
@@ -205,25 +205,25 @@ SparseMatrix<T, SYM>::setCol(u_int col, value_type val)
     _rowmap.insert(std::make_pair(col, val));
 #endif
     if (col >= _ncol)
-	_ncol = col + 1;		// —ñ”‚ğXV
+	_ncol = col + 1;		// åˆ—æ•°ã‚’æ›´æ–°
 }
 
-//! ’¼‘O‚Ìs‚Æ“¯‚¶ˆÊ’u‚É”ñ—ë¬•ª‚ğ‚Â‚æ‚¤‚Ès‚ğƒZƒbƒg‚·‚éD
+//! ç›´å‰ã®è¡Œã¨åŒã˜ä½ç½®ã«éé›¶æˆåˆ†ã‚’æŒã¤ã‚ˆã†ãªè¡Œã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
 /*!
-  V‚½‚ÉƒZƒbƒg‚³‚ê‚és‚Ì¬•ª‚Ì’l‚Í‘S‚Ä0‚Æ‚È‚éD
-  \throw std::logic_error	’¼‘O‚Ìs‚ª‘¶İ‚µ‚È‚¢ê‡‚É‘—o
+  æ–°ãŸã«ã‚»ãƒƒãƒˆã•ã‚Œã‚‹è¡Œã®æˆåˆ†ã®å€¤ã¯å…¨ã¦0ã¨ãªã‚‹ï¼
+  \throw std::logic_error	ç›´å‰ã®è¡ŒãŒå­˜åœ¨ã—ãªã„å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> inline void
 SparseMatrix<T, SYM>::copyRow()
 {
-    u_int	row = _rowIndex.size();	// Œ»İ‚Ü‚Å‚ÉƒZƒbƒg‚³‚ê‚½s”
+    u_int	row = _rowIndex.size();	// ç¾åœ¨ã¾ã§ã«ã‚»ãƒƒãƒˆã•ã‚ŒãŸè¡Œæ•°
     if (row == 0)
 	throw std::logic_error("TU::SparseMatrix<T, SYM>::copyRow(): no previous rows!");
 
-  // s‚Ìæ“ª¬•ª‚Ì’Ê‚µ”Ô†‚ğƒZƒbƒg‚·‚éDrow‚ªŒ»İ‚Ìs”Ô†‚Æ‚È‚éD
+  // è¡Œã®å…ˆé ­æˆåˆ†ã®é€šã—ç•ªå·ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼rowãŒç¾åœ¨ã®è¡Œç•ªå·ã¨ãªã‚‹ï¼
     setRow();
 
-  // ’¼‘O‚Ìs‚Ì(‘ÎÌs—ñ‚Ìê‡‚Í2”Ô–ÚˆÈ~‚Ì)¬•ª‚Ì—ñ”Ô†‚ğŒ»İ‚Ìs‚ÉƒRƒs[‚·‚éD
+  // ç›´å‰ã®è¡Œã®(å¯¾ç§°è¡Œåˆ—ã®å ´åˆã¯2ç•ªç›®ä»¥é™ã®)æˆåˆ†ã®åˆ—ç•ªå·ã‚’ç¾åœ¨ã®è¡Œã«ã‚³ãƒ”ãƒ¼ã™ã‚‹ï¼
 #ifdef BASE1_INDEX
     for (u_int n  = _rowIndex[row - 1] - (SYM ? 0 : 1),
 	       ne = _rowIndex[row] - 1; n < ne; ++n)
@@ -237,26 +237,26 @@ SparseMatrix<T, SYM>::copyRow()
     }
 }
 
-//! ‰Šú‰»‚ğŠ®—¹‚·‚éD
+//! åˆæœŸåŒ–ã‚’å®Œäº†ã™ã‚‹ï¼
 /*!
-  \throw std::logic_error	¶¬‚³‚ê‚½‘as—ñ‚Ì\‘¢‚ª‰ó‚ê‚Ä‚¢‚éê‡‚É‘—o
+  \throw std::logic_error	ç”Ÿæˆã•ã‚ŒãŸç–è¡Œåˆ—ã®æ§‹é€ ãŒå£Šã‚Œã¦ã„ã‚‹å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> inline void
 SparseMatrix<T, SYM>::endInit()
 {
-    setRow();				// ƒ_ƒ~[‚Ìs‚ğƒZƒbƒg
+    setRow();				// ãƒ€ãƒŸãƒ¼ã®è¡Œã‚’ã‚»ãƒƒãƒˆ
     
-  // \‘¢ƒ`ƒFƒbƒN‚ğs‚¤D
-    if (SYM)				// ‘ÎÌs—ñ‚È‚ç...
+  // æ§‹é€ ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†ï¼
+    if (SYM)				// å¯¾ç§°è¡Œåˆ—ãªã‚‰...
     {
-      // s”‚Æ—ñ”‚ª“™‚µ‚¢‚©H
+      // è¡Œæ•°ã¨åˆ—æ•°ãŒç­‰ã—ã„ã‹ï¼Ÿ
 	if (nrow() != ncol())
 	    throw std::logic_error("SparseMatrix<T, true>::endInit(): the numbers of rows and columns must be equal!");
     }
 #ifdef LIBTUTOOLS_DEBUG
     if (SYM)
     {
-      // Šes‚Ìæ“ª¬•ª‚ª‘ÎŠp¬•ª‚Å‚ ‚é‚©H
+      // å„è¡Œã®å…ˆé ­æˆåˆ†ãŒå¯¾è§’æˆåˆ†ã§ã‚ã‚‹ã‹ï¼Ÿ
 	for (u_int i = 0; i < nrow(); ++i)
 #ifdef BASE1_INDEX
 	    if (i != _columns[_rowIndex[i]-1]-1)
@@ -266,7 +266,7 @@ SparseMatrix<T, SYM>::endInit()
 		throw std::logic_error("SparseMatrix<T, true>::endInit(): the first entry of each row must be a diagonal element!");
     }
 
-  // Šes“à‚Å—ñ”Ô†‚ª‹·‹`’P’²‘‰Á‚É‚È‚Á‚Ä‚¢‚é‚©H
+  // å„è¡Œå†…ã§åˆ—ç•ªå·ãŒç‹­ç¾©å˜èª¿å¢—åŠ ã«ãªã£ã¦ã„ã‚‹ã‹ï¼Ÿ
     for (u_int i = 0; i < nrow(); ++i)
 #ifdef BASE1_INDEX
 	for (int n = _rowIndex[i] - 1; n < _rowIndex[i+1] - 2; ++n)
@@ -279,11 +279,11 @@ SparseMatrix<T, SYM>::endInit()
 }
 
 /*
- * ----------------------- Šî–{î•ñ ---------------------------------
+ * ----------------------- åŸºæœ¬æƒ…å ± ---------------------------------
  */
-//! s—ñ‚ÌŸŒ³‚·‚È‚í‚¿s”‚ğ•Ô‚·D
+//! è¡Œåˆ—ã®æ¬¡å…ƒã™ãªã‚ã¡è¡Œæ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	s—ñ‚ÌŸŒ³(=s”)
+  \return	è¡Œåˆ—ã®æ¬¡å…ƒ(=è¡Œæ•°)
 */
 template <class T, bool SYM> inline u_int
 SparseMatrix<T, SYM>::dim() const
@@ -291,9 +291,9 @@ SparseMatrix<T, SYM>::dim() const
     return nrow();
 }
     
-//! s—ñ‚Ìs”‚ğ•Ô‚·D
+//! è¡Œåˆ—ã®è¡Œæ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	s—ñ‚Ìs”
+  \return	è¡Œåˆ—ã®è¡Œæ•°
 */
 template <class T, bool SYM> inline u_int
 SparseMatrix<T, SYM>::nrow() const
@@ -301,9 +301,9 @@ SparseMatrix<T, SYM>::nrow() const
     return _rowIndex.size() - 1;
 }
     
-//! s—ñ‚Ì—ñ”‚ğ•Ô‚·D
+//! è¡Œåˆ—ã®åˆ—æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	s—ñ‚Ì—ñ”
+  \return	è¡Œåˆ—ã®åˆ—æ•°
 */
 template <class T, bool SYM> inline u_int
 SparseMatrix<T, SYM>::ncol() const
@@ -311,9 +311,9 @@ SparseMatrix<T, SYM>::ncol() const
     return _ncol;
 }
     
-//! s—ñ‚Ì”ñ—ë¬•ª”‚ğ•Ô‚·D
+//! è¡Œåˆ—ã®éé›¶æˆåˆ†æ•°ã‚’è¿”ã™ï¼
 /*!
-  \return	s—ñ‚Ì”ñ—ë¬•ª”
+  \return	è¡Œåˆ—ã®éé›¶æˆåˆ†æ•°
 */
 template <class T, bool SYM> inline u_int
 SparseMatrix<T, SYM>::nelements() const
@@ -321,10 +321,10 @@ SparseMatrix<T, SYM>::nelements() const
     return _columns.size();
 }
     
-//! w’è‚³‚ê‚½s‚Ì¬•ª”‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸè¡Œã®æˆåˆ†æ•°ã‚’è¿”ã™ï¼
 /*!
-  \param i	s”Ô†
-  \return	‘æis‚Ì¬•ª”
+  \param i	è¡Œç•ªå·
+  \return	ç¬¬iè¡Œã®æˆåˆ†æ•°
 */
 template <class T, bool SYM> inline u_int
 SparseMatrix<T, SYM>::nelements(u_int i) const
@@ -332,11 +332,11 @@ SparseMatrix<T, SYM>::nelements(u_int i) const
     return _rowIndex[i+1] - _rowIndex[i];
 }
     
-//! w’è‚³‚ê‚½s‚Æ—ñ‚É‘Î‰‚·‚é¬•ª‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸè¡Œã¨åˆ—ã«å¯¾å¿œã™ã‚‹æˆåˆ†ã‚’è¿”ã™ï¼
 /*!
-  \param i			s”Ô†
-  \param j			—ñ”Ô†
-  \return			(i, j)¬•ª
+  \param i			è¡Œç•ªå·
+  \param j			åˆ—ç•ªå·
+  \return			(i, j)æˆåˆ†
 */
 template <class T, bool SYM> inline T
 SparseMatrix<T, SYM>::operator ()(u_int i, u_int j) const
@@ -345,12 +345,12 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j) const
     return (n >= 0 ? _values[n] : T(0));
 }
 
-//! w’è‚³‚ê‚½s‚Æ—ñ‚É‘Î‰‚·‚é¬•ª‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸè¡Œã¨åˆ—ã«å¯¾å¿œã™ã‚‹æˆåˆ†ã‚’è¿”ã™ï¼
 /*!
-  \param i			s”Ô†
-  \param j			—ñ”Ô†
-  \return			(i, j)¬•ª
-  \throw std::invalid_argument	‚±‚Ìs—ñ‚ª(i, j)¬•ª‚ğ‚½‚È‚¢ê‡‚É‘—o
+  \param i			è¡Œç•ªå·
+  \param j			åˆ—ç•ªå·
+  \return			(i, j)æˆåˆ†
+  \throw std::invalid_argument	ã“ã®è¡Œåˆ—ãŒ(i, j)æˆåˆ†ã‚’æŒãŸãªã„å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> inline T&
 SparseMatrix<T, SYM>::operator ()(u_int i, u_int j)
@@ -360,12 +360,12 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j)
 }
     
 /*
- * ----------------------- Šî–{‰‰Z ---------------------------------
+ * ----------------------- åŸºæœ¬æ¼”ç®— ---------------------------------
  */
-//! ‚·‚×‚Ä‚Ì0‚Å‚È‚¢¬•ª‚É’è”‚ğ‘ã“ü‚·‚éD
+//! ã™ã¹ã¦ã®0ã§ãªã„æˆåˆ†ã«å®šæ•°ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  \param c	‘ã“ü‚·‚é’è”
-  \return	‚±‚Ì‘as—ñ
+  \param c	ä»£å…¥ã™ã‚‹å®šæ•°
+  \return	ã“ã®ç–è¡Œåˆ—
 */
 template <class T, bool SYM> inline SparseMatrix<T, SYM>&
 SparseMatrix<T, SYM>::operator =(value_type c)
@@ -374,10 +374,10 @@ SparseMatrix<T, SYM>::operator =(value_type c)
     return *this;
 }
     
-//! ‚±‚Ì‘as—ñ‚É’è”‚ğŠ|‚¯‚éD
+//! ã“ã®ç–è¡Œåˆ—ã«å®šæ•°ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param c	Š|‚¯‚é’è”
-  \return	‚±‚Ì‘as—ñ
+  \param c	æ›ã‘ã‚‹å®šæ•°
+  \return	ã“ã®ç–è¡Œåˆ—
 */
 template <class T, bool SYM> SparseMatrix<T, SYM>&
 SparseMatrix<T, SYM>::operator *=(value_type c)
@@ -387,10 +387,10 @@ SparseMatrix<T, SYM>::operator *=(value_type c)
     return *this;
 }
     
-//! ‚±‚Ì‘as—ñ‚ğ’è”‚ÅŠ„‚éD
+//! ã“ã®ç–è¡Œåˆ—ã‚’å®šæ•°ã§å‰²ã‚‹ï¼
 /*!
-  \param c	Š|‚¯‚é’è”
-  \return	‚±‚Ì‘as—ñ
+  \param c	æ›ã‘ã‚‹å®šæ•°
+  \return	ã“ã®ç–è¡Œåˆ—
 */
 template <class T, bool SYM> SparseMatrix<T, SYM>&
 SparseMatrix<T, SYM>::operator /=(value_type c)
@@ -400,12 +400,12 @@ SparseMatrix<T, SYM>::operator /=(value_type c)
     return *this;
 }
     
-//! ‚±‚Ì‘as—ñ‚É‘¼‚Ì‘as—ñ‚ğ‘«‚·D
+//! ã“ã®ç–è¡Œåˆ—ã«ä»–ã®ç–è¡Œåˆ—ã‚’è¶³ã™ï¼
 /*!
-  2‚Â‚Ì‘as—ñ‚Í“¯ˆê‚Ì\‘¢‚ğ‚½‚Ë‚Î‚È‚ç‚È‚¢D
-  \param A			‘«‚·‘as—ñ
-  \return			‚±‚Ì‘as—ñ
-  \throw std::invalid_argument	2‚Â‚Ì‘as—ñ‚Ì\‘¢‚ªˆê’v‚µ‚È‚¢ê‡‚É‘—o
+  2ã¤ã®ç–è¡Œåˆ—ã¯åŒä¸€ã®æ§‹é€ ã‚’æŒãŸã­ã°ãªã‚‰ãªã„ï¼
+  \param A			è¶³ã™ç–è¡Œåˆ—
+  \return			ã“ã®ç–è¡Œåˆ—
+  \throw std::invalid_argument	2ã¤ã®ç–è¡Œåˆ—ã®æ§‹é€ ãŒä¸€è‡´ã—ãªã„å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> SparseMatrix<T, SYM>&
 SparseMatrix<T, SYM>::operator +=(const SparseMatrix& A)
@@ -420,12 +420,12 @@ SparseMatrix<T, SYM>::operator +=(const SparseMatrix& A)
     return *this;
 }
     
-//! ‚±‚Ì‘as—ñ‚©‚ç‘¼‚Ì‘as—ñ‚ğˆø‚­D
+//! ã“ã®ç–è¡Œåˆ—ã‹ã‚‰ä»–ã®ç–è¡Œåˆ—ã‚’å¼•ãï¼
 /*!
-  2‚Â‚Ì‘as—ñ‚Í“¯ˆê‚Ì\‘¢‚ğ‚½‚Ë‚Î‚È‚ç‚È‚¢D
-  \param A			ˆø‚­‘as—ñ
-  \return			‚±‚Ì‘as—ñ
-  \throw std::invalid_argument	2‚Â‚Ì‘as—ñ‚Ì\‘¢‚ªˆê’v‚µ‚È‚¢ê‡‚É‘—o
+  2ã¤ã®ç–è¡Œåˆ—ã¯åŒä¸€ã®æ§‹é€ ã‚’æŒãŸã­ã°ãªã‚‰ãªã„ï¼
+  \param A			å¼•ãç–è¡Œåˆ—
+  \return			ã“ã®ç–è¡Œåˆ—
+  \throw std::invalid_argument	2ã¤ã®ç–è¡Œåˆ—ã®æ§‹é€ ãŒä¸€è‡´ã—ãªã„å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> SparseMatrix<T, SYM>&
 SparseMatrix<T, SYM>::operator -=(const SparseMatrix& A)
@@ -440,11 +440,11 @@ SparseMatrix<T, SYM>::operator -=(const SparseMatrix& A)
     return *this;
 }
 
-//! ‚±‚Ì‘as—ñ‚Æ‘¼‚Ì‘as—ñ‚Ì˜a‚ğŒvZ‚·‚éD
+//! ã“ã®ç–è¡Œåˆ—ã¨ä»–ã®ç–è¡Œåˆ—ã®å’Œã‚’è¨ˆç®—ã™ã‚‹ï¼
 /*!
-  2‚Â‚Ì‘as—ñ‚Í“¯ˆê‚ÌƒTƒCƒY‚ğ‚½‚Ë‚Î‚È‚ç‚È‚¢D
-  \param A	‘«‚·‘as—ñ
-  \return	2‚Â‚Ì‘as—ñ‚Ì˜a
+  2ã¤ã®ç–è¡Œåˆ—ã¯åŒä¸€ã®ã‚µã‚¤ã‚ºã‚’æŒãŸã­ã°ãªã‚‰ãªã„ï¼
+  \param A	è¶³ã™ç–è¡Œåˆ—
+  \return	2ã¤ã®ç–è¡Œåˆ—ã®å’Œ
 */
 template <class T, bool SYM> inline SparseMatrix<T, SYM>
 SparseMatrix<T, SYM>::operator +(const SparseMatrix& A) const
@@ -452,11 +452,11 @@ SparseMatrix<T, SYM>::operator +(const SparseMatrix& A) const
     return binary_op(A, std::plus<T>());
 }
     
-//! ‚±‚Ì‘as—ñ‚Æ‘¼‚Ì‘as—ñ‚Ì·‚ğŒvZ‚·‚éD
+//! ã“ã®ç–è¡Œåˆ—ã¨ä»–ã®ç–è¡Œåˆ—ã®å·®ã‚’è¨ˆç®—ã™ã‚‹ï¼
 /*!
-  2‚Â‚Ì‘as—ñ‚Í“¯ˆê‚ÌƒTƒCƒY‚ğ‚½‚Ë‚Î‚È‚ç‚È‚¢D
-  \param A	ˆø‚­‘as—ñ
-  \return	2‚Â‚Ì‘as—ñ‚Ì·
+  2ã¤ã®ç–è¡Œåˆ—ã¯åŒä¸€ã®ã‚µã‚¤ã‚ºã‚’æŒãŸã­ã°ãªã‚‰ãªã„ï¼
+  \param A	å¼•ãç–è¡Œåˆ—
+  \return	2ã¤ã®ç–è¡Œåˆ—ã®å·®
 */
 template <class T, bool SYM> inline SparseMatrix<T, SYM>
 SparseMatrix<T, SYM>::operator -(const SparseMatrix& A) const
@@ -464,10 +464,10 @@ SparseMatrix<T, SYM>::operator -(const SparseMatrix& A) const
     return binary_op(A, std::minus<T>());
 }
     
-//! ‘as—ñ‚ÆƒxƒNƒgƒ‹‚ÌÏ
+//! ç–è¡Œåˆ—ã¨ãƒ™ã‚¯ãƒˆãƒ«ã®ç©
 /*!
-  \param v	ƒxƒNƒgƒ‹
-  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \return	çµæœã®ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, bool SYM> template <class S, class B> Vector<T>
 SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
@@ -498,14 +498,14 @@ SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
     return a;
 }
 
-//! ‚±‚Ì‘as—ñ‚É‰E‚©‚ç©g‚Ì“]’u‚ğŠ|‚¯‚½s—ñ‚ğ•Ô‚·D
+//! ã“ã®ç–è¡Œåˆ—ã«å³ã‹ã‚‰è‡ªèº«ã®è»¢ç½®ã‚’æ›ã‘ãŸè¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \return	Œ‹‰Ê‚ğŠi”[‚µ‚½‘a‘ÎÌs—ñ
+  \return	çµæœã‚’æ ¼ç´ã—ãŸç–å¯¾ç§°è¡Œåˆ—
 */
 template <class T, bool SYM> SparseMatrix<T, true>
 SparseMatrix<T, SYM>::compose() const
 {
-    SparseMatrix<T, true>	AAt;	// Œ‹‰Ê‚ğŠi”[‚·‚é‘a‘ÎÌs—ñ
+    SparseMatrix<T, true>	AAt;	// çµæœã‚’æ ¼ç´ã™ã‚‹ç–å¯¾ç§°è¡Œåˆ—
 
     AAt.beginInit();
     for (u_int i = 0; i < nrow(); ++i)
@@ -524,12 +524,12 @@ SparseMatrix<T, SYM>::compose() const
     return AAt;
 }
     
-//! ‚±‚Ì‘as—ñ‚É‰E‚©‚ç—^‚¦‚ç‚ê‚½‘a‘ÎÌs—ñ‚Æ©g‚Ì“]’u‚ğŠ|‚¯‚½s—ñ‚ğ•Ô‚·D
+//! ã“ã®ç–è¡Œåˆ—ã«å³ã‹ã‚‰ä¸ãˆã‚‰ã‚ŒãŸç–å¯¾ç§°è¡Œåˆ—ã¨è‡ªèº«ã®è»¢ç½®ã‚’æ›ã‘ãŸè¡Œåˆ—ã‚’è¿”ã™ï¼
 /*!
-  \param W			‘a‘ÎÌs—ñ
-  \return			Œ‹‰Ê‚ğŠi”[‚µ‚½‘a‘ÎÌs—ñ
-  \throw std::invalid_argument	‚±‚Ì‘as—ñ‚Ì—ñ”‚Æ W ‚Ìs”‚ªˆê’v‚µ‚È‚¢
-				ê‡‚É‘—o
+  \param W			ç–å¯¾ç§°è¡Œåˆ—
+  \return			çµæœã‚’æ ¼ç´ã—ãŸç–å¯¾ç§°è¡Œåˆ—
+  \throw std::invalid_argument	ã“ã®ç–è¡Œåˆ—ã®åˆ—æ•°ã¨ W ã®è¡Œæ•°ãŒä¸€è‡´ã—ãªã„
+				å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> SparseMatrix<T, true>
 SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W) const
@@ -573,14 +573,14 @@ SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W) const
 }
 
 /*
- * ----------------------- ƒuƒƒbƒN‰‰Z -----------------------------
+ * ----------------------- ãƒ–ãƒ­ãƒƒã‚¯æ¼”ç®— -----------------------------
  */
-//! ‘as—ñ‚Ìs’†‚Ì–§‚È•”•ª‚ğƒxƒNƒgƒ‹‚Æ‚µ‚Äæ‚èo‚·D
+//! ç–è¡Œåˆ—ã®è¡Œä¸­ã®å¯†ãªéƒ¨åˆ†ã‚’ãƒ™ã‚¯ãƒˆãƒ«ã¨ã—ã¦å–ã‚Šå‡ºã™ï¼
 /*!
-  \param i	‹N“_‚Ìs”Ô†
-  \param j	‹N“_‚Ì—ñ”Ô†
-  \param d	æ‚èo‚·¬•ª”
-  \return	æ‚èo‚µ‚½¬•ª‚ğ•À‚×‚½ƒxƒNƒgƒ‹
+  \param i	èµ·ç‚¹ã®è¡Œç•ªå·
+  \param j	èµ·ç‚¹ã®åˆ—ç•ªå·
+  \param d	å–ã‚Šå‡ºã™æˆåˆ†æ•°
+  \return	å–ã‚Šå‡ºã—ãŸæˆåˆ†ã‚’ä¸¦ã¹ãŸãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class T, bool SYM> Vector<T>
 SparseMatrix<T, SYM>::operator ()(u_int i, u_int j, u_int d) const
@@ -613,13 +613,13 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j, u_int d) const
     return v;
 }
 
-//! ‘as—ñ’†‚Ì–§‚ÈƒuƒƒbƒN‚ğs—ñ‚Æ‚µ‚Äæ‚èo‚·D
+//! ç–è¡Œåˆ—ä¸­ã®å¯†ãªãƒ–ãƒ­ãƒƒã‚¯ã‚’è¡Œåˆ—ã¨ã—ã¦å–ã‚Šå‡ºã™ï¼
 /*!
-  \param i	‹N“_‚Ìs”Ô†
-  \param j	‹N“_‚Ì—ñ”Ô†
-  \param r	æ‚èo‚·s”
-  \param c	æ‚èo‚·—ñ”
-  \return	æ‚èo‚µ‚½¬•ª‚ğ•À‚×‚½s—ñ
+  \param i	èµ·ç‚¹ã®è¡Œç•ªå·
+  \param j	èµ·ç‚¹ã®åˆ—ç•ªå·
+  \param r	å–ã‚Šå‡ºã™è¡Œæ•°
+  \param c	å–ã‚Šå‡ºã™åˆ—æ•°
+  \return	å–ã‚Šå‡ºã—ãŸæˆåˆ†ã‚’ä¸¦ã¹ãŸè¡Œåˆ—
 */
 template <class T, bool SYM> Matrix<T>
 SparseMatrix<T, SYM>::operator ()(u_int i, u_int j,
@@ -632,13 +632,13 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j,
     return M;
 }
 
-//! ‘as—ñ’†‚Ìs‚Ì–§‚È•”•ª‚ğƒxƒNƒgƒ‹‚Æ‚İ‚È‚µ‚Ä—^‚¦‚ç‚ê‚½ƒxƒNƒgƒ‹‚ğ‘ã“ü‚·‚éD
+//! ç–è¡Œåˆ—ä¸­ã®è¡Œã®å¯†ãªéƒ¨åˆ†ã‚’ãƒ™ã‚¯ãƒˆãƒ«ã¨ã¿ãªã—ã¦ä¸ãˆã‚‰ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  (i, j)¬•ª‚ğ‹N“_‚Æ‚·‚é˜A‘±•”•ª‚É—^‚¦‚ç‚ê‚½ƒxƒNƒgƒ‹‚ğ‘ã“ü‚·‚éD
-  \param i	‹N“_‚Ìs”Ô†
-  \param j	‹N“_‚Ì—ñ”Ô†
-  \param v	‘ã“ü‚·‚éƒxƒNƒgƒ‹
-  \return	‚±‚Ì‘a‘ÎÌs—ñ
+  (i, j)æˆåˆ†ã‚’èµ·ç‚¹ã¨ã™ã‚‹é€£ç¶šéƒ¨åˆ†ã«ä¸ãˆã‚‰ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«ã‚’ä»£å…¥ã™ã‚‹ï¼
+  \param i	èµ·ç‚¹ã®è¡Œç•ªå·
+  \param j	èµ·ç‚¹ã®åˆ—ç•ªå·
+  \param v	ä»£å…¥ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã“ã®ç–å¯¾ç§°è¡Œåˆ—
 */
 template <class T, bool SYM> template <class S, class B>
 inline SparseMatrix<T, SYM>&
@@ -647,13 +647,13 @@ SparseMatrix<T, SYM>::assign(u_int i, u_int j, const Vector<S, B>& v)
     return apply(i, j, Assign<S>(), v);
 }
     
-//! ‘as—ñ’†‚Ì–§‚ÈƒuƒƒbƒN‚ğs—ñ‚Æ‚İ‚È‚µ‚Ä—^‚¦‚ç‚ê‚½s—ñ‚ğ‘ã“ü‚·‚éD
+//! ç–è¡Œåˆ—ä¸­ã®å¯†ãªãƒ–ãƒ­ãƒƒã‚¯ã‚’è¡Œåˆ—ã¨ã¿ãªã—ã¦ä¸ãˆã‚‰ã‚ŒãŸè¡Œåˆ—ã‚’ä»£å…¥ã™ã‚‹ï¼
 /*!
-  (i, j)¬•ª‚ğ‹N“_‚Æ‚·‚é˜A‘±•”•ª‚É—^‚¦‚ç‚ê‚½s—ñ‚ğ‘ã“ü‚·‚éD
-  \param i	‹N“_‚Ìs”Ô†
-  \param j	‹N“_‚Ì—ñ”Ô†
-  \param M	‘ã“ü‚·‚és—ñ
-  \return	‚±‚Ì‘a‘ÎÌs—ñ
+  (i, j)æˆåˆ†ã‚’èµ·ç‚¹ã¨ã™ã‚‹é€£ç¶šéƒ¨åˆ†ã«ä¸ãˆã‚‰ã‚ŒãŸè¡Œåˆ—ã‚’ä»£å…¥ã™ã‚‹ï¼
+  \param i	èµ·ç‚¹ã®è¡Œç•ªå·
+  \param j	èµ·ç‚¹ã®åˆ—ç•ªå·
+  \param M	ä»£å…¥ã™ã‚‹è¡Œåˆ—
+  \return	ã“ã®ç–å¯¾ç§°è¡Œåˆ—
 */
 template <class T, bool SYM> template <class S, class B, class R>
 inline SparseMatrix<T, SYM>&
@@ -662,13 +662,13 @@ SparseMatrix<T, SYM>::assign(u_int i, u_int j, const Matrix<S, B, R>& M)
     return apply(i, j, Assign<S>(), M);
 }
     
-//! —^‚¦‚ç‚ê‚½ƒxƒNƒgƒ‹‚ÌŠe¬•ª‚ğw’è‚³‚ê‚½¬•ª‚ğ‹N“_‚Æ‚µ‚Ä“K—p‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«ã®å„æˆåˆ†ã‚’æŒ‡å®šã•ã‚ŒãŸæˆåˆ†ã‚’èµ·ç‚¹ã¨ã—ã¦é©ç”¨ã™ã‚‹ï¼
 /*!
-  \param i	‹N“_‚Ìs”Ô†
-  \param j	‹N“_‚Ì—ñ”Ô†
-  \param f	TŒ^CSŒ^‚Ìˆø”‚ğ‚Æ‚èTŒ^‚Ì’l‚ğ•Ô‚·2€‰‰Zq
-  \param v	‚»‚ÌŠe¬•ª‚ªf‚Ì‘æ2ˆø”‚Æ‚È‚éƒxƒNƒgƒ‹
-  \return	‚±‚Ì‘a‘ÎÌs—ñ
+  \param i	èµ·ç‚¹ã®è¡Œç•ªå·
+  \param j	èµ·ç‚¹ã®åˆ—ç•ªå·
+  \param f	Tå‹ï¼ŒSå‹ã®å¼•æ•°ã‚’ã¨ã‚ŠTå‹ã®å€¤ã‚’è¿”ã™2é …æ¼”ç®—å­
+  \param v	ãã®å„æˆåˆ†ãŒfã®ç¬¬2å¼•æ•°ã¨ãªã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+  \return	ã“ã®ç–å¯¾ç§°è¡Œåˆ—
 */
 template <class T, bool SYM> template <class OP, class S, class B>
 SparseMatrix<T, SYM>&
@@ -701,13 +701,13 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Vector<S, B>& v)
     return *this;
 }
     
-//! —^‚¦‚ç‚ê‚½s—ñ‚ÌŠe¬•ª‚ğw’è‚³‚ê‚½¬•ª‚ğ‹N“_‚Æ‚µ‚Ä“K—p‚·‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸè¡Œåˆ—ã®å„æˆåˆ†ã‚’æŒ‡å®šã•ã‚ŒãŸæˆåˆ†ã‚’èµ·ç‚¹ã¨ã—ã¦é©ç”¨ã™ã‚‹ï¼
 /*!
-  \param i	‹N“_‚Ìs”Ô†
-  \param j	‹N“_‚Ì—ñ”Ô†
-  \param f	TŒ^CSŒ^‚Ìˆø”‚ğ‚Æ‚èTŒ^‚Ì’l‚ğ•Ô‚·2€‰‰Zq
-  \param M	‚»‚ÌŠe¬•ª‚ªf‚Ì‘æ2ˆø”‚Æ‚È‚és—ñ
-  \return	‚±‚Ì‘a‘ÎÌs—ñ
+  \param i	èµ·ç‚¹ã®è¡Œç•ªå·
+  \param j	èµ·ç‚¹ã®åˆ—ç•ªå·
+  \param f	Tå‹ï¼ŒSå‹ã®å¼•æ•°ã‚’ã¨ã‚ŠTå‹ã®å€¤ã‚’è¿”ã™2é …æ¼”ç®—å­
+  \param M	ãã®å„æˆåˆ†ãŒfã®ç¬¬2å¼•æ•°ã¨ãªã‚‹è¡Œåˆ—
+  \return	ã“ã®ç–å¯¾ç§°è¡Œåˆ—
 */
 template <class T, bool SYM> template <class OP, class S, class B, class R>
 SparseMatrix<T, SYM>&
@@ -736,17 +736,17 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Matrix<S, B, R>& M)
 }
     
 /*
- * ----------------------- ˜A—§ˆêŸ•û’ö® -----------------------------
+ * ----------------------- é€£ç«‹ä¸€æ¬¡æ–¹ç¨‹å¼ -----------------------------
  */
-//! ‚±‚Ìs—ñ‚ğŒW”‚Æ‚·‚é˜A—§ˆêŸ•û’ö®‚ğ‰ğ‚­D
+//! ã“ã®è¡Œåˆ—ã‚’ä¿‚æ•°ã¨ã™ã‚‹é€£ç«‹ä¸€æ¬¡æ–¹ç¨‹å¼ã‚’è§£ãï¼
 /*!
-  MKL direct sparse solver‚É‚æ‚Á‚Ä
-  \f$\TUvec{A}{}\TUvec{x}{} = \TUvec{b}{}\f$‚ğ‰ğ‚­D
-  \param b			ƒxƒNƒgƒ‹
-  \return			‰ğƒxƒNƒgƒ‹
-  \throw std::logic_error	‚±‚Ì‘as—ñ‚ª³•û‚Å‚È‚¢ê‡‚É‘—o
-  \throw std::runtime_error	MKL direct sparse solver ‚ªƒGƒ‰[‚ğ•Ô‚µ‚½
-				ê‡‚É‘—o
+  MKL direct sparse solverã«ã‚ˆã£ã¦
+  \f$\TUvec{A}{}\TUvec{x}{} = \TUvec{b}{}\f$ã‚’è§£ãï¼
+  \param b			ãƒ™ã‚¯ãƒˆãƒ«
+  \return			è§£ãƒ™ã‚¯ãƒˆãƒ«
+  \throw std::logic_error	ã“ã®ç–è¡Œåˆ—ãŒæ­£æ–¹ã§ãªã„å ´åˆã«é€å‡º
+  \throw std::runtime_error	MKL direct sparse solver ãŒã‚¨ãƒ©ãƒ¼ã‚’è¿”ã—ãŸ
+				å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> Vector<T>
 SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
@@ -756,41 +756,41 @@ SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
     if (nrow() != ncol())
 	throw std::logic_error("TU::SparseMatrix<T, SYM>::solve(): not a square matrix!");
 
-  // pardiso ‚ÌŠeíƒpƒ‰ƒ[ƒ^‚ğİ’è‚·‚éD
-    _MKL_DSS_HANDLE_t	pt[64];		// pardiso‚Ì“à•”ƒƒ‚ƒŠ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+  // pardiso ã®å„ç¨®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ï¼
+    _MKL_DSS_HANDLE_t	pt[64];		// pardisoã®å†…éƒ¨ãƒ¡ãƒ¢ãƒªã¸ã®ãƒã‚¤ãƒ³ã‚¿
     for (int i = 0; i < 64; ++i)
 	pt[i] = 0;
     _INTEGER_t		iparm[64];
     for (int i = 0; i < 64; ++i)
 	iparm[i] = 0;
-    iparm[0]  =  1;			// iparm[1-] ‚ÉƒfƒtƒHƒ‹ƒg’lˆÈŠO‚ğw’è
+    iparm[0]  =  1;			// iparm[1-] ã«ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ä»¥å¤–ã‚’æŒ‡å®š
     iparm[1]  =  2;			// nested dissection algorithm
     iparm[9]  =  8;			// eps = 1.0e-8
-    iparm[17] = -1;			// •ª‰ğ‚Ì”ñ—ë¬•ª”‚ğƒŒƒ|[ƒg
+    iparm[17] = -1;			// åˆ†è§£ã®éé›¶æˆåˆ†æ•°ã‚’ãƒ¬ãƒãƒ¼ãƒˆ
     iparm[20] =  1;			// Bunch and Kaufman pivoting
-    iparm[27] = pardiso_precision();	// float ‚Ü‚½‚Í double ‚ğw’è
+    iparm[27] = pardiso_precision();	// float ã¾ãŸã¯ double ã‚’æŒ‡å®š
 #ifndef BASE1_INDEX
-    iparm[34] = 1;			// CŒ`®‚Ìindex‚·‚È‚í‚¿0ƒx[ƒX
+    iparm[34] = 1;			// Cå½¢å¼ã®indexã™ãªã‚ã¡0ãƒ™ãƒ¼ã‚¹
 #endif
-    _INTEGER_t		maxfct = 1;	// ‚»‚Ì•ª‰ğ‚ğ•Û‚·‚é‚×‚«s—ñ‚Ì”
-    _INTEGER_t		mnum   = 1;	// ‰½”Ô–Ú‚Ìs—ñ‚É‚Â‚¢‚Ä‰ğ‚­‚©‚ğw’è
-    _INTEGER_t		mtype  = (SYM ? -2 : 11);	// À‘ÎÌ^À”ñ‘ÎÌs—ñ
-    _INTEGER_t		phase  = 13;	// s—ñ‚Ì‰ğÍ‚©‚ç”½•œ‚É‚æ‚é×–§‰»‚Ü‚Å
-    _INTEGER_t		n      = nrow();// ˜A—§ˆêŸ•û’ö®‚Ì®”
-    _INTEGER_t		nrhs   = 1;	// Ax = b ‚É‚¨‚¯‚é b ‚Ì—ñ”
-    _INTEGER_t		msglvl = 0;	// ƒƒbƒZ[ƒW‚ğo—Í‚µ‚È‚¢
-    _INTEGER_t		error  = 0;	// ƒGƒ‰[ƒR[ƒh
-    Array<_INTEGER_t>	perm(n);	// permutationƒxƒNƒgƒ‹
-    Vector<T>		x(n);		// ‰ğƒxƒNƒgƒ‹
+    _INTEGER_t		maxfct = 1;	// ãã®åˆ†è§£ã‚’ä¿æŒã™ã‚‹ã¹ãè¡Œåˆ—ã®æ•°
+    _INTEGER_t		mnum   = 1;	// ä½•ç•ªç›®ã®è¡Œåˆ—ã«ã¤ã„ã¦è§£ãã‹ã‚’æŒ‡å®š
+    _INTEGER_t		mtype  = (SYM ? -2 : 11);	// å®Ÿå¯¾ç§°ï¼å®Ÿéå¯¾ç§°è¡Œåˆ—
+    _INTEGER_t		phase  = 13;	// è¡Œåˆ—ã®è§£æã‹ã‚‰åå¾©ã«ã‚ˆã‚‹ç´°å¯†åŒ–ã¾ã§
+    _INTEGER_t		n      = nrow();// é€£ç«‹ä¸€æ¬¡æ–¹ç¨‹å¼ã®å¼æ•°
+    _INTEGER_t		nrhs   = 1;	// Ax = b ã«ãŠã‘ã‚‹ b ã®åˆ—æ•°
+    _INTEGER_t		msglvl = 0;	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡ºåŠ›ã—ãªã„
+    _INTEGER_t		error  = 0;	// ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
+    Array<_INTEGER_t>	perm(n);	// permutationãƒ™ã‚¯ãƒˆãƒ«
+    Vector<T>		x(n);		// è§£ãƒ™ã‚¯ãƒˆãƒ«
 
-  // ˜A—§ˆêŸ•û’ö®‚ğ‰ğ‚­D
+  // é€£ç«‹ä¸€æ¬¡æ–¹ç¨‹å¼ã‚’è§£ãï¼
     PARDISO(&pt[0], &maxfct, &mnum, &mtype, &phase, &n, (void*)&_values[0],
 	    (_INTEGER_t*)&_rowIndex[0], (_INTEGER_t*)&_columns[0],
 	    &perm[0], &nrhs, iparm, &msglvl, (void*)&b[0], &x[0], &error);
     if (error != 0)
 	throw std::runtime_error("TU::SparseMatrix<T, SYM>::solve(): PARDISO failed!");
 
-  // pardiso “à‚Åg—p‚µ‚½‘Sƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚éD
+  // pardiso å†…ã§ä½¿ç”¨ã—ãŸå…¨ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹ï¼
     phase = -1;
     PARDISO(&pt[0], &maxfct, &mnum, &mtype, &phase, &n, (void*)&_values[0],
 	    (_INTEGER_t*)&_rowIndex[0], (_INTEGER_t*)&_columns[0],
@@ -802,11 +802,11 @@ SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
 }
 
 /*
- * ----------------------- —LŒÀ«‚Ìƒ`ƒFƒbƒN -----------------------------
+ * ----------------------- æœ‰é™æ€§ã®ãƒã‚§ãƒƒã‚¯ -----------------------------
  */
-//! ‚±‚Ìs—ñ‚Ì‘S‚Ä‚Ì¬•ª‚ª—LŒÀ‚Å‚ ‚é‚©’²‚×‚éD
+//! ã“ã®è¡Œåˆ—ã®å…¨ã¦ã®æˆåˆ†ãŒæœ‰é™ã§ã‚ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 /*!
-  \return	 ‘S‚Ä—LŒÀ‚È‚çtrue, ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \return	 å…¨ã¦æœ‰é™ãªã‚‰true, ãã†ã§ãªã‘ã‚Œã°false
 */
 template <class T, bool SYM> bool
 SparseMatrix<T, SYM>::isfinite() const
@@ -822,12 +822,12 @@ SparseMatrix<T, SYM>::isfinite() const
 }
 
 /*
- * ----------------------- “üo—Í -----------------------------
+ * ----------------------- å…¥å‡ºåŠ› -----------------------------
  */
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç‘as—ñ‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ç–è¡Œåˆ—ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, bool SYM> std::istream&
 SparseMatrix<T, SYM>::get(std::istream& in)
@@ -841,12 +841,12 @@ SparseMatrix<T, SYM>::get(std::istream& in)
 	setRow();
 
 	for (u_int col = 0; (c = skipws(in)) != '\n'; ++col)
-	    if (isdigit(c) || (c == '+') || (c == '-'))	// ”š‚È‚ç‚Î...
+	    if (isdigit(c) || (c == '+') || (c == '-'))	// æ•°å­—ãªã‚‰ã°...
 	    {
-		in.putback(c);		// ‘‚«–ß‚µ‚Ä
+		in.putback(c);		// æ›¸ãæˆ»ã—ã¦
 		T	val;
-		in >> val;		// ‚ ‚ç‚½‚ß‚Ä”š‚Æ‚µ‚Ä“Ç‚İ’¼‚·D
-		setCol(col, val);	// —ñ”Ô†‚Æ’l‚ğƒZƒbƒg‚·‚éD
+		in >> val;		// ã‚ã‚‰ãŸã‚ã¦æ•°å­—ã¨ã—ã¦èª­ã¿ç›´ã™ï¼
+		setCol(col, val);	// åˆ—ç•ªå·ã¨å€¤ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
 	    }
     }
 
@@ -855,10 +855,10 @@ SparseMatrix<T, SYM>::get(std::istream& in)
     return in;
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚Ö‘as—ñ‚ğ‘‚«o‚·(ASCII)D
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸ç–è¡Œåˆ—ã‚’æ›¸ãå‡ºã™(ASCII)ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, bool SYM> std::ostream&
 SparseMatrix<T, SYM>::put(std::ostream& out) const
@@ -894,11 +894,11 @@ SparseMatrix<T, SYM>::put(std::ostream& out) const
 /*
  * ----------------------- private members -----------------------------
  */
-//! ‚±‚Ì‘as—ñ‚Æ‘¼‚Ì‘as—ñ‚ÌŠÔ‚Å¬•ª–ˆ‚Ì2€‰‰Z‚ğs‚¤D
+//! ã“ã®ç–è¡Œåˆ—ã¨ä»–ã®ç–è¡Œåˆ—ã®é–“ã§æˆåˆ†æ¯ã®2é …æ¼”ç®—ã‚’è¡Œã†ï¼
 /*!
-  \param B			‚à‚¤ˆê•û‚Ì‘as—ñ
-  \return			2‚Â‚Ì‘as—ñŠÔ‚Ì¬•ª–ˆ‚Ì2€‰‰Z‚Å“¾‚ç‚ê‚é‘as—ñ
-  \throw std::invalid_argument	2‚Â‚Ì‘as—ñ‚ÌƒTƒCƒY‚ªˆê’v‚µ‚È‚¢ê‡‚É‘—o
+  \param B			ã‚‚ã†ä¸€æ–¹ã®ç–è¡Œåˆ—
+  \return			2ã¤ã®ç–è¡Œåˆ—é–“ã®æˆåˆ†æ¯ã®2é …æ¼”ç®—ã§å¾—ã‚‰ã‚Œã‚‹ç–è¡Œåˆ—
+  \throw std::invalid_argument	2ã¤ã®ç–è¡Œåˆ—ã®ã‚µã‚¤ã‚ºãŒä¸€è‡´ã—ãªã„å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> template <class OP> SparseMatrix<T, SYM>
 SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
@@ -911,7 +911,7 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
     S.beginInit();
     for (u_int i = 0; i < nrow(); ++i)
     {
-	S.setRow();		// ‘æis‚Ìæ“ª¬•ª‚Ì’Ê‚µ”Ô†‚ğƒZƒbƒg
+	S.setRow();		// ç¬¬iè¡Œã®å…ˆé ­æˆåˆ†ã®é€šã—ç•ªå·ã‚’ã‚»ãƒƒãƒˆ
 #ifdef BASE1_INDEX
 	for (u_int m = _rowIndex[i]-1, n = B._rowIndex[i]-1; ; )
 	{
@@ -927,20 +927,20 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
 	    const u_int	k = (n < B._rowIndex[i+1] ? B._columns[n]
 						  : B.ncol());
 #endif
-	    if (j == k)		// —¼•û‚Ìs—ñ‚ª(i, j(=k))¬•ª‚ğ‚ÂH
+	    if (j == k)		// ä¸¡æ–¹ã®è¡Œåˆ—ãŒ(i, j(=k))æˆåˆ†ã‚’æŒã¤ï¼Ÿ
 	    {
-		if (j == ncol())	// —¼•û‚Ìs—ñ‚É‚Â‚¢‚Ä’²‚×I‚¦‚Ä‚¢‚ê‚Î...
-		    break;		// ’Eo‚µ‚ÄŸ‚Ìs‚ğˆ—
+		if (j == ncol())	// ä¸¡æ–¹ã®è¡Œåˆ—ã«ã¤ã„ã¦èª¿ã¹çµ‚ãˆã¦ã„ã‚Œã°...
+		    break;		// è„±å‡ºã—ã¦æ¬¡ã®è¡Œã‚’å‡¦ç†
 		S.setCol(j, op(_values[m], B._values[n]));
 		++m;
 		++n;
 	    }
-	    else if (j < k)	// ‚±‚Ìs—ñ‚Í(i, j)¬•ª‚ğ‚Â‚ªCB‚Í‚½‚È‚¢H
+	    else if (j < k)	// ã“ã®è¡Œåˆ—ã¯(i, j)æˆåˆ†ã‚’æŒã¤ãŒï¼ŒBã¯æŒãŸãªã„ï¼Ÿ
 	    {
 		S.setCol(j, op(_values[m], T(0)));
 		++m;
 	    }
-	    else		// B‚Í(i, k)¬•ª‚ğ‚Â‚ªC‚±‚Ìs—ñ‚Í‚½‚È‚¢
+	    else		// Bã¯(i, k)æˆåˆ†ã‚’æŒã¤ãŒï¼Œã“ã®è¡Œåˆ—ã¯æŒãŸãªã„
 	    {
 		S.setCol(k, op(T(0), B._values[n]));
 		++n;
@@ -952,17 +952,17 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
     return S;
 }
     
-//! ‚±‚Ì‘as—ñ‚Æ—^‚¦‚ç‚ê‚½‘as—ñ‚©‚ç‚»‚ê‚¼‚ê1s‚¸‚Âæ‚èo‚µC‚»‚ê‚ç‚Ì“àÏ‚ğ‹‚ß‚éD
+//! ã“ã®ç–è¡Œåˆ—ã¨ä¸ãˆã‚‰ã‚ŒãŸç–è¡Œåˆ—ã‹ã‚‰ãã‚Œãã‚Œ1è¡Œãšã¤å–ã‚Šå‡ºã—ï¼Œãã‚Œã‚‰ã®å†…ç©ã‚’æ±‚ã‚ã‚‹ï¼
 /*!
-  \param B			‚à‚¤1‚Â‚Ì‘as—ñ
-  \param i			‚±‚Ì‘as—ñ‚Ìs”Ô†
-  \param j			B ‚Ìs”Ô†
-  \param val			‚±‚Ì‘as—ñ‚Ì‘æis‚Æ B ‚Ì‘æjs‚Ì“àÏ‚Ì’l‚ª
-				•Ô‚³‚ê‚é
-  \return			‚±‚Ì‘as—ñ‚Ì‘æis‚Æ B ‚Ì‘æjs‚ª—ñ”Ô†‚ğ
-				­‚È‚­‚Æ‚à1‚Â‹¤—L‚·‚ê‚Îtrue,
-				‚»‚¤‚Å‚È‚¯‚ê‚Î false
-  \throw std::invalid_argument	‚±‚Ì‘as—ñ‚Æ B ‚Ì—ñ”‚ªˆê’v‚µ‚È‚¢ê‡‚É‘—o
+  \param B			ã‚‚ã†1ã¤ã®ç–è¡Œåˆ—
+  \param i			ã“ã®ç–è¡Œåˆ—ã®è¡Œç•ªå·
+  \param j			B ã®è¡Œç•ªå·
+  \param val			ã“ã®ç–è¡Œåˆ—ã®ç¬¬iè¡Œã¨ B ã®ç¬¬jè¡Œã®å†…ç©ã®å€¤ãŒ
+				è¿”ã•ã‚Œã‚‹
+  \return			ã“ã®ç–è¡Œåˆ—ã®ç¬¬iè¡Œã¨ B ã®ç¬¬jè¡ŒãŒåˆ—ç•ªå·ã‚’
+				å°‘ãªãã¨ã‚‚1ã¤å…±æœ‰ã™ã‚Œã°true,
+				ãã†ã§ãªã‘ã‚Œã° false
+  \throw std::invalid_argument	ã“ã®ç–è¡Œåˆ—ã¨ B ã®åˆ—æ•°ãŒä¸€è‡´ã—ãªã„å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> template <bool SYM2> bool
 SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
@@ -1005,16 +1005,16 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
     return exist;
 }
 
-//! w’è‚³‚ê‚½s‚Æ—ñ‚É‚¨‚¯‚é¬•ª‚Ì’Ê‚µ”Ô†‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸè¡Œã¨åˆ—ã«ãŠã‘ã‚‹æˆåˆ†ã®é€šã—ç•ªå·ã‚’è¿”ã™ï¼
 /*!
-  \param i			s”Ô†
-  \param j			—ñ”Ô†
-  \param throwExcept		(i, j)¬•ª‚ª‘¶İ‚µ‚È‚¢‚Æ‚«C
-				true‚È‚ç‚Î std::invalid_argument ‚ğ‘—oC
-				false‚È‚ç‚Î-1‚ğ•Ô‚·
-  \return			(i, j)¬•ª‚Ì’Ê‚µ”Ô†‚Ü‚½‚Í-1
-  \throw std::invalid_argument	‚±‚Ìs—ñ‚ª(i, j)¬•ª‚ğ‚½‚¸ throwExcept ‚ª
-				true ‚Ìê‡‚É‘—o
+  \param i			è¡Œç•ªå·
+  \param j			åˆ—ç•ªå·
+  \param throwExcept		(i, j)æˆåˆ†ãŒå­˜åœ¨ã—ãªã„ã¨ãï¼Œ
+				trueãªã‚‰ã° std::invalid_argument ã‚’é€å‡ºï¼Œ
+				falseãªã‚‰ã°-1ã‚’è¿”ã™
+  \return			(i, j)æˆåˆ†ã®é€šã—ç•ªå·ã¾ãŸã¯-1
+  \throw std::invalid_argument	ã“ã®è¡Œåˆ—ãŒ(i, j)æˆåˆ†ã‚’æŒãŸãš throwExcept ãŒ
+				true ã®å ´åˆã«é€å‡º
 */
 template <class T, bool SYM> inline int
 SparseMatrix<T, SYM>::index(u_int i, u_int j, bool throwExcept) const
@@ -1025,7 +1025,7 @@ SparseMatrix<T, SYM>::index(u_int i, u_int j, bool throwExcept) const
     if (i >= nrow())
 	throw std::invalid_argument("TU::SparseMatrix<T, SYM>::index(): invalid row index!");
     
-  // w’è‚³‚ê‚½—ñ”Ô†‚É‘Î‰‚·‚é¬•ª‚ª‚±‚Ìs‚É‚ ‚é‚©2•ª–@‚É‚æ‚Á‚Ä’²‚×‚éD
+  // æŒ‡å®šã•ã‚ŒãŸåˆ—ç•ªå·ã«å¯¾å¿œã™ã‚‹æˆåˆ†ãŒã“ã®è¡Œã«ã‚ã‚‹ã‹2åˆ†æ³•ã«ã‚ˆã£ã¦èª¿ã¹ã‚‹ï¼
 #ifdef BASE1_INDEX
     for (u_int low = _rowIndex[i]-1, high = _rowIndex[i+1]-1; low != high; )
 #else
@@ -1048,7 +1048,7 @@ SparseMatrix<T, SYM>::index(u_int i, u_int j, bool throwExcept) const
 	    return mid;
     }
 
-  // w’è‚³‚ê‚½¬•ª‚ª‚İ‚Â‚©‚ç‚È‚©‚Á‚½‚Ì‚ÅC—áŠO‚ğ“Š‚°‚é‚©-1‚ğ•Ô‚·D
+  // æŒ‡å®šã•ã‚ŒãŸæˆåˆ†ãŒã¿ã¤ã‹ã‚‰ãªã‹ã£ãŸã®ã§ï¼Œä¾‹å¤–ã‚’æŠ•ã’ã‚‹ã‹-1ã‚’è¿”ã™ï¼
     if (throwExcept)
 	throw std::invalid_argument("TU::SparseMatrix<T, SYM>::index(): non-existent element!");
     return -1;
@@ -1063,31 +1063,31 @@ SparseMatrix<double, false>::pardiso_precision()	{return 0;}
 template<> inline int
 SparseMatrix<double, true> ::pardiso_precision()	{return 0;}
 
-//! ”ñ‹ó”’•¶š‚Ü‚½‚Í‰üs‚É’B‚·‚é‚Ü‚ÅƒXƒgƒŠ[ƒ€‚ğ“Ç‚İi‚ß‚éD
+//! éç©ºç™½æ–‡å­—ã¾ãŸã¯æ”¹è¡Œã«é”ã™ã‚‹ã¾ã§ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’èª­ã¿é€²ã‚ã‚‹ï¼
 /*!
-  “’B‚µ‚½”ñ‹ó”’•¶š‚à‚µ‚­‚Í‰üs‚ÍƒXƒgƒŠ[ƒ€‚Éc‚³‚ê‚È‚¢D
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	”ñ‹ó”’•¶š‚É’B‚µ‚½‚ç‚»‚Ì•¶š‚ğ•Ô‚µC
-		‰üs‚©ƒXƒgƒŠ[ƒ€I’[‚É’B‚µ‚½‚ç‰üs‚ğ•Ô‚·D
+  åˆ°é”ã—ãŸéç©ºç™½æ–‡å­—ã‚‚ã—ãã¯æ”¹è¡Œã¯ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«æ®‹ã•ã‚Œãªã„ï¼
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	éç©ºç™½æ–‡å­—ã«é”ã—ãŸã‚‰ãã®æ–‡å­—ã‚’è¿”ã—ï¼Œ
+		æ”¹è¡Œã‹ã‚¹ãƒˆãƒªãƒ¼ãƒ çµ‚ç«¯ã«é”ã—ãŸã‚‰æ”¹è¡Œã‚’è¿”ã™ï¼
 */
 template <class T, bool SYM> char
 SparseMatrix<T, SYM>::skipws(std::istream& in)
 {
     for (char c; in.get(c); )
-	if (!isspace(c) || (c == '\n'))	// ”ñ‹ó”’•¶š‚à‚µ‚­‚Í‰üs‚È‚ç‚Î...
-	    return c;			// ‚»‚Ì•¶š‚ğ•Ô‚·D
+	if (!isspace(c) || (c == '\n'))	// éç©ºç™½æ–‡å­—ã‚‚ã—ãã¯æ”¹è¡Œãªã‚‰ã°...
+	    return c;			// ãã®æ–‡å­—ã‚’è¿”ã™ï¼
 
-    return '\n';		// ƒtƒ@ƒCƒ‹I’[‚È‚ç‚Î‰üs‚ğ•Ô‚·D
+    return '\n';		// ãƒ•ã‚¡ã‚¤ãƒ«çµ‚ç«¯ãªã‚‰ã°æ”¹è¡Œã‚’è¿”ã™ï¼
 }
 
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! ƒxƒNƒgƒ‹‚Æ‘as—ñ‚ÌÏ
+//! ãƒ™ã‚¯ãƒˆãƒ«ã¨ç–è¡Œåˆ—ã®ç©
 /*!
-  \param v	ƒxƒNƒgƒ‹
-  \param A	‘as—ñ
-  \return	Œ‹‰Ê‚ÌƒxƒNƒgƒ‹
+  \param v	ãƒ™ã‚¯ãƒˆãƒ«
+  \param A	ç–è¡Œåˆ—
+  \return	çµæœã®ãƒ™ã‚¯ãƒˆãƒ«
 */
 template <class S, class B, class T2, bool SYM2> Vector<S>
 operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
@@ -1117,11 +1117,11 @@ operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
     return a;
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç‘as—ñ‚ğ“Ç‚İ‚Ş(ASCII)D
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ç–è¡Œåˆ—ã‚’èª­ã¿è¾¼ã‚€(ASCII)ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \param A	‘as—ñ‚Ì“Ç‚İ‚İæ
-  \return	in‚Åw’è‚µ‚½“ü—ÍƒXƒgƒŠ[ƒ€
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param A	ç–è¡Œåˆ—ã®èª­ã¿è¾¼ã¿å…ˆ
+  \return	inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, bool SYM> inline std::istream&
 operator >>(std::istream& in, SparseMatrix<T, SYM>& A)
@@ -1129,11 +1129,11 @@ operator >>(std::istream& in, SparseMatrix<T, SYM>& A)
     return A.get(in >> std::ws);
 }
 
-//! o—ÍƒXƒgƒŠ[ƒ€‚Ö‘as—ñ‚ğ‘‚«o‚µ(ASCII)C‚³‚ç‚É‰üsƒR[ƒh‚ğo—Í‚·‚éD
+//! å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸ç–è¡Œåˆ—ã‚’æ›¸ãå‡ºã—(ASCII)ï¼Œã•ã‚‰ã«æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›ã™ã‚‹ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param A	‘‚«o‚·‘as—ñ
-  \return	out‚Åw’è‚µ‚½o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param A	æ›¸ãå‡ºã™ç–è¡Œåˆ—
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 template <class T, bool SYM> inline std::ostream&
 operator <<(std::ostream& out, const SparseMatrix<T, SYM>& A)

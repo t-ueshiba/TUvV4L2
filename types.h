@@ -1,22 +1,22 @@
 /*
- *  $Id: types.h,v 1.37 2012-08-16 01:30:37 ueshiba Exp $
+ *  $Id: types.h,v 1.38 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
-  \mainpage	libTUTools++ - ”z—ñCƒxƒNƒgƒ‹Cs—ñC‰æ‘œ“™‚ÌŠî–{“I‚Èƒf[ƒ^Œ^‚Æ‚»‚ê‚É•t‚µ‚½ƒAƒ‹ƒSƒŠƒYƒ€‚ğû‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠ
+  \mainpage	libTUTools++ - é…åˆ—ï¼Œãƒ™ã‚¯ãƒˆãƒ«ï¼Œè¡Œåˆ—ï¼Œç”»åƒç­‰ã®åŸºæœ¬çš„ãªãƒ‡ãƒ¼ã‚¿å‹ã¨ãã‚Œã«ä»˜éšã—ãŸã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’åã‚ãŸãƒ©ã‚¤ãƒ–ãƒ©ãƒª
   \anchor	libTUTools
 
-  \section copyright ’˜ìŒ 
-  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+  \section copyright è‘—ä½œæ¨©
+  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
 
-  ‘nìÒFAÅr•v
+  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
 
-  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
-  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
-  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
-  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
    
-  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
-  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
 
   Copyright 2002-2007.
   National Institute of Advanced Industrial Science and Technology (AIST)
@@ -32,16 +32,16 @@
   The copyright holder or the creator are not responsible for any
   damages caused by using this program.
 
-  \section abstract ŠT—v
-  libTUTools++‚ÍC”z—ñCƒxƒNƒgƒ‹Cs—ñC‰æ‘œ“™‚ÌŠî–{“I‚Èƒf[ƒ^Œ^‚Æ‚»‚ê
-  ‚É•t‚µ‚½ƒAƒ‹ƒSƒŠƒYƒ€‚ğû‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠ‚Å‚ ‚éDŒ»İÀ‘•‚³‚ê‚Ä‚¢‚éå
-  —v‚ÈƒNƒ‰ƒX‚¨‚æ‚ÑŠÖ”‚Í‚¨‚¨‚Ü‚©‚ÉˆÈ‰º‚Ì•ª–ì‚É•ª—Ş‚³‚ê‚éD
+  \section abstract æ¦‚è¦
+  libTUTools++ã¯ï¼Œé…åˆ—ï¼Œãƒ™ã‚¯ãƒˆãƒ«ï¼Œè¡Œåˆ—ï¼Œç”»åƒç­‰ã®åŸºæœ¬çš„ãªãƒ‡ãƒ¼ã‚¿å‹ã¨ãã‚Œ
+  ã«ä»˜éšã—ãŸã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’åã‚ãŸãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§ã‚ã‚‹ï¼ç¾åœ¨å®Ÿè£…ã•ã‚Œã¦ã„ã‚‹ä¸»
+  è¦ãªã‚¯ãƒ©ã‚¹ãŠã‚ˆã³é–¢æ•°ã¯ãŠãŠã¾ã‹ã«ä»¥ä¸‹ã®åˆ†é‡ã«åˆ†é¡ã•ã‚Œã‚‹ï¼
 
-  <b>1ŸŒ³‚¨‚æ‚Ñ2ŸŒ³”z—ñ</b>
+  <b>1æ¬¡å…ƒãŠã‚ˆã³2æ¬¡å…ƒé…åˆ—</b>
   - #TU::Array
   - #TU::Array2
 
-  <b>ƒxƒNƒgƒ‹‚Æs—ñ‚¨‚æ‚ÑüŒ`ŒvZ</b>
+  <b>ãƒ™ã‚¯ãƒˆãƒ«ã¨è¡Œåˆ—ãŠã‚ˆã³ç·šå½¢è¨ˆç®—</b>
   - #TU::Vector
   - #TU::Matrix
   - #TU::LUDecomposition
@@ -53,7 +53,7 @@
   - #TU::BlockDiagonalMatrix
   - #TU::SparseMatrix
 
-  <b>”ñüŒ`Å“K‰»</b>
+  <b>éç·šå½¢æœ€é©åŒ–</b>
   - #TU::NullConstraint
   - #TU::ConstNormConstraint
   - #TU::minimizeSquare(const F&, const G&, AT&, u_int, double)
@@ -62,10 +62,10 @@
   <b>RANSAC</b>
   - #TU::ransac(const PointSet&, Model&, Conform, double)
 
-  <b>ƒOƒ‰ƒtƒJƒbƒg</b>
+  <b>ã‚°ãƒ©ãƒ•ã‚«ãƒƒãƒˆ</b>
   - #boost::GraphCuts
 
-  <b>“_C’¼üC•½–Ê“™‚ÌŠô‰½—v‘f‚Æ‚»‚Ì•ÏŠ·</b>
+  <b>ç‚¹ï¼Œç›´ç·šï¼Œå¹³é¢ç­‰ã®å¹¾ä½•è¦ç´ ã¨ãã®å¤‰æ›</b>
   - #TU::Point1
   - #TU::Point2
   - #TU::Point3
@@ -77,7 +77,7 @@
   - #TU::Affinity2
   - #TU::BoundingBox
   
-  <b>“Š‰e‚ÌŠô‰½</b>
+  <b>æŠ•å½±ã®å¹¾ä½•</b>
   - #TU::IntrinsicBase
   - #TU::IntrinsicWithFocalLength
   - #TU::IntrinsicWithEuclideanImagePlane
@@ -86,7 +86,7 @@
   - #TU::CanonicalCamera
   - #TU::Camera
   
-  <b>‰æ‘f‚Æ‰æ‘œ</b>
+  <b>ç”»ç´ ã¨ç”»åƒ</b>
   - #TU::RGB
   - #TU::BGR
   - #TU::RGBA
@@ -101,14 +101,14 @@
   - #TU::GenericImage
   - #TU::Movie
 
-  <b>‰æ‘œˆ—</b>
+  <b>ç”»åƒå‡¦ç†</b>
   - #TU::EdgeDetector
   - #TU::CorrectIntensity
   - #TU::Warp
   - #TU::IntegralImage
   - #TU::DiagonalIntegralImage
   
-  <b>‰æ‘œ‚ÉŒÀ‚ç‚È‚¢M†ˆ—</b>
+  <b>ç”»åƒã«é™ã‚‰ãªã„ä¿¡å·å‡¦ç†</b>
   - #TU::IIRFilter
   - #TU::BidirectionalIIRFilter
   - #TU::BidirectionalIIRFilter2
@@ -117,25 +117,25 @@
   - #TU::GaussianConvolver
   - #TU::GaussianConvolver2
   
-  <b>“Áêƒf[ƒ^\‘¢</b>
+  <b>ç‰¹æ®Šãƒ‡ãƒ¼ã‚¿æ§‹é€ </b>
   - #TU::List
   - #TU::Heap
   - #TU::PSTree
   - #TU::NDTree
   
-  <b>Bezier‹Èü‚ÆBezier‹È–Ê</b>
+  <b>Bezieræ›²ç·šã¨Bezieræ›²é¢</b>
   - #TU::BezierCurve
   - #TU::BezierSurface
   
-  <b>B-spline‹Èü‚ÆB-spline‹È–Ê</b>
+  <b>B-splineæ›²ç·šã¨B-splineæ›²é¢</b>
   - #TU::BSplineKnots
   - #TU::BSplineCurve
   - #TU::BSplineSurface
   
-  <b>ƒƒbƒVƒ…</b>
+  <b>ãƒ¡ãƒƒã‚·ãƒ¥</b>
   - #TU::Mesh
 
-  <b>ƒAƒ‹ƒSƒŠƒYƒ€</b>
+  <b>ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ </b>
   - #std::min(const T&, const T&, const T&)
   - #std::min(const T&, const T&, const T&, const T&)
   - #std::max(const T&, const T&, const T&)
@@ -148,7 +148,7 @@
   - #TU::mopOpen(Iterator begin, Iterator end, u_int niter)
   - #TU::mopClose(Iterator begin, Iterator end, u_int niter)
 
-  <b>ŠÖ”ƒIƒuƒWƒFƒNƒg</b>
+  <b>é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ</b>
   - #TU::unarize
   - #TU::seq_transform
   - #TU::mem_var_t
@@ -156,7 +156,7 @@
   - #TU::mem_var_ref_t
   - #TU::const_mem_var_ref_t
 
-  <b>”½•œq</b>
+  <b>åå¾©å­</b>
   - #TU::make_mbr_iterator(Iterator i, S T::* m)
   - #TU::make_const_mbr_iterator(Iterator i, S T::* m)
   - #TU::make_first_iterator(Iterator i)
@@ -165,7 +165,7 @@
   - #TU::make_const_second_iterator(Iterator i)
   - #TU::box_filter_iterator
   
-  <b>ƒ}ƒjƒsƒ…ƒŒ[ƒ^</b>
+  <b>ãƒãƒ‹ãƒ”ãƒ¥ãƒ¬ãƒ¼ã‚¿</b>
   - #TU::skipl(std::istream&)
   - #TU::IOManip
   - #TU::IManip1
@@ -174,25 +174,25 @@
   - #TU::IManip2
   - #TU::OManip2
 
-  <b>ƒXƒgƒŠ[ƒ€
+  <b>ã‚¹ãƒˆãƒªãƒ¼ãƒ 
   - #TU::fdistream
   - #TU::fdostream
   - #TU::fdstream
   
-  <b>ƒVƒŠƒAƒ‹ƒCƒ“ƒ^ƒtƒF[ƒX</b>
+  <b>ã‚·ãƒªã‚¢ãƒ«ã‚¤ãƒ³ã‚¿ãƒ•ã‚§ãƒ¼ã‚¹</b>
   - #TU::Serial
   - #TU::TriggerGenerator
   - #TU::PM16C_04
   - #TU::SHOT602
 
-  <b>—””­¶Ší</b>
+  <b>ä¹±æ•°ç™ºç”Ÿå™¨</b>
   - #TU::Random
 
-  <b>SIMD–½—ß</b>
+  <b>SIMDå‘½ä»¤</b>
   - #mm::vec
   
   \file		types.h
-  \brief	Šî–{“I‚Èƒf[ƒ^Œ^‚ğƒOƒ[ƒoƒ‹‚È–¼‘O‹óŠÔ‚É’Ç‰Á
+  \brief	åŸºæœ¬çš„ãªãƒ‡ãƒ¼ã‚¿å‹ã‚’ã‚°ãƒ­ãƒ¼ãƒãƒ«ãªåå‰ç©ºé–“ã«è¿½åŠ 
 */
 #ifndef __TUtypes_h
 #define __TUtypes_h
@@ -203,29 +203,29 @@
 #  else
 #    define __PORT	__declspec(dllimport)
 #  endif
-#  define _USE_MATH_DEFINES	    // <math.h>‚ÌM_PI“™‚Ì’è‹`‚ğ—LŒø‰»
-#  define _CRT_SECURE_NO_WARNINGS   // C•W€ŠÖ”g—p‚ÌŒx‚ğ—}§
-#  define _CRT_NONSTDC_NO_DEPRECATE // POSIXŠÖ”g—p‚ÌŒx‚ğ—}§
-#  define _SCL_SECURE_NO_WARNINGS   // C++•W€ŠÖ”g—p‚ÌŒx‚ğ—}§
+#  define _USE_MATH_DEFINES	    // <math.h>ã®M_PIç­‰ã®å®šç¾©ã‚’æœ‰åŠ¹åŒ–
+#  define _CRT_SECURE_NO_WARNINGS   // Cæ¨™æº–é–¢æ•°ä½¿ç”¨æ™‚ã®è­¦å‘Šã‚’æŠ‘åˆ¶
+#  define _CRT_NONSTDC_NO_DEPRECATE // POSIXé–¢æ•°ä½¿ç”¨æ™‚ã®è­¦å‘Šã‚’æŠ‘åˆ¶
+#  define _SCL_SECURE_NO_WARNINGS   // C++æ¨™æº–é–¢æ•°ä½¿ç”¨æ™‚ã®è­¦å‘Šã‚’æŠ‘åˆ¶
 
-typedef unsigned int		size_t;		//!< ”z—ñ“™‚ÌƒTƒCƒY‚ğ•\‚·Œ^
-typedef unsigned char		u_char;		//!< •„†‚È‚µ8bit®”
-typedef unsigned short		u_short;	//!< •„†‚È‚µ16bit®”
-typedef unsigned int		u_int;		//!< •„†‚È‚µ32bit®”
-typedef unsigned long		u_long;		//!< •„†‚È‚µ32/64bit®”
-typedef signed char		int8_t;		//!< •„†•t‚«8bit®”
-typedef short			int16_t;	//!< •„†•t‚«16bit®”
-typedef int			int32_t;	//!< •„†•t‚«32bit®”
-typedef long long		int64_t;	//!< •„†•t‚«64bit®”
-typedef unsigned char		u_int8_t;	//!< •„†‚È‚µ8bit®”
-typedef unsigned short		u_int16_t;	//!< •„†‚È‚µ16bit®”
-typedef unsigned int		u_int32_t;	//!< •„†‚È‚µ32bit®”
-typedef unsigned long long	u_int64_t;	//!< •„†‚È‚µ64bit®”
+typedef unsigned int		size_t;		//!< é…åˆ—ç­‰ã®ã‚µã‚¤ã‚ºã‚’è¡¨ã™å‹
+typedef unsigned char		u_char;		//!< ç¬¦å·ãªã—8bitæ•´æ•°
+typedef unsigned short		u_short;	//!< ç¬¦å·ãªã—16bitæ•´æ•°
+typedef unsigned int		u_int;		//!< ç¬¦å·ãªã—32bitæ•´æ•°
+typedef unsigned long		u_long;		//!< ç¬¦å·ãªã—32/64bitæ•´æ•°
+typedef signed char		int8_t;		//!< ç¬¦å·ä»˜ã8bitæ•´æ•°
+typedef short			int16_t;	//!< ç¬¦å·ä»˜ã16bitæ•´æ•°
+typedef int			int32_t;	//!< ç¬¦å·ä»˜ã32bitæ•´æ•°
+typedef long long		int64_t;	//!< ç¬¦å·ä»˜ã64bitæ•´æ•°
+typedef unsigned char		u_int8_t;	//!< ç¬¦å·ãªã—8bitæ•´æ•°
+typedef unsigned short		u_int16_t;	//!< ç¬¦å·ãªã—16bitæ•´æ•°
+typedef unsigned int		u_int32_t;	//!< ç¬¦å·ãªã—32bitæ•´æ•°
+typedef unsigned long long	u_int64_t;	//!< ç¬¦å·ãªã—64bitæ•´æ•°
 #else
 #  define __PORT
 #  include <sys/types.h>
 #endif
 
-typedef signed char		s_char;		//!< •„†•t‚«8bit®”
+typedef signed char		s_char;		//!< ç¬¦å·ä»˜ã8bitæ•´æ•°
 
 #endif	/*  !__TUtypes_h	*/

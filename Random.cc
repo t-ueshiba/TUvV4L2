@@ -44,7 +44,7 @@
       Toshio UESHIBA
 	National Institute of Advanced Industrial Science and Technology (AIST)
    
-   $Id: Random.cc,v 1.13 2010-02-14 23:29:09 ueshiba Exp $
+   $Id: Random.cc,v 1.14 2012-08-29 21:17:08 ueshiba Exp $
 */
 #include "TU/Random.h"
 #include <cmath>
@@ -59,9 +59,9 @@ namespace TU
 /************************************************************************
 *  class Random								*
 ************************************************************************/
-//! —””­¶Ší‚ğ¶¬‚·‚éD
+//! ä¹±æ•°ç™ºç”Ÿå™¨ã‚’ç”Ÿæˆã™ã‚‹ï¼
 /*!
-   Œ»İ‚ğƒV[ƒh‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚éD
+   ç¾åœ¨æ™‚åˆ»ã‚’ã‚·ãƒ¼ãƒ‰ã¨ã—ã¦åˆæœŸåŒ–ã•ã‚Œã‚‹ï¼
 */
 Random::Random()
     :_mti(N + 1), _hasExtra(false), _extra(0.0)
@@ -69,7 +69,7 @@ Random::Random()
     initialize();
 }
 
-//! Œ»İ‚ğƒV[ƒh‚Æ‚µ‚Ä—””­¶Ší‚ğ‰Šú‰»‚·‚éD
+//! ç¾åœ¨æ™‚åˆ»ã‚’ã‚·ãƒ¼ãƒ‰ã¨ã—ã¦ä¹±æ•°ç™ºç”Ÿå™¨ã‚’åˆæœŸåŒ–ã™ã‚‹ï¼
 void
 Random::initialize()
 {
@@ -78,9 +78,9 @@ Random::initialize()
     initialize(tv.tv_usec);
 }
     
-//! ƒV[ƒh‚©‚ç—””­¶Ší‚ğ‰Šú‰»‚·‚éD
+//! ã‚·ãƒ¼ãƒ‰ã‹ã‚‰ä¹±æ•°ç™ºç”Ÿå™¨ã‚’åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param seed	ƒV[ƒh
+  \param seed	ã‚·ãƒ¼ãƒ‰
 */
 void
 Random::initialize(u_long seed)
@@ -100,10 +100,10 @@ Random::initialize(u_long seed)
     }
 }
 
-//! •¡”‚Ì‰Šú‰»ƒL[‚©‚ç—””­¶Ší‚ğ‰Šú‰»‚·‚éD
+//! è¤‡æ•°ã®åˆæœŸåŒ–ã‚­ãƒ¼ã‹ã‚‰ä¹±æ•°ç™ºç”Ÿå™¨ã‚’åˆæœŸåŒ–ã™ã‚‹ï¼
 /*!
-  \param keys	‰Šú‰»ƒL[‚Ì”z—ñ
-  \param nkeys	‰Šú‰»ƒL[‚ÌŒÂ”
+  \param keys	åˆæœŸåŒ–ã‚­ãƒ¼ã®é…åˆ—
+  \param nkeys	åˆæœŸåŒ–ã‚­ãƒ¼ã®å€‹æ•°
 */
 void
 Random::initializeByArray(const u_long keys[], int nkeys)
@@ -142,7 +142,7 @@ Random::initializeByArray(const u_long keys[], int nkeys)
     _mt[0] = 0x80000000UL;	 // MSB is 1; assuring non-zero initial array
 }
 
-//! ‹æŠÔ [0,0xffffffff] “à‚Ì32bit’·‚Ì®”‚ğ”­¶‚·‚éD
+//! åŒºé–“ [0,0xffffffff] å†…ã®32bité•·ã®æ•´æ•°ã‚’ç™ºç”Ÿã™ã‚‹ï¼
 u_long
 Random::generateInt32()
 {
@@ -188,7 +188,7 @@ Random::generateInt32()
     return y;
 }
 
-//! •W€ƒKƒEƒX•ª•z‚É]‚¤À”‚ğ”­¶‚·‚éD
+//! æ¨™æº–ã‚¬ã‚¦ã‚¹åˆ†å¸ƒã«å¾“ã†å®Ÿæ•°ã‚’ç™ºç”Ÿã™ã‚‹ï¼
 double
 Random::gaussian()
 {

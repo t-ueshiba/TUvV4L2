@@ -1,15 +1,15 @@
 /*
- *  ʿ��14-19ǯ���ȡ˻��ȵ������縦��� �����ͭ
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �Ϻ�ԡ����ǽ���
+ *  創作者：植芝俊夫
  *
- *  �ܥץ������ϡ��ȡ˻��ȵ������縦���ο����Ǥ��뿢�ǽ��פ��Ϻ��
- *  ���ȡ˻��ȵ������縦��꤬������ͭ������̩����Ǥ��������ͭ
- *  �Ԥˤ����Ĥʤ����ܥץ���������ѡ�ʣ�������ѡ��軰�Ԥس�������
- *  ���ι԰٤�ػߤ��ޤ���
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���Υץ������ˤ�ä������뤤���ʤ�»�����Ф��Ƥ⡤�����ͭ�Ԥ�
- *  ����Ϻ�Ԥ���Ǥ���餤�ޤ���
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: io.cc,v 1.1 2011-01-17 00:04:33 ueshiba Exp $
+ *  $Id: io.cc,v 1.2 2012-08-29 21:17:08 ueshiba Exp $
  */
 #include "TU/io.h"
 #include <algorithm>
@@ -36,13 +36,13 @@ namespace TU
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! ���ꤷ�����ϥե�����򥪡��ץ󤹤롥
+//! 指定した入力ファイルをオープンする．
 /*!
-  \param in	�����ץ󤵤줿�ե����뤬��ӤĤ��������ϥ��ȥ꡼��
-  \param name	�ե�����̾(��ĥ�Ҥ�ޤޤ�)
-  \param dirs	':'�Ƕ��ڤ�줿�ե�����õ���ǥ��쥯�ȥ���¤�
-  \param ext	�ե�����γ�ĥ�ҡ�0����ꤹ��г�ĥ�Ҥʤ�
-  \return	�����ץ󤵤줿�ե������full path̾(��ĥ�Ҥ�ޤޤ�)
+  \param in	オープンされたファイルが結びつけられる入力ストリーム
+  \param name	ファイル名(拡張子を含まず)
+  \param dirs	':'で区切られたファイル探索ディレクトリの並び
+  \param ext	ファイルの拡張子，0を指定すれば拡張子なし
+  \return	オープンされたファイルのfull path名(拡張子を含まず)
 */
 std::string
 openFile(std::ifstream& in, const std::string& name,

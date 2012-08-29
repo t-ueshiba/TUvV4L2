@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: TriggerGenerator.cc,v 1.22 2010-01-15 01:21:12 ueshiba Exp $
+ *  $Id: TriggerGenerator.cc,v 1.23 2012-08-29 21:17:08 ueshiba Exp $
  */
 #include "TU/TriggerGenerator.h"
 #include "TU/Manip.h"
@@ -37,9 +37,9 @@ namespace TU
 /************************************************************************
 *  class TriggerGenerator						*
 ************************************************************************/
-//! w’è‚³‚ê‚½tty‚ğopen‚µ‚ÄƒgƒŠƒKM†”­¶Ší‚ğì‚éD
+//! æŒ‡å®šã•ã‚ŒãŸttyã‚’openã—ã¦ãƒˆãƒªã‚¬ä¿¡å·ç™ºç”Ÿå™¨ã‚’ä½œã‚‹ï¼
 /*!
-  \param ttyname	tty–¼
+  \param ttyname	ttyå
 */
 TriggerGenerator::TriggerGenerator(const char* ttyname)
     :Serial(ttyname)
@@ -55,9 +55,9 @@ TriggerGenerator::TriggerGenerator(const char* ttyname)
     setf(ios_base::internal, ios_base::adjustfield);
 }
 
-//! ƒtƒ@[ƒ€ƒEƒFƒA‚ÌID‚ğo—ÍƒXƒgƒŠ[ƒ€‚É‘‚«o‚·D
+//! ãƒ•ã‚¡ãƒ¼ãƒ ã‚¦ã‚§ã‚¢ã®IDã‚’å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 void
 TriggerGenerator::showId(std::ostream& out)
@@ -76,10 +76,10 @@ TriggerGenerator::showId(std::ostream& out)
     *this >> skipl;
 }
 
-//! ƒgƒŠƒKM†‚ğo—Í‚·‚éƒ`ƒƒƒ“ƒlƒ‹‚ğw’è‚·‚éD
+//! ãƒˆãƒªã‚¬ä¿¡å·ã‚’å‡ºåŠ›ã™ã‚‹ãƒãƒ£ãƒ³ãƒãƒ«ã‚’æŒ‡å®šã™ã‚‹ï¼
 /*!
-  \param channel	o—Íƒ`ƒƒƒ“ƒlƒ‹‚É‘Î‰‚·‚éƒrƒbƒg‚É1‚ğ—§‚Ä‚½ƒrƒbƒgƒ}ƒbƒv
-  \return		‚±‚ÌƒgƒŠƒKM†”­¶Ší
+  \param channel	å‡ºåŠ›ãƒãƒ£ãƒ³ãƒãƒ«ã«å¯¾å¿œã™ã‚‹ãƒ“ãƒƒãƒˆã«1ã‚’ç«‹ã¦ãŸãƒ“ãƒƒãƒˆãƒãƒƒãƒ—
+  \return		ã“ã®ãƒˆãƒªã‚¬ä¿¡å·ç™ºç”Ÿå™¨
 */
 TriggerGenerator&
 TriggerGenerator::selectChannel(u_int channel)
@@ -91,10 +91,10 @@ TriggerGenerator::selectChannel(u_int channel)
     return *this;
 }
 
-//! ƒgƒŠƒKM†‚Ìo—ÍŠÔŠu‚ğw’è‚·‚éD
+//! ãƒˆãƒªã‚¬ä¿¡å·ã®å‡ºåŠ›é–“éš”ã‚’æŒ‡å®šã™ã‚‹ï¼
 /*!
-  \param interval	o—ÍŠÔŠu(msec)D10 <= interval <=
-  \return		‚±‚ÌƒgƒŠƒKM†”­¶Ší
+  \param interval	å‡ºåŠ›é–“éš”(msec)ï¼10 <= interval <=
+  \return		ã“ã®ãƒˆãƒªã‚¬ä¿¡å·ç™ºç”Ÿå™¨
 */
 TriggerGenerator&
 TriggerGenerator::setInterval(u_int interval)
@@ -109,9 +109,9 @@ TriggerGenerator::setInterval(u_int interval)
     return *this;
 }
 
-//! ƒgƒŠƒKM†‚ğ1‚Â‚¾‚¯o—Í‚·‚éD
+//! ãƒˆãƒªã‚¬ä¿¡å·ã‚’1ã¤ã ã‘å‡ºåŠ›ã™ã‚‹ï¼
 /*!
-  \return		‚±‚ÌƒgƒŠƒKM†”­¶Ší
+  \return		ã“ã®ãƒˆãƒªã‚¬ä¿¡å·ç™ºç”Ÿå™¨
 */
 TriggerGenerator&
 TriggerGenerator::oneShot()
@@ -123,9 +123,9 @@ TriggerGenerator::oneShot()
     return *this;
 }
 
-//! ƒgƒŠƒKM†‚ğ˜A‘±“I‚Éo—Í‚·‚éD
+//! ãƒˆãƒªã‚¬ä¿¡å·ã‚’é€£ç¶šçš„ã«å‡ºåŠ›ã™ã‚‹ï¼
 /*!
-  \return		‚±‚ÌƒgƒŠƒKM†”­¶Ší
+  \return		ã“ã®ãƒˆãƒªã‚¬ä¿¡å·ç™ºç”Ÿå™¨
 */
 TriggerGenerator&
 TriggerGenerator::continuousShot()
@@ -137,9 +137,9 @@ TriggerGenerator::continuousShot()
     return *this;
 }
 
-//! ƒgƒŠƒKM†‚ğ’â~‚·‚éD
+//! ãƒˆãƒªã‚¬ä¿¡å·ã‚’åœæ­¢ã™ã‚‹ï¼
 /*!
-  \return		‚±‚ÌƒgƒŠƒKM†”­¶Ší
+  \return		ã“ã®ãƒˆãƒªã‚¬ä¿¡å·ç™ºç”Ÿå™¨
 */
 TriggerGenerator&
 TriggerGenerator::stopContinuousShot()
@@ -151,12 +151,12 @@ TriggerGenerator::stopContinuousShot()
     return *this;
 }
 
-//! ƒgƒŠƒKM†”­¶Ší‚Ìó‘Ô‚ğæ“¾‚·‚éD
+//! ãƒˆãƒªã‚¬ä¿¡å·ç™ºç”Ÿå™¨ã®çŠ¶æ…‹ã‚’å–å¾—ã™ã‚‹ï¼
 /*!
-  \param channel	ƒgƒŠƒKM†‚ğo—Í‚·‚éƒ`ƒƒƒ“ƒlƒ‹‚É1‚ğ—§‚Ä‚½ƒrƒbƒgƒ}ƒbƒv
-			‚ª•Ô‚³‚ê‚é
-  \param interval	ƒgƒŠƒKM†‚Ìo—ÍŠÔŠu(msec)‚ª•Ô‚³‚ê‚é
-  \return		ƒgƒŠƒKM†‚ªo—Í’†‚È‚ç‚ÎtrueC‚»‚¤‚Å‚È‚¯‚ê‚Îfalse
+  \param channel	ãƒˆãƒªã‚¬ä¿¡å·ã‚’å‡ºåŠ›ã™ã‚‹ãƒãƒ£ãƒ³ãƒãƒ«ã«1ã‚’ç«‹ã¦ãŸãƒ“ãƒƒãƒˆãƒãƒƒãƒ—
+			ãŒè¿”ã•ã‚Œã‚‹
+  \param interval	ãƒˆãƒªã‚¬ä¿¡å·ã®å‡ºåŠ›é–“éš”(msec)ãŒè¿”ã•ã‚Œã‚‹
+  \return		ãƒˆãƒªã‚¬ä¿¡å·ãŒå‡ºåŠ›ä¸­ãªã‚‰ã°trueï¼Œãã†ã§ãªã‘ã‚Œã°false
 */
 bool
 TriggerGenerator::getStatus(u_int& channel, u_int& interval)
@@ -165,7 +165,7 @@ TriggerGenerator::getStatus(u_int& channel, u_int& interval)
     
     *this << 'I' << endl;
 
-    char	c, token[5];	// token‚Í"STOP"‚Ü‚½‚Í"RUN"‚Ì‚¢‚¸‚ê‚©
+    char	c, token[5];	// tokenã¯"STOP"ã¾ãŸã¯"RUN"ã®ã„ãšã‚Œã‹
     *this >> c >> std::hex >> channel >> c;
     *this >> c >> std::dec >> interval >> c >> token >> skipl >> skipl;
     

@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: SHOT602.h,v 1.3 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: SHOT602.h,v 1.4 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		SHOT602.h
-  \brief	�N���X TU::SHOT602 �̒�`�Ǝ���
+  \brief	クラス TU::SHOT602 の定義と実装
 */
 #ifndef __TUSHOT602_h
 #define __TUSHOT602_h
@@ -41,55 +41,55 @@ namespace TU
 /************************************************************************
 *  class SHOT602							*
 ************************************************************************/
-//! �V�O�}���@���p���X���[�^�R���g���[��SHOT-604�𐧌䂷��N���X
+//! シグマ光機製パルスモータコントローラSHOT-604を制御するクラス
 class __PORT SHOT602 : public Serial
 {
   public:
-  //! ��
+  //! 軸
     enum Axis
     {
-	Axis_1,		//!< ��1��
-	Axis_2,		//!< ��2��
-	Axis_Both	//!< ��1,2���̗���
+	Axis_1,		//!< 第1軸
+	Axis_2,		//!< 第2軸
+	Axis_Both	//!< 第1,2軸の両方
     };
 
-  //! �X�s�[�h
+  //! スピード
     enum Speed
     {
-	LowSpeed,	//!< �ᑬ
-	HighSpeed	//!< ����
+	LowSpeed,	//!< 低速
+	HighSpeed	//!< 高速
     };
 
   public:
     SHOT602(const char* ttyname)					;
 
-  // �t�@�[���E�F�A�o�[�W����
+  // ファームウェアバージョン
     void	showId(std::ostream& out)				;
 
-  // �z�[���|�W�V�������o
+  // ホームポジション検出
     SHOT602&	findHome(Axis axis, bool dir, bool dir2=true)		;
     SHOT602&	setOrigin(Axis axis)					;
     
-  // ��Ԍ��o
+  // 状態検出
     bool	isBusy()						;
     int		where(Axis axis)					;
     bool	atLimit(Axis axis)					;
     bool	getStatus(int& position1, int& position2,
 			  bool& limit1, bool& limit2)			;
 
-  // ���x�ݒ�
+  // 速度設定
     SHOT602&	setSpeed(Speed speed,
 			 u_int bottom1=0,   u_int top1=0,
 			 u_int duration1=0, u_int bottom2=0,
 			 u_int top2=0,	    u_int duration2=0)		;
     
-  // �ړ�
+  // 移動
     SHOT602&	stop(Axis axis)						;
     SHOT602&	emergencyStop()						;
     SHOT602&	jog(Axis axis, bool dir, bool dir2=true)		;
     SHOT602&	move(Axis axis, int val, int val2=0, bool block=false)	;
 
-  // �㎥
+  // 励磁
     SHOT602&	setHold(Axis axis, bool on1, bool on2=true)		;
 
   private:

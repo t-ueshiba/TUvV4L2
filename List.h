@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: List.h,v 1.5 2012-06-06 07:58:08 ueshiba Exp $
+ *  $Id: List.h,v 1.6 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		List.h
-  \brief	�N���X TU::List �̒�`�Ǝ���
+  \brief	クラス TU::List の定義と実装
 */
 #ifndef __TUList_h
 #define __TUList_h
@@ -179,44 +179,44 @@ class List
 };
  
 /*
- *  'i' �̈ʒu�� 'x' ��}�����A���̑}�����ꂽ�ʒu��Ԃ��B
+ *  'i' の位置に 'x' を挿入し、その挿入された位置を返す。
  */
 template <class T> typename List<T>::Iterator
 List<T>::insert(Iterator i, T& x)
 {
-    if (i == end())				// �����ɑ}���H
+    if (i == end())				// 末尾に挿入？
 	_back = &x;
 
-    if (i == begin())				// ���X�g�̐擪�H
+    if (i == begin())				// リストの先頭？
     {
-	x._next = _front;			// �擪�ɑ}��
+	x._next = _front;			// 先頭に挿入
 	_front = &x;
     }
     else
-	i._prev->insertNext(&x);		// �u��O�̎��v�ɑ}��
+	i._prev->insertNext(&x);		// 「手前の次」に挿入
 
     return i;
 }
 
 /*
- *  'i' �̈ʒu�ɂ���v�f���폜���A�폜���ꂽ�v�f�ւ̎Q�Ƃ�Ԃ��B
+ *  'i' の位置にある要素を削除し、削除された要素への参照を返す。
  */
 template <class T> typename List<T>::reference
 List<T>::erase(Iterator i)
 {
     T&	x = *i;
-    if (&x == _back)				// ���X�g�̖����H
-	_back = i._prev;			// �����̗v�f���폜
-    if (&x == _front)				// ���X�g�̐擪�H
-	_front = _front->_next;			// �擪�̗v�f���폜
+    if (&x == _back)				// リストの末尾？
+	_back = i._prev;			// 末尾の要素を削除
+    if (&x == _front)				// リストの先頭？
+	_front = _front->_next;			// 先頭の要素を削除
     else
-	i._prev->eraseNext();			// �u��O�̎��v���폜
+	i._prev->eraseNext();			// 「手前の次」を削除
     
     return x;
 }
 
 /*
- *  'x' �Ɠ����I�u�W�F�N�g�i���X�P�����Ȃ��͂��j���폜����B
+ *  'x' と同じオブジェクト（高々１つしかないはず）を削除する。
  */
 template <class T> void
 List<T>::remove(const T& x)

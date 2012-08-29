@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: fdstream.h,v 1.2 2011-08-22 00:06:25 ueshiba Exp $
+ *  $Id: fdstream.h,v 1.3 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		fdstream.h
-  \brief	�t�@�C���L�q�q�t���X�g���[���o�b�t�@�Ɋւ���N���X�̒�`�Ǝ���
+  \brief	ファイル記述子付きストリームバッファに関するクラスの定義と実装
 */
 #ifndef __TUfdstream_h
 #define __TUfdstream_h
@@ -43,15 +43,15 @@ namespace TU
 /************************************************************************
 *  class fdbuf								*
 ************************************************************************/
-//! �t�@�C���L�q�q�����X�g���[���o�b�t�@�N���X
+//! ファイル記述子を持つストリームバッファクラス
 /*!
-  #TU::fdistream, #TU::fdostream, #TU::fdstream �̓����Ŏg����D
+  #TU::fdistream, #TU::fdostream, #TU::fdstream の内部で使われる．
 */
 class __PORT fdbuf : public std::streambuf
 {
   public:
-    typedef std::streambuf::traits_type	traits_type;	//!< �����̌^
-    typedef traits_type::int_type	int_type;	//!< �����̌^
+    typedef std::streambuf::traits_type	traits_type;	//!< 特性の型
+    typedef traits_type::int_type	int_type;	//!< 整数の型
 
   public:
     fdbuf(int fd, bool closeFdOnClosing)				;
@@ -67,18 +67,18 @@ class __PORT fdbuf : public std::streambuf
   protected:
     enum
     {
-	pbSize	= 4,			//!< putback�̈�̍ő啶����
-	bufSize	= 1024			//!< �ʏ�ǂݍ��ݗ̈�̍ő啶����
+	pbSize	= 4,			//!< putback領域の最大文字数
+	bufSize	= 1024			//!< 通常読み込み領域の最大文字数
     };
     
-    const int	_fd;			//!< �t�@�C���L�q�q
-    const bool	_closeFdOnClosing;	//!< ���̃o�b�t�@�̔j�󎞂�_fd��close
-    char	_buf[bufSize + pbSize];	//!< �ǂݍ��݃f�[�^�̈�
+    const int	_fd;			//!< ファイル記述子
+    const bool	_closeFdOnClosing;	//!< このバッファの破壊時に_fdをclose
+    char	_buf[bufSize + pbSize];	//!< 読み込みデータ領域
 };
 
-//! �t�@�C���L�q�q��Ԃ��D
+//! ファイル記述子を返す．
 /*!
-  \return	�t�@�C���L�q�q
+  \return	ファイル記述子
 */
 inline int
 fdbuf::fd() const
@@ -89,7 +89,7 @@ fdbuf::fd() const
 /************************************************************************
 *  class fdistream							*
 ************************************************************************/
-//! �t�@�C���L�q�q�������̓X�g���[���N���X
+//! ファイル記述子を持つ入力ストリームクラス
 class __PORT fdistream : public std::istream
 {
   public:
@@ -99,13 +99,13 @@ class __PORT fdistream : public std::istream
     int		fd()						const	;
     
   protected:
-    fdbuf	_buf;		//!< �t�@�C���L�q�q�����X�g���[���o�b�t�@
+    fdbuf	_buf;		//!< ファイル記述子を持つストリームバッファ
 };
 
-//! �w�肵���t�@�C���L�q�q������̓X�g���[�������D
+//! 指定したファイル記述子から入力ストリームを作る．
 /*!
-  ���̃X�g���[�����j�󂳂�Ă��t�@�C���L�q�q��close����Ȃ��D
-  \param fd	���͉\�ȃt�@�C���L�q�q
+  このストリームが破壊されてもファイル記述子はcloseされない．
+  \param fd	入力可能なファイル記述子
 */
 inline
 fdistream::fdistream(int fd)
@@ -114,9 +114,9 @@ fdistream::fdistream(int fd)
     rdbuf(&_buf);
 }
 
-//! �t�@�C���L�q�q��Ԃ��D
+//! ファイル記述子を返す．
 /*!
-  \return	�t�@�C���L�q�q
+  \return	ファイル記述子
 */
 inline int
 fdistream::fd() const
@@ -127,7 +127,7 @@ fdistream::fd() const
 /************************************************************************
 *  class fdostream							*
 ************************************************************************/
-//! �t�@�C���L�q�q�����o�̓X�g���[���N���X
+//! ファイル記述子を持つ出力ストリームクラス
 class __PORT fdostream : public std::ostream
 {
   public:
@@ -137,13 +137,13 @@ class __PORT fdostream : public std::ostream
     int		fd()						const	;
     
   protected:
-    fdbuf	_buf;		//!< �t�@�C���L�q�q�����X�g���[���o�b�t�@
+    fdbuf	_buf;		//!< ファイル記述子を持つストリームバッファ
 };
 
-//! �w�肵���t�@�C���L�q�q����o�̓X�g���[�������D
+//! 指定したファイル記述子から出力ストリームを作る．
 /*!
-  ���̃X�g���[�����j�󂳂�Ă��t�@�C���L�q�q��close����Ȃ��D
-  \param fd	�o�͉\�ȃt�@�C���L�q�q
+  このストリームが破壊されてもファイル記述子はcloseされない．
+  \param fd	出力可能なファイル記述子
 */
 inline
 fdostream::fdostream(int fd)
@@ -152,9 +152,9 @@ fdostream::fdostream(int fd)
     rdbuf(&_buf);
 }
 
-//! �t�@�C���L�q�q��Ԃ��D
+//! ファイル記述子を返す．
 /*!
-  \return	�t�@�C���L�q�q
+  \return	ファイル記述子
 */
 inline int
 fdostream::fd() const
@@ -165,7 +165,7 @@ fdostream::fd() const
 /************************************************************************
 *  class fdstream							*
 ************************************************************************/
-//! �t�@�C���L�q�q�������o�̓X�g���[���N���X
+//! ファイル記述子を持つ入出力ストリームクラス
 class __PORT fdstream : public std::iostream
 {
   public:
@@ -175,13 +175,13 @@ class __PORT fdstream : public std::iostream
     int		fd()						const	;
     
   protected:
-    fdbuf	_buf;		//!< �t�@�C���L�q�q�����X�g���[���o�b�t�@
+    fdbuf	_buf;		//!< ファイル記述子を持つストリームバッファ
 };
 
-//! �w�肵���t�@�C���L�q�q������o�̓X�g���[�������D
+//! 指定したファイル記述子から入出力ストリームを作る．
 /*!
-  ���̃X�g���[�����j�󂳂�Ă��t�@�C���L�q�q��close����Ȃ��D
-  \param fd	���o�͉\�ȃt�@�C���L�q�q
+  このストリームが破壊されてもファイル記述子はcloseされない．
+  \param fd	入出力可能なファイル記述子
 */
 inline
 fdstream::fdstream(int fd)
@@ -190,9 +190,9 @@ fdstream::fdstream(int fd)
     rdbuf(&_buf);
 }
 
-//! �t�@�C���L�q�q��Ԃ��D
+//! ファイル記述子を返す．
 /*!
-  \return	�t�@�C���L�q�q
+  \return	ファイル記述子
 */
 inline int
 fdstream::fd() const

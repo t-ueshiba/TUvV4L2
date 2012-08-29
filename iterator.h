@@ -1,15 +1,15 @@
 /*
- *  •½¬14-24”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-24å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2012.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: iterator.h,v 1.3 2012-08-16 18:59:59 ueshiba Exp $
+ *  $Id: iterator.h,v 1.4 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		iterator.h
-  \brief	Šeí”½•œq‚Ì’è‹`‚ÆÀ‘•
+  \brief	å„ç¨®åå¾©å­ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TUiterator_h
 #define __TUiterator_h
@@ -40,7 +40,7 @@
 
 namespace TU
 {
-//! SŒ^‚Ìƒƒ“ƒo•Ï”‚ğ‚ÂTŒ^ƒIƒuƒWƒFƒNƒg‚Ö‚Ì”½•œq‚©‚ç‚»‚Ìƒƒ“ƒo‚É’¼ÚƒAƒNƒZƒX(R/W)‚·‚é”½•œq‚ğì‚éD
+//! Så‹ã®ãƒ¡ãƒ³ãƒå¤‰æ•°ã‚’æŒã¤Tå‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®åå¾©å­ã‹ã‚‰ãã®ãƒ¡ãƒ³ãƒã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹(R/W)ã™ã‚‹åå¾©å­ã‚’ä½œã‚‹ï¼
 template <class Iterator, class S, class T>
 inline boost::transform_iterator<mem_var_ref_t<S, T>, Iterator>
 make_mbr_iterator(Iterator i, S T::* m)
@@ -48,7 +48,7 @@ make_mbr_iterator(Iterator i, S T::* m)
     return boost::make_transform_iterator(i, mem_var_ref(m));
 }
     
-//! SŒ^‚Ìƒƒ“ƒo•Ï”‚ğ‚ÂTŒ^ƒIƒuƒWƒFƒNƒg‚Ö‚Ì”½•œq‚©‚ç‚»‚Ìƒƒ“ƒo‚É’¼ÚƒAƒNƒZƒX(R)‚·‚é”½•œq‚ğì‚éD
+//! Så‹ã®ãƒ¡ãƒ³ãƒå¤‰æ•°ã‚’æŒã¤Tå‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®åå¾©å­ã‹ã‚‰ãã®ãƒ¡ãƒ³ãƒã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹(R)ã™ã‚‹åå¾©å­ã‚’ä½œã‚‹ï¼
 template <class Iterator, class S, class T>
 inline boost::transform_iterator<const_mem_var_ref_t<S, T>, Iterator>
 make_const_mbr_iterator(Iterator i, S const T::* m)
@@ -56,9 +56,9 @@ make_const_mbr_iterator(Iterator i, S const T::* m)
     return boost::make_transform_iterator(i, mem_var_ref(m));
 }
 
-//! std::pair‚Ö‚Ì”½•œq‚©‚ç‚»‚Ì‘æ1—v‘f‚É’¼ÚƒAƒNƒZƒX(R/W)‚·‚é”½•œq‚ğì‚éD
+//! std::pairã¸ã®åå¾©å­ã‹ã‚‰ãã®ç¬¬1è¦ç´ ã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹(R/W)ã™ã‚‹åå¾©å­ã‚’ä½œã‚‹ï¼
 /*!
-  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
+  \param i	ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹åå¾©å­
 */
 template <class Iterator>
 inline boost::transform_iterator<
@@ -72,9 +72,9 @@ make_first_iterator(Iterator i)
 		i, &std::iterator_traits<Iterator>::value_type::first);
 }
     
-//! std::pair‚Ö‚Ì”½•œq‚©‚ç‚»‚Ì‘æ1—v‘f‚É’¼ÚƒAƒNƒZƒX(R)‚·‚é”½•œq‚ğì‚éD
+//! std::pairã¸ã®åå¾©å­ã‹ã‚‰ãã®ç¬¬1è¦ç´ ã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹(R)ã™ã‚‹åå¾©å­ã‚’ä½œã‚‹ï¼
 /*!
-  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
+  \param i	ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹åå¾©å­
 */
 template <class Iterator>
 inline boost::transform_iterator<
@@ -88,9 +88,9 @@ make_const_first_iterator(Iterator i)
 		i, &std::iterator_traits<Iterator>::value_type::first);
 }
     
-//! std::pair‚Ö‚Ì”½•œq‚©‚ç‚»‚Ì‘æ2—v‘f‚É’¼ÚƒAƒNƒZƒX(R/W)‚·‚é”½•œq‚ğì‚éD
+//! std::pairã¸ã®åå¾©å­ã‹ã‚‰ãã®ç¬¬2è¦ç´ ã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹(R/W)ã™ã‚‹åå¾©å­ã‚’ä½œã‚‹ï¼
 /*!
-  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
+  \param i	ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹åå¾©å­
 */
 template <class Iterator>
 inline boost::transform_iterator<
@@ -104,9 +104,9 @@ make_second_iterator(Iterator i)
 		i, &std::iterator_traits<Iterator>::value_type::second);
 }
     
-//! std::pair‚Ö‚Ì”½•œq‚©‚ç‚»‚Ì‘æ2—v‘f‚É’¼ÚƒAƒNƒZƒX(R)‚·‚é”½•œq‚ğì‚éD
+//! std::pairã¸ã®åå¾©å­ã‹ã‚‰ãã®ç¬¬2è¦ç´ ã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹(R)ã™ã‚‹åå¾©å­ã‚’ä½œã‚‹ï¼
 /*!
-  \param i	ƒx[ƒX‚Æ‚È‚é”½•œq
+  \param i	ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹åå¾©å­
 */
 template <class Iterator>
 inline boost::transform_iterator<
@@ -123,9 +123,9 @@ make_const_second_iterator(Iterator i)
 /************************************************************************
 *  class box_filter_iterator						*
 ************************************************************************/
-//! ƒRƒ“ƒeƒi’†‚Ìw’è‚³‚ê‚½—v‘f‚É‘Î‚µ‚Äbox filter‚ğ“K—p‚µ‚½Œ‹‰Ê‚ğ•Ô‚·”½•œq
+//! ã‚³ãƒ³ãƒ†ãƒŠä¸­ã®æŒ‡å®šã•ã‚ŒãŸè¦ç´ ã«å¯¾ã—ã¦box filterã‚’é©ç”¨ã—ãŸçµæœã‚’è¿”ã™åå¾©å­
 /*!
-  \param Iterator	ƒRƒ“ƒeƒi’†‚Ì—v‘f‚ğw‚·’è””½•œq‚ÌŒ^
+  \param Iterator	ã‚³ãƒ³ãƒ†ãƒŠä¸­ã®è¦ç´ ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã®å‹
 */
 template <class Iterator>
 class box_filter_iterator
@@ -205,14 +205,14 @@ class box_filter_iterator
   private:
     Iterator		_head;
     Iterator		_tail;
-    mutable bool	_valid;	//!< _val ‚ª [_head, _tail] ‚Ì‘˜a‚È‚çtrue
-    mutable value_type	_val;	//!< [_head, _tail) ‚Ü‚½‚Í [_head, _tail] ‚Ì‘˜a
+    mutable bool	_valid;	//!< _val ãŒ [_head, _tail] ã®ç·å’Œãªã‚‰true
+    mutable value_type	_val;	//!< [_head, _tail) ã¾ãŸã¯ [_head, _tail] ã®ç·å’Œ
 };
 
-//! box filter”½•œq‚ğ¶¬‚·‚é
+//! box filteråå¾©å­ã‚’ç”Ÿæˆã™ã‚‹
 /*!
-  \param iter	ƒRƒ“ƒeƒi’†‚Ì—v‘f‚ğw‚·’è””½•œq‚ÌŒ^
-  \return	box filter”½•œq
+  \param iter	ã‚³ãƒ³ãƒ†ãƒŠä¸­ã®è¦ç´ ã‚’æŒ‡ã™å®šæ•°åå¾©å­ã®å‹
+  \return	box filteråå¾©å­
 */
 template <class Iterator> box_filter_iterator<Iterator>
 make_box_filter_iterator(Iterator iter)

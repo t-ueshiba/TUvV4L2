@@ -1,15 +1,15 @@
 /*
- *  •½¬14-19”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ14-19å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: ImageBase.cc,v 1.35 2012-06-19 08:32:40 ueshiba Exp $
+ *  $Id: ImageBase.cc,v 1.36 2012-08-29 21:17:08 ueshiba Exp $
  */
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
@@ -89,10 +89,10 @@ ImageBase::~ImageBase()
 {
 }
 
-//! “ü—ÍƒXƒgƒŠ[ƒ€‚©‚ç‰æ‘œ‚Ìƒwƒbƒ_‚ğ“Ç‚İ‚ŞD
+//! å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ç”»åƒã®ãƒ˜ãƒƒãƒ€ã‚’èª­ã¿è¾¼ã‚€ï¼
 /*!
-  \param in	“ü—ÍƒXƒgƒŠ[ƒ€
-  \return	“Ç‚İ‚Ü‚ê‚½‰æ‘œ‚Ì‰æ‘f‚Ìƒ^ƒCƒv
+  \param in	å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \return	èª­ã¿è¾¼ã¾ã‚ŒãŸç”»åƒã®ç”»ç´ ã®ã‚¿ã‚¤ãƒ—
 */
 ImageBase::TypeInfo
 ImageBase::restoreHeader(std::istream& in)
@@ -124,12 +124,12 @@ ImageBase::restoreHeader(std::istream& in)
     return TypeInfo(DEFAULT);
 }
 
-//! w’è‚µ‚½‰æ‘fƒ^ƒCƒv‚Åo—ÍƒXƒgƒŠ[ƒ€‚É‰æ‘œ‚Ìƒwƒbƒ_‚ğ‘‚«o‚·D
+//! æŒ‡å®šã—ãŸç”»ç´ ã‚¿ã‚¤ãƒ—ã§å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«ç”»åƒã®ãƒ˜ãƒƒãƒ€ã‚’æ›¸ãå‡ºã™ï¼
 /*!
-  \param out	o—ÍƒXƒgƒŠ[ƒ€
-  \param type	‰æ‘fƒ^ƒCƒvD‚½‚¾‚µC#DEFAULT‚ğw’è‚µ‚½ê‡‚ÍC
-		‚±‚Ì‰æ‘œƒIƒuƒWƒFƒNƒg‚Ì‰æ‘fƒ^ƒCƒv‚Å‘‚«o‚³‚ê‚éD
-  \return	ÀÛ‚É‘‚«o‚·ê‡‚Ì‰æ‘fƒ^ƒCƒvD
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param type	ç”»ç´ ã‚¿ã‚¤ãƒ—ï¼ãŸã ã—ï¼Œ#DEFAULTã‚’æŒ‡å®šã—ãŸå ´åˆã¯ï¼Œ
+		ã“ã®ç”»åƒã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç”»ç´ ã‚¿ã‚¤ãƒ—ã§æ›¸ãå‡ºã•ã‚Œã‚‹ï¼
+  \return	å®Ÿéš›ã«æ›¸ãå‡ºã™å ´åˆã®ç”»ç´ ã‚¿ã‚¤ãƒ—ï¼
 */
 ImageBase::Type
 ImageBase::saveHeader(std::ostream& out, Type type) const
@@ -150,11 +150,11 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
     return DEFAULT;
 }
 
-//! w’è‚³‚ê‚½ƒ^ƒCƒv‚Ì1s‚ ‚½‚è‚Ìƒf[ƒ^ƒoƒCƒg”‚Ü‚½‚ÍpaddingƒoƒCƒg”‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸã‚¿ã‚¤ãƒ—ã®1è¡Œã‚ãŸã‚Šã®ãƒ‡ãƒ¼ã‚¿ãƒã‚¤ãƒˆæ•°ã¾ãŸã¯paddingãƒã‚¤ãƒˆæ•°ã‚’è¿”ã™ï¼
 /*!
-  \param type		‰æ‘f‚Ìƒ^ƒCƒv
-  \param padding	false‚È‚çƒf[ƒ^ƒoƒCƒg”, true‚È‚çpaddingƒoƒCƒg”
-  \return		1s‚ ‚½‚è‚Ìƒf[ƒ^ƒoƒCƒg”‚Ü‚½‚ÍpaddingƒoƒCƒg”
+  \param type		ç”»ç´ ã®ã‚¿ã‚¤ãƒ—
+  \param padding	falseãªã‚‰ãƒ‡ãƒ¼ã‚¿ãƒã‚¤ãƒˆæ•°, trueãªã‚‰paddingãƒã‚¤ãƒˆæ•°
+  \return		1è¡Œã‚ãŸã‚Šã®ãƒ‡ãƒ¼ã‚¿ãƒã‚¤ãƒˆæ•°ã¾ãŸã¯paddingãƒã‚¤ãƒˆæ•°
 */
 u_int
 ImageBase::type2nbytes(Type type, bool padding) const
@@ -206,10 +206,10 @@ ImageBase::type2nbytes(Type type, bool padding) const
     return (padding ? nbytesPerLine - nbytes : nbytesPerLine);
 }
 
-//! w’è‚³‚ê‚½ƒ^ƒCƒv‚Ì‰æ‘f‚Ìƒrƒbƒg”‚ğ•Ô‚·D
+//! æŒ‡å®šã•ã‚ŒãŸã‚¿ã‚¤ãƒ—ã®ç”»ç´ ã®ãƒ“ãƒƒãƒˆæ•°ã‚’è¿”ã™ï¼
 /*!
-  \param type	‰æ‘f‚Ìƒ^ƒCƒv
-  \return	‰æ‘f‚Ìƒrƒbƒg”
+  \param type	ç”»ç´ ã®ã‚¿ã‚¤ãƒ—
+  \return	ç”»ç´ ã®ãƒ“ãƒƒãƒˆæ•°
 */
 u_int
 ImageBase::type2depth(Type type)
@@ -602,9 +602,9 @@ ImageBase::saveBMPHeader(std::ostream& out, Type type) const
 /************************************************************************
 *  class ImageBase::TypeInfo						*
 ************************************************************************/
-//! —^‚¦‚ç‚ê‚½‰æ‘fƒ^ƒCƒv‚É‘Î‚µ‚ÄŠO•”‹L‰¯‚Ö‚ÌƒfƒtƒHƒ‹ƒg•t‰Áî•ñ‚ğì‚éD
+//! ä¸ãˆã‚‰ã‚ŒãŸç”»ç´ ã‚¿ã‚¤ãƒ—ã«å¯¾ã—ã¦å¤–éƒ¨è¨˜æ†¶ã¸ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆä»˜åŠ æƒ…å ±ã‚’ä½œã‚‹ï¼
 /*!
-  \param ty	‰æ‘fƒ^ƒCƒv
+  \param ty	ç”»ç´ ã‚¿ã‚¤ãƒ—
 */
 __PORT
 ImageBase::TypeInfo::TypeInfo(Type ty)

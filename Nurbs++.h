@@ -1,15 +1,15 @@
 /*
- *  ����14-19�N�i�Ɓj�Y�ƋZ�p���������� ���쌠���L
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
  *  
- *  �n��ҁF�A�ŏr�v
+ *  創作者：植芝俊夫
  *
- *  �{�v���O�����́i�Ɓj�Y�ƋZ�p�����������̐E���ł���A�ŏr�v���n�삵�C
- *  �i�Ɓj�Y�ƋZ�p���������������쌠�����L����閧���ł��D���쌠���L
- *  �҂ɂ�鋖�Ȃ��ɖ{�v���O�������g�p�C�����C���ρC��O�҂֊J������
- *  ���̍s�ׂ��֎~���܂��D
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
  *  
- *  ���̃v���O�����ɂ���Đ����邢���Ȃ鑹�Q�ɑ΂��Ă��C���쌠���L�҂�
- *  ��ёn��҂͐ӔC�𕉂��܂���B
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
  *
  *  Copyright 2002-2007.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -25,11 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Nurbs++.h,v 1.20 2012-08-16 01:30:37 ueshiba Exp $
+ *  $Id: Nurbs++.h,v 1.21 2012-08-29 21:17:08 ueshiba Exp $
  */
 /*!
   \file		Nurbs++.h
-  \brief	��L��/�L��B-spline�Ȑ�/�ȖʂɊ֘A����N���X�̒�`�Ǝ���
+  \brief	非有理/有理B-spline曲線/曲面に関連するクラスの定義と実装
 */
 #ifndef __TUNurbsPP_h
 #define __TUNurbsPP_h
@@ -41,9 +41,9 @@ namespace TU
 /************************************************************************
 *  class BSplineKnots<T>						*
 ************************************************************************/
-//! B-spline�Ȑ��܂��͋Ȗʂ̃m�b�g��\���N���X
+//! B-spline曲線または曲面のノットを表すクラス
 /*!
-  \param T	�m�b�g�̒l�̌^
+  \param T	ノットの値の型
 */
 template <class T>
 class BSplineKnots : private Array<T>
@@ -304,10 +304,10 @@ BSplineKnots<T>::removeKnot(u_int k)
 /************************************************************************
 *  class BSplineCurve<C>						*
 ************************************************************************/
-//! ��L���܂��͗L��B-spline�Ȑ���\���N���X
+//! 非有理または有理B-spline曲線を表すクラス
 /*!
-  \param C	����_�̌^�Dd������Ԓ��̔�L���Ȑ��ł����d�����x�N�g���C
-		�L���Ȑ��ł����(d+1)�����x�N�g���D
+  \param C	制御点の型．d次元空間中の非有理曲線であればd次元ベクトル，
+		有理曲線であれば(d+1)次元ベクトル．
 */
 template <class C>
 class BSplineCurve : private Array<C>
@@ -526,10 +526,10 @@ RationalBSplineCurve3d;
 /************************************************************************
 *  class BSplineSurface<C>						*
 ************************************************************************/
-//! ��L���܂��͗L��B-spline�Ȗʂ�\���N���X
+//! 非有理または有理B-spline曲面を表すクラス
 /*!
-  \param C	����_�̌^�Dd������Ԓ��̔�L���Ȗʂł����d�����x�N�g���C
-		�L���Ȗʂł����(d+1)�����x�N�g���D
+  \param C	制御点の型．d次元空間中の非有理曲面であればd次元ベクトル，
+		有理曲面であれば(d+1)次元ベクトル．
 */
 template <class C>
 class BSplineSurface : private Array2<Array<C> >

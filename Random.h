@@ -44,11 +44,11 @@
       Toshio UESHIBA
 	National Institute of Advanced Industrial Science and Technology (AIST)
    
-   $Id: Random.h,v 1.11 2011-08-22 00:06:25 ueshiba Exp $
+   $Id: Random.h,v 1.12 2012-08-29 21:17:08 ueshiba Exp $
 */
 /*!
   \file		Random.h
-  \brief	ƒNƒ‰ƒX TU::Random ‚Ì’è‹`‚ÆÀ‘•
+  \brief	ã‚¯ãƒ©ã‚¹ TU::Random ã®å®šç¾©ã¨å®Ÿè£…
 */
 #ifndef __TURandom_h
 #define __TURandom_h
@@ -60,7 +60,7 @@ namespace TU
 /************************************************************************
 *  class Random								*
 ************************************************************************/
-//! Mersenne Twister‚É‚æ‚é—””­¶Ší
+//! Mersenne Twisterã«ã‚ˆã‚‹ä¹±æ•°ç™ºç”Ÿå™¨
 class __PORT Random
 {
   public:
@@ -87,28 +87,28 @@ class __PORT Random
     double	_extra;
 };
     
-//! ‹æŠÔ [0,0x7fffffff] “à‚Ì31bit’·‚Ì®”‚ğ”­¶‚·‚éD
+//! åŒºé–“ [0,0x7fffffff] å†…ã®31bité•·ã®æ•´æ•°ã‚’ç™ºç”Ÿã™ã‚‹ï¼
 inline long
 Random::generateInt31()
 {
     return (long)(generateInt32() >> 1);
 }
 
-//! ‹æŠÔ [0,1] “à‚ÌÀ”‚ğ”­¶‚·‚éD
+//! åŒºé–“ [0,1] å†…ã®å®Ÿæ•°ã‚’ç™ºç”Ÿã™ã‚‹ï¼
 inline double
 Random::generateClosedReal()
 {
     return generateInt32()*(1.0/4294967295.0);     // divided by 2^32-1
 }
 
-//! ‹æŠÔ [0,1) “à‚ÌÀ”‚ğ”­¶‚·‚éD
+//! åŒºé–“ [0,1) å†…ã®å®Ÿæ•°ã‚’ç™ºç”Ÿã™ã‚‹ï¼
 inline double
 Random::generateHalfOpenReal()
 {
     return generateInt32()*(1.0/4294967296.0);     // divided by 2^32
 }
 
-//! ‹æŠÔ (0,1) “à‚ÌÀ”‚ğ”­¶‚·‚éD
+//! åŒºé–“ (0,1) å†…ã®å®Ÿæ•°ã‚’ç™ºç”Ÿã™ã‚‹ï¼
 inline double
 Random::generateOpenReal()
 {
@@ -116,7 +116,7 @@ Random::generateOpenReal()
     return (((double)generateInt32()) + 0.5)*(1.0/4294967296.0);
 }
 
-//! ‹æŠÔ [0,1) “à‚Ì53bit’·‚ÌÀ”‚ğ”­¶‚·‚éD
+//! åŒºé–“ [0,1) å†…ã®53bité•·ã®å®Ÿæ•°ã‚’ç™ºç”Ÿã™ã‚‹ï¼
 inline double
 Random::generateRes53() 
 { 
