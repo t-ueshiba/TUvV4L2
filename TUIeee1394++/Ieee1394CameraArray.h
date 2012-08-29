@@ -1,9 +1,9 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.10 2012-08-10 02:54:48 ueshiba Exp $
+ *  $Id: Ieee1394CameraArray.h,v 1.11 2012-08-29 19:30:24 ueshiba Exp $
  */
 /*!
   \file		Ieee1394CameraArray.h
-  \brief	$B%/%i%9(B TU::Ieee1394CameraArray $B$NDj5A$H<BAu(B
+  \brief	クラス TU::Ieee1394CameraArray の定義と実装
 */
 #ifndef __TUIeee1394CameraArray_h
 #define __TUIeee1394CameraArray_h
@@ -13,9 +13,9 @@
 #  include "TU/Ieee1394++.h"
 #  include "TU/io.h"
 
-//! $B%G%U%)%k%H$N%+%a%iL>(B
+//! デフォルトのカメラ名
 #  define DEFAULT_CAMERA_NAME	"IEEE1394Camera"
-//! $B%+%a%i@_Dj%U%!%$%k$r<}$a$k%G%U%)%k%H$N%G%#%l%/%H%jL>(B
+//! カメラ設定ファイルを収めるデフォルトのディレクトリ名
 #  define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
 
 namespace TU
@@ -23,9 +23,9 @@ namespace TU
 /************************************************************************
 *  class Ieee1394CameraArray						*
 ************************************************************************/
-//! IEEE1394$B%G%8%?%k%+%a%i$NG[Ns$rI=$9%/%i%9(B
+//! IEEE1394デジタルカメラの配列を表すクラス
 /*!
-  TU::Ieee1394Camera$B$X$N%]%$%s%?$NG[Ns$H$7$FDj5A$5$l$k(B.
+  TU::Ieee1394Cameraへのポインタの配列として定義される.
 */
 class Ieee1394CameraArray : public Array<Ieee1394Camera*>
 {
@@ -45,12 +45,12 @@ class Ieee1394CameraArray : public Array<Ieee1394Camera*>
     std::string		calibFile()				const	;
 
   private:
-    std::string		_fullName;	//!< $B%+%a%i$N(Bfull path$BL>(B
+    std::string		_fullName;	//!< カメラのfull path名
 };
 
-//! $B%+%a%i$N(Bfull path$BL>$rJV$9(B.
+//! カメラのfull path名を返す.
 /*!
-  \return	$B%+%a%i$N(Bfull path$BL>(B
+  \return	カメラのfull path名
 */
 inline const std::string&
 Ieee1394CameraArray::fullName() const
@@ -58,9 +58,9 @@ Ieee1394CameraArray::fullName() const
     return _fullName;
 }
     
-//! $B%+%a%i@_Dj%U%!%$%kL>$rJV$9(B.
+//! カメラ設定ファイル名を返す.
 /*!
-  \return	$B%+%a%i@_Dj%U%!%$%kL>(B
+  \return	カメラ設定ファイル名
 */
 inline std::string
 Ieee1394CameraArray::configFile() const
@@ -68,9 +68,9 @@ Ieee1394CameraArray::configFile() const
     return _fullName + ".conf";
 }
     
-//! $B%-%c%j%V%l!<%7%g%s%U%!%$%kL>$rJV$9(B.
+//! キャリブレーションファイル名を返す.
 /*!
-  \return	$B%-%c%j%V%l!<%7%g%s%U%!%$%kL>(B
+  \return	キャリブレーションファイル名
 */
 inline std::string
 Ieee1394CameraArray::calibFile() const

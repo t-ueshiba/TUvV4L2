@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.26 2012-08-13 07:12:25 ueshiba Exp $
+ *  $Id: Ieee1394Node.cc,v 1.27 2012-08-29 19:30:24 ueshiba Exp $
  */
 #include "TU/Ieee1394++.h"
 #include <unistd.h>
@@ -138,30 +138,30 @@ Ieee1394Node::Port::isRegisteredNode(const Ieee1394Node& node) const
 std::map<int, Ieee1394Node::Port*>	Ieee1394Node::_portMap;
 #endif	// !__APPLE__
 
-//! IEEE1394$B%N!<%I%*%V%8%'%/%H$r@8@.$9$k(B
+//! IEEE1394ノードオブジェクトを生成する
 /*!
-  \param unit_spec_ID	$B$3$N%N!<%I$N<oN`$r<($9(BID(ex. IEEE1394$B%G%8%?%k%+%a%i(B
-			$B$G$"$l$P(B, 0x00a02d)
-  \param uniqId		$B8D!9$N5!4o8GM-$N(B64bit ID. $BF10l$N(BIEEE1394 bus$B$K(B
-			$BF10l$N(Bunit_spec_ID$B$r;}$DJ#?t$N5!4o$,@\B3$5$l$F(B
-			$B$$$k>l9g(B, $B$3$l$K$h$C$FF1Dj$r9T$&(B. 
-			0$B$,M?$($i$l$k$H(B, $B;XDj$5$l$?(Bunit_spec_ID$B$r;}$A(B
-			$B$^$@(B#Ieee1394Node$B%*%V%8%'%/%H$r3d$jEv$F$i$l$F(B
-			$B$$$J$$5!4o$N$&$A(B, $B0lHV:G=i$K$_$D$+$C$?$b$N$,$3$N(B
-			$B%*%V%8%'%/%H$H7k$S$D$1$i$l$k(B. 
-  \param delay		IEEE1394$B%+!<%I$N<oN`$K$h$C$F$O(B, $B%l%8%9%?$NFI$_=q$-(B
+  \param unit_spec_ID	このノードの種類を示すID(ex. IEEE1394デジタルカメラ
+			であれば, 0x00a02d)
+  \param uniqId		個々の機器固有の64bit ID. 同一のIEEE1394 busに
+			同一のunit_spec_IDを持つ複数の機器が接続されて
+			いる場合, これによって同定を行う. 
+			0が与えられると, 指定されたunit_spec_IDを持ち
+			まだ#Ieee1394Nodeオブジェクトを割り当てられて
+			いない機器のうち, 一番最初にみつかったものがこの
+			オブジェクトと結びつけられる. 
+  \param delay		IEEE1394カードの種類によっては, レジスタの読み書き
 			(Ieee1394Node::readQuadlet(),
-			Ieee1394Node::writeQuadlet())$B;~$KCY1d$rF~$l$J$$$H(B
-			$BF0:n$7$J$$$3$H$,$"$k(B. $B$3$NCY1dNL$r(Bmicro second$BC10L(B
-			$B$G;XDj$9$k(B. ($BNc(B: $B%a%k%3$N(BIFC-ILP3$B$G$O(B1, DragonFly
-			$BIUB0$N%\!<%I$G$O(B0)
-  \param sync_tag	1$B$^$H$^$j$N%G!<%?$rJ#?t$N%Q%1%C%H$KJ,3d$7$F(B
-			isochronous$B%b!<%I$G<u?.$9$k:]$K(B, $B:G=i$N%Q%1%C%H$K(B
-			$BF14|MQ$N(Btag$B$,$D$$$F$$$k>l9g$O(B1$B$r;XDj(B. $B$=$&$G$J$1$l(B
-			$B$P(B0$B$r;XDj(B. 
-  \param flags		video1394$B$N%U%i%0(B. VIDEO1394_SYNC_FRAMES, 
+			Ieee1394Node::writeQuadlet())時に遅延を入れないと
+			動作しないことがある. この遅延量をmicro second単位
+			で指定する. (例: メルコのIFC-ILP3では1, DragonFly
+			付属のボードでは0)
+  \param sync_tag	1まとまりのデータを複数のパケットに分割して
+			isochronousモードで受信する際に, 最初のパケットに
+			同期用のtagがついている場合は1を指定. そうでなけれ
+			ば0を指定. 
+  \param flags		video1394のフラグ. VIDEO1394_SYNC_FRAMES, 
 			VIDEO1394_INCLUDE_ISO_HEADERS,
-			VIDEO1394_VARIABLE_PACKET_SIZE$B$NAH9g$o$;(B. 
+			VIDEO1394_VARIABLE_PACKET_SIZEの組合わせ. 
 */
 Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 #if defined(USE_VIDEO1394)
@@ -248,7 +248,7 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
     raw1394_set_userdata(_handle, this);
 }
 	     
-//! IEEE1394$B%N!<%I%*%V%8%'%/%H$rGK2u$9$k(B
+//! IEEE1394ノードオブジェクトを破壊する
 Ieee1394Node::~Ieee1394Node()
 {
     unmapListenBuffer();
@@ -270,7 +270,7 @@ Ieee1394Node::cmdRegBase() const
 }
 #endif
 
-//! $B$3$N%N!<%I$K7k$SIU$1$i$l$F$$$k5!4o8GM-$N(B64bit ID$B$rJV$9(B
+//! このノードに結び付けられている機器固有の64bit IDを返す
 u_int64_t
 Ieee1394Node::globalUniqueId() const
 {
@@ -279,9 +279,9 @@ Ieee1394Node::globalUniqueId() const
     return (hi << 32) | lo;
 }
 
-//! $BM?$($i$l$?(Bkey$B$KBP$9$kCM$r(BUnit Dependent Directory$B$+$iFI$_=P$9(B
+//! 与えられたkeyに対する値をUnit Dependent Directoryから読み出す
 /*!
-  \param key	key$B$9$J$o$A(B4byte$B$NJB$S$N(BMSB$BB&(B8bit
+  \param key	keyすなわち4byteの並びのMSB側8bit
  */
 u_int
 Ieee1394Node::readValueFromUnitDependentDirectory(u_char key) const
@@ -302,9 +302,9 @@ Ieee1394Node::readValueFromUnitDependentDirectory(u_char key) const
     return readValueFromDirectory(key, offset);
 }
 
-//! $BM?$($i$l$?(Bkey$B$KBP$9$kCM$r(BUnit Directory$B$+$iFI$_=P$9(B
+//! 与えられたkeyに対する値をUnit Directoryから読み出す
 /*!
-  \param key	key$B$9$J$o$A(B4byte$B$NJB$S$N(BMSB$BB&(B8bit
+  \param key	keyすなわち4byteの並びのMSB側8bit
  */
 u_int
 Ieee1394Node::readValueFromUnitDirectory(u_char key) const
@@ -350,9 +350,9 @@ Ieee1394Node::readQuadletFromConfigROM(u_int offset) const
     return readQuadlet(CSR_REGISTER_BASE + CSR_CONFIG_ROM + offset);
 }
     
-//! $B%N!<%IFb$N;XDj$5$l$?%"%I%l%9$+$i(B4byte$B$NCM$rFI$_=P$9(B
+//! ノード内の指定されたアドレスから4byteの値を読み出す
 /*!
-  \param addr	$B8D!9$N%N!<%IFb$N@dBP%"%I%l%9(B
+  \param addr	個々のノード内の絶対アドレス
  */
 quadlet_t
 Ieee1394Node::readQuadlet(nodeaddr_t addr) const
@@ -367,10 +367,10 @@ Ieee1394Node::readQuadlet(nodeaddr_t addr) const
     return quadlet_t(ntohl(quad));
 }
 
-//! $B%N!<%IFb$N;XDj$5$l$?%"%I%l%9$K(B4byte$B$NCM$r=q$-9~$`(B
+//! ノード内の指定されたアドレスに4byteの値を書き込む
 /*!
-  \param addr	$B8D!9$N%N!<%IFb$N@dBP%"%I%l%9(B
-  \param quad	$B=q$-9~$`(B4byte$B$NCM(B
+  \param addr	個々のノード内の絶対アドレス
+  \param quad	書き込む4byteの値
  */
 void
 Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
@@ -384,12 +384,12 @@ Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
 	::usleep(_delay);
 }
 
-//! isochronous$B<u?.MQ$N%P%C%U%!$r3d$jEv$F$k(B
+//! isochronous受信用のバッファを割り当てる
 /*!
-  \param packet_size	$B<u?.$9$k%Q%1%C%H(B1$B$D$"$?$j$N%5%$%:(B($BC10L(B: byte)
-  \param buf_size	$B%P%C%U%!(B1$B$D$"$?$j$N%5%$%:(B($BC10L(B: byte)
-  \param nb_buffers	$B3d$jEv$F$k%P%C%U%!?t(B
-  \return		$B3d$jEv$F$i$l$?(Bisochronous$B<u?.MQ$N%A%c%s%M%k(B
+  \param packet_size	受信するパケット1つあたりのサイズ(単位: byte)
+  \param buf_size	バッファ1つあたりのサイズ(単位: byte)
+  \param nb_buffers	割り当てるバッファ数
+  \return		割り当てられたisochronous受信用のチャンネル
  */
 u_char
 Ieee1394Node::mapListenBuffer(size_t packet_size,
@@ -429,13 +429,13 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
     usleep(100000);
     return _mmap.channel;
 #else
-  // $B%P%C%U%!(B1$B$DJ,$N%G!<%?$rE>Aw$9$k$?$a$KI,MW$J%Q%1%C%H?t(B
+  // バッファ1つ分のデータを転送するために必要なパケット数
     const u_int	npackets = (buf_size - 1) / packet_size + 1;
 
-  // raw1394_loop_iterate()$B$O!$(Binterval$B8D$N%Q%1%C%H$r<u?.$9$k$?$S$K%f!<%6B&$K(B
-  // $B@)8f$rJV$9!%(Blibraw1394$B$G$O$3$N%G%U%)%k%HCM$O%Q%1%C%H?t$N(B1/4$B$G$"$k!%$?$@$7!$(B
-  // 512$B%Q%1%C%H$r1[$($kCM$r;XDj$9$k$H!$(Braw1394_loop_iterate()$B$+$i5"$C$F$3$J$/(B
-  // $B$J$k$h$&$G$"$k!%(B
+  // raw1394_loop_iterate()は，interval個のパケットを受信するたびにユーザ側に
+  // 制御を返す．libraw1394ではこのデフォルト値はパケット数の1/4である．ただし，
+  // 512パケットを越える値を指定すると，raw1394_loop_iterate()から帰ってこなく
+  // なるようである．
 #  if defined(__APPLE__)
     const u_int	interval = npackets;
 #  else
@@ -460,10 +460,10 @@ Ieee1394Node::mapListenBuffer(size_t packet_size,
 #endif
 }
 
-//! isochronous$B%G!<%?$,<u?.$5$l$k$N$rBT$D(B
+//! isochronousデータが受信されるのを待つ
 /*!
-  $B<B:]$K%G!<%?$,<u?.$5$l$k$^$G(B, $BK\4X?t$O8F$S=P$7B&$K@)8f$rJV$5$J$$(B. 
-  \return	$B%G!<%?$NF~$C$?%P%C%U%!$N@hF,%"%I%l%9(B. 
+  実際にデータが受信されるまで, 本関数は呼び出し側に制御を返さない. 
+  \return	データの入ったバッファの先頭アドレス. 
  */
 const u_char*
 Ieee1394Node::waitListenBuffer()
@@ -477,9 +477,9 @@ Ieee1394Node::waitListenBuffer()
     if (ioctl(_port->fd(), VIDEO1394_IOC_LISTEN_WAIT_BUFFER, &wait) < 0)
 	throw runtime_error(string("TU::Ieee1394Node::waitListenBuffer: VIDEO1394_IOC_LISTEN_WAIT_BUFFER failed!! ") + strerror(errno));
 
-  // wait.filltime$B$O!$A4%Q%1%C%H$,E~Ce$7$F%P%C%U%!$,0lGU$K$J$C$?;~9o$rI=$9!%(B
-  // $B$3$l$+$i:G=i$N%Q%1%C%H$,E~Ce$7$?;~9o$r?dDj$9$k$?$a$K!$%P%C%U%!$"$?$j$N(B
-  // $B%Q%1%C%H?t$K%Q%1%C%HE~Ce4V3V(B(125 micro sec)$B$r>h$8$??t$r8:$8$k!%(B
+  // wait.filltimeは，全パケットが到着してバッファが一杯になった時刻を表す．
+  // これから最初のパケットが到着した時刻を推定するために，バッファあたりの
+  // パケット数にパケット到着間隔(125 micro sec)を乗じた数を減じる．
     _arrivaltime = u_int64_t(wait.filltime.tv_sec)*1000000LL
 		 + u_int64_t(wait.filltime.tv_usec)
 		 - u_int64_t(((_mmap.buf_size - 1)/_mmap.packet_size + 1)*125);
@@ -489,9 +489,9 @@ Ieee1394Node::waitListenBuffer()
 #  if defined(DEBUG)
     cerr << "*** BEGIN [waitListenBuffer] ***" << endl;
 #  endif
-    while (_current < _mid)		// [_buf, _mid)$B$,K~$?$5$l$k$^$G(B
+    while (_current < _mid)		// [_buf, _mid)が満たされるまで
     {
-	raw1394_loop_iterate(_handle);	// $B%Q%1%C%H$r<u?.$9$k!%(B
+	raw1394_loop_iterate(_handle);	// パケットを受信する．
 #  if defined(DEBUG)
 	cerr << "wait: current = " << _current - _buf << endl;
 #  endif
@@ -504,7 +504,7 @@ Ieee1394Node::waitListenBuffer()
 #endif
 }
 
-//! $B%G!<%?<u?.:Q$_$N%P%C%U%!$r:F$S%-%e!<%$%s%0$7$F<!$N<u?.%G!<%?$KHw$($k(B
+//! データ受信済みのバッファを再びキューイングして次の受信データに備える
 void
 Ieee1394Node::requeueListenBuffer()
 {
@@ -520,7 +520,7 @@ Ieee1394Node::requeueListenBuffer()
 #else
     if (_current != 0)
     {
-      // [_buf, _mid) $B$rGQ4~$7(B [_mid, _current)$B$r%P%C%U%!NN0h$N@hF,$K0\$9(B
+      // [_buf, _mid) を廃棄し [_mid, _current)をバッファ領域の先頭に移す
 	const size_t	len = _current - _mid;
 	memcpy(_buf, _mid, len);
 	_current     = _buf + len;
@@ -535,7 +535,7 @@ Ieee1394Node::requeueListenBuffer()
 #endif
 }
 
-//! $B$9$Y$F$N<u?.MQ%P%C%U%!$NFbMF$r6u$K$9$k(B
+//! すべての受信用バッファの内容を空にする
 void
 Ieee1394Node::flushListenBuffer()
 {
@@ -552,7 +552,7 @@ Ieee1394Node::flushListenBuffer()
 #endif    
 }
 
-//! $B%N!<%I$K3d$jEv$F$?$9$Y$F$N<u?.MQ%P%C%U%!$rGQ4~$9$k(B
+//! ノードに割り当てたすべての受信用バッファを廃棄する
 void
 Ieee1394Node::unmapListenBuffer()
 {
@@ -579,50 +579,50 @@ Ieee1394Node::unmapListenBuffer()
 u_int64_t
 Ieee1394Node::cycletimeToLocaltime(u_int32_t cycletime) const
 {
-  // $B8=:_$N%5%$%/%k;~9o$H;~9o$r3MF@$9$k!%(B
+  // 現在のサイクル時刻と時刻を獲得する．
     u_int32_t	cycletime0;
     u_int64_t	localtime0;
     raw1394_read_cycle_timer(_handle, &cycletime0, &localtime0);
 
-  // $B8=;~9o$H;XDj$5$l$?;~9o$N%5%$%/%k;~9o$r%5%V%5%$%/%kCM$KD>$7!$(B
-  // $BN><T$N$:$l$r5a$a$k!%(B
+  // 現時刻と指定された時刻のサイクル時刻をサブサイクル値に直し，
+  // 両者のずれを求める．
     u_int32_t	subcycle0 = cycletime_to_subcycle(cycletime0);
     u_int32_t	subcycle  = cycletime_to_subcycle(cycletime);
     u_int64_t	diff	  = (subcycle0 + (128LL*8000LL*3072LL) - subcycle)
 			  % (128LL*8000LL*3072LL);
 
-  // $B$:$l$r(Bmicro sec$BC10L$KD>$7$F(B(1 subcycle = 125/3072 usec)$B8=:_;~9o$+$i:9$70z$/(B. 
+  // ずれをmicro sec単位に直して(1 subcycle = 125/3072 usec)現在時刻から差し引く. 
     return localtime0 - (125LL*diff)/3072LL;
 }
 
 u_int64_t
 Ieee1394Node::cycleToLocaltime(u_int32_t cycle) const
 {
-  // $B8=:_$N%5%$%/%k;~9o$H;~9o$r3MF@$9$k!%(B
+  // 現在のサイクル時刻と時刻を獲得する．
     u_int32_t	cycletime0;
     u_int64_t	localtime0;
     raw1394_read_cycle_timer(_handle, &cycletime0, &localtime0);
 
-  // $B8=:_$N%5%$%/%k;~9o$+$i%5%$%/%kCM(B($B<~4|!'(B8000)$B$r<h$j=P$7!$M?$($i$l$?(B
-  // $B%5%$%/%kCM$H$N$:$l$r5a$a$k!%(B
+  // 現在のサイクル時刻からサイクル値(周期：8000)を取り出し，与えられた
+  // サイクル値とのずれを求める．
     u_int32_t	cycle0 = (cycletime0 & 0x1fff000) >> 12;
     u_int32_t	diff   = (cycle0 + 8000 - cycle) % 8000;
     
-  // $B$:$l$r(Bmicro sec$BC10L$KD>$7$F(B(1 cycle = 125 micro sec)$B8=:_;~9o$+$i:9$70z$/(B. 
+  // ずれをmicro sec単位に直して(1 cycle = 125 micro sec)現在時刻から差し引く. 
     return localtime0 - u_int64_t(125*diff);
 }
 
 #if !defined(USE_VIDEO1394)
-//! $B$3$N%N!<%I$K3d$jEv$F$i$l$?(Bisochronous$B<u?.MQ%P%C%U%!$K%Q%1%C%H%G!<%?$rE>Aw$9$k(B
+//! このノードに割り当てられたisochronous受信用バッファにパケットデータを転送する
 /*!
-  $BK\%O%s%I%i$O!$%Q%1%C%H$,(B1$B$D<u?.$5$l$k$?$S$K8F$S=P$5$l$k!%$^$?!$(BmapListenBuffer()
-  $BFb$N(B raw1394_iso_recv_init() $B$r8F$s$@;~E@$G4{$K(Bisochronous$BE>Aw$,;O$^$C$F$$$k(B
-  $B>l9g$O!$(BwaitListenBuffer() $BFb$G(B raw1394_loop_iterate() $B$r8F$P$J$/$F$b$3$N(B
-  $B%O%s%I%i$,8F$P$l$k$3$H$,$"$k$?$a!$(Bbuffer overrun $B$rKI$0J}:v$O$3$N%O%s%I%iFb$G(B
-  $B$H$C$F$*$+$J$1$l$P$J$i$J$$!%(B
-  \param data	$B%Q%1%C%H%G!<%?(B
-  \param len	$B%Q%1%C%H%G!<%?$N%P%$%H?t(B
-  \param sy	$B%U%l!<%`$N@hF,%Q%1%C%H$G$"$l$P(B1, $B$=$&$G$J$1$l$P(B0
+  本ハンドラは，パケットが1つ受信されるたびに呼び出される．また，mapListenBuffer()
+  内の raw1394_iso_recv_init() を呼んだ時点で既にisochronous転送が始まっている
+  場合は，waitListenBuffer() 内で raw1394_loop_iterate() を呼ばなくてもこの
+  ハンドラが呼ばれることがあるため，buffer overrun を防ぐ方策はこのハンドラ内で
+  とっておかなければならない．
+  \param data	パケットデータ
+  \param len	パケットデータのバイト数
+  \param sy	フレームの先頭パケットであれば1, そうでなければ0
 */
 raw1394_iso_disposition
 Ieee1394Node::receive(raw1394handle_t handle,
@@ -634,18 +634,18 @@ Ieee1394Node::receive(raw1394handle_t handle,
 
     Ieee1394Node* const	node = (Ieee1394Node*)raw1394_get_userdata(handle);
 
-  // [_buf, _mid)$B$ND9$5$r%U%l!<%`%5%$%:$K$7$F$"$k$N$G!$(Bsy$B%Q%1%C%H$OI,$:(B
-  // _buf, _mid$B$N$$$:$l$+$K5-O?$5$l$k!%(Braw1394_loop_iterate() $B$O!$$3$N(B
-  // $B%O%s%I%i$r(Binterval$B2s8F$V!%FC$K(Binterval$B$,(B1$B%U%l!<%`$"$?$j$N%Q%1%C%H?t$N(B
-  // $BLs?t$G$J$$>l9g$O!$(B_buf$B$K(Bsy$B%Q%1%C%H$rFI$_9~$s$@8e$K%U%l!<%`A4BN$N<u?.$,(B
-  // $B40N;$7$?8e$K!$$5$i$K(B_mid$B$K<!$N%U%l!<%`$N(Bsy$B%Q%1%C%H$,FI$_9~$^$l$k!%(B
-    if (sy)				// $B%U%l!<%`$N@hF,%Q%1%C%H$J$i$P(B...
+  // [_buf, _mid)の長さをフレームサイズにしてあるので，syパケットは必ず
+  // _buf, _midのいずれかに記録される．raw1394_loop_iterate() は，この
+  // ハンドラをinterval回呼ぶ．特にintervalが1フレームあたりのパケット数の
+  // 約数でない場合は，_bufにsyパケットを読み込んだ後にフレーム全体の受信が
+  // 完了した後に，さらに_midに次のフレームのsyパケットが読み込まれる．
+    if (sy)				// フレームの先頭パケットならば...
     {
 	node->_arrivaltime_next = node->cycleToLocaltime(cycle);
 	
-	if (node->_current != node->_mid)	// _mid$B$,FI$_9~$_@h$G$J$1$l$P(B
+	if (node->_current != node->_mid)	// _midが読み込み先でなければ
 	{
-	    node->_current = node->_buf;	// _buf$B$KFI$_9~$`(B
+	    node->_current = node->_buf;	// _bufに読み込む
 	    node->_arrivaltime = node->_arrivaltime_next;
 	}
 #  if defined(DEBUG)
@@ -677,10 +677,10 @@ Ieee1394Node::receive(raw1394handle_t handle,
 	cerr << endl;
     }
 #  endif
-    if (node->_current + len <= node->_end)	// overrun$B$,@8$8$J$1$l$P(B...
+    if (node->_current + len <= node->_end)	// overrunが生じなければ...
     {
-	memcpy(node->_current, data, len);	// $B%Q%1%C%H$rFI$_9~$`(B
-	node->_current += len;			// $B<!$NFI$_9~$_0LCV$K?J$a$k(B
+	memcpy(node->_current, data, len);	// パケットを読み込む
+	node->_current += len;			// 次の読み込み位置に進める
     }
     
     return RAW1394_ISO_OK;

@@ -1,11 +1,11 @@
 /*
- *  $Id: Ieee1394++.h,v 1.36 2012-08-13 07:12:25 ueshiba Exp $
+ *  $Id: Ieee1394++.h,v 1.37 2012-08-29 19:30:24 ueshiba Exp $
  */
 /*!
-  \mainpage	libTUIeee1394++ - IIDC 1394$B%Y!<%9$N%G%8%?%k%+%a%i$r@)8f$9$k(BC++$B%i%$%V%i%j(B
+  \mainpage	libTUIeee1394++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
   \anchor	libTUIeee1394
 
-  \section copyright $BCx:n8"(B
+  \section copyright 著作権
   Copyright (C) 2003-2006 Toshio UESHIBA
   National Institute of Advanced Industrial Science and Technology (AIST)
  
@@ -25,26 +25,26 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
   USA
 
-  \section abstract $B35MW(B
-  libTUIeee1394++$B$O!$(B
+  \section abstract 概要
+  libTUIeee1394++は，
   <a href="http://www.1394ta.com/Technology/Specifications/specifications.htm">
-  IIDC 1394$B%Y!<%9$N%G%8%?%k%+%a%i(B</a>$B$r@)8f$9$k(BC++$B%i%$%V%i%j$G$"$k(B. $BF1(B
-  $B0l$^$?$O0[$J$k(BIEEE1394$B%P%9$K@\B3$5$l$?J#?t$N%+%a%i$r!$$=$l$>$lFHN)$K(B
-  $B%3%s%H%m!<%k$9$k$3$H$,$G$-$k(B. 
+  IIDC 1394ベースのデジタルカメラ</a>を制御するC++ライブラリである. 同
+  一または異なるIEEE1394バスに接続された複数のカメラを，それぞれ独立に
+  コントロールすることができる. 
 
-  $B<BAu$5$l$F$$$k<gMW$J%/%i%9$*$h$S$=$N(Bpublic$B$J%a%s%P4X?t$O!$$*$*$^$+$K(B
-  $B0J2<$N$h$&$KJ,N`$5$l$k(B. 
+  実装されている主要なクラスおよびそのpublicなメンバ関数は，おおまかに
+  以下のように分類される. 
 
-  #TU::Ieee1394Node - IEEE1394$B%P%9$K@\B3$5$l$kMM!9$J5!4o$N%Y!<%9$H$J$k%/%i%9(B
+  #TU::Ieee1394Node - IEEE1394バスに接続される様々な機器のベースとなるクラス
   - #TU::Ieee1394Node::nodeId()
   - #TU::Ieee1394Node::globalUniqueId()
   - #TU::Ieee1394Node::arrivaltime()
   - #TU::Ieee1394Node::channel()
   - #TU::Ieee1394Node::delay()
 
-  #TU::Ieee1394Camera - IEEE1394$B%G%8%?%k%+%a%i$rI=$9%/%i%9(B
+  #TU::Ieee1394Camera - IEEE1394デジタルカメラを表すクラス
 
-  - <b>$B4pK\5!G=(B</b>
+  - <b>基本機能</b>
     - #TU::Ieee1394Camera::inquireBasicFunction()
     - #TU::Ieee1394Camera::powerOn()
     - #TU::Ieee1394Camera::powerOff()
@@ -53,7 +53,7 @@
     - #TU::Ieee1394Camera::setSpeed()
     - #TU::Ieee1394Camera::getSpeed()
   
-  - <b>$B2hA|%U%)!<%^%C%H$H%U%l!<%`%l!<%H(B</b>
+  - <b>画像フォーマットとフレームレート</b>
     - #TU::Ieee1394Camera::inquireFrameRate()
     - #TU::Ieee1394Camera::setFormatAndFrameRate()
     - #TU::Ieee1394Camera::getFormat()
@@ -62,22 +62,22 @@
     - #TU::Ieee1394Camera::height()
     - #TU::Ieee1394Camera::pixelFormat()
 
-  - <b>$BFC<l%U%)!<%^%C%H(B(Format_7)</b>
+  - <b>特殊フォーマット(Format_7)</b>
     - #TU::Ieee1394Camera::getFormat_7_Info()
     - #TU::Ieee1394Camera::setFormat_7_ROI()
     - #TU::Ieee1394Camera::setFormat_7_PixelFormat()
 
-  - <b>$B2hA|$N;#1F%b!<%I$N@_Dj(B</b>
+  - <b>画像の撮影モードの設定</b>
     - #TU::Ieee1394Camera::continuousShot()
     - #TU::Ieee1394Camera::stopContinuousShot()
     - #TU::Ieee1394Camera::inContinuousShot()
     - #TU::Ieee1394Camera::oneShot()
     - #TU::Ieee1394Camera::multiShot()
 
-  - <b>$B2hA|$N;#1F(B</b>
+  - <b>画像の撮影</b>
     - #TU::Ieee1394Camera::snap()
 
-  - <b>$B2hA|$N<h$j9~$_(B</b>
+  - <b>画像の取り込み</b>
     - #TU::Ieee1394Camera::operator >>()
     - #TU::Ieee1394Camera::captureRGBImage()
     - #TU::Ieee1394Camera::captureDirectly()
@@ -87,7 +87,7 @@
     - #TU::Ieee1394Camera::unembedTimestamp()
     - #TU::Ieee1394Camera::getTimestamp()
 
-  - <b>$B%+%a%i$NMM!9$J5!G=$N@)8f(B</b>
+  - <b>カメラの様々な機能の制御</b>
     - #TU::Ieee1394Camera::inquireFeatureFunction()
     - #TU::Ieee1394Camera::onePush()
     - #TU::Ieee1394Camera::inOnePushOperation()
@@ -104,22 +104,22 @@
     - #TU::Ieee1394Camera::getWhiteBalance()
     - #TU::Ieee1394Camera::getAimedTemperature()
 
-  - <b>$B%H%j%,%b!<%I(B</b>
+  - <b>トリガモード</b>
     - #TU::Ieee1394Camera::setTriggerMode()
     - #TU::Ieee1394Camera::getTriggerMode()
     - #TU::Ieee1394Camera::setTriggerPolarity()
     - #TU::Ieee1394Camera::getTriggerPolarity()
 
-  - <b>$B%+%a%i@_Dj$NJ]B8(B</b>
+  - <b>カメラ設定の保存</b>
     - #TU::Ieee1394Camera::saveConfig()
     - #TU::Ieee1394Camera::restoreConfig()
     - #TU::Ieee1394Camera::getMemoryChannelMax()
 
-  #TU::Ieee1394CameraArray - IEEE1394$B%G%8%?%k%+%a%i$NG[Ns$rI=$9%/%i%9(B
+  #TU::Ieee1394CameraArray - IEEE1394デジタルカメラの配列を表すクラス
     - #TU::Ieee1394CameraArray::Ieee1394CameraArray()
 
   \file		Ieee1394++.h
-  \brief	IEEE1394$B%G%P%$%9$K4XO"$9$k%/%i%9$NDj5A$H<BAu(B
+  \brief	IEEE1394デバイスに関連するクラスの定義と実装
 */
 #ifndef __TUIeee1394PP_h
 #define __TUIeee1394PP_h
@@ -146,17 +146,17 @@
 
 /*!
   \namespace	TU
-  \brief	$BK\%i%$%V%i%j$GDj5A$5$l$?%/%i%9$*$h$S4X?t$rG<$a$kL>A06u4V(B
+  \brief	本ライブラリで定義されたクラスおよび関数を納める名前空間
  */
 namespace TU
 {
 /************************************************************************
 *  class Ieee1394Node							*
 ************************************************************************/
-//! IEEE1394$B$N%N!<%I$rI=$9%/%i%9(B
+//! IEEE1394のノードを表すクラス
 /*!
-  $B0lHL$K$O(B, $B$h$j6qBNE*$J5!G=$r;}$C$?%N!<%I(B(ex. $B%G%8%?%k%+%a%i(B)$B$rI=$9(B
-  $B%/%i%9$N4pDl%/%i%9$H$7$FMQ$$$i$l$k(B. 
+  一般には, より具体的な機能を持ったノード(ex. デジタルカメラ)を表す
+  クラスの基底クラスとして用いられる. 
 */
 class Ieee1394Node
 {
@@ -186,7 +186,7 @@ class Ieee1394Node
     };
 #endif	// !__APPLE__
   public:
-  //! isochronous$BE>Aw$NB.EY(B
+  //! isochronous転送の速度
     enum Speed
     {
 	SPD_100M	= 0,			//!< 100Mbps
@@ -198,23 +198,23 @@ class Ieee1394Node
     };
 
   public:
-  //! $B$3$N%N!<%I$N(BID(IEEE1394 bus$B>e$N%"%I%l%9(B)$B$rJV$9(B
+  //! このノードのID(IEEE1394 bus上のアドレス)を返す
   /*!
-    \return	$B$3$N%N!<%I$N(BID
+    \return	このノードのID
    */
     nodeid_t	nodeId()			const	{return _nodeId;}
 
     u_int64_t	globalUniqueId()		const	;
 
-  //! $B$3$N%N!<%I$N(Bisochronous$B<u?.MQ%P%C%U%!$K%U%l!<%`$N@hF,%Q%1%C%H$,E~Ce$7$?;~9o$rJV$9(B
+  //! このノードのisochronous受信用バッファにフレームの先頭パケットが到着した時刻を返す
   /*!
-    \return	$B<u?.MQ%P%C%U%!$K%U%l!<%`$N@hF,%Q%1%C%H$,E~Ce$7$?;~9o(B
+    \return	受信用バッファにフレームの先頭パケットが到着した時刻
    */
     u_int64_t	arrivaltime()			const	{return _arrivaltime;}
 
-  //! $B$3$N%N!<%I$K3d$jEv$F$i$l$?(Bisochronous$B%A%c%s%M%k$rJV$9(B
+  //! このノードに割り当てられたisochronousチャンネルを返す
   /*!
-    \return	isochronous$B%A%c%s%M%k(B
+    \return	isochronousチャンネル
    */
 #if defined(USE_VIDEO1394)
     u_char	channel()			const	{return _mmap.channel;}
@@ -222,9 +222,9 @@ class Ieee1394Node
     u_char	channel()			const	{return _channel;}
 #endif
 
-  //! $B$3$N%N!<%I$K3d$jEv$F$i$l$?(Basynchronous$BDL?.$NCY1dNL$rJV$9(B
+  //! このノードに割り当てられたasynchronous通信の遅延量を返す
   /*!
-    \return	$BCY1dNL!JC10L!'(Bmicro seconds$B!K(B
+    \return	遅延量（単位：micro seconds）
    */
     u_int	delay()				const	{return _delay;}
     
@@ -294,33 +294,33 @@ class Ieee1394Node
 /************************************************************************
 *  class Ieee1394Camera							*
 ************************************************************************/
-//! IEEE1394$B%G%8%?%k%+%a%i$rI=$9%/%i%9(B
+//! IEEE1394デジタルカメラを表すクラス
 /*!
-  1394-based Digital Camera Specification ver. 1.30$B$K=`5r(B. 
+  1394-based Digital Camera Specification ver. 1.30に準拠. 
 */
 class Ieee1394Camera : public Ieee1394Node
 {
   public:
-  //! $B%+%a%i$N%?%$%W(B
+  //! カメラのタイプ
     enum Type
     {
-	Monocular	= 0x00a02d,	//!< $BC14c%+%a%i(B
-	Binocular	= 0x00b09d	//!< $BFs4c%+%a%i(B
+	Monocular	= 0x00a02d,	//!< 単眼カメラ
+	Binocular	= 0x00b09d	//!< 二眼カメラ
     };
 	
-  //! $B%+%a%i$,%5%]!<%H$7$F$$$k4pK\5!G=$rI=$9%S%C%H%^%C%W(B
-  /*! $B$I$N$h$&$J4pK\5!G=$,%5%]!<%H$5$l$F$$$k$+$O(B, inquireBasicFunction() $B$K(B
-      $B$h$C$FCN$k$3$H$,$G$-$k(B. */
+  //! カメラがサポートしている基本機能を表すビットマップ
+  /*! どのような基本機能がサポートされているかは, inquireBasicFunction() に
+      よって知ることができる. */
     enum BasicFunction
     {
-	Advanced_Feature_Inq	= (0x1u << 31),	//!< $B%+%a%i%Y%s%@0MB8$N5!G=(B
-	I1394b_mode_Capability	= (0x1u << 23),	//!< 1394b$B%b!<%I(B
-	Cam_Power_Cntl_Inq	= (0x1u << 15),	//!< $BEE8;(Bon/off$B$N@)8f(B
-	One_Shot_Inq		= (0x1u << 12),	//!< $B2hA|(B1$BKg$@$1$N;#1F(B
-	Multi_Shot_Inq		= (0x1u << 11)	//!< $B;XDj$5$l$?Kg?t$N;#1F(B
+	Advanced_Feature_Inq	= (0x1u << 31),	//!< カメラベンダ依存の機能
+	I1394b_mode_Capability	= (0x1u << 23),	//!< 1394bモード
+	Cam_Power_Cntl_Inq	= (0x1u << 15),	//!< 電源on/offの制御
+	One_Shot_Inq		= (0x1u << 12),	//!< 画像1枚だけの撮影
+	Multi_Shot_Inq		= (0x1u << 11)	//!< 指定された枚数の撮影
     };
 
-  //! $B%+%a%i$,=PNO$9$k2hA|$N7A<0(B
+  //! カメラが出力する画像の形式
     enum Format
     {
 	YUV444_160x120	 = 0x200,	//!< Format_0_0: 160x120 YUV(4:4:4)
@@ -354,19 +354,19 @@ class Ieee1394Camera : public Ieee1394Node
 	Format_5_5	 = 0x2b4,	//!< Format_5_5: 
 	Format_5_6	 = 0x2b8,	//!< Format_5_6: 
 	Format_5_7	 = 0x2bc,	//!< Format_5_7: 
-	Format_7_0	 = 0x2e0,	//!< Format_7_0: $B%+%a%i5!<o$K0MB8(B
-	Format_7_1	 = 0x2e4,	//!< Format_7_1: $B%+%a%i5!<o$K0MB8(B
-	Format_7_2	 = 0x2e8,	//!< Format_7_2: $B%+%a%i5!<o$K0MB8(B
-	Format_7_3	 = 0x2ec,	//!< Format_7_3: $B%+%a%i5!<o$K0MB8(B
-	Format_7_4	 = 0x2f0,	//!< Format_7_4: $B%+%a%i5!<o$K0MB8(B
-	Format_7_5	 = 0x2f4,	//!< Format_7_5: $B%+%a%i5!<o$K0MB8(B
-	Format_7_6	 = 0x2f8,	//!< Format_7_6: $B%+%a%i5!<o$K0MB8(B
-	Format_7_7	 = 0x2fc,	//!< Format_7_7: $B%+%a%i5!<o$K0MB8(B
+	Format_7_0	 = 0x2e0,	//!< Format_7_0: カメラ機種に依存
+	Format_7_1	 = 0x2e4,	//!< Format_7_1: カメラ機種に依存
+	Format_7_2	 = 0x2e8,	//!< Format_7_2: カメラ機種に依存
+	Format_7_3	 = 0x2ec,	//!< Format_7_3: カメラ機種に依存
+	Format_7_4	 = 0x2f0,	//!< Format_7_4: カメラ機種に依存
+	Format_7_5	 = 0x2f4,	//!< Format_7_5: カメラ機種に依存
+	Format_7_6	 = 0x2f8,	//!< Format_7_6: カメラ機種に依存
+	Format_7_7	 = 0x2fc,	//!< Format_7_7: カメラ機種に依存
     };
 
-  //! $B%+%a%i$N%U%l!<%`%l!<%H$rI=$9%S%C%H%^%C%W(B
-  /*! $B$I$N$h$&$J%U%l!<%`%l!<%H$,%5%]!<%H$5$l$F$$$k$+$O(B, inquireFrameRate()
-      $B$K$h$C$FCN$k$3$H$,$G$-$k(B. */
+  //! カメラのフレームレートを表すビットマップ
+  /*! どのようなフレームレートがサポートされているかは, inquireFrameRate()
+      によって知ることができる. */
     enum FrameRate
     {
 	FrameRate_1_875	= (0x1u << 31),	//!< 1.875fps
@@ -377,10 +377,10 @@ class Ieee1394Camera : public Ieee1394Node
 	FrameRate_60	= (0x1u << 26),	//!< 60fps
 	FrameRate_120	= (0x1u << 25),	//!< 120fps
 	FrameRate_240	= (0x1u << 24),	//!< 240fps
-	FrameRate_x	= (0x1u << 23)	//!< $BFC<l$J%U%l!<%`%l!<%H(B
+	FrameRate_x	= (0x1u << 23)	//!< 特殊なフレームレート
     };
     
-  //! $B=PNO2hA|$N2hAG$N7A<0(B
+  //! 出力画像の画素の形式
     enum PixelFormat
     {
 	MONO_8		= (0x1u << 31),	//!< Y(mono)	  8bit/pixel
@@ -396,51 +396,51 @@ class Ieee1394Camera : public Ieee1394Node
 	RAW_16		= (0x1u << 21)	//!< RAW	 16bit/pixel
     };
 
-  //! $BCM$r@_Dj$G$-$k%+%a%i$NB0@-(B
+  //! 値を設定できるカメラの属性
     enum Feature
     {
-	BRIGHTNESS	= 0x800,	//!< $BL@$k$5D4@0(B
-	AUTO_EXPOSURE	= 0x804,	//!< $B<+F0O*=PD4@0(B
-	SHARPNESS	= 0x808,	//!< $BA/L@$5D4@0(B
-	WHITE_BALANCE	= 0x80c,	//!< $B%[%o%$%H%P%i%s%9D4@0(B
-	HUE		= 0x810,	//!< $B?'$N?'AjD4@0(B
-	SATURATION	= 0x814,	//!< $B?'$NK0OBEYD4@0(B
-	GAMMA		= 0x818,	//!< $B51EY$N%,%s%^Jd@5D4@0(B
-	SHUTTER		= 0x81c,	//!< $B%7%c%C%?!<%9%T!<%ID4@0(B
-	GAIN		= 0x820,	//!< $B%2%$%sD4@0(B
-	IRIS		= 0x824,	//!< $B%"%$%j%9D4@0(B
-	FOCUS		= 0x828,	//!< $B%U%)!<%+%9D4@0(B
-	TEMPERATURE	= 0x82c,	//!< $B?'29EYD4@0(B
-	TRIGGER_MODE	= 0x830,	//!< $B30It%H%j%,?.9f$N%b!<%I(B
-	TRIGGER_DELAY	= 0x834,	//!< $B%H%j%,F~NO$+$iO*8w3+;O$^$G$NCY$l(B
-	FRAME_RATE	= 0x83c,	//!< $B%U%l!<%`%l!<%H$N<jF0@_Dj(B
-	ZOOM		= 0x880,	//!< $B%:!<%`D4@0(B
-	PAN		= 0x884,	//!< $B%Q%s(B($B:81&$N<s?6$j(B)$BD4@0(B
-	TILT		= 0x888,	//!< $B%A%k%H(B($B>e2<$N<s?6$j(B)$BD4@0(B
+	BRIGHTNESS	= 0x800,	//!< 明るさ調整
+	AUTO_EXPOSURE	= 0x804,	//!< 自動露出調整
+	SHARPNESS	= 0x808,	//!< 鮮明さ調整
+	WHITE_BALANCE	= 0x80c,	//!< ホワイトバランス調整
+	HUE		= 0x810,	//!< 色の色相調整
+	SATURATION	= 0x814,	//!< 色の飽和度調整
+	GAMMA		= 0x818,	//!< 輝度のガンマ補正調整
+	SHUTTER		= 0x81c,	//!< シャッタースピード調整
+	GAIN		= 0x820,	//!< ゲイン調整
+	IRIS		= 0x824,	//!< アイリス調整
+	FOCUS		= 0x828,	//!< フォーカス調整
+	TEMPERATURE	= 0x82c,	//!< 色温度調整
+	TRIGGER_MODE	= 0x830,	//!< 外部トリガ信号のモード
+	TRIGGER_DELAY	= 0x834,	//!< トリガ入力から露光開始までの遅れ
+	FRAME_RATE	= 0x83c,	//!< フレームレートの手動設定
+	ZOOM		= 0x880,	//!< ズーム調整
+	PAN		= 0x884,	//!< パン(左右の首振り)調整
+	TILT		= 0x888,	//!< チルト(上下の首振り)調整
 	OPTICAL_FILTER	= 0x88c,
 	CAPTURE_SIZE	= 0x8c0,
 	CAPTURE_QUALITY	= 0x8c4
     };
 
-  //! $B3FB0@-(B( Feature)$B$K$D$$$F%+%a%i$,%5%]!<%H$7$F$$$k5!G=$rI=$9%S%C%H%^%C%W(B
-  /*! $B$I$N$h$&$J5!G=$,%5%]!<%H$5$l$F$$$k$+$O(B, inquireFeatureFunction() $B$K(B
-      $B$h$C$FCN$k$3$H$,$G$-$k(B. */
+  //! 各属性( Feature)についてカメラがサポートしている機能を表すビットマップ
+  /*! どのような機能がサポートされているかは, inquireFeatureFunction() に
+      よって知ることができる. */
     enum FeatureFunction
     {
-	Presence	= (0x1u << 31),	//!< $B$3$NB0@-$=$N$b$N$r%5%]!<%H(B
-      //Abs_Control	= (0x1u << 30),	//!< $B$3$NB0@-$rCM$K$h$C$F@)8f2DG=(B
-	One_Push	= (0x1u << 28),	//!< one push$B%b!<%I$r%5%]!<%H(B
-	ReadOut		= (0x1u << 27),	//!< $B$3$NB0@-$NCM$rFI$_=P$7$,2DG=(B
-	OnOff		= (0x1u << 26),	//!< $B$3$NB0@-$N(Bon/off$B$,2DG=(B
-	Auto		= (0x1u << 25),	//!< $B$3$NB0@-$NCM$N<+F0@_Dj$,2DG=(B
-	Manual		= (0x1u << 24)	//!< $B$3$NB0@-$NCM$N<jF0@_Dj$,2DG=(B
+	Presence	= (0x1u << 31),	//!< この属性そのものをサポート
+      //Abs_Control	= (0x1u << 30),	//!< この属性を値によって制御可能
+	One_Push	= (0x1u << 28),	//!< one pushモードをサポート
+	ReadOut		= (0x1u << 27),	//!< この属性の値を読み出しが可能
+	OnOff		= (0x1u << 26),	//!< この属性のon/offが可能
+	Auto		= (0x1u << 25),	//!< この属性の値の自動設定が可能
+	Manual		= (0x1u << 24)	//!< この属性の値の手動設定が可能
     };
     
-  //! $B%+%a%i$N30It%H%j%,!<%b!<%I(B
+  //! カメラの外部トリガーモード
     enum TriggerMode
     {
-	Trigger_Mode0	=  0,	//!< $B%H%j%,(Bon$B$+$i(B #SHUTTER $B$G;XDj$7$?;~4V$@$1C_@Q(B
-	Trigger_Mode1	=  1,	//!< $B%H%j%,(Bon$B$+$i%H%j%,(Boff$B$K$J$k$^$GC_@Q(B
+	Trigger_Mode0	=  0,	//!< トリガonから #SHUTTER で指定した時間だけ蓄積
+	Trigger_Mode1	=  1,	//!< トリガonからトリガoffになるまで蓄積
 	Trigger_Mode2	=  2,
 	Trigger_Mode3	=  3,
 	Trigger_Mode4	=  4,
@@ -448,38 +448,38 @@ class Ieee1394Camera : public Ieee1394Node
 	Trigger_Mode14	= 14
     };
 
-  //! $B%+%a%i$N30It%H%j%,!<?.9f$N6K@-(B
+  //! カメラの外部トリガー信号の極性
     enum TriggerPolarity
     {
-	LowActiveInput	= 0,		//!< low$B$G%H%j%,(Bon
-	HighActiveInput	= (0x1u << 24)	//!< high$B$G%H%j%,(Bon
+	LowActiveInput	= 0,		//!< lowでトリガon
+	HighActiveInput	= (0x1u << 24)	//!< highでトリガon
     };
 
-  //! $BK\%+%a%i$,%5%]!<%H$9$k(BFormat_7$B$K4X$9$k>pJs(B(getFormat_7_Info() $B$GF@$i$l$k(B)
+  //! 本カメラがサポートするFormat_7に関する情報(getFormat_7_Info() で得られる)
     struct Format_7_Info
     {
-	u_int		maxWidth;		//!< $B2hA|$N:GBgI}(B
-	u_int		maxHeight;		//!< $B2hA|$N:GBg9b$5(B
-	u_int		unitWidth;		//!< $B2hA|I}$N:G>.C10L(B
-	u_int		unitHeight;		//!< $B2hA|9b$5$N:G>.C10L(B
-	u_int		unitU0;			//!< $B86E@?eJ?0LCV;XDj$N:G>.C10L(B
-	u_int		unitV0;			//!< $B86E@?bD>0LCV;XDj$N:G>.C10L(B
-	u_int		u0;			//!< $B86E@?eJ?0LCV(B
-	u_int		v0;			//!< $B86E@?bD>0LCV(B
-	u_int		width;			//!< $B2hA|$NI}(B
-	u_int		height;			//!< $B2hA|$N9b$5(B
-	PixelFormat	pixelFormat;		//!< $B2hA|$N2hAG7A<0(B
-	u_int		availablePixelFormats;	//!< $BMxMQ$G$-$k2hAG7A<0(B
+	u_int		maxWidth;		//!< 画像の最大幅
+	u_int		maxHeight;		//!< 画像の最大高さ
+	u_int		unitWidth;		//!< 画像幅の最小単位
+	u_int		unitHeight;		//!< 画像高さの最小単位
+	u_int		unitU0;			//!< 原点水平位置指定の最小単位
+	u_int		unitV0;			//!< 原点垂直位置指定の最小単位
+	u_int		u0;			//!< 原点水平位置
+	u_int		v0;			//!< 原点垂直位置
+	u_int		width;			//!< 画像の幅
+	u_int		height;			//!< 画像の高さ
+	PixelFormat	pixelFormat;		//!< 画像の画素形式
+	u_int		availablePixelFormats;	//!< 利用できる画素形式
     };
     
-  //! Dragonfly(Pointgrey Research Inc.)$B$N(BBayer$B%Q%?!<%s(B
+  //! Dragonfly(Pointgrey Research Inc.)のBayerパターン
     enum Bayer
     {
-	RGGB = 0x52474742,	//!< $B:8>e$+$i1&2<$K8~$+$C$F(BR, G, G, B
-	BGGR = 0x42474752,	//!< $B:8>e$+$i1&2<$K8~$+$C$F(BB, G, G, R
-	GRBG = 0x47524247,	//!< $B:8>e$+$i1&2<$K8~$+$C$F(BG, R, B, G
-	GBRG = 0x47425247,	//!< $B:8>e$+$i1&2<$K8~$+$C$F(BG, B, R, G
-	YYYY = 0x59595959	//!< $B$9$Y$F(BY(monochrome)
+	RGGB = 0x52474742,	//!< 左上から右下に向かってR, G, G, B
+	BGGR = 0x42474752,	//!< 左上から右下に向かってB, G, G, R
+	GRBG = 0x47524247,	//!< 左上から右下に向かってG, R, B, G
+	GBRG = 0x47425247,	//!< 左上から右下に向かってG, B, R, G
+	YYYY = 0x59595959	//!< すべてY(monochrome)
     };
 
   private:
@@ -615,45 +615,45 @@ class Ieee1394Camera : public Ieee1394Node
     bool		_littleEndian;	// true if MONO16 is in little endian format.
 };
 
-//! $B$3$N%+%a%i$,%5%]!<%H$9$k(BBayer$B%Q%?!<%s(B(#Bayer)$B$rJV$9(B
+//! このカメラがサポートするBayerパターン(#Bayer)を返す
 inline Ieee1394Camera::Bayer
 Ieee1394Camera::bayerTileMapping() const
 {
     return _bayer;
 }
 
-//! $B$3$N%+%a%i$N(B#MONO_16 $B%U%)!<%^%C%H$,(Blittle endian$B$G$"$k$+$rD4$Y$k(B
+//! このカメラの#MONO_16 フォーマットがlittle endianであるかを調べる
 inline bool
 Ieee1394Camera::isLittleEndian() const
 {
     return _littleEndian;
 }
 
-//! $B8=:_@_Dj$5$l$F$$$k2hA|%U%)!<%^%C%H(B(#Format)$B$NI}$rJV$9(B
+//! 現在設定されている画像フォーマット(#Format)の幅を返す
 inline u_int
 Ieee1394Camera::width() const
 {
     return _w;
 }
 
-//! $B8=:_@_Dj$5$l$F$$$k2hA|%U%)!<%^%C%H(B(#Format)$B$N9b$5$rJV$9(B
+//! 現在設定されている画像フォーマット(#Format)の高さを返す
 inline u_int
 Ieee1394Camera::height() const
 {
     return _h;
 }
 
-//! $B8=:_@_Dj$5$l$F$$$k2hA|%U%)!<%^%C%H(B(#Format)$B$N2hAG7A<0(B(#PixelFormat)$B$rJV$9(B
+//! 現在設定されている画像フォーマット(#Format)の画素形式(#PixelFormat)を返す
 inline Ieee1394Camera::PixelFormat
 Ieee1394Camera::pixelFormat() const
 {
     return _p;
 }
 
-//! $B%+%a%i$,%5%]!<%H$7$F$$$k4pK\5!G=$rJV$9(B
+//! カメラがサポートしている基本機能を返す
 /*!
-  \return	$B%5%]!<%H$5$l$F$$$k5!G=$r(B #BasicFunction $B7?$NNs5sCM$N(Bor$B$H$7$F(B
-		$BJV$9(B
+  \return	サポートされている機能を #BasicFunction 型の列挙値のorとして
+		返す
  */
 inline quadlet_t
 Ieee1394Camera::inquireBasicFunction() const
@@ -661,12 +661,12 @@ Ieee1394Camera::inquireBasicFunction() const
     return readQuadletFromRegister(0x400);
 }
 
-//! $B%+%a%i$+$i=PNO$5$l$k:G=i$N2hA|$rJ];}$9$k(B
+//! カメラから出力される最初の画像を保持する
 /*!
-  $B%+%a%i$+$i$N2hA|=PNO$O(B, continuousShot(), oneShot(), multiShot() $B$N(B
-  $B$$$:$l$+$K$h$C$F9T$o$l$k(B. $B<B:]$K2hA|%G!<%?$,<u?.$5$l$k$^$G(B, $BK\4X?t$O(B
-  $B8F$S=P$7B&$K@)8f$rJV$5$J$$(B. 
-  \return	$B$3$N(BIEEE1394$B%+%a%i%*%V%8%'%/%H(B
+  カメラからの画像出力は, continuousShot(), oneShot(), multiShot() の
+  いずれかによって行われる. 実際に画像データが受信されるまで, 本関数は
+  呼び出し側に制御を返さない. 
+  \return	このIEEE1394カメラオブジェクト
  */
 inline Ieee1394Camera&
 Ieee1394Camera::snap()
@@ -678,17 +678,17 @@ Ieee1394Camera::snap()
 }
 
 #ifdef HAVE_LIBTUTOOLS__
-//! IEEE1394$B%+%a%i$+$i=PNO$5$l$?2hA|$rD>@\E*$K<h$j9~$`(B
+//! IEEE1394カメラから出力された画像を直接的に取り込む
 /*!
-  #operator >>() $B$H$N0c$$$O(B, $B2hA|7A<0$NJQ49$r9T$o$J$$$3$H$H(B, Image<T> $B9=B$BN(B
-  $B$NCf$N%G!<%?NN0h$X$N%]%$%s%?$r(BIEEE1394$BF~NO%P%C%U%!$X$N%]%$%s%?$K=q$-49$($k(B
-  $B$3$H$K$h$C$F(B, $B<B:]$K$O%G!<%?$N%3%T!<$r9T$o$J$$$3$H$G$"$k(B. 
-  $B%F%s%W%l!<%H%Q%i%a!<%?(BT$B$O(B, $B3JG<@h$N2hA|$N2hAG7A<0$rI=$9(B. $B$J$*(B, $BK\4X?t$r(B
-  $B8F$S=P$9A0$K(B snap() $B$K$h$C$F%+%a%i$+$i$N2hA|$rJ];}$7$F$*$+$J$1$l$P$J$i$J$$(B. 
-  \param image	$B2hA|%G!<%?$r3JG<$9$k2hA|%*%V%8%'%/%H(B. $B2hA|$NI}$H9b$5$O(B, 
-		$B8=:_%+%a%i$K@_Dj$5$l$F$$$k2hA|%5%$%:$K9g$o$;$F<+F0E*$K(B
-		$B@_Dj$5$l$k(B. 
-  \return	$B$3$N(BIEEE1394$B%+%a%i%*%V%8%'%/%H(B
+  #operator >>() との違いは, 画像形式の変換を行わないことと, Image<T> 構造体
+  の中のデータ領域へのポインタをIEEE1394入力バッファへのポインタに書き換える
+  ことによって, 実際にはデータのコピーを行わないことである. 
+  テンプレートパラメータTは, 格納先の画像の画素形式を表す. なお, 本関数を
+  呼び出す前に snap() によってカメラからの画像を保持しておかなければならない. 
+  \param image	画像データを格納する画像オブジェクト. 画像の幅と高さは, 
+		現在カメラに設定されている画像サイズに合わせて自動的に
+		設定される. 
+  \return	このIEEE1394カメラオブジェクト
 */
 template <class T> const Ieee1394Camera&
 Ieee1394Camera::captureDirectly(Image<T>& image) const
@@ -701,10 +701,10 @@ Ieee1394Camera::captureDirectly(Image<T>& image) const
 }
 #endif
 
-//! $B2hA|$KKd$a9~$^$l$?;#1F;~9o$rF@$k!%(B
+//! 画像に埋め込まれた撮影時刻を得る．
 /*!
-  $BM=$a(B embedTimestamp() $B$K$h$C$F2hA|$X$N;#1F;~9oKd$a9~$_$r;X<($7$J$1$l$P$J$i$J$$!%(B
-  \return	micro second$BC10L$GI=$7$?2hA|$N;#1F;~9o(B
+  予め embedTimestamp() によって画像への撮影時刻埋め込みを指示しなければならない．
+  \return	micro second単位で表した画像の撮影時刻
 */ 
 inline u_int64_t
 Ieee1394Camera::getTimestamp() const

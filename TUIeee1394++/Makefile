@@ -1,38 +1,32 @@
 #
-#  $Id: Makefile,v 1.43 2012-08-16 02:42:25 ueshiba Exp $
+#  $Id: Makefile,v 1.44 2012-08-29 19:30:24 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include/TU
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	= -DHAVE_LIBTUTOOLS__ #-DUSE_VIDEO1394 #-DDEBUG
+CPPFLAGS	= -DHAVE_LIBTUTOOLS__ #-DUSE_VIDEO1394 -DDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CCC), icpc)
-  CFLAGS	= -O
+ifeq ($(CXX), icpc)
+  CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  ifeq ($(OSTYPE), darwin)
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  else
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  endif
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#
 #########################
 .SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -52,18 +46,6 @@ SRCS		= Ieee1394Camera.cc \
 OBJS		= Ieee1394Camera.o \
 		Ieee1394CameraArray.o \
 		Ieee1394Node.o
-
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.43 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
 
 include $(PROJECT)/lib/l.mk
 ###
