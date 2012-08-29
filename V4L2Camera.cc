@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.7 2012-07-01 23:53:47 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.8 2012-08-29 21:17:10 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -122,16 +122,16 @@ template <class S, class T> static const S*
 bayerRGGBOdd3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    YX_ZY(b, g, r)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(b, g, r)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ´ñ¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¥‡æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	XYX_YZY_XYX(r, g, b)
 	yXy_ZYZ_yXy(r, g, b)
     }
     --buf;
     --nxt;
-    YX_ZY(b, g, r)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(b, g, r)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     
     return buf + 1;
 }
@@ -140,16 +140,16 @@ template <class S, class T> static const S*
 bayerRGGBEven3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    XY_YZ(r, g, b)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(r, g, b)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ¶ö¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¶æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	yXy_ZYZ_yXy(b, g, r)
 	XYX_YZY_XYX(b, g, r)
     }
     --buf;
     --nxt;
-    XY_YZ(r, g, b)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(r, g, b)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
 
     return buf + 1;
 }
@@ -175,16 +175,16 @@ template <class S, class T> static const S*
 bayerBGGROdd3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    YX_ZY(r, g, b)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(r, g, b)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ´ñ¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¥‡æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	XYX_YZY_XYX(b, g, r)
 	yXy_ZYZ_yXy(b, g, r)
     }
     --buf;
     --nxt;
-    YX_ZY(r, g, b)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(r, g, b)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
 
     return buf + 1;
 }
@@ -193,16 +193,16 @@ template <class S, class T> static const S*
 bayerBGGREven3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    XY_YZ(b, g, r)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(b, g, r)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ¶ö¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¶æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	yXy_ZYZ_yXy(r, g, b)
 	XYX_YZY_XYX(r, g, b)
     }
     --buf;
     --nxt;
-    XY_YZ(b, g, r)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(b, g, r)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
 
     return buf + 1;
 }
@@ -228,16 +228,16 @@ template <class S, class T> static const S*
 bayerGRBGOdd3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    XY_YZ(b, g, r)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(b, g, r)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ´ñ¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¥‡æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	yXy_ZYZ_yXy(r, g, b)
 	XYX_YZY_XYX(r, g, b)
     }
     --buf;
     --nxt;
-    XY_YZ(b, g, r)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(b, g, r)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
 
     return buf + 1;
 }
@@ -246,16 +246,16 @@ template <class S, class T> static const S*
 bayerGRBGEven3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    YX_ZY(r, g, b)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(r, g, b)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ¶ö¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¶æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	XYX_YZY_XYX(b, g, r)
 	yXy_ZYZ_yXy(b, g, r)
     }
     --buf;
     --nxt;
-    YX_ZY(r, g, b)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(r, g, b)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
 
     return buf + 1;
 }
@@ -281,16 +281,16 @@ template <class S, class T> static const S*
 bayerGBRGOdd3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    XY_YZ(r, g, b)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(r, g, b)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ´ñ¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¥‡æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	yXy_ZYZ_yXy(b, g, r)
 	XYX_YZY_XYX(b, g, r)
     }
     --buf;
     --nxt;
-    XY_YZ(r, g, b)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    XY_YZ(r, g, b)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
 
     return buf + 1;
 }
@@ -299,16 +299,16 @@ template <class S, class T> static const S*
 bayerGBRGEven3x3(const S* buf, T* rgb, int w)
 {
     const S	*nxt = buf + w;			// next line
-    YX_ZY(b, g, r)				// º¸Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(b, g, r)				// å·¦ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
     const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// ¶ö¿ô¹ÔÃæ´Ö¤ÎÎó¤ò½èÍı
+    while ((w -= 2) > 0)			// å¶æ•°è¡Œä¸­é–“ã®åˆ—ã‚’å‡¦ç†
     {
 	XYX_YZY_XYX(r, g, b)
 	yXy_ZYZ_yXy(r, g, b)
     }
     --buf;
     --nxt;
-    YX_ZY(b, g, r)				// ±¦Ã¼¤Î²èÁÇ¤Ï2x2¤Ç½èÍı
+    YX_ZY(b, g, r)				// å³ç«¯ã®ç”»ç´ ã¯2x2ã§å‡¦ç†
 
     return buf + 1;
 }
@@ -331,9 +331,9 @@ v4l2_get_fd(const char* dev)
 /*
  *  public member functions
  */
-//! Video for Linux v.2 ¥«¥á¥é¥Î¡¼¥É¤òÀ¸À®¤¹¤ë
+//! Video for Linux v.2 ã‚«ãƒ¡ãƒ©ãƒãƒ¼ãƒ‰ã‚’ç”Ÿæˆã™ã‚‹
 /*!
-  \param dev	¥Ç¥Ğ¥¤¥¹Ì¾
+  \param dev	ãƒ‡ãƒã‚¤ã‚¹å
 */
 V4L2Camera::V4L2Camera(const char* dev)
     :_fd(v4l2_get_fd(dev)), _formats(), _controls(),
@@ -342,15 +342,15 @@ V4L2Camera::V4L2Camera(const char* dev)
 {
     using namespace	std;
 
-    enumerateFormats();		// ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¡¤²èÁü¥µ¥¤¥º¡¤¥Õ¥ì¡¼¥à¥ì¡¼¥È
-    enumerateControls();	// ¥«¥á¥é¤Î¥³¥ó¥È¥í¡¼¥ë=Â°À­
+    enumerateFormats();		// ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆï¼Œç”»åƒã‚µã‚¤ã‚ºï¼Œãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ
+    enumerateControls();	// ã‚«ãƒ¡ãƒ©ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«=å±æ€§
 
-  // ¤³¤Î¥«¥á¥é¤Î¤É¤Î²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤âËÜ¥é¥¤¥Ö¥é¥ê¤ÇÌ¤¥µ¥İ¡¼¥È¤Ê¤é¤ĞÎã³°¤òÁ÷½Ğ
+  // ã“ã®ã‚«ãƒ¡ãƒ©ã®ã©ã®ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚‚æœ¬ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§æœªã‚µãƒãƒ¼ãƒˆãªã‚‰ã°ä¾‹å¤–ã‚’é€å‡º
     PixelFormatRange	pixelFormats = availablePixelFormats();
     if (pixelFormats.first == pixelFormats.second)
 	throw runtime_error("V4L2Camera::V4L2Camera(): no available pixel formats!");
     
-  // ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤È²èÁü¥µ¥¤¥º¤ª¤è¤Ó¥Õ¥ì¡¼¥à¥ì¡¼¥È¤Î¸½ºßÃÍ¤ò¼èÆÀ
+  // ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¨ç”»åƒã‚µã‚¤ã‚ºãŠã‚ˆã³ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã®ç¾åœ¨å€¤ã‚’å–å¾—
     v4l2_format	fmt;
     memset(&fmt, 0, sizeof(fmt));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -362,10 +362,10 @@ V4L2Camera::V4L2Camera(const char* dev)
     u_int	fps_n, fps_d;
     getFrameRate(fps_n, fps_d);
 
-  // ¥«¥á¥é¤Ë¸½ºß¥»¥Ã¥È¤µ¤ì¤Æ¤¤¤ë²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤¬ËÜ¥é¥¤¥Ö¥é¥ê¤ÇÌ¤¥µ¥İ¡¼¥È¤Ê¤é¤Ğ¡¤
-  // ¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ë1ÈÖÌÜ¤Î²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤Ë¥»¥Ã¥È¤·¡¤²èÁü¥µ¥¤¥º¤ò¤½¤Î¥Õ¥©¡¼
-  // ¥Ş¥Ã¥È¤Ë¤ª¤±¤ëºÇÂçÃÍ¤Ë¤¹¤ë¡¥¤Ş¤¿¡¤¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ò¤½¤Î²èÁü¥µ¥¤¥º¤Ë¤ª¤±¤ëºÇÂçÃÍ
-  // ¤Ë¤¹¤ë¡¥
+  // ã‚«ãƒ¡ãƒ©ã«ç¾åœ¨ã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã‚‹ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒæœ¬ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§æœªã‚µãƒãƒ¼ãƒˆãªã‚‰ã°ï¼Œ
+  // ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹1ç•ªç›®ã®ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã«ã‚»ãƒƒãƒˆã—ï¼Œç”»åƒã‚µã‚¤ã‚ºã‚’ãã®ãƒ•ã‚©ãƒ¼
+  // ãƒãƒƒãƒˆã«ãŠã‘ã‚‹æœ€å¤§å€¤ã«ã™ã‚‹ï¼ã¾ãŸï¼Œãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’ãã®ç”»åƒã‚µã‚¤ã‚ºã«ãŠã‘ã‚‹æœ€å¤§å€¤
+  // ã«ã™ã‚‹ï¼
     if (_pixelFormat == UNKNOWN_PIXEL_FORMAT)
     {
 	_pixelFormat = *pixelFormats.first;
@@ -379,11 +379,11 @@ V4L2Camera::V4L2Camera(const char* dev)
 	fps_d = frameRate.fps_d.max;
     }
     
-  // ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¡¤²èÁü¥µ¥¤¥º¡¤¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ò¥»¥Ã¥È
+  // ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆï¼Œç”»åƒã‚µã‚¤ã‚ºï¼Œãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’ã‚»ãƒƒãƒˆ
     setFormat(_pixelFormat, _width, _height, fps_n, fps_d);
 }
 
-//! Video for Linux v.2¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È¤òÇË²õ¤¹¤ë
+//! Video for Linux v.2ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç ´å£Šã™ã‚‹
 V4L2Camera::~V4L2Camera()
 {
     stopContinuousShot();
@@ -393,10 +393,10 @@ V4L2Camera::~V4L2Camera()
 /*
  *  Format stuffs.
  */
-//! »ØÄê¤µ¤ì¤¿²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤¬¤³¤Î¥«¥á¥é¤Ç¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ë¤«Ä´¤Ù¤ë
+//! æŒ‡å®šã•ã‚ŒãŸç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒã“ã®ã‚«ãƒ¡ãƒ©ã§ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹
 /*!
-  \param pixelFormat	¥µ¥İ¡¼¥È¤ÎÍ­Ìµ¤òÄ´¤Ù¤¿¤¤²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È
-  \return		¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ì¤Ğtrue¡¤¤½¤¦¤Ç¤Ê¤±¤ì¤Ğfalse
+  \param pixelFormat	ã‚µãƒãƒ¼ãƒˆã®æœ‰ç„¡ã‚’èª¿ã¹ãŸã„ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+  \return		ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚Œã°trueï¼Œãã†ã§ãªã‘ã‚Œã°false
 */
 bool
 V4L2Camera::isAvailable(PixelFormat pixelFormat) const
@@ -409,14 +409,14 @@ V4L2Camera::isAvailable(PixelFormat pixelFormat) const
     return false;
 }
 
-//! ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¡¤²èÁü¥µ¥¤¥º¤ª¤è¤Ó¥Õ¥ì¡¼¥à¥ì¡¼¥È¤òÀßÄê¤¹¤ë
+//! ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆï¼Œç”»åƒã‚µã‚¤ã‚ºãŠã‚ˆã³ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹
 /*!
-  \param pixelFormat	ÀßÄê¤·¤¿¤¤²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È
-  \param width		ÀßÄê¤·¤¿¤¤²èÁüÉı
-  \param height		ÀßÄê¤·¤¿¤¤²èÁü¹â¤µ
-  \param fps_n		ÀßÄê¤·¤¿¤¤¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ÎÊ¬»Ò
-  \param fps_d		ÀßÄê¤·¤¿¤¤¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ÎÊ¬Êì
-  \return		¤³¤Î¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  \param pixelFormat	è¨­å®šã—ãŸã„ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+  \param width		è¨­å®šã—ãŸã„ç”»åƒå¹…
+  \param height		è¨­å®šã—ãŸã„ç”»åƒé«˜ã•
+  \param fps_n		è¨­å®šã—ãŸã„ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã®åˆ†å­
+  \param fps_d		è¨­å®šã—ãŸã„ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã®åˆ†æ¯
+  \return		ã“ã®ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 V4L2Camera&
 V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
@@ -424,7 +424,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
 {
     using namespace	std;
 
-  // »ØÄê¤µ¤ì¤¿²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¡¤²èÁü¥µ¥¤¥º¡¤¥Õ¥ì¡¼¥à´Ö³Ö¤ÎÁÈ¤ß¹ç¤ï¤»¤¬Í­¸ú¤«¥Á¥§¥Ã¥¯
+  // æŒ‡å®šã•ã‚ŒãŸç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆï¼Œç”»åƒã‚µã‚¤ã‚ºï¼Œãƒ•ãƒ¬ãƒ¼ãƒ é–“éš”ã®çµ„ã¿åˆã‚ã›ãŒæœ‰åŠ¹ã‹ãƒã‚§ãƒƒã‚¯
     BOOST_FOREACH (const FrameSize& frameSize,
 		   availableFrameSizes(pixelFormat))
     {
@@ -443,11 +443,11 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
     
     throw invalid_argument("V4L2Camera::setFormat() illegal combination of pixel format, frame size and frame rate!! ");
 
-  // ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤È²èÁü¥µ¥¤¥º¤òÀßÄê
+  // ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¨ç”»åƒã‚µã‚¤ã‚ºã‚’è¨­å®š
   ok:
     const bool	cont = inContinuousShot();
-    if (cont)			// ²èÁü¤ò½ĞÎÏÃæ¤Ç¤¢¤ì¤Ğ...
-	stopContinuousShot();	// »ß¤á¤ë
+    if (cont)			// ç”»åƒã‚’å‡ºåŠ›ä¸­ã§ã‚ã‚Œã°...
+	stopContinuousShot();	// æ­¢ã‚ã‚‹
 
     unmapBuffers();
     
@@ -463,7 +463,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
     _height	 = fmt.fmt.pix.height;
     _pixelFormat = uintToPixelFormat(fmt.fmt.pix.pixelformat);
 
-  // ¥Õ¥ì¡¼¥à´Ö³Ö¤òÀßÄê
+  // ãƒ•ãƒ¬ãƒ¼ãƒ é–“éš”ã‚’è¨­å®š
     v4l2_streamparm	streamparm;
     streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     streamparm.parm.capture.timeperframe.numerator   = fps_n;
@@ -471,19 +471,19 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
     if (ioctl(VIDIOC_S_PARM, &streamparm))
 	throw runtime_error(string("V4L2Camera::setFormat(): VIDIOC_S_PARM failed!! ") + strerror(errno));
 
-  // ¥Ğ¥Ã¥Õ¥¡¤ò¥Ş¥Ã¥×
+  // ãƒãƒƒãƒ•ã‚¡ã‚’ãƒãƒƒãƒ—
     mapBuffers(NB_BUFFERS);
     
-    if (cont)			// ²èÁü¤ò½ĞÎÏÃæ¤À¤Ã¤¿¤Ê¤é...
-	continuousShot();	// ºÆ¤Ó½ĞÎÏ¤µ¤»¤ë
+    if (cont)			// ç”»åƒã‚’å‡ºåŠ›ä¸­ã ã£ãŸãªã‚‰...
+	continuousShot();	// å†ã³å‡ºåŠ›ã•ã›ã‚‹
 
     return *this;
 }
 
-//! ¸½ºß¥«¥á¥é¤ËÀßÄê¤µ¤ì¤Æ¤¤¤ë¥Õ¥ì¡¼¥à¥ì¡¼¥È¤òÊÖ¤¹
+//! ç¾åœ¨ã‚«ãƒ¡ãƒ©ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’è¿”ã™
 /*!
-  \param fps_n	ÀßÄê¤µ¤ì¤Æ¤¤¤ë¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ÎÊ¬»Ò¤¬ÊÖ¤µ¤ì¤ë
-  \param fps_d	ÀßÄê¤µ¤ì¤Æ¤¤¤ë¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ÎÊ¬Êì¤¬ÊÖ¤µ¤ì¤ë
+  \param fps_n	è¨­å®šã•ã‚Œã¦ã„ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã®åˆ†å­ãŒè¿”ã•ã‚Œã‚‹
+  \param fps_d	è¨­å®šã•ã‚Œã¦ã„ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã®åˆ†æ¯ãŒè¿”ã•ã‚Œã‚‹
 */
 void
 V4L2Camera::getFrameRate(u_int& fps_n, u_int& fps_d) const
@@ -501,10 +501,10 @@ V4L2Camera::getFrameRate(u_int& fps_n, u_int& fps_d) const
 /*
  *  Feature stuffs.
  */
-//! »ØÄê¤µ¤ì¤¿Â°À­¤¬¤³¤Î¥«¥á¥é¤Ç¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ë¤«Ä´¤Ù¤ë
+//! æŒ‡å®šã•ã‚ŒãŸå±æ€§ãŒã“ã®ã‚«ãƒ¡ãƒ©ã§ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹
 /*!
-  \param feature	¥µ¥İ¡¼¥È¤ÎÍ­Ìµ¤òÄ´¤Ù¤¿¤¤Â°À­
-  \return		¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ì¤Ğtrue¡¤¤½¤¦¤Ç¤Ê¤±¤ì¤Ğfalse
+  \param feature	ã‚µãƒãƒ¼ãƒˆã®æœ‰ç„¡ã‚’èª¿ã¹ãŸã„å±æ€§
+  \return		ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚Œã°trueï¼Œãã†ã§ãªã‘ã‚Œã°false
 */
 bool
 V4L2Camera::isAvailable(Feature feature) const
@@ -516,11 +516,11 @@ V4L2Camera::isAvailable(Feature feature) const
     return false;
 }
     
-//! »ØÄê¤µ¤ì¤¿Â°À­¤ÎÃÍ¤òÀßÄê¤¹¤ë
+//! æŒ‡å®šã•ã‚ŒãŸå±æ€§ã®å€¤ã‚’è¨­å®šã™ã‚‹
 /*!
-  \param feature	ÃÍ¤òÀßÄê¤·¤¿¤¤Â°À­
-  \param value		ÀßÄê¤¹¤ëÃÍ
-  \return		¤³¤Î¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  \param feature	å€¤ã‚’è¨­å®šã—ãŸã„å±æ€§
+  \param value		è¨­å®šã™ã‚‹å€¤
+  \return		ã“ã®ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 V4L2Camera&
 V4L2Camera::setValue(Feature feature, int value)
@@ -547,10 +547,10 @@ V4L2Camera::setValue(Feature feature, int value)
     return *this;
 }
     
-//! »ØÄê¤µ¤ì¤¿Â°À­¤Î¸½ºß¤ÎÃÍ¤òÄ´¤Ù¤ë
+//! æŒ‡å®šã•ã‚ŒãŸå±æ€§ã®ç¾åœ¨ã®å€¤ã‚’èª¿ã¹ã‚‹
 /*!
-  \param feature	ÂĞ¾İ¤È¤Ê¤ëÂ°À­
-  \return		¸½ºß¤ÎÃÍ
+  \param feature	å¯¾è±¡ã¨ãªã‚‹å±æ€§
+  \return		ç¾åœ¨ã®å€¤
 */
 int
 V4L2Camera::getValue(Feature feature) const
@@ -570,12 +570,12 @@ V4L2Camera::getValue(Feature feature) const
     return ctrl.value;
 }
     
-//! »ØÄê¤µ¤ì¤¿Â°À­¤¬¤È¤êÆÀ¤ëÃÍ¤ÎÈÏ°Ï¤ÈÊÑ²½¹ï¤ß¤òÄ´¤Ù¤ë
+//! æŒ‡å®šã•ã‚ŒãŸå±æ€§ãŒã¨ã‚Šå¾—ã‚‹å€¤ã®ç¯„å›²ã¨å¤‰åŒ–åˆ»ã¿ã‚’èª¿ã¹ã‚‹
 /*!
-  \param feature	ÂĞ¾İ¤È¤Ê¤ëÂ°À­
-  \param min		¤È¤êÆÀ¤ëÃÍ¤ÎºÇ¾®ÃÍ¤¬ÊÖ¤µ¤ì¤ë. 
-  \param max		¤È¤êÆÀ¤ëÃÍ¤ÎºÇÂçÃÍ¤¬ÊÖ¤µ¤ì¤ë. 
-  \param step		ÃÍ¤ÎÊÑ²½¹ï¤ß¤¬ÊÖ¤µ¤ì¤ë. 
+  \param feature	å¯¾è±¡ã¨ãªã‚‹å±æ€§
+  \param min		ã¨ã‚Šå¾—ã‚‹å€¤ã®æœ€å°å€¤ãŒè¿”ã•ã‚Œã‚‹. 
+  \param max		ã¨ã‚Šå¾—ã‚‹å€¤ã®æœ€å¤§å€¤ãŒè¿”ã•ã‚Œã‚‹. 
+  \param step		å€¤ã®å¤‰åŒ–åˆ»ã¿ãŒè¿”ã•ã‚Œã‚‹. 
 */
 void
 V4L2Camera::getMinMaxStep(Feature feature, int& min, int& max, int& step) const
@@ -590,9 +590,9 @@ V4L2Camera::getMinMaxStep(Feature feature, int& min, int& max, int& step) const
 /*
  *  Capture stuffs.
  */
-//! ¥«¥á¥é¤«¤é¤Î²èÁü¤ÎÏ¢Â³Åª½ĞÎÏ¤ò³«»Ï¤¹¤ë
+//! ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®ç”»åƒã®é€£ç¶šçš„å‡ºåŠ›ã‚’é–‹å§‹ã™ã‚‹
 /*!
-  \return	¤³¤Î¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 V4L2Camera&
 V4L2Camera::continuousShot()
@@ -611,9 +611,9 @@ V4L2Camera::continuousShot()
     return *this;
 }
 
-//! ¥«¥á¥é¤«¤é¤Î²èÁü¤ÎÏ¢Â³Åª½ĞÎÏ¤òÄä»ß¤¹¤ë
+//! ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®ç”»åƒã®é€£ç¶šçš„å‡ºåŠ›ã‚’åœæ­¢ã™ã‚‹
 /*!
-  \return	¤³¤Î¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 V4L2Camera&
 V4L2Camera::stopContinuousShot()
@@ -634,28 +634,28 @@ V4L2Camera::stopContinuousShot()
 }
 
 #ifdef HAVE_LIBTUTOOLS__
-//! IEEE1394¥«¥á¥é¤«¤é½ĞÎÏ¤µ¤ì¤¿²èÁü1ËçÊ¬¤Î¥Ç¡¼¥¿¤òÅ¬Åö¤Ê·Á¼°¤ËÊÑ´¹¤·¤Æ¼è¤ê¹ş¤à
+//! IEEE1394ã‚«ãƒ¡ãƒ©ã‹ã‚‰å‡ºåŠ›ã•ã‚ŒãŸç”»åƒ1æšåˆ†ã®ãƒ‡ãƒ¼ã‚¿ã‚’é©å½“ãªå½¢å¼ã«å¤‰æ›ã—ã¦å–ã‚Šè¾¼ã‚€
 /*!
-  ¥Æ¥ó¥×¥ì¡¼¥È¥Ñ¥é¥á¡¼¥¿T¤Ï, ³ÊÇ¼Àè¤Î²èÁü¤Î²èÁÇ·Á¼°¤òÉ½¤¹. ¤Ê¤ª, ËÜ´Ø¿ô¤ò
-  ¸Æ¤Ó½Ğ¤¹Á°¤Ë #snap() ¤Ë¤è¤Ã¤Æ¥«¥á¥é¤«¤é¤Î²èÁü¤òÊİ»ı¤·¤Æ¤ª¤«¤Ê¤±¤ì¤Ğ¤Ê¤é¤Ê¤¤.
-  \param image	²èÁü¥Ç¡¼¥¿¤ò³ÊÇ¼¤¹¤ë²èÁü¥ª¥Ö¥¸¥§¥¯¥È. ²èÁü¤ÎÉı¤È¹â¤µ¤Ï, 
-		¸½ºß¥«¥á¥é¤ËÀßÄê¤µ¤ì¤Æ¤¤¤ë²èÁü¥µ¥¤¥º¤Ë¹ç¤ï¤»¤Æ¼«Æ°Åª¤Ë
-		ÀßÄê¤µ¤ì¤ë. ¤Ş¤¿, ¥«¥á¥é¤ËÀßÄê¤µ¤ì¤¿¥Õ¥©¡¼¥Ş¥Ã¥È¤Î²èÁÇ·Á¼°
-		¤¬²èÁü¤Î¤½¤ì¤Ë°ìÃ×¤·¤Ê¤¤¾ì¹ç¤Ï, ¼«Æ°Åª¤ËÊÑ´¹¤¬¹Ô¤ï¤ì¤ë.
-		¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ë²èÁÇ·Á¼°T¤Ï, u_char, short, float, double,
+  ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿Tã¯, æ ¼ç´å…ˆã®ç”»åƒã®ç”»ç´ å½¢å¼ã‚’è¡¨ã™. ãªãŠ, æœ¬é–¢æ•°ã‚’
+  å‘¼ã³å‡ºã™å‰ã« #snap() ã«ã‚ˆã£ã¦ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®ç”»åƒã‚’ä¿æŒã—ã¦ãŠã‹ãªã‘ã‚Œã°ãªã‚‰ãªã„.
+  \param image	ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹ç”»åƒã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ. ç”»åƒã®å¹…ã¨é«˜ã•ã¯, 
+		ç¾åœ¨ã‚«ãƒ¡ãƒ©ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹ç”»åƒã‚µã‚¤ã‚ºã«åˆã‚ã›ã¦è‡ªå‹•çš„ã«
+		è¨­å®šã•ã‚Œã‚‹. ã¾ãŸ, ã‚«ãƒ¡ãƒ©ã«è¨­å®šã•ã‚ŒãŸãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®ç”»ç´ å½¢å¼
+		ãŒç”»åƒã®ãã‚Œã«ä¸€è‡´ã—ãªã„å ´åˆã¯, è‡ªå‹•çš„ã«å¤‰æ›ãŒè¡Œã‚ã‚Œã‚‹.
+		ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ç”»ç´ å½¢å¼Tã¯, u_char, short, float, double,
 		RGB, RGBA, BGR,	ABGR, YUV444, YUV422, YUYV422, YUV411
-		¤Î¤¤¤º¤ì¤«¤Ç¤¢¤ë.	¤Ş¤¿, ¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ëÊÑ´¹¤Ï°Ê²¼¤Î¤È¤ª¤ê¤Ç¤¢¤ê,
-		¥«¥á¥é¤Î²èÁÇ·Á¼°¤¬¤³¤ì°Ê³°¤ËÀßÄê¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¤Ïstd::domain_error
-		Îã³°¤¬Á÷½Ğ¤µ¤ì¤ë.
-		    -# #BGR24 -> T (YUV422, YUYV422, YUV411 ¤ò½ü¤¯)
-		    -# #RGB24 -> T (YUV422, YUYV422, YUV411 ¤ò½ü¤¯) 
-		    -# #BGR32 -> T (YUV422, YUYV422, YUV411 ¤ò½ü¤¯) 
-		    -# #RGB32 -> T (YUV422, YUYV422, YUV411 ¤ò½ü¤¯) 
+		ã®ã„ãšã‚Œã‹ã§ã‚ã‚‹.	ã¾ãŸ, ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹å¤‰æ›ã¯ä»¥ä¸‹ã®ã¨ãŠã‚Šã§ã‚ã‚Š,
+		ã‚«ãƒ¡ãƒ©ã®ç”»ç´ å½¢å¼ãŒã“ã‚Œä»¥å¤–ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯std::domain_error
+		ä¾‹å¤–ãŒé€å‡ºã•ã‚Œã‚‹.
+		    -# #BGR24 -> T (YUV422, YUYV422, YUV411 ã‚’é™¤ã)
+		    -# #RGB24 -> T (YUV422, YUYV422, YUV411 ã‚’é™¤ã) 
+		    -# #BGR32 -> T (YUV422, YUYV422, YUV411 ã‚’é™¤ã) 
+		    -# #RGB32 -> T (YUV422, YUYV422, YUV411 ã‚’é™¤ã) 
 		    -# #GREY -> T
 		    -# #Y16 -> T
 		    -# #YUYV -> T
 		    -# #UYVY -> T
-  \return	¤³¤ÎIEEE1394¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  \return	ã“ã®IEEE1394ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 template <class T> const V4L2Camera&
 V4L2Camera::operator >>(Image<T>& image) const
@@ -740,22 +740,22 @@ V4L2Camera::operator >>(Image<T>& image) const
     return *this;
 }
 
-//! ¥«¥á¥é¤«¤é½ĞÎÏ¤µ¤ì¤¿²èÁü¤òRGB·Á¼°¥«¥é¡¼²èÁü¤È¤·¤Æ¼è¤ê¹ş¤à
+//! ã‚«ãƒ¡ãƒ©ã‹ã‚‰å‡ºåŠ›ã•ã‚ŒãŸç”»åƒã‚’RGBå½¢å¼ã‚«ãƒ©ãƒ¼ç”»åƒã¨ã—ã¦å–ã‚Šè¾¼ã‚€
 /*!
-  #operator >>() ¤È¤Î°ã¤¤¤Ï, #PixelFormat ¤¬bayer¥Ñ¥¿¡¼¥ó¤Ç¤¢¤ë¾ì¹ç,
-  RGB·Á¼°¤Ø¤ÎÊÑ´¹¤ò¹Ô¤¦¤³¤È¤Ç¤¢¤ë. ¥Æ¥ó¥×¥ì¡¼¥È¥Ñ¥é¥á¡¼¥¿T¤Ï, ³ÊÇ¼Àè¤Î²èÁü¤Î
-  ²èÁÇ·Á¼°¤òÉ½¤¹. ¤Ê¤ª, ËÜ´Ø¿ô¤ò¸Æ¤Ó½Ğ¤¹Á°¤Ë #snap() ¤Ë¤è¤Ã¤Æ¥«¥á¥é¤«¤é¤Î
-  ²èÁü¤òÊİ»ı¤·¤Æ¤ª¤«¤Ê¤±¤ì¤Ğ¤Ê¤é¤Ê¤¤.
-  \param image	²èÁü¥Ç¡¼¥¿¤ò³ÊÇ¼¤¹¤ë²èÁü¥ª¥Ö¥¸¥§¥¯¥È. ²èÁü¤ÎÉı¤È¹â¤µ¤Ï,
-		¸½ºß¥«¥á¥é¤ËÀßÄê¤µ¤ì¤Æ¤¤¤ë²èÁü¥µ¥¤¥º¤Ë¹ç¤ï¤»¤Æ¼«Æ°Åª¤Ë
-		ÀßÄê¤µ¤ì¤ë. ¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ë²èÁÇ·Á¼°T¤Ï RGB, RGBA,
-		BGR, ABGR ¤Î¤¤¤º¤ì¤«¤Ç¤¢¤ë. ¤Ş¤¿, ¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤ëÊÑ´¹¤Ï
-		°Ê²¼¤Î¤È¤ª¤ê¤Ç¤¢¤ê, ¥«¥á¥é¤Î²èÁÇ·Á¼°¤¬¤³¤ì°Ê³°¤ËÀßÄê¤µ¤ì¤Æ¤¤¤ë
-		¾ì¹ç¤Ïstd::domain_errorÎã³°¤¬Á÷½Ğ¤µ¤ì¤ë.
+  #operator >>() ã¨ã®é•ã„ã¯, #PixelFormat ãŒbayerãƒ‘ã‚¿ãƒ¼ãƒ³ã§ã‚ã‚‹å ´åˆ,
+  RGBå½¢å¼ã¸ã®å¤‰æ›ã‚’è¡Œã†ã“ã¨ã§ã‚ã‚‹. ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿Tã¯, æ ¼ç´å…ˆã®ç”»åƒã®
+  ç”»ç´ å½¢å¼ã‚’è¡¨ã™. ãªãŠ, æœ¬é–¢æ•°ã‚’å‘¼ã³å‡ºã™å‰ã« #snap() ã«ã‚ˆã£ã¦ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®
+  ç”»åƒã‚’ä¿æŒã—ã¦ãŠã‹ãªã‘ã‚Œã°ãªã‚‰ãªã„.
+  \param image	ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹ç”»åƒã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ. ç”»åƒã®å¹…ã¨é«˜ã•ã¯,
+		ç¾åœ¨ã‚«ãƒ¡ãƒ©ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹ç”»åƒã‚µã‚¤ã‚ºã«åˆã‚ã›ã¦è‡ªå‹•çš„ã«
+		è¨­å®šã•ã‚Œã‚‹. ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ç”»ç´ å½¢å¼Tã¯ RGB, RGBA,
+		BGR, ABGR ã®ã„ãšã‚Œã‹ã§ã‚ã‚‹. ã¾ãŸ, ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹å¤‰æ›ã¯
+		ä»¥ä¸‹ã®ã¨ãŠã‚Šã§ã‚ã‚Š, ã‚«ãƒ¡ãƒ©ã®ç”»ç´ å½¢å¼ãŒã“ã‚Œä»¥å¤–ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹
+		å ´åˆã¯std::domain_errorä¾‹å¤–ãŒé€å‡ºã•ã‚Œã‚‹.
 		    -# #SBGGR8 -> T
 		    -# #SGBRG8 -> T
 		    -# #SGRBG8 -> T
-  \return	¤³¤Î¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 template <class T> const V4L2Camera&
 V4L2Camera::captureRGBImage(Image<T>& image) const
@@ -773,7 +773,7 @@ V4L2Camera::captureRGBImage(Image<T>& image) const
       {
 	const u_char*	p = bayerBGGR2x2(img, &image[0][0], width());
 	int		v = 1;
-	while (v < image.height() - 1)	// Ãæ´Ö¤Î¹Ô¤ò½èÍı
+	while (v < image.height() - 1)	// ä¸­é–“ã®è¡Œã‚’å‡¦ç†
 	{
 	    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
 	    p = bayerBGGREven3x3(p, &image[v++][0], width());
@@ -786,7 +786,7 @@ V4L2Camera::captureRGBImage(Image<T>& image) const
       {
 	const u_char*	p = bayerGBRG2x2(img, &image[0][0], width());
 	int		v = 1;
-	while (v < image.height() - 1)	// Ãæ´Ö¤Î¹Ô¤ò½èÍı
+	while (v < image.height() - 1)	// ä¸­é–“ã®è¡Œã‚’å‡¦ç†
 	{
 	    p = bayerGBRGOdd3x3 (p, &image[v++][0], width());
 	    p = bayerGBRGEven3x3(p, &image[v++][0], width());
@@ -799,7 +799,7 @@ V4L2Camera::captureRGBImage(Image<T>& image) const
       {
 	const u_char*	p = bayerGRBG2x2(img, &image[0][0], width());
 	int		v = 1;
-	while (v < image.height() - 1)	// Ãæ´Ö¤Î¹Ô¤ò½èÍı
+	while (v < image.height() - 1)	// ä¸­é–“ã®è¡Œã‚’å‡¦ç†
 	{
 	    p = bayerGRBGOdd3x3 (p, &image[v++][0], width());
 	    p = bayerGRBGEven3x3(p, &image[v++][0], width());
@@ -822,14 +822,14 @@ struct RGB
 };
 #endif	// HAVE_LIBTUTOOLS__
 
-//! ¥«¥á¥é¤«¤é½ĞÎÏ¤µ¤ì¤¿²èÁü1ËçÊ¬¤Î¥Ç¡¼¥¿¤ò¤Ê¤ó¤éÊÑ´¹¤ò¹Ô¤ï¤º¤Ë¼è¤ê¹ş¤à
+//! ã‚«ãƒ¡ãƒ©ã‹ã‚‰å‡ºåŠ›ã•ã‚ŒãŸç”»åƒ1æšåˆ†ã®ãƒ‡ãƒ¼ã‚¿ã‚’ãªã‚“ã‚‰å¤‰æ›ã‚’è¡Œã‚ãšã«å–ã‚Šè¾¼ã‚€
 /*!
-  ËÜ´Ø¿ô¤ò¸Æ¤Ó½Ğ¤¹Á°¤Ë #snap() ¤Ë¤è¤Ã¤Æ¥«¥á¥é¤«¤é¤Î²èÁü¤òÊİ»ı¤·¤Æ¤ª¤«¤Ê¤±¤ì¤Ğ
-  ¤Ê¤é¤Ê¤¤.
-  \param image	²èÁü¥Ç¡¼¥¿¤Î³ÊÇ¼ÎÎ°è¤Ø¤Î¥İ¥¤¥ó¥¿. #width(), #height() ¤ª¤è¤Ó
-		#pixelFormat() ¤òÍÑ¤¤¤Æ²èÁü¤Î¥µ¥¤¥º¤È²èÁÇ¤Î·Á¼°¤òÄ´¤Ù¤Æ
-		²èÁü1ËçÊ¬¤ÎÎÎ°è¤ò³ÎÊİ¤·¤Æ¤ª¤¯¤Î¤Ï, ¥æ¡¼¥¶¤ÎÀÕÇ¤¤Ç¤¢¤ë.
-  \return	¤³¤Î¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  æœ¬é–¢æ•°ã‚’å‘¼ã³å‡ºã™å‰ã« #snap() ã«ã‚ˆã£ã¦ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®ç”»åƒã‚’ä¿æŒã—ã¦ãŠã‹ãªã‘ã‚Œã°
+  ãªã‚‰ãªã„.
+  \param image	ç”»åƒãƒ‡ãƒ¼ã‚¿ã®æ ¼ç´é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿. #width(), #height() ãŠã‚ˆã³
+		#pixelFormat() ã‚’ç”¨ã„ã¦ç”»åƒã®ã‚µã‚¤ã‚ºã¨ç”»ç´ ã®å½¢å¼ã‚’èª¿ã¹ã¦
+		ç”»åƒ1æšåˆ†ã®é ˜åŸŸã‚’ç¢ºä¿ã—ã¦ãŠãã®ã¯, ãƒ¦ãƒ¼ã‚¶ã®è²¬ä»»ã§ã‚ã‚‹.
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 const V4L2Camera&
 V4L2Camera::captureRaw(void* image) const
@@ -841,17 +841,17 @@ V4L2Camera::captureRaw(void* image) const
     return *this;
 }
 
-//! ¥«¥á¥é¤«¤é½ĞÎÏ¤µ¤ì¤¿Bayer¥Ñ¥¿¡¼¥ó²èÁü1ËçÊ¬¤Î¥Ç¡¼¥¿¤òRGB·Á¼°¤ËÊÑ´¹¤·¤Æ¼è¤ê¹ş¤à
+//! ã‚«ãƒ¡ãƒ©ã‹ã‚‰å‡ºåŠ›ã•ã‚ŒãŸBayerãƒ‘ã‚¿ãƒ¼ãƒ³ç”»åƒ1æšåˆ†ã®ãƒ‡ãƒ¼ã‚¿ã‚’RGBå½¢å¼ã«å¤‰æ›ã—ã¦å–ã‚Šè¾¼ã‚€
 /*!
-  ËÜ´Ø¿ô¤ò¸Æ¤Ó½Ğ¤¹Á°¤Ë #snap() ¤Ë¤è¤Ã¤Æ¥«¥á¥é¤«¤é¤Î²èÁü¤òÊİ»ı¤·¤Æ¤ª¤«¤Ê¤±¤ì¤Ğ
-  ¤Ê¤é¤Ê¤¤.
-  \param image	²èÁü¥Ç¡¼¥¿¤Î³ÊÇ¼ÎÎ°è¤Ø¤Î¥İ¥¤¥ó¥¿. #width(), #height() ¤ª¤è¤Ó
-		#pixelFormat() ¤òÍÑ¤¤¤Æ²èÁü¤Î¥µ¥¤¥º¤È²èÁÇ¤Î·Á¼°¤òÄ´¤Ù¤Æ
-		²èÁü1ËçÊ¬¤ÎÎÎ°è¤ò³ÎÊİ¤·¤Æ¤ª¤¯¤Î¤Ï, ¥æ¡¼¥¶¤ÎÀÕÇ¤¤Ç¤¢¤ë.
-		²èÁü¥Ç¡¼¥¿¤Ï, ³Æ²èÁÇËè¤Ë R, G, B (³Æ 1 byte)¤Î½ç¤Ç³ÊÇ¼¤µ¤ì
-		¤ë. ¥«¥á¥é¤Î²èÁÇ·Á¼°¤¬ #SBGGR8, #SGRBG8, #SGBRG8 °Ê³°¤ËÀßÄê¤µ¤ì
-		¤Æ¤¤¤ë¾ì¹ç¤Ïstd::domain_errorÎã³°¤¬Á÷½Ğ¤µ¤ì¤ë.
-  \return	¤³¤Î¥«¥á¥é¥ª¥Ö¥¸¥§¥¯¥È
+  æœ¬é–¢æ•°ã‚’å‘¼ã³å‡ºã™å‰ã« #snap() ã«ã‚ˆã£ã¦ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®ç”»åƒã‚’ä¿æŒã—ã¦ãŠã‹ãªã‘ã‚Œã°
+  ãªã‚‰ãªã„.
+  \param image	ç”»åƒãƒ‡ãƒ¼ã‚¿ã®æ ¼ç´é ˜åŸŸã¸ã®ãƒã‚¤ãƒ³ã‚¿. #width(), #height() ãŠã‚ˆã³
+		#pixelFormat() ã‚’ç”¨ã„ã¦ç”»åƒã®ã‚µã‚¤ã‚ºã¨ç”»ç´ ã®å½¢å¼ã‚’èª¿ã¹ã¦
+		ç”»åƒ1æšåˆ†ã®é ˜åŸŸã‚’ç¢ºä¿ã—ã¦ãŠãã®ã¯, ãƒ¦ãƒ¼ã‚¶ã®è²¬ä»»ã§ã‚ã‚‹.
+		ç”»åƒãƒ‡ãƒ¼ã‚¿ã¯, å„ç”»ç´ æ¯ã« R, G, B (å„ 1 byte)ã®é †ã§æ ¼ç´ã•ã‚Œ
+		ã‚‹. ã‚«ãƒ¡ãƒ©ã®ç”»ç´ å½¢å¼ãŒ #SBGGR8, #SGRBG8, #SGBRG8 ä»¥å¤–ã«è¨­å®šã•ã‚Œ
+		ã¦ã„ã‚‹å ´åˆã¯std::domain_errorä¾‹å¤–ãŒé€å‡ºã•ã‚Œã‚‹.
+  \return	ã“ã®ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 const V4L2Camera&
 V4L2Camera::captureBayerRaw(void* image) const
@@ -868,7 +868,7 @@ V4L2Camera::captureBayerRaw(void* image) const
 	RGB*		rgb = (RGB*)image;
 	const u_char*	p = bayerBGGR2x2(img, rgb, width());
 	rgb += width();
-	for (int n = height(); (n -= 2) > 0; )	// Ãæ´Ö¤Î¹Ô¤ò½èÍı
+	for (int n = height(); (n -= 2) > 0; )	// ä¸­é–“ã®è¡Œã‚’å‡¦ç†
 	{
 	    p = bayerBGGROdd3x3 (p, rgb, width());
 	    rgb += width();
@@ -884,7 +884,7 @@ V4L2Camera::captureBayerRaw(void* image) const
 	RGB*		rgb = (RGB*)image;
 	const u_char*	p = bayerGRBG2x2(img, rgb, width());
 	rgb += width();
-	for (int n = height(); (n -= 2) > 0; )	// Ãæ´Ö¤Î¹Ô¤ò½èÍı
+	for (int n = height(); (n -= 2) > 0; )	// ä¸­é–“ã®è¡Œã‚’å‡¦ç†
 	{
 	    p = bayerGRBGOdd3x3 (p, rgb, width());
 	    rgb += width();
@@ -900,7 +900,7 @@ V4L2Camera::captureBayerRaw(void* image) const
 	RGB*		rgb = (RGB*)image;
 	const u_char*	p = bayerGBRG2x2(img, rgb, width());
 	rgb += width();
-	for (int n = height(); (n -= 2) > 0; )	// Ãæ´Ö¤Î¹Ô¤ò½èÍı
+	for (int n = height(); (n -= 2) > 0; )	// ä¸­é–“ã®è¡Œã‚’å‡¦ç†
 	{
 	    p = bayerGBRGOdd3x3 (p, rgb, width());
 	    rgb += width();
@@ -922,10 +922,10 @@ V4L2Camera::captureBayerRaw(void* image) const
 /*
  *  Utility functions
  */
-//! unsinged int¤ÎÃÍ¤òÆ±¤¸¥Ó¥Ã¥È¥Ñ¥¿¡¼¥ó¤ò»ı¤Ä #PixelFormat ¤ËÄ¾¤¹
+//! unsinged intã®å€¤ã‚’åŒã˜ãƒ“ãƒƒãƒˆãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’æŒã¤ #PixelFormat ã«ç›´ã™
 /*!
-  \param pixelFormat	#PixelFormat ¤ËÄ¾¤·¤¿¤¤unsigned intÃÍ
-  \return		#PixelFormat ·¿¤ÎenumÃÍ
+  \param pixelFormat	#PixelFormat ã«ç›´ã—ãŸã„unsigned intå€¤
+  \return		#PixelFormat å‹ã®enumå€¤
  */
 V4L2Camera::PixelFormat
 V4L2Camera::uintToPixelFormat(u_int pixelFormat)
@@ -959,10 +959,10 @@ V4L2Camera::uintToPixelFormat(u_int pixelFormat)
     return UNKNOWN_PIXEL_FORMAT;
 }
 
-//! unsinged int¤ÎÃÍ¤òÆ±¤¸¥Ó¥Ã¥È¥Ñ¥¿¡¼¥ó¤ò»ı¤Ä #Feature ¤ËÄ¾¤¹
+//! unsinged intã®å€¤ã‚’åŒã˜ãƒ“ãƒƒãƒˆãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’æŒã¤ #Feature ã«ç›´ã™
 /*!
-  \param feature	#Feature ¤ËÄ¾¤·¤¿¤¤unsigned intÃÍ
-  \return		#Feature ·¿¤ÎenumÃÍ
+  \param feature	#Feature ã«ç›´ã—ãŸã„unsigned intå€¤
+  \return		#Feature å‹ã®enumå€¤
  */
 V4L2Camera::Feature
 V4L2Camera::uintToFeature(u_int feature)
@@ -1036,7 +1036,7 @@ V4L2Camera::uintToFeature(u_int feature)
 void
 V4L2Camera::enumerateFormats()
 {
-  // ¤³¤Î¥«¥á¥é¤¬¥µ¥İ¡¼¥È¤¹¤ë²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤òÎóµó
+  // ã“ã®ã‚«ãƒ¡ãƒ©ãŒã‚µãƒãƒ¼ãƒˆã™ã‚‹ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’åˆ—æŒ™
     v4l2_fmtdesc	fmtdesc;
     memset(&fmtdesc, 0, sizeof(fmtdesc));
     fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1045,8 +1045,8 @@ V4L2Camera::enumerateFormats()
 	 ++fmtdesc.index)
     {
 	PixelFormat	pixelFormat = uintToPixelFormat(fmtdesc.pixelformat);
-	if (pixelFormat == UNKNOWN_PIXEL_FORMAT)  // Ì¤ÃÎ¤Î¥Õ¥©¡¼¥Ş¥Ã¥È¤Ê¤é¤Ğ...
-	    continue;				  // ¥¹¥­¥Ã¥×¤¹¤ë
+	if (pixelFormat == UNKNOWN_PIXEL_FORMAT)  // æœªçŸ¥ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãªã‚‰ã°...
+	    continue;				  // ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹
 	
 	_formats.push_back(Format());
 	Format&	format = _formats.back();
@@ -1054,7 +1054,7 @@ V4L2Camera::enumerateFormats()
 	format.pixelFormat = pixelFormat;
 	format.name	   = (char*)fmtdesc.description;
 
-      // ¤³¤Î²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤Î¤â¤È¤Ç¥µ¥İ¡¼¥È¤µ¤ì¤ë²èÁü¥µ¥¤¥º¤òÎóµó
+      // ã“ã®ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®ã‚‚ã¨ã§ã‚µãƒãƒ¼ãƒˆã•ã‚Œã‚‹ç”»åƒã‚µã‚¤ã‚ºã‚’åˆ—æŒ™
 	v4l2_frmsizeenum	fsize;
 	memset(&fsize, 0, sizeof(fsize));
 	fsize.type	   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1094,8 +1094,8 @@ V4L2Camera::enumerateFormats()
 		}
 	    }
 
-	  // ¤³¤Î²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤È²èÁü¥µ¥¤¥º¤Î¤â¤È¤Ç¥µ¥İ¡¼¥È¤µ¤ì¤ë
-	  // ¥Õ¥ì¡¼¥à¥ì¡¼¥È¤òÎóµó
+	  // ã“ã®ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¨ç”»åƒã‚µã‚¤ã‚ºã®ã‚‚ã¨ã§ã‚µãƒãƒ¼ãƒˆã•ã‚Œã‚‹
+	  // ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’åˆ—æŒ™
 	    v4l2_frmivalenum	fival;
 	    memset(&fival, 0, sizeof(fival));
 	    fival.type	       = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1145,29 +1145,29 @@ V4L2Camera::enumerateFormats()
 void
 V4L2Camera::enumerateControls()
 {
-  // ¤³¤Î¥«¥á¥é¤¬¥µ¥İ¡¼¥È¤¹¤ë¥³¥ó¥È¥í¡¼¥ë(Â°À­)¤òÎóµó
+  // ã“ã®ã‚«ãƒ¡ãƒ©ãŒã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«(å±æ€§)ã‚’åˆ—æŒ™
     v4l2_queryctrl	ctrl;
     memset(&ctrl, 0, sizeof(ctrl));
 
     for (int id = 0, ret; (ret = ioctl(id, ctrl)) == 0 || errno != EINVAL; )
-	if (ret)		// ioctl¤¬EINVAL¤Ç¤Ê¤¤¥¨¥é¡¼¤òÊÖ¤·¤¿¤é...
+	if (ret)		// ioctlãŒEINVALã§ãªã„ã‚¨ãƒ©ãƒ¼ã‚’è¿”ã—ãŸã‚‰...
 	{
-	    if (ctrl.id <= id)	// ¼¡¤Îctrl.id¤¬¥»¥Ã¥È¤µ¤ì¤Ê¤«¤Ã¤¿¤é(v4l2¤Îbug)
-		++id;		// ¼«Ê¬¤Ç¼¡¤Îid¤Ë¿Ê¤á¤Ê¤±¤ì¤Ğ¤Ê¤é¤Ê¤¤
+	    if (ctrl.id <= id)	// æ¬¡ã®ctrl.idãŒã‚»ãƒƒãƒˆã•ã‚Œãªã‹ã£ãŸã‚‰(v4l2ã®bug)
+		++id;		// è‡ªåˆ†ã§æ¬¡ã®idã«é€²ã‚ãªã‘ã‚Œã°ãªã‚‰ãªã„
 	    else
 		break;
 	}
-	else			// ioctl¤¬Àµ¾ï¤Ë½ªÎ»¤·¤¿¤é...
+	else			// ioctlãŒæ­£å¸¸ã«çµ‚äº†ã—ãŸã‚‰...
 	{
-	    if (ctrl.id == id)	// ctrl.id¤¬¹¹¿·¤µ¤ì¤Ê¤«¤Ã¤¿¤é...(v4l2¤Îbug)
-		break;		// Îóµó¤òÃæÃÇ
+	    if (ctrl.id == id)	// ctrl.idãŒæ›´æ–°ã•ã‚Œãªã‹ã£ãŸã‚‰...(v4l2ã®bug)
+		break;		// åˆ—æŒ™ã‚’ä¸­æ–­
 	    
-	    id = ctrl.id;	// ¼¡¤Îid¤ò¥»¥Ã¥È¤¹¤ë¡¥
+	    id = ctrl.id;	// æ¬¡ã®idã‚’ã‚»ãƒƒãƒˆã™ã‚‹ï¼
 
 	    Feature	feature = uintToFeature(ctrl.id);
-	    if (ctrl.flags & V4L2_CTRL_FLAG_DISABLED ||	// Ìµ¸ú²½¤µ¤ì¤Æ¤¤¤ë¤«
-		feature == UNKNOWN_FEATURE)		// Ì¤ÃÎ¤ÎÂ°À­¤Ê¤é¤Ğ...
-		continue;				// ¥¹¥­¥Ã¥×¤·¤Æ¼¡¤Ø
+	    if (ctrl.flags & V4L2_CTRL_FLAG_DISABLED ||	// ç„¡åŠ¹åŒ–ã•ã‚Œã¦ã„ã‚‹ã‹
+		feature == UNKNOWN_FEATURE)		// æœªçŸ¥ã®å±æ€§ãªã‚‰ã°...
+		continue;				// ã‚¹ã‚­ãƒƒãƒ—ã—ã¦æ¬¡ã¸
 
 	    _controls.push_back(Control());
 	    Control&	control = _controls.back();
@@ -1261,41 +1261,41 @@ V4L2Camera::featureToControl(Feature feature) const
     return _controls[0];
 }
 
-//! »ØÄê¤·¤¿¸Ä¿ô¤Î¼õ¿®ÍÑ¤Î¥Ğ¥Ã¥Õ¥¡¤ò³ÎÊİ¤·¡¤¥á¥â¥ê¤ò¥Ş¥Ã¥×¤·¤Æ¥­¥å¡¼¤ËÆş¤ì¤ë
+//! æŒ‡å®šã—ãŸå€‹æ•°ã®å—ä¿¡ç”¨ã®ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿ã—ï¼Œãƒ¡ãƒ¢ãƒªã‚’ãƒãƒƒãƒ—ã—ã¦ã‚­ãƒ¥ãƒ¼ã«å…¥ã‚Œã‚‹
 /*!
-  \param n	¥Ğ¥Ã¥Õ¥¡¤Î¸Ä¿ô
+  \param n	ãƒãƒƒãƒ•ã‚¡ã®å€‹æ•°
  */
 void
 V4L2Camera::mapBuffers(u_int n)
 {
-    n = requestBuffers(n);	// »ØÄê¤µ¤ì¤¿¸Ä¿ô¤À¤±¥Ğ¥Ã¥Õ¥¡¤ò³ÎÊİ
-    if (n < 2)			// ½¼Ê¬¤Ê¸Ä¿ô¤ò³ÎÊİ¤Ç¤­¤Ê¤«¤Ã¤¿¤é...
-	throw std::runtime_error("V4L2Camera::mapBuffer(): failed to allocate sufficient number of buffers!!");	// Ã¦½Ğ¤¹¤ë
+    n = requestBuffers(n);	// æŒ‡å®šã•ã‚ŒãŸå€‹æ•°ã ã‘ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿
+    if (n < 2)			// å……åˆ†ãªå€‹æ•°ã‚’ç¢ºä¿ã§ããªã‹ã£ãŸã‚‰...
+	throw std::runtime_error("V4L2Camera::mapBuffer(): failed to allocate sufficient number of buffers!!");	// è„±å‡ºã™ã‚‹
 
     _buffers.resize(n);
-    for (u_int i = 0; i < _buffers.size(); ++i)	// ³ÎÊİ¤µ¤ì¤¿¸Ä¿ô¤Î¥Ğ¥Ã¥Õ¥¡¤Ë
+    for (u_int i = 0; i < _buffers.size(); ++i)	// ç¢ºä¿ã•ã‚ŒãŸå€‹æ•°ã®ãƒãƒƒãƒ•ã‚¡ã«
     {
-	_buffers[i].map(_fd, i);		// ¥á¥â¥ê¤ò¥Ş¥Ã¥×¤·¤Æ
-	enqueueBuffer(i);			// ¥­¥å¡¼¤ËÆş¤ì¤ë
+	_buffers[i].map(_fd, i);		// ãƒ¡ãƒ¢ãƒªã‚’ãƒãƒƒãƒ—ã—ã¦
+	enqueueBuffer(i);			// ã‚­ãƒ¥ãƒ¼ã«å…¥ã‚Œã‚‹
     }
 
     usleep(100000);
 }
 
-//! ¤¹¤Ù¤Æ¤Î¼õ¿®ÍÑ¥Ğ¥Ã¥Õ¥¡¤ò²òÊü¤¹¤ë
+//! ã™ã¹ã¦ã®å—ä¿¡ç”¨ãƒãƒƒãƒ•ã‚¡ã‚’è§£æ”¾ã™ã‚‹
 void
 V4L2Camera::unmapBuffers()
 {
     for (u_int i = 0; i < _buffers.size(); ++i)
 	_buffers[i].unmap();
-    requestBuffers(0);	// ³ÎÊİ¤¹¤ë¥Ğ¥Ã¥Õ¥¡¿ô¤ò0¤Ë¤¹¤ë¤³¤È¤Ë¤è¤Ã¤Æ¥­¥å¡¼¤ò¥¯¥ê¥¢
-    _current = ~0;	// ¥Ç¡¼¥¿¤¬»Ä¤Ã¤Æ¤¤¤Ê¤¤¤³¤È¤ò¼¨¤¹
+    requestBuffers(0);	// ç¢ºä¿ã™ã‚‹ãƒãƒƒãƒ•ã‚¡æ•°ã‚’0ã«ã™ã‚‹ã“ã¨ã«ã‚ˆã£ã¦ã‚­ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+    _current = ~0;	// ãƒ‡ãƒ¼ã‚¿ãŒæ®‹ã£ã¦ã„ãªã„ã“ã¨ã‚’ç¤ºã™
 }
 
-//! »ØÄê¤·¤¿¸Ä¿ô¤Î¼õ¿®ÍÑ¥Ğ¥Ã¥Õ¥¡¤ò³ÎÊİ¤¹¤ë¤è¤¦¤ËÍ×µá¤¹¤ë
+//! æŒ‡å®šã—ãŸå€‹æ•°ã®å—ä¿¡ç”¨ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿ã™ã‚‹ã‚ˆã†ã«è¦æ±‚ã™ã‚‹
 /*!
-  \param n	¥Ğ¥Ã¥Õ¥¡¤Î¸Ä¿ô
-  \return	¼Âºİ¤Ë³ÎÊİ¤µ¤ì¤¿¥Ğ¥Ã¥Õ¥¡¤Î¸Ä¿ô
+  \param n	ãƒãƒƒãƒ•ã‚¡ã®å€‹æ•°
+  \return	å®Ÿéš›ã«ç¢ºä¿ã•ã‚ŒãŸãƒãƒƒãƒ•ã‚¡ã®å€‹æ•°
 */
 u_int
 V4L2Camera::requestBuffers(u_int n)
@@ -1315,9 +1315,9 @@ V4L2Camera::requestBuffers(u_int n)
     return reqbuf.count;
 }
 
-//! »ØÄê¤·¤¿¥Ğ¥Ã¥Õ¥¡¤òqueue¤ËÆş¤ì¤ë
+//! æŒ‡å®šã—ãŸãƒãƒƒãƒ•ã‚¡ã‚’queueã«å…¥ã‚Œã‚‹
 /*!
-  \param index	¥Ğ¥Ã¥Õ¥¡¤Îindex
+  \param index	ãƒãƒƒãƒ•ã‚¡ã®index
  */
 void
 V4L2Camera::enqueueBuffer(u_int index) const
@@ -1335,10 +1335,10 @@ V4L2Camera::enqueueBuffer(u_int index) const
 #endif
 }
 
-//! ¥Ç¡¼¥¿¤ò¼õ¿®¤·¤¿¥Ğ¥Ã¥Õ¥¡¤ò¥­¥å¡¼¤«¤é¼è¤ê½Ğ¤¹
+//! ãƒ‡ãƒ¼ã‚¿ã‚’å—ä¿¡ã—ãŸãƒãƒƒãƒ•ã‚¡ã‚’ã‚­ãƒ¥ãƒ¼ã‹ã‚‰å–ã‚Šå‡ºã™
 /*!
-  ¼Âºİ¤Ë¥Ç¡¼¥¿¤¬¼õ¿®¤µ¤ì¤ë¤Ş¤Ç, ËÜ´Ø¿ô¤Ï¸Æ¤Ó½Ğ¤·Â¦¤ËÀ©¸æ¤òÊÖ¤µ¤Ê¤¤. 
-  \return	¥Ç¡¼¥¿¤ò¼õ¿®¤·¤¿¥Ğ¥Ã¥Õ¥¡¤Îindex
+  å®Ÿéš›ã«ãƒ‡ãƒ¼ã‚¿ãŒå—ä¿¡ã•ã‚Œã‚‹ã¾ã§, æœ¬é–¢æ•°ã¯å‘¼ã³å‡ºã—å´ã«åˆ¶å¾¡ã‚’è¿”ã•ãªã„. 
+  \return	ãƒ‡ãƒ¼ã‚¿ã‚’å—ä¿¡ã—ãŸãƒãƒƒãƒ•ã‚¡ã®index
  */
 u_int
 V4L2Camera::dequeueBuffer()
@@ -1370,14 +1370,14 @@ V4L2Camera::ioctl(int request, void* arg) const
     return ret;
 }
 
-//! »ØÄê¤µ¤ì¤¿¥³¥ó¥È¥í¡¼¥ëID¤ËÂĞ±ş¤¹¤ë¥³¥ó¥È¥í¡¼¥ë¤Î¾ğÊó¤ò¼èÆÀ¤¹¤ë¡¥
+//! æŒ‡å®šã•ã‚ŒãŸã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«IDã«å¯¾å¿œã™ã‚‹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®æƒ…å ±ã‚’å–å¾—ã™ã‚‹ï¼
 /*!
-  V4L2_CTRL_FLAG_NEXT_CTRL ¥Õ¥é¥°¤òÎ©¤Æ¤Æ VIDIO_QUERYCTRL ¤ò¹Ô¤Ã¤Æ¤¤¤ë¡¥
-  ctrl.id ¤Ë»ØÄê¤µ¤ì¤¿ ID ¤è¤êÂç¤­¤ÊºÇ¾®¤Î ID ¤¬ÊÖ¤µ¤ì¤ë¤Ï¤º¤Ç¤¢¤ë¤¬¡¤
-  ¤½¤¦¤Ê¤é¤Ê¤¤buggy¤Êv4l2¤Î¼ÂÁõ¤¬Â¸ºß¤¹¤ë¡¥
-  \param id	¥³¥ó¥È¥í¡¼¥ëID
-  \param ctrl	¥³¥ó¥È¥í¡¼¥ë¤Î¾ğÊó¤¬ÊÖ¤µ¤ì¤ë
-  \return	Àµ¾ï¤Ë¾ğÊó¤¬¼èÆÀ¤µ¤ì¤¿¤é0¡¤¥¨¥é¡¼¤¬À¸¤¸¤¿¤éÈóÎí
+  V4L2_CTRL_FLAG_NEXT_CTRL ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã¦ VIDIO_QUERYCTRL ã‚’è¡Œã£ã¦ã„ã‚‹ï¼
+  ctrl.id ã«æŒ‡å®šã•ã‚ŒãŸ ID ã‚ˆã‚Šå¤§ããªæœ€å°ã® ID ãŒè¿”ã•ã‚Œã‚‹ã¯ãšã§ã‚ã‚‹ãŒï¼Œ
+  ãã†ãªã‚‰ãªã„buggyãªv4l2ã®å®Ÿè£…ãŒå­˜åœ¨ã™ã‚‹ï¼
+  \param id	ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
+  \param ctrl	ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®æƒ…å ±ãŒè¿”ã•ã‚Œã‚‹
+  \return	æ­£å¸¸ã«æƒ…å ±ãŒå–å¾—ã•ã‚ŒãŸã‚‰0ï¼Œã‚¨ãƒ©ãƒ¼ãŒç”Ÿã˜ãŸã‚‰éé›¶
 */
 int
 V4L2Camera::ioctl(int id, v4l2_queryctrl& ctrl) const
@@ -1388,7 +1388,7 @@ V4L2Camera::ioctl(int id, v4l2_queryctrl& ctrl) const
     {
 	ctrl.id = id | V4L2_CTRL_FLAG_NEXT_CTRL;
 
-      // ioctl¤¬À®¸ù¤¹¤ë¤«¡¤I/O¥¨¥é¡¼°Ê³°¤Î¥¨¥é¡¼¤¬À¸¤¸¤¿¤éÃ¦½Ğ¤¹¤ë¡¥
+      // ioctlãŒæˆåŠŸã™ã‚‹ã‹ï¼ŒI/Oã‚¨ãƒ©ãƒ¼ä»¥å¤–ã®ã‚¨ãƒ©ãƒ¼ãŒç”Ÿã˜ãŸã‚‰è„±å‡ºã™ã‚‹ï¼
 	if ((ret = ::ioctl(_fd, VIDIOC_QUERYCTRL, &ctrl)) == 0 ||
 	    (errno != EIO && errno != EPIPE && errno != ETIMEDOUT))
 	    break;
@@ -1405,7 +1405,7 @@ V4L2Camera::Buffer::map(int fd, u_int index)
 {
     using namespace	std;
 
-  // ¥Ğ¥Ã¥Õ¥¡¤ÎÂç¤­¤µ¤È¥ª¥Õ¥»¥Ã¥È¤òÄ´¤Ù¤ë¡¥
+  // ãƒãƒƒãƒ•ã‚¡ã®å¤§ãã•ã¨ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’èª¿ã¹ã‚‹ï¼
     v4l2_buffer	buf;
     memset(&buf, 0, sizeof(buf));
     buf.index  = index;
@@ -1414,7 +1414,7 @@ V4L2Camera::Buffer::map(int fd, u_int index)
     if (::ioctl(fd, VIDIOC_QUERYBUF, &buf))
 	throw runtime_error(string("V4L2Camera::Buffer::Buffer(): VIDIOC_QUERYBUF failed!! ") + strerror(errno));
 	
-  // ÆÀ¤é¤ì¤¿Âç¤­¤µ¤È¥ª¥Õ¥»¥Ã¥È¤ò¤â¤È¤Ë¥á¥â¥êÎÎ°è¤ò¥Ğ¥Ã¥Õ¥¡¤Ë¥Ş¥Ã¥×¤¹¤ë¡¥
+  // å¾—ã‚‰ã‚ŒãŸå¤§ãã•ã¨ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’ã‚‚ã¨ã«ãƒ¡ãƒ¢ãƒªé ˜åŸŸã‚’ãƒãƒƒãƒ•ã‚¡ã«ãƒãƒƒãƒ—ã™ã‚‹ï¼
     if ((_p = ::mmap(0, buf.length, PROT_READ | PROT_WRITE,
 		     MAP_SHARED, fd, buf.m.offset)) == MAP_FAILED)
     {
@@ -1510,11 +1510,11 @@ operator <<(std::ostream& out, const V4L2Camera::Control& control)
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-//! ÃÍ¤ÎÈÏ°Ï¤ò½ĞÎÏ¥¹¥È¥ê¡¼¥à¤Ë½ĞÎÏ¤¹¤ë
+//! å€¤ã®ç¯„å›²ã‚’å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«å‡ºåŠ›ã™ã‚‹
 /*
-  \param out	½ĞÎÏ¥¹¥È¥ê¡¼¥à
-  \param range	ÃÍ¤ÎÈÏ°Ï
-  \return	out¤Ç»ØÄê¤·¤¿½ĞÎÏ¥¹¥È¥ê¡¼¥à
+  \param out	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param range	å€¤ã®ç¯„å›²
+  \return	outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */ 
 template <class T> std::ostream&
 operator <<(std::ostream& out, const V4L2Camera::Range<T>& range)
@@ -1527,11 +1527,11 @@ operator <<(std::ostream& out, const V4L2Camera::Range<T>& range)
 		   << ']';
 }
     
-//! ²èÁü¥µ¥¤¥º¤ò½ĞÎÏ¥¹¥È¥ê¡¼¥à¤Ë½ĞÎÏ¤¹¤ë
+//! ç”»åƒã‚µã‚¤ã‚ºã‚’å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«å‡ºåŠ›ã™ã‚‹
 /*
-  \param out		½ĞÎÏ¥¹¥È¥ê¡¼¥à
-  \param frameSize	²èÁü¥µ¥¤¥º
-  \return		out¤Ç»ØÄê¤·¤¿½ĞÎÏ¥¹¥È¥ê¡¼¥à
+  \param out		å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param frameSize	ç”»åƒã‚µã‚¤ã‚º
+  \return		outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */ 
 std::ostream&
 operator <<(std::ostream& out, const V4L2Camera::FrameSize& frameSize)
@@ -1544,11 +1544,11 @@ operator <<(std::ostream& out, const V4L2Camera::FrameSize& frameSize)
     return out;
 }
     
-//! ¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ò½ĞÎÏ¥¹¥È¥ê¡¼¥à¤Ë½ĞÎÏ¤¹¤ë
+//! ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«å‡ºåŠ›ã™ã‚‹
 /*
-  \param out		½ĞÎÏ¥¹¥È¥ê¡¼¥à
-  \param frameRate	¥Õ¥ì¡¼¥à¥ì¡¼¥È
-  \return		out¤Ç»ØÄê¤·¤¿½ĞÎÏ¥¹¥È¥ê¡¼¥à
+  \param out		å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param frameRate	ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ
+  \return		outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */ 
 std::ostream&
 operator <<(std::ostream& out, const V4L2Camera::FrameRate& frameRate)
@@ -1556,11 +1556,11 @@ operator <<(std::ostream& out, const V4L2Camera::FrameRate& frameRate)
     return out << frameRate.fps_n << '/' << frameRate.fps_d;
 }
 
-//! ¥á¥Ë¥å¡¼¹àÌÜ¤ò½ĞÎÏ¥¹¥È¥ê¡¼¥à¤Ë½ĞÎÏ¤¹¤ë
+//! ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã‚’å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«å‡ºåŠ›ã™ã‚‹
 /*
-  \param out		½ĞÎÏ¥¹¥È¥ê¡¼¥à
-  \param menuItem	¥á¥Ë¥å¡¼¹àÌÜ
-  \return		out¤Ç»ØÄê¤·¤¿½ĞÎÏ¥¹¥È¥ê¡¼¥à
+  \param out		å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param menuItem	ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®
+  \return		outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */ 
 std::ostream&
 operator <<(std::ostream& out, const V4L2Camera::MenuItem& menuItem)
@@ -1568,16 +1568,16 @@ operator <<(std::ostream& out, const V4L2Camera::MenuItem& menuItem)
     return out << menuItem.index << ": " << menuItem.name;
 }
 
-//! ¸½ºß¤Î¥«¥á¥é¤ÎÀßÄê¤ò¥¹¥È¥ê¡¼¥à¤Ë½ñ¤­½Ğ¤¹
+//! ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©ã®è¨­å®šã‚’ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«æ›¸ãå‡ºã™
 /*!
-  \param out		½ĞÎÏ¥¹¥È¥ê¡¼¥à
-  \param camera		ÂĞ¾İ¤È¤Ê¤ë¥«¥á¥é
-  \return		out¤Ç»ØÄê¤·¤¿½ĞÎÏ¥¹¥È¥ê¡¼¥à
+  \param out		å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param camera		å¯¾è±¡ã¨ãªã‚‹ã‚«ãƒ¡ãƒ©
+  \return		outã§æŒ‡å®šã—ãŸå‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 std::ostream&
 operator <<(std::ostream& out, const V4L2Camera& camera)
 {
-  // ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤È²èÁü¥µ¥¤¥º¤ò½ñ¤­½Ğ¤¹¡¥
+  // ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¨ç”»åƒã‚µã‚¤ã‚ºã‚’æ›¸ãå‡ºã™ï¼
     V4L2Camera::PixelFormat	pixelFormat = camera.pixelFormat();
     char			fourcc[5];
     fourcc[0] =	 pixelFormat	    & 0xff;
@@ -1587,12 +1587,12 @@ operator <<(std::ostream& out, const V4L2Camera& camera)
     fourcc[4] = '\0';
     out << fourcc << ' ' << camera.width() << 'x' << camera.height();
 
-  // ¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ò½ñ¤­½Ğ¤¹¡¥
+  // ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’æ›¸ãå‡ºã™ï¼
     u_int	fps_n, fps_d;
     camera.getFrameRate(fps_n, fps_d);
     out << ' ' << fps_n << '/' << fps_d;
 
-  // ³Æ¥«¥á¥éÂ°À­¤ÎÃÍ¤ò½ñ¤­½Ğ¤¹¡¥
+  // å„ã‚«ãƒ¡ãƒ©å±æ€§ã®å€¤ã‚’æ›¸ãå‡ºã™ï¼
     BOOST_FOREACH (V4L2Camera::Feature feature, camera.availableFeatures())
 	for (u_int i = 0; i < NFEATURES; ++i)
 	    if (feature == features[i].feature)
@@ -1605,29 +1605,29 @@ operator <<(std::ostream& out, const V4L2Camera& camera)
     return out << std::endl;
 }
 
-//! ¥¹¥È¥ê¡¼¥à¤«¤éÆÉ¤ß¹ş¤ó¤ÀÀßÄê¤ò¥«¥á¥é¤Ë¥»¥Ã¥È¤¹¤ë
+//! ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰èª­ã¿è¾¼ã‚“ã è¨­å®šã‚’ã‚«ãƒ¡ãƒ©ã«ã‚»ãƒƒãƒˆã™ã‚‹
 /*!
-  \param in		ÆşÎÏ¥¹¥È¥ê¡¼¥à
-  \param camera		ÂĞ¾İ¤È¤Ê¤ë¥«¥á¥é
-  \return		in¤Ç»ØÄê¤·¤¿ÆşÎÏ¥¹¥È¥ê¡¼¥à
+  \param in		å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+  \param camera		å¯¾è±¡ã¨ãªã‚‹ã‚«ãƒ¡ãƒ©
+  \return		inã§æŒ‡å®šã—ãŸå…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 */
 std::istream&
 operator >>(std::istream& in, V4L2Camera& camera)
 {
-  // ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¡¤²èÁü¥µ¥¤¥º¡¤¥Õ¥ì¡¼¥à¥ì¡¼¥È¤òÆÉ¤ß¹ş¤ó¤Ç¥«¥á¥é¤ËÀßÄê¤¹¤ë¡¥
+  // ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆï¼Œç”»åƒã‚µã‚¤ã‚ºï¼Œãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’èª­ã¿è¾¼ã‚“ã§ã‚«ãƒ¡ãƒ©ã«è¨­å®šã™ã‚‹ï¼
     std::string	s;
-    in >> s;				// ²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È
+    in >> s;				// ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
     V4L2Camera::PixelFormat	pixelFormat
 	= V4L2Camera::uintToPixelFormat( s[0]	     | (s[1] <<  8) |
 					(s[2] << 16) | (s[3] << 24));
     char	c;
     u_int	w, h;
-    in >> w >> c >> h;			// ²èÁü¤ÎÉı¤È¹â¤µ
+    in >> w >> c >> h;			// ç”»åƒã®å¹…ã¨é«˜ã•
     u_int	fps_n, fps_d;
-    in >> fps_n >> c >> fps_d;		// ¥Õ¥ì¡¼¥à¥ì¡¼¥È¤ÎÊ¬»Ò¤ÈÊ¬Êì
+    in >> fps_n >> c >> fps_d;		// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã®åˆ†å­ã¨åˆ†æ¯
     camera.setFormat(pixelFormat, w, h, fps_n, fps_d);
     
-  // ³Æ¥«¥á¥éÂ°À­¤òÆÉ¤ß¹ş¤ó¤Ç¥«¥á¥é¤ËÀßÄê¤¹¤ë¡¥
+  // å„ã‚«ãƒ¡ãƒ©å±æ€§ã‚’èª­ã¿è¾¼ã‚“ã§ã‚«ãƒ¡ãƒ©ã«è¨­å®šã™ã‚‹ï¼
     while (in >> s)
 	for (u_int i = 0; i < NFEATURES; ++i)
 	    if (s == features[i].name)
