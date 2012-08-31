@@ -11,7 +11,8 @@ SUBDIR	= Bezier		\
 	  Serial		\
 	  Sparse		\
 	  Spline		\
-	  Vector
+	  Vector		\
+	  mm
 
 TARGETS	= all clean depend
 
