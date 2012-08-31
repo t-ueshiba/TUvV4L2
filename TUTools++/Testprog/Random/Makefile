@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.5 2012-08-16 01:31:10 ueshiba Exp $
+#  $Id: Makefile,v 1.6 2012-08-31 02:36:53 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -9,37 +9,35 @@ INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= rantest
 LIBS		= -lTUTools++
+ifeq ($(OSTYPE), darwin)
+  LIBS	       +=
+#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+endif
 
 CPPFLAGS	=
 CFLAGS		= -g
-CCFLAGS		= -g
-LDFLAGS		=
+NVCCFLAGS	= -g
+ifeq ($(CXX), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  CPPFLAGS     += -DSSE3
+endif
+CCFLAGS		= $(CFLAGS)
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Random.h \
 		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
 
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.5 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
-
 include $(PROJECT)/lib/p.mk
-include $(PROJECT)/lib/RCS.mk
+
 ###
 main.o: /usr/local/include/TU/Random.h /usr/local/include/TU/types.h
