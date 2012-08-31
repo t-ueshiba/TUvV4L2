@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.14 2012-08-16 01:30:51 ueshiba Exp $
+#  $Id: Makefile,v 1.15 2012-08-31 02:36:30 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -10,26 +10,28 @@ INCDIRS		= -I$(PREFIX)/include
 PROGRAM		= beziertest
 LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11
+ifeq ($(OSTYPE), darwin)
+  LIBS	       +=
+#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+endif
 
-CPPFLAGS	=
-CFLAGS		= -g -Wextra
-ifeq ($(CCC), icpc)
+CPPFLAGS	= -DLIBTUTOOLS_DEBUG
+CFLAGS		= -g
+NVCCFLAGS	= -g
+ifeq ($(CXX), icpc)
   CFLAGS	= -O3
-  ifeq ($(OSTYPE), darwin)
-    CPPFLAGS   += -DSSE3
-  else
-    CPPFLAGS   += -DSSE3
-  endif
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
-LDFLAGS		=
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Bezier++.h \
 		/usr/local/include/TU/Geometry++.h \
@@ -59,18 +61,6 @@ SRCS		= draw.cc \
 		main.cc
 OBJS		= draw.o \
 		main.o
-
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.14 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
 
 include $(PROJECT)/lib/p.mk
 

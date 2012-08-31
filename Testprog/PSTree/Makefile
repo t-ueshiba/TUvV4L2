@@ -1,26 +1,36 @@
 #
-#  $Id: Makefile,v 1.12 2012-08-16 01:31:07 ueshiba Exp $
+#  $Id: Makefile,v 1.13 2012-08-31 02:36:51 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)
+DEST		= $(PREFIX)/bin
 INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= pstreetest
-LIBS		= -lTUTools++
+LIBS		=
+ifeq ($(OSTYPE), darwin)
+  LIBS	       +=
+#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+endif
 
 CPPFLAGS	=
 CFLAGS		= -g
-CCFLAGS		= -g
-LDFLAGS		=
+NVCCFLAGS	= -g
+ifeq ($(CXX), icpc)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  CPPFLAGS     += -DSSE3
+endif
+CCFLAGS		= $(CFLAGS)
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#
 #########################
-SUFFIX		= .cc:sC
+.SUFFIXES:	.cu
+SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Heap.h \
@@ -35,20 +45,8 @@ HDRS		=
 SRCS		= pstreetest.cc
 OBJS		= pstreetest.o
 
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.12 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
-
 include $(PROJECT)/lib/p.mk
-include $(PROJECT)/lib/RCS.mk
+
 ###
 pstreetest.o: /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
