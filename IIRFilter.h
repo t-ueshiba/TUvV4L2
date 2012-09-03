@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.18 2012-08-29 21:17:08 ueshiba Exp $
+ *  $Id: IIRFilter.h,v 1.19 2012-09-03 04:56:21 ueshiba Exp $
  */
 /*!
   \file		IIRFilter.h
@@ -249,7 +249,14 @@ template <u_int D, class T=float> class IIRFilter
 		backward(IN ib, IN ie, OUT out)			const	;
     
   private:
+#ifdef USE_IIR_FILTER_ITERATOR
+    typedef boost::array<T, D>		array_type;
+
+    array_type	_ci;	//!< 入力フィルタ係数
+    array_type	_co;	//!< 出力フィルタ係数
+#else
     T		_c[D+D];	// coefficients
+#endif
 };
 
 //! フィルタのz変換係数をセットする
@@ -271,9 +278,13 @@ template <u_int D, class T=float> class IIRFilter
 template <u_int D, class T> IIRFilter<D, T>&
 IIRFilter<D, T>::initialize(const T c[D+D])
 {
+#ifdef USE_IIR_FILTER_ITERATOR
+    std::copy(c,     c + D,	_ci.begin());
+    std::copy(c + D, c + D + D,	_co.begin());
+#else
     for (u_int i = 0; i < D+D; ++i)
 	_c[i] = c[i];
-
+#endif
     return *this;
 }
 
@@ -289,12 +300,21 @@ IIRFilter<D, T>::limitsF(T& limit0F, T& limit1F, T& limit2F) const
     T	n0 = 0, d0 = 1, n1 = 0, d1 = 0, n2 = 0, d2 = 0;
     for (u_int i = 0; i < D; ++i)
     {
+#ifdef USE_IIR_FILTER_ITERATOR
+	n0 +=	      _ci[i];
+	d0 -=	      _co[i];
+	n1 +=	    i*_ci[D-1-i];
+	d1 -=	(i+1)*_co[D-1-i];
+	n2 += (i-1)*i*_ci[D-1-i];
+	d2 -= i*(i+1)*_co[D-1-i];
+#else
 	n0 +=	      _c[i];
 	d0 -=	      _c[D+i];
 	n1 +=	    i*_c[D-1-i];
 	d1 -=	(i+1)*_c[D+D-1-i];
 	n2 += (i-1)*i*_c[D-1-i];
 	d2 -= i*(i+1)*_c[D+D-1-i];
+#endif
     }
     const T	x0 = n0/d0, x1 = (n1 - x0*d1)/d0,
 		x2 = (n2 - 2*x1*d1 - x0*d2)/d0;
@@ -315,12 +335,21 @@ IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
     T	n0 = 0, d0 = 1, n1 = 0, d1 = 0, n2 = 0, d2 = 0;
     for (u_int i = 0; i < D; ++i)
     {
+#ifdef USE_IIR_FILTER_ITERATOR
+	n0 +=	      _ci[i];
+	d0 -=	      _co[i];
+	n1 +=	(i+1)*_ci[i];
+	d1 -=	(i+1)*_co[i];
+	n2 += i*(i+1)*_ci[i];
+	d2 -= i*(i+1)*_co[i];
+#else
 	n0 +=	      _c[i];
 	d0 -=	      _c[D+i];
 	n1 +=	(i+1)*_c[i];
 	d1 -=	(i+1)*_c[D+i];
 	n2 += i*(i+1)*_c[i];
 	d2 -= i*(i+1)*_c[D+i];
+#endif
     }
     const T	x0 = n0/d0, x1 = (n1 - x0*d1)/d0,
 		x2 = (n2 - 2*x1*d1 - x0*d2)/d0;
@@ -339,6 +368,13 @@ IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
 template <u_int D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 {
+#ifdef USE_IIR_FILTER_ITERATOR
+    return std::copy(make_iir_filter_iterator<D, true>(
+			 ib, _ci.begin(), _co.begin()),
+		     make_iir_filter_iterator<D, true>(
+			 ie, _ci.begin(), _co.begin()),
+		     out);
+#else
     typedef typename std::iterator_traits<IN>::difference_type	diff_t;
     
     for (IN in = ib; in != ie; ++in)
@@ -358,18 +394,26 @@ IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
     }
 
     return out;
+#endif
 }
     
 //! 後退方向にフィルタを適用する
 /*!
   \param ib	入力データ列の先頭を指す反復子
   \param ie	入力データ列の末尾の次を指す反復子
-  \param out	出力データ列の先頭を指す反復子
-  \return	出力データ列の末尾の次を指す反復子
+  \param oe	出力データ列の末尾の次を指す反復子
+  \return	出力データ列の先頭を指す反復子
 */
 template <u_int D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 {
+#ifdef USE_IIR_FILTER_ITERATOR
+    return std::copy(make_iir_filter_iterator<D, false>(
+			 ib, _ci.rbegin(), _co.rbegin()),
+		     make_iir_filter_iterator<D, false>(
+			 ie, _ci.rbegin(), _co.rbegin()),
+			 oe);
+#else
     typedef typename std::iterator_traits<IN>::difference_type	diff_t;
     
     for (IN in = ie; in != ib; )
@@ -383,8 +427,9 @@ IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
     }
 
     return oe;
+#endif
 }
-
+#ifndef USE_IIR_FILTER_ITERATOR
 template <> template <class IN, class OUT> OUT
 IIRFilter<2u, float>::forward(IN ib, IN ie, OUT out) const
 {
@@ -538,7 +583,7 @@ IIRFilter<4u, float>::backward(IN ib, IN ie, OUT oe) const
 
     return oe;
 }
-
+#endif
 /************************************************************************
 *  class BidirectionalIIRFilter<D, T>					*
 ************************************************************************/
@@ -704,7 +749,12 @@ BidirectionalIIRFilter<D, T>::operator ()(IN ib, IN ie, OUT out) const
     _bufB.resize(size);
 
     _iirF.forward (ib, ie, _bufF.begin());
+#ifdef USE_IIR_FILTER_ITERATOR
+    _iirB.backward(std::reverse_iterator<IN>(ie),
+		   std::reverse_iterator<IN>(ib), _bufB.rbegin());
+#else
     _iirB.backward(ib, ie, _bufB.end());
+#endif
 
     return std::transform(_bufF.begin(), _bufF.end(), _bufB.begin(),
 			  out, std::plus<T>());
