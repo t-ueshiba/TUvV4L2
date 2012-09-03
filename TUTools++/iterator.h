@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: iterator.h,v 1.5 2012-09-03 04:56:21 ueshiba Exp $
+ *  $Id: iterator.h,v 1.6 2012-09-03 05:09:42 ueshiba Exp $
  */
 /*!
   \file		iterator.h
@@ -146,7 +146,7 @@ class box_filter_iterator
     typedef typename super::pointer			pointer;
 
   public:
-			box_filter_iterator(Iterator i, size_t w=0)
+			box_filter_iterator(Iterator i, unsigned int w=0)
 			    :_head(i), _tail(_head), _valid(true), _val()
 			{
 			    if (w > 0)
@@ -231,7 +231,7 @@ make_box_filter_iterator(Iterator iter)
   \param IN	コンテナ中の要素を指す定数反復子の型
   \param COEFF	フィルタのz変換係数
 */
-template <u_int D, bool FWD, class IN, class COEFF>
+template <unsigned int D, bool FWD, class IN, class COEFF>
 class iir_filter_iterator
     : public std::iterator<std::input_iterator_tag,
 			   typename std::iterator_traits<COEFF>::value_type>
@@ -325,7 +325,7 @@ class iir_filter_iterator
     buf_iterator	_oiter;		//!< D時点前の出力データを指す反復子
 };
 
-template <u_int D, bool FWD, class IN, class COEFF>
+template <unsigned int D, bool FWD, class IN, class COEFF>
 iir_filter_iterator<D, FWD, IN, COEFF>
 make_iir_filter_iterator(IN in, COEFF ci, COEFF co)
 {
