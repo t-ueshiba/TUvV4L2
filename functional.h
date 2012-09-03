@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: functional.h,v 1.3 2012-08-29 21:17:08 ueshiba Exp $
+ *  $Id: functional.h,v 1.4 2012-09-03 22:15:18 ueshiba Exp $
  */
 /*!
   \file		functional.h
@@ -214,11 +214,10 @@ class const_mem_var_ref_t : public std::unary_function<const T&, S>
     
 //! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R)する関数オブジェクトを生成する
 template <class S, class T> inline const_mem_var_ref_t<S, T>
-mem_var_ref(S const T::* m)
+const_mem_var_ref(S const T::* m)
 {
     return const_mem_var_ref_t<S, T>(m);
 }
 
 }
 #endif
-

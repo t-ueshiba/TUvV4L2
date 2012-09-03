@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: iterator.h,v 1.6 2012-09-03 05:09:42 ueshiba Exp $
+ *  $Id: iterator.h,v 1.7 2012-09-03 22:15:18 ueshiba Exp $
  */
 /*!
   \file		iterator.h
@@ -122,7 +122,7 @@ make_const_second_iterator(Iterator i)
 }
     
 /************************************************************************
-*  class box_filter_iterator						*
+*  class box_filter_iterator<Iterator>					*
 ************************************************************************/
 //! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
 /*!
@@ -224,11 +224,11 @@ make_box_filter_iterator(Iterator iter)
 /************************************************************************
 *  class iir_filter_iterator<D, FWD, IN, COEFF>				*
 ************************************************************************/
-//! コンテナ中の指定された要素に対してinfinite impulse response filterを適用した結果を返す反復子
+//! データ列中の指定された要素に対してinfinite impulse response filterを適用した結果を返す反復子
 /*!
   \param D	フィルタの階数
   \param FWD	前進フィルタならtrue, 後退フィルタならfalse
-  \param IN	コンテナ中の要素を指す定数反復子の型
+  \param IN	データ列中の要素を指す定数反復子の型
   \param COEFF	フィルタのz変換係数
 */
 template <unsigned int D, bool FWD, class IN, class COEFF>
