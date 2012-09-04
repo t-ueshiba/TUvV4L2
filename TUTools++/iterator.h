@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: iterator.h,v 1.7 2012-09-03 22:15:18 ueshiba Exp $
+ *  $Id: iterator.h,v 1.8 2012-09-04 01:45:28 ueshiba Exp $
  */
 /*!
   \file		iterator.h
@@ -54,7 +54,7 @@ template <class Iterator, class S, class T>
 inline boost::transform_iterator<const_mem_var_ref_t<S, T>, Iterator>
 make_const_mbr_iterator(Iterator i, S const T::* m)
 {
-    return boost::make_transform_iterator(i, mem_var_ref(m));
+    return boost::make_transform_iterator(i, const_mem_var_ref(m));
 }
 
 //! std::pairへの反復子からその第1要素に直接アクセス(R/W)する反復子を作る．
