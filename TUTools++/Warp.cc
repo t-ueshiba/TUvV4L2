@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.22 2012-08-29 21:17:08 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.23 2012-09-10 08:26:18 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -179,6 +179,26 @@ bilinearInterpolate(const Image<T>& in, int us, int vs, int du, int dv)
     return out;
 }
 
+template <> static inline YUV444
+bilinearInterpolate(const Image<YUV444>& in, int us, int vs, int du, int dv)
+{
+    YUV444	in00 = in[vs][us],   in01 = in[vs][us+1],
+		in10 = in[vs+1][us], in11 = in[vs+1][us+1];
+    int		tmp0, tmp1;
+    YUV444	out;
+    tmp0 = int(in00.y) + ((du * (int(in01.y) - int(in00.y))) >> 7);
+    tmp1 = int(in10.y) + ((du * (int(in11.y) - int(in10.y))) >> 7);
+    out.y = tmp0 + ((dv * (tmp1 - tmp0)) >> 7);
+    tmp0 = int(in00.u) + ((du * (int(in01.u) - int(in00.u))) >> 7);
+    tmp1 = int(in10.u) + ((du * (int(in11.u) - int(in10.u))) >> 7);
+    out.u = tmp0 + ((dv * (tmp1 - tmp0)) >> 7);
+    tmp0 = int(in00.v) + ((du * (int(in01.v) - int(in00.v))) >> 7);
+    tmp1 = int(in10.v) + ((du * (int(in11.v) - int(in10.v))) >> 7);
+    out.v = tmp0 + ((dv * (tmp1 - tmp0)) >> 7);
+
+    return out;
+}
+
 template <> inline u_char
 bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
 {
@@ -278,6 +298,19 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
     empty();
 #  endif	
 #endif
+    while (outp < outq)
+	*outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
+    out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
+}
+
+template <> __PORT void
+Warp::warpLine(const Image<YUV444>& in, Image<YUV444>& out, u_int v) const
+{
+    const short		*usp  = _fracs[v].us, *vsp = _fracs[v].vs;
+    const u_char	*dup  = _fracs[v].du, *dvp = _fracs[v].dv;
+    YUV444		*outp = out[v] + _fracs[v].lmost;
+    YUV444* const	outq  = outp + _fracs[v].width();
+
     while (outp < outq)
 	*outp++ = bilinearInterpolate(in, *usp++, *vsp++, *dup++, *dvp++);
     out[v].setLimits(_fracs[v].lmost, _fracs[v].lmost + _fracs[v].width());
