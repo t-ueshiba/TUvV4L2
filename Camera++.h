@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Camera++.h,v 1.5 2012-08-29 21:17:08 ueshiba Exp $
+ *  $Id: Camera++.h,v 1.6 2012-09-10 08:26:18 ueshiba Exp $
  */
 /*!
   \file		Camera++.h
@@ -1024,6 +1024,14 @@ class CanonicalCamera
     typedef Point2<value_type>				point2_type;
   //! 3次元点の型
     typedef Point3<value_type>				point3_type;
+  //! 2次元直線の型
+    typedef HyperPlane<Vector<value_type,
+			      FixedSizedBuf<value_type, 3> > >
+							line_type;
+  //! 3次元平面の型
+    typedef HyperPlane<Vector<value_type,
+			      FixedSizedBuf<value_type, 4> > >
+							plane_type;
   //! ベクトルの型
     typedef Vector<value_type>				vector_type;
   //! 行列の型
@@ -1048,6 +1056,10 @@ class CanonicalCamera
     void		setTranslation(const point3_type& t)		;
     void		setRotation(const matrix33_type& Rt)		;
 
+    plane_type		h(const line_type& l)			const	;
+    point3_type		X(const point2_type& x,
+			  const plane_type& h)			const	;
+    
     static u_int	dof()						;
     void		update(const vector_type& dp)			;
     void		updateFCC(const vector_type& dp)		;
@@ -1221,6 +1233,36 @@ CanonicalCamera<T>::setRotation(const matrix33_type& Rt)
     _Rt = Rt;
 }
 
+//! 画像平面上の直線とカメラの投影中心を通る3次元空間中の平面を返す．
+/*!
+  \param l	画像平面上の直線の同次座標
+  \return	lとカメラの投影中心を通る平面の同次座標
+*/
+template <class T> inline typename CanonicalCamera<T>::plane_type
+CanonicalCamera<T>::h(const line_type& l) const
+{
+    plane_type	h;
+    h(0, 3) = l * _Rt;
+    h[3] = -(h(0, 3) * _t);
+
+    return h;
+}
+
+//! 画像平面上の点を3次元空間中の平面に逆投影した点を返す．
+/*!
+  \param x	画像平面上の点の非同次座標
+  \param h	3次元空間中の平面の同次座標
+  \return	xをhに逆投影した3次元空間中の点の非同次座標
+*/
+template <class T> inline typename CanonicalCamera<T>::point3_type
+CanonicalCamera<T>::X(const point2_type& x, const plane_type& h) const
+{
+    point3_type	Rx = x[0]*_Rt[0] + x[1]*_Rt[1] + _Rt[2];
+    value_type	k  = (h(0, 3)*_t + h[3]) / (h(0, 3)*Rx);
+
+    return _t - k*Rx;
+}
+
 //! カメラ外部パラメータの自由度を返す．
 /*!
   \return	外部パラメータの自由度, すなわち6
@@ -1339,6 +1381,8 @@ class Camera : public CanonicalCamera<typename I::value_type>, public I
     typedef typename extrinsic_type::value_type		value_type;
     typedef typename extrinsic_type::point2_type	point2_type;
     typedef typename extrinsic_type::point3_type	point3_type;
+    typedef typename extrinsic_type::line_type		line_type;
+    typedef typename extrinsic_type::plane_type		plane_type;
     typedef typename extrinsic_type::vector_type	vector_type;
     typedef typename extrinsic_type::matrix_type	matrix_type;
     typedef typename extrinsic_type::matrix33_type	matrix33_type;
@@ -1360,6 +1404,10 @@ class Camera : public CanonicalCamera<typename I::value_type>, public I
     matrix34_type	P()					const	;
     void		setProjection(const matrix34_type& P)		;
 
+    plane_type		h(const line_type& l)			const	;
+    point3_type		X(const point2_type& u,
+			  const plane_type& h)			const	;
+    
     static u_int	dof()						;
     void		update(const vector_type& dp)			;
     void		updateFCC(const vector_type& dp)		;
@@ -1560,6 +1608,29 @@ Camera<I>::setProjection(const matrix34_type& P)
     extrinsic_type::setTranslation(t);
     extrinsic_type::setRotation(Rt);
     intrinsic_type::setK(K);    
+}
+
+//! 画像平面上の直線とカメラの投影中心を通る3次元空間中の平面を返す．
+/*!
+  \param l	画像平面上の直線の同次座標
+  \return	lとカメラの投影中心を通る平面の同次座標
+*/
+template <class T> inline typename Camera<T>::plane_type
+Camera<T>::h(const line_type& l) const
+{
+    return extrinsic_type::h(l * intrinsic_type::K());
+}
+
+//! 画像平面上の点を3次元空間中の平面に逆投影した点を返す．
+/*!
+  \param u	画像平面上の点の非同次座標
+  \param h	3次元空間中の平面の同次座標
+  \return	xをhに逆投影した3次元空間中の点の非同次座標
+*/
+template <class T> inline typename Camera<T>::point3_type
+Camera<T>::X(const point2_type& u, const plane_type& h) const
+{
+    return extrinsic_type::X(intrinsic_type::xFromU(u), h);
 }
 
 //! カメラの外部／可変内部パラメータの自由度を返す．

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Geometry++.h,v 1.45 2012-08-29 21:17:08 ueshiba Exp $
+ *  $Id: Geometry++.h,v 1.46 2012-09-10 08:26:18 ueshiba Exp $
  */
 /*!
   \file		Geometry++.h
@@ -628,7 +628,8 @@ class HyperPlane : public V
     typedef typename V::value_type			value_type;
     
   public:
-    HyperPlane(u_int d=2)				;
+    HyperPlane()					;
+    explicit HyperPlane(u_int d)			;
 
   //! 同次座標ベクトルを指定して超平面オブジェクトを生成する．
   /*!
@@ -673,6 +674,18 @@ class HyperPlane : public V
     dist(const Vector<T, B>& x)			const	;
 };
 
+//! 超平面オブジェクトを生成する．
+/*!
+  無限遠超平面([0, 0,..., 0, 1])に初期化される．
+*/
+template <class V> inline
+HyperPlane<V>::HyperPlane()
+    :V()
+{
+    if (V::dim() > 0)
+	(*this)[V::dim()-1] = 1;
+}
+    
 //! 空間の次元を指定して超平面オブジェクトを生成する．
 /*!
   無限遠超平面([0, 0,..., 0, 1])に初期化される．
