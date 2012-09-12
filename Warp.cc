@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.23 2012-09-10 08:26:18 ueshiba Exp $
+ *  $Id: Warp.cc,v 1.24 2012-09-12 06:33:28 ueshiba Exp $
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
@@ -179,7 +179,7 @@ bilinearInterpolate(const Image<T>& in, int us, int vs, int du, int dv)
     return out;
 }
 
-template <> static inline YUV444
+template <> inline YUV444
 bilinearInterpolate(const Image<YUV444>& in, int us, int vs, int du, int dv)
 {
     YUV444	in00 = in[vs][us],   in01 = in[vs][us+1],

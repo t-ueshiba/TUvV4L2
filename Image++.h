@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Image++.h,v 1.61 2012-08-29 21:17:08 ueshiba Exp $
+ *  $Id: Image++.h,v 1.62 2012-09-12 06:33:28 ueshiba Exp $
  */
 /*!
   \file		Image++.h
@@ -1097,8 +1097,8 @@ ImageLine<YUV411>::resize(YUV411* p, u_int d)
     Array<YUV411>::resize(p, d);
 }
 
-/********st****************************************************************
-*  class Image<T>:	Generic image class				*
+/************************************************************************
+*  class Image<T>:							*
 ************************************************************************/
 //! T型の画素を持つ画像を表すクラス
 /*!
@@ -1173,7 +1173,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     \param c	代入する画素値
     \return	この画像
   */
-    Image&	operator = (const T& c)		{Array2<ImageLine<T> >::
+    Image&	operator =(const T& c)		{Array2<ImageLine<T> >::
 						 operator =(c); return *this;}
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out,
