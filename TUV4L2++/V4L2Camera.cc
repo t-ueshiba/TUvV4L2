@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.8 2012-08-29 21:17:10 ueshiba Exp $
+ *  $Id: V4L2Camera.cc,v 1.9 2012-09-12 11:24:47 ueshiba Exp $
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -1628,7 +1628,11 @@ operator >>(std::istream& in, V4L2Camera& camera)
     camera.setFormat(pixelFormat, w, h, fps_n, fps_d);
     
   // 各カメラ属性を読み込んでカメラに設定する．
-    while (in >> s)
+    for (char c; in.get(c) && c != '\n'; )
+    {
+	in.putback(c);
+	in >> s;
+
 	for (u_int i = 0; i < NFEATURES; ++i)
 	    if (s == features[i].name)
 	    {
@@ -1637,6 +1641,7 @@ operator >>(std::istream& in, V4L2Camera& camera)
 		camera.setValue(features[i].feature, val);
 		break;
 	    }
+    }
     
     return in;
 }
