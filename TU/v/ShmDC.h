@@ -25,34 +25,47 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ModalDialog.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: ShmDC.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvModalDialog_h
-#define __TUvModalDialog_h
+#ifndef __TUvShmDC_h
+#define __TUvShmDC_h
 
-#include "TU/v/Dialog.h"
+#include "TU/v/CanvasPaneDC.h"
+#include <X11/extensions/XShm.h>
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class ModalDialog							*
+*  class ShmDC								*
 ************************************************************************/
-class ModalDialog : public Dialog
+class ShmDC : public CanvasPaneDC
 {
   public:
-    ModalDialog(Window& parentWindow, const char* myName, 
-		const CmdDef cmd[])				;
-    virtual ~ModalDialog()					;
+    ShmDC(CanvasPane& parentCanvasPane, u_int width=0, u_int height=0,
+	  u_int mul=1, u_int div=1)					;
+    virtual		~ShmDC()					;
 
-    virtual void	show()					;
-    virtual void	hide()					;
+  protected:
+    virtual void	allocateXImage(int buffWidth, int buffHeight)	;
+    virtual void	putXImage()				const	;
+    char*		attachShm(u_int size)				;
+    virtual void	destroyShmImage()				;
+    XShmSegmentInfo*	xShmInfo()					;
     
   private:
-    bool		_active;
+    XShmSegmentInfo	_xShmInfo;
+    u_int		_xShmSize;	// Size of shm currently allocated.
+    bool		_xShmAvailable;
 };
+
+inline XShmSegmentInfo*
+ShmDC::xShmInfo()
+{
+    return &_xShmInfo;
+}
 
 }
 }
-#endif	// !__TUvModalDialog_h
+#endif	// !__TUvShmDC_h

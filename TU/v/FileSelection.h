@@ -25,12 +25,14 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Confirm.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: FileSelection.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvConfirm_h
-#define __TUvConfirm_h
+#ifndef __TUvFileSelection_h
+#define __TUvFileSelection_h
 
-#include <sstream>
+#include <fstream>
+#include <string>
+#include <dirent.h>
 #include "TU/v/ModalDialog.h"
 
 namespace TU
@@ -38,22 +40,35 @@ namespace TU
 namespace v
 {
 /************************************************************************
-*  class Confirm							*
+*  class FileSelection							*
 ************************************************************************/
-class Confirm : public ModalDialog, public std::ostringstream
+class FileSelection : public ModalDialog
 {
   public:
-    Confirm(Window& parentWindow)					;
-    virtual		~Confirm()					;
+    FileSelection(Window& parentWindow)					;
+    virtual		~FileSelection()				;
 
-    bool		ok()						;
-    
+    bool		open(std::ifstream& in)				;
+    bool		open(std::ofstream& out)			;
+
     virtual void	callback(CmdId id, CmdVal val)			;
 
   private:
-    bool		_ok;
+    struct cmp
+    {
+	bool	operator ()(const char* a, const char* b)
+						{return ::strcmp(a, b) < 0;}
+    };
+    
+    void		changeDirectory(const std::string& dirname)	;
+    void		getFileNames(DIR* dirp, int n)			;
+    std::string		fullPathName(const char* filename)	const	;
+
+    std::string		_fullname;  // fullpath file name currently selected.
+    std::string		_dirname;   // directory name currently browsing.
+    Array<char*>	_filenames; // file names under _dirname.
 };
 
 }
 }
-#endif	// !__TUvConfirm_h
+#endif // !__TUvFileSelection_h

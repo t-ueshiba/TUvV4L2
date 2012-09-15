@@ -25,10 +25,10 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPane.h,v 1.7 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Menu.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvCanvasPane_h
-#define __TUvCanvasPane_h
+#ifndef __TUvMenu_h
+#define __TUvMenu_h
 
 #include "TU/v/TUv++.h"
 
@@ -37,32 +37,57 @@ namespace TU
 namespace v
 {
 /************************************************************************
-*  class CanvasPane							*
+*  class Menu							*
 ************************************************************************/
-class CanvasPane : public Pane
+class Menu : public Cmd
 {
   public:
-    CanvasPane(Window& parentWin, u_int devWidth=0, u_int devHeight=0)	;
-    virtual			~CanvasPane()				;
+    class Item : public Cmd
+    {
+      public:
+	Item(Menu& parentMenu, const MenuDef& menuItem)			;
+	virtual			~Item()					;
+	
+	virtual const Widget&	widget()			const	;
 
+	virtual void	callback(CmdId id, CmdVal val)			;
+	virtual CmdVal	getValue()				const	;
+	virtual void	setValue(CmdVal val)				;
+
+      private:
+	const Widget	_widget;	// smeLineObject or smeBSBObject
+
+	static u_int	_nitems;
+    };
+
+  public:
+    Menu(Object& parentObject, const MenuDef menu[])			;
+    Menu(Object& parentObject, const MenuDef menu[],
+	 const char* name, ::Widget parentWidget)			;
+    virtual			~Menu()					;
+	    
     virtual const Widget&	widget()			const	;
 
-    virtual void		repaintUnderlay()			;
-    virtual void		repaintOverlay()			;
-    void			moveDC(int u, int v)			;
-    
-  protected:
-    virtual CanvasPane&		canvasPane()				;
-    virtual void		initializeGraphics()			;
-    
   private:
-  // allow access to initializeGraphics
-    friend void		CBcanvasPaneDC(::Widget, XtPointer client_data,
-				       XtPointer)			;
+    const Widget		_widget;	// simpleMenuWidget
+};
 
-    const Widget	_widget;		// viewportWidget
+/************************************************************************
+*  class ChoiceMenu							*
+************************************************************************/
+class ChoiceMenu : public Menu
+{
+  public:
+    ChoiceMenu(Object& parentObject, const MenuDef menu[])		;
+    ChoiceMenu(Object& parentObject, const MenuDef menu[],
+	       const char* name, ::Widget widget)			;
+    virtual		~ChoiceMenu()					;
+	    
+    virtual void	callback(CmdId id, CmdVal val)			;
+    virtual CmdVal	getValue()				const	;
+    virtual void	setValue(CmdVal val)				;
 };
 
 }
 }
-#endif	// !__CanvasPane_h
+#endif	// !__TUvMenu_h

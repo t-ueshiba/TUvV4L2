@@ -25,32 +25,29 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CmdPane.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Widget-Xaw.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvCmdPane_h
-#define __TUvCmdPane_h
-
-#include "TU/v/CmdWindow.h"
-
-namespace TU
-{
-namespace v
-{
-/************************************************************************
-*  class CmdPane							*
-************************************************************************/
-class CmdPane : public Pane, public CmdParent
+class Widget
 {
   public:
-    CmdPane(Window& parentWindow, const CmdDef cmd[])		;
-    virtual ~CmdPane()						;
+    Widget(::Widget widget)				;
+    Widget(const Widget& parentWidget,
+	   const char*	name, const CmdDef& cmd)	;
+    ~Widget()						;
 
-    virtual const Widget&	widget()		const	;
+			operator ::Widget()	const	{return _widget;}
 
+    u_int		width()				const	;
+    u_int		height()			const	;
+    Point2<int>		position()			const	;
+    u_long		background()			const	;
+    Widget&		setWidth(u_int w)			;
+    Widget&		setHeight(u_int h)			;
+    Widget&		setPosition(const Point2<int>&)		;
+    
   private:
-    const Widget	_widget;		// boxWidget
-};
+    Widget(const Widget&)					;
+    Widget&		operator =(const Widget&)		;
 
-}
-}
-#endif	// !__TUvCmdPane_h
+    ::Widget		_widget;
+};

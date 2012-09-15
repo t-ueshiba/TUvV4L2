@@ -25,46 +25,34 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: App.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Icon.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvApp_h
-#define __TUvApp_h
+#ifndef __TUvIcon_h
+#define __TUvIcon_h
 
-#include "TU/v/TUv++.h"
 #include "TU/v/Colormap.h"
+#include <X11/Xutil.h>
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class App								*
+*  class Icon								*
 ************************************************************************/
-class App : public Window
+class Icon
 {
   public:
-    App(int& argc, char* argv[])					;
-    virtual ~App()							;
+    Icon(const Colormap& colormap, const u_char data[])	;
+    ~Icon()						;
 
-    virtual const Widget&	widget()			const	;
-    virtual Colormap&		colormap()				;
-    virtual void		callback(CmdId id, CmdVal val)		;
-
-	    void	run()						;
-    virtual void	exit()						;
-
-	    void	addColormapWindow(const Window& vWindow)const;
+    Pixmap		xpixmap()		const	{return _pixmap;}
     
-  protected:
-    virtual App&	app()						;
-
   private:
-    XtAppContext	_appContext;
-    const Widget	_widget;		// applicationShellWidget
-    Colormap		_colormap;
-    bool		_active;
+    Display* const	_display;
+    const Pixmap	_pixmap;
 };
 
 }
 }
-#endif	// !__TUvApp_h
+#endif	// !__TUvIcon_h

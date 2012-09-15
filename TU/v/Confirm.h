@@ -25,10 +25,10 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Notify.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Confirm.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvNotify_h
-#define __TUvNotify_h
+#ifndef __TUvConfirm_h
+#define __TUvConfirm_h
 
 #include <sstream>
 #include "TU/v/ModalDialog.h"
@@ -38,19 +38,22 @@ namespace TU
 namespace v
 {
 /************************************************************************
-*  class Notify								*
+*  class Confirm							*
 ************************************************************************/
-class Notify : public ModalDialog, public std::ostringstream
+class Confirm : public ModalDialog, public std::ostringstream
 {
   public:
-    Notify(Window& parentWindow)					;
-    virtual		~Notify()					;
+    Confirm(Window& parentWindow)					;
+    virtual		~Confirm()					;
 
-    virtual void	show()						;
+    bool		ok()						;
     
     virtual void	callback(CmdId id, CmdVal val)			;
+
+  private:
+    bool		_ok;
 };
 
 }
 }
-#endif // !__TUvNotify_h
+#endif	// !__TUvConfirm_h

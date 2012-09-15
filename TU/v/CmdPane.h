@@ -25,34 +25,32 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Icon.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: CmdPane.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvIcon_h
-#define __TUvIcon_h
+#ifndef __TUvCmdPane_h
+#define __TUvCmdPane_h
 
-#include "TU/v/Colormap.h"
-#include <X11/Xutil.h>
+#include "TU/v/CmdWindow.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class Icon								*
+*  class CmdPane							*
 ************************************************************************/
-class Icon
+class CmdPane : public Pane, public CmdParent
 {
   public:
-    Icon(const Colormap& colormap, const u_char data[])	;
-    ~Icon()						;
+    CmdPane(Window& parentWindow, const CmdDef cmd[])		;
+    virtual ~CmdPane()						;
 
-    Pixmap		xpixmap()		const	{return _pixmap;}
-    
+    virtual const Widget&	widget()		const	;
+
   private:
-    Display* const	_display;
-    const Pixmap	_pixmap;
+    const Widget	_widget;		// boxWidget
 };
 
 }
 }
-#endif	// !__TUvIcon_h
+#endif	// !__TUvCmdPane_h

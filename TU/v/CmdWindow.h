@@ -25,34 +25,71 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC3.h,v 1.7 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: CmdWindow.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvCanvasPaneDC3_h
-#define __TUvCanvasPaneDC3_h
+#ifndef __TUvCmdWindow_h
+#define __TUvCmdWindow_h
 
-#include "TU/v/CanvasPaneDC.h"
-#include "TU/v/DC3.h"
+#include "TU/v/TUv++.h"
+#include "TU/v/Colormap.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class CanvasPaneDC3							*
+*  class CmdWindow							*
 ************************************************************************/
-class CanvasPaneDC3 : virtual public CanvasPaneDC, public DC3
+class CmdWindow : public Window
 {
+  private:
+    class Paned : public Object
+    {
+      public:
+	Paned(CmdWindow&)					;
+	virtual			~Paned()			;
+	
+	virtual const Widget&	widget()		const	;
+
+      private:
+	const Widget	_widget;			// gridboxWidget
+    };
+
   public:
-    CanvasPaneDC3(CanvasPane& parentCanvasPane,
-		  u_int width=0, u_int height=0,
-		  u_int mul=1, u_int div=1)				;
-    virtual		~CanvasPaneDC3()				;
-    virtual void	callback(CmdId id, CmdVal val)			;
+    CmdWindow(Window&			parentWindow,
+	      const char*		myName,
+	      Colormap::Mode		mode,
+	      u_int			resolution,
+	      u_int			underlayCmapDim,
+	      u_int			overlayDepth,
+	      int			screen=-1,
+	      bool			fullScreen=false)	;
+    CmdWindow(Window&			parentWindow,
+	      const char*		myName,
+	      const XVisualInfo*	vinfo,
+	      Colormap::Mode		mode,
+	      u_int			resolution,
+	      u_int			underlayCmapDim,
+	      u_int			overlayDepth,
+	      bool			fullScreen=false)	;
+    virtual			~CmdWindow()			;
+
+    virtual const Widget&	widget()		const	;
+    virtual Colormap&		colormap()			;
+    virtual void		show()				;
 
   protected:
-    virtual void	initializeGraphics()				;
+    virtual Object&		paned()				;
+
+  private:
+    friend void		EVcmdWindow(::Widget widget, XtPointer cmdWindowPtr,
+				    XEvent* event, Boolean*);
+    
+    Colormap		_colormap;
+    const Widget	_widget;		// applicationShellWidget
+    Paned		_paned;
 };
 
 }
 }
-#endif	// !__TUvCanvasPaneDC3_h
+#endif	// !__TUvCmdWindow_h
