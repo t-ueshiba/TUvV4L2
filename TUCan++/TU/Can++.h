@@ -1,5 +1,5 @@
 /*
- *  $Id: Can++.h,v 1.4 2012-08-29 21:16:49 ueshiba Exp $
+ *  $Id: Can++.h,v 1.1 2012-09-15 05:20:12 ueshiba Exp $
  */
 #ifndef __TUCanPP_h
 #define __TUCanPP_h
