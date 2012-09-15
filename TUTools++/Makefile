@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.111 2012-09-01 05:37:14 ueshiba Exp $
+#  $Id: Makefile,v 1.112 2012-09-15 03:59:12 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/lib
-INCDIR		= $(PREFIX)/include/TU
+INCDIR		= $(PREFIX)/include
 INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
@@ -27,73 +27,48 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= TU/BlockDiagonalMatrix++.h \
+EXTHDRS		=
+HDRS		= TU/Array++.h \
+		TU/Bezier++.h \
+		TU/BlockDiagonalMatrix++.h \
+		TU/BoxFilter.h \
 		TU/Camera++.h \
 		TU/CorrectIntensity.h \
+		TU/DericheConvolver.h \
 		TU/EdgeDetector.h \
 		TU/GaussianConvolver.h \
+		TU/Geometry++.h \
+		TU/GraphCuts.h \
+		TU/GuidedFilter.h \
+		TU/Heap.h \
+		TU/IIRFilter.h \
 		TU/Image++.h \
+		TU/IntegralImage.h \
+		TU/List.h \
 		TU/Manip.h \
+		TU/Mesh++.h \
+		TU/Minimize.h \
+		TU/Movie.h \
+		TU/NDTree++.h \
+		TU/Nurbs++.h \
 		TU/PM16C_04.h \
+		TU/PSTree.h \
 		TU/Profiler.h \
 		TU/Random.h \
+		TU/Ransac.h \
 		TU/SHOT602.h \
-		TU/TU/Geometry++.h \
-		TU/TU/IIRFilter.h \
-		TU/TU/Serial.h \
-		TU/TU/TU/Array++.h \
-		TU/TU/TU/Minimize.h \
-		TU/TU/TU/TU/functional.h \
-		TU/TU/TU/TU/types.h \
-		TU/TU/TU/fdstream.h \
-		TU/TU/TU/iterator.h \
-		TU/TU/Vector++.h \
+		TU/Serial.h \
+		TU/SparseMatrix++.h \
 		TU/TriggerGenerator.h \
+		TU/Vector++.h \
 		TU/Warp.h \
+		TU/algorithm.h \
+		TU/fdstream.h \
+		TU/functional.h \
 		TU/io.h \
+		TU/iterator.h \
 		TU/mmInstructions.h \
-		TU/windows/fakeWindows.h
-HDRS		= Array++.h \
-		Bezier++.h \
-		BlockDiagonalMatrix++.h \
-		BoxFilter.h \
-		Camera++.h \
-		CorrectIntensity.h \
-		DericheConvolver.h \
-		EdgeDetector.h \
-		GaussianConvolver.h \
-		Geometry++.h \
-		GraphCuts.h \
-		GuidedFilter.h \
-		Heap.h \
-		IIRFilter.h \
-		Image++.h \
-		IntegralImage.h \
-		List.h \
-		Manip.h \
-		Mesh++.h \
-		Minimize.h \
-		Movie.h \
-		NDTree++.h \
-		Nurbs++.h \
-		PM16C_04.h \
-		PSTree.h \
-		Profiler.h \
-		Random.h \
-		Ransac.h \
-		SHOT602.h \
-		Serial.h \
-		SparseMatrix++.h \
-		TriggerGenerator.h \
-		Vector++.h \
-		Warp.h \
-		algorithm.h \
-		fdstream.h \
-		functional.h \
-		io.h \
-		iterator.h \
-		mmInstructions.h \
-		types.h
+		TU/types.h
 SRCS		= BlockDiagonalMatrix++.inst.cc \
 		ConversionFromYUV.cc \
 		CorrectIntensity.cc \
@@ -137,49 +112,38 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 
 include $(PROJECT)/lib/l.mk
 ###
-BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-ConversionFromYUV.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
-	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
-CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/TU/iterator.h TU/TU/TU/TU/functional.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h \
-	TU/mmInstructions.h
-EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/TU/Geometry++.h \
-	TU/TU/TU/iterator.h TU/TU/TU/TU/functional.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h \
-	TU/mmInstructions.h
-GaussianCoefficients.o: TU/GaussianConvolver.h TU/TU/Vector++.h \
-	TU/TU/TU/Array++.h TU/TU/TU/TU/types.h TU/TU/IIRFilter.h \
-	TU/mmInstructions.h TU/TU/TU/Minimize.h
-GenericImage.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
-	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
-Image++.inst.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
-	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
-ImageBase.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
-	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h TU/Camera++.h TU/Manip.h
-ImageLine.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
-	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h
-PM16C_04.o: TU/PM16C_04.h TU/TU/Serial.h TU/TU/TU/fdstream.h \
-	TU/TU/TU/TU/types.h TU/Manip.h
-Profiler.o: TU/Profiler.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h \
-	TU/windows/fakeWindows.h
-Random.o: TU/Random.h TU/TU/TU/TU/types.h TU/windows/fakeWindows.h
-SHOT602.o: TU/SHOT602.h TU/TU/Serial.h TU/TU/TU/fdstream.h \
-	TU/TU/TU/TU/types.h TU/Manip.h
-Serial.o: TU/TU/Serial.h TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h
-TriggerGenerator.o: TU/TriggerGenerator.h TU/TU/Serial.h \
-	TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h TU/Manip.h
-Vector++.inst.o: TU/TU/Vector++.h TU/TU/TU/Array++.h TU/TU/TU/TU/types.h
-Warp.o: TU/Warp.h TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/iterator.h \
-	TU/TU/TU/TU/functional.h TU/TU/Vector++.h TU/TU/TU/Array++.h \
-	TU/TU/TU/TU/types.h TU/TU/TU/Minimize.h TU/Camera++.h \
-	TU/mmInstructions.h
-fdstream.o: TU/TU/TU/fdstream.h TU/TU/TU/TU/types.h
+BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/Vector++.h \
+	TU/Array++.h TU/types.h
+ConversionFromYUV.o: TU/Image++.h TU/Geometry++.h TU/iterator.h \
+	TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
+CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/Geometry++.h \
+	TU/iterator.h TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h \
+	TU/Minimize.h TU/mmInstructions.h
+EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/Geometry++.h \
+	TU/iterator.h TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h \
+	TU/Minimize.h TU/mmInstructions.h
+GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
+	TU/types.h TU/IIRFilter.h TU/mmInstructions.h TU/Minimize.h
+GenericImage.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
+Image++.inst.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
+ImageBase.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h TU/Camera++.h \
+	TU/Manip.h
+ImageLine.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
+PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
+Profiler.o: TU/Profiler.h TU/Array++.h TU/types.h windows/fakeWindows.h
+Random.o: TU/Random.h TU/types.h windows/fakeWindows.h
+SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
+Serial.o: TU/Serial.h TU/fdstream.h TU/types.h
+TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
+	TU/types.h TU/Manip.h
+Vector++.inst.o: TU/Vector++.h TU/Array++.h TU/types.h
+Warp.o: TU/Warp.h TU/Image++.h TU/Geometry++.h TU/iterator.h \
+	TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h \
+	TU/Camera++.h TU/mmInstructions.h
+fdstream.o: TU/fdstream.h TU/types.h
 io.o: TU/io.h
-manipulators.o: TU/Manip.h TU/TU/TU/TU/types.h
+manipulators.o: TU/Manip.h TU/types.h
