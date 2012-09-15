@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.112 2012-09-15 03:59:12 ueshiba Exp $
+#  $Id: Makefile,v 1.113 2012-09-15 07:21:08 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,7 +27,7 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		=
+EXTHDRS		= windows/fakeWindows.h
 HDRS		= TU/Array++.h \
 		TU/Bezier++.h \
 		TU/BlockDiagonalMatrix++.h \
