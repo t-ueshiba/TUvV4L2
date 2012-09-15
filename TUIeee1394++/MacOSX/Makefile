@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.8 2012-09-15 05:13:16 ueshiba Exp $
+#  $Id: Makefile,v 1.9 2012-09-15 05:44:23 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -28,7 +28,9 @@ LINKER		= $(CXX)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= raw1394_.h
-HDRS		= raw1394_.h
+HDRS		= libraw1394/csr.h \
+		libraw1394/raw1394.h \
+		raw1394_.h
 SRCS		= raw1394.cc
 OBJS		= raw1394.o
 
