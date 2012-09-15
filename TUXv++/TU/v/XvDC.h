@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.h,v 1.9 2012-08-29 21:17:16 ueshiba Exp $
+ *  $Id: XvDC.h,v 1.1 2012-09-15 05:03:23 ueshiba Exp $
  */
 #ifndef __TUvXvDC_h
 #define __TUvXvDC_h
