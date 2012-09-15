@@ -25,36 +25,30 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC.h,v 1.8 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: MemoryDC.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvCanvasPaneDC_h
-#define __TUvCanvasPaneDC_h
+#ifndef __TUvMemoryDC_h
+#define __TUvMemoryDC_h
 
 #include "TU/v/XDC.h"
 #include "TU/v/CanvasPane.h"
-#include "TU/v/Menu.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class CanvasPaneDC							*
+*  class MemoryDC							*
 ************************************************************************/
-class CanvasPaneDC : public Object, public XDC
+class MemoryDC : public XDC
 {
   public:
-    CanvasPaneDC(CanvasPane& parentCanvasPane,
-		 u_int width=0, u_int height=0,
-		 u_int mul=1, u_int div=1)				;
-    virtual		~CanvasPaneDC()					;
-    
-    virtual const Widget&	widget()			const	;
+    MemoryDC(Colormap& colormap,
+	     u_int width, u_int height, u_int mul=1, u_int div=1)	;
+    virtual		~MemoryDC()					;
 
-    virtual DC&		setSize(u_int width, u_int height,
-				u_int mul,   u_int div)			;
-    virtual void	callback(CmdId id, CmdVal val)			;
-	    void	grabKeyboard()				const	;
+    DC&			setSize(u_int width, u_int height,
+				u_int mul, u_int div)			;
 
   protected:
     virtual Drawable	drawable()				const	;
@@ -63,24 +57,9 @@ class CanvasPaneDC : public Object, public XDC
     virtual DC&		repaintOverlay()				;
 
   private:
-    friend void		EVcanvasPaneDC(::Widget,
-				       XtPointer client_data,
-				       XEvent* event,
-				       Boolean*)			;
-    friend void		CBcanvasPaneDC(::Widget,
-				       XtPointer client_data,
-				       XtPointer)			;
-
-    void		setDeviceSize()					;
-    virtual u_int	realWidth()				const	;
-    virtual u_int	realHeight()				const	;
-
-    const Widget	_widget;		// vCanvasWidget
-    Menu		_popup;
-    int			_u_last;
-    int			_v_last;
+    Pixmap	_pixmap;
 };
 
 }
 }
-#endif	// !__TUvCanvasPaneDC_h
+#endif	// !__TUvMemoryDC_h

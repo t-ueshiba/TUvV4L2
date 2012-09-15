@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Timer.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Timer.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
 #ifndef __TUvTimer_h
 #define __TUvTimer_h

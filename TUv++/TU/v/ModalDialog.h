@@ -25,29 +25,34 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Widget-Xaw.h,v 1.8 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: ModalDialog.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-class Widget
+#ifndef __TUvModalDialog_h
+#define __TUvModalDialog_h
+
+#include "TU/v/Dialog.h"
+
+namespace TU
+{
+namespace v
+{
+/************************************************************************
+*  class ModalDialog							*
+************************************************************************/
+class ModalDialog : public Dialog
 {
   public:
-    Widget(::Widget widget)				;
-    Widget(const Widget& parentWidget,
-	   const char*	name, const CmdDef& cmd)	;
-    ~Widget()						;
+    ModalDialog(Window& parentWindow, const char* myName, 
+		const CmdDef cmd[])				;
+    virtual ~ModalDialog()					;
 
-			operator ::Widget()	const	{return _widget;}
-
-    u_int		width()				const	;
-    u_int		height()			const	;
-    Point2<int>		position()			const	;
-    u_long		background()			const	;
-    Widget&		setWidth(u_int w)			;
-    Widget&		setHeight(u_int h)			;
-    Widget&		setPosition(const Point2<int>&)		;
+    virtual void	show()					;
+    virtual void	hide()					;
     
   private:
-    Widget(const Widget&)					;
-    Widget&		operator =(const Widget&)		;
-
-    ::Widget		_widget;
+    bool		_active;
 };
+
+}
+}
+#endif	// !__TUvModalDialog_h

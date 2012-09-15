@@ -25,47 +25,32 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ShmDC.h,v 1.7 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Notify.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvShmDC_h
-#define __TUvShmDC_h
+#ifndef __TUvNotify_h
+#define __TUvNotify_h
 
-#include "TU/v/CanvasPaneDC.h"
-#include <X11/extensions/XShm.h>
+#include <sstream>
+#include "TU/v/ModalDialog.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class ShmDC								*
+*  class Notify								*
 ************************************************************************/
-class ShmDC : public CanvasPaneDC
+class Notify : public ModalDialog, public std::ostringstream
 {
   public:
-    ShmDC(CanvasPane& parentCanvasPane, u_int width=0, u_int height=0,
-	  u_int mul=1, u_int div=1)					;
-    virtual		~ShmDC()					;
+    Notify(Window& parentWindow)					;
+    virtual		~Notify()					;
 
-  protected:
-    virtual void	allocateXImage(int buffWidth, int buffHeight)	;
-    virtual void	putXImage()				const	;
-    char*		attachShm(u_int size)				;
-    virtual void	destroyShmImage()				;
-    XShmSegmentInfo*	xShmInfo()					;
+    virtual void	show()						;
     
-  private:
-    XShmSegmentInfo	_xShmInfo;
-    u_int		_xShmSize;	// Size of shm currently allocated.
-    bool		_xShmAvailable;
+    virtual void	callback(CmdId id, CmdVal val)			;
 };
 
-inline XShmSegmentInfo*
-ShmDC::xShmInfo()
-{
-    return &_xShmInfo;
-}
-
 }
 }
-#endif	// !__TUvShmDC_h
+#endif // !__TUvNotify_h

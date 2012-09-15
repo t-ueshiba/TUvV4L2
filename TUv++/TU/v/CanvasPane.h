@@ -25,41 +25,44 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: MemoryDC.h,v 1.8 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: CanvasPane.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvMemoryDC_h
-#define __TUvMemoryDC_h
+#ifndef __TUvCanvasPane_h
+#define __TUvCanvasPane_h
 
-#include "TU/v/XDC.h"
-#include "TU/v/CanvasPane.h"
+#include "TU/v/TUv++.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class MemoryDC							*
+*  class CanvasPane							*
 ************************************************************************/
-class MemoryDC : public XDC
+class CanvasPane : public Pane
 {
   public:
-    MemoryDC(Colormap& colormap,
-	     u_int width, u_int height, u_int mul=1, u_int div=1)	;
-    virtual		~MemoryDC()					;
+    CanvasPane(Window& parentWin, u_int devWidth=0, u_int devHeight=0)	;
+    virtual			~CanvasPane()				;
 
-    DC&			setSize(u_int width, u_int height,
-				u_int mul, u_int div)			;
+    virtual const Widget&	widget()			const	;
 
+    virtual void		repaintUnderlay()			;
+    virtual void		repaintOverlay()			;
+    void			moveDC(int u, int v)			;
+    
   protected:
-    virtual Drawable	drawable()				const	;
-    virtual void	initializeGraphics()				;
-    virtual DC&		repaintUnderlay()				;
-    virtual DC&		repaintOverlay()				;
-
+    virtual CanvasPane&		canvasPane()				;
+    virtual void		initializeGraphics()			;
+    
   private:
-    Pixmap	_pixmap;
+  // allow access to initializeGraphics
+    friend void		CBcanvasPaneDC(::Widget, XtPointer client_data,
+				       XtPointer)			;
+
+    const Widget	_widget;		// viewportWidget
 };
 
 }
 }
-#endif	// !__TUvMemoryDC_h
+#endif	// !__CanvasPane_h

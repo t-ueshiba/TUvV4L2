@@ -25,12 +25,11 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CmdWindow.h,v 1.8 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Bitmap.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvCmdWindow_h
-#define __TUvCmdWindow_h
+#ifndef __TUvBitmap_h
+#define __TUvBitmap_h
 
-#include "TU/v/TUv++.h"
 #include "TU/v/Colormap.h"
 
 namespace TU
@@ -38,58 +37,21 @@ namespace TU
 namespace v
 {
 /************************************************************************
-*  class CmdWindow							*
+*  class TUvBitmap							*
 ************************************************************************/
-class CmdWindow : public Window
+class Bitmap
 {
-  private:
-    class Paned : public Object
-    {
-      public:
-	Paned(CmdWindow&)					;
-	virtual			~Paned()			;
-	
-	virtual const Widget&	widget()		const	;
-
-      private:
-	const Widget	_widget;			// gridboxWidget
-    };
-
   public:
-    CmdWindow(Window&			parentWindow,
-	      const char*		myName,
-	      Colormap::Mode		mode,
-	      u_int			resolution,
-	      u_int			underlayCmapDim,
-	      u_int			overlayDepth,
-	      int			screen=-1,
-	      bool			fullScreen=false)	;
-    CmdWindow(Window&			parentWindow,
-	      const char*		myName,
-	      const XVisualInfo*	vinfo,
-	      Colormap::Mode		mode,
-	      u_int			resolution,
-	      u_int			underlayCmapDim,
-	      u_int			overlayDepth,
-	      bool			fullScreen=false)	;
-    virtual			~CmdWindow()			;
+    Bitmap(const Colormap& colormap, const u_char data[])	;
+    ~Bitmap()							;
 
-    virtual const Widget&	widget()		const	;
-    virtual Colormap&		colormap()			;
-    virtual void		show()				;
-
-  protected:
-    virtual Object&		paned()				;
-
-  private:
-    friend void		EVcmdWindow(::Widget widget, XtPointer cmdWindowPtr,
-				    XEvent* event, Boolean*);
+    Pixmap		xpixmap()		const	{return _bitmap;}
     
-    Colormap		_colormap;
-    const Widget	_widget;		// applicationShellWidget
-    Paned		_paned;
+  private:
+    Display* const	_display;
+    const Pixmap	_bitmap;
 };
 
 }
 }
-#endif	// !__TUvCmdWindow_h
+#endif	// !__TUvBitmap_h

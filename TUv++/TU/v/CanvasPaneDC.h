@@ -25,50 +25,62 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: FileSelection.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: CanvasPaneDC.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvFileSelection_h
-#define __TUvFileSelection_h
+#ifndef __TUvCanvasPaneDC_h
+#define __TUvCanvasPaneDC_h
 
-#include <fstream>
-#include <string>
-#include <dirent.h>
-#include "TU/v/ModalDialog.h"
+#include "TU/v/XDC.h"
+#include "TU/v/CanvasPane.h"
+#include "TU/v/Menu.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class FileSelection							*
+*  class CanvasPaneDC							*
 ************************************************************************/
-class FileSelection : public ModalDialog
+class CanvasPaneDC : public Object, public XDC
 {
   public:
-    FileSelection(Window& parentWindow)					;
-    virtual		~FileSelection()				;
+    CanvasPaneDC(CanvasPane& parentCanvasPane,
+		 u_int width=0, u_int height=0,
+		 u_int mul=1, u_int div=1)				;
+    virtual		~CanvasPaneDC()					;
+    
+    virtual const Widget&	widget()			const	;
 
-    bool		open(std::ifstream& in)				;
-    bool		open(std::ofstream& out)			;
-
+    virtual DC&		setSize(u_int width, u_int height,
+				u_int mul,   u_int div)			;
     virtual void	callback(CmdId id, CmdVal val)			;
+	    void	grabKeyboard()				const	;
+
+  protected:
+    virtual Drawable	drawable()				const	;
+    virtual void	initializeGraphics()				;
+    virtual DC&		repaintUnderlay()				;
+    virtual DC&		repaintOverlay()				;
 
   private:
-    struct cmp
-    {
-	bool	operator ()(const char* a, const char* b)
-						{return ::strcmp(a, b) < 0;}
-    };
-    
-    void		changeDirectory(const std::string& dirname)	;
-    void		getFileNames(DIR* dirp, int n)			;
-    std::string		fullPathName(const char* filename)	const	;
+    friend void		EVcanvasPaneDC(::Widget,
+				       XtPointer client_data,
+				       XEvent* event,
+				       Boolean*)			;
+    friend void		CBcanvasPaneDC(::Widget,
+				       XtPointer client_data,
+				       XtPointer)			;
 
-    std::string		_fullname;  // fullpath file name currently selected.
-    std::string		_dirname;   // directory name currently browsing.
-    Array<char*>	_filenames; // file names under _dirname.
+    void		setDeviceSize()					;
+    virtual u_int	realWidth()				const	;
+    virtual u_int	realHeight()				const	;
+
+    const Widget	_widget;		// vCanvasWidget
+    Menu		_popup;
+    int			_u_last;
+    int			_v_last;
 };
 
 }
 }
-#endif // !__TUvFileSelection_h
+#endif	// !__TUvCanvasPaneDC_h

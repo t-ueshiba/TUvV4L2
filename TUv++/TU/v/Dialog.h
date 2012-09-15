@@ -25,33 +25,37 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Bitmap.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id: Dialog.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
  */
-#ifndef __TUvBitmap_h
-#define __TUvBitmap_h
+#ifndef __TUvDialog_h
+#define __TUvDialog_h
 
-#include "TU/v/Colormap.h"
+#include "TU/v/CmdPane.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  class TUvBitmap							*
+*  class Dialog								*
 ************************************************************************/
-class Bitmap
+class Dialog : public Window
 {
   public:
-    Bitmap(const Colormap& colormap, const u_char data[])	;
-    ~Bitmap()							;
+    Dialog(Window& parentWindow, const char* myName,
+	   const CmdDef cmd[])					;
+    virtual ~Dialog()						;
 
-    Pixmap		xpixmap()		const	{return _bitmap;}
+    virtual const Widget&	widget()		const	;
+
+  protected:
+    CmdPane&			pane()				{return _pane;}
     
   private:
-    Display* const	_display;
-    const Pixmap	_bitmap;
+    const Widget	_widget;		// transientShellWidget
+    CmdPane		_pane;
 };
 
 }
 }
-#endif	// !__TUvBitmap_h
+#endif	// !__TUvDialog_h
