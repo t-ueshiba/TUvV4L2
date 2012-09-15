@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2++.h,v 1.8 2012-08-29 21:17:10 ueshiba Exp $
+ *  $Id: V4L2++.h,v 1.1 2012-09-15 05:10:04 ueshiba Exp $
  */
 /*!
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
