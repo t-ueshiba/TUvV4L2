@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.15 2012-09-15 05:20:10 ueshiba Exp $
+#  $Id: Makefile,v 1.16 2012-09-15 07:20:53 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,11 +27,8 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/types.h \
-		TU/Can++.h
-HDRS		= Can++.h
+EXTHDRS		=
+HDRS		= TU/Can++.h
 SRCS		= Can.cc \
 		Manus.cc
 OBJS		= Can.o \

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.38 2012-09-15 05:00:44 ueshiba Exp $
+#  $Id: Makefile,v 1.39 2012-09-15 07:21:16 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,29 +27,16 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= ButtonCmd_.h \
-		ChoiceFrameCmd_.h \
-		ChoiceMenuButtonCmd_.h \
-		FrameCmd_.h \
-		LabelCmd_.h \
-		ListCmd_.h \
-		MenuButtonCmd_.h \
-		RadioButtonCmd_.h \
-		SliderCmd_.h \
-		TextInCmd_.h \
-		ToggleButtonCmd_.h \
-		vCanvasP_.h \
-		vCanvas_.h \
-		vGridboxP_.h \
-		vGridbox_.h \
-		vScrollbarP_.h \
-		vScrollbar_.h \
-		vSliderP_.h \
-		vSlider_.h \
-		vTextFieldP_.h \
-		vTextField_.h \
-		vViewportP_.h \
-		vViewport_.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/List.h \
+		/usr/local/include/TU/Manip.h \
+		/usr/local/include/TU/Minimize.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/types.h
 HDRS		= ButtonCmd_.h \
 		ChoiceFrameCmd_.h \
 		ChoiceMenuButtonCmd_.h \

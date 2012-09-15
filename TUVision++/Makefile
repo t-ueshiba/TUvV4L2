@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.29 2012-09-15 05:19:14 ueshiba Exp $
+#  $Id: Makefile,v 1.30 2012-09-15 07:21:12 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,7 +27,28 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		=
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Brep/Brep++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/List.h \
+		/usr/local/include/TU/Manip.h \
+		/usr/local/include/TU/Minimize.h \
+		/usr/local/include/TU/Object++.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/v/CanvasPane.h \
+		/usr/local/include/TU/v/CanvasPaneDC.h \
+		/usr/local/include/TU/v/CmdPane.h \
+		/usr/local/include/TU/v/CmdWindow.h \
+		/usr/local/include/TU/v/Colormap.h \
+		/usr/local/include/TU/v/DC.h \
+		/usr/local/include/TU/v/Menu.h \
+		/usr/local/include/TU/v/TUv++.h \
+		/usr/local/include/TU/v/Widget-Xaw.h \
+		/usr/local/include/TU/v/XDC.h
 HDRS		= TU/v/Vision++.h
 SRCS		= BrepCanvasPane.cc \
 		BrepCmdPane.cc

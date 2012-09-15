@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.24 2012-09-15 05:16:29 ueshiba Exp $
+#  $Id: Makefile,v 1.25 2012-09-15 07:20:58 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,7 +27,8 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		=
+EXTHDRS		= /usr/local/include/TU/Object++.h \
+		/usr/local/include/TU/types.h
 HDRS		= TU/Collection++.h
 SRCS		= Collection++.cc \
 		ObjTreeBase.cc \
@@ -38,6 +39,9 @@ OBJS		= Collection++.o \
 
 include $(PROJECT)/lib/l.mk
 ###
-Collection++.o: TU/Collection++.h
-ObjTreeBase.o: TU/Collection++.h
-TUCollection++.sa.o: TU/Collection++.h
+Collection++.o: TU/Collection++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h
+ObjTreeBase.o: TU/Collection++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h
+TUCollection++.sa.o: TU/Collection++.h /usr/local/include/TU/Object++.h \
+	/usr/local/include/TU/types.h

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.25 2012-09-15 05:15:46 ueshiba Exp $
+#  $Id: Makefile,v 1.26 2012-09-15 07:21:03 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,7 +27,7 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= Object++_.h
+EXTHDRS		= /usr/local/include/TU/types.h
 HDRS		= Object++_.h \
 		TU/Object++.h
 SRCS		= Desc.cc \

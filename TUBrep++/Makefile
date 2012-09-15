@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.28 2012-09-15 05:18:11 ueshiba Exp $
+#  $Id: Makefile,v 1.29 2012-09-15 07:20:51 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
@@ -27,7 +27,14 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		=
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Minimize.h \
+		/usr/local/include/TU/Object++.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/types.h
 HDRS		= TU/Brep/Brep++.h
 SRCS		= Geometry.cc \
 		HalfEdge.cc \
