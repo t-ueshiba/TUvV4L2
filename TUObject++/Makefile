@@ -1,11 +1,11 @@
 #
-#  $Id: Makefile,v 1.24 2012-09-01 05:37:10 ueshiba Exp $
+#  $Id: Makefile,v 1.25 2012-09-15 05:15:46 ueshiba Exp $
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/lib
-INCDIR		= $(PREFIX)/include/TU
+INCDIR		= $(PREFIX)/include
 INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
@@ -27,10 +27,9 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= /usr/local/include/TU/types.h \
+EXTHDRS		= Object++_.h
+HDRS		= Object++_.h \
 		TU/Object++.h
-HDRS		= Object++.h \
-		Object++_.h
 SRCS		= Desc.cc \
 		Object++.cc \
 		Object.cc \
