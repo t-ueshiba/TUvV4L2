@@ -19,13 +19,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.14 2012-08-29 19:33:23 ueshiba Exp $
+ *  $Id: raw1394_.h,v 1.15 2012-09-15 05:13:16 ueshiba Exp $
  */
 /*!
   \file		raw1394_.h
   \brief	::raw1394 構造体の定義と実装
 */ 
-#include "raw1394.h"
+#include "libraw1394/raw1394.h"
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
 #include <CoreServices/CoreServices.h>
 
