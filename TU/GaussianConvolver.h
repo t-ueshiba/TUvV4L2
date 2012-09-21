@@ -112,6 +112,9 @@ template <class T> class __PORT GaussianCoefficients
 template <class T> class GaussianConvolver
     : public GaussianCoefficients<T>, private BidirectionalIIRFilter<4u, T>
 {
+  public:
+    typedef T						coeff_type;
+    
   private:
     typedef GaussianCoefficients<T>			coeffs;
     typedef BidirectionalIIRFilter<4u, T>		super;
@@ -189,6 +192,9 @@ GaussianConvolver<T>::diff2(IN ib, IN ie, OUT out)
 template <class T> class GaussianConvolver2
     : public GaussianCoefficients<T>, private BidirectionalIIRFilter2<4u, T>
 {
+  public:
+    typedef T						coeff_type;
+    
   private:
     typedef GaussianCoefficients<T>			coeffs;
     typedef BidirectionalIIRFilter2<4u, T>		super;

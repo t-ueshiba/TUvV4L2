@@ -14,13 +14,13 @@ ifeq ($(OSTYPE), darwin)
 #  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
-CPPFLAGS	= -DUSE_TBB
+CPPFLAGS	= -DUSE_IIR_FILTER_ITERATOR #-DUSE_TBB 
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
   CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DSSE3
+#  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
