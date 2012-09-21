@@ -12,94 +12,60 @@ namespace TU
 /************************************************************************
 *  static fucntions							*
 ************************************************************************/
-template <class S, class T> void
-doJob(float alpha, bool gaussian)
+template <class T, class CONVOLVER> void
+doJob(typename CONVOLVER::coeff_type alpha)
 {
     using namespace	std;
 	
-    Image<S>	in;
+    typedef typename CONVOLVER::coeff_type	value_type;
+    
+    Image<T>	in;
     in.restore(cin);
     
-    Image<T>	out(in.width(), in.height());
-    Profiler	profiler(1);
+    Image<value_type>	out(in.width(), in.height());
+    Profiler		profiler(1);
+    CONVOLVER		convolver(alpha);
 
-    if (gaussian)
+    for (int i = 0; i < 5; ++i)
     {
-	GaussianConvolver2<T>	convolver(alpha);
-
-	for (int i = 0; i < 10; ++i)
+	for (int j = 0; j < 100; ++j)
 	{
-	    for (int j = 0; j < 100; ++j)
-	    {
-		profiler.start(0);
-		convolver.smooth(in.begin(), in.end(), out.begin());
-		profiler.stop().nextFrame();
-	    }
-	    cerr << "---------------------------------------------" << endl;
-	    profiler.print(cerr);
+	    profiler.start(0);
+	    convolver.smooth(in.begin(), in.end(), out.begin());
+	    profiler.stop().nextFrame();
 	}
+	cerr << "---------------------------------------------" << endl;
+	profiler.print(cerr);
     }
-    else
-    {
-	DericheConvolver2<T>	convolver(alpha);
 
-	for (int i = 0; i < 10; ++i)
-	{
-	    for (int j = 0; j < 100; ++j)
-	    {
-		profiler.start(0);
-		convolver.smooth(in.begin(), in.end(), out.begin());
-		profiler.stop().nextFrame();
-	    }
-	    cerr << "---------------------------------------------" << endl;
-	    profiler.print(cerr);
-	}
-    }
-    out.save(cout, ImageBase::FLOAT);
+    out.save(cout);
 }
  
-template <class S, class T> void
-doJob1(float alpha, bool gaussian)
+template <class T, class CONVOLVER> void
+doJob1(typename CONVOLVER::coeff_type alpha)
 {
     using namespace	std;
-	
-    Image<S>	in;
+
+    typedef typename CONVOLVER::coeff_type	value_type;
+    
+    Image<T>	in;
     in.restore(cin);
     
-    ImageLine<T>	out(in.width());
-    Profiler		profiler(1);
+    ImageLine<value_type>	out(in.width());
+    Profiler			profiler(1);
 
-    if (gaussian)
+    CONVOLVER			convolver(alpha);
+
+    for (int i = 0; i < 5; ++i)
     {
-	GaussianConvolver<T>	convolver(alpha);
-
-	for (int i = 0; i < 10; ++i)
+	for (int j = 0; j < 100; ++j)
 	{
-	    for (int j = 0; j < 100; ++j)
-	    {
-		profiler.start(0);
-		convolver.smooth(in[0].begin(), in[0].end(), out.begin());
-		profiler.stop().nextFrame();
-	    }
-	    cerr << "---------------------------------------------" << endl;
-	    profiler.print(cerr);
+	    profiler.start(0);
+	    convolver.smooth(in[0].begin(), in[0].end(), out.begin());
+	    profiler.stop().nextFrame();
 	}
-    }
-    else
-    {
-	DericheConvolver<T>	convolver(alpha);
-
-	for (int i = 0; i < 10; ++i)
-	{
-	    for (int j = 0; j < 100; ++j)
-	    {
-		profiler.start(0);
-		convolver.smooth(in[0].begin(), in[0].end(), out.begin());
-		profiler.stop().nextFrame();
-	    }
-	    cerr << "---------------------------------------------" << endl;
-	    profiler.print(cerr);
-	}
+	cerr << "---------------------------------------------" << endl;
+	profiler.print(cerr);
     }
 }
  
@@ -114,6 +80,9 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
+    typedef u_char	pixel_type;
+    typedef float	coeff_type;
+    
     float		alpha = 1.0;
     bool		gaussian = false;
     extern char*	optarg;
@@ -130,9 +99,18 @@ main(int argc, char* argv[])
 
     try
     {
-	doJob1<u_char, float>(alpha, gaussian);
-	cerr << endl;
-	doJob<u_char, float>(alpha, gaussian);
+	if (gaussian)
+	{
+	    doJob1<pixel_type, GaussianConvolver< coeff_type> >(alpha);
+	    cerr << endl;
+	    doJob< pixel_type, GaussianConvolver2<coeff_type> >(alpha);
+	}
+	else
+	{
+	    doJob1<pixel_type, DericheConvolver< coeff_type> >(alpha);
+	    cerr << endl;
+	    doJob< pixel_type, DericheConvolver2<coeff_type> >(alpha);
+	}
     }
     catch (exception& err)
     {

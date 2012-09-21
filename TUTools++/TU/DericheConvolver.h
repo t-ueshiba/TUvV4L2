@@ -45,15 +45,17 @@ namespace TU
 template <class T> class DericheCoefficients
 {
   public:
+    typedef T	value_type;
+    
     void	initialize(T alpha)			;
     
   protected:
     DericheCoefficients(T alpha)			{initialize(alpha);}
     
   protected:
-    T		_c0[4];		//!< forward coefficients for smoothing
-    T		_c1[4];		//!< forward coefficients for 1st derivatives
-    T		_c2[4];		//!< forward coefficients for 2nd derivatives
+    value_type	_c0[4];		//!< forward coefficients for smoothing
+    value_type	_c1[4];		//!< forward coefficients for 1st derivatives
+    value_type	_c2[4];		//!< forward coefficients for 2nd derivatives
 };
 
 //! Canny-Deriche核の初期化を行う
@@ -61,9 +63,9 @@ template <class T> class DericheCoefficients
   \param alpha	フィルタサイズを表す正数（小さいほど広がりが大きい）
 */
 template <class T> inline void
-DericheCoefficients<T>::initialize(T alpha)
+DericheCoefficients<T>::initialize(value_type alpha)
 {
-    const T	e  = expf(-alpha), beta = sinhf(alpha);
+    const value_type	e  = std::exp(-alpha), beta = std::sinh(alpha);
     _c0[0] =  (alpha - 1.0) * e;		// i(n-1)
     _c0[1] =  1.0;				// i(n)
     _c0[2] = -e * e;				// oF(n-2)
@@ -87,6 +89,9 @@ DericheCoefficients<T>::initialize(T alpha)
 template <class T> class DericheConvolver
     : public DericheCoefficients<T>, private BidirectionalIIRFilter<2u, T>
 {
+  public:
+    typedef T						coeff_type;
+    
   private:
     typedef DericheCoefficients<T>			coeffs;
     typedef BidirectionalIIRFilter<2u, T>		super;
@@ -164,6 +169,9 @@ DericheConvolver<T>::diff2(IN ib, IN ie, OUT out)
 template <class T> class DericheConvolver2
     : public DericheCoefficients<T>, private BidirectionalIIRFilter2<2u, T>
 {
+  public:
+    typedef T						coeff_type;
+    
   private:
     typedef DericheCoefficients<T>			coeffs;
     typedef BidirectionalIIRFilter2<2u, T>		super;

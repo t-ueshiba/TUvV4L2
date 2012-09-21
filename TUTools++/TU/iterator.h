@@ -222,7 +222,7 @@ make_box_filter_iterator(Iterator iter)
 }
 
 /************************************************************************
-*  class iir_filter_iterator<D, FWD, IN, COEFF>				*
+*  class iir_filter_iterator<D, FWD, IN, COEFF, OUT>			*
 ************************************************************************/
 //! データ列中の指定された要素に対してinfinite impulse response filterを適用した結果を返す反復子
 /*!
@@ -231,80 +231,209 @@ make_box_filter_iterator(Iterator iter)
   \param IN	データ列中の要素を指す定数反復子の型
   \param COEFF	フィルタのz変換係数
 */
-template <unsigned int D, bool FWD, class IN, class COEFF>
-class iir_filter_iterator
-    : public std::iterator<std::input_iterator_tag,
-			   typename std::iterator_traits<COEFF>::value_type>
+template <unsigned int D, bool FWD, class COEFF, class IN,
+	  class OUT=typename std::iterator_traits<COEFF>::value_type>
+class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 {
   public:
-    typedef typename std::iterator_traits<COEFF>::value_type	value_type;
-    typedef iir_filter_iterator					self;
+    typedef OUT				value_type;
+    typedef iir_filter_iterator		self;
 
   private:
-    typedef boost::array<value_type, D>				buf_type;
-    typedef typename buf_type::iterator				buf_iterator;
+    typedef boost::array<value_type, D>	buf_type;
     
+  private:
+    static inline value_type
+		inner_product(COEFF c, const buf_type& buf,
+			      value_type init, std::size_t i)
+		{
+		    typedef typename buf_type::const_iterator	const_iterator;
+
+		    const_iterator	p = buf.begin() + i;
+		    for (const_iterator q = p; q != buf.end(); ++q)
+			init += *c++ * *q;
+		    for (const_iterator q = buf.begin(); q != p; ++q)
+			init += *c++ * *q;
+		    
+		    return init;
+		}
+
+#define TU_INPRO_2_0(C, BUF, OUT)	OUT += *C   * BUF[0];	\
+					OUT += *++C * BUF[1]
+#define TU_INPRO_2_1(C, BUF, OUT)	OUT += *C   * BUF[1];	\
+					OUT += *++C * BUF[0]
+#define TU_INPRO_4_0(C, BUF, OUT)	OUT += *C   * BUF[0];	\
+					OUT += *++C * BUF[1];	\
+					OUT += *++C * BUF[2];	\
+					OUT += *++C * BUF[3]
+#define TU_INPRO_4_1(C, BUF, OUT)	OUT += *C   * BUF[1];	\
+					OUT += *++C * BUF[2];	\
+					OUT += *++C * BUF[3];	\
+					OUT += *++C * BUF[0]
+#define TU_INPRO_4_2(C, BUF, OUT)	OUT += *C   * BUF[2];	\
+					OUT += *++C * BUF[3];	\
+					OUT += *++C * BUF[0];	\
+					OUT += *++C * BUF[1]
+#define TU_INPRO_4_3(C, BUF, OUT)	OUT += *C   * BUF[3];	\
+					OUT += *++C * BUF[0];	\
+					OUT += *++C * BUF[1];	\
+					OUT += *++C * BUF[2]
+
   public:
 		iir_filter_iterator(IN in, COEFF ci, COEFF co)
-		    :_in(in), _ci(ci), _co(co),
-		     _iiter(_ibuf.begin()), _oiter(_obuf.begin())
+		    :_in(in), _ci(ci), _co(co), _ibuf(), _obuf(), _i(0)
 		{
 		    _ibuf.fill(value_type(0));
 		    _obuf.fill(value_type(0));
 		}
 
-		iir_filter_iterator(const iir_filter_iterator& iir)
-		    :_in(iir._in), _ci(iir._ci), _co(iir._co),
-		     _ibuf(iir._ibuf),
-		     _iiter(_ibuf.begin() + (iir._iiter - iir._ibuf.begin())),
-		     _obuf(iir._obuf),
-		     _oiter(_obuf.begin() + (iir._oiter - iir._obuf.begin()))
-		{}
-
-    iir_filter_iterator&
-		operator =(const iir_filter_iterator& iir)
-		{
-		    _in	   = iir._in;
-		    _ci	   = iir._ci;
-		    _co	   = iir._co;
-		    _ibuf  = iir._ibuf;
-		    _iiter = _ibuf.begin()
-			   + (iir._iiter - iir._ibuf.begin());
-		    _obuf  = iir._obuf;
-		    _oiter = _obuf.begin()
-			   + (iir._oiter - iir._obuf.begin());
-		}
-    
     value_type	operator *()
 		{
-		    if (FWD)
-		    {
-			*_iiter = *_in++;	// 最新のデータを読み込む
-			if (++_iiter == _ibuf.end())
-			    _iiter = _ibuf.begin();	// circular buffer
-		    }
+		    value_type	out = value_type(0);
 		    
-		    value_type	out = 0;
-		    COEFF	c   = _ci;
-		    for (buf_iterator i = _iiter; i != _ibuf.end(); ++i)
-			out += *c++ * *i;
-		    for (buf_iterator i = _ibuf.begin(); i != _iiter; ++i)
-			out += *c++ * *i;
-		    c = _co;
-		    for (buf_iterator o = _oiter; o != _obuf.end(); ++o)
-			out += *c++ * *o;
-		    for (buf_iterator o = _obuf.begin(); o != _oiter; ++o)
-			out += *c++ * *o;
-		    *_oiter = out;	// 最古の出力データの位置に上書き
-
-		    if (++_oiter == _obuf.end())
-			_oiter = _obuf.begin();	// circular buffer
-
-		    if (!FWD)
+		    switch (D)
 		    {
-			*_iiter = *_in++;	// 最新のデータを読み込む
-			if (++_iiter == _ibuf.end())
-			    _iiter = _ibuf.begin();	// circular buffer
+		      case 2:
+		      {
+			COEFF	c = _co;
+			
+			if (_i == 0)
+			{
+			    TU_INPRO_2_0(c, _obuf, out);
+			    c = _ci;
+			    if (FWD)
+			    {
+				_ibuf[0] = *_in++;
+			        TU_INPRO_2_1(c, _ibuf, out);
+			    }
+			    else
+			    {
+				TU_INPRO_2_0(c, _ibuf, out);
+				_ibuf[0] = *_in++;
+			    }
+			    _obuf[0] = out;
+			    _i = 1;
+			}
+			else
+			{
+			    TU_INPRO_2_1(c, _obuf, out);
+			    c = _ci;
+			    if (FWD)
+			    {
+				_ibuf[1] = *_in++;
+				TU_INPRO_2_0(c, _ibuf, out);
+			    }
+			    else
+			    {
+				TU_INPRO_2_1(c, _ibuf, out);
+				_ibuf[1] = *_in++;
+			    }
+			    _obuf[1] = out;
+			    _i = 0;
+			}
+		      }
+			break;
+
+		      case 4:
+		      {
+		        COEFF	c = _co;
+			
+			switch(_i)
+			{
+			  case 0:
+			    TU_INPRO_4_0(c, _obuf, out);
+			    c = _ci;
+			    if (FWD)
+			    {
+				_ibuf[0] = *_in++;
+				TU_INPRO_4_1(c, _ibuf, out);
+			    }
+			    else
+			    {
+				TU_INPRO_4_0(c, _ibuf, out);
+				_ibuf[0] = *_in++;
+			    }
+			    _obuf[0] = out;
+			    _i = 1;
+			    break;
+			
+			  case 1:
+			    TU_INPRO_4_1(c, _obuf, out);
+			    c = _ci;
+			    if (FWD)
+			    {
+				_ibuf[1] = *_in++;
+				TU_INPRO_4_2(c, _ibuf, out);
+			    }
+			    else
+			    {
+				TU_INPRO_4_1(c, _ibuf, out);
+				_ibuf[1] = *_in++;
+			    }
+			    _obuf[1] = out;
+			    _i = 2;
+			    break;
+
+			  case 2:
+			    TU_INPRO_4_2(c, _obuf, out);
+			    c = _ci;
+			    if (FWD)
+			    {
+				_ibuf[2] = *_in++;
+				TU_INPRO_4_3(c, _ibuf, out);
+			    }
+			    else
+			    {
+				TU_INPRO_4_2(c, _ibuf, out);
+				_ibuf[2] = *_in++;
+			    }
+			    _obuf[2] = out;
+			    _i = 3;
+			    break;
+
+			  default:
+			    TU_INPRO_4_3(c, _obuf, out);
+			    c = _ci;
+			    if (FWD)
+			    {
+				_ibuf[3] = *_in++;
+				TU_INPRO_4_0(c, _ibuf, out);
+			    }
+			    else
+			    {
+				TU_INPRO_4_3(c, _ibuf, out);
+				_ibuf[3] = *_in++;
+			    }
+			    _obuf[3] = out;
+			    _i = 0;
+			    break;
+			}
+		      }
+			break;
+
+		      default:
+		      {
+			  out = inner_product(_co, _obuf, out, _i);
+			  if (FWD)
+			  {
+			      value_type&	obuf = _obuf[_i];
+			
+			      _ibuf[_i] = *_in++;	// 最新のデータを入力
+			      _i = (_i + 1) % D;
+
+			      out = inner_product(_ci, _ibuf, out, _i);
+			      obuf = out;
+			  }
+			  else
+			  {
+			      out = inner_product(_ci, _ibuf, out, _i);
+
+			      _obuf[_i] = out;
+			      _ibuf[_i] = *_in++;	// 最新のデータを入力
+			      _i = (_i + 1) % D;
+			  }
+		      }
+		        break;
 		    }
 		    
 		    return out;
@@ -314,22 +443,28 @@ class iir_filter_iterator
     self&	operator ++(int)		{return *this;}
     bool	operator ==(const self& a)const	{return _in == a._in;}
     bool	operator !=(const self& a)const	{return !operator ==(a);}
-	
+
   private:
     IN			_in;		//!< 入力データ列の現在位置を指す反復子
     const COEFF		_ci;		//!< 先頭の入力フィルタ係数を指す反復子
     const COEFF		_co;		//!< 先頭の出力フィルタ係数を指す反復子
-    buf_type		_ibuf;		//!< D時点前の入力データを指す反復子
-    buf_iterator	_iiter;		//!< 最新入力データの読み込み位置
+    buf_type		_ibuf;		//!< 過去D時点の入力データ
     buf_type		_obuf;		//!< 過去D時点の出力データ
-    buf_iterator	_oiter;		//!< D時点前の出力データを指す反復子
+    std::size_t		_i;		//!< D時点前の出力データを指す反復子
+
+#undef TU_INPRO_2_0
+#undef TU_INPRO_2_1
+#undef TU_INPRO_4_0
+#undef TU_INPRO_4_1
+#undef TU_INPRO_4_2
+#undef TU_INPRO_4_3
 };
 
-template <unsigned int D, bool FWD, class IN, class COEFF>
-iir_filter_iterator<D, FWD, IN, COEFF>
+template <unsigned int D, bool FWD, class OUT, class COEFF, class IN>
+iir_filter_iterator<D, FWD, COEFF, IN, OUT>
 make_iir_filter_iterator(IN in, COEFF ci, COEFF co)
 {
-    return iir_filter_iterator<D, FWD, IN, COEFF>(in, ci, co);
+    return iir_filter_iterator<D, FWD, COEFF, IN, OUT>(in, ci, co);
 }
 
 }
