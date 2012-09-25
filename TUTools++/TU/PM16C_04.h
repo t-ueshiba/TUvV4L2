@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: PM16C_04.h,v 1.1 2012-09-15 03:59:19 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \file		PM16C_04.h

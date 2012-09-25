@@ -87,7 +87,7 @@ main(int argc, char* argv[])
 
     for (box_filter_iterator<square_iterator>
 	     iter(square_iterator(a.begin()), w),
-	     end (square_iterator(a.end()));
+	     end (square_iterator(a.end() + 1 - w));
 	 iter != end; ++iter)
 	cout << ' ' << *iter;
     cout << endl;
@@ -99,11 +99,12 @@ main(int argc, char* argv[])
 
     for (box_filter_iterator<array_square_iterator>
 	     row (array_square_iterator(A.begin()), w),
-	     rend(array_square_iterator(A.end()));
+	     rend(array_square_iterator(A.end() + 1 - w));
 	 row != rend; ++row)
     {
 	for (box_filter_iterator<array_iterator>
-		 col(row->begin(), w), cend(row->end()); col != cend; ++col)
+		 col(row->begin(), w), cend(row->end() + 1 - w);
+	     col != cend; ++col)
 	    cout << ' ' << *col;
 	cout << endl;
     }
@@ -120,7 +121,8 @@ main(int argc, char* argv[])
 			  boost::make_tuple(a.begin(), b.begin()))), w),
 	     end (mul_iterator(
 		      boost::make_zip_iterator(
-			  boost::make_tuple(a.end(), b.end()))));
+			  boost::make_tuple(a.end() + 1 - w,
+					    b.end() + 1 - w))));
 	 iter != end; ++iter)
 	cout << ' ' << *iter;
     cout << endl << endl;
@@ -137,11 +139,13 @@ main(int argc, char* argv[])
 			  boost::make_tuple(A.begin(), B.begin()))), w),
 	     rend(array_mul_iterator(
 		      boost::make_zip_iterator(
-			  boost::make_tuple(A.end(), B.end()))));
+			  boost::make_tuple(A.end() + 1 - w,
+					    B.end() + 1 - w))));
 	 row != rend; ++row)
     {
 	for (box_filter_iterator<array_iterator>
-		 col(row->begin(), w), cend(row->end()); col != cend; ++col)
+		 col(row->begin(), w), cend(row->end() + 1 - w);
+	     col != cend; ++col)
 	    cout << ' ' << *col;
 	cout << endl;
     }

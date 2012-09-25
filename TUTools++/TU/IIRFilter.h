@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: IIRFilter.h,v 1.2 2012-09-15 03:59:19 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \file		IIRFilter.h
@@ -249,8 +249,8 @@ template <u_int D, class T=float> class IIRFilter
     void	limitsB(T& limit0B, T& limit1B, T& limit2B)	const	;
     template <class IN, class OUT>
     OUT		forward(IN ib, IN ie, OUT out)			const	;
-    template <class IN, class OUT> OUT
-		backward(IN ib, IN ie, OUT out)			const	;
+    template <class IN, class OUT>
+    OUT		backward(IN ib, IN ie, OUT out)			const	;
 
     const coeffs_type&	ci()			const	{return _ci;}
     const coeffs_type&	co()			const	{return _co;}
@@ -595,7 +595,7 @@ template <u_int D, class T=float> class BidirectionalIIRFilter
 		initialize(const T c[D+D], Order order)			;
     void	limits(T& limit0, T& limit1, T& limit2)		const	;
     template <class IN, class OUT>
-    OUT		operator ()(IN ib, IN ie, OUT out)		const	;
+    OUT		convolve(IN ib, IN ie, OUT out)			const	;
 
     const coeffs_type&	ciF()			const	{return _iirF.ci();}
     const coeffs_type&	coF()			const	{return _iirF.co();}
@@ -731,10 +731,9 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
   \param ib	入力データ列の先頭を指す反復子
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
-  \return	出力データ列の末尾の次を指す反復子
 */
 template <u_int D, class T> template <class IN, class OUT> inline OUT
-BidirectionalIIRFilter<D, T>::operator ()(IN ib, IN ie, OUT out) const
+BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
     typedef value_type*						pointer;
@@ -766,81 +765,43 @@ template <u_int D, class T=float> class BidirectionalIIRFilter2
 {
   private:
     typedef BidirectionalIIRFilter<D, T>	biir_type;
-    
-  public:
-    typedef typename biir_type::coeff_type	coeff_type;
-    typedef typename biir_type::coeffs_type	coeffs_type;
-    typedef typename biir_type::Order		Order;
-    
-  private:
-    template <class RowIter>
-    struct vertical_iterator
-	: public std::iterator<
-	    std::bidirectional_iterator_tag,
-	    typename std::iterator_traits<RowIter>::value_type::iterator>
-    {
-      private:
-	typedef typename
-	    std::iterator_traits<RowIter>::value_type	col_type;
-
-      public:
-	typedef typename col_type::difference_type	difference_type;
-	typedef typename col_type::value_type		value_type;
-	typedef typename col_type::reference		reference;
-	typedef typename col_type::iterator		iterator;
-
-      public:
-	vertical_iterator(RowIter row, difference_type offset)
-	    :_row(row), _offset(offset)				{}
-
-	iterator
-		operator ->()	 const	{ return _row->begin() + _offset; }
-	reference
-		operator *()	 const	{ return *operator ->(); }
-	vertical_iterator&
-		operator ++()		{ ++_row; return *this; }
-	vertical_iterator
-		operator ++(int) const	{
-					    vertical_iterator	tmp = *this;
-					    operator ++();
-					    return tmp;
-					}
-
-      private:
-	RowIter			_row;
-	const difference_type	_offset;
-    };
 #if defined(USE_TBB)
     template <class IN, class OUT> class ConvolveRows
     {
       public:
-	ConvolveRows(const BidirectionalIIRFilter<D, T>& biir,
-		     IN in, OUT out)
+	ConvolveRows(const biir_type& biir, IN in, OUT out)
 	    :_biir(biir), _in(in), _out(out)			{}
 
 	void	operator ()(const tbb::blocked_range<u_int>& r) const
 		{
 		    for (u_int i = r.begin(); i != r.end(); ++i)
-			_biir(_in[i].begin(), _in[i].end(),
-			      vertical_iterator<OUT>(_out, i));
+			_biir.convolve(_in[i].begin(), _in[i].end(),
+				       vertical_iterator<OUT>(_out, i));
 		}
 	
       private:
-	const BidirectionalIIRFilter<D, T>	_biir;
-	const IN				_in;
-	const OUT				_out;
+	const biir_type	_biir;
+	const IN	_in;
+	const OUT	_out;
     };
 #endif
+
+  public:
+    typedef typename biir_type::coeff_type	coeff_type;
+    typedef typename biir_type::coeffs_type	coeffs_type;
+    typedef typename biir_type::Order		Order;
     
   public:
     BidirectionalIIRFilter2&
 		initialize(const T cHF[], const T cHB[],
-			   const T cVF[], const T cVB[])	;
+			   const T cVF[], const T cVB[]);
     BidirectionalIIRFilter2&
 		initialize(const T cHF[], Order orderH,
-			   const T cVF[], Order orderV)		;
-    template <class IN, class OUT>
-    OUT		operator ()(IN ib, IN ie, OUT out)	const	;
+			   const T cVF[], Order orderV)	;
+    template <class IN, class OUT,
+	      class BVAL=typename std::iterator_traits<OUT>
+				     ::value_type::value_type>
+    OUT		convolve(IN ib, IN ie, OUT out)	const	;
     
     const coeffs_type&	ciHF()			const	{return _biirH.ciF();}
     const coeffs_type&	coHF()			const	{return _biirH.coF();}
@@ -899,14 +860,13 @@ BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <u_int D, class T> template <class IN, class OUT> OUT
-BidirectionalIIRFilter2<D, T>::operator ()(IN ib, IN ie, OUT out) const
+template <u_int D, class T> template <class IN, class OUT, class BVAL> OUT
+BidirectionalIIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type
 							row_type;
-    typedef typename row_type::value_type		value_type;
-    typedef Array2<Array<value_type> >			buf_type;
-    typedef typename buf_type::iterator			row_iterator;
+    typedef BVAL					buf_value_type;
+    typedef Array2<Array<buf_value_type> >		buf_type;
     typedef typename buf_type::const_iterator		const_row_iterator;
 
     buf_type	buf((ib != ie ? std::distance(ib->begin(), ib->end()) : 0),
@@ -919,21 +879,19 @@ BidirectionalIIRFilter2<D, T>::operator ()(IN ib, IN ie, OUT out) const
     tbb::parallel_for(tbb::blocked_range<u_int>(0, buf.nrow(), 1),
 		      ConvolveRows<const_row_iterator, OUT>(
 			  _biirV, buf.begin(), out));
-
-    return out + buf.ncol();
 #else
-    for (row_iterator brow = buf.begin(); ib != ie; ++ib)
-	_biirH(ib->begin(), ib->end(),
-	       vertical_iterator<row_iterator>(
-		   buf.begin(), brow++ - buf.begin()));
+    std::size_t	n = 0;
+    for (; ib != ie; ++ib)
+	_biirH.convolve(ib->begin(), ib->end(),
+			make_vertical_iterator(buf.begin(), n++));
 
-    const OUT	out0 = out;
+    n = 0;
     for (const_row_iterator brow = buf.begin(); brow != buf.end(); ++brow)
-	_biirV(brow->begin(), brow->end(),
-	       vertical_iterator<OUT>(out0, out++ - out0));
-
-    return out;
+	_biirV.convolve(brow->begin(), brow->end(),
+			make_vertical_iterator(out, n++));
 #endif
+    std::advance(out, buf.ncol());
+    return out;
 }
 
 }
