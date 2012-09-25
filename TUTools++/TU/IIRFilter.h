@@ -867,6 +867,7 @@ BidirectionalIIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 							row_type;
     typedef BVAL					buf_value_type;
     typedef Array2<Array<buf_value_type> >		buf_type;
+    typedef typename buf_type::iterator			row_iterator;
     typedef typename buf_type::const_iterator		const_row_iterator;
 
     buf_type	buf((ib != ie ? std::distance(ib->begin(), ib->end()) : 0),
