@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: iterator.h,v 1.1 2012-09-15 03:59:19 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \file		iterator.h
@@ -34,8 +34,8 @@
 #ifndef __TUiterator_h
 #define __TUiterator_h
 
-#include <iterator>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/iterator_adaptors.hpp>
 #include <boost/array.hpp>
 #include "TU/functional.h"
 
@@ -122,126 +122,193 @@ make_const_second_iterator(Iterator i)
 }
     
 /************************************************************************
-*  class box_filter_iterator<Iterator>					*
+*  class vertical_iterator<ITER>					*
+************************************************************************/
+//! ランダムアクセス可能なコンテナの配列に対して，各コンテナ中の特定のindexに対応する要素にアクセスする反復子
+/*
+  \param ITER	ランダムアクセス可能なコンテナを指す反復子
+*/
+template <class ITER>
+class vertical_iterator
+    : public boost::iterator_adaptor<vertical_iterator<ITER>,	// self
+				     ITER,			// base
+				     typename std::iterator_traits<
+					 typename std::iterator_traits<ITER>
+						     ::value_type::iterator>
+					     ::value_type>	// value_type
+{
+  private:
+    typedef typename boost::iterator_adaptor<
+			vertical_iterator,
+			ITER,
+			typename std::iterator_traits<
+			    typename std::iterator_traits<ITER>
+			    ::value_type::iterator>::value_type>	super;
+				    
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+    
+  public:
+    vertical_iterator(ITER const& iter, std::size_t idx)
+	:super(iter), _idx(idx)					{}
+
+  private:
+    bool	equal(const vertical_iterator& iter) const
+		{
+		    return super::equal() && (_idx == iter._idx);
+		}
+	
+    reference	dereference() const
+		{
+		    return *(super::base()->begin() + _idx);
+		}
+    
+  private:
+    const std::size_t	_idx;
+};
+
+//! vertical反復子を生成する
+/*!
+  \param iter	ランダムアクセス可能なコンテナを指す定数反復子
+  \return	box filter反復子
+*/
+template <class ITER> vertical_iterator<ITER>
+make_vertical_iterator(ITER iter, std::size_t idx)
+{
+    return vertical_iterator<ITER>(iter, idx);
+}
+
+/************************************************************************
+*  class box_filter_iterator<ITER>					*
 ************************************************************************/
 //! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
 /*!
-  \param Iterator	コンテナ中の要素を指す定数反復子の型
+  \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class Iterator>
+template <class ITER>
 class box_filter_iterator
-    : public std::iterator<
-		std::input_iterator_tag,
-		typename std::iterator_traits<Iterator>::value_type>
+    : public boost::iterator_adaptor<box_filter_iterator<ITER>,	// self
+				     ITER,			// base
+				     boost::use_default,	// value_type
+				     boost::single_pass_traversal_tag>
 {
   private:
-    typedef std::iterator<
-		std::input_iterator_tag,
-		typename std::iterator_traits<Iterator>::value_type> super;
+    typedef boost::iterator_adaptor<box_filter_iterator,
+				    ITER,
+				    boost::use_default,
+				    boost::single_pass_traversal_tag>	super;
     
   public:
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::value_type			value_type;
-    typedef typename super::reference			reference;
-    typedef typename super::pointer			pointer;
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
 
   public:
-			box_filter_iterator(Iterator i, unsigned int w=0)
-			    :_head(i), _tail(_head), _valid(true), _val()
-			{
-			    if (w > 0)
-			    {
-				_val = *_tail;
+		box_filter_iterator(ITER const& iter, std::size_t w=0)
+		    :super(iter), _tail(iter), _valid(true), _val()
+		{
+		    if (w > 0)
+		    {
+			_val = *_tail;
 				
-				while (--w > 0)
-				    _val += *++_tail;
-			    }
-			}
-
-    reference		operator *() const
-			{
-			    if (!_valid)
-			    {
-				_val += *_tail;
-				_valid = true;
-			    }
-			    return _val;
-			}
-    
-    const pointer	operator ->() const
-			{
-			    return &operator *();
-			}
-    
-    box_filter_iterator&
-			operator ++()
-			{
-			    _val -= *_head;
-			    if (!_valid)
-				_val += *_tail;
-			    else
-				_valid = false;
-			    ++_head;
-			    ++_tail;
-			    return *this;
-			}
-    
-    box_filter_iterator	operator ++(int)
-			{
-			    box_filter_iterator	tmp = *this;
-			    operator ++();
-			    return tmp;
-			}
-    
-    bool		operator ==(const box_filter_iterator& a) const
-			{
-			    return _head == a._head;
-			}
-    
-    bool		operator !=(const box_filter_iterator& a) const
-			{
-			    return !operator ==(a);
-			}
+			while (--w > 0)
+			    _val += *++_tail;
+		    }
+		}
 
   private:
-    Iterator		_head;
-    Iterator		_tail;
-    mutable bool	_valid;	//!< _val が [_head, _tail] の総和ならtrue
-    mutable value_type	_val;	//!< [_head, _tail) または [_head, _tail] の総和
+    reference	dereference() const
+		{
+		    if (!_valid)
+		    {
+			_val += *_tail;
+			_valid = true;
+		    }
+		    return _val;
+		}
+    
+    void	increment()
+		{
+		    _val -= *super::base();
+		    if (!_valid)
+			_val += *_tail;
+		    else
+			_valid = false;
+		    ++super::base_reference();
+		    ++_tail;
+		}
+
+  private:
+    ITER		_tail;
+    mutable bool	_valid;	//!< _val が [base(), _tail] の総和ならtrue
+    mutable value_type	_val;	//!< [base(), _tail) or [base(), _tail] の総和
 };
 
 //! box filter反復子を生成する
 /*!
-  \param iter	コンテナ中の要素を指す定数反復子の型
+  \param iter	コンテナ中の要素を指す定数反復子
   \return	box filter反復子
 */
-template <class Iterator> box_filter_iterator<Iterator>
-make_box_filter_iterator(Iterator iter)
+template <class ITER> box_filter_iterator<ITER>
+make_box_filter_iterator(ITER iter)
 {
-    return box_filter_iterator<Iterator>(iter);
+    return box_filter_iterator<ITER>(iter);
 }
 
 /************************************************************************
-*  class iir_filter_iterator<D, FWD, IN, COEFF, OUT>			*
+*  class iir_filter_iterator<D, FWD, COEFF, ITER, T>			*
 ************************************************************************/
 //! データ列中の指定された要素に対してinfinite impulse response filterを適用した結果を返す反復子
 /*!
   \param D	フィルタの階数
   \param FWD	前進フィルタならtrue, 後退フィルタならfalse
-  \param IN	データ列中の要素を指す定数反復子の型
   \param COEFF	フィルタのz変換係数
+  \param ITER	データ列中の要素を指す定数反復子の型
+  \param T	フィルタ出力の型
 */
-template <unsigned int D, bool FWD, class COEFF, class IN,
-	  class OUT=typename std::iterator_traits<COEFF>::value_type>
-class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
+template <unsigned int D, bool FWD, class COEFF, class ITER,
+	  class T=typename std::iterator_traits<COEFF>::value_type>
+class iir_filter_iterator
+    : public boost::iterator_adaptor<
+		iir_filter_iterator<D, FWD, COEFF, ITER, T>,	// self
+		ITER,						// base
+		T,						// value_type
+		boost::single_pass_traversal_tag,		// traversal
+		T>						// reference
 {
-  public:
-    typedef OUT				value_type;
-    typedef iir_filter_iterator		self;
-
   private:
-    typedef boost::array<value_type, D>	buf_type;
-    
+    typedef boost::iterator_adaptor<
+		iir_filter_iterator, ITER, T,
+		boost::single_pass_traversal_tag, T>	super;
+    typedef boost::array<T, D>				buf_type;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+		iir_filter_iterator(ITER const& iter, COEFF ci, COEFF co)
+		    :super(iter), _ci(ci), _co(co), _ibuf(), _obuf(), _i(0)
+		{
+		    _ibuf.fill(value_type(0));
+		    _obuf.fill(value_type(0));
+		}
+
   private:
     static inline value_type
 		inner_product(COEFF c, const buf_type& buf,
@@ -279,15 +346,7 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 					OUT += *++C * BUF[1];	\
 					OUT += *++C * BUF[2]
 
-  public:
-		iir_filter_iterator(IN in, COEFF ci, COEFF co)
-		    :_in(in), _ci(ci), _co(co), _ibuf(), _obuf(), _i(0)
-		{
-		    _ibuf.fill(value_type(0));
-		    _obuf.fill(value_type(0));
-		}
-
-    value_type	operator *()
+    value_type	dereference() const
 		{
 		    value_type	out = value_type(0);
 		    
@@ -303,13 +362,13 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			    c = _ci;
 			    if (FWD)
 			    {
-				_ibuf[0] = *_in++;
+				_ibuf[0] = *super::base();
 			        TU_INPRO_2_1(c, _ibuf, out);
 			    }
 			    else
 			    {
 				TU_INPRO_2_0(c, _ibuf, out);
-				_ibuf[0] = *_in++;
+				_ibuf[0] = *super::base();
 			    }
 			    _obuf[0] = out;
 			    _i = 1;
@@ -320,13 +379,13 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			    c = _ci;
 			    if (FWD)
 			    {
-				_ibuf[1] = *_in++;
+				_ibuf[1] = *super::base();
 				TU_INPRO_2_0(c, _ibuf, out);
 			    }
 			    else
 			    {
 				TU_INPRO_2_1(c, _ibuf, out);
-				_ibuf[1] = *_in++;
+				_ibuf[1] = *super::base();
 			    }
 			    _obuf[1] = out;
 			    _i = 0;
@@ -345,13 +404,13 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			    c = _ci;
 			    if (FWD)
 			    {
-				_ibuf[0] = *_in++;
+				_ibuf[0] = *super::base();
 				TU_INPRO_4_1(c, _ibuf, out);
 			    }
 			    else
 			    {
 				TU_INPRO_4_0(c, _ibuf, out);
-				_ibuf[0] = *_in++;
+				_ibuf[0] = *super::base();
 			    }
 			    _obuf[0] = out;
 			    _i = 1;
@@ -362,13 +421,13 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			    c = _ci;
 			    if (FWD)
 			    {
-				_ibuf[1] = *_in++;
+				_ibuf[1] = *super::base();
 				TU_INPRO_4_2(c, _ibuf, out);
 			    }
 			    else
 			    {
 				TU_INPRO_4_1(c, _ibuf, out);
-				_ibuf[1] = *_in++;
+				_ibuf[1] = *super::base();
 			    }
 			    _obuf[1] = out;
 			    _i = 2;
@@ -379,13 +438,13 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			    c = _ci;
 			    if (FWD)
 			    {
-				_ibuf[2] = *_in++;
+				_ibuf[2] = *super::base();
 				TU_INPRO_4_3(c, _ibuf, out);
 			    }
 			    else
 			    {
 				TU_INPRO_4_2(c, _ibuf, out);
-				_ibuf[2] = *_in++;
+				_ibuf[2] = *super::base();
 			    }
 			    _obuf[2] = out;
 			    _i = 3;
@@ -396,13 +455,13 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			    c = _ci;
 			    if (FWD)
 			    {
-				_ibuf[3] = *_in++;
+				_ibuf[3] = *super::base();
 				TU_INPRO_4_0(c, _ibuf, out);
 			    }
 			    else
 			    {
 				TU_INPRO_4_3(c, _ibuf, out);
-				_ibuf[3] = *_in++;
+				_ibuf[3] = *super::base();
 			    }
 			    _obuf[3] = out;
 			    _i = 0;
@@ -418,7 +477,7 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			  {
 			      value_type&	obuf = _obuf[_i];
 			
-			      _ibuf[_i] = *_in++;	// 最新のデータを入力
+			      _ibuf[_i] = *super::base();
 			      _i = (_i + 1) % D;
 
 			      out = inner_product(_ci, _ibuf, out, _i);
@@ -427,9 +486,9 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 			  else
 			  {
 			      out = inner_product(_ci, _ibuf, out, _i);
-
 			      _obuf[_i] = out;
-			      _ibuf[_i] = *_in++;	// 最新のデータを入力
+			      
+			      _ibuf[_i] = *super::base();
 			      _i = (_i + 1) % D;
 			  }
 		      }
@@ -438,19 +497,6 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 		    
 		    return out;
 		}
-    
-    self&	operator ++()			{return *this;}
-    self&	operator ++(int)		{return *this;}
-    bool	operator ==(const self& a)const	{return _in == a._in;}
-    bool	operator !=(const self& a)const	{return !operator ==(a);}
-
-  private:
-    IN			_in;		//!< 入力データ列の現在位置を指す反復子
-    const COEFF		_ci;		//!< 先頭の入力フィルタ係数を指す反復子
-    const COEFF		_co;		//!< 先頭の出力フィルタ係数を指す反復子
-    buf_type		_ibuf;		//!< 過去D時点の入力データ
-    buf_type		_obuf;		//!< 過去D時点の出力データ
-    std::size_t		_i;		//!< D時点前の出力データを指す反復子
 
 #undef TU_INPRO_2_0
 #undef TU_INPRO_2_1
@@ -458,13 +504,20 @@ class iir_filter_iterator : public std::iterator<std::input_iterator_tag, OUT>
 #undef TU_INPRO_4_1
 #undef TU_INPRO_4_2
 #undef TU_INPRO_4_3
+
+  private:
+    const COEFF		_ci;	//!< 先頭の入力フィルタ係数を指す反復子
+    const COEFF		_co;	//!< 先頭の出力フィルタ係数を指す反復子
+    mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
+    mutable buf_type	_obuf;	//!< 過去D時点の出力データ
+    mutable std::size_t	_i;	//!< 最も古い(D時点前)入/出力データへのindex
 };
 
-template <unsigned int D, bool FWD, class OUT, class COEFF, class IN>
-iir_filter_iterator<D, FWD, COEFF, IN, OUT>
-make_iir_filter_iterator(IN in, COEFF ci, COEFF co)
+template <unsigned int D, bool FWD, class T, class COEFF, class ITER>
+iir_filter_iterator<D, FWD, COEFF, ITER, T>
+make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 {
-    return iir_filter_iterator<D, FWD, COEFF, IN, OUT>(in, ci, co);
+    return iir_filter_iterator<D, FWD, COEFF, ITER, T>(iter, ci, co);
 }
 
 }

@@ -44,7 +44,7 @@
       Toshio UESHIBA
 	National Institute of Advanced Industrial Science and Technology (AIST)
    
-   $Id: Random.h,v 1.1 2012-09-15 03:59:19 ueshiba Exp $
+   $Id$
 */
 /*!
   \file		Random.h

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Vector++.inst.cc,v 1.14 2012-08-29 21:17:08 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Vector++.h"
 

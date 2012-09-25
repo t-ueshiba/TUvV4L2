@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: EdgeDetector.h,v 1.2 2012-09-15 03:59:19 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \file		EdgeDetector.h

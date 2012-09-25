@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id: Warp.cc,v 1.24 2012-09-12 06:33:28 ueshiba Exp $
+ *  $Id$
  */
 #if defined(__INTEL_COMPILER)
 #  undef SSE4
