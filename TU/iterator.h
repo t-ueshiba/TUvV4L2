@@ -276,6 +276,11 @@ class row_iterator
     row_iterator(ITER const& iter, FUNC const& func)
 	:super(iter), _coliter(iter->begin(), func)			{}
 
+    reference	operator [](std::size_t i) const
+		{
+		    return reference(super::base() + i, _coliter);
+		}
+    
   private:
     reference	dereference() const
 		{
