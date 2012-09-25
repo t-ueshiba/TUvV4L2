@@ -122,6 +122,185 @@ make_const_second_iterator(Iterator i)
 }
     
 /************************************************************************
+*  class assignment_iterator<FUNC, ITER>				*
+************************************************************************/
+namespace detail
+{
+    template <class FUNC, class ITER>
+    class assignment_proxy
+    {
+      public:
+	typedef FUNC	func_type;
+    
+      public:
+	assignment_proxy(ITER const& iter, FUNC const& func)
+	    :_iter(iter), _func(func)					{}
+
+	template <class T>
+	assignment_proxy&	operator =(const T& val)
+				{
+				    *_iter = _func(val);
+				    return *this;
+				}
+
+      private:
+	ITER const&	_iter;
+	FUNC const&	_func;
+    };
+}
+
+//! operator *()を左辺値として使うときに，右辺値を指定された関数によって変換してから代入を行うための反復子
+/*!
+  \param FUNC	変換を行う関数オブジェクトの型
+  \param ITER	変換結果の代入先を指す反復子
+*/
+template <class FUNC, class ITER>
+class assignment_iterator
+    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
+				     ITER,
+				     typename FUNC::argument_type,
+				     boost::use_default,
+				     detail::assignment_proxy<FUNC, ITER> >
+{
+  private:
+    typedef boost::iterator_adaptor<assignment_iterator,
+				    ITER,
+				    typename FUNC::argument_type,
+				    boost::use_default,
+				    detail::assignment_proxy<FUNC, ITER> >
+						super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    assignment_iterator(ITER const& iter, FUNC const& func=FUNC())
+	:super(iter), _func(func)					{}
+
+    FUNC const&	functor() const
+		{
+		    return _func;
+		}
+	
+  private:
+    reference	dereference() const
+		{
+		    return reference(super::base(), _func);
+		}
+    
+  private:
+    const FUNC	_func;
+};
+    
+template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
+make_assignment_iterator(ITER iter, FUNC func)
+{
+    return assignment_iterator<FUNC, ITER>(iter, func);
+}
+
+template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
+make_assignment_iterator(ITER iter)
+{
+    return assignment_iterator<FUNC, ITER>(iter);
+}
+
+/************************************************************************
+*  class row_iterator<COLITER, ITER>					*
+************************************************************************/
+namespace detail
+{
+    template <class COLITER, class ITER>
+    class row_proxy
+    {
+      public:
+	typedef COLITER	iterator;
+    
+      public:
+	row_proxy(ITER const& iter, COLITER const& coliter)
+	    :_iter(iter), _coliter(coliter)				{}
+    
+	iterator	begin()	const
+			{
+			    return iterator(_iter->begin(), _coliter.functor());
+			}
+	iterator	end() const
+			{
+			    return iterator(_iter->end(), _coliter.functor());
+			}
+    
+      private:
+	ITER const&	_iter;
+	COLITER const&	_coliter;
+    };
+}
+    
+//! コンテナを指す反復子に対して，取り出した値を変換したり値を変換してから格納する作業をサポートする反復子
+/*
+  \param COLITER	コンテナ中の個々の値に対して変換を行う反復子
+  \param ITER		begin(), end()をサポートするコンテナを指す反復子
+*/ 
+template <class COLITER, class ITER>
+class row_iterator
+    : public boost::iterator_adaptor<row_iterator<COLITER, ITER>,
+				     ITER,
+				     detail::row_proxy<COLITER, ITER>,
+				     boost::use_default,
+				     detail::row_proxy<COLITER, ITER> >
+{
+  private:
+    typedef boost::iterator_adaptor<row_iterator,
+				    ITER,
+				    detail::row_proxy<COLITER, ITER>,
+				    boost::use_default,
+				    detail::row_proxy<COLITER, ITER> >	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    row_iterator(ITER const& iter)
+	:super(iter), _coliter(iter->begin())				{}
+    template <class FUNC>
+    row_iterator(ITER const& iter, FUNC const& func)
+	:super(iter), _coliter(iter->begin(), func)			{}
+
+  private:
+    reference	dereference() const
+		{
+		    return reference(super::base(), _coliter);
+		}
+
+  private:
+    COLITER 	_coliter;
+};
+
+template <class COLITER, class ITER, class FUNC>
+inline row_iterator<COLITER, ITER>
+make_row_iterator(ITER iter, FUNC func)
+{
+    return row_iterator<COLITER, ITER>(iter, func);
+}
+
+template <class COLITER, class ITER>
+inline row_iterator<COLITER, ITER>
+make_row_iterator(ITER iter)
+{
+    return row_iterator<COLITER, ITER>(iter);
+}
+
+/************************************************************************
 *  class vertical_iterator<ITER>					*
 ************************************************************************/
 //! ランダムアクセス可能なコンテナの配列に対して，各コンテナ中の特定のindexに対応する要素にアクセスする反復子
@@ -135,15 +314,24 @@ class vertical_iterator
 				     typename std::iterator_traits<
 					 typename std::iterator_traits<ITER>
 						     ::value_type::iterator>
-					     ::value_type>	// value_type
-{
+					     ::value_type,	// value_type
+				     boost::use_default,	// traversal
+				     typename std::iterator_traits<
+					 typename std::iterator_traits<ITER>
+						     ::value_type::iterator>
+					     ::reference>	// reference
+{	
   private:
+    typedef typename std::iterator_traits<ITER>
+			::value_type::iterator	col_iterator;
     typedef typename boost::iterator_adaptor<
 			vertical_iterator,
 			ITER,
-			typename std::iterator_traits<
-			    typename std::iterator_traits<ITER>
-			    ::value_type::iterator>::value_type>	super;
+			typename std::iterator_traits<col_iterator>
+				    ::value_type,
+			boost::use_default,
+			typename std::iterator_traits<col_iterator>
+				    ::reference>	super;
 				    
   public:
     typedef typename super::difference_type	difference_type;
@@ -166,7 +354,9 @@ class vertical_iterator
 	
     reference	dereference() const
 		{
-		    return *(super::base()->begin() + _idx);
+		    col_iterator	col = super::base()->begin();
+		    std::advance(col, _idx);
+		    return *col;
 		}
     
   private:
@@ -176,7 +366,7 @@ class vertical_iterator
 //! vertical反復子を生成する
 /*!
   \param iter	ランダムアクセス可能なコンテナを指す定数反復子
-  \return	box filter反復子
+  \return	vertical反復子
 */
 template <class ITER> vertical_iterator<ITER>
 make_vertical_iterator(ITER iter, std::size_t idx)
@@ -513,6 +703,13 @@ class iir_filter_iterator
     mutable std::size_t	_i;	//!< 最も古い(D時点前)入/出力データへのindex
 };
 
+//! infinite impulse response filter反復子を生成する
+/*!
+  \param iter	コンテナ中の要素を指す定数反復子
+  \param ci	先頭の入力フィルタ係数を指す反復子
+  \param ci	先頭の出力フィルタ係数を指す反復子
+  \return	infinite impulse response filter反復子
+*/
 template <unsigned int D, bool FWD, class T, class COEFF, class ITER>
 iir_filter_iterator<D, FWD, COEFF, ITER, T>
 make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
