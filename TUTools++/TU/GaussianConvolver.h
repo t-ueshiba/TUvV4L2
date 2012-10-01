@@ -124,9 +124,9 @@ template <class T> class GaussianConvolver
 
     GaussianConvolver&	initialize(T sigma)				;
 
-    template <class IN, class OUT> OUT	smooth(IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> OUT	diff  (IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> OUT	diff2 (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> void	smooth(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> void	diff  (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT> void	diff2 (IN ib, IN ie, OUT out)	;
 
   protected:
     using	coeffs::_c0;
@@ -153,10 +153,10 @@ GaussianConvolver<T>::initialize(T sigma)
   \param out	出力データ列の先頭を指す反復子
   \return	出力データ列の末尾の次を指す反復子
 */
-template <class T> template <class IN, class OUT> inline OUT
+template <class T> template <class IN, class OUT> inline void
 GaussianConvolver<T>::smooth(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c0, super::Zeroth).convolve(ib, ie, out);
+    super::initialize(_c0, super::Zeroth).convolve(ib, ie, out);
 }
 
 //! Gauss核による1階微分
@@ -166,10 +166,10 @@ GaussianConvolver<T>::smooth(IN ib, IN ie, OUT out)
   \param out	出力データ列の先頭を指す反復子
   \return	出力データ列の末尾の次を指す反復子
 */
-template <class T> template <class IN, class OUT> inline OUT
+template <class T> template <class IN, class OUT> inline void
 GaussianConvolver<T>::diff(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c1, super::First).convolve(ib, ie, out);
+    super::initialize(_c1, super::First).convolve(ib, ie, out);
 }
 
 //! Gauss核による2階微分
@@ -179,10 +179,10 @@ GaussianConvolver<T>::diff(IN ib, IN ie, OUT out)
   \param out	出力データ列の先頭を指す反復子
   \return	出力データ列の末尾の次を指す反復子
 */
-template <class T> template <class IN, class OUT> inline OUT
+template <class T> template <class IN, class OUT> inline void
 GaussianConvolver<T>::diff2(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c2, super::Second).convolve(ib, ie, out);
+    super::initialize(_c2, super::Second).convolve(ib, ie, out);
 }
 
 /************************************************************************
@@ -204,31 +204,33 @@ template <class T> class GaussianConvolver2
     GaussianConvolver2(T sigma=1.0)	:GaussianCoefficients<T>(sigma) {}
 
     GaussianConvolver2&	initialize(T sigma)				;
+    using		super::grainSize;
+    using		super::setGrainSize;
     
     template <class IN, class OUT,
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
-    OUT			smooth(IN ib, IN ie, OUT out)			;
+    void		smooth(IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
-    OUT			diffH (IN ib, IN ie, OUT out)			;
+    void		diffH (IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
-    OUT			diffV (IN ib, IN ie, OUT out)			;
+    void		diffV (IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
-    OUT			diffHH(IN ib, IN ie, OUT out)			;
+    void		diffHH(IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
-    OUT			diffHV(IN ib, IN ie, OUT out)			;
+    void		diffHV(IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
-    OUT			diffVV(IN ib, IN ie, OUT out)			;
+    void		diffVV(IN ib, IN ie, OUT out)			;
 
   protected:
     using	coeffs::_c0;
@@ -255,10 +257,10 @@ GaussianConvolver2<T>::initialize(T sigma)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline OUT
+template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c0, IIRF::Zeroth, _c0, IIRF::Zeroth)
+    super::initialize(_c0, IIRF::Zeroth, _c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -269,10 +271,10 @@ GaussianConvolver2<T>::smooth(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline OUT
+template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c1, IIRF::First, _c0, IIRF::Zeroth)
+    super::initialize(_c1, IIRF::First, _c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -283,10 +285,10 @@ GaussianConvolver2<T>::diffH(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline OUT
+template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c0, IIRF::Zeroth, _c1, IIRF::First)
+    super::initialize(_c0, IIRF::Zeroth, _c1, IIRF::First)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -297,10 +299,10 @@ GaussianConvolver2<T>::diffV(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline OUT
+template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c2, IIRF::Second, _c0, IIRF::Zeroth)
+    super::initialize(_c2, IIRF::Second, _c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -311,10 +313,10 @@ GaussianConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline OUT
+template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c1, IIRF::First, _c1, IIRF::First)
+    super::initialize(_c1, IIRF::First, _c1, IIRF::First)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -325,10 +327,10 @@ GaussianConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline OUT
+template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 {
-    return super::initialize(_c0, IIRF::Zeroth, _c2, IIRF::Second)
+    super::initialize(_c0, IIRF::Zeroth, _c2, IIRF::Second)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 

@@ -34,15 +34,10 @@
 #ifndef	__TUIIRFilterPP_h
 #define	__TUIIRFilterPP_h
 
-#include <iterator>
 #include <algorithm>
 #include <boost/array.hpp>
-#include "TU/Array++.h"
+#include "TU/Filter2.h"
 #include "TU/mmInstructions.h"
-#if defined(USE_TBB)
-#  include <tbb/parallel_for.h>
-#  include <tbb/blocked_range.h>
-#endif
 
 #if defined(SSE2)
 namespace mm
@@ -251,10 +246,12 @@ template <u_int D, class T=float> class IIRFilter
     OUT		forward(IN ib, IN ie, OUT out)			const	;
     template <class IN, class OUT>
     OUT		backward(IN ib, IN ie, OUT out)			const	;
-
+    
     const coeffs_type&	ci()			const	{return _ci;}
     const coeffs_type&	co()			const	{return _co;}
 	
+    static u_int	outLength(u_int inLength)	;
+
   private:
     coeffs_type	_ci;	//!< 入力フィルタ係数
     coeffs_type	_co;	//!< 出力フィルタ係数
@@ -412,6 +409,18 @@ IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
     return oe;
 #endif
 }
+
+//! 与えられた長さの入力データ列に対する出力データ列の長さを返す
+/*!
+  \param inLength	入力データ列の長さ
+  \return		出力データ列の長さ
+*/
+template <u_int D, class T> inline u_int
+IIRFilter<D, T>::outLength(u_int inLength)
+{
+    return inLength;
+}
+    
 #ifndef USE_IIR_FILTER_ITERATOR
 template <> template <class IN, class OUT> OUT
 IIRFilter<2u, float>::forward(IN ib, IN ie, OUT out) const
@@ -595,12 +604,14 @@ template <u_int D, class T=float> class BidirectionalIIRFilter
 		initialize(const T c[D+D], Order order)			;
     void	limits(T& limit0, T& limit1, T& limit2)		const	;
     template <class IN, class OUT>
-    OUT		convolve(IN ib, IN ie, OUT out)			const	;
+    void	convolve(IN ib, IN ie, OUT out)			const	;
 
     const coeffs_type&	ciF()			const	{return _iirF.ci();}
     const coeffs_type&	coF()			const	{return _iirF.co();}
     const coeffs_type&	ciB()			const	{return _iirB.ci();}
     const coeffs_type&	coB()			const	{return _iirB.co();}
+
+    static u_int	outLength(u_int inLength)	;
 	
   private:
     IIRFilter<D, T>	_iirF;
@@ -732,7 +743,7 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
 */
-template <u_int D, class T> template <class IN, class OUT> inline OUT
+template <u_int D, class T> template <class IN, class OUT> inline void
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
@@ -751,40 +762,32 @@ BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 #else
     _iirB.backward(ib, ie, pointer(_bufB.end()));
 #endif    
-    return std::transform(const_pointer(_bufF.begin()),
-			  const_pointer(_bufF.end()),
-			  const_pointer(_bufB.begin()),
-			  out, std::plus<value_type>());
+    std::transform(const_pointer(_bufF.begin()), const_pointer(_bufF.end()),
+		   const_pointer(_bufB.begin()),
+		   out, std::plus<value_type>());
 }
 
+//! 与えられた長さの入力データ列に対する出力データ列の長さを返す
+/*!
+  \param inLength	入力データ列の長さ
+  \return		出力データ列の長さ
+*/
+template <u_int D, class T> inline u_int
+BidirectionalIIRFilter<D, T>::outLength(u_int inLength)
+{
+    return IIRFilter<D, T>::outLength(inLength);
+}
+    
 /************************************************************************
 *  class BidirectionalIIRFilter2<D, T>					*
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
-template <u_int D, class T=float> class BidirectionalIIRFilter2
+template <u_int D, class T=float>
+class BidirectionalIIRFilter2 : public Filter2<BidirectionalIIRFilter<D, T> >
 {
   private:
     typedef BidirectionalIIRFilter<D, T>	biir_type;
-#if defined(USE_TBB)
-    template <class IN, class OUT> class ConvolveRows
-    {
-      public:
-	ConvolveRows(const biir_type& biir, IN in, OUT out)
-	    :_biir(biir), _in(in), _out(out)			{}
-
-	void	operator ()(const tbb::blocked_range<u_int>& r) const
-		{
-		    for (u_int i = r.begin(); i != r.end(); ++i)
-			_biir.convolve(_in[i].begin(), _in[i].end(),
-				       vertical_iterator<OUT>(_out, i));
-		}
-	
-      private:
-	const biir_type	_biir;
-	const IN	_in;
-	const OUT	_out;
-    };
-#endif
+    typedef Filter2<biir_type>			super;
 
   public:
     typedef typename biir_type::coeff_type	coeff_type;
@@ -793,28 +796,24 @@ template <u_int D, class T=float> class BidirectionalIIRFilter2
     
   public:
     BidirectionalIIRFilter2&
-		initialize(const T cHF[], const T cHB[],
-			   const T cVF[], const T cVB[]);
+			initialize(const T cHF[], const T cHB[],
+				   const T cVF[], const T cVB[])	;
     BidirectionalIIRFilter2&
-		initialize(const T cHF[], Order orderH,
-			   const T cVF[], Order orderV)	;
-    template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<OUT>
-				     ::value_type::value_type>
-    OUT		convolve(IN ib, IN ie, OUT out)	const	;
-    
-    const coeffs_type&	ciHF()			const	{return _biirH.ciF();}
-    const coeffs_type&	coHF()			const	{return _biirH.coF();}
-    const coeffs_type&	ciHB()			const	{return _biirH.ciB();}
-    const coeffs_type&	coHB()			const	{return _biirH.coB();}
-    const coeffs_type&	ciVF()			const	{return _biirV.ciF();}
-    const coeffs_type&	coVF()			const	{return _biirV.coF();}
-    const coeffs_type&	ciVB()			const	{return _biirV.ciB();}
-    const coeffs_type&	coVB()			const	{return _biirV.coB();}
+			initialize(const T cHF[], Order orderH,
+				   const T cVF[], Order orderV)		;
 
-  private:
-    BidirectionalIIRFilter<D, T>	_biirH;
-    BidirectionalIIRFilter<D, T>	_biirV;
+    using		super::convolve;
+    using		super::filterH;
+    using		super::filterV;
+    
+    const coeffs_type&	ciHF()		const	{return filterH().ciF();}
+    const coeffs_type&	coHF()		const	{return filterH().coF();}
+    const coeffs_type&	ciHB()		const	{return filterH().ciB();}
+    const coeffs_type&	coHB()		const	{return filterH().coB();}
+    const coeffs_type&	ciVF()		const	{return filterV().ciF();}
+    const coeffs_type&	coVF()		const	{return filterV().coF();}
+    const coeffs_type&	ciVB()		const	{return filterV().ciB();}
+    const coeffs_type&	coVB()		const	{return filterV().coB();}
 };
     
 //! フィルタのz変換係数をセットする
@@ -829,8 +828,8 @@ template <u_int D, class T> inline BidirectionalIIRFilter2<D, T>&
 BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], const T cHB[],
 					  const T cVF[], const T cVB[])
 {
-    _biirH.initialize(cHF, cHB);
-    _biirV.initialize(cVF, cVB);
+    filterH().initialize(cHF, cHB);
+    filterV().initialize(cVF, cVB);
 
     return *this;
 }
@@ -847,52 +846,10 @@ template <u_int D, class T> inline BidirectionalIIRFilter2<D, T>&
 BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
 					  const T cVF[], Order orderV)
 {
-    _biirH.initialize(cHF, orderH);
-    _biirV.initialize(cVF, orderV);
+    filterH().initialize(cHF, orderH);
+    filterV().initialize(cVF, orderV);
 
     return *this;
-}
-
-//! 与えられた2次元配列とこのフィルタの畳み込みを行う
-/*!
-  \param ib	入力2次元データ配列の先頭行を指す反復子
-  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
-  \param out	出力2次元データ配列の先頭行を指す反復子
-  \return	出力2次元データ配列の末尾の次の行を指す反復子
-*/
-template <u_int D, class T> template <class IN, class OUT, class BVAL> OUT
-BidirectionalIIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
-{
-    typedef typename std::iterator_traits<OUT>::value_type
-							row_type;
-    typedef BVAL					buf_value_type;
-    typedef Array2<Array<buf_value_type> >		buf_type;
-    typedef typename buf_type::iterator			row_iterator;
-    typedef typename buf_type::const_iterator		const_row_iterator;
-
-    buf_type	buf((ib != ie ? std::distance(ib->begin(), ib->end()) : 0),
-		    std::distance(ib, ie));
-#if defined(USE_TBB)
-    tbb::parallel_for(tbb::blocked_range<u_int>(0, buf.ncol(), 1),
-		      ConvolveRows<IN, row_iterator>(
-			  _biirH, ib, buf.begin()));
-
-    tbb::parallel_for(tbb::blocked_range<u_int>(0, buf.nrow(), 1),
-		      ConvolveRows<const_row_iterator, OUT>(
-			  _biirV, buf.begin(), out));
-#else
-    std::size_t	n = 0;
-    for (; ib != ie; ++ib)
-	_biirH.convolve(ib->begin(), ib->end(),
-			make_vertical_iterator(buf.begin(), n++));
-
-    n = 0;
-    for (const_row_iterator brow = buf.begin(); brow != buf.end(); ++brow)
-	_biirV.convolve(brow->begin(), brow->end(),
-			make_vertical_iterator(out, n++));
-#endif
-    std::advance(out, buf.ncol());
-    return out;
 }
 
 }

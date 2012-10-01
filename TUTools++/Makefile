@@ -36,6 +36,7 @@ HDRS		= TU/Array++.h \
 		TU/CorrectIntensity.h \
 		TU/DericheConvolver.h \
 		TU/EdgeDetector.h \
+		TU/Filter2.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
 		TU/GraphCuts.h \
@@ -123,7 +124,8 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/Geometry++.h \
 	TU/iterator.h TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h \
 	TU/Minimize.h TU/mmInstructions.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
-	TU/types.h TU/IIRFilter.h TU/mmInstructions.h TU/Minimize.h
+	TU/types.h TU/IIRFilter.h TU/Filter2.h TU/iterator.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
 	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
 Image++.inst.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
