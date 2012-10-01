@@ -33,10 +33,10 @@ main(int argc, char* argv[])
     for (u_int i = 0; i < b.size(); ++i)
 	b[i] = a[i]; //+ 1;
 
+    GuidedFilter<float>	gf(w, e);
     Array<float>	c(a.size());
-  /*guidedFilter(a.begin(), a.end() + 1 - w,
-    b.begin(), b.end() + 1 - w, c.begin(), w, e);*/
-    guidedFilter(a.begin(), a.end() + 1 - w, c.begin(), w, e);
+    gf.convolve(a.begin(), a.end(), b.begin(), b.end(), c.begin() + w - 1);
+  //gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
     cout << c;
 
   // guided filterを2つの2D arrayに適用する．
@@ -49,10 +49,10 @@ main(int argc, char* argv[])
 	for (u_int j = 0; j < B.ncol(); ++j)
 	    B[i][j] = A[i][j];// + 1;
 
+    GuidedFilter2<float>	gf2(w, w, e);
     Array2<Array<float> >	C(A.nrow(), A.ncol());
-  //guidedFilter2(A.begin(), A.end() + 1 - w,
-  //	  B.begin(), B.end() + 1 - w, C.begin(), w, w, e);
-    guidedFilter2(A.begin(), A.end() + 1 - w, C.begin(), w, w, e);
+  //gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
+    gf2.convolve(A.begin(), A.end(), C.begin());
     cout << C;
 
     return 0;

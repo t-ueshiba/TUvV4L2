@@ -13,7 +13,7 @@ namespace TU
 *  static fucntions							*
 ************************************************************************/
 template <class T, class CONVOLVER> void
-doJob(typename CONVOLVER::coeff_type alpha)
+doJob(typename CONVOLVER::coeff_type alpha, size_t grainSize)
 {
     using namespace	std;
 	
@@ -25,7 +25,8 @@ doJob(typename CONVOLVER::coeff_type alpha)
     Image<value_type>	out(in.width(), in.height());
     Profiler		profiler(1);
     CONVOLVER		convolver(alpha);
-
+    convolver.setGrainSize(grainSize);
+    
     for (int i = 0; i < 5; ++i)
     {
 	for (int j = 0; j < 100; ++j)
@@ -85,8 +86,9 @@ main(int argc, char* argv[])
     
     float		alpha = 1.0;
     bool		gaussian = false;
+    size_t		grainSize = 1;
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "a:G")) != -1; )
+    for (int c; (c = getopt(argc, argv, "a:Gg:")) != -1; )
 	switch (c)
 	{
 	  case 'a':
@@ -94,6 +96,9 @@ main(int argc, char* argv[])
 	    break;
 	  case 'G':
 	    gaussian = true;
+	    break;
+	  case 'g':
+	    grainSize = atoi(optarg);
 	    break;
 	}
 
@@ -103,13 +108,15 @@ main(int argc, char* argv[])
 	{
 	    doJob1<pixel_type, GaussianConvolver< coeff_type> >(alpha);
 	    cerr << endl;
-	    doJob< pixel_type, GaussianConvolver2<coeff_type> >(alpha);
+	    doJob< pixel_type, GaussianConvolver2<coeff_type> >(alpha,
+								grainSize);
 	}
 	else
 	{
 	    doJob1<pixel_type, DericheConvolver< coeff_type> >(alpha);
 	    cerr << endl;
-	    doJob< pixel_type, DericheConvolver2<coeff_type> >(alpha);
+	    doJob< pixel_type, DericheConvolver2<coeff_type> >(alpha,
+							       grainSize);
 	}
     }
     catch (exception& err)

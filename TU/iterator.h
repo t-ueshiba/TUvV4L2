@@ -34,7 +34,9 @@
 #ifndef __TUiterator_h
 #define __TUiterator_h
 
+#include <cstddef>				// for including size_t
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/iterator/zip_iterator.hpp>
 #include <boost/iterator_adaptors.hpp>
 #include <boost/array.hpp>
 #include "TU/functional.h"
@@ -130,9 +132,6 @@ namespace detail
     class assignment_proxy
     {
       public:
-	typedef FUNC	func_type;
-    
-      public:
 	assignment_proxy(ITER const& iter, FUNC const& func)
 	    :_iter(iter), _func(func)					{}
 
@@ -211,54 +210,50 @@ make_assignment_iterator(ITER iter)
 }
 
 /************************************************************************
-*  class row_iterator<COLITER, ITER>					*
+*  class assignment2_iterator<FUNC, ITER>				*
 ************************************************************************/
 namespace detail
 {
-    template <class COLITER, class ITER>
-    class row_proxy
+    template <class FUNC, class ITER>
+    class assignment2_proxy
     {
       public:
-	typedef COLITER	iterator;
-    
-      public:
-	row_proxy(ITER const& iter, COLITER const& coliter)
-	    :_iter(iter), _coliter(coliter)				{}
-    
-	iterator	begin()	const
-			{
-			    return iterator(_iter->begin(), _coliter.functor());
-			}
-	iterator	end() const
-			{
-			    return iterator(_iter->end(), _coliter.functor());
-			}
-    
+	assignment2_proxy(ITER const& iter, FUNC const& func)
+	    :_iter(iter), _func(func)					{}
+
+	template <class T>
+	assignment2_proxy&	operator =(const T& val)
+				{
+				    _func(*_iter, val);
+				    return *this;
+				}
+
       private:
 	ITER const&	_iter;
-	COLITER const&	_coliter;
+	FUNC const&	_func;
     };
 }
-    
-//! コンテナを指す反復子に対して，取り出した値を変換したり値を変換してから格納する作業をサポートする反復子
-/*
-  \param COLITER	コンテナ中の個々の値に対して変換を行う反復子
-  \param ITER		begin(), end()をサポートするコンテナを指す反復子
-*/ 
-template <class COLITER, class ITER>
-class row_iterator
-    : public boost::iterator_adaptor<row_iterator<COLITER, ITER>,
+
+//! operator *()を左辺値として使うときに，この左辺値と右辺値に指定された関数を適用するための反復子
+/*!
+  \param FUNC	変換を行う関数オブジェクトの型
+  \param ITER	変換結果の代入先を指す反復子
+*/
+template <class FUNC, class ITER>
+class assignment2_iterator
+    : public boost::iterator_adaptor<assignment2_iterator<FUNC, ITER>,
 				     ITER,
-				     detail::row_proxy<COLITER, ITER>,
+				     typename FUNC::second_argument_type,
 				     boost::use_default,
-				     detail::row_proxy<COLITER, ITER> >
+				     detail::assignment2_proxy<FUNC, ITER> >
 {
   private:
-    typedef boost::iterator_adaptor<row_iterator,
+    typedef boost::iterator_adaptor<assignment2_iterator,
 				    ITER,
-				    detail::row_proxy<COLITER, ITER>,
+				    typename FUNC::second_argument_type,
 				    boost::use_default,
-				    detail::row_proxy<COLITER, ITER> >	super;
+				    detail::assignment2_proxy<FUNC, ITER> >
+						super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -270,13 +265,153 @@ class row_iterator
     friend class				boost::iterator_core_access;
 
   public:
-    row_iterator(ITER const& iter)
-	:super(iter), _coliter(iter->begin())				{}
-    template <class FUNC>
-    row_iterator(ITER const& iter, FUNC const& func)
-	:super(iter), _coliter(iter->begin(), func)			{}
+    assignment2_iterator(ITER const& iter, FUNC const& func=FUNC())
+	:super(iter), _func(func)					{}
 
-    reference	operator [](std::size_t i) const
+    FUNC const&	functor() const
+		{
+		    return _func;
+		}
+	
+  private:
+    reference	dereference() const
+		{
+		    return reference(super::base(), _func);
+		}
+    
+  private:
+    const FUNC	_func;
+};
+    
+template <class FUNC, class ITER> inline assignment2_iterator<FUNC, ITER>
+make_assignment2_iterator(ITER iter, FUNC func)
+{
+    return assignment2_iterator<FUNC, ITER>(iter, func);
+}
+
+template <class FUNC, class ITER> inline assignment2_iterator<FUNC, ITER>
+make_assignment2_iterator(ITER iter)
+{
+    return assignment2_iterator<FUNC, ITER>(iter);
+}
+
+/************************************************************************
+*  class row_iterator<COL, ROWBASE>					*
+************************************************************************/
+namespace detail
+{
+    template <class COL, class ROWBASE>
+    class row_proxy
+    {
+      public:
+	typedef ROWBASE					row_base_iterator;
+	typedef typename std::iterator_traits<row_base_iterator>
+			    ::value_type::iterator	col_base_iterator;
+	typedef COL					iterator;
+
+      public:
+	row_proxy(row_base_iterator const& iter, iterator const& coliter)
+	    :_iter(iter), _coliter(coliter)				{}
+    
+	iterator	begin()	const
+			{
+			    return iterator(_iter->begin(),
+					    _coliter.functor());
+			}
+	iterator	end() const
+			{
+			    return iterator(_iter->end(),
+					    _coliter.functor());
+			}
+
+      private:
+	row_base_iterator const&	_iter;
+	iterator const&			_coliter;
+    };
+
+    template <class COL, class TUPLE>
+    class row_proxy<COL, boost::zip_iterator<TUPLE> >
+    {
+      public:
+	typedef boost::zip_iterator<TUPLE>		row_base_iterator;
+	typedef boost::zip_iterator<
+		   boost::tuple<typename std::iterator_traits<
+				    typename TUPLE::head_type>
+				::value_type::iterator,
+				typename std::iterator_traits<
+				    typename TUPLE::tail_type::head_type>
+				::value_type::iterator> >
+							col_base_iterator;
+	typedef COL					iterator;
+    
+      public:
+	row_proxy(row_base_iterator const& iter, iterator const& coliter)
+	    :_iter(iter), _coliter(coliter)				{}
+    
+	iterator	begin()	const
+			{
+			    return iterator(
+				boost::make_zip_iterator(
+				    boost::make_tuple(
+					boost::get<0>(*_iter).begin(),
+					boost::get<1>(*_iter).begin())),
+				_coliter.functor());
+			}
+	iterator	end() const
+			{
+			    return iterator(
+				boost::make_zip_iterator(
+				    boost::make_tuple(
+					boost::get<0>(*_iter).end(),
+					boost::get<1>(*_iter).end())),
+				_coliter.functor());
+			}
+    
+      private:
+	row_base_iterator const&	_iter;
+	iterator const&			_coliter;
+    };
+}
+    
+//! コンテナを指す反復子に対して，取り出した値を変換したり値を変換してから格納する作業をサポートする反復子
+/*
+  \param COL		コンテナ中の個々の値に対して変換を行う反復子
+  \param ROWBASE	begin(), end()をサポートするコンテナを指す反復子
+*/ 
+template <class COL, class ROWBASE>
+class row_iterator
+    : public boost::iterator_adaptor<row_iterator<COL, ROWBASE>,
+				     ROWBASE,
+				     detail::row_proxy<COL, ROWBASE>,
+				     boost::use_default,
+				     detail::row_proxy<COL, ROWBASE> >
+{
+  private:
+    typedef boost::iterator_adaptor<
+		row_iterator,
+		ROWBASE,
+		detail::row_proxy<COL, ROWBASE>,
+		boost::use_default,
+		detail::row_proxy<COL, ROWBASE> >	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    row_iterator(ROWBASE const& iter)
+	:super(iter), _coliter()					{}
+    template <class FUNC>
+    row_iterator(ROWBASE const& iter, FUNC const& func)
+	:super(iter),
+	 _coliter(typename value_type::col_base_iterator(), func)	{}
+
+    reference	operator [](size_t i) const
 		{
 		    return reference(super::base() + i, _coliter);
 		}
@@ -288,21 +423,86 @@ class row_iterator
 		}
 
   private:
-    COLITER 	_coliter;
+    COL const	_coliter;
 };
 
-template <class COLITER, class ITER, class FUNC>
-inline row_iterator<COLITER, ITER>
-make_row_iterator(ITER iter, FUNC func)
+template <template <class, class> class COL, class ROWBASE, class FUNC>
+inline row_iterator<COL<FUNC,
+			typename std::iterator_traits<ROWBASE>
+				    ::value_type::iterator>,
+		    ROWBASE>
+make_row_iterator(ROWBASE iter, FUNC func)
 {
-    return row_iterator<COLITER, ITER>(iter, func);
+    typedef typename std::iterator_traits<ROWBASE>
+			::value_type::iterator		col_base_iterator;
+
+    return row_iterator<COL<FUNC, col_base_iterator>, ROWBASE>(iter, func);
 }
 
-template <class COLITER, class ITER>
-inline row_iterator<COLITER, ITER>
-make_row_iterator(ITER iter)
+template <template <class, class> class COL, class TUPLE, class FUNC>
+inline row_iterator<COL<FUNC,
+			boost::zip_iterator<
+			    boost::tuple<
+				typename std::iterator_traits<
+				    typename TUPLE::head_type>
+				::value_type::iterator,
+				typename std::iterator_traits<
+				    typename TUPLE::tail_type::head_type>
+				::value_type::iterator> > >,
+		    boost::zip_iterator<TUPLE> >
+make_row_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
 {
-    return row_iterator<COLITER, ITER>(iter);
+    typedef boost::zip_iterator<
+		boost::tuple<
+		    typename std::iterator_traits<
+			typename TUPLE::head_type>::value_type::iterator,
+		    typename std::iterator_traits<
+			typename TUPLE::tail_type::head_type>
+			::value_type::iterator> >	col_base_iterator;
+
+    return row_iterator<COL<FUNC, col_base_iterator>,
+			boost::zip_iterator<TUPLE> >(iter, func);
+}
+
+template <class FUNC, class ROWBASE>
+inline row_iterator<
+	 boost::transform_iterator<
+	   FUNC,
+	   typename std::iterator_traits<ROWBASE>::value_type::iterator>,
+	 ROWBASE>
+make_row_transform_iterator(ROWBASE iter, FUNC func)
+{
+    typedef typename std::iterator_traits<ROWBASE>::value_type::iterator
+							col_base_iterator;
+
+    return row_iterator<boost::transform_iterator<FUNC, col_base_iterator>,
+			ROWBASE>(iter, func);
+}
+
+template <class FUNC, class TUPLE>
+inline row_iterator<
+	   boost::transform_iterator<
+	       FUNC,
+	       boost::zip_iterator<
+		   boost::tuple<typename std::iterator_traits<
+				    typename TUPLE::head_type>
+				::value_type::iterator,
+				typename std::iterator_traits<
+				    typename TUPLE::tail_type::head_type>
+				::value_type::iterator> > >,
+	   boost::zip_iterator<TUPLE> >
+make_row_transform_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
+{
+    typedef boost::zip_iterator<
+		boost::tuple<typename std::iterator_traits<
+				 typename TUPLE::head_type>
+			     ::value_type::iterator,
+			     typename std::iterator_traits<
+				 typename TUPLE::tail_type::head_type>
+			     ::value_type::iterator> >	col_base_iterator;
+
+    return row_iterator<boost::transform_iterator<FUNC, col_base_iterator>,
+			boost::zip_iterator<TUPLE> >(iter, func);
 }
 
 /************************************************************************
@@ -348,7 +548,7 @@ class vertical_iterator
     friend class				boost::iterator_core_access;
     
   public:
-    vertical_iterator(ITER const& iter, std::size_t idx)
+    vertical_iterator(ITER const& iter, size_t idx)
 	:super(iter), _idx(idx)					{}
 
   private:
@@ -365,7 +565,7 @@ class vertical_iterator
 		}
     
   private:
-    const std::size_t	_idx;
+    const size_t	_idx;
 };
 
 //! vertical反復子を生成する
@@ -374,29 +574,29 @@ class vertical_iterator
   \return	vertical反復子
 */
 template <class ITER> vertical_iterator<ITER>
-make_vertical_iterator(ITER iter, std::size_t idx)
+make_vertical_iterator(ITER iter, size_t idx)
 {
     return vertical_iterator<ITER>(iter, idx);
 }
 
 /************************************************************************
-*  class box_filter_iterator<ITER>					*
+*  class box_filter_iterator<ITER, T>					*
 ************************************************************************/
 //! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER>
+template <class ITER, class T=typename std::iterator_traits<ITER>::value_type>
 class box_filter_iterator
-    : public boost::iterator_adaptor<box_filter_iterator<ITER>,	// self
+    : public boost::iterator_adaptor<box_filter_iterator<ITER, T>,	// self
 				     ITER,			// base
-				     boost::use_default,	// value_type
+				     T,				// value_type
 				     boost::single_pass_traversal_tag>
 {
   private:
     typedef boost::iterator_adaptor<box_filter_iterator,
 				    ITER,
-				    boost::use_default,
+				    T,
 				    boost::single_pass_traversal_tag>	super;
     
   public:
@@ -409,15 +609,15 @@ class box_filter_iterator
     friend class				boost::iterator_core_access;
 
   public:
-		box_filter_iterator(ITER const& iter, std::size_t w=0)
-		    :super(iter), _tail(iter), _valid(true), _val()
+		box_filter_iterator(ITER const& iter, size_t w=0)
+		    :super(iter), _head(iter), _valid(true), _val()
 		{
 		    if (w > 0)
 		    {
-			_val = *_tail;
+			_val = *super::base();
 				
 			while (--w > 0)
-			    _val += *++_tail;
+			    _val += *++super::base_reference();
 		    }
 		}
 
@@ -426,7 +626,7 @@ class box_filter_iterator
 		{
 		    if (!_valid)
 		    {
-			_val += *_tail;
+			_val += *super::base();
 			_valid = true;
 		    }
 		    return _val;
@@ -434,19 +634,19 @@ class box_filter_iterator
     
     void	increment()
 		{
-		    _val -= *super::base();
+		    _val -= *_head;
 		    if (!_valid)
-			_val += *_tail;
+			_val += *super::base();
 		    else
 			_valid = false;
+		    ++_head;
 		    ++super::base_reference();
-		    ++_tail;
 		}
 
   private:
-    ITER		_tail;
-    mutable bool	_valid;	//!< _val が [base(), _tail] の総和ならtrue
-    mutable value_type	_val;	//!< [base(), _tail) or [base(), _tail] の総和
+    ITER		_head;
+    mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
+    mutable value_type	_val;	// [_head, base()) or [_head, base()] の総和
 };
 
 //! box filter反復子を生成する
@@ -454,10 +654,10 @@ class box_filter_iterator
   \param iter	コンテナ中の要素を指す定数反復子
   \return	box filter反復子
 */
-template <class ITER> box_filter_iterator<ITER>
+template <class T, class ITER> box_filter_iterator<ITER, T>
 make_box_filter_iterator(ITER iter)
 {
-    return box_filter_iterator<ITER>(iter);
+    return box_filter_iterator<ITER, T>(iter);
 }
 
 /************************************************************************
@@ -507,7 +707,7 @@ class iir_filter_iterator
   private:
     static inline value_type
 		inner_product(COEFF c, const buf_type& buf,
-			      value_type init, std::size_t i)
+			      value_type init, size_t i)
 		{
 		    typedef typename buf_type::const_iterator	const_iterator;
 
@@ -705,7 +905,7 @@ class iir_filter_iterator
     const COEFF		_co;	//!< 先頭の出力フィルタ係数を指す反復子
     mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
     mutable buf_type	_obuf;	//!< 過去D時点の出力データ
-    mutable std::size_t	_i;	//!< 最も古い(D時点前)入/出力データへのindex
+    mutable size_t	_i;	//!< 最も古い(D時点前)入/出力データへのindex
 };
 
 //! infinite impulse response filter反復子を生成する
