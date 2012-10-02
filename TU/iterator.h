@@ -296,57 +296,43 @@ make_assignment2_iterator(ITER iter)
 }
 
 /************************************************************************
-*  class row_iterator<COL, ROWBASE>					*
+*  class row_iterator<COL, FUNC, ROWBASE>				*
 ************************************************************************/
 namespace detail
 {
-    template <class COL, class ROWBASE>
+    template <class COL, class FUNC, class ROWBASE>
     class row_proxy
     {
       public:
-	typedef ROWBASE					row_base_iterator;
-	typedef typename std::iterator_traits<row_base_iterator>
-			    ::value_type::iterator	col_base_iterator;
-	typedef COL					iterator;
+	typedef COL	iterator;
 
       public:
-	row_proxy(row_base_iterator const& iter, iterator const& coliter)
-	    :_iter(iter), _coliter(coliter)				{}
+	row_proxy(ROWBASE const& iter, FUNC const& func)
+	    :_iter(iter), _func(func)				{}
     
 	iterator	begin()	const
 			{
-			    return iterator(_iter->begin(),
-					    _coliter.functor());
+			    return iterator(_iter->begin(), _func);
 			}
 	iterator	end() const
 			{
-			    return iterator(_iter->end(),
-					    _coliter.functor());
+			    return iterator(_iter->end(), _func);
 			}
 
       private:
-	row_base_iterator const&	_iter;
-	iterator const&			_coliter;
+	ROWBASE const&	_iter;
+	FUNC const&	_func;
     };
 
-    template <class COL, class TUPLE>
-    class row_proxy<COL, boost::zip_iterator<TUPLE> >
+    template <class COL, class FUNC, class TUPLE>
+    class row_proxy<COL, FUNC, boost::zip_iterator<TUPLE> >
     {
       public:
-	typedef boost::zip_iterator<TUPLE>		row_base_iterator;
-	typedef boost::zip_iterator<
-		   boost::tuple<typename std::iterator_traits<
-				    typename TUPLE::head_type>
-				::value_type::iterator,
-				typename std::iterator_traits<
-				    typename TUPLE::tail_type::head_type>
-				::value_type::iterator> >
-							col_base_iterator;
-	typedef COL					iterator;
+	typedef COL	iterator;
     
       public:
-	row_proxy(row_base_iterator const& iter, iterator const& coliter)
-	    :_iter(iter), _coliter(coliter)				{}
+	row_proxy(boost::zip_iterator<TUPLE> const& iter, FUNC const& func)
+	    :_iter(iter), _func(func)				{}
     
 	iterator	begin()	const
 			{
@@ -355,7 +341,7 @@ namespace detail
 				    boost::make_tuple(
 					boost::get<0>(*_iter).begin(),
 					boost::get<1>(*_iter).begin())),
-				_coliter.functor());
+				_func);
 			}
 	iterator	end() const
 			{
@@ -364,35 +350,36 @@ namespace detail
 				    boost::make_tuple(
 					boost::get<0>(*_iter).end(),
 					boost::get<1>(*_iter).end())),
-				_coliter.functor());
+				_func);
 			}
     
       private:
-	row_base_iterator const&	_iter;
-	iterator const&			_coliter;
+	boost::zip_iterator<TUPLE> const&	_iter;
+	FUNC const&				_func;
     };
 }
     
 //! コンテナを指す反復子に対して，取り出した値を変換したり値を変換してから格納する作業をサポートする反復子
 /*
   \param COL		コンテナ中の個々の値に対して変換を行う反復子
+  \param FUNC		変換関数
   \param ROWBASE	begin(), end()をサポートするコンテナを指す反復子
 */ 
-template <class COL, class ROWBASE>
+template <class COL, class FUNC, class ROWBASE>
 class row_iterator
-    : public boost::iterator_adaptor<row_iterator<COL, ROWBASE>,
+    : public boost::iterator_adaptor<row_iterator<COL, FUNC, ROWBASE>,
 				     ROWBASE,
-				     detail::row_proxy<COL, ROWBASE>,
+				     detail::row_proxy<COL, FUNC, ROWBASE>,
 				     boost::use_default,
-				     detail::row_proxy<COL, ROWBASE> >
+				     detail::row_proxy<COL, FUNC, ROWBASE> >
 {
   private:
     typedef boost::iterator_adaptor<
 		row_iterator,
 		ROWBASE,
-		detail::row_proxy<COL, ROWBASE>,
+		detail::row_proxy<COL, FUNC, ROWBASE>,
 		boost::use_default,
-		detail::row_proxy<COL, ROWBASE> >	super;
+		detail::row_proxy<COL, FUNC, ROWBASE> >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -404,42 +391,40 @@ class row_iterator
     friend class				boost::iterator_core_access;
 
   public:
-    row_iterator(ROWBASE const& iter)
-	:super(iter), _coliter()					{}
-    template <class FUNC>
     row_iterator(ROWBASE const& iter, FUNC const& func)
-	:super(iter),
-	 _coliter(typename value_type::col_base_iterator(), func)	{}
+	:super(iter), _func(func)				{}
 
     reference	operator [](size_t i) const
 		{
-		    return reference(super::base() + i, _coliter);
+		    return reference(super::base() + i, _func);
 		}
     
   private:
     reference	dereference() const
 		{
-		    return reference(super::base(), _coliter);
+		    return reference(super::base(), _func);
 		}
 
   private:
-    COL const	_coliter;
+    FUNC const	_func;
 };
 
-template <template <class, class> class COL, class ROWBASE, class FUNC>
+template <template <class, class> class COL, class FUNC, class ROWBASE>
 inline row_iterator<COL<FUNC,
 			typename std::iterator_traits<ROWBASE>
 				    ::value_type::iterator>,
+		    FUNC,
 		    ROWBASE>
 make_row_iterator(ROWBASE iter, FUNC func)
 {
     typedef typename std::iterator_traits<ROWBASE>
 			::value_type::iterator		col_base_iterator;
 
-    return row_iterator<COL<FUNC, col_base_iterator>, ROWBASE>(iter, func);
+    return row_iterator<COL<FUNC, col_base_iterator>,
+			FUNC, ROWBASE>(iter, func);
 }
 
-template <template <class, class> class COL, class TUPLE, class FUNC>
+template <template <class, class> class COL, class FUNC, class TUPLE>
 inline row_iterator<COL<FUNC,
 			boost::zip_iterator<
 			    boost::tuple<
@@ -449,6 +434,7 @@ inline row_iterator<COL<FUNC,
 				typename std::iterator_traits<
 				    typename TUPLE::tail_type::head_type>
 				::value_type::iterator> > >,
+		    FUNC,
 		    boost::zip_iterator<TUPLE> >
 make_row_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
 {
@@ -461,22 +447,23 @@ make_row_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
 			::value_type::iterator> >	col_base_iterator;
 
     return row_iterator<COL<FUNC, col_base_iterator>,
-			boost::zip_iterator<TUPLE> >(iter, func);
+			FUNC, boost::zip_iterator<TUPLE> >(iter, func);
 }
 
 template <class FUNC, class ROWBASE>
 inline row_iterator<
 	 boost::transform_iterator<
 	   FUNC,
-	   typename std::iterator_traits<ROWBASE>::value_type::iterator>,
+	   typename std::iterator_traits<ROWBASE>::value_type::const_iterator>,
+	 FUNC,
 	 ROWBASE>
 make_row_transform_iterator(ROWBASE iter, FUNC func)
 {
-    typedef typename std::iterator_traits<ROWBASE>::value_type::iterator
-							col_base_iterator;
+    typedef typename std::iterator_traits<ROWBASE>
+			::value_type::const_iterator	col_base_iterator;
 
     return row_iterator<boost::transform_iterator<FUNC, col_base_iterator>,
-			ROWBASE>(iter, func);
+			FUNC, ROWBASE>(iter, func);
 }
 
 template <class FUNC, class TUPLE>
@@ -486,23 +473,24 @@ inline row_iterator<
 	       boost::zip_iterator<
 		   boost::tuple<typename std::iterator_traits<
 				    typename TUPLE::head_type>
-				::value_type::iterator,
+				::value_type::const_iterator,
 				typename std::iterator_traits<
 				    typename TUPLE::tail_type::head_type>
-				::value_type::iterator> > >,
+				::value_type::const_iterator> > >,
+	   FUNC,
 	   boost::zip_iterator<TUPLE> >
 make_row_transform_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
 {
     typedef boost::zip_iterator<
-		boost::tuple<typename std::iterator_traits<
-				 typename TUPLE::head_type>
-			     ::value_type::iterator,
-			     typename std::iterator_traits<
-				 typename TUPLE::tail_type::head_type>
-			     ::value_type::iterator> >	col_base_iterator;
+		boost::tuple<
+		    typename std::iterator_traits<typename TUPLE::head_type>
+		    ::value_type::const_iterator,
+		    typename std::iterator_traits<typename TUPLE::tail_type
+								::head_type>
+		    ::value_type::const_iterator> >	col_base_iterator;
 
     return row_iterator<boost::transform_iterator<FUNC, col_base_iterator>,
-			boost::zip_iterator<TUPLE> >(iter, func);
+			FUNC, boost::zip_iterator<TUPLE> >(iter, func);
 }
 
 /************************************************************************
