@@ -249,10 +249,9 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     using namespace	boost;
 
     typedef Array<Coeff>					carray_type;
-    typedef typename Coeff
-		::template Init<typename Coeff::Params>		coeff_init;
+    typedef typename Coeff::template Init<typename Coeff::Params>
+								coeff_init;
     typedef typename std::iterator_traits<GUIDE>::value_type	guide_type;
-    typedef typename std::iterator_traits<OUT>::value_type	out_type;
     typedef typename Coeff::Trans				coeff_trans;
     
   // guided filterの2次元係数ベクトルを計算する．
@@ -285,14 +284,12 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
     using namespace	boost;
 
     typedef Array<Coeff>					carray_type;
-    typedef typename Coeff
-		::template Init<typename Coeff::SimpleParams>	coeff_init;
-    typedef typename std::iterator_traits<IN>::value_type	in_type;
-    typedef typename std::iterator_traits<OUT>::value_type	out_type;
+    typedef typename Coeff::template Init<typename Coeff::SimpleParams>
+								coeff_init;
     typedef typename Coeff::Trans				coeff_trans;
 
   // guided filterの2次元係数ベクトルを計算する．
-    carray_type	c(super::outLengh(std::distance(ib, ie)));
+    carray_type	c(super::outLength(std::distance(ib, ie)));
     super::convolve(ib, ie,
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(width(), _e)));
@@ -375,8 +372,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 
     typedef Array2<Array<Coeff> >				carray2_type;
     typedef Identity<IN, OUT>					identity;
-    typedef typename Coeff
-		::template Init<typename Coeff::Params>		coeff_init;
+    typedef typename Coeff::template Init<typename Coeff::Params>
+								coeff_init;
     typedef typename Coeff::Trans				coeff_trans;
     
     const size_t	n = rowWidth() * colWidth();
@@ -415,8 +412,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     using namespace	boost;
 
     typedef Array2<Array<Coeff> >				carray2_type;
-    typedef typename Coeff
-		::template Init<typename Coeff::SimpleParams>	coeff_init;
+    typedef typename Coeff::template Init<typename Coeff::SimpleParams>
+								coeff_init;
     typedef typename Coeff::Trans				coeff_trans;
 
     const size_t	n = rowWidth() * colWidth();
