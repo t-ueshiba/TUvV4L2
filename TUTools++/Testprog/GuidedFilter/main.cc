@@ -38,7 +38,7 @@ main(int argc, char* argv[])
     gf.convolve(a.begin(), a.end(), b.begin(), b.end(), c.begin() + w - 1);
   //gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
     cout << c;
-
+  /*
   // guided filterを2つの2D arrayに適用する．
     Array2<Array<short> >	A;
     cerr << ">> ";
@@ -54,6 +54,6 @@ main(int argc, char* argv[])
   //gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
     gf2.convolve(A.begin(), A.end(), C.begin());
     cout << C;
-
+  */
     return 0;
 }

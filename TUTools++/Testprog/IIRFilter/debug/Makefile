@@ -5,12 +5,12 @@
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= 
+INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= iirftest
 LIBS		=
 
-CPPFLAGS	= -std=c++0x -DSSE2
+CPPFLAGS	= -DSSE2
 CFLAGS		= -O3
 CCFLAGS		= $(CFLAGS)
 LDFLAGS		=
@@ -21,16 +21,7 @@ LINKER		= $(CCC)
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC
-EXTHDRS		= TU/DericheConvolver.h \
-		TU/Image++.h \
-		TU/TU/Geometry++.h \
-		TU/TU/IIRFilter.h \
-		TU/TU/TU/Minimize.h \
-		TU/TU/TU/TU/Array++.h \
-		TU/TU/TU/TU/TU/types.h \
-		TU/TU/TU/Vector++.h \
-		TU/TU/TU/mmInstructions.h \
-		TU/TU/TU/utility.h
+EXTHDRS		=
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -50,7 +41,3 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: TU/Image++.h TU/TU/Geometry++.h TU/TU/TU/utility.h \
-	TU/TU/TU/Vector++.h TU/TU/TU/TU/Array++.h TU/TU/TU/TU/TU/types.h \
-	TU/TU/TU/Minimize.h TU/DericheConvolver.h TU/TU/IIRFilter.h \
-	TU/TU/TU/mmInstructions.h
