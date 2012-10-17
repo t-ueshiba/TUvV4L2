@@ -1,5 +1,5 @@
 /*
- *  $Id: createCaptureCmds.cc,v 1.1 2012-06-19 06:14:31 ueshiba Exp $
+ *  $Id$
  */
 #include "multicam.h"
 
