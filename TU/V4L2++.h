@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2++.h,v 1.1 2012-09-15 05:10:04 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
@@ -74,6 +74,12 @@ class V4L2Camera
 	ZOOM_ABSOLUTE			= V4L2_CID_ZOOM_ABSOLUTE,
 	ZOOM_RELATIVE			= V4L2_CID_ZOOM_RELATIVE,
 	ZOOM_CONTINUOUS			= V4L2_CID_ZOOM_CONTINUOUS,
+#ifdef V4L2_CID_IRIS_ABSOLUTE
+	IRIS_ABSOLUTE			= V4L2_CID_IRIS_ABSOLUTE,
+#endif
+#ifdef V4L2_CID_IRIS_RELATIVE
+	IRIS_RELATIVE			= V4L2_CID_IRIS_RELATIVE,
+#endif
 	PAN_ABSOLUTE			= V4L2_CID_PAN_ABSOLUTE,
 	PAN_RELATIVE			= V4L2_CID_PAN_RELATIVE,
 	PAN_RESET			= V4L2_CID_PAN_RESET,
@@ -238,6 +244,7 @@ class V4L2Camera
   private:
     void		enumerateFormats()				;
     void		enumerateControls()				;
+    bool		addControl(u_int id)				;
     int			enumerateMenuItems(
 			    const v4l2_queryctrl& ctrl,
 			    std::vector<MenuItem>& menuItems)		;

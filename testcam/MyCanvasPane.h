@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCanvasPane.h,v 1.2 2012-06-29 03:10:04 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/v/CanvasPane.h"
 #include "TU/v/CanvasPaneDC.h"

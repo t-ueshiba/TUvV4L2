@@ -1,5 +1,5 @@
 /*
- *  $Id: multicam.h,v 1.4 2012-06-29 03:10:04 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/v/TUv++.h"
 #include "TU/V4L2++.h"
@@ -36,7 +36,7 @@ enum
 
   // Camera control.
     c_ContinuousShot,
-
+    
   // Camera feasures.
     c_Brightness		= V4L2Camera::BRIGHTNESS,
     c_Brightness_Auto		= V4L2Camera::BRIGHTNESS_AUTO,
@@ -60,6 +60,12 @@ enum
     c_Zomm_Absolute		= V4L2Camera::ZOOM_ABSOLUTE,
     c_Zoom_Relative		= V4L2Camera::ZOOM_RELATIVE,
     c_Zoom_Continuous		= V4L2Camera::ZOOM_CONTINUOUS,
+#ifdef V4L2_CID_IRIS_ABSOLUTE
+    c_Iris_Absolute		= V4L2Camera::IRIS_ABSOLUTE,
+#endif
+#ifdef V4L2_CID_IRIS_RELATIVE
+    c_Iris_Relative		= V4L2Camera::IRIS_RELATIVE,
+#endif
     c_Pan_Absolute		= V4L2Camera::PAN_ABSOLUTE,
     c_Pan_Relative		= V4L2Camera::PAN_RELATIVE,
     c_Pan_Reset			= V4L2Camera::PAN_RESET,

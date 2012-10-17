@@ -1,5 +1,5 @@
 /*
- *  $Id: V4L2Camera.cc,v 1.9 2012-09-12 11:24:47 ueshiba Exp $
+ *  $Id$
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -89,6 +89,12 @@ static const struct
     {V4L2Camera::ZOOM_ABSOLUTE,			"ZOOM_ABSOLUTE"},
     {V4L2Camera::ZOOM_RELATIVE,			"ZOOM_RELATIVE"},
     {V4L2Camera::ZOOM_CONTINUOUS,		"ZOOM_CONTINUOUS"},
+#ifdef V4L2_CID_IRIS_ABSOLUTE
+    {V4L2Camera::IRIS_ABSOLUTE,			"IRIS_ABSOLUTE"},
+#endif
+#ifdef V4L2_CID_IRIS_RELATIVE
+    {V4L2Camera::IRIS_RELATIVE,			"IRIS_RELATIVE"},
+#endif
     {V4L2Camera::PAN_ABSOLUTE,			"PAN_ABSOLUTE"},
     {V4L2Camera::PAN_RELATIVE,			"PAN_RELATIVE"},
     {V4L2Camera::PAN_RESET,			"PAN_RESET"},
@@ -342,6 +348,16 @@ V4L2Camera::V4L2Camera(const char* dev)
 {
     using namespace	std;
 
+  // デバイスの能力を調査
+    v4l2_capability	cap;
+    memset(&cap, 0, sizeof(cap));
+    if (ioctl(VIDIOC_QUERYCAP, &cap))
+	throw runtime_error(string("V4L2Camera::V4L2Camera(): VIDIOC_QUERYCAP failed!! ") + strerror(errno));
+    if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+	throw runtime_error("V4L2Camera::V4L2Camera(): not a capture device!");
+    if (!(cap.capabilities & V4L2_CAP_STREAMING))
+	throw runtime_error("V4L2Camera::V4L2Camera(): not a streaming device!");
+    
     enumerateFormats();		// 画素フォーマット，画像サイズ，フレームレート
     enumerateControls();	// カメラのコントロール=属性
 
@@ -452,6 +468,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
     unmapBuffers();
     
     v4l2_format	fmt;
+    memset(&fmt, 0, sizeof(fmt));
     fmt.type		    = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     fmt.fmt.pix.width       = width;
     fmt.fmt.pix.height      = height;
@@ -465,6 +482,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
 
   // フレーム間隔を設定
     v4l2_streamparm	streamparm;
+    memset(&streamparm, 0, sizeof(streamparm));
     streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     streamparm.parm.capture.timeperframe.numerator   = fps_n;
     streamparm.parm.capture.timeperframe.denominator = fps_d;
@@ -491,6 +509,7 @@ V4L2Camera::getFrameRate(u_int& fps_n, u_int& fps_d) const
     using namespace	std;
     
     v4l2_streamparm	streamparm;
+    memset(&streamparm, 0, sizeof(streamparm));
     streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(VIDIOC_G_PARM, &streamparm))
 	throw runtime_error(string("V4L2Camera::getFrameRate(): VIDIOC_G_PARM failed!! ") + strerror(errno));
@@ -539,6 +558,7 @@ V4L2Camera::setValue(Feature feature, int value)
 	throw out_of_range("V4L2Camera::setValue(): out of range value!! ");
 
     v4l2_control	ctrl;
+    memset(&ctrl, 0, sizeof(ctrl));
     ctrl.id    = control.feature;
     ctrl.value = value;
     if (ioctl(VIDIOC_S_CTRL, &ctrl))
@@ -563,6 +583,7 @@ V4L2Camera::getValue(Feature feature) const
 	throw runtime_error("V4L2Camera::getValue(): write only feature!! ");
 
     v4l2_control	ctrl;
+    memset(&ctrl, 0, sizeof(ctrl));
     ctrl.id = control.feature;
     if (ioctl(VIDIOC_G_CTRL, &ctrl))
 	throw runtime_error(string("V4L2Camera::getValue(): VIDIOC_G_CTRL failed!! ") + strerror(errno));
@@ -1013,6 +1034,14 @@ V4L2Camera::uintToFeature(u_int feature)
 	return ZOOM_RELATIVE;
       case ZOOM_CONTINUOUS:
 	return ZOOM_CONTINUOUS;
+#ifdef V4L2_CID_IRIS_ABSOLUTE
+      case IRIS_ABSOLUTE:
+	return IRIS_ABSOLUTE;
+#endif
+#ifdef V4L2_CID_IRIS_RELATIVE
+      case IRIS_RELATIVE:
+	return IRIS_RELATIVE;
+#endif
       case PAN_ABSOLUTE:
 	return PAN_ABSOLUTE;
       case PAN_RELATIVE:
@@ -1141,7 +1170,8 @@ V4L2Camera::enumerateFormats()
 	}
     }
 }
-    
+
+#if 1
 void
 V4L2Camera::enumerateControls()
 {
@@ -1204,7 +1234,79 @@ V4L2Camera::enumerateControls()
 	    control.flags = ctrl.flags;
 	}
 }
+
+#else
+void
+V4L2Camera::enumerateControls()
+{
+    using namespace	std;
     
+  // このカメラがサポートするコントロール(属性)を列挙
+    for (u_int id = V4L2_CID_BASE; id < V4L2_CID_LASTP1; ++id)
+	addControl(id);
+    for (u_int id = V4L2_CID_PRIVATE_BASE; addControl(id); ++id)
+	;
+    for (u_int id = V4L2_CID_CAMERA_CLASS_BASE +  1;
+	       id < V4L2_CID_CAMERA_CLASS_BASE + 19; ++id)
+	addControl(id);
+}
+
+bool
+V4L2Camera::addControl(u_int id)
+{
+    using namespace	std;
+    
+  // idに指定されたコントロールがサポートされているか調査
+    v4l2_queryctrl	ctrl;
+    memset(&ctrl, 0, sizeof(ctrl));
+    ctrl.id = id;
+    if (ioctl(VIDIOC_QUERYCTRL, &ctrl))
+	return false;
+
+  // コントロールが有効かつ既知であるか調査
+    Feature	feature = uintToFeature(ctrl.id);
+    if (ctrl.flags & V4L2_CTRL_FLAG_DISABLED ||	// 無効化されているか
+	feature == UNKNOWN_FEATURE)		// 未知の属性ならば...
+	return true;				// 直ちにリターン
+
+  // コントロールの諸性質を保存
+    _controls.push_back(Control());
+    Control&	control = _controls.back();
+	    
+    control.feature = feature;
+    control.name    = (char*)ctrl.name;
+
+    switch (ctrl.type)
+    {
+      case V4L2_CTRL_TYPE_INTEGER:
+      case V4L2_CTRL_TYPE_BOOLEAN:
+      case V4L2_CTRL_TYPE_MENU:
+	control.type = ctrl.type;
+	if (control.type == V4L2_CTRL_TYPE_MENU)
+	{
+	    control.range.min = 0;
+	    control.range.max = enumerateMenuItems(ctrl, control.menuItems);
+	    control.range.step = 1;
+	}
+	else
+	{
+	    control.range.min  = ctrl.minimum;
+	    control.range.max  = ctrl.maximum;
+	    control.range.step = ctrl.step;
+	}
+	break;
+      default:
+	_controls.pop_back();
+	break;
+    }
+
+    control.def	  = ctrl.default_value;
+    control.flags = ctrl.flags;
+
+    return true;
+}
+#endif
+
 int
 V4L2Camera::enumerateMenuItems(const v4l2_queryctrl& ctrl,
 			       std::vector<MenuItem>& menuItems)
@@ -1215,9 +1317,15 @@ V4L2Camera::enumerateMenuItems(const v4l2_queryctrl& ctrl,
     
     for (menu.index = ctrl.minimum; menu.index <= ctrl.maximum; ++menu.index)
     {
+      // 本当はioctl()の戻り値をチェックするべきだが，linux-3.2.0 では
+      // V4L2_CID_EXPOSURE_AUTOに対するVIDOC_QUERYMENUが失敗するので，
+      // あえてエラーチェックをしない．
+#if 0
 	if (ioctl(VIDIOC_QUERYMENU, &menu))
 	    break;
-	
+#else
+	ioctl(VIDIOC_QUERYMENU, &menu);
+#endif
 	menuItems.push_back(MenuItem());
 	MenuItem&	menuItem = menuItems.back();
 
@@ -1325,6 +1433,7 @@ V4L2Camera::enqueueBuffer(u_int index) const
     using namespace	std;
     
     v4l2_buffer	buf;
+    memset(&buf, 0, sizeof(buf));
     buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buf.memory = V4L2_MEMORY_MMAP;
     buf.index  = index;
@@ -1346,6 +1455,7 @@ V4L2Camera::dequeueBuffer()
     using namespace	std;
     
     v4l2_buffer	buf;
+    memset(&buf, 0, sizeof(buf));
     buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buf.memory = V4L2_MEMORY_MMAP;
     if (ioctl(VIDIOC_DQBUF, &buf))

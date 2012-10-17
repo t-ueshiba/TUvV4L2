@@ -1,5 +1,5 @@
 /*
- *  $Id: MyCmdWindow.cc,v 1.4 2012-06-29 03:10:04 ueshiba Exp $
+ *  $Id$
  */
 #include <unistd.h>
 #include <sys/time.h>
@@ -128,6 +128,12 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	  case c_Zomm_Absolute:
 	  case c_Zoom_Relative:
 	  case c_Zoom_Continuous:
+#ifdef V4L2_CID_IRIS_ABSOLUTE
+	  case c_Iris_Absolute:
+#endif
+#ifdef V4L2_CID_IRIS_RELATIVE
+	  case c_Iris_Relative:
+#endif
 	  case c_Pan_Absolute:
 	  case c_Pan_Relative:
 	  case c_Pan_Reset:
