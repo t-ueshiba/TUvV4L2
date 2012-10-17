@@ -8,9 +8,8 @@ DEST		= $(PREFIX)/bin
 INCDIRS		= -I$(PREFIX)/include -I$(HOME)/src/TUv++
 
 PROGRAM		= testcam
-#LIBS		= -lTUV4L2++ -lTUXv++ -lTUv++ -lTUTools++ \
-#		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11
-LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11
+LIBS		= -lTUV4L2++ -lTUXv++ -lTUv++ -lTUTools++ \
+		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11
 ifeq ($(OSTYPE), darwin)
   LIBS	       +=
 #  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
