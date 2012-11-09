@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ChoiceFrameCmd_.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id$  
  */
 #ifndef __TUvChoiceFrameCmd_h
 #define __TUvChoiceFrameCmd_h

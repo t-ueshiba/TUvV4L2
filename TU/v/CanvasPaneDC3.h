@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: CanvasPaneDC3.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
+ *  $Id$  
  */
 #ifndef __TUvCanvasPaneDC3_h
 #define __TUvCanvasPaneDC3_h

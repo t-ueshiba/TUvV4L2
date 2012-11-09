@@ -1,4 +1,4 @@
-/* $Id: vGridbox_.h,v 1.2 2002-07-25 02:38:13 ueshiba Exp $
+/* $Id$
  *
  * This widget manages multiple child widgets, arranging them in a
  * rectangular grid.  Child widgets may occupy multiple grid cells.

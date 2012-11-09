@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: ChoiceMenuButtonCmd_.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id$  
  */
 #ifndef __TUvChoiceMenuButtonCmd_h
 #define __TUvChoiceMenuButtonCmd_h

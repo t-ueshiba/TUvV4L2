@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: Dialog.cc,v 1.8 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id$  
  */
 #include "TU/v/Dialog.h"
 #include "TU/v/Colormap.h"
