@@ -85,7 +85,7 @@ GaussianCoefficients<T>::Params::operator -=(const vector_type& p)
 template <class T> typename GaussianCoefficients<T>::vector_type
 GaussianCoefficients<T>::EvenConstraint::operator ()(const AT& params) const
 {
-    vector_type		val(1);
+    vector_type		val(1u);
     const value_type	as0 = params[0].alpha/_sigma,
 			ts0 = params[0].theta/_sigma,
 			as1 = params[1].alpha/_sigma,

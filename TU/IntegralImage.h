@@ -35,6 +35,10 @@
 #define	__TUIntegralImage_h
 
 #include "TU/Image++.h"
+#ifdef USE_TBB
+#  include <tbb/parallel_for.h>
+#  include <tbb/blocked_range.h>
+#endif
 
 namespace TU
 {
@@ -47,6 +51,28 @@ class IntegralImage : public Image<T>
 {
   private:
     typedef Image<T>	super;
+
+#ifdef USE_TBB
+    template <class S, class B>
+    class CrossVal
+    {
+      public:
+	CrossVal(const IntegralImage& in, Image<S, B>& out, int cropSize)
+	    :_in(in), _out(out), _cropSize(cropSize)			{}
+    
+	void	operator ()(const tbb::blocked_range<u_int>& r) const
+		{
+		    for (u_int v = r.begin(); v != r.end(); ++v)
+			for (u_int u = 0; u < _out.width() - 1; ++u)
+			    _out[v][u] = _in.crossVal(u, v, _cropSize);
+		}
+
+      private:
+	const IntegralImage&	_in;
+	Image<S, B>&		_out;
+	const int		_cropSize;
+    };
+#endif
     
   public:
     IntegralImage()							;
@@ -182,10 +208,14 @@ template <class T> template <class S, class B> const IntegralImage<T>&
 IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(originalHeight(), originalWidth());
+#ifdef USE_TBB
+    tbb::parallel_for(tbb::blocked_range<u_int>(0, out.height() - 1, 1),
+		      CrossVal<S, B>(*this, out, cropSize));
+#else
     for (u_int v = 0; v < out.height(); ++v)
 	for (u_int u = 0; u < out.width(); ++u)
 	    out[v][u] = crossVal(u, v, cropSize);
-
+#endif
     return *this;
 }
 
@@ -219,6 +249,29 @@ template <class T>
 class DiagonalIntegralImage : public Image<T>
 {
     typedef Image<T>	super;
+
+#ifdef USE_TBB
+    template <class S, class B>
+    class CrossVal
+    {
+      public:
+	CrossVal(const DiagonalIntegralImage& in,
+		 Image<S, B>& out, int cropSize)
+	    :_in(in), _out(out), _cropSize(cropSize)			{}
+    
+	void	operator ()(const tbb::blocked_range<u_int>& r) const
+		{
+		    for (u_int v = r.begin(); v != r.end(); ++v)
+			for (u_int u = 0; u < _out.width() - 1; ++u)
+			    _out[v][u] = _in.crossVal(u, v, _cropSize);
+		}
+
+      private:
+	const DiagonalIntegralImage&	_in;
+	Image<S, B>&			_out;
+	const int			_cropSize;
+    };
+#endif
     
   public:
     DiagonalIntegralImage()						;
@@ -348,10 +401,16 @@ template <class T> template <class S, class B> const DiagonalIntegralImage<T>&
 DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(height(), width());
+#ifdef USE_TBB
+    tbb::parallel_for(tbb::blocked_range<u_int>(0,
+						out.height() - 2*cropSize - 1,
+						1),
+		      CrossVal<S, B>(*this, out, cropSize));
+#else
     for (u_int v = 0; v < out.height() - 2*cropSize - 1; ++v)
 	for (u_int u = 0; u < out.width(); ++u)
 	    out[v][u] = crossVal(u, v, cropSize);
-
+#endif
     return *this;
 }
 

@@ -51,8 +51,8 @@ main(int argc, char* argv[])
 
     GuidedFilter2<float>	gf2(w, w, e);
     Array2<Array<float> >	C(A.nrow(), A.ncol());
-  //gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
-    gf2.convolve(A.begin(), A.end(), C.begin());
+    gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
+  //gf2.convolve(A.begin(), A.end(), C.begin());
     cout << C;
   */
     return 0;

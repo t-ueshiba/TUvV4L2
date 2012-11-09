@@ -2,7 +2,7 @@
  *  $Id: main.cc,v 1.1 2012-07-23 00:45:48 ueshiba Exp $
  */
 #include <cstdlib>
-#include "TU/BoxFilter.h"
+#include "TU/iterator.h"
 #include "TU/Array++.h"
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/zip_iterator.hpp>
