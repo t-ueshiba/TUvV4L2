@@ -1,5 +1,5 @@
 /*
- *  $Id: Collection++.h,v 1.1 2012-09-15 05:16:31 ueshiba Exp $
+ *  $Id$
  */
 #ifndef __TUCollectionPP_h
 #define __TUCollectionPP_h

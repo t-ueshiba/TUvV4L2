@@ -1,5 +1,5 @@
 /*
- *  $Id: Desc.cc,v 1.5 2012-08-29 21:17:03 ueshiba Exp $
+ *  $Id$
  */
 #include "Object++_.h"
 #include <stdarg.h>

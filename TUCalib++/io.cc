@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: io.cc,v 1.3 2002-07-25 07:47:28 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Calib++.h"
 #include <fstream>

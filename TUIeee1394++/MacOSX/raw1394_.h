@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: raw1394_.h,v 1.15 2012-09-15 05:13:16 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \file		raw1394_.h

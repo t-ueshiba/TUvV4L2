@@ -1,5 +1,5 @@
 /*
- *  $Id: TUBrep++.inst.cc,v 1.4 2012-08-29 21:16:44 ueshiba Exp $
+ *  $Id$
  */
 
 #if defined(__GNUG__) || defined(__INTEL_COMPILER)

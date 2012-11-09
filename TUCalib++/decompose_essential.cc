@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: decompose_essential.cc,v 1.1 2002-08-09 01:28:05 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Calib++.h"
 

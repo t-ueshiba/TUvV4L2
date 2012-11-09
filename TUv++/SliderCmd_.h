@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: SliderCmd_.h,v 1.6 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id$  
  */
 #ifndef __TUvSliderCmd_h
 #define __TUvSliderCmd_h

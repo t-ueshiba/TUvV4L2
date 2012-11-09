@@ -8,7 +8,8 @@ SUBDIR	= TUTools++		\
 	  TUVision++		\
 	  TUXv++		\
 	  TUCuda++		\
-	  TUV4L2++
+	  TUV4L2++		\
+	  TUUSB++
 #	  TUThread++		\
 #	  TUCalib++		\
 #	  Kanatani		\

@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.h,v 1.1 2012-09-15 05:08:53 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \file		Ieee1394CameraArray.h

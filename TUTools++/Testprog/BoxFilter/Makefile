@@ -15,7 +15,7 @@ ifeq ($(OSTYPE), darwin)
 endif
 
 CPPFLAGS	=
-CFLAGS		= -g
+CFLAGS		= -g -O
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
   CFLAGS	= -O3
@@ -32,7 +32,6 @@ LINKER		= $(CXX)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/BoxFilter.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/types.h
@@ -43,6 +42,6 @@ OBJS		= main.o
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: /usr/local/include/TU/BoxFilter.h /usr/local/include/TU/iterator.h \
+main.o: /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/types.h

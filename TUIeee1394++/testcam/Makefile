@@ -51,8 +51,9 @@ EXTHDRS		= ../../../multicam/server/multicam.h \
 		/usr/local/include/TU/TriggerGenerator.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/fdstream.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/types.h \
-		/usr/local/include/TU/utility.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -73,16 +74,14 @@ EXTHDRS		= ../../../multicam/server/multicam.h \
 HDRS		= MyCanvasPane.h \
 		MyCmdWindow.h \
 		MyModalDialog.h
-SRCS		= Ieee1394Node.cc \
-		MyCanvasPane.cc \
+SRCS		= MyCanvasPane.cc \
 		MyCmdWindow.cc \
 		MyModalDialog.cc \
 		createCaptureCmds.cc \
 		createFeatureCmds.cc \
 		createMenuCmds.cc \
 		main.cc
-OBJS		= Ieee1394Node.o \
-		MyCanvasPane.o \
+OBJS		= MyCanvasPane.o \
 		MyCmdWindow.o \
 		MyModalDialog.o \
 		createCaptureCmds.o \
@@ -105,18 +104,13 @@ REV		= $(shell echo $Revision: 1.7 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-Ieee1394Node.o: /usr/local/include/TU/Ieee1394++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h
 MyCanvasPane.o: MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
@@ -124,10 +118,10 @@ MyCanvasPane.o: MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 MyCmdWindow.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h MyCmdWindow.h \
 	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/CmdPane.h \
@@ -144,9 +138,9 @@ MyCmdWindow.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/Movie.h MyModalDialog.h
 MyModalDialog.o: MyModalDialog.h /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
@@ -155,34 +149,34 @@ MyModalDialog.o: MyModalDialog.h /usr/local/include/TU/Ieee1394++.h \
 createCaptureCmds.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
 createFeatureCmds.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
 createMenuCmds.o: ../../../multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
 main.o: MyCmdWindow.h /usr/local/include/TU/v/App.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/utility.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/ModalDialog.h \

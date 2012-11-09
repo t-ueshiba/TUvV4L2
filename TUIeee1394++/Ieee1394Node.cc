@@ -19,7 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: Ieee1394Node.cc,v 1.27 2012-08-29 19:30:24 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Ieee1394++.h"
 #include <unistd.h>

@@ -1,5 +1,5 @@
 /*
- *  $Id: Object.cc,v 1.4 2012-08-29 21:17:03 ueshiba Exp $
+ *  $Id$
  */
 #include "Object++_.h"
 #include <stdexcept>

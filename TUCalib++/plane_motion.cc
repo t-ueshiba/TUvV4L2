@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: plane_motion.cc,v 1.2 2002-07-25 02:38:01 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Calib++.h"
 

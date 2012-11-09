@@ -1,5 +1,5 @@
 /*
- *  $Id: Calib++.cc,v 1.5 2011-06-24 00:32:26 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Calib++.h"
 

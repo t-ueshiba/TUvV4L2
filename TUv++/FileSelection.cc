@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: FileSelection.cc,v 1.10 2012-08-29 21:17:18 ueshiba Exp $  
+ *  $Id$  
  */
 #include <unistd.h>
 #include <sys/types.h>

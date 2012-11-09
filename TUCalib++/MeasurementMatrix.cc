@@ -1,5 +1,5 @@
 /*
- *  $Id: MeasurementMatrix.cc,v 1.12 2007-02-28 00:18:40 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Calib++.h"
 #include <iomanip>

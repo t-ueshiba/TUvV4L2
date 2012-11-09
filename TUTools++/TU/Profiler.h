@@ -31,6 +31,9 @@
   \file		Profiler.h
   \brief	クラス TU::Profiler の定義と実装
 */
+#ifndef __TUProfiler_h
+#define __TUProfiler_h
+
 #include "TU/Array++.h"
 #include <iostream>
 #ifdef WIN32
@@ -148,3 +151,4 @@ Profiler::Timer::stop()
 }
 
 }
+#endif

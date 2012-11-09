@@ -1,5 +1,5 @@
 /*
- *  $Id: Object++.h,v 1.1 2012-09-15 05:15:48 ueshiba Exp $
+ *  $Id$
  */
 #ifndef __TUObjectPP_h
 #define __TUObjectPP_h

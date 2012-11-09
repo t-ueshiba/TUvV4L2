@@ -1,5 +1,5 @@
 /*
- *  $Id: BrepCanvasPane.cc,v 1.6 2012-08-29 21:17:14 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/v/Vision++.h"
 #include <limits.h>

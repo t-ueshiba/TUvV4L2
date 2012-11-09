@@ -1,5 +1,5 @@
 /*
- *  $Id: Can.cc,v 1.4 2012-08-29 21:16:49 ueshiba Exp $
+ *  $Id$
  */
 /*!
   \mainpage	libTUCan++ - CANおよびManusマニピュレータコントローラ

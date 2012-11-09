@@ -1,5 +1,5 @@
 /*
- *  $Id: affine_registration.cc,v 1.2 2002-07-25 02:38:00 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Vector++.h"
 

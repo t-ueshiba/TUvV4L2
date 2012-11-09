@@ -1,5 +1,5 @@
 /*
- *  $Id: Ieee1394CameraArray.cc,v 1.11 2012-08-29 19:30:24 ueshiba Exp $
+ *  $Id$
  */
 #include <cstdlib>
 #include "TU/Ieee1394CameraArray.h"

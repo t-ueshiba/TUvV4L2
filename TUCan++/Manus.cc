@@ -1,5 +1,5 @@
 /*
- *  $Id: Manus.cc,v 1.4 2012-08-29 21:16:49 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Can++.h"
 

@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: Calib++.h,v 1.14 2011-06-24 00:32:26 ueshiba Exp $
+ *  $Id$
  */
 #ifndef __TUCalibPP_h
 #define __TUCalibPP_h

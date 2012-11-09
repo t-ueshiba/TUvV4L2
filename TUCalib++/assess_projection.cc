@@ -20,7 +20,7 @@
  */
 
 /*
- *  $Id: assess_projection.cc,v 1.2 2002-07-25 02:38:00 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Calib++.h"
 

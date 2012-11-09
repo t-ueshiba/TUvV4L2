@@ -1,5 +1,5 @@
 /*
- *  $Id: ptest.cc,v 1.5 2002-12-10 01:08:04 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/Object++.h"
 //#ifdef __GNUG__

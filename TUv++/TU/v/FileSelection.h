@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id: FileSelection.h,v 1.1 2012-09-15 05:00:49 ueshiba Exp $  
+ *  $Id$  
  */
 #ifndef __TUvFileSelection_h
 #define __TUvFileSelection_h

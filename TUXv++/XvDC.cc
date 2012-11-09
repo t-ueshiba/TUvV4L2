@@ -25,7 +25,7 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: XvDC.cc,v 1.11 2012-08-29 21:17:16 ueshiba Exp $
+ *  $Id$
  */
 #include "TU/v/XvDC.h"
 #include <stdexcept>
