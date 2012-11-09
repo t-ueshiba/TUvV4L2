@@ -27,8 +27,7 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= /usr/local/include/TU/Lazy++.h \
-		windows/fakeWindows.h
+EXTHDRS		= windows/fakeWindows.h
 HDRS		= TU/Array++.h \
 		TU/Bezier++.h \
 		TU/BlockDiagonalMatrix++.h \
@@ -117,31 +116,25 @@ include $(PROJECT)/lib/l.mk
 BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/Vector++.h \
 	TU/Array++.h TU/types.h
 ConversionFromYUV.o: TU/Image++.h TU/Geometry++.h TU/iterator.h \
-	TU/functional.h /usr/local/include/TU/Lazy++.h TU/Vector++.h \
-	TU/Array++.h TU/types.h TU/Minimize.h
+	TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
 CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/Geometry++.h \
-	TU/iterator.h TU/functional.h /usr/local/include/TU/Lazy++.h \
-	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h \
-	TU/mmInstructions.h
+	TU/iterator.h TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h \
+	TU/Minimize.h TU/mmInstructions.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/Geometry++.h \
-	TU/iterator.h TU/functional.h /usr/local/include/TU/Lazy++.h \
-	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h \
-	TU/mmInstructions.h
+	TU/iterator.h TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h \
+	TU/Minimize.h TU/mmInstructions.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/types.h TU/IIRFilter.h TU/Filter2.h TU/iterator.h TU/functional.h \
-	/usr/local/include/TU/Lazy++.h TU/mmInstructions.h TU/Minimize.h
+	TU/mmInstructions.h TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
-	/usr/local/include/TU/Lazy++.h TU/Vector++.h TU/Array++.h TU/types.h \
-	TU/Minimize.h
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
 Image++.inst.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
-	/usr/local/include/TU/Lazy++.h TU/Vector++.h TU/Array++.h TU/types.h \
-	TU/Minimize.h
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
 ImageBase.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
-	/usr/local/include/TU/Lazy++.h TU/Vector++.h TU/Array++.h TU/types.h \
-	TU/Minimize.h TU/Camera++.h TU/Manip.h
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h TU/Camera++.h \
+	TU/Manip.h
 ImageLine.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
-	/usr/local/include/TU/Lazy++.h TU/Vector++.h TU/Array++.h TU/types.h \
-	TU/Minimize.h
+	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 Profiler.o: TU/Profiler.h TU/Array++.h TU/types.h windows/fakeWindows.h
 Random.o: TU/Random.h TU/types.h windows/fakeWindows.h
@@ -151,9 +144,8 @@ TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
 	TU/types.h TU/Manip.h
 Vector++.inst.o: TU/Vector++.h TU/Array++.h TU/types.h
 Warp.o: TU/Warp.h TU/Image++.h TU/Geometry++.h TU/iterator.h \
-	TU/functional.h /usr/local/include/TU/Lazy++.h TU/Vector++.h \
-	TU/Array++.h TU/types.h TU/Minimize.h TU/Camera++.h \
-	TU/mmInstructions.h
+	TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h \
+	TU/Camera++.h TU/mmInstructions.h
 fdstream.o: TU/fdstream.h TU/types.h
 io.o: TU/io.h
 manipulators.o: TU/Manip.h TU/types.h
