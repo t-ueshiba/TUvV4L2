@@ -37,7 +37,6 @@
 #include <iterator>
 #include <iostream>
 #include <stdexcept>
-#include <functional>
 #include "TU/types.h"
 #ifdef __INTEL_COMPILER
 #  include <mmintrin.h>
@@ -45,173 +44,6 @@
 
 namespace TU
 {
-/************************************************************************
-*  class Expression<E>							*
-************************************************************************/
-template <class E>
-struct Expression
-{
-    const E&	entity()	const	{return static_cast<const E&>(*this);}
-};
-
-/************************************************************************
-*  class IsExpression<T>						*
-************************************************************************/
-template <class T>
-class IsExpression
-{
-  private:
-    typedef char	Small;
-    struct Big {char dummy[2];};
-
-    template <class E>
-    static Small	test(Expression<E>)	;
-    static Big		test(...)		;
-    static T		makeT()			;
-    
-  public:
-    enum
-    {
-	isExpression = (sizeof(test(makeT())) == sizeof(Small))
-    };
-};
-#if 0
-/************************************************************************
-*  class UnaryOperator<OP, E>						*
-************************************************************************/
-template <class OP, class E>
-class UnaryOperator : public Expression<UnaryOperator<OP, E> >
-{
-  public:
-    typedef typename OP::result_type		element_type;
-    
-  public:
-    UnaryOperator(const OP& op, const Expression<E>& expr)
-	:_op(op), _entity(expr.entity())	{}
-    
-    u_int		size()		const	{return _entity.size();}
-    u_int		ncol()		const	{return _entity.ncol();}
-    element_type	operator [](u_int i) const
-			{
-			    return _op(_entity[i]);
-			}
-    element_type	eval(u_int i, u_int j) const
-			{
-			    return _op(_entity.eval(i, j));
-			}
-	
-  private:
-    const OP	_op;
-    const E&	_entity;
-};
-
-template <class E>
-inline UnaryOperator<std::negate<typename E::element_type>, E>
-operator -(const Expression<E>& expr)
-{
-    typedef std::negate<typename E::element_type>	op_type;
-    
-    return UnaryOperator<op_type, E>(op_type(), expr);
-}
-
-template <class E> inline
-UnaryOperator<std::binder2nd<std::multiplies<typename E::element_type> >, E>
-operator *(const Expression<E>& expr, typename E::element_type c)
-{
-    typedef std::multiplies<typename E::element_type>	op_type;
-    typedef std::binder2nd<op_type>			binder_type;
-    
-    return UnaryOperator<binder_type, E>(binder_type(op_type(), c), expr);
-}
-
-template <class E> inline
-UnaryOperator<std::binder1st<std::multiplies<typename E::element_type> >, E>
-operator *(typename E::element_type c, const Expression<E>& expr)
-{
-    typedef std::multiplies<typename E::element_type>	op_type;
-    typedef std::binder1st<op_type>			binder_type;
-    
-    return UnaryOperator<binder_type, E>(binder_type(op_type(), c), expr);
-}
-
-template <class E> inline
-UnaryOperator<std::binder2nd<std::divides<typename E::element_type> >, E>
-operator /(const Expression<E>& expr, typename E::element_type c)
-{
-    typedef std::divides<typename E::element_type>	op_type;
-    typedef std::binder2nd<op_type>			binder_type;
-    
-    return UnaryOperator<binder_type, E>(binder_type(op_type(), c), expr);
-}
-
-/************************************************************************
-*  class BinaryOperator<OP, L, R>					*
-************************************************************************/
-template <class OP, class L, class R>
-class BinaryOperator : public Expression<BinaryOperator<OP, L, R> >
-{
-  public:
-    typedef typename OP::result_type		element_type;
-    
-  public:
-    BinaryOperator(const OP& op,
-		   const Expression<L>& l, const Expression<R>& r)
-	:_op(op), _l(l.entity()), _r(r.entity())	{}
-
-    u_int		size()			const	;
-    u_int		ncol()			const	;
-    element_type	operator [](u_int i) const
-			{
-			    return _op(_l[i], _r[i]);
-			}
-    element_type	eval(u_int i, u_int j) const
-			{
-			    return _op(_l.eval(i, j), _r.eval(i, j));
-			}
-    
-  private:
-    const OP	_op;
-    const L&	_l;
-    const R&	_r;
-};
-
-template <class OP, class L, class R> inline u_int
-BinaryOperator<OP, L, R>::size() const
-{
-    const u_int	d = _l.size();
-    if (d != _r.size())
-	throw std::logic_error("BinaryOperator<OP, L, R>::size: mismatched size!");
-    return d;
-}
-
-template <class OP, class L, class R> inline u_int
-BinaryOperator<OP, L, R>::ncol() const
-{
-    const u_int	d = _l.ncol();
-    if (d != _r.ncol())
-	throw std::logic_error("BinaryOperator<OP, L, R>::ncol: mismatched size!");
-    return d;
-}
-
-template <class L, class R>
-inline BinaryOperator<std::plus<typename L::element_type>, L, R>
-operator +(const Expression<L>& l, const Expression<R>& r)
-{
-    typedef std::plus<typename L::element_type>	op_type;
-
-    return BinaryOperator<op_type, L, R>(op_type(), l, r);
-}
-
-template <class L, class R>
-inline BinaryOperator<std::minus<typename L::element_type>, L, R>
-operator -(const Expression<L>& l, const Expression<R>& r)
-{
-    typedef std::minus<typename L::element_type>	op_type;
-
-    return BinaryOperator<op_type, L, R>(op_type(), l, r);
-}
-#endif
-    
 /************************************************************************
 *  class Buf<T>								*
 ************************************************************************/
@@ -793,10 +625,29 @@ FixedSizedBuf<T, D>::put(std::ostream& out) const
   \param B	バッファ
 */
 template <class T, class B=Buf<T> >
-class Array : public B, public Expression<Array<T, B> >
+class Array : public B
 {
   private:
     typedef B						super;
+
+    template <class A>
+    class IsArray
+    {
+      private:
+	typedef char	Small;
+	struct Big {char dummy[2];};
+
+	template <class T>
+	static Small	test(Array<T>)	;
+	static Big	test(...)	;
+	static A	makeA()		;
+    
+      public:
+	enum
+	{
+	    isArray = (sizeof(test(makeA())) == sizeof(Small))
+	};
+    };
     
     template <class T2, bool>
     struct ElementType
@@ -808,10 +659,10 @@ class Array : public B, public Expression<Array<T, B> >
     {
 	typedef typename T2::element_type		element_type;
     };
-
+    
   public:
   //! 成分の型
-    typedef typename ElementType<T, IsExpression<T>::isExpression>
+    typedef typename ElementType<T, IsArray<T>::isArray>
 			::element_type			element_type;
   //! 要素の型    
     typedef typename super::value_type			value_type;
@@ -844,12 +695,6 @@ class Array : public B, public Expression<Array<T, B> >
     Array(const Array<T2, B2>& a)					;
     template <class T2, class B2>
     Array&		operator =(const Array<T2, B2>& a)		;
-#if 0
-    template <class E>
-    Array(const Expression<E>& expr)					;
-    template <class E>
-    Array&		operator =(const Expression<E>& expr)		;
-#endif
     Array&		operator =(const element_type& c)		;
     
     iterator			begin()					;
@@ -864,7 +709,7 @@ class Array : public B, public Expression<Array<T, B> >
     using		super::size;
     using		super::dim;
     using		super::resize;
-    
+
     u_int		ncol()					const	;
 			operator pointer()				;
   			operator const_pointer()		const	;
@@ -878,12 +723,6 @@ class Array : public B, public Expression<Array<T, B> >
     Array&		operator +=(const Array<T2, B2>& a)		;
     template <class T2, class B2>
     Array&		operator -=(const Array<T2, B2>& a)		;
-#if 0
-    template <class E>
-    Array&		operator +=(const Expression<E>& expr)		;
-    template <class E>
-    Array&		operator -=(const Expression<E>& expr)		;
-#endif
     template <class T2, class B2>
     bool		operator ==(const Array<T2, B2>& a)	const	;
     template <class T2, class B2>
@@ -964,36 +803,6 @@ Array<T, B>::operator =(const Array<T2, B2>& a)
 	(*this)[i] = a[i];
     return *this;
 }
-    
-#if 0
-//! 他の式と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
-/*!
-  コピーコンストラクタは別個自動的に生成される．
-  \param expr	コピー元の式
-*/
-template <class T, class B> template <class E>
-Array<T, B>::Array(const Expression<E>& expr)
-    :super(expr.entity().size())
-{
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] = expr.entity()[i];
-}
-	
-//! 他の式を評価して自分に代入する（標準代入演算子の拡張）．
-/*!
-  標準代入演算子は別個自動的に生成される．
-  \param expr	コピー元の式
-  \return	この配列
-*/
-template <class T, class B> template <class E> Array<T, B>&
-Array<T, B>::operator =(const Expression<E>& expr)
-{
-    resize(expr.entity().size());
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] = expr.entity()[i];
-    return *this;
-}
-#endif
 
 //! 全ての要素に同一の値を代入する．
 /*!
@@ -1207,36 +1016,6 @@ Array<T, B>::operator -=(const Array<T2, B2>& a)
     return *this;
 }
 
-#if 0
-//! 他の式を評価してこの配列に足す．
-/*!
-  \param expr	足す式
-  \return	この配列
-*/
-template <class T, class B> template <class E> Array<T, B>&
-Array<T, B>::operator +=(const Expression<E>& expr)
-{
-    check_size(expr.entity().size());
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] += expr.entity()[i];
-    return *this;
-}
-
-//! 他の式を評価してこの配列から引く．
-/*!
-  \param expr	引く式
-  \return	この配列
-*/
-template <class T, class B> template <class E> Array<T, B>&
-Array<T, B>::operator -=(const Expression<E>& expr)
-{
-    check_size(expr.entity().size());
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] -= expr.entity()[i];
-    return *this;
-}
-#endif
-
 //! 2つの配列を要素毎に比較し，同じであるか調べる．
 /*!
   \param expr	比較対象となる配列
@@ -1377,20 +1156,12 @@ class Array2 : public Array<T, R>
     Array2(const Array2& a)						;
     template <class T2, class B2, class R2>
     Array2(const Array2<T2, B2, R2>& a)					;
-#if 0
-    template <class E>
-    Array2(const Expression<E>& expr)					;
-#endif
     template <class B2, class R2>
     Array2(Array2<T, B2, R2>& a,
 	   u_int i, u_int j, u_int r, u_int c)				;
     Array2&		operator =(const Array2& a)			;
     template <class T2, class B2, class R2>
     Array2&		operator =(const Array2<T2, B2, R2>& a)		;
-#if 0
-    template <class E>
-    Array2&		operator =(const Expression<E>& expr)		;
-#endif
     Array2&		operator =(const element_type& c)		;
 
     using		super::begin;
@@ -1405,12 +1176,6 @@ class Array2 : public Array<T, R>
     u_int		nrow()					const	;
     u_int		ncol()					const	;
     u_int		stride()				const	;
-#if 0
-    template <class E>
-    Array2&		operator +=(const Expression<E>& expr)		;
-    template <class E>
-    Array2&		operator -=(const Expression<E>& expr)		;
-#endif
     bool		resize(u_int r, u_int c)			;
     void		resize(pointer p, u_int r, u_int c)		;
     std::istream&	restore(std::istream& in)			;
@@ -1488,29 +1253,6 @@ Array2<T, B, R>::Array2(const Array2<T2, B2, R2>& a)
     super::operator =(a);
 }    
 
-#if 0
-//! 他の式と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
-/*!
-  コピーコンストラクタを定義しないと自動的に作られてしまうので，
-  このコンストラクタがあってもコピーコンストラクタを別個に定義
-  しなければならない．
-  \param expr	コピー元の式
-*/
-template <class T, class B, class R> template <class E> inline
-Array2<T, B, R>::Array2(const Expression<E>& expr)
-    :super(expr.entity().size()), _ncol(expr.entity().ncol()),
-     _buf(nrow()*buf_type::stride(ncol()))
-{
-    set_rows();
-    for (u_int i = 0; i < nrow(); ++i)
-    {
-	reference	row = (*this)[i];
-	for (u_int j = 0; j < ncol(); ++j)
-	    row[j] = expr.entity().eval(i, j);
-    }
-}    
-#endif
-
 //! 記憶領域を元の配列と共有した部分配列を作る
 /*!
   \param a	配列
@@ -1560,28 +1302,6 @@ Array2<T, B, R>::operator =(const Array2<T2, B2, R2>& a)
     super::operator =(a);
     return *this;
 }
-
-#if 0
-//! 他の式を自分に代入する（標準代入演算子の拡張）．
-/*!
-  標準代入演算子を定義しないと自動的に作られてしまうので，この代入演算子が
-  あっても標準代入演算子を別個に定義しなければならない．
-  \param expr	コピー元の式
-  \return	この配列
-*/
-template <class T, class B, class R> template <class E> inline Array2<T, B, R>&
-Array2<T, B, R>::operator =(const Expression<E>& expr)
-{
-    resize(expr.entity().size(), expr.entity().ncol());
-    for (u_int i = 0; i < nrow(); ++i)
-    {
-	reference	row = (*this)[i];
-	for (u_int j = 0; j < ncol(); ++j)
-	    row[j] = expr.entity().eval(i, j);
-    }
-    return *this;
-}
-#endif
 
 //! 全ての要素に同一の値を代入する．
 /*!
@@ -1646,46 +1366,6 @@ Array2<T, B, R>::stride() const
     return (nrow() > 1 ? const_pointer((*this)[1]) - const_pointer((*this)[0])
 		       : _ncol);
 }
-
-#if 0
-//! 他の式を評価してこの配列に足す．
-/*!
-  \param expr	足す式
-  \return	この配列
-*/
-template <class T, class B, class R> template <class E> Array2<T, B, R>&
-Array2<T, B, R>::operator +=(const Expression<E>& expr)
-{
-    if ((size() != expr.entity().size()) || (ncol() != expr.entity().ncol()))
-	throw std::logic_error("Array2<T, B, R>::operator +=: mismatched size!");
-    for (u_int i = 0; i < nrow(); ++i)
-    {
-	reference	row = (*this)[i];
-	for (u_int j = 0; j < ncol(); ++j)
-	    row[j] += expr.entity().eval(i, j);
-    }
-    return *this;
-}
-
-//! 他の式を評価してこの配列から引く．
-/*!
-  \param expr	引く式
-  \return	この配列
-*/
-template <class T, class B, class R> template <class E> Array2<T, B, R>&
-Array2<T, B, R>::operator -=(const Expression<E>& expr)
-{
-    if ((size() != expr.entity().size()) || (ncol() != expr.entity().ncol()))
-	throw std::logic_error("Array2<T, B, R>::operator -=: mismatched size!");
-    for (u_int i = 0; i < nrow(); ++i)
-    {
-	reference	row = (*this)[i];
-	for (u_int j = 0; j < ncol(); ++j)
-	    row[j] -= expr.entity().eval(i, j);
-    }
-    return *this;
-}
-#endif
 
 //! 配列のサイズを変更する．
 /*!

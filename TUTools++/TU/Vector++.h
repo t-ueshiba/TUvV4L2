@@ -172,7 +172,7 @@ class Vector : public Array<T, B>
     typedef Array<T, B>					super;
     
   public:
-    typedef T						element_type;
+    typedef typename super::element_type		element_type;
     typedef typename super::value_type			value_type;
     typedef typename super::difference_type		difference_type;
     typedef typename super::reference			reference;
@@ -199,12 +199,6 @@ class Vector : public Array<T, B>
     Vector(const Vector<T2, B2>& v)					;
     template <class T2, class B2>
     Vector&		operator =(const Vector<T2, B2>& v)		;
-#if 0
-    template <class E>
-    Vector(const Expression<E>& expr)					;
-    template <class E>
-    Vector&		operator =(const Expression<E>& expr)		;
-#endif
     using		super::begin;
     using		super::end;
     using		super::size;
@@ -222,12 +216,6 @@ class Vector : public Array<T, B>
     Vector&		operator +=(const Vector<T2, B2>& v)		;
     template <class T2, class B2>
     Vector&		operator -=(const Vector<T2, B2>& v)		;
-#if 0
-    template <class E>
-    Vector&		operator +=(const Expression<E>& expr)		;
-    template <class E>
-    Vector&		operator -=(const Expression<E>& expr)		;
-#endif
     template <class T2, class B2>
     Vector&		operator ^=(const Vector<T2, B2>& V)		;
     template <class T2, class B2, class R2>
@@ -313,29 +301,7 @@ Vector<T, B>::operator =(const Vector<T2, B2>& v)
     super::operator =(v);
     return *this;
 }
-#if 0
-//! 他の式と同一成分を持つベクトルを作る(コピーコンストラクタの拡張)．
-/*!
-  \param expr	コピー元の式
-*/
-template <class T, class B> template <class E> inline
-Vector<T, B>::Vector(const Expression<E>& expr)
-    :super(expr)
-{
-}
-    
-//! 他の式を自分に代入する(代入演算子の拡張)．
-/*!
-  \param expr	コピー元の式
-  \return	このベクトル
-*/
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator =(const Expression<E>& expr)
-{
-    super::operator =(expr);
-    return *this;
-}
-#endif
+
 //! このベクトルと記憶領域を共有した部分ベクトルを生成する．
 /*!
     \param i	部分ベクトルの第0成分を指定するindex
@@ -422,31 +388,7 @@ Vector<T, B>::operator -=(const Vector<T2, B2>& v)
     super::operator -=(v);
     return *this;
 }
-#if 0
-//! このベクトルに他の式を足す．
-/*!
-  \param expr	足す式
-  \return	このベクトル
-*/
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator +=(const Expression<E>& expr)
-{
-    super::operator +=(expr);
-    return *this;
-}
 
-//! このベクトルから他の式を引く．
-/*!
-  \param expr	引く式
-  \return	このベクトル
-*/
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator -=(const Expression<E>& expr)
-{
-    super::operator -=(expr);
-    return *this;
-}
-#endif
 //! このベクトルと他の3次元ベクトルとのベクトル積をとる．
 /*!
     \param v	他のベクトル
@@ -652,7 +594,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef Array2<Vector<T>, B, R>			super;
     
   public:
-    typedef T						element_type;
+    typedef typename super::element_type		element_type;
     typedef typename super::value_type			value_type;
     typedef typename super::difference_type		difference_type;
     typedef typename super::reference			reference;
@@ -679,12 +621,6 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix(const Matrix<T2, B2, R2>& m)					;
     template <class T2, class B2, class R2>
     Matrix&		operator =(const Matrix<T2, B2, R2>& m)		;
-#if 0
-    template <class E>
-    Matrix(const Expression<E>& expr)					;
-    template <class E>
-    Matrix&		operator =(const Expression<E>& expr)		;
-#endif
     using		super::begin;
     using		super::end;
     using		super::size;
@@ -705,12 +641,6 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix&		operator +=(const Matrix<T2, B2, R2>& m)	;
     template <class T2, class B2, class R2>
     Matrix&		operator -=(const Matrix<T2, B2, R2>& m)	;
-#if 0
-    template <class E>
-    Matrix&		operator +=(const Expression<E>& expr)		;
-    template <class E>
-    Matrix&		operator -=(const Expression<E>& expr)		;
-#endif
     template <class T2, class B2, class R2>
     Matrix&		operator *=(const Matrix<T2, B2, R2>& m)	;
     template <class T2, class B2>
@@ -826,32 +756,6 @@ Matrix<T, B, R>::operator =(const Matrix<T2, B2, R2>& m)
     return *this;
 }
 
-#if 0
-//! 他の式と同一成分を持つ行列を作る(コピーコンストラクタの拡張)．
-/*!
-  \param expr	コピー元の式
-*/
-template <class T, class B, class R> template <class E>
-inline
-Matrix<T, B, R>::Matrix(const Expression<E>& expr)
-    :super(expr)
-{
-}
-
-//! 他の式を自分に代入する(代入演算子の拡張)．
-/*!
-  \param expr	コピー元の式
-  \return	この行列
-*/
-template <class T, class B, class R> template <class E>
-inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator =(const Expression<E>& expr)
-{
-    super::operator =(expr);
-    return *this;
-}
-#endif
-
 //! この行列の行を並べて記憶領域を共有するベクトルを生成する．
 /*!
   全行の記憶領域は連続していなければならない．
@@ -956,33 +860,7 @@ Matrix<T, B, R>::operator -=(const Matrix<T2, B2, R2>& m)
     super::operator -=(m);
     return *this;
 }
-#if 0
-//! この行列に他の式を足す．
-/*!
-  \param expr	足す式
-  \return	この行列
-*/
-template <class T, class B, class R> template <class E>
-inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator +=(const Expression<E>& expr)
-{
-    super::operator +=(expr);
-    return *this;
-}
 
-//! この行列から他の式を引く．
-/*!
-  \param expr	引く式
-  \return	この行列
-*/
-template <class T, class B, class R> template <class E>
-inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator -=(const Expression<E>& expr)
-{
-    super::operator -=(expr);
-    return *this;
-}
-#endif
 //! この行列に他の行列を掛ける．
 /*!
   \param m	掛ける行列
