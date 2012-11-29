@@ -89,11 +89,11 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (u_int i = _b.degree(); i <= _b.M() - _b.degree(); ++i)
 	{
-	    Vector3f	p = _b(_b.knots(i));
+	    Vector3f	p = _b(_b.knot(i));
 	    glVertex3fv((const float*)p);
 	}
       glEnd();
-    /*      for (float u = _b.knots(0); u <= _b.knots(_b.M()); u += 0.05)
+    /*      for (float u = _b.knot(0); u <= _b.knot(_b.M()); u += 0.05)
       {
 	  Array<Vector3f>	p = _b.derivatives(u, 1);
 	  glBegin(GL_LINE_STRIP);
@@ -110,7 +110,7 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (u_int i = _bb.degree(); i <= _bb.M() - _bb.degree(); ++i)
 	{
-	    Vector3f	p = _bb(_bb.knots(i));
+	    Vector3f	p = _bb(_bb.knot(i));
 	    glVertex3fv((const float*)p);
 	}
       glEnd();
@@ -124,7 +124,7 @@ MyCanvasPane::initializeGraphics()
       glBegin(GL_POINTS);
 	for (u_int i = _c.degree(); i <= _c.M() - _c.degree(); ++i)
 	{
-	    Vector4f	p = _c(_c.knots()[i]);
+	    Vector4f	p = _c(_c.knot(i));
 	    glVertex4fv((const float*)p);
 	}
       glEnd();
@@ -139,7 +139,7 @@ MyCanvasPane::initializeGraphics()
 	for (u_int j = _s.vDegree(); j <= _s.vM() - _s.vDegree(); ++j)
 	    for (u_int i = _s.uDegree(); i <= _s.uM() - _s.uDegree(); ++i)
 	    {
-		Vector3f	p = _s(_s.uKnots(i), _s.vKnots(j));
+		Vector3f	p = _s(_s.uKnot(i), _s.vKnot(j));
 		glVertex3fv((const float*)p);
 	    }
       glEnd();
@@ -154,7 +154,7 @@ MyCanvasPane::initializeGraphics()
 	for (u_int j = _ss.vDegree(); j <= _ss.vM() - _ss.vDegree(); ++j)
 	    for (u_int i = _ss.uDegree(); i <= _ss.uM() - _ss.uDegree(); ++i)
 	    {
-		Vector3f	p = _ss(_ss.uKnots(i), _ss.vKnots(j));
+		Vector3f	p = _ss(_ss.uKnot(i), _ss.vKnot(j));
 		glVertex3fv((const float*)p);
 	    }
       glEnd();

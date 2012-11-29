@@ -45,17 +45,17 @@ namespace TU
 template <class T> class DericheCoefficients
 {
   public:
-    typedef T	value_type;
+    typedef T	coeff_type;
     
-    void	initialize(T alpha)			;
-    
-  protected:
-    DericheCoefficients(T alpha)			{initialize(alpha);}
+    void	initialize(coeff_type alpha)		;
     
   protected:
-    value_type	_c0[4];		//!< forward coefficients for smoothing
-    value_type	_c1[4];		//!< forward coefficients for 1st derivatives
-    value_type	_c2[4];		//!< forward coefficients for 2nd derivatives
+    DericheCoefficients(coeff_type alpha)		{initialize(alpha);}
+    
+  protected:
+    coeff_type	_c0[4];		//!< forward coefficients for smoothing
+    coeff_type	_c1[4];		//!< forward coefficients for 1st derivatives
+    coeff_type	_c2[4];		//!< forward coefficients for 2nd derivatives
 };
 
 //! Canny-Deriche核の初期化を行う
@@ -63,9 +63,9 @@ template <class T> class DericheCoefficients
   \param alpha	フィルタサイズを表す正数（小さいほど広がりが大きい）
 */
 template <class T> inline void
-DericheCoefficients<T>::initialize(value_type alpha)
+DericheCoefficients<T>::initialize(coeff_type alpha)
 {
-    const value_type	e  = std::exp(-alpha), beta = std::sinh(alpha);
+    const coeff_type	e = std::exp(-alpha), beta = std::sinh(alpha);
     _c0[0] =  (alpha - 1.0) * e;		// i(n-1)
     _c0[1] =  1.0;				// i(n)
     _c0[2] = -e * e;				// oF(n-2)
@@ -93,22 +93,17 @@ template <class T> class DericheConvolver
     typedef T						coeff_type;
     
   private:
-    typedef DericheCoefficients<T>			coeffs;
-    typedef BidirectionalIIRFilter<2u, T>		super;
+    typedef DericheCoefficients<coeff_type>		coeffs;
+    typedef BidirectionalIIRFilter<2u, coeff_type>	super;
     
   public:
-    DericheConvolver(T alpha=1)	:DericheCoefficients<T>(alpha)		{}
+    DericheConvolver(coeff_type alpha=1)	:coeffs(alpha)		{}
 
     DericheConvolver&	initialize(T alpha)				;
     
     template <class IN, class OUT> void	smooth(IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> void	diff  (IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> void	diff2 (IN ib, IN ie, OUT out)	;
-
-  protected:
-    using	coeffs::_c0;
-    using	coeffs::_c1;
-    using	coeffs::_c2;
 };
 
 //! Canny-Deriche核のalpha値を設定する
@@ -133,7 +128,7 @@ DericheConvolver<T>::initialize(T alpha)
 template <class T> template <class IN, class OUT> inline void
 DericheConvolver<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, super::Zeroth).convolve(ib, ie, out);
+    super::initialize(coeffs::_c0, super::Zeroth).convolve(ib, ie, out);
 }
 
 //! Canny-Deriche核による1階微分
@@ -146,7 +141,7 @@ DericheConvolver<T>::smooth(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT> inline void
 DericheConvolver<T>::diff(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, super::First).convolve(ib, ie, out);
+    super::initialize(coeffs::_c1, super::First).convolve(ib, ie, out);
 }
 
 //! Canny-Deriche核による2階微分
@@ -159,7 +154,7 @@ DericheConvolver<T>::diff(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT> inline void
 DericheConvolver<T>::diff2(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, super::Second).convolve(ib, ie, out);
+    super::initialize(coeffs::_c2, super::Second).convolve(ib, ie, out);
 }
 
 /************************************************************************
@@ -173,14 +168,14 @@ template <class T> class DericheConvolver2
     typedef T						coeff_type;
     
   private:
-    typedef DericheCoefficients<T>			coeffs;
-    typedef BidirectionalIIRFilter2<2u, T>		super;
-    typedef BidirectionalIIRFilter<2u, T>		IIRF;
+    typedef DericheCoefficients<coeff_type>		coeffs;
+    typedef BidirectionalIIRFilter2<2u, coeff_type>	super;
+    typedef BidirectionalIIRFilter<2u, coeff_type>	IIRF;
     
   public:
-    DericheConvolver2(T alpha=1)	:DericheCoefficients<T>(alpha)	{}
+    DericheConvolver2(coeff_type alpha=1)	:coeffs(alpha)		{}
 
-    DericheConvolver2&	initialize(T alpha)				;
+    DericheConvolver2&	initialize(coeff_type alpha)			;
     using		super::grainSize;
     using		super::setGrainSize;
     
@@ -207,11 +202,6 @@ template <class T> class DericheConvolver2
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
     void		diffVV(IN ib, IN ie, OUT out)			;
-
-  protected:
-    using	coeffs::_c0;
-    using	coeffs::_c1;
-    using	coeffs::_c2;
 };
 
 //! Canny-Deriche核のalpha値を設定する
@@ -220,7 +210,7 @@ template <class T> class DericheConvolver2
   \return	このガウス核
 */
 template <class T> DericheConvolver2<T>&
-DericheConvolver2<T>::initialize(T alpha)
+DericheConvolver2<T>::initialize(coeff_type alpha)
 {
     coeffs::initialize(alpha);
     return *this;
@@ -236,7 +226,7 @@ DericheConvolver2<T>::initialize(T alpha)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 DericheConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth, _c0, IIRF::Zeroth)
+    super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -250,7 +240,7 @@ DericheConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 DericheConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First, _c0, IIRF::Zeroth)
+    super::initialize(coeffs::_c1, IIRF::First, coeffs::_c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -264,7 +254,7 @@ DericheConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 DericheConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth, _c1, IIRF::First)
+    super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c1, IIRF::First)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -278,7 +268,7 @@ DericheConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 DericheConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, IIRF::Second, _c0, IIRF::Zeroth)
+    super::initialize(coeffs::_c2, IIRF::Second, coeffs::_c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -292,7 +282,7 @@ DericheConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 DericheConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First, _c1, IIRF::First)
+    super::initialize(coeffs::_c1, IIRF::First, coeffs::_c1, IIRF::First)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -306,7 +296,7 @@ DericheConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 DericheConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth, _c2, IIRF::Second)
+    super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c2, IIRF::Second)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 

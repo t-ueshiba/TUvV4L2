@@ -32,6 +32,7 @@ LINKER		= $(CXX)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Expression++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/types.h
 HDRS		=
@@ -41,5 +42,6 @@ OBJS		= mtest.o
 include $(PROJECT)/lib/p.mk
 
 ###
-mtest.o: /usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+mtest.o: /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Expression++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/types.h

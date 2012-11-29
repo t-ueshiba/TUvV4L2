@@ -54,12 +54,17 @@ template <class ET>
 class NullConstraint
 {
   public:
+    typedef ET					element_type;
+    typedef Vector<element_type>		vector_type;
+    typedef Matrix<element_type>		matrix_type;
+
+  public:
   //! 任意の引数に対して0次元ベクトルを出力する．
     template <class AT>
-    Vector<ET>	operator ()(const AT&)	const	{return Vector<ET>(0);}
+    vector_type	operator ()(const AT&)	const	{return vector_type(0);}
   //! 任意の引数に対して0x0行列を出力する．
     template <class AT>
-    Matrix<ET>	jacobian(const AT&)	const	{return Matrix<ET>(0, 0);}
+    matrix_type	jacobian(const AT&)	const	{return matrix_type(0, 0);}
 };
 
 /************************************************************************
@@ -72,37 +77,40 @@ class NullConstraint
   テンプレートパラメータGとして利用することを想定している．
   \param AT	引数の型．以下の条件を満たすこと：
   -# ベクトルや行列である場合，その要素の型を
-	AT::value_type
+	AT::element_type
      という名前でtypedefしている．
   -# メンバ関数
-	AT::value_type	AT::square() const
+	AT::element_type	AT::square() const
      によって，その2乗ノルム値を知ることができる．
-  -# Vector<AT::value_type>
+  -# Vector<AT::element_type>
      型に変換できる(例：
-     Matrix<AT::value_type>
+     Matrix<AT::element_type>
      型はその要素を行優先順に1列に並べたベクトルに変換可能)．
 */
 template <class AT>
 class ConstNormConstraint
 {
-  private:
-    typedef typename AT::value_type	ET;
+  public:
+    typedef AT						argument_type;
+    typedef typename argument_type::element_type	element_type;
+    typedef Vector<element_type>			vector_type;
+    typedef Matrix<element_type>			matrix_type;
     
   public:
   //! 新たな拘束条件を生成し，その2乗ノルムの目標値を設定する．
   /*!
     \param x	引数(この2乗ノルム値が目標値となる)
   */
-    ConstNormConstraint(const AT& x) :_sqr(x.square())			{}
+    ConstNormConstraint(const argument_type& x) :_sqr(x.square())	{}
 
   //! 与えられた引数の2乗ノルム値と目標値の差を出力する．
   /*!
     \param x	引数
     \return	xの2乗ノルム値と目標値の差を収めた1次元ベクトル
   */
-    Vector<ET>	operator ()(const AT& x) const
+    vector_type	operator ()(const argument_type& x) const
 		{
-		    Vector<ET>	val(1);
+		    vector_type	val(1);
 		    val[0] = x.square() - _sqr;
 		    return val;
 		}
@@ -112,16 +120,16 @@ class ConstNormConstraint
     \param x	引数
     \return	1階微分値を収めた1xd行列(dはベクトル化された引数の次元)
   */
-    Matrix<ET>	jacobian(const AT& x) const
+    matrix_type	jacobian(const argument_type& x) const
 		{
-		    const Vector<ET>	y(x);
-		    Matrix<ET>		L(1, y.dim());
+		    const vector_type	y(x);
+		    matrix_type		L(1, y.size());
 		    (L[0] = y) *= 2.0;
 		    return L;
 		}
 	    
   private:
-    const ET	_sqr;
+    const element_type	_sqr;
 };
 
 /************************************************************************
@@ -139,34 +147,34 @@ class ConstNormConstraint
   テンプレートパラメータATは，ベクトル値関数および拘束条件関数の引数を表す型であり，
   以下の条件を満たすこと：
   -# 引数がベクトルや行列である場合，その要素の型を
-	AT::value_type
+	AT::element_type
      という名前でtypedefしている．
 
   テンプレートパラメータFは，AT型の引数を入力してベクトル値を出力する関数を表す型であり，
   以下の条件を満たすこと：
   -# 出力ベクトルの要素の型を
-	F::value_type
+	F::element_type
      という名前でtypedefしている．
   -# 引数xを与えたときの関数値は，メンバ関数
-	Vector<F:value_type>	F::operator ()(const AT& x) const
+	Vector<F:element_type>	F::operator ()(const AT& x) const
      によって与えられる．
   -# 引数xを与えたときのヤコビアンは，メンバ関数
-	Matrix<F:value_type>	F::jacobian(const AT& x) const
+	Matrix<F:element_type>	F::jacobian(const AT& x) const
      によって与えられる．
   -# メンバ関数
-	void	F::update(const AT& x, const Vector<F::value_type>& dx) const
+	void	F::update(const AT& x, const Vector<F::element_type>& dx) const
      によって引数xを微少量dxだけ更新することができる．
 
   テンプレートパラメータGは，AT型の引数を入力してベクトル値を出力する関数を表す型であり，
   以下の条件を満たすこと：
   -# 出力ベクトルの要素の型を
-	G::value_type
+	G::element_type
      という名前でtypedefしている．
   -# 引数xを与えたときの関数値は，メンバ関数
-	Vector<G:value_type>	G::operator ()(const AT& x) const
+	Vector<G:element_type>	G::operator ()(const AT& x) const
      によって与えられる．
   -# 引数xを与えたときのヤコビアンは，メンバ関数
-	Matrix<G::value_type>	G::jacobian(const AT& x) const
+	Matrix<G::element_type>	G::jacobian(const AT& x) const
      によって与えられる．
 
   \param f		その2乗ノルムを最小化すべきベクトル値関数
@@ -177,30 +185,32 @@ class ConstNormConstraint
   \param tol		収束判定条件を表す閾値(更新量がこの値以下になれば収束と見なす)
   \return		xの推定値の共分散行列
 */
-template <class F, class G, class AT> Matrix<typename F::value_type>
+template <class F, class G, class AT> Matrix<typename F::element_type>
 minimizeSquare(const F& f, const G& g, AT& x,
 	       u_int niter_max=100, double tol=1.5e-8)
 {
     using namespace			std;
-    typedef typename F::value_type	ET;	// element type.
-
-    Vector<ET>	fval   = f(x);			// function value.
-    ET		sqr    = fval * fval;		// square value.
-    ET		lambda = 1.0e-4;		// L-M parameter.
+    typedef typename F::element_type	element_type;	// element type.
+    typedef Vector<element_type>	vector_type;
+    typedef Matrix<element_type>	matrix_type;
+    
+    vector_type		fval   = f(x);			// function value.
+    element_type	sqr    = fval * fval;		// square value.
+    element_type	lambda = 1.0e-4;		// L-M parameter.
 
     for (u_int n = 0; n++ < niter_max; )
     {
-	const Matrix<ET>&	J    = f.jacobian(x);	// Jacobian.
-	const Vector<ET>&	Jtf  = fval * J;
-	const Vector<ET>&	gval = g(x);		// constraint residual.
-	const u_int		xdim = J.ncol(), gdim = gval.dim();
-	Matrix<ET>		A(xdim + gdim, xdim + gdim);
+	const matrix_type&	J    = f.jacobian(x);	// Jacobian.
+	const vector_type&	Jtf  = fval * J;
+	const vector_type&	gval = g(x);		// constraint residual.
+	const u_int		xdim = J.ncol(), gdim = gval.size();
+	matrix_type		A(xdim + gdim, xdim + gdim);
 
 	A(0, 0, xdim, xdim) = J.trns() * J;
 	A(xdim, 0, gdim, xdim) = g.jacobian(x);
 	A(0, xdim, xdim, gdim) = A(xdim, 0, gdim, xdim).trns();
 
-	Vector<ET>		diagA(xdim);
+	vector_type		diagA(xdim);
 	for (u_int i = 0; i < xdim; ++i)
 	    diagA[i] = A[i][i];			// Keep diagonal elements.
 
@@ -209,7 +219,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	  // Compute dx: update for parameters x to be estimated.
 	    for (u_int i = 0; i < xdim; ++i)
 		A[i][i] = (1.0 + lambda) * diagA[i];	// Augument diagonals.
-	    Vector<ET>	dx(xdim + gdim);
+	    vector_type	dx(xdim + gdim);
 	    dx(0, xdim) = Jtf;
 	    dx(xdim, gdim) = gval;
 	    dx.solve(A);
@@ -217,8 +227,8 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	  // Compute updated parameters and function value to it.
 	    AT			x_new(x);
 	    f.update(x_new, dx(0, xdim));
-	    const Vector<ET>&	fval_new = f(x_new);
-	    const ET		sqr_new  = fval_new * fval_new;
+	    const vector_type&	fval_new = f(x_new);
+	    const element_type	sqr_new  = fval_new * fval_new;
 #ifdef TUMinimizePP_DEBUG
 	    cerr << "val^2 = " << sqr << ", gval = " << gval
 		 << "  (update: val^2 = " << sqr_new
@@ -245,7 +255,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	}
     }
     throw std::runtime_error("minimizeSquare: maximum iteration limit exceeded!");
-    return Matrix<ET>(0, 0);
+    return matrix_type(0, 0);
 }
 
 /************************************************************************
@@ -270,18 +280,18 @@ minimizeSquare(const F& f, const G& g, AT& x,
   テンプレートパラメータATAは，ベクトル値関数fの第1引数および拘束条件関数gの
   引数aを表す型であり，以下の条件を満たすこと：
   -# 引数がベクトルや行列である場合，その要素の型を
-	ATA::value_type
+	ATA::element_type
      という名前でtypedefしている．
 
   テンプレートパラメータIBは，個々のベクトル値関数f_jの第2引数b_jを指す
   反復子を表す型であり，以下の条件を満たすこと：
-  -# iterator_traits<IB>::value_type
+  -# iterator_traits<IB>::element_type
      でこの反復子が指す引数の型(以下，ATBとする)を知ることができる．
 
   テンプレートパラメータFは，ATA型の引数aとATB型の引数b_jを入力して
   ベクトル値を出力する関数を表す型であり，以下の条件を満たすこと：
   -# 出力ベクトルの要素の型を
-	F::value_type
+	F::element_type
      という名前でtypedefしている．
   -# ヤコビアンの型を
 	F::jacobian_type
@@ -297,28 +307,28 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	F::adim()
      に等しい．
   -# 引数a, b_jを与えたときのf_jの関数値は，メンバ関数
-	Vector<F:value_type>	F::operator ()(const ATA& a, const ATB& b, int j) const
+	Vector<F:element_type>	F::operator ()(const ATA& a, const ATB& b, int j) const
      によって与えられる．
   -# 引数a, b_jを与えたときのaで微分したヤコビアンは，メンバ関数
 	F::jacobian_type	F::jacobianA(const ATA& a, const ATB& b, int j) const
      によって与えられる．
   -# メンバ関数
-	void	F::updateA(const ATA& a, const Vector<F::value_type>& da) const
+	void	F::updateA(const ATA& a, const Vector<F::element_type>& da) const
      によって引数aを微少量daだけ更新することができる．
   -# メンバ関数
-	void	F::updateB(const ATB& b_j, const Vector<F::value_type>& db_j) const
+	void	F::updateB(const ATB& b_j, const Vector<F::element_type>& db_j) const
      によって引数bを微少量db_jだけ更新することができる．
 
   テンプレートパラメータGは，ATA型の引数を入力してベクトル値を出力する関数を
   表す型であり，以下の条件を満たすこと：
   -# 出力ベクトルの要素の型を
-	G::value_type
+	G::element_type
      という名前でtypedefしている．
   -# 引数aを与えたときの関数値は，メンバ関数
-	Vector<G:value_type>	G::operator ()(const ATA& a) const
+	Vector<G:element_type>	G::operator ()(const ATA& a) const
      によって与えられる．
   -# 引数aを与えたときのヤコビアンは，メンバ関数
-	Matrix<G::value_type>	G::jacobian(const ATA& a) const
+	Matrix<G::element_type>	G::jacobian(const ATA& a) const
      によって与えられる．
 
   \param f		その2乗ノルムを最小化すべきベクトル値関数
@@ -332,40 +342,43 @@ minimizeSquare(const F& f, const G& g, AT& x,
 			収束と見なす)
   \return		a, b_1, b_2,..., b_Jの推定値の共分散行列
 */
-template <class F, class G, class ATA, class IB> Matrix<typename F::value_type>
+template <class F, class G, class ATA, class IB>
+Matrix<typename F::element_type>
 minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		     u_int niter_max=100, double tol=1.5e-8)
 {
     using namespace					std;
-    typedef typename F::value_type			ET;  // element type.
-    typedef typename F::jacobian_type			JT;  // Jacobian type.
+    typedef typename F::element_type			element_type;
+    typedef typename F::jacobian_type			jacobian_type;
+    typedef Vector<element_type>			vector_type;
+    typedef Matrix<element_type>			matrix_type;
     typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
     
-    const u_int			nb = distance(bbegin, bend);
-    Array<Vector<ET> >		fval(nb);	// function values.
-    ET				sqr = 0;	// sum of squares.
-    int				j = 0;
+    const u_int		nb = distance(bbegin, bend);
+    Array<vector_type>	fval(nb);	// function values.
+    element_type	sqr = 0;	// sum of squares.
+    int			j = 0;
     for (IB b = bbegin; b != bend; ++b, ++j)
     {
 	fval[j] = f(a, *b, j);
 	sqr    += fval[j] * fval[j];
     }
-    ET	lambda = 1.0e-7;			// L-M parameter.
+    element_type	lambda = 1.0e-7;		// L-M parameter.
 
     for (u_int n = 0; n++ < niter_max; )
     {
 	const u_int		adim = f.adim();
-	JT			U(f.adims(), f.adims());
-	Vector<ET>		Jtf(adim);
-	Array<Matrix<ET> >	V(nb);
-	Array<Matrix<ET> >	W(nb);
-	Array<Vector<ET> >	Ktf(nb);
+	jacobian_type		U(f.adims(), f.adims());
+	vector_type		Jtf(adim);
+	Array<matrix_type>	V(nb);
+	Array<matrix_type>	W(nb);
+	Array<vector_type>	Ktf(nb);
 	j = 0;
 	for (IB b = bbegin; b != bend; ++b, ++j)
 	{
-	    const JT&		J  = f.jacobianA(a, *b, j);
-	    const JT&		Jt = J.trns();
-	    const Matrix<ET>&	K  = f.jacobianB(a, *b, j);
+	    const jacobian_type&	J  = f.jacobianA(a, *b, j);
+	    const jacobian_type&	Jt = J.trns();
+	    const matrix_type&		K  = f.jacobianB(a, *b, j);
 
 	    U     += Jt * J;
 	    Jtf   += fval[j] * J;
@@ -374,9 +387,9 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    Ktf[j] = fval[j] * K;
 	}
 
-      	const Vector<ET>&	gval = g(a);
-	const u_int		gdim = gval.dim();
-	Matrix<ET>		A(adim + gdim, adim + gdim);
+      	const vector_type&	gval = g(a);
+	const u_int		gdim = gval.size();
+	matrix_type		A(adim + gdim, adim + gdim);
 	
 	A(adim, 0, gdim, adim) = g.jacobian(a);
 	A(0, adim, adim, gdim) = A(adim, 0, gdim, adim).trns();
@@ -388,15 +401,15 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    for (u_int i = 0; i < adim; ++i)
 		A[i][i] *= (1.0 + lambda);		// Augument diagonals.
 
-	    Vector<ET>		da(adim + gdim);
+	    vector_type		da(adim + gdim);
 	    da(0, adim) = Jtf;
 	    da(adim, gdim) = gval;
-	    Array<Matrix<ET> >	VinvWt(nb);
-	    Array<Vector<ET> >	VinvKtf(nb);
+	    Array<matrix_type>	VinvWt(nb);
+	    Array<vector_type>	VinvKtf(nb);
 	    for (u_int j = 0; j < nb; ++j)
 	    {
-		Matrix<ET>	Vinv = V[j];
-		for (u_int k = 0; k < Vinv.dim(); ++k)
+		matrix_type	Vinv = V[j];
+		for (u_int k = 0; k < Vinv.size(); ++k)
 		    Vinv[k][k] *= (1.0 + lambda);	// Augument diagonals.
 		Vinv = Vinv.inv();
 		VinvWt[j]  = Vinv * W[j].trns();
@@ -411,11 +424,11 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    f.updateA(a_new, da(0, adim));
 	    Array<ATB>		b_new(nb);
 	    copy(bbegin, bend, b_new.begin());
-	    Array<Vector<ET> >	fval_new(nb);
-	    ET			sqr_new = 0;
+	    Array<vector_type>	fval_new(nb);
+	    element_type	sqr_new = 0;
 	    for (u_int j = 0; j < nb; ++j)
 	    {
-		const Vector<ET>& db = VinvKtf[j] - VinvWt[j] * da(0, adim);
+		const vector_type& db = VinvKtf[j] - VinvWt[j] * da(0, adim);
 		f.updateB(b_new[j], db);
 		fval_new[j] = f(a_new, b_new[j], j);
 		sqr_new	   += fval_new[j] * fval_new[j];
@@ -430,9 +443,9 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    {
 		u_int		bdim = 0;
 		for (u_int j = 0; j < nb; ++j)
-		    bdim += V[j].dim();
-		Matrix<ET>	S(adim + bdim, adim + bdim);
-		Matrix<ET>	Sa(S, 0, 0, adim, adim);
+		    bdim += V[j].size();
+		matrix_type	S(adim + bdim, adim + bdim);
+		matrix_type	Sa(S, 0, 0, adim, adim);
 		Sa = U;
 		for (u_int j = 0; j < nb; ++j)
 		{
@@ -441,7 +454,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		}
 		for (u_int jj = adim, j = 0; j < nb; ++j)
 		{
-		    const Matrix<ET>&	VinvWtSa = VinvWt[j] * Sa;
+		    const matrix_type&	VinvWtSa = VinvWt[j] * Sa;
 		    for (u_int kk = adim, k = 0; k <= j; ++k)
 		    {
 			S(jj, kk, VinvWtSa.nrow(), VinvWt[k].nrow())
@@ -476,7 +489,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     }
     throw std::runtime_error("minimizeSquareSparse: maximum iteration limit exceeded!");
 
-    return Matrix<ET>(0, 0);
+    return matrix_type(0, 0);
 }
 
 /************************************************************************
@@ -488,38 +501,40 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 			  u_int niter_max=100, double tol=1.5e-8)
 {
     using namespace					std;
-    typedef typename F::value_type			ET;  // element type.
+    typedef typename F::element_type			element_type;
+    typedef Vector<element_type>			vector_type;
+    typedef Matrix<element_type>			matrix_type;
     typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
 
-    const u_int			nb = distance(bbegin, bend);
-    Array<Vector<ET> >		fval(nb);	// function values.
-    ET				sqr = 0;	// sum of squares.
-    int				j = 0;
+    const u_int		nb = distance(bbegin, bend);
+    Array<vector_type>	fval(nb);	// function values.
+    element_type	sqr = 0;	// sum of squares.
+    int			j = 0;
     for (IB b = bbegin; b != bend; ++b, ++j)
     {
 	fval[j] = f(a, *b, j);
 	sqr    += fval[j] * fval[j];
     }
-    ET	lambda = 1.0e-7;			// L-M parameter.
+    element_type	lambda = 1.0e-7;		// L-M parameter.
 
     for (u_int n = 0; n++ < niter_max; )
     {
 	const u_int		adim = f.adim();
 	const u_int		bdim = f.bdim() * nb;
-      	const Vector<ET>&	gval = g(a);
-	const u_int		gdim = gval.dim();
-	Matrix<ET>		U(adim, adim);
-	Vector<ET>		Jtf(adim);
-	Array<Matrix<ET> >	V(nb);
-	Array<Matrix<ET> >	W(nb);
-	Array<Vector<ET> >	Ktf(nb);
-	Matrix<ET>		A(adim + bdim + gdim, adim + bdim + gdim);
+      	const vector_type&	gval = g(a);
+	const u_int		gdim = gval.size();
+	matrix_type		U(adim, adim);
+	vector_type		Jtf(adim);
+	Array<matrix_type>	V(nb);
+	Array<matrix_type>	W(nb);
+	Array<vector_type>	Ktf(nb);
+	matrix_type		A(adim + bdim + gdim, adim + bdim + gdim);
 	j = 0;
 	for (IB b = bbegin; b != bend; ++b, ++j)
 	{
-	    const Matrix<ET>&	J  = f.jacobianA(a, *b, j);
-	    const Matrix<ET>&	Jt = J.trns();
-	    const Matrix<ET>&	K  = f.jacobianB(a, *b, j);
+	    const matrix_type&	J  = f.jacobianA(a, *b, j);
+	    const matrix_type&	Jt = J.trns();
+	    const matrix_type&	K  = f.jacobianB(a, *b, j);
 
 	    U     += Jt * J;
 	    Jtf   += fval[j] * J;
@@ -548,7 +563,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 			*= (1.0 + lambda);
 	    }
 
-	    Vector<ET>	dx(adim + bdim + gdim);
+	    vector_type	dx(adim + bdim + gdim);
 	    dx(0, adim) = Jtf;
 	    for (u_int j = 0; j < nb; ++j)
 		dx(adim + j*f.bdim(), f.bdim()) = Ktf[j];
@@ -560,11 +575,11 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    f.updateA(a_new, dx(0, adim));
 	    Array<ATB>		b_new(nb);
 	    copy(bbegin, bend, b_new.begin());
-	    Array<Vector<ET> >	fval_new(nb);
-	    ET			sqr_new = 0;
+	    Array<vector_type>	fval_new(nb);
+	    element_type	sqr_new = 0;
 	    for (u_int j = 0; j < nb; ++j)
 	    {
-		const Vector<ET>& db = dx(adim + j*f.bdim(), f.bdim());
+		const vector_type& db = dx(adim + j*f.bdim(), f.bdim());
 	      //		cerr << "*** check:  "
 	      // << (dx(0, adim) * W[j] + V[j] * db - Ktf[j]);
 		f.updateB(b_new[j], db);
@@ -583,7 +598,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		for (u_int j = 0; j < nb; ++j)
 		    A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
 			= V[j];
-		Vector<ET>	evalue;
+		vector_type	evalue;
 		A(0, 0, adim + bdim, adim + bdim).eigen(evalue);
 		cerr << evalue;
 		return A(0, 0, adim + bdim, adim + bdim).pinv(1.0e8) *= sqr;
@@ -604,7 +619,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     }
     throw std::runtime_error("minimizeSquareSparseDebug: maximum iteration limit exceeded!");
 
-    return Matrix<ET>(0, 0);
+    return matrix_type(0, 0);
 }
 
 }

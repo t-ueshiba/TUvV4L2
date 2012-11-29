@@ -70,10 +70,10 @@ GenericImage::restoreData(std::istream& in)
 __PORT std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {
-    if (_colormap.dim() > 0)
+    if (_colormap.size() > 0)
     {
 	_colormap.save(out);
-	for (u_int i = _colormap.dim(); i < 256; ++i)
+	for (u_int i = _colormap.size(); i < 256; ++i)
 	    out.put(0).put(0).put(0).put(0);
     }
     

@@ -51,7 +51,7 @@ template <class T, bool SYM=false>
 class SparseMatrix
 {
   public:
-    typedef T		value_type;		//!< 成分の型
+    typedef T		element_type;		//!< 成分の型
 
   private:
     template <class S>
@@ -64,40 +64,44 @@ class SparseMatrix
   // 構造生成
     void		beginInit()					;
     void		setRow()					;
-    void		setCol(u_int col, value_type val=0)		;
+    void		setCol(u_int col, element_type val=0)		;
     void		copyRow()					;
     void		endInit()					;
     
   // 基本情報
-    u_int		dim()					const	;
+    u_int		size()					const	;
     u_int		nrow()					const	;
     u_int		ncol()					const	;
     u_int		nelements()				const	;
     u_int		nelements(u_int i)			const	;
-    T			operator ()(u_int i, u_int j)		const	;
-    T&			operator ()(u_int i, u_int j)			;
+    element_type	operator ()(u_int i, u_int j)		const	;
+    element_type&	operator ()(u_int i, u_int j)			;
 
   // 基本演算
-    SparseMatrix&	operator  =(value_type c)			;
-    SparseMatrix&	operator *=(value_type c)			;
-    SparseMatrix&	operator /=(value_type c)			;
+    SparseMatrix&	operator  =(element_type c)			;
+    SparseMatrix&	operator *=(element_type c)			;
+    SparseMatrix&	operator /=(element_type c)			;
     SparseMatrix&	operator +=(const SparseMatrix& A)		;
     SparseMatrix&	operator -=(const SparseMatrix& A)		;
     SparseMatrix	operator  +(const SparseMatrix& A)	const	;
     SparseMatrix	operator  -(const SparseMatrix& A)	const	;
     template <class S, class B>
-    Vector<T>		operator  *(const Vector<S, B>& v)	const	;
+    Vector<element_type>
+			operator  *(const Vector<S, B>& v)	const	;
     template <class S, class B, class T2, bool SYM2>
     friend Vector<S>	operator  *(const Vector<S, B>& v,
 				    const SparseMatrix<T2, SYM2>& A)	;
-    SparseMatrix<T, true>
+    SparseMatrix<element_type, true>
 			compose()				const	;
-    SparseMatrix<T, true>
-			compose(const SparseMatrix<T, true>& W)	const	;
+    SparseMatrix<element_type, true>
+			compose(const SparseMatrix<element_type,
+						   true>& W)	const	;
 
   // ブロック演算
-    Vector<T>		operator ()(u_int i, u_int j, u_int d)	const	;
-    Matrix<T>		operator ()(u_int i, u_int j,
+    Vector<element_type>
+			operator ()(u_int i, u_int j, u_int d)	const	;
+    Matrix<element_type>
+			operator ()(u_int i, u_int j,
 				    u_int r, u_int c)		const	;
     template <class S, class B>
     SparseMatrix&	assign(u_int i, u_int j, const Vector<S, B>& v)	;
@@ -112,7 +116,8 @@ class SparseMatrix
 			      OP op, const Matrix<S, B, R>& M)		;
 
   // 連立一次方程式
-    Vector<T>		solve(const Vector<T>& b)		const	;
+    Vector<element_type>
+			solve(const Vector<element_type>& b)	const	;
 
   // 有限性のチェック
     bool		isfinite()				const	;
@@ -121,7 +126,7 @@ class SparseMatrix
     std::istream&	get(std::istream& in)				;
     std::ostream&	put(std::ostream& out)			const	;
     
-    friend class SparseMatrix<T, !SYM>;
+    friend class SparseMatrix<element_type, !SYM>;
 
   private:
     template <class OP>
@@ -135,11 +140,12 @@ class SparseMatrix
     static char		skipws(std::istream& in)			;
     
   private:
-    u_int		_ncol;		//!< 列の数
-    std::vector<u_int>	_rowIndex;	//!< 各行の先頭成分の通し番号
-    std::vector<u_int>	_columns;	//!< 各成分の列番号
-    std::vector<T>	_values;	//!< 各成分の値
-    std::map<u_int, T>	_rowmap;	//!< 1行中の列番号と値の一時バッファ
+    u_int			_ncol;		//!< 列の数
+    std::vector<u_int>		_rowIndex;	//!< 各行の先頭成分の通し番号
+    std::vector<u_int>		_columns;	//!< 各成分の列番号
+    std::vector<element_type>	_values;	//!< 各成分の値
+    std::map<u_int,
+	     element_type>	_rowmap;	//!< 1行中の列番号と値の対応表
 };
 
 /*
@@ -173,11 +179,7 @@ SparseMatrix<T, SYM>::setRow()
     }
 
   // この行の先頭成分の通し番号をセット
-#ifdef BASE1_INDEX
-    _rowIndex.push_back(nelements() + 1);
-#else
     _rowIndex.push_back(nelements());
-#endif
 }
 
 //! 成分の列番号とその値をセットする．
@@ -189,7 +191,7 @@ SparseMatrix<T, SYM>::setRow()
 				を指定すると送出
 */
 template <class T, bool SYM> inline void
-SparseMatrix<T, SYM>::setCol(u_int col, value_type val)
+SparseMatrix<T, SYM>::setCol(u_int col, element_type val)
 {
     u_int	row = _rowIndex.size();	// 現在までにセットされた行数
     if (row == 0)
@@ -199,11 +201,7 @@ SparseMatrix<T, SYM>::setCol(u_int col, value_type val)
 	if (col < --row)		// 与えられた列番号を現在の行番号と比較
 	    throw std::invalid_argument("TU::SparseMatrix<T, SYM>::setCol(): column index must not be less than row index!");
     }
-#ifdef BASE1_INDEX
-    _rowmap.insert(std::make_pair(col + 1, val));
-#else
     _rowmap.insert(std::make_pair(col, val));
-#endif
     if (col >= _ncol)
 	_ncol = col + 1;		// 列数を更新
 }
@@ -224,13 +222,8 @@ SparseMatrix<T, SYM>::copyRow()
     setRow();
 
   // 直前の行の(対称行列の場合は2番目以降の)成分の列番号を現在の行にコピーする．
-#ifdef BASE1_INDEX
-    for (u_int n  = _rowIndex[row - 1] - (SYM ? 0 : 1),
-	       ne = _rowIndex[row] - 1; n < ne; ++n)
-#else
     for (u_int n  = _rowIndex[row - 1] + (SYM ? 1 : 0),
 	       ne = _rowIndex[row]; n < ne; ++n)
-#endif
     {
 	_columns.push_back(_columns[n]);
 	_values.push_back(T(0));
@@ -258,21 +251,13 @@ SparseMatrix<T, SYM>::endInit()
     {
       // 各行の先頭成分が対角成分であるか？
 	for (u_int i = 0; i < nrow(); ++i)
-#ifdef BASE1_INDEX
-	    if (i != _columns[_rowIndex[i]-1]-1)
-#else
 	    if (i != _columns[_rowIndex[i]])
-#endif
 		throw std::logic_error("SparseMatrix<T, true>::endInit(): the first entry of each row must be a diagonal element!");
     }
 
   // 各行内で列番号が狭義単調増加になっているか？
     for (u_int i = 0; i < nrow(); ++i)
-#ifdef BASE1_INDEX
-	for (int n = _rowIndex[i] - 1; n < _rowIndex[i+1] - 2; ++n)
-#else
 	for (int n = _rowIndex[i]; n < _rowIndex[i+1] - 1; ++n)
-#endif
 	    if (_columns[n] >= _columns[n+1])
 		throw std::logic_error("SparseMatrix<T, SYM>::endInit(): the column indices must be strictly increasing within each row!");
 #endif
@@ -286,7 +271,7 @@ SparseMatrix<T, SYM>::endInit()
   \return	行列の次元(=行数)
 */
 template <class T, bool SYM> inline u_int
-SparseMatrix<T, SYM>::dim() const
+SparseMatrix<T, SYM>::size() const
 {
     return nrow();
 }
@@ -368,7 +353,7 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j)
   \return	この疎行列
 */
 template <class T, bool SYM> inline SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::operator =(value_type c)
+SparseMatrix<T, SYM>::operator =(element_type c)
 {
     std::fill(_values.begin(), _values.end(), c);
     return *this;
@@ -380,7 +365,7 @@ SparseMatrix<T, SYM>::operator =(value_type c)
   \return	この疎行列
 */
 template <class T, bool SYM> SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::operator *=(value_type c)
+SparseMatrix<T, SYM>::operator *=(element_type c)
 {
     std::transform(_values.begin(), _values.end(), _values.begin(),
 		   std::bind2nd(std::multiplies<T>(), c));
@@ -393,7 +378,7 @@ SparseMatrix<T, SYM>::operator *=(value_type c)
   \return	この疎行列
 */
 template <class T, bool SYM> SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::operator /=(value_type c)
+SparseMatrix<T, SYM>::operator /=(element_type c)
 {
     std::transform(_values.begin(), _values.end(), _values.begin(),
 		   std::bind2nd(std::divides<T>(), c));
@@ -472,7 +457,7 @@ SparseMatrix<T, SYM>::operator -(const SparseMatrix& A) const
 template <class T, bool SYM> template <class S, class B> Vector<T>
 SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
 {
-    v.check_dim(ncol());
+    v.check_size(ncol());
     
     Vector<T>	a(nrow());
     for (u_int i = 0; i < nrow(); ++i)
@@ -488,11 +473,7 @@ SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
 	}
 	
 	for (u_int n = _rowIndex[i]; n < _rowIndex[i+1]; ++n)
-#ifdef BASE1_INDEX
-	    a[i] += _values[n-1] * v[_columns[n-1]-1];
-#else
 	    a[i] += _values[n] * v[_columns[n]];
-#endif
     }
 
     return a;
@@ -591,7 +572,7 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j, u_int d) const
     u_int	dj = 0;
     if (SYM)
     {
-	for (u_int je = std::min(i, j + v.dim()); j + dj < je; ++dj)
+	for (u_int je = std::min(i, j + v.size()); j + dj < je; ++dj)
 	{
 #ifdef LIBTUTOOLS_DEBUG
 	    if (p != &_values[index(i, j+dj, true)])
@@ -601,7 +582,7 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j, u_int d) const
 	    p += (nelements(j + dj) - 1);
 	}
     }
-    for (; dj < v.dim(); ++dj)
+    for (; dj < v.size(); ++dj)
     {
 #ifdef LIBTUTOOLS_DEBUG
 	if (p != &_values[index(i, j+dj, true)])
@@ -678,7 +659,7 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Vector<S, B>& v)
     u_int	dj = 0;
     if (SYM)
     {
-	for (u_int je = std::min(i, j + v.dim()); j + dj < je; ++dj)
+	for (u_int je = std::min(i, j + v.size()); j + dj < je; ++dj)
 	{
 #ifdef LIBTUTOOLS_DEBUG
 	    if (p != &_values[index(i, j+dj, true)])
@@ -688,7 +669,7 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Vector<S, B>& v)
 	    p += (nelements(j + dj) - 1);
 	}
     }
-    for (; dj < v.dim(); ++dj)
+    for (; dj < v.size(); ++dj)
     {
 #ifdef LIBTUTOOLS_DEBUG
 	if (p != &_values[index(i, j+dj, true)])
@@ -751,7 +732,7 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Matrix<S, B, R>& M)
 template <class T, bool SYM> Vector<T>
 SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
 {
-    b.check_dim(ncol());
+    b.check_size(ncol());
     
     if (nrow() != ncol())
 	throw std::logic_error("TU::SparseMatrix<T, SYM>::solve(): not a square matrix!");
@@ -769,9 +750,7 @@ SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
     iparm[17] = -1;			// 分解の非零成分数をレポート
     iparm[20] =  1;			// Bunch and Kaufman pivoting
     iparm[27] = pardiso_precision();	// float または double を指定
-#ifndef BASE1_INDEX
     iparm[34] = 1;			// C形式のindexすなわち0ベース
-#endif
     _INTEGER_t		maxfct = 1;	// その分解を保持するべき行列の数
     _INTEGER_t		mnum   = 1;	// 何番目の行列について解くかを指定
     _INTEGER_t		mtype  = (SYM ? -2 : 11);	// 実対称／実非対称行列
@@ -876,11 +855,7 @@ SparseMatrix<T, SYM>::put(std::ostream& out) const
 
 	for (; j < ncol(); ++j)
 	{
-#ifdef BASE1_INDEX
-	    if ((n < _rowIndex[i+1]-1) && (j == _columns[n]-1))
-#else
 	    if ((n < _rowIndex[i+1]) && (j == _columns[n]))
-#endif
 		out << ' ' << _values[n++];
 	    else
 		out << " _";
@@ -912,21 +887,10 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
     for (u_int i = 0; i < nrow(); ++i)
     {
 	S.setRow();		// 第i行の先頭成分の通し番号をセット
-#ifdef BASE1_INDEX
-	for (u_int m = _rowIndex[i]-1, n = B._rowIndex[i]-1; ; )
-	{
-	    const u_int	j = (m <   _rowIndex[i+1]-1 ?   _columns[m]-1
-						    :   ncol());
-	    const u_int	k = (n < B._rowIndex[i+1]-1 ? B._columns[n]-1
-						    : B.ncol());
-#else
 	for (u_int m = _rowIndex[i], n = B._rowIndex[i]; ; )
 	{
-	    const u_int	j = (m <   _rowIndex[i+1] ?   _columns[m]
-						  :   ncol());
-	    const u_int	k = (n < B._rowIndex[i+1] ? B._columns[n]
-						  : B.ncol());
-#endif
+	    const u_int	j = (m <   _rowIndex[i+1] ?   _columns[m] :   ncol());
+	    const u_int	k = (n < B._rowIndex[i+1] ? B._columns[n] : B.ncol());
 	    if (j == k)		// 両方の行列が(i, j(=k))成分を持つ？
 	    {
 		if (j == ncol())	// 両方の行列について調べ終えていれば...
@@ -986,15 +950,9 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
 	    }
 	}
     }
-#ifdef BASE1_INDEX
-    for (u_int m = _rowIndex[i]-1; m < _rowIndex[i+1]-1; ++m)
-    {
-	const int	n = B.index(j, _columns[m]-1);
-#else
     for (u_int m = _rowIndex[i]; m < _rowIndex[i+1]; ++m)
     {
 	const int	n = B.index(j, _columns[m]);
-#endif
 	if (n >= 0)
 	{
 	    exist = true;
@@ -1026,24 +984,13 @@ SparseMatrix<T, SYM>::index(u_int i, u_int j, bool throwExcept) const
 	throw std::invalid_argument("TU::SparseMatrix<T, SYM>::index(): invalid row index!");
     
   // 指定された列番号に対応する成分がこの行にあるか2分法によって調べる．
-#ifdef BASE1_INDEX
-    for (u_int low = _rowIndex[i]-1, high = _rowIndex[i+1]-1; low != high; )
-#else
     for (u_int low = _rowIndex[i], high = _rowIndex[i+1]; low != high; )
-#endif
     {
 	u_int	mid = (low + high) / 2;
-#ifdef BASE1_INDEX
-	if (j < _columns[mid]-1)
-	    high = mid;
-	else if (j > _columns[mid]-1)
-	    low = mid + 1;
-#else
 	if (j < _columns[mid])
 	    high = mid;
 	else if (j > _columns[mid])
 	    low = mid + 1;
-#endif
 	else
 	    return mid;
     }
@@ -1092,7 +1039,7 @@ SparseMatrix<T, SYM>::skipws(std::istream& in)
 template <class S, class B, class T2, bool SYM2> Vector<S>
 operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
 {
-    v.check_dim(A.nrow());
+    v.check_size(A.nrow());
     
     Vector<S>	a(A.ncol());
     for (u_int j = 0; j < A.ncol(); ++j)
@@ -1106,11 +1053,7 @@ operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
 	if (SYM2)
 	{
 	    for (u_int n = A._rowIndex[j]; n < A._rowIndex[j+1]; ++n)
-#ifdef BASE1_INDEX
-		a[j] += v[A._columns[n-1]-1] * A._values[n-1];
-#else
 		a[j] += v[A._columns[n]] * A._values[n];
-#endif
 	}
     }
 

@@ -158,7 +158,7 @@ template <class T> Movie<T>&
 Movie<T>::setSizes(const Array<Size>& sizes)
 {
   // ビュー数と各ビューのオフセットを設定．
-    _views.resize(sizes.dim());
+    _views.resize(sizes.size());
     u_int	n = 0;
     for (u_int i = 0; i < nviews(); ++i)
     {
@@ -217,7 +217,7 @@ Movie<T>::setCircularMode(bool circular)
 template <class T> inline u_int
 Movie<T>::nviews() const
 {
-    return _views.dim();
+    return _views.size();
 }
 
 //! 指定されたビューに対応する画像の幅を返す．
@@ -398,7 +398,7 @@ Movie<T>::insert(u_int n)
 	--_current;			// 挿入位置の1つ前．
 
   // 現フレームの直前に挿入
-    _frames.insert(cur, n, Frame(_dummy->dim()));
+    _frames.insert(cur, n, Frame(_dummy->size()));
 
   // _current に挿入された領域の先頭を再設定する．
   // 先頭からの _current のオフセット _cFrame は変化しない．
@@ -586,7 +586,7 @@ Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
 template <class T> Movie<T>&
 Movie<T>::setFrameToViews()
 {
-    for (u_int i = 0; i < _views.dim(); ++i)
+    for (u_int i = 0; i < _views.size(); ++i)
 	_views[i].resize((T*)*_current + _views[i].offset,
 			 _views[i].height(), _views[i].width());
     return *this;
