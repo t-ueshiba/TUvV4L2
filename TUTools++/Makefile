@@ -36,6 +36,7 @@ HDRS		= TU/Array++.h \
 		TU/CorrectIntensity.h \
 		TU/DericheConvolver.h \
 		TU/EdgeDetector.h \
+		TU/Expression++.h \
 		TU/Filter2.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
