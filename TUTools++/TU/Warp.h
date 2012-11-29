@@ -56,7 +56,7 @@ class Warp
 	FracArray(u_int d=0)
 	    :us(d), vs(d), du(d), dv(d), lmost(0)	{}
 
-	u_int		width()			const	{return us.dim();}
+	u_int		width()			const	{return us.size();}
 	void		resize(u_int d)			;
 
 #if defined(__INTEL_COMPILER)
@@ -104,7 +104,7 @@ class Warp
   /*!
     return	出力画像の高さ
   */
-    u_int	height()			const	{return _fracs.dim();}
+    u_int	height()			const	{return _fracs.size();}
     
     int		lmost(int v)			const	;
     int		rmost(int v)			const	;

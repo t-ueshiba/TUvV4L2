@@ -100,7 +100,7 @@ class Heap
   /*!
     \return	最大要素数
   */
-    size_t	max_size()		const	{return _array.dim();}
+    size_t	max_size()		const	{return _array.size();}
 
   //! ヒープが空であるか調べる．
   /*!
@@ -148,7 +148,7 @@ Heap<T, Cmp>::Heap(u_int d, const Cmp& cmp)
 */
 template <class T, class Cmp>
 Heap<T, Cmp>::Heap(Array<T>& a, const Cmp& cmp)
-    :_array((T*)a, a.dim()), _n(a.dim()), _cmp(cmp)
+    :_array((T*)a, a.size()), _n(a.size()), _cmp(cmp)
 {
     for (u_int i = _n / 2; i > 0; )
 	downheap(--i);
@@ -174,7 +174,7 @@ Heap<T, Cmp>::top() const
 template <class T, class Cmp> inline void
 Heap<T, Cmp>::push(const T& elm)
 {
-    if (_n >= _array.dim())
+    if (_n >= _array.size())
 	throw std::length_error("TU::Heap<T, Cmp>::push: Heap is full!!");
 
     _array[_n] = elm;
@@ -291,7 +291,7 @@ sort(Array<T>& a, const Cmp& cmp)
 
   // 後ろから a[] に代入しないと a[] の領域を内部で共有している
   // ヒープを壊してしまうことに注意．
-    for (u_int i = a.dim(); i > 0; )
+    for (u_int i = a.size(); i > 0; )
 	a[--i] = heap.pop();
 }
  

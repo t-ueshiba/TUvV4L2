@@ -136,10 +136,10 @@ PSTree<S, T, CompareX, CompareY>::PSTree(Array<T>& array,
 					 CompareY compareY)
     :_array(array), _root(0), _compareX(compareX), _compareY(compareY)
 {
-    if (array.dim() > 0)
+    if (array.size() > 0)
     {
 	sort(array, _compareY);
-	_root = new Node(array, 0, array.dim(), _compareX);
+	_root = new Node(array, 0, array.size(), _compareX);
     }
 }
 

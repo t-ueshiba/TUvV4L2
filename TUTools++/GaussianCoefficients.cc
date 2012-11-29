@@ -59,8 +59,8 @@ coefficients4(double a0, double b0, double omega0, double alpha0,
 *  class GaussianCoefficients<T>::Params				*
 ************************************************************************/
 template <class T> void
-GaussianCoefficients<T>::Params::set(value_type aa, value_type bb,
-				     value_type tt, value_type aaa)
+GaussianCoefficients<T>::Params::set(element_type aa, element_type bb,
+				     element_type tt, element_type aaa)
 {
     a	  = aa;
     b	  = bb;
@@ -83,10 +83,10 @@ GaussianCoefficients<T>::Params::operator -=(const vector_type& p)
 *  class GaussianCoefficients<T>::EvenConstraint			*
 ************************************************************************/
 template <class T> typename GaussianCoefficients<T>::vector_type
-GaussianCoefficients<T>::EvenConstraint::operator ()(const AT& params) const
+GaussianCoefficients<T>::EvenConstraint::operator ()(const argument_type& params) const
 {
     vector_type		val(1u);
-    const value_type	as0 = params[0].alpha/_sigma,
+    const element_type	as0 = params[0].alpha/_sigma,
 			ts0 = params[0].theta/_sigma,
 			as1 = params[1].alpha/_sigma,
 			ts1 = params[1].theta/_sigma;
@@ -99,11 +99,11 @@ GaussianCoefficients<T>::EvenConstraint::operator ()(const AT& params) const
 }
 
 template <class T> typename GaussianCoefficients<T>::matrix_type
-GaussianCoefficients<T>::EvenConstraint::jacobian(const AT& params) const
+GaussianCoefficients<T>::EvenConstraint::jacobian(const argument_type& params) const
 {
     using namespace	std;
     
-    const value_type	c0  = cos (params[0].theta/_sigma),
+    const element_type	c0  = cos (params[0].theta/_sigma),
 			s0  = sin (params[0].theta/_sigma),
 			ch0 = cosh(params[0].alpha/_sigma),
 			sh0 = sinh(params[0].alpha/_sigma),
@@ -133,13 +133,14 @@ GaussianCoefficients<T>::EvenConstraint::jacobian(const AT& params) const
 *  class GaussianCoefficients<T>::CostFunction				*
 ************************************************************************/
 template <class T> typename GaussianCoefficients<T>::vector_type
-GaussianCoefficients<T>::CostFunction::operator ()(const AT& params) const
+GaussianCoefficients<T>::CostFunction
+		       ::operator ()(const argument_type& params) const
 {
     vector_type	val(_ndivisions+1);
-    for (u_int k = 0; k < val.dim(); ++k)
+    for (u_int k = 0; k < val.size(); ++k)
     {
-	value_type	f = 0.0, x = k*_range/_ndivisions;
-	for (u_int i = 0; i < params.dim(); ++i)
+	element_type	f = 0.0, x = k*_range/_ndivisions;
+	for (u_int i = 0; i < params.size(); ++i)
 	{
 	    const Params&	p = params[i];
 	    f += (p.a*cos(x*p.theta) + p.b*sin(x*p.theta))*exp(-x*p.alpha);
@@ -151,18 +152,19 @@ GaussianCoefficients<T>::CostFunction::operator ()(const AT& params) const
 }
     
 template <class T> typename GaussianCoefficients<T>::matrix_type
-GaussianCoefficients<T>::CostFunction::jacobian(const AT& params) const
+GaussianCoefficients<T>::CostFunction
+		       ::jacobian(const argument_type& params) const
 {
-    matrix_type	val(_ndivisions+1, 4*params.dim());
+    matrix_type	val(_ndivisions+1, 4*params.size());
     for (u_int k = 0; k < val.nrow(); ++k)
     {
 	vector_type&	row = val[k];
-	value_type	x = k*_range/_ndivisions;
+	element_type	x = k*_range/_ndivisions;
 	
-	for (u_int i = 0; i < params.dim(); ++i)
+	for (u_int i = 0; i < params.size(); ++i)
 	{
 	    const Params&	p = params[i];
-	    const value_type	c = cos(x*p.theta), s = sin(x*p.theta),
+	    const element_type	c = cos(x*p.theta), s = sin(x*p.theta),
 				e = exp(-x*p.alpha);
 	    row[4*i]   = c * e;
 	    row[4*i+1] = s * e;
@@ -175,10 +177,10 @@ GaussianCoefficients<T>::CostFunction::jacobian(const AT& params) const
 }
 
 template <class T> void
-GaussianCoefficients<T>::CostFunction::update(AT& params,
+GaussianCoefficients<T>::CostFunction::update(argument_type& params,
 					      const vector_type& dp) const
 {
-    for (u_int i = 0; i < params.dim(); ++i)
+    for (u_int i = 0; i < params.size(); ++i)
 	params[i] -= dp(4*i, 4);
 }
 
@@ -201,7 +203,7 @@ GaussianCoefficients<T>::initialize(T sigma)
 
   /*    coefficients4(-1.27844,   3.24717, 0.752205/sigma, 1.18524/sigma,
 	0.278487, -1.54294, 2.21984/sigma,  1.27214/sigma, _c2);*/
-    typename CostFunction::AT	params(CostFunction::D);
+    typename CostFunction::argument_type	params(CostFunction::D);
     params[0].set(-1.3, 3.6, 0.75, 1.2);
     params[1].set(0.32, -1.7, 2.2, 1.3);
     CostFunction	err(100, 5.0);

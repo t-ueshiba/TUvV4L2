@@ -15,7 +15,7 @@ ifeq ($(OSTYPE), darwin)
 endif
 
 CPPFLAGS	= -DUSE_TBB -DUSE_IIR_FILTER_ITERATOR #-DUSE_TBB
-CFLAGS		= -g
+CFLAGS		= -g -O2 -std=c++0x
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
   CFLAGS	= -O3

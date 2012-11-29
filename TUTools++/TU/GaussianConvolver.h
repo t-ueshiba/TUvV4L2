@@ -46,63 +46,67 @@ namespace TU
 template <class T> class __PORT GaussianCoefficients
 {
   private:
-    typedef double		value_type;
-    typedef Matrix<value_type>	matrix_type;
-    typedef Vector<value_type>	vector_type;
+    typedef double			element_type;
+    typedef Matrix<element_type>	matrix_type;
+    typedef Vector<element_type>	vector_type;
 
     struct Params
     {
-	void		set(value_type aa, value_type bb,
-			    value_type tt, value_type aaa);
+	void		set(element_type aa, element_type bb,
+			    element_type tt, element_type aaa);
 	Params&		operator -=(const vector_type& p)		;
     
-	value_type	a, b, theta, alpha;
+	element_type	a, b, theta, alpha;
     };
 
     class EvenConstraint
     {
       public:
-	typedef Array<Params>	AT;
+	typedef Array<Params>	argument_type;
 
-	EvenConstraint(value_type sigma) :_sigma(sigma)			{}
+	EvenConstraint(element_type sigma) :_sigma(sigma)		{}
 	
-	vector_type	operator ()(const AT& params)		const	;
-	matrix_type	jacobian(const AT& params)		const	;
+	vector_type	operator ()(const argument_type& params) const	;
+	matrix_type	jacobian(const argument_type& params)	 const	;
 
       private:
-	value_type	_sigma;
+	element_type	_sigma;
     };
 
     class CostFunction
     {
       public:
-	typedef typename GaussianCoefficients<T>::value_type	value_type;
-	typedef Array<Params>					AT;
+	typedef typename GaussianCoefficients<T>::element_type	element_type;
+	typedef Array<Params>					argument_type;
     
 	enum		{D = 2};
 
-	CostFunction(int ndivisions, value_type range)
+	CostFunction(int ndivisions, element_type range)
 	    :_ndivisions(ndivisions), _range(range)			{}
     
-	vector_type	operator ()(const AT& params)		  const	;
-	matrix_type	jacobian(const AT& params)		  const	;
-	void		update(AT& params, const vector_type& dp) const	;
+	vector_type	operator ()(const argument_type& params) const	;
+	matrix_type	jacobian(const argument_type& params)	 const	;
+	void		update(argument_type& params,
+			       const vector_type& dp)		 const	;
 
       private:
 	const int		_ndivisions;
-	const value_type	_range;
+	const element_type	_range;
     };
 
   public:
-    void	initialize(T sigma)			;
+    typedef	T					coeff_type;
+    
+  public:
+    void	initialize(coeff_type sigma)		;
     
   protected:
-    GaussianCoefficients(T sigma)			{initialize(sigma);}
+    GaussianCoefficients(coeff_type sigma)		{initialize(sigma);}
     
   protected:
-    T		_c0[8];		//!< forward coefficients for smoothing
-    T		_c1[8];		//!< forward coefficients for 1st derivatives
-    T		_c2[8];		//!< forward coefficients for 2nd derivatives
+    coeff_type	_c0[8];		//!< forward coefficients for smoothing
+    coeff_type	_c1[8];		//!< forward coefficients for 1st derivatives
+    coeff_type	_c2[8];		//!< forward coefficients for 2nd derivatives
 };
     
 /************************************************************************
@@ -116,13 +120,13 @@ template <class T> class GaussianConvolver
     typedef T						coeff_type;
     
   private:
-    typedef GaussianCoefficients<T>			coeffs;
-    typedef BidirectionalIIRFilter<4u, T>		super;
+    typedef GaussianCoefficients<coeff_type>		coeffs;
+    typedef BidirectionalIIRFilter<4u, coeff_type>	super;
     
   public:
-    GaussianConvolver(T sigma=1.0)	:GaussianCoefficients<T>(sigma)	{}
+    GaussianConvolver(coeff_type sigma=1.0)	:coeffs(sigma)		{}
 
-    GaussianConvolver&	initialize(T sigma)				;
+    GaussianConvolver&	initialize(coeff_type sigma)			;
 
     template <class IN, class OUT> void	smooth(IN ib, IN ie, OUT out)	;
     template <class IN, class OUT> void	diff  (IN ib, IN ie, OUT out)	;
@@ -140,7 +144,7 @@ template <class T> class GaussianConvolver
   \return	このガウス核
 */
 template <class T> GaussianConvolver<T>&
-GaussianConvolver<T>::initialize(T sigma)
+GaussianConvolver<T>::initialize(coeff_type sigma)
 {
     coeffs::initialize(sigma);
     return *this;
@@ -156,7 +160,7 @@ GaussianConvolver<T>::initialize(T sigma)
 template <class T> template <class IN, class OUT> inline void
 GaussianConvolver<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, super::Zeroth).convolve(ib, ie, out);
+    super::initialize(coeffs::_c0, super::Zeroth).convolve(ib, ie, out);
 }
 
 //! Gauss核による1階微分
@@ -169,7 +173,7 @@ GaussianConvolver<T>::smooth(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT> inline void
 GaussianConvolver<T>::diff(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, super::First).convolve(ib, ie, out);
+    super::initialize(coeffs::_c1, super::First).convolve(ib, ie, out);
 }
 
 //! Gauss核による2階微分
@@ -182,7 +186,7 @@ GaussianConvolver<T>::diff(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT> inline void
 GaussianConvolver<T>::diff2(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, super::Second).convolve(ib, ie, out);
+    super::initialize(coeffs::_c2, super::Second).convolve(ib, ie, out);
 }
 
 /************************************************************************
@@ -196,14 +200,14 @@ template <class T> class GaussianConvolver2
     typedef T						coeff_type;
     
   private:
-    typedef GaussianCoefficients<T>			coeffs;
-    typedef BidirectionalIIRFilter2<4u, T>		super;
-    typedef BidirectionalIIRFilter<4u, T>		IIRF;
+    typedef GaussianCoefficients<coeff_type>		coeffs;
+    typedef BidirectionalIIRFilter2<4u, coeff_type>	super;
+    typedef BidirectionalIIRFilter<4u, coeff_type>	IIRF;
     
   public:
-    GaussianConvolver2(T sigma=1.0)	:GaussianCoefficients<T>(sigma) {}
+    GaussianConvolver2(coeff_type sigma=1.0)	:coeffs(sigma)		{}
 
-    GaussianConvolver2&	initialize(T sigma)				;
+    GaussianConvolver2&	initialize(coeff_type sigma)			;
     using		super::grainSize;
     using		super::setGrainSize;
     
@@ -231,11 +235,6 @@ template <class T> class GaussianConvolver2
 	      class BVAL=typename std::iterator_traits<OUT>
 				     ::value_type::value_type>
     void		diffVV(IN ib, IN ie, OUT out)			;
-
-  protected:
-    using	coeffs::_c0;
-    using	coeffs::_c1;
-    using	coeffs::_c2;
 };
 
 //! Gauss核のsigma値を設定する
@@ -244,7 +243,7 @@ template <class T> class GaussianConvolver2
   \return	このガウス核
 */
 template <class T> GaussianConvolver2<T>&
-GaussianConvolver2<T>::initialize(T sigma)
+GaussianConvolver2<T>::initialize(coeff_type sigma)
 {
     coeffs::initialize(sigma);
     return *this;
@@ -260,7 +259,7 @@ GaussianConvolver2<T>::initialize(T sigma)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth, _c0, IIRF::Zeroth)
+    super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -274,7 +273,7 @@ GaussianConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First, _c0, IIRF::Zeroth)
+    super::initialize(coeffs::_c1, IIRF::First, coeffs::_c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -288,7 +287,7 @@ GaussianConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth, _c1, IIRF::First)
+    super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c1, IIRF::First)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -302,7 +301,7 @@ GaussianConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c2, IIRF::Second, _c0, IIRF::Zeroth)
+    super::initialize(coeffs::_c2, IIRF::Second, coeffs::_c0, IIRF::Zeroth)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -316,7 +315,7 @@ GaussianConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c1, IIRF::First, _c1, IIRF::First)
+    super::initialize(coeffs::_c1, IIRF::First, coeffs::_c1, IIRF::First)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 
@@ -330,7 +329,7 @@ GaussianConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 template <class T> template <class IN, class OUT, class BVAL> inline void
 GaussianConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 {
-    super::initialize(_c0, IIRF::Zeroth, _c2, IIRF::Second)
+    super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c2, IIRF::Second)
 	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
 }
 

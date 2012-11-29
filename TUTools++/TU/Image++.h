@@ -602,7 +602,7 @@ class ImageLine : public Array<T>
 			    return *this;
 			}
 
-    using		Array<T>::dim;
+    using		Array<T>::size;
     template <class S>
     T			at(S uf)		const	;
     const YUV422*	fill(const YUV422* src)		;
@@ -642,7 +642,7 @@ class ImageLine : public Array<T>
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
 	
-    bool		resize(u_int d)			;
+    bool		resize(u_int d)		;
     void		resize(T* p, u_int d)		;
 
   private:
@@ -698,7 +698,7 @@ template <class T> const YUV422*
 ImageLine<T>::fill(const YUV422* src)
 {
     register T* dst = *this;
-    for (register u_int u = 0; u < dim(); u += 2)
+    for (register u_int u = 0; u < size(); u += 2)
     {
 	*dst++ = fromYUV<T>(src[0].y, src[0].x, src[1].x);
 	*dst++ = fromYUV<T>(src[1].y, src[0].x, src[1].x);
@@ -716,7 +716,7 @@ template <class T> const YUYV422*
 ImageLine<T>::fill(const YUYV422* src)
 {
     register T* dst = *this;
-    for (register u_int u = 0; u < dim(); u += 2)
+    for (register u_int u = 0; u < size(); u += 2)
     {
 	*dst++ = fromYUV<T>(src[0].y, src[0].x, src[1].x);
 	*dst++ = fromYUV<T>(src[1].y, src[0].x, src[1].x);
@@ -734,7 +734,7 @@ template <class T> const YUV411*
 ImageLine<T>::fill(const YUV411* src)
 {
     register T*  dst = *this;
-    for (register u_int u = 0; u < dim(); u += 4)
+    for (register u_int u = 0; u < size(); u += 4)
     {
 	*dst++ = fromYUV<T>(src[0].y0, src[0].x, src[1].x);
 	*dst++ = fromYUV<T>(src[0].y1, src[0].x, src[1].x);
@@ -754,7 +754,7 @@ template <class T> template <class S> const S*
 ImageLine<T>::fill(const S* src)
 {
     T* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = T(*src++);
     return src;
 }
@@ -769,7 +769,7 @@ template <class T> template <class S, class L> const S*
 ImageLine<T>::lookup(const S* src, const L* tbl)
 {
     T* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = T(*(tbl + *src++));
     return src;
 }
@@ -782,8 +782,8 @@ ImageLine<T>::lookup(const S* src, const L* tbl)
 template <class T> inline const T*
 ImageLine<T>::fill(const T* src)
 {
-    memcpy((T*)*this, src, dim() * sizeof(T));
-    return src + dim();
+    memcpy((T*)*this, src, size() * sizeof(T));
+    return src + size();
 }
 
 //! スキャンラインの画素数を変更する．
@@ -849,7 +849,7 @@ class ImageLine<YUV422> : public Array<YUV422>
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
 	
-    bool		resize(u_int d)			;
+    bool		resize(u_int d)		;
     void		resize(YUV422* p, u_int d)	;
 
   private:
@@ -872,15 +872,15 @@ ImageLine<YUV422>::operator ()(u_int u, u_int d)
 inline const YUV422*
 ImageLine<YUV422>::fill(const YUV422* src)
 {
-    memcpy((YUV422*)*this, src, dim() * sizeof(YUV422));
-    return src + dim();
+    memcpy((YUV422*)*this, src, size() * sizeof(YUV422));
+    return src + size();
 }
 
 template <class S> const S*
 ImageLine<YUV422>::fill(const S* src)
 {
     YUV422* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = YUV422(*src++);
     return src;
 }
@@ -889,7 +889,7 @@ template <class S, class L> const S*
 ImageLine<YUV422>::lookup(const S* src, const L* tbl)
 {
     YUV422* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = YUV422(*(tbl + *src++));
     return src;
 }
@@ -942,7 +942,7 @@ class ImageLine<YUYV422> : public Array<YUYV422>
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
 	
-    bool		resize(u_int d)			;
+    bool		resize(u_int d)		;
     void		resize(YUYV422* p, u_int d)	;
 
   private:
@@ -965,15 +965,15 @@ ImageLine<YUYV422>::operator ()(u_int u, u_int d)
 inline const YUYV422*
 ImageLine<YUYV422>::fill(const YUYV422* src)
 {
-    memcpy((YUYV422*)*this, src, dim() * sizeof(YUYV422));
-    return src + dim();
+    memcpy((YUYV422*)*this, src, size() * sizeof(YUYV422));
+    return src + size();
 }
 
 template <class S> const S*
 ImageLine<YUYV422>::fill(const S* src)
 {
     YUYV422* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = YUYV422(*src++);
     return src;
 }
@@ -982,7 +982,7 @@ template <class S, class L> const S*
 ImageLine<YUYV422>::lookup(const S* src, const L* tbl)
 {
     YUYV422* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = YUYV422(*(tbl + *src++));
     return src;
 }
@@ -1036,7 +1036,7 @@ class ImageLine<YUV411> : public Array<YUV411>
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
 	
-    bool		resize(u_int d)			;
+    bool		resize(u_int d)		;
     void		resize(YUV411* p, u_int d)	;
 
   private:
@@ -1059,15 +1059,15 @@ ImageLine<YUV411>::operator ()(u_int u, u_int d)
 inline const YUV411*
 ImageLine<YUV411>::fill(const YUV411* src)
 {
-    memcpy((YUV411*)*this, src, dim() * sizeof(YUV411));
-    return src + dim();
+    memcpy((YUV411*)*this, src, size() * sizeof(YUV411));
+    return src + size();
 }
 
 template <class S> const S*
 ImageLine<YUV411>::fill(const S* src)
 {
     YUV411* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = YUV411(*src++);
     return src;
 }
@@ -1076,7 +1076,7 @@ template <class S, class L> const S*
 ImageLine<YUV411>::lookup(const S* src, const L* tbl)
 {
     YUV411* dst = *this;
-    for (u_int n = dim() + 1; --n; )
+    for (u_int n = size() + 1; --n; )
 	*dst++ = YUV422(*(tbl + *src++));
     return src;
 }
@@ -1183,7 +1183,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     std::ostream&	saveData(std::ostream& out,
 				 Type type=DEFAULT)		const	;
     void		resize(u_int h, u_int w)			;
-    void		resize(T* p, u_int h, u_int w)			;
+    void		resize(T* p, u_int h, u_int w)		;
 
   private:
     template <class S>
@@ -1448,7 +1448,7 @@ Image<T, B>::saveRows(std::ostream& out, Type type) const
     TypeInfo	typeInfo(type);
 
     Array<L>	colormap(typeInfo.ncolors);
-    for (u_int i = 0; i < colormap.dim(); ++i)
+    for (u_int i = 0; i < colormap.size(); ++i)
 	colormap[i] = i;
     colormap.save(out);
     

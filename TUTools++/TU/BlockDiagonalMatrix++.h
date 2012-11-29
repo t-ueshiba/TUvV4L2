@@ -58,32 +58,35 @@ namespace TU
 template <class T>
 class BlockDiagonalMatrix : public Array<Matrix<T> >
 {
+  private:
+    typedef Array<Matrix<T> >	super;
+    
   public:
-    typedef T						value_type;
+    typedef T			element_type;
     
   public:
   //! 指定された個数の小行列から成るブロック対角行列を生成する．
   /*!
     \param d	小行列の個数
   */
-    explicit BlockDiagonalMatrix(u_int d=0)	:Array<Matrix<T> >(d)	{}
+    explicit BlockDiagonalMatrix(u_int d=0)	:super(d)		{}
     BlockDiagonalMatrix(const Array<u_int>& nrows,
 			const Array<u_int>& ncols)			;
 
-    using			Array<Matrix<T> >::dim;
+    using			super::size;
     u_int			nrow()				const	;
     u_int			ncol()				const	;
     BlockDiagonalMatrix		trns()				const	;
-    BlockDiagonalMatrix&	operator  =(const T& c)			;
+    BlockDiagonalMatrix&	operator  =(element_type c)		;
 
   //! このブロック対角行列の全ての成分に同一の数値を掛ける．
   /*!
     \param c	掛ける数値
     \return	このブロック対角行列
   */
-    BlockDiagonalMatrix&	operator *=(double c)
+    BlockDiagonalMatrix&	operator *=(element_type c)
 				{
-				    Array<Matrix<T> >::operator *=(c);
+				    super::operator *=(c);
 				    return *this;
 				}
 
@@ -92,9 +95,10 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
     \param c	割る数値
     \return	このブロック対角行列
   */
-    BlockDiagonalMatrix&	operator /=(double c)
+    template <class T2>
+    BlockDiagonalMatrix&	operator /=(T2 c)
 				{
-				    Array<Matrix<T> >::operator /=(c);
+				    super::operator /=(c);
 				    return *this;
 				}
 
@@ -131,14 +135,14 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
 template <class T>
 BlockDiagonalMatrix<T>::BlockDiagonalMatrix(const Array<u_int>& nrows,
 					    const Array<u_int>& ncols)
-    :Array<Matrix<T> >(nrows.dim())
+    :Array<Matrix<T> >(nrows.size())
 {
-    if (nrows.dim() != ncols.dim())
+    if (nrows.size() != ncols.size())
 	throw std::invalid_argument("TU::BlockDiagonalMatrix<T>::BlockDiagonalMatrix: dimension mismatch between nrows and ncols!!");
-    for (u_int i = 0; i < dim(); ++i)
+    for (u_int i = 0; i < size(); ++i)
     {
 	(*this)[i].resize(nrows[i], ncols[i]);
-	(*this)[i] = 0.0;
+	(*this)[i] = element_type(0);
     }
 }
 
@@ -149,8 +153,8 @@ BlockDiagonalMatrix<T>::BlockDiagonalMatrix(const Array<u_int>& nrows,
 template <class T> u_int
 BlockDiagonalMatrix<T>::nrow() const
 {
-    size_t	r = 0;
-    for (u_int i = 0; i < dim(); ++i)
+    u_int	r = 0;
+    for (u_int i = 0; i < size(); ++i)
 	r += (*this)[i].nrow();
     return r;
 }
@@ -162,8 +166,8 @@ BlockDiagonalMatrix<T>::nrow() const
 template <class T> u_int
 BlockDiagonalMatrix<T>::ncol() const
 {
-    size_t	c = 0;
-    for (u_int i = 0; i < dim(); ++i)
+    u_int	c = 0;
+    for (u_int i = 0; i < size(); ++i)
 	c += (*this)[i].ncol();
     return c;
 }
@@ -182,8 +186,8 @@ BlockDiagonalMatrix<T>::ncol() const
 template <class T> BlockDiagonalMatrix<T>
 BlockDiagonalMatrix<T>::trns() const
 {
-    BlockDiagonalMatrix	val(dim());
-    for (u_int i = 0; i < val.dim(); ++i)
+    BlockDiagonalMatrix	val(size());
+    for (u_int i = 0; i < val.size(); ++i)
 	val[i] = (*this)[i].trns();
     return val;
 }
@@ -194,9 +198,9 @@ BlockDiagonalMatrix<T>::trns() const
   \return	このブロック対角行列
 */
 template <class T> BlockDiagonalMatrix<T>&
-BlockDiagonalMatrix<T>::operator =(const T& c)
+BlockDiagonalMatrix<T>::operator =(element_type c)
 {
-    for (u_int i = 0; i < dim(); ++i)
+    for (u_int i = 0; i < size(); ++i)
 	(*this)[i] = c;
     return *this;
 }
@@ -210,7 +214,7 @@ BlockDiagonalMatrix<T>::operator Matrix<T>() const
 {
     Matrix<T>	val(nrow(), ncol());
     int		r = 0, c = 0;
-    for (u_int i = 0; i < dim(); ++i)
+    for (u_int i = 0; i < size(); ++i)
     {
 	val(r, c, (*this)[i].nrow(), (*this)[i].ncol()) = (*this)[i];
 	r += (*this)[i].nrow();
@@ -231,9 +235,9 @@ BlockDiagonalMatrix<T>::operator Matrix<T>() const
 template <class T> BlockDiagonalMatrix<T>
 operator *(const BlockDiagonalMatrix<T>& a, const BlockDiagonalMatrix<T>& b)
 {
-    a.check_dim(b.dim());
-    BlockDiagonalMatrix<T>	val(a.dim());
-    for (u_int i = 0; i < val.dim(); ++i)
+    a.check_size(b.size());
+    BlockDiagonalMatrix<T>	val(a.size());
+    for (u_int i = 0; i < val.size(); ++i)
 	val[i] = a[i] * b[i];
     return val;
 }
@@ -249,7 +253,7 @@ operator *(const BlockDiagonalMatrix<T>& b, const Matrix<T>& m)
 {
     Matrix<T>	val(b.nrow(), m.ncol());
     u_int	r = 0, c = 0;
-    for (u_int i = 0; i < b.dim(); ++i)
+    for (u_int i = 0; i < b.size(); ++i)
     {
 	val(r, 0, b[i].nrow(), m.ncol())
 	    = b[i] * m(c, 0, b[i].ncol(), m.ncol());
@@ -272,7 +276,7 @@ operator *(const Matrix<T>& m, const BlockDiagonalMatrix<T>& b)
 {
     Matrix<T>	val(m.nrow(), b.ncol());
     u_int	r = 0, c = 0;
-    for (u_int i = 0; i < b.dim(); ++i)
+    for (u_int i = 0; i < b.size(); ++i)
     {
 	val(0, c, m.nrow(), b[i].ncol())
 	    = m(0, r, m.nrow(), b[i].nrow()) * b[i];
@@ -295,13 +299,13 @@ operator *(const BlockDiagonalMatrix<T>& b, const Vector<T>& v)
 {
     Vector<T>	val(b.nrow());
     u_int	r = 0, c = 0;
-    for (u_int i = 0; i < b.dim(); ++i)
+    for (u_int i = 0; i < b.size(); ++i)
     {
 	val(r, b[i].nrow()) = b[i] * v(c, b[i].ncol());
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
-    if (c != v.dim())
+    if (c != v.size())
 	throw std::invalid_argument("TU::operaotr *(const BlockDiagonalMatrix<T>&, const Vector<T>&): dimension mismatch!!");
     return val;
 }
@@ -317,13 +321,13 @@ operator *(const Vector<T>& v, const BlockDiagonalMatrix<T>& b)
 {
     Vector<T>	val(b.ncol());
     u_int	r = 0, c = 0;
-    for (u_int i = 0; i < b.dim(); ++i)
+    for (u_int i = 0; i < b.size(); ++i)
     {
 	val(c, b[i].ncol()) = v(r, b[i].nrow()) * b[i];
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
-    if (r != v.dim())
+    if (r != v.size())
 	throw std::invalid_argument("TU::operaotr *(const Vector<T>&, const BlockDiagonalMatrix<T>&): dimension mismatch!!");
     return val;
 }
