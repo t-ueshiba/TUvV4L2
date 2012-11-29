@@ -637,8 +637,8 @@ class Array : public B
 	typedef char	Small;
 	struct Big {char dummy[2];};
 
-	template <class T>
-	static Small	test(Array<T>)	;
+	template <class T2>
+	static Small	test(Array<T2>)	;
 	static Big	test(...)	;
 	static A	makeA()		;
     
