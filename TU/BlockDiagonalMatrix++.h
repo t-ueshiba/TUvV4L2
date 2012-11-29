@@ -77,7 +77,7 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
     u_int			nrow()				const	;
     u_int			ncol()				const	;
     BlockDiagonalMatrix		trns()				const	;
-    BlockDiagonalMatrix&	operator  =(element_type c)		;
+    BlockDiagonalMatrix&	operator =(element_type c)		;
 
   //! このブロック対角行列の全ての成分に同一の数値を掛ける．
   /*!
