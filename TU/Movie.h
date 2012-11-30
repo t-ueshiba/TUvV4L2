@@ -173,7 +173,7 @@ Movie<T>::setSizes(const Array<Size>& sizes)
 
   // 各ビューにダミーフレームを設定．
     for (u_int i = 0; i < nviews(); ++i)
-	_views[i].resize((T*)*_dummy + _views[i].offset,
+	_views[i].resize(_dummy->ptr() + _views[i].offset,
 			 sizes[i].second, sizes[i].first);
 
   // 現フレームをダミーフレームに設定．
@@ -587,7 +587,7 @@ template <class T> Movie<T>&
 Movie<T>::setFrameToViews()
 {
     for (u_int i = 0; i < _views.size(); ++i)
-	_views[i].resize((T*)*_current + _views[i].offset,
+	_views[i].resize(_current->ptr() + _views[i].offset,
 			 _views[i].height(), _views[i].width());
     return *this;
 }

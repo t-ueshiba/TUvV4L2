@@ -637,10 +637,10 @@ class Array : public B
 	typedef char	Small;
 	struct Big {char dummy[2];};
 
-	template <class T2>
-	static Small	test(Array<T2>)	;
-	static Big	test(...)	;
-	static A	makeA()		;
+	template <class T2, class B2>
+	static Small	test(Array<T2, B2>)	;
+	static Big	test(...)		;
+	static A	makeA()			;
     
       public:
 	enum
@@ -709,10 +709,8 @@ class Array : public B
     using		super::size;
     using		super::dim;
     using		super::resize;
-
-    u_int		ncol()					const	;
-			operator pointer()				;
-  			operator const_pointer()		const	;
+    using		super::ptr;
+    
     reference		operator [](u_int i)				;
     const_reference	operator [](u_int i)			const	;
     const element_type&	eval(u_int i, u_int j)			const	;
@@ -817,12 +815,6 @@ Array<T, B>::operator =(const element_type& c)
     return *this;
 }
 
-template <class T, class B> inline u_int
-Array<T, B>::ncol() const
-{
-    return (size() != 0 ? super::ptr()->size() : 0);
-}
-
 //! 配列の先頭要素を指す反復子を返す．
 /*!
   \return	先頭要素を指す反復子
@@ -831,7 +823,7 @@ template <class T, class B>
 inline typename Array<T, B>::iterator
 Array<T, B>::begin()
 {
-    return super::ptr();
+    return ptr();
 }
 
 //! 配列の先頭要素を指す定数反復子を返す．
@@ -841,7 +833,7 @@ Array<T, B>::begin()
 template <class T, class B> inline typename Array<T, B>::const_iterator
 Array<T, B>::begin() const
 {
-    return super::ptr();
+    return ptr();
 }
 
 //! 配列の末尾を指す反復子を返す．
@@ -904,26 +896,6 @@ Array<T, B>::rend() const
     return const_reverse_iterator(begin());
 }
 
-//! 配列の内部記憶領域へのポインタを返す．
-/*!
-  \return	内部記憶領域へのポインタ
-*/
-template <class T, class B> inline
-Array<T, B>::operator pointer()
-{
-    return super::ptr();
-}
-
-//! 配列の内部記憶領域へのポインタを返す．
-/*!
-  \return	内部記憶領域へのポインタ
-*/
-template <class T, class B> inline
-Array<T, B>::operator const_pointer() const
-{
-    return super::ptr();
-}
-
 //! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
 /*!
   \param i			要素を指定するindex
@@ -937,7 +909,7 @@ Array<T, B>::operator [](u_int i)
     if (i < 0 || u_int(i) >= size())
 	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
 #endif
-    return super::ptr()[i];
+    return ptr()[i];
 }
 
 //! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
@@ -953,7 +925,7 @@ Array<T, B>::operator [](u_int i) const
     if (i < 0 || u_int(i) >= size())
 	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
 #endif
-    return super::ptr()[i];
+    return ptr()[i];
 }
 #if 0
 template <class T, class B> inline const typename Array<T, B>::element_type&
@@ -1051,7 +1023,7 @@ Array<T, B>::operator !=(const Array<T2, B2>& a) const
 template <class T, class B> inline std::istream&
 Array<T, B>::restore(std::istream& in)
 {
-    in.read((char*)pointer(*this), sizeof(value_type) * size());
+    in.read((char*)ptr(), sizeof(value_type) * size());
     return in;
 }
 
@@ -1063,7 +1035,7 @@ Array<T, B>::restore(std::istream& in)
 template <class T, class B> inline std::ostream&
 Array<T, B>::save(std::ostream& out) const
 {
-    out.write((const char*)const_pointer(*this), sizeof(T) * size());
+    out.write((const char*)ptr(), sizeof(value_type) * size());
     return out;
 }
 
@@ -1143,9 +1115,9 @@ class Array2 : public Array<T, R>
   //! 成分の型    
     typedef typename super::element_type		element_type;
   //! 成分へのポインタ    
-    typedef element_type*				pointer;
+    typedef typename buf_type::pointer			pointer;
   //! 定数成分へのポインタ    
-    typedef const element_type*				const_pointer;
+    typedef typename buf_type::const_pointer		const_pointer;
   //! ポインタ間の差    
     typedef std::ptrdiff_t				difference_type;
 
@@ -1171,8 +1143,8 @@ class Array2 : public Array<T, R>
     using		super::size;
     using		super::dim;
     
-			operator pointer()				;
-			operator const_pointer()		const	;
+    pointer		ptr()						;
+    const_pointer	ptr()					const	;
     u_int		nrow()					const	;
     u_int		ncol()					const	;
     u_int		stride()				const	;
@@ -1320,8 +1292,8 @@ Array2<T, B, R>::operator =(const element_type& c)
 /*!
   \return	内部記憶領域へのポインタ
 */
-template <class T, class B, class R> inline
-Array2<T, B, R>::operator pointer()
+template <class T, class B, class R> inline typename Array2<T, B, R>::pointer
+Array2<T, B, R>::ptr()
 {
     return _buf.ptr();
 }
@@ -1330,8 +1302,9 @@ Array2<T, B, R>::operator pointer()
 /*!
   \return	内部記憶領域へのポインタ
 */
-template <class T, class B, class R> inline
-Array2<T, B, R>::operator const_pointer() const
+template <class T, class B, class R>
+inline typename Array2<T, B, R>::const_pointer
+Array2<T, B, R>::ptr() const
 {
     return _buf.ptr();
 }
@@ -1363,8 +1336,7 @@ Array2<T, B, R>::ncol() const
 template <class T, class B, class R> inline u_int
 Array2<T, B, R>::stride() const
 {
-    return (nrow() > 1 ? const_pointer((*this)[1]) - const_pointer((*this)[0])
-		       : _ncol);
+    return (nrow() > 1 ? (*this)[1].ptr() - (*this)[0].ptr() : _ncol);
 }
 
 //! 配列のサイズを変更する．
