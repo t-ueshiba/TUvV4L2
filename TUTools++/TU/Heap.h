@@ -148,7 +148,7 @@ Heap<T, Cmp>::Heap(u_int d, const Cmp& cmp)
 */
 template <class T, class Cmp>
 Heap<T, Cmp>::Heap(Array<T>& a, const Cmp& cmp)
-    :_array((T*)a, a.size()), _n(a.size()), _cmp(cmp)
+    :_array(a.ptr(), a.size()), _n(a.size()), _cmp(cmp)
 {
     for (u_int i = _n / 2; i > 0; )
 	downheap(--i);

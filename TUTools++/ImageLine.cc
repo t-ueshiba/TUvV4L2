@@ -37,7 +37,7 @@ namespace TU
 const YUV444*
 ImageLine<YUV422>::fill(const YUV444* src)
 {
-    register YUV422* dst = *this;
+    register YUV422* dst = ptr();
     for (register int n = size(); n > 0; n -= 2)
     {
 	dst->x = src->u;
@@ -55,7 +55,7 @@ ImageLine<YUV422>::fill(const YUV444* src)
 const YUV411*
 ImageLine<YUV422>::fill(const YUV411* src)
 {
-    register YUV422* dst = *this;
+    register YUV422* dst = ptr();
     for (register int n = size(); n > 0; n -= 4)
     {
 	dst->x = src[0].x;
@@ -81,7 +81,7 @@ ImageLine<YUV422>::fill(const YUV411* src)
 const YUV444*
 ImageLine<YUYV422>::fill(const YUV444* src)
 {
-    register YUYV422* dst = *this;
+    register YUYV422* dst = ptr();
     for (register int n = size(); n > 0; n -= 2)
     {
 	dst->y = src->y;
@@ -99,7 +99,7 @@ ImageLine<YUYV422>::fill(const YUV444* src)
 const YUV411*
 ImageLine<YUYV422>::fill(const YUV411* src)
 {
-    register YUYV422* dst = *this;
+    register YUYV422* dst = ptr();
     for (register int n = size(); n > 0; n -= 4)
     {
 	dst->y = src[0].y0;
@@ -125,7 +125,7 @@ ImageLine<YUYV422>::fill(const YUV411* src)
 const YUV444*
 ImageLine<YUV411>::fill(const YUV444* src)
 {
-    register YUV411* dst = *this;
+    register YUV411* dst = ptr();
     for (register int n = size(); n > 0; n -= 2)
     {
 	dst->x  = src[0].u;
@@ -144,7 +144,7 @@ ImageLine<YUV411>::fill(const YUV444* src)
 const YUV422*
 ImageLine<YUV411>::fill(const YUV422* src)
 {
-    register YUV411* dst = *this;
+    register YUV411* dst = ptr();
     for (register int n = size(); n > 0; n -= 2)
     {
 	dst->x  = src[0].x;
@@ -163,7 +163,7 @@ ImageLine<YUV411>::fill(const YUV422* src)
 const YUYV422*
 ImageLine<YUV411>::fill(const YUYV422* src)
 {
-    register YUV411* dst = *this;
+    register YUV411* dst = ptr();
     for (register int n = size(); n > 0; n -= 2)
     {
 	dst->x  = src[0].x;

@@ -109,7 +109,7 @@ CorrectIntensity::operator()(Image<T>& image, u_int vs, u_int ve) const
     
     for (u_int v = vs; v < ve; ++v)
     {
-	T*		p = image[v];
+	T*		p = image[v].ptr();
 	T* const	q = p + image.width();
 #if defined(SSE)
 	using namespace	mm;
