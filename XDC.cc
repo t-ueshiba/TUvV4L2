@@ -116,7 +116,7 @@ XDC::fillBuff(const Image<S>& image)
     {
 	for (u_int v = 0; v < image.height(); ++v)
 	{
-	    const S*	p = image[v];
+	    const S*	p = image[v].ptr();
 	    T*		q = (T*)(buff + v * bytesPerLine);
 	    for (register int u = 0; u < image.width(); ++u)
 		*q++ = _colormap.getUnderlayPixel(p[uu<S>(u)], u, v);
@@ -129,7 +129,7 @@ XDC::fillBuff(const Image<S>& image)
 	    for (int vs = -1, vdp = 0, vd = 0; vd < buffHeight; ++vd)
 		if ((vs+1)*buffHeight <= vd*image.height())
 		{
-		    const S*	p = image[++vs];
+		    const S*	p = image[++vs].ptr();
 		    T*		q = (T*)(buff + vd * bytesPerLine);
 		    for (int us = -1, ud = 0; ud < buffWidth; )
 		    {
@@ -149,7 +149,7 @@ XDC::fillBuff(const Image<S>& image)
 	    for (int vs = 0, vd = 0; vd < buffHeight; ++vs)
 		if (vd*image.height() <= vs*buffHeight)
 		{
-		    const S*	p = image[vs];
+		    const S*	p = image[vs].ptr();
 		    T*		q = (T*)(buff + (vd++) * bytesPerLine);
 		    for (int us = 0, ud = 0; ud < buffWidth; ++us)
 			if (ud*image.width() <= us*buffWidth)
@@ -576,7 +576,7 @@ XDC::dump(std::ostream& out) const
       break;
     }
     XQueryColors(_colormap.display(), _colormap,
-		 (XColor*)xcolors, xcolors.dim());
+		 xcolors.ptr(), xcolors.dim());
 
   // Convert XColor entries to XWDColor format and save them.
     for (int i = 0; i < xcolors.dim(); ++i)
@@ -660,7 +660,7 @@ XDC::allocateXImage(int buffWidth, int buffHeight)
     if (_ximage == 0)
 	throw std::runtime_error("TU::v::XDC::allocateXImage(): XCreateImage failed!!");
     _buff.resize(_ximage->bytes_per_line * _ximage->height);
-    _ximage->data = (char*)_buff;
+    _ximage->data = _buff.ptr();
 }
 
 void

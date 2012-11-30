@@ -154,7 +154,7 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
       // Allocate private color cells and planes.
 	u_long	planes[8*sizeof(u_long)];
 	if (!XAllocColorCells(_display, _colormap, False, planes, overlayDepth,
-			      _pixels[0], _pixels.ncol()))
+			      _pixels[0].ptr(), _pixels.ncol()))
 	{
 	    throw runtime_error("TU::v::Colormap::Colormap(): failed to allocate private colors.");
 	}
@@ -191,7 +191,7 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
 
 Colormap::~Colormap()
 {
-    XFreeColors(_display, _colormap, _pixels[0], _pixels.ncol(),
+    XFreeColors(_display, _colormap, _pixels[0].ptr(), _pixels.ncol(),
 		_overlayPlanes);
     XFreeColormap(_display, _colormap);
 }
