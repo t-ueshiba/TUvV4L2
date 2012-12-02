@@ -201,6 +201,8 @@ class Vector : public Array<T, B>
     Vector&		operator =(const Vector<T2, B2>& v)		;
     using		super::begin;
     using		super::end;
+    using		super::rbegin;
+    using		super::rend;
     using		super::size;
     using		super::ptr;
     using		super::check_size;
@@ -602,6 +604,8 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef typename super::const_pointer		const_pointer;
     typedef typename super::iterator			iterator;
     typedef typename super::const_iterator		const_iterator;
+    typedef typename super::reverse_iterator		reverse_iterator;
+    typedef typename super::const_reverse_iterator	const_reverse_iterator;
   //! 成分の型が等しい3次元ベクトルの型
     typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
   //! 成分の型が等しい4次元ベクトルの型
@@ -622,6 +626,8 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix&		operator =(const Matrix<T2, B2, R2>& m)		;
     using		super::begin;
     using		super::end;
+    using		super::rbegin;
+    using		super::rend;
     using		super::size;
     using		super::nrow;
     using		super::ncol;
