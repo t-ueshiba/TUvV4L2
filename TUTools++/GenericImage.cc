@@ -48,14 +48,14 @@ GenericImage::restoreData(std::istream& in)
     u_int	npads = type2nbytes(_typeInfo.type, true);
     if (_typeInfo.bottomToTop)
     {
-	for (u_int v = height(); v > 0; )
-	    if (!(*this)[--v].restore(in) || !in.ignore(npads))
+	for (reverse_iterator line = rbegin(); line != rend(); ++line)
+	    if (!line->restore(in) || !in.ignore(npads))
 		break;
     }
     else
     {
-	for (u_int v = 0; v < height(); )
-	    if (!(*this)[v++].restore(in) || !in.ignore(npads))
+	for (iterator line = begin(); line != end(); ++line)
+	    if (!line->restore(in) || !in.ignore(npads))
 		break;
     }
 
@@ -82,14 +82,14 @@ GenericImage::saveData(std::ostream& out) const
 
     if (_typeInfo.bottomToTop)
     {
-	for (u_int v = height(); v > 0; )
-	    if (!(*this)[--v].save(out) || !pad.save(out))
+	for (const_reverse_iterator line = rbegin(); line != rend(); ++line)
+	    if (!line->save(out) || !pad.save(out))
 		break;
     }
     else
     {
-	for (u_int v = 0; v < height(); )
-	    if (!(*this)[v++].save(out) || !pad.save(out))
+	for (const_iterator line = begin(); line != end(); ++line)
+	    if (!line->save(out) || !pad.save(out))
 		break;
     }
     

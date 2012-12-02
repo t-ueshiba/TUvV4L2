@@ -343,9 +343,9 @@ operator <<(std::ostream& out, const YUYV422& yuv)
 struct YUV411
 {
     YUV411(u_char yy0=0, u_char yy1=0, u_char xx=128)
-			:x(xx), y0(yy0), y1(yy1)		{}
+			:x(xx), y0(yy0), y1(yy1)			{}
     template <class T>
-    YUV411(const T& p)	:x(128), y0(u_char(p)), y1(u_char(p))	{}
+    YUV411(const T& p)	:x(128), y0(u_char(p)), y1(u_char(*(&p+1)))	{}
 
     bool	operator ==(const YUV411& p)	const	{return (x  == p.x  &&
 								 y0 == p.y0 &&
@@ -564,7 +564,20 @@ template <class T>
 class ImageLine : public Array<T>
 {
   private:
-    typedef Array<T>						super;
+    typedef Array<T>					super;
+
+  public:
+    typedef typename super::element_type		element_type;
+    typedef typename super::value_type			value_type;
+    typedef typename super::difference_type		difference_type;
+    typedef typename super::reference			reference;
+    typedef typename super::const_reference		const_reference;
+    typedef typename super::pointer			pointer;
+    typedef typename super::const_pointer		const_pointer;
+    typedef typename super::iterator			iterator;
+    typedef typename super::const_iterator		const_iterator;
+    typedef typename super::reverse_iterator		reverse_iterator;
+    typedef typename super::const_reverse_iterator	const_reverse_iterator;
     
   public:
   //! 指定した画素数のスキャンラインを生成する．
@@ -602,6 +615,10 @@ class ImageLine : public Array<T>
     ImageLine&		operator =(const T& c)		{super::operator =(c);
 							 return *this;}
 
+    using		super::begin;
+    using		super::end;
+    using		super::rbegin;
+    using		super::rend;
     using		super::size;
     using		super::ptr;
 
@@ -699,8 +716,7 @@ ImageLine<T>::at(S uf) const
 template <class T> const YUV422*
 ImageLine<T>::fill(const YUV422* src)
 {
-    register T* dst = ptr();
-    for (register u_int u = 0; u < size(); u += 2)
+    for (iterator dst = begin(); dst < end() - 1; )
     {
 	*dst++ = fromYUV<T>(src[0].y, src[0].x, src[1].x);
 	*dst++ = fromYUV<T>(src[1].y, src[0].x, src[1].x);
@@ -717,8 +733,7 @@ ImageLine<T>::fill(const YUV422* src)
 template <class T> const YUYV422*
 ImageLine<T>::fill(const YUYV422* src)
 {
-    register T* dst = ptr();
-    for (register u_int u = 0; u < size(); u += 2)
+    for (iterator dst = begin(); dst < end() - 1; )
     {
 	*dst++ = fromYUV<T>(src[0].y, src[0].x, src[1].x);
 	*dst++ = fromYUV<T>(src[1].y, src[0].x, src[1].x);
@@ -735,8 +750,7 @@ ImageLine<T>::fill(const YUYV422* src)
 template <class T> const YUV411*
 ImageLine<T>::fill(const YUV411* src)
 {
-    register T*  dst = ptr();
-    for (register u_int u = 0; u < size(); u += 4)
+    for (iterator dst = begin(); dst < end() - 3; )
     {
 	*dst++ = fromYUV<T>(src[0].y0, src[0].x, src[1].x);
 	*dst++ = fromYUV<T>(src[0].y1, src[0].x, src[1].x);
@@ -755,8 +769,7 @@ ImageLine<T>::fill(const YUV411* src)
 template <class T> template <class S> const S*
 ImageLine<T>::fill(const S* src)
 {
-    T* dst = ptr();
-    for (u_int n = size() + 1; --n; )
+    for (iterator dst = begin(); dst != end(); )
 	*dst++ = T(*src++);
     return src;
 }
@@ -770,8 +783,7 @@ ImageLine<T>::fill(const S* src)
 template <class T> template <class S, class L> const S*
 ImageLine<T>::lookup(const S* src, const L* tbl)
 {
-    T* dst = ptr();
-    for (u_int n = size() + 1; --n; )
+    for (iterator dst = begin(); dst != end(); )
 	*dst++ = T(*(tbl + *src++));
     return src;
 }
@@ -823,11 +835,11 @@ template <>
 class ImageLine<YUV422> : public Array<YUV422>
 {
   private:
-    typedef Array<YUV422>					super;
-    
+    typedef Array<YUV422>			super;
+
   public:
     explicit ImageLine(u_int d=0)
-	:super(d), _lmost(0), _rmost(d)				{*this = 0;}
+	:super(d), _lmost(0), _rmost(d)				{}
     ImageLine(YUV422* p, u_int d)
 	:super(p, d), _lmost(0), _rmost(d)			{}
     ImageLine(ImageLine<YUV422>& l, u_int u, u_int d)
@@ -836,6 +848,7 @@ class ImageLine<YUV422> : public Array<YUV422>
     ImageLine		operator ()(u_int u, u_int d)		;
     ImageLine&		operator =(YUV422 c)		{super::operator =(c);
 							 return *this;}
+
     const YUV444*	fill(const YUV444* src)		;
     const YUV422*	fill(const YUV422* src)		;
     const YUV411*	fill(const YUV411* src)		;
@@ -881,8 +894,7 @@ ImageLine<YUV422>::fill(const YUV422* src)
 template <class S> const S*
 ImageLine<YUV422>::fill(const S* src)
 {
-    YUV422* dst = ptr();
-    for (u_int n = size() + 1; --n; )
+    for (iterator dst = begin(); dst < end(); )
 	*dst++ = YUV422(*src++);
     return src;
 }
@@ -890,8 +902,7 @@ ImageLine<YUV422>::fill(const S* src)
 template <class S, class L> const S*
 ImageLine<YUV422>::lookup(const S* src, const L* tbl)
 {
-    YUV422* dst = ptr();
-    for (u_int n = size() + 1; --n; )
+    for (iterator dst = begin(); dst < end(); )
 	*dst++ = YUV422(*(tbl + *src++));
     return src;
 }
@@ -916,11 +927,11 @@ template <>
 class ImageLine<YUYV422> : public Array<YUYV422>
 {
   private:
-    typedef Array<YUYV422>					super;
-    
+    typedef Array<YUYV422>			super;
+
   public:
     explicit ImageLine(u_int d=0)
-	:super(d), _lmost(0), _rmost(d)				{*this = 0;}
+	:super(d), _lmost(0), _rmost(d)				{}
     ImageLine(YUYV422* p, u_int d)
 	:super(p, d), _lmost(0), _rmost(d)			{}
     ImageLine(ImageLine<YUYV422>& l, u_int u, u_int d)
@@ -929,6 +940,7 @@ class ImageLine<YUYV422> : public Array<YUYV422>
     ImageLine		operator ()(u_int u, u_int d)		;
     ImageLine&		operator =(YUYV422 c)		{super::operator =(c);
 							 return *this;}
+
     const YUV444*	fill(const YUV444* src)		;
     const YUYV422*	fill(const YUYV422* src)	;
     const YUV411*	fill(const YUV411* src)		;
@@ -944,7 +956,7 @@ class ImageLine<YUYV422> : public Array<YUYV422>
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
 	
-    bool		resize(u_int d)		;
+    bool		resize(u_int d)			;
     void		resize(YUYV422* p, u_int d)	;
 
   private:
@@ -974,8 +986,7 @@ ImageLine<YUYV422>::fill(const YUYV422* src)
 template <class S> const S*
 ImageLine<YUYV422>::fill(const S* src)
 {
-    YUYV422* dst = ptr();
-    for (u_int n = size() + 1; --n; )
+    for (iterator dst = begin(); dst < end(); )
 	*dst++ = YUYV422(*src++);
     return src;
 }
@@ -983,8 +994,7 @@ ImageLine<YUYV422>::fill(const S* src)
 template <class S, class L> const S*
 ImageLine<YUYV422>::lookup(const S* src, const L* tbl)
 {
-    YUYV422* dst = ptr();
-    for (u_int n = size() + 1; --n; )
+    for (iterator dst = begin(); dst < end(); )
 	*dst++ = YUYV422(*(tbl + *src++));
     return src;
 }
@@ -1009,19 +1019,20 @@ template <>
 class ImageLine<YUV411> : public Array<YUV411>
 {
   private:
-    typedef Array<YUV411>					super;
-    
+    typedef Array<YUV411>			super;
+
   public:
     explicit ImageLine(u_int d=0)
-	:super(d), _lmost(0), _rmost(d)				{*this = 0;}
+	:super(d/2), _lmost(0), _rmost(d)			{}
     ImageLine(YUV411* p, u_int d)
-	:super(p, d), _lmost(0), _rmost(d)			{}
+	:super(p, d/2), _lmost(0), _rmost(d)			{}
     ImageLine(ImageLine<YUV411>& l, u_int u, u_int d)
-	:super(l, u, d), _lmost(0), _rmost(d)			{}
+	:super(l, u/2, d/2), _lmost(0), _rmost(d)		{}
     const ImageLine	operator ()(u_int u, u_int d)	const	;
     ImageLine		operator ()(u_int u, u_int d)		;
     ImageLine&		operator =(YUV411 c)		{super::operator =(c);
 							 return *this;}
+    
     const YUV444*	fill(const YUV444* src)		;
     const YUV422*	fill(const YUV422* src)		;
     const YUYV422*	fill(const YUYV422* src)	;
@@ -1038,7 +1049,7 @@ class ImageLine<YUV411> : public Array<YUV411>
     bool		valid(int u)		const	{return (u >= _lmost &&
 								 u <  _rmost);}
 	
-    bool		resize(u_int d)		;
+    bool		resize(u_int d)			;
     void		resize(YUV411* p, u_int d)	;
 
   private:
@@ -1068,18 +1079,22 @@ ImageLine<YUV411>::fill(const YUV411* src)
 template <class S> const S*
 ImageLine<YUV411>::fill(const S* src)
 {
-    YUV411* dst = ptr();
-    for (u_int n = size() + 1; --n; )
-	*dst++ = YUV411(*src++);
+    for (iterator dst = begin(); dst < end(); )
+    {
+	*dst++ = YUV411(*src);
+	src += 2;
+    }
     return src;
 }
 
 template <class S, class L> const S*
 ImageLine<YUV411>::lookup(const S* src, const L* tbl)
 {
-    YUV411* dst = ptr();
-    for (u_int n = size() + 1; --n; )
-	*dst++ = YUV422(*(tbl + *src++));
+    for (iterator dst = begin(); dst < end(); )
+    {
+	*dst++ = YUV411(*(tbl + *src));
+	src += 2;
+    }
     return src;
 }
 
@@ -1088,7 +1103,7 @@ ImageLine<YUV411>::resize(u_int d)
 {
     _lmost = 0;
     _rmost = d;
-    return Array<YUV411>::resize(d);
+    return super::resize(d/2);
 }
 
 inline void
@@ -1096,7 +1111,7 @@ ImageLine<YUV411>::resize(YUV411* p, u_int d)
 {
     _lmost = 0;
     _rmost = d;
-    Array<YUV411>::resize(p, d);
+    super::resize(p, d/2);
 }
 
 /************************************************************************
@@ -1111,8 +1126,21 @@ template <class T, class B=Buf<T> >
 class Image : public Array2<ImageLine<T>, B>, public ImageBase
 {
   private:
-    typedef Array2<ImageLine<T>, B>				super;
+    typedef Array2<ImageLine<T>, B>			super;
     
+  public:
+    typedef typename super::element_type		element_type;
+    typedef typename super::value_type			value_type;
+    typedef typename super::difference_type		difference_type;
+    typedef typename super::reference			reference;
+    typedef typename super::const_reference		const_reference;
+    typedef typename super::pointer			pointer;
+    typedef typename super::const_pointer		const_pointer;
+    typedef typename super::iterator			iterator;
+    typedef typename super::const_iterator		const_iterator;
+    typedef typename super::reverse_iterator		reverse_iterator;
+    typedef typename super::const_reverse_iterator	const_reverse_iterator;
+
   public:
   //! 幅と高さを指定して画像を生成する．
   /*!
@@ -1179,8 +1207,12 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     Image&	operator =(const T& c)		{super::operator =(c);
 						 return *this;}
 
-    using		super::ptr;
-    
+    using	super::begin;
+    using	super::end;
+    using	super::rbegin;
+    using	super::rend;
+    using	super::ptr;
+
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out,
 			     Type type=DEFAULT)			const	;
@@ -1398,20 +1430,20 @@ Image<T, B>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
     ImageLine<S>	buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (u_int v = height(); v > 0; )
+	for (reverse_iterator line = rbegin(); line != rend(); ++line)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    (*this)[--v].fill(buf.ptr());
+	    line->fill(buf.ptr());
 	}
     }
     else
     {
-	for (u_int v = 0; v < height(); )
+	for (iterator line = begin(); line != end(); ++line)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    (*this)[v++].fill(buf.ptr());
+	    line->fill(buf.ptr());
 	}
     }
 
@@ -1428,20 +1460,20 @@ Image<T, B>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
     ImageLine<S>	buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (u_int v = height(); v > 0; )
+	for (reverse_iterator line = rbegin(); line != rend(); ++line)    
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    (*this)[--v].lookup(buf.ptr(), colormap.ptr());
+	    line->lookup(buf.ptr(), colormap.ptr());
 	}
     }
     else
     {
-	for (u_int v = 0; v < height(); )
+	for (iterator line = begin(); line != end(); ++line)    
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    (*this)[v++].lookup(buf.ptr(), colormap.ptr());
+	    line->lookup(buf.ptr(), colormap.ptr());
 	}
     }
 
@@ -1464,18 +1496,18 @@ Image<T, B>::saveRows(std::ostream& out, Type type) const
     ImageLine<D>	buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (u_int v = height(); v > 0; )
+	for (const_reverse_iterator line = rbegin(); line != rend(); ++line)
 	{
-	    buf.fill((*this)[--v].ptr());
+	    buf.fill(line->ptr());
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}
     }
     else
     {
-	for (u_int v = 0; v < height(); )
+	for (const_iterator line = begin(); line != end(); ++line)
 	{
-	    buf.fill((*this)[v++].ptr());
+	    buf.fill(line->ptr());
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}
@@ -1568,42 +1600,10 @@ Image<T, B>::_resize(u_int h, u_int w, const TypeInfo&)
     Image<T, B>::resize(h, w);		// Don't call ImageBase::resize!
 }
 
-template <> inline
-Image<YUV411, Buf<YUV411> >::Image(u_int w, u_int h)
-    :Array2<ImageLine<YUV411>, Buf<YUV411> >(h, w/2), ImageBase()
-{
-    *this = 0;
-}
-
-template <> inline
-Image<YUV411, Buf<YUV411> >::Image(YUV411* p, u_int w, u_int h)
-    :Array2<ImageLine<YUV411>, Buf<YUV411> >(p, h, w/2), ImageBase()
-{
-}
-
-template <> template <class B2> inline
-Image<YUV411, Buf<YUV411> >::Image(Image<YUV411, B2>& i,
-				   u_int u, u_int v, u_int w, u_int h)
-    :Array2<ImageLine<YUV411>, Buf<YUV411> >(i, v, u/2, h, w/2), ImageBase(i)
-{
-}
-
 template <> inline u_int
-Image<YUV411, Buf<YUV411> >::width() const
+Buf<YUV411>::stride(u_int siz)
 {
-    return 2 * ncol();
-}
-
-template <> inline void
-Image<YUV411, Buf<YUV411> >::resize(u_int h, u_int w)
-{
-    Array2<ImageLine<YUV411>, Buf<YUV411> >::resize(h, w/2);
-}
-
-template <> inline void
-Image<YUV411, Buf<YUV411> >::resize(YUV411* p, u_int h, u_int w)
-{
-    Array2<ImageLine<YUV411>, Buf<YUV411> >::resize(p, h, w/2);
+    return siz / 2;
 }
 
 /************************************************************************
