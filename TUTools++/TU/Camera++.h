@@ -483,6 +483,8 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
     IntrinsicWithFocalLength(element_type k=1,
 			     const point2_type& u0=point2_type(0, 0),
 			     element_type a=1, element_type s=0)	;
+
+    using		super::u;
     
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
@@ -573,6 +575,8 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
 				     const point2_type& u0=point2_type(0, 0),
 				     element_type a=1, element_type s=0);
 
+    using		super::u;
+    
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
@@ -656,6 +660,8 @@ class Intrinsic : public IntrinsicBase<T>
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
+    using		super::u;
+    
   protected:
     point2_type		u(const point2_type& x,
 			  matrix_type* J, matrix_type* H)	const	;
@@ -746,8 +752,8 @@ class IntrinsicWithDistortion : public I
     point2_type		u(const point2_type& x)			const	;
     point2_type		xd(const point2_type& x)		const	;
     point2_type		xFromU(const point2_type& u)		const	;
-    element_type		d1()				const	;
-    element_type		d2()				const	;
+    element_type	d1()					const	;
+    element_type	d2()					const	;
     void		setDistortion(element_type d1, element_type d2)	;
     
     static u_int	dofIntrinsic()					;
@@ -764,8 +770,8 @@ class IntrinsicWithDistortion : public I
     vector_type		DDu(const point2_type& x)		const	;
     
   private:
-    element_type		_d1;
-    element_type		_d2;
+    element_type	_d1;
+    element_type	_d2;
 };
 
 //! 内部パラメータをセットして初期化する．
