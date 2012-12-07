@@ -35,55 +35,153 @@
 #define	__TUImagePP_h
 
 #include <string.h>
+#include <boost/operators.hpp>
 #include "TU/Geometry++.h"
 
 namespace TU
 {
+namespace detail
+{
 /************************************************************************
-*  struct RGB, BGR, RGBA, ABGR, ARGB & BGRA				*
+*  struct RGB, BGR, RGBA, ARGB, ABGR, BGRA				*
 ************************************************************************/
-struct BGR;
-struct RGBA;
-struct ABGR;
-struct ARGB;
-struct BGRA;
-struct YUV444;
-
-//! Red, Green, Blue（各8bit）の順で並んだカラー画素
 struct RGB
 {
-    RGB()					:r(0),  g(0),  b(0)	{}
     RGB(u_char rr, u_char gg, u_char bb)	:r(rr), g(gg), b(bb)	{}
-    RGB(const BGR& p)							;
-    RGB(const RGBA& p)							;
-    RGB(const ABGR& p)							;
-    RGB(const ARGB& p)							;
-    RGB(const BGRA& p)							;
-    RGB(const YUV444& p)						;
-    template <class T>
-    RGB(const T& p)	:r(u_char(p)), g(u_char(p)), b(u_char(p))	{}
-
-		operator u_char()	const	{return u_char(double(*this));}
-		operator s_char()	const	{return s_char(double(*this));}
-		operator short()	const	{return short(double(*this));}
-		operator int()		const	{return int(double(*this));}
-		operator float()	const	{return float(double(*this));}
-		operator double()	const	{return 0.3*r+0.59*g+0.11*b;}
     
-    RGB&	operator +=(const RGB& p)	{r += p.r; g += p.g; b += p.b;
-						 return *this;}
-    RGB&	operator -=(const RGB& p)	{r -= p.r; g -= p.g; b -= p.b;
-						 return *this;}
-    template <class T>
-    RGB&	operator *=(T c)		{r *= c; g *= c; b *= c;
-						 return *this;}
-    bool	operator ==(const RGB& p) const	{return (r == p.r &&
-							 g == p.g &&
-							 b == p.b);}
-    bool	operator !=(const RGB& p) const	{return !(*this == p);}
-    
-    u_char	r, g, b;
+    u_char r, g, b;
 };
+
+struct BGR
+{
+    BGR(u_char rr, u_char gg, u_char bb)	:b(bb), g(gg), r(rr)	{}
+    
+    u_char b, g, r;
+};
+
+struct RGBA
+{
+    RGBA(u_char rr, u_char gg, u_char bb, u_char aa=255)
+	:r(rr), g(gg), b(bb), a(aa)					{}
+    
+    u_char r, g, b, a;
+};
+
+struct ABGR
+{
+    ABGR(u_char rr, u_char gg, u_char bb, u_char aa=255)
+	:a(aa), b(bb), g(gg), r(rr)					{}
+    
+    u_char a, b, g, r;
+};
+
+struct ARGB
+{
+    ARGB(u_char rr, u_char gg, u_char bb, u_char aa=255)
+	:a(aa), r(rr), g(gg), b(bb)					{}
+    
+    u_char a, r, g, b;
+};
+
+struct BGRA
+{
+    BGRA(u_char rr, u_char gg, u_char bb, u_char aa=255)
+	:b(bb), g(gg), r(rr), a(aa)					{}
+    
+    u_char b, g, r, a;
+};
+}
+
+/************************************************************************
+*  struct RGBB<E>							*
+************************************************************************/
+struct YUV444;
+
+template <class E>
+struct RGB_ : public E, boost::additive<RGB_<E>,
+			boost::multiplicative<RGB_<E>, float,
+			boost::equality_comparable<RGB_<E> > > >
+{
+    typedef u_char	element_type;
+
+    RGB_(u_char rr=0, u_char gg=0, u_char bb=0)	     :E(rr, gg, bb)	{}
+    RGB_(u_char rr, u_char gg, u_char bb, u_char aa) :E(rr, gg, bb, aa)	{}
+    RGB_(const RGB_<detail::RGB>& p)		     :E(p.r, p.g, p.b)	{}
+    RGB_(const RGB_<detail::BGR>& p)		     :E(p.r, p.g, p.b)	{}
+    RGB_(const YUV444& p)						;
+    template <class E1>
+    RGB_(const RGB_<E1>& p)	:E(p.r, p.g, p.b, p.a)			{}
+    template <class T>
+    RGB_(const T& p)		:E(u_char(p), u_char(p), u_char(p))	{}
+
+    using	E::r;
+    using	E::g;
+    using	E::b;
+	   
+		operator u_char() const	{return u_char(float(*this));}
+		operator s_char() const	{return s_char(float(*this));}
+		operator short()  const	{return short(float(*this));}
+		operator int()	  const	{return int(float(*this));}
+		operator float()  const	{return 0.3f*r + 0.59f*g + 0.11f*b;}
+		operator double() const	{return double(float(*this));}
+    
+    RGB_&	operator +=(const RGB_& p)
+		{
+		    r += p.r;
+		    g += p.g;
+		    b += p.b;
+		    return *this;
+		}
+    RGB_&	operator -=(const RGB_& p)
+		{
+		    r -= p.r;
+		    g -= p.g;
+		    b -= p.b;
+		    return *this;
+		}
+    RGB_&	operator *=(float c)
+		{
+		    r *= c; g *= c; b *= c;
+		    return *this;
+		}
+    RGB_&	operator /=(float c)
+		{
+		    r /= c; g /= c; b /= c;
+		    return *this;
+		}
+    bool	operator ==(const RGB_& p) const
+		{
+		    return (r == p.r && g == p.g && b == p.b && E::a == p.a);
+		}
+};
+
+template <class E> inline std::istream&
+operator >>(std::istream& in, RGB_<E>& p)
+{
+    return in >> (u_int&)p.r >> (u_int&)p.g >> (u_int&)p.b >> (u_int&)p.a;
+}
+
+template <class E> inline std::ostream&
+operator <<(std::ostream& out, const RGB_<E>& p)
+{
+    return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b
+	       << (u_int)p.a;
+}
+
+/************************************************************************
+*  struct RGB								*
+************************************************************************/
+//! Red, Green, Blue（各8bit）の順で並んだカラー画素
+typedef RGB_<detail::RGB>	RGB;
+
+template <> template <class E1> inline
+RGB_<detail::RGB>::RGB_(const RGB_<E1>& p) :detail::RGB(p.r, p.g, p.b)	{}
+    
+template <> inline bool
+RGB_<detail::RGB>::operator ==(const RGB_& p) const
+{
+    return (r == p.r && g == p.g && b == p.b);
+}
 
 inline std::istream&
 operator >>(std::istream& in, RGB& p)
@@ -97,44 +195,20 @@ operator <<(std::ostream& out, const RGB& p)
     return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b;
 }
 
+/************************************************************************
+*  struct BGR								*
+************************************************************************/
 //! Blue, Green, Red（各8bit）の順で並んだカラー画素
-struct BGR
-{
-    BGR()					:b(0),   g(0),   r(0)	{}
-    BGR(u_char rr, u_char gg, u_char bb)	:b(bb),  g(gg),  r(rr)	{}
-    BGR(const RGB& p)				:b(p.b), g(p.g), r(p.r)	{}
-    BGR(const RGBA& p)							;
-    BGR(const ABGR& p)							;
-    BGR(const ARGB& p)							;
-    BGR(const BGRA& p)							;
-    BGR(const YUV444& p)						;
-    template <class T>
-    BGR(const T& c)	:b(u_char(c)), g(u_char(c)), r(u_char(c))	{}
+typedef RGB_<detail::BGR>	BGR;
 
-		operator u_char()	const	{return u_char(double(*this));}
-		operator s_char()	const	{return s_char(double(*this));}
-		operator short()	const	{return short(double(*this));}
-		operator int()		const	{return int(double(*this));}
-		operator float()	const	{return float(double(*this));}
-		operator double()	const	{return 0.3*r+0.59*g+0.11*b;}
-
-    BGR&	operator +=(const BGR& p)	{r += p.r; g += p.g; b += p.b;
-						 return *this;}
-    BGR&	operator -=(const BGR& p)	{r -= p.r; g -= p.g; b -= p.b;
-						 return *this;}
-    template <class T>
-    BGR&	operator *=(T c)		{r *= c; g *= c; b *= c;
-						 return *this;}
-    bool	operator ==(const BGR& p) const	{return (r == p.r &&
-							 g == p.g &&
-							 b == p.b);}
-    bool	operator !=(const BGR& p) const	{return !(*this != p);}
+template <> template <class E1> inline
+RGB_<detail::BGR>::RGB_(const RGB_<E1>& p) :detail::BGR(p.r, p.g, p.b)	{}
     
-    u_char	b, g, r;
-};
-
-inline
-RGB::RGB(const BGR& p)	:r(p.r), g(p.g), b(p.b)	{}
+template <> inline bool
+RGB_<detail::BGR>::operator ==(const RGB_& p) const
+{
+    return (r == p.r && g == p.g && b == p.b);
+}
 
 inline std::istream&
 operator >>(std::istream& in, BGR& p)
@@ -148,90 +222,17 @@ operator <<(std::ostream& out, const BGR& p)
     return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b;
 }
 
-//! カラー画素のalphaチャンネル
-struct Alpha
-{
-    Alpha(u_char aa=255)	:a(aa)			{}
-
-    int		operator ==(const Alpha& p) const	{return a == p.a;}
-    int		operator !=(const Alpha& p) const	{return !(*this == p);}
-    
-    u_char	a;
-};
-
+/************************************************************************
+*  struct RGBA, ABGR, ARGB, BGRA					*
+************************************************************************/
 //! Red, Green, Blue, Alpha（各8bit）の順で並んだカラー画素
-struct RGBA : public RGB, public Alpha
-{
-    RGBA()		:RGB(),        Alpha()		{}
-    RGBA(u_char r, u_char g, u_char b, u_char a=255)
-			:RGB(r, g, b), Alpha(a)		{}
-    template <class T>
-    RGBA(const T& p)	:RGB(p),       Alpha()		{}
-
-    bool	operator ==(const RGBA& p) const
-		{return (Alpha::operator ==(p) && RGB::operator ==(p));}
-    bool	operator !=(const RGBA& p)	const	{return !(*this != p);}
-};
-
+typedef RGB_<detail::RGBA>	RGBA;
 //! Alpha, Blue, Green, Red（各8bit）の順で並んだカラー画素
-struct ABGR : public Alpha, public BGR
-{
-    ABGR()		:Alpha(),  BGR()		{}
-    ABGR(u_char r, u_char g, u_char b, u_char a=255)
-			:Alpha(a), BGR(r, g, b)  	{}
-    template <class T>
-    ABGR(const T& p)	:Alpha(),  BGR(p)		{}
-
-    bool	operator ==(const ABGR& p) const
-		{return (Alpha::operator ==(p) && BGR::operator ==(p));}
-    bool	operator !=(const ABGR& p) const	{return !(*this != p);}
-};
-
+typedef RGB_<detail::ABGR>	ABGR;
 //! Alpha, Red, Green, Blue（各8bit）の順で並んだカラー画素
-struct ARGB : public Alpha, public RGB
-{
-    ARGB()		:Alpha(),  RGB()		{}
-    ARGB(u_char r, u_char g, u_char b, u_char a=255)
-			:Alpha(a), RGB(r, g, b)  	{}
-    template <class T>
-    ARGB(const T& p)	:Alpha(),  RGB(p)		{}
-
-    bool	operator ==(const ARGB& p) const
-		{return (Alpha::operator ==(p) && RGB::operator ==(p));}
-    bool	operator !=(const ARGB& p) const	{return !(*this != p);}
-};
-
+typedef RGB_<detail::ARGB>	ARGB;
 //! Blue, Green, Red, Alpha（各8bit）の順で並んだカラー画素
-struct BGRA : public BGR, public Alpha
-{
-    BGRA()		:BGR(), Alpha()  		{}
-    BGRA(u_char r, u_char g, u_char b, u_char a=255)
-			:BGR(r, g, b), Alpha(a)   	{}
-    template <class T>
-    BGRA(const T& p)	:BGR(p), Alpha()		{}
-
-    bool	operator ==(const BGRA& p) const
-		{return (Alpha::operator ==(p) && BGR::operator ==(p));}
-    bool	operator !=(const BGRA& p) const	{return !(*this != p);}
-};
-
-inline
-RGB::RGB(const RGBA& p)	:r(p.r), g(p.g), b(p.b)	{}
-
-inline
-RGB::RGB(const ABGR& p)	:r(p.r), g(p.g), b(p.b)	{}
-
-inline
-RGB::RGB(const BGRA& p)	:r(p.r), g(p.g), b(p.b)	{}
-
-inline
-BGR::BGR(const RGBA& p)	:r(p.r), g(p.g), b(p.b)	{}
-
-inline
-BGR::BGR(const ABGR& p)	:r(p.r), g(p.g), b(p.b)	{}
-
-inline
-BGR::BGR(const BGRA& p)	:r(p.r), g(p.g), b(p.b)	{}
+typedef RGB_<detail::BGRA>	BGRA;
 
 /************************************************************************
 *  struct YUV444, YUV422, YUYV422, YUV411				*
@@ -447,16 +448,10 @@ fromYUV<YUV444>(u_char y, u_char u, u_char v)
     return YUV444(y, u, v);
 }
 
-inline
-RGB::RGB(const YUV444& p)
+template <class E> inline
+RGB_<E>::RGB_(const YUV444& p)
+    :E(fromYUV<RGB_>(p.y, p.u, p.v))
 {
-    *this = fromYUV<RGB>(p.y, p.u, p.v);
-}
-
-inline
-BGR::BGR(const YUV444& p)
-{
-    *this = fromYUV<BGR>(p.y, p.u, p.v);
 }
 
 /************************************************************************
