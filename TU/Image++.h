@@ -104,7 +104,8 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
 {
     typedef u_char	element_type;
 
-    RGB_(u_char rr=0, u_char gg=0, u_char bb=0)	     :E(rr, gg, bb)	{}
+    RGB_()					     :E(0, 0, 0)	{}
+    RGB_(u_char rr, u_char gg, u_char bb)	     :E(rr, gg, bb)	{}
     RGB_(u_char rr, u_char gg, u_char bb, u_char aa) :E(rr, gg, bb, aa)	{}
     RGB_(const RGB_<detail::RGB>& p)		     :E(p.r, p.g, p.b)	{}
     RGB_(const RGB_<detail::BGR>& p)		     :E(p.r, p.g, p.b)	{}
