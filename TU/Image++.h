@@ -1275,7 +1275,7 @@ Image<T, B>::at(const Point2<S>& p) const
 {
     const int	v    = floor(p[1]);
     const T	out0 = (*this)[v].at(p[0]);
-    const float	dv   = p[1] - vf;
+    const float	dv   = p[1] - v;
     return (dv ? (1.0f - dv)*out0 + dv*(*this)[v+1].at(p[0]) : out0);
 }
 
