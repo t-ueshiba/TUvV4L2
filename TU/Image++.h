@@ -699,9 +699,9 @@ template <class T> template <class S> inline T
 ImageLine<T>::at(S uf) const
 {
     const int	u  = floor(uf);
-    const T*	in = &(*this)[u];
-    const S	du = uf - u;
-    return (du ? (1 - du) * *in + du * *(in + 1) : *in);
+    const T*	in = ptr() + u;
+    const float	du = uf - u;
+    return (du ? (1.0f - du) * *in + du * *(in + 1) : *in);
 }
 
 //! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
@@ -1273,10 +1273,10 @@ Image<T, B>::operator ()(u_int u, u_int v, u_int w, u_int h)
 template <class T, class B> template <class S> inline T
 Image<T, B>::at(const Point2<S>& p) const
 {
-    const int	v  = floor(p[1]);
+    const int	v    = floor(p[1]);
     const T	out0 = (*this)[v].at(p[0]);
-    const S	dv = p[1] - v;
-    return (dv ? (1 - dv)*out0 + dv*(*this)[v+1].at(p[0]) : out0);
+    const float	dv   = p[1] - vf;
+    return (dv ? (1.0f - dv)*out0 + dv*(*this)[v+1].at(p[0]) : out0);
 }
 
 //! 入力ストリームから画像を読み込む．
