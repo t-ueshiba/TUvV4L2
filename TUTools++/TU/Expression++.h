@@ -88,7 +88,7 @@ class Expression
     void	addTo(Array2<T, B, R>& a) const
 		{
 		    if ((a.size() != size()) || (a.ncol() != ncol()))
-			throw std::logic_error("Expression<E>::operator +=: mismatched size!");
+			throw std::logic_error("Expression<E>::addTo: mismatched size!");
 		    for (u_int i = 0; i < a.size(); ++i)
 		    {
 			typename Array2<T, B, R>::reference	row = a[i];
@@ -101,7 +101,7 @@ class Expression
     void	subtractFrom(Array2<T, B, R>& a) const
 		{
 		    if ((a.size() != size()) || (a.ncol() != ncol()))
-			throw std::logic_error("Expression<E>::operator -=: mismatched size!");
+			throw std::logic_error("Expression<E>::subtractFrom: mismatched size!");
 		    for (u_int i = 0; i < a.size(); ++i)
 		    {
 			typename Array2<T, B, R>::reference	row = a[i];
@@ -135,10 +135,6 @@ class UnaryOperator : public Expression<UnaryOperator<OP, E> >
     element_type	eval(u_int i, u_int j) const
 			{
 			    return _op(_entity.eval(i, j));
-			}
-			operator array_type() const
-			{
-			    return array_type(*this);
 			}
 	
   private:
@@ -210,10 +206,6 @@ class BinaryOperator : public Expression<BinaryOperator<OP, L, R> >
 			{
 			    return _op(_l.eval(i, j), _r.eval(i, j));
 			}
-			operator array_type() const
-			{
-			    return array_type(*this);
-			}
     
   private:
     const OP	_op;
@@ -243,7 +235,7 @@ template <class L, class R>
 inline BinaryOperator<std::plus<typename L::element_type>, L, R>
 operator +(const Expression<L>& l, const Expression<R>& r)
 {
-    typedef std::plus<typename L::element_type>	op_type;
+    typedef std::plus<typename L::element_type>		op_type;
 
     return BinaryOperator<op_type, L, R>(op_type(), l, r);
 }
@@ -257,6 +249,47 @@ operator -(const Expression<L>& l, const Expression<R>& r)
     return BinaryOperator<op_type, L, R>(op_type(), l, r);
 }
 
+/************************************************************************
+*  Binary operators requiring immediate evaluations of arguments	*
+************************************************************************/
+template <class ARG1, class ARG2> struct multiplies;
+
+template <class L, class R>
+typename TU::multiplies<typename L::array_type,
+			typename R::array_type>::result_type
+operator *(const Expression<L>& l, const Expression<R>& r)
+{
+    typedef TU::multiplies<typename L::array_type,
+			   typename R::array_type>	op_type;
+    
+    return op_type()(l.entity(), r.entity());
+}
+
+template <class ARG1, class ARG2> struct modulus;
+
+template <class L, class R>
+typename TU::modulus<typename L::array_type,
+		     typename R::array_type>::result_type
+operator %(const Expression<L>& l, const Expression<R>& r)
+{
+    typedef TU::modulus<typename L::array_type,
+			typename R::array_type>	op_type;
+    
+    return op_type()(l.entity(), r.entity());
+}
+
+template <class ARG1, class ARG2> struct bitxor;
+
+template <class L, class R>
+typename TU::bitxor<typename L::array_type,
+		    typename R::array_type>::result_type
+operator ^(const Expression<L>& l, const Expression<R>& r)
+{
+    typedef TU::bitxor<typename L::array_type,
+		       typename R::array_type>	op_type;
+    
+    return op_type()(l.entity(), r.entity());
+}
 
 }
 #endif	/* !__TUExpressionPP_h */
