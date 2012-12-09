@@ -301,7 +301,7 @@ IntrinsicBase<T>::Ktinv() const
     matrix33_type	mat;
     mat[0][0] = element_type(1) / _k00;
     mat[1][0] = -_k01 / (_k00 * _k);
-    mat[2][0] = -_u0[0] * mat[0][0] - _u0[1] * mat[0][1];
+    mat[2][0] = -_u0[0] * mat[0][0] - _u0[1] * mat[1][0];
     mat[1][1] = element_type(1) / _k;
     mat[2][1] = -_u0[1] / k();
     mat[2][2] = element_type(1);
