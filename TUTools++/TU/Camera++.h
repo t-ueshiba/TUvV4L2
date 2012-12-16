@@ -81,6 +81,7 @@ class IntrinsicBase
     void		setAspect(element_type a)			;
     void		setSkew(element_type s)				;
     void		setK(const matrix33_type& K)			;
+    void		setDistortion(element_type, element_type)	;
     
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
@@ -364,6 +365,15 @@ IntrinsicBase<T>::setK(const matrix33_type& K)
     setSkew(K[0][1] / K[1][1]);
 }
 
+//! 放射歪曲係数を設定する．
+/*!
+ *  実際には何もしないダミー関数
+ */
+template <class T> inline void
+IntrinsicBase<T>::setDistortion(element_type, element_type)
+{
+}
+    
 //! 可変内部パラメータの自由度を返す．
 /*!
   \return	可変内部パラメータの自由度, すなわち0
