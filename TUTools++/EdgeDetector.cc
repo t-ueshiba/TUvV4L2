@@ -162,7 +162,8 @@ EdgeDetector::strength(const Image<float>& edgeH,
 	using namespace		mm;
 	
 	const u_int		nelms = F32vec::size;
-	for (const float* const end2 = dst + 4*(out.width()/4); dst < end2; )
+	for (const float* const end2 = dst + F32vec::floor(out.width());
+	     dst < end2; )
 	{
 	    const F32vec	fH = loadu(eH), fV = loadu(eV);
 	    
@@ -174,7 +175,7 @@ EdgeDetector::strength(const Image<float>& edgeH,
 #endif
 	while (dst < end)
 	{
-	    *dst++ = sqrtf(*eH * *eH + *eV * *eV);
+	    *dst++ = std::sqrt(*eH * *eH + *eV * *eV);
 	    ++eH;
 	    ++eV;
 	}
@@ -207,16 +208,16 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
-	    const Is32vec	d0 = dir4(load(eH), load(eV));
+	    const Is32vec	d0 = dir4(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d1 = dir4(load(eH), load(eV));
+	    const Is32vec	d1 = dir4(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d2 = dir4(load(eH), load(eV));
+	    const Is32vec	d2 = dir4(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d3 = dir4(load(eH), load(eV));
+	    const Is32vec	d3 = dir4(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
 	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
@@ -258,16 +259,16 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
-	    const Is32vec	d0 = dir8(load(eH), load(eV));
+	    const Is32vec	d0 = dir8(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d1 = dir8(load(eH), load(eV));
+	    const Is32vec	d1 = dir8(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d2 = dir8(load(eH), load(eV));
+	    const Is32vec	d2 = dir8(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d3 = dir8(load(eH), load(eV));
+	    const Is32vec	d3 = dir8(loadu(eH), loadu(eV));
 	    eH += nelms;
 	    eV += nelms;
 	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));

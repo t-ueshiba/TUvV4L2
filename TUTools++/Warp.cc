@@ -356,5 +356,9 @@ Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
 template __PORT void
 Warp::warpLine(const Image<RGBA>& in, Image<RGBA>& out, u_int v) const;
 template __PORT void
+Warp::warpLine(const Image<ARGB>& in, Image<ARGB>& out, u_int v) const;
+template __PORT void
 Warp::warpLine(const Image<ABGR>& in, Image<ABGR>& out, u_int v) const;
+template __PORT void
+Warp::warpLine(const Image<BGRA>& in, Image<BGRA>& out, u_int v) const;
 }
