@@ -216,9 +216,9 @@ bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
 template <class T> void
 Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 {
-    const short		*usp  = _fracs[v].us.ptr(), *vsp = _fracs[v].vs.ptr();
-    const u_char	*dup  = _fracs[v].du.ptr(), *dvp = _fracs[v].dv.ptr();
-    T			*outp = out[v].ptr() + _fracs[v].lmost;
+    const short		*usp  = _fracs[v].us.data(), *vsp = _fracs[v].vs.data();
+    const u_char	*dup  = _fracs[v].du.data(), *dvp = _fracs[v].dv.data();
+    T			*outp = out[v].data() + _fracs[v].lmost;
     T* const		outq  = outp + _fracs[v].width();
 #if defined(SSE)
     using namespace	mm;
@@ -306,9 +306,9 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 template <> __PORT void
 Warp::warpLine(const Image<YUV444>& in, Image<YUV444>& out, u_int v) const
 {
-    const short		*usp  = _fracs[v].us.ptr(), *vsp = _fracs[v].vs.ptr();
-    const u_char	*dup  = _fracs[v].du.ptr(), *dvp = _fracs[v].dv.ptr();
-    YUV444		*outp = out[v].ptr() + _fracs[v].lmost;
+    const short		*usp  = _fracs[v].us.data(), *vsp = _fracs[v].vs.data();
+    const u_char	*dup  = _fracs[v].du.data(), *dvp = _fracs[v].dv.data();
+    YUV444		*outp = out[v].data() + _fracs[v].lmost;
     YUV444* const	outq  = outp + _fracs[v].width();
 
     while (outp < outq)
@@ -319,9 +319,9 @@ Warp::warpLine(const Image<YUV444>& in, Image<YUV444>& out, u_int v) const
 template <> __PORT void
 Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
 {
-    const short		*usp  = _fracs[v].us.ptr(), *vsp = _fracs[v].vs.ptr();
-    const u_char	*dup  = _fracs[v].du.ptr(), *dvp = _fracs[v].dv.ptr();
-    u_char		*outp = out[v].ptr() + _fracs[v].lmost;
+    const short		*usp  = _fracs[v].us.data(), *vsp = _fracs[v].vs.data();
+    const u_char	*dup  = _fracs[v].du.data(), *dvp = _fracs[v].dv.data();
+    u_char		*outp = out[v].data() + _fracs[v].lmost;
     u_char* const	outq  = outp + _fracs[v].width();
 #if defined(SSE)
     using namespace	mm;
