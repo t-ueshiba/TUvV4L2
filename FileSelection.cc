@@ -198,7 +198,7 @@ FileSelection::changeDirectory(const std::string& dirname)
 	}
 
   // Set file names in scrolling list.
-    pane().setProp(c_FileList, _filenames.ptr());
+    pane().setProp(c_FileList, _filenames.data());
 
   // Change directory.
     _dirname = dirname;
