@@ -204,7 +204,7 @@ class Vector : public Array<T, B>
     using		super::rbegin;
     using		super::rend;
     using		super::size;
-    using		super::ptr;
+    using		super::data;
     using		super::check_size;
     
     const Vector<T>	operator ()(u_int i, u_int d)		const	;
@@ -631,7 +631,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     using		super::size;
     using		super::nrow;
     using		super::ncol;
-    using		super::ptr;
+    using		super::data;
     using		super::check_size;
     
 			operator const Vector<T>()		const	;
@@ -770,7 +770,7 @@ Matrix<T, B, R>::operator =(const Matrix<T2, B2, R2>& m)
 template <class T, class B, class R> inline
 Matrix<T, B, R>::operator const Vector<T>() const
 {
-    return Vector<T>(const_cast<T*>(ptr()), nrow()*ncol());
+    return Vector<T>(const_cast<T*>(data()), nrow()*ncol());
 }
 
 //! この行列と記憶領域を共有した部分行列を生成する．

@@ -529,7 +529,9 @@ class __PORT ImageBase
   */
     void		resize(u_int h, u_int w)	{_resize(h, w,
 								 DEFAULT);}
-	
+    u_int		npixelsToBorder(u_int u, u_int v,
+					u_int dir)	const	;
+    
   private:
     TypeInfo		restorePBMHeader(std::istream& in)	;
     TypeInfo		restoreBMPHeader(std::istream& in)	;
@@ -548,6 +550,37 @@ class __PORT ImageBase
     double		d1;			//!< 放射歪曲の第1係数
     double		d2;			//!< 放射歪曲の第2係数
 };
+
+//! 指定された向きに沿った与えられた点から画像境界までの画素数を返す．
+/*!
+  \param u	始点の横座標
+  \param v	始点の縦座標
+  \param dir	8隣接方向
+  \return	画像境界までの画素数(始点を含む)
+*/
+inline u_int
+ImageBase::npixelsToBorder(u_int u, u_int v, u_int dir) const
+{
+    switch (dir % 8)
+    {
+      case 0:
+	return width() - u;
+      case 1:
+	return std::min(width() - u, height() - v);
+      case 2:
+	return height() - v;
+      case 3:
+	return std::min(u + 1, height() - v);
+      case 4:
+	return u;
+      case 5:
+	return std::min(u + 1, v + 1);
+      case 6:
+	return v + 1;
+    }
+
+    return std::min(width() - u, v + 1);
+}
 
 /************************************************************************
 *  class ImageLine<T>:	Generic image scanline class			*
@@ -616,7 +649,7 @@ class ImageLine : public Array<T>
     using		super::rbegin;
     using		super::rend;
     using		super::size;
-    using		super::ptr;
+    using		super::data;
 
     template <class S>
     T			at(S uf)		const	;
@@ -699,7 +732,7 @@ template <class T> template <class S> inline T
 ImageLine<T>::at(S uf) const
 {
     const int	u  = floor(uf);
-    const T*	in = ptr() + u;
+    const T*	in = data() + u;
     const float	du = uf - u;
     return (du ? (1.0f - du) * *in + du * *(in + 1) : *in);
 }
@@ -792,7 +825,7 @@ ImageLine<T>::lookup(const S* src, const L* tbl)
 template <class T> inline const T*
 ImageLine<T>::fill(const T* src)
 {
-    memcpy(ptr(), src, size() * sizeof(T));
+    memcpy(data(), src, size() * sizeof(T));
     return src + size();
 }
 
@@ -883,7 +916,7 @@ ImageLine<YUV422>::operator ()(u_int u, u_int d)
 inline const YUV422*
 ImageLine<YUV422>::fill(const YUV422* src)
 {
-    memcpy(ptr(), src, size() * sizeof(YUV422));
+    memcpy(data(), src, size() * sizeof(YUV422));
     return src + size();
 }
 
@@ -975,7 +1008,7 @@ ImageLine<YUYV422>::operator ()(u_int u, u_int d)
 inline const YUYV422*
 ImageLine<YUYV422>::fill(const YUYV422* src)
 {
-    memcpy(ptr(), src, size() * sizeof(YUYV422));
+    memcpy(data(), src, size() * sizeof(YUYV422));
     return src + size();
 }
 
@@ -1068,7 +1101,7 @@ ImageLine<YUV411>::operator ()(u_int u, u_int d)
 inline const YUV411*
 ImageLine<YUV411>::fill(const YUV411* src)
 {
-    memcpy(ptr(), src, size() * sizeof(YUV411));
+    memcpy(data(), src, size() * sizeof(YUV411));
     return src + size();
 }
 
@@ -1207,7 +1240,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     using	super::end;
     using	super::rbegin;
     using	super::rend;
-    using	super::ptr;
+    using	super::data;
 
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out,
@@ -1430,7 +1463,7 @@ Image<T, B>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->fill(buf.ptr());
+	    line->fill(buf.data());
 	}
     }
     else
@@ -1439,7 +1472,7 @@ Image<T, B>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->fill(buf.ptr());
+	    line->fill(buf.data());
 	}
     }
 
@@ -1460,7 +1493,7 @@ Image<T, B>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->lookup(buf.ptr(), colormap.ptr());
+	    line->lookup(buf.data(), colormap.data());
 	}
     }
     else
@@ -1469,7 +1502,7 @@ Image<T, B>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->lookup(buf.ptr(), colormap.ptr());
+	    line->lookup(buf.data(), colormap.data());
 	}
     }
 
@@ -1494,7 +1527,7 @@ Image<T, B>::saveRows(std::ostream& out, Type type) const
     {
 	for (const_reverse_iterator line = rbegin(); line != rend(); ++line)
 	{
-	    buf.fill(line->ptr());
+	    buf.fill(line->data());
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}
@@ -1503,7 +1536,7 @@ Image<T, B>::saveRows(std::ostream& out, Type type) const
     {
 	for (const_iterator line = begin(); line != end(); ++line)
 	{
-	    buf.fill(line->ptr());
+	    buf.fill(line->data());
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}

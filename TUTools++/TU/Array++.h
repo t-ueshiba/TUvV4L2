@@ -70,8 +70,8 @@ class Buf
     Buf&		operator =(const Buf& b)		;
     ~Buf()							;
 
-    pointer		ptr()					;
-    const_pointer	ptr()				const	;
+    pointer		data()					;
+    const_pointer	data()				const	;
     u_int		size()				const	;
     u_int		dim()				const	;
     bool		resize(u_int siz)			;
@@ -140,14 +140,14 @@ Buf<T>::~Buf()
     
 //! バッファが使用する内部記憶領域へのポインタを返す．
 template <class T> inline typename Buf<T>::pointer
-Buf<T>::ptr()
+Buf<T>::data()
 {
     return _p;
 }
 
 //! バッファが使用する内部記憶領域へのポインタを返す．
 template <class T> inline typename Buf<T>::const_pointer
-Buf<T>::ptr() const
+Buf<T>::data() const
 {
     return _p;
 }
@@ -312,7 +312,7 @@ class AlignedBuf : public Buf<T>
     AlignedBuf&		operator =(const AlignedBuf& b)		;
     ~AlignedBuf()						;
 
-    using		super::ptr;
+    using		super::data;
     using		super::size;
     using		super::dim;
     
@@ -366,7 +366,7 @@ AlignedBuf<T>::operator =(const AlignedBuf<T>& b)
 template <class T> inline
 AlignedBuf<T>::~AlignedBuf()
 {
-    memfree(ptr());
+    memfree(data());
 }
     
 //! バッファの要素数を変更する．
@@ -380,7 +380,7 @@ AlignedBuf<T>::resize(u_int siz)
     if (siz == size())
 	return false;
 
-    memfree(ptr());
+    memfree(data());
     super::resize(memalloc(siz), siz);
     return true;
 }
@@ -458,8 +458,8 @@ class FixedSizedBuf
     FixedSizedBuf(const FixedSizedBuf& b)			;
     FixedSizedBuf&	operator =(const FixedSizedBuf& b)	;
     
-    pointer		ptr()					;
-    const_pointer	ptr()				const	;
+    pointer		data()					;
+    const_pointer	data()				const	;
     static u_int	size()					;
     static u_int	dim()					;
     static bool		resize(u_int siz)			;
@@ -516,14 +516,14 @@ FixedSizedBuf<T, D>::operator =(const FixedSizedBuf<T, D>& b)
 
 //! バッファが使用する内部記憶領域へのポインタを返す．
 template <class T, u_int D> inline typename FixedSizedBuf<T, D>::pointer
-FixedSizedBuf<T, D>::ptr()
+FixedSizedBuf<T, D>::data()
 {
     return _p;
 }
 
 //! バッファが使用する内部記憶領域へのポインタを返す．
 template <class T, u_int D> inline typename FixedSizedBuf<T, D>::const_pointer
-FixedSizedBuf<T, D>::ptr() const
+FixedSizedBuf<T, D>::data() const
 {
     return _p;
 }
@@ -709,7 +709,7 @@ class Array : public B
     using		super::size;
     using		super::dim;
     using		super::resize;
-    using		super::ptr;
+    using		super::data;
     
     reference		operator [](u_int i)				;
     const_reference	operator [](u_int i)			const	;
@@ -823,7 +823,7 @@ template <class T, class B>
 inline typename Array<T, B>::iterator
 Array<T, B>::begin()
 {
-    return ptr();
+    return data();
 }
 
 //! 配列の先頭要素を指す定数反復子を返す．
@@ -833,7 +833,7 @@ Array<T, B>::begin()
 template <class T, class B> inline typename Array<T, B>::const_iterator
 Array<T, B>::begin() const
 {
-    return ptr();
+    return data();
 }
 
 //! 配列の末尾を指す反復子を返す．
@@ -909,7 +909,7 @@ Array<T, B>::operator [](u_int i)
     if (i < 0 || u_int(i) >= size())
 	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
 #endif
-    return ptr()[i];
+    return data()[i];
 }
 
 //! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
@@ -925,7 +925,7 @@ Array<T, B>::operator [](u_int i) const
     if (i < 0 || u_int(i) >= size())
 	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
 #endif
-    return ptr()[i];
+    return data()[i];
 }
 #if 0
 template <class T, class B> inline const typename Array<T, B>::element_type&
@@ -1023,7 +1023,7 @@ Array<T, B>::operator !=(const Array<T2, B2>& a) const
 template <class T, class B> inline std::istream&
 Array<T, B>::restore(std::istream& in)
 {
-    in.read((char*)ptr(), sizeof(value_type) * size());
+    in.read((char*)data(), sizeof(value_type) * size());
     return in;
 }
 
@@ -1035,7 +1035,7 @@ Array<T, B>::restore(std::istream& in)
 template <class T, class B> inline std::ostream&
 Array<T, B>::save(std::ostream& out) const
 {
-    out.write((const char*)ptr(), sizeof(value_type) * size());
+    out.write((const char*)data(), sizeof(value_type) * size());
     return out;
 }
 
@@ -1143,8 +1143,8 @@ class Array2 : public Array<T, R>
     using		super::size;
     using		super::dim;
     
-    pointer		ptr()						;
-    const_pointer	ptr()					const	;
+    pointer		data()						;
+    const_pointer	data()					const	;
     u_int		nrow()					const	;
     u_int		ncol()					const	;
     u_int		stride()				const	;
@@ -1293,9 +1293,9 @@ Array2<T, B, R>::operator =(const element_type& c)
   \return	内部記憶領域へのポインタ
 */
 template <class T, class B, class R> inline typename Array2<T, B, R>::pointer
-Array2<T, B, R>::ptr()
+Array2<T, B, R>::data()
 {
-    return _buf.ptr();
+    return _buf.data();
 }
 
 //! 2次元配列の内部記憶領域へのポインタを返す．
@@ -1304,9 +1304,9 @@ Array2<T, B, R>::ptr()
 */
 template <class T, class B, class R>
 inline typename Array2<T, B, R>::const_pointer
-Array2<T, B, R>::ptr() const
+Array2<T, B, R>::data() const
 {
-    return _buf.ptr();
+    return _buf.data();
 }
 
 //! 2次元配列の行数を返す．
@@ -1336,7 +1336,7 @@ Array2<T, B, R>::ncol() const
 template <class T, class B, class R> inline u_int
 Array2<T, B, R>::stride() const
 {
-    return (nrow() > 1 ? (*this)[1].ptr() - (*this)[0].ptr() : _ncol);
+    return (nrow() > 1 ? (*this)[1].data() - (*this)[0].data() : _ncol);
 }
 
 //! 配列のサイズを変更する．
@@ -1447,7 +1447,7 @@ Array2<T, B, R>::set_rows()
 {
     const u_int	stride = buf_type::stride(ncol());
     for (u_int i = 0; i < nrow(); ++i)
-	(*this)[i].resize(_buf.ptr() + i*stride, ncol());
+	(*this)[i].resize(_buf.data() + i*stride, ncol());
 }
     
 //! 入力ストリームから配列を読み込む(ASCII)．

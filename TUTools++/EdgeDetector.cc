@@ -155,8 +155,8 @@ EdgeDetector::strength(const Image<float>& edgeH,
     out.resize(edgeH.height(), edgeH.width());
     for (u_int v = 0; v < out.height(); ++v)
     {
-	const float		*eH = edgeH[v].ptr(), *eV = edgeV[v].ptr();
-	float*			dst = out[v].ptr();
+	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
+	float*			dst = out[v].data();
 	const float* const	end = dst + out.width();
 #if defined(SSE)
 	using namespace		mm;
@@ -198,8 +198,8 @@ EdgeDetector::direction4(const Image<float>& edgeH,
     out.resize(edgeH.height(), edgeH.width());
     for (u_int v = 0; v < out.height(); ++v)
     {
-	const float		*eH = edgeH[v].ptr(), *eV = edgeV[v].ptr();
-	u_char*			dst = out[v].ptr();
+	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
+	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
 	using namespace		mm;
@@ -249,8 +249,8 @@ EdgeDetector::direction8(const Image<float>& edgeH,
     out.resize(edgeH.height(), edgeH.width());
     for (u_int v = 0; v < out.height(); ++v)
     {
-	const float		*eH = edgeH[v].ptr(), *eV = edgeV[v].ptr();
-	u_char*			dst = out[v].ptr();
+	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
+	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
 	using namespace		mm;
@@ -321,12 +321,12 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
   // 以上ならばWEAKラベルをそれぞれ書き込む．そうでなければ0を書き込む．
     for (u_int v = 0; ++v < out.height() - 1; )
     {
-	const float		*prv = strength[v-1].ptr(),
-				*str = strength[v].ptr(),
-				*nxt = strength[v+1].ptr();
-	const u_char		*dir = direction[v].ptr();
+	const float		*prv = strength[v-1].data(),
+				*str = strength[v].data(),
+				*nxt = strength[v+1].data();
+	const u_char		*dir = direction[v].data();
 	const u_char* const	end  = &out[v][out.width() - 1];
-	for (u_char* dst = out[v].ptr(); ++dst < end; )
+	for (u_char* dst = out[v].data(); ++dst < end; )
 	{
 	    ++prv;
 	    ++str;
@@ -386,10 +386,10 @@ EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
   // 現在点を左上隅とする2x2ウィンドウ中の画素が異符号ならエッジ点とする．
     for (u_int v = 0; v < out.height() - 1; ++v)
     {
-	const float		*cur = in[v].ptr(),
-				*nxt = in[v+1].ptr();
+	const float		*cur = in[v].data(),
+				*nxt = in[v+1].data();
 	const u_char* const	end  = &out[v][out.width() - 1];
-	for (u_char* dst = out[v].ptr(); dst < end; )
+	for (u_char* dst = out[v].data(); dst < end; )
 	{
 	    if ((*cur >= 0.0 && *(cur+1) >= 0.0 &&
 		 *nxt >= 0.0 && *(nxt+1) >= 0.0) ||
@@ -431,11 +431,11 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
   // 現在点を左上隅とする2x2ウィンドウ中の画素が異符号ならエッジ点とする．
     for (u_int v = 0; ++v < out.height() - 1; )
     {
-	const float		*cur = in[v].ptr(),
-				*nxt = in[v+1].ptr(),
-				*str = strength[v].ptr();
+	const float		*cur = in[v].data(),
+				*nxt = in[v+1].data(),
+				*str = strength[v].data();
 	const u_char* const	end  = &out[v][out.width() - 1];
-	for (u_char* dst = out[v].ptr(); ++dst < end; )
+	for (u_char* dst = out[v].data(); ++dst < end; )
 	{
 	    ++cur;
 	    ++nxt;
@@ -485,7 +485,7 @@ EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
   // EDGE点には255を，そうでない点には0を書き込む．
     for (u_int v = 0; v < edge.height(); )
     {
-	u_char*	dst = edge[v++].ptr();
+	u_char*	dst = edge[v++].data();
 	for (const u_char* const end = dst + edge.width(); dst < end; ++dst)
 	    *dst = (*dst & EDGE ? 255 : 0);
     }

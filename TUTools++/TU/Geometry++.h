@@ -995,7 +995,7 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
     vector_type	eval;
     matrix_type	Ut = A.eigen(eval);
     *this = yNormalize.Tinv()
-	  * matrix_type(Ut[Ut.nrow()-1].ptr(), ydim + 1, xdim1)
+	  * matrix_type(Ut[Ut.nrow()-1].data(), ydim + 1, xdim1)
 	  * xNormalize.T();
 
   // 変換行列が正方ならば，その行列式が１になるように正規化する．
@@ -1384,7 +1384,7 @@ Affinity<M>::fit(Iterator begin, Iterator end)
 
   // 変換行列をセットする．
     super::resize(ydim + 1, xdim + 1);
-    super::operator ()(0, 0, ydim, xdim) = matrix_type(v.ptr(), ydim, xdim);
+    super::operator ()(0, 0, ydim, xdim) = matrix_type(v.data(), ydim, xdim);
     for (u_int j = 0; j < ydim; ++j)
 	(*this)[j][xdim] = v[xydim2 + j];
     (*this)[ydim][xdim] = 1;
