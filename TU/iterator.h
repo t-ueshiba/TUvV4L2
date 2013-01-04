@@ -327,7 +327,8 @@ namespace detail
     {
       public:
 	typedef COL	iterator;
-
+	typedef COL	const_iterator;
+	
       public:
 	row_proxy(ROWBASE const& row, FUNC const& func)
 	    :_row(row), _func(func)				{}
@@ -351,7 +352,8 @@ namespace detail
     {
       public:
 	typedef COL	iterator;
-    
+	typedef COL	const_iterator;
+	
       private:
 	struct begin_iterator
 	{
