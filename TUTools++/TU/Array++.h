@@ -38,6 +38,10 @@
 #include <iostream>
 #include <stdexcept>
 #include "TU/types.h"
+#if __cplusplus > 197711L
+#  define __CXX0X
+#  include <initializer_list>
+#endif
 #ifdef __INTEL_COMPILER
 #  include <mmintrin.h>
 #endif
@@ -694,8 +698,12 @@ class Array : public B
     template <class T2, class B2>
     Array(const Array<T2, B2>& a)					;
     template <class T2, class B2>
-    Array&		operator =(const Array<T2, B2>& a)		;
-    Array&		operator =(const element_type& c)		;
+    Array&	operator =(const Array<T2, B2>& a)			;
+#ifdef __CXX0X
+    Array(std::initializer_list<value_type> args)			;
+    Array&	operator =(std::initializer_list<value_type> args)	;
+#endif
+    Array&	operator =(const element_type& c)			;
     
     iterator			begin()					;
     const_iterator		begin()				const	;
@@ -802,6 +810,27 @@ Array<T, B>::operator =(const Array<T2, B2>& a)
     return *this;
 }
 
+#ifdef __CXX0X
+template <class T, class B>
+Array<T, B>::Array(std::initializer_list<value_type> args)
+    :super(args.size())
+{
+    u_int	i = 0;
+    for (auto val : args)
+	(*this)[i++] = val;
+}
+
+template <class T, class B> Array<T, B>&
+Array<T, B>::operator =(std::initializer_list<value_type> args)
+{
+    resize(args.size());
+    u_int	i = 0;
+    for (auto val : args)
+	(*this)[i++] = val;
+    return *this;
+}
+#endif
+    
 //! 全ての要素に同一の値を代入する．
 /*!
   \param c	代入する値
@@ -1125,16 +1154,19 @@ class Array2 : public Array<T, R>
     Array2()								;
     Array2(u_int r, u_int c)						;
     Array2(pointer p, u_int r, u_int c)					;
+    template <class B2, class R2>
+    Array2(Array2<T, B2, R2>& a, u_int i, u_int j, u_int r, u_int c)	;
     Array2(const Array2& a)						;
+    Array2&	operator =(const Array2& a)				;
     template <class T2, class B2, class R2>
     Array2(const Array2<T2, B2, R2>& a)					;
-    template <class B2, class R2>
-    Array2(Array2<T, B2, R2>& a,
-	   u_int i, u_int j, u_int r, u_int c)				;
-    Array2&		operator =(const Array2& a)			;
     template <class T2, class B2, class R2>
-    Array2&		operator =(const Array2<T2, B2, R2>& a)		;
-    Array2&		operator =(const element_type& c)		;
+    Array2&	operator =(const Array2<T2, B2, R2>& a)			;
+    Array2&	operator =(const element_type& c)			;
+#ifdef __CXX0X
+    Array2(std::initializer_list<value_type> args)			;
+    Array2&	operator =(std::initializer_list<value_type> args)	;
+#endif
 
     using		super::begin;
     using		super::end;
@@ -1197,34 +1229,6 @@ Array2<T, B, R>::Array2(pointer p, u_int r, u_int c)
     set_rows();
 }
 
-//! コピーコンストラクタ
-/*!
-  \param a	コピー元の配列
-*/
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2(const Array2& a)
-    :super(a.nrow()), _ncol(a.ncol()), _buf(nrow()*buf_type::stride(ncol()))
-{
-    set_rows();
-    super::operator =((const super&)a);
-}    
-
-//! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
-/*!
-  コピーコンストラクタを定義しないと自動的に作られてしまうので，
-  このコンストラクタがあってもコピーコンストラクタを別個に定義
-  しなければならない．
-  \param a	コピー元の配列
-*/
-template <class T, class B, class R> template <class T2, class B2, class R2>
-inline
-Array2<T, B, R>::Array2(const Array2<T2, B2, R2>& a)
-    :super(a.nrow()), _ncol(a.ncol()), _buf(nrow()*buf_type::stride(ncol()))
-{
-    set_rows();
-    super::operator =(a);
-}    
-
 //! 記憶領域を元の配列と共有した部分配列を作る
 /*!
   \param a	配列
@@ -1246,6 +1250,18 @@ Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
 	(*this)[ii].resize(pointer(&a[i+ii][j]), ncol());
 }    
 
+//! コピーコンストラクタ
+/*!
+  \param a	コピー元の配列
+*/
+template <class T, class B, class R> inline
+Array2<T, B, R>::Array2(const Array2& a)
+    :super(a.nrow()), _ncol(a.ncol()), _buf(nrow()*buf_type::stride(ncol()))
+{
+    set_rows();
+    super::operator =((const super&)a);
+}    
+
 //! 標準代入演算子
 /*!
   \param a	コピー元の配列
@@ -1258,6 +1274,22 @@ Array2<T, B, R>::operator =(const Array2& a)
     super::operator =((const super&)a);
     return *this;
 }
+
+//! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
+/*!
+  コピーコンストラクタを定義しないと自動的に作られてしまうので，
+  このコンストラクタがあってもコピーコンストラクタを別個に定義
+  しなければならない．
+  \param a	コピー元の配列
+*/
+template <class T, class B, class R> template <class T2, class B2, class R2>
+inline
+Array2<T, B, R>::Array2(const Array2<T2, B2, R2>& a)
+    :super(a.nrow()), _ncol(a.ncol()), _buf(nrow()*buf_type::stride(ncol()))
+{
+    set_rows();
+    super::operator =(a);
+}    
 
 //! 他の配列を自分に代入する（標準代入演算子の拡張）．
 /*!
@@ -1274,6 +1306,29 @@ Array2<T, B, R>::operator =(const Array2<T2, B2, R2>& a)
     super::operator =(a);
     return *this;
 }
+
+#ifdef __CXX0X
+template <class T, class B, class R>
+Array2<T, B, R>::Array2(std::initializer_list<value_type> args)
+    :super(args.size()), _ncol(args.size() ? args.begin()->size() : 0),
+     _buf(nrow()*buf_type::stride(ncol()))
+{
+    set_rows();
+    u_int	i = 0;
+    for (auto val : args)
+	(*this)[i++] = val;
+}
+
+template <class T, class B, class R> Array2<T, B, R>&
+Array2<T, B, R>::operator =(std::initializer_list<value_type> args)
+{
+    resize(args.size(), (args.size() ? args.begin()->size() : 0));
+    u_int	i = 0;
+    for (auto val : args)
+	(*this)[i++] = val;
+    return *this;
+}
+#endif
 
 //! 全ての要素に同一の値を代入する．
 /*!

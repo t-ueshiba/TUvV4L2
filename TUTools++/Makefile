@@ -10,7 +10,7 @@ INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	=
+CPPFLAGS	= -std=c++0x
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
@@ -59,6 +59,7 @@ HDRS		= TU/Array++.h \
 		TU/Random.h \
 		TU/Ransac.h \
 		TU/SHOT602.h \
+		TU/SeparableFilter2.h \
 		TU/Serial.h \
 		TU/SparseMatrix++.h \
 		TU/TriggerGenerator.h \
@@ -125,8 +126,8 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/Geometry++.h \
 	TU/iterator.h TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h \
 	TU/Minimize.h TU/mmInstructions.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
-	TU/types.h TU/IIRFilter.h TU/Filter2.h TU/iterator.h TU/functional.h \
-	TU/mmInstructions.h TU/Minimize.h
+	TU/types.h TU/IIRFilter.h TU/SeparableFilter2.h TU/iterator.h \
+	TU/functional.h TU/mmInstructions.h TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \
 	TU/Vector++.h TU/Array++.h TU/types.h TU/Minimize.h
 Image++.inst.o: TU/Image++.h TU/Geometry++.h TU/iterator.h TU/functional.h \

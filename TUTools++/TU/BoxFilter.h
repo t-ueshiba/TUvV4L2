@@ -34,7 +34,7 @@
 #ifndef	__TUBoxFilter_h
 #define	__TUBoxFilter_h
 
-#include "TU/Filter2.h"
+#include "TU/SeparableFilter2.h"
 #include <algorithm>
 
 namespace TU
@@ -98,7 +98,7 @@ BoxFilter::convolve(IN ib, IN ie, OUT out) const
 *  class BoxFilter2							*
 ************************************************************************/
 //! 2次元入力データ列にbox filterを適用するクラス
-class BoxFilter2 : public Filter2<BoxFilter>
+class BoxFilter2 : public SeparableFilter2<BoxFilter>
 {
   public:
   //! box filterを生成する．

@@ -41,6 +41,26 @@
 namespace TU
 {
 /************************************************************************
+*  class identity							*
+************************************************************************/
+//! 与えられた引数をそのまま返す関数オブジェクト
+/*!
+  \param T	引数の型
+*/
+template <class T>
+class identity : public std::unary_function<T, T>
+{
+  private:
+    typedef std::unary_function<T, T>	super;
+
+  public:
+    typedef typename super::argument_type	argument_type;
+    typedef typename super::result_type		result_type;
+
+    result_type	operator ()(argument_type arg)	const	{return arg;}
+};
+    
+/************************************************************************
 *  class unarize							*
 ************************************************************************/
 //! 2変数関数を2変数tupleを引数とする1変数関数に直す関数オブジェクト

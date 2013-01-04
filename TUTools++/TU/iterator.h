@@ -296,6 +296,28 @@ make_assignment2_iterator(ITER iter)
 }
 
 /************************************************************************
+*  struct subiterator<ITER>						*
+************************************************************************/
+template <class ITER>
+struct subiterator
+    : boost::mpl::if_<
+	boost::is_same<typename std::iterator_traits<ITER>::pointer,
+		       typename std::iterator_traits<ITER>::value_type*>,
+	typename std::iterator_traits<ITER>::value_type::iterator,
+	typename std::iterator_traits<ITER>::value_type::const_iterator>
+{
+};
+
+template <class TUPLE>
+struct subiterator<boost::zip_iterator<TUPLE> >
+{
+    typedef boost::zip_iterator<
+		typename boost::detail::tuple_impl_specific
+			      ::tuple_meta_transform<
+		    TUPLE, subiterator<boost::mpl::_1> >::type>		type;
+};
+
+/************************************************************************
 *  class row_iterator<COL, FUNC, ROWBASE>				*
 ************************************************************************/
 namespace detail
@@ -307,20 +329,20 @@ namespace detail
 	typedef COL	iterator;
 
       public:
-	row_proxy(ROWBASE const& iter, FUNC const& func)
-	    :_iter(iter), _func(func)				{}
+	row_proxy(ROWBASE const& row, FUNC const& func)
+	    :_row(row), _func(func)				{}
     
 	iterator	begin()	const
 			{
-			    return iterator(_iter->begin(), _func);
+			    return iterator(_row->begin(), _func);
 			}
 	iterator	end() const
 			{
-			    return iterator(_iter->end(), _func);
+			    return iterator(_row->end(), _func);
 			}
 
       private:
-	ROWBASE const&	_iter;
+	ROWBASE const&	_row;
 	FUNC const&	_func;
     };
 
@@ -330,31 +352,58 @@ namespace detail
       public:
 	typedef COL	iterator;
     
+      private:
+	struct begin_iterator
+	{
+	    template <class ROW>
+	    struct apply
+	    {
+		typedef typename subiterator<ROW>::type	type;
+	    };
+
+	    template <class ROW> typename apply<ROW>::type
+	    operator ()(ROW const& row)	const	{return row->begin();}
+	};
+	
+	struct end_iterator
+	{
+	    template <class ROW>
+	    struct apply
+	    {
+		typedef typename subiterator<ROW>::type	type;
+	    };
+
+	    template <class ROW> typename apply<ROW>::type
+	    operator ()(ROW const& row)	const	{return row->end();}
+	};
+	
       public:
-	row_proxy(boost::zip_iterator<TUPLE> const& iter, FUNC const& func)
-	    :_iter(iter), _func(func)				{}
+	row_proxy(boost::zip_iterator<TUPLE> const& row, FUNC const& func)
+	    :_row(row), _func(func)				{}
     
 	iterator	begin()	const
 			{
 			    return iterator(
 				boost::make_zip_iterator(
-				    boost::make_tuple(
-					boost::get<0>(*_iter).begin(),
-					boost::get<1>(*_iter).begin())),
+				    boost::detail::tuple_impl_specific
+				    ::tuple_transform(
+					_row.get_iterator_tuple(),
+					begin_iterator())),
 				_func);
 			}
 	iterator	end() const
 			{
 			    return iterator(
 				boost::make_zip_iterator(
-				    boost::make_tuple(
-					boost::get<0>(*_iter).end(),
-					boost::get<1>(*_iter).end())),
+				    boost::detail::tuple_impl_specific
+				    ::tuple_transform(
+					_row.get_iterator_tuple(),
+					end_iterator())),
 				_func);
 			}
     
       private:
-	boost::zip_iterator<TUPLE> const&	_iter;
+	boost::zip_iterator<TUPLE> const&	_row;
 	FUNC const&				_func;
     };
 }
@@ -391,8 +440,8 @@ class row_iterator
     friend class				boost::iterator_core_access;
 
   public:
-    row_iterator(ROWBASE const& iter, FUNC const& func)
-	:super(iter), _func(func)				{}
+    row_iterator(ROWBASE const& row, FUNC const& func)
+	:super(row), _func(func)				{}
 
     reference	operator [](size_t i) const
 		{
@@ -410,87 +459,26 @@ class row_iterator
 };
 
 template <template <class, class> class COL, class FUNC, class ROWBASE>
-inline row_iterator<COL<FUNC,
-			typename std::iterator_traits<ROWBASE>
-				    ::value_type::iterator>,
-		    FUNC,
-		    ROWBASE>
-make_row_iterator(ROWBASE iter, FUNC func)
+inline row_iterator<COL<FUNC, typename subiterator<ROWBASE>::type>,
+		    FUNC, ROWBASE>
+make_row_iterator(ROWBASE row, FUNC func)
 {
-    typedef typename std::iterator_traits<ROWBASE>
-			::value_type::iterator		col_base_iterator;
+    typedef typename subiterator<ROWBASE>::type	col_base_iterator;
 
     return row_iterator<COL<FUNC, col_base_iterator>,
-			FUNC, ROWBASE>(iter, func);
-}
-
-template <template <class, class> class COL, class FUNC, class TUPLE>
-inline row_iterator<COL<FUNC,
-			boost::zip_iterator<
-			    boost::tuple<
-				typename std::iterator_traits<
-				    typename TUPLE::head_type>
-				::value_type::iterator,
-				typename std::iterator_traits<
-				    typename TUPLE::tail_type::head_type>
-				::value_type::iterator> > >,
-		    FUNC,
-		    boost::zip_iterator<TUPLE> >
-make_row_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
-{
-    typedef boost::zip_iterator<
-		boost::tuple<
-		    typename std::iterator_traits<
-			typename TUPLE::head_type>::value_type::iterator,
-		    typename std::iterator_traits<
-			typename TUPLE::tail_type::head_type>
-			::value_type::iterator> >	col_base_iterator;
-
-    return row_iterator<COL<FUNC, col_base_iterator>,
-			FUNC, boost::zip_iterator<TUPLE> >(iter, func);
+			FUNC, ROWBASE>(row, func);
 }
 
 template <class FUNC, class ROWBASE>
-inline row_iterator<
-	 boost::transform_iterator<
-	   FUNC,
-	   typename std::iterator_traits<ROWBASE>::value_type::const_iterator>,
-	 FUNC,
-	 ROWBASE>
-make_row_transform_iterator(ROWBASE iter, FUNC func)
+inline row_iterator<boost::transform_iterator<
+			FUNC, typename subiterator<ROWBASE>::type>,
+		    FUNC, ROWBASE>
+make_row_transform_iterator(ROWBASE row, FUNC func)
 {
-    typedef typename std::iterator_traits<ROWBASE>
-			::value_type::const_iterator	col_base_iterator;
+    typedef typename subiterator<ROWBASE>::type	col_base_iterator;
 
     return row_iterator<boost::transform_iterator<FUNC, col_base_iterator>,
-			FUNC, ROWBASE>(iter, func);
-}
-
-template <class FUNC, class TUPLE>
-inline row_iterator<
-	   boost::transform_iterator<
-	       FUNC,
-	       boost::zip_iterator<
-		   boost::tuple<typename std::iterator_traits<
-				    typename TUPLE::head_type>
-				::value_type::const_iterator,
-				typename std::iterator_traits<
-				    typename TUPLE::tail_type::head_type>
-				::value_type::const_iterator> > >,
-	   FUNC,
-	   boost::zip_iterator<TUPLE> >
-make_row_transform_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
-{
-    typedef boost::zip_iterator<
-		boost::tuple<
-		    typename std::iterator_traits<typename TUPLE::head_type>
-		    ::value_type::const_iterator,
-		    typename std::iterator_traits<typename TUPLE::tail_type
-								::head_type>
-		    ::value_type::const_iterator> >	col_base_iterator;
-
-    return row_iterator<boost::transform_iterator<FUNC, col_base_iterator>,
-			FUNC, boost::zip_iterator<TUPLE> >(iter, func);
+			FUNC, ROWBASE>(row, func);
 }
 
 /************************************************************************
@@ -502,21 +490,17 @@ make_row_transform_iterator(boost::zip_iterator<TUPLE> iter, FUNC func)
 */
 template <class ITER>
 class vertical_iterator
-    : public boost::iterator_adaptor<vertical_iterator<ITER>,	// self
-				     ITER,			// base
-				     typename std::iterator_traits<
-					 typename std::iterator_traits<ITER>
-						     ::value_type::iterator>
-					     ::value_type,	// value_type
-				     boost::use_default,	// traversal
-				     typename std::iterator_traits<
-					 typename std::iterator_traits<ITER>
-						     ::value_type::iterator>
-					     ::reference>	// reference
+    : public boost::iterator_adaptor<
+		vertical_iterator<ITER>,			   // self
+		ITER,						   // base
+		typename std::iterator_traits<
+		    typename subiterator<ITER>::type>::value_type, // value
+		boost::use_default,				   // traversal
+		typename std::iterator_traits<
+		    typename subiterator<ITER>::type>::reference>  // reference	
 {	
   private:
-    typedef typename std::iterator_traits<ITER>
-			::value_type::iterator	col_iterator;
+    typedef typename subiterator<ITER>::type		col_iterator;
     typedef typename boost::iterator_adaptor<
 			vertical_iterator,
 			ITER,
