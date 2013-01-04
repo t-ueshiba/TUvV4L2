@@ -316,22 +316,6 @@ class GuidedFilter2 : private BoxFilter2
   private:
     typedef BoxFilter2					super;
 
-    template <class IN, class OUT>
-    struct Identity
-    {
-	typedef boost::tuple<
-		    typename std::iterator_traits<IN>
-				::value_type::value_type,
-		    typename std::iterator_traits<OUT>
-				::value_type::value_type>	argument_type;
-	typedef const argument_type&				result_type;
-
-	result_type	operator ()(const argument_type& arg) const
-			{
-			    return arg;
-			}
-    };
-
   public:
     GuidedFilter2(size_t wrow, size_t wcol, value_type e)
 	:super(wrow, wcol, 0), _e(e)				{}
@@ -371,7 +355,6 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     using namespace	boost;
 
     typedef Array2<Array<Coeff> >				carray2_type;
-    typedef Identity<IN, OUT>					identity;
     typedef typename Coeff::template Init<typename Coeff::Params>
 								coeff_init;
     typedef typename Coeff::Trans				coeff_trans;

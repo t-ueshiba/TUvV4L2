@@ -36,7 +36,7 @@
 
 #include <algorithm>
 #include <boost/array.hpp>
-#include "TU/Filter2.h"
+#include "TU/SeparableFilter2.h"
 #include "TU/mmInstructions.h"
 
 #if defined(SSE2)
@@ -783,11 +783,12 @@ BidirectionalIIRFilter<D, T>::outLength(u_int inLength)
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
 template <u_int D, class T=float>
-class BidirectionalIIRFilter2 : public Filter2<BidirectionalIIRFilter<D, T> >
+class BidirectionalIIRFilter2
+    : public SeparableFilter2<BidirectionalIIRFilter<D, T> >
 {
   private:
     typedef BidirectionalIIRFilter<D, T>	biir_type;
-    typedef Filter2<biir_type>			super;
+    typedef SeparableFilter2<biir_type>		super;
 
   public:
     typedef typename biir_type::coeff_type	coeff_type;
