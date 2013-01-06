@@ -63,7 +63,7 @@ class BoxFilter
   /*
     \return	box filterのウィンドウ幅
    */
-    size_t	width()			const	{return _width;}
+    size_t	width()				const	{return _width;}
 
     template <class IN, class OUT>
     void	convolve(IN ib, IN ie, OUT out)	const	;

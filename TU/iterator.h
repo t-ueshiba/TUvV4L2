@@ -475,7 +475,11 @@ template <class FUNC, class ROWBASE>
 inline row_iterator<boost::transform_iterator<
 			FUNC, typename subiterator<ROWBASE>::type>,
 		    FUNC, ROWBASE>
-make_row_transform_iterator(ROWBASE row, FUNC func)
+make_row_transform_iterator(ROWBASE row,
+			    FUNC func=identity<
+					typename std::iterator_traits<
+					  typename subiterator<ROWBASE>::type>
+					>::value_type())
 {
     typedef typename subiterator<ROWBASE>::type	col_base_iterator;
 
@@ -533,9 +537,10 @@ class vertical_iterator
 	
     reference	dereference() const
 		{
-		    col_iterator	col = super::base()->begin();
-		    std::advance(col, _idx);
-		    return *col;
+		  //col_iterator	col = super::base()->begin() + _idx;
+		  //std::advance(col, _idx);
+		  //return *col;
+		    return *(super::base()->begin() + _idx);
 		}
     
   private:

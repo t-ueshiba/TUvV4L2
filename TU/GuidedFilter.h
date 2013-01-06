@@ -32,6 +32,7 @@
   \brief	guided filterに関するクラスの定義と実装
 */
 #include "TU/BoxFilter.h"
+#include <boost/operators.hpp>
 
 namespace TU
 {
@@ -48,16 +49,25 @@ class GuidedFilter : public BoxFilter
     class Coeff
     {
       public:
-	class Params
+	class Params : public boost::additive<Params>
 	{
 	  public:
-	    Params()	:_v0(0), _v1(0), _v2(0), _v3(0)			{}
+	    struct Init
+	    {
+		typedef Params	result_type;
+	    
+		template <class TUPLE>
+		result_type	operator ()(TUPLE t) const
+				{
+				    return result_type(boost::get<0>(t),
+						       boost::get<1>(t));
+				}
+	    };
+	
+	  public:
+	    Params(value_type p=0, value_type g=0)
+		:_v0(p), _v1(g), _v2(_v0*_v1), _v3(_v1*_v1)		{}
     
-	    template <class TUPLE>
-	    Params(const TUPLE& t)
-		:_v0(boost::get<0>(t)), _v1(boost::get<1>(t)),
-		 _v2(_v0*_v1), _v3(_v1*_v1)				{}
-
 	    Params&		operator +=(const Params& v)
 				{
 				    _v0 += v._v0;
@@ -92,13 +102,22 @@ class GuidedFilter : public BoxFilter
 	    value_type		_v0, _v1, _v2, _v3;
 	};
     
-	class SimpleParams
+	class SimpleParams : public boost::additive<SimpleParams>
 	{
 	  public:
-	    SimpleParams()	:_v0(0), _v1(0)			{}
-
-	    template <class IN>
-	    SimpleParams(IN p)	:_v0(p), _v1(_v0*_v0)		{}
+	    struct Init
+	    {
+		typedef SimpleParams	result_type;
+	    
+		template <class IN>
+		result_type	operator ()(IN p) const
+				{
+				    return result_type(p);
+				}
+	    };
+	
+	  public:
+	    SimpleParams(value_type p=0) :_v0(p), _v1(_v0*_v0)	{}
 
 	    SimpleParams&	operator +=(const SimpleParams& v)
 				{
@@ -139,7 +158,7 @@ class GuidedFilter : public BoxFilter
 	  public:
 	    Init(size_t n, value_type e) :_n(n), _e(e)			{}
 
-	    result_type	operator ()(const argument_type& params) const
+	    result_type	operator ()(argument_type params) const
 			{
 			    return result_type(params, _n, _e);
 			}
@@ -159,8 +178,7 @@ class GuidedFilter : public BoxFilter
 	    Trans(size_t n)	:_n(n)					{}
 
 	    template <class TUPLE>
-	    result_type	operator ()(TUPLE t,
-				    const second_argument_type& coeffs) const
+	    result_type	operator ()(TUPLE t, second_argument_type coeffs) const
 			{
 			    boost::get<0>(t)
 				= coeffs.trans(boost::get<1>(t), _n);
@@ -249,6 +267,7 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     using namespace	boost;
 
     typedef Array<Coeff>					carray_type;
+    typedef typename Coeff::Params::Init			params_init;
     typedef typename Coeff::template Init<typename Coeff::Params>
 								coeff_init;
     typedef typename std::iterator_traits<GUIDE>::value_type	guide_type;
@@ -256,8 +275,10 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     carray_type	c(super::outLength(std::distance(ib, ie)));
-    super::convolve(make_zip_iterator(make_tuple(ib, gb)),
-		    make_zip_iterator(make_tuple(ie, ge)),
+    super::convolve(make_transform_iterator(
+			make_zip_iterator(make_tuple(ib, gb)), params_init()),
+		    make_transform_iterator(
+			make_zip_iterator(make_tuple(ie, ge)), params_init()),
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(width(), _e)));
 
@@ -284,13 +305,15 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
     using namespace	boost;
 
     typedef Array<Coeff>					carray_type;
+    typedef typename Coeff::SimpleParams::Init			params_init;
     typedef typename Coeff::template Init<typename Coeff::SimpleParams>
 								coeff_init;
     typedef typename Coeff::Trans				coeff_trans;
 
   // guided filterの2次元係数ベクトルを計算する．
     carray_type	c(super::outLength(std::distance(ib, ie)));
-    super::convolve(ib, ie,
+    super::convolve(make_transform_iterator(ib, params_init()),
+		    make_transform_iterator(ie, params_init()),
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(width(), _e)));
 
@@ -355,10 +378,11 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     using namespace	boost;
 
     typedef Array2<Array<Coeff> >				carray2_type;
+    typedef typename Coeff::Params::Init			params_init;
     typedef typename Coeff::template Init<typename Coeff::Params>
 								coeff_init;
     typedef typename Coeff::Trans				coeff_trans;
-    
+
     const size_t	n = rowWidth() * colWidth();
     carray2_type	c(super::outRowLength(std::distance(ib, ie)),
 			  (ib != ie ?
@@ -366,9 +390,9 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 							     ib->end())) :
 			   0));
     super::convolve(make_row_transform_iterator(
-			make_zip_iterator(make_tuple(ib, gb)), identity()),
+			make_zip_iterator(make_tuple(ib, gb)), params_init()),
 		    make_row_transform_iterator(
-			make_zip_iterator(make_tuple(ie, ge)), identity()),
+			make_zip_iterator(make_tuple(ie, ge)), params_init()),
 		    make_row_iterator<assignment_iterator>(c.begin(),
 							   coeff_init(n, _e)));
 			   
@@ -395,6 +419,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     using namespace	boost;
 
     typedef Array2<Array<Coeff> >				carray2_type;
+    typedef typename Coeff::SimpleParams::Init			params_init;
     typedef typename Coeff::template Init<typename Coeff::SimpleParams>
 								coeff_init;
     typedef typename Coeff::Trans				coeff_trans;
@@ -405,7 +430,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 			   super::outColLength(std::distance(ib->begin(),
 							     ib->end())) :
 			   0));
-    super::convolve(ib, ie,
+    super::convolve(make_row_transform_iterator(ib, params_init()),
+		    make_row_transform_iterator(ie, params_init()),
 		    make_row_iterator<assignment_iterator>(c.begin(),
 							   coeff_init(n, _e)));
     

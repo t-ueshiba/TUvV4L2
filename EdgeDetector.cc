@@ -293,6 +293,62 @@ EdgeDetector::direction8(const Image<float>& edgeH,
     return *this;
 }
     
+const EdgeDetector&
+EdgeDetector::ridge(const Image<float>& edgeHH,
+		    const Image<float>& edgeHV,
+		    const Image<float>& edgeVV,
+		    Image<float>& strength, Image<u_char>& direction) const
+{
+    typedef ImageLine<float>::const_iterator	const_fiterator;
+    typedef ImageLine<float>::iterator		fiterator;
+    typedef ImageLine<u_char>::iterator		citerator;
+    
+    Matrix22f		H;		// Hessian
+    Vector<float>	lambda;		// eigen values
+    
+    strength.resize(edgeHH.height(), edgeHH.width());
+    direction.resize(edgeHH.height(), edgeHH.width());
+    for (u_int v = 0; v < strength.height(); ++v)
+    {
+	const_fiterator	eHH = edgeHH[v].begin(), eHV = edgeHV[v].begin(),
+			eVV = edgeVV[v].begin();
+	citerator	dir = direction[v].begin();
+	for (fiterator str = strength[v].begin(), end = strength[v].end();
+	     str != end; ++str)
+	{
+	    H[0][0] = *eHH++;
+	    H[0][1] = H[1][0] = *eHV++;
+	    H[1][1] = *eVV++;
+
+	    const Vector<float>& n = H.eigen(lambda)[0];
+	    const float	sH = slant * n[0], sV = slant * n[1];
+	    *str = lambda[0];
+	    *dir = (sH <= n[1] ?
+		    (n[0] <= sV ?
+		     (n[0] <= -sV ?
+		      (sH <= -n[1] ? 4 : 3) : 2) : 1) :
+		    (sH <= -n[1] ?
+		     (n[0] <= -sV ?
+		      (n[0] <=  sV ? 5 : 6) : 7) : 0));
+	    if (*str > 0)
+	    {
+		if (*dir >= 4)
+		    *dir -= 4;
+	    }
+	    else
+	    {
+		*str *= -1.0f;
+		if (*dir < 4)
+		    *dir += 4;
+	    }
+	    
+	    ++dir;
+	}
+    }
+
+    return *this;
+}
+    
 //! 非極大値抑制処理により細線化を行う
 /*!
   \param strength	エッジ強度入力画像
