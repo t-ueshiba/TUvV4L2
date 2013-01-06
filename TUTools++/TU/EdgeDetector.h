@@ -65,6 +65,10 @@ class __PORT EdgeDetector
 	direction8(const Image<float>& edgeH,
 		   const Image<float>& edgeV, Image<u_char>& out) const	;
     const EdgeDetector&
+	ridge(const Image<float>& edgeHH,
+	      const Image<float>& edgeHV, const Image<float>& edgeVV,
+	      Image<float>& strength, Image<u_char>& direction)	  const	;
+    const EdgeDetector&
 	suppressNonmaxima(const Image<float>& strength,
 			  const Image<u_char>& direction,
 			  Image<u_char>& out)			  const	;
