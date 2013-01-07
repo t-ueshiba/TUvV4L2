@@ -212,28 +212,28 @@ template <class T> class GaussianConvolver2
     using		super::setGrainSize;
     
     template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<OUT>
-				     ::value_type::value_type>
+	      class BVAL=typename std::iterator_traits<
+			   typename subiterator<OUT>::type>::value_type>
     void		smooth(IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<OUT>
-				     ::value_type::value_type>
+	      class BVAL=typename std::iterator_traits<
+			   typename subiterator<OUT>::type>::value_type>
     void		diffH (IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<OUT>
-				     ::value_type::value_type>
+	      class BVAL=typename std::iterator_traits<
+			   typename subiterator<OUT>::type>::value_type>
     void		diffV (IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<OUT>
-				     ::value_type::value_type>
+	      class BVAL=typename std::iterator_traits<
+			   typename subiterator<OUT>::type>::value_type>
     void		diffHH(IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<OUT>
-				     ::value_type::value_type>
+	      class BVAL=typename std::iterator_traits<
+			   typename subiterator<OUT>::type>::value_type>
     void		diffHV(IN ib, IN ie, OUT out)			;
     template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<OUT>
-				     ::value_type::value_type>
+	      class BVAL=typename std::iterator_traits<
+			   typename subiterator<OUT>::type>::value_type>
     void		diffVV(IN ib, IN ie, OUT out)			;
 };
 
