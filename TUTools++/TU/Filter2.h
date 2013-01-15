@@ -97,8 +97,8 @@ class Filter2
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
 */
-template <class F> template <class IN, class OUT> void
-Filter2<F>::operator ()(IN ib, IN ie, OUT out) const
+template <class IN, class OUT> void
+Filter2::operator ()(IN ib, IN ie, OUT out) const
 {
 #if defined(USE_TBB)
     tbb::parallel_for(tbb::blocked_range<u_int>(0, buf.ncol(), _grainSize),
