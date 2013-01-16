@@ -39,32 +39,54 @@ static const float	slant = 0.41421356;	// tan(M_PI/8)
 namespace mm
 {
 static inline Is32vec
-dir4(F32vec eH, F32vec eV)
+dir4(F32vec u, F32vec v)
 {
-    Is32vec	l0 = cast<int>(eH < eV),
-		l1 = cast<int>(eH < -eV);
-    return ((l0 ^ l1) & vec<int>(0x2)) | (l1 & vec<int>(0x4));
+    const Is32vec	l2 = cast<int>(u <  v),
+			l4 = cast<int>(u < -v);
+    return (l4 & Is32vec(0x4)) | ((l2 ^ l4) & Is32vec(0x2));
 }
 
 static inline Is32vec
-dir8(F32vec eH, F32vec eV)
+dir4(F32vec u, F32vec v, F32vec lambda)
 {
-    F32vec	sH = F32vec(slant) * eH,
-		sV = F32vec(slant) * eV;
-    Is32vec	l0 = cast<int>(sH <  eV),
-		l1 = cast<int>(eH <  sV),
-		l2 = cast<int>(eH < -sV),
-		l3 = cast<int>(sH < -eV);
-    return (((l0 ^ l1) | (l2 ^ l3)) & Is32vec(0x1)) |
-	   ((l1 ^ l3) & Is32vec(0x2)) |
-	   (l3 & Is32vec(0x4));
+    const Is32vec	l = cast<int>((u < zero<float>()) ^
+				      (v < zero<float>()));
+    return ((l ^ cast<int>(lambda < zero<float>())) & Is32vec(0x4)) |
+	   (l					    & Is32vec(0x2)) |
+						      Is32vec(0x1);
+}
+
+static inline Is32vec
+dir8(F32vec u, F32vec v)
+{
+    const F32vec	su = F32vec(slant) * u,
+			sv = F32vec(slant) * v;
+    const Is32vec	l1 = cast<int>(su <   v),
+			l2 = cast<int>( u <  sv),
+			l3 = cast<int>( u < -sv),
+			l4 = cast<int>(su <  -v);
+    return (l4			    & Is32vec(0x4)) |
+	   ((l2 ^ l4)		    & Is32vec(0x2)) |
+	   (((l1 ^ l2) | (l3 ^ l4)) & Is32vec(0x1));
+}
+
+static inline Is32vec
+dir8(F32vec u, F32vec v, F32vec lambda)
+{
+    const Is32vec	l2 = cast<int>(u < zero<float>()),
+			l4 = cast<int>(v < zero<float>()),
+			l  = l2 ^ l4;
+    return ((cast<int>(lambda < zero<float>()) ^ l) & Is32vec(0x4)) |
+	   (l					    & Is32vec(0x2)) |
+	   (((cast<int>(u <  v) ^ l2) |
+	     (cast<int>(u < -v) ^ l4))		    & Is32vec(0x1));
 }
 
 template <class T> static inline vec<T>
-evalue(vec<T> a, vec<T> b, vec<T> c)
+eigen(vec<T> a, vec<T> b, vec<T> c)
 {
-    vec<T>	avrg = avg(a, c), diff = sub_avg(a, c),
-		frac = sqrt(diff*diff + b*b);
+    const vec<T>	avrg = avg(a, c), diff = sub_avg(a, c),
+			frac = sqrt(diff*diff + b*b);
     return select(avrg > zero<T>(), avrg + frac, avrg - frac);
 }
 }
@@ -73,28 +95,44 @@ evalue(vec<T> a, vec<T> b, vec<T> c)
 namespace TU
 {
 template <class T> static inline u_int
-dir4(T eH, T eV)
+dir4(T u, T v)
 {
-    return (eH <= eV ? (eH <= -eV ? 4 : 2) : (eH <= -eV ? 6 : 0));
+    return (u <= v ? (u <= -v ? 4 : 2) : (u <= -v ? 6 : 0));
 }
     
 template <class T> static inline u_int
-dir8(T eH, T eV)
+dir4(T u, T v, T lambda)
 {
-    const T	sH = slant * eH, sV = slant * eV;
-    return (sH <= eV ?
-	    (eH <=  sV ? (eH <= -sV ? (sH <= -eV ? 4 : 3) : 2) : 1) :
-	    (sH <= -eV ? (eH <= -sV ? (eH <=  sV ? 5 : 6) : 7) : 0));
+    const u_int	l = (u < 0) ^ (v < 0);
+    return ((lambda < 0) ^ l) << 2) | (l << 1) | 0x1;
+}
+    
+template <class T> static inline u_int
+dir8(T u, T v)
+{
+    const T	su = slant * u, sv = slant * v;
+    return (su <= v ?
+	    (u <=  sv ? (u <= -sv ? (su <= -v ? 4 : 3) : 2) : 1) :
+	    (su <= -v ? (u <= -sv ? (u <=  sv ? 5 : 6) : 7) : 0));
+}
+    
+template <class T> static inline u_int
+dir8(T u, T v, T lambda)
+{
+    const u_int	l2 = (u < 0), l4 = (v < 0), l = l2 ^ l4;
+    return (((lambda < 0) ^ l) << 2) |
+	   (l		       << 1) |
+	   ((u < v) ^ l2) | ((u < -v) ^ l4);
 }
     
 template <class T> static inline T
-evalue(T a, T b, T c)
+eigen(T a, T b, T c)
 {
     const T	avrg = T(0.5)*(a + c), diff = T(0.5)*(a - c),
 		frac = std::sqrt(diff*diff + b*b);
     return (avrg > T(0) ? avrg + frac : avrg - frac);
 }
-
+    
 //! あるエッジ点と指定された方向の近傍点が接続しているか調べる
 /*!
   \param edge	エッジ画像
@@ -168,7 +206,7 @@ canInterpolate(const Image<u_char>& edge, const Point2i& p)
   // 付いていない弱いエッジ点が1つだけあれば，trueを返す．
     return (nedges != 0 && nweaks == 1);
 }
-    
+
 /************************************************************************
 *  class EdgeDetector							*
 ************************************************************************/
@@ -333,10 +371,8 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	     dir != end2; dir += Iu8vec::size)
 	{
 	    F32vec	fHH = loadu(eHH), fHV = loadu(eHV);
-	    F32vec	lambda = evalue(fHH, fHV, loadu(eVV));
-	    Is32vec	d0 = dir8(fHV, lambda - fHH);
-	    d0 = select(cast<int>(lambda > zero<float>()),
-			d0 & Is32vec(~0x4), d0 | Is32vec(0x4));
+	    F32vec	lambda = eigen(fHH, fHV, loadu(eVV));
+	    Is32vec	d0 = dir8(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -345,10 +381,8 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 
 	    fHH = loadu(eHH);
 	    fHV = loadu(eHV);
-	    lambda = evalue(fHH, fHV, loadu(eVV));
-	    Is32vec	d1 = dir8(fHV, lambda - fHH);
-	    d1 = select(cast<int>(lambda > zero<float>()),
-			d1 & Is32vec(~0x4), d1 | Is32vec(0x4));
+	    lambda = eigen(fHH, fHV, loadu(eVV));
+	    Is32vec	d1 = dir8(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -357,10 +391,8 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 
 	    fHH = loadu(eHH);
 	    fHV = loadu(eHV);
-	    lambda = evalue(fHH, fHV, loadu(eVV));
-	    Is32vec	d2 = dir8(fHV, lambda - fHH);
-	    d2 = select(cast<int>(lambda > zero<float>()),
-			d2 & Is32vec(~0x4), d2 | Is32vec(0x4));
+	    lambda = eigen(fHH, fHV, loadu(eVV));
+	    Is32vec	d2 = dir8(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -369,10 +401,8 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 
 	    fHH = loadu(eHH);
 	    fHV = loadu(eHV);
-	    lambda = evalue(fHH, fHV, loadu(eVV));
-	    Is32vec	d3 = dir8(fHV, lambda - fHH);
-	    d3 = select(cast<int>(lambda > zero<float>()),
-			d3 & Is32vec(~0x4), d3 | Is32vec(0x4));
+	    lambda = eigen(fHH, fHV, loadu(eVV));
+	    Is32vec	d3 = dir8(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -384,21 +414,9 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 #endif
 	for (citerator end = direction[v].end(); dir != end; ++dir)
 	{
-	    *str = evalue(*eHH, *eHV, *eVV);
-	    *dir = dir8(*eHV, *str - *eHH);
-	    if (*str > 0)
-	    {
-		*dir &= ~0x4;
-	      //if (*dir >= 4)
-	      //    *dir -= 4;
-	    }
-	    else
-	    {
-		*str *= -1.0f;
-		*dir |= 0x4;
-	      //if (*dir < 4)
-	      //    *dir += 4;
-	    }
+	    const float	lambda = eigen(*eHH, *eHV, *eVV);
+	    *str = std::abs(lambda);
+	    *dir = dir8(*eHV, lambda - *eHH, lambda);
 	    
 	    ++eHH;
 	    ++eHV;
