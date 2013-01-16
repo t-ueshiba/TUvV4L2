@@ -41,9 +41,8 @@ namespace mm
 static inline Is32vec
 dir4(F32vec u, F32vec v)
 {
-    const Is32vec	l2 = cast<int>(u <  v),
-			l4 = cast<int>(u < -v);
-    return (l4 & Is32vec(0x4)) | ((l2 ^ l4) & Is32vec(0x2));
+    const Is32vec	l4 = cast<int>(u < -v);
+    return (l4 & Is32vec(0x4)) | ((cast<int>(u <  v) ^ l4) & Is32vec(0x2));
 }
 
 static inline Is32vec
@@ -61,13 +60,12 @@ dir8(F32vec u, F32vec v)
 {
     const F32vec	su = F32vec(slant) * u,
 			sv = F32vec(slant) * v;
-    const Is32vec	l1 = cast<int>(su <   v),
-			l2 = cast<int>( u <  sv),
-			l3 = cast<int>( u < -sv),
+    const Is32vec	l2 = cast<int>( u <  sv),
 			l4 = cast<int>(su <  -v);
-    return (l4			    & Is32vec(0x4)) |
-	   ((l2 ^ l4)		    & Is32vec(0x2)) |
-	   (((l1 ^ l2) | (l3 ^ l4)) & Is32vec(0x1));
+    return (l4				  & Is32vec(0x4)) |
+	   ((l2 ^ l4)			  & Is32vec(0x2)) |
+	   (((cast<int>(su <   v) ^ l2) |
+	     (cast<int>( u < -sv) ^ l4))  & Is32vec(0x1));
 }
 
 static inline Is32vec
