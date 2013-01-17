@@ -284,7 +284,8 @@ XDC::operator <<(const Point2<int>& p)
       {
 	u_int	w = (mul() > div() ? mul() / div() : 1);
 	XFillRectangle(_colormap.display(), drawable(), _gc,
-		       log2devU(p[0]), log2devV(p[1]), w, w);
+		       log2devR(p[0] + offset()[0]),
+		       log2devR(p[1] + offset()[1]), w, w);
       }
 	break;
 	
