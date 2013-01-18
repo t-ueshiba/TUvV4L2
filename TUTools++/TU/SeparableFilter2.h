@@ -81,9 +81,7 @@ class SeparableFilter2
   public:
     SeparableFilter2() :_filterH(), _filterV(), _shift(0), _grainSize(1) {}
 
-    template <class IN, class OUT,
-  	      class BVAL=typename std::iterator_traits<
-			     typename subiterator<OUT>::type>::value_type>
+    template <class IN, class OUT>
     void	convolve(IN ib, IN ie, OUT out)	const	;
     size_t	shift()				const	{ return _shift; }
     void	setShift(size_t s)			{ _shift = s; }
@@ -109,12 +107,14 @@ class SeparableFilter2
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
 */
-template <class F> template <class IN, class OUT, class BVAL> void
+template <class F> template <class IN, class OUT> void
 SeparableFilter2<F>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef Array2<Array<BVAL> >		buf_type;
-    typedef typename buf_type::iterator		buf_iterator;
-    typedef typename buf_type::const_iterator	const_buf_iterator;
+    typedef typename std::iterator_traits<
+	typename subiterator<OUT>::type>::value_type	element_type;
+    typedef Array2<Array<element_type> >		buf_type;
+    typedef typename buf_type::iterator			buf_iterator;
+    typedef typename buf_type::const_iterator		const_buf_iterator;
     
     buf_type	buf((ib != ie ?
 		     _filterH.outLength(std::distance(ib->begin(), ib->end())) :
