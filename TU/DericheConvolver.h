@@ -179,29 +179,17 @@ template <class T> class DericheConvolver2
     using		super::grainSize;
     using		super::setGrainSize;
     
-    template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<
-			   typename subiterator<OUT>::type>::value_type>
+    template <class IN, class OUT>
     void		smooth(IN ib, IN ie, OUT out)			;
-    template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<
-			   typename subiterator<OUT>::type>::value_type>
+    template <class IN, class OUT>
     void		diffH (IN ib, IN ie, OUT out)			;
-    template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<
-			   typename subiterator<OUT>::type>::value_type>
+    template <class IN, class OUT>
     void		diffV (IN ib, IN ie, OUT out)			;
-    template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<
-			   typename subiterator<OUT>::type>::value_type>
+    template <class IN, class OUT>
     void		diffHH(IN ib, IN ie, OUT out)			;
-    template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<
-			   typename subiterator<OUT>::type>::value_type>
+    template <class IN, class OUT>
     void		diffHV(IN ib, IN ie, OUT out)			;
-    template <class IN, class OUT,
-	      class BVAL=typename std::iterator_traits<
-			   typename subiterator<OUT>::type>::value_type>
+    template <class IN, class OUT>
     void		diffVV(IN ib, IN ie, OUT out)			;
 };
 
@@ -224,11 +212,11 @@ DericheConvolver2<T>::initialize(coeff_type alpha)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline void
+template <class T> template <class IN, class OUT> inline void
 DericheConvolver2<T>::smooth(IN ib, IN ie, OUT out)
 {
     super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c0, IIRF::Zeroth)
-	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
+	  .template convolve<IN, OUT>(ib, ie, out);
 }
 
 //! Canny-Deriche核による横方向1階微分
@@ -238,11 +226,11 @@ DericheConvolver2<T>::smooth(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline void
+template <class T> template <class IN, class OUT> inline void
 DericheConvolver2<T>::diffH(IN ib, IN ie, OUT out)
 {
     super::initialize(coeffs::_c1, IIRF::First, coeffs::_c0, IIRF::Zeroth)
-	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
+	  .template convolve<IN, OUT>(ib, ie, out);
 }
 
 //! Canny-Deriche核による縦方向1階微分
@@ -252,11 +240,11 @@ DericheConvolver2<T>::diffH(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline void
+template <class T> template <class IN, class OUT> inline void
 DericheConvolver2<T>::diffV(IN ib, IN ie, OUT out)
 {
     super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c1, IIRF::First)
-	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
+	  .template convolve<IN, OUT>(ib, ie, out);
 }
 
 //! Canny-Deriche核による横方向2階微分
@@ -266,11 +254,11 @@ DericheConvolver2<T>::diffV(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline void
+template <class T> template <class IN, class OUT> inline void
 DericheConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
 {
     super::initialize(coeffs::_c2, IIRF::Second, coeffs::_c0, IIRF::Zeroth)
-	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
+	  .template convolve<IN, OUT>(ib, ie, out);
 }
 
 //! Canny-Deriche核による縦横両方向2階微分
@@ -280,11 +268,11 @@ DericheConvolver2<T>::diffHH(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline void
+template <class T> template <class IN, class OUT> inline void
 DericheConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
 {
     super::initialize(coeffs::_c1, IIRF::First, coeffs::_c1, IIRF::First)
-	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
+	  .template convolve<IN, OUT>(ib, ie, out);
 }
 
 //! Canny-Deriche核による縦方向2階微分
@@ -294,11 +282,11 @@ DericheConvolver2<T>::diffHV(IN ib, IN ie, OUT out)
   \param out	出力2次元データ配列の先頭行を指す反復子
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
-template <class T> template <class IN, class OUT, class BVAL> inline void
+template <class T> template <class IN, class OUT> inline void
 DericheConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 {
     super::initialize(coeffs::_c0, IIRF::Zeroth, coeffs::_c2, IIRF::Second)
-	  .template convolve<IN, OUT, BVAL>(ib, ie, out);
+	  .template convolve<IN, OUT>(ib, ie, out);
 }
 
 }
