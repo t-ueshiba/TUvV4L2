@@ -24,10 +24,10 @@ class HRP2 : public HRP2Client
   private:
     typedef HRP2Client	super;
     
-  //! HRP2������δ���λ��������ƻ뤹�륹��å�
+  //! HRP2の特定の関節の姿勢を常時監視するスレッド
   /*!
-   *  �������󥰥Хåե�����¸�������饤����Ȥ��׵�˱����ƻ��ꤵ�줿����ˤ�äȤ�
-   *  �ᤤ����ˤ�����������֤���
+   *  姿勢をリングバッファに保存し，クライアントの要求に応じて指定された時刻にもっとも
+   *  近い時刻における姿勢を返す．
    */
     class GetRealPoseThread
     {
@@ -37,8 +37,8 @@ class HRP2 : public HRP2Client
 	    ChronoPose()			:D(), t(0)		{}
 	    ChronoPose(const Pose& D_, Time t_)	:D(D_), t(t_)		{}
 
-	    Pose	D;	//!< ����
-	    Time	t;	//!< ���λ�����Ȥä�����(micro sec)
+	    Pose	D;	//!< 姿勢
+	    Time	t;	//!< この姿勢をとった時刻(micro sec)
 	};
 
       public:
@@ -67,10 +67,10 @@ class HRP2 : public HRP2Client
 	pthread_t				_thread;
     };
 
-  //! HRP2�ΰ���������ʤ����ޥ�ɤ�¹Ԥ��륹��å�
+  //! HRP2の引数を持たないコマンドを実行するスレッド
   /*!
-   *  HRP2����ɸ�ͤ���ã����ޤǸƽ�¦��������֤��ʤ����ޥ�ɤˤĤ��ơ��������Ω����
-   *  ����åɤ����餻�뤳�Ȥˤ�ꡤ���ޥ�ɼ¹���˥ۥ���¦���̤κ�Ȥ�Ԥ���褦�ˤ��롥
+   *  HRP2が目標値に到達するまで呼出側に制御を返さないコマンドについて，これを独立した
+   *  スレッドで走らせることにより，コマンド実行中にホスト側が別の作業を行えるようにする．
    */
     class ExecuteCommandThread
     {

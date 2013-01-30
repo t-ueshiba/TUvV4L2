@@ -24,13 +24,13 @@ HRP2::setup(bool isLeftHand)
 {
     using namespace	std;
     
-  // ¹´Â«ÀßÄê
+  // æ‹˜æŸè¨­å®š
     bool	constrained[] = {true, true, true, true, true, true};
     double	weights[]     = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0};
     if (!SelectTaskDofs(isLeftHand, constrained, weights))
 	throw runtime_error("HRP2Client::SelectTaskDofs() failed!!");
     
-  // »ÈÍÑ¤¹¤ë¼«Í³ÅÙ¤òÀßÄê
+  // ä½¿ç”¨ã™ã‚‹è‡ªç”±åº¦ã‚’è¨­å®š
     bool	usedDofs[] =
 		{
 		    true, true, true, true, true, true,		// right leg
@@ -46,19 +46,19 @@ HRP2::setup(bool isLeftHand)
     if (!SelectUsedDofs(usedDofs))
 	throw runtime_error("HRP2Client::SelectUsedDofs() failed!!");
     
-  // ¥Ù¡¼¥¹¤È¤Ê¤ë¥ê¥ó¥¯¤òÀßÄê
+  // ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹ãƒªãƒ³ã‚¯ã‚’è¨­å®š
     if (!SelectBaseLink("RLEG_JOINT5"))
 	throw runtime_error("HRP2Client::SelectBaseLink() failed!!");
 
-  // Later¥â¡¼¥É¤ËÀßÄê
+  // Laterãƒ¢ãƒ¼ãƒ‰ã«è¨­å®š
     if (!SelectExecutionMode(true))
 	throw runtime_error("HRP2Client::SelectExecutionMode() failed!!");
 
-  // È¿ÂĞÂ¦¤Î¼ê¤ò¶¯À©Åª¤Ëdeselect¤·¡¤½êË¾¤Î¼ê¤òselect¤¹¤ë¡¥
+  // åå¯¾å´ã®æ‰‹ã‚’å¼·åˆ¶çš„ã«deselectã—ï¼Œæ‰€æœ›ã®æ‰‹ã‚’selectã™ã‚‹ï¼
     DeSelectArm(!isLeftHand);
     SelectArm(isLeftHand);
 
-  // ¥¹¥ì¥Ã¥É¤òµ¯Æ°¤¹¤ë¡¥
+  // ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’èµ·å‹•ã™ã‚‹ï¼
     _getRealPose.run();
     _executeCommand.run();
 }
@@ -106,10 +106,10 @@ HRP2::GetRealPoseThread::GetRealPoseThread(HRP2Client& hrp2,
 HRP2::GetRealPoseThread::~GetRealPoseThread()
 {
     pthread_mutex_lock(&_mutex);
-    _quit = true;			// ½ªÎ»¥Õ¥é¥°¤òÎ©¤Æ¤ë
+    _quit = true;			// çµ‚äº†ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
     pthread_mutex_unlock(&_mutex);
 
-    pthread_join(_thread, NULL);	// »Ò¥¹¥ì¥Ã¥É¤Î½ªÎ»¤òÂÔ¤Ä
+    pthread_join(_thread, NULL);	// å­ã‚¹ãƒ¬ãƒƒãƒ‰ã®çµ‚äº†ã‚’å¾…ã¤
     pthread_mutex_destroy(&_mutex);
 }
 
@@ -125,9 +125,9 @@ bool
 HRP2::GetRealPoseThread::operator ()(Time time,
 				     Pose& D, Time& t) const
 {
-  // Í¿¤¨¤é¤ì¤¿»ş¹ï¤è¤ê¤â¸å¤Î¥İ¡¼¥º¤¬ÆÀ¤é¤ì¤ë¤Ş¤ÇÂÔ¤Ä¡¥
-    ChronoPose	after;		// time¤è¤ê¤â¸å¤Î»ş¹ï¤Ç¼èÆÀ¤µ¤ì¤¿¥İ¡¼¥º
-    for (;;)			// ¤òÈ¯¸«¤¹¤ë¤Ş¤ÇÂÔ¤Ä¡¥
+  // ä¸ãˆã‚‰ã‚ŒãŸæ™‚åˆ»ã‚ˆã‚Šã‚‚å¾Œã®ãƒãƒ¼ã‚ºãŒå¾—ã‚‰ã‚Œã‚‹ã¾ã§å¾…ã¤ï¼
+    ChronoPose	after;		// timeã‚ˆã‚Šã‚‚å¾Œã®æ™‚åˆ»ã§å–å¾—ã•ã‚ŒãŸãƒãƒ¼ã‚º
+    for (;;)			// ã‚’ç™ºè¦‹ã™ã‚‹ã¾ã§å¾…ã¤ï¼
     {
 	pthread_mutex_lock(&_mutex);
 	if (!_poses.empty() && (after = _poses.back()).t > time)
@@ -135,31 +135,31 @@ HRP2::GetRealPoseThread::operator ()(Time time,
 	pthread_mutex_unlock(&_mutex);
     }
 
-  // ¥ê¥ó¥°¥Ğ¥Ã¥Õ¥¡¤ò²áµî¤ËÁÌ¤ê¡¤Í¿¤¨¤é¤ì¤¿»ş¹ï¤è¤ê¤âÁ°¤Î¥İ¡¼¥º¤òÃµ¤¹¡¥
+  // ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã‚’éå»ã«é¡ã‚Šï¼Œä¸ãˆã‚‰ã‚ŒãŸæ™‚åˆ»ã‚ˆã‚Šã‚‚å‰ã®ãƒãƒ¼ã‚ºã‚’æ¢ã™ï¼
     BOOST_REVERSE_FOREACH (const ChronoPose& pose, _poses)
     {
-	if (pose.t <= time)	// time¤ÎÄ¾Á°¤Î¥İ¡¼¥º¤Ê¤é¤Ğ¡¥¡¥¡¥
+	if (pose.t <= time)	// timeã®ç›´å‰ã®ãƒãƒ¼ã‚ºãªã‚‰ã°ï¼ï¼ï¼
 	{
-	  // pose¤Èafter¤Î¤¦¤Á¡¤¤½¤Î»ş¹ï¤¬time¤Ë¶á¤¤Êı¤òÊÖ¤¹¡¥
+	  // poseã¨afterã®ã†ã¡ï¼Œãã®æ™‚åˆ»ãŒtimeã«è¿‘ã„æ–¹ã‚’è¿”ã™ï¼
 	    if ((time - pose.t) < (after.t - time))
-	    {			// time¤¬after¤è¤ê¤âpose¤Î»ş¹ï¤Ë¶á¤±¤ì¤Ğ¡¥¡¥¡¥
+	    {			// timeãŒafterã‚ˆã‚Šã‚‚poseã®æ™‚åˆ»ã«è¿‘ã‘ã‚Œã°ï¼ï¼ï¼
 		D = pose.D;
 		t = pose.t;
 	    }
-	    else		// time¤¬pose¤è¤ê¤âafter¤Î»ş¹ï¤Ë¶á¤±¤ì¤Ğ¡¥¡¥¡¥
+	    else		// timeãŒposeã‚ˆã‚Šã‚‚afterã®æ™‚åˆ»ã«è¿‘ã‘ã‚Œã°ï¼ï¼ï¼
 	    {
 		D = after.D;
 		t = after.t;
 	    }
 	    pthread_mutex_unlock(&_mutex);
 
-	    return true;	// time¤ò¶´¤à£²¤Ä¤Î¥İ¡¼¥º¤òÈ¯¸«¤·¤¿
+	    return true;	// timeã‚’æŒŸã‚€ï¼’ã¤ã®ãƒãƒ¼ã‚ºã‚’ç™ºè¦‹ã—ãŸ
 	}
 	after = pose;
     }
     pthread_mutex_unlock(&_mutex);
 
-    return false;		// time¤ÎÄ¾Á°¤Î¥İ¡¼¥º¤òÈ¯¸«¤Ç¤­¤Ê¤«¤Ã¤¿
+    return false;		// timeã®ç›´å‰ã®ãƒãƒ¼ã‚ºã‚’ç™ºè¦‹ã§ããªã‹ã£ãŸ
 }
 
 bool
@@ -202,22 +202,22 @@ HRP2::GetRealPoseThread::mainLoop()
     for (;;)
     {
 	pthread_mutex_lock(&_mutex);
-	bool	quit = _quit;		// Ì¿Îá¤ò¼èÆÀ
+	bool	quit = _quit;		// å‘½ä»¤ã‚’å–å¾—
 	pthread_mutex_unlock(&_mutex);
-	if (quit)			// ½ªÎ»Ì¿Îá¤Ê¤é¤Ğ...
-	    break;			// Ã¦½Ğ
+	if (quit)			// çµ‚äº†å‘½ä»¤ãªã‚‰ã°...
+	    break;			// è„±å‡º
 
 	Pose	D;
 	double	sec, nsec;
 	if (_hrp2.GetRealPose(const_cast<char*>(_linkName.c_str()),
-			      D.data(), &sec, &nsec))	// ¥İ¡¼¥ºÆşÎÏÀ®¸ù¡©
+			      D.data(), &sec, &nsec))	// ãƒãƒ¼ã‚ºå…¥åŠ›æˆåŠŸï¼Ÿ
 	{
 	    Time	t = usec(sec, nsec);	// micro second
 	    
 	    if (_poses.empty() || (t != _poses.back().t))
 	    {
 		pthread_mutex_lock(&_mutex);
-		_poses.push_back(ChronoPose(D, t));	// ¥ê¥ó¥°¥Ğ¥Ã¥Õ¥¡¤ËÆş¤ì¤ë
+		_poses.push_back(ChronoPose(D, t));	// ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã«å…¥ã‚Œã‚‹
 		pthread_mutex_unlock(&_mutex);
 	    }
 	}
@@ -247,11 +247,11 @@ HRP2::ExecuteCommandThread::ExecuteCommandThread(HRP2Client& hrp2)
 HRP2::ExecuteCommandThread::~ExecuteCommandThread()
 {
     pthread_mutex_lock(&_mutex);
-    _quit = true;			// ½ªÎ»Ì¿Îá¤ò¥»¥Ã¥È
-    pthread_cond_signal(&_cond);	// »Ò¥¹¥ì¥Ã¥É¤Ë½ªÎ»Ì¿Îá¤òÁ÷¤ë
+    _quit = true;			// çµ‚äº†å‘½ä»¤ã‚’ã‚»ãƒƒãƒˆ
+    pthread_cond_signal(&_cond);	// å­ã‚¹ãƒ¬ãƒƒãƒ‰ã«çµ‚äº†å‘½ä»¤ã‚’é€ã‚‹
     pthread_mutex_unlock(&_mutex);
 
-    pthread_join(_thread, NULL);	// »Ò¥¹¥ì¥Ã¥É¤Î½ªÎ»¤òÂÔ¤Ä
+    pthread_join(_thread, NULL);	// å­ã‚¹ãƒ¬ãƒƒãƒ‰ã®çµ‚äº†ã‚’å¾…ã¤
     pthread_cond_destroy(&_cond);
     pthread_mutex_destroy(&_mutex);
 }
@@ -269,7 +269,7 @@ HRP2::ExecuteCommandThread::operator ()(Command command) const
 {
     pthread_mutex_lock(&_mutex);
     _command = command;
-    pthread_cond_signal(&_cond);	// »Ò¥¹¥ì¥Ã¥É¤Ë¼Â¹ÔÌ¿Îá¤òÁ÷¤ë
+    pthread_cond_signal(&_cond);	// å­ã‚¹ãƒ¬ãƒƒãƒ‰ã«å®Ÿè¡Œå‘½ä»¤ã‚’é€ã‚‹
     pthread_mutex_unlock(&_mutex);
 }
 
@@ -277,8 +277,8 @@ void
 HRP2::ExecuteCommandThread::wait() const
 {
     pthread_mutex_lock(&_mutex);
-    while (_command != 0)			// ¼Â¹Ô¤¬´°Î»¤¹¤ë¤Ş¤Ç
-	pthread_cond_wait(&_cond, &_mutex);	// ÂÔ¤Ä
+    while (_command != 0)			// å®Ÿè¡ŒãŒå®Œäº†ã™ã‚‹ã¾ã§
+	pthread_cond_wait(&_cond, &_mutex);	// å¾…ã¤
     pthread_mutex_unlock(&_mutex);
 }
 
@@ -298,16 +298,16 @@ HRP2::ExecuteCommandThread::mainLoop()
     pthread_mutex_lock(&_mutex);
     for (;;)
     {
-	pthread_cond_wait(&_cond, &_mutex);	// ¿Æ¤«¤é¤ÎÌ¿Îá¤òÂÔ¤Ä
-	if (_quit)				// ¥¹¥ì¥Ã¥É½ªÎ»Ì¿Îá¤Ê¤é¤Ğ...
-	    break;				// ¥ë¡¼¥×¤òÃ¦½Ğ
-	else if (_command != 0)			// ¼Â¹ÔÌ¿Îá¤Ê¤é¤Ğ...
+	pthread_cond_wait(&_cond, &_mutex);	// è¦ªã‹ã‚‰ã®å‘½ä»¤ã‚’å¾…ã¤
+	if (_quit)				// ã‚¹ãƒ¬ãƒƒãƒ‰çµ‚äº†å‘½ä»¤ãªã‚‰ã°...
+	    break;				// ãƒ«ãƒ¼ãƒ—ã‚’è„±å‡º
+	else if (_command != 0)			// å®Ÿè¡Œå‘½ä»¤ãªã‚‰ã°...
 	{
 	    pthread_mutex_unlock(&_mutex);
-	    (_hrp2.*_command)();		// ¥³¥Ş¥ó¥É¤ò¼Â¹Ô
+	    (_hrp2.*_command)();		// ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œ
 	    pthread_mutex_lock(&_mutex);
 	    _command = 0;
-	    pthread_cond_signal(&_cond);	// ¿Æ¤Ë¼Â¹Ô¤¬´°Î»¤·¤¿¤³¤È¤òÄÌÃÎ
+	    pthread_cond_signal(&_cond);	// è¦ªã«å®Ÿè¡ŒãŒå®Œäº†ã—ãŸã“ã¨ã‚’é€šçŸ¥
 	}
     }
     pthread_mutex_unlock(&_mutex);
