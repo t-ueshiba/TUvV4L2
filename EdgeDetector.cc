@@ -42,11 +42,20 @@ static inline Is32vec
 dir4(F32vec u, F32vec v)
 {
     const Is32vec	l4 = cast<int>(u < -v);
-    return (l4 & Is32vec(0x4)) | ((cast<int>(u <  v) ^ l4) & Is32vec(0x2));
+    return (l4 & Is32vec(0x4)) | ((cast<int>(u < v) ^ l4) & Is32vec(0x2));
 }
 
 static inline Is32vec
-dir4(F32vec u, F32vec v, F32vec lambda)
+dir4x(F32vec u, F32vec v)
+{
+    const Is32vec	l4 = cast<int>(v < zero<float>());
+    return (l4				        & Is32vec(0x4)) |
+	   ((cast<int>(u < zero<float>()) ^ l4) & Is32vec(0x2)) |
+						  Is32vec(0x1);
+}
+
+static inline Is32vec
+dir4x(F32vec u, F32vec v, F32vec lambda)
 {
     const Is32vec	l = cast<int>((u < zero<float>()) ^
 				      (v < zero<float>()));
@@ -69,7 +78,19 @@ dir8(F32vec u, F32vec v)
 }
 
 static inline Is32vec
-dir8(F32vec u, F32vec v, F32vec lambda)
+dir8x(F32vec u, F32vec v)
+{
+    const Is32vec	l2 = cast<int>(u < zero<float>()),
+			l4 = cast<int>(v < zero<float>()),
+			l  = l2 ^ l4;
+    return (l4				& Is32vec(0x4)) |
+	   (l				& Is32vec(0x2)) |
+	   (((cast<int>(u <  v) ^ l2) |
+	     (cast<int>(u < -v) ^ l4))  & Is32vec(0x1));
+}
+
+static inline Is32vec
+dir8x(F32vec u, F32vec v, F32vec lambda)
 {
     const Is32vec	l2 = cast<int>(u < zero<float>()),
 			l4 = cast<int>(v < zero<float>()),
@@ -95,11 +116,17 @@ namespace TU
 template <class T> static inline u_int
 dir4(T u, T v)
 {
-    return (u <= v ? (u <= -v ? 4 : 2) : (u <= -v ? 6 : 0));
+    return (u < -v ? (u < v ? 4 : 6) : (u < v ? 2 : 0));
 }
     
 template <class T> static inline u_int
-dir4(T u, T v, T lambda)
+dir4x(T u, T v)
+{
+    return (v < 0 ? (u < 0 ? 5 : 7) : (u < 0 ? 3 : 1));
+}
+    
+template <class T> static inline u_int
+dir4x(T u, T v, T lambda)
 {
     const u_int	l = (u < 0) ^ (v < 0);
     return ((lambda < 0) ^ l) << 2) | (l << 1) | 0x1;
@@ -109,13 +136,21 @@ template <class T> static inline u_int
 dir8(T u, T v)
 {
     const T	su = slant * u, sv = slant * v;
-    return (su <= v ?
-	    (u <=  sv ? (u <= -sv ? (su <= -v ? 4 : 3) : 2) : 1) :
-	    (su <= -v ? (u <= -sv ? (u <=  sv ? 5 : 6) : 7) : 0));
+    return (su < -v ?
+	    ( u < -sv ? (u < sv ? (su <   v ? 4 : 5) : 6) : 7) :
+	    (su <   v ? (u < sv ? ( u < -sv ? 3 : 2) : 1) : 0));
 }
     
 template <class T> static inline u_int
-dir8(T u, T v, T lambda)
+dir8x(T u, T v)
+{
+    return (v < 0 ?
+	    (u < -v ? (u < 0 ? (u <  v ? 4 : 5) : 6) : 7) :
+	    (u <  v ? (u < 0 ? (u < -v ? 3 : 2) : 1) : 0));
+}
+    
+template <class T> static inline u_int
+dir8x(T u, T v, T lambda)
 {
     const u_int	l2 = (u < 0), l4 = (v < 0), l = l2 ^ l4;
     return (((lambda < 0) ^ l) << 2) |
@@ -297,6 +332,45 @@ EdgeDetector::direction4(const Image<float>& edgeH,
     return *this;
 }
     
+const EdgeDetector&
+EdgeDetector::direction4x(const Image<float>& edgeH,
+			  const Image<float>& edgeV, Image<u_char>& out) const
+{
+    out.resize(edgeH.height(), edgeH.width());
+    for (u_int v = 0; v < out.height(); ++v)
+    {
+	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
+	u_char*			dst = out[v].data();
+	const u_char* const	end = dst + out.width();
+#if defined(SSE2)
+	using namespace		mm;
+
+	const u_int		nelms = F32vec::size;
+	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
+	     dst < end2; dst += Iu8vec::size)
+	{
+	    const Is32vec	d0 = dir4x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d1 = dir4x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d2 = dir4x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d3 = dir4x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
+	}
+#endif
+	while (dst < end)
+	    *dst++ = dir4x(*eH++, *eV++);
+    }
+    
+    return *this;
+}
+    
 //! 8近傍によるエッジ方向を求める
 /*!
   \param edgeH	横方向1階微分入力画像
@@ -344,6 +418,45 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 }
     
 const EdgeDetector&
+EdgeDetector::direction8x(const Image<float>& edgeH,
+			  const Image<float>& edgeV, Image<u_char>& out) const
+{
+    out.resize(edgeH.height(), edgeH.width());
+    for (u_int v = 0; v < out.height(); ++v)
+    {
+	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
+	u_char*			dst = out[v].data();
+	const u_char* const	end = dst + out.width();
+#if defined(SSE2)
+	using namespace		mm;
+
+	const u_int		nelms = F32vec::size;
+	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
+	     dst < end2; dst += Iu8vec::size)
+	{
+	    const Is32vec	d0 = dir8x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d1 = dir8x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d2 = dir8x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    const Is32vec	d3 = dir8x(loadu(eH), loadu(eV));
+	    eH += nelms;
+	    eV += nelms;
+	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
+	}
+#endif
+	while (dst < end)
+	    *dst++ = dir8x(*eH++, *eV++);
+    }
+    
+    return *this;
+}
+    
+const EdgeDetector&
 EdgeDetector::ridge(const Image<float>& edgeHH,
 		    const Image<float>& edgeHV,
 		    const Image<float>& edgeVV,
@@ -370,7 +483,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	{
 	    F32vec	fHH = loadu(eHH), fHV = loadu(eHV);
 	    F32vec	lambda = eigen(fHH, fHV, loadu(eVV));
-	    Is32vec	d0 = dir8(fHV, lambda - fHH, lambda);
+	    Is32vec	d0 = dir8x(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -380,7 +493,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	    fHH = loadu(eHH);
 	    fHV = loadu(eHV);
 	    lambda = eigen(fHH, fHV, loadu(eVV));
-	    Is32vec	d1 = dir8(fHV, lambda - fHH, lambda);
+	    Is32vec	d1 = dir8x(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -390,7 +503,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	    fHH = loadu(eHH);
 	    fHV = loadu(eHV);
 	    lambda = eigen(fHH, fHV, loadu(eVV));
-	    Is32vec	d2 = dir8(fHV, lambda - fHH, lambda);
+	    Is32vec	d2 = dir8x(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -400,7 +513,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	    fHH = loadu(eHH);
 	    fHV = loadu(eHV);
 	    lambda = eigen(fHH, fHV, loadu(eVV));
-	    Is32vec	d3 = dir8(fHV, lambda - fHH, lambda);
+	    Is32vec	d3 = dir8x(fHV, lambda - fHH, lambda);
 	    storeu(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
@@ -414,7 +527,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	{
 	    const float	lambda = eigen(*eHH, *eHV, *eVV);
 	    *str = std::abs(lambda);
-	    *dir = dir8(*eHV, lambda - *eHH, lambda);
+	    *dir = dir8x(*eHV, lambda - *eHH, lambda);
 	    
 	    ++eHH;
 	    ++eHV;
