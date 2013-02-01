@@ -35,7 +35,6 @@
 #define __TUiterator_h
 
 #include <cstddef>				// for including size_t
-#include <vector>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/iterator_adaptors.hpp>
@@ -574,7 +573,6 @@ class box_filter_iterator
 				    ITER,
 				    T,
 				    boost::single_pass_traversal_tag>	super;
-    typedef std::vector<T>			buf_type;
     
   public:
     typedef typename super::difference_type	difference_type;
@@ -587,50 +585,43 @@ class box_filter_iterator
 
   public:
 		box_filter_iterator(ITER const& iter, size_t w=0)
-		    :super(iter), _buf(w), _i(0), _valid(true), _val()
+		    :super(iter), _head(iter), _valid(true), _val()
 		{
-		    for (size_t i = 0; i < _buf.size(); ++i)
-			if (i == 0)
-			    _val = (_buf[0] = *super::base());
-			else
-			{
-			    ++super::base_reference();
-			    _val += (_buf[i] = *super::base());
-			}
+		    if (w > 0)
+		    {
+			_val = *super::base();
+				
+			while (--w > 0)
+			    _val += *++super::base_reference();
+		    }
 		}
 
   private:
     reference	dereference() const
 		{
-		    if (!_valid)	// 現時点のデータが未読ならば...
-		    {			// 読み込んで保存し，足し込む
-			_val += (_buf[_i] = *super::base());
-			if (++_i == _buf.size())
-			    _i = 0;
-			_valid = true;	// _valには最新データまで含まれる
+		    if (!_valid)
+		    {
+			_val += *super::base();
+			_valid = true;
 		    }
 		    return _val;
 		}
     
     void	increment()
 		{
-		    _val -= _buf[_i];	// 最も古いデータを差し引く
-		    if (!_valid)	// 現時点のデータが未読ならば...
-		    {			// 読み込んで保存し，足し込む
-			_val += (_buf[_i] = *super::base());
-			if (++_i == _buf.size())
-			    _i = 0;
-		    }
+		    _val -= *_head;
+		    if (!_valid)
+			_val += *super::base();
 		    else
-			_valid = false;		// 次の入力データは未読
-		    ++super::base_reference();	// 次の入力データへ進む
+			_valid = false;
+		    ++_head;
+		    ++super::base_reference();
 		}
 
   private:
-    mutable buf_type	_buf;	// 過去w時点の入力データ
-    mutable size_t	_i;	// 最も古い(w-1時点前)入力データへのindex
-    mutable bool	_valid;	// _valが現時点のデータを含むならtrue
-    mutable value_type	_val;	// w-1時点前〜1時点前/現時点の入力データの総和
+    ITER		_head;
+    mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
+    mutable value_type	_val;	// [_head, base()) or [_head, base()] の総和
 };
 
 //! box filter反復子を生成する
