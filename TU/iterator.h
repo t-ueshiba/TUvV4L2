@@ -630,9 +630,9 @@ class box_filter_iterator
   \return	box filter反復子
 */
 template <class T, class ITER> box_filter_iterator<ITER, T>
-make_box_filter_iterator(ITER iter)
+make_box_filter_iterator(ITER iter, size_t w=0)
 {
-    return box_filter_iterator<ITER, T>(iter);
+    return box_filter_iterator<ITER, T>(iter, w);
 }
 
 /************************************************************************
