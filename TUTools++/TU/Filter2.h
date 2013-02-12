@@ -48,7 +48,8 @@ class Filter2
   public:
 #if defined(USE_TBB)
   private:
-    template <class IN, class OUT> class ConvolveRows
+    template <class IN, class OUT>
+    class FilterRows
     {
       public:
 	FilterRows(size_t shift, IN const& in, OUT const& out)
@@ -101,7 +102,8 @@ template <class IN, class OUT> void
 Filter2::operator ()(IN ib, IN ie, OUT out) const
 {
 #if defined(USE_TBB)
-    tbb::parallel_for(tbb::blocked_range<u_int>(0, buf.ncol(), _grainSize),
+    tbb::parallel_for(tbb::blocked_range<u_int>(0, std::distance(ib, ie),
+						_grainSize),
 		      FilterRows<IN, OUT>(_shift, ib, out));
 #else
     typedef typename subiterator<OUT>::type	col_iterator;
