@@ -38,10 +38,10 @@
 #include <iostream>
 #include <stdexcept>
 #include "TU/types.h"
-#if __cplusplus > 197711L
-#  define __CXX0X
-#  include <initializer_list>
-#endif
+//#if __cplusplus > 197711L
+//#  define __CXX0X
+//#  include <initializer_list>
+//#endif
 #ifdef __INTEL_COMPILER
 #  include <mmintrin.h>
 #endif
@@ -707,12 +707,16 @@ class Array : public B
     
     iterator			begin()					;
     const_iterator		begin()				const	;
+    const_iterator		cbegin()			const	;
     iterator			end()					;
     const_iterator		end()				const	;
+    const_iterator		cend()				const	;
     reverse_iterator		rbegin()				;
     const_reverse_iterator	rbegin()			const	;
+    const_reverse_iterator	crbegin()			const	;
     reverse_iterator		rend()					;
     const_reverse_iterator	rend()				const	;
+    const_reverse_iterator	crend()				const	;
 
     using		super::size;
     using		super::dim;
@@ -865,6 +869,16 @@ Array<T, B>::begin() const
     return data();
 }
 
+//! 配列の先頭要素を指す定数反復子を返す．
+/*!
+  \return	先頭要素を指す定数反復子
+*/
+template <class T, class B> inline typename Array<T, B>::const_iterator
+Array<T, B>::cbegin() const
+{
+    return data();
+}
+
 //! 配列の末尾を指す反復子を返す．
 /*!
   \return	末尾を指す反復子
@@ -885,6 +899,16 @@ Array<T, B>::end() const
     return begin() + size();
 }
 
+//! 配列の末尾を指す定数反復子を返す．
+/*!
+  \return	末尾を指す定数反復子
+*/
+template <class T, class B> inline typename Array<T, B>::const_iterator
+Array<T, B>::cend() const
+{
+    return begin() + size();
+}
+
 //! 配列の末尾要素を指す逆反復子を返す．
 /*!
   \return	末尾要素を指す逆反復子
@@ -895,12 +919,22 @@ Array<T, B>::rbegin()
     return reverse_iterator(end());
 }
 
-//! 配列の末尾要素を指す逆反復子を返す．
+//! 配列の末尾要素を指す定数逆反復子を返す．
 /*!
-  \return	末尾要素を指す逆反復子
+  \return	末尾要素を指す定数逆反復子
 */
 template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
 Array<T, B>::rbegin() const
+{
+    return const_reverse_iterator(end());
+}
+
+//! 配列の末尾要素を指す定数逆反復子を返す．
+/*!
+  \return	末尾要素を指す定数逆反復子
+*/
+template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
+Array<T, B>::crbegin() const
 {
     return const_reverse_iterator(end());
 }
@@ -915,12 +949,22 @@ Array<T, B>::rend()
     return reverse_iterator(begin());
 }
 
-//! 配列の先頭を指す逆反復子を返す．
+//! 配列の先頭を指す定数逆反復子を返す．
 /*!
-  \return	先頭を指す逆反復子
+  \return	先頭を指す定数逆反復子
 */
 template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
 Array<T, B>::rend() const
+{
+    return const_reverse_iterator(begin());
+}
+
+//! 配列の先頭を指す定数逆反復子を返す．
+/*!
+  \return	先頭を指す定数逆反復子
+*/
+template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
+Array<T, B>::crend() const
 {
     return const_reverse_iterator(begin());
 }

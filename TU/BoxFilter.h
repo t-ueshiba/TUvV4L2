@@ -88,10 +88,8 @@ class BoxFilter
 template <class IN, class OUT> void
 BoxFilter::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef typename std::iterator_traits<OUT>::value_type	value_type;
-    typedef box_filter_iterator<IN, value_type>			iterator;
-    
-    std::copy(iterator(ib, _width), iterator(ie), out);
+    std::copy(make_box_filter_iterator(ib, _width),
+	      make_box_filter_iterator(ie), out);
 }
 
 /************************************************************************
