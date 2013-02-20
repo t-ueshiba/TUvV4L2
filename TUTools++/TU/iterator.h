@@ -528,7 +528,7 @@ class vertical_iterator
   private:
     bool	equal(const vertical_iterator& iter) const
 		{
-		    return super::equal() && (_idx == iter._idx);
+		    return super::equal(iter) && (_idx == iter._idx);
 		}
 	
     reference	dereference() const
@@ -555,23 +555,23 @@ make_vertical_iterator(ITER iter, size_t idx)
 }
 
 /************************************************************************
-*  class box_filter_iterator<ITER, T>					*
+*  class box_filter_iterator<ITER>					*
 ************************************************************************/
 //! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER, class T=typename std::iterator_traits<ITER>::value_type>
+template <class ITER>
 class box_filter_iterator
-    : public boost::iterator_adaptor<box_filter_iterator<ITER, T>,	// self
+    : public boost::iterator_adaptor<box_filter_iterator<ITER>,	// self
 				     ITER,			// base
-				     T,				// value_type
+				     boost::use_default,	// value_type
 				     boost::single_pass_traversal_tag>
 {
   private:
     typedef boost::iterator_adaptor<box_filter_iterator,
 				    ITER,
-				    T,
+				    boost::use_default,
 				    boost::single_pass_traversal_tag>	super;
     
   public:
@@ -584,6 +584,11 @@ class box_filter_iterator
     friend class				boost::iterator_core_access;
 
   public:
+		box_filter_iterator()
+		    :super(), _head(super::base()), _valid(true), _val()
+		{
+		}
+    
 		box_filter_iterator(ITER const& iter, size_t w=0)
 		    :super(iter), _head(iter), _valid(true), _val()
 		{
@@ -596,6 +601,21 @@ class box_filter_iterator
 		    }
 		}
 
+    void	initialize(ITER const& iter, size_t w=0)
+		{
+		    super::base_reference() = iter;
+		    _head = iter;
+		    _valid = true;
+
+		    if (w > 0)
+		    {
+			_val = *super::base();
+				
+			while (--w > 0)
+			    _val += *++super::base_reference();
+		    }
+		}
+    
   private:
     reference	dereference() const
 		{
@@ -629,10 +649,10 @@ class box_filter_iterator
   \param iter	コンテナ中の要素を指す定数反復子
   \return	box filter反復子
 */
-template <class T, class ITER> box_filter_iterator<ITER, T>
+template <class ITER> box_filter_iterator<ITER>
 make_box_filter_iterator(ITER iter, size_t w=0)
 {
-    return box_filter_iterator<ITER, T>(iter, w);
+    return box_filter_iterator<ITER>(iter, w);
 }
 
 /************************************************************************
@@ -897,5 +917,74 @@ make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
     return iir_filter_iterator<D, FWD, COEFF, ITER, T>(iter, ci, co);
 }
 
+/************************************************************************
+*  class ring_iterator<ITER>						*
+************************************************************************/
+template <class ITER>
+class ring_iterator
+    : public boost::iterator_adaptor<ring_iterator<ITER>,	// self
+				     ITER,			// base
+				     boost::use_default,	// value_type
+				     boost::single_pass_traversal_tag>
+{
+  private:
+    typedef boost::iterator_adaptor<ring_iterator,
+				    ITER,
+				    boost::use_default,
+				    boost::single_pass_traversal_tag>	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    ring_iterator()
+	:super(), _begin(super::base()), _end(super::base())	{}
+    
+    ring_iterator(ITER const& begin, ITER const& end)
+	:super(begin), _begin(begin), _end(end)			{}
+
+  private:
+    void	advance(difference_type n)
+		{
+		    difference_type	d = std::distance(_begin, _end);
+		    n %= d;
+		    if (n >= std::distance(super::base(), _end))
+			std::advance(super::base_reference(), n - d);
+		    else if (n < std::distance(super::base(), _begin))
+			std::advance(super::base_reference(), n + d);
+		    else
+			std::advance(super::base_reference(), n);
+		}
+    
+    void	increment()
+		{
+		    if (++super::base_reference() == _end)
+			super::base_reference() = _begin;
+		}
+
+    void	decrement()
+		{
+		    if (super::base() == _begin)
+			super::base_reference() = _end;
+		    --super::base_reference();
+		}
+    
+  private:
+    ITER 	_begin;
+    ITER 	_end;
+};
+
+template <class ITER> ring_iterator<ITER>
+make_ring_iterator(ITER begin, ITER end)
+{
+    return ring_iterator<ITER>(begin, end);
+}
+    
 }
 #endif
