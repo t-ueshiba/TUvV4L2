@@ -14,11 +14,11 @@ ifeq ($(OSTYPE), darwin)
   LIBS	       += -framework IOKit -framework CoreFoundation
 endif
 
-#CCC		= g++
+#CXX		= g++
 CPPFLAGS	= -DHAVE_LIBTUTOOLS__ -DDEBUG=2 #-DMONO_IMAGE #-DUSE_VIDEO1394 #-DDEBUG #-DUseXvDC
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CCC), icpc)
+ifeq ($(CXX), icpc)
   CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   ifeq ($(OSTYPE), darwin)
@@ -31,7 +31,7 @@ ifeq ($(CCC), icpc)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LINKER		= $(CCC)
+LINKER		= $(CXX)
 
 #########################
 #  Macros set by mkmf	#

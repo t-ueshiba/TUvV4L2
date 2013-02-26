@@ -2693,23 +2693,25 @@ operator <<(std::ostream& out, const Ieee1394Camera& camera)
     {
 	u_int	inq = camera.inquireFeatureFunction(features[i].feature);
 
-	if (inq & Ieee1394Camera::Presence)
+	if ((inq & Ieee1394Camera::Presence) &&
+	    (inq & Ieee1394Camera::Manual)   &&
+	    (inq & Ieee1394Camera::ReadOut))
 	{
-	    out << ' ' << features[i].name << ' ';
-
+	    out << ' ' << features[i].name;
+	    
 	    if ((inq & Ieee1394Camera::Auto) &&
 		camera.isAuto(features[i].feature))
-		out << -1;
+		out << ' ' << -1;
 	    else
 	    {
 		if (features[i].feature == Ieee1394Camera::WHITE_BALANCE)
 		{
 		    u_int	ub, vr;
 		    camera.getWhiteBalance(ub, vr);
-		    out << ub << ' ' << vr;
+		    out << ' ' << ub << ' ' << vr;
 		}
 		else
-		    out << camera.getValue(features[i].feature);
+		    out << ' ' << camera.getValue(features[i].feature);
 	    }
 	}
     }

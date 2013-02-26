@@ -296,64 +296,70 @@ createCommands(My1394Camera& camera)
 		GtkWidget*	label = gtk_label_new(feature[i].name);
 		gtk_table_attach_defaults(GTK_TABLE(commands), label,
 					  0, 1, y, y+1);
-	      // この機能が取り得る値の範囲を調べる．
-		u_int	min, max;
-		camera.getMinMax(feature[i].feature, min, max);
-		if (feature[i].feature == Ieee1394Camera::WHITE_BALANCE)
+		if (inq & Ieee1394Camera::ReadOut)
 		{
-		  // white balanceの現在の値を調べる．
-		    u_int	ub, vr;
-		    camera.getWhiteBalance(ub, vr);
-		  // white balanceのUB値を与えるためのadjustment widgetを生成．
-		    GtkObject*	adj = gtk_adjustment_new(ub, min, max,
+		  // この機能が取り得る値の範囲を調べる．
+		    u_int	min, max;
+		    camera.getMinMax(feature[i].feature, min, max);
+		    if (feature[i].feature == Ieee1394Camera::WHITE_BALANCE)
+		    {
+		      // white balanceの現在の値を調べる．
+			u_int	ub, vr;
+			camera.getWhiteBalance(ub, vr);
+		      // white balanceのUB値を与えるためのadjustment widgetを生成．
+			GtkObject*	adj = gtk_adjustment_new(ub, min, max,
+								 1.0, 1.0, 0.0);
+		      // コールバック関数の登録．
+			gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
+					   GTK_SIGNAL_FUNC(CBsetWhiteBalanceUB),
+					   &camera);
+		      // adjustmentを操作するためのscale widgetを生成．
+			GtkWidget*	scale = gtk_hscale_new(
+						    GTK_ADJUSTMENT(adj));
+			gtk_scale_set_digits(GTK_SCALE(scale), 0);
+			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
+						  1, 2, y, y+1);
+			++i;
+			++y;
+			GtkWidget*	label = gtk_label_new(feature[i].name);
+			gtk_table_attach_defaults(GTK_TABLE(commands), label,
+						  0, 1, y, y+1);
+		      // white balanceのVR値を与えるためのadjustment widgetを生成．
+			adj = gtk_adjustment_new(vr, min, max, 1.0, 1.0, 0.0);
+		      // コールバック関数の登録．
+			gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
+					   GTK_SIGNAL_FUNC(CBsetWhiteBalanceVR),
+					   &camera);
+		      // adjustmentを操作するためのscale widgetを生成．
+			scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+			gtk_scale_set_digits(GTK_SCALE(scale), 0);
+			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
+						  1, 2, y, y+1);
+		    }
+		    else
+		    {
+		      // この機能の現在の値を調べる．
+			int	val = camera.getValue(feature[i].feature);
+		      // この機能に値を与えるためのadjustment widgetを生成．
+			GtkObject*
+				adj = gtk_adjustment_new(val, min, max,
 							 1.0, 1.0, 0.0);
-		  // コールバック関数の登録．
-		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-				       GTK_SIGNAL_FUNC(CBsetWhiteBalanceUB),
-				       &camera);
-		  // adjustmentを操作するためのscale widgetを生成．
-		    GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
-		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
-		    gtk_table_attach_defaults(GTK_TABLE(commands), scale,
-					      1, 2, y, y+1);
-		    ++i;
-		    ++y;
-		    GtkWidget*	label = gtk_label_new(feature[i].name);
-		    gtk_table_attach_defaults(GTK_TABLE(commands), label,
-					      0, 1, y, y+1);
-		  // white balanceのVR値を与えるためのadjustment widgetを生成．
-		    adj = gtk_adjustment_new(vr, min, max, 1.0, 1.0, 0.0);
-		  // コールバック関数の登録．
-		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-				       GTK_SIGNAL_FUNC(CBsetWhiteBalanceVR),
-				       &camera);
-		  // adjustmentを操作するためのscale widgetを生成．
-		    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
-		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
-		    gtk_table_attach_defaults(GTK_TABLE(commands), scale,
-					      1, 2, y, y+1);
-		}
-		else
-		{
-		  // この機能の現在の値を調べる．
-		    int		val = camera.getValue(feature[i].feature);
-		  // この機能に値を与えるためのadjustment widgetを生成．
-		    GtkObject*	adj = gtk_adjustment_new(val, min, max,
-							 1.0, 1.0, 0.0);
-		  // コールバック関数の登録．
-		    cameraAndFeature[i].camera = &camera;
-		    cameraAndFeature[i].feature = feature[i].feature;
-		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-				       GTK_SIGNAL_FUNC(CBsetValue),
-				       (gpointer)&cameraAndFeature[i]);
-		  // adjustmentを操作するためのscale widgetを生成．
-		    GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
-		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
-		    gtk_table_attach_defaults(GTK_TABLE(commands), scale,
-					      1, 2, y, y+1);
+		      // コールバック関数の登録．
+			cameraAndFeature[i].camera = &camera;
+			cameraAndFeature[i].feature = feature[i].feature;
+			gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
+					   GTK_SIGNAL_FUNC(CBsetValue),
+					   (gpointer)&cameraAndFeature[i]);
+		      // adjustmentを操作するためのscale widgetを生成．
+			GtkWidget*
+				scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+			gtk_scale_set_digits(GTK_SCALE(scale), 0);
+			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
+						  1, 2, y, y+1);
+		    }
 		}
 	    }
 

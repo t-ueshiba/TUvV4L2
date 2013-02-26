@@ -177,7 +177,8 @@ operator <<(std::ostream& out, const My1394Camera& camera)
     {
 	u_int	inq = camera.inquireFeatureFunction(feature[i].feature);
 	if ((inq & Ieee1394Camera::Presence) &&
-	    (inq & Ieee1394Camera::Manual))
+	    (inq & Ieee1394Camera::Manual)   &&
+	    (inq & Ieee1394Camera::ReadOut))
 	{
 	    out << ' ' << feature[i].name << ' ';
 
