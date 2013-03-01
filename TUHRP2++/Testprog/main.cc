@@ -1,7 +1,7 @@
 /*
  *  $Id: main.cc,v 1.8 2009-08-07 05:09:12 ueshiba Exp $
  */
-#include <stdlib.h>
+#include <cstdlib>
 #include <stdexcept>
 #include "TU/Manip.h"
 #include "TU/HRP2++.h"
@@ -40,9 +40,6 @@ doJob(HRP2& hrp2, const std::string& configDirs, const std::string& cameraName)
 {
     using namespace	std;
 
-    typedef HRP2::Pose	Pose;
-    typedef HRP2::Time	Time;
-    
   // ロボットの右手第６軸に対する校正点の相対的位置を読み込み
     ifstream	in;
     openFile(in, configDirs, cameraName + ".hrp2");
@@ -53,14 +50,14 @@ doJob(HRP2& hrp2, const std::string& configDirs, const std::string& cameraName)
     cerr << "--- Target point ---\n" << X6 << endl;
 
   // 校正点の読み込み
-    Array<Pose>	poseList;
+    Array<Matrix44d>	poseList;
     in >> poseList;
     cerr << "--- Robot poses ---\n" << poseList;
     in.close();
 
   // 右手の把持中心を校正点に設定
     Vector3d	graspOffset = X6(0, 3);
-    if (!hrp2.SetGraspCenter(0, graspOffset.data()))
+    if (!hrp2.SetGraspCenter(false, graspOffset.data()))
 	throw runtime_error("HRP2Client::SetGraspCenter() failed!!");
 	
   // 初期姿勢へ
@@ -77,7 +74,7 @@ doJob(HRP2& hrp2, const std::string& configDirs, const std::string& cameraName)
 	if (n == 0 || n == 2 || n == 7 || n == 8)
 	    duration = 15.0;
 	
-	if (!hrp2.SetTargetPose(0, poseList[n].data(), duration))
+	if (!hrp2.SetTargetPose(false, poseList[n].data(), duration))
 	{
 	    cerr << "HRP2Client::SetTargetPose(): failed!" << endl;
 	    continue;
@@ -90,20 +87,19 @@ doJob(HRP2& hrp2, const std::string& configDirs, const std::string& cameraName)
 	hrp2.PlayMotion();
 
       // ロボット右手首第６軸の真の姿勢を求める。
-	Pose	Dw6;	// 第6軸座標系からワールド座標系への変換行列
-	Time	time;
-	if (!hrp2.GetRealPose("RARM_JOINT6", Dw6, time))
+	HRP2::TimedPose	Dw6;	// 第6軸座標系からワールド座標系への変換行列
+	if (!hrp2.GetRealPose("RARM_JOINT6", Dw6))
 	{
 	    cerr << "HRP2Client::GetRealPose(): failed!" << endl;
 	}
 	else
 	{
 	  // 第６軸の真の姿勢が求まったら、それを把持中心の姿勢に変換する。
-	    Pose	D6g = Pose::I(4);
+	    Matrix44d	D6g = Matrix44d::I(4);
 	    D6g[0][3] = X6[0];
 	    D6g[1][3] = X6[1];
 	    D6g[2][3] = X6[2];
-	    Pose	Dwg = Dw6 * D6g;
+	    Matrix44d	Dwg = Dw6 * D6g;
 	    cout << "--- Real-" << n << '/' << poseList.dim() - 1 << " ---\n"
 		 << Dwg;
 	}
@@ -126,10 +122,14 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
+
+  // Main job.
     try
     {
+      // HRP2を初期化
+	HRP2		hrp2(argc, argv, true);
+
       // Parse command options.
-	HRP2		hrp2(argc, argv);
 	string		configDirs = DEFAULT_CONFIG_DIRS;
 	string		cameraName = DEFAULT_CAMERA_NAME;
 	extern char*	optarg;
@@ -144,7 +144,6 @@ main(int argc, char* argv[])
 		break;
 	    }
     
-      // Main job.
 	doJob(hrp2, configDirs, cameraName);
     }
     catch (exception& err)

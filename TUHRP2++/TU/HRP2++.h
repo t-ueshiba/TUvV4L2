@@ -1,120 +1,223 @@
 /*
- *  $Id$
- */
+  for the communication between HRP2 control RTC's (currently ReachingRTC and 
+  SequencePlayerRTC) service provider and Vision program.
+  by nkita 100808
+
+  revise 100812 to add SeqencePlayerService
+  revise 100826 to cope with HRP2DOF7 model
+*/
 #ifndef __TUHRP2PP_H
 #define __TUHRP2PP_H
 
+#include <rtm/CorbaNaming.h>
+#include <rtm/RTObject.h>
+#include <rtm/CorbaConsumer.h>
+#include <rtm/idl/BasicDataType.hh>
+#include "ReachingService.h"
+#include "SequencePlayerService.h"
+#include "ForwardKinematicsService.hh"
+#include "WalkGeneratorService.h"
+#include "misc.h"
 #include <pthread.h>
 #include <string>
+#include <queue>
 #include <boost/circular_buffer.hpp>
 #include "TU/Vector++.h"
-#include "HRP2Client.h"
+
+#ifdef HRP3
+#  include "bodyinfo_HRP3.h"
+#  include "bodyinfo_HRP2toHRP3.h"
+#endif
+
+#ifdef HRP2
+#  include "bodyinfo_HRP2YH.h"
+#endif
+
+#ifdef HRP2DOF7
+#  include "bodyinfo_HRP2DOF7.h"
+#endif
 
 namespace TU
 {
 /************************************************************************
 *  class HRP2								*
 ************************************************************************/
-class HRP2 : public HRP2Client
+class HRP2
 {
   public:
     typedef Matrix44d	Pose;
     typedef u_int64_t	Time;
+
+    struct TimedPose : public Matrix44d
+    {
+	Time	t;
+    };
     
   private:
-    typedef HRP2Client	super;
-    
-  //! HRP2ã®ç‰¹å®šã®é–¢ç¯€ã®å§¿å‹¢ã‚’å¸¸æ™‚ç›£è¦–ã™ã‚‹ã‚¹ãƒ¬ãƒƒãƒ‰
+    enum posture_id
+    {
+	INITPOS, HALFSIT, CLOTHINIT, DESIREDPOS
+    };
+
+    enum mask_id
+    {
+	HANDS, LEFTHAND, RIGHTHAND, DESIREDMASK, EXCEPTHEAD
+    };
+
+  //! HRP2¤ÎÆÃÄê¤Î´ØÀá¤Î»ÑÀª¤ò¾ï»ş´Æ»ë¤¹¤ë¥¹¥ì¥Ã¥É
   /*!
-   *  å§¿å‹¢ã‚’ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã«ä¿å­˜ã—ï¼Œã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®è¦æ±‚ã«å¿œã˜ã¦æŒ‡å®šã•ã‚ŒãŸæ™‚åˆ»ã«ã‚‚ã£ã¨ã‚‚
-   *  è¿‘ã„æ™‚åˆ»ã«ãŠã‘ã‚‹å§¿å‹¢ã‚’è¿”ã™ï¼
+   *  »ÑÀª¤ò¥ê¥ó¥°¥Ğ¥Ã¥Õ¥¡¤ËÊİÂ¸¤·¡¤¥¯¥é¥¤¥¢¥ó¥È¤ÎÍ×µá¤Ë±ş¤¸¤Æ»ØÄê¤µ¤ì¤¿»ş¹ï¤Ë¤â¤Ã¤È¤â
+   *  ¶á¤¤»ş¹ï¤Ë¤ª¤±¤ë»ÑÀª¤òÊÖ¤¹¡¥
    */
     class GetRealPoseThread
     {
-      private:
-	struct ChronoPose
-	{
-	    ChronoPose()			:D(), t(0)		{}
-	    ChronoPose(const Pose& D_, Time t_)	:D(D_), t(t_)		{}
-
-	    Pose	D;	//!< å§¿å‹¢
-	    Time	t;	//!< ã“ã®å§¿å‹¢ã‚’ã¨ã£ãŸæ™‚åˆ»(micro sec)
-	};
-
       public:
-	GetRealPoseThread(HRP2Client& hrp2,
+	GetRealPoseThread(HRP2& hrp2,
 			  const char* linkName, u_int capacity)		;
 	~GetRealPoseThread()						;
 
 	void		run()						;
-	bool		operator ()(Time time, Pose& D, Time& t) const	;
-	bool		operator ()(Pose& D, Time& t)		 const	;
-	void		timeSpan(Time& t0, Time& t1)		 const	;
+	bool		operator ()(Time time, TimedPose& D)	const	;
+	void		timeSpan(Time& t0, Time& t1)		const	;
 		
       private:
 	void*		mainLoop()					;
 	static void*	threadProc(void* thread)			;
-	static Time	usec(double sec, double nsec)
-			{
-			    return Time(1000000*sec + nsec/1000);
-			}
 	
-	HRP2Client&				_hrp2;
+	HRP2&					_hrp2;
 	const std::string			_linkName;
-	boost::circular_buffer<ChronoPose>	_poses;
+	boost::circular_buffer<TimedPose>	_poses;
 	bool					_quit;
 	mutable pthread_mutex_t			_mutex;
 	pthread_t				_thread;
     };
 
-  //! HRP2ã®å¼•æ•°ã‚’æŒãŸãªã„ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹ã‚¹ãƒ¬ãƒƒãƒ‰
+  //! HRP2¤Î°ú¿ô¤ò»ı¤¿¤Ê¤¤¥³¥Ş¥ó¥É¤ò¼Â¹Ô¤¹¤ë¥¹¥ì¥Ã¥É
   /*!
-   *  HRP2ãŒç›®æ¨™å€¤ã«åˆ°é”ã™ã‚‹ã¾ã§å‘¼å‡ºå´ã«åˆ¶å¾¡ã‚’è¿”ã•ãªã„ã‚³ãƒãƒ³ãƒ‰ã«ã¤ã„ã¦ï¼Œã“ã‚Œã‚’ç‹¬ç«‹ã—ãŸ
-   *  ã‚¹ãƒ¬ãƒƒãƒ‰ã§èµ°ã‚‰ã›ã‚‹ã“ã¨ã«ã‚ˆã‚Šï¼Œã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œä¸­ã«ãƒ›ã‚¹ãƒˆå´ãŒåˆ¥ã®ä½œæ¥­ã‚’è¡Œãˆã‚‹ã‚ˆã†ã«ã™ã‚‹ï¼
+   *  HRP2¤¬ÌÜÉ¸ÃÍ¤ËÅşÃ£¤¹¤ë¤Ş¤Ç¸Æ½ĞÂ¦¤ËÀ©¸æ¤òÊÖ¤µ¤Ê¤¤¥³¥Ş¥ó¥É¤Ë¤Ä¤¤¤Æ¡¤¤³¤ì¤òÆÈÎ©¤·¤¿
+   *  ¥¹¥ì¥Ã¥É¤ÇÁö¤é¤»¤ë¤³¤È¤Ë¤è¤ê¡¤¥³¥Ş¥ó¥É¼Â¹ÔÃæ¤Ë¥Û¥¹¥ÈÂ¦¤¬ÊÌ¤Îºî¶È¤ò¹Ô¤¨¤ë¤è¤¦¤Ë¤¹¤ë¡¥
    */
     class ExecuteCommandThread
     {
       public:
-	typedef bool	(HRP2Client::* Command)();
+	typedef void	(HRP2::* Command)(bool) const;
 	
       public:
-	ExecuteCommandThread(HRP2Client& hrp2)				;
+	ExecuteCommandThread(HRP2& hrp2)				;
 	~ExecuteCommandThread()						;
 
 	void		run()						;
 	void		operator ()(Command command)		const	;
 	void		wait()					const	;
-	bool		poll()					const	;
+	bool		isCompleted()				const	;
     
       private:
 	void*		mainLoop()					;
 	static void*	threadProc(void* thread)			;
 
-	HRP2Client&		_hrp2;
-	mutable Command		_command;
-	bool			_quit;
-	mutable pthread_mutex_t	_mutex;
-	mutable pthread_cond_t	_cond;
-	pthread_t		_thread;
+	HRP2&				_hrp2;
+	mutable std::queue<Command>	_commands;
+	bool				_quit;
+	mutable pthread_mutex_t		_mutex;
+	mutable pthread_cond_t		_cond;
+	pthread_t			_thread;
     };
 
   public:
-    HRP2(int argc, char* argv[],
+    HRP2(int argc, char* argv[], bool isLaterMode,
 	 const char* linkName="RARM_JOINT6", u_int capacity=100)	;
 
+    bool	init(int argc, char* argv[])				;
+    void	getMotion()						;
+
+    u_int	getMotionLength()				const	;
+    bool	getPosture(u_int rank, double*& q, double*& p,
+			   double*& rpy, double*& zmp)			;
+
+  // ReachingService
+    bool	SelectArm(bool isLeft)				const	;
+    bool	DeSelectArm(bool isLeft)			const	;
+    bool	isSelected(bool isLeft)				const	;
+    bool	isMaster(bool isLeft)				const	;
+    bool	SetGraspCenter(bool isLeft, const double* pos)	const	;
+    bool	SelectUsedDofs(const bool* used)		const	;
+    bool	SelectTaskDofs(bool isLeft,
+			       const bool* constrained,
+			       const double* weights)		const	;
+    bool	SelectExecutionMode(bool isLaterMode)		const	;
+    bool	SetTargetPose(bool isLeft, const double* pose,
+			      double duration)			const	;
+    bool	SetTargetArc(bool isLeft, const double* rot,
+			     const double* cen,
+			     const double* ax,
+			     double theta, double duration)	const	;
+    bool	SetTargetVelocity(bool isLeft,
+				  const double* velocity,
+				  double duration)		const	;
+    bool	GetCurrentPose(bool isLeft, double* pose)	const	;
+    void	GenerateMotion(bool blocked=true)		const	;
+    void	PlayMotion(bool blocked=true)			const	;
+    bool	isCompleted()					const	;
+    bool	GoRestPosture()					const	;
+    void	ReverseRotation(bool isLeft)			const	;
+    void	EnableRelativePositionConstraint(bool on)	const	;
+    void	EnableGazeConstraint(bool on)			const	;
+
+  // ForwardKinematicsService
+    bool	SelectBaseLink(const char* linkname)		const	;
+    bool	GetReferencePose(const char* linkname,
+				 TimedPose& D)			const	;
+    bool	GetRealPose(const char* linkName, TimedPose& D)	const	;
     bool	GetRealPose(const char* linkName,
-			    Pose& D, Time& t)			const	;
-    bool	GetRealPose(const char* linkName, Time time,
-			    Pose& D, Time& t)			const	;
-    void	PlayMotion(bool blocked=true)				;
-    bool	poll()						const	;
+			    Time time, TimedPose& D)		const	;
+
+  // SequencePlayerService
+    void	go_halfsitting()					;
+    void	go_clothinit()						;
+    void	go_pickupclothtableinitpos()				;
+    void	go_leftpickupclothtableinitpos()			;
+    void	go_rightpickupclothtableinitpos()			;
+    void	go_leftpushhangclothpos()				;
+    void	go_leftlowpushhangclothpos()				;
+    void	go_leftpushhangclothpos2()				;
+    void	go_lefthangclothpos()					;
+    void	go_righthangclothpos()					;
+    void	go_handopeningpos(bool isLeft, double ang)	const	;
+    void	go_leftarmpos(double angle)			const	;
+    void	chest_rotate(int yaw, int pitch)			;
+    void	head_rotate(int yaw, int pitch)				;
+
+  // WalkGeneratorService
+    void	walkTo(double x, double y, double theta)	const	;
+    void	arcTo(double x, double y, double theta)		const	;
+
+  private:
+    template <class SERVICE> typename SERVICE::_ptr_type
+		getService(const std::string& name,
+			   CORBA::ORB_ptr orb, RTC::CorbaNaming* naming);
+    bool	getServiceIOR(RTC::CorbaConsumer<RTC::RTObject> rtc,
+			      const std::string& serviceName)		;
+    bool	isSuccess(bool success, size_t n, ...)		const	;
+    bool	isTrue(bool success, size_t n, ...)		const	;
+    void	setup(bool isLeft, bool isLaterMode)			;
+    void	seqplay(mask_id id)				const	;
     
   private:
-    void	setup(bool isLeftHand)					;
-    
-  private:
-    GetRealPoseThread		_getRealPose;
-    ExecuteCommandThread	_executeCommand;
+    OpenHRP::ReachingService_var		_reaching;
+    OpenHRP::ReachingService::motion_var	_motion;
+    OpenHRP::SequencePlayerService_var		_seqplayer;
+    OpenHRP::ForwardKinematicsService_var	_fk;
+    OpenHRP::WalkGeneratorService_var		_walkgenerator;
+    bool					_walk_flag;
+
+    OpenHRP::dSequence				_posture[4];
+    OpenHRP::bSequence				_mask[5];
+    const char*					_ior;
+
+    bool					_verbose;
+
+    GetRealPoseThread				_getRealPose;
+    ExecuteCommandThread			_executeCommand;
 };
 
 }
