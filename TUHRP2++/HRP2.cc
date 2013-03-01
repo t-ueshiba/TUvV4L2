@@ -1,20 +1,14 @@
 /*
-  for the communication between HRP2 control RTC's (currently ReachingRTC and 
-  SequencePlayerRTC) service provider and Vision program.
-  by nkita 100808
-
-  revise 100812 to add SeqencePlayerService
-  revise 100826 to cope with HRP2DOF7 model
-  revise 100916 to cope with hand open/close motion
-  revise 100921 to cope with new interface of ReachingRTC
-  revise 101217 to cope with new interface of ReachingRTC
-  revise 110216 to cope with new interface of SequencePlayerRTC
-  revise 120523 to cope with exception yeiled by CsNaming etc.
-  revise 120724 to cope with new interface of ReachingRTC
-  revise 120803 to cope with new interface of ReachingRTC
-		and to be compatible with ReachingService.idl
-*/
-
+ *  For the communication between HRP2 control RTC's (currently ReachingRTC
+ *  and SequencePlayerRTC) service provider and Vision program.
+ *    by nkita 100808
+ *
+ *  Revised to support coninuous monitoring hand poses and integrated into
+ *  new library libTUHRP2++.
+ *    by t.ueshiba 130301.
+ *    
+ *  $Id$
+ */
 #include "TU/HRP2++.h"
 #include <cstdlib>
 #include <cstdarg>
@@ -49,136 +43,60 @@ usec(HRP2::Time sec, HRP2::Time nsec)
 /************************************************************************
 *  class HRP2								*
 ************************************************************************/
-HRP2::HRP2(int argc, char* argv[],
-	   bool isLaterMode, const char* linkName, u_int capacity)
-    :_reaching(0), _motion(0), _seqplayer(0), _fk(0), _walkgenerator(0),
-     _walk_flag(false), _ior(0), _verbose(false),
-     _getRealPose(*this, linkName, capacity),
-     _executeCommand(*this)
+HRP2::HRP2(int argc, char* argv[], const char* linkName, u_int capacity)
+    :_ior(0),
+     _reaching(0), _motion(0), _seqplayer(0), _fk(0), _walkgenerator(0),
+     _getRealPose(*this, linkName, capacity), _executeCommand(*this),
+     _verbose(false)
 {
     using namespace	std;
     
     if (!init(argc, argv))
 	throw runtime_error("HRP2Client::init() failed!");
-    setup(false, isLaterMode);
 }
 
-bool
-HRP2::init(int argc, char* argv[])
+void
+HRP2::setup(bool isLeftHand, bool isLaterMode)
 {
-    using namespace	OpenHRP;
     using namespace	std;
-    using		::optarg;
-    using		::optind;
     
-    const char*		nameServerHost = "localhost:2809";
-    optind = 1;
-    _verbose = false;
-    for (int c; (c = getopt(argc, argv, "N:V")) != EOF; )
-	switch (c)
-	{
-	  case 'N':
-	    nameServerHost = optarg;
-	    break;
-	  case 'V':
-	    _verbose = true;
-	    break;
-	}
-
-  // ORBを取得
-    CORBA::ORB_var	orb = CORBA::ORB_init(argc, argv);;
-
-  // NamingServerを取得
-    RTC::CorbaNaming*	naming;
-    try
-    {
-	naming = new RTC::CorbaNaming(orb, nameServerHost);
-	if (_verbose)
-	    cerr << "TU::HRP2: Succeeded to get naming server "
-		 << nameServerHost << endl;
-    }
-    catch (...)
-    {
-	cerr << "TU::HRP2: FAILED to get naming server." << endl;
-	return false;
-    }
+  // 拘束設定
+    bool	constrained[] = {true, true, true, true, true, true};
+    double	weights[]     = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0};
+    if (!SelectTaskDofs(isLeftHand, constrained, weights))
+	throw runtime_error("HRP2Client::SelectTaskDofs() failed!!");
     
-  // ReachingServiceを取得
-    _reaching = getService<ReachingService>("Reaching", orb, naming);
+  // 使用する自由度を設定
+    bool	usedDofs[] =
+		{
+		    true, true, true, true, true, true,		// right leg
+		    true, true, true, true, true, true,		// left leg
+		    true, false,				// waist
+		    false, false,				// neck
+		    true, true, true, true, true, true, true,	// right arm
+		    false,					// right hand
+		    false, false, false, false, false, false, false, // left arm
+		    false,					// left hand
+		    true, true, true, false, false, false	// base
+		};
+    if (!SelectUsedDofs(usedDofs))
+	throw runtime_error("HRP2Client::SelectUsedDofs() failed!!");
     
-  // SequencePlayerServiceを取得
-    _seqplayer = getService<SequencePlayerService>("SequencePlayer",
-						   orb, naming);
+  // ベースとなるリンクを設定
+    if (!SelectBaseLink("RLEG_JOINT5"))
+	throw runtime_error("HRP2Client::SelectBaseLink() failed!!");
 
-  // ForwardKinematicsServiceを取得
-    _fk = getService<ForwardKinematicsService>("ForwardKinematics",
-					       orb, naming);
+  // LaterモードまたはImmediateモードに設定
+    if (!SelectExecutionMode(isLaterMode))
+	throw runtime_error("HRP2Client::SelectExecutionMode() failed!!");
 
-  // WalkGeneratorServiceを取得
-    _walkgenerator = getService<WalkGeneratorService>("WalkGenerator",
-						      orb, naming);
-    _walk_flag = (_walkgenerator != 0);
+  // 反対側の手を強制的にdeselectし，所望の手をselectする．
+    DeSelectArm(!isLeftHand);
+    SelectArm(isLeftHand);
 
-  // set initial _posture
-    _posture[INITPOS].length(DOF);
-    _posture[HALFSIT].length(DOF);
-    _posture[CLOTHINIT].length(DOF);
-    _posture[DESIREDPOS].length(DOF);
-	
-    for (int i = 0; i < DOF; i++)
-	_posture[INITPOS][i] = _posture[HALFSIT][i] = 0;
-
-    _posture[INITPOS][R_HAND_P] = deg2rad( 5);
-    _posture[INITPOS][L_HAND_P] = deg2rad(-5);
-
-  // set half sitting posture
-    _posture[HALFSIT][RLEG_JOINT2] = HALF_SITTING_HIP_ANGLE;
-    _posture[HALFSIT][RLEG_JOINT3] = HALF_SITTING_KNEE_ANGLE;
-    _posture[HALFSIT][RLEG_JOINT4] = HALF_SITTING_ANKLE_ANGLE;
-
-    _posture[HALFSIT][LLEG_JOINT2] = HALF_SITTING_HIP_ANGLE;
-    _posture[HALFSIT][LLEG_JOINT3] = HALF_SITTING_KNEE_ANGLE;
-    _posture[HALFSIT][LLEG_JOINT4] = HALF_SITTING_ANKLE_ANGLE;
-
-    _posture[HALFSIT][RARM_JOINT0] = deg2rad( 15);
-    _posture[HALFSIT][RARM_JOINT1] = deg2rad(-10);
-    _posture[HALFSIT][RARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][R_HAND_P] = deg2rad( 10);
-
-    _posture[HALFSIT][LARM_JOINT0] = deg2rad( 15);
-    _posture[HALFSIT][LARM_JOINT1] = deg2rad( 10);
-    _posture[HALFSIT][LARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][L_HAND_P] = deg2rad(-10);
-
-    for (int i = 0;i < DOF; i++)
-	_posture[CLOTHINIT][i] = _posture[DESIREDPOS][i] = _posture[HALFSIT][i];
-	
-    _posture[CLOTHINIT][RARM_JOINT0] = deg2rad(30);
-    _posture[CLOTHINIT][RARM_JOINT1] = 0.0;
-  //  _posture[CLOTHINIT][RARM_JOINT3] = deg2rad(-105);
-    _posture[CLOTHINIT][RARM_JOINT3] = deg2rad(-100);
-    _posture[CLOTHINIT][RARM_JOINT4] = 0.0;
-    _posture[CLOTHINIT][RARM_JOINT5] = deg2rad(-15);
-
-  // set initial mask
-    _mask[HANDS].length(DOF);
-    _mask[LEFTHAND].length(DOF);
-    _mask[RIGHTHAND].length(DOF);
-    _mask[DESIREDMASK].length(DOF);
-    _mask[EXCEPTHEAD].length(DOF);
-	
-    for (int i = 0; i < DOF; i++)
-    {
-	_mask[HANDS][i] = _mask[LEFTHAND][i]
-		       = _mask[RIGHTHAND][i] = _mask[DESIREDMASK][i] = 1;
-	_mask[EXCEPTHEAD][i] = 0;
-    }
-
-    _mask[HANDS][L_HAND_P] = _mask[LEFTHAND][L_HAND_P] = 0;
-    _mask[HANDS][R_HAND_P] = _mask[RIGHTHAND][R_HAND_P] = 0;
-    _mask[EXCEPTHEAD][HEAD_JOINT0] = _mask[EXCEPTHEAD][HEAD_JOINT1] = 1;
-
-    return isSuccess(true, 1, " to initialize HRP2.");
+  // スレッドを起動する．
+    _getRealPose.run();
+    _executeCommand.run();
 }
 
 /*
@@ -409,7 +327,8 @@ HRP2::getMotionLength() const
 }
 
 bool
-HRP2::getPosture(u_int rank, double*& q, double*& p, double*& rpy, double*& zmp)
+HRP2::getPosture(u_int rank,
+		 double*& q, double*& p, double*& rpy, double*& zmp)
 {
     if (rank > _motion->length())
 	return false;
@@ -674,7 +593,7 @@ HRP2::head_rotate(int yaw, int pitch)
 void
 HRP2::walkTo(double x, double y, double theta) const
 {
-    if (_walk_flag)
+    if (_walkgenerator)
     {
 	_walkgenerator->setTargetPosNoWait(x, y, deg2rad(theta));
 	isSuccess(true, 1, " to do walkTo.");
@@ -685,7 +604,7 @@ HRP2::walkTo(double x, double y, double theta) const
 void
 HRP2::arcTo(double x, double y, double theta) const
 {
-    if (_walk_flag)
+    if (_walkgenerator)
     {
 	_walkgenerator->setArcNoWait(x, y, deg2rad(theta));
 	isSuccess(true, 1, " to do arcTo.");
@@ -696,6 +615,128 @@ HRP2::arcTo(double x, double y, double theta) const
 /*
  *  private member functions
  */
+bool
+HRP2::init(int argc, char* argv[])
+{
+    using namespace	OpenHRP;
+    using namespace	std;
+    using		::optarg;
+    using		::optind;
+    
+    const char*		nameServerHost = "localhost:2809";
+    optind = 1;
+    _verbose = false;
+    for (int c; (c = getopt(argc, argv, "N:V")) != EOF; )
+	switch (c)
+	{
+	  case 'N':
+	    nameServerHost = optarg;
+	    break;
+	  case 'V':
+	    _verbose = true;
+	    break;
+	}
+
+  // ORBを取得
+    CORBA::ORB_var	orb = CORBA::ORB_init(argc, argv);;
+
+  // NamingServerを取得
+    RTC::CorbaNaming*	naming;
+    try
+    {
+	naming = new RTC::CorbaNaming(orb, nameServerHost);
+    }
+    catch (...)
+    {
+	cerr << "TU::HRP2: FAILED to get naming server." << endl;
+	return false;
+    }
+    
+  // ReachingServiceを取得
+    isSuccess(_reaching = getService<ReachingService>("Reaching",
+						      orb, naming),
+	      1, " to get ReachingService.");
+    
+    
+  // SequencePlayerServiceを取得
+    isSuccess(_seqplayer = getService<SequencePlayerService>("SequencePlayer",
+							     orb, naming),
+	      1, " to get SequencePlayerService.");
+
+  // ForwardKinematicsServiceを取得
+    isSuccess(_fk = getService<ForwardKinematicsService>("ForwardKinematics",
+							 orb, naming),
+	      1, " to get ForwardKinematicsService.");
+
+  // WalkGeneratorServiceを取得
+
+     isSuccess(_walkgenerator = getService<WalkGeneratorService>(
+				    "WalkGenerator", orb, naming),
+	       1, " to get WalkGeneratorService.");
+
+  // set initial _posture
+    _posture[INITPOS].length(DOF);
+    _posture[HALFSIT].length(DOF);
+    _posture[CLOTHINIT].length(DOF);
+    _posture[DESIREDPOS].length(DOF);
+	
+    for (int i = 0; i < DOF; i++)
+	_posture[INITPOS][i] = _posture[HALFSIT][i] = 0;
+
+    _posture[INITPOS][R_HAND_P] = deg2rad( 5);
+    _posture[INITPOS][L_HAND_P] = deg2rad(-5);
+
+  // set half sitting posture
+    _posture[HALFSIT][RLEG_JOINT2] = HALF_SITTING_HIP_ANGLE;
+    _posture[HALFSIT][RLEG_JOINT3] = HALF_SITTING_KNEE_ANGLE;
+    _posture[HALFSIT][RLEG_JOINT4] = HALF_SITTING_ANKLE_ANGLE;
+
+    _posture[HALFSIT][LLEG_JOINT2] = HALF_SITTING_HIP_ANGLE;
+    _posture[HALFSIT][LLEG_JOINT3] = HALF_SITTING_KNEE_ANGLE;
+    _posture[HALFSIT][LLEG_JOINT4] = HALF_SITTING_ANKLE_ANGLE;
+
+    _posture[HALFSIT][RARM_JOINT0] = deg2rad( 15);
+    _posture[HALFSIT][RARM_JOINT1] = deg2rad(-10);
+    _posture[HALFSIT][RARM_JOINT3] = deg2rad(-30);
+    _posture[HALFSIT][R_HAND_P] = deg2rad( 10);
+
+    _posture[HALFSIT][LARM_JOINT0] = deg2rad( 15);
+    _posture[HALFSIT][LARM_JOINT1] = deg2rad( 10);
+    _posture[HALFSIT][LARM_JOINT3] = deg2rad(-30);
+    _posture[HALFSIT][L_HAND_P] = deg2rad(-10);
+
+    for (int i = 0; i < DOF; i++)
+	_posture[CLOTHINIT][i] = _posture[DESIREDPOS][i]
+			       = _posture[HALFSIT][i];
+	
+    _posture[CLOTHINIT][RARM_JOINT0] = deg2rad(30);
+    _posture[CLOTHINIT][RARM_JOINT1] = 0.0;
+  //  _posture[CLOTHINIT][RARM_JOINT3] = deg2rad(-105);
+    _posture[CLOTHINIT][RARM_JOINT3] = deg2rad(-100);
+    _posture[CLOTHINIT][RARM_JOINT4] = 0.0;
+    _posture[CLOTHINIT][RARM_JOINT5] = deg2rad(-15);
+
+  // set initial mask
+    _mask[HANDS].length(DOF);
+    _mask[LEFTHAND].length(DOF);
+    _mask[RIGHTHAND].length(DOF);
+    _mask[DESIREDMASK].length(DOF);
+    _mask[EXCEPTHEAD].length(DOF);
+	
+    for (int i = 0; i < DOF; i++)
+    {
+	_mask[HANDS][i] = _mask[LEFTHAND][i]
+			= _mask[RIGHTHAND][i] = _mask[DESIREDMASK][i] = 1;
+	_mask[EXCEPTHEAD][i] = 0;
+    }
+
+    _mask[HANDS][L_HAND_P] = _mask[LEFTHAND][L_HAND_P] = 0;
+    _mask[HANDS][R_HAND_P] = _mask[RIGHTHAND][R_HAND_P] = 0;
+    _mask[EXCEPTHEAD][HEAD_JOINT0] = _mask[EXCEPTHEAD][HEAD_JOINT1] = 1;
+
+    return isSuccess(true, 1, " to initialize HRP2.");
+}
+
 template <class SERVICE> typename SERVICE::_ptr_type
 HRP2::getService(const std::string& name,
 		 CORBA::ORB_ptr orb, RTC::CorbaNaming* naming)
@@ -709,9 +750,6 @@ HRP2::getService(const std::string& name,
     {
 	rtc.setObject(naming->resolve((name + "0.rtc").c_str()));
 	rtc->_non_existent();
-	if (_verbose)
-	    cerr << "TU::HRP2: Succeeded to get RTC of " << name
-		 << '.' << endl;
     }
     catch (...)
     {
@@ -726,8 +764,6 @@ HRP2::getService(const std::string& name,
 	     << endl;
 	return 0;
     }
-    if (_verbose)
-	cerr << "TU::HRP2: Succeeded to get " << name << "Service." << endl;
 
     return SERVICE::_narrow(orb->string_to_object(_ior));
 }
@@ -736,10 +772,15 @@ bool
 HRP2::getServiceIOR(RTC::CorbaConsumer<RTC::RTObject> rtc,
 		    const std::string& serviceName)
 {
+    using namespace	std;
+    
   // TargetRTCのポートリストを取得
     RTC::PortServiceList	ports = *(rtc->get_ports());
     if (ports.length() <= 0)
-	return isSuccess(false, 1, " to get PortServiceList of RTC.");
+    {
+	cerr << "TU::HRP2: FAILED to get PortServiceList of RTC." << endl;
+	return false;
+    }
 
     RTC::ComponentProfile*	cprof = rtc->get_component_profile();
     std::string			portname = std::string(cprof->instance_name)
@@ -780,7 +821,7 @@ HRP2::isSuccess(bool success, size_t n, ...) const
 	va_list	args;
 	va_start(args, n);
     
-	cerr << "TU::HRP2:" << (success ? " succeeded" : " FAILED");
+	cerr << "TU::HRP2:" << (success ? " Succeeded" : " FAILED");
 	for (size_t i = 0; i < n; ++i)
 	{
 	    const char*	s = va_arg(args, const char*);
@@ -795,16 +836,16 @@ HRP2::isSuccess(bool success, size_t n, ...) const
 }
 
 bool
-HRP2::isTrue(bool success, size_t n, ...) const
+HRP2::isTrue(bool ret, size_t n, ...) const
 {
     using namespace	std;
     
-    if (_verbose || !success)
+    if (_verbose)
     {
 	va_list	args;
 	va_start(args, n);
     
-	cerr << "TU::HRP2:" << (success ? " " : " NOT");
+	cerr << "TU::HRP2:" << (ret ? " " : " NOT");
 	for (size_t i = 0; i < n; ++i)
 	{
 	    const char*	s = va_arg(args, const char*);
@@ -815,51 +856,7 @@ HRP2::isTrue(bool success, size_t n, ...) const
 	va_end(args);
     }
     
-    return success;
-}
-
-void
-HRP2::setup(bool isLeftHand, bool isLaterMode)
-{
-    using namespace	std;
-    
-  // 拘束設定
-    bool	constrained[] = {true, true, true, true, true, true};
-    double	weights[]     = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0};
-    if (!SelectTaskDofs(isLeftHand, constrained, weights))
-	throw runtime_error("HRP2Client::SelectTaskDofs() failed!!");
-    
-  // 使用する自由度を設定
-    bool	usedDofs[] =
-		{
-		    true, true, true, true, true, true,		// right leg
-		    true, true, true, true, true, true,		// left leg
-		    true, false,				// waist
-		    false, false,				// neck
-		    true, true, true, true, true, true, true,	// right arm
-		    false,					// right hand
-		    false, false, false, false, false, false, false, // left arm
-		    false,					// left hand
-		    true, true, true, false, false, false	// base
-		};
-    if (!SelectUsedDofs(usedDofs))
-	throw runtime_error("HRP2Client::SelectUsedDofs() failed!!");
-    
-  // ベースとなるリンクを設定
-    if (!SelectBaseLink("RLEG_JOINT5"))
-	throw runtime_error("HRP2Client::SelectBaseLink() failed!!");
-
-  // LaterモードまたはImmediateモードに設定
-    if (!SelectExecutionMode(isLaterMode))
-	throw runtime_error("HRP2Client::SelectExecutionMode() failed!!");
-
-  // 反対側の手を強制的にdeselectし，所望の手をselectする．
-    DeSelectArm(!isLeftHand);
-    SelectArm(isLeftHand);
-
-  // スレッドを起動する．
-    _getRealPose.run();
-    _executeCommand.run();
+    return ret;
 }
 
 void
@@ -907,7 +904,7 @@ HRP2::seqplay(mask_id id) const
 /************************************************************************
 *  class HRP2::GetRealPoseThread					*
 ************************************************************************/
-HRP2::GetRealPoseThread::GetRealPoseThread(HRP2& hrp2,
+HRP2::GetRealPoseThread::GetRealPoseThread(const HRP2& hrp2,
 					   const char* linkName,
 					   u_int capacity)
     :_hrp2(hrp2), _linkName(linkName), _poses(capacity),
@@ -1010,6 +1007,8 @@ HRP2::GetRealPoseThread::mainLoop()
 		pthread_mutex_unlock(&_mutex);
 	    }
 	}
+
+	usleep(500);
     }
 
     return 0;
@@ -1026,7 +1025,7 @@ HRP2::GetRealPoseThread::threadProc(void* thread)
 /************************************************************************
 *  class HRP2::ExecuteCommandThread					*
 ************************************************************************/
-HRP2::ExecuteCommandThread::ExecuteCommandThread(HRP2& hrp2)
+HRP2::ExecuteCommandThread::ExecuteCommandThread(const HRP2& hrp2)
     :_hrp2(hrp2), _commands(), _quit(false), _mutex(), _cond(), _thread()
 {
     pthread_mutex_init(&_mutex, NULL);

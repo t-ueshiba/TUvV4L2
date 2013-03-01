@@ -127,7 +127,8 @@ main(int argc, char* argv[])
     try
     {
       // HRP2を初期化
-	HRP2		hrp2(argc, argv, true);
+	HRP2		hrp2(argc, argv);
+	hrp2.setup(false, true);
 
       // Parse command options.
 	string		configDirs = DEFAULT_CONFIG_DIRS;

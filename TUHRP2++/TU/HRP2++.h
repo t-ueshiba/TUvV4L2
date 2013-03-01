@@ -1,11 +1,14 @@
 /*
-  for the communication between HRP2 control RTC's (currently ReachingRTC and 
-  SequencePlayerRTC) service provider and Vision program.
-  by nkita 100808
-
-  revise 100812 to add SeqencePlayerService
-  revise 100826 to cope with HRP2DOF7 model
-*/
+ *  For the communication between HRP2 control RTC's (currently ReachingRTC
+ *  and SequencePlayerRTC) service provider and Vision program.
+ *    by nkita 100808
+ *
+ *  Revised to support coninuous monitoring hand poses and integrated into
+ *  new library libTUHRP2++.
+ *    by t.ueshiba 130301.
+ *    
+ *  $Id$
+ */
 #ifndef __TUHRP2PP_H
 #define __TUHRP2PP_H
 
@@ -48,7 +51,7 @@ class HRP2
     typedef Matrix44d	Pose;
     typedef u_int64_t	Time;
 
-    struct TimedPose : public Matrix44d
+    struct TimedPose : public Pose
     {
 	Time	t;
     };
@@ -72,7 +75,7 @@ class HRP2
     class GetRealPoseThread
     {
       public:
-	GetRealPoseThread(HRP2& hrp2,
+	GetRealPoseThread(const HRP2& hrp2,
 			  const char* linkName, u_int capacity)		;
 	~GetRealPoseThread()						;
 
@@ -84,7 +87,7 @@ class HRP2
 	void*		mainLoop()					;
 	static void*	threadProc(void* thread)			;
 	
-	HRP2&					_hrp2;
+	const HRP2&				_hrp2;
 	const std::string			_linkName;
 	boost::circular_buffer<TimedPose>	_poses;
 	bool					_quit;
@@ -103,7 +106,7 @@ class HRP2
 	typedef void	(HRP2::* Command)(bool) const;
 	
       public:
-	ExecuteCommandThread(HRP2& hrp2)				;
+	ExecuteCommandThread(const HRP2& hrp2)				;
 	~ExecuteCommandThread()						;
 
 	void		run()						;
@@ -115,7 +118,7 @@ class HRP2
 	void*		mainLoop()					;
 	static void*	threadProc(void* thread)			;
 
-	HRP2&				_hrp2;
+	const HRP2&			_hrp2;
 	mutable std::queue<Command>	_commands;
 	bool				_quit;
 	mutable pthread_mutex_t		_mutex;
@@ -124,10 +127,10 @@ class HRP2
     };
 
   public:
-    HRP2(int argc, char* argv[], bool isLaterMode,
+    HRP2(int argc, char* argv[],
 	 const char* linkName="RARM_JOINT6", u_int capacity=100)	;
 
-    bool	init(int argc, char* argv[])				;
+    void	setup(bool isLeft, bool isLaterMode)			;
     void	getMotion()						;
 
     u_int	getMotionLength()				const	;
@@ -192,32 +195,31 @@ class HRP2
     void	arcTo(double x, double y, double theta)		const	;
 
   private:
+    bool	init(int argc, char* argv[])				;
     template <class SERVICE> typename SERVICE::_ptr_type
 		getService(const std::string& name,
 			   CORBA::ORB_ptr orb, RTC::CorbaNaming* naming);
     bool	getServiceIOR(RTC::CorbaConsumer<RTC::RTObject> rtc,
 			      const std::string& serviceName)		;
     bool	isSuccess(bool success, size_t n, ...)		const	;
-    bool	isTrue(bool success, size_t n, ...)		const	;
-    void	setup(bool isLeft, bool isLaterMode)			;
+    bool	isTrue(bool ret, size_t n, ...)			const	;
     void	seqplay(mask_id id)				const	;
     
   private:
+    const char*					_ior;
     OpenHRP::ReachingService_var		_reaching;
     OpenHRP::ReachingService::motion_var	_motion;
     OpenHRP::SequencePlayerService_var		_seqplayer;
     OpenHRP::ForwardKinematicsService_var	_fk;
     OpenHRP::WalkGeneratorService_var		_walkgenerator;
-    bool					_walk_flag;
 
     OpenHRP::dSequence				_posture[4];
     OpenHRP::bSequence				_mask[5];
-    const char*					_ior;
-
-    bool					_verbose;
 
     GetRealPoseThread				_getRealPose;
     ExecuteCommandThread			_executeCommand;
+
+    bool					_verbose;
 };
 
 }
