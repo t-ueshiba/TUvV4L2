@@ -36,6 +36,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <boost/iterator_adaptors.hpp>
 #include "TU/types.h"
 
 #if defined(AVX2)		// Haswell (2013?)
@@ -135,12 +136,12 @@ class vec
     int			operator [](int i)	const	;
     value_type&		operator [](int i)		;
     
-    static u_int	floor(u_int n)	{return size*(n/size);}
-    static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
+    static size_t	floor(size_t n)	{return size*(n/size);}
+    static size_t	ceil(size_t n)	{return (n == 0 ? 0 :
 						 size*((n - 1)/size + 1));}
 
-    private:
-      base_type		_base;
+  private:
+    base_type		_base;
 };
 
 template <class T> inline int
@@ -203,12 +204,12 @@ class vec<float>
     const value_type&	operator [](int i)	const	;
     value_type&		operator [](int i)		;
     
-    static u_int	floor(u_int n)	{return size*(n/size);}
-    static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
+    static size_t	floor(size_t n)	{return size*(n/size);}
+    static size_t	ceil(size_t n)	{return (n == 0 ? 0 :
 						 size*((n - 1)/size + 1));}
 
-    private:
-      base_type		_base;
+  private:
+    base_type		_base;
 };
 
 inline const typename vec<float>::value_type&
@@ -263,12 +264,12 @@ class vec<double>
     const value_type&	operator [](int i)	const	;
     value_type&		operator [](int i)		;
     
-    static u_int	floor(u_int n)	{return size*(n/size);}
-    static u_int	ceil(u_int n)	{return (n == 0 ? 0 :
+    static size_t	floor(size_t n)	{return size*(n/size);}
+    static size_t	ceil(size_t n)	{return (n == 0 ? 0 :
 						 size*((n - 1)/size + 1));}
 
-    private:
-      base_type		_base;
+  private:
+    base_type		_base;
 };
 
 inline const typename vec<double>::value_type&
@@ -297,7 +298,7 @@ typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 template <class T> std::ostream&
 operator <<(std::ostream& out, const vec<T>& x)
 {
-    for (u_int i = 0; i < vec<T>::size; ++i)
+    for (size_t i = 0; i < vec<T>::size; ++i)
 	out << ' ' << x[i];
 
     return out;
@@ -1958,6 +1959,145 @@ inline void	empty()			{_mm_empty();}
 #undef MM_FUNC_1
 #undef MM_FUNC_2
 #undef MM_FUNC_2R
+
+/************************************************************************
+*  class load_iterator<T>						*
+************************************************************************/
+template <class T>
+class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
+						     const T*,
+						     vec<T>,
+						     boost::use_default,
+						     vec<T> >
+{
+  private:
+    typedef boost::iterator_adaptor<load_iterator<T>,
+				    const T*,
+				    vec<T>,
+				    boost::use_default,
+				    vec<T> >		super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    load_iterator(const T* p)	:super(p)	{}
+
+  private:
+    reference		dereference() const
+			{
+			    return loadu(super::base());
+			}
+    void		advance(difference_type n)
+			{
+			    super::base_reference()
+				+= n * difference_type(value_type::size);
+			}
+    void		increment()
+			{
+			    super::base_reference() += value_type::size;
+			}
+    void		decrement()
+			{
+			    super::base_reference() -= value_type::size;
+			}
+    difference_type	distance_to(load_iterator iter) const
+			{
+			    return value_type::size
+				 * (iter.base() - super::base());
+			}
+};
+
+template <class T> load_iterator<T>
+make_load_iterator(const T* p)
+{
+    return load_iterator<T>(p);
+}
+    
+/************************************************************************
+*  class store_iterator<T>						*
+************************************************************************/
+namespace detail
+{
+    template <class T>
+    class store_proxy
+    {
+      public:
+	store_proxy(T* p)	:_p(p)		{}
+	
+	store_proxy&	operator =(vec<T> val)
+			{
+			    storeu(_p, val);
+			    return *this;
+			}
+	
+      private:
+	T* const	_p;
+    };
+}
+
+template <class T>
+class store_iterator : public boost::iterator_adaptor<store_iterator<T>,
+						      T*,
+						      vec<T>,
+						      boost::use_default,
+						      detail::store_proxy<T> >
+{
+  private:
+    typedef boost::iterator_adaptor<store_iterator<T>,
+				    T*,
+				    vec<T>,
+				    boost::use_default,
+				    detail::store_proxy<T> >	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    store_iterator(T* p)	:super(p)	{}
+
+  private:
+    reference		dereference() const
+			{
+			    return reference(super::base());
+			}
+    void		advance(difference_type n)
+			{
+			    super::base_reference()
+				+= n * difference_type(value_type::size);
+			}
+    void		increment()
+			{
+			    super::base_reference() += value_type::size;
+			}
+    void		decrement()
+			{
+			    super::base_reference() -= value_type::size;
+			}
+    difference_type	distance_to(store_iterator iter) const
+			{
+			    return value_type::size
+				 * (iter.base() - super::base());
+			}
+};
+
+template <class T> store_iterator<T>
+make_store_iterator(T* p)
+{
+    return store_iterator<T>(p);
+}
 
 }
 #endif

@@ -129,7 +129,7 @@ template <class T> static inline u_int
 dir4x(T u, T v, T lambda)
 {
     const u_int	l = (u < 0) ^ (v < 0);
-    return ((lambda < 0) ^ l) << 2) | (l << 1) | 0x1;
+    return (((lambda < 0) ^ l) << 2) | (l << 1) | 0x1;
 }
     
 template <class T> static inline u_int
