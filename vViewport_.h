@@ -1,5 +1,3 @@
-/* $XConsortium: Viewport.h,v 1.23 94/04/17 20:13:27 kaleb Exp $ */
-
 /************************************************************
 
 Copyright (c) 1987, 1994  X Consortium
@@ -30,13 +28,13 @@ Copyright 1987 by Digital Equipment Corporation, Maynard, Massachusetts.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of Digital not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.  
+software without specific, written prior permission.
 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -99,7 +97,6 @@ typedef struct _VViewportRec  *VViewportWidget;
 _XFUNCPROTOBEGIN
 
 extern void vViewportSetLocation (
-#if NeedFunctionPrototypes
     Widget		/* gw */,
 #if NeedWidePrototypes
     /* float */ double	/* xoff */,
@@ -108,11 +105,9 @@ extern void vViewportSetLocation (
     float		/* xoff */,
     float		/* yoff */
 #endif
-#endif
 );
 
 extern void vViewportSetCoordinates (
-#if NeedFunctionPrototypes
     Widget		/* gw */,
 #if NeedWidePrototypes
     /* Position */ int	/* x */,
@@ -120,7 +115,6 @@ extern void vViewportSetCoordinates (
 #else
     Position		/* x */,
     Position		/* y */
-#endif
 #endif
 );
 

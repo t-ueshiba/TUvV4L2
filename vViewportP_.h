@@ -1,5 +1,4 @@
 /*
- * $XConsortium: ViewportP.h,v 1.14 94/04/17 20:13:28 jim Exp $
  * Private declarations for ViewportWidgetClass
  */
 
@@ -33,13 +32,13 @@ Copyright 1987 by Digital Equipment Corporation, Maynard, Massachusetts.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of Digital not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.  
+software without specific, written prior permission.
 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -56,6 +55,7 @@ SOFTWARE.
 
 #include "vViewport_.h"
 #include <X11/Xaw3d/FormP.h>
+#include <X11/Xaw3d/ThreeDP.h>
 
 typedef struct {int empty;} VViewportClassPart;
 
@@ -83,6 +83,7 @@ typedef struct _VViewportPart {
     /* private state */
     Widget clip, child;		/* The clipping and (scrolled) child widgets */
     Widget  horiz_bar, vert_bar;/* What scrollbars we currently have. */
+    ThreeDWidget threeD;
 } VViewportPart;
 
 typedef struct _VViewportRec {
