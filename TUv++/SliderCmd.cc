@@ -124,7 +124,7 @@ SliderCmd::setValue(CmdVal val)
 {
     setValueInternal(val);
     float	percent = (_val - _min) / (float)_range;
-    XawSliderSetThumb(_slider, percent, 0.0);
+    vSliderSetThumb(_slider, percent, 0.0);
 }
 
 void

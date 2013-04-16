@@ -1,5 +1,3 @@
-/* $XConsortium: Slider.h,v 1.7 91/07/26 21:59:31 converse Exp $ */
-
 /***********************************************************
 
 Copyright (c) 1987, 1988  X Consortium
@@ -48,8 +46,8 @@ SOFTWARE.
 
 ******************************************************************/
 
-#ifndef _Slider_h
-#define _Slider_h
+#ifndef _vSlider_h
+#define _vSlider_h
 
 /****************************************************************
  *
@@ -108,8 +106,8 @@ SOFTWARE.
 
 */
 
-/* 
- * Most things we need are in StringDefs.h 
+/*
+ * Most things we need are in StringDefs.h
  */
 
 #define XtCMinimumThumb "MinimumThumb"
@@ -128,8 +126,7 @@ extern WidgetClass sliderWidgetClass;
 
 _XFUNCPROTOBEGIN
 
-extern void XawSliderSetThumb(
-#if NeedFunctionPrototypes
+extern void vSliderSetThumb(
     Widget		/* slider */,
 #if NeedWidePrototypes
     /* float */ double	/* top */,
@@ -138,9 +135,8 @@ extern void XawSliderSetThumb(
     float		/* top */,
     float		/* shown */
 #endif
-#endif		 
 );
 
 _XFUNCPROTOEND
 
-#endif /* _Slider_h */
+#endif /* _vSlider_h */

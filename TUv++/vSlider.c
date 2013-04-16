@@ -1,8 +1,8 @@
+
 /* MODIFIED ATHENA SLIDER (USING ARROWHEADS AT ENDS OF TRAVEL) */
 /* Modifications Copyright 1992 by Mitch Trachtenberg             */
 /* Rights, permissions, and disclaimer of warranty are as in the  */
 /* DEC and MIT notice below.                                      */
-/* $XConsortium: Slider.c,v 1.70 91/10/16 21:39:40 eswu Exp $ */
 
 /***********************************************************
 
@@ -56,6 +56,11 @@ SOFTWARE.
 /* created by weissman, Mon Jul  7 13:20:03 1986 */
 /* converted by swick, Thu Aug 27 1987 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#include <X11/Xaw3d/Xaw3dP.h>
+
 #include <X11/IntrinsicP.h>
 #include <X11/StringDefs.h>
 
@@ -64,12 +69,14 @@ SOFTWARE.
 
 #include <X11/Xmu/Drawing.h>
 
+#include <stdint.h>
+
 /* Private definitions. */
 
 static char defaultTranslations[] =
-    "<BtnDown>:	   StartScroll(Continuous) MoveThumb() NotifyThumb()	\n\
-     <BtnMotion>:  MoveThumb() NotifyThumb()				\n\
-     <BtnUp>:	   NotifyScroll(Proportional) EndScroll()";
+    "<BtnDown>:    StartScroll(Continuous) MoveThumb() NotifyThumb() \n\
+     <BtnMotion>:  MoveThumb() NotifyThumb() \n\
+     <BtnUp>:      NotifyScroll(Proportional) EndScroll()";
 
 static float floatZero = 0.0;
 
@@ -107,19 +114,19 @@ static XtResource resources[] = {
 };
 #undef Offset
 
-static void ClassInitialize();
-static void Initialize();
-static void Destroy();
-static void Realize();
-static void Resize();
-static void Redisplay();
-static Boolean SetValues();
+static void ClassInitialize(void);
+static void Initialize(Widget, Widget, ArgList, Cardinal *);
+static void Destroy(Widget);
+static void Realize(Widget, Mask *, XSetWindowAttributes *);
+static void Resize(Widget);
+static void Redisplay(Widget, XEvent *, Region);
+static Boolean SetValues(Widget, Widget, Widget, ArgList, Cardinal *);
 
-static void StartScroll();
-static void MoveThumb();
-static void NotifyThumb();
-static void NotifyScroll();
-static void EndScroll();
+static void StartScroll(Widget, XEvent *, String *, Cardinal *);
+static void MoveThumb(Widget, XEvent *, String *, Cardinal *);
+static void NotifyThumb(Widget, XEvent *, String *, Cardinal *);
+static void NotifyScroll(Widget, XEvent *, String *, Cardinal *);
+static void EndScroll(Widget, XEvent *, String *, Cardinal *);
 
 static XtActionsRec actions[] = {
     {"StartScroll",     StartScroll},
@@ -186,7 +193,8 @@ WidgetClass sliderWidgetClass = (WidgetClass)&sliderClassRec;
 #define MIN(x,y)	((x) < (y) ? (x) : (y))
 #define MAX(x,y)	((x) > (y) ? (x) : (y))
 
-static void ClassInitialize()
+static void
+ClassInitialize(void)
 {
     XawInitializeWidgetSet();
     XtAddConverter( XtRString, XtROrientation, XmuCvtStringToOrientation,
@@ -195,24 +203,22 @@ static void ClassInitialize()
 
 #define MARGIN(sbw) (sbw)->threeD.shadow_width
 
-/* 
- The original Xaw Slider's FillArea *really* relied on the fact that the 
+/*
+ The original Xaw Slider's FillArea *really* relied on the fact that the
  server was going to clip at the window boundaries; so the logic was really
- rather sloppy.  To avoid drawing over the shadows and the arrows requires 
+ rather sloppy.  To avoid drawing over the shadows and the arrows requires
  some extra care...  Hope I didn't make any mistakes.
 */
-static void FillArea (sbw, top, bottom, fill)
-    SliderWidget sbw;
-    Position top, bottom;
-    int fill;
+static void
+FillArea (SliderWidget sbw, Position top, Position bottom, int fill)
 {
     int tlen = bottom - top;	/* length of thumb in pixels */
     int sw, margin, floor;
     int lx, ly, lw, lh;
 
-    if (bottom <= 0 || bottom <= top) 
+    if (bottom <= 0 || bottom <= top)
 	return;
-    if ((sw = sbw->threeD.shadow_width) < 0) 
+    if ((sw = sbw->threeD.shadow_width) < 0)
 	sw = 0;
     margin = MARGIN (sbw);
     floor = sbw->slider.length - margin;
@@ -232,12 +238,12 @@ static void FillArea (sbw, top, bottom, fill)
     }
     if (lh <= 0 || lw <= 0) return;
     if (fill) {
-	XFillRectangle(XtDisplay((Widget) sbw), XtWindow((Widget) sbw), 
-			sbw->slider.gc, 
+	XFillRectangle(XtDisplay((Widget) sbw), XtWindow((Widget) sbw),
+			sbw->slider.gc,
 			lx, ly, (unsigned int) lw, (unsigned int) lh);
     } else {
-	XClearArea (XtDisplay((Widget) sbw), XtWindow((Widget) sbw), 
-			lx, ly, (unsigned int) lw, (unsigned int) lh, 
+	XClearArea (XtDisplay((Widget) sbw), XtWindow((Widget) sbw),
+			lx, ly, (unsigned int) lw, (unsigned int) lh,
 			FALSE);
     }
 }
@@ -246,23 +252,22 @@ static void FillArea (sbw, top, bottom, fill)
    sbw->shown.  The old area is erased.  The painting and
    erasing is done cleverly so that no flickering will occur. */
 
-static void PaintThumb (sbw, event)
-    SliderWidget sbw;
-    XEvent *event; 
+static void
+PaintThumb (SliderWidget sbw, XEvent *event)
 {
     Dimension s                   = sbw->threeD.shadow_width;
     Position  oldtop              = sbw->slider.topLoc;
     Position  oldbot              = oldtop + sbw->slider.shownLength;
     Dimension margin              = MARGIN (sbw);
     Dimension tzl                 = sbw->slider.length - margin - margin;
-    Position  newtop, newbot;    
+    Position newtop, newbot;
     Position  floor               = sbw->slider.length - margin;
 
     newtop = margin + (int)(tzl * sbw->slider.top);
     newbot = newtop + (int)(tzl * sbw->slider.shown);
     if (sbw->slider.shown < 1.) newbot++;
     if (newbot < newtop + (int)sbw->slider.min_thumb +
-                        2 * (int)sbw->threeD.shadow_width) 
+                        2 * (int)sbw->threeD.shadow_width)
       newbot = newtop + sbw->slider.min_thumb +
                         2 * sbw->threeD.shadow_width;
     if ( newbot >= floor ) {
@@ -275,12 +280,12 @@ static void PaintThumb (sbw, event)
     if (XtIsRealized ((Widget) sbw)) {
       /*  3D thumb wanted ?
        */
-      if (s) 
+      //if (s)
 	  {
 	  Position	oldmid = (oldtop + oldbot) / 2;
 	  Position	newmid = (newtop + newbot) / 2;
 	      
-	  if (newtop < oldtop) FillArea(sbw, oldtop, oldtop + s, 0);
+          if (newtop < oldtop) FillArea(sbw, oldtop, oldtop + s, 0);
           if (newtop > oldtop) FillArea(sbw, oldtop, MIN(newtop, oldmid), 0);
 	  if (newmid < oldmid)
 	  {
@@ -293,9 +298,9 @@ static void PaintThumb (sbw, event)
 	      FillArea(sbw, oldmid - s, oldmid, 0);
 	  }
           if (newbot < oldbot) FillArea(sbw, MAX(newbot, oldmid), oldbot, 0);
-	  if (newbot > oldbot) FillArea(sbw, oldbot - s, oldbot, 0);
+          if (newbot > oldbot) FillArea(sbw, oldbot - s, oldbot, 0);
 
-          if (sbw->slider.orientation == XtorientHorizontal) 
+          if (sbw->slider.orientation == XtorientHorizontal)
 	      {
 	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
 		  newtop, s, newmid, sbw->core.height - s,
@@ -304,7 +309,7 @@ static void PaintThumb (sbw, event)
 		  newmid, s, newbot, sbw->core.height - s,
 		  sbw->threeD.relief, TRUE);
 	      }
-	  else 
+	  else
 	      {
 	      _ShadowSurroundedBox((Widget)sbw, (ThreeDWidget)sbw,
 		  s, newtop, sbw->core.width - s, newmid,
@@ -314,29 +319,28 @@ static void PaintThumb (sbw, event)
 		  sbw->threeD.relief, TRUE);
 	      }
 	  }
-      else 
-	  {
-	  /* 
-	    Note to Mitch: FillArea is (now) correctly implemented to 
-	    not draw over shadows or the arrows. Therefore setting clipmasks 
+	/*      else
+		{*/
+	  /*
+	    Note to Mitch: FillArea is (now) correctly implemented to
+	    not draw over shadows or the arrows. Therefore setting clipmasks
 	    doesn't seem to be necessary.  Correct me if I'm wrong!
 	  */
-          if (newtop < oldtop) FillArea(sbw, newtop, MIN(newbot, oldtop), 1);
+	/*if (newtop < oldtop) FillArea(sbw, newtop, MIN(newbot, oldtop), 1);
           if (newtop > oldtop) FillArea(sbw, oldtop, MIN(newtop, oldbot), 0);
           if (newbot < oldbot) FillArea(sbw, MAX(newbot, oldtop), oldbot, 0);
           if (newbot > oldbot) FillArea(sbw, MAX(newtop, oldbot), newbot, 1);
-	  }
+	  }*/
     }
 }
-
 
 /*	Function Name: Destroy
  *	Description: Called as the slider is going away...
  *	Arguments: w - the slider.
  *	Returns: nonw
  */
-static void Destroy (w)
-    Widget w;
+static void
+Destroy (Widget w)
 {
     SliderWidget sbw = (SliderWidget) w;
     XtReleaseGC (w, sbw->slider.gc);
@@ -345,11 +349,11 @@ static void Destroy (w)
 /*	Function Name: CreateGC
  *	Description: Creates the GC.
  *	Arguments: w - the slider widget.
- *	Returns: none. 
+ *	Returns: none.
  */
 
-static void CreateGC (w)
-    Widget w;
+static void
+CreateGC (Widget w)
 {
     SliderWidget sbw = (SliderWidget) w;
     XGCValues gcValues;
@@ -357,7 +361,7 @@ static void CreateGC (w)
     unsigned int depth = 1;
 
     if (sbw->slider.thumb == XtUnspecifiedPixmap) {
-        sbw->slider.thumb = XmuCreateStippledPixmap (XtScreen(w), 
+        sbw->slider.thumb = XmuCreateStippledPixmap (XtScreen(w),
 					(Pixel) 1, (Pixel) 0, depth);
     } else if (sbw->slider.thumb != None) {
 	Window root;
@@ -391,8 +395,8 @@ static void CreateGC (w)
     sbw->slider.gc = XtGetGC (w, mask, &gcValues);
 }
 
-static void SetDimensions (sbw)
-    SliderWidget sbw;
+static void
+SetDimensions (SliderWidget sbw)
 {
     if (sbw->slider.orientation == XtorientVertical) {
 	sbw->slider.length = sbw->core.height;
@@ -404,11 +408,8 @@ static void SetDimensions (sbw)
 }
 
 /* ARGSUSED */
-static void Initialize( request, new, args, num_args )
-    Widget request;		/* what the client asked for */
-    Widget new;			/* what we're going to give him */
-    ArgList args;
-    Cardinal *num_args;
+static void
+Initialize(Widget request, Widget new, ArgList args, Cardinal *num_args)
 {
     SliderWidget sbw = (SliderWidget) new;
 
@@ -422,18 +423,14 @@ static void Initialize( request, new, args, num_args )
 	sbw->core.height = (sbw->slider.orientation == XtorientHorizontal)
 	    ? sbw->slider.thickness : sbw->slider.length;
 
-  //sbw->threeD.shadow_width = 1;
-    
     SetDimensions (sbw);
     sbw->slider.direction = 0;
     sbw->slider.topLoc = 0;
     sbw->slider.shownLength = sbw->slider.min_thumb;
 }
 
-static void Realize (w, valueMask, attributes)
-    Widget w;
-    Mask *valueMask;
-    XSetWindowAttributes *attributes;
+static void
+Realize(Widget w, Mask *valueMask, XSetWindowAttributes *attributes)
 {
     SliderWidget sbw = (SliderWidget) w;
     sbw->slider.inactiveCursor =
@@ -442,21 +439,18 @@ static void Realize (w, valueMask, attributes)
 	: sbw->slider.horCursor;
 
     XtVaSetValues (w, XtNcursor, sbw->slider.inactiveCursor, NULL);
-    /* 
-     * The Simple widget actually stuffs the value in the valuemask. 
+
+    /*
+     * The Simple widget actually stuffs the value in the valuemask.
      */
-    
+
     (*sliderWidgetClass->core_class.superclass->core_class.realize)
 	(w, valueMask, attributes);
 }
 
 /* ARGSUSED */
-static Boolean SetValues (current, request, desired, args, num_args)
-    Widget  current,		/* what I am */
-	    request,		/* what he wants me to be */
-	    desired;		/* what I will become */
-    ArgList args;
-    Cardinal *num_args;
+static Boolean
+SetValues(Widget current, Widget request, Widget desired, ArgList args, Cardinal *num_args)
 {
     SliderWidget sbw = (SliderWidget) current;
     SliderWidget dsbw = (SliderWidget) desired;
@@ -490,8 +484,8 @@ static Boolean SetValues (current, request, desired, args, num_args)
     return redraw;
 }
 
-static void Resize (w)
-    Widget w;
+static void
+Resize (Widget w)
 {
     /* ForgetGravity has taken care of background, but thumb may
      * have to move as a result of the new size. */
@@ -501,10 +495,8 @@ static void Resize (w)
 
 
 /* ARGSUSED */
-static void Redisplay (w, event, region)
-    Widget w;
-    XEvent *event;
-    Region region;
+static void
+Redisplay(Widget w, XEvent *event, Region region)
 {
     SliderWidget sbw = (SliderWidget) w;
     SliderWidgetClass swclass = (SliderWidgetClass) XtClass (w);
@@ -528,13 +520,13 @@ static void Redisplay (w, event, region)
 	XRectInRegion (region, x, y, width, height) != RectangleOut) {
 	/* Forces entire thumb to be painted. */
 	sbw->slider.topLoc = -(sbw->slider.length + 1);
-	PaintThumb (sbw, event); 
+	PaintThumb (sbw, event);
     }
 }
 
 
-static Boolean CompareEvents (oldEvent, newEvent)
-    XEvent *oldEvent, *newEvent;
+static Boolean
+CompareEvents(XEvent *oldEvent, XEvent *newEvent)
 {
 #define Check(field) if (newEvent->field != oldEvent->field) return False;
 
@@ -544,23 +536,23 @@ static Boolean CompareEvents (oldEvent, newEvent)
 
     switch (newEvent->type) {
     case MotionNotify:
-	Check(xmotion.state); 
+	Check(xmotion.state);
 	break;
     case ButtonPress:
     case ButtonRelease:
 	Check(xbutton.state);
-	Check(xbutton.button); 
+	Check(xbutton.button);
 	break;
     case KeyPress:
     case KeyRelease:
 	Check(xkey.state);
-	Check(xkey.keycode); 
+	Check(xkey.keycode);
 	break;
     case EnterNotify:
     case LeaveNotify:
 	Check(xcrossing.mode);
 	Check(xcrossing.detail);
-	Check(xcrossing.state); 
+	Check(xcrossing.state);
 	break;
     }
 #undef Check
@@ -573,10 +565,8 @@ struct EventData {
     int count;
 };
 
-static Bool PeekNotifyEvent (dpy, event, args)
-    Display *dpy;
-    XEvent *event;
-    char *args;
+static Bool
+PeekNotifyEvent(Display *dpy, XEvent *event, char *args)
 {
     struct EventData *eventData = (struct EventData*)args;
 
@@ -585,9 +575,8 @@ static Bool PeekNotifyEvent (dpy, event, args)
 }
 
 
-static Boolean LookAhead (w, event)
-    Widget w;
-    XEvent *event;
+static Boolean
+LookAhead (Widget w, XEvent *event)
 {
     XEvent newEvent;
     struct EventData eventData;
@@ -603,48 +592,45 @@ static Boolean LookAhead (w, event)
 }
 
 
-static void ExtractPosition (event, x, y)
-    XEvent *event;
-    Position *x, *y;		/* RETURN */
+static void
+ExtractPosition(XEvent *event, Position *x, Position *y)
 {
     switch( event->type ) {
     case MotionNotify:
-	*x = event->xmotion.x;	 
-	*y = event->xmotion.y;	  
+	*x = event->xmotion.x;
+	*y = event->xmotion.y;
 	break;
     case ButtonPress:
     case ButtonRelease:
-	*x = event->xbutton.x;   
-	*y = event->xbutton.y;   
+	*x = event->xbutton.x;
+	*y = event->xbutton.y;
 	break;
     case KeyPress:
     case KeyRelease:
-	*x = event->xkey.x;      
-	*y = event->xkey.y;	  
+	*x = event->xkey.x;
+	*y = event->xkey.y;
 	break;
     case EnterNotify:
     case LeaveNotify:
-	*x = event->xcrossing.x; 
-	*y = event->xcrossing.y; 
+	*x = event->xcrossing.x;
+	*y = event->xcrossing.y;
 	break;
     default:
 	*x = 0; *y = 0;
     }
 }
 
+
 /* ARGSUSED */
-static void StartScroll (w, event, params, num_params )
-    Widget w;
-    XEvent *event;
-    String *params;		/* direction: Back|Forward|Smooth */
-    Cardinal *num_params;	/* we only support 1 */
+static void
+StartScroll (Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     SliderWidget sbw = (SliderWidget) w;
     Cursor cursor;
     char direction;
 
     if (sbw->slider.direction != 0) return; /* if we're already scrolling */
-    if (*num_params > 0) 
+    if (*num_params > 0)
 	direction = *params[0];
     else
 	direction = 'C';
@@ -663,37 +649,34 @@ static void StartScroll (w, event, params, num_params )
  * two numbers.
  */
 
-static int InRange(num, small, big)
-    int num, small, big;
+static int
+InRange(int num, int small, int big)
 {
     return (num < small) ? small : ((num > big) ? big : num);
 }
 
 /*
- * Same as above, but for floating numbers. 
+ * Same as above, but for floating numbers.
  */
 
-static float FloatInRange(num, small, big)
-    float num, small, big;
+static float
+FloatInRange(float num, float small, float big)
 {
     return (num < small) ? small : ((num > big) ? big : num);
 }
 
 
-static void NotifyScroll (w, event, params, num_params)
-    Widget w;
-    XEvent *event;
-    String *params;		/* style: Proportional|FullLength */
-    Cardinal *num_params;	/* we only support 1 */
+static void
+NotifyScroll (Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     SliderWidget sbw = (SliderWidget) w;
-    long call_data;
+    intptr_t call_data = 0;
     char style;
     Position x, y;
 
     if (sbw->slider.direction == 0) return; /* if no StartScroll */
     if (LookAhead (w, event)) return;
-    if (*num_params > 0) 
+    if (*num_params > 0)
 	style = *params[0];
     else
 	style = 'P';
@@ -702,18 +685,18 @@ static void NotifyScroll (w, event, params, num_params)
     case 'P':    /* Proportional */
     case 'p':
 	ExtractPosition (event, &x, &y);
-	call_data = 
-	    InRange (PICKLENGTH (sbw, x, y), 0, (int) sbw->slider.length); 
+	call_data =
+	    InRange (PICKLENGTH (sbw, x, y), 0, (int) sbw->slider.length);
 	break;
 
     case 'F':    /* FullLength */
-    case 'f':    
-	call_data = sbw->slider.length; 
+    case 'f':
+	call_data = sbw->slider.length;
 	break;
     }
     switch (sbw->slider.direction) {
     case 'B':
-    case 'b':    
+    case 'b':
 	call_data = -call_data;
 	/* fall through */
 
@@ -730,11 +713,8 @@ static void NotifyScroll (w, event, params, num_params)
 }
 
 /* ARGSUSED */
-static void EndScroll(w, event, params, num_params )
-    Widget w;
-    XEvent *event;		/* unused */
-    String *params;		/* unused */
-    Cardinal *num_params;	/* unused */
+static void
+EndScroll(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     SliderWidget sbw = (SliderWidget) w;
 
@@ -743,9 +723,8 @@ static void EndScroll(w, event, params, num_params )
     sbw->slider.direction = 0;
 }
 
-static float FractionLoc (sbw, x, y)
-    SliderWidget sbw;
-    int x, y;
+static float
+FractionLoc (SliderWidget sbw, int x, int y)
 {
     float   result;
     int margin;
@@ -761,26 +740,21 @@ static float FractionLoc (sbw, x, y)
 }
 
 
-static void MoveThumb (w, event, params, num_params)
-    Widget w;
-    XEvent *event;
-    String *params;		/* unused */
-    Cardinal *num_params;	/* unused */
+static void
+MoveThumb (Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     SliderWidget sbw = (SliderWidget) w;
     Position x, y;
-    float loc, t, s;
+    float loc, s;
 
     if (sbw->slider.direction == 0) return; /* if no StartScroll */
-    
+
     if (LookAhead (w, event)) return;
 
     if (!event->xmotion.same_screen) return;
 
     ExtractPosition (event, &x, &y);
-    
     loc = FractionLoc (sbw, x, y);
-    t = sbw->slider.top;
     s = sbw->slider.shown;
     sbw->slider.picked = 0.5 * s;
 
@@ -791,38 +765,33 @@ static void MoveThumb (w, event, params, num_params)
       if (sbw->slider.top < 0.0) sbw->slider.top = 0.0;
     }
 
-#if 0
-    /* this breaks many text-line scrolls */
-    if (sbw->slider.top + sbw->slider.shown > 1.0)
-      sbw->slider.top = 1.0 - sbw->slider.shown;
-#endif
     PaintThumb (sbw, event);
     XFlush (XtDisplay (w));	/* re-draw it before Notifying */
 }
 
 
 /* ARGSUSED */
-static void NotifyThumb (w, event, params, num_params )
-    Widget w;
-    XEvent *event;
-    String *params;		/* unused */
-    Cardinal *num_params;	/* unused */
+static void
+NotifyThumb (Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     register SliderWidget	sbw = (SliderWidget) w;
     Dimension			margin = MARGIN(sbw);
     float			tzl = sbw->slider.length - 2*margin;
-    float			top = sbw->slider.top
-				    * tzl / (tzl - sbw->slider.shownLength);
+    union {
+        XtPointer xtp;
+        float xtf;
+    } xtpf;
 
-    top = FloatInRange(top, 0.0, 1.0);
-    
     if (sbw->slider.direction == 0) return; /* if no StartScroll */
-    
+
     if (LookAhead (w, event)) return;
 
     /* thumbProc is not pretty, but is necessary for backwards
        compatibility on those architectures for which it work{s,ed};
        the intent is to pass a (truncated) float by value. */
+    xtpf.xtf = FloatInRange(sbw->slider.top *
+			    tzl / (tzl - sbw->slider.shownLength), 0.0, 1.0);
+
 /* #ifdef XAW_ARROW_SLIDERS */
     /* This corrects for rounding errors: If the thumb is moved to the end of
        the scrollable area sometimes the last line/column is not displayed.
@@ -841,43 +810,38 @@ static void NotifyThumb (w, event, params, num_params )
     /* Removed the dependancy on slider arrows. Xterm as distributed in
        X11R6.6 by The XFree86 Project wants this correction, with or without
        the arrows. */
-    top += 0.0001;
+    xtpf.xtf += 0.0001;
 /* #endif */
-    XtCallCallbacks (w, XtNthumbProc, *(XtPointer*)&top);
-    XtCallCallbacks (w, XtNjumpProc, (XtPointer)&top);
+
+    XtCallCallbacks (w, XtNthumbProc, xtpf.xtp);
+    XtCallCallbacks (w, XtNjumpProc, (XtPointer)&sbw->slider.top);
 }
 
 
 
 /************************************************************
  *
- *  Public routines. 
+ *  Public routines.
  *
  ************************************************************/
 
 /* Set the scroll bar to the given location. */
 
-#if NeedFunctionPrototypes
-void XawSliderSetThumb (Widget w, 
+void vSliderSetThumb (Widget w,
 #if NeedWidePrototypes
 			double top, double shown)
 #else
 			float top, float shown)
 #endif
-#else
-void XawSliderSetThumb (w, top, shown)
-    Widget w;
-    float top, shown;
-#endif
 {
-    SliderWidget sbw = (SliderWidget) w;
-    Dimension margin = MARGIN(sbw);
-    float tzl = sbw->slider.length - 2*margin;
+    SliderWidget	sbw = (SliderWidget) w;
+    Dimension		margin = MARGIN(sbw);
+    float		tzl = sbw->slider.length - 2*margin;
 
     top *= (tzl - sbw->slider.shownLength) / tzl;
     
 #ifdef WIERD
-    fprintf(stderr,"< vSliderSetThumb w=%p, top=%f, shown=%f\n", 
+    fprintf(stderr,"< vSliderSetThumb w=%p, top=%f, shown=%f\n",
 	    w,top,shown);
 #endif
 
@@ -889,6 +853,6 @@ void XawSliderSetThumb (w, top, shown)
     sbw->slider.shown = (shown > 1.0) ? 1.0 :
 				(shown >= 0.0) ? shown : sbw->slider.shown;
 
-    PaintThumb (sbw, (XEvent*)NULL);
+    PaintThumb (sbw, NULL);
 }
 

@@ -3,10 +3,6 @@
 /* Rights, permissions, and disclaimer of warranty are as in the  */
 /* DEC and MIT notice below.  See usage warning in .c file.       */
 
-/*
- * $XConsortium: SliderP.h,v 1.2 90/04/11 17:33:53 jim Exp $
- */
-
 /***********************************************************
 
 Copyright (c) 1987, 1988  X Consortium
@@ -58,9 +54,9 @@ SOFTWARE.
 #ifndef _vSliderP_h
 #define _vSliderP_h
 
-#include "vSlider_.h"
 #include <X11/Xaw3d/Xaw3dP.h>
 #include <X11/Xaw3d/ThreeDP.h>
+#include "vSlider_.h"
 
 typedef struct {
      /* public */

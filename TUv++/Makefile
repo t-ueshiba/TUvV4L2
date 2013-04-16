@@ -10,7 +10,7 @@ INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	=
+CPPFLAGS	= -DXAW_INTERNATIONALIZATION
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
@@ -75,8 +75,6 @@ HDRS		= ButtonCmd_.h \
 		vCanvas_.h \
 		vGridboxP_.h \
 		vGridbox_.h \
-		vScrollbarP_.h \
-		vScrollbar_.h \
 		vSliderP_.h \
 		vSlider_.h \
 		vTextFieldP_.h \
@@ -124,7 +122,6 @@ SRCS		= App.cc \
 		XDC.cc \
 		vCanvas.c \
 		vGridbox.c \
-		vScrollbar.c \
 		vSlider.c \
 		vTextField.c \
 		vViewport.c
@@ -169,7 +166,6 @@ OBJS		= App.o \
 		XDC.o \
 		vCanvas.o \
 		vGridbox.o \
-		vScrollbar.o \
 		vSlider.o \
 		vTextField.o \
 		vViewport.o
@@ -427,7 +423,6 @@ XDC.o: TU/v/XDC.h TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	TU/v/Colormap.h
 vCanvas.o: vCanvasP_.h vCanvas_.h
 vGridbox.o: vGridboxP_.h vGridbox_.h
-vScrollbar.o: vScrollbarP_.h vScrollbar_.h
 vSlider.o: vSliderP_.h vSlider_.h
 vTextField.o: vTextFieldP_.h vTextField_.h
-vViewport.o: vScrollbar_.h vViewportP_.h vViewport_.h
+vViewport.o: vViewportP_.h vViewport_.h
