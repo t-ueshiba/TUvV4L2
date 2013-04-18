@@ -6,7 +6,7 @@
 #################################
 DEST		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		=
 
 NAME		= $(shell basename $(PWD))
 
