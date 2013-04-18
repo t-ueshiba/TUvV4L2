@@ -5,7 +5,7 @@
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include -I$(X11HOME)/include
+INCDIRS		=
 
 PROGRAM		= vtest
 LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11
