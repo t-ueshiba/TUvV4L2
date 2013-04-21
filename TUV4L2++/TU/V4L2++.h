@@ -30,7 +30,8 @@ namespace TU
 class V4L2Camera
 {
   public:
-    enum PixelFormat		//! 出力画像の画素の形式
+  //! 出力画像の画素の形式    
+    enum PixelFormat
     {
 	BGR24	= V4L2_PIX_FMT_BGR24,	//!< 24 bits/pix, BGR-8-8-8
 	RGB24	= V4L2_PIX_FMT_RGB24,	//!< 24 bits/pix, RGB-8-8-8
@@ -50,7 +51,8 @@ class V4L2Camera
 	UNKNOWN_PIXEL_FORMAT = v4l2_fourcc('U', 'K', 'N', 'W')
     };
 
-    enum Feature		//! カメラの属性
+  //! カメラの属性
+    enum Feature
     {
 	BRIGHTNESS			= V4L2_CID_BRIGHTNESS,
 	BRIGHTNESS_AUTO			= V4L2_CID_AUTOBRIGHTNESS,
@@ -90,9 +92,15 @@ class V4L2Camera
 	UNKNOWN_FEATURE
     };
 
+  //! 値の範囲
     template <class T>
-    struct Range		//! 値の範囲
+    struct Range
     {
+      //! 与えられた値がこの範囲に納まっているか調べる
+      /*!
+	\param val	値
+	\return		範囲に納まっていればtrue, そうでなければfalse
+      */
 	bool	involves(T val) const
 		{
 		    return (min <= val && val <= max &&
@@ -104,16 +112,20 @@ class V4L2Camera
 	T	step;				//!< 増分ステップ
     };
 
-    struct FrameRate		//! フレームレート
+  //! フレームレート
+    struct FrameRate
     {
 	Range<u_int>		fps_n;		//!< 分子
 	Range<u_int>		fps_d;		//!< 分母
     };
+  //! フレームレートを指す反復子
     typedef std::vector<FrameRate>::const_iterator	FrameRateIterator;
+  //! フレームレートの範囲を表す反復子のペア
     typedef std::pair<FrameRateIterator, FrameRateIterator>
 							FrameRateRange;
     
-    struct FrameSize		//! 画像の大きさ
+  //! 画像サイズ
+    struct FrameSize
     {
 	FrameRateRange		availableFrameRates()		const	;
 	
@@ -121,16 +133,21 @@ class V4L2Camera
 	Range<u_int>		height;		//!< 画像の高さ
 	std::vector<FrameRate>	frameRates;	//!< フレーム間隔
     };
+  //! 画像サイズを指す反復子
     typedef std::vector<FrameSize>::const_iterator	FrameSizeIterator;
+  //! 画素サイズの範囲を表す反復子のペア
     typedef std::pair<FrameSizeIterator, FrameSizeIterator>
 							FrameSizeRange;
 
-    struct MenuItem		//! メニュー項目
+  //! メニュー項目
+    struct MenuItem
     {
 	int			index;		//!< メニュー項目の識別子
 	std::string		name;		//!< メニュー項目名
     };
+  //! メニュー項目を指す反復子
     typedef std::vector<MenuItem>::const_iterator	MenuItemIterator;
+  //! メニュー項目の範囲を表す反復子のペア
     typedef std::pair<MenuItemIterator, MenuItemIterator>
 							MenuItemRange;
     
@@ -145,7 +162,7 @@ class V4L2Camera
     struct Control		//! コントロール
     {
       public:
-	Feature			feature;	//!< コントロールの識別子
+	Feature			feature;	//!< 属性(コントロールの識別子)
 	std::string		name;		//!< コントロール名
 	v4l2_ctrl_type		type;		//!< 値の型
 	Range<int>		range;		//!< 値の範囲
@@ -182,10 +199,14 @@ class V4L2Camera
     };
 
   public:
+  //! 画素フォーマットを指す反復子
     typedef MemberIterator<PixelFormat, Format>		PixelFormatIterator;
+  //! 画素フォーマットの範囲を表す反復子のペア
     typedef std::pair<PixelFormatIterator, PixelFormatIterator>
 							PixelFormatRange;
+  //! 属性を指す反復子
     typedef MemberIterator<Feature, Control>		FeatureIterator;
+  //! 属性の範囲を表す反復子のペア
     typedef std::pair<FeatureIterator, FeatureIterator>	FeatureRange;
     
   public:
@@ -391,7 +412,7 @@ V4L2Camera::getDefaultValue(Feature feature) const
 
 //! 指定した属性に付けられている名前を返す
 /*!
-  \param pixelFormat	対象となる属性
+  \param feature	対象となる属性
   \return		属性の名前
 */
 inline const std::string&
@@ -480,7 +501,7 @@ V4L2Camera::MemberIterator<V4L2Camera::Feature,
 
 //! 指定した画像サイズのもとでこのカメラで利用できるフレームレートの範囲を返す
 /*!
-  \return		フレームレート(#FrameRate)を指す定数反復子のペア
+  \return	フレームレート(#FrameRate)を指す定数反復子のペア
 */
 inline V4L2Camera::FrameRateRange
 V4L2Camera::FrameSize::availableFrameRates() const
