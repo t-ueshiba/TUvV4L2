@@ -8,14 +8,16 @@ DEST		= $(PREFIX)/bin
 INCDIRS		= -I$(PREFIX)/include -I$(HOME)/src/TUv++
 
 PROGRAM		= testcam
-LIBS		= -lTUV4L2++ -lTUXv++ -lTUv++ -lTUTools++ \
-		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11
+LIBS		= -lTUV4L2++ -lTUv++ -lTUTools++ \
+		  -lXaw3d -lXt -lXext -lXmu -lX11
+#LIBS		= -lTUv++ -lTUTools++ \
+#		  -lXaw3d -lXt -lXext -lXmu -lX11
 ifeq ($(OSTYPE), darwin)
   LIBS	       +=
 #  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
-#CXX		= g++
+CXX		= g++
 CPPFLAGS	= -DHAVE_LIBTUTOOLS__ #-D_DEBUG
 CFLAGS		= -g -std=c++0x
 NVCCFLAGS	= -g
@@ -72,12 +74,14 @@ HDRS		= MyCanvasPane.h \
 		multicam.h
 SRCS		= MyCanvasPane.cc \
 		MyCmdWindow.cc \
+		V4L2Camera.cc \
 		createCaptureCmds.cc \
 		createFeatureCmds.cc \
 		createMenuCmds.cc \
 		main.cc
 OBJS		= MyCanvasPane.o \
 		MyCmdWindow.o \
+		V4L2Camera.o \
 		createCaptureCmds.o \
 		createFeatureCmds.o \
 		createMenuCmds.o \
@@ -126,6 +130,11 @@ MyCmdWindow.o: multicam.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
 	/usr/local/include/TU/v/XvDC.h
+V4L2Camera.o: /usr/local/include/TU/V4L2++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h
 createCaptureCmds.o: multicam.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \

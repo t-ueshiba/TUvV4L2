@@ -71,13 +71,19 @@ static const struct
     {V4L2Camera::BRIGHTNESS_AUTO,		"BRIGHTNESS_AUTO"},
     {V4L2Camera::CONTRAST,			"CONTRAST"},
     {V4L2Camera::GAIN,				"GAIN"},
+    {V4L2Camera::GAIN_AUTO,			"GAIN_AUTO"},
     {V4L2Camera::SATURATION,			"SATURATION"},
     {V4L2Camera::HUE,				"HUE"},
     {V4L2Camera::HUE_AUTO,			"HUE_AUTO"},
     {V4L2Camera::GAMMA,				"GAMMA"},
     {V4L2Camera::SHARPNESS,			"SHARPNESS"},
+    {V4L2Camera::BLACK_LEVEL,			"BLACK_LEVEL"},
     {V4L2Camera::WHITE_BALANCE_TEMPERATURE,	"WHITE_BALANCE_TEMPERATURE"},
     {V4L2Camera::WHITE_BALANCE_AUTO,		"WHITE_BALANCE_AUTO"},
+    {V4L2Camera::RED_BALANCE,			"RED_BALANCE"},
+    {V4L2Camera::BLUE_BALANCE,			"BLUE_BALANCE"},
+    {V4L2Camera::HFLIP,				"HFLIP"},
+    {V4L2Camera::VFLIP,				"VFLIP"},
     {V4L2Camera::BACKLIGHT_COMPENSATION,	"BACKLIGHT_COMPENSATION"},
     {V4L2Camera::POWER_LINE_FREQUENCY,		"POWER_LINE_FREQUENCY"},
     {V4L2Camera::EXPOSURE_AUTO,			"EXPOSURE_AUTO"},
@@ -100,7 +106,38 @@ static const struct
     {V4L2Camera::PAN_RESET,			"PAN_RESET"},
     {V4L2Camera::TILT_ABSOLUTE,			"TILT_ABSOLUTE"},
     {V4L2Camera::TILT_RELATIVE,			"TILT_RELATIVE"},
-    {V4L2Camera::TILT_RESET,			"TILT_RESET"}
+    {V4L2Camera::TILT_RESET,			"TILT_RESET"},
+
+    {V4L2Camera::CID_PRIVATE0,			"CID_PRIVATE0"},
+    {V4L2Camera::CID_PRIVATE1,			"CID_PRIVATE1"},
+    {V4L2Camera::CID_PRIVATE2,			"CID_PRIVATE2"},
+    {V4L2Camera::CID_PRIVATE3,			"CID_PRIVATE3"},
+    {V4L2Camera::CID_PRIVATE4,			"CID_PRIVATE4"},
+    {V4L2Camera::CID_PRIVATE5,			"CID_PRIVATE5"},
+    {V4L2Camera::CID_PRIVATE6,			"CID_PRIVATE6"},
+    {V4L2Camera::CID_PRIVATE7,			"CID_PRIVATE7"},
+    {V4L2Camera::CID_PRIVATE8,			"CID_PRIVATE8"},
+    {V4L2Camera::CID_PRIVATE9,			"CID_PRIVATE9"},
+    {V4L2Camera::CID_PRIVATE10,			"CID_PRIVATE10"},
+    {V4L2Camera::CID_PRIVATE11,			"CID_PRIVATE11"},
+    {V4L2Camera::CID_PRIVATE12,			"CID_PRIVATE12"},
+    {V4L2Camera::CID_PRIVATE13,			"CID_PRIVATE13"},
+    {V4L2Camera::CID_PRIVATE14,			"CID_PRIVATE14"},
+    {V4L2Camera::CID_PRIVATE15,			"CID_PRIVATE15"},
+    {V4L2Camera::CID_PRIVATE16,			"CID_PRIVATE16"},
+    {V4L2Camera::CID_PRIVATE17,			"CID_PRIVATE17"},
+    {V4L2Camera::CID_PRIVATE18,			"CID_PRIVATE18"},
+    {V4L2Camera::CID_PRIVATE19,			"CID_PRIVATE19"},
+    {V4L2Camera::CID_PRIVATE20,			"CID_PRIVATE20"},
+    {V4L2Camera::CID_PRIVATE21,			"CID_PRIVATE21"},
+    {V4L2Camera::CID_PRIVATE22,			"CID_PRIVATE22"},
+    {V4L2Camera::CID_PRIVATE23,			"CID_PRIVATE23"},
+    {V4L2Camera::CID_PRIVATE24,			"CID_PRIVATE24"},
+    {V4L2Camera::CID_PRIVATE25,			"CID_PRIVATE25"},
+    {V4L2Camera::CID_PRIVATE26,			"CID_PRIVATE26"},
+    {V4L2Camera::CID_PRIVATE27,			"CID_PRIVATE27"},
+    {V4L2Camera::CID_PRIVATE28,			"CID_PRIVATE28"},
+    {V4L2Camera::CID_PRIVATE29,			"CID_PRIVATE29"},
 };
 static const int	NFEATURES = sizeof(features) / sizeof(features[0]);
 
@@ -998,6 +1035,12 @@ V4L2Camera::uintToFeature(u_int feature)
 	return CONTRAST;
       case GAIN:
 	return GAIN;
+      case GAIN_AUTO:
+	return GAIN_AUTO;
+      case HFLIP:
+	return HFLIP;
+      case VFLIP:
+	return VFLIP;
       case SATURATION:
 	return SATURATION;
       case HUE:
@@ -1008,10 +1051,16 @@ V4L2Camera::uintToFeature(u_int feature)
 	return GAMMA;
       case SHARPNESS:
 	return SHARPNESS;
+      case BLACK_LEVEL:
+	return BLACK_LEVEL;
       case WHITE_BALANCE_TEMPERATURE:
 	return WHITE_BALANCE_TEMPERATURE;
       case WHITE_BALANCE_AUTO:
 	return WHITE_BALANCE_AUTO;
+      case RED_BALANCE:
+	return RED_BALANCE;
+      case BLUE_BALANCE:
+	return BLUE_BALANCE;
       case BACKLIGHT_COMPENSATION:
 	return BACKLIGHT_COMPENSATION;
       case POWER_LINE_FREQUENCY:
@@ -1054,6 +1103,66 @@ V4L2Camera::uintToFeature(u_int feature)
 	return TILT_RELATIVE;
       case TILT_RESET:
 	return TILT_RESET;
+      case CID_PRIVATE0:
+	return CID_PRIVATE0;
+      case CID_PRIVATE1:
+	return CID_PRIVATE1;
+      case CID_PRIVATE2:
+	return CID_PRIVATE2;
+      case CID_PRIVATE3:
+	return CID_PRIVATE3;
+      case CID_PRIVATE4:
+	return CID_PRIVATE4;
+      case CID_PRIVATE5:
+	return CID_PRIVATE5;
+      case CID_PRIVATE6:
+	return CID_PRIVATE6;
+      case CID_PRIVATE7:
+	return CID_PRIVATE7;
+      case CID_PRIVATE8:
+	return CID_PRIVATE8;
+      case CID_PRIVATE9:
+	return CID_PRIVATE9;
+      case CID_PRIVATE10:
+	return CID_PRIVATE10;
+      case CID_PRIVATE11:
+	return CID_PRIVATE11;
+      case CID_PRIVATE12:
+	return CID_PRIVATE12;
+      case CID_PRIVATE13:
+	return CID_PRIVATE13;
+      case CID_PRIVATE14:
+	return CID_PRIVATE14;
+      case CID_PRIVATE15:
+	return CID_PRIVATE15;
+      case CID_PRIVATE16:
+	return CID_PRIVATE16;
+      case CID_PRIVATE17:
+	return CID_PRIVATE17;
+      case CID_PRIVATE18:
+	return CID_PRIVATE18;
+      case CID_PRIVATE19:
+	return CID_PRIVATE19;
+      case CID_PRIVATE20:
+	return CID_PRIVATE20;
+      case CID_PRIVATE21:
+	return CID_PRIVATE21;
+      case CID_PRIVATE22:
+	return CID_PRIVATE22;
+      case CID_PRIVATE23:
+	return CID_PRIVATE23;
+      case CID_PRIVATE24:
+	return CID_PRIVATE24;
+      case CID_PRIVATE25:
+	return CID_PRIVATE25;
+      case CID_PRIVATE26:
+	return CID_PRIVATE26;
+      case CID_PRIVATE27:
+	return CID_PRIVATE27;
+      case CID_PRIVATE28:
+	return CID_PRIVATE28;
+      case CID_PRIVATE29:
+	return CID_PRIVATE29;
     }
     
     return UNKNOWN_FEATURE;
@@ -1081,7 +1190,15 @@ V4L2Camera::enumerateFormats()
 	Format&	format = _formats.back();
 
 	format.pixelFormat = pixelFormat;
-	format.name	   = (char*)fmtdesc.description;
+	if (fmtdesc.description[0])
+	    format.name	= (char*)fmtdesc.description;
+	else
+	{
+	    format.name	+=  pixelFormat	       & 0xff;
+	    format.name	+= (pixelFormat >>  8) & 0xff;
+	    format.name	+= (pixelFormat >> 16) & 0xff;
+	    format.name	+= (pixelFormat >> 24) & 0xff;
+	}
 
       // この画素フォーマットのもとでサポートされる画像サイズを列挙
 	v4l2_frmsizeenum	fsize;
@@ -1204,34 +1321,34 @@ V4L2Camera::enumerateControls()
 	    
 	    control.feature = feature;
 	    control.name    = (char*)ctrl.name;
+	    control.type    = ctrl.type;
+	    control.flags   = ctrl.flags;
 
 	    switch (ctrl.type)
 	    {
 	      case V4L2_CTRL_TYPE_INTEGER:
+		control.range.min  = ctrl.minimum;
+		control.range.max  = ctrl.maximum;
+		control.range.step = ctrl.step;
+		control.def	   = ctrl.default_value;
+		break;
 	      case V4L2_CTRL_TYPE_BOOLEAN:
+		control.range.min  = 0;
+		control.range.max  = 1;
+		control.range.step = 1;
+		control.def	   = (ctrl.default_value ? 1 : 0);
+		break;
 	      case V4L2_CTRL_TYPE_MENU:
-		control.type = ctrl.type;
-		if (control.type == V4L2_CTRL_TYPE_MENU)
-		{
-		    control.range.min = 0;
-		    control.range.max
-			= enumerateMenuItems(ctrl, control.menuItems);
-		    control.range.step = 1;
-		}
-		else
-		{
-		    control.range.min  = ctrl.minimum;
-		    control.range.max  = ctrl.maximum;
-		    control.range.step = ctrl.step;
-		}
+		control.range.min  = 0;
+		control.range.max
+		    = enumerateMenuItems(ctrl, control.menuItems);
+		control.range.step = 1;
+		control.def	   = ctrl.default_value;
 		break;
 	      default:
 		_controls.pop_back();
 		break;
 	    }
-
-	    control.def	  = ctrl.default_value;
-	    control.flags = ctrl.flags;
 	}
 }
 
@@ -1244,8 +1361,9 @@ V4L2Camera::enumerateControls()
   // このカメラがサポートするコントロール(属性)を列挙
     for (u_int id = V4L2_CID_BASE; id < V4L2_CID_LASTP1; ++id)
 	addControl(id);
-    for (u_int id = V4L2_CID_PRIVATE_BASE; addControl(id); ++id)
-	;
+    for (u_int id = V4L2_CID_PRIVATE_BASE;
+	       id < V4L2_CID_PRIVATE_BASE + 64; ++id)
+	 addControl(id);
     for (u_int id = V4L2_CID_CAMERA_CLASS_BASE +  1;
 	       id < V4L2_CID_CAMERA_CLASS_BASE + 19; ++id)
 	addControl(id);
@@ -1275,33 +1393,33 @@ V4L2Camera::addControl(u_int id)
 	    
     control.feature = feature;
     control.name    = (char*)ctrl.name;
+    control.type    = ctrl.type;
+    control.flags   = ctrl.flags;
 
     switch (ctrl.type)
     {
       case V4L2_CTRL_TYPE_INTEGER:
+	control.range.min  = ctrl.minimum;
+	control.range.max  = ctrl.maximum;
+	control.range.step = ctrl.step;
+	control.def	   = ctrl.default_value;
+	break;
       case V4L2_CTRL_TYPE_BOOLEAN:
+	control.range.min  = 0;
+	control.range.max  = 1;
+	control.range.step = 1;
+	control.def	   = (ctrl.default_value ? 1 : 0);
+	break;
       case V4L2_CTRL_TYPE_MENU:
-	control.type = ctrl.type;
-	if (control.type == V4L2_CTRL_TYPE_MENU)
-	{
-	    control.range.min = 0;
-	    control.range.max = enumerateMenuItems(ctrl, control.menuItems);
-	    control.range.step = 1;
-	}
-	else
-	{
-	    control.range.min  = ctrl.minimum;
-	    control.range.max  = ctrl.maximum;
-	    control.range.step = ctrl.step;
-	}
+	control.range.min  = 0;
+	control.range.max  = enumerateMenuItems(ctrl, control.menuItems);
+	control.range.step = 1;
+	control.def	   = ctrl.default_value;
 	break;
       default:
 	_controls.pop_back();
 	break;
     }
-
-    control.def	  = ctrl.default_value;
-    control.flags = ctrl.flags;
 
     return true;
 }
