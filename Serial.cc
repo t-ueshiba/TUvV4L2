@@ -30,6 +30,7 @@
 #include "TU/Serial.h"
 #include <stdexcept>
 #include <cstring>
+#include <unistd.h>	// for ::close()
 #include <errno.h>
 
 namespace TU

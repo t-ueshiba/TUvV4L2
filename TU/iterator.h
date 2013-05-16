@@ -976,8 +976,8 @@ class ring_iterator
 		}
     
   private:
-    ITER 	_begin;
-    ITER 	_end;
+    ITER	_begin;
+    ITER	_end;
 };
 
 template <class ITER> ring_iterator<ITER>
