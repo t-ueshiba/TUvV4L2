@@ -54,6 +54,9 @@ class IntrinsicBase
     typedef Vector<element_type>			vector_type;
   //! 行列の型
     typedef Matrix<element_type>			matrix_type;
+  //! 2x2行列の型
+    typedef Matrix<element_type, FixedSizedBuf<element_type, 4>,
+		   FixedSizedBuf<vector_type, 2> >	matrix22_type;
   //! 3x3行列の型
     typedef Matrix<element_type, FixedSizedBuf<element_type, 9>,
 		   FixedSizedBuf<vector_type, 3> >	matrix33_type;
@@ -65,6 +68,7 @@ class IntrinsicBase
 
     point2_type		u(const point2_type& x)			const	;
     point2_type		xFromU(const point2_type& u)		const	;
+    matrix22_type	Jx(const point2_type& x)		const	;
 
     element_type	k()					const	;
     const point2_type&	u0()					const	;
@@ -149,6 +153,28 @@ IntrinsicBase<T>::xFromU(const point2_type& u) const
 {
     return point2_type((u[0] - _u0[0] - (u[1] - _u0[1]) * _k01 / _k) / _k00,
 		       (u[1] - _u0[1]) / _k);
+}
+    
+//! canonical画像座標に対する画像座標の1階微分を求める．
+/*!
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	canonical画像座標に対する画像座標の1階微分，すなわち
+		\f$
+		\TUvec{J}{x} =
+		\TUbeginarray{cc}
+		ak & sk \\ & k
+		\TUendarray
+		\f$
+*/
+template <class T> inline typename IntrinsicBase<T>::matrix22_type
+IntrinsicBase<T>::Jx(const point2_type& x) const
+{
+    matrix22_type	J;
+    J[0][0] = _k00;
+    J[0][1] = _k01;
+    J[1][1] = _k;
+    
+    return J;
 }
     
 //! 焦点距離を返す．
@@ -487,6 +513,7 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
     typedef typename super::point2_type		point2_type;
     typedef typename super::vector_type		vector_type;
     typedef typename super::matrix_type		matrix_type;
+    typedef typename super::matrix22_type	matrix22_type;
     typedef typename super::matrix33_type	matrix33_type;
     
   public:
@@ -495,6 +522,7 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
 			     element_type a=1, element_type s=0)	;
 
     using		super::u;
+    using		super::Jx;
     
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
@@ -578,6 +606,7 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
     typedef typename super::point2_type		point2_type;
     typedef typename super::vector_type		vector_type;
     typedef typename super::matrix_type		matrix_type;
+    typedef typename super::matrix22_type	matrix22_type;
     typedef typename super::matrix33_type	matrix33_type;
     
   public:
@@ -586,6 +615,7 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
 				     element_type a=1, element_type s=0);
 
     using		super::u;
+    using		super::Jx;
     
     static u_int	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
@@ -661,6 +691,7 @@ class Intrinsic : public IntrinsicBase<T>
     typedef typename super::point2_type		point2_type;
     typedef typename super::vector_type		vector_type;
     typedef typename super::matrix_type		matrix_type;
+    typedef typename super::matrix22_type	matrix22_type;
     typedef typename super::matrix33_type	matrix33_type;
     
   public:
@@ -671,6 +702,7 @@ class Intrinsic : public IntrinsicBase<T>
     void		updateIntrinsic(const vector_type& dp)		;
 
     using		super::u;
+    using		super::Jx;
     
   protected:
     point2_type		u(const point2_type& x,
@@ -751,6 +783,7 @@ class IntrinsicWithDistortion : public I
     typedef typename super::point2_type		point2_type;
     typedef typename super::vector_type		vector_type;
     typedef typename super::matrix_type		matrix_type;
+    typedef typename super::matrix22_type	matrix22_type;
     typedef typename super::matrix33_type	matrix33_type;
     
   public:
@@ -762,6 +795,7 @@ class IntrinsicWithDistortion : public I
     point2_type		u(const point2_type& x)			const	;
     point2_type		xd(const point2_type& x)		const	;
     point2_type		xFromU(const point2_type& u)		const	;
+    matrix22_type	Jx(const point2_type& x)		const	;
     element_type	d1()					const	;
     element_type	d2()					const	;
     void		setDistortion(element_type d1, element_type d2)	;
@@ -853,6 +887,29 @@ IntrinsicWithDistortion<I>::xFromU(const point2_type& u) const
     const element_type	sqr = xd * xd,
 			tmp = element_type(1) - sqr*(_d1 + sqr*_d2);
     return point2_type(tmp * xd[0], tmp * xd[1]);
+}
+    
+//! canonical画像座標に対する画像座標の1階微分を求める．
+/*!
+  \param x	canonical画像座標における投影点の2次元位置
+  \return	canonical画像座標に対する画像座標の1階微分，すなわち
+		\f$
+		\TUvec{J}{x} =
+		\TUbeginarray{cc}
+		ak & sk \\ & k
+		\TUendarray
+		\f$
+*/
+template <class I> inline typename IntrinsicWithDistortion<I>::matrix22_type
+IntrinsicWithDistortion<I>::Jx(const point2_type& x) const
+{
+    const element_type	sqr = x * x,
+			tmp = element_type(1) + sqr*(_d1 + sqr*_d2);
+    matrix22_type	J = ((2*_d1 + 4*sqr*_d2) * x) % x;
+    J[0][0] += tmp;
+    J[1][1] += tmp;
+    
+    return super::Jx(xd) * J;
 }
     
 //! 放射歪曲の第1係数を返す．
@@ -1050,6 +1107,9 @@ class CanonicalCamera
     typedef Vector<element_type>				vector_type;
   //! 行列の型
     typedef Matrix<element_type>				matrix_type;
+  //! 2x3行列の型
+    typedef Matrix<element_type, FixedSizedBuf<element_type, 6>,
+		   FixedSizedBuf<vector_type, 2> >		matrix23_type;
   //! 3x3行列の型
     typedef Matrix<element_type, FixedSizedBuf<element_type, 9>,
 		   FixedSizedBuf<vector_type, 3> >		matrix33_type;
@@ -1063,6 +1123,7 @@ class CanonicalCamera
 
     point2_type		x(const point3_type& X,
 			  matrix_type* J=0, matrix_type* H=0)	const	;
+    matrix23_type	Jx(const point3_type& X)		const	;
     matrix34_type	Pc()					const	;
     const point3_type&	t()					const	;
     const matrix33_type&
@@ -1182,6 +1243,22 @@ CanonicalCamera<T>::x(const point3_type& X,
     }
     
     return x;
+}
+
+template <class T> inline typename CanonicalCamera<T>::matrix23_type
+CanonicalCamera<T>::Jx(const point3_type& X) const
+{
+    typedef Vector<element_type,
+		   FixedSizedBuf<element_type, 3> >	vector3_type;
+
+    const vector3_type&	dX = X - _t;
+    const vector_type&	Xc = _Rt * dX;
+    point2_type		x(Xc[0] / Xc[2], Xc[1] / Xc[2]);
+    matrix23_type	J;
+    (J[0] = _Rt[0] - x[0]*_Rt[2]) /= Xc[2];
+    (J[1] = _Rt[1] - x[1]*_Rt[2]) /= Xc[2];
+    
+    return J;
 }
 
 //! 3次元ユークリッド空間からcanonical画像平面への投影行列を求める．
@@ -1401,6 +1478,7 @@ class Camera : public CanonicalCamera<typename I::element_type>, public I
     typedef typename extrinsic_type::plane_type		plane_type;
     typedef typename extrinsic_type::vector_type	vector_type;
     typedef typename extrinsic_type::matrix_type	matrix_type;
+    typedef typename extrinsic_type::matrix23_type	matrix23_type;
     typedef typename extrinsic_type::matrix33_type	matrix33_type;
     typedef typename extrinsic_type::matrix34_type	matrix34_type;
   //! 内部パラメータの型
@@ -1417,6 +1495,7 @@ class Camera : public CanonicalCamera<typename I::element_type>, public I
     point2_type		operator ()(const point3_type& X,
 				    matrix_type* J=0,
 				    matrix_type* H=0)		const	;
+    matrix23_type	Jx(const point3_type& X)		const	;
     matrix34_type	P()					const	;
     void		setProjection(const matrix34_type& P)		;
 
@@ -1541,6 +1620,12 @@ Camera<I>::operator ()(const point3_type& X,
     }
     
     return intrinsic_type::u(extrinsic_type::x(X, J, H), J, H);
+}
+
+template <class I> inline typename Camera<I>::matrix23_type
+Camera<I>::Jx(const point3_type& X) const
+{
+    return intrinsic_type::Jx(extrinsic_type::x(X)) * extrinsic_type::Jx(X);
 }
 
 //! 3次元ユークリッド空間から画像平面への投影行列を求める．
