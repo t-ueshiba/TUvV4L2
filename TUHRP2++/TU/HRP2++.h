@@ -193,7 +193,7 @@ class HRP2
   // WalkGeneratorService
     void	walkTo(double x, double y, double theta)	const	;
     void	arcTo(double x, double y, double theta)		const	;
-
+    
   private:
     bool	init(int argc, char* argv[])				;
     template <class SERVICE> typename SERVICE::_ptr_type
@@ -201,8 +201,8 @@ class HRP2
 			   CORBA::ORB_ptr orb, RTC::CorbaNaming* naming);
     bool	getServiceIOR(RTC::CorbaConsumer<RTC::RTObject> rtc,
 			      const std::string& serviceName)		;
-    bool	isSuccess(bool success, size_t n, ...)		const	;
-    bool	isTrue(bool ret, size_t n, ...)			const	;
+    bool	isSuccess(bool success, ...)			const	;
+    bool	isTrue(bool ret, ...)				const	;
     void	seqplay(mask_id id)				const	;
     
   private:

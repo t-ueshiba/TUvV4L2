@@ -110,8 +110,7 @@ HRP2::SelectArm(bool isLeft) const
     return isSuccess(_reaching->selectArm(isLeft ?
 					  ReachingService::LEFT_ARM :
 					  ReachingService::RIGHT_ARM),
-		     3,
-		     " to select ", (isLeft ? "left" : "right"), " arm.");
+		     " to select ", (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -122,8 +121,7 @@ HRP2::DeSelectArm(bool isLeft) const
     return isSuccess(_reaching->deselectArm(isLeft ?
 					    ReachingService::LEFT_ARM :
 					    ReachingService::RIGHT_ARM),
-		     3,
-		     " to deselect ", (isLeft ? "left" : "right"), " arm.");
+		     " to deselect ", (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -133,7 +131,7 @@ HRP2::isSelected(bool isLeft) const
 
     return isTrue(_reaching->isSelected(isLeft ? ReachingService::LEFT_ARM
 					       : ReachingService::RIGHT_ARM),
-		  3, " selected", (isLeft ? "left" : "right"), " arm.");
+		  " selected", (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -143,7 +141,7 @@ HRP2::isMaster(bool isLeft) const
 
     return isTrue(_reaching->isMaster(isLeft ? ReachingService::LEFT_ARM
 					     : ReachingService::RIGHT_ARM),
-		  3, " a master", (isLeft ? "left" : "right"), " arm");
+		  " a master", (isLeft ? "left" : "right"), " arm", 0);
 }
 
 bool
@@ -158,8 +156,8 @@ HRP2::SetGraspCenter(bool isLeft, const double* pos) const
 						ReachingService::LEFT_ARM :
 						ReachingService::RIGHT_ARM),
 					       dpos),
-		     3, " to set GraspCenter for ",
-		     (isLeft ? "left" : "right"), " arm.");
+		     " to set GraspCenter for ",
+		     (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -171,7 +169,7 @@ HRP2::SelectUsedDofs(const bool* used) const
     copyToSeq(used, bused, DOF + 6);
 
     return isSuccess(_reaching->selectUsedDofs(bused),
-		     1, " to select used DOFs.");
+		     " to select used DOFs.", 0);
 }
 
 bool
@@ -190,8 +188,8 @@ HRP2::SelectTaskDofs(bool isLeft,
 						ReachingService::LEFT_ARM :
 						ReachingService::RIGHT_ARM),
 					       bools, wei),
-		     3, " to select task DOF for ",
-		     (isLeft ? "left" : "right"), " arm.");
+		     " to select task DOF for ",
+		     (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -202,8 +200,8 @@ HRP2::SelectExecutionMode(bool isLaterMode) const
     return isSuccess(_reaching->selectExecutionMode(
 				  isLaterMode ? ReachingService::LATER
 					      : ReachingService::IMMEDIATELY),
-		     3, " to select ",
-		     (isLaterMode ? "LATER" : "IMMEDIATELY"), " mode.");
+		     " to select ",
+		     (isLaterMode ? "LATER" : "IMMEDIATELY"), " mode.", 0);
 } 
 
 bool
@@ -218,8 +216,8 @@ HRP2::SetTargetPose(bool isLeft, const double* pose, double duration) const
 					       ReachingService::LEFT_ARM :
 					       ReachingService::RIGHT_ARM),
 					      hmat, duration),
-		     3, " to set target pose for ",
-		     (isLeft ? "left" : "right"), " arm.");
+		     " to set target pose for ",
+		     (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -241,8 +239,8 @@ HRP2::SetTargetArc(bool isLeft,
 					      ReachingService::RIGHT_ARM),
 					     rotation, center, axis, theta,
 					     duration),
-		     3, " to set target arc for ", 
-		     (isLeft ? "left" : "right"), " arm.");
+		     " to set target arc for ", 
+		     (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -258,8 +256,8 @@ HRP2::SetTargetVelocity(bool isLeft,
 				    (isLeft ? ReachingService::LEFT_ARM
 					    : ReachingService::RIGHT_ARM),
 				    vel, duration),
-		     3, " to set target velocity for ",
-		     (isLeft ? "left" : "right"), " arm.");
+		     " to set target velocity for ",
+		     (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 bool
@@ -275,8 +273,8 @@ HRP2::GetCurrentPose(bool isLeft, double* pose) const
     if (ret)
 	copyFromSeq(hmat, pose, 16);
 
-    return isSuccess(ret, 3, " to get current pose for ",
-		     (isLeft ? "left" : "right"), " arm.");
+    return isSuccess(ret, " to get current pose for ",
+		     (isLeft ? "left" : "right"), " arm.", 0);
 }
 
 void
@@ -285,7 +283,7 @@ HRP2::GenerateMotion(bool blocked) const
     if (blocked)
     {
 	_reaching->generateMotion();
-	isSuccess(true, 1, " to do generateMotion.");
+	isSuccess(true, " to do generateMotion.", 0);
     }
     else
 	_executeCommand(&HRP2::GenerateMotion);
@@ -296,7 +294,7 @@ HRP2::PlayMotion(bool blocked) const
 {
     if (blocked)
     {
-	isSuccess(_reaching->playMotion(), 1, " to do playMotion.");
+	isSuccess(_reaching->playMotion(), " to do playMotion.", 0);
     }
     else
 	_executeCommand(&HRP2::PlayMotion);
@@ -311,7 +309,7 @@ HRP2::isCompleted() const
 bool
 HRP2::GoRestPosture() const
 {
-    return isSuccess(_reaching->goRestPosture(), 1, " to do goRestPosture.");
+    return isSuccess(_reaching->goRestPosture(), " to do goRestPosture.", 0);
 } 
 
 void
@@ -347,22 +345,22 @@ HRP2::ReverseRotation(bool isLeft) const
 
     _reaching->reverseRotation(isLeft ? ReachingService::LEFT_ARM
 				      : ReachingService::RIGHT_ARM);
-    isSuccess(true, 3, " to do ReverseRotation for ",
-	      (isLeft ? "left" : "right"), " arm.");
+    isSuccess(true, " to do ReverseRotation for ",
+	      (isLeft ? "left" : "right"), " arm.", 0);
 } 
 
 void
 HRP2::EnableRelativePositionConstraint(bool on) const
 {
     _reaching->enableRelativePositionConstraint(on);
-    isTrue(on, 1, " enabled relative position constraint.");
+    isTrue(on, " enabled relative position constraint.", 0);
 } 
 
 void
 HRP2::EnableGazeConstraint(bool on) const
 {
     _reaching->enableGazeConstraint(on);
-    isTrue(on, 1, " enabled gaze constraint.");
+    isTrue(on, " enabled gaze constraint.", 0);
 } 
 
 /*
@@ -371,8 +369,7 @@ HRP2::EnableGazeConstraint(bool on) const
 bool
 HRP2::SelectBaseLink(const char* linkname) const
 {
-    return isSuccess(_fk->selectBaseLink(linkname),
-		     1, " to select BaseLink.");
+    return isSuccess(_fk->selectBaseLink(linkname), " to select BaseLink.", 0);
 } 
 
 bool
@@ -387,7 +384,7 @@ HRP2::GetReferencePose(const char* linkname, TimedPose& D) const
 	D.t = usec(hmat->tm.sec, hmat->tm.nsec);
     }
 
-    return isSuccess(success, 1, " to get reffrence pose.");
+    return isSuccess(success, " to get reffrence pose.", 0);
 }
 
 bool
@@ -407,7 +404,7 @@ HRP2::GetRealPose(const char* linkname, TimedPose& D) const
 	D.t = usec(hmat->tm.sec, hmat->tm.nsec);
     }
 
-  //return isSuccess(success, 1, " to get real pose.");
+  //return isSuccess(success, " to get real pose.", 0);
     return success;
 }
 
@@ -596,7 +593,7 @@ HRP2::walkTo(double x, double y, double theta) const
     if (_walkgenerator)
     {
 	_walkgenerator->setTargetPosNoWait(x, y, deg2rad(theta));
-	isSuccess(true, 1, " to do walkTo.");
+	isSuccess(true, " to do walkTo.", 0);
     }
     return;
 } 
@@ -607,7 +604,7 @@ HRP2::arcTo(double x, double y, double theta) const
     if (_walkgenerator)
     {
 	_walkgenerator->setArcNoWait(x, y, deg2rad(theta));
-	isSuccess(true, 1, " to do arcTo.");
+	isSuccess(true, " to do arcTo.", 0);
     }
     return;
 } 
@@ -655,25 +652,26 @@ HRP2::init(int argc, char* argv[])
   // ReachingServiceを取得
     isSuccess(_reaching = getService<ReachingService>("Reaching",
 						      orb, naming),
-	      1, " to get ReachingService.");
+	      " to get ReachingService.", 0);
     
     
   // SequencePlayerServiceを取得
     isSuccess(_seqplayer = getService<SequencePlayerService>("SequencePlayer",
 							     orb, naming),
-	      1, " to get SequencePlayerService.");
+	      " to get SequencePlayerService.", 0);
 
   // ForwardKinematicsServiceを取得
     isSuccess(_fk = getService<ForwardKinematicsService>("ForwardKinematics",
 							 orb, naming),
-	      1, " to get ForwardKinematicsService.");
+	      " to get ForwardKinematicsService.", 0);
 
+#if HAVE_WALKGENERATOR
   // WalkGeneratorServiceを取得
-
-     isSuccess(_walkgenerator = getService<WalkGeneratorService>(
-				    "WalkGenerator", orb, naming),
-	       1, " to get WalkGeneratorService.");
-
+    isSuccess(_walkgenerator = getService<WalkGeneratorService>("WalkGenerator",
+								orb, naming),
+	      " to get WalkGeneratorService.", 0);
+#endif
+    
   // set initial _posture
     _posture[INITPOS].length(DOF);
     _posture[HALFSIT].length(DOF);
@@ -734,7 +732,7 @@ HRP2::init(int argc, char* argv[])
     _mask[HANDS][R_HAND_P] = _mask[RIGHTHAND][R_HAND_P] = 0;
     _mask[EXCEPTHEAD][HEAD_JOINT0] = _mask[EXCEPTHEAD][HEAD_JOINT1] = 1;
 
-    return isSuccess(true, 1, " to initialize HRP2.");
+    return isSuccess(true, " to initialize HRP2.", 0);
 }
 
 template <class SERVICE> typename SERVICE::_ptr_type
@@ -812,21 +810,18 @@ HRP2::getServiceIOR(RTC::CorbaConsumer<RTC::RTObject> rtc,
 }
 
 bool
-HRP2::isSuccess(bool success, size_t n, ...) const
+HRP2::isSuccess(bool success, ...) const
 {
     using namespace	std;
     
     if (_verbose || !success)
     {
 	va_list	args;
-	va_start(args, n);
+	va_start(args, success);
     
 	cerr << "TU::HRP2:" << (success ? " Succeeded" : " FAILED");
-	for (size_t i = 0; i < n; ++i)
-	{
-	    const char*	s = va_arg(args, const char*);
+	for (const char*s; s = va_arg(args, const char*); )
 	    cerr << s;
-	}
 	cerr << endl;
 
 	va_end(args);
@@ -836,21 +831,18 @@ HRP2::isSuccess(bool success, size_t n, ...) const
 }
 
 bool
-HRP2::isTrue(bool ret, size_t n, ...) const
+HRP2::isTrue(bool ret, ...) const
 {
     using namespace	std;
     
     if (_verbose)
     {
 	va_list	args;
-	va_start(args, n);
+	va_start(args, ret);
     
 	cerr << "TU::HRP2:" << (ret ? " " : " NOT");
-	for (size_t i = 0; i < n; ++i)
-	{
-	    const char*	s = va_arg(args, const char*);
+	for (const char* s; s = va_arg(args, const char*); )
 	    cerr << s;
-	}
 	cerr << endl;
 
 	va_end(args);
