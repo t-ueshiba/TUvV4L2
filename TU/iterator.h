@@ -411,7 +411,7 @@ namespace detail
 }
     
 //! コンテナを指す反復子に対して，取り出した値を変換したり値を変換してから格納する作業をサポートする反復子
-/*
+/*!
   \param COL		コンテナ中の個々の値に対して変換を行う反復子
   \param FUNC		変換関数
   \param ROWBASE	begin(), end()をサポートするコンテナを指す反復子
@@ -487,7 +487,7 @@ make_row_transform_iterator(ROWBASE row, FUNC func=FUNC())
 *  class vertical_iterator<ITER>					*
 ************************************************************************/
 //! ランダムアクセス可能なコンテナの配列に対して，各コンテナ中の特定のindexに対応する要素にアクセスする反復子
-/*
+/*!
   \param ITER	ランダムアクセス可能なコンテナを指す反復子
 */
 template <class ITER>
