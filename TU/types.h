@@ -65,6 +65,9 @@
   <b>グラフカット</b>
   - #boost::GraphCuts
 
+  <b>動的計画法</b>
+  - #TU::DP
+
   <b>点，直線，平面等の幾何要素とその変換</b>
   - #TU::Point1
   - #TU::Point2
@@ -109,6 +112,8 @@
   - #TU::DiagonalIntegralImage
   
   <b>画像に限らない信号処理</b>
+  - #TU::Filter2
+  - #TU::SeparableFilter2
   - #TU::IIRFilter
   - #TU::BidirectionalIIRFilter
   - #TU::BidirectionalIIRFilter2
@@ -116,7 +121,11 @@
   - #TU::DericheConvolver2
   - #TU::GaussianConvolver
   - #TU::GaussianConvolver2
-  
+  - #TU::BoxFilter
+  - #TU::BoxFilter2
+  - #TU::GuidedFilter
+  - #TU::GuidedFilter2
+
   <b>特殊データ構造</b>
   - #TU::List
   - #TU::Heap
@@ -163,7 +172,13 @@
   - #TU::make_const_first_iterator(Iterator i)
   - #TU::make_second_iterator(Iterator i)
   - #TU::make_const_second_iterator(Iterator i)
+  - #TU::assignment_iterator
+  - #TU::assignment2_iterator
+  - #TU::row_iterator
+  - #TU::vertical_iterator
   - #TU::box_filter_iterator
+  - #TU::iir_filter_iterator
+  - #TU::ring_iterator
   
   <b>マニピュレータ</b>
   - #TU::skipl(std::istream&)
