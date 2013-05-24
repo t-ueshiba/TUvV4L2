@@ -629,11 +629,11 @@ class box_filter_iterator
     
     void	increment()
 		{
-		    _val -= *_head;
 		    if (!_valid)
 			_val += *super::base();
 		    else
 			_valid = false;
+		    _val -= *_head;
 		    ++_head;
 		    ++super::base_reference();
 		}
@@ -920,6 +920,10 @@ make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 /************************************************************************
 *  class ring_iterator<ITER>						*
 ************************************************************************/
+//! 2つの反復子によって指定された範囲を循環バッファとしてアクセスする反復子
+/*!
+  \param ITER	データ列中の要素を指す反復子の型
+*/
 template <class ITER>
 class ring_iterator
     : public boost::iterator_adaptor<ring_iterator<ITER>,	// self

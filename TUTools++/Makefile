@@ -34,6 +34,7 @@ HDRS		= TU/Array++.h \
 		TU/BoxFilter.h \
 		TU/Camera++.h \
 		TU/CorrectIntensity.h \
+		TU/DP.h \
 		TU/DericheConvolver.h \
 		TU/EdgeDetector.h \
 		TU/Expression++.h \

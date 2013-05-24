@@ -47,20 +47,20 @@ class BoxFilter
 {
   public:
   //! box filterを生成する．
-  /*
+  /*!
     \param w	box filterのウィンドウ幅
    */	
 		BoxFilter(size_t w=3) :_width(w)	{}
     
   //! box filterのウィンドウ幅を設定する．
-  /*
+  /*!
     \param w	box filterのウィンドウ幅
     \return	このbox filter
    */
     BoxFilter&	setWidth(size_t w)		{_width = w; return *this;}
 
   //! box filterのウィンドウ幅を返す．
-  /*
+  /*!
     \return	box filterのウィンドウ幅
    */
     size_t	width()				const	{return _width;}
@@ -100,9 +100,9 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
 {
   public:
   //! box filterを生成する．
-  /*
-    \param wrow	box filterのウィンドウの行幅
-    \param wcol	box filterのウィンドウの列幅
+  /*!
+    \param wrow	box filterのウィンドウの行幅(高さ)
+    \param wcol	box filterのウィンドウの列幅(幅)
     \param s	出力データの水平方向書き込み位置のずらし量
    */	
 		BoxFilter2(size_t wrow=3, size_t wcol=3, size_t s=0)
@@ -110,8 +110,8 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
 		    setRowWidth(wrow).setColWidth(wcol).setShift(s);
 		}
     
-  //! box filterのウィンドウの行幅を設定する．
-  /*
+  //! box filterのウィンドウの行幅(高さ)を設定する．
+  /*!
     \param wrow	box filterのウィンドウの行幅
     \return	このbox filter
    */
@@ -121,8 +121,8 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
 		    return *this;
 		}
 
-  //! box filterのウィンドウの列幅を設定する．
-  /*
+  //! box filterのウィンドウの列幅(幅)を設定する．
+  /*!
     \param wcol	box filterのウィンドウの列幅
     \return	このbox filter
    */
@@ -132,23 +132,33 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
 		    return *this;
 		}
 
-  //! box filterのウィンドウ幅を返す．
-  /*
+  //! box filterのウィンドウ行幅(高さ)を返す．
+  /*!
     \return	box filterのウィンドウの行幅
    */
     size_t	rowWidth()	const	{return filterV().width();}
 
-  //! box filterのウィンドウ幅を返す．
-  /*
+  //! box filterのウィンドウ列幅(幅)を返す．
+  /*!
     \return	box filterのウィンドウの列幅
    */
     size_t	colWidth()	const	{return filterH().width();}
 
+  //! 与えられた行幅(高さ)を持つ入力データ列に対する出力データ列の行幅を返す．
+  /*!
+    \param inRowLength	入力データ列の行幅
+    \return		出力データ列の行幅
+   */
     size_t	outRowLength(size_t inRowLength) const
 		{
 		    return filterV().outLength(inRowLength);
 		}
     
+  //! 与えられた列幅(幅)を持つ入力データ列に対する出力データ列の列幅を返す．
+  /*!
+    \param inColLength	入力データ列の列幅
+    \return		出力データ列の列幅
+   */
     size_t	outColLength(size_t inColLength) const
 		{
 		    return filterH().outLength(inColLength);
