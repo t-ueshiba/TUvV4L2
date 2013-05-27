@@ -123,7 +123,7 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
 		operator s_char() const	{return s_char(float(*this));}
 		operator short()  const	{return short(float(*this));}
 		operator int()	  const	{return int(float(*this));}
-		operator float()  const	{return 0.3f*r + 0.59f*g + 0.11f*b;}
+		operator float()  const	{return 0.299f*r + 0.587f*g + 0.114f*b;}
 		operator double() const	{return double(float(*this));}
     
     RGB_&	operator +=(const RGB_& p)
