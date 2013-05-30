@@ -868,7 +868,8 @@ class Projectivity : public M
     vector_type		mapP(const Vector<S, B>& x)		const	;
     template <class S, class B>
     matrix_type		jacobian(const Vector<S, B>& x)		const	;
-
+    template <class S, class B>
+    matrix_type		Jx(const Vector<S, B>& x)		const	;
     template <class In, class Out>
     element_type	sqdist(const std::pair<In, Out>& pair)	const	;
     template <class In, class Out>
@@ -877,7 +878,7 @@ class Projectivity : public M
     void		update(const vector_type& dt)			;
 
     template <class Iterator>
-    element_type	reprojectionError(Iterator begin,
+    element_type	rmsError(Iterator begin,
 					  Iterator end)		const	;
     
   protected:
@@ -1042,7 +1043,7 @@ Projectivity<M>::ndataMin() const
     
 //! 与えられた点に射影変換を適用してその非同次座標を返す．
 /*!
-  \param x	点の非同次座標(inDim()次元)または同次座標(inDim()+1次元)
+  \param x	点の非同次座標(inDim()次元)または同次座標(inDim()+1 次元)
   \return	射影変換された点の非同次座標(outDim() 次元)
 */
 template <class M> template <class S, class B>
@@ -1070,8 +1071,8 @@ Projectivity<M>::operator ()(const Vector<S, B>& x) const
 
 //! 与えられた点に射影変換を適用してその同次座標を返す．
 /*!
-  \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1次元)
-  \return	射影変換された点の同次座標(outDim()+1次元)
+  \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
+  \return	射影変換された点の同次座標(outDim()+1 次元)
 */
 template <class M> template <class S, class B>
 inline typename Projectivity<M>::vector_type
@@ -1095,8 +1096,8 @@ Projectivity<M>::mapP(const Vector<S, B>& x) const
 //! 与えられた点におけるヤコビ行列を返す．
 /*!
   ヤコビ行列とは射影変換行列成分に関する1階微分のことである．
-  \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1次元)
-  \return	outDim() x (outDim()+1)x(inDim()+1)ヤコビ行列
+  \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
+  \return	outDim() x ((outDim()+1)x(inDim()+1)) ヤコビ行列
 */
 template <class M> template <class S, class B>
 typename Projectivity<M>::matrix_type
@@ -1107,13 +1108,32 @@ Projectivity<M>::jacobian(const Vector<S, B>& x) const
 	xP = x.homogeneous();
     else
 	xP = x;
-    const vector_type&	y  = mapP(xP);
+    const vector_type&	y = mapP(xP);
     matrix_type		J(outDim(), (outDim() + 1)*xP.size());
     for (u_int i = 0; i < J.nrow(); ++i)
     {
 	J[i](i*xP.size(), xP.size()) = xP;
 	(J[i](outDim()*xP.size(), xP.size()) = xP) *= (-y[i]/y[outDim()]);
     }
+    J /= y[outDim()];
+
+    return J;
+}
+    
+//! 与えられた点においてその点の座標に関するヤコビ行列を返す．
+/*!
+  \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
+  \return	outDim() x inDim() ヤコビ行列
+*/
+template <class M> template <class S, class B>
+typename Projectivity<M>::matrix_type
+Projectivity<M>::Jx(const Vector<S, B>& x) const
+{
+    const vector_type&	y = mapP(x);
+    matrix_type		J(outDim(), inDim());
+    for (u_int i = 0; i < J.nrow(); ++i)
+	J[i] = (*this)[i](0, J.ncol())
+	     - (y[i]/y[outDim()]) * (*this)[outDim()](0, J.ncol());
     J /= y[outDim()];
 
     return J;
@@ -1148,7 +1168,7 @@ Projectivity<M>::dist(const std::pair<In, Out>& pair) const
 //! この射影変換のパラメータ数を返す．
 /*!
   射影変換行列の要素数であり，変換の自由度数とは異なる．
-  \return	射影変換のパラメータ数((outDim()+1)x(inDim()+1))
+  \return	射影変換のパラメータ数((outDim()+1) x (inDim()+1))
 */
 template <class M> inline u_int
 Projectivity<M>::nparams() const
@@ -1158,7 +1178,7 @@ Projectivity<M>::nparams() const
 
 //! 射影変換行列を与えられた量だけ修正する．
 /*!
-  \param dt	修正量を表すベクトル((outDim()+1)x(inDim()+1)次元)
+  \param dt	修正量を表すベクトル((outDim()+1) x (inDim()+1) 次元)
 */
 template <class M> inline void
 Projectivity<M>::update(const vector_type& dt)
@@ -1166,18 +1186,18 @@ Projectivity<M>::update(const vector_type& dt)
     vector_type		t(*this);
     element_type	l = t.length();
     t -= dt;
-    t *= (l / t.length());
+    t *= (l / t.length());	// 修正の前後で射影変換行列のノルムは不変
 }
 
-//! 与えられた点対列の平均再投影誤差を返す．
+//! 与えられた点対列の平均変換誤差を返す．
 /*!
   \param begin	点対列の先頭を示す反復子
   \param end	点対列の末尾を示す反復子
-  \return	平均再投影誤差
+  \return	平均変換誤差
 */
 template <class M> template <class Iterator>
 typename Projectivity<M>::element_type
-Projectivity<M>::reprojectionError(Iterator begin, Iterator end) const
+Projectivity<M>::rmsError(Iterator begin, Iterator end) const
 {
     element_type	sqrerr_sum = 0;
     u_int		npoints = 0;
@@ -1282,6 +1302,8 @@ class Affinity : public Projectivity<M>
 
     using	super::inDim;
     using	super::outDim;
+    using	super::mapP;
+    using	super::Jx;
     
     template <class S, class B, class R>
     void	set(const Matrix<S, B, R>& T)				;
@@ -1289,6 +1311,11 @@ class Affinity : public Projectivity<M>
     void	fit(Iterator begin, Iterator end)			;
     Affinity	inv()						const	;
     u_int	ndataMin()					const	;
+
+    template <class S, class B>
+    matrix_type	jacobian(const Vector<S, B>& x)			const	;
+    u_int	nparams()					const	;
+    void	update(const vector_type& dt)				;
     
   //! このアフィン変換の変形部分を表現する行列を返す．
   /*! 
@@ -1303,7 +1330,7 @@ class Affinity : public Projectivity<M>
 //! 変換行列を指定してアフィン変換オブジェクトを生成する．
 /*!
   変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
-  \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
+  \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
 template<class M> template <class S, class B, class R> inline
 Affinity<M>::Affinity(const Matrix<S, B, R>& T)
@@ -1328,7 +1355,7 @@ Affinity<M>::Affinity(Iterator begin, Iterator end)
 //! 変換行列を指定する．
 /*!
   変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
-  \param T			(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
+  \param T			(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
 template<class M> template <class S, class B, class R> inline void
 Affinity<M>::set(const Matrix<S, B, R>& T)
@@ -1423,6 +1450,52 @@ template<class M> inline u_int
 Affinity<M>::ndataMin() const
 {
     return inDim() + 1;
+}
+
+//! 与えられた点におけるヤコビ行列を返す．
+/*!
+  ヤコビ行列とはアフィン変換行列成分に関する1階微分のことである．
+  \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1次元)
+  \return	outDim() x (outDim()x(inDim()+1)) ヤコビ行列
+*/
+template <class M> template <class S, class B>
+typename Affinity<M>::matrix_type
+Affinity<M>::jacobian(const Vector<S, B>& x) const
+{
+    vector_type	xP;
+    if (x.size() == inDim())
+	xP = x.homogeneous();
+    else
+	xP = x;
+    const vector_type&	y = mapP(xP);
+    matrix_type		J(outDim(), outDim()*xP.size());
+    for (u_int i = 0; i < J.nrow(); ++i)
+	J[i](i*xP.size(), xP.size()) = xP;
+    J /= y[outDim()];
+
+    return J;
+}
+
+//! このアフィン変換の独立なパラメータ数を返す．
+/*!
+  アフィン変換行列の最初のoutDim()行の要素数であり，変換の自由度数と一致する．
+  \return	アフィン変換のパラメータ数(outDim() x (inDim()+1))
+*/
+template <class M> inline u_int
+Affinity<M>::nparams() const
+{
+    return outDim()*(inDim() + 1);
+}
+
+//! アフィン変換行列を与えられた量だけ修正する．
+/*!
+  \param dt	修正量を表すベクトル(outDim() x (inDim()+1) 次元)
+*/
+template <class M> inline void
+Affinity<M>::update(const vector_type& dt)
+{
+    vector_type		t(*this);
+    t(0, nparams()) -= dt;
 }
 
 typedef Affinity<Matrix22f>	Affinity11f;

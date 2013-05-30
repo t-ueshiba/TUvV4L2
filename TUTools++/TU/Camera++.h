@@ -909,7 +909,7 @@ IntrinsicWithDistortion<I>::Jx(const point2_type& x) const
     J[0][0] += tmp;
     J[1][1] += tmp;
     
-    return super::Jx(xd) * J;
+    return super::Jx(xd(x)) * J;
 }
     
 //! 放射歪曲の第1係数を返す．
@@ -1116,6 +1116,9 @@ class CanonicalCamera
   //! 3x4行列の型
     typedef Matrix<element_type, FixedSizedBuf<element_type, 12>,
 		   FixedSizedBuf<vector_type, 3> >		matrix34_type;
+  //! 4x4行列の型
+    typedef Matrix<element_type, FixedSizedBuf<element_type, 16>,
+		   FixedSizedBuf<vector_type, 4> >		matrix44_type;
 
   public:
     CanonicalCamera(const point3_type& t=point3_type(0, 0, 0),
@@ -1481,6 +1484,7 @@ class Camera : public CanonicalCamera<typename I::element_type>, public I
     typedef typename extrinsic_type::matrix23_type	matrix23_type;
     typedef typename extrinsic_type::matrix33_type	matrix33_type;
     typedef typename extrinsic_type::matrix34_type	matrix34_type;
+    typedef typename extrinsic_type::matrix44_type	matrix44_type;
   //! 内部パラメータの型
     typedef I						intrinsic_type;
     
