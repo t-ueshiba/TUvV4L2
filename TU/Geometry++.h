@@ -1286,6 +1286,9 @@ class Affinity : public Projectivity<M>
     typedef typename super::element_type	element_type;
     typedef typename super::vector_type		vector_type;
     typedef typename super::matrix_type		matrix_type;
+
+  //! アフィン変換オブジェクトを生成する．
+    Affinity()	:super()						{}
     
   //! 入力空間と出力空間の次元を指定してアフィン変換オブジェクトを生成する．
   /*!
@@ -1293,7 +1296,7 @@ class Affinity : public Projectivity<M>
     \param inDim	入力空間の次元
     \param outDim	出力空間の次元
   */
-    Affinity(u_int inDim=2, u_int outDim=2)	:super(inDim, outDim)	{}
+    Affinity(u_int inDim, u_int outDim)	:super(inDim, outDim)		{}
 
     template <class S, class B, class R>
     Affinity(const Matrix<S, B, R>& T)					;
@@ -1506,6 +1509,276 @@ typedef Affinity<Matrix44f>	Affinity33f;
 typedef Affinity<Matrix44d>	Affinity33d;
 typedef Affinity<Matrix34f>	Affinity23f;
 typedef Affinity<Matrix34d>	Affinity23d;
+
+/************************************************************************
+*  class Rigidity<M>							*
+************************************************************************/
+//! 剛体変換を行うクラス
+/*!
+  回転行列\f$\TUvec{R}{} \in \TUspace{SO}{n}\f$と
+  \f$\TUvec{t}{} \in \TUspace{R}{n}\f$を用いてm次元空間の点
+  \f$\TUvec{x}{} \in \TUspace{R}{n}\f$をn次元空間の点
+  \f$\TUvec{y}{} \simeq \TUvec{R}{}\TUvec{x}{} + \TUvec{t}{}
+  \in \TUspace{R}{n}\f$に写す．
+*/
+template <class M>
+class Rigidity : public Affinity<M>
+{
+  private:
+    typedef Affinity<M>				super;
+
+  public:
+    typedef typename super::base_type		base_type;
+    typedef typename super::element_type	element_type;
+    typedef typename super::vector_type		vector_type;
+    typedef typename super::matrix_type		matrix_type;
+    
+  //! 入力空間と出力空間の次元を指定して剛体変換オブジェクトを生成する．
+  /*!
+    恒等変換として初期化される．
+    \param d	入力/出力空間の次元
+  */
+    Rigidity(u_int d=2)	:super(d, d)					{}
+
+    template <class S, class B, class RB>
+    Rigidity(const Matrix<S, B, RB>& T)					;
+    template <class Iterator>
+    Rigidity(Iterator begin, Iterator end)				;
+
+    using		super::inDim;
+    using		super::outDim;
+
+    u_int		dim()					const	;
+    template <class S, class B, class RB>
+    void		set(const Matrix<S, B, RB>& T)			;
+    template <class Iterator>
+    void		fit(Iterator begin, Iterator end)		;
+    Rigidity		inv()					const	;
+    u_int		ndataMin()				const	;
+    template <class S, class B>
+    matrix_type		jacobian(const Vector<S, B>& x)		const	;
+    u_int		nparams()				const	;
+    void		update(const vector_type& dt)			;
+    
+    const matrix_type	R()					const	;
+    vector_type		t()					const	;
+};
+
+//! 変換行列を指定して剛体変換オブジェクトを生成する．
+/*!
+  \param T	(d+1) x (d+1)行列(dは入力/出力空間の次元)
+*/
+template<class M> template <class S, class B, class RB> inline
+Rigidity<M>::Rigidity(const Matrix<S, B, RB>& T)
+{
+    set(T);
+}
+
+//! 与えられた点対列の非同次座標から剛体変換オブジェクトを生成する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
+*/
+template<class M> template <class Iterator> inline
+Rigidity<M>::Rigidity(Iterator begin, Iterator end)
+{
+    fit(begin, end);
+}
+
+//! この剛体変換の入力/出力空間の次元を返す．
+/*! 
+  \return	入力/出力空間の次元(同次座標のベクトルとしての次元は dim()+1)
+*/
+template<class M> inline u_int
+Rigidity<M>::dim() const
+{
+    return inDim();
+}
+
+//! 変換行列を指定する．
+/*!
+  \param T	(d+1) x (d+1) 行列(dは入力/出力空間の次元)
+*/
+template<class M> template <class S, class B, class RB> inline void
+Rigidity<M>::set(const Matrix<S, B, RB>& T)
+{
+    if (T.nrow() != T.ncol())
+	throw std::invalid_argument("Rigidity::set(): non-square matrix!!");
+    super::set(T);
+}
+    
+//! 与えられた点対列の非同次座標から剛体変換を計算する．
+/*!
+  \param begin			点対列の先頭を示す反復子
+  \param end			点対列の末尾を示す反復子
+  \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
+*/
+template<class M> template <class Iterator> void
+Rigidity<M>::fit(Iterator begin, Iterator end)
+{
+  // 充分な個数の点対があるか？
+    const u_int	ndata = std::distance(begin, end);
+    if (ndata == 0)		// beginが有効か？
+	throw std::invalid_argument("Rigidity::fit(): 0-length input data!!");
+    const u_int	d = begin->first.size();
+    if (begin->second.size() != d)
+	throw std::invalid_argument("Rigidity::fit(): input data contains a pair of different dimensions!!");
+    if (ndata < d)		// 行列のサイズが未定なのでndataMin()は無効
+	throw std::invalid_argument("Rigidity::fit(): not enough input data!!");
+
+  // 重心の計算
+    vector_type	xc(d), yc(d);
+    for (Iterator corres = begin; corres != end; ++corres)
+    {
+	xc += corres->first;
+	yc += corres->second;
+    }
+    xc /= ndata;
+    yc /= ndata;
+    
+  // モーメント行列の計算
+    matrix_type	A(d, d);
+    for (Iterator corres = begin; corres != end; ++corres)
+	A += (corres->first - xc) % (corres->second - yc);
+
+  // 点群間の剛体変換の計算
+    SVDecomposition<element_type>	svd(A);
+    super::resize(d + 1, d + 1);
+    super::operator ()(0, 0, d, d) = svd.Ut().trns() * svd.Vt();
+    for (u_int i = 0; i < d; ++i)
+	(*this)[i][d] = yc[i] - (*this)[i](0, d) * xc;
+    (*this)[d][d] = 1;
+}
+
+//! この剛体変換の回転部分を表現する回転行列を返す．
+/*! 
+  \return	dim() x dim() 行列
+*/
+template <class M> const typename Rigidity<M>::matrix_type
+Rigidity<M>::R() const
+{
+    return super::A();
+}
+
+//! この剛体変換の並行移動部分を表現するベクトルを返す．
+/*! 
+  \return	dim() 次元ベクトル
+*/
+template <class M> typename Rigidity<M>::vector_type
+Rigidity<M>::t() const
+{
+    return super::b();
+}
+
+//! この剛体変換の逆変換を返す．
+/*!
+  \return	逆変換
+*/
+template <class M> inline Rigidity<M>
+Rigidity<M>::inv() const
+{
+    Rigidity	Dinv(inDim());
+
+    for (u_int i = 0; i < dim(); ++i)
+	for (u_int j = 0; j < dim(); ++j)
+	    Dinv[j][i] = (*this)[i][j];
+
+    vector_type	tt = t();
+    for (u_int j = 0; j < dim(); ++j)
+	Dinv[j][dim()] = tt[j];
+
+    return Dinv;
+}
+    
+//! 剛体変換を求めるために必要な点対の最小個数を返す．
+/*!
+  現在設定されている空間の次元をもとに計算される．
+  \return	必要な点対の最小個数すなわち空間の次元mに対してm
+*/
+template<class M> inline u_int
+Rigidity<M>::ndataMin() const
+{
+    return dim();
+}
+
+//! 与えられた点におけるヤコビ行列を返す．
+/*!
+  ヤコビ行列とは並進/回転パラメータに関する1階微分のことである．
+  \param x	点の非同次座標(dim() 次元)または同次座標(dim()+1 次元)
+  \return	dim()xdim() x (dim()+1)/2 ヤコビ行列
+*/
+template <class M> template <class S, class B>
+typename Rigidity<M>::matrix_type
+Rigidity<M>::jacobian(const Vector<S, B>& x) const
+{
+    vector_type	xx;
+    if (x.size() == dim())
+	xx = x;
+    else
+	xx = x.inhomogeneous();
+    
+    u_int	dof = dim() * (dim() + 1) / 2;
+    matrix_type	J(dim(), dof);
+    
+    switch (dim())
+    {
+      case 2:
+	J[0][0] = J[1][1] = 1;
+	J[0][2] = -((*this)[1](0, 2) * xx);
+	J[1][2] =   (*this)[0](0, 2) * xx;
+	break;
+      case 3:
+	J[0][0] = J[1][1] = J[2][2] = 1.0;
+	J(0, 3, 3, 3) = (R() * xx).skew();
+	break;
+      default:
+	throw std::runtime_error("Rigidity<M>::jacobian(): sorry, not implemented yet...");
+	break;
+    }
+
+    return J;
+}
+    
+//! この剛体変換の独立なパラメータ数を返す．
+/*!
+  剛体変換の独立なパラメータ数すなわち変換の自由度数に一致する．
+  \return	剛体変換のパラメータ数(dim() x (dim()+1))/2
+*/
+template <class M> inline u_int
+Rigidity<M>::nparams() const
+{
+    return (dim()*(dim() + 1))/2;
+}
+
+//! 剛体変換行列を与えられた量だけ修正する．
+/*!
+  \param dt	修正量を表すベクトル(dim() x (dim()+1)/2 次元)
+*/
+template <class M> void
+Rigidity<M>::update(const vector_type& dt)
+{
+    for (u_int i = 0; i < dim(); ++i)
+	(*this)[i][dim()] -= dt[i];
+    
+    switch (dim())
+    {
+      case 2:
+	(*this)(0, 0, 2, 2) = matrix_type::Rt(-dt[2]) * (*this)(0, 0, 2, 2);
+	break;
+      case 3:
+	(*this)(0, 0, 3, 3) = matrix_type::Rt(-dt(3, 3)) * (*this)(0, 0, 3, 3);
+	break;
+      default:
+	throw std::runtime_error("Rigidity<M>::update(): sorry, not implemented yet...");
+	break;
+    }
+}
+
+typedef Rigidity<Matrix33f>	Rigidity22f;
+typedef Rigidity<Matrix33d>	Rigidity22d;
+typedef Rigidity<Matrix44f>	Rigidity33f;
+typedef Rigidity<Matrix44d>	Rigidity33d;
 
 /************************************************************************
 *  class Homography<T>							*

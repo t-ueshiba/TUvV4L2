@@ -610,6 +610,9 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
   //! 成分の型が等しい4次元ベクトルの型
     typedef Vector<T, FixedSizedBuf<T, 4> >		vector4_type;
+  //! 成分の型が等しい2x2行列の型
+    typedef Matrix<T, FixedSizedBuf<T, 4>,
+		   FixedSizedBuf<Vector<T>, 2> >	matrix22_type;
   //! 成分の型が等しい3x3行列の型
     typedef Matrix<T, FixedSizedBuf<T, 9>,
 		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
@@ -680,6 +683,8 @@ class Matrix : public Array2<Vector<T>, B, R>
     vector4_type	rot2quaternion()			const	;
 
     static Matrix	I(u_int d)					;
+    static matrix22_type
+			Rt(T theta)					;
     template <class T2, class B2>
     static matrix33_type
 			Rt(const Vector<T2, B2>& n, T c, T s)		;
@@ -1394,6 +1399,18 @@ Matrix<T, B, R>::I(u_int d)
     return Matrix<T, B, R>(d, d).diag(1.0);
 }
 
+template <class T, class B, class R>
+inline typename Matrix<T, B, R>::matrix22_type
+Matrix<T, B, R>::Rt(T theta)
+{
+    matrix22_type	Qt;
+    Qt[0][0] = Qt[1][1] = std::cos(theta);
+    Qt[0][1] = std::sin(theta);
+    Qt[1][0] = -Qt[0][1];
+
+    return Qt;
+}
+
 //! 3次元回転行列を生成する．
 /*!
   \param n	回転軸を表す3次元単位ベクトル
@@ -1407,7 +1424,7 @@ Matrix<T, B, R>::I(u_int d)
 		\f]
 */
 template <class T, class B, class R> template <class T2, class B2>
-Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+inline typename Matrix<T, B, R>::matrix33_type
 Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
 {
     if (n.size() != 3)
@@ -1451,7 +1468,7 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& n, T c, T s)
 		\f]
 */
 template <class T, class B, class R> template <class T2, class B2>
-Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+typename Matrix<T, B, R>::matrix33_type
 Matrix<T, B, R>::Rt(const Vector<T2, B2>& v)
 {
     if (v.size() == 4)			// quaternion ?
