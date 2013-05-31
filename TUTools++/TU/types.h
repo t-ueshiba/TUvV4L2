@@ -76,6 +76,7 @@
   - #TU::Normalize
   - #TU::Projectivity
   - #TU::Affinity
+  - #TU::Rigidity
   - #TU::Homography
   - #TU::Affinity2
   - #TU::BoundingBox
