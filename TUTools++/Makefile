@@ -29,6 +29,7 @@ LINKER		= $(CXX)
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= windows/fakeWindows.h
 HDRS		= TU/Array++.h \
+		TU/BandMatrix++.h \
 		TU/Bezier++.h \
 		TU/BlockDiagonalMatrix++.h \
 		TU/BoxFilter.h \

@@ -106,15 +106,15 @@ main(int argc, char* argv[])
     {
 	if (gaussian)
 	{
-	    doJob1<pixel_type, GaussianConvolver< coeff_type> >(alpha);
-	    cerr << endl;
+	  /*doJob1<pixel_type, GaussianConvolver< coeff_type> >(alpha);
+	    cerr << endl;*/
 	    doJob< pixel_type, GaussianConvolver2<coeff_type> >(alpha,
 								grainSize);
 	}
 	else
 	{
-	    doJob1<pixel_type, DericheConvolver< coeff_type> >(alpha);
-	    cerr << endl;
+	  /*doJob1<pixel_type, DericheConvolver< coeff_type> >(alpha);
+	    cerr << endl;*/
 	    doJob< pixel_type, DericheConvolver2<coeff_type> >(alpha,
 							       grainSize);
 	}

@@ -15,7 +15,7 @@ ifeq ($(OSTYPE), darwin)
 endif
 
 CPPFLAGS	= -DUSE_TBB -DUSE_IIR_FILTER_ITERATOR #-DUSE_TBB
-CFLAGS		= -g -O2 -std=c++0x
+CFLAGS		= -g -std=c++0x
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
   CFLAGS	= -O3
@@ -39,6 +39,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Profiler.h \
+		/usr/local/include/TU/SeparableFilter2.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
@@ -57,6 +58,7 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/DericheConvolver.h \
 	/usr/local/include/TU/IIRFilter.h \
+	/usr/local/include/TU/SeparableFilter2.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/GaussianConvolver.h \
 	/usr/local/include/TU/Profiler.h
