@@ -52,6 +52,7 @@
   - #TU::SVDecomposition
   - #TU::BlockDiagonalMatrix
   - #TU::SparseMatrix
+  - #TU::BandMatrix
 
   <b>非線形最適化</b>
   - #TU::NullConstraint
