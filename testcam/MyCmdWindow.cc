@@ -206,8 +206,8 @@ MyCmdWindow::tick()
     static struct timeval	start;
     countTime(nframes, start);
 
-    _camera.snap() >> _image;
-  //_camera.snap().captureRGBImage(_image);
+  //_camera.snap() >> _image;
+    _camera.snap().captureRGBImage(_image);
 
     repaintCanvas();
 }
