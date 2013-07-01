@@ -14,11 +14,31 @@
 #include <cstdarg>
 #include <boost/foreach.hpp>
 
+#if defined(HRP3)
+#  include "bodyinfo_HRP3.h"
+#  include "bodyinfo_HRP2toHRP3.h"
+#elif defined(HRP2YH)
+#  include "bodyinfo_HRP2YH.h"
+#elif defined(HRP2SH)
+#  include "bodyinfo_HRP2SH.h"
+#else
+#  include "bodyinfo_HRP2DOF7.h"
+#endif
+
 namespace TU
 {
 /************************************************************************
 *  static functions							*
 ************************************************************************/
+static std::ostream&
+printTime(std::ostream& out, u_int64_t localtime)
+{
+    u_int32_t	usec = localtime % 1000;
+    u_int32_t	msec = (localtime / 1000) % 1000;
+    u_int32_t	sec  = localtime / 1000000;
+    return out << sec << '.' << msec << '.' << usec;
+}
+
 template <class ITER, class SEQ> static void
 copyToSeq(ITER src, SEQ& seq, size_t n)
 {
@@ -59,13 +79,13 @@ void
 HRP2::setup(bool isLeftHand, bool isLaterMode)
 {
     using namespace	std;
-    
+
   // 拘束設定
     bool	constrained[] = {true, true, true, true, true, true};
     double	weights[]     = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0};
     if (!SelectTaskDofs(isLeftHand, constrained, weights))
 	throw runtime_error("HRP2Client::SelectTaskDofs() failed!!");
-    
+
   // 使用する自由度を設定
     bool	usedDofs[] =
 		{
@@ -81,7 +101,7 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
 		};
     if (!SelectUsedDofs(usedDofs))
 	throw runtime_error("HRP2Client::SelectUsedDofs() failed!!");
-    
+
   // ベースとなるリンクを設定
     if (!SelectBaseLink("RLEG_JOINT5"))
 	throw runtime_error("HRP2Client::SelectBaseLink() failed!!");
@@ -820,7 +840,7 @@ HRP2::isSuccess(bool success, ...) const
 	va_start(args, success);
     
 	cerr << "TU::HRP2:" << (success ? " Succeeded" : " FAILED");
-	for (const char*s; s = va_arg(args, const char*); )
+	for (const char*s; (s = va_arg(args, const char*)) != 0; )
 	    cerr << s;
 	cerr << endl;
 
@@ -841,7 +861,7 @@ HRP2::isTrue(bool ret, ...) const
 	va_start(args, ret);
     
 	cerr << "TU::HRP2:" << (ret ? " " : " NOT");
-	for (const char* s; s = va_arg(args, const char*); )
+	for (const char* s; (s = va_arg(args, const char*)) != 0; )
 	    cerr << s;
 	cerr << endl;
 
@@ -930,6 +950,13 @@ HRP2::GetRealPoseThread::operator ()(Time time, TimedPose& D) const
     TimedPose	after;		// timeよりも後の時刻で取得されたポーズ
     for (;;)			// を発見するまで待つ．
     {
+#if 0
+	using namespace	std;
+
+	cerr << "Latest: ";
+	printTime(cerr, _poses.back().t);
+	cerr << endl;
+#endif	
 	pthread_mutex_lock(&_mutex);
 	if (!_poses.empty() && (after = _poses.back()).t > time)
 	    break;

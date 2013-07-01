@@ -11,8 +11,8 @@ INCDIRS		= -I. -I$(PREFIX)/include
 NAME		= $(shell basename $(PWD))
 
 #CXX		= g++
-CPPFLAGS	= `rtm-config --cflags` -DHRP2DOF7
-CFLAGS		= -O2
+CPPFLAGS	= -DHRP2SH
+CFLAGS		= -O2 `rtm-config --cflags` 
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．

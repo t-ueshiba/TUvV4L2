@@ -27,19 +27,6 @@
 #include <boost/circular_buffer.hpp>
 #include "TU/Vector++.h"
 
-#ifdef HRP3
-#  include "bodyinfo_HRP3.h"
-#  include "bodyinfo_HRP2toHRP3.h"
-#endif
-
-#ifdef HRP2
-#  include "bodyinfo_HRP2YH.h"
-#endif
-
-#ifdef HRP2DOF7
-#  include "bodyinfo_HRP2DOF7.h"
-#endif
-
 namespace TU
 {
 /************************************************************************
