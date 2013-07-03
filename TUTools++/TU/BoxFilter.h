@@ -50,20 +50,20 @@ class BoxFilter
   /*!
     \param w	box filterのウィンドウ幅
    */	
-		BoxFilter(size_t w=3) :_width(w)	{}
+		BoxFilter(size_t w=3) :_winSize(w)	{}
     
   //! box filterのウィンドウ幅を設定する．
   /*!
     \param w	box filterのウィンドウ幅
     \return	このbox filter
    */
-    BoxFilter&	setWidth(size_t w)		{_width = w; return *this;}
+    BoxFilter&	setWinSize(size_t w)		{_winSize = w; return *this;}
 
   //! box filterのウィンドウ幅を返す．
   /*!
     \return	box filterのウィンドウ幅
    */
-    size_t	width()				const	{return _width;}
+    size_t	winSize()		const	{return _winSize;}
 
     template <class IN, class OUT>
     void	convolve(IN ib, IN ie, OUT out)	const	;
@@ -73,10 +73,10 @@ class BoxFilter
     \param inLen	入力データ列の長さ
     \return		出力データ列の長さ
    */
-    size_t	outLength(size_t inLen)	const	{return inLen + 1 - _width;}
+    size_t	outLength(size_t inLen)	const	{return inLen + 1 - _winSize;}
 	
   private:
-    size_t	_width;		//!< box filterのウィンドウ幅
+    size_t	_winSize;		//!< box filterのウィンドウ幅
 };
     
 /*!
@@ -88,7 +88,7 @@ class BoxFilter
 template <class IN, class OUT> void
 BoxFilter::convolve(IN ib, IN ie, OUT out) const
 {
-    std::copy(make_box_filter_iterator(ib, _width),
+    std::copy(make_box_filter_iterator(ib, _winSize),
 	      make_box_filter_iterator(ie), out);
 }
 
@@ -107,7 +107,7 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
    */	
 		BoxFilter2(size_t wrow=3, size_t wcol=3, size_t s=0)
 		{
-		    setRowWidth(wrow).setColWidth(wcol).setShift(s);
+		    setRowWinSize(wrow).setColWinSize(wcol).setShift(s);
 		}
     
   //! box filterのウィンドウの行幅(高さ)を設定する．
@@ -115,9 +115,9 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
     \param wrow	box filterのウィンドウの行幅
     \return	このbox filter
    */
-    BoxFilter2&	setRowWidth(size_t wrow)
+    BoxFilter2&	setRowWinSize(size_t wrow)
 		{
-		    filterV().setWidth(wrow);
+		    filterV().setWinSize(wrow);
 		    return *this;
 		}
 
@@ -126,9 +126,9 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
     \param wcol	box filterのウィンドウの列幅
     \return	このbox filter
    */
-    BoxFilter2&	setColWidth(size_t wcol)
+    BoxFilter2&	setColWinSize(size_t wcol)
 		{
-		    filterH().setWidth(wcol);
+		    filterH().setWinSize(wcol);
 		    return *this;
 		}
 
@@ -136,13 +136,13 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
   /*!
     \return	box filterのウィンドウの行幅
    */
-    size_t	rowWidth()	const	{return filterV().width();}
+    size_t	rowWinSize()	const	{return filterV().winSize();}
 
   //! box filterのウィンドウ列幅(幅)を返す．
   /*!
     \return	box filterのウィンドウの列幅
    */
-    size_t	colWidth()	const	{return filterH().width();}
+    size_t	colWinSize()	const	{return filterH().winSize();}
 
   //! 与えられた行幅(高さ)を持つ入力データ列に対する出力データ列の行幅を返す．
   /*!

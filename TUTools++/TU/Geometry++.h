@@ -1532,13 +1532,19 @@ class Rigidity : public Affinity<M>
     typedef typename super::element_type	element_type;
     typedef typename super::vector_type		vector_type;
     typedef typename super::matrix_type		matrix_type;
+
+  //! 剛体変換オブジェクトを生成する．
+  /*!
+    恒等変換として初期化される．
+  */
+    Rigidity()		:super()					{}
     
   //! 入力空間と出力空間の次元を指定して剛体変換オブジェクトを生成する．
   /*!
     恒等変換として初期化される．
     \param d	入力/出力空間の次元
   */
-    Rigidity(u_int d=2)	:super(d, d)					{}
+    Rigidity(u_int d)	:super(d, d)					{}
 
     template <class S, class B, class RB>
     Rigidity(const Matrix<S, B, RB>& T)					;
