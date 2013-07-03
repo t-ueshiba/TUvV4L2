@@ -141,6 +141,48 @@ namespace detail
 				    *_iter = _func(val);
 				    return *this;
 				}
+	template <class T>
+	assignment_proxy&	operator +=(const T& val)
+				{
+				    *_iter += _func(val);
+				    return *this;
+				}
+	template <class T>
+	assignment_proxy&	operator -=(const T& val)
+				{
+				    *_iter -= _func(val);
+				    return *this;
+				}
+	template <class T>
+	assignment_proxy&	operator *=(const T& val)
+				{
+				    *_iter *= _func(val);
+				    return *this;
+				}
+	template <class T>
+	assignment_proxy&	operator /=(const T& val)
+				{
+				    *_iter /= _func(val);
+				    return *this;
+				}
+	template <class T>
+	assignment_proxy&	operator &=(const T& val)
+				{
+				    *_iter &= _func(val);
+				    return *this;
+				}
+	template <class T>
+	assignment_proxy&	operator |=(const T& val)
+				{
+				    *_iter |= _func(val);
+				    return *this;
+				}
+	template <class T>
+	assignment_proxy&	operator ^=(const T& val)
+				{
+				    *_iter ^= _func(val);
+				    return *this;
+				}
 
       private:
 	ITER const&	_iter;
