@@ -1160,7 +1160,7 @@ MM_LOGICAL_SHIFT_RIGHT(u_int64_t, u_int64_t)
 ************************************************************************/
 //! T型ベクトルの下位半分をS型ベクトルに型変換する．
 /*!
-  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
+  整数ベクトル間の変換の場合，SのサイズはTの2倍である．また，S, Tは
   符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
   \param x	変換されるベクトル
   \return	変換されたベクトル
@@ -1169,7 +1169,7 @@ template <class S, class T> static vec<S>	cvt(vec<T> x)		;
 
 //! T型ベクトルの上位半分をS型ベクトルに型変換する．
 /*!
-  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
+  整数ベクトル間の変換の場合，SのサイズはTの2倍である．また，S, Tは
   符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
   \param x	変換されるベクトル
   \return	変換されたベクトル
@@ -1996,8 +1996,7 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
 			}
     void		advance(difference_type n)
 			{
-			    super::base_reference()
-				+= n * difference_type(value_type::size);
+			    super::base_reference() += n * value_type::size;
 			}
     void		increment()
 			{
@@ -2009,8 +2008,8 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
 			}
     difference_type	distance_to(load_iterator iter) const
 			{
-			    return value_type::size
-				 * (iter.base() - super::base());
+			    return (iter.base() - super::base())
+				 * value_type::size;
 			}
 };
 
@@ -2075,8 +2074,7 @@ class store_iterator : public boost::iterator_adaptor<store_iterator<T>,
 			}
     void		advance(difference_type n)
 			{
-			    super::base_reference()
-				+= n * difference_type(value_type::size);
+			    super::base_reference() += n * value_type::size;
 			}
     void		increment()
 			{
@@ -2088,8 +2086,8 @@ class store_iterator : public boost::iterator_adaptor<store_iterator<T>,
 			}
     difference_type	distance_to(store_iterator iter) const
 			{
-			    return value_type::size
-				 * (iter.base() - super::base());
+			    return (iter.base() - super::base())
+				 * value_type::size;
 			}
 };
 
