@@ -1686,7 +1686,7 @@ Rigidity<M>::inv() const
 
     vector_type	tt = t();
     for (u_int j = 0; j < dim(); ++j)
-	Dinv[j][dim()] = tt[j];
+	Dinv[j][dim()] = -(Dinv[j](0, dim()) * tt);
 
     return Dinv;
 }
