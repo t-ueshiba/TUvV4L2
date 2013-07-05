@@ -357,6 +357,9 @@ Ieee1394Camera::Ieee1394Camera(Type type, u_int64_t uniqId,
      _w(0), _h(0), _p(MONO_8), _img(0), _img_size(0),
      _acr(0), _bayer(YYYY), _littleEndian(false)
 {
+    u_int	vendor_name_offset = readValueFromUnitDependentDirectory(0x81);
+    u_int	model_name_offset  = readValueFromUnitDependentDirectory(0x82);
+    
   // Set speed of isochronous transmission.
     setSpeed(speed);
 
@@ -365,7 +368,7 @@ Ieee1394Camera::Ieee1394Camera(Type type, u_int64_t uniqId,
 
   // Get base address of access control register if supported.
     if (inquireBasicFunction() & Advanced_Feature_Inq)
-	_acr = CSR_REGISTER_BASE + readQuadletFromRegister(0x480) * 4;
+	_acr = CSR_REGISTER_BASE + 4 * readQuadletFromRegister(0x480);
     
   // Get Bayer pattern supported by this camera.
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
@@ -2558,14 +2561,11 @@ Ieee1394Camera::unlockAdvancedFeature(u_int64_t featureId, u_int timeout)
 {
     if (_acr == 0)
 	return false;
-    writeQuadlet(_acr,	   (featureId >> 16) & 0xffffffff);
-    writeQuadlet(_acr + 4, (featureId & 0xffff) | 0xf000 | (timeout & 0xfff));
-  /*    u_int	busId_nodeId = readQuadlet(_acr) >> 16;
-    std::cerr << "NodeId = " << std::hex << nodeId()
-	      << ", BusId + NodeId = " << std::hex << busId_nodeId
-	      << std::endl;*/
-    
-    return true;
+    writeQuadlet(_acr,	    featureId >> 16);		// upper 32bits
+    writeQuadlet(_acr + 4, (featureId << 16) | 0xf000 | (timeout & 0xfff));
+    u_int	busId_nodeId = readQuadlet(_acr) >> 16;
+
+    return nodeId() == busId_nodeId;
 }
 
 /************************************************************************
