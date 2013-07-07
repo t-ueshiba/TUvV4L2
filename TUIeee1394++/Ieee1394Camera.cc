@@ -2319,26 +2319,32 @@ Ieee1394Camera::setFormat_7_PacketSize(Format format7)
 	if (quad & ErrorFlag_1)
 	    throw std::runtime_error("Ieee1394Camera::setFormat_7_PacketSize: failed to read bytePerPacket value!!");
     }
-    u_int	bytePerPacket = readQuadlet(base + BYTE_PER_PACKET) & 0xffff;
-    if (bytePerPacket != 0)
-	writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);	// 推奨値を設定. 
-    else
+
+    const u_int	recBytePerPacket = readQuadlet(base + BYTE_PER_PACKET) & 0xffff;
+    if (recBytePerPacket != 0)	// 推奨値が有効ならば...
     {
-	const quadlet_t	quad = readQuadlet(base + PACKET_PARA_INQ);
-	const u_int	unitBytePerPacket = (quad & 0xffff0000) >> 16,
+      // 推奨値を設定
+	writeQuadlet(base + BYTE_PER_PACKET, recBytePerPacket << 16);
+
+	if (!present || !(readQuadlet(base + VALUE_SETTING) & ErrorFlag_2))
+	    return recBytePerPacket;
+    }
+
+    const quadlet_t	quad = readQuadlet(base + PACKET_PARA_INQ);
+    const u_int		unitBytePerPacket = (quad & 0xffff0000) >> 16,
 			maxBytePerPacket  = (quad & 0xffff);
-	bytePerPacket = (unitBytePerPacket != 0 ?
-			 unitBytePerPacket * (maxBytePerPacket /
-					      unitBytePerPacket) : 0);
-	writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);
-    }
-    if (present)
+    for (u_int n = (unitBytePerPacket != 0 ?
+		    maxBytePerPacket / unitBytePerPacket : 0); n > 0; --n)
     {
-	if (readQuadlet(base + VALUE_SETTING) & ErrorFlag_2)
-	    throw std::runtime_error("Ieee1394Camera::setFormat_7_PacketSize: failed to set bytePerPacket!!");
+	const u_int	bytePerPacket = n * unitBytePerPacket;
+	writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);
+
+	if (!present || !(readQuadlet(base + VALUE_SETTING) & ErrorFlag_2))
+	    return bytePerPacket;
     }
-    
-    return bytePerPacket;
+
+    throw std::runtime_error("Ieee1394Camera::setFormat_7_PacketSize: failed to set bytePerPacket!!");
+    return 0;
 }
 
 quadlet_t
