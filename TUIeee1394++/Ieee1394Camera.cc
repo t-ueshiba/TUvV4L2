@@ -357,9 +357,6 @@ Ieee1394Camera::Ieee1394Camera(Type type, u_int64_t uniqId,
      _w(0), _h(0), _p(MONO_8), _img(0), _img_size(0),
      _acr(0), _bayer(YYYY), _littleEndian(false)
 {
-    u_int	vendor_name_offset = readValueFromUnitDependentDirectory(0x81);
-    u_int	model_name_offset  = readValueFromUnitDependentDirectory(0x82);
-    
   // Set speed of isochronous transmission.
     setSpeed(speed);
 
