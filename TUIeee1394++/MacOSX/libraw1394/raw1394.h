@@ -33,6 +33,8 @@
   - raw1394_set_userdata()
   - raw1394_get_userdata()
   - raw1394_command_register_base()
+  - raw1394_get_local_id()
+  - raw1394_get_remote_id()
   - raw1394_read()
   - raw1394_write()
   - raw1394_loop_iterate()
@@ -154,6 +156,22 @@ void*	raw1394_get_userdata(raw1394handle_t handle);
 nodeaddr_t
 	raw1394_command_register_base(raw1394handle_t handle);
 
+//! ::raw1394 構造体が表すローカルノード(ホスト)のIDを返す
+/*!
+  \param handle		::raw1394 構造体へのハンドル
+  \return		ローカルノードのID
+*/
+nodeid_t
+	raw1394_get_remote_id(raw1394handle_t handle);
+    
+//! ::raw1394 構造体が表すリモートノード(デバイス)のIDを返す
+/*!
+  \param handle		::raw1394 構造体へのハンドル
+  \return		リモートノードのID
+*/
+nodeid_t
+	raw1394_get_local_id(raw1394handle_t handle);
+    
 //! 指定したFireWireアドレスから任意バイト数のデータをasynchronous転送で読み込む
 /*!
   \param handle		::raw1394 構造体へのハンドル

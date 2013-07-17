@@ -204,6 +204,39 @@ raw1394::cmdRegBase() const
     return addr;
 }
 
+//! この ::raw1394 構造体が表すIEEE1394ノードのIDを得る
+/*!
+  \param local	ローカル(ホスト)側のIDならばtrue,
+		リモート(デバイス)側のIDならばfalse
+  \return	ノードID
+*/
+UInt16
+raw1394::nodeID(bool local) const
+{
+    using namespace	std;
+    
+    UInt32	generation;
+    if ((*_fwDeviceInterface)->GetBusGeneration(
+	    _fwDeviceInterface, &generation) != kIOReturnSuccess)
+	throw runtime_error("raw1394::nodeID: failed to get bus generation number!!");
+
+    UInt16	id;
+    if (local)
+    {
+	if ((*_fwDeviceInterface)->GetLocalNodeIDWithGeneration(
+		_fwDeviceInterface, generation, &id) != kIOReturnSuccess)
+	    throw runtime_error("raw1394::nodeID: failed to get local node ID!!");
+    }
+    else
+    {
+	if ((*_fwDeviceInterface)->GetRemoteNodeID(
+		_fwDeviceInterface, generation, &id) != kIOReturnSuccess)
+	    throw runtime_error("raw1394::nodeID: failed to get remote node ID!!");
+    }
+    
+    return id;
+}
+
 //! isochronous受信の初期設定を行う
 /*!
   \param handler	カーネルが受信した各パケットに対して実行されるハンドラ
@@ -639,6 +672,18 @@ raw1394_command_register_base(raw1394handle_t handle)
 {
     FWAddress	fwaddr = handle->cmdRegBase();
     return (UInt64(fwaddr.addressHi) << 32) | UInt64(fwaddr.addressLo);
+}
+
+extern "C" nodeid_t
+raw1394_get_local_id(raw1394handle_t handle)
+{
+    return handle->nodeID(true);
+}
+
+extern "C" nodeid_t
+raw1394_get_remote_id(raw1394handle_t handle)
+{
+    return handle->nodeID(false);
 }
 
 extern "C" int

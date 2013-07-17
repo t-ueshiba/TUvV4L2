@@ -82,6 +82,7 @@ struct raw1394
     void	setUserData(void* data)					;
     void*	getUserData()					const	;
     FWAddress	cmdRegBase()					const	;
+    UInt16	nodeID(bool local)				const	;
     IOReturn	read(const FWAddress& addr,
 		     void* buf, UInt32 size)			const	;
     IOReturn	readQuadlet(const FWAddress& addr, UInt32* quad)const	;

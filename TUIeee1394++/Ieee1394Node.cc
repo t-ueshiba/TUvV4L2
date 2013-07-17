@@ -169,11 +169,12 @@ Ieee1394Node::Ieee1394Node(u_int unit_spec_ID, u_int64_t uniqId, u_int delay
 #endif
 			   )
 #if defined(__APPLE__)
-    :_handle(raw1394_new_handle(unit_spec_ID, uniqId)), 
+    :_handle(raw1394_new_handle(unit_spec_ID, uniqId)),
+     _nodeId(raw1394_get_remote_id(_handle)),
 #else
-    :_port(0), _handle(raw1394_new_handle()),
+    :_port(0), _handle(raw1394_new_handle()), _nodeId(0),
 #endif
-     _nodeId(0), _delay(delay), _buf(0), _arrivaltime(0),
+     _delay(delay), _buf(0), _arrivaltime(0),
 #if defined(USE_VIDEO1394)
      _mmap(), _current(0), _buf_size(0)
 #else

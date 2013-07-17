@@ -11,7 +11,7 @@ PROGRAM		= $(shell basename $(PWD))
 LIBS		= -lTUIeee1394++ -lTUXv++ -lTUv++ -lTUTools++ \
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
 ifeq ($(OSTYPE), darwin)
-  LIBS	       += -framework IOKit -framework CoreFoundation
+  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
 #CXX		= g++
