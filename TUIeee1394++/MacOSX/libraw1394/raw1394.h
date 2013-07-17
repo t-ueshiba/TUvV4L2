@@ -162,7 +162,7 @@ nodeaddr_t
   \return		ローカルノードのID
 */
 nodeid_t
-	raw1394_get_remote_id(raw1394handle_t handle);
+	raw1394_get_local_id(raw1394handle_t handle);
     
 //! ::raw1394 構造体が表すリモートノード(デバイス)のIDを返す
 /*!
@@ -170,7 +170,7 @@ nodeid_t
   \return		リモートノードのID
 */
 nodeid_t
-	raw1394_get_local_id(raw1394handle_t handle);
+	raw1394_get_remote_id(raw1394handle_t handle);
     
 //! 指定したFireWireアドレスから任意バイト数のデータをasynchronous転送で読み込む
 /*!
