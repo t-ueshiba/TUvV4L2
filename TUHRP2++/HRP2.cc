@@ -93,10 +93,20 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
 		    true, true, true, true, true, true,		// left leg
 		    true, false,				// waist
 		    false, false,				// neck
+#if defined(HRP2SH)
+		    true, true, true, true, true, true,	true,	// right arm
+		    false,					// right hand
+		    false, false, false, false, false, false, false, // left arm
+		    false,					// left hand
+		    false, false, false, false, false,	// right hand joint
+		    false, false, false, false, false,	// left hand joint
+		    false,					// swinger
+#else
 		    true, true, true, true, true, true, true,	// right arm
 		    false,					// right hand
 		    false, false, false, false, false, false, false, // left arm
 		    false,					// left hand
+#endif
 		    true, true, true, false, false, false	// base
 		};
     if (!SelectUsedDofs(usedDofs))

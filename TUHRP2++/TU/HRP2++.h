@@ -115,7 +115,7 @@ class HRP2
 
   public:
     HRP2(int argc, char* argv[],
-	 const char* linkName="RARM_JOINT6", u_int capacity=100)	;
+	 const char* linkName="RARM_JOINT6", u_int capacity=200)	;
 
     void	setup(bool isLeft, bool isLaterMode)			;
     void	getMotion()						;
