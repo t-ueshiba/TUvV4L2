@@ -107,7 +107,7 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
 		    false, false, false, false, false, false, false, // left arm
 		    false,					// left hand
 #endif
-		    true, true, true, false, false, false	// base
+		    true, true, false, false, false, false	// base
 		};
     if (!SelectUsedDofs(usedDofs))
 	throw runtime_error("HRP2Client::SelectUsedDofs() failed!!");
@@ -571,7 +571,12 @@ HRP2::go_handopeningpos(bool isLeft, double angle) const
 
     double time = 5.0;
     _seqplayer->setJointAngle((isLeft ? LARM_HAND : RARM_HAND),
-			      deg2rad(isLeft ? angle : -angle), time);
+#if defined(HRP2SH)
+			      angle,
+#else
+			      deg2rad(isLeft ? angle : -angle),
+#endif
+			      time);
     while (!_seqplayer->isEmpty())
 	;
 
@@ -723,15 +728,27 @@ HRP2::init(int argc, char* argv[])
     _posture[HALFSIT][LLEG_JOINT3] = HALF_SITTING_KNEE_ANGLE;
     _posture[HALFSIT][LLEG_JOINT4] = HALF_SITTING_ANKLE_ANGLE;
 
+#if defined(HRP2SH)
     _posture[HALFSIT][RARM_JOINT0] = deg2rad( 15);
     _posture[HALFSIT][RARM_JOINT1] = deg2rad(-10);
     _posture[HALFSIT][RARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][R_HAND_P] = deg2rad( 10);
+    _posture[HALFSIT][R_HAND_P]	   = deg2rad( 20);
 
     _posture[HALFSIT][LARM_JOINT0] = deg2rad( 15);
     _posture[HALFSIT][LARM_JOINT1] = deg2rad( 10);
     _posture[HALFSIT][LARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][L_HAND_P] = deg2rad(-10);
+    _posture[HALFSIT][L_HAND_P]	   = deg2rad( 20);
+#else
+    _posture[HALFSIT][RARM_JOINT0] = deg2rad( 15);
+    _posture[HALFSIT][RARM_JOINT1] = deg2rad(-10);
+    _posture[HALFSIT][RARM_JOINT3] = deg2rad(-30);
+    _posture[HALFSIT][R_HAND_P]	   = deg2rad( 10);
+
+    _posture[HALFSIT][LARM_JOINT0] = deg2rad( 15);
+    _posture[HALFSIT][LARM_JOINT1] = deg2rad( 10);
+    _posture[HALFSIT][LARM_JOINT3] = deg2rad(-30);
+    _posture[HALFSIT][L_HAND_P]	   = deg2rad(-10);
+#endif
 
     for (int i = 0; i < DOF; i++)
 	_posture[CLOTHINIT][i] = _posture[DESIREDPOS][i]
