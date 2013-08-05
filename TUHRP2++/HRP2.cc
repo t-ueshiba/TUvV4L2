@@ -113,7 +113,7 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
 	throw runtime_error("HRP2Client::SelectUsedDofs() failed!!");
 
   // ベースとなるリンクを設定
-    if (!SelectBaseLink("RLEG_JOINT5"))
+    if (!SelectBaseLink(RLEG_END))
 	throw runtime_error("HRP2Client::SelectBaseLink() failed!!");
 
   // LaterモードまたはImmediateモードに設定
@@ -468,13 +468,13 @@ HRP2::go_pickupclothtableinitpos()
 void
 HRP2::go_leftpickupclothtableinitpos()
 {
-    _posture[DESIREDPOS][LARM_JOINT0] = deg2rad(-105);
-    _posture[DESIREDPOS][LARM_JOINT1] = deg2rad(42);
-    _posture[DESIREDPOS][LARM_JOINT2] = deg2rad(-72);
-    _posture[DESIREDPOS][LARM_JOINT3] = deg2rad(-106);
-    _posture[DESIREDPOS][LARM_JOINT4] = deg2rad(25);
-    _posture[DESIREDPOS][LARM_JOINT5] = deg2rad(0);
-    _posture[DESIREDPOS][LARM_JOINT6] = deg2rad(45); // added by nkita 110214
+    _posture[DESIREDPOS][L_SHOULDER_P] = deg2rad(-105);
+    _posture[DESIREDPOS][L_SHOULDER_R] = deg2rad(42);
+    _posture[DESIREDPOS][L_SHOULDER_Y] = deg2rad(-72);
+    _posture[DESIREDPOS][L_ELBOW_P]    = deg2rad(-106);
+    _posture[DESIREDPOS][L_WRIST_Y]    = deg2rad(25);
+    _posture[DESIREDPOS][L_WRIST_P]    = deg2rad(0);
+    _posture[DESIREDPOS][L_HAND_P]     = deg2rad(45); // added by nkita 110214
 
     seqplay(HANDS);
 }
@@ -482,13 +482,13 @@ HRP2::go_leftpickupclothtableinitpos()
 void
 HRP2::go_rightpickupclothtableinitpos()
 {
-    _posture[DESIREDPOS][RARM_JOINT0] = deg2rad(-105);
-    _posture[DESIREDPOS][RARM_JOINT1] = deg2rad(-42);
-    _posture[DESIREDPOS][RARM_JOINT2] = deg2rad(72);
-    _posture[DESIREDPOS][RARM_JOINT3] = deg2rad(-106);
-    _posture[DESIREDPOS][RARM_JOINT4] = deg2rad(-25);
-    _posture[DESIREDPOS][RARM_JOINT5] = deg2rad(0);
-    _posture[DESIREDPOS][RARM_JOINT6] = deg2rad(45);
+    _posture[DESIREDPOS][R_SHOULDER_P] = deg2rad(-105);
+    _posture[DESIREDPOS][R_SHOULDER_R] = deg2rad(-42);
+    _posture[DESIREDPOS][R_SHOULDER_Y] = deg2rad(72);
+    _posture[DESIREDPOS][R_ELBOW_P]    = deg2rad(-106);
+    _posture[DESIREDPOS][R_WRIST_Y]    = deg2rad(-25);
+    _posture[DESIREDPOS][R_WRIST_P]    = deg2rad(0);
+    _posture[DESIREDPOS][R_HAND_P]     = deg2rad(45);
 
     seqplay(HANDS);
 }
@@ -496,13 +496,13 @@ HRP2::go_rightpickupclothtableinitpos()
 void
 HRP2::go_leftpushhangclothpos()
 {
-    _posture[DESIREDPOS][LARM_JOINT0] = deg2rad(-72.6);
-    _posture[DESIREDPOS][LARM_JOINT1] = deg2rad(95);
-    _posture[DESIREDPOS][LARM_JOINT2] = deg2rad(-81);
-    _posture[DESIREDPOS][LARM_JOINT3] = deg2rad(-136.8);
-    _posture[DESIREDPOS][LARM_JOINT4] = deg2rad(82.8);
-    _posture[DESIREDPOS][LARM_JOINT5] = deg2rad(0.0);
-    _posture[DESIREDPOS][L_HAND_P]    = deg2rad(0.0);
+    _posture[DESIREDPOS][L_SHOULDER_P] = deg2rad(-72.6);
+    _posture[DESIREDPOS][L_SHOULDER_R] = deg2rad(95);
+    _posture[DESIREDPOS][L_SHOULDER_Y] = deg2rad(-81);
+    _posture[DESIREDPOS][L_ELBOW_P]    = deg2rad(-136.8);
+    _posture[DESIREDPOS][L_WRIST_Y]    = deg2rad(82.8);
+    _posture[DESIREDPOS][L_WRIST_P]    = deg2rad(0.0);
+    _posture[DESIREDPOS][L_HAND_P]     = deg2rad(0.0);
 
     seqplay(HANDS);
 }
@@ -510,13 +510,13 @@ HRP2::go_leftpushhangclothpos()
 void
 HRP2::go_leftlowpushhangclothpos()
 {
-    _posture[DESIREDPOS][LARM_JOINT0] = deg2rad(-35.8);
-    _posture[DESIREDPOS][LARM_JOINT1] = deg2rad(61.4);
-    _posture[DESIREDPOS][LARM_JOINT2] = deg2rad(-80.9);
-    _posture[DESIREDPOS][LARM_JOINT3] = deg2rad(-137);
-    _posture[DESIREDPOS][LARM_JOINT4] = deg2rad(46.4);
-    _posture[DESIREDPOS][LARM_JOINT5] = deg2rad(-7.4);
-    _posture[DESIREDPOS][L_HAND_P]    = deg2rad(0);
+    _posture[DESIREDPOS][L_SHOULDER_P] = deg2rad(-35.8);
+    _posture[DESIREDPOS][L_SHOULDER_R] = deg2rad(61.4);
+    _posture[DESIREDPOS][L_SHOULDER_Y] = deg2rad(-80.9);
+    _posture[DESIREDPOS][L_ELBOW_P]    = deg2rad(-137);
+    _posture[DESIREDPOS][L_WRIST_Y]    = deg2rad(46.4);
+    _posture[DESIREDPOS][L_WRIST_P]    = deg2rad(-7.4);
+    _posture[DESIREDPOS][L_HAND_P]     = deg2rad(0);
 
     seqplay(HANDS);
 }
@@ -524,13 +524,13 @@ HRP2::go_leftlowpushhangclothpos()
 void
 HRP2::go_leftpushhangclothpos2()
 {
-    _posture[DESIREDPOS][LARM_JOINT0] = deg2rad(-80);
-    _posture[DESIREDPOS][LARM_JOINT1] = deg2rad(60);
-    _posture[DESIREDPOS][LARM_JOINT2] = deg2rad(-90);
-    _posture[DESIREDPOS][LARM_JOINT3] = deg2rad(-130);
-    _posture[DESIREDPOS][LARM_JOINT4] = deg2rad(0);
-    _posture[DESIREDPOS][LARM_JOINT5] = deg2rad(0.0);
-    _posture[DESIREDPOS][L_HAND_P]    = deg2rad(0.0);
+    _posture[DESIREDPOS][L_SHOULDER_P] = deg2rad(-80);
+    _posture[DESIREDPOS][L_SHOULDER_R] = deg2rad(60);
+    _posture[DESIREDPOS][L_SHOULDER_Y] = deg2rad(-90);
+    _posture[DESIREDPOS][L_ELBOW_P]    = deg2rad(-130);
+    _posture[DESIREDPOS][L_WRIST_Y]    = deg2rad(0);
+    _posture[DESIREDPOS][L_WRIST_P]    = deg2rad(0.0);
+    _posture[DESIREDPOS][L_HAND_P]     = deg2rad(0.0);
 
     seqplay(HANDS);
 }
@@ -538,12 +538,12 @@ HRP2::go_leftpushhangclothpos2()
 void
 HRP2::go_lefthangclothpos()
 {
-    _posture[DESIREDPOS][LARM_JOINT0] = deg2rad(-145);
-    _posture[DESIREDPOS][LARM_JOINT1] = deg2rad(42.5);
-    _posture[DESIREDPOS][LARM_JOINT2] = deg2rad(-90);
-    _posture[DESIREDPOS][LARM_JOINT3] = deg2rad(-99);
-    _posture[DESIREDPOS][LARM_JOINT4] = deg2rad(59);
-    _posture[DESIREDPOS][LARM_JOINT5] = deg2rad(58.8);
+    _posture[DESIREDPOS][L_SHOULDER_P] = deg2rad(-145);
+    _posture[DESIREDPOS][L_SHOULDER_R] = deg2rad(42.5);
+    _posture[DESIREDPOS][L_SHOULDER_Y] = deg2rad(-90);
+    _posture[DESIREDPOS][L_ELBOW_P]    = deg2rad(-99);
+    _posture[DESIREDPOS][L_WRIST_Y]    = deg2rad(59);
+    _posture[DESIREDPOS][L_WRIST_P]    = deg2rad(58.8);
 
     seqplay(HANDS);
 }
@@ -551,12 +551,12 @@ HRP2::go_lefthangclothpos()
 void
 HRP2::go_righthangclothpos()
 {
-    _posture[DESIREDPOS][RARM_JOINT0] = deg2rad(-145);
-    _posture[DESIREDPOS][RARM_JOINT1] = deg2rad(-42.5);
-    _posture[DESIREDPOS][RARM_JOINT2] = deg2rad(90);
-    _posture[DESIREDPOS][RARM_JOINT3] = deg2rad(-99);
-    _posture[DESIREDPOS][RARM_JOINT4] = deg2rad(-59);
-    _posture[DESIREDPOS][RARM_JOINT5] = deg2rad(58.8);
+    _posture[DESIREDPOS][R_SHOULDER_P] = deg2rad(-145);
+    _posture[DESIREDPOS][R_SHOULDER_R] = deg2rad(-42.5);
+    _posture[DESIREDPOS][R_SHOULDER_Y] = deg2rad(90);
+    _posture[DESIREDPOS][R_ELBOW_P]    = deg2rad(-99);
+    _posture[DESIREDPOS][R_WRIST_Y]    = deg2rad(-59);
+    _posture[DESIREDPOS][R_WRIST_P]    = deg2rad(58.8);
 
     seqplay(HANDS);
 }
@@ -572,7 +572,7 @@ HRP2::go_handopeningpos(bool isLeft, double angle) const
     double time = 5.0;
     _seqplayer->setJointAngle((isLeft ? LARM_HAND : RARM_HAND),
 #if defined(HRP2SH)
-			      angle,
+			      deg2rad(angle),
 #else
 			      deg2rad(isLeft ? angle : -angle),
 #endif
@@ -585,27 +585,10 @@ HRP2::go_handopeningpos(bool isLeft, double angle) const
 }
 
 void
-HRP2::go_leftarmpos(double angle) const
-{
-    using namespace	std;
-
-    if (_verbose)
-	cerr << "TU::HRP2: Begin to send LARM_JOINT6 angle to SequencePlayerRTC." << endl;
-
-    double time = 5.0;
-    _seqplayer->setJointAngle("LARM_JOINT6", deg2rad(angle), time);
-    while (!_seqplayer->isEmpty())
-	;
-    
-    if (_verbose)
-	cerr << "TU::HRP2: Finish to send LARM_JOINT6 angle to SequencePlayerRTC." << endl;
-}
-
-void
 HRP2::chest_rotate(int yaw, int pitch)
 {
-    _posture[DESIREDPOS][CHEST_JOINT0] = deg2rad(yaw);
-    _posture[DESIREDPOS][CHEST_JOINT1] = deg2rad(pitch);
+    _posture[DESIREDPOS][CHEST_Y] = deg2rad(yaw);
+    _posture[DESIREDPOS][CHEST_P] = deg2rad(pitch);
 
     seqplay(EXCEPTHEAD);
 }
@@ -613,8 +596,8 @@ HRP2::chest_rotate(int yaw, int pitch)
 void
 HRP2::head_rotate(int yaw, int pitch)
 {
-    _posture[DESIREDPOS][HEAD_JOINT0] = deg2rad(yaw);
-    _posture[DESIREDPOS][HEAD_JOINT1] = deg2rad(pitch);
+    _posture[DESIREDPOS][HEAD_Y] = deg2rad(yaw);
+    _posture[DESIREDPOS][HEAD_P] = deg2rad(pitch);
 
     seqplay(EXCEPTHEAD);
 }
@@ -707,61 +690,62 @@ HRP2::init(int argc, char* argv[])
 	      " to get WalkGeneratorService.", 0);
 #endif
     
-  // set initial _posture
     _posture[INITPOS].length(DOF);
     _posture[HALFSIT].length(DOF);
     _posture[CLOTHINIT].length(DOF);
     _posture[DESIREDPOS].length(DOF);
 	
+  // Set initial _posture
     for (int i = 0; i < DOF; i++)
 	_posture[INITPOS][i] = _posture[HALFSIT][i] = 0;
-
     _posture[INITPOS][R_HAND_P] = deg2rad( 5);
     _posture[INITPOS][L_HAND_P] = deg2rad(-5);
 
-  // set half sitting posture
-    _posture[HALFSIT][RLEG_JOINT2] = HALF_SITTING_HIP_ANGLE;
-    _posture[HALFSIT][RLEG_JOINT3] = HALF_SITTING_KNEE_ANGLE;
-    _posture[HALFSIT][RLEG_JOINT4] = HALF_SITTING_ANKLE_ANGLE;
+  // Set half sitting posture
+    _posture[HALFSIT][R_HIP_P]   = HALF_SITTING_HIP_ANGLE;
+    _posture[HALFSIT][R_KNEE_P]  = HALF_SITTING_KNEE_ANGLE;
+    _posture[HALFSIT][R_ANKLE_P] = HALF_SITTING_ANKLE_ANGLE;
 
-    _posture[HALFSIT][LLEG_JOINT2] = HALF_SITTING_HIP_ANGLE;
-    _posture[HALFSIT][LLEG_JOINT3] = HALF_SITTING_KNEE_ANGLE;
-    _posture[HALFSIT][LLEG_JOINT4] = HALF_SITTING_ANKLE_ANGLE;
+    _posture[HALFSIT][L_HIP_P]   = HALF_SITTING_HIP_ANGLE;
+    _posture[HALFSIT][L_KNEE_P]  = HALF_SITTING_KNEE_ANGLE;
+    _posture[HALFSIT][L_ANKLE_P] = HALF_SITTING_ANKLE_ANGLE;
 
 #if defined(HRP2SH)
-    _posture[HALFSIT][RARM_JOINT0] = deg2rad( 15);
-    _posture[HALFSIT][RARM_JOINT1] = deg2rad(-10);
-    _posture[HALFSIT][RARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][R_HAND_P]	   = deg2rad( 20);
+    _posture[HALFSIT][R_SHOULDER_P] = deg2rad( 15);
+    _posture[HALFSIT][R_SHOULDER_R] = deg2rad(-10);
+    _posture[HALFSIT][R_ELBOW_P]    = deg2rad(-30);
+    _posture[HALFSIT][R_HAND_P]	    = deg2rad( 20);
 
-    _posture[HALFSIT][LARM_JOINT0] = deg2rad( 15);
-    _posture[HALFSIT][LARM_JOINT1] = deg2rad( 10);
-    _posture[HALFSIT][LARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][L_HAND_P]	   = deg2rad( 20);
+    _posture[HALFSIT][L_SHOULDER_P] = deg2rad( 15);
+    _posture[HALFSIT][L_SHOULDER_R] = deg2rad( 10);
+    _posture[HALFSIT][L_ELBOW_P]    = deg2rad(-30);
+    _posture[HALFSIT][L_HAND_P]	    = deg2rad( 20);
 #else
-    _posture[HALFSIT][RARM_JOINT0] = deg2rad( 15);
-    _posture[HALFSIT][RARM_JOINT1] = deg2rad(-10);
-    _posture[HALFSIT][RARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][R_HAND_P]	   = deg2rad( 10);
+    _posture[HALFSIT][R_SHOULDER_P] = deg2rad( 15);
+    _posture[HALFSIT][R_SHOULDER_R] = deg2rad(-10);
+    _posture[HALFSIT][R_ELBOW_P]    = deg2rad(-30);
+    _posture[HALFSIT][R_HAND_P]	    = deg2rad( 10);
 
-    _posture[HALFSIT][LARM_JOINT0] = deg2rad( 15);
-    _posture[HALFSIT][LARM_JOINT1] = deg2rad( 10);
-    _posture[HALFSIT][LARM_JOINT3] = deg2rad(-30);
-    _posture[HALFSIT][L_HAND_P]	   = deg2rad(-10);
+    _posture[HALFSIT][L_SHOULDER_P] = deg2rad( 15);
+    _posture[HALFSIT][L_SHOULDER_R] = deg2rad( 10);
+    _posture[HALFSIT][L_ELBOW_P]    = deg2rad(-30);
+    _posture[HALFSIT][L_HAND_P]	    = deg2rad(-10);
 #endif
 
+  // Set clothinit posture
     for (int i = 0; i < DOF; i++)
 	_posture[CLOTHINIT][i] = _posture[DESIREDPOS][i]
 			       = _posture[HALFSIT][i];
 	
-    _posture[CLOTHINIT][RARM_JOINT0] = deg2rad(30);
-    _posture[CLOTHINIT][RARM_JOINT1] = 0.0;
-  //  _posture[CLOTHINIT][RARM_JOINT3] = deg2rad(-105);
-    _posture[CLOTHINIT][RARM_JOINT3] = deg2rad(-100);
-    _posture[CLOTHINIT][RARM_JOINT4] = 0.0;
-    _posture[CLOTHINIT][RARM_JOINT5] = deg2rad(-15);
+    _posture[CLOTHINIT][R_SHOULDER_P] = deg2rad(30);
+    _posture[CLOTHINIT][R_SHOULDER_R] = 0.0;
+  //_posture[CLOTHINIT][R_SHOULDER_R] = deg2rad(-10);
+  //_posture[CLOTHINIT][R_ELBOW_P]    = deg2rad(-105);
+    _posture[CLOTHINIT][R_ELBOW_P]    = deg2rad(-100);
+    _posture[CLOTHINIT][R_WRIST_Y]    = 0.0;
+    _posture[CLOTHINIT][R_WRIST_P]    = deg2rad(-15);
 
-  // set initial mask
+  // Set initial mask
     _mask[HANDS].length(DOF);
     _mask[LEFTHAND].length(DOF);
     _mask[RIGHTHAND].length(DOF);
@@ -777,7 +761,7 @@ HRP2::init(int argc, char* argv[])
 
     _mask[HANDS][L_HAND_P] = _mask[LEFTHAND][L_HAND_P] = 0;
     _mask[HANDS][R_HAND_P] = _mask[RIGHTHAND][R_HAND_P] = 0;
-    _mask[EXCEPTHEAD][HEAD_JOINT0] = _mask[EXCEPTHEAD][HEAD_JOINT1] = 1;
+    _mask[EXCEPTHEAD][HEAD_Y] = _mask[EXCEPTHEAD][HEAD_P] = 1;
 
     return isSuccess(true, " to initialize HRP2.", 0);
 }

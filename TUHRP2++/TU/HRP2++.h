@@ -173,7 +173,6 @@ class HRP2
     void	go_lefthangclothpos()					;
     void	go_righthangclothpos()					;
     void	go_handopeningpos(bool isLeft, double ang)	const	;
-    void	go_leftarmpos(double angle)			const	;
     void	chest_rotate(int yaw, int pitch)			;
     void	head_rotate(int yaw, int pitch)				;
 

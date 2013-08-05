@@ -8,7 +8,8 @@ DEST		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include
 INCDIRS		= -I. -I$(PREFIX)/include
 
-NAME		= $(shell basename $(PWD))
+#NAME		= $(shell basename $(PWD))
+NAME		= TUHRP2SH++
 
 #CXX		= g++
 CPPFLAGS	= -DHRP2SH
