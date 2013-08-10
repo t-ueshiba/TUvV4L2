@@ -327,7 +327,7 @@ class AlignedBuf : public Buf<T>
     static pointer	memalloc(u_int siz)			;
     static void		memfree(pointer p)			;
     
-    enum		{ALIGN = 16};
+    enum		{ALIGN = 32};
     class LCM		//! sizeof(T)とALIGNの最小公倍数
     {
       public:
