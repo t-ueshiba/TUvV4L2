@@ -78,6 +78,7 @@ template <class T>	struct type_traits;
 template <>
 struct type_traits<int8_t>
 {
+    typedef int8_t	signed_type;
     typedef int16_t	upper_type;
     typedef void	lower_type;
     enum
@@ -90,6 +91,7 @@ struct type_traits<int8_t>
 template <>
 struct type_traits<u_int8_t>
 {
+    typedef int8_t	signed_type;
     typedef int16_t	upper_type;
     typedef void	lower_type;
     enum
@@ -102,6 +104,7 @@ struct type_traits<u_int8_t>
 template <>
 struct type_traits<int16_t>
 {
+    typedef int16_t	signed_type;
     typedef int32_t	upper_type;
     typedef int8_t	lower_type;
     enum
@@ -114,6 +117,7 @@ struct type_traits<int16_t>
 template <>
 struct type_traits<u_int16_t>
 {
+    typedef int16_t	signed_type;
     typedef int32_t	upper_type;
     typedef u_int8_t	lower_type;
     enum
@@ -126,6 +130,7 @@ struct type_traits<u_int16_t>
 template <>
 struct type_traits<int32_t>
 {
+    typedef int32_t	signed_type;
     typedef int64_t	upper_type;
     typedef int16_t	lower_type;
     enum
@@ -138,6 +143,7 @@ struct type_traits<int32_t>
 template <>
 struct type_traits<u_int32_t>
 {
+    typedef int32_t	signed_type;
     typedef int64_t	upper_type;
     typedef u_int16_t	lower_type;
     enum
@@ -150,6 +156,7 @@ struct type_traits<u_int32_t>
 template <>
 struct type_traits<int64_t>
 {
+    typedef int64_t	signed_type;
     typedef void	upper_type;
     typedef int32_t	lower_type;
     enum
@@ -162,6 +169,7 @@ struct type_traits<int64_t>
 template <>
 struct type_traits<u_int64_t>
 {
+    typedef int64_t	signed_type;
     typedef void	upper_type;
     typedef u_int32_t	lower_type;
     enum
@@ -428,6 +436,8 @@ operator <<(std::ostream& out, const vec<T>& x)
 ************************************************************************/
 #define MM_PREFIX(type)		MM_PREFIX_##type
 #define MM_SUFFIX(type)		MM_SUFFIX_##type
+#define MM_SIGNED(type)		MM_SIGNED_##type
+#define MM_BASE(type)		MM_BASE_##type
 
 #if defined(AVX2)
 #  define MM_PREFIX_int8_t	_mm256_
@@ -474,6 +484,23 @@ operator <<(std::ostream& out, const vec<T>& x)
 #endif
 #define MM_SUFFIX_void
 
+#define MM_SIGNED_int8_t	MM_SUFFIX_int8_t
+#define MM_SIGNED_u_int8_t	MM_SUFFIX_int8_t
+#define MM_SIGNED_int16_t	MM_SUFFIX_int16_t
+#define MM_SIGNED_u_int16_t	MM_SUFFIX_int16_t
+#define MM_SIGNED_int32_t	MM_SUFFIX_int32_t
+#define MM_SIGNED_u_int32_t	MM_SUFFIX_int32_t
+#define MM_SIGNED_u_int64_t	MM_SUFFIX_u_int64_t
+    
+#define MM_BASE_int8_t		MM_SUFFIX_ivec_t
+#define MM_BASE_u_int8_t	MM_SUFFIX_ivec_t
+#define MM_BASE_int16_t		MM_SUFFIX_ivec_t
+#define MM_BASE_u_int16_t	MM_SUFFIX_ivec_t
+#define MM_BASE_int32_t		MM_SUFFIX_ivec_t
+#define MM_BASE_u_int32_t	MM_SUFFIX_ivec_t
+#define MM_BASE_u_int64_t	MM_SUFFIX_ivec_t
+#define MM_BASE_ivec_t		MM_SUFFIX_ivec_t
+
 #if defined(AVX)
 #  define MM_PREFIX_float	_mm256_
 #  define MM_PREFIX_fvec_t	_mm256_
@@ -491,72 +518,87 @@ operator <<(std::ostream& out, const vec<T>& x)
 #if defined(SSE)
 #  define MM_SUFFIX_float	ps
 #  define MM_SUFFIX_fvec_t	ps
+#  define MM_SIGNED_float	ps
+#  define MM_BASE_float		ps
+#  define MM_BASE_fvec_t	ps
 #endif    
 #if defined(SSE2)
 #  define MM_SUFFIX_double	pd
 #  define MM_SUFFIX_dvec_t	pd
+#  define MM_SIGNED_double	pd
+#  define MM_BASE_double	pd
+#  define MM_BASE_dvec_t	pd
 #endif    
 
-#define MM_CAT(op, prefix, from, to)		prefix##op##from##_##to
-#define MM_MNEMONIC(op, prefix, from, to)	MM_CAT(op, prefix, from, to)
+#define MM_CAT(op, prefix, from, suffix)	prefix##op##from##_##suffix
+#define MM_MNEMONIC(op, prefix, from, suffix)	MM_CAT(op, prefix, from, suffix)
 
-#define MM_TMPL_FUNC(signature, op, args, from_t, to_t)			\
+#define MM_TMPL_FUNC(signature, op, args, from, to, suffix)		\
     inline signature							\
     {									\
-	return MM_MNEMONIC(op, MM_PREFIX(to_t),				\
-			   MM_SUFFIX(from_t), MM_SUFFIX(to_t))args;	\
+	return MM_MNEMONIC(op, MM_PREFIX(to),				\
+			   MM_SUFFIX(from), suffix(to))args;		\
     }
 
-#define MM_FUNC(signature, op, args, from_t, to_t)			\
-    template <> MM_TMPL_FUNC(signature, op, args, from_t, to_t)
+#define MM_FUNC(signature, op, args, from, to, suffix)			\
+    template <> MM_TMPL_FUNC(signature, op, args, from, to, suffix)
 
-#define MM_FUNC_1(func, op, type, base)					\
-    MM_FUNC(vec<type> func(vec<type> x), op, (x), void, base)
-
-#define MM_FUNC_2(func, op, type, base)					\
+#define MM_FUNC_2(func, op, type)					\
     MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
-	    op, (x, y), void, base)
+	    op, (x, y), void, type, MM_SIGNED)
 
-#define MM_FUNC_2R(func, op, type, base)				\
+#define MM_BASE_FUNC_2(func, op, type)					\
     MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
-	    op, (y, x), void, base)
+	    op, (x, y), void, type, MM_BASE)
+
+#define MM_NUMERIC_FUNC_1(func, op, type)				\
+    MM_FUNC(vec<type> func(vec<type> x),				\
+	    op, (x), void, type, MM_SUFFIX)
+
+#define MM_NUMERIC_FUNC_2(func, op, type)				\
+    MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
+	    op, (x, y), void, type, MM_SUFFIX)
+
+#define MM_NUMERIC_FUNC_2R(func, op, type)				\
+    MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
+	    op, (y, x), void, type, MM_SUFFIX)
 
 /************************************************************************
 *  Constructors of vec<T>						*
 ************************************************************************/
-#define MM_CONSTRUCTOR_1(type, base)					\
+#define MM_CONSTRUCTOR_1(type)						\
     inline								\
     vec<type>::vec(value_type a)					\
-	:_base(MM_MNEMONIC(set1, MM_PREFIX(base), , MM_SUFFIX(base))	\
+	:_base(MM_MNEMONIC(set1, MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a))							\
     {									\
     }
-#define MM_CONSTRUCTOR_2(type, base)					\
+#define MM_CONSTRUCTOR_2(type)						\
     inline								\
     vec<type>::vec(value_type a1, value_type a0)			\
-	:_base(MM_MNEMONIC(set, MM_PREFIX(base), , MM_SUFFIX(base))	\
+	:_base(MM_MNEMONIC(set, MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a1, a0))						\
     {									\
     }
-#define MM_CONSTRUCTOR_4(type, base)					\
+#define MM_CONSTRUCTOR_4(type)						\
     inline								\
     vec<type>::vec(value_type a3, value_type a2,			\
 		   value_type a1, value_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(base), , MM_SUFFIX(base))	\
+	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a3, a2, a1, a0))					\
     {									\
     }
-#define MM_CONSTRUCTOR_8(type, base)					\
+#define MM_CONSTRUCTOR_8(type)						\
     inline								\
     vec<type>::vec(value_type a7, value_type a6,			\
 		   value_type a5, value_type a4,			\
 		   value_type a3, value_type a2,			\
 		   value_type a1, value_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SUFFIX(base))	\
+	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a7, a6, a5, a4,	a3, a2, a1, a0))			\
     {									\
     }
-#define MM_CONSTRUCTOR_16(type, base)					\
+#define MM_CONSTRUCTOR_16(type)						\
     inline								\
     vec<type>::vec(value_type a15, value_type a14,			\
 		   value_type a13, value_type a12,			\
@@ -566,12 +608,12 @@ operator <<(std::ostream& out, const vec<T>& x)
 		   value_type a5,  value_type a4,			\
 		   value_type a3,  value_type a2,			\
 		   value_type a1,  value_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SUFFIX(base))	\
+	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a15, a14, a13, a12, a11, a10, a9, a8,			\
 		a7,  a6,  a5,  a4,  a3,  a2,  a1, a0))			\
     {									\
     }
-#define MM_CONSTRUCTOR_32(type, base)					\
+#define MM_CONSTRUCTOR_32(type)						\
     inline								\
     vec<type>::vec(value_type a31, value_type a30,			\
 		   value_type a29, value_type a28,			\
@@ -589,7 +631,7 @@ operator <<(std::ostream& out, const vec<T>& x)
 		   value_type a5,  value_type a4,			\
 		   value_type a3,  value_type a2,			\
 		   value_type a1,  value_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SUFFIX(base))	\
+	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a31, a30, a29, a28, a27, a26, a25, a24,			\
 		a23, a22, a21, a20, a19, a18, a17, a16,			\
 		a15, a14, a13, a12, a11, a10, a9,  a8,			\
@@ -597,51 +639,51 @@ operator <<(std::ostream& out, const vec<T>& x)
     {									\
     }
 
-MM_CONSTRUCTOR_1(int8_t,    int8_t)
-MM_CONSTRUCTOR_1(int16_t,   int16_t)
-MM_CONSTRUCTOR_1(int32_t,   int32_t)
-MM_CONSTRUCTOR_1(u_int8_t,  int8_t)
-MM_CONSTRUCTOR_1(u_int16_t, int16_t)
-MM_CONSTRUCTOR_1(u_int32_t, int32_t)
+MM_CONSTRUCTOR_1(int8_t)
+MM_CONSTRUCTOR_1(int16_t)
+MM_CONSTRUCTOR_1(int32_t)
+MM_CONSTRUCTOR_1(u_int8_t)
+MM_CONSTRUCTOR_1(u_int16_t)
+MM_CONSTRUCTOR_1(u_int32_t)
 
 #if defined(AVX2)
-  MM_CONSTRUCTOR_32(int8_t,    int8_t)	
-  MM_CONSTRUCTOR_32(u_int8_t,  int8_t)	
-  MM_CONSTRUCTOR_16(int16_t,   int16_t)	
-  MM_CONSTRUCTOR_16(u_int16_t, int16_t)	
-  MM_CONSTRUCTOR_8(int32_t,    int32_t)
-  MM_CONSTRUCTOR_8(u_int32_t,  int32_t)
+  MM_CONSTRUCTOR_32(int8_t)	
+  MM_CONSTRUCTOR_32(u_int8_t)	
+  MM_CONSTRUCTOR_16(int16_t)	
+  MM_CONSTRUCTOR_16(u_int16_t)	
+  MM_CONSTRUCTOR_8(int32_t)
+  MM_CONSTRUCTOR_8(u_int32_t)
 #elif defined(SSE2)
-  MM_CONSTRUCTOR_16(int8_t,   int8_t)
-  MM_CONSTRUCTOR_8(int16_t,   int16_t)
-  MM_CONSTRUCTOR_4(int32_t,   int32_t)
-  MM_CONSTRUCTOR_16(u_int8_t, int8_t)
-  MM_CONSTRUCTOR_8(u_int16_t, int16_t)
-  MM_CONSTRUCTOR_4(u_int32_t, int32_t)
+  MM_CONSTRUCTOR_16(int8_t)
+  MM_CONSTRUCTOR_8(int16_t)
+  MM_CONSTRUCTOR_4(int32_t)
+  MM_CONSTRUCTOR_16(u_int8_t)
+  MM_CONSTRUCTOR_8(u_int16_t)
+  MM_CONSTRUCTOR_4(u_int32_t)
 #else
-  MM_CONSTRUCTOR_8(int8_t,    int8_t)
-  MM_CONSTRUCTOR_4(int16_t,   int16_t)
-  MM_CONSTRUCTOR_2(int32_t,   int32_t)
-  MM_CONSTRUCTOR_8(u_int8_t,  int8_t)
-  MM_CONSTRUCTOR_4(u_int16_t, int16_t)
-  MM_CONSTRUCTOR_2(u_int32_t, int32_t)
+  MM_CONSTRUCTOR_8(int8_t)
+  MM_CONSTRUCTOR_4(int16_t)
+  MM_CONSTRUCTOR_2(int32_t)
+  MM_CONSTRUCTOR_8(u_int8_t)
+  MM_CONSTRUCTOR_4(u_int16_t)
+  MM_CONSTRUCTOR_2(u_int32_t)
 #endif
 
 #if defined(SSE)
-  MM_CONSTRUCTOR_1(float, fvec_t)
+  MM_CONSTRUCTOR_1(float)
 #  if defined(AVX)
-  MM_CONSTRUCTOR_8(float, fvec_t)
+  MM_CONSTRUCTOR_8(float)
 #  else
-  MM_CONSTRUCTOR_4(float, fvec_t)
+  MM_CONSTRUCTOR_4(float)
 #  endif
 #endif
 
 #if defined(SSE2)
-  MM_CONSTRUCTOR_1(double, dvec_t)
+  MM_CONSTRUCTOR_1(double)
 #  if defined(AVX) 
-  MM_CONSTRUCTOR_4(double, dvec_t)
+  MM_CONSTRUCTOR_4(double)
 #  else
-  MM_CONSTRUCTOR_2(double, dvec_t)
+  MM_CONSTRUCTOR_2(double)
 #  endif
 #endif
 
@@ -683,24 +725,26 @@ template <class T> static void		store(T* p, vec<T> x)		;
 */
 template <class T> static void		storeu(T* p, vec<T> x)		;
 
-#define MM_LOAD_STORE(type, base)					\
-    MM_FUNC(vec<type> load(const type* p),				\
-	    load, ((const base*)p), void, base)				\
-    MM_FUNC(vec<type> loadu(const type* p),				\
-	    loadu, ((const base*)p), void, base)			\
-    MM_FUNC(void store(type* p, vec<type> x),				\
-	    store, ((base*)p, x), void, base)				\
-    MM_FUNC(void storeu(type* p, vec<type> x),				\
-	    storeu, ((base*)p, x), void, base)
-
 #if defined(SSE2)
-  MM_LOAD_STORE(int8_t,    ivec_t)
-  MM_LOAD_STORE(int16_t,   ivec_t)
-  MM_LOAD_STORE(int32_t,   ivec_t)
-  MM_LOAD_STORE(u_int8_t,  ivec_t)
-  MM_LOAD_STORE(u_int16_t, ivec_t)
-  MM_LOAD_STORE(u_int32_t, ivec_t)
-  MM_LOAD_STORE(u_int64_t, ivec_t)
+#  define MM_LOAD_STORE(type)						\
+    MM_FUNC(vec<type> load(const type* p), load,			\
+	    ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+    MM_FUNC(vec<type> loadu(const type* p), loadu,			\
+	    ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+    MM_FUNC(void store(type* p, vec<type> x), store,			\
+	    ((vec<type>::base_type*)p, x), void, type, MM_BASE)		\
+    MM_FUNC(void storeu(type* p, vec<type> x), storeu,			\
+	    ((vec<type>::base_type*)p, x), void, type, MM_BASE)
+
+  MM_LOAD_STORE(int8_t)
+  MM_LOAD_STORE(int16_t)
+  MM_LOAD_STORE(int32_t)
+  MM_LOAD_STORE(u_int8_t)
+  MM_LOAD_STORE(u_int16_t)
+  MM_LOAD_STORE(u_int32_t)
+  MM_LOAD_STORE(u_int64_t)
+
+#  undef MM_LOAD_STORE  
 #else
   template <class T> inline vec<T>
   load(const T* p)
@@ -725,13 +769,22 @@ template <class T> static void		storeu(T* p, vec<T> x)		;
 #endif
 
 #if defined(SSE)
-  MM_LOAD_STORE(float, float)
-#endif
-#if defined(SSE2)
-  MM_LOAD_STORE(double, double)
-#endif
+#  define MM_LOAD_STORE(type)						\
+    MM_FUNC(vec<type> load(const type* p), load,			\
+	    ((const type*)p), void, type, MM_BASE)			\
+    MM_FUNC(vec<type> loadu(const type* p), loadu,			\
+	    ((const type*)p), void, type, MM_BASE)			\
+    MM_FUNC(void store(type* p, vec<type> x), store,			\
+	    ((type*)p, x), void, type, MM_BASE)				\
+    MM_FUNC(void storeu(type* p, vec<type> x), storeu,			\
+	    ((type*)p, x), void, type, MM_BASE)
 
-#undef MM_LOAD_STORE
+  MM_LOAD_STORE(float)
+#  if defined(SSE2)
+  MM_LOAD_STORE(double)
+#  endif
+#  undef MM_LOAD_STORE
+#endif
   
 /************************************************************************
 *  Zero-vector generators						*
@@ -739,22 +792,22 @@ template <class T> static void		storeu(T* p, vec<T> x)		;
 //! 全成分が0であるベクトルを生成する．
 template <class T> static vec<T>	zero()				;
 
-#define MM_ZERO(type, base)						\
-    MM_FUNC(vec<type> zero<type>(), setzero, (), void, base)
+#define MM_ZERO(type)							\
+    MM_FUNC(vec<type> zero<type>(), setzero, (), void, type, MM_BASE)
 
-MM_ZERO(int8_t,    ivec_t)
-MM_ZERO(int16_t,   ivec_t)
-MM_ZERO(int32_t,   ivec_t)
-MM_ZERO(u_int8_t,  ivec_t)
-MM_ZERO(u_int16_t, ivec_t)
-MM_ZERO(u_int32_t, ivec_t)
-MM_ZERO(u_int64_t, ivec_t)
+MM_ZERO(int8_t)
+MM_ZERO(int16_t)
+MM_ZERO(int32_t)
+MM_ZERO(u_int8_t)
+MM_ZERO(u_int16_t)
+MM_ZERO(u_int32_t)
+MM_ZERO(u_int64_t)
     
 #if defined(SSE)
-  MM_ZERO(float, fvec_t)
+  MM_ZERO(float)
 #endif
 #if defined(SSE2)
-  MM_ZERO(double, dvec_t)
+  MM_ZERO(double)
 #endif
 
 #undef MM_ZERO
@@ -808,16 +861,22 @@ cast_base(ivec_t x)
       return _mm256_castsi256_si128(_mm256_castpd_si256(x));
   }
 #elif defined(SSE2)
-  MM_FUNC(fvec_t cast_base<fvec_t>(ivec_t x), cast, (x), ivec_t, fvec_t)
-  MM_FUNC(ivec_t cast_base<ivec_t>(fvec_t x), cast, (x), fvec_t, ivec_t)
-  MM_FUNC(dvec_t cast_base<dvec_t>(ivec_t x), cast, (x), ivec_t, dvec_t)
-  MM_FUNC(ivec_t cast_base<ivec_t>(dvec_t x), cast, (x), dvec_t, ivec_t)
+  MM_FUNC(fvec_t cast_base<fvec_t>(ivec_t x),
+	  cast, (x), ivec_t, fvec_t, MM_BASE)
+  MM_FUNC(ivec_t cast_base<ivec_t>(fvec_t x),
+	  cast, (x), fvec_t, ivec_t, MM_BASE)
+  MM_FUNC(dvec_t cast_base<dvec_t>(ivec_t x),
+	  cast, (x), ivec_t, dvec_t, MM_BASE)
+  MM_FUNC(ivec_t cast_base<ivec_t>(dvec_t x),
+	  cast, (x), dvec_t, ivec_t, MM_BASE)
 #endif
 
 // float <-> double
 #if defined(SSE2)
-  MM_FUNC(dvec_t cast_base<dvec_t>(fvec_t x), cast, (x), fvec_t, dvec_t)
-  MM_FUNC(fvec_t cast_base<fvec_t>(dvec_t x), cast, (x), dvec_t, fvec_t)
+  MM_FUNC(dvec_t cast_base<dvec_t>(fvec_t x),
+	  cast, (x), fvec_t, dvec_t, MM_BASE)
+  MM_FUNC(fvec_t cast_base<fvec_t>(dvec_t x),
+	  cast, (x), dvec_t, fvec_t, MM_BASE)
 #endif
   
 /************************************************************************
@@ -861,29 +920,29 @@ shuffle_high(vec<T> x)							;
 template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
 shuffle(vec<T> x)							;
 
-#define MM_SHUFFLE_LOW_HIGH_I4(type, base)				\
+#define MM_SHUFFLE_LOW_HIGH_I4(type)					\
     template <u_int I3, u_int I2, u_int I1, u_int I0>			\
     MM_TMPL_FUNC(vec<type> shuffle_low(vec<type> x),			\
 		 shufflelo, (x, _MM_SHUFFLE(I3, I2, I1, I0)),		\
-		 void, base)						\
+		 void, type, MM_SIGNED)					\
     template <u_int I3, u_int I2, u_int I1, u_int I0>			\
     MM_TMPL_FUNC(vec<type> shuffle_high(vec<type> x),			\
 		 shufflehi, (x, _MM_SHUFFLE(I3, I2, I1, I0)),		\
-		 void, base)
-#define MM_SHUFFLE_I4(type, base)					\
+		 void, type, MM_SIGNED)
+#define MM_SHUFFLE_I4(type)						\
     template <u_int I3, u_int I2, u_int I1, u_int I0>			\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x),			\
 		 shuffle, (x, _MM_SHUFFLE(I3, I2, I1, I0)),		\
-		 void, base)
+		 void, type, MM_SIGNED)
 
 #if defined(SSE2)
-  MM_SHUFFLE_I4(int32_t,   int32_t)
-  MM_SHUFFLE_I4(u_int32_t, int32_t)
-  MM_SHUFFLE_LOW_HIGH_I4(int16_t,   int16_t)
-  MM_SHUFFLE_LOW_HIGH_I4(u_int16_t, int16_t)
+  MM_SHUFFLE_I4(int32_t)
+  MM_SHUFFLE_I4(u_int32_t)
+  MM_SHUFFLE_LOW_HIGH_I4(int16_t)
+  MM_SHUFFLE_LOW_HIGH_I4(u_int16_t)
 #elif defined(SSE)
-  MM_SHUFFLE_I4(int16_t,   int16_t)
-  MM_SHUFFLE_I4(u_int16_t, int16_t)
+  MM_SHUFFLE_I4(int16_t)
+  MM_SHUFFLE_I4(u_int16_t)
 #endif
   
 #undef MM_SHUFFLE_LOW_HIGH_I4
@@ -921,16 +980,17 @@ shuffle(vec<T> x, vec<T> y)						;
     template <u_int Yh, u_int Yl, u_int Xh, u_int Xl>			\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x, vec<type> y),		\
 		 shuffle, (x, y, _MM_SHUFFLE(Yh, Yl, Xh, Xl)),		\
-		 void, type)
+		 void, type, MM_SUFFIX)
 #define MM_SHUFFLE_D4(type)						\
     template <u_int Yh, u_int Yl, u_int Xh, u_int Xl>			\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x, vec<type> y),		\
 		 shuffle, (x, y, _MM_SHUFFLE4(Yh, Yl, Xh, Xl)),		\
-		 void, type)
+		 void, type, MM_SUFFIX)
 #define MM_SHUFFLE_D2(type)						\
     template <u_int Y, u_int X>						\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x, vec<type> y),		\
-		 shuffle, (x, y, _MM_SHUFFLE2(Y, X)), void, type)
+		 shuffle, (x, y, _MM_SHUFFLE2(Y, X)),			\
+		 void, type, MM_SUFFIX)
 
 #if defined(SSE)
   MM_SHUFFLE_F4(float)
@@ -991,21 +1051,21 @@ template <class T> static vec<T>	unpack_low(vec<T> x, vec<T> y)	;
 */
 template <class T> static vec<T>	unpack_high(vec<T> x, vec<T> y)	;
 
-#define MM_UNPACK_LOW_HIGH(type, base)					\
-    MM_FUNC_2(unpack_low,  unpacklo, type, base)			\
-    MM_FUNC_2(unpack_high, unpackhi, type, base)
+#define MM_UNPACK_LOW_HIGH(type)					\
+    MM_FUNC_2(unpack_low,  unpacklo, type)				\
+    MM_FUNC_2(unpack_high, unpackhi, type)
 
-MM_UNPACK_LOW_HIGH(int8_t,    int8_t)
-MM_UNPACK_LOW_HIGH(int16_t,   int16_t)
-MM_UNPACK_LOW_HIGH(int32_t,   int32_t)
-MM_UNPACK_LOW_HIGH(u_int8_t,  int8_t)
-MM_UNPACK_LOW_HIGH(u_int16_t, int16_t)
-MM_UNPACK_LOW_HIGH(u_int32_t, int32_t)
+MM_UNPACK_LOW_HIGH(int8_t)
+MM_UNPACK_LOW_HIGH(int16_t)
+MM_UNPACK_LOW_HIGH(int32_t)
+MM_UNPACK_LOW_HIGH(u_int8_t)
+MM_UNPACK_LOW_HIGH(u_int16_t)
+MM_UNPACK_LOW_HIGH(u_int32_t)
 #if defined(SSE)
-  MM_UNPACK_LOW_HIGH(float, float)
+  MM_UNPACK_LOW_HIGH(float)
 #  if defined(SSE2)
-  MM_UNPACK_LOW_HIGH(u_int64_t, u_int64_t)
-  MM_UNPACK_LOW_HIGH(double,    double)
+  MM_UNPACK_LOW_HIGH(u_int64_t)
+  MM_UNPACK_LOW_HIGH(double)
 #  endif
 #endif
 
@@ -1080,27 +1140,27 @@ template <u_int I, class T> static T	extract(vec<T> x)		;
     template <u_int I> inline int					\
     extract(vec<type> x)						\
     {									\
-	return MM_MNEMONIC(extract, _mm_,				\
-			   MM_SUFFIX(void), MM_SUFFIX(base))(		\
+	return MM_MNEMONIC(extract, _mm_, , MM_SIGNED(type))(		\
 			       _mm256_extractf128_si256(		\
 				   x,					\
 				   (I < vec<type>::lane_size ? 0 : 1)),	\
 			       I & (vec<type>::lane_size - 1));		\
     }
 #else
-#  define MM_EXTRACT(type, base)					\
+#  define MM_EXTRACT(type)						\
     template <u_int I>							\
-    MM_TMPL_FUNC(int extract(vec<type> x), extract, (x, I), void, base)
+    MM_TMPL_FUNC(int extract(vec<type> x),				\
+		 extract, (x, I), void, type, MM_SIGNED)
 #endif
 
 #if defined(SSE)
-  MM_EXTRACT(int16_t,   int16_t)
-  MM_EXTRACT(u_int16_t, int16_t)
+  MM_EXTRACT(int16_t)
+  MM_EXTRACT(u_int16_t)
 #  if defined(SSE4)
-  MM_EXTRACT(int8_t,    int8_t)
-  MM_EXTRACT(u_int8_t,  int8_t)
-  MM_EXTRACT(int32_t,   int32_t)
-  MM_EXTRACT(u_int32_t, int32_t)
+  MM_EXTRACT(int8_t)
+  MM_EXTRACT(u_int8_t)
+  MM_EXTRACT(int32_t)
+  MM_EXTRACT(u_int32_t)
 #  else
 #  endif
 #endif
@@ -1164,11 +1224,11 @@ template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
     template <> inline vec<type>					\
     shift_r<0>(vec<type> x)				{return x;}	\
     template <u_int N>							\
-    MM_TMPL_FUNC(vec<type> shift_l(vec<type> x),			\
-		 slli, (x, N*vec<type>::value_size), void, ivec_t)	\
+    MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), slli,			\
+		 (x, N*vec<type>::value_size), void, type, MM_BASE)	\
     template <u_int N>							\
-    MM_TMPL_FUNC(vec<type> shift_r(vec<type> x),			\
-		 srli, (x, N*vec<type>::value_size), void, ivec_t)
+    MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), srli,			\
+		 (x, N*vec<type>::value_size), void, type, MM_BASE)
 #else
 #  define MM_ELM_SHIFTS_I(type)						\
     template <> inline vec<type>					\
@@ -1176,11 +1236,11 @@ template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
     template <> inline vec<type>					\
     shift_r<0>(vec<type> x)				{return x;}	\
     template <u_int N>							\
-    MM_TMPL_FUNC(vec<type> shift_l(vec<type> x),			\
-		 slli, (x, 8*N*vec<type>::value_size), void, ivec_t)	\
+    MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), slli,			\
+		 (x, 8*N*vec<type>::value_size), void, type, MM_BASE)	\
     template <u_int N>							\
-    MM_TMPL_FUNC(vec<type> shift_r(vec<type> x),			\
-		 srli, (x, 8*N*vec<type>::value_size), void, ivec_t)
+    MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), srli,			\
+		 (x, 8*N*vec<type>::value_size), void, type, MM_BASE)
 #endif
 
 MM_ELM_SHIFTS_I(int8_t)
@@ -1335,31 +1395,31 @@ template <class T> static vec<T>	operator <<(vec<T> x, int n)	;
 */
 template <class T> static vec<T>	operator >>(vec<T> x, int n)	;
 
-#define MM_LOGICAL_SHIFT_LEFT(type, base)				\
+#define MM_LOGICAL_SHIFT_LEFT(type)					\
     MM_FUNC(vec<type> operator <<(vec<type> x, int n),			\
-	    slli, (x, n), void, base)
-#define MM_LOGICAL_SHIFT_RIGHT(type, base)				\
+	    slli, (x, n), void, type, MM_SIGNED)
+#define MM_LOGICAL_SHIFT_RIGHT(type)					\
     MM_FUNC(vec<type> operator >>(vec<type> x, int n),			\
-	    srli, (x, n), void, base)
-#define MM_ARITHMETIC_SHIFT_RIGHT(type)					\
+	    srli, (x, n), void, type, MM_SIGNED)
+#define MM_NUMERIC_SHIFT_RIGHT(type)					\
     MM_FUNC(vec<type> operator >>(vec<type> x, int n),			\
-	    srai, (x, n), void, type)
+	    srai, (x, n), void, type, MM_SIGNED)
 
-MM_LOGICAL_SHIFT_LEFT(int16_t,   int16_t)
-MM_LOGICAL_SHIFT_LEFT(int32_t,   int32_t)
-MM_LOGICAL_SHIFT_LEFT(u_int16_t, int16_t)
-MM_LOGICAL_SHIFT_LEFT(u_int32_t, int32_t)
-MM_LOGICAL_SHIFT_LEFT(u_int64_t, u_int64_t)
+MM_LOGICAL_SHIFT_LEFT(int16_t)
+MM_LOGICAL_SHIFT_LEFT(int32_t)
+MM_LOGICAL_SHIFT_LEFT(u_int16_t)
+MM_LOGICAL_SHIFT_LEFT(u_int32_t)
+MM_LOGICAL_SHIFT_LEFT(u_int64_t)
 
-MM_ARITHMETIC_SHIFT_RIGHT(int16_t)
-MM_ARITHMETIC_SHIFT_RIGHT(int32_t)
-MM_LOGICAL_SHIFT_RIGHT(u_int16_t, int16_t)
-MM_LOGICAL_SHIFT_RIGHT(u_int32_t, int32_t)
-MM_LOGICAL_SHIFT_RIGHT(u_int64_t, u_int64_t)
+MM_NUMERIC_SHIFT_RIGHT(int16_t)
+MM_NUMERIC_SHIFT_RIGHT(int32_t)
+MM_LOGICAL_SHIFT_RIGHT(u_int16_t)
+MM_LOGICAL_SHIFT_RIGHT(u_int32_t)
+MM_LOGICAL_SHIFT_RIGHT(u_int64_t)
 
 #undef MM_LOGICAL_SHIFT_LEFT
 #undef MM_LOGICAL_SHIFT_RIGHT
-#undef MM_ARITHMETIC_SHIFT_RIGHT
+#undef MM_NUMERIC_SHIFT_RIGHT
 
 /************************************************************************
 *  Type conversion operators						*
@@ -1396,29 +1456,28 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 // [1] 整数ベクトル間の変換
 #if defined(SSE4)
 #  if defined(AVX2)
-#    define MM_CVTUP(from, to, base)					\
+#    define MM_CVTUP(from, to)						\
       template <> inline vec<to>					\
       cvt<to>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm256_, MM_SUFFIX(from),		\
-			     MM_SUFFIX(base))(				\
-				 _mm256_castsi256_si128(x));		\
+			     MM_SIGNED(to))(_mm256_castsi256_si128(x));	\
       }
-#    define MM_CVTHI(from, to, base)					\
+#    define MM_CVTHI(from, to)						\
       template <> inline vec<to>					\
       cvt_high<to>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm256_, MM_SUFFIX(from),		\
-			     MM_SUFFIX(base))(				\
+			     MM_SIGNED(to))(				\
 				 _mm256_extractf128_si256(x, 0x1));	\
       }
 #  else	// SSE4 && !AVX2
-#    define MM_CVTUP(from, to, base)					\
+#    define MM_CVTUP(from, to)						\
       template <> inline vec<to>					\
       cvt<to>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm_,					\
-			     MM_SUFFIX(from), MM_SUFFIX(base))(x);	\
+			     MM_SUFFIX(from), MM_SIGNED(to))(x);	\
       }
 #    define MM_CVTHI(from, to)						\
       template <> inline vec<to>					\
@@ -1427,33 +1486,33 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 	  return cvt<to>(shift_r<vec<from>::size/2>(x));		\
       }
 #  endif
-  MM_CVTUP(int8_t,    int16_t,	 int16_t)	// s_char -> short
-  MM_CVTHI(int8_t,    int16_t,	 int16_t)	// s_char -> short
-  MM_CVTUP(int8_t,    int32_t,	 int32_t)	// s_char -> int
-  MM_CVTUP(int8_t,    u_int64_t, u_int64_t)	// s_char -> u_long
+  MM_CVTUP(int8_t,    int16_t)		// s_char -> short
+  MM_CVTHI(int8_t,    int16_t)		// s_char -> short
+  MM_CVTUP(int8_t,    int32_t)		// s_char -> int
+  MM_CVTUP(int8_t,    u_int64_t)	// s_char -> u_long
   
-  MM_CVTUP(int16_t,   int32_t,	 int32_t)	// short  -> int
-  MM_CVTHI(int16_t,   int32_t,	 int32_t)	// short  -> int
-  MM_CVTUP(int16_t,   u_int64_t, u_int64_t)	// short  -> u_long
+  MM_CVTUP(int16_t,   int32_t)		// short  -> int
+  MM_CVTHI(int16_t,   int32_t)		// short  -> int
+  MM_CVTUP(int16_t,   u_int64_t)	// short  -> u_long
   
-  MM_CVTUP(int32_t,   u_int64_t, u_int64_t)	// int    -> u_long
-  MM_CVTHI(int32_t,   u_int64_t, u_int64_t)	// int    -> u_long
+  MM_CVTUP(int32_t,   u_int64_t)	// int    -> u_long
+  MM_CVTHI(int32_t,   u_int64_t)	// int    -> u_long
 
-  MM_CVTUP(u_int8_t,  int16_t,	 int16_t)	// u_char -> short
-  MM_CVTHI(u_int8_t,  int16_t,	 int16_t)	// u_char -> short
-  MM_CVTUP(u_int8_t,  u_int16_t, int16_t)	// u_char -> u_short
-  MM_CVTHI(u_int8_t,  u_int16_t, int16_t)	// u_char -> u_short
-  MM_CVTUP(u_int8_t,  int32_t,	 int32_t)	// u_char -> int
-  MM_CVTUP(u_int8_t,  u_int64_t, u_int64_t)	// u_char -> u_long
+  MM_CVTUP(u_int8_t,  int16_t)		// u_char -> short
+  MM_CVTHI(u_int8_t,  int16_t)		// u_char -> short
+  MM_CVTUP(u_int8_t,  u_int16_t)	// u_char -> u_short
+  MM_CVTHI(u_int8_t,  u_int16_t)	// u_char -> u_short
+  MM_CVTUP(u_int8_t,  int32_t)		// u_char -> int
+  MM_CVTUP(u_int8_t,  u_int64_t)	// u_char -> u_long
   
-  MM_CVTUP(u_int16_t, int32_t,	 int32_t)	// u_short -> int
-  MM_CVTHI(u_int16_t, int32_t,	 int32_t)	// u_short -> int
-  MM_CVTUP(u_int16_t, u_int32_t, int32_t)	// u_short -> u_int
-  MM_CVTHI(u_int16_t, u_int32_t, int32_t)	// u_short -> u_int
-  MM_CVTUP(u_int16_t, u_int64_t, u_int64_t)	// u_short -> u_long
+  MM_CVTUP(u_int16_t, int32_t)		// u_short -> int
+  MM_CVTHI(u_int16_t, int32_t)		// u_short -> int
+  MM_CVTUP(u_int16_t, u_int32_t)	// u_short -> u_int
+  MM_CVTHI(u_int16_t, u_int32_t)	// u_short -> u_int
+  MM_CVTUP(u_int16_t, u_int64_t)	// u_short -> u_long
   
-  MM_CVTUP(u_int32_t, u_int64_t, u_int64_t)	// u_int -> u_long
-  MM_CVTHI(u_int32_t, u_int64_t, u_int64_t)	// u_int -> u_long
+  MM_CVTUP(u_int32_t, u_int64_t)	// u_int -> u_long
+  MM_CVTHI(u_int32_t, u_int64_t)	// u_int -> u_long
 
 #  undef MM_CVTUP
 #  undef MM_CVTHI
@@ -1500,8 +1559,7 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
     template <> inline vec<to>						\
     cvt(vec<from> x, vec<from> y)					\
     {									\
-	return MM_MNEMONIC(packs, _mm256_,				\
-			   MM_SUFFIX(void), MM_SUFFIX(from))(		\
+	return MM_MNEMONIC(packs, _mm256_, , MM_SUFFIX(from))(		\
 			       _mm256_permute2f128_si256(x, y, 0x20),	\
 			       _mm256_permute2f128_si256(x, y, 0x31));	\
     }
@@ -1509,18 +1567,17 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
     template <> inline vec<to>						\
     cvt(vec<from> x, vec<from> y)					\
     {									\
-	return MM_MNEMONIC(packus, _mm256_,				\
-			   MM_SUFFIX(void), MM_SUFFIX(from))(		\
+	return MM_MNEMONIC(packus, _mm256_, , MM_SUFFIX(from))(		\
 			       _mm256_permute2f128_si256(x, y, 0x20),	\
 			       _mm256_permute2f128_si256(x, y, 0x31));	\
     }
 #else
 #  define MM_CVTDOWN_I(from, to)					\
     MM_FUNC(vec<to> cvt<to>(vec<from> x, vec<from> y),			\
-	    packs, (x, y), void, from)
+	    packs, (x, y), void, from, MM_SIGNED)
 #  define MM_CVTDOWN_UI(from, to)					\
     MM_FUNC(vec<to> cvt<to>(vec<from> x, vec<from> y),			\
-	    packus, (x, y), void, from)
+	    packus, (x, y), void, from, MM_SIGNED)
 #endif
 
 #define _mm_packus_pi16	_mm_packs_pu16	// 不適切な命名をSSE2に合わせて修正
@@ -1537,7 +1594,7 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 
 // [2] 整数ベクトルと浮動小数点数ベクトル間の変換
 #define MM_CVT(from, to)						\
-    MM_FUNC(vec<to> cvt<to>(vec<from> x), cvt, (x), from, to)
+    MM_FUNC(vec<to> cvt<to>(vec<from> x), cvt, (x), from, to, MM_SUFFIX)
 #define MM_CVT_2(type0, type1)						\
     MM_CVT(type0, type1)						\
     MM_CVT(type1, type0)
@@ -1644,8 +1701,8 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 #elif defined(SSE)
   MM_CVT_2(int8_t,  float)		// s_char <-> float
   MM_CVT_2(int16_t, float)		// short  <-> float
-  MM_FUNC(F32vec cvt<float>(Is32vec x),
-	  cvt, (zero<float>(), x), int32_t, float)	// int -> float
+  MM_FUNC(F32vec cvt<float>(Is32vec x), cvt,
+	  (zero<float>(), x), int32_t, float, MM_SUFFIX)  // int -> float
   MM_CVT(float,	    int32_t)		// float   -> int
   MM_CVT(u_int8_t,  float)		// u_char  -> float
   MM_CVT(u_int16_t, float)		// u_short -> float
@@ -1713,60 +1770,53 @@ cvt_mask(vec<T> x, vec<T> y)						;
 
 // [1] 整数ベクトル間のマスク変換
 #if defined(AVX2)
-#  define MM_CVTUP_MASK(from, to, base)					\
+#  define MM_CVTUP_MASK(from, to)					\
     template <> inline vec<to>						\
     cvt_mask(vec<from> x)						\
     {									\
-	return _mm256_permute2f128_si256(				\
-		   MM_MNEMONIC(unpacklo, _mm256_,			\
-			       MM_SUFFIX(void), MM_SUFFIX(base))(x, x),	\
-		   MM_MNEMONIC(unpackhi, _mm256_,			\
-			       MM_SUFFIX(void), MM_SUFFIX(base))(x, x),	\
-		   0x20);						\
+	return MM_MNEMONIC(cvt, _mm256_,				\
+			   MM_SIGNED(from), MM_SIGNED(to))(		\
+		   _mm256_castsi256_si128(x));				\
     }									\
     template <> inline vec<to>						\
     cvt_mask_high(vec<from> x)						\
     {									\
-	return _mm256_permute2f128_si256(				\
-		   MM_MNEMONIC(unpacklo, _mm256_,			\
-			       MM_SUFFIX(void), MM_SUFFIX(base))(x, x),	\
-		   MM_MNEMONIC(unpackhi, _mm256_,			\
-			       MM_SUFFIX(void), MM_SUFFIX(base))(x, x),	\
-		   0x31);						\
+	return MM_MNEMONIC(cvt, _mm256_,				\
+			   MM_SIGNED(from), MM_SIGNED(to))(		\
+		   _mm256_extractf128_si256(x, 0x1));			\
     }
-#  define MM_CVTDOWN_MASK(from, to, base)				\
+#  define MM_CVTDOWN_MASK(from, to)					\
     template <> inline vec<to>						\
     cvt_mask(vec<from> x, vec<from> y)					\
     {									\
-	return MM_MNEMONIC(packs, _mm256_,				\
-			   MM_SUFFIX(void), MM_SUFFIX(base))(		\
+	return MM_MNEMONIC(packs, _mm256_, , MM_SIGNED(from))(		\
 			       _mm256_permute2f128_si256(x, y, 0x20),	\
 			       _mm256_permute2f128_si256(x, y, 0x31));	\
     }
 #else
-#  define MM_CVTUP_MASK(from, to, base)					\
+#  define MM_CVTUP_MASK(from, to)					\
     MM_FUNC(vec<to> cvt_mask(vec<from> x),				\
-	    unpacklo, (x, x), void, base)				\
+	    unpacklo, (x, x), void, from, MM_SIGNED)			\
     MM_FUNC(vec<to> cvt_mask_high(vec<from> x),				\
-	    unpackhi, (x, x), void, base)
-#  define MM_CVTDOWN_MASK(from, to, base)				\
+	    unpackhi, (x, x), void, from, MM_SIGNED)
+#  define MM_CVTDOWN_MASK(from, to)					\
     MM_FUNC(vec<to> cvt_mask(vec<from> x, vec<from> y),			\
-	    packs, (x, y), void, base)
+	    packs, (x, y), void, from, MM_SIGNED)
 #endif
-#define MM_CVT_MASK(type0, type1, base0, base1)				\
-    MM_CVTUP_MASK(type0, type1, base0)					\
-    MM_CVTDOWN_MASK(type1, type0, base1)
+#define MM_CVT_MASK(type0, type1)					\
+    MM_CVTUP_MASK(type0, type1)						\
+    MM_CVTDOWN_MASK(type1, type0)
 
-MM_CVT_MASK(int8_t,    int16_t,   int8_t,  int16_t)  // s_char  <-> short
-MM_CVT_MASK(int8_t,    u_int16_t, int8_t,  int16_t)  // s_char  <-> u_short
-MM_CVT_MASK(int16_t,   int32_t,   int16_t, int32_t)  // short   <-> int
-MM_CVT_MASK(int16_t,   u_int32_t, int16_t, int32_t)  // short   <-> u_int
-MM_CVT_MASK(u_int8_t,  int16_t,   int8_t,  int16_t)  // u_char  <-> short
-MM_CVT_MASK(u_int8_t,  u_int16_t, int8_t,  int16_t)  // u_char  <-> u_short
-MM_CVT_MASK(u_int16_t, int32_t,   int16_t, int32_t)  // u_short <-> int
-MM_CVT_MASK(u_int16_t, u_int32_t, int16_t, int32_t)  // u_short <-> u_int
-MM_CVTUP_MASK(int32_t,   u_int64_t, int32_t)	     // int      -> u_long
-MM_CVTUP_MASK(u_int32_t, u_int64_t, int32_t)	     // u_int    -> u_long
+MM_CVT_MASK(int8_t,    int16_t)		// s_char  <-> short
+MM_CVT_MASK(int8_t,    u_int16_t)	// s_char  <-> u_short
+MM_CVT_MASK(int16_t,   int32_t)		// short   <-> int
+MM_CVT_MASK(int16_t,   u_int32_t)	// short   <-> u_int
+MM_CVT_MASK(u_int8_t,  int16_t)		// u_char  <-> short
+MM_CVT_MASK(u_int8_t,  u_int16_t)	// u_char  <-> u_short
+MM_CVT_MASK(u_int16_t, int32_t)		// u_short <-> int
+MM_CVT_MASK(u_int16_t, u_int32_t)	// u_short <-> u_int
+MM_CVTUP_MASK(int32_t,   u_int64_t)	// int      -> u_long
+MM_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
 
 #undef MM_CVTUP_MASK
 #undef MM_CVTDOWN_MASK
@@ -1823,25 +1873,25 @@ template <class T> static vec<T>	operator |(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator ^(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	andnot(vec<T> x, vec<T> y)	;
 
-#define MM_LOGICALS(type, base)						\
-    MM_FUNC_2(operator &, and,    type, base)				\
-    MM_FUNC_2(operator |, or,     type, base)				\
-    MM_FUNC_2(operator ^, xor,    type, base)				\
-    MM_FUNC_2(andnot,	  andnot, type, base)
+#define MM_LOGICALS(type)						\
+    MM_BASE_FUNC_2(operator &, and,    type)				\
+    MM_BASE_FUNC_2(operator |, or,     type)				\
+    MM_BASE_FUNC_2(operator ^, xor,    type)				\
+    MM_BASE_FUNC_2(andnot,     andnot, type)
 
-MM_LOGICALS(int8_t,    ivec_t)
-MM_LOGICALS(int16_t,   ivec_t)
-MM_LOGICALS(int32_t,   ivec_t)
-MM_LOGICALS(u_int8_t,  ivec_t)
-MM_LOGICALS(u_int16_t, ivec_t)
-MM_LOGICALS(u_int32_t, ivec_t)
-MM_LOGICALS(u_int64_t, ivec_t)
+MM_LOGICALS(int8_t)
+MM_LOGICALS(int16_t)
+MM_LOGICALS(int32_t)
+MM_LOGICALS(u_int8_t)
+MM_LOGICALS(u_int16_t)
+MM_LOGICALS(u_int32_t)
+MM_LOGICALS(u_int64_t)
 
 #if defined(SSE)
-  MM_LOGICALS(float,   fvec_t)
+  MM_LOGICALS(float)
 #endif
 #if defined(SSE2)
-  MM_LOGICALS(double,  dvec_t)
+  MM_LOGICALS(double)
 #endif
 
 #undef MM_LOGICALS
@@ -1982,22 +2032,30 @@ select(vec<T> mask, vec<T> x, vec<T> y)
 }
 
 #if defined(SSE4)
-#  define MM_SELECT(type, base)						\
+#  define MM_SELECT(type)						\
+    template <> inline vec<type>					\
+    select(vec<type> mask, vec<type> x, vec<type> y)			\
+    {									\
+	   return MM_MNEMONIC(blendv, MM_PREFIX(type), ,		\
+			      MM_SIGNED(int8_t))(y, x, mask);		\
+    }
+#  define MM_SELECT_F(type)						\
     MM_FUNC(vec<type> select(vec<type> mask, vec<type> x, vec<type> y),	\
-	    blendv, (y, x, mask), void, base)
+	    blendv, (y, x, mask), void, type, MM_BASE)
 
-  MM_SELECT(int8_t,    int8_t)
-  MM_SELECT(int16_t,   int8_t)
-  MM_SELECT(int32_t,   int8_t)
-  MM_SELECT(u_int8_t,  int8_t)
-  MM_SELECT(u_int16_t, int8_t)
-  MM_SELECT(u_int32_t, int8_t)
-  MM_SELECT(u_int64_t, int8_t)
+  MM_SELECT(int8_t)
+  MM_SELECT(int16_t)
+  MM_SELECT(int32_t)
+  MM_SELECT(u_int8_t)
+  MM_SELECT(u_int16_t)
+  MM_SELECT(u_int32_t)
+  MM_SELECT(u_int64_t)
 
-  MM_SELECT(float,  float)
-  MM_SELECT(double, double)
+  MM_SELECT_F(float)
+  MM_SELECT_F(double)
   
 #  undef MM_SELECT
+#  undef MM_SELECT_F
 #endif
 
 /************************************************************************
@@ -2011,27 +2069,27 @@ template <class T> static vec<T>	operator >=(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator <=(vec<T> x, vec<T> y)	;
 
 // MMX, SSE, AVX2 には整数に対する cmplt ("less than") がない！
-#define MM_COMPARES(type, base)						\
-    MM_FUNC_2( operator ==, cmpeq, type, base)				\
-    MM_FUNC_2( operator >,  cmpgt, type, base)				\
-    MM_FUNC_2R(operator <,  cmpgt, type, base)
+#define MM_COMPARES(type)						\
+    MM_NUMERIC_FUNC_2( operator ==, cmpeq, type)			\
+    MM_NUMERIC_FUNC_2( operator >,  cmpgt, type)			\
+    MM_NUMERIC_FUNC_2R(operator <,  cmpgt, type)
 
 // 符号なし数に対しては等値性チェックしかできない！
-MM_FUNC_2(operator ==, cmpeq, u_int8_t,  int8_t)
-MM_FUNC_2(operator ==, cmpeq, u_int16_t, int16_t)
-MM_FUNC_2(operator ==, cmpeq, u_int32_t, int32_t)
+MM_FUNC_2(operator ==, cmpeq, u_int8_t)
+MM_FUNC_2(operator ==, cmpeq, u_int16_t)
+MM_FUNC_2(operator ==, cmpeq, u_int32_t)
 #if defined(SSE4)
-  MM_FUNC_2(operator ==, cmpeq, u_int64_t, u_int64_t)
+  MM_FUNC_2(operator ==, cmpeq, u_int64_t)
 #endif
 
-MM_COMPARES(int8_t,  int8_t)
-MM_COMPARES(int16_t, int16_t)
-MM_COMPARES(int32_t, int32_t)
+MM_COMPARES(int8_t)
+MM_COMPARES(int16_t)
+MM_COMPARES(int32_t)
 
 #if defined(AVX)	// AVX の浮動小数点数比較演算子はパラメータ形式
 #  define MM_COMPARE_F(func, type, opcode)				\
     MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
-	    cmp, (x, y, opcode), void, type)
+	    cmp, (x, y, opcode), void, type, MM_SUFFIX)
 #  define MM_COMPARES_F(type)						\
     MM_COMPARE_F(operator ==, type, _CMP_EQ_OQ)				\
     MM_COMPARE_F(operator >,  type, _CMP_GT_OS)				\
@@ -2046,16 +2104,16 @@ MM_COMPARES(int32_t, int32_t)
 #  undef MM_COMPARE_F
 #  undef MM_COMPARES_F
 #elif defined(SSE)
-#  define MM_COMPARES_SUP(type, base)					\
-    MM_FUNC_2( operator !=, cmpneq, type, base)				\
-    MM_FUNC_2( operator >=, cmpge,  type, base)				\
-    MM_FUNC_2R(operator <=, cmpge,  type, base)
+#  define MM_COMPARES_SUP(type)						\
+    MM_NUMERIC_FUNC_2( operator !=, cmpneq, type)				\
+    MM_NUMERIC_FUNC_2( operator >=, cmpge,  type)				\
+    MM_NUMERIC_FUNC_2R(operator <=, cmpge,  type)
 
-  MM_COMPARES(float, float)
-  MM_COMPARES_SUP(float, float)
+  MM_COMPARES(float)
+  MM_COMPARES_SUP(float)
 #  if defined(SSE2)
-    MM_COMPARES(double, double)
-    MM_COMPARES_SUP(double, double)
+    MM_COMPARES(double)
+    MM_COMPARES_SUP(double)
 #  endif
 
 #  undef MM_COMPARES_SUP
@@ -2099,22 +2157,22 @@ operator -(vec<T> x)
 }
 
 #define MM_ADD_SUB(type)						\
-    MM_FUNC_2(operator +, add, type, type)				\
-    MM_FUNC_2(operator -, sub, type, type)
+    MM_NUMERIC_FUNC_2(operator +, add, type)					\
+    MM_NUMERIC_FUNC_2(operator -, sub, type)
 
 // 符号なし数は，飽和演算によって operator [+|-] を定義する．
 #define MM_ADD_SUB_U(type)						\
-    MM_FUNC_2(operator +, adds, type, type)				\
-    MM_FUNC_2(operator -, subs, type, type)
+    MM_NUMERIC_FUNC_2(operator +, adds, type)					\
+    MM_NUMERIC_FUNC_2(operator -, subs, type)
 
 // 符号あり数は，飽和演算に sat_[add|sub] という名前を与える．
 #define MM_SAT_ADD_SUB(type)						\
-    MM_FUNC_2(sat_add, adds, type, type)				\
-    MM_FUNC_2(sat_sub, subs, type, type)
+    MM_NUMERIC_FUNC_2(sat_add, adds, type)					\
+    MM_NUMERIC_FUNC_2(sat_sub, subs, type)
 
 #define MM_MIN_MAX(type)						\
-    MM_FUNC_2(min, min, type, type)					\
-    MM_FUNC_2(max, max, type, type)
+    MM_NUMERIC_FUNC_2(min, min, type)						\
+    MM_NUMERIC_FUNC_2(max, max, type)
 
 // 加減算
 MM_ADD_SUB(int8_t)
@@ -2128,16 +2186,16 @@ MM_SAT_ADD_SUB(u_int8_t)
 MM_SAT_ADD_SUB(u_int16_t)
 
 // 乗算
-MM_FUNC_2(operator *, mullo, int16_t, int16_t)
-MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
+MM_NUMERIC_FUNC_2(operator *, mullo, int16_t)
+MM_NUMERIC_FUNC_2(mulhi,      mulhi, int16_t)
 
 #if defined(SSE)
   // 加減算
   MM_ADD_SUB(float)
 
   // 乗除算
-  MM_FUNC_2(operator *, mul, float, float)
-  MM_FUNC_2(operator /, div, float, float)
+  MM_NUMERIC_FUNC_2(operator *, mul, float)
+  MM_NUMERIC_FUNC_2(operator /, div, float)
 
   // Min/Max
   MM_MIN_MAX(u_int8_t)
@@ -2145,9 +2203,9 @@ MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
   MM_MIN_MAX(float)
 
   // その他
-  MM_FUNC_1(sqrt,  sqrt,  float, float)
-  MM_FUNC_1(rsqrt, rsqrt, float, float)
-  MM_FUNC_1(rcp,   rcp,   float, float)
+  MM_NUMERIC_FUNC_1(sqrt,  sqrt,  float)
+  MM_NUMERIC_FUNC_1(rsqrt, rsqrt, float)
+  MM_NUMERIC_FUNC_1(rcp,   rcp,   float)
 #endif
 
 #if defined(SSE2)
@@ -2155,20 +2213,20 @@ MM_FUNC_2(mulhi,      mulhi, int16_t, int16_t)
   MM_ADD_SUB(double)
 
   // 乗除算
-  MM_FUNC_2(operator *, mul, u_int32_t, u_int32_t)
-  MM_FUNC_2(operator *, mul, double, double)
-  MM_FUNC_2(operator /, div, double, double)
+  MM_NUMERIC_FUNC_2(operator *, mul, u_int32_t)
+  MM_NUMERIC_FUNC_2(operator *, mul, double)
+  MM_NUMERIC_FUNC_2(operator /, div, double)
 
   // Min/Max
   MM_MIN_MAX(double)
 
   // その他
-  MM_FUNC_1(sqrt, sqrt, double, double)
+  MM_NUMERIC_FUNC_1(sqrt, sqrt, double)
 #endif
 
 #if defined(SSE4)
   // 乗算
-  MM_FUNC_2(operator *, mullo, int32_t, int32_t)
+  MM_NUMERIC_FUNC_2(operator *, mullo, int32_t)
 
   // Min/Max
   MM_MIN_MAX(int8_t)
@@ -2206,8 +2264,8 @@ template <class T> static inline vec<T>
 sub_avg(vec<T> x, vec<T> y)		{return (x - y) >> 1;}
 
 #if defined(SSE)
-  MM_FUNC_2(avg, avg, u_int8_t,  u_int8_t)
-  MM_FUNC_2(avg, avg, u_int16_t, u_int16_t)
+  MM_NUMERIC_FUNC_2(avg, avg, u_int8_t)
+  MM_NUMERIC_FUNC_2(avg, avg, u_int16_t)
   template <> inline F32vec
   avg(F32vec x, F32vec y)		{return (x + y) * F32vec(0.5f);}
   template <> inline F32vec
@@ -2230,9 +2288,9 @@ template <> inline Iu16vec		abs(Iu16vec x)	{return x;}
 template <> inline Iu32vec		abs(Iu32vec x)	{return x;}
 
 #if defined(SSSE3)
-  MM_FUNC_1(abs, abs, int8_t,  int8_t)
-  MM_FUNC_1(abs, abs, int16_t, int16_t)
-  MM_FUNC_1(abs, abs, int32_t, int32_t)
+  MM_NUMERIC_FUNC_1(abs, abs, int8_t)
+  MM_NUMERIC_FUNC_1(abs, abs, int16_t)
+  MM_NUMERIC_FUNC_1(abs, abs, int32_t)
 #endif
   
 /************************************************************************
@@ -2289,70 +2347,70 @@ template <class T> static vec<T>	asinh(vec<T> x)			;
 template <class T> static vec<T>	atanh(vec<T> x)			;
 
 #  if defined(SSE2)
-  MM_FUNC_1(erf,     erf,     double, double)
-  MM_FUNC_1(erfc,    erfc,    double, double)
+  MM_NUMERIC_FUNC_1(erf,     erf,     double)
+  MM_NUMERIC_FUNC_1(erfc,    erfc,    double)
 
-  MM_FUNC_1(exp,     exp,     double, double)
-  MM_FUNC_1(exp2,    exp2,    double, double)
-  MM_FUNC_2(pow,     pow,     double, double)
+  MM_NUMERIC_FUNC_1(exp,     exp,     double)
+  MM_NUMERIC_FUNC_1(exp2,    exp2,    double)
+  MM_NUMERIC_FUNC_2(pow,     pow,     double)
 
-  MM_FUNC_1(log,     log,     double, double)
-  MM_FUNC_1(log2,    log2,    double, double)
-  MM_FUNC_1(log10,   log10,   double, double)
+  MM_NUMERIC_FUNC_1(log,     log,     double)
+  MM_NUMERIC_FUNC_1(log2,    log2,    double)
+  MM_NUMERIC_FUNC_1(log10,   log10,   double)
 
-  MM_FUNC_1(invsqrt, invsqrt, double, double)
-  MM_FUNC_1(cbrt,    cbrt,    double, double)
-  MM_FUNC_1(invcbrt, invcbrt, double, double)
+  MM_NUMERIC_FUNC_1(invsqrt, invsqrt, double)
+  MM_NUMERIC_FUNC_1(cbrt,    cbrt,    double)
+  MM_NUMERIC_FUNC_1(invcbrt, invcbrt, double)
 
-  MM_FUNC_1(cos,     cos,     double, double)
-  MM_FUNC_1(sin,     sin,     double, double)
-  MM_FUNC_1(tan,     tan,     double, double)
+  MM_NUMERIC_FUNC_1(cos,     cos,     double)
+  MM_NUMERIC_FUNC_1(sin,     sin,     double)
+  MM_NUMERIC_FUNC_1(tan,     tan,     double)
   MM_FUNC(F64vec sincos(dvec_t* pcos, F64vec x),
 	  sincos, (pcos, x),  void,   double)
-  MM_FUNC_1(acos,    acos,    double, double)
-  MM_FUNC_1(asin,    asin,    double, double)
-  MM_FUNC_1(atan,    atan,    double, double)
-  MM_FUNC_2(atan2,   atan2,   double, double)
-  MM_FUNC_1(cosh,    cosh,    double, double)
-  MM_FUNC_1(sinh,    sinh,    double, double)
-  MM_FUNC_1(tanh,    tanh,    double, double)
-  MM_FUNC_1(acosh,   acosh,   double, double)
-  MM_FUNC_1(asinh,   asinh,   double, double)
-  MM_FUNC_1(atanh,   atanh,   double, double)
+  MM_NUMERIC_FUNC_1(acos,    acos,    double)
+  MM_NUMERIC_FUNC_1(asin,    asin,    double)
+  MM_NUMERIC_FUNC_1(atan,    atan,    double)
+  MM_NUMERIC_FUNC_2(atan2,   atan2,   double)
+  MM_NUMERIC_FUNC_1(cosh,    cosh,    double)
+  MM_NUMERIC_FUNC_1(sinh,    sinh,    double)
+  MM_NUMERIC_FUNC_1(tanh,    tanh,    double)
+  MM_NUMERIC_FUNC_1(acosh,   acosh,   double)
+  MM_NUMERIC_FUNC_1(asinh,   asinh,   double)
+  MM_NUMERIC_FUNC_1(atanh,   atanh,   double)
 #  endif
-  MM_FUNC_1(erf,     erf,     float, float)
-  MM_FUNC_1(erfc,    erfc,    float, float)
+  MM_NUMERIC_FUNC_1(erf,     erf,     float)
+  MM_NUMERIC_FUNC_1(erfc,    erfc,    float)
 
-  MM_FUNC_1(exp,     exp,     float, float)
-  MM_FUNC_1(cexp,    cexp,    float, float)
-  MM_FUNC_1(exp2,    exp2,    float, float)
-  MM_FUNC_2(pow,     pow,     float, float)
+  MM_NUMERIC_FUNC_1(exp,     exp,     float)
+  MM_NUMERIC_FUNC_1(cexp,    cexp,    float)
+  MM_NUMERIC_FUNC_1(exp2,    exp2,    float)
+  MM_NUMERIC_FUNC_2(pow,     pow,     float)
 
-  MM_FUNC_1(log,     log,     float, float)
-  MM_FUNC_1(log2,    log2,    float, float)
-  MM_FUNC_1(log10,   log10,   float, float)
-  MM_FUNC_1(clog,    clog,    float, float)
+  MM_NUMERIC_FUNC_1(log,     log,     float)
+  MM_NUMERIC_FUNC_1(log2,    log2,    float)
+  MM_NUMERIC_FUNC_1(log10,   log10,   float)
+  MM_NUMERIC_FUNC_1(clog,    clog,    float)
 
-  MM_FUNC_1(invsqrt, invsqrt, float, float)
-  MM_FUNC_1(cbrt,    cbrt,    float, float)
-  MM_FUNC_1(invcbrt, invcbrt, float, float)
-  MM_FUNC_1(csqrt,   csqrt,   float, float)
+  MM_NUMERIC_FUNC_1(invsqrt, invsqrt, float)
+  MM_NUMERIC_FUNC_1(cbrt,    cbrt,    float)
+  MM_NUMERIC_FUNC_1(invcbrt, invcbrt, float)
+  MM_NUMERIC_FUNC_1(csqrt,   csqrt,   float)
 
-  MM_FUNC_1(cos,     cos,     float, float)
-  MM_FUNC_1(sin,     sin,     float, float)
-  MM_FUNC_1(tan,     tan,     float, float)
+  MM_NUMERIC_FUNC_1(cos,     cos,     float)
+  MM_NUMERIC_FUNC_1(sin,     sin,     float)
+  MM_NUMERIC_FUNC_1(tan,     tan,     float)
   MM_FUNC(F32vec sincos(fvec_t* pcos, F32vec x),
 	  sincos, (pcos, x),  void,  float)
-  MM_FUNC_1(acos,    acos,    float, float)
-  MM_FUNC_1(asin,    asin,    float, float)
-  MM_FUNC_1(atan,    atan,    float, float)
-  MM_FUNC_2(atan2,   atan2,   float, float)
-  MM_FUNC_1(cosh,    cosh,    float, float)
-  MM_FUNC_1(sinh,    sinh,    float, float)
-  MM_FUNC_1(tanh,    tanh,    float, float)
-  MM_FUNC_1(acosh,   acosh,   float, float)
-  MM_FUNC_1(asinh,   asinh,   float, float)
-  MM_FUNC_1(atanh,   atanh,   float, float)
+  MM_NUMERIC_FUNC_1(acos,    acos,    float)
+  MM_NUMERIC_FUNC_1(asin,    asin,    float)
+  MM_NUMERIC_FUNC_1(atan,    atan,    float)
+  MM_NUMERIC_FUNC_2(atan2,   atan2,   float)
+  MM_NUMERIC_FUNC_1(cosh,    cosh,    float)
+  MM_NUMERIC_FUNC_1(sinh,    sinh,    float)
+  MM_NUMERIC_FUNC_1(tanh,    tanh,    float)
+  MM_NUMERIC_FUNC_1(acosh,   acosh,   float)
+  MM_NUMERIC_FUNC_1(asinh,   asinh,   float)
+  MM_NUMERIC_FUNC_1(atanh,   atanh,   float)
 #endif
 
 /************************************************************************
@@ -2414,6 +2472,7 @@ inline void	empty()			{_mm_empty();}
 ************************************************************************/
 #undef MM_PREFIX
 #undef MM_SUFFIX
+#undef MM_BASE
 
 #undef MM_PREFIX_int8_t
 #undef MM_PREFIX_u_int8_t
@@ -2434,27 +2493,51 @@ inline void	empty()			{_mm_empty();}
 #undef MM_SUFFIX_ivec_t
 #undef MM_SUFFIX_void
 
+#undef MM_SIGNED_int8_t
+#undef MM_SIGNED_u_int8_t
+#undef MM_SIGNED_int16_t
+#undef MM_SIGNED_u_int16_t
+#undef MM_SIGNED_int32_t
+#undef MM_SIGNED_u_int32_t
+#undef MM_SIGNED_u_int64_t
+
+#undef MM_BASE_int8_t
+#undef MM_BASE_u_int8_t
+#undef MM_BASE_int16_t
+#undef MM_BASE_u_int16_t
+#undef MM_BASE_int32_t
+#undef MM_BASE_u_int32_t
+#undef MM_BASE_u_int64_t
+#undef MM_BASE_u_ivec_t
+
 #if defined(SSE)
 #  undef MM_PREFIX_float
-#  undef MM_SUFFIX_float
 #  undef MM_PREFIX_fvec_t
+#  undef MM_SUFFIX_float
 #  undef MM_SUFFIX_fvec_t
+#  undef MM_SIGNED_float
+#  undef MM_BASE_float
+#  undef MM_BASE_fvec_t
 #endif
 
 #if defined(SSE2)
 #  undef MM_PREFIX_double
-#  undef MM_SUFFIX_double
 #  undef MM_PREFIX_dvec_t
+#  undef MM_SUFFIX_double
 #  undef MM_SUFFIX_dvec_t
+#  undef MM_SIGNED_double
+#  undef MM_BASE_double
+#  undef MM_BASE_dvec_t
 #endif
 
 #undef MM_CAT
 #undef MM_MNEMONIC
 #undef MM_TMPL_FUNC
 #undef MM_FUNC
-#undef MM_FUNC_1
 #undef MM_FUNC_2
-#undef MM_FUNC_2R
+#undef MM_NUMERIC_FUNC_1
+#undef MM_NUMERIC_FUNC_2
+#undef MM_NUMERIC_FUNC_2R
 
 /************************************************************************
 *  class load_iterator<T>						*
