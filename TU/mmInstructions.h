@@ -1136,7 +1136,7 @@ MM_N_TUPLE(u_int32_t)
 template <u_int I, class T> static T	extract(vec<T> x)		;
 
 #if defined(AVX2)
-#  define MM_EXTRACT(type, base)					\
+#  define MM_EXTRACT(type)						\
     template <u_int I> inline int					\
     extract(vec<type> x)						\
     {									\
@@ -1900,12 +1900,13 @@ MM_LOGICALS(u_int64_t)
 *  Lookup								*
 ************************************************************************/
 #if defined(AVX2)
-#  define MM_LOOKUP(type, base)						\
+#  define MM_LOOKUP(type)						\
     template <class S> static inline vec<type>				\
     lookup(const S* p, vec<type> idx)					\
     {									\
-	return cvt<type>(lookup(p, cvt<base>(idx)),			\
-			 lookup(p, cvt_high<base>(idx)));		\
+	typedef type_traits<type>::upper_type	upper_type;		\
+	return cvt<type>(lookup(p, cvt<upper_type>(idx)),		\
+			 lookup(p, cvt_high<upper_type>(idx)));		\
     }
 
   template <class S> static inline vec<int>
@@ -1926,10 +1927,10 @@ MM_LOGICALS(u_int64_t)
       }
   }
 
-  MM_LOOKUP(short,   int)
-  MM_LOOKUP(u_short, int);
-  MM_LOOKUP(s_char,  short)
-  MM_LOOKUP(u_char,  short)
+  MM_LOOKUP(short)
+  MM_LOOKUP(u_short);
+  MM_LOOKUP(s_char)
+  MM_LOOKUP(u_char)
 
 #  undef MM_LOOKUP
 #else	// !AVX2
