@@ -726,16 +726,27 @@ template <class T> static void		store(T* p, vec<T> x)		;
 template <class T> static void		storeu(T* p, vec<T> x)		;
 
 #if defined(SSE2)
-#  define MM_LOAD_STORE(type)						\
-    MM_FUNC(vec<type> load(const type* p), load,			\
-	    ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-    MM_FUNC(vec<type> loadu(const type* p), loadu,			\
-	    ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-    MM_FUNC(void store(type* p, vec<type> x), store,			\
-	    ((vec<type>::base_type*)p, x), void, type, MM_BASE)		\
-    MM_FUNC(void storeu(type* p, vec<type> x), storeu,			\
-	    ((vec<type>::base_type*)p, x), void, type, MM_BASE)
-
+#  if defined(AVX2)
+#    define MM_LOAD_STORE(type)						\
+      MM_FUNC(vec<type> load(const type* p), load,			\
+	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+      MM_FUNC(vec<type> loadu(const type* p), lddqu,			\
+	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+      MM_FUNC(void store(type* p, vec<type> x), store,			\
+	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)	\
+      MM_FUNC(void storeu(type* p, vec<type> x), storeu,		\
+	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)
+#  else
+#    define MM_LOAD_STORE(type)						\
+      MM_FUNC(vec<type> load(const type* p), load,			\
+	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+      MM_FUNC(vec<type> loadu(const type* p), loadu,			\
+	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+      MM_FUNC(void store(type* p, vec<type> x), store,			\
+	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)	\
+      MM_FUNC(void storeu(type* p, vec<type> x), storeu,		\
+	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)
+#  endif
   MM_LOAD_STORE(int8_t)
   MM_LOAD_STORE(int16_t)
   MM_LOAD_STORE(int32_t)
