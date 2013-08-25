@@ -431,6 +431,20 @@ operator <<(std::ostream& out, const vec<T>& x)
     return out;
 }
 
+//! SIMDベクトルの内容をストリームに逆順に出力する．
+/*!
+  \param out	出力ストリーム
+  \param vec	SIMDベクトル
+  \return	outで指定した出力ストリーム
+*/
+template <class T> std::ostream&
+print(std::ostream& out, const vec<T>& x)
+{
+    for (size_t n = vec<T>::size; n-- > 0; )
+	out << ' ' << x[n];
+    return out << std::endl;
+}
+
 /************************************************************************
 *  Macros for constructing mnemonics of intrinsics			*
 ************************************************************************/
@@ -1135,48 +1149,71 @@ MM_N_TUPLE(u_int32_t)
 
 #undef MM_N_TUPLE
     
+#if defined(SSE)
 /************************************************************************
-*  Extracting elements							*
+*  Inserting/Extracting elements					*
 ************************************************************************/
-//! ベクトルから指定された成分を取り出す．
+//! ベクトルの指定された位置に成分を挿入する．
 /*!
-  \param I	取り出す成分を指定するindex
+  \param I	挿入する位置を指定するindex
+  \param x	ベクトル
+  \return	成分を挿入されたベクトル
+*/
+template <u_int I, class T> static vec<T>   insert(vec<T> x, int val)	;
+
+//! ベクトルから指定された位置から成分を取り出す．
+/*!
+  \param I	取り出す位置を指定するindex
   \param x	ベクトル
   \return	取り出された成分
 */
-template <u_int I, class T> static T	extract(vec<T> x)		;
+template <u_int I, class T> static int	     extract(vec<T> x)		;
 
-#if defined(AVX2)
-#  define MM_EXTRACT(type)						\
-    template <u_int I> inline int					\
-    extract(vec<type> x)						\
-    {									\
-	return MM_MNEMONIC(extract, _mm_, , MM_SIGNED(type))(		\
-			       _mm256_extractf128_si256(		\
-				   x,					\
-				   (I < vec<type>::lane_size ? 0 : 1)),	\
-			       I & (vec<type>::lane_size - 1));		\
-    }
-#else
-#  define MM_EXTRACT(type)						\
-    template <u_int I>							\
-    MM_TMPL_FUNC(int extract(vec<type> x),				\
-		 extract, (x, I), void, type, MM_SIGNED)
-#endif
-
-#if defined(SSE)
-  MM_EXTRACT(int16_t)
-  MM_EXTRACT(u_int16_t)
-#  if defined(SSE4)
-  MM_EXTRACT(int8_t)
-  MM_EXTRACT(u_int8_t)
-  MM_EXTRACT(int32_t)
-  MM_EXTRACT(u_int32_t)
+#  if defined(AVX2)
+#    define MM_INSERT_EXTRACT(type)					\
+      template <u_int I> inline vec<type>				\
+      insert(vec<type> x, int val)					\
+      {									\
+	  return _mm256_insertf128_si256(				\
+		     x,							\
+		     MM_MNEMONIC(insert, _mm_, , MM_SIGNED(type))(	\
+			 _mm256_extractf128_si256(			\
+			     x,						\
+			     (I < vec<type>::lane_size ? 0 : 1)),	\
+			 val,						\
+			 I % vec<type>::lane_size),			\
+		     (I < vec<type>::lane_size ? 0 : 1));		\
+      }									\
+      template <u_int I> inline int					\
+      extract(vec<type> x)						\
+      {									\
+	  return MM_MNEMONIC(extract, _mm_, , MM_SIGNED(type))(		\
+		     _mm256_extractf128_si256(				\
+			 x,						\
+			 (I < vec<type>::lane_size ? 0 : 1)),		\
+		     I & (vec<type>::lane_size - 1));			\
+      }
 #  else
+#    define MM_INSERT_EXTRACT(type)					\
+      template <u_int I>		 				\
+      MM_TMPL_FUNC(vec<type> insert(vec<type> x, int val),		\
+		   insert, (x, val, I), void, type, MM_SIGNED)		\
+      template <u_int I>						\
+      MM_TMPL_FUNC(int extract(vec<type> x),				\
+		   extract, (x, I), void, type, MM_SIGNED)
 #  endif
-#endif
+
+  MM_INSERT_EXTRACT(int16_t)
+  MM_INSERT_EXTRACT(u_int16_t)
+#  if defined(SSE4)
+    MM_INSERT_EXTRACT(int8_t)
+    MM_INSERT_EXTRACT(u_int8_t)
+    MM_INSERT_EXTRACT(int32_t)
+    MM_INSERT_EXTRACT(u_int32_t)
+#  endif
   
-#undef MM_EXTRACT
+#  undef MM_INSERT_EXTRACT
+#endif
 
 /************************************************************************
 *  Elementwise shift operators						*
@@ -1331,13 +1368,21 @@ set_rmost(typename vec<T>::value_type x)
 }
 
 /************************************************************************
-*  Replacing rightmost element of x with that of y			*
+*  Replacing rightmost/leftmost element of x with that of y		*
 ************************************************************************/
-#if defined(AVX)
-  static inline F32vec
-  replace_rmost(F32vec x, F32vec y)	{return _mm256_blend_ps(x, y, 0x01);}
-  static inline F64vec
-  replace_rmost(F64vec x, F64vec y)	{return _mm256_blend_pd(x, y, 0x01);}
+template <class T> static vec<T>	replace_rmost(vec<T> x, vec<T> y);
+template <class T> static vec<T>	replace_lmost(vec<T> x, vec<T> y);
+
+#if defined(SSE4)
+#  define MM_REPLACE(type)						\
+    MM_FUNC(vec<type> replace_rmost(vec<type> x, vec<type> y),		\
+	    blend, (x, y, 0x01), void, type, MM_SUFFIX)			\
+    MM_FUNC(vec<type> replace_lmost(vec<type> x, vec<type> y),		\
+	    blend, (x, y, 0x01 << vec<type>::size - 1),			\
+	    void, type, MM_SUFFIX)
+
+  MM_REPLACE(float)
+  MM_REPLACE(double)
 #elif defined(SSE)
   static inline F32vec
   replace_rmost(F32vec x, F32vec y)	{return _mm_move_ss(x, y);}
@@ -2117,8 +2162,8 @@ MM_COMPARES(int32_t)
 #  undef MM_COMPARES_F
 #elif defined(SSE)
 #  define MM_COMPARES_SUP(type)						\
-    MM_NUMERIC_FUNC_2( operator !=, cmpneq, type)				\
-    MM_NUMERIC_FUNC_2( operator >=, cmpge,  type)				\
+    MM_NUMERIC_FUNC_2( operator !=, cmpneq, type)			\
+    MM_NUMERIC_FUNC_2( operator >=, cmpge,  type)			\
     MM_NUMERIC_FUNC_2R(operator <=, cmpge,  type)
 
   MM_COMPARES(float)
@@ -2169,21 +2214,21 @@ operator -(vec<T> x)
 }
 
 #define MM_ADD_SUB(type)						\
-    MM_NUMERIC_FUNC_2(operator +, add, type)					\
+    MM_NUMERIC_FUNC_2(operator +, add, type)				\
     MM_NUMERIC_FUNC_2(operator -, sub, type)
 
 // 符号なし数は，飽和演算によって operator [+|-] を定義する．
 #define MM_ADD_SUB_U(type)						\
-    MM_NUMERIC_FUNC_2(operator +, adds, type)					\
+    MM_NUMERIC_FUNC_2(operator +, adds, type)				\
     MM_NUMERIC_FUNC_2(operator -, subs, type)
 
 // 符号あり数は，飽和演算に sat_[add|sub] という名前を与える．
 #define MM_SAT_ADD_SUB(type)						\
-    MM_NUMERIC_FUNC_2(sat_add, adds, type)					\
+    MM_NUMERIC_FUNC_2(sat_add, adds, type)				\
     MM_NUMERIC_FUNC_2(sat_sub, subs, type)
 
 #define MM_MIN_MAX(type)						\
-    MM_NUMERIC_FUNC_2(min, min, type)						\
+    MM_NUMERIC_FUNC_2(min, min, type)					\
     MM_NUMERIC_FUNC_2(max, max, type)
 
 // 加減算
@@ -2319,6 +2364,33 @@ diff(Is16vec x, Is16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
 template <> inline Iu16vec
 diff(Iu16vec x, Iu16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
   
+/************************************************************************
+*  Sum of vector elements						*
+************************************************************************/
+template <u_int I, u_int N, class T> static inline vec<T>
+hsum(vec<T> x)
+{
+    if (I <= N)
+	return hsum<I << 1, N>(x + shift_r<I>(x));
+    else
+	return x;
+}
+    
+template <class T> static inline T
+hsum(vec<T> x)
+{
+    return (hsum<1, vec<T>::size/2>(x))[0];
+}
+
+/************************************************************************
+*  Inner product							*
+************************************************************************/
+template <class T> static inline T
+inner_product(vec<T> x, vec<T> y)
+{
+    return hsum(x * y);
+}
+
 /************************************************************************
 *  SVML(Short Vector Math Library) functions				*
 ************************************************************************/
