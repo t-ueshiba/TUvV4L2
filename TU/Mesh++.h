@@ -65,6 +65,8 @@ class Mesh
     {
 	NSides = M			//!< 1つの面が持つ辺の数
     };
+
+    class Edge;
     
   //! 多角形メッシュの面の基底となるクラス
     class Face
