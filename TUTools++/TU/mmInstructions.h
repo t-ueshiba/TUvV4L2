@@ -303,7 +303,9 @@ class vec<float>
     typedef fvec_t	base_type;	//!< ベースとなるSIMDデータ型
       
     enum	{value_size = sizeof(value_type),
-		 size	    = sizeof(base_type)/sizeof(value_type)};
+		 size	    = sizeof(base_type)/sizeof(value_type),
+		 lane_size  = (sizeof(base_type) > 16 ? 16/sizeof(value_type)
+						      : size)};
 
     vec()						{}
     vec(value_type a)					;
@@ -366,7 +368,9 @@ class vec<double>
     typedef dvec_t	base_type;	//!< ベースとなるSIMDデータ型
       
     enum	{value_size = sizeof(value_type),
-		 size	    = sizeof(base_type)/sizeof(value_type)};
+		 size	    = sizeof(base_type)/sizeof(value_type),
+		 lane_size  = (sizeof(base_type) > 16 ? 16/sizeof(value_type)
+						      : size)};
 
     vec()						{}
     vec(value_type a)					;
@@ -1178,29 +1182,27 @@ template <u_int I, class T> static int	     extract(vec<T> x)		;
 		     x,							\
 		     MM_MNEMONIC(insert, _mm_, , MM_SIGNED(type))(	\
 			 _mm256_extractf128_si256(			\
-			     x,						\
-			     (I < vec<type>::lane_size ? 0 : 1)),	\
-			 val,						\
-			 I % vec<type>::lane_size),			\
-		     (I < vec<type>::lane_size ? 0 : 1));		\
+			     x, I / vec<type>::lane_size),		\
+			 val, I % vec<type>::lane_size),		\
+		     I / vec<type>::lane_size);				\
       }									\
       template <u_int I> inline int					\
       extract(vec<type> x)						\
       {									\
 	  return MM_MNEMONIC(extract, _mm_, , MM_SIGNED(type))(		\
 		     _mm256_extractf128_si256(				\
-			 x,						\
-			 (I < vec<type>::lane_size ? 0 : 1)),		\
-		     I & (vec<type>::lane_size - 1));			\
+			 x, I / vec<type>::lane_size),			\
+		     I / vec<type>::lane_size);				\
       }
+
 #  else
 #    define MM_INSERT_EXTRACT(type)					\
       template <u_int I>		 				\
-      MM_TMPL_FUNC(vec<type> insert(vec<type> x, int val),		\
-		   insert, (x, val, I), void, type, MM_SIGNED)		\
+      MM_TMPL_FUNC(vec<type> insert(vec<type> x, int val), insert,	\
+		   (x, val, I), void, type, MM_SIGNED)			\
       template <u_int I>						\
-      MM_TMPL_FUNC(int extract(vec<type> x),				\
-		   extract, (x, I), void, type, MM_SIGNED)
+      MM_TMPL_FUNC(int extract(vec<type> x), extract,			\
+		   (x, I), void, type, MM_SIGNED)
 #  endif
 
   MM_INSERT_EXTRACT(int16_t)
@@ -1211,9 +1213,73 @@ template <u_int I, class T> static int	     extract(vec<T> x)		;
     MM_INSERT_EXTRACT(int32_t)
     MM_INSERT_EXTRACT(u_int32_t)
 #  endif
-  
+
 #  undef MM_INSERT_EXTRACT
-#endif
+
+#  if defined(AVX)
+    template <u_int I> inline F32vec
+    insert(F32vec x, float val)
+    {
+	return _mm256_insertf128_ps(x,
+				    _mm_insert_ps(
+					_mm256_extractf128_ps(
+					    x, I / F32vec::lane_size),
+					_mm_set_ss(val),
+					(I % F32vec::lane_size) << 4),
+				    I / F32vec::lane_size);
+    }
+#  elif defined(SSE4)
+    template <u_int I> inline F32vec
+    insert(F32vec x, float val)
+    {
+	return _mm_insert_ps(x, _mm_set_ss(val), I << 4);
+    }
+#  endif
+
+template <u_int I> float	extract(F32vec x)			;
+#  if defined(AVX)
+    template <> inline float
+    extract<0>(F32vec x)
+    {
+	return _mm_cvtss_f32(_mm256_extractf128_ps(x, 0x0));
+    }
+
+    template <> inline float
+    extract<4>(F32vec x)
+    {
+	return _mm_cvtss_f32(_mm256_extractf128_ps(x, 0x1));
+    }
+#  else
+    template <> inline float
+    extract<0>(F32vec x)
+    {
+	return _mm_cvtss_f32(x);
+    }
+#  endif
+
+#  if defined(SSE2)
+    template <u_int I> double	extract(F64vec x)			;
+#    if defined(AVX)
+      template <> inline double
+      extract<0>(F64vec x)
+      {
+	  return _mm_cvtsd_f64(_mm256_extractf128_pd(x, 0x0));
+      }
+
+      template <> inline double
+      extract<2>(F64vec x)
+      {
+	  return _mm_cvtsd_f64(_mm256_extractf128_pd(x, 0x1));
+      }
+#    else
+      template <> inline double
+      extract<0>(F64vec x)
+      {
+	  return _mm_cvtsd_f64(x);
+      }
+#    endif
+#  endif
+#endif  
 
 /************************************************************************
 *  Elementwise shift operators						*
@@ -1965,30 +2031,42 @@ MM_LOGICALS(u_int64_t)
 			 lookup(p, cvt_high<upper_type>(idx)));		\
     }
 
-  template <class S> static inline vec<int>
-  lookup(const S* p, vec<int> i)
+  template <class S> static inline Is32vec
+  lookup(const S* p, Is32vec idx)
   {
-      const u_int	n = 8*(sizeof(int) - sizeof(S));
+      const u_int	n = 8*(sizeof(int32_t) - sizeof(S));
       if (type_traits<S>::is_signed)
       {
-	  vec<int>	val(_mm256_i32gather_epi32((const int*)p,
-						   i, sizeof(S)));
+	  Is32vec	val(_mm256_i32gather_epi32((const int32_t*)p,
+						   idx, sizeof(S)));
 	  return (val << n) >> n;
       }
       else
       {
-	  vec<u_int>	val(_mm256_i32gather_epi32((const int*)p,
-						   i, sizeof(S)));
-	  return cast<int>((val << n) >> n);
+	  Iu32vec	val(_mm256_i32gather_epi32((const int32_t*)p,
+						   idx, sizeof(S)));
+	  return cast<int32_t>((val << n) >> n);
       }
   }
 
-  MM_LOOKUP(short)
-  MM_LOOKUP(u_short);
-  MM_LOOKUP(s_char)
-  MM_LOOKUP(u_char)
-
+  MM_LOOKUP(int16_t)
+  MM_LOOKUP(u_int16_t)
+  MM_LOOKUP(int8_t)
+  MM_LOOKUP(u_int8_t)
 #  undef MM_LOOKUP
+
+  static inline F32vec
+  lookup(const float* p, Is32vec idx)
+  {
+      return _mm256_i32gather_ps(p, idx, sizeof(float));
+  }
+
+  static inline F64vec
+  lookup(const double* p, Is32vec idx)
+  {
+      return _mm256_i32gather_pd(p, _mm256_extractf128_si256(idx, 0x0),
+				 sizeof(double));
+  }
 #else	// !AVX2
 #  define MM_LOOKUP4(type)						\
     template <class S> static inline vec<type>				\
@@ -2185,6 +2263,7 @@ template <class T> static vec<T>	operator +(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator -(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator *(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator /(vec<T> x, vec<T> y)	;
+template <class T> static vec<T>	operator %(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator -(vec<T> x)		;
 template <class T> static vec<T>	sat_add(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	sat_sub(vec<T> x, vec<T> y)	;
@@ -2370,7 +2449,7 @@ diff(Iu16vec x, Iu16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
 template <u_int I, u_int N, class T> static inline vec<T>
 hsum(vec<T> x)
 {
-    if (I <= N)
+    if (I < N)
 	return hsum<I << 1, N>(x + shift_r<I>(x));
     else
 	return x;
@@ -2379,7 +2458,7 @@ hsum(vec<T> x)
 template <class T> static inline T
 hsum(vec<T> x)
 {
-    return (hsum<1, vec<T>::size/2>(x))[0];
+    return extract<0>(hsum<1, vec<T>::size>(x));
 }
 
 /************************************************************************
@@ -2394,9 +2473,11 @@ inner_product(vec<T> x, vec<T> y)
 /************************************************************************
 *  SVML(Short Vector Math Library) functions				*
 ************************************************************************/
-#if defined(SSE) && defined(USE_SVML)
 template <class T> static vec<T>	erf(vec<T> x)			;
 template <class T> static vec<T>	erfc(vec<T> x)			;
+
+template <class T> static vec<T>	floor(vec<T> x)			;
+template <class T> static vec<T>	ceil(vec<T> x)			;
 
 template <class T> static vec<T>	exp(vec<T> x)			;
 template <class T> static vec<T>	cexp(vec<T> x)			;
@@ -2430,71 +2511,113 @@ template <class T> static vec<T>	acosh(vec<T> x)			;
 template <class T> static vec<T>	asinh(vec<T> x)			;
 template <class T> static vec<T>	atanh(vec<T> x)			;
 
-#  if defined(SSE2)
-  MM_NUMERIC_FUNC_1(erf,     erf,     double)
-  MM_NUMERIC_FUNC_1(erfc,    erfc,    double)
+#if defined(SSE)
+  MM_NUMERIC_FUNC_1(erf,     erf,        float)
+  MM_NUMERIC_FUNC_1(erfc,    erfc,       float)
 
-  MM_NUMERIC_FUNC_1(exp,     exp,     double)
-  MM_NUMERIC_FUNC_1(exp2,    exp2,    double)
-  MM_NUMERIC_FUNC_2(pow,     pow,     double)
-
-  MM_NUMERIC_FUNC_1(log,     log,     double)
-  MM_NUMERIC_FUNC_1(log2,    log2,    double)
-  MM_NUMERIC_FUNC_1(log10,   log10,   double)
-
-  MM_NUMERIC_FUNC_1(invsqrt, invsqrt, double)
-  MM_NUMERIC_FUNC_1(cbrt,    cbrt,    double)
-  MM_NUMERIC_FUNC_1(invcbrt, invcbrt, double)
-
-  MM_NUMERIC_FUNC_1(cos,     cos,     double)
-  MM_NUMERIC_FUNC_1(sin,     sin,     double)
-  MM_NUMERIC_FUNC_1(tan,     tan,     double)
-  MM_FUNC(F64vec sincos(dvec_t* pcos, F64vec x),
-	  sincos, (pcos, x),  void,   double)
-  MM_NUMERIC_FUNC_1(acos,    acos,    double)
-  MM_NUMERIC_FUNC_1(asin,    asin,    double)
-  MM_NUMERIC_FUNC_1(atan,    atan,    double)
-  MM_NUMERIC_FUNC_2(atan2,   atan2,   double)
-  MM_NUMERIC_FUNC_1(cosh,    cosh,    double)
-  MM_NUMERIC_FUNC_1(sinh,    sinh,    double)
-  MM_NUMERIC_FUNC_1(tanh,    tanh,    double)
-  MM_NUMERIC_FUNC_1(acosh,   acosh,   double)
-  MM_NUMERIC_FUNC_1(asinh,   asinh,   double)
-  MM_NUMERIC_FUNC_1(atanh,   atanh,   double)
+#  if defined(SSE4)
+  MM_NUMERIC_FUNC_1(floor,   floor,	 float)
+  MM_NUMERIC_FUNC_1(ceil,    ceil,	 float)
+#  else
+  MM_NUMERIC_FUNC_1(floor,   svml_floor, float)
+  MM_NUMERIC_FUNC_1(ceil,    svml_ceil,	 float)
 #  endif
-  MM_NUMERIC_FUNC_1(erf,     erf,     float)
-  MM_NUMERIC_FUNC_1(erfc,    erfc,    float)
+  
+  MM_NUMERIC_FUNC_1(exp,     exp,        float)
+  MM_NUMERIC_FUNC_1(cexp,    cexp,       float)
+  MM_NUMERIC_FUNC_1(exp2,    exp2,       float)
+  MM_NUMERIC_FUNC_2(pow,     pow,        float)
 
-  MM_NUMERIC_FUNC_1(exp,     exp,     float)
-  MM_NUMERIC_FUNC_1(cexp,    cexp,    float)
-  MM_NUMERIC_FUNC_1(exp2,    exp2,    float)
-  MM_NUMERIC_FUNC_2(pow,     pow,     float)
+  MM_NUMERIC_FUNC_1(log,     log,        float)
+  MM_NUMERIC_FUNC_1(log2,    log2,       float)
+  MM_NUMERIC_FUNC_1(log10,   log10,      float)
+  MM_NUMERIC_FUNC_1(clog,    clog,       float)
 
-  MM_NUMERIC_FUNC_1(log,     log,     float)
-  MM_NUMERIC_FUNC_1(log2,    log2,    float)
-  MM_NUMERIC_FUNC_1(log10,   log10,   float)
-  MM_NUMERIC_FUNC_1(clog,    clog,    float)
+  MM_NUMERIC_FUNC_1(invsqrt, invsqrt,    float)
+  MM_NUMERIC_FUNC_1(cbrt,    cbrt,       float)
+  MM_NUMERIC_FUNC_1(invcbrt, invcbrt,    float)
+  MM_NUMERIC_FUNC_1(csqrt,   csqrt,      float)
 
-  MM_NUMERIC_FUNC_1(invsqrt, invsqrt, float)
-  MM_NUMERIC_FUNC_1(cbrt,    cbrt,    float)
-  MM_NUMERIC_FUNC_1(invcbrt, invcbrt, float)
-  MM_NUMERIC_FUNC_1(csqrt,   csqrt,   float)
-
-  MM_NUMERIC_FUNC_1(cos,     cos,     float)
-  MM_NUMERIC_FUNC_1(sin,     sin,     float)
-  MM_NUMERIC_FUNC_1(tan,     tan,     float)
+  MM_NUMERIC_FUNC_1(cos,     cos,        float)
+  MM_NUMERIC_FUNC_1(sin,     sin,        float)
+  MM_NUMERIC_FUNC_1(tan,     tan,        float)
   MM_FUNC(F32vec sincos(fvec_t* pcos, F32vec x),
-	  sincos, (pcos, x),  void,  float)
-  MM_NUMERIC_FUNC_1(acos,    acos,    float)
-  MM_NUMERIC_FUNC_1(asin,    asin,    float)
-  MM_NUMERIC_FUNC_1(atan,    atan,    float)
-  MM_NUMERIC_FUNC_2(atan2,   atan2,   float)
-  MM_NUMERIC_FUNC_1(cosh,    cosh,    float)
-  MM_NUMERIC_FUNC_1(sinh,    sinh,    float)
-  MM_NUMERIC_FUNC_1(tanh,    tanh,    float)
-  MM_NUMERIC_FUNC_1(acosh,   acosh,   float)
-  MM_NUMERIC_FUNC_1(asinh,   asinh,   float)
-  MM_NUMERIC_FUNC_1(atanh,   atanh,   float)
+	  sincos, (pcos, x), void, float, MM_SUFFIX)
+  MM_NUMERIC_FUNC_1(acos,    acos,       float)
+  MM_NUMERIC_FUNC_1(asin,    asin,       float)
+  MM_NUMERIC_FUNC_1(atan,    atan,       float)
+  MM_NUMERIC_FUNC_2(atan2,   atan2,      float)
+  MM_NUMERIC_FUNC_1(cosh,    cosh,       float)
+  MM_NUMERIC_FUNC_1(sinh,    sinh,       float)
+  MM_NUMERIC_FUNC_1(tanh,    tanh,       float)
+  MM_NUMERIC_FUNC_1(acosh,   acosh,      float)
+  MM_NUMERIC_FUNC_1(asinh,   asinh,      float)
+  MM_NUMERIC_FUNC_1(atanh,   atanh,      float)
+#endif
+
+#if defined(SSE2)
+  template <class T> static vec<T>	divrem(vec<T>& r,
+					       vec<T> x, vec<T> y)	;
+
+  // 整数除算
+  MM_NUMERIC_FUNC_2(operator /, div, int8_t)
+  MM_NUMERIC_FUNC_2(operator /, div, int16_t)
+  MM_NUMERIC_FUNC_2(operator /, div, int32_t)
+  MM_NUMERIC_FUNC_2(operator /, div, u_int8_t)
+  MM_NUMERIC_FUNC_2(operator /, div, u_int16_t)
+  MM_NUMERIC_FUNC_2(operator /, div, u_int32_t)
+
+  // 剰余
+  MM_NUMERIC_FUNC_2(operator %, rem, int8_t)
+  MM_NUMERIC_FUNC_2(operator %, rem, int16_t)
+  MM_NUMERIC_FUNC_2(operator %, rem, int32_t)
+  MM_NUMERIC_FUNC_2(operator %, rem, u_int8_t)
+  MM_NUMERIC_FUNC_2(operator %, rem, u_int16_t)
+  MM_NUMERIC_FUNC_2(operator %, rem, u_int32_t)
+
+  // 除算と剰余
+  MM_FUNC(Is32vec divrem(Is32vec& r, Is32vec x, Is32vec y),
+	  idivrem, ((ivec_t*)&r, x, y), void, int32_t, MM_SIGNED)
+  MM_FUNC(Iu32vec divrem(Iu32vec& r, Iu32vec x, Iu32vec y),
+	  udivrem, ((ivec_t*)&r, x, y), void, u_int32_t, MM_SIGNED)
+
+  MM_NUMERIC_FUNC_1(erf,     erf,        double)
+  MM_NUMERIC_FUNC_1(erfc,    erfc,       double)
+
+#  if defined(SSE4)
+  MM_NUMERIC_FUNC_1(floor,   floor,	 double)
+  MM_NUMERIC_FUNC_1(ceil,    ceil,	 double)
+#  else
+  MM_NUMERIC_FUNC_1(floor,   svml_floor, double)
+  MM_NUMERIC_FUNC_1(ceil,    svml_ceil,	 double)
+#  endif
+  MM_NUMERIC_FUNC_1(exp,     exp,        double)
+  MM_NUMERIC_FUNC_1(exp2,    exp2,       double)
+  MM_NUMERIC_FUNC_2(pow,     pow,        double)
+
+  MM_NUMERIC_FUNC_1(log,     log,        double)
+  MM_NUMERIC_FUNC_1(log2,    log2,       double)
+  MM_NUMERIC_FUNC_1(log10,   log10,      double)
+
+  MM_NUMERIC_FUNC_1(invsqrt, invsqrt,    double)
+  MM_NUMERIC_FUNC_1(cbrt,    cbrt,       double)
+  MM_NUMERIC_FUNC_1(invcbrt, invcbrt,    double)
+
+  MM_NUMERIC_FUNC_1(cos,     cos,        double)
+  MM_NUMERIC_FUNC_1(sin,     sin,        double)
+  MM_NUMERIC_FUNC_1(tan,     tan,        double)
+  MM_FUNC(F64vec sincos(dvec_t* pcos, F64vec x),
+	  sincos, (pcos, x), void, double, MM_SUFFIX)
+  MM_NUMERIC_FUNC_1(acos,    acos,       double)
+  MM_NUMERIC_FUNC_1(asin,    asin,       double)
+  MM_NUMERIC_FUNC_1(atan,    atan,       double)
+  MM_NUMERIC_FUNC_2(atan2,   atan2,      double)
+  MM_NUMERIC_FUNC_1(cosh,    cosh,       double)
+  MM_NUMERIC_FUNC_1(sinh,    sinh,       double)
+  MM_NUMERIC_FUNC_1(tanh,    tanh,       double)
+  MM_NUMERIC_FUNC_1(acosh,   acosh,      double)
+  MM_NUMERIC_FUNC_1(asinh,   asinh,      double)
+  MM_NUMERIC_FUNC_1(atanh,   atanh,      double)
 #endif
 
 /************************************************************************
