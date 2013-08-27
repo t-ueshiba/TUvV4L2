@@ -778,7 +778,7 @@ class iir_filter_iterator
 					OUT += *++C * BUF[1];	\
 					OUT += *++C * BUF[2]
 
-    value_type	dereference() const
+    reference	dereference() const
 		{
 		    value_type	out = value_type(0);
 		    
