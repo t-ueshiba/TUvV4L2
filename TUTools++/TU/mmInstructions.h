@@ -2556,26 +2556,32 @@ template <class T> static vec<T>	atanh(vec<T> x)			;
 #endif
 
 #if defined(SSE2)
-  template <class T> static vec<T>	divrem(vec<T>& r,
-					       vec<T> x, vec<T> y)	;
-
+#  if defined(_mm_idiv_epi32)
   // 整数除算
   MM_NUMERIC_FUNC_2(operator /, div, int8_t)
   MM_NUMERIC_FUNC_2(operator /, div, int16_t)
-  MM_NUMERIC_FUNC_2(operator /, div, int32_t)
   MM_NUMERIC_FUNC_2(operator /, div, u_int8_t)
   MM_NUMERIC_FUNC_2(operator /, div, u_int16_t)
-  MM_NUMERIC_FUNC_2(operator /, div, u_int32_t)
 
   // 剰余
   MM_NUMERIC_FUNC_2(operator %, rem, int8_t)
   MM_NUMERIC_FUNC_2(operator %, rem, int16_t)
-  MM_NUMERIC_FUNC_2(operator %, rem, int32_t)
   MM_NUMERIC_FUNC_2(operator %, rem, u_int8_t)
   MM_NUMERIC_FUNC_2(operator %, rem, u_int16_t)
-  MM_NUMERIC_FUNC_2(operator %, rem, u_int32_t)
+#  endif
+  
+  // 整数除算
+  MM_FUNC_2(operator /, idiv, int32_t)
+  MM_FUNC_2(operator /, udiv, u_int32_t)
+
+  // 剰余
+  MM_FUNC_2(operator %, irem, int32_t)
+  MM_FUNC_2(operator %, urem, u_int32_t)
 
   // 除算と剰余
+  template <class T> static vec<T>	divrem(vec<T>& r,
+					       vec<T> x, vec<T> y)	;
+
   MM_FUNC(Is32vec divrem(Is32vec& r, Is32vec x, Is32vec y),
 	  idivrem, ((ivec_t*)&r, x, y), void, int32_t, MM_SIGNED)
   MM_FUNC(Iu32vec divrem(Iu32vec& r, Iu32vec x, Iu32vec y),
