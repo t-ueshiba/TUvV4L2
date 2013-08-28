@@ -2034,19 +2034,16 @@ MM_LOGICALS(u_int64_t)
   template <class S> static inline Is32vec
   lookup(const S* p, Is32vec idx)
   {
-      const u_int	n = 8*(sizeof(int32_t) - sizeof(S));
+      const size_t	n = sizeof(int32_t) - sizeof(S);
+      const void*	q = (const void*)p - n;
       if (type_traits<S>::is_signed)
-      {
-	  Is32vec	val(_mm256_i32gather_epi32((const int32_t*)p,
-						   idx, sizeof(S)));
-	  return (val << n) >> n;
-      }
+	  return _mm256_srai_epi32(_mm256_i32gather_epi32((const int32_t*)q,
+							  idx, sizeof(S)),
+				   8*n);
       else
-      {
-	  Iu32vec	val(_mm256_i32gather_epi32((const int32_t*)p,
-						   idx, sizeof(S)));
-	  return cast<int32_t>((val << n) >> n);
-      }
+	  return _mm256_srli_epi32(_mm256_i32gather_epi32((const int32_t*)q,
+							  idx, sizeof(S)),
+				   8*n);
   }
 
   MM_LOOKUP(int16_t)
