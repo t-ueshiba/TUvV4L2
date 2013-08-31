@@ -291,7 +291,8 @@ typedef vec<int16_t>	Is16vec;	//!< 符号付き16bit整数ベクトル
 typedef vec<u_int16_t>	Iu16vec;	//!< 符号なし16bit整数ベクトル
 typedef vec<int32_t>	Is32vec;	//!< 符号付き32bit整数ベクトル
 typedef vec<u_int32_t>	Iu32vec;	//!< 符号なし32bit整数ベクトル
-typedef vec<u_int64_t>	I64vec;		//!< 64bit整数ベクトル
+typedef vec<int64_t>	Is64vec;	//!< 符号付き64bit整数ベクトル
+typedef vec<u_int64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
     
 #if defined(SSE)
 //! float型の成分を持つSIMDベクトルを表すクラス
@@ -464,6 +465,7 @@ print(std::ostream& out, const vec<T>& x)
 #  define MM_PREFIX_u_int16_t	_mm256_
 #  define MM_PREFIX_int32_t	_mm256_
 #  define MM_PREFIX_u_int32_t	_mm256_
+#  define MM_PREFIX_int64_t	_mm256_
 #  define MM_PREFIX_u_int64_t	_mm256_
 #  define MM_PREFIX_ivec_t	_mm256_
 #else
@@ -473,6 +475,7 @@ print(std::ostream& out, const vec<T>& x)
 #  define MM_PREFIX_u_int16_t	_mm_
 #  define MM_PREFIX_int32_t	_mm_
 #  define MM_PREFIX_u_int32_t	_mm_
+#  define MM_PREFIX_int64_t	_mm_
 #  define MM_PREFIX_u_int64_t	_mm_
 #  define MM_PREFIX_ivec_t	_mm_
 #endif
@@ -484,6 +487,7 @@ print(std::ostream& out, const vec<T>& x)
 #  define MM_SUFFIX_u_int16_t	epu16
 #  define MM_SUFFIX_int32_t	epi32
 #  define MM_SUFFIX_u_int32_t	epu32
+#  define MM_SUFFIX_int64_t	epi64
 #  define MM_SUFFIX_u_int64_t	epi64
 #  if defined(AVX2)
 #    define MM_SUFFIX_ivec_t	si256
@@ -497,6 +501,7 @@ print(std::ostream& out, const vec<T>& x)
 #  define MM_SUFFIX_u_int16_t	pu16
 #  define MM_SUFFIX_int32_t	pi32
 #  define MM_SUFFIX_u_int32_t	pu32
+#  define MM_SUFFIX_int64_t	si64
 #  define MM_SUFFIX_u_int64_t	si64
 #  define MM_SUFFIX_ivec_t	si64
 #endif
@@ -508,7 +513,8 @@ print(std::ostream& out, const vec<T>& x)
 #define MM_SIGNED_u_int16_t	MM_SUFFIX_int16_t
 #define MM_SIGNED_int32_t	MM_SUFFIX_int32_t
 #define MM_SIGNED_u_int32_t	MM_SUFFIX_int32_t
-#define MM_SIGNED_u_int64_t	MM_SUFFIX_u_int64_t
+#define MM_SIGNED_int64_t	MM_SUFFIX_int64_t
+#define MM_SIGNED_u_int64_t	MM_SUFFIX_int64_t
     
 #define MM_BASE_int8_t		MM_SUFFIX_ivec_t
 #define MM_BASE_u_int8_t	MM_SUFFIX_ivec_t
@@ -516,6 +522,7 @@ print(std::ostream& out, const vec<T>& x)
 #define MM_BASE_u_int16_t	MM_SUFFIX_ivec_t
 #define MM_BASE_int32_t		MM_SUFFIX_ivec_t
 #define MM_BASE_u_int32_t	MM_SUFFIX_ivec_t
+#define MM_BASE_int64_t		MM_SUFFIX_ivec_t
 #define MM_BASE_u_int64_t	MM_SUFFIX_ivec_t
 #define MM_BASE_ivec_t		MM_SUFFIX_ivec_t
 
@@ -768,6 +775,7 @@ template <class T> static void		storeu(T* p, vec<T> x)		;
   MM_LOAD_STORE(int8_t)
   MM_LOAD_STORE(int16_t)
   MM_LOAD_STORE(int32_t)
+  MM_LOAD_STORE(int64_t)
   MM_LOAD_STORE(u_int8_t)
   MM_LOAD_STORE(u_int16_t)
   MM_LOAD_STORE(u_int32_t)
@@ -827,6 +835,7 @@ template <class T> static vec<T>	zero()				;
 MM_ZERO(int8_t)
 MM_ZERO(int16_t)
 MM_ZERO(int32_t)
+MM_ZERO(int64_t)
 MM_ZERO(u_int8_t)
 MM_ZERO(u_int16_t)
 MM_ZERO(u_int32_t)
@@ -1093,6 +1102,7 @@ MM_UNPACK_LOW_HIGH(u_int32_t)
 #if defined(SSE)
   MM_UNPACK_LOW_HIGH(float)
 #  if defined(SSE2)
+  MM_UNPACK_LOW_HIGH(int64_t)
   MM_UNPACK_LOW_HIGH(u_int64_t)
   MM_UNPACK_LOW_HIGH(double)
 #  endif
@@ -1146,6 +1156,7 @@ MM_N_TUPLE(u_int32_t)
 #if defined(SSE)
   MM_N_TUPLE(float)
 #  if defined(SSE2)
+  MM_N_TUPLE(int64_t)
   MM_N_TUPLE(u_int64_t)
   MM_N_TUPLE(double)
 #  endif
@@ -1360,6 +1371,7 @@ template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
 MM_ELM_SHIFTS_I(int8_t)
 MM_ELM_SHIFTS_I(int16_t)
 MM_ELM_SHIFTS_I(int32_t)
+MM_ELM_SHIFTS_I(int64_t)
 MM_ELM_SHIFTS_I(u_int8_t)
 MM_ELM_SHIFTS_I(u_int16_t)
 MM_ELM_SHIFTS_I(u_int32_t)
@@ -1529,6 +1541,7 @@ template <class T> static vec<T>	operator >>(vec<T> x, int n)	;
 
 MM_LOGICAL_SHIFT_LEFT(int16_t)
 MM_LOGICAL_SHIFT_LEFT(int32_t)
+MM_LOGICAL_SHIFT_LEFT(int64_t)
 MM_LOGICAL_SHIFT_LEFT(u_int16_t)
 MM_LOGICAL_SHIFT_LEFT(u_int32_t)
 MM_LOGICAL_SHIFT_LEFT(u_int64_t)
@@ -1546,23 +1559,20 @@ MM_LOGICAL_SHIFT_RIGHT(u_int64_t)
 /************************************************************************
 *  Type conversion operators						*
 ************************************************************************/
-//! T型ベクトルの下位半分をS型ベクトルに型変換する．
+//! T型ベクトルのI番目の部分をS型ベクトルに型変換する．
 /*!
-  整数ベクトル間の変換の場合，SのサイズはTの2倍である．また，S, Tは
+  整数ベクトル間の変換の場合，SのサイズはTの2/4/8倍である．また，S, Tは
   符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class S, class T> static vec<S>	cvt(vec<T> x)		;
-
-//! T型ベクトルの上位半分をS型ベクトルに型変換する．
-/*!
-  整数ベクトル間の変換の場合，SのサイズはTの2倍である．また，S, Tは
-  符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
-  \param x	変換されるベクトル
-  \return	変換されたベクトル
-*/
-template <class S, class T> static vec<S>	cvt_high(vec<T> x)	;
+template <class S, u_int I=0, class T> static inline vec<S>
+cvt(vec<T> x)
+{
+    typedef typename type_traits<S>::lower_type	L;
+    
+    return cvt<S, I & 0x1>(cvt<L, I >> 1>(x));
+}
 
 //! 2つのT型整数ベクトルをより小さなS型整数ベクトルに型変換する．
 /*!
@@ -1580,14 +1590,14 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 #  if defined(AVX2)
 #    define MM_CVTUP(from, to)						\
       template <> inline vec<to>					\
-      cvt<to>(vec<from> x)						\
+      cvt<to, 0>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm256_, MM_SUFFIX(from),		\
 			     MM_SIGNED(to))(_mm256_castsi256_si128(x));	\
       }
 #    define MM_CVTHI(from, to)						\
       template <> inline vec<to>					\
-      cvt_high<to>(vec<from> x)						\
+      cvt<to, 1>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm256_, MM_SUFFIX(from),		\
 			     MM_SIGNED(to))(				\
@@ -1596,14 +1606,14 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 #  else	// SSE4 && !AVX2
 #    define MM_CVTUP(from, to)						\
       template <> inline vec<to>					\
-      cvt<to>(vec<from> x)						\
+      cvt<to, 0>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm_,					\
 			     MM_SUFFIX(from), MM_SIGNED(to))(x);	\
       }
 #    define MM_CVTHI(from, to)						\
       template <> inline vec<to>					\
-      cvt_high<to>(vec<from> x)						\
+      cvt<to, 1>(vec<from> x)						\
       {									\
 	  return cvt<to>(shift_r<vec<from>::size/2>(x));		\
       }
@@ -1611,28 +1621,33 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
   MM_CVTUP(int8_t,    int16_t)		// s_char -> short
   MM_CVTHI(int8_t,    int16_t)		// s_char -> short
   MM_CVTUP(int8_t,    int32_t)		// s_char -> int
-  MM_CVTUP(int8_t,    u_int64_t)	// s_char -> u_long
+  MM_CVTUP(int8_t,    int64_t)		// s_char -> long
   
   MM_CVTUP(int16_t,   int32_t)		// short  -> int
   MM_CVTHI(int16_t,   int32_t)		// short  -> int
-  MM_CVTUP(int16_t,   u_int64_t)	// short  -> u_long
+  MM_CVTUP(int16_t,   int64_t)		// short  -> long
   
-  MM_CVTUP(int32_t,   u_int64_t)	// int    -> u_long
-  MM_CVTHI(int32_t,   u_int64_t)	// int    -> u_long
+  MM_CVTUP(int32_t,   int64_t)		// int    -> long
+  MM_CVTHI(int32_t,   int64_t)		// int    -> long
 
   MM_CVTUP(u_int8_t,  int16_t)		// u_char -> short
   MM_CVTHI(u_int8_t,  int16_t)		// u_char -> short
   MM_CVTUP(u_int8_t,  u_int16_t)	// u_char -> u_short
   MM_CVTHI(u_int8_t,  u_int16_t)	// u_char -> u_short
   MM_CVTUP(u_int8_t,  int32_t)		// u_char -> int
+  MM_CVTUP(u_int8_t,  u_int32_t)	// u_char -> u_int
+  MM_CVTUP(u_int8_t,  int64_t)		// u_char -> long
   MM_CVTUP(u_int8_t,  u_int64_t)	// u_char -> u_long
   
   MM_CVTUP(u_int16_t, int32_t)		// u_short -> int
   MM_CVTHI(u_int16_t, int32_t)		// u_short -> int
   MM_CVTUP(u_int16_t, u_int32_t)	// u_short -> u_int
   MM_CVTHI(u_int16_t, u_int32_t)	// u_short -> u_int
+  MM_CVTUP(u_int16_t, int64_t)		// u_short -> long
   MM_CVTUP(u_int16_t, u_int64_t)	// u_short -> u_long
   
+  MM_CVTUP(u_int32_t, int64_t)		// u_int -> long
+  MM_CVTHI(u_int32_t, int64_t)		// u_int -> long
   MM_CVTUP(u_int32_t, u_int64_t)	// u_int -> u_long
   MM_CVTHI(u_int32_t, u_int64_t)	// u_int -> u_long
 
@@ -1641,35 +1656,36 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 #else	// !SSE4
 #  define MM_CVTUP_I(from, to)						\
     template <> inline vec<to>						\
-    cvt<to>(vec<from> x)						\
+    cvt<to, 0>(vec<from> x)						\
     {									\
 	return cast<to>(dup<0>(x)) >> 8*vec<from>::value_size;		\
     }									\
     template <> inline vec<to>						\
-    cvt_high(vec<from> x)						\
+    cvt<to, 1>(vec<from> x)						\
     {									\
 	return cast<to>(dup<1>(x)) >> 8*vec<from>::value_size;		\
     }
 #  define MM_CVTUP_UI(from, to)						\
     template <> inline vec<to>						\
-    cvt<to>(vec<from> x)						\
+    cvt<to, 0>(vec<from> x)						\
     {									\
 	return cast<to>(unpack_low(x, zero<from>()));			\
     }									\
     template <> inline vec<to>						\
-    cvt_high(vec<from> x)						\
+    cvt<to, 1>(vec<from> x)						\
     {									\
 	return cast<to>(unpack_high(x, zero<from>()));			\
     }
 
   MM_CVTUP_I(int8_t,     int16_t)	// s_char  -> short
   MM_CVTUP_I(int16_t,    int32_t)	// short   -> int
-  MM_CVTUP_I(int32_t,    u_int64_t)	// int	   -> u_long
+  // epi64の算術右シフトが未サポートなので int -> long は実装できない
 
   MM_CVTUP_UI(u_int8_t,  int16_t)	// u_char  -> short
   MM_CVTUP_UI(u_int8_t,  u_int16_t)	// u_char  -> u_short
   MM_CVTUP_UI(u_int16_t, int32_t)	// u_short -> int
   MM_CVTUP_UI(u_int16_t, u_int32_t)	// u_short -> u_int
+  MM_CVTUP_UI(u_int32_t, int64_t)	// u_int   -> long
   MM_CVTUP_UI(u_int32_t, u_int64_t)	// u_int   -> u_long
 
 #  undef MM_CVTUP_I
@@ -1929,15 +1945,17 @@ cvt_mask(vec<T> x, vec<T> y)						;
     MM_CVTUP_MASK(type0, type1)						\
     MM_CVTDOWN_MASK(type1, type0)
 
-MM_CVT_MASK(int8_t,    int16_t)		// s_char  <-> short
-MM_CVT_MASK(int8_t,    u_int16_t)	// s_char  <-> u_short
-MM_CVT_MASK(int16_t,   int32_t)		// short   <-> int
-MM_CVT_MASK(int16_t,   u_int32_t)	// short   <-> u_int
-MM_CVT_MASK(u_int8_t,  int16_t)		// u_char  <-> short
-MM_CVT_MASK(u_int8_t,  u_int16_t)	// u_char  <-> u_short
-MM_CVT_MASK(u_int16_t, int32_t)		// u_short <-> int
-MM_CVT_MASK(u_int16_t, u_int32_t)	// u_short <-> u_int
+MM_CVT_MASK(int8_t,	 int16_t)	// s_char  <-> short
+MM_CVT_MASK(int8_t,	 u_int16_t)	// s_char  <-> u_short
+MM_CVT_MASK(int16_t,	 int32_t)	// short   <-> int
+MM_CVT_MASK(int16_t,	 u_int32_t)	// short   <-> u_int
+MM_CVT_MASK(u_int8_t,	 int16_t)	// u_char  <-> short
+MM_CVT_MASK(u_int8_t,	 u_int16_t)	// u_char  <-> u_short
+MM_CVT_MASK(u_int16_t,	 int32_t)	// u_short <-> int
+MM_CVT_MASK(u_int16_t,	 u_int32_t)	// u_short <-> u_int
+MM_CVTUP_MASK(int32_t,   int64_t)	// int      -> long
 MM_CVTUP_MASK(int32_t,   u_int64_t)	// int      -> u_long
+MM_CVTUP_MASK(u_int32_t, int64_t)	// int	    -> u_long
 MM_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
 
 #undef MM_CVTUP_MASK
@@ -1966,9 +1984,11 @@ cvt_mask<int32_t>(F32vec x)	{return cast<int32_t>(x);}
 template <> inline Iu32vec
 cvt_mask<u_int32_t>(F32vec x)	{return cast<u_int32_t>(x);}
 
-// u_int64, int, u_int, short, u_short, s_char, u_char -> double
+// int64, u_int64, int, u_int, short, u_short, s_char, u_char -> double
 template <> inline F64vec
-cvt_mask<double>(I64vec x)  {return cast<double>(x);}
+cvt_mask<double>(Is64vec x) {return cast<double>(x);}
+template <> inline F64vec
+cvt_mask<double>(Iu64vec x) {return cast<double>(x);}
 template <> inline F64vec
 cvt_mask<double>(Is32vec x) {return cvt_mask<double>(cvt_mask<u_int64_t>(x));}
 template <> inline F64vec
@@ -1982,8 +2002,10 @@ cvt_mask<double>(Is8vec x)  {return cvt_mask<double>(cvt_mask<int16_t>(x));}
 template <> inline F64vec
 cvt_mask<double>(Iu8vec x)  {return cvt_mask<double>(cvt_mask<u_int16_t>(x));}
 
-// double -> u_int64
-template <> inline I64vec
+// double -> int64, u_int64
+template <> inline Is64vec
+cvt_mask<int64_t>(F64vec x)	{return cast<int64_t>(x);}
+template <> inline Iu64vec
 cvt_mask<u_int64_t>(F64vec x)	{return cast<u_int64_t>(x);}
 #endif
 
@@ -2004,6 +2026,7 @@ template <class T> static vec<T>	andnot(vec<T> x, vec<T> y)	;
 MM_LOGICALS(int8_t)
 MM_LOGICALS(int16_t)
 MM_LOGICALS(int32_t)
+MM_LOGICALS(int64_t)
 MM_LOGICALS(u_int8_t)
 MM_LOGICALS(u_int16_t)
 MM_LOGICALS(u_int32_t)
@@ -2027,8 +2050,8 @@ MM_LOGICALS(u_int64_t)
     lookup(const S* p, vec<type> idx)					\
     {									\
 	typedef type_traits<type>::upper_type	upper_type;		\
-	return cvt<type>(lookup(p, cvt<upper_type>(idx)),		\
-			 lookup(p, cvt_high<upper_type>(idx)));		\
+	return cvt<type>(lookup(p, cvt<upper_type, 0>(idx)),		\
+			 lookup(p, cvt<upper_type, 1>(idx)));		\
     }
 
   template <class S> static inline Is32vec
@@ -2087,8 +2110,8 @@ MM_LOGICALS(u_int64_t)
     template <class S> static inline vec<type>				\
     lookup(const S* p, vec<type> idx)					\
     {									\
-	const Is16vec	idx_lo = cvt<int16_t>(idx),			\
-			idx_hi = cvt_high<int16_t>(idx);		\
+	const Is16vec	idx_lo = cvt<int16_t, 0>(idx),			\
+			idx_hi = cvt<int16_t, 1>(idx);			\
 	return vec<type>(p[extract<3>(idx_hi)], p[extract<2>(idx_hi)],	\
 			 p[extract<1>(idx_hi)], p[extract<0>(idx_hi)],	\
 			 p[extract<3>(idx_lo)], p[extract<2>(idx_lo)],	\
@@ -2114,8 +2137,8 @@ MM_LOGICALS(u_int64_t)
     template <class S> static inline vec<type>				\
     lookup(const S* p, vec<type> idx)					\
     {									\
-	const Is16vec	idx_lo = cvt<int16_t>(idx),			\
-			idx_hi = cvt_high<int16_t>(idx);		\
+	const Is16vec	idx_lo = cvt<int16_t, 0>(idx),			\
+			idx_hi = cvt<int16_t, 1>(idx);			\
 	return vec<type>(p[extract<7>(idx_hi)], p[extract<6>(idx_hi)],	\
 			 p[extract<5>(idx_hi)], p[extract<4>(idx_hi)],	\
 			 p[extract<3>(idx_hi)], p[extract<2>(idx_hi)],	\
@@ -2126,6 +2149,7 @@ MM_LOGICALS(u_int64_t)
 			 p[extract<1>(idx_lo)], p[extract<0>(idx_lo)]);	\
     }
 #  endif
+
 #  if defined(SSE2)
   MM_LOOKUP16(int8_t)
   MM_LOOKUP16(u_int8_t)
@@ -2178,6 +2202,7 @@ select(vec<T> mask, vec<T> x, vec<T> y)
   MM_SELECT(int8_t)
   MM_SELECT(int16_t)
   MM_SELECT(int32_t)
+  MM_SELECT(int64_t)
   MM_SELECT(u_int8_t)
   MM_SELECT(u_int16_t)
   MM_SELECT(u_int32_t)
@@ -2311,6 +2336,7 @@ operator -(vec<T> x)
 MM_ADD_SUB(int8_t)
 MM_ADD_SUB(int16_t)
 MM_ADD_SUB(int32_t)
+MM_ADD_SUB(int64_t)
 MM_ADD_SUB_U(u_int8_t)
 MM_ADD_SUB_U(u_int16_t)
 MM_SAT_ADD_SUB(int8_t)
@@ -2441,7 +2467,7 @@ template <> inline Iu16vec
 diff(Iu16vec x, Iu16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
   
 /************************************************************************
-*  Sum of vector elements						*
+*  Horizontal sum of vector elements					*
 ************************************************************************/
 template <u_int I, u_int N, class T> static inline vec<T>
 hsum(vec<T> x)
@@ -2509,8 +2535,8 @@ template <class T> static vec<T>	asinh(vec<T> x)			;
 template <class T> static vec<T>	atanh(vec<T> x)			;
 
 #if defined(SSE)
-  MM_NUMERIC_FUNC_1(erf,     erf,        float)
-  MM_NUMERIC_FUNC_1(erfc,    erfc,       float)
+  MM_NUMERIC_FUNC_1(erf,     erf,	 float)
+  MM_NUMERIC_FUNC_1(erfc,    erfc,	 float)
 
 #  if defined(SSE4)
   MM_NUMERIC_FUNC_1(floor,   floor,	 float)
@@ -2520,36 +2546,36 @@ template <class T> static vec<T>	atanh(vec<T> x)			;
   MM_NUMERIC_FUNC_1(ceil,    svml_ceil,	 float)
 #  endif
   
-  MM_NUMERIC_FUNC_1(exp,     exp,        float)
-  MM_NUMERIC_FUNC_1(cexp,    cexp,       float)
-  MM_NUMERIC_FUNC_1(exp2,    exp2,       float)
-  MM_NUMERIC_FUNC_2(pow,     pow,        float)
+  MM_NUMERIC_FUNC_1(exp,     exp,	 float)
+  MM_NUMERIC_FUNC_1(cexp,    cexp,	 float)
+  MM_NUMERIC_FUNC_1(exp2,    exp2,	 float)
+  MM_NUMERIC_FUNC_2(pow,     pow,	 float)
 
-  MM_NUMERIC_FUNC_1(log,     log,        float)
-  MM_NUMERIC_FUNC_1(log2,    log2,       float)
-  MM_NUMERIC_FUNC_1(log10,   log10,      float)
-  MM_NUMERIC_FUNC_1(clog,    clog,       float)
+  MM_NUMERIC_FUNC_1(log,     log,	 float)
+  MM_NUMERIC_FUNC_1(log2,    log2,	 float)
+  MM_NUMERIC_FUNC_1(log10,   log10,	 float)
+  MM_NUMERIC_FUNC_1(clog,    clog,	 float)
 
-  MM_NUMERIC_FUNC_1(invsqrt, invsqrt,    float)
-  MM_NUMERIC_FUNC_1(cbrt,    cbrt,       float)
-  MM_NUMERIC_FUNC_1(invcbrt, invcbrt,    float)
-  MM_NUMERIC_FUNC_1(csqrt,   csqrt,      float)
+  MM_NUMERIC_FUNC_1(invsqrt, invsqrt,	 float)
+  MM_NUMERIC_FUNC_1(cbrt,    cbrt,	 float)
+  MM_NUMERIC_FUNC_1(invcbrt, invcbrt,	 float)
+  MM_NUMERIC_FUNC_1(csqrt,   csqrt,	 float)
 
-  MM_NUMERIC_FUNC_1(cos,     cos,        float)
-  MM_NUMERIC_FUNC_1(sin,     sin,        float)
-  MM_NUMERIC_FUNC_1(tan,     tan,        float)
+  MM_NUMERIC_FUNC_1(cos,     cos,	 float)
+  MM_NUMERIC_FUNC_1(sin,     sin,	 float)
+  MM_NUMERIC_FUNC_1(tan,     tan,	 float)
   MM_FUNC(F32vec sincos(fvec_t* pcos, F32vec x),
 	  sincos, (pcos, x), void, float, MM_SUFFIX)
-  MM_NUMERIC_FUNC_1(acos,    acos,       float)
-  MM_NUMERIC_FUNC_1(asin,    asin,       float)
-  MM_NUMERIC_FUNC_1(atan,    atan,       float)
-  MM_NUMERIC_FUNC_2(atan2,   atan2,      float)
-  MM_NUMERIC_FUNC_1(cosh,    cosh,       float)
-  MM_NUMERIC_FUNC_1(sinh,    sinh,       float)
-  MM_NUMERIC_FUNC_1(tanh,    tanh,       float)
-  MM_NUMERIC_FUNC_1(acosh,   acosh,      float)
-  MM_NUMERIC_FUNC_1(asinh,   asinh,      float)
-  MM_NUMERIC_FUNC_1(atanh,   atanh,      float)
+  MM_NUMERIC_FUNC_1(acos,    acos,	 float)
+  MM_NUMERIC_FUNC_1(asin,    asin,	 float)
+  MM_NUMERIC_FUNC_1(atan,    atan,	 float)
+  MM_NUMERIC_FUNC_2(atan2,   atan2,	 float)
+  MM_NUMERIC_FUNC_1(cosh,    cosh,	 float)
+  MM_NUMERIC_FUNC_1(sinh,    sinh,	 float)
+  MM_NUMERIC_FUNC_1(tanh,    tanh,	 float)
+  MM_NUMERIC_FUNC_1(acosh,   acosh,	 float)
+  MM_NUMERIC_FUNC_1(asinh,   asinh,	 float)
+  MM_NUMERIC_FUNC_1(atanh,   atanh,	 float)
 #endif
 
 #if defined(SSE2)
@@ -2690,6 +2716,7 @@ inline void	empty()			{_mm_empty();}
 #undef MM_PREFIX_u_int16_t
 #undef MM_PREFIX_int32_t
 #undef MM_PREFIX_u_int32_t
+#undef MM_PREFIX_int64_t
 #undef MM_PREFIX_u_int64_t
 #undef MM_PREFIX_ivec_t
 
@@ -2699,6 +2726,7 @@ inline void	empty()			{_mm_empty();}
 #undef MM_SUFFIX_u_int16_t
 #undef MM_SUFFIX_int32_t
 #undef MM_SUFFIX_u_int32_t
+#undef MM_SUFFIX_int64_t
 #undef MM_SUFFIX_u_int64_t
 #undef MM_SUFFIX_ivec_t
 #undef MM_SUFFIX_void
@@ -2709,6 +2737,7 @@ inline void	empty()			{_mm_empty();}
 #undef MM_SIGNED_u_int16_t
 #undef MM_SIGNED_int32_t
 #undef MM_SIGNED_u_int32_t
+#undef MM_SIGNED_int64_t
 #undef MM_SIGNED_u_int64_t
 
 #undef MM_BASE_int8_t
@@ -2717,6 +2746,7 @@ inline void	empty()			{_mm_empty();}
 #undef MM_BASE_u_int16_t
 #undef MM_BASE_int32_t
 #undef MM_BASE_u_int32_t
+#undef MM_BASE_int64_t
 #undef MM_BASE_u_int64_t
 #undef MM_BASE_u_ivec_t
 

@@ -63,8 +63,8 @@ namespace mm
 				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
 				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
 #  endif
-      const Is16vec	ss = linearInterpolate(cvt<short>(uc),
-					       cvt_high<short>(uc), du);
+      const Is16vec	ss = linearInterpolate(cvt<short, 0>(uc),
+					       cvt<short, 1>(uc), du);
       vs += Is16vec(1);
 #  if defined(SSE2)
       uc = cast<u_char>(Iu32vec(*(u_int*)&in[extract<1>(vs)][extract<1>(ue)],
@@ -76,8 +76,8 @@ namespace mm
 				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
 #  endif
       return linearInterpolate(ss,
-			       linearInterpolate(cvt<short>(uc),
-						 cvt_high<short>(uc), du),
+			       linearInterpolate(cvt<short, 0>(uc),
+						 cvt<short, 1>(uc), du),
 			       dv);
   }
     
@@ -113,8 +113,8 @@ namespace mm
 			   in[extract<1>(vs)][extract<1>(us)],
 			   in[extract<0>(vs)][extract<0>(us)]);
 #  endif
-      const Is16vec	ss = linearInterpolate(cvt<short>(uc),
-					       cvt_high<short>(uc), du);
+      const Is16vec	ss = linearInterpolate(cvt<short, 0>(uc),
+					       cvt<short, 1>(uc), du);
       vs += Is16vec(1);
 #  if defined(SSE2)
       uc = Iu8vec(in[extract<7>(vs)][extract<7>(ue)],
@@ -144,8 +144,8 @@ namespace mm
 		  in[extract<0>(vs)][extract<0>(us)]);
 #  endif
       return linearInterpolate(ss,
-			       linearInterpolate(cvt<short>(uc),
-						 cvt_high<short>(uc), du),
+			       linearInterpolate(cvt<short, 0>(uc),
+						 cvt<short, 1>(uc), du),
 			       dv);
   }
 }
@@ -233,13 +233,13 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 	Iu8vec		du4 = quadup<0>(du), dv4 = quadup<0>(dv);
 	storeu((u_char*)outp,
 	       cvt<u_char>(bilinearInterpolate(in, uu, vv,
-					       cvt<short>(du4),
-					       cvt<short>(dv4)),
+					       cvt<short, 0>(du4),
+					       cvt<short, 0>(dv4)),
 			   bilinearInterpolate(in,
 					       shift_r<npixels>(uu),
 					       shift_r<npixels>(vv),
-					       cvt_high<short>(du4),
-					       cvt_high<short>(dv4))));
+					       cvt<short, 1>(du4),
+					       cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	    
 	du4 = quadup<1>(du);
@@ -248,13 +248,13 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 	       cvt<u_char>(bilinearInterpolate(in,
 					       shift_r<2*npixels>(uu),
 					       shift_r<2*npixels>(vv),
-					       cvt<short>(du4),
-					       cvt<short>(dv4)),
+					       cvt<short, 0>(du4),
+					       cvt<short, 0>(dv4)),
 			   bilinearInterpolate(in,
 					       shift_r<3*npixels>(uu),
 					       shift_r<3*npixels>(vv),
-					       cvt_high<short>(du4),
-					       cvt_high<short>(dv4))));
+					       cvt<short, 1>(du4),
+					       cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	usp  += Is16vec::size;
 	vsp  += Is16vec::size;
@@ -265,13 +265,13 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 	dv4 = quadup<2>(dv);
 	storeu((u_char*)outp,
 	       cvt<u_char>(bilinearInterpolate(in, uu, vv,
-					       cvt<short>(du4),
-					       cvt<short>(dv4)),
+					       cvt<short, 0>(du4),
+					       cvt<short, 0>(dv4)),
 			   bilinearInterpolate(in,
 					       shift_r<npixels>(uu),
 					       shift_r<npixels>(vv),
-					       cvt_high<short>(du4),
-					       cvt_high<short>(dv4))));
+					       cvt<short, 1>(du4),
+					       cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	    
 	du4 = quadup<3>(du);
@@ -280,13 +280,13 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 	       cvt<u_char>(bilinearInterpolate(in,
 					       shift_r<2*npixels>(uu),
 					       shift_r<2*npixels>(vv),
-					       cvt<short>(du4),
-					       cvt<short>(dv4)),
+					       cvt<short, 0>(du4),
+					       cvt<short, 0>(dv4)),
 			   bilinearInterpolate(in,
 					       shift_r<3*npixels>(uu),
 					       shift_r<3*npixels>(vv),
-					       cvt_high<short>(du4),
-					       cvt_high<short>(dv4))));
+					       cvt<short, 1>(du4),
+					       cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	usp  += Is16vec::size;
 	vsp  += Is16vec::size;
@@ -336,8 +336,8 @@ Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
 	storeu(outp, cvt<u_char>(out0,
 				 bilinearInterpolate(in,
 						     load(usp), load(vsp),
-						     cvt_high<short>(du),
-						     cvt_high<short>(dv))));
+						     cvt<short, 1>(du),
+						     cvt<short, 1>(dv))));
 	usp  += Is16vec::size;
 	vsp  += Is16vec::size;
 	dup  += Iu8vec::size;
