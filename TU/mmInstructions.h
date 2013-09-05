@@ -39,7 +39,7 @@
 #include <boost/iterator_adaptors.hpp>
 #include "TU/types.h"
 
-#if defined(AVX2)		// Haswell (2013?)
+#if defined(AVX2)		// Core-i7 Haswell (2013)
 #  define AVX
 #endif
 #if defined(AVX)		// Core-i7 Sandy-Bridge (2011)
@@ -79,11 +79,50 @@ template <>
 struct type_traits<int8_t>
 {
     typedef int8_t	signed_type;
-    typedef int16_t	upper_type;
+    typedef u_int8_t	unsigned_type;
     typedef void	lower_type;
+    typedef int16_t	upper_type;
     enum
     {
-	is_bool	  = false,
+	is_signed = true,
+    };
+};
+    
+template <>
+struct type_traits<int16_t>
+{
+    typedef int16_t	signed_type;
+    typedef u_int16_t	unsigned_type;
+    typedef int8_t	lower_type;
+    typedef int32_t	upper_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
+    
+template <>
+struct type_traits<int32_t>
+{
+    typedef int32_t	signed_type;
+    typedef u_int32_t	unsigned_type;
+    typedef int16_t	lower_type;
+    typedef int64_t	upper_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
+    
+template <>
+struct type_traits<int64_t>
+{
+    typedef int64_t	signed_type;
+    typedef u_int64_t	unsigned_type;
+    typedef int32_t	lower_type;
+    typedef void	upper_type;
+    enum
+    {
 	is_signed = true,
     };
 };
@@ -92,25 +131,12 @@ template <>
 struct type_traits<u_int8_t>
 {
     typedef int8_t	signed_type;
-    typedef int16_t	upper_type;
+    typedef u_int8_t	unsigned_type;
     typedef void	lower_type;
+    typedef int16_t	upper_type;
     enum
     {
-	is_bool	  = false,
 	is_signed = false,
-    };
-};
-    
-template <>
-struct type_traits<int16_t>
-{
-    typedef int16_t	signed_type;
-    typedef int32_t	upper_type;
-    typedef int8_t	lower_type;
-    enum
-    {
-	is_bool	  = false,
-	is_signed = true,
     };
 };
     
@@ -118,25 +144,12 @@ template <>
 struct type_traits<u_int16_t>
 {
     typedef int16_t	signed_type;
+    typedef u_int16_t	unsigned_type;
     typedef int32_t	upper_type;
     typedef u_int8_t	lower_type;
     enum
     {
-	is_bool	  = false,
 	is_signed = false,
-    };
-};
-    
-template <>
-struct type_traits<int32_t>
-{
-    typedef int32_t	signed_type;
-    typedef int64_t	upper_type;
-    typedef int16_t	lower_type;
-    enum
-    {
-	is_bool	  = false,
-	is_signed = true,
     };
 };
     
@@ -144,25 +157,12 @@ template <>
 struct type_traits<u_int32_t>
 {
     typedef int32_t	signed_type;
-    typedef int64_t	upper_type;
+    typedef u_int32_t	unsigned_type;
     typedef u_int16_t	lower_type;
+    typedef int64_t	upper_type;
     enum
     {
-	is_bool	  = false,
 	is_signed = false,
-    };
-};
-    
-template <>
-struct type_traits<int64_t>
-{
-    typedef int64_t	signed_type;
-    typedef void	upper_type;
-    typedef int32_t	lower_type;
-    enum
-    {
-	is_bool	  = false,
-	is_signed = true,
     };
 };
     
@@ -170,11 +170,11 @@ template <>
 struct type_traits<u_int64_t>
 {
     typedef int64_t	signed_type;
-    typedef void	upper_type;
+    typedef u_int64_t	unsigned_type;
     typedef u_int32_t	lower_type;
+    typedef void	upper_type;
     enum
     {
-	is_bool	  = false,
 	is_signed = false,
     };
 };
@@ -286,12 +286,12 @@ vec<T>::operator [](int i)
 }
 
 typedef vec<int8_t>	Is8vec;		//!< 符号付き8bit整数ベクトル
-typedef vec<u_int8_t>	Iu8vec;		//!< 符号なし8bit整数ベクトル
 typedef vec<int16_t>	Is16vec;	//!< 符号付き16bit整数ベクトル
-typedef vec<u_int16_t>	Iu16vec;	//!< 符号なし16bit整数ベクトル
 typedef vec<int32_t>	Is32vec;	//!< 符号付き32bit整数ベクトル
-typedef vec<u_int32_t>	Iu32vec;	//!< 符号なし32bit整数ベクトル
 typedef vec<int64_t>	Is64vec;	//!< 符号付き64bit整数ベクトル
+typedef vec<u_int8_t>	Iu8vec;		//!< 符号なし8bit整数ベクトル
+typedef vec<u_int16_t>	Iu16vec;	//!< 符号なし16bit整数ベクトル
+typedef vec<u_int32_t>	Iu32vec;	//!< 符号なし32bit整数ベクトル
 typedef vec<u_int64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
     
 #if defined(SSE)
@@ -460,34 +460,34 @@ print(std::ostream& out, const vec<T>& x)
 
 #if defined(AVX2)
 #  define MM_PREFIX_int8_t	_mm256_
-#  define MM_PREFIX_u_int8_t	_mm256_
 #  define MM_PREFIX_int16_t	_mm256_
-#  define MM_PREFIX_u_int16_t	_mm256_
 #  define MM_PREFIX_int32_t	_mm256_
-#  define MM_PREFIX_u_int32_t	_mm256_
 #  define MM_PREFIX_int64_t	_mm256_
+#  define MM_PREFIX_u_int8_t	_mm256_
+#  define MM_PREFIX_u_int16_t	_mm256_
+#  define MM_PREFIX_u_int32_t	_mm256_
 #  define MM_PREFIX_u_int64_t	_mm256_
 #  define MM_PREFIX_ivec_t	_mm256_
 #else
 #  define MM_PREFIX_int8_t	_mm_
-#  define MM_PREFIX_u_int8_t	_mm_
 #  define MM_PREFIX_int16_t	_mm_
-#  define MM_PREFIX_u_int16_t	_mm_
 #  define MM_PREFIX_int32_t	_mm_
-#  define MM_PREFIX_u_int32_t	_mm_
 #  define MM_PREFIX_int64_t	_mm_
+#  define MM_PREFIX_u_int8_t	_mm_
+#  define MM_PREFIX_u_int16_t	_mm_
+#  define MM_PREFIX_u_int32_t	_mm_
 #  define MM_PREFIX_u_int64_t	_mm_
 #  define MM_PREFIX_ivec_t	_mm_
 #endif
 
 #if defined(SSE2)
 #  define MM_SUFFIX_int8_t	epi8
-#  define MM_SUFFIX_u_int8_t	epu8
 #  define MM_SUFFIX_int16_t	epi16
-#  define MM_SUFFIX_u_int16_t	epu16
 #  define MM_SUFFIX_int32_t	epi32
-#  define MM_SUFFIX_u_int32_t	epu32
 #  define MM_SUFFIX_int64_t	epi64
+#  define MM_SUFFIX_u_int8_t	epu8
+#  define MM_SUFFIX_u_int16_t	epu16
+#  define MM_SUFFIX_u_int32_t	epu32
 #  define MM_SUFFIX_u_int64_t	epi64
 #  if defined(AVX2)
 #    define MM_SUFFIX_ivec_t	si256
@@ -496,33 +496,33 @@ print(std::ostream& out, const vec<T>& x)
 #  endif
 #else
 #  define MM_SUFFIX_int8_t	pi8
-#  define MM_SUFFIX_u_int8_t	pu8
 #  define MM_SUFFIX_int16_t	pi16
-#  define MM_SUFFIX_u_int16_t	pu16
 #  define MM_SUFFIX_int32_t	pi32
-#  define MM_SUFFIX_u_int32_t	pu32
 #  define MM_SUFFIX_int64_t	si64
+#  define MM_SUFFIX_u_int8_t	pu8
+#  define MM_SUFFIX_u_int16_t	pu16
+#  define MM_SUFFIX_u_int32_t	pu32
 #  define MM_SUFFIX_u_int64_t	si64
 #  define MM_SUFFIX_ivec_t	si64
 #endif
 #define MM_SUFFIX_void
 
 #define MM_SIGNED_int8_t	MM_SUFFIX_int8_t
-#define MM_SIGNED_u_int8_t	MM_SUFFIX_int8_t
 #define MM_SIGNED_int16_t	MM_SUFFIX_int16_t
-#define MM_SIGNED_u_int16_t	MM_SUFFIX_int16_t
 #define MM_SIGNED_int32_t	MM_SUFFIX_int32_t
-#define MM_SIGNED_u_int32_t	MM_SUFFIX_int32_t
 #define MM_SIGNED_int64_t	MM_SUFFIX_int64_t
+#define MM_SIGNED_u_int8_t	MM_SUFFIX_int8_t
+#define MM_SIGNED_u_int16_t	MM_SUFFIX_int16_t
+#define MM_SIGNED_u_int32_t	MM_SUFFIX_int32_t
 #define MM_SIGNED_u_int64_t	MM_SUFFIX_int64_t
     
 #define MM_BASE_int8_t		MM_SUFFIX_ivec_t
-#define MM_BASE_u_int8_t	MM_SUFFIX_ivec_t
 #define MM_BASE_int16_t		MM_SUFFIX_ivec_t
-#define MM_BASE_u_int16_t	MM_SUFFIX_ivec_t
 #define MM_BASE_int32_t		MM_SUFFIX_ivec_t
-#define MM_BASE_u_int32_t	MM_SUFFIX_ivec_t
 #define MM_BASE_int64_t		MM_SUFFIX_ivec_t
+#define MM_BASE_u_int8_t	MM_SUFFIX_ivec_t
+#define MM_BASE_u_int16_t	MM_SUFFIX_ivec_t
+#define MM_BASE_u_int32_t	MM_SUFFIX_ivec_t
 #define MM_BASE_u_int64_t	MM_SUFFIX_ivec_t
 #define MM_BASE_ivec_t		MM_SUFFIX_ivec_t
 
@@ -673,10 +673,10 @@ MM_CONSTRUCTOR_1(u_int32_t)
 
 #if defined(AVX2)
   MM_CONSTRUCTOR_32(int8_t)	
-  MM_CONSTRUCTOR_32(u_int8_t)	
   MM_CONSTRUCTOR_16(int16_t)	
-  MM_CONSTRUCTOR_16(u_int16_t)	
   MM_CONSTRUCTOR_8(int32_t)
+  MM_CONSTRUCTOR_32(u_int8_t)	
+  MM_CONSTRUCTOR_16(u_int16_t)	
   MM_CONSTRUCTOR_8(u_int32_t)
 #elif defined(SSE2)
   MM_CONSTRUCTOR_16(int8_t)
@@ -751,7 +751,7 @@ template <class T> static void		store(T* p, vec<T> x)		;
 template <class T> static void		storeu(T* p, vec<T> x)		;
 
 #if defined(SSE2)
-#  if defined(AVX2)
+#  if defined(SSE3)
 #    define MM_LOAD_STORE(type)						\
       MM_FUNC(vec<type> load(const type* p), load,			\
 	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
@@ -1571,7 +1571,7 @@ cvt(vec<T> x)
 {
     typedef typename type_traits<S>::lower_type	L;
     
-    return cvt<S, I & 0x1>(cvt<L, I >> 1>(x));
+    return cvt<S, I&0x1>(cvt<L, I>>1>(x));
 }
 
 //! 2つのT型整数ベクトルをより小さなS型整数ベクトルに型変換する．
@@ -1588,14 +1588,14 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 // [1] 整数ベクトル間の変換
 #if defined(SSE4)
 #  if defined(AVX2)
-#    define MM_CVTUP(from, to)						\
+#    define MM_CVTUP0(from, to)						\
       template <> inline vec<to>					\
       cvt<to, 0>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm256_, MM_SUFFIX(from),		\
 			     MM_SIGNED(to))(_mm256_castsi256_si128(x));	\
       }
-#    define MM_CVTHI(from, to)						\
+#    define MM_CVTUP1(from, to)						\
       template <> inline vec<to>					\
       cvt<to, 1>(vec<from> x)						\
       {									\
@@ -1604,55 +1604,55 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 				 _mm256_extractf128_si256(x, 0x1));	\
       }
 #  else	// SSE4 && !AVX2
-#    define MM_CVTUP(from, to)						\
+#    define MM_CVTUP0(from, to)						\
       template <> inline vec<to>					\
       cvt<to, 0>(vec<from> x)						\
       {									\
 	  return MM_MNEMONIC(cvt, _mm_,					\
 			     MM_SUFFIX(from), MM_SIGNED(to))(x);	\
       }
-#    define MM_CVTHI(from, to)						\
+#    define MM_CVTUP1(from, to)						\
       template <> inline vec<to>					\
       cvt<to, 1>(vec<from> x)						\
       {									\
 	  return cvt<to>(shift_r<vec<from>::size/2>(x));		\
       }
 #  endif
-  MM_CVTUP(int8_t,    int16_t)		// s_char -> short
-  MM_CVTHI(int8_t,    int16_t)		// s_char -> short
-  MM_CVTUP(int8_t,    int32_t)		// s_char -> int
-  MM_CVTUP(int8_t,    int64_t)		// s_char -> long
+  MM_CVTUP0(int8_t,    int16_t)		// s_char -> short
+  MM_CVTUP1(int8_t,    int16_t)		// s_char -> short
+  MM_CVTUP0(int8_t,    int32_t)		// s_char -> int
+  MM_CVTUP0(int8_t,    int64_t)		// s_char -> long
   
-  MM_CVTUP(int16_t,   int32_t)		// short  -> int
-  MM_CVTHI(int16_t,   int32_t)		// short  -> int
-  MM_CVTUP(int16_t,   int64_t)		// short  -> long
+  MM_CVTUP0(int16_t,   int32_t)		// short  -> int
+  MM_CVTUP1(int16_t,   int32_t)		// short  -> int
+  MM_CVTUP0(int16_t,   int64_t)		// short  -> long
   
-  MM_CVTUP(int32_t,   int64_t)		// int    -> long
-  MM_CVTHI(int32_t,   int64_t)		// int    -> long
+  MM_CVTUP0(int32_t,   int64_t)		// int    -> long
+  MM_CVTUP1(int32_t,   int64_t)		// int    -> long
 
-  MM_CVTUP(u_int8_t,  int16_t)		// u_char -> short
-  MM_CVTHI(u_int8_t,  int16_t)		// u_char -> short
-  MM_CVTUP(u_int8_t,  u_int16_t)	// u_char -> u_short
-  MM_CVTHI(u_int8_t,  u_int16_t)	// u_char -> u_short
-  MM_CVTUP(u_int8_t,  int32_t)		// u_char -> int
-  MM_CVTUP(u_int8_t,  u_int32_t)	// u_char -> u_int
-  MM_CVTUP(u_int8_t,  int64_t)		// u_char -> long
-  MM_CVTUP(u_int8_t,  u_int64_t)	// u_char -> u_long
+  MM_CVTUP0(u_int8_t,  int16_t)		// u_char -> short
+  MM_CVTUP1(u_int8_t,  int16_t)		// u_char -> short
+  MM_CVTUP0(u_int8_t,  u_int16_t)	// u_char -> u_short
+  MM_CVTUP1(u_int8_t,  u_int16_t)	// u_char -> u_short
+  MM_CVTUP0(u_int8_t,  int32_t)		// u_char -> int
+  MM_CVTUP0(u_int8_t,  u_int32_t)	// u_char -> u_int
+  MM_CVTUP0(u_int8_t,  int64_t)		// u_char -> long
+  MM_CVTUP0(u_int8_t,  u_int64_t)	// u_char -> u_long
   
-  MM_CVTUP(u_int16_t, int32_t)		// u_short -> int
-  MM_CVTHI(u_int16_t, int32_t)		// u_short -> int
-  MM_CVTUP(u_int16_t, u_int32_t)	// u_short -> u_int
-  MM_CVTHI(u_int16_t, u_int32_t)	// u_short -> u_int
-  MM_CVTUP(u_int16_t, int64_t)		// u_short -> long
-  MM_CVTUP(u_int16_t, u_int64_t)	// u_short -> u_long
+  MM_CVTUP0(u_int16_t, int32_t)		// u_short -> int
+  MM_CVTUP1(u_int16_t, int32_t)		// u_short -> int
+  MM_CVTUP0(u_int16_t, u_int32_t)	// u_short -> u_int
+  MM_CVTUP1(u_int16_t, u_int32_t)	// u_short -> u_int
+  MM_CVTUP0(u_int16_t, int64_t)		// u_short -> long
+  MM_CVTUP0(u_int16_t, u_int64_t)	// u_short -> u_long
   
-  MM_CVTUP(u_int32_t, int64_t)		// u_int -> long
-  MM_CVTHI(u_int32_t, int64_t)		// u_int -> long
-  MM_CVTUP(u_int32_t, u_int64_t)	// u_int -> u_long
-  MM_CVTHI(u_int32_t, u_int64_t)	// u_int -> u_long
+  MM_CVTUP0(u_int32_t, int64_t)		// u_int -> long
+  MM_CVTUP1(u_int32_t, int64_t)		// u_int -> long
+  MM_CVTUP0(u_int32_t, u_int64_t)	// u_int -> u_long
+  MM_CVTUP1(u_int32_t, u_int64_t)	// u_int -> u_long
 
-#  undef MM_CVTUP
-#  undef MM_CVTHI
+#  undef MM_CVTUP0
+#  undef MM_CVTUP1
 #else	// !SSE4
 #  define MM_CVTUP_I(from, to)						\
     template <> inline vec<to>						\
@@ -2711,42 +2711,42 @@ inline void	empty()			{_mm_empty();}
 #undef MM_BASE
 
 #undef MM_PREFIX_int8_t
-#undef MM_PREFIX_u_int8_t
 #undef MM_PREFIX_int16_t
-#undef MM_PREFIX_u_int16_t
 #undef MM_PREFIX_int32_t
-#undef MM_PREFIX_u_int32_t
 #undef MM_PREFIX_int64_t
+#undef MM_PREFIX_u_int8_t
+#undef MM_PREFIX_u_int16_t
+#undef MM_PREFIX_u_int32_t
 #undef MM_PREFIX_u_int64_t
 #undef MM_PREFIX_ivec_t
 
 #undef MM_SUFFIX_int8_t
-#undef MM_SUFFIX_u_int8_t
 #undef MM_SUFFIX_int16_t
-#undef MM_SUFFIX_u_int16_t
 #undef MM_SUFFIX_int32_t
-#undef MM_SUFFIX_u_int32_t
 #undef MM_SUFFIX_int64_t
+#undef MM_SUFFIX_u_int8_t
+#undef MM_SUFFIX_u_int16_t
+#undef MM_SUFFIX_u_int32_t
 #undef MM_SUFFIX_u_int64_t
 #undef MM_SUFFIX_ivec_t
 #undef MM_SUFFIX_void
 
 #undef MM_SIGNED_int8_t
-#undef MM_SIGNED_u_int8_t
 #undef MM_SIGNED_int16_t
-#undef MM_SIGNED_u_int16_t
 #undef MM_SIGNED_int32_t
-#undef MM_SIGNED_u_int32_t
 #undef MM_SIGNED_int64_t
+#undef MM_SIGNED_u_int8_t
+#undef MM_SIGNED_u_int16_t
+#undef MM_SIGNED_u_int32_t
 #undef MM_SIGNED_u_int64_t
 
 #undef MM_BASE_int8_t
-#undef MM_BASE_u_int8_t
 #undef MM_BASE_int16_t
-#undef MM_BASE_u_int16_t
 #undef MM_BASE_int32_t
-#undef MM_BASE_u_int32_t
 #undef MM_BASE_int64_t
+#undef MM_BASE_u_int8_t
+#undef MM_BASE_u_int16_t
+#undef MM_BASE_u_int32_t
 #undef MM_BASE_u_int64_t
 #undef MM_BASE_u_ivec_t
 
@@ -2780,9 +2780,9 @@ inline void	empty()			{_mm_empty();}
 #undef MM_NUMERIC_FUNC_2R
 
 /************************************************************************
-*  class load_iterator<T>						*
+*  class load_iterator<T, ALIGNED>					*
 ************************************************************************/
-template <class T>
+template <class T, bool ALIGNED=false>
 class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
 						     const T*,
 						     vec<T>,
@@ -2790,11 +2790,11 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
 						     vec<T> >
 {
   private:
-    typedef boost::iterator_adaptor<load_iterator<T>,
+    typedef boost::iterator_adaptor<load_iterator,
 				    const T*,
 				    vec<T>,
 				    boost::use_default,
-				    vec<T> >		super;
+				    vec<T> >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -2811,7 +2811,10 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
   private:
     reference		dereference() const
 			{
-			    return loadu(super::base());
+			    if (ALIGNED)
+				return load(super::base());
+			    else
+				return loadu(super::base());
 			}
     void		advance(difference_type n)
 			{
@@ -2832,47 +2835,104 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
 			}
 };
 
-template <class T> load_iterator<T>
+template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
 make_load_iterator(const T* p)
 {
-    return load_iterator<T>(p);
+    return load_iterator<T, ALIGNED>(p);
 }
-    
+
 /************************************************************************
-*  class store_iterator<T>						*
+*  class store_iterator<T, ALIGNED>					*
 ************************************************************************/
 namespace detail
 {
-    template <class T>
+    template <class T, bool ALIGNED>
     class store_proxy
     {
       public:
 	store_proxy(T* p)	:_p(p)		{}
 	
-	store_proxy&	operator =(vec<T> val)
-			{
-			    storeu(_p, val);
-			    return *this;
-			}
+	const store_proxy&	operator =(vec<T> val) const
+				{
+				    store(val);
+				    return *this;
+				}
+	const store_proxy&	operator +=(vec<T> val) const
+				{
+				    store(load() + val);
+				    return *this;
+				}
+	const store_proxy&	operator -=(vec<T> val) const
+				{
+				    store(load() - val);
+				    return *this;
+				}
+	const store_proxy&	operator *=(vec<T> val) const
+				{
+				    store(load() * val);
+				    return *this;
+				}
+	const store_proxy&	operator /=(vec<T> val) const
+				{
+				    store(load() / val);
+				    return *this;
+				}
+	const store_proxy&	operator %=(vec<T> val) const
+				{
+				    store(load() % val);
+				    return *this;
+				}
+	const store_proxy&	operator &=(vec<T> val) const
+				{
+				    store(load() & val);
+				    return *this;
+				}
+	const store_proxy&	operator |=(vec<T> val) const
+				{
+				    store(load() | val);
+				    return *this;
+				}
+	const store_proxy&	operator ^=(vec<T> val) const
+				{
+				    store(load() ^ val);
+				    return *this;
+				}
+
+      private:
+	vec<T>			load() const
+				{
+				    if (ALIGNED)
+					return mm::load(_p);
+				    else
+					return mm::loadu(_p);
+				}
+	void			store(vec<T> val) const
+				{
+				    if (ALIGNED)
+					mm::store(_p, val);
+				    else
+					mm::storeu(_p, val);
+				}
 	
       private:
-	T* const	_p;
+	T* const		_p;
     };
 }
 
-template <class T>
-class store_iterator : public boost::iterator_adaptor<store_iterator<T>,
-						      T*,
-						      vec<T>,
-						      boost::use_default,
-						      detail::store_proxy<T> >
+template <class T, bool ALIGNED=false>
+class store_iterator
+    : public boost::iterator_adaptor<store_iterator<T, ALIGNED>,
+				     T*,
+				     vec<T>,
+				     boost::use_default,
+				     detail::store_proxy<T, ALIGNED> >
 {
   private:
-    typedef boost::iterator_adaptor<store_iterator<T>,
+    typedef boost::iterator_adaptor<store_iterator,
 				    T*,
 				    vec<T>,
 				    boost::use_default,
-				    detail::store_proxy<T> >	super;
+				    detail::store_proxy<T, ALIGNED> >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -2910,10 +2970,349 @@ class store_iterator : public boost::iterator_adaptor<store_iterator<T>,
 			}
 };
 
-template <class T> store_iterator<T>
+template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
 make_store_iterator(T* p)
 {
-    return store_iterator<T>(p);
+    return store_iterator<T, ALIGNED>(p);
+}
+
+/************************************************************************
+*  class conversion_iterator<T, ITER>					*
+************************************************************************/
+template <class T, class ITER>
+class conversion_iterator
+    : public boost::iterator_adaptor<
+		conversion_iterator<T, ITER>,			// self
+		ITER,						// base
+		vec<T>,						// value_type
+		boost::single_pass_traversal_tag,		// traversal
+		vec<T> >					// reference
+{
+  private:
+    typedef boost::iterator_adaptor<conversion_iterator,
+				    ITER,
+				    vec<T>, 
+				    boost::single_pass_traversal_tag,
+				    vec<T> >		super;
+    typedef typename std::iterator_traits<ITER>
+			::value_type::value_type	element_type;
+    typedef typename type_traits<element_type>::lower_type
+							lower_type;
+    typedef typename type_traits<lower_type>::signed_type
+							signed_lower_type;
+    typedef typename type_traits<lower_type>::unsigned_type
+							unsigned_lower_type;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  private:
+    template <class S, class DUMMY=void>
+    struct down
+    {
+	static vec<S>
+	exec(ITER& iter)
+	{
+	    typedef typename type_traits<S>::upper_type	U;
+
+	    vec<U>	x = down<U>::exec(iter);
+	    return cvt<S>(x, down<U>::exec(iter));
+	}
+    };
+
+    template <class DUMMY>
+    struct down<signed_lower_type, DUMMY>
+    {
+	static vec<signed_lower_type>
+	exec(ITER& iter)
+	{
+	    vec<element_type>	x = down<element_type>::exec(iter);
+	    return cvt<signed_lower_type>(x, down<element_type>::exec(iter));
+	}
+    };
+    
+    template <class DUMMY>
+    struct down<unsigned_lower_type, DUMMY>
+    {
+	static vec<unsigned_lower_type>
+	exec(ITER& iter)
+	{
+	    vec<element_type>	x = down<element_type>::exec(iter);
+	    return cvt<unsigned_lower_type>(x, down<element_type>::exec(iter));
+	}
+    };
+    
+    template <class DUMMY>
+    struct down<element_type, DUMMY>
+    {
+	static vec<element_type>
+	exec(ITER& iter)
+	{
+	    vec<element_type>	x = *iter;
+	    ++iter;
+	    return x;
+	}
+    };
+    
+  public:
+		conversion_iterator(ITER const& iter)	:super(iter)	{}
+
+  private:
+    reference	dereference() const
+		{
+		    return down<T>::exec(const_cast<ITER&>(super::base()));
+		}
+    void	advance(difference_type n)		{}
+    void	increment()				{}
+    void	decrement()				{}
+};
+
+template <class T, class ITER> conversion_iterator<T, ITER>
+make_conversion_iterator(ITER iter)
+{
+    return conversion_iterator<T, ITER>(iter);
+}
+
+/************************************************************************
+*  class assignment_iterator<FUNC, ITER>				*
+************************************************************************/
+namespace detail
+{
+    template <class FUNC, class ITER>
+    class assignment_proxy
+    {
+      public:
+	typedef typename FUNC::argument_type::value_type	value_type;
+	typedef typename FUNC::result_type			result_type;
+	
+      private:
+	typedef typename std::iterator_traits<ITER>::reference	reference;
+	
+	struct copy
+	{
+	    static void	assign(reference x, result_type y)	{ x = y; }
+	};
+	
+	struct plus
+	{
+	    static void	assign(reference x, result_type y)	{ x += y; }
+	};
+	
+	struct minus
+	{
+	    static void	assign(reference x, result_type y)	{ x -= y; }
+	};
+	
+	struct multiplies
+	{
+	    static void	assign(reference x, result_type y)	{ x *= y; }
+	};
+	
+	struct divides
+	{
+	    static void	assign(reference x, result_type y)	{ x /= y; }
+	};
+	
+	struct modulus
+	{
+	    static void	assign(reference x, result_type y)	{ x %= y; }
+	};
+	
+	struct bit_and
+	{
+	    static void	assign(reference x, result_type y)	{ x &= y; }
+	};
+	
+	struct bit_or
+	{
+	    static void	assign(reference x, result_type y)	{ x |= y; }
+	};
+	
+	struct bit_xor
+	{
+	    static void	assign(reference x, result_type y)	{ x ^= y; }
+	};
+	
+	template <class OP>
+	class assignment_operator
+	{
+	  private:
+	    typedef typename type_traits<value_type>::lower_type
+							lower_type;
+
+	  public:
+	    typedef typename type_traits<lower_type>::signed_type
+							signed_lower_type;
+	    typedef typename type_traits<lower_type>::unsigned_type
+							unsigned_lower_type;
+	    
+	  public:
+	    assignment_operator(FUNC const& func)	:_func(func)	{}
+
+	    template <class T>
+	    ITER	operator ()(ITER iter, vec<T> x) const
+			{
+			    typedef typename type_traits<T>::upper_type	U;
+			    
+			    return (*this)((*this)(iter, cvt<U, 0>(x)),
+					   cvt<U, 1>(x));
+			}
+	    ITER	operator ()(ITER iter, vec<signed_lower_type> x) const
+			{
+			    return (*this)((*this)(iter,
+						   cvt<value_type, 0>(x)),
+					   cvt<value_type, 1>(x));
+			}
+	    ITER	operator ()(ITER iter,
+				    vec<unsigned_lower_type> x) const
+			{
+			    return (*this)((*this)(iter,
+						   cvt<value_type, 0>(x)),
+					   cvt<value_type, 1>(x));
+			}
+	    ITER	operator ()(ITER iter, vec<value_type> x) const
+			{
+			    OP::assign(*iter, _func(x));
+			    return ++iter;
+			}
+
+	  private:
+	    FUNC const&	_func;
+	};
+
+      public:
+	assignment_proxy(ITER const& iter, FUNC const& func)
+	    :_iter(const_cast<ITER&>(iter)), _func(func)		{}
+
+	template <class T>
+	void	operator =(vec<T> x)
+		{
+		    assignment_operator<copy>		op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator +=(vec<T> x)
+		{
+		    assignment_operator<plus>		op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator -=(vec<T> x)
+		{
+		    assignment_operator<minus>		op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator *=(vec<T> x)
+		{
+		    assignment_operator<multiplies>	op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator /=(vec<T> x)
+		{
+		    assignment_operator<divides>	op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator %=(vec<T> x)
+		{
+		    assignment_operator<modulus>	op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator &=(vec<T> x)
+		{
+		    assignment_operator<bit_and>	op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator |=(vec<T> x)
+		{
+		    assignment_operator<bit_or>		op(_func);
+		    _iter = op(_iter, x);
+		}
+	template <class T>
+	void	operator ^=(vec<T> x)
+		{
+		    assignment_operator<bit_xor>	op(_func);
+		    _iter = op(_iter, x);
+		}
+	
+      private:
+	ITER&		_iter;
+	FUNC const&	_func;
+    };
+}
+
+template <class FUNC, class ITER>
+class assignment_iterator
+    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
+				     ITER,
+				     typename FUNC::argument_type,
+				     boost::single_pass_traversal_tag,
+				     detail::assignment_proxy<FUNC, ITER> >
+{
+  private:
+    typedef boost::iterator_adaptor<assignment_iterator,
+				    ITER,
+				    typename FUNC::argument_type,
+				    boost::single_pass_traversal_tag,
+				    detail::assignment_proxy<FUNC, ITER> >
+								super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    assignment_iterator(ITER const& iter, FUNC const& func=FUNC())
+	:super(iter), _func(func)					{}
+
+    FUNC const&		functor() const
+			{
+			    return _func;
+			}
+	
+  private:
+    reference		dereference() const
+			{
+			    return reference(super::base(), _func);
+			}
+    void		advance(difference_type n)			{}
+    void		increment()					{}
+    void		decrement()					{}
+    difference_type	distance_to(assignment_iterator iter) const
+			{
+			    return (iter.base() - super::base())
+				 * value_type::size;
+			}
+
+  private:
+    FUNC const		_func;
+};
+
+template <class FUNC, class ITER> assignment_iterator<FUNC, ITER>
+make_assignment_iterator(ITER iter, FUNC func)
+{
+    return assignment_iterator<FUNC, ITER>(iter, func);
+}
+
+template <class FUNC, class ITER> assignment_iterator<FUNC, ITER>
+make_assignment_iterator(ITER iter)
+{
+    return assignment_iterator<FUNC, ITER>(iter);
 }
 
 }
