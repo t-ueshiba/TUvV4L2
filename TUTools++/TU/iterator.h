@@ -136,57 +136,57 @@ namespace detail
 	    :_iter(iter), _func(func)					{}
 
 	template <class T>
-	assignment_proxy&	operator =(const T& val)
+	const assignment_proxy&	operator =(const T& val) const
 				{
 				    *_iter = _func(val);
 				    return *this;
 				}
 	template <class T>
-	assignment_proxy&	operator +=(const T& val)
+	const assignment_proxy&	operator +=(const T& val) const
 				{
 				    *_iter += _func(val);
 				    return *this;
 				}
 	template <class T>
-	assignment_proxy&	operator -=(const T& val)
+	const assignment_proxy&	operator -=(const T& val) const
 				{
 				    *_iter -= _func(val);
 				    return *this;
 				}
 	template <class T>
-	assignment_proxy&	operator *=(const T& val)
+	const assignment_proxy&	operator *=(const T& val) const
 				{
 				    *_iter *= _func(val);
 				    return *this;
 				}
 	template <class T>
-	assignment_proxy&	operator /=(const T& val)
+	const assignment_proxy&	operator /=(const T& val) const
 				{
 				    *_iter /= _func(val);
 				    return *this;
 				}
 	template <class T>
-	assignment_proxy&	operator &=(const T& val)
+	const assignment_proxy&	operator &=(const T& val) const
 				{
 				    *_iter &= _func(val);
 				    return *this;
 				}
 	template <class T>
-	assignment_proxy&	operator |=(const T& val)
+	const assignment_proxy&	operator |=(const T& val) const
 				{
 				    *_iter |= _func(val);
 				    return *this;
 				}
 	template <class T>
-	assignment_proxy&	operator ^=(const T& val)
+	const assignment_proxy&	operator ^=(const T& val) const
 				{
 				    *_iter ^= _func(val);
 				    return *this;
 				}
 
       private:
-	ITER const&	_iter;
-	FUNC const&	_func;
+	ITER const&		_iter;
+	FUNC const&		_func;
     };
 }
 
@@ -236,7 +236,7 @@ class assignment_iterator
 		}
     
   private:
-    const FUNC	_func;
+    FUNC const	_func;
 };
     
 template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
@@ -264,11 +264,11 @@ namespace detail
 	    :_iter(iter), _func(func)					{}
 
 	template <class T>
-	assignment2_proxy&	operator =(const T& val)
-				{
-				    _func(*_iter, val);
-				    return *this;
-				}
+	const assignment2_proxy&	operator =(const T& val) const
+					{
+					    _func(*_iter, val);
+					    return *this;
+					}
 
       private:
 	ITER const&	_iter;
@@ -322,7 +322,7 @@ class assignment2_iterator
 		}
     
   private:
-    const FUNC	_func;
+    FUNC const	_func;
 };
     
 template <class FUNC, class ITER> inline assignment2_iterator<FUNC, ITER>
