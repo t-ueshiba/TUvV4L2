@@ -2058,7 +2058,7 @@ MM_LOGICALS(u_int64_t)
   lookup(const S* p, Is32vec idx)
   {
       const size_t	n = sizeof(int32_t) - sizeof(S);
-      const void*	q = (const void*)p - n;
+      const void*	q = (const int8_t*)p - n;
       if (type_traits<S>::is_signed)
 	  return _mm256_srai_epi32(_mm256_i32gather_epi32((const int32_t*)q,
 							  idx, sizeof(S)),
