@@ -236,7 +236,7 @@ class assignment_iterator
 		}
     
   private:
-    FUNC const	_func;
+    FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
 template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
@@ -322,7 +322,7 @@ class assignment2_iterator
 		}
     
   private:
-    FUNC const	_func;
+    FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
 template <class FUNC, class ITER> inline assignment2_iterator<FUNC, ITER>
@@ -499,7 +499,7 @@ class row_iterator
 		}
 
   private:
-    FUNC const	_func;
+    FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
 
 template <template <class, class> class COL, class FUNC, class ROWBASE>
@@ -582,7 +582,7 @@ class vertical_iterator
 		}
     
   private:
-    const size_t	_idx;
+    size_t	_idx;	// 代入を可能にするためconstは付けない
 };
 
 //! vertical反復子を生成する

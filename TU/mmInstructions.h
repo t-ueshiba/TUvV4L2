@@ -34,11 +34,6 @@
 #if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
 #define __mmInstructions_h
 
-#include <iostream>
-#include <cassert>
-#include <boost/iterator_adaptors.hpp>
-#include "TU/types.h"
-
 #if defined(AVX2)		// Core-i7 Haswell (2013)
 #  define AVX
 #endif
@@ -61,9 +56,14 @@
 #  define MMX
 #endif
 
-#include <immintrin.h>
-
 #if defined(MMX)
+#include <immintrin.h>
+#include <iostream>
+#include <cassert>
+#include <boost/iterator_adaptors.hpp>
+#include "TU/types.h"
+#include "TU/functional.h"
+
 /*!
   \namespace	mm
   \brief	Intel SIMD命令を利用するためのクラスおよび関数を納める名前空間
@@ -2977,19 +2977,19 @@ make_store_iterator(T* p)
 }
 
 /************************************************************************
-*  class conversion_iterator<T, ITER>					*
+*  class cvtdown_iterator<T, ITER>					*
 ************************************************************************/
 template <class T, class ITER>
-class conversion_iterator
+class cvtdown_iterator
     : public boost::iterator_adaptor<
-		conversion_iterator<T, ITER>,			// self
+		cvtdown_iterator<T, ITER>,			// self
 		ITER,						// base
 		vec<T>,						// value_type
 		boost::single_pass_traversal_tag,		// traversal
 		vec<T> >					// reference
 {
   private:
-    typedef boost::iterator_adaptor<conversion_iterator,
+    typedef boost::iterator_adaptor<cvtdown_iterator,
 				    ITER,
 				    vec<T>, 
 				    boost::single_pass_traversal_tag,
@@ -3014,42 +3014,44 @@ class conversion_iterator
 
   private:
     template <class S, class DUMMY=void>
-    struct down
+    struct cvtdown
     {
 	static vec<S>
 	exec(ITER& iter)
 	{
 	    typedef typename type_traits<S>::upper_type	U;
 
-	    vec<U>	x = down<U>::exec(iter);
-	    return cvt<S>(x, down<U>::exec(iter));
+	    vec<U>	x = cvtdown<U>::exec(iter);
+	    return cvt<S>(x, cvtdown<U>::exec(iter));
 	}
     };
 
     template <class DUMMY>
-    struct down<signed_lower_type, DUMMY>
+    struct cvtdown<signed_lower_type, DUMMY>
     {
 	static vec<signed_lower_type>
 	exec(ITER& iter)
 	{
-	    vec<element_type>	x = down<element_type>::exec(iter);
-	    return cvt<signed_lower_type>(x, down<element_type>::exec(iter));
+	    vec<element_type>	x = cvtdown<element_type>::exec(iter);
+	    return cvt<signed_lower_type>(x,
+					  cvtdown<element_type>::exec(iter));
 	}
     };
     
     template <class DUMMY>
-    struct down<unsigned_lower_type, DUMMY>
+    struct cvtdown<unsigned_lower_type, DUMMY>
     {
 	static vec<unsigned_lower_type>
 	exec(ITER& iter)
 	{
-	    vec<element_type>	x = down<element_type>::exec(iter);
-	    return cvt<unsigned_lower_type>(x, down<element_type>::exec(iter));
+	    vec<element_type>	x = cvtdown<element_type>::exec(iter);
+	    return cvt<unsigned_lower_type>(x,
+					    cvtdown<element_type>::exec(iter));
 	}
     };
     
     template <class DUMMY>
-    struct down<element_type, DUMMY>
+    struct cvtdown<element_type, DUMMY>
     {
 	static vec<element_type>
 	exec(ITER& iter)
@@ -3061,89 +3063,44 @@ class conversion_iterator
     };
     
   public:
-		conversion_iterator(ITER const& iter)	:super(iter)	{}
+		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
 
   private:
     reference	dereference() const
 		{
-		    return down<T>::exec(const_cast<ITER&>(super::base()));
+		    return cvtdown<T>::exec(const_cast<ITER&>(super::base()));
 		}
-    void	advance(difference_type n)		{}
-    void	increment()				{}
-    void	decrement()				{}
+    void	advance(difference_type n)				{}
+    void	increment()						{}
+    void	decrement()						{}
 };
 
-template <class T, class ITER> conversion_iterator<T, ITER>
-make_conversion_iterator(ITER iter)
+template <class T, class ITER> cvtdown_iterator<T, ITER>
+make_cvtdown_iterator(ITER iter)
 {
-    return conversion_iterator<T, ITER>(iter);
+    return cvtdown_iterator<T, ITER>(iter);
 }
 
 /************************************************************************
-*  class assignment_iterator<FUNC, ITER>				*
+*  class cvtup_iterator<ITER>						*
 ************************************************************************/
 namespace detail
 {
-    template <class FUNC, class ITER>
-    class assignment_proxy
+    template <class ITER>
+    class cvtup_proxy
     {
       public:
-	typedef typename FUNC::argument_type::value_type	value_type;
-	typedef typename FUNC::result_type			result_type;
+	typedef typename std::iterator_traits<ITER>::value_type	value_type;
+	typedef typename value_type::value_type			element_type;
 	
       private:
 	typedef typename std::iterator_traits<ITER>::reference	reference;
 	
-	struct copy
-	{
-	    static void	assign(reference x, result_type y)	{ x = y; }
-	};
-	
-	struct plus
-	{
-	    static void	assign(reference x, result_type y)	{ x += y; }
-	};
-	
-	struct minus
-	{
-	    static void	assign(reference x, result_type y)	{ x -= y; }
-	};
-	
-	struct multiplies
-	{
-	    static void	assign(reference x, result_type y)	{ x *= y; }
-	};
-	
-	struct divides
-	{
-	    static void	assign(reference x, result_type y)	{ x /= y; }
-	};
-	
-	struct modulus
-	{
-	    static void	assign(reference x, result_type y)	{ x %= y; }
-	};
-	
-	struct bit_and
-	{
-	    static void	assign(reference x, result_type y)	{ x &= y; }
-	};
-	
-	struct bit_or
-	{
-	    static void	assign(reference x, result_type y)	{ x |= y; }
-	};
-	
-	struct bit_xor
-	{
-	    static void	assign(reference x, result_type y)	{ x ^= y; }
-	};
-	
 	template <class OP>
-	class assignment_operator
+	class cvtup
 	{
 	  private:
-	    typedef typename type_traits<value_type>::lower_type
+	    typedef typename type_traits<element_type>::lower_type
 							lower_type;
 
 	  public:
@@ -3153,119 +3110,119 @@ namespace detail
 							unsigned_lower_type;
 	    
 	  public:
-	    assignment_operator(FUNC const& func)	:_func(func)	{}
-
 	    template <class T>
-	    ITER	operator ()(ITER iter, vec<T> x) const
+	    static void	exec(ITER& iter, vec<T> x)
 			{
 			    typedef typename type_traits<T>::upper_type	U;
-			    
-			    return (*this)((*this)(iter, cvt<U, 0>(x)),
-					   cvt<U, 1>(x));
+			    exec(iter, cvt<U, 0>(x));
+			    exec(iter, cvt<U, 1>(x));
 			}
-	    ITER	operator ()(ITER iter, vec<signed_lower_type> x) const
+	    static void	exec(ITER& iter, vec<signed_lower_type> x)
 			{
-			    return (*this)((*this)(iter,
-						   cvt<value_type, 0>(x)),
-					   cvt<value_type, 1>(x));
+			    exec(iter, cvt<element_type, 0>(x));
+			    exec(iter, cvt<element_type, 1>(x));
 			}
-	    ITER	operator ()(ITER iter,
-				    vec<unsigned_lower_type> x) const
+	    static void	exec(ITER& iter, vec<unsigned_lower_type> x)
 			{
-			    return (*this)((*this)(iter,
-						   cvt<value_type, 0>(x)),
-					   cvt<value_type, 1>(x));
+			    exec(iter, cvt<element_type, 0>(x));
+			    exec(iter, cvt<element_type, 1>(x));
 			}
-	    ITER	operator ()(ITER iter, vec<value_type> x) const
+	    static void	exec(ITER& iter, vec<element_type> x)
 			{
-			    OP::assign(*iter, _func(x));
-			    return ++iter;
+			    OP()(*iter, x);
+			    ++iter;
 			}
-
-	  private:
-	    FUNC const&	_func;
 	};
 
       public:
-	assignment_proxy(ITER const& iter, FUNC const& func)
-	    :_iter(const_cast<ITER&>(iter)), _func(func)		{}
+	cvtup_proxy(ITER const& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
 	template <class T>
-	void	operator =(vec<T> x)
-		{
-		    assignment_operator<copy>		op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator =(vec<T> x)
+			{
+			    cvtup<TU::assign<reference, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator +=(vec<T> x)
-		{
-		    assignment_operator<plus>		op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator +=(vec<T> x)
+			{
+			    cvtup<TU::assign_plus<reference, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator -=(vec<T> x)
-		{
-		    assignment_operator<minus>		op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator -=(vec<T> x)
+			{
+			    cvtup<TU::assign_minus<reference, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator *=(vec<T> x)
-		{
-		    assignment_operator<multiplies>	op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator *=(vec<T> x)
+			{
+			    cvtup<TU::assign_multiplies<reference,
+							value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator /=(vec<T> x)
-		{
-		    assignment_operator<divides>	op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator /=(vec<T> x)
+			{
+			    cvtup<TU::assign_divides<refernece, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator %=(vec<T> x)
-		{
-		    assignment_operator<modulus>	op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator %=(vec<T> x)
+			{
+			    cvtup<TU::assign_modulus<reference, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator &=(vec<T> x)
-		{
-		    assignment_operator<bit_and>	op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator &=(vec<T> x)
+			{
+			    cvtup<TU::assign_bit_and<reference, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator |=(vec<T> x)
-		{
-		    assignment_operator<bit_or>		op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator |=(vec<T> x)
+			{
+			    cvtup<TU::assign_bit_or<reference, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	template <class T>
-	void	operator ^=(vec<T> x)
-		{
-		    assignment_operator<bit_xor>	op(_func);
-		    _iter = op(_iter, x);
-		}
+	cvtup_proxy&	operator ^=(vec<T> x)
+			{
+			    cvtup<TU::assign_bit_xor<reference, value_type> >
+				::exec(_iter, x);
+			    return *this;
+			}
 	
       private:
 	ITER&		_iter;
-	FUNC const&	_func;
     };
 }
 
-template <class FUNC, class ITER>
-class assignment_iterator
-    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
+template <class ITER>
+class cvtup_iterator
+    : public boost::iterator_adaptor<cvtup_iterator<ITER>,
 				     ITER,
-				     typename FUNC::argument_type,
+				     typename std::iterator_traits<ITER>
+						 ::value_type,
 				     boost::single_pass_traversal_tag,
-				     detail::assignment_proxy<FUNC, ITER> >
+				     detail::cvtup_proxy<ITER> >
 {
   private:
-    typedef boost::iterator_adaptor<assignment_iterator,
+    typedef boost::iterator_adaptor<cvtup_iterator,
 				    ITER,
-				    typename FUNC::argument_type,
+				    typename std::iterator_traits<ITER>
+						::value_type,
 				    boost::single_pass_traversal_tag,
-				    detail::assignment_proxy<FUNC, ITER> >
-								super;
+				    detail::cvtup_proxy<ITER> >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -3277,45 +3234,30 @@ class assignment_iterator
     friend class				boost::iterator_core_access;
 
   public:
-    assignment_iterator(ITER const& iter, FUNC const& func=FUNC())
-	:super(iter), _func(func)					{}
+    cvtup_iterator(ITER const& iter)	:super(iter)			{}
 
-    FUNC const&		functor() const
-			{
-			    return _func;
-			}
-	
   private:
     reference		dereference() const
 			{
-			    return reference(super::base(), _func);
+			    return reference(super::base());
 			}
     void		advance(difference_type n)			{}
     void		increment()					{}
     void		decrement()					{}
-    difference_type	distance_to(assignment_iterator iter) const
+    difference_type	distance_to(cvtup_iterator iter) const
 			{
 			    return (iter.base() - super::base())
 				 * value_type::size;
 			}
-
-  private:
-    FUNC const		_func;
 };
 
-template <class FUNC, class ITER> assignment_iterator<FUNC, ITER>
-make_assignment_iterator(ITER iter, FUNC func)
+template <class ITER> cvtup_iterator<ITER>
+make_cvtup_iterator(ITER iter)
 {
-    return assignment_iterator<FUNC, ITER>(iter, func);
-}
-
-template <class FUNC, class ITER> assignment_iterator<FUNC, ITER>
-make_assignment_iterator(ITER iter)
-{
-    return assignment_iterator<FUNC, ITER>(iter);
+    return cvtup_iterator<ITER>(iter);
 }
 
 }
-#endif
+#endif	// MMX
 
 #endif	// !__mmInstructions_h

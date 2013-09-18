@@ -41,7 +41,7 @@
 namespace TU
 {
 /************************************************************************
-*  class identity							*
+*  struct identity							*
 ************************************************************************/
 //! 恒等関数
 /*!
@@ -54,6 +54,204 @@ struct identity
     typedef T	result_type;
     
     result_type	operator ()(argument_type x)	const	{ return x; }
+};
+
+/************************************************************************
+*  struct assign							*
+************************************************************************/
+//! 代入
+/*!
+  \param S	代入先の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type x,
+			    second_argument_type y) const
+		{
+		    return x = y;
+		}
+};
+
+/************************************************************************
+*  struct assign_plus							*
+************************************************************************/
+//! 引数を加算
+/*!
+  \param S	加算元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_plus
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    return x += y;
+		}
+};
+
+/************************************************************************
+*  struct assign_minus							*
+************************************************************************/
+//! 引数を減算
+/*!
+  \param S	減算元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_minus
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    return x -= y;
+		}
+};
+
+/************************************************************************
+*  struct assign_multiplies						*
+************************************************************************/
+//! 引数を乗算
+/*!
+  \param S	乗算元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_multiplies
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    return x *= y;
+		}
+};
+
+/************************************************************************
+*  struct assign_divides						*
+************************************************************************/
+//! 引数を除算
+/*!
+  \param S	除算元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_divides
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    return x /= y;
+		}
+};
+
+/************************************************************************
+*  struct assign_modulus						*
+************************************************************************/
+//! 引数で割った時の剰余を代入
+/*!
+  \param S	剰余をとる元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_modulus
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    return x %= y;
+		}
+};
+
+/************************************************************************
+*  struct assign_bit_and						*
+************************************************************************/
+//! 引数とのAND
+/*!
+  \param S	ANDをとる元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_bit_and
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    return x &= y;
+		}
+};
+
+/************************************************************************
+*  struct assign_bit_or							*
+************************************************************************/
+//! 引数とのOR
+/*!
+  \param S	ORをとる元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_bit_or
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    return x |= y;
+		}
+};
+
+/************************************************************************
+*  struct assign_bit_xor						*
+************************************************************************/
+//! 引数とのXOR
+/*!
+  \param S	XORをとる元の型
+  \param T	引数の型
+*/
+template <class S, class T=S>
+struct assign_bit_xor
+{
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef S	result_type;
+    
+    result_type	operator ()(first_argument_type x,
+			    second_argument_type y) const
+		{
+		    return x ^= y;
+		}
 };
 
 /************************************************************************
