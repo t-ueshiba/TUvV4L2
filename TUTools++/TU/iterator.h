@@ -570,7 +570,8 @@ class vertical_iterator
   private:
     bool	equal(const vertical_iterator& iter) const
 		{
-		    return super::equal(iter) && (_idx == iter._idx);
+		    return (super::base() == iter.base()) &&
+			   (_idx == iter._idx);
 		}
 	
     reference	dereference() const
