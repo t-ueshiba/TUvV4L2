@@ -2994,54 +2994,41 @@ class cvtdown_iterator
     friend class				boost::iterator_core_access;
 
   private:
-    template <class S, class DUMMY=void>
-    struct cvtdown
+    template <class S> struct type2type
     {
-	static vec<S>
-	exec(ITER& iter)
-	{
-	    typedef typename type_traits<S>::upper_type	U;
-
-	    vec<U>	x = cvtdown<U>::exec(iter);
-	    return cvt<S>(x, cvtdown<U>::exec(iter));
-	}
-    };
-
-    template <class DUMMY>
-    struct cvtdown<signed_lower_type, DUMMY>
-    {
-	static vec<signed_lower_type>
-	exec(ITER& iter)
-	{
-	    vec<element_type>	x = cvtdown<element_type>::exec(iter);
-	    return cvt<signed_lower_type>(x,
-					  cvtdown<element_type>::exec(iter));
-	}
+	typedef S	type;
     };
     
-    template <class DUMMY>
-    struct cvtdown<unsigned_lower_type, DUMMY>
+    template <class S> vec<S>
+    cvtdown(type2type<S>)
     {
-	static vec<unsigned_lower_type>
-	exec(ITER& iter)
-	{
-	    vec<element_type>	x = cvtdown<element_type>::exec(iter);
-	    return cvt<unsigned_lower_type>(x,
-					    cvtdown<element_type>::exec(iter));
-	}
-    };
+	typedef typename type_traits<S>::upper_type	U;
+
+	vec<U>	x = cvtdown(type2type<U>());
+	return cvt<S>(x, cvtdown(type2type<U>()));
+    }
+
+    vec<signed_lower_type>
+    cvtdown(type2type<signed_lower_type>)
+    {
+	vec<element_type>	x = cvtdown(type2type<element_type>());
+	return cvt<signed_lower_type>(x, cvtdown(type2type<element_type>()));
+    }
     
-    template <class DUMMY>
-    struct cvtdown<element_type, DUMMY>
+    vec<unsigned_lower_type>
+    cvtdown(type2type<unsigned_lower_type>)
     {
-	static vec<element_type>
-	exec(ITER& iter)
-	{
-	    vec<element_type>	x = *iter;
-	    ++iter;
-	    return x;
-	}
-    };
+	vec<element_type>	x = cvtdown(type2type<element_type>());
+	return cvt<unsigned_lower_type>(x, cvtdown(type2type<element_type>()));
+    }
+    
+    vec<element_type>
+    cvtdown(type2type<element_type>)
+    {
+	vec<element_type>	x = *super::base();
+	++super::base_reference();
+	return x;
+    }
     
   public:
 		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
@@ -3049,7 +3036,8 @@ class cvtdown_iterator
   private:
     reference	dereference() const
 		{
-		    return cvtdown<T>::exec(const_cast<ITER&>(super::base()));
+		    return const_cast<cvtdown_iterator*>(this)
+				->cvtdown(type2type<T>());
 		}
     void	advance(difference_type n)				{}
     void	increment()						{}
@@ -3070,50 +3058,42 @@ namespace detail
     template <class ITER>
     class cvtup_proxy
     {
-      public:
+      private:
 	typedef typename std::iterator_traits<ITER>::value_type	value_type;
 	typedef typename value_type::value_type			element_type;
-	
-      private:
 	typedef typename std::iterator_traits<ITER>::reference	reference;
-	
-	template <class OP>
-	class cvtup
-	{
-	  private:
-	    typedef typename type_traits<element_type>::lower_type
-							lower_type;
-
-	  public:
-	    typedef typename type_traits<lower_type>::signed_type
+	typedef typename type_traits<element_type>::lower_type	lower_type;
+	typedef typename type_traits<lower_type>::signed_type
 							signed_lower_type;
-	    typedef typename type_traits<lower_type>::unsigned_type
+	typedef typename type_traits<lower_type>::unsigned_type
 							unsigned_lower_type;
-	    
-	  public:
-	    template <class T>
-	    static void	exec(ITER& iter, vec<T> x)
+
+	template <class OP, class T>
+	void		cvtup(vec<T> x)
 			{
 			    typedef typename type_traits<T>::upper_type	U;
-			    exec(iter, cvt<U, 0>(x));
-			    exec(iter, cvt<U, 1>(x));
+
+			    cvtup<OP>(cvt<U, 0>(x));
+			    cvtup<OP>(cvt<U, 1>(x));
 			}
-	    static void	exec(ITER& iter, vec<signed_lower_type> x)
+	template <class OP>
+	void		cvtup(vec<signed_lower_type> x)
 			{
-			    exec(iter, cvt<element_type, 0>(x));
-			    exec(iter, cvt<element_type, 1>(x));
+			    cvtup<OP>(cvt<element_type, 0>(x));
+			    cvtup<OP>(cvt<element_type, 1>(x));
 			}
-	    static void	exec(ITER& iter, vec<unsigned_lower_type> x)
+	template <class OP>
+	void		cvtup(vec<unsigned_lower_type> x)
 			{
-			    exec(iter, cvt<element_type, 0>(x));
-			    exec(iter, cvt<element_type, 1>(x));
+			    cvtup<OP>(cvt<element_type, 0>(x));
+			    cvtup<OP>(cvt<element_type, 1>(x));
 			}
-	    static void	exec(ITER& iter, vec<element_type> x)
+	template <class OP>
+	void		cvtup(vec<element_type> x)
 			{
-			    OP()(*iter, x);
-			    ++iter;
+			    OP()(*_iter, x);
+			    ++_iter;
 			}
-	};
 
       public:
 	cvtup_proxy(ITER const& iter)	:_iter(const_cast<ITER&>(iter))	{}
@@ -3121,65 +3101,61 @@ namespace detail
 	template <class T>
 	cvtup_proxy&	operator =(vec<T> x)
 			{
-			    cvtup<TU::assign<reference, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign<reference, value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator +=(vec<T> x)
 			{
-			    cvtup<TU::assign_plus<reference, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign_plus<reference, value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator -=(vec<T> x)
 			{
-			    cvtup<TU::assign_minus<reference, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign_minus<reference, value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator *=(vec<T> x)
 			{
 			    cvtup<TU::assign_multiplies<reference,
-							value_type> >
-				::exec(_iter, x);
+							value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator /=(vec<T> x)
 			{
-			    cvtup<TU::assign_divides<refernece, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign_divides<refernece,
+						     value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator %=(vec<T> x)
 			{
-			    cvtup<TU::assign_modulus<reference, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign_modulus<reference,
+						     value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator &=(vec<T> x)
 			{
-			    cvtup<TU::assign_bit_and<reference, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign_bit_and<reference,
+						     value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator |=(vec<T> x)
 			{
-			    cvtup<TU::assign_bit_or<reference, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign_bit_or<reference,
+						    value_type> >(x);
 			    return *this;
 			}
 	template <class T>
 	cvtup_proxy&	operator ^=(vec<T> x)
 			{
-			    cvtup<TU::assign_bit_xor<reference, value_type> >
-				::exec(_iter, x);
+			    cvtup<TU::assign_bit_xor<reference,
+						     value_type> >(x);
 			    return *this;
 			}
 	
