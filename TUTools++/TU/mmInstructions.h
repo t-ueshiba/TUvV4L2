@@ -743,14 +743,16 @@ MM_CONSTRUCTOR_1(u_int32_t)
   \param p	ロード元のメモリアドレス
   \return	ロードされたベクトル
 */
-template <bool ALIGNED, class T> static vec<T>	load(const T* p)	;
+template <bool ALIGNED=false, class T>
+static vec<T>	load(const T* p)					;
 
 //! メモリにベクトルをストアする．
 /*!
   \param p	ストア先のメモリアドレス
   \param x	ストアされるベクトル
 */
-template <bool ALIGNED, class T> static void	store(T* p, vec<T> x)	;
+template <bool ALIGNED=false, class T>
+static void	store(T* p, vec<T> x)					;
 
 #if defined(SSE2)
 #  if defined(SSE3)
@@ -2993,55 +2995,46 @@ class cvtdown_iterator
 
     friend class				boost::iterator_core_access;
 
-  private:
-    template <class S> struct type2type
-    {
-	typedef S	type;
-    };
-    
-    template <class S> vec<S>
-    cvtdown(type2type<S>)
-    {
-	typedef typename type_traits<S>::upper_type	U;
-
-	vec<U>	x = cvtdown(type2type<U>());
-	return cvt<S>(x, cvtdown(type2type<U>()));
-    }
-
-    vec<signed_lower_type>
-    cvtdown(type2type<signed_lower_type>)
-    {
-	vec<element_type>	x = cvtdown(type2type<element_type>());
-	return cvt<signed_lower_type>(x, cvtdown(type2type<element_type>()));
-    }
-    
-    vec<unsigned_lower_type>
-    cvtdown(type2type<unsigned_lower_type>)
-    {
-	vec<element_type>	x = cvtdown(type2type<element_type>());
-	return cvt<unsigned_lower_type>(x, cvtdown(type2type<element_type>()));
-    }
-    
-    vec<element_type>
-    cvtdown(type2type<element_type>)
-    {
-	vec<element_type>	x = *super::base();
-	++super::base_reference();
-	return x;
-    }
-    
   public:
 		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
 
   private:
     reference	dereference() const
 		{
-		    return const_cast<cvtdown_iterator*>(this)
-				->cvtdown(type2type<T>());
+		    reference	x;
+		    const_cast<cvtdown_iterator*>(this)->cvtdown(x);
+		    return x;
 		}
     void	advance(difference_type n)				{}
     void	increment()						{}
     void	decrement()						{}
+    template <class S>
+    void	cvtdown(vec<S>& x)
+		{
+		    vec<typename type_traits<S>::upper_type>	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt<S>(y, z);
+		}
+    void	cvtdown(vec<signed_lower_type>& x)
+		{
+		    vec<element_type>	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt<signed_lower_type>(y, z);
+		}
+    void	cvtdown(vec<unsigned_lower_type>& x)
+		{
+		    vec<element_type>	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt<unsigned_lower_type>(y, z);
+		}
+    void	cvtdown(vec<element_type>& x)
+		{
+		    x = *super::base();
+		    ++super::base_reference();
+		}
 };
 
 template <class T, class ITER> cvtdown_iterator<T, ITER>
