@@ -228,65 +228,65 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 	using namespace	std;
 
 	const u_int	npixels = Is16vec::size/4;
-	Is16vec		uu = load(usp), vv = load(vsp);
-	Iu8vec		du = load(dup), dv = load(dvp);
+	Is16vec		uu = load<true>(usp), vv = load<true>(vsp);
+	Iu8vec		du = load<true>(dup), dv = load<true>(dvp);
 	Iu8vec		du4 = quadup<0>(du), dv4 = quadup<0>(dv);
-	storeu((u_char*)outp,
-	       cvt<u_char>(bilinearInterpolate(in, uu, vv,
-					       cvt<short, 0>(du4),
-					       cvt<short, 0>(dv4)),
-			   bilinearInterpolate(in,
-					       shift_r<npixels>(uu),
-					       shift_r<npixels>(vv),
-					       cvt<short, 1>(du4),
-					       cvt<short, 1>(dv4))));
+	store<false>((u_char*)outp,
+		     cvt<u_char>(bilinearInterpolate(in, uu, vv,
+						     cvt<short, 0>(du4),
+						     cvt<short, 0>(dv4)),
+				 bilinearInterpolate(in,
+						     shift_r<npixels>(uu),
+						     shift_r<npixels>(vv),
+						     cvt<short, 1>(du4),
+						     cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	    
 	du4 = quadup<1>(du);
 	dv4 = quadup<1>(dv);
-	storeu((u_char*)outp,
-	       cvt<u_char>(bilinearInterpolate(in,
-					       shift_r<2*npixels>(uu),
-					       shift_r<2*npixels>(vv),
-					       cvt<short, 0>(du4),
-					       cvt<short, 0>(dv4)),
-			   bilinearInterpolate(in,
-					       shift_r<3*npixels>(uu),
-					       shift_r<3*npixels>(vv),
-					       cvt<short, 1>(du4),
-					       cvt<short, 1>(dv4))));
+	store<false>((u_char*)outp,
+		     cvt<u_char>(bilinearInterpolate(in,
+						     shift_r<2*npixels>(uu),
+						     shift_r<2*npixels>(vv),
+						     cvt<short, 0>(du4),
+						     cvt<short, 0>(dv4)),
+				 bilinearInterpolate(in,
+						     shift_r<3*npixels>(uu),
+						     shift_r<3*npixels>(vv),
+						     cvt<short, 1>(du4),
+						     cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	usp  += Is16vec::size;
 	vsp  += Is16vec::size;
 	    
-	uu  = load(usp);
-	vv  = load(vsp);
+	uu  = load<true>(usp);
+	vv  = load<true>(vsp);
 	du4 = quadup<2>(du);
 	dv4 = quadup<2>(dv);
-	storeu((u_char*)outp,
-	       cvt<u_char>(bilinearInterpolate(in, uu, vv,
-					       cvt<short, 0>(du4),
-					       cvt<short, 0>(dv4)),
-			   bilinearInterpolate(in,
-					       shift_r<npixels>(uu),
-					       shift_r<npixels>(vv),
-					       cvt<short, 1>(du4),
-					       cvt<short, 1>(dv4))));
+	store<false>((u_char*)outp,
+		     cvt<u_char>(bilinearInterpolate(in, uu, vv,
+						     cvt<short, 0>(du4),
+						     cvt<short, 0>(dv4)),
+				 bilinearInterpolate(in,
+						     shift_r<npixels>(uu),
+						     shift_r<npixels>(vv),
+						     cvt<short, 1>(du4),
+						     cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	    
 	du4 = quadup<3>(du);
 	dv4 = quadup<3>(dv);
-	storeu((u_char*)outp,
-	       cvt<u_char>(bilinearInterpolate(in,
-					       shift_r<2*npixels>(uu),
-					       shift_r<2*npixels>(vv),
-					       cvt<short, 0>(du4),
-					       cvt<short, 0>(dv4)),
-			   bilinearInterpolate(in,
-					       shift_r<3*npixels>(uu),
-					       shift_r<3*npixels>(vv),
-					       cvt<short, 1>(du4),
-					       cvt<short, 1>(dv4))));
+	store<false>((u_char*)outp,
+		     cvt<u_char>(bilinearInterpolate(in,
+						     shift_r<2*npixels>(uu),
+						     shift_r<2*npixels>(vv),
+						     cvt<short, 0>(du4),
+						     cvt<short, 0>(dv4)),
+				 bilinearInterpolate(in,
+						     shift_r<3*npixels>(uu),
+						     shift_r<3*npixels>(vv),
+						     cvt<short, 1>(du4),
+						     cvt<short, 1>(dv4))));
 	outp += Iu8vec::size/4;
 	usp  += Is16vec::size;
 	vsp  += Is16vec::size;
@@ -328,14 +328,17 @@ Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
 
     for (u_char* const outr = outq - Iu8vec::size; outp <= outr; )
     {
-	Iu8vec	du = load(dup), dv = load(dvp);
-	Is16vec	out0 = bilinearInterpolate(in, load(usp), load(vsp),
+	Iu8vec	du = load<true>(dup), dv = load<true>(dvp);
+	Is16vec	out0 = bilinearInterpolate(in,
+					   load<true>(usp), load<true>(vsp),
 					   cvt<short>(du), cvt<short>(dv));
 	usp += Is16vec::size;
 	vsp += Is16vec::size;
-	storeu(outp, cvt<u_char>(out0,
+	store<false>(outp,
+		     cvt<u_char>(out0,
 				 bilinearInterpolate(in,
-						     load(usp), load(vsp),
+						     load<true>(usp),
+						     load<true>(vsp),
 						     cvt<short, 1>(du),
 						     cvt<short, 1>(dv))));
 	usp  += Is16vec::size;

@@ -40,9 +40,9 @@ template <class T> static inline void
 correct(T* p, F32vec a, F32vec b)
 {
     const u_int		nelms = F32vec::size;
-    const Iu8vec	val = load((const u_char*)p);
+    const Iu8vec	val = load<false>((const u_char*)p);
 #  if defined(SSE2)
-    storeu((u_char*)p,
+    store<false>((u_char*)p,
 	   cvt<u_char>(
 	       cvt<short>(
 		   cvt<int>(a + b * cvt<float>(val)),
@@ -51,9 +51,10 @@ correct(T* p, F32vec a, F32vec b)
 		   cvt<int>(a + b * cvt<float>(shift_r<2*nelms>(val))),
 		   cvt<int>(a + b * cvt<float>(shift_r<3*nelms>(val))))));
 #  else
-    storeu((u_char*)p,
-	   cvt<u_char>(cvt<short>(a + b * cvt<float>(val)),
-		       cvt<short>(a + b * cvt<float>(shift_r<nelms>(val)))));
+    store<false>((u_char*)p,
+		 cvt<u_char>(cvt<short>(a + b * cvt<float>(val)),
+			     cvt<short>(a + b * cvt<float>(
+					    shift_r<nelms>(val)))));
 #  endif
 }
 
@@ -62,18 +63,19 @@ correct(short* p, F32vec a, F32vec b)
 {
 #  if defined(SSE2)
     const u_int		nelms = F32vec::size;
-    const Is16vec	val = loadu(p);
-    storeu(p, cvt<short>(cvt<int>(a + b * cvt<float>(val)),
-			 cvt<int>(a + b * cvt<float>(shift_r<nelms>(val)))));
+    const Is16vec	val = load<false>(p);
+    store<false>(p, cvt<short>(cvt<int>(a + b * cvt<float>(val)),
+			       cvt<int>(a + b * cvt<float>(
+					    shift_r<nelms>(val)))));
 #  else
-    storeu(p, cvt<short>(a + b * cvt<float>(loadu(p))));
+    store<false>(p, cvt<short>(a + b * cvt<float>(load<false>(p))));
 #  endif
 }
 
 template <> inline void
 correct(float* p, F32vec a, F32vec b)
 {
-    storeu(p, a + b * loadu(p));
+    store<false>(p, a + b * load<false>(p));
 }
 }
 #endif
