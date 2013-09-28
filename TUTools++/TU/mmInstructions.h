@@ -178,7 +178,23 @@ struct type_traits<u_int64_t>
 	is_signed = false,
     };
 };
-    
+
+template <>
+struct type_traits<float>
+{
+    typedef int32_t	int_type;
+    typedef void	lower_type;
+    typedef double	upper_type;
+};
+
+template <>
+struct type_traits<double>
+{
+    typedef int64_t	int_type;
+    typedef float	lower_type;
+    typedef void	upper_type;
+};
+
 /************************************************************************
 *  SIMD vector types							*
 ************************************************************************/
@@ -722,54 +738,40 @@ MM_CONSTRUCTOR_1(u_int32_t)
 /************************************************************************
 *  Load/Store								*
 ************************************************************************/
-//! 16byteにalignされたメモリからベクトルをロードする．
-/*!
-  \param p	16byteにalignされたロード元のメモリアドレス
-  \return	ロードされたベクトル
-*/
-template <class T> static vec<T>	load(const T* p)		;
-
 //! メモリからベクトルをロードする．
 /*!
   \param p	ロード元のメモリアドレス
   \return	ロードされたベクトル
 */
-template <class T> static vec<T>	loadu(const T* p)		;
-
-//! 16byteにalignされたメモリにベクトルをストアする．
-/*!
-  \param p	16byteにalignされたストア先のメモリアドレス
-  \param x	ストアされるベクトル
-*/
-template <class T> static void		store(T* p, vec<T> x)		;
+template <bool ALIGNED, class T> static vec<T>	load(const T* p)	;
 
 //! メモリにベクトルをストアする．
 /*!
   \param p	ストア先のメモリアドレス
   \param x	ストアされるベクトル
 */
-template <class T> static void		storeu(T* p, vec<T> x)		;
+template <bool ALIGNED, class T> static void	store(T* p, vec<T> x)	;
 
 #if defined(SSE2)
 #  if defined(SSE3)
 #    define MM_LOAD_STORE(type)						\
-      MM_FUNC(vec<type> load(const type* p), load,			\
+      MM_FUNC(vec<type> load<true>(const type* p), load,		\
 	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(vec<type> loadu(const type* p), lddqu,			\
+      MM_FUNC(vec<type> load<false>(const type* p), lddqu,		\
 	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(void store(type* p, vec<type> x), store,			\
+      MM_FUNC(void store<true>(type* p, vec<type> x), store,		\
 	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)	\
-      MM_FUNC(void storeu(type* p, vec<type> x), storeu,		\
+      MM_FUNC(void store<false>(type* p, vec<type> x), storeu,		\
 	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)
 #  else
 #    define MM_LOAD_STORE(type)						\
-      MM_FUNC(vec<type> load(const type* p), load,			\
+      MM_FUNC(vec<type> load<true>(const type* p), load,		\
 	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(vec<type> loadu(const type* p), loadu,			\
+      MM_FUNC(vec<type> load<false>(const type* p), loadu,		\
 	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(void store(type* p, vec<type> x), store,			\
+      MM_FUNC(void store<true>(type* p, vec<type> x), store,		\
 	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)	\
-      MM_FUNC(void storeu(type* p, vec<type> x), storeu,		\
+      MM_FUNC(void store<false>(type* p, vec<type> x), storeu,		\
 	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)
 #  endif
   MM_LOAD_STORE(int8_t)
@@ -783,37 +785,27 @@ template <class T> static void		storeu(T* p, vec<T> x)		;
 
 #  undef MM_LOAD_STORE  
 #else
-  template <class T> inline vec<T>
+  template <bool ALIGNED, class T> inline vec<T>
   load(const T* p)
   {
       return *((const typename vec<T>::base_type*)p);
   }
-  template <class T> inline vec<T>
-  loadu(const T* p)
-  {
-      return load(p);
-  }
-  template <class T> inline void
+  template <bool ALIGNED, class T> inline void
   store(T* p, vec<T> x)
   {
       *((typename vec<T>::base_type*)p) = x;
-  }
-  template <class T> inline void
-  storeu(T* p, vec<T> x)
-  {
-      store(p, x);
   }
 #endif
 
 #if defined(SSE)
 #  define MM_LOAD_STORE(type)						\
-    MM_FUNC(vec<type> load(const type* p), load,			\
+    MM_FUNC(vec<type> load<true>(const type* p), load,			\
 	    ((const type*)p), void, type, MM_BASE)			\
-    MM_FUNC(vec<type> loadu(const type* p), loadu,			\
+    MM_FUNC(vec<type> load<false>(const type* p), loadu,		\
 	    ((const type*)p), void, type, MM_BASE)			\
-    MM_FUNC(void store(type* p, vec<type> x), store,			\
+    MM_FUNC(void store<true>(type* p, vec<type> x), store,		\
 	    ((type*)p, x), void, type, MM_BASE)				\
-    MM_FUNC(void storeu(type* p, vec<type> x), storeu,			\
+    MM_FUNC(void store<false>(type* p, vec<type> x), storeu,		\
 	    ((type*)p, x), void, type, MM_BASE)
 
   MM_LOAD_STORE(float)
@@ -2811,10 +2803,7 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
   private:
     reference		dereference() const
 			{
-			    if (ALIGNED)
-				return load(super::base());
-			    else
-				return loadu(super::base());
+			    return load<ALIGNED>(super::base());
 			}
     void		advance(difference_type n)
 			{
@@ -2854,66 +2843,58 @@ namespace detail
 	
 	const store_proxy&	operator =(vec<T> val) const
 				{
-				    store(val);
+				    store<ALIGNED>(_p, val);
 				    return *this;
 				}
 	const store_proxy&	operator +=(vec<T> val) const
 				{
-				    store(load() + val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) + val);
 				    return *this;
 				}
 	const store_proxy&	operator -=(vec<T> val) const
 				{
-				    store(load() - val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) - val);
 				    return *this;
 				}
 	const store_proxy&	operator *=(vec<T> val) const
 				{
-				    store(load() * val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) * val);
 				    return *this;
 				}
 	const store_proxy&	operator /=(vec<T> val) const
 				{
-				    store(load() / val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) / val);
 				    return *this;
 				}
 	const store_proxy&	operator %=(vec<T> val) const
 				{
-				    store(load() % val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) % val);
 				    return *this;
 				}
 	const store_proxy&	operator &=(vec<T> val) const
 				{
-				    store(load() & val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) & val);
 				    return *this;
 				}
 	const store_proxy&	operator |=(vec<T> val) const
 				{
-				    store(load() | val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) | val);
 				    return *this;
 				}
 	const store_proxy&	operator ^=(vec<T> val) const
 				{
-				    store(load() ^ val);
+				    store<ALIGNED>(_p,
+						   load<ALIGNED>(_p) ^ val);
 				    return *this;
 				}
 
-      private:
-	vec<T>			load() const
-				{
-				    if (ALIGNED)
-					return mm::load(_p);
-				    else
-					return mm::loadu(_p);
-				}
-	void			store(vec<T> val) const
-				{
-				    if (ALIGNED)
-					mm::store(_p, val);
-				    else
-					mm::storeu(_p, val);
-				}
-	
       private:
 	T* const		_p;
     };

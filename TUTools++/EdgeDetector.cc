@@ -267,9 +267,9 @@ EdgeDetector::strength(const Image<float>& edgeH,
 	for (const float* const end2 = dst + F32vec::floor(out.width());
 	     dst < end2; )
 	{
-	    const F32vec	fH = loadu(eH), fV = loadu(eV);
+	    const F32vec	fH = load<false>(eH), fV = load<false>(eV);
 	    
-	    storeu(dst, sqrt(fH * fH + fV * fV));
+	    store<false>(dst, sqrt(fH * fH + fV * fV));
 	    eH  += nelms;
 	    eV  += nelms;
 	    dst += nelms;
@@ -310,19 +310,20 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
-	    const Is32vec	d0 = dir4(loadu(eH), loadu(eV));
+	    const Is32vec	d0 = dir4(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d1 = dir4(loadu(eH), loadu(eV));
+	    const Is32vec	d1 = dir4(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d2 = dir4(loadu(eH), loadu(eV));
+	    const Is32vec	d2 = dir4(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d3 = dir4(loadu(eH), loadu(eV));
+	    const Is32vec	d3 = dir4(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
+	    store<false>(dst,
+			 cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
 	}
 #endif
 	while (dst < end)
@@ -349,19 +350,20 @@ EdgeDetector::direction4x(const Image<float>& edgeH,
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
-	    const Is32vec	d0 = dir4x(loadu(eH), loadu(eV));
+	    const Is32vec	d0 = dir4x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d1 = dir4x(loadu(eH), loadu(eV));
+	    const Is32vec	d1 = dir4x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d2 = dir4x(loadu(eH), loadu(eV));
+	    const Is32vec	d2 = dir4x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d3 = dir4x(loadu(eH), loadu(eV));
+	    const Is32vec	d3 = dir4x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
+	    store<false>(dst,
+			 cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
 	}
 #endif
 	while (dst < end)
@@ -395,19 +397,20 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
-	    const Is32vec	d0 = dir8(loadu(eH), loadu(eV));
+	    const Is32vec	d0 = dir8(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d1 = dir8(loadu(eH), loadu(eV));
+	    const Is32vec	d1 = dir8(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d2 = dir8(loadu(eH), loadu(eV));
+	    const Is32vec	d2 = dir8(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d3 = dir8(loadu(eH), loadu(eV));
+	    const Is32vec	d3 = dir8(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
+	    store<false>(dst,
+			 cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
 	}
 #endif
 	while (dst < end)
@@ -434,19 +437,20 @@ EdgeDetector::direction8x(const Image<float>& edgeH,
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
-	    const Is32vec	d0 = dir8x(loadu(eH), loadu(eV));
+	    const Is32vec	d0 = dir8x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d1 = dir8x(loadu(eH), loadu(eV));
+	    const Is32vec	d1 = dir8x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d2 = dir8x(loadu(eH), loadu(eV));
+	    const Is32vec	d2 = dir8x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    const Is32vec	d3 = dir8x(loadu(eH), loadu(eV));
+	    const Is32vec	d3 = dir8x(load<false>(eH), load<false>(eV));
 	    eH += nelms;
 	    eV += nelms;
-	    storeu(dst, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
+	    store<false>(dst,
+			 cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
 	}
 #endif
 	while (dst < end)
@@ -481,46 +485,47 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	for (citerator end2 = dir + Iu8vec::floor(direction.width());
 	     dir != end2; dir += Iu8vec::size)
 	{
-	    F32vec	fHH = loadu(eHH), fHV = loadu(eHV);
-	    F32vec	lambda = eigen(fHH, fHV, loadu(eVV));
+	    F32vec	fHH = load<false>(eHH), fHV = load<false>(eHV);
+	    F32vec	lambda = eigen(fHH, fHV, load<false>(eVV));
 	    Is32vec	d0 = dir8x(fHV, lambda - fHH, lambda);
-	    storeu(str, abs(lambda));
+	    store<false>(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
 	    eHV += nelms;
 	    eVV += nelms;
 
-	    fHH = loadu(eHH);
-	    fHV = loadu(eHV);
-	    lambda = eigen(fHH, fHV, loadu(eVV));
+	    fHH = load<false>(eHH);
+	    fHV = load<false>(eHV);
+	    lambda = eigen(fHH, fHV, load<false>(eVV));
 	    Is32vec	d1 = dir8x(fHV, lambda - fHH, lambda);
-	    storeu(str, abs(lambda));
+	    store<false>(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
 	    eHV += nelms;
 	    eVV += nelms;
 
-	    fHH = loadu(eHH);
-	    fHV = loadu(eHV);
-	    lambda = eigen(fHH, fHV, loadu(eVV));
+	    fHH = load<false>(eHH);
+	    fHV = load<false>(eHV);
+	    lambda = eigen(fHH, fHV, load<false>(eVV));
 	    Is32vec	d2 = dir8x(fHV, lambda - fHH, lambda);
-	    storeu(str, abs(lambda));
+	    store<false>(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
 	    eHV += nelms;
 	    eVV += nelms;
 
-	    fHH = loadu(eHH);
-	    fHV = loadu(eHV);
-	    lambda = eigen(fHH, fHV, loadu(eVV));
+	    fHH = load<false>(eHH);
+	    fHV = load<false>(eHV);
+	    lambda = eigen(fHH, fHV, load<false>(eVV));
 	    Is32vec	d3 = dir8x(fHV, lambda - fHH, lambda);
-	    storeu(str, abs(lambda));
+	    store<false>(str, abs(lambda));
 	    str += nelms;
 	    eHH += nelms;
 	    eHV += nelms;
 	    eVV += nelms;
 
-	    storeu(dir, cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
+	    store<false>(dir,
+			 cvt<u_char>(cvt<short>(d0, d1), cvt<short>(d2, d3)));
 	}
 #endif
 	for (citerator end = direction[v].end(); dir != end; ++dir)

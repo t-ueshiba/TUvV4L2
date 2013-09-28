@@ -80,14 +80,17 @@ forward2(const u_char*& in, float*& out, F32vec ci01co01, F32vec& tmp)
 {
     const u_int	nelmsF = F32vec::size,
 		nelms8 = Iu8vec::size;
-    Iu8vec	in8 = loadu(in);
-    storeu(out, forward2(cvt<float>(in8), ci01co01, tmp));
+    Iu8vec	in8 = load<false>(in);
+    store<false>(out, forward2(cvt<float>(in8), ci01co01, tmp));
     out += nelmsF;
-    storeu(out, forward2(cvt<float>(shift_r<nelmsF>(in8)), ci01co01, tmp));
+    store<false>(out,
+		 forward2(cvt<float>(shift_r<nelmsF>(in8)), ci01co01, tmp));
     out += nelmsF;
-    storeu(out, forward2(cvt<float>(shift_r<2*nelmsF>(in8)), ci01co01, tmp));
+    store<false>(out,
+		 forward2(cvt<float>(shift_r<2*nelmsF>(in8)), ci01co01, tmp));
     out += nelmsF;
-    storeu(out, forward2(cvt<float>(shift_r<3*nelmsF>(in8)), ci01co01, tmp));
+    store<false>(out,
+		 forward2(cvt<float>(shift_r<3*nelmsF>(in8)), ci01co01, tmp));
     out += nelmsF;
     in  += nelms8;
 }
@@ -96,7 +99,7 @@ template <> inline void
 forward2(const float*& in, float*& out, F32vec ci01co01, F32vec& tmp)
 {
     const u_int	nelmsF = F32vec::size;
-    storeu(out, forward2(loadu(in), ci01co01, tmp));
+    store<false>(out, forward2(load<false>(in), ci01co01, tmp));
     out += nelmsF;
     in  += nelmsF;
 }
@@ -110,15 +113,19 @@ backward2(const u_char*& in, float*& out, F32vec ci10co10, F32vec& tmp)
     const u_int	nelmsF = F32vec::size,
 		nelms8 = Iu8vec::size;
     in -= nelms8;
-    Iu8vec	in8 = loadu(in);
+    Iu8vec	in8 = load<false>(in);
     out -= nelmsF;
-    storeu(out, backward2(cvt<float>(shift_r<3*nelmsF>(in8)), ci10co10, tmp));
+    store<false>(out,
+		 backward2(cvt<float>(shift_r<3*nelmsF>(in8)), ci10co10, tmp));
     out -= nelmsF;
-    storeu(out, backward2(cvt<float>(shift_r<2*nelmsF>(in8)), ci10co10, tmp));
+    store<false>(out,
+		 backward2(cvt<float>(shift_r<2*nelmsF>(in8)), ci10co10, tmp));
     out -= nelmsF;
-    storeu(out, backward2(cvt<float>(shift_r<nelmsF>(in8)), ci10co10, tmp));
+    store<false>(out,
+		 backward2(cvt<float>(shift_r<nelmsF>(in8)), ci10co10, tmp));
     out -= nelmsF;
-    storeu(out, backward2(cvt<float>(in8), ci10co10, tmp));
+    store<false>(out,
+		 backward2(cvt<float>(in8), ci10co10, tmp));
 }
 
 template <> inline void
@@ -127,7 +134,7 @@ backward2(const float*& in, float*& out, F32vec ci10co10, F32vec& tmp)
     const u_int	nelmsF = F32vec::size;
     in  -= nelmsF;
     out -= nelmsF;
-    storeu(out, backward2(loadu(in), ci10co10, tmp));
+    store<false>(out, backward2(load<false>(in), ci10co10, tmp));
 }
 
 static inline F32vec
@@ -166,17 +173,17 @@ forward4(const u_char*& in, float*& out,
 {
     const u_int	nelmsF = F32vec::size,
 		nelms8 = Iu8vec::size;
-    Iu8vec	in8 = loadu(in);
-    storeu(out, forward4(cvt<float>(in8), ci0123, co0123, tmp));
+    Iu8vec	in8 = load<false>(in);
+    store<false>(out, forward4(cvt<float>(in8), ci0123, co0123, tmp));
     out += nelmsF;
-    storeu(out,
-	   forward4(cvt<float>(shift_r<nelmsF>(in8)), ci0123, co0123, tmp));
+    store<false>(out, forward4(cvt<float>(shift_r<nelmsF>(in8)),
+			       ci0123, co0123, tmp));
     out += nelmsF;
-    storeu(out,
-	   forward4(cvt<float>(shift_r<2*nelmsF>(in8)), ci0123, co0123, tmp));
+    store<false>(out, forward4(cvt<float>(shift_r<2*nelmsF>(in8)),
+			       ci0123, co0123, tmp));
     out += nelmsF;
-    storeu(out,
-	   forward4(cvt<float>(shift_r<3*nelmsF>(in8)), ci0123, co0123, tmp));
+    store<false>(out, forward4(cvt<float>(shift_r<3*nelmsF>(in8)),
+			       ci0123, co0123, tmp));
     out += nelmsF;
     in  += nelms8;
 }
@@ -186,7 +193,7 @@ forward4(const float*& in, float*& out,
 	 F32vec ci0123, F32vec co0123, F32vec& tmp)
 {
     const u_int	nelmsF = F32vec::size;
-    storeu(out, forward4(loadu(in), ci0123, co0123, tmp));
+    store<false>(out, forward4(load<false>(in), ci0123, co0123, tmp));
     out += nelmsF;
     in  += nelmsF;
 }
@@ -201,18 +208,18 @@ backward4(const u_char*& in, float*& out,
     const u_int	nelmsF = F32vec::size,
 		nelms8 = Iu8vec::size;
     in -= nelms8;
-    Iu8vec	in8 = loadu(in);
+    Iu8vec	in8 = load<false>(in);
     out -= nelmsF;
-    storeu(out,
-	   backward4(cvt<float>(shift_r<3*nelmsF>(in8)), ci3210, co3210, tmp));
+    store<false>(out, backward4(cvt<float>(shift_r<3*nelmsF>(in8)),
+				ci3210, co3210, tmp));
     out -= nelmsF;
-    storeu(out,
-	   backward4(cvt<float>(shift_r<2*nelmsF>(in8)), ci3210, co3210, tmp));
+    store<false>(out, backward4(cvt<float>(shift_r<2*nelmsF>(in8)),
+				ci3210, co3210, tmp));
     out -= nelmsF;
-    storeu(out,
-	   backward4(cvt<float>(shift_r<nelmsF>(in8)), ci3210, co3210, tmp));
+    store<false>(out, backward4(cvt<float>(shift_r<nelmsF>(in8)),
+				ci3210, co3210, tmp));
     out -= nelmsF;
-    storeu(out, backward4(cvt<float>(in8), ci3210, co3210, tmp));
+    store<false>(out, backward4(cvt<float>(in8), ci3210, co3210, tmp));
 }
 
 template <> inline void
@@ -222,7 +229,7 @@ backward4(const float*& in, float*& out,
     const u_int	nelmsF = F32vec::size;
     in  -= nelmsF;
     out -= nelmsF;
-    storeu(out, backward4(loadu(in), ci3210, co3210, tmp));
+    store<false>(out, backward4(load<false>(in), ci3210, co3210, tmp));
 }
 }
 #endif
