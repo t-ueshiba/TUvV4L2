@@ -182,17 +182,27 @@ struct type_traits<u_int64_t>
 template <>
 struct type_traits<float>
 {
-    typedef int32_t	int_type;
+    typedef int32_t	signed_type;
+    typedef u_int32_t	unsigned_type;
     typedef void	lower_type;
     typedef double	upper_type;
+    enum
+    {
+	is_signed = true,
+    };
 };
 
 template <>
 struct type_traits<double>
 {
-    typedef int64_t	int_type;
+    typedef int64_t	signed_type;
+    typedef u_int64_t	unsigned_type;
     typedef float	lower_type;
     typedef void	upper_type;
+    enum
+    {
+	is_signed = true,
+    };
 };
 
 /************************************************************************
