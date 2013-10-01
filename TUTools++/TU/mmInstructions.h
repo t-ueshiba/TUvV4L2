@@ -64,6 +64,130 @@
 #include "TU/types.h"
 #include "TU/functional.h"
 
+/************************************************************************
+*  Emulations								*
+************************************************************************/
+// alignr はSSSE3以降でのみサポートされるが，極めて便利なのでemulationバージョンを定義
+#if !defined(SSSE3)
+  static inline __m64
+  _mm_alignr_pi8(__m64 y, __m64 x, const int count)
+  {
+      return _mm_or_si64(_mm_slli_si64(y, 8*(8 - count)),
+			 _mm_srli_si64(x, 8*count));
+  }
+#  if defined(SSE2)
+    static inline __m128i
+    _mm_alignr_epi8(__m128i y, __m128i x, const int count)
+    {
+	return _mm_or_si128(_mm_slli_si128(y, 16 - count),
+			    _mm_srli_si128(x, count));
+    }
+#  endif
+#endif
+
+// AVX以降では alignr が上下のlaneに分断されて使いにくいので，自然なバージョンを定義
+#if defined(AVX2)
+  static inline __m256i
+  _mm256_emu_alignr_epi8(__m256i y, __m256i x, const int count)
+  {
+      if (count < 16)
+	  return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, y, 0x21), x,
+				    count);
+      else
+	  return _mm256_alignr_epi8(y, _mm256_permute2f128_si256(x, y, 0x21),
+				    count - 16);
+  }
+#elif defined(AVX)
+  static inline __m256i
+  _mm256_emu_alignr_epi8(__m256i y, __m256i x, const int count)
+  {
+      if (count < 16)
+	  return _mm256_insertf128_si256(
+		     _mm256_insertf128_si256(
+			 _mm256_undefined_si256(),
+			 _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x1),
+					 _mm256_extractf128_si256(x, 0x0),
+					 count),
+			 0x0),
+		     _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x0),
+				     _mm256_extractf128_si256(x, 0x1),
+				     count),
+		     0x1);
+      else
+	  return _mm256_insertf128_si256(
+		     _mm256_insertf128_si256(
+			 _mm256_undefined_si256(),
+			 _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x0),
+					 _mm256_extractf128_si256(x, 0x1),
+					 count - 16),
+			 0x0),
+		     _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x1),
+				     _mm256_extractf128_si256(y, 0x0),
+				     count - 16),
+		     0x1);
+  }
+#endif
+
+// AVX以降では srli_si256, slli_si256 が上下のlaneに分断されて使いにくいので，
+// 自然なバージョンを定義
+#if defined(AVX2)
+  static inline __m256i
+  _mm256_emu_srli_si256(__m256i x, const int count)
+  {
+      return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x81), x,
+				count);
+  }
+
+  static inline __m256i
+  _mm256_emu_slli_si256(__m256i x, const int count)
+  {
+      if (count < 16)
+	  return _mm256_alignr_epi8(x, _mm256_permute2f128_si256(x, x, 0x08),
+				    16 - count);
+      else
+	  return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x08),
+				    _mm256_setzero_si256(),
+				    32 - count);
+  }
+#elif defined(AVX)
+  static inline __m256i
+  _mm256_emu_srli_si256(__m256i x, const int count)
+  {
+      __m128i	y = _mm256_extractf128_si256(x, 0x1);
+      return _mm256_insertf128_si256(
+		 _mm256_insertf128_si256(
+		     _mm256_undefined_si256(),
+		     _mm_alignr_epi8(y, _mm256_extractf128_si256(x, 0x0),
+				     count),
+		     0x0),
+		 _mm_srli_si128(y, count),
+		 0x1);
+  }
+
+  static inline __m256i
+  _mm256_emu_slli_si256(__m256i x, const int count)
+  {
+      if (count < 16)
+      {
+	  __m128i	y = _mm256_extractf128_si256(x, 0x0);
+	  return _mm256_insertf128_si256(
+		     _mm256_insertf128_si256(_mm256_undefined_si256(),
+					     _mm_slli_si128(y, count),
+					     0x0),
+		     _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x1), y,
+				     16 - count),
+		     0x1);
+      }
+      else
+	  return _mm256_insertf128_si256(
+		     _mm256_setzero_si256(),
+		     _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x0),
+				     _mm_setzero_si128(),
+				     32 - count),
+		     0x1);
+  }
+#endif
+
 /*!
   \namespace	mm
   \brief	Intel SIMD命令を利用するためのクラスおよび関数を納める名前空間
@@ -1186,7 +1310,7 @@ template <u_int I, class T> static vec<T>   insert(vec<T> x, int val)	;
   \param x	ベクトル
   \return	取り出された成分
 */
-template <u_int I, class T> static int	     extract(vec<T> x)		;
+template <u_int I, class T> static int	    extract(vec<T> x)		;
 
 #  if defined(AVX2)
 #    define MM_INSERT_EXTRACT(type)					\
@@ -1319,33 +1443,19 @@ template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
 
 // 整数ベクトルの要素シフト（実装上の注意：MMXでは64bit整数のシフトは
 // bit単位だが，SSE2以上の128bit整数ではbyte単位である．また，AVX2では
-// 2つの128bit整数のシフトとなる．）
+// 上下のlaneに分断されないemulationバージョンを使う．）
 #if defined(AVX2)
 #  define MM_ELM_SHIFTS_I(type)						\
     template <> inline vec<type>					\
     shift_l<0>(vec<type> x)				{return x;}	\
     template <> inline vec<type>					\
     shift_r<0>(vec<type> x)				{return x;}	\
-    template <u_int N> inline vec<type>					\
-    shift_l(vec<type> x)						\
-    {									\
-	if (N < vec<type>::lane_size)					\
-	    return _mm256_alignr_epi8(					\
-		     x, _mm256_permute2f128_si256(x, x, 0x08),		\
-		     (vec<type>::lane_size - N)*vec<type>::value_size);	\
-	else								\
-	    return _mm256_alignr_epi8(					\
-		     _mm256_permute2f128_si256(x, x, 0x08),		\
-		     _mm256_setzero_si256(),				\
-		     (vec<type>::size - N)*vec<type>::value_size);	\
-    }									\
-    template <u_int N> inline vec<type>					\
-    shift_r(vec<type> x)						\
-    {									\
-	return _mm256_alignr_epi8(					\
-		   _mm256_permute2f128_si256(x, x, 0x81), x,		\
-		   N*vec<type>::value_size);				\
-    }
+    template <u_int N>							\
+    MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), emu_slli,		\
+		 (x, N*vec<type>::value_size), void, type, MM_BASE)	\
+    template <u_int N>							\
+    MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), emu_srli,		\
+		 (x, N*vec<type>::value_size), void, type, MM_BASE)
 #elif defined(SSE2)
 #  define MM_ELM_SHIFTS_I(type)						\
     template <> inline vec<type>					\
@@ -1384,32 +1494,142 @@ MM_ELM_SHIFTS_I(u_int64_t)
 #undef MM_ELM_SHIFTS_I
 
 // 浮動小数点数ベクトルの要素シフト
-// （整数ベクトルと同一サイズの場合のみ定義できる）
-#if defined(AVX2) || (!defined(AVX) && defined(SSE2))
-  template <u_int N> inline vec<float>
-  shift_l(vec<float> x)
+#if !defined(AVX2) && defined(AVX)
+  template <u_int N> static inline F32vec
+  shift_l(F32vec x)
+  {
+      return _mm256_castsi256_ps(_mm256_emu_slli_si256(_mm256_castps_si256(x),
+						       N*F32vec::value_size));
+  }
+
+  template <u_int N> static inline F32vec
+  shift_r(F32vec x)
+  {
+      return _mm256_castsi256_ps(_mm256_emu_srli_si256(_mm256_castps_si256(x),
+						       N*F32vec::value_size));
+  }
+
+  template <u_int N> static inline F64vec
+  shift_l(F64vec x)
+  {
+      return _mm256_castsi256_pd(_mm256_emu_slli_si256(_mm256_castpd_si256(x),
+						       N*F64vec::value_size));
+  }
+
+  template <u_int N> static inline F64vec
+  shift_r(F64vec x)
+  {
+      return _mm256_castsi256_pd(_mm256_emu_srli_si256(_mm256_castpd_si256(x),
+						       N*F64vec::value_size));
+  }
+#elif defined(SSE2)
+  template <u_int N> static inline F32vec
+  shift_l(F32vec x)
   {
       return cast<float>(shift_l<N>(cast<u_int32_t>(x)));
   }
 
-  template <u_int N> inline vec<float>
-  shift_r(vec<float> x)
+  template <u_int N> static inline F32vec
+  shift_r(F32vec x)
   {
       return cast<float>(shift_r<N>(cast<u_int32_t>(x)));
   }
 
-  template <u_int N> inline vec<double>
-  shift_l(vec<double> x)
+  template <u_int N> static inline F64vec
+  shift_l(F64vec x)
   {
       return cast<double>(shift_l<N>(cast<u_int64_t>(x)));
   }
 
-  template <u_int N> inline vec<double>
-  shift_r(vec<double> x)
+  template <u_int N> static inline F64vec
+  shift_r(F64vec x)
   {
       return cast<double>(shift_r<N>(cast<u_int64_t>(x)));
   }
 #endif
+
+/************************************************************************
+*  Elementwise concatinated shift operators				*
+************************************************************************/
+//! 2つのベクトルを連結した2倍長のベクトルの要素を右シフトした後，下位ベクトルを取り出す．
+/*!
+  シフト後の上位にはyの要素が入る．
+  \param N	シフト数(成分単位), 0 <= N <= vec<T>::size
+  \param y	上位のベクトル
+  \param x	下位のベクトル
+  \return	シフトされたベクトル
+*/
+template <u_int N, class T> static vec<T> shift_r(vec<T> y, vec<T> x)	;
+
+#if defined(AVX2)
+#  define MM_ELM_SHIFT_R_I2(type)					\
+    template <u_int N>							\
+    MM_TMPL_FUNC(vec<type> shift_r(vec<type> y, vec<type> x),		\
+		 emu_alignr, (y, x, N*vec<type>::value_size),		\
+		 void, int8_t, MM_SIGNED)
+#else
+#  define MM_ELM_SHIFT_R_I2(type)					\
+    template <u_int N>							\
+    MM_TMPL_FUNC(vec<type> shift_r(vec<type> y, vec<type> x),		\
+		 alignr, (y, x, N*vec<type>::value_size),		\
+		 void, int8_t, MM_SIGNED)
+#endif
+MM_ELM_SHIFT_R_I2(int8_t)
+MM_ELM_SHIFT_R_I2(int16_t)
+MM_ELM_SHIFT_R_I2(int32_t)
+MM_ELM_SHIFT_R_I2(int64_t)
+MM_ELM_SHIFT_R_I2(u_int8_t)
+MM_ELM_SHIFT_R_I2(u_int16_t)
+MM_ELM_SHIFT_R_I2(u_int32_t)
+MM_ELM_SHIFT_R_I2(u_int64_t)
+
+#undef MM_ELM_SHIFT_R_I2
+
+// 浮動小数点数ベクトルの要素シフト
+#if !defined(AVX2) && defined(AVX)
+  template <u_int N> static inline F32vec
+  shift_r(F32vec y, F32vec x)
+  {
+      return _mm256_castsi256_ps(_mm256_emu_alignr_epi8(_mm256_castps_si256(y),
+							_mm256_castps_si256(x),
+							N*F32vec::value_size));
+  }
+
+  template <u_int N> static inline F64vec
+  shift_r(F64vec y, F64vec x)
+  {
+      return _mm256_castsi256_pd(_mm256_emu_alignr_epi8(_mm256_castpd_si256(y),
+							_mm256_castpd_si256(x),
+							N*F64vec::value_size));
+  }
+#elif defined(SSE2)
+  template <u_int N> static inline F32vec
+  shift_r(F32vec y, F32vec x)
+  {
+      return cast<float>(shift_r<N>(cast<u_int32_t>(y), cast<u_int32_t>(x)));
+  }
+
+  template <u_int N> static inline F64vec
+  shift_r(F64vec y, F64vec x)
+  {
+      return cast<double>(shift_r<N>(cast<u_int64_t>(y), cast<u_int64_t>(x)));
+  }
+#endif
+
+//! 2つのベクトルを連結した2倍長のベクトルの要素を左シフトした後，上位ベクトルを取り出す．
+/*!
+  シフト後の下位にはxの要素が入る．
+  \param N	シフト数(成分単位), 0 <= N <= vec<T>::size
+  \param y	上位のベクトル
+  \param x	下位のベクトル
+  \return	シフトされたベクトル
+*/
+template <u_int N, class T> static inline vec<T>
+shift_l(vec<T> y, vec<T> x)
+{
+    const u_int	SIZE = vec<T>::size;
+    return shift_r<SIZE - N>(y, x);
+}
 
 /************************************************************************
 *  Element wise shift to left/right-most				*
@@ -1814,14 +2034,14 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 #  undef MM_CVTI_F
 #elif defined(SSE2)
 #  define MM_CVTI_F(itype, suffix)					\
-    template <> inline vec<float>					\
+    template <> inline F32vec						\
     cvt<float>(vec<itype> x)						\
     {									\
 	return MM_MNEMONIC(cvt, _mm_, suffix, ps)(_mm_movepi64_pi64(x));\
     }
 #  define MM_CVTF_I(itype, suffix)					\
     template <> inline vec<itype>					\
-    cvt<itype>(vec<float> x)						\
+    cvt<itype>(F32vec x)						\
     {									\
 	return _mm_movpi64_epi64(MM_MNEMONIC(cvt, _mm_, ps, suffix)(x));\
     }
@@ -2402,6 +2622,24 @@ MM_NUMERIC_FUNC_2(mulhi,      mulhi, int16_t)
 #undef MM_ADD_SUB_U
 #undef MM_SAT_ADD_SUB
 #undef MM_MIN_MAX
+
+template <class T> static inline vec<T>
+operator *(T c, vec<T> x)
+{
+    return vec<T>(c) * x;
+}
+
+template <class T> static inline vec<T>
+operator *(vec<T> x, T c)
+{
+    return x * vec<T>(c);
+}
+
+template <class T> static inline vec<T>
+operator /(vec<T> x, T c)
+{
+    return x / vec<T>(c);
+}
 
 /************************************************************************
 *  "[Greater|Less] than or equal to" operators				*
@@ -3215,6 +3453,96 @@ template <class ITER> cvtup_iterator<ITER>
 make_cvtup_iterator(ITER iter)
 {
     return cvtup_iterator<ITER>(iter);
+}
+
+/************************************************************************
+*  class shift_iterator<ITER>						*
+************************************************************************/
+template <class ITER>
+class shift_iterator
+    : public boost::iterator_adaptor<
+			shift_iterator<ITER>,
+			ITER,
+			boost::use_default,
+			boost::forward_traversal_tag,
+			typename std::iterator_traits<ITER>::value_type>
+{
+  private:
+    typedef boost::iterator_adaptor<
+		shift_iterator,
+		ITER,
+		boost::use_default,
+		boost::forward_traversal_tag,
+		typename std::iterator_traits<ITER>::value_type>	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+		shift_iterator(ITER iter, size_t pos=0)
+		    :super(iter), _pos(0), _val(*iter), _next(), _valid(true)
+		{
+		    while (pos--)
+			increment();
+		}
+
+  private:
+    reference	dereference() const
+		{
+		    if (!_valid)		// !_valid なら必ず _pos == 1
+			load_and_shift();
+		    return _val;
+		}
+    void	increment()
+		{
+		    switch (++_pos)
+		    {
+		      case 1:
+			++super::base_reference();
+			_valid = false;
+			break;
+		      case value_type::size:
+			_pos = 0;		// default:に落ちる
+		      default:
+			if (!_valid)		// !_valid なら必ず _pos == 2
+			    load_and_shift();
+			shift();
+			break;
+		    }
+		}
+    bool	equal(const shift_iterator& iter) const
+		{
+		    return (super::base() == iter.base()) &&
+			   (_pos == iter._pos);
+		}
+    void	load_and_shift() const
+		{
+		    _next  = *super::base();
+		    _valid = true;
+		    shift();
+		}
+    void	shift() const
+		{
+		    _val  = shift_r<1>(_next, _val);
+		    _next = shift_r<1>(_next);
+		}
+
+  private:
+    size_t		_pos;
+    mutable value_type	_val, _next;
+    mutable bool	_valid;		//!< _nextに入力値が読み込まれていればtrue
+};
+
+template <class ITER> shift_iterator<ITER>
+make_shift_iterator(ITER iter)
+{
+    return shift_iterator<ITER>(iter);
 }
 
 }
