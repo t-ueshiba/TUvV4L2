@@ -33,8 +33,10 @@
 /************************************************************************
 *  static functions							*
 ************************************************************************/
+namespace TU
+{
 static const float	slant = 0.41421356;	// tan(M_PI/8)
-    
+
 #if defined(SSE2)
 namespace mm
 {
@@ -108,11 +110,10 @@ eigen(vec<T> a, vec<T> b, vec<T> c)
 			frac = sqrt(diff*diff + b*b);
     return select(avrg > zero<T>(), avrg + frac, avrg - frac);
 }
-}
+
+}	// namespace mm
 #endif
 
-namespace TU
-{
 template <class T> static inline u_int
 dir4(T u, T v)
 {

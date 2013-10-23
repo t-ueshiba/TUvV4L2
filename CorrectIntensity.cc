@@ -33,6 +33,8 @@
 /************************************************************************
 *  static functions							*
 ************************************************************************/
+namespace TU
+{
 #if defined(SSE)
 namespace mm
 {
@@ -77,11 +79,10 @@ correct(float* p, F32vec a, F32vec b)
 {
     store<false>(p, a + b * load<false>(p));
 }
-}
+
+}	// namespace mm
 #endif
 
-namespace TU
-{
 static inline u_char
 toUChar(float val)
 {

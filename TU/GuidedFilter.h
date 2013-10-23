@@ -171,17 +171,17 @@ class GuidedFilter : public BoxFilter
 	class Trans
 	{
 	  public:
-	    typedef Coeff	second_argument_type;
+	    typedef Coeff	first_argument_type;
 	    typedef void	result_type;
 	
 	  public:
 	    Trans(size_t n)	:_n(n)					{}
 
 	    template <class TUPLE>
-	    result_type	operator ()(TUPLE t, second_argument_type coeffs) const
+	    result_type	operator ()(first_argument_type coeffs, TUPLE t) const
 			{
-			    boost::get<0>(t)
-				= coeffs.trans(boost::get<1>(t), _n);
+			    boost::get<1>(t)
+				= coeffs.trans(boost::get<0>(t), _n);
 			}
 	
 	  private:
@@ -276,9 +276,11 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
   // guided filterの2次元係数ベクトルを計算する．
     carray_type	c(super::outLength(std::distance(ib, ie)));
     super::convolve(make_transform_iterator(
-			make_zip_iterator(make_tuple(ib, gb)), params_init()),
+			make_fast_zip_iterator(make_tuple(ib, gb)),
+			params_init()),
 		    make_transform_iterator(
-			make_zip_iterator(make_tuple(ie, ge)), params_init()),
+			make_fast_zip_iterator(make_tuple(ie, ge)),
+			params_init()),
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(winSize(), _e)));
 
@@ -286,7 +288,7 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     std::advance(gb, winSize() - 1);
     super::convolve(c.begin(), c.end(),
 		    make_assignment2_iterator(
-			make_zip_iterator(make_tuple(out, gb)),
+			make_fast_zip_iterator(make_tuple(out, gb)),
 			coeff_trans(winSize())));
 }
 
@@ -321,7 +323,7 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
     std::advance(ib, winSize() - 1);
     super::convolve(c.begin(), c.end(),
 		    make_assignment2_iterator(
-			make_zip_iterator(make_tuple(out, ib)),
+			make_fast_zip_iterator(make_tuple(ib, out)),
 			coeff_trans(winSize())));
 }
 
@@ -389,19 +391,22 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			   super::outColLength(std::distance(ib->begin(),
 							     ib->end())) :
 			   0));
+
     super::convolve(make_row_transform_iterator(
-			make_zip_iterator(make_tuple(ib, gb)), params_init()),
+			make_fast_zip_iterator(make_tuple(ib, gb)),
+			params_init()),
 		    make_row_transform_iterator(
-			make_zip_iterator(make_tuple(ie, ge)), params_init()),
+			make_fast_zip_iterator(make_tuple(ie, ge)),
+			params_init()),
 		    make_row_iterator<assignment_iterator>(c.begin(),
 							   coeff_init(n, _e)));
-			   
+
     const_cast<GuidedFilter2*>(this)->setShift(colWinSize() - 1);
     std::advance(gb,  rowWinSize() - 1);
     std::advance(out, rowWinSize() - 1);
     super::convolve(c.begin(), c.end(),
 		    make_row_iterator<assignment2_iterator>(
-			make_zip_iterator(make_tuple(out, gb)),
+			make_fast_zip_iterator(make_tuple(gb, out)),
 			coeff_trans(n)));
     const_cast<GuidedFilter2*>(this)->setShift(0);
 }
@@ -440,7 +445,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     std::advance(out, rowWinSize() - 1);
     super::convolve(c.begin(), c.end(),
 		    make_row_iterator<assignment2_iterator>(
-			make_zip_iterator(make_tuple(out, ib)),
+			make_fast_zip_iterator(make_tuple(ib, out)),
 			coeff_trans(n)));
     const_cast<GuidedFilter2*>(this)->setShift(0);
 }

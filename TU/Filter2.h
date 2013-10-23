@@ -52,29 +52,23 @@ class Filter2
     class FilterRows
     {
       public:
-	FilterRows(size_t shift, IN const& in, OUT const& out)
-	    :_shift(shift), _in(in), _out(out)				{}
+	FilterRows(IN const& in, OUT const& out, size_t shift)
+	    :_in(in), _out(out), _shift(shift) 				{}
 
-	void	operator ()(const tbb::blocked_range<u_int>& r) const
+	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    typedef typename subiterator<OUT>::type	col_iterator;
-    
-		    IN	in  = _in;
+		    IN	ib = _in, ie = _in;
+		    std::advance(ib, r.begin());
+		    std::advance(ie, r.end());
 		    OUT	out = _out;
-		    std::advance(in,  r.begin());
 		    std::advance(out, r.begin());
-		    for (u_int i = r.begin(); i != r.end(); ++i, ++in, ++out)
-		    {
-			col_iterator	col = out->begin();
-			std::advance(col, _shift);
-			std::copy(in->begin(), in->end(), col);
-		    }
+		    Filter2::filterRows(ib, ie, out, _shift);
 		}
 
       private:
-	size_t const	_shift;
 	IN     const&	_in;
 	OUT    const&	_out;
+	size_t const	_shift;
     };
 #endif
   public:
@@ -87,6 +81,10 @@ class Filter2
     size_t	grainSize()			const	{ return _grainSize; }
     void	setGrainSize(size_t gs)			{ _grainSize = gs; }
 
+  private:
+    template <class IN, class OUT>
+    static void	filterRows(IN ib, IN ie, OUT out, size_t shift)	;
+    
   private:
     size_t	_shift;		// 出力データの水平方向書き込み位置のずらし量
     size_t	_grainSize;
@@ -102,20 +100,26 @@ template <class IN, class OUT> void
 Filter2::operator ()(IN ib, IN ie, OUT out) const
 {
 #if defined(USE_TBB)
-    tbb::parallel_for(tbb::blocked_range<u_int>(0, std::distance(ib, ie),
-						_grainSize),
-		      FilterRows<IN, OUT>(_shift, ib, out));
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, std::distance(ib, ie),
+						 _grainSize),
+		      FilterRows<IN, OUT>(ib, out, _shift));
 #else
+    filterRows(ib, ie, out, _shift);
+#endif
+}
+
+template <class IN, class OUT> void
+Filter2::filterRows(IN ib, IN ie, OUT out, size_t shift)
+{
     typedef typename subiterator<OUT>::type	col_iterator;
-    
+
     for (; ib != ie; ++ib, ++out)
     {
 	col_iterator	col = out->begin();
-	std::advance(col, _shift);
+	std::advance(col, shift);
 	std::copy(ib->begin(), ib->end(), col);
     }
-#endif
 }
-    
+
 }
 #endif	// !__TUFilter2_h

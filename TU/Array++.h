@@ -638,8 +638,8 @@ class Array : public B
     class IsArray
     {
       private:
-	typedef char	Small;
-	struct Big {char dummy[2];};
+	typedef char				Small;
+	struct Big				{ char dummy[2]; };
 
 	template <class T2, class B2>
 	static Small	test(Array<T2, B2>)	;
@@ -647,27 +647,24 @@ class Array : public B
 	static A	makeA()			;
     
       public:
-	enum
-	{
-	    isArray = (sizeof(test(makeA())) == sizeof(Small))
-	};
+	enum		{ value = (sizeof(test(makeA())) == sizeof(Small)) };
     };
     
     template <class T2, bool>
     struct ElementType
     {
-	typedef T2					element_type;
+	typedef T2				type;
     };
     template <class T2>
     struct ElementType<T2, true>
     {
-	typedef typename T2::element_type		element_type;
+	typedef typename T2::element_type	type;
     };
     
   public:
   //! 成分の型
-    typedef typename ElementType<T, IsArray<T>::isArray>
-			::element_type			element_type;
+    typedef typename ElementType<T, IsArray<T>::value>::type
+							element_type;
   //! 要素の型    
     typedef typename super::value_type			value_type;
   //! 要素への参照

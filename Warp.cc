@@ -38,6 +38,8 @@
 #endif
 #include "TU/Warp.h"
 
+namespace TU
+{
 #if defined(SSE)
 namespace mm
 {
@@ -148,11 +150,9 @@ namespace mm
 						 cvt<short, 1>(uc), du),
 			       dv);
   }
-}
+
+}	// namespace mm
 #endif
-    
-namespace TU
-{
 /************************************************************************
 *  static functions							*
 ************************************************************************/
