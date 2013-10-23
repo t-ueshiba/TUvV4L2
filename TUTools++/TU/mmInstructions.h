@@ -57,12 +57,10 @@
 #endif
 
 #if defined(MMX)
+#include <sys/types.h>
 #include <immintrin.h>
 #include <iostream>
 #include <cassert>
-#include <boost/iterator_adaptors.hpp>
-#include "TU/types.h"
-#include "TU/functional.h"
 
 /************************************************************************
 *  Emulations								*
@@ -188,6 +186,8 @@
   }
 #endif
 
+namespace TU
+{
 /*!
   \namespace	mm
   \brief	Intel SIMD命令を利用するためのクラスおよび関数を納める名前空間
@@ -601,6 +601,13 @@ print(std::ostream& out, const vec<T>& x)
 }
 
 /************************************************************************
+*  Predicates for boost::mpl						*
+************************************************************************/
+//! 与えられた型が何らかの mm::vec であるかを判定する boost::mpl 用の predicate
+template <class T> struct is_vec		{ enum { value = false }; };
+template <class T> struct is_vec<vec<T> >	{ enum { value = true  }; };
+
+/************************************************************************
 *  Macros for constructing mnemonics of intrinsics			*
 ************************************************************************/
 #define MM_PREFIX(type)		MM_PREFIX_##type
@@ -936,13 +943,13 @@ static void	store(T* p, vec<T> x)					;
 #if defined(SSE)
 #  define MM_LOAD_STORE(type)						\
     MM_FUNC(vec<type> load<true>(const type* p), load,			\
-	    ((const type*)p), void, type, MM_BASE)			\
+	    (p), void, type, MM_BASE)					\
     MM_FUNC(vec<type> load<false>(const type* p), loadu,		\
-	    ((const type*)p), void, type, MM_BASE)			\
+	    (p), void, type, MM_BASE)					\
     MM_FUNC(void store<true>(type* p, vec<type> x), store,		\
-	    ((type*)p, x), void, type, MM_BASE)				\
+	    (p, x), void, type, MM_BASE)				\
     MM_FUNC(void store<false>(type* p, vec<type> x), storeu,		\
-	    ((type*)p, x), void, type, MM_BASE)
+	    (p, x), void, type, MM_BASE)
 
   MM_LOAD_STORE(float)
 #  if defined(SSE2)
@@ -1058,7 +1065,7 @@ cast_base(ivec_t x)
   \param x	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
+template <size_t I3, size_t I2, size_t I1, size_t I0, class T> static vec<T>
 shuffle_low(vec<T> x)							;
 
 //! 8つの成分を持つ整数ベクトルの上位4成分をシャッフルする．
@@ -1071,7 +1078,7 @@ shuffle_low(vec<T> x)							;
   \param x	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
+template <size_t I3, size_t I2, size_t I1, size_t I0, class T> static vec<T>
 shuffle_high(vec<T> x)							;
 
 //! 4つの成分を持つ整数ベクトルの成分をシャッフルする．
@@ -1083,20 +1090,20 @@ shuffle_high(vec<T> x)							;
   \param x	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <u_int I3, u_int I2, u_int I1, u_int I0, class T> static vec<T>
+template <size_t I3, size_t I2, size_t I1, size_t I0, class T> static vec<T>
 shuffle(vec<T> x)							;
 
 #define MM_SHUFFLE_LOW_HIGH_I4(type)					\
-    template <u_int I3, u_int I2, u_int I1, u_int I0>			\
+    template <size_t I3, size_t I2, size_t I1, size_t I0>		\
     MM_TMPL_FUNC(vec<type> shuffle_low(vec<type> x),			\
 		 shufflelo, (x, _MM_SHUFFLE(I3, I2, I1, I0)),		\
 		 void, type, MM_SIGNED)					\
-    template <u_int I3, u_int I2, u_int I1, u_int I0>			\
+    template <size_t I3, size_t I2, size_t I1, size_t I0>		\
     MM_TMPL_FUNC(vec<type> shuffle_high(vec<type> x),			\
 		 shufflehi, (x, _MM_SHUFFLE(I3, I2, I1, I0)),		\
 		 void, type, MM_SIGNED)
 #define MM_SHUFFLE_I4(type)						\
-    template <u_int I3, u_int I2, u_int I1, u_int I0>			\
+    template <size_t I3, size_t I2, size_t I1, size_t I0>		\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x),			\
 		 shuffle, (x, _MM_SHUFFLE(I3, I2, I1, I0)),		\
 		 void, type, MM_SIGNED)
@@ -1125,7 +1132,7 @@ shuffle(vec<T> x)							;
   \param y	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <u_int Yh, u_int Yl, u_int Xh, u_int Xl, class T> static vec<T>
+template <size_t Yh, size_t Yl, size_t Xh, size_t Xl, class T> static vec<T>
 shuffle(vec<T> x, vec<T> y)						;
 
 //! 2つの成分を持つ2つの浮動小数点数ベクトルの成分をシャッフルする．
@@ -1137,23 +1144,23 @@ shuffle(vec<T> x, vec<T> y)						;
   \param y	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <u_int Y, u_int X, class T> static vec<T>
+template <size_t Y, size_t X, class T> static vec<T>
 shuffle(vec<T> x, vec<T> y)						;
 
 #define _MM_SHUFFLE4(i3, i2, i1, i0)					\
     (((i3) << 3) | ((i2) << 2) | ((i1) << 1) | (i0))
 #define MM_SHUFFLE_F4(type)						\
-    template <u_int Yh, u_int Yl, u_int Xh, u_int Xl>			\
+    template <size_t Yh, size_t Yl, size_t Xh, size_t Xl>		\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x, vec<type> y),		\
 		 shuffle, (x, y, _MM_SHUFFLE(Yh, Yl, Xh, Xl)),		\
 		 void, type, MM_SUFFIX)
 #define MM_SHUFFLE_D4(type)						\
-    template <u_int Yh, u_int Yl, u_int Xh, u_int Xl>			\
+    template <size_t Yh, size_t Yl, size_t Xh, size_t Xl>		\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x, vec<type> y),		\
 		 shuffle, (x, y, _MM_SHUFFLE4(Yh, Yl, Xh, Xl)),		\
 		 void, type, MM_SUFFIX)
 #define MM_SHUFFLE_D2(type)						\
-    template <u_int Y, u_int X>						\
+    template <size_t Y, size_t X>					\
     MM_TMPL_FUNC(vec<type> shuffle(vec<type> x, vec<type> y),		\
 		 shuffle, (x, y, _MM_SHUFFLE2(Y, X)),			\
 		 void, type, MM_SUFFIX)
@@ -1180,20 +1187,20 @@ shuffle(vec<T> x, vec<T> y)						;
   \param x	2つ，または4つの成分を持つベクトル
   \return	生成されたベクトル
 */
-template <u_int N, class T> static inline vec<T>
+template <size_t N, class T> static inline vec<T>
 set1(vec<T> x)
 {
       return shuffle<N, N, N, N>(x);
 }
 
 #if defined(SSE)
-  template <u_int N> static inline F32vec
+  template <size_t N> static inline F32vec
   set1(F32vec x)		{return shuffle<N, N, N, N>(x, x);}
 #  if defined(AVX)
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   set1(F64vec x)		{return shuffle<N, N, N, N>(x, x);}
 #  elif defined(SSE2)
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   set1(F64vec x)		{return shuffle<N, N>(x, x);}
 #  endif
 #endif
@@ -1243,21 +1250,21 @@ MM_UNPACK_LOW_HIGH(u_int32_t)
 ************************************************************************/
 // 複製数：N = 2, 4, 8, 16,...;
 // 全体をN個の部分に分けたときの複製区間：0 <= I < N
-template <u_int N, u_int I, class T> static vec<T>	n_tuple(vec<T> x);
+template <size_t N, size_t I, class T> static vec<T>	n_tuple(vec<T> x);
 
-template <u_int I, class T> static inline vec<T>
+template <size_t I, class T> static inline vec<T>
 dup(vec<T> x)
 {
     return n_tuple<2, I>(x);
 }
 
-template <u_int I, class T> static inline vec<T>
+template <size_t I, class T> static inline vec<T>
 quadup(vec<T> x)
 {
     return n_tuple<4, I>(x);
 }
     
-template <u_int I, class T> static inline vec<T>
+template <size_t I, class T> static inline vec<T>
 octup(vec<T> x)
 {
     return n_tuple<8, I>(x);
@@ -1269,7 +1276,7 @@ octup(vec<T> x)
     template <> inline vec<type>					\
     n_tuple<2, 1>(vec<type> x)		{return unpack_high(x, x);}
 
-template <u_int N, u_int I, class T> inline vec<T>
+template <size_t N, size_t I, class T> inline vec<T>
 n_tuple(vec<T> x)
 {
     return n_tuple<2, (I&0x1)>(n_tuple<(N>>1), (I>>1)>(x));
@@ -1302,7 +1309,7 @@ MM_N_TUPLE(u_int32_t)
   \param x	ベクトル
   \return	成分を挿入されたベクトル
 */
-template <u_int I, class T> static vec<T>   insert(vec<T> x, int val)	;
+template <size_t I, class T> static vec<T>   insert(vec<T> x, int val)	;
 
 //! ベクトルから指定された位置から成分を取り出す．
 /*!
@@ -1310,11 +1317,11 @@ template <u_int I, class T> static vec<T>   insert(vec<T> x, int val)	;
   \param x	ベクトル
   \return	取り出された成分
 */
-template <u_int I, class T> static int	    extract(vec<T> x)		;
+template <size_t I, class T> static int	    extract(vec<T> x)		;
 
 #  if defined(AVX2)
 #    define MM_INSERT_EXTRACT(type)					\
-      template <u_int I> inline vec<type>				\
+      template <size_t I> inline vec<type>				\
       insert(vec<type> x, int val)					\
       {									\
 	  return _mm256_insertf128_si256(				\
@@ -1325,7 +1332,7 @@ template <u_int I, class T> static int	    extract(vec<T> x)		;
 			 val, I % vec<type>::lane_size),		\
 		     I / vec<type>::lane_size);				\
       }									\
-      template <u_int I> inline int					\
+      template <size_t I> inline int					\
       extract(vec<type> x)						\
       {									\
 	  return MM_MNEMONIC(extract, _mm_, , MM_SIGNED(type))(		\
@@ -1336,10 +1343,10 @@ template <u_int I, class T> static int	    extract(vec<T> x)		;
 
 #  else
 #    define MM_INSERT_EXTRACT(type)					\
-      template <u_int I>		 				\
+      template <size_t I>		 				\
       MM_TMPL_FUNC(vec<type> insert(vec<type> x, int val), insert,	\
 		   (x, val, I), void, type, MM_SIGNED)			\
-      template <u_int I>						\
+      template <size_t I>						\
       MM_TMPL_FUNC(int extract(vec<type> x), extract,			\
 		   (x, I), void, type, MM_SIGNED)
 #  endif
@@ -1356,7 +1363,7 @@ template <u_int I, class T> static int	    extract(vec<T> x)		;
 #  undef MM_INSERT_EXTRACT
 
 #  if defined(AVX)
-    template <u_int I> inline F32vec
+    template <size_t I> inline F32vec
     insert(F32vec x, float val)
     {
 	return _mm256_insertf128_ps(x,
@@ -1368,14 +1375,14 @@ template <u_int I, class T> static int	    extract(vec<T> x)		;
 				    I / F32vec::lane_size);
     }
 #  elif defined(SSE4)
-    template <u_int I> inline F32vec
+    template <size_t I> inline F32vec
     insert(F32vec x, float val)
     {
 	return _mm_insert_ps(x, _mm_set_ss(val), I << 4);
     }
 #  endif
 
-template <u_int I> float	extract(F32vec x)			;
+template <size_t I> float	extract(F32vec x)			;
 #  if defined(AVX)
     template <> inline float
     extract<0>(F32vec x)
@@ -1397,7 +1404,7 @@ template <u_int I> float	extract(F32vec x)			;
 #  endif
 
 #  if defined(SSE2)
-    template <u_int I> double	extract(F64vec x)			;
+    template <size_t I> double	extract(F64vec x)			;
 #    if defined(AVX)
       template <> inline double
       extract<0>(F64vec x)
@@ -1430,7 +1437,7 @@ template <u_int I> float	extract(F32vec x)			;
   \param x	シフトされるベクトル
   \return	シフトされたベクトル
 */
-template <u_int N, class T> static vec<T>	shift_l(vec<T> x)	;
+template <size_t N, class T> static vec<T>	shift_l(vec<T> x)	;
 
 //! ベクトルの要素を右シフトする．
 /*!
@@ -1439,7 +1446,7 @@ template <u_int N, class T> static vec<T>	shift_l(vec<T> x)	;
   \param x	シフトされるベクトル
   \return	シフトされたベクトル
 */
-template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
+template <size_t N, class T> static vec<T>	shift_r(vec<T> x)	;
 
 // 整数ベクトルの要素シフト（実装上の注意：MMXでは64bit整数のシフトは
 // bit単位だが，SSE2以上の128bit整数ではbyte単位である．また，AVX2では
@@ -1450,10 +1457,10 @@ template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
     shift_l<0>(vec<type> x)				{return x;}	\
     template <> inline vec<type>					\
     shift_r<0>(vec<type> x)				{return x;}	\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), emu_slli,		\
 		 (x, N*vec<type>::value_size), void, type, MM_BASE)	\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), emu_srli,		\
 		 (x, N*vec<type>::value_size), void, type, MM_BASE)
 #elif defined(SSE2)
@@ -1462,10 +1469,10 @@ template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
     shift_l<0>(vec<type> x)				{return x;}	\
     template <> inline vec<type>					\
     shift_r<0>(vec<type> x)				{return x;}	\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), slli,			\
 		 (x, N*vec<type>::value_size), void, type, MM_BASE)	\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), srli,			\
 		 (x, N*vec<type>::value_size), void, type, MM_BASE)
 #else
@@ -1474,10 +1481,10 @@ template <u_int N, class T> static vec<T>	shift_r(vec<T> x)	;
     shift_l<0>(vec<type> x)				{return x;}	\
     template <> inline vec<type>					\
     shift_r<0>(vec<type> x)				{return x;}	\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), slli,			\
 		 (x, 8*N*vec<type>::value_size), void, type, MM_BASE)	\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), srli,			\
 		 (x, 8*N*vec<type>::value_size), void, type, MM_BASE)
 #endif
@@ -1495,53 +1502,53 @@ MM_ELM_SHIFTS_I(u_int64_t)
 
 // 浮動小数点数ベクトルの要素シフト
 #if !defined(AVX2) && defined(AVX)
-  template <u_int N> static inline F32vec
+  template <size_t N> static inline F32vec
   shift_l(F32vec x)
   {
       return _mm256_castsi256_ps(_mm256_emu_slli_si256(_mm256_castps_si256(x),
 						       N*F32vec::value_size));
   }
 
-  template <u_int N> static inline F32vec
+  template <size_t N> static inline F32vec
   shift_r(F32vec x)
   {
       return _mm256_castsi256_ps(_mm256_emu_srli_si256(_mm256_castps_si256(x),
 						       N*F32vec::value_size));
   }
 
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   shift_l(F64vec x)
   {
       return _mm256_castsi256_pd(_mm256_emu_slli_si256(_mm256_castpd_si256(x),
 						       N*F64vec::value_size));
   }
 
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   shift_r(F64vec x)
   {
       return _mm256_castsi256_pd(_mm256_emu_srli_si256(_mm256_castpd_si256(x),
 						       N*F64vec::value_size));
   }
 #elif defined(SSE2)
-  template <u_int N> static inline F32vec
+  template <size_t N> static inline F32vec
   shift_l(F32vec x)
   {
       return cast<float>(shift_l<N>(cast<u_int32_t>(x)));
   }
 
-  template <u_int N> static inline F32vec
+  template <size_t N> static inline F32vec
   shift_r(F32vec x)
   {
       return cast<float>(shift_r<N>(cast<u_int32_t>(x)));
   }
 
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   shift_l(F64vec x)
   {
       return cast<double>(shift_l<N>(cast<u_int64_t>(x)));
   }
 
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   shift_r(F64vec x)
   {
       return cast<double>(shift_r<N>(cast<u_int64_t>(x)));
@@ -1559,17 +1566,17 @@ MM_ELM_SHIFTS_I(u_int64_t)
   \param x	下位のベクトル
   \return	シフトされたベクトル
 */
-template <u_int N, class T> static vec<T> shift_r(vec<T> y, vec<T> x)	;
+template <size_t N, class T> static vec<T> shift_r(vec<T> y, vec<T> x)	;
 
 #if defined(AVX2)
 #  define MM_ELM_SHIFT_R_I2(type)					\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> y, vec<type> x),		\
 		 emu_alignr, (y, x, N*vec<type>::value_size),		\
 		 void, int8_t, MM_SIGNED)
 #else
 #  define MM_ELM_SHIFT_R_I2(type)					\
-    template <u_int N>							\
+    template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> y, vec<type> x),		\
 		 alignr, (y, x, N*vec<type>::value_size),		\
 		 void, int8_t, MM_SIGNED)
@@ -1587,7 +1594,7 @@ MM_ELM_SHIFT_R_I2(u_int64_t)
 
 // 浮動小数点数ベクトルの要素シフト
 #if !defined(AVX2) && defined(AVX)
-  template <u_int N> static inline F32vec
+  template <size_t N> static inline F32vec
   shift_r(F32vec y, F32vec x)
   {
       return _mm256_castsi256_ps(_mm256_emu_alignr_epi8(_mm256_castps_si256(y),
@@ -1595,7 +1602,7 @@ MM_ELM_SHIFT_R_I2(u_int64_t)
 							N*F32vec::value_size));
   }
 
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   shift_r(F64vec y, F64vec x)
   {
       return _mm256_castsi256_pd(_mm256_emu_alignr_epi8(_mm256_castpd_si256(y),
@@ -1603,13 +1610,13 @@ MM_ELM_SHIFT_R_I2(u_int64_t)
 							N*F64vec::value_size));
   }
 #elif defined(SSE2)
-  template <u_int N> static inline F32vec
+  template <size_t N> static inline F32vec
   shift_r(F32vec y, F32vec x)
   {
       return cast<float>(shift_r<N>(cast<u_int32_t>(y), cast<u_int32_t>(x)));
   }
 
-  template <u_int N> static inline F64vec
+  template <size_t N> static inline F64vec
   shift_r(F64vec y, F64vec x)
   {
       return cast<double>(shift_r<N>(cast<u_int64_t>(y), cast<u_int64_t>(x)));
@@ -1624,7 +1631,7 @@ MM_ELM_SHIFT_R_I2(u_int64_t)
   \param x	下位のベクトル
   \return	シフトされたベクトル
 */
-template <u_int N, class T> static inline vec<T>
+template <size_t N, class T> static inline vec<T>
 shift_l(vec<T> y, vec<T> x)
 {
     const u_int	SIZE = vec<T>::size;
@@ -1790,7 +1797,7 @@ MM_LOGICAL_SHIFT_RIGHT(u_int64_t)
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class S, u_int I=0, class T> static inline vec<S>
+template <class S, size_t I=0, class T> static inline vec<S>
 cvt(vec<T> x)
 {
     typedef typename type_traits<S>::lower_type	L;
@@ -2711,7 +2718,7 @@ diff(Iu16vec x, Iu16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
 /************************************************************************
 *  Horizontal sum of vector elements					*
 ************************************************************************/
-template <u_int I, u_int N, class T> static inline vec<T>
+template <size_t I, size_t N, class T> static inline vec<T>
 hsum(vec<T> x)
 {
     if (I < N)
@@ -3022,530 +3029,49 @@ inline void	empty()			{_mm_empty();}
 #undef MM_NUMERIC_FUNC_2R
 
 /************************************************************************
-*  class load_iterator<T, ALIGNED>					*
+*  functions for supporting memory alignment				*
 ************************************************************************/
-template <class T, bool ALIGNED=false>
-class load_iterator : public boost::iterator_adaptor<load_iterator<T>,
-						     const T*,
-						     vec<T>,
-						     boost::use_default,
-						     vec<T> >
+//! 指定されたアドレスがアライメントされているか調べる
+/*!
+  \param p	調べたいアドレス
+  \return	アライメントされていれば true, そうでなければ flase
+*/
+template <class T> inline bool
+is_aligned(T* p)
 {
-  private:
-    typedef boost::iterator_adaptor<load_iterator,
-				    const T*,
-				    vec<T>,
-				    boost::use_default,
-				    vec<T> >	super;
-
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
-
-  public:
-    load_iterator(const T* p)	:super(p)	{}
-
-  private:
-    reference		dereference() const
-			{
-			    return load<ALIGNED>(super::base());
-			}
-    void		advance(difference_type n)
-			{
-			    super::base_reference() += n * value_type::size;
-			}
-    void		increment()
-			{
-			    super::base_reference() += value_type::size;
-			}
-    void		decrement()
-			{
-			    super::base_reference() -= value_type::size;
-			}
-    difference_type	distance_to(load_iterator iter) const
-			{
-			    return (iter.base() - super::base())
-				 * value_type::size;
-			}
-};
-
-template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
-make_load_iterator(const T* p)
+    return (reinterpret_cast<size_t>(p) % sizeof(vec<T>) == 0);
+}
+    
+//! 指定されたアドレスの直後のアライメントされているアドレスを返す
+/*!
+  \param p	アドレス
+  \return	pの直後(pを含む)のアライメントされているアドレス
+*/
+template <class T> inline T*
+begin(T* p)
 {
-    return load_iterator<T, ALIGNED>(p);
+    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
+    const size_t	vsize = vec<T>::size;
+    
+    return p + (vsize - 1 - (nelms - 1) % vsize);
+}
+    
+//! 指定されたアドレスの直前のアライメントされているアドレスを返す
+/*!
+  \param p	アドレス
+  \return	pの直前(pを含む)のアライメントされているアドレス
+*/
+template <class T> inline T*
+end(T* p)
+{
+    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
+    const size_t	vsize = vec<T>::size;
+    
+    return p - (nelms % vsize);
 }
 
-/************************************************************************
-*  class store_iterator<T, ALIGNED>					*
-************************************************************************/
-namespace detail
-{
-    template <class T, bool ALIGNED>
-    class store_proxy
-    {
-      public:
-	store_proxy(T* p)	:_p(p)		{}
-	
-	const store_proxy&	operator =(vec<T> val) const
-				{
-				    store<ALIGNED>(_p, val);
-				    return *this;
-				}
-	const store_proxy&	operator +=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) + val);
-				    return *this;
-				}
-	const store_proxy&	operator -=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) - val);
-				    return *this;
-				}
-	const store_proxy&	operator *=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) * val);
-				    return *this;
-				}
-	const store_proxy&	operator /=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) / val);
-				    return *this;
-				}
-	const store_proxy&	operator %=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) % val);
-				    return *this;
-				}
-	const store_proxy&	operator &=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) & val);
-				    return *this;
-				}
-	const store_proxy&	operator |=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) | val);
-				    return *this;
-				}
-	const store_proxy&	operator ^=(vec<T> val) const
-				{
-				    store<ALIGNED>(_p,
-						   load<ALIGNED>(_p) ^ val);
-				    return *this;
-				}
-
-      private:
-	T* const		_p;
-    };
-}
-
-template <class T, bool ALIGNED=false>
-class store_iterator
-    : public boost::iterator_adaptor<store_iterator<T, ALIGNED>,
-				     T*,
-				     vec<T>,
-				     boost::use_default,
-				     detail::store_proxy<T, ALIGNED> >
-{
-  private:
-    typedef boost::iterator_adaptor<store_iterator,
-				    T*,
-				    vec<T>,
-				    boost::use_default,
-				    detail::store_proxy<T, ALIGNED> >	super;
-
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
-
-  public:
-    store_iterator(T* p)	:super(p)	{}
-
-  private:
-    reference		dereference() const
-			{
-			    return reference(super::base());
-			}
-    void		advance(difference_type n)
-			{
-			    super::base_reference() += n * value_type::size;
-			}
-    void		increment()
-			{
-			    super::base_reference() += value_type::size;
-			}
-    void		decrement()
-			{
-			    super::base_reference() -= value_type::size;
-			}
-    difference_type	distance_to(store_iterator iter) const
-			{
-			    return (iter.base() - super::base())
-				 * value_type::size;
-			}
-};
-
-template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
-make_store_iterator(T* p)
-{
-    return store_iterator<T, ALIGNED>(p);
-}
-
-/************************************************************************
-*  class cvtdown_iterator<T, ITER>					*
-************************************************************************/
-template <class T, class ITER>
-class cvtdown_iterator
-    : public boost::iterator_adaptor<
-		cvtdown_iterator<T, ITER>,			// self
-		ITER,						// base
-		vec<T>,						// value_type
-		boost::single_pass_traversal_tag,		// traversal
-		vec<T> >					// reference
-{
-  private:
-    typedef boost::iterator_adaptor<cvtdown_iterator,
-				    ITER,
-				    vec<T>, 
-				    boost::single_pass_traversal_tag,
-				    vec<T> >		super;
-    typedef typename std::iterator_traits<ITER>
-			::value_type::value_type	element_type;
-    typedef typename type_traits<element_type>::lower_type
-							lower_type;
-    typedef typename type_traits<lower_type>::signed_type
-							signed_lower_type;
-    typedef typename type_traits<lower_type>::unsigned_type
-							unsigned_lower_type;
-
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
-
-  public:
-		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
-
-  private:
-    reference	dereference() const
-		{
-		    reference	x;
-		    const_cast<cvtdown_iterator*>(this)->cvtdown(x);
-		    return x;
-		}
-    void	advance(difference_type n)				{}
-    void	increment()						{}
-    void	decrement()						{}
-    template <class S>
-    void	cvtdown(vec<S>& x)
-		{
-		    vec<typename type_traits<S>::upper_type>	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<S>(y, z);
-		}
-    void	cvtdown(vec<signed_lower_type>& x)
-		{
-		    vec<element_type>	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<signed_lower_type>(y, z);
-		}
-    void	cvtdown(vec<unsigned_lower_type>& x)
-		{
-		    vec<element_type>	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<unsigned_lower_type>(y, z);
-		}
-    void	cvtdown(vec<element_type>& x)
-		{
-		    x = *super::base();
-		    ++super::base_reference();
-		}
-};
-
-template <class T, class ITER> cvtdown_iterator<T, ITER>
-make_cvtdown_iterator(ITER iter)
-{
-    return cvtdown_iterator<T, ITER>(iter);
-}
-
-/************************************************************************
-*  class cvtup_iterator<ITER>						*
-************************************************************************/
-namespace detail
-{
-    template <class ITER>
-    class cvtup_proxy
-    {
-      private:
-	typedef typename std::iterator_traits<ITER>::value_type	value_type;
-	typedef typename value_type::value_type			element_type;
-	typedef typename std::iterator_traits<ITER>::reference	reference;
-	typedef typename type_traits<element_type>::lower_type	lower_type;
-	typedef typename type_traits<lower_type>::signed_type
-							signed_lower_type;
-	typedef typename type_traits<lower_type>::unsigned_type
-							unsigned_lower_type;
-
-	template <class OP, class T>
-	void		cvtup(vec<T> x)
-			{
-			    typedef typename type_traits<T>::upper_type	U;
-
-			    cvtup<OP>(cvt<U, 0>(x));
-			    cvtup<OP>(cvt<U, 1>(x));
-			}
-	template <class OP>
-	void		cvtup(vec<signed_lower_type> x)
-			{
-			    cvtup<OP>(cvt<element_type, 0>(x));
-			    cvtup<OP>(cvt<element_type, 1>(x));
-			}
-	template <class OP>
-	void		cvtup(vec<unsigned_lower_type> x)
-			{
-			    cvtup<OP>(cvt<element_type, 0>(x));
-			    cvtup<OP>(cvt<element_type, 1>(x));
-			}
-	template <class OP>
-	void		cvtup(vec<element_type> x)
-			{
-			    OP()(*_iter, x);
-			    ++_iter;
-			}
-
-      public:
-	cvtup_proxy(ITER const& iter)	:_iter(const_cast<ITER&>(iter))	{}
-
-	template <class T>
-	cvtup_proxy&	operator =(vec<T> x)
-			{
-			    cvtup<TU::assign<reference, value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator +=(vec<T> x)
-			{
-			    cvtup<TU::assign_plus<reference, value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator -=(vec<T> x)
-			{
-			    cvtup<TU::assign_minus<reference, value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator *=(vec<T> x)
-			{
-			    cvtup<TU::assign_multiplies<reference,
-							value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator /=(vec<T> x)
-			{
-			    cvtup<TU::assign_divides<refernece,
-						     value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator %=(vec<T> x)
-			{
-			    cvtup<TU::assign_modulus<reference,
-						     value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator &=(vec<T> x)
-			{
-			    cvtup<TU::assign_bit_and<reference,
-						     value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator |=(vec<T> x)
-			{
-			    cvtup<TU::assign_bit_or<reference,
-						    value_type> >(x);
-			    return *this;
-			}
-	template <class T>
-	cvtup_proxy&	operator ^=(vec<T> x)
-			{
-			    cvtup<TU::assign_bit_xor<reference,
-						     value_type> >(x);
-			    return *this;
-			}
-	
-      private:
-	ITER&		_iter;
-    };
-}
-
-template <class ITER>
-class cvtup_iterator
-    : public boost::iterator_adaptor<cvtup_iterator<ITER>,
-				     ITER,
-				     typename std::iterator_traits<ITER>
-						 ::value_type,
-				     boost::single_pass_traversal_tag,
-				     detail::cvtup_proxy<ITER> >
-{
-  private:
-    typedef boost::iterator_adaptor<cvtup_iterator,
-				    ITER,
-				    typename std::iterator_traits<ITER>
-						::value_type,
-				    boost::single_pass_traversal_tag,
-				    detail::cvtup_proxy<ITER> >	super;
-
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
-
-  public:
-    cvtup_iterator(ITER const& iter)	:super(iter)			{}
-
-  private:
-    reference		dereference() const
-			{
-			    return reference(super::base());
-			}
-    void		advance(difference_type n)			{}
-    void		increment()					{}
-    void		decrement()					{}
-    difference_type	distance_to(cvtup_iterator iter) const
-			{
-			    return (iter.base() - super::base())
-				 * value_type::size;
-			}
-};
-
-template <class ITER> cvtup_iterator<ITER>
-make_cvtup_iterator(ITER iter)
-{
-    return cvtup_iterator<ITER>(iter);
-}
-
-/************************************************************************
-*  class shift_iterator<ITER>						*
-************************************************************************/
-template <class ITER>
-class shift_iterator
-    : public boost::iterator_adaptor<
-			shift_iterator<ITER>,
-			ITER,
-			boost::use_default,
-			boost::forward_traversal_tag,
-			typename std::iterator_traits<ITER>::value_type>
-{
-  private:
-    typedef boost::iterator_adaptor<
-		shift_iterator,
-		ITER,
-		boost::use_default,
-		boost::forward_traversal_tag,
-		typename std::iterator_traits<ITER>::value_type>	super;
-
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
-
-  public:
-		shift_iterator(ITER iter, size_t pos=0)
-		    :super(iter), _pos(0), _val(*iter), _next(), _valid(true)
-		{
-		    while (pos--)
-			increment();
-		}
-
-  private:
-    reference	dereference() const
-		{
-		    if (!_valid)		// !_valid なら必ず _pos == 1
-			load_and_shift();
-		    return _val;
-		}
-    void	increment()
-		{
-		    switch (++_pos)
-		    {
-		      case 1:
-			++super::base_reference();
-			_valid = false;
-			break;
-		      case value_type::size:
-			_pos = 0;		// default:に落ちる
-		      default:
-			if (!_valid)		// !_valid なら必ず _pos == 2
-			    load_and_shift();
-			shift();
-			break;
-		    }
-		}
-    bool	equal(const shift_iterator& iter) const
-		{
-		    return (super::base() == iter.base()) &&
-			   (_pos == iter._pos);
-		}
-    void	load_and_shift() const
-		{
-		    _next  = *super::base();
-		    _valid = true;
-		    shift();
-		}
-    void	shift() const
-		{
-		    _val  = shift_r<1>(_next, _val);
-		    _next = shift_r<1>(_next);
-		}
-
-  private:
-    size_t		_pos;
-    mutable value_type	_val, _next;
-    mutable bool	_valid;		//!< _nextに入力値が読み込まれていればtrue
-};
-
-template <class ITER> shift_iterator<ITER>
-make_shift_iterator(ITER iter)
-{
-    return shift_iterator<ITER>(iter);
-}
-
-}
+}	// namespace mm
+}	// namespace TU
 #endif	// MMX
 
 #endif	// !__mmInstructions_h

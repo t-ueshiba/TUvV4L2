@@ -39,6 +39,8 @@ HDRS		= TU/Array++.h \
 		TU/DericheConvolver.h \
 		TU/EdgeDetector.h \
 		TU/Expression++.h \
+		TU/FIRFilter.h \
+		TU/FIRGaussianConvolver.h \
 		TU/Filter2.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
@@ -78,6 +80,7 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		ConversionFromYUV.cc \
 		CorrectIntensity.cc \
 		EdgeDetector.cc \
+		FIRGaussianCoefficients.cc \
 		GaussianCoefficients.cc \
 		GenericImage.cc \
 		Image++.inst.cc \
@@ -98,6 +101,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		ConversionFromYUV.o \
 		CorrectIntensity.o \
 		EdgeDetector.o \
+		FIRGaussianCoefficients.o \
 		GaussianCoefficients.o \
 		GenericImage.o \
 		Image++.inst.o \
@@ -127,6 +131,9 @@ CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/Geometry++.h \
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/Geometry++.h \
 	TU/iterator.h TU/functional.h TU/Vector++.h TU/Array++.h TU/types.h \
 	TU/Minimize.h TU/mmInstructions.h
+FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
+	TU/iterator.h TU/functional.h TU/SeparableFilter2.h TU/Array++.h \
+	TU/types.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/types.h TU/IIRFilter.h TU/SeparableFilter2.h TU/iterator.h \
 	TU/functional.h TU/mmInstructions.h TU/Minimize.h

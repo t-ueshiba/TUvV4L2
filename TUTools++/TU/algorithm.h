@@ -149,6 +149,21 @@ op3x3(Iterator begin, Iterator end, OP op)
 	*p = *q;			// 次行の上画素 = 注目画素
     }
 }
+
+//! 2つのシーケンスの個々の要素に2変数関数を適用する.
+/*!
+  \param begin1	第1のシーケンスの先頭要素を指す反復子
+  \param end1	第1のシーケンスの末尾要素の次を指す反復子
+  \param begin2	第2のシーケンスの先頭要素を指す反復子
+  \param func	適用する2変数関数
+*/
+template <class Iterator1, class Iterator2, class FUNC> FUNC
+for_each(Iterator1 begin1, Iterator1 end1, Iterator2 begin2, FUNC func)
+{
+    for (; begin1 != end1; ++begin1, ++begin2)
+	func(*begin1, *begin2);
+    return func;
+}
     
 /************************************************************************
 *  morphological operations						*

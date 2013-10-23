@@ -36,12 +36,15 @@
 
 #include <functional>
 #include <algorithm>
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits.hpp>
 #include <boost/tuple/tuple.hpp>
+#include "TU/mmInstructions.h"
 
 namespace TU
 {
 /************************************************************************
-*  struct identity							*
+*  struct identity<T>							*
 ************************************************************************/
 //! 恒等関数
 /*!
@@ -57,264 +60,244 @@ struct identity
 };
 
 /************************************************************************
-*  struct assign							*
+*  struct assign<S, T>							*
 ************************************************************************/
 //! 代入
 /*!
-  \param S	代入先の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	代入先の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    result_type	operator ()(first_argument_type x,
+    void	operator ()(first_argument_type x,
 			    second_argument_type y) const
 		{
-		    return x = y;
+		    y = x;
 		}
 };
 
 /************************************************************************
-*  struct assign_plus							*
+*  struct assign_plus<S, T>						*
 ************************************************************************/
 //! 引数を加算
 /*!
-  \param S	加算元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	加算元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_plus
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
 			    second_argument_type y) const
 		{
-		    return x += y;
+		    y += x;
 		}
 };
 
 /************************************************************************
-*  struct assign_minus							*
+*  struct assign_minus<S, T>						*
 ************************************************************************/
 //! 引数を減算
 /*!
-  \param S	減算元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	減算元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_minus
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
 			    second_argument_type y) const
 		{
-		    return x -= y;
+		    y -= x;
 		}
 };
 
 /************************************************************************
-*  struct assign_multiplies						*
+*  struct assign_multiplies<S, T>					*
 ************************************************************************/
 //! 引数を乗算
 /*!
-  \param S	乗算元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	乗算元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_multiplies
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
 			    second_argument_type y) const
 		{
-		    return x *= y;
+		    y *= x;
 		}
 };
 
 /************************************************************************
-*  struct assign_divides						*
+*  struct assign_divides<S, T>						*
 ************************************************************************/
 //! 引数を除算
 /*!
-  \param S	除算元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	除算元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_divides
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
 			    second_argument_type y) const
 		{
-		    return x /= y;
+		    y /= x;
 		}
 };
 
 /************************************************************************
-*  struct assign_modulus						*
+*  struct assign_modulus<S, T>						*
 ************************************************************************/
 //! 引数で割った時の剰余を代入
 /*!
-  \param S	剰余をとる元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	剰余をとる元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_modulus
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
 			    second_argument_type y) const
 		{
-		    return x %= y;
+		    y %= x;
 		}
 };
 
 /************************************************************************
-*  struct assign_bit_and						*
+*  struct assign_bit_and<S, T>						*
 ************************************************************************/
 //! 引数とのAND
 /*!
-  \param S	ANDをとる元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	ANDをとる元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_bit_and
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
 			    second_argument_type y) const
 		{
-		    return x &= y;
+		    x &= y;
 		}
 };
 
 /************************************************************************
-*  struct assign_bit_or							*
+*  struct assign_bit_or<S, T>						*
 ************************************************************************/
 //! 引数とのOR
 /*!
-  \param S	ORをとる元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	ORをとる元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_bit_or
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
 			    second_argument_type y) const
 		{
-		    return x |= y;
+		    y |= x;
 		}
 };
 
 /************************************************************************
-*  struct assign_bit_xor						*
+*  struct assign_bit_xor<S, T>						*
 ************************************************************************/
 //! 引数とのXOR
 /*!
-  \param S	XORをとる元の型
-  \param T	引数の型
+  \param S	引数の型
+  \param T	XORをとる元の型
 */
-template <class S, class T=S>
+template <class S, class T>
 struct assign_bit_xor
 {
-    typedef S	first_argument_type;
-    typedef T	second_argument_type;
-    typedef S	result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
     result_type	operator ()(first_argument_type x,
 			    second_argument_type y) const
 		{
-		    return x ^= y;
+		    y ^= x;
 		}
 };
 
 /************************************************************************
-*  class unarize							*
+*  class unarize<FUNC>							*
 ************************************************************************/
-//! 2変数関数を2変数tupleを引数とする1変数関数に直す関数オブジェクト
-/*!
-  \param OP	2変数関数オブジェクトの型
-*/
-template <class OP>
+template <class FUNC>
 class unarize
 {
   public:
-    typedef typename OP::result_type				result_type;
-
-    unarize(const OP& op=OP())	:_op(op)			{}
-    
-    template <class TUPLE>
-    result_type	operator ()(const TUPLE& t) const
-		{
-		    return _op(boost::get<0>(t), boost::get<1>(t));
-		}
+    typedef typename FUNC::first_argument_type	first_argument_type;
+    typedef typename FUNC::value_type		value_type;
+    typedef typename FUNC::result_type		result_type;
 
   private:
-    const OP	_op;
-};
+    template <class S>
+    struct result_t
+    {
+	typedef typename boost::mpl
+			      ::if_<boost::is_same<S, first_argument_type>,
+				    value_type, result_type>::type	type;
+    };
 
-/************************************************************************
-*  class seq_transform							*
-************************************************************************/
-//! 1または2組のデータ列の各要素に対して1または2変数関数を適用して1組のデータ列を出力する関数オブジェクト
-/*!
-  \param RESULT	変換された要素を出力するデータ列の型
-  \param OP	個々の要素に適用される1変数/2変数関数オブジェクトの型
-*/
-template <class RESULT, class OP>
-class seq_transform
-{
   public:
-    typedef const RESULT&					result_type;
+    unarize(const FUNC& func=FUNC())	:_func(func)			{}
 
-    seq_transform(const OP& op=OP())	:_op(op), _result()	{}
+    template <class S, class T> typename result_t<S>::type
+    operator ()(const boost::tuples::cons<
+		     S, boost::tuples::cons<
+		       T, boost::tuples::null_type> >& t) const
+    {
+	return _func(boost::get<0>(t), boost::get<1>(t));
+    }
+    template <class S, class T, class U> typename result_t<S>::type
+    operator ()(const boost::tuples::cons<
+		     S, boost::tuples::cons<
+		       T, boost::tuples::cons<
+			 U, boost::tuples::null_type> > >& t) const
+    {
+	return _func(boost::get<0>(t), boost::get<1>(t), boost::get<2>(t));
+    }
 
-    template <class ARG>
-    result_type	operator ()(const ARG& x) const
-		{
-		    _result.resize(x.size());
-		    std::transform(x.begin(), x.end(), _result.begin(), _op);
-		    return _result;
-		}
-    
-    template <class ARG0, class ARG1>
-    result_type	operator ()(const ARG0& x, const ARG1& y) const
-		{
-		    _result.resize(x.size());
-		    std::transform(x.begin(), x.end(), y.begin(),
-				   _result.begin(), _op);
-		    return _result;
-		}
-    
   private:
-    const OP		_op;
-    mutable RESULT	_result;
+    FUNC const	_func;
 };
 
 /************************************************************************
@@ -433,5 +416,68 @@ const_mem_var_ref(S const T::* m)
     return const_mem_var_ref_t<S, T>(m);
 }
 
-}
+#if defined(MMX)
+namespace mm
+{
+/************************************************************************
+*  struct tuple2vec<T, N>						*
+************************************************************************/
+//! 同じ成分を持つboost::tupleをSIMDベクトルに変換する関数オブジェクト
+/*!
+  \param T	成分の型
+  \param N	成分の個数(vec<T>::sizeに等しい)
+*/
+template <class T, size_t N=vec<T>::size>	struct tuple2vec;
+template <class T>
+struct tuple2vec<T, 1>
+{
+    typedef boost::tuple<T>				argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<0>(t));
+		}
+};
+template <class T>
+struct tuple2vec<T, 2>
+{
+    typedef boost::tuple<T, T>				argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<1>(t), boost::get<0>(t));
+		}
+};
+template <class T>
+struct tuple2vec<T, 4>
+{
+    typedef boost::tuple<T, T, T, T>			argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<3>(t), boost::get<2>(t),
+				       boost::get<1>(t), boost::get<0>(t));
+		}
+};
+template <class T>
+struct tuple2vec<T, 8>
+{
+    typedef boost::tuple<T, T, T, T, T, T, T, T>	argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<7>(t), boost::get<6>(t),
+				       boost::get<5>(t), boost::get<4>(t),
+				       boost::get<3>(t), boost::get<2>(t),
+				       boost::get<1>(t), boost::get<0>(t));
+		}
+};
+
+}	// namespace mm
+#endif	// MMX
+}	// namespace TU
 #endif

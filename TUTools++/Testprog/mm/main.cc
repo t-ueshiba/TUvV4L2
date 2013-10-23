@@ -7,7 +7,7 @@ int
 main()
 {
     using namespace	std;
-    using namespace	mm;
+    using namespace	TU::mm;
     
 #if defined AVX2
     vec<int>	x(-7, 6, -5, 4, -3, 2, -1, 0);
@@ -56,9 +56,9 @@ main()
     cout << (x >> 1) << endl << endl;
 
     vec<short>		s(-800, 700, -600, 500, -400, 300, -200, 100);
-    cout << cvt<int>(s) << endl << cvt<u_int>(s) << endl;
+    cout << cvt<int>(s) << endl;
     vec<u_short>	us(800, 700, 600, 500, 400, 300, 200, 100);
-    cout << cvt<int>(us) << endl << cvt_high<u_int>(us) << endl << endl;
+    cout << cvt<int>(us) << endl << cvt<u_int, 1>(us) << endl << endl;
 
   //cout << "rot-l:" << rotate_l(cvt<int>(s)) << endl << endl;
     

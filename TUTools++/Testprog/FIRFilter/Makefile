@@ -1,13 +1,13 @@
 #
-#  $Id: Makefile,v 1.30 2012-08-31 02:36:42 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
+INCDIRS		= -I. -I$(PREFIX)/include
 
-PROGRAM		= iirfprof
+PROGRAM		= firfprof
 LIBS		= -lTUTools++ -ltbb
 ifeq ($(OSTYPE), darwin)
   LIBS	       +=
@@ -18,9 +18,9 @@ CPPFLAGS	= -DUSE_TBB
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
-  CFLAGS	= -O3 -xAVX
+  CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DAVX
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -32,10 +32,9 @@ LINKER		= $(CXX)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/DericheConvolver.h \
-		/usr/local/include/TU/GaussianConvolver.h \
+		/usr/local/include/TU/FIRFilter.h \
+		/usr/local/include/TU/FIRGaussianConvolver.h \
 		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/IIRFilter.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Profiler.h \
@@ -43,9 +42,9 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/types.h
-HDRS		=
+HDRS		= TU/fir_filter_iterator.h \
+		TU/fir_filter_iterator2.h
 SRCS		= main.cc
 OBJS		= main.o
 
@@ -56,9 +55,7 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/DericheConvolver.h \
-	/usr/local/include/TU/IIRFilter.h \
+	/usr/local/include/TU/FIRGaussianConvolver.h \
+	/usr/local/include/TU/FIRFilter.h \
 	/usr/local/include/TU/SeparableFilter2.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/GaussianConvolver.h \
 	/usr/local/include/TU/Profiler.h

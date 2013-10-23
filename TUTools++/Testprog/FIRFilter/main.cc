@@ -3,7 +3,7 @@
  */
 #include <stdlib.h>
 #include "TU/Image++.h"
-#include "TU/BoxFilter.h"
+#include "TU/FIRGaussianConvolver.h"
 #include "TU/Profiler.h"
 
 namespace TU
@@ -11,28 +11,29 @@ namespace TU
 /************************************************************************
 *  static fucntions							*
 ************************************************************************/
-template <class T> void
-doJob(size_t winSize, size_t grainSize, int niter)
+template <class T, class COEFF> void
+doJob(COEFF alpha, size_t grainSize, int niter)
 {
     using namespace	std;
 
     typedef T		pixel_type;
-    typedef float	value_type;
+    typedef COEFF	value_type;
     
-    Image<pixel_type>	in;
+    Image<pixel_type>		in;
     in.restore(cin);
     
-    Image<value_type>	out(in.width(), in.height());
-    Profiler		profiler(1);
-    BoxFilter2		box(winSize);
-    box.setGrainSize(grainSize);
+    Image<value_type>		out(in.width(), in.height());
+    Profiler			profiler(1);
+    FIRGaussianConvolver2<>	convolver(alpha);
+    convolver.setGrainSize(grainSize);
     
     for (int i = 0; i < 5; ++i)
     {
 	for (int j = 0; j < niter; ++j)
 	{
 	    profiler.start(0);
-	    box.convolve(in.begin(), in.end(), out.begin());
+	    convolver.smooth(in.begin(), in.end(), out.begin());
+	  //convolver.diffVV(in.begin(), in.end(), out.begin());
 	    profiler.stop().nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
@@ -42,27 +43,27 @@ doJob(size_t winSize, size_t grainSize, int niter)
     out.save(cout);
 }
  
-template <class T> void
-doJob1(size_t winSize, int niter)
+template <class T, class COEFF> void
+doJob1(COEFF alpha, int niter)
 {
     using namespace	std;
 
     typedef T		pixel_type;
-    typedef float	value_type;
+    typedef COEFF	value_type;
     
     Image<pixel_type>		in;
     in.restore(cin);
     
     ImageLine<value_type>	out(in.width());
     Profiler			profiler(1);
-    BoxFilter			box(winSize);
+    FIRGaussianConvolver<>	convolver(alpha);
 
     for (int i = 0; i < 5; ++i)
     {
 	for (int j = 0; j < niter; ++j)
 	{
 	    profiler.start(0);
-	    box.convolve(in[0].begin(), in[0].end(), out.begin());
+	    convolver.smooth(in[0].begin(), in[0].end(), out.begin());
 	    profiler.stop().nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
@@ -81,17 +82,18 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
-    typedef int		pixel_type;
+    typedef u_char	pixel_type;
+    typedef float	coeff_type;
     
-    size_t		winSize = 3;
+    float		alpha = 1.0;
     size_t		grainSize = 100;
     int			niter = 100;
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "w:g:n:")) != -1; )
+    for (int c; (c = getopt(argc, argv, "a:g:n:")) != -1; )
 	switch (c)
 	{
-	  case 'w':
-	    winSize = atoi(optarg);
+	  case 'a':
+	    alpha = atof(optarg);
 	    break;
 	  case 'g':
 	    grainSize = atoi(optarg);
@@ -103,9 +105,9 @@ main(int argc, char* argv[])
 
     try
     {
-      //doJob1<pixel_type>(winSize, niter);
+      //doJob1<pixel_type>(alpha, niter);
 	cerr << endl;
-	doJob<pixel_type>(winSize, grainSize, niter);
+	doJob< pixel_type>(alpha, grainSize, niter);
     }
     catch (exception& err)
     {

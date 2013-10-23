@@ -39,201 +39,6 @@
 #include "TU/SeparableFilter2.h"
 #include "TU/mmInstructions.h"
 
-#if defined(SSE2)
-namespace mm
-{
-/************************************************************************
-*  static functions							*
-************************************************************************/
-static inline F32vec
-forward2(F32vec in3210, F32vec ci01co01, F32vec& tmp)
-{
-    tmp = shift_r<1>(tmp) + ci01co01 * shuffle<0, 0, 0, 0>(tmp, in3210);
-    F32vec	out0123 = tmp;
-    tmp = shift_r<1>(tmp) + ci01co01 * shuffle<1, 1, 0, 0>(tmp, in3210);
-    out0123 = replace_rmost(shift_l<1>(out0123), tmp);
-    tmp = shift_r<1>(tmp) + ci01co01 * shuffle<2, 2, 0, 0>(tmp, in3210);
-    out0123 = replace_rmost(shift_l<1>(out0123), tmp);
-    tmp = shift_r<1>(tmp) + ci01co01 * shuffle<3, 3, 0, 0>(tmp, in3210);
-    return reverse(replace_rmost(shift_l<1>(out0123), tmp));
-}
-
-static inline F32vec
-backward2(F32vec in3210, F32vec ci10co10, F32vec& tmp)
-{
-    F32vec	out3210 = tmp;
-    tmp = shift_r<1>(tmp) + ci10co10 * shuffle<3, 3, 0, 0>(tmp, in3210);
-    out3210 = replace_rmost(shift_l<1>(out3210), tmp);
-    tmp = shift_r<1>(tmp) + ci10co10 * shuffle<2, 2, 0, 0>(tmp, in3210);
-    out3210 = replace_rmost(shift_l<1>(out3210), tmp);
-    tmp = shift_r<1>(tmp) + ci10co10 * shuffle<1, 1, 0, 0>(tmp, in3210);
-    out3210 = replace_rmost(shift_l<1>(out3210), tmp);
-    tmp = shift_r<1>(tmp) + ci10co10 * shuffle<0, 0, 0, 0>(tmp, in3210);
-    return out3210;
-}
-
-template <class S> static void
-forward2(const S*& in, float*& out, F32vec ci01co01, F32vec& tmp);
-
-template <> inline void
-forward2(const u_char*& in, float*& out, F32vec ci01co01, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size,
-		nelms8 = Iu8vec::size;
-    Iu8vec	in8 = load<false>(in);
-    store<false>(out, forward2(cvt<float>(in8), ci01co01, tmp));
-    out += nelmsF;
-    store<false>(out,
-		 forward2(cvt<float>(shift_r<nelmsF>(in8)), ci01co01, tmp));
-    out += nelmsF;
-    store<false>(out,
-		 forward2(cvt<float>(shift_r<2*nelmsF>(in8)), ci01co01, tmp));
-    out += nelmsF;
-    store<false>(out,
-		 forward2(cvt<float>(shift_r<3*nelmsF>(in8)), ci01co01, tmp));
-    out += nelmsF;
-    in  += nelms8;
-}
-
-template <> inline void
-forward2(const float*& in, float*& out, F32vec ci01co01, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size;
-    store<false>(out, forward2(load<false>(in), ci01co01, tmp));
-    out += nelmsF;
-    in  += nelmsF;
-}
-
-template <class S> static void
-backward2(const S*& in, float*& out, F32vec ci10co10, F32vec& tmp);
-
-template <> inline void
-backward2(const u_char*& in, float*& out, F32vec ci10co10, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size,
-		nelms8 = Iu8vec::size;
-    in -= nelms8;
-    Iu8vec	in8 = load<false>(in);
-    out -= nelmsF;
-    store<false>(out,
-		 backward2(cvt<float>(shift_r<3*nelmsF>(in8)), ci10co10, tmp));
-    out -= nelmsF;
-    store<false>(out,
-		 backward2(cvt<float>(shift_r<2*nelmsF>(in8)), ci10co10, tmp));
-    out -= nelmsF;
-    store<false>(out,
-		 backward2(cvt<float>(shift_r<nelmsF>(in8)), ci10co10, tmp));
-    out -= nelmsF;
-    store<false>(out,
-		 backward2(cvt<float>(in8), ci10co10, tmp));
-}
-
-template <> inline void
-backward2(const float*& in, float*& out, F32vec ci10co10, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size;
-    in  -= nelmsF;
-    out -= nelmsF;
-    store<false>(out, backward2(load<false>(in), ci10co10, tmp));
-}
-
-static inline F32vec
-forward4(F32vec in3210, F32vec ci0123, F32vec co0123, F32vec& tmp)
-{
-    tmp = shift_r<1>(tmp) + ci0123 * set1<0>(in3210) + co0123 * set1<0>(tmp);
-    F32vec	out0123 = tmp;
-    tmp = shift_r<1>(tmp) + ci0123 * set1<1>(in3210) + co0123 * set1<0>(tmp);
-    out0123 = replace_rmost(shift_l<1>(out0123), tmp);
-    tmp = shift_r<1>(tmp) + ci0123 * set1<2>(in3210) + co0123 * set1<0>(tmp);
-    out0123 = replace_rmost(shift_l<1>(out0123), tmp);
-    tmp = shift_r<1>(tmp) + ci0123 * set1<3>(in3210) + co0123 * set1<0>(tmp);
-    return reverse(replace_rmost(shift_l<1>(out0123), tmp));
-}
-
-static inline F32vec
-backward4(F32vec in3210, F32vec ci3210, F32vec co3210, F32vec& tmp)
-{
-    F32vec	out3210 = tmp;
-    tmp = shift_r<1>(tmp) + ci3210 * set1<3>(in3210) + co3210 * set1<0>(tmp);
-    out3210 = replace_rmost(shift_l<1>(out3210), tmp);
-    tmp = shift_r<1>(tmp) + ci3210 * set1<2>(in3210) + co3210 * set1<0>(tmp);
-    out3210 = replace_rmost(shift_l<1>(out3210), tmp);
-    tmp = shift_r<1>(tmp) + ci3210 * set1<1>(in3210) + co3210 * set1<0>(tmp);
-    out3210 = replace_rmost(shift_l<1>(out3210), tmp);
-    tmp = shift_r<1>(tmp) + ci3210 * set1<0>(in3210) + co3210 * set1<0>(tmp);
-    return out3210;
-}
-
-template <class S> static void
-forward4(const S*& in, float*& out, F32vec ci0123, F32vec co0123, F32vec& tmp);
-
-template <> inline void
-forward4(const u_char*& in, float*& out,
-	 F32vec ci0123, F32vec co0123, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size,
-		nelms8 = Iu8vec::size;
-    Iu8vec	in8 = load<false>(in);
-    store<false>(out, forward4(cvt<float>(in8), ci0123, co0123, tmp));
-    out += nelmsF;
-    store<false>(out, forward4(cvt<float>(shift_r<nelmsF>(in8)),
-			       ci0123, co0123, tmp));
-    out += nelmsF;
-    store<false>(out, forward4(cvt<float>(shift_r<2*nelmsF>(in8)),
-			       ci0123, co0123, tmp));
-    out += nelmsF;
-    store<false>(out, forward4(cvt<float>(shift_r<3*nelmsF>(in8)),
-			       ci0123, co0123, tmp));
-    out += nelmsF;
-    in  += nelms8;
-}
-
-template <> inline void
-forward4(const float*& in, float*& out,
-	 F32vec ci0123, F32vec co0123, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size;
-    store<false>(out, forward4(load<false>(in), ci0123, co0123, tmp));
-    out += nelmsF;
-    in  += nelmsF;
-}
-
-template <class S> static void
-backward4(const S*& in, float*& out, F32vec ci3210, F32vec co3210, F32vec& tmp);
-
-template <> inline void
-backward4(const u_char*& in, float*& out,
-	  F32vec ci3210, F32vec co3210, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size,
-		nelms8 = Iu8vec::size;
-    in -= nelms8;
-    Iu8vec	in8 = load<false>(in);
-    out -= nelmsF;
-    store<false>(out, backward4(cvt<float>(shift_r<3*nelmsF>(in8)),
-				ci3210, co3210, tmp));
-    out -= nelmsF;
-    store<false>(out, backward4(cvt<float>(shift_r<2*nelmsF>(in8)),
-				ci3210, co3210, tmp));
-    out -= nelmsF;
-    store<false>(out, backward4(cvt<float>(shift_r<nelmsF>(in8)),
-				ci3210, co3210, tmp));
-    out -= nelmsF;
-    store<false>(out, backward4(cvt<float>(in8), ci3210, co3210, tmp));
-}
-
-template <> inline void
-backward4(const float*& in, float*& out,
-	  F32vec ci3210, F32vec co3210, F32vec& tmp)
-{
-    const u_int	nelmsF = F32vec::size;
-    in  -= nelmsF;
-    out -= nelmsF;
-    store<false>(out, backward4(load<false>(in), ci3210, co3210, tmp));
-}
-}
-#endif
-
 namespace TU
 {
 /************************************************************************
@@ -351,7 +156,6 @@ IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
 template <u_int D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 {
-#ifdef USE_IIR_FILTER_ITERATOR
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
     
     return std::copy(make_iir_filter_iterator<D, true, value_type>(
@@ -359,27 +163,6 @@ IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 		     make_iir_filter_iterator<D, true, value_type>(
 			 ie, _ci.begin(), _co.begin()),
 		     out);
-#else
-    typedef typename std::iterator_traits<IN>::difference_type	diff_t;
-    
-    for (IN in = ib; in != ie; ++in)
-    {
-	diff_t	d = in - ib;
-
-	if (d < diff_t(D))
-	    *out = _ci[D-1-d]*in[-d];
-	else
-	{
-	    d = D;
-	    *out = 0;
-	}
-	for (diff_t i = -d; i++ < 0; )
-	    *out += (_ci[D-1+i]*in[i] + _co[D-1+i]*out[i-1]);
-	++out;
-    }
-
-    return out;
-#endif
 }
     
 //! 後退方向にフィルタを適用する
@@ -392,7 +175,6 @@ IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 template <u_int D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 {
-#ifdef USE_IIR_FILTER_ITERATOR
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
     
     return std::copy(make_iir_filter_iterator<D, false, value_type>(
@@ -400,21 +182,6 @@ IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 		     make_iir_filter_iterator<D, false, value_type>(
 			 ie, _ci.rbegin(), _co.rbegin()),
 		     oe);
-#else
-    typedef typename std::iterator_traits<IN>::difference_type	diff_t;
-    
-    for (IN in = ie; in != ib; )
-    {
-	const diff_t	d = std::min(diff_t(D), ie - in);
-
-	--in;
-      	*--oe = 0;
-	for (diff_t i = 0; i < d; ++i)
-	    *oe += (_ci[i]*in[i+1] + _co[i]*oe[i+1]);
-    }
-
-    return oe;
-#endif
 }
 
 //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
@@ -428,161 +195,6 @@ IIRFilter<D, T>::outLength(u_int inLength)
     return inLength;
 }
     
-#ifndef USE_IIR_FILTER_ITERATOR
-template <> template <class IN, class OUT> OUT
-IIRFilter<2u, float>::forward(IN ib, IN ie, OUT out) const
-{
-    typedef typename std::iterator_traits<IN>::value_type	ivalue_type;
-    
-    const ivalue_type*	in = ib;
-#if defined(SSE2)
-    using namespace	mm;
-    
-    const F32vec	ci01co01(_ci[0], _ci[1], _co[0], _co[1]);
-    F32vec		tmp(_ci[0]*in[1], _ci[0]*in[0] + _ci[1]*in[1],
-			    _ci[1]*in[0], 0.0);
-    in += 2;		// forward2()のために2つ前進．
-    for (IN tail2 = ie - vec<ivalue_type>::size - 2;
-	 in <= tail2; )	// inがoutよりも2つ前進しているのでoverrunに注意．
-	forward2(in, out, ci01co01, tmp);
-    empty();
-    in -= 2;		// 2つ前進していた分を元に戻す．
-#else
-    *out = _ci[1]*in[0];
-    ++in;
-    ++out;
-    *out = _ci[0]*in[-1] + _ci[1]*in[0] + _co[1]*out[-1];
-    ++in;
-    ++out;
-#endif
-    for (; in < ie; ++in)
-    {
-	*out = _ci[0]*in[-1] + _ci[1]*in[0] + _co[0]*out[-2] + _co[1]*out[-1];
-	++out;
-    }
-
-    return out;
-}
-    
-template <> template <class IN, class OUT> OUT
-IIRFilter<2u, float>::backward(IN ib, IN ie, OUT oe) const
-{
-    typedef typename std::iterator_traits<IN>::value_type	ivalue_type;
-    
-    const ivalue_type*	in = ie;
-#if defined(SSE2)
-    using namespace	mm;
-
-    const F32vec	ci10co10(_ci[1], _ci[0], _co[1], _co[0]);
-    F32vec		tmp(_ci[1]*in[-2], _ci[1]*in[-1] + _ci[0]*in[-2],
-			    _ci[0]*in[-1], 0.0);
-    in -= 2;		// backward2()のために2つ後退．
-    for (IN head2 = ib + vec<ivalue_type>::size + 2;
-	 in >= head2; )	// inがoeよりも2つ後退しているのでoverrunに注意．
-	backward2(in, oe, ci10co10, tmp);
-    empty();
-    in += 2;			// 2つ後退していた分を元に戻す．
-#else
-    --in;
-    --oe;
-    *oe = 0.0;
-    --in;
-    --oe;
-    *oe = _ci[0]*in[1] + _co[0]*oe[1];
-#endif
-    while (--in >= ib)
-    {
-	--oe;
-	*oe = _ci[0]*in[1] + _ci[1]*in[2] + _co[0]*oe[1] + _co[1]*oe[2];
-    }
-
-    return oe;
-}
-
-template <> template <class IN, class OUT> OUT
-IIRFilter<4u, float>::forward(IN ib, IN ie, OUT out) const
-{
-    typedef typename std::iterator_traits<IN>::value_type	ivalue_type;
-    
-    const ivalue_type*	in = ib;
-#if defined(SSE2)
-    using namespace	mm;
-
-    const F32vec	ci0123(_ci[0], _ci[1], _ci[2], _ci[3]),
-			co0123(_co[0], _co[1], _co[2], _co[3]);
-    F32vec		tmp = zero<float>();
-    for (IN tail2 = ie - vec<ivalue_type>::size; in <= tail2; )
-	forward4(in, out, ci0123, co0123, tmp);
-    empty();
-#else
-    *out = _ci[3]*in[0];
-    ++in;
-    ++out;
-    *out = _ci[2]*in[-1] + _ci[3]*in[0]
-			 + _co[3]*out[-1];
-    ++in;
-    ++out;
-    *out = _ci[1]*in[-2] + _ci[2]*in[-1]  + _ci[3]*in[0]
-			 + _co[2]*out[-2] + _co[3]*out[-1];
-    ++in;
-    ++out;
-    *out = _ci[0]*in[-3] + _ci[1]*in[-2]  + _ci[2]*in[-1]  + _ci[3]*in[0]
-			 + _co[1]*out[-3] + _co[2]*out[-2] + _co[3]*out[-1];
-    ++in;
-    ++out;
-#endif
-    for (; in < ie; ++in)
-    {
-	*out = _ci[0]*in[-3]  + _ci[1]*in[-2]  + _ci[2]*in[-1]  + _ci[3]*in[0]
-	     + _co[0]*out[-4] + _co[1]*out[-3] + _co[2]*out[-2] + _co[3]*out[-1];
-	++out;
-    }
-
-    return out;
-}
-    
-template <> template <class IN, class OUT> OUT
-IIRFilter<4u, float>::backward(IN ib, IN ie, OUT oe) const
-{
-    typedef typename std::iterator_traits<IN>::value_type	ivalue_type;
-
-    const ivalue_type*	in = ie;
-#if defined(SSE2)
-    using namespace	mm;
-
-    const F32vec	ci3210(_ci[3], _ci[2], _ci[1], _ci[0]),
-			co3210(_co[3], _co[2], _co[1], _co[0]);
-    F32vec		tmp = zero<float>();
-    for (IN head2 = ib + vec<ivalue_type>::size; in >= head2; )
-	backward4(in, oe, ci3210, co3210, tmp);
-    empty();
-#else
-    --in;
-    --oe;
-    *oe = 0.0;
-    --in;
-    --oe;
-    *oe = _ci[0]*in[1]
-	+ _co[0]*oe[1];
-    --in;
-    --oe;
-    *oe = _ci[0]*in[1] + _ci[1]*in[2]
-	+ _co[0]*oe[1] + _co[1]*oe[2];
-    --in;
-    --oe;
-    *oe = _ci[0]*in[1] + _ci[1]*in[2] + _ci[2]*in[3]
-	+ _co[0]*oe[1] + _co[1]*oe[2] + _co[2]*oe[3];
-#endif
-    while (--in >= ib)
-    {
-	--oe;
-	*oe = _ci[0]*in[1] + _ci[1]*in[2] + _ci[2]*in[3] + _ci[3]*in[4]
-	    + _co[0]*oe[1] + _co[1]*oe[2] + _co[2]*oe[3] + _co[3]*oe[4];
-    }
-
-    return oe;
-}
-#endif
 /************************************************************************
 *  class BidirectionalIIRFilter<D, T>					*
 ************************************************************************/
@@ -611,7 +223,7 @@ template <u_int D, class T=float> class BidirectionalIIRFilter
 		initialize(const T c[D+D], Order order)			;
     void	limits(T& limit0, T& limit1, T& limit2)		const	;
     template <class IN, class OUT>
-    void	convolve(IN ib, IN ie, OUT out)			const	;
+    OUT		convolve(IN ib, IN ie, OUT out)			const	;
 
     const coeffs_type&	ciF()			const	{return _iirF.ci();}
     const coeffs_type&	coF()			const	{return _iirF.co();}
@@ -750,7 +362,7 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
 */
-template <u_int D, class T> template <class IN, class OUT> inline void
+template <u_int D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
@@ -762,16 +374,13 @@ BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
     _bufB.resize(size*sizeof(value_type));
 
     _iirF.forward(ib, ie, pointer(_bufF.begin()));
-#ifdef USE_IIR_FILTER_ITERATOR
     _iirB.backward(std::reverse_iterator<IN>(ie),
 		   std::reverse_iterator<IN>(ib),
 		   std::reverse_iterator<pointer>(pointer(_bufB.end())));
-#else
-    _iirB.backward(ib, ie, pointer(_bufB.end()));
-#endif    
-    std::transform(const_pointer(_bufF.begin()), const_pointer(_bufF.end()),
-		   const_pointer(_bufB.begin()),
-		   out, std::plus<value_type>());
+    return std::transform(const_pointer(_bufF.begin()),
+			  const_pointer(_bufF.end()),
+			  const_pointer(_bufB.begin()),
+			  out, std::plus<value_type>());
 }
 
 //! 与えられた長さの入力データ列に対する出力データ列の長さを返す

@@ -8,7 +8,7 @@ DEST		= $(PREFIX)/bin
 INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= boxFilterTest
-LIBS		=
+LIBS		= -lTUTools++
 ifeq ($(OSTYPE), darwin)
   LIBS	       +=
 #  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
