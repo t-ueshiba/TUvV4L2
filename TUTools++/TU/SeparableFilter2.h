@@ -175,7 +175,7 @@ template <class F> template <class IN, class OUT> void
 SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie, OUT out,
 				  size_t shift, boost::true_type)
 {
-#if defined(SSE)
+#if defined(SSE2)
     typedef typename std::iterator_traits<
 		typename subiterator<OUT>::type>::value_type	value_type;
     typedef mm::vec<value_type>					vec_type;
