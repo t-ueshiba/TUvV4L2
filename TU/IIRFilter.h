@@ -37,7 +37,6 @@
 #include <algorithm>
 #include <boost/array.hpp>
 #include "TU/SeparableFilter2.h"
-#include "TU/mmInstructions.h"
 
 namespace TU
 {
@@ -235,8 +234,6 @@ template <u_int D, class T=float> class BidirectionalIIRFilter
   private:
     IIRFilter<D, T>	_iirF;
     IIRFilter<D, T>	_iirB;
-    mutable buf_type	_bufF;
-    mutable buf_type	_bufB;
 };
 
 //! フィルタのz変換係数をセットする
@@ -366,20 +363,23 @@ template <u_int D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
-    typedef value_type*						pointer;
-    typedef const pointer					const_pointer;
+#if defined(MMX)
+    typedef typename boost::mpl::if_<
+	mm::is_vec<value_type>,
+	mm::vec_array<Array<value_type, AlignedBuf<value_type> >, true>,
+	Array<value_type> >::type				buf_type;
+#else
+    typedef Array<value_type>					buf_type;
+#endif
+    typedef typename buf_type::iterator				buf_iterator;
+    
+    buf_type	bufF(std::distance(ib, ie)), bufB(bufF.size());
 
-    std::size_t	size = std::distance(ib, ie);
-    _bufF.resize(size*sizeof(value_type));
-    _bufB.resize(size*sizeof(value_type));
-
-    _iirF.forward(ib, ie, pointer(_bufF.begin()));
+    _iirF.forward(ib, ie, bufF.begin());
     _iirB.backward(std::reverse_iterator<IN>(ie),
 		   std::reverse_iterator<IN>(ib),
-		   std::reverse_iterator<pointer>(pointer(_bufB.end())));
-    return std::transform(const_pointer(_bufF.begin()),
-			  const_pointer(_bufF.end()),
-			  const_pointer(_bufB.begin()),
+		   std::reverse_iterator<buf_iterator>(bufB.end()));
+    return std::transform(bufF.cbegin(), bufF.cend(), bufB.cbegin(),
 			  out, std::plus<value_type>());
 }
 

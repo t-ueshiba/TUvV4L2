@@ -18,9 +18,9 @@ CPPFLAGS	= -DUSE_TBB
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
-  CFLAGS	= -O3
+  CFLAGS	= -O3 -xAVX
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DAVX
 endif
 CCFLAGS		= $(CFLAGS)
 
