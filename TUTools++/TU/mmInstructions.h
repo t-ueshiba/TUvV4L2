@@ -887,6 +887,17 @@ MM_CONSTRUCTOR_1(u_int32_t)
 template <bool ALIGNED=false, class T>
 static vec<T>	load(const T* p)					;
 
+//! メモリからベクトルをロードする．
+/*!
+  \param p	ロード元のメモリアドレス
+  \return	ロードされたベクトル
+*/
+template <bool ALIGNED=false, class T> static inline vec<T>
+load(const vec<T>* p)
+{
+    return load(reinterpret_cast<const T*>(p));
+}
+
 //! メモリにベクトルをストアする．
 /*!
   \param p	ストア先のメモリアドレス
@@ -894,6 +905,17 @@ static vec<T>	load(const T* p)					;
 */
 template <bool ALIGNED=false, class T>
 static void	store(T* p, vec<T> x)					;
+
+//! メモリにベクトルをストアする．
+/*!
+  \param p	ストア先のメモリアドレス
+  \param x	ストアされるベクトル
+*/
+template <bool ALIGNED=false, class T> static inline void
+store(vec<T>* p, vec<T> x)
+{
+    store(reinterpret_cast<T*>(p), x);
+}
 
 #if defined(SSE2)
 #  if defined(SSE3)

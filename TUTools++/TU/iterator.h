@@ -724,14 +724,14 @@ namespace mm
 */
 template <class T, bool ALIGNED=false>
 class load_iterator : public boost::iterator_adaptor<load_iterator<T, ALIGNED>,
-						     const T*,
+						     const vec<T>*,
 						     vec<T>,
 						     boost::use_default,
 						     vec<T> >
 {
   private:
     typedef boost::iterator_adaptor<load_iterator,
-				    const T*,
+				    const vec<T>*,
 				    vec<T>,
 				    boost::use_default,
 				    vec<T> >		super;
@@ -746,33 +746,19 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T, ALIGNED>,
     friend class				boost::iterator_core_access;
 
   public:
-    load_iterator(const T* p)	:super(p)	{}
-    load_iterator(const vec<T>* p)
-	:super(reinterpret_cast<const T*>(p))	{}
+    load_iterator(const vec<T>* p)	:super(p)	{}
+    load_iterator(const T* p)
+	:super(reinterpret_cast<const vec<T>*>(p))	{}
     
   private:
-    reference		dereference() const
-			{
-			    return load<ALIGNED>(super::base());
-			}
-    void		advance(difference_type n)
-			{
-			    super::base_reference() += n * value_type::size;
-			}
-    void		increment()
-			{
-			    super::base_reference() += value_type::size;
-			}
-    void		decrement()
-			{
-			    super::base_reference() -= value_type::size;
-			}
-    difference_type	distance_to(load_iterator iter) const
-			{
-			    return (iter.base() - super::base())
-				 / value_type::size;
-			}
+    reference	dereference()	const	{return load<ALIGNED>(super::base());}
 };
+
+template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
+make_load_iterator(const vec<T>* p)
+{
+    return load_iterator<T, ALIGNED>(p);
+}
 
 template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
 make_load_iterator(const T* p)
@@ -793,7 +779,8 @@ namespace detail
 	typedef vec<element_type>	value_type;
 	
       public:
-	store_proxy(T* p)	:_p(p)	{}
+	store_proxy(vec<T>* p)	:_p(p)					{}
+	store_proxy(T* p)	:_p(reinterpret_cast<vec<T>*>(p))	{}
 	
 	value_type	operator =(value_type val) const
 			{
@@ -834,7 +821,7 @@ namespace detail
 			}
 
       private:
-	T* const	_p;
+	vec<T>* const	_p;
     };
 }
 
@@ -847,14 +834,14 @@ namespace detail
 template <class T, bool ALIGNED=false>
 class store_iterator
     : public boost::iterator_adaptor<store_iterator<T, ALIGNED>,
-				     T*,
+				     vec<T>*,
 				     vec<T>,
 				     boost::use_default,
 				     detail::store_proxy<T, ALIGNED> >
 {
   private:
     typedef boost::iterator_adaptor<store_iterator,
-				    T*,
+				    vec<T>*,
 				    vec<T>,
 				    boost::use_default,
 				    detail::store_proxy<T, ALIGNED> >	super;
@@ -869,32 +856,18 @@ class store_iterator
     friend class				boost::iterator_core_access;
 
   public:
-    store_iterator(T* p)	:super(p)			{}
-    store_iterator(vec<T>* p)	:super(reinterpret_cast<T*>(p))	{}
+    store_iterator(vec<T>* p)	:super(p)				{}
+    store_iterator(T* p)	:super(reinterpret_cast<vec<T>*>(p))	{}
 	       
   private:
-    reference		dereference() const
-			{
-			    return reference(super::base());
-			}
-    void		advance(difference_type n)
-			{
-			    super::base_reference() += n * value_type::size;
-			}
-    void		increment()
-			{
-			    super::base_reference() += value_type::size;
-			}
-    void		decrement()
-			{
-			    super::base_reference() -= value_type::size;
-			}
-    difference_type	distance_to(store_iterator iter) const
-			{
-			    return (iter.base() - super::base())
-				 / value_type::size;
-			}
+    reference	dereference()	const	{return reference(super::base());}
 };
+
+template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
+make_store_iterator(vec<T>* p)
+{
+    return store_iterator<T, ALIGNED>(p);
+}
 
 template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
 make_store_iterator(T* p)
@@ -1617,7 +1590,7 @@ class iir_filter_iterator
     typedef typename buf_type::const_iterator		buf_iterator;
 
     template <size_t DD, bool FF>
-    struct int2type				{enum {dim = DD, fwd = FF};};
+    struct selector				{enum {dim = DD, fwd = FF};};
     
   public:
     typedef typename super::difference_type	difference_type;
@@ -1632,8 +1605,8 @@ class iir_filter_iterator
 		iir_filter_iterator(ITER const& iter, COEFF ci, COEFF co)
 		    :super(iter), _ci(ci), _co(co), _ibuf(), _obuf(), _i(0)
 		{
-		    _ibuf.fill(value_type(0));
-		    _obuf.fill(value_type(0));
+		    std::fill(_ibuf.begin(), _ibuf.end(), value_type(0));
+		    std::fill(_obuf.begin(), _obuf.end(), value_type(0));
 		}
 
   private:
@@ -1678,7 +1651,7 @@ class iir_filter_iterator
 			}
 
     template <size_t DD>
-    value_type	update(int2type<DD, true>) const
+    value_type	update(selector<DD, true>) const
 		{
 		    size_t	i = _i;
 		    if (++_i == D)
@@ -1689,7 +1662,7 @@ class iir_filter_iterator
 		}
     
     template <size_t DD>
-    value_type	update(int2type<DD, false>) const
+    value_type	update(selector<DD, false>) const
 		{
 		    value_type	val = inpro(_co, _obuf.cbegin(), _i)
 				    + inpro(_ci, _ibuf.cbegin(), _i);
@@ -1700,7 +1673,7 @@ class iir_filter_iterator
 		    return val;
 		}
 
-    value_type	update(int2type<2, true>) const
+    value_type	update(selector<2, true>) const
 		{
 		    value_type	val;
 		    
@@ -1724,7 +1697,7 @@ class iir_filter_iterator
 		    return val;
 		}
 
-    value_type	update(int2type<2, false>) const
+    value_type	update(selector<2, false>) const
 		{
 		    value_type	val;
 		    
@@ -1748,7 +1721,7 @@ class iir_filter_iterator
 		    return val;
 		}
 
-    value_type	update(int2type<4, true>) const
+    value_type	update(selector<4, true>) const
 		{
 		    value_type	val;
 		    
@@ -1787,7 +1760,7 @@ class iir_filter_iterator
 		    return val;
 		}
 
-    value_type	update(int2type<4, false>) const
+    value_type	update(selector<4, false>) const
 		{
 		    value_type	val;
 		    
@@ -1828,7 +1801,7 @@ class iir_filter_iterator
 
     reference	dereference() const
 		{
-		    return update(int2type<D, FWD>());
+		    return update(selector<D, FWD>());
 		}
     
   private:
