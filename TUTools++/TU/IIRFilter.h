@@ -363,14 +363,7 @@ template <u_int D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
-#if defined(MMX)
-    typedef typename boost::mpl::if_<
-	mm::is_vec<value_type>,
-	mm::vec_array<Array<value_type, AlignedBuf<value_type> >, true>,
-	Array<value_type> >::type				buf_type;
-#else
-    typedef Array<value_type>					buf_type;
-#endif
+    typedef Array<value_type, Buf<value_type, true> >		buf_type;
     typedef typename buf_type::iterator				buf_iterator;
     
     buf_type	bufF(std::distance(ib, ie)), bufB(bufF.size());
