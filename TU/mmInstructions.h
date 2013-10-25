@@ -63,6 +63,7 @@
 #include <cassert>
 #include <boost/iterator_adaptors.hpp>
 #include <boost/tuple/tuple.hpp>
+#include "TU/functional.h"
 
 /************************************************************************
 *  Emulations								*
