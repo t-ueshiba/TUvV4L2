@@ -590,16 +590,12 @@ class row2col
     size_t const	_idx;	//!< 列を指定するindex
 };
 
-template <class ROW>
-inline boost::transform_iterator<
-    row2col<ROW>, ROW, boost::use_default,
-    typename std::iterator_traits<typename subiterator<ROW>::type>::value_type>
+template <class VAL=boost::use_default, class ROW>
+inline boost::transform_iterator<row2col<ROW>, ROW, boost::use_default, VAL>
 make_vertical_iterator(ROW row, size_t idx)
 {
     return boost::transform_iterator<
-	row2col<ROW>, ROW, boost::use_default,
-	typename std::iterator_traits<typename subiterator<ROW>::type>
-	    ::value_type>(row, row2col<ROW>(idx));
+	row2col<ROW>, ROW, boost::use_default, VAL>(row, row2col<ROW>(idx));
 }
     
 /************************************************************************

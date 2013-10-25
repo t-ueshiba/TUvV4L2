@@ -35,11 +35,9 @@
 #define __TUfunctional_h
 
 #include <functional>
-#include <algorithm>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/tuple/tuple.hpp>
-#include "TU/mmInstructions.h"
 
 namespace TU
 {

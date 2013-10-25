@@ -81,14 +81,18 @@ class Buf : public BufTraits<T, ALIGNED>
   private:
     enum	{ ALIGN = (ALIGNED ? 32 : 1) };
     
-    typedef BufTraits<T, ALIGNED>		super;
+    typedef BufTraits<T, ALIGNED>			super;
 
   public:
-    typedef T					value_type;
-    typedef const value_type*			const_pointer;
-    typedef value_type*				pointer;
-    typedef typename super::const_iterator	const_iterator;
-    typedef typename super::iterator		iterator;
+    typedef T						value_type;
+    typedef const value_type*				const_pointer;
+    typedef value_type*					pointer;
+    typedef typename super::const_iterator		const_iterator;
+    typedef typename super::iterator			iterator;
+    typedef typename std::iterator_traits<const_iterator>::reference
+							const_reference;
+    typedef typename std::iterator_traits<iterator>::reference
+							reference;
     
   public:
     explicit		Buf(u_int siz=0)			;
@@ -364,14 +368,18 @@ template <class T, u_int D, bool ALIGNED=false>
 class FixedSizedBuf : public BufTraits<T, ALIGNED>
 {
   private:
-    typedef BufTraits<T, ALIGNED>		super;
+    typedef BufTraits<T, ALIGNED>			super;
 
   public:
-    typedef T					value_type;
-    typedef const value_type*			const_pointer;
-    typedef value_type*				pointer;
-    typedef typename super::const_iterator	const_iterator;
-    typedef typename super::iterator		iterator;
+    typedef T						value_type;
+    typedef const value_type*				const_pointer;
+    typedef value_type*					pointer;
+    typedef typename super::const_iterator		const_iterator;
+    typedef typename super::iterator			iterator;
+    typedef typename std::iterator_traits<const_iterator>::reference
+							const_reference;
+    typedef typename std::iterator_traits<iterator>::reference
+							reference;
     
   public:
     explicit		FixedSizedBuf(u_int siz=D)		;
@@ -571,24 +579,22 @@ class Array : public B
 							element_type;
   //! 要素の型    
     typedef typename super::value_type			value_type;
-  //! 要素へのポインタ
-    typedef typename super::pointer			pointer;
   //! 定数要素へのポインタ
     typedef typename super::const_pointer		const_pointer;
-  //! 反復子
-    typedef typename super::iterator			iterator;
+  //! 要素へのポインタ
+    typedef typename super::pointer			pointer;
   //! 定数反復子
     typedef typename super::const_iterator		const_iterator;
-  //! 逆反復子    
-    typedef std::reverse_iterator<iterator>		reverse_iterator;
+  //! 反復子
+    typedef typename super::iterator			iterator;
   //! 定数逆反復子    
     typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
-  //! 要素への参照
-    typedef typename std::iterator_traits<iterator>::reference
-							reference;
+  //! 逆反復子    
+    typedef std::reverse_iterator<iterator>		reverse_iterator;
   //! 定数要素への参照
-    typedef typename std::iterator_traits<const_iterator>::reference
-							const_reference;
+    typedef typename super::const_reference		const_reference;
+  //! 要素への参照
+    typedef typename super::reference			reference;
   //! ポインタ間の差
     typedef std::ptrdiff_t				difference_type;
     
@@ -1108,26 +1114,26 @@ class Array2 : public Array<T, R>
     typedef B						buf_type;
     
   public:
-  //! 行の型    
-    typedef typename super::value_type			value_type;
-  //! 行への参照    
-    typedef typename super::reference			reference;
-  //! 定数行への参照    
-    typedef typename super::const_reference		const_reference;
-  //! 行の反復子    
-    typedef typename super::iterator			iterator;
-  //! 行の定数反復子    
-    typedef typename super::const_iterator		const_iterator;
-  //! 行の逆反復子    
-    typedef typename super::reverse_iterator		reverse_iterator;
-  //! 行の定数逆反復子    
-    typedef typename super::const_reverse_iterator	const_reverse_iterator;
   //! 成分の型    
     typedef typename super::element_type		element_type;
-  //! 成分へのポインタ    
-    typedef element_type*				pointer;
-  //! 定数成分へのポインタ    
-    typedef const element_type*				const_pointer;
+  //! 行の型    
+    typedef typename super::value_type			value_type;
+  //! 行の定数反復子    
+    typedef typename super::const_iterator		const_iterator;
+  //! 行の反復子    
+    typedef typename super::iterator			iterator;
+  //! 行の定数逆反復子    
+    typedef typename super::const_reverse_iterator	const_reverse_iterator;
+  //! 行の逆反復子    
+    typedef typename super::reverse_iterator		reverse_iterator;
+  //! 定数行への参照    
+    typedef typename super::const_reference		const_reference;
+  //! 行への参照    
+    typedef typename super::reference			reference;
+  //! 定数要素へのポインタ    
+    typedef typename buf_type::const_pointer		const_pointer;
+  //! 要素へのポインタ    
+    typedef typename buf_type::pointer			pointer;
   //! ポインタ間の差    
     typedef std::ptrdiff_t				difference_type;
 
@@ -1227,8 +1233,8 @@ Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
 			u_int i, u_int j, u_int r, u_int c)
     :super(super::partial_size(i, r, a.nrow())),
      _ncol(super::partial_size(j, c, a.ncol())),
-     _buf((nrow() > 0 && ncol() > 0 ? pointer(&a[i][j])
-				    : pointer((element_type*)0)),
+     _buf((nrow() > 0 && ncol() > 0 ?
+	   pointer(&a[i][j]) : pointer((typename buf_type::value_type*)0)),
 	  nrow()*_buf.stride(ncol()))
 {
     for (u_int ii = 0; ii < nrow(); ++ii)
