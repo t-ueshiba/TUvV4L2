@@ -38,32 +38,57 @@
 #include <iostream>
 #include <stdexcept>
 #include "TU/types.h"
+#include "TU/mmInstructions.h"
 //#if __cplusplus > 197711L
 //#  define __CXX0X
 //#  include <initializer_list>
 //#endif
-#ifdef __INTEL_COMPILER
-#  include <mmintrin.h>
-#endif
 
 namespace TU
 {
 /************************************************************************
-*  class Buf<T>								*
+*  class BufTraits<T, ALIGNED>						*
+************************************************************************/
+template <class T, bool ALIGNED>
+struct BufTraits
+{
+    typedef const T*				const_iterator;
+    typedef T*					iterator;
+};
+#if defined(MMX)			// MMX が定義されているときは...
+template <class T, bool ALIGNED>
+struct BufTraits<mm::vec<T>, ALIGNED>	// 要素がvec<T>の配列の反復子を特別版に
+{
+    typedef mm::load_iterator<T, ALIGNED>	const_iterator;
+    typedef mm::store_iterator<T, ALIGNED>	iterator;
+};
+#endif
+
+/************************************************************************
+*  class Buf<T, ALIGNED>						*
 ************************************************************************/
 //! 可変長バッファクラス
 /*!
   単独で使用することはなく， TU::Array または TU::Array2 の
   第2テンプレート引数に指定することによって，それらの基底クラスとして使う．
-  \param T	要素の型
+  \param T		要素の型
+  \param ALIGNED	バッファのアドレスがalignされていれば true,
+			そうでなければ false
 */
-template <class T>
-class Buf
+template <class T, bool ALIGNED=false>
+class Buf : public BufTraits<T, ALIGNED>
 {
+  private:
+    enum	{ ALIGN = (ALIGNED ? 32 : 1) };
+    
+    typedef BufTraits<T, ALIGNED>		super;
+
   public:
-    typedef T			value_type;	//!< 要素の型
-    typedef value_type*		pointer;	//!< 要素へのポインタ
-    typedef const value_type*	const_pointer;	//!< 要素へのポインタ
+    typedef T					value_type;
+    typedef const value_type*			const_pointer;
+    typedef value_type*				pointer;
+    typedef typename super::const_iterator	const_iterator;
+    typedef typename super::iterator		iterator;
     
   public:
     explicit		Buf(u_int siz=0)			;
@@ -78,11 +103,65 @@ class Buf
     bool		resize(u_int siz)			;
     void		resize(pointer p, u_int siz)		;
     static u_int	stride(u_int siz)			;
-    std::istream&	get(std::istream& in, u_int m)		;
+    std::istream&	get(std::istream& in, u_int m=0)	;
 
   private:
-    pointer	_p;				//!< 記憶領域の先頭ポインタ
+    template <bool _ALIGNED, class=void>
+    struct Allocator
+    {
+	static pointer	alloc(u_int siz)	{ return new value_type[siz]; }
+	static void	free(pointer p, u_int)	{ delete [] p; }
+    };
+#if defined(MMX)
+    template <class DUMMY>		// MMX が定義されていれて，かつ
+    struct Allocator<true, DUMMY>	// alignment するならば...
+    {					// _mm_alloc(), _mm_free() を使用
+	static pointer
+	alloc(u_int siz)
+	{
+	    pointer	p = static_cast<pointer>(
+				_mm_malloc(sizeof(value_type)*siz, ALIGN));
+	    if (p == 0)
+		throw std::runtime_error("Buf<T, ALIGNED>::Allocator<true>::alloc(): failed to allocate memory!!");
+	    
+	    for (pointer q = p; q != p + siz; ++q)
+		new(q) value_type();	// 確保した各要素にコンストラクタを適用
+	    return p;
+	}
+
+	static void
+	free(pointer p, u_int siz)
+	{
+	    if (p != 0)
+	    {
+		for (pointer q = p; q != p + siz; ++q)
+		    q->~value_type();	// 解放する各要素にデストラクタを適用
+		_mm_free(p);
+	    }
+	}
+    };
+#endif
+    typedef Allocator<ALIGNED>			allocator;
+    
+    template <u_int I, u_int J>
+    struct GCD		// 最大公約数を求める template meta-function
+    {
+	enum	{value = GCD<(I > J ? I % J : I), (I > J ? J : J % I)>::value};
+    };
+    template <u_int I>
+    struct GCD<I, 0>
+    {
+	enum	{value = I};
+    };
+    template <u_int J>
+    struct GCD<0, J>
+    {
+	enum	{value = J};
+    };
+
+  private:
     u_int	_size;				//!< 要素数
+    pointer	_p;				//!< 記憶領域の先頭ポインタ
     u_int	_shared	  : 1;			//!< 記憶領域の共有を示すフラグ
     u_int	_capacity : 8*sizeof(u_int)-1;	//!< 要素数単位の容量: >= _size
 };
@@ -91,9 +170,9 @@ class Buf
 /*!
   \param siz	要素数
 */
-template <class T> inline
-Buf<T>::Buf(u_int siz)
-    :_p(new value_type[siz]), _size(siz), _shared(0), _capacity(_size)
+template <class T, bool ALIGNED> inline
+Buf<T, ALIGNED>::Buf(u_int siz)
+    :_size(siz), _p(allocator::alloc(_size)), _shared(0), _capacity(_size)
 {
 }
 
@@ -102,24 +181,24 @@ Buf<T>::Buf(u_int siz)
   \param p	外部領域へのポインタ
   \param siz	要素数
 */
-template <class T> inline
-Buf<T>::Buf(pointer p, u_int siz)
-    :_p(p), _size(siz), _shared(1), _capacity(_size)
+template <class T, bool ALIGNED> inline
+Buf<T, ALIGNED>::Buf(pointer p, u_int siz)
+    :_size(siz), _p(p), _shared(1), _capacity(_size)
 {
 }
     
 //! コピーコンストラクタ
-template <class T>
-Buf<T>::Buf(const Buf& b)
-    :_p(new value_type[b._size]), _size(b._size), _shared(0), _capacity(_size)
+template <class T, bool ALIGNED>
+Buf<T, ALIGNED>::Buf(const Buf& b)
+    :_size(b._size), _p(allocator::alloc(_size)), _shared(0), _capacity(_size)
 {
     for (u_int i = 0; i < _size; ++i)
 	_p[i] = b._p[i];
 }
 
 //! 標準代入演算子
-template <class T> Buf<T>&
-Buf<T>::operator =(const Buf& b)
+template <class T, bool ALIGNED> Buf<T, ALIGNED>&
+Buf<T, ALIGNED>::operator =(const Buf& b)
 {
     if (this != &b)
     {
@@ -131,30 +210,30 @@ Buf<T>::operator =(const Buf& b)
 }
 
 //! デストラクタ
-template <class T> inline
-Buf<T>::~Buf()
+template <class T, bool ALIGNED> inline
+Buf<T, ALIGNED>::~Buf()
 {
     if (!_shared)
-	delete [] _p;
+	allocator::free(_p, _size);
 }
     
 //! バッファが使用する内部記憶領域への定数ポインタを返す．
-template <class T> inline typename Buf<T>::const_pointer
-Buf<T>::data() const
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_pointer
+Buf<T, ALIGNED>::data() const
 {
     return _p;
 }
     
 //! バッファが使用する内部記憶領域へのポインタを返す．
-template <class T> inline typename Buf<T>::pointer
-Buf<T>::data()
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::pointer
+Buf<T, ALIGNED>::data()
 {
     return _p;
 }
 
 //! バッファの要素数を返す．
-template <class T> inline u_int
-Buf<T>::size() const
+template <class T, bool ALIGNED> inline u_int
+Buf<T, ALIGNED>::size() const
 {
     return _size;
 }
@@ -169,21 +248,21 @@ Buf<T>::size() const
   \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
 				に送出
 */
-template <class T> bool
-Buf<T>::resize(u_int siz)
+template <class T, bool ALIGNED> bool
+Buf<T, ALIGNED>::resize(u_int siz)
 {
     if (_size == siz)
 	return false;
     
     if (_shared)
-	throw std::logic_error("Buf<T>::resize: cannot change size of shared buffer!");
+	throw std::logic_error("Buf<T, ALIGNED>::resize: cannot change size of shared buffer!");
 
     const u_int	old_size = _size;
     _size = siz;
     if (_capacity < _size)
     {
-	delete [] _p;
-	_p	  = new value_type[_size];
+	allocator::free(_p, old_size);
+	_p = allocator::alloc(_size);
 	_capacity = _size;
     }
     return _size > old_size;
@@ -194,12 +273,12 @@ Buf<T>::resize(u_int siz)
   \param p	新しい記憶領域へのポインタ
   \param siz	新しい要素数
 */
-template <class T> inline void
-Buf<T>::resize(pointer p, u_int siz)
+template <class T, bool ALIGNED> inline void
+Buf<T, ALIGNED>::resize(pointer p, u_int siz)
 {
-    _size = siz;
     if (!_shared)
-	delete [] _p;
+	allocator::free(_p, _size);
+    _size     = siz;
     _p	      = p;
     _shared   = 1;
     _capacity = _size;
@@ -212,10 +291,20 @@ Buf<T>::resize(pointer p, u_int siz)
   \param siz	要素数
   \return	alignされた要素数
 */
-template <class T> inline u_int
-Buf<T>::stride(u_int siz)
+template <class T, bool ALIGNED> inline u_int
+Buf<T, ALIGNED>::stride(u_int siz)
 {
-    return siz;
+#if defined(MMX)
+    if (ALIGNED)
+    {
+	const u_int	LCM = ALIGN * sizeof(T) / GCD<sizeof(T), ALIGN>::value;
+      // LCM * m >= sizeof(T) * siz なる最小の m を求める．
+	const u_int	m = (sizeof(T)*siz + LCM - 1) / LCM;
+	return (LCM * m) / sizeof(T);
+    }
+    else
+#endif
+	return siz;
 }
     
 //! 入力ストリームから指定した箇所に配列を読み込む(ASCII)．
@@ -224,8 +313,8 @@ Buf<T>::stride(u_int siz)
   \param m	読み込み先の先頭を指定するindex
   \return	inで指定した入力ストリーム
 */
-template <class T> std::istream&
-Buf<T>::get(std::istream& in, u_int m)
+template <class T, bool ALIGNED> std::istream&
+Buf<T, ALIGNED>::get(std::istream& in, u_int m)
 {
     const u_int		BufSiz = (sizeof(value_type) < 2048 ?
 				  2048 / sizeof(value_type) : 1);
@@ -258,180 +347,55 @@ Buf<T>::get(std::istream& in, u_int m)
     
     return in;
 }
-
-#ifdef __INTEL_COMPILER
-/************************************************************************
-*  class AlignedBuf<T>							*
-************************************************************************/
-//! 記憶領域のアドレスが16byteの倍数になるようalignされた可変長バッファクラス
-/*!
-  単独で使用することはなく， TU::Array または TU::Array2 の
-  第2テンプレート引数に指定することによって，それらの基底クラスとして使う．
-  \param T	要素の型
-*/
-template <class T>
-class AlignedBuf : public Buf<T>
-{
-  private:
-    typedef Buf<T>			super;
-
-  public:
-    typedef typename super::value_type	value_type;	//! 要素の型
-    typedef typename super::pointer	pointer;	//! 要素へのポインタ
-
-  public:
-    explicit		AlignedBuf(u_int siz=0)			;
-			AlignedBuf(const AlignedBuf& b)		;
-    AlignedBuf&		operator =(const AlignedBuf& b)		;
-			~AlignedBuf()				;
-
-    using		super::data;
-    using		super::size;
-
-    bool		resize(u_int siz)			;
-    static u_int	stride(u_int siz)			;
-    
-  private:
-    static pointer	memalloc(u_int siz)			;
-    static void		memfree(pointer p)			;
-
-    enum	{ALIGN = 32,};
-    
-    template <u_int I, u_int J>
-    struct GCD
-    {
-	enum	{value = GCD<(I > J ? I % J : I), (I > J ? J : J % I)>::value};
-    };
-    template <u_int I>
-    struct GCD<I, 0>
-    {
-	enum	{value = I};
-    };
-    template <u_int J>
-    struct GCD<0, J>
-    {
-	enum	{value = J};
-    };
-};
-
-//! 指定した要素数のバッファを生成する．
-/*!
-  \param siz	要素数
-*/
-template <class T> inline
-AlignedBuf<T>::AlignedBuf(u_int siz)
-    :super(memalloc(siz), siz)
-{
-}
-
-//! コピーコンストラクタ
-template <class T>
-AlignedBuf<T>::AlignedBuf(const AlignedBuf& b)
-    :super(memalloc(b.size()), b.size())
-{
-    super::operator =(b);
-}
-
-//! 標準代入演算子
-template <class T> AlignedBuf<T>&
-AlignedBuf<T>::operator =(const AlignedBuf& b)
-{
-    resize(b.size());		// Buf<T>::resize(u_int)は使えない．
-    super::operator =(b);
-    return *this;
-}
-
-//! デストラクタ
-template <class T> inline
-AlignedBuf<T>::~AlignedBuf()
-{
-    memfree(data());
-}
-    
-//! バッファの要素数を変更する．
-/*!
-  \param siz	新しい要素数
-  \return	sizが元の要素数と等しければtrue，そうでなければfalse
-*/
-template <class T> inline bool
-AlignedBuf<T>::resize(u_int siz)
-{
-    if (siz == size())
-	return false;
-
-    memfree(data());
-    super::resize(memalloc(siz), siz);
-    return true;
-}
-
-//! 記憶領域をalignするために必要な要素数を返す．
-/*!
-  必要な記憶容量が32byteの倍数になるよう，与えられた要素数を繰り上げる．
-  \param siz	要素数
-  \return	alignされた要素数
-*/
-template <class T> inline u_int
-AlignedBuf<T>::stride(u_int siz)
-{
-  // ALIGN と sizeof(T) の最小公倍数を求める．
-    const u_int	LCM = ALIGN * sizeof(T) / GCD<sizeof(T), ALIGN>::value;
-  // LCM * m >= sizeof(T) * siz なる最小の m を求める．
-    const u_int	m = (sizeof(T)*siz + LCM - 1) / LCM;
-    return (LCM * m) / sizeof(T);
-}
-
-template <class T> inline typename AlignedBuf<T>::pointer
-AlignedBuf<T>::memalloc(u_int siz)
-{
-    void*	p = _mm_malloc(sizeof(value_type)*siz, ALIGN);
-    if (p == 0)
-	throw std::runtime_error("AlignedBuf<T>::memalloc(): failed to allocate memory!!");
-    return static_cast<pointer>(p);
-}
-
-template <class T> inline void
-AlignedBuf<T>::memfree(pointer p)
-{
-    if (p != 0)
-	_mm_free(p);
-}
-#endif	// __INTEL_COMPILER
     
 /************************************************************************
-*  class FixedSizedBuf<T, D>						*
+*  class FixedSizedBuf<T, D, ALIGNED>					*
 ************************************************************************/
 //! 定数サイズのバッファクラス
 /*!
   単独で使用することはなく， TU::Array の第2テンプレート引数に指定する
   ことによって TU::Array の基底クラスとして使う．
-  \param T	要素の型
-  \param D	バッファ中の要素数
+  \param T		要素の型
+  \param D		バッファ中の要素数
+  \param ALIGNED	バッファのアドレスがalignされていれば true,
+			そうでなければ false
 */
-template <class T, u_int D>
-class FixedSizedBuf
+template <class T, u_int D, bool ALIGNED=false>
+class FixedSizedBuf : public BufTraits<T, ALIGNED>
 {
-  public:
-    typedef T			value_type;	//!< 要素の型
-    typedef value_type*		pointer;	//!< 要素へのポインタ
-    typedef const value_type*	const_pointer;	//!< 定数要素へのポインタ
+  private:
+    typedef BufTraits<T, ALIGNED>		super;
 
+  public:
+    typedef T					value_type;
+    typedef const value_type*			const_pointer;
+    typedef value_type*				pointer;
+    typedef typename super::const_iterator	const_iterator;
+    typedef typename super::iterator		iterator;
+    
   public:
     explicit		FixedSizedBuf(u_int siz=D)		;
 			FixedSizedBuf(pointer, u_int)		;
 			FixedSizedBuf(const FixedSizedBuf& b)	;
     FixedSizedBuf&	operator =(const FixedSizedBuf& b)	;
-
+    
     const_pointer	data()				const	;
     pointer		data()					;
     static u_int	size()					;
-    static u_int	dim()					;
     static bool		resize(u_int siz)			;
     void		resize(pointer p, u_int siz)		;
     static u_int	stride(u_int siz)			;
     std::istream&	get(std::istream& in)			;
 
   private:
-    T			_p[D];				// D-sized buffer
+    template <bool _ALIGNED, class=void>
+    struct Buffer		{ value_type p[D]; };
+#if defined(MMX)
+    template <class DUMMY>
+    struct Buffer<true, DUMMY>	{ __declspec(align(32)) value_type p[D]; };
+#endif
+
+    Buffer<ALIGNED>	_buf;				// D-sized buffer
 };
 
 //! バッファを生成する．
@@ -440,8 +404,8 @@ class FixedSizedBuf
   \throw std::logic_error	sizがテンプレートパラメータDに一致しない場合に
 				送出
 */
-template <class T, u_int D> inline
-FixedSizedBuf<T, D>::FixedSizedBuf(u_int siz)
+template <class T, u_int D, bool ALIGNED> inline
+FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(u_int siz)
 {
     resize(siz);
 }
@@ -452,49 +416,49 @@ FixedSizedBuf<T, D>::FixedSizedBuf(u_int siz)
   この関数は常に例外を送出する．
   \throw std::logic_error	この関数が呼ばれたら必ず送出
 */
-template <class T, u_int D> inline
-FixedSizedBuf<T, D>::FixedSizedBuf(pointer, u_int)
+template <class T, u_int D, bool ALIGNED> inline
+FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(pointer, u_int)
 {
-    throw std::logic_error("FixedSizedBuf<T, D>::FixedSizedBuf(pointer, u_int): cannot specify a pointer to external storage!!");
+    throw std::logic_error("FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(pointer, u_int): cannot specify a pointer to external storage!!");
 }
 
 //! コピーコンストラクタ
-template <class T, u_int D>
-FixedSizedBuf<T, D>::FixedSizedBuf(const FixedSizedBuf<T, D>& b)
+template <class T, u_int D, bool ALIGNED>
+FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(const FixedSizedBuf& b)
 {
     for (u_int i = 0; i < D; ++i)
-	_p[i] = b._p[i];
+	_buf.p[i] = b._buf.p[i];
 }
 
 //! 標準代入演算子
-template <class T, u_int D> FixedSizedBuf<T, D>&
-FixedSizedBuf<T, D>::operator =(const FixedSizedBuf<T, D>& b)
+template <class T, u_int D, bool ALIGNED> FixedSizedBuf<T, D, ALIGNED>&
+FixedSizedBuf<T, D, ALIGNED>::operator =(const FixedSizedBuf& b)
 {
     if (this != &b)
 	for (u_int i = 0; i < D; ++i)
-	    _p[i] = b._p[i];
+	    _buf.p[i] = b._buf.p[i];
     return *this;
 }
 
 //! バッファが使用する内部記憶領域への定数ポインタを返す．
-template <class T, u_int D>
-inline typename FixedSizedBuf<T, D>::const_pointer
-FixedSizedBuf<T, D>::data() const
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::const_pointer
+FixedSizedBuf<T, D, ALIGNED>::data() const
 {
-    return _p;
+    return _buf.p;
 }
     
 //! バッファが使用する内部記憶領域へのポインタを返す．
-template <class T, u_int D>
-inline typename FixedSizedBuf<T, D>::pointer
-FixedSizedBuf<T, D>::data()
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::pointer
+FixedSizedBuf<T, D, ALIGNED>::data()
 {
-    return _p;
+    return _buf.p;
 }
 
 //! バッファの要素数を返す．
-template <class T, u_int D> inline u_int
-FixedSizedBuf<T, D>::size()
+template <class T, u_int D, bool ALIGNED> inline u_int
+FixedSizedBuf<T, D, ALIGNED>::size()
 {
     return D;
 }
@@ -508,11 +472,11 @@ FixedSizedBuf<T, D>::size()
   \throw std::logic_error	sizがテンプレートパラメータDに一致しない場合に
 				送出
 */
-template <class T, u_int D> inline bool
-FixedSizedBuf<T, D>::resize(u_int siz)
+template <class T, u_int D, bool ALIGNED> inline bool
+FixedSizedBuf<T, D, ALIGNED>::resize(u_int siz)
 {
     if (siz != D)
-	throw std::logic_error("FixedSizedBuf<T, D>::resize(u_int): cannot change buffer size!!");
+	throw std::logic_error("FixedSizedBuf<T, D, ALIGNED>::resize(u_int): cannot change buffer size!!");
     return false;
 }
     
@@ -527,11 +491,11 @@ FixedSizedBuf<T, D>::resize(u_int siz)
 				sizがテンプレートパラメータDに一致しない場合に
 				送出
 */
-template <class T, u_int D> inline void
-FixedSizedBuf<T, D>::resize(pointer p, u_int siz)
+template <class T, u_int D, bool ALIGNED> inline void
+FixedSizedBuf<T, D, ALIGNED>::resize(pointer p, u_int siz)
 {
-    if (p != _p || siz != D)
-	throw std::logic_error("FixedSizedBuf<T, D>::resize(pointer, u_int): cannot specify a potiner to external storage!!");
+    if (p != _buf.p || siz != D)
+	throw std::logic_error("FixedSizedBuf<T, D, ALIGNED>::resize(pointer, u_int): cannot specify a potiner to external storage!!");
 }
     
 //! 記憶領域をalignするために必要な要素数を返す．
@@ -541,8 +505,8 @@ FixedSizedBuf<T, D>::resize(pointer p, u_int siz)
   \param siz	要素数
   \return	alignされた要素数
 */
-template <class T, u_int D> inline u_int
-FixedSizedBuf<T, D>::stride(u_int siz)
+template <class T, u_int D, bool ALIGNED> inline u_int
+FixedSizedBuf<T, D, ALIGNED>::stride(u_int siz)
 {
     return siz;
 }
@@ -552,14 +516,14 @@ FixedSizedBuf<T, D>::stride(u_int siz)
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-template <class T, u_int D> std::istream&
-FixedSizedBuf<T, D>::get(std::istream& in)
+template <class T, u_int D, bool ALIGNED> std::istream&
+FixedSizedBuf<T, D, ALIGNED>::get(std::istream& in)
 {
     for (u_int i = 0; i < D; ++i)
-	in >> _p[i];
+	in >> _buf.p[i];
     return in;
 }
-    
+
 /************************************************************************
 *  class Array<T, B>							*
 ************************************************************************/
@@ -569,10 +533,10 @@ FixedSizedBuf<T, D>::get(std::istream& in)
   \param B	バッファ
 */
 template <class T, class B=Buf<T> >
-class Array
+class Array : public B
 {
   private:
-    typedef B					buf_type;
+    typedef B					super;
 
     template <class _A>
     class IsArray
@@ -606,23 +570,25 @@ class Array
     typedef typename ElementType<T, IsArray<T>::value>::type
 							element_type;
   //! 要素の型    
-    typedef T						value_type;
-  //! 要素への参照
-    typedef value_type&					reference;
-  //! 定数要素への参照
-    typedef const value_type&				const_reference;
+    typedef typename super::value_type			value_type;
   //! 要素へのポインタ
-    typedef value_type*					pointer;
+    typedef typename super::pointer			pointer;
   //! 定数要素へのポインタ
-    typedef const value_type*				const_pointer;
+    typedef typename super::const_pointer		const_pointer;
   //! 反復子
-    typedef pointer					iterator;
+    typedef typename super::iterator			iterator;
   //! 定数反復子
-    typedef const_pointer				const_iterator;
+    typedef typename super::const_iterator		const_iterator;
   //! 逆反復子    
     typedef std::reverse_iterator<iterator>		reverse_iterator;
   //! 定数逆反復子    
     typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
+  //! 要素への参照
+    typedef typename std::iterator_traits<iterator>::reference
+							reference;
+  //! 定数要素への参照
+    typedef typename std::iterator_traits<const_iterator>::reference
+							const_reference;
   //! ポインタ間の差
     typedef std::ptrdiff_t				difference_type;
     
@@ -630,7 +596,6 @@ class Array
     Array()								;
     explicit Array(u_int d)						;
     Array(pointer p, u_int d)						;
-    Array(buf_type b)							;
     template <class B2>
     Array(Array<T, B2>& a, u_int i, u_int d)				;
     template <class T2, class B2>
@@ -642,14 +607,12 @@ class Array
     Array&	operator =(std::initializer_list<value_type> args)	;
 #endif
     Array&	operator =(const element_type& c)			;
-    
-    const_pointer		data()				const	;
-    pointer			data()					;
-    u_int			size()				const	;
+
+    using	super::data;
+    using	super::size;
+    using	super::resize;
+
     u_int			dim()				const	;
-    bool			resize(u_int siz)			;
-    void			resize(pointer p, u_int siz)		;
-    
     const_iterator		cbegin()			const	;
     const_iterator		begin()				const	;
     iterator			begin()					;
@@ -677,7 +640,7 @@ class Array
     bool		operator ==(const Array<T2, B2>& a)	const	;
     template <class T2, class B2>
     bool		operator !=(const Array<T2, B2>& a)	const	;
-    std::istream&	get(std::istream& in, u_int m=0)		;
+    std::istream&	get(std::istream& in)				;
     std::ostream&	put(std::ostream& out)			const	;
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out)			const	;
@@ -685,15 +648,12 @@ class Array
 
   protected:
     static u_int	partial_size(u_int i, u_int d, u_int a)	;
-
-  private:
-    buf_type		_buf;
 };
 
 //! 配列を生成する．
 template <class T, class B> inline
 Array<T, B>::Array()
-    :_buf()
+    :super()
 {
 }
 
@@ -703,7 +663,7 @@ Array<T, B>::Array()
 */
 template <class T, class B> inline
 Array<T, B>::Array(u_int d)
-    :_buf(d)
+    :super(d)
 {
 }
 
@@ -714,18 +674,7 @@ Array<T, B>::Array(u_int d)
 */
 template <class T, class B> inline
 Array<T, B>::Array(pointer p, u_int d)
-    :_buf(p, d)
-{
-}
-
-//! 外部のバッファを指定して配列を生成する．
-/*!
-  テンプレートパラメータBが外部バッファへの参照である場合を想定している.
-  \param b	外部バッファ
-*/
-template <class T, class B> inline
-Array<T, B>::Array(buf_type b)
-    :_buf(b)
+    :super(p, d)
 {
 }
 
@@ -737,8 +686,8 @@ Array<T, B>::Array(buf_type b)
 */
 template <class T, class B> template <class B2> inline
 Array<T, B>::Array(Array<T, B2>& a, u_int i, u_int d)
-    :_buf(i < a.size() ? pointer(&a[i]) : pointer((element_type*)0),
-	  partial_size(i, d, a.size()))
+    :super(i < a.size() ? pointer(&a[i]) : pointer((element_type*)0),
+	   partial_size(i, d, a.size()))
 {
 }
 
@@ -749,7 +698,7 @@ Array<T, B>::Array(Array<T, B2>& a, u_int i, u_int d)
 */
 template <class T, class B> template <class T2, class B2>
 Array<T, B>::Array(const Array<T2, B2>& a)
-    :_buf(a.size())
+    :super(a.size())
 {
     for (u_int i = 0; i < size(); ++i)
 	(*this)[i] = a[i];
@@ -773,7 +722,7 @@ Array<T, B>::operator =(const Array<T2, B2>& a)
 #ifdef __CXX0X
 template <class T, class B>
 Array<T, B>::Array(std::initializer_list<value_type> args)
-    :_buf(args.size())
+    :super(args.size())
 {
     u_int	i = 0;
     for (auto val : args)
@@ -791,61 +740,6 @@ Array<T, B>::operator =(std::initializer_list<value_type> args)
 }
 #endif
     
-//! 内部記憶領域への定数ポインタを返す．
-template <class T, class B> inline typename Array<T, B>::const_pointer
-Array<T, B>::data() const
-{
-    return _buf.data();
-}
-    
-//! 内部記憶領域へのポインタを返す．
-template <class T, class B> inline typename Array<T, B>::pointer
-Array<T, B>::data()
-{
-    return _buf.data();
-}
-
-//! 要素数を返す．
-template <class T, class B> inline u_int
-Array<T, B>::size() const
-{
-    return _buf.size();
-}
-    
-//! 要素数を返す．
-template <class T, class B> inline u_int
-Array<T, B>::dim() const
-{
-    return size();
-}
-    
-//! 要素数を変更する．
-/*!
-  ただし，他のオブジェクトと記憶領域を共有している配列の要素数を
-  変更することはできない．
-  \param siz			新しい要素数
-  \return			sizが元の要素数よりも大きければtrue，そう
-				でなければfalse
-  \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
-				に送出
-*/
-template <class T, class B> bool
-Array<T, B>::resize(u_int siz)
-{
-    return _buf.resize(siz);
-}
-
-//! 内部で使用する記憶領域を指定したものに変更する．
-/*!
-  \param p	新しい記憶領域へのポインタ
-  \param siz	新しい要素数
-*/
-template <class T, class B> inline void
-Array<T, B>::resize(pointer p, u_int siz)
-{
-    _buf.resize(p, siz);
-}
-
 //! 全ての要素に同一の値を代入する．
 /*!
   \param c	代入する値
@@ -859,6 +753,13 @@ Array<T, B>::operator =(const element_type& c)
     return *this;
 }
 
+//! 要素数を返す．
+template <class T, class B> inline u_int
+Array<T, B>::dim() const
+{
+    return size();
+}
+    
 //! 配列の先頭要素を指す定数反復子を返す．
 /*!
   \return	先頭要素を指す定数反復子
@@ -1105,10 +1006,10 @@ Array<T, B>::operator !=(const Array<T2, B2>& a) const
   \param m	読み込み先の先頭を指定するindex
   \return	inで指定した入力ストリーム
 */
-template <class T, class B> std::istream&
-Array<T, B>::get(std::istream& in, u_int m)
+template <class T, class B> inline std::istream&
+Array<T, B>::get(std::istream& in)
 {
-    return _buf.get(in, m);
+    return super::get(in);
 }
 
 //! 出力ストリームに配列を書き出す(ASCII)．
@@ -1309,20 +1210,6 @@ Array2<T, B, R>::Array2(u_int r, u_int c)
 template <class T, class B, class R> inline
 Array2<T, B, R>::Array2(pointer p, u_int r, u_int c)
     :super(r), _ncol(c), _buf(p, nrow()*_buf.stride(ncol()))
-{
-    set_rows();
-}
-
-//! 外部のバッファを指定して2次元配列を生成する.
-/*!
-  テンプレートパラメータBが外部バッファへの参照である場合を想定している.
-  \param buf	外部バッファ
-  \param r	行数
-  \param c	列数
-*/
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2(buf_type buf, u_int r, u_int c)
-    :super(r), _ncol(c), _buf(buf)
 {
     set_rows();
 }

@@ -59,13 +59,8 @@ class Warp
 	u_int		width()			const	{return us.size();}
 	void		resize(u_int d)			;
 
-#if defined(__INTEL_COMPILER)
-	Array<short,  AlignedBuf<short> >	us, vs;
-	Array<u_char, AlignedBuf<u_char> >	du, dv;
-#else
-	Array<short>				us, vs;
-	Array<u_char>				du, dv;
-#endif
+	Array<short,  Buf<short, true> >	us, vs;
+	Array<u_char, Buf<u_char, true> >	du, dv;
 	int					lmost;
     };
 

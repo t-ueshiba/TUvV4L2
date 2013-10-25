@@ -61,6 +61,8 @@
 #include <immintrin.h>
 #include <iostream>
 #include <cassert>
+#include <boost/iterator_adaptors.hpp>
+#include <boost/tuple/tuple.hpp>
 
 /************************************************************************
 *  Emulations								*
@@ -3092,6 +3094,558 @@ end(T* p)
     return p - (nelms % vsize);
 }
 
+/************************************************************************
+*  struct tuple2vec<T, N>						*
+************************************************************************/
+//! 同じ成分を持つboost::tupleをSIMDベクトルに変換する関数オブジェクト
+/*!
+  \param T	成分の型
+  \param N	成分の個数(vec<T>::sizeに等しい)
+*/
+template <class T, size_t N=vec<T>::size>	struct tuple2vec;
+template <class T>
+struct tuple2vec<T, 1>
+{
+    typedef boost::tuple<T>				argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<0>(t));
+		}
+};
+template <class T>
+struct tuple2vec<T, 2>
+{
+    typedef boost::tuple<T, T>				argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<1>(t), boost::get<0>(t));
+		}
+};
+template <class T>
+struct tuple2vec<T, 4>
+{
+    typedef boost::tuple<T, T, T, T>			argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<3>(t), boost::get<2>(t),
+				       boost::get<1>(t), boost::get<0>(t));
+		}
+};
+template <class T>
+struct tuple2vec<T, 8>
+{
+    typedef boost::tuple<T, T, T, T, T, T, T, T>	argument_type;
+    typedef vec<T>					result_type;
+
+    result_type	operator ()(const argument_type& t) const
+		{
+		    return result_type(boost::get<7>(t), boost::get<6>(t),
+				       boost::get<5>(t), boost::get<4>(t),
+				       boost::get<3>(t), boost::get<2>(t),
+				       boost::get<1>(t), boost::get<0>(t));
+		}
+};
+
+/************************************************************************
+*  class load_iterator<T, ALIGNED>					*
+************************************************************************/
+//! 指定されたアドレスからSIMDベクトルを読み込む反復子
+/*!
+  \param T		SIMDベクトルの成分の型
+  \param ALIGNED	読み込み元のアドレスがalignmentされていればtrue,
+			そうでなければfalse
+*/
+template <class T, bool ALIGNED=false>
+class load_iterator : public boost::iterator_adaptor<load_iterator<T, ALIGNED>,
+						     const vec<T>*,
+						     vec<T>,
+						     boost::use_default,
+						     vec<T> >
+{
+  private:
+    typedef boost::iterator_adaptor<load_iterator,
+				    const vec<T>*,
+				    vec<T>,
+				    boost::use_default,
+				    vec<T> >		super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    load_iterator(const vec<T>* p)	:super(p)	{}
+    load_iterator(const T* p)
+	:super(reinterpret_cast<const vec<T>*>(p))	{}
+    
+  private:
+    reference	dereference()	const	{return load<ALIGNED>(super::base());}
+};
+
+template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
+make_load_iterator(const vec<T>* p)
+{
+    return load_iterator<T, ALIGNED>(p);
+}
+
+template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
+make_load_iterator(const T* p)
+{
+    return load_iterator<T, ALIGNED>(p);
+}
+
+/************************************************************************
+*  class store_iterator<T, ALIGNED>					*
+************************************************************************/
+namespace detail
+{
+    template <class T, bool ALIGNED=false>
+    class store_proxy
+    {
+      public:
+	typedef T			element_type;
+	typedef vec<element_type>	value_type;
+	
+      public:
+	store_proxy(vec<T>* p)	:_p(p)					{}
+	store_proxy(T* p)	:_p(reinterpret_cast<vec<T>*>(p))	{}
+	
+	value_type	operator =(value_type val) const
+			{
+			    store<ALIGNED>(_p, val);
+			    return val;
+			}
+	value_type	operator +=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) + val);
+			}
+	value_type	operator -=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) - val);
+			}
+	value_type	operator *=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) * val);
+			}
+	value_type	operator /=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) / val);
+			}
+	value_type	operator %=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) % val);
+			}
+	value_type	operator &=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) & val);
+			}
+	value_type	operator |=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) | val);
+			}
+	value_type	operator ^=(value_type val) const
+			{
+			    return operator =(load<ALIGNED>(_p) ^ val);
+			}
+
+      private:
+	vec<T>* const	_p;
+    };
+}
+
+//! 指定されたアドレスにSIMDベクトルを書き込む反復子
+/*!
+  \param T		SIMDベクトルの成分の型
+  \param ALIGNED	書き込み先アドレスがalignmentされていればtrue,
+			そうでなければfalse
+*/
+template <class T, bool ALIGNED=false>
+class store_iterator
+    : public boost::iterator_adaptor<store_iterator<T, ALIGNED>,
+				     vec<T>*,
+				     vec<T>,
+				     boost::use_default,
+				     detail::store_proxy<T, ALIGNED> >
+{
+  private:
+    typedef boost::iterator_adaptor<store_iterator,
+				    vec<T>*,
+				    vec<T>,
+				    boost::use_default,
+				    detail::store_proxy<T, ALIGNED> >	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    store_iterator(vec<T>* p)	:super(p)				{}
+    store_iterator(T* p)	:super(reinterpret_cast<vec<T>*>(p))	{}
+	       
+  private:
+    reference	dereference()	const	{return reference(super::base());}
+};
+
+template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
+make_store_iterator(vec<T>* p)
+{
+    return store_iterator<T, ALIGNED>(p);
+}
+
+template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
+make_store_iterator(T* p)
+{
+    return store_iterator<T, ALIGNED>(p);
+}
+
+/************************************************************************
+*  class cvtdown_iterator<T, ITER>					*
+************************************************************************/
+//! SIMDベクトルを出力する反復子を介して複数のSIMDベクトルを読み込み，それをより小さな成分を持つSIMDベクトルに変換する反復子
+/*!
+  \param T	変換先のSIMDベクトルの成分の型
+  \param ITER	SIMDベクトルを出力する反復子
+*/
+template <class T, class ITER>
+class cvtdown_iterator
+    : public boost::iterator_adaptor<
+		cvtdown_iterator<T, ITER>,			// self
+		ITER,						// base
+		vec<T>,						// value_type
+		boost::single_pass_traversal_tag,		// traversal
+		vec<T> >					// reference
+{
+  private:
+    typedef boost::iterator_adaptor<cvtdown_iterator,
+				    ITER,
+				    vec<T>, 
+				    boost::single_pass_traversal_tag,
+				    vec<T> >		super;
+    typedef typename std::iterator_traits<ITER>
+			::value_type::value_type	element_type;
+    typedef typename type_traits<element_type>::lower_type
+							lower_type;
+    typedef typename type_traits<lower_type>::signed_type
+							signed_lower_type;
+    typedef typename type_traits<lower_type>::unsigned_type
+							unsigned_lower_type;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
+
+  private:
+    template <class S>
+    void	cvtdown(vec<S>& x)
+		{
+		    vec<typename type_traits<S>::upper_type>	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt<S>(y, z);
+		}
+    void	cvtdown(vec<signed_lower_type>& x)
+		{
+		    vec<element_type>	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt<signed_lower_type>(y, z);
+		}
+    void	cvtdown(vec<unsigned_lower_type>& x)
+		{
+		    vec<element_type>	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt<unsigned_lower_type>(y, z);
+		}
+    void	cvtdown(vec<element_type>& x)
+		{
+		    x = *super::base();
+		    ++super::base_reference();
+		}
+    reference	dereference() const
+		{
+		    reference	x;
+		    const_cast<cvtdown_iterator*>(this)->cvtdown(x);
+		    return x;
+		}
+    void	advance(difference_type n)				{}
+    void	increment()						{}
+    void	decrement()						{}
+};
+
+template <class T, class ITER> cvtdown_iterator<T, ITER>
+make_cvtdown_iterator(ITER iter)
+{
+    return cvtdown_iterator<T, ITER>(iter);
+}
+
+/************************************************************************
+*  class cvtup_iterator<ITER>						*
+************************************************************************/
+namespace detail
+{
+    template <class ITER>
+    class cvtup_proxy
+    {
+      private:
+	typedef typename std::iterator_traits<ITER>::value_type	value_type;
+	typedef typename value_type::value_type			element_type;
+	typedef typename std::iterator_traits<ITER>::reference	reference;
+	typedef typename type_traits<element_type>::lower_type	lower_type;
+	typedef typename type_traits<lower_type>::signed_type
+							signed_lower_type;
+	typedef typename type_traits<lower_type>::unsigned_type
+							unsigned_lower_type;
+
+	template <class OP, class T>
+	void	cvtup(vec<T> x)
+		{
+		    typedef typename type_traits<T>::upper_type	U;
+
+		    cvtup<OP>(cvt<U, 0>(x));
+		    cvtup<OP>(cvt<U, 1>(x));
+		}
+	template <class OP>
+	void	cvtup(vec<signed_lower_type> x)
+		{
+		    cvtup<OP>(cvt<element_type, 0>(x));
+		    cvtup<OP>(cvt<element_type, 1>(x));
+		}
+	template <class OP>
+	void	cvtup(vec<unsigned_lower_type> x)
+		{
+		    cvtup<OP>(cvt<element_type, 0>(x));
+		    cvtup<OP>(cvt<element_type, 1>(x));
+		}
+	template <class OP>
+	void	cvtup(vec<element_type> x)
+		{
+		    OP()(x, *_iter);
+		    ++_iter;
+		}
+
+      public:
+	cvtup_proxy(ITER const& iter)	:_iter(const_cast<ITER&>(iter))	{}
+
+	template <class T>
+	void	operator =(vec<T> x)
+		{
+		    cvtup<assign<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator +=(vec<T> x)
+		{
+		    cvtup<assign_plus<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator -=(vec<T> x)
+		{
+		    cvtup<assign_minus<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator *=(vec<T> x)
+		{
+		    cvtup<assign_multiplies<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator /=(vec<T> x)
+		{
+		    cvtup<assign_divides<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator %=(vec<T> x)
+		{
+		    cvtup<assign_modulus<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator &=(vec<T> x)
+		{
+		    cvtup<assign_bit_and<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator |=(vec<T> x)
+		{
+		    cvtup<assign_bit_or<value_type, reference> >(x);
+		}
+	template <class T>
+	void	operator ^=(vec<T> x)
+		{
+		    cvtup<assign_bit_xor<value_type, reference> >(x);
+		}
+	
+      private:
+	ITER&	_iter;
+    };
+}
+
+//! SIMDベクトルを受け取ってより大きな成分を持つ複数のSIMDベクトルに変換し，それを指定された反復子を介して書き込む反復子
+/*!
+  \param ITER	変換先のSIMDベクトルを入力する反復子
+*/
+template <class ITER>
+class cvtup_iterator
+    : public boost::iterator_adaptor<cvtup_iterator<ITER>,
+				     ITER,
+				     typename std::iterator_traits<ITER>
+						 ::value_type,
+				     boost::single_pass_traversal_tag,
+				     detail::cvtup_proxy<ITER> >
+{
+  private:
+    typedef boost::iterator_adaptor<cvtup_iterator,
+				    ITER,
+				    typename std::iterator_traits<ITER>
+						::value_type,
+				    boost::single_pass_traversal_tag,
+				    detail::cvtup_proxy<ITER> >	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+    cvtup_iterator(ITER const& iter)	:super(iter)			{}
+
+  private:
+    reference		dereference() const
+			{
+			    return reference(super::base());
+			}
+    void		advance(difference_type n)			{}
+    void		increment()					{}
+    void		decrement()					{}
+    difference_type	distance_to(cvtup_iterator iter) const
+			{
+			    return (iter.base() - super::base())
+				 / value_type::size;
+			}
+};
+
+template <class ITER> cvtup_iterator<ITER>
+make_cvtup_iterator(ITER iter)
+{
+    return cvtup_iterator<ITER>(iter);
+}
+
+/************************************************************************
+*  class shift_iterator<ITER>						*
+************************************************************************/
+template <class ITER>
+class shift_iterator
+    : public boost::iterator_adaptor<
+			shift_iterator<ITER>,
+			ITER,
+			boost::use_default,
+			boost::forward_traversal_tag,
+			typename std::iterator_traits<ITER>::value_type>
+{
+  private:
+    typedef boost::iterator_adaptor<
+		shift_iterator,
+		ITER,
+		boost::use_default,
+		boost::forward_traversal_tag,
+		typename std::iterator_traits<ITER>::value_type>	super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+		shift_iterator(ITER iter, size_t pos=0)
+		    :super(iter), _pos(0), _val(*iter), _next(), _valid(true)
+		{
+		    while (pos--)
+			increment();
+		}
+
+  private:
+    void	shift() const
+		{
+		    _val  = shift_r<1>(_next, _val);
+		    _next = shift_r<1>(_next);
+		}
+    void	load_and_shift() const
+		{
+		    _next  = *super::base();
+		    _valid = true;
+		    shift();
+		}
+    reference	dereference() const
+		{
+		    if (!_valid)		// !_valid なら必ず _pos == 1
+			load_and_shift();
+		    return _val;
+		}
+    void	increment()
+		{
+		    switch (++_pos)
+		    {
+		      case 1:
+			++super::base_reference();
+			_valid = false;
+			break;
+		      case value_type::size:
+			_pos = 0;		// default:に落ちる
+		      default:
+			if (!_valid)		// !_valid なら必ず _pos == 2
+			    load_and_shift();
+			shift();
+			break;
+		    }
+		}
+    bool	equal(const shift_iterator& iter) const
+		{
+		    return (super::base() == iter.base()) &&
+			   (_pos == iter._pos);
+		}
+
+  private:
+    size_t		_pos;
+    mutable value_type	_val, _next;
+    mutable bool	_valid;	//!< _nextに入力値が読み込まれていればtrue
+};
+
+template <class ITER> shift_iterator<ITER>
+make_shift_iterator(ITER iter)
+{
+    return shift_iterator<ITER>(iter);
+}
+    
 }	// namespace mm
 }	// namespace TU
 #endif	// MMX
