@@ -103,11 +103,10 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
   /*!
     \param wrow	box filterのウィンドウの行幅(高さ)
     \param wcol	box filterのウィンドウの列幅(幅)
-    \param s	出力データの水平方向書き込み位置のずらし量
    */	
-		BoxFilter2(size_t wrow=3, size_t wcol=3, size_t s=0)
+		BoxFilter2(size_t wrow=3, size_t wcol=3)
 		{
-		    setRowWinSize(wrow).setColWinSize(wcol).setShift(s);
+		    setRowWinSize(wrow).setColWinSize(wcol);
 		}
     
   //! box filterのウィンドウの行幅(高さ)を設定する．

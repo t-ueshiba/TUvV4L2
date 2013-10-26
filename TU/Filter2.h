@@ -42,6 +42,330 @@
 
 namespace TU
 {
+/************************************************************************
+*  strength<T>								*
+************************************************************************/
+//! 水平/垂直方向1階微分値からその強度を計算
+template <class T>
+struct strength
+{
+    typedef T	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
+	
+    result_type
+    operator ()(first_argument_type eH, second_argument_type eV) const
+    {
+	return std::sqrt(eH*eH + eV*eV);
+    }
+
+#if defined(SSE)
+    struct mm_
+    {
+	typedef mm::vec<T>	first_argument_type;
+	typedef mm::vec<T>	second_argument_type;
+	typedef mm::vec<T>	result_type;
+
+	mm_()			{}
+	mm_(const strength&)	{}
+
+	result_type
+	operator ()(first_argument_type eH, second_argument_type eV) const
+	{
+	    return mm::sqrt(eH*eH + eV*eV);
+	}
+    };
+#endif
+};
+    
+/************************************************************************
+*  dir4<T>								*
+************************************************************************/
+//! 2次元ベクトルの方向を右/下/左/上の4種に分類
+template <class T>
+struct dir4
+{
+    typedef T		first_argument_type;
+    typedef T		second_argument_type;
+    typedef u_int	result_type;
+	
+    result_type
+    operator ()(first_argument_type u, second_argument_type v) const
+    {
+	return (u < -v ? (u < v ? 4 : 6) : (u < v ? 2 : 0));
+    }
+
+#if defined(AVX2) || (!defined(AVX) && defined(SSE2))
+    struct mm_
+    {
+	typedef mm::vec<T>			first_argument_type;
+	typedef mm::vec<T>			second_argument_type;
+	typedef typename mm::type_traits<T>::signed_type
+						value_type;
+	typedef mm::vec<value_type>		result_type;
+    
+	mm_()					{}
+	mm_(const dir4&)			{}
+	
+	result_type
+	operator ()(first_argument_type u, second_argument_type v) const
+	{
+	    using namespace	mm;
+		    
+	    const result_type	l4 = cast<signed_type>(u < -v);
+	    return (l4				    & result_type(0x4))
+		 | ((cast<signed_type>(u < v) ^ l4) & result_type(0x2));
+	}
+    };
+#endif
+};
+    
+/************************************************************************
+*  dir4x<T>								*
+************************************************************************/
+//! 2次元ベクトルの方向を右下/左下/左上/右上の4種に分類
+template <class T>
+struct dir4x
+{
+    typedef T		first_argument_type;
+    typedef T		second_argument_type;
+    typedef T		third_argument_type;
+    typedef u_int	result_type;
+	
+    result_type
+    operator ()(first_argument_type u, second_argument_type v) const
+    {
+	return (v < 0 ? (u < 0 ? 5 : 7) : (u < 0 ? 3 : 1));
+    }
+
+    result_type
+    operator ()(first_argument_type  u,
+		second_argument_type v, third_argument_type lambda) const
+    {
+	const u_int	l = (u < 0) ^ (v < 0);
+	return (((lambda < 0) ^ l) << 2) | (l << 1) | 0x1;
+    }
+    
+#if defined(AVX2) || (!defined(AVX) && defined(SSE2))
+    struct mm_
+    {
+	typedef mm::vec<T>			first_argument_type;
+	typedef mm::vec<T>			second_argument_type;
+	typedef mm::vec<T>			third_argument_type;
+	typedef typename mm::type_traits<T>::signed_type
+						value_type;
+	typedef mm::vec<value_type>		result_type;
+    
+	mm_()					{}
+	mm_(const dir4x&)			{}
+	
+	result_type
+	operator ()(first_argument_type u, second_argument_type v) const
+	{
+	    using namespace	mm;
+		    
+	    const result_type	l4 = cast<value_type>(v < zero<T>());
+	    return (l4 & result_type(0x4))
+		 | ((cast<value_type>(u < zero<T>()) ^ l4) & result_type(0x2))
+		 | result_type(0x1);
+	}
+
+	result_type
+	operator ()(first_argument_type  u,
+		    second_argument_type v, third_argument_type lambda) const
+	{
+	    using namespace	mm;
+		    
+	    const result_type	l = cast<value_type>((u < zero<T>()) ^
+						     (v < zero<T>()));
+	    return ((l ^ cast<value_type>(lambda < zero<T>())) &
+		    result_type(0x4))
+		 | (l & result_type(0x2)) | result_type(0x1);
+	}
+    };
+#endif    
+};
+    
+/************************************************************************
+*  dir8<T>								*
+************************************************************************/
+//! 8次元ベクトルの方向を右/右下/下/左下/左/左上/上/右上の8種に分類
+template <class T>
+struct dir8
+{
+    typedef T		first_argument_type;
+    typedef T		second_argument_type;
+    typedef u_int	result_type;
+	
+    result_type
+    operator ()(first_argument_type u, second_argument_type v) const
+    {
+	const T	su = _slant * u, sv = _slant * v;
+	return (su < -v ?
+		( u < -sv ?
+		  (u <  sv ? (su <   v ? 4 : 5) : 6) : 7) :
+		(su <   v ?
+		 (u <  sv ? ( u < -sv ? 3 : 2) : 1) : 0));
+    }
+    
+#if defined(AVX2) || (!defined(AVX) && defined(SSE2))
+    struct mm_
+    {
+	typedef mm::vec<T>			first_argument_type;
+	typedef mm::vec<T>			second_argument_type;
+	typedef typename mm::type_traits<T>::signed_type
+						value_type;
+	typedef mm::vec<value_type>		result_type;
+
+	mm_()					{}
+	mm_(const dir8&)			{}
+	
+	result_type
+	operator ()(first_argument_type u, second_argument_type v) const
+	{
+	    using namespace	mm;
+
+	    const vec<T>	su = vec<T>(_slant) * u,
+				sv = vec<T>(_slant) * v;
+	    const result_type	l2 = cast<value_type>( u <  sv),
+				l4 = cast<value_type>(su <  -v);
+	    return (l4					& result_type(0x4))
+		 | ((l2 ^ l4)				& result_type(0x2))
+		 | (((cast<value_type>(su <   v) ^ l2) |
+		     (cast<value_type>( u < -sv) ^ l4)) & result_type(0x1));
+	}
+    };
+#endif
+  private:
+    static const T	_slant;
+};
+
+template <class T> const T	dir8<T>::_slant = 0.41421356;	// tan(M_PI/8)
+    
+/************************************************************************
+*  dir8x<T>								*
+************************************************************************/
+//! 8次元ベクトルの方向を右右下/右下下/左下下/左左下/左左上/左上上/右上上/右右上の8種に分類
+template <class T>
+struct dir8x
+{
+    typedef T		first_argument_type;
+    typedef T		second_argument_type;
+    typedef T		third_argument_type;
+    typedef u_int	result_type;
+	
+    result_type
+    operator ()(first_argument_type u, second_argument_type v) const
+    {
+	return (v < 0 ?
+		(u < -v ? (u < 0 ? (u <  v ? 4 : 5) : 6) : 7) :
+		(u <  v ? (u < 0 ? (u < -v ? 3 : 2) : 1) : 0));
+    }
+
+    result_type
+    operator ()(first_argument_type  u,
+		second_argument_type v, third_argument_type lambda) const
+    {
+	const u_int	l2 = (u < 0), l4 = (v < 0), l = l2 ^ l4;
+	return (((lambda < 0) ^ l) << 2) | (l << 1)
+	     | ((u <  v) ^ l2)		 | ((u < -v) ^ l4);
+    }
+    
+#if defined(AVX2) || (!defined(AVX) && defined(SSE2))
+    struct mm_
+    {
+	typedef mm::vec<T>			first_argument_type;
+	typedef mm::vec<T>			second_argument_type;
+	typedef mm::vec<T>			third_argument_type;
+	typedef typename mm::type_traits<T>::signed_type
+						value_type;
+	typedef mm::vec<value_type>		result_type;
+    
+	mm_()					{}
+	mm_(const dir8x&)			{}
+
+	result_type
+	operator ()(first_argument_type u, second_argument_type v) const
+	{
+	    using namespace	mm;
+		    
+	    const result_type	l2 = cast<value_type>(u < zero<T>()),
+				l4 = cast<value_type>(v < zero<T>()),
+				l  = l2 ^ l4;
+	    return (l4				      & result_type(0x4))
+		 | (l				      & result_type(0x2))
+		 | (((cast<value_type>(u <  v) ^ l2) |
+		     (cast<value_type>(u < -v) ^ l4)) & result_type(0x1));
+	}
+	
+	result_type
+	operator ()(first_argument_type  u,
+		    second_argument_type v, third_argument_type lambda) const
+	{
+	    using namespace	mm;
+	    
+	    const result_type	l2 = cast<value_type>(u < zero<T>()),
+				l4 = cast<value_type>(v < zero<T>()),
+				l  = l2 ^ l4;
+	    return ((cast<value_type>(lambda < zero<T>()) ^ l)
+						      & result_type(0x4))
+		 | (l				      & result_type(0x2))
+		 | (((cast<value_type>(u <  v) ^ l2) |
+		     (cast<value_type>(u < -v) ^ l4)) & result_type(0x1));
+	}
+    };
+#endif    
+};
+    
+/************************************************************************
+*  eigen<T>								*
+************************************************************************/
+//! 2x2対称行列の絶対値が大きい方の固有値を求める
+template <class T>
+struct eigen
+{
+    typedef T		first_argument_type;
+    typedef T		second_argument_type;
+    typedef T		third_argument_type;
+    typedef T		result_type;
+	
+    result_type
+    operator ()(first_argument_type  a,
+		second_argument_type b, third_argument_type c) const
+    {
+	const T	avrg = T(0.5)*(a + c), diff = T(0.5)*(a - c),
+		frac = std::sqrt(diff*diff + b*b);
+	return (avrg > T(0) ? avrg + frac : avrg - frac);
+    }
+    
+#if defined(SSE)
+    struct mm_
+    {
+	typedef mm::vec<T>	first_argument_type;
+	typedef mm::vec<T>	second_argument_type;
+	typedef mm::vec<T>	third_argument_type;
+	typedef mm::vec<T>	result_type;
+
+	mm_()			{}
+	mm_(const eigen&)	{}
+
+	result_type
+	operator ()(first_argument_type  a,
+		    second_argument_type b, third_argument_type c) const
+	{
+	    using namespace	mm;
+		    
+	    const vec<T>	avrg = avg(a, c), diff = sub_avg(a, c),
+				frac = sqrt(diff*diff + b*b);
+	    return select(avrg > zero<T>(), avrg + frac, avrg - frac);
+	}
+    };
+#endif
+};
+
+/************************************************************************
+*  class Filter2							*
+************************************************************************/
 //! 水平/垂直方向に分離不可能な2次元フィルタを表すクラス
 class Filter2
 {
@@ -52,8 +376,7 @@ class Filter2
     class FilterRows
     {
       public:
-	FilterRows(IN const& in, OUT const& out, size_t shift)
-	    :_in(in), _out(out), _shift(shift) 				{}
+	FilterRows(IN const& in, OUT const& out) :_in(in), _out(out)	{}
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
@@ -62,31 +385,27 @@ class Filter2
 		    std::advance(ie, r.end());
 		    OUT	out = _out;
 		    std::advance(out, r.begin());
-		    Filter2::filterRows(ib, ie, out, _shift);
+		    Filter2::filterRows(ib, ie, out);
 		}
 
       private:
 	IN     const&	_in;
 	OUT    const&	_out;
-	size_t const	_shift;
     };
 #endif
   public:
-    Filter2()	:_shift(0), _grainSize(1)		{}
+    Filter2()	:_grainSize(1)				{}
 
     template <class IN, class OUT>
     void	operator ()(IN ib, IN ie, OUT out) const;
-    size_t	shift()				const	{ return _shift; }
-    void	setShift(size_t s)			{ _shift = s; }
     size_t	grainSize()			const	{ return _grainSize; }
     void	setGrainSize(size_t gs)			{ _grainSize = gs; }
 
   private:
     template <class IN, class OUT>
-    static void	filterRows(IN ib, IN ie, OUT out, size_t shift)	;
+    static void	filterRows(IN ib, IN ie, OUT out)	;
     
   private:
-    size_t	_shift;		// 出力データの水平方向書き込み位置のずらし量
     size_t	_grainSize;
 };
     
@@ -102,23 +421,17 @@ Filter2::operator ()(IN ib, IN ie, OUT out) const
 #if defined(USE_TBB)
     tbb::parallel_for(tbb::blocked_range<size_t>(0, std::distance(ib, ie),
 						 _grainSize),
-		      FilterRows<IN, OUT>(ib, out, _shift));
+		      FilterRows<IN, OUT>(ib, out));
 #else
-    filterRows(ib, ie, out, _shift);
+    filterRows(ib, ie, out);
 #endif
 }
 
 template <class IN, class OUT> void
-Filter2::filterRows(IN ib, IN ie, OUT out, size_t shift)
+Filter2::filterRows(IN ib, IN ie, OUT out)
 {
-    typedef typename subiterator<OUT>::type	col_iterator;
-
     for (; ib != ie; ++ib, ++out)
-    {
-	col_iterator	col = out->begin();
-	std::advance(col, shift);
 	std::copy(ib->begin(), ib->end(), col);
-    }
 }
 
 }
