@@ -35,8 +35,6 @@
 #define __TUfunctional_h
 
 #include <functional>
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits.hpp>
 #include <boost/tuple/tuple.hpp>
 
 namespace TU
@@ -72,11 +70,8 @@ struct assign
     typedef T		second_argument_type;
     typedef void	result_type;
     
-    void	operator ()(first_argument_type x,
-			    second_argument_type y) const
-		{
-		    y = x;
-		}
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y)	const	{ y = x; }
 };
 
 /************************************************************************
@@ -95,10 +90,7 @@ struct assign_plus
     typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-		    y += x;
-		}
+			    second_argument_type y)	const	{ y += x; }
 };
 
 /************************************************************************
@@ -117,10 +109,7 @@ struct assign_minus
     typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-		    y -= x;
-		}
+			    second_argument_type y)	const	{ y -= x; }
 };
 
 /************************************************************************
@@ -139,10 +128,7 @@ struct assign_multiplies
     typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-		    y *= x;
-		}
+			    second_argument_type y)	const	{ y *= x; }
 };
 
 /************************************************************************
@@ -161,10 +147,7 @@ struct assign_divides
     typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-		    y /= x;
-		}
+			    second_argument_type y)	const	{ y /= x; }
 };
 
 /************************************************************************
@@ -183,10 +166,7 @@ struct assign_modulus
     typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-		    y %= x;
-		}
+			    second_argument_type y)	const	{ y %= x; }
 };
 
 /************************************************************************
@@ -205,10 +185,7 @@ struct assign_bit_and
     typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-		    x &= y;
-		}
+			    second_argument_type y)	const	{ x &= y; }
 };
 
 /************************************************************************
@@ -227,10 +204,7 @@ struct assign_bit_or
     typedef void	result_type;
     
     result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-		    y |= x;
-		}
+			    second_argument_type y)	const	{ y |= x; }
 };
 
 /************************************************************************
@@ -248,44 +222,32 @@ struct assign_bit_xor
     typedef T		second_argument_type;
     typedef void	result_type;
     
-    result_type	operator ()(first_argument_type x,
-			    second_argument_type y) const
-		{
-		    y ^= x;
-		}
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y)	const	{ y ^= x; }
 };
 
 /************************************************************************
 *  class unarize<FUNC>							*
 ************************************************************************/
+//! 引数をtupleにまとめることによって2/3/4変数関数を1変数関数に変換
 template <class FUNC>
 class unarize
 {
   public:
-    typedef typename FUNC::first_argument_type	first_argument_type;
-    typedef typename FUNC::value_type		value_type;
-    typedef typename FUNC::result_type		result_type;
-
-  private:
-    template <class S>
-    struct result_t
-    {
-	typedef typename boost::mpl
-			      ::if_<boost::is_same<S, first_argument_type>,
-				    value_type, result_type>::type	type;
-    };
+    typedef typename FUNC::result_type			result_type;
 
   public:
-    unarize(const FUNC& func=FUNC())	:_func(func)			{}
+    unarize(const FUNC& func=FUNC())	:_func(func)	{}
 
-    template <class S, class T> typename result_t<S>::type
+    template <class S, class T> result_type
     operator ()(const boost::tuples::cons<
 		     S, boost::tuples::cons<
 		       T, boost::tuples::null_type> >& t) const
     {
 	return _func(boost::get<0>(t), boost::get<1>(t));
     }
-    template <class S, class T, class U> typename result_t<S>::type
+
+    template <class S, class T, class U> result_type
     operator ()(const boost::tuples::cons<
 		     S, boost::tuples::cons<
 		       T, boost::tuples::cons<
@@ -293,6 +255,19 @@ class unarize
     {
 	return _func(boost::get<0>(t), boost::get<1>(t), boost::get<2>(t));
     }
+
+    template <class S, class T, class U, class V> result_type
+    operator ()(const boost::tuples::cons<
+		     S, boost::tuples::cons<
+		       T, boost::tuples::cons<
+			 U, boost::tuples::cons<
+			   V, boost::tuples::null_type> > > >& t) const
+    {
+	return _func(boost::get<0>(t), boost::get<1>(t),
+		     boost::get<2>(t), boost::get<3>(t));
+    }
+
+    FUNC const&	functor()			const	{return _func;}
 
   private:
     FUNC const	_func;

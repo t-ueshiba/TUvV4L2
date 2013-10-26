@@ -413,10 +413,6 @@ namespace detail
     template <class ROW, class COL, class ARG>
     class row_proxy
     {
-      public:
-	typedef COL	iterator;
-	typedef COL	const_iterator;
-	
       private:
 	typedef typename subiterator<ROW>::type		subiter_t;
 	
@@ -425,8 +421,16 @@ namespace detail
 	    template <class _ROW>
 	    struct apply { typedef typename subiterator<_ROW>::type type; };
 
+	    invoke_begin(size_t j)	:_j(j)		{}
 	    template <class _ROW> typename apply<_ROW>::type
-	    operator ()(_ROW const& row)	const	{return row->begin();}
+	    operator ()(_ROW const& row) const
+	    {
+		typename apply<_ROW>::type	col = row->begin();
+		std::advance(col, _j);
+		return col;
+	    }
+
+	    size_t const	_j;
 	};
 	
 	struct invoke_end
@@ -434,55 +438,87 @@ namespace detail
 	    template <class _ROW>
 	    struct apply { typedef typename subiterator<_ROW>::type type; };
 
+	    invoke_end(size_t)				{}
 	    template <class _ROW> typename apply<_ROW>::type
 	    operator ()(_ROW const& row)	const	{return row->end();}
 	};
 
-      private:
-	template <class _ARG>
-	static COL
-		make_iterator(subiter_t const& col, _ARG const& arg)
-		{
-		    return COL(col, arg);
-		}
-	static COL
-		make_iterator(subiter_t const& col, boost::tuples::null_type)
-		{
-		    return COL(col);
-		}
+	template <class _COL, class _ARG, class=void>
+	struct make_iterator
+	{
+	    _COL	operator ()(subiter_t col, _ARG const& arg) const
+			{
+			    return _COL(col, arg);
+			}
+	};
+	template <class DUMMY>
+	struct make_iterator<boost::use_default,
+			     boost::tuples::null_type, DUMMY>
+	{
+	    subiter_t	operator ()(subiter_t col,
+				    boost::tuples::null_type) const
+			{
+			    return col;
+			}
+	};
+	template <class _COL, class DUMMY>
+	struct make_iterator<_COL, boost::tuples::null_type, DUMMY>
+	{
+	    _COL	operator ()(subiter_t col,
+				    boost::tuples::null_type) const
+			{
+			    return _COL(col);
+			}
+	};
 
 	template <class INVOKE, class _ROW>
 	static typename subiterator<_ROW>::type
-		make_subiterator(_ROW const& row)
-		{
-		    return INVOKE()(row);
-		}
+	make_subiterator(_ROW const& row, size_t j)
+	{
+	    return INVOKE(j)(row);
+	}
 	template <class INVOKE, class TUPLE>
 	static typename subiterator<fast_zip_iterator<TUPLE> >::type
-		make_subiterator(fast_zip_iterator<TUPLE> const& row)
-		{
-		    return make_fast_zip_iterator(
-			boost::detail::tuple_impl_specific::
-			tuple_transform(row.get_iterator_tuple(), INVOKE()));
-		}
+	make_subiterator(fast_zip_iterator<TUPLE> row, size_t j)
+	{
+	    return make_fast_zip_iterator(
+		boost::detail::tuple_impl_specific::
+		tuple_transform(row.get_iterator_tuple(), INVOKE(j)));
+	}
 
       public:
-	row_proxy(ROW const& row, ARG const& arg) :_row(row), _arg(arg)	{}
+	typedef typename boost::mpl::if_<
+	    boost::is_same<COL, boost::use_default>,
+	    subiter_t, COL>::type			iterator;
+	typedef iterator				const_iterator;
 
-	COL	begin() const
-		{
-		    return make_iterator(make_subiterator<invoke_begin>(_row),
-					 _arg);
-		}
-	COL	end() const
-		{
-		    return make_iterator(make_subiterator<invoke_end>(_row),
-					 _arg);
-		}
+      public:
+	row_proxy(ROW const& row, ARG const& arg, size_t jb, size_t je)
+	    :_row(row), _arg(arg), _jb(jb), _je(je)			{}
+
+	iterator
+	begin() const
+	{
+	    return make_iterator<COL, ARG>()(
+		make_subiterator<invoke_begin>(_row, _jb), _arg);
+	}
+
+	iterator
+	end() const
+	{
+	    if (_je != 0)
+		return make_iterator<COL, ARG>()(
+		    make_subiterator<invoke_begin>(_row, _je), _arg);
+	    else
+		return make_iterator<COL, ARG>()(
+		    make_subiterator<invoke_end>(_row, 0), _arg);
+	}
 
       private:
 	ROW const&	_row;
 	ARG const&	_arg;
+	size_t const	_jb;
+	size_t const	_je;
     };
 }
     
@@ -492,7 +528,8 @@ namespace detail
   \param COL	コンテナ中の個々の値に対して変換を行う反復子
   \param ARG	変換関数
 */ 
-template <class ROW, class COL, class ARG=boost::tuples::null_type>
+template <class ROW,
+	  class COL=boost::use_default, class ARG=boost::tuples::null_type>
 class row_iterator
     : public boost::iterator_adaptor<row_iterator<ROW, COL, ARG>,
 				     ROW,
@@ -517,50 +554,55 @@ class row_iterator
     friend class				boost::iterator_core_access;
 
   public:
-    row_iterator(ROW const& row, ARG const& arg=ARG())
-	:super(row), _arg(arg)				{}
+    row_iterator(ROW const& row,
+		 ARG const& arg=ARG(), size_t jb=0, size_t je=0)
+	:super(row), _arg(arg), _jb(jb), _je(je)		{}
 
     reference	operator [](size_t i) const
 		{
-		    return reference(super::base() + i, _arg);
+		    return reference(super::base() + i, _arg, _jb, _je);
 		}
     
   private:
     reference	dereference() const
 		{
-		    return reference(super::base(), _arg);
+		    return reference(super::base(), _arg, _jb, _je);
 		}
 
   private:
     ARG 	_arg;	// 代入を可能にするためconstは付けない
+    size_t	_jb;	// 同上
+    size_t	_je;	// 同上
 };
 
 template <template <class, class> class COL, class ARG, class ROW>
 inline row_iterator<ROW, COL<ARG, typename subiterator<ROW>::type>, ARG>
-make_row_iterator(ROW row, ARG arg=ARG())
+make_row_iterator(ROW row, ARG arg=ARG(), size_t jb=0, size_t je=0)
 {
     typedef typename subiterator<ROW>::type	col_iterator;
 
-    return row_iterator<ROW, COL<ARG, col_iterator>, ARG>(row, arg);
+    return row_iterator<ROW, COL<ARG, col_iterator>, ARG>(row, arg, jb, je);
 }
 
-template <class COL, class ROW> inline row_iterator<ROW, COL>
-make_row_iterator(ROW row)
+template <class COL=boost::use_default, class ROW>
+inline row_iterator<ROW, COL>
+make_row_iterator(ROW row, size_t jb=0, size_t je=0)
 {
-    return row_iterator<ROW, COL>(row);
+    return row_iterator<ROW, COL>(row, boost::tuples::null_type(), jb, je);
 }
 
 template <class FUNC, class ROW>
 inline row_iterator<ROW, boost::transform_iterator<
 			     FUNC, typename subiterator<ROW>::type>, FUNC>
-make_row_transform_iterator(ROW row, FUNC func=FUNC())
+make_row_transform_iterator(ROW row, FUNC func=FUNC(),
+			    size_t jb=0, size_t je=0)
 {
-    typedef typename subiterator<ROW>::type	col_iterator;
+    typedef typename subiterator<ROW>::type	subiter_t;
 
-    return row_iterator<ROW, boost::transform_iterator<FUNC, col_iterator>,
-			FUNC>(row, func);
+    return row_iterator<ROW, boost::transform_iterator<FUNC, subiter_t>,
+			FUNC>(row, func, jb, je);
 }
-
+		    
 /************************************************************************
 *  class row2col<ROW>							*
 ************************************************************************/

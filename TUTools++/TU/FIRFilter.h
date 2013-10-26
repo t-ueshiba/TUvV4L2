@@ -185,9 +185,8 @@ FIRFilter2<D, T>::initialize(const T cH[], const T cV[])
 template <size_t D, class T> template <class IN, class OUT> inline void
 FIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
-    const_cast<FIRFilter2*>(this)->setShift(D/2);
     std::advance(out, D/2);
-    super::convolve(ib, ie, out);
+    super::convolve(ib, ie, make_row_iterator(out, D/2));
 }
 
 }
