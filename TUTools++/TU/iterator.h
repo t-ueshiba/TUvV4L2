@@ -373,12 +373,24 @@ make_fast_zip_iterator(TUPLE t)
 //! 反復子 ITER が指す値が持つ iterator もしくは const_iterator
 template <class ITER>
 struct subiterator
-    : boost::mpl::if_<
+{
+    typedef typename boost::mpl::if_<
 	boost::is_same<typename std::iterator_traits<ITER>::pointer,
 		       typename std::iterator_traits<ITER>::value_type*>,
 	typename std::iterator_traits<ITER>::value_type::iterator,
 	typename std::iterator_traits<ITER>::value_type::const_iterator>
-{
+	::type						type;
+    
+    typedef typename std::iterator_traits<type>::difference_type
+							difference_type;
+    typedef typename std::iterator_traits<type>::value_type
+							value_type;
+    typedef typename std::iterator_traits<type>::pointer
+							pointer;
+    typedef typename std::iterator_traits<type>::reference
+							reference;
+    typedef typename std::iterator_traits<type>::iterator_category
+							iterator_category;
 };
 
 template <class TUPLE>
@@ -388,6 +400,17 @@ struct subiterator<boost::zip_iterator<TUPLE> >
 		typename boost::detail::tuple_impl_specific
 			      ::tuple_meta_transform<
 		    TUPLE, subiterator<boost::mpl::_1> >::type>	type;
+
+    typedef typename std::iterator_traits<type>::difference_type
+							difference_type;
+    typedef typename std::iterator_traits<type>::value_type
+							value_type;
+    typedef typename std::iterator_traits<type>::pointer
+							pointer;
+    typedef typename std::iterator_traits<type>::reference
+							reference;
+    typedef typename std::iterator_traits<type>::iterator_category
+							iterator_category;
 };
 
 template <class TUPLE>
@@ -397,6 +420,17 @@ struct subiterator<fast_zip_iterator<TUPLE> >
 		typename boost::detail::tuple_impl_specific
 			      ::tuple_meta_transform<
 		    TUPLE, subiterator<boost::mpl::_1> >::type>	type;
+
+    typedef typename std::iterator_traits<type>::difference_type
+							difference_type;
+    typedef typename std::iterator_traits<type>::value_type
+							value_type;
+    typedef typename std::iterator_traits<type>::pointer
+							pointer;
+    typedef typename std::iterator_traits<type>::reference
+							reference;
+    typedef typename std::iterator_traits<type>::iterator_category
+							iterator_category;
 };
 
 /************************************************************************
@@ -631,9 +665,14 @@ template <class ROW>
 struct vertical_iterator
 {
     typedef boost::transform_iterator<
-	row2col<ROW>, ROW, boost::use_default,
-	typename std::iterator_traits<
-	    typename subiterator<ROW>::type>::value_type>	type;
+		row2col<ROW>, ROW, boost::use_default,
+		typename subiterator<ROW>::value_type>	type;
+
+    typedef typename type::difference_type		difference_type;
+    typedef typename type::value_type			value_type;
+    typedef typename type::pointer			pointer;
+    typedef typename type::reference			reference;
+    typedef typename type::iterator_category		iterator_category;
 };
 
 template <class ROW>

@@ -62,8 +62,7 @@ class SeparableFilter2
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    typedef typename std::iterator_traits<
-			typename subiterator<OUT>::type>::value_type
+		    typedef typename subiterator<OUT>::value_type
 								value_type;
 		    typedef typename boost::is_arithmetic<value_type>
 					  ::type		is_numeric;
@@ -86,8 +85,7 @@ class SeparableFilter2
     struct row2vcol
     {
       public:
-	typedef typename std::iterator_traits<
-	    typename subiterator<OUT>::type>::value_type	value_type;
+	typedef typename subiterator<OUT>::value_type		value_type;
 	typedef typename std::iterator_traits<OUT>::reference	argument_type;
 	typedef mm::detail::store_proxy<value_type>		result_type;
     
@@ -140,8 +138,7 @@ class SeparableFilter2
 template <class F> template <class IN, class OUT> void
 SeparableFilter2<F>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef typename std::iterator_traits<
-	typename subiterator<OUT>::type>::value_type	value_type;
+    typedef typename subiterator<OUT>::value_type	value_type;
     typedef typename boost::is_arithmetic<value_type>::type
 							is_numeric;
     typedef Array2<Array<value_type> >			buf_type;
@@ -171,8 +168,7 @@ SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie, OUT out,
 				  size_t col, boost::true_type)
 {
 #if defined(SSE2)
-    typedef typename std::iterator_traits<
-		typename subiterator<OUT>::type>::value_type	value_type;
+    typedef typename subiterator<OUT>::value_type		value_type;
     typedef mm::vec<value_type>					vec_type;
     typedef mm::row_vec_iterator<value_type, IN>		in_iterator;
     typedef boost::transform_iterator<
