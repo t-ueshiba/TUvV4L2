@@ -180,14 +180,14 @@ SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie, OUT out,
 
     const size_t	vsize = vec_type::size;
     
-    IN	im = ib;
-    std::advance(im, (std::distance(ib, ie) / vsize) * vsize);
-    for (in_iterator vec_ib(ib), vec_im(im); vec_ib != vec_im;
-	 ++vec_ib, col += vsize)
-	filter.convolve(vec_ib->begin(), vec_ib->end(),
+    IN	in = ib;
+    std::advance(ib, (std::distance(ib, ie) / vsize) * vsize);
+    for (in_iterator vec_in(in), vec_ib(ib); vec_in != vec_ib;
+	 ++vec_in, col += vsize)
+	filter.convolve(vec_in->begin(), vec_in->end(),
 			out_iterator(out, row2vcol<OUT>(col)));
 #endif
-    convolveRows(filter, im, ie, out, col, boost::false_type());
+    convolveRows(filter, ib, ie, out, col, boost::false_type());
 }
 
 template <class F> template <class IN, class OUT> void
