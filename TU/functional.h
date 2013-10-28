@@ -273,6 +273,12 @@ class unarize
     FUNC const	_func;
 };
 
+template <class FUNC> inline unarize<FUNC>
+make_unary_function(const FUNC& func)
+{
+    return unarize<FUNC>(func);
+}
+    
 /************************************************************************
 *  class mem_var_t							*
 ************************************************************************/
