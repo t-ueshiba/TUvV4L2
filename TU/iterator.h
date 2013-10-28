@@ -218,12 +218,9 @@ class assignment_iterator
 
   public:
     assignment_iterator(ITER const& iter, FUNC const& func=FUNC())
-	:super(iter), _func(func)					{}
+	:super(iter), _func(func)			{}
 
-    FUNC const&	functor() const
-		{
-		    return _func;
-		}
+    FUNC const&	functor()	const			{ return _func; }
 	
   private:
     reference	dereference() const
@@ -257,7 +254,7 @@ namespace detail
     {
       public:
 	assignment2_proxy(ITER const& iter, FUNC const& func)
-	    :_iter(iter), _func(func)					{}
+	    :_iter(iter), _func(func)			{}
 
 	template <class T>
 	void	operator =(const T& val)	const	{ _func(val, *_iter); }
@@ -300,12 +297,9 @@ class assignment2_iterator
 
   public:
     assignment2_iterator(ITER const& iter, FUNC const& func=FUNC())
-	:super(iter), _func(func)					{}
+	:super(iter), _func(func)			{}
 
-    FUNC const&	functor() const
-		{
-		    return _func;
-		}
+    FUNC const&	functor()			const	{ return _func; }
 	
   private:
     reference	dereference() const
@@ -393,7 +387,7 @@ struct subiterator<boost::zip_iterator<TUPLE> >
     typedef boost::zip_iterator<
 		typename boost::detail::tuple_impl_specific
 			      ::tuple_meta_transform<
-		    TUPLE, subiterator<boost::mpl::_1> >::type>		type;
+		    TUPLE, subiterator<boost::mpl::_1> >::type>	type;
 };
 
 template <class TUPLE>
@@ -402,7 +396,7 @@ struct subiterator<fast_zip_iterator<TUPLE> >
     typedef fast_zip_iterator<
 		typename boost::detail::tuple_impl_specific
 			      ::tuple_meta_transform<
-		    TUPLE, subiterator<boost::mpl::_1> >::type>		type;
+		    TUPLE, subiterator<boost::mpl::_1> >::type>	type;
 };
 
 /************************************************************************
@@ -444,31 +438,32 @@ namespace detail
 	};
 
 	template <class _COL, class _ARG, class=void>
-	struct make_iterator
+	struct col_iterator
 	{
-	    _COL	operator ()(subiter_t col, _ARG const& arg) const
-			{
-			    return _COL(col, arg);
-			}
-	};
-	template <class DUMMY>
-	struct make_iterator<boost::use_default,
-			     boost::tuples::null_type, DUMMY>
-	{
-	    subiter_t	operator ()(subiter_t col,
-				    boost::tuples::null_type) const
-			{
-			    return col;
-			}
+	    static _COL
+	    make(subiter_t col, _ARG const& arg)
+	    {
+		return _COL(col, arg);
+	    }
 	};
 	template <class _COL, class DUMMY>
-	struct make_iterator<_COL, boost::tuples::null_type, DUMMY>
+	struct col_iterator<_COL, boost::tuples::null_type, DUMMY>
 	{
-	    _COL	operator ()(subiter_t col,
-				    boost::tuples::null_type) const
-			{
-			    return _COL(col);
-			}
+	    static _COL
+	    make(subiter_t col, boost::tuples::null_type)
+	    {
+		return _COL(col);
+	    }
+	};
+	template <class DUMMY>
+	struct col_iterator<boost::use_default,
+			    boost::tuples::null_type, DUMMY>
+	{
+	    static subiter_t
+	    make(subiter_t col, boost::tuples::null_type)
+	    {
+		return col;
+	    }
 	};
 
 	template <class INVOKE, class _ROW>
@@ -499,7 +494,7 @@ namespace detail
 	iterator
 	begin() const
 	{
-	    return make_iterator<COL, ARG>()(
+	    return col_iterator<COL, ARG>::make(
 		make_subiterator<invoke_begin>(_row, _jb), _arg);
 	}
 
@@ -507,10 +502,10 @@ namespace detail
 	end() const
 	{
 	    if (_je != 0)
-		return make_iterator<COL, ARG>()(
+		return col_iterator<COL, ARG>::make(
 		    make_subiterator<invoke_begin>(_row, _je), _arg);
 	    else
-		return make_iterator<COL, ARG>()(
+		return col_iterator<COL, ARG>::make(
 		    make_subiterator<invoke_end>(_row, 0), _arg);
 	}
 
@@ -632,12 +627,20 @@ class row2col
     size_t const	_idx;	//!< 列を指定するindex
 };
 
-template <class VAL=boost::use_default, class ROW>
-inline boost::transform_iterator<row2col<ROW>, ROW, boost::use_default, VAL>
+template <class ROW>
+struct vertical_iterator
+{
+    typedef boost::transform_iterator<
+	row2col<ROW>, ROW, boost::use_default,
+	typename std::iterator_traits<
+	    typename subiterator<ROW>::type>::value_type>	type;
+};
+
+template <class ROW>
+inline typename vertical_iterator<ROW>::type
 make_vertical_iterator(ROW row, size_t idx)
 {
-    return boost::transform_iterator<
-	row2col<ROW>, ROW, boost::use_default, VAL>(row, row2col<ROW>(idx));
+    return typename vertical_iterator<ROW>::type(row, row2col<ROW>(idx));
 }
     
 /************************************************************************
@@ -703,8 +706,8 @@ class ring_iterator
 		}
     
   private:
-    ITER	_begin;
-    ITER	_end;
+    ITER	_begin;	// 代入を可能にするためconstは付けない
+    ITER	_end;	// 同上
 };
 
 template <class ITER> ring_iterator<ITER>
@@ -997,9 +1000,6 @@ class fir_filter_iterator
 
   private:
     const COEFF		_c;	//!< 先頭のフィルタ係数を指す反復子
-#if defined(SSE)
-    __attribute__((align(32)))
-#endif
     mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
     size_t		_i;	//!< 最新の入力データへのindex
 };
@@ -1275,13 +1275,7 @@ class iir_filter_iterator
   private:
     const COEFF		_ci;	//!< 先頭の入力フィルタ係数を指す反復子
     const COEFF		_co;	//!< 先頭の出力フィルタ係数を指す反復子
-#if defined(SSE)
-    __attribute__((align(32)))
-#endif
     mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
-#if defined(SSE)
-    __attribute__((align(32)))
-#endif
     mutable buf_type	_obuf;	//!< 過去D時点の出力データ
     mutable size_t	_i;
 };
