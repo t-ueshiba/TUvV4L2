@@ -133,52 +133,60 @@ namespace detail
     class assignment_proxy
     {
       public:
-	typedef typename std::iterator_traits<ITER>::reference	reference;
+	typedef assignment_proxy	self;
 
       public:
 	assignment_proxy(ITER const& iter, FUNC const& func)
 	    :_iter(iter), _func(func)					{}
 
 	template <class T>
-	reference	operator =(const T& val) const
-			{
-			    return *_iter = _func(val);
-			}
+	self&	operator =(const T& val)
+		{
+		    *_iter  = _func(val);
+		    return *this;
+		}
 	template <class T>
-	reference	operator +=(const T& val) const
-			{
-			    return *_iter += _func(val);
-			}
+	self&	operator +=(const T& val)
+		{
+		    *_iter += _func(val);
+		    return *this;
+		}
 	template <class T>
-	reference	operator -=(const T& val) const
-			{
-			    return *_iter -= _func(val);
-			}
+	self&	operator -=(const T& val)
+		{
+		    *_iter -= _func(val);
+		    return *this;
+		}
 	template <class T>
-	reference	operator *=(const T& val) const
-			{
-			    return *_iter *= _func(val);
-			}
+	self&	operator *=(const T& val)
+		{
+		    *_iter *= _func(val);
+		    return *this;
+		}
 	template <class T>
-	reference	operator /=(const T& val) const
-			{
-			    return *_iter /= _func(val);
-			}
+	self&	operator /=(const T& val)
+		{
+		    *_iter /= _func(val);
+		    return *this;
+		}
 	template <class T>
-	reference	operator &=(const T& val) const
-			{
-			    return *_iter &= _func(val);
-			}
+	self&	operator &=(const T& val)
+		{
+		    *_iter &= _func(val);
+		    return *this;
+		}
 	template <class T>
-	reference	operator |=(const T& val) const
-			{
-			    return *_iter |= _func(val);
-			}
+	self&	operator |=(const T& val)
+		{
+		    *_iter |= _func(val);
+		    return *this;
+		}
 	template <class T>
-	reference	operator ^=(const T& val) const
-			{
-			    return *_iter ^= _func(val);
-			}
+	self&	operator ^=(const T& val)
+		{
+		    *_iter ^= _func(val);
+		    return *this;
+		}
 
       private:
 	ITER const&	_iter;
@@ -253,11 +261,18 @@ namespace detail
     class assignment2_proxy
     {
       public:
+	typedef assignment2_proxy	self;
+	
+      public:
 	assignment2_proxy(ITER const& iter, FUNC const& func)
-	    :_iter(iter), _func(func)			{}
+	    :_iter(iter), _func(func)					{}
 
 	template <class T>
-	void	operator =(const T& val)	const	{ _func(val, *_iter); }
+	self&	operator =(const T& val)
+		{
+		    _func(val, *_iter);
+		    return *this;
+		}
 
       private:
 	ITER const&	_iter;
@@ -508,7 +523,7 @@ namespace detail
 	}
 	template <class INVOKE, class TUPLE>
 	static typename subiterator<fast_zip_iterator<TUPLE> >::type
-	make_subiterator(fast_zip_iterator<TUPLE> row, size_t j)
+	make_subiterator(fast_zip_iterator<TUPLE> const& row, size_t j)
 	{
 	    return make_fast_zip_iterator(
 		boost::detail::tuple_impl_specific::
@@ -1019,10 +1034,11 @@ class fir_filter_iterator
   private:
     reference	dereference() const
 		{
-		    value_type		val = _c[D-1]
-					    * (_ibuf[_i] = *super::base());
-		    COEFF		c   = _c;
-		    buf_iterator	bi  = _ibuf.cbegin() + _i;
+		    value_type		val = *super::base();
+		    _ibuf[_i] = val;
+		    val *= _c[D-1];
+		    COEFF		c  = _c;
+		    buf_iterator const	bi = _ibuf.cbegin() + _i;
 		    for (buf_iterator p = bi; ++p != _ibuf.cend(); ++c)
 			val += *c * *p;
 		    for (buf_iterator p = _ibuf.cbegin(); p != bi; ++p, ++c)
@@ -1119,7 +1135,7 @@ class iir_filter_iterator
   private:
     static value_type	inpro(COEFF c, buf_iterator b, size_t i)
 			{
-			    buf_iterator	bi  = b + i;
+			    buf_iterator const	bi  = b + i;
 			    value_type		val = *c * *bi;
 			    for (buf_iterator p = bi; ++p != b + D; )
 				val += *++c * *p;
@@ -1160,7 +1176,7 @@ class iir_filter_iterator
     template <size_t DD>
     value_type	update(selector<DD, true>) const
 		{
-		    size_t	i = _i;
+		    size_t const	i = _i;
 		    if (++_i == D)
 			_i = 0;
 		    _ibuf[i] = *super::base();
@@ -1171,8 +1187,8 @@ class iir_filter_iterator
     template <size_t DD>
     value_type	update(selector<DD, false>) const
 		{
-		    value_type	val = inpro(_co, _obuf.cbegin(), _i)
-				    + inpro(_ci, _ibuf.cbegin(), _i);
+		    value_type const	val = inpro(_co, _obuf.cbegin(), _i)
+					    + inpro(_ci, _ibuf.cbegin(), _i);
 		    _obuf[_i] = val;
 		    _ibuf[_i] = *super::base();
 		    if (++_i == D)

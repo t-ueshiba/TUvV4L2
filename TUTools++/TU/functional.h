@@ -75,7 +75,7 @@ struct assign
 };
 
 /************************************************************************
-*  struct assign_plus<S, T>						*
+*  struct plus_assign<S, T>						*
 ************************************************************************/
 //! 引数を加算
 /*!
@@ -83,7 +83,7 @@ struct assign
   \param T	加算元の型
 */
 template <class S, class T>
-struct assign_plus
+struct plus_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
@@ -94,7 +94,7 @@ struct assign_plus
 };
 
 /************************************************************************
-*  struct assign_minus<S, T>						*
+*  struct minus_assign<S, T>						*
 ************************************************************************/
 //! 引数を減算
 /*!
@@ -102,7 +102,7 @@ struct assign_plus
   \param T	減算元の型
 */
 template <class S, class T>
-struct assign_minus
+struct minus_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
@@ -113,7 +113,7 @@ struct assign_minus
 };
 
 /************************************************************************
-*  struct assign_multiplies<S, T>					*
+*  struct multiplies_assign<S, T>					*
 ************************************************************************/
 //! 引数を乗算
 /*!
@@ -121,7 +121,7 @@ struct assign_minus
   \param T	乗算元の型
 */
 template <class S, class T>
-struct assign_multiplies
+struct multiplies_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
@@ -132,7 +132,7 @@ struct assign_multiplies
 };
 
 /************************************************************************
-*  struct assign_divides<S, T>						*
+*  struct divides_assign<S, T>						*
 ************************************************************************/
 //! 引数を除算
 /*!
@@ -140,7 +140,7 @@ struct assign_multiplies
   \param T	除算元の型
 */
 template <class S, class T>
-struct assign_divides
+struct divides_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
@@ -151,7 +151,7 @@ struct assign_divides
 };
 
 /************************************************************************
-*  struct assign_modulus<S, T>						*
+*  struct modulus_assign<S, T>						*
 ************************************************************************/
 //! 引数で割った時の剰余を代入
 /*!
@@ -159,7 +159,7 @@ struct assign_divides
   \param T	剰余をとる元の型
 */
 template <class S, class T>
-struct assign_modulus
+struct modulus_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
@@ -170,7 +170,7 @@ struct assign_modulus
 };
 
 /************************************************************************
-*  struct assign_bit_and<S, T>						*
+*  struct bit_and_assign<S, T>						*
 ************************************************************************/
 //! 引数とのAND
 /*!
@@ -178,7 +178,7 @@ struct assign_modulus
   \param T	ANDをとる元の型
 */
 template <class S, class T>
-struct assign_bit_and
+struct bit_and_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
@@ -189,7 +189,7 @@ struct assign_bit_and
 };
 
 /************************************************************************
-*  struct assign_bit_or<S, T>						*
+*  struct bit_or_assign<S, T>						*
 ************************************************************************/
 //! 引数とのOR
 /*!
@@ -197,7 +197,7 @@ struct assign_bit_and
   \param T	ORをとる元の型
 */
 template <class S, class T>
-struct assign_bit_or
+struct bit_or_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
@@ -208,7 +208,7 @@ struct assign_bit_or
 };
 
 /************************************************************************
-*  struct assign_bit_xor<S, T>						*
+*  struct bit_xor_assign<S, T>						*
 ************************************************************************/
 //! 引数とのXOR
 /*!
@@ -216,7 +216,7 @@ struct assign_bit_or
   \param T	XORをとる元の型
 */
 template <class S, class T>
-struct assign_bit_xor
+struct bit_xor_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
