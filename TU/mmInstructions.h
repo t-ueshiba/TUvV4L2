@@ -3217,48 +3217,49 @@ namespace detail
       public:
 	typedef T			element_type;
 	typedef vec<element_type>	value_type;
+	typedef store_proxy		self;
 	
       public:
 	store_proxy(vec<T>* p)	:_p(p)					{}
 	store_proxy(T* p)	:_p(reinterpret_cast<vec<T>*>(p))	{}
 	
-	value_type	operator =(value_type val) const
-			{
-			    store<ALIGNED>(_p, val);
-			    return val;
-			}
-	value_type	operator +=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) + val);
-			}
-	value_type	operator -=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) - val);
-			}
-	value_type	operator *=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) * val);
-			}
-	value_type	operator /=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) / val);
-			}
-	value_type	operator %=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) % val);
-			}
-	value_type	operator &=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) & val);
-			}
-	value_type	operator |=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) | val);
-			}
-	value_type	operator ^=(value_type val) const
-			{
-			    return operator =(load<ALIGNED>(_p) ^ val);
-			}
+	self&	operator =(value_type val)
+		{
+		    store<ALIGNED>(_p, val);
+		    return *this;
+		}
+	self&	operator +=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) + val);
+		}
+	self&	operator -=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) - val);
+		}
+	self&	operator *=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) * val);
+		}
+	self&	operator /=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) / val);
+		}
+	self&	operator %=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) % val);
+		}
+	self&	operator &=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) & val);
+		}
+	self&	operator |=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) | val);
+		}
+	self&	operator ^=(value_type val)
+		{
+		    return operator =(load<ALIGNED>(_p) ^ val);
+		}
 
       private:
 	vec<T>* const	_p;
@@ -3412,6 +3413,9 @@ namespace detail
     template <class ITER>
     class cvtup_proxy
     {
+      public:
+	typedef cvtup_proxy	self;
+
       private:
 	typedef typename std::iterator_traits<ITER>::value_type	value_type;
 	typedef typename value_type::value_type			element_type;
@@ -3453,49 +3457,58 @@ namespace detail
 	cvtup_proxy(ITER const& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
 	template <class T>
-	void	operator =(vec<T> x)
+	self&	operator =(vec<T> x)
 		{
 		    cvtup<assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator +=(vec<T> x)
+	self&	operator +=(vec<T> x)
 		{
-		    cvtup<assign_plus<value_type, reference> >(x);
+		    cvtup<plus_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator -=(vec<T> x)
+	self&	operator -=(vec<T> x)
 		{
-		    cvtup<assign_minus<value_type, reference> >(x);
+		    cvtup<minus_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator *=(vec<T> x)
+	self&	operator *=(vec<T> x)
 		{
-		    cvtup<assign_multiplies<value_type, reference> >(x);
+		    cvtup<multiplies_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator /=(vec<T> x)
+	self&	operator /=(vec<T> x)
 		{
-		    cvtup<assign_divides<value_type, reference> >(x);
+		    cvtup<divides_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator %=(vec<T> x)
+	self&	operator %=(vec<T> x)
 		{
-		    cvtup<assign_modulus<value_type, reference> >(x);
+		    cvtup<modulus_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator &=(vec<T> x)
+	self&	operator &=(vec<T> x)
 		{
-		    cvtup<assign_bit_and<value_type, reference> >(x);
+		    cvtup<bit_and_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator |=(vec<T> x)
+	self&	operator |=(vec<T> x)
 		{
-		    cvtup<assign_bit_or<value_type, reference> >(x);
+		    cvtup<bit_or_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	template <class T>
-	void	operator ^=(vec<T> x)
+	self&	operator ^=(vec<T> x)
 		{
-		    cvtup<assign_bit_xor<value_type, reference> >(x);
+		    cvtup<bit_xor_assign<value_type, reference> >(x);
+		    return *this;
 		}
 	
       private:
