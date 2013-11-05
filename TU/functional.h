@@ -68,10 +68,13 @@ struct assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y = x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y = x;
+			}
 };
 
 /************************************************************************
@@ -87,10 +90,13 @@ struct plus_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y += x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y += x;
+			}
 };
 
 /************************************************************************
@@ -106,10 +112,13 @@ struct minus_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y -= x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y -= x;
+			}
 };
 
 /************************************************************************
@@ -125,10 +134,13 @@ struct multiplies_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y *= x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y *= x;
+			}
 };
 
 /************************************************************************
@@ -144,10 +156,13 @@ struct divides_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y /= x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y /= x;
+			}
 };
 
 /************************************************************************
@@ -163,10 +178,13 @@ struct modulus_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y %= x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y %= x;
+			}
 };
 
 /************************************************************************
@@ -182,10 +200,13 @@ struct bit_and_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ x &= y; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y &= x;
+			}
 };
 
 /************************************************************************
@@ -201,10 +222,13 @@ struct bit_or_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y |= x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y |= x;
+			}
 };
 
 /************************************************************************
@@ -220,10 +244,13 @@ struct bit_xor_assign
 {
     typedef S		first_argument_type;
     typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef T		result_type;
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y)	const	{ y ^= x; }
+    result_type&	operator ()(const first_argument_type&  x,
+				    second_argument_type& y) const
+			{
+			    return y ^= x;
+			}
 };
 
 /************************************************************************
