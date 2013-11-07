@@ -3414,11 +3414,11 @@ namespace detail
     class cvtup_proxy
     {
       public:
-	typedef cvtup_proxy	self;
-
-      private:
 	typedef typename std::iterator_traits<ITER>::value_type	value_type;
 	typedef typename value_type::value_type			element_type;
+	typedef cvtup_proxy					self;
+
+      private:
 	typedef typename std::iterator_traits<ITER>::reference	reference;
 	typedef typename type_traits<element_type>::lower_type	lower_type;
 	typedef typename type_traits<lower_type>::signed_type
@@ -3518,7 +3518,7 @@ namespace detail
 
 //! SIMDベクトルを受け取ってより大きな成分を持つ複数のSIMDベクトルに変換し，それを指定された反復子を介して書き込む反復子
 /*!
-  \param ITER	変換先のSIMDベクトルを入力する反復子
+  \param ITER	変換されたSIMDベクトルの書き込み先を指す反復子
 */
 template <class ITER>
 class cvtup_iterator

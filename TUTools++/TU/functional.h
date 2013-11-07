@@ -254,45 +254,38 @@ struct bit_xor_assign
 };
 
 /************************************************************************
-*  class unarize<FUNC>							*
+*  class unarize2<FUNC>							*
 ************************************************************************/
-//! 引数をtupleにまとめることによって2/3/4変数関数を1変数関数に変換
+//! 引数をtupleにまとめることによって2変数関数を1変数関数に変換
 template <class FUNC>
-class unarize
+class unarize2
 {
   public:
-    typedef typename FUNC::result_type			result_type;
+    typedef boost::tuple<typename FUNC::first_argument_type,
+			 typename FUNC::second_argument_type>	argument_type;
+    typedef typename FUNC::result_type				result_type;
 
+    struct mm_
+    {
+	typedef boost::tuple<typename FUNC::mm_::first_argument_type,
+			     typename FUNC::mm_::second_argument_type>
+								argument_type;
+	typedef typename FUNC::mm_::result_type			result_type;
+
+	result_type	operator ()(const argument_type& arg) const
+			{
+			    refunn _func.mm_(boost::get<0>(arg),
+					     boost::get<1>(arg));
+			}
+    };
+    
   public:
-    unarize(const FUNC& func=FUNC())	:_func(func)	{}
+    unarize2(const FUNC& func=FUNC())	:_func(func)	{}
 
-    template <class S, class T> result_type
-    operator ()(const boost::tuples::cons<
-		     S, boost::tuples::cons<
-		       T, boost::tuples::null_type> >& t) const
-    {
-	return _func(boost::get<0>(t), boost::get<1>(t));
-    }
-
-    template <class S, class T, class U> result_type
-    operator ()(const boost::tuples::cons<
-		     S, boost::tuples::cons<
-		       T, boost::tuples::cons<
-			 U, boost::tuples::null_type> > >& t) const
-    {
-	return _func(boost::get<0>(t), boost::get<1>(t), boost::get<2>(t));
-    }
-
-    template <class S, class T, class U, class V> result_type
-    operator ()(const boost::tuples::cons<
-		     S, boost::tuples::cons<
-		       T, boost::tuples::cons<
-			 U, boost::tuples::cons<
-			   V, boost::tuples::null_type> > > >& t) const
-    {
-	return _func(boost::get<0>(t), boost::get<1>(t),
-		     boost::get<2>(t), boost::get<3>(t));
-    }
+    result_type	operator ()(const argument_type& arg) const
+		{
+		    return _func(boost::get<0>(arg), boost::get<1>(arg));
+		}
 
     FUNC const&	functor()			const	{return _func;}
 
@@ -300,10 +293,79 @@ class unarize
     FUNC const	_func;
 };
 
-template <class FUNC> inline unarize<FUNC>
-make_unary_function(const FUNC& func)
+template <class FUNC> inline unarize2<FUNC>
+make_unary_function2(const FUNC& func)
 {
-    return unarize<FUNC>(func);
+    return unarize2<FUNC>(func);
+}
+    
+/************************************************************************
+*  class unarize3<FUNC>							*
+************************************************************************/
+//! 引数をtupleにまとめることによって3変数関数を1変数関数に変換
+template <class FUNC>
+class unarize3
+{
+  public:
+    typedef typename FUNC::result_type				result_type;
+    typedef boost::tuple<typename FUNC::first_argument_type,
+			 typename FUNC::second_argument_type,
+			 typename FUNC::third_argument_type>	argument_type;
+    
+  public:
+    unarize3(const FUNC& func=FUNC())	:_func(func)	{}
+
+    result_type	operator ()(const argument_type& arg) const
+		{
+		    return _func(boost::get<0>(arg),
+				 boost::get<1>(arg), boost::bet<2>(arg));
+		}
+
+    FUNC const&	functor()			const	{return _func;}
+
+  private:
+    FUNC const	_func;
+};
+
+template <class FUNC> inline unarize3<FUNC>
+make_unary_function3(const FUNC& func)
+{
+    return unarize3<FUNC>(func);
+}
+    
+/************************************************************************
+*  class unarize4<FUNC>							*
+************************************************************************/
+//! 引数をtupleにまとめることによって4変数関数を1変数関数に変換
+template <class FUNC>
+class unarize4
+{
+  public:
+    typedef typename FUNC::result_type				result_type;
+    typedef boost::tuple<typename FUNC::first_argument_type,
+			 typename FUNC::second_argument_type,
+			 typename FUNC::third_argument_type,
+			 typename FUNC::fourth_argument_type>	argument_type;
+    
+  public:
+    unarize4(const FUNC& func=FUNC())	:_func(func)	{}
+
+    result_type	operator ()(const argument_type& arg) const
+		{
+		    return _func(boost::get<0>(arg), boost::get<1>(arg),
+				 boost::get<2>(arg), boost::get<3>(arg));
+		}
+
+    FUNC const&	functor()			const	{return _func;}
+
+  private:
+    FUNC const	_func;
+};
+
+template <class FUNC> inline unarize4<FUNC>
+make_unary_function4(const FUNC& func)
+{
+    return unarize4<FUNC>(func);
 }
     
 /************************************************************************
