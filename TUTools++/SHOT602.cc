@@ -141,6 +141,8 @@ SHOT602::where(Axis axis)
 	return position1;
       case Axis_2:
 	return position2;
+      default:
+	break;
     }
 
     throw runtime_error("SHOT602::where(): unknown axis!");
@@ -166,6 +168,8 @@ SHOT602::atLimit(Axis axis)
 	return limit1;
       case Axis_2:
 	return limit2;
+      default:
+	break;
     }
 
     throw runtime_error("SHOT602::atLimit(): unknown axis!");

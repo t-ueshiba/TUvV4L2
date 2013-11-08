@@ -431,7 +431,7 @@ template <class IN, class OUT> void
 Filter2::filterRows(IN ib, IN ie, OUT out)
 {
     for (; ib != ie; ++ib, ++out)
-	std::copy(ib->begin(), ib->end(), out);
+	std::copy(ib->begin(), ib->end(), out->begin());
 }
 
 }

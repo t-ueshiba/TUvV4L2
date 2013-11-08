@@ -41,6 +41,271 @@
 namespace TU
 {
 /************************************************************************
+*  class iir_filter_iterator<D, FWD, COEFF, ITER, T>			*
+************************************************************************/
+//! データ列中の指定された要素に対してinfinite impulse response filterを適用した結果を返す反復子
+/*!
+  \param D	フィルタの階数
+  \param FWD	前進フィルタならtrue, 後退フィルタならfalse
+  \param COEFF	フィルタのz変換係数
+  \param ITER	データ列中の要素を指す定数反復子の型
+  \param T	フィルタ出力の型
+*/
+template <size_t D, bool FWD, class COEFF, class ITER,
+	  class T=typename std::iterator_traits<COEFF>::value_type>
+class iir_filter_iterator
+    : public boost::iterator_adaptor<
+		iir_filter_iterator<D, FWD, COEFF, ITER, T>,	// self
+		ITER,						// base
+		T,						// value_type
+		boost::single_pass_traversal_tag,		// traversal
+		T>						// reference
+{
+  private:
+    typedef boost::iterator_adaptor<
+		iir_filter_iterator, ITER, T,
+		boost::single_pass_traversal_tag, T>	super;
+    typedef Array<T, FixedSizedBuf<T, D, true> >	buf_type;
+    typedef typename buf_type::const_iterator		buf_iterator;
+
+    template <size_t DD, bool FF>
+    struct selector				{enum {dim = DD, fwd = FF};};
+    
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+		iir_filter_iterator(ITER const& iter, COEFF ci, COEFF co)
+		    :super(iter), _ci(ci), _co(co), _ibuf(), _obuf(), _i(0)
+		{
+		    std::fill(_ibuf.begin(), _ibuf.end(), value_type(0));
+		    std::fill(_obuf.begin(), _obuf.end(), value_type(0));
+		}
+
+  private:
+    static value_type	inpro(COEFF c, buf_iterator b, size_t i)
+			{
+			    buf_iterator const	bi  = b + i;
+			    value_type		val = *c * *bi;
+			    for (buf_iterator p = bi; ++p != b + D; )
+				val += *++c * *p;
+			    for (buf_iterator p = b; p != bi; ++p)
+				val += *++c * *p;
+
+			    return val;
+			}
+    static value_type	inpro_2_0(COEFF c, buf_iterator b)
+			{
+			    return *c * *b + *(c+1) * *(b+1);
+			}
+    static value_type	inpro_2_1(COEFF c, buf_iterator b)
+			{
+			    return *c * *(b+1) + *(c+1) * *b;
+			}
+    static value_type	inpro_4_0(COEFF c, buf_iterator b)
+			{
+			    return *c	  * *b	   + *(c+1) * *(b+1)
+				 + *(c+2) * *(b+2) + *(c+3) * *(b+3);
+			}
+    static value_type	inpro_4_1(COEFF c, buf_iterator b)
+			{
+			    return *c	  * *(b+1) + *(c+1) * *(b+2)
+				 + *(c+2) * *(b+3) + *(c+3) * *b;
+			}
+    static value_type	inpro_4_2(COEFF c, buf_iterator b)
+			{
+			    return *c	  * *(b+2) + *(c+1) * *(b+3)
+				 + *(c+2) * *b	   + *(c+3) * *(b+1);
+			}
+    static value_type 	inpro_4_3(COEFF c, buf_iterator b)
+			{
+			    return *c	  * *(b+3) + *(c+1) * *b
+				 + *(c+2) * *(b+1) + *(c+3) * *(b+2);
+			}
+
+    template <size_t DD>
+    value_type	update(selector<DD, true>) const
+		{
+		    size_t const	i = _i;
+		    if (++_i == D)
+			_i = 0;
+		    _ibuf[i] = *super::base();
+		    return (_obuf[i] = inpro(_co, _obuf.cbegin(),  i)
+				     + inpro(_ci, _ibuf.cbegin(), _i));
+		}
+    
+    template <size_t DD>
+    value_type	update(selector<DD, false>) const
+		{
+		    value_type const	val = inpro(_co, _obuf.cbegin(), _i)
+					    + inpro(_ci, _ibuf.cbegin(), _i);
+		    _obuf[_i] = val;
+		    _ibuf[_i] = *super::base();
+		    if (++_i == D)
+			_i = 0;
+		    return val;
+		}
+
+    value_type	update(selector<2, true>) const
+		{
+		    value_type	val;
+		    
+		    if (_i == 0)
+		    {
+			_i = 1;
+			_ibuf[0] = *super::base();
+			_obuf[0] = val
+				 = inpro_2_0(_co, _obuf.cbegin())
+				 + inpro_2_1(_ci, _ibuf.cbegin());
+		    }
+		    else
+		    {
+			_i = 0;
+			_ibuf[1] = *super::base();
+			_obuf[1] = val
+				 = inpro_2_1(_co, _obuf.cbegin())
+				 + inpro_2_0(_ci, _ibuf.cbegin());
+		    }
+
+		    return val;
+		}
+
+    value_type	update(selector<2, false>) const
+		{
+		    value_type	val;
+		    
+		    if (_i == 0)
+		    {
+			_i = 1;
+			_obuf[0] = val
+				 = inpro_2_0(_co, _obuf.cbegin())
+				 + inpro_2_0(_ci, _ibuf.cbegin());
+			_ibuf[0] = *super::base();
+		    }
+		    else
+		    {
+			_i = 0;
+			_obuf[1] = val
+				 = inpro_2_1(_co, _obuf.cbegin())
+				 + inpro_2_1(_ci, _ibuf.cbegin());
+			_ibuf[1] = *super::base();
+		    }
+
+		    return val;
+		}
+
+    value_type	update(selector<4, true>) const
+		{
+		    value_type	val;
+		    
+		    switch (_i)
+		    {
+		      case 0:
+			_i = 1;
+			_ibuf[0] = *super::base();
+			_obuf[0] = val
+				 = inpro_4_0(_co, _obuf.cbegin())
+				 + inpro_4_1(_ci, _ibuf.cbegin());
+			break;
+		      case 1:
+			_i = 2;
+			_ibuf[1] = *super::base();
+			_obuf[1] = val
+				 = inpro_4_1(_co, _obuf.cbegin())
+				 + inpro_4_2(_ci, _ibuf.cbegin());
+			break;
+		      case 2:
+			_i = 3;
+			_ibuf[2] = *super::base();
+			_obuf[2] = val
+				 = inpro_4_2(_co, _obuf.cbegin())
+				 + inpro_4_3(_ci, _ibuf.cbegin());
+			break;
+		      default:
+			_i = 0;
+			_ibuf[3] = *super::base();
+			_obuf[3] = val
+				 = inpro_4_3(_co, _obuf.cbegin())
+				 + inpro_4_0(_ci, _ibuf.cbegin());
+			break;
+		    }
+
+		    return val;
+		}
+
+    value_type	update(selector<4, false>) const
+		{
+		    value_type	val;
+		    
+		    switch (_i)
+		    {
+		      case 0:
+			_i = 1;
+			_obuf[0] = val
+				 = inpro_4_0(_co, _obuf.cbegin())
+				 + inpro_4_0(_ci, _ibuf.cbegin());
+			_ibuf[0] = *super::base();
+			break;
+		      case 1:
+			_i = 2;
+			_obuf[1] = val
+				 = inpro_4_1(_co, _obuf.cbegin())
+				 + inpro_4_1(_ci, _ibuf.cbegin());
+			_ibuf[1] = *super::base();
+			break;
+		      case 2:
+			_i = 3;
+			_obuf[2] = val
+				 = inpro_4_2(_co, _obuf.cbegin())
+				 + inpro_4_2(_ci, _ibuf.cbegin());
+			_ibuf[2] = *super::base();
+			break;
+		      default:
+			_i = 0;
+			_obuf[3] = val
+				 = inpro_4_3(_co, _obuf.cbegin())
+				 + inpro_4_3(_ci, _ibuf.cbegin());
+			_ibuf[3] = *super::base();
+			break;
+		    }
+
+		    return val;
+		}
+
+    reference	dereference() const
+		{
+		    return update(selector<D, FWD>());
+		}
+    
+  private:
+    const COEFF		_ci;	//!< 先頭の入力フィルタ係数を指す反復子
+    const COEFF		_co;	//!< 先頭の出力フィルタ係数を指す反復子
+    mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
+    mutable buf_type	_obuf;	//!< 過去D時点の出力データ
+    mutable size_t	_i;
+};
+
+//! infinite impulse response filter反復子を生成する
+/*!
+  \param iter	コンテナ中の要素を指す定数反復子
+  \param ci	先頭の入力フィルタ係数を指す反復子
+  \param ci	先頭の出力フィルタ係数を指す反復子
+  \return	infinite impulse response filter反復子
+*/
+template <size_t D, bool FWD, class T, class COEFF, class ITER>
+iir_filter_iterator<D, FWD, COEFF, ITER, T>
+make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
+{
+    return iir_filter_iterator<D, FWD, COEFF, ITER, T>(iter, ci, co);
+}
+
+/************************************************************************
 *  class IIRFilter<D, T>						*
 ************************************************************************/
 //! 片側Infinite Inpulse Response Filterを表すクラス

@@ -261,24 +261,11 @@ template <class FUNC>
 class unarize2
 {
   public:
+    typedef FUNC						functor_type;
     typedef boost::tuple<typename FUNC::first_argument_type,
 			 typename FUNC::second_argument_type>	argument_type;
     typedef typename FUNC::result_type				result_type;
 
-    struct mm_
-    {
-	typedef boost::tuple<typename FUNC::mm_::first_argument_type,
-			     typename FUNC::mm_::second_argument_type>
-								argument_type;
-	typedef typename FUNC::mm_::result_type			result_type;
-
-	result_type	operator ()(const argument_type& arg) const
-			{
-			    refunn _func.mm_(boost::get<0>(arg),
-					     boost::get<1>(arg));
-			}
-    };
-    
   public:
     unarize2(const FUNC& func=FUNC())	:_func(func)	{}
 
@@ -307,6 +294,7 @@ template <class FUNC>
 class unarize3
 {
   public:
+    typedef FUNC						functor_type;
     typedef typename FUNC::result_type				result_type;
     typedef boost::tuple<typename FUNC::first_argument_type,
 			 typename FUNC::second_argument_type,
@@ -318,7 +306,7 @@ class unarize3
     result_type	operator ()(const argument_type& arg) const
 		{
 		    return _func(boost::get<0>(arg),
-				 boost::get<1>(arg), boost::bet<2>(arg));
+				 boost::get<1>(arg), boost::get<2>(arg));
 		}
 
     FUNC const&	functor()			const	{return _func;}
@@ -341,6 +329,7 @@ template <class FUNC>
 class unarize4
 {
   public:
+    typedef FUNC						functor_type;
     typedef typename FUNC::result_type				result_type;
     typedef boost::tuple<typename FUNC::first_argument_type,
 			 typename FUNC::second_argument_type,

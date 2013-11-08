@@ -36,11 +36,111 @@
 
 #include <algorithm>
 #include <boost/array.hpp>
-#include "TU/iterator.h"
 #include "TU/SeparableFilter2.h"
 
 namespace TU
 {
+/************************************************************************
+*  class fir_filter_iterator<D, COEFF, ITER, T>				*
+************************************************************************/
+//! データ列中の指定された要素に対してfinite impulse response filterを適用した結果を返す反復子
+/*!
+  \param D	フィルタの階数
+  \param COEFF	フィルタのz変換係数
+  \param ITER	データ列中の要素を指す定数反復子の型
+  \param T	フィルタ出力の型
+*/
+template <size_t D, class COEFF, class ITER,
+	  class T=typename std::iterator_traits<COEFF>::value_type>
+class fir_filter_iterator
+    : public boost::iterator_adaptor<
+		fir_filter_iterator<D, COEFF, ITER, T>,		// self
+		ITER,						// base
+		T,						// value_type
+		boost::forward_traversal_tag,			// traversal
+		T>						// reference
+{
+  private:
+    typedef boost::iterator_adaptor<
+		fir_filter_iterator, ITER, T,
+		boost::forward_traversal_tag, T>	super;
+    typedef Array<T, FixedSizedBuf<T, D, true> >	buf_type;
+    typedef typename buf_type::const_iterator		buf_iterator;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+		fir_filter_iterator(ITER const& iter, COEFF c)
+		    :super(iter), _c(c), _ibuf(), _i(0)
+		{
+		    for (; _i != D - 1; ++_i, ++super::base_reference())
+			_ibuf[_i] = *super::base();
+		}
+		fir_filter_iterator(ITER const& iter)
+		    :super(iter), _c(), _ibuf(), _i(0)
+		{
+		}
+
+  private:
+    reference	dereference() const
+		{
+		    value_type		val = *super::base();
+		    _ibuf[_i] = val;
+		    val *= _c[D-1];
+		    COEFF		c  = _c;
+		    buf_iterator const	bi = _ibuf.cbegin() + _i;
+		    for (buf_iterator p = bi; ++p != _ibuf.cend(); ++c)
+			val += *c * *p;
+		    for (buf_iterator p = _ibuf.cbegin(); p != bi; ++p, ++c)
+			val += *c * *p;
+
+		    return val;
+		}
+    void	increment()
+		{
+		    ++super::base_reference();
+		    if (++_i == D)
+			_i = 0;
+		}
+
+  private:
+    const COEFF		_c;	//!< 先頭のフィルタ係数を指す反復子
+    mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
+    size_t		_i;	//!< 最新の入力データへのindex
+};
+
+//! finite impulse response filter反復子を生成する
+/*!
+  \param iter	コンテナ中の要素を指す定数反復子
+  \param c	先頭の入力フィルタ係数を指す反復子
+  \return	finite impulse response filter反復子
+*/
+template <size_t D, class T, class COEFF, class ITER>
+fir_filter_iterator<D, COEFF, ITER, T>
+make_fir_filter_iterator(ITER iter, COEFF c)
+{
+    return fir_filter_iterator<D, COEFF, ITER, T>(iter, c);
+}
+
+//! finite impulse response filter反復子(終端)を生成する
+/*!
+  \param iter	コンテナ中の要素を指す定数反復子
+  \return	finite impulse response filter反復子(終端)
+*/
+template <size_t D, class T, class COEFF, class ITER>
+fir_filter_iterator<D, COEFF, ITER, T>
+make_fir_filter_iterator(ITER iter)
+{
+    return fir_filter_iterator<D, COEFF, ITER, T>(iter);
+}
+
 /************************************************************************
 *  class FIRFilter<D, T>						*
 ************************************************************************/
