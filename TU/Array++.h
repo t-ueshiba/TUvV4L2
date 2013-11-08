@@ -38,6 +38,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "TU/types.h"
+#include "TU/iterator.h"
 #include "TU/mmInstructions.h"
 //#if __cplusplus > 197711L
 //#  define __CXX0X

@@ -34,11 +34,111 @@
 #ifndef	__TUBoxFilter_h
 #define	__TUBoxFilter_h
 
-#include "TU/SeparableFilter2.h"
 #include <algorithm>
+#include "TU/SeparableFilter2.h"
 
 namespace TU
 {
+/************************************************************************
+*  class box_filter_iterator<ITER>					*
+************************************************************************/
+//! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
+/*!
+  \param ITER	コンテナ中の要素を指す定数反復子の型
+*/
+template <class ITER>
+class box_filter_iterator
+    : public boost::iterator_adaptor<box_filter_iterator<ITER>,	// self
+				     ITER,			// base
+				     boost::use_default,	// value_type
+				     boost::single_pass_traversal_tag>
+{
+  private:
+    typedef boost::iterator_adaptor<box_filter_iterator,
+				    ITER,
+				    boost::use_default,
+				    boost::single_pass_traversal_tag>	super;
+    
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+
+  public:
+		box_filter_iterator()
+		    :super(), _head(super::base()), _valid(true), _val()
+		{
+		}
+    
+		box_filter_iterator(ITER const& iter, size_t w=0)
+		    :super(iter), _head(iter), _valid(true), _val()
+		{
+		    if (w > 0)
+		    {
+			_val = *super::base();
+				
+			while (--w > 0)
+			    _val += *++super::base_reference();
+		    }
+		}
+
+    void	initialize(ITER const& iter, size_t w=0)
+		{
+		    super::base_reference() = iter;
+		    _head = iter;
+		    _valid = true;
+
+		    if (w > 0)
+		    {
+			_val = *super::base();
+				
+			while (--w > 0)
+			    _val += *++super::base_reference();
+		    }
+		}
+    
+  private:
+    reference	dereference() const
+		{
+		    if (!_valid)
+		    {
+			(_val -= *_head) += *super::base();
+			_valid = true;
+		    }
+		    return _val;
+		}
+    
+    void	increment()
+		{
+		    if (!_valid)
+			(_val -= *_head) += *super::base();
+		    else
+			_valid = false;
+		    ++_head;
+		    ++super::base_reference();
+		}
+
+  private:
+    ITER		_head;
+    mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
+    mutable value_type	_val;	// [_head, base()) or [_head, base()] の総和
+};
+
+//! box filter反復子を生成する
+/*!
+  \param iter	コンテナ中の要素を指す定数反復子
+  \return	box filter反復子
+*/
+template <class ITER> box_filter_iterator<ITER>
+make_box_filter_iterator(ITER iter, size_t w=0)
+{
+    return box_filter_iterator<ITER>(iter, w);
+}
+
 /************************************************************************
 *  class BoxFilter							*
 ************************************************************************/

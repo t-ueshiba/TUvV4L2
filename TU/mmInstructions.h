@@ -61,9 +61,7 @@
 #include <immintrin.h>
 #include <iostream>
 #include <cassert>
-#include <boost/iterator_adaptors.hpp>
-#include <boost/tuple/tuple.hpp>
-#include "TU/functional.h"
+#include "TU/iterator.h"
 
 /************************************************************************
 *  Emulations								*
@@ -3516,7 +3514,7 @@ namespace detail
     };
 }
 
-//! SIMDベクトルを受け取ってより大きな成分を持つ複数のSIMDベクトルに変換し，それを指定された反復子を介して書き込む反復子
+//! SIMDベクトルを受け取ってより大きな成分を持つ複数のSIMDベクトルに変換し，それらを指定された反復子を介して書き込む反復子
 /*!
   \param ITER	変換されたSIMDベクトルの書き込み先を指す反復子
 */
@@ -3660,6 +3658,80 @@ make_shift_iterator(ITER iter)
     return shift_iterator<ITER>(iter);
 }
     
+/************************************************************************
+*  class row_vec_iterator<T, ROW>					*
+************************************************************************/
+template <class T, class ROW>
+class row_vec_iterator
+    : public boost::iterator_adaptor<row_vec_iterator<T, ROW>,
+				     row_iterator<
+					 fast_zip_iterator<
+					     typename iterator_tuple<
+						 ROW, vec<T>::size>::type>,
+					 boost::transform_iterator<
+					     tuple2vec<T>,
+					     typename subiterator<
+						 fast_zip_iterator<
+						     typename iterator_tuple<
+							 ROW,
+							 vec<T>::size>::type>
+						 >::type>,
+					 tuple2vec<T> > >
+{
+  private:
+    typedef fast_zip_iterator<
+      typename iterator_tuple<ROW, vec<T>::size>::type>	row_zip_iterator;
+    typedef boost::iterator_adaptor<
+		row_vec_iterator,
+		row_iterator<
+		    row_zip_iterator,
+		    boost::transform_iterator<
+			tuple2vec<T>,
+			typename subiterator<
+			    row_zip_iterator>::type>,
+		    tuple2vec<T> > >			super;
+
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+
+    friend class				boost::iterator_core_access;
+    
+  public:
+    row_vec_iterator(ROW const& row)
+	:super(make_row_transform_iterator(
+		   make_fast_zip_iterator(
+		       make_iterator_tuple<vec<T>::size>(row)),
+		   tuple2vec<T>()))					{}
+
+    void		advance(difference_type n)
+			{
+			    super::base_reference() += n * vec<T>::size;
+			}
+    void		increment()
+			{
+			    super::base_reference() += vec<T>::size;
+			}
+    void		decrement()
+			{
+			    super::base_reference() -= vec<T>::size;
+			}
+    difference_type	distance_to(row_vec_iterator iter) const
+			{
+			    return (iter.base() - super::base())
+				 / vec<T>::size;
+			}
+};
+
+template <class T, class ROW> inline row_vec_iterator<T, ROW>
+make_row_vec_iterator(ROW const& row)
+{
+    return row_vec_iterator<T, ROW>(row);
+}
+
 }	// namespace mm
 }	// namespace TU
 #endif	// MMX

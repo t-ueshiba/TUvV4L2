@@ -200,6 +200,8 @@ ImageBase::type2nbytes(Type type, bool padding) const
 	nbytes *= sizeof(BGRA);
 	align = 4;
 	break;
+      default:
+	break;
     }
     u_int	nbytesPerLine = align * ((nbytes + align - 1) / align);
 
@@ -236,6 +238,8 @@ ImageBase::type2depth(Type type)
 	return 12;
       case BMP_32:
 	return 32;
+      default:
+	break;
     }
 
     return 8;
@@ -310,6 +314,8 @@ ImageBase::restorePBMHeader(std::istream& in)
 		    if (!strcmp(val, "Big"))
 			throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
 		}
+		break;
+	      default:
 		break;
 	    }
 	}
@@ -619,6 +625,8 @@ ImageBase::TypeInfo::TypeInfo(Type ty)
       case BMP_24:
       case BMP_32:
 	bottomToTop = true;
+	break;
+      default:
 	break;
     }
 }

@@ -34,7 +34,6 @@
 #ifndef __TUSeparableFilter2_h
 #define __TUSeparableFilter2_h
 
-#include "TU/iterator.h"
 #include "TU/Array++.h"
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
