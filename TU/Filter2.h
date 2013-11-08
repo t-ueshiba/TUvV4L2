@@ -112,9 +112,9 @@ struct dir4
 	{
 	    using namespace	mm;
 		    
-	    const result_type	l4 = cast<signed_type>(u < -v);
-	    return (l4				    & result_type(0x4))
-		 | ((cast<signed_type>(u < v) ^ l4) & result_type(0x2));
+	    const result_type	l4 = cast<value_type>(u < -v);
+	    return (l4				   & result_type(0x4))
+		 | ((cast<value_type>(u < v) ^ l4) & result_type(0x2));
 	}
     };
 #endif

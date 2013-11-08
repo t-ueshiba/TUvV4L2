@@ -274,10 +274,15 @@ class unarize2
 		    return _func(boost::get<0>(arg), boost::get<1>(arg));
 		}
 
-    FUNC const&	functor()			const	{return _func;}
+    const FUNC&	functor()			const	{return _func;}
+
+    struct mm_ : unarize2<typename FUNC::mm_>
+    {
+	mm_(const unarize2& u)	:super(u.functor())		{}
+    };
 
   private:
-    FUNC const	_func;
+    const FUNC	_func;
 };
 
 template <class FUNC> inline unarize2<FUNC>
@@ -309,10 +314,15 @@ class unarize3
 				 boost::get<1>(arg), boost::get<2>(arg));
 		}
 
-    FUNC const&	functor()			const	{return _func;}
+    const FUNC&	functor()			const	{return _func;}
+
+    struct mm_ : unarize3<typename FUNC::mm_>
+    {
+	mm_(const unarize3& u)	:super(u.functor())		{}
+    };
 
   private:
-    FUNC const	_func;
+    const FUNC	_func;
 };
 
 template <class FUNC> inline unarize3<FUNC>
@@ -345,10 +355,15 @@ class unarize4
 				 boost::get<2>(arg), boost::get<3>(arg));
 		}
 
-    FUNC const&	functor()			const	{return _func;}
+    const FUNC&	functor()			const	{return _func;}
+
+    struct mm_ : unarize4<typename FUNC::mm_>
+    {
+	mm_(const unarize4& u)	:super(u.functor())		{}
+    };
 
   private:
-    FUNC const	_func;
+    const FUNC	_func;
 };
 
 template <class FUNC> inline unarize4<FUNC>
