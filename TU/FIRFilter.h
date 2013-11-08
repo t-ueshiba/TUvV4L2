@@ -286,7 +286,7 @@ template <size_t D, class T> template <class IN, class OUT> inline void
 FIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     std::advance(out, D/2);
-    super::convolve(ib, ie, make_row_iterator(out, D/2));
+    super::convolve(ib, ie, make_row_iterator<boost::use_default>(out, D/2));
 }
 
 }
