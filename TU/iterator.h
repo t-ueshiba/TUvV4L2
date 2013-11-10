@@ -381,6 +381,67 @@ make_fast_zip_iterator(TUPLE t)
     return fast_zip_iterator<TUPLE>(t);
 }
 
+namespace detail
+{
+/************************************************************************
+*  struct tuple_meta_transform2<TUPLE1, TUPLE2, BINARY_META_FUN>	*
+************************************************************************/
+template<class TUPLE1, class TUPLE2, class BINARY_META_FUN>
+struct tuple_meta_transform2;
+      
+template<class TUPLE1, class TUPLE2, class BINARY_META_FUN>
+struct tuple_meta_transform2_impl
+{
+    typedef boost::tuples::cons<
+	typename boost::mpl::apply2<
+	    typename boost::mpl::lambda<BINARY_META_FUN>::type,
+	    typename TUPLE1::head_type,
+	    typename TUPLE2::head_type>::type,
+	typename tuple_meta_transform2<
+	    typename TUPLE1::tail_type,
+	    typename TUPLE2::tail_type,
+	    BINARY_META_FUN>::type>				type;
+};
+
+template<class TUPLE1, class TUPLE2, class BINARY_META_FUN>
+struct tuple_meta_transform2
+    : boost::mpl::eval_if<
+	boost::is_same<TUPLE1, boost::tuples::null_type>,
+	boost::mpl::identity<boost::tuples::null_type>,
+	tuple_meta_transform2_impl<TUPLE1, TUPLE2, BINARY_META_FUN> >
+{
+};
+
+/************************************************************************
+*  tuple_transform2<TUPLE1>(TUPLE2, FUNC)				*
+************************************************************************/
+template <class, class FUNC> inline boost::tuples::null_type
+tuple_transform2(boost::tuples::null_type const&, FUNC)
+{
+    return boost::tuples::null_type();
+}
+template <class TUPLE1, class TUPLE2, class FUNC>
+inline typename tuple_meta_transform2<TUPLE1, TUPLE2, FUNC>::type
+tuple_transform2(TUPLE2 const& t, FUNC func)
+{ 
+    typedef typename tuple_meta_transform2<
+	typename TUPLE1::tail_type,
+	typename TUPLE2::tail_type, FUNC>::type	transformed_tail_type;
+
+    return boost::tuples::cons<
+	typename boost::mpl::apply2<
+	    FUNC,
+	    typename TUPLE1::head_type,
+	    typename TUPLE2::head_type>::type,
+	transformed_tail_type>(
+	    func.template operator ()<typename TUPLE1::head_type>(
+		boost::tuples::get<0>(t)),
+	    tuple_transform2<typename TUPLE1::tail_type>(
+		t.get_tail(), func));
+}
+
+}	// namespace detail
+
 /************************************************************************
 *  struct subiterator<ITER>						*
 ************************************************************************/
@@ -677,23 +738,21 @@ class row2col
 
 template <class ROW>
 struct vertical_iterator
+    : public boost::transform_iterator<row2col<ROW>, ROW, boost::use_default,
+				       typename subiterator<ROW>::value_type>
 {
     typedef boost::transform_iterator<
 		row2col<ROW>, ROW, boost::use_default,
-		typename subiterator<ROW>::value_type>	type;
+		typename subiterator<ROW>::value_type>		super;
 
-    typedef typename type::difference_type		difference_type;
-    typedef typename type::value_type			value_type;
-    typedef typename type::pointer			pointer;
-    typedef typename type::reference			reference;
-    typedef typename type::iterator_category		iterator_category;
+    vertical_iterator(ROW row, size_t idx)
+	:super(row, row2col<ROW>(idx))				{}
 };
 
-template <class ROW>
-inline typename vertical_iterator<ROW>::type
+template <class ROW> inline vertical_iterator<ROW>
 make_vertical_iterator(ROW row, size_t idx)
 {
-    return typename vertical_iterator<ROW>::type(row, row2col<ROW>(idx));
+    return vertical_iterator<ROW>(row, idx);
 }
     
 /************************************************************************
