@@ -747,6 +747,12 @@ struct vertical_iterator
 
     vertical_iterator(ROW row, size_t idx)
 	:super(row, row2col<ROW>(idx))				{}
+    vertical_iterator(super const& iter)	:super(iter)	{}
+    vertical_iterator&	operator =(super const& iter)
+			{
+			    super::operator =(iter);
+			    return *this;
+			}
 };
 
 template <class ROW> inline vertical_iterator<ROW>
