@@ -3429,6 +3429,12 @@ class cvtdown_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
     cvtdown_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(TU::detail::tuple_transform2<T_TUPLE>(
 		   iter.get_iterator_tuple(), invoke()))		{}
+    cvtdown_iterator(super const& iter)	:super(iter)			{}
+    cvtdown_iterator&	operator =(super const& iter)
+			{
+			    super::operator =(iter);
+			    return *this;
+			}
 };
     
 template <class T, class ITER> cvtdown_iterator<T, ITER>
@@ -3626,6 +3632,12 @@ class cvtup_iterator<fast_zip_iterator<ITER_TUPLE> >
     cvtup_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(boost::detail::tuple_impl_specific::
 	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
+    cvtup_iterator(super const& iter)	:super(iter)			{}
+    cvtup_iterator&	operator =(super const& iter)
+			{
+			    super::operator =(iter);
+			    return *this;
+			}
 };
 
 template <class ITER> cvtup_iterator<ITER>
