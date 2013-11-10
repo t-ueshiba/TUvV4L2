@@ -36,6 +36,7 @@
 
 #include <functional>
 #include <boost/tuple/tuple.hpp>
+#include <boost/type_traits.hpp>
 
 namespace TU
 {
@@ -49,10 +50,10 @@ namespace TU
 template <class T>
 struct identity
 {
-    typedef T	argument_type;
-    typedef T	result_type;
+    typedef typename boost::remove_reference<T>::type	argument_type;
+    typedef argument_type				result_type;
     
-    result_type	operator ()(argument_type x)	const	{ return x; }
+    T	operator ()(T x)			const	{ return x; }
 };
 
 /************************************************************************
@@ -66,15 +67,11 @@ struct identity
 template <class S, class T>
 struct assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y = x;
-			}
+    T	operator ()(S x, T y)			const	{ return y = x; }
 };
 
 /************************************************************************
@@ -88,15 +85,11 @@ struct assign
 template <class S, class T>
 struct plus_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y += x;
-			}
+    T	operator ()(S x, T y)			const	{ return y += x; }
 };
 
 /************************************************************************
@@ -110,15 +103,11 @@ struct plus_assign
 template <class S, class T>
 struct minus_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y -= x;
-			}
+    T	operator ()(S x, T y)			const	{ return y -= x; }
 };
 
 /************************************************************************
@@ -132,15 +121,11 @@ struct minus_assign
 template <class S, class T>
 struct multiplies_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y *= x;
-			}
+    T	operator ()(S x, T y)			const	{ return y *= x; }
 };
 
 /************************************************************************
@@ -154,15 +139,11 @@ struct multiplies_assign
 template <class S, class T>
 struct divides_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y /= x;
-			}
+    T	operator ()(S x, T y)			const	{ return y /= x; }
 };
 
 /************************************************************************
@@ -176,15 +157,11 @@ struct divides_assign
 template <class S, class T>
 struct modulus_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y %= x;
-			}
+    T	operator ()(S x, T y)			const	{ return y %= x; }
 };
 
 /************************************************************************
@@ -198,15 +175,11 @@ struct modulus_assign
 template <class S, class T>
 struct bit_and_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y &= x;
-			}
+    T	operator ()(S x, T y)			const	{ return y &= x; }
 };
 
 /************************************************************************
@@ -220,15 +193,11 @@ struct bit_and_assign
 template <class S, class T>
 struct bit_or_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y |= x;
-			}
+    T	operator ()(S x, T y)			const	{ return y |= x; }
 };
 
 /************************************************************************
@@ -242,15 +211,11 @@ struct bit_or_assign
 template <class S, class T>
 struct bit_xor_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef T		result_type;
+    typedef typename boost::remove_reference<S>::type	first_argument_type;
+    typedef typename boost::remove_reference<T>::type	second_argument_type;
+    typedef second_argument_type			result_type;
     
-    result_type&	operator ()(const first_argument_type&  x,
-				    second_argument_type& y) const
-			{
-			    return y ^= x;
-			}
+    T	operator ()(S x, T y)			const	{ return y ^= x; }
 };
 
 /************************************************************************
@@ -266,6 +231,15 @@ class unarize2
 			 typename FUNC::second_argument_type>	argument_type;
     typedef typename FUNC::result_type				result_type;
 
+    class mm : public unarize2<typename FUNC::mm>
+    {
+      private:
+	typedef unarize2<typename FUNC::mm>		super;
+
+      public:
+	mm(const unarize2& u)	:super(u.functor())	{}
+    };
+
   public:
     unarize2(const FUNC& func=FUNC())	:_func(func)	{}
 
@@ -275,11 +249,6 @@ class unarize2
 		}
 
     const FUNC&	functor()			const	{return _func;}
-
-    struct mm_ : unarize2<typename FUNC::mm_>
-    {
-	mm_(const unarize2& u)	:super(u.functor())		{}
-    };
 
   private:
     const FUNC	_func;
@@ -305,6 +274,15 @@ class unarize3
 			 typename FUNC::second_argument_type,
 			 typename FUNC::third_argument_type>	argument_type;
     
+    class mm_ : public unarize3<typename FUNC::mm_>
+    {
+      private:
+	typedef unarize3<typename FUNC::mm_>		super;
+
+      public:
+	mm_(const unarize3& u)	:super(u.functor())	{}
+    };
+
   public:
     unarize3(const FUNC& func=FUNC())	:_func(func)	{}
 
@@ -315,11 +293,6 @@ class unarize3
 		}
 
     const FUNC&	functor()			const	{return _func;}
-
-    struct mm_ : unarize3<typename FUNC::mm_>
-    {
-	mm_(const unarize3& u)	:super(u.functor())		{}
-    };
 
   private:
     const FUNC	_func;
@@ -346,6 +319,15 @@ class unarize4
 			 typename FUNC::third_argument_type,
 			 typename FUNC::fourth_argument_type>	argument_type;
     
+    class mm_ : public unarize4<typename FUNC::mm_>
+    {
+      private:
+	typedef unarize3<typename FUNC::mm_>		super;
+
+      public:
+	mm_(const unarize4& u)	:super(u.functor())	{}
+    };
+
   public:
     unarize4(const FUNC& func=FUNC())	:_func(func)	{}
 
@@ -356,11 +338,6 @@ class unarize4
 		}
 
     const FUNC&	functor()			const	{return _func;}
-
-    struct mm_ : unarize4<typename FUNC::mm_>
-    {
-	mm_(const unarize4& u)	:super(u.functor())		{}
-    };
 
   private:
     const FUNC	_func;

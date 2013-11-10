@@ -61,8 +61,8 @@ class SeparableFilter2
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    typedef typename subiterator<OUT>::value_type
-								value_type;
+		    typedef
+			typename subiterator<OUT>::value_type	value_type;
 		    typedef typename boost::is_arithmetic<value_type>
 					  ::type		is_numeric;
 		    

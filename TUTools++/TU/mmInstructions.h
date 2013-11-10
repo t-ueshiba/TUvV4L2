@@ -3397,6 +3397,40 @@ class cvtdown_iterator
     void	decrement()						{}
 };
 
+template <class T_TUPLE, class ITER_TUPLE>
+class cvtdown_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
+    : public fast_zip_iterator<
+	typename TU::detail::tuple_meta_transform2<
+	    T_TUPLE, ITER_TUPLE,
+	    boost::mpl::identity<
+		cvtdown_iterator<boost::mpl::_1, boost::mpl::_2> > >::type>
+{
+  private:
+    typedef fast_zip_iterator<
+	typename TU::detail::tuple_meta_transform2<
+	    T_TUPLE, ITER_TUPLE,
+	    boost::mpl::identity<
+		cvtdown_iterator<
+		    boost::mpl::_1, boost::mpl::_2> > >::type>	super;
+	
+    struct invoke
+    {
+	template <class T, class ITER>
+	struct apply	{ typedef cvtdown_iterator<T, ITER>	type; };
+
+	template <class T, class ITER> typename apply<T, ITER>::type
+	operator ()(ITER const& iter) const
+	{
+	    return typename apply<T, ITER>::type(iter);
+	}
+    };
+
+  public:
+    cvtdown_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
+	:super(TU::detail::tuple_transform2<T_TUPLE>(
+		   iter.get_iterator_tuple(), invoke()))		{}
+};
+    
 template <class T, class ITER> cvtdown_iterator<T, ITER>
 make_cvtdown_iterator(ITER iter)
 {
@@ -3560,6 +3594,38 @@ class cvtup_iterator
 			    return (iter.base() - super::base())
 				 / value_type::size;
 			}
+};
+
+template <class ITER_TUPLE>
+class cvtup_iterator<fast_zip_iterator<ITER_TUPLE> >
+    : public fast_zip_iterator<
+	typename boost::detail::tuple_impl_specific::tuple_meta_transform<
+	    ITER_TUPLE,
+	    boost::mpl::identity<cvtup_iterator<boost::mpl::_1> > >::type>
+{
+  private:
+    typedef fast_zip_iterator<
+	typename boost::detail::tuple_impl_specific::tuple_meta_transform<
+	    ITER_TUPLE,
+	    boost::mpl::identity<
+		cvtup_iterator<boost::mpl::_1> > >::type>	super;
+
+    struct invoke
+    {
+	template <class ITER>
+	struct apply	{ typedef cvtup_iterator<ITER>	type; };
+
+	template <class ITER> typename apply<ITER>::type
+	operator ()(ITER const& iter) const
+	{
+	    return typename apply<ITER>::type(iter);
+	}
+    };
+    
+  public:
+    cvtup_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
+	:super(boost::detail::tuple_impl_specific::
+	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
 };
 
 template <class ITER> cvtup_iterator<ITER>
