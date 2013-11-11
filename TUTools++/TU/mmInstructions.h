@@ -888,17 +888,6 @@ MM_CONSTRUCTOR_1(u_int32_t)
 template <bool ALIGNED=false, class T>
 static vec<T>	load(const T* p)					;
 
-//! メモリからベクトルをロードする．
-/*!
-  \param p	ロード元のメモリアドレス
-  \return	ロードされたベクトル
-*/
-template <bool ALIGNED=false, class T> static inline vec<T>
-load(const vec<T>* p)
-{
-    return load(reinterpret_cast<const T*>(p));
-}
-
 //! メモリにベクトルをストアする．
 /*!
   \param p	ストア先のメモリアドレス
@@ -906,17 +895,6 @@ load(const vec<T>* p)
 */
 template <bool ALIGNED=false, class T>
 static void	store(T* p, vec<T> x)					;
-
-//! メモリにベクトルをストアする．
-/*!
-  \param p	ストア先のメモリアドレス
-  \param x	ストアされるベクトル
-*/
-template <bool ALIGNED=false, class T> static inline void
-store(vec<T>* p, vec<T> x)
-{
-    store(reinterpret_cast<T*>(p), x);
-}
 
 #if defined(SSE2)
 #  if defined(SSE3)
@@ -3152,27 +3130,29 @@ struct tuple2vec<T, 8>
 };
 
 /************************************************************************
-*  class load_iterator<T, ALIGNED>					*
+*  class load_iterator<ITER, ALIGNED>					*
 ************************************************************************/
-//! 指定されたアドレスからSIMDベクトルを読み込む反復子
+//! 反復子が指すアドレスからSIMDベクトルを読み込む反復子
 /*!
-  \param T		SIMDベクトルの成分の型
+  \param ITER		SIMDベクトルの読み込み元を指す反復子の型
   \param ALIGNED	読み込み元のアドレスがalignmentされていればtrue,
 			そうでなければfalse
 */
-template <class T, bool ALIGNED=false>
-class load_iterator : public boost::iterator_adaptor<load_iterator<T, ALIGNED>,
-						     const vec<T>*,
-						     vec<T>,
-						     boost::use_default,
-						     vec<T> >
+template <class ITER, bool ALIGNED=false>
+class load_iterator : public boost::iterator_adaptor<
+			load_iterator<ITER, ALIGNED>,
+			ITER,
+			vec<typename std::iterator_traits<ITER>::value_type>,
+			boost::use_default,
+			vec<typename std::iterator_traits<ITER>::value_type> >
 {
   private:
+    typedef typename std::iterator_traits<ITER>::value_type	element_type;
     typedef boost::iterator_adaptor<load_iterator,
-				    const vec<T>*,
-				    vec<T>,
+				    ITER,
+				    vec<element_type>,
 				    boost::use_default,
-				    vec<T> >		super;
+				    vec<element_type> >		super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -3183,107 +3163,179 @@ class load_iterator : public boost::iterator_adaptor<load_iterator<T, ALIGNED>,
 
     friend class				boost::iterator_core_access;
 
-  public:
-    load_iterator(const vec<T>* p)	:super(p)	{}
-    load_iterator(const T* p)
-	:super(reinterpret_cast<const vec<T>*>(p))	{}
     
+  public:
+    load_iterator(ITER iter)	:super(iter)	{}
+    load_iterator(const value_type* p)
+	:super(reinterpret_cast<ITER>(p))	{}
+	       
   private:
-    reference	dereference()	const	{return load<ALIGNED>(super::base());}
+    reference		dereference() const
+			{
+			    return load<ALIGNED>(super::base());
+			}
+    void		advance(difference_type n)
+			{
+			    super::base_reference() += n * value_type::size;
+			}
+    void		increment()
+			{
+			    super::base_reference() += value_type::size;
+			}
+    void		decrement()
+			{
+			    super::base_reference() -= value_type::size;
+			}
+    difference_type	distance_to(load_iterator iter) const
+			{
+			    return (iter.base() - super::base())
+				 / value_type::size;
+			}
 };
 
-template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
-make_load_iterator(const vec<T>* p)
+namespace detail
 {
-    return load_iterator<T, ALIGNED>(p);
+    template <class ITER, class ALIGNED>
+    struct loader
+    {
+	typedef load_iterator<ITER, ALIGNED::value>		type;
+    };
+    template <class ITER_TUPLE, class ALIGNED>
+    struct loader<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
+    {
+	typedef fast_zip_iterator<
+	    typename boost::detail::tuple_impl_specific::
+	    tuple_meta_transform<
+		ITER_TUPLE,
+		loader<boost::mpl::_1, ALIGNED> >::type>	type;
+    };
+}	// namespace detail
+    
+template <class ITER_TUPLE, bool ALIGNED>
+class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
+    : public detail::loader<fast_zip_iterator<ITER_TUPLE>,
+			    boost::mpl::bool_<ALIGNED> >::type
+{
+  private:
+    typedef typename
+	detail::loader<fast_zip_iterator<ITER_TUPLE>,
+		       boost::mpl::bool_<ALIGNED> >::type	super;
+    
+    struct invoke
+    {
+	template <class ITER>
+	struct apply
+	{
+	    typedef load_iterator<ITER, ALIGNED>		type;
+	};
+
+	template <class ITER> typename apply<ITER>::type
+	operator ()(ITER const& iter) const
+	{
+	    return typename apply<ITER>::type(iter);
+	}
+    };
+
+  public:
+    load_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
+	:super(boost::detail::tuple_impl_specific::
+	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
+    load_iterator(super const& iter)	:super(iter)			{}
+};
+
+template <bool ALIGNED=false, class ITER> load_iterator<ITER, ALIGNED>
+make_load_iterator(ITER iter)
+{
+    return load_iterator<ITER, ALIGNED>(iter);
 }
 
-template <bool ALIGNED=false, class T> load_iterator<T, ALIGNED>
-make_load_iterator(const T* p)
+template <bool ALIGNED=false, class T> load_iterator<const T*, ALIGNED>
+make_load_iterator(const vec<T>* p)
 {
-    return load_iterator<T, ALIGNED>(p);
+    return load_iterator<const T*, ALIGNED>(p);
 }
 
 /************************************************************************
-*  class store_iterator<T, ALIGNED>					*
+*  class store_iterator<ITER, ALIGNED>					*
 ************************************************************************/
 namespace detail
 {
-    template <class T, bool ALIGNED=false>
+    template <class ITER, bool ALIGNED=false>
     class store_proxy
     {
       public:
-	typedef T			element_type;
-	typedef vec<element_type>	value_type;
-	typedef store_proxy		self;
+	typedef typename std::iterator_traits<ITER>::value_type	element_type;
+	typedef vec<element_type>				value_type;
+	typedef store_proxy					self;
 	
       public:
-	store_proxy(vec<T>* p)	:_p(p)					{}
-	store_proxy(T* p)	:_p(reinterpret_cast<vec<T>*>(p))	{}
+	store_proxy(ITER iter)	:_iter(iter)				{}
 	
 	self&	operator =(value_type val)
 		{
-		    store<ALIGNED>(_p, val);
+		    store<ALIGNED>(_iter, val);
 		    return *this;
 		}
 	self&	operator +=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) + val);
+		    return operator =(load<ALIGNED>(_iter) + val);
 		}
 	self&	operator -=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) - val);
+		    return operator =(load<ALIGNED>(_iter) - val);
 		}
 	self&	operator *=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) * val);
+		    return operator =(load<ALIGNED>(_iter) * val);
 		}
 	self&	operator /=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) / val);
+		    return operator =(load<ALIGNED>(_iter) / val);
 		}
 	self&	operator %=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) % val);
+		    return operator =(load<ALIGNED>(_iter) % val);
 		}
 	self&	operator &=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) & val);
+		    return operator =(load<ALIGNED>(_iter) & val);
 		}
 	self&	operator |=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) | val);
+		    return operator =(load<ALIGNED>(_iter) | val);
 		}
 	self&	operator ^=(value_type val)
 		{
-		    return operator =(load<ALIGNED>(_p) ^ val);
+		    return operator =(load<ALIGNED>(_iter) ^ val);
 		}
 
       private:
-	vec<T>* const	_p;
+	ITER const	_iter;
     };
-}
+}	// namespace detail
 
-//! 指定されたアドレスにSIMDベクトルを書き込む反復子
+//! 反復子が指す書き込み先にSIMDベクトルを書き込む反復子
 /*!
-  \param T		SIMDベクトルの成分の型
+  \param ITER		SIMDベクトルの書き込み先を指す反復子の型
   \param ALIGNED	書き込み先アドレスがalignmentされていればtrue,
 			そうでなければfalse
 */
-template <class T, bool ALIGNED=false>
-class store_iterator
-    : public boost::iterator_adaptor<store_iterator<T, ALIGNED>,
-				     vec<T>*,
-				     vec<T>,
-				     boost::use_default,
-				     detail::store_proxy<T, ALIGNED> >
+template <class ITER, bool ALIGNED=false>
+class store_iterator : public boost::iterator_adaptor<
+			store_iterator<ITER, ALIGNED>,
+			ITER,
+			vec<typename std::iterator_traits<ITER>::value_type>,
+			boost::use_default,
+			detail::store_proxy<ITER, ALIGNED> >
 {
   private:
-    typedef boost::iterator_adaptor<store_iterator,
-				    vec<T>*,
-				    vec<T>,
-				    boost::use_default,
-				    detail::store_proxy<T, ALIGNED> >	super;
+    typedef typename std::iterator_traits<ITER>::value_type	element_type;
+    typedef boost::iterator_adaptor<
+		store_iterator,
+		ITER,
+		vec<element_type>,
+		boost::use_default,
+		detail::store_proxy<ITER, ALIGNED> >		super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -3295,23 +3347,94 @@ class store_iterator
     friend class				boost::iterator_core_access;
 
   public:
-    store_iterator(vec<T>* p)	:super(p)				{}
-    store_iterator(T* p)	:super(reinterpret_cast<vec<T>*>(p))	{}
+    store_iterator(ITER iter)	:super(iter)	{}
+    store_iterator(value_type* p)
+	:super(reinterpret_cast<ITER>(p))	{}
 	       
   private:
-    reference	dereference()	const	{return reference(super::base());}
+    reference		dereference() const
+			{
+			    return reference(super::base());
+			}
+    void		advance(difference_type n)
+			{
+			    super::base_reference() += n * value_type::size;
+			}
+    void		increment()
+			{
+			    super::base_reference() += value_type::size;
+			}
+    void		decrement()
+			{
+			    super::base_reference() -= value_type::size;
+			}
+    difference_type	distance_to(store_iterator iter) const
+			{
+			    return (iter.base() - super::base())
+				 / value_type::size;
+			}
 };
 
-template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
-make_store_iterator(vec<T>* p)
+namespace detail
 {
-    return store_iterator<T, ALIGNED>(p);
+    template <class ITER, class ALIGNED>
+    struct storer
+    {
+	typedef store_iterator<ITER, ALIGNED::value>		type;
+    };
+    template <class ITER_TUPLE, class ALIGNED>
+    struct storer<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
+    {
+	typedef fast_zip_iterator<
+	    typename boost::detail::tuple_impl_specific::
+	    tuple_meta_transform<
+		ITER_TUPLE,
+		storer<boost::mpl::_1, ALIGNED> >::type>	type;
+    };
+}	// namespace detail
+
+template <class ITER_TUPLE, bool ALIGNED>
+class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
+    : public detail::storer<fast_zip_iterator<ITER_TUPLE>,
+			    boost::mpl::bool_<ALIGNED> >::type
+{
+  private:
+    typedef typename
+	detail::storer<fast_zip_iterator<ITER_TUPLE>,
+		       boost::mpl::bool_<ALIGNED> >::type	super;
+
+    struct invoke
+    {
+	template <class ITER>
+	struct apply
+	{
+	    typedef store_iterator<ITER, ALIGNED>		type;
+	};
+
+	template <class ITER> typename apply<ITER>::type
+	operator ()(ITER const& iter) const
+	{
+	    return typename apply<ITER>::type(iter);
+	}
+    };
+
+  public:
+    store_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
+	:super(boost::detail::tuple_impl_specific::
+	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
+    store_iterator(super const& iter)	:super(iter)			{}
+};
+    
+template <bool ALIGNED=false, class ITER> store_iterator<ITER, ALIGNED>
+make_store_iterator(ITER iter)
+{
+    return store_iterator<ITER, ALIGNED>(iter);
 }
 
-template <bool ALIGNED=false, class T> store_iterator<T, ALIGNED>
-make_store_iterator(T* p)
+template <bool ALIGNED=false, class T> store_iterator<T*, ALIGNED>
+make_store_iterator(vec<T>* p)
 {
-    return store_iterator<T, ALIGNED>(p);
+    return store_iterator<T*, ALIGNED>(p);
 }
 
 /************************************************************************
@@ -3416,7 +3539,10 @@ class cvtdown_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
     struct invoke
     {
 	template <class T, class ITER>
-	struct apply	{ typedef cvtdown_iterator<T, ITER>	type; };
+	struct apply
+	{
+	    typedef cvtdown_iterator<T, ITER>	type;
+	};
 
 	template <class T, class ITER> typename apply<T, ITER>::type
 	operator ()(ITER const& iter) const
@@ -3430,11 +3556,6 @@ class cvtdown_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
 	:super(TU::detail::tuple_transform2<T_TUPLE>(
 		   iter.get_iterator_tuple(), invoke()))		{}
     cvtdown_iterator(super const& iter)	:super(iter)			{}
-    cvtdown_iterator&	operator =(super const& iter)
-			{
-			    super::operator =(iter);
-			    return *this;
-			}
 };
     
 template <class T, class ITER> cvtdown_iterator<T, ITER>
@@ -3619,7 +3740,10 @@ class cvtup_iterator<fast_zip_iterator<ITER_TUPLE> >
     struct invoke
     {
 	template <class ITER>
-	struct apply	{ typedef cvtup_iterator<ITER>	type; };
+	struct apply
+	{
+	    typedef cvtup_iterator<ITER>	type;
+	};
 
 	template <class ITER> typename apply<ITER>::type
 	operator ()(ITER const& iter) const
@@ -3633,11 +3757,6 @@ class cvtup_iterator<fast_zip_iterator<ITER_TUPLE> >
 	:super(boost::detail::tuple_impl_specific::
 	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
     cvtup_iterator(super const& iter)	:super(iter)			{}
-    cvtup_iterator&	operator =(super const& iter)
-			{
-			    super::operator =(iter);
-			    return *this;
-			}
 };
 
 template <class ITER> cvtup_iterator<ITER>

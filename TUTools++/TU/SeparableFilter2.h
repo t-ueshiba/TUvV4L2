@@ -84,9 +84,9 @@ class SeparableFilter2
     struct row2vcol
     {
       public:
-	typedef typename subiterator<OUT>::value_type		value_type;
 	typedef typename std::iterator_traits<OUT>::reference	argument_type;
-	typedef mm::detail::store_proxy<value_type>		result_type;
+	typedef mm::detail::store_proxy<
+		    typename subiterator<OUT>::pointer>		result_type;
     
       public:
 	row2vcol(size_t idx)	:_idx(idx)			{}
