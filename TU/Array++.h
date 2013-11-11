@@ -53,15 +53,15 @@ namespace TU
 template <class T, bool ALIGNED>
 struct BufTraits
 {
-    typedef const T*				const_iterator;
-    typedef T*					iterator;
+    typedef const T*					const_iterator;
+    typedef T*						iterator;
 };
 #if defined(MMX)			// MMX が定義されているときは...
 template <class T, bool ALIGNED>
 struct BufTraits<mm::vec<T>, ALIGNED>	// 要素がvec<T>の配列の反復子を特別版に
 {
-    typedef mm::load_iterator<T, ALIGNED>	const_iterator;
-    typedef mm::store_iterator<T, ALIGNED>	iterator;
+    typedef mm::load_iterator<const T*, ALIGNED>	const_iterator;
+    typedef mm::store_iterator<T*, ALIGNED>		iterator;
 };
 #endif
 
