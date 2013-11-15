@@ -528,6 +528,100 @@ Mesh<V, F, M>::showTopology(std::ostream& out) const
 }
 #endif
     
+//! 入力ストリームからSTL形式のメッシュを読み込む．
+/*!
+  \param in	入力ストリーム
+  \return	inで指定した入力ストリーム
+*/
+template <class V, class F, u_int M> std::istream&
+Mesh<V, F, M>::restoreSTL(std::istream& in)
+{
+    using namespace	std;
+
+    typedef vector<fiterator>				Faces;
+    typedef map<viterator, Faces, Compare>		VerticesWithFaces;
+    typedef typename VerticesWithFaces::iterator	VertexIterator;
+
+    clear();					// 頂点と面のリストを空にする．
+    
+    char	header[80];
+    in.read(header, sizeof(header));		// ヘッダ(80文字)を読み捨てる.
+    
+    u_int	nfaces;
+    in.read((char*)&nfaces, sizeof(nfaces));	// 面数を読み込む.
+
+    VerticesWithFaces	verticesWithFaces;
+    for (u_int i = 0; i < nfaces; ++i)
+    {
+	Vector3f	normal;
+	normal.restore(in);			// 法線ベクトルを読み捨てる.
+
+	VertexIterator	vf[3];
+	for (u_int e = 0; e < 3; ++e)
+	{
+	    V		vertex;
+	    vertex.restore(in);			// 頂点の3D座標を読み込む.
+	    viterator	v = newVertex(vertex);
+
+	    bool	isNew;
+	    boost::tie(vf[e], isNew)
+		= verticesWithFaces.insert(make_pair(v, Faces()));
+	    if (!isNew)
+		deleteVertex(v);
+	}
+
+	viterator	v[] = {vf[0]->first, vf[1]->first, vf[2]->first};
+#ifndef TUMeshPP_DEBUG
+	fiterator	f = newFace(F(v));	// 新しい面を生成
+#else
+	fiterator	f = newFace(F(v, i));	// 新しい面を生成
+#endif
+	vf[0]->second.push_back(f);
+	vf[1]->second.push_back(f);
+	vf[2]->second.push_back(f);
+	
+	char	delimiter[2];
+	in.read(delimiter, sizeof(delimiter));	// デリミタを読み捨てる.
+    }
+
+    setTopology(verticesWithFaces);		// 面と点，面と面を関係づける.
+    
+    return in;
+}
+
+//! 出力ストリームにSTL形式でメッシュを書き出す．
+/*!
+  \param out	出力ストリーム
+  \return	outで指定した出力ストリーム
+*/
+template <class V, class F, u_int M> std::ostream&
+Mesh<V, F, M>::saveSTL(std::ostream& out) const
+{
+    char	header[80];
+    std::fill(header, header + 80, '\0');
+    out.write(header, sizeof(header));		// ヘッダ(80文字)を書き出す.
+
+    u_int	nfaces = _faces.size();
+    out.write((char*)&nfaces, sizeof(nfaces));	// 面数を書き出す.
+
+    for (const_fiterator f = fbegin(); f != fend(); ++f)
+    {
+	Vector3f	coord[3];
+	coord[0] = f->v(0);
+	coord[1] = f->v(1);
+	coord[2] = f->v(2);
+	Vector3f	normal = ((coord[1] - coord[0]) ^
+				  (coord[2] - coord[0])).normal();
+	out.write((char*)&normal, sizeof(normal));
+	out.write((char*)coord,   sizeof(coord));
+	
+	char	delimiter[2];
+	out.write(delimiter, sizeof(delimiter));
+    }
+    
+    return out;
+}
+    
 //! 入力ストリームからメッシュを読み込む．
 /*!
   \param in	入力ストリーム
@@ -592,90 +686,35 @@ Mesh<V, F, M>::get(std::istream& in)
     return in;
 }
 
-template <class V, class F, u_int M> std::istream&
-Mesh<V, F, M>::restoreSTL(std::istream& in)
+//! 出力ストリームにメッシュを書き出す．
+/*!
+  \param out	出力ストリーム
+  \return	outで指定した出力ストリーム
+*/
+template <class V, class F, u_int M> std::ostream&
+Mesh<V, F, M>::put(std::ostream& out) const
 {
     using namespace	std;
-
-    typedef vector<fiterator>				Faces;
-    typedef map<viterator, Faces, Compare>		VerticesWithFaces;
-    typedef typename VerticesWithFaces::iterator	VertexIterator;
-
-    clear();					// 頂点と面のリストを空にする．
     
-    char	header[80];
-    in.read(header, sizeof(header));		// ヘッダ(80文字)を読み捨てる.
-    
-    u_int	nfaces;
-    in.read((char*)&nfaces, sizeof(nfaces));	// 面数を読み込む.
-
-    VerticesWithFaces	verticesWithFaces;
-    for (u_int i = 0; i < nfaces; ++i)
+    map<const V*, u_int>	dict;
+    u_int			vnum = 1;
+    for (const_viterator v = vbegin(); v != vend(); ++v)
     {
-	Vector3f	normal;
-	normal.restore(in);			// 法線ベクトルを読み捨てる.
-
-	VertexIterator	vf[3];
-	for (u_int e = 0; e < 3; ++e)
-	{
-	    V		vertex;
-	    vertex.restore(in);			// 頂点の3D座標を読み込む.
-	    viterator	v = newVertex(vertex);
-
-	    bool	isNew;
-	    boost::tie(vf[e], isNew)
-		= verticesWithFaces.insert(make_pair(v, Faces()));
-	    if (!isNew)
-		deleteVertex(v);
-	}
-
-	viterator	v[] = {vf[0]->first, vf[1]->first, vf[2]->first};
-#ifndef TUMeshPP_DEBUG
-	fiterator	f = newFace(F(v));	// 新しい面を生成
-#else
-	fiterator	f = newFace(F(v, i));	// 新しい面を生成
-#endif
-	vf[0]->second.push_back(f);
-	vf[1]->second.push_back(f);
-	vf[2]->second.push_back(f);
-	
-	char	delimiter[2];
-	in.read(delimiter, sizeof(delimiter));	// デリミタを読み捨てる.
+	dict[&(*v)] = vnum;
+	out << "Vertex " << vnum++ << ' ' << *v;
     }
-
-    setTopology(verticesWithFaces);		// 面と点，面と面を関係づける.
-    
-    return in;
-}
-
-template <class V, class F, u_int M> std::ostream&
-Mesh<V, F, M>::saveSTL(std::ostream& out) const
-{
-    char	header[80];
-    std::fill(header, header + 80, '\0');
-    out.write(header, sizeof(header));		// ヘッダ(80文字)を書き出す.
-
-    u_int	nfaces = _faces.size();
-    out.write((char*)&nfaces, sizeof(nfaces));	// 面数を書き出す.
-
+    u_int	fnum = 1;
     for (const_fiterator f = fbegin(); f != fend(); ++f)
     {
-	Vector3f	coord[3];
-	coord[0] = f->v(0);
-	coord[1] = f->v(1);
-	coord[2] = f->v(2);
-	Vector3f	normal = ((coord[1] - coord[0]) ^
-				  (coord[2] - coord[0])).normal();
-	out.write((char*)&normal, sizeof(normal));
-	out.write((char*)coord,   sizeof(coord));
-	
-	char	delimiter[2];
-	out.write(delimiter, sizeof(delimiter));
+	out << "Face " << fnum++;
+	for (u_int e = 0; e < NSides; ++e)
+	    out << ' ' << dict[&(f->v(e))];
+	out << std::endl;
     }
     
     return out;
 }
-    
+
 template <class V, class F, u_int M> template <class VF> void
 Mesh<V, F, M>::setTopology(const VF& verticesWithFaces)
 {
@@ -721,35 +760,6 @@ Mesh<V, F, M>::setTopology(const VF& verticesWithFaces)
 #ifdef TUMeshPP_DEBUG
     showTopology(cerr);
 #endif
-}
-
-//! 出力ストリームにメッシュを書き出す．
-/*!
-  \param out	出力ストリーム
-  \return	outで指定した出力ストリーム
-*/
-template <class V, class F, u_int M> std::ostream&
-Mesh<V, F, M>::put(std::ostream& out) const
-{
-    using namespace	std;
-    
-    map<const V*, u_int>	dict;
-    u_int			vnum = 1;
-    for (const_viterator v = vbegin(); v != vend(); ++v)
-    {
-	dict[&(*v)] = vnum;
-	out << "Vertex " << vnum++ << ' ' << *v;
-    }
-    u_int	fnum = 1;
-    for (const_fiterator f = fbegin(); f != fend(); ++f)
-    {
-	out << "Face " << fnum++;
-	for (u_int e = 0; e < NSides; ++e)
-	    out << ' ' << dict[&(f->v(e))];
-	out << std::endl;
-    }
-    
-    return out;
 }
 
 //! 新しい頂点を生成して頂点リストに登録する．

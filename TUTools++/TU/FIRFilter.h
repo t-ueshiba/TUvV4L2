@@ -169,7 +169,7 @@ class FIRFilter
 /*!
   \param c	z変換係数. z変換関数は
 		\f[
-		  H(z^{-1}) = {c_{D-1} + c_{D-2}z^{-1} + c_{D-3}z^{-2} +
+		  H(z^{-1}) = c_{D-1} + c_{D-2}z^{-1} + c_{D-3}z^{-2} +
 		  \cdots + c_{0}z^{-(D-1)}
 		\f]
   \return	このフィルタ自身
