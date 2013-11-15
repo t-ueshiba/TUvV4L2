@@ -204,11 +204,7 @@ class Mesh
     friend std::istream&
     operator >>(std::istream& in, Mesh& mesh)
     {
-	char	c = in.peek();
-	if (c == 'V')
-	    return mesh.get(in);
-	else
-	    return mesh.restoreSTL(in);
+	return mesh.get(in);
     }
 
   //! 出力ストリームにメッシュを書き出す．
