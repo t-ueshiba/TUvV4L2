@@ -42,35 +42,7 @@ doJob(typename CONVOLVER::coeff_type alpha, size_t grainSize)
 
     out.save(cout);
 }
- 
-template <class T, class CONVOLVER> void
-doJob1(typename CONVOLVER::coeff_type alpha)
-{
-    using namespace	std;
 
-    typedef typename CONVOLVER::coeff_type	value_type;
-    
-    Image<T>	in;
-    in.restore(cin);
-    
-    ImageLine<value_type>	out(in.width());
-    Profiler			profiler(1);
-
-    CONVOLVER			convolver(alpha);
-
-    for (int i = 0; i < 5; ++i)
-    {
-	for (int j = 0; j < 100; ++j)
-	{
-	    profiler.start(0);
-	    convolver.smooth(in[0].begin(), in[0].end(), out.begin());
-	    profiler.stop().nextFrame();
-	}
-	cerr << "---------------------------------------------" << endl;
-	profiler.print(cerr);
-    }
-}
- 
 }
 
 /************************************************************************
@@ -87,7 +59,7 @@ main(int argc, char* argv[])
     
     float		alpha = 1.0;
     bool		gaussian = false;
-    size_t		grainSize = 100;
+    size_t		grainSize = 1;
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "a:Gg:")) != -1; )
 	switch (c)
@@ -107,15 +79,11 @@ main(int argc, char* argv[])
     {
 	if (gaussian)
 	{
-	  /*doJob1<pixel_type, GaussianConvolver< coeff_type> >(alpha);
-	    cerr << endl;*/
 	    doJob< pixel_type, GaussianConvolver2<coeff_type> >(alpha,
 								grainSize);
 	}
 	else
 	{
-	  /*doJob1<pixel_type, DericheConvolver< coeff_type> >(alpha);
-	    cerr << endl;*/
 	    doJob< pixel_type, DericheConvolver2<coeff_type> >(alpha,
 							       grainSize);
 	}

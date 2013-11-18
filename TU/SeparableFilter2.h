@@ -56,48 +56,26 @@ class SeparableFilter2
     template <class IN, class OUT> class ConvolveRows
     {
       public:
-	ConvolveRows(F const& filter, IN const& in, OUT const& out)
-	    :_filter(filter), _in(in), _out(out)			{}
+	ConvolveRows(F const& filter,
+		     IN const& in, OUT const& out, size_t col)
+	    :_filter(filter), _in(in), _out(out), _col(col)		{}
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    typedef
-			typename subiterator<OUT>::value_type	value_type;
-		    typedef typename boost::is_arithmetic<value_type>
-					  ::type		is_numeric;
-		    
-		    IN	ib = _in, ie = _in;
-		    std::advance(ib, r.begin());
+		    IN		in = _in, ie = _in;
+		    std::advance(in, r.begin());
 		    std::advance(ie, r.end());
-		    SeparableFilter2<F>::convolveRows(_filter, ib, ie, _out,
-						      r.begin(), is_numeric());
+		    size_t	col = _col + r.begin();
+		    for (; in != ie; ++in, ++col)
+			_filter.convolve(in->begin(), in->end(),
+					 make_vertical_iterator(_out, col));
 		}
 
       private:
 	F      const	_filter;  // cache等の内部状態を持ち得るので参照は不可
 	IN     const&	_in;
 	OUT    const&	_out;
-    };
-#endif
-#if defined(SSE)
-    template <class OUT>
-    struct row2vcol
-    {
-      public:
-	typedef typename std::iterator_traits<OUT>::reference	argument_type;
-	typedef mm::detail::store_proxy<
-		    typename subiterator<OUT>::pointer>		result_type;
-    
-      public:
-	row2vcol(size_t idx)	:_idx(idx)			{}
-    
-	result_type	operator ()(argument_type row) const
-			{
-			    return result_type(row.begin() + _idx);
-			}
-    
-      private:
-	size_t const	_idx;	//!< 列を指定するindex
+	size_t const	_col;
     };
 #endif
   public:
@@ -116,11 +94,11 @@ class SeparableFilter2
 
   private:
     template <class IN, class OUT>
-    static void	convolveRows(F const& filter, IN ib, IN ie,
-			     OUT out, size_t col, boost::true_type)	;
+    void	convolveRows(F const& filter, IN ib, IN ie, OUT out,
+			     size_t, boost::true_type)		const	;
     template <class IN, class OUT>
-    static void	convolveRows(F const& filter, IN ib, IN ie,
-			     OUT out, size_t col, boost::false_type)	;
+    void	convolveRows(F const& filter, IN ib, IN ie, OUT out,
+			     size_t col, boost::false_type)	const	;
     
   private:
     F		_filterH;
@@ -137,61 +115,55 @@ class SeparableFilter2
 template <class F> template <class IN, class OUT> void
 SeparableFilter2<F>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef typename subiterator<OUT>::value_type	value_type;
-    typedef typename boost::is_arithmetic<value_type>::type
-							is_numeric;
-    typedef Array2<Array<value_type> >			buf_type;
-    typedef typename buf_type::iterator			buf_iterator;
-    typedef typename buf_type::const_iterator		const_buf_iterator;
+    typedef typename subiterator<OUT>::value_type		value_type;
+    typedef Array2<Array<value_type> >				buf_type;
+    typedef typename boost::is_arithmetic<value_type>::type	is_numeric;
 
     if (ib == ie)
 	return;
     
     buf_type	buf(_filterH.outLength(std::distance(ib->begin(), ib->end())),
 		    std::distance(ib, ie));
-#if defined(USE_TBB)
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, buf.ncol(), _grainSize),
-		      ConvolveRows<IN, buf_iterator>(
-			  _filterH, ib, buf.begin()));
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, buf.nrow(), _grainSize),
-		      ConvolveRows<const_buf_iterator, OUT>(
-			  _filterV, buf.begin(), out));
-#else
+
     convolveRows(_filterH, ib, ie, buf.begin(), 0, is_numeric());
-    convolveRows(_filterV, buf.begin(), buf.end(), out, 0, is_numeric());
-#endif
+    convolveRows(_filterV, buf.cbegin(), buf.cend(), out, 0, is_numeric());
 }
 
-template <class F> template <class IN, class OUT> void
-SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie, OUT out,
-				  size_t col, boost::true_type)
+template <class F> template <class IN, class OUT> inline void
+SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie,
+				  OUT out, size_t, boost::true_type) const
 {
+    size_t	col = 0;
 #if defined(SSE2)
-    typedef typename subiterator<OUT>::value_type		value_type;
-    typedef mm::vec<value_type>					vec_type;
-    typedef mm::row_vec_iterator<value_type, IN>		in_iterator;
-    typedef boost::transform_iterator<
-	row2vcol<OUT>, OUT, boost::use_default, vec_type>	out_iterator;
+    typedef typename subiterator<OUT>::value_type	value_type;
+    typedef typename subiterator<OUT>::type		col_iterator;
 
-    const size_t	vsize = vec_type::size;
-    
-    IN	in = ib;
-    std::advance(ib, (std::distance(ib, ie) / vsize) * vsize);
-    for (in_iterator vec_in(in), vec_ib(ib); vec_in != vec_ib;
-	 ++vec_in, col += vsize)
-	filter.convolve(vec_in->begin(), vec_in->end(),
-			out_iterator(out, row2vcol<OUT>(col)));
+    const size_t	vsize = mm::vec<value_type>::size;
+    IN			in    = ib;
+    col = (std::distance(ib, ie) / vsize) * vsize;
+    std::advance(ib, col);
+    convolveRows(filter,
+		 mm::make_row_vec_iterator<value_type>(in),
+		 mm::make_row_vec_iterator<value_type>(ib),
+		 make_row_iterator<mm::store_iterator<col_iterator> >(out),
+		 0, boost::false_type());
 #endif
     convolveRows(filter, ib, ie, out, col, boost::false_type());
 }
 
-template <class F> template <class IN, class OUT> void
-SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie, OUT out,
-				  size_t col, boost::false_type)
+template <class F> template <class IN, class OUT> inline void
+SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie,
+				  OUT out, size_t col, boost::false_type) const
 {
+#if defined(USE_TBB)
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, std::distance(ib, ie),
+						 _grainSize),
+		      ConvolveRows<IN, OUT>(filter, ib, out, col));
+#else
     for (; ib != ie; ++ib, ++col)
 	filter.convolve(ib->begin(), ib->end(),
 			make_vertical_iterator(out, col));
+#endif
 }
 
 }

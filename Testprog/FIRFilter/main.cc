@@ -86,7 +86,7 @@ main(int argc, char* argv[])
     typedef float	coeff_type;
     
     float		alpha = 1.0;
-    size_t		grainSize = 100;
+    size_t		grainSize = 1;
     int			niter = 100;
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "a:g:n:")) != -1; )
