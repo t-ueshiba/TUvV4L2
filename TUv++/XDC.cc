@@ -282,10 +282,13 @@ XDC::operator <<(const Point2<int>& p)
       default:
       case DOT:
       {
-	u_int	w = (mul() > div() ? mul() / div() : 1);
+	XGCValues	values;
+	XGetGCValues(_colormap.display(), _gc, GCLineWidth, &values);
+	u_int	w = (mul() > div() ? mul() / div() : 1) *
+		    (values.line_width > 0 ? values.line_width : 1);
 	XFillRectangle(_colormap.display(), drawable(), _gc,
-		       log2devR(p[0] + offset()[0]),
-		       log2devR(p[1] + offset()[1]), w, w);
+		       log2devR(p[0] + offset()[0]) - w/2,
+		       log2devR(p[1] + offset()[1]) - w/2, w, w);
       }
 	break;
 	
