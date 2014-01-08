@@ -34,7 +34,7 @@
 #ifndef __TUArrayPP_h
 #define __TUArrayPP_h
 
-#include <iterator>
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include "TU/types.h"
@@ -104,6 +104,12 @@ class Buf : public BufTraits<T, ALIGNED>
 
     const_pointer	data()				const	;
     pointer		data()					;
+    const_iterator	cbegin()			const	;
+    const_iterator	begin()				const	;
+    iterator		begin()					;
+    const_iterator	cend()				const	;
+    const_iterator	end()				const	;
+    iterator		end()					;
     u_int		size()				const	;
     bool		resize(u_int siz)			;
     void		resize(pointer p, u_int siz)		;
@@ -197,8 +203,7 @@ template <class T, bool ALIGNED>
 Buf<T, ALIGNED>::Buf(const Buf& b)
     :_size(b._size), _p(allocator::alloc(_size)), _shared(0), _capacity(_size)
 {
-    for (u_int i = 0; i < _size; ++i)
-	_p[i] = b._p[i];
+    std::copy(b.cbegin(), b.cend(), begin());
 }
 
 //! 標準代入演算子
@@ -208,8 +213,7 @@ Buf<T, ALIGNED>::operator =(const Buf& b)
     if (this != &b)
     {
 	resize(b._size);
-	for (u_int i = 0; i < _size; ++i)
-	    _p[i] = b._p[i];
+	std::copy(b.cbegin(), b.cend(), begin());
     }
     return *this;
 }
@@ -234,6 +238,48 @@ template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::pointer
 Buf<T, ALIGNED>::data()
 {
     return _p;
+}
+
+//! バッファの先頭要素を指す定数反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
+Buf<T, ALIGNED>::cbegin() const
+{
+    return data();
+}
+
+//! バッファの先頭要素を指す定数反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
+Buf<T, ALIGNED>::begin() const
+{
+    return cbegin();
+}
+
+//! バッファの先頭要素を指す反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::iterator
+Buf<T, ALIGNED>::begin()
+{
+    return data();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
+Buf<T, ALIGNED>::cend() const
+{
+    return cbegin() + size();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
+Buf<T, ALIGNED>::end() const
+{
+    return cend();
+}
+
+//! バッファの末尾を指す反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::iterator
+Buf<T, ALIGNED>::end()
+{
+    return begin() + size();
 }
 
 //! バッファの要素数を返す．
@@ -390,6 +436,12 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
     
     const_pointer	data()				const	;
     pointer		data()					;
+    const_iterator	cbegin()			const	;
+    const_iterator	begin()				const	;
+    iterator		begin()					;
+    const_iterator	cend()				const	;
+    const_iterator	end()				const	;
+    iterator		end()					;
     static u_int	size()					;
     static bool		resize(u_int siz)			;
     void		resize(pointer p, u_int siz)		;
@@ -397,6 +449,21 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
     std::istream&	get(std::istream& in)			;
 
   private:
+    template <u_int N, class=void>
+    struct copy
+    {
+	void	exec(const_iterator src, iterator dst) const
+		{
+		    *dst = *src;
+		    copy<N+1>().exec(++src, ++dst);
+		}
+    };
+    template <class DUMMY>
+    struct copy<D, DUMMY>
+    {
+	void	exec(const_iterator, iterator)		const	{}
+    };
+    
     template <bool _ALIGNED, class=void>
     struct Buffer		{ value_type p[D]; };
 #if defined(MMX)
@@ -404,6 +471,7 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
     struct Buffer<true, DUMMY>	{ __declspec(align(32)) value_type p[D]; };
 #endif
 
+  private:
     Buffer<ALIGNED>	_buf;				// D-sized buffer
 };
 
@@ -435,8 +503,7 @@ FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(pointer, u_int)
 template <class T, u_int D, bool ALIGNED>
 FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(const FixedSizedBuf& b)
 {
-    for (u_int i = 0; i < D; ++i)
-	_buf.p[i] = b._buf.p[i];
+    copy<0>().exec(b.cbegin(), begin());
 }
 
 //! 標準代入演算子
@@ -444,8 +511,7 @@ template <class T, u_int D, bool ALIGNED> FixedSizedBuf<T, D, ALIGNED>&
 FixedSizedBuf<T, D, ALIGNED>::operator =(const FixedSizedBuf& b)
 {
     if (this != &b)
-	for (u_int i = 0; i < D; ++i)
-	    _buf.p[i] = b._buf.p[i];
+	copy<0>().exec(b.cbegin(), begin());
     return *this;
 }
 
@@ -463,6 +529,54 @@ inline typename FixedSizedBuf<T, D, ALIGNED>::pointer
 FixedSizedBuf<T, D, ALIGNED>::data()
 {
     return _buf.p;
+}
+
+//! バッファの先頭要素を指す定数反復子を返す．
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
+FixedSizedBuf<T, D, ALIGNED>::cbegin() const
+{
+    return data();
+}
+
+//! バッファの先頭要素を指す定数反復子を返す．
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
+FixedSizedBuf<T, D, ALIGNED>::begin() const
+{
+    return cbegin();
+}
+
+//! バッファの先頭要素を指す反復子を返す．
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::iterator
+FixedSizedBuf<T, D, ALIGNED>::begin()
+{
+    return data();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
+FixedSizedBuf<T, D, ALIGNED>::cend() const
+{
+    return cbegin() + size();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
+FixedSizedBuf<T, D, ALIGNED>::end() const
+{
+    return cend();
+}
+
+//! バッファの末尾を指す反復子を返す．
+template <class T, u_int D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::iterator
+FixedSizedBuf<T, D, ALIGNED>::end()
+{
+    return begin() + size();
 }
 
 //! バッファの要素数を返す．
@@ -616,16 +730,14 @@ class Array : public B
     Array&	operator =(const element_type& c)			;
 
     using	super::data;
+    using	super::cbegin;
+    using	super::begin;
+    using	super::cend;
+    using	super::end;
     using	super::size;
     using	super::resize;
 
     u_int			dim()				const	;
-    const_iterator		cbegin()			const	;
-    const_iterator		begin()				const	;
-    iterator			begin()					;
-    const_iterator		cend()				const	;
-    const_iterator		end()				const	;
-    iterator			end()					;
     const_reverse_iterator	crbegin()			const	;
     const_reverse_iterator	rbegin()			const	;
     reverse_iterator		rbegin()				;
@@ -707,8 +819,7 @@ template <class T, class B> template <class T2, class B2>
 Array<T, B>::Array(const Array<T2, B2>& a)
     :super(a.size())
 {
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] = a[i];
+    std::copy(a.cbegin(), a.cend(), begin());
 }
 	
 //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -721,8 +832,7 @@ template <class T, class B> template <class T2, class B2> Array<T, B>&
 Array<T, B>::operator =(const Array<T2, B2>& a)
 {
     resize(a.size());
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] = a[i];
+    std::copy(a.cbegin(), a.cend(), begin());
     return *this;
 }
 
@@ -767,67 +877,6 @@ Array<T, B>::dim() const
     return size();
 }
     
-//! 配列の先頭要素を指す定数反復子を返す．
-/*!
-  \return	先頭要素を指す定数反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_iterator
-Array<T, B>::cbegin() const
-{
-    return data();
-}
-
-//! 配列の先頭要素を指す定数反復子を返す．
-/*!
-  \return	先頭要素を指す定数反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_iterator
-Array<T, B>::begin() const
-{
-    return cbegin();
-}
-
-//! 配列の先頭要素を指す反復子を返す．
-/*!
-  \return	先頭要素を指す反復子
-*/
-template <class T, class B>
-inline typename Array<T, B>::iterator
-Array<T, B>::begin()
-{
-    return data();
-}
-
-//! 配列の末尾を指す定数反復子を返す．
-/*!
-  \return	末尾を指す定数反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_iterator
-Array<T, B>::cend() const
-{
-    return begin() + size();
-}
-
-//! 配列の末尾を指す定数反復子を返す．
-/*!
-  \return	末尾を指す定数反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_iterator
-Array<T, B>::end() const
-{
-    return cend();
-}
-
-//! 配列の末尾を指す反復子を返す．
-/*!
-  \return	末尾を指す反復子
-*/
-template <class T, class B> inline typename Array<T, B>::iterator
-Array<T, B>::end()
-{
-    return begin() + size();
-}
-
 //! 配列の末尾要素を指す定数逆反復子を返す．
 /*!
   \return	末尾要素を指す定数逆反復子

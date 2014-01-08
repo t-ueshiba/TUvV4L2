@@ -30,7 +30,7 @@
 #ifndef __FAKEWINDOWS_H
 #define __FAKEWINDOWS_H
 
-#ifdef WIN32
+#if defined(WIN32) || defined(X64)
 #include "TU/types.h"
 #include <winsock2.h>
 
@@ -128,5 +128,5 @@ __PORT int	usleep(unsigned int)					;
 }
 #endif
 
-#endif	/* WIN32		*/
+#endif	/* WIN32 || X64		*/
 #endif	/* !__FAKEWINDOWS_H	*/

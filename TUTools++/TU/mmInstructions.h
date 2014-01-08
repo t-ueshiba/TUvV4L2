@@ -196,141 +196,6 @@ namespace TU
 namespace mm
 {
 /************************************************************************
-*  type traits								*
-************************************************************************/
-template <class T>	struct type_traits;
-
-template <>
-struct type_traits<int8_t>
-{
-    typedef int8_t	signed_type;
-    typedef u_int8_t	unsigned_type;
-    typedef void	lower_type;
-    typedef int16_t	upper_type;
-    enum
-    {
-	is_signed = true,
-    };
-};
-    
-template <>
-struct type_traits<int16_t>
-{
-    typedef int16_t	signed_type;
-    typedef u_int16_t	unsigned_type;
-    typedef int8_t	lower_type;
-    typedef int32_t	upper_type;
-    enum
-    {
-	is_signed = true,
-    };
-};
-    
-template <>
-struct type_traits<int32_t>
-{
-    typedef int32_t	signed_type;
-    typedef u_int32_t	unsigned_type;
-    typedef int16_t	lower_type;
-    typedef int64_t	upper_type;
-    enum
-    {
-	is_signed = true,
-    };
-};
-    
-template <>
-struct type_traits<int64_t>
-{
-    typedef int64_t	signed_type;
-    typedef u_int64_t	unsigned_type;
-    typedef int32_t	lower_type;
-    typedef void	upper_type;
-    enum
-    {
-	is_signed = true,
-    };
-};
-    
-template <>
-struct type_traits<u_int8_t>
-{
-    typedef int8_t	signed_type;
-    typedef u_int8_t	unsigned_type;
-    typedef void	lower_type;
-    typedef int16_t	upper_type;
-    enum
-    {
-	is_signed = false,
-    };
-};
-    
-template <>
-struct type_traits<u_int16_t>
-{
-    typedef int16_t	signed_type;
-    typedef u_int16_t	unsigned_type;
-    typedef int32_t	upper_type;
-    typedef u_int8_t	lower_type;
-    enum
-    {
-	is_signed = false,
-    };
-};
-    
-template <>
-struct type_traits<u_int32_t>
-{
-    typedef int32_t	signed_type;
-    typedef u_int32_t	unsigned_type;
-    typedef u_int16_t	lower_type;
-    typedef int64_t	upper_type;
-    enum
-    {
-	is_signed = false,
-    };
-};
-    
-template <>
-struct type_traits<u_int64_t>
-{
-    typedef int64_t	signed_type;
-    typedef u_int64_t	unsigned_type;
-    typedef u_int32_t	lower_type;
-    typedef void	upper_type;
-    enum
-    {
-	is_signed = false,
-    };
-};
-
-template <>
-struct type_traits<float>
-{
-    typedef int32_t	signed_type;
-    typedef u_int32_t	unsigned_type;
-    typedef void	lower_type;
-    typedef double	upper_type;
-    enum
-    {
-	is_signed = true,
-    };
-};
-
-template <>
-struct type_traits<double>
-{
-    typedef int64_t	signed_type;
-    typedef u_int64_t	unsigned_type;
-    typedef float	lower_type;
-    typedef void	upper_type;
-    enum
-    {
-	is_signed = true,
-    };
-};
-
-/************************************************************************
 *  SIMD vector types							*
 ************************************************************************/
 #if defined(AVX2)
@@ -600,6 +465,153 @@ print(std::ostream& out, const vec<T>& x)
 	out << ' ' << x[n];
     return out << std::endl;
 }
+
+/************************************************************************
+*  type traits								*
+************************************************************************/
+template <class T>	struct type_traits;
+
+template <>
+struct type_traits<int8_t>
+{
+    typedef int8_t	signed_type;
+    typedef u_int8_t	unsigned_type;
+    typedef void	lower_type;
+    typedef int16_t	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
+    
+template <>
+struct type_traits<int16_t>
+{
+    typedef int16_t	signed_type;
+    typedef u_int16_t	unsigned_type;
+    typedef int8_t	lower_type;
+    typedef int32_t	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
+    
+template <>
+struct type_traits<int32_t>
+{
+    typedef int32_t	signed_type;
+    typedef u_int32_t	unsigned_type;
+    typedef int16_t	lower_type;
+    typedef int64_t	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
+    
+template <>
+struct type_traits<int64_t>
+{
+    typedef int64_t	signed_type;
+    typedef u_int64_t	unsigned_type;
+    typedef int32_t	lower_type;
+    typedef void	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
+    
+template <>
+struct type_traits<u_int8_t>
+{
+    typedef int8_t	signed_type;
+    typedef u_int8_t	unsigned_type;
+    typedef void	lower_type;
+    typedef u_int16_t	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = false,
+    };
+};
+    
+template <>
+struct type_traits<u_int16_t>
+{
+    typedef int16_t	signed_type;
+    typedef u_int16_t	unsigned_type;
+    typedef u_int8_t	lower_type;
+    typedef u_int32_t	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = false,
+    };
+};
+    
+template <>
+struct type_traits<u_int32_t>
+{
+    typedef int32_t	signed_type;
+    typedef u_int32_t	unsigned_type;
+    typedef u_int16_t	lower_type;
+    typedef u_int64_t	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = false,
+    };
+};
+    
+template <>
+struct type_traits<u_int64_t>
+{
+    typedef int64_t	signed_type;
+    typedef u_int64_t	unsigned_type;
+    typedef u_int32_t	lower_type;
+    typedef void	upper_type;
+    typedef float	complementary_type;
+    enum
+    {
+	is_signed = false,
+    };
+};
+
+template <>
+struct type_traits<float>
+{
+    typedef float	signed_type;
+    typedef void	unsigned_type;
+    typedef void	lower_type;
+    typedef double	upper_type;
+    typedef typename boost::mpl::if_c<sizeof(ivec_t) == sizeof(fvec_t),
+				     int32_t, int16_t>::type
+			complementary_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
+
+template <>
+struct type_traits<double>
+{
+    typedef double	signed_type;
+    typedef void	unsigned_type;
+    typedef float	lower_type;
+    typedef void	upper_type;
+    typedef int32_t	complementary_type;
+    enum
+    {
+	is_signed = true,
+    };
+};
 
 /************************************************************************
 *  Predicates for boost::mpl						*
@@ -1964,25 +1976,33 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 
 // [2] 整数ベクトルと浮動小数点数ベクトル間の変換
 #define MM_CVT(from, to)						\
-    MM_FUNC(vec<to> cvt<to>(vec<from> x), cvt, (x), from, to, MM_SUFFIX)
+  MM_FUNC(vec<to> cvt<to>(vec<from> x), cvt, (x), from, to, MM_SUFFIX)
 #define MM_CVT_2(type0, type1)						\
-    MM_CVT(type0, type1)						\
-    MM_CVT(type1, type0)
+  MM_CVT(type0, type1)							\
+  MM_CVT(type1, type0)
 
 #if defined(AVX)
 #  if defined(AVX2)
     MM_CVT_2(int32_t, float)		// int   <-> float
 
     template <> inline F64vec		// int    -> double
-    cvt<double>(Is32vec x)
+    cvt<double, 0>(Is32vec x)
     {
-	return _mm256_cvtepi32_pd(_mm256_castsi256_si128(x));			
+	return _mm256_cvtepi32_pd(_mm256_castsi256_si128(x));
+    }
+
+    template <> inline F64vec		// int    -> double
+    cvt<double, 1>(Is32vec x)
+    {
+	return _mm256_cvtepi32_pd(_mm256_extractf128_si256(x, 0x1));
     }
 
     template <> inline Is32vec		// double -> int
-    cvt<int32_t>(F64vec x)		
+    cvt<int32_t>(F64vec x, F64vec y)
     {
-	return _mm256_castsi128_si256(_mm256_cvtpd_epi32(x));
+	return _mm256_insertf128_si256(_mm256_castsi128_si256(
+					   _mm256_cvtpd_epi32(x)),
+				       _mm256_cvtpd_epi32(y), 0x1);
     }
 
 #    define MM_CVTI_F(itype, ftype)					\
@@ -1992,16 +2012,23 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 	  return cvt<ftype>(cvt<int32_t>(x));				\
       }
 #  else		// AVX && !AVX2
-    template <> inline F32vec		// int    -> float
-    cvt<float>(Is32vec x)
+    template <> inline F32vec		// 2*int  -> float
+    cvt<float>(Is32vec x, Is32vec y)
     {
-	return _mm256_cvtepi32_ps(_mm256_castsi128_si256(x));			
+	return _mm256_cvtepi32_ps(
+		   _mm256_insertf128_si256(_mm256_castsi128_si256(x), y, 0x1));
     }
 
     template <> inline Is32vec		// float  -> int
-    cvt<int32_t>(F32vec x)		
+    cvt<int32_t, 0>(F32vec x)
     {
 	return _mm256_castsi256_si128(_mm256_cvtps_epi32(x));
+    }
+
+    template <> inline Is32vec		// float  -> int
+    cvt<int32_t, 1>(F32vec x)
+    {
+	return _mm256_extractf128_si256(_mm256_cvtps_epi32(x), 0x1);
     }
 
     MM_CVT(int32_t, double)		// int    -> double
@@ -2012,14 +2039,12 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 	return _mm256_cvtpd_epi32(x);
     }
 
-    template <> inline F32vec
-    cvt<float>(Is32vec x, Is32vec y)	// 2*int  -> float
+    template <> inline Is16vec		// float  -> short
+    cvt<int16_t>(F32vec x)
     {
-	return _mm256_cvtepi32_ps(
-		   _mm256_insertf128_si256(
-		       _mm256_insertf128_si256(_mm256_setzero_si256(),
-					       x, 0x0),
-		       y, 0x1));
+	__m256i	y = _mm256_cvtps_epi32(x);
+	return cvt<int16_t>(vec<int32_t>(_mm256_castsi256_si128(y)),
+			    vec<int32_t>(_mm256_extractf128_si256(y, 0x1)));
     }
 
 #    define MM_CVTI_F(itype, ftype)					\
@@ -2028,8 +2053,7 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
       {									\
 	  return MM_MNEMONIC(cvt, _mm256_, epi32, MM_SUFFIX(ftype))(	\
 		     _mm256_insertf128_si256(				\
-			 _mm256_insertf128_si256(_mm256_setzero_si256(),\
-						 cvt<int32_t>(x), 0x0),	\
+			 _mm256_castsi128_si256(cvt<int32_t>(x)),	\
 			 cvt<int32_t>(shift_r<4>(x)), 0x1));		\
       }
 #  endif
@@ -2038,9 +2062,25 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
   MM_CVTI_F(int16_t,   float)		// short   -> float
   MM_CVTI_F(u_int8_t,  float)		// u_char  -> float
   MM_CVTI_F(u_int16_t, float)		// u_short -> float
-
 #  undef MM_CVTI_F
+
 #elif defined(SSE2)
+  MM_CVT_2(int32_t, float)		// int    <-> float
+
+  MM_CVT(int32_t, double)		// int	   -> double
+
+  template <> inline F64vec		// int	   -> double
+  cvt<double, 1>(Is32vec x)
+  {
+      return _mm_cvtepi32_pd(_mm_shuffle_epi32(x, _MM_SHUFFLE(1, 0, 3, 2)));
+  }
+
+  template <> inline Is32vec		// double  -> int
+  cvt<int32_t>(F64vec x, F64vec y)
+  {
+      return _mm_unpacklo_epi64(_mm_cvtpd_epi32(x), _mm_cvtpd_epi32(y));
+  }
+
 #  define MM_CVTI_F(itype, suffix)					\
     template <> inline F32vec						\
     cvt<float>(vec<itype> x)						\
@@ -2059,46 +2099,71 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 
   MM_CVT_2FI(int8_t,   pi8)		// s_char <-> float
   MM_CVT_2FI(int16_t,  pi16)		// short  <-> float
-  MM_CVT_2(int32_t, float)		// int    <-> float
   MM_CVTI_F(u_int8_t,  pu8)		// u_char  -> float
   MM_CVTI_F(u_int16_t, pu16)		// u_short -> float
-
-  MM_CVT_2(int32_t, double)		// int    <-> double
 
 #  undef MM_CVTI_F
 #  undef MM_CVTF_I
 #  undef MM_CVT_2FI
-#elif defined(SSE)
-  MM_CVT_2(int8_t,  float)		// s_char <-> float
-  MM_CVT_2(int16_t, float)		// short  <-> float
-  MM_FUNC(F32vec cvt<float>(Is32vec x), cvt,
-	  (zero<float>(), x), int32_t, float, MM_SUFFIX)  // int -> float
-  MM_CVT(float,	    int32_t)		// float   -> int
-  MM_CVT(u_int8_t,  float)		// u_char  -> float
-  MM_CVT(u_int16_t, float)		// u_short -> float
 
+#elif defined(SSE)
   template <> inline F32vec
-  cvt<float>(Is32vec x, Is32vec y)	// 2*int  -> float
+  cvt<float>(Is32vec x, Is32vec y)	// 2*int   -> float
   {
       return _mm_cvtpi32x2_ps(x, y);
   }
+
+  MM_CVT(float, int32_t)		// float   -> int
+
+  template <> inline Is32vec		// float   -> int
+  cvt<int32_t, 1>(F32vec x)
+  {
+      return _mm_cvtps_pi32(_mm_shuffle_ps(x, x, _MM_SHUFFLE(1, 0, 3, 2)));
+  }
+
+  MM_CVT_2(int8_t,  float)		// s_char <-> float
+  MM_CVT_2(int16_t, float)		// short  <-> float
+  MM_CVT(u_int8_t,  float)		// u_char  -> float
+  MM_CVT(u_int16_t, float)		// u_short -> float
 #endif
   
 // [3] 浮動小数点数ベクトル間の変換
 #if defined(AVX)
   template <> F64vec
-  cvt<double>(F32vec x)			// float -> double
+  cvt<double, 0>(F32vec x)		// float -> double
   {
       return _mm256_cvtps_pd(_mm256_castps256_ps128(x));
   }
-
-template <> F32vec			// double -> float
-  cvt<float>(F64vec x)
+  template <> F64vec
+  cvt<double, 1>(F32vec x)		// float -> double
   {
-      return _mm256_castps128_ps256(_mm256_cvtpd_ps(x));
+      return _mm256_cvtps_pd(_mm256_extractf128_ps(x, 1));
+  }
+
+  template <> F32vec			// double -> float
+  cvt<float>(F64vec x, F64vec y)
+  {
+      return _mm256_insertf128_ps(_mm256_castps128_ps256(_mm256_cvtpd_ps(x)),
+				  _mm256_cvtpd_ps(y), 1);
   }
 #elif defined(SSE2)
-  MM_CVT_2(float, double)		// float <-> double
+  template <> F64vec
+  cvt<double, 0>(F32vec x)		// float -> double
+  {
+      return _mm_cvtps_pd(x);
+  }
+  template <> F64vec
+  cvt<double, 1>(F32vec x)		// float -> double
+  {
+      return _mm_cvtps_pd(_mm_shuffle_ps(x, x, _MM_SHUFFLE(1, 0, 3, 2)));
+  }
+	  
+  template <> F32vec			// double -> float
+  cvt<float>(F64vec x, F64vec y)
+  {
+      return _mm_shuffle_ps(_mm_cvtpd_ps(x), _mm_cvtpd_ps(y),
+			    _MM_SHUFFLE(1, 0, 1, 0));
+  }
 #endif
   
 #undef MM_CVT
@@ -3462,13 +3527,9 @@ class cvtdown_iterator
 				    vec<T> >		super;
     typedef typename std::iterator_traits<ITER>
 			::value_type::value_type	element_type;
-    typedef typename type_traits<element_type>::lower_type
-							lower_type;
-    typedef typename type_traits<lower_type>::signed_type
-							signed_lower_type;
-    typedef typename type_traits<lower_type>::unsigned_type
-							unsigned_lower_type;
-
+    typedef typename type_traits<element_type>::complementary_type
+							complementary_type;
+    
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
@@ -3485,24 +3546,33 @@ class cvtdown_iterator
     template <class S>
     void	cvtdown(vec<S>& x)
 		{
-		    vec<typename type_traits<S>::upper_type>	y, z;
+		    typedef typename type_traits<
+				typename type_traits<S>::upper_type>
+				::signed_type		signed_upper_type;
+		    
+		    vec<signed_upper_type>	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
 		    x = cvt<S>(y, z);
 		}
-    void	cvtdown(vec<signed_lower_type>& x)
+    void	cvtdown(vec<complementary_type>& x, boost::mpl::bool_<true>)
 		{
-		    vec<element_type>	y, z;
+		    vec<element_type>	y;
 		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<signed_lower_type>(y, z);
+		    x = cvt<complementary_type>(y);
 		}
-    void	cvtdown(vec<unsigned_lower_type>& x)
+    void	cvtdown(vec<complementary_type>& x, boost::mpl::bool_<false>)
 		{
 		    vec<element_type>	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
-		    x = cvt<unsigned_lower_type>(y, z);
+		    x = cvt<complementary_type>(y, z);
+		}
+    void	cvtdown(vec<complementary_type>& x)
+		{
+		    const bool	SameSize = (vec<complementary_type>::size ==
+					    vec<element_type>::size);
+		    cvtdown(x, boost::mpl::bool_<SameSize>());
 		}
     void	cvtdown(vec<element_type>& x)
 		{
@@ -3579,12 +3649,15 @@ namespace detail
 
       private:
 	typedef typename std::iterator_traits<ITER>::reference	reference;
-	typedef typename type_traits<element_type>::lower_type	lower_type;
-	typedef typename type_traits<lower_type>::signed_type
-							signed_lower_type;
-	typedef typename type_traits<lower_type>::unsigned_type
-							unsigned_lower_type;
-
+	typedef typename type_traits<element_type>::complementary_type
+							complementary_type;
+	typedef typename boost::mpl::if_<
+		    boost::is_floating_point<element_type>,
+		    complementary_type, element_type>::type	integral_type;
+	typedef typename type_traits<
+		    typename type_traits<integral_type>::lower_type>
+		    ::unsigned_type			unsigned_lower_type;
+	
 	template <class OP, class T>
 	void	cvtup(vec<T> x)
 		{
@@ -3594,13 +3667,25 @@ namespace detail
 		    cvtup<OP>(cvt<U, 1>(x));
 		}
 	template <class OP>
-	void	cvtup(vec<signed_lower_type> x)
+	void	cvtup(vec<unsigned_lower_type> x)
 		{
-		    cvtup<OP>(cvt<element_type, 0>(x));
-		    cvtup<OP>(cvt<element_type, 1>(x));
+		    cvtup<OP>(cvt<integral_type, 0>(x));
+		    cvtup<OP>(cvt<integral_type, 1>(x));
 		}
 	template <class OP>
-	void	cvtup(vec<unsigned_lower_type> x)
+	void	cvtup(vec<complementary_type> x)
+		{
+		    const bool	SameSize = (vec<complementary_type>::size ==
+					    vec<element_type>::size);
+		    cvtup<OP>(x, boost::mpl::bool_<SameSize>());
+		}
+	template <class OP>
+	void	cvtup(vec<complementary_type> x, boost::mpl::bool_<true>)
+		{
+		    cvtup<OP>(cvt<element_type>(x));
+		}
+	template <class OP>
+	void	cvtup(vec<complementary_type> x, boost::mpl::bool_<false>)
 		{
 		    cvtup<OP>(cvt<element_type, 0>(x));
 		    cvtup<OP>(cvt<element_type, 1>(x));

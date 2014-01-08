@@ -214,7 +214,7 @@
 #ifndef __TUtypes_h
 #define __TUtypes_h
 
-#ifdef WIN32
+#if defined(WIN32) || defined(X64)
 #  ifdef _USRDLL
 #    define __PORT	__declspec(dllexport)
 #  else

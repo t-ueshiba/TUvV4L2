@@ -60,6 +60,8 @@ class __PORT Profiler
 	Timer&	start()						;
 	Timer&	stop()						;
 	timeval	print(std::ostream& out, u_int nframes)	const	;
+	timeval	printTabSeparated(std::ostream& out,
+				  u_int nframes)	const	;
 	
       private:
 	timeval	_accum;
@@ -72,14 +74,15 @@ class __PORT Profiler
     \param ntimers	タイマの個数
    */
     Profiler(u_int ntimers)
-	:_active(0), _timers(ntimers), _nframes(0)		{}
+	:_active(0), _timers(ntimers), _nframes(0)			{}
 
-    u_int		nframes()			const	;
-    const Profiler&	reset()				const	;
-    const Profiler&	start(int n)			const	;
-    const Profiler&	stop()				const	;
-    const Profiler&	nextFrame()			const	;
-    std::ostream&	print(std::ostream& out)	const	;
+    u_int		nframes()				const	;
+    const Profiler&	reset()					const	;
+    const Profiler&	start(int n)				const	;
+    const Profiler&	stop()					const	;
+    const Profiler&	nextFrame()				const	;
+    std::ostream&	print(std::ostream& out)		const	;
+    std::ostream&	printTabSeparated(std::ostream& out)	const	;
 
   private:
     mutable int			_active;
