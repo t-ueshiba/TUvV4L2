@@ -586,8 +586,8 @@ struct type_traits<u_int64_t>
 template <>
 struct type_traits<float>
 {
-    typedef float	signed_type;
-    typedef void	unsigned_type;
+    typedef int32_t	signed_type;		//!< 同一サイズの符号付き整数
+    typedef u_int32_t	unsigned_type;		//!< 同一サイズの符号なし整数
     typedef void	lower_type;
     typedef double	upper_type;
     typedef typename boost::mpl::if_c<sizeof(ivec_t) == sizeof(fvec_t),
@@ -602,8 +602,8 @@ struct type_traits<float>
 template <>
 struct type_traits<double>
 {
-    typedef double	signed_type;
-    typedef void	unsigned_type;
+    typedef int64_t	signed_type;		//!< 同一サイズの符号付き整数
+    typedef u_int64_t	unsigned_type;		//!< 同一サイズの符号なし整数
     typedef float	lower_type;
     typedef void	upper_type;
     typedef int32_t	complementary_type;
@@ -3546,9 +3546,13 @@ class cvtdown_iterator
     template <class S>
     void	cvtdown(vec<S>& x)
 		{
-		    typedef typename type_traits<
-				typename type_traits<S>::upper_type>
-				::signed_type		signed_upper_type;
+		    typedef typename type_traits<S>::upper_type
+							upper_type;
+		    typedef typename boost::mpl::if_<
+				boost::is_floating_point<S>,
+				upper_type,
+				typename type_traits<upper_type>::signed_type>
+				::type			signed_upper_type;
 		    
 		    vec<signed_upper_type>	y, z;
 		    cvtdown(y);

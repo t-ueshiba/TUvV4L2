@@ -467,7 +467,6 @@ template <u_int D, class T=float> class BidirectionalIIRFilter
 {
   private:
     typedef IIRFilter<D, T>			iirf_type;
-    typedef Array<u_char>			buf_type;
     
   public:
     typedef typename iirf_type::coeff_type	coeff_type;
