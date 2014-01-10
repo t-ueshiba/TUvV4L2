@@ -506,7 +506,14 @@ struct type_traits<int32_t>
     typedef u_int32_t	unsigned_type;
     typedef int16_t	lower_type;
     typedef int64_t	upper_type;
+#if defined(SSE2)
+    typedef typename boost::mpl::if_c<
+	sizeof(ivec_t) == sizeof(fvec_t),
+	float, double>::type
+			complementary_type;
+#else
     typedef float	complementary_type;
+#endif
     enum
     {
 	is_signed = true,
@@ -590,9 +597,14 @@ struct type_traits<float>
     typedef u_int32_t	unsigned_type;		//!< 同一サイズの符号なし整数
     typedef void	lower_type;
     typedef double	upper_type;
-    typedef typename boost::mpl::if_c<sizeof(ivec_t) == sizeof(fvec_t),
-				     int32_t, int16_t>::type
+#if defined(SSE)
+    typedef typename boost::mpl::if_c<
+	sizeof(ivec_t) == sizeof(fvec_t),
+	int32_t, int16_t>::type
 			complementary_type;
+#else
+    typedef void	complementary_type;
+#endif
     enum
     {
 	is_signed = true,
