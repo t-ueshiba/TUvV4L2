@@ -474,11 +474,11 @@ template <class T>	struct type_traits;
 template <>
 struct type_traits<int8_t>
 {
-    typedef int8_t	signed_type;
-    typedef u_int8_t	unsigned_type;
-    typedef void	lower_type;
-    typedef int16_t	upper_type;
-    typedef float	complementary_type;
+    typedef int8_t		signed_type;
+    typedef u_int8_t		unsigned_type;
+    typedef void		lower_type;
+    typedef int16_t		upper_type;
+    typedef float		complementary_type;
     enum
     {
 	is_signed = true,
@@ -488,11 +488,11 @@ struct type_traits<int8_t>
 template <>
 struct type_traits<int16_t>
 {
-    typedef int16_t	signed_type;
-    typedef u_int16_t	unsigned_type;
-    typedef int8_t	lower_type;
-    typedef int32_t	upper_type;
-    typedef float	complementary_type;
+    typedef int16_t		signed_type;
+    typedef u_int16_t		unsigned_type;
+    typedef int8_t		lower_type;
+    typedef int32_t		upper_type;
+    typedef float		complementary_type;
     enum
     {
 	is_signed = true,
@@ -502,17 +502,16 @@ struct type_traits<int16_t>
 template <>
 struct type_traits<int32_t>
 {
-    typedef int32_t	signed_type;
-    typedef u_int32_t	unsigned_type;
-    typedef int16_t	lower_type;
-    typedef int64_t	upper_type;
+    typedef int32_t		signed_type;
+    typedef u_int32_t		unsigned_type;
+    typedef int16_t		lower_type;
+    typedef int64_t		upper_type;
 #if defined(SSE2)
     typedef typename boost::mpl::if_c<
 	sizeof(ivec_t) == sizeof(fvec_t),
-	float, double>::type
-			complementary_type;
+	float, double>::type	complementary_type;
 #else
-    typedef float	complementary_type;
+    typedef float		complementary_type;
 #endif
     enum
     {
@@ -523,11 +522,11 @@ struct type_traits<int32_t>
 template <>
 struct type_traits<int64_t>
 {
-    typedef int64_t	signed_type;
-    typedef u_int64_t	unsigned_type;
-    typedef int32_t	lower_type;
-    typedef void	upper_type;
-    typedef float	complementary_type;
+    typedef int64_t		signed_type;
+    typedef u_int64_t		unsigned_type;
+    typedef int32_t		lower_type;
+    typedef void		upper_type;
+    typedef float		complementary_type;
     enum
     {
 	is_signed = true,
@@ -537,11 +536,11 @@ struct type_traits<int64_t>
 template <>
 struct type_traits<u_int8_t>
 {
-    typedef int8_t	signed_type;
-    typedef u_int8_t	unsigned_type;
-    typedef void	lower_type;
-    typedef u_int16_t	upper_type;
-    typedef float	complementary_type;
+    typedef int8_t		signed_type;
+    typedef u_int8_t		unsigned_type;
+    typedef void		lower_type;
+    typedef u_int16_t		upper_type;
+    typedef float		complementary_type;
     enum
     {
 	is_signed = false,
@@ -551,11 +550,11 @@ struct type_traits<u_int8_t>
 template <>
 struct type_traits<u_int16_t>
 {
-    typedef int16_t	signed_type;
-    typedef u_int16_t	unsigned_type;
-    typedef u_int8_t	lower_type;
-    typedef u_int32_t	upper_type;
-    typedef float	complementary_type;
+    typedef int16_t		signed_type;
+    typedef u_int16_t		unsigned_type;
+    typedef u_int8_t		lower_type;
+    typedef u_int32_t		upper_type;
+    typedef float		complementary_type;
     enum
     {
 	is_signed = false,
@@ -565,11 +564,11 @@ struct type_traits<u_int16_t>
 template <>
 struct type_traits<u_int32_t>
 {
-    typedef int32_t	signed_type;
-    typedef u_int32_t	unsigned_type;
-    typedef u_int16_t	lower_type;
-    typedef u_int64_t	upper_type;
-    typedef float	complementary_type;
+    typedef int32_t		signed_type;
+    typedef u_int32_t		unsigned_type;
+    typedef u_int16_t		lower_type;
+    typedef u_int64_t		upper_type;
+    typedef float		complementary_type;
     enum
     {
 	is_signed = false,
@@ -579,11 +578,11 @@ struct type_traits<u_int32_t>
 template <>
 struct type_traits<u_int64_t>
 {
-    typedef int64_t	signed_type;
-    typedef u_int64_t	unsigned_type;
-    typedef u_int32_t	lower_type;
-    typedef void	upper_type;
-    typedef float	complementary_type;
+    typedef int64_t		signed_type;
+    typedef u_int64_t		unsigned_type;
+    typedef u_int32_t		lower_type;
+    typedef void		upper_type;
+    typedef float		complementary_type;
     enum
     {
 	is_signed = false,
@@ -593,18 +592,18 @@ struct type_traits<u_int64_t>
 template <>
 struct type_traits<float>
 {
-    typedef int32_t	signed_type;		//!< 同一サイズの符号付き整数
-    typedef u_int32_t	unsigned_type;		//!< 同一サイズの符号なし整数
-    typedef void	lower_type;
-    typedef double	upper_type;
+    typedef int32_t		signed_type;	//!< 同一サイズの符号付き整数
+    typedef u_int32_t		unsigned_type;	//!< 同一サイズの符号なし整数
+    typedef void		lower_type;
+    typedef double		upper_type;
 #if defined(SSE)
     typedef typename boost::mpl::if_c<
 	sizeof(ivec_t) == sizeof(fvec_t),
-	int32_t, int16_t>::type
-			complementary_type;
+	int32_t, int16_t>::type	complementary_type;
 #else
-    typedef void	complementary_type;
+    typedef void		complementary_type;
 #endif
+    typedef complementary_type	complementary_mask_type;
     enum
     {
 	is_signed = true,
@@ -614,11 +613,18 @@ struct type_traits<float>
 template <>
 struct type_traits<double>
 {
-    typedef int64_t	signed_type;		//!< 同一サイズの符号付き整数
-    typedef u_int64_t	unsigned_type;		//!< 同一サイズの符号なし整数
-    typedef float	lower_type;
-    typedef void	upper_type;
-    typedef int32_t	complementary_type;
+    typedef int64_t		signed_type;	//!< 同一サイズの符号付き整数
+    typedef u_int64_t		unsigned_type;	//!< 同一サイズの符号なし整数
+    typedef float		lower_type;
+    typedef void		upper_type;
+    typedef int32_t		complementary_type;
+#if defined(SSE2)
+    typedef typename boost::mpl::if_c<
+	sizeof(ivec_t) == sizeof(dvec_t),
+	int64_t, int32_t>::type	complementary_mask_type;
+#else
+    typedef void		complementary_mask_type;
+#endif
     enum
     {
 	is_signed = true,
@@ -2184,25 +2190,20 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 /************************************************************************
 *  Mask conversion operators						*
 ************************************************************************/
-//! T型マスクベクトルの下位半分をS型マスクベクトルに型変換する．
+//! T型マスクベクトルのI番目の部分をS型マスクベクトルに型変換する．
 /*!
-  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
+  整数ベクトル間の変換の場合，SのサイズはTの2/4/8倍である．また，S, Tは
   符号付き／符号なしのいずれでも良い．
   \param x	変換されるマスクベクトル
   \return	変換されたマスクベクトル
 */
-template <class S, class T> static vec<S>
-cvt_mask(vec<T> x)							;
-
-//! T型マスクベクトルの上位半分をS型マスクベクトルに型変換する．
-/*!
-  整数ベクトル間の変換の場合，SのサイズはTの倍である．また，S, Tは
-  符号付き／符号なしのいずれでも良い．
-  \param x	変換されるマスクベクトル
-  \return	変換されたマスクベクトル
-*/
-template <class S, class T> static vec<S>
-cvt_mask_high(vec<T> x)							;
+template <class S, size_t I=0, class T> static inline vec<S>
+cvt_mask(vec<T> x)
+{
+    typedef typename type_traits<S>::lower_type	L;
+    
+    return cvt_mask<S, I&0x1>(cvt_mask<L, I>>1>(x));
+}
 
 //! 2つのT型整数マスクベクトルをより小さなS型整数マスクベクトルに型変換する．
 /*!
@@ -2219,14 +2220,14 @@ cvt_mask(vec<T> x, vec<T> y)						;
 #if defined(AVX2)
 #  define MM_CVTUP_MASK(from, to)					\
     template <> inline vec<to>						\
-    cvt_mask(vec<from> x)						\
+    cvt_mask<to, 0>(vec<from> x)					\
     {									\
 	return MM_MNEMONIC(cvt, _mm256_,				\
 			   MM_SIGNED(from), MM_SIGNED(to))(		\
 		   _mm256_castsi256_si128(x));				\
     }									\
     template <> inline vec<to>						\
-    cvt_mask_high(vec<from> x)						\
+    cvt_mask<to, 1>(vec<from> x)					\
     {									\
 	return MM_MNEMONIC(cvt, _mm256_,				\
 			   MM_SIGNED(from), MM_SIGNED(to))(		\
@@ -2242,10 +2243,16 @@ cvt_mask(vec<T> x, vec<T> y)						;
     }
 #else
 #  define MM_CVTUP_MASK(from, to)					\
-    MM_FUNC(vec<to> cvt_mask(vec<from> x),				\
-	    unpacklo, (x, x), void, from, MM_SIGNED)			\
-    MM_FUNC(vec<to> cvt_mask_high(vec<from> x),				\
-	    unpackhi, (x, x), void, from, MM_SIGNED)
+    template <> inline vec<to>						\
+    cvt_mask<to, 0>(vec<from> x)					\
+    {									\
+	return MM_MNEMONIC(unpacklo, _mm_, , MM_SIGNED(from))(x, x);	\
+    }									\
+    template <> inline vec<to>						\
+    cvt_mask<to, 1>(vec<from> x)					\
+    {									\
+	return MM_MNEMONIC(unpackhi, _mm_, , MM_SIGNED(from))(x, x);	\
+    }
 #  define MM_CVTDOWN_MASK(from, to)					\
     MM_FUNC(vec<to> cvt_mask(vec<from> x, vec<from> y),			\
 	    packs, (x, y), void, from, MM_SIGNED)
@@ -2273,49 +2280,57 @@ MM_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
     
 // [2] 整数ベクトルと浮動小数点数ベクトル間のマスク変換
 #if defined(SSE2)
-// int, u_int, short, u_short, s_char, u_char -> float
-template <> inline F32vec
-cvt_mask<float>(Is32vec x)  {return cast<float>(x);}
-template <> inline F32vec
-cvt_mask<float>(Iu32vec x)  {return cast<float>(x);}
-template <> inline F32vec
-cvt_mask<float>(Is16vec x)  {return cvt_mask<float>(cvt_mask<int32_t>(x));}
-template <> inline F32vec
-cvt_mask<float>(Iu16vec x)  {return cvt_mask<float>(cvt_mask<u_int32_t>(x));}
-template <> inline F32vec
-cvt_mask<float>(Is8vec x)   {return cvt_mask<float>(cvt_mask<int16_t>(x));}
-template <> inline F32vec
-cvt_mask<float>(Iu8vec x)   {return cvt_mask<float>(cvt_mask<u_int16_t>(x));}
+#  if !defined(AVX) || defined(AVX2)	// Is32vec::size == F32vec::size
+#    define MM_CVT_MASK_2FI(itype, ftype)				\
+      template <> inline vec<ftype>					\
+      cvt_mask<ftype>(vec<itype> x)	{return cast<ftype>(x);}	\
+      template <> inline vec<itype>					\
+      cvt_mask<itype>(vec<ftype> x)	{return cast<itype>(x);}
 
-// float -> int, u_int
-template <> inline Is32vec
-cvt_mask<int32_t>(F32vec x)	{return cast<int32_t>(x);}
-template <> inline Iu32vec
-cvt_mask<u_int32_t>(F32vec x)	{return cast<u_int32_t>(x);}
+    MM_CVT_MASK_2FI(int32_t,   float)	// int	  <-> float
+    MM_CVT_MASK_2FI(u_int32_t, float)	// u_int  <-> float
+    MM_CVT_MASK_2FI(int64_t,   double)	// long	  <-> double
+    MM_CVT_MASK_2FI(u_int64_t, double)	// u_long <-> double
 
-// int64, u_int64, int, u_int, short, u_short, s_char, u_char -> double
-template <> inline F64vec
-cvt_mask<double>(Is64vec x) {return cast<double>(x);}
-template <> inline F64vec
-cvt_mask<double>(Iu64vec x) {return cast<double>(x);}
-template <> inline F64vec
-cvt_mask<double>(Is32vec x) {return cvt_mask<double>(cvt_mask<u_int64_t>(x));}
-template <> inline F64vec
-cvt_mask<double>(Iu32vec x) {return cvt_mask<double>(cvt_mask<u_int64_t>(x));}
-template <> inline F64vec
-cvt_mask<double>(Is16vec x) {return cvt_mask<double>(cvt_mask<int32_t>(x));}
-template <> inline F64vec
-cvt_mask<double>(Iu16vec x) {return cvt_mask<double>(cvt_mask<u_int32_t>(x));}
-template <> inline F64vec
-cvt_mask<double>(Is8vec x)  {return cvt_mask<double>(cvt_mask<int16_t>(x));}
-template <> inline F64vec
-cvt_mask<double>(Iu8vec x)  {return cvt_mask<double>(cvt_mask<u_int16_t>(x));}
+#    undef MM_CVT_MASK_2FI
+#  else	// AVX && !AVX2
+#    define MM_CVT_MASK_IF(itype, ftype)				\
+    template <> inline vec<ftype>					\
+      cvt_mask<ftype>(vec<itype> x)					\
+      {									\
+	  typedef type_traits<itype>::upper_type	upper_type;	\
+      									\
+	  return MM_MNEMONIC(cast, _mm256_, si256, MM_SUFFIX(ftype))(	\
+		     _mm256_insertf128_si256(				\
+			 _mm256_castsi128_si256(			\
+			     cvt_mask<upper_type, 0>(x)),		\
+			 cvt_mask<upper_type, 1>(x), 0x1));		\
+      }
+#    define MM_CVT_MASK_FI(itype)					\
+      template <> inline vec<itype>					\
+      cvt_mask<itype>(F32vec x)						\
+      {									\
+	  typedef type_traits<itype>::upper_type	upper_type;	\
+	  								\
+	  return cvt_mask<itype>(					\
+		     vec<upper_type>(					\
+			 _mm256_castsi256_si128(			\
+			     _mm256_castps_si256(x))),			\
+		     vec<upper_type>(					\
+		         _mm256_extractf128_si256(			\
+			     _mm256_castps_si256(x), 0x1)));		\
+      }
 
-// double -> int64, u_int64
-template <> inline Is64vec
-cvt_mask<int64_t>(F64vec x)	{return cast<int64_t>(x);}
-template <> inline Iu64vec
-cvt_mask<u_int64_t>(F64vec x)	{return cast<u_int64_t>(x);}
+    MM_CVT_MASK_IF(int16_t,   float)	// short   -> float
+    MM_CVT_MASK_FI(int16_t)		// float   -> short
+    MM_CVT_MASK_IF(u_int16_t, float)	// u_short -> float
+    MM_CVT_MASK_FI(u_int16_t)		// float   -> u_short
+    MM_CVT_MASK_IF(int32_t,   double)	// int     -> double
+    MM_CVT_MASK_IF(u_int32_t, double)	// u_int   -> double
+
+#    undef MM_CVT_MASK_IF
+#    undef MM_CVT_MASK_FI
+#  endif
 #endif
 
 /************************************************************************
