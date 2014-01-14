@@ -2373,9 +2373,10 @@ MM_LOGICALS(u_int64_t)
     template <class S> static inline vec<type>				\
     lookup(const S* p, vec<type> idx)					\
     {									\
-	typedef type_traits<type>::upper_type	upper_type;		\
-	return cvt<type>(lookup(p, cvt<upper_type, 0>(idx)),		\
-			 lookup(p, cvt<upper_type, 1>(idx)));		\
+	typedef type_traits<type_traits<type>::upper_type>		\
+		    ::signed_type		signed_upper_type;	\
+	return cvt<type>(lookup(p, cvt<signed_upper_type, 0>(idx)),	\
+			 lookup(p, cvt<signed_upper_type, 1>(idx)));	\
     }
 
   template <class S> static inline Is32vec
