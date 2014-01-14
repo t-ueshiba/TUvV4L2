@@ -865,8 +865,7 @@ Array<T, B>::operator =(std::initializer_list<value_type> args)
 template <class T, class B> Array<T, B>&
 Array<T, B>::operator =(const element_type& c)
 {
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] = c;
+    std::fill(begin(), end(), c);
     return *this;
 }
 
@@ -983,8 +982,8 @@ Array<T, B>::eval(u_int i, u_int j) const
 template <class T, class B> Array<T, B>&
 Array<T, B>::operator *=(element_type c)
 {
-    for (u_int i = 0; i < size(); )
-	(*this)[i++] *= c;
+    for (iterator q = begin(); q != end(); ++q)
+	*q *= c;
     return *this;
 }
 
@@ -996,8 +995,8 @@ Array<T, B>::operator *=(element_type c)
 template <class T, class B> template <class T2> inline Array<T, B>&
 Array<T, B>::operator /=(T2 c)
 {
-    for (u_int i = 0; i < size(); )
-	(*this)[i++] /= c;
+    for (iterator q = begin(); q != end(); ++q)
+	*q /= c;
     return *this;
 }
 
@@ -1009,9 +1008,10 @@ Array<T, B>::operator /=(T2 c)
 template <class T, class B> template <class T2, class B2> Array<T, B>&
 Array<T, B>::operator +=(const Array<T2, B2>& a)
 {
-    check_size(a.size());
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] += a[i];
+  //check_size(a.size());
+    typename Array<T2, B2>::const_iterator	p = a.cbegin();
+    for (iterator q = begin(); q != end(); ++q, ++p)
+	*q += *p;
     return *this;
 }
 
@@ -1023,9 +1023,10 @@ Array<T, B>::operator +=(const Array<T2, B2>& a)
 template <class T, class B> template <class T2, class B2> Array<T, B>&
 Array<T, B>::operator -=(const Array<T2, B2>& a)
 {
-    check_size(a.size());
-    for (u_int i = 0; i < size(); ++i)
-	(*this)[i] -= a[i];
+  //check_size(a.size());
+    typename Array<T2, B2>::const_iterator	p = a.cbegin();
+    for (iterator q = begin(); q != end(); ++q, ++p)
+	*q -= *p;
     return *this;
 }
 
@@ -1039,8 +1040,9 @@ Array<T, B>::operator ==(const Array<T2, B2>& a) const
 {
     if (size() != a.size())
 	return false;
-    for (u_int i = 0; i < size(); ++i)
-	if ((*this)[i] != a[i])
+    typename Array<T2, B2>::const_iterator	p = a.cbegin();
+    for (const_iterator q = cbegin(); q != cend(); ++q, ++p)
+	if (*q != *p)
 	    return false;
     return true;
 }
@@ -1076,8 +1078,8 @@ Array<T, B>::get(std::istream& in)
 template <class T, class B> std::ostream&
 Array<T, B>::put(std::ostream& out) const
 {
-    for (u_int i = 0; i < size(); )
-	out << ' ' << (*this)[i++];
+    for (const_iterator q = cbegin(); q != cend(); ++q)
+	out << ' ' << *q;
     return out;
 }
 
@@ -1381,8 +1383,7 @@ Array2<T, B, R>::operator =(std::initializer_list<value_type> args)
 template <class T, class B, class R> Array2<T, B, R>&
 Array2<T, B, R>::operator =(const element_type& c)
 {
-    for (u_int i = 0; i < nrow(); )
-	(*this)[i++] = c;
+    std::fill(begin(), end(), c);
     return *this;
 }
 
@@ -1479,8 +1480,8 @@ Array2<T, B, R>::resize(pointer p, u_int r, u_int c)
 template <class T, class B, class R> std::istream&
 Array2<T, B, R>::restore(std::istream& in)
 {
-    for (u_int i = 0; i < nrow(); )
-	(*this)[i++].restore(in);
+    for (iterator q = begin(); q != end(); ++q)
+	q->restore(in);
     return in;
 }
 
@@ -1492,8 +1493,8 @@ Array2<T, B, R>::restore(std::istream& in)
 template <class T, class B, class R> std::ostream&
 Array2<T, B, R>::save(std::ostream& out) const
 {
-    for (u_int i = 0; i < nrow(); )
-	(*this)[i++].save(out);
+    for (const_iterator q = cbegin(); q != cend(); ++q)
+	q->save(out);
     return out;
 }
 
