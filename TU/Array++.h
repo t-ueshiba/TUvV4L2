@@ -676,7 +676,7 @@ class Array : public B
       public:
 	enum		{ value = (sizeof(test(makeA())) == sizeof(Small)) };
     };
-    
+
     template <class _T, bool>
     struct ElementType
     {

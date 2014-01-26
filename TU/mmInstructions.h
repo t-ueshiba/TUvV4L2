@@ -3436,7 +3436,6 @@ class store_iterator : public boost::iterator_adaptor<
     typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
     typedef typename super::iterator_category	iterator_category;
-    typedef load_iterator<ITER, ALIGNED>	loader;
     
     friend class				boost::iterator_core_access;
 
@@ -3445,9 +3444,9 @@ class store_iterator : public boost::iterator_adaptor<
     store_iterator(value_type* p)
 	:super(reinterpret_cast<ITER>(p))	{}
 
-    loader		operator ()() const
+    value_type		operator ()() const
 			{
-			    return loader(super::base());
+			    return load<ALIGNED>(super::base());
 			}
     
   private:
