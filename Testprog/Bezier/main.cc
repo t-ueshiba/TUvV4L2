@@ -82,7 +82,7 @@ MyCanvasPane::initializeGraphics()
 	for (int i = 0; i <= 20; ++i)
 	{
 	    Vector3d	p = _b(i / 20.0);
-	    glVertex3dv((const double*)p);
+	    glVertex3dv(p.data());
 	}
       glEnd();
 
@@ -92,7 +92,7 @@ MyCanvasPane::initializeGraphics()
 	    glBegin(GL_LINE_STRIP);
 	    Array<Vector3d>	p = _b.deCasteljau(0.3, r);
 	    for (int i = 0; i < p.dim(); ++i)
-		glVertex3dv((const double*)p[i]);
+		glVertex3dv(p[i].data());
 	    glEnd();
 	}
     glEndList();
@@ -107,7 +107,7 @@ MyCanvasPane::initializeGraphics()
 	for (int i = 0; i <= 20; ++i)
 	{
 	    Vector4d	p = _c(i / 20.0);
-	    glVertex4dv((const double*)p);
+	    glVertex4dv(p.data());
 	}
       glEnd();
 
@@ -117,7 +117,7 @@ MyCanvasPane::initializeGraphics()
 	    glBegin(GL_LINE_STRIP);
 	    Array<Vector4d>	p = _c.deCasteljau(0.3, r);
 	    for (int i = 0; i < p.dim(); ++i)
-		glVertex4dv((const double*)p[i]);
+		glVertex4dv(p[i].data());
 	    glEnd();
 	}
     glEndList();
@@ -133,7 +133,7 @@ MyCanvasPane::initializeGraphics()
 	    for (int i = 0; i <= 20; ++i)
 	    {
 		Vector3d	p = _s(i / 20.0, j / 20.0);
-		glVertex3dv((const double*)p);
+		glVertex3dv(p.data());
 	    }
       glEnd();
     glEndList();
