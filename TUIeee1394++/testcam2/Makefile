@@ -33,7 +33,7 @@ LINKER		= $(CXX)
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= ../testcam/MyCanvasPane.h \
 		../testcam/MyModalDialog.h \
-		/Users/ueshiba/multicam/server/multicam.h \
+		/home/ueshiba/multicam/server/multicam.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Ieee1394++.h \
@@ -99,7 +99,7 @@ MyCanvasPane.o: ../testcam/MyCanvasPane.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
 	/usr/local/include/TU/v/XvDC.h
-MyCmdWindow.o: /Users/ueshiba/multicam/server/multicam.h \
+MyCmdWindow.o: /home/ueshiba/multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
@@ -131,7 +131,7 @@ MyModalDialog.o: ../testcam/MyModalDialog.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h
-createCaptureCmds.o: /Users/ueshiba/multicam/server/multicam.h \
+createCaptureCmds.o: /home/ueshiba/multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
@@ -139,7 +139,7 @@ createCaptureCmds.o: /Users/ueshiba/multicam/server/multicam.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
-createFeatureCmds.o: /Users/ueshiba/multicam/server/multicam.h \
+createFeatureCmds.o: /home/ueshiba/multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
@@ -147,7 +147,7 @@ createFeatureCmds.o: /Users/ueshiba/multicam/server/multicam.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
-createMenuCmds.o: /Users/ueshiba/multicam/server/multicam.h \
+createMenuCmds.o: /home/ueshiba/multicam/server/multicam.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \

@@ -8,15 +8,9 @@ SUBDIR	= TUTools++		\
 	  TUVision++		\
 	  TUXv++		\
 	  TUCuda++		\
-#	  TUV4L2++
-#	  TUThread++		\
-#	  TUCalib++		\
-#	  Kanatani		\
-#	  TUXgl++		\
-#	  TUXil++		\
-#	  TUXilXgl++		\
-#	  TUSnapper24++		\
-#	  TUS2200++		
+	  TUV4L2++		\
+	  TUUSB++		\
+	  TUHRP2++
 
 TARGETS	= all install clean depend
 

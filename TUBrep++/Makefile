@@ -34,6 +34,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/types.h
 HDRS		= TU/Brep/Brep++.h
 SRCS		= Geometry.cc \
@@ -57,34 +58,41 @@ Geometry.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 HalfEdge.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 Loop.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 Neighbor.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 PointB.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 TUBrep++.inst.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 TUBrep++.sa.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
