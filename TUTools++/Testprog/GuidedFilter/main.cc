@@ -30,7 +30,7 @@ main(int argc, char* argv[])
     cin >> a;
 
     Array<u_char>	b(a.size());
-    for (u_int i = 0; i < b.size(); ++i)
+    for (size_t i = 0; i < b.size(); ++i)
 	b[i] = a[i]; //+ 1;
 
     GuidedFilter<float>	gf(w, e);
@@ -45,8 +45,8 @@ main(int argc, char* argv[])
     cin >> A;
 
     Array2<Array<u_char> >	B(A.nrow(), A.ncol());
-    for (u_int i = 0; i < B.nrow(); ++i)
-	for (u_int j = 0; j < B.ncol(); ++j)
+    for (size_t i = 0; i < B.nrow(); ++i)
+	for (size_t j = 0; j < B.ncol(); ++j)
 	    B[i][j] = A[i][j];// + 1;
 
     GuidedFilter2<float>	gf2(w, w, e);

@@ -3592,13 +3592,13 @@ class cvtdown_iterator
 		    cvtdown(z);
 		    x = cvt<S>(y, z);
 		}
-    void	cvtdown(vec<complementary_type>& x, boost::mpl::bool_<true>)
+    void	cvtdown(vec<complementary_type>& x, boost::mpl::true_)
 		{
 		    vec<element_type>	y;
 		    cvtdown(y);
 		    x = cvt<complementary_type>(y);
 		}
-    void	cvtdown(vec<complementary_type>& x, boost::mpl::bool_<false>)
+    void	cvtdown(vec<complementary_type>& x, boost::mpl::false_)
 		{
 		    vec<element_type>	y, z;
 		    cvtdown(y);
@@ -3717,12 +3717,12 @@ namespace detail
 		    cvtup<OP>(x, boost::mpl::bool_<SameSize>());
 		}
 	template <class OP>
-	void	cvtup(vec<complementary_type> x, boost::mpl::bool_<true>)
+	void	cvtup(vec<complementary_type> x, boost::mpl::true_)
 		{
 		    cvtup<OP>(cvt<element_type>(x));
 		}
 	template <class OP>
-	void	cvtup(vec<complementary_type> x, boost::mpl::bool_<false>)
+	void	cvtup(vec<complementary_type> x, boost::mpl::false_)
 		{
 		    cvtup<OP>(cvt<element_type, 0>(x));
 		    cvtup<OP>(cvt<element_type, 1>(x));

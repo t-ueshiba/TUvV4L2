@@ -13,7 +13,7 @@ operator <<(OglDC& dc, const BezierCurve3d& b)
     glPushAttrib(GL_EVAL_BIT);
     glEnable(GL_MAP1_VERTEX_3);
     glMap1d(GL_MAP1_VERTEX_3,
-	    0.0, 1.0, b.dim(), b.degree()+1, (const double*)b);
+	    0.0, 1.0, b.dim(), b.degree()+1, b.data());
     glBegin(GL_LINE_STRIP);
       for (int sample = 0; sample <= 20; ++sample)
 	  glEvalCoord1f((GLfloat)sample/20.0);
@@ -26,7 +26,7 @@ operator <<(OglDC& dc, const BezierCurve3d& b)
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
       for (u_int i = 0; i <= b.degree(); ++i)
-	  glVertex3dv((const double*)b[i]);
+	  glVertex3dv(b[i].data());
     glEnd();
     glPopAttrib();
 
@@ -39,7 +39,7 @@ operator <<(OglDC& dc, const RationalBezierCurve3d& b)
     glPushAttrib(GL_EVAL_BIT);
     glEnable(GL_MAP1_VERTEX_4);
     glMap1d(GL_MAP1_VERTEX_4,
-	    0.0, 1.0, b.dim(), b.degree()+1, (const double*)b);
+	    0.0, 1.0, b.dim(), b.degree()+1, b.data());
     glBegin(GL_LINE_STRIP);
       for (int sample = 0; sample <= 20; ++sample)
 	  glEvalCoord1f((GLfloat)sample/20.0);
@@ -52,7 +52,7 @@ operator <<(OglDC& dc, const RationalBezierCurve3d& b)
     glLineStipple(2, 0xaaaa);
     glBegin(GL_LINE_STRIP);
       for (u_int i = 0; i <= b.degree(); ++i)
-	  glVertex4dv((const double*)b[i]);
+	  glVertex4dv(b[i].data());
     glEnd();
     glPopAttrib();
     
@@ -111,7 +111,7 @@ operator <<(OglDC& dc, const BezierSurface3d& b)
     glMap2d(GL_MAP2_VERTEX_3,
 	    0.0, 1.0,			b.dim(), b.uDegree()+1,
 	    0.0, 1.0, (b.uDegree()+1) *	b.dim(), b.vDegree()+1,
-	    (const double*)b);
+	    b.data());
     glMapGrid2d(20, 0.0, 1.0, 20, 0.0, 1.0);
     glFrontFace(GL_CW);
     glEvalMesh2(GL_FILL, 0, 20, 0, 20);
@@ -126,14 +126,14 @@ operator <<(OglDC& dc, const BezierSurface3d& b)
     {
 	glBegin(GL_LINE_STRIP);
 	for (u_int i = 0; i <= b.uDegree(); ++i)
-	    glVertex3dv((const double*)b[j][i]);
+	    glVertex3dv(b[j][i].data());
 	glEnd();
     }
     for (u_int i = 0; i <= b.uDegree(); ++i)
     {
 	glBegin(GL_LINE_STRIP);
 	for (u_int j = 0; j <= b.vDegree(); ++j)
-	    glVertex3dv((const double*)b[j][i]);
+	    glVertex3dv(b[j][i].data());
 	glEnd();
     }
     glPopAttrib();
