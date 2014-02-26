@@ -45,7 +45,7 @@ GenericImage::restoreData(std::istream& in)
     _colormap.resize(_typeInfo.ncolors);
     _colormap.restore(in);
 
-    u_int	npads = type2nbytes(_typeInfo.type, true);
+    size_t	npads = type2nbytes(_typeInfo.type, true);
     if (_typeInfo.bottomToTop)
     {
 	for (reverse_iterator line = rbegin(); line != rend(); ++line)
@@ -73,7 +73,7 @@ GenericImage::saveData(std::ostream& out) const
     if (_colormap.size() > 0)
     {
 	_colormap.save(out);
-	for (u_int i = _colormap.size(); i < 256; ++i)
+	for (size_t i = _colormap.size(); i < 256; ++i)
 	    out.put(0).put(0).put(0).put(0);
     }
     
@@ -96,13 +96,13 @@ GenericImage::saveData(std::ostream& out) const
     return out;
 }
 
-__PORT u_int
+__PORT size_t
 GenericImage::_width() const
 {
     return (ncol()*8) / type2depth(_typeInfo.type);
 }
 
-__PORT u_int
+__PORT size_t
 GenericImage::_height() const
 {
     return nrow();
@@ -115,7 +115,7 @@ GenericImage::_defaultType() const
 }
 
 __PORT void
-GenericImage::_resize(u_int h, u_int w, const TypeInfo& typeInfo)
+GenericImage::_resize(size_t h, size_t w, const TypeInfo& typeInfo)
 {
     _typeInfo = typeInfo;
     w = (type2depth(_typeInfo.type)*w + 7) / 8;

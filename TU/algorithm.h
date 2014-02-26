@@ -210,14 +210,14 @@ min3x3(P p, P q, P r)
   \param niter	収縮と膨張の回数
 */
 template <class Iterator> void
-mopOpen(Iterator begin, Iterator end, u_int niter=1)
+mopOpen(Iterator begin, Iterator end, size_t niter=1)
 {
     typedef typename std::iterator_traits<Iterator>::value_type::iterator
 								col_iterator;
 
-    for (u_int n = 0; n < niter; ++n)
+    for (size_t n = 0; n < niter; ++n)
 	op3x3(begin, end, min3x3<col_iterator>);	// 収縮(erosion)
-    for (u_int n = 0; n < niter; ++n)
+    for (size_t n = 0; n < niter; ++n)
 	op3x3(begin, end, max3x3<col_iterator>);	// 膨張(dilation)
 }
 
@@ -229,14 +229,14 @@ mopOpen(Iterator begin, Iterator end, u_int niter=1)
   \param niter	収縮と膨張の回数
 */
 template <class Iterator> void
-mopClose(Iterator begin, Iterator end, u_int niter=1)
+mopClose(Iterator begin, Iterator end, size_t niter=1)
 {
     typedef typename std::iterator_traits<Iterator>::value_type::iterator
 								col_iterator;
     
-    for (u_int n = 0; n < niter; ++n)
+    for (size_t n = 0; n < niter; ++n)
 	op3x3(begin, end, max3x3<col_iterator>);	// 膨張(dilation)
-    for (u_int n = 0; n < niter; ++n)
+    for (size_t n = 0; n < niter; ++n)
 	op3x3(begin, end, min3x3<col_iterator>);	// 収縮(erosion)
 }
     

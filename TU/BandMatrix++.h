@@ -47,7 +47,7 @@ namespace TU
   \param P	左帯幅(j < i-P なるjに対して(i, j)成分が0になるような非負整数)
   \param Q	右帯幅(j > i+P なるjに対して(i, j)成分が0になるような非負整数)
 */
-template <class T, u_int P, u_int Q>
+template <class T, size_t P, size_t Q>
 class BandMatrix
 {
   public:
@@ -59,15 +59,15 @@ class BandMatrix
     
   public:
   // 構造操作
-    explicit BandMatrix(u_int siz=P+Q+1)				;
-    void		resize(u_int siz)				;
+    explicit BandMatrix(size_t siz=P+Q+1)				;
+    void		resize(size_t siz)				;
 
   // 基本情報
-    static u_int	leftBandWidth()					;
-    static u_int	rightBandWidth()				;
-    u_int		size()					const	;
-    element_type	operator ()(u_int i, u_int j)		const	;
-    element_type&	operator ()(u_int i, u_int j)			;
+    static size_t	leftBandWidth()					;
+    static size_t	rightBandWidth()				;
+    size_t		size()					const	;
+    element_type	operator ()(size_t i, size_t j)		const	;
+    element_type&	operator ()(size_t i, size_t j)			;
     matrix_type		A()					const	;
     matrix_type		L()					const	;
     matrix_type		U()					const	;
@@ -82,10 +82,10 @@ class BandMatrix
     std::ostream&	put(std::ostream& out)			const	;
     
   private:
-    u_int		colBegin(u_int i)			const	;
-    u_int		colEnd(u_int i)				const	;
-    u_int		rowBegin(u_int j)			const	;
-    u_int		rowEnd(u_int j)				const	;
+    size_t		colBegin(size_t i)			const	;
+    size_t		colEnd(size_t i)			const	;
+    size_t		rowBegin(size_t j)			const	;
+    size_t		rowEnd(size_t j)			const	;
     
   private:
     Array<RowData>	_buf;
@@ -95,8 +95,8 @@ class BandMatrix
 /*!
   \param siz	帯行列の行と列のサイズ(次元)
 */
-template <class T, u_int P, u_int Q>
-BandMatrix<T, P, Q>::BandMatrix(u_int siz)
+template <class T, size_t P, size_t Q>
+BandMatrix<T, P, Q>::BandMatrix(size_t siz)
     :_buf(siz)
 {
     if (siz < P+1 || siz < Q+1)
@@ -107,8 +107,8 @@ BandMatrix<T, P, Q>::BandMatrix(u_int siz)
 /*!
   \param siz	帯行列の行と列のサイズ(次元)
 */
-template <class T, u_int P, u_int Q> inline void
-BandMatrix<T, P, Q>::resize(u_int siz)
+template <class T, size_t P, size_t Q> inline void
+BandMatrix<T, P, Q>::resize(size_t siz)
 {
     if (siz < P+1 || siz < Q+1)
 	throw std::invalid_argument("TU::BandMatrix<T, P, Q>::BandMatrix(): too small dimension!");
@@ -121,7 +121,7 @@ BandMatrix<T, P, Q>::resize(u_int siz)
 /*!
   \return	左帯幅
 */
-template <class T, u_int P, u_int Q> inline u_int
+template <class T, size_t P, size_t Q> inline size_t
 BandMatrix<T, P, Q>::leftBandWidth()
 {
     return P;
@@ -131,7 +131,7 @@ BandMatrix<T, P, Q>::leftBandWidth()
 /*!
   \return	右帯幅
 */
-template <class T, u_int P, u_int Q> inline u_int
+template <class T, size_t P, size_t Q> inline size_t
 BandMatrix<T, P, Q>::rightBandWidth()
 {
     return Q;
@@ -141,7 +141,7 @@ BandMatrix<T, P, Q>::rightBandWidth()
 /*!
   \return	行と列のサイズ(次元)
 */
-template <class T, u_int P, u_int Q> inline u_int
+template <class T, size_t P, size_t Q> inline size_t
 BandMatrix<T, P, Q>::size() const
 {
     return _buf.size();
@@ -154,9 +154,9 @@ BandMatrix<T, P, Q>::size() const
   \param j	列を指定するindex
   \return	(i, j)成分への定数参照
 */
-template <class T, u_int P, u_int Q>
+template <class T, size_t P, size_t Q>
 inline typename BandMatrix<T, P, Q>::element_type
-BandMatrix<T, P, Q>::operator ()(u_int i, u_int j) const
+BandMatrix<T, P, Q>::operator ()(size_t i, size_t j) const
 {
     return _buf[i][P+j-i];
 }
@@ -168,9 +168,9 @@ BandMatrix<T, P, Q>::operator ()(u_int i, u_int j) const
   \param j	列を指定するindex
   \return	(i, j)成分への参照
 */
-template <class T, u_int P, u_int Q>
+template <class T, size_t P, size_t Q>
 inline typename BandMatrix<T, P, Q>::element_type&
-BandMatrix<T, P, Q>::operator ()(u_int i, u_int j)
+BandMatrix<T, P, Q>::operator ()(size_t i, size_t j)
 {
     return _buf[i][P+j-i];
 }
@@ -179,16 +179,16 @@ BandMatrix<T, P, Q>::operator ()(u_int i, u_int j)
 /*!
   \return	変換された密行列
 */
-template <class T, u_int P, u_int Q>
+template <class T, size_t P, size_t Q>
 inline typename BandMatrix<T, P, Q>::matrix_type
 BandMatrix<T, P, Q>::A() const
 {
     matrix_type	m(size(), size());
 
-    for (u_int i = 0; i < size(); ++i)
+    for (size_t i = 0; i < size(); ++i)
     {
-	const u_int	je = colEnd(i);
-	for (u_int j = colBegin(i); j < je; ++j)
+	const size_t	je = colEnd(i);
+	for (size_t j = colBegin(i); j < je; ++j)
 	    m[i][j] = (*this)(i, j);
     }
     
@@ -200,14 +200,14 @@ BandMatrix<T, P, Q>::A() const
   左帯幅は leftBandWidth() に等しい.
   \return	下半三角部分
 */
-template <class T, u_int P, u_int Q>
+template <class T, size_t P, size_t Q>
 inline typename BandMatrix<T, P, Q>::matrix_type
 BandMatrix<T, P, Q>::L() const
 {
     matrix_type	m(size(), size());
 
-    for (u_int i = 0; i < size(); ++i)
-	for (u_int j = colBegin(i); j <= i; ++j)
+    for (size_t i = 0; i < size(); ++i)
+	for (size_t j = colBegin(i); j <= i; ++j)
 	    m[i][j] = (*this)(i, j);
     
     return m;
@@ -218,17 +218,17 @@ BandMatrix<T, P, Q>::L() const
   右帯幅は rightBandWidth() に等しく，対角成分はすべて1である.
   \return	上半三角部分
 */
-template <class T, u_int P, u_int Q>
+template <class T, size_t P, size_t Q>
 inline typename BandMatrix<T, P, Q>::matrix_type
 BandMatrix<T, P, Q>::U() const
 {
     matrix_type	m(size(), size());
 
-    for (u_int i = 0; i < size(); ++i)
+    for (size_t i = 0; i < size(); ++i)
     {
 	m[i][i] = 1;
-	const u_int	je = colEnd(i);
-	for (u_int j = i + 1; j < je; ++j)
+	const size_t	je = colEnd(i);
+	for (size_t j = i + 1; j < je; ++j)
 	    m[i][j] = (*this)(i, j);
     }
     
@@ -240,7 +240,7 @@ BandMatrix<T, P, Q>::U() const
   \param c	代入する値
   \return	この帯行列
 */
-template <class T, u_int P, u_int Q> inline BandMatrix<T, P, Q>&
+template <class T, size_t P, size_t Q> inline BandMatrix<T, P, Q>&
 BandMatrix<T, P, Q>::operator =(element_type c)
 {
     _buf = c;
@@ -252,24 +252,24 @@ BandMatrix<T, P, Q>::operator =(element_type c)
   上半三角行列の右帯幅は rightBandWidth() に等しく，対角成分はすべて1である.
   \return	分解されたこの帯行列
 */
-template <class T, u_int P, u_int Q> BandMatrix<T, P, Q>&
+template <class T, size_t P, size_t Q> BandMatrix<T, P, Q>&
 BandMatrix<T, P, Q>::decompose()
 {
-    for (u_int n = 0; n < size(); ++n)
+    for (size_t n = 0; n < size(); ++n)
     {
 	const element_type	a = (*this)(n, n);
 	if (a == element_type(0))
 	    throw std::runtime_error("TU::BandMatrix<T, P, Q>::decompose(): sigular matrix!");
 	
-	const u_int	je = colEnd(n);
-	for (u_int j = n + 1; j < je; ++j)
+	const size_t	je = colEnd(n);
+	for (size_t j = n + 1; j < je; ++j)
 	    (*this)(n, j) /= a;
 
-	const u_int	ie = rowEnd(n);
-	for (u_int i = n + 1; i < ie; ++i)
+	const size_t	ie = rowEnd(n);
+	for (size_t i = n + 1; i < ie; ++i)
 	{
 	    const element_type	b  = (*this)(i, n);
-	    for (u_int j = n + 1; j < je; ++j)
+	    for (size_t j = n + 1; j < je; ++j)
 		(*this)(i, j) -= b * (*this)(n, j);
 	}
     }
@@ -287,19 +287,19 @@ BandMatrix<T, P, Q>::decompose()
 				しない場合に送出
   \throw std::runtime_error	もとの正方行列が正則でない場合に送出
 */
-template <class T, u_int P, u_int Q> template <class T2, class B2> void
+template <class T, size_t P, size_t Q> template <class T2, class B2> void
 BandMatrix<T, P, Q>::substitute(Vector<T2, B2>& b) const
 {
     if (b.size() != size())
 	throw std::invalid_argument("TU::BandMatrix<T, P, Q>::substitute(): Dimension of given vector is not equalt to mine!");
 
-    for (u_int j = 0; j < b.size(); ++j)
-	for (u_int i = rowBegin(j); i < j; ++i)
+    for (size_t j = 0; j < b.size(); ++j)
+	for (size_t i = rowBegin(j); i < j; ++i)
 	    b[j] -= b[i] * (*this)(i, j);	// forward substitution
 
-    for (u_int j = b.size(); j-- > 0; )
+    for (size_t j = b.size(); j-- > 0; )
     {
-	for (u_int i = rowEnd(j); --i > j; )
+	for (size_t i = rowEnd(j); --i > j; )
 	    b[j] -= b[i] * (*this)(i, j);	// backward substitution
 	if ((*this)(j, j) == element_type(0))
 	    throw std::runtime_error("TU::BandMatrix<T, P, Q>::substitute(): sigular matrix!");
@@ -312,17 +312,17 @@ BandMatrix<T, P, Q>::substitute(Vector<T2, B2>& b) const
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-template <class T, u_int P, u_int Q> std::ostream&
+template <class T, size_t P, size_t Q> std::ostream&
 BandMatrix<T, P, Q>::put(std::ostream& out) const
 {
-    for (u_int i = 0; i < size(); ++i)
+    for (size_t i = 0; i < size(); ++i)
     {
-	const u_int	jb = colBegin(i), je = colEnd(i);
-	for (u_int j = 0; j < jb; ++j)
+	const size_t	jb = colBegin(i), je = colEnd(i);
+	for (size_t j = 0; j < jb; ++j)
 	    out << " _";
-	for (u_int j = jb; j < je; ++j)
+	for (size_t j = jb; j < je; ++j)
 	    out << ' ' << (*this)(i, j);
-	for (u_int j = je; j < size(); ++j)
+	for (size_t j = je; j < size(); ++j)
 	    out << " _";
 	out << std::endl;
     }
@@ -330,26 +330,26 @@ BandMatrix<T, P, Q>::put(std::ostream& out) const
     return out;
 }
 
-template <class T, u_int P, u_int Q> inline u_int
-BandMatrix<T, P, Q>::colBegin(u_int i) const
+template <class T, size_t P, size_t Q> inline size_t
+BandMatrix<T, P, Q>::colBegin(size_t i) const
 {
     return (i > P ? i - P : 0);
 }
 
-template <class T, u_int P, u_int Q> inline u_int
-BandMatrix<T, P, Q>::colEnd(u_int i) const
+template <class T, size_t P, size_t Q> inline size_t
+BandMatrix<T, P, Q>::colEnd(size_t i) const
 {
     return (i + Q < size() ? i + Q + 1 : size());
 }
 
-template <class T, u_int P, u_int Q> inline u_int
-BandMatrix<T, P, Q>::rowBegin(u_int j) const
+template <class T, size_t P, size_t Q> inline size_t
+BandMatrix<T, P, Q>::rowBegin(size_t j) const
 {
     return (j > Q ? j - Q : 0);
 }
 
-template <class T, u_int P, u_int Q> inline u_int
-BandMatrix<T, P, Q>::rowEnd(u_int j) const
+template <class T, size_t P, size_t Q> inline size_t
+BandMatrix<T, P, Q>::rowEnd(size_t j) const
 {
     return (j + P < size() ? j + P + 1 : size());
 }
@@ -364,7 +364,7 @@ BandMatrix<T, P, Q>::rowEnd(u_int j) const
   \param A	帯行列
   \return	outで指定した出力ストリーム
 */
-template <class T, u_int P, u_int Q> inline std::ostream&
+template <class T, size_t P, size_t Q> inline std::ostream&
 operator <<(std::ostream& out, const BandMatrix<T, P, Q>& A)
 {
     return A.put(out) << std::endl;

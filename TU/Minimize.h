@@ -187,7 +187,7 @@ class ConstNormConstraint
 */
 template <class F, class G, class AT> Matrix<typename F::element_type>
 minimizeSquare(const F& f, const G& g, AT& x,
-	       u_int niter_max=100, double tol=1.5e-8)
+	       size_t niter_max=100, double tol=1.5e-8)
 {
     using namespace			std;
     typedef typename F::element_type	element_type;	// element type.
@@ -198,12 +198,12 @@ minimizeSquare(const F& f, const G& g, AT& x,
     element_type	sqr    = fval * fval;		// square value.
     element_type	lambda = 1.0e-4;		// L-M parameter.
 
-    for (u_int n = 0; n++ < niter_max; )
+    for (size_t n = 0; n++ < niter_max; )
     {
 	const matrix_type&	J    = f.jacobian(x);	// Jacobian.
 	const vector_type&	Jtf  = fval * J;
 	const vector_type&	gval = g(x);		// constraint residual.
-	const u_int		xdim = J.ncol(), gdim = gval.size();
+	const size_t		xdim = J.ncol(), gdim = gval.size();
 	matrix_type		A(xdim + gdim, xdim + gdim);
 
 	A(0, 0, xdim, xdim) = J.trns() * J;
@@ -211,13 +211,13 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	A(0, xdim, xdim, gdim) = A(xdim, 0, gdim, xdim).trns();
 
 	vector_type		diagA(xdim);
-	for (u_int i = 0; i < xdim; ++i)
+	for (size_t i = 0; i < xdim; ++i)
 	    diagA[i] = A[i][i];			// Keep diagonal elements.
 
 	for (;;)
 	{
 	  // Compute dx: update for parameters x to be estimated.
-	    for (u_int i = 0; i < xdim; ++i)
+	    for (size_t i = 0; i < xdim; ++i)
 		A[i][i] = (1.0 + lambda) * diagA[i];	// Augument diagonals.
 	    vector_type	dx(xdim + gdim);
 	    dx(0, xdim) = Jtf;
@@ -237,7 +237,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	    if (fabs(sqr_new - sqr) <=
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
 	    {
-		for (u_int i = 0; i < xdim; ++i)
+		for (size_t i = 0; i < xdim; ++i)
 		    A[i][i] = diagA[i];
 		return A(0, 0, xdim, xdim).pinv(1.0e8);
 	    }
@@ -297,10 +297,10 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	F::jacobian_type
      という名前でtypedefしている．
   -# ATA型の引数aが持つ自由度を
-	u_int	F::adim() const
+	size_t	F::adim() const
      によって知ることができる．
   -# 引数aをa_1, a_2,..., a_Iに分割した場合の各a_iが持つ自由度を
-	const Array<u_int>&	F::adims() const;
+	const Array<size_t>&	F::adims() const;
      によって知ることができる．この配列の要素の総和は
 	F::adim()
      に等しい．aが分割できない場合長さ1の配列が返され，その唯一の要素の値は
@@ -345,7 +345,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 template <class F, class G, class ATA, class IB>
 Matrix<typename F::element_type>
 minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
-		     u_int niter_max=100, double tol=1.5e-8)
+		     size_t niter_max=100, double tol=1.5e-8)
 {
     using namespace					std;
     typedef typename F::element_type			element_type;
@@ -354,7 +354,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     typedef Matrix<element_type>			matrix_type;
     typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
     
-    const u_int		nb = distance(bbegin, bend);
+    const size_t	nb = distance(bbegin, bend);
     Array<vector_type>	fval(nb);	// function values.
     element_type	sqr = 0;	// sum of squares.
     int			j = 0;
@@ -365,9 +365,9 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     }
     element_type	lambda = 1.0e-7;		// L-M parameter.
 
-    for (u_int n = 0; n++ < niter_max; )
+    for (size_t n = 0; n++ < niter_max; )
     {
-	const u_int		adim = f.adim();
+	const size_t		adim = f.adim();
 	jacobian_type		U(f.adims(), f.adims());
 	vector_type		Jtf(adim);
 	Array<matrix_type>	V(nb);
@@ -388,7 +388,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	}
 
       	const vector_type&	gval = g(a);
-	const u_int		gdim = gval.size();
+	const size_t		gdim = gval.size();
 	matrix_type		A(adim + gdim, adim + gdim);
 	
 	A(adim, 0, gdim, adim) = g.jacobian(a);
@@ -398,7 +398,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	{
 	  // Compute da: update for parameters a to be estimated.
 	    A(0, 0, adim, adim) = U;
-	    for (u_int i = 0; i < adim; ++i)
+	    for (size_t i = 0; i < adim; ++i)
 		A[i][i] *= (1.0 + lambda);		// Augument diagonals.
 
 	    vector_type		da(adim + gdim);
@@ -406,10 +406,10 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    da(adim, gdim) = gval;
 	    Array<matrix_type>	VinvWt(nb);
 	    Array<vector_type>	VinvKtf(nb);
-	    for (u_int j = 0; j < nb; ++j)
+	    for (size_t j = 0; j < nb; ++j)
 	    {
 		matrix_type	Vinv = V[j];
-		for (u_int k = 0; k < Vinv.size(); ++k)
+		for (size_t k = 0; k < Vinv.size(); ++k)
 		    Vinv[k][k] *= (1.0 + lambda);	// Augument diagonals.
 		Vinv = Vinv.inv();
 		VinvWt[j]  = Vinv * W[j].trns();
@@ -426,7 +426,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    copy(bbegin, bend, b_new.begin());
 	    Array<vector_type>	fval_new(nb);
 	    element_type	sqr_new = 0;
-	    for (u_int j = 0; j < nb; ++j)
+	    for (size_t j = 0; j < nb; ++j)
 	    {
 		const vector_type& db = VinvKtf[j] - VinvWt[j] * da(0, adim);
 		f.updateB(b_new[j], db);
@@ -441,21 +441,21 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    if (fabs(sqr_new - sqr) <=
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
 	    {
-		u_int		bdim = 0;
-		for (u_int j = 0; j < nb; ++j)
+		size_t		bdim = 0;
+		for (size_t j = 0; j < nb; ++j)
 		    bdim += V[j].size();
 		matrix_type	S(adim + bdim, adim + bdim);
 		matrix_type	Sa(S, 0, 0, adim, adim);
 		Sa = U;
-		for (u_int j = 0; j < nb; ++j)
+		for (size_t j = 0; j < nb; ++j)
 		{
 		    VinvWt[j] = V[j].inv() * W[j].trns();
 		    Sa -= W[j] * VinvWt[j];
 		}
-		for (u_int jj = adim, j = 0; j < nb; ++j)
+		for (size_t jj = adim, j = 0; j < nb; ++j)
 		{
 		    const matrix_type&	VinvWtSa = VinvWt[j] * Sa;
-		    for (u_int kk = adim, k = 0; k <= j; ++k)
+		    for (size_t kk = adim, k = 0; k <= j; ++k)
 		    {
 			S(jj, kk, VinvWtSa.nrow(), VinvWt[k].nrow())
 			     = VinvWtSa * VinvWt[k].trns();
@@ -465,7 +465,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		    jj += VinvWt[j].nrow();
 		}
 		Sa = Sa.pinv(1.0e8);
-		for (u_int jj = adim, j = 0; j < nb; ++j)
+		for (size_t jj = adim, j = 0; j < nb; ++j)
 		{
 		    S(jj, 0, VinvWt[j].nrow(), adim) = -VinvWt[j] * Sa;
 		    jj += VinvWt[j].nrow();
@@ -498,7 +498,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 ************************************************************************/
 template <class F, class G, class ATA, class IB>  Matrix<typename F::ET>
 minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
-			  u_int niter_max=100, double tol=1.5e-8)
+			  size_t niter_max=100, double tol=1.5e-8)
 {
     using namespace					std;
     typedef typename F::element_type			element_type;
@@ -506,7 +506,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     typedef Matrix<element_type>			matrix_type;
     typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
 
-    const u_int		nb = distance(bbegin, bend);
+    const size_t	nb = distance(bbegin, bend);
     Array<vector_type>	fval(nb);	// function values.
     element_type	sqr = 0;	// sum of squares.
     int			j = 0;
@@ -517,12 +517,12 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     }
     element_type	lambda = 1.0e-7;		// L-M parameter.
 
-    for (u_int n = 0; n++ < niter_max; )
+    for (size_t n = 0; n++ < niter_max; )
     {
-	const u_int		adim = f.adim();
-	const u_int		bdim = f.bdim() * nb;
+	const size_t		adim = f.adim();
+	const size_t		bdim = f.bdim() * nb;
       	const vector_type&	gval = g(a);
-	const u_int		gdim = gval.size();
+	const size_t		gdim = gval.size();
 	matrix_type		U(adim, adim);
 	vector_type		Jtf(adim);
 	Array<matrix_type>	V(nb);
@@ -552,20 +552,20 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	{
 	  // Compute da: update for parameters a to be estimated.
 	    A(0, 0, adim, adim) = U;
-	    for (u_int i = 0; i < adim; ++i)
+	    for (size_t i = 0; i < adim; ++i)
 		A[i][i] *= (1.0 + lambda);
-	    for (u_int j = 0; j < nb; ++j)
+	    for (size_t j = 0; j < nb; ++j)
 	    {
 		A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
 		    = V[j];
-		for (u_int k = 0; k < f.bdim(); ++k)
+		for (size_t k = 0; k < f.bdim(); ++k)
 		    A[adim + j*f.bdim() + k][adim + j*f.bdim() + k]
 			*= (1.0 + lambda);
 	    }
 
 	    vector_type	dx(adim + bdim + gdim);
 	    dx(0, adim) = Jtf;
-	    for (u_int j = 0; j < nb; ++j)
+	    for (size_t j = 0; j < nb; ++j)
 		dx(adim + j*f.bdim(), f.bdim()) = Ktf[j];
 	    dx(adim + bdim, gdim) = gval;
 	    dx.solve(A);
@@ -577,7 +577,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    copy(bbegin, bend, b_new.begin());
 	    Array<vector_type>	fval_new(nb);
 	    element_type	sqr_new = 0;
-	    for (u_int j = 0; j < nb; ++j)
+	    for (size_t j = 0; j < nb; ++j)
 	    {
 		const vector_type& db = dx(adim + j*f.bdim(), f.bdim());
 	      //		cerr << "*** check:  "
@@ -595,7 +595,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
 	    {
 		A(0, 0, adim, adim) = U;
-		for (u_int j = 0; j < nb; ++j)
+		for (size_t j = 0; j < nb; ++j)
 		    A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
 			= V[j];
 		vector_type	evalue;

@@ -73,7 +73,7 @@ class Heap
     typedef value_compare			key_compare;
     
   public:
-    explicit Heap(u_int d=0, const Cmp& cmp=Cmp())	;
+    explicit Heap(size_t d=0, const Cmp& cmp=Cmp())	;
     Heap(Array<T>& a, const Cmp& cmp=Cmp())		;
 
   //! ヒープの先頭要素(最大要素)を指す反復子を返す．
@@ -122,11 +122,11 @@ class Heap
     void	resize(size_t d)		;
     
   private:
-    void	upheap(u_int current)		;
-    void	downheap(u_int current)		;
+    void	upheap(size_t current)		;
+    void	downheap(size_t current)	;
     
     Array<T>	_array;
-    u_int	_n;		// # of elements in the heap.
+    size_t	_n;		// # of elements in the heap.
     const Cmp	_cmp;
 };
 
@@ -136,7 +136,7 @@ class Heap
   \param cmp	比較関数オブジェクト
 */
 template <class T, class Cmp>
-Heap<T, Cmp>::Heap(u_int d, const Cmp& cmp)
+Heap<T, Cmp>::Heap(size_t d, const Cmp& cmp)
     :_array(d), _n(0), _cmp(cmp)
 {
 }
@@ -150,7 +150,7 @@ template <class T, class Cmp>
 Heap<T, Cmp>::Heap(Array<T>& a, const Cmp& cmp)
     :_array(a.data(), a.size()), _n(a.size()), _cmp(cmp)
 {
-    for (u_int i = _n / 2; i > 0; )
+    for (size_t i = _n / 2; i > 0; )
 	downheap(--i);
 }
 
@@ -243,12 +243,12 @@ Heap<T, Cmp>::resize(size_t d)
 }
     
 template <class T, class Cmp> void
-Heap<T, Cmp>::upheap(u_int current)
+Heap<T, Cmp>::upheap(size_t current)
 {
     T	val = _array[current];
     while (current > 0)				// While having a parent...
     {
-	u_int	parent = (current - 1) / 2;	// Index of the parent node.
+	size_t	parent = (current - 1) / 2;	// Index of the parent node.
 	if (!_cmp(_array[parent], val))
 	    break;
 	
@@ -259,10 +259,10 @@ Heap<T, Cmp>::upheap(u_int current)
 }
 
 template <class T, class Cmp> void
-Heap<T, Cmp>::downheap(u_int current)
+Heap<T, Cmp>::downheap(size_t current)
 {
     T	val = _array[current];
-    for (u_int child; (child = 2 * current + 1) < _n; )
+    for (size_t child; (child = 2 * current + 1) < _n; )
     {
 	if (child + 1 < _n && _cmp(_array[child], _array[child + 1]))
 	    ++child;				// Choose larger child.
@@ -291,7 +291,7 @@ sort(Array<T>& a, const Cmp& cmp)
 
   // 後ろから a[] に代入しないと a[] の領域を内部で共有している
   // ヒープを壊してしまうことに注意．
-    for (u_int i = a.size(); i > 0; )
+    for (size_t i = a.size(); i > 0; )
 	a[--i] = heap.pop();
 }
  

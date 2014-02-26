@@ -62,7 +62,7 @@ class BezierCurve : private Array<C>
   /*!
     \param p	次数
   */
-    BezierCurve(u_int p=0)	:super(p+1)	{}
+    BezierCurve(size_t p=0)	:super(p+1)	{}
 
   //! 指定した制御点を持つBezier曲線を作る．
   /*!
@@ -74,23 +74,23 @@ class BezierCurve : private Array<C>
   /*!
     \return	空間の次元
   */
-    static u_int	dim()			{return coord_type::size();}
+    static size_t	dim()			{return coord_type::size();}
 
   //! 曲線の次数(= 制御点数-1)を調べる．
   /*!
     \return	次数
   */
-    u_int	degree()		const	{return super::size()-1;}
+    size_t	degree()		const	{return super::size()-1;}
 
     coord_type	operator ()(element_type t)		const	;
-    coord_array	deCasteljau(element_type t, u_int r)	const	;
+    coord_array	deCasteljau(element_type t, size_t r)	const	;
     void	elevateDegree()					;
 
   //! 制御点の1次元配列へのポインタを返す．
   /*!
     \return	制御点の配列へのポインタ
   */
-		operator const element_type*()	const	{return (*this)[0];}
+    const element_type*	data()		const	{return (*this)[0].data();}
 
     friend	class Array2<BezierCurve>;	// allow access to resize.
     
@@ -132,7 +132,7 @@ BezierCurve<C>::operator ()(element_type t) const
     element_type	s = 1.0 - t, fact = 1.0;
     int			nCi = 1;
     coord_type	b((*this)[0] * s);
-    for (u_int i = 1; i < degree(); ++i)
+    for (size_t i = 1; i < degree(); ++i)
     {
 	fact *= t;
       /* 
@@ -152,15 +152,15 @@ BezierCurve<C>::operator ()(element_type t) const
   \param r
 */
 template <class C> Array<C>
-BezierCurve<C>::deCasteljau(element_type t, u_int r) const
+BezierCurve<C>::deCasteljau(element_type t, size_t r) const
 {
     if (r > degree())
 	r = degree();
 
     const element_type	s = 1.0 - t;
     Array<coord_type>	b_tmp(*this);
-    for (u_int k = 1; k <= r; ++k)
-	for (u_int i = 0; i <= degree() - k; ++i)
+    for (size_t k = 1; k <= r; ++k)
+	for (size_t i = 0; i <= degree() - k; ++i)
 	    (b_tmp[i] *= s) += t * b_tmp[i+1];
     b_tmp.resize(degree() - r + 1);
     return b_tmp;
@@ -173,7 +173,7 @@ BezierCurve<C>::elevateDegree()
     coord_array	b_tmp(*this);
     super::resize(degree() + 2);
     (*this)[0] = b_tmp[0];
-    for (u_int i = 1; i < degree(); ++i)
+    for (size_t i = 1; i < degree(); ++i)
     {
 	element_type	alpha = element_type(i) / element_type(degree());
 	
@@ -217,7 +217,7 @@ class BezierSurface : private Array2<BezierCurve<C> >
     \param p	横方向次数
     \param q	縦方向次数
   */
-    BezierSurface(u_int p, u_int q) :super(q+1, p+1)	{}
+    BezierSurface(size_t p, size_t q) :super(q+1, p+1)	{}
 
     BezierSurface(const coord_array2& b)		;
 
@@ -225,24 +225,24 @@ class BezierSurface : private Array2<BezierCurve<C> >
   /*!
     \return	空間の次元
   */
-    static u_int	dim()			{return coord_type::size();}
+    static size_t	dim()			{return coord_type::size();}
 
   //! 曲面の横方向次数を調べる．
   /*!
     \return	横方向次数
   */
-    u_int	uDegree()		const	{return super::ncol()-1;}
+    size_t	uDegree()		const	{return super::ncol()-1;}
 
   //! 曲面の縦方向次数を調べる．
   /*!
     \return	縦方向次数
   */
-    u_int	vDegree()		const	{return super::nrow()-1;}
+    size_t	vDegree()		const	{return super::nrow()-1;}
 
     coord_type	operator ()(element_type u, element_type v)	const	;
     coord_array2
 		deCasteljau(element_type u, element_type v,
-			    u_int r)				const	;
+			    size_t r)				const	;
     void	uElevateDegree()					;
     void	vElevateDegree()					;
 
@@ -250,7 +250,7 @@ class BezierSurface : private Array2<BezierCurve<C> >
   /*!
     \return	制御点の配列へのポインタ
   */
-		operator const element_type*()	const	{return (*this)[0][0];}
+    const element_type*	data()		const	{return (*this)[0][0].data();}
 
     using	super::operator [];
     using	super::operator ==;
@@ -287,8 +287,8 @@ template <class C>
 BezierSurface<C>::BezierSurface(const coord_array2& b)
     :super(b.nrow(), b.ncol())
 {
-    for (u_int j = 0; j <= vDegree(); ++j)
-	for (u_int i = 0; i <= uDegree(); ++i)
+    for (size_t j = 0; j <= vDegree(); ++j)
+	for (size_t i = 0; i <= uDegree(); ++i)
 	    (*this)[j][i] = b[j][i];
 }
 
@@ -302,7 +302,7 @@ template <class C> typename BezierSurface<C>::coord_type
 BezierSurface<C>::operator ()(element_type u, element_type v) const
 {
     curve_type	vCurve(vDegree());
-    for (u_int j = 0; j <= vDegree(); ++j)
+    for (size_t j = 0; j <= vDegree(); ++j)
 	vCurve[j] = (*this)[j](u);
     return vCurve(v);
 }

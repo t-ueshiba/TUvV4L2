@@ -51,7 +51,7 @@ namespace TU
   \param F	面の型．Mesh<V, F, M>::Faceの派生クラスでなければならない．
   \param M	1つの面が持つ辺の数
 */
-template <class V, class F, u_int M=3u>
+template <class V, class F, size_t M=3u>
 class Mesh
 {
   public:
@@ -73,8 +73,8 @@ class Mesh
     class Face
     {
       public:
-	V&		v(u_int e)				const	;
-	F&		f(u_int e)				const	;
+	V&		v(size_t e)				const	;
+	F&		f(size_t e)				const	;
 	
 	friend class	Edge;
 
@@ -82,7 +82,7 @@ class Mesh
 #ifndef TUMeshPP_DEBUG
 	Face(viterator v[])						;
 #else
-	Face(viterator v[], u_int fn)					;
+	Face(viterator v[], size_t fn)					;
 #endif
 	
       private:
@@ -93,7 +93,7 @@ class Mesh
 	fiterator	_f[NSides];	//!< この面に隣接する面を指す反復子
 #ifdef TUMeshPP_DEBUG
       public:
-	const u_int	fnum;
+	const size_t	fnum;
 #endif
     };
 
@@ -108,11 +108,11 @@ class Mesh
 	
 	V&		v()					const	;
 	F&		f()					const	;
-	u_int		e()					const	;
+	size_t		e()					const	;
 	bool		operator ==(const Edge& edge)		const	;
 	bool		operator !=(const Edge& edge)		const	;
 	bool		commonVertex(const Edge& edge)		const	;
-	u_int		valence()				const	;
+	size_t		valence()				const	;
 	Edge&		operator ++()					;
 	Edge&		operator --()					;
 	Edge&		operator ~()					;
@@ -134,7 +134,7 @@ class Mesh
 
       private:
 	fiterator	_f;		//!< 親の面を指す反復子
-	u_int		_e;		//!< 辺の番号
+	size_t		_e;		//!< 辺の番号
     };
 
   private:
@@ -229,18 +229,18 @@ class Mesh
   \param vertex	M個の頂点
   \return	v[0] を始点とする辺
 */
-template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
+template <class V, class F, size_t M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::initialize(const V vertex[])
 {
   // 表の面を生成する．
     viterator	v[NSides];
-    for (u_int e = 0; e < NSides; ++e)
+    for (size_t e = 0; e < NSides; ++e)
 	v[e] = newVertex(vertex[e]);
     fiterator	f = newFace(F(v));
 
   // 裏の面を生成する．
     viterator	vC[NSides];
-    for (u_int e = 0; e < NSides; ++e)
+    for (size_t e = 0; e < NSides; ++e)
 	vC[e] = v[NSides-1-e];
     fiterator	fC = newFace(F(vC));
 
@@ -256,7 +256,7 @@ Mesh<V, F, M>::initialize(const V vertex[])
 }
 
 //! メッシュの全ての頂点と面を消去して空にする．
-template <class V, class F, u_int M> inline void
+template <class V, class F, size_t M> inline void
 Mesh<V, F, M>::clear()
 {
     _vertices.clear();
@@ -270,7 +270,7 @@ Mesh<V, F, M>::clear()
 		リターン後はedgeの手前の裏の辺を指すように更新される．
   \return	edgeの裏の手前の裏の辺を指す反復子
 */
-template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
+template <class V, class F, size_t M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::kill(Edge& edge)
 {
     using namespace	std;
@@ -324,7 +324,7 @@ Mesh<V, F, M>::kill(Edge& edge)
   \param v	新たな辺およびedge0の始点となる頂点
   \return	新たな辺
 */
-template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
+template <class V, class F, size_t M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::make(const Edge& edge0, const Edge& edge1, const V& v)
 {
     using namespace	std;
@@ -373,7 +373,7 @@ Mesh<V, F, M>::make(const Edge& edge0, const Edge& edge1, const V& v)
   \param edge	消去する辺
   \return	生成された辺
 */
-template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
+template <class V, class F, size_t M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::swap(const Edge& edge)
 {
     using namespace	std;
@@ -411,13 +411,13 @@ Mesh<V, F, M>::swap(const Edge& edge)
 /*!
   \return	bounding box
 */
-template <class V, class F, u_int M> BoundingBox<V>
+template <class V, class F, size_t M> BoundingBox<V>
 Mesh<V, F, M>::boundingBox() const
 {
     BoundingBox<V>	bbox;
     
     for (const_fiterator f = _faces.begin(); f != _faces.end(); ++f)
-	for (u_int e = 0; e < NSides; ++e)
+	for (size_t e = 0; e < NSides; ++e)
 	    bbox.expand(f->v(e));
     
     return bbox;
@@ -427,7 +427,7 @@ Mesh<V, F, M>::boundingBox() const
 /*!
   \return	最初の頂点を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::vbegin()
 {
     return _vertices.begin();
@@ -437,7 +437,7 @@ Mesh<V, F, M>::vbegin()
 /*!
   \return	最初の頂点を指す定数反復子
 */
-template <class V, class F, u_int M>
+template <class V, class F, size_t M>
 inline typename Mesh<V, F, M>::const_viterator
 Mesh<V, F, M>::vbegin() const
 {
@@ -448,7 +448,7 @@ Mesh<V, F, M>::vbegin() const
 /*!
   \return	最後の頂点の次を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::vend()
 {
     return _vertices.end();
@@ -458,7 +458,7 @@ Mesh<V, F, M>::vend()
 /*!
   \return	最後の頂点の次を指す定数反復子
 */
-template <class V, class F, u_int M>
+template <class V, class F, size_t M>
 inline typename Mesh<V, F, M>::const_viterator
 Mesh<V, F, M>::vend() const
 {
@@ -469,7 +469,7 @@ Mesh<V, F, M>::vend() const
 /*!
   \return	最初の面を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::fbegin()
 {
     return _faces.begin();
@@ -479,7 +479,7 @@ Mesh<V, F, M>::fbegin()
 /*!
   \return	最初の面を指す定数反復子
 */
-template <class V, class F, u_int M>
+template <class V, class F, size_t M>
 inline typename Mesh<V, F, M>::const_fiterator
 Mesh<V, F, M>::fbegin() const
 {
@@ -490,7 +490,7 @@ Mesh<V, F, M>::fbegin() const
 /*!
   \return	最後の面の次を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::fend()
 {
     return _faces.end();
@@ -500,7 +500,7 @@ Mesh<V, F, M>::fend()
 /*!
   \return	最後の面の次を指す定数反復子
 */
-template <class V, class F, u_int M>
+template <class V, class F, size_t M>
 inline typename Mesh<V, F, M>::const_fiterator
 Mesh<V, F, M>::fend() const
 {
@@ -513,13 +513,13 @@ Mesh<V, F, M>::fend() const
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-template <class V, class F, u_int M> std::ostream&
+template <class V, class F, size_t M> std::ostream&
 Mesh<V, F, M>::showTopology(std::ostream& out) const
 {
     for (const_fiterator f = _faces.begin(); f != _faces.end(); ++f)
     {
 	out << "Face[" << f->fnum << "]:";
-	for (u_int e = 0; e < NSides; ++e)
+	for (size_t e = 0; e < NSides; ++e)
 	    out << ' ' << f->f(e).fnum;
 	out << std::endl;
     }
@@ -533,7 +533,7 @@ Mesh<V, F, M>::showTopology(std::ostream& out) const
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-template <class V, class F, u_int M> std::istream&
+template <class V, class F, size_t M> std::istream&
 Mesh<V, F, M>::restoreSTL(std::istream& in)
 {
     using namespace	std;
@@ -547,17 +547,17 @@ Mesh<V, F, M>::restoreSTL(std::istream& in)
     char	header[80];
     in.read(header, sizeof(header));		// ヘッダ(80文字)を読み捨てる.
     
-    u_int	nfaces;
+    size_t	nfaces;
     in.read((char*)&nfaces, sizeof(nfaces));	// 面数を読み込む.
 
     VerticesWithFaces	verticesWithFaces;
-    for (u_int i = 0; i < nfaces; ++i)
+    for (size_t i = 0; i < nfaces; ++i)
     {
 	Vector3f	normal;
 	normal.restore(in);			// 法線ベクトルを読み捨てる.
 
 	VertexIterator	vf[3];
-	for (u_int e = 0; e < 3; ++e)
+	for (size_t e = 0; e < 3; ++e)
 	{
 	    V		vertex;
 	    vertex.restore(in);			// 頂点の3D座標を読み込む.
@@ -594,14 +594,14 @@ Mesh<V, F, M>::restoreSTL(std::istream& in)
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-template <class V, class F, u_int M> std::ostream&
+template <class V, class F, size_t M> std::ostream&
 Mesh<V, F, M>::saveSTL(std::ostream& out) const
 {
     char	header[80];
     std::fill(header, header + 80, '\0');
     out.write(header, sizeof(header));		// ヘッダ(80文字)を書き出す.
 
-    u_int	nfaces = _faces.size();
+    size_t	nfaces = _faces.size();
     out.write((char*)&nfaces, sizeof(nfaces));	// 面数を書き出す.
 
     for (const_fiterator f = fbegin(); f != fend(); ++f)
@@ -627,7 +627,7 @@ Mesh<V, F, M>::saveSTL(std::ostream& out) const
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-template <class V, class F, u_int M> std::istream&
+template <class V, class F, size_t M> std::istream&
 Mesh<V, F, M>::get(std::istream& in)
 {
     using namespace	std;
@@ -644,7 +644,7 @@ Mesh<V, F, M>::get(std::istream& in)
     while (in >> c && c == 'V')
     {
 	char		dummy[64];
-	u_int		vnum;
+	size_t		vnum;
 	V		vertex;
 	in >> dummy >> vnum >> vertex;		// 頂点を読み込む．
 	viterator	v = newVertex(vertex);	// 新しい頂点を生成
@@ -658,12 +658,12 @@ Mesh<V, F, M>::get(std::istream& in)
     while (in >> c && c == 'F')
     {
 	char	dummy[64];
-	u_int	fnum;
+	size_t	fnum;
 	in >> dummy >> fnum;		// 面番号をスキップ．
 
 	viterator	v[NSides];	// この面の頂点を指す全反復子
-	u_int		vnum[NSides];	// この面の頂点の全番号
-	for (u_int e = 0; e < NSides; ++e)
+	size_t		vnum[NSides];	// この面の頂点の全番号
+	for (size_t e = 0; e < NSides; ++e)
 	{
 	    in >> vnum[e];		// この面の頂点の番号を読み込む．
 	    --vnum[e];			// 頂点番号は1から始まるのでデクリメント
@@ -675,7 +675,7 @@ Mesh<V, F, M>::get(std::istream& in)
 	fiterator	f = newFace(F(v, fnum));	// 新しい面を生成
 #endif
       // 個々の頂点に自身の親としてこの面を登録する．
-	for (u_int e = 0; e < NSides; ++e)
+	for (size_t e = 0; e < NSides; ++e)
 	    verticesWithFaces[vnum[e]].second.push_back(f);
     }
     if (in)
@@ -691,23 +691,23 @@ Mesh<V, F, M>::get(std::istream& in)
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-template <class V, class F, u_int M> std::ostream&
+template <class V, class F, size_t M> std::ostream&
 Mesh<V, F, M>::put(std::ostream& out) const
 {
     using namespace	std;
     
-    map<const V*, u_int>	dict;
-    u_int			vnum = 1;
+    map<const V*, size_t>	dict;
+    size_t			vnum = 1;
     for (const_viterator v = vbegin(); v != vend(); ++v)
     {
 	dict[&(*v)] = vnum;
 	out << "Vertex " << vnum++ << ' ' << *v;
     }
-    u_int	fnum = 1;
+    size_t	fnum = 1;
     for (const_fiterator f = fbegin(); f != fend(); ++f)
     {
 	out << "Face " << fnum++;
-	for (u_int e = 0; e < NSides; ++e)
+	for (size_t e = 0; e < NSides; ++e)
 	    out << ' ' << dict[&(f->v(e))];
 	out << std::endl;
     }
@@ -715,7 +715,7 @@ Mesh<V, F, M>::put(std::ostream& out) const
     return out;
 }
 
-template <class V, class F, u_int M> template <class VF> void
+template <class V, class F, size_t M> template <class VF> void
 Mesh<V, F, M>::setTopology(const VF& verticesWithFaces)
 {
     typedef typename VF::const_iterator			VertexIterator;
@@ -767,7 +767,7 @@ Mesh<V, F, M>::setTopology(const VF& verticesWithFaces)
  \param f	生成する頂点のプロトタイプ
  \return	生成された頂点を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::newVertex(const V& v)
 {
     _vertices.push_front(v);
@@ -779,7 +779,7 @@ Mesh<V, F, M>::newVertex(const V& v)
  \param f	生成する面のプロトタイプ
  \return	生成された面を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::newFace(const F& f)
 {
     _faces.push_front(f);
@@ -790,7 +790,7 @@ Mesh<V, F, M>::newFace(const F& f)
 /*!
  \param f	破壊する頂点を指す反復子
 */
-template <class V, class F, u_int M> inline void
+template <class V, class F, size_t M> inline void
 Mesh<V, F, M>::deleteVertex(viterator v)
 {
     _vertices.erase(v);
@@ -800,7 +800,7 @@ Mesh<V, F, M>::deleteVertex(viterator v)
 /*!
  \param f	破壊する面を指す反復子
 */
-template <class V, class F, u_int M> inline void
+template <class V, class F, size_t M> inline void
 Mesh<V, F, M>::deleteFace(fiterator f)
 {
     _faces.erase(f);
@@ -813,15 +813,15 @@ Mesh<V, F, M>::deleteFace(fiterator f)
 /*!
   \param v	M個の頂点への反復子
 */
-template <class V, class F, u_int M> inline
+template <class V, class F, size_t M> inline
 #ifndef TUMeshPP_DEBUG
 Mesh<V, F, M>::Face::Face(viterator v[])
 #else
-Mesh<V, F, M>::Face::Face(viterator v[], u_int fn)
+Mesh<V, F, M>::Face::Face(viterator v[], size_t fn)
     :fnum(fn)
 #endif
 {
-    for (u_int e = 0; e < NSides; ++e)
+    for (size_t e = 0; e < NSides; ++e)
 	_v[e] = v[e];
 }
 
@@ -830,8 +830,8 @@ Mesh<V, F, M>::Face::Face(viterator v[], u_int fn)
   \param e	辺のindex, 0 <= e < M
   \return	e番目の辺の始点すなわちこの面のe番目の頂点
 */
-template <class V, class F, u_int M> inline V&
-Mesh<V, F, M>::Face::v(u_int e) const
+template <class V, class F, size_t M> inline V&
+Mesh<V, F, M>::Face::v(size_t e) const
 {
     return *_v[e];
 }
@@ -841,8 +841,8 @@ Mesh<V, F, M>::Face::v(u_int e) const
   \param e	辺のindex, 0 <= e < M
   \return	e番目の辺を介して隣接する面
 */
-template <class V, class F, u_int M> inline F&
-Mesh<V, F, M>::Face::f(u_int e) const
+template <class V, class F, size_t M> inline F&
+Mesh<V, F, M>::Face::f(size_t e) const
 {
     return *_f[e];
 }
@@ -851,13 +851,13 @@ Mesh<V, F, M>::Face::f(u_int e) const
 /*!
   \return	この面を指す反復子
 */
-template <class V, class F, u_int M> typename Mesh<V, F, M>::fiterator
+template <class V, class F, size_t M> typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::Face::self() const
 {
     using namespace	std;
     
     fiterator	fC = _f[0];		// 0番目の辺を介して隣接する面
-    for (u_int e = 0; e < NSides; ++e)
+    for (size_t e = 0; e < NSides; ++e)
     {					// fCのe番目の辺を
 	fiterator	f = fC->_f[e];	// 介して隣接する面への反復子fが
 	if (&(*f) == this)		// この面を指していたら
@@ -876,7 +876,7 @@ Mesh<V, F, M>::Face::self() const
 /*!
   \param face	面
 */
-template <class V, class F, u_int M> inline
+template <class V, class F, size_t M> inline
 Mesh<V, F, M>::Edge::Edge(const Face& face)
     :_f(face.self()), _e(0)
 {
@@ -886,7 +886,7 @@ Mesh<V, F, M>::Edge::Edge(const Face& face)
 /*!
   \return	この辺の始点
 */
-template <class V, class F, u_int M> inline V&
+template <class V, class F, size_t M> inline V&
 Mesh<V, F, M>::Edge::v() const
 {
     return *viter();
@@ -896,7 +896,7 @@ Mesh<V, F, M>::Edge::v() const
 /*!
   \return	この辺を所有する面
 */
-template <class V, class F, u_int M> inline F&
+template <class V, class F, size_t M> inline F&
 Mesh<V, F, M>::Edge::f() const
 {
     return *fiter();
@@ -906,7 +906,7 @@ Mesh<V, F, M>::Edge::f() const
 /*!
   \return	辺の番号
 */
-template <class V, class F, u_int M> inline u_int
+template <class V, class F, size_t M> inline size_t
 Mesh<V, F, M>::Edge::e() const
 {
     return _e;
@@ -917,7 +917,7 @@ Mesh<V, F, M>::Edge::e() const
   \param edge	比較対象の辺
   \return	同一ならtrue, そうでなければfalse
 */
-template <class V, class F, u_int M> inline bool
+template <class V, class F, size_t M> inline bool
 Mesh<V, F, M>::Edge::operator ==(const Edge& edge) const
 {
     return (_e == edge._e) && (_f == edge._f);
@@ -928,7 +928,7 @@ Mesh<V, F, M>::Edge::operator ==(const Edge& edge) const
   \param edge	比較対象の辺
   \return	異なればtrue, そうでなければfalse
 */
-template <class V, class F, u_int M> inline bool
+template <class V, class F, size_t M> inline bool
 Mesh<V, F, M>::Edge::operator !=(const Edge& edge) const
 {
     return !(*this == edge);
@@ -939,7 +939,7 @@ Mesh<V, F, M>::Edge::operator !=(const Edge& edge) const
   \param edge	比較対象の辺
   \return	共有していればtrue, そうでなければfalse
 */
-template <class V, class F, u_int M> bool
+template <class V, class F, size_t M> bool
 Mesh<V, F, M>::Edge::commonVertex(const Edge& edge) const
 {
     Edge	tmp(*this);
@@ -956,10 +956,10 @@ Mesh<V, F, M>::Edge::commonVertex(const Edge& edge) const
 /*!
   \return	辺の始点の価数
 */
-template <class V, class F, u_int M> u_int
+template <class V, class F, size_t M> size_t
 Mesh<V, F, M>::Edge::valence() const
 {
-    u_int	n = 0;
+    size_t	n = 0;
     Edge	edge(*this);
     do
     {
@@ -973,7 +973,7 @@ Mesh<V, F, M>::Edge::valence() const
 /*!
   \return	前進後の辺
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator ++()
 {
     if (_e == NSides - 1)
@@ -987,7 +987,7 @@ Mesh<V, F, M>::Edge::operator ++()
 /*!
   \return	後退後の辺
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator --()
 {
     if (_e == 0)
@@ -1001,7 +1001,7 @@ Mesh<V, F, M>::Edge::operator --()
 /*!
   \return	移動後の辺
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge&
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::Edge&
 Mesh<V, F, M>::Edge::operator ~()
 {
     return *this = conj();
@@ -1011,7 +1011,7 @@ Mesh<V, F, M>::Edge::operator ~()
 /*!
   \return	次の辺
 */
-    template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge
+    template <class V, class F, size_t M> inline typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::Edge::next() const
 {
     Edge	edge(*this);
@@ -1022,7 +1022,7 @@ Mesh<V, F, M>::Edge::next() const
 /*!
   \return	手前の辺
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::Edge
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::Edge::prev() const
 {
     Edge	edge(*this);
@@ -1033,7 +1033,7 @@ Mesh<V, F, M>::Edge::prev() const
 /*!
   \return	裏側の辺
 */
-template <class V, class F, u_int M> typename Mesh<V, F, M>::Edge
+template <class V, class F, size_t M> typename Mesh<V, F, M>::Edge
 Mesh<V, F, M>::Edge::conj() const
 {
     viterator	vn = next().viter();	// この辺の終点
@@ -1047,7 +1047,7 @@ Mesh<V, F, M>::Edge::conj() const
 /*!
   \return	この辺を所有する面を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::fiterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::Edge::fiter() const
 {
     return _f;
@@ -1057,7 +1057,7 @@ Mesh<V, F, M>::Edge::fiter() const
 /*!
   \return	この辺の始点を指す反復子
 */
-template <class V, class F, u_int M> inline typename Mesh<V, F, M>::viterator
+template <class V, class F, size_t M> inline typename Mesh<V, F, M>::viterator
 Mesh<V, F, M>::Edge::viter() const
 {
     return _f->_v[_e];
@@ -1067,7 +1067,7 @@ Mesh<V, F, M>::Edge::viter() const
 /*!
   \param f	面を指す反復子
 */
-template <class V, class F, u_int M> inline
+template <class V, class F, size_t M> inline
 Mesh<V, F, M>::Edge::Edge(fiterator f)
     :_f(f), _e(0)
 {
@@ -1077,7 +1077,7 @@ Mesh<V, F, M>::Edge::Edge(fiterator f)
 /*!
   \param edge	背中合わせの対象となる辺
 */
-template <class V, class F, u_int M> inline void
+template <class V, class F, size_t M> inline void
 Mesh<V, F, M>::Edge::pair(const Edge& edge) const
 {
     _f->_f[_e] = edge._f;	// この辺の裏面をedgeの親面に
@@ -1090,7 +1090,7 @@ Mesh<V, F, M>::Edge::pair(const Edge& edge) const
   \param v	頂点を指す反復子
   \param edgeE	走査の終点となる辺 (この辺の始点は置き換えられない)
 */
-template <class V, class F, u_int M> void
+template <class V, class F, size_t M> void
 Mesh<V, F, M>::Edge::replaceVertex(viterator v, const Edge& edgeE) const
 {
   // 先に始点を書き換えてしまうと裏に移れなくなってしまうので，
@@ -1106,7 +1106,7 @@ Mesh<V, F, M>::Edge::replaceVertex(viterator v, const Edge& edgeE) const
 /*!
   \param v	頂点を指す反復子
 */
-template <class V, class F, u_int M> inline void
+template <class V, class F, size_t M> inline void
 Mesh<V, F, M>::Edge::replaceVertex(viterator v) const
 {
     _f->_v[_e] = v;

@@ -87,7 +87,7 @@ class IntrinsicBase
     void		setK(const matrix33_type& K)			;
     void		setDistortion(element_type, element_type)	;
     
-    static u_int	dofIntrinsic()					;
+    static size_t	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
     std::istream&	get(std::istream& in)				;
@@ -404,7 +404,7 @@ IntrinsicBase<T>::setDistortion(element_type, element_type)
 /*!
   \return	可変内部パラメータの自由度, すなわち0
 */
-template <class T> inline u_int
+template <class T> inline size_t
 IntrinsicBase<T>::dofIntrinsic()
 {
     return 0;
@@ -524,7 +524,7 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
     using		super::u;
     using		super::Jx;
     
-    static u_int	dofIntrinsic()					;
+    static size_t	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
   protected:
@@ -550,7 +550,7 @@ IntrinsicWithFocalLength<T>::IntrinsicWithFocalLength(
 /*!
   \return	可変内部パラメータの自由度, すなわち1
 */
-template <class T> inline u_int
+template <class T> inline size_t
 IntrinsicWithFocalLength<T>::dofIntrinsic()
 {
     return 1;
@@ -617,7 +617,7 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
     using		super::u;
     using		super::Jx;
     
-    static u_int	dofIntrinsic()					;
+    static size_t	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
   protected:
@@ -643,7 +643,7 @@ IntrinsicWithEuclideanImagePlane<T>::IntrinsicWithEuclideanImagePlane(
 /*!
   \return	可変内部パラメータの自由度, すなわち3
 */
-template <class T> inline u_int
+template <class T> inline size_t
 IntrinsicWithEuclideanImagePlane<T>::dofIntrinsic()
 {
     return super::dofIntrinsic() + 2;
@@ -656,7 +656,7 @@ IntrinsicWithEuclideanImagePlane<T>::dofIntrinsic()
 template <class T> inline void
 IntrinsicWithEuclideanImagePlane<T>::updateIntrinsic(const vector_type& dp)
 {
-    const u_int	j = super::dofIntrinsic();
+    const size_t	j = super::dofIntrinsic();
     super::updateIntrinsic(dp(0, j));
     super::_u0[0] -= dp[j];
     super::_u0[1] -= dp[j + 1];
@@ -669,7 +669,7 @@ IntrinsicWithEuclideanImagePlane<T>::u(const point2_type& x,
     if (J)
     {
       // [画像主点に関する1階微分]
-	const u_int	j = 6 + super::dofIntrinsic();
+	const size_t	j = 6 + super::dofIntrinsic();
 	(*J)[0][j] = (*J)[1][j+1] = 1;
     }
     
@@ -698,7 +698,7 @@ class Intrinsic : public IntrinsicBase<T>
     Intrinsic(element_type k=1, const point2_type& u0=point2_type(0, 0),
 	      element_type a=1, element_type s=0)			;
 
-    static u_int	dofIntrinsic()					;
+    static size_t	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
     using		super::u;
@@ -727,7 +727,7 @@ Intrinsic<T>::Intrinsic(element_type k, const point2_type& u0,
 /*!
   \return	可変内部パラメータの自由度, すなわち5
 */
-template <class T> inline u_int
+template <class T> inline size_t
 Intrinsic<T>::dofIntrinsic()
 {
     return 5;
@@ -800,7 +800,7 @@ class IntrinsicWithDistortion : public I
     element_type	d2()					const	;
     void		setDistortion(element_type d1, element_type d2)	;
     
-    static u_int	dofIntrinsic()					;
+    static size_t	dofIntrinsic()					;
     void		updateIntrinsic(const vector_type& dp)		;
 
     std::istream&	get(std::istream& in)				;
@@ -948,7 +948,7 @@ IntrinsicWithDistortion<I>::setDistortion(element_type d1, element_type d2)
 /*!
   \return	可変内部パラメータの自由度
 */
-template <class I> inline u_int
+template <class I> inline size_t
 IntrinsicWithDistortion<I>::dofIntrinsic()
 {
     return super::dofIntrinsic() + 2;
@@ -961,7 +961,7 @@ IntrinsicWithDistortion<I>::dofIntrinsic()
 template <class I> inline void
 IntrinsicWithDistortion<I>::updateIntrinsic(const vector_type& dp)
 {
-    const u_int	j = super::dofIntrinsic();
+    const size_t	j = super::dofIntrinsic();
     super::updateIntrinsic(dp(0, j));
     _d1 -= dp[j];
     _d2 -= dp[j + 1];
@@ -1004,7 +1004,7 @@ IntrinsicWithDistortion<I>::u(const point2_type& x,
     {
       // [放射歪曲パラメータに関する1階微分]
 	const element_type	sqr = x * x;
-	const u_int		i = 6 + super::dofIntrinsic();
+	const size_t		i = 6 + super::dofIntrinsic();
 	(*J)[0][i]   = sqr * (super::k00() * x[0] + super::k01() * x[1]);
 	(*J)[1][i]   = sqr * (			    super::k()   * x[1]);
 	(*J)[0][i+1] = sqr * (*J)[0][i];
@@ -1138,7 +1138,7 @@ class CanonicalCamera
     point3_type		X(const point2_type& x,
 			  const plane_type& h)			const	;
     
-    static u_int	dof()						;
+    static size_t	dof()						;
     void		update(const vector_type& dp)			;
     void		updateFCC(const vector_type& dp)		;
 
@@ -1362,7 +1362,7 @@ CanonicalCamera<T>::X(const point2_type& x, const plane_type& h) const
 /*!
   \return	外部パラメータの自由度, すなわち6
 */
-template <class T> inline u_int
+template <class T> inline size_t
 CanonicalCamera<T>::dof()
 {
     return 6;
@@ -1507,7 +1507,7 @@ class Camera : public CanonicalCamera<typename I::element_type>, public I
     point3_type		X(const point2_type& u,
 			  const plane_type& h)			const	;
     
-    static u_int	dof()						;
+    static size_t	dof()						;
     void		update(const vector_type& dp)			;
     void		updateFCC(const vector_type& dp)		;
 
@@ -1743,7 +1743,7 @@ Camera<T>::X(const point2_type& u, const plane_type& h) const
 /*!
   \return	外部／可変内部パラメータの自由度, すなわち 6 + dofIntrinsic()
 */
-template <class I> inline u_int
+template <class I> inline size_t
 Camera<I>::dof()
 {
     return extrinsic_type::dof() + intrinsic_type::dofIntrinsic();

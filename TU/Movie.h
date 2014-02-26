@@ -53,7 +53,7 @@ template <class T> class Movie
 {
   public:
   //! 各ビューの幅と高さのペア
-    typedef std::pair<u_int, u_int>			Size;
+    typedef std::pair<size_t, size_t>			Size;
 
   private:
   //! ビュー
@@ -61,7 +61,7 @@ template <class T> class Movie
     {
 	View()	:Image<T>(), offset(0)					{}
 	
-	u_int	offset;		//!< フレームの先頭からの画像データ領域のオフセット
+	size_t	offset;		//!< フレームの先頭からの画像データ領域のオフセット
     };
 
   //! フレーム
@@ -71,14 +71,14 @@ template <class T> class Movie
 	typedef Array<T>				super;
 
       public:
-	explicit Frame(u_int n=0)	:super(n)	{super::operator =(0);}
+	explicit Frame(size_t n=0)	:super(n)	{super::operator =(0);}
     };
 
     typedef std::list<Frame>				Frames;
     typedef typename Frames::iterator			iterator;
 
   public:
-    Movie(u_int nviews=0)						;
+    Movie(size_t nviews=0)						;
 
   // Set sizes for each view.
     Movie<T>&		setSizes(const Array<Size>& sizes)		;
@@ -86,26 +86,26 @@ template <class T> class Movie
   // General information.
     bool		isCircularMode()			const	;
     Movie<T>&		setCircularMode(bool circular)			;
-    u_int		nviews()				const	;
-    u_int		width(u_int view)			const	;
-    u_int		height(u_int view)			const	;
-    const Image<T>&	image(u_int view)			const	;
-    Image<T>&		image(u_int view)			;
+    size_t		nviews()				const	;
+    size_t		width(size_t view)			const	;
+    size_t		height(size_t view)			const	;
+    const Image<T>&	image(size_t view)			const	;
+    Image<T>&		image(size_t view)			;
 
   // Handling frames.
 			operator bool()				const	;
-    u_int		nframes()				const	;
-    u_int		currentFrame()				const	;
-    Movie<T>&		setFrame(u_int frame)				;
+    size_t		nframes()				const	;
+    size_t		currentFrame()				const	;
+    Movie<T>&		setFrame(size_t frame)				;
     Movie<T>&		rewind()					;
     Movie<T>&		operator ++()					;
     Movie<T>&		operator --()					;
     
   // Edit movie.
-    Movie<T>&		insert(u_int n)					;
-    const Movie<T>&	copy(u_int n)				const	;
-    Movie<T>&		cut(u_int n)					;
-    u_int		paste()						;
+    Movie<T>&		insert(size_t n)					;
+    const Movie<T>&	copy(size_t n)				const	;
+    Movie<T>&		cut(size_t n)					;
+    size_t		paste()						;
     Movie<T>&		swap()						;
     
   // Restore/Save movie.
@@ -124,8 +124,8 @@ template <class T> class Movie
     ImageBase::TypeInfo	restoreHeader(std::istream& in)			;
     std::istream&	restoreFrames(std::istream& in,
 				      ImageBase::TypeInfo typeInfo,
-				      u_int m)				;
-    static u_int	npixels(u_int n)				;
+				      size_t m)				;
+    static size_t	npixels(size_t n)				;
     
   private:
     bool		_circular;	//!< 循環モード/非循環モード
@@ -133,7 +133,7 @@ template <class T> class Movie
     Frames		_frames;	//!< フレームの並び
     iterator		_dummy;		//!< フレームの末尾を表すダミーフレーム
     iterator		_current;	//!< 現フレーム
-    u_int		_cFrame;	//!< 現フレームの番号
+    size_t		_cFrame;	//!< 現フレームの番号
     mutable Frames	_buf;		//!< 編集用バッファ
 };
 
@@ -142,7 +142,7 @@ template <class T> class Movie
   \param nviews		ビュー数
 */
 template <class T> inline
-Movie<T>::Movie(u_int nviews)
+Movie<T>::Movie(size_t nviews)
     :_circular(false), _views(nviews), _frames(1),
      _dummy(_frames.begin()), _current(_dummy), _cFrame(0), _buf()
 {
@@ -159,8 +159,8 @@ Movie<T>::setSizes(const Array<Size>& sizes)
 {
   // ビュー数と各ビューのオフセットを設定．
     _views.resize(sizes.size());
-    u_int	n = 0;
-    for (u_int i = 0; i < nviews(); ++i)
+    size_t	n = 0;
+    for (size_t i = 0; i < nviews(); ++i)
     {
 	_views[i].offset = n;
 	n += npixels(sizes[i].first * sizes[i].second);
@@ -172,7 +172,7 @@ Movie<T>::setSizes(const Array<Size>& sizes)
     _dummy  = _frames.begin();
 
   // 各ビューにダミーフレームを設定．
-    for (u_int i = 0; i < nviews(); ++i)
+    for (size_t i = 0; i < nviews(); ++i)
 	_views[i].resize(_dummy->data() + _views[i].offset,
 			 sizes[i].second, sizes[i].first);
 
@@ -214,7 +214,7 @@ Movie<T>::setCircularMode(bool circular)
 /*!
   \return	view数
 */
-template <class T> inline u_int
+template <class T> inline size_t
 Movie<T>::nviews() const
 {
     return _views.size();
@@ -225,8 +225,8 @@ Movie<T>::nviews() const
   \param view	ビュー番号
   \return	画像の幅
 */
-template <class T> inline u_int
-Movie<T>::width(u_int view) const
+template <class T> inline size_t
+Movie<T>::width(size_t view) const
 {
     return _views[view].width();
 }
@@ -236,8 +236,8 @@ Movie<T>::width(u_int view) const
   \param view	ビュー番号
   \return	画像の高さ
 */
-template <class T> inline u_int
-Movie<T>::height(u_int view) const
+template <class T> inline size_t
+Movie<T>::height(size_t view) const
 {
     return _views[view].height();
 }
@@ -248,7 +248,7 @@ Movie<T>::height(u_int view) const
   \return	画像
 */
 template <class T> inline const Image<T>&
-Movie<T>::image(u_int view) const
+Movie<T>::image(size_t view) const
 {
     return _views[view];
 }
@@ -259,7 +259,7 @@ Movie<T>::image(u_int view) const
   \return	画像
 */
 template <class T> inline Image<T>&
-Movie<T>::image(u_int view)
+Movie<T>::image(size_t view)
 {
     return _views[view];
 }
@@ -279,7 +279,7 @@ Movie<T>::operator bool() const
 /*!
   \return	フレーム数
 */
-template <class T> inline u_int
+template <class T> inline size_t
 Movie<T>::nframes() const
 {
     return _frames.size() - 1;		// ダミーフレームはカウントしない．
@@ -289,7 +289,7 @@ Movie<T>::nframes() const
 /*!
   \return	フレーム番号
 */
-template <class T> inline u_int
+template <class T> inline size_t
 Movie<T>::currentFrame() const
 {
     return _cFrame;
@@ -303,7 +303,7 @@ Movie<T>::currentFrame() const
   \return	このムービー
 */
 template <class T> inline Movie<T>&
-Movie<T>::setFrame(u_int frame)
+Movie<T>::setFrame(size_t frame)
 {
     using namespace	std;
 
@@ -387,7 +387,7 @@ Movie<T>::operator --()
   \return	このムービー
 */
 template <class T> Movie<T>&
-Movie<T>::insert(u_int n)
+Movie<T>::insert(size_t n)
 {
     iterator	cur = _current;		// 現フレームを記憶する．
 
@@ -417,7 +417,7 @@ Movie<T>::insert(u_int n)
   \return	このムービー
  */
 template <class T> const Movie<T>&
-Movie<T>::copy(u_int n) const
+Movie<T>::copy(size_t n) const
 {
   // コピーされる領域の末尾を検出する．
     iterator	tail = _current;
@@ -436,7 +436,7 @@ Movie<T>::copy(u_int n) const
   \return	このムービー
  */
 template <class T> Movie<T>&
-Movie<T>::cut(u_int n)
+Movie<T>::cut(size_t n)
 {
   // カットされる領域の末尾を検出する．
     n = std::min(n, nframes() - _cFrame);
@@ -462,11 +462,11 @@ Movie<T>::cut(u_int n)
   編集用バッファは空になる．現フレームは挿入された領域の先頭になる．
   \return	挿入されたフレーム数
  */
-template <class T> u_int
+template <class T> size_t
 Movie<T>::paste()
 {
     iterator	cur = _current;		// 現フレームを記憶する．
-    u_int	n = _buf.size();	// 編集用バッファ中のフレーム数
+    size_t	n = _buf.size();	// 編集用バッファ中のフレーム数
     
   // 挿入後の _current の再設定に備える．
     if (_current == _frames.begin())	// 先頭に挿入するなら...
@@ -556,7 +556,7 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
     using namespace	std;
     
     out << 'M' << nviews() << endl;
-    for (u_int i = 0; i < nviews(); ++i)
+    for (size_t i = 0; i < nviews(); ++i)
 	type = _views[i].saveHeader(out, type);
     return type;
 }
@@ -571,7 +571,7 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
 template <class T> std::ostream&
 Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
 {
-    for (u_int i = 0; i < nviews(); ++i)
+    for (size_t i = 0; i < nviews(); ++i)
 	_views[i].saveData(out, type);
     return out;
 }
@@ -586,7 +586,7 @@ Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
 template <class T> Movie<T>&
 Movie<T>::setFrameToViews()
 {
-    for (u_int i = 0; i < _views.size(); ++i)
+    for (size_t i = 0; i < _views.size(); ++i)
 	_views[i].resize(_current->data() + _views[i].offset,
 			 _views[i].height(), _views[i].width());
     return *this;
@@ -605,14 +605,14 @@ Movie<T>::restoreHeader(std::istream& in)
 	throw runtime_error("TU::Movie<T>::restoreHeader: not a movie file!!");
 
   // ビュー数を読み込み，そのための領域を確保する．
-    u_int	nv;
+    size_t	nv;
     in >> nv >> skipl;
     _views.resize(nv);
 
   // 各ビューのヘッダを読み込み，その画像サイズをセットする．
     ImageBase::TypeInfo	typeInfo(ImageBase::DEFAULT);
     Array<Size>		sizes(nviews());
-    for (u_int i = 0; i < nviews(); ++i)
+    for (size_t i = 0; i < nviews(); ++i)
     {
 	typeInfo = _views[i].restoreHeader(in);
 	sizes[i] = make_pair(_views[i].width(), _views[i].height());
@@ -623,12 +623,13 @@ Movie<T>::restoreHeader(std::istream& in)
 }
 
 template <class T> std::istream&
-Movie<T>::restoreFrames(std::istream& in, ImageBase::TypeInfo typeInfo, u_int m)
+Movie<T>::restoreFrames(std::istream& in,
+			ImageBase::TypeInfo typeInfo, size_t m)
 {
     for (;;)
     {
       // とりあえずダミーフレームに読み込む．
-	for (u_int i = 0; i < nviews(); ++i)
+	for (size_t i = 0; i < nviews(); ++i)
 	    if (!_views[i].restoreData(in, typeInfo))
 		goto finish;
 
@@ -642,14 +643,14 @@ Movie<T>::restoreFrames(std::istream& in, ImageBase::TypeInfo typeInfo, u_int m)
     return in;
 }
 
-template <class T> inline u_int
-Movie<T>::npixels(u_int n)
+template <class T> inline size_t
+Movie<T>::npixels(size_t n)
 {
     return n;
 }
 
-template <> inline u_int
-Movie<YUV411>::npixels(u_int n)
+template <> inline size_t
+Movie<YUV411>::npixels(size_t n)
 {
     return n / 2;
 }

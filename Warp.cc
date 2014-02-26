@@ -214,7 +214,7 @@ bilinearInterpolate(const Image<u_char>& in, int us, int vs, int du, int dv)
 *  class Warp								*
 ************************************************************************/
 template <class T> void
-Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
+Warp::warpLine(const Image<T>& in, Image<T>& out, size_t v) const
 {
     const short		*usp  = _fracs[v].us.data(), *vsp = _fracs[v].vs.data();
     const u_char	*dup  = _fracs[v].du.data(), *dvp = _fracs[v].dv.data();
@@ -227,7 +227,7 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
     {
 	using namespace	std;
 
-	const u_int	npixels = Is16vec::size/4;
+	const size_t	npixels = Is16vec::size/4;
 	Is16vec		uu = load<true>(usp), vv = load<true>(vsp);
 	Iu8vec		du = load<true>(dup), dv = load<true>(dvp);
 	Iu8vec		du4 = quadup<0>(du), dv4 = quadup<0>(dv);
@@ -304,7 +304,7 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, u_int v) const
 }
 
 template <> __PORT void
-Warp::warpLine(const Image<YUV444>& in, Image<YUV444>& out, u_int v) const
+Warp::warpLine(const Image<YUV444>& in, Image<YUV444>& out, size_t v) const
 {
     const short		*usp  = _fracs[v].us.data(), *vsp = _fracs[v].vs.data();
     const u_char	*dup  = _fracs[v].du.data(), *dvp = _fracs[v].dv.data();
@@ -317,7 +317,7 @@ Warp::warpLine(const Image<YUV444>& in, Image<YUV444>& out, u_int v) const
 }
 
 template <> __PORT void
-Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
+Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, size_t v) const
 {
     const short		*usp  = _fracs[v].us.data(), *vsp = _fracs[v].vs.data();
     const u_char	*dup  = _fracs[v].du.data(), *dvp = _fracs[v].dv.data();
@@ -357,11 +357,11 @@ Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, u_int v) const
 }
 
 template __PORT void
-Warp::warpLine(const Image<RGBA>& in, Image<RGBA>& out, u_int v) const;
+Warp::warpLine(const Image<RGBA>& in, Image<RGBA>& out, size_t v) const;
 template __PORT void
-Warp::warpLine(const Image<ARGB>& in, Image<ARGB>& out, u_int v) const;
+Warp::warpLine(const Image<ARGB>& in, Image<ARGB>& out, size_t v) const;
 template __PORT void
-Warp::warpLine(const Image<ABGR>& in, Image<ABGR>& out, u_int v) const;
+Warp::warpLine(const Image<ABGR>& in, Image<ABGR>& out, size_t v) const;
 template __PORT void
-Warp::warpLine(const Image<BGRA>& in, Image<BGRA>& out, u_int v) const;
+Warp::warpLine(const Image<BGRA>& in, Image<BGRA>& out, size_t v) const;
 }
