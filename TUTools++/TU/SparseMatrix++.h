@@ -64,18 +64,18 @@ class SparseMatrix
   // 構造生成
     void		beginInit()					;
     void		setRow()					;
-    void		setCol(u_int col, element_type val=0)		;
+    void		setCol(size_t col, element_type val=0)		;
     void		copyRow()					;
     void		endInit()					;
     
   // 基本情報
-    u_int		size()					const	;
-    u_int		nrow()					const	;
-    u_int		ncol()					const	;
-    u_int		nelements()				const	;
-    u_int		nelements(u_int i)			const	;
-    element_type	operator ()(u_int i, u_int j)		const	;
-    element_type&	operator ()(u_int i, u_int j)			;
+    size_t		size()					const	;
+    size_t		nrow()					const	;
+    size_t		ncol()					const	;
+    size_t		nelements()				const	;
+    size_t		nelements(size_t i)			const	;
+    element_type	operator ()(size_t i, size_t j)		const	;
+    element_type&	operator ()(size_t i, size_t j)			;
 
   // 基本演算
     SparseMatrix&	operator  =(element_type c)			;
@@ -99,20 +99,20 @@ class SparseMatrix
 
   // ブロック演算
     Vector<element_type>
-			operator ()(u_int i, u_int j, u_int d)	const	;
+			operator ()(size_t i, size_t j, size_t d) const	;
     Matrix<element_type>
-			operator ()(u_int i, u_int j,
-				    u_int r, u_int c)		const	;
+			operator ()(size_t i, size_t j,
+				    size_t r, size_t c)		const	;
     template <class S, class B>
-    SparseMatrix&	assign(u_int i, u_int j, const Vector<S, B>& v)	;
+    SparseMatrix&	assign(size_t i, size_t j, const Vector<S, B>& v)	;
     template <class S, class B, class R>
-    SparseMatrix&	assign(u_int i, u_int j,
+    SparseMatrix&	assign(size_t i, size_t j,
 			       const Matrix<S, B, R>& M)		;
     template <class OP, class S, class B>
-    SparseMatrix&	apply(u_int i, u_int j,
+    SparseMatrix&	apply(size_t i, size_t j,
 			      OP op, const Vector<S, B>& v)		;
     template <class OP, class S, class B, class R>
-    SparseMatrix&	apply(u_int i, u_int j,
+    SparseMatrix&	apply(size_t i, size_t j,
 			      OP op, const Matrix<S, B, R>& M)		;
 
   // 連立一次方程式
@@ -133,18 +133,18 @@ class SparseMatrix
     SparseMatrix	binary_op(const SparseMatrix& B, OP op)	const	;
     template <bool SYM2>
     bool		inner_product(const SparseMatrix<T, SYM2>& B,
-				      u_int i, u_int j, T& val)	const	;
-    int			index(u_int i, u_int j,
+				      size_t i, size_t j, T& val) const	;
+    int			index(size_t i, size_t j,
 			      bool throwExcept=false)		const	;
     static int		pardiso_precision()				;
     static char		skipws(std::istream& in)			;
     
   private:
-    u_int			_ncol;		//!< 列の数
-    std::vector<u_int>		_rowIndex;	//!< 各行の先頭成分の通し番号
-    std::vector<u_int>		_columns;	//!< 各成分の列番号
+    size_t			_ncol;		//!< 列の数
+    std::vector<size_t>		_rowIndex;	//!< 各行の先頭成分の通し番号
+    std::vector<size_t>		_columns;	//!< 各成分の列番号
     std::vector<element_type>	_values;	//!< 各成分の値
-    std::map<u_int,
+    std::map<size_t,
 	     element_type>	_rowmap;	//!< 1行中の列番号と値の対応表
 };
 
@@ -169,7 +169,7 @@ SparseMatrix<T, SYM>::setRow()
   // ソート済みの1つ前の行の列番号をそれぞれ_columnsと_valueにコピー
     if (!_rowIndex.empty())
     {
-	for (typename std::map<u_int, T>::const_iterator
+	for (typename std::map<size_t, T>::const_iterator
 		 iter = _rowmap.begin(); iter != _rowmap.end(); ++iter)
 	{
 	    _columns.push_back(iter->first);
@@ -191,9 +191,9 @@ SparseMatrix<T, SYM>::setRow()
 				を指定すると送出
 */
 template <class T, bool SYM> inline void
-SparseMatrix<T, SYM>::setCol(u_int col, element_type val)
+SparseMatrix<T, SYM>::setCol(size_t col, element_type val)
 {
-    u_int	row = _rowIndex.size();	// 現在までにセットされた行数
+    size_t	row = _rowIndex.size();	// 現在までにセットされた行数
     if (row == 0)
 	throw std::logic_error("TU::SparseMatrix<T, SYM>::setCol(): _rowIndex is not set!");
     if (SYM)
@@ -214,7 +214,7 @@ SparseMatrix<T, SYM>::setCol(u_int col, element_type val)
 template <class T, bool SYM> inline void
 SparseMatrix<T, SYM>::copyRow()
 {
-    u_int	row = _rowIndex.size();	// 現在までにセットされた行数
+    size_t	row = _rowIndex.size();	// 現在までにセットされた行数
     if (row == 0)
 	throw std::logic_error("TU::SparseMatrix<T, SYM>::copyRow(): no previous rows!");
 
@@ -222,7 +222,7 @@ SparseMatrix<T, SYM>::copyRow()
     setRow();
 
   // 直前の行の(対称行列の場合は2番目以降の)成分の列番号を現在の行にコピーする．
-    for (u_int n  = _rowIndex[row - 1] + (SYM ? 1 : 0),
+    for (size_t n  = _rowIndex[row - 1] + (SYM ? 1 : 0),
 	       ne = _rowIndex[row]; n < ne; ++n)
     {
 	_columns.push_back(_columns[n]);
@@ -250,13 +250,13 @@ SparseMatrix<T, SYM>::endInit()
     if (SYM)
     {
       // 各行の先頭成分が対角成分であるか？
-	for (u_int i = 0; i < nrow(); ++i)
+	for (size_t i = 0; i < nrow(); ++i)
 	    if (i != _columns[_rowIndex[i]])
 		throw std::logic_error("SparseMatrix<T, true>::endInit(): the first entry of each row must be a diagonal element!");
     }
 
   // 各行内で列番号が狭義単調増加になっているか？
-    for (u_int i = 0; i < nrow(); ++i)
+    for (size_t i = 0; i < nrow(); ++i)
 	for (int n = _rowIndex[i]; n < _rowIndex[i+1] - 1; ++n)
 	    if (_columns[n] >= _columns[n+1])
 		throw std::logic_error("SparseMatrix<T, SYM>::endInit(): the column indices must be strictly increasing within each row!");
@@ -270,7 +270,7 @@ SparseMatrix<T, SYM>::endInit()
 /*!
   \return	行列の次元(=行数)
 */
-template <class T, bool SYM> inline u_int
+template <class T, bool SYM> inline size_t
 SparseMatrix<T, SYM>::size() const
 {
     return nrow();
@@ -280,7 +280,7 @@ SparseMatrix<T, SYM>::size() const
 /*!
   \return	行列の行数
 */
-template <class T, bool SYM> inline u_int
+template <class T, bool SYM> inline size_t
 SparseMatrix<T, SYM>::nrow() const
 {
     return _rowIndex.size() - 1;
@@ -290,7 +290,7 @@ SparseMatrix<T, SYM>::nrow() const
 /*!
   \return	行列の列数
 */
-template <class T, bool SYM> inline u_int
+template <class T, bool SYM> inline size_t
 SparseMatrix<T, SYM>::ncol() const
 {
     return _ncol;
@@ -300,7 +300,7 @@ SparseMatrix<T, SYM>::ncol() const
 /*!
   \return	行列の非零成分数
 */
-template <class T, bool SYM> inline u_int
+template <class T, bool SYM> inline size_t
 SparseMatrix<T, SYM>::nelements() const
 {
     return _columns.size();
@@ -311,8 +311,8 @@ SparseMatrix<T, SYM>::nelements() const
   \param i	行番号
   \return	第i行の成分数
 */
-template <class T, bool SYM> inline u_int
-SparseMatrix<T, SYM>::nelements(u_int i) const
+template <class T, bool SYM> inline size_t
+SparseMatrix<T, SYM>::nelements(size_t i) const
 {
     return _rowIndex[i+1] - _rowIndex[i];
 }
@@ -324,7 +324,7 @@ SparseMatrix<T, SYM>::nelements(u_int i) const
   \return			(i, j)成分
 */
 template <class T, bool SYM> inline T
-SparseMatrix<T, SYM>::operator ()(u_int i, u_int j) const
+SparseMatrix<T, SYM>::operator ()(size_t i, size_t j) const
 {
     const int	n = index(i, j);
     return (n >= 0 ? _values[n] : T(0));
@@ -338,7 +338,7 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j) const
   \throw std::invalid_argument	この行列が(i, j)成分を持たない場合に送出
 */
 template <class T, bool SYM> inline T&
-SparseMatrix<T, SYM>::operator ()(u_int i, u_int j)
+SparseMatrix<T, SYM>::operator ()(size_t i, size_t j)
 {
     const int	n = index(i, j, true);
     return _values[n];
@@ -460,11 +460,11 @@ SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
     v.check_size(ncol());
     
     Vector<T>	a(nrow());
-    for (u_int i = 0; i < nrow(); ++i)
+    for (size_t i = 0; i < nrow(); ++i)
     {
 	if (SYM)
 	{
-	    for (u_int j = 0; j < i; ++j)
+	    for (size_t j = 0; j < i; ++j)
 	    {
 		const int	n = index(i, j);
 		if (n >= 0)
@@ -472,7 +472,7 @@ SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
 	    }
 	}
 	
-	for (u_int n = _rowIndex[i]; n < _rowIndex[i+1]; ++n)
+	for (size_t n = _rowIndex[i]; n < _rowIndex[i+1]; ++n)
 	    a[i] += _values[n] * v[_columns[n]];
     }
 
@@ -489,11 +489,11 @@ SparseMatrix<T, SYM>::compose() const
     SparseMatrix<T, true>	AAt;	// 結果を格納する疎対称行列
 
     AAt.beginInit();
-    for (u_int i = 0; i < nrow(); ++i)
+    for (size_t i = 0; i < nrow(); ++i)
     {
 	AAt.setRow();
 	
-	for (u_int j = i; j < nrow(); ++j)
+	for (size_t j = i; j < nrow(); ++j)
 	{
 	    T	val;
 	    if (inner_product(*this, i, j, val))
@@ -520,13 +520,13 @@ SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W) const
 
     SparseMatrix<T, false>	AW;
     AW.beginInit();
-    for (u_int i = 0; i < nrow(); ++i)
+    for (size_t i = 0; i < nrow(); ++i)
     {
 	std::cerr << i << '/' << nrow() << std::endl;
 	
 	AW.setRow();
 
-	for (u_int j = 0; j < W.nrow(); ++j)
+	for (size_t j = 0; j < W.nrow(); ++j)
 	{
 	    T	val;
 	    if (inner_product(W, i, j, val))
@@ -537,11 +537,11 @@ SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W) const
 
     SparseMatrix<T, true>	AWAt;
     AWAt.beginInit();
-    for (u_int i = 0; i < AW.nrow(); ++i)
+    for (size_t i = 0; i < AW.nrow(); ++i)
     {
 	AWAt.setRow();
 
-	for (u_int j = i; j < nrow(); ++j)
+	for (size_t j = i; j < nrow(); ++j)
 	{
 	    T	val;
 	    if (AW.inner_product(*this, i, j, val))
@@ -564,15 +564,15 @@ SparseMatrix<T, SYM>::compose(const SparseMatrix<T, true>& W) const
   \return	取り出した成分を並べたベクトル
 */
 template <class T, bool SYM> Vector<T>
-SparseMatrix<T, SYM>::operator ()(u_int i, u_int j, u_int d) const
+SparseMatrix<T, SYM>::operator ()(size_t i, size_t j, size_t d) const
 {
     Vector<T>	v(d);
     const int	n = index(i, j, true);
     const T*	p = &_values[n];
-    u_int	dj = 0;
+    size_t	dj = 0;
     if (SYM)
     {
-	for (u_int je = std::min(i, j + v.size()); j + dj < je; ++dj)
+	for (size_t je = std::min(i, j + v.size()); j + dj < je; ++dj)
 	{
 #ifdef LIBTUTOOLS_DEBUG
 	    if (p != &_values[index(i, j+dj, true)])
@@ -603,11 +603,11 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j, u_int d) const
   \return	取り出した成分を並べた行列
 */
 template <class T, bool SYM> Matrix<T>
-SparseMatrix<T, SYM>::operator ()(u_int i, u_int j,
-				  u_int r, u_int c) const
+SparseMatrix<T, SYM>::operator ()(size_t i, size_t j,
+				  size_t r, size_t c) const
 {
     Matrix<T>	M(r, c);
-    for (u_int di = 0; di < M.nrow(); ++di)
+    for (size_t di = 0; di < M.nrow(); ++di)
 	M[di] = (*this)(i + di, j, M.ncol());
 
     return M;
@@ -623,7 +623,7 @@ SparseMatrix<T, SYM>::operator ()(u_int i, u_int j,
 */
 template <class T, bool SYM> template <class S, class B>
 inline SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::assign(u_int i, u_int j, const Vector<S, B>& v)
+SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Vector<S, B>& v)
 {
     return apply(i, j, Assign<S>(), v);
 }
@@ -638,7 +638,7 @@ SparseMatrix<T, SYM>::assign(u_int i, u_int j, const Vector<S, B>& v)
 */
 template <class T, bool SYM> template <class S, class B, class R>
 inline SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::assign(u_int i, u_int j, const Matrix<S, B, R>& M)
+SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Matrix<S, B, R>& M)
 {
     return apply(i, j, Assign<S>(), M);
 }
@@ -653,13 +653,13 @@ SparseMatrix<T, SYM>::assign(u_int i, u_int j, const Matrix<S, B, R>& M)
 */
 template <class T, bool SYM> template <class OP, class S, class B>
 SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Vector<S, B>& v)
+SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Vector<S, B>& v)
 {
     T*		p = &(*this)(i, j);
-    u_int	dj = 0;
+    size_t	dj = 0;
     if (SYM)
     {
-	for (u_int je = std::min(i, j + v.size()); j + dj < je; ++dj)
+	for (size_t je = std::min(i, j + v.size()); j + dj < je; ++dj)
 	{
 #ifdef LIBTUTOOLS_DEBUG
 	    if (p != &_values[index(i, j+dj, true)])
@@ -692,23 +692,23 @@ SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Vector<S, B>& v)
 */
 template <class T, bool SYM> template <class OP, class S, class B, class R>
 SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::apply(u_int i, u_int j, OP op, const Matrix<S, B, R>& M)
+SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Matrix<S, B, R>& M)
 {
     if (SYM && i > j)
     {
 	const Matrix<S>	Mt = M.trns();
 	
-	for (u_int dj = 0; dj < Mt.nrow(); ++dj)
+	for (size_t dj = 0; dj < Mt.nrow(); ++dj)
 	{
-	    const u_int	di = std::max(j + dj, i) - i;
+	    const size_t	di = std::max(j + dj, i) - i;
 	    apply(j + dj, i + di, op, Mt[dj](di, Mt.ncol() - di));
 	}
     }
     else
     {
-	for (u_int di = 0; di < M.nrow(); ++di)
+	for (size_t di = 0; di < M.nrow(); ++di)
 	{
-	    const u_int	dj = (SYM ? std::max(i + di, j) - j : 0);
+	    const size_t	dj = (SYM ? std::max(i + di, j) - j : 0);
 	    apply(i + di, j + dj, op, M[di](dj, M.ncol() - dj));
 	}
     }
@@ -790,7 +790,7 @@ SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
 template <class T, bool SYM> bool
 SparseMatrix<T, SYM>::isfinite() const
 {
-    for (u_int n = 0; n < _values.size(); ++n)
+    for (size_t n = 0; n < _values.size(); ++n)
 #ifdef __INTEL_COMPILER
 	if (!::isfinite(_values[n]))
 #else
@@ -819,7 +819,7 @@ SparseMatrix<T, SYM>::get(std::istream& in)
 	
 	setRow();
 
-	for (u_int col = 0; (c = skipws(in)) != '\n'; ++col)
+	for (size_t col = 0; (c = skipws(in)) != '\n'; ++col)
 	    if (isdigit(c) || (c == '+') || (c == '-'))	// 数字ならば...
 	    {
 		in.putback(c);		// 書き戻して
@@ -842,10 +842,10 @@ SparseMatrix<T, SYM>::get(std::istream& in)
 template <class T, bool SYM> std::ostream&
 SparseMatrix<T, SYM>::put(std::ostream& out) const
 {
-    u_int	n = 0;
-    for (u_int i = 0; i < nrow(); ++i)
+    size_t	n = 0;
+    for (size_t i = 0; i < nrow(); ++i)
     {
-	u_int	j = 0;
+	size_t	j = 0;
 	
 	if (SYM)
 	{
@@ -884,13 +884,13 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
     SparseMatrix	S;
 
     S.beginInit();
-    for (u_int i = 0; i < nrow(); ++i)
+    for (size_t i = 0; i < nrow(); ++i)
     {
 	S.setRow();		// 第i行の先頭成分の通し番号をセット
-	for (u_int m = _rowIndex[i], n = B._rowIndex[i]; ; )
+	for (size_t m = _rowIndex[i], n = B._rowIndex[i]; ; )
 	{
-	    const u_int	j = (m <   _rowIndex[i+1] ?   _columns[m] :   ncol());
-	    const u_int	k = (n < B._rowIndex[i+1] ? B._columns[n] : B.ncol());
+	    const size_t	j = (m <   _rowIndex[i+1] ?   _columns[m] :   ncol());
+	    const size_t	k = (n < B._rowIndex[i+1] ? B._columns[n] : B.ncol());
 	    if (j == k)		// 両方の行列が(i, j(=k))成分を持つ？
 	    {
 		if (j == ncol())	// 両方の行列について調べ終えていれば...
@@ -930,7 +930,7 @@ SparseMatrix<T, SYM>::binary_op(const SparseMatrix& B, OP op) const
 */
 template <class T, bool SYM> template <bool SYM2> bool
 SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
-				    u_int i, u_int j, T& val) const
+				    size_t i, size_t j, T& val) const
 {
     if (ncol() != B.ncol())
 	throw std::invalid_argument("inner_product(): mismatched dimension!");
@@ -940,7 +940,7 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
 
     if (SYM)
     {
-	for (u_int col = 0; col < i; ++col)
+	for (size_t col = 0; col < i; ++col)
 	{
 	    int	m, n;
 	    if ((m = index(i, col)) >= 0 && (n = B.index(j, col)) >= 0)
@@ -950,7 +950,7 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
 	    }
 	}
     }
-    for (u_int m = _rowIndex[i]; m < _rowIndex[i+1]; ++m)
+    for (size_t m = _rowIndex[i]; m < _rowIndex[i+1]; ++m)
     {
 	const int	n = B.index(j, _columns[m]);
 	if (n >= 0)
@@ -975,7 +975,7 @@ SparseMatrix<T, SYM>::inner_product(const SparseMatrix<T, SYM2>& B,
 				true の場合に送出
 */
 template <class T, bool SYM> inline int
-SparseMatrix<T, SYM>::index(u_int i, u_int j, bool throwExcept) const
+SparseMatrix<T, SYM>::index(size_t i, size_t j, bool throwExcept) const
 {
     if (SYM && i > j)
 	std::swap(i, j);
@@ -984,9 +984,9 @@ SparseMatrix<T, SYM>::index(u_int i, u_int j, bool throwExcept) const
 	throw std::invalid_argument("TU::SparseMatrix<T, SYM>::index(): invalid row index!");
     
   // 指定された列番号に対応する成分がこの行にあるか2分法によって調べる．
-    for (u_int low = _rowIndex[i], high = _rowIndex[i+1]; low != high; )
+    for (size_t low = _rowIndex[i], high = _rowIndex[i+1]; low != high; )
     {
-	u_int	mid = (low + high) / 2;
+	size_t	mid = (low + high) / 2;
 	if (j < _columns[mid])
 	    high = mid;
 	else if (j > _columns[mid])
@@ -1042,9 +1042,9 @@ operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
     v.check_size(A.nrow());
     
     Vector<S>	a(A.ncol());
-    for (u_int j = 0; j < A.ncol(); ++j)
+    for (size_t j = 0; j < A.ncol(); ++j)
     {
-	for (u_int i = 0; i < (SYM2 ? j : A.nrow()); ++i)
+	for (size_t i = 0; i < (SYM2 ? j : A.nrow()); ++i)
 	{
 	    const int	n = A.index(i, j);
 	    if (n >= 0)
@@ -1052,7 +1052,7 @@ operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
 	}
 	if (SYM2)
 	{
-	    for (u_int n = A._rowIndex[j]; n < A._rowIndex[j+1]; ++n)
+	    for (size_t n = A._rowIndex[j]; n < A._rowIndex[j+1]; ++n)
 		a[j] += v[A._columns[n]] * A._values[n];
 	}
     }

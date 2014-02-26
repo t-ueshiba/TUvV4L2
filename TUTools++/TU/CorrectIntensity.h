@@ -56,7 +56,7 @@ class __PORT CorrectIntensity
     void	initialize(float offset, float gain)			;
     template <class T>
     void	operator()(Image<T>& image,
-			   u_int vs=0, u_int ve=0)		const	;
+			   size_t vs=0, size_t ve=0)		const	;
     
   private:
     template <class T>

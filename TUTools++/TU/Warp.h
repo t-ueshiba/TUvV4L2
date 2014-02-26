@@ -53,11 +53,11 @@ class Warp
   private:
     struct FracArray
     {
-	FracArray(u_int d=0)
+	FracArray(size_t d=0)
 	    :us(d), vs(d), du(d), dv(d), lmost(0)	{}
 
-	u_int		width()			const	{return us.size();}
-	void		resize(u_int d)			;
+	size_t		width()			const	{return us.size();}
+	void		resize(size_t d)			;
 
 	Array<short,  Buf<short, true> >	us, vs;
 	Array<u_char, Buf<u_char, true> >	du, dv;
@@ -72,9 +72,9 @@ class Warp
 	WarpLine(const Warp& warp, const Image<T>& in, Image<T>& out)
 	    :_warp(warp), _in(in), _out(out)				{}
 	
-	void	operator ()(const tbb::blocked_range<u_int>& r) const
+	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    for (u_int v = r.begin(); v != r.end(); ++v)
+		    for (size_t v = r.begin(); v != r.end(); ++v)
 			_warp.warpLine(_in, _out, v);
 		}
 
@@ -93,13 +93,13 @@ class Warp
   /*!
     return	出力画像の幅
   */
-    u_int	width()				const	{return _width;}
+    size_t	width()				const	{return _width;}
 
   //! 出力画像の高さを返す．
   /*!
     return	出力画像の高さ
   */
-    u_int	height()			const	{return _fracs.size();}
+    size_t	height()			const	{return _fracs.size();}
     
     int		lmost(int v)			const	;
     int		rmost(int v)			const	;
@@ -107,13 +107,13 @@ class Warp
     template <class T>
     void	initialize(const Matrix<T, FixedSizedBuf<T, 9>,
 			   FixedSizedBuf<Vector<T>, 3> >& Htinv,
-			   u_int inWidth,  u_int inHeight,
-			   u_int outWidth, u_int outHeight)		;
+			   size_t inWidth,  size_t inHeight,
+			   size_t outWidth, size_t outHeight)		;
     template <class I>
     void	initialize(const typename I::matrix33_type& Htinv,
 			   const I& intrinsic,
-			   u_int inWidth,  u_int inHeight,
-			   u_int outWidth, u_int outHeight)		;
+			   size_t inWidth,  size_t inHeight,
+			   size_t outWidth, size_t outHeight)		;
     template <class T>
     void	operator ()(const Image<T>& in, Image<T>& out)	const	;
     Vector2f	operator ()(int u, int v)			const	;
@@ -124,15 +124,15 @@ class Warp
   private:
     template <class T>
     void	warpLine(const Image<T>& in,
-			 Image<T>& out, u_int v)		const	;
+			 Image<T>& out, size_t v)		const	;
     
   private:
     Array<FracArray>	_fracs;
-    u_int		_width;
+    size_t		_width;
 };
 
 inline void
-Warp::FracArray::resize(u_int d)
+Warp::FracArray::resize(size_t d)
 {
     us.resize(d);
     vs.resize(d);
@@ -186,8 +186,8 @@ Warp::rmost(int v) const
 template <class T> inline void
 Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
 			      FixedSizedBuf<Vector<T>, 3> >& Htinv,
-		 u_int inWidth,  u_int inHeight,
-		 u_int outWidth, u_int outHeight)
+		 size_t inWidth,  size_t inHeight,
+		 size_t outWidth, size_t outHeight)
 {
     initialize(Htinv, IntrinsicBase<T>(),
 	       inWidth, inHeight, outWidth, outHeight);
@@ -222,8 +222,8 @@ Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
 */
 template <class I> void
 Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
-		 u_int inWidth,  u_int inHeight,
-		 u_int outWidth, u_int outHeight)
+		 size_t inWidth,  size_t inHeight,
+		 size_t outWidth, size_t outHeight)
 {
     typedef I						intrinsic_type;
     typedef typename intrinsic_type::point2_type	point2_type;
@@ -236,12 +236,12 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
   /* Compute frac for each pixel. */
     const matrix_type&	HKtinv = Htinv * intrinsic.Ktinv();
     vector_type		leftmost = HKtinv[2];
-    for (u_int v = 0; v < height(); ++v)
+    for (size_t v = 0; v < height(); ++v)
     {
 	vector_type	x = leftmost;
 	FracArray	frac(width());
-	u_int		n = 0;
-	for (u_int u = 0; u < width(); ++u)
+	size_t		n = 0;
+	for (size_t u = 0; u < width(); ++u)
 	{
 	    const point2_type&	m = intrinsic.u(point2_type(x[0]/x[2],
 							    x[1]/x[2]));
@@ -261,7 +261,7 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
 
 	_fracs[v].resize(n);
 	_fracs[v].lmost = frac.lmost;
-	for (u_int u = 0; u < n; ++u)
+	for (size_t u = 0; u < n; ++u)
 	{
 	    _fracs[v].us[u] = frac.us[u];
 	    _fracs[v].vs[u] = frac.vs[u];
@@ -286,10 +286,10 @@ Warp::operator ()(const Image<T>& in, Image<T>& out) const
 #if defined(USE_TBB)
     using namespace	tbb;
 
-    parallel_for(blocked_range<u_int>(0, out.height(), 1),
+    parallel_for(blocked_range<size_t>(0, out.height(), 1),
 		 WarpLine<T>(*this, in, out));
 #else
-    for (u_int v = 0; v < out.height(); ++v)
+    for (size_t v = 0; v < out.height(); ++v)
 	warpLine(in, out, v);
 #endif
 }

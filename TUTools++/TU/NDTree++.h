@@ -47,7 +47,7 @@ namespace TU
   \param T	要素の型
   \param D	空間の次元，D=2のときquad tree, D=3のときoctreeとなる
  */
-template <class T, u_int D>
+template <class T, size_t D>
 class NDTree
 {
   private:
@@ -78,12 +78,12 @@ class NDTree
       private:
 	struct NodeInfo
 	{
-	    NodeInfo(Node* n, const position_type& p, u_int l)
+	    NodeInfo(Node* n, const position_type& p, size_t l)
 		:node(n), dp(p), len(l)					{}
 	    
 	    Node*		node;		//!< ノードへのポインタ
 	    position_type	dp;		//!< ノードの相対位置
-	    u_int		len;		//!< ノードのセル長
+	    size_t		len;		//!< ノードのセル長
 	};
 	
       public:
@@ -91,7 +91,7 @@ class NDTree
 			Iterator(const NDTree& tree)			;
 	
 	position_type	position()				const	;
-	u_int		length()				const	;
+	size_t		length()				const	;
 	reference	operator *()				const	;
 	pointer		operator ->()				const	;
 	Iterator&	operator ++()					;
@@ -100,13 +100,13 @@ class NDTree
 	bool		operator !=(const Iterator& iter)	const	;
 
       private:
-	position_type	new_dp(u_int idx)			const	;
+	position_type	new_dp(size_t idx)			const	;
 	
       private:
 	position_type		_org;		//!< 2^D分木の原点の位置
 	Leaf*			_leaf;		//!< この反復子が指している葉
 	position_type		_dp;		//!< 葉の相対位置
-	u_int			_len;		//!< 葉のセル長
+	size_t			_len;		//!< 葉のセル長
 	std::stack<NodeInfo>	_fringe;	//!< 未訪問のノードたち
     };
 
@@ -121,8 +121,8 @@ class NDTree
 
     const position_type&
 			origin()				const	;
-    u_int		length0()				const	;
-    u_int		size()					const	;
+    size_t		length0()				const	;
+    size_t		size()					const	;
     bool		empty()					const	;
     void		clear()						;
     pointer		find(const position_type& pos)			;
@@ -150,18 +150,18 @@ class NDTree
 	virtual		~Node()						;
 
 	virtual Node*	clone()					 const	= 0;
-	virtual u_int	size()					 const	= 0;
-	virtual pointer	find(const position_type& dp, u_int len)	= 0;
+	virtual size_t	size()					 const	= 0;
+	virtual pointer	find(const position_type& dp, size_t len)	= 0;
 	virtual const_pointer
-			find(const position_type& dp, u_int len) const	= 0;
+			find(const position_type& dp, size_t len) const	= 0;
 	virtual void	insert(const position_type& dp,
-			       const_reference val, u_int len)		= 0;
-	virtual Node*	erase(const position_type& dp, u_int len)	= 0;
+			       const_reference val, size_t len)		= 0;
+	virtual Node*	erase(const position_type& dp, size_t len)	= 0;
 	virtual Branch* branch()				  	= 0;
 	virtual Leaf*	leaf()					  	= 0;
-	virtual void	print(std::ostream& out, u_int nindents) const	= 0;
+	virtual void	print(std::ostream& out, size_t nindents) const	= 0;
 	static Node*	create(const position_type& dp,
-			       const_reference val, u_int len)		;
+			       const_reference val, size_t len)		;
     };
 
     class Branch : public Node
@@ -171,24 +171,24 @@ class NDTree
         virtual		~Branch()					;
 
 	virtual Node*	clone()					 const	;
-	virtual u_int	size()					 const	;
-	virtual pointer	find(const position_type& dp, u_int len)	;
+	virtual size_t	size()					 const	;
+	virtual pointer	find(const position_type& dp, size_t len)	;
 	virtual const_pointer
-			find(const position_type& dp, u_int len) const	;
+			find(const position_type& dp, size_t len) const	;
 	virtual void	insert(const position_type& dp,
-			       const_reference val, u_int len)		;
-	virtual Node*	erase(const position_type& dp, u_int len)	;
+			       const_reference val, size_t len)		;
+	virtual Node*	erase(const position_type& dp, size_t len)	;
 	virtual Branch* branch()				  	;
 	virtual Leaf*	leaf()					  	;
-	virtual void	print(std::ostream& out, u_int nindents) const	;
-	static Node*	ascend(Node* node, u_int idx)			;
-	Node*		descend(u_int& idx)				;
+	virtual void	print(std::ostream& out, size_t nindents) const	;
+	static Node*	ascend(Node* node, size_t idx)			;
+	Node*		descend(size_t& idx)				;
 
       private:
 		        Branch(const Branch&)				;
         Branch&		operator =(const Branch&)			;
 
-	static u_int	child_idx(const position_type& dp, u_int len)	;
+	static size_t	child_idx(const position_type& dp, size_t len)	;
 
 	friend class	Iterator<value_type>;
 	friend class	Iterator<const value_type>;
@@ -204,16 +204,16 @@ class NDTree
 	virtual		~Leaf()						;
 	
 	virtual Node*	clone()					 const	;
-	virtual u_int	size()					 const	;
-	virtual pointer	find(const position_type& dp, u_int len)	;
+	virtual size_t	size()					 const	;
+	virtual pointer	find(const position_type& dp, size_t len)	;
 	virtual const_pointer
-			find(const position_type& dp, u_int len) const	;
+			find(const position_type& dp, size_t len) const	;
 	virtual void	insert(const position_type& dp,
-			       const_reference val, u_int len)		;
-	virtual Node*	erase(const position_type& dp, u_int len)	;
+			       const_reference val, size_t len)		;
+	virtual Node*	erase(const position_type& dp, size_t len)	;
 	virtual Branch* branch()				  	;
 	virtual Leaf*	leaf()					  	;
-	virtual void	print(std::ostream& out, u_int nindents) const	;
+	virtual void	print(std::ostream& out, size_t nindents) const	;
 
 	friend class	Iterator<value_type>;
 	friend class	Iterator<const value_type>;
@@ -224,7 +224,7 @@ class NDTree
 
   private:
     position_type	_org;
-    u_int		_len0;
+    size_t		_len0;
     Node*		_root;
 };
 
@@ -232,7 +232,7 @@ class NDTree
 *  class NDTree<T, D>							*
 ************************************************************************/
 //! D次元空間を表現する2^D分木を生成する．
-template <class T, u_int D> inline
+template <class T, size_t D> inline
 NDTree<T, D>::NDTree()
     :_org(), _len0(0), _root(0)
 {
@@ -242,7 +242,7 @@ NDTree<T, D>::NDTree()
 /*!
   \param tree	コピー元の2^D分木
 */
-template <class T, u_int D> inline
+template <class T, size_t D> inline
 NDTree<T, D>::NDTree(const NDTree& tree)
     :_org(tree._org), _len0(tree._len0), _root(0)
 {
@@ -251,7 +251,7 @@ NDTree<T, D>::NDTree(const NDTree& tree)
 }
 
 //! デストラクタ
-template <class T, u_int D> inline
+template <class T, size_t D> inline
 NDTree<T, D>::~NDTree()
 {
     delete _root;
@@ -262,7 +262,7 @@ NDTree<T, D>::~NDTree()
   \param tree	コピー元の2^D分木
   \return	この2^D分木
 */
-template <class T, u_int D> inline NDTree<T, D>&
+template <class T, size_t D> inline NDTree<T, D>&
 NDTree<T, D>::operator =(const NDTree& tree)
 {
     if (this != &tree)
@@ -279,7 +279,7 @@ NDTree<T, D>::operator =(const NDTree& tree)
 /*!
   \return	rootセルの原点位置
 */
-template <class T, u_int D> inline const typename NDTree<T, D>::position_type&
+template <class T, size_t D> inline const typename NDTree<T, D>::position_type&
 NDTree<T, D>::origin() const
 {
     return _org;
@@ -289,7 +289,7 @@ NDTree<T, D>::origin() const
 /*!
   \return	rootセルの一辺の長さ
 */
-template <class T, u_int D> inline u_int
+template <class T, size_t D> inline size_t
 NDTree<T, D>::length0() const
 {
     return _len0;
@@ -299,7 +299,7 @@ NDTree<T, D>::length0() const
 /*!
   \return	葉の数
 */
-template <class T, u_int D> inline u_int
+template <class T, size_t D> inline size_t
 NDTree<T, D>::size() const
 {
     return (_root ? _root->size() : 0);
@@ -309,14 +309,14 @@ NDTree<T, D>::size() const
 /*!
   \return	空であればtrue, そうでなければfalse
 */
-template <class T, u_int D> inline bool
+template <class T, size_t D> inline bool
 NDTree<T, D>::empty() const
 {
     return !_root;
 }
 
 //! この2^D分木を空にする．
-template <class T, u_int D> inline void
+template <class T, size_t D> inline void
 NDTree<T, D>::clear()
 {
     delete _root;
@@ -330,7 +330,7 @@ NDTree<T, D>::clear()
   \return	posで指定された位置に葉が存在すればその値へのポインタ
 		を返す．存在しなければ0を返す．
 */
-template <class T, u_int D> inline typename NDTree<T, D>::pointer
+template <class T, size_t D> inline typename NDTree<T, D>::pointer
 NDTree<T, D>::find(const position_type& pos)
 {
     if (!_root || out_of_range(pos))
@@ -345,7 +345,7 @@ NDTree<T, D>::find(const position_type& pos)
   \return	posで指定された位置に葉が存在すればその値へのポインタ
 		を返す．存在しなければ0を返す．
 */
-template <class T, u_int D> inline typename NDTree<T, D>::const_pointer
+template <class T, size_t D> inline typename NDTree<T, D>::const_pointer
 NDTree<T, D>::find(const position_type& pos) const
 {
     if (!_root || out_of_range(pos))
@@ -360,7 +360,7 @@ NDTree<T, D>::find(const position_type& pos) const
   \param pos	D次元空間中の位置
   \param val	格納する値
 */
-template <class T, u_int D> void
+template <class T, size_t D> void
 NDTree<T, D>::insert(const position_type& pos, const_reference val)
 {
     if (_root)
@@ -368,8 +368,8 @@ NDTree<T, D>::insert(const position_type& pos, const_reference val)
 	for (;;)
 	{
 	    bool	ascend = false;
-	    u_int	idx = 0;
-	    for (u_int d = 0; d < Dim; ++d)
+	    size_t	idx = 0;
+	    for (size_t d = 0; d < Dim; ++d)
 		if (pos[d] < _org[d])		// 負方向に逸脱なら...
 		{
 		    ascend = true;		// _rootの昇階が必要
@@ -401,7 +401,7 @@ NDTree<T, D>::insert(const position_type& pos, const_reference val)
 /*!
   \param pos	D次元空間中の位置
 */
-template <class T, u_int D> void
+template <class T, size_t D> void
 NDTree<T, D>::erase(const position_type& pos)
 {
     if (!_root || out_of_range(pos))
@@ -419,7 +419,7 @@ NDTree<T, D>::erase(const position_type& pos)
   // _rootが子を1つだけ持つ枝ならば，子を_rootに付け替えることにより降階する．
     for (Branch* b; b = _root->branch(); )	// _rootが枝ならば...
     {
-	u_int	idx;
+	size_t	idx;
 	Node*	child = b->descend(idx);	// 1段分の降階を試みる．
 	if (!child)				// 降階できなければ...
 	    break;				// 直ちに脱出
@@ -428,7 +428,7 @@ NDTree<T, D>::erase(const position_type& pos)
 		
 	_len0 >>= 1;				// _rootのセル長を半分にする．
 	position_type	dp;			// 古いrootから見た子の相対位置
-	for (u_int d = 0; d < Dim; ++d)			// 子のindexを
+	for (size_t d = 0; d < Dim; ++d)		// 子のindexを
 	    dp[d] = (idx & (1 << d) ? _len0 : 0);	// 相対位置に変換
 	_org += dp;				// 原点を子の位置に移す．
     }
@@ -438,7 +438,7 @@ NDTree<T, D>::erase(const position_type& pos)
 /*!
   \return	先頭要素を指す反復子
 */
-template <class T, u_int D> inline typename NDTree<T, D>::iterator
+template <class T, size_t D> inline typename NDTree<T, D>::iterator
 NDTree<T, D>::begin()
 {
     return iterator(*this);
@@ -448,7 +448,7 @@ NDTree<T, D>::begin()
 /*!
   \return	先頭要素を指す定数反復子
 */
-template <class T, u_int D> inline typename NDTree<T, D>::const_iterator
+template <class T, size_t D> inline typename NDTree<T, D>::const_iterator
 NDTree<T, D>::begin() const
 {
     return const_iterator(*this);
@@ -458,7 +458,7 @@ NDTree<T, D>::begin() const
 /*!
   \return	末尾を指す反復子
 */
-template <class T, u_int D> inline typename NDTree<T, D>::iterator
+template <class T, size_t D> inline typename NDTree<T, D>::iterator
 NDTree<T, D>::end()
 {
     return iterator();
@@ -468,7 +468,7 @@ NDTree<T, D>::end()
 /*!
   \return	末尾を指す定数反復子
 */
-template <class T, u_int D> inline typename NDTree<T, D>::const_iterator
+template <class T, size_t D> inline typename NDTree<T, D>::const_iterator
 NDTree<T, D>::end() const
 {
     return const_iterator();
@@ -479,7 +479,7 @@ NDTree<T, D>::end() const
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-template <class T, u_int D> std::ostream&
+template <class T, size_t D> std::ostream&
 NDTree<T, D>::put(std::ostream& out) const
 {
     using namespace	std;
@@ -496,14 +496,14 @@ NDTree<T, D>::put(std::ostream& out) const
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-template <class T, u_int D> std::istream&
+template <class T, size_t D> std::istream&
 NDTree<T, D>::get(std::istream& in)
 {
     clear();					// 既存の全セルを廃棄
 
     for (position_type pos; in >> pos; )	// 葉の位置を読み込み
     {
-	u_int		len;
+	size_t		len;
 	value_type	val;
 	in >> len >> val;			// 葉のセル長と値を読み込む．
 	insert(pos, val);			// 指定された位置に値を挿入
@@ -517,7 +517,7 @@ NDTree<T, D>::get(std::istream& in)
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-template <class T, u_int D> inline std::ostream&
+template <class T, size_t D> inline std::ostream&
 NDTree<T, D>::print(std::ostream& out) const
 {
     if (_root)
@@ -526,10 +526,10 @@ NDTree<T, D>::print(std::ostream& out) const
     return out;
 }
     
-template <class T, u_int D> bool
+template <class T, size_t D> bool
 NDTree<T, D>::out_of_range(const position_type& pos) const
 {
-    for (u_int d = 0; d < Dim; ++d)
+    for (size_t d = 0; d < Dim; ++d)
 	if ((pos[d] < _org[d]) || (pos[d] >= _org[d] + int(_len0)))
 	    return true;
     return false;
@@ -539,7 +539,7 @@ NDTree<T, D>::out_of_range(const position_type& pos) const
 *  class NDTree<T, D>::Iterator<S>					*
 ************************************************************************/
 //! 何も指さない2^D分木のための反復子を作る．
-template <class T, u_int D> template <class S> inline
+template <class T, size_t D> template <class S> inline
 NDTree<T, D>::Iterator<S>::Iterator()
     :_org(), _leaf(0), _dp(), _len(0)
 {
@@ -550,7 +550,7 @@ NDTree<T, D>::Iterator<S>::Iterator()
   反復子は2^D分木の先頭要素を指すように初期化される．
   \param tree	2^D分木
 */
-template <class T, u_int D> template <class S> inline
+template <class T, size_t D> template <class S> inline
 NDTree<T, D>::Iterator<S>::Iterator(const NDTree& tree)
     :_org(), _leaf(0), _dp(), _len(0)
 {
@@ -568,7 +568,7 @@ NDTree<T, D>::Iterator<S>::Iterator(const NDTree& tree)
 /*!
   \return	葉の位置
 */
-template <class T, u_int D> template <class S>
+template <class T, size_t D> template <class S>
 inline typename NDTree<T, D>::position_type
 NDTree<T, D>::Iterator<S>::position() const
 {
@@ -579,7 +579,7 @@ NDTree<T, D>::Iterator<S>::position() const
 /*!
   \return	葉のセル長
 */
-template <class T, u_int D> template <class S> inline u_int
+template <class T, size_t D> template <class S> inline size_t
 NDTree<T, D>::Iterator<S>::length() const
 {
     return _len;
@@ -589,7 +589,7 @@ NDTree<T, D>::Iterator<S>::length() const
 /*!
   \return	値への参照
 */
-template <class T, u_int D> template <class S> inline S&
+template <class T, size_t D> template <class S> inline S&
 NDTree<T, D>::Iterator<S>::operator *() const
 {
     return _leaf->_val;
@@ -599,7 +599,7 @@ NDTree<T, D>::Iterator<S>::operator *() const
 /*!
   \return	値へのポインタ
 */
-template <class T, u_int D> template <class S> inline S*
+template <class T, size_t D> template <class S> inline S*
 NDTree<T, D>::Iterator<S>::operator ->() const
 {
     return &(operator *());
@@ -609,7 +609,7 @@ NDTree<T, D>::Iterator<S>::operator ->() const
 /*!
   \return	インクリメント後のこの反復子
 */
-template <class T, u_int D> template <class S> NDTree<T, D>::Iterator<S>&
+template <class T, size_t D> template <class S> NDTree<T, D>::Iterator<S>&
 NDTree<T, D>::Iterator<S>::operator ++()
 {
   // 1. _leaf != 0			反復子が空でない葉を指している状態
@@ -644,7 +644,7 @@ NDTree<T, D>::Iterator<S>::operator ++()
 /*!
   \return	インクリメント前の反復子
 */
-template <class T, u_int D> template <class S> inline NDTree<T, D>::Iterator<S>
+template <class T, size_t D> template <class S> inline NDTree<T, D>::Iterator<S>
 NDTree<T, D>::Iterator<S>::operator ++(int)
 {
     Iterator	tmp = *this;
@@ -657,7 +657,7 @@ NDTree<T, D>::Iterator<S>::operator ++(int)
   \param iter	比較対象の反復子
   \return	同一の要素を指していればtrue, そうでなければfalse
 */
-template <class T, u_int D> template <class S> inline bool
+template <class T, size_t D> template <class S> inline bool
 NDTree<T, D>::Iterator<S>::operator ==(const Iterator& iter) const
 {
     return _leaf == iter._leaf;
@@ -668,18 +668,18 @@ NDTree<T, D>::Iterator<S>::operator ==(const Iterator& iter) const
   \param iter	比較対象の反復子
   \return	異なる要素を指していればtrue, そうでなければfalse
 */
-template <class T, u_int D> template <class S> inline bool
+template <class T, size_t D> template <class S> inline bool
 NDTree<T, D>::Iterator<S>::operator !=(const Iterator& iter) const
 {
     return !operator ==(iter);
 }
 
-template <class T, u_int D> template <class S>
+template <class T, size_t D> template <class S>
 typename NDTree<T, D>::position_type
-NDTree<T, D>::Iterator<S>::new_dp(u_int idx) const
+NDTree<T, D>::Iterator<S>::new_dp(size_t idx) const
 {
     position_type	dp = _dp;
-    for (u_int d = 0; d < Dim; ++d)
+    for (size_t d = 0; d < Dim; ++d)
 	if (idx & (1 << d))
 	    dp[d] |= _len;
 
@@ -689,14 +689,14 @@ NDTree<T, D>::Iterator<S>::new_dp(u_int idx) const
 /************************************************************************
 *  class NDTree<T, D>::Node						*
 ************************************************************************/
-template <class T, u_int D>
+template <class T, size_t D>
 NDTree<T, D>::Node::~Node()
 {
 }
 
-template <class T, u_int D> inline typename NDTree<T, D>::Node*
+template <class T, size_t D> inline typename NDTree<T, D>::Node*
 NDTree<T, D>::Node::create(const position_type& dp,
-			   const_reference val, u_int len)
+			   const_reference val, size_t len)
 {
     if (len != 1)
     {
@@ -711,42 +711,42 @@ NDTree<T, D>::Node::create(const position_type& dp,
 /************************************************************************
 *  class NDTree<T, D>::Branch						*
 ************************************************************************/
-template <class T, u_int D>
+template <class T, size_t D>
 NDTree<T, D>::Branch::Branch()
 {
-    for (u_int i = 0; i < NChildren; ++i)
+    for (size_t i = 0; i < NChildren; ++i)
 	_children[i] = 0;
 }
 
-template <class T, u_int D>
+template <class T, size_t D>
 NDTree<T, D>::Branch::~Branch()
 {
-    for (u_int i = 0; i < NChildren; ++i)
+    for (size_t i = 0; i < NChildren; ++i)
 	delete _children[i];
 }
 
-template <class T, u_int D> typename NDTree<T, D>::Node*
+template <class T, size_t D> typename NDTree<T, D>::Node*
 NDTree<T, D>::Branch::clone() const
 {
     Branch*	b = new Branch;
-    for (u_int i = 0; i < NChildren; ++i)
+    for (size_t i = 0; i < NChildren; ++i)
 	if (_children[i])
 	    b->_children[i] = _children[i]->clone();
     return b;
 }
     
-template <class T, u_int D> u_int
+template <class T, size_t D> size_t
 NDTree<T, D>::Branch::size() const
 {
-    u_int	n = 0;
-    for (u_int i = 0; i < NChildren; ++i)
+    size_t	n = 0;
+    for (size_t i = 0; i < NChildren; ++i)
 	if (_children[i])
 	    n += _children[i]->size();
     return n;
 }
 
-template <class T, u_int D> typename NDTree<T, D>::pointer
-NDTree<T, D>::Branch::find(const position_type& dp, u_int len)
+template <class T, size_t D> typename NDTree<T, D>::pointer
+NDTree<T, D>::Branch::find(const position_type& dp, size_t len)
 {
     len >>= 1;						// 1つ下のレベルへ
     Node*	child = _children[child_idx(dp, len)];	// 子
@@ -754,8 +754,8 @@ NDTree<T, D>::Branch::find(const position_type& dp, u_int len)
     return (child ? child->find(dp, len) : 0);
 }
 
-template <class T, u_int D> typename NDTree<T, D>::const_pointer
-NDTree<T, D>::Branch::find(const position_type& dp, u_int len) const
+template <class T, size_t D> typename NDTree<T, D>::const_pointer
+NDTree<T, D>::Branch::find(const position_type& dp, size_t len) const
 {
     len >>= 1;						// 1つ下のレベルへ
     const Node*	child = _children[child_idx(dp, len)];	// 子
@@ -763,9 +763,9 @@ NDTree<T, D>::Branch::find(const position_type& dp, u_int len) const
     return (child ? child->find(dp, len) : 0);
 }
 
-template <class T, u_int D> void
+template <class T, size_t D> void
 NDTree<T, D>::Branch::insert(const position_type& dp,
-			     const_reference val, u_int len)
+			     const_reference val, size_t len)
 {
     len >>= 1;						// 1つ下のレベルへ
     Node*&	child = _children[child_idx(dp, len)];	// 子
@@ -776,8 +776,8 @@ NDTree<T, D>::Branch::insert(const position_type& dp,
 	child = Node::create(dp, val, len);		// 新たに子を作って挿入
 }
 
-template <class T, u_int D> typename NDTree<T, D>::Node*
-NDTree<T, D>::Branch::erase(const position_type& dp, u_int len)
+template <class T, size_t D> typename NDTree<T, D>::Node*
+NDTree<T, D>::Branch::erase(const position_type& dp, size_t len)
 {
     len >>= 1;						// 1つ下のレベルへ
     Node*&	child = _children[child_idx(dp, len)];	// 子
@@ -786,7 +786,7 @@ NDTree<T, D>::Branch::erase(const position_type& dp, u_int len)
 	return this;					// この枝自身を返す
     child = child->erase(dp, len);			// 子孫から消去
 
-    for (u_int i = 0; i < NChildren; ++i)
+    for (size_t i = 0; i < NChildren; ++i)
 	if (_children[i])	// 子が1つでも残っていれば...
 	    return this;	// この枝自身を返す
 
@@ -794,27 +794,27 @@ NDTree<T, D>::Branch::erase(const position_type& dp, u_int len)
     return 0;			// 0を返す
 }
     
-template <class T, u_int D> typename NDTree<T, D>::Branch*
+template <class T, size_t D> typename NDTree<T, D>::Branch*
 NDTree<T, D>::Branch::branch()
 {
     return this;
 }
     
-template <class T, u_int D> typename NDTree<T, D>::Leaf*
+template <class T, size_t D> typename NDTree<T, D>::Leaf*
 NDTree<T, D>::Branch::leaf()
 {
     return 0;
 }
     
-template <class T, u_int D> void
-NDTree<T, D>::Branch::print(std::ostream& out, u_int nindents) const
+template <class T, size_t D> void
+NDTree<T, D>::Branch::print(std::ostream& out, size_t nindents) const
 {
     using namespace	std;
 
     out << endl;
-    for (u_int i = 0; i < NChildren; ++i)
+    for (size_t i = 0; i < NChildren; ++i)
     {
-	for (u_int n = 0; n < nindents; ++n)
+	for (size_t n = 0; n < nindents; ++n)
 	    out << ' ';
 	out << '[' << i << "]: ";
 	if (_children[i])
@@ -824,8 +824,8 @@ NDTree<T, D>::Branch::print(std::ostream& out, u_int nindents) const
     }
 }
     
-template <class T, u_int D> typename NDTree<T, D>::Node*
-NDTree<T, D>::Branch::ascend(Node* node, u_int idx)
+template <class T, size_t D> typename NDTree<T, D>::Node*
+NDTree<T, D>::Branch::ascend(Node* node, size_t idx)
 {
     Branch*	b = new Branch;
     b->_children[idx] = node;
@@ -833,11 +833,11 @@ NDTree<T, D>::Branch::ascend(Node* node, u_int idx)
     return b;
 }
     
-template <class T, u_int D> typename NDTree<T, D>::Node*
-NDTree<T, D>::Branch::descend(u_int& idx)
+template <class T, size_t D> typename NDTree<T, D>::Node*
+NDTree<T, D>::Branch::descend(size_t& idx)
 {
-    u_int	nchildren = 0;
-    for (u_int i = 0; i < NChildren; ++i)
+    size_t	nchildren = 0;
+    for (size_t i = 0; i < NChildren; ++i)
 	if (_children[i])
 	{
 	    ++nchildren;		// 子の数と
@@ -854,10 +854,10 @@ NDTree<T, D>::Branch::descend(u_int& idx)
     return root;			// 新しいrootを返す．
 }
     
-template <class T, u_int D> u_int
-NDTree<T, D>::Branch::child_idx(const position_type& dp, u_int len)
+template <class T, size_t D> size_t
+NDTree<T, D>::Branch::child_idx(const position_type& dp, size_t len)
 {
-    u_int	i = 0;
+    size_t	i = 0;
     for (int d = 0; d < Dim; ++d)
 	if (dp[d] & len)
 	    i |= (1 << d);
@@ -868,56 +868,56 @@ NDTree<T, D>::Branch::child_idx(const position_type& dp, u_int len)
 /************************************************************************
 *  class NDTree<T, D>::Leaf						*
 ************************************************************************/
-template <class T, u_int D> inline
+template <class T, size_t D> inline
 NDTree<T, D>::Leaf::Leaf(const_reference val)
     :_val(val)
 {
 }
 
-template <class T, u_int D>
+template <class T, size_t D>
 NDTree<T, D>::Leaf::~Leaf()
 {
 }
 
-template <class T, u_int D> typename NDTree<T, D>::Node*
+template <class T, size_t D> typename NDTree<T, D>::Node*
 NDTree<T, D>::Leaf::clone() const
 {
     return new Leaf(*this);
 }
     
-template <class T, u_int D> u_int
+template <class T, size_t D> size_t
 NDTree<T, D>::Leaf::size() const
 {
     return 1;
 }
     
-template <class T, u_int D> typename NDTree<T, D>::pointer
-NDTree<T, D>::Leaf::find(const position_type&, u_int len)
+template <class T, size_t D> typename NDTree<T, D>::pointer
+NDTree<T, D>::Leaf::find(const position_type&, size_t len)
 {
     if (len != 1)
 	throw std::logic_error("NDTree<T, D>::Leaf::find: non-zero \'len\'!");
     return &_val;
 }
 
-template <class T, u_int D> typename NDTree<T, D>::const_pointer
-NDTree<T, D>::Leaf::find(const position_type&, u_int len) const
+template <class T, size_t D> typename NDTree<T, D>::const_pointer
+NDTree<T, D>::Leaf::find(const position_type&, size_t len) const
 {
     if (len != 1)
 	throw std::logic_error("NDTree<T, D>::Leaf::find: non-zero \'len\'!");
     return &_val;
 }
 
-template <class T, u_int D> void
+template <class T, size_t D> void
 NDTree<T, D>::Leaf::insert(const position_type& pos,
-			   const_reference val, u_int len)
+			   const_reference val, size_t len)
 {
     if (len != 1)
 	throw std::logic_error("NDTree<T, D>::Leaf::insert: non-zero \'len\'!");
     _val = val;
 }
 
-template <class T, u_int D> typename NDTree<T, D>::Node*
-NDTree<T, D>::Leaf::erase(const position_type&, u_int len)
+template <class T, size_t D> typename NDTree<T, D>::Node*
+NDTree<T, D>::Leaf::erase(const position_type&, size_t len)
 {
     if (len != 1)
 	throw std::logic_error("NDTree<T, D>::Leaf::erase: non-zero \'len\'!");
@@ -925,20 +925,20 @@ NDTree<T, D>::Leaf::erase(const position_type&, u_int len)
     return 0;
 }
 
-template <class T, u_int D> typename NDTree<T, D>::Branch*
+template <class T, size_t D> typename NDTree<T, D>::Branch*
 NDTree<T, D>::Leaf::branch()
 {
     return 0;
 }
     
-template <class T, u_int D> typename NDTree<T, D>::Leaf*
+template <class T, size_t D> typename NDTree<T, D>::Leaf*
 NDTree<T, D>::Leaf::leaf()
 {
     return this;
 }
     
-template <class T, u_int D> void
-NDTree<T, D>::Leaf::print(std::ostream& out, u_int nindents) const
+template <class T, size_t D> void
+NDTree<T, D>::Leaf::print(std::ostream& out, size_t nindents) const
 {
     out << _val << std::endl;
 }
@@ -952,7 +952,7 @@ NDTree<T, D>::Leaf::print(std::ostream& out, u_int nindents) const
   \param tree	2^D分木の読み込み先
   \return	inで指定した入力ストリーム
 */
-template <class T, u_int D> inline std::istream&
+template <class T, size_t D> inline std::istream&
 operator >>(std::istream& in, NDTree<T, D>& tree)
 {
     return tree.get(in);
@@ -964,7 +964,7 @@ operator >>(std::istream& in, NDTree<T, D>& tree)
   \param tree	書き出す2^D分木
   \return	outで指定した出力ストリーム
 */
-template <class T, u_int D> inline std::ostream&
+template <class T, size_t D> inline std::ostream&
 operator <<(std::ostream& out, const NDTree<T, D>& tree)
 {
     return tree.put(out);

@@ -113,16 +113,16 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
   /*!
     \param v	コピー元2次元ベクトル
   */
-    template <class T2, class B2>
-    Point2(const Vector<T2, B2>& v) :super(v)				{}
+    template <class E>
+    Point2(const Expression<E>& v) :super(v)				{}
 
   //! 他の2次元ベクトルを自分に代入する．
   /*!
     \param v	コピー元2次元ベクトル
     \return	この2次元点
   */
-    template <class T2, class B2>
-    Point2&	operator =(const Vector<T2, B2>& v)
+    template <class E>
+    Point2&	operator =(const Expression<E>& v)
 		{
 		    super::operator =(v);
 		    return *this;
@@ -277,9 +277,9 @@ Point2<T>::dir(const Point2<T>& p) const
 /*!
   \param pp	2次元点
   \param pn	2次元点
-  \return	pp->*this->pnがなす角度を-180degから180degまでを8等分した区間で
-		表した-4から3までの整数値．特に，pp, pnの少なくとも一方がこの点に
-		一致するならば4
+  \return	pp->*this->pnがなす角度を-180degから180degまでを8等分した
+		区間で表した-4から3までの整数値．特に，pp, pnの少なくとも
+		一方がこの点に一致するならば4
 */
 template <class T> int
 Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
@@ -321,16 +321,16 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
   /*!
     \param v	コピー元3次元ベクトル
   */
-    template <class T2, class B2>
-    Point3(const Vector<T2, B2>& v) :super(v)				{}
+    template <class E>
+    Point3(const Expression<E>& v) :super(v)				{}
 
   //! 他の3次元ベクトルを自分に代入する．
   /*!
     \param v	コピー元3次元ベクトル
     \return	この3次元点
   */
-    template <class T2, class B2>
-    Point3&	operator =(const Vector<T2, B2>& v)
+    template <class E>
+    Point3&	operator =(const Expression<E>& v)
 		{
 		    super::operator =(v);
 		    return *this;
@@ -391,7 +391,7 @@ class Normalize
     恒等変換として初期化される．
     \param d	空間の次元
   */
-    Normalize(u_int d=2) :_npoints(0), _scale(1.0), _centroid(d)	{}
+    Normalize(size_t d=2) :_npoints(0), _scale(1.0), _centroid(d)	{}
 
     template <class Iterator>
     Normalize(Iterator first, Iterator last)				;
@@ -399,7 +399,7 @@ class Normalize
     template <class Iterator>
     void		update(Iterator first, Iterator last)		;
 
-    u_int		spaceDim()				const	;
+    size_t		spaceDim()				const	;
     template <class S2, class B2>
     vector_type		operator ()(const Vector<S2, B2>& x)	const	;
     template <class S2, class B2>
@@ -413,7 +413,7 @@ class Normalize
     const vector_type&	centroid()				const	;
     
   private:
-    u_int		_npoints;	//!< これまでに与えた点の総数
+    size_t		_npoints;	//!< これまでに与えた点の総数
     element_type	_scale;		//!< これまでに与えた点の振幅のRMS値
     vector_type		_centroid;	//!< これまでに与えた点群の重心
 };
@@ -465,7 +465,7 @@ Normalize<S>::update(Iterator first, Iterator last)
 /*! 
   \return	空間の次元(同次座標のベクトルとしての次元は spaceDim()+1)
 */
-template <class S> inline u_int
+template <class S> inline size_t
 Normalize<S>::spaceDim() const
 {
     return _centroid.size();
@@ -529,7 +529,7 @@ template <class S> typename Normalize<S>::matrix_type
 Normalize<S>::T() const
 {
     matrix_type	TT(spaceDim()+1, spaceDim()+1);
-    for (u_int i = 0; i < spaceDim(); ++i)
+    for (size_t i = 0; i < spaceDim(); ++i)
     {
 	TT[i][i] = 1.0 / _scale;
 	TT[i][spaceDim()] = -_centroid[i] / _scale;
@@ -553,7 +553,7 @@ template <class S> typename Normalize<S>::matrix_type
 Normalize<S>::Tt() const
 {
     matrix_type	TTt(spaceDim()+1, spaceDim()+1);
-    for (u_int i = 0; i < spaceDim(); ++i)
+    for (size_t i = 0; i < spaceDim(); ++i)
     {
 	TTt[i][i] = 1.0 / _scale;
 	TTt[spaceDim()][i] = -_centroid[i] / _scale;
@@ -577,7 +577,7 @@ template <class S> typename Normalize<S>::matrix_type
 Normalize<S>::Tinv() const
 {
     matrix_type	TTinv(spaceDim()+1, spaceDim()+1);
-    for (u_int i = 0; i < spaceDim(); ++i)
+    for (size_t i = 0; i < spaceDim(); ++i)
     {
 	TTinv[i][i] = _scale;
 	TTinv[i][spaceDim()] = _centroid[i];
@@ -601,7 +601,7 @@ template <class S> typename Normalize<S>::matrix_type
 Normalize<S>::Ttinv() const
 {
     matrix_type	TTtinv(spaceDim()+1, spaceDim()+1);
-    for (u_int i = 0; i < spaceDim(); ++i)
+    for (size_t i = 0; i < spaceDim(); ++i)
     {
 	TTtinv[i][i] = _scale;
 	TTtinv[spaceDim()][i] = _centroid[i];
@@ -634,14 +634,14 @@ class HyperPlane : public V
     
   public:
     HyperPlane()					;
-    explicit HyperPlane(u_int d)			;
+    explicit HyperPlane(size_t d)			;
 
   //! 同次座標ベクトルを指定して超平面オブジェクトを生成する．
   /*!
     \param p	(d+1)次元ベクトル(dは超平面が存在する射影空間の次元)
   */
-    template <class T, class B>
-    HyperPlane(const Vector<T, B>& p)	:super(p)	{}
+    template <class E>
+    HyperPlane(const Expression<E>& p)	:super(p)	{}
 
     template <class Iterator>
     HyperPlane(Iterator begin, Iterator end)		;
@@ -653,8 +653,8 @@ class HyperPlane : public V
     \param v	(d+1)次元ベクトル(dは超平面が存在する射影空間の次元)
     \return	この超平面オブジェクト
   */
-    template <class T, class B>
-    HyperPlane&	operator =(const Vector<T, B>& v)	{super::operator =(v);
+    template <class E>
+    HyperPlane&	operator =(const Expression<E>& v)	{super::operator =(v);
 							 return *this;}
 
     template <class Iterator>
@@ -664,14 +664,14 @@ class HyperPlane : public V
   /*! 
     \return	射影空間の次元(同次座標のベクトルとしての次元は spaceDim()+1)
   */
-    u_int	spaceDim()			const	{return size()-1;}
+    size_t	spaceDim()			const	{return size()-1;}
 
   //! 超平面を求めるために必要な点の最小個数を返す．
   /*!
     現在設定されている射影空間の次元をもとに計算される．
     \return	必要な点の最小個数すなわち入力空間の次元 spaceDim()
   */
-    u_int	ndataMin()			const	{return spaceDim();}
+    size_t	ndataMin()			const	{return spaceDim();}
 
     template <class T, class B>
     element_type	sqdist(const Vector<T, B>& x)	const	;
@@ -697,7 +697,7 @@ HyperPlane<V>::HyperPlane()
   \param d	この超平面が存在する射影空間の次元
 */
 template <class V> inline
-HyperPlane<V>::HyperPlane(u_int d)
+HyperPlane<V>::HyperPlane(size_t d)
     :super(d + 1)
 {
     (*this)[d] = 1;
@@ -728,7 +728,8 @@ HyperPlane<V>::fit(Iterator begin, Iterator end)
     const Normalize<element_type>	normalize(begin, end);
 
   // 充分な個数の点があるか？
-    const u_int	ndata = std::distance(begin, end), d = normalize.spaceDim();
+    const size_t	ndata = std::distance(begin, end),
+			d     = normalize.spaceDim();
     if (ndata < d)	// Vのサイズが未定なのでndataMin()は無効
 	throw std::invalid_argument("Hyperplane::initialize(): not enough input data!!");
 
@@ -821,14 +822,14 @@ class Projectivity : public M
     typedef Matrix<element_type>		matrix_type;
 
     Projectivity()							;
-    Projectivity(u_int inDim, u_int outDim)				;
+    Projectivity(size_t inDim, size_t outDim)				;
 
   //! 変換行列を指定して射影変換オブジェクトを生成する．
   /*!
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
   */
-    template <class S, class B, class R>
-    Projectivity(const Matrix<S, B, R>& T) :super(T)			{}
+    template <class E>
+    Projectivity(const Expression<E>& T) :super(T)			{}
 
     template <class Iterator>
     Projectivity(Iterator begin, Iterator end, bool refine=false)	;
@@ -841,8 +842,8 @@ class Projectivity : public M
   /*!
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
   */
-    template <class S, class B, class R>
-    void	set(const Matrix<S, B, R>& T)		{super::operator =(T);}
+    template <class E>
+    void	set(const Expression<E>& T)		{super::operator =(T);}
     
     template <class Iterator>
     void	fit(Iterator begin, Iterator end, bool refine=false)	;
@@ -851,15 +852,15 @@ class Projectivity : public M
   /*! 
     \return	入力空間の次元(同次座標のベクトルとしての次元は inDim()+1)
   */
-    u_int	inDim()				const	{return ncol()-1;}
+    size_t	inDim()				const	{return ncol()-1;}
 
   //! この射影変換の出力空間の次元を返す．
   /*! 
     \return	出力空間の次元(同次座標のベクトルとしての次元は outDim()+1)
   */
-    u_int	outDim()			const	{return nrow()-1;}
+    size_t	outDim()			const	{return nrow()-1;}
 
-    u_int	ndataMin()			const	;
+    size_t	ndataMin()			const	;
 
     Projectivity	inv()					const	;
     template <class S, class B>
@@ -874,7 +875,7 @@ class Projectivity : public M
     element_type	sqdist(const std::pair<In, Out>& pair)	const	;
     template <class In, class Out>
     element_type	dist(const std::pair<In, Out>& pair)	const	;
-    u_int		nparams()				const	;
+    size_t		nparams()				const	;
     void		update(const vector_type& dt)			;
 
     template <class Iterator>
@@ -900,7 +901,7 @@ class Projectivity : public M
 
       private:
 	const Iterator	_begin, _end;
-	const u_int	_npoints;
+	const size_t	_npoints;
     };
 };
 
@@ -914,8 +915,8 @@ Projectivity<M>::Projectivity()
 {
     if (nrow() > 0 && ncol() > 0)
     {
-	u_int	n = std::min(ncol() - 1, nrow() - 1);
-	for (u_int i = 0; i < n; ++i)
+	size_t	n = std::min(ncol() - 1, nrow() - 1);
+	for (size_t i = 0; i < n; ++i)
 	    (*this)[i][i] = 1.0;
 	(*this)[nrow() - 1][ncol() - 1] = 1.0;
     }
@@ -928,11 +929,11 @@ Projectivity<M>::Projectivity()
   \param outDim	出力空間の次元
 */
 template <class M>
-Projectivity<M>::Projectivity(u_int inDim, u_int outDim)
+Projectivity<M>::Projectivity(size_t inDim, size_t outDim)
     :super(outDim + 1, inDim + 1)
 {
-    u_int	n = std::min(inDim, outDim);
-    for (u_int i = 0; i < n; ++i)
+    size_t	n = std::min(inDim, outDim);
+    for (size_t i = 0; i < n; ++i)
 	(*this)[i][i] = 1.0;
     (*this)[outDim][inDim] = 1.0;
 }
@@ -968,8 +969,8 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
 			   make_const_second_iterator(end));
 
   // 充分な個数の点対があるか？
-    const u_int	ndata = std::distance(begin, end);
-    const u_int	xdim1 = xNormalize.spaceDim() + 1,
+    const size_t	ndata = std::distance(begin, end);
+    const size_t	xdim1 = xNormalize.spaceDim() + 1,
 		ydim  = yNormalize.spaceDim();
     if (ndata*ydim < xdim1*(ydim + 1) - 1)	// 行列のサイズが未定なので
 						// ndataMin()は使えない
@@ -983,11 +984,11 @@ Projectivity<M>::fit(Iterator begin, Iterator end, bool refine)
 	const vector_type&	y  = yNormalize(iter->second);
 	const matrix_type&	xx = x % x;
 	A(0, 0, xdim1, xdim1) += xx;
-	for (u_int j = 0; j < ydim; ++j)
+	for (size_t j = 0; j < ydim; ++j)
 	    A(ydim*xdim1, j*xdim1, xdim1, xdim1) -= y[j] * xx;
 	A(ydim*xdim1, ydim*xdim1, xdim1, xdim1) += (y*y) * xx;
     }
-    for (u_int j = 1; j < ydim; ++j)
+    for (size_t j = 1; j < ydim; ++j)
 	A(j*xdim1, j*xdim1, xdim1, xdim1) = A(0, 0, xdim1, xdim1);
     A.symmetrize();
 
@@ -1034,11 +1035,11 @@ Projectivity<M>::inv() const
   \return	必要な点対の最小個数すなわち入力空間の次元m，出力空間の次元n
 		に対して m + 1 + m/n
 */
-template <class M> inline u_int
+template <class M> inline size_t
 Projectivity<M>::ndataMin() const
 {
     return inDim() + 1
-	 + u_int(std::ceil(element_type(inDim()) / element_type(outDim())));
+	 + size_t(std::ceil(element_type(inDim()) / element_type(outDim())));
 }
     
 //! 与えられた点に射影変換を適用してその非同次座標を返す．
@@ -1053,20 +1054,20 @@ Projectivity<M>::operator ()(const Vector<S, B>& x) const
     if (x.size() == inDim())
     {
 	vector_type	y(outDim());
-	u_int		j;
+	size_t		j;
 	for (j = 0; j < y.size(); ++j)
 	{
 	    y[j] = (*this)[j][x.size()];
-	    for (u_int i = 0; i < x.size(); ++i)
+	    for (size_t i = 0; i < x.size(); ++i)
 		y[j] += (*this)[j][i] * x[i];
 	}
 	element_type	w = (*this)[j][x.size()];
-	for (u_int i = 0; i < x.size(); ++i)
+	for (size_t i = 0; i < x.size(); ++i)
 	    w += (*this)[j][i] * x[i];
 	return y /= w;
     }
     else
-	return (*this * x).inhomogeneous();
+	return vector_type(*this * x).inhomogeneous();
 }
 
 //! 与えられた点に射影変換を適用してその同次座標を返す．
@@ -1081,10 +1082,10 @@ Projectivity<M>::mapP(const Vector<S, B>& x) const
     if (x.size() == inDim())
     {
 	vector_type	y(nrow());
-	for (u_int j = 0; j < y.size(); ++j)
+	for (size_t j = 0; j < y.size(); ++j)
 	{
 	    y[j] = (*this)[j][x.size()];
-	    for (u_int i = 0; i < x.size(); ++i)
+	    for (size_t i = 0; i < x.size(); ++i)
 		y[j] += (*this)[j][i] * x[i];
 	}
 	return y;
@@ -1110,7 +1111,7 @@ Projectivity<M>::jacobian(const Vector<S, B>& x) const
 	xP = x;
     const vector_type&	y = mapP(xP);
     matrix_type		J(outDim(), (outDim() + 1)*xP.size());
-    for (u_int i = 0; i < J.nrow(); ++i)
+    for (size_t i = 0; i < J.nrow(); ++i)
     {
 	J[i](i*xP.size(), xP.size()) = xP;
 	(J[i](outDim()*xP.size(), xP.size()) = xP) *= (-y[i]/y[outDim()]);
@@ -1131,7 +1132,7 @@ Projectivity<M>::Jx(const Vector<S, B>& x) const
 {
     const vector_type&	y = mapP(x);
     matrix_type		J(outDim(), inDim());
-    for (u_int i = 0; i < J.nrow(); ++i)
+    for (size_t i = 0; i < J.nrow(); ++i)
 	J[i] = (*this)[i](0, J.ncol())
 	     - (y[i]/y[outDim()]) * (*this)[outDim()](0, J.ncol());
     J /= y[outDim()];
@@ -1170,7 +1171,7 @@ Projectivity<M>::dist(const std::pair<In, Out>& pair) const
   射影変換行列の要素数であり，変換の自由度数とは異なる．
   \return	射影変換のパラメータ数((outDim()+1) x (inDim()+1))
 */
-template <class M> inline u_int
+template <class M> inline size_t
 Projectivity<M>::nparams() const
 {
     return (outDim() + 1)*(inDim() + 1);
@@ -1200,7 +1201,7 @@ typename Projectivity<M>::element_type
 Projectivity<M>::rmsError(Iterator begin, Iterator end) const
 {
     element_type	sqrerr_sum = 0;
-    u_int		npoints = 0;
+    size_t		npoints = 0;
     for (Iterator iter = begin; iter != end; ++iter)
     {
 	const vector_type&	err = (*this)(iter->first) - iter->second;
@@ -1221,9 +1222,9 @@ template <class M> template <class Map, class Iterator>
 typename Projectivity<M>::template Cost<Map, Iterator>::vector_type
 Projectivity<M>::Cost<Map, Iterator>::operator ()(const Map& map) const
 {
-    const u_int	outDim = map.outDim();
+    const size_t	outDim = map.outDim();
     vector_type	val(_npoints*outDim);
-    u_int	n = 0;
+    size_t	n = 0;
     for (Iterator iter = _begin; iter != _end; ++iter)
     {
 	val(n, outDim) = map(iter->first) - iter->second;
@@ -1237,9 +1238,9 @@ template <class M> template <class Map, class Iterator>
 typename Projectivity<M>::template Cost<Map, Iterator>::matrix_type
 Projectivity<M>::Cost<Map, Iterator>::jacobian(const Map& map) const
 {
-    const u_int	outDim = map.outDim();
+    const size_t	outDim = map.outDim();
     matrix_type	J(_npoints*outDim, map.nparams());
-    u_int	n = 0;
+    size_t	n = 0;
     for (Iterator iter = _begin; iter != _end; ++iter)
     {
 	J(n, 0, outDim, J.ncol()) = map.jacobian(iter->first);
@@ -1296,10 +1297,10 @@ class Affinity : public Projectivity<M>
     \param inDim	入力空間の次元
     \param outDim	出力空間の次元
   */
-    Affinity(u_int inDim, u_int outDim)	:super(inDim, outDim)		{}
+    Affinity(size_t inDim, size_t outDim)	:super(inDim, outDim)	{}
 
-    template <class S, class B, class R>
-    Affinity(const Matrix<S, B, R>& T)					;
+    template <class E>
+    Affinity(const Expression<E>& T)					;
     template <class Iterator>
     Affinity(Iterator begin, Iterator end)				;
 
@@ -1308,16 +1309,16 @@ class Affinity : public Projectivity<M>
     using	super::mapP;
     using	super::Jx;
     
-    template <class S, class B, class R>
-    void	set(const Matrix<S, B, R>& T)				;
+    template <class E>
+    void	set(const Expression<E>& T)				;
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)			;
     Affinity	inv()						const	;
-    u_int	ndataMin()					const	;
+    size_t	ndataMin()					const	;
 
     template <class S, class B>
     matrix_type	jacobian(const Vector<S, B>& x)			const	;
-    u_int	nparams()					const	;
+    size_t	nparams()					const	;
     void	update(const vector_type& dt)				;
     
   //! このアフィン変換の変形部分を表現する行列を返す．
@@ -1335,8 +1336,8 @@ class Affinity : public Projectivity<M>
   変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
   \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
-template<class M> template <class S, class B, class R> inline
-Affinity<M>::Affinity(const Matrix<S, B, R>& T)
+template<class M> template <class E> inline
+Affinity<M>::Affinity(const Expression<E>& T)
     :super(T)
 {
     (*this)[outDim()]	       = 0;
@@ -1360,8 +1361,8 @@ Affinity<M>::Affinity(Iterator begin, Iterator end)
   変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
   \param T			(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
-template<class M> template <class S, class B, class R> inline void
-Affinity<M>::set(const Matrix<S, B, R>& T)
+template<class M> template <class E> inline void
+Affinity<M>::set(const Expression<E>& T)
 {
     super::set(T);
     (*this)[outDim()]	       = 0;
@@ -1378,15 +1379,15 @@ template<class M> template <class Iterator> void
 Affinity<M>::fit(Iterator begin, Iterator end)
 {
   // 充分な個数の点対があるか？
-    const u_int	ndata = std::distance(begin, end);
+    const size_t	ndata = std::distance(begin, end);
     if (ndata == 0)		// beginが有効か？
 	throw std::invalid_argument("Affinity::fit(): 0-length input data!!");
-    const u_int	xdim = begin->first.size();
+    const size_t	xdim = begin->first.size();
     if (ndata < xdim + 1)	// 行列のサイズが未定なのでndataMin()は無効
 	throw std::invalid_argument("Affinity::fit(): not enough input data!!");
 
   // データ行列の計算
-    const u_int	ydim = begin->second.size(), xydim2 = xdim*ydim;
+    const size_t	ydim = begin->second.size(), xydim2 = xdim*ydim;
     matrix_type	N(xdim, xdim);
     vector_type	c(xdim), v(xydim2 + ydim);
     for (Iterator iter = begin; iter != end; ++iter)
@@ -1396,12 +1397,12 @@ Affinity<M>::fit(Iterator begin, Iterator end)
 
 	N += x % x;
 	c += x;
-	for (u_int j = 0; j < ydim; ++j)
+	for (size_t j = 0; j < ydim; ++j)
 	    v(j*xdim, xdim) += y[j]*x;
 	v(xydim2, ydim) += y;
     }
     matrix_type	W(xydim2 + ydim, xydim2 + ydim);
-    for (u_int j = 0; j < ydim; ++j)
+    for (size_t j = 0; j < ydim; ++j)
     {
 	W(j*xdim, j*xdim, xdim, xdim) = N;
 	W[xydim2 + j](j*xdim, xdim)   = c;
@@ -1415,7 +1416,7 @@ Affinity<M>::fit(Iterator begin, Iterator end)
   // 変換行列をセットする．
     super::resize(ydim + 1, xdim + 1);
     super::operator ()(0, 0, ydim, xdim) = matrix_type(v.data(), ydim, xdim);
-    for (u_int j = 0; j < ydim; ++j)
+    for (size_t j = 0; j < ydim; ++j)
 	(*this)[j][xdim] = v[xydim2 + j];
     (*this)[ydim][xdim] = 1;
 }
@@ -1428,7 +1429,7 @@ template <class M> typename Affinity<M>::vector_type
 Affinity<M>::b() const
 {
     vector_type	bb(outDim());
-    for (u_int j = 0; j < bb.size(); ++j)
+    for (size_t j = 0; j < bb.size(); ++j)
 	bb[j] = (*this)[j][inDim()];
 
     return bb;
@@ -1449,7 +1450,7 @@ Affinity<M>::inv() const
   現在設定されている入出力空間の次元をもとに計算される．
   \return	必要な点対の最小個数すなわち入力空間の次元mに対して m + 1
 */
-template<class M> inline u_int
+template<class M> inline size_t
 Affinity<M>::ndataMin() const
 {
     return inDim() + 1;
@@ -1472,7 +1473,7 @@ Affinity<M>::jacobian(const Vector<S, B>& x) const
 	xP = x;
     const vector_type&	y = mapP(xP);
     matrix_type		J(outDim(), outDim()*xP.size());
-    for (u_int i = 0; i < J.nrow(); ++i)
+    for (size_t i = 0; i < J.nrow(); ++i)
 	J[i](i*xP.size(), xP.size()) = xP;
     J /= y[outDim()];
 
@@ -1484,7 +1485,7 @@ Affinity<M>::jacobian(const Vector<S, B>& x) const
   アフィン変換行列の最初のoutDim()行の要素数であり，変換の自由度数と一致する．
   \return	アフィン変換のパラメータ数(outDim() x (inDim()+1))
 */
-template <class M> inline u_int
+template <class M> inline size_t
 Affinity<M>::nparams() const
 {
     return outDim()*(inDim() + 1);
@@ -1544,26 +1545,26 @@ class Rigidity : public Affinity<M>
     恒等変換として初期化される．
     \param d	入力/出力空間の次元
   */
-    Rigidity(u_int d)	:super(d, d)					{}
+    Rigidity(size_t d)	:super(d, d)					{}
 
-    template <class S, class B, class RB>
-    Rigidity(const Matrix<S, B, RB>& T)					;
+    template <class E>
+    Rigidity(const Expression<E>& T)					;
     template <class Iterator>
     Rigidity(Iterator begin, Iterator end)				;
 
     using		super::inDim;
     using		super::outDim;
 
-    u_int		dim()					const	;
-    template <class S, class B, class RB>
-    void		set(const Matrix<S, B, RB>& T)			;
+    size_t		dim()					const	;
+    template <class E>
+    void		set(const Expression<E>& T)			;
     template <class Iterator>
     void		fit(Iterator begin, Iterator end)		;
     Rigidity		inv()					const	;
-    u_int		ndataMin()				const	;
+    size_t		ndataMin()				const	;
     template <class S, class B>
     matrix_type		jacobian(const Vector<S, B>& x)		const	;
-    u_int		nparams()				const	;
+    size_t		nparams()				const	;
     void		update(const vector_type& dt)			;
     
     const matrix_type	R()					const	;
@@ -1574,8 +1575,8 @@ class Rigidity : public Affinity<M>
 /*!
   \param T	(d+1) x (d+1)行列(dは入力/出力空間の次元)
 */
-template<class M> template <class S, class B, class RB> inline
-Rigidity<M>::Rigidity(const Matrix<S, B, RB>& T)
+template<class M> template <class E> inline
+Rigidity<M>::Rigidity(const Expression<E>& T)
 {
     set(T);
 }
@@ -1596,7 +1597,7 @@ Rigidity<M>::Rigidity(Iterator begin, Iterator end)
 /*! 
   \return	入力/出力空間の次元(同次座標のベクトルとしての次元は dim()+1)
 */
-template<class M> inline u_int
+template<class M> inline size_t
 Rigidity<M>::dim() const
 {
     return inDim();
@@ -1606,8 +1607,8 @@ Rigidity<M>::dim() const
 /*!
   \param T	(d+1) x (d+1) 行列(dは入力/出力空間の次元)
 */
-template<class M> template <class S, class B, class RB> inline void
-Rigidity<M>::set(const Matrix<S, B, RB>& T)
+template<class M> template <class E> inline void
+Rigidity<M>::set(const Expression<E>& T)
 {
     if (T.nrow() != T.ncol())
 	throw std::invalid_argument("Rigidity::set(): non-square matrix!!");
@@ -1624,10 +1625,10 @@ template<class M> template <class Iterator> void
 Rigidity<M>::fit(Iterator begin, Iterator end)
 {
   // 充分な個数の点対があるか？
-    const u_int	ndata = std::distance(begin, end);
+    const size_t	ndata = std::distance(begin, end);
     if (ndata == 0)		// beginが有効か？
 	throw std::invalid_argument("Rigidity::fit(): 0-length input data!!");
-    const u_int	d = begin->first.size();
+    const size_t	d = begin->first.size();
     if (begin->second.size() != d)
 	throw std::invalid_argument("Rigidity::fit(): input data contains a pair of different dimensions!!");
     if (ndata < d)		// 行列のサイズが未定なのでndataMin()は無効
@@ -1652,7 +1653,7 @@ Rigidity<M>::fit(Iterator begin, Iterator end)
     SVDecomposition<element_type>	svd(A);
     super::resize(d + 1, d + 1);
     super::operator ()(0, 0, d, d) = svd.Ut().trns() * svd.Vt();
-    for (u_int i = 0; i < d; ++i)
+    for (size_t i = 0; i < d; ++i)
 	(*this)[i][d] = yc[i] - (*this)[i](0, d) * xc;
     (*this)[d][d] = 1;
 }
@@ -1686,12 +1687,12 @@ Rigidity<M>::inv() const
 {
     Rigidity	Dinv(inDim());
 
-    for (u_int i = 0; i < dim(); ++i)
-	for (u_int j = 0; j < dim(); ++j)
+    for (size_t i = 0; i < dim(); ++i)
+	for (size_t j = 0; j < dim(); ++j)
 	    Dinv[j][i] = (*this)[i][j];
 
     vector_type	tt = t();
-    for (u_int j = 0; j < dim(); ++j)
+    for (size_t j = 0; j < dim(); ++j)
 	Dinv[j][dim()] = -(Dinv[j](0, dim()) * tt);
 
     return Dinv;
@@ -1702,7 +1703,7 @@ Rigidity<M>::inv() const
   現在設定されている空間の次元をもとに計算される．
   \return	必要な点対の最小個数すなわち空間の次元mに対してm
 */
-template<class M> inline u_int
+template<class M> inline size_t
 Rigidity<M>::ndataMin() const
 {
     return dim();
@@ -1724,7 +1725,7 @@ Rigidity<M>::jacobian(const Vector<S, B>& x) const
     else
 	xx = x.inhomogeneous();
     
-    u_int	dof = dim() * (dim() + 1) / 2;
+    size_t	dof = dim() * (dim() + 1) / 2;
     matrix_type	J(dim(), dof);
     
     switch (dim())
@@ -1751,7 +1752,7 @@ Rigidity<M>::jacobian(const Vector<S, B>& x) const
   剛体変換の独立なパラメータ数すなわち変換の自由度数に一致する．
   \return	剛体変換のパラメータ数(dim() x (dim()+1))/2
 */
-template <class M> inline u_int
+template <class M> inline size_t
 Rigidity<M>::nparams() const
 {
     return (dim()*(dim() + 1))/2;
@@ -1764,7 +1765,7 @@ Rigidity<M>::nparams() const
 template <class M> void
 Rigidity<M>::update(const vector_type& dt)
 {
-    for (u_int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < dim(); ++i)
 	(*this)[i][dim()] -= dt[i];
     
     switch (dim())
@@ -1818,9 +1819,9 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
 		   FixedSizedBuf<Vector<element_type>, 2> >	jacobian_type;
 
   public:
-    Homography()			 :super()		{}
-    template <class S, class B, class R>
-    Homography(const Matrix<S, B, R>& H) :super(H)		{}
+    Homography()			:super()		{}
+    template <class E>
+    Homography(const Expression<E>& H)	:super(H)		{}
     template <class Iterator>
     Homography(Iterator begin, Iterator end, bool refine=false)	;
 
@@ -1944,8 +1945,8 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
 
   public:
     Affinity2()	:super()					{}
-    template <class S, class B, class R>
-    Affinity2(const Matrix<S, B, R>& A)				;
+    template <class E>
+    Affinity2(const Expression<E>& A)				;
     template <class Iterator>
     Affinity2(Iterator begin, Iterator end)			;
 
@@ -1963,8 +1964,8 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
     void	compose(const param_type& dt)			;
 };
 
-template <class T> template <class S, class B, class R> inline
-Affinity2<T>::Affinity2(const Matrix<S, B, R>& A)
+template <class T> template <class E> inline
+Affinity2<T>::Affinity2(const Expression<E>& A)
     :super(A)
 {
     (*this)[2][0] = (*this)[2][1] = 0;
@@ -2043,14 +2044,14 @@ class BoundingBox
 
   public:
     BoundingBox()				;
-    explicit BoundingBox(u_int d)		;
+    explicit BoundingBox(size_t d)		;
 
     bool		operator !()	const	;
   //! このbounding boxが属する空間の次元を返す．
   /*!
     \return	空間の次元
   */
-    u_int		dim()		const	{return _min.size();}
+    size_t		dim()		const	{return _min.size();}
 
   //! このbounding boxの最小点を返す．
   /*!
@@ -2147,7 +2148,7 @@ BoundingBox<P>::BoundingBox()
   \param d	空間の次元
 */
 template <class P> inline
-BoundingBox<P>::BoundingBox(u_int d)
+BoundingBox<P>::BoundingBox(size_t d)
     :_min(d), _max(d)
 {
     clear();
@@ -2160,7 +2161,7 @@ BoundingBox<P>::BoundingBox(u_int d)
 template <class P> bool
 BoundingBox<P>::operator !() const
 {
-    for (u_int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < dim(); ++i)
 	if (_min[i] > _max[i])
 	    return true;
     return false;
@@ -2174,7 +2175,7 @@ BoundingBox<P>::operator !() const
 template <class P> template <class S, class B> bool
 BoundingBox<P>::include(const Vector<S, B>& p)
 {
-    for (u_int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < dim(); ++i)
 	if (p[i] < _min[i] || p[i] > _max[i])
 	    return false;
     return true;
@@ -2189,7 +2190,7 @@ BoundingBox<P>::clear()
 {
     typedef std::numeric_limits<element_type>	Limits;
     
-    for (u_int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < dim(); ++i)
     {
 	_min[i] = Limits::max();
 	_max[i] = (Limits::is_integer ? Limits::min() : -Limits::max());
@@ -2320,7 +2321,7 @@ template <class P> std::ostream&
 operator <<(std::ostream& out, const BoundingBox<P>& bbox)
 {
 #ifdef _DEBUG
-    for (u_int i = 0; i < bbox.dim(); ++i)
+    for (size_t i = 0; i < bbox.dim(); ++i)
     {
 	if (i != 0)
 	    out << 'x';

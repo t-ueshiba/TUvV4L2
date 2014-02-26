@@ -309,7 +309,7 @@ make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 *  class IIRFilter<D, T>						*
 ************************************************************************/
 //! 片側Infinite Inpulse Response Filterを表すクラス
-template <u_int D, class T=float> class IIRFilter
+template <size_t D, class T=float> class IIRFilter
 {
   public:
     typedef T				coeff_type;
@@ -326,7 +326,7 @@ template <u_int D, class T=float> class IIRFilter
     const coeffs_type&	ci()			const	{return _ci;}
     const coeffs_type&	co()			const	{return _co;}
 	
-    static u_int	outLength(u_int inLength)	;
+    static size_t	outLength(size_t inLength)	;
 
   private:
     coeffs_type	_ci;	//!< 入力フィルタ係数
@@ -349,7 +349,7 @@ template <u_int D, class T=float> class IIRFilter
 		\f]
   \return	このフィルタ自身
 */
-template <u_int D, class T> IIRFilter<D, T>&
+template <size_t D, class T> IIRFilter<D, T>&
 IIRFilter<D, T>::initialize(const T c[D+D])
 {
     std::copy(c,     c + D,	_ci.begin());
@@ -364,11 +364,11 @@ IIRFilter<D, T>::initialize(const T c[D+D])
   \param limit1F	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
   \param limit2F	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
-template <u_int D, class T> void
+template <size_t D, class T> void
 IIRFilter<D, T>::limitsF(T& limit0F, T& limit1F, T& limit2F) const
 {
     T	n0 = 0, d0 = 1, n1 = 0, d1 = 0, n2 = 0, d2 = 0;
-    for (u_int i = 0; i < D; ++i)
+    for (size_t i = 0; i < D; ++i)
     {
 	n0 +=	      _ci[i];
 	d0 -=	      _co[i];
@@ -390,11 +390,11 @@ IIRFilter<D, T>::limitsF(T& limit0F, T& limit1F, T& limit2F) const
   \param limit1B	傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
   \param limit2B	2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
-template <u_int D, class T> void
+template <size_t D, class T> void
 IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
 {
     T	n0 = 0, d0 = 1, n1 = 0, d1 = 0, n2 = 0, d2 = 0;
-    for (u_int i = 0; i < D; ++i)
+    for (size_t i = 0; i < D; ++i)
     {
 	n0 +=	      _ci[i];
 	d0 -=	      _co[i];
@@ -417,7 +417,7 @@ IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
   \param out	出力データ列の先頭を指す反復子
   \return	出力データ列の末尾の次を指す反復子
 */
-template <u_int D, class T> template <class IN, class OUT> OUT
+template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
@@ -436,7 +436,7 @@ IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
   \param oe	出力データ列の末尾の次を指す反復子
   \return	出力データ列の先頭を指す反復子
 */
-template <u_int D, class T> template <class IN, class OUT> OUT
+template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
@@ -453,8 +453,8 @@ IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
   \param inLength	入力データ列の長さ
   \return		出力データ列の長さ
 */
-template <u_int D, class T> inline u_int
-IIRFilter<D, T>::outLength(u_int inLength)
+template <size_t D, class T> inline size_t
+IIRFilter<D, T>::outLength(size_t inLength)
 {
     return inLength;
 }
@@ -463,7 +463,7 @@ IIRFilter<D, T>::outLength(u_int inLength)
 *  class BidirectionalIIRFilter<D, T>					*
 ************************************************************************/
 //! 両側Infinite Inpulse Response Filterを表すクラス
-template <u_int D, class T=float> class BidirectionalIIRFilter
+template <size_t D, class T=float> class BidirectionalIIRFilter
 {
   private:
     typedef IIRFilter<D, T>			iirf_type;
@@ -493,7 +493,7 @@ template <u_int D, class T=float> class BidirectionalIIRFilter
     const coeffs_type&	ciB()			const	{return _iirB.ci();}
     const coeffs_type&	coB()			const	{return _iirB.co();}
 
-    static u_int	outLength(u_int inLength)	;
+    static size_t	outLength(size_t inLength)	;
 	
   private:
     IIRFilter<D, T>	_iirF;
@@ -517,7 +517,7 @@ template <u_int D, class T=float> class BidirectionalIIRFilter
 		\f]
 		となる.
 */
-template <u_int D, class T> inline BidirectionalIIRFilter<D, T>&
+template <size_t D, class T> inline BidirectionalIIRFilter<D, T>&
 BidirectionalIIRFilter<D, T>::initialize(const T cF[D+D], const T cB[D+D])
 {
     _iirF.initialize(cF);
@@ -547,13 +547,13 @@ BidirectionalIIRFilter<D, T>::initialize(const T cF[D+D], const T cB[D+D])
 		1, 1, 2になるよう，全体のスケールも調整される．
   \return	このフィルタ自身
 */
-template <u_int D, class T> BidirectionalIIRFilter<D, T>&
+template <size_t D, class T> BidirectionalIIRFilter<D, T>&
 BidirectionalIIRFilter<D, T>::initialize(const T c[D+D], Order order)
 {
   // Compute 0th, 1st and 2nd derivatives of the forward z-transform
   // functions at z = 1.
     T	n0 = 0, d0 = 1, n1 = 0, d1 = 0, n2 = 0, d2 = 0;
-    for (u_int i = 0; i < D; ++i)
+    for (size_t i = 0; i < D; ++i)
     {
 	n0 +=	      c[i];
 	d0 -=	      c[D+i];
@@ -567,7 +567,7 @@ BidirectionalIIRFilter<D, T>::initialize(const T c[D+D], Order order)
     
   // Compute denominators.
     T	cF[D+D], cB[D+D];
-    for (u_int i = 0; i < D; ++i)
+    for (size_t i = 0; i < D; ++i)
 	cB[D+D-1-i] = cF[D+i] = c[D+i];
 
   // Compute nominators.
@@ -575,7 +575,7 @@ BidirectionalIIRFilter<D, T>::initialize(const T c[D+D], Order order)
     {
 	const T	k = -0.5/x1;
 	cF[D-1] = cB[D-1] = 0;
-	for (u_int i = 0; i < D-1; ++i)
+	for (size_t i = 0; i < D-1; ++i)
 	{
 	    cF[i]     = k*c[i];				// i(n-D+1+i)
 	    cB[D-2-i] = -cF[i];				// i(n+D-1-i)
@@ -587,7 +587,7 @@ BidirectionalIIRFilter<D, T>::initialize(const T c[D+D], Order order)
 				     : 1.0 / (2.0*x0 - c[D-1]));
 	cF[D-1] = k*c[D-1];				// i(n)
 	cB[D-1] = cF[D-1] * c[D];			// i(n+D)
-	for (u_int i = 0; i < D-1; ++i)
+	for (size_t i = 0; i < D-1; ++i)
 	{
 	    cF[i]     = k*c[i];				// i(n-D+1+i)
 	    cB[D-2-i] = cF[i] + cF[D-1] * cF[D+1+i];	// i(n+D-1-i)
@@ -603,7 +603,7 @@ BidirectionalIIRFilter<D, T>::initialize(const T c[D+D], Order order)
   \param limit1		傾き一定入力 in(n) = n を与えたときの出力極限値を返す．
   \param limit2		2次入力 in(n) = n^2 を与えたときの出力極限値を返す．
 */
-template <u_int D, class T> void
+template <size_t D, class T> void
 BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
 {
     T	limit0F, limit1F, limit2F;
@@ -623,7 +623,7 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
 */
-template <u_int D, class T> template <class IN, class OUT> inline OUT
+template <size_t D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
@@ -645,8 +645,8 @@ BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
   \param inLength	入力データ列の長さ
   \return		出力データ列の長さ
 */
-template <u_int D, class T> inline u_int
-BidirectionalIIRFilter<D, T>::outLength(u_int inLength)
+template <size_t D, class T> inline size_t
+BidirectionalIIRFilter<D, T>::outLength(size_t inLength)
 {
     return IIRFilter<D, T>::outLength(inLength);
 }
@@ -655,7 +655,7 @@ BidirectionalIIRFilter<D, T>::outLength(u_int inLength)
 *  class BidirectionalIIRFilter2<D, T>					*
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
-template <u_int D, class T=float>
+template <size_t D, class T=float>
 class BidirectionalIIRFilter2
     : public SeparableFilter2<BidirectionalIIRFilter<D, T> >
 {
@@ -698,7 +698,7 @@ class BidirectionalIIRFilter2
   \param cVB	縦方向後退z変換係数
   \return	このフィルタ自身
 */
-template <u_int D, class T> inline BidirectionalIIRFilter2<D, T>&
+template <size_t D, class T> inline BidirectionalIIRFilter2<D, T>&
 BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], const T cHB[],
 					  const T cVF[], const T cVB[])
 {
@@ -716,7 +716,7 @@ BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], const T cHB[],
   \param orderV	縦方向微分階数
   \return	このフィルタ自身
 */
-template <u_int D, class T> inline BidirectionalIIRFilter2<D, T>&
+template <size_t D, class T> inline BidirectionalIIRFilter2<D, T>&
 BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
 					  const T cVF[], Order orderV)
 {

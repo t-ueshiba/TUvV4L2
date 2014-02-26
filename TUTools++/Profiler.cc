@@ -40,7 +40,7 @@ const Profiler&
 Profiler::reset() const
 {
     _active = 0;
-    for (u_int n = 0; n < _timers.size(); ++n)
+    for (size_t n = 0; n < _timers.size(); ++n)
 	_timers[n].reset();
     _nframes = 0;
     return *this;
@@ -59,7 +59,7 @@ Profiler::print(std::ostream& out) const
     timeval		sum_accum;
     sum_accum.tv_sec = sum_accum.tv_usec = 0;
 
-    for (u_int n = 0; n < _timers.size(); ++n)
+    for (size_t n = 0; n < _timers.size(); ++n)
     {
 	timeval	accum = _timers[n].print(out, _nframes);
 	sum_accum.tv_sec  += accum.tv_sec;
@@ -78,7 +78,7 @@ Profiler::printTabSeparated(std::ostream& out) const
     timeval		sum_accum;
     sum_accum.tv_sec = sum_accum.tv_usec = 0;
 
-    for (u_int n = 0; n < _timers.size(); ++n)
+    for (size_t n = 0; n < _timers.size(); ++n)
     {
 	timeval	accum = _timers[n].printTabSeparated(out, _nframes);
 	sum_accum.tv_sec  += accum.tv_sec;
@@ -90,7 +90,7 @@ Profiler::printTabSeparated(std::ostream& out) const
 }
 
 timeval
-Profiler::Timer::print(std::ostream& out, u_int nframes) const
+Profiler::Timer::print(std::ostream& out, size_t nframes) const
 {
     using namespace	std;
 
@@ -107,7 +107,7 @@ Profiler::Timer::print(std::ostream& out, u_int nframes) const
 }
 
 timeval
-Profiler::Timer::printTabSeparated(std::ostream& out, u_int nframes) const
+Profiler::Timer::printTabSeparated(std::ostream& out, size_t nframes) const
 {
     if (nframes > 0)
     {

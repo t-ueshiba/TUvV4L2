@@ -60,10 +60,10 @@ class IntegralImage : public Image<T>
 	CrossVal(const IntegralImage& in, Image<S, B>& out, int cropSize)
 	    :_in(in), _out(out), _cropSize(cropSize)			{}
     
-	void	operator ()(const tbb::blocked_range<u_int>& r) const
+	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    for (u_int v = r.begin(); v != r.end(); ++v)
-			for (u_int u = 0; u < _out.width() - 1; ++u)
+		    for (size_t v = r.begin(); v != r.end(); ++v)
+			for (size_t u = 0; u < _out.width() - 1; ++u)
 			    _out[v][u] = _in.crossVal(u, v, _cropSize);
 		}
 
@@ -87,8 +87,8 @@ class IntegralImage : public Image<T>
     template <class S, class B> const IntegralImage&
 		crossVal(Image<S, B>& out, int cropSize)	const	;
 
-    u_int	originalWidth()					const	;
-    u_int	originalHeight()				const	;
+    size_t	originalWidth()					const	;
+    size_t	originalHeight()				const	;
     
     using	super::width;
     using	super::height;
@@ -123,7 +123,7 @@ IntegralImage<T>::initialize(const Image<S, B>& image)
 
   // 上と左に余白を入れる
     (*this)[0] = 0;				    // 0行目はすべて0
-    for (u_int v = 1; v < height(); ++v)
+    for (size_t v = 1; v < height(); ++v)
     {
 	T*		dst = (*this)[v].data();
 	*dst = 0;				    // 0列目は0
@@ -209,11 +209,11 @@ IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(originalHeight(), originalWidth());
 #ifdef USE_TBB
-    tbb::parallel_for(tbb::blocked_range<u_int>(0, out.height() - 1, 1),
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, out.height() - 1, 1),
 		      CrossVal<S, B>(*this, out, cropSize));
 #else
-    for (u_int v = 0; v < out.height(); ++v)
-	for (u_int u = 0; u < out.width(); ++u)
+    for (size_t v = 0; v < out.height(); ++v)
+	for (size_t u = 0; u < out.width(); ++u)
 	    out[v][u] = crossVal(u, v, cropSize);
 #endif
     return *this;
@@ -224,7 +224,7 @@ IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
   積分画像自体の幅と高さはそれぞれ原画像よりも1だけ大きいのでこの分を減じた値を返す．
   \return	原画像の幅
 */
-template <class T> u_int
+template <class T> size_t
 IntegralImage<T>::originalWidth() const
 {
     return width() - 1;
@@ -235,7 +235,7 @@ IntegralImage<T>::originalWidth() const
   積分画像自体の幅と高さはそれぞれ原画像よりも1だけ大きいのでこの分を減じた値を返す．
   \return	原画像の高さ
 */
-template <class T> u_int
+template <class T> size_t
 IntegralImage<T>::originalHeight() const
 {
     return height() - 1;
@@ -259,10 +259,10 @@ class DiagonalIntegralImage : public Image<T>
 		 Image<S, B>& out, int cropSize)
 	    :_in(in), _out(out), _cropSize(cropSize)			{}
     
-	void	operator ()(const tbb::blocked_range<u_int>& r) const
+	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    for (u_int v = r.begin(); v != r.end(); ++v)
-			for (u_int u = 0; u < _out.width() - 1; ++u)
+		    for (size_t v = r.begin(); v != r.end(); ++v)
+			for (size_t u = 0; u < _out.width() - 1; ++u)
 			    _out[v][u] = _in.crossVal(u, v, _cropSize);
 		}
 
@@ -285,8 +285,8 @@ class DiagonalIntegralImage : public Image<T>
     template <class S, class B> const DiagonalIntegralImage&
 		crossVal(Image<S, B>& out, int cropSize)	const	;
 
-    u_int	originalWidth()					const	;
-    u_int	originalHeight()				const	;
+    size_t	originalWidth()					const	;
+    size_t	originalHeight()				const	;
     
     using	super::width;
     using	super::height;
@@ -322,10 +322,10 @@ DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
     super::resize(image.height(), image.width());
     
     Array<T>	K(width() + height() - 1), L(width() + height() - 1);
-    for (u_int i = 0; i < K.dim(); ++i)
+    for (size_t i = 0; i < K.dim(); ++i)
 	K[i] = L[i] = 0;
     
-    for (u_int v = 0; v < height(); ++v)
+    for (size_t v = 0; v < height(); ++v)
     {
 	const S*	src = image[v].data();
 	T		*dst = (*this)[v].data(),
@@ -402,13 +402,13 @@ DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
 {
     out.resize(height(), width());
 #ifdef USE_TBB
-    tbb::parallel_for(tbb::blocked_range<u_int>(0,
-						out.height() - 2*cropSize - 1,
-						1),
+    tbb::parallel_for(tbb::blocked_range<size_t>(0,
+						 out.height() - 2*cropSize - 1,
+						 1),
 		      CrossVal<S, B>(*this, out, cropSize));
 #else
-    for (u_int v = 0; v < out.height() - 2*cropSize - 1; ++v)
-	for (u_int u = 0; u < out.width(); ++u)
+    for (size_t v = 0; v < out.height() - 2*cropSize - 1; ++v)
+	for (size_t u = 0; u < out.width(); ++u)
 	    out[v][u] = crossVal(u, v, cropSize);
 #endif
     return *this;
@@ -419,7 +419,7 @@ DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
   対角積分画像自体の幅と高さは原画像と同じである．
   \return	原画像の幅
 */
-template <class T> u_int
+template <class T> size_t
 DiagonalIntegralImage<T>::originalWidth() const
 {
     return width();
@@ -430,7 +430,7 @@ DiagonalIntegralImage<T>::originalWidth() const
   対角積分画像自体の幅と高さは原画像と同じである．
   \return	原画像の高さ
 */
-template <class T> u_int
+template <class T> size_t
 DiagonalIntegralImage<T>::originalHeight() const
 {
     return height();

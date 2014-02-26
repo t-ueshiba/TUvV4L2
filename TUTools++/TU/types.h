@@ -57,8 +57,8 @@
   <b>非線形最適化</b>
   - #TU::NullConstraint
   - #TU::ConstNormConstraint
-  - #TU::minimizeSquare(const F&, const G&, AT&, u_int, double)
-  - #TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, u_int, double)
+  - #TU::minimizeSquare(const F&, const G&, AT&, size_t, double)
+  - #TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, size_t, double)
 
   <b>RANSAC</b>
   - #TU::ransac(const PointSet&, Model&, Conform, double)
@@ -156,12 +156,13 @@
   - #TU::op3x3(Iterator begin, Iterator end, OP op)
   - #TU::max3x3(P p, P q, P r)
   - #TU::min3x3(P p, P q, P r)
-  - #TU::mopOpen(Iterator begin, Iterator end, u_int niter)
-  - #TU::mopClose(Iterator begin, Iterator end, u_int niter)
+  - #TU::mopOpen(Iterator begin, Iterator end, size_t niter)
+  - #TU::mopClose(Iterator begin, Iterator end, size_t niter)
 
   <b>関数オブジェクト</b>
-  - #TU::unarize
-  - #TU::seq_transform
+  - #TU::unarize2
+  - #TU::unarize3
+  - #TU::unarize4
   - #TU::mem_var_t
   - #TU::const_mem_var_t
   - #TU::mem_var_ref_t
@@ -169,7 +170,7 @@
 
   <b>反復子</b>
   - #TU::make_mbr_iterator(Iterator i, S T::* m)
-  - #TU::make_const_mbr_iterator(Iterator i, S T::* m)
+  - #TU::make_const_mbr_iterator(Iterator i, S const T::* m)
   - #TU::make_first_iterator(Iterator i)
   - #TU::make_const_first_iterator(Iterator i)
   - #TU::make_second_iterator(Iterator i)
@@ -206,7 +207,7 @@
   - #TU::Random
 
   <b>SIMD命令</b>
-  - #mm::vec
+  - #TU::mm::vec
   
   \file		types.h
   \brief	基本的なデータ型をグローバルな名前空間に追加

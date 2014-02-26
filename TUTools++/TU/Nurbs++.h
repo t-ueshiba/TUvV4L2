@@ -57,32 +57,29 @@ class BSplineKnots : private Array<T>
     typedef Array2<knot_array>	knot_array2;
     
   public:
-    BSplineKnots(u_int deg, element_type us, element_type ue)		;
+    BSplineKnots(size_t deg, element_type us, element_type ue)		;
     
-    u_int	degree()		 const	{return _degree;}
-    u_int	M()			 const	{return size()-1;}
-    u_int	L()			 const	{return M()-degree()-degree();}
-    u_int	findSpan(element_type u) const	;
-    u_int	leftmost(u_int k)	 const	;
-    u_int	rightmost(u_int k)	 const	;
-    u_int	multiplicity(u_int k)	 const	;
+    size_t	degree()		 const	{return _degree;}
+    size_t	M()			 const	{return size()-1;}
+    size_t	L()			 const	{return M()-degree()-degree();}
+    size_t	findSpan(element_type u) const	;
+    size_t	leftmost(size_t k)	 const	;
+    size_t	rightmost(size_t k)	 const	;
+    size_t	multiplicity(size_t k)	 const	;
 
-    knot_array	basis(element_type u, u_int& I)			const	;
-    knot_array2	derivatives(element_type u, u_int K, u_int& I)	const	;
+    knot_array	basis(element_type u, size_t& I)		 const	;
+    knot_array2	derivatives(element_type u, size_t K, size_t& I) const	;
 
-    u_int	insertKnot(element_type u)		;
-    u_int	removeKnot(u_int k)			;
+    size_t	insertKnot(element_type u)		;
+    size_t	removeKnot(size_t k)			;
     void	elevateDegree()				{++_degree;}
-		operator const element_type*() const
-		{
-		    return super::operator const element_type*();
-		}
 
     using	super::size;
+    using	super::data;
     using	super::operator [];		// knots
     
   private:
-    u_int	_degree;
+    size_t	_degree;
 };
 
 /*
@@ -91,19 +88,19 @@ class BSplineKnots : private Array<T>
  *			       deg+1 times  deg+1 times
  */
 template <class T>
-BSplineKnots<T>::BSplineKnots(u_int deg, element_type us, element_type ue)
+BSplineKnots<T>::BSplineKnots(size_t deg, element_type us, element_type ue)
     :super(deg+1+deg+1), _degree(deg)
 {
-    for (u_int i = 0; i <= degree(); ++i)
+    for (size_t i = 0; i <= degree(); ++i)
 	(*this)[i] = us;
-    for (u_int i = M() - degree(); i <= M(); ++i)
+    for (size_t i = M() - degree(); i <= M(); ++i)
 	(*this)[i] = ue;
 }
 
 /*
  *  Find span such that u_{span} <= u < u_{span+1} for given 'u'.
  */
-template <class T> u_int
+template <class T> size_t
 BSplineKnots<T>::findSpan(element_type u) const
 {
     using namespace	std;
@@ -112,9 +109,9 @@ BSplineKnots<T>::findSpan(element_type u) const
 	return M()-degree()-1;
 
   // binary search
-    for (u_int low = degree(), high = M()-degree(); low != high; )
+    for (size_t low = degree(), high = M()-degree(); low != high; )
     {
-	u_int	mid = (low + high) / 2;
+	size_t	mid = (low + high) / 2;
 
 	if (u < (*this)[mid])
 	    high = mid;
@@ -132,8 +129,8 @@ BSplineKnots<T>::findSpan(element_type u) const
 /*
  *  Return index of the leftmost knot with same value as k-th knot.
  */
-template <class T> u_int
-BSplineKnots<T>::leftmost(u_int k) const
+template <class T> size_t
+BSplineKnots<T>::leftmost(size_t k) const
 {
     while (k > 0 && (*this)[k-1] == (*this)[k])
 	--k;
@@ -143,8 +140,8 @@ BSplineKnots<T>::leftmost(u_int k) const
 /*
  *  Return index of the rightmost knot with same value as k-th knot.
  */
-template <class T> u_int
-BSplineKnots<T>::rightmost(u_int k) const
+template <class T> size_t
+BSplineKnots<T>::rightmost(size_t k) const
 {
     while (k+1 <= M() && (*this)[k+1] == (*this)[k])
 	++k;
@@ -154,8 +151,8 @@ BSplineKnots<T>::rightmost(u_int k) const
 /*
  *  Return multiplicity of k-th knot.
  */
-template <class T> u_int
-BSplineKnots<T>::multiplicity(u_int k) const
+template <class T> size_t
+BSplineKnots<T>::multiplicity(size_t k) const
 {
     return rightmost(k) - leftmost(k) + 1;
 }
@@ -166,19 +163,19 @@ BSplineKnots<T>::multiplicity(u_int k) const
  *    array[i] = N_{I-p+i}(u) where 0 <= i <= degree.
  */
 template <class T> typename BSplineKnots<T>::knot_array
-BSplineKnots<T>::basis(element_type u, u_int& I) const
+BSplineKnots<T>::basis(element_type u, size_t& I) const
 {
     I = findSpan(u);
     
     knot_array	Npi(degree()+1);
     knot_array	left(degree()), right(degree());
     Npi[0] = 1.0;
-    for (u_int i = 0; i < degree(); ++i)
+    for (size_t i = 0; i < degree(); ++i)
     {
 	left[i]	 = u - (*this)[I-i];
 	right[i] = (*this)[I+i+1] - u;
 	element_type  saved = 0.0;
-	for (u_int j = 0; j <= i; ++j)
+	for (size_t j = 0; j <= i; ++j)
 	{
 	    const element_type	tmp = Npi[j] / (right[j] + left[i-j]);
 	    Npi[j] = saved + right[j]*tmp;
@@ -196,7 +193,7 @@ BSplineKnots<T>::basis(element_type u, u_int& I) const
  *	where 0 <= k <= K and 0 <= i <= degree.
  */
 template <class T> typename BSplineKnots<T>::knot_array2
-BSplineKnots<T>::derivatives(element_type u, u_int K, u_int& I) const
+BSplineKnots<T>::derivatives(element_type u, size_t K, size_t& I) const
 {
     using namespace	std;
     
@@ -205,12 +202,12 @@ BSplineKnots<T>::derivatives(element_type u, u_int K, u_int& I) const
     knot_array2	ndu(degree()+1, degree()+1);
     knot_array	left(degree()), right(degree());
     ndu[0][0] = 1.0;
-    for (u_int i = 0; i < degree(); ++i)
+    for (size_t i = 0; i < degree(); ++i)
     {
 	left[i]  = u - (*this)[I-i];
 	right[i] = (*this)[I+i+1] - u;
 	element_type	saved = 0.0;
-	for (u_int j = 0; j <= i; ++j)
+	for (size_t j = 0; j <= i; ++j)
 	{
 	    ndu[j][i+1] = right[j] + left[i-j];		// upper triangle
 
@@ -223,15 +220,15 @@ BSplineKnots<T>::derivatives(element_type u, u_int K, u_int& I) const
     
     knot_array2	N(K+1, degree()+1);
     N[0] = ndu[degree()];				// values of basis
-    for (u_int i = 0; i <= degree(); ++i)
+    for (size_t i = 0; i <= degree(); ++i)
     {
 	knot_array2	a(2, degree()+1);
 	int		previous = 0, current = 1;
 	a[previous][0] = 1.0;
-	for (u_int k = 1; k <= K; ++k)			// k-th derivative
+	for (size_t k = 1; k <= K; ++k)			// k-th derivative
 	{
 	    N[k][i] = 0.0;
-	    for (u_int j = k - min(k, i); j <= min(k, degree()-i); ++j)
+	    for (size_t j = k - min(k, i); j <= min(k, degree()-i); ++j)
 	    {
 		a[current][j] = ((j != k ? a[previous][j]   : 0.0) -
 				 (j != 0 ? a[previous][j-1] : 0.0))
@@ -243,10 +240,10 @@ BSplineKnots<T>::derivatives(element_type u, u_int K, u_int& I) const
     }
 
   // Multiply factors    
-    u_int	fact = degree();
-    for (u_int k = 1; k <= K; ++k)
+    size_t	fact = degree();
+    for (size_t k = 1; k <= K; ++k)
     {
-	for (u_int i = 0; i <= degree(); ++i)
+	for (size_t i = 0; i <= degree(); ++i)
 	    N[k][i] *= fact;
 	fact *= (degree() - k);
     }
@@ -257,16 +254,16 @@ BSplineKnots<T>::derivatives(element_type u, u_int K, u_int& I) const
 /*
  *  Insert a knot with value 'u' and return its index of location.
  */
-template <class T> u_int
+template <class T> size_t
 BSplineKnots<T>::insertKnot(element_type u)
 {
-    u_int	l = findSpan(u) + 1;	// insertion point for the new knot
+    size_t	l = findSpan(u) + 1;	// insertion point for the new knot
     super	tmp(*this);
     super::resize(size() + 1);
-    for (u_int i = 0; i < l; ++i)	// copy unchanged knots
+    for (size_t i = 0; i < l; ++i)	// copy unchanged knots
 	(*this)[i] = tmp[i];
     (*this)[l] = u;			// insert a new knot
-    for (u_int i = M(); i > l; --i)	// shift unchanged knots
+    for (size_t i = M(); i > l; --i)	// shift unchanged knots
 	(*this)[i] = tmp[i-1];
     return rightmost(l);		// index of the new knot
 }
@@ -274,15 +271,15 @@ BSplineKnots<T>::insertKnot(element_type u)
 /*
  *  Remove k-th knot and return its right-most index.
  */
-template <class T> u_int
-BSplineKnots<T>::removeKnot(u_int k)
+template <class T> size_t
+BSplineKnots<T>::removeKnot(size_t k)
 {
     k = rightmost(k);			// index of the knot to be removed
     super	tmp(*this);
     super::resize(size() - 1);
-    for (u_int i = 0; i < k; ++i)	// copy unchanged knots
+    for (size_t i = 0; i < k; ++i)	// copy unchanged knots
 	(*this)[i] = tmp[i];
-    for (u_int i = M(); i >= k; --i)	// shift unchanged knots
+    for (size_t i = M(); i >= k; --i)	// shift unchanged knots
 	(*this)[i] = tmp[i+1];
     return k;				// index of the new knot
 }
@@ -310,29 +307,30 @@ class BSplineCurve : private Array<C>
     typedef coord_array				super;
 
   public:
-    BSplineCurve(u_int degree, element_type us=0.0, element_type ue=1.0);
+    BSplineCurve(size_t degree, element_type us=0.0, element_type ue=1.0);
 
-    static u_int
+    static size_t
 		dim()				{return coord_type::size();}
 
-    u_int	degree()		const	{return _knots.degree();}
-    u_int	M()			const	{return _knots.M();}
-    u_int	L()			const	{return _knots.L();}
-    u_int	N()			const	{return super::size()-1;}
+    size_t	degree()		const	{return _knots.degree();}
+    size_t	M()			const	{return _knots.M();}
+    size_t	L()			const	{return _knots.L();}
+    size_t	N()			const	{return super::size()-1;}
     element_type
 		knot(int i)		const	{return _knots[i];}
-    u_int	multiplicity(u_int k)	const	{return
+    size_t	multiplicity(size_t k)	const	{return
 						     _knots.multiplicity(k);}
     const knots_type&
 		knots()			const	{return _knots;}
 
     coord_type	operator ()(element_type u)		const	;
-    coord_array	derivatives(element_type u, u_int K)	const	;
+    coord_array	derivatives(element_type u, size_t K)	const	;
 
-    u_int	insertKnot(element_type u)		;
-    u_int	removeKnot(u_int k)			;
-    void	elevateDegree()				;
-		operator const element_type*()	const	{return (*this)[0];}
+    size_t	insertKnot(element_type u)	;
+    size_t	removeKnot(size_t k)		;
+    void	elevateDegree()			;
+    const element_type*
+		data()			const	{return (*this)[0].data();}
 
     using	super::operator [];
     using	super::operator ==;
@@ -345,7 +343,7 @@ class BSplineCurve : private Array<C>
 };
 
 template <class C>
-BSplineCurve<C>::BSplineCurve(u_int degree, element_type us, element_type ue)
+BSplineCurve<C>::BSplineCurve(size_t degree, element_type us, element_type ue)
     :super(degree + 1), _knots(degree, us, ue)
 {
 }
@@ -356,10 +354,10 @@ BSplineCurve<C>::BSplineCurve(u_int degree, element_type us, element_type ue)
 template <class C> typename BSplineCurve<C>::coord_type
 BSplineCurve<C>::operator ()(element_type u) const
 {
-    u_int	span;
+    size_t	span;
     knot_array	N = _knots.basis(u, span);
     coord_type	c;
-    for (u_int i = 0; i <= degree(); ++i)
+    for (size_t i = 0; i <= degree(); ++i)
 	c += N[i] * (*this)[span-degree()+i];
     return c;
 }
@@ -369,34 +367,34 @@ BSplineCurve<C>::operator ()(element_type u) const
  *      array[k] = "k-th derivative of the curve at 'u'" where 0 <= k <= K.
  */
 template <class C> typename BSplineCurve<C>::coord_array
-BSplineCurve<C>::derivatives(element_type u, u_int K) const
+BSplineCurve<C>::derivatives(element_type u, size_t K) const
 {
     using namespace	std;
     
-    u_int	I;
+    size_t	I;
     knot_array2	dN = _knots.derivatives(u, min(K,degree()), I);
     coord_array	ders(K+1);
-    for (u_int k = 0; k < dN.nrow(); ++k)
-	for (u_int i = 0; i <= degree(); ++i)
+    for (size_t k = 0; k < dN.nrow(); ++k)
+	for (size_t i = 0; i <= degree(); ++i)
 	    ders[k] += dN[k][i] * (*this)[I-degree()+i];
     return ders;
 }
 
 /*
- *  u_int BSplineCurve<C>::insertKnot(element_type u)
+ *  size_t BSplineCurve<C>::insertKnot(element_type u)
  *
  *    Insert a knot at 'u', recompute control points and return the index
  *    of the new knot.
  */
-template <class C> u_int
+template <class C> size_t
 BSplineCurve<C>::insertKnot(element_type u)
 {
-    u_int	l = _knots.insertKnot(u);
+    size_t	l = _knots.insertKnot(u);
     super	tmp(*this);
     super::resize(super::size() + 1);	// cannot omit super:: specifier
-    for (u_int i = 0; i < l-degree(); ++i)
+    for (size_t i = 0; i < l-degree(); ++i)
 	(*this)[i] = tmp[i];		// copy unchanged control points
-    for (u_int i = l-degree(); i < l; ++i)
+    for (size_t i = l-degree(); i < l; ++i)
     {
       //  Note that we have already inserted a new knot at l. So, old
       //  knot(i+degree()) must be accressed as knot(i+degree()+1).
@@ -406,27 +404,27 @@ BSplineCurve<C>::insertKnot(element_type u)
 
 	(*this)[i] = (1.0 - alpha) * tmp[i-1] + alpha * tmp[i];
     }
-    for (u_int i = N(); i >= l; --i)
+    for (size_t i = N(); i >= l; --i)
 	(*this)[i] = tmp[i-1];		// copy unchanged control points
 
     return l;
 }
 
 /*
- *  u_int BSplineCurve<C>::removeKnot(u_int k)
+ *  size_t BSplineCurve<C>::removeKnot(size_t k)
  *
  *    Remove k-th knot, recompute control points and return the index of
  *    the removed knot.
  */
-template <class C> u_int
-BSplineCurve<C>::removeKnot(u_int k)
+template <class C> size_t
+BSplineCurve<C>::removeKnot(size_t k)
 {
-    u_int		s = multiplicity(k);
+    size_t		s = multiplicity(k);
     element_type	u = knot(k);
     k = _knots.removeKnot(k);
     super	tmp(*this);
     super::resize(super::size() - 1);	// cannot omit Array<C>:: specifier
-    u_int	i, j;
+    size_t	i, j;
     for (i = 0; i < k - degree(); ++i)
 	(*this)[i] = tmp[i];		// copy unchanged control points
     for (j = N(); j >= k - s; --j)
@@ -460,29 +458,29 @@ template <class C> void
 BSplineCurve<C>::elevateDegree()
 {
   // Convert to Bezier segments.
-    Array<u_int>	mul(L());
-    u_int		nsegments = 1;
-    for (u_int k = degree() + 1; k < M() - degree(); k += degree())
+    Array<size_t>	mul(L());
+    size_t		nsegments = 1;
+    for (size_t k = degree() + 1; k < M() - degree(); k += degree())
     {
       // Elevate multiplicity of each internal knot to degree().
 	mul[nsegments-1] = multiplicity(k);
-	for (u_int n = mul[nsegments-1]; n < degree(); ++n)
+	for (size_t n = mul[nsegments-1]; n < degree(); ++n)
 	    insertKnot(knot(k));
 	++nsegments;
     }
     super	tmp(*this);	// Save control points of Bezier segments.
 
   // Set knots and allocate area for control points.
-    for (u_int k = 0; k <= M(); )  // Elevate multiplicity of each knot by one.
+    for (size_t k = 0; k <= M(); )  // Elevate multiplicity of each knot by one.
 	k = _knots.insertKnot(knot(k)) + 1;
     _knots.elevateDegree();
     super::resize(super::size() + nsegments);
 
   // Elevate degree of each Bezier segment.
-    for (u_int n = 0; n < nsegments; ++n)
+    for (size_t n = 0; n < nsegments; ++n)
     {
 	(*this)[n*degree()] = tmp[n*(degree()-1)];
-	for (u_int i = 1; i < degree(); ++i)
+	for (size_t i = 1; i < degree(); ++i)
 	{
 	    element_type	alpha = element_type(i)
 				      / element_type(degree());
@@ -494,8 +492,8 @@ BSplineCurve<C>::elevateDegree()
     (*this)[nsegments*degree()] = tmp[nsegments*(degree()-1)];
 
   // Remove redundant internal knots.
-    for (u_int k = degree() + 1, n = 0; k < M() - degree(); k += mul[n]+1, ++n)
-	for (u_int r = degree(); --r > mul[n]; )
+    for (size_t k = degree() + 1, n = 0; k < M() - degree(); k += mul[n]+1, ++n)
+	for (size_t r = degree(); --r > mul[n]; )
 	    removeKnot(k);
 }
 
@@ -538,27 +536,27 @@ class BSplineSurface : private Array2<Array<C> >
     typedef typename knots_type::knot_array	knot_array;
     typedef typename knots_type::knot_array2	knot_array2;
     
-    BSplineSurface(u_int uDegree, u_int vDegree,
+    BSplineSurface(size_t uDegree, size_t vDegree,
 		   element_type us=0.0, element_type ue=1.0,
 		   element_type vs=0.0, element_type ve=1.0)	;
 
-    static u_int	dim()			{return coord_type::size();}
+    static size_t	dim()			{return coord_type::size();}
 
-    u_int	uDegree()		const	{return _uKnots.degree();}
-    u_int	uM()			const	{return _uKnots.M();}
-    u_int	uL()			const	{return _uKnots.L();}
-    u_int	uN()			const	{return ncol()-1;}
-    u_int	vDegree()		const	{return _vKnots.degree();}
-    u_int	vM()			const	{return _vKnots.M();}
-    u_int	vL()			const	{return _vKnots.L();}
-    u_int	vN()			const	{return nrow()-1;}
+    size_t	uDegree()		const	{return _uKnots.degree();}
+    size_t	uM()			const	{return _uKnots.M();}
+    size_t	uL()			const	{return _uKnots.L();}
+    size_t	uN()			const	{return ncol()-1;}
+    size_t	vDegree()		const	{return _vKnots.degree();}
+    size_t	vM()			const	{return _vKnots.M();}
+    size_t	vL()			const	{return _vKnots.L();}
+    size_t	vN()			const	{return nrow()-1;}
     element_type
 		uKnot(int i)		const	{return _uKnots[i];}
     element_type
 		vKnot(int j)		const	{return _vKnots[j];}
-    u_int	uMultiplicity(int k)	const	{return
+    size_t	uMultiplicity(int k)	const	{return
 						     _uKnots.multiplicity(k);}
-    u_int	vMultiplicity(int l)	const	{return
+    size_t	vMultiplicity(int l)	const	{return
 						     _vKnots.multiplicity(l);}
     const knots_type&
 		uKnots()		const	{return _uKnots;}
@@ -569,15 +567,16 @@ class BSplineSurface : private Array2<Array<C> >
 			    element_type v)	const	;
     coord_array2
 		derivatives(element_type u, element_type v,
-			    u_int D)		const	;
+			    size_t D)		const	;
 
-    u_int	uInsertKnot(element_type u)		;
-    u_int	vInsertKnot(element_type v)		;
-    u_int	uRemoveKnot(u_int k)			;
-    u_int	vRemoveKnot(u_int l)			;
+    size_t	uInsertKnot(element_type u)		;
+    size_t	vInsertKnot(element_type v)		;
+    size_t	uRemoveKnot(size_t k)			;
+    size_t	vRemoveKnot(size_t l)			;
     void	uElevateDegree()			;
     void	vElevateDegree()			;
-		operator const element_type*() const	{return (*this)[0][0];}
+    const element_type*
+		data()			const	{return (*this)[0][0].data();}
 
     using	super::operator [];
     using	super::ncol;
@@ -599,7 +598,7 @@ class BSplineSurface : private Array2<Array<C> >
 };
 
 template <class C>
-BSplineSurface<C>::BSplineSurface(u_int uDeg, u_int vDeg,
+BSplineSurface<C>::BSplineSurface(size_t uDeg, size_t vDeg,
 				  element_type us, element_type ue,
 				  element_type vs, element_type ve)
     :super(vDeg + 1, uDeg + 1), _uKnots(uDeg, us, ue), _vKnots(vDeg, vs, ve)
@@ -612,14 +611,14 @@ BSplineSurface<C>::BSplineSurface(u_int uDeg, u_int vDeg,
 template <class C> C
 BSplineSurface<C>::operator ()(element_type u, element_type v) const
 {
-    u_int	uSpan, vSpan;
+    size_t	uSpan, vSpan;
     knot_array	Nu = _uKnots.basis(u, uSpan);
     knot_array	Nv = _vKnots.basis(v, vSpan);
     coord_type	c;
-    for (u_int j = 0; j <= vDegree(); ++j)
+    for (size_t j = 0; j <= vDegree(); ++j)
     {
 	coord_type	tmp;
-	for (u_int i = 0; i <= uDegree(); ++i)
+	for (size_t i = 0; i <= uDegree(); ++i)
 	    tmp += Nu[i] * (*this)[vSpan-vDegree()+j][uSpan-uDegree()+i];
 	c += Nv[j] * tmp;
     }
@@ -632,22 +631,22 @@ BSplineSurface<C>::operator ()(element_type u, element_type v) const
  *        where 0 <= k <= D and 0 <= l <= D.
  */
 template <class C> typename BSplineSurface<C>::coord_array2
-BSplineSurface<C>::derivatives(element_type u, element_type v, u_int D) const
+BSplineSurface<C>::derivatives(element_type u, element_type v, size_t D) const
 {
     using namespace	std;
     
-    u_int		I, J;
+    size_t		I, J;
     knot_array2		udN = _uKnots.derivatives(u, min(D,uDegree()), I),
 			vdN = _vKnots.derivatives(v, min(D,vDegree()), J);
     coord_array2	ders(D+1, D+1);
-    for (u_int k = 0; k < udN.nrow(); ++k)		// derivatives w.r.t u
+    for (size_t k = 0; k < udN.nrow(); ++k)		// derivatives w.r.t u
     {
 	Array<coord_type>	tmp(vDegree()+1);
-	for (u_int j = 0; j <= vDegree(); ++j)
-	    for (u_int i = 0; i <= uDegree(); ++i)
+	for (size_t j = 0; j <= vDegree(); ++j)
+	    for (size_t i = 0; i <= uDegree(); ++i)
 		tmp[j] += udN[k][i] * (*this)[J-vDegree()+j][I-uDegree()+i];
-	for (u_int l = 0; l < min(vdN.nrow(), D-k); ++l)// derivatives w.r.t v
-	    for (u_int j = 0; j <= vDegree(); ++j)
+	for (size_t l = 0; l < min(vdN.nrow(), D-k); ++l)// derivatives w.r.t v
+	    for (size_t j = 0; j <= vDegree(); ++j)
 		ders[l][k] += vdN[l][j] * tmp[j];
     }
     return ders;
@@ -659,24 +658,24 @@ BSplineSurface<C>::derivatives(element_type u, element_type v, u_int D) const
  *    Insert a knot in u-direction at 'u', recompute control points and return
  *    the index of the new knot.
  */
-template <class C> u_int
+template <class C> size_t
 BSplineSurface<C>::uInsertKnot(element_type u)
 {
-    u_int		l = _uKnots.insertKnot(u);
+    size_t		l = _uKnots.insertKnot(u);
     super		tmp(*this);
     super::resize(nrow(), ncol()+1);
     Array<element_type>	alpha(uDegree());
-    for (u_int i = l-uDegree(); i < l; ++i)
+    for (size_t i = l-uDegree(); i < l; ++i)
 	alpha[i-l+uDegree()] =
 	    (u - uKnot(i)) / (uKnot(i+uDegree()+1) - uKnot(i));
-    for (u_int j = 0; j <= vN(); ++j)
+    for (size_t j = 0; j <= vN(); ++j)
     {
-	for (u_int i = 0; i < l-uDegree(); ++i)
+	for (size_t i = 0; i < l-uDegree(); ++i)
 	    (*this)[j][i] = tmp[j][i];
-	for (u_int i = l-uDegree(); i < l; ++i)
+	for (size_t i = l-uDegree(); i < l; ++i)
 	    (*this)[j][i] = (1.0 - alpha[i-l+uDegree()]) * tmp[j][i-1]
 				 + alpha[i-l+uDegree()]  * tmp[j][i];
-	for (u_int i = uN(); i >= l; --i)
+	for (size_t i = uN(); i >= l; --i)
 	    (*this)[j][i] = tmp[j][i-1];
     }
 
@@ -684,29 +683,29 @@ BSplineSurface<C>::uInsertKnot(element_type u)
 }
 
 /*
- *  u_int BSplineSurface<C>::vInsertKnot(element_type v)
+ *  size_t BSplineSurface<C>::vInsertKnot(element_type v)
  *
  *    Insert a knot in v-direction at 'v', recompute control points and return
  *    the index of the new knot.
  */
-template <class C> u_int
+template <class C> size_t
 BSplineSurface<C>::vInsertKnot(element_type v)
 {
-    u_int		l = _vKnots.insertKnot(v);
+    size_t		l = _vKnots.insertKnot(v);
     super		tmp(*this);
     super::resize(nrow()+1, ncol());
     Array<element_type>	alpha(vDegree());
-    for (u_int j = l-vDegree(); j < l; ++j)
+    for (size_t j = l-vDegree(); j < l; ++j)
 	alpha[j-l+vDegree()] =
 	    (v - vKnot(j)) / (vKnot(j+vDegree()+1) - vKnot(j));
-    for (u_int i = 0; i <= uN(); ++i)
+    for (size_t i = 0; i <= uN(); ++i)
     {
-	for (u_int j = 0; j < l-vDegree(); ++j)
+	for (size_t j = 0; j < l-vDegree(); ++j)
 	    (*this)[j][i] = tmp[j][i];
-	for (u_int j = l-vDegree(); j < l; ++j)
+	for (size_t j = l-vDegree(); j < l; ++j)
 	    (*this)[j][i] = (1.0 - alpha[j-l+vDegree()]) * tmp[j-1][i]
 				 + alpha[j-l+vDegree()]  * tmp[j]  [i];
-	for (u_int j = vN(); j >= l; --j)
+	for (size_t j = vN(); j >= l; --j)
 	    (*this)[j][i] = tmp[j-1][i];
     }
 
@@ -717,17 +716,17 @@ BSplineSurface<C>::vInsertKnot(element_type v)
  *  Remove k-th knot in u-derection, recompute control points and return 
  *  the index of the removed knot.
  */
-template <class C> u_int
-BSplineSurface<C>::uRemoveKnot(u_int k)
+template <class C> size_t
+BSplineSurface<C>::uRemoveKnot(size_t k)
 {
-    u_int		s = uMultiplicity(k);
+    size_t		s = uMultiplicity(k);
     element_type	u = uKnot(k);
     k = _uKnots.removeKnot(k);
     super	tmp(*this);
     super::resize(nrow(), ncol()-1);
-    for (u_int j = 0; j <= vN(); ++j)
+    for (size_t j = 0; j <= vN(); ++j)
     {
-	u_int	is, ie;
+	size_t	is, ie;
 	for (is = 0; is < k - uDegree(); ++is)
 	    (*this)[j][is] = tmp[j][is];    // copy unchanged control points
 	for (ie = uN(); ie >= k - s; --ie)
@@ -764,17 +763,17 @@ BSplineSurface<C>::uRemoveKnot(u_int k)
  *  Remove l-th knot in v-derection, recompute control points and return 
  *  the index of the removed knot.
  */
-template <class C> u_int
-BSplineSurface<C>::vRemoveKnot(u_int l)
+template <class C> size_t
+BSplineSurface<C>::vRemoveKnot(size_t l)
 {
-    u_int		s = vMultiplicity(l);
+    size_t		s = vMultiplicity(l);
     element_type	v = vKnot(l);
     l = _vKnots.removeKnot(l);
     super	tmp(*this);
     super::resize(nrow()-1, ncol());
-    for (u_int i = 0; i <= uN(); ++i)
+    for (size_t i = 0; i <= uN(); ++i)
     {
-	u_int	js, je;
+	size_t	js, je;
 	for (js = 0; js < l - vDegree(); ++js)
 	    (*this)[js][i] = tmp[js][i];    // copy unchanged control points
 	for (je = vN(); je >= l - s; --je)
@@ -814,31 +813,31 @@ template <class C> void
 BSplineSurface<C>::uElevateDegree()
 {
   // Convert to Bezier segments.
-    Array<u_int>	mul(uL());
-    u_int		nsegments = 1;
-    for (u_int k = uDegree() + 1; k < uM() - uDegree(); k += uDegree())
+    Array<size_t>	mul(uL());
+    size_t		nsegments = 1;
+    for (size_t k = uDegree() + 1; k < uM() - uDegree(); k += uDegree())
     {
       // Elevate multiplicity of each internal knot to uDegree().
 	mul[nsegments-1] = uMultiplicity(k);
-	for (u_int n = mul[nsegments-1]; n < uDegree(); ++n)
+	for (size_t n = mul[nsegments-1]; n < uDegree(); ++n)
 	    uInsertKnot(uKnot(k));
 	++nsegments;
     }
     super	tmp(*this);	// Save Bezier control points.
 
   // Set knots and allocate area for control points.
-    for (u_int k = 0; k <= uM(); )
+    for (size_t k = 0; k <= uM(); )
 	k = _uKnots.insertKnot(uKnot(k)) + 1;
     _uKnots.elevateDegree();
     super::resize(nrow(), ncol() + nsegments);
     
   // Elevate degree of each Bezier segment.
-    for (u_int j = 0; j <= vN(); ++j)
+    for (size_t j = 0; j <= vN(); ++j)
     {
-	for (u_int n = 0; n < nsegments; ++n)
+	for (size_t n = 0; n < nsegments; ++n)
 	{
 	    (*this)[j][n*uDegree()] = tmp[j][n*(uDegree()-1)];
-	    for (u_int i = 1; i < uDegree(); ++i)
+	    for (size_t i = 1; i < uDegree(); ++i)
 	    {
 		element_type	alpha = element_type(i)
 				      / element_type(uDegree());
@@ -852,9 +851,9 @@ BSplineSurface<C>::uElevateDegree()
     }
 
   // Remove redundant internal knots.
-    for (u_int k = uDegree() + 1, j = 0;
+    for (size_t k = uDegree() + 1, j = 0;
 	 k < uM() - uDegree(); k += mul[j]+1, ++j)
-	for (u_int r = uDegree(); --r > mul[j]; )
+	for (size_t r = uDegree(); --r > mul[j]; )
 	    uRemoveKnot(k);
 }
 
@@ -867,31 +866,31 @@ template <class C> void
 BSplineSurface<C>::vElevateDegree()
 {
   // Convert to Bezier segments.
-    Array<u_int>	mul(vL());
-    u_int		nsegments = 1;
-    for (u_int l = vDegree() + 1; l < vM() - vDegree(); l += vDegree())
+    Array<size_t>	mul(vL());
+    size_t		nsegments = 1;
+    for (size_t l = vDegree() + 1; l < vM() - vDegree(); l += vDegree())
     {
       // Elevate multiplicity of each internal knot to vDegree().
 	mul[nsegments-1] = vMultiplicity(l);
-	for (u_int n = mul[nsegments-1]; n < vDegree(); ++n)
+	for (size_t n = mul[nsegments-1]; n < vDegree(); ++n)
 	    vInsertKnot(vKnot(l));
 	++nsegments;
     }
     super	tmp(*this);	// Save Bezier control points.
 
   // Set knots and allocate area for control points.
-    for (u_int l = 0; l <= vM(); )
+    for (size_t l = 0; l <= vM(); )
 	l = _vKnots.insertKnot(vKnot(l)) + 1;
     _vKnots.elevateDegree();
     super::resize(nrow() + nsegments, ncol());
     
   // Elevate degree of each Bezier segment.
-    for (u_int i = 0; i <= uN(); ++i)
+    for (size_t i = 0; i <= uN(); ++i)
     {
-	for (u_int n = 0; n < nsegments; ++n)
+	for (size_t n = 0; n < nsegments; ++n)
 	{
 	    (*this)[n*vDegree()][i] = tmp[n*(vDegree()-1)][i];
-	    for (u_int j = 1; j < vDegree(); ++j)
+	    for (size_t j = 1; j < vDegree(); ++j)
 	    {
 		element_type	alpha = element_type(j)
 				      / element_type(vDegree());
@@ -905,9 +904,9 @@ BSplineSurface<C>::vElevateDegree()
     }
 
   // Remove redundant internal knots.
-    for (u_int l = vDegree() + 1, i = 0;
+    for (size_t l = vDegree() + 1, i = 0;
 	 l < vM() - vDegree(); l += mul[i]+1, ++i)
-	for (u_int r = vDegree(); --r > mul[i]; )
+	for (size_t r = vDegree(); --r > mul[i]; )
 	    vRemoveKnot(l);
 }
 

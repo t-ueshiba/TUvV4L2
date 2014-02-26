@@ -41,7 +41,7 @@ namespace mm
 template <class T> static inline void
 correct(T* p, F32vec a, F32vec b)
 {
-    const u_int		nelms = F32vec::size;
+    const size_t		nelms = F32vec::size;
     const Iu8vec	val = load<false>((const u_char*)p);
 #  if defined(SSE2)
     store<false>((u_char*)p,
@@ -64,7 +64,7 @@ template <> inline void
 correct(short* p, F32vec a, F32vec b)
 {
 #  if defined(SSE2)
-    const u_int		nelms = F32vec::size;
+    const size_t		nelms = F32vec::size;
     const Is16vec	val = load<false>(p);
     store<false>(p, cvt<short>(cvt<int>(a + b * cvt<float>(val)),
 			       cvt<int>(a + b * cvt<float>(
@@ -105,19 +105,19 @@ toShort(float val)
   \param ve		輝度を補正する領域の最後の行の次を指定するindex
 */ 
 template <class T> void
-CorrectIntensity::operator()(Image<T>& image, u_int vs, u_int ve) const
+CorrectIntensity::operator()(Image<T>& image, size_t vs, size_t ve) const
 {
     if (ve == 0)
 	ve = image.height();
     
-    for (u_int v = vs; v < ve; ++v)
+    for (size_t v = vs; v < ve; ++v)
     {
 	T*		p = image[v].data();
 	T* const	q = p + image.width();
 #if defined(SSE)
 	using namespace	mm;
 
-	const u_int	nelms = vec<T>::size;
+	const size_t	nelms = vec<T>::size;
 	const F32vec	a(_offset), b(_gain);
 	for (T* const r = q - nelms; p <= r; p += nelms)
 	    correct(p, a, b);
@@ -160,14 +160,14 @@ CorrectIntensity::val(float pixel) const
 }
 
 template __PORT void
-CorrectIntensity::operator ()(Image<u_char>& image, u_int vs, u_int ve) const;
+CorrectIntensity::operator ()(Image<u_char>& image, size_t vs, size_t ve) const;
 template __PORT void
-CorrectIntensity::operator ()(Image<short>& image,  u_int vs, u_int ve) const;
+CorrectIntensity::operator ()(Image<short>& image,  size_t vs, size_t ve) const;
 template __PORT void
-CorrectIntensity::operator ()(Image<float>& image,  u_int vs, u_int ve) const;
+CorrectIntensity::operator ()(Image<float>& image,  size_t vs, size_t ve) const;
 template __PORT void
-CorrectIntensity::operator ()(Image<RGBA>& image,   u_int vs, u_int ve) const;
+CorrectIntensity::operator ()(Image<RGBA>& image,   size_t vs, size_t ve) const;
 template __PORT void
-CorrectIntensity::operator ()(Image<ABGR>& image,   u_int vs, u_int ve) const;
+CorrectIntensity::operator ()(Image<ABGR>& image,   size_t vs, size_t ve) const;
     
 }

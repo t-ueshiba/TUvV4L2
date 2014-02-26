@@ -55,7 +55,7 @@ namespace TU
 	double	Pointset::inlierRate() const;
      によって知ることができる．
   -# メンバ関数
-	PoinstSet::Container	Pointset::sample(u_int npoints) const;
+	PoinstSet::Container	Pointset::sample(size_t npoints) const;
      によってランダムにnpoints個の部分集合を取り出せる．
 
   テンプレートパラメータModelは当てはめるべきモデルを表すクラスであり，
@@ -65,7 +65,7 @@ namespace TU
 	void	Model::fit(Iterator first, Iterator last);
      によって点集合にモデルを当てはめることができる．
   -# 1.に必要な最少点数をメンバ関数
-	u_int	Model::ndataMin() const;
+	size_t	Model::ndataMin() const;
      によって知ることができる．
 
   テンプレートパラメータConformは点のモデルへの適合性を判定する関数
@@ -101,14 +101,15 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
     if (inlierRate < 0.0 || inlierRate >= 1.0)
 	throw invalid_argument("ransac<PointSet, Model>: inlier rate is not within [0, 1)!!");
     double	tmp = 1.0;
-    for (u_int n = model.ndataMin(); n-- > 0; )
+    for (size_t n = model.ndataMin(); n-- > 0; )
 	tmp *= inlierRate;
-    const u_int	ntrials = u_int(ceil(log(1.0 - hitRate) / log(1.0 - tmp)));
+    const size_t	ntrials = size_t(ceil(log(1.0 - hitRate) /
+					      log(1.0 - tmp)));
 
   // 試行（最小個数の点をサンプル，モデル生成，inlier検出）をntrials回行う．
     Container	inlierSetA, inlierSetB;
     Container	*inliers = &inlierSetA, *inliersMax = &inlierSetB;
-    for (u_int n = 0; n < ntrials; ++n)
+    for (size_t n = 0; n < ntrials; ++n)
     {
       // 点集合からモデルの計算に必要な最小個数の点をサンプルする．
 	const Container&	minimalSet = pointSet.sample(model.ndataMin());

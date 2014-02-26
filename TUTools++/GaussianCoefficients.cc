@@ -137,10 +137,10 @@ GaussianCoefficients<T>::CostFunction
 		       ::operator ()(const argument_type& params) const
 {
     vector_type	val(_ndivisions+1);
-    for (u_int k = 0; k < val.size(); ++k)
+    for (size_t k = 0; k < val.size(); ++k)
     {
 	element_type	f = 0.0, x = k*_range/_ndivisions;
-	for (u_int i = 0; i < params.size(); ++i)
+	for (size_t i = 0; i < params.size(); ++i)
 	{
 	    const Params&	p = params[i];
 	    f += (p.a*cos(x*p.theta) + p.b*sin(x*p.theta))*exp(-x*p.alpha);
@@ -156,12 +156,12 @@ GaussianCoefficients<T>::CostFunction
 		       ::jacobian(const argument_type& params) const
 {
     matrix_type	val(_ndivisions+1, 4*params.size());
-    for (u_int k = 0; k < val.nrow(); ++k)
+    for (size_t k = 0; k < val.nrow(); ++k)
     {
 	vector_type&	row = val[k];
 	element_type	x = k*_range/_ndivisions;
 	
-	for (u_int i = 0; i < params.size(); ++i)
+	for (size_t i = 0; i < params.size(); ++i)
 	{
 	    const Params&	p = params[i];
 	    const element_type	c = cos(x*p.theta), s = sin(x*p.theta),
@@ -180,7 +180,7 @@ template <class T> void
 GaussianCoefficients<T>::CostFunction::update(argument_type& params,
 					      const vector_type& dp) const
 {
-    for (u_int i = 0; i < params.size(); ++i)
+    for (size_t i = 0; i < params.size(); ++i)
 	params[i] -= dp(4*i, 4);
 }
 

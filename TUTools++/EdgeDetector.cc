@@ -256,7 +256,7 @@ EdgeDetector::strength(const Image<float>& edgeH,
 		       const Image<float>& edgeV, Image<float>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (u_int v = 0; v < out.height(); ++v)
+    for (size_t v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	float*			dst = out[v].data();
@@ -264,7 +264,7 @@ EdgeDetector::strength(const Image<float>& edgeH,
 #if defined(SSE)
 	using namespace		mm;
 	
-	const u_int		nelms = F32vec::size;
+	const size_t		nelms = F32vec::size;
 	for (const float* const end2 = dst + F32vec::floor(out.width());
 	     dst < end2; )
 	{
@@ -299,7 +299,7 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 			 const Image<float>& edgeV, Image<u_char>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (u_int v = 0; v < out.height(); ++v)
+    for (size_t v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
@@ -307,7 +307,7 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 #if defined(SSE2)
 	using namespace		mm;
 
-	const u_int		nelms = F32vec::size;
+	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
@@ -339,7 +339,7 @@ EdgeDetector::direction4x(const Image<float>& edgeH,
 			  const Image<float>& edgeV, Image<u_char>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (u_int v = 0; v < out.height(); ++v)
+    for (size_t v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
@@ -347,7 +347,7 @@ EdgeDetector::direction4x(const Image<float>& edgeH,
 #if defined(SSE2)
 	using namespace		mm;
 
-	const u_int		nelms = F32vec::size;
+	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
@@ -386,7 +386,7 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 			 const Image<float>& edgeV, Image<u_char>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (u_int v = 0; v < out.height(); ++v)
+    for (size_t v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
@@ -394,7 +394,7 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 #if defined(SSE2)
 	using namespace		mm;
 
-	const u_int		nelms = F32vec::size;
+	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
@@ -426,7 +426,7 @@ EdgeDetector::direction8x(const Image<float>& edgeH,
 			  const Image<float>& edgeV, Image<u_char>& out) const
 {
     out.resize(edgeH.height(), edgeH.width());
-    for (u_int v = 0; v < out.height(); ++v)
+    for (size_t v = 0; v < out.height(); ++v)
     {
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
@@ -434,7 +434,7 @@ EdgeDetector::direction8x(const Image<float>& edgeH,
 #if defined(SSE2)
 	using namespace		mm;
 
-	const u_int		nelms = F32vec::size;
+	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
 	     dst < end2; dst += Iu8vec::size)
 	{
@@ -473,7 +473,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
     
     strength.resize(edgeHH.height(), edgeHH.width());
     direction.resize(edgeHH.height(), edgeHH.width());
-    for (u_int v = 0; v < strength.height(); ++v)
+    for (size_t v = 0; v < strength.height(); ++v)
     {
 	const_fiterator	eHH = edgeHH[v].begin(), eHV = edgeHV[v].begin(),
 			eVV = edgeVV[v].begin();
@@ -482,7 +482,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 #if defined(SSE)
 	using namespace	mm;
 
-	const u_int	nelms = F32vec::size;
+	const size_t	nelms = F32vec::size;
 	for (citerator end2 = dir + Iu8vec::floor(direction.width());
 	     dir != end2; dir += Iu8vec::size)
 	{
@@ -562,16 +562,16 @@ EdgeDetector::suppressNonmaxima(const Image<float>& strength,
 
   // 出力画像の外周を0にする．
     if (out.height() > 0)
-	for (u_int u = 0; u < out.width(); ++u)
+	for (size_t u = 0; u < out.width(); ++u)
 	    out[0][u] = out[out.height()-1][u] = 0;
     if (out.width() > 0)
-	for (u_int v = 0; v < out.height(); ++v)
+	for (size_t v = 0; v < out.height(); ++v)
 	    out[v][0] = out[v][out.width()-1] = 0;
 
   // 各点のエッジ強度が (1) その点のエッジ方向に沿った両隣と比較して極大に
   // なっており，かつ，(2a) 強い閾値以上ならばEDGEラベルを，(2b) 弱い閾値
   // 以上ならばWEAKラベルをそれぞれ書き込む．そうでなければ0を書き込む．
-    for (u_int v = 0; ++v < out.height() - 1; )
+    for (size_t v = 0; ++v < out.height() - 1; )
     {
 	const float		*prv = strength[v-1].data(),
 				*str = strength[v].data(),
@@ -629,14 +629,14 @@ EdgeDetector::zeroCrossing(const Image<float>& in, Image<u_char>& out) const
 
   // 出力画像の下端と右端を0にする．
     if (out.height() > 0)
-	for (u_int u = 0; u < out.width(); ++u)
+	for (size_t u = 0; u < out.width(); ++u)
 	    out[out.height()-1][u] = 0;
     if (out.width() > 0)
-	for (u_int v = 0; v < out.height(); ++v)
+	for (size_t v = 0; v < out.height(); ++v)
 	    out[v][out.width()-1] = 0;
 
   // 現在点を左上隅とする2x2ウィンドウ中の画素が異符号ならエッジ点とする．
-    for (u_int v = 0; v < out.height() - 1; ++v)
+    for (size_t v = 0; v < out.height() - 1; ++v)
     {
 	const float		*cur = in[v].data(),
 				*nxt = in[v+1].data();
@@ -674,14 +674,14 @@ EdgeDetector::zeroCrossing(const Image<float>& in, const Image<float>& strength,
 
   // 出力画像の外周を0にする．
     if (out.height() > 0)
-	for (u_int u = 0; u < out.width(); ++u)
+	for (size_t u = 0; u < out.width(); ++u)
 	    out[0][u] = out[out.height()-1][u] = 0;
     if (out.width() > 0)
-	for (u_int v = 0; v < out.height(); ++v)
+	for (size_t v = 0; v < out.height(); ++v)
 	    out[v][0] = out[v][out.width()-1] = 0;
 
   // 現在点を左上隅とする2x2ウィンドウ中の画素が異符号ならエッジ点とする．
-    for (u_int v = 0; ++v < out.height() - 1; )
+    for (size_t v = 0; ++v < out.height() - 1; )
     {
 	const float		*cur = in[v].data(),
 				*nxt = in[v+1].data(),
@@ -718,15 +718,15 @@ const EdgeDetector&
 EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
 {
   // 強いエッジ点を起点にして，接続する弱いエッジ点を追跡しEDGEラベルを付ける．
-    for (u_int v = 0; ++v < edge.height() - 1; )
-	for (u_int u = 0; ++u < edge.width() - 1; )
+    for (size_t v = 0; ++v < edge.height() - 1; )
+	for (size_t u = 0; ++u < edge.width() - 1; )
 	    if (edge[v][u] & EDGE)
 		trace(edge, Point2i(u, v));
 
   // EDGEラベルが付いておらず，かつ付いている点と付いていない弱いエッジ点の
   // 橋渡しになれる点に新たにEDGEラベルを付けて追跡を行う．
-    for (u_int v = 0; ++v < edge.height() - 1; )
-	for (u_int u = 0; ++u < edge.width() - 1; )
+    for (size_t v = 0; ++v < edge.height() - 1; )
+	for (size_t u = 0; ++u < edge.width() - 1; )
 	{
 	    Point2i	p(u, v);
 	    
@@ -735,7 +735,7 @@ EdgeDetector::hysteresisThresholding(Image<u_char>& edge) const
 	}
 
   // EDGE点には255を，そうでない点には0を書き込む．
-    for (u_int v = 0; v < edge.height(); )
+    for (size_t v = 0; v < edge.height(); )
     {
 	u_char*	dst = edge[v++].data();
 	for (const u_char* const end = dst + edge.width(); dst < end; ++dst)

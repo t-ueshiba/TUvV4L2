@@ -36,7 +36,7 @@ namespace TU
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-inline static u_int	bit2byte(u_int i)	{return (i + 7)/8;}
+inline static size_t	bit2byte(size_t i)	{return (i + 7)/8;}
 
 inline static bool
 isBigEndian()
@@ -156,10 +156,10 @@ ImageBase::saveHeader(std::ostream& out, Type type) const
   \param padding	falseならデータバイト数, trueならpaddingバイト数
   \return		1行あたりのデータバイト数またはpaddingバイト数
 */
-u_int
+size_t
 ImageBase::type2nbytes(Type type, bool padding) const
 {
-    u_int	nbytes = _width(), align = 1;
+    size_t	nbytes = _width(), align = 1;
     switch (type)
     {
       case SHORT:
@@ -203,7 +203,7 @@ ImageBase::type2nbytes(Type type, bool padding) const
       default:
 	break;
     }
-    u_int	nbytesPerLine = align * ((nbytes + align - 1) / align);
+    size_t	nbytesPerLine = align * ((nbytes + align - 1) / align);
 
     return (padding ? nbytesPerLine - nbytes : nbytesPerLine);
 }
@@ -213,7 +213,7 @@ ImageBase::type2nbytes(Type type, bool padding) const
   \param type	画素のタイプ
   \return	画素のビット数
 */
-u_int
+size_t
 ImageBase::type2depth(Type type)
 {
     switch (type)
@@ -374,7 +374,7 @@ ImageBase::restorePBMHeader(std::istream& in)
 	d2 *= (k * k * k * k);
     }
 
-    u_int	w, h;
+    size_t	w, h;
     in >> w >> h;
     _resize(h, w, typeInfo);			// set width & height
     in >> w >> skipl;				// skip MaxValue
@@ -501,7 +501,7 @@ ImageBase::savePBMHeader(std::ostream& out, Type type) const
 	break;
     }
 
-    const u_int	depth = type2depth(type);
+    const size_t	depth = type2depth(type);
     out << "# PixelLength: " << bit2byte(depth) << endl;
     out << "# DataType: ";
     switch (type)
@@ -582,7 +582,7 @@ ImageBase::saveBMPHeader(std::ostream& out, Type type) const
     out << "BM";
 
   // Write file header.
-    u_int	ncolors = (type == BMP_8 ? 256 : 0);
+    size_t	ncolors = (type == BMP_8 ? 256 : 0);
     put<int>(out, 14 + 40 + 4*ncolors
 	     + type2nbytes(type, false)*_height());	// Write bfSize.
     put<short>(out, 0);					// Write bfReserved1.
