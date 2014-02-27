@@ -35,10 +35,623 @@
 #define __TUVectorPP_h
 
 #include "TU/Array++.h"
+#include <numeric>
 #include <cmath>
 
 namespace TU
 {
+/************************************************************************
+*  class Product<L, R>							*
+************************************************************************/
+//! 2つの配列式の積演算を表すクラス
+template <class L, class R>
+class Product : public Expression<Product<L, R> >,
+		public OpNode
+{
+  private:
+    typedef typename detail::ValueType<L>::type		lvalue_type;
+    typedef typename detail::ValueType<R>::type		rvalue_type;
+
+    enum
+    {
+	lvalue_is_expr = detail::IsExpression<lvalue_type>::value,
+	rvalue_is_expr = detail::IsExpression<rvalue_type>::value,
+    };
+
+  // 左辺が多次元配列ならあらかじめ右辺を評価する.
+    typedef typename detail::ArgumentType<
+	R, lvalue_is_expr>::type			rargument_type;
+    typedef typename boost::remove_cv<
+	typename boost::remove_reference<
+	    rargument_type>::type>::type		right_type;
+    
+  // 右辺のみが多次元配列ならあらかじめ左辺を評価する.
+    typedef typename detail::ArgumentType<
+	L, (!lvalue_is_expr && rvalue_is_expr)>::type	largument_type;
+    typedef typename boost::remove_cv<
+	typename boost::remove_reference<
+	    largument_type>::type>::type		left_type;
+
+    template <class _L>
+    struct RowIterator
+    {
+	typedef typename _L::const_iterator		type;
+    };
+
+    template <class _R>
+    struct ColumnIterator
+    {
+	typedef column_iterator<const _R>		type;
+    };
+
+  // 左辺が多次元配列なら左辺の各行を反復. そうでないなら右辺の各列を反復.
+    typedef typename boost::mpl::eval_if_c<
+	lvalue_is_expr, RowIterator<left_type>,
+	ColumnIterator<right_type> >::type		base_iterator;
+    typedef typename boost::mpl::if_c<
+	rvalue_is_expr, column_proxy<const right_type>,
+	right_type>::type				rcolumn_type;
+    typedef typename boost::mpl::if_c<
+	lvalue_is_expr,
+	Product<lvalue_type, right_type>,
+	Product<left_type, rcolumn_type> >::type	product_type;
+    
+    template <class _L, class _R>
+    class ResultType
+    {
+      private:
+	template <class _T>
+	struct _Array
+	{
+	    typedef Array<typename _T::type>		type;
+	};
+	typedef typename _L::value_type			lvalue_type;
+	typedef typename boost::mpl::eval_if<
+	    detail::IsExpression<_R>,
+	    detail::ResultType<_R>,
+	    boost::mpl::identity<_R> >::type		rvalue_type;
+
+      public:
+	typedef typename boost::mpl::eval_if<
+	    detail::IsExpression<lvalue_type>,
+	    _Array<ResultType<lvalue_type, _R> >,
+	    boost::mpl::identity<rvalue_type> >::type	type;
+    };
+	
+  public:
+  //! 評価結果の型
+    typedef typename ResultType<L, rvalue_type>::type	result_type;
+  //! 成分の型
+    typedef typename R::element_type			element_type;
+  //! value()が返す値の型
+    typedef typename boost::mpl::if_c<
+	(lvalue_is_expr || rvalue_is_expr),
+	Product<L, R>, element_type>::type		type;
+  //! 要素の型
+    typedef typename product_type::type			value_type;
+
+  //! 定数反復子
+    class const_iterator
+	: public boost::iterator_adaptor<const_iterator,
+					 base_iterator,
+					 value_type,
+					 boost::use_default,
+					 value_type>
+    {
+      private:
+	typedef boost::iterator_adaptor<const_iterator,
+					base_iterator,
+					value_type,
+					boost::use_default,
+					value_type>	super;
+	typedef typename boost::mpl::if_c<
+		    lvalue_is_expr,
+		    right_type, left_type>::type	other_type;
+	
+      public:
+	typedef typename super::difference_type		difference_type;
+	typedef typename super::pointer			pointer;
+	typedef typename super::reference		reference;
+	typedef typename super::iterator_category	iterator_category;
+
+	friend class	boost::iterator_core_access;
+	
+      public:
+	const_iterator(base_iterator iter, const other_type& other)
+	    :super(iter), _other(other)					{}
+	
+      private:
+	reference	dereference(boost::mpl::true_) const
+			{
+			    return product_type::value(*super::base(), _other);
+			}
+	reference	dereference(boost::mpl::false_) const
+			{
+			    return product_type::value(_other, *super::base());
+			}
+	reference	dereference() const
+			{
+			    return dereference(boost::mpl::
+					       bool_<lvalue_is_expr>());
+			}
+	
+      private:
+	const other_type&	_other;
+    };
+
+    typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+  private:
+    static type		value(const Expression<L>& l,
+			      const Expression<R>& r, boost::mpl::true_)
+			{
+			    return Product(l, r);
+			}
+    static type		value(const Expression<L>& l,
+			      const Expression<R>& r, boost::mpl::false_)
+			{
+			    return std::inner_product(l().cbegin(), l().cend(),
+						      r().cbegin(),
+						      element_type(0));
+			}
+    const_iterator	cbegin(boost::mpl::true_) const
+			{
+			    return const_iterator(_l.cbegin(), _r);
+			}
+    const_iterator	cbegin(boost::mpl::false_) const
+			{
+			    return const_iterator(column_cbegin(_r), _l);
+			}
+    const_iterator	cend(boost::mpl::true_) const
+			{
+			    return const_iterator(_l.cend(), _r);
+			}
+    const_iterator	cend(boost::mpl::false_) const
+			{
+			    return const_iterator(column_cend(_r), _l);
+			}
+    size_t		size(boost::mpl::true_) const
+			{
+			    return _l.size();
+			}
+    size_t		size(boost::mpl::false_) const
+			{
+			    return _r.ncol();
+			}
+    void		check_size(size_t size, boost::mpl::true_) const
+			{
+			    if (_l.ncol() != size)
+				throw std::logic_error("Product<L, R>::check_size: mismatched size!");
+			}
+    void		check_size(size_t size, boost::mpl::false_) const
+			{
+			    if (_l.size() != size)
+				throw std::logic_error("Product<L, R>::check_size: mismatched size!");
+			}
+    
+  public:
+    Product(const Expression<L>& l, const Expression<R>& r)
+	:_l(l()), _r(r())
+			{
+			    check_size(_r.size(),
+				       boost::mpl::bool_<lvalue_is_expr>());
+			}
+
+    static type		value(const Expression<L>& l, const Expression<R>& r)
+			{
+			    return value(l, r,
+					 boost::mpl::bool_<(lvalue_is_expr ||
+							    rvalue_is_expr)>());
+			}
+    
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
+			{
+			    return cbegin(boost::mpl::bool_<lvalue_is_expr>());
+			}
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	begin() const
+			{
+			    return cbegin();
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return cend(boost::mpl::bool_<lvalue_is_expr>());
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	end() const
+			{
+			    return cend();
+			}
+  //! 演算結果の要素数を返す.
+    size_t		size() const
+			{
+			    return size(boost::mpl::bool_<lvalue_is_expr>());
+			}
+  //! 演算結果の列数を返す.
+    size_t		ncol() const
+			{
+			    return _r.ncol();
+			}
+    
+  private:
+    const largument_type	_l;
+    const rargument_type	_r;
+};
+
+/************************************************************************
+*  class ExteriorProduct<L, R>						*
+************************************************************************/
+//! 2つの配列型の式の外積演算を表すクラス
+template <class L, class R>
+class ExteriorProduct : public Expression<ExteriorProduct<L, R> >,
+			public OpNode
+{
+  private:
+    typedef typename detail::ArgumentType<L, true>::type	largument_type;
+    typedef typename detail::ArgumentType<R, true>::type	rargument_type;
+    typedef typename L::result_type::const_iterator		base_iterator;
+    typedef typename R::result_type				right_type;
+    
+  public:
+  //! 評価結果の型
+    typedef Array<right_type>					result_type;
+  //! 成分の型
+    typedef typename result_type::element_type			element_type;
+  //! 要素の型
+    typedef UnaryOperator<std::binder1st<std::multiplies<element_type> >,
+			  right_type>				value_type;
+  //! 定数反復子
+    class const_iterator
+	: public boost::iterator_adaptor<const_iterator,
+					 base_iterator,
+					 value_type,
+					 boost::use_default,
+					 value_type>
+    {
+      private:
+	typedef boost::iterator_adaptor<const_iterator,
+					base_iterator,
+					value_type,
+					boost::use_default,
+					value_type>	super;
+	
+      public:
+	typedef typename super::difference_type		difference_type;
+	typedef typename super::pointer			pointer;
+	typedef typename super::reference		reference;
+	typedef typename super::iterator_category	iterator_category;
+
+	friend class	boost::iterator_core_access;
+	
+      public:
+	const_iterator(base_iterator iter, const right_type& r)
+	    :super(iter), _r(r)						{}
+	
+      private:
+	reference	dereference() const
+			{
+			    return *super::base() * _r;
+			}
+	
+      private:
+	const right_type&	_r;
+    };
+
+    typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+  public:
+    ExteriorProduct(const Expression<L>& l, const Expression<R>& r)
+	:_l(l()), _r(r())						{}
+
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
+			{
+			    return const_iterator(_l.cbegin(), _r);
+			}
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	begin() const
+			{
+			    return cbegin();
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return const_iterator(_l.cend(), _r);
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	end() const
+			{
+			    return cend();
+			}
+  //! 演算結果の要素数を返す.
+    size_t		size() const
+			{
+			    return _l.size();
+			}
+  //! 演算結果の列数を返す.
+    size_t		ncol() const
+			{
+			    return _r.size();
+			}
+    
+  private:
+    const largument_type	_l;
+    const rargument_type	_r;
+};
+
+/************************************************************************
+*  class VectorProduct<L, R>						*
+************************************************************************/
+//! 2つの配列型の式のベクトル積演算を表すクラス
+template <class L, class R>
+class VectorProduct : public Expression<VectorProduct<L, R> >,
+		      public OpNode
+{
+  private:
+    typedef typename detail::ValueType<L>::type		lvalue_type;
+
+    enum
+    {
+	lvalue_is_expr = detail::IsExpression<lvalue_type>::value,
+    };
+    
+    typedef typename detail::ArgumentType<L, !lvalue_is_expr>::type
+							largument_type;
+    typedef typename detail::ArgumentType<R, true>::type
+							rargument_type;
+    typedef typename boost::remove_cv<
+	typename boost::remove_reference<
+	    rargument_type>::type>::type		right_type;
+    typedef typename right_type::value_type		rvalue_type;
+    typedef typename L::const_iterator			base_iterator;
+    typedef Array<rvalue_type, FixedSizedBuf<rvalue_type, 3> >
+							array3_type;
+    typedef VectorProduct<lvalue_type, right_type>	product_type;
+    
+    template <class _L>
+    class ResultType
+    {
+      private:
+	template <class _T>
+	struct _Array
+	{
+	    typedef Array<typename _T::type>		type;
+	};
+	typedef typename _L::value_type			lvalue_type;
+
+      public:
+	typedef typename boost::mpl::eval_if<
+	    detail::IsExpression<lvalue_type>,
+	    _Array<ResultType<lvalue_type> >,
+	    boost::mpl::identity<array3_type> >::type	type;
+    };
+	
+  public:
+  //! 評価結果の型
+    typedef typename ResultType<L>::type		result_type;
+  //! 成分の型
+    typedef typename result_type::element_type		element_type;
+  //! value()が返す値の型
+    typedef typename boost::mpl::if_c<
+	lvalue_is_expr,
+	VectorProduct<L, R>, array3_type>::type		type;
+  //! 要素の型
+    typedef typename boost::mpl::eval_if_c<
+	lvalue_is_expr, product_type,
+	boost::mpl::identity<array3_type> >::type	value_type;
+    
+  //! 定数反復子
+    class const_iterator
+	: public boost::iterator_adaptor<const_iterator,
+					 base_iterator,
+					 value_type,
+					 boost::use_default,
+					 value_type>
+    {
+      private:
+	typedef boost::iterator_adaptor<const_iterator,
+					base_iterator,
+					value_type,
+					boost::use_default,
+					value_type>	super;
+
+      public:
+	typedef typename super::difference_type		difference_type;
+	typedef typename super::pointer			pointer;
+	typedef typename super::reference		reference;
+	typedef typename super::iterator_category	iterator_category;
+
+	friend class	boost::iterator_core_access;
+
+      public:
+	const_iterator(base_iterator iter, const right_type& r)
+	    :super(iter), _r(r)						{}
+
+      private:
+	reference	dereference() const
+			{
+			    return product_type(*super::base(), _r).value();
+			}
+
+      private:
+	const right_type&	_r;
+    };
+
+    typedef const_iterator	iterator;	//!< 定数反復子の別名
+
+  private:
+    void		check_size(size_t size, boost::mpl::true_) const
+			{
+			    if (_l.ncol() != size)
+				throw std::logic_error("VectorProduct<L, R>::check_size: mismatched size!");
+			}
+    void		check_size(size_t size, boost::mpl::false_) const
+			{
+			    if (_l.size() != size)
+				throw std::logic_error("VectorProduct<L, R>::check_size: mismatched size!");
+			}
+    type		value(boost::mpl::true_) const
+			{
+			    return *this;
+			}
+    type		value(boost::mpl::false_) const
+			{
+			    type	val(3);
+
+			    val[0] = _l[1] * _r[2] - _l[2] * _r[1];
+			    val[1] = _l[2] * _r[0] - _l[0] * _r[2];
+			    val[2] = _l[0] * _r[1] - _l[1] * _r[0];
+
+			    return val;
+			}
+    size_t		ncol(boost::mpl::true_) const
+			{
+			    return 3;
+			}
+    size_t		ncol(boost::mpl::false_) const
+			{
+			    return _r.ncol();
+			}
+    
+  public:
+    VectorProduct(const Expression<L>& l, const Expression<R>& r)
+	:_l(l()), _r(r())
+			{
+			    check_size(3, boost::mpl::bool_<lvalue_is_expr>());
+			    check_size(_r.size(),
+				       boost::mpl::bool_<lvalue_is_expr>());
+			}
+
+    type		value()
+			{
+			    return value(boost::mpl::bool_<lvalue_is_expr>());
+			}
+
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
+			{
+			    return const_iterator(_l.cbegin(), _r);
+			}
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	begin() const
+			{
+			    return cbegin();
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return const_iterator(_l.cend(), _r);
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	end() const
+			{
+			    return cend();
+			}
+  //! 演算結果の要素数を返す.
+    size_t		size() const
+			{
+			    return _l.size();
+			}
+  //! 演算結果の列数を返す.
+    size_t		ncol() const
+			{
+			    return ncol(boost::mpl::bool_<lvalue_is_expr>());
+			}
+    
+  private:
+    const largument_type	_l;
+    const rargument_type	_r;
+};
+
+template <class T, class B=Buf<T> >				class Vector;
+template <class T, class B=Buf<T>, class R=Buf<Vector<T> > >	class Matrix;
+
+namespace detail
+{
+template <class L, class R>
+class ProductType
+{
+  private:
+    enum
+    {
+	lvalue_is_expr = detail::IsExpression<typename L::value_type>::value,
+	rvalue_is_expr = detail::IsExpression<typename R::value_type>::value,
+    };
+    typedef typename R::element_type				element_type;
+    
+  public:
+    typedef typename boost::mpl::if_c<
+	lvalue_is_expr,
+	typename boost::mpl::if_c<
+	    rvalue_is_expr,
+	    Matrix<element_type>, Vector<element_type> >::type,
+	typename boost::mpl::if_c<
+	    rvalue_is_expr,
+	    Vector<element_type>, element_type>::type>::type	type;
+};
+
+template <class L, class R>
+class VectorProductType
+{
+  private:
+    enum
+    {
+	lvalue_is_expr = detail::IsExpression<typename L::value_type>::value,
+	rvalue_is_expr = detail::IsExpression<typename R::value_type>::value,
+    };
+    typedef typename R::element_type				element_type;
+    
+  public:
+    typedef typename boost::mpl::if_c<
+	(lvalue_is_expr || rvalue_is_expr),
+	Matrix<element_type>,
+	Vector<element_type, FixedSizedBuf<element_type, 3> > >::type	type;
+};
+
+}
+/************************************************************************
+*  numerical operators							*
+************************************************************************/
+//! 2つの配列式の積をとる.
+/*!
+  aliasingを防ぐため，積演算子ノードではなく評価結果そのものを返す.
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	積の評価結果
+*/
+template <class L, class R> inline typename detail::ProductType<L, R>::type
+operator *(const Expression<L>& l, const Expression<R>& r)
+{
+    return Product<L, R>::value(l, r);
+}
+
+//! 2つの配列タイプの式の外積をとる.
+/*!
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	外積演算子ノード
+*/
+template <class L, class R> inline Matrix<typename R::element_type>
+operator %(const Expression<L>& l, const Expression<R>& r)
+{
+    return ExteriorProduct<L, R>(l, r);
+}
+
+//! 2つの配列タイプの式のベクトル積をとる.
+/*!
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	ベクトル積
+*/
+template <class L, class R>
+inline typename detail::VectorProductType<L, R>::type
+operator ^(const Expression<L>& l, const Expression<R>& r)
+{
+    return VectorProduct<L, R>(l, r).value();
+}
+
 /************************************************************************
 *  class Rotation<T>							*
 ************************************************************************/
@@ -157,14 +770,12 @@ Rotation<T>::Rotation(size_t p, size_t q, element_type theta)
 /************************************************************************
 *  class Vector<T>							*
 ************************************************************************/
-template <class T, class B, class R>	class Matrix;
-
 //! T型の成分を持つベクトルを表すクラス
 /*!
   \param T	成分の型
   \param B	バッファ
 */
-template <class T, class B=Buf<T> >
+template <class T, class B>
 class Vector : public Array<T, B>
 {
   private:
@@ -571,7 +1182,7 @@ template <class T>	class SVDecomposition;
   \param B	バッファ
   \param R	行バッファ
 */
-template <class T, class B=Buf<T>, class R=Buf<Vector<T> > >
+template <class T, class B, class R>
 class Matrix : public Array2<Vector<T>, B, R>
 {
   private:
