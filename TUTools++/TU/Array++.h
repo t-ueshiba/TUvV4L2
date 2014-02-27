@@ -43,10 +43,11 @@
 #include "TU/iterator.h"
 #include "TU/mmInstructions.h"
 #include "TU/Expression++.h"
-//#if __cplusplus > 197711L
-//#  define __CXX0X
-//#  include <initializer_list>
-//#endif
+#if (__cplusplus > 199711L) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  define __CXX0X
+//#  define __CXX0X_MOVE		// 移動コンストラクタ/代入を使用
+#  include <initializer_list>
+#endif
 
 namespace TU
 {
@@ -103,6 +104,10 @@ class Buf : public BufTraits<T, ALIGNED>
 			Buf(pointer p, size_t siz)		;
 			Buf(const Buf& b)			;
     Buf&		operator =(const Buf& b)		;
+#ifdef __CXX0X_MOVE
+			Buf(Buf&& b)				;
+    Buf&		operator =(Buf&& b)			;
+#endif
 			~Buf()					;
 
     const_pointer	data()				const	;
@@ -220,6 +225,43 @@ Buf<T, ALIGNED>::operator =(const Buf& b)
     }
     return *this;
 }
+
+#ifdef __CXX0X_MOVE
+/*
+ *  注意：移動コンストラクタ/代入を使うと，Array2<Array<T> >&&型右辺値 x を
+ *  Array<Array<T> >型左辺値 y に移動させたときに Array<Array<T> >部分が
+ *  shallow copyされるだけなので，y の各要素の記憶領域は x._buf のままで
+ *  ある．よって，x が破壊されるときに一緒に x._buf も破壊されると dangling
+ *  pointer が生じる．y がArray2<Array<T> >型ならば，x._buf も一緒に
+ *  y._buf にshallow copyされるので，問題は生じない．
+ */
+//! 移動コンストラクタ
+template <class T, bool ALIGNED> inline
+Buf<T, ALIGNED>::Buf(Buf&& b)
+    :_size(b._size), _p(b._p), _shared(b._shared), _capacity(b._capacity)
+{
+    b._p = nullptr;	// b の 破壊時に b._p がdeleteされることを防ぐ．
+}
+
+//! 移動代入演算子
+template <class T, bool ALIGNED> inline Buf<T, ALIGNED>&
+Buf<T, ALIGNED>::operator =(Buf&& b)
+{
+    if (_shared)
+	return operator =(static_cast<const Buf&>(b));
+
+    std::cerr << "move assignment!" << std::endl;
+    
+    allocator::free(_p, _size);
+    _size     = b._size;
+    _p	      = b._p;
+    _capacity = b._capacity;
+
+    b._p = nullptr;	// b の 破壊時に b._p がdeleteされることを防ぐ．
+    
+    return *this;
+}
+#endif
 
 //! デストラクタ
 template <class T, bool ALIGNED> inline
@@ -662,13 +704,11 @@ template <class T, class B=Buf<T> >
 class Array : public B, public Expression<Array<T, B> >
 {
   private:
-    typedef B					super;
-    typedef Expression<Array<T, B> >		expression_type;
-    
+    typedef B						super;
     template <class _T>
     struct ElementType
     {
-	typedef typename _T::element_type	type;
+	typedef typename _T::element_type		type;
     };
 
   public:
@@ -823,18 +863,18 @@ Array<T, B>::operator =(const Expression<E>& expr)
 }
 
 #ifdef __CXX0X
-template <class T, class B>
+template <class T, class B> inline
 Array<T, B>::Array(std::initializer_list<value_type> args)
     :super(args.size())
 {
-    std::copy(args.cbegin(), args.cend(), begin());
+    std::copy(args.begin(), args.end(), begin());
 }
 
-template <class T, class B> Array<T, B>&
+template <class T, class B> inline Array<T, B>&
 Array<T, B>::operator =(std::initializer_list<value_type> args)
 {
     resize(args.size());
-    std::copy(args.cbegin(), args.cend(), begin());
+    std::copy(args.begin(), args.end(), begin());
     return *this;
 }
 #endif
@@ -1187,6 +1227,10 @@ class Array2 : public Array<T, R>
     Array2&	operator =(const Expression<E>& expr)			;
     Array2&	operator =(const element_type& c)			;
 #ifdef __CXX0X
+#  ifdef __CXX0X_MOVE
+    Array2(Array2&& a)							;
+    Array2&	operator =(Array2&& a)					;
+#  endif
     Array2(std::initializer_list<value_type> args)			;
     Array2&	operator =(std::initializer_list<value_type> args)	;
 #endif
@@ -1309,8 +1353,7 @@ Array2<T, B, R>::operator =(const Array2& a)
   しなければならない．
   \param expr	コピー元の配列
 */
-template <class T, class B, class R> template <class E>
-inline
+template <class T, class B, class R> template <class E> inline
 Array2<T, B, R>::Array2(const Expression<E>& expr)
     :super(expr().size()), _ncol(expr().ncol()),
      _buf(size()*_buf.stride(ncol()))
@@ -1326,8 +1369,7 @@ Array2<T, B, R>::Array2(const Expression<E>& expr)
   \param expr	コピー元の配列
   \return	この配列
 */
-template <class T, class B, class R> template <class E>
-inline Array2<T, B, R>&
+template <class T, class B, class R> template <class E> inline Array2<T, B, R>&
 Array2<T, B, R>::operator =(const Expression<E>& expr)
 {
     resize(expr().size(), expr().ncol());
@@ -1336,20 +1378,37 @@ Array2<T, B, R>::operator =(const Expression<E>& expr)
 }
 
 #ifdef __CXX0X
-template <class T, class B, class R>
+#  ifdef __CXX0X_MOVE
+template <class T, class B, class R> inline
+Array2<T, B, R>::Array2(Array2&& a)
+    :super(std::move(a)), _ncol(a._ncol), _buf(std::move(a._buf))
+{
+}
+
+template <class T, class B, class R> inline Array2<T, B, R>&
+Array2<T, B, R>::operator =(Array2&& a)
+{
+    super::operator =(std::move(a));
+    _ncol = a._ncol;
+    _buf  = std::move(a._buf);
+    return *this;
+}
+#  endif
+
+template <class T, class B, class R> inline
 Array2<T, B, R>::Array2(std::initializer_list<value_type> args)
-    :super(args.size()), _ncol(args.size() ? args.cbegin()->size() : 0),
+    :super(args.size()), _ncol(args.size() ? args.begin()->size() : 0),
      _buf(size()*_buf.stride(ncol()))
 {
     set_rows();
-    std::copy(args.cbegin(), args.cend(), begin());
+    std::copy(args.begin(), args.end(), begin());
 }
 
-template <class T, class B, class R> Array2<T, B, R>&
+template <class T, class B, class R> inline Array2<T, B, R>&
 Array2<T, B, R>::operator =(std::initializer_list<value_type> args)
 {
-    resize(args.size(), (args.size() ? args.cbegin()->size() : 0));
-    std::copy(args.cbegin(), args.cend(), begin());
+    resize(args.size(), (args.size() ? args.begin()->size() : 0));
+    std::copy(args.begin(), args.end(), begin());
     return *this;
 }
 #endif
@@ -1622,7 +1681,7 @@ class Product : public Expression<Product<L, R> >,
   //! 評価結果の型
     typedef typename ResultType<L, rvalue_type>::type	result_type;
   //! 成分の型
-    typedef typename L::element_type			element_type;
+    typedef typename R::element_type			element_type;
   //! value()が返す値の型
     typedef typename boost::mpl::if_c<
 	(lvalue_is_expr || rvalue_is_expr),
@@ -1811,7 +1870,7 @@ class ExteriorProduct : public Expression<ExteriorProduct<L, R> >,
   //! 評価結果の型
     typedef Array<right_type>					result_type;
   //! 成分の型
-    typedef typename L::element_type				element_type;
+    typedef typename result_type::element_type			element_type;
   //! 要素の型
     typedef UnaryOperator<std::binder1st<std::multiplies<element_type> >,
 			  right_type>				value_type;
@@ -1957,7 +2016,7 @@ class VectorProduct : public Expression<VectorProduct<L, R> >,
   //! 評価結果の型
     typedef typename ResultType<L>::type		result_type;
   //! 成分の型
-    typedef typename R::element_type			element_type;
+    typedef typename result_type::element_type		element_type;
   //! value()が返す値の型
     typedef typename boost::mpl::if_c<
 	lvalue_is_expr,

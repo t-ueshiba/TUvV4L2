@@ -284,11 +284,11 @@ Vector<T, B>::Vector(Vector<T, B2>& v, size_t i, size_t d)
 
 //! 他のベクトルと同一成分を持つベクトルを作る(コピーコンストラクタの拡張)．
 /*!
-  \param expr	コピー元ベクトル
+  \param v	コピー元ベクトル
 */
 template <class T, class B> template <class E> inline
-Vector<T, B>::Vector(const Expression<E>& expr)
-    :super(expr)
+Vector<T, B>::Vector(const Expression<E>& v)
+    :super(v)
 {
 }
     
@@ -298,9 +298,9 @@ Vector<T, B>::Vector(const Expression<E>& expr)
   \return	このベクトル
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator =(const Expression<E>& expr)
+Vector<T, B>::operator =(const Expression<E>& v)
 {
-    super::operator =(expr);
+    super::operator =(v);
     return *this;
 }
 
@@ -367,14 +367,14 @@ Vector<T, B>::operator /=(T2 c)
 
 //! このベクトルに他のベクトルを足す．
 /*!
-  \param expr	足すベクトル
+  \param v	足すベクトル
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} + \TUvec{v}{}\f$
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator +=(const Expression<E>& expr)
+Vector<T, B>::operator +=(const Expression<E>& v)
 {
-    super::operator +=(expr);
+    super::operator +=(v);
     return *this;
 }
 
@@ -385,9 +385,9 @@ Vector<T, B>::operator +=(const Expression<E>& expr)
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} - \TUvec{v}{}\f$
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator -=(const Expression<E>& expr)
+Vector<T, B>::operator -=(const Expression<E>& v)
 {
-    super::operator -=(expr);
+    super::operator -=(v);
     return *this;
 }
 
@@ -607,7 +607,7 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class B2, class R2>
     Matrix(Matrix<T, B2, R2>& m, size_t i, size_t j, size_t r, size_t c);
     template <class E>
-    Matrix(const Expression<E>& expr)					;
+    Matrix(const Expression<E>& m)					;
     Matrix(const BlockDiagonalMatrix<T>& m)				;
     template <class E>
     Matrix&		operator =(const Expression<E>& m)		;
@@ -632,9 +632,9 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class T2>
     Matrix&		operator /=(T2 c)				;
     template <class E>
-    Matrix&		operator +=(const Expression<E>& expr)		;
+    Matrix&		operator +=(const Expression<E>& m)		;
     template <class E>
-    Matrix&		operator -=(const Expression<E>& expr)		;
+    Matrix&		operator -=(const Expression<E>& m)		;
     template <class E>
     Matrix&		operator *=(const Expression<E>& m)		;
     template <class E>
@@ -729,25 +729,23 @@ Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
 
 //! 他の行列と同一成分を持つ行列を作る(コピーコンストラクタの拡張)．
 /*!
-  \param expr	コピー元行列
+  \param m	コピー元行列
 */
-template <class T, class B, class R> template <class E>
-inline
-Matrix<T, B, R>::Matrix(const Expression<E>& expr)
-    :super(expr)
+template <class T, class B, class R> template <class E> inline
+Matrix<T, B, R>::Matrix(const Expression<E>& m)
+    :super(m)
 {
 }
 
 //! 他の行列を自分に代入する(代入演算子の拡張)．
 /*!
-  \param expr	コピー元行列
+  \param m	コピー元行列
   \return	この行列
 */
-template <class T, class B, class R> template <class E>
-inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator =(const Expression<E>& expr)
+template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator =(const Expression<E>& m)
 {
-    super::operator =(expr);
+    super::operator =(m);
     return *this;
 }
 
