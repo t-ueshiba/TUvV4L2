@@ -103,7 +103,7 @@ class Buf : public BufTraits<T, ALIGNED>
 			Buf(pointer p, size_t siz)		;
 			Buf(const Buf& b)			;
     Buf&		operator =(const Buf& b)		;
-#if defined(_CXX0X) && defined(__CXX0X_MOVE)
+#if defined(__CXX0X) && defined(__CXX0X_MOVE)
 			Buf(Buf&& b)				;
     Buf&		operator =(Buf&& b)			;
 #endif
