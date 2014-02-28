@@ -739,17 +739,21 @@ class Array : public B, public Expression<Array<T, B> >
     typedef std::ptrdiff_t				difference_type;
     
   public:
-    Array()								;
-    explicit Array(size_t d)						;
-    Array(pointer p, size_t d)						;
+		Array()							;
+    explicit	Array(size_t d)						;
+		Array(pointer p, size_t d)				;
     template <class B2>
-    Array(Array<T, B2>& a, size_t i, size_t d)				;
+		Array(Array<T, B2>& a, size_t i, size_t d)		;
     template <class E>
-    Array(const Expression<E>& expr)					;
+		Array(const Expression<E>& expr)			;
     template <class E>
     Array&	operator =(const Expression<E>& expr)			;
 #if defined(__CXX0X)
-    Array(std::initializer_list<value_type> args)			;
+#  if defined(__CXX0X_MOVE)
+		Array(Array&& a)					;
+    Array&	operator =(Array&& a)					;
+#  endif
+		Array(std::initializer_list<value_type> args)		;
     Array&	operator =(std::initializer_list<value_type> args)	;
 #endif
     Array&	operator =(const element_type& c)			;
@@ -862,6 +866,20 @@ Array<T, B>::operator =(const Expression<E>& expr)
 }
 
 #if defined(__CXX0X)
+#  if defined(__CXX0X_MOVE)
+template <class T, class B> inline
+Array<T, B>::Array(Array&& a)
+    :super(std::move(a))
+{
+}
+
+template <class T, class B> inline Array<T, B>&
+Array<T, B>::operator =(Array&& a)
+{
+    super::operator =(std::move(a));
+}
+#  endif
+
 template <class T, class B> inline
 Array<T, B>::Array(std::initializer_list<value_type> args)
     :super(args.size())
@@ -1212,16 +1230,17 @@ class Array2 : public Array<T, R>
     typedef std::ptrdiff_t				difference_type;
 
   public:
-    Array2()								;
-    Array2(size_t r, size_t c)						;
-    Array2(pointer p, size_t r, size_t c)				;
-    Array2(buf_type buf, size_t r, size_t c)				;
+		Array2()						;
+		Array2(size_t r, size_t c)				;
+		Array2(pointer p, size_t r, size_t c)			;
+		Array2(buf_type buf, size_t r, size_t c)		;
     template <class B2, class R2>
-    Array2(Array2<T, B2, R2>& a, size_t i, size_t j, size_t r, size_t c);
-    Array2(const Array2& a)						;
+		Array2(Array2<T, B2, R2>& a,
+		       size_t i, size_t j, size_t r, size_t c)		;
+		Array2(const Array2& a)					;
     Array2&	operator =(const Array2& a)				;
     template <class E>
-    Array2(const Expression<E>& expr)					;
+		Array2(const Expression<E>& expr)			;
     template <class E>
     Array2&	operator =(const Expression<E>& expr)			;
     Array2&	operator =(const element_type& c)			;
