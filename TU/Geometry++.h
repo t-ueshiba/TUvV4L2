@@ -1610,7 +1610,7 @@ Rigidity<M>::dim() const
 template<class M> template <class E> inline void
 Rigidity<M>::set(const Expression<E>& T)
 {
-    if (T.nrow() != T.ncol())
+    if (T().size() != T().ncol())
 	throw std::invalid_argument("Rigidity::set(): non-square matrix!!");
     super::set(T);
 }
