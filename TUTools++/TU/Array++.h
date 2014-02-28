@@ -249,8 +249,6 @@ Buf<T, ALIGNED>::operator =(Buf&& b)
     if (_shared)
 	return operator =(static_cast<const Buf&>(b));
 
-    std::cerr << "move assignment!" << std::endl;
-    
     allocator::free(_p, _size);
     _size     = b._size;
     _p	      = b._p;
