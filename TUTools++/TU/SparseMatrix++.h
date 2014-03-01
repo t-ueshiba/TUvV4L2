@@ -141,8 +141,8 @@ class SparseMatrix
     
   private:
     size_t			_ncol;		//!< 列の数
-    std::vector<size_t>		_rowIndex;	//!< 各行の先頭成分の通し番号
-    std::vector<size_t>		_columns;	//!< 各成分の列番号
+    std::vector<_INTEGER_t>	_rowIndex;	//!< 各行の先頭成分の通し番号
+    std::vector<_INTEGER_t>	_columns;	//!< 各成分の列番号
     std::vector<element_type>	_values;	//!< 各成分の値
     std::map<size_t,
 	     element_type>	_rowmap;	//!< 1行中の列番号と値の対応表
@@ -223,7 +223,7 @@ SparseMatrix<T, SYM>::copyRow()
 
   // 直前の行の(対称行列の場合は2番目以降の)成分の列番号を現在の行にコピーする．
     for (size_t n  = _rowIndex[row - 1] + (SYM ? 1 : 0),
-	       ne = _rowIndex[row]; n < ne; ++n)
+	        ne = _rowIndex[row]; n < ne; ++n)
     {
 	_columns.push_back(_columns[n]);
 	_values.push_back(T(0));
@@ -763,17 +763,23 @@ SparseMatrix<T, SYM>::solve(const Vector<T>& b) const
     Vector<T>		x(n);		// 解ベクトル
 
   // 連立一次方程式を解く．
-    PARDISO(&pt[0], &maxfct, &mnum, &mtype, &phase, &n, (void*)&_values[0],
-	    (_INTEGER_t*)&_rowIndex[0], (_INTEGER_t*)&_columns[0],
-	    &perm[0], &nrhs, iparm, &msglvl, (void*)&b[0], &x[0], &error);
+    PARDISO(&pt[0], &maxfct, &mnum, &mtype, &phase, &n,
+	    const_cast<element_type*>(&_values[0]),
+	    const_cast<_INTEGER_t*>(&_rowIndex[0]),
+	    const_cast<_INTEGER_t*>(&_columns[0]),
+	    &perm[0], &nrhs, iparm, &msglvl,
+	    const_cast<element_type*>(b.data()), &x[0], &error);
     if (error != 0)
 	throw std::runtime_error("TU::SparseMatrix<T, SYM>::solve(): PARDISO failed!");
 
   // pardiso 内で使用した全メモリを解放する．
     phase = -1;
-    PARDISO(&pt[0], &maxfct, &mnum, &mtype, &phase, &n, (void*)&_values[0],
-	    (_INTEGER_t*)&_rowIndex[0], (_INTEGER_t*)&_columns[0],
-	    &perm[0], &nrhs, iparm, &msglvl, (void*)&b[0], &x[0], &error);
+    PARDISO(&pt[0], &maxfct, &mnum, &mtype, &phase, &n,
+	    const_cast<element_type*>(&_values[0]),
+	    const_cast<_INTEGER_t*>(&_rowIndex[0]),
+	    const_cast<_INTEGER_t*>(&_columns[0]),
+	    &perm[0], &nrhs, iparm, &msglvl,
+	    const_cast<element_type*>(b.data()), &x[0], &error);
     if (error != 0)
 	throw std::runtime_error("TU::SparseMatrix<T, SYM>::solve(): PARDISO failed to release memory!");
 
