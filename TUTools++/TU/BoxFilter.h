@@ -70,7 +70,7 @@ class box_filter_iterator
 
   public:
 		box_filter_iterator()
-		    :super(), _head(super::base()), _valid(true), _val()
+		    :super(), _head(super::base()), _val(), _valid(true)
 		{
 		}
     
@@ -106,7 +106,8 @@ class box_filter_iterator
 		{
 		    if (!_valid)
 		    {
-			(_val -= *_head) += *super::base();
+			_val += (*super::base() - *_head);
+		      //(_val -= *_head) += *super::base();
 			_valid = true;
 		    }
 		    return _val;
@@ -114,18 +115,15 @@ class box_filter_iterator
     
     void	increment()
 		{
-		    if (!_valid)
-			(_val -= *_head) += *super::base();
-		    else
-			_valid = false;
 		    ++_head;
 		    ++super::base_reference();
+		    _valid = false;
 		}
 
   private:
     ITER		_head;
-    mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
     mutable value_type	_val;	// [_head, base()) or [_head, base()] の総和
+    mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
 };
 
 //! box filter反復子を生成する
