@@ -142,7 +142,7 @@ class Buf : public BufTraits<T, ALIGNED>
 	    if (p == 0)
 		throw std::runtime_error("Buf<T, ALIGNED>::Allocator<true>::alloc(): failed to allocate memory!!");
 	    
-	    for (pointer q = p; q != p + siz; ++q)
+	    for (pointer q = p, qe = p + siz; q != qe; ++q)
 		new(q) value_type();	// 確保した各要素にコンストラクタを適用
 	    return p;
 	}
@@ -152,7 +152,7 @@ class Buf : public BufTraits<T, ALIGNED>
 	{
 	    if (p != 0)
 	    {
-		for (pointer q = p; q != p + siz; ++q)
+		for (pointer q = p, qe = p + siz; q != qe; ++q)
 		    q->~value_type();	// 解放する各要素にデストラクタを適用
 		_mm_free(p);
 	    }
@@ -1020,7 +1020,7 @@ Array<T, B>::operator [](size_t i)
 template <class T, class B> Array<T, B>&
 Array<T, B>::operator *=(element_type c)
 {
-    for (iterator q = begin(); q != end(); ++q)
+    for (iterator q = begin(), qe = end(); q != qe; ++q)
 	*q *= c;
     return *this;
 }
@@ -1033,7 +1033,7 @@ Array<T, B>::operator *=(element_type c)
 template <class T, class B> template <class T2> inline Array<T, B>&
 Array<T, B>::operator /=(T2 c)
 {
-    for (iterator q = begin(); q != end(); ++q)
+    for (iterator q = begin(), qe = end(); q != qe; ++q)
 	*q /= c;
     return *this;
 }
@@ -1048,7 +1048,7 @@ Array<T, B>::operator +=(const Expression<E>& expr)
 {
     check_size(expr().size());
     typename E::const_iterator	p = expr().cbegin();
-    for (iterator q = begin(); q != end(); ++q, ++p)
+    for (iterator q = begin(), qe = end(); q != qe; ++q, ++p)
 	*q += *p;
     return *this;
 }
@@ -1063,7 +1063,7 @@ Array<T, B>::operator -=(const Expression<E>& expr)
 {
     check_size(expr().size());
     typename E::const_iterator	p = expr().cbegin();
-    for (iterator q = begin(); q != end(); ++q, ++p)
+    for (iterator q = begin(), qe = end(); q != qe; ++q, ++p)
 	*q -= *p;
     return *this;
 }
@@ -1116,7 +1116,7 @@ Array<T, B>::get(std::istream& in)
 template <class T, class B> std::ostream&
 Array<T, B>::put(std::ostream& out) const
 {
-    for (const_iterator q = cbegin(); q != cend(); ++q)
+    for (const_iterator q = cbegin(), qe = cend(); q != qe; ++q)
 	out << ' ' << *q;
     return out;
 }
@@ -1153,8 +1153,10 @@ Array<T, B>::save(std::ostream& out) const
 template <class T, class B> inline void
 Array<T, B>::check_size(size_t d) const
 {
+#if !defined(NO_CHECK_SIZE)
     if (d != size())
 	throw std::logic_error("Array<T, B>::check_size: mismatched size!");
+#endif
 }
 
 template <class T, class B> inline size_t
@@ -1534,7 +1536,7 @@ Array2<T, B, R>::resize(pointer p, size_t r, size_t c)
 template <class T, class B, class R> std::istream&
 Array2<T, B, R>::restore(std::istream& in)
 {
-    for (iterator q = begin(); q != end(); ++q)
+    for (iterator q = begin(), qe = end(); q != qe; ++q)
 	q->restore(in);
     return in;
 }
@@ -1547,7 +1549,7 @@ Array2<T, B, R>::restore(std::istream& in)
 template <class T, class B, class R> std::ostream&
 Array2<T, B, R>::save(std::ostream& out) const
 {
-    for (const_iterator q = cbegin(); q != cend(); ++q)
+    for (const_iterator q = cbegin(), qe = end(); q != qe; ++q)
 	q->save(out);
     return out;
 }

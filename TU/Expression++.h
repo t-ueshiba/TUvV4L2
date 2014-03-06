@@ -418,9 +418,11 @@ class BinaryOperator : public Expression<BinaryOperator<OP, L, R> >,
 		   const Expression<R>& r, const OP& op)
 	:_l(l()), _r(r()), _op(op)
 			{
+#if !defined(NO_CHECK_SIZE)
     			    const size_t	d = _l.size();
 			    if (d != _r.size())
 				throw std::logic_error("BinaryOperator<OP, L, R>::BinaryOperator: mismatched size!");
+#endif
 			}
 
   //! 演算結果の先頭要素を指す定数反復子を返す.
@@ -538,8 +540,10 @@ class column_proxy : public Expression<column_proxy<A> >
     template <class E>
     column_proxy&		operator =(const Expression<E>& expr)
 				{
+#if !defined(NO_CHECK_SIZE)
 				    if (expr.size() != size())
 					throw std::logic_error("column_proxy<A>::operator =: mismatched size!");
+#endif
 				    std::copy(expr().cbegin(), expr().cend(),
 					      begin());
 				    return *this;

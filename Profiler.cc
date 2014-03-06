@@ -39,9 +39,10 @@ namespace TU
 const Profiler&
 Profiler::reset() const
 {
-    _active = 0;
-    for (size_t n = 0; n < _timers.size(); ++n)
-	_timers[n].reset();
+    _active = -1;
+    for (size_t n = 0; n < _accums.size(); ++n)
+	_accums[n].tv_sec = _accums[n].tv_usec = 0;
+    _t0.tv_sec = _t0.tv_usec = 0;
     _nframes = 0;
     return *this;
 }
@@ -56,16 +57,25 @@ std::ostream&
 Profiler::print(std::ostream& out) const
 {
     using namespace	std;
-    timeval		sum_accum;
-    sum_accum.tv_sec = sum_accum.tv_usec = 0;
+    
+    timeval		total;
+    total.tv_sec = total.tv_usec = 0;
 
-    for (size_t n = 0; n < _timers.size(); ++n)
+    for (size_t n = 0; n < _accums.size(); ++n)
     {
-	timeval	accum = _timers[n].print(out, _nframes);
-	sum_accum.tv_sec  += accum.tv_sec;
-	sum_accum.tv_usec += accum.tv_usec;
+	if (_nframes > 0)
+	{
+	    double	tmp = _accums[n].tv_sec * 1.0e6 + _accums[n].tv_usec;
+	    out << setw(9) << tmp / (1.0e3 * _nframes) << "ms("
+		<< setw(7) << 1.0e6 * _nframes / tmp << "fps)";
+	}
+	else
+	    out << setw(9) << '*' << "ms(" << setw(7) << '*' << "fps)";
+
+	total.tv_sec  += _accums[n].tv_sec;
+	total.tv_usec += _accums[n].tv_usec;
     }
-    double	tmp = sum_accum.tv_sec * 1.0e6 + sum_accum.tv_usec;
+    double	tmp = total.tv_sec * 1.0e6 + total.tv_usec;
     return out << '|' << setw(8) << tmp / (1.0e3 * _nframes)
 	       << "ms(" << setw(7) << 1.0e6 * _nframes / tmp
 	       << "fps)" << endl;
@@ -74,48 +84,23 @@ Profiler::print(std::ostream& out) const
 std::ostream&
 Profiler::printTabSeparated(std::ostream& out) const
 {
-    using namespace	std;
-    timeval		sum_accum;
-    sum_accum.tv_sec = sum_accum.tv_usec = 0;
+    timeval		total;
+    total.tv_sec = total.tv_usec = 0;
 
-    for (size_t n = 0; n < _timers.size(); ++n)
+    for (size_t n = 0; n < _accums.size(); ++n)
     {
-	timeval	accum = _timers[n].printTabSeparated(out, _nframes);
-	sum_accum.tv_sec  += accum.tv_sec;
-	sum_accum.tv_usec += accum.tv_usec;
+	if (_nframes > 0)
+	{
+	    double	tmp = _accums[n].tv_sec * 1.0e6 + _accums[n].tv_usec;
+	    out << tmp / (1.0e3 * _nframes);
+	}
+
+	total.tv_sec  += _accums[n].tv_sec;
+	total.tv_usec += _accums[n].tv_usec;
 	out << '\t';
     }
-    double	tmp = sum_accum.tv_sec * 1.0e6 + sum_accum.tv_usec;
-    return out << "| " << tmp / (1.0e3 * _nframes) << endl;
-}
-
-timeval
-Profiler::Timer::print(std::ostream& out, size_t nframes) const
-{
-    using namespace	std;
-
-    if (nframes > 0)
-    {
-	double	tmp = _accum.tv_sec * 1.0e6 + _accum.tv_usec;
-	out << setw(9) << tmp / (1.0e3 * nframes) << "ms("
-	    << setw(7) << 1.0e6 * nframes / tmp << "fps)";
-    }
-    else
-	out << setw(9) << '*' << "ms(" << setw(7) << '*' << "fps)";
-
-    return _accum;
-}
-
-timeval
-Profiler::Timer::printTabSeparated(std::ostream& out, size_t nframes) const
-{
-    if (nframes > 0)
-    {
-	double	tmp = _accum.tv_sec * 1.0e6 + _accum.tv_usec;
-	out << tmp / (1.0e3 * nframes);
-    }
-
-    return _accum;
+    double	tmp = total.tv_sec * 1.0e6 + total.tv_usec;
+    return out << "| " << tmp / (1.0e3 * _nframes) << std::endl;
 }
 
 }
