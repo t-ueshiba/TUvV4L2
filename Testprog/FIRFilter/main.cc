@@ -34,7 +34,7 @@ doJob(COEFF alpha, size_t grainSize, int niter)
 	    profiler.start(0);
 	    convolver.smooth(in.begin(), in.end(), out.begin());
 	  //convolver.diffVV(in.begin(), in.end(), out.begin());
-	    profiler.stop().nextFrame();
+	    profiler.nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
 	profiler.print(cerr);
@@ -64,7 +64,7 @@ doJob1(COEFF alpha, int niter)
 	{
 	    profiler.start(0);
 	    convolver.smooth(in[0].begin(), in[0].end(), out.begin());
-	    profiler.stop().nextFrame();
+	    profiler.nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
 	profiler.print(cerr);

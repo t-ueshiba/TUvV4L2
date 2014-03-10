@@ -3782,13 +3782,13 @@ namespace detail
 	template <class T>
 	self&	operator |=(vec<T> x)
 		{
-		    cvtup<bit_or_assign<value_type, reference> >(x);
+		    cvtup<bit_or_assign<value_type, value_type> >(x);
 		    return *this;
 		}
 	template <class T>
 	self&	operator ^=(vec<T> x)
 		{
-		    cvtup<bit_xor_assign<value_type, reference> >(x);
+		    cvtup<bit_xor_assign<value_type, value_type> >(x);
 		    return *this;
 		}
 	
