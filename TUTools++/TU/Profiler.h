@@ -121,7 +121,7 @@ Profiler::start(int n) const
 inline const Profiler&
 Profiler::stop() const
 {
-    start(-1);
+    return start(-1);
 }
 
 //! 現在動いているタイマがあればそれを停止し，フレーム番号を一つ進める．

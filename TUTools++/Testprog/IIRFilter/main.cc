@@ -34,7 +34,7 @@ doJob(typename CONVOLVER::coeff_type alpha, size_t grainSize)
 	    profiler.start(0);
 	    convolver.smooth(in.begin(), in.end(), out.begin());
 	  //convolver.diffVV(in.begin(), in.end(), out.begin());
-	    profiler.stop().nextFrame();
+	    profiler.nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
 	profiler.print(cerr);

@@ -33,7 +33,7 @@ doJob(size_t winSize, size_t grainSize, int niter)
 	{
 	    profiler.start(0);
 	    box.convolve(in.begin(), in.end(), out.begin());
-	    profiler.stop().nextFrame();
+	    profiler.nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
 	profiler.print(cerr);
@@ -63,7 +63,7 @@ doJob1(size_t winSize, int niter)
 	{
 	    profiler.start(0);
 	    box.convolve(in[0].begin(), in[0].end(), out.begin());
-	    profiler.stop().nextFrame();
+	    profiler.nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
 	profiler.print(cerr);
