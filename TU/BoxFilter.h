@@ -68,6 +68,30 @@ class box_filter_iterator
 
     friend class				boost::iterator_core_access;
 
+  private:
+    template <class _VITER, class _ITER>
+    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::false_)
+		{
+		    *val += (*curr - *head);
+		}
+    template <class _VITER, class _ITER>
+    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::true_)
+		{
+		    typedef typename std::iterator_traits<_ITER>
+					::value_type		value_type;
+		    typedef typename value_type::const_iterator	const_iterator;
+		    typedef typename value_type::iterator	iterator;
+		    typedef boost::mpl::bool_<
+			detail::IsExpression<
+			    typename value_type::value_type>::value>
+								value_is_expr;
+		    
+		    const_iterator	c = curr->begin(), h = head->begin();
+		    for (iterator v = val->begin(), ve = val->end();
+			 v != ve; ++v, ++c, ++h)
+			update(v, c, h, value_is_expr());
+		}
+    
   public:
 		box_filter_iterator()
 		    :super(), _head(super::base()), _val(), _valid(true)
@@ -104,9 +128,14 @@ class box_filter_iterator
   private:
     reference	dereference() const
 		{
+		    typedef boost::mpl::bool_<
+			detail::IsExpression<value_type>::value>
+								value_is_expr;
+		    
 		    if (!_valid)
 		    {
-			_val += (*super::base() - *_head);
+			update(&_val, super::base(), _head, value_is_expr());
+		      //_val += (*super::base() - *_head);
 		      //(_val -= *_head) += *super::base();
 			_valid = true;
 		    }
