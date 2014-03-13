@@ -33,9 +33,12 @@ LINKER		= $(CXX)
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/BoxFilter.h \
+		/usr/local/include/TU/Expression++.h \
 		/usr/local/include/TU/GuidedFilter.h \
+		/usr/local/include/TU/SeparableFilter2.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
@@ -45,6 +48,9 @@ include $(PROJECT)/lib/p.mk
 
 ###
 main.o: /usr/local/include/TU/GuidedFilter.h \
-	/usr/local/include/TU/BoxFilter.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h
+	/usr/local/include/TU/BoxFilter.h \
+	/usr/local/include/TU/SeparableFilter2.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Expression++.h

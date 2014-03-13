@@ -39,6 +39,7 @@ SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/DericheConvolver.h \
 		/usr/local/include/TU/EdgeDetector.h \
+		/usr/local/include/TU/Expression++.h \
 		/usr/local/include/TU/GaussianConvolver.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/IIRFilter.h \
@@ -51,8 +52,10 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= EdgeDetector.cc \
+		main.cc
+OBJS		= EdgeDetector.o \
+		main.o
 
 #########################
 #  Macros used by RCS	#
@@ -69,13 +72,19 @@ REV		= $(shell echo $Revision: 1.4 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
+EdgeDetector.o: /usr/local/include/TU/EdgeDetector.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Expression++.h /usr/local/include/TU/Minimize.h
 main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Expression++.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/GaussianConvolver.h \
 	/usr/local/include/TU/IIRFilter.h \
 	/usr/local/include/TU/SeparableFilter2.h \
-	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/DericheConvolver.h \
 	/usr/local/include/TU/EdgeDetector.h

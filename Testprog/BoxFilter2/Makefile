@@ -1,17 +1,16 @@
 #
-#  $Id: Makefile,v 1.10 2012-08-31 02:37:12 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
+INCDIRS		= -I. -I$(PREFIX)/include
 
-PROGRAM		= mtest
+PROGRAM		= boxFilterTest2
 LIBS		=
-ifeq ($(OSTYPE), darwin)
-  LIBS	       +=
-#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+ifneq (,$(findstring darwin,$(OSTYPE)))
+  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
 CPPFLAGS	=
@@ -32,21 +31,23 @@ LINKER		= $(CXX)
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/BoxFilter.h \
 		/usr/local/include/TU/Expression++.h \
-		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/SeparableFilter2.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= mtest.cc
-OBJS		= mtest.o
+SRCS		= main.cc
+OBJS		= main.o
 
 include $(PROJECT)/lib/p.mk
 
 ###
-mtest.o: /usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
+main.o: /usr/local/include/TU/BoxFilter.h \
+	/usr/local/include/TU/SeparableFilter2.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Expression++.h
