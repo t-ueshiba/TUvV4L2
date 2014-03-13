@@ -58,7 +58,7 @@ class box_filter_iterator
 				    ITER,
 				    boost::use_default,
 				    boost::single_pass_traversal_tag>	super;
-    
+		    
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
@@ -68,30 +68,6 @@ class box_filter_iterator
 
     friend class				boost::iterator_core_access;
 
-  private:
-    template <class _VITER, class _ITER>
-    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::false_)
-		{
-		    *val += (*curr - *head);
-		}
-    template <class _VITER, class _ITER>
-    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::true_)
-		{
-		    typedef typename std::iterator_traits<_ITER>
-					::value_type		value_type;
-		    typedef typename value_type::const_iterator	const_iterator;
-		    typedef typename value_type::iterator	iterator;
-		    typedef boost::mpl::bool_<
-			detail::IsExpression<
-			    typename value_type::value_type>::value>
-								value_is_expr;
-		    
-		    const_iterator	c = curr->begin(), h = head->begin();
-		    for (iterator v = val->begin(), ve = val->end();
-			 v != ve; ++v, ++c, ++h)
-			update(v, c, h, value_is_expr());
-		}
-    
   public:
 		box_filter_iterator()
 		    :super(), _head(super::base()), _val(), _valid(true)
@@ -99,7 +75,7 @@ class box_filter_iterator
 		}
     
 		box_filter_iterator(ITER const& iter, size_t w=0)
-		    :super(iter), _head(iter), _valid(true), _val()
+		    :super(iter), _head(iter), _val(), _valid(true)
 		{
 		    if (w > 0)
 		    {
@@ -126,17 +102,38 @@ class box_filter_iterator
 		}
     
   private:
-    reference	dereference() const
+    typedef boost::mpl::bool_<detail::IsExpression<value_type>::value>
+								value_is_expr;
+
+    template <class _VITER, class _ITER>
+    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::false_)
 		{
+		    *val += (*curr - *head);
+		}
+    template <class _VITER, class _ITER>
+    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::true_)
+		{
+		    typedef typename std::iterator_traits<_ITER>
+					::value_type		value_type;
+		    typedef typename value_type::const_iterator	const_iterator;
+		    typedef typename value_type::iterator	iterator;
 		    typedef boost::mpl::bool_<
-			detail::IsExpression<value_type>::value>
+			detail::IsExpression<
+			    typename value_type::value_type>::value>
 								value_is_expr;
 		    
+		    const_iterator	c = curr->begin(), h = head->begin();
+		    for (iterator v = val->begin(), ve = val->end();
+			 v != ve; ++v, ++c, ++h)
+			update(v, c, h, value_is_expr());
+		}
+
+    reference	dereference() const
+		{
 		    if (!_valid)
 		    {
 			update(&_val, super::base(), _head, value_is_expr());
-		      //_val += (*super::base() - *_head);
-		      //(_val -= *_head) += *super::base();
+			++_head;
 			_valid = true;
 		    }
 		    return _val;
@@ -144,13 +141,18 @@ class box_filter_iterator
     
     void	increment()
 		{
-		    ++_head;
+		    if (!_valid)
+		    {
+			update(&_val, super::base(), _head, value_is_expr());
+			++_head;
+		    }
+		    else
+			_valid = false;
 		    ++super::base_reference();
-		    _valid = false;
 		}
 
   private:
-    ITER		_head;
+    mutable ITER	_head;
     mutable value_type	_val;	// [_head, base()) or [_head, base()] の総和
     mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
 };
