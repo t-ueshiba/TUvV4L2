@@ -127,14 +127,8 @@ class Buf : public BufTraits<T, ALIGNED>
     template <bool _ALIGNED, class=void>
     struct Allocator
     {
-	static pointer	alloc(size_t siz)
-			{
-			    return (siz ? new value_type[siz] : 0);
-			}
-	static void	free(pointer p, size_t)
-			{
-			    delete [] p;
-			}
+	static pointer	alloc(size_t siz)	{ return new value_type[siz]; }
+	static void	free(pointer p, size_t)	{ delete [] p; }
     };
 #if defined(MMX)
     template <class DUMMY>		// MMX が定義されていれて，かつ
@@ -143,9 +137,6 @@ class Buf : public BufTraits<T, ALIGNED>
 	static pointer
 	alloc(size_t siz)
 	{
-	    if (siz == 0)
-		return 0;
-	    
 	    pointer	p = static_cast<pointer>(
 				_mm_malloc(sizeof(value_type)*siz, ALIGN));
 	    if (p == 0)
