@@ -141,12 +141,16 @@ class box_filter_iterator
     
     void	increment()
 		{
+		  // dereference() せずに increment() する可能性があ
+		  // るなら次のコードを有効化する．ただし，性能は低下．
+#ifdef TU_BOX_FILTER_ITERATOR_CONSERVATIVE
 		    if (!_valid)
 		    {
 			update(&_val, super::base(), _head, value_is_expr());
 			++_head;
 		    }
 		    else
+#endif
 			_valid = false;
 		    ++super::base_reference();
 		}
