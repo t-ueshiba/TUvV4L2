@@ -137,6 +137,9 @@ class Buf : public BufTraits<T, ALIGNED>
 	static pointer
 	alloc(size_t siz)
 	{
+	    if (siz == 0)
+		return 0;
+	    
 	    pointer	p = static_cast<pointer>(
 				_mm_malloc(sizeof(value_type)*siz, ALIGN));
 	    if (p == 0)
