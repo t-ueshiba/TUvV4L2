@@ -1133,6 +1133,7 @@ class CanonicalCamera
 			Rt()					const	;
     void		setTranslation(const point3_type& t)		;
     void		setRotation(const matrix33_type& Rt)		;
+    void		move(const matrix44_type& D)			;
 
     plane_type		h(const line_type& l)			const	;
     point3_type		X(const point2_type& x,
@@ -1309,7 +1310,6 @@ CanonicalCamera<T>::Rt() const
 //! カメラの位置を設定する．
 /*!
   \param t	カメラの3次元位置
-  \return	このカメラ
 */
 template <class T> inline void
 CanonicalCamera<T>::setTranslation(const point3_type& t)
@@ -1320,12 +1320,33 @@ CanonicalCamera<T>::setTranslation(const point3_type& t)
 //! カメラの姿勢を設定する．
 /*!
   \param Rt	カメラの姿勢を表す3x3回転行列
-  \return	このカメラ
 */
 template <class T> inline void
 CanonicalCamera<T>::setRotation(const matrix33_type& Rt)
 {
     _Rt = Rt;
+}
+
+//! カメラを移動する．
+/*!
+  \param D	カメラの移動を表す4x4剛体変換行列，すなわち
+		\f$
+		\TUvec{D}{} =
+		\TUbeginarray{cc} \TUtvec{Q}{} & - \TUtvec{Q}{}\TUvec{d}{} \\
+		\TUtvec{0}{} & 1
+		\TUendarray
+		\f$
+		ここで\f$\TUvec{d}{}\f$はワールド座標系から見たカメラの移動量，
+		\f$\TUvec{Q}{}\f$の各列はワールド座標系から見た移動後の各座標
+		軸の向き
+*/
+template <class T> inline void
+CanonicalCamera<T>::move(const matrix44_type& D)
+{
+    _t[0] += D[0][3];
+    _t[1] += D[1][3];
+    _t[2] += D[2][3];
+    _Rt *= D(0, 0, 3, 3);
 }
 
 //! 画像平面上の直線とカメラの投影中心を通る3次元空間中の平面を返す．
