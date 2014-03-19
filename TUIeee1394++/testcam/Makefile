@@ -40,6 +40,7 @@ LINKER		= $(CXX)
 SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Expression++.h \
+		/usr/local/include/TU/Expression++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Ieee1394++.h \
 		/usr/local/include/TU/Image++.h \

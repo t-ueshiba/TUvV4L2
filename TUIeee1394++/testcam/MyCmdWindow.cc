@@ -323,7 +323,9 @@ MyCmdWindow::tick()
 	    _trigger.oneShot();
 #endif
 	_camera.snap() >> _movie.image(0);
+#if 0
 	printTime(std::cerr, _camera.arrivaltime()) << std::endl;
+#endif
     }
     
     repaintCanvas();
