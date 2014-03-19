@@ -41,7 +41,6 @@
 #include "TU/types.h"
 #include "TU/iterator.h"
 #include "TU/mmInstructions.h"
-#include "TU/Expression++.h"
 #if (__cplusplus > 199711L) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #  define __CXX0X
 //#  define __CXX0X_MOVE		// 移動コンストラクタ/代入を使用
@@ -701,7 +700,7 @@ FixedSizedBuf<T, D, ALIGNED>::get(std::istream& in)
   \param B	バッファ
 */
 template <class T, class B=Buf<T> >
-class Array : public B, public Expression<Array<T, B> >
+class Array : public B, public container<Array<T, B> >
 {
   private:
     typedef B						super;
@@ -716,7 +715,7 @@ class Array : public B, public Expression<Array<T, B> >
     typedef Array					result_type;
   //! 成分の型
     typedef typename boost::mpl::eval_if<
-	detail::IsExpression<T>,
+	detail::is_container<T>,
 	ElementType<T>, boost::mpl::identity<T> >::type	element_type;
   //! 要素の型    
     typedef typename super::value_type			value_type;
@@ -746,9 +745,9 @@ class Array : public B, public Expression<Array<T, B> >
     template <class B2>
 		Array(Array<T, B2>& a, size_t i, size_t d)		;
     template <class E>
-		Array(const Expression<E>& expr)			;
+		Array(const container<E>& expr)			;
     template <class E>
-    Array&	operator =(const Expression<E>& expr)			;
+    Array&	operator =(const container<E>& expr)			;
 #if defined(__CXX0X)
 #  if defined(__CXX0X_MOVE)
 		Array(Array&& a)					;
@@ -782,13 +781,13 @@ class Array : public B, public Expression<Array<T, B> >
     template <class T2>
     Array&		operator /=(T2 c)				;
     template <class E>
-    Array&		operator +=(const Expression<E>& expr)		;
+    Array&		operator +=(const container<E>& expr)		;
     template <class E>
-    Array&		operator -=(const Expression<E>& expr)		;
+    Array&		operator -=(const container<E>& expr)		;
     template <class E>
-    bool		operator ==(const Expression<E>& expr)	const	;
+    bool		operator ==(const container<E>& expr)	const	;
     template <class E>
-    bool		operator !=(const Expression<E>& expr)	const	;
+    bool		operator !=(const container<E>& expr)	const	;
     std::istream&	get(std::istream& in)				;
     std::ostream&	put(std::ostream& out)			const	;
     std::istream&	restore(std::istream& in)			;
@@ -846,10 +845,10 @@ Array<T, B>::Array(Array<T, B2>& a, size_t i, size_t d)
   \param expr	コピー元の配列
 */
 template <class T, class B> template <class E>
-Array<T, B>::Array(const Expression<E>& expr)
+Array<T, B>::Array(const container<E>& expr)
     :super(expr().size())
 {
-    std::copy(expr().cbegin(), expr().cend(), begin());
+    std::copy(expr().begin(), expr().end(), begin());
 }
 	
 //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -859,10 +858,10 @@ Array<T, B>::Array(const Expression<E>& expr)
   \return	この配列
 */
 template <class T, class B> template <class E> Array<T, B>&
-Array<T, B>::operator =(const Expression<E>& expr)
+Array<T, B>::operator =(const container<E>& expr)
 {
     resize(expr().size());
-    std::copy(expr().cbegin(), expr().cend(), begin());
+    std::copy(expr().begin(), expr().end(), begin());
     return *this;
 }
 
@@ -1047,10 +1046,10 @@ Array<T, B>::operator /=(T2 c)
   \return	この配列
 */
 template <class T, class B> template <class E> Array<T, B>&
-Array<T, B>::operator +=(const Expression<E>& expr)
+Array<T, B>::operator +=(const container<E>& expr)
 {
     check_size(expr().size());
-    typename E::const_iterator	p = expr().cbegin();
+    typename E::const_iterator	p = expr().begin();
     for (iterator q = begin(), qe = end(); q != qe; ++q, ++p)
 	*q += *p;
     return *this;
@@ -1062,10 +1061,10 @@ Array<T, B>::operator +=(const Expression<E>& expr)
   \return	この配列
 */
 template <class T, class B> template <class E> Array<T, B>&
-Array<T, B>::operator -=(const Expression<E>& expr)
+Array<T, B>::operator -=(const container<E>& expr)
 {
     check_size(expr().size());
-    typename E::const_iterator	p = expr().cbegin();
+    typename E::const_iterator	p = expr().begin();
     for (iterator q = begin(), qe = end(); q != qe; ++q, ++p)
 	*q -= *p;
     return *this;
@@ -1077,12 +1076,12 @@ Array<T, B>::operator -=(const Expression<E>& expr)
   \return	全ての要素が同じならばtrue，そうでなければfalse
 */
 template <class T, class B> template <class E> bool
-Array<T, B>::operator ==(const Expression<E>& expr) const
+Array<T, B>::operator ==(const container<E>& expr) const
 {
     if (size() != expr().size())
 	return false;
-    typename E::const_iterator	p = expr().cbegin();
-    for (const_iterator q = cbegin(); q != cend(); ++q, ++p)
+    typename E::const_iterator	p = expr().begin();
+    for (const_iterator q = begin(); q != end(); ++q, ++p)
 	if (*q != *p)
 	    return false;
     return true;
@@ -1094,7 +1093,7 @@ Array<T, B>::operator ==(const Expression<E>& expr) const
   \return	異なる要素が存在すればtrue，そうでなければfalse
 */
 template <class T, class B> template <class E> inline bool
-Array<T, B>::operator !=(const Expression<E>& expr) const
+Array<T, B>::operator !=(const container<E>& expr) const
 {
     return !(*this == expr);
 }
@@ -1168,30 +1167,6 @@ Array<T, B>::partial_size(size_t i, size_t d, size_t a)
     return (i+d <= a ? d : i < a ? a-i : 0);
 }
 
-//! 入力ストリームから配列を読み込む(ASCII)．
-/*!
-  \param in	入力ストリーム
-  \param a	配列の読み込み先
-  \return	inで指定した入力ストリーム
-*/
-template <class T, class B> inline std::istream&
-operator >>(std::istream& in, Array<T, B>& a)
-{
-    return a.get(in >> std::ws);
-}
-
-//! 出力ストリームへ配列を書き出し(ASCII)，さらに改行コードを出力する．
-/*!
-  \param out	出力ストリーム
-  \param a	書き出す配列
-  \return	outで指定した出力ストリーム
-*/
-template <class T, class B> inline std::ostream&
-operator <<(std::ostream& out, const Array<T, B>& a)
-{
-    return a.put(out) << std::endl;
-}
-
 /************************************************************************
 *  class Array2<T, B, R>						*
 ************************************************************************/
@@ -1243,9 +1218,9 @@ class Array2 : public Array<T, R>
 		Array2(const Array2& a)					;
     Array2&	operator =(const Array2& a)				;
     template <class E>
-		Array2(const Expression<E>& expr)			;
+		Array2(const container<E>& expr)			;
     template <class E>
-    Array2&	operator =(const Expression<E>& expr)			;
+    Array2&	operator =(const container<E>& expr)			;
     Array2&	operator =(const element_type& c)			;
 #if defined(__CXX0X)
 #  if defined(__CXX0X_MOVE)
@@ -1375,7 +1350,7 @@ Array2<T, B, R>::operator =(const Array2& a)
   \param expr	コピー元の配列
 */
 template <class T, class B, class R> template <class E> inline
-Array2<T, B, R>::Array2(const Expression<E>& expr)
+Array2<T, B, R>::Array2(const container<E>& expr)
     :super(expr().size()), _ncol(expr().ncol()),
      _buf(size()*_buf.stride(ncol()))
 {
@@ -1391,7 +1366,7 @@ Array2<T, B, R>::Array2(const Expression<E>& expr)
   \return	この配列
 */
 template <class T, class B, class R> template <class E> inline Array2<T, B, R>&
-Array2<T, B, R>::operator =(const Expression<E>& expr)
+Array2<T, B, R>::operator =(const container<E>& expr)
 {
     resize(expr().size(), expr().ncol());
     super::operator =(expr);
@@ -1552,7 +1527,7 @@ Array2<T, B, R>::restore(std::istream& in)
 template <class T, class B, class R> std::ostream&
 Array2<T, B, R>::save(std::ostream& out) const
 {
-    for (const_iterator q = cbegin(), qe = end(); q != qe; ++q)
+    for (const_iterator q = cbegin(), qe = cend(); q != qe; ++q)
 	q->save(out);
     return out;
 }
@@ -1608,7 +1583,49 @@ Array2<T, B, R>::set_rows()
 	(*this)[i].resize(_buf.data() + i*stride, ncol());
 }
     
+/************************************************************************
+*  I/O functions							*
+************************************************************************/
+//! 出力ストリームへ配列式を書き出し(ASCII)，さらに改行コードを出力する．
+/*!
+  \param out	出力ストリーム
+  \param expr	書き出す配列式
+  \return	outで指定した出力ストリーム
+*/
+template <class E> std::ostream&
+operator <<(std::ostream& out, const container<E>& expr)
+{
+    typedef typename E::const_iterator	const_iterator;
+    for (const_iterator iter = expr().begin(); iter != expr().end(); ++iter)
+	out << ' ' << *iter;
+    return out << std::endl;
+}
+
 //! 入力ストリームから配列を読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \param a	配列の読み込み先
+  \return	inで指定した入力ストリーム
+*/
+template <class T, class B> inline std::istream&
+operator >>(std::istream& in, Array<T, B>& a)
+{
+    return a.get(in >> std::ws);
+}
+
+//! 出力ストリームへ配列を書き出し(ASCII)，さらに改行コードを出力する．
+/*!
+  \param out	出力ストリーム
+  \param a	書き出す配列
+  \return	outで指定した出力ストリーム
+*/
+template <class T, class B> inline std::ostream&
+operator <<(std::ostream& out, const Array<T, B>& a)
+{
+    return a.put(out) << std::endl;
+}
+
+//! 入力ストリームから2次元配列を読み込む(ASCII)．
 /*!
   \param in	入力ストリーム
   \param a	配列の読み込み先

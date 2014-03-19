@@ -41,6 +41,458 @@
 namespace TU
 {
 /************************************************************************
+*  class op_node							*
+************************************************************************/
+//! 演算子のノードを表すクラス
+struct op_node
+{
+};
+    
+/************************************************************************
+*  class container<E>							*
+************************************************************************/
+//! コンテナを表すクラス
+/*!
+  \param C	コンテナの実体の型
+*/
+template <class C>
+struct container
+{
+  //! この式の実体への参照を返す.
+    const C&	operator ()() const
+		{
+		    return static_cast<const C&>(*this);
+		}
+};
+
+//! 実装の詳細を収める名前空間
+namespace detail
+{
+  /**********************************************************************
+  *  meta template predicates						*
+  **********************************************************************/
+  //! 与えられた型がコンテナであるかを判別するテンプレート述語
+  /*!
+    \param T	任意の型
+  */
+    template <class T>
+    class is_container
+    {
+      private:
+	typedef char	Small;
+	struct Big	{ Small dummy[2]; };
+	
+	template <class _C>
+	static Small	test(container<_C>)	;
+	static Big	test(...)		;
+	static T	makeT()			;
+    
+      public:
+	enum		{ value = (sizeof(test(makeT())) == sizeof(Small)) };
+    };
+
+  //! 与えられた式の評価結果の型を返すテンプレート述語
+  /*!
+    \param E	式を表す型
+  */
+    template <class E>
+    struct ResultType
+    {
+	typedef typename E::result_type			type;
+    };
+    
+  //! 式の要素型が演算子でない配列ならばその基底配列型, そうでなければ要素型そのもの
+  /*!
+    \param E	value_typeを持つ式を表す型
+  */
+    template <class E>
+    class ValueType
+    {
+      private:
+	typedef typename E::value_type			value_type;
+
+      public:
+	typedef typename boost::mpl::eval_if_c<
+	    (is_container<value_type>::value &&
+	     !boost::is_convertible<value_type, op_node>::value),
+	    ResultType<value_type>,
+	    boost::mpl::identity<value_type> >::type	type;
+    };
+
+  //! 式が演算子ノードならばそれ自体もしくはその評価結果，そうでなければそれへの参照
+  /*!
+    \param E	配列式を表す型
+    \param EVAL	演算子ノードを評価するならtrue, そうでなければfalse
+  */
+    template <class E, bool EVAL=false>
+    struct ArgumentType
+    {
+	typedef typename boost::mpl::if_<
+	    boost::is_convertible<E, op_node>,
+	    typename boost::mpl::if_c<
+		EVAL, typename E::result_type, E>::type,
+	    const E&>::type				type;
+    };
+}
+    
+/************************************************************************
+*  class unary_operator<OP, E>						*
+************************************************************************/
+//! 配列式に対する単項演算子を表すクラス
+/*!
+  \param OP	各成分に適用される単項演算子の型
+  \param E	単項演算子の引数となる式の実体の型
+*/
+template <class OP, class E>
+class unary_operator : public container<unary_operator<OP, E> >,
+		       public op_node
+{
+  private:
+    typedef typename detail::ArgumentType<E>::type	argument_type;
+    typedef typename detail::ValueType<E>::type		evalue_type;
+    typedef boost::mpl::bool_<
+	detail::is_container<evalue_type>::value>	evalue_is_expr;
+
+  public:
+  //! 評価結果の型
+    typedef typename E::result_type			result_type;
+  //! 成分の型
+    typedef typename result_type::element_type		element_type;
+  //! 要素の型
+    typedef typename boost::mpl::if_<
+	evalue_is_expr, unary_operator<OP, evalue_type>,
+	element_type>::type				value_type;
+  //! 定数反復子
+    class const_iterator
+	: public boost::iterator_adaptor<const_iterator,
+					 typename E::const_iterator,
+					 value_type,
+					 boost::use_default,
+					 value_type>
+    {
+      private:
+	typedef boost::iterator_adaptor<
+		    const_iterator,
+		    typename E::const_iterator,
+		    value_type,
+		    boost::use_default,
+		    value_type>				super;
+	typedef typename super::base_type		base_type;
+
+      public:
+	typedef typename super::difference_type		difference_type;
+	typedef typename super::pointer			pointer;
+	typedef typename super::reference		reference;
+	typedef typename super::iterator_category	iterator_category;
+
+	friend class	boost::iterator_core_access;
+	
+      public:
+	const_iterator(base_type iter, const OP& op)
+	    :super(iter), _op(op)					{}
+	
+      private:
+	reference	dereference(boost::mpl::true_) const
+			{
+			    return reference(*super::base(), _op);
+			}
+	reference	dereference(boost::mpl::false_) const
+			{
+			    return _op(*super::base());
+			}
+	reference	dereference() const
+			{
+			    return dereference(evalue_is_expr());
+			}
+
+      private:
+	const OP&	_op;	//!< 単項演算子
+    };
+
+    typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+  public:
+  //! 単項演算子を生成する.
+    unary_operator(const container<E>& expr, const OP& op)
+	:_e(expr()), _op(op)						{}
+
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	begin() const
+			{
+			    return const_iterator(_e.begin(), _op);
+			}
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
+			{
+			    return begin();
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	end() const
+			{
+			    return const_iterator(_e.end(), _op);
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return end();
+			}
+  //! 演算結果の要素数を返す.
+    size_t		size() const
+			{
+			    return _e.size();
+			}
+  //! 演算結果の列数を返す.
+    size_t		ncol() const
+			{
+			    return _e.ncol();
+			}
+	    
+  private:
+    const argument_type	_e;	//!< 引数となる式の実体
+    const OP		_op;	//!< 単項演算子
+};
+
+//! 与えられた配列式の各要素の符号を反転する.
+/*!
+  \param expr	配列式
+  \return	符号反転演算子ノード
+*/
+template <class E>
+inline unary_operator<std::negate<typename E::element_type>, E>
+operator -(const container<E>& expr)
+{
+    typedef std::negate<typename E::element_type>	op_type;
+    
+    return unary_operator<op_type, E>(expr, op_type());
+}
+
+//! 与えられた配列式の各要素に定数を掛ける.
+/*!
+  \param expr	配列式
+  \param c	乗数
+  \return	乗算演算子ノード
+*/
+template <class E> inline
+unary_operator<std::binder2nd<std::multiplies<typename E::element_type> >, E>
+operator *(const container<E>& expr, typename E::element_type c)
+{
+    typedef std::multiplies<typename E::element_type>	op_type;
+    typedef std::binder2nd<op_type>			binder_type;
+    
+    return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
+}
+
+//! 与えられた配列式の各要素に定数を掛ける.
+/*!
+  \param c	乗数
+  \param expr	配列式
+  \return	乗算演算子ノード
+*/
+template <class E> inline
+unary_operator<std::binder1st<std::multiplies<typename E::element_type> >, E>
+operator *(typename E::element_type c, const container<E>& expr)
+{
+    typedef std::multiplies<typename E::element_type>	op_type;
+    typedef std::binder1st<op_type>			binder_type;
+    
+    return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
+}
+
+//! 与えられた配列式の各要素を定数で割る.
+/*!
+  \param expr	配列式
+  \param c	除数
+  \return	除算演算子ノード
+*/
+template <class E> inline
+unary_operator<std::binder2nd<std::divides<typename E::element_type> >, E>
+operator /(const container<E>& expr, typename E::element_type c)
+{
+    typedef std::divides<typename E::element_type>	op_type;
+    typedef std::binder2nd<op_type>			binder_type;
+    
+    return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
+}
+
+/************************************************************************
+*  class binary_operator<OP, L, R>					*
+************************************************************************/
+//! 配列式に対する2項演算子を表すクラス
+/*!
+  \param OP	各成分に適用される2項演算子の型
+  \param L	2項演算子の第1引数となる式の実体の型
+  \param R	2項演算子の第2引数となる式の実体の型
+*/
+template <class OP, class L, class R>
+class binary_operator : public container<binary_operator<OP, L, R> >,
+			public op_node
+{
+  private:
+    typedef typename detail::ArgumentType<L>::type	largument_type;
+    typedef typename detail::ArgumentType<R>::type	rargument_type;
+    typedef typename detail::ValueType<L>::type		lvalue_type;
+    typedef typename detail::ValueType<R>::type		rvalue_type;
+    typedef boost::mpl::bool_<
+	detail::is_container<lvalue_type>::value>	lvalue_is_expr;
+
+  public:
+  //! 配列の型
+    typedef typename R::result_type			result_type;
+  //! 成分の型
+    typedef typename result_type::element_type		element_type;
+  //! 要素の型
+    typedef typename boost::mpl::if_<
+	lvalue_is_expr,
+	binary_operator<OP, lvalue_type, rvalue_type>,
+	element_type>::type				value_type;
+  //! 定数反復子
+    class const_iterator
+	: public boost::iterator_adaptor<const_iterator,
+					 typename L::const_iterator,
+					 value_type,
+					 boost::use_default,
+					 value_type>
+    {
+      private:
+	typedef boost::iterator_adaptor<
+		    const_iterator,
+		    typename L::const_iterator,
+		    value_type,
+		    boost::use_default,
+		    value_type>				super;
+	typedef typename super::base_type		lbase_type;
+	typedef typename R::const_iterator		rbase_type;
+	
+      public:
+	typedef typename super::difference_type		difference_type;
+	typedef typename super::pointer			pointer;
+	typedef typename super::reference		reference;
+	typedef typename super::iterator_category	iterator_category;
+
+	friend class	boost::iterator_core_access;
+	
+      public:
+	const_iterator(lbase_type liter, rbase_type riter, const OP& op)
+	    :super(liter), _riter(riter), _op(op)			{}
+	
+      private:
+	reference	dereference(boost::mpl::true_) const
+			{
+			    return reference(*super::base(), *_riter, _op);
+			}
+	reference	dereference(boost::mpl::false_) const
+			{
+			    return _op(*super::base(), *_riter);
+			}
+	reference	dereference() const
+			{
+			    return dereference(lvalue_is_expr());
+			}
+	void		advance(difference_type n)
+			{
+			    super::base_reference() += n;
+			    _riter += n;
+			}
+	void		increment()
+			{
+			    ++super::base_reference();
+			    ++_riter;
+			}
+	void		decrement()
+			{
+			    --super::base_reference();
+			    --_riter;
+			}
+	
+      private:
+	rbase_type	_riter;	//!< 第2引数となる式の実体を指す反復子
+	const OP&	_op;	//!< 2項演算子
+    };
+
+    typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+  public:
+  //! 2項演算子を生成する.
+    binary_operator(const container<L>& l,
+		   const container<R>& r, const OP& op)
+	:_l(l()), _r(r()), _op(op)
+			{
+#if !defined(NO_CHECK_SIZE)
+    			    const size_t	d = _l.size();
+			    if (d != _r.size())
+				throw std::logic_error("binary_operator<OP, L, R>::binary_operator: mismatched size!");
+#endif
+			}
+
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	begin() const
+			{
+			    return const_iterator(_l.begin(),
+						  _r.begin(), _op);
+			}
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
+			{
+			    return begin();
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	end() const
+			{
+			    return const_iterator(_l.end(), _r.end(), _op);
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return end();
+			}
+  //! 演算結果の要素数を返す.
+    size_t		size() const
+			{
+			    return _l.size();
+			}
+  //! 演算結果の列数を返す.
+    size_t		ncol() const
+			{
+			    return _l.ncol();
+			}
+    
+  private:
+    const largument_type	_l;	//!< 第1引数となる式の実体
+    const rargument_type	_r;	//!< 第2引数となる式の実体
+    const OP			_op;	//!< 2項演算子
+};
+
+//! 与えられた2つの配列式の各要素の和をとる.
+/*!
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	加算演算子ノード
+*/
+template <class L, class R>
+inline binary_operator<std::plus<typename R::element_type>, L, R>
+operator +(const container<L>& l, const container<R>& r)
+{
+    typedef std::plus<typename R::element_type>		op_type;
+
+    return binary_operator<op_type, L, R>(l, r, op_type());
+}
+
+//! 与えられた2つの配列式の各要素の差をとる.
+/*!
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	減算演算子ノード
+*/
+template <class L, class R>
+inline binary_operator<std::minus<typename R::element_type>, L, R>
+operator -(const container<L>& l, const container<R>& r)
+{
+    typedef std::minus<typename R::element_type>	op_type;
+
+    return binary_operator<op_type, L, R>(l, r, op_type());
+}
+
+/************************************************************************
 *  struct identity<T>							*
 ************************************************************************/
 //! 恒等関数

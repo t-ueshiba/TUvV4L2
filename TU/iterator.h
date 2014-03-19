@@ -514,7 +514,7 @@ struct subiterator<fast_zip_iterator<TUPLE> >
 namespace detail
 {
     template <class ROW, class COL, class ARG>
-    class row_proxy
+    class row_proxy : public container<row_proxy<ROW, COL, ARG> >
     {
       private:
 	typedef typename subiterator<ROW>::type		subiter_t;
@@ -760,7 +760,302 @@ make_vertical_iterator(ROW row, size_t idx)
 {
     return vertical_iterator<ROW>(row, idx);
 }
+
+/************************************************************************
+*  class column_iterator<A>						*
+************************************************************************/
+namespace detail
+{
+  //! 2次元配列の列を表す代理オブジェクト
+  /*!
+    \param A	2次元配列の型
+  */
+    template <class A>
+    class column_proxy : public container<column_proxy<A> >
+    {
+      public:
+      //! 定数反復子
+	typedef vertical_iterator<typename A::const_iterator>
+							const_iterator;
+      //! 反復子
+	typedef vertical_iterator<typename A::iterator>	iterator;
+      //! 定数逆反復子
+	typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
+      //! 逆反復子
+	typedef std::reverse_iterator<iterator>		reverse_iterator;
+      //! 要素の型
+	typedef typename iterator::value_type		value_type;
+      //! 定数要素への参照
+	typedef typename const_iterator::reference	const_reference;
+      //! 要素への参照
+	typedef typename iterator::reference		reference;
+      //! 評価結果の型
+	typedef column_proxy<typename A::result_type>	result_type;
+      //! 成分の型
+	typedef typename A::element_type		element_type;
     
+      public:
+      //! 2次元配列の列を表す代理オブジェクトを生成する.
+      /*!
+	\param a	2次元配列
+	\param col	列を指定するindex
+      */
+	column_proxy(A& a, size_t col)	:_a(a), _col(col)		{}
+
+      //! この列に他の配列を代入する.
+      /*!
+	\param expr	代入元の配列を表す式
+	\return		この列
+      */
+	template <class E>
+	column_proxy&		operator =(const container<E>& expr)
+				{
+#if !defined(NO_CHECK_SIZE)
+				    if (expr().size() != size())
+					throw std::logic_error("column_proxy<A>::operator =: mismatched size!");
+#endif
+				    std::copy(expr().begin(), expr().end(),
+					      begin());
+				    return *this;
+				}
+	
+      //! 列の要素数すなわち行数を返す.
+	size_t			size() const
+				{
+				    return _a.size();
+				}
+      //! 列の先頭要素を指す定数反復子を返す.
+	const_iterator		begin() const
+				{
+				    return const_iterator(_a.begin(), _col);
+				}
+      //! 列の先頭要素を指す定数反復子を返す.
+	const_iterator		cbegin() const
+				{
+				    return begin();
+				}
+      //! 列の先頭要素を指す反復子を返す.
+	iterator		begin()
+				{
+				    return iterator(_a.begin(), _col);
+				}
+      //! 列の末尾を指す定数反復子を返す.
+	const_iterator		end() const
+				{
+				    return const_iterator(_a.end(), _col);
+				}
+      //! 列の末尾を指す定数反復子を返す.
+	const_iterator		cend() const
+				{
+				    return end();
+				}
+      //! 列の末尾を指す反復子を返す.
+	iterator		end()
+				{
+				    return iterator(_a.end(), _col);
+				}
+      //! 列の末尾要素を指す定数逆反復子を返す.
+	const_reverse_iterator	rbegin() const
+				{
+				    return const_reverse_iterator(end());
+				}
+      //! 列の末尾要素を指す定数逆反復子を返す.
+	const_reverse_iterator	crbegin() const
+				{
+				    return rbegin();
+				}
+      //! 列の末尾要素を指す逆反復子を返す.
+	reverse_iterator	rbegin()
+				{
+				    return reverse_iterator(end());
+				}
+      //! 列の先頭を指す定数逆反復子を返す.
+	const_reverse_iterator	rend() const
+				{
+				    return const_reverse_iterator(begin());
+				}
+      //! 列の先頭を指す定数逆反復子を返す.
+	const_reverse_iterator	crend() const
+				{
+				    return rend();
+				}
+      //! 列の先頭を指す逆反復子を返す.
+	reverse_iterator	rend()
+				{
+				    return reverse_iterator(begin());
+				}
+      //! 列の定数要素にアクセスする.
+      /*!
+	\param i	要素を指定するindex
+	\return		indexによって指定された定数要素
+      */
+	const_reference		operator [](size_t i) const
+				{
+				    return *(cbegin() + i);
+				}
+      //! 列の要素にアクセスする.
+      /*!
+	\param i	要素を指定するindex
+	\return		indexによって指定された要素
+      */
+	reference		operator [](size_t i)
+				{
+				    return *(begin() + i);
+				}
+
+      private:
+	A&		_a;	//!< 2次元配列への参照
+	size_t const	_col;	//!< 列を指定するindex
+    };
+}
+
+//! 2次元配列の列を指す反復子
+/*!
+  \param A	2次元配列の型
+*/
+template <class A>
+class column_iterator
+    : public boost::iterator_facade<column_iterator<A>,
+				    detail::column_proxy<A>,
+				    boost::random_access_traversal_tag,
+				    detail::column_proxy<A> >
+{
+  private:
+    typedef boost::iterator_facade<column_iterator,
+				   detail::column_proxy<A>,
+				   boost::random_access_traversal_tag,
+				   detail::column_proxy<A> >	super;
+
+  public:
+    typedef typename super::value_type			value_type;
+    typedef typename super::reference			reference;
+    typedef typename super::pointer			pointer;
+    typedef typename super::difference_type		difference_type;
+    typedef typename super::iterator_category		iterator_category;
+    
+    friend class	boost::iterator_core_access;
+    
+  public:
+    column_iterator(A& a, size_t col)	:_a(a), _col(col)		{}
+
+    reference		dereference() const
+			{
+			    return reference(_a, _col);
+			}
+    bool		equal(const column_iterator& iter) const
+			{
+			    return _col == iter._col;
+			}
+    void		increment()
+			{
+			    ++_col;
+			}
+    void		decrement()
+			{
+			    --_col;
+			}
+    void		advance(difference_type n)
+			{
+			    _col += n;
+			}
+    difference_type	distance_to(const column_iterator& iter) const
+			{
+			    return iter._col - _col;
+			}
+    
+  private:
+    A&			_a;
+    difference_type	_col;
+};
+
+//! 2次元配列の先頭の列を指す定数反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	先頭の列を指す定数反復子
+*/
+template <class A> column_iterator<const A>
+column_cbegin(const A& a)
+{
+    return column_iterator<const A>(a, 0);
+}
+    
+//! 2次元配列の先頭の列を指す反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	先頭の列を指す反復子
+*/
+template <class A> column_iterator<A>
+column_begin(A& a)
+{
+    return column_iterator<A>(a, 0);
+}
+    
+//! 2次元配列の末尾の列を指す定数反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	末尾の列を指す定数反復子
+*/
+template <class A> column_iterator<const A>
+column_cend(const A& a)
+{
+    return column_iterator<const A>(a, a.ncol());
+}
+    
+//! 2次元配列の末尾の列を指す反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	末尾の列を指す反復子
+*/
+template <class A> column_iterator<A>
+column_end(A& a)
+{
+    return column_iterator<A>(a, a.ncol());
+}
+    
+//! 2次元配列の末尾の列を指す定数逆反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	末尾の列を指す定数逆反復子
+*/
+template <class A> std::reverse_iterator<column_iterator<const A> >
+column_crbegin(const A& a)
+{
+    return std::reverse_iterator<column_iterator<const A> >(column_cend(a));
+}
+    
+//! 2次元配列の末尾の列を指す逆反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	末尾の列を指す逆反復子
+*/
+template <class A> std::reverse_iterator<column_iterator<A> >
+column_rbegin(A& a)
+{
+    return std::reverse_iterator<column_iterator<A> >(column_end(a));
+}
+    
+//! 2次元配列の先頭の列を指す定数逆反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	先頭の列を指す定数逆反復子
+*/
+template <class A> std::reverse_iterator<column_iterator<const A> >
+column_crend(const A& a)
+{
+    return std::reverse_iterator<column_iterator<const A> >(column_cbegin(a));
+}
+    
+//! 2次元配列の先頭の列を指す逆反復子を返す.
+/*!
+  \param a	2次元配列
+  \return	先頭の列を指す逆反復子
+*/
+template <class A> std::reverse_iterator<column_iterator<A> >
+column_rend(A& a)
+{
+    return std::reverse_iterator<column_iterator<A> >(column_begin(a));
+}
+
 /************************************************************************
 *  class ring_iterator<ITER>						*
 ************************************************************************/

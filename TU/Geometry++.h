@@ -114,7 +114,7 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     \param v	コピー元2次元ベクトル
   */
     template <class E>
-    Point2(const Expression<E>& v) :super(v)				{}
+    Point2(const container<E>& v) :super(v)				{}
 
   //! 他の2次元ベクトルを自分に代入する．
   /*!
@@ -122,7 +122,7 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     \return	この2次元点
   */
     template <class E>
-    Point2&	operator =(const Expression<E>& v)
+    Point2&	operator =(const container<E>& v)
 		{
 		    super::operator =(v);
 		    return *this;
@@ -322,7 +322,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
     \param v	コピー元3次元ベクトル
   */
     template <class E>
-    Point3(const Expression<E>& v) :super(v)				{}
+    Point3(const container<E>& v) :super(v)				{}
 
   //! 他の3次元ベクトルを自分に代入する．
   /*!
@@ -330,7 +330,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
     \return	この3次元点
   */
     template <class E>
-    Point3&	operator =(const Expression<E>& v)
+    Point3&	operator =(const container<E>& v)
 		{
 		    super::operator =(v);
 		    return *this;
@@ -641,7 +641,7 @@ class HyperPlane : public V
     \param p	(d+1)次元ベクトル(dは超平面が存在する射影空間の次元)
   */
     template <class E>
-    HyperPlane(const Expression<E>& p)	:super(p)	{}
+    HyperPlane(const container<E>& p)	:super(p)	{}
 
     template <class Iterator>
     HyperPlane(Iterator begin, Iterator end)		;
@@ -654,7 +654,7 @@ class HyperPlane : public V
     \return	この超平面オブジェクト
   */
     template <class E>
-    HyperPlane&	operator =(const Expression<E>& v)	{super::operator =(v);
+    HyperPlane&	operator =(const container<E>& v)	{super::operator =(v);
 							 return *this;}
 
     template <class Iterator>
@@ -829,7 +829,7 @@ class Projectivity : public M
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
   */
     template <class E>
-    Projectivity(const Expression<E>& T) :super(T)			{}
+    Projectivity(const container<E>& T) :super(T)			{}
 
     template <class Iterator>
     Projectivity(Iterator begin, Iterator end, bool refine=false)	;
@@ -843,7 +843,7 @@ class Projectivity : public M
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
   */
     template <class E>
-    void	set(const Expression<E>& T)		{super::operator =(T);}
+    void	set(const container<E>& T)		{super::operator =(T);}
     
     template <class Iterator>
     void	fit(Iterator begin, Iterator end, bool refine=false)	;
@@ -1300,7 +1300,7 @@ class Affinity : public Projectivity<M>
     Affinity(size_t inDim, size_t outDim)	:super(inDim, outDim)	{}
 
     template <class E>
-    Affinity(const Expression<E>& T)					;
+    Affinity(const container<E>& T)					;
     template <class Iterator>
     Affinity(Iterator begin, Iterator end)				;
 
@@ -1310,7 +1310,7 @@ class Affinity : public Projectivity<M>
     using	super::Jx;
     
     template <class E>
-    void	set(const Expression<E>& T)				;
+    void	set(const container<E>& T)				;
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)			;
     Affinity	inv()						const	;
@@ -1337,7 +1337,7 @@ class Affinity : public Projectivity<M>
   \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
 template<class M> template <class E> inline
-Affinity<M>::Affinity(const Expression<E>& T)
+Affinity<M>::Affinity(const container<E>& T)
     :super(T)
 {
     (*this)[outDim()]	       = 0;
@@ -1362,7 +1362,7 @@ Affinity<M>::Affinity(Iterator begin, Iterator end)
   \param T			(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
 template<class M> template <class E> inline void
-Affinity<M>::set(const Expression<E>& T)
+Affinity<M>::set(const container<E>& T)
 {
     super::set(T);
     (*this)[outDim()]	       = 0;
@@ -1548,7 +1548,7 @@ class Rigidity : public Affinity<M>
     Rigidity(size_t d)	:super(d, d)					{}
 
     template <class E>
-    Rigidity(const Expression<E>& T)					;
+    Rigidity(const container<E>& T)					;
     template <class Iterator>
     Rigidity(Iterator begin, Iterator end)				;
 
@@ -1557,7 +1557,7 @@ class Rigidity : public Affinity<M>
 
     size_t		dim()					const	;
     template <class E>
-    void		set(const Expression<E>& T)			;
+    void		set(const container<E>& T)			;
     template <class Iterator>
     void		fit(Iterator begin, Iterator end)		;
     Rigidity		inv()					const	;
@@ -1576,7 +1576,7 @@ class Rigidity : public Affinity<M>
   \param T	(d+1) x (d+1)行列(dは入力/出力空間の次元)
 */
 template<class M> template <class E> inline
-Rigidity<M>::Rigidity(const Expression<E>& T)
+Rigidity<M>::Rigidity(const container<E>& T)
 {
     set(T);
 }
@@ -1608,7 +1608,7 @@ Rigidity<M>::dim() const
   \param T	(d+1) x (d+1) 行列(dは入力/出力空間の次元)
 */
 template<class M> template <class E> inline void
-Rigidity<M>::set(const Expression<E>& T)
+Rigidity<M>::set(const container<E>& T)
 {
     if (T().size() != T().ncol())
 	throw std::invalid_argument("Rigidity::set(): non-square matrix!!");
@@ -1821,7 +1821,7 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
   public:
     Homography()			:super()		{}
     template <class E>
-    Homography(const Expression<E>& H)	:super(H)		{}
+    Homography(const container<E>& H)	:super(H)		{}
     template <class Iterator>
     Homography(Iterator begin, Iterator end, bool refine=false)	;
 
@@ -1946,7 +1946,7 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
   public:
     Affinity2()	:super()					{}
     template <class E>
-    Affinity2(const Expression<E>& A)				;
+    Affinity2(const container<E>& A)				;
     template <class Iterator>
     Affinity2(Iterator begin, Iterator end)			;
 
@@ -1965,7 +1965,7 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
 };
 
 template <class T> template <class E> inline
-Affinity2<T>::Affinity2(const Expression<E>& A)
+Affinity2<T>::Affinity2(const container<E>& A)
     :super(A)
 {
     (*this)[2][0] = (*this)[2][1] = 0;
