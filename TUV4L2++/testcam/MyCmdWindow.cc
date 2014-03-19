@@ -3,7 +3,7 @@
  */
 #include <unistd.h>
 #include <sys/time.h>
-#include "multicam.h"
+#include "testcam.h"
 #include "MyCmdWindow.h"
 
 namespace TU
@@ -25,6 +25,15 @@ countTime(int& nframes, struct timeval& start)
     }
     if (nframes++ == 0)
 	gettimeofday(&start, NULL);
+}
+
+static std::ostream&
+printTime(std::ostream& out, u_int64_t localtime)
+{
+    u_int64_t	usec = localtime % 1000;
+    u_int64_t	msec = (localtime / 1000) % 1000;
+    u_int64_t	sec  = localtime / 1000000;
+    return out << sec << '.' << msec << '.' << usec;
 }
 
 namespace v
@@ -208,7 +217,8 @@ MyCmdWindow::tick()
 
   //_camera.snap() >> _image;
     _camera.snap().captureRGBImage(_image);
-
+    printTime(std::cerr, _camera.arrivaltime()) << std::endl;
+    
     repaintCanvas();
 }
     

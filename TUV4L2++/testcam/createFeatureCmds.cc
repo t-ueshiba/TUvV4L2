@@ -3,7 +3,7 @@
  */
 #include <vector>
 #include <boost/foreach.hpp>
-#include "multicam.h"
+#include "testcam.h"
 
 namespace TU
 {

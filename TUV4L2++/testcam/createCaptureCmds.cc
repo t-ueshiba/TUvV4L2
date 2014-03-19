@@ -1,7 +1,7 @@
 /*
  *  $Id$
  */
-#include "multicam.h"
+#include "testcam.h"
 
 namespace TU
 {
