@@ -46,17 +46,17 @@ namespace TU
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER>
+template <class ITER, class VAL=typename std::iterator_traits<ITER>::value_type>
 class box_filter_iterator
     : public boost::iterator_adaptor<box_filter_iterator<ITER>,	// self
 				     ITER,			// base
-				     boost::use_default,	// value_type
+				     VAL,			// value_type
 				     boost::single_pass_traversal_tag>
 {
   private:
     typedef boost::iterator_adaptor<box_filter_iterator,
 				    ITER,
-				    boost::use_default,
+				    VAL,
 				    boost::single_pass_traversal_tag>	super;
 		    
   public:
@@ -102,7 +102,7 @@ class box_filter_iterator
 		}
     
   private:
-    typedef boost::mpl::bool_<detail::IsExpression<value_type>::value>
+    typedef boost::mpl::bool_<detail::is_container<value_type>::value>
 								value_is_expr;
 
     template <class _VITER, class _ITER>
@@ -118,7 +118,7 @@ class box_filter_iterator
 		    typedef typename value_type::const_iterator	const_iterator;
 		    typedef typename value_type::iterator	iterator;
 		    typedef boost::mpl::bool_<
-			detail::IsExpression<
+			detail::is_container<
 			    typename value_type::value_type>::value>
 								value_is_expr;
 		    

@@ -45,8 +45,8 @@ namespace TU
 ************************************************************************/
 //! 2つの配列式の積演算を表すクラス
 template <class L, class R>
-class Product : public Expression<Product<L, R> >,
-		public OpNode
+class Product : public container<Product<L, R> >,
+		public op_node
 {
   private:
     typedef typename detail::ValueType<L>::type		lvalue_type;
@@ -54,8 +54,8 @@ class Product : public Expression<Product<L, R> >,
 
     enum
     {
-	lvalue_is_expr = detail::IsExpression<lvalue_type>::value,
-	rvalue_is_expr = detail::IsExpression<rvalue_type>::value,
+	lvalue_is_expr = detail::is_container<lvalue_type>::value,
+	rvalue_is_expr = detail::is_container<rvalue_type>::value,
     };
 
   // 左辺が多次元配列ならあらかじめ右辺を評価する.
@@ -89,7 +89,7 @@ class Product : public Expression<Product<L, R> >,
 	lvalue_is_expr, RowIterator<left_type>,
 	ColumnIterator<right_type> >::type		base_iterator;
     typedef typename boost::mpl::if_c<
-	rvalue_is_expr, column_proxy<const right_type>,
+	rvalue_is_expr, detail::column_proxy<const right_type>,
 	right_type>::type				rcolumn_type;
     typedef typename boost::mpl::if_c<
 	lvalue_is_expr,
@@ -107,13 +107,13 @@ class Product : public Expression<Product<L, R> >,
 	};
 	typedef typename _L::value_type			lvalue_type;
 	typedef typename boost::mpl::eval_if<
-	    detail::IsExpression<_R>,
+	    detail::is_container<_R>,
 	    detail::ResultType<_R>,
 	    boost::mpl::identity<_R> >::type		rvalue_type;
 
       public:
 	typedef typename boost::mpl::eval_if<
-	    detail::IsExpression<lvalue_type>,
+	    detail::is_container<lvalue_type>,
 	    _Array<ResultType<lvalue_type, _R> >,
 	    boost::mpl::identity<rvalue_type> >::type	type;
     };
@@ -182,31 +182,31 @@ class Product : public Expression<Product<L, R> >,
     typedef const_iterator	iterator;	//!< 定数反復子の別名
     
   private:
-    static type		value(const Expression<L>& l,
-			      const Expression<R>& r, boost::mpl::true_)
+    static type		value(const container<L>& l,
+			      const container<R>& r, boost::mpl::true_)
 			{
 			    return Product(l, r);
 			}
-    static type		value(const Expression<L>& l,
-			      const Expression<R>& r, boost::mpl::false_)
+    static type		value(const container<L>& l,
+			      const container<R>& r, boost::mpl::false_)
 			{
-			    return std::inner_product(l().cbegin(), l().cend(),
-						      r().cbegin(),
+			    return std::inner_product(l().begin(), l().end(),
+						      r().begin(),
 						      element_type(0));
 			}
-    const_iterator	cbegin(boost::mpl::true_) const
+    const_iterator	begin(boost::mpl::true_) const
 			{
-			    return const_iterator(_l.cbegin(), _r);
+			    return const_iterator(_l.begin(), _r);
 			}
-    const_iterator	cbegin(boost::mpl::false_) const
+    const_iterator	begin(boost::mpl::false_) const
 			{
 			    return const_iterator(column_cbegin(_r), _l);
 			}
-    const_iterator	cend(boost::mpl::true_) const
+    const_iterator	end(boost::mpl::true_) const
 			{
-			    return const_iterator(_l.cend(), _r);
+			    return const_iterator(_l.end(), _r);
 			}
-    const_iterator	cend(boost::mpl::false_) const
+    const_iterator	end(boost::mpl::false_) const
 			{
 			    return const_iterator(column_cend(_r), _l);
 			}
@@ -230,14 +230,14 @@ class Product : public Expression<Product<L, R> >,
 			}
     
   public:
-    Product(const Expression<L>& l, const Expression<R>& r)
+    Product(const container<L>& l, const container<R>& r)
 	:_l(l()), _r(r())
 			{
 			    check_size(_r.size(),
 				       boost::mpl::bool_<lvalue_is_expr>());
 			}
 
-    static type		value(const Expression<L>& l, const Expression<R>& r)
+    static type		value(const container<L>& l, const container<R>& r)
 			{
 			    return value(l, r,
 					 boost::mpl::bool_<(lvalue_is_expr ||
@@ -245,24 +245,24 @@ class Product : public Expression<Product<L, R> >,
 			}
     
   //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return cbegin(boost::mpl::bool_<lvalue_is_expr>());
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
     const_iterator	begin() const
 			{
-			    return cbegin();
+			    return begin(boost::mpl::bool_<lvalue_is_expr>());
 			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
 			{
-			    return cend(boost::mpl::bool_<lvalue_is_expr>());
+			    return begin();
 			}
   //! 演算結果の末尾を指す定数反復子を返す.
     const_iterator	end() const
 			{
-			    return cend();
+			    return end(boost::mpl::bool_<lvalue_is_expr>());
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return end();
 			}
   //! 演算結果の要素数を返す.
     size_t		size() const
@@ -285,8 +285,8 @@ class Product : public Expression<Product<L, R> >,
 ************************************************************************/
 //! 2つの配列型の式の外積演算を表すクラス
 template <class L, class R>
-class ExteriorProduct : public Expression<ExteriorProduct<L, R> >,
-			public OpNode
+class ExteriorProduct : public container<ExteriorProduct<L, R> >,
+			public op_node
 {
   private:
     typedef typename detail::ArgumentType<L, true>::type	largument_type;
@@ -300,8 +300,8 @@ class ExteriorProduct : public Expression<ExteriorProduct<L, R> >,
   //! 成分の型
     typedef typename result_type::element_type			element_type;
   //! 要素の型
-    typedef UnaryOperator<std::binder1st<std::multiplies<element_type> >,
-			  right_type>				value_type;
+    typedef unary_operator<std::binder1st<std::multiplies<element_type> >,
+			   right_type>				value_type;
   //! 定数反復子
     class const_iterator
 	: public boost::iterator_adaptor<const_iterator,
@@ -342,28 +342,28 @@ class ExteriorProduct : public Expression<ExteriorProduct<L, R> >,
     typedef const_iterator	iterator;	//!< 定数反復子の別名
     
   public:
-    ExteriorProduct(const Expression<L>& l, const Expression<R>& r)
+    ExteriorProduct(const container<L>& l, const container<R>& r)
 	:_l(l()), _r(r())						{}
 
   //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return const_iterator(_l.cbegin(), _r);
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
     const_iterator	begin() const
 			{
-			    return cbegin();
+			    return const_iterator(_l.begin(), _r);
 			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
 			{
-			    return const_iterator(_l.cend(), _r);
+			    return begin();
 			}
   //! 演算結果の末尾を指す定数反復子を返す.
     const_iterator	end() const
 			{
-			    return cend();
+			    return const_iterator(_l.end(), _r);
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return end();
 			}
   //! 演算結果の要素数を返す.
     size_t		size() const
@@ -386,15 +386,15 @@ class ExteriorProduct : public Expression<ExteriorProduct<L, R> >,
 ************************************************************************/
 //! 2つの配列型の式のベクトル積演算を表すクラス
 template <class L, class R>
-class VectorProduct : public Expression<VectorProduct<L, R> >,
-		      public OpNode
+class VectorProduct : public container<VectorProduct<L, R> >,
+		      public op_node
 {
   private:
     typedef typename detail::ValueType<L>::type		lvalue_type;
 
     enum
     {
-	lvalue_is_expr = detail::IsExpression<lvalue_type>::value,
+	lvalue_is_expr = detail::is_container<lvalue_type>::value,
     };
     
     typedef typename detail::ArgumentType<L, !lvalue_is_expr>::type
@@ -423,7 +423,7 @@ class VectorProduct : public Expression<VectorProduct<L, R> >,
 
       public:
 	typedef typename boost::mpl::eval_if<
-	    detail::IsExpression<lvalue_type>,
+	    detail::is_container<lvalue_type>,
 	    _Array<ResultType<lvalue_type> >,
 	    boost::mpl::identity<array3_type> >::type	type;
     };
@@ -516,7 +516,7 @@ class VectorProduct : public Expression<VectorProduct<L, R> >,
 			}
     
   public:
-    VectorProduct(const Expression<L>& l, const Expression<R>& r)
+    VectorProduct(const container<L>& l, const container<R>& r)
 	:_l(l()), _r(r())
 			{
 			    check_size(3, boost::mpl::bool_<lvalue_is_expr>());
@@ -530,24 +530,24 @@ class VectorProduct : public Expression<VectorProduct<L, R> >,
 			}
 
   //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return const_iterator(_l.cbegin(), _r);
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
     const_iterator	begin() const
 			{
-			    return cbegin();
+			    return const_iterator(_l.begin(), _r);
 			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
+  //! 演算結果の先頭要素を指す定数反復子を返す.
+    const_iterator	cbegin() const
 			{
-			    return const_iterator(_l.cend(), _r);
+			    return begin();
 			}
   //! 演算結果の末尾を指す定数反復子を返す.
     const_iterator	end() const
 			{
-			    return cend();
+			    return const_iterator(_l.end(), _r);
+			}
+  //! 演算結果の末尾を指す定数反復子を返す.
+    const_iterator	cend() const
+			{
+			    return end();
 			}
   //! 演算結果の要素数を返す.
     size_t		size() const
@@ -576,8 +576,8 @@ class ProductType
   private:
     enum
     {
-	lvalue_is_expr = detail::IsExpression<typename L::value_type>::value,
-	rvalue_is_expr = detail::IsExpression<typename R::value_type>::value,
+	lvalue_is_expr = detail::is_container<typename L::value_type>::value,
+	rvalue_is_expr = detail::is_container<typename R::value_type>::value,
     };
     typedef typename R::element_type				element_type;
     
@@ -598,8 +598,8 @@ class VectorProductType
   private:
     enum
     {
-	lvalue_is_expr = detail::IsExpression<typename L::value_type>::value,
-	rvalue_is_expr = detail::IsExpression<typename R::value_type>::value,
+	lvalue_is_expr = detail::is_container<typename L::value_type>::value,
+	rvalue_is_expr = detail::is_container<typename R::value_type>::value,
     };
     typedef typename R::element_type				element_type;
     
@@ -622,7 +622,7 @@ class VectorProductType
   \return	積の評価結果
 */
 template <class L, class R> inline typename detail::ProductType<L, R>::type
-operator *(const Expression<L>& l, const Expression<R>& r)
+operator *(const container<L>& l, const container<R>& r)
 {
     return Product<L, R>::value(l, r);
 }
@@ -634,7 +634,7 @@ operator *(const Expression<L>& l, const Expression<R>& r)
   \return	外積演算子ノード
 */
 template <class L, class R> inline Matrix<typename R::element_type>
-operator %(const Expression<L>& l, const Expression<R>& r)
+operator %(const container<L>& l, const container<R>& r)
 {
     return ExteriorProduct<L, R>(l, r);
 }
@@ -647,7 +647,7 @@ operator %(const Expression<L>& l, const Expression<R>& r)
 */
 template <class L, class R>
 inline typename detail::VectorProductType<L, R>::type
-operator ^(const Expression<L>& l, const Expression<R>& r)
+operator ^(const container<L>& l, const container<R>& r)
 {
     return VectorProduct<L, R>(l, r).value();
 }
@@ -806,11 +806,11 @@ class Vector : public Array<T, B>
     template <class B2>
     Vector(Vector<T, B2>& v, size_t i, size_t d)			;
     template <class E>
-    Vector(const Expression<E>& v)					;
+    Vector(const container<E>& v)					;
     template <class B2, class R2>
     Vector(const Matrix<T, B2, R2>& m)					;
     template <class E>
-    Vector&		operator =(const Expression<E>& v)		;
+    Vector&		operator =(const container<E>& v)		;
     
     using		super::begin;
     using		super::end;
@@ -827,23 +827,23 @@ class Vector : public Array<T, B>
     template <class T2>
     Vector&		operator /=(T2 c)				;
     template <class E>
-    Vector&		operator +=(const Expression<E>& v)		;
+    Vector&		operator +=(const container<E>& v)		;
     template <class E>
-    Vector&		operator -=(const Expression<E>& v)		;
+    Vector&		operator -=(const container<E>& v)		;
     template <class E>
-    Vector&		operator *=(const Expression<E>& m)		;
+    Vector&		operator *=(const container<E>& m)		;
     template <class E>
-    Vector&		operator ^=(const Expression<E>& v)		;
+    Vector&		operator ^=(const container<E>& v)		;
     T			square()				const	;
     double		length()				const	;
     template <class E>
-    T			sqdist(const Expression<E>& v)		const	;
+    T			sqdist(const container<E>& v)		const	;
     template <class E>
-    double		dist(const Expression<E>& v)		const	;
+    double		dist(const container<E>& v)		const	;
     Vector&		normalize()					;
     Vector		normal()				const	;
     template <class E>
-    Vector&		solve(const Expression<E>& m)			;
+    Vector&		solve(const container<E>& m)			;
     matrix33_type	skew()					const	;
     Vector<T>		homogeneous()				const	;
     Vector<T>		inhomogeneous()				const	;
@@ -898,7 +898,7 @@ Vector<T, B>::Vector(Vector<T, B2>& v, size_t i, size_t d)
   \param v	コピー元ベクトル
 */
 template <class T, class B> template <class E> inline
-Vector<T, B>::Vector(const Expression<E>& v)
+Vector<T, B>::Vector(const container<E>& v)
     :super(v)
 {
 }
@@ -909,7 +909,7 @@ Vector<T, B>::Vector(const Expression<E>& v)
   \return	このベクトル
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator =(const Expression<E>& v)
+Vector<T, B>::operator =(const container<E>& v)
 {
     super::operator =(v);
     return *this;
@@ -983,7 +983,7 @@ Vector<T, B>::operator /=(T2 c)
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} + \TUvec{v}{}\f$
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator +=(const Expression<E>& v)
+Vector<T, B>::operator +=(const container<E>& v)
 {
     super::operator +=(v);
     return *this;
@@ -996,7 +996,7 @@ Vector<T, B>::operator +=(const Expression<E>& v)
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} - \TUvec{v}{}\f$
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator -=(const Expression<E>& v)
+Vector<T, B>::operator -=(const container<E>& v)
 {
     super::operator -=(v);
     return *this;
@@ -1009,7 +1009,7 @@ Vector<T, B>::operator -=(const Expression<E>& v)
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\TUvec{M}{}\f$
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator *=(const Expression<E>& m)
+Vector<T, B>::operator *=(const container<E>& m)
 {
     return *this = *this * m;
 }
@@ -1021,7 +1021,7 @@ Vector<T, B>::operator *=(const Expression<E>& m)
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} \times \TUvec{v}{}\f$
 */
 template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator ^=(const Expression<E>& v)
+Vector<T, B>::operator ^=(const container<E>& v)
 {
     return *this = *this ^ v;
 }
@@ -1053,7 +1053,7 @@ Vector<T, B>::length() const
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
 */
 template <class T, class B> template <class E> inline T
-Vector<T, B>::sqdist(const Expression<E>& v) const
+Vector<T, B>::sqdist(const container<E>& v) const
 {
     return Vector(*this - v).square();
 }
@@ -1065,7 +1065,7 @@ Vector<T, B>::sqdist(const Expression<E>& v) const
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
 template <class T, class B> template <class E> inline double
-Vector<T, B>::dist(const Expression<E>& v) const
+Vector<T, B>::dist(const container<E>& v) const
 {
     return std::sqrt(double(sqdist(v)));
 }
@@ -1218,10 +1218,10 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class B2, class R2>
     Matrix(Matrix<T, B2, R2>& m, size_t i, size_t j, size_t r, size_t c);
     template <class E>
-    Matrix(const Expression<E>& m)					;
+    Matrix(const container<E>& m)					;
     Matrix(const BlockDiagonalMatrix<T>& m)				;
     template <class E>
-    Matrix&		operator =(const Expression<E>& m)		;
+    Matrix&		operator =(const container<E>& m)		;
     Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
 
     using		super::begin;
@@ -1243,18 +1243,18 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class T2>
     Matrix&		operator /=(T2 c)				;
     template <class E>
-    Matrix&		operator +=(const Expression<E>& m)		;
+    Matrix&		operator +=(const container<E>& m)		;
     template <class E>
-    Matrix&		operator -=(const Expression<E>& m)		;
+    Matrix&		operator -=(const container<E>& m)		;
     template <class E>
-    Matrix&		operator *=(const Expression<E>& m)		;
+    Matrix&		operator *=(const container<E>& m)		;
     template <class E>
-    Matrix&		operator ^=(const Expression<E>& v)		;
+    Matrix&		operator ^=(const container<E>& v)		;
     Matrix&		diag(T c)					;
     Matrix<T>		trns()					const	;
     Matrix		inv()					const	;
     template <class E>
-    Matrix&		solve(const Expression<E>& m)			;
+    Matrix&		solve(const container<E>& m)			;
     T			det()					const	;
     T			det(size_t p, size_t q)			const	;
     T			trace()					const	;
@@ -1343,7 +1343,7 @@ Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
   \param m	コピー元行列
 */
 template <class T, class B, class R> template <class E> inline
-Matrix<T, B, R>::Matrix(const Expression<E>& m)
+Matrix<T, B, R>::Matrix(const container<E>& m)
     :super(m)
 {
 }
@@ -1354,7 +1354,7 @@ Matrix<T, B, R>::Matrix(const Expression<E>& m)
   \return	この行列
 */
 template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator =(const Expression<E>& m)
+Matrix<T, B, R>::operator =(const container<E>& m)
 {
     super::operator =(m);
     return *this;
@@ -1433,7 +1433,7 @@ Matrix<T, B, R>::operator /=(T2 c)
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} + \TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator +=(const Expression<E>& m)
+Matrix<T, B, R>::operator +=(const container<E>& m)
 {
     super::operator +=(m);
     return *this;
@@ -1447,7 +1447,7 @@ Matrix<T, B, R>::operator +=(const Expression<E>& m)
 */
 template <class T, class B, class R> template <class E>
 inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator -=(const Expression<E>& m)
+Matrix<T, B, R>::operator -=(const container<E>& m)
 {
     super::operator -=(m);
     return *this;
@@ -1460,7 +1460,7 @@ Matrix<T, B, R>::operator -=(const Expression<E>& m)
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
 */
 template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator *=(const Expression<E>& m)
+Matrix<T, B, R>::operator *=(const container<E>& m)
 {
     return *this = *this * m;
 }
@@ -1472,7 +1472,7 @@ Matrix<T, B, R>::operator *=(const Expression<E>& m)
 		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
 template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator ^=(const Expression<E>& v)
+Matrix<T, B, R>::operator ^=(const container<E>& v)
 {
     return *this = *this ^ v;
 }
@@ -2120,7 +2120,7 @@ class LUDecomposition : private Array2<Vector<T> >
     
   public:
     template <class E>
-    LUDecomposition(const Expression<E>& m)		;
+    LUDecomposition(const container<E>& m)		;
 
     template <class T2, class B2>
     void	substitute(Vector<T2, B2>& b)	const	;
@@ -2145,7 +2145,7 @@ class LUDecomposition : private Array2<Vector<T> >
  \throw std::invalid_argument	mが正方行列でない場合に送出
 */
 template <class T> template <class E>
-LUDecomposition<T>::LUDecomposition(const Expression<E>& m)
+LUDecomposition<T>::LUDecomposition(const container<E>& m)
     :super(m), _index(ncol()), _det(1.0)
 {
     using namespace	std;
@@ -2254,7 +2254,7 @@ LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
 */
 template <class T, class B> template <class E>
 inline Vector<T, B>&
-Vector<T, B>::solve(const Expression<E>& m)
+Vector<T, B>::solve(const container<E>& m)
 {
     LUDecomposition<T>(m).substitute(*this);
     return *this;
@@ -2269,7 +2269,7 @@ Vector<T, B>::solve(const Expression<E>& m)
 */
 template <class T, class B, class R> template <class E>
 Matrix<T, B, R>&
-Matrix<T, B, R>::solve(const Expression<E>& m)
+Matrix<T, B, R>::solve(const container<E>& m)
 {
     LUDecomposition<T>	lu(m);
     
@@ -2308,7 +2308,7 @@ class Householder : public Matrix<T>
     Householder(size_t dd, size_t d)
 	:super(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
     template <class E>
-    Householder(const Expression<E>& a, size_t d)		;
+    Householder(const container<E>& a, size_t d)		;
 
     using		super::size;
     
@@ -2330,7 +2330,7 @@ class Householder : public Matrix<T>
 };
 
 template <class T> template <class E>
-Householder<T>::Householder(const Expression<E>& a, size_t d)
+Householder<T>::Householder(const container<E>& a, size_t d)
     :super(a), _d(d), _sigma(size())
 {
     if (a().size() != a().ncol())
@@ -2516,7 +2516,7 @@ class QRDecomposition : private Matrix<T>
     
   public:
     template <class E>
-    QRDecomposition(const Expression<E>& m)		;
+    QRDecomposition(const container<E>& m)		;
 
   //! QR分解の下半三角行列を返す．
   /*!
@@ -2542,7 +2542,7 @@ class QRDecomposition : private Matrix<T>
  \param m	QR分解する一般行列
 */
 template <class T> template <class E>
-QRDecomposition<T>::QRDecomposition(const Expression<E>& m)
+QRDecomposition<T>::QRDecomposition(const container<E>& m)
     :super(m), _Qt(m().ncol(), 0)
 {
     size_t	n = std::min(nrow(), ncol());
@@ -2574,7 +2574,7 @@ class TriDiagonal
     
   public:
     template <class E>
-    TriDiagonal(const Expression<E>& a)			;
+    TriDiagonal(const container<E>& a)			;
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す．
   /*!
@@ -2620,7 +2620,7 @@ class TriDiagonal
   \throw std::invalid_argument	aが正方行列でない場合に送出
 */
 template <class T> template <class E>
-TriDiagonal<T>::TriDiagonal(const Expression<E>& a)
+TriDiagonal<T>::TriDiagonal(const container<E>& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
 {
     if (_Ut.nrow() != _Ut.ncol())
@@ -2772,7 +2772,7 @@ class BiDiagonal
     
   public:
     template <class E>
-    BiDiagonal(const Expression<E>& a)		;
+    BiDiagonal(const container<E>& a)		;
 
   //! 2重対角化される行列の行数を返す．
   /*!
@@ -2834,7 +2834,7 @@ class BiDiagonal
   \param a	2重対角化する一般行列
 */
 template <class T> template <class E>
-BiDiagonal<T>::BiDiagonal(const Expression<E>& a)
+BiDiagonal<T>::BiDiagonal(const container<E>& a)
     :_Dt((a().size() < a().ncol() ? a().ncol() : a().size()), 0),
      _Et((a().size() < a().ncol() ? a().size() : a().ncol()), 1),
      _diagonal(_Dt.sigma()), _off_diagonal(_Et.sigma()), _anorm(0),
@@ -3072,7 +3072,7 @@ class SVDecomposition : private BiDiagonal<T>
     \param a	特異値分解する一般行列
   */
     template <class E>
-    SVDecomposition(const Expression<E>& a)
+    SVDecomposition(const container<E>& a)
 	:super(a)				{super::diagonalize();}
 
     using	super::nrow;
