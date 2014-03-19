@@ -1,7 +1,7 @@
 /*
  *  $Id: createFeatureCmds.cc,v 1.2 2012-06-20 07:50:08 ueshiba Exp $
  */
-#include "multicam.h"
+#include "testcam.h"
 
 namespace TU
 {

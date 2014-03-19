@@ -1,7 +1,7 @@
 /*
  *  $Id: createMenuCmds.cc,v 1.1 2009-07-28 00:00:48 ueshiba Exp $
  */
-#include "multicam.h"
+#include "testcam.h"
 
 namespace TU
 {
