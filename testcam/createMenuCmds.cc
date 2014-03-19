@@ -5,7 +5,7 @@
 #include <list>
 #include <boost/foreach.hpp>
 #include <sstream>
-#include "multicam.h"
+#include "testcam.h"
 
 namespace TU
 {
