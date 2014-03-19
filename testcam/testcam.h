@@ -1,5 +1,5 @@
 /*
- *  $Id$
+ *  $Id: testcam.h 1334 2013-05-06 20:21:15Z ueshiba $
  */
 #include "TU/v/TUv++.h"
 #include "TU/V4L2++.h"
