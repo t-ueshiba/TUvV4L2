@@ -157,9 +157,8 @@ class HRP2
     bool	SelectBaseLink(const char* linkname)		const	;
     bool	GetReferencePose(const char* linkname,
 				 TimedPose& D)			const	;
+    bool	GetRealPose(Time time, TimedPose& D)		const	;
     bool	GetRealPose(const char* linkName, TimedPose& D)	const	;
-    bool	GetRealPose(const char* linkName,
-			    Time time, TimedPose& D)		const	;
 
   // SequencePlayerService
     void	go_halfsitting()					;

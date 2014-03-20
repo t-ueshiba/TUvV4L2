@@ -418,7 +418,7 @@ HRP2::GetReferencePose(const char* linkname, TimedPose& D) const
 }
 
 bool
-HRP2::GetRealPose(const char* linkname, Time time, TimedPose& D) const
+HRP2::GetRealPose(Time time, TimedPose& D) const
 {
     return _getRealPose(time, D);
 }
