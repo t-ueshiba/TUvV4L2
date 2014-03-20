@@ -21,7 +21,7 @@ IDLFLAGS2	= -bcxx -Wbh=.hh -Wbs=.cc -Wba -Wbd=DynSK.cc -Wbtf
 #########################################
 #  C++ preprocessor and compiler	#
 #########################################
-INCDIRS		= -I. -I$(PREFIX)/include/rtm/idl
+INCDIRS		= -I`rtm-config --rtm-includedir` -I`rtm-config --rtm-idldir`
 CPPFLAGS	= -DOMNIORB4 -DTVMET_OPTIMIZE -DNDEBUG -DUSE_CLAPACK_INTERFACE
 CCC		= g++
 CCFLAGS		= -fPIC -O3 -Wall -fno-schedule-insns -fno-schedule-insns2 -fno-strict-aliasing

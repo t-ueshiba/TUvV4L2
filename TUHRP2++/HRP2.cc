@@ -639,8 +639,9 @@ HRP2::init(int argc, char* argv[])
     using		::optind;
     
     const char*		nameServerHost = "localhost:2809";
-    optind = 1;
     _verbose = false;
+
+    ::opterr = 0;
     for (int c; (c = getopt(argc, argv, "N:V")) != EOF; )
 	switch (c)
 	{
@@ -651,7 +652,8 @@ HRP2::init(int argc, char* argv[])
 	    _verbose = true;
 	    break;
 	}
-
+    ::opterr = 1;
+    
   // ORBを取得
     CORBA::ORB_var	orb = CORBA::ORB_init(argc, argv);;
 
