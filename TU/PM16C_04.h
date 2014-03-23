@@ -42,7 +42,7 @@ namespace TU
 *  class PM16C_04							*
 ************************************************************************/
 //! ツジ電子製パルスモータコントローラPM16C_04を制御するクラス
-class __PORT PM16C_04 : public Serial
+class PM16C_04 : public Serial
 {
   public:
   //! 軸

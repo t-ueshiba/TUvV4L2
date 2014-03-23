@@ -42,7 +42,7 @@ namespace TU
 *  class SHOT602							*
 ************************************************************************/
 //! シグマ光機製パルスモータコントローラSHOT-604を制御するクラス
-class __PORT SHOT602 : public Serial
+class SHOT602 : public Serial
 {
   public:
   //! 軸

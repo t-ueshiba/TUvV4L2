@@ -38,7 +38,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
-#include "TU/types.h"
 #include "TU/iterator.h"
 #include "TU/mmInstructions.h"
 #if (__cplusplus > 199711L) || defined(__GXX_EXPERIMENTAL_CXX0X__)
@@ -88,14 +87,14 @@ class Buf : public BufTraits<T, ALIGNED>
 
   public:
     typedef T						value_type;
-    typedef const value_type*				const_pointer;
     typedef value_type*					pointer;
-    typedef typename super::const_iterator		const_iterator;
+    typedef const value_type*				const_pointer;
     typedef typename super::iterator			iterator;
-    typedef typename std::iterator_traits<const_iterator>::reference
-							const_reference;
+    typedef typename super::const_iterator		const_iterator;
     typedef typename std::iterator_traits<iterator>::reference
 							reference;
+    typedef typename std::iterator_traits<const_iterator>::reference
+							const_reference;
     
   public:
     explicit		Buf(size_t siz=0)			;
@@ -108,14 +107,14 @@ class Buf : public BufTraits<T, ALIGNED>
 #endif
 			~Buf()					;
 
-    const_pointer	data()				const	;
     pointer		data()					;
-    const_iterator	cbegin()			const	;
-    const_iterator	begin()				const	;
+    const_pointer	data()				const	;
     iterator		begin()					;
-    const_iterator	cend()				const	;
-    const_iterator	end()				const	;
+    const_iterator	begin()				const	;
+    const_iterator	cbegin()			const	;
     iterator		end()					;
+    const_iterator	end()				const	;
+    const_iterator	cend()				const	;
     size_t		size()				const	;
     bool		resize(size_t siz)			;
     void		resize(pointer p, size_t siz)		;
@@ -212,7 +211,7 @@ template <class T, bool ALIGNED>
 Buf<T, ALIGNED>::Buf(const Buf& b)
     :_size(b._size), _p(allocator::alloc(_size)), _shared(0), _capacity(_size)
 {
-    std::copy(b.cbegin(), b.cend(), begin());
+    std::copy(b.begin(), b.end(), begin());
 }
 
 //! 標準代入演算子
@@ -222,7 +221,7 @@ Buf<T, ALIGNED>::operator =(const Buf& b)
     if (this != &b)
     {
 	resize(b._size);
-	std::copy(b.cbegin(), b.cend(), begin());
+	std::copy(b.begin(), b.end(), begin());
     }
     return *this;
 }
@@ -270,13 +269,6 @@ Buf<T, ALIGNED>::~Buf()
 	allocator::free(_p, _size);
 }
     
-//! バッファが使用する内部記憶領域への定数ポインタを返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_pointer
-Buf<T, ALIGNED>::data() const
-{
-    return _p;
-}
-    
 //! バッファが使用する内部記憶領域へのポインタを返す．
 template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::pointer
 Buf<T, ALIGNED>::data()
@@ -284,9 +276,16 @@ Buf<T, ALIGNED>::data()
     return _p;
 }
 
-//! バッファの先頭要素を指す定数反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
-Buf<T, ALIGNED>::cbegin() const
+//! バッファが使用する内部記憶領域への定数ポインタを返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_pointer
+Buf<T, ALIGNED>::data() const
+{
+    return _p;
+}
+    
+//! バッファの先頭要素を指す反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::iterator
+Buf<T, ALIGNED>::begin()
 {
     return data();
 }
@@ -295,28 +294,14 @@ Buf<T, ALIGNED>::cbegin() const
 template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
 Buf<T, ALIGNED>::begin() const
 {
-    return cbegin();
-}
-
-//! バッファの先頭要素を指す反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::iterator
-Buf<T, ALIGNED>::begin()
-{
     return data();
 }
 
-//! バッファの末尾を指す定数反復子を返す．
+//! バッファの先頭要素を指す定数反復子を返す．
 template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
-Buf<T, ALIGNED>::cend() const
+Buf<T, ALIGNED>::cbegin() const
 {
-    return cbegin() + size();
-}
-
-//! バッファの末尾を指す定数反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
-Buf<T, ALIGNED>::end() const
-{
-    return cend();
+    return begin();
 }
 
 //! バッファの末尾を指す反復子を返す．
@@ -324,6 +309,20 @@ template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::iterator
 Buf<T, ALIGNED>::end()
 {
     return begin() + size();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
+Buf<T, ALIGNED>::end() const
+{
+    return begin() + size();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
+Buf<T, ALIGNED>::cend() const
+{
+    return end();
 }
 
 //! バッファの要素数を返す．
@@ -463,14 +462,14 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
 
   public:
     typedef T						value_type;
-    typedef const value_type*				const_pointer;
     typedef value_type*					pointer;
-    typedef typename super::const_iterator		const_iterator;
+    typedef const value_type*				const_pointer;
     typedef typename super::iterator			iterator;
-    typedef typename std::iterator_traits<const_iterator>::reference
-							const_reference;
+    typedef typename super::const_iterator		const_iterator;
     typedef typename std::iterator_traits<iterator>::reference
 							reference;
+    typedef typename std::iterator_traits<const_iterator>::reference
+							const_reference;
     
   public:
     explicit		FixedSizedBuf(size_t siz=D)		;
@@ -478,14 +477,14 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
 			FixedSizedBuf(const FixedSizedBuf& b)	;
     FixedSizedBuf&	operator =(const FixedSizedBuf& b)	;
     
-    const_pointer	data()				const	;
     pointer		data()					;
-    const_iterator	cbegin()			const	;
-    const_iterator	begin()				const	;
+    const_pointer	data()				const	;
     iterator		begin()					;
-    const_iterator	cend()				const	;
-    const_iterator	end()				const	;
+    const_iterator	begin()				const	;
+    const_iterator	cbegin()			const	;
     iterator		end()					;
+    const_iterator	end()				const	;
+    const_iterator	cend()				const	;
     static size_t	size()					;
     static bool		resize(size_t siz)			;
     void		resize(pointer p, size_t siz)		;
@@ -547,7 +546,7 @@ FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(pointer, size_t)
 template <class T, size_t D, bool ALIGNED>
 FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(const FixedSizedBuf& b)
 {
-    copy<0>().exec(b.cbegin(), begin());
+    copy<0>().exec(b.begin(), begin());
 }
 
 //! 標準代入演算子
@@ -555,8 +554,16 @@ template <class T, size_t D, bool ALIGNED> FixedSizedBuf<T, D, ALIGNED>&
 FixedSizedBuf<T, D, ALIGNED>::operator =(const FixedSizedBuf& b)
 {
     if (this != &b)
-	copy<0>().exec(b.cbegin(), begin());
+	copy<0>().exec(b.begin(), begin());
     return *this;
+}
+
+//! バッファが使用する内部記憶領域へのポインタを返す．
+template <class T, size_t D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::pointer
+FixedSizedBuf<T, D, ALIGNED>::data()
+{
+    return _buf.p;
 }
 
 //! バッファが使用する内部記憶領域への定数ポインタを返す．
@@ -567,18 +574,10 @@ FixedSizedBuf<T, D, ALIGNED>::data() const
     return _buf.p;
 }
     
-//! バッファが使用する内部記憶領域へのポインタを返す．
+//! バッファの先頭要素を指す反復子を返す．
 template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::pointer
-FixedSizedBuf<T, D, ALIGNED>::data()
-{
-    return _buf.p;
-}
-
-//! バッファの先頭要素を指す定数反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
-FixedSizedBuf<T, D, ALIGNED>::cbegin() const
+inline typename FixedSizedBuf<T, D, ALIGNED>::iterator
+FixedSizedBuf<T, D, ALIGNED>::begin()
 {
     return data();
 }
@@ -588,31 +587,15 @@ template <class T, size_t D, bool ALIGNED>
 inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
 FixedSizedBuf<T, D, ALIGNED>::begin() const
 {
-    return cbegin();
-}
-
-//! バッファの先頭要素を指す反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::iterator
-FixedSizedBuf<T, D, ALIGNED>::begin()
-{
     return data();
 }
 
-//! バッファの末尾を指す定数反復子を返す．
+//! バッファの先頭要素を指す定数反復子を返す．
 template <class T, size_t D, bool ALIGNED>
 inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
-FixedSizedBuf<T, D, ALIGNED>::cend() const
+FixedSizedBuf<T, D, ALIGNED>::cbegin() const
 {
-    return cbegin() + size();
-}
-
-//! バッファの末尾を指す定数反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
-FixedSizedBuf<T, D, ALIGNED>::end() const
-{
-    return cend();
+    return begin();
 }
 
 //! バッファの末尾を指す反復子を返す．
@@ -621,6 +604,22 @@ inline typename FixedSizedBuf<T, D, ALIGNED>::iterator
 FixedSizedBuf<T, D, ALIGNED>::end()
 {
     return begin() + size();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, size_t D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
+FixedSizedBuf<T, D, ALIGNED>::end() const
+{
+    return begin() + size();
+}
+
+//! バッファの末尾を指す定数反復子を返す．
+template <class T, size_t D, bool ALIGNED>
+inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
+FixedSizedBuf<T, D, ALIGNED>::cend() const
+{
+    return end();
 }
 
 //! バッファの要素数を返す．
@@ -719,22 +718,22 @@ class Array : public B, public container<Array<T, B> >
 	ElementType<T>, boost::mpl::identity<T> >::type	element_type;
   //! 要素の型    
     typedef typename super::value_type			value_type;
-  //! 定数要素へのポインタ
-    typedef typename super::const_pointer		const_pointer;
   //! 要素へのポインタ
     typedef typename super::pointer			pointer;
-  //! 定数反復子
-    typedef typename super::const_iterator		const_iterator;
+  //! 定数要素へのポインタ
+    typedef typename super::const_pointer		const_pointer;
   //! 反復子
     typedef typename super::iterator			iterator;
-  //! 定数逆反復子    
-    typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
+  //! 定数反復子
+    typedef typename super::const_iterator		const_iterator;
   //! 逆反復子    
     typedef std::reverse_iterator<iterator>		reverse_iterator;
-  //! 定数要素への参照
-    typedef typename super::const_reference		const_reference;
+  //! 定数逆反復子    
+    typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
   //! 要素への参照
     typedef typename super::reference			reference;
+  //! 定数要素への参照
+    typedef typename super::const_reference		const_reference;
   //! ポインタ間の差
     typedef std::ptrdiff_t				difference_type;
     
@@ -759,24 +758,24 @@ class Array : public B, public container<Array<T, B> >
     Array&	operator =(const element_type& c)			;
 
     using	super::data;
-    using	super::cbegin;
     using	super::begin;
-    using	super::cend;
+    using	super::cbegin;
     using	super::end;
+    using	super::cend;
     using	super::size;
     using	super::resize;
 
     size_t			dim()				const	;
     size_t			ncol()				const	;
-    const_reverse_iterator	crbegin()			const	;
-    const_reverse_iterator	rbegin()			const	;
     reverse_iterator		rbegin()				;
-    const_reverse_iterator	crend()				const	;
-    const_reverse_iterator	rend()				const	;
+    const_reverse_iterator	rbegin()			const	;
+    const_reverse_iterator	crbegin()			const	;
     reverse_iterator		rend()					;
+    const_reverse_iterator	rend()				const	;
+    const_reverse_iterator	crend()				const	;
 
-    const_reference	operator [](size_t i)			const	;
     reference		operator [](size_t i)				;
+    const_reference	operator [](size_t i)			const	;
     Array&		operator *=(element_type c)			;
     template <class T2>
     Array&		operator /=(T2 c)				;
@@ -919,29 +918,9 @@ Array<T, B>::dim() const
 template <class T, class B> inline size_t
 Array<T, B>::ncol() const
 {
-    return (size() ? cbegin()->size() : 0);
+    return (size() ? begin()->size() : 0);
 }
     
-//! 配列の末尾要素を指す定数逆反復子を返す．
-/*!
-  \return	末尾要素を指す定数逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::crbegin() const
-{
-    return const_reverse_iterator(cend());
-}
-
-//! 配列の末尾要素を指す定数逆反復子を返す．
-/*!
-  \return	末尾要素を指す定数逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::rbegin() const
-{
-    return crbegin();
-}
-
 //! 配列の末尾要素を指す逆反復子を返す．
 /*!
   \return	末尾要素を指す逆反復子
@@ -952,24 +931,24 @@ Array<T, B>::rbegin()
     return reverse_iterator(end());
 }
 
-//! 配列の先頭を指す定数逆反復子を返す．
+//! 配列の末尾要素を指す定数逆反復子を返す．
 /*!
-  \return	先頭を指す定数逆反復子
+  \return	末尾要素を指す定数逆反復子
 */
 template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::crend() const
+Array<T, B>::rbegin() const
 {
-    return const_reverse_iterator(cbegin());
+    return const_reverse_iterator(end());
 }
 
-//! 配列の先頭を指す定数逆反復子を返す．
+//! 配列の末尾要素を指す定数逆反復子を返す．
 /*!
-  \return	先頭を指す定数逆反復子
+  \return	末尾要素を指す定数逆反復子
 */
 template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::rend() const
+Array<T, B>::crbegin() const
 {
-    return crend();
+    return rbegin();
 }
 
 //! 配列の先頭を指す逆反復子を返す．
@@ -982,20 +961,24 @@ Array<T, B>::rend()
     return reverse_iterator(begin());
 }
 
-//! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
+//! 配列の先頭を指す定数逆反復子を返す．
 /*!
-  \param i			要素を指定するindex
-  \return			indexによって指定された要素
-  \throw std::out_of_range	0 <= i < size()でない場合に送出
+  \return	先頭を指す定数逆反復子
 */
-template <class T, class B> inline typename Array<T, B>::const_reference
-Array<T, B>::operator [](size_t i) const
+template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
+Array<T, B>::rend() const
 {
-#if defined(LIBTUTOOLS_DEBUG)
-    if (i < 0 || size_t(i) >= size())
-	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
-#endif
-    return *(cbegin() + i);
+    return const_reverse_iterator(begin());
+}
+
+//! 配列の先頭を指す定数逆反復子を返す．
+/*!
+  \return	先頭を指す定数逆反復子
+*/
+template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
+Array<T, B>::crend() const
+{
+    return rend();
 }
 
 //! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
@@ -1006,6 +989,22 @@ Array<T, B>::operator [](size_t i) const
 */
 template <class T, class B> inline typename Array<T, B>::reference
 Array<T, B>::operator [](size_t i)
+{
+#if defined(LIBTUTOOLS_DEBUG)
+    if (i < 0 || size_t(i) >= size())
+	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
+#endif
+    return *(begin() + i);
+}
+
+//! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
+/*!
+  \param i			要素を指定するindex
+  \return			indexによって指定された要素
+  \throw std::out_of_range	0 <= i < size()でない場合に送出
+*/
+template <class T, class B> inline typename Array<T, B>::const_reference
+Array<T, B>::operator [](size_t i) const
 {
 #if defined(LIBTUTOOLS_DEBUG)
     if (i < 0 || size_t(i) >= size())
@@ -1118,7 +1117,7 @@ Array<T, B>::get(std::istream& in)
 template <class T, class B> std::ostream&
 Array<T, B>::put(std::ostream& out) const
 {
-    for (const_iterator q = cbegin(), qe = cend(); q != qe; ++q)
+    for (const_iterator q = begin(), qe = end(); q != qe; ++q)
 	out << ' ' << *q;
     return out;
 }
@@ -1188,22 +1187,22 @@ class Array2 : public Array<T, R>
     typedef typename super::element_type		element_type;
   //! 行の型    
     typedef typename super::value_type			value_type;
-  //! 行の定数反復子    
-    typedef typename super::const_iterator		const_iterator;
   //! 行の反復子    
     typedef typename super::iterator			iterator;
-  //! 行の定数逆反復子    
-    typedef typename super::const_reverse_iterator	const_reverse_iterator;
+  //! 行の定数反復子    
+    typedef typename super::const_iterator		const_iterator;
   //! 行の逆反復子    
     typedef typename super::reverse_iterator		reverse_iterator;
-  //! 定数行への参照    
-    typedef typename super::const_reference		const_reference;
+  //! 行の定数逆反復子    
+    typedef typename super::const_reverse_iterator	const_reverse_iterator;
   //! 行への参照    
     typedef typename super::reference			reference;
-  //! 定数要素へのポインタ    
-    typedef typename buf_type::const_pointer		const_pointer;
+  //! 定数行への参照    
+    typedef typename super::const_reference		const_reference;
   //! 要素へのポインタ    
     typedef typename buf_type::pointer			pointer;
+  //! 定数要素へのポインタ    
+    typedef typename buf_type::const_pointer		const_pointer;
   //! ポインタ間の差    
     typedef std::ptrdiff_t				difference_type;
 
@@ -1230,19 +1229,19 @@ class Array2 : public Array<T, R>
     Array2(std::initializer_list<value_type> args)			;
     Array2&	operator =(std::initializer_list<value_type> args)	;
 #endif
-    using		super::cbegin;
     using		super::begin;
-    using		super::cend;
+    using		super::cbegin;
     using		super::end;
-    using		super::crbegin;
+    using		super::cend;
     using		super::rbegin;
-    using		super::crend;
+    using		super::crbegin;
     using		super::rend;
+    using		super::crend;
     using		super::size;
     using		super::dim;
 
-    const_pointer	data()					const	;
     pointer		data()						;
+    const_pointer	data()					const	;
     size_t		nrow()					const	;
     size_t		ncol()					const	;
     size_t		stride()				const	;
@@ -1421,6 +1420,16 @@ Array2<T, B, R>::operator =(const element_type& c)
     return *this;
 }
 
+//! 2次元配列の内部記憶領域へのポインタを返す．
+/*!
+  \return	内部記憶領域へのポインタ
+*/
+template <class T, class B, class R> inline typename Array2<T, B, R>::pointer
+Array2<T, B, R>::data()
+{
+    return _buf.data();
+}
+
 //! 2次元配列の内部記憶領域への定数ポインタを返す．
 /*!
   \return	内部記憶領域への定数ポインタ
@@ -1428,16 +1437,6 @@ Array2<T, B, R>::operator =(const element_type& c)
 template <class T, class B, class R>
 inline typename Array2<T, B, R>::const_pointer
 Array2<T, B, R>::data() const
-{
-    return _buf.data();
-}
-
-//! 2次元配列の内部記憶領域へのポインタを返す．
-/*!
-  \return	内部記憶領域へのポインタ
-*/
-template <class T, class B, class R> inline typename Array2<T, B, R>::pointer
-Array2<T, B, R>::data()
 {
     return _buf.data();
 }
@@ -1527,7 +1526,7 @@ Array2<T, B, R>::restore(std::istream& in)
 template <class T, class B, class R> std::ostream&
 Array2<T, B, R>::save(std::ostream& out) const
 {
-    for (const_iterator q = cbegin(), qe = cend(); q != qe; ++q)
+    for (const_iterator q = begin(), qe = end(); q != qe; ++q)
 	q->save(out);
     return out;
 }

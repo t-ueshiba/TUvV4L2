@@ -40,7 +40,7 @@
 namespace TU
 {
 /************************************************************************
-*  class box_filter_iterator<ITER>					*
+*  class box_filter_iterator<ITER, VAL>					*
 ************************************************************************/
 //! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
 /*!
@@ -48,7 +48,7 @@ namespace TU
 */
 template <class ITER, class VAL=typename std::iterator_traits<ITER>::value_type>
 class box_filter_iterator
-    : public boost::iterator_adaptor<box_filter_iterator<ITER>,	// self
+    : public boost::iterator_adaptor<box_filter_iterator<ITER, VAL>,
 				     ITER,			// base
 				     VAL,			// value_type
 				     boost::single_pass_traversal_tag>
@@ -113,13 +113,12 @@ class box_filter_iterator
     template <class _VITER, class _ITER>
     static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::true_)
 		{
-		    typedef typename std::iterator_traits<_ITER>
-					::value_type		value_type;
-		    typedef typename value_type::const_iterator	const_iterator;
-		    typedef typename value_type::iterator	iterator;
+		    typedef typename std::iterator_traits<_ITER>::value_type
+					::const_iterator	const_iterator;
+		    typedef typename subiterator<_VITER>::type	iterator;
 		    typedef boost::mpl::bool_<
 			detail::is_container<
-			    typename value_type::value_type>::value>
+			    typename subiterator<_VITER>::value_type>::value>
 								value_is_expr;
 		    
 		    const_iterator	c = curr->begin(), h = head->begin();

@@ -43,7 +43,7 @@ namespace TU
 *  class GaussianCoefficients<T>					*
 ************************************************************************/
 //! Gauss核の係数を表すクラス
-template <class T> class __PORT GaussianCoefficients
+template <class T> class GaussianCoefficients
 {
   private:
     typedef double			element_type;

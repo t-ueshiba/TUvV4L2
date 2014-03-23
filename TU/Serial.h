@@ -43,7 +43,7 @@ namespace TU
 *  class Serial								*
 ************************************************************************/
 //! シリアルポートクラス
-class __PORT Serial : public fdstream
+class Serial : public fdstream
 {
   public:
 		Serial(const char*)					;

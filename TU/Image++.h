@@ -36,6 +36,7 @@
 
 #include <string.h>
 #include <boost/operators.hpp>
+#include "TU/types.h"
 #include "TU/Geometry++.h"
 
 namespace TU

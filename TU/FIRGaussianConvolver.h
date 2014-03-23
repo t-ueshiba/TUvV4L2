@@ -14,7 +14,7 @@ namespace TU
 ************************************************************************/
 //! Gauss核の係数を表すクラス
 template <size_t D, class T>
-class __PORT FIRGaussianCoefficients
+class FIRGaussianCoefficients
 {
   public:
     typedef	T					coeff_type;
