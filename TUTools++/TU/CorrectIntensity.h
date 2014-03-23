@@ -42,7 +42,7 @@ namespace TU
 *  class CorrectIntensity						*
 ************************************************************************/
 //! 画像の線形輝度補正を行うクラス
-class __PORT CorrectIntensity
+class CorrectIntensity
 {
   public:
   //! オフセットとゲインを指定して輝度補正オブジェクトを生成する．

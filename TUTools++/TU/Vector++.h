@@ -813,9 +813,13 @@ class Vector : public Array<T, B>
     Vector&		operator =(const container<E>& v)		;
     
     using		super::begin;
+    using		super::cbegin;
     using		super::end;
+    using		super::cend;
     using		super::rbegin;
+    using		super::crbegin;
     using		super::rend;
+    using		super::crend;
     using		super::size;
     using		super::data;
     using		super::check_size;
@@ -1225,9 +1229,13 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
 
     using		super::begin;
+    using		super::cbegin;
     using		super::end;
+    using		super::cend;
     using		super::rbegin;
+    using		super::crbegin;
     using		super::rend;
+    using		super::crend;
     using		super::size;
     using		super::nrow;
     using		super::ncol;

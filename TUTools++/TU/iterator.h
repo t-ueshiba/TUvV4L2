@@ -356,7 +356,8 @@ class fast_zip_iterator
     typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
     typedef typename super::iterator_category	iterator_category;
-
+    typedef TUPLE				iterator_tuple;
+    
     friend class				boost::iterator_core_access;
 
   public:
@@ -513,7 +514,8 @@ struct subiterator<fast_zip_iterator<TUPLE> >
 ************************************************************************/
 namespace detail
 {
-    template <class ROW, class COL, class ARG>
+    template <class ROW,
+	      class COL=boost::use_default, class ARG=boost::tuples::null_type>
     class row_proxy : public container<row_proxy<ROW, COL, ARG> >
     {
       private:
@@ -600,6 +602,18 @@ namespace detail
 	row_proxy(ROW const& row, ARG const& arg, size_t jb, size_t je)
 	    :_row(row), _arg(arg), _jb(jb), _je(je)			{}
 
+	size_t
+	size() const
+	{
+	    return std::distance(begin(), end());
+	}
+
+	size_t
+	ncol() const
+	{
+	    return (size() ? begin()->size() : 0);
+	}
+	
 	iterator
 	begin() const
 	{

@@ -42,7 +42,7 @@ namespace TU
 *  class TriggerGenerator						*
 ************************************************************************/
 //! 東通産業製トリガ信号発生器を表すクラス
-class __PORT TriggerGenerator : public Serial
+class TriggerGenerator : public Serial
 {
   public:
     TriggerGenerator(const char* ttyname)				;

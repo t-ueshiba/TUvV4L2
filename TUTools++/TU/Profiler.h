@@ -34,6 +34,7 @@
 #ifndef __TUProfiler_h
 #define __TUProfiler_h
 
+#include "TU/types.h"
 #include "TU/Array++.h"
 #include <iostream>
 #ifdef WIN32
@@ -48,7 +49,7 @@ namespace TU
 *  clsss Profiler							*
 ************************************************************************/
 //! プログラムの各ステップ毎に実行時間を測定するためのクラス．
-class __PORT Profiler
+class Profiler
 {
   public:
     Profiler(size_t ntimers)						;

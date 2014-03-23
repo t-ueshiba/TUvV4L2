@@ -34,7 +34,6 @@
 #ifndef __TUGeometryPP_h
 #define __TUGeometryPP_h
 
-#include "TU/iterator.h"
 #include "TU/Vector++.h"
 #include "TU/Minimize.h"
 #include <limits>

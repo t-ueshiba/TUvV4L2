@@ -35,6 +35,7 @@
 #define __TUfunctional_h
 
 #include <functional>
+#include <stdexcept>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits.hpp>
 
@@ -121,7 +122,7 @@ namespace detail
 
   //! 式が演算子ノードならばそれ自体もしくはその評価結果，そうでなければそれへの参照
   /*!
-    \param E	配列式を表す型
+    \param E	コンテナ式を表す型
     \param EVAL	演算子ノードを評価するならtrue, そうでなければfalse
   */
     template <class E, bool EVAL=false>
@@ -138,7 +139,7 @@ namespace detail
 /************************************************************************
 *  class unary_operator<OP, E>						*
 ************************************************************************/
-//! 配列式に対する単項演算子を表すクラス
+//! コンテナ式に対する単項演算子を表すクラス
 /*!
   \param OP	各成分に適用される単項演算子の型
   \param E	単項演算子の引数となる式の実体の型
@@ -252,9 +253,9 @@ class unary_operator : public container<unary_operator<OP, E> >,
     const OP		_op;	//!< 単項演算子
 };
 
-//! 与えられた配列式の各要素の符号を反転する.
+//! 与えられたコンテナ式の各要素の符号を反転する.
 /*!
-  \param expr	配列式
+  \param expr	コンテナ式
   \return	符号反転演算子ノード
 */
 template <class E>
@@ -266,9 +267,9 @@ operator -(const container<E>& expr)
     return unary_operator<op_type, E>(expr, op_type());
 }
 
-//! 与えられた配列式の各要素に定数を掛ける.
+//! 与えられたコンテナ式の各要素に定数を掛ける.
 /*!
-  \param expr	配列式
+  \param expr	コンテナ式
   \param c	乗数
   \return	乗算演算子ノード
 */
@@ -282,10 +283,10 @@ operator *(const container<E>& expr, typename E::element_type c)
     return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
 }
 
-//! 与えられた配列式の各要素に定数を掛ける.
+//! 与えられたコンテナ式の各要素に定数を掛ける.
 /*!
   \param c	乗数
-  \param expr	配列式
+  \param expr	コンテナ式
   \return	乗算演算子ノード
 */
 template <class E> inline
@@ -298,9 +299,9 @@ operator *(typename E::element_type c, const container<E>& expr)
     return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
 }
 
-//! 与えられた配列式の各要素を定数で割る.
+//! 与えられたコンテナ式の各要素を定数で割る.
 /*!
-  \param expr	配列式
+  \param expr	コンテナ式
   \param c	除数
   \return	除算演算子ノード
 */
@@ -317,7 +318,7 @@ operator /(const container<E>& expr, typename E::element_type c)
 /************************************************************************
 *  class binary_operator<OP, L, R>					*
 ************************************************************************/
-//! 配列式に対する2項演算子を表すクラス
+//! コンテナ式に対する2項演算子を表すクラス
 /*!
   \param OP	各成分に適用される2項演算子の型
   \param L	2項演算子の第1引数となる式の実体の型
@@ -336,7 +337,7 @@ class binary_operator : public container<binary_operator<OP, L, R> >,
 	detail::is_container<lvalue_type>::value>	lvalue_is_expr;
 
   public:
-  //! 配列の型
+  //! 評価結果の型
     typedef typename R::result_type			result_type;
   //! 成分の型
     typedef typename result_type::element_type		element_type;
@@ -462,10 +463,10 @@ class binary_operator : public container<binary_operator<OP, L, R> >,
     const OP			_op;	//!< 2項演算子
 };
 
-//! 与えられた2つの配列式の各要素の和をとる.
+//! 与えられた2つのコンテナ式の各要素の和をとる.
 /*!
-  \param l	左辺の配列式
-  \param r	右辺の配列式
+  \param l	左辺のコンテナ式
+  \param r	右辺のコンテナ式
   \return	加算演算子ノード
 */
 template <class L, class R>
@@ -477,10 +478,10 @@ operator +(const container<L>& l, const container<R>& r)
     return binary_operator<op_type, L, R>(l, r, op_type());
 }
 
-//! 与えられた2つの配列式の各要素の差をとる.
+//! 与えられた2つのコンテナ式の各要素の差をとる.
 /*!
-  \param l	左辺の配列式
-  \param r	右辺の配列式
+  \param l	左辺のコンテナ式
+  \param r	右辺のコンテナ式
   \return	減算演算子ノード
 */
 template <class L, class R>
