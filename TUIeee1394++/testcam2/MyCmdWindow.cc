@@ -3,7 +3,7 @@
  */
 #include <unistd.h>
 #include <sys/time.h>
-#include "multicam.h"
+#include "testcam.h"
 #include "MyCmdWindow.h"
 #include "MyModalDialog.h"
 #include <iomanip>
