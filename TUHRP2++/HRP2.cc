@@ -100,7 +100,6 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
 		    false,					// left hand
 		    false, false, false, false, false,	// right hand joint
 		    false, false, false, false, false,	// left hand joint
-		    false,					// swinger
 #else
 		    true, true, true, true, true, true, true,	// right arm
 		    false,					// right hand

@@ -51,9 +51,10 @@
 #define LHAND_JOINT3	40
 #define LHAND_JOINT4	41
 
-#define SWINGER         42
+//#define SWINGER         42
 
-#define DOF		43
+//#define DOF		43
+#define DOF		42
 
 #define FORCE_SENSOR_NO	4
 #define GYRO_SENSOR_NO	1
