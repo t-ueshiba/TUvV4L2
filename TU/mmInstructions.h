@@ -66,7 +66,7 @@
 /************************************************************************
 *  Emulations								*
 ************************************************************************/
-// alignr はSSSE3以降でのみサポートされるが，極めて便利なのでemulationバージョンを定義
+// alignr はSSSE3以降でのみサポートされるが，至便なのでemulationバージョンを定義
 #if !defined(SSSE3)
   static inline __m64
   _mm_alignr_pi8(__m64 y, __m64 x, const int count)
@@ -86,104 +86,92 @@
 
 // AVX以降では alignr が上下のlaneに分断されて使いにくいので，自然なバージョンを定義
 #if defined(AVX2)
-  static inline __m256i
-  _mm256_emu_alignr_epi8(__m256i y, __m256i x, const int count)
+  template <size_t N> static inline __m256i
+  _mm256_emu_alignr_epi8(__m256i y, __m256i x)
   {
-      if (count < 16)
-	  return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, y, 0x21), x,
-				    count);
-      else
-	  return _mm256_alignr_epi8(y, _mm256_permute2f128_si256(x, y, 0x21),
-				    count - 16);
+      return (N < 16 ?
+	      _mm256_alignr_epi8(_mm256_permute2f128_si256(x, y, 0x21), x, N) :
+	      _mm256_alignr_epi8(y, _mm256_permute2f128_si256(x, y, 0x21),
+				 N - 16));
   }
 #elif defined(AVX)
-  static inline __m256i
-  _mm256_emu_alignr_epi8(__m256i y, __m256i x, const int count)
+  template <size_t N> static inline __m256i
+  _mm256_emu_alignr_epi8(__m256i y, __m256i x)
   {
-      if (count < 16)
-	  return _mm256_insertf128_si256(
-		     _mm256_insertf128_si256(
-			 _mm256_undefined_si256(),
-			 _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x1),
-					 _mm256_extractf128_si256(x, 0x0),
-					 count),
-			 0x0),
-		     _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x0),
-				     _mm256_extractf128_si256(x, 0x1),
-				     count),
-		     0x1);
-      else
-	  return _mm256_insertf128_si256(
-		     _mm256_insertf128_si256(
-			 _mm256_undefined_si256(),
-			 _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x0),
-					 _mm256_extractf128_si256(x, 0x1),
-					 count - 16),
-			 0x0),
-		     _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x1),
-				     _mm256_extractf128_si256(y, 0x0),
-				     count - 16),
-		     0x1);
+      return (N < 16 ?
+	      _mm256_insertf128_si256(
+		  _mm256_insertf128_si256(
+		      _mm256_undefined_si256(),
+		      _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x1),
+				      _mm256_extractf128_si256(x, 0x0),
+				      N),
+		      0x0),
+		  _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x0),
+				  _mm256_extractf128_si256(x, 0x1),
+				  N),
+		  0x1) :
+	      _mm256_insertf128_si256(
+		  _mm256_insertf128_si256(
+		      _mm256_undefined_si256(),
+		      _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x0),
+				      _mm256_extractf128_si256(x, 0x1),
+				      N - 16),
+		      0x0),
+		  _mm_alignr_epi8(_mm256_extractf128_si256(y, 0x1),
+				  _mm256_extractf128_si256(y, 0x0),
+				  N - 16),
+		  0x1));
   }
 #endif
 
 // AVX以降では srli_si256, slli_si256 が上下のlaneに分断されて使いにくいので，
 // 自然なバージョンを定義
 #if defined(AVX2)
-  static inline __m256i
-  _mm256_emu_srli_si256(__m256i x, const int count)
+  template <size_t N> static inline __m256i
+  _mm256_emu_srli_si256(__m256i x)
   {
-      return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x81), x,
-				count);
+      return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x81), x, N);
   }
 
-  static inline __m256i
-  _mm256_emu_slli_si256(__m256i x, const int count)
+  template <size_t N> static inline __m256i
+  _mm256_emu_slli_si256(__m256i x)
   {
-      if (count < 16)
-	  return _mm256_alignr_epi8(x, _mm256_permute2f128_si256(x, x, 0x08),
-				    16 - count);
-      else
-	  return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x08),
-				    _mm256_setzero_si256(),
-				    32 - count);
+      return (N < 16 ?
+	      _mm256_alignr_epi8(x, _mm256_permute2f128_si256(x, x, 0x08),
+				 16 - N) :
+	      _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x08),
+				 _mm256_setzero_si256(),
+				 32 - N));
   }
 #elif defined(AVX)
-  static inline __m256i
-  _mm256_emu_srli_si256(__m256i x, const int count)
+  template <size_t N> static inline __m256i
+  _mm256_emu_srli_si256(__m256i x)
   {
       __m128i	y = _mm256_extractf128_si256(x, 0x1);
       return _mm256_insertf128_si256(
 		 _mm256_insertf128_si256(
 		     _mm256_undefined_si256(),
-		     _mm_alignr_epi8(y, _mm256_extractf128_si256(x, 0x0),
-				     count),
+		     _mm_alignr_epi8(y, _mm256_extractf128_si256(x, 0x0), N),
 		     0x0),
-		 _mm_srli_si128(y, count),
+		 _mm_srli_si128(y, N),
 		 0x1);
   }
 
-  static inline __m256i
-  _mm256_emu_slli_si256(__m256i x, const int count)
+  template <size_t N> static inline __m256i
+  _mm256_emu_slli_si256(__m256i x)
   {
-      if (count < 16)
-      {
-	  __m128i	y = _mm256_extractf128_si256(x, 0x0);
-	  return _mm256_insertf128_si256(
-		     _mm256_insertf128_si256(_mm256_undefined_si256(),
-					     _mm_slli_si128(y, count),
-					     0x0),
-		     _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x1), y,
-				     16 - count),
-		     0x1);
-      }
-      else
-	  return _mm256_insertf128_si256(
-		     _mm256_setzero_si256(),
-		     _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x0),
-				     _mm_setzero_si128(),
-				     32 - count),
-		     0x1);
+      __m128i	y = _mm256_extractf128_si256(x, 0x0);
+      return (N < 16 ?
+	      _mm256_insertf128_si256(
+		  _mm256_insertf128_si256(_mm256_undefined_si256(),
+					  _mm_slli_si128(y, N),
+					  0x0),
+		  _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x1), y, 16 - N),
+		  0x1) :
+	      _mm256_insertf128_si256(
+		  _mm256_setzero_si256(),
+		  _mm_alignr_epi8(y, _mm_setzero_si128(), 32 - N),
+		  0x1));
   }
 #endif
 
@@ -1488,12 +1476,16 @@ template <size_t N, class T> static vec<T>	shift_r(vec<T> x)	;
     shift_l<0>(vec<type> x)				{return x;}	\
     template <> inline vec<type>					\
     shift_r<0>(vec<type> x)				{return x;}	\
-    template <size_t N>							\
-    MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), emu_slli,		\
-		 (x, N*vec<type>::value_size), void, type, MM_BASE)	\
-    template <size_t N>							\
-    MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), emu_srli,		\
-		 (x, N*vec<type>::value_size), void, type, MM_BASE)
+    template <size_t N> vec<type>					\
+    shift_l(vec<type> x)						\
+    {									\
+	return _mm256_emu_slli_si256<N*vec<type>::value_size>(x);	\
+    }									\
+    template <size_t N> vec<type>					\
+    shift_r(vec<type> x)						\
+    {									\
+	return _mm256_emu_srli_si256<N*vec<type>::value_size>(x);	\
+    }
 #elif defined(SSE2)
 #  define MM_ELM_SHIFTS_I(type)						\
     template <> inline vec<type>					\
@@ -1536,29 +1528,29 @@ MM_ELM_SHIFTS_I(u_int64_t)
   template <size_t N> static inline F32vec
   shift_l(F32vec x)
   {
-      return _mm256_castsi256_ps(_mm256_emu_slli_si256(_mm256_castps_si256(x),
-						       N*F32vec::value_size));
+      return _mm256_castsi256_ps(
+	  _mm256_emu_slli_si256<N*F32vec::value_size>(_mm256_castps_si256(x)));
   }
 
   template <size_t N> static inline F32vec
   shift_r(F32vec x)
   {
-      return _mm256_castsi256_ps(_mm256_emu_srli_si256(_mm256_castps_si256(x),
-						       N*F32vec::value_size));
+      return _mm256_castsi256_ps(
+	  _mm256_emu_srli_si256<N*F32vec::value_size>(_mm256_castps_si256(x)));
   }
 
   template <size_t N> static inline F64vec
   shift_l(F64vec x)
   {
-      return _mm256_castsi256_pd(_mm256_emu_slli_si256(_mm256_castpd_si256(x),
-						       N*F64vec::value_size));
+      return _mm256_castsi256_pd(
+	  _mm256_emu_slli_si256<N*F64vec::value_size>(_mm256_castpd_si256(x)));
   }
 
   template <size_t N> static inline F64vec
   shift_r(F64vec x)
   {
-      return _mm256_castsi256_pd(_mm256_emu_srli_si256(_mm256_castpd_si256(x),
-						       N*F64vec::value_size));
+      return _mm256_castsi256_pd(
+	  _mm256_emu_srli_si256<N*F64vec::value_size>(_mm256_castpd_si256(x)));
   }
 #elif defined(SSE2)
   template <size_t N> static inline F32vec
@@ -1603,7 +1595,7 @@ template <size_t N, class T> static vec<T> shift_r(vec<T> y, vec<T> x)	;
 #  define MM_ELM_SHIFT_R_I2(type)					\
     template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> y, vec<type> x),		\
-		 emu_alignr, (y, x, N*vec<type>::value_size),		\
+		 emu_alignr<N*vec<type>::value_size>, (y, x),		\
 		 void, int8_t, MM_SIGNED)
 #else
 #  define MM_ELM_SHIFT_R_I2(type)					\
@@ -1628,17 +1620,17 @@ MM_ELM_SHIFT_R_I2(u_int64_t)
   template <size_t N> static inline F32vec
   shift_r(F32vec y, F32vec x)
   {
-      return _mm256_castsi256_ps(_mm256_emu_alignr_epi8(_mm256_castps_si256(y),
-							_mm256_castps_si256(x),
-							N*F32vec::value_size));
+      return _mm256_castsi256_ps(
+	  _mm256_emu_alignr_epi8<N*F32vec::value_size>(_mm256_castps_si256(y),
+						       _mm256_castps_si256(x)));
   }
 
   template <size_t N> static inline F64vec
   shift_r(F64vec y, F64vec x)
   {
-      return _mm256_castsi256_pd(_mm256_emu_alignr_epi8(_mm256_castpd_si256(y),
-							_mm256_castpd_si256(x),
-							N*F64vec::value_size));
+      return _mm256_castsi256_pd(
+	  _mm256_emu_alignr_epi8<N*F64vec::value_size>(_mm256_castpd_si256(y),
+						       _mm256_castpd_si256(x)));
   }
 #elif defined(SSE2)
   template <size_t N> static inline F32vec

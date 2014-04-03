@@ -1416,7 +1416,7 @@ Array2<T, B, R>::operator =(std::initializer_list<value_type> args)
 template <class T, class B, class R> Array2<T, B, R>&
 Array2<T, B, R>::operator =(const element_type& c)
 {
-    std::fill(begin(), end(), c);
+    super::operator =(c);
     return *this;
 }
 
