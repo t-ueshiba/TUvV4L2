@@ -229,7 +229,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	    f.update(x_new, dx(0, xdim));
 	    const vector_type&	fval_new = f(x_new);
 	    const element_type	sqr_new  = fval_new * fval_new;
-#ifdef TUMinimizePP_DEBUG
+#ifdef TU_MINIMIZE_DEBUG
 	    cerr << "val^2 = " << sqr << ", gval = " << gval
 		 << "  (update: val^2 = " << sqr_new
 		 << ", lambda = " << lambda << ")" << endl;
@@ -433,7 +433,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		fval_new[j] = f(a_new, b_new[j], j);
 		sqr_new	   += fval_new[j] * fval_new[j];
 	    }
-#ifdef TUMinimizePP_DEBUG
+#ifdef TU_MINIMIZE_DEBUG
 	    cerr << "val^2 = " << sqr << ", gval = " << gval
 		 << "  (update: val^2 = " << sqr_new
 		 << ", lambda = " << lambda << ")" << endl;
@@ -586,7 +586,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		fval_new[j] = f(a_new, b_new[j], j);
 		sqr_new	   += fval_new[j] * fval_new[j];
 	    }
-#ifdef TUMinimizePP_DEBUG
+#ifdef TU_MINIMIZE_DEBUG
 	    cerr << "val^2 = " << sqr << ", gval = " << gval
 		 << "  (update: val^2 = " << sqr_new
 		 << ", lambda = " << lambda << ")" << endl;

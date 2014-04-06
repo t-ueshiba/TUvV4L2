@@ -79,7 +79,7 @@ class Mesh
 	friend class	Edge;
 
       protected:
-#ifndef TUMeshPP_DEBUG
+#ifndef TU_MESH_DEBUG
 	Face(viterator v[])						;
 #else
 	Face(viterator v[], size_t fn)					;
@@ -91,7 +91,7 @@ class Mesh
       private:
 	viterator	_v[NSides];	//!< この面の頂点を指す反復子
 	fiterator	_f[NSides];	//!< この面に隣接する面を指す反復子
-#ifdef TUMeshPP_DEBUG
+#ifdef TU_MESH_DEBUG
       public:
 	const size_t	fnum;
 #endif
@@ -179,7 +179,7 @@ class Mesh
     const_fiterator	fbegin()				const	;
     fiterator		fend()						;
     const_fiterator	fend()					const	;
-#ifdef TUMeshPP_DEBUG
+#ifdef TU_MESH_DEBUG
     std::ostream&	showTopology(std::ostream& out)		const	;
 #endif
     std::istream&	restoreSTL(std::istream& in)			;
@@ -507,7 +507,7 @@ Mesh<V, F, M>::fend() const
     return _faces.end();
 }
 
-#ifdef TUMeshPP_DEBUG
+#ifdef TU_MESH_DEBUG
 //! 出力ストリームにこのメッシュを構成する面の接続関係を書き出す．
 /*!
   \param out	出力ストリーム
@@ -571,7 +571,7 @@ Mesh<V, F, M>::restoreSTL(std::istream& in)
 	}
 
 	viterator	v[] = {vf[0]->first, vf[1]->first, vf[2]->first};
-#ifndef TUMeshPP_DEBUG
+#ifndef TU_MESH_DEBUG
 	fiterator	f = newFace(F(v));	// 新しい面を生成
 #else
 	fiterator	f = newFace(F(v, i));	// 新しい面を生成
@@ -669,7 +669,7 @@ Mesh<V, F, M>::get(std::istream& in)
 	    --vnum[e];			// 頂点番号は1から始まるのでデクリメント
 	    v[e] = verticesWithFaces[vnum[e]].first;	// 反復子を取り出す
 	}
-#ifndef TUMeshPP_DEBUG
+#ifndef TU_MESH_DEBUG
 	fiterator	f = newFace(F(v));		// 新しい面を生成
 #else
 	fiterator	f = newFace(F(v, fnum));	// 新しい面を生成
@@ -757,7 +757,7 @@ Mesh<V, F, M>::setTopology(const VF& verticesWithFaces)
 	    continue;
 	}
     }
-#ifdef TUMeshPP_DEBUG
+#ifdef TU_MESH_DEBUG
     showTopology(cerr);
 #endif
 }
@@ -814,7 +814,7 @@ Mesh<V, F, M>::deleteFace(fiterator f)
   \param v	M個の頂点への反復子
 */
 template <class V, class F, size_t M> inline
-#ifndef TUMeshPP_DEBUG
+#ifndef TU_MESH_DEBUG
 Mesh<V, F, M>::Face::Face(viterator v[])
 #else
 Mesh<V, F, M>::Face::Face(viterator v[], size_t fn)

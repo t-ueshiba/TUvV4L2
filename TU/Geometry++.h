@@ -2319,7 +2319,7 @@ operator &(const BoundingBox<P>& a, const BoundingBox<P>& b)
 template <class P> std::ostream&
 operator <<(std::ostream& out, const BoundingBox<P>& bbox)
 {
-#ifdef _DEBUG
+#ifdef TU_DEBUG
     for (size_t i = 0; i < bbox.dim(); ++i)
     {
 	if (i != 0)

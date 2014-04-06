@@ -264,8 +264,8 @@ class vec
     vec<value_type>&	operator ^=(vec<value_type> x)	;
     vec<value_type>&	andnot(vec<value_type> x)	;
 
-    int			operator [](int i)	const	;
-    value_type&		operator [](int i)		;
+    int			operator [](size_t i)	const	;
+    value_type&		operator [](size_t i)		;
     
     static size_t	floor(size_t n)	{return size*(n/size);}
     static size_t	ceil(size_t n)	{return (n == 0 ? 0 :
@@ -276,16 +276,16 @@ class vec
 };
 
 template <class T> inline int
-vec<T>::operator [](int i) const
+vec<T>::operator [](size_t i) const
 {
-    assert((0 <= i) && (i < size));
+    assert(i < size);
     return *((value_type*)&_base + i);
 }
     
 template <class T> inline typename vec<T>::value_type&
-vec<T>::operator [](int i)
+vec<T>::operator [](size_t i)
 {
-    assert((0 <= i) && (i < size));
+    assert(i < size);
     return *((value_type*)&_base + i);
 }
 
@@ -335,8 +335,8 @@ class vec<float>
     vec<value_type>&	operator ^=(vec<value_type> x)	;
     vec<value_type>&	andnot(vec<value_type> x)	;
 
-    const value_type&	operator [](int i)	const	;
-    value_type&		operator [](int i)		;
+    const value_type&	operator [](size_t i)	const	;
+    value_type&		operator [](size_t i)		;
     
     static size_t	floor(size_t n)	{return size*(n/size);}
     static size_t	ceil(size_t n)	{return (n == 0 ? 0 :
@@ -347,16 +347,16 @@ class vec<float>
 };
 
 inline const typename vec<float>::value_type&
-vec<float>::operator [](int i) const
+vec<float>::operator [](size_t i) const
 {
-    assert((0 <= i) && (i < size));
+    assert(i < size);
     return *((value_type*)&_base + i);
 }
     
 inline typename vec<float>::value_type&
-vec<float>::operator [](int i)
+vec<float>::operator [](size_t i)
 {
-    assert((0 <= i) && (i < size));
+    assert(i < size);
     return *((value_type*)&_base + i);
 }
 
@@ -397,8 +397,8 @@ class vec<double>
     vec<value_type>&	operator ^=(vec<value_type> x)	;
     vec<value_type>&	andnot(vec<value_type> x)	;
 
-    const value_type&	operator [](int i)	const	;
-    value_type&		operator [](int i)		;
+    const value_type&	operator [](size_t i)	const	;
+    value_type&		operator [](size_t i)		;
     
     static size_t	floor(size_t n)	{return size*(n/size);}
     static size_t	ceil(size_t n)	{return (n == 0 ? 0 :
@@ -409,16 +409,16 @@ class vec<double>
 };
 
 inline const typename vec<double>::value_type&
-vec<double>::operator [](int i) const
+vec<double>::operator [](size_t i) const
 {
-    assert((0 <= i) && (i < size));
+    assert(i < size);
     return *((value_type*)&_base + i);
 }
     
 inline typename vec<double>::value_type&
-vec<double>::operator [](int i)
+vec<double>::operator [](size_t i)
 {
-    assert((0 <= i) && (i < size));
+    assert(i < size);
     return *((value_type*)&_base + i);
 }
 
