@@ -246,7 +246,7 @@ SparseMatrix<T, SYM>::endInit()
 	if (nrow() != ncol())
 	    throw std::logic_error("SparseMatrix<T, true>::endInit(): the numbers of rows and columns must be equal!");
     }
-#ifdef LIBTUTOOLS_DEBUG
+#ifdef TU_DEBUG
     if (SYM)
     {
       // 各行の先頭成分が対角成分であるか？
@@ -574,7 +574,7 @@ SparseMatrix<T, SYM>::operator ()(size_t i, size_t j, size_t d) const
     {
 	for (size_t je = std::min(i, j + v.size()); j + dj < je; ++dj)
 	{
-#ifdef LIBTUTOOLS_DEBUG
+#ifdef TU_DEBUG
 	    if (p != &_values[index(i, j+dj, true)])
 		throw std::invalid_argument("TU::SparseMatrix<T, SYM>::operator (): accessing non-existent element!");
 #endif
@@ -584,7 +584,7 @@ SparseMatrix<T, SYM>::operator ()(size_t i, size_t j, size_t d) const
     }
     for (; dj < v.size(); ++dj)
     {
-#ifdef LIBTUTOOLS_DEBUG
+#ifdef TU_DEBUG
 	if (p != &_values[index(i, j+dj, true)])
 	    throw std::invalid_argument("TU::SparseMatrix<T, SYM>::operator (): accessing non-existent element!");
 #endif
@@ -661,7 +661,7 @@ SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Vector<S, B>& v)
     {
 	for (size_t je = std::min(i, j + v.size()); j + dj < je; ++dj)
 	{
-#ifdef LIBTUTOOLS_DEBUG
+#ifdef TU_DEBUG
 	    if (p != &_values[index(i, j+dj, true)])
 		throw std::invalid_argument("TU::SparseMatrix<T, SYM>::apply(): accessing non-existent element!");
 #endif
@@ -671,7 +671,7 @@ SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Vector<S, B>& v)
     }
     for (; dj < v.size(); ++dj)
     {
-#ifdef LIBTUTOOLS_DEBUG
+#ifdef TU_DEBUG
 	if (p != &_values[index(i, j+dj, true)])
 	    throw std::invalid_argument("TU::SparseMatrix<T, SYM>::apply(): accessing non-existent element!");
 #endif

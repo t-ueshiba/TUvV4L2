@@ -35,7 +35,7 @@
 #define __TUfunctional_h
 
 #include <functional>
-#include <stdexcept>
+#include <cassert>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits.hpp>
 
@@ -418,11 +418,7 @@ class binary_operator : public container<binary_operator<OP, L, R> >,
 		   const container<R>& r, const OP& op)
 	:_l(l()), _r(r()), _op(op)
 			{
-#if !defined(NO_CHECK_SIZE)
-    			    const size_t	d = _l.size();
-			    if (d != _r.size())
-				throw std::logic_error("binary_operator<OP, L, R>::binary_operator: mismatched size!");
-#endif
+			    assert(_l.size() == _r.size());
 			}
 
   //! 演算結果の先頭要素を指す定数反復子を返す.

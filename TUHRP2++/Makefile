@@ -12,7 +12,7 @@ NAME		= $(shell basename $(PWD))
 #NAME		= TUHRP2SH++
 
 #CXX		= g++
-CPPFLAGS	= -DHRP2SH
+CPPFLAGS	= -DNDEBUG -DHRP2SH
 CFLAGS		= -O2 `rtm-config --cflags` 
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)

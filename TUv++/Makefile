@@ -10,7 +10,7 @@ INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	= -DXAW_INTERNATIONALIZATION
+CPPFLAGS	= -DXAW_INTERNATIONALIZATION -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
@@ -173,315 +173,313 @@ OBJS		= App.o \
 
 include $(PROJECT)/lib/l.mk
 ###
-App.o: TU/v/App.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h
-Bitmap.o: TU/v/Bitmap.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+App.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 Bitmap.o: TU/v/Bitmap.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 ButtonCmd.o: ButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h TU/v/Bitmap.h
 CanvasPane.o: TU/v/CanvasPane.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h vViewport_.h vGridbox_.h
 CanvasPaneDC.o: TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Manip.h TU/v/Colormap.h TU/v/CanvasPane.h \
-	TU/v/TUv++.h /usr/local/include/TU/List.h TU/v/Widget-Xaw.h \
-	TU/v/Menu.h vCanvas_.h vViewport_.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h \
+	TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TUv++.h \
+	/usr/local/include/TU/List.h TU/v/Widget-Xaw.h TU/v/Menu.h vCanvas_.h \
+	vViewport_.h
 CanvasPaneDC3.o: TU/v/CanvasPaneDC3.h TU/v/CanvasPaneDC.h TU/v/XDC.h \
 	TU/v/DC.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Manip.h TU/v/Colormap.h TU/v/CanvasPane.h \
-	TU/v/TUv++.h /usr/local/include/TU/List.h TU/v/Widget-Xaw.h \
-	TU/v/Menu.h TU/v/DC3.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h \
+	TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TUv++.h \
+	/usr/local/include/TU/List.h TU/v/Widget-Xaw.h TU/v/Menu.h TU/v/DC3.h
 ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h TU/v/TUv++.h \
 	TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Colormap.h TU/v/CanvasPane.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/Menu.h \
-	/usr/local/include/TU/v/DC3.h
-ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 ChoiceMenuButtonCmd.o: ChoiceMenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h \
 	TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h
-Cmd.o: /usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 Cmd.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h LabelCmd_.h SliderCmd_.h FrameCmd_.h ButtonCmd_.h \
 	TU/v/Bitmap.h ToggleButtonCmd_.h MenuButtonCmd_.h TU/v/Menu.h \
 	ChoiceMenuButtonCmd_.h RadioButtonCmd_.h ChoiceFrameCmd_.h ListCmd_.h \
 	TextInCmd_.h
-CmdPane.o: TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+CmdPane.o: TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h vGridbox_.h
 CmdParent.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 CmdWindow.o: TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h TU/v/App.h vGridbox_.h
 Colormap.o: TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 Confirm.o: TU/v/Confirm.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 DC.o: TU/v/DC.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Manip.h
-DC3.o: /usr/local/include/TU/v/DC3.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h
+DC3.o: TU/v/DC3.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Manip.h
-Dialog.o: /usr/local/include/TU/v/Dialog.h TU/v/CmdPane.h \
-	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/types.h
+Dialog.o: TU/v/Dialog.h TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h \
+	TU/v/Colormap.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 FileSelection.o: TU/v/FileSelection.h TU/v/ModalDialog.h TU/v/Dialog.h \
 	TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h TU/v/Notify.h TU/v/Confirm.h
 FrameCmd.o: FrameCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 Icon.o: TU/v/Icon.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 LabelCmd.o: LabelCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 ListCmd.o: ListCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h vViewport_.h
 MemoryDC.o: TU/v/MemoryDC.h TU/v/XDC.h TU/v/DC.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Manip.h TU/v/Colormap.h TU/v/CanvasPane.h \
-	TU/v/TUv++.h /usr/local/include/TU/List.h TU/v/Widget-Xaw.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h \
+	TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TUv++.h \
+	/usr/local/include/TU/List.h TU/v/Widget-Xaw.h
 Menu.o: TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h TU/v/Bitmap.h
 MenuButtonCmd.o: MenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 ModalDialog.o: TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 Notify.o: TU/v/Notify.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 Object.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 Pane.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h vGridbox_.h
 RadioButtonCmd.o: TU/v/Bitmap.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h RadioButtonCmd_.h TU/v/TUv++.h \
 	/usr/local/include/TU/List.h TU/v/Widget-Xaw.h vGridbox_.h
 ShmDC.o: TU/v/ShmDC.h TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Manip.h TU/v/Colormap.h TU/v/CanvasPane.h \
-	TU/v/TUv++.h /usr/local/include/TU/List.h TU/v/Widget-Xaw.h \
-	TU/v/Menu.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h \
+	TU/v/Colormap.h TU/v/CanvasPane.h TU/v/TUv++.h \
+	/usr/local/include/TU/List.h TU/v/Widget-Xaw.h TU/v/Menu.h
 SliderCmd.o: SliderCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h vSlider_.h vGridbox_.h
 TUv++.inst.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 TextInCmd.o: TextInCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h vTextField_.h
 Timer.o: TU/v/Timer.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h TU/v/App.h
 ToggleButtonCmd.o: ToggleButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h TU/v/Bitmap.h
 Widget-Xaw.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h vGridbox_.h vTextField_.h vViewport_.h
 Window.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	TU/v/Widget-Xaw.h
 XDC.o: TU/v/XDC.h TU/v/DC.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Manip.h TU/v/Colormap.h
+	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h \
+	TU/v/Colormap.h
 vCanvas.o: vCanvasP_.h vCanvas_.h
 vGridbox.o: vGridboxP_.h vGridbox_.h
 vSlider.o: vSliderP_.h vSlider_.h

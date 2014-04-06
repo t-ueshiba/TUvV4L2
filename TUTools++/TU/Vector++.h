@@ -826,10 +826,9 @@ class Vector : public Array<T, B>
     
     const Vector<T>	operator ()(size_t i, size_t d)		const	;
     Vector<T>		operator ()(size_t i, size_t d)			;
-    Vector&		operator  =(element_type c)			;
-    Vector&		operator *=(element_type c)			;
-    template <class T2>
-    Vector&		operator /=(T2 c)				;
+    Vector&		operator  =(const element_type& c)		;
+    Vector&		operator *=(const element_type& c)		;
+    Vector&		operator /=(const element_type& c)		;
     template <class E>
     Vector&		operator +=(const container<E>& v)		;
     template <class E>
@@ -949,7 +948,7 @@ Vector<T, B>::operator ()(size_t i, size_t d) const
   \return	このベクトル
 */
 template <class T, class B> inline Vector<T, B>&
-Vector<T, B>::operator =(element_type c)
+Vector<T, B>::operator =(const element_type& c)
 {
     super::operator =(c);
     return *this;
@@ -961,7 +960,7 @@ Vector<T, B>::operator =(element_type c)
   \return	このベクトル，すなわち\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$
 */
 template <class T, class B> inline Vector<T, B>&
-Vector<T, B>::operator *=(element_type c)
+Vector<T, B>::operator *=(const element_type& c)
 {
     super::operator *=(c);
     return *this;
@@ -973,8 +972,8 @@ Vector<T, B>::operator *=(element_type c)
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \frac{\TUvec{u}{}}{c}\f$
 */
-template <class T, class B> template <class T2> inline Vector<T, B>&
-Vector<T, B>::operator /=(T2 c)
+template <class T, class B> inline Vector<T, B>&
+Vector<T, B>::operator /=(const element_type& c)
 {
     super::operator /=(c);
     return *this;
@@ -1246,10 +1245,9 @@ class Matrix : public Array2<Vector<T>, B, R>
 				    size_t r, size_t c)		const	;
     Matrix<T>		operator ()(size_t i, size_t j,
 				    size_t r, size_t c)			;
-    Matrix&		operator  =(element_type c)			;
-    Matrix&		operator *=(element_type c)			;
-    template <class T2>
-    Matrix&		operator /=(T2 c)				;
+    Matrix&		operator  =(const element_type& c)		;
+    Matrix&		operator *=(const element_type& c)		;
+    Matrix&		operator /=(const element_type& c)		;
     template <class E>
     Matrix&		operator +=(const container<E>& m)		;
     template <class E>
@@ -1402,7 +1400,7 @@ Matrix<T, B, R>::operator ()(size_t i, size_t j, size_t r, size_t c) const
   \return	この行列
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator =(element_type c)
+Matrix<T, B, R>::operator =(const element_type& c)
 {
     super::operator =(c);
     return *this;
@@ -1414,7 +1412,7 @@ Matrix<T, B, R>::operator =(element_type c)
   \return	この行列，すなわち\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
 */
 template <class T, class B, class R> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator *=(element_type c)
+Matrix<T, B, R>::operator *=(const element_type& c)
 {
     super::operator *=(c);
     return *this;
@@ -1426,9 +1424,8 @@ Matrix<T, B, R>::operator *=(element_type c)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \frac{\TUvec{A}{}}{c}\f$
 */
-template <class T, class B, class R> template <class T2>
-inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator /=(T2 c)
+template <class T, class B, class R> inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator /=(const element_type& c)
 {
     super::operator /=(c);
     return *this;
@@ -2659,7 +2656,7 @@ TriDiagonal<T>::diagonalize(bool abs)
     {
 	int	niter = 0;
 	
-#ifdef TUVectorPP_DEBUG
+#ifdef TU_DEBUG
 	cerr << "******** n = " << n << " ********" << endl;
 #endif
 	while (!off_diagonal_is_zero(n))
@@ -2699,7 +2696,7 @@ TriDiagonal<T>::diagonalize(bool abs)
 		    _off_diagonal[i+1] *= rot.cos();
 		}
 	    }
-#ifdef TUVectorPP_DEBUG
+#ifdef TU_DEBUG
 	    cerr << "  niter = " << niter << ": " << off_diagonal();
 #endif	    
 	}
@@ -2893,7 +2890,7 @@ BiDiagonal<T>::diagonalize()
     {
 	size_t	niter = 0;
 	
-#ifdef TUVectorPP_DEBUG
+#ifdef TU_DEBUG
 	cerr << "******** n = " << n << " ********" << endl;
 #endif
 	while (!off_diagonal_is_zero(n))	// n > 0 here
@@ -2933,7 +2930,7 @@ BiDiagonal<T>::diagonalize()
 	  /* Set x and y which determine initial(i = m+1) plane rotation */
 	    T	x, y;
 	    initialize_rotation(m, n, x, y);
-#ifdef TUBiDiagonal_DEBUG
+#ifdef TU_DEBUG
 	    cerr << "--- m = " << m << ", n = " << n << "---"
 		 << endl;
 	    cerr << "  diagonal:     " << diagonal();
@@ -2980,7 +2977,7 @@ BiDiagonal<T>::diagonalize()
 		    x		        = _off_diagonal[i];
 		}
 	    }
-#ifdef TUVectorPP_DEBUG
+#ifdef TU_DEBUG
 	    cerr << "  niter = " << niter << ": " << off_diagonal();
 #endif
 	}

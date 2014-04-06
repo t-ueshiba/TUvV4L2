@@ -36,6 +36,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <cassert>
 #include <iostream>
 #include <iomanip>
 #include "TU/iterator.h"
@@ -121,6 +122,23 @@ class Buf : public BufTraits<T, ALIGNED>
     static size_t	stride(size_t siz)			;
     std::istream&	get(std::istream& in, size_t m=0)	;
 
+  protected:
+    template <class OP, class ITER>
+    void		for_each(ITER src, const OP& op)
+			{
+			    for (iterator dst = begin(), last = end();
+				 dst != last; ++dst, ++src)
+				op(*src, *dst);
+			}
+    template <class OP>
+    void		for_each1(const typename OP::first_argument_type& c,
+				  const OP& op)
+			{
+			    for (iterator dst = begin(), last = end();
+				 dst != last; ++dst)
+				op(c, *dst);
+			}
+    
   private:
     template <bool _ALIGNED, class=void>
     struct Allocator
@@ -491,20 +509,41 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
     static size_t	stride(size_t siz)			;
     std::istream&	get(std::istream& in)			;
 
+  protected:
+    template <class OP, class ITER>
+    void		for_each(ITER src, const OP& op)
+			{
+			    for_each_impl<0, OP>::exec(src, begin(), op);
+			}
+    template <class OP>
+    void		for_each1(const typename OP::first_argument_type& c,
+				  const OP& op)
+			{
+			    for_each_impl<0, OP>::exec(c, begin(), op);
+			}
+    
   private:
-    template <size_t N, class=void>
-    struct copy
+    template <size_t N, class OP>
+    struct for_each_impl
     {
-	void	exec(const_iterator src, iterator dst) const
-		{
-		    *dst = *src;
-		    copy<N+1>().exec(++src, ++dst);
-		}
+	template <class _ITER>
+	static void	exec(_ITER src, iterator dst, const OP& op)
+			{
+			    op(*src, *dst);
+			    for_each_impl<N+1, OP>::exec(++src, ++dst, op);
+			}
+	static void	exec(const typename OP::first_argument_type& c,
+			     iterator dst, const OP& op)
+			{
+			    op(c, *dst);
+			    for_each_impl<N+1, OP>::exec(c, ++dst, op);
+			}
     };
-    template <class DUMMY>
-    struct copy<D, DUMMY>
+    template <class OP>
+    struct for_each_impl<D, OP>
     {
-	void	exec(const_iterator, iterator)		const	{}
+	template <class _ANY>
+	static void	exec(_ANY, iterator, const OP&)		{}
     };
     
     template <bool _ALIGNED, class=void>
@@ -546,7 +585,7 @@ FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(pointer, size_t)
 template <class T, size_t D, bool ALIGNED>
 FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(const FixedSizedBuf& b)
 {
-    copy<0>().exec(b.begin(), begin());
+    for_each(b.begin(), assign<value_type, reference>());
 }
 
 //! 標準代入演算子
@@ -554,7 +593,7 @@ template <class T, size_t D, bool ALIGNED> FixedSizedBuf<T, D, ALIGNED>&
 FixedSizedBuf<T, D, ALIGNED>::operator =(const FixedSizedBuf& b)
 {
     if (this != &b)
-	copy<0>().exec(b.begin(), begin());
+	for_each(b.begin(), assign<value_type, reference>());
     return *this;
 }
 
@@ -633,16 +672,13 @@ FixedSizedBuf<T, D, ALIGNED>::size()
 /*!
   実際にはバッファの要素数を変更することはできないので，与えられた要素数が
   このバッファの要素数に等しい場合のみ，通常どおりにこの関数から制御が返る．
-  \param siz			新しい要素数
-  \return			常にfalse
-  \throw std::logic_error	sizがテンプレートパラメータDに一致しない場合に
-				送出
+  \param siz	新しい要素数
+  \return	常にfalse
 */
 template <class T, size_t D, bool ALIGNED> inline bool
 FixedSizedBuf<T, D, ALIGNED>::resize(size_t siz)
 {
-    if (siz != D)
-	throw std::logic_error("FixedSizedBuf<T, D, ALIGNED>::resize(size_t): cannot change buffer size!!");
+    assert(siz == D);
     return false;
 }
     
@@ -651,17 +687,13 @@ FixedSizedBuf<T, D, ALIGNED>::resize(size_t siz)
   実際にはバッファの記憶領域を変更することはできないので，与えられたポインタ
   と要素数がこのバッファのそれらに等しい場合のみ，通常どおりにこの関数から制御
   が返る．
-  \param p			新しい記憶領域へのポインタ
-  \param siz			新しい要素数
-  \throw std::logic_error	pがこのバッファの内部記憶領域に一致しないか，
-				sizがテンプレートパラメータDに一致しない場合に
-				送出
+  \param p	新しい記憶領域へのポインタ
+  \param siz	新しい要素数
 */
 template <class T, size_t D, bool ALIGNED> inline void
 FixedSizedBuf<T, D, ALIGNED>::resize(pointer p, size_t siz)
 {
-    if (p != _buf.p || siz != D)
-	throw std::logic_error("FixedSizedBuf<T, D, ALIGNED>::resize(pointer, size_t): cannot specify a potiner to external storage!!");
+    assert(p == _buf.p && siz == D);
 }
     
 //! 記憶領域をalignするために必要な要素数を返す．
@@ -776,9 +808,8 @@ class Array : public B, public container<Array<T, B> >
 
     reference		operator [](size_t i)				;
     const_reference	operator [](size_t i)			const	;
-    Array&		operator *=(element_type c)			;
-    template <class T2>
-    Array&		operator /=(T2 c)				;
+    Array&		operator *=(const element_type& c)		;
+    Array&		operator /=(const element_type& c)		;
     template <class E>
     Array&		operator +=(const container<E>& expr)		;
     template <class E>
@@ -847,7 +878,8 @@ template <class T, class B> template <class E>
 Array<T, B>::Array(const container<E>& expr)
     :super(expr().size())
 {
-    std::copy(expr().begin(), expr().end(), begin());
+    super::for_each(expr().begin(),
+		    assign<typename E::value_type, reference>());
 }
 	
 //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -860,7 +892,8 @@ template <class T, class B> template <class E> Array<T, B>&
 Array<T, B>::operator =(const container<E>& expr)
 {
     resize(expr().size());
-    std::copy(expr().begin(), expr().end(), begin());
+    super::for_each(expr().begin(),
+		    assign<typename E::value_type, reference>());
     return *this;
 }
 
@@ -903,7 +936,7 @@ Array<T, B>::operator =(std::initializer_list<value_type> args)
 template <class T, class B> Array<T, B>&
 Array<T, B>::operator =(const element_type& c)
 {
-    std::fill(begin(), end(), c);
+    super::for_each1(c, assign<element_type, reference>());
     return *this;
 }
 
@@ -981,35 +1014,27 @@ Array<T, B>::crend() const
     return rend();
 }
 
-//! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
+//! 配列の要素へアクセスする
 /*!
-  \param i			要素を指定するindex
-  \return			indexによって指定された要素
-  \throw std::out_of_range	0 <= i < size()でない場合に送出
+  \param i	要素を指定するindex
+  \return	indexによって指定された要素
 */
 template <class T, class B> inline typename Array<T, B>::reference
 Array<T, B>::operator [](size_t i)
 {
-#if defined(LIBTUTOOLS_DEBUG)
-    if (i < 0 || size_t(i) >= size())
-	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
-#endif
+    assert(i < size());
     return *(begin() + i);
 }
 
-//! 配列の要素へアクセスする（LIBTUTOOLS_DEBUGを指定するとindexのチェックあり）
+//! 配列の要素へアクセスする
 /*!
-  \param i			要素を指定するindex
-  \return			indexによって指定された要素
-  \throw std::out_of_range	0 <= i < size()でない場合に送出
+  \param i	要素を指定するindex
+  \return	indexによって指定された要素
 */
 template <class T, class B> inline typename Array<T, B>::const_reference
 Array<T, B>::operator [](size_t i) const
 {
-#if defined(LIBTUTOOLS_DEBUG)
-    if (i < 0 || size_t(i) >= size())
-	throw std::out_of_range("TU::Array<T, B>::operator []: invalid index!");
-#endif
+    assert(i < size());
     return *(begin() + i);
 }
 
@@ -1019,10 +1044,9 @@ Array<T, B>::operator [](size_t i) const
   \return	この配列
 */
 template <class T, class B> Array<T, B>&
-Array<T, B>::operator *=(element_type c)
+Array<T, B>::operator *=(const element_type& c)
 {
-    for (iterator q = begin(), qe = end(); q != qe; ++q)
-	*q *= c;
+    super::for_each1(c, multiplies_assign<element_type, reference>());
     return *this;
 }
 
@@ -1031,11 +1055,10 @@ Array<T, B>::operator *=(element_type c)
   \param c	割る数値
   \return	この配列
 */
-template <class T, class B> template <class T2> inline Array<T, B>&
-Array<T, B>::operator /=(T2 c)
+template <class T, class B> inline Array<T, B>&
+Array<T, B>::operator /=(const element_type& c)
 {
-    for (iterator q = begin(), qe = end(); q != qe; ++q)
-	*q /= c;
+    super::for_each1(c, divides_assign<element_type, reference>());
     return *this;
 }
 
@@ -1047,10 +1070,9 @@ Array<T, B>::operator /=(T2 c)
 template <class T, class B> template <class E> Array<T, B>&
 Array<T, B>::operator +=(const container<E>& expr)
 {
-    check_size(expr().size());
-    typename E::const_iterator	p = expr().begin();
-    for (iterator q = begin(), qe = end(); q != qe; ++q, ++p)
-	*q += *p;
+    assert(size() == expr().size());
+    super::for_each(expr().begin(),
+		    plus_assign<typename E::value_type, reference>());
     return *this;
 }
 
@@ -1062,10 +1084,9 @@ Array<T, B>::operator +=(const container<E>& expr)
 template <class T, class B> template <class E> Array<T, B>&
 Array<T, B>::operator -=(const container<E>& expr)
 {
-    check_size(expr().size());
-    typename E::const_iterator	p = expr().begin();
-    for (iterator q = begin(), qe = end(); q != qe; ++q, ++p)
-	*q -= *p;
+    assert(size() == expr().size());
+    super::for_each(expr().begin(),
+		    minus_assign<typename E::value_type, reference>());
     return *this;
 }
 
@@ -1307,12 +1328,11 @@ Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
 			size_t i, size_t j, size_t r, size_t c)
     :super(super::partial_size(i, r, a.size())),
      _ncol(super::partial_size(j, c, a.ncol())),
-     _buf((size() > 0 && ncol() > 0 ?
-	   pointer(&a[i][j]) : pointer((typename buf_type::value_type*)0)),
+     _buf((size() > 0 && ncol() > 0 ? a[i].data() + j : pointer(0)),
 	  size()*_buf.stride(ncol()))
 {
     for (size_t ii = 0; ii < size(); ++ii)
-	(*this)[ii].resize(pointer(&a[i+ii][j]), ncol());
+	(*this)[ii].resize(a[i+ii].data() + j, ncol());
 }    
 
 //! コピーコンストラクタ
@@ -1321,8 +1341,7 @@ Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
 */
 template <class T, class B, class R> inline
 Array2<T, B, R>::Array2(const Array2& a)
-    :super(a.size()), _ncol(a.ncol()),
-     _buf(size()*_buf.stride(ncol()))
+    :super(a.size()), _ncol(a.ncol()), _buf(size()*_buf.stride(ncol()))
 {
     set_rows();
     super::operator =((const super&)a);

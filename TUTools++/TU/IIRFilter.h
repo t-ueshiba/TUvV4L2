@@ -522,7 +522,7 @@ BidirectionalIIRFilter<D, T>::initialize(const T cF[D+D], const T cB[D+D])
 {
     _iirF.initialize(cF);
     _iirB.initialize(cB);
-#ifdef _DEBUG
+#ifdef TU_DEBUG
   /*T	limit0, limit1, limit2;
     limits(limit0, limit1, limit2);
     std::cerr << "limit0 = " << limit0 << ", limit1 = " << limit1
