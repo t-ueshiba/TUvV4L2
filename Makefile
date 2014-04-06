@@ -10,7 +10,7 @@ INCDIRS		= -I. -I$(PREFIX)/include
 
 NAME		= $(shell basename $(PWD))
 
-CPPFLAGS	= -DHAVE_LIBTUTOOLS__
+CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
