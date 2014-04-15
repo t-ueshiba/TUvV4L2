@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.3 2012-08-31 02:38:43 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
@@ -7,7 +7,7 @@
 DEST		= $(PREFIX)/bin
 INCDIRS		= -I$(PREFIX)/include
 
-PROGRAM		= mmtest
+PROGRAM		= $(shell basename $(PWD))
 LIBS		=
 ifeq ($(OSTYPE), darwin)
   LIBS	       +=
