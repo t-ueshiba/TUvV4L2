@@ -41,7 +41,7 @@ namespace mm
 template <class T> static inline void
 correct(T* p, F32vec a, F32vec b)
 {
-    const size_t		nelms = F32vec::size;
+    const size_t	nelms = F32vec::size;
     const Iu8vec	val = load<false>((const u_char*)p);
 #  if defined(SSE2)
     store<false>((u_char*)p,
@@ -64,7 +64,7 @@ template <> inline void
 correct(short* p, F32vec a, F32vec b)
 {
 #  if defined(SSE2)
-    const size_t		nelms = F32vec::size;
+    const size_t	nelms = F32vec::size;
     const Is16vec	val = load<false>(p);
     store<false>(p, cvt<short>(cvt<int>(a + b * cvt<float>(val)),
 			       cvt<int>(a + b * cvt<float>(
@@ -165,9 +165,5 @@ template __PORT void
 CorrectIntensity::operator ()(Image<short>& image,  size_t vs, size_t ve) const;
 template __PORT void
 CorrectIntensity::operator ()(Image<float>& image,  size_t vs, size_t ve) const;
-template __PORT void
-CorrectIntensity::operator ()(Image<RGBA>& image,   size_t vs, size_t ve) const;
-template __PORT void
-CorrectIntensity::operator ()(Image<ABGR>& image,   size_t vs, size_t ve) const;
     
 }

@@ -61,6 +61,7 @@
 #include <immintrin.h>
 #include <iostream>
 #include <cassert>
+#include <boost/utility/enable_if.hpp>
 #include "TU/iterator.h"
 
 /************************************************************************
@@ -196,12 +197,18 @@ namespace mm
     
 #if defined(AVX)
   typedef __m256	fvec_t;		//!< floatベクトルのSIMD型
-  typedef __m256d	dvec_t;		//!< doubleベクトルのSIMD型
 #elif defined(SSE)
   typedef __m128	fvec_t;		//!< floatベクトルのSIMD型
-#  if defined(SSE2)  
+#else
+  typedef char		fvec_t;		//!< ダミー
+#endif
+
+#if defined(AVX)
+  typedef __m256d	dvec_t;		//!< doubleベクトルのSIMD型
+#elif defined(SSE2)
   typedef __m128d	dvec_t;		//!< doubleベクトルのSIMD型
-#  endif
+#else
+  typedef char		dvec_t;		//!< ダミー
 #endif
 
 /************************************************************************
@@ -212,57 +219,59 @@ template <class T>	struct type_traits;
 template <>
 struct type_traits<int8_t>
 {
-    typedef int8_t	signed_type;		//!< 同一サイズの符号付き整数
-    typedef u_int8_t	unsigned_type;		//!< 同一サイズの符号なし整数
-    typedef void	lower_type;		//!< 半分のサイズの整数
-    typedef int16_t	upper_type;		//!< 2倍のサイズの整数
-    typedef float	complementary_type;
-    typedef float	complementary_mask_type;
+    typedef u_int8_t	mask_type;		  //!< マスク
+    typedef int8_t	signed_type;		  //!< 同サイズの符号付き整数
+    typedef u_int8_t	unsigned_type;		  //!< 同サイズの符号なし整数
+    typedef void	lower_type;		  //!< 半サイズの整数
+    typedef int16_t	upper_type;		  //!< 倍サイズの整数
+    typedef float	complementary_type;	  //!< ダミー
+    typedef void	complementary_mask_type;  //!< ダミー
 };
     
 template <>
 struct type_traits<int16_t>
 {
+    typedef u_int16_t	mask_type;
     typedef int16_t	signed_type;
     typedef u_int16_t	unsigned_type;
     typedef int8_t	lower_type;
     typedef int32_t	upper_type;
     typedef float	complementary_type;
-    typedef float	complementary_mask_type;
+    typedef void	complementary_mask_type;
 };
     
 template <>
 struct type_traits<int32_t>
 {
+    typedef u_int32_t	mask_type;
     typedef int32_t	signed_type;
     typedef u_int32_t	unsigned_type;
     typedef int16_t	lower_type;
     typedef int64_t	upper_type;
-#if defined(SSE2)
     typedef typename boost::mpl::if_c<
-	sizeof(ivec_t) == sizeof(fvec_t),
-	float,
-	double>::type	complementary_type;	//!< 相互変換可能な浮動小数点数
-#else
-    typedef float	complementary_type;
-#endif
-    typedef float	complementary_mask_type;
+	(sizeof(fvec_t) == sizeof(ivec_t)) ||	// fvec_t と ivec_tが同サイズ
+	(sizeof(dvec_t) == sizeof(char)),	// または dvec_t が未定義なら...
+	float, double>::type
+			complementary_type;	//!< 相互変換可能な浮動小数点数
+    typedef void	complementary_mask_type;
 };
     
 template <>
 struct type_traits<int64_t>
 {
+    typedef u_int64_t	mask_type;
     typedef int64_t	signed_type;
     typedef u_int64_t	unsigned_type;
     typedef int32_t	lower_type;
     typedef void	upper_type;
-    typedef float	complementary_type;
-    typedef double	complementary_mask_type;
+    typedef double	complementary_type;
+    typedef void	complementary_mask_type;
 };
     
 template <>
 struct type_traits<u_int8_t>
 {
+    typedef u_int8_t	mask_type;
     typedef int8_t	signed_type;
     typedef u_int8_t	unsigned_type;
     typedef void	lower_type;
@@ -274,6 +283,7 @@ struct type_traits<u_int8_t>
 template <>
 struct type_traits<u_int16_t>
 {
+    typedef u_int16_t	mask_type;
     typedef int16_t	signed_type;
     typedef u_int16_t	unsigned_type;
     typedef u_int8_t	lower_type;
@@ -285,60 +295,61 @@ struct type_traits<u_int16_t>
 template <>
 struct type_traits<u_int32_t>
 {
+    typedef u_int32_t	mask_type;
     typedef int32_t	signed_type;
     typedef u_int32_t	unsigned_type;
     typedef u_int16_t	lower_type;
     typedef u_int64_t	upper_type;
     typedef float	complementary_type;
-    typedef float	complementary_mask_type;
+    typedef typename boost::mpl::if_c<
+	sizeof(ivec_t) == sizeof(fvec_t),
+	float, double>::type
+			complementary_mask_type;
 };
     
 template <>
 struct type_traits<u_int64_t>
 {
+    typedef u_int64_t	mask_type;
     typedef int64_t	signed_type;
     typedef u_int64_t	unsigned_type;
     typedef u_int32_t	lower_type;
     typedef void	upper_type;
-    typedef float	complementary_type;
+    typedef double	complementary_type;
     typedef double	complementary_mask_type;
 };
 
 template <>
 struct type_traits<float>
 {
-    typedef int32_t	signed_type;		//!< 同一サイズの符号付き整数
-    typedef u_int32_t	unsigned_type;		//!< 同一サイズの符号なし整数
+    typedef float	mask_type;
+    typedef int32_t	signed_type;
+    typedef u_int32_t	unsigned_type;
     typedef void	lower_type;
     typedef double	upper_type;
-#if defined(SSE)
     typedef typename boost::mpl::if_c<
 	sizeof(ivec_t) == sizeof(fvec_t),
-	int32_t,
-	int16_t>::type	complementary_type;	//!< 相互変換可能な符号付き整数
-#else
-    typedef void	complementary_type;
-#endif
-    typedef complementary_type
+	int32_t, int16_t>::type
+			complementary_type;
+    typedef typename boost::mpl::if_c<
+	sizeof(ivec_t) == sizeof(fvec_t),
+	u_int32_t, u_int16_t>::type
 			complementary_mask_type;
 };
 
 template <>
 struct type_traits<double>
 {
-    typedef int64_t	signed_type;		//!< 同一サイズの符号付き整数
-    typedef u_int64_t	unsigned_type;		//!< 同一サイズの符号なし整数
+    typedef double	mask_type;
+    typedef int64_t	signed_type;
+    typedef u_int64_t	unsigned_type;
     typedef float	lower_type;
     typedef void	upper_type;
-    typedef int32_t	complementary_type;	//!< 相互変換可能な符号付き整数
-#if defined(SSE2)
+    typedef int32_t	complementary_type;
     typedef typename boost::mpl::if_c<
 	sizeof(ivec_t) == sizeof(dvec_t),
-	int64_t,
-	int32_t>::type	complementary_mask_type;  //!< 成分数が等しい符号付き整数
-#else
-    typedef void	complementary_mask_type;
-#endif
+	u_int64_t, u_int32_t>::type
+			complementary_mask_type;
 };
 
 /************************************************************************
@@ -352,32 +363,27 @@ class vec
   //! 成分の型    
     typedef T							value_type;
   //! ベースとなるSIMDデータ型
-#  if defined(SSE2)
     typedef typename boost::mpl::if_<
 	boost::is_same<T, double>, dvec_t,
 	typename boost::mpl::if_<
 	    boost::is_same<T, float>,
 	    fvec_t, ivec_t>::type>::type			base_type;
-#  elif defined(SSE)
-    typedef typename boost::mpl::if_<
-	boost::is_same<T, float>, fvec_t, ivec_t>::type		base_type;
-#  else
-    typedef ivec_t						base_type;
-#  endif
+    typedef vec<typename type_traits<T>::mask_type>		mask_type;
+    
     enum	{value_size = sizeof(value_type),
 		 size	    = sizeof(base_type)/sizeof(value_type),
 		 lane_size  = (sizeof(base_type) > 16 ? 16/sizeof(value_type)
 						      : size)};
 
-    vec()						{}
-    vec(value_type a)					;
-    vec(value_type a1, value_type a0)			;
+    vec()				{}
+    vec(value_type a)			;
+    vec(value_type a1, value_type a0)	;
     vec(value_type a3, value_type a2,
-	value_type a1, value_type a0)			;
+	value_type a1, value_type a0)	;
     vec(value_type a7, value_type a6,
 	value_type a5, value_type a4,
 	value_type a3, value_type a2,
-	value_type a1, value_type a0)			;
+	value_type a1, value_type a0)	;
     vec(value_type a15, value_type a14,
 	value_type a13, value_type a12,
 	value_type a11, value_type a10,
@@ -385,7 +391,7 @@ class vec
 	value_type a7,  value_type a6,
 	value_type a5,  value_type a4,
 	value_type a3,  value_type a2,
-	value_type a1,  value_type a0)			;
+	value_type a1,  value_type a0)	;
     vec(value_type a31, value_type a30,
 	value_type a29, value_type a28,
 	value_type a27, value_type a26,
@@ -401,63 +407,62 @@ class vec
 	value_type a7,  value_type a6,
 	value_type a5,  value_type a4,
 	value_type a3,  value_type a2,
-	value_type a1,  value_type a0)			;
+	value_type a1,  value_type a0)	;
     
   // ベース型との間の型変換
-    vec(base_type m)	:_base(m)			{}
-			operator base_type()		{ return _base; }
+    vec(base_type m)	:_base(m)	{}
+		operator base_type()	{ return _base; }
 
-    vec<value_type>&	flip_sign()
-			{
-			    return *this = -*this;
-			}
-    vec<value_type>&	operator +=(vec<value_type> x)
-			{
-			    return *this = *this + x;
-			}
-    vec<value_type>&	operator -=(vec<value_type> x)
-			{
-			    return *this = *this - x;
-			}
-    vec<value_type>&	operator *=(vec<value_type> x)
-			{
-			    return *this = *this * x;
-			}
-    vec<value_type>&	operator &=(vec<value_type> x)
-			{
-			    return *this = *this & x;
-			}
-    vec<value_type>&	operator |=(vec<value_type> x)
-			{
-			    return *this = *this | x;
-			}
-    vec<value_type>&	operator ^=(vec<value_type> x)
-			{
-			    return *this = *this ^ x;
-			}
-    vec<value_type>&	andnot(vec<value_type> x)
-			{
-			    return *this = mm::andnot(x, *this);
-			}
-    value_type		operator [](size_t i) const
-			{
-			    assert(i < size);
-			    return *((value_type*)&_base + i);
-			}
-    value_type&		operator [](size_t i)
-			{
-			    assert(i < size);
-			    return *((value_type*)&_base + i);
-			}
+    vec&	flip_sign()		{ return *this = -*this; }
+    vec&	operator +=(vec x)	{ return *this = *this + x; }
+    vec&	operator -=(vec x)	{ return *this = *this - x; }
+    vec&	operator *=(vec x)	{ return *this = *this * x; }
+    vec&	operator &=(vec x)	{ return *this = *this & x; }
+    vec&	operator |=(vec x)	{ return *this = *this | x; }
+    vec&	operator ^=(vec x)	{ return *this = *this ^ x; }
+    vec&	andnot(vec x)		{ return *this = mm::andnot(x, *this); }
+    template <class S>
+    vec&	operator &=(typename boost::enable_if<
+				boost::is_same<vec<S>, mask_type>,
+				mask_type>::type x)
+		{
+		    return *this = *this & x;
+		}
+    template <class S>
+    vec&	operator |=(typename boost::enable_if<
+				boost::is_same<vec<S>, mask_type>,
+				mask_type>::type x)
+		{
+		    return *this = *this | x;
+		}
+    template <class S>
+    vec&	operator ^=(typename boost::enable_if<
+				boost::is_same<vec<S>, mask_type>,
+				mask_type>::type x)
+		{
+		    return *this = *this ^ x;
+		}
+    template <class S>
+    vec&	andnot(typename boost::enable_if<
+			   boost::is_same<vec<S>, mask_type>,
+			   mask_type>::type x)
+		{
+		    return *this = mm::andnot(x, *this);
+		}
+    value_type	operator [](size_t i) const
+		{
+		    assert(i < size);
+		    return *((value_type*)&_base + i);
+		}
+    value_type&	operator [](size_t i)
+		{
+		    assert(i < size);
+		    return *((value_type*)&_base + i);
+		}
     
-    static size_t	floor(size_t n)
-			{
-			    return size*(n/size);
-			}
-    static size_t	ceil(size_t n)
-			{
-			    return (n == 0 ? 0 : size*((n - 1)/size + 1));
-			}
+    static size_t	floor(size_t n)	{ return size*(n/size); }
+    static size_t	ceil(size_t n)	{ return (n == 0 ? 0 :
+						  size*((n - 1)/size + 1)); }
 
   private:
     base_type		_base;
@@ -488,31 +493,13 @@ template <class T> std::ostream&
 operator <<(std::ostream& out, const vec<T>& x)
 {
     typedef typename boost::mpl::if_c<
-	boost::is_same<T, int8_t  >::value ||
-	boost::is_same<T, u_int8_t>::value, int32_t, T>::type	value_type;
+	(boost::is_same<T, int8_t  >::value ||
+	 boost::is_same<T, u_int8_t>::value), int32_t, T>::type	value_type;
 
     for (size_t i = 0; i < vec<T>::size; ++i)
 	out << ' ' << value_type(x[i]);
 
     return out;
-}
-
-//! SIMDベクトルの内容をストリームに逆順に出力する．
-/*!
-  \param out	出力ストリーム
-  \param vec	SIMDベクトル
-  \return	outで指定した出力ストリーム
-*/
-template <class T> std::ostream&
-print(std::ostream& out, const vec<T>& x)
-{
-    typedef typename boost::mpl::if_c<
-	(boost::is_same<T, int8_t>::value ||
-	 boost::is_same<T, u_int8_t>::value), int32_t, T>::type	value_type;
-
-    for (size_t n = vec<T>::size; n-- > 0; )
-	out << ' ' << value_type(x[n]);
-    return out << std::endl;
 }
 
 /************************************************************************
@@ -655,10 +642,6 @@ template <class T> struct is_vec<vec<T> >	{ enum { value = true  }; };
 #define MM_NUMERIC_FUNC_2(func, op, type)				\
     MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
 	    op, (x, y), void, type, MM_SUFFIX)
-
-#define MM_NUMERIC_FUNC_2R(func, op, type)				\
-    MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
-	    op, (y, x), void, type, MM_SUFFIX)
 
 /************************************************************************
 *  Constructors of vec<T>						*
@@ -1723,6 +1706,11 @@ cvt(vec<T> x)
     
     return cvt<S, I&0x1>(cvt<L, I>>1>(x));
 }
+template <class S> static inline vec<S>
+cvt(vec<S> x)
+{
+    return x;
+}
 
 //! 2つのT型整数ベクトルをより小さなS型整数ベクトルに型変換する．
 /*!
@@ -1970,7 +1958,7 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
   MM_CVTI_F(u_int16_t, float)		// u_short -> float
 #  undef MM_CVTI_F
 
-#elif defined(SSE2)
+#elif defined(SSE2)	// !AVX && SSE2
   MM_CVT_2(int32_t, float)		// int    <-> float
 
   MM_CVT(int32_t, double)		// int	   -> double
@@ -2012,7 +2000,7 @@ MM_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 #  undef MM_CVTF_I
 #  undef MM_CVT_2FI
 
-#elif defined(SSE)
+#elif defined(SSE)	// !SSE2 && SSE
   template <> inline F32vec
   cvt<float>(Is32vec x, Is32vec y)	// 2*int   -> float
   {
@@ -2092,6 +2080,11 @@ cvt_mask(vec<T> x)
     
     return cvt_mask<S, I&0x1>(cvt_mask<L, I>>1>(x));
 }
+template <class S> static inline vec<S>
+cvt_mask(vec<S> x)
+{
+    return x;
+}
 
 //! 2つのT型整数マスクベクトルをより小さなS型整数マスクベクトルに型変換する．
 /*!
@@ -2149,17 +2142,8 @@ cvt_mask(vec<T> x, vec<T> y)						;
     MM_CVTUP_MASK(type0, type1)						\
     MM_CVTDOWN_MASK(type1, type0)
 
-MM_CVT_MASK(int8_t,	 int16_t)	// s_char  <-> short
-MM_CVT_MASK(int8_t,	 u_int16_t)	// s_char  <-> u_short
-MM_CVT_MASK(int16_t,	 int32_t)	// short   <-> int
-MM_CVT_MASK(int16_t,	 u_int32_t)	// short   <-> u_int
-MM_CVT_MASK(u_int8_t,	 int16_t)	// u_char  <-> short
 MM_CVT_MASK(u_int8_t,	 u_int16_t)	// u_char  <-> u_short
-MM_CVT_MASK(u_int16_t,	 int32_t)	// u_short <-> int
 MM_CVT_MASK(u_int16_t,	 u_int32_t)	// u_short <-> u_int
-MM_CVTUP_MASK(int32_t,   int64_t)	// int      -> long
-MM_CVTUP_MASK(int32_t,   u_int64_t)	// int      -> u_long
-MM_CVTUP_MASK(u_int32_t, int64_t)	// u_int    -> long
 MM_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
 
 #undef MM_CVTUP_MASK
@@ -2169,17 +2153,26 @@ MM_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
 // [2] 整数ベクトルと浮動小数点数ベクトル間のマスク変換
 #if defined(SSE2)
 #  if !defined(AVX) || defined(AVX2)	// Is32vec::size == F32vec::size
-#    define MM_CVT_MASK_2FI(itype, ftype)				\
-      template <> inline vec<ftype>					\
-      cvt_mask<ftype>(vec<itype> x)	{return cast<ftype>(x);}	\
-      template <> inline vec<itype>					\
-      cvt_mask<itype>(vec<ftype> x)	{return cast<itype>(x);}
-
-    MM_CVT_MASK_2FI(int32_t,   float)	// int	  <-> float
-    MM_CVT_MASK_2FI(u_int32_t, float)	// u_int  <-> float
-    MM_CVT_MASK_2FI(int64_t,   double)	// long	  <-> double
-    MM_CVT_MASK_2FI(u_int64_t, double)	// u_long <-> double
-
+    template <> inline vec<float>
+    cvt_mask<float>(vec<u_int32_t> x)
+    {
+	return cast_base<fvec_t>(ivec_t(x));
+    }
+    template <> inline vec<u_int32_t>
+    cvt_mask<u_int32_t>(vec<float> x)
+    {
+	return cast_base<ivec_t>(fvec_t(x));
+    }
+    template <> inline vec<double>
+    cvt_mask<double>(vec<u_int64_t> x)
+    {
+	return cast_base<dvec_t>(ivec_t(x));
+    }
+    template <> inline vec<u_int64_t>
+    cvt_mask<u_int64_t>(vec<double> x)
+    {
+	return cast_base<ivec_t>(dvec_t(x));
+    }
 #    undef MM_CVT_MASK_2FI
 #  else	// AVX && !AVX2
 #    define MM_CVT_MASK_IF(itype, ftype)				\
@@ -2209,11 +2202,8 @@ MM_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
 			     _mm256_castps_si256(x), 0x1)));		\
       }
 
-    MM_CVT_MASK_IF(int16_t,   float)	// short   -> float
-    MM_CVT_MASK_FI(int16_t)		// float   -> short
     MM_CVT_MASK_IF(u_int16_t, float)	// u_short -> float
     MM_CVT_MASK_FI(u_int16_t)		// float   -> u_short
-    MM_CVT_MASK_IF(int32_t,   double)	// int     -> double
     MM_CVT_MASK_IF(u_int32_t, double)	// u_int   -> double
 
 #    undef MM_CVT_MASK_IF
@@ -2228,6 +2218,69 @@ template <class T> static vec<T>	operator &(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator |(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator ^(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	andnot(vec<T> x, vec<T> y)	;
+
+template <class T> static inline vec<T>
+operator &(typename boost::disable_if<
+	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
+	       typename vec<T>::mask_type>::type x,
+	   vec<T> y)
+{
+    return cvt_mask<T>(x) & y;
+}
+    
+template <class T> static inline vec<T>
+operator |(typename boost::disable_if<
+	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
+	       typename vec<T>::mask_type>::type x,
+	   vec<T> y)
+{
+    return cvt_mask<T>(x) | y;
+}
+    
+template <class T> static inline vec<T>
+operator ^(typename boost::disable_if<
+	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
+	       typename vec<T>::mask_type>::type x,
+	   vec<T> y)
+{
+    return cvt_mask<T>(x) ^ y;
+}
+    
+template <class T> static inline vec<T>
+andnot(typename boost::disable_if<
+	  boost::is_same<typename vec<T>::mask_type, vec<T> >,
+	  typename vec<T>::mask_type>::type x,
+       vec<T> y)
+{
+    return andnot(cvt_mask<T>(x), y);
+}
+
+template <class T> static inline vec<T>
+operator &(vec<T> x,
+	   typename boost::disable_if<
+	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
+	       typename vec<T>::mask_type>::type y)
+{
+    return x & cvt_mask<T>(y);
+}
+    
+template <class T> static inline vec<T>
+operator |(vec<T> x,
+	   typename boost::disable_if<
+	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
+	       typename vec<T>::mask_type>::type y)
+{
+    return x | cvt_mask<T>(y);
+}
+    
+template <class T> static inline vec<T>
+operator ^(vec<T> x,
+	   typename boost::disable_if<
+	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
+	       typename vec<T>::mask_type>::type y)
+{
+    return x ^ cvt_mask<T>(y);
+}
 
 #define MM_LOGICALS(type)						\
     MM_BASE_FUNC_2(operator &, and,    type)				\
@@ -2252,7 +2305,7 @@ MM_LOGICALS(u_int64_t)
 #endif
 
 #undef MM_LOGICALS
-
+    
 /************************************************************************
 *  Lookup								*
 ************************************************************************/
@@ -2392,7 +2445,7 @@ MM_LOGICALS(u_int64_t)
 		yからそれぞれ選択して生成されたベクトル
 */
 template <class T> static inline vec<T>
-select(vec<T> mask, vec<T> x, vec<T> y)
+select(typename vec<T>::mask_type mask, vec<T> x, vec<T> y)
 {
     return (mask & x) | andnot(mask, y);
 }
@@ -2400,13 +2453,14 @@ select(vec<T> mask, vec<T> x, vec<T> y)
 #if defined(SSE4)
 #  define MM_SELECT(type)						\
     template <> inline vec<type>					\
-    select(vec<type> mask, vec<type> x, vec<type> y)			\
+    select(vec<type>::mask_type mask, vec<type> x, vec<type> y)		\
     {									\
 	   return MM_MNEMONIC(blendv, MM_PREFIX(type), ,		\
 			      MM_SIGNED(int8_t))(y, x, mask);		\
     }
 #  define MM_SELECT_F(type)						\
-    MM_FUNC(vec<type> select(vec<type> mask, vec<type> x, vec<type> y),	\
+    MM_FUNC(vec<type> select(vec<type>::mask_type mask,			\
+			     vec<type> x, vec<type> y),			\
 	    blendv, (y, x, mask), void, type, MM_BASE)
 
   MM_SELECT(int8_t)
@@ -2428,25 +2482,37 @@ select(vec<T> mask, vec<T> x, vec<T> y)
 /************************************************************************
 *  Compare operators							*
 ************************************************************************/
-template <class T> static vec<T>	operator ==(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator > (vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator < (vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator !=(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator >=(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator <=(vec<T> x, vec<T> y)	;
+template <class T> static typename vec<T>::mask_type
+operator ==(vec<T> x, vec<T> y)						;
+template <class T> static typename vec<T>::mask_type
+operator > (vec<T> x, vec<T> y)						;
+template <class T> static typename vec<T>::mask_type
+operator < (vec<T> x, vec<T> y)						;
+template <class T> static typename vec<T>::mask_type
+operator !=(vec<T> x, vec<T> y)						;
+template <class T> static typename vec<T>::mask_type
+operator >=(vec<T> x, vec<T> y)						;
+template <class T> static typename vec<T>::mask_type
+operator <=(vec<T> x, vec<T> y)						;
 
 // MMX, SSE, AVX2 には整数に対する cmplt ("less than") がない！
+#define MM_COMPARE(func, op, type)					\
+    MM_FUNC(vec<type>::mask_type func(vec<type> x, vec<type> y),	\
+	    op, (x, y), void, type, MM_SIGNED)
+#define MM_COMPARE_R(func, op, type)					\
+    MM_FUNC(vec<type>::mask_type func(vec<type> x, vec<type> y),	\
+	    op, (y, x), void, type, MM_SIGNED)
 #define MM_COMPARES(type)						\
-    MM_NUMERIC_FUNC_2( operator ==, cmpeq, type)			\
-    MM_NUMERIC_FUNC_2( operator >,  cmpgt, type)			\
-    MM_NUMERIC_FUNC_2R(operator <,  cmpgt, type)
+    MM_COMPARE(  operator ==, cmpeq, type)				\
+    MM_COMPARE(  operator >,  cmpgt, type)				\
+    MM_COMPARE_R(operator <,  cmpgt, type)
 
 // 符号なし数に対しては等値性チェックしかできない！
-MM_FUNC_2(operator ==, cmpeq, u_int8_t)
-MM_FUNC_2(operator ==, cmpeq, u_int16_t)
-MM_FUNC_2(operator ==, cmpeq, u_int32_t)
+MM_COMPARE(operator ==, cmpeq, u_int8_t)
+MM_COMPARE(operator ==, cmpeq, u_int16_t)
+MM_COMPARE(operator ==, cmpeq, u_int32_t)
 #if defined(SSE4)
-  MM_FUNC_2(operator ==, cmpeq, u_int64_t)
+  MM_COMPARE(operator ==, cmpeq, u_int64_t)
 #endif
 
 MM_COMPARES(int8_t)
@@ -2455,7 +2521,7 @@ MM_COMPARES(int32_t)
 
 #if defined(AVX)	// AVX の浮動小数点数比較演算子はパラメータ形式
 #  define MM_COMPARE_F(func, type, opcode)				\
-    MM_FUNC(vec<type> func(vec<type> x, vec<type> y),			\
+    MM_FUNC(vec<type>::mask_type func(vec<type> x, vec<type> y),	\
 	    cmp, (x, y, opcode), void, type, MM_SUFFIX)
 #  define MM_COMPARES_F(type)						\
     MM_COMPARE_F(operator ==, type, _CMP_EQ_OQ)				\
@@ -2472,9 +2538,9 @@ MM_COMPARES(int32_t)
 #  undef MM_COMPARES_F
 #elif defined(SSE)
 #  define MM_COMPARES_SUP(type)						\
-    MM_NUMERIC_FUNC_2( operator !=, cmpneq, type)			\
-    MM_NUMERIC_FUNC_2( operator >=, cmpge,  type)			\
-    MM_NUMERIC_FUNC_2R(operator <=, cmpge,  type)
+    MM_COMPARE(  operator !=, cmpneq, type)				\
+    MM_COMPARE(  operator >=, cmpge,  type)				\
+    MM_COMPARE_R(operator <=, cmpge,  type)
 
   MM_COMPARES(float)
   MM_COMPARES_SUP(float)
@@ -2486,6 +2552,7 @@ MM_COMPARES(int32_t)
 #  undef MM_COMPARES_SUP
 #endif
 
+#undef MM_COMPARE
 #undef MM_COMPARES
 
 /************************************************************************
@@ -2630,13 +2697,13 @@ operator /(vec<T> x, T c)
 /************************************************************************
 *  "[Greater|Less] than or equal to" operators				*
 ************************************************************************/
-template <class T> static inline vec<T>
+template <class T> static inline typename vec<T>::mask_type
 operator >=(vec<T> x, vec<T> y)
 {
     return max(x, y) == x;
 }
 
-template <class T> static inline vec<T>
+template <class T> static inline typename vec<T>::mask_type
 operator <=(vec<T> x, vec<T> y)
 {
     return y >= x;
@@ -2956,7 +3023,6 @@ inline void	empty()			{_mm_empty();}
 #undef MM_FUNC_2
 #undef MM_NUMERIC_FUNC_1
 #undef MM_NUMERIC_FUNC_2
-#undef MM_NUMERIC_FUNC_2R
 
 /************************************************************************
 *  functions for supporting memory alignment				*
@@ -3752,15 +3818,6 @@ class cvtdown_mask_iterator
 			::value_type::value_type	element_type;
     typedef typename type_traits<element_type>::complementary_mask_type
 							complementary_mask_type;
-    typedef typename boost::mpl::if_<
-	boost::is_floating_point<element_type>,
-	complementary_mask_type,
-	element_type>::type				integral_type;
-    typedef typename boost::mpl::if_<
-	boost::is_signed<integral_type>,
-	typename type_traits<integral_type>::unsigned_type,
-	typename type_traits<integral_type>::signed_type>::type
-							flipped_type;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -3784,12 +3841,6 @@ class cvtdown_mask_iterator
 		    cvtdown(y);
 		    cvtdown(z);
 		    x = cvt_mask<S>(y, z);
-		}
-    void	cvtdown(vec<flipped_type>& x)
-		{
-		    vec<element_type>	y;
-		    cvtdown(y);
-		    x = cast<flipped_type>(y);
 		}
     void	cvtdown(vec<complementary_mask_type>& x)
 		{
@@ -3875,15 +3926,6 @@ namespace detail
 							reference;
 	typedef typename type_traits<element_type>::complementary_mask_type
 							complementary_mask_type;
-	typedef typename boost::mpl::if_<
-	    boost::is_floating_point<element_type>,
-	    complementary_mask_type,
-	    element_type>::type				integral_type;
-	typedef typename boost::mpl::if_<
-	    boost::is_signed<integral_type>,
-	    typename type_traits<integral_type>::unsigned_type,
-	    typename type_traits<integral_type>::signed_type>::type
-							flipped_type;
 	
 	template <class OP, class T>
 	void	cvtup(vec<T> x)
@@ -3892,11 +3934,6 @@ namespace detail
 
 		    cvtup<OP>(cvt_mask<upper_type, 0>(x));
 		    cvtup<OP>(cvt_mask<upper_type, 1>(x));
-		}
-	template <class OP>
-	void	cvtup(vec<flipped_type> x)
-		{
-		    cvtup<OP>(cast<integral_type>(x));
 		}
 	template <class OP>
 	void	cvtup(vec<complementary_mask_type> x)
