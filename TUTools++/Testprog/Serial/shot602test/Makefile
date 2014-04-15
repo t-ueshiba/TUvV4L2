@@ -18,7 +18,7 @@ CPPFLAGS	=
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
-  CFLAGS	= -O3
+#  CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   CPPFLAGS     += -DSSE3
 endif
@@ -31,16 +31,22 @@ LINKER		= $(CXX)
 #########################
 .SUFFIXES:	.cu
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= /usr/local/include/TU/SHOT602.h \
+EXTHDRS		= /usr/local/include/TU/Manip.h \
+		/usr/local/include/TU/SHOT602.h \
 		/usr/local/include/TU/Serial.h \
 		/usr/local/include/TU/fdstream.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= SHOT602.cc \
+		main.cc
+OBJS		= SHOT602.o \
+		main.o
 
 include $(PROJECT)/lib/p.mk
 
 ###
+SHOT602.o: /usr/local/include/TU/SHOT602.h /usr/local/include/TU/Serial.h \
+	/usr/local/include/TU/fdstream.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Manip.h
 main.o: /usr/local/include/TU/SHOT602.h /usr/local/include/TU/Serial.h \
 	/usr/local/include/TU/fdstream.h /usr/local/include/TU/types.h
