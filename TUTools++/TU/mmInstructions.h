@@ -468,6 +468,33 @@ class vec
     base_type		_base;
 };
 
+template <class T> static inline vec<T>&
+operator &=(vec<T>& x,
+	    typename boost::disable_if<
+		boost::is_same<typename vec<T>::mask_type, vec<T> >,
+		typename vec<T>::mask_type>::type y)
+{
+    return x = x & y;
+}
+
+template <class T> static inline vec<T>&
+operator |=(vec<T>& x,
+	    typename boost::disable_if<
+		boost::is_same<typename vec<T>::mask_type, vec<T> >,
+		typename vec<T>::mask_type>::type y)
+{
+    return x = x | y;
+}
+
+template <class T> static inline vec<T>&
+operator ^=(vec<T>& x,
+	    typename boost::disable_if<
+		boost::is_same<typename vec<T>::mask_type, vec<T> >,
+		typename vec<T>::mask_type>::type y)
+{
+    return x = x ^ y;
+}
+
 typedef vec<int8_t>	Is8vec;		//!< 符号付き8bit整数ベクトル
 typedef vec<int16_t>	Is16vec;	//!< 符号付き16bit整数ベクトル
 typedef vec<int32_t>	Is32vec;	//!< 符号付き32bit整数ベクトル
@@ -2225,7 +2252,7 @@ operator &(typename boost::disable_if<
 	       typename vec<T>::mask_type>::type x,
 	   vec<T> y)
 {
-    return cvt_mask<T>(x) & y;
+    return cast<T>(x) & y;
 }
     
 template <class T> static inline vec<T>
@@ -2234,7 +2261,7 @@ operator |(typename boost::disable_if<
 	       typename vec<T>::mask_type>::type x,
 	   vec<T> y)
 {
-    return cvt_mask<T>(x) | y;
+    return cast<T>(x) | y;
 }
     
 template <class T> static inline vec<T>
@@ -2243,7 +2270,7 @@ operator ^(typename boost::disable_if<
 	       typename vec<T>::mask_type>::type x,
 	   vec<T> y)
 {
-    return cvt_mask<T>(x) ^ y;
+    return cast<T>(x) ^ y;
 }
     
 template <class T> static inline vec<T>
@@ -2252,7 +2279,7 @@ andnot(typename boost::disable_if<
 	  typename vec<T>::mask_type>::type x,
        vec<T> y)
 {
-    return andnot(cvt_mask<T>(x), y);
+    return andnot(cast<T>(x), y);
 }
 
 template <class T> static inline vec<T>
@@ -2261,7 +2288,7 @@ operator &(vec<T> x,
 	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
 	       typename vec<T>::mask_type>::type y)
 {
-    return x & cvt_mask<T>(y);
+    return x & cast<T>(y);
 }
     
 template <class T> static inline vec<T>
@@ -2270,7 +2297,7 @@ operator |(vec<T> x,
 	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
 	       typename vec<T>::mask_type>::type y)
 {
-    return x | cvt_mask<T>(y);
+    return x | cast<T>(y);
 }
     
 template <class T> static inline vec<T>
@@ -2279,7 +2306,7 @@ operator ^(vec<T> x,
 	       boost::is_same<typename vec<T>::mask_type, vec<T> >,
 	       typename vec<T>::mask_type>::type y)
 {
-    return x ^ cvt_mask<T>(y);
+    return x ^ cast<T>(y);
 }
 
 #define MM_LOGICALS(type)						\
