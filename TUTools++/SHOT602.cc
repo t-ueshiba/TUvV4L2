@@ -53,7 +53,7 @@ SHOT602::SHOT602(const char* ttyname)
 #endif
 	.c_baud(9600).c_csize(8).c_noparity().c_stop1();
 
-    setSpeed(HighSpeed);
+  //setSpeed(HighSpeed);
 }
     
 //! ファームウェアのIDを出力ストリームに書き出す．

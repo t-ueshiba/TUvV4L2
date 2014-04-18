@@ -131,7 +131,7 @@ namespace detail
 	typedef typename boost::mpl::if_<
 	    boost::is_convertible<E, op_node>,
 	    typename boost::mpl::if_c<
-		EVAL, typename E::result_type, E>::type,
+		EVAL, const typename E::result_type, const E>::type,
 	    const E&>::type				type;
     };
 }
@@ -249,7 +249,7 @@ class unary_operator : public container<unary_operator<OP, E> >,
 			}
 	    
   private:
-    const argument_type	_e;	//!< 引数となる式の実体
+    argument_type	_e;	//!< 引数となる式の実体
     const OP		_op;	//!< 単項演算子
 };
 
@@ -454,9 +454,9 @@ class binary_operator : public container<binary_operator<OP, L, R> >,
 			}
     
   private:
-    const largument_type	_l;	//!< 第1引数となる式の実体
-    const rargument_type	_r;	//!< 第2引数となる式の実体
-    const OP			_op;	//!< 2項演算子
+    largument_type	_l;	//!< 第1引数となる式の実体
+    rargument_type	_r;	//!< 第2引数となる式の実体
+    const OP		_op;	//!< 2項演算子
 };
 
 //! 与えられた2つのコンテナ式の各要素の和をとる.
