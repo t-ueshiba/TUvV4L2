@@ -276,8 +276,8 @@ class Product : public container<Product<L, R> >,
 			}
     
   private:
-    const largument_type	_l;
-    const rargument_type	_r;
+    largument_type	_l;
+    rargument_type	_r;
 };
 
 /************************************************************************
@@ -377,8 +377,8 @@ class ExteriorProduct : public container<ExteriorProduct<L, R> >,
 			}
     
   private:
-    const largument_type	_l;
-    const rargument_type	_r;
+    largument_type	_l;
+    rargument_type	_r;
 };
 
 /************************************************************************
@@ -561,8 +561,8 @@ class VectorProduct : public container<VectorProduct<L, R> >,
 			}
     
   private:
-    const largument_type	_l;
-    const rargument_type	_r;
+    largument_type	_l;
+    rargument_type	_r;
 };
 
 template <class T, class B=Buf<T> >				class Vector;
