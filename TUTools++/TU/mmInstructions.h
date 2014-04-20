@@ -3259,6 +3259,13 @@ class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     };
 
   public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+    
+  public:
     load_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(boost::detail::tuple_impl_specific::
 	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
@@ -3291,8 +3298,12 @@ namespace detail
 	typedef store_proxy					self;
 	
       public:
-	store_proxy(ITER iter)	:_iter(iter)				{}
-	
+	store_proxy(ITER iter)		:_iter(iter)			{}
+
+		operator value_type() const
+		{
+		    return load<ALIGNED>(_iter);
+		}
 	self&	operator =(value_type val)
 		{
 		    store<ALIGNED>(_iter, val);
@@ -3332,7 +3343,7 @@ namespace detail
 		}
 
       private:
-	ITER const	_iter;
+	ITER 	_iter;
     };
 }	// namespace detail
 
@@ -3445,11 +3456,52 @@ class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
 	}
     };
 
+    struct load
+    {
+	template <class ITER>
+	struct apply
+	{
+	    typedef typename std::iterator_traits<ITER>::value_type	type;
+	};
+
+	template <class ITER> typename apply<ITER>::type
+	operator ()(ITER const& iter) const
+	{
+	    return iter();
+	}
+    };
+
+    template <class _ITER>
+    struct value
+    {
+	typedef typename std::iterator_traits<_ITER>::value_type	type;
+    };
+    template <class _TUPLE>
+    struct value<fast_zip_iterator<_TUPLE> >
+    {
+	typedef typename boost::detail::tuple_impl_specific::
+	tuple_meta_transform<_TUPLE,
+			     value<boost::mpl::_1> >::type		type;
+    };
+    
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename value<super>::type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+    
   public:
     store_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(boost::detail::tuple_impl_specific::
 	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
     store_iterator(super const& iter)	:super(iter)			{}
+
+    value_type	operator ()() const
+		{
+		    return boost::detail::tuple_impl_specific::
+			tuple_transform(super::get_iterator_tuple(), load());
+		}
 };
     
 template <bool ALIGNED=false, class ITER> store_iterator<ITER, ALIGNED>
@@ -3588,6 +3640,13 @@ class cvtdown_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
     };
 
   public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+    
+  public:
     cvtdown_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(TU::detail::tuple_transform2<T_TUPLE>(
 		   iter.get_iterator_tuple(), invoke()))		{}
@@ -3667,7 +3726,7 @@ namespace detail
 
       public:
 	cvtup_proxy(ITER const& iter)	:_iter(const_cast<ITER&>(iter))	{}
-
+	
 	template <class T>
 	self&	operator =(vec<T> x)
 		{
@@ -3806,6 +3865,13 @@ class cvtup_iterator<fast_zip_iterator<ITER_TUPLE> >
     };
     
   public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+    
+  public:
     cvtup_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(boost::detail::tuple_impl_specific::
 	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
@@ -3922,6 +3988,13 @@ class cvtdown_mask_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
 	}
     };
 
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
+    
   public:
     cvtdown_mask_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(TU::detail::tuple_transform2<T_TUPLE>(
@@ -4084,6 +4157,13 @@ class cvtup_mask_iterator<fast_zip_iterator<ITER_TUPLE> >
 	    return typename apply<ITER>::type(iter);
 	}
     };
+    
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::value_type		value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::reference		reference;
+    typedef typename super::iterator_category	iterator_category;
     
   public:
     cvtup_mask_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
