@@ -201,7 +201,7 @@ class V4L2Camera
       public:
 	Feature			feature;	//!< 属性(コントロールの識別子)
 	std::string		name;		//!< コントロール名
-	v4l2_ctrl_type		type;		//!< 値の型
+	u_int			type;		//!< 値の型
 	Range<int>		range;		//!< 値の範囲
 	int			def;		//!< デフォルト値
 	u_int			flags;
