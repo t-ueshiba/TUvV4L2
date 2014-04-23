@@ -217,7 +217,7 @@ MyCmdWindow::tick()
 
   //_camera.snap() >> _image;
     _camera.snap().captureRGBImage(_image);
-    printTime(std::cerr, _camera.arrivaltime()) << std::endl;
+  //printTime(std::cerr, _camera.arrivaltime()) << std::endl;
     
     repaintCanvas();
 }
