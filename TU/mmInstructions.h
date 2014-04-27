@@ -3079,6 +3079,20 @@ begin(T* p)
     return p + (vsize - 1 - (nelms - 1) % vsize);
 }
     
+//! 指定されたアドレスの直後のアライメントされているアドレスを返す
+/*!
+  \param p	アドレス
+  \return	pの直後(pを含む)のアライメントされているアドレス
+*/
+template <class T> inline const T*
+cbegin(const T* p)
+{
+    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
+    const size_t	vsize = vec<T>::size;
+    
+    return p + (vsize - 1 - (nelms - 1) % vsize);
+}
+    
 //! 指定されたアドレスの直前のアライメントされているアドレスを返す
 /*!
   \param p	アドレス
@@ -3086,6 +3100,20 @@ begin(T* p)
 */
 template <class T> inline T*
 end(T* p)
+{
+    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
+    const size_t	vsize = vec<T>::size;
+    
+    return p - (nelms % vsize);
+}
+
+//! 指定されたアドレスの直前のアライメントされているアドレスを返す
+/*!
+  \param p	アドレス
+  \return	pの直前(pを含む)のアライメントされているアドレス
+*/
+template <class T> inline const T*
+cend(const T* p)
 {
     const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
     const size_t	vsize = vec<T>::size;
@@ -3258,18 +3286,41 @@ class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
 	}
     };
 
+    struct base_iterator
+    {
+	template <class ITER>
+	struct apply
+	{
+	    typedef typename ITER::base_type	type;
+	};
+
+	template <class ITER> typename apply<ITER>::type
+	operator ()(ITER const& iter) const
+	{
+	    return iter.base();
+	}
+    };
+
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
     typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
     typedef typename super::iterator_category	iterator_category;
+    typedef ITER_TUPLE				base_type;
     
   public:
     load_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
 	:super(boost::detail::tuple_impl_specific::
 	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
     load_iterator(super const& iter)	:super(iter)			{}
+
+    base_type	base() const
+		{
+		    return boost::detail::tuple_impl_specific::
+			tuple_transform(super::get_iterator_tuple(),
+					base_iterator());
+		}
 };
 
 template <bool ALIGNED=false, class ITER> load_iterator<ITER, ALIGNED>
@@ -3456,6 +3507,21 @@ class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
 	}
     };
 
+    struct base_iterator
+    {
+	template <class ITER>
+	struct apply
+	{
+	    typedef typename ITER::base_type	type;
+	};
+
+	template <class ITER> typename apply<ITER>::type
+	operator ()(ITER const& iter) const
+	{
+	    return iter.base();
+	}
+    };
+
     struct load
     {
 	template <class ITER>
@@ -3490,6 +3556,7 @@ class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
     typedef typename super::iterator_category	iterator_category;
+    typedef ITER_TUPLE				base_type;
     
   public:
     store_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
@@ -3497,6 +3564,13 @@ class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
 	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
     store_iterator(super const& iter)	:super(iter)			{}
 
+    base_type	base() const
+		{
+		    return boost::detail::tuple_impl_specific::
+			tuple_transform(super::get_iterator_tuple(),
+					base_iterator());
+		}
+    
     value_type	operator ()() const
 		{
 		    return boost::detail::tuple_impl_specific::
