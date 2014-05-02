@@ -65,7 +65,8 @@ class IntrinsicBase
     IntrinsicBase(element_type k=1,
 		  const point2_type& u0=point2_type(0, 0),
 		  element_type a=1, element_type s=0)			;
-
+    IntrinsicBase(const matrix33_type& K)				;
+    
     point2_type		u(const point2_type& x)			const	;
     point2_type		xFromU(const point2_type& u)		const	;
     matrix22_type	Jx(const point2_type& x)		const	;
@@ -118,6 +119,17 @@ IntrinsicBase<T>::IntrinsicBase(element_type k, const point2_type& u0,
 				element_type a, element_type s)
     :_k(k), _u0(u0), _k00(a*_k), _k01(s*_k)
 {
+}
+
+//! 内部パラメータをセットして初期化する．
+/*!
+  \param K	3x3内部パラメータ行列
+*/
+template <class T> inline
+IntrinsicBase<T>::IntrinsicBase(const matrix33_type& K)
+    :_k(1), _u0(0, 0), _k00(1), _k01(0)
+{
+    setK(K);
 }
 
 //! canonical画像座標系において表現された投影点の画像座標系における位置を求める．
