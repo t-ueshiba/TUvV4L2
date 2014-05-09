@@ -59,7 +59,7 @@ template <class T> class Movie
   //! ビュー
     struct View : public Image<T>
     {
-	View()	:Image<T>(), offset(0)					{}
+	View()	:Image<T>(), offset(0)			{}
 	
 	size_t	offset;		//!< フレームの先頭からの画像データ領域のオフセット
     };
@@ -90,7 +90,7 @@ template <class T> class Movie
     size_t		width(size_t view)			const	;
     size_t		height(size_t view)			const	;
     const Image<T>&	image(size_t view)			const	;
-    Image<T>&		image(size_t view)			;
+    Image<T>&		image(size_t view)				;
 
   // Handling frames.
 			operator bool()				const	;
@@ -102,7 +102,7 @@ template <class T> class Movie
     Movie<T>&		operator --()					;
     
   // Edit movie.
-    Movie<T>&		insert(size_t n)					;
+    Movie<T>&		insert(size_t n)				;
     const Movie<T>&	copy(size_t n)				const	;
     Movie<T>&		cut(size_t n)					;
     size_t		paste()						;

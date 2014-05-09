@@ -518,9 +518,9 @@ struct assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y = x; }
+    void	operator ()(const S& x, T y)	const	{ y = x; }
 };
 
 /************************************************************************
@@ -536,9 +536,9 @@ struct plus_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y += x; }
+    void	operator ()(const S& x, T y)	const	{ y += x; }
 };
 
 /************************************************************************
@@ -554,9 +554,9 @@ struct minus_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y -= x; }
+    void	operator ()(const S& x, T y)	const	{ y -= x; }
 };
 
 /************************************************************************
@@ -572,9 +572,9 @@ struct multiplies_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y *= x; }
+    void	operator ()(const S& x, T y)	const	{ y *= x; }
 };
 
 /************************************************************************
@@ -590,9 +590,9 @@ struct divides_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y /= x; }
+    void	operator ()(const S& x, T y)	const	{ y /= x; }
 };
 
 /************************************************************************
@@ -608,9 +608,9 @@ struct modulus_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y %= x; }
+    void	operator ()(const S& x, T y)	const	{ y %= x; }
 };
 
 /************************************************************************
@@ -626,9 +626,9 @@ struct bit_and_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y &= x; }
+    void	operator ()(const S& x, T y)	const	{ y &= x; }
 };
 
 /************************************************************************
@@ -644,9 +644,9 @@ struct bit_or_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y |= x; }
+    void	operator ()(const S& x, T y)	const	{ y |= x; }
 };
 
 /************************************************************************
@@ -662,9 +662,9 @@ struct bit_xor_assign
 {
     typedef S						first_argument_type;
     typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef second_argument_type			result_type;
+    typedef void					result_type;
     
-    T	operator ()(const S& x, T y)		const	{ return y ^= x; }
+    void	operator ()(const S& x, T y)	const	{ y ^= x; }
 };
 
 /************************************************************************
