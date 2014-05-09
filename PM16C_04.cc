@@ -32,6 +32,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <cstring>
+#include <unistd.h>
 
 namespace TU
 {

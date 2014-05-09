@@ -74,7 +74,6 @@ HDRS		= TU/Array++.h \
 		TU/io.h \
 		TU/iterator.h \
 		TU/mmInstructions.h \
-		TU/tmp.h \
 		TU/types.h
 SRCS		= BlockDiagonalMatrix++.inst.cc \
 		ConversionFromYUV.cc \
