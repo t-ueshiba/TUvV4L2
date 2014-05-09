@@ -33,7 +33,9 @@ HDRS		= TU/Array++.h \
 		TU/Bezier++.h \
 		TU/BlockDiagonalMatrix++.h \
 		TU/BoxFilter.h \
+		TU/CCSImage.h \
 		TU/Camera++.h \
+		TU/ComplexImage.h \
 		TU/CorrectIntensity.h \
 		TU/DP.h \
 		TU/DericheConvolver.h \
@@ -74,6 +76,7 @@ HDRS		= TU/Array++.h \
 		TU/io.h \
 		TU/iterator.h \
 		TU/mmInstructions.h \
+		TU/tmp.h \
 		TU/types.h
 SRCS		= BlockDiagonalMatrix++.inst.cc \
 		ConversionFromYUV.cc \
