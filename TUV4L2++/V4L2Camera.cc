@@ -1477,8 +1477,10 @@ V4L2Camera::featureToControl(Feature feature) const
 	{
 	    if (control.flags & V4L2_CTRL_FLAG_DISABLED)
 		throw runtime_error("V4L2Camera::featureToControl(): disabled feature!! ");
+	  /*
 	    if (control.flags & V4L2_CTRL_FLAG_INACTIVE)
 		throw runtime_error("V4L2Camera::featureToControl(): inactive feature!! ");
+	  */
 	    return control;
 	}
     
