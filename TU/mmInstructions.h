@@ -361,7 +361,7 @@ class vec
 {
   public:
   //! 成分の型    
-    typedef T							value_type;
+    typedef T							element_type;
   //! ベースとなるSIMDデータ型
     typedef typename boost::mpl::if_<
 	boost::is_same<T, double>, dvec_t,
@@ -370,44 +370,44 @@ class vec
 	    fvec_t, ivec_t>::type>::type			base_type;
     typedef vec<typename type_traits<T>::mask_type>		mask_type;
     
-    enum	{value_size = sizeof(value_type),
-		 size	    = sizeof(base_type)/sizeof(value_type),
-		 lane_size  = (sizeof(base_type) > 16 ? 16/sizeof(value_type)
-						      : size)};
+    enum	{element_size = sizeof(element_type),
+		 size	      = sizeof(base_type)/sizeof(element_type),
+		 lane_size    = (sizeof(base_type) > 16 ?
+				 16/sizeof(element_type) : size)};
 
-    vec()				{}
-    vec(value_type a)			;
-    vec(value_type a1, value_type a0)	;
-    vec(value_type a3, value_type a2,
-	value_type a1, value_type a0)	;
-    vec(value_type a7, value_type a6,
-	value_type a5, value_type a4,
-	value_type a3, value_type a2,
-	value_type a1, value_type a0)	;
-    vec(value_type a15, value_type a14,
-	value_type a13, value_type a12,
-	value_type a11, value_type a10,
-	value_type a9,  value_type a8,
-	value_type a7,  value_type a6,
-	value_type a5,  value_type a4,
-	value_type a3,  value_type a2,
-	value_type a1,  value_type a0)	;
-    vec(value_type a31, value_type a30,
-	value_type a29, value_type a28,
-	value_type a27, value_type a26,
-	value_type a25, value_type a24,
-	value_type a23, value_type a22,
-	value_type a21, value_type a20,
-	value_type a19, value_type a18,
-	value_type a17, value_type a16,
-	value_type a15, value_type a14,
-	value_type a13, value_type a12,
-	value_type a11, value_type a10,
-	value_type a9,  value_type a8,
-	value_type a7,  value_type a6,
-	value_type a5,  value_type a4,
-	value_type a3,  value_type a2,
-	value_type a1,  value_type a0)	;
+    vec()					{}
+    vec(element_type a)				;
+    vec(element_type a1,  element_type a0)	;
+    vec(element_type a3,  element_type a2,
+	element_type a1,  element_type a0)	;
+    vec(element_type a7,  element_type a6,
+	element_type a5,  element_type a4,
+	element_type a3,  element_type a2,
+	element_type a1,  element_type a0)	;
+    vec(element_type a15, element_type a14,
+	element_type a13, element_type a12,
+	element_type a11, element_type a10,
+	element_type a9,  element_type a8,
+	element_type a7,  element_type a6,
+	element_type a5,  element_type a4,
+	element_type a3,  element_type a2,
+	element_type a1,  element_type a0)	;
+    vec(element_type a31, element_type a30,
+	element_type a29, element_type a28,
+	element_type a27, element_type a26,
+	element_type a25, element_type a24,
+	element_type a23, element_type a22,
+	element_type a21, element_type a20,
+	element_type a19, element_type a18,
+	element_type a17, element_type a16,
+	element_type a15, element_type a14,
+	element_type a13, element_type a12,
+	element_type a11, element_type a10,
+	element_type a9,  element_type a8,
+	element_type a7,  element_type a6,
+	element_type a5,  element_type a4,
+	element_type a3,  element_type a2,
+	element_type a1,  element_type a0)	;
     
   // ベース型との間の型変換
     vec(base_type m)	:_base(m)	{}
@@ -449,15 +449,15 @@ class vec
 		{
 		    return *this = mm::andnot(x, *this);
 		}
-    value_type	operator [](size_t i) const
+    element_type	operator [](size_t i) const
 		{
 		    assert(i < size);
-		    return *((value_type*)&_base + i);
+		    return *((element_type*)&_base + i);
 		}
-    value_type&	operator [](size_t i)
+    element_type&	operator [](size_t i)
 		{
 		    assert(i < size);
-		    return *((value_type*)&_base + i);
+		    return *((element_type*)&_base + i);
 		}
     
     static size_t	floor(size_t n)	{ return size*(n/size); }
@@ -521,10 +521,10 @@ operator <<(std::ostream& out, const vec<T>& x)
 {
     typedef typename boost::mpl::if_c<
 	(boost::is_same<T, int8_t  >::value ||
-	 boost::is_same<T, u_int8_t>::value), int32_t, T>::type	value_type;
+	 boost::is_same<T, u_int8_t>::value), int32_t, T>::type	element_type;
 
     for (size_t i = 0; i < vec<T>::size; ++i)
-	out << ' ' << value_type(x[i]);
+	out << ' ' << element_type(x[i]);
 
     return out;
 }
@@ -675,46 +675,46 @@ template <class T> struct is_vec<vec<T> >	{ enum { value = true  }; };
 ************************************************************************/
 #define MM_CONSTRUCTOR_1(type)						\
     inline								\
-    vec<type>::vec(value_type a)					\
+    vec<type>::vec(element_type a)					\
 	:_base(MM_MNEMONIC(set1, MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a))							\
     {									\
     }
 #define MM_CONSTRUCTOR_2(type)						\
     inline								\
-    vec<type>::vec(value_type a1, value_type a0)			\
+    vec<type>::vec(element_type a1, element_type a0)			\
 	:_base(MM_MNEMONIC(set, MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a1, a0))						\
     {									\
     }
 #define MM_CONSTRUCTOR_4(type)						\
     inline								\
-    vec<type>::vec(value_type a3, value_type a2,			\
-		   value_type a1, value_type a0)			\
+    vec<type>::vec(element_type a3, element_type a2,			\
+		   element_type a1, element_type a0)			\
 	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a3, a2, a1, a0))					\
     {									\
     }
 #define MM_CONSTRUCTOR_8(type)						\
     inline								\
-    vec<type>::vec(value_type a7, value_type a6,			\
-		   value_type a5, value_type a4,			\
-		   value_type a3, value_type a2,			\
-		   value_type a1, value_type a0)			\
+    vec<type>::vec(element_type a7, element_type a6,			\
+		   element_type a5, element_type a4,			\
+		   element_type a3, element_type a2,			\
+		   element_type a1, element_type a0)			\
 	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a7, a6, a5, a4,	a3, a2, a1, a0))			\
     {									\
     }
 #define MM_CONSTRUCTOR_16(type)						\
     inline								\
-    vec<type>::vec(value_type a15, value_type a14,			\
-		   value_type a13, value_type a12,			\
-		   value_type a11, value_type a10,			\
-		   value_type a9,  value_type a8,			\
-		   value_type a7,  value_type a6,			\
-		   value_type a5,  value_type a4,			\
-		   value_type a3,  value_type a2,			\
-		   value_type a1,  value_type a0)			\
+    vec<type>::vec(element_type a15, element_type a14,			\
+		   element_type a13, element_type a12,			\
+		   element_type a11, element_type a10,			\
+		   element_type a9,  element_type a8,			\
+		   element_type a7,  element_type a6,			\
+		   element_type a5,  element_type a4,			\
+		   element_type a3,  element_type a2,			\
+		   element_type a1,  element_type a0)			\
 	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a15, a14, a13, a12, a11, a10, a9, a8,			\
 		a7,  a6,  a5,  a4,  a3,  a2,  a1, a0))			\
@@ -722,22 +722,22 @@ template <class T> struct is_vec<vec<T> >	{ enum { value = true  }; };
     }
 #define MM_CONSTRUCTOR_32(type)						\
     inline								\
-    vec<type>::vec(value_type a31, value_type a30,			\
-		   value_type a29, value_type a28,			\
-		   value_type a27, value_type a26,			\
-		   value_type a25, value_type a24,			\
-		   value_type a23, value_type a22,			\
-		   value_type a21, value_type a20,			\
-		   value_type a19, value_type a18,			\
-		   value_type a17, value_type a16,			\
-		   value_type a15, value_type a14,			\
-		   value_type a13, value_type a12,			\
-		   value_type a11, value_type a10,			\
-		   value_type a9,  value_type a8,			\
-		   value_type a7,  value_type a6,			\
-		   value_type a5,  value_type a4,			\
-		   value_type a3,  value_type a2,			\
-		   value_type a1,  value_type a0)			\
+    vec<type>::vec(element_type a31, element_type a30,			\
+		   element_type a29, element_type a28,			\
+		   element_type a27, element_type a26,			\
+		   element_type a25, element_type a24,			\
+		   element_type a23, element_type a22,			\
+		   element_type a21, element_type a20,			\
+		   element_type a19, element_type a18,			\
+		   element_type a17, element_type a16,			\
+		   element_type a15, element_type a14,			\
+		   element_type a13, element_type a12,			\
+		   element_type a11, element_type a10,			\
+		   element_type a9,  element_type a8,			\
+		   element_type a7,  element_type a6,			\
+		   element_type a5,  element_type a4,			\
+		   element_type a3,  element_type a2,			\
+		   element_type a1,  element_type a0)			\
 	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a31, a30, a29, a28, a27, a26, a25, a24,			\
 		a23, a22, a21, a20, a19, a18, a17, a16,			\
@@ -1385,12 +1385,12 @@ template <size_t N, class T> static vec<T>	shift_r(vec<T> x)	;
     template <size_t N> vec<type>					\
     shift_l(vec<type> x)						\
     {									\
-	return _mm256_emu_slli_si256<N*vec<type>::value_size>(x);	\
+	return _mm256_emu_slli_si256<N*vec<type>::element_size>(x);	\
     }									\
     template <size_t N> vec<type>					\
     shift_r(vec<type> x)						\
     {									\
-	return _mm256_emu_srli_si256<N*vec<type>::value_size>(x);	\
+	return _mm256_emu_srli_si256<N*vec<type>::element_size>(x);	\
     }
 #elif defined(SSE2)
 #  define MM_ELM_SHIFTS_I(type)						\
@@ -1400,10 +1400,10 @@ template <size_t N, class T> static vec<T>	shift_r(vec<T> x)	;
     shift_r<0>(vec<type> x)				{return x;}	\
     template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), slli,			\
-		 (x, N*vec<type>::value_size), void, type, MM_BASE)	\
+		 (x, N*vec<type>::element_size), void, type, MM_BASE)	\
     template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), srli,			\
-		 (x, N*vec<type>::value_size), void, type, MM_BASE)
+		 (x, N*vec<type>::element_size), void, type, MM_BASE)
 #else
 #  define MM_ELM_SHIFTS_I(type)						\
     template <> inline vec<type>					\
@@ -1412,10 +1412,10 @@ template <size_t N, class T> static vec<T>	shift_r(vec<T> x)	;
     shift_r<0>(vec<type> x)				{return x;}	\
     template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_l(vec<type> x), slli,			\
-		 (x, 8*N*vec<type>::value_size), void, type, MM_BASE)	\
+		 (x, 8*N*vec<type>::element_size), void, type, MM_BASE)	\
     template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> x), srli,			\
-		 (x, 8*N*vec<type>::value_size), void, type, MM_BASE)
+		 (x, 8*N*vec<type>::element_size), void, type, MM_BASE)
 #endif
 
 MM_ELM_SHIFTS_I(int8_t)
@@ -1435,28 +1435,28 @@ MM_ELM_SHIFTS_I(u_int64_t)
   shift_l(F32vec x)
   {
       return _mm256_castsi256_ps(
-	  _mm256_emu_slli_si256<N*F32vec::value_size>(_mm256_castps_si256(x)));
+	_mm256_emu_slli_si256<N*F32vec::element_size>(_mm256_castps_si256(x)));
   }
 
   template <size_t N> static inline F32vec
   shift_r(F32vec x)
   {
       return _mm256_castsi256_ps(
-	  _mm256_emu_srli_si256<N*F32vec::value_size>(_mm256_castps_si256(x)));
+	_mm256_emu_srli_si256<N*F32vec::element_size>(_mm256_castps_si256(x)));
   }
 
   template <size_t N> static inline F64vec
   shift_l(F64vec x)
   {
       return _mm256_castsi256_pd(
-	  _mm256_emu_slli_si256<N*F64vec::value_size>(_mm256_castpd_si256(x)));
+	_mm256_emu_slli_si256<N*F64vec::element_size>(_mm256_castpd_si256(x)));
   }
 
   template <size_t N> static inline F64vec
   shift_r(F64vec x)
   {
       return _mm256_castsi256_pd(
-	  _mm256_emu_srli_si256<N*F64vec::value_size>(_mm256_castpd_si256(x)));
+	_mm256_emu_srli_si256<N*F64vec::element_size>(_mm256_castpd_si256(x)));
   }
 #elif defined(SSE2)
   template <size_t N> static inline F32vec
@@ -1501,13 +1501,13 @@ template <size_t N, class T> static vec<T> shift_r(vec<T> y, vec<T> x)	;
 #  define MM_ELM_SHIFT_R_I2(type)					\
     template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> y, vec<type> x),		\
-		 emu_alignr<N*vec<type>::value_size>, (y, x),		\
+		 emu_alignr<N*vec<type>::element_size>, (y, x),		\
 		 void, int8_t, MM_SIGNED)
 #else
 #  define MM_ELM_SHIFT_R_I2(type)					\
     template <size_t N>							\
     MM_TMPL_FUNC(vec<type> shift_r(vec<type> y, vec<type> x),		\
-		 alignr, (y, x, N*vec<type>::value_size),		\
+		 alignr, (y, x, N*vec<type>::element_size),		\
 		 void, int8_t, MM_SIGNED)
 #endif
 MM_ELM_SHIFT_R_I2(int8_t)
@@ -1527,7 +1527,7 @@ MM_ELM_SHIFT_R_I2(u_int64_t)
   shift_r(F32vec y, F32vec x)
   {
       return _mm256_castsi256_ps(
-	  _mm256_emu_alignr_epi8<N*F32vec::value_size>(_mm256_castps_si256(y),
+	_mm256_emu_alignr_epi8<N*F32vec::element_size>(_mm256_castps_si256(y),
 						       _mm256_castps_si256(x)));
   }
 
@@ -1535,7 +1535,7 @@ MM_ELM_SHIFT_R_I2(u_int64_t)
   shift_r(F64vec y, F64vec x)
   {
       return _mm256_castsi256_pd(
-	  _mm256_emu_alignr_epi8<N*F64vec::value_size>(_mm256_castpd_si256(y),
+	_mm256_emu_alignr_epi8<N*F64vec::element_size>(_mm256_castpd_si256(y),
 						       _mm256_castpd_si256(x)));
   }
 #elif defined(SSE2)
@@ -1600,7 +1600,7 @@ shift_rmost_to_lmost(vec<T> x)
   \return	xを右端成分とするベクトル
 */
 template <class T> static inline vec<T>
-set_rmost(typename vec<T>::value_type x)
+set_rmost(typename vec<T>::element_type x)
 {
     return shift_lmost_to_rmost(vec<T>(x));
 }
@@ -1823,12 +1823,12 @@ template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
     template <> inline vec<to>						\
     cvt<to, 0>(vec<from> x)						\
     {									\
-	return cast<to>(dup<0>(x)) >> 8*vec<from>::value_size;		\
+	return cast<to>(dup<0>(x)) >> 8*vec<from>::element_size;	\
     }									\
     template <> inline vec<to>						\
     cvt<to, 1>(vec<from> x)						\
     {									\
-	return cast<to>(dup<1>(x)) >> 8*vec<from>::value_size;		\
+	return cast<to>(dup<1>(x)) >> 8*vec<from>::element_size;	\
     }
 #  define MM_CVTUP_UI(from, to)						\
     template <> inline vec<to>						\
@@ -3179,6 +3179,49 @@ struct tuple2vec<T, 8>
 		}
 };
 
+namespace detail
+{
+    /********************************************************************
+    *  class vec_tuple<TUPLE, S>					*
+    ********************************************************************/
+    //! 与えられたtupleと同数のSIMDベクトルから成るtuple
+    /*!
+      \param S		tupleを構成するSIMDベクトルの要素の型
+      \param TUPLE	元のtuple
+    */
+    template <class TUPLE, class S=void>
+    struct vec_tuple
+    {
+	template <class, class _S>
+	struct impl
+	{
+	    typedef vec<_S>	type;
+	};
+
+	typedef typename boost::mpl::
+	    if_<boost::is_same<S, void>,
+		typename TUPLE::head_type::element_type,
+		S>::type					element_type;
+	typedef typename boost::detail::tuple_impl_specific::
+	    tuple_meta_transform<
+		TUPLE,
+		impl<boost::mpl::_1, element_type> >::type	type;
+
+	enum	{element_size = sizeof(element_type),
+		 size	      = vec<element_type>::size};
+    };
+    template <class T, class S>
+    struct vec_tuple<vec<T>, S>
+    {
+	typedef typename boost::mpl::
+	    if_<boost::is_same<S, void>, T, S>::type		element_type;
+	typedef vec<element_type>				type;
+
+	enum	{element_size = sizeof(element_type),
+		 size	      = vec<element_type>::size};
+    };
+}
+
 /************************************************************************
 *  class load_iterator<ITER, ALIGNED>					*
 ************************************************************************/
@@ -3405,19 +3448,19 @@ namespace detail
 			そうでなければfalse
 */
 template <class ITER, bool ALIGNED=false>
-class store_iterator : public boost::iterator_adaptor<
-			store_iterator<ITER, ALIGNED>,
-			ITER,
-			vec<typename std::iterator_traits<ITER>::value_type>,
-			boost::use_default,
-			detail::store_proxy<ITER, ALIGNED> >
+class store_iterator
+    : public boost::iterator_adaptor<
+		store_iterator<ITER, ALIGNED>,
+		ITER,
+		typename detail::store_proxy<ITER, ALIGNED>::value_type,
+		boost::use_default,
+		detail::store_proxy<ITER, ALIGNED> >
 {
   private:
-    typedef typename std::iterator_traits<ITER>::value_type	element_type;
     typedef boost::iterator_adaptor<
 		store_iterator,
 		ITER,
-		vec<element_type>,
+		typename detail::store_proxy<ITER, ALIGNED>::value_type,
 		boost::use_default,
 		detail::store_proxy<ITER, ALIGNED> >		super;
 
@@ -3603,21 +3646,39 @@ class cvtdown_iterator
     : public boost::iterator_adaptor<
 		cvtdown_iterator<T, ITER>,			// self
 		ITER,						// base
-		vec<T>,						// value_type
-		boost::single_pass_traversal_tag,		// traversal
-		vec<T> >					// reference
+		typename detail::vec_tuple<
+		    typename std::iterator_traits<ITER>::value_type, T>::type,
+		boost::single_pass_traversal_tag,
+		typename detail::vec_tuple<
+		    typename std::iterator_traits<ITER>::value_type, T>::type>
 {
   private:
+    typedef typename std::iterator_traits<ITER>::value_type	src_vec;
     typedef boost::iterator_adaptor<cvtdown_iterator,
 				    ITER,
-				    vec<T>, 
+				    typename detail::vec_tuple<
+					src_vec, T>::type,
 				    boost::single_pass_traversal_tag,
-				    vec<T> >		super;
-    typedef typename std::iterator_traits<ITER>
-			::value_type::value_type	element_type;
+				    typename detail::vec_tuple<
+					src_vec, T>::type>	super;
+
+    typedef typename detail::vec_tuple<src_vec>::element_type
+							element_type;
     typedef typename type_traits<element_type>::complementary_type
 							complementary_type;
-    
+    typedef typename detail::vec_tuple<
+		src_vec, complementary_type>::type	complementary_vec;
+
+    template <class _S>
+    struct invoke
+    {
+	template <class _T> struct apply	{ typedef vec<_S> type; };
+	template <class _T> typename apply<_T>::type
+	operator ()(vec<_T> x)		  const	{ return cvt<_S>(x); }
+	template <class _T> typename apply<_T>::type
+	operator ()(vec<_T> x, vec<_T> y) const	{ return cvt<_S>(x, y); }
+    };
+
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
@@ -3631,100 +3692,82 @@ class cvtdown_iterator
 		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
 
   private:
-    template <class S>
-    void	cvtdown(vec<S>& x)
+    template <class _S, class _T> static
+    vec<_S>	cvt(vec<_T> x)
 		{
-		    typedef typename type_traits<S>::upper_type
-							upper_type;
+		    return mm::cvt<_S>(x);
+		}
+    template <class _S, class _TUPLE>
+    static typename detail::vec_tuple<src_vec, _S>::type
+		cvt(const _TUPLE& x)
+		{
+		    return boost::detail::tuple_impl_specific::
+			tuple_transform(x, invoke<_S>());
+		}
+    template <class _S, class _T> static
+    vec<_S>	cvt(vec<_T> x, vec<_T> y)
+		{
+		    return mm::cvt<_S>(x, y);
+		}
+    template <class _S, class _TUPLE>
+    static typename detail::vec_tuple<src_vec, _S>::type
+		cvt(const _TUPLE& x, const _TUPLE& y)
+		{
+		    return TU::detail::tuple_transform(x, y, invoke<_S>());
+		}
+
+    void	cvtdown(src_vec& x)
+		{
+		    x = *super::base();
+		    ++super::base_reference();
+		}
+    void	cvtdown(complementary_vec& x)
+		{
+		    const bool	SameSize = (vec<complementary_type>::size ==
+					    vec<element_type>::size);
+		    cvtdown(x, boost::mpl::bool_<SameSize>());
+		}
+    void	cvtdown(complementary_vec& x, boost::mpl::true_)
+		{
+		    src_vec	y;
+		    cvtdown(y);
+		    x = cvt<complementary_type>(y);
+		}
+    void	cvtdown(complementary_vec& x, boost::mpl::false_)
+		{
+		    src_vec	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt<complementary_type>(y, z);
+		}
+    template <class _VEC>
+    void	cvtdown(_VEC& x)
+		{
+		    typedef typename detail::
+				vec_tuple<_VEC>::element_type	S;
+		    typedef typename type_traits<S>::upper_type	upper_type;
 		    typedef typename boost::mpl::if_<
 				boost::is_floating_point<S>,
 				upper_type,
 				typename type_traits<upper_type>::signed_type>
 				::type			signed_upper_type;
 		    
-		    vec<signed_upper_type>	y, z;
+		    typename detail::vec_tuple<
+			src_vec, signed_upper_type>::type	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
 		    x = cvt<S>(y, z);
 		}
-    void	cvtdown(vec<complementary_type>& x)
-		{
-		    const bool	SameSize = (vec<complementary_type>::size ==
-					    vec<element_type>::size);
-		    cvtdown(x, boost::mpl::bool_<SameSize>());
-		}
-    void	cvtdown(vec<complementary_type>& x, boost::mpl::true_)
-		{
-		    vec<element_type>	y;
-		    cvtdown(y);
-		    x = cvt<complementary_type>(y);
-		}
-    void	cvtdown(vec<complementary_type>& x, boost::mpl::false_)
-		{
-		    vec<element_type>	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<complementary_type>(y, z);
-		}
-    void	cvtdown(vec<element_type>& x)
-		{
-		    x = *super::base();
-		    ++super::base_reference();
-		}
+
     reference	dereference() const
 		{
 		    reference	x;
 		    const_cast<cvtdown_iterator*>(this)->cvtdown(x);
 		    return x;
 		}
-    void	advance(difference_type n)				{}
+    void	advance(difference_type)				{}
     void	increment()						{}
     void	decrement()						{}
-};
-
-template <class T_TUPLE, class ITER_TUPLE>
-class cvtdown_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
-    : public fast_zip_iterator<
-	typename TU::detail::tuple_meta_transform2<
-	    T_TUPLE, ITER_TUPLE,
-	    boost::mpl::identity<
-		cvtdown_iterator<boost::mpl::_1, boost::mpl::_2> > >::type>
-{
-  private:
-    typedef fast_zip_iterator<
-	typename TU::detail::tuple_meta_transform2<
-	    T_TUPLE, ITER_TUPLE,
-	    boost::mpl::identity<
-		cvtdown_iterator<
-		    boost::mpl::_1, boost::mpl::_2> > >::type>	super;
-	
-    struct invoke
-    {
-	template <class T, class ITER>
-	struct apply
-	{
-	    typedef cvtdown_iterator<T, ITER>	type;
-	};
-
-	template <class T, class ITER> typename apply<T, ITER>::type
-	operator ()(ITER const& iter) const
-	{
-	    return typename apply<T, ITER>::type(iter);
-	}
-    };
-
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-    
-  public:
-    cvtdown_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
-	:super(TU::detail::tuple_transform2<T_TUPLE>(
-		   iter.get_iterator_tuple(), invoke()))		{}
-    cvtdown_iterator(super const& iter)	:super(iter)			{}
 };
     
 template <class T, class ITER> cvtdown_iterator<T, ITER>
@@ -3742,15 +3785,29 @@ namespace detail
     class cvtup_proxy
     {
       public:
-	typedef typename std::iterator_traits<ITER>::value_type	value_type;
-	typedef typename value_type::value_type			element_type;
-	typedef cvtup_proxy					self;
+	typedef typename detail::vec_tuple<
+		    typename std::iterator_traits<ITER>
+				::value_type>::type	value_type;
+	typedef typename detail::vec_tuple<value_type>
+			       ::element_type		element_type;
+	typedef cvtup_proxy				self;
 
       private:
+	template <class _S, size_t _I>
+	struct invoke
+	{
+	    template <class _T> struct apply	{ typedef vec<_S> type; };
+	    template <class _T> typename apply<_T>::type
+	    operator ()(vec<_T> x)	const	{ return cvt<_S, _I>(x); }
+	};
+
 	typedef typename std::iterator_traits<ITER>::reference
 							reference;
 	typedef typename type_traits<element_type>::complementary_type
 							complementary_type;
+	typedef typename detail::vec_tuple<
+		    value_type,
+		    complementary_type>::type		complementary_vec;
 	typedef typename boost::mpl::if_<
 		    boost::is_floating_point<element_type>,
 		    complementary_type,
@@ -3758,101 +3815,120 @@ namespace detail
 	typedef typename type_traits<
 		    typename type_traits<integral_type>::lower_type>
 		    ::unsigned_type			unsigned_lower_type;
+	typedef typename detail::vec_tuple<
+		    value_type,
+		    unsigned_lower_type>::type		unsigned_lower_vec;
 	
-	template <class OP, class T>
-	void	cvtup(vec<T> x)
+      private:
+	template <class _S, size_t _I=0, class _T> static
+	vec<_S>	cvt(vec<_T> x)
 		{
-		    typedef typename type_traits<T>::upper_type	upper_type;
+		    return mm::cvt<_S, _I>(x);
+		}
+	template <class _S, size_t _I=0, class _TUPLE>
+	static typename detail::vec_tuple<value_type, _S>::type
+		cvt(const _TUPLE& x)
+		{
+		    return boost::detail::tuple_impl_specific::
+			tuple_transform(x, invoke<_S, _I>());
+		}
 
-		    cvtup<OP>(cvt<upper_type, 0>(x));
-		    cvtup<OP>(cvt<upper_type, 1>(x));
-		}
-	template <class OP>
-	void	cvtup(vec<unsigned_lower_type> x)
+	template <class _OP>
+	void	cvtup(value_type x)
 		{
-		    cvtup<OP>(cvt<integral_type, 0>(x));
-		    cvtup<OP>(cvt<integral_type, 1>(x));
+		    _OP()(x, *_iter);
+		    ++_iter;
 		}
-	template <class OP>
-	void	cvtup(vec<complementary_type> x)
+	template <class _OP>
+	void	cvtup(unsigned_lower_vec x)
+		{
+		    cvtup<_OP>(cvt<integral_type, 0>(x));
+		    cvtup<_OP>(cvt<integral_type, 1>(x));
+		}
+	template <class _OP>
+	void	cvtup(complementary_vec x)
 		{
 		    const bool	SameSize = (vec<complementary_type>::size ==
 					    vec<element_type>::size);
-		    cvtup<OP>(x, boost::mpl::bool_<SameSize>());
+		    cvtup<_OP>(x, boost::mpl::bool_<SameSize>());
 		}
-	template <class OP>
-	void	cvtup(vec<complementary_type> x, boost::mpl::true_)
+	template <class _OP>
+	void	cvtup(complementary_vec x, boost::mpl::true_)
 		{
-		    cvtup<OP>(cvt<element_type>(x));
+		    cvtup<_OP>(cvt<element_type>(x));
 		}
-	template <class OP>
-	void	cvtup(vec<complementary_type> x, boost::mpl::false_)
+	template <class _OP>
+	void	cvtup(complementary_vec x, boost::mpl::false_)
 		{
-		    cvtup<OP>(cvt<element_type, 0>(x));
-		    cvtup<OP>(cvt<element_type, 1>(x));
+		    cvtup<_OP>(cvt<element_type, 0>(x));
+		    cvtup<_OP>(cvt<element_type, 1>(x));
 		}
-	template <class OP>
-	void	cvtup(vec<element_type> x)
+	template <class _OP, class _VEC>
+	void	cvtup(_VEC x)
 		{
-		    OP()(x, *_iter);
-		    ++_iter;
+		    typedef typename detail::
+				vec_tuple<_VEC>::element_type	S;
+		    typedef typename type_traits<S>::upper_type	upper_type;
+
+		    cvtup<_OP>(cvt<upper_type, 0>(x));
+		    cvtup<_OP>(cvt<upper_type, 1>(x));
 		}
 
       public:
-	cvtup_proxy(ITER const& iter)	:_iter(const_cast<ITER&>(iter))	{}
+	cvtup_proxy(ITER const& iter) :_iter(const_cast<ITER&>(iter)) {}
 	
-	template <class T>
-	self&	operator =(vec<T> x)
+	template <class _VEC>
+	self&	operator =(_VEC x)
 		{
 		    cvtup<assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator +=(vec<T> x)
+	template <class _VEC>
+	self&	operator +=(_VEC x)
 		{
 		    cvtup<plus_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator -=(vec<T> x)
+	template <class _VEC>
+	self&	operator -=(_VEC x)
 		{
 		    cvtup<minus_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator *=(vec<T> x)
+	template <class _VEC>
+	self&	operator *=(_VEC x)
 		{
 		    cvtup<multiplies_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator /=(vec<T> x)
+	template <class _VEC>
+	self&	operator /=(_VEC x)
 		{
 		    cvtup<divides_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator %=(vec<T> x)
+	template <class _VEC>
+	self&	operator %=(_VEC x)
 		{
 		    cvtup<modulus_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator &=(vec<T> x)
+	template <class _VEC>
+	self&	operator &=(_VEC x)
 		{
 		    cvtup<bit_and_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator |=(vec<T> x)
+	template <class _VEC>
+	self&	operator |=(_VEC x)
 		{
-		    cvtup<bit_or_assign<value_type, value_type> >(x);
+		    cvtup<bit_or_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator ^=(vec<T> x)
+	template <class _VEC>
+	self&	operator ^=(_VEC x)
 		{
-		    cvtup<bit_xor_assign<value_type, value_type> >(x);
+		    cvtup<bit_xor_assign<value_type, reference> >(x);
 		    return *this;
 		}
 	
@@ -3867,20 +3943,20 @@ namespace detail
 */
 template <class ITER>
 class cvtup_iterator
-    : public boost::iterator_adaptor<cvtup_iterator<ITER>,
-				     ITER,
-				     typename std::iterator_traits<ITER>
-						 ::value_type,
-				     boost::single_pass_traversal_tag,
-				     detail::cvtup_proxy<ITER> >
+    : public boost::iterator_adaptor<
+		 cvtup_iterator<ITER>,
+		 ITER,
+		 typename detail::cvtup_proxy<ITER>::value_type,
+		 boost::single_pass_traversal_tag,
+		 detail::cvtup_proxy<ITER> >
 {
   private:
-    typedef boost::iterator_adaptor<cvtup_iterator,
-				    ITER,
-				    typename std::iterator_traits<ITER>
-						::value_type,
-				    boost::single_pass_traversal_tag,
-				    detail::cvtup_proxy<ITER> >	super;
+    typedef boost::iterator_adaptor<
+		cvtup_iterator,
+		ITER,
+		typename detail::cvtup_proxy<ITER>::value_type,
+		boost::single_pass_traversal_tag,
+		detail::cvtup_proxy<ITER> >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -3899,57 +3975,14 @@ class cvtup_iterator
 			{
 			    return reference(super::base());
 			}
-    void		advance(difference_type n)			{}
+    void		advance(difference_type)			{}
     void		increment()					{}
     void		decrement()					{}
-    difference_type	distance_to(cvtup_iterator iter) const
+    difference_type	distance_to(cvtup_iterator const& iter) const
 			{
 			    return (iter.base() - super::base())
 				 / value_type::size;
 			}
-};
-
-template <class ITER_TUPLE>
-class cvtup_iterator<fast_zip_iterator<ITER_TUPLE> >
-    : public fast_zip_iterator<
-	typename boost::detail::tuple_impl_specific::tuple_meta_transform<
-	    ITER_TUPLE,
-	    boost::mpl::identity<cvtup_iterator<boost::mpl::_1> > >::type>
-{
-  private:
-    typedef fast_zip_iterator<
-	typename boost::detail::tuple_impl_specific::tuple_meta_transform<
-	    ITER_TUPLE,
-	    boost::mpl::identity<
-		cvtup_iterator<boost::mpl::_1> > >::type>	super;
-
-    struct invoke
-    {
-	template <class ITER>
-	struct apply
-	{
-	    typedef cvtup_iterator<ITER>	type;
-	};
-
-	template <class ITER> typename apply<ITER>::type
-	operator ()(ITER const& iter) const
-	{
-	    return typename apply<ITER>::type(iter);
-	}
-    };
-    
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-    
-  public:
-    cvtup_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
-	:super(boost::detail::tuple_impl_specific::
-	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
-    cvtup_iterator(super const& iter)	:super(iter)			{}
 };
 
 template <class ITER> cvtup_iterator<ITER>
@@ -3971,20 +4004,38 @@ class cvtdown_mask_iterator
     : public boost::iterator_adaptor<
 		cvtdown_mask_iterator<T, ITER>,			// self
 		ITER,						// base
-		vec<T>,						// value_type
-		boost::single_pass_traversal_tag,		// traversal
-		vec<T> >					// reference
+		typename detail::vec_tuple<
+		    typename std::iterator_traits<ITER>::value_type, T>::type,
+		boost::single_pass_traversal_tag,
+		typename detail::vec_tuple<
+		    typename std::iterator_traits<ITER>::value_type, T>::type>
 {
   private:
+    typedef typename std::iterator_traits<ITER>::value_type	src_vec;
     typedef boost::iterator_adaptor<cvtdown_mask_iterator,
 				    ITER,
-				    vec<T>, 
+				    typename detail::vec_tuple<
+					src_vec, T>::type,
 				    boost::single_pass_traversal_tag,
-				    vec<T> >		super;
-    typedef typename std::iterator_traits<ITER>
-			::value_type::value_type	element_type;
+				    typename detail::vec_tuple<
+					src_vec, T>::type>	super;
+
+    typedef typename detail::vec_tuple<src_vec>::element_type
+							element_type;
     typedef typename type_traits<element_type>::complementary_mask_type
-							complementary_mask_type;
+							complementary_type;
+    typedef typename detail::vec_tuple<
+		src_vec, complementary_type>::type	complementary_vec;
+
+    template <class _S>
+    struct invoke
+    {
+	template <class _T> struct apply	{ typedef vec<_S> type; };
+	template <class _T> typename apply<_T>::type
+	operator ()(vec<_T> x)		  const	{ return cvt_mask<_S>(x); }
+	template <class _T> typename apply<_T>::type
+	operator ()(vec<_T> x, vec<_T> y) const	{ return cvt_mask<_S>(x, y); }
+    };
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -3999,81 +4050,63 @@ class cvtdown_mask_iterator
 		cvtdown_mask_iterator(ITER const& iter)	:super(iter)	{}
 
   private:
-    template <class S>
-    void	cvtdown(vec<S>& x)
+    template <class _S, class _T> static
+    vec<_S>	cvt_mask(vec<_T> x)
 		{
-		    typedef typename type_traits<S>::upper_type	upper_type;
-		    
-		    vec<upper_type>	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt_mask<S>(y, z);
+		    return mm::cvt_mask<_S>(x);
 		}
-    void	cvtdown(vec<complementary_mask_type>& x)
+    template <class _S, class _TUPLE>
+    static typename detail::vec_tuple<src_vec, _S>::type
+		cvt_mask(const _TUPLE& x)
 		{
-		    vec<element_type>	y;
-		    cvtdown(y);
-		    x = cvt_mask<complementary_mask_type>(y);
+		    return boost::detail::tuple_impl_specific::
+			tuple_transform(x, invoke<_S>());
 		}
-    void	cvtdown(vec<element_type>& x)
+    template <class _S, class _T> static
+    vec<_S>	cvt_mask(vec<_T> x, vec<_T> y)
+		{
+		    return mm::cvt_mask<_S>(x, y);
+		}
+    template <class _S, class _TUPLE>
+    static typename detail::vec_tuple<src_vec, _S>::type
+		cvt_mask(const _TUPLE& x, const _TUPLE& y)
+		{
+		    return detail::tuple_transform(x, y, invoke<_S>());
+		}
+
+    void	cvtdown(src_vec& x)
 		{
 		    x = *super::base();
 		    ++super::base_reference();
 		}
+    void	cvtdown(complementary_vec& x)
+		{
+		    src_vec	y;
+		    cvtdown(y);
+		    x = cvt_mask<complementary_type>(y);
+		}
+    template <class _VEC>
+    void	cvtdown(_VEC& x)
+		{
+		    typedef typename detail::
+				vec_tuple<_VEC>::element_type	S;
+		    typedef typename type_traits<S>::upper_type	upper_type;
+		    typename detail::vec_tuple<
+				 src_vec, upper_type>::type	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt_mask<S>(y, z);
+		}
+
     reference	dereference() const
 		{
 		    reference	x;
 		    const_cast<cvtdown_mask_iterator*>(this)->cvtdown(x);
 		    return x;
 		}
-    void	advance(difference_type n)				{}
+    void	advance(difference_type)				{}
     void	increment()						{}
     void	decrement()						{}
-};
-
-template <class T_TUPLE, class ITER_TUPLE>
-class cvtdown_mask_iterator<T_TUPLE, fast_zip_iterator<ITER_TUPLE> >
-    : public fast_zip_iterator<
-	typename TU::detail::tuple_meta_transform2<
-	    T_TUPLE, ITER_TUPLE,
-	    boost::mpl::identity<
-		cvtdown_mask_iterator<boost::mpl::_1, boost::mpl::_2> > >::type>
-{
-  private:
-    typedef fast_zip_iterator<
-	typename TU::detail::tuple_meta_transform2<
-	    T_TUPLE, ITER_TUPLE,
-	    boost::mpl::identity<
-		cvtdown_mask_iterator<
-		    boost::mpl::_1, boost::mpl::_2> > >::type>	super;
-	
-    struct invoke
-    {
-	template <class T, class ITER>
-	struct apply
-	{
-	    typedef cvtdown_mask_iterator<T, ITER>	type;
-	};
-
-	template <class T, class ITER> typename apply<T, ITER>::type
-	operator ()(ITER const& iter) const
-	{
-	    return typename apply<T, ITER>::type(iter);
-	}
-    };
-
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-    
-  public:
-    cvtdown_mask_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
-	:super(TU::detail::tuple_transform2<T_TUPLE>(
-		   iter.get_iterator_tuple(), invoke()))		{}
-    cvtdown_mask_iterator(super const& iter)	:super(iter)		{}
 };
     
 template <class T, class ITER> cvtdown_mask_iterator<T, ITER>
@@ -4091,62 +4124,91 @@ namespace detail
     class cvtup_mask_proxy
     {
       public:
-	typedef typename std::iterator_traits<ITER>::value_type	value_type;
-	typedef typename value_type::value_type			element_type;
+	typedef typename detail::vec_tuple<
+		    typename std::iterator_traits<ITER>
+				::value_type>::type	value_type;
+	typedef typename detail::vec_tuple<value_type>
+			       ::element_type		element_type;
 	typedef cvtup_mask_proxy				self;
 
       private:
+	template <class _S, size_t _I>
+	struct invoke
+	{
+	    template <class _T> struct apply	{ typedef vec<_S> type; };
+	    template <class _T> typename apply<_T>::type
+	    operator ()(vec<_T> x)	const	{ return cvt_mask<_S, _I>(x); }
+	};
+
 	typedef typename std::iterator_traits<ITER>::reference
 							reference;
 	typedef typename type_traits<element_type>::complementary_mask_type
-							complementary_mask_type;
+							complementary_type;
+	typedef typename detail::vec_tuple<
+		    value_type,
+		    complementary_type>::type		complementary_vec;
 	
-	template <class OP, class T>
-	void	cvtup(vec<T> x)
+      private:
+	template <class _S, size_t _I=0, class _T> static
+	vec<_S>	cvt_mask(vec<_T> x)
 		{
-		    typedef typename type_traits<T>::upper_type	upper_type;
+		    return mm::cvt_mask<_S, _I>(x);
+		}
+	template <class _S, size_t _I=0, class _TUPLE>
+	static typename detail::vec_tuple<value_type, _S>::type
+		cvt_mask(const _TUPLE& x)
+		{
+		    return boost::detail::tuple_impl_specific::
+			tuple_transform(x, invoke<_S, _I>());
+		}
 
-		    cvtup<OP>(cvt_mask<upper_type, 0>(x));
-		    cvtup<OP>(cvt_mask<upper_type, 1>(x));
-		}
-	template <class OP>
-	void	cvtup(vec<complementary_mask_type> x)
+	template <class _OP>
+	void	cvtup(value_type x)
 		{
-		    cvtup<OP>(cvt_mask<element_type>(x));
-		}
-	template <class OP>
-	void	cvtup(vec<element_type> x)
-		{
-		    OP()(x, *_iter);
+		    _OP()(x, *_iter);
 		    ++_iter;
+		}
+	template <class _OP>
+	void	cvtup(complementary_vec x)
+		{
+		    cvtup<_OP>(cvt_mask<element_type>(x));
+		}
+	template <class _OP, class _VEC>
+	void	cvtup(_VEC x)
+		{
+		    typedef typename detail::
+				vec_tuple<_VEC>::element_type	S;
+		    typedef typename type_traits<S>::upper_type	upper_type;
+
+		    cvtup<_OP>(cvt_mask<upper_type, 0>(x));
+		    cvtup<_OP>(cvt_mask<upper_type, 1>(x));
 		}
 
       public:
-	cvtup_mask_proxy(ITER const& iter)
-	    :_iter(const_cast<ITER&>(iter))				{}
-
-	template <class T>
-	self&	operator =(vec<T> x)
+	cvtup_mask_proxy(ITER const& iter) :_iter(const_cast<ITER&>(iter)) {}
+	
+	template <class _VEC>
+	self&	operator =(_VEC x)
 		{
 		    cvtup<assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator &=(vec<T> x)
+	template <class _VEC>
+	self&	operator &=(_VEC x)
 		{
 		    cvtup<bit_and_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator |=(vec<T> x)
+	template <class _VEC>
+	self&	operator |=(_VEC x)
 		{
-		    cvtup<bit_or_assign<value_type, value_type> >(x);
+		    cvtup<bit_or_assign<value_type, reference> >(x);
 		    return *this;
 		}
-	template <class T>
-	self&	operator ^=(vec<T> x)
+	template <class _VEC>
+	self&	operator ^=(_VEC x)
 		{
-		    cvtup<bit_xor_assign<value_type, value_type> >(x);
+		    cvtup<bit_xor_assign<value_type, reference> >(x);
 		    return *this;
 		}
 	
@@ -4161,20 +4223,20 @@ namespace detail
 */
 template <class ITER>
 class cvtup_mask_iterator
-    : public boost::iterator_adaptor<cvtup_mask_iterator<ITER>,
-				     ITER,
-				     typename std::iterator_traits<ITER>
-						 ::value_type,
-				     boost::single_pass_traversal_tag,
-				     detail::cvtup_mask_proxy<ITER> >
+    : public boost::iterator_adaptor<
+		 cvtup_mask_iterator<ITER>,
+		 ITER,
+		 typename detail::cvtup_mask_proxy<ITER>::value_type,
+		 boost::single_pass_traversal_tag,
+		 detail::cvtup_mask_proxy<ITER> >
 {
   private:
-    typedef boost::iterator_adaptor<cvtup_mask_iterator,
-				    ITER,
-				    typename std::iterator_traits<ITER>
-						::value_type,
-				    boost::single_pass_traversal_tag,
-				    detail::cvtup_mask_proxy<ITER> >	super;
+    typedef boost::iterator_adaptor<
+		cvtup_mask_iterator,
+		ITER,
+		typename detail::cvtup_mask_proxy<ITER>::value_type,
+		boost::single_pass_traversal_tag,
+		detail::cvtup_mask_proxy<ITER> >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -4193,57 +4255,14 @@ class cvtup_mask_iterator
 			{
 			    return reference(super::base());
 			}
-    void		advance(difference_type n)			{}
+    void		advance(difference_type)			{}
     void		increment()					{}
     void		decrement()					{}
-    difference_type	distance_to(cvtup_mask_iterator iter) const
+    difference_type	distance_to(cvtup_mask_iterator const& iter) const
 			{
 			    return (iter.base() - super::base())
 				 / value_type::size;
 			}
-};
-
-template <class ITER_TUPLE>
-class cvtup_mask_iterator<fast_zip_iterator<ITER_TUPLE> >
-    : public fast_zip_iterator<
-	typename boost::detail::tuple_impl_specific::tuple_meta_transform<
-	    ITER_TUPLE,
-	    boost::mpl::identity<cvtup_mask_iterator<boost::mpl::_1> > >::type>
-{
-  private:
-    typedef fast_zip_iterator<
-	typename boost::detail::tuple_impl_specific::tuple_meta_transform<
-	    ITER_TUPLE,
-	    boost::mpl::identity<
-		cvtup_mask_iterator<boost::mpl::_1> > >::type>	super;
-
-    struct invoke
-    {
-	template <class ITER>
-	struct apply
-	{
-	    typedef cvtup_mask_iterator<ITER>	type;
-	};
-
-	template <class ITER> typename apply<ITER>::type
-	operator ()(ITER const& iter) const
-	{
-	    return typename apply<ITER>::type(iter);
-	}
-    };
-    
-  public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-    
-  public:
-    cvtup_mask_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
-	:super(boost::detail::tuple_impl_specific::
-	       tuple_transform(iter.get_iterator_tuple(), invoke()))	{}
-    cvtup_mask_iterator(super const& iter)	:super(iter)		{}
 };
 
 template <class ITER> cvtup_mask_iterator<ITER>
