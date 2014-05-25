@@ -385,6 +385,30 @@ make_fast_zip_iterator(TUPLE t)
 namespace detail
 {
 /************************************************************************
+*  tuple_transform(TUPLE, TUPLE, FUNC)					*
+************************************************************************/
+template <class FUNC> inline boost::tuples::null_type
+tuple_transform(boost::tuples::null_type, boost::tuples::null_type, FUNC)
+{
+    return boost::tuples::null_type();
+}
+template <class TUPLE, class FUNC>
+inline typename boost::detail::tuple_impl_specific::
+tuple_meta_transform<TUPLE, FUNC>::type
+tuple_transform(TUPLE const& t1, TUPLE const& t2, FUNC func)
+{ 
+    typedef typename boost::detail::tuple_impl_specific::
+	tuple_meta_transform<typename TUPLE::tail_type, FUNC>::type
+						transformed_tail_type;
+
+    return boost::tuples::cons<
+	typename boost::mpl::apply<FUNC, typename TUPLE::head_type>::type,
+	transformed_tail_type>(func(t1.get_head(), t2.get_head()),
+			       tuple_transform(t1.get_tail(),
+					       t2.get_tail(), func));
+}
+
+/************************************************************************
 *  struct tuple_meta_transform2<TUPLE1, TUPLE2, BINARY_META_FUN>	*
 ************************************************************************/
 template<class TUPLE1, class TUPLE2, class BINARY_META_FUN>

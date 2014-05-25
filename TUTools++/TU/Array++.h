@@ -1043,7 +1043,7 @@ Array<T, B>::operator [](size_t i) const
   \param c	掛ける数値
   \return	この配列
 */
-template <class T, class B> Array<T, B>&
+template <class T, class B> inline Array<T, B>&
 Array<T, B>::operator *=(const element_type& c)
 {
     super::for_each1(c, multiplies_assign<element_type, reference>());
@@ -1067,7 +1067,7 @@ Array<T, B>::operator /=(const element_type& c)
   \param expr	足す配列
   \return	この配列
 */
-template <class T, class B> template <class E> Array<T, B>&
+template <class T, class B> template <class E> inline Array<T, B>&
 Array<T, B>::operator +=(const container<E>& expr)
 {
     assert(size() == expr().size());
@@ -1081,7 +1081,7 @@ Array<T, B>::operator +=(const container<E>& expr)
   \param expr	引く配列
   \return	この配列
 */
-template <class T, class B> template <class E> Array<T, B>&
+template <class T, class B> template <class E> inline Array<T, B>&
 Array<T, B>::operator -=(const container<E>& expr)
 {
     assert(size() == expr().size());
