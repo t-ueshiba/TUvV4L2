@@ -4071,7 +4071,7 @@ class cvtdown_mask_iterator
     static typename detail::vec_tuple<src_vec, _S>::type
 		cvt_mask(const _TUPLE& x, const _TUPLE& y)
 		{
-		    return detail::tuple_transform(x, y, invoke<_S>());
+		    return TU::detail::tuple_transform(x, y, invoke<_S>());
 		}
 
     void	cvtdown(src_vec& x)
