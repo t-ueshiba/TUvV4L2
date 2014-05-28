@@ -20,7 +20,7 @@ NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
   CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DAVX2
+  CPPFLAGS     += -DSSE2
 endif
 CCFLAGS		= $(CFLAGS)
 
