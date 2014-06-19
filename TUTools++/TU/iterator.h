@@ -838,7 +838,7 @@ namespace detail
 	\param a	2次元配列
 	\param col	列を指定するindex
       */
-	column_proxy(A& a, size_t col)	:_a(a), _col(col)		{}
+	column_proxy(A* a, size_t col)	:_a(a), _col(col)		{}
 
       //! この列に他の配列を代入する.
       /*!
@@ -860,12 +860,16 @@ namespace detail
       //! 列の要素数すなわち行数を返す.
 	size_t			size() const
 				{
-				    return _a.size();
+				    return _a->size();
+				}
+	size_t			ncol() const
+				{
+				    return (size() ? begin()->size() : 0);
 				}
       //! 列の先頭要素を指す定数反復子を返す.
 	const_iterator		begin() const
 				{
-				    return const_iterator(_a.begin(), _col);
+				    return const_iterator(_a->begin(), _col);
 				}
       //! 列の先頭要素を指す定数反復子を返す.
 	const_iterator		cbegin() const
@@ -875,12 +879,12 @@ namespace detail
       //! 列の先頭要素を指す反復子を返す.
 	iterator		begin()
 				{
-				    return iterator(_a.begin(), _col);
+				    return iterator(_a->begin(), _col);
 				}
       //! 列の末尾を指す定数反復子を返す.
 	const_iterator		end() const
 				{
-				    return const_iterator(_a.end(), _col);
+				    return const_iterator(_a->end(), _col);
 				}
       //! 列の末尾を指す定数反復子を返す.
 	const_iterator		cend() const
@@ -890,7 +894,7 @@ namespace detail
       //! 列の末尾を指す反復子を返す.
 	iterator		end()
 				{
-				    return iterator(_a.end(), _col);
+				    return iterator(_a->end(), _col);
 				}
       //! 列の末尾要素を指す定数逆反復子を返す.
 	const_reverse_iterator	rbegin() const
@@ -942,7 +946,7 @@ namespace detail
 				}
 
       private:
-	A&		_a;	//!< 2次元配列への参照
+	A* const	_a;	//!< 2次元配列へのポインタ
 	size_t const	_col;	//!< 列を指定するindex
     };
 }
@@ -955,13 +959,13 @@ template <class A>
 class column_iterator
     : public boost::iterator_facade<column_iterator<A>,
 				    detail::column_proxy<A>,
-				    boost::random_access_traversal_tag,
+				    std::random_access_iterator_tag,
 				    detail::column_proxy<A> >
 {
   private:
     typedef boost::iterator_facade<column_iterator,
 				   detail::column_proxy<A>,
-				   boost::random_access_traversal_tag,
+				   std::random_access_iterator_tag,
 				   detail::column_proxy<A> >	super;
 
   public:
@@ -974,7 +978,7 @@ class column_iterator
     friend class	boost::iterator_core_access;
     
   public:
-    column_iterator(A& a, size_t col)	:_a(a), _col(col)		{}
+    column_iterator(A& a, size_t col)	:_a(&a), _col(col)		{}
 
     reference		dereference() const
 			{
@@ -1002,7 +1006,7 @@ class column_iterator
 			}
     
   private:
-    A&			_a;
+    A*			_a;
     difference_type	_col;
 };
 
@@ -1102,17 +1106,10 @@ column_rend(A& a)
   \param ITER	データ列中の要素を指す反復子の型
 */
 template <class ITER>
-class ring_iterator
-    : public boost::iterator_adaptor<ring_iterator<ITER>,	// self
-				     ITER,			// base
-				     boost::use_default,	// value_type
-				     boost::single_pass_traversal_tag>
+class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
 {
   private:
-    typedef boost::iterator_adaptor<ring_iterator,
-				    ITER,
-				    boost::use_default,
-				    boost::single_pass_traversal_tag>	super;
+    typedef boost::iterator_adaptor<ring_iterator, ITER>	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -1135,9 +1132,11 @@ class ring_iterator
 		{
 		    difference_type	d = std::distance(_begin, _end);
 		    n %= d;
-		    if (n >= std::distance(super::base(), _end))
+		    difference_type	i = std::distance(_begin,
+							  super::base()) + n;
+		    if (i >= d)
 			std::advance(super::base_reference(), n - d);
-		    else if (n < std::distance(super::base(), _begin))
+		    else if (i < 0)
 			std::advance(super::base_reference(), n + d);
 		    else
 			std::advance(super::base_reference(), n);

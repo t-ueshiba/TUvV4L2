@@ -121,7 +121,7 @@ class box_filter_iterator
 			    typename subiterator<_VITER>::value_type>::value>
 								value_is_expr;
 		    
-		    const_iterator	c = curr->begin(), h = head->begin();
+		    const_iterator	c = curr->cbegin(), h = head->cbegin();
 		    for (iterator v = val->begin(), ve = val->end();
 			 v != ve; ++v, ++c, ++h)
 			update(v, c, h, value_is_expr());
