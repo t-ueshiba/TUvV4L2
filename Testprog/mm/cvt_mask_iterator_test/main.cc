@@ -55,25 +55,25 @@ main()
     using namespace	TU;
 
     cerr << "--- src: int8_t, dst: singed ---" << endl;
-    mm::doJob<int8_t,	 int8_t >();
+  //mm::doJob<int8_t,	 int8_t >();
     mm::doJob<int8_t,	 int16_t>();
     mm::doJob<int8_t,	 int32_t>();
     mm::doJob<int8_t,	 int64_t>();
 
     cerr << "--- src: int8_t, dst: unsinged ---" << endl;
-    mm::doJob<int8_t,	 u_int8_t >();
+  //mm::doJob<int8_t,	 u_int8_t >();
     mm::doJob<int8_t,	 u_int16_t>();
     mm::doJob<int8_t,	 u_int32_t>();
     mm::doJob<int8_t,	 u_int64_t>();
 
     cerr << "--- src: u_int8_t, dst: singed ---" << endl;
-    mm::doJob<u_int8_t,  int8_t >();
+  //mm::doJob<u_int8_t,  int8_t >();
     mm::doJob<u_int8_t,  int16_t>();
     mm::doJob<u_int8_t,  int32_t>();
     mm::doJob<u_int8_t,  int64_t>();
 
     cerr << "--- src: u_int8_t, dst: unsinged ---" << endl;
-    mm::doJob<u_int8_t,  u_int8_t >();
+  //mm::doJob<u_int8_t,  u_int8_t >();
     mm::doJob<u_int8_t,  u_int16_t>();
     mm::doJob<u_int8_t,  u_int32_t>();
     mm::doJob<u_int8_t,  u_int64_t>();
@@ -123,15 +123,15 @@ main()
     cerr << "--- src: u_int32_t, dst: unsinged ---" << endl;
     mm::doJob<u_int32_t, u_int8_t >();
     mm::doJob<u_int32_t, u_int16_t>();
-    mm::doJob<u_int32_t, u_int32_t>();
+  //mm::doJob<u_int32_t, u_int32_t>();
     mm::doJob<u_int32_t, u_int64_t>();
 
     cerr << "--- src: int64_t ---" << endl;
-    mm::doJob<int64_t,   int64_t>();
+  //mm::doJob<int64_t,   int64_t>();
     mm::doJob<int64_t,   u_int64_t>();
     cerr << "--- src: u_int64_t ---" << endl;
     mm::doJob<u_int64_t, int64_t>();
-    mm::doJob<u_int64_t, u_int64_t>();
+  //mm::doJob<u_int64_t, u_int64_t>();
 
 #if defined(SSE2)
     mm::doJob<int8_t,    float    >();

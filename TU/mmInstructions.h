@@ -3905,17 +3905,21 @@ class cvtdown_mask_iterator
     typedef typename detail::vec_tuple<
 	elementary_vec, complementary_type>::type	complementary_vec;
     typedef typename boost::mpl::if_<
-		boost::is_floating_point<element_type>,
-		complementary_type, element_type>::type	integral_type;
+	boost::is_floating_point<element_type>,
+	complementary_type, element_type>::type		integral_type;
     typedef typename detail::vec_tuple<
-		elementary_vec, integral_type>::type	integral_vec;
+	elementary_vec, integral_type>::type		integral_vec;
     typedef typename boost::mpl::if_<
-		boost::is_signed<integral_type>,
-		typename type_traits<integral_type>::unsigned_type,
-		typename type_traits<integral_type>::signed_type>::type
+	boost::is_signed<integral_type>,
+	typename type_traits<integral_type>::unsigned_type,
+	typename type_traits<integral_type>::signed_type>::type
 							flipped_type;
     typedef typename detail::vec_tuple<
-		elementary_vec, flipped_type>::type	flipped_vec;
+	elementary_vec, flipped_type>::type		flipped_vec;
+    typedef typename type_traits<flipped_type>::lower_type
+							flipped_lower_type;
+    typedef typename detail::vec_tuple<
+	elementary_vec, flipped_lower_type>::type	flipped_lower_vec;
 
     template <class _S>
     struct invoke
@@ -3981,6 +3985,13 @@ class cvtdown_mask_iterator
 		    cvtdown(y);
 		    x = cvt_mask<flipped_type>(y);
 		}
+    void	cvtdown(flipped_lower_vec& x)
+		{
+		    integral_vec	y, z;
+		    cvtdown(y);
+		    cvtdown(z);
+		    x = cvt_mask<flipped_lower_type>(y, z);
+		}
     template <class _VEC>
     void	cvtdown(_VEC& x)
 		{
@@ -4041,8 +4052,7 @@ namespace detail
 	typedef typename type_traits<element_type>::complementary_mask_type
 							complementary_type;
 	typedef typename detail::vec_tuple<
-		    value_type,
-		    complementary_type>::type		complementary_vec;
+	    value_type, complementary_type>::type	complementary_vec;
 	typedef typename boost::mpl::if_<
 	    boost::is_floating_point<element_type>,
 	    complementary_type, element_type>::type	integral_type;
@@ -4053,6 +4063,10 @@ namespace detail
 							flipped_type;
 	typedef typename detail::vec_tuple<
 	    value_type, flipped_type>::type		flipped_vec;
+	typedef typename type_traits<flipped_type>::lower_type
+							flipped_lower_type;
+	typedef typename detail::vec_tuple<
+	    value_type, flipped_lower_type>::type	flipped_lower_vec;
 	
       private:
 	template <class _S, size_t _I=0, class _T> static
@@ -4083,6 +4097,12 @@ namespace detail
 	void	cvtup(flipped_vec x)
 		{
 		    cvtup<_OP>(cvt_mask<integral_type>(x));
+		}
+	template <class _OP>
+	void	cvtup(flipped_lower_vec x)
+		{
+		    cvtup<_OP>(cvt_mask<integral_type, 0>(x));
+		    cvtup<_OP>(cvt_mask<integral_type, 1>(x));
 		}
 	template <class _OP, class _VEC>
 	void	cvtup(_VEC x)

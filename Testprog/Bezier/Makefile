@@ -34,7 +34,6 @@ LINKER		= $(CXX)
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Bezier++.h \
-		/usr/local/include/TU/Expression++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/List.h \
@@ -71,11 +70,11 @@ draw.o: draw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Expression++.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
@@ -83,12 +82,12 @@ draw.o: draw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/Bezier++.h
 main.o: /usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Expression++.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/CanvasPane.h draw.h \
 	/usr/local/include/TU/v/OglDC.h \
