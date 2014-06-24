@@ -57,11 +57,15 @@ class Warp
 	    :us(d), vs(d), du(d), dv(d), lmost(0)	{}
 
 	size_t		width()			const	{return us.size();}
-	void		resize(size_t d)			;
-
-	Array<short,  Buf<short, true> >	us, vs;
-	Array<u_char, Buf<u_char, true> >	du, dv;
-	int					lmost;
+	void		resize(size_t d)		;
+#if defined(MMX)
+	Array<short,  Buf<short,  mm::allocator<short > > >	us, vs;
+	Array<u_char, Buf<u_char, mm::allocator<u_char> > >	du, dv;
+#else
+	Array<short>						us, vs;
+	Array<u_char>						du, dv;
+#endif
+	int							lmost;
     };
 
 #if defined(USE_TBB)

@@ -39,6 +39,7 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include "TU/iterator.h"
 #include "TU/mmInstructions.h"
 #if (__cplusplus > 199711L) || defined(__GXX_EXPERIMENTAL_CXX0X__)
@@ -68,21 +69,24 @@ struct BufTraits<mm::vec<T>, ALIGNED>	// 要素がvec<T>の配列の反復子を
 #endif
 
 /************************************************************************
-*  class Buf<T, ALIGNED>						*
+*  class Buf<T, ALLOC>							*
 ************************************************************************/
 //! 可変長バッファクラス
 /*!
   単独で使用することはなく，TU::Array または TU::Array2 の
   第2テンプレート引数に指定することによって，それらの基底クラスとして使う．
   \param T		要素の型
-  \param ALIGNED	バッファのアドレスがalignされていれば true,
-			そうでなければ false
+  \param ALLOC		アロケータの型
 */
-template <class T, bool ALIGNED=false>
-class Buf : public BufTraits<T, ALIGNED>
+template <class T, class ALLOC=std::allocator<T> >
+class Buf
+    : public BufTraits<T, !boost::is_same<ALLOC, std::allocator<T> >::value>
 {
   private:
-    enum	{ ALIGN = (ALIGNED ? 32 : 1) };
+    enum
+    {
+	ALIGNED = !boost::is_same<ALLOC, std::allocator<T> >::value
+    };
     
     typedef BufTraits<T, ALIGNED>			super;
 
@@ -96,6 +100,7 @@ class Buf : public BufTraits<T, ALIGNED>
 							reference;
     typedef typename std::iterator_traits<const_iterator>::reference
 							const_reference;
+    typedef ALLOC					allocator_type;
     
   public:
     explicit		Buf(size_t siz=0)			;
@@ -140,46 +145,21 @@ class Buf : public BufTraits<T, ALIGNED>
 			}
     
   private:
-    template <bool _ALIGNED, class=void>
-    struct Allocator
-    {
-	static pointer	alloc(size_t siz)	{ return new value_type[siz]; }
-	static void	free(pointer p, size_t)	{ delete [] p; }
-    };
-#if defined(MMX)
-    template <class DUMMY>		// MMX が定義されていれて，かつ
-    struct Allocator<true, DUMMY>	// alignment するならば...
-    {					// _mm_malloc(), _mm_free() を使用
-	static pointer
-	alloc(size_t siz)
-	{
-	    if (siz == 0)
-		return 0;
-	    
-	    pointer	p = static_cast<pointer>(
-				_mm_malloc(sizeof(value_type)*siz, ALIGN));
-	    if (p == 0)
-		throw std::runtime_error("Buf<T, ALIGNED>::Allocator<true>::alloc(): failed to allocate memory!!");
-	    
-	    for (pointer q = p, qe = p + siz; q != qe; ++q)
-		new(q) value_type();	// 確保した各要素にコンストラクタを適用
-	    return p;
-	}
+    pointer		alloc(size_t siz)
+			{
+			    pointer	p = _allocator.allocate(siz);
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				_allocator.construct(q, value_type());
+			    return p;
+			}
+    void		free(pointer p, size_t siz)
+			{
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				_allocator.destroy(q);
+			    _allocator.deallocate(p, siz);
+			}
 
-	static void
-	free(pointer p, size_t siz)
-	{
-	    if (p != 0)
-	    {
-		for (pointer q = p, qe = p + siz; q != qe; ++q)
-		    q->~value_type();	// 解放する各要素にデストラクタを適用
-		_mm_free(p);
-	    }
-	}
-    };
-#endif
-    typedef Allocator<ALIGNED>			allocator;
-    
+  private:
     template <size_t I, size_t J>
     struct GCD		// 最大公約数を求める template meta-function
     {
@@ -197,19 +177,20 @@ class Buf : public BufTraits<T, ALIGNED>
     };
 
   private:
-    size_t	_size;				//!< 要素数
-    pointer	_p;				//!< 記憶領域の先頭ポインタ
-    size_t	_shared	  : 1;			//!< 記憶領域の共有を示すフラグ
-    size_t	_capacity : 8*sizeof(size_t)-1;	//!< 要素数単位の容量: >= _size
+    allocator_type	_allocator;
+    size_t		_size;			//!< 要素数
+    pointer		_p;			//!< 記憶領域の先頭ポインタ
+    size_t		_shared	  : 1;		//!< 記憶領域の共有を示すフラグ
+    size_t		_capacity : 8*sizeof(size_t)-1;	//!< 要素数単位の容量
 };
 
 //! 指定した要素数のバッファを生成する．
 /*!
   \param siz	要素数
 */
-template <class T, bool ALIGNED> inline
-Buf<T, ALIGNED>::Buf(size_t siz)
-    :_size(siz), _p(allocator::alloc(_size)), _shared(0), _capacity(_size)
+template <class T, class ALLOC> inline
+Buf<T, ALLOC>::Buf(size_t siz)
+    :_allocator(), _size(siz), _p(alloc(_size)), _shared(0), _capacity(_size)
 {
 }
 
@@ -218,23 +199,24 @@ Buf<T, ALIGNED>::Buf(size_t siz)
   \param p	外部領域へのポインタ
   \param siz	要素数
 */
-template <class T, bool ALIGNED> inline
-Buf<T, ALIGNED>::Buf(pointer p, size_t siz)
-    :_size(siz), _p(p), _shared(1), _capacity(_size)
+template <class T, class ALLOC> inline
+Buf<T, ALLOC>::Buf(pointer p, size_t siz)
+    :_allocator(), _size(siz), _p(p), _shared(1), _capacity(_size)
 {
 }
     
 //! コピーコンストラクタ
-template <class T, bool ALIGNED>
-Buf<T, ALIGNED>::Buf(const Buf& b)
-    :_size(b._size), _p(allocator::alloc(_size)), _shared(0), _capacity(_size)
+template <class T, class ALLOC>
+Buf<T, ALLOC>::Buf(const Buf& b)
+    :_allocator(), _size(b._size),
+     _p(alloc(_size)), _shared(0), _capacity(_size)
 {
     std::copy(b.begin(), b.end(), begin());
 }
 
 //! 標準代入演算子
-template <class T, bool ALIGNED> Buf<T, ALIGNED>&
-Buf<T, ALIGNED>::operator =(const Buf& b)
+template <class T, class ALLOC> Buf<T, ALLOC>&
+Buf<T, ALLOC>::operator =(const Buf& b)
 {
     if (this != &b)
     {
@@ -254,21 +236,22 @@ Buf<T, ALIGNED>::operator =(const Buf& b)
  *  x._buf も一緒に y._buf にshallow copyされるので，問題は生じない．
  */
 //! 移動コンストラクタ
-template <class T, bool ALIGNED> inline
-Buf<T, ALIGNED>::Buf(Buf&& b)
-    :_size(b._size), _p(b._p), _shared(b._shared), _capacity(b._capacity)
+template <class T, class ALLOC> inline
+Buf<T, ALLOC>::Buf(Buf&& b)
+    :_allocator(), _size(b._size),
+     _p(b._p), _shared(b._shared), _capacity(b._capacity)
 {
     b._p = nullptr;	// b の 破壊時に b._p がdeleteされることを防ぐ．
 }
 
 //! 移動代入演算子
-template <class T, bool ALIGNED> inline Buf<T, ALIGNED>&
-Buf<T, ALIGNED>::operator =(Buf&& b)
+template <class T, class ALLOC> inline Buf<T, ALLOC>&
+Buf<T, ALLOC>::operator =(Buf&& b)
 {
     if (_shared)
 	return operator =(static_cast<const Buf&>(b));
 
-    allocator::free(_p, _size);
+    free(_p, _size);
     _size     = b._size;
     _p	      = b._p;
     _capacity = b._capacity;
@@ -280,72 +263,72 @@ Buf<T, ALIGNED>::operator =(Buf&& b)
 #endif
 
 //! デストラクタ
-template <class T, bool ALIGNED> inline
-Buf<T, ALIGNED>::~Buf()
+template <class T, class ALLOC> inline
+Buf<T, ALLOC>::~Buf()
 {
     if (!_shared)
-	allocator::free(_p, _size);
+	free(_p, _size);
 }
     
 //! バッファが使用する内部記憶領域へのポインタを返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::pointer
-Buf<T, ALIGNED>::data()
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::pointer
+Buf<T, ALLOC>::data()
 {
     return _p;
 }
 
 //! バッファが使用する内部記憶領域への定数ポインタを返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_pointer
-Buf<T, ALIGNED>::data() const
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_pointer
+Buf<T, ALLOC>::data() const
 {
     return _p;
 }
     
 //! バッファの先頭要素を指す反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::iterator
-Buf<T, ALIGNED>::begin()
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::iterator
+Buf<T, ALLOC>::begin()
 {
     return data();
 }
 
 //! バッファの先頭要素を指す定数反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
-Buf<T, ALIGNED>::begin() const
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
+Buf<T, ALLOC>::begin() const
 {
     return data();
 }
 
 //! バッファの先頭要素を指す定数反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
-Buf<T, ALIGNED>::cbegin() const
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
+Buf<T, ALLOC>::cbegin() const
 {
     return begin();
 }
 
 //! バッファの末尾を指す反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::iterator
-Buf<T, ALIGNED>::end()
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::iterator
+Buf<T, ALLOC>::end()
 {
     return begin() + size();
 }
 
 //! バッファの末尾を指す定数反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
-Buf<T, ALIGNED>::end() const
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
+Buf<T, ALLOC>::end() const
 {
     return begin() + size();
 }
 
 //! バッファの末尾を指す定数反復子を返す．
-template <class T, bool ALIGNED> inline typename Buf<T, ALIGNED>::const_iterator
-Buf<T, ALIGNED>::cend() const
+template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
+Buf<T, ALLOC>::cend() const
 {
     return end();
 }
 
 //! バッファの要素数を返す．
-template <class T, bool ALIGNED> inline size_t
-Buf<T, ALIGNED>::size() const
+template <class T, class ALLOC> inline size_t
+Buf<T, ALLOC>::size() const
 {
     return _size;
 }
@@ -360,21 +343,21 @@ Buf<T, ALIGNED>::size() const
   \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
 				に送出
 */
-template <class T, bool ALIGNED> bool
-Buf<T, ALIGNED>::resize(size_t siz)
+template <class T, class ALLOC> bool
+Buf<T, ALLOC>::resize(size_t siz)
 {
     if (_size == siz)
 	return false;
     
     if (_shared)
-	throw std::logic_error("Buf<T, ALIGNED>::resize: cannot change size of shared buffer!");
+	throw std::logic_error("Buf<T, ALLOC>::resize: cannot change size of shared buffer!");
 
     const size_t	old_size = _size;
     _size = siz;
     if (_capacity < _size)
     {
-	allocator::free(_p, old_size);
-	_p = allocator::alloc(_size);
+	free(_p, old_size);
+	_p = alloc(_size);
 	_capacity = _size;
     }
     return _size > old_size;
@@ -385,11 +368,11 @@ Buf<T, ALIGNED>::resize(size_t siz)
   \param p	新しい記憶領域へのポインタ
   \param siz	新しい要素数
 */
-template <class T, bool ALIGNED> inline void
-Buf<T, ALIGNED>::resize(pointer p, size_t siz)
+template <class T, class ALLOC> inline void
+Buf<T, ALLOC>::resize(pointer p, size_t siz)
 {
     if (!_shared)
-	allocator::free(_p, _size);
+	free(_p, _size);
     _size     = siz;
     _p	      = p;
     _shared   = 1;
@@ -403,13 +386,14 @@ Buf<T, ALIGNED>::resize(pointer p, size_t siz)
   \param siz	要素数
   \return	alignされた要素数
 */
-template <class T, bool ALIGNED> inline size_t
-Buf<T, ALIGNED>::stride(size_t siz)
+template <class T, class ALLOC> inline size_t
+Buf<T, ALLOC>::stride(size_t siz)
 {
 #if defined(MMX)
     if (ALIGNED)
     {
-	const size_t	LCM = ALIGN * sizeof(T) / GCD<sizeof(T), ALIGN>::value;
+	const size_t	LCM = mm::ALIGN * sizeof(T)
+			    / GCD<sizeof(T), mm::ALIGN>::value;
       // LCM * m >= sizeof(T) * siz なる最小の m を求める．
 	const size_t	m = (sizeof(T)*siz + LCM - 1) / LCM;
 	return (LCM * m) / sizeof(T);
@@ -425,8 +409,8 @@ Buf<T, ALIGNED>::stride(size_t siz)
   \param m	読み込み先の先頭を指定するindex
   \return	inで指定した入力ストリーム
 */
-template <class T, bool ALIGNED> std::istream&
-Buf<T, ALIGNED>::get(std::istream& in, size_t m)
+template <class T, class ALLOC> std::istream&
+Buf<T, ALLOC>::get(std::istream& in, size_t m)
 {
     const size_t		BufSiz = (sizeof(value_type) < 2048 ?
 				  2048 / sizeof(value_type) : 1);
@@ -547,7 +531,7 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
     };
     
     template <bool _ALIGNED, class=void>
-    struct Buffer		{ value_type p[D]; };
+    struct Buffer		{ value_type	p[D]; };
 #if defined(MMX)
     template <class DUMMY>
     struct Buffer<true, DUMMY>	{ __declspec(align(32)) value_type p[D]; };
