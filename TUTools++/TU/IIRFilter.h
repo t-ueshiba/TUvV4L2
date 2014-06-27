@@ -627,7 +627,12 @@ template <size_t D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
-    typedef Array<value_type, Buf<value_type, true> >		buf_type;
+#if defined(MMX)
+    typedef Array<value_type,
+		  Buf<value_type, mm::allocator<value_type> > >	buf_type;
+#else
+    typedef Array<value_type>					buf_type;
+#endif
     typedef typename buf_type::iterator				buf_iterator;
     
     buf_type	bufF(std::distance(ib, ie)), bufB(bufF.size());
