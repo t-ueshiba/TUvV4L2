@@ -33,7 +33,8 @@ LINKER		= $(CXX)
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h
+		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -42,4 +43,5 @@ include $(PROJECT)/lib/p.mk
 
 ###
 main.o: /usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/tuple.h
