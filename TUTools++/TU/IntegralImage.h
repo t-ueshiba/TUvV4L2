@@ -31,8 +31,8 @@
   \file		IntegralImage.h
   \brief	クラス TU::IntegralImage, TU::DiagonalIntegralImage の定義と実装
 */
-#ifndef	__TUIntegralImage_h
-#define	__TUIntegralImage_h
+#ifndef	__TU_INTEGRALIMAGE_H
+#define	__TU_INTEGRALIMAGE_H
 
 #include "TU/Image++.h"
 #ifdef USE_TBB
@@ -452,5 +452,4 @@ DiagonalIntegralImage<T>::correct(int& u, int& v) const
 }
 
 }
-
-#endif	/* !__TUIntegralImage_h */
+#endif	// !__TU_INTEGRALIMAGE_H

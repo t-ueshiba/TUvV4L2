@@ -31,8 +31,8 @@
   \file		Profiler.h
   \brief	クラス TU::Profiler の定義と実装
 */
-#ifndef __TUProfiler_h
-#define __TUProfiler_h
+#ifndef __TU_PROFILER_H
+#define __TU_PROFILER_H
 
 #include "TU/types.h"
 #include "TU/Array++.h"
@@ -135,4 +135,4 @@ Profiler::nextFrame() const
 }
 
 }
-#endif
+#endif	// !__TU_PROFILER_H

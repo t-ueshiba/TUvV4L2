@@ -31,8 +31,8 @@
   \file		EdgeDetector.h
   \brief	クラス TU::EdgeDetector の定義と実装
 */
-#ifndef	__TUEdgeDetector_h
-#define	__TUEdgeDetector_h
+#ifndef	__TU_EDGEDETECTOR_H
+#define	__TU_EDGEDETECTOR_H
 
 #include "TU/Image++.h"
 
@@ -118,5 +118,4 @@ EdgeDetector::initialize(float th_low, float th_high)
 }
  
 }
-
-#endif	/* !__TUEdgeDetector_h */
+#endif	// !__TU_EDGEDETECTOR_H

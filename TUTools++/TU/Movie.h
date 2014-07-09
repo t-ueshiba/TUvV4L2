@@ -31,8 +31,8 @@
   \file		Movie.h
   \brief	クラス TU::Movie の定義と実装
 */
-#ifndef __TUMovie_h
-#define __TUMovie_h
+#ifndef __TU_MOVIE_H
+#define __TU_MOVIE_H
 
 #include <utility>
 #include <list>
@@ -656,4 +656,4 @@ Movie<YUV411>::npixels(size_t n)
 }
 
 }
-#endif	// !__TUMovie_h
+#endif	// !__TU_MOVIE_H

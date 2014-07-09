@@ -31,8 +31,8 @@
   \file		PM16C_04.h
   \brief	クラス TU::PM16C_04 の定義と実装
 */
-#ifndef __TUPM16C_04_h
-#define __TUPM16C_04_h
+#ifndef __TU_PM16C_04_H
+#define __TU_PM16C_04_H
 
 #include "TU/Serial.h"
 
@@ -165,5 +165,4 @@ class PM16C_04 : public Serial
 };
     
 }
-
-#endif	// !__TUPM16C_04_h
+#endif	// !__TU_PM16C_04_H

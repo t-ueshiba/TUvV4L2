@@ -31,8 +31,8 @@
   \file		Heap.h
   \brief	クラス TU::Heap の定義と実装
 */
-#ifndef __TUHeap_h
-#define __TUHeap_h
+#ifndef __TU_HEAP_H
+#define __TU_HEAP_H
 
 #include "TU/Array++.h"
 #include <functional>
@@ -296,5 +296,4 @@ sort(Array<T>& a, const Cmp& cmp)
 }
  
 }
-
-#endif	// !__TUHeap_h
+#endif	// !__TU_HEAP_H

@@ -31,8 +31,8 @@
   \file		Nurbs++.h
   \brief	非有理/有理B-spline曲線/曲面に関連するクラスの定義と実装
 */
-#ifndef __TUNurbsPP_h
-#define __TUNurbsPP_h
+#ifndef __TU_NURBSPP_H
+#define __TU_NURBSPP_H
 
 #include "TU/Vector++.h"
 
@@ -916,4 +916,4 @@ typedef BSplineSurface<Vector3d>	BSplineSurface3d;
 typedef BSplineSurface<Vector4d>	RationalBSplineSurface3d;
 
 }
-#endif
+#endif	// !__TU_NURBSPP_H

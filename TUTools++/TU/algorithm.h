@@ -31,8 +31,8 @@
   \file		algorithm.h
   \brief	各種アルゴリズムの定義と実装
 */
-#ifndef __TUalgorithm_h
-#define __TUalgorithm_h
+#ifndef __TU_ALGORITHM_H
+#define __TU_ALGORITHM_H
 
 #include <algorithm>
 #include "TU/types.h"
@@ -241,4 +241,4 @@ mopClose(Iterator begin, Iterator end, size_t niter=1)
 }
     
 }
-#endif
+#endif	// !__TU_ALGORITHM_H

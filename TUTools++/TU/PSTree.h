@@ -31,8 +31,8 @@
   \file		PSTree.h
   \brief	クラス TU::PSTree の定義と実装
 */
-#ifndef __TUPSTree_h
-#define __TUPSTree_h
+#ifndef __TU_PSTREE_H
+#define __TU_PSTREE_H
 
 #include "TU/Heap.h"
 #include "TU/List.h"
@@ -289,4 +289,4 @@ PSTree<S, T, CompareX, CompareY>::Node::print(std::ostream& out,
 }
  
 }
-#endif	// !__TUPSTree_h
+#endif	// !__TU_PSTREE_H

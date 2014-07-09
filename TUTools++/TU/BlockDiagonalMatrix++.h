@@ -31,8 +31,8 @@
   \file		BlockDiagonalMatrix++.h
   \brief	クラス TU::BlockDiagonalMatrix の定義と実装
 */
-#ifndef __TUBlockDiagonalMatrixPP_h
-#define __TUBlockDiagonalMatrixPP_h
+#ifndef __TU_BLOCKDIAGONALMATRIXPP_H
+#define __TU_BLOCKDIAGONALMATRIXPP_H
 
 #include "TU/Vector++.h"
 
@@ -348,5 +348,4 @@ operator *(const Vector<T>& v, const BlockDiagonalMatrix<T>& b)
 }
  
 }
-
-#endif	/* !__TUBlockDiagonalMatrixPP_h	*/
+#endif	// !__TU_BLOCKDIAGONALMATRIXPP_H

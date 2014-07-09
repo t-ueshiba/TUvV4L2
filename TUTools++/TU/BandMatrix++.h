@@ -31,8 +31,8 @@
   \file		BandMatrix++.h
   \brief	クラス TU::BandMatrix の定義と実装
 */
-#ifndef __TUBandMatrixPP_h
-#define __TUBandMatrixPP_h
+#ifndef __TU_BANDMATRIXPP_H
+#define __TU_BANDMATRIXPP_H
 
 #include "TU/Vector++.h"
 
@@ -371,5 +371,4 @@ operator <<(std::ostream& out, const BandMatrix<T, P, Q>& A)
 }
 
 }
-
-#endif
+#endif	// !__TU_BANDMATRIXPP_H

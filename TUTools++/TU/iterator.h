@@ -31,8 +31,8 @@
   \file		iterator.h
   \brief	各種反復子の定義と実装
 */
-#ifndef __TUiterator_h
-#define __TUiterator_h
+#ifndef __TU_ITERATOR_H
+#define __TU_ITERATOR_H
 
 #include <cstddef>				// for including size_t
 #include <boost/iterator/transform_iterator.hpp>
@@ -1116,4 +1116,4 @@ make_iterator_tuple(ITER iter)
 }
 
 }	// namespace TU
-#endif
+#endif	// !__TU_ITERATOR_H

@@ -50,8 +50,8 @@
   \file		Random.h
   \brief	クラス TU::Random の定義と実装
 */
-#ifndef __TURandom_h
-#define __TURandom_h
+#ifndef __TU_RANDOM_H
+#define __TU_RANDOM_H
 
 #include "TU/types.h"
 
@@ -126,5 +126,4 @@ Random::generateRes53()
 } 
 
 }
-
-#endif	// !__TURandom_h
+#endif	// !__TU_RANDOM_H

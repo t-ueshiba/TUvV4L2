@@ -31,8 +31,8 @@
   \file		SHOT602.h
   \brief	クラス TU::SHOT602 の定義と実装
 */
-#ifndef __TUSHOT602_h
-#define __TUSHOT602_h
+#ifndef __TU_SHOT602_H
+#define __TU_SHOT602_H
 
 #include "TU/Serial.h"
 
@@ -99,5 +99,4 @@ class SHOT602 : public Serial
 };
     
 }
-
-#endif	// !__TUSHOT602_h
+#endif	// !__TU_SHOT602_H

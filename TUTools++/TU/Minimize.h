@@ -31,8 +31,8 @@
   \file		Minimize.h
   \brief	汎用最小自乗法に関連する関数の定義と実装
 */
-#ifndef __TUMinimize_h
-#define __TUMinimize_h
+#ifndef __TU_MINIMIZE_H
+#define __TU_MINIMIZE_H
 
 #include "TU/Vector++.h"
 #include <algorithm>
@@ -623,4 +623,4 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 }
 
 }
-#endif	/* !__TUMinimize_h	*/
+#endif	// !__TU_MINIMIZE_H

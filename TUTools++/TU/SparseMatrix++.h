@@ -31,8 +31,8 @@
   \file		SparseMatrix++.h
   \brief	クラス TU::SparseMatrix の定義と実装
 */
-#ifndef __TUSparseMatrixPP_h
-#define __TUSparseMatrixPP_h
+#ifndef __TU_SPARSEMATRIXPP_H
+#define __TU_SPARSEMATRIXPP_H
 
 #include "TU/Vector++.h"
 #include <vector>
@@ -1091,5 +1091,4 @@ operator <<(std::ostream& out, const SparseMatrix<T, SYM>& A)
 }
 
 }
-
-#endif	// ! __TUSparseMatrixPP_h
+#endif	// ! __TU_SPARSEMATRIXPP_H

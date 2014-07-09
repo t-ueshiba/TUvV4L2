@@ -27,8 +27,8 @@
  *
  *  $Id: CCSImage.h,v 1.2 2010-11-22 06:16:19 ueshiba Exp $
  */
-#ifndef __CCSIMAGE_H
-#define __CCSIMAGE_H
+#ifndef __TU_CCSIMAGE_H
+#define __TU_CCSIMAGE_H
 
 #include "TU/Image++.h"
 #include <complex>
@@ -730,4 +730,4 @@ CCSImage<T>::maximum() const
 }
     
 }
-#endif	// !__CCSIMAGE_H
+#endif	// !__TU_CCSIMAGE_H

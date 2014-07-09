@@ -31,8 +31,8 @@
   \file		DericheConvolver.h
   \brief	Canny-Deriche核による畳み込みに関するクラスの定義と実装
 */
-#ifndef	__TUDericheConvolver_h
-#define	__TUDericheConvolver_h
+#ifndef	__TU_DERICHECONVOLVER_H
+#define	__TU_DERICHECONVOLVER_H
 
 #include "TU/IIRFilter.h"
 
@@ -290,4 +290,5 @@ DericheConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 }
 
 }
-#endif	/* !__TUDericheConvolver_h */
+#endif	// !__TU_DERICHECONVOLVER_H
+

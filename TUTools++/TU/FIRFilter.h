@@ -31,8 +31,8 @@
   \file		FIRFilter.h
   \brief	一般的なfinite impulse response filterを表すクラスの定義と実装
 */
-#ifndef	__TUFIRFilter_h
-#define	__TUFIRFilter_h
+#ifndef	__TU_FIRFILTER_H
+#define	__TU_FIRFILTER_H
 
 #include <algorithm>
 #include <boost/array.hpp>
@@ -290,4 +290,4 @@ FIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 }
 
 }
-#endif	/* !__TUFIRFilter_h */
+#endif	// !__TU_FIRFILTER_H

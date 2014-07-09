@@ -31,6 +31,9 @@
   \file		GuidedFilter.h
   \brief	guided filterに関するクラスの定義と実装
 */
+#ifndef __TU_GUIDEDFILTER_H
+#define __TU_GUIDEDFILTER_H
+
 #include "TU/BoxFilter.h"
 #include <boost/operators.hpp>
 
@@ -447,3 +450,4 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 }
 
 }
+#endif	// !__TU_GUIDEDFILTER_H

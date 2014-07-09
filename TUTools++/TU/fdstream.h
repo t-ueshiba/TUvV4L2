@@ -31,8 +31,8 @@
   \file		fdstream.h
   \brief	ファイル記述子付きストリームバッファに関するクラスの定義と実装
 */
-#ifndef __TUfdstream_h
-#define __TUfdstream_h
+#ifndef __TU_FDSTREAM_H
+#define __TU_FDSTREAM_H
 
 #include "TU/types.h"
 #include <iostream>
@@ -201,5 +201,4 @@ fdstream::fd() const
 }
 
 }
-
-#endif	// !__TUfdstream_h
+#endif	// !__TU_FDSTREAM_H

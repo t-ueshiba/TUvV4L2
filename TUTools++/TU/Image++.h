@@ -31,8 +31,8 @@
   \file		Image++.h
   \brief	画素と画像に関連するクラスの定義と実装
 */
-#ifndef	__TUImagePP_h
-#define	__TUImagePP_h
+#ifndef	__TU_IMAGEPP_H
+#define	__TU_IMAGEPP_H
 
 #include <string.h>
 #include <boost/operators.hpp>
@@ -1701,4 +1701,4 @@ GenericImage::save(std::ostream& out) const
 }
 
 }
-#endif	/* !__TUImagePP_h */
+#endif	// !__TU_IMAGEPP_H

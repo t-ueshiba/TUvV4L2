@@ -31,8 +31,8 @@
   \file		functional.h
   \brief	関数オブジェクトの定義と実装
 */
-#ifndef __TUfunctional_h
-#define __TUfunctional_h
+#ifndef __TU_FUNCTIONAL_H
+#define __TU_FUNCTIONAL_H
 
 #include <functional>
 #include <cassert>
@@ -915,4 +915,4 @@ const_mem_var_ref(S const T::* m)
 }
 
 }	// namespace TU
-#endif
+#endif	// !__TU_FUNCTIONAL_H

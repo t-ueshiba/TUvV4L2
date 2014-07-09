@@ -31,8 +31,8 @@
   \file		Camera++.h
   \brief	カメラ内部パラメータおよびカメラ自身に関するクラスの定義と実装
 */
-#ifndef __TUCameraPP_h
-#define __TUCameraPP_h
+#ifndef __TU_CAMERAPP_H
+#define __TU_CAMERAPP_H
 
 #include "TU/Geometry++.h"
 
@@ -1870,4 +1870,4 @@ operator <<(std::ostream& out, const Camera<I>& camera)
 }
 
 }
-#endif	/* !__TUCameraPP_h */
+#endif	// !__TU_CAMERAPP_H
