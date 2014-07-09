@@ -31,8 +31,8 @@
   \file		TriggerGenerator.h
   \brief	クラス TU::TriggerGenerator の定義と実装
 */
-#ifndef __TUTriggerGenerator_h
-#define __TUTriggerGenerator_h
+#ifndef __TU_TRIGGERGENERATOR_H
+#define __TU_TRIGGERGENERATOR_H
 
 #include "TU/Serial.h"
 
@@ -57,5 +57,4 @@ class TriggerGenerator : public Serial
 };
 
 }
-
-#endif	// !__TUTriggerGenerator_h
+#endif	// !__TU_TRIGGERGENERATOR_H

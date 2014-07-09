@@ -31,8 +31,8 @@
   \file		List.h
   \brief	クラス TU::List の定義と実装
 */
-#ifndef __TUList_h
-#define __TUList_h
+#ifndef __TU_LIST_H
+#define __TU_LIST_H
 #include <iterator>
 
 namespace TU
@@ -235,5 +235,4 @@ List<T>::remove(const T& x)
 }
 
 }
-
-#endif	// !__TUList_h
+#endif	// !__TU_LIST_H

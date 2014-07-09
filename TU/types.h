@@ -212,8 +212,8 @@
   \file		types.h
   \brief	基本的なデータ型をグローバルな名前空間に追加
 */
-#ifndef __TUtypes_h
-#define __TUtypes_h
+#ifndef __TU_TYPES_H
+#define __TU_TYPES_H
 
 #if defined(WIN32) || defined(X64)
 #  ifdef _USRDLL
@@ -246,4 +246,4 @@ typedef unsigned long long	u_int64_t;	//!< 符号なし64bit整数
 
 typedef signed char		s_char;		//!< 符号付き8bit整数
 
-#endif	/*  !__TUtypes_h	*/
+#endif	//  !__TU_TYPES_H

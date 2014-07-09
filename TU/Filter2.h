@@ -31,8 +31,8 @@
   \file		Filter2.h
   \brief	水平/垂直方向に分離不可能な2次元フィルタを表すクラスの定義
 */
-#ifndef __TUFilter2_h
-#define __TUFilter2_h
+#ifndef __TU_FILTER2_H
+#define __TU_FILTER2_H
 
 #include "TU/iterator.h"
 #if defined(USE_TBB)
@@ -114,4 +114,4 @@ Filter2::filterRows(IN ib, IN ie, OUT out)
 }
 
 }
-#endif	// !__TUFilter2_h
+#endif	// !__TU_FILTER2_H

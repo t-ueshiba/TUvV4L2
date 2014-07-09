@@ -31,8 +31,8 @@
   \file		Mesh++.h
   \brief	クラス TU::Mesh の定義と実装
 */
-#ifndef __TUMeshPP_h
-#define __TUMeshPP_h
+#ifndef __TU_MESHPP_H
+#define __TU_MESHPP_H
 
 #include <list>
 #include <vector>
@@ -1113,4 +1113,4 @@ Mesh<V, F, M>::Edge::replaceVertex(viterator v) const
 }
 
 }
-#endif	// !__TUMeshPP_h
+#endif	// !__TU_MESHPP_H

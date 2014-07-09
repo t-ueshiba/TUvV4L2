@@ -27,10 +27,10 @@
  *
  *  $Id: ComplexImage.h,v 1.2 2010-11-22 06:16:19 ueshiba Exp $
  */
-#ifndef __COMPLEXIMAGE_H
-#define __COMPLEXIMAGE_H
+#ifndef __TU_COMPLEXIMAGE_H
+#define __TU_COMPLEXIMAGE_H
 
-#include "CCSImage.h"
+#include "TU/CCSImage.h"
 
 namespace TU
 {
@@ -494,4 +494,4 @@ ComplexImage<T>::maximum(Point2<T>& pMax) const
 }
 
 }
-#endif	// !__COMPLEXIMAGE_H
+#endif	// !__TU_COMPLEXIMAGE_H

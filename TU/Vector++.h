@@ -31,8 +31,8 @@
   \file		Vector++.h
   \brief	ベクトルと行列およびそれに関連するクラスの定義と実装
 */
-#ifndef __TUVectorPP_h
-#define __TUVectorPP_h
+#ifndef __TU_VECTORPP_H
+#define __TU_VECTORPP_H
 
 #include "TU/Array++.h"
 #include <numeric>
@@ -3158,5 +3158,4 @@ typedef Matrix<double, FixedSizedBuf<double, 12>,
 	       FixedSizedBuf<Vector<double>,  2> >
 	Matrix26d;			//!< double型成分を持つ2x6行列
 }
-
-#endif	/* !__TUVectorPP_h	*/
+#endif	// !__TU_VECTORPP_H

@@ -31,8 +31,8 @@
   \file		Warp.h
   \brief	クラス TU::Warp の定義と実装
 */
-#ifndef	__TUWarp_h
-#define	__TUWarp_h
+#ifndef	__TU_WARP_H
+#define	__TU_WARP_H
 
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
@@ -334,6 +334,6 @@ Warp::src(int u, int v) const
     return cvt<float>(tmp) + cvt<float>(shift_r<4>(tmp)) / F32vec(128.0);
 }
 #endif
-}
 
-#endif	/* !__TUWarp_h */
+}
+#endif	// !__TU_WARP_H

@@ -31,8 +31,8 @@
   \file		NDTree++.h
   \brief	クラス TU::NDTree の定義と実装
 */
-#ifndef __TUNDTreePP_h
-#define __TUNDTreePP_h
+#ifndef __TU_NDTREEPP_H
+#define __TU_NDTREEPP_H
 
 #include <stack>
 #include "TU/Array++.h"
@@ -971,4 +971,4 @@ operator <<(std::ostream& out, const NDTree<T, D>& tree)
 }
 
 }
-#endif
+#endif	// !__TU_NDTREE_H

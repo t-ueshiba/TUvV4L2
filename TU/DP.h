@@ -31,8 +31,8 @@
   \file		DP.h
   \brief	動的計画法による最適化器の定義と実装
 */
-#ifndef __TUDP_H
-#define __TUDP_H
+#ifndef __TU_DP_H
+#define __TU_DP_H
 
 #include <iterator>
 #include <algorithm>
@@ -251,4 +251,4 @@ DP<DOM, T>::put(std::ostream& out) const
 }
 
 }
-#endif	// !__TUDP_H
+#endif	// !__TU_DP_H

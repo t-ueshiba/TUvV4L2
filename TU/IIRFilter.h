@@ -31,8 +31,8 @@
   \file		IIRFilter.h
   \brief	各種infinite impulse response filterに関するクラスの定義と実装
 */
-#ifndef	__TUIIRFilterPP_h
-#define	__TUIIRFilterPP_h
+#ifndef	__TU_IIRFILTER_H
+#define	__TU_IIRFILTER_H
 
 #include <algorithm>
 #include <boost/array.hpp>
@@ -732,4 +732,4 @@ BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
 }
 
 }
-#endif	/* !__TUIIRFilterPP_h */
+#endif	// !__TU_IIRFILTER_H

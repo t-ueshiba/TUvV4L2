@@ -31,8 +31,8 @@
   \file		Array++.h
   \brief	配列クラスの定義と実装
 */
-#ifndef __TUArrayPP_h
-#define __TUArrayPP_h
+#ifndef __TU_ARRAYPP_H
+#define __TU_ARRAYPP_H
 
 #include <algorithm>
 #include <stdexcept>
@@ -1640,4 +1640,4 @@ operator >>(std::istream& in, Array2<T, B, R>& a)
 }
 
 }
-#endif	/* !__TUArrayPP_h */
+#endif	/* !__TU_ARRAYPP_H */

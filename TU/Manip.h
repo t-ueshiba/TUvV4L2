@@ -31,8 +31,8 @@
   \file		Manip.h
   \brief	各種マニピュレータの定義と実装
 */
-#ifndef __TUManip_h
-#define __TUManip_h
+#ifndef __TU_MANIP_H
+#define __TU_MANIP_H
 
 #include <iostream>
 #include "TU/types.h"
@@ -205,5 +205,4 @@ operator <<(SS& s, const OManip2<S, T, U>& m)
 }
  
 }
-
-#endif	/* !__TUManip_h		*/
+#endif	// !__TU_MANIP_H

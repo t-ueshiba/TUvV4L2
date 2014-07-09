@@ -31,8 +31,8 @@
   \file		BoxFilter.h
   \brief	box filterに関するクラスの定義と実装
 */
-#ifndef	__TUBoxFilter_h
-#define	__TUBoxFilter_h
+#ifndef	__TU_BOXFILTER_H
+#define	__TU_BOXFILTER_H
 
 #include <algorithm>
 #include "TU/SeparableFilter2.h"
@@ -297,4 +297,4 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
 };
 
 }
-#endif	/* !__TUBoxFilter_h	*/
+#endif	// !__TU_BOXFILTER_H

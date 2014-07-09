@@ -31,8 +31,8 @@
   \file		Ransac.h
   \brief	RANSACを行う関数の定義と実装
 */
-#ifndef __TURansac_h
-#define __TURansac_h
+#ifndef __TU_RANSAC_H
+#define __TU_RANSAC_H
 
 #include <math.h>
 #include <stdexcept>
@@ -139,5 +139,4 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 }
     
 }
-
-#endif // !__TURansac_h
+#endif // !__TU_RANSAC_H

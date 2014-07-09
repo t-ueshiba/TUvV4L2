@@ -31,8 +31,8 @@
   \file		Bezier++.h
   \brief	Bezier曲線およびBezier曲面に関連するクラスの定義と実装
 */
-#ifndef __TUBezierPP_h
-#define __TUBezierPP_h
+#ifndef __TU_BEZIERPP_H
+#define __TU_BEZIERPP_H
 
 #include "TU/Vector++.h"
 
@@ -313,4 +313,4 @@ typedef BezierSurface<Vector3d>	BezierSurface3d;
 typedef BezierSurface<Vector4d>	RationalBezierSurface3d;
  
 }
-#endif
+#endif	// !__TU_BEZIERPP_H

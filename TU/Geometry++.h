@@ -31,8 +31,8 @@
   \file		Geometry++.h
   \brief	点，直線，超平面および各種の幾何変換に関するクラスの定義と実装
 */
-#ifndef __TUGeometryPP_h
-#define __TUGeometryPP_h
+#ifndef __TU_GEOMETRYPP_H
+#define __TU_GEOMETRYPP_H
 
 #include "TU/Vector++.h"
 #include "TU/Minimize.h"
@@ -2333,4 +2333,4 @@ operator <<(std::ostream& out, const BoundingBox<P>& bbox)
 }
     
 }
-#endif	/* !__TUGeometryPP_h */
+#endif	// !__TU_GEOMETRYPP_H

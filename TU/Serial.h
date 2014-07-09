@@ -31,8 +31,8 @@
   \file		Serial.h
   \brief	クラス TU::Serial の定義と実装
 */
-#ifndef __TUSerial_h
-#define __TUSerial_h
+#ifndef __TU_SERIAL_H
+#define __TU_SERIAL_H
 
 #include "TU/fdstream.h"
 #include <termios.h>
@@ -79,5 +79,4 @@ class Serial : public fdstream
 };
 
 }
-
-#endif	// !__TUSerial_h
+#endif	// !__TU_SERIAL_H

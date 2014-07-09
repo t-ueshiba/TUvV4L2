@@ -31,8 +31,8 @@
   \file		mmInstructions.h
   \brief	Intel CPUのマルチメディア命令に関連するクラスと関数の定義と実装
 */
-#if !defined(__mmInstructions_h) && defined(__INTEL_COMPILER)
-#define __mmInstructions_h
+#if !defined(__TU_MMINSTRUCTIONS_H) && defined(__INTEL_COMPILER)
+#define __TU_MMINSTRUCTIONS_H
 
 #if defined(AVX2)		// Core-i7 Haswell (2013)
 #  define AVX
@@ -4393,4 +4393,4 @@ make_row_vec_iterator(ROW const& row)
 }	// namespace TU
 #endif	// MMX
 
-#endif	// !__mmInstructions_h
+#endif	// !__TU_MMINSTRUCTIONS_H

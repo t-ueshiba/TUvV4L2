@@ -4,6 +4,9 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 
+#ifndef __TU_TUPLE_H
+#define __TU_TUPLE_H
+
 namespace TU
 {
 namespace detail
@@ -181,3 +184,4 @@ struct tuple2cons<boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>, T>
 };
 
 }
+#endif	// !__TU_TUPLE_H

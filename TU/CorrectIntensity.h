@@ -31,8 +31,8 @@
   \file		CorrectIntensity.h
   \brief	クラス TU::CorrectIntensity の定義と実装
 */
-#ifndef	__TUCorrectIntensity_h
-#define	__TUCorrectIntensity_h
+#ifndef	__TU_CORRECTINTENSITY_H
+#define	__TU_CORRECTINTENSITY_H
 
 #include "TU/Image++.h"
 
@@ -79,5 +79,4 @@ CorrectIntensity::initialize(float offset, float gain)
 }
 
 }
-
-#endif	/* !__TUCorrectIntensity_h */
+#endif	// !__TU_CORRECTINTENSITY_H
