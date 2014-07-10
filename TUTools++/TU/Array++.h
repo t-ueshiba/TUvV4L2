@@ -1640,4 +1640,4 @@ operator >>(std::istream& in, Array2<T, B, R>& a)
 }
 
 }
-#endif	/* !__TU_ARRAYPP_H */
+#endif	// !__TU_ARRAYPP_H

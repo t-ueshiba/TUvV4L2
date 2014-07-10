@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TUBrepPP_h
-#define __TUBrepPP_h
+#ifndef __TU_BREP_BREPPP_H
+#define __TU_BREP_BREPPP_H
 
 #include "TU/Object++.h"
 #include "TU/Geometry++.h"
@@ -423,4 +423,4 @@ Neighbor::Neighbor(const Geometry* g)
  
 }
 }
-#endif	/* !__TUBrepPP_h */
+#endif	// !__TU_BREP_BREPPP_H

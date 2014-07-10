@@ -5,8 +5,8 @@
   \file		Ieee1394CameraArray.h
   \brief	クラス TU::Ieee1394CameraArray の定義と実装
 */
-#ifndef __TUIeee1394CameraArray_h
-#define __TUIeee1394CameraArray_h
+#ifndef __TU_IEEE1394CAMERAARRAY_H
+#define __TU_IEEE1394CAMERAARRAY_H
 
 #ifdef HAVE_LIBTUTOOLS__
 #  include "TU/Array++.h"
@@ -79,5 +79,5 @@ Ieee1394CameraArray::calibFile() const
 }
     
 }
-#endif	/* HAVE_LIBTUTOOLS__		*/    
-#endif	/* !__TUIeeeCameraArray_h	*/
+#endif	// HAVE_LIBTUTOOLS__
+#endif	// ! __TU_IEEE1394CAMERAARRAY_H

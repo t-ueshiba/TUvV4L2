@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TUCollectionPP_h
-#define __TUCollectionPP_h
+#ifndef __TU_COLLECTIONPP_H
+#define __TU_COLLECTIONPP_H
 
 #include "TU/Object++.h"
 
@@ -267,4 +267,4 @@ template <class T>	class ObjTree : public ObjTreeBase
 };
  
 }
-#endif	/* !__TUCollectionPP_h */
+#endif	// !__TU_COLLECTIONPP_H

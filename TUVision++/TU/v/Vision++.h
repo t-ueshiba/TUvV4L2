@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TUVisionPP_h
-#define __TUVisionPP_h
+#ifndef __TU_V_VISIONPP_H
+#define __TU_V_VISIONPP_H
 
 #include "TU/Brep/Brep++.h"
 #include "TU/v/CmdPane.h"
@@ -118,5 +118,5 @@ BrepCanvasPane::sync()
 
 }
 }
-#endif	/* !__TUVisionPP_h	*/
+#endif	// !__TU_V_VISIONPP_H
 

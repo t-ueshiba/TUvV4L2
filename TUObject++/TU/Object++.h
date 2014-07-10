@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TUObjectPP_h
-#define __TUObjectPP_h
+#ifndef __TU_OBJECTPP_H
+#define __TU_OBJECTPP_H
 
 #include "TU/types.h"
 #include <iostream>
@@ -206,4 +206,4 @@ class Cons : public Object
 std::ostream&	eoc(std::ostream&);			// End of context
  
 }
-#endif	/* !__TUObjectPP_h */
+#endif	// !__TU_OBJECTPP_H

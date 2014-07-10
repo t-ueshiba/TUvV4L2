@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TUCanPP_h
-#define __TUCanPP_h
+#ifndef __TU_CANPP_H
+#define __TU_CANPP_H
 
 #include <sys/types.h>
 #include <can4linux.h>
@@ -232,4 +232,4 @@ Manus::operator bool() const
 }
  
 }
-#endif	/* !__TUCanPP_h	*/
+#endif	// !__TU_CANPP_H

@@ -121,8 +121,8 @@
   \file		Ieee1394++.h
   \brief	IEEE1394デバイスに関連するクラスの定義と実装
 */
-#ifndef __TUIeee1394PP_h
-#define __TUIeee1394PP_h
+#ifndef __TU_IEEE1394PP_H
+#define __TU_IEEE1394PP_H
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -782,4 +782,4 @@ std::ostream&	operator <<(std::ostream& out, const Ieee1394Camera& camera);
 std::istream&	operator >>(std::istream& in, Ieee1394Camera& camera);
 
 }
-#endif	/* !__TUIeee1394PP_h	*/
+#endif	// !__TU_IEEE1394PP_H

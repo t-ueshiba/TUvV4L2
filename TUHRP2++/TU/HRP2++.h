@@ -9,8 +9,8 @@
  *    
  *  $Id$
  */
-#ifndef __TUHRP2PP_H
-#define __TUHRP2PP_H
+#ifndef __TU_HRP2PP_H
+#define __TU_HRP2PP_H
 
 #include <rtm/CorbaNaming.h>
 #include <rtm/RTObject.h>
@@ -208,4 +208,4 @@ class HRP2
 };
 
 }
-#endif	// !__TUHRP2PP_H
+#endif	// !__TU_HRP2PP_H
