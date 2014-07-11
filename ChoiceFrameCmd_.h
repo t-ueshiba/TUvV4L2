@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvChoiceFrameCmd_h
-#define __TUvChoiceFrameCmd_h
+#ifndef __VCHOICEFRAMECMD_H
+#define __VCHOICEFRAMECMD_H
 
 #include "FrameCmd_.h"
 
@@ -52,4 +52,4 @@ class ChoiceFrameCmd : public FrameCmd
 
 }
 }
-#endif	// !__TUvChoiceFrameCmd_h
+#endif	// !__VCHOICEFRAMECMD_H

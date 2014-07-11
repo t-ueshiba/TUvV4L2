@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvListCmd_h
-#define __TUvListCmd_h
+#ifndef __VLISTCMD_H
+#define __VLISTCMD_H
 
 #include "TU/v/TUv++.h"
 
@@ -63,4 +63,4 @@ class ListCmd : public Cmd
 
 }
 }
-#endif	// !__TUvListCmd_h
+#endif	// !__VLISTCMD_H

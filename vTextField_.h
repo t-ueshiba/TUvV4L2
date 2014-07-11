@@ -22,8 +22,8 @@
  *         http://www.ae.utexas.edu/~rwmcm
  */
 
-#ifndef _TextField_H
-#define _TextField_H
+#ifndef __VTEXTFIELD_H
+#define __VTEXTFIELD_H
 
 #include <X11/Core.h>
 
@@ -117,4 +117,4 @@ void TextFieldSetString P_((Widget aw, char *str));
 
 #undef P_
 
-#endif /* _TextField_H */
+#endif	/* !__VTEXTFIELD_H	*/

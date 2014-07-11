@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvTextInCmd_h
-#define __TUvTextInCmd_h
+#ifndef __VTEXTINCMD_H
+#define __VTEXTINCMD_H
 
 #include "TU/v/TUv++.h"
 
@@ -56,4 +56,4 @@ class TextInCmd : public Cmd
 
 }
 }
-#endif	// !__TUvTextInCmd_h
+#endif	// !__VTEXTINCMD_H

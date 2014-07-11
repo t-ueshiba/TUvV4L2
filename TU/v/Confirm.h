@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvConfirm_h
-#define __TUvConfirm_h
+#ifndef __TU_V_CONFIRM_H
+#define __TU_V_CONFIRM_H
 
 #include <sstream>
 #include "TU/v/ModalDialog.h"
@@ -56,4 +56,4 @@ class Confirm : public ModalDialog, public std::ostringstream
 
 }
 }
-#endif	// !__TUvConfirm_h
+#endif	// !__TU_V_CONFIRM_H

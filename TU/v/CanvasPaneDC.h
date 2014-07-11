@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvCanvasPaneDC_h
-#define __TUvCanvasPaneDC_h
+#ifndef __TU_V_CANVASPANEDC_H
+#define __TU_V_CANVASPANEDC_H
 
 #include "TU/v/XDC.h"
 #include "TU/v/CanvasPane.h"
@@ -83,4 +83,4 @@ class CanvasPaneDC : public Object, public XDC
 
 }
 }
-#endif	// !__TUvCanvasPaneDC_h
+#endif	// !__TU_V_CANVASPANEDC_H

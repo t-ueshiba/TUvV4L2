@@ -50,8 +50,8 @@ SOFTWARE.
 
 ********************************************************/
 
-#ifndef _vViewportP_h
-#define _vViewportP_h
+#ifndef __VVIEWPORTP_H
+#define __VVIEWPORTP_H
 
 #include "vViewport_.h"
 #include <X11/Xaw3d/FormP.h>
@@ -106,4 +106,4 @@ typedef struct _VViewportConstraintsRec {
     VViewportConstraintsPart	viewport;
 } VViewportConstraintsRec, *VViewportConstraints;
 
-#endif /* _vViewportP_h */
+#endif	/* !__VVIEWPORTP_H	*/

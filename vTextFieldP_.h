@@ -22,8 +22,8 @@
  *         http://www.ae.utexas.edu/~rwmcm
  */
 
-#ifndef _TextFieldP_H
-#define _TextFieldP_H
+#ifndef __VTEXTFIELDP_H
+#define __VTEXTFIELDP_H
 
 #include <X11/Core.h>
 #include <X11/Xaw3d/ThreeDP.h>
@@ -107,4 +107,4 @@ typedef struct _TextFieldRec {
 } TextFieldRec;
 
 
-#endif /* _TextFieldP_H */
+#endif	/* !__VTEXTFIELDP_H	*/
