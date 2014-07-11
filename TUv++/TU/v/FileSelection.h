@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvFileSelection_h
-#define __TUvFileSelection_h
+#ifndef __TU_V_FILESELECTION_H
+#define __TU_V_FILESELECTION_H
 
 #include <fstream>
 #include <string>
@@ -71,4 +71,4 @@ class FileSelection : public ModalDialog
 
 }
 }
-#endif // !__TUvFileSelection_h
+#endif // !__TU_V_FILESELECTION_H

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvCanvasPaneDC3_h
-#define __TUvCanvasPaneDC3_h
+#ifndef __TU_V_CANVASPANEDC3_H
+#define __TU_V_CANVASPANEDC3_H
 
 #include "TU/v/CanvasPaneDC.h"
 #include "TU/v/DC3.h"
@@ -55,4 +55,4 @@ class CanvasPaneDC3 : virtual public CanvasPaneDC, public DC3
 
 }
 }
-#endif	// !__TUvCanvasPaneDC3_h
+#endif	// !__TU_V_CANVASPANEDC3_H

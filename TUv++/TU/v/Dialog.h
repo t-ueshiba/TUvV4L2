@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvDialog_h
-#define __TUvDialog_h
+#ifndef __TU_V_DIALOG_H
+#define __TU_V_DIALOG_H
 
 #include "TU/v/CmdPane.h"
 
@@ -58,4 +58,4 @@ class Dialog : public Window
 
 }
 }
-#endif	// !__TUvDialog_h
+#endif	// !__TU_V_DIALOG_H

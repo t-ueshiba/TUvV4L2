@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvPP_h
-#define __TUvPP_h
+#ifndef __TU_VPP_H
+#define __TU_VPP_H
 
 #ifdef UseGtk
 #  include <gtk/gtk.h>
@@ -387,4 +387,4 @@ CmdParent::detachCmd()
 
 }	// namespace v
 }	// namespace TU
-#endif	// ! __TUPP_h
+#endif	// ! __TU_VPP_H

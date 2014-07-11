@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvLabelCmd_h
-#define __TUvLabelCmd_h
+#ifndef __VLABELCMD_H
+#define __VLABELCMD_H
 
 #include "TU/v/TUv++.h"
 
@@ -53,4 +53,4 @@ class LabelCmd : public Cmd
 
 }
 }
-#endif	// !__TUvLabelCmd_h
+#endif	// !__VLABELCMD_H

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvFrameCmd_h
-#define __TUvFrameCmd_h
+#ifndef __VFRAMECMD_H
+#define __VFRAMECMD_H
 
 #include "TU/v/TUv++.h"
 
@@ -53,4 +53,4 @@ class FrameCmd : public Cmd
 
 }
 }
-#endif	// !__TUvFrameCmd_h
+#endif	// !__VFRAMECMD_H

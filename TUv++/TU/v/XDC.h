@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvXDC_h
-#define __TUvXDC_h
+#ifndef __TU_V_XDC_H
+#define __TU_V_XDC_H
 
 #include "TU/v/DC.h"
 #include "TU/v/Colormap.h"
@@ -171,4 +171,4 @@ inline GC		XDC::gc()		const	{return _gc;}
 
 }
 }
-#endif	// !__TUvXDC_h
+#endif	// !__TU_V_XDC_H

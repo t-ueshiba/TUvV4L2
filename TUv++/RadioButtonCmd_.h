@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TUvRadioButtonCmd_h
-#define __TUvRadioButtonCmd_h
+#ifndef __VRADIOBUTTONCMD_H
+#define __VRADIOBUTTONCMD_H
 
 #include "TU/v/TUv++.h"
 
@@ -60,4 +60,4 @@ class RadioButtonCmd : public Cmd
 
 }
 }
-#endif	// !__TUvRadioButtonCmd_h
+#endif	// !__VRADIOBUTTONCMD_H

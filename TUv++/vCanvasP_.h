@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef vCanvasP_h
-#define vCanvasP_h
+#ifndef __VCANVASP_H
+#define __VCANVASP_H
 
 #include "vCanvas_.h"
 
@@ -66,4 +66,4 @@ typedef struct _VCanvasRec
     VCanvasPart		vcanvas;
 } VCanvasRec;
 
-#endif
+#endif	/* !__VCANVASP_H	*/
