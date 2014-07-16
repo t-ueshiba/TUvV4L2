@@ -217,11 +217,11 @@ class V4L2Camera
 	void		map(int fd, u_int index)	;
 	void		unmap()				;
 	const void*	p()			const	{return _p;}
-	u_int		size()			const	{return _size;}
+	size_t		size()			const	{return _size;}
 	
       private:
 	void*		_p;
-	u_int		_size;
+	size_t		_size;
     };
 
     template <class S, class T>
@@ -256,12 +256,12 @@ class V4L2Camera
 								const	;
     bool		isAvailable(PixelFormat pixelFormat)	const	;
     V4L2Camera&		setFormat(PixelFormat pixelFormat,
-				  u_int width, u_int height,
+				  size_t width, size_t height,
 				  u_int fps_n, u_int fps_d)		;
     void		getFrameRate(u_int& fps_n, u_int& fps_d) const	;
     const std::string&	getName(PixelFormat pixelFormat)	const	;
-    u_int		width()					const	;
-    u_int		height()				const	;
+    size_t		width()					const	;
+    size_t		height()				const	;
     PixelFormat		pixelFormat()				const	;
     std::ostream&	put(std::ostream& out,
 			    PixelFormat pixelFormat)		const	;
@@ -328,8 +328,8 @@ class V4L2Camera
     const int			_fd;
     std::vector<Format>		_formats;
     std::vector<Control>	_controls;
-    u_int			_width;
-    u_int			_height;
+    size_t			_width;
+    size_t			_height;
     PixelFormat			_pixelFormat;
     std::vector<Buffer>		_buffers;
     u_int			_current;	// キューから取り出されている
@@ -371,14 +371,14 @@ V4L2Camera::getName(PixelFormat pixelFormat) const
 }
 
 //! 現在設定されている画像幅を返す
-inline u_int
+inline size_t
 V4L2Camera::width() const
 {
     return _width;
 }
 
 //! 現在設定されている画像高さを返す
-inline u_int
+inline size_t
 V4L2Camera::height() const
 {
     return _height;

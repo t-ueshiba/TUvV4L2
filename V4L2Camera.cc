@@ -472,7 +472,7 @@ V4L2Camera::isAvailable(PixelFormat pixelFormat) const
   \return		このカメラオブジェクト
 */
 V4L2Camera&
-V4L2Camera::setFormat(PixelFormat pixelFormat, u_int width, u_int height,
+V4L2Camera::setFormat(PixelFormat pixelFormat, size_t width, size_t height,
 		      u_int fps_n, u_int fps_d)
 {
     using namespace	std;
@@ -729,7 +729,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case BGR24:
       {
 	const BGR*	src = (const BGR*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
@@ -737,7 +737,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case RGB24:
       {
 	const RGB*	src = (const RGB*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
@@ -745,7 +745,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case BGR32:
       {
 	const ABGR*	src = (const ABGR*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
@@ -753,7 +753,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case RGB32:
       {
 	const RGBA*	src = (const RGBA*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
@@ -761,7 +761,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case GREY:
       {
 	const u_char*	src = (const u_char*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
@@ -769,7 +769,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case Y16:
       {
 	const u_short*	src = (const u_short*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
@@ -777,7 +777,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case YUYV:
       {
 	const YUYV422*	src = (const YUYV422*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
         break;
@@ -785,7 +785,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case UYVY:
       {
 	const YUV422*	src = (const YUV422*)img;
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	    src = image[v].fill(src);
       }
 	break;
@@ -894,7 +894,25 @@ V4L2Camera::captureRaw(void* image) const
 {
     if (_current == ~0)
 	throw std::runtime_error("V4L2Camera::captureRaw(): no images snapped!!");
-    memcpy(image, _buffers[_current].p(), _buffers[_current].size());
+    size_t	pixelSize = 1;
+    switch (_pixelFormat)
+    {
+      case Y16:
+      case YUYV:
+      case UYVY:
+	pixelSize = 2;
+	break;
+      case BGR24:
+      case RGB24:
+	pixelSize = 3;
+	break;
+      case BGR32:
+      case RGB32:
+	pixelSize = 4;
+	break;
+    }
+    
+    memcpy(image, _buffers[_current].p(), width() * height() * pixelSize);
 
     return *this;
 }
@@ -1501,7 +1519,7 @@ V4L2Camera::mapBuffers(u_int n)
 	throw std::runtime_error("V4L2Camera::mapBuffer(): failed to allocate sufficient number of buffers!!");	// 脱出する
 
     _buffers.resize(n);
-    for (u_int i = 0; i < _buffers.size(); ++i)	// 確保された個数のバッファに
+    for (size_t i = 0; i < _buffers.size(); ++i)	// 確保された個数のバッファに
     {
 	_buffers[i].map(_fd, i);		// メモリをマップして
 	enqueueBuffer(i);			// キューに入れる
@@ -1514,7 +1532,7 @@ V4L2Camera::mapBuffers(u_int n)
 void
 V4L2Camera::unmapBuffers()
 {
-    for (u_int i = 0; i < _buffers.size(); ++i)
+    for (size_t i = 0; i < _buffers.size(); ++i)
 	_buffers[i].unmap();
     requestBuffers(0);	// 確保するバッファ数を0にすることによってキューをクリア
     _current = ~0;	// データが残っていないことを示す
@@ -1825,7 +1843,7 @@ operator <<(std::ostream& out, const V4L2Camera& camera)
 
   // 各カメラ属性の値を書き出す．
     BOOST_FOREACH (V4L2Camera::Feature feature, camera.availableFeatures())
-	for (u_int i = 0; i < NFEATURES; ++i)
+	for (size_t i = 0; i < NFEATURES; ++i)
 	    if (feature == features[i].feature)
 	    {
 		out << ' ' << features[i].name
@@ -1852,7 +1870,7 @@ operator >>(std::istream& in, V4L2Camera& camera)
 	= V4L2Camera::uintToPixelFormat( s[0]	     | (s[1] <<  8) |
 					(s[2] << 16) | (s[3] << 24));
     char	c;
-    u_int	w, h;
+    size_t	w, h;
     in >> w >> c >> h;			// 画像の幅と高さ
     u_int	fps_n, fps_d;
     in >> fps_n >> c >> fps_d;		// フレームレートの分子と分母
@@ -1864,7 +1882,7 @@ operator >>(std::istream& in, V4L2Camera& camera)
 	in.putback(c);
 	in >> s;
 
-	for (u_int i = 0; i < NFEATURES; ++i)
+	for (size_t i = 0; i < NFEATURES; ++i)
 	    if (s == features[i].name)
 	    {
 		int	val;
