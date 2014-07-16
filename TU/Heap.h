@@ -127,7 +127,7 @@ class Heap
     
     Array<T>	_array;
     size_t	_n;		// # of elements in the heap.
-    const Cmp	_cmp;
+    Cmp		_cmp;
 };
 
 //! 空のヒープを作る．
