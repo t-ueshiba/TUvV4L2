@@ -42,12 +42,15 @@ HDRS		= TU/Array++.h \
 		TU/EdgeDetector.h \
 		TU/FIRFilter.h \
 		TU/FIRGaussianConvolver.h \
+		TU/Feature.h \
+		TU/FeatureMatch.h \
 		TU/Filter2.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
 		TU/GraphCuts.h \
 		TU/GuidedFilter.h \
 		TU/Heap.h \
+		TU/ICIA.h \
 		TU/IIRFilter.h \
 		TU/Image++.h \
 		TU/IntegralImage.h \
@@ -64,6 +67,7 @@ HDRS		= TU/Array++.h \
 		TU/Random.h \
 		TU/Ransac.h \
 		TU/SHOT602.h \
+		TU/SURFCreator.h \
 		TU/SeparableFilter2.h \
 		TU/Serial.h \
 		TU/SparseMatrix++.h \
@@ -83,6 +87,7 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		CorrectIntensity.cc \
 		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
+		FeatureMatch.cc \
 		GaussianCoefficients.cc \
 		GenericImage.cc \
 		Image++.inst.cc \
@@ -92,6 +97,7 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		Profiler.cc \
 		Random.cc \
 		SHOT602.cc \
+		SURFCreator.cc \
 		Serial.cc \
 		TriggerGenerator.cc \
 		Vector++.inst.cc \
@@ -104,6 +110,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		CorrectIntensity.o \
 		EdgeDetector.o \
 		FIRGaussianCoefficients.o \
+		FeatureMatch.o \
 		GaussianCoefficients.o \
 		GenericImage.o \
 		Image++.inst.o \
@@ -113,6 +120,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		Profiler.o \
 		Random.o \
 		SHOT602.o \
+		SURFCreator.o \
 		Serial.o \
 		TriggerGenerator.o \
 		Vector++.inst.o \
@@ -138,6 +146,10 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/Geometry++.h \
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/iterator.h TU/functional.h \
 	TU/mmInstructions.h TU/tuple.h
+FeatureMatch.o: TU/FeatureMatch.h TU/Random.h TU/types.h TU/Ransac.h \
+	TU/Feature.h TU/Geometry++.h TU/Vector++.h TU/Array++.h TU/iterator.h \
+	TU/functional.h TU/mmInstructions.h TU/tuple.h TU/Minimize.h \
+	TU/Manip.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/iterator.h TU/functional.h TU/mmInstructions.h TU/tuple.h \
 	TU/IIRFilter.h TU/SeparableFilter2.h TU/Minimize.h
@@ -158,6 +170,10 @@ Profiler.o: TU/Profiler.h TU/types.h TU/Array++.h TU/iterator.h \
 	TU/functional.h TU/mmInstructions.h TU/tuple.h windows/fakeWindows.h
 Random.o: TU/Random.h TU/types.h windows/fakeWindows.h
 SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
+SURFCreator.o: TU/SURFCreator.h TU/Feature.h TU/Geometry++.h TU/Vector++.h \
+	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
+	TU/tuple.h TU/Minimize.h TU/Manip.h TU/types.h TU/IntegralImage.h \
+	TU/Image++.h TU/Heap.h
 Serial.o: TU/Serial.h TU/fdstream.h TU/types.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
 	TU/types.h TU/Manip.h
