@@ -67,6 +67,7 @@ class Heap
     typedef const value_type&			const_reference;
     typedef value_type*				pointer;
     typedef const value_type*			const_pointer;
+    typedef typename Array<T>::iterator		iterator;
     typedef typename Array<T>::const_iterator	const_iterator;
     typedef Cmp					value_compare;
     typedef value_type				key_type;
@@ -81,14 +82,42 @@ class Heap
     begin() から end() までは降順に並んでいるとは限らないことに注意．
     \return	ヒープの先頭要素を指す反復子
   */
+    iterator		begin()			{return _array.begin();}
+
+  //! ヒープの先頭要素(最大要素)を指す定数反復子を返す．
+  /*!
+    begin() から end() までは降順に並んでいるとは限らないことに注意．
+    \return	ヒープの先頭要素を指す定数反復子
+  */
     const_iterator	begin()		const	{return _array.begin();}
+
+  //! ヒープの先頭要素(最大要素)を指す定数反復子を返す．
+  /*!
+    cbegin() から cend() までは降順に並んでいるとは限らないことに注意．
+    \return	ヒープの先頭要素を指す定数反復子
+  */
+    const_iterator	cbegin()	const	{return begin();}
 
   //! ヒープの末尾を指す反復子を返す．
   /*!
     begin() から end() までは降順に並んでいるとは限らないことに注意．
     \return	ヒープの末尾を指す反復子
   */
+    iterator		end()			{return _array.begin() + _n;}
+
+  //! ヒープの末尾を指す定数反復子を返す．
+  /*!
+    begin() から end() までは降順に並んでいるとは限らないことに注意．
+    \return	ヒープの末尾を指す定数反復子
+  */
     const_iterator	end()		const	{return _array.begin() + _n;}
+
+  //! ヒープの末尾を指す定数反復子を返す．
+  /*!
+    cbegin() から cend() までは降順に並んでいるとは限らないことに注意．
+    \return	ヒープの末尾を指す定数反復子
+  */
+    const_iterator	cend()		const	{return end();}
 
   //! 現在の要素数を返す．
   /*!
