@@ -214,58 +214,54 @@ class SURFCreator
     SURFCreator(const Parameters& params)	:_params(params)	{}
 
     SURFCreator&	setParameters(const Parameters& parameters)	;
-    const Parameters&	getParameters()				  const	;
+    const Parameters&	getParameters()				const	;
 
     template <class F, class T, class OUT>
-    void		createSURFs(const Image<T>& image, OUT out)	;
+    void	createSURFs(const Image<T>& image, OUT out)	const	;
     template <class T, class F>
-    SURFCreator&	detectFeatures(const Image<T>& image,
-				       Inserter<F>& insert)		;
+    void	detectFeatures(const Image<T>& image,
+			       Inserter<F>& insert)		const	;
     template <class ITER>
-    SURFCreator&	makeDescriptors(ITER begin, ITER end)		;
+    void	makeDescriptors(ITER begin, ITER end)		const	;
     
   private:
     template <class T, size_t D>
-    void		assignOrientation(Feature<T, D>& feature) const	;
+    void	assignOrientation(Feature<T, D>& feature)	const	;
     template <class T, size_t D>
-    void		makeDescriptor(Feature<T, D>& feature)	  const	;
-    void		calcDets(size_t octave, size_t scale,
-				 Matrix<value_type>& det,
-				 size_t& borderSize)		  const	;
-    void		calcDetsLine(size_t y, size_t octave,
-				     size_t filterSize,
-				     size_t borderSize,
-				     Matrix<value_type>& det)	  const	;
+    void	makeDescriptor(Feature<T, D>& feature)		const	;
+    void	calcDets(size_t octave, size_t scale,
+			 Matrix<value_type>& det,
+			 size_t& borderSize)			const	;
+    void	calcDetsLine(size_t y, size_t octave,
+			     size_t filterSize, size_t borderSize,
+			     Matrix<value_type>& det)		const	;
     template <class F>
-    void		detect(size_t octave, size_t scale,
-			       const Array<Matrix<value_type> >& det,
-			       const Array<size_t>& borderSizes,
-			       Inserter<F>& insert)		  const	;
+    void	detect(size_t octave, size_t scale,
+		       const Array<Matrix<value_type> >& det,
+		       const Array<size_t>& borderSizes,
+		       Inserter<F>& insert)			const	;
     template <class F>
-    void		detectLine(size_t y, size_t s, size_t pixelStep,
-				   const Array<Matrix<value_type> >& det,
-				   const Array<size_t>& borderSizes,
-				   Inserter<F>& insert)		  const	;
-    static bool		fineTuneExtrema(
-			    const Array<Matrix<value_type> >& det,
-			    int x, int y, int s, 
-			    value_type& xf, value_type& yf,
-			    value_type& sf, value_type& score,
-			    size_t octaveWidth,
-			    size_t octaveHeight,
-			    size_t borderSize)				;
-    bool		calcTrace(value_type x, value_type y,
-				  value_type scale, int& trace)	  const	;
-    size_t		getFilterSize(size_t octave, size_t scale) const;
-    size_t		getBorderSize(size_t octave, size_t scale) const;
+    void	detectLine(size_t y, size_t s, size_t pixelStep,
+			   const Array<Matrix<value_type> >& det,
+			   const Array<size_t>& borderSizes,
+			   Inserter<F>& insert)			const	;
+    static bool	fineTuneExtrema(const Array<Matrix<value_type> >& det,
+				int x, int y, int s, 
+				value_type& xf, value_type& yf,
+				value_type& sf, value_type& score,
+				size_t octaveWidth, size_t octaveHeight,
+				size_t borderSize)			;
+    bool	calcTrace(value_type x, value_type y,
+			  value_type scale, int& trace)		const	;
+    size_t	getFilterSize(size_t octave, size_t scale)	const	;
+    size_t	getBorderSize(size_t octave, size_t scale)	const	;
     template <size_t D>
-    static void		vote(value_type uIdx, value_type vIdx,
-			     value_type wu,   value_type wv,
-			     Histogram bins)				;
+    static void	vote(value_type uIdx, value_type vIdx,
+		     value_type wu,   value_type wv, Histogram bins)	;
     
   private:
-    IntegralImage<value_type>		_integralImage;
     Parameters				_params;
+    mutable IntegralImage<value_type>	_integralImage;
 
     static const value_type		_magFactor;
     static const value_type		_baseSigma;
@@ -286,7 +282,7 @@ SURFCreator::getParameters() const
 
 //! 画像からSURF特徴を抽出
 template <class F, class T, class OUT> void
-SURFCreator::createSURFs(const Image<T>& image, OUT out)
+SURFCreator::createSURFs(const Image<T>& image, OUT out) const
 {
     typedef typename Sieve<F>::Inserter		Inserter;
     
@@ -308,8 +304,8 @@ SURFCreator::createSURFs(const Image<T>& image, OUT out)
     std::copy(features.cbegin(), features.cend(), out);
 }
 
-template <class T, class F> SURFCreator&
-SURFCreator::detectFeatures(const Image<T>& image, Inserter<F>& insert)
+template <class T, class F> void
+SURFCreator::detectFeatures(const Image<T>& image, Inserter<F>& insert) const
 {
     _integralImage.initialize(image);	// 積分画像を作る
     
@@ -330,12 +326,10 @@ SURFCreator::detectFeatures(const Image<T>& image, Inserter<F>& insert)
 	for (size_t s = 1; s < (_params.nScales - 1); s += 2)
 	    detect(o, s, det, borderSizes, insert);
     }
-
-    return *this;
 }
 
-template <class ITER> SURFCreator&
-SURFCreator::makeDescriptors(ITER begin, ITER end)
+template <class ITER> void
+SURFCreator::makeDescriptors(ITER begin, ITER end) const
 {
     typedef typename std::iterator_traits<ITER>::value_type
 							feature_type;
@@ -361,7 +355,6 @@ SURFCreator::makeDescriptors(ITER begin, ITER end)
 	makeDescriptor(*feature);
     }
 #endif
-    return *this;
 }
     
 inline void
