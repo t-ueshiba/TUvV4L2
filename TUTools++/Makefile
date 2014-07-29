@@ -146,9 +146,9 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/Geometry++.h \
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/iterator.h TU/functional.h \
 	TU/mmInstructions.h TU/tuple.h
-FeatureMatch.o: TU/FeatureMatch.h TU/Random.h TU/types.h TU/Ransac.h \
-	TU/Feature.h TU/Geometry++.h TU/Vector++.h TU/Array++.h TU/iterator.h \
-	TU/functional.h TU/mmInstructions.h TU/tuple.h TU/Minimize.h \
+FeatureMatch.o: TU/FeatureMatch.h TU/Geometry++.h TU/Vector++.h \
+	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
+	TU/tuple.h TU/Minimize.h TU/Random.h TU/types.h TU/Ransac.h \
 	TU/Manip.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/iterator.h TU/functional.h TU/mmInstructions.h TU/tuple.h \

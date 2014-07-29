@@ -32,9 +32,10 @@
 
 #include <utility>
 #include <vector>
+#include "TU/Geometry++.h"
 #include "TU/Random.h"
 #include "TU/Ransac.h"
-#include "TU/Feature.h"
+#include "TU/Manip.h"
 
 namespace TU
 {
