@@ -30,10 +30,10 @@
 #ifndef __TU_SURFCREATOR_H
 #define __TU_SURFCREATOR_H
 
-#include <boost/iterator/iterator_adaptor.hpp>
 #include "TU/Feature.h"
 #include "TU/IntegralImage.h"
 #include "TU/Heap.h"
+#include <boost/iterator/iterator_adaptor.hpp>
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>
@@ -42,11 +42,11 @@
 
 namespace TU
 {
+template <class F>	class Sieve;
+    
 /************************************************************************
 *  class SURFCreator							*
 ************************************************************************/
-template <class F>	class Sieve;
-    
 //! SURF特徴点を検出してその記述子を作るクラス
 class SURFCreator
 {

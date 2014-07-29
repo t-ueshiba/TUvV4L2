@@ -78,7 +78,7 @@ main.o: /usr/local/include/TU/SURFCreator.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/IntegralImage.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/Heap.h \
 	/usr/local/include/TU/FeatureMatch.h /usr/local/include/TU/Random.h \
-	/usr/local/include/TU/Ransac.h MatchImage.h \
-	/usr/local/include/TU/ICIA.h /usr/local/include/TU/DericheConvolver.h \
+	/usr/local/include/TU/Ransac.h /usr/local/include/TU/ICIA.h \
+	/usr/local/include/TU/DericheConvolver.h \
 	/usr/local/include/TU/IIRFilter.h \
-	/usr/local/include/TU/SeparableFilter2.h
+	/usr/local/include/TU/SeparableFilter2.h MatchImage.h
