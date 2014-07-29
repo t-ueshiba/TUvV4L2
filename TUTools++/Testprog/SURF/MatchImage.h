@@ -17,12 +17,13 @@ class MatchImage : public Image<RGB>
   public:
     MatchImage()	:Image<RGB>()					{}
 
-    template <class ITER>
-    Point2i	initializeH(ITER begin, ITER end)			;
-    template <class ITER>
-    Point2i	initializeV(ITER begin, ITER end)			;
+    template <class IMG>
+    Point2i	initializeH(IMG begin, IMG end)				;
+    template <class IMG>
+    Point2i	initializeV(IMG begin, IMG end)				;
     MatchImage&	copy(const Image<u_char>& image, int u0, int v0)	;
-    MatchImage&	drawMatches(const FeatureMatch::MatchSet& matchSet,
+    template <class MATCH>
+    MatchImage&	drawMatches(MATCH begin, MATCH end,
 			    const Point2i& origin0,
 			    const Point2i& origin1, bool green)		;
 
@@ -30,11 +31,11 @@ class MatchImage : public Image<RGB>
     MatchImage&	drawLine(const Point2i& p, const Point2i& q, bool green);
 };
 		    
-template <class ITER> Point2i
-MatchImage::initializeH(ITER begin, ITER end)
+template <class IMG> Point2i
+MatchImage::initializeH(IMG begin, IMG end)
 {
     size_t	w = 0, h = 0;
-    for (ITER image = begin; image != end; ++image)
+    for (IMG image = begin; image != end; ++image)
     {
 	w += image->width();
 	if (image->height() > h)
@@ -43,7 +44,7 @@ MatchImage::initializeH(ITER begin, ITER end)
     resize(h, w);
 
     size_t	u0 = width(), nimages = 0;
-    for (ITER image = begin; image != end; ++image)
+    for (IMG image = begin; image != end; ++image)
     {
 	u0 -= image->width();
 	copy(*image, u0, 0);
@@ -58,11 +59,11 @@ MatchImage::initializeH(ITER begin, ITER end)
 	return Point2i(0, 0);
 }
 
-template <class ITER> Point2i
-MatchImage::initializeV(ITER begin, ITER end)
+template <class IMG> Point2i
+MatchImage::initializeV(IMG begin, IMG end)
 {
     size_t	w = 0, h = 0;
-    for (ITER image = begin; image != end; ++image)
+    for (IMG image = begin; image != end; ++image)
     {
 	if (image->width() > w)
 	    w = image->width();
@@ -71,7 +72,7 @@ MatchImage::initializeV(ITER begin, ITER end)
     resize(h, w);
 
     size_t	v0 = height(), nimages = 0;
-    for (ITER image = begin; image != end; ++image)
+    for (IMG image = begin; image != end; ++image)
     {
 	v0 -= image->height();
 	copy(*image, 0, v0);
@@ -86,5 +87,16 @@ MatchImage::initializeV(ITER begin, ITER end)
 	return Point2i(0, 0);
 }
 
+template <class MATCH> MatchImage&
+MatchImage::drawMatches(MATCH begin, MATCH end,
+			const Point2i& origin0, const Point2i& origin1,
+			bool green)
+{
+    for (MATCH match = begin; match != end; ++match)
+	drawLine(match->first + origin0, match->second + origin1, green);
+
+    return *this;
+}
+    
 }
 #endif

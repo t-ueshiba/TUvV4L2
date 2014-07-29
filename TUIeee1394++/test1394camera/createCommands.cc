@@ -317,7 +317,7 @@ createCommands(My1394Camera& camera)
 			GtkWidget*	scale = gtk_hscale_new(
 						    GTK_ADJUSTMENT(adj));
 			gtk_scale_set_digits(GTK_SCALE(scale), 0);
-			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
 			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
 						  1, 2, y, y+1);
 			++i;

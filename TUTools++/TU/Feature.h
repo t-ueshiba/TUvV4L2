@@ -296,5 +296,12 @@ operator >(const Feature<T, D>& feature0, const Feature<T, D>& feature1)
     return feature0.score > feature1.score;
 }
 
+/************************************************************************
+*  type definitions							*
+************************************************************************/
+typedef Feature<int, 128u>	SIFT;
+typedef Feature<float, 64u>	SURF;
+typedef Feature<float, 128u>	SURF128;
+
 }
 #endif	// !__TU_FEATURE_H

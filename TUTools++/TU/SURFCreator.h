@@ -42,10 +42,6 @@
 
 namespace TU
 {
-typedef Feature<int, 128u>	SIFT;
-typedef Feature<float, 64u>	SURF;
-typedef Feature<float, 128u>	SURF128;
-
 /************************************************************************
 *  class SURFCreator							*
 ************************************************************************/
@@ -69,9 +65,8 @@ class SURFCreator
     };
 
   //! 検出された特徴点の挿入子
-    template <class F> class Insertor
+    template <class F> struct Inserter
     {
-      public:	
 	virtual void	operator ()(const F& feature)			= 0;
     };
     
@@ -189,7 +184,7 @@ class SURFCreator
 	DetectLine(const SURFCreator& creator, size_t s, size_t pixelStep,
 		   const Array<Matrix<value_type> >& det,
 		   const Array<size_t>& borderSizes,
-		   Insertor<F>& insert)
+		   Inserter<F>& insert)
 	    :_creator(creator), _s(s), _pixelStep(pixelStep),
 	     _det(det), _borderSizes(borderSizes), _insert(insert)	{}
 	
@@ -208,7 +203,7 @@ class SURFCreator
 	const size_t				_pixelStep;
 	const Array<Matrix<value_type> >&	_det;
 	const Array<size_t>&			_borderSizes;
-	Insertor<F>&				_insert;
+	Inserter<F>&				_insert;
     };
 #endif
 
@@ -221,9 +216,9 @@ class SURFCreator
     
     template <class T, class F>
     SURFCreator&	detectFeatures(const Image<T>& image,
-				       Insertor<F>& insert)		;
+				       Inserter<F>& insert)		;
     template <class ITER>
-    SURFCreator&	makeDescriptors(ITER begin, ITER end)	;
+    SURFCreator&	makeDescriptors(ITER begin, ITER end)		;
     
   private:
     template <class T, size_t D>
@@ -241,12 +236,12 @@ class SURFCreator
     void		detect(size_t octave, size_t scale,
 			       const Array<Matrix<value_type> >& det,
 			       const Array<size_t>& borderSizes,
-			       Insertor<F>& insert)		  const	;
+			       Inserter<F>& insert)		  const	;
     template <class F>
     void		detectLine(size_t y, size_t s, size_t pixelStep,
 				   const Array<Matrix<value_type> >& det,
 				   const Array<size_t>& borderSizes,
-				   Insertor<F>& insert)		  const	;
+				   Inserter<F>& insert)		  const	;
     static bool		fineTuneExtrema(
 			    const Array<Matrix<value_type> >& det,
 			    int x, int y, int s, 
@@ -286,7 +281,7 @@ SURFCreator::getParameters() const
 }
 
 template <class T, class F> SURFCreator&
-SURFCreator::detectFeatures(const Image<T>& image, Insertor<F>& insert)
+SURFCreator::detectFeatures(const Image<T>& image, Inserter<F>& insert)
 {
     _integralImage.initialize(image);	// 積分画像を作る
     
@@ -319,18 +314,18 @@ SURFCreator::makeDescriptors(ITER begin, ITER end)
     typedef typename feature_type::value_type		feature_value_type;
 
 #if defined(USE_TBB)
-    using namespace	tbb;
-    
-    parallel_for(blocked_range<ITER>(begin, end, 1),
-		 Apply<ITER>(
-		     *this,
-		     &SURFCreator::assignOrientation<
-			 feature_value_type, feature_type::DescriptorDim>));
-    parallel_for(blocked_range<ITER>(begin, end, 1),
-		 Apply<ITER>(
-		     *this,
-		     &SURFCreator::makeDescriptor<
-			 feature_value_type, feature_type::DescriptorDim>));
+    tbb::parallel_for(tbb::blocked_range<ITER>(begin, end, 1),
+		      Apply<ITER>(
+			  *this,
+			  &SURFCreator::assignOrientation<
+			      feature_value_type,
+			      feature_type::DescriptorDim>));
+    tbb::parallel_for(tbb::blocked_range<ITER>(begin, end, 1),
+		      Apply<ITER>(
+			  *this,
+			  &SURFCreator::makeDescriptor<
+			      feature_value_type,
+			      feature_type::DescriptorDim>));
 #else
     for (ITER feature = begin; feature != end; ++feature)
     {
@@ -364,7 +359,7 @@ template <class F> void
 SURFCreator::detect(size_t o, size_t s,
 		    const Array<Matrix<value_type> >& det,
 		    const Array<size_t>& borderSizes,
-		    Insertor<F>& insert) const
+		    Inserter<F>& insert) const
 {
     const size_t	pixelStep  = 1 << o;			// 2^octave
     const size_t	borderSize = borderSizes[s+1];
@@ -392,10 +387,10 @@ class Sieve : public container<Sieve<F, CMP> >
     typedef Array2<HeapArray>		HeapArray2;
     
   public:
-    class Insertor : public SURFCreator::Insertor<F>
+    class Inserter : public SURFCreator::Inserter<F>
     {
       public:
-	Insertor(Sieve& sieve)	:_sieve(sieve)	{}
+	Inserter(Sieve& sieve)	:_sieve(sieve)	{}
 	virtual void	operator ()(const F& feature)
 			{
 #if defined(USE_TBB)
@@ -572,25 +567,29 @@ Sieve<F, CMP>::clear()
 *  global functions							*
 ************************************************************************/
 //! 画像からSURF特徴を抽出
-template <class F> Array<F>
-createSURF(const Image<u_char>& image, const SURFCreator::Parameters& params)
+template <class F, class T, class OUT> void
+createSURF(const Image<T>& image, OUT out,
+	   const SURFCreator::Parameters& params)
 {
-    typedef typename Sieve<F>::Insertor		Insertor;
+    typedef typename Sieve<F>::Inserter		Inserter;
     
-  // SURF検出器を生成しパラメータを設定する．
-    SURFCreator	creator(params);
-
-  // 画像全体を10x10のバケットに区切り，
-  // 各バケットにスコアの高い順に高々10個のSURFを登録する．
+  // 画像全体を10x10のバケットに区切り，各バケットにスコアの高い順に高々10個の
+  // SURFを登録する．
     Sieve<F>	sieve(image.height(), image.width(), 10, 10, 10);
-    Insertor	insertor(sieve);
-    creator.detectFeatures(image, insertor);
+    Inserter	insert(sieve);
+    SURFCreator	creator(params);
+    creator.detectFeatures(image, insert);
 
   // 各SURF特徴点に向きと特徴ベクトルを与える．
-    Array<F>	features(sieve);
+#if defined(USE_TBB)		  // Sieveの反復子はrandom access不可
+    Array<F>	features(sieve);  // なので並列処理時はArrayに移す．
+#else
+    Sieve<F>&	features = sieve;
+#endif
     creator.makeDescriptors(features.begin(), features.end());
 
-    return features;
+  // SURF特徴点を出力する．
+    std::copy(features.cbegin(), features.cend(), out);
 }
 
 }

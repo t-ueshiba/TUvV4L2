@@ -622,7 +622,7 @@ template <class F> void
 SURFCreator::detectLine(size_t y, size_t s, size_t pixelStep,
 			const Array<Matrix<value_type> >& det,
 			const Array<size_t>& borderSizes,
-			Insertor<F>& insert) const
+			Inserter<F>& insert) const
 {
     const size_t	borderSize   = borderSizes[s+1];
     const size_t	octaveHeight = _integralImage.originalHeight()
@@ -868,12 +868,12 @@ template void	SURFCreator::detectLine(
 		    size_t y, size_t s, size_t pixelStep,
 		    const Array<Matrix<value_type> >& det,
 		    const Array<size_t>& borderSizes,
-		    Insertor<SURF>& insert)			 const	;
+		    Inserter<SURF>& insert)			 const	;
 template void	SURFCreator::detectLine(
 		    size_t y, size_t s, size_t pixelStep,
 		    const Array<Matrix<value_type> >& det,
 		    const Array<size_t>& borderSizes,
-		    Insertor<SURF128>& insert)			 const	;
+		    Inserter<SURF128>& insert)			 const	;
 template void	SURFCreator::assignOrientation(SURF& feature)	 const	;
 template void	SURFCreator::assignOrientation(SURF128& feature) const	;
 template void	SURFCreator::makeDescriptor(SURF& feature)	 const	;
