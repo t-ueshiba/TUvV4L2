@@ -45,6 +45,8 @@ namespace TU
 /************************************************************************
 *  class SURFCreator							*
 ************************************************************************/
+template <class F>	class Sieve;
+    
 //! SURF特徴点を検出してその記述子を作るクラス
 class SURFCreator
 {
@@ -213,7 +215,9 @@ class SURFCreator
 
     SURFCreator&	setParameters(const Parameters& parameters)	;
     const Parameters&	getParameters()				  const	;
-    
+
+    template <class F, class T, class OUT>
+    void		createSURFs(const Image<T>& image, OUT out)	;
     template <class T, class F>
     SURFCreator&	detectFeatures(const Image<T>& image,
 				       Inserter<F>& insert)		;
@@ -278,6 +282,30 @@ inline const SURFCreator::Parameters&
 SURFCreator::getParameters() const
 {
     return _params;
+}
+
+//! 画像からSURF特徴を抽出
+template <class F, class T, class OUT> void
+SURFCreator::createSURFs(const Image<T>& image, OUT out)
+{
+    typedef typename Sieve<F>::Inserter		Inserter;
+    
+  // 画像全体を10x10のバケットに区切り，各バケットにスコアの高い順に高々10個の
+  // SURFを登録する．
+    Sieve<F>	sieve(image.height(), image.width(), 10, 10, 10);
+    Inserter	insert(sieve);
+    detectFeatures(image, insert);
+
+  // 各SURF特徴点に向きと特徴ベクトルを与える．
+#if defined(USE_TBB)		  // Sieveの反復子はrandom access不可
+    Array<F>	features(sieve);  // なので並列処理時はArrayに移す．
+#else
+    Sieve<F>&	features = sieve;
+#endif
+    makeDescriptors(features.begin(), features.end());
+
+  // SURF特徴点を出力する．
+    std::copy(features.cbegin(), features.cend(), out);
 }
 
 template <class T, class F> SURFCreator&
@@ -377,14 +405,13 @@ SURFCreator::detect(size_t o, size_t s,
 }
 
 /************************************************************************
-*  class Sieve<F, CMP>							*
+*  class Sieve<F>							*
 ************************************************************************/
-template <class F, class CMP=std::greater<F> >
-class Sieve : public container<Sieve<F, CMP> >
+template <class F>
+class Sieve : public container<Sieve<F> >
 {
   private:
-    typedef Array<Heap<F, CMP> >	HeapArray;
-    typedef Array2<HeapArray>		HeapArray2;
+    typedef Heap<F, std::greater<F> >		heap_type;
     
   public:
     class Inserter : public SURFCreator::Inserter<F>
@@ -478,8 +505,8 @@ class Sieve : public container<Sieve<F, CMP> >
 
     typedef F							value_type;
     typedef Iterator<const Sieve&,
-		     typename Heap<F, CMP>::const_iterator>	const_iterator;
-    typedef Iterator<Sieve&, typename Heap<F, CMP>::iterator>	iterator;
+		     typename heap_type::const_iterator>	const_iterator;
+    typedef Iterator<Sieve&, typename heap_type::iterator>	iterator;
     
   public:
     Sieve(size_t height, size_t width,
@@ -517,14 +544,14 @@ class Sieve : public container<Sieve<F, CMP> >
 			}
 	
   private:
-    const size_t	_max_size;
-    HeapArray2		_buckets;
-    const float		_dx, _dy;
+    const size_t		_max_size;
+    Array2<Array<heap_type> >	_buckets;
+    const float			_dx, _dy;
 };
 
-template <class F, class CMP>
-Sieve<F, CMP>::Sieve(size_t height, size_t width,
-		     size_t r, size_t c, size_t max_siz)
+template <class F>
+Sieve<F>::Sieve(size_t height, size_t width,
+		size_t r, size_t c, size_t max_siz)
     :_max_size(max_siz), _buckets(r, c),
      _dy(float(r)/float(height)), _dx(float(c)/float(width))
 {
@@ -533,8 +560,8 @@ Sieve<F, CMP>::Sieve(size_t height, size_t width,
 	    _buckets[i][j].resize(_max_size);
 }
 
-template <class F, class CMP> size_t
-Sieve<F, CMP>::size() const
+template <class F> size_t
+Sieve<F>::size() const
 {
     size_t	n = 0;
     for (size_t i = 0; i < _buckets.nrow(); ++i)
@@ -544,8 +571,8 @@ Sieve<F, CMP>::size() const
     return n;
 }
 
-template <class F, class CMP> inline bool
-Sieve<F, CMP>::insert(const F& feature)
+template <class F> inline bool
+Sieve<F>::insert(const F& feature)
 {
     size_t	i = size_t(feature[1]*_dy), j = size_t(feature[0]*_dx);
     if (i >= _buckets.nrow())
@@ -555,41 +582,12 @@ Sieve<F, CMP>::insert(const F& feature)
     return _buckets[i][j].push_or_replace(feature);
 }
 
-template <class F, class CMP> void
-Sieve<F, CMP>::clear()
+template <class F> void
+Sieve<F>::clear()
 {
     for (size_t i = 0; i < _buckets.nrow(); ++i)
 	for (size_t j = 0; j < _buckets.ncol(); ++j)
 	    _buckets[i][j].clear();
-}
-
-/************************************************************************
-*  global functions							*
-************************************************************************/
-//! 画像からSURF特徴を抽出
-template <class F, class T, class OUT> void
-createSURF(const Image<T>& image, OUT out,
-	   const SURFCreator::Parameters& params)
-{
-    typedef typename Sieve<F>::Inserter		Inserter;
-    
-  // 画像全体を10x10のバケットに区切り，各バケットにスコアの高い順に高々10個の
-  // SURFを登録する．
-    Sieve<F>	sieve(image.height(), image.width(), 10, 10, 10);
-    Inserter	insert(sieve);
-    SURFCreator	creator(params);
-    creator.detectFeatures(image, insert);
-
-  // 各SURF特徴点に向きと特徴ベクトルを与える．
-#if defined(USE_TBB)		  // Sieveの反復子はrandom access不可
-    Array<F>	features(sieve);  // なので並列処理時はArrayに移す．
-#else
-    Sieve<F>&	features = sieve;
-#endif
-    creator.makeDescriptors(features.begin(), features.end());
-
-  // SURF特徴点を出力する．
-    std::copy(features.cbegin(), features.cend(), out);
 }
 
 }

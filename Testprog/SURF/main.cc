@@ -129,10 +129,11 @@ doJob(const Image<T> images[2],
     typedef typename MAP::element_type	element_type;
     
   // 画像からSURF特徴を取り出す．
+    SURFCreator		surfCreator(surfParams);
     vector<SURF>	surfs0, surfs1;
-    createSURF<SURF>(images[0], back_inserter(surfs0), surfParams);
+    surfCreator.createSURFs<SURF>(images[0], back_inserter(surfs0));
     cerr << surfs0.size() << " SURFs extracted." << endl;
-    createSURF<SURF>(images[1], back_inserter(surfs1), surfParams);
+    surfCreator.createSURFs<SURF>(images[1], back_inserter(surfs1));
     cerr << surfs1.size() << " SURFs extracted." << endl;
 
   // 点対応を検出する．
