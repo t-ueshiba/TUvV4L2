@@ -19,18 +19,6 @@ MatchImage::copy(const Image<u_char>& image, int u0, int v0)
 }
     
 MatchImage&
-MatchImage::drawMatches(const FeatureMatch::MatchSet& matchSet,
-			const Point2i& origin0, const Point2i& origin1,
-			bool green)
-{
-    for (FeatureMatch::MatchSet::const_iterator match = matchSet.begin();
-	 match != matchSet.end(); ++match)
-	drawLine(match->first + origin0, match->second + origin1, green);
-
-    return *this;
-}
-    
-MatchImage&
 MatchImage::drawLine(const Point2i& p, const Point2i& q, bool green)
 {
     using namespace	std;

@@ -46,7 +46,6 @@ class FeatureMatch
   public:
     typedef double			value_type;
     typedef std::pair<Point2f, Point2f>	Match;		//!< 2画像間の点対応
-    typedef std::vector<Match>		MatchSet;	//!< 点対応の集合
 
     struct Parameters
     {
@@ -64,12 +63,17 @@ class FeatureMatch
 	size_t		nmatchesMin;	//!< 画像間対応に必要な最小マッチング数
     };
 
+    struct Inserter
+    {
+	virtual void	operator ()(const Match& match)	= 0;
+    };
+    
   private:
     class Sampler
     {
       public:
-	typedef MatchSet			Container;
-	typedef MatchSet::const_iterator	const_iterator;
+	typedef std::vector<Match>		Container;
+	typedef Container::const_iterator	const_iterator;
 
 	Sampler(const_iterator begin, const_iterator end, double inlierRate)
 	    :_begin(begin), _end(end),
@@ -110,21 +114,20 @@ class FeatureMatch
     FeatureMatch(const Parameters& params)	:_params(params)	{}
     
     FeatureMatch&	setParameters(const Parameters& parameters)	;
-    const Parameters&	getParameters()				const	;
+    const Parameters&	getParameters()				  const	;
     
-    template <class MAP, class ITER>
-    MatchSet		operator ()(MAP& map,
-				    ITER begin0, ITER end0,
-				    ITER begin1, ITER end1)	const	;
+    template <class MAP, class IN, class OUT>
+    void		operator ()(MAP& map, IN begin0, IN end0,
+				    IN begin1, IN end1, OUT out)  const	;
 
   private:
-    template <class ITER>
-    MatchSet	findCandidateMatches(ITER begin0, ITER end0,
-				     ITER begin1, ITER end1)	const	;
-    template <class ITER>
+    template <class IN, class OUT>
+    void	findCandidateMatches(IN begin0, IN end0,
+				     IN begin1, IN end1, OUT out) const	;
+    template <class IN>
     bool	findBestMatch(
-		    ITER feature, ITER& feature_best,
-		    const std::vector<std::vector<ITER> >& buckets) const;
+		    IN feature, IN& feature_best,
+		    const std::vector<std::vector<IN> >& buckets) const	;
     template <class T>
     static T	fraction(T angle, size_t size)
 		{
@@ -148,25 +151,28 @@ FeatureMatch::getParameters() const
     return _params;
 }
 
-template <class MAP, class ITER> FeatureMatch::MatchSet
-FeatureMatch::operator ()(MAP& map,
-			  ITER begin0, ITER end0, ITER begin1, ITER end1) const
+template <class MAP, class IN, class OUT> void
+FeatureMatch::operator ()(MAP& map, IN begin0, IN end0,
+			  IN begin1, IN end1, OUT out) const
 {
     using namespace	std;
+
+    typedef Sampler::Container			Container;
     
   // 特徴間の全対応候補を求める．
-    MatchSet	candidates = findCandidateMatches(begin0, end0,
-						  begin1, end1);
+    Container	candidates;
+    findCandidateMatches(begin0, end0,
+			 begin1, end1, back_inserter(candidates));
 
   // RANSACによって誤対応を除去するとともに，画像間変換を求める．
     Sampler	sampler(candidates.begin(),
 			candidates.end(), _params.inlierRate);
-    MatchSet	matchSet = ransac(sampler, map,
+    Container	matchSet = ransac(sampler, map,
 				  Conform<MAP>(_params.conformThresh));
     cerr << setw(3) << matchSet.size() << " matches selected from "
 	 << candidates.size() << " candidates." << endl;
 
-    return matchSet;
+    std::copy(matchSet.begin(), matchSet.end(), out);
 }
 
 //! 2枚の画像から取り出した特徴を用いて双方向探索により対応点候補をみつける．
@@ -175,25 +181,25 @@ FeatureMatch::operator ()(MAP& map,
   \param end0		一方の画像の特徴の末尾の次
   \param begin1		もう一方の画像の特徴の先頭
   \param end1		もう一方の画像の特徴の末尾の次
-  \return
+  \param out		対応点候補の出力先
 */
-template <class ITER> FeatureMatch::MatchSet
-FeatureMatch::findCandidateMatches(ITER begin0, ITER end0,
-				   ITER begin1, ITER end1) const
+template <class IN, class OUT> void
+FeatureMatch::findCandidateMatches(IN begin0, IN end0,
+				   IN begin1, IN end1, OUT out) const
 {
     using namespace	std;
 
   // [begin0, end0), [begin1, end1) を angle によって分類する．
     const size_t		nbuckets = 360;
-    vector<vector<ITER> >	buckets0(nbuckets);
-    vector<vector<ITER> >	buckets1(nbuckets);
-    for (ITER feature0 = begin0; feature0 != end0; ++feature0)
+    vector<vector<IN> >	buckets0(nbuckets);
+    vector<vector<IN> >	buckets1(nbuckets);
+    for (IN feature0 = begin0; feature0 != end0; ++feature0)
     {
 	int	i = int(fraction(feature0->angle, buckets0.size()));
 
 	buckets0[i].push_back(feature0);
     }
-    for (ITER feature1 = begin1; feature1 != end1; ++feature1)
+    for (IN feature1 = begin1; feature1 != end1; ++feature1)
     {
 	int	i = int(fraction(feature1->angle, buckets1.size()));
 
@@ -201,25 +207,22 @@ FeatureMatch::findCandidateMatches(ITER begin0, ITER end0,
     }
 
   // [begin0, end0)の各特徴について特徴記述子間の距離をもとに対応候補を検出する．
-    MatchSet	candidateMatches;
-    for (ITER feature0 = begin0; feature0 != end0; ++feature0)
+    for (IN feature0 = begin0; feature0 != end0; ++feature0)
     {
       // feature0 に対する最良の対応を探す．
-	ITER	feature_best1;
+	IN	feature_best1;
 	if (findBestMatch(feature0, feature_best1, buckets1))
 	{
 	  // 逆方向もチェックして相思相愛だけを残す
-	    ITER	feature_best0;
+	    IN	feature_best0;
 	    if (findBestMatch(feature_best1, feature_best0, buckets0) &&
 		feature0 == feature_best0)
 	    {
-		candidateMatches.push_back(make_pair(*feature0,
-						     *feature_best1));
+		*out = make_pair(*feature0, *feature_best1);
+		++out;
 	    }
 	}
     }
-
-    return candidateMatches;
 }
 
 //! 指定された特徴に最も良く対応する特徴を指定されたバケット群の中から探索する．
@@ -230,16 +233,16 @@ FeatureMatch::findCandidateMatches(ITER begin0, ITER end0,
   \return		最良のマッチングのスコアが2位のマッチングのスコアの
 			separation倍未満ならばtrue, そうでなければfalse
 */
-template <class ITER> bool
+template <class IN> bool
 FeatureMatch::findBestMatch(
-		  ITER feature, ITER& feature_best,
-		  const std::vector<std::vector<ITER> >& buckets) const
+		  IN feature, IN& feature_best,
+		  const std::vector<std::vector<IN> >& buckets) const
 {
     using namespace	std;
 
-    typedef typename iterator_traits<ITER>::value_type	feature_type;
+    typedef typename iterator_traits<IN>::value_type	feature_type;
     typedef typename feature_type::value_type		value_type;
-    typedef vector<ITER>				bucket_t;
+    typedef vector<IN>					bucket_t;
     
   // 該当区間を検索する．
     value_type	sqd_best   = numeric_limits<value_type>::max(),

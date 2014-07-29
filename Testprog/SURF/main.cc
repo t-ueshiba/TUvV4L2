@@ -3,8 +3,8 @@
  */
 #include "TU/SURFCreator.h"
 #include "TU/FeatureMatch.h"
-#include "MatchImage.h"
 #include "TU/ICIA.h"
+#include "MatchImage.h"
 #include <fstream>
 
 namespace TU
@@ -129,22 +129,24 @@ doJob(const Image<T> images[2],
     typedef typename MAP::element_type	element_type;
     
   // 画像からSURF特徴を取り出す．
-    Array<SURF>	surfs0 = createSURF<SURF>(images[0], surfParams);
+    vector<SURF>	surfs0, surfs1;
+    createSURF<SURF>(images[0], back_inserter(surfs0), surfParams);
     cerr << surfs0.size() << " SURFs extracted." << endl;
-    Array<SURF>	surfs1 = createSURF<SURF>(images[1], surfParams);
+    createSURF<SURF>(images[1], back_inserter(surfs1), surfParams);
     cerr << surfs1.size() << " SURFs extracted." << endl;
 
   // 点対応を検出する．
     FeatureMatch		match(matchParams);
     MAP				map;
-    FeatureMatch::MatchSet	matchSet = match(map,
-						 surfs0.begin(), surfs0.end(),
-						 surfs1.begin(), surfs1.end());
+    vector<FeatureMatch::Match>	matchSet;
+    match(map, surfs0.begin(), surfs0.end(), surfs1.begin(), surfs1.end(),
+	  back_inserter(matchSet));
 
   // 点対応を示す画像を生成する．
     MatchImage	matchImage;
     Point2i	delta = matchImage.initializeH(images, images + 2);
-    matchImage.drawMatches(matchSet, delta, Point2i(0, 0), true);
+    matchImage.drawMatches(matchSet.begin(), matchSet.end(),
+			   delta, Point2i(0, 0), true);
     matchImage.save(cout);
 
     if (refine)
