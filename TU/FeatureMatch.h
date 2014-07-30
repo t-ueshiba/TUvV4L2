@@ -54,14 +54,12 @@ class FeatureMatch
 	    :separation(0.85),
 	     diffAngleMax(15.0*M_PI/180.0),
 	     inlierRate(0.1),
-	     conformThresh(4.0),
-	     nmatchesMin(6)				{}
+	     conformThresh(4.0)				{}
 
 	value_type	separation;	//!< 1位のマッチングの2位に対する割合
 	value_type	diffAngleMax;	//!< 2つの特徴がマッチできる最大角度差
 	value_type	inlierRate;	//!< マッチング候補内のインライアの割合
 	value_type	conformThresh;	//!< インライアとなる最大当てはめ誤差
-	size_t		nmatchesMin;	//!< 画像間対応に必要な最小マッチング数
     };
 
     struct Inserter
@@ -109,6 +107,8 @@ class FeatureMatch
       private:
 	const value_type	_sqThresh;	//!< 適合判定のしきい値の二乗
     };
+
+    enum	{ NBUCKETS = 360 };
     
   public:
     FeatureMatch()				:_params()		{}
@@ -126,9 +126,8 @@ class FeatureMatch
     void	findCandidateMatches(IN begin0, IN end0,
 				     IN begin1, IN end1, OUT out) const	;
     template <class IN>
-    bool	findBestMatch(
-		    IN feature, IN& feature_best,
-		    const std::vector<std::vector<IN> >& buckets) const	;
+    bool	findBestMatch(IN feature, IN& feature_best,
+			      const std::vector<IN> buckets[])	  const	;
     template <class T>
     static T	fraction(T angle, size_t size)
 		{
@@ -191,18 +190,17 @@ FeatureMatch::findCandidateMatches(IN begin0, IN end0,
     using namespace	std;
 
   // [begin0, end0), [begin1, end1) を angle によって分類する．
-    const size_t		nbuckets = 360;
-    vector<vector<IN> >	buckets0(nbuckets);
-    vector<vector<IN> >	buckets1(nbuckets);
+    vector<IN>		buckets0[NBUCKETS];
+    vector<IN>		buckets1[NBUCKETS];
     for (IN feature0 = begin0; feature0 != end0; ++feature0)
     {
-	int	i = int(fraction(feature0->angle, buckets0.size()));
+	int	i = int(fraction(feature0->angle, NBUCKETS));
 
 	buckets0[i].push_back(feature0);
     }
     for (IN feature1 = begin1; feature1 != end1; ++feature1)
     {
-	int	i = int(fraction(feature1->angle, buckets1.size()));
+	int	i = int(fraction(feature1->angle, NBUCKETS));
 
 	buckets1[i].push_back(feature1);
     }
@@ -235,9 +233,8 @@ FeatureMatch::findCandidateMatches(IN begin0, IN end0,
 			separation倍未満ならばtrue, そうでなければfalse
 */
 template <class IN> bool
-FeatureMatch::findBestMatch(
-		  IN feature, IN& feature_best,
-		  const std::vector<std::vector<IN> >& buckets) const
+FeatureMatch::findBestMatch(IN feature, IN& feature_best,
+			    const std::vector<IN> buckets[]) const
 {
     using namespace	std;
 
@@ -248,13 +245,13 @@ FeatureMatch::findBestMatch(
   // 該当区間を検索する．
     value_type	sqd_best   = numeric_limits<value_type>::max(),
 		sqd_second = numeric_limits<value_type>::max();
-    const int	idx	   = int(fraction(feature->angle, buckets.size())),
+    const int	idx	   = int(fraction(feature->angle, NBUCKETS)),
 		range	   = int(ceil(fraction(_params.diffAngleMax,
-					       buckets.size())));
+					       NBUCKETS)));
     for (int i = idx - range; i <= idx + range; ++i)
     {
-	const int	j = (i < 0		 ? i + buckets.size() :
-			     i >= buckets.size() ? i - buckets.size() : i);
+	const int	j = (i < 0	   ? i + NBUCKETS :
+			     i >= NBUCKETS ? i - NBUCKETS : i);
 	const bucket_t&	bucket = buckets[j];
 	
 	for (typename bucket_t::const_iterator
