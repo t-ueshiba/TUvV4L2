@@ -9,7 +9,7 @@ namespace TU
 *  class MatchImage							*
 ************************************************************************/
 MatchImage&
-MatchImage::copy(const Image<u_char>& image, int u0, int v0)
+MatchImage::copy(const Image<u_char>& image, size_t u0, size_t v0)
 {
     for (size_t v = 0; v < image.height(); ++v)
 	for (size_t u = 0; u < image.width(); ++u)
