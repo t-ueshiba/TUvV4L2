@@ -21,7 +21,7 @@ class MatchImage : public Image<RGB>
     Point2i	initializeH(IMG begin, IMG end)				;
     template <class IMG>
     Point2i	initializeV(IMG begin, IMG end)				;
-    MatchImage&	copy(const Image<u_char>& image, int u0, int v0)	;
+    MatchImage&	copy(const Image<u_char>& image, size_t u0, size_t v0)	;
     template <class MATCH>
     MatchImage&	drawMatches(MATCH begin, MATCH end,
 			    const Point2i& origin0,
