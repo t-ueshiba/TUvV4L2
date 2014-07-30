@@ -272,8 +272,8 @@ SURFCreator::BoxFilter::mmGetDet(size_t x) const
 inline SURFCreator::value_type
 SURFCreator::BoxFilter::getWx(size_t x, size_t y)
 {
-    return _integralImage.crop2(x,	  x + _w1, y - _w1, y + _w1)
-	 - _integralImage.crop2(x - _w1, x,	   y - _w1, y + _w1);
+    return _integralImage.crop2(x,	 x + _w1, y - _w1, y + _w1)
+	 - _integralImage.crop2(x - _w1, x,	  y - _w1, y + _w1);
 }
 
 inline SURFCreator::value_type
@@ -407,10 +407,10 @@ template <class T, size_t D> void
 SURFCreator::assignOrientation(Feature<T, D>& feature) const
 {
     using namespace	std;
-    
+
   // 特徴点の位置とスケール変化のステップを取り出す．
-    const size_t	xc   = size_t(feature[0] + 0.5),
-			yc   = size_t(feature[1] + 0.5);
+    const int		xc   = int(feature[0] + 0.5),
+			yc   = int(feature[1] + 0.5);
     const int		step = int(feature.sigma + 0.8);
     HarrResponse	resp[19*19*2];
     BoxFilter		boxFilter(_integralImage, 2.0 * feature.sigma + 1.6);
@@ -424,9 +424,9 @@ SURFCreator::assignOrientation(Feature<T, D>& feature) const
 	for (int i = -9; i <= 9; ++i)
 	{
 	    const int	x = xc + i * step;
-	    
+
 	  // keep points in a circular region of diameter 6s
-	    const size_t	sqrad = i * i + j * j;
+	    const int	sqrad = i * i + j * j;
 	    if (sqrad <= 81 && boxFilter.checkBoundsW(x, y))
 	    {
 		value_type	wx  = boxFilter.getWx(x, y),
@@ -723,7 +723,7 @@ SURFCreator::detectLine(size_t y, size_t s, size_t pixelStep,
 	int	trace;
 	if (!calcTrace(xf, yf, sf, trace))
 	    continue;
-					
+
       // 特徴点を生成し，挿入子によってユーザ側のコンテナに挿入する．
 	insert(F(xf, yf, sf * _baseSigma, 0, score, trace));
     }
@@ -838,7 +838,7 @@ SURFCreator::calcTrace(value_type x, value_type y,
 		       value_type scale, int& trace) const
 {
     BoxFilter	boxFilter(_integralImage, 3*scale);
-    const size_t	xx = size_t(x + 0.5), yy = size_t(y + 0.5);
+    const int	xx = int(x + 0.5), yy = int(y + 0.5);
 
     if(!boxFilter.checkBounds(xx, yy))
 	return false;

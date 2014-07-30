@@ -461,8 +461,9 @@ class Sieve : public container<Sieve<F> >
       private:
 	void	increment()
 		{
-		    if (++super::base_reference() ==
-			_sieve._buckets[_i][_j].end())
+		    ++super::base_reference();
+		    
+		    while (super::base() == _sieve._buckets[_i][_j].end())
 		    {
 			if (++_j == _sieve._buckets.ncol())
 			{
@@ -476,7 +477,7 @@ class Sieve : public container<Sieve<F> >
 		}
 	void	decrement()
 		{
-		    if (super::base() == _sieve._buckets[_i][_j].begin())
+		    while (super::base() == _sieve._buckets[_i][_j].begin())
 		    {
 			if (_j == 0)
 			{
@@ -488,6 +489,7 @@ class Sieve : public container<Sieve<F> >
 			super::base_reference()
 			    = _sieve._buckets[_i][--_j].end();
 		    }
+		    
 		    --super::base_reference();
 		}
 	
