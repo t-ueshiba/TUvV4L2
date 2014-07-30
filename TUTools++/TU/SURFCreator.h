@@ -450,19 +450,23 @@ class Sieve : public container<Sieve<F> >
 	friend class	boost::iterator_core_access;
 
       public:
-	Iterator(SIEVE sieve, bool isBegin)
-	    :super(isBegin ? sieve._buckets[0][0].begin() :
-		   sieve._buckets[sieve._buckets.nrow()-1]
-		    		 [sieve._buckets.ncol()-1].end()),
-	     _sieve(sieve),
-	     _i(isBegin ? 0 : _sieve._buckets.nrow() - 1),
-	     _j(isBegin ? 0 : _sieve._buckets.ncol() - 1)		{}
+		Iterator(SIEVE sieve, bool isBegin)
+		    :super(isBegin ? sieve._buckets[0][0].begin() :
+			   sieve._buckets[sieve._buckets.nrow()-1]
+					 [sieve._buckets.ncol()-1].end()),
+		     _sieve(sieve),
+		     _i(isBegin ? 0 : _sieve._buckets.nrow() - 1),
+		     _j(isBegin ? 0 : _sieve._buckets.ncol() - 1)
+		{
+		    if (isBegin)
+			checkBucketEnd();
+		    else
+			checkBucketBegin();
+		}
 
       private:
-	void	increment()
+	void	checkBucketEnd()
 		{
-		    ++super::base_reference();
-		    
 		    while (super::base() == _sieve._buckets[_i][_j].end())
 		    {
 			if (++_j == _sieve._buckets.ncol())
@@ -475,7 +479,7 @@ class Sieve : public container<Sieve<F> >
 			    = _sieve._buckets[_i][_j].begin();
 		    }
 		}
-	void	decrement()
+	void	checkBucketBegin()
 		{
 		    while (super::base() == _sieve._buckets[_i][_j].begin())
 		    {
@@ -489,7 +493,15 @@ class Sieve : public container<Sieve<F> >
 			super::base_reference()
 			    = _sieve._buckets[_i][--_j].end();
 		    }
-		    
+		}
+	void	increment()
+		{
+		    ++super::base_reference();
+		    checkBucketEnd();
+		}
+	void	decrement()
+		{
+		    checkBucketBegin();
 		    --super::base_reference();
 		}
 	
