@@ -118,13 +118,16 @@ class FeatureMatch
     const Parameters&	getParameters()				  const	;
     
     template <class MAP, class IN, class OUT>
-    void		operator ()(MAP& map, IN begin0, IN end0,
-				    IN begin1, IN end1, OUT out)  const	;
-
-  private:
+    void	operator ()(MAP& map, IN begin0, IN end0,
+			    IN begin1, IN end1, OUT out)	  const	;
     template <class IN, class OUT>
     void	findCandidateMatches(IN begin0, IN end0,
 				     IN begin1, IN end1, OUT out) const	;
+    template <class MAP, class IN, class OUT>
+    void	selectMatches(MAP& map,
+			      IN begin, IN end, OUT out)	  const	;
+    
+  private:
     template <class IN>
     bool	findBestMatch(IN feature, IN& feature_best,
 			      const std::vector<IN> buckets[])	  const	;
@@ -151,12 +154,19 @@ FeatureMatch::getParameters() const
     return _params;
 }
 
+//! 2枚の画像から取り出した特徴からRANSACによって対応点を選び出す．
+/*!
+  \param map		対応点間に成立する画像間変換が返される
+  \param begin0		一方の画像の特徴の先頭
+  \param end0		一方の画像の特徴の末尾の次
+  \param begin1		もう一方の画像の特徴の先頭
+  \param end1		もう一方の画像の特徴の末尾の次
+  \param out		対応点候補の出力先
+*/
 template <class MAP, class IN, class OUT> void
 FeatureMatch::operator ()(MAP& map, IN begin0, IN end0,
 			  IN begin1, IN end1, OUT out) const
 {
-    using namespace	std;
-
     typedef Sampler::Container			Container;
     
   // 特徴間の全対応候補を求める．
@@ -165,14 +175,7 @@ FeatureMatch::operator ()(MAP& map, IN begin0, IN end0,
 			 begin1, end1, back_inserter(candidates));
 
   // RANSACによって誤対応を除去するとともに，画像間変換を求める．
-    Sampler	sampler(candidates.begin(),
-			candidates.end(), _params.inlierRate);
-    Container	matchSet = ransac(sampler, map,
-				  Conform<MAP>(_params.conformThresh));
-    cerr << setw(3) << matchSet.size() << " matches selected from "
-	 << candidates.size() << " candidates." << endl;
-
-    std::copy(matchSet.begin(), matchSet.end(), out);
+    selectMatches(map, candidates.begin(), candidates.end(), out);
 }
 
 //! 2枚の画像から取り出した特徴を用いて双方向探索により対応点候補をみつける．
@@ -187,11 +190,9 @@ template <class IN, class OUT> void
 FeatureMatch::findCandidateMatches(IN begin0, IN end0,
 				   IN begin1, IN end1, OUT out) const
 {
-    using namespace	std;
-
   // [begin0, end0), [begin1, end1) を angle によって分類する．
-    vector<IN>		buckets0[NBUCKETS];
-    vector<IN>		buckets1[NBUCKETS];
+    std::vector<IN>	buckets0[NBUCKETS];
+    std::vector<IN>	buckets1[NBUCKETS];
     for (IN feature0 = begin0; feature0 != end0; ++feature0)
     {
 	int	i = int(fraction(feature0->angle, NBUCKETS));
@@ -205,25 +206,48 @@ FeatureMatch::findCandidateMatches(IN begin0, IN end0,
 	buckets1[i].push_back(feature1);
     }
 
-  // [begin0, end0)の各特徴について特徴記述子間の距離をもとに対応候補を検出する．
+  // [begin0, end0)の各特徴に対し特徴記述子間の距離をもとに対応候補を検出する．
     for (IN feature0 = begin0; feature0 != end0; ++feature0)
     {
       // feature0 に対する最良の対応を探す．
 	IN	feature_best1;
 	if (findBestMatch(feature0, feature_best1, buckets1))
 	{
-	  // 逆方向もチェックして相思相愛だけを残す
+	  // 逆方向もチェックして相思相愛だけを残す．
 	    IN	feature_best0;
 	    if (findBestMatch(feature_best1, feature_best0, buckets0) &&
 		feature0 == feature_best0)
 	    {
-		*out = make_pair(*feature0, *feature_best1);
+		*out = std::make_pair(*feature0, *feature_best1);
 		++out;
 	    }
 	}
     }
 }
 
+//! 対応点候補からRANSACによって対応点を選び出す．
+/*!
+  \param map		対応点間に成立する画像間変換が返される
+  \param begin		対応点候補の先頭
+  \param end		対応点候補の末尾の次
+  \param out		対応点候補の出力先
+*/
+template <class MAP, class IN, class OUT> void
+FeatureMatch::selectMatches(MAP& map, IN begin, IN end, OUT out) const
+{
+    using namespace		std;
+    typedef Sampler::Container	Container;
+    
+  // RANSACによって誤対応を除去するとともに，画像間変換を求める．
+    Sampler	sampler(begin, end, _params.inlierRate);
+    Container	matchSet = ransac(sampler, map,
+				  Conform<MAP>(_params.conformThresh));
+    cerr << setw(3) << matchSet.size() << " matches selected from "
+	 << distance(begin, end) << " candidates." << endl;
+
+    std::copy(matchSet.begin(), matchSet.end(), out);
+}
+    
 //! 指定された特徴に最も良く対応する特徴を指定されたバケット群の中から探索する．
 /*!
   \param feature	特徴
