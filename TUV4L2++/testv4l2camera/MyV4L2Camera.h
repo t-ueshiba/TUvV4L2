@@ -33,7 +33,7 @@ class MyV4L2Camera : public V4L2Camera
   //! 画像の表示領域となるキャンバスを返す．
     GtkWidget*		canvas()				const	;
     V4L2Camera&		setFormat(PixelFormat pixelFormat,
-				  u_int width, u_int height,
+				  size_t width, size_t height,
 				  u_int fps_n, u_int fps_d)		;
     void		idle()						;
     void		draw()						;

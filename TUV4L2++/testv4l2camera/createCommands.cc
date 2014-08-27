@@ -27,7 +27,7 @@ static std::list<CameraAndFeature>	cameraAndFeatures;
 //! キャプチャボタンがonの間定期的に呼ばれるidle用コールバック関数．
 /*!
   カメラから画像を取り込んでcanvasに表示する．
-  \param userdata	MyV4L2Camera (IEEE1394カメラ)
+  \param userdata	MyV4L2Camera (V4L2カメラ)
   \return		TRUEを返す
 */
 static gint
@@ -42,7 +42,7 @@ CBidle(gpointer userdata)
 /*!
   timerを activate/deactivate する．
   \param toggle		キャプチャボタン
-  \param userdata	MyV4L2Camera (IEEE1394カメラ)
+  \param userdata	MyV4L2Camera (V4L2カメラ)
 */
 static void
 CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
@@ -65,7 +65,7 @@ CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
 /*!
   あるカメラ機能を on/off する．
   \param toggle		on/off ボタン
-  \param userdata	CameraAndFeature (IEEE1394カメラと on/off
+  \param userdata	CameraAndFeature (V4L2カメラと on/off
 			したい機能の2ツ組)
 */
 static void
@@ -81,7 +81,7 @@ CBturnOnOff(GtkWidget* toggle, gpointer userdata)
 /*!
   あるカメラ機能の値を設定する．
   \param adj		設定値を与える adjuster
-  \param userdata	CameraAndFeature (IEEE1394カメラと値を設定したい
+  \param userdata	CameraAndFeature (V4L2カメラと値を設定したい
 			機能の2ツ組)
 */
 static void
@@ -109,8 +109,8 @@ CBmenuitem(GtkMenuItem*, gpointer userdata)
 ************************************************************************/
 //! カメラの各種機能に設定する値を指定するためのコマンド群を生成する．
 /*!
-  IEEE1394カメラがサポートしている機能を調べて生成するコマンドを決定する．
-  \param camera		IEEE1394カメラ
+  V4L2カメラがサポートしている機能を調べて生成するコマンドを決定する．
+  \param camera		V4L2カメラ
   \return		生成されたコマンド群が貼りつけられたテーブル
 */
 GtkWidget*
@@ -133,7 +133,7 @@ createCommands(MyV4L2Camera& camera)
 		       GTK_SIGNAL_FUNC(CBcontinuousShot), &camera);
 
   // カメラの現在の画像取り込み状態をtoggle buttonに反映．
-    u_int	y = 0;
+    size_t	y = 0;
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
 				 (camera.inContinuousShot() ? TRUE : FALSE));
     gtk_table_attach_defaults(GTK_TABLE(commands), toggle, 0, 2, y, y+1);
