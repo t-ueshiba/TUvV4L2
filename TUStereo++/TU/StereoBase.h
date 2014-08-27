@@ -832,45 +832,6 @@ class StereoBase : public Profiler
     };
 
   protected:
-#if defined(USE_TBB)
-    template <class ROW, class ROW_D>
-    class Match
-    {
-      public:
-		Match(STEREO& stereo,
-		      ROW rowL, ROW rowLlast, ROW rowR, ROW rowV, ROW_D rowD)
-		    :_stereo(stereo), _rowL(rowL), _rowLlast(rowLlast),
-		     _rowR(rowR), _rowV(rowV), _rowD(rowD)
-		{
-		}
-	
-	void	operator ()(const tbb::blocked_range<size_t>& r) const
-		{
-		    if (_rowR == _rowV)
-			_stereo.match(_rowL + r.begin(),
-				      std::min(_rowL + r.end() +
-					       _stereo.getOverlap(),
-					       _rowLlast),
-				      _rowR + r.begin(), _rowD + r.begin());
-		    else
-			_stereo.match(_rowL + r.begin(),
-				      std::min(_rowL + r.end() +
-					       _stereo.getOverlap(), 
-					       _rowLlast),
-				      _rowLlast, _rowR + r.begin(),
-				      _rowV, _rowD + r.begin());
-		}
-	
-      private:
-	STEREO&		_stereo;
-	const ROW	_rowL;
-	const ROW	_rowLlast;
-	const ROW	_rowR;
-	const ROW	_rowV;
-	const ROW_D	_rowD;
-    };
-#endif
-    
     template <class T>
     struct Allocator
     {
@@ -924,6 +885,45 @@ class StereoBase : public Profiler
     };
 
   private:
+#if defined(USE_TBB)
+    template <class ROW, class ROW_D>
+    class Match
+    {
+      public:
+		Match(STEREO& stereo,
+		      ROW rowL, ROW rowLlast, ROW rowR, ROW rowV, ROW_D rowD)
+		    :_stereo(stereo), _rowL(rowL), _rowLlast(rowLlast),
+		     _rowR(rowR), _rowV(rowV), _rowD(rowD)
+		{
+		}
+	
+	void	operator ()(const tbb::blocked_range<size_t>& r) const
+		{
+		    if (_rowR == _rowV)
+			_stereo.match(_rowL + r.begin(),
+				      std::min(_rowL + r.end() +
+					       _stereo.getOverlap(),
+					       _rowLlast),
+				      _rowR + r.begin(), _rowD + r.begin());
+		    else
+			_stereo.match(_rowL + r.begin(),
+				      std::min(_rowL + r.end() +
+					       _stereo.getOverlap(), 
+					       _rowLlast),
+				      _rowLlast, _rowR + r.begin(),
+				      _rowV, _rowD + r.begin());
+		}
+	
+      private:
+	STEREO&		_stereo;
+	const ROW	_rowL;
+	const ROW	_rowLlast;
+	const ROW	_rowR;
+	const ROW	_rowV;
+	const ROW_D	_rowD;
+    };
+#endif
+    
     template <class DMIN, class DELTA>
     class FilterDisparity
     {
