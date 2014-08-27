@@ -123,13 +123,13 @@ MyV4L2Camera::~MyV4L2Camera()
 */
 V4L2Camera&
 MyV4L2Camera::setFormat(PixelFormat pixFmt,
-			u_int w, u_int h, u_int fps_n, u_int fps_d)
+			size_t w, size_t h, u_int fps_n, u_int fps_d)
 {
   // V4L2カメラに対して画像フォーマットとフレームレートを指定する．
     V4L2Camera::setFormat(pixFmt, w, h, fps_n, fps_d);
 
   // 指定したフォーマットに合わせて入力画像バッファとRGBバッファを再確保する．
-    u_int	buffSize;
+    size_t	buffSize;
     switch (pixelFormat())
     {
       case RGB32:
@@ -201,8 +201,8 @@ MyV4L2Camera::draw()
       {
 	const u_char*	p = _buf;
 	MyRGB*		q = _rgb;
-	for (u_int y = 0; y < height(); ++y)
-	    for (u_int x = 0; x < width(); x += 2)
+	for (size_t y = 0; y < height(); ++y)
+	    for (size_t x = 0; x < width(); x += 2)
 	    {
 		*q++ = yuv2rgb(p[1], p[0], p[2]);	// Y0, U, V
 		*q++ = yuv2rgb(p[3], p[0], p[2]);	// Y1, U, V
@@ -218,8 +218,8 @@ MyV4L2Camera::draw()
       {
 	const u_char*	p = _buf;
 	MyRGB*		q = _rgb;
-	for (u_int y = 0; y < height(); ++y)
-	    for (u_int x = 0; x < width(); x += 2)
+	for (size_t y = 0; y < height(); ++y)
+	    for (size_t x = 0; x < width(); x += 2)
 	    {
 		*q++ = yuv2rgb(p[0], p[1], p[3]);	// Y0, U, V
 		*q++ = yuv2rgb(p[2], p[1], p[3]);	// Y1, U, V
@@ -261,8 +261,8 @@ MyV4L2Camera::draw()
       {
 	const u_short*	p = (u_short*)_buf;
 	u_char*		q = _buf;
-	for (u_int y = 0; y < height(); ++y)
-	    for (u_int x = 0; x < width(); ++x)
+	for (size_t y = 0; y < height(); ++y)
+	    for (size_t x = 0; x < width(); ++x)
 		*q++ = *p++;
 	gdk_draw_gray_image(_canvas->window,
 			    _canvas->style

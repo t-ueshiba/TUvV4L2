@@ -18,7 +18,7 @@ struct CameraAndFormat
 {
     MyV4L2Camera*		camera;
     V4L2Camera::PixelFormat	pixelFormat;
-    u_int			width, height;
+    size_t			width, height;
     u_int			fps_n, fps_d;
 };
 static std::list<CameraAndFormat>	cameraAndFormats;
@@ -90,7 +90,7 @@ CBsave(GtkMenuItem*, gpointer userdata)
 
 //! カメラの設定値を標準出力に書き出して終了するためのコールバック関数．
 /*!
-  \param userdata	MyV4L2Camera (IEEEV4L2カメラ)
+  \param userdata	MyV4L2Camera (V4L2カメラ)
 */
 static void
 CBexit(GtkMenuItem*, gpointer userdata)
@@ -107,9 +107,9 @@ CBexit(GtkMenuItem*, gpointer userdata)
 ************************************************************************/
 //! メニューバーを生成する．
 /*!
-  IEEEV4L2カメラがサポートしている画像フォーマットとフレームレートを調べて
+  V4L2カメラがサポートしている画像フォーマットとフレームレートを調べて
   メニュー項目を決定する．
-  \param camera		IEEEV4L2カメラ
+  \param camera		V4L2カメラ
   \return		生成されたメニューバー
 */
 GtkWidget*

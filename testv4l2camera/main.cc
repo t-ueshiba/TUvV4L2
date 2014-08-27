@@ -2,7 +2,7 @@
  *  $Id: main.cc,v 1.11 2012-08-29 19:35:49 ueshiba Exp $
  */
 /*!
-  \mainpage	testv4l2camera - program for testing an IIDC 1394-based Digital Camera
+  \mainpage	testv4l2camera - program for testing an Video for Linux v.2 camera
   \anchor	testv4l2camera
 
   \section copyright 著作権
@@ -48,14 +48,12 @@ usage(const char* s)
 {
     using namespace	std;
     
-    cerr << "\nControl an IEEE1394 digital camera.\n"
+    cerr << "\nControl a Video for Linux v.2 digital camera.\n"
 	 << endl;
-    cerr << " Usage: " << s << " [-b] [uniqueID]"
+    cerr << " Usage: " << s << " [-d <device>]"
          << endl;
     cerr << " arguments.\n"
-         << "  -b:       IEEE1394b(800Mbps) mode\n"
-         << "  uniqueID: camera unique-ID in hex format"
-	 << " (i.e. 0x####, default: arbitrary)\n"
+         << "  -d <device>  device file of the camera (default: /dev/video0)\n"
          << endl;
 }
 
@@ -65,7 +63,7 @@ usage(const char* s)
 ************************************************************************/
 //! メイン関数
 /*!
-  "-p <port num>" でIEEE1394ポート(インターフェースカード)の番号を指定する．
+  "-d <device>" でカメラのデバイスファイルを指定する．
   \param argc	引数の数(コマンド名を含む)
   \param argv   引数文字列の配列
 */
@@ -79,12 +77,15 @@ main(int argc, char* argv[])
 
     const char*		dev = "/dev/video0";
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "d:")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "d:h")) != EOF; )
 	switch (c)
 	{
 	  case 'd':
 	    dev = optarg;
 	    break;
+	  case 'h':
+	    usage(argv[0]);
+	    return 1;
 	}
     
   // 本業を行う．
