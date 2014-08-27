@@ -612,8 +612,10 @@ class row_iterator
 
   public:
     row_iterator(ROW const& row,
-		 ARG const& arg=ARG(), size_t jb=0, size_t je=0)
+		 ARG const& arg, size_t jb=0, size_t je=0)
 	:super(row), _arg(arg), _jb(jb), _je(je)		{}
+    row_iterator(ROW const& row, size_t jb, size_t je=0)
+	:super(row), _arg(), _jb(jb), _je(je)			{}
 
     reference	operator [](size_t i) const
 		{
