@@ -1,4 +1,5 @@
 SUBDIR	= TUTools++		\
+	  TUStereo++		\
 	  TUv++			\
 	  TUOgl++		\
 	  TUIeee1394++		\
