@@ -131,28 +131,28 @@ MyDialog::MyDialog(const Ieee1394Camera::Format_7_Info& fmt7info)
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
     GtkWidget*	scale = gtk_hscale_new(GTK_ADJUSTMENT(_u0));
     gtk_scale_set_digits(GTK_SCALE(scale), 0);
-    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 50);
     gtk_table_attach_defaults(GTK_TABLE(table), scale, 1, 2, 0, 1);
     
     label = gtk_label_new("v0:");
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
     scale = gtk_hscale_new(GTK_ADJUSTMENT(_v0));
     gtk_scale_set_digits(GTK_SCALE(scale), 0);
-    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 50);
     gtk_table_attach_defaults(GTK_TABLE(table), scale, 1, 2, 1, 2);
     
     label = gtk_label_new("width:");
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
     scale = gtk_hscale_new(GTK_ADJUSTMENT(_width));
     gtk_scale_set_digits(GTK_SCALE(scale), 0);
-    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 50);
     gtk_table_attach_defaults(GTK_TABLE(table), scale, 1, 2, 2, 3);
     
     label = gtk_label_new("height:");
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
     scale = gtk_hscale_new(GTK_ADJUSTMENT(_height));
     gtk_scale_set_digits(GTK_SCALE(scale), 0);
-    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 50);
     gtk_table_attach_defaults(GTK_TABLE(table), scale, 1, 2, 3, 4);
 
   // PixelFormat設定用のオプションメニューを生成してtableにパック．

@@ -221,6 +221,9 @@ createCommands(My1394Camera& camera)
     GtkWidget*	commands = gtk_table_new(4, 2 + NFEATURES, FALSE);
     u_int	y = 0;
 
+    gtk_table_set_row_spacings(GTK_TABLE(commands), 2);
+    gtk_table_set_col_spacings(GTK_TABLE(commands), 5);
+    
   // カメラからの画像取り込みをon/offするtoggle buttonを生成．
     GtkWidget* toggle = gtk_toggle_button_new_with_label("Capture");
   // コールバック関数の登録．
@@ -334,7 +337,7 @@ createCommands(My1394Camera& camera)
 		      // adjustmentを操作するためのscale widgetを生成．
 			scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 			gtk_scale_set_digits(GTK_SCALE(scale), 0);
-			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
 			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
 						  1, 2, y, y+1);
 		    }
@@ -356,7 +359,7 @@ createCommands(My1394Camera& camera)
 			GtkWidget*
 				scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 			gtk_scale_set_digits(GTK_SCALE(scale), 0);
-			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 30);
+			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
 			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
 						  1, 2, y, y+1);
 		    }
