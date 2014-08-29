@@ -16,10 +16,12 @@ namespace TU
 template <class SCORE, class DISP>
 class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 {
-  private:
-    typedef StereoBase<SADStereo<SCORE, DISP> >		super;
+  public:
     typedef SCORE					Score;
     typedef DISP					Disparity;
+
+  private:
+    typedef StereoBase<SADStereo<Score, Disparity> >	super;
 #if defined(SSE)
     typedef mm::vec<Score>				ScoreVec;
     typedef mm::vec<Disparity>				DisparityVec;

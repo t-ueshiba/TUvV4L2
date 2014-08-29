@@ -16,10 +16,12 @@ namespace TU
 template <class SCORE, class DISP>
 class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 {
-  private:
-    typedef StereoBase<GFStereo<SCORE, DISP> >		super;
+  public:
     typedef SCORE					Score;
     typedef DISP					Disparity;
+
+  private:
+    typedef StereoBase<GFStereo<Score, Disparity> >	super;
 #if defined(SSE)
     typedef mm::vec<Score>				ScoreVec;
     typedef mm::vec<Disparity>				DisparityVec;

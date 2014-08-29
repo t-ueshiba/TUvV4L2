@@ -5,6 +5,7 @@
 #ifndef __TU_STEREOBASE_H
 #define __TU_STEREOBASE_H
 
+#include "TU/Image++.h"
 #include "TU/algorithm.h"	// Use std::min(), std::max() and TU::diff().
 #include "TU/tuple.h"
 #include <limits>		// Use std::numeric_limits<T>.
