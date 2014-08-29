@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#include <boost/iterator/zip_iterator.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include "TU/iterator.h"
 
 #ifndef __TU_TUPLE_H
 #define __TU_TUPLE_H
