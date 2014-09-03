@@ -534,7 +534,7 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 #endif
 	*dminL = dL;
 	*delta = (dL == 0 || dL == dsw1 ? 0 :
-		  float(R[dL-1] - R[dL+1]) /
+		  0.5f * float(R[dL-1] - R[dL+1]) /
 		  float(std::max(R[dL-1] - R[dL], R[dL+1] - R[dL]) + 1));
 	++delta;
 	++dminL;

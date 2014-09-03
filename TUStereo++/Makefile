@@ -14,7 +14,7 @@ CPPFLAGS	= -DNDEBUG -DUSE_TBB
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
-  CFLAGS	= -O3
+  CFLAGS	= -O3 #-stdlib=libstdc++
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   CPPFLAGS     += -DSSE3
 endif
