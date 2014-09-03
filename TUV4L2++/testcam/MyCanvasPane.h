@@ -32,6 +32,7 @@ class MyCanvasPane : public CanvasPane
     
     void		resize(u_int w, u_int h)			;
     virtual void	repaintUnderlay()				;
+    virtual void	callback(CmdId id, CmdVal val)			;
     
   private:
 #if defined(UseShmDC)

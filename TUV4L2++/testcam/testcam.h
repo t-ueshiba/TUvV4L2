@@ -34,8 +34,12 @@ enum
     c_SGBRG8			= V4L2Camera::SGBRG8,
     c_SGRBG8			= V4L2Camera::SGRBG8,
 
+  // ROI setting,
+    c_ROI,
+    
   // Camera control.
     c_ContinuousShot,
+    c_Cursor,
     
   // Camera feasures.
     c_Brightness		= V4L2Camera::BRIGHTNESS,
