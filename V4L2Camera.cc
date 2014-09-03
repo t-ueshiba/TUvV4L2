@@ -535,7 +535,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, size_t width, size_t height,
     return *this;
 }
 
-//! 現在カメラに設定されているフレームレートを返す
+//! 現在カメラに設定されているフレームレートを取得する
 /*!
   \param fps_n	設定されているフレームレートの分子が返される
   \param fps_d	設定されているフレームレートの分母が返される
@@ -552,6 +552,118 @@ V4L2Camera::getFrameRate(u_int& fps_n, u_int& fps_d) const
 	throw runtime_error(string("V4L2Camera::getFrameRate(): VIDIOC_G_PARM failed!! ") + strerror(errno));
     fps_n = streamparm.parm.capture.timeperframe.numerator;
     fps_d = streamparm.parm.capture.timeperframe.denominator;
+}
+
+/*
+ *  ROI stuffs.
+ */
+//! 画像のROI(Region of Interest)を設定する
+/*!
+  指定された値がそのとおり設定できるとは限らないので，
+  getROI() によって実際に設定された値を確認すること
+  \param u0	ROIの左上隅の横座標
+  \param v0	ROIの左上隅の縦座標
+  \param width	ROIの幅
+  \param height	ROIの高さ
+  \return	このカメラオブジェクト
+*/
+V4L2Camera&
+V4L2Camera::setROI(size_t u0, size_t v0, size_t width, size_t height)
+{
+    using namespace	std;
+
+    const bool	cont = inContinuousShot();
+    if (cont)			// 画像を出力中であれば...
+	stopContinuousShot();	// 止める
+
+    unmapBuffers();
+    
+    v4l2_crop	crop;
+    crop.type     = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    crop.c.left   = u0;
+    crop.c.top	  = v0;
+    crop.c.width  = width;
+    crop.c.height = height;
+    if (ioctl(VIDIOC_S_CROP, &crop))
+	throw runtime_error(string("V4L2Camera::setROI(): VIDIOC_S_CROP failed!! ") + strerror(errno));
+
+    getROI(u0, v0, _width, _height);
+
+    mapBuffers(NB_BUFFERS);
+
+    if (cont)			// 画像を出力中だったなら...
+	continuousShot();	// 再び出力させる
+    
+    return *this;
+}
+
+//! 画像のROI(Region of Interest)を取得する
+/*!
+  ROIがサポートされていない場合は，u0, v0に0が，width, heightに
+  現在のフォーマットの幅と高さがそれぞれ返される
+  \param u0	ROIの左上隅の横座標が返される
+  \param v0	ROIの左上隅の縦座標が返される
+  \param width	ROIの幅が返される
+  \param height	ROIの高さが返される
+  \return	ROIがサポートされていればtrue, そうでなければfalse
+*/
+bool
+V4L2Camera::getROI(size_t& u0, size_t& v0, size_t& width, size_t& height) const
+{
+    v4l2_crop	crop;
+    memset(&crop, 0, sizeof(crop));
+    crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (ioctl(VIDIOC_G_CROP, &crop))
+    {
+	u0     = 0;
+	v0     = 0;
+	width  = _width;
+	height = _height;
+
+	return false;
+    }
+
+    u0     = crop.c.left;
+    v0     = crop.c.top;
+    width  = crop.c.width;
+    height = crop.c.height;
+
+    return true;
+}
+
+//! 画像のROI(Region of Interest)を設定可能な範囲を取得する
+/*!
+  ROIがサポートされていない場合は，minU0, minV0に0が，maxWidth,
+  maxHeightに現在のフォーマットの幅と高さがそれぞれ返される
+  \param minU0		ROIの左上隅の横座標の最小値
+  \param minV0		ROIの左上隅の縦座標の最小値
+  \param maxWidth	ROIの幅の最大値
+  \param maxHeight	ROIの高さの最大値
+  \return		ROIがサポートされていればtrue, そうでなければfalse
+*/
+bool
+V4L2Camera::getROILimits(size_t& minU0, size_t& minV0,
+			 size_t& maxWidth, size_t& maxHeight) const
+{
+    v4l2_cropcap	cropcap;
+    memset(&cropcap, 0, sizeof(cropcap));
+    cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (ioctl(VIDIOC_CROPCAP, &cropcap))
+    {
+	minU0	  = 0;
+	minV0	  = 0;
+	maxWidth  = _width;
+	maxHeight = _height;
+
+	return false;
+    }
+
+    minU0     = cropcap.bounds.left;
+    minV0     = cropcap.bounds.top;
+    maxWidth  = cropcap.bounds.width;
+    maxHeight = cropcap.bounds.height;
+
+    return true;
 }
 
 /*
@@ -604,7 +716,7 @@ V4L2Camera::setValue(Feature feature, int value)
     return *this;
 }
     
-//! 指定された属性の現在の値を調べる
+//! 指定された属性の現在の値を取得する
 /*!
   \param feature	対象となる属性
   \return		現在の値
@@ -628,7 +740,7 @@ V4L2Camera::getValue(Feature feature) const
     return ctrl.value;
 }
     
-//! 指定された属性がとり得る値の範囲と変化刻みを調べる
+//! 指定された属性がとり得る値の範囲と変化刻みを取得する
 /*!
   \param feature	対象となる属性
   \param min		とり得る値の最小値が返される. 
@@ -692,7 +804,7 @@ V4L2Camera::stopContinuousShot()
 }
 
 #ifdef HAVE_LIBTUTOOLS__
-//! IEEE1394カメラから出力された画像1枚分のデータを適当な形式に変換して取り込む
+//! カメラから出力された画像1枚分のデータを適当な形式に変換して取り込む
 /*!
   テンプレートパラメータTは, 格納先の画像の画素形式を表す. なお, 本関数を
   呼び出す前に #snap() によってカメラからの画像を保持しておかなければならない.
@@ -713,7 +825,7 @@ V4L2Camera::stopContinuousShot()
 		    -# #Y16 -> T
 		    -# #YUYV -> T
 		    -# #UYVY -> T
-  \return	このIEEE1394カメラオブジェクト
+  \return	このカメラオブジェクト
 */
 template <class T> const V4L2Camera&
 V4L2Camera::operator >>(Image<T>& image) const
@@ -987,6 +1099,24 @@ V4L2Camera::captureBayerRaw(void* image) const
       }
         break;
 
+#ifdef V4L2_PIX_FMT_SRGGB8
+      case SRGGB8:
+      {
+	RGB*		rgb = (RGB*)image;
+	const u_char*	p = bayerRGGB2x2(img, rgb, width());
+	rgb += width();
+	for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
+	{
+	    p = bayerRGGBOdd3x3 (p, rgb, width());
+	    rgb += width();
+	    p = bayerRGGBEven3x3(p, rgb, width());
+	    rgb += width();
+	}
+	bayerRGGB2x2(p - width(), rgb, width());
+      }
+        break;
+#endif
+
       default:
 	throw std::domain_error("V4L2Camera::captureBayerRaw(): must be bayer format!!");
 	break;
@@ -1030,6 +1160,10 @@ V4L2Camera::uintToPixelFormat(u_int pixelFormat)
 	return SGBRG8;
       case SGRBG8:
 	return SGRBG8;
+#ifdef V4L2_PIX_FMT_SRGGB8
+      case SRGGB8:
+	return SRGGB8;
+#endif
     }
     
     return UNKNOWN_PIXEL_FORMAT;

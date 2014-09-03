@@ -13,6 +13,7 @@ ifeq ($(OSTYPE), darwin)
   LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
+CXX		= g++
 CPPFLAGS	= #-DG_DISABLE_DETPRECATED -DGTK_DISABLE_DEPRECATED
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -48,12 +49,17 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
-HDRS		= MyV4L2Camera.h
-SRCS		= MyV4L2Camera.cc \
+HDRS		= MyDialog.h \
+		MyV4L2Camera.h
+SRCS		= MyDialog.cc \
+		MyV4L2Camera.cc \
+		V4L2Camera.cc \
 		createCommands.cc \
 		createMenubar.cc \
 		main.cc
-OBJS		= MyV4L2Camera.o \
+OBJS		= MyDialog.o \
+		MyV4L2Camera.o \
+		V4L2Camera.o \
 		createCommands.o \
 		createMenubar.o \
 		main.o
@@ -73,7 +79,21 @@ REV		= $(shell echo $Revision: 1.19 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
+MyDialog.o: MyDialog.h /usr/local/include/TU/V4L2++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/Minimize.h
 MyV4L2Camera.o: MyV4L2Camera.h /usr/local/include/TU/V4L2++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/Minimize.h
+V4L2Camera.o: /usr/local/include/TU/V4L2++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
@@ -93,7 +113,7 @@ createMenubar.o: MyV4L2Camera.h /usr/local/include/TU/V4L2++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h
+	/usr/local/include/TU/Minimize.h MyDialog.h
 main.o: MyV4L2Camera.h /usr/local/include/TU/V4L2++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \

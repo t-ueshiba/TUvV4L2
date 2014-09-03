@@ -34,6 +34,12 @@ static CmdDef MenuCmds[] =
      0, 0, 1, 1, 0},
     {C_MenuButton, c_PixelFormat, 0, "Pixel format",	    0, CA_None,
      1, 0, 1, 1, 0},
+    {C_Button,		   c_ROI, 0,	  "Set ROI",	    0, CA_None,
+     2, 0, 1, 1, 0},
+    {C_ToggleButton,  c_ContinuousShot, 0, "Continuous shot", noProp, CA_None,
+     3, 0, 1, 1, 0},
+    {C_Label,	      c_Cursor,		0, "(   ,   )",	      noProp, CA_None,
+     4, 0, 1, 1, 0},
     EndOfCmds
 };
 

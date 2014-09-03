@@ -33,7 +33,7 @@ class MyCmdWindow : public CmdWindow
     Image<PixelType>	_image;
     MyCanvasPane	_canvas;
     CmdPane		_menuCmd;
-    CmdPane		_captureCmd;
+  //CmdPane		_captureCmd;
     CmdPane		_featureCmd;
     FileSelection	_fileSelection;
     Timer		_timer;

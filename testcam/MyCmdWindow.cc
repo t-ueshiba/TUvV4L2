@@ -3,8 +3,10 @@
  */
 #include <unistd.h>
 #include <sys/time.h>
+#include <sstream>
 #include "testcam.h"
 #include "MyCmdWindow.h"
+#include "MyModalDialog.h"
 
 namespace TU
 {
@@ -52,15 +54,15 @@ MyCmdWindow::MyCmdWindow(App& parentApp, V4L2Camera& camera)
      _image(),
      _canvas(*this, _camera.width(), _camera.height(), _image),
      _menuCmd(*this, createMenuCmds(_camera)),
-     _captureCmd(*this, createCaptureCmds()),
+   //_captureCmd(*this, createCaptureCmds()),
      _featureCmd(*this, createFeatureCmds(_camera)),
      _fileSelection(*this),
      _timer(*this, 0)
 {
     _menuCmd.place(0, 0, 2, 1);
-    _captureCmd.place(0, 1, 1, 1);
+  //_captureCmd.place(0, 1, 1, 1);
     _featureCmd.place(1, 1, 1, 1);
-    _canvas.place(0, 2, 2, 1);
+    _canvas.place(0, 1, 1, 1);
 
     show();
 }
@@ -115,6 +117,19 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	  }
 	    break;
 
+	  case c_ROI:
+	  {
+	    size_t	u0, v0, width, height;
+	    if (_camera.getROI(u0, v0, width, height))
+	    {
+		MyModalDialog	modalDialog(*this, _camera);
+		modalDialog.getROI(u0, v0, width, height);
+		_camera.setROI(u0, v0, width, height);
+		_canvas.resize(_camera.width(), _camera.height());
+	    }
+	  }
+	    break;
+	  
 	  case c_Brightness:
 	  case c_Brightness_Auto:
 	  case c_Contrast:
@@ -200,6 +215,14 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 		_camera.stopContinuousShot();
 	    }
 	    break;
+
+	  case Id_MouseMove:
+	  {
+	    ostringstream	s;
+	    s << '(' << val.u << ',' << val.v << ')';
+	    _menuCmd.setString(c_Cursor, s.str().c_str());
+	  }
+	    break;
 	}
     }
     catch (exception& err)
@@ -231,11 +254,11 @@ MyCmdWindow::repaintCanvas()
 void
 MyCmdWindow::stopContinuousShotIfRunning()
 {
-    if (_captureCmd.getValue(c_ContinuousShot))
+    if (_menuCmd.getValue(c_ContinuousShot))
     {
 	_timer.stop();
 	_camera.stopContinuousShot();
-	_captureCmd.setValue(c_ContinuousShot, 0);
+	_menuCmd.setValue(c_ContinuousShot, 0);
     }
 }
  

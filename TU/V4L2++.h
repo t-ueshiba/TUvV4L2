@@ -47,7 +47,9 @@ class V4L2Camera
 	SBGGR8	= V4L2_PIX_FMT_SBGGR8,	//!<  8 bits/pix, BGGR bayer pattern
 	SGBRG8	= V4L2_PIX_FMT_SGBRG8,	//!<  8 bits/pix, GBRG bayer pattern
 	SGRBG8	= V4L2_PIX_FMT_SGRBG8,	//!<  8 bits/pix, GRBG bayer pattern
-
+#ifdef V4L2_PIX_FMT_SRGGB8
+	SRGGB8	= V4L2_PIX_FMT_SRGGB8,	//!<  8 bits/pix, RGGB bayer pattern
+#endif
 	UNKNOWN_PIXEL_FORMAT = v4l2_fourcc('U', 'K', 'N', 'W')
     };
 
@@ -166,8 +168,8 @@ class V4L2Camera
     {
 	FrameRateRange		availableFrameRates()		const	;
 	
-	Range<u_int>		width;		//!< 画像の幅
-	Range<u_int>		height;		//!< 画像の高さ
+	Range<size_t>		width;		//!< 画像の幅
+	Range<size_t>		height;		//!< 画像の高さ
 	std::vector<FrameRate>	frameRates;	//!< フレーム間隔
     };
   //! 画像サイズを指す反復子
@@ -265,7 +267,17 @@ class V4L2Camera
     PixelFormat		pixelFormat()				const	;
     std::ostream&	put(std::ostream& out,
 			    PixelFormat pixelFormat)		const	;
-  
+
+  // ROI stuffs.
+    V4L2Camera&		setROI(size_t u0, size_t v0,
+			       size_t width, size_t height)		;
+    bool		getROI(size_t& u0, size_t& v0,
+			       size_t& width, size_t& height)	const	;
+    bool		getROILimits(size_t& minU0,
+				     size_t& minV0,
+				     size_t& maxWidth,
+				     size_t& maxHeight)		const	;
+
   // Feature stuffs.
     FeatureRange	availableFeatures()			const	;
     MenuItemRange	availableMenuItems(Feature feature)	const	;
@@ -337,7 +349,7 @@ class V4L2Camera
     u_int64_t			_arrivaltime;
 };
 
-//! このカメラで利用できる画素フォーマットの範囲を返す
+//! このカメラで利用できる画素フォーマットの範囲を取得する
 /*!
   \return	画素フォーマット(#PixelFormat)を指す定数反復子のペア
 */
@@ -347,7 +359,7 @@ V4L2Camera::availablePixelFormats() const
     return std::make_pair(_formats.begin(), _formats.end());
 }
     
-//! 指定した画素フォーマットのもとでこのカメラで利用できる画像サイズの範囲を返す
+//! 指定した画素フォーマットのもとでこのカメラで利用できる画像サイズの範囲を取得する
 /*!
   \param pixelFormat	画素フォーマット
   \return		画像サイズ(#FrameSize)を指す定数反復子のペア
@@ -359,7 +371,7 @@ V4L2Camera::availableFrameSizes(PixelFormat pixelFormat) const
     return std::make_pair(format.frameSizes.begin(), format.frameSizes.end());
 }
     
-//! 指定した画素フォーマットに付けられている名前を返す
+//! 指定した画素フォーマットに付けられている名前を取得する
 /*!
   \param pixelFormat	画素フォーマット
   \return		画素フォーマットの名前
@@ -370,28 +382,28 @@ V4L2Camera::getName(PixelFormat pixelFormat) const
     return pixelFormatToFormat(pixelFormat).name;
 }
 
-//! 現在設定されている画像幅を返す
+//! 現在設定されている画像幅を取得する
 inline size_t
 V4L2Camera::width() const
 {
     return _width;
 }
 
-//! 現在設定されている画像高さを返す
+//! 現在設定されている画像高さを取得する
 inline size_t
 V4L2Camera::height() const
 {
     return _height;
 }
 
-//! 現在設定されている画素フォーマット(#PixelFormat)を返す
+//! 現在設定されている画素フォーマット(#PixelFormat)を取得する
 inline V4L2Camera::PixelFormat
 V4L2Camera::pixelFormat() const
 {
     return _pixelFormat;
 }
 
-//! 指定された画素フォーマットの内容を出力する．
+//! 指定された画素フォーマットの内容を出力する
 /*!
   \param out		出力ストリーム
   \param pixelFormat	画素フォーマット
@@ -403,7 +415,7 @@ V4L2Camera::put(std::ostream& out, PixelFormat pixelFormat) const
     return out << pixelFormatToFormat(pixelFormat);
 }
 
-//! このカメラで利用できる属性の範囲を返す
+//! このカメラで利用できる属性の範囲を取得する
 /*!
   \return	属性(#Feature)を指す定数反復子のペア
 */
@@ -413,7 +425,7 @@ V4L2Camera::availableFeatures() const
     return std::make_pair(_controls.begin(), _controls.end());
 }
     
-//! この属性で利用できるメニュー項目の範囲を返す
+//! この属性で利用できるメニュー項目の範囲を取得する
 /*!
   \return	メニュー項目(#MenuItem)を指す定数反復子のペア
 */
@@ -436,7 +448,7 @@ V4L2Camera::put(std::ostream& out, Feature feature) const
     return out << featureToControl(feature);
 }
 
-//! 指定された属性のデフォルト値を調べる
+//! 指定された属性のデフォルト値を取得する
 /*!
   \param feature	対象となる属性
   \return		デフォルト値
@@ -447,7 +459,7 @@ V4L2Camera::getDefaultValue(Feature feature) const
     return featureToControl(feature).def;
 }
 
-//! 指定した属性に付けられている名前を返す
+//! 指定した属性に付けられている名前を取得する
 /*!
   \param feature	対象となる属性
   \return		属性の名前
@@ -512,7 +524,7 @@ V4L2Camera::captureDirectly(Image<T>& image) const
 }
 #endif
 
-//! 画像データがホストに到着した時刻を返す
+//! 画像データがホストに到着した時刻を取得する
 /*!
   \return	画像データがホストに到着した時刻
 */
@@ -536,7 +548,7 @@ V4L2Camera::MemberIterator<V4L2Camera::Feature,
     return base_reference()->feature;
 }
 
-//! 指定した画像サイズのもとでこのカメラで利用できるフレームレートの範囲を返す
+//! 指定した画像サイズのもとでこのカメラで利用できるフレームレートの範囲を取得する
 /*!
   \return	フレームレート(#FrameRate)を指す定数反復子のペア
 */

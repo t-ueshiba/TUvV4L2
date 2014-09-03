@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include "MyV4L2Camera.h"
+#include "MyDialog.h"
 
 #define DEFAULT_IMAGE_FILE_NAME	"testv4l2camera.pbm"
 
@@ -102,6 +103,23 @@ CBexit(GtkMenuItem*, gpointer userdata)
     gtk_exit(0);
 }
 
+//! カメラからの画像にROIを設定するdialogを表示するためのコールバック関数．
+/*!
+  \param userdata	MyV4L2Camera (V4L2カメラ)
+*/
+static void
+CBsetROI(GtkMenuItem*, gpointer userdata)
+{
+    MyV4L2Camera*	camera = (MyV4L2Camera*)userdata;
+    size_t		u0, v0, width, height;
+    if (camera->getROI(u0, v0, width, height))
+    {
+	MyDialog	dialog(*camera);
+	dialog.getROI(u0, v0, width, height);
+	camera->setROI(u0, v0, width, height);
+    }
+}
+    
 /************************************************************************
 *  global functions							*
 ************************************************************************/
@@ -175,6 +193,13 @@ createMenubar(MyV4L2Camera& camera)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
 
+  // "Set ROI"メニューを生成
+    menu = gtk_menu_new();
+    item = gtk_menu_item_new_with_label("Set ROI...");
+    gtk_signal_connect(GTK_OBJECT(item), "button_press_event",
+		       GTK_SIGNAL_FUNC(CBsetROI), &camera);
+    gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
+    
     gtk_widget_show_all(menubar);
     
     return menubar;
