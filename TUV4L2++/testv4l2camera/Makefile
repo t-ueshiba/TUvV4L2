@@ -53,13 +53,11 @@ HDRS		= MyDialog.h \
 		MyV4L2Camera.h
 SRCS		= MyDialog.cc \
 		MyV4L2Camera.cc \
-		V4L2Camera.cc \
 		createCommands.cc \
 		createMenubar.cc \
 		main.cc
 OBJS		= MyDialog.o \
 		MyV4L2Camera.o \
-		V4L2Camera.o \
 		createCommands.o \
 		createMenubar.o \
 		main.o
@@ -87,13 +85,6 @@ MyDialog.o: MyDialog.h /usr/local/include/TU/V4L2++.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h
 MyV4L2Camera.o: MyV4L2Camera.h /usr/local/include/TU/V4L2++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h
-V4L2Camera.o: /usr/local/include/TU/V4L2++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
