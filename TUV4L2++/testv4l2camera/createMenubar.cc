@@ -194,9 +194,8 @@ createMenubar(MyV4L2Camera& camera)
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
 
   // "Set ROI"メニューを生成
-    menu = gtk_menu_new();
     item = gtk_menu_item_new_with_label("Set ROI...");
-    gtk_signal_connect(GTK_OBJECT(item), "button_press_event",
+    gtk_signal_connect(GTK_OBJECT(item), "activate",
 		       GTK_SIGNAL_FUNC(CBsetROI), &camera);
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
     

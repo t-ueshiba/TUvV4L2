@@ -13,7 +13,7 @@ ifeq ($(OSTYPE), darwin)
   LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
-CXX		= g++
+#CXX		= g++
 CPPFLAGS	= #-DG_DISABLE_DETPRECATED -DGTK_DISABLE_DEPRECATED
 CFLAGS		= -g
 NVCCFLAGS	= -g
