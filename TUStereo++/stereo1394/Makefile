@@ -35,9 +35,9 @@ endif
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
-  CFLAGS	= -O3 -xCORE-AVX2
+  CFLAGS	= -O3 -xAVX
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DAVX2
+  CPPFLAGS     += -DAVX
 endif
 CCFLAGS		= $(CFLAGS)
 

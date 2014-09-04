@@ -140,18 +140,21 @@ template <class T>
 class MyOglCanvasPane : public MyOglCanvasPaneBase
 {
   public:
-    MyOglCanvasPane(Window&		parentWin,
-		    size_t		width,
-		    size_t		height,
-		    const Image<float>&	disparityMap,
-		    const Image<T>&	textureImage,
-		    const Warp*		warp)			;
-
+			MyOglCanvasPane(
+			    Window&		parentWin,
+			    size_t		width,
+			    size_t		height,
+			    const Image<float>&	disparityMap,
+			    const Image<T>&	textureImage,
+			    const Warp*		warp)		;
+    virtual		~MyOglCanvasPane()			;
+    
     virtual void	repaintUnderlay()			;
     
   private:
     const Image<T>&	_textureImage;
     const Warp* const	_warp;
+    GLuint		_list;
 };
 
 template <class T> inline
@@ -162,8 +165,14 @@ MyOglCanvasPane<T>::MyOglCanvasPane(Window&		parentWin,
 				    const Image<T>&	textureImage,
 				    const Warp*		warp)
     :MyOglCanvasPaneBase(parentWin, width, height, disparityMap),
-     _textureImage(textureImage), _warp(warp)
+     _textureImage(textureImage), _warp(warp), _list(glGenLists(1))
 {
+}
+
+template <class T>
+MyOglCanvasPane<T>::~MyOglCanvasPane()
+{
+    glDeleteLists(_list, 1);
 }
 
 template <class T> void
@@ -174,10 +183,10 @@ MyOglCanvasPane<T>::repaintUnderlay()
     if (_parallax > 0.0)
     {
 	glPushMatrix();	// Keep the current model-view transformation.
+
 	_dc << v::axis(DC3::X) << v::translate(-_parallax / 2.0);
 	glDrawBuffer(GL_BACK_LEFT);
-	list = glGenLists(1);
-	glNewList(list, GL_COMPILE_AND_EXECUTE);
+	glNewList(_list, GL_COMPILE_AND_EXECUTE);
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -201,10 +210,10 @@ MyOglCanvasPane<T>::repaintUnderlay()
     {
 	glEndList();
 
-      	_dc << v::translate(_parallax);
+	_dc << v::translate(_parallax);
 	glDrawBuffer(GL_BACK_RIGHT);
-	glCallList(list);
-	glDeleteLists(list, 1);
+	glCallList(_list);
+	
 	glPopMatrix();	// Restore the original model-view transformation.
     }
 
