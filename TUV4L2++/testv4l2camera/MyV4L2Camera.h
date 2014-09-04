@@ -32,12 +32,17 @@ class MyV4L2Camera : public V4L2Camera
 
   //! 画像の表示領域となるキャンバスを返す．
     GtkWidget*		canvas()				const	;
-    V4L2Camera&		setFormat(PixelFormat pixelFormat,
+    MyV4L2Camera&	setFormat(PixelFormat pixelFormat,
 				  size_t width, size_t height,
 				  u_int fps_n, u_int fps_d)		;
+    MyV4L2Camera&	setROI(size_t u0, size_t v0,
+			       size_t width, size_t height)		;
     void		idle()						;
     void		draw()						;
     std::ostream&	save(std::ostream& out)			const	;
+
+  private:
+    void		allocateBuffers()				;
     
   private:
     GtkWidget* const	_canvas;	// 画像を表示する領域

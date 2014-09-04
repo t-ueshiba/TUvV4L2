@@ -114,57 +114,42 @@ MyV4L2Camera::~MyV4L2Camera()
     delete [] _buf;
 }
 
-//! 画像フォーマットとフレームレートを指定する．
+//! 画素フォーマット，画像サイズおよびフレームレートを設定する
 /*!
-  さらに入力画像バッファとRGBバッファを確保し直し，canvasの大きさを変更する．
-  \param format	設定したい画像フォーマット．
-  \param rate	設定したいフレームレート．
-  \return	このV4L2カメラオブジェクト．
+  \param pixelFormat	設定したい画素フォーマット
+  \param width		設定したい画像幅
+  \param height		設定したい画像高さ
+  \param fps_n		設定したいフレームレートの分子
+  \param fps_d		設定したいフレームレートの分母
+  \return		このカメラオブジェクト
 */
-V4L2Camera&
+MyV4L2Camera&
 MyV4L2Camera::setFormat(PixelFormat pixFmt,
 			size_t w, size_t h, u_int fps_n, u_int fps_d)
 {
-  // V4L2カメラに対して画像フォーマットとフレームレートを指定する．
     V4L2Camera::setFormat(pixFmt, w, h, fps_n, fps_d);
+    allocateBuffers();
 
-  // 指定したフォーマットに合わせて入力画像バッファとRGBバッファを再確保する．
-    size_t	buffSize;
-    switch (pixelFormat())
-    {
-      case RGB32:
-	buffSize = width() * height() * 4;
-	break;
-      case RGB24:
-	buffSize = width() * height() * 3;
-	break;
-      case Y16:
-      case YUYV:
-      case UYVY:
-	buffSize = width() * height() * 2;
-	break;
-      case GREY:
-      case SBGGR8:
-      case SGBRG8:
-      case SGRBG8:
-	buffSize = width() * height();
-	break;
-      default:
-	throw std::invalid_argument("Unsupported pixel format!!");
-	break;
-    }
-    delete [] _rgb;
-    delete [] _buf;
-    _buf = new u_char[buffSize];
-    _rgb = new MyRGB[width() * height()];
-
-  // 指定したフォーマットに合わせてcanvasの大きさを変更する．
-    gtk_drawing_area_size(GTK_DRAWING_AREA(_canvas), width(), height());
-    gtk_widget_show(_canvas);
-    
     return *this;
 }
 
+//! 画像のROI(Region of Interest)を設定する
+/*!
+  \param u0	ROIの左上隅の横座標
+  \param v0	ROIの左上隅の縦座標
+  \param width	ROIの幅
+  \param height	ROIの高さ
+  \return	このカメラオブジェクト
+*/
+MyV4L2Camera&
+MyV4L2Camera::setROI(size_t u0, size_t v0, size_t w, size_t h)
+{
+    V4L2Camera::setROI(u0, v0, w, h);
+    allocateBuffers();
+
+    return *this;
+}
+    
 //! カメラから画像を読み込み，canvasに表示する．
 /*!
   画像キャプチャボタンが押されている間は，idle関数として他にやることが
@@ -316,4 +301,42 @@ MyV4L2Camera::save(std::ostream& out) const
     return out;
 }
  
+void
+MyV4L2Camera::allocateBuffers()
+{
+  // 指定したフォーマットに合わせて入力画像バッファとRGBバッファを再確保する．
+    size_t	buffSize;
+    switch (pixelFormat())
+    {
+      case RGB32:
+	buffSize = width() * height() * 4;
+	break;
+      case RGB24:
+	buffSize = width() * height() * 3;
+	break;
+      case Y16:
+      case YUYV:
+      case UYVY:
+	buffSize = width() * height() * 2;
+	break;
+      case GREY:
+      case SBGGR8:
+      case SGBRG8:
+      case SGRBG8:
+	buffSize = width() * height();
+	break;
+      default:
+	throw std::invalid_argument("Unsupported pixel format!!");
+	break;
+    }
+    delete [] _rgb;
+    delete [] _buf;
+    _buf = new u_char[buffSize];
+    _rgb = new MyRGB[width() * height()];
+
+  // 指定したフォーマットに合わせてcanvasの大きさを変更する．
+    gtk_drawing_area_size(GTK_DRAWING_AREA(_canvas), width(), height());
+    gtk_widget_show(_canvas);
+}
+
 }
