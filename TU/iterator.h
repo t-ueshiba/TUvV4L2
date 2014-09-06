@@ -207,16 +207,17 @@ class assignment_iterator
 				     detail::assignment_proxy<FUNC, ITER> >
 {
   private:
-    typedef boost::iterator_adaptor<assignment_iterator,
-				    ITER,
-				    typename FUNC::argument_type,
-				    boost::use_default,
-				    detail::assignment_proxy<FUNC, ITER> >
-						super;
+    typedef boost::iterator_adaptor<
+		assignment_iterator,
+		ITER,
+		typename FUNC::argument_type,
+		boost::use_default,
+		detail::assignment_proxy<FUNC, ITER> >	super;
 
   public:
     typedef typename super::reference	reference;
-    friend class			boost::iterator_core_access;
+    
+    friend class	boost::iterator_core_access;
 
   public:
     assignment_iterator(ITER const& iter, FUNC const& func=FUNC())
@@ -297,7 +298,8 @@ class assignment2_iterator
 
   public:
     typedef typename super::reference	reference;
-    friend class			boost::iterator_core_access;
+    
+    friend class	boost::iterator_core_access;
 
   public:
     assignment2_iterator(ITER const& iter, FUNC const& func=FUNC())
@@ -342,6 +344,7 @@ class fast_zip_iterator
 
   public:
     typedef TUPLE	iterator_tuple;
+    
     friend class	boost::iterator_core_access;
 
   public:
@@ -587,7 +590,8 @@ class row_iterator
 
   public:
     typedef typename super::reference	reference;
-    friend class			boost::iterator_core_access;
+    
+    friend class	boost::iterator_core_access;
 
   public:
     row_iterator(ROW const& row,
@@ -1010,7 +1014,8 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
 
   public:
     typedef typename super::difference_type	difference_type;
-    friend class				boost::iterator_core_access;
+    
+    friend class	boost::iterator_core_access;
 
   public:
     ring_iterator()
