@@ -35,7 +35,6 @@
 #define __TU_ALGORITHM_H
 
 #include <algorithm>
-#include "TU/types.h"
 
 /*!
   \namespace	std

@@ -72,11 +72,8 @@ class iir_filter_iterator
     struct selector				{enum {dim = DD, fwd = FF};};
     
   public:
-    typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 

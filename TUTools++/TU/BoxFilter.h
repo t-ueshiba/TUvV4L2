@@ -60,11 +60,8 @@ class box_filter_iterator
 				    boost::single_pass_traversal_tag>	super;
 		    
   public:
-    typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 
@@ -118,8 +115,8 @@ class box_filter_iterator
 		    typedef typename subiterator<_VITER>::type	iterator;
 		    typedef boost::mpl::bool_<
 			detail::is_container<
-			    typename subiterator<_VITER>::value_type>::value>
-								value_is_expr;
+			    typename std::iterator_traits<
+				iterator>::value_type>::value>	value_is_expr;
 		    
 		    const_iterator	c = curr->cbegin(), h = head->cbegin();
 		    for (iterator v = val->begin(), ve = val->end();

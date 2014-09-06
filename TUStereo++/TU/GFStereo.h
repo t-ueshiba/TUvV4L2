@@ -42,13 +42,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 			  typename super::Allocator<ScoreVec>::type> >	super;
 	    
       public:
-	typedef typename super::value_type		value_type;
-	typedef typename super::iterator		iterator;
-	typedef typename super::const_iterator		const_iterator;
-	typedef typename super::pointer			pointer;
-	typedef typename super::const_pointer		const_pointer;
-	typedef typename super::reference		reference;
-	typedef typename super::const_reference		const_reference;
+	typedef typename super::iterator	iterator;
+	typedef typename super::const_iterator	const_iterator;
+	typedef typename super::reference	reference;
 	
 	class const_iterator2
 	    : public boost::iterator_adaptor<const_iterator2,
@@ -66,10 +62,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
 	  public:
 	    typedef typename super::difference_type	difference_type;
-	    typedef typename super::value_type		value_type;
-	    typedef typename super::pointer		pointer;
 	    typedef typename super::reference		reference;
-	    typedef typename super::iterator_category	iterator_category;
 
 	    friend class	boost::iterator_core_access;
 	    
@@ -135,10 +128,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
 	  public:
 	    typedef typename super::difference_type	difference_type;
-	    typedef typename super::value_type		value_type;
-	    typedef typename super::pointer		pointer;
 	    typedef typename super::reference		reference;
-	    typedef typename super::iterator_category	iterator_category;
 
 	    friend class	boost::iterator_core_access;
 	    

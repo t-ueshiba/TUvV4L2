@@ -2,6 +2,7 @@
  *  $Id: main.cc,v 1.1 2012-07-23 00:45:48 ueshiba Exp $
  */
 #include <cstdlib>
+#include "TU/types.h"
 #include "TU/GuidedFilter.h"
 
 int

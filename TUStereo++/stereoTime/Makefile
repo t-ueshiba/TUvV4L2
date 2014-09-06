@@ -9,21 +9,20 @@ INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= stereoTime
 LIBS		= -lTUStereo++ -lTUTools++ -ltbb -ltbbmalloc
-ifeq ($(OSTYPE), darwin)
+ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       +=
 endif
 
 CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
+ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3 -xCORE-AVX2 #-stdlib=libstdc++
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DAVX2
+#  CPPFLAGS     += -DAVX2
 endif
 CCFLAGS		= $(CFLAGS)
 
-LDFLAGS		= -stdlib=libstdc++
 LINKER		= $(CXX)
 
 #########################

@@ -8,10 +8,10 @@ SUBDIR	= TUTools++		\
 	  TUCollection++	\
 	  TUVision++		\
 	  TUXv++		\
-	  TUCuda++		\
-	  TUV4L2++		\
-	  TUUSB++		\
-	  TUHRP2++
+#	  TUCuda++		\
+#	  TUV4L2++		\
+#	  TUUSB++		\
+#	  TUHRP2++
 
 TARGETS	= all install clean depend
 

@@ -15,9 +15,9 @@ PROGRAM		= stereo1394
 LIBS		= -lTUIeee1394++ -lTUOgl++ -lTUv++ -lTUStereo++ -lTUTools++ \
 		  -lGLU -lGL \
 		  -lXaw3d -lXt -lXext -lXmu -lX11 -lraw1394 -ltbb -ltbbmalloc
-ifeq ($(OSTYPE), darwin)
-  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
+#ifneq ($(findstring darwin,$(OSTYPE)),)
+#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+#endif
 
 CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ -DUSE_TBB -DNO_RV \
 		  -DDISPLAY_2D -DDISPLAY_3D #-DUSE_VIDEO1394 #-DNO_VERTICAL_BM \
@@ -25,7 +25,7 @@ CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ -DUSE_TBB -DNO_RV \
 ifeq ($(PROGRAM), corrStereo-color)
   CPPFLAGS     += -DCOLOR
 endif
-ifeq ($(PROGRAM), corrStereo-demo)
+ifneq ($(PROGRAM), corrStereo-demo)
   CPPFLAGS     += -DDEMO
 endif
 ifeq ($(PROGRAM), corrStereo-color-demo)
@@ -34,7 +34,7 @@ endif
 
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
+ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3 -xAVX
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   CPPFLAGS     += -DAVX

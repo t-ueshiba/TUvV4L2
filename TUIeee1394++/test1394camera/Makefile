@@ -9,8 +9,7 @@ INCDIRS		= -I$(PREFIX)/include
 
 PROGRAM		= $(shell basename $(PWD))
 LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell pkg-config gtk+-2.0 --libs)
-#LIBS		= -lTUIeee1394++ -lTUTools++ -lraw1394 $(shell pkg-config gtk+-3.0 --libs)
-ifeq ($(OSTYPE), darwin)
+ifeq ($(OSTYPE), darwin13)
   LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
@@ -29,7 +28,6 @@ ifeq ($(CCC), icpc)
   endif
 endif
 CFLAGS	       += $(shell pkg-config gtk+-2.0 --cflags)
-#CFLAGS	       += $(shell pkg-config gtk+-3.0 --cflags)
 CCFLAGS		= $(CFLAGS)
 
 LINKER		= $(CCC)

@@ -238,13 +238,9 @@ class rvcolumn_iterator
 				    detail::rvcolumn_proxy<COL> >	super;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
+    typedef typename super::reference	reference;
 
-    friend class				boost::iterator_core_access;
+    friend class			boost::iterator_core_access;
 
   public:
     rvcolumn_iterator(COL col)	:super(col)			{}
@@ -268,10 +264,6 @@ class dummy_iterator : public boost::iterator_adaptor<dummy_iterator<ITER>,
 
   public:
     typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 
@@ -313,10 +305,7 @@ class mask_iterator
     
   public:
     typedef typename super::difference_type		difference_type;
-    typedef typename super::value_type			value_type;
-    typedef typename super::pointer			pointer;
     typedef typename super::reference			reference;
-    typedef typename super::iterator_category		iterator_category;
 
     friend class	boost::iterator_core_access;
 
@@ -599,10 +588,7 @@ namespace mm
       
       public:
 	typedef typename super::difference_type		difference_type;
-	typedef typename super::value_type		value_type;
-	typedef typename super::pointer			pointer;
 	typedef typename super::reference		reference;
-	typedef typename super::iterator_category	iterator_category;
 
 	friend class	boost::iterator_core_access;
 
