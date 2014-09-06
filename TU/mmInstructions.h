@@ -3148,10 +3148,7 @@ class load_iterator : public boost::iterator_adaptor<
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
     friend class				boost::iterator_core_access;
 
     
@@ -3243,12 +3240,7 @@ class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     };
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-    typedef ITER_TUPLE				base_type;
+    typedef ITER_TUPLE	base_type;
     
   public:
     load_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
@@ -3365,9 +3357,7 @@ class store_iterator
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
     
     friend class				boost::iterator_core_access;
 
@@ -3492,11 +3482,8 @@ class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     };
     
   public:
-    typedef typename super::difference_type	difference_type;
     typedef typename value<super>::type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
     typedef ITER_TUPLE				base_type;
     
   public:
@@ -3582,10 +3569,7 @@ class cvtdown_iterator
 
   public:
     typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 
@@ -3861,9 +3845,7 @@ class cvtup_iterator
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 
@@ -3957,10 +3939,7 @@ class cvtdown_mask_iterator
 
   public:
     typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 
@@ -4195,9 +4174,7 @@ class cvtup_mask_iterator
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 
@@ -4248,9 +4225,7 @@ class shift_iterator
   public:
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
     typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
 
@@ -4350,10 +4325,6 @@ class row_vec_iterator
 
   public:
     typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
 
     friend class				boost::iterator_core_access;
     

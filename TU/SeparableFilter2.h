@@ -135,8 +135,8 @@ SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie,
 {
     size_t	col = 0;
 #if defined(SSE2)
-    typedef typename subiterator<OUT>::value_type	value_type;
     typedef typename subiterator<OUT>::type		col_iterator;
+    typedef typename subiterator<OUT>::value_type	value_type;
 
     const size_t	vsize = mm::vec<value_type>::size;
     IN			in    = ib;

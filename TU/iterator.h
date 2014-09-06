@@ -215,13 +215,8 @@ class assignment_iterator
 						super;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
+    typedef typename super::reference	reference;
+    friend class			boost::iterator_core_access;
 
   public:
     assignment_iterator(ITER const& iter, FUNC const& func=FUNC())
@@ -301,13 +296,8 @@ class assignment2_iterator
 						super;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
+    typedef typename super::reference	reference;
+    friend class			boost::iterator_core_access;
 
   public:
     assignment2_iterator(ITER const& iter, FUNC const& func=FUNC())
@@ -351,14 +341,8 @@ class fast_zip_iterator
 				    boost::zip_iterator<TUPLE> >	super;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-    typedef TUPLE				iterator_tuple;
-    
-    friend class				boost::iterator_core_access;
+    typedef TUPLE	iterator_tuple;
+    friend class	boost::iterator_core_access;
 
   public:
     fast_zip_iterator(TUPLE const& t)	:super(t)	{}
@@ -602,13 +586,8 @@ class row_iterator
 				    detail::row_proxy<ROW, COL, ARG> >	super;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
-    friend class				boost::iterator_core_access;
+    typedef typename super::reference	reference;
+    friend class			boost::iterator_core_access;
 
   public:
     row_iterator(ROW const& row,
@@ -693,12 +672,15 @@ class row2col
 
 template <class ROW>
 struct vertical_iterator
-    : public boost::transform_iterator<row2col<ROW>, ROW, boost::use_default,
-				       typename subiterator<ROW>::value_type>
+    : public boost::transform_iterator<
+	row2col<ROW>, ROW, boost::use_default,
+	typename std::iterator_traits<
+	    typename subiterator<ROW>::type>::value_type>
 {
     typedef boost::transform_iterator<
-		row2col<ROW>, ROW, boost::use_default,
-		typename subiterator<ROW>::value_type>		super;
+	row2col<ROW>, ROW, boost::use_default,
+	typename std::iterator_traits<
+	    typename subiterator<ROW>::type>::value_type>	super;
 
     vertical_iterator(ROW row, size_t idx)
 	:super(row, row2col<ROW>(idx))				{}
@@ -886,11 +868,9 @@ class column_iterator
 				   detail::column_proxy<A> >	super;
 
   public:
-    typedef typename super::value_type			value_type;
-    typedef typename super::reference			reference;
-    typedef typename super::pointer			pointer;
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::iterator_category		iterator_category;
+    typedef typename super::reference		reference;
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::iterator_category	iterator_category;
     
     friend class	boost::iterator_core_access;
     
@@ -1030,11 +1010,6 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
 
   public:
     typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::pointer		pointer;
-    typedef typename super::reference		reference;
-    typedef typename super::iterator_category	iterator_category;
-
     friend class				boost::iterator_core_access;
 
   public:

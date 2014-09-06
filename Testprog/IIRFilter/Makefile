@@ -1,26 +1,25 @@
 #
-#  $Id: Makefile,v 1.30 2012-08-31 02:36:42 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
 DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
+INCDIRS		= -I. -I$(PREFIX)/include
 
-PROGRAM		= iirfprof
+PROGRAM		= $(shell basename $(PWD))
 LIBS		= -lTUTools++ -ltbb
-ifeq ($(OSTYPE), darwin)
-  LIBS	       +=
-#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
 endif
 
-CPPFLAGS	= -DUSE_TBB
+CPPFLAGS	= -DNDEBUG -DUSE_TBB
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-  CFLAGS	= -O3 #-stdlib=libstdc++ #-xCORE-AVX2
+ifneq ($(findstring icpc,$(CXX)),)
+  CFLAGS	= -O3 -xAVX
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DSSE3
+#  CPPFLAGS     += -DAVX
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -44,6 +43,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
@@ -56,7 +56,7 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/DericheConvolver.h \
 	/usr/local/include/TU/IIRFilter.h \

@@ -1,13 +1,19 @@
-SUBDIR	= Bezier		\
+SUBDIR	= BandMatrix		\
+	  Bezier		\
 	  BoxFilter		\
+	  BoxFilter2		\
+	  DP			\
 	  EdgeDetector		\
+	  FIRFilter		\
 	  GraphCuts		\
 	  GuidedFilter		\
+	  Heap			\
 	  IIRFilter		\
 	  List			\
 	  NDTree		\
 	  PSTree		\
 	  Random		\
+	  SURF			\
 	  Serial		\
 	  Sparse		\
 	  Spline		\

@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.113 2012-09-15 07:21:08 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
@@ -13,7 +13,7 @@ NAME		= $(shell basename $(PWD))
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
+ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   CPPFLAGS     += -DSSE3
