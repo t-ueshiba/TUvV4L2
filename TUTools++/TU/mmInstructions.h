@@ -3149,7 +3149,8 @@ class load_iterator : public boost::iterator_adaptor<
     typedef typename super::difference_type	difference_type;
     typedef typename super::value_type		value_type;
     typedef typename super::reference		reference;
-    friend class				boost::iterator_core_access;
+    
+    friend class	boost::iterator_core_access;
 
     
   public:
@@ -3359,7 +3360,7 @@ class store_iterator
     typedef typename super::value_type		value_type;
     typedef typename super::reference		reference;
     
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
     store_iterator(ITER iter)	:super(iter)	{}
@@ -3571,7 +3572,7 @@ class cvtdown_iterator
     typedef typename super::difference_type	difference_type;
     typedef typename super::reference		reference;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
 		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
@@ -3847,7 +3848,7 @@ class cvtup_iterator
     typedef typename super::value_type		value_type;
     typedef typename super::reference		reference;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
     cvtup_iterator(ITER const& iter)	:super(iter)			{}
@@ -3941,7 +3942,7 @@ class cvtdown_mask_iterator
     typedef typename super::difference_type	difference_type;
     typedef typename super::reference		reference;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
 		cvtdown_mask_iterator(ITER const& iter)	:super(iter)	{}
@@ -4176,7 +4177,7 @@ class cvtup_mask_iterator
     typedef typename super::value_type		value_type;
     typedef typename super::reference		reference;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
     cvtup_mask_iterator(ITER const& iter)	:super(iter)		{}
@@ -4227,7 +4228,7 @@ class shift_iterator
     typedef typename super::value_type		value_type;
     typedef typename super::reference		reference;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
 		shift_iterator(ITER iter, size_t pos=0)
@@ -4326,7 +4327,7 @@ class row_vec_iterator
   public:
     typedef typename super::difference_type	difference_type;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
     
   public:
     row_vec_iterator(ROW const& row)

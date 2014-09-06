@@ -60,10 +60,10 @@ class box_filter_iterator
 				    boost::single_pass_traversal_tag>	super;
 		    
   public:
-    typedef typename super::value_type		value_type;
-    typedef typename super::reference		reference;
+    typedef typename super::value_type	value_type;
+    typedef typename super::reference	reference;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
 		box_filter_iterator()

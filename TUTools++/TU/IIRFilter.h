@@ -72,10 +72,10 @@ class iir_filter_iterator
     struct selector				{enum {dim = DD, fwd = FF};};
     
   public:
-    typedef typename super::value_type		value_type;
-    typedef typename super::reference		reference;
+    typedef typename super::value_type	value_type;
+    typedef typename super::reference	reference;
 
-    friend class				boost::iterator_core_access;
+    friend class	boost::iterator_core_access;
 
   public:
 		iir_filter_iterator(ITER const& iter, COEFF ci, COEFF co)
