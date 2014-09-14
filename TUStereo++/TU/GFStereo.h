@@ -34,17 +34,19 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     class ScoreVecArray
 	: public Array<ScoreVec,
 		       Buf<ScoreVec,
-			   typename super::Allocator<ScoreVec>::type> >
+			   typename super::template
+			   Allocator<ScoreVec>::type> >
     {
       private:
 	typedef Array<ScoreVec,
 		      Buf<ScoreVec,
-			  typename super::Allocator<ScoreVec>::type> >	super;
+			  typename super::template
+			  Allocator<ScoreVec>::type> >	array_t;
 	    
       public:
-	typedef typename super::iterator	iterator;
-	typedef typename super::const_iterator	const_iterator;
-	typedef typename super::reference	reference;
+	typedef typename array_t::iterator		iterator;
+	typedef typename array_t::const_iterator	const_iterator;
+	typedef typename array_t::reference		reference;
 	
 	class const_iterator2
 	    : public boost::iterator_adaptor<const_iterator2,
@@ -159,14 +161,14 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	};
 
       public:
-	ScoreVecArray()				:super()		{}
-	explicit ScoreVecArray(size_t d)	:super(d)		{}
+	ScoreVecArray()				:array_t()		{}
+	explicit ScoreVecArray(size_t d)	:array_t(d)		{}
 	
-	using		super::operator =;
-	using		super::begin;
-	using		super::cbegin;
-	using		super::end;
-	using		super::cend;
+	using		array_t::operator =;
+	using		array_t::begin;
+	using		array_t::cbegin;
+	using		array_t::end;
+	using		array_t::cend;
 	
 	    
 	const_iterator2	cbegin2() const
@@ -304,13 +306,16 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     typedef Array2<ScoreVecArray,
 		   Buf<ScoreVec,
-		       typename super::Allocator<ScoreVec>::type>,
+		       typename super::template
+		       Allocator<ScoreVec>::type>,
 		   Buf<ScoreVecArray,
-		       typename super::Allocator<ScoreVecArray>::type> >
+		       typename super::template
+		       Allocator<ScoreVecArray>::type> >
 							ScoreVecArray2;
     typedef Array<ScoreVecArray2,
 		  Buf<ScoreVecArray2,
-		      typename super::Allocator<ScoreVecArray2>::type> >
+		      typename super::template
+		      Allocator<ScoreVecArray2>::type> >
 							ScoreVecArray2Array;
     typedef typename ScoreVecArray2::iterator		col_siterator;
     typedef typename ScoreVecArray2::const_iterator
@@ -336,12 +341,12 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     typedef Array<Disparity,
 		  Buf<Disparity,
-		      typename super::Allocator<Disparity>::type> >
-							DisparityArray;
+		      typename super::template
+		      Allocator<Disparity>::type> >	DisparityArray;
     typedef Array2<DisparityArray,
 		   Buf<Disparity,
-		       typename super::Allocator<Disparity>::type> >
-							DisparityArray2;
+		       typename super::template
+		       Allocator<Disparity>::type> >	DisparityArray2;
     typedef typename DisparityArray::iterator		col_diterator;
     typedef typename DisparityArray::const_iterator	const_col_diterator;
     typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
@@ -350,8 +355,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     typedef Array<float,
 		  Buf<float,
-		      typename super::Allocator<float>::type> >
-							FloatArray;
+		      typename super::template
+		      Allocator<float>::type> >		FloatArray;
     typedef typename FloatArray::reverse_iterator	reverse_col_fiterator;
     
     struct Buffers
@@ -441,7 +446,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
   private:
     using	super::start;
     using	super::nextFrame;
-    
+    using	super::selectDisparities;
+    using	super::pruneDisparities;
+
     template <template <class, class> class ASSIGN, class COL, class COL_RV>
     void	initializeFilterParameters(COL colL, COL colLe,
 					   COL_RV colRV,
@@ -465,8 +472,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 				   DMIN_RV dminRV, RMIN_RV RminRV) const;
 
   private:
-    Parameters				_params;
-    typename super::Pool<Buffers>	_bufferPool;
+    Parameters					_params;
+    typename super::template Pool<Buffers>	_bufferPool;
 };
 
 template <class SCORE, class DISP>
@@ -811,8 +818,6 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	typename std::iterator_traits<qiterator>::reference>	assign_type;
     typedef ASSIGN<Score, Score&>				gassign_type;
 
-    const assign_type	assign_op;
-    const gassign_type	gassign_op;
     for (; colL != colLe; ++colL)
     {
 	const Score	pixL = *colL;
@@ -823,10 +828,10 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 		       Qe(make_assignment_iterator(colQ->end2(),
 						   ParamInit(pixL)));
 	     Q != Qe; ++Q, ++P)
-	    assign_op(*P, *Q);
+	    assign_type()(*P, *Q);
 
-	gassign_op(pixL,	colF->g_sum);
-	gassign_op(pixL * pixL, colF->g_sqsum);
+	gassign_type()(pixL,	    colF->g_sum);
+	gassign_type()(pixL * pixL, colF->g_sqsum);
 	
 	++colRV;
 	++colQ;

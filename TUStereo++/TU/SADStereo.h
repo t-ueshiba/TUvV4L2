@@ -31,17 +31,20 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 #endif
     typedef Array<ScoreVec,
 		  Buf<ScoreVec,
-		      typename super::Allocator<ScoreVec>::type> >
-							ScoreVecArray;
+		      typename super::template
+		      Allocator<ScoreVec>::type> >	ScoreVecArray;
     typedef Array2<ScoreVecArray,
 		   Buf<ScoreVec,
-		       typename super::Allocator<ScoreVec>::type>,
+		       typename super::template
+		       Allocator<ScoreVec>::type>,
 		   Buf<ScoreVecArray,
-		       typename super::Allocator<ScoreVecArray>::type> >
+		       typename super::template
+		       Allocator<ScoreVecArray>::type> >
 							ScoreVecArray2;
     typedef Array<ScoreVecArray2,
 		  Buf<ScoreVecArray2,
-		      typename super::Allocator<ScoreVecArray2>::type> >
+		      typename super::template
+		      Allocator<ScoreVecArray2>::type> >
 							ScoreVecArray2Array;
     typedef typename ScoreVecArray2::iterator		col_siterator;
     typedef typename ScoreVecArray2::const_iterator
@@ -56,17 +59,17 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 							ScoreVecArrayBox;
     typedef Array<Disparity,
 		  Buf<Disparity,
-		      typename super::Allocator<Disparity>::type> >
-							DisparityArray;
+		      typename super::template
+		      Allocator<Disparity>::type> >	DisparityArray;
     typedef Array2<DisparityArray,
 		   Buf<Disparity,
-		       typename super::Allocator<Disparity>::type> >
-							DisparityArray2;
+		       typename super::template
+		       Allocator<Disparity>::type> >	DisparityArray2;
     typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
     typedef Array<float,
 		  Buf<float,
-		      typename super::Allocator<float>::type> >
-							FloatArray;
+		      typename super::template
+		      Allocator<float>::type> >		FloatArray;
     typedef typename FloatArray::reverse_iterator	reverse_col_fiterator;
 
     struct Buffers
@@ -133,6 +136,8 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
   private:
     using	super::start;
     using	super::nextFrame;
+    using	super::selectDisparities;
+    using	super::pruneDisparities;
     
     template <template <class, class> class ASSIGN, class COL, class COL_RV>
     void	initializeDissimilarities(COL colL, COL colLe,
@@ -150,8 +155,8 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 				   DMIN_RV dminRV, RMIN_RV RminRV) const;
 
   private:
-    Parameters				_params;
-    typename super::Pool<Buffers>	_bufferPool;
+    Parameters					_params;
+    typename super::template Pool<Buffers>	_bufferPool;
 };
     
 template <class SCORE, class DISP>
@@ -411,13 +416,12 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 	typename std::iterator_traits<piterator>::value_type,
 	typename std::iterator_traits<qiterator>::reference>	assign_type;
 
-    const assign_type	assign_op;
     for (; colL != colLe; ++colL)
     {
 	piterator	P(in_iterator(colRV->begin()),
 			  makeBinder(op_type(_params.intensityDiffMax), *colL));
 	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
-	    assign_op(*P, *Q);
+	    assign_type()(*P, *Q);
 	
 	++colRV;
 	++colP;
