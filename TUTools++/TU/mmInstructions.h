@@ -3344,7 +3344,7 @@ class store_iterator
 		store_iterator<ITER, ALIGNED>,
 		ITER,
 		typename detail::store_proxy<ITER, ALIGNED>::value_type,
-		boost::use_default,
+		std::forward_iterator_tag,
 		detail::store_proxy<ITER, ALIGNED> >
 {
   private:
@@ -3352,7 +3352,7 @@ class store_iterator
 		store_iterator,
 		ITER,
 		typename detail::store_proxy<ITER, ALIGNED>::value_type,
-		boost::use_default,
+		std::forward_iterator_tag,
 		detail::store_proxy<ITER, ALIGNED> >		super;
 
   public:
