@@ -45,6 +45,7 @@ HDRS		= TU/Array++.h \
 		TU/Feature.h \
 		TU/FeatureMatch.h \
 		TU/Filter2.h \
+		TU/GFStereo.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
 		TU/GraphCuts.h \
@@ -66,11 +67,14 @@ HDRS		= TU/Array++.h \
 		TU/Profiler.h \
 		TU/Random.h \
 		TU/Ransac.h \
+		TU/Rectify.h \
+		TU/SADStereo.h \
 		TU/SHOT602.h \
 		TU/SURFCreator.h \
 		TU/SeparableFilter2.h \
 		TU/Serial.h \
 		TU/SparseMatrix++.h \
+		TU/StereoBase.h \
 		TU/TriggerGenerator.h \
 		TU/Vector++.h \
 		TU/Warp.h \
@@ -96,6 +100,7 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		PM16C_04.cc \
 		Profiler.cc \
 		Random.cc \
+		Rectify.cc \
 		SHOT602.cc \
 		SURFCreator.cc \
 		Serial.cc \
@@ -119,6 +124,7 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		PM16C_04.o \
 		Profiler.o \
 		Random.o \
+		Rectify.o \
 		SHOT602.o \
 		SURFCreator.o \
 		Serial.o \
@@ -169,6 +175,10 @@ PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 Profiler.o: TU/Profiler.h TU/types.h TU/Array++.h TU/iterator.h \
 	TU/functional.h TU/mmInstructions.h TU/tuple.h windows/fakeWindows.h
 Random.o: TU/Random.h TU/types.h windows/fakeWindows.h
+Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h \
+	TU/Vector++.h TU/Array++.h TU/iterator.h TU/functional.h \
+	TU/mmInstructions.h TU/tuple.h TU/Minimize.h TU/Camera++.h \
+	TU/algorithm.h
 SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 SURFCreator.o: TU/SURFCreator.h TU/Feature.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
