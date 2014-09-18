@@ -1,1 +1,0 @@
-../stereo1394/MyOglCanvasPane.cc
