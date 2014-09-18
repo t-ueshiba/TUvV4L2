@@ -25,6 +25,10 @@
 #  include "bodyinfo_HRP2DOF7.h"
 #endif
 
+#if !defined(HALF_SITTING_WAIST_HEIGHT)
+#  define HALF_SITTING_WAIST_HEIGHT	(LEG_LINK_LEN1*cos(HALF_SITTING_HIP_ANGLE)+LEG_LINK_LEN2*cos(HALF_SITTING_ANKLE_ANGLE)+ANKLE_HEIGHT)
+#endif
+
 namespace TU
 {
 /************************************************************************

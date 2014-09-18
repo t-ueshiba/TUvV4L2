@@ -3,10 +3,6 @@ SUBDIR	= TUTools++		\
 	  TUv++			\
 	  TUOgl++		\
 	  TUIeee1394++		\
-	  TUObject++		\
-	  TUBrep++		\
-	  TUCollection++	\
-	  TUVision++		\
 	  TUXv++		\
 #	  TUCuda++		\
 #	  TUV4L2++		\

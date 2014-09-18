@@ -124,6 +124,8 @@
 #ifndef __TU_IEEE1394PP_H
 #define __TU_IEEE1394PP_H
 
+//#define USE_VIDEO1394
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
