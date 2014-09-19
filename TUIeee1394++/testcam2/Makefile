@@ -35,7 +35,6 @@ EXTHDRS		= ../testcam/MyCanvasPane.h \
 		../testcam/MyModalDialog.h \
 		../testcam/testcam.h \
 		/usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Expression++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Ieee1394++.h \
 		/usr/local/include/TU/Ieee1394CameraArray.h \
@@ -52,6 +51,7 @@ EXTHDRS		= ../testcam/MyCanvasPane.h \
 		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
@@ -95,10 +95,9 @@ MyCanvasPane.o: ../testcam/MyCanvasPane.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Expression++.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
@@ -108,7 +107,7 @@ MyCmdWindow.o: ../testcam/testcam.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h MyCmdWindow.h \
@@ -130,9 +129,8 @@ MyModalDialog.o: ../testcam/MyModalDialog.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Expression++.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
@@ -143,7 +141,7 @@ createCaptureCmds.o: ../testcam/testcam.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
@@ -152,7 +150,7 @@ createFeatureCmds.o: ../testcam/testcam.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
@@ -161,17 +159,14 @@ createMenuCmds.o: ../testcam/testcam.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
 main.o: /usr/local/include/TU/Ieee1394CameraArray.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Expression++.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Minimize.h \

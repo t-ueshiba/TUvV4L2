@@ -431,9 +431,9 @@ MyCmdWindow::separateChannels(const Image<YUV422>& image)
     
     for (int v = 0; v < image.height(); ++v)
     {
-	const YUV422*	p = image[v];
-	PixelType*	q = imageL[v];
-	PixelType*	r = imageR[v];
+	const YUV422*	p = image[v].data();
+	PixelType*	q = imageL[v].data();
+	PixelType*	r = imageR[v].data();
 	for (int n = image.width(); n > 0; --n)
 	{
 	    *q++ = p->y;
@@ -452,10 +452,10 @@ MyCmdWindow::separateChannels(const Image<RGB>& image)
 
     for (int v = 0; v < image.height(); ++v)
     {
-	const RGB*	p = image[v];
-	PixelType*	q = imageC[v];
-	PixelType*	r = imageH[v];
-	PixelType*	s = imageV[v];
+	const RGB*	p = image[v].data();
+	PixelType*	q = imageC[v].data();
+	PixelType*	r = imageH[v].data();
+	PixelType*	s = imageV[v].data();
 	for (int n = image.width(); n > 0; --n)
 	{
 	    *q++ = p->r;
