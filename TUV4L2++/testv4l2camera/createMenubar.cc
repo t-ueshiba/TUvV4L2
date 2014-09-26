@@ -3,6 +3,7 @@
  */
 #include <list>
 #include <boost/foreach.hpp>
+#include <iostream>
 #include <sstream>
 #include <fstream>
 #include "MyV4L2Camera.h"
@@ -100,6 +101,7 @@ CBexit(GtkMenuItem*, gpointer userdata)
     
     MyV4L2Camera*	camera = (MyV4L2Camera*)userdata;
     camera->stopContinuousShot();
+    cout << camera->dev() << ' ' << *camera;
     gtk_exit(0);
 }
 

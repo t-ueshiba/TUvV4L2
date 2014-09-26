@@ -252,6 +252,8 @@ class V4L2Camera
     V4L2Camera(const char* dev)						;
     ~V4L2Camera()							;
 
+    const std::string&	dev()					const	;
+    
   // Format stuffs.
     PixelFormatRange	availablePixelFormats()			const	;
     FrameSizeRange	availableFrameSizes(PixelFormat pixelFormat)
@@ -338,6 +340,7 @@ class V4L2Camera
     
   private:
     const int			_fd;
+    const std::string		_dev;
     std::vector<Format>		_formats;
     std::vector<Control>	_controls;
     size_t			_width;
@@ -348,6 +351,16 @@ class V4L2Camera
     bool			_inContinuousShot;
     u_int64_t			_arrivaltime;
 };
+
+//! このカメラのデバイスファイル名を取得する
+/*!
+  \return	デバイスファイル名
+*/
+inline const std::string&
+V4L2Camera::dev() const
+{
+    return _dev;
+}
 
 //! このカメラで利用できる画素フォーマットの範囲を取得する
 /*!
