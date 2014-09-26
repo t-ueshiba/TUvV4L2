@@ -379,7 +379,7 @@ v4l2_get_fd(const char* dev)
   \param dev	デバイス名
 */
 V4L2Camera::V4L2Camera(const char* dev)
-    :_fd(v4l2_get_fd(dev)), _formats(), _controls(),
+    :_fd(v4l2_get_fd(dev)), _dev(dev), _formats(), _controls(),
      _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
      _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime(0)
 {
@@ -2025,7 +2025,7 @@ operator >>(std::istream& in, V4L2Camera& camera)
 		break;
 	    }
     }
-    
+
     return in;
 }
 
