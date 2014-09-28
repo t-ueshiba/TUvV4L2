@@ -34,7 +34,8 @@ scaleDisparity(Image<T>& disparityMap, u_int disparitySearchWidth)
 
 template <class STEREO, class T> static void
 doJob(std::istream& in, size_t windowSize, size_t disparitySearchWidth,
-      size_t disparityMax, size_t grainSize, double scale, bool binocular)
+      size_t disparityMax, size_t grainSize, double scale, bool binocular,
+      size_t ntrials)
 {
     using namespace	std;
     
@@ -87,9 +88,9 @@ doJob(std::istream& in, size_t windowSize, size_t disparitySearchWidth,
 	 << disparityMap.width() << 'x' << disparityMap.height() << endl;
     
     if (binocular)    
-	for (int i = 0; i < 5; ++i)
+	for (size_t i = 0; i < ntrials; ++i)
 	{
-	    for (int j = 0; j < 10; ++j)
+	    for (size_t j = 0; j < 10; ++j)
 	    {
 		profiler.start(0);		// rectificationの所要時間
 		rectify(images[0], images[1],
@@ -104,9 +105,9 @@ doJob(std::istream& in, size_t windowSize, size_t disparitySearchWidth,
 	    stereo.print(cerr);			// マッチングの各ステップ
 	}
     else	
-	for (int i = 0; i < 5; ++i)
+	for (size_t i = 0; i < ntrials; ++i)
 	{
-	    for (int j = 0; j < 10; ++j)
+	    for (size_t j = 0; j < 10; ++j)
 	    {
 		profiler.start(0);		// rectificationの所要時間
 		rectify(images[0], images[1], images[2],
@@ -160,10 +161,11 @@ main(int argc, char* argv[])
     size_t	disparitySearchWidth	= 0;
     size_t	disparityMax		= 0;
     size_t	grainSize		= DEFAULT_GRAINSIZE;
+    size_t	ntrials			= 5;
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "Gp:d:s:BCW:D:M:g:")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "Gp:d:s:BCW:D:M:g:n:")) != EOF; )
 	switch (c)
 	{
 	  case 'G':
@@ -196,6 +198,9 @@ main(int argc, char* argv[])
 	  case 'g':
 	    grainSize = atoi(optarg);
 	    break;
+	  case 'n':
+	    ntrials = atoi(optarg);
+	    break;
 	}
     
   // 本当のお仕事．
@@ -207,11 +212,11 @@ main(int argc, char* argv[])
 	if (gfstereo)
 	    doJob<GFStereoType, u_char>(in, windowSize, disparityMax,
 					disparitySearchWidth, grainSize,
-					scale, binocular);
+					scale, binocular, ntrials);
 	else
 	    doJob<SADStereoType, u_char>(in, windowSize, disparityMax,
 					 disparitySearchWidth, grainSize,
-					 scale, binocular);
+					 scale, binocular, ntrials);
     }
     catch (exception& err)
     {
