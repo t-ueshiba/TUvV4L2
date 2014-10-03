@@ -222,6 +222,9 @@ MyV4L2Camera::draw()
 			   0, 0, width(), height(),
 			   GDK_RGB_DITHER_NONE, (guchar*)_buf, 3*width());
 	break;
+#ifdef V4L2_PIX_FMT_SRGGB8
+      case SRGGB8:
+#endif
       case SBGGR8:
       case SGBRG8:
       case SGRBG8:
@@ -280,6 +283,9 @@ MyV4L2Camera::save(std::ostream& out) const
 	break;
 
       case RGB24:
+#ifdef V4L2_PIX_FMT_SRGGB8
+      case SRGGB8:
+#endif
       case SBGGR8:
       case SGBRG8:
       case SGRBG8:
@@ -320,6 +326,9 @@ MyV4L2Camera::allocateBuffers()
 	buffSize = width() * height() * 2;
 	break;
       case GREY:
+#ifdef V4L2_PIX_FMT_SRGGB8
+      case SRGGB8:
+#endif
       case SBGGR8:
       case SGBRG8:
       case SGRBG8:
