@@ -393,8 +393,8 @@ Ieee1394Node::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
   \return		割り当てられたisochronous受信用のチャンネル
  */
 u_char
-Ieee1394Node::mapListenBuffer(size_t packet_size,
-			      size_t buf_size, u_int nb_buffers)
+Ieee1394Node::mapListenBuffer(u_int packet_size,
+			      u_int buf_size, u_int nb_buffers)
 {
     using namespace	std;
     
@@ -519,7 +519,7 @@ Ieee1394Node::requeueListenBuffer()
 	throw runtime_error(string("TU::Ieee1394Node::requeueListenBuffer: VIDEO1394_IOC_LISTEN_QUEUE_BUFFER failed!! ") + strerror(errno));
     ++_current %= _mmap.nb_buffers;	// next buffer.
 #else
-    if (_current != 0)
+    if (_current >= _mid)
     {
       // [_buf, _mid) を廃棄し [_mid, _current)をバッファ領域の先頭に移す
 	const size_t	len = _current - _mid;

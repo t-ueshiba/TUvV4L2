@@ -244,8 +244,8 @@ class Ieee1394Node
 								const	;
     quadlet_t		readQuadlet(nodeaddr_t addr)		const	;
     void		writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;
-    u_char		mapListenBuffer(size_t packet_size,
-					size_t buf_size,
+    u_char		mapListenBuffer(u_int packet_size,
+					u_int buf_size,
 					u_int nb_buffers)		;
     const u_char*	waitListenBuffer()				;
     void		requeueListenBuffer()				;
