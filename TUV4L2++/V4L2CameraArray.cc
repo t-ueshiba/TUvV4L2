@@ -80,5 +80,13 @@ V4L2CameraArray::~V4L2CameraArray()
 	delete (*this)[i];
 }
 
+const V4L2CameraArray&
+V4L2CameraArray::exec(V4L2Camera& (V4L2Camera::*mf)()) const
+{
+    for (size_t i = 0; i < size(); ++i)
+	((*this)[i]->*mf)();
+    return *this;
+}
+
 }
 #endif	/* HAVE_LIBTUTOOLS__	*/    
