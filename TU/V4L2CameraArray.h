@@ -35,11 +35,21 @@ class V4L2CameraArray : public Array<V4L2Camera*>
 		    int ncameras=-1)					;
     ~V4L2CameraArray()							;
 
-    void		initialize(const char* name, const char* dirs=0,
-				   int ncameras=-1)			;
-    const std::string&	fullName()				const	;
-    std::string		configFile()				const	;
-    std::string		calibFile()				const	;
+    void	initialize(const char* name, const char* dirs=0,
+			   int ncameras=-1)				;
+    const std::string&
+		fullName()					  const	;
+    std::string	configFile()					  const	;
+    std::string	calibFile()					  const	;
+    const V4L2CameraArray&
+		exec(V4L2Camera& (V4L2Camera::*mf)())		  const	;
+    template <class ARG>
+    const V4L2CameraArray&
+		exec(V4L2Camera& (V4L2Camera::*mf)(ARG), ARG arg) const	;
+    template <class ARG0, class ARG1>
+    const V4L2CameraArray&
+		exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
+		     ARG0 arg0, ARG1 arg1)			  const	;
 
   private:
     std::string		_fullName;	//!< カメラのfull path名
@@ -73,6 +83,23 @@ inline std::string
 V4L2CameraArray::calibFile() const
 {
     return _fullName + ".calib";
+}
+    
+template <class ARG> const V4L2CameraArray&
+V4L2CameraArray::exec(V4L2Camera& (V4L2Camera::*mf)(ARG), ARG arg) const
+{
+    for (size_t i = 0; i < size(); ++i)
+	((*this)[i]->*mf)(arg);
+    return *this;
+}
+
+template <class ARG0, class ARG1> const V4L2CameraArray&
+V4L2CameraArray::exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
+		      ARG0 arg0, ARG1 arg1) const
+{
+    for (size_t i = 0; i < size(); ++i)
+	((*this)[i]->*mf)(arg0, arg1);
+    return *this;
 }
     
 }
