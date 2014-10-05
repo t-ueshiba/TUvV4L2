@@ -36,16 +36,27 @@ class Ieee1394CameraArray : public Array<Ieee1394Camera*>
 			int ncameras=-1)				;
     ~Ieee1394CameraArray()						;
 
-    void		initialize(const char* name, const char* dirs=0,
-				   Ieee1394Node::Speed
-				       speed=Ieee1394Node::SPD_400M,
-				   int ncameras=-1)			;
-    const std::string&	fullName()				const	;
-    std::string		configFile()				const	;
-    std::string		calibFile()				const	;
-
+    void	initialize(const char* name, const char* dirs=0,
+			   Ieee1394Node::Speed
+			       speed=Ieee1394Node::SPD_400M,
+			   int ncameras=-1)				;
+    const std::string&
+		fullName()					const	;
+    std::string	configFile()					const	;
+    std::string	calibFile()					const	;
+    const Ieee1394CameraArray&
+		exec(Ieee1394Camera& (Ieee1394Camera::*mf)())	const	;
+    template <class ARG>
+    const Ieee1394CameraArray&
+		exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG),
+		     ARG arg)					const	;
+    template <class ARG0, class ARG1>
+    const Ieee1394CameraArray&
+		exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
+		     ARG0 arg0, ARG1 arg1)			const	;
+    
   private:
-    std::string		_fullName;	//!< カメラのfull path名
+    std::string	_fullName;	//!< カメラのfull path名
 };
 
 //! カメラのfull path名を返す.
@@ -76,6 +87,24 @@ inline std::string
 Ieee1394CameraArray::calibFile() const
 {
     return _fullName + ".calib";
+}
+    
+template <class ARG> const Ieee1394CameraArray&
+Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG),
+			  ARG arg) const
+{
+    for (size_t i = 0; i < size(); ++i)
+	((*this)[i]->*mf)(arg);
+    return *this;
+}
+
+template <class ARG0, class ARG1> const Ieee1394CameraArray&
+Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
+			  ARG0 arg0, ARG1 arg1) const
+{
+    for (size_t i = 0; i < size(); ++i)
+	((*this)[i]->*mf)(arg0, arg1);
+    return *this;
 }
     
 }

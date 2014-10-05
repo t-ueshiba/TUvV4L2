@@ -50,7 +50,7 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
     using namespace	std;
 
   // 現在設定されている全カメラを廃棄する.
-    for (int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < size(); ++i)
 	delete (*this)[i];
 
   // 設定ファイルのfull path名を生成し, ファイルをオープンする.
@@ -68,7 +68,7 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
     resize(ncameras);
     
   // 設定ファイルに記された全カメラを生成する.
-    for (int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < size(); ++i)
     {
 	string		s;
 	in >> s;			// global unique IDの読み込み
@@ -82,8 +82,16 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
 //! IEEE1394デジタルカメラの配列を破壊する.
 Ieee1394CameraArray::~Ieee1394CameraArray()
 {
-    for (int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < size(); ++i)
 	delete (*this)[i];
+}
+
+const Ieee1394CameraArray&
+Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)()) const
+{
+    for (size_t i = 0; i < size(); ++i)
+	((*this)[i]->*mf)();
+    return *this;
 }
 
 }
