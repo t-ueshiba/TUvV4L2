@@ -30,7 +30,7 @@
 #include <fstream>
 #include <string>
 #include "TU/v/TUv++.h"
-#include "TU/V4L2++.h"
+#include "TU/V4L2CameraArray.h"
 
 /************************************************************************
 *  global data and definitions						*
@@ -52,11 +52,6 @@ enum
     c_SaveThreeD,
     c_SaveThreeDImage,
     
-  // Camera selection.
-    c_SelectionSchemes,
-    c_TripletSelection,
-    c_CameraSelection,
-
   // Camera video format.
     c_PixelFormat,
     c_BGR24			= V4L2Camera::BGR24,
@@ -70,6 +65,9 @@ enum
     c_SBGGR8			= V4L2Camera::SBGGR8,
     c_SGBRG8			= V4L2Camera::SGBRG8,
     c_SGRBG8			= V4L2Camera::SGRBG8,
+
+  // Camera selection.
+    c_CameraChoice,
 
   // Camera features.
     c_Brightness		= V4L2Camera::BRIGHTNESS,

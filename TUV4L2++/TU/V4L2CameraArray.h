@@ -30,6 +30,9 @@ namespace TU
 class V4L2CameraArray : public Array<V4L2Camera*>
 {
   public:
+    typedef V4L2Camera	camera_type;
+    
+  public:
     V4L2CameraArray()							;
     V4L2CameraArray(const char* name, const char* dirs=0,
 		    int ncameras=-1)					;

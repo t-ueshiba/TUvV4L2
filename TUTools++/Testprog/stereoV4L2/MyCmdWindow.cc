@@ -97,9 +97,10 @@ struct Epsilon<GFStereo<SCORE, DISP> >
     
 namespace v
 {
-CmdDef*	createMenuCmds(const V4L2Camera& camera)	;
-CmdDef*	createCaptureCmds()				;
-CmdDef*	createFeatureCmds(const V4L2Camera& camera)	;
+CmdDef*	createMenuCmds(const V4L2Camera& camera)			;
+CmdDef*	createCaptureCmds()						;
+CmdDef*	createFeatureCmds(const V4L2CameraArray& cameras)		;
+void	refreshFeatureCmds(const V4L2Camera& camera, CmdPane& cmdPane)	;
     
 /************************************************************************
 *  class MyCmdWindow<STEREO, PIXEL>					*
@@ -132,7 +133,7 @@ MyCmdWindow<STEREO, PIXEL>::MyCmdWindow(
      _b(0.0),
      _menuCmd(*this, createMenuCmds(*_cameras[0])),
      _captureCmd(*this, createCaptureCmds()),
-     _featureCmd(*this, createFeatureCmds(*_cameras[0])),
+     _featureCmd(*this, createFeatureCmds(_cameras)),
 #if defined(DISPLAY_2D)
      _disparityMapUC(),
      _canvasL(*this, 320, 240, _rectifiedImages[0]),
@@ -420,10 +421,23 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
 	  case c_Cid_Private27:
 	  case c_Cid_Private28:
 	  case c_Cid_Private29:
-	    for (size_t i = 0; i < _cameras.size(); ++i)
-		_cameras[i]->setValue(V4L2Camera::uintToFeature(id), val);
+	  {
+	    const size_t	n = _featureCmd.getValue(c_CameraChoice);
+	    if (n < _cameras.size())  
+		_cameras[n]->setValue(V4L2Camera::uintToFeature(id), val);
+	    else
+		for (size_t i = 0; i < _cameras.size(); ++i)
+		    _cameras[i]->setValue(V4L2Camera::uintToFeature(id), val);
+	  }
 	    break;
 
+	  case c_CameraChoice:
+	  {
+	    const size_t	n = (val < _cameras.size() ? size_t(val) : 0);
+	    refreshFeatureCmds(*_cameras[n], _featureCmd);
+	  }
+	    break;
+	  
 	  case c_ContinuousShot:
 	    if (val)
 	    {

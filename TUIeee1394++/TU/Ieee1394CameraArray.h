@@ -30,6 +30,9 @@ namespace TU
 class Ieee1394CameraArray : public Array<Ieee1394Camera*>
 {
   public:
+    typedef Ieee1394Camera	camera_type;
+    
+  public:
     Ieee1394CameraArray()						;
     Ieee1394CameraArray(const char* name, const char* dirs=0,
 			Ieee1394Node::Speed speed=Ieee1394Node::SPD_400M,
