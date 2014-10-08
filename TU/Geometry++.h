@@ -1770,10 +1770,10 @@ Rigidity<M>::update(const vector_type& dt)
     switch (dim())
     {
       case 2:
-	(*this)(0, 0, 2, 2) = matrix_type::Rt(-dt[2]) * (*this)(0, 0, 2, 2);
+	(*this)(0, 0, 2, 2) = matrix_type::Rt(vector_type(-dt[2])) * (*this)(0, 0, 2, 2);
 	break;
       case 3:
-	(*this)(0, 0, 3, 3) = matrix_type::Rt(-dt(3, 3)) * (*this)(0, 0, 3, 3);
+	(*this)(0, 0, 3, 3) = matrix_type::Rt(vector_type(-dt(3, 3))) * (*this)(0, 0, 3, 3);
 	break;
       default:
 	throw std::runtime_error("Rigidity<M>::update(): sorry, not implemented yet...");
