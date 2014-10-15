@@ -309,6 +309,15 @@ class V4L2Camera
     const V4L2Camera&	captureBayerRaw(void* image)		const	;
     u_int64_t		arrivaltime()				const	;
 
+  // Generic control functions.
+    V4L2Camera&		exec(V4L2Camera& (V4L2Camera::*mf)(), int=-1)	;
+    template <class ARG>
+    V4L2Camera&		exec(V4L2Camera& (V4L2Camera::*mf)(ARG),
+			     ARG arg, int=-1)				;
+    template <class ARG0, class ARG1>
+    V4L2Camera&		exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
+			     ARG0 arg0, ARG1 arg1, int=-1);
+
   // Utility functions.
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
     static Feature	uintToFeature(u_int feature)			;
@@ -547,6 +556,25 @@ V4L2Camera::arrivaltime() const
     return _arrivaltime;
 }
 
+inline V4L2Camera&
+V4L2Camera::exec(V4L2Camera& (V4L2Camera::*mf)(), int)
+{
+    return (this->*mf)();
+}
+
+template <class ARG> inline V4L2Camera&
+V4L2Camera::exec(V4L2Camera& (V4L2Camera::*mf)(ARG), ARG arg, int)
+{
+    return (this->*mf)(arg);
+}
+
+template <class ARG0, class ARG1> inline V4L2Camera&
+V4L2Camera::exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
+		 ARG0 arg0, ARG1 arg1, int)
+{
+    return (this->*mf)(arg0, arg1);
+}
+    
 template <> inline const V4L2Camera::PixelFormat&
 V4L2Camera::MemberIterator<V4L2Camera::PixelFormat,
 			   V4L2Camera::Format>::dereference() const
@@ -585,5 +613,9 @@ std::ostream&	operator <<(std::ostream& out,
 			    const V4L2Camera::MenuItem& menuItem)	;
 std::ostream&	operator <<(std::ostream& out, const V4L2Camera& camera);
 std::istream&	operator >>(std::istream& in, V4L2Camera& camera)	;
+bool		handleCameraFormats(V4L2Camera& camera,
+				    u_int id, int val)			;
+bool		handleCameraFeatures(V4L2Camera& camera,
+				     u_int id, int val, int=-1)		;
 }
 #endif	// !__TU_V4L2PP_H

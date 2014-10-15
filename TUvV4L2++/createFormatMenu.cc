@@ -1,11 +1,12 @@
 /*
- *  $Id$
+ *  $Id: createFormatMenu.cc,v 1.1 2009-07-28 00:00:48 ueshiba Exp $
  */
 #include <vector>
 #include <list>
-#include <boost/foreach.hpp>
 #include <sstream>
-#include "testcam.h"
+#include <boost/foreach.hpp>
+#include "TU/V4L2++.h"
+#include "TU/v/TUv++.h"
 
 namespace TU
 {
@@ -18,41 +19,18 @@ static std::vector<MenuDef>			pixelFormatMenus;
 static std::list<std::vector<MenuDef> >		frameSizeMenusList;
 static std::list<std::vector<std::string> >	frameSizeLabelsList;
     
-static MenuDef fileMenu[] =
-{
-    {"Save",			M_Save,		 false, noSub},
-    {"Restore camera config.",	c_RestoreConfig, false, noSub},
-    {"Save camera config.",	c_SaveConfig,	 false, noSub},
-    {"-",			M_Line,		 false, noSub},
-    {"Quit",			M_Exit,		 false, noSub},
-    EndOfMenu
-};
-
-static CmdDef MenuCmds[] =
-{
-    {C_MenuButton,	  M_File, 0,	     "File", fileMenu, CA_None,
-     0, 0, 1, 1, 0},
-    {C_MenuButton, c_PixelFormat, 0, "Pixel format",	    0, CA_None,
-     1, 0, 1, 1, 0},
-    {C_Button,		   c_ROI, 0,	  "Set ROI",	    0, CA_None,
-     2, 0, 1, 1, 0},
-    {C_ToggleButton,  c_ContinuousShot, 0, "Continuous shot", noProp, CA_None,
-     3, 0, 1, 1, 0},
-    {C_Label,	      c_Cursor,		0, "(   ,   )",	      noProp, CA_None,
-     4, 0, 1, 1, 0},
-    EndOfCmds
-};
-
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-CmdDef*
-createMenuCmds(const V4L2Camera& camera)
+MenuDef*
+createFormatMenu(const V4L2Camera& camera)
 {
+    static const char*	setROILabel = "set ROI";
+    
     BOOST_FOREACH (V4L2Camera::PixelFormat pixelFormat,
 		   camera.availablePixelFormats())
     {
-      // ¤³¤Î²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤ËÂĞ±ş¤¹¤ë¥á¥Ë¥å¡¼¹àÌÜ¤òºî¤ë¡¥
+      // ã“ã®ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã«å¯¾å¿œã™ã‚‹ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã‚’ä½œã‚‹ï¼
 	pixelFormatMenus.push_back(MenuDef());
 	MenuDef&	pixelFormatMenu = pixelFormatMenus.back();
 
@@ -60,7 +38,7 @@ createMenuCmds(const V4L2Camera& camera)
 	pixelFormatMenu.id	= pixelFormat;
 	pixelFormatMenu.checked = true;
 
-      // ¤³¤Î²èÁÇ¥Õ¥©¡¼¥Ş¥Ã¥È¤¬¥µ¥İ¡¼¥È¤¹¤ë³Æ¥Õ¥ì¡¼¥à¥µ¥¤¥º¤ËÂĞ±ş¤¹¤ë¥á¥Ë¥å¡¼¹àÌÜ¤òºî¤ë¡¥
+      // ã“ã®ç”»ç´ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒã‚µãƒãƒ¼ãƒˆã™ã‚‹å„ãƒ•ãƒ¬ãƒ¼ãƒ ã‚µã‚¤ã‚ºã«å¯¾å¿œã™ã‚‹ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã‚’ä½œã‚‹ï¼
 	frameSizeMenusList.push_back(std::vector<MenuDef>());
 	std::vector<MenuDef>&	frameSizeMenus = frameSizeMenusList.back();
 	frameSizeLabelsList.push_back(std::vector<std::string>());
@@ -69,7 +47,7 @@ createMenuCmds(const V4L2Camera& camera)
 	BOOST_FOREACH (const V4L2Camera::FrameSize& frameSize,
 		       camera.availableFrameSizes(pixelFormat))
 	{
-	  // ¤³¤Î¥Õ¥ì¡¼¥à¥µ¥¤¥º¤ËÂĞ±ş¤¹¤ë¥á¥Ë¥å¡¼¹àÌÜ¤òºî¤ë¡¥
+	  // ã“ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‚µã‚¤ã‚ºã«å¯¾å¿œã™ã‚‹ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã‚’ä½œã‚‹ï¼
 	    frameSizeMenus.push_back(MenuDef());
 	    MenuDef&		frameSizeMenu = frameSizeMenus.back();
 	    const size_t	j = frameSizeMenus.size() - 1;
@@ -90,13 +68,20 @@ createMenuCmds(const V4L2Camera& camera)
 
 	pixelFormatMenu.submenu = &frameSizeMenus.front();
     }
+
+  // ROIã‚’æŒ‡å®šã™ã‚‹é …ç›®ã‚’ä½œã‚‹ï¼
+    pixelFormatMenus.push_back(MenuDef());
+    MenuDef&	setROIMenu = pixelFormatMenus.back();
+    setROIMenu.label	= setROILabel;
+    setROIMenu.id	= M_Format;
+    setROIMenu.checked	= false;
+    setROIMenu.submenu	= noSub;
+    
     pixelFormatMenus.push_back(MenuDef());
     pixelFormatMenus.back().label = 0;
 
-    MenuCmds[1].prop = &pixelFormatMenus.front();
-
-    return MenuCmds;
+    return &pixelFormatMenus.front();
 }
  
-}
-}
+}	// namespace v
+}	// namespace TU

@@ -81,10 +81,13 @@ V4L2CameraArray::~V4L2CameraArray()
 }
 
 const V4L2CameraArray&
-V4L2CameraArray::exec(V4L2Camera& (V4L2Camera::*mf)()) const
+V4L2CameraArray::exec(V4L2Camera& (V4L2Camera::*mf)(), int n) const
 {
-    for (size_t i = 0; i < size(); ++i)
-	((*this)[i]->*mf)();
+    if (0 <= n && n < size())
+	((*this)[n]->*mf)();
+    else
+	for (size_t i = 0; i < size(); ++i)
+	    ((*this)[i]->*mf)();
     return *this;
 }
 

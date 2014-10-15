@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile,v 1.7 2012-09-15 07:21:10 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
@@ -13,7 +13,7 @@ NAME		= $(shell basename $(PWD))
 CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
+ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   CPPFLAGS     += -DSSE3
@@ -29,43 +29,63 @@ LINKER		= $(CXX)
 SUFFIX		= .cc:sC .cu:sC .cpp:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Ieee1394++.h \
+		/usr/local/include/TU/Ieee1394CameraArray.h \
 		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/List.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
-HDRS		= TU/V4L2++.h \
-		TU/V4L2CameraArray.h
-SRCS		= V4L2Camera.cc \
-		V4L2CameraArray.cc \
-		V4L2CameraUtility.cc
-OBJS		= V4L2Camera.o \
-		V4L2CameraArray.o \
-		V4L2CameraUtility.o
+		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/v/CmdPane.h \
+		/usr/local/include/TU/v/CmdWindow.h \
+		/usr/local/include/TU/v/Colormap.h \
+		/usr/local/include/TU/v/Dialog.h \
+		/usr/local/include/TU/v/ModalDialog.h \
+		/usr/local/include/TU/v/TUv++.h \
+		/usr/local/include/TU/v/Widget-Xaw.h
+HDRS		= TU/v/vIeee1394++.h
+SRCS		= createFeatureCmds.cc \
+		createFormatMenu.cc \
+		handleCameraSpecialFormat.cc
+OBJS		= createFeatureCmds.o \
+		createFormatMenu.o \
+		handleCameraSpecialFormat.o
 
 include $(PROJECT)/lib/l.mk
 ###
-V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
+createFeatureCmds.o: TU/v/vIeee1394++.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h
-V4L2CameraArray.o: TU/V4L2CameraArray.h TU/V4L2++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Ieee1394CameraArray.h \
+	/usr/local/include/TU/Ieee1394++.h
+createFormatMenu.o: /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/io.h
-V4L2CameraUtility.o: TU/V4L2CameraArray.h TU/V4L2++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h
+handleCameraSpecialFormat.o: /usr/local/include/TU/Ieee1394++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/io.h
+	/usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/v/ModalDialog.h \
+	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h

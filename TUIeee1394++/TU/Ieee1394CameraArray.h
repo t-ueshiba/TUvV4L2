@@ -8,10 +8,10 @@
 #ifndef __TU_IEEE1394CAMERAARRAY_H
 #define __TU_IEEE1394CAMERAARRAY_H
 
+#include "TU/Ieee1394++.h"
+
 #ifdef HAVE_LIBTUTOOLS__
-#  include "TU/Array++.h"
-#  include "TU/Ieee1394++.h"
-#  include "TU/io.h"
+#  include <string>
 
 //! デフォルトのカメラ名
 #  define DEFAULT_CAMERA_NAME	"IEEE1394Camera"
@@ -48,15 +48,16 @@ class Ieee1394CameraArray : public Array<Ieee1394Camera*>
     std::string	configFile()					const	;
     std::string	calibFile()					const	;
     const Ieee1394CameraArray&
-		exec(Ieee1394Camera& (Ieee1394Camera::*mf)())	const	;
+		exec(Ieee1394Camera& (Ieee1394Camera::*mf)(),
+		     int n=-1)					const	;
     template <class ARG>
     const Ieee1394CameraArray&
 		exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG),
-		     ARG arg)					const	;
+		     ARG arg, int n=-1)				const	;
     template <class ARG0, class ARG1>
     const Ieee1394CameraArray&
 		exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
-		     ARG0 arg0, ARG1 arg1)			const	;
+		     ARG0 arg0, ARG1 arg1, int n=-1)		const	;
     
   private:
     std::string	_fullName;	//!< カメラのfull path名
@@ -91,25 +92,40 @@ Ieee1394CameraArray::calibFile() const
 {
     return _fullName + ".calib";
 }
-    
+
 template <class ARG> const Ieee1394CameraArray&
 Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG),
-			  ARG arg) const
+			  ARG arg, int n) const
 {
-    for (size_t i = 0; i < size(); ++i)
-	((*this)[i]->*mf)(arg);
+    if (0 <= n && n < size())
+	((*this)[n]->*mf)(arg);
+    else
+	for (size_t i = 0; i < size(); ++i)
+	    ((*this)[i]->*mf)(arg);
     return *this;
 }
 
 template <class ARG0, class ARG1> const Ieee1394CameraArray&
 Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
-			  ARG0 arg0, ARG1 arg1) const
+			  ARG0 arg0, ARG1 arg1, int n) const
 {
-    for (size_t i = 0; i < size(); ++i)
-	((*this)[i]->*mf)(arg0, arg1);
+    if (0 <= n && n < size())
+	((*this)[n]->*mf)(arg0, arg1);
+    else
+	for (size_t i = 0; i < size(); ++i)
+	    ((*this)[i]->*mf)(arg0, arg1);
     return *this;
 }
-    
+
+/************************************************************************
+*  global functions							*
+************************************************************************/
+bool	handleCameraFormats(const Ieee1394CameraArray& cameras,
+			    u_int id, u_int val);
+bool	handleCameraFeatures(const Ieee1394CameraArray& cameras,
+			     u_int id, int val, int new_val, int n=-1);
+bool	handleCameraWhiteBalance(const Ieee1394CameraArray& cameras,
+				 u_int id, int val, int ub, int vr, int n=-1);
 }
 #endif	// HAVE_LIBTUTOOLS__
 #endif	// ! __TU_IEEE1394CAMERAARRAY_H

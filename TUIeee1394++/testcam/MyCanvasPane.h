@@ -11,22 +11,17 @@
 
 namespace TU
 {
-#ifdef MONO_IMAGE
-typedef u_char		PixelType;
-#else
-typedef RGBA		PixelType;
-#endif
-
 namespace v
 {
 /************************************************************************
-*  class MyCanvasPane							*
+*  class MyCanvasPane<PIXEL>						*
 ************************************************************************/
+template <class PIXEL>
 class MyCanvasPane : public CanvasPane
 {
   public:
     MyCanvasPane(Window& parentWin, u_int width, u_int height,
-		 const Image<PixelType>& image)
+		 const Image<PIXEL>& image)
 	:CanvasPane(parentWin, width, height),
 	 _dc(*this, image.width(), image.height()), _image(image)	{}
     
@@ -35,19 +30,25 @@ class MyCanvasPane : public CanvasPane
     
   private:
 #if defined(UseShmDC)
-    ShmDC			_dc;
+    ShmDC		_dc;
 #elif defined(UseXvDC)
-    XvDC			_dc;
+    XvDC		_dc;
 #else
-    CanvasPaneDC		_dc;
+    CanvasPaneDC	_dc;
 #endif
-    const Image<PixelType>&	_image;
+    const Image<PIXEL>&	_image;
 };
 
-inline void
-MyCanvasPane::resize()
+template <class PIXEL> inline void
+MyCanvasPane<PIXEL>::resize()
 {
     _dc.setSize(_image.width(), _image.height(), _dc.mul(), _dc.div());
+}
+
+template <class PIXEL> void
+MyCanvasPane<PIXEL>::repaintUnderlay()
+{
+    _dc << _image;
 }
 
 }

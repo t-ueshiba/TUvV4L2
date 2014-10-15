@@ -1,10 +1,10 @@
 /*
  *  $Id$
  */
+#ifdef HAVE_LIBTUTOOLS__
 #include <cstdlib>
 #include "TU/Ieee1394CameraArray.h"
-
-#ifdef HAVE_LIBTUTOOLS__
+#include "TU/io.h"
 
 namespace TU
 {
@@ -87,10 +87,13 @@ Ieee1394CameraArray::~Ieee1394CameraArray()
 }
 
 const Ieee1394CameraArray&
-Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)()) const
+Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(), int n) const
 {
-    for (size_t i = 0; i < size(); ++i)
-	((*this)[i]->*mf)();
+    if (0 <= n && n < size())
+	((*this)[n]->*mf)();
+    else
+	for (size_t i = 0; i < size(); ++i)
+	    ((*this)[i]->*mf)();
     return *this;
 }
 

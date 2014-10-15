@@ -432,7 +432,7 @@ class Ieee1394Camera : public Ieee1394Node
 	Presence	= (0x1u << 31),	//!< この属性そのものをサポート
       //Abs_Control	= (0x1u << 30),	//!< この属性を値によって制御可能
 	One_Push	= (0x1u << 28),	//!< one pushモードをサポート
-	ReadOut		= (0x1u << 27),	//!< この属性の値を読み出しが可能
+	ReadOut		= (0x1u << 27),	//!< この属性の値の読み出しが可能
 	OnOff		= (0x1u << 26),	//!< この属性のon/offが可能
 	Auto		= (0x1u << 25),	//!< この属性の値の自動設定が可能
 	Manual		= (0x1u << 24)	//!< この属性の値の手動設定が可能
@@ -588,6 +588,16 @@ class Ieee1394Camera : public Ieee1394Node
     Ieee1394Camera&	unembedTimestamp()				;
     u_int64_t		getTimestamp()				const	;
 
+  // Generic control functions.
+    Ieee1394Camera&	exec(Ieee1394Camera& (Ieee1394Camera::*mf)(),
+			     int=-1)					;
+    template <class ARG>
+    Ieee1394Camera&	exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG),
+			     ARG arg, int=-1)				;
+    template <class ARG0, class ARG1>
+    Ieee1394Camera&	exec(Ieee1394Camera& (Ieee1394Camera::*mf)
+			     (ARG0, ARG1), ARG0 arg0, ARG1 arg1, int=-1);
+
   // Utility functions.
     static Format	uintToFormat(u_int format)			;
     static FrameRate	uintToFrameRate(u_int frameRate)		;
@@ -730,6 +740,25 @@ Ieee1394Camera::checkAvailability(Format format, FrameRate rate) const
     }
 }
 
+inline Ieee1394Camera&
+Ieee1394Camera::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(), int)
+{
+    return (this->*mf)();
+}
+
+template <class ARG> inline Ieee1394Camera&
+Ieee1394Camera::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG), ARG arg, int)
+{
+    return (this->*mf)(arg);
+}
+
+template <class ARG0, class ARG1> inline Ieee1394Camera&
+Ieee1394Camera::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
+		     ARG0 arg0, ARG1 arg1, int)
+{
+    return (this->*mf)(arg0, arg1);
+}
+    
 inline quadlet_t
 Ieee1394Camera::checkAvailability(Feature feature, u_int inq) const
 {
@@ -778,10 +807,21 @@ Ieee1394Camera::writeQuadletToRegister(u_int offset, quadlet_t quad)
 }
  
 /************************************************************************
+*  global data								*
+************************************************************************/
+const u_int	IEEE1394CAMERA_OFFSET_ONOFF = 0x100;
+const u_int	IEEE1394CAMERA_OFFSET_AUTO  = 0x200;
+const u_int	IEEE1394CAMERA_OFFSET_VR    = 0x1;
+
+/************************************************************************
 *  global functions							*
 ************************************************************************/
 std::ostream&	operator <<(std::ostream& out, const Ieee1394Camera& camera);
 std::istream&	operator >>(std::istream& in, Ieee1394Camera& camera);
-
+bool		handleCameraFormats(Ieee1394Camera& camera, u_int id, int val);
+bool		handleCameraFeatures(Ieee1394Camera& camera,
+				     u_int id, int val, int=-1);
+bool		handleCameraWhiteBalance(Ieee1394Camera& camera,
+					 u_int id, int ub, int vr, int=-1);
 }
 #endif	// !__TU_IEEE1394PP_H

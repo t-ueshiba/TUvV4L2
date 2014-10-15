@@ -1,11 +1,10 @@
 /*
  *  $Id: main.cc,v 1.4 2012-08-13 07:15:07 ueshiba Exp $
  */
-#include <unistd.h>
-#include <stdlib.h>
-#include "MyCmdWindow.h"
-#include "TU/Ieee1394++.h"
+#include <cstdlib>
 #include <iomanip>
+#include "MyCmdWindow.h"
+#include "TU/v/vIeee1394++.h"
 
 /************************************************************************
 *  global functions							*
@@ -43,17 +42,9 @@ main(int argc, char* argv[])
     
     try
     {
-#if defined(UseTrigger)
-	TriggerGenerator	trigger(triggerDev);
-#endif
-	Ieee1394Camera		camera(Ieee1394Camera::Monocular,
-				       uniqId, speed, delay);
+	Ieee1394Camera	camera(Ieee1394Camera::Monocular, uniqId, speed, delay);
 
-	v::MyCmdWindow	myWin(vapp, camera
-#if defined(UseTrigger)
-			      , trigger
-#endif
-			     );
+	v::MyCmdWindow<Ieee1394Camera, u_char>	myWin(vapp, camera);
 	vapp.run();
 
 	camera.stopContinuousShot();
