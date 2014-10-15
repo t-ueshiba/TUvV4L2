@@ -3,6 +3,7 @@
  */
 #include <cstdlib>
 #include "MyCmdWindow.h"
+#include "TU/v/vV4L2++.h"
 
 /************************************************************************
 *  global functions							*
@@ -28,9 +29,8 @@ main(int argc, char* argv[])
     
     try
     {
-	V4L2Camera	camera(dev);
-	
-	v::MyCmdWindow	myWin(vapp, camera);
+	V4L2Camera				camera(dev);
+	v::MyCmdWindow<V4L2Camera, u_char>	myWin(vapp, camera);
 	vapp.run();
 
 	cout << camera;
