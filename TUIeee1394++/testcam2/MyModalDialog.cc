@@ -1,1 +1,0 @@
-../testcam/MyModalDialog.cc

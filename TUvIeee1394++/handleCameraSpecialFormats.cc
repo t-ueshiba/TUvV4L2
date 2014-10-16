@@ -1,7 +1,7 @@
 /*
  *  $Id$
  */
-#include "TU/Ieee1394++.h"
+#include "TU/v/vIeee1394++.h"
 #include "TU/v/ModalDialog.h"
 
 namespace TU
@@ -177,8 +177,8 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
 *  global functions							*
 ************************************************************************/
 bool
-handleCameraSpecialFormat(Ieee1394Camera& camera, u_int id, u_int val,
-			  Window& window)
+handleCameraSpecialFormats(Ieee1394Camera& camera,
+			   u_int id, int val, Window& window)
 {
     switch (id)
     {
@@ -203,6 +203,42 @@ handleCameraSpecialFormat(Ieee1394Camera& camera, u_int id, u_int val,
 	      .setFormat_7_PixelFormat(format7, pixelFormat)
 	      .setFormatAndFrameRate(format7,
 				     Ieee1394Camera::uintToFrameRate(val));
+      }
+	return true;
+    }
+    
+    return false;
+}
+
+bool
+handleCameraSpecialFormats(const Array<Ieee1394Camera*>& cameras,
+			   u_int id, int val, Window& window)
+{
+    switch (id)
+    {
+      case Ieee1394Camera::Format_7_0:
+      case Ieee1394Camera::Format_7_1:
+      case Ieee1394Camera::Format_7_2:
+      case Ieee1394Camera::Format_7_3:
+      case Ieee1394Camera::Format_7_4:
+      case Ieee1394Camera::Format_7_5:
+      case Ieee1394Camera::Format_7_6:
+      case Ieee1394Camera::Format_7_7:
+      {
+	Ieee1394Camera::Format	format7 = Ieee1394Camera::uintToFormat(id);
+	Ieee1394Camera::Format_7_Info
+				fmt7info
+				    = cameras[0]->getFormat_7_Info(format7);
+	v::MyModalDialog	modalDialog(window, fmt7info);
+	u_int			u0, v0, width, height;
+	Ieee1394Camera::PixelFormat
+				pixelFormat = modalDialog.getROI(u0, v0,
+								 width, height);
+	for (size_t i = 0; i < cameras.size(); ++i)
+	    cameras[i]->setFormat_7_ROI(format7, u0, v0, width, height)
+		       .setFormat_7_PixelFormat(format7, pixelFormat)
+		       .setFormatAndFrameRate(
+			   format7, Ieee1394Camera::uintToFrameRate(val));
       }
 	return true;
     }
