@@ -5,8 +5,7 @@
 #include <list>
 #include <sstream>
 #include <boost/foreach.hpp>
-#include "TU/V4L2++.h"
-#include "TU/v/TUv++.h"
+#include "TU/v/vV4L2++.h"
 
 namespace TU
 {
@@ -73,7 +72,7 @@ createFormatMenu(const V4L2Camera& camera)
     pixelFormatMenus.push_back(MenuDef());
     MenuDef&	setROIMenu = pixelFormatMenus.back();
     setROIMenu.label	= setROILabel;
-    setROIMenu.id	= M_Format;
+    setROIMenu.id	= V4L2Camera::UNKNOWN_PIXEL_FORMAT;
     setROIMenu.checked	= false;
     setROIMenu.submenu	= noSub;
     

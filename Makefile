@@ -33,10 +33,8 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/List.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/V4L2++.h \
-		/usr/local/include/TU/V4L2CameraArray.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/tuple.h \
@@ -51,10 +49,10 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 HDRS		= TU/v/vV4L2++.h
 SRCS		= createFeatureCmds.cc \
 		createFormatMenu.cc \
-		handleCameraSpecialFormat.cc
+		handleCameraSpecialFormats.cc
 OBJS		= createFeatureCmds.o \
 		createFormatMenu.o \
-		handleCameraSpecialFormat.o
+		handleCameraSpecialFormats.o
 
 include $(PROJECT)/lib/l.mk
 ###
@@ -66,27 +64,25 @@ createFeatureCmds.o: TU/v/vV4L2++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/V4L2CameraArray.h \
-	/usr/local/include/TU/V4L2++.h /usr/local/include/TU/io.h
-createFormatMenu.o: /usr/local/include/TU/V4L2++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h
-handleCameraSpecialFormat.o: /usr/local/include/TU/V4L2++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/v/ModalDialog.h \
-	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/V4L2++.h
+createFormatMenu.o: TU/v/vV4L2++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/V4L2++.h
+handleCameraSpecialFormats.o: TU/v/vV4L2++.h \
+	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/V4L2++.h \
+	/usr/local/include/TU/v/ModalDialog.h \
+	/usr/local/include/TU/v/Dialog.h

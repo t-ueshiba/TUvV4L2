@@ -98,7 +98,7 @@ createFeatureCmds(const V4L2Camera& camera)
 }
 
 CmdDef*
-createFeatureCmds(const V4L2CameraArray& cameras)
+createFeatureCmds(const Array<V4L2Camera*>& cameras)
 {
     cameraChoiceCmds  .resize(cameras.size() + 2);
     cameraChoiceTitles.resize(cameras.size() + 1);
@@ -136,7 +136,7 @@ createFeatureCmds(const V4L2CameraArray& cameras)
     cameraChoiceCmds[++i].type = C_EndOfList;
 	
     featureCmds[0].type	      = C_ChoiceFrame;
-    featureCmds[0].id	      = 0;
+    featureCmds[0].id	      = V4L2Camera::UNKNOWN_FEATURE;
     featureCmds[0].val	      = cameras.size();
     featureCmds[0].title      = 0;
     featureCmds[0].prop       = cameraChoiceCmds.data();
@@ -149,7 +149,7 @@ createFeatureCmds(const V4L2CameraArray& cameras)
 
     createFeatureCmds(*cameras[0], 1);
 }
-    
+
 void
 refreshFeatureCmds(const V4L2Camera& camera, CmdPane& cmdPane)
 {
@@ -160,5 +160,23 @@ refreshFeatureCmds(const V4L2Camera& camera, CmdPane& cmdPane)
 			     V4L2Camera::uintToFeature(featureCmd->id)));
 }
 
+bool
+handleCameraFeatures(const Array<V4L2Camera*>& cameras,
+		     u_int id, int val, CmdPane& cmdPane)
+{
+    if (id == V4L2Camera::UNKNOWN_FEATURE)
+    {
+	const size_t	n = (0 <= val && val < cameras.size() ? val : 0);
+	refreshFeatureCmds(*cameras[n], cmdPane);
+
+	return true;
+    }
+    else
+    {
+	const size_t	n = cmdPane.getValue(V4L2Camera::UNKNOWN_FEATURE);
+	return handleCameraFeatures(cameras, id, val, n);
+    }
+}
+    
 }
 }
