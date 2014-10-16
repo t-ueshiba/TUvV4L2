@@ -2,8 +2,8 @@
  *  $Id$
  */
 #include <cstdlib>
-#include "MyCmdWindow.h"
 #include "TU/v/vV4L2++.h"
+#include "MyCmdWindow.h"
 
 /************************************************************************
 *  global functions							*
@@ -26,7 +26,8 @@ main(int argc, char* argv[])
 	    dev = optarg;
 	    break;
 	}
-    
+
+  // Main job.
     try
     {
 	V4L2Camera				camera(dev);

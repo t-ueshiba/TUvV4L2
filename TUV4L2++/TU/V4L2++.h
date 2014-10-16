@@ -309,15 +309,6 @@ class V4L2Camera
     const V4L2Camera&	captureBayerRaw(void* image)		const	;
     u_int64_t		arrivaltime()				const	;
 
-  // Generic control functions.
-    V4L2Camera&		exec(V4L2Camera& (V4L2Camera::*mf)(), int=-1)	;
-    template <class ARG>
-    V4L2Camera&		exec(V4L2Camera& (V4L2Camera::*mf)(ARG),
-			     ARG arg, int=-1)				;
-    template <class ARG0, class ARG1>
-    V4L2Camera&		exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
-			     ARG0 arg0, ARG1 arg1, int=-1);
-
   // Utility functions.
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
     static Feature	uintToFeature(u_int feature)			;
@@ -556,25 +547,6 @@ V4L2Camera::arrivaltime() const
     return _arrivaltime;
 }
 
-inline V4L2Camera&
-V4L2Camera::exec(V4L2Camera& (V4L2Camera::*mf)(), int)
-{
-    return (this->*mf)();
-}
-
-template <class ARG> inline V4L2Camera&
-V4L2Camera::exec(V4L2Camera& (V4L2Camera::*mf)(ARG), ARG arg, int)
-{
-    return (this->*mf)(arg);
-}
-
-template <class ARG0, class ARG1> inline V4L2Camera&
-V4L2Camera::exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
-		 ARG0 arg0, ARG1 arg1, int)
-{
-    return (this->*mf)(arg0, arg1);
-}
-    
 template <> inline const V4L2Camera::PixelFormat&
 V4L2Camera::MemberIterator<V4L2Camera::PixelFormat,
 			   V4L2Camera::Format>::dereference() const
@@ -617,5 +589,56 @@ bool		handleCameraFormats(V4L2Camera& camera,
 				    u_int id, int val)			;
 bool		handleCameraFeatures(V4L2Camera& camera,
 				     u_int id, int val, int=-1)		;
+
+inline void
+exec(V4L2Camera& camera, V4L2Camera& (V4L2Camera::*mf)(), int=-1)
+{
+    (camera.*mf)();
+}
+
+template <class ARG> inline void
+exec(V4L2Camera& camera, V4L2Camera& (V4L2Camera::*mf)(ARG), ARG arg, int=-1)
+{
+    (camera.*mf)(arg);
+}
+
+template <class ARG0, class ARG1> inline void
+exec(V4L2Camera& camera,
+     V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1), ARG0 arg0, ARG1 arg1, int=-1)
+{
+    (camera.*mf)(arg0, arg1);
+}
+
+#ifdef HAVE_LIBTUTOOLS__
+bool	handleCameraFormats(const Array<V4L2Camera*>& cameras,
+			    u_int id, int val)				;
+bool	handleCameraFeatures(const Array<V4L2Camera*>& cameras,
+			     u_int id, int val, int n=-1)		;
+void	exec(const Array<V4L2Camera*>& cameras,
+	     V4L2Camera& (V4L2Camera::*mf)(), int n=-1)			;
+
+template <class ARG> void
+exec(const Array<V4L2Camera*>& cameras,
+     V4L2Camera& (V4L2Camera::*mf)(ARG), ARG arg, int n=-1)
+{
+    if (0 <= n && n < cameras.size())
+	(cameras[n]->*mf)(arg);
+    else
+	for (size_t i = 0; i < size(); ++i)
+	    (cameras[i]->*mf)(arg);
+}
+
+template <class ARG0, class ARG1> void
+exec(const Array<V4L2Camera*>& cameras,
+     V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1), ARG0 arg0, ARG1 arg1, int n=-1)
+{
+    if (0 <= n && n < cameras.size())
+	(cameras[n]->*mf)(arg0, arg1);
+    else
+	for (size_t i = 0; i < cameras.size(); ++i)
+	    (cameras[i]->*mf)(arg0, arg1);
+}
+#endif    
+    
 }
 #endif	// !__TU_V4L2PP_H

@@ -1,8 +1,7 @@
 /*
  *  $Id: createFormatMenu.cc,v 1.1 2009-07-28 00:00:48 ueshiba Exp $
  */
-#include "TU/Ieee1394++.h"
-#include "TU/v/TUv++.h"
+#include "TU/v/vIeee1394++.h"
 
 namespace TU
 {
@@ -17,7 +16,7 @@ struct Format
     const char*			name;
     
 };
-static Format format[] =
+static Format formats[] =
 {
     {Ieee1394Camera::YUV444_160x120,	"160x120-YUV(4:4:4)"},
     {Ieee1394Camera::YUV422_320x240,	"320x240-YUV(4:2:2)"},
@@ -51,14 +50,14 @@ static Format format[] =
     {Ieee1394Camera::Format_7_6,	"Format_7_6"},
     {Ieee1394Camera::Format_7_6,	"Format_7_7"}
 };
-static const int	NFORMATS = sizeof(format)/sizeof(format[0]);
+static const int	NFORMATS = sizeof(formats)/sizeof(formats[0]);
 
 struct FrameRate
 {
     Ieee1394Camera::FrameRate	frameRate;
     const char*			name;
 };
-static FrameRate frameRate[] =
+static FrameRate frameRates[] =
 {
     {Ieee1394Camera::FrameRate_1_875,	"1.875fps"},
     {Ieee1394Camera::FrameRate_3_75,	"3.75fps"},
@@ -68,10 +67,10 @@ static FrameRate frameRate[] =
     {Ieee1394Camera::FrameRate_60,	"60fps"},
     {Ieee1394Camera::FrameRate_x,	"custom frame rate"}
 };
-static const int	NRATES=sizeof(frameRate)/sizeof(frameRate[0]);
+static const int	NRATES = sizeof(frameRates)/sizeof(frameRates[0]);
 
-static MenuDef		formatMenu[NFORMATS + 1];
-static MenuDef		rateMenu[NFORMATS][NRATES + 1];
+static MenuDef		formatMenus[NFORMATS + 1];
+static MenuDef		rateMenus[NFORMATS][NRATES + 1];
 
 /************************************************************************
 *  global functions							*
@@ -84,37 +83,37 @@ createFormatMenu(const Ieee1394Camera& camera)
     size_t			nitems = 0;
     for (size_t i = 0; i < NFORMATS; ++i)
     {
-	u_int	inq = camera.inquireFrameRate(format[i].format);
+	u_int	inq = camera.inquireFrameRate(formats[i].format);
 	size_t	nrates = 0;
 	for (size_t j = 0; j < NRATES; ++j)
 	{
-	    if (inq & frameRate[j].frameRate)
+	    if (inq & frameRates[j].frameRate)
 	    {
 	      // Create submenu items for setting frame rate.
-		rateMenu[nitems][nrates].label	   = frameRate[j].name;
-		rateMenu[nitems][nrates].id	   = frameRate[j].frameRate;
-		rateMenu[nitems][nrates].checked
-		    = ((current_format == format[i].format) &&
-		       (current_rate == frameRate[j].frameRate));
-		rateMenu[nitems][nrates].submenu   = noSub;
+		rateMenus[nitems][nrates].label	   = frameRates[j].name;
+		rateMenus[nitems][nrates].id	   = frameRates[j].frameRate;
+		rateMenus[nitems][nrates].checked
+		    = ((current_format == formats[i].format) &&
+		       (current_rate == frameRates[j].frameRate));
+		rateMenus[nitems][nrates].submenu   = noSub;
 		++nrates;
 	    }
 	}
-	rateMenu[nitems][nrates].label = 0;
+	rateMenus[nitems][nrates].label = 0;
 	
 	if (nrates != 0)
 	{
 	  // Create menu items for setting format.
-	    formatMenu[nitems].label	 = format[i].name;
-	    formatMenu[nitems].id	 = format[i].format;
-	    formatMenu[nitems].checked	 = true;
-	    formatMenu[nitems].submenu	 = rateMenu[nitems];
+	    formatMenus[nitems].label	 = formats[i].name;
+	    formatMenus[nitems].id	 = formats[i].format;
+	    formatMenus[nitems].checked	 = true;
+	    formatMenus[nitems].submenu	 = rateMenus[nitems];
 	    ++nitems;
 	}
     }
-    formatMenu[nitems].label = 0;
+    formatMenus[nitems].label = 0;
 
-    return formatMenu;
+    return formatMenus;
 }
 
 }	// namespace v

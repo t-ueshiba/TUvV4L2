@@ -2,6 +2,7 @@ SUBDIR	= TUTools++		\
 	  TUv++			\
 	  TUOgl++		\
 	  TUIeee1394++		\
+	  TUvIeee1394++		\
 	  TUObject++		\
 	  TUBrep++		\
 	  TUCollection++	\
@@ -9,6 +10,7 @@ SUBDIR	= TUTools++		\
 	  TUXv++		\
 	  TUCuda++		\
 	  TUV4L2++		\
+	  TUvV4L2++		\
 	  TUUSB++		\
 	  TUHRP2++
 

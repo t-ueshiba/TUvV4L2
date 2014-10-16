@@ -5,7 +5,7 @@
 #define __TU_V_VIEEE1394PP_H
 
 #include "TU/v/CmdPane.h"
-#include "TU/Ieee1394CameraArray.h"
+#include "TU/Ieee1394++.h"
 
 namespace TU
 {
@@ -15,13 +15,19 @@ namespace v
 *  global functions							*
 ************************************************************************/
 MenuDef*	createFormatMenu(const Ieee1394Camera& camera)		;
-bool		handleCameraSpecialFormat(Ieee1394Camera& camera,
-					  u_int id, u_int val,
-					  Window& window)		;
+bool		handleCameraSpecialFormats(Ieee1394Camera& camera,
+					   u_int id, int val,
+					   Window& window)		;
+bool		handleCameraSpecialFormats(
+		    const Array<Ieee1394Camera*>& cameras,
+		    u_int id, int val, Window& window)			;
 CmdDef*		createFeatureCmds(const Ieee1394Camera& camera)		;
-CmdDef*		createFeatureCmds(const Ieee1394CameraArray& cameras)	;
+CmdDef*		createFeatureCmds(const Array<Ieee1394Camera*>& cameras);
 void		refreshFeatureCmds(const Ieee1394Camera& camera,
 				   CmdPane& cmdPane)			;
+bool		handleCameraFeatures(
+		    const Array<Ieee1394Camera*>& cameras,
+		    u_int id, int val, CmdPane& cmdPane)		;
 
 }	// namespace v
 }	// namespace TU

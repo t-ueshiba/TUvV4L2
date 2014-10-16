@@ -41,6 +41,7 @@ static const size_t		NFEATURES = sizeof(features)
 static CmdDef			featureCmds[3*NFEATURES + 2];
 static Array<CmdDef>		cameraChoiceCmds;
 static Array<std::string>	cameraChoiceTitles;
+static const CmdId		CAMERA_CHOICE = Ieee1394Camera::BRIGHTNESS + 2;
 
 /************************************************************************
 *  static functions							*
@@ -187,7 +188,7 @@ createFeatureCmds(const Ieee1394Camera& camera)
 }
 
 CmdDef*
-createFeatureCmds(const Ieee1394CameraArray& cameras)
+createFeatureCmds(const Array<Ieee1394Camera*>& cameras)
 {
     cameraChoiceCmds  .resize(cameras.size() + 2);
     cameraChoiceTitles.resize(cameras.size() + 1);
@@ -225,7 +226,7 @@ createFeatureCmds(const Ieee1394CameraArray& cameras)
     cameraChoiceCmds[++i].type = C_EndOfList;
 	
     featureCmds[0].type		= C_ChoiceFrame;
-    featureCmds[0].id		= 0;
+    featureCmds[0].id		= CAMERA_CHOICE;
     featureCmds[0].val		= cameras.size();
     featureCmds[0].title	= 0;
     featureCmds[0].prop		= cameraChoiceCmds.data();
@@ -265,9 +266,27 @@ refreshFeatureCmds(const Ieee1394Camera& camera, CmdPane& cmdPane)
 	    ++featureCmd;
 	    cmdPane.setValue(featureCmd->id, int(vr));
 	}
-	else
+	else if (id != Ieee1394Camera::TRIGGER_MODE)
 	    cmdPane.setValue(id, int(camera.getValue(
 					 Ieee1394Camera::uintToFeature(id))));
+    }
+}
+
+bool
+handleCameraFeatures(const Array<Ieee1394Camera*>& cameras,
+		     u_int id, int val, CmdPane& cmdPane)
+{
+    if (id == CAMERA_CHOICE)
+    {
+	const size_t	n = (0 <= val && val < cameras.size() ? val : 0);
+	refreshFeatureCmds(*cameras[n], cmdPane);
+
+	return true;
+    }
+    else
+    {
+	const size_t	n = cmdPane.getValue(CAMERA_CHOICE);
+	return handleCameraFeatures(cameras, id, val, n);
     }
 }
 

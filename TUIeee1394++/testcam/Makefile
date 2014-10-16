@@ -41,7 +41,6 @@ SUFFIX		= .cc:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Ieee1394++.h \
-		/usr/local/include/TU/Ieee1394CameraArray.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/List.h \
 		/usr/local/include/TU/Manip.h \
@@ -92,7 +91,8 @@ REV		= $(shell echo $Revision: 1.7 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: MyCmdWindow.h /usr/local/include/TU/v/App.h \
+main.o: /usr/local/include/TU/v/vIeee1394++.h \
+	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
@@ -101,15 +101,12 @@ main.o: MyCmdWindow.h /usr/local/include/TU/v/App.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
-	/usr/local/include/TU/v/FileSelection.h \
+	/usr/local/include/TU/Ieee1394++.h MyCmdWindow.h \
+	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/Timer.h \
 	/usr/local/include/TU/Movie.h /usr/local/include/TU/Manip.h testcam.h \
 	MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/v/Menu.h \
-	/usr/local/include/TU/v/ShmDC.h /usr/local/include/TU/v/XvDC.h \
-	/usr/local/include/TU/v/vIeee1394++.h \
-	/usr/local/include/TU/Ieee1394CameraArray.h \
-	/usr/local/include/TU/Ieee1394++.h
+	/usr/local/include/TU/v/ShmDC.h /usr/local/include/TU/v/XvDC.h

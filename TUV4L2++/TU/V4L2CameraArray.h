@@ -37,22 +37,11 @@ class V4L2CameraArray : public Array<V4L2Camera*>
 		    int ncameras=-1)					;
     ~V4L2CameraArray()							;
 
-    void	initialize(const char* name, const char* dirs=0,
-			   int ncameras=-1)				;
-    const std::string&
-		fullName()					const	;
-    std::string	configFile()					const	;
-    std::string	calibFile()					const	;
-    const V4L2CameraArray&
-		exec(V4L2Camera& (V4L2Camera::*mf)(), int n=-1)	const	;
-    template <class ARG>
-    const V4L2CameraArray&
-		exec(V4L2Camera& (V4L2Camera::*mf)(ARG),
-		     ARG arg, int n=-1)				const	;
-    template <class ARG0, class ARG1>
-    const V4L2CameraArray&
-		exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
-		     ARG0 arg0, ARG1 arg1, int n=-1)		const	;
+    void		initialize(const char* name, const char* dirs=0,
+				   int ncameras=-1)			;
+    const std::string&	fullName()				const	;
+    std::string		configFile()				const	;
+    std::string		calibFile()				const	;
 
   private:
     std::string		_fullName;	//!< カメラのfull path名
@@ -88,36 +77,6 @@ V4L2CameraArray::calibFile() const
     return _fullName + ".calib";
 }
     
-template <class ARG> const V4L2CameraArray&
-V4L2CameraArray::exec(V4L2Camera& (V4L2Camera::*mf)(ARG), ARG arg, int n) const
-{
-    if (0 <= n && n < size())
-	((*this)[n]->*mf)(arg);
-    else
-	for (size_t i = 0; i < size(); ++i)
-	    ((*this)[i]->*mf)(arg);
-    return *this;
-}
-
-template <class ARG0, class ARG1> const V4L2CameraArray&
-V4L2CameraArray::exec(V4L2Camera& (V4L2Camera::*mf)(ARG0, ARG1),
-		      ARG0 arg0, ARG1 arg1, int n) const
-{
-    if (0 <= n && n < size())
-	((*this)[n]->*mf)(arg0, arg1);
-    else
-	for (size_t i = 0; i < size(); ++i)
-	    ((*this)[i]->*mf)(arg0, arg1);
-    return *this;
-}
-    
-/************************************************************************
-*  global functions							*
-************************************************************************/
-bool	handleCameraFormats(const V4L2CameraArray& cameras,
-			    u_int id, int val)				;
-bool	handleCameraFeatures(const V4L2CameraArray& cameras,
-			     u_int id, int val, int n=-1)		;
 }
 #endif	// HAVE_LIBTUTOOLS__
 #endif	// ! __TU_IEEE1394CAMERAARRAY_H

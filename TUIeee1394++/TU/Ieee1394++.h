@@ -126,7 +126,7 @@
 
 //#define USE_VIDEO1394
 
-#if HAVE_CONFIG_H
+#if defined(HAVE_CONFIG_H)
 #  include <config.h>
 #endif
 #include <libraw1394/raw1394.h>
@@ -588,16 +588,6 @@ class Ieee1394Camera : public Ieee1394Node
     Ieee1394Camera&	unembedTimestamp()				;
     u_int64_t		getTimestamp()				const	;
 
-  // Generic control functions.
-    Ieee1394Camera&	exec(Ieee1394Camera& (Ieee1394Camera::*mf)(),
-			     int=-1)					;
-    template <class ARG>
-    Ieee1394Camera&	exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG),
-			     ARG arg, int=-1)				;
-    template <class ARG0, class ARG1>
-    Ieee1394Camera&	exec(Ieee1394Camera& (Ieee1394Camera::*mf)
-			     (ARG0, ARG1), ARG0 arg0, ARG1 arg1, int=-1);
-
   // Utility functions.
     static Format	uintToFormat(u_int format)			;
     static FrameRate	uintToFrameRate(u_int frameRate)		;
@@ -740,25 +730,6 @@ Ieee1394Camera::checkAvailability(Format format, FrameRate rate) const
     }
 }
 
-inline Ieee1394Camera&
-Ieee1394Camera::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(), int)
-{
-    return (this->*mf)();
-}
-
-template <class ARG> inline Ieee1394Camera&
-Ieee1394Camera::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG), ARG arg, int)
-{
-    return (this->*mf)(arg);
-}
-
-template <class ARG0, class ARG1> inline Ieee1394Camera&
-Ieee1394Camera::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
-		     ARG0 arg0, ARG1 arg1, int)
-{
-    return (this->*mf)(arg0, arg1);
-}
-    
 inline quadlet_t
 Ieee1394Camera::checkAvailability(Feature feature, u_int inq) const
 {
@@ -823,5 +794,60 @@ bool		handleCameraFeatures(Ieee1394Camera& camera,
 				     u_int id, int val, int=-1);
 bool		handleCameraWhiteBalance(Ieee1394Camera& camera,
 					 u_int id, int ub, int vr, int=-1);
+
+inline void
+exec(Ieee1394Camera& camera, Ieee1394Camera& (Ieee1394Camera::*mf)(), int=-1)
+{
+    (camera.*mf)();
+}
+
+template <class ARG> inline void
+exec(Ieee1394Camera& camera, Ieee1394Camera& (Ieee1394Camera::*mf)(ARG),
+     ARG arg, int=-1)
+{
+    (camera.*mf)(arg);
+}
+
+template <class ARG0, class ARG1> inline void
+exec(Ieee1394Camera& camera, Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
+     ARG0 arg0, ARG1 arg1, int=-1)
+{
+    (camera.*mf)(arg0, arg1);
+}
+    
+#if defined(HAVE_LIBTUTOOLS__)
+bool	handleCameraFormats(const Array<Ieee1394Camera*>& cameras,
+			    u_int id, int val);
+bool	handleCameraFeatures(const Array<Ieee1394Camera*>& cameras,
+			     u_int id, int val, int n=-1);
+bool	handleCameraWhiteBalance(const Array<Ieee1394Camera*>& cameras,
+				 u_int id, int ub, int vr, int n=-1);
+void	exec(const Array<Ieee1394Camera*>& cameras,
+	     Ieee1394Camera& (Ieee1394Camera::*mf)(), int n=-1);
+    
+template <class ARG> void
+exec(const Array<Ieee1394Camera*>& cameras,
+     Ieee1394Camera& (Ieee1394Camera::*mf)(ARG), ARG arg, int n=-1)
+{
+    if (0 <= n && n < cameras.size())
+	(cameras[n]->*mf)(arg);
+    else
+	for (size_t i = 0; i < cameras.size(); ++i)
+	    (cameras[i]->*mf)(arg);
+}
+
+template <class ARG0, class ARG1> void
+exec(const Array<Ieee1394Camera*>& cameras,
+     Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
+     ARG0 arg0, ARG1 arg1, int n=-1)
+{
+    if (0 <= n && n < cameras.size())
+	(cameras[n]->*mf)(arg0, arg1);
+    else
+	for (size_t i = 0; i < cameras.size(); ++i)
+	    (cameras[i]->*mf)(arg0, arg1);
+}
+#endif
+
 }
 #endif	// !__TU_IEEE1394PP_H

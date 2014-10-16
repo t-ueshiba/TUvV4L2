@@ -86,16 +86,5 @@ Ieee1394CameraArray::~Ieee1394CameraArray()
 	delete (*this)[i];
 }
 
-const Ieee1394CameraArray&
-Ieee1394CameraArray::exec(Ieee1394Camera& (Ieee1394Camera::*mf)(), int n) const
-{
-    if (0 <= n && n < size())
-	((*this)[n]->*mf)();
-    else
-	for (size_t i = 0; i < size(); ++i)
-	    ((*this)[i]->*mf)();
-    return *this;
-}
-
 }
 #endif	/* HAVE_LIBTUTOOLS__	*/    

@@ -1,7 +1,6 @@
 /*
  *  $Id: MyCmdWindow.h,v 1.3 2011-01-05 02:06:09 ueshiba Exp $
  */
-#include <sys/time.h>
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CmdPane.h"
@@ -13,89 +12,8 @@
 
 namespace TU
 {
-/************************************************************************
-*  static functions							*
-************************************************************************/
-static inline void
-countTime(int& nframes, timeval& start)
-{
-    if (nframes == 10)
-    {
-	timeval	end;
-	gettimeofday(&end, NULL);
-	double	interval = (end.tv_sec  - start.tv_sec) +
-	    (end.tv_usec - start.tv_usec) / 1.0e6;
-	std::cerr << nframes / interval << " frames/sec" << std::endl;
-	nframes = 0;
-    }
-    if (nframes++ == 0)
-	gettimeofday(&start, NULL);
-}
-
-static inline std::ostream&
-printTime(std::ostream& out, u_int64_t localtime)
-{
-    u_int64_t	usec = localtime % 1000;
-    u_int64_t	msec = (localtime / 1000) % 1000;
-    u_int64_t	sec  = localtime / 1000000;
-    return out << sec << '.' << msec << '.' << usec;
-}
-
 namespace v
 {
-/************************************************************************
-*  local data								*
-************************************************************************/
-static MenuDef nframesMenu[] =
-{
-    {" 10",  10, false, noSub},
-    {"100", 100, true,  noSub},
-    {"300", 300, false, noSub},
-    {"600", 600, false, noSub},
-    EndOfMenu
-};
-
-static MenuDef fileMenu[] =
-{
-    {"Save",			M_Save,		 false, noSub},
-    {"Restore camera config.",	c_RestoreConfig, false, noSub},
-    {"Save camera config.",	c_SaveConfig,	 false, noSub},
-    {"-",			M_Line,		 false, noSub},
-    {"Quit",			M_Exit,		 false, noSub},
-    EndOfMenu
-};
-
-static CmdDef menuCmds[] =
-{
-    {C_MenuButton, M_File,   0, "File",   fileMenu, CA_None, 0, 0, 1, 1, 0},
-    {C_MenuButton, M_Format, 0, "Format", noProp,   CA_None, 1, 0, 1, 1, 0},
-    {C_ChoiceMenuButton, c_NFrames, 100, "# of movie frames", nframesMenu,
-     CA_None, 2, 0, 1, 1, 0},
-    EndOfCmds
-};
-
-static CmdDef captureCmds[] =
-{
-    {C_ToggleButton,  c_ContinuousShot, 0, "Continuous shot", noProp, CA_None,
-     0, 0, 1, 1, 0},
-    {C_Button,	      c_OneShot,        0, "One shot",	      noProp, CA_None,
-     0, 1, 1, 1, 0},
-    {C_ToggleButton,  c_PlayMovie,	0, "Play",	      noProp, CA_None,
-     1, 0, 1, 1, 0},
-    {C_Button,  c_BackwardMovie, 0, "<",    noProp, CA_None, 2, 0, 1, 1, 0},
-    {C_Button,  c_ForwardMovie,  0, ">",    noProp, CA_None, 3, 0, 1, 1, 0},
-    {C_Slider,  c_StatusMovie,   0, "",     noProp, CA_None, 1, 1, 3, 1, 0},
-    EndOfCmds
-};
-
-template <class CAMERA> static CmdDef*
-createMenuCmds(const CAMERA& camera)
-{
-    menuCmds[1].prop = createFormatMenu(camera);
-    
-    return menuCmds;
-}
-
 /************************************************************************
 *  class MyCmdWindow<CAMERA, PIXEL>					*
 ************************************************************************/
@@ -122,7 +40,6 @@ class MyCmdWindow : public CmdWindow
     CmdPane		_captureCmd;
     CmdPane		_featureCmd;
     Timer		_timer;
-    int			_movieProp[3];
 };
  
 template <class CAMERA, class PIXEL>
@@ -132,7 +49,7 @@ MyCmdWindow<CAMERA, PIXEL>::MyCmdWindow(App& parentApp, CAMERA& camera)
      _movie(1),
      _canvas(*this, _camera.width(), _camera.height(), _movie.image(0)),
      _menuCmd(*this, createMenuCmds(_camera)),
-     _captureCmd(*this, captureCmds),
+     _captureCmd(*this, createCaptureCmds()),
      _featureCmd(*this, createFeatureCmds(_camera)),
      _timer(*this, 0)
 {
@@ -159,7 +76,7 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	    initializeMovie();
 	    return;
 	}
-	else if (handleCameraSpecialFormat(_camera, id, val, *this))
+	else if (handleCameraSpecialFormats(_camera, id, val, *this))
 	{
 	    initializeMovie();
 	    return;
@@ -274,10 +191,8 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 
     _canvas.resize();
 
-    _movieProp[0] = 0;
-    _movieProp[1] = _movie.nframes() - 1;
-    _movieProp[2] = 1;
-    _captureCmd.setProp(c_StatusMovie, _movieProp);
+    int	props[] = {0, _movie.nframes() - 1, 1};
+    _captureCmd.setProp(c_StatusMovie, props);
     
     repaintCanvas();
 }
