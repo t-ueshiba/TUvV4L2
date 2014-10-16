@@ -80,5 +80,18 @@ V4L2CameraArray::~V4L2CameraArray()
 	delete (*this)[i];
 }
 
+/************************************************************************
+*  global functions							*
+************************************************************************/
+std::ostream&
+operator <<(std::ostream& out, const V4L2CameraArray& cameras)
+{
+    out << cameras.size() << std::endl;
+    for (size_t i = 0; i < cameras.size(); ++i)
+	out << cameras[i]->dev() << ' ' << *cameras[i];
+
+    return out;
+}
+
 }
 #endif	/* HAVE_LIBTUTOOLS__	*/    
