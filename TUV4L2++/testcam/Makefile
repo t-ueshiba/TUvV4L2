@@ -19,7 +19,7 @@ endif
 
 #CXX		= g++
 CPPFLAGS	= -DHAVE_LIBTUTOOLS__ #-DMONO_IMAGE #-D_DEBUG
-CFLAGS		= -g -std=c++0x
+CFLAGS		= -g
 NVCCFLAGS	= -g
 ifeq ($(CXX), icpc)
   CFLAGS	= -O3
@@ -52,10 +52,8 @@ EXTHDRS		= /home/ueshiba/src/TUIeee1394++/testcam/MyCanvasPane.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Movie.h \
 		/usr/local/include/TU/V4L2++.h \
-		/usr/local/include/TU/V4L2CameraArray.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/tuple.h \
@@ -97,17 +95,18 @@ REV		= $(shell echo $Revision: 1.2 $	|		\
 include $(PROJECT)/lib/p.mk
 
 ###
-main.o: /home/ueshiba/src/TUIeee1394++/testcam/MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
+main.o: /usr/local/include/TU/v/vV4L2++.h \
+	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
-	/usr/local/include/TU/v/FileSelection.h \
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/V4L2++.h \
+	/home/ueshiba/src/TUIeee1394++/testcam/MyCmdWindow.h \
+	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/Timer.h \
 	/usr/local/include/TU/Movie.h /usr/local/include/TU/Manip.h \
@@ -116,7 +115,4 @@ main.o: /home/ueshiba/src/TUIeee1394++/testcam/MyCmdWindow.h \
 	/usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/v/Menu.h \
-	/usr/local/include/TU/v/ShmDC.h /usr/local/include/TU/v/XvDC.h \
-	/usr/local/include/TU/v/vV4L2++.h \
-	/usr/local/include/TU/V4L2CameraArray.h \
-	/usr/local/include/TU/V4L2++.h /usr/local/include/TU/io.h
+	/usr/local/include/TU/v/ShmDC.h /usr/local/include/TU/v/XvDC.h
