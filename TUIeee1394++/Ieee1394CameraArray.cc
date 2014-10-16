@@ -3,6 +3,7 @@
  */
 #ifdef HAVE_LIBTUTOOLS__
 #include <cstdlib>
+#include <iomanip>
 #include "TU/Ieee1394CameraArray.h"
 #include "TU/io.h"
 
@@ -84,6 +85,23 @@ Ieee1394CameraArray::~Ieee1394CameraArray()
 {
     for (size_t i = 0; i < size(); ++i)
 	delete (*this)[i];
+}
+
+/************************************************************************
+*  global functions							*
+************************************************************************/
+std::ostream&
+operator <<(std::ostream& out, const Ieee1394CameraArray& cameras)
+{
+    using namespace	std;
+    
+    out << cameras[0]->delay() << ' ' << cameras.size() << endl;
+    for (size_t i = 0; i < cameras.size(); ++i)
+	out << "0x" << setw(16) << setfill('0')
+	    << hex << cameras[i]->globalUniqueId() << ' '
+	    << dec << *cameras[i];
+
+    return out;
 }
 
 }

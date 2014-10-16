@@ -81,6 +81,12 @@ Ieee1394CameraArray::calibFile() const
     return _fullName + ".calib";
 }
 
+/************************************************************************
+*  global functions							*
+************************************************************************/
+std::ostream&
+operator <<(std::ostream& out, const Ieee1394CameraArray& cameras)	;
+
 }
 #endif	// HAVE_LIBTUTOOLS__
 #endif	// ! __TU_IEEE1394CAMERAARRAY_H
