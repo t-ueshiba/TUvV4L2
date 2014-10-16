@@ -624,7 +624,7 @@ exec(const Array<V4L2Camera*>& cameras,
     if (0 <= n && n < cameras.size())
 	(cameras[n]->*mf)(arg);
     else
-	for (size_t i = 0; i < size(); ++i)
+	for (size_t i = 0; i < cameras.size(); ++i)
 	    (cameras[i]->*mf)(arg);
 }
 

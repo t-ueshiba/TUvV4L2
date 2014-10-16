@@ -63,13 +63,19 @@ handleCameraFeaturesV4L2(CAMERAS& cameras, u_int id, int val, int n)
       case V4L2Camera::BRIGHTNESS_AUTO:
       case V4L2Camera::CONTRAST:
       case V4L2Camera::GAIN:
+      case V4L2Camera::GAIN_AUTO:
       case V4L2Camera::SATURATION:
       case V4L2Camera::HUE:
       case V4L2Camera::HUE_AUTO:
       case V4L2Camera::GAMMA:
       case V4L2Camera::SHARPNESS:
+      case V4L2Camera::BLACK_LEVEL:
       case V4L2Camera::WHITE_BALANCE_TEMPERATURE:
       case V4L2Camera::WHITE_BALANCE_AUTO:
+      case V4L2Camera::RED_BALANCE:
+      case V4L2Camera::BLUE_BALANCE:
+      case V4L2Camera::HFLIP:
+      case V4L2Camera::VFLIP:
       case V4L2Camera::BACKLIGHT_COMPENSATION:
       case V4L2Camera::POWER_LINE_FREQUENCY:
       case V4L2Camera::EXPOSURE_AUTO:
