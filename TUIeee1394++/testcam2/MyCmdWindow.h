@@ -1,7 +1,6 @@
 /*
  *  $Id: MyCmdWindow.h,v 1.3 2011-01-05 02:04:50 ueshiba Exp $
  */
-#include <sys/time.h>
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CmdPane.h"
@@ -41,7 +40,6 @@ class MyCmdWindow : public CmdWindow
     CmdPane			_captureCmd;
     CmdPane			_featureCmd;
     Timer			_timer;
-    int				_movieProp[3];
 };
 
 template <class CAMERA, class PIXEL>
@@ -209,10 +207,8 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 	    _canvases[i]->resize();
     }
 
-    _movieProp[0] = 0;
-    _movieProp[1] = _movie.nframes() - 1;
-    _movieProp[2] = 1;
-    _captureCmd.setProp(c_StatusMovie, _movieProp);
+    int	props[] = {0, _movie.nframes() - 1, 1};
+    _captureCmd.setProp(c_StatusMovie, props);
     
     repaintCanvases();
 }
