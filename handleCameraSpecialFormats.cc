@@ -1,7 +1,7 @@
 /*
  *  $Id$
  */
-#include "TU/V4L2++.h"
+#include "TU/v/vV4L2++.h"
 #include "TU/v/ModalDialog.h"
 
 namespace TU
@@ -101,10 +101,10 @@ MyModalDialog::createROICmds(const V4L2Camera& camera)
 *  global functions							*
 ************************************************************************/
 bool
-handleCameraSpecialFormat(V4L2Camera& camera, u_int id, u_int val,
-			  Window& window)
+handleCameraSpecialFormats(V4L2Camera& camera,
+			   u_int id, int val, Window& window)
 {
-    if (id == M_Format)
+    if (id == V4L2Camera::UNKNOWN_PIXEL_FORMAT)
     {
 	size_t	u0, v0, width, height;
 	if (camera.getROI(u0, v0, width, height))
@@ -112,6 +112,28 @@ handleCameraSpecialFormat(V4L2Camera& camera, u_int id, u_int val,
 	    MyModalDialog	modalDialog(window, camera);
 	    modalDialog.getROI(u0, v0, width, height);
 	    camera.setROI(u0, v0, width, height);
+	}
+
+	return true;
+    }
+
+    return false;
+}
+
+bool
+handleCameraSpecialFormats(const Array<V4L2Camera*>& cameras,
+			   u_int id, int val, Window& window)
+{
+    if (id == V4L2Camera::UNKNOWN_PIXEL_FORMAT)
+    {
+	size_t	u0, v0, width, height;
+	if (cameras[0]->getROI(u0, v0, width, height))
+	{
+	    MyModalDialog	modalDialog(window, *cameras[0]);
+	    modalDialog.getROI(u0, v0, width, height);
+
+	    for (size_t i = 0; i < cameras.size(); ++i)
+		cameras[i]->setROI(u0, v0, width, height);
 	}
 
 	return true;
