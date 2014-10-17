@@ -1,1 +1,0 @@
-../testcam/MyCanvasPane.cc

@@ -15,14 +15,13 @@ main(int argc, char* argv[])
     using namespace	TU;
     
     v::App			vapp(argc, argv);
-    const char*			triggerDev = "/dev/ttyS0";
     Ieee1394Camera::Type	type = Ieee1394Camera::Binocular;
     Ieee1394Node::Speed		speed = Ieee1394Node::SPD_400M;
     u_int			delay = 1;
 
   // Parse command line.
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "bd:t:123")) != -1; )
+    for (int c; (c = getopt(argc, argv, "bd:123")) != -1; )
 	switch (c)
 	{
 	  case 'b':
@@ -30,9 +29,6 @@ main(int argc, char* argv[])
 	    break;
 	  case 'd':
 	    delay = atoi(optarg);
-	    break;
-	  case 't':
-	    triggerDev = optarg;
 	    break;
 	  case '1':
 	    type = Ieee1394Camera::Monocular;
@@ -48,23 +44,15 @@ main(int argc, char* argv[])
     
     try
     {
-#if defined(UseTrigger)
-	TriggerGenerator	trigger(triggerDev);
-#endif
 	Ieee1394Camera		camera(type, uniqId, speed, delay);
 
 	cerr << "0x" << hex << setw(16) << setfill('0')
 	     << camera.globalUniqueId() << dec << endl;
 	
-	v::MyCmdWindow	myWin(vapp, camera, type
-#if defined(UseTrigger)
-			      , trigger
-#endif
-			     );
+	v::MyCmdWindow<u_char>	myWin(vapp, camera, type);
 	vapp.run();
 
 	camera.stopContinuousShot();
-
     }
     catch (exception& err)
     {
