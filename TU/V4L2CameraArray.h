@@ -42,7 +42,13 @@ class V4L2CameraArray : public Array<V4L2Camera*>
     const std::string&	fullName()				const	;
     std::string		configFile()				const	;
     std::string		calibFile()				const	;
-
+    friend std::istream&
+			operator >>(std::istream& in,
+				    V4L2CameraArray& cameras)		;
+    
+  private:
+    std::istream&	restore(std::istream& in, int ncameras)		;
+    
   private:
     std::string		_fullName;	//!< カメラのfull path名
 };
