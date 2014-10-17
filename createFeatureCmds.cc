@@ -160,10 +160,26 @@ refreshFeatureCmds(const V4L2Camera& camera, CmdPane& cmdPane)
 			     V4L2Camera::uintToFeature(featureCmd->id)));
 }
 
+void
+refreshFeatureCmds(const Array<V4L2Camera*>& cameras, CmdPane& cmdPane)
+{
+    if (cameras.size() == 0)
+	return;
+
+    int	n = cmdPane.getValue(V4L2Camera::UNKNOWN_FEATURE);
+    if (n < 0 || n >= cameras.size())
+	n = 0;
+    
+    refreshFeatureCmds(*cameras[n], cmdPane);
+}
+
 bool
 handleCameraFeatures(const Array<V4L2Camera*>& cameras,
 		     u_int id, int val, CmdPane& cmdPane)
 {
+    if (cameras.size() == 0)
+	return false;
+
     if (id == V4L2Camera::UNKNOWN_FEATURE)
     {
 	const size_t	n = (0 <= val && val < cameras.size() ? val : 0);
