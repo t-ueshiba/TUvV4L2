@@ -272,10 +272,26 @@ refreshFeatureCmds(const Ieee1394Camera& camera, CmdPane& cmdPane)
     }
 }
 
+void
+refreshFeatureCmds(const Array<Ieee1394Camera*>& cameras, CmdPane& cmdPane)
+{
+    if (cameras.size() == 0)
+	return;
+
+    int	n = cmdPane.getValue(CAMERA_CHOICE);
+    if (n < 0 || n >= cameras.size())
+	n = 0;
+    
+    refreshFeatureCmds(*cameras[n], cmdPane);
+}
+
 bool
 handleCameraFeatures(const Array<Ieee1394Camera*>& cameras,
 		     u_int id, int val, CmdPane& cmdPane)
 {
+    if (cameras.size() == 0)
+	return false;
+
     if (id == CAMERA_CHOICE)
     {
 	const size_t	n = (0 <= val && val < cameras.size() ? val : 0);

@@ -44,11 +44,7 @@ void
 V4L2CameraArray::initialize(const char* name, const char* dirs, int ncameras)
 {
     using namespace	std;
-
-  // 現在設定されている全カメラを廃棄する.
-    for (size_t i = 0; i < size(); ++i)
-	delete (*this)[i];
-
+    
   // 設定ファイルのfull path名を生成し, ファイルをオープンする.
     ifstream	in;
     _fullName = openFile(in,
@@ -61,16 +57,9 @@ V4L2CameraArray::initialize(const char* name, const char* dirs, int ncameras)
     in >> n;
     if ((ncameras < 0) || (ncameras > n))
 	ncameras = n;
-    resize(ncameras);
     
   // 設定ファイルに記された全カメラを生成する.
-    for (size_t i = 0; i < size(); ++i)
-    {
-	string	dev;
-	in >> dev;			// device file名の読み込み
-	(*this)[i] = new V4L2Camera(dev.c_str());
-	in >> *(*this)[i];		// カメラパラメータの読み込みと設定
-    }
+    restore(in, ncameras);
 }
 
 //! IEEE1394デジタルカメラの配列を破壊する.
@@ -80,9 +69,40 @@ V4L2CameraArray::~V4L2CameraArray()
 	delete (*this)[i];
 }
 
+std::istream&
+V4L2CameraArray::restore(std::istream& in, int ncameras)
+{
+  // 現在設定されている全カメラを廃棄する.
+    for (size_t i = 0; i < size(); ++i)
+	delete (*this)[i];
+
+  // カメラ数を設定する．
+    resize(ncameras);
+    
+  // 設定ファイルに記された全カメラを生成する.
+    for (size_t i = 0; i < size(); ++i)
+    {
+	std::string	dev;
+	in >> dev;			// device file名の読み込み
+	(*this)[i] = new V4L2Camera(dev.c_str());
+	in >> *(*this)[i];		// カメラパラメータの読み込みと設定
+    }
+
+    return in;
+}
+    
 /************************************************************************
 *  global functions							*
 ************************************************************************/
+std::istream&
+operator >>(std::istream& in, V4L2CameraArray& cameras)
+{
+    int	n;
+    in >> n;		// カメラ数を読み込む.
+
+    return cameras.restore(in, n);
+}
+
 std::ostream&
 operator <<(std::ostream& out, const V4L2CameraArray& cameras)
 {

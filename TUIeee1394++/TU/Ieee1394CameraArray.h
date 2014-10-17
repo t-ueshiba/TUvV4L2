@@ -46,6 +46,13 @@ class Ieee1394CameraArray : public Array<Ieee1394Camera*>
     const std::string&	fullName()				const	;
     std::string		configFile()				const	;
     std::string		calibFile()				const	;
+    friend std::istream&
+			operator >>(std::istream& in,
+				    Ieee1394CameraArray& cameras)	;
+    
+  private:
+    std::istream&	restore(std::istream& in, int ncameras,
+				Ieee1394Node::Speed speed, int delay)	;
     
   private:
     std::string		_fullName;	//!< カメラのfull path名

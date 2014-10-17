@@ -24,6 +24,8 @@ CmdDef*		createFeatureCmds(const V4L2Camera& camera)		;
 CmdDef*		createFeatureCmds(const Array<V4L2Camera*>& cameras)	;
 void		refreshFeatureCmds(const V4L2Camera& camera,
 				   CmdPane& cmdPane)			;
+void		refreshFeatureCmds(const Array<V4L2Camera*>& cameras,
+				   CmdPane& cmdPane)			;
 bool		handleCameraFeatures(
 		    const Array<V4L2Camera*>& cameras,
 		    u_int id, int val, CmdPane& cmdPane)		;

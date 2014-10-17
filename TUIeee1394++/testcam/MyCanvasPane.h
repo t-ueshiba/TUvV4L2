@@ -3,9 +3,9 @@
  */
 #include "TU/v/CanvasPane.h"
 #include "TU/v/CanvasPaneDC.h"
-#if defined(UseShmDC)
+#if defined(USE_SHMDC)
 #  include "TU/v/ShmDC.h"
-#elif defined(UseXvDC)
+#elif defined(USE_XVDC)
 #  include "TU/v/XvDC.h"
 #endif
 
@@ -24,14 +24,18 @@ class MyCanvasPane : public CanvasPane
 		 const Image<PIXEL>& image)
 	:CanvasPane(parentWin, width, height),
 	 _dc(*this, image.width(), image.height()), _image(image)	{}
+    MyCanvasPane(Window& parentWin, const Image<PIXEL>& image,
+		 u_int w, u_int h, u_int mul, u_int div)
+	:CanvasPane(parentWin, (w * mul)/div, (h * mul)/div),
+	 _dc(*this, w, h, mul, div), _image(image)			{}
     
     void		resize()					;
     virtual void	repaintUnderlay()				;
     
   private:
-#if defined(UseShmDC)
+#if defined(USE_SHMDC)
     ShmDC		_dc;
-#elif defined(UseXvDC)
+#elif defined(USE_XVDC)
     XvDC		_dc;
 #else
     CanvasPaneDC	_dc;

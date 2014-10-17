@@ -48,17 +48,11 @@ void
 Ieee1394CameraArray::initialize(const char* name, const char* dirs,
 				Ieee1394Node::Speed speed, int ncameras)
 {
-    using namespace	std;
-
-  // 現在設定されている全カメラを廃棄する.
-    for (size_t i = 0; i < size(); ++i)
-	delete (*this)[i];
-
   // 設定ファイルのfull path名を生成し, ファイルをオープンする.
-    ifstream	in;
+    std::ifstream	in;
     _fullName = openFile(in,
-			 string(name != 0 ? name : DEFAULT_CAMERA_NAME),
-			 string(dirs != 0 ? dirs : DEFAULT_CONFIG_DIRS),
+			 std::string(name != 0 ? name : DEFAULT_CAMERA_NAME),
+			 std::string(dirs != 0 ? dirs : DEFAULT_CONFIG_DIRS),
 			 ".conf");
     
   // 設定ファイルから遅延パラメータとカメラ数を読み込む.
@@ -66,18 +60,8 @@ Ieee1394CameraArray::initialize(const char* name, const char* dirs,
     in >> delay >> n;
     if ((ncameras < 0) || (ncameras > n))
 	ncameras = n;
-    resize(ncameras);
-    
-  // 設定ファイルに記された全カメラを生成する.
-    for (size_t i = 0; i < size(); ++i)
-    {
-	string		s;
-	in >> s;			// global unique IDの読み込み
-	u_int64_t	uniqId = strtoull(s.c_str(), 0, 0);
-	(*this)[i] = new Ieee1394Camera(Ieee1394Camera::Monocular,
-					uniqId, speed, delay);
-	in >> *(*this)[i];		// カメラパラメータの読み込みと設定
-    }
+
+    restore(in, ncameras, speed, delay);
 }
 
 //! IEEE1394デジタルカメラの配列を破壊する.
@@ -87,9 +71,43 @@ Ieee1394CameraArray::~Ieee1394CameraArray()
 	delete (*this)[i];
 }
 
+std::istream&
+Ieee1394CameraArray::restore(std::istream& in, int ncameras,
+			     Ieee1394Node::Speed speed, int delay)
+{
+  // 現在設定されている全カメラを廃棄する.
+    for (size_t i = 0; i < size(); ++i)
+	delete (*this)[i];
+
+  // カメラ数を設定する．
+    resize(ncameras);
+    
+  // 設定ファイルに記された全カメラを生成する.
+    for (size_t i = 0; i < size(); ++i)
+    {
+	std::string	s;
+	in >> s;			// global unique IDの読み込み
+	u_int64_t	uniqId = strtoull(s.c_str(), 0, 0);
+	(*this)[i] = new Ieee1394Camera(Ieee1394Camera::Monocular,
+					uniqId, speed, delay);
+	in >> *(*this)[i];		// カメラパラメータの読み込みと設定
+    }
+
+    return in;
+}
+    
 /************************************************************************
 *  global functions							*
 ************************************************************************/
+std::istream&
+operator >>(std::istream& in, Ieee1394CameraArray& cameras)
+{
+    int	delay, n;
+    in >> delay >> n;		// 遅延パラメータとカメラ数を読み込む.
+
+    return cameras.restore(in, n, Ieee1394Node::SPD_400M, delay);
+}
+
 std::ostream&
 operator <<(std::ostream& out, const Ieee1394CameraArray& cameras)
 {
