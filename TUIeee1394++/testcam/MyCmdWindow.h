@@ -101,7 +101,7 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 		_movie.image(0).save(out);
 	  }
 	    break;
-	
+
 	  case c_ContinuousShot:
 	    if (val)
 	    {

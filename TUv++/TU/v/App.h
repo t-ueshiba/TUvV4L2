@@ -50,6 +50,7 @@ class App : public Window
     virtual Colormap&		colormap()				;
     virtual void		callback(CmdId id, CmdVal val)		;
 
+	    void	step()						;
 	    void	run()						;
     virtual void	exit()						;
 

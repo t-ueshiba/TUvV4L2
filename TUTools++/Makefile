@@ -4,29 +4,41 @@
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/lib
-INCDIR		= $(PREFIX)/include
+#PROGRAM		= $(shell basename $(PWD))
+LIBRARY		= lib$(shell basename $(PWD))
+
+VPATH		=
+
+IDLS		=
+MOCHDRS		=
+
 INCDIRS		= -I. -I$(PREFIX)/include
-
-NAME		= $(shell basename $(PWD))
-
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		=
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= windows/fakeWindows.h
 HDRS		= TU/Array++.h \
 		TU/BandMatrix++.h \
@@ -135,7 +147,11 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		io.o \
 		manipulators.o
 
-include $(PROJECT)/lib/l.mk
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \

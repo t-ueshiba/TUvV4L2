@@ -1,32 +1,42 @@
 #
-#  $Id: Makefile,v 1.7 2012-09-15 07:21:10 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/lib
-INCDIR		= $(PREFIX)/include
+#PROGRAM		= $(shell basename $(PWD))
+LIBRARY		= lib$(shell basename $(PWD))
+
+IDLDIR		= .
+IDLS		=
+
 INCDIRS		= -I. -I$(PREFIX)/include
-
-NAME		= $(shell basename $(PWD))
-
 CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
+ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		=
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+.SUFFIXES:	.cu .idl .hh .so
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -47,7 +57,10 @@ OBJS		= V4L2Camera.o \
 		V4L2CameraArray.o \
 		V4L2CameraUtility.o
 
-include $(PROJECT)/lib/l.mk
+#include $(PROJECT)/lib/rtc.mk		# modified: CPPFLAGS, LIBS
+#include $(PROJECT)/lib/cnoid.mk	# modified: CPPFLAGS, LIBS, LIBDIR
+include $(PROJECT)/lib/lib.mk		# added:    PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \

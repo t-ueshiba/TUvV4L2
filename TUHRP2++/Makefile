@@ -4,30 +4,42 @@
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/lib
-INCDIR		= $(PREFIX)/include
+#PROGRAM		= $(shell basename $(PWD))
+LIBRARY		= lib$(shell basename $(PWD))
+
+VPATH		=
+
+IDLS		= ForwardKinematicsService.idl ReachingService.idl \
+		  SequencePlayerService.idl WalkGeneratorService.idl
+MOCHDRS		=
+
 INCDIRS		= -I. -I$(PREFIX)/include
-
-NAME		= $(shell basename $(PWD))
-#NAME		= TUHRP2SH++
-
-#CXX		= g++
-CPPFLAGS	= -DNDEBUG -DHRP2YH
-CFLAGS		= -O2 `rtm-config --cflags` 
+CPPFLAGS	= -DNDEBUG
+CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+ifneq ($(findstring icpc,$(CXX)),)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		=
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/include/math.h \
 		/usr/local/include/ForwardKinematicsService.hh \
 		/usr/local/include/ReachingService.h \
@@ -49,7 +61,11 @@ HDRS		= TU/HRP2++.h \
 SRCS		= HRP2.cc
 OBJS		= HRP2.o
 
-include $(PROJECT)/lib/l.mk
+include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 HRP2.o: TU/HRP2++.h /usr/local/include/ReachingService.h \
 	/usr/local/include/SequencePlayerService.h \

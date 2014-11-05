@@ -11,10 +11,6 @@ namespace v
 {
 enum
 {
-  // File menu
-    c_RestoreConfig,
-    c_SaveConfig,
-
   // # of movie frames.
     c_NFrames,
 
@@ -69,8 +65,6 @@ createMenuCmds(const CAMERA& camera)
     static MenuDef fileMenu[] =
     {
 	{"Save",			M_Save,		 false, noSub},
-	{"Restore camera config.",	c_RestoreConfig, false, noSub},
-	{"Save camera config.",		c_SaveConfig,	 false, noSub},
 	{"-",				M_Line,		 false, noSub},
 	{"Quit",			M_Exit,		 false, noSub},
 	EndOfMenu

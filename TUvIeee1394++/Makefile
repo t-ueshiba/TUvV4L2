@@ -4,29 +4,39 @@
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/lib
-INCDIR		= $(PREFIX)/include
+#PROGRAM		= $(shell basename $(PWD))
+LIBRARY		= lib$(shell basename $(PWD))
+
+IDLDIR		= .
+IDLS		=
+
 INCDIRS		= -I. -I$(PREFIX)/include
-
-NAME		= $(shell basename $(PWD))
-
-CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__
+CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ # -DUSE_VIDEO1394
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		=
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+.SUFFIXES:	.cu .idl .hh .so
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Ieee1394++.h \
@@ -54,7 +64,10 @@ OBJS		= createFeatureCmds.o \
 		createFormatMenu.o \
 		handleCameraSpecialFormats.o
 
-include $(PROJECT)/lib/l.mk
+#include $(PROJECT)/lib/rtc.mk		# modified: CPPFLAGS, LIBS
+#include $(PROJECT)/lib/cnoid.mk	# modified: CPPFLAGS, LIBS, LIBDIR
+include $(PROJECT)/lib/lib.mk		# added:    PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 createFeatureCmds.o: TU/v/vIeee1394++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \

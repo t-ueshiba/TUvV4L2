@@ -204,16 +204,20 @@ App::callback(CmdId, CmdVal)
 }
 
 void
+App::step()
+{
+    XEvent	event;
+	
+    XtAppNextEvent(_appContext, &event);
+    XtDispatchEvent(&event);
+}
+
+void
 App::run()
 {
     _active = true;
     while (_active)
-    {
-	XEvent	event;
-	
-	XtAppNextEvent(_appContext, &event);
-	XtDispatchEvent(&event);
-    }
+	step();
 }
 
 void

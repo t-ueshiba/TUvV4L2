@@ -4,38 +4,41 @@
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
-
 PROGRAM		= HRP2test
-LIBS		= -lTUHRP2++ -lTUTools++ -lHRP2Corba `rtm-config --libs`
+#LIBRARY		= lib$(shell basename $(PWD))
 
-ifeq ($(OSTYPE), darwin)
-  LIBS	       +=
-endif
+VPATH		=
 
-#CXX		= g++
-CPPFLAGS	=
-CFLAGS		= -g `rtm-config --cflags`
+IDLS		=
+MOCHDRS		=
+
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG
+CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-  ifeq ($(OSTYPE), darwin)
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  else
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  endif
+ifneq ($(findstring icpc,$(CXX)),)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O			# must < -O2
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		= -lTUHRP2++ -lTUTools++
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/include/math.h \
 		/usr/local/include/ForwardKinematicsService.hh \
 		/usr/local/include/ReachingService.h \
@@ -44,31 +47,22 @@ EXTHDRS		= /usr/include/math.h \
 		/usr/local/include/TU/HRP2++.h \
 		/usr/local/include/TU/Manip.h \
 		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h \
 		/usr/local/include/WalkGeneratorService.h \
-		/usr/local/include/bodyinfo_HRP2DOF7.h \
-		/usr/local/include/bodyinfo_HRP2YH.h \
-		/usr/local/include/bodyinfo_HRP2toHRP3.h \
-		/usr/local/include/bodyinfo_HRP3.h \
 		/usr/local/include/misc.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
 
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision$	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
-
-include $(PROJECT)/lib/p.mk
-
+include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 main.o: /usr/local/include/TU/Manip.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/HRP2++.h /usr/local/include/ReachingService.h \
@@ -76,7 +70,6 @@ main.o: /usr/local/include/TU/Manip.h /usr/local/include/TU/types.h \
 	/usr/local/include/ForwardKinematicsService.hh \
 	/usr/local/include/WalkGeneratorService.h /usr/local/include/misc.h \
 	/usr/include/math.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/bodyinfo_HRP3.h \
-	/usr/local/include/bodyinfo_HRP2toHRP3.h \
-	/usr/local/include/bodyinfo_HRP2YH.h \
-	/usr/local/include/bodyinfo_HRP2DOF7.h
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h
