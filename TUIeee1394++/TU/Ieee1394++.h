@@ -105,6 +105,7 @@
     - #TU::Ieee1394Camera::getAimedTemperature()
 
   - <b>トリガモード</b>
+    - #TU::Ieee1394Camera::inquireTriggerMode()
     - #TU::Ieee1394Camera::setTriggerMode()
     - #TU::Ieee1394Camera::getTriggerMode()
     - #TU::Ieee1394Camera::setTriggerPolarity()
@@ -439,15 +440,18 @@ class Ieee1394Camera : public Ieee1394Node
     };
     
   //! カメラの外部トリガーモード
+  /*! どのトリガーモードがサポートされているかは, inquireTriggerMode() に
+      よって知ることができる. */
     enum TriggerMode
     {
-	Trigger_Mode0	=  0,	//!< トリガonから #SHUTTER で指定した時間だけ蓄積
-	Trigger_Mode1	=  1,	//!< トリガonからトリガoffになるまで蓄積
-	Trigger_Mode2	=  2,
-	Trigger_Mode3	=  3,
-	Trigger_Mode4	=  4,
-	Trigger_Mode5	=  5,
-	Trigger_Mode14	= 14
+	Trigger_Mode0	= (0x1u << 15),  //!< トリガonから #SHUTTER で指定した時間だけ蓄積
+	Trigger_Mode1	= (0x1u << 14),  //!< トリガonからトリガoffになるまで蓄積
+	Trigger_Mode2	= (0x1u << 13),
+	Trigger_Mode3	= (0x1u << 12),
+	Trigger_Mode4	= (0x1u << 11),
+	Trigger_Mode5	= (0x1u << 10),
+	Trigger_Mode14	= (0x1u << 1),
+	Trigger_Mode15	= 0x1u
     };
 
   //! カメラの外部トリガー信号の極性

@@ -285,6 +285,22 @@ bayerGBRGEven3x3(const S* buf, T* rgb, int w)
     return buf + 1;
 }
 
+static quadlet_t
+triggerModeValue(Ieee1394Camera::TriggerMode mode)
+{
+    quadlet_t	val = 0;
+    for (u_int n = mode; n >>= 1; )
+	++val;
+
+    return 15 - val;
+}
+
+static inline u_int
+triggerModeInq(quadlet_t val)
+{
+    return 0x1u << (15 - val);
+}
+
 /************************************************************************
 *  local constants							*
 ************************************************************************/
@@ -1189,10 +1205,10 @@ Ieee1394Camera::getAimedTemperature() const
 Ieee1394Camera&
 Ieee1394Camera::setTriggerMode(TriggerMode mode)
 {
-    checkAvailability(TRIGGER_MODE, (0x1u << (15 - mode)));
+    checkAvailability(TRIGGER_MODE, mode);
     writeQuadletToRegister(TRIGGER_MODE,
 			   (readQuadletFromRegister(TRIGGER_MODE) & ~0xf0000) |
-			   ((mode & 0xf) << 16));
+			   triggerModeValue(mode) << 16);
     return *this;
 }
 
@@ -1204,8 +1220,9 @@ Ieee1394Camera::TriggerMode
 Ieee1394Camera::getTriggerMode() const
 {
     checkAvailability(TRIGGER_MODE, ReadOut);
-    return uintToTriggerMode((readQuadletFromRegister(TRIGGER_MODE) >> 16)
-			     & 0xf);
+    return uintToTriggerMode(
+	       triggerModeInq(
+		   (readQuadletFromRegister(TRIGGER_MODE) >> 16) & 0xf));
 }
 
 //! トリガ信号の極性を設定する
