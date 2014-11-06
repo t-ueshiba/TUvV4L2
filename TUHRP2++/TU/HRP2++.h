@@ -16,11 +16,10 @@
 #include <rtm/RTObject.h>
 #include <rtm/CorbaConsumer.h>
 #include <rtm/idl/BasicDataType.hh>
-#include "ReachingService.h"
-#include "SequencePlayerService.h"
+#include "ReachingService.hh"
+#include "SequencePlayerService.hh"
 #include "ForwardKinematicsService.hh"
-#include "WalkGeneratorService.h"
-#include "misc.h"
+#include "WalkGeneratorService.hh"
 #include <pthread.h>
 #include <string>
 #include <queue>

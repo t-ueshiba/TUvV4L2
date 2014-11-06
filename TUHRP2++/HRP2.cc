@@ -64,6 +64,12 @@ usec(HRP2::Time sec, HRP2::Time nsec)
     return 1000000*sec + (nsec + 500)/1000;
 }
 
+template <class T> static inline T
+deg2rad(T deg)
+{
+    return (deg * M_PI) / 180;
+}
+    
 /************************************************************************
 *  class HRP2								*
 ************************************************************************/
