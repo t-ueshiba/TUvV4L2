@@ -786,18 +786,20 @@ Ieee1394Camera::writeQuadletToRegister(u_int offset, quadlet_t quad)
 ************************************************************************/
 const u_int	IEEE1394CAMERA_OFFSET_ONOFF = 0x100;
 const u_int	IEEE1394CAMERA_OFFSET_AUTO  = 0x200;
-const u_int	IEEE1394CAMERA_OFFSET_VR    = 0x1;
+const u_int	IEEE1394CAMERA_OFFSET_VR    = 0x2;
 
 /************************************************************************
 *  global functions							*
 ************************************************************************/
 std::ostream&	operator <<(std::ostream& out, const Ieee1394Camera& camera);
 std::istream&	operator >>(std::istream& in, Ieee1394Camera& camera);
-bool		handleCameraFormats(Ieee1394Camera& camera, u_int id, int val);
-bool		handleCameraFeatures(Ieee1394Camera& camera,
-				     u_int id, int val, int=-1);
-bool		handleCameraWhiteBalance(Ieee1394Camera& camera,
-					 u_int id, int ub, int vr, int=-1);
+bool		setCameraFormat(Ieee1394Camera& camera, u_int id, int val);
+bool		setCameraFeatureValue(Ieee1394Camera& camera,
+				      u_int id, int val, int=-1);
+bool		setCameraWhiteBalance(Ieee1394Camera& camera,
+				      u_int id, int ub, int vr, int=-1);
+u_int		getFeatureValue(const Ieee1394Camera& camera,
+				u_int id, int=-1);
 
 inline void
 exec(Ieee1394Camera& camera, Ieee1394Camera& (Ieee1394Camera::*mf)(), int=-1)
@@ -818,16 +820,38 @@ exec(Ieee1394Camera& camera, Ieee1394Camera& (Ieee1394Camera::*mf)(ARG0, ARG1),
 {
     (camera.*mf)(arg0, arg1);
 }
-    
+
+template <class RESULT> inline RESULT
+exec(const Ieee1394Camera& camera,
+     RESULT (Ieee1394Camera::*mf)() const, int=-1)
+{
+    return (camera.*mf)();
+}
+
+template <class ARG, class RESULT> inline RESULT
+exec(const Ieee1394Camera& camera, RESULT (Ieee1394Camera::*mf)(ARG) const,
+     ARG arg, int=-1)
+{
+    return (camera.*mf)(arg);
+}
+
+template <class ARG0, class ARG1, class RESULT> inline void
+exec(const Ieee1394Camera& camera,
+     RESULT (Ieee1394Camera::*mf)(ARG0&, ARG1&) const,
+     ARG0& arg0, ARG1& arg1, int=-1)
+{
+    (camera.*mf)(arg0, arg1);
+}
+
 #if defined(HAVE_LIBTUTOOLS__)
-bool	handleCameraFormats(const Array<Ieee1394Camera*>& cameras,
-			    u_int id, int val);
-bool	handleCameraFeatures(const Array<Ieee1394Camera*>& cameras,
-			     u_int id, int val, int n=-1);
-bool	handleCameraWhiteBalance(const Array<Ieee1394Camera*>& cameras,
-				 u_int id, int ub, int vr, int n=-1);
+bool	setCameraFormat(const Array<Ieee1394Camera*>& cameras,
+			u_int id, int val)				;
+bool	setCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
+			      u_int id, int val, int n=-1)		;
+u_int	getCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
+			      u_int id, int n=-1)			;
 void	exec(const Array<Ieee1394Camera*>& cameras,
-	     Ieee1394Camera& (Ieee1394Camera::*mf)(), int n=-1);
+	     Ieee1394Camera& (Ieee1394Camera::*mf)(), int n=-1)		;
     
 template <class ARG> void
 exec(const Array<Ieee1394Camera*>& cameras,
@@ -850,6 +874,31 @@ exec(const Array<Ieee1394Camera*>& cameras,
     else
 	for (size_t i = 0; i < cameras.size(); ++i)
 	    (cameras[i]->*mf)(arg0, arg1);
+}
+
+template <class RESULT> RESULT
+exec(const Array<Ieee1394Camera*>& cameras,
+     RESULT (Ieee1394Camera::*mf)() const, int n=-1)
+{
+    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
+    return (cameras[i]->*mf)();
+}
+
+template <class ARG, class RESULT> RESULT
+exec(const Array<Ieee1394Camera*>& cameras,
+     RESULT (Ieee1394Camera::*mf)(ARG) const, ARG arg, int n=-1)
+{
+    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
+    return (cameras[i]->*mf)(arg);
+}
+
+template <class ARG0, class ARG1, class RESULT> void
+exec(const Array<Ieee1394Camera*>& cameras,
+     RESULT (Ieee1394Camera::*mf)(ARG0&, ARG1&) const,
+     ARG0& arg0, ARG1& arg1, int n=-1)
+{
+    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
+    (cameras[i]->*mf)(arg0, arg1);
 }
 #endif
 

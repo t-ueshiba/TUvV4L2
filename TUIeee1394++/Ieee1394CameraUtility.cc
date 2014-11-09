@@ -9,7 +9,7 @@ namespace TU
 *  static functions							*
 ************************************************************************/
 template <class CAMERAS> static bool
-handleCameraFormats1394(CAMERAS& cameras, u_int id, u_int val)
+setCameraFormat1394(CAMERAS& cameras, u_int id, u_int val)
 {
     switch (id)
     {
@@ -46,7 +46,7 @@ handleCameraFormats1394(CAMERAS& cameras, u_int id, u_int val)
 }
     
 template <class CAMERAS> static bool
-handleCameraFeatures1394(CAMERAS& cameras, u_int id, u_int val, int n)
+setCameraFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
 {
     switch (id)
     {
@@ -72,7 +72,23 @@ handleCameraFeatures1394(CAMERAS& cameras, u_int id, u_int val, int n)
 	exec(cameras, &Ieee1394Camera::setTriggerMode,
 	     Ieee1394Camera::uintToTriggerMode(val), n);
 	return true;
-	
+
+      case Ieee1394Camera::WHITE_BALANCE:
+      {
+	u_int	ub, vr;
+	exec(cameras, &Ieee1394Camera::getWhiteBalance, ub,  vr, n);
+	exec(cameras, &Ieee1394Camera::setWhiteBalance, val, vr, n);
+      }
+	return true;
+      
+      case Ieee1394Camera::WHITE_BALANCE + IEEE1394CAMERA_OFFSET_VR:
+      {
+	u_int	ub, vr;
+	exec(cameras, &Ieee1394Camera::getWhiteBalance, ub, vr,  n);
+	exec(cameras, &Ieee1394Camera::setWhiteBalance, ub, val, n);
+      }
+	return true;
+      
       case Ieee1394Camera::BRIGHTNESS	 + IEEE1394CAMERA_OFFSET_ONOFF:
       case Ieee1394Camera::AUTO_EXPOSURE + IEEE1394CAMERA_OFFSET_ONOFF:
       case Ieee1394Camera::SHARPNESS	 + IEEE1394CAMERA_OFFSET_ONOFF:
@@ -128,16 +144,87 @@ handleCameraFeatures1394(CAMERAS& cameras, u_int id, u_int val, int n)
     return false;
 }
 
-template <class CAMERAS> static bool
-handleCameraWhiteBalance1394(CAMERAS& cameras,
-			     u_int id, u_int ub, u_int vr, int n)
+template <class CAMERAS> static u_int
+getCameraFeatureValue1394(CAMERAS& cameras, u_int id, int n)
 {
     switch (id)
     {
+      case Ieee1394Camera::BRIGHTNESS:
+      case Ieee1394Camera::AUTO_EXPOSURE:
+      case Ieee1394Camera::SHARPNESS:
+      case Ieee1394Camera::HUE:
+      case Ieee1394Camera::SATURATION:
+      case Ieee1394Camera::GAMMA:
+      case Ieee1394Camera::SHUTTER:
+      case Ieee1394Camera::GAIN:
+      case Ieee1394Camera::IRIS:
+      case Ieee1394Camera::FOCUS:
+      case Ieee1394Camera::TEMPERATURE:
+      case Ieee1394Camera::ZOOM:
+      case Ieee1394Camera::PAN:
+      case Ieee1394Camera::TILT:
+	return exec(cameras, &Ieee1394Camera::getValue,
+		    Ieee1394Camera::uintToFeature(id), n);
+
+      case Ieee1394Camera::TRIGGER_MODE:
+	return exec(cameras, &Ieee1394Camera::getTriggerMode, n);
+	
       case Ieee1394Camera::WHITE_BALANCE:
+      {
+	u_int	ub, vr;
+	exec(cameras, &Ieee1394Camera::getWhiteBalance, ub, vr, n);
+	return ub;
+      }
+      
       case Ieee1394Camera::WHITE_BALANCE + IEEE1394CAMERA_OFFSET_VR:
-	exec(cameras, &Ieee1394Camera::setWhiteBalance, ub, vr, n);
-	return true;
+      {
+	u_int	ub, vr;
+	exec(cameras, &Ieee1394Camera::getWhiteBalance, ub, vr, n);
+	return vr;
+      }
+	
+      case Ieee1394Camera::BRIGHTNESS	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::AUTO_EXPOSURE + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::SHARPNESS	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::WHITE_BALANCE + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::HUE		 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::SATURATION	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::GAMMA	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::SHUTTER	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::GAIN		 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::IRIS		 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::FOCUS	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::TEMPERATURE	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::TRIGGER_MODE	 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::ZOOM		 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::PAN		 + IEEE1394CAMERA_OFFSET_ONOFF:
+      case Ieee1394Camera::TILT		 + IEEE1394CAMERA_OFFSET_ONOFF:
+      {
+	Ieee1394Camera::Feature	feature = Ieee1394Camera::uintToFeature(
+					      id - IEEE1394CAMERA_OFFSET_ONOFF);
+	return exec(cameras, &Ieee1394Camera::isTurnedOn, feature, n);
+      }
+
+      case Ieee1394Camera::BRIGHTNESS	 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::AUTO_EXPOSURE + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::SHARPNESS	 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::WHITE_BALANCE + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::HUE		 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::SATURATION	 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::GAMMA	 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::SHUTTER	 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::GAIN		 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::IRIS		 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::FOCUS	 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::TEMPERATURE	 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::ZOOM		 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::PAN		 + IEEE1394CAMERA_OFFSET_AUTO:
+      case Ieee1394Camera::TILT		 + IEEE1394CAMERA_OFFSET_AUTO:
+      {
+	Ieee1394Camera::Feature	feature = Ieee1394Camera::uintToFeature(
+					      id - IEEE1394CAMERA_OFFSET_AUTO);
+	return exec(cameras, &Ieee1394Camera::isAuto, feature, n);
+      }
     }
 
     return false;
@@ -147,42 +234,41 @@ handleCameraWhiteBalance1394(CAMERAS& cameras,
 *  global functions							*
 ************************************************************************/
 bool
-handleCameraFormats(Ieee1394Camera& camera, u_int id, int val)
+setCameraFormat(Ieee1394Camera& camera, u_int id, int val)
 {
-    return handleCameraFormats1394(camera, id, val);
+    return setCameraFormat1394(camera, id, val);
 }
 
 bool
-handleCameraFeatures(Ieee1394Camera& camera, u_int id, int val, int)
+setCameraFeatureValue(Ieee1394Camera& camera, u_int id, int val, int)
 {
-    return handleCameraFeatures1394(camera, id, val, -1);
+    return setCameraFeatureValue1394(camera, id, val, -1);
 }
 
-bool
-handleCameraWhiteBalance(Ieee1394Camera& camera, u_int id, int ub, int vr, int)
+u_int
+getCameraFeatureValue(Ieee1394Camera& camera, u_int id, int)
 {
-    return handleCameraWhiteBalance1394(camera, id, ub, vr, -1);
+    return getCameraFeatureValue1394(camera, id, -1);
 }
-
+    
 #ifdef HAVE_LIBTUTOOLS__
 bool
-handleCameraFormats(const Array<Ieee1394Camera*>& cameras, u_int id, int val)
+setCameraFormat(const Array<Ieee1394Camera*>& cameras, u_int id, int val)
 {
-    return handleCameraFormats1394(cameras, id, val);
+    return setCameraFormat1394(cameras, id, val);
 }
 
 bool
-handleCameraFeatures(const Array<Ieee1394Camera*>& cameras,
+setCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
 		     u_int id, int val, int n)
 {
-    return handleCameraFeatures1394(cameras, id, val, n);
+    return setCameraFeatureValue1394(cameras, id, val, n);
 }
 
-bool
-handleCameraWhiteBalance(const Array<Ieee1394Camera*>& cameras,
-			 u_int id, int ub, int vr, int n)
+u_int
+getCameraFeatureValue(const Array<Ieee1394Camera*>& cameras, u_int id, int n)
 {
-    return handleCameraWhiteBalance1394(cameras, id, ub, vr, n);
+    return getCameraFeatureValue1394(cameras, id, n);
 }
 
 void
