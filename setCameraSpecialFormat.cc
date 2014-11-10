@@ -101,8 +101,7 @@ MyModalDialog::createROICmds(const V4L2Camera& camera)
 *  global functions							*
 ************************************************************************/
 bool
-handleCameraSpecialFormats(V4L2Camera& camera,
-			   u_int id, int val, Window& window)
+setCameraSpecialFormat(V4L2Camera& camera, u_int id, int val, Window& window)
 {
     if (id == V4L2Camera::UNKNOWN_PIXEL_FORMAT)
     {
@@ -121,8 +120,8 @@ handleCameraSpecialFormats(V4L2Camera& camera,
 }
 
 bool
-handleCameraSpecialFormats(const Array<V4L2Camera*>& cameras,
-			   u_int id, int val, Window& window)
+setCameraSpecialFormat(const Array<V4L2Camera*>& cameras,
+		       u_int id, int val, Window& window)
 {
     if (id == V4L2Camera::UNKNOWN_PIXEL_FORMAT)
     {
