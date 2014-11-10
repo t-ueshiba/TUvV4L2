@@ -174,8 +174,8 @@ refreshFeatureCmds(const Array<V4L2Camera*>& cameras, CmdPane& cmdPane)
 }
 
 bool
-handleCameraFeatures(const Array<V4L2Camera*>& cameras,
-		     u_int id, int val, CmdPane& cmdPane)
+setCameraFeatureValue(const Array<V4L2Camera*>& cameras,
+		      u_int id, int val, CmdPane& cmdPane)
 {
     if (cameras.size() == 0)
 	return false;
@@ -190,7 +190,7 @@ handleCameraFeatures(const Array<V4L2Camera*>& cameras,
     else
     {
 	const size_t	n = cmdPane.getValue(V4L2Camera::UNKNOWN_FEATURE);
-	return handleCameraFeatures(cameras, id, val, n);
+	return setCameraFeatureValue(cameras, id, val, n);
     }
 }
     
