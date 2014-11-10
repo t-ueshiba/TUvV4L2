@@ -17,9 +17,9 @@ CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3 -xAVX
+  CFLAGS	= -O3 -xCORE-AVX2
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DAVX
+  CPPFLAGS     += -DAVX2
 endif
 CCFLAGS		= $(CFLAGS)
 

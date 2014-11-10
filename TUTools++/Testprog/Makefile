@@ -18,7 +18,10 @@ SUBDIR	= BandMatrix		\
 	  Sparse		\
 	  Spline		\
 	  Vector		\
-	  mm
+	  mm			\
+	  stereo1394		\
+	  stereoGUI		\
+	  stereoTime
 
 TARGETS	= all clean depend
 

@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include "TU/SADStereo.h"
 #include "TU/GFStereo.h"
+#include "TU/io.h"
 #include "MyCmdWindow.h"
 
 #define DEFAULT_PARAM_FILE	"stereo"
