@@ -145,7 +145,7 @@ setCameraFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
 }
 
 template <class CAMERAS> static u_int
-getCameraFeatureValue1394(CAMERAS& cameras, u_int id, int n)
+getCameraFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
 {
     switch (id)
     {
@@ -227,7 +227,9 @@ getCameraFeatureValue1394(CAMERAS& cameras, u_int id, int n)
       }
     }
 
-    return false;
+    throw std::invalid_argument("getCameraFeatureValue1394(): unknown feature!!");
+    
+    return 0;
 }
 
 /************************************************************************
@@ -246,7 +248,7 @@ setCameraFeatureValue(Ieee1394Camera& camera, u_int id, int val, int)
 }
 
 u_int
-getCameraFeatureValue(Ieee1394Camera& camera, u_int id, int)
+getCameraFeatureValue(const Ieee1394Camera& camera, u_int id, int)
 {
     return getCameraFeatureValue1394(camera, id, -1);
 }
@@ -260,7 +262,7 @@ setCameraFormat(const Array<Ieee1394Camera*>& cameras, u_int id, int val)
 
 bool
 setCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
-		     u_int id, int val, int n)
+		      u_int id, int val, int n)
 {
     return setCameraFeatureValue1394(cameras, id, val, n);
 }

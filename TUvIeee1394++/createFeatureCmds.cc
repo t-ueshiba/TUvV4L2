@@ -286,8 +286,8 @@ refreshFeatureCmds(const Array<Ieee1394Camera*>& cameras, CmdPane& cmdPane)
 }
 
 bool
-handleCameraFeatures(const Array<Ieee1394Camera*>& cameras,
-		     u_int id, int val, CmdPane& cmdPane)
+setCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
+		      u_int id, int val, CmdPane& cmdPane)
 {
     if (cameras.size() == 0)
 	return false;
@@ -302,7 +302,7 @@ handleCameraFeatures(const Array<Ieee1394Camera*>& cameras,
     else
     {
 	const size_t	n = cmdPane.getValue(CAMERA_CHOICE);
-	return handleCameraFeatures(cameras, id, val, n);
+	return setCameraFeatureValue(cameras, id, val, n);
     }
 }
 

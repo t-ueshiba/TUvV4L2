@@ -59,10 +59,10 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 HDRS		= TU/v/vIeee1394++.h
 SRCS		= createFeatureCmds.cc \
 		createFormatMenu.cc \
-		handleCameraSpecialFormats.cc
+		setCameraSpecialFormat.cc
 OBJS		= createFeatureCmds.o \
 		createFormatMenu.o \
-		handleCameraSpecialFormats.o
+		setCameraSpecialFormat.o
 
 #include $(PROJECT)/lib/rtc.mk		# modified: CPPFLAGS, LIBS
 #include $(PROJECT)/lib/cnoid.mk	# modified: CPPFLAGS, LIBS, LIBDIR
@@ -89,7 +89,7 @@ createFormatMenu.o: TU/v/vIeee1394++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
-handleCameraSpecialFormats.o: TU/v/vIeee1394++.h \
+setCameraSpecialFormat.o: TU/v/vIeee1394++.h \
 	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \

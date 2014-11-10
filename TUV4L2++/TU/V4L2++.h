@@ -585,10 +585,9 @@ std::ostream&	operator <<(std::ostream& out,
 			    const V4L2Camera::MenuItem& menuItem)	;
 std::ostream&	operator <<(std::ostream& out, const V4L2Camera& camera);
 std::istream&	operator >>(std::istream& in, V4L2Camera& camera)	;
-bool		handleCameraFormats(V4L2Camera& camera,
-				    u_int id, int val)			;
-bool		handleCameraFeatures(V4L2Camera& camera,
-				     u_int id, int val, int=-1)		;
+bool		setCameraFormat(V4L2Camera& camera, u_int id, int val)	;
+bool		setCameraFeatureValue(V4L2Camera& camera,
+				      u_int id, int val, int=-1)	;
 
 inline void
 exec(V4L2Camera& camera, V4L2Camera& (V4L2Camera::*mf)(), int=-1)
@@ -609,11 +608,26 @@ exec(V4L2Camera& camera,
     (camera.*mf)(arg0, arg1);
 }
 
+template <class RESULT> inline RESULT
+exec(const V4L2Camera& camera, RESULT (V4L2Camera::*mf)() const, int=-1)
+{
+    return (camera.*mf)();
+}
+
+template <class ARG, class RESULT> inline RESULT
+exec(const V4L2Camera& camera, RESULT (V4L2Camera::*mf)(ARG) const,
+     ARG arg, int=-1)
+{
+    return (camera.*mf)(arg);
+}
+
 #ifdef HAVE_LIBTUTOOLS__
-bool	handleCameraFormats(const Array<V4L2Camera*>& cameras,
-			    u_int id, int val)				;
-bool	handleCameraFeatures(const Array<V4L2Camera*>& cameras,
-			     u_int id, int val, int n=-1)		;
+bool	setCameraFormat(const Array<V4L2Camera*>& cameras,
+			u_int id, int val)				;
+bool	setCameraFeatureValue(const Array<V4L2Camera*>& cameras,
+			      u_int id, int val, int n=-1)		;
+int	getCameraFeatureValue(const Array<V4L2Camera*>& cameras,
+			      u_int id, int n=-1)			;
 void	exec(const Array<V4L2Camera*>& cameras,
 	     V4L2Camera& (V4L2Camera::*mf)(), int n=-1)			;
 
@@ -637,6 +651,22 @@ exec(const Array<V4L2Camera*>& cameras,
     else
 	for (size_t i = 0; i < cameras.size(); ++i)
 	    (cameras[i]->*mf)(arg0, arg1);
+}
+
+template <class RESULT> inline RESULT
+exec(const Array<V4L2Camera*>& cameras,
+     RESULT (V4L2Camera::*mf)() const, int n=-1)
+{
+    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
+    return (cameras[i]->*mf)();
+}
+
+template <class ARG, class RESULT> RESULT
+exec(const Array<V4L2Camera*>& cameras,
+     RESULT (V4L2Camera::*mf)(ARG) const, ARG arg, int n=-1)
+{
+    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
+    return (cameras[i]->*mf)(arg);
 }
 #endif    
     

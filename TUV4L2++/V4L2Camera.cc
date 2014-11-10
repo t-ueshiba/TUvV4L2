@@ -494,7 +494,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, size_t width, size_t height,
 	}
     }
     
-    throw invalid_argument("V4L2Camera::setFormat() illegal combination of pixel format, frame size and frame rate!! ");
+    throw invalid_argument("V4L2Camera::setFormat(): illegal combination of pixel format, frame size and frame rate!! ");
 
   // 画素フォーマットと画像サイズを設定
   ok:
@@ -831,7 +831,7 @@ template <class T> const V4L2Camera&
 V4L2Camera::operator >>(Image<T>& image) const
 {
     if (_current == ~0)
-	throw std::runtime_error("TU::V4L2Camera::operator >>: no images snapped!!");
+	throw std::runtime_error("TU::V4L2Camera::operator >>(): no images snapped!!");
     const u_char* const	img = (u_char*)_buffers[_current].p();
     
   // Transfer image data from current buffer.
