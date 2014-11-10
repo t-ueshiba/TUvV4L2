@@ -177,8 +177,8 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
 *  global functions							*
 ************************************************************************/
 bool
-handleCameraSpecialFormats(Ieee1394Camera& camera,
-			   u_int id, int val, Window& window)
+setCameraSpecialFormat(Ieee1394Camera& camera,
+		       u_int id, int val, Window& window)
 {
     switch (id)
     {
@@ -211,8 +211,8 @@ handleCameraSpecialFormats(Ieee1394Camera& camera,
 }
 
 bool
-handleCameraSpecialFormats(const Array<Ieee1394Camera*>& cameras,
-			   u_int id, int val, Window& window)
+setCameraSpecialFormat(const Array<Ieee1394Camera*>& cameras,
+		       u_int id, int val, Window& window)
 {
     switch (id)
     {
