@@ -190,7 +190,7 @@ setCameraFeatureValue(const Array<V4L2Camera*>& cameras,
     else
     {
 	const size_t	n = cmdPane.getValue(V4L2Camera::UNKNOWN_FEATURE);
-	return setCameraFeatureValue(cameras, id, val, n);
+	return setFeatureValue(cameras, id, val, n);
     }
 }
     
