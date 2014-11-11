@@ -9,7 +9,7 @@ namespace TU
 *  static functions							*
 ************************************************************************/
 template <class CAMERAS> static bool
-setCameraFormat1394(CAMERAS& cameras, u_int id, u_int val)
+setFormat1394(CAMERAS& cameras, u_int id, u_int val)
 {
     switch (id)
     {
@@ -46,7 +46,7 @@ setCameraFormat1394(CAMERAS& cameras, u_int id, u_int val)
 }
     
 template <class CAMERAS> static bool
-setCameraFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
+setFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
 {
     switch (id)
     {
@@ -154,7 +154,7 @@ setCameraFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
 }
 
 template <class CAMERAS> static u_int
-getCameraFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
+getFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
 {
     switch (id)
     {
@@ -239,7 +239,7 @@ getCameraFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
 	return exec(cameras, &Ieee1394Camera::getTriggerPolarity, n);
     }
 
-    throw std::invalid_argument("getCameraFeatureValue1394(): unknown feature!!");
+    throw std::invalid_argument("getFeatureValue1394(): unknown feature!!");
     
     return 0;
 }
@@ -248,41 +248,41 @@ getCameraFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
 *  global functions							*
 ************************************************************************/
 bool
-setCameraFormat(Ieee1394Camera& camera, u_int id, int val)
+setFormat(Ieee1394Camera& camera, u_int id, int val)
 {
-    return setCameraFormat1394(camera, id, val);
+    return setFormat1394(camera, id, val);
 }
 
 bool
-setCameraFeatureValue(Ieee1394Camera& camera, u_int id, int val, int)
+setFeatureValue(Ieee1394Camera& camera, u_int id, int val, int)
 {
-    return setCameraFeatureValue1394(camera, id, val, -1);
+    return setFeatureValue1394(camera, id, val, -1);
 }
 
 u_int
-getCameraFeatureValue(const Ieee1394Camera& camera, u_int id, int)
+getFeatureValue(const Ieee1394Camera& camera, u_int id, int)
 {
-    return getCameraFeatureValue1394(camera, id, -1);
+    return getFeatureValue1394(camera, id, -1);
 }
     
 #ifdef HAVE_LIBTUTOOLS__
 bool
-setCameraFormat(const Array<Ieee1394Camera*>& cameras, u_int id, int val)
+setFormat(const Array<Ieee1394Camera*>& cameras, u_int id, int val)
 {
-    return setCameraFormat1394(cameras, id, val);
+    return setFormat1394(cameras, id, val);
 }
 
 bool
-setCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
-		      u_int id, int val, int n)
+setFeatureValue(const Array<Ieee1394Camera*>& cameras,
+		u_int id, int val, int n)
 {
-    return setCameraFeatureValue1394(cameras, id, val, n);
+    return setFeatureValue1394(cameras, id, val, n);
 }
 
 u_int
-getCameraFeatureValue(const Array<Ieee1394Camera*>& cameras, u_int id, int n)
+getFeatureValue(const Array<Ieee1394Camera*>& cameras, u_int id, int n)
 {
-    return getCameraFeatureValue1394(cameras, id, n);
+    return getFeatureValue1394(cameras, id, n);
 }
 
 void

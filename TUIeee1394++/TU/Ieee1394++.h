@@ -793,11 +793,9 @@ const u_int	IEEE1394CAMERA_OFFSET_VR    = 0x2;
 ************************************************************************/
 std::ostream&	operator <<(std::ostream& out, const Ieee1394Camera& camera);
 std::istream&	operator >>(std::istream& in, Ieee1394Camera& camera);
-bool		setCameraFormat(Ieee1394Camera& camera, u_int id, int val);
-bool		setCameraFeatureValue(Ieee1394Camera& camera,
-				      u_int id, int val, int=-1);
-bool		setCameraWhiteBalance(Ieee1394Camera& camera,
-				      u_int id, int ub, int vr, int=-1);
+bool		setFormat(Ieee1394Camera& camera, u_int id, int val);
+bool		setFeatureValue(Ieee1394Camera& camera,
+				u_int id, int val, int=-1);
 u_int		getFeatureValue(const Ieee1394Camera& camera,
 				u_int id, int=-1);
 
@@ -844,12 +842,12 @@ exec(const Ieee1394Camera& camera,
 }
 
 #if defined(HAVE_LIBTUTOOLS__)
-bool	setCameraFormat(const Array<Ieee1394Camera*>& cameras,
-			u_int id, int val)				;
-bool	setCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
-			      u_int id, int val, int n=-1)		;
-u_int	getCameraFeatureValue(const Array<Ieee1394Camera*>& cameras,
-			      u_int id, int n=-1)			;
+bool	setFormat(const Array<Ieee1394Camera*>& cameras,
+		  u_int id, int val)					;
+bool	setFeatureValue(const Array<Ieee1394Camera*>& cameras,
+			u_int id, int val, int n=-1)			;
+u_int	getFeatureValue(const Array<Ieee1394Camera*>& cameras,
+			u_int id, int n=-1)				;
 void	exec(const Array<Ieee1394Camera*>& cameras,
 	     Ieee1394Camera& (Ieee1394Camera::*mf)(), int n=-1)		;
     
