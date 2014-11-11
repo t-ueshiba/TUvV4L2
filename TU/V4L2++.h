@@ -585,8 +585,8 @@ std::ostream&	operator <<(std::ostream& out,
 			    const V4L2Camera::MenuItem& menuItem)	;
 std::ostream&	operator <<(std::ostream& out, const V4L2Camera& camera);
 std::istream&	operator >>(std::istream& in, V4L2Camera& camera)	;
-bool		setCameraFormat(V4L2Camera& camera, u_int id, int val)	;
-bool		setCameraFeatureValue(V4L2Camera& camera,
+bool		setFormat(V4L2Camera& camera, u_int id, int val)	;
+bool		setFeatureValue(V4L2Camera& camera,
 				      u_int id, int val, int=-1)	;
 
 inline void
@@ -622,12 +622,11 @@ exec(const V4L2Camera& camera, RESULT (V4L2Camera::*mf)(ARG) const,
 }
 
 #ifdef HAVE_LIBTUTOOLS__
-bool	setCameraFormat(const Array<V4L2Camera*>& cameras,
-			u_int id, int val)				;
-bool	setCameraFeatureValue(const Array<V4L2Camera*>& cameras,
-			      u_int id, int val, int n=-1)		;
-int	getCameraFeatureValue(const Array<V4L2Camera*>& cameras,
-			      u_int id, int n=-1)			;
+bool	setFormat(const Array<V4L2Camera*>& cameras, u_int id, int val)	;
+bool	setFeatureValue(const Array<V4L2Camera*>& cameras,
+			u_int id, int val, int n=-1)			;
+int	getFeatureValue(const Array<V4L2Camera*>& cameras,
+			u_int id, int n=-1)				;
 void	exec(const Array<V4L2Camera*>& cameras,
 	     V4L2Camera& (V4L2Camera::*mf)(), int n=-1)			;
 

@@ -28,7 +28,7 @@ setFormat(const Array<V4L2Camera*>& cameras,
 }
     
 template <class CAMERAS> static bool
-setCameraFormatV4L2(CAMERAS& cameras, u_int id, int val)
+setFormatV4L2(CAMERAS& cameras, u_int id, int val)
 {
     V4L2Camera::PixelFormat	pixelFormat = V4L2Camera::uintToPixelFormat(id);
 
@@ -40,7 +40,7 @@ setCameraFormatV4L2(CAMERAS& cameras, u_int id, int val)
 }
     
 template <class CAMERAS> static bool
-setCameraFeatureValueV4L2(CAMERAS& cameras, u_int id, int val, int n)
+setFeatureValueV4L2(CAMERAS& cameras, u_int id, int val, int n)
 {
     V4L2Camera::Feature	feature = V4L2Camera::uintToFeature(id);
 
@@ -52,12 +52,12 @@ setCameraFeatureValueV4L2(CAMERAS& cameras, u_int id, int val, int n)
 }
 
 template <class CAMERAS> static int
-getCameraFeatureValueV4L2(CAMERAS& cameras, u_int id, int n)
+getFeatureValueV4L2(CAMERAS& cameras, u_int id, int n)
 {
     V4L2Camera::Feature	feature = V4L2Camera::uintToFeature(id);
 
     if (feature == V4L2Camera::UNKNOWN_FEATURE)
-	throw std::invalid_argument("getCameraFeatureValueV4L2(): unknown feature!!");
+	throw std::invalid_argument("getFeatureValueV4L2(): unknown feature!!");
 
     return exec(cameras, &V4L2Camera::getValue, feature, n);
 }
@@ -66,41 +66,40 @@ getCameraFeatureValueV4L2(CAMERAS& cameras, u_int id, int n)
 *  global functions							*
 ************************************************************************/
 bool
-setCameraFormat(V4L2Camera& camera, u_int id, int val)
+setFormat(V4L2Camera& camera, u_int id, int val)
 {
-    return setCameraFormatV4L2(camera, id, val);
+    return setFormatV4L2(camera, id, val);
 }
 
 bool
-setCameraFeatureValue(V4L2Camera& camera, u_int id, int val, int)
+setFeatureValue(V4L2Camera& camera, u_int id, int val, int)
 {
-    return setCameraFeatureValueV4L2(camera, id, val, -1);
+    return setFeatureValueV4L2(camera, id, val, -1);
 }
 
 int
-getCameraFeatureValue(const V4L2Camera& camera, u_int id, int)
+getFeatureValue(const V4L2Camera& camera, u_int id, int)
 {
-    return getCameraFeatureValueV4L2(camera, id, -1);
+    return getFeatureValueV4L2(camera, id, -1);
 }
     
 #ifdef HAVE_LIBTUTOOLS__
 bool
-setCameraFormat(const Array<V4L2Camera*>& cameras, u_int id, int val)
+setFormat(const Array<V4L2Camera*>& cameras, u_int id, int val)
 {
-    return setCameraFormatV4L2(cameras, id, val);
+    return setFormatV4L2(cameras, id, val);
 }
 
 bool
-setCameraFeatureValue(const Array<V4L2Camera*>& cameras,
-		      u_int id, int val, int n)
+setFeatureValue(const Array<V4L2Camera*>& cameras, u_int id, int val, int n)
 {
-    return setCameraFeatureValueV4L2(cameras, id, val, n);
+    return setFeatureValueV4L2(cameras, id, val, n);
 }
 
 int
-getCameraFeatureValue(const Array<V4L2Camera*>& cameras, u_int id, int n)
+getFeatureValue(const Array<V4L2Camera*>& cameras, u_int id, int n)
 {
-    return getCameraFeatureValueV4L2(cameras, id, n);
+    return getFeatureValueV4L2(cameras, id, n);
 }
     
 void
