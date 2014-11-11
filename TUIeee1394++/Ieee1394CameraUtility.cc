@@ -139,6 +139,15 @@ setCameraFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
 	    exec(cameras, &Ieee1394Camera::setManualMode, feature, n);
       }
         return true;
+
+      case Ieee1394Camera::TRIGGER_MODE	 + IEEE1394CAMERA_OFFSET_AUTO:
+	if (val)
+	    exec(cameras, &Ieee1394Camera::setTriggerPolarity,
+		 Ieee1394Camera::HighActiveInput, n);
+	else
+	    exec(cameras, &Ieee1394Camera::setTriggerPolarity,
+		 Ieee1394Camera::LowActiveInput, n);
+	return true;
     }
 
     return false;
@@ -225,6 +234,9 @@ getCameraFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
 					      id - IEEE1394CAMERA_OFFSET_AUTO);
 	return exec(cameras, &Ieee1394Camera::isAuto, feature, n);
       }
+
+      case Ieee1394Camera::TRIGGER_MODE	 + IEEE1394CAMERA_OFFSET_AUTO:
+	return exec(cameras, &Ieee1394Camera::getTriggerPolarity, n);
     }
 
     throw std::invalid_argument("getCameraFeatureValue1394(): unknown feature!!");
