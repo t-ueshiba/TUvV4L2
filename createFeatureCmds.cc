@@ -174,8 +174,8 @@ refreshFeatureCmds(const Array<V4L2Camera*>& cameras, CmdPane& cmdPane)
 }
 
 bool
-setCameraFeatureValue(const Array<V4L2Camera*>& cameras,
-		      u_int id, int val, CmdPane& cmdPane)
+setFeatureValue(const Array<V4L2Camera*>& cameras,
+		u_int id, int val, CmdPane& cmdPane)
 {
     if (cameras.size() == 0)
 	return false;
