@@ -15,21 +15,18 @@ namespace v
 *  global functions							*
 ************************************************************************/
 MenuDef*	createFormatMenu(const Ieee1394Camera& camera)		;
-bool		setCameraSpecialFormat(Ieee1394Camera& camera,
-				       u_int id, int val,
-				       Window& window)			;
-bool		setCameraSpecialFormat(
-		    const Array<Ieee1394Camera*>& cameras,
-		    u_int id, int val, Window& window)			;
+bool		setSpecialFormat(Ieee1394Camera& camera,
+				 u_int id, int val, Window& window)	;
+bool		setSpecialFormat(const Array<Ieee1394Camera*>& cameras,
+				 u_int id, int val, Window& window)	;
 CmdDef*		createFeatureCmds(const Ieee1394Camera& camera)		;
 CmdDef*		createFeatureCmds(const Array<Ieee1394Camera*>& cameras);
 void		refreshFeatureCmds(const Ieee1394Camera& camera,
 				   CmdPane& cmdPane)			;
 void		refreshFeatureCmds(const Array<Ieee1394Camera*>& cameras,
 				   CmdPane& cmdPane)			;
-bool		setCameraFeatureValue(
-		    const Array<Ieee1394Camera*>& cameras,
-		    u_int id, int val, CmdPane& cmdPane)		;
+bool		setFeatureValue(const Array<Ieee1394Camera*>& cameras,
+				u_int id, int val, CmdPane& cmdPane)	;
 
 }	// namespace v
 }	// namespace TU
