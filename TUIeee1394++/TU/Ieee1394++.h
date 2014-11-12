@@ -527,7 +527,7 @@ class Ieee1394Camera : public Ieee1394Node
     PixelFormat		pixelFormat()				const	;
 
   // Format_7 stuffs.
-    Format_7_Info	getFormat_7_Info(Format format7)		;
+    Format_7_Info	getFormat_7_Info(Format format7)	const	;
     Ieee1394Camera&	setFormat_7_ROI(Format format7, 
 					u_int u0, u_int v0,
 					u_int width, u_int height)	;
