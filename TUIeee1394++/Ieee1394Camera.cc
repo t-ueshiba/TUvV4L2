@@ -808,7 +808,7 @@ Ieee1394Camera::getFrameRate() const
   \return	 指定されたフォーマットの内容
  */
 Ieee1394Camera::Format_7_Info
-Ieee1394Camera::getFormat_7_Info(Format format7) const
+Ieee1394Camera::getFormat_7_Info(Format format7)
 {
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
     quadlet_t		quad;
@@ -836,7 +836,7 @@ Ieee1394Camera::getFormat_7_Info(Format format7) const
     {
 	fmt7info.width  = fmt7info.unitWidth;
 	fmt7info.height = fmt7info.unitHeight;
-	const_cast<Ieee1394Camera*>(this)->writeQuadlet(
+	writeQuadlet(
 	    base + IMAGE_SIZE,
 	    ((fmt7info.width << 16) & 0xffff0000) | (fmt7info.height & 0xffff));
     }
@@ -850,8 +850,7 @@ Ieee1394Camera::getFormat_7_Info(Format format7) const
 #ifdef DEBUG
     using namespace	std;
     
-    cerr << hex
-	 <<   "max size:    " << fmt7info.maxWidth  << 'x' << fmt7info.maxHeight
+    cerr <<   "max size:    " << fmt7info.maxWidth  << 'x' << fmt7info.maxHeight
 	 << "\nunit size:   " << fmt7info.unitWidth << 'x' << fmt7info.unitHeight
 	 << "\norigin unit: " << fmt7info.unitU0 << 'x' << fmt7info.unitV0
 	 << "\norigin:      " << fmt7info.u0	 << ',' << fmt7info.v0
