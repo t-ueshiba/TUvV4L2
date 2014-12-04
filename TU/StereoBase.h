@@ -158,11 +158,12 @@ class Binder
 		    return _op(_arg0, boost::get<0>(args))
 			 + _op(_arg0, boost::get<1>(args));
 		}
+  /*
     result_type	operator ()(argument_type arg1, argument_type arg2) const
 		{
 		    return _op(_arg0, arg1) + _op(_arg0, arg2);
 		}
-    
+  */
   private:
     const OP			_op;
     const fixed_argument_type	_arg0;
@@ -786,8 +787,10 @@ class StereoBase : public Profiler
   //! ステレオ対応探索の各種パラメータを収めるクラス．
     struct Parameters
     {
-	Parameters()	:disparitySearchWidth(64), disparityMax(64),
-			 disparityInconsistency(2), grainSize(100)	{}
+	Parameters()
+	    :doHorizontalBackMatch(true), doVerticalBackMatch(true),
+	     disparitySearchWidth(64), disparityMax(64),
+	     disparityInconsistency(2), grainSize(100)			{}
 
       //! 視差の最小値を返す．
 	size_t		disparityMin() const
@@ -798,7 +801,8 @@ class StereoBase : public Profiler
 			{
 			    return in >> disparitySearchWidth
 				      >> disparityMax
-				      >> disparityInconsistency;
+				      >> disparityInconsistency
+				      >> grainSize;
 			}
 	std::ostream&	put(std::ostream& out) const
 			{
@@ -809,13 +813,19 @@ class StereoBase : public Profiler
 			    cerr << "  maximum disparity:                  ";
 			    out << disparityMax << endl;
 			    cerr << "  allowable disparity inconsistency:  ";
-			    return out << disparityInconsistency << endl;
+			    out << disparityInconsistency << endl;
+			    cerr << "  grain size for parallel processing: ";
+			    out << grainSize << endl;
+
+			    return out;
 			}
-			    
+
+	bool	doHorizontalBackMatch;	//!< 右画像から基準画像への逆探索
+	bool	doVerticalBackMatch;	//!< 上画像から基準画像への逆探索
 	size_t	disparitySearchWidth;	//!< 視差の探索幅
 	size_t	disparityMax;		//!< 視差の最大値
 	size_t	disparityInconsistency;	//!< 最適視差の不一致の許容値
-	size_t	grainSize;		//!< 並列実行の粒度
+	size_t	grainSize;		//!< 並列処理の粒度
     };
 
   protected:
@@ -945,6 +955,31 @@ class StereoBase : public Profiler
 	const argument_type	_thr;
     };
 
+    template <class DMIN, class DELTA>
+    class CorrectDisparity
+    {
+      public:
+	typedef typename std::iterator_traits<DMIN>::value_type	argument_type;
+	typedef typename std::iterator_traits<DELTA>::value_type
+								result_type;
+    
+      public:
+	CorrectDisparity(DELTA delta, argument_type dmax)
+	    :_delta(delta), _dmax(dmax)					{}
+
+	result_type	operator ()(argument_type dL) const
+			{
+			    result_type
+			    	val = result_type(_dmax - dL) - *_delta;
+			    ++_delta;
+			    return val;
+			}
+
+      private:
+	mutable DELTA		_delta;
+	const argument_type	_dmax;
+    };
+    
   public:
     template <class ROW, class ROW_D>
     void	operator ()(ROW rowL, ROW rowLe,
@@ -1004,10 +1039,15 @@ template <class DMIN, class DELTA, class COL_D> inline void
 StereoBase<STEREO>::selectDisparities(DMIN dminL, DMIN dminLe, DMIN dminR,
 				      DELTA delta, COL_D colD) const
 {
-    std::transform(dminL, dminLe, colD,
-		   FilterDisparity<DMIN, DELTA>(
-		       dminR, delta, _stereo.getParameters().disparityMax,
-		       _stereo.getParameters().disparityInconsistency));
+    if (_stereo.getParameters().doHorizontalBackMatch)
+	std::transform(dminL, dminLe, colD,
+		       FilterDisparity<DMIN, DELTA>(
+			   dminR, delta, _stereo.getParameters().disparityMax,
+			   _stereo.getParameters().disparityInconsistency));
+    else
+	std::transform(dminL, dminLe, colD,
+		       CorrectDisparity<DMIN, DELTA>(
+			   delta, _stereo.getParameters().disparityMax));
 }
 
 //! 上画像からの逆方向視差探索を行う

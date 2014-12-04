@@ -64,23 +64,29 @@ main(int argc, char* argv[])
     typedef GFStereo<float,  u_char>	GFStereoType;
 #endif
     
-    v::App	vapp(argc, argv);	// GUIの初期化．
-    bool	gfstereo	= false;
-    string	paramFile	= DEFAULT_PARAM_FILE;
-    string	configDirs	= DEFAULT_CONFIG_DIRS;
-    double	scale		= DEFAULT_SCALE;
-    bool	movie		= false;
-    bool	textureMapping	= false;
-    double	parallax	= -1.0;
-    u_int	grainSize	= DEFAULT_GRAINSIZE;
+    bool	gfstereo		= false;
+    bool	doHorizontalBackMatch	= true;
+    bool	doVerticalBackMatch	= true;
+    string	paramFile		= DEFAULT_PARAM_FILE;
+    string	configDirs		= DEFAULT_CONFIG_DIRS;
+    double	scale			= DEFAULT_SCALE;
+    bool	textureMapping		= false;
+    double	parallax		= -1.0;
+    u_int	grainSize		= DEFAULT_GRAINSIZE;
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "Gp:d:s:xq:g:h")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "GHVp:d:s:xq:g:h")) != EOF; )
 	switch (c)
 	{
 	  case 'G':
 	    gfstereo = true;
+	    break;
+	  case 'H':
+	    doHorizontalBackMatch = false;
+	    break;
+	  case 'V':
+	    doVerticalBackMatch = false;
 	    break;
 	  case 'p':
 	    paramFile = optarg;
@@ -108,6 +114,8 @@ main(int argc, char* argv[])
   // 本当のお仕事．
     try
     {
+	v::App		vapp(argc, argv);	// GUIの初期化．
+
       // OpenGLの設定．
 	int		attrs[] = {GLX_RGBA,
 				   GLX_RED_SIZE,	1,
@@ -136,7 +144,9 @@ main(int argc, char* argv[])
 	{
 	    GFStereoType::Parameters	params;
 	    params.get(in);
-	    params.grainSize = grainSize;
+	    params.doHorizontalBackMatch = doHorizontalBackMatch;
+	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
 	    v::MyCmdWindow<GFStereoType>
@@ -149,7 +159,9 @@ main(int argc, char* argv[])
 	{
 	    SADStereoType::Parameters	params;
 	    params.get(in);
-	    params.grainSize = grainSize;
+	    params.doHorizontalBackMatch = doHorizontalBackMatch;
+	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
 	    v::MyCmdWindow<SADStereoType>

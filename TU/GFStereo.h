@@ -406,17 +406,16 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
 	std::istream&	get(std::istream& in)
 			{
-			    in >> windowSize;
 			    super::Parameters::get(in);
-			    return in >> intensityDiffMax;
+			    return in >> windowSize >> intensityDiffMax;
 			}
 	std::ostream&	put(std::ostream& out) const
 			{
 			    using namespace	std;
 
+			    super::Parameters::put(out);
 			    cerr << "  window size:                        ";
 			    out << windowSize << endl;
-			    super::Parameters::put(out);
 			    cerr << "  maximum intensity difference:       ";
 			    out << intensityDiffMax << endl;
 			    cerr << "  epsilon for guided filtering:       ";

@@ -33,24 +33,12 @@ scaleDisparity(Image<T>& disparityMap, u_int disparitySearchWidth)
 }
 
 template <class STEREO, class T> static void
-doJob(std::istream& in, size_t windowSize, size_t disparitySearchWidth,
-      size_t disparityMax, size_t grainSize, double scale, bool binocular,
-      size_t ntrials)
+doJob(std::istream& in, const typename STEREO::Parameters& params,
+      double scale, bool binocular, size_t ntrials)
 {
     using namespace	std;
     
   // ステレオマッチングパラメータを設定．
-    typename STEREO::Parameters	params;
-    params.get(in);
-	    
-    if (windowSize != 0)
-	params.windowSize = windowSize;
-    if (disparityMax != 0)
-	params.disparityMax = disparityMax;
-    if (disparitySearchWidth != 0)
-	params.disparitySearchWidth = disparitySearchWidth;
-    params.grainSize = grainSize;
-	    
     cerr << "--- Stereo matching parameters ---\n";
     params.put(cerr);
 
@@ -152,6 +140,8 @@ main(int argc, char* argv[])
 #endif
 
     bool	gfstereo		= false;
+    bool	doHorizontalBackMatch	= true;
+    bool	doVerticalBackMatch	= true;
     string	paramFile		= DEFAULT_PARAM_FILE;
     string	configDirs		= DEFAULT_CONFIG_DIRS;
     double	scale			= DEFAULT_SCALE;
@@ -165,11 +155,17 @@ main(int argc, char* argv[])
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "Gp:d:s:BCW:D:M:g:n:")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "GHVp:d:s:BCW:D:M:g:n:")) != EOF; )
 	switch (c)
 	{
 	  case 'G':
 	    gfstereo = true;
+	    break;
+	  case 'H':
+	    doHorizontalBackMatch = false;
+	    break;
+	  case 'V':
+	    doVerticalBackMatch = false;
 	    break;
 	  case 'p':
 	    paramFile = optarg;
@@ -210,13 +206,39 @@ main(int argc, char* argv[])
 	openFile(in, paramFile, configDirs, ".params");
 
 	if (gfstereo)
-	    doJob<GFStereoType, u_char>(in, windowSize, disparityMax,
-					disparitySearchWidth, grainSize,
-					scale, binocular, ntrials);
+	{
+	    GFStereoType::Parameters	params;
+	    params.get(in);
+	    
+	    if (windowSize != 0)
+		params.windowSize = windowSize;
+	    if (disparityMax != 0)
+		params.disparityMax = disparityMax;
+	    if (disparitySearchWidth != 0)
+		params.disparitySearchWidth = disparitySearchWidth;
+	    params.doHorizontalBackMatch = doHorizontalBackMatch;
+	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.grainSize		 = grainSize;
+
+	    doJob<GFStereoType, u_char>(in, params, scale, binocular, ntrials);
+	}
 	else
-	    doJob<SADStereoType, u_char>(in, windowSize, disparityMax,
-					 disparitySearchWidth, grainSize,
-					 scale, binocular, ntrials);
+	{
+	    SADStereoType::Parameters	params;
+	    params.get(in);
+	    
+	    if (windowSize != 0)
+		params.windowSize = windowSize;
+	    if (disparityMax != 0)
+		params.disparityMax = disparityMax;
+	    if (disparitySearchWidth != 0)
+		params.disparitySearchWidth = disparitySearchWidth;
+	    params.doHorizontalBackMatch = doHorizontalBackMatch;
+	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.grainSize		 = grainSize;
+
+	    doJob<SADStereoType, u_char>(in, params, scale, binocular, ntrials);
+	}
     }
     catch (exception& err)
     {

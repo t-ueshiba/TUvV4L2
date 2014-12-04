@@ -103,7 +103,7 @@ createFeatureCmds(const V4L2CameraArray& cameras)
 	    else
 	    {
 		if (feature == V4L2Camera::CID_PRIVATE0)
-		    max = 200;
+		    max = 1000;
 		
 		featureCmds[n].type = C_Slider;
 		props[n][0] = min;
