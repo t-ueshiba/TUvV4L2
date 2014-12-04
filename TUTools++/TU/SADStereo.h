@@ -93,29 +93,30 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
   public:
     struct Parameters : public super::Parameters
     {
-	Parameters()	:windowSize(11),
-			 intensityDiffMax(20), grainSize(100)		{}
+	Parameters()	:windowSize(11), intensityDiffMax(20)		{}
 
 	std::istream&	get(std::istream& in)
 			{
-			    in >> windowSize;
 			    super::Parameters::get(in);
-			    return in >> intensityDiffMax >> grainSize;
+			    in >> windowSize >> intensityDiffMax;
+
+			    return in;
 			}
 	std::ostream&	put(std::ostream& out) const
 			{
 			    using namespace	std;
 
+			    super::Parameters::put(out);
 			    cerr << "  window size:                        ";
 			    out << windowSize << endl;
-			    super::Parameters::put(out);
 			    cerr << "  maximum intensity difference:       ";
-			    return out << intensityDiffMax << endl;
+			    out << intensityDiffMax << endl;
+			    
+			    return out;
 			}
 			    
 	size_t	windowSize;			//!< ウィンドウのサイズ
 	size_t	intensityDiffMax;		//!< 輝度差の最大値
-	size_t	grainSize;			//!< 並列実行の粒度
     };
 
   public:
@@ -373,20 +374,22 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 
 	++rowR;
     }
-#if !defined(NO_VERTICAL_BM)
-  // 上画像からの逆方向視差探索により誤対応を除去する．マルチスレッドの
-  // 場合は短冊を跨がる視差探索ができず各短冊毎に処理せねばならないので，
-  // 結果はシングルスレッド時と異なる．
-    start(5);
-    rowD = rowD0;
-    for (v = H - N + 1; v-- != 0; )
+
+    if (_params.doVerticalBackMatch)
     {
-	pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
-			 make_vertical_iterator(buffers->dminV.cend(),   v),
-			 rowD->begin() + N/2);
-	++rowD;
+      // 上画像からの逆方向視差探索により誤対応を除去する．マルチスレッドの
+      // 場合は短冊を跨がる視差探索ができず各短冊毎に処理せねばならないので，
+      // 結果はシングルスレッド時と異なる．
+	start(5);
+	rowD = rowD0;
+	for (v = H - N + 1; v-- != 0; )
+	{
+	    pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
+			     make_vertical_iterator(buffers->dminV.cend(),   v),
+			     rowD->begin() + N/2);
+	    ++rowD;
+	}
     }
-#endif
 
     _bufferPool.put(buffers);
     nextFrame();

@@ -110,24 +110,31 @@ main(int argc, char* argv[])
     typedef GFStereo<float,  u_char>	GFStereoType;
 #endif
 
-    v::App		vapp(argc, argv);			// GUIの初期化．
-    bool		gfstereo	= false;
-    const char*		cameraName	= DEFAULT_CAMERA_NAME;
-    const char*		configDirs	= DEFAULT_CONFIG_DIRS;
-    string		paramFile	= DEFAULT_PARAM_FILE;
-    double		scale		= DEFAULT_SCALE;
-    bool		textureMapping	= false;
-    double		parallax	= -1.0;
-    Ieee1394Node::Speed	speed		= Ieee1394Node::SPD_400M;
-    size_t		grainSize	= DEFAULT_GRAINSIZE;
+    bool		gfstereo		= false;
+    bool		doHorizontalBackMatch	= true;
+    bool		doVerticalBackMatch	= true;
+    const char*		cameraName		= DEFAULT_CAMERA_NAME;
+    const char*		configDirs		= DEFAULT_CONFIG_DIRS;
+    string		paramFile		= DEFAULT_PARAM_FILE;
+    double		scale			= DEFAULT_SCALE;
+    bool		textureMapping		= false;
+    double		parallax		= -1.0;
+    Ieee1394Node::Speed	speed			= Ieee1394Node::SPD_400M;
+    size_t		grainSize		= DEFAULT_GRAINSIZE;
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "Gd:c:Bp:s:xq:g:h")) != -1; )
+    for (int c; (c = getopt(argc, argv, "GHVd:c:Bp:s:xq:g:h")) != -1; )
 	switch (c)
 	{
 	  case 'G':
 	    gfstereo = true;
+	    break;
+	  case 'H':
+	    doHorizontalBackMatch = false;
+	    break;
+	  case 'V':
+	    doVerticalBackMatch = false;
 	    break;
 	  case 'd':
 	    configDirs = optarg;
@@ -161,6 +168,7 @@ main(int argc, char* argv[])
   // 本当のお仕事．
     try
     {
+	v::App		vapp(argc, argv);	// GUIの初期化．
 #if defined(DISPLAY_3D)
       // OpenGLの設定．
 	int		attrs[] = {GLX_RGBA,
@@ -197,7 +205,9 @@ main(int argc, char* argv[])
 	{
 	    GFStereoType::Parameters	params;
 	    params.get(in);
-	    params.grainSize = grainSize;
+	    params.doHorizontalBackMatch = doHorizontalBackMatch;
+	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
 	    v::MyCmdWindow<GFStereoType>
@@ -214,7 +224,9 @@ main(int argc, char* argv[])
 	{
 	    SADStereoType::Parameters	params;
 	    params.get(in);
-	    params.grainSize = grainSize;
+	    params.doHorizontalBackMatch = doHorizontalBackMatch;
+	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
 	    v::MyCmdWindow<SADStereoType>

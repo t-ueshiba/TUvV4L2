@@ -412,7 +412,7 @@ Buf<T, ALLOC>::stride(size_t siz)
 template <class T, class ALLOC> std::istream&
 Buf<T, ALLOC>::get(std::istream& in, size_t m)
 {
-    const size_t		BufSiz = (sizeof(value_type) < 2048 ?
+    const size_t	BufSiz = (sizeof(value_type) < 2048 ?
 				  2048 / sizeof(value_type) : 1);
     pointer const	tmp = new value_type[BufSiz];
     size_t		n = 0;
