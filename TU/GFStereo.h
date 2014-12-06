@@ -797,7 +797,7 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
     typedef typename iterator_value<COL>::type			pixel_type;
     typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef typename Diff<pixel_type>::mm			op_type;
+    typedef Diff<mm::vec<pixel_type> >				op_type;
     typedef boost::transform_iterator<
 	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
     typedef mm::cvtup_iterator<
@@ -847,7 +847,7 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
     typedef typename iterator_value<COL>::type			pixel_type;
     typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef typename Diff<pixel_type>::mm			op_type;
+    typedef Diff<mm::vec<pixel_type> >				op_type;
     typedef boost::transform_iterator<
 	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
     typedef mm::cvtup_iterator<
