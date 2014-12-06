@@ -42,97 +42,87 @@ template <class T>
 class Diff
 {
   public:
-    typedef T	first_argument_type;
-    typedef T	second_argument_type;
-    typedef int	result_type;
+    typedef T						first_argument_type;
+    typedef first_argument_type				second_argument_type;
+    typedef int						result_type;
     
   public:
-    Diff(T intensityDiffMax)
-	:_intensityDiffMax(intensityDiffMax)		{}
+    Diff(T thresh)	:_thresh(thresh)		{}
     
-    result_type	operator ()(first_argument_type  imgL,
-			    second_argument_type imgR) const
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
 		{
 #if defined(NO_SATURATION)
-		    return diff(imgL, imgR);
+		    return diff(x, y);
 #else
-		    return std::min(diff(imgL, imgR), _intensityDiffMax);
+		    return std::min(diff(x, y), _thresh);
 #endif
 		}
     
   private:
-    const T	_intensityDiffMax;
-
-#if defined(SSE)
-  public:
-    class mm
-    {
-      public:
-	typedef TU::mm::vec<T>			first_argument_type;
-	typedef first_argument_type		second_argument_type;
-	typedef typename TU::mm::type_traits<T>
-			       ::signed_type	signed_type;
-	typedef TU::mm::vec<signed_type>	result_type;
-
-      public:
-	mm(T intensityDiffMax)
-	    :_intensityDiffMax(intensityDiffMax)		{}
-    
-	result_type	operator ()(first_argument_type  imgL,
-				    second_argument_type imgR) const
-			{
-			    using namespace	mm;
-#  if defined(NO_SATURATION)
-			    return cast<signed_type>(diff(imgL, imgR));
-#  else
-			    return cast<signed_type>(min(diff(imgL, imgR),
-							 _intensityDiffMax));
-#  endif
-			}
-      private:
-	const TU::mm::vec<T>	_intensityDiffMax;
-    };
-#endif
+    const T	_thresh;
 };
+    
+#if defined(SSE)
+template <class T>
+class Diff<mm::vec<T> >
+{
+  public:
+    typedef mm::vec<T>					first_argument_type;
+    typedef first_argument_type				second_argument_type;
+    typedef typename mm::type_traits<T>::signed_type	signed_type;
+    typedef mm::vec<signed_type>			result_type;
+
+  public:
+    Diff(T thresh)	:_thresh(thresh)		{}
+    
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
+		{
+		    using namespace	mm;
+#  if defined(NO_SATURATION)
+		    return cast<signed_type>(diff(x, y));
+#  else
+		    return cast<signed_type>(min(diff(x, y), _thresh));
+#  endif
+		}
+    
+  private:
+    const mm::vec<T>	_thresh;
+};
+#endif
 
 template <>
 class Diff<RGBA>
 {
   public:
-    typedef RGBA	first_argument_type;
-    typedef RGBA	second_argument_type;
-    typedef int		result_type;
+    typedef RGBA				first_argument_type;
+    typedef first_argument_type			second_argument_type;
+    typedef int					result_type;
     
   public:
-    Diff(u_char intensityDiffMax)
-	:_intensityDiffMax(intensityDiffMax)		{}
+    Diff(u_char thresh)	:_thresh(thresh)	{}
     
-    result_type	operator ()(first_argument_type  imgL,
-			    second_argument_type imgR) const
+    result_type	operator ()(first_argument_type  x,
+			    second_argument_type y) const
 		{
 #if defined(NO_SATURATION)
-		    return (imgL.r > imgR.r ?
-			    imgL.r - imgR.r : imgR.r - imgL.r)
-			 + (imgL.g > imgR.g ?
-			    imgL.g - imgR.g : imgR.g - imgL.g)
-			 + (imgL.b > imgR.b ?
-			    imgL.b - imgR.b : imgR.b - imgL.b);
+		    return (x.r > y.r ? x.r - y.r : y.r - x.r)
+			 + (x.g > y.g ? x.g - y.g : y.g - x.g)
+			 + (x.b > y.b ? x.b - y.b : y.b - x.b);
 #else
 		    using namespace	std;
-		    return min(u_char(imgL.r > imgR.r ?
-				      imgL.r - imgR.r : imgR.r - imgL.r),
-			       _intensityDiffMax)
-			 + min(u_char(imgL.g > imgR.g ?
-				      imgL.g - imgR.g : imgR.g - imgL.g),
-			       _intensityDiffMax)
-			 + min(u_char(imgL.b > imgR.b ?
-				      imgL.b - imgR.b : imgR.b - imgL.b),
-			       _intensityDiffMax);
+		    return min(u_char(x.r > y.r ? x.r - y.r : y.r - x.r),
+			       _thresh)
+			 + min(u_char(x.g > y.g ? x.g - y.g : y.g - x.g),
+			       _thresh)
+			 + min(u_char(x.b > y.b ? x.b - y.b : y.b - x.b),
+			       _thresh);
 #endif
 		}
     
   private:
-    const u_char	_intensityDiffMax;
+    const u_char	_thresh;
 };
 
 /************************************************************************
@@ -152,8 +142,8 @@ class Binder
 		{
 		    return _op(_arg0, arg);
 		}
-    result_type	operator ()(const boost::tuple<argument_type,
-					       argument_type>& args) const
+    result_type	operator ()(boost::tuple<const argument_type&,
+					 const argument_type&> args) const
 		{
 		    return _op(_arg0, boost::get<0>(args))
 			 + _op(_arg0, boost::get<1>(args));

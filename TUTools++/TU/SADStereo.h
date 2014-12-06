@@ -404,7 +404,7 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
     typedef typename iterator_value<COL>::type			pixel_type;
     typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef typename Diff<pixel_type>::mm			op_type;
+    typedef Diff<mm::vec<pixel_type> >				op_type;
     typedef boost::transform_iterator<
 	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
     typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
@@ -421,7 +421,7 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 
     for (; colL != colLe; ++colL)
     {
-	piterator	P(in_iterator(colRV->begin()),
+	piterator	P(colRV->begin(),
 			  makeBinder(op_type(_params.intensityDiffMax), *colL));
 	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
 	    assign_type()(*P, *Q);
@@ -440,7 +440,7 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
     typedef typename iterator_value<COL>::type			pixel_type;
     typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef typename Diff<pixel_type>::mm			op_type;
+    typedef Diff<mm::vec<pixel_type> >				op_type;
     typedef boost::transform_iterator<
 	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
     typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
