@@ -128,13 +128,15 @@ enum
 
   // Stereo matching parameters
     c_Binocular,
-    c_WindowSize,
     c_DisparitySearchWidth,
     c_DisparityMax,
     c_DisparityInconsistency,
+    c_WindowSize,
     c_IntensityDiffMax,
-    c_DepthRange,
+    c_DerivativeDiffMax,
+    c_Alpha,
     c_Regularization,
+    c_DepthRange,
     
   // Viewing control.
     c_DrawMode,

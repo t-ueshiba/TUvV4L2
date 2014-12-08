@@ -56,8 +56,9 @@ class GuidedFilter : public BoxFilter
 	{
 	    typedef Params	result_type;
 	    
-	    template <class TUPLE>
-	    result_type	operator ()(TUPLE t) const
+	    template <class IN, class GUIDE>
+	    result_type	operator ()(boost::tuple<const IN&,
+						 const GUIDE&> t) const
 			{
 			    return result_type(boost::get<0>(t),
 					       boost::get<1>(t));

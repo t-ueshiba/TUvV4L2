@@ -148,12 +148,7 @@ class Binder
 		    return _op(_arg0, boost::get<0>(args))
 			 + _op(_arg0, boost::get<1>(args));
 		}
-  /*
-    result_type	operator ()(argument_type arg1, argument_type arg2) const
-		{
-		    return _op(_arg0, arg1) + _op(_arg0, arg2);
-		}
-  */
+
   private:
     const OP			_op;
     const fixed_argument_type	_arg0;
