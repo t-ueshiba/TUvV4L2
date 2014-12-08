@@ -233,27 +233,17 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
       public:
 	typedef ScoreVecTuple	argument_type;
 	typedef ScoreVecTuple	result_type;
-	typedef ScoreVecTuple	first_argument_type;
 
       public:
 	ParamUpdate(Score gn, Score gp)	:_gn(gn), _gp(gp)		{}
 
-	result_type	operator ()(argument_type p) const
+	result_type	operator ()(boost::tuple<const ScoreVec&,
+						 const ScoreVec&> p) const
 			{
 			    using namespace	boost;
 			    
 			    return result_type(get<0>(p) - get<1>(p),
 					       _gn*get<0>(p) - _gp*get<1>(p));
-			}
-	template <class TUPLE>
-	void		operator ()(first_argument_type p, TUPLE t) const
-			{
-			    using namespace	boost;
-
-			    get<1>(t) = first_argument_type(
-				get<0>(get<0>(t)) + get<0>(p) - get<1>(p),
-				get<1>(get<0>(t)) + _gn*get<0>(p)
-						  - _gp*get<1>(p));
 			}
 
       private:
@@ -264,14 +254,15 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     class CoeffInit
     {
       public:
-	typedef ScoreVecTuple	argument_type;
+	ScoreVecTuple	argument_type;
 	typedef ScoreVecTuple	result_type;
 	
       public:
 	CoeffInit(Score g_avg, Score g_sqavg, Score e)
 	    :_g_avg(g_avg), _g_rvar(1/(g_sqavg - g_avg*g_avg + e*e))	{}
 
-	result_type	operator ()(argument_type params) const
+	result_type	operator ()(boost::tuple<const ScoreVec&,
+						 const ScoreVec&> params) const
 			{
 			    using namespace	boost;
 			    
@@ -294,7 +285,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
       public:
 	CoeffTrans(Score g) :_g(g)					{}
 
-	result_type	operator ()(argument_type  coeffs) const
+	result_type	operator ()(boost::tuple<const ScoreVec&,
+						 const ScoreVec&> coeffs) const
 			{
 			    return (boost::get<0>(coeffs) * _g +
 				    boost::get<1>(coeffs));
@@ -378,24 +370,6 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	ScoreVecArray		RminR;	// 1 x D
 	DisparityArray2		dminV;	// (W - N + 1) x (H + D - 1)
 	ScoreVecArray2		RminV;	// (W - N + 1) x D
-    };
-
-    template <class ITER>
-    class TupleIterator
-    {
-      public:
-	typedef typename iterator_value<ITER>::type		element_type;
-	typedef boost::tuple<element_type, element_type>	value_type;
-	typedef value_type					reference;
-
-      public:
-	TupleIterator(const ITER& p, const ITER& q)	:_p(p), _q(q)	{}
-    
-	reference	operator *()	const	{ return reference(*_p, *_q); }
-	TupleIterator&	operator ++()		{ ++_p; ++_q; return *this; }
-
-      private:
-	ITER	_p, _q;
     };
 
   public:
@@ -862,23 +836,21 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 				typename ScoreVecArray::iterator2>
 								qiterator;
 #endif
-  /* 本来は fast_zip_iterator<boost::tuple<piterator, piterator> > として
-   * 定義したいが，fast_zip_iterator を piterator と組み合わせると速度低下が
-   * 著しいので，TupleIterator<ITER> を用いる．
-   */
-    typedef TupleIterator<piterator>				ppiterator;
-
+    typedef fast_zip_iterator<boost::tuple<piterator, piterator> >
+								ppiterator;
+    
     for (; colL != colLe; ++colL)
     {
 	const Score	pixLp = *colLp, pixL = *colL;
-	ppiterator	P(boost::make_transform_iterator(
-			      colRV->begin(),
-			      makeBinder(op_type(_params.intensityDiffMax),
-					 pixL)),
-			  boost::make_transform_iterator(
-			      colRVp->begin(),
-			      makeBinder(op_type(_params.intensityDiffMax),
-					 pixLp)));
+	ppiterator	P(boost::make_tuple(
+			      piterator(colRV->begin(),
+					makeBinder(
+					    op_type(_params.intensityDiffMax),
+					    pixL)),
+			      piterator(colRVp->begin(),
+					makeBinder(
+					    op_type(_params.intensityDiffMax),
+					    pixLp))));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamUpdate(pixL, pixLp))),
 		       Qe(make_assignment_iterator(colQ->end2(),
