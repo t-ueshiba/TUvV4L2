@@ -1,39 +1,45 @@
 #
-#  $Id: Makefile,v 1.65 2012-08-30 01:58:19 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/bin
+PROGRAM		= $(shell basename $(PWD))
+#LIBRARY		= lib$(shell basename $(PWD))
+
+VPATH		=
+
+IDLS		=
+MOCHDRS		=
+
 INCDIRS		= -I../stereo1394 -I$(PREFIX)/include
-
-PROGRAM		= stereoGUI
-
-LIBS		= -lTUOgl++ -lTUv++ -lTUStereo++ -lTUTools++ \
-		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 -ltbb -ltbbmalloc
-ifeq ($(OSTYPE), darwin)
-  LIBS	       +=
-#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
-
 CPPFLAGS	= -DNDEBUG -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
-
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-  CFLAGS	= -O3 -xAVX
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DAVX2
+ifneq ($(findstring icpc,$(CXX)),)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O			# must < -O2
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		= -lTUOgl++ -lTUv++ -lTUStereo++ -lTUTools++ \
+		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 -ltbb -ltbbmalloc
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../stereo1394/ComputeThreeD.h \
 		../stereo1394/DrawThreeD.h \
 		../stereo1394/MyCanvasPane.h \
@@ -99,8 +105,11 @@ OBJS		= ComputeThreeD.o \
 		createMenuCmds.o \
 		main.o
 
-include $(PROJECT)/lib/p.mk
-
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 ComputeThreeD.o: ../stereo1394/ComputeThreeD.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \

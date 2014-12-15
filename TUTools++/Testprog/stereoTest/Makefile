@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
+CPPFLAGS	= -DNDEBUG #-DPROFILE #-DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
@@ -23,7 +23,7 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++ -ltbb -ltbbmalloc
+LIBS		= -lTUTools++ #-ltbb -ltbbmalloc
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
