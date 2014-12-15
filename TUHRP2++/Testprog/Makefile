@@ -39,11 +39,7 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/include/math.h \
-		/usr/local/include/ForwardKinematicsService.hh \
-		/usr/local/include/ReachingService.h \
-		/usr/local/include/SequencePlayerService.h \
-		/usr/local/include/TU/Array++.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/HRP2++.h \
 		/usr/local/include/TU/Manip.h \
 		/usr/local/include/TU/Vector++.h \
@@ -51,9 +47,7 @@ EXTHDRS		= /usr/include/math.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h \
-		/usr/local/include/WalkGeneratorService.h \
-		/usr/local/include/misc.h
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -65,11 +59,7 @@ include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 include $(PROJECT)/lib/common.mk
 ###
 main.o: /usr/local/include/TU/Manip.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/HRP2++.h /usr/local/include/ReachingService.h \
-	/usr/local/include/SequencePlayerService.h \
-	/usr/local/include/ForwardKinematicsService.hh \
-	/usr/local/include/WalkGeneratorService.h /usr/local/include/misc.h \
-	/usr/include/math.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/HRP2++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h
