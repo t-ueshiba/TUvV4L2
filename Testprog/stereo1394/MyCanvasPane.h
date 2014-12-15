@@ -103,7 +103,7 @@ class MyCanvasPane : public MyCanvasPaneBase
 template <class T> void
 MyCanvasPane<T>::repaintUnderlay()
 {
-    _dc << _image;
+    _dc << clear << _image;
 }
 
 }

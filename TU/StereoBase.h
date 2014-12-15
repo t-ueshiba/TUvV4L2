@@ -321,14 +321,18 @@ class mask_iterator
 		{
 		    element_type	RminR  = *_RminRV;
 		    *_RminRV = _nextRV;
-
+		    ++_RminRV;
+		    
 		    if (R < RminR)
 		    {
 			_nextRV = R;
 			mask = true;
 		    }
 		    else
+		    {
+			_nextRV = RminR;
 			mask = false;
+		    }
 		}
     template <class _VEC>
     void	update(element_type R, _VEC& mask)
@@ -338,6 +342,7 @@ class mask_iterator
 		    element_type	RminR = get<0>(*_RminRV),
 					RminV = get<1>(*_RminRV);
 		    *_RminRV = _nextRV;
+		    ++_RminRV;
 
 		    if (R < RminR)
 		    {
@@ -345,7 +350,10 @@ class mask_iterator
 			get<0>(mask) = true;
 		    }
 		    else
+		    {
+			get<0>(_nextRV) = RminR;
 			get<0>(mask) = false;
+		    }
 		    
 		    if (R < RminV)
 		    {
@@ -353,7 +361,10 @@ class mask_iterator
 			get<1>(mask) = true;
 		    }
 		    else
+		    {
+			get<1>(_nextRV) = RminV;
 			get<1>(mask) = false;
+		    }
 		}
 
     void	cvtdown(reference& mask)
