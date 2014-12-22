@@ -42,124 +42,99 @@ template <class T>
 class Diff
 {
   public:
-    typedef T						first_argument_type;
-    typedef first_argument_type				second_argument_type;
-    typedef int						result_type;
+    typedef T		first_argument_type;
+    typedef T		second_argument_type;
+    typedef int		result_type;
     
   public:
     Diff(T thresh)	:_thresh(thresh)		{}
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
+    result_type	operator ()(T x, T y) const
 		{
-#if defined(NO_SATURATION)
-		    return diff(x, y);
-#else
 		    return std::min(diff(x, y), _thresh);
-#endif
 		}
     
   private:
     const T	_thresh;
 };
     
+template <>
+class Diff<RGBA>
+{
+  public:
+    typedef RGBA	first_argument_type;
+    typedef RGBA	second_argument_type;
+    typedef int		result_type;
+    
+  public:
+    Diff(u_char thresh)	:_diff(thresh)			{}
+    
+    result_type	operator ()(RGBA x, RGBA y) const
+		{
+		    return _diff(x.r, y.r) + _diff(x.g, y.g) + _diff(x.b, y.b);
+		}
+    
+  private:
+    const Diff<u_char>	_diff;
+};
+
+template <class T>
+class Diff<boost::tuples::cons<
+	       T, boost::tuples::cons<T, boost::tuples::null_type> > >
+{
+  public:
+    typedef T						first_argument_type;
+    typedef boost::tuple<const T&, const T&>		second_argument_type;
+    typedef typename Diff<T>::result_type		result_type;
+
+  public:
+    Diff(T thresh)	:_diff(thresh)			{}
+
+    result_type	operator ()(T x, boost::tuple<const T&, const T&> y) const
+		{
+		    using namespace	boost;
+		    
+		    return _diff(x, get<0>(y)) + _diff(x, get<1>(y));
+		}
+
+  private:
+    const Diff<T>	_diff;
+};
+
 #if defined(SSE)
 template <class T>
 class Diff<mm::vec<T> >
 {
   public:
     typedef mm::vec<T>					first_argument_type;
-    typedef first_argument_type				second_argument_type;
+    typedef mm::vec<T>					second_argument_type;
     typedef typename mm::type_traits<T>::signed_type	signed_type;
     typedef mm::vec<signed_type>			result_type;
 
   public:
-    Diff(T thresh)	:_thresh(thresh)		{}
+    Diff(mm::vec<T> thresh)	:_thresh(thresh)	{}
     
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
+    result_type	operator ()(mm::vec<T> x, mm::vec<T> y) const
 		{
 		    using namespace	mm;
-#  if defined(NO_SATURATION)
-		    return cast<signed_type>(diff(x, y));
-#  else
+
 		    return cast<signed_type>(min(diff(x, y), _thresh));
-#  endif
 		}
-    
+
   private:
     const mm::vec<T>	_thresh;
 };
 #endif
 
-template <>
-class Diff<RGBA>
-{
-  public:
-    typedef RGBA				first_argument_type;
-    typedef first_argument_type			second_argument_type;
-    typedef int					result_type;
-    
-  public:
-    Diff(u_char thresh)	:_thresh(thresh)	{}
-    
-    result_type	operator ()(first_argument_type  x,
-			    second_argument_type y) const
-		{
-#if defined(NO_SATURATION)
-		    return (x.r > y.r ? x.r - y.r : y.r - x.r)
-			 + (x.g > y.g ? x.g - y.g : y.g - x.g)
-			 + (x.b > y.b ? x.b - y.b : y.b - x.b);
-#else
-		    using namespace	std;
-		    return min(u_char(x.r > y.r ? x.r - y.r : y.r - x.r),
-			       _thresh)
-			 + min(u_char(x.g > y.g ? x.g - y.g : y.g - x.g),
-			       _thresh)
-			 + min(u_char(x.b > y.b ? x.b - y.b : y.b - x.b),
-			       _thresh);
-#endif
-		}
-    
-  private:
-    const u_char	_thresh;
-};
-
 /************************************************************************
-*  class Binder<OP>							*
+*  exec_assignment							*
 ************************************************************************/
-template <class OP>
-class Binder
+template <template <class, class> class ASSIGN, class S, class T> void
+exec_assignment(S x, T y)
 {
-  public:
-    typedef typename OP::first_argument_type	fixed_argument_type;
-    typedef typename OP::second_argument_type	argument_type;
-    typedef typename OP::result_type		result_type;
-    
-    Binder(OP op, fixed_argument_type arg0) :_op(op), _arg0(arg0)	{}
-
-    result_type	operator ()(argument_type arg) const
-		{
-		    return _op(_arg0, arg);
-		}
-    result_type	operator ()(boost::tuple<const argument_type&,
-					 const argument_type&> args) const
-		{
-		    return _op(_arg0, boost::get<0>(args))
-			 + _op(_arg0, boost::get<1>(args));
-		}
-
-  private:
-    const OP			_op;
-    const fixed_argument_type	_arg0;
-};
-
-template <class OP> Binder<OP>
-makeBinder(OP op, typename OP::first_argument_type arg0)
-{
-    return Binder<OP>(op, arg0);
+    ASSIGN<S, T>()(x, y);
 }
-    
+
 /************************************************************************
 *  class rvcolumn_iterator<COL>						*
 ************************************************************************/
@@ -917,33 +892,50 @@ class StereoBase : public Profiler
     };
 #endif
     
-    template <class DMIN, class DELTA>
-    class FilterDisparity
+    template <class DMIN, class DELTA, class DISP, bool HOR_BACKMATCH>
+    class CorrectDisparity
     {
       public:
 	typedef typename std::iterator_traits<DMIN>::value_type	argument_type;
-	typedef typename std::iterator_traits<DELTA>::value_type
-								result_type;
-    
+	typedef DISP						result_type;
+
+      private:
+	typedef boost::mpl::bool_<
+	  boost::is_floating_point<result_type>::value>	is_floating_point;
+	typedef boost::mpl::bool_<HOR_BACKMATCH>	hor_backmatch;
+	
       public:
-	FilterDisparity(DMIN dminR, DELTA delta,
+	CorrectDisparity(DMIN dminR, DELTA delta,
 			argument_type dmax, argument_type thr)
 	    :_dminR(dminR), _delta(delta), _dmax(dmax), _thr(thr)	{}
 
 	result_type	operator ()(argument_type dL) const
 			{
-			    result_type
-#if !defined(NO_HORIZONTAL_BM)
-				val = (diff(dL, *(_dminR + dL)) <= _thr  ?
-				       result_type(_dmax - dL) - *_delta : 0);
-#else
-			    	val = result_type(_dmax - dL) - *_delta;
-#endif
+			    result_type	val = filter(dL, hor_backmatch());
 			    ++_dminR;
 			    ++_delta;
 			    return val;
 			}
 
+      private:
+	result_type	filter(argument_type dL, boost::mpl::true_) const
+			{
+			    return (diff(dL, *(_dminR + dL)) <= _thr ?
+				    correct(dL, is_floating_point()) : 0);
+			}
+	result_type	filter(argument_type dL, boost::mpl::false_) const
+			{
+			    return correct(dL, is_floating_point());
+			}
+	result_type	correct(argument_type dL, boost::mpl::true_) const
+			{
+			    return result_type(_dmax - dL) - *_delta;
+			}
+	result_type	correct(argument_type dL, boost::mpl::false_) const
+			{
+			    return _dmax - dL;
+			}
+	
       private:
 	mutable DMIN		_dminR;
 	mutable DELTA		_delta;
@@ -951,31 +943,6 @@ class StereoBase : public Profiler
 	const argument_type	_thr;
     };
 
-    template <class DMIN, class DELTA>
-    class CorrectDisparity
-    {
-      public:
-	typedef typename std::iterator_traits<DMIN>::value_type	argument_type;
-	typedef typename std::iterator_traits<DELTA>::value_type
-								result_type;
-    
-      public:
-	CorrectDisparity(DELTA delta, argument_type dmax)
-	    :_delta(delta), _dmax(dmax)					{}
-
-	result_type	operator ()(argument_type dL) const
-			{
-			    result_type
-			    	val = result_type(_dmax - dL) - *_delta;
-			    ++_delta;
-			    return val;
-			}
-
-      private:
-	mutable DELTA		_delta;
-	const argument_type	_dmax;
-    };
-    
   public:
     template <class ROW, class ROW_D>
     void	operator ()(ROW rowL, ROW rowLe,
@@ -1035,15 +1002,20 @@ template <class DMIN, class DELTA, class COL_D> inline void
 StereoBase<STEREO>::selectDisparities(DMIN dminL, DMIN dminLe, DMIN dminR,
 				      DELTA delta, COL_D colD) const
 {
-    if (_stereo.getParameters().doHorizontalBackMatch)
+    typedef typename std::iterator_traits<COL_D>::value_type	DISP;
+    
+    const Parameters&	params = _stereo.getParameters();
+    
+    if (params.doHorizontalBackMatch)
 	std::transform(dminL, dminLe, colD,
-		       FilterDisparity<DMIN, DELTA>(
-			   dminR, delta, _stereo.getParameters().disparityMax,
-			   _stereo.getParameters().disparityInconsistency));
+		       CorrectDisparity<DMIN, DELTA, DISP, true>(
+			   dminR, delta,
+			   params.disparityMax, params.disparityInconsistency));
     else
 	std::transform(dminL, dminLe, colD,
-		       CorrectDisparity<DMIN, DELTA>(
-			   delta, _stereo.getParameters().disparityMax));
+		       CorrectDisparity<DMIN, DELTA, DISP, false>(
+			   dminR, delta,
+			   params.disparityMax, params.disparityInconsistency));
 }
 
 //! 上画像からの逆方向視差探索を行う
@@ -1055,10 +1027,10 @@ StereoBase<STEREO>::pruneDisparities(DMINV dminV,
     {
 	if (*colD != 0)
 	{
-	    const size_t	dL = _stereo.getParameters().disparityMax
-				   - size_t(*colD);
+	    const Parameters&	params = _stereo.getParameters();
+	    const size_t	dL = params.disparityMax - size_t(*colD);
 	    const size_t	dV = *(dminV.operator ->() + dL);
-	    if (diff(dL, dV) > _stereo.getParameters().disparityInconsistency)
+	    if (diff(dL, dV) > params.disparityInconsistency)
 		*colD = 0;
 	}
 	++colD;

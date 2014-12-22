@@ -401,30 +401,27 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colP) const
 {
-    typedef typename iterator_value<COL>::type			pixel_type;
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef Diff<mm::vec<pixel_type> >				op_type;
-    typedef boost::transform_iterator<
-	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
+    typedef mm::load_iterator<
+	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
     typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
 								qiterator;
 #else
-    typedef Diff<pixel_type>					op_type;
-    typedef boost::transform_iterator<Binder<op_type>, in_iterator>
-								piterator;
+    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
-    typedef ASSIGN<
-	typename std::iterator_traits<piterator>::value_type,
-	typename std::iterator_traits<qiterator>::reference>	assign_type;
+    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
 
     for (; colL != colLe; ++colL)
     {
-	piterator	P(colRV->begin(),
-			  makeBinder(op_type(_params.intensityDiffMax), *colL));
+	using namespace	std::placeholders;
+	
+	auto	P = boost::make_transform_iterator(
+			in_iterator(colRV->begin()),
+			std::bind(diff_type(_params.intensityDiffMax),
+				  *colL, _1));
 	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
-	    assign_type()(*P, *Q);
+	    exec_assignment<ASSIGN>(*P, *Q);
 	
 	++colRV;
 	++colP;
@@ -437,29 +434,29 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					      COL colLp, COL_RV colRVp,
 					      col_siterator colQ) const
 {
-    typedef typename iterator_value<COL>::type			pixel_type;
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef Diff<mm::vec<pixel_type> >				op_type;
-    typedef boost::transform_iterator<
-	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
+    typedef mm::load_iterator<
+	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
     typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
 								qiterator;
 #else
-    typedef Diff<pixel_type>					op_type;
-    typedef boost::transform_iterator<Binder<op_type>, in_iterator>
-								piterator;
+    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
+    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
 
     for (; colL != colLe; ++colL)
     {
-	piterator	Pp(colRVp->begin(),
-			   makeBinder(op_type(_params.intensityDiffMax),
-				      *colLp)),
-			Pn(colRV->begin(),
-			   makeBinder(op_type(_params.intensityDiffMax),
-				      *colL));
+	using namespace	std::placeholders;
+
+	auto	Pp = boost::make_transform_iterator(
+			 in_iterator(colRVp->begin()),
+			 std::bind(diff_type(_params.intensityDiffMax),
+				   *colLp, _1)),
+		Pn = boost::make_transform_iterator(
+			 in_iterator(colRV->begin()),
+			 std::bind(diff_type(_params.intensityDiffMax),
+				   *colL, _1));
 	for (qiterator Q(colQ->begin()), Qe(colQ->end());
 	     Q != Qe; ++Q, ++Pp, ++Pn)
 	    *Q += (*Pn - *Pp);
