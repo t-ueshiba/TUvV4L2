@@ -768,40 +768,37 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 						  col_siterator colQ,
 						  col_giterator colF) const
 {
-    typedef typename iterator_value<COL>::type			pixel_type;
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef Diff<mm::vec<pixel_type> >				op_type;
-    typedef boost::transform_iterator<
-	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
+    typedef mm::load_iterator<
+	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
     typedef mm::cvtup_iterator<
 	assignment_iterator<ParamInit,
 			    typename ScoreVecArray::iterator2> >
 								qiterator;
 #else
-    typedef Diff<pixel_type>					op_type;
-    typedef boost::transform_iterator<Binder<op_type>, in_iterator>
-								piterator;
+    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
     typedef assignment_iterator<ParamInit,
 				typename ScoreVecArray::iterator2>
 								qiterator;
 #endif
-    typedef ASSIGN<
-	typename std::iterator_traits<piterator>::value_type,
-	typename std::iterator_traits<qiterator>::reference>	assign_type;
+    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
     typedef ASSIGN<Score, Score&>				gassign_type;
 
     for (; colL != colLe; ++colL)
     {
+	using namespace	std::placeholders;
+	
 	const Score	pixL = *colL;
-	piterator	P(in_iterator(colRV->begin()),
-			  makeBinder(op_type(_params.intensityDiffMax), pixL));
+	auto		P = boost::make_transform_iterator(
+				in_iterator(colRV->begin()),
+				std::bind(diff_type(_params.intensityDiffMax),
+					  pixL, _1));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamInit(pixL))),
 		       Qe(make_assignment_iterator(colQ->end2(),
 						   ParamInit(pixL)));
 	     Q != Qe; ++Q, ++P)
-	    assign_type()(*P, *Q);
+	    exec_assignment<ASSIGN>(*P, *Q);
 
 	gassign_type()(pixL,	    colF->g_sum);
 	gassign_type()(pixL * pixL, colF->g_sqsum);
@@ -818,39 +815,38 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 					      col_siterator colQ,
 					      col_giterator colF) const
 {
-    typedef typename iterator_value<COL>::type			pixel_type;
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
 #if defined(SSE)
-    typedef Diff<mm::vec<pixel_type> >				op_type;
-    typedef boost::transform_iterator<
-	Binder<op_type>, mm::load_iterator<in_iterator> >	piterator;
+    typedef mm::load_iterator<
+	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
     typedef mm::cvtup_iterator<
 	assignment_iterator<ParamUpdate,
 			    typename ScoreVecArray::iterator2> >
 								qiterator;
 #else
-    typedef Diff<pixel_type>					op_type;
-    typedef boost::transform_iterator<Binder<op_type>, in_iterator>
-								piterator;
+    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
     typedef assignment_iterator<ParamUpdate,
 				typename ScoreVecArray::iterator2>
 								qiterator;
 #endif
-    typedef fast_zip_iterator<boost::tuple<piterator, piterator> >
-								ppiterator;
+    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
     
     for (; colL != colLe; ++colL)
     {
+	using namespace	std::placeholders;
+	
 	const Score	pixLp = *colLp, pixL = *colL;
-	ppiterator	P(boost::make_tuple(
-			      piterator(colRV->begin(),
-					makeBinder(
-					    op_type(_params.intensityDiffMax),
-					    pixL)),
-			      piterator(colRVp->begin(),
-					makeBinder(
-					    op_type(_params.intensityDiffMax),
-					    pixLp))));
+	auto		P = make_fast_zip_iterator(
+				boost::make_tuple(
+				    boost::make_transform_iterator(
+					in_iterator(colRV->begin()),
+					std::bind(
+					    diff_type(_params.intensityDiffMax),
+					    pixL, _1)),
+				    boost::make_transform_iterator(
+					in_iterator(colRVp->begin()),
+					std::bind(
+					    diff_type(_params.intensityDiffMax),
+					    pixLp, _1))));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamUpdate(pixL, pixLp))),
 		       Qe(make_assignment_iterator(colQ->end2(),
