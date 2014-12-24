@@ -128,6 +128,8 @@ enum
 
   // Stereo matching parameters
     c_Binocular,
+    c_DoHorizontalBackMatch,
+    c_DoVerticalBackMatch,
     c_DisparitySearchWidth,
     c_DisparityMax,
     c_DisparityInconsistency,
