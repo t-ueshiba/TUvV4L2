@@ -782,7 +782,6 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 								qiterator;
 #endif
     typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
-    typedef ASSIGN<Score, Score&>				gassign_type;
 
     for (; colL != colLe; ++colL)
     {
@@ -800,8 +799,8 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	     Q != Qe; ++Q, ++P)
 	    exec_assignment<ASSIGN>(*P, *Q);
 
-	gassign_type()(pixL,	    colF->g_sum);
-	gassign_type()(pixL * pixL, colF->g_sqsum);
+	exec_assignment<ASSIGN>(pixL,	     colF->g_sum);
+	exec_assignment<ASSIGN>(pixL * pixL, colF->g_sqsum);
 	
 	++colRV;
 	++colQ;

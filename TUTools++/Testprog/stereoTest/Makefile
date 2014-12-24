@@ -19,9 +19,9 @@ NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3 -xAVX
   NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DAVX
+#  CPPFLAGS     += -DAVX
 endif
-CCFLAGS		= $(CFLAGS)
+CCFLAGS		= $(CFLAGS) -std=c++11
 
 LIBS		= -lTUTools++ #-ltbb -ltbbmalloc
 ifneq ($(findstring darwin,$(OSTYPE)),)
@@ -61,8 +61,10 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= Rectify.cc \
+		main.cc
+OBJS		= Rectify.o \
+		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -70,6 +72,14 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
+Rectify.o: /usr/local/include/TU/Rectify.h /usr/local/include/TU/Warp.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h \
+	/usr/local/include/TU/algorithm.h
 main.o: /usr/local/include/TU/io.h /usr/local/include/TU/Rectify.h \
 	/usr/local/include/TU/Warp.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \

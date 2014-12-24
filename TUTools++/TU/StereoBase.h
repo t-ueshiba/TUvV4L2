@@ -42,9 +42,12 @@ template <class T>
 class Diff
 {
   public:
-    typedef T		first_argument_type;
-    typedef T		second_argument_type;
-    typedef int		result_type;
+    typedef T						first_argument_type;
+    typedef T						second_argument_type;
+    typedef typename boost::mpl::eval_if<
+	boost::is_integral<T>,
+	boost::make_signed<T>,
+	boost::mpl::identity<T> >::type			result_type;
     
   public:
     Diff(T thresh)	:_thresh(thresh)		{}
@@ -108,7 +111,7 @@ class Diff<mm::vec<T> >
   public:
     typedef mm::vec<T>					first_argument_type;
     typedef mm::vec<T>					second_argument_type;
-    typedef typename mm::type_traits<T>::signed_type	signed_type;
+    typedef typename boost::make_signed<T>::type	signed_type;
     typedef mm::vec<signed_type>			result_type;
 
   public:
@@ -130,9 +133,9 @@ class Diff<mm::vec<T> >
 *  exec_assignment							*
 ************************************************************************/
 template <template <class, class> class ASSIGN, class S, class T> void
-exec_assignment(S x, T y)
+exec_assignment(const S& x, T&& y)
 {
-    ASSIGN<S, T>()(x, y);
+    ASSIGN<S, T>()(x, std::forward<T>(y));
 }
 
 /************************************************************************

@@ -21,7 +21,7 @@ ifneq ($(findstring icpc,$(CXX)),)
   NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
-CCFLAGS		= $(CFLAGS)
+CCFLAGS		= $(CFLAGS) -std=c++11
 
 LIBS		=
 ifneq ($(findstring darwin,$(OSTYPE)),)

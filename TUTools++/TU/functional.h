@@ -38,6 +38,7 @@
 #include <cassert>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits.hpp>
+#include <boost/iterator/iterator_adaptor.hpp>
 
 namespace TU
 {
@@ -516,11 +517,11 @@ struct identity
 template <class S, class T>
 struct assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y = x; }
+    void	operator ()(const S& x, T&& y)	const	{ y = x; }
 };
 
 /************************************************************************
@@ -534,11 +535,11 @@ struct assign
 template <class S, class T>
 struct plus_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y += x; }
+    void	operator ()(const S& x, T&& y)	const	{ y += x; }
 };
 
 /************************************************************************
@@ -552,11 +553,11 @@ struct plus_assign
 template <class S, class T>
 struct minus_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y -= x; }
+    void	operator ()(const S& x, T&& y)	const	{ y -= x; }
 };
 
 /************************************************************************
@@ -570,11 +571,11 @@ struct minus_assign
 template <class S, class T>
 struct multiplies_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y *= x; }
+    void	operator ()(const S& x, T&& y)	const	{ y *= x; }
 };
 
 /************************************************************************
@@ -588,11 +589,11 @@ struct multiplies_assign
 template <class S, class T>
 struct divides_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y /= x; }
+    void	operator ()(const S& x, T&& y)	const	{ y /= x; }
 };
 
 /************************************************************************
@@ -606,11 +607,11 @@ struct divides_assign
 template <class S, class T>
 struct modulus_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y %= x; }
+    void	operator ()(const S& x, T&& y)	const	{ y %= x; }
 };
 
 /************************************************************************
@@ -624,11 +625,11 @@ struct modulus_assign
 template <class S, class T>
 struct bit_and_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y &= x; }
+    void	operator ()(const S& x, T&& y)	const	{ y &= x; }
 };
 
 /************************************************************************
@@ -642,11 +643,11 @@ struct bit_and_assign
 template <class S, class T>
 struct bit_or_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y |= x; }
+    void	operator ()(const S& x, T&& y)	const	{ y |= x; }
 };
 
 /************************************************************************
@@ -660,11 +661,11 @@ struct bit_or_assign
 template <class S, class T>
 struct bit_xor_assign
 {
-    typedef S						first_argument_type;
-    typedef typename boost::remove_reference<T>::type	second_argument_type;
-    typedef void					result_type;
+    typedef S		first_argument_type;
+    typedef T		second_argument_type;
+    typedef void	result_type;
     
-    void	operator ()(const S& x, T y)	const	{ y ^= x; }
+    void	operator ()(const S& x, T&& y)	const	{ y ^= x; }
 };
 
 /************************************************************************
