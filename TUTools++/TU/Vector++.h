@@ -204,7 +204,9 @@ class Vector : public Array<T, B>
     Vector&		operator =(const E& v)				;
     Vector&		operator =(std::
 				   initializer_list<value_type> args)	;
-    
+
+    using		super::fill;
+    using		super::data;
     using		super::begin;
     using		super::cbegin;
     using		super::end;
@@ -214,7 +216,6 @@ class Vector : public Array<T, B>
     using		super::rend;
     using		super::crend;
     using		super::size;
-    using		super::data;
     using		super::check_size;
     
     const Vector<T>	operator ()(size_t i, size_t d)		const	;
@@ -547,6 +548,7 @@ class Matrix : public Array2<Vector<T>, B, R>
 				   initializer_list<value_type> arg)	;
     Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
 
+    using		super::fill;
     using		super::begin;
     using		super::cbegin;
     using		super::end;
