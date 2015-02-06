@@ -2329,10 +2329,16 @@ template <class T, size_t R, size_t C>
 using FixedSizedMatrix = Matrix<T, FixedSizedBuf<T, R*C>,
 				FixedSizedBuf<Vector<T>, R> >;
 
+typedef FixedSizedVector<short,  2>	Vector2s;
+typedef FixedSizedVector<int,    2>	Vector2i;
 typedef FixedSizedVector<float,  2>	Vector2f;
 typedef FixedSizedVector<double, 2>	Vector2d;
+typedef FixedSizedVector<short,  3>	Vector3s;
+typedef FixedSizedVector<int,    3>	Vector3i;
 typedef FixedSizedVector<float,  3>	Vector3f;
 typedef FixedSizedVector<double, 3>	Vector3d;
+typedef FixedSizedVector<short,  4>	Vector4s;
+typedef FixedSizedVector<int,    4>	Vector4i;
 typedef FixedSizedVector<float,  4>	Vector4f;
 typedef FixedSizedVector<double, 4>	Vector4d;
 typedef FixedSizedMatrix<float,  2, 2>	Matrix22f;
