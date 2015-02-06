@@ -1818,7 +1818,7 @@ template <class I> inline void
 Camera<I>::updateFCC(const vector_type& dp)
 {
     extrinsic_type::updateFCC(dp);
-    updateIntrinsic(dp(3, dp.size() - 3));
+    intrinsic_type::updateIntrinsic(dp(3, dp.size() - 3));
 }
     
 //! 入力ストリームからカメラの外部/内部パラメータを読み込む(ASCII)．
