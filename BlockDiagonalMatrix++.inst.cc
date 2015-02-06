@@ -31,8 +31,6 @@
 
 namespace TU
 {
-template class Array<Matrix<float> >;
-template class Array<Matrix<double> >;
 template class BlockDiagonalMatrix<float>;
 template class BlockDiagonalMatrix<double>;
 

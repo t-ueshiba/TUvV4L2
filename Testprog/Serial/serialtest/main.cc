@@ -1,6 +1,7 @@
 /*
  *  $Id: main.cc,v 1.2 2012-08-15 07:58:34 ueshiba Exp $
  */
+#include <unistd.h>
 #include <cstdlib>
 #include <exception>
 #include "TU/Serial.h"

@@ -42,19 +42,13 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../stereo1394/ComputeThreeD.h \
-		../stereo1394/DrawThreeD.h \
-		../stereo1394/MyCanvasPane.h \
-		../stereo1394/MyOglCanvasPane.h \
-		../stereo1394/MyOglWindow.h \
-		/usr/local/include/TU/Array++.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/BoxFilter.h \
 		/usr/local/include/TU/Camera++.h \
 		/usr/local/include/TU/GFStereo.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/List.h \
-		/usr/local/include/TU/Manip.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Profiler.h \
 		/usr/local/include/TU/Rectify.h \
@@ -73,25 +67,16 @@ EXTHDRS		= ../stereo1394/ComputeThreeD.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h \
 		/usr/local/include/TU/v/App.h \
-		/usr/local/include/TU/v/CanvasPane.h \
-		/usr/local/include/TU/v/CanvasPaneDC.h \
-		/usr/local/include/TU/v/CanvasPaneDC3.h \
 		/usr/local/include/TU/v/CmdPane.h \
 		/usr/local/include/TU/v/CmdWindow.h \
 		/usr/local/include/TU/v/Colormap.h \
-		/usr/local/include/TU/v/DC.h \
-		/usr/local/include/TU/v/DC3.h \
 		/usr/local/include/TU/v/Dialog.h \
 		/usr/local/include/TU/v/FileSelection.h \
-		/usr/local/include/TU/v/Menu.h \
 		/usr/local/include/TU/v/ModalDialog.h \
 		/usr/local/include/TU/v/Notify.h \
-		/usr/local/include/TU/v/OglDC.h \
-		/usr/local/include/TU/v/ShmDC.h \
 		/usr/local/include/TU/v/TUv++.h \
 		/usr/local/include/TU/v/Timer.h \
-		/usr/local/include/TU/v/Widget-Xaw.h \
-		/usr/local/include/TU/v/XDC.h
+		/usr/local/include/TU/v/Widget-Xaw.h
 HDRS		= MyCmdWindow.h \
 		stereoV4L2.h
 SRCS		= ComputeThreeD.cc \
@@ -119,31 +104,9 @@ OBJS		= ComputeThreeD.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-ComputeThreeD.o: ../stereo1394/ComputeThreeD.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h
-DrawThreeD.o: ../stereo1394/DrawThreeD.h /usr/local/include/TU/Warp.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h
-MyCanvasPane.o: ../stereo1394/MyCanvasPane.h \
-	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h
+DrawThreeD.o: /usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h
 MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/CmdPane.h \
@@ -151,8 +114,9 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/Notify.h \
 	stereoV4L2.h /usr/local/include/TU/V4L2CameraArray.h \
@@ -160,40 +124,18 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	MyCmdWindow.h /usr/local/include/TU/v/App.h \
 	/usr/local/include/TU/v/Timer.h /usr/local/include/TU/Rectify.h \
 	/usr/local/include/TU/Warp.h /usr/local/include/TU/Camera++.h \
-	../stereo1394/MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
-	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
-	../stereo1394/MyOglWindow.h ../stereo1394/MyOglCanvasPane.h \
-	/usr/local/include/TU/v/OglDC.h \
-	/usr/local/include/TU/v/CanvasPaneDC3.h /usr/local/include/TU/v/DC3.h \
-	../stereo1394/DrawThreeD.h ../stereo1394/ComputeThreeD.h \
 	/usr/local/include/TU/SADStereo.h /usr/local/include/TU/StereoBase.h \
 	/usr/local/include/TU/algorithm.h /usr/local/include/TU/Profiler.h \
 	/usr/local/include/TU/BoxFilter.h \
 	/usr/local/include/TU/SeparableFilter2.h \
 	/usr/local/include/TU/GFStereo.h
-MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
-	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/OglDC.h \
-	/usr/local/include/TU/v/CanvasPaneDC3.h \
-	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	../stereo1394/DrawThreeD.h /usr/local/include/TU/Warp.h \
-	/usr/local/include/TU/Camera++.h
 createCaptureCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
@@ -203,8 +145,9 @@ createFeatureCmds.o: /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h stereoV4L2.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
@@ -213,8 +156,9 @@ createMenuCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
@@ -223,8 +167,9 @@ main.o: /usr/local/include/TU/SADStereo.h \
 	/usr/local/include/TU/StereoBase.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/algorithm.h \
 	/usr/local/include/TU/Profiler.h /usr/local/include/TU/BoxFilter.h \
 	/usr/local/include/TU/SeparableFilter2.h \
@@ -237,12 +182,4 @@ main.o: /usr/local/include/TU/SADStereo.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
 	/usr/local/include/TU/V4L2++.h /usr/local/include/TU/io.h \
 	/usr/local/include/TU/Rectify.h /usr/local/include/TU/Warp.h \
-	/usr/local/include/TU/Camera++.h ../stereo1394/MyCanvasPane.h \
-	/usr/local/include/TU/v/CanvasPane.h \
-	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
-	../stereo1394/MyOglWindow.h ../stereo1394/MyOglCanvasPane.h \
-	/usr/local/include/TU/v/OglDC.h \
-	/usr/local/include/TU/v/CanvasPaneDC3.h /usr/local/include/TU/v/DC3.h \
-	../stereo1394/DrawThreeD.h
+	/usr/local/include/TU/Camera++.h

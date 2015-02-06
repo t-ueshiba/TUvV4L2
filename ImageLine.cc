@@ -35,7 +35,7 @@ namespace TU
 *  class ImageLine<YUV422>						*
 ************************************************************************/
 const YUV444*
-ImageLine<YUV422>::fill(const YUV444* src)
+ImageLine<YUV422>::copy(const YUV444* src)
 {
     for (iterator dst = begin(); dst < end() - 1; )
     {
@@ -52,7 +52,7 @@ ImageLine<YUV422>::fill(const YUV444* src)
 }
 
 const YUV411*
-ImageLine<YUV422>::fill(const YUV411* src)
+ImageLine<YUV422>::copy(const YUV411* src)
 {
     for (iterator dst = begin(); dst < end() - 3; )
     {
@@ -77,7 +77,7 @@ ImageLine<YUV422>::fill(const YUV411* src)
 *  class ImageLine<YUYV422>						*
 ************************************************************************/
 const YUV444*
-ImageLine<YUYV422>::fill(const YUV444* src)
+ImageLine<YUYV422>::copy(const YUV444* src)
 {
     for (iterator dst = begin(); dst < end() - 1; )
     {
@@ -94,7 +94,7 @@ ImageLine<YUYV422>::fill(const YUV444* src)
 }
 
 const YUV411*
-ImageLine<YUYV422>::fill(const YUV411* src)
+ImageLine<YUYV422>::copy(const YUV411* src)
 {
     for (iterator dst = begin(); dst < end() - 3; )
     {
@@ -119,7 +119,7 @@ ImageLine<YUYV422>::fill(const YUV411* src)
 *  class ImageLine<YUV411>						*
 ************************************************************************/
 const YUV444*
-ImageLine<YUV411>::fill(const YUV444* src)
+ImageLine<YUV411>::copy(const YUV444* src)
 {
     for (iterator dst = begin(); dst < end() - 1; )
     {
@@ -137,7 +137,7 @@ ImageLine<YUV411>::fill(const YUV444* src)
 }
 
 const YUV422*
-ImageLine<YUV411>::fill(const YUV422* src)
+ImageLine<YUV411>::copy(const YUV422* src)
 {
     for (iterator dst = begin(); dst < end() - 1; )
     {
@@ -155,7 +155,7 @@ ImageLine<YUV411>::fill(const YUV422* src)
 }
  
 const YUYV422*
-ImageLine<YUV411>::fill(const YUYV422* src)
+ImageLine<YUV411>::copy(const YUYV422* src)
 {
     for (iterator dst = begin(); dst < end() - 1; )
     {

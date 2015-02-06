@@ -359,7 +359,7 @@ MyCmdWindow<STEREO, PIXEL>::initializeRectification()
 			    _scale,
 			    _stereo.getParameters().disparitySearchWidth,
 			    _stereo.getParameters().disparityMax);
-	_rectifiedImages[2] = 0;
+	_rectifiedImages[2].fill(0);
 	_canvasV.repaintUnderlay();
     }
     else

@@ -7,6 +7,7 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
+#include <typeinfo>
 
 namespace TU
 {
@@ -566,7 +567,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	      // さらにフィルタ係数を横方向に積算して最終的な係数を求め，
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
-	  	buffers->RminR = std::numeric_limits<Score>::max();
+	  	buffers->RminR.fill(std::numeric_limits<Score>::max());
 		computeDisparities(B.crbegin(), B.crend(), rowG->crbegin(),
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
@@ -712,7 +713,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	      // さらにフィルタ係数を横方向に積算して最終的な係数を求め，
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
-		buffers->RminR = std::numeric_limits<Score>::max();
+		buffers->RminR.fill(std::numeric_limits<Score>::max());
 		computeDisparities(B.rbegin(), B.crend(), rowG->crbegin(),
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
@@ -722,7 +723,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 					       buffers->dminR.end() - D + 1,
 					       make_vertical_iterator(
 						   buffers->dminV.end(), v)))),
-				   make_row_iterator<boost::use_default>(
+				   make_row_iterator(
 				       make_fast_zip_iterator(
 					   boost::make_tuple(
 					       make_dummy_iterator(
@@ -769,19 +770,17 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 						  col_giterator colF) const
 {
 #if defined(SSE)
-    typedef mm::load_iterator<
-	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
+    typedef mm::load_iterator<typename iterator_value<COL_RV>::iterator>
+								in_iterator;
     typedef mm::cvtup_iterator<
-	assignment_iterator<ParamInit,
-			    typename ScoreVecArray::iterator2> >
-								qiterator;
+	assignment_iterator<
+	    ParamInit, typename ScoreVecArray::iterator2> >	qiterator;
 #else
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
-    typedef assignment_iterator<ParamInit,
-				typename ScoreVecArray::iterator2>
-								qiterator;
+    typedef typename iterator_value<COL_RV>::iterator		in_iterator;
+    typedef assignment_iterator<
+	ParamInit, typename ScoreVecArray::iterator2>		qiterator;
 #endif
-    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
+    typedef Diff<iterator_value<in_iterator> >			diff_type;
 
     for (; colL != colLe; ++colL)
     {
@@ -815,19 +814,17 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 					      col_giterator colF) const
 {
 #if defined(SSE)
-    typedef mm::load_iterator<
-	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
+    typedef mm::load_iterator<typename iterator_value<COL_RV>::iterator>
+								in_iterator;
     typedef mm::cvtup_iterator<
-	assignment_iterator<ParamUpdate,
-			    typename ScoreVecArray::iterator2> >
-								qiterator;
+	assignment_iterator<
+	    ParamUpdate, typename ScoreVecArray::iterator2> >	qiterator;
 #else
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
-    typedef assignment_iterator<ParamUpdate,
-				typename ScoreVecArray::iterator2>
-								qiterator;
+    typedef typename iterator_value<COL_RV>::iterator		in_iterator;
+    typedef assignment_iterator<
+	ParamUpdate, typename ScoreVecArray::iterator2>		qiterator;
 #endif
-    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
+    typedef Diff<iterator_value<in_iterator> >			diff_type;
     
     for (; colL != colLe; ++colL)
     {
@@ -908,28 +905,26 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 
 #if defined(SSE)
 	typedef mm::store_iterator<
-	    typename iterator_value<DMIN_RV>::type::iterator>	diterator;
+	    typename iterator_value<DMIN_RV>::iterator>		diterator;
 #  if defined(WITHOUT_CVTDOWN)
 	typedef mm::cvtdown_mask_iterator<
 	    Disparity,
 	    mm::mask_iterator<
 		typename ScoreVecArray::const_iterator,
-		typename iterator_value<RMIN_RV>::type::iterator> >
-								miterator;
+		typename iterator_value<RMIN_RV>::iterator> >	miterator;
 #  else
 	typedef mm::mask_iterator<
 	    Disparity,
 	    typename ScoreVecArray::const_iterator,
-	    typename iterator_value<RMIN_RV>::type::iterator>	miterator;
+	    typename iterator_value<RMIN_RV>::iterator>		miterator;
 #  endif
 #else
-	typedef typename iterator_value<DMIN_RV>::type::iterator
-								diterator;
+	typedef typename iterator_value<DMIN_RV>::iterator	diterator;
 	typedef mask_iterator<
 	    typename ScoreVecArray::const_iterator,
-	    typename iterator_value<RMIN_RV>::type::iterator>	miterator;
+	    typename iterator_value<RMIN_RV>::iterator>		miterator;
 #endif
-	typedef typename iterator_value<diterator>::type	dvalue_type;
+	typedef iterator_value<diterator>			dvalue_type;
 
 	Idx<DisparityVec>	index;
 	diterator		dminRVt((--dminRV)->begin());
@@ -986,9 +981,8 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 	    break;
 #else
     Q.resize(W, 2*DD);			// Q(u, *; d)
-    Q = 0;
     F.resize(W);
-    F = GuideElement();
+    F.fill(GuideElement());
 #endif
 
     A.resize(N + 1);
@@ -1010,7 +1004,7 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D,
 
     dminV.resize(dminL.size(), H + D - 1);
     RminV.resize(dminL.size(), RminR.size());
-    RminV = std::numeric_limits<SCORE>::max();
+    RminV.fill(std::numeric_limits<SCORE>::max());
 }
 
 }

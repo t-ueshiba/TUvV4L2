@@ -258,7 +258,7 @@ template <class T> size_t
 BSplineKnots<T>::insertKnot(element_type u)
 {
     size_t	l = findSpan(u) + 1;	// insertion point for the new knot
-    super	tmp(*this);
+    super	tmp(static_cast<const super&>(*this));
     super::resize(size() + 1);
     for (size_t i = 0; i < l; ++i)	// copy unchanged knots
 	(*this)[i] = tmp[i];
@@ -275,7 +275,7 @@ template <class T> size_t
 BSplineKnots<T>::removeKnot(size_t k)
 {
     k = rightmost(k);			// index of the knot to be removed
-    super	tmp(*this);
+    super	tmp(static_cast<const super&>(*this));
     super::resize(size() - 1);
     for (size_t i = 0; i < k; ++i)	// copy unchanged knots
 	(*this)[i] = tmp[i];
@@ -390,7 +390,7 @@ template <class C> size_t
 BSplineCurve<C>::insertKnot(element_type u)
 {
     size_t	l = _knots.insertKnot(u);
-    super	tmp(*this);
+    super	tmp(static_cast<const super&>(*this));
     super::resize(super::size() + 1);	// cannot omit super:: specifier
     for (size_t i = 0; i < l-degree(); ++i)
 	(*this)[i] = tmp[i];		// copy unchanged control points
@@ -422,7 +422,7 @@ BSplineCurve<C>::removeKnot(size_t k)
     size_t		s = multiplicity(k);
     element_type	u = knot(k);
     k = _knots.removeKnot(k);
-    super	tmp(*this);
+    super	tmp(static_cast<const super&>(*this));
     super::resize(super::size() - 1);	// cannot omit Array<C>:: specifier
     size_t	i, j;
     for (i = 0; i < k - degree(); ++i)
@@ -468,7 +468,8 @@ BSplineCurve<C>::elevateDegree()
 	    insertKnot(knot(k));
 	++nsegments;
     }
-    super	tmp(*this);	// Save control points of Bezier segments.
+  // Save control points of Bezier segments.    
+    super	tmp(static_cast<const super&>(*this));
 
   // Set knots and allocate area for control points.
     for (size_t k = 0; k <= M(); )  // Elevate multiplicity of each knot by one.

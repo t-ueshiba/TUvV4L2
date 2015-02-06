@@ -1,49 +1,58 @@
 #
-#  $Id: Makefile,v 1.17 2012-08-31 02:37:09 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
+PROGRAM		= $(shell basename $(PWD))
+#LIBRARY		= lib$(shell basename $(PWD))
 
-PROGRAM		= splinetest
-LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
-		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11
-ifeq ($(OSTYPE), darwin)
-  LIBS	       +=
-#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
+VPATH		=
 
-CPPFLAGS	= -DLIBTUTOOLS_DEBUG
+IDLS		=
+MOCHDRS		=
+
+INCDIRS		= -I../.. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
+ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+  NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
+		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/List.h \
-		/usr/local/include/TU/Manip.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Nurbs++.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/types.h \
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
+EXTHDRS		= ../../TU/Array++.h \
+		../../TU/Geometry++.h \
+		../../TU/Image++.h \
+		../../TU/List.h \
+		../../TU/Manip.h \
+		../../TU/Minimize.h \
+		../../TU/Nurbs++.h \
+		../../TU/Vector++.h \
+		../../TU/functional.h \
+		../../TU/iterator.h \
+		../../TU/mmInstructions.h \
+		../../TU/tuple.h \
+		../../TU/types.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -63,36 +72,35 @@ SRCS		= draw.cc \
 OBJS		= draw.o \
 		main.o
 
-include $(PROJECT)/lib/p.mk
-
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 draw.o: draw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Colormap.h \
+	/usr/local/include/TU/v/DC.h ../../TU/Geometry++.h \
+	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
+	../../TU/tuple.h ../../TU/functional.h ../../TU/mmInstructions.h \
+	../../TU/Minimize.h ../../TU/Image++.h ../../TU/types.h \
+	../../TU/Manip.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	/usr/local/include/TU/Nurbs++.h
+	../../TU/Nurbs++.h
 main.o: /usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
+	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
+	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
+	../../TU/functional.h ../../TU/mmInstructions.h ../../TU/Minimize.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/CanvasPane.h draw.h \
 	/usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	/usr/local/include/TU/Nurbs++.h
+	../../TU/Nurbs++.h

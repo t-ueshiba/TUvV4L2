@@ -122,15 +122,15 @@ IntegralImage<T>::initialize(const Image<S, B>& image)
     super::resize(image.height() + 1, image.width() + 1);
 
   // 上と左に余白を入れる
-    (*this)[0] = 0;				    // 0行目はすべて0
+    (*this)[0].fill(0);					// 0行目はすべて0
     for (size_t v = 1; v < height(); ++v)
     {
 	T*		dst = (*this)[v].data();
-	*dst = 0;				    // 0列目は0
+	*dst = 0;					// 0列目は0
 
 	const S*	src = image[v-1].data();
-	T		val = 0;		    // この行のこの画素までの和
-	const T*	prv = (*this)[v-1].data();   // 1行上
+	T		val = 0;			// この行のこの画素までの和
+	const T*	prv = (*this)[v-1].data();	// 1行上
 	const T* const	end = dst + width();
 	while (++dst < end)
 	    *dst = (val += *src++) + *(++prv);

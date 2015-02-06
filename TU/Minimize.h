@@ -122,12 +122,12 @@ class ConstNormConstraint
   */
     matrix_type	jacobian(const argument_type& x) const
 		{
-		    const vector_type&	y = x;
+		    const vector_type&	y = serialize(x);
 		    matrix_type		L(1, y.size());
 		    (L[0] = y) *= 2.0;
 		    return L;
 		}
-	    
+
   private:
     const element_type	_sqr;
 };

@@ -71,7 +71,7 @@ class box_filter_iterator
 		{
 		}
     
-		box_filter_iterator(ITER const& iter, size_t w=0)
+		box_filter_iterator(const ITER& iter, size_t w=0)
 		    :super(iter), _head(iter), _val(), _valid(true)
 		{
 		    if (w > 0)
@@ -83,7 +83,7 @@ class box_filter_iterator
 		    }
 		}
 
-    void	initialize(ITER const& iter, size_t w=0)
+    void	initialize(const ITER& iter, size_t w=0)
 		{
 		    super::base_reference() = iter;
 		    _head = iter;
@@ -99,27 +99,26 @@ class box_filter_iterator
 		}
     
   private:
-    typedef boost::mpl::bool_<detail::is_container<value_type>::value>
+    typedef std::integral_constant<bool, detail::is_range<value_type>::value>
 								value_is_expr;
 
-    template <class _VITER, class _ITER>
-    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::false_)
+    template <class VITER_, class ITER_>
+    static void	update(VITER_ val, ITER_ curr, ITER_ head, std::false_type)
 		{
 		    *val += (*curr - *head);
 		}
-    template <class _VITER, class _ITER>
-    static void	update(_VITER val, _ITER curr, _ITER head, boost::mpl::true_)
+    template <class VITER_, class ITER_>
+    static void	update(VITER_ val, ITER_ curr, ITER_ head, std::true_type)
 		{
-		    typedef typename std::iterator_traits<_ITER>::value_type
-					::const_iterator	const_iterator;
-		    typedef typename subiterator<_VITER>::type	iterator;
-		    typedef boost::mpl::bool_<
-			detail::is_container<
+		    typedef subiterator<VITER_>			iterator;
+		    typedef std::integral_constant<
+			bool,
+			detail::is_range<
 			    typename std::iterator_traits<
 				iterator>::value_type>::value>	value_is_expr;
 		    
-		    const_iterator	c = curr->cbegin(), h = head->cbegin();
-		    for (iterator v = val->begin(), ve = val->end();
+		    auto	c = curr->cbegin(), h = head->cbegin();
+		    for (auto v = val->begin(), ve = val->end();
 			 v != ve; ++v, ++c, ++h)
 			update(v, c, h, value_is_expr());
 		}

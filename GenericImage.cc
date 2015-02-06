@@ -78,8 +78,6 @@ GenericImage::saveData(std::ostream& out) const
     }
     
     Array<u_char>	pad(type2nbytes(_typeInfo.type, true));
-    pad = 0;
-
     if (_typeInfo.bottomToTop)
     {
 	for (const_reverse_iterator line = rbegin(); line != rend(); ++line)
@@ -119,7 +117,7 @@ GenericImage::_resize(size_t h, size_t w, const TypeInfo& typeInfo)
 {
     _typeInfo = typeInfo;
     w = (type2depth(_typeInfo.type)*w + 7) / 8;
-    Array2<Array<u_char> >::resize(h, w);
+    super::resize(h, w);
 }
 
 }

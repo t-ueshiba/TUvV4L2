@@ -34,462 +34,92 @@
 #ifndef __TU_FUNCTIONAL_H
 #define __TU_FUNCTIONAL_H
 
-#include <functional>
+#include <cstddef>				// for including size_t
+#include <cmath>				// std::sqrt()
+#include <functional>				// std::bind()
+#include <type_traits>				// std::integral_constant
+#include <numeric>				// std::accumulate()
 #include <cassert>
-#include <boost/tuple/tuple.hpp>
-#include <boost/type_traits.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 
 namespace TU
 {
 /************************************************************************
-*  class op_node							*
+*  struct plus<S, T>							*
 ************************************************************************/
-//! 演算子のノードを表すクラス
-struct op_node
+//! 加算
+/*!
+  \param S	左辺の型
+  \param T	右辺の型
+*/
+template <class S, class T>
+struct plus
 {
+    typedef S				first_argument_type;
+    typedef T				second_argument_type;
+    typedef decltype(std::declval<S>()+
+		     std::declval<T>())	result_type;
+    
+    result_type	operator ()(const S& x, const T& y)	const	{ return x + y; }
 };
     
 /************************************************************************
-*  class container<E>							*
+*  struct minus<S, T>							*
 ************************************************************************/
-//! コンテナを表すクラス
+//! 加算
 /*!
-  \param C	コンテナの実体の型
+  \param S	左辺の型
+  \param T	右辺の型
 */
-template <class C>
-struct container
+template <class S, class T>
+struct minus
 {
-  //! この式の実体への参照を返す.
-    const C&	operator ()() const
-		{
-		    return static_cast<const C&>(*this);
-		}
+    typedef S				first_argument_type;
+    typedef T				second_argument_type;
+    typedef decltype(std::declval<S>()-
+		     std::declval<T>())	result_type;
+    
+    result_type	operator ()(const S& x, const T& y)	const	{ return x - y; }
 };
-
-//! 実装の詳細を収める名前空間
-namespace detail
-{
-  /**********************************************************************
-  *  meta template predicates						*
-  **********************************************************************/
-  //! 与えられた型がコンテナであるかを判別するテンプレート述語
-  /*!
-    \param T	任意の型
-  */
-    template <class T>
-    class is_container
-    {
-      private:
-	typedef char	Small;
-	struct Big	{ Small dummy[2]; };
-	
-	template <class _C>
-	static Small	test(container<_C>)	;
-	static Big	test(...)		;
-	static T	makeT()			;
-    
-      public:
-	enum		{ value = (sizeof(test(makeT())) == sizeof(Small)) };
-    };
-
-  //! 与えられた式の評価結果の型を返すテンプレート述語
-  /*!
-    \param E	式を表す型
-  */
-    template <class E>
-    struct ResultType
-    {
-	typedef typename E::result_type			type;
-    };
-    
-  //! 式の要素型が演算子でない配列ならばその基底配列型, そうでなければ要素型そのもの
-  /*!
-    \param E	value_typeを持つ式を表す型
-  */
-    template <class E>
-    class ValueType
-    {
-      private:
-	typedef typename E::value_type			value_type;
-
-      public:
-	typedef typename boost::mpl::eval_if_c<
-	    (is_container<value_type>::value &&
-	     !boost::is_convertible<value_type, op_node>::value),
-	    ResultType<value_type>,
-	    boost::mpl::identity<value_type> >::type	type;
-    };
-
-  //! 式が演算子ノードならばそれ自体もしくはその評価結果，そうでなければそれへの参照
-  /*!
-    \param E	コンテナ式を表す型
-    \param EVAL	演算子ノードを評価するならtrue, そうでなければfalse
-  */
-    template <class E, bool EVAL=false>
-    struct ArgumentType
-    {
-	typedef typename boost::mpl::if_<
-	    boost::is_convertible<E, op_node>,
-	    typename boost::mpl::if_c<
-		EVAL, const typename E::result_type, const E>::type,
-	    const E&>::type				type;
-    };
-}
     
 /************************************************************************
-*  class unary_operator<OP, E>						*
+*  struct multiplies<S, T>						*
 ************************************************************************/
-//! コンテナ式に対する単項演算子を表すクラス
+//! 乗算
 /*!
-  \param OP	各成分に適用される単項演算子の型
-  \param E	単項演算子の引数となる式の実体の型
+  \param S	左辺の型
+  \param T	右辺の型
 */
-template <class OP, class E>
-class unary_operator : public container<unary_operator<OP, E> >,
-		       public op_node
+template <class S, class T>
+struct multiplies
 {
-  private:
-    typedef typename detail::ArgumentType<E>::type	argument_type;
-    typedef typename detail::ValueType<E>::type		evalue_type;
-    typedef boost::mpl::bool_<
-	detail::is_container<evalue_type>::value>	evalue_is_expr;
-
-  public:
-  //! 評価結果の型
-    typedef typename E::result_type			result_type;
-  //! 成分の型
-    typedef typename result_type::element_type		element_type;
-  //! 要素の型
-    typedef typename boost::mpl::if_<
-	evalue_is_expr, unary_operator<OP, evalue_type>,
-	element_type>::type				value_type;
-  //! 定数反復子
-    class const_iterator
-	: public boost::iterator_adaptor<const_iterator,
-					 typename E::const_iterator,
-					 value_type,
-					 boost::use_default,
-					 value_type>
-    {
-      private:
-	typedef boost::iterator_adaptor<
-		    const_iterator,
-		    typename E::const_iterator,
-		    value_type,
-		    boost::use_default,
-		    value_type>				super;
-	typedef typename super::base_type		base_type;
-
-      public:
-	typedef typename super::difference_type		difference_type;
-	typedef typename super::pointer			pointer;
-	typedef typename super::reference		reference;
-	typedef typename super::iterator_category	iterator_category;
-
-	friend class	boost::iterator_core_access;
-	
-      public:
-	const_iterator(base_type iter, const OP& op)
-	    :super(iter), _op(op)					{}
-	
-      private:
-	reference	dereference(boost::mpl::true_) const
-			{
-			    return reference(*super::base(), _op);
-			}
-	reference	dereference(boost::mpl::false_) const
-			{
-			    return _op(*super::base());
-			}
-	reference	dereference() const
-			{
-			    return dereference(evalue_is_expr());
-			}
-
-      private:
-	const OP&	_op;	//!< 単項演算子
-    };
-
-    typedef const_iterator	iterator;	//!< 定数反復子の別名
+    typedef S				first_argument_type;
+    typedef T				second_argument_type;
+    typedef decltype(std::declval<S>()*
+		     std::declval<T>())	result_type;
     
-  public:
-  //! 単項演算子を生成する.
-    unary_operator(const container<E>& expr, const OP& op)
-	:_e(expr()), _op(op)						{}
-
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	begin() const
-			{
-			    return const_iterator(_e.begin(), _op);
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return begin();
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	end() const
-			{
-			    return const_iterator(_e.end(), _op);
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
-			{
-			    return end();
-			}
-  //! 演算結果の要素数を返す.
-    size_t		size() const
-			{
-			    return _e.size();
-			}
-  //! 演算結果の列数を返す.
-    size_t		ncol() const
-			{
-			    return _e.ncol();
-			}
-	    
-  private:
-    argument_type	_e;	//!< 引数となる式の実体
-    const OP		_op;	//!< 単項演算子
+    result_type	operator ()(const S& x, const T& y)	const	{ return x * y; }
 };
-
-//! 与えられたコンテナ式の各要素の符号を反転する.
-/*!
-  \param expr	コンテナ式
-  \return	符号反転演算子ノード
-*/
-template <class E>
-inline unary_operator<std::negate<typename E::element_type>, E>
-operator -(const container<E>& expr)
-{
-    typedef std::negate<typename E::element_type>	op_type;
     
-    return unary_operator<op_type, E>(expr, op_type());
-}
-
-//! 与えられたコンテナ式の各要素に定数を掛ける.
-/*!
-  \param expr	コンテナ式
-  \param c	乗数
-  \return	乗算演算子ノード
-*/
-template <class E> inline
-unary_operator<std::binder2nd<std::multiplies<typename E::element_type> >, E>
-operator *(const container<E>& expr, typename E::element_type c)
-{
-    typedef std::multiplies<typename E::element_type>	op_type;
-    typedef std::binder2nd<op_type>			binder_type;
-    
-    return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
-}
-
-//! 与えられたコンテナ式の各要素に定数を掛ける.
-/*!
-  \param c	乗数
-  \param expr	コンテナ式
-  \return	乗算演算子ノード
-*/
-template <class E> inline
-unary_operator<std::binder1st<std::multiplies<typename E::element_type> >, E>
-operator *(typename E::element_type c, const container<E>& expr)
-{
-    typedef std::multiplies<typename E::element_type>	op_type;
-    typedef std::binder1st<op_type>			binder_type;
-    
-    return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
-}
-
-//! 与えられたコンテナ式の各要素を定数で割る.
-/*!
-  \param expr	コンテナ式
-  \param c	除数
-  \return	除算演算子ノード
-*/
-template <class E> inline
-unary_operator<std::binder2nd<std::divides<typename E::element_type> >, E>
-operator /(const container<E>& expr, typename E::element_type c)
-{
-    typedef std::divides<typename E::element_type>	op_type;
-    typedef std::binder2nd<op_type>			binder_type;
-    
-    return unary_operator<binder_type, E>(expr, binder_type(op_type(), c));
-}
-
 /************************************************************************
-*  class binary_operator<OP, L, R>					*
+*  struct divides<S, T>							*
 ************************************************************************/
-//! コンテナ式に対する2項演算子を表すクラス
+//! 除算
 /*!
-  \param OP	各成分に適用される2項演算子の型
-  \param L	2項演算子の第1引数となる式の実体の型
-  \param R	2項演算子の第2引数となる式の実体の型
+  \param S	左辺の型
+  \param T	右辺の型
 */
-template <class OP, class L, class R>
-class binary_operator : public container<binary_operator<OP, L, R> >,
-			public op_node
+template <class S, class T>
+struct divides
 {
-  private:
-    typedef typename detail::ArgumentType<L>::type	largument_type;
-    typedef typename detail::ArgumentType<R>::type	rargument_type;
-    typedef typename detail::ValueType<L>::type		lvalue_type;
-    typedef typename detail::ValueType<R>::type		rvalue_type;
-    typedef boost::mpl::bool_<
-	detail::is_container<lvalue_type>::value>	lvalue_is_expr;
-
-  public:
-  //! 評価結果の型
-    typedef typename R::result_type			result_type;
-  //! 成分の型
-    typedef typename result_type::element_type		element_type;
-  //! 要素の型
-    typedef typename boost::mpl::if_<
-	lvalue_is_expr,
-	binary_operator<OP, lvalue_type, rvalue_type>,
-	element_type>::type				value_type;
-  //! 定数反復子
-    class const_iterator
-	: public boost::iterator_adaptor<const_iterator,
-					 typename L::const_iterator,
-					 value_type,
-					 boost::use_default,
-					 value_type>
-    {
-      private:
-	typedef boost::iterator_adaptor<
-		    const_iterator,
-		    typename L::const_iterator,
-		    value_type,
-		    boost::use_default,
-		    value_type>				super;
-	typedef typename super::base_type		lbase_type;
-	typedef typename R::const_iterator		rbase_type;
-	
-      public:
-	typedef typename super::difference_type		difference_type;
-	typedef typename super::pointer			pointer;
-	typedef typename super::reference		reference;
-	typedef typename super::iterator_category	iterator_category;
-
-	friend class	boost::iterator_core_access;
-	
-      public:
-	const_iterator(lbase_type liter, rbase_type riter, const OP& op)
-	    :super(liter), _riter(riter), _op(op)			{}
-	
-      private:
-	reference	dereference(boost::mpl::true_) const
-			{
-			    return reference(*super::base(), *_riter, _op);
-			}
-	reference	dereference(boost::mpl::false_) const
-			{
-			    return _op(*super::base(), *_riter);
-			}
-	reference	dereference() const
-			{
-			    return dereference(lvalue_is_expr());
-			}
-	void		advance(difference_type n)
-			{
-			    super::base_reference() += n;
-			    _riter += n;
-			}
-	void		increment()
-			{
-			    ++super::base_reference();
-			    ++_riter;
-			}
-	void		decrement()
-			{
-			    --super::base_reference();
-			    --_riter;
-			}
-	
-      private:
-	rbase_type	_riter;	//!< 第2引数となる式の実体を指す反復子
-	const OP&	_op;	//!< 2項演算子
-    };
-
-    typedef const_iterator	iterator;	//!< 定数反復子の別名
+    typedef S				first_argument_type;
+    typedef T				second_argument_type;
+    typedef decltype(std::declval<S>()/
+		     std::declval<T>())	result_type;
     
-  public:
-  //! 2項演算子を生成する.
-    binary_operator(const container<L>& l,
-		   const container<R>& r, const OP& op)
-	:_l(l()), _r(r()), _op(op)
-			{
-			    assert(_l.size() == _r.size());
-			}
-
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	begin() const
-			{
-			    return const_iterator(_l.begin(),
-						  _r.begin(), _op);
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return begin();
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	end() const
-			{
-			    return const_iterator(_l.end(), _r.end(), _op);
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
-			{
-			    return end();
-			}
-  //! 演算結果の要素数を返す.
-    size_t		size() const
-			{
-			    return _l.size();
-			}
-  //! 演算結果の列数を返す.
-    size_t		ncol() const
-			{
-			    return _l.ncol();
-			}
-    
-  private:
-    largument_type	_l;	//!< 第1引数となる式の実体
-    rargument_type	_r;	//!< 第2引数となる式の実体
-    const OP		_op;	//!< 2項演算子
+    result_type	operator ()(const S& x, const T& y)	const	{ return x / y; }
 };
-
-//! 与えられた2つのコンテナ式の各要素の和をとる.
-/*!
-  \param l	左辺のコンテナ式
-  \param r	右辺のコンテナ式
-  \return	加算演算子ノード
-*/
-template <class L, class R>
-inline binary_operator<std::plus<typename R::element_type>, L, R>
-operator +(const container<L>& l, const container<R>& r)
-{
-    typedef std::plus<typename R::element_type>		op_type;
-
-    return binary_operator<op_type, L, R>(l, r, op_type());
-}
-
-//! 与えられた2つのコンテナ式の各要素の差をとる.
-/*!
-  \param l	左辺のコンテナ式
-  \param r	右辺のコンテナ式
-  \return	減算演算子ノード
-*/
-template <class L, class R>
-inline binary_operator<std::minus<typename R::element_type>, L, R>
-operator -(const container<L>& l, const container<R>& r)
-{
-    typedef std::minus<typename R::element_type>	op_type;
-
-    return binary_operator<op_type, L, R>(l, r, op_type());
-}
-
+    
 /************************************************************************
 *  struct identity<T>							*
 ************************************************************************/
@@ -503,7 +133,7 @@ struct identity
     typedef T	argument_type;
     typedef T	result_type;
     
-    T&	operator ()(T& x)			const	{ return x; }
+    T&	operator ()(T&& x)		const	{ return x; }
 };
 
 /************************************************************************
@@ -517,11 +147,11 @@ struct identity
 template <class S, class T>
 struct assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y = x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y = x; return y; }
 };
 
 /************************************************************************
@@ -535,11 +165,11 @@ struct assign
 template <class S, class T>
 struct plus_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y += x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y += x; return y; }
 };
 
 /************************************************************************
@@ -553,11 +183,11 @@ struct plus_assign
 template <class S, class T>
 struct minus_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y -= x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y -= x; return y; }
 };
 
 /************************************************************************
@@ -571,11 +201,11 @@ struct minus_assign
 template <class S, class T>
 struct multiplies_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y *= x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y *= x; return y; }
 };
 
 /************************************************************************
@@ -589,11 +219,11 @@ struct multiplies_assign
 template <class S, class T>
 struct divides_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y /= x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y /= x; return y; }
 };
 
 /************************************************************************
@@ -607,11 +237,11 @@ struct divides_assign
 template <class S, class T>
 struct modulus_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y %= x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y %= x; return y; }
 };
 
 /************************************************************************
@@ -625,11 +255,11 @@ struct modulus_assign
 template <class S, class T>
 struct bit_and_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y &= x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y &= x; return y; }
 };
 
 /************************************************************************
@@ -643,11 +273,11 @@ struct bit_and_assign
 template <class S, class T>
 struct bit_or_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y |= x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y |= x; return y; }
 };
 
 /************************************************************************
@@ -661,259 +291,615 @@ struct bit_or_assign
 template <class S, class T>
 struct bit_xor_assign
 {
-    typedef S		first_argument_type;
-    typedef T		second_argument_type;
-    typedef void	result_type;
+    typedef S	first_argument_type;
+    typedef T	second_argument_type;
+    typedef T	result_type;
     
-    void	operator ()(const S& x, T&& y)	const	{ y ^= x; }
+    T&	operator ()(const S& x, T&& y)	const	{ y ^= x; return y; }
 };
 
-/************************************************************************
-*  class unarize2<FUNC>							*
-************************************************************************/
-//! 引数をtupleにまとめることによって2変数関数を1変数関数に変換
-template <class FUNC>
-class unarize2
+//! 実装の詳細を収める名前空間
+namespace detail
 {
-  public:
-    typedef FUNC						functor_type;
-    typedef boost::tuple<typename FUNC::first_argument_type,
-			 typename FUNC::second_argument_type>	argument_type;
-    typedef typename FUNC::result_type				result_type;
+  /**********************************************************************
+  *  struct opnode							*
+  **********************************************************************/
+  //! 演算子のノードを表すクラス
+  struct opnode		{};
+    
+  namespace impl
+  {
+    template <class T>	struct identity	{ typedef T	type; };
+    template <class>	struct ignore	{ typedef void	type; };
 
-    class mm : public unarize2<typename FUNC::mm>
+    struct has_begin
     {
-      private:
-	typedef unarize2<typename FUNC::mm>		super;
-
-      public:
-	mm(const unarize2& u)	:super(u.functor())	{}
+	template <class E_> static auto
+	check(E_*) -> decltype(std::declval<E_&>().begin(), std::true_type());
+	template <class E_> static auto
+	check(...) -> std::false_type;
+    };
+      
+    template <class E, class=void>
+    struct const_iterator_t
+    {
+	typedef void						type;
+    };
+    template <class E>
+    struct const_iterator_t<
+	E, typename ignore<typename E::const_iterator>::type>
+    {
+	typedef typename E::const_iterator			type;
     };
 
-  public:
-    unarize2(const FUNC& func=FUNC())	:_func(func)	{}
-
-    result_type	operator ()(const argument_type& arg) const
-		{
-		    return _func(boost::get<0>(arg), boost::get<1>(arg));
-		}
-
-    const FUNC&	functor()			const	{return _func;}
-
-  private:
-    const FUNC	_func;
-};
-
-template <class FUNC> inline unarize2<FUNC>
-make_unary_function2(const FUNC& func)
-{
-    return unarize2<FUNC>(func);
-}
-    
-/************************************************************************
-*  class unarize3<FUNC>							*
-************************************************************************/
-//! 引数をtupleにまとめることによって3変数関数を1変数関数に変換
-template <class FUNC>
-class unarize3
-{
-  public:
-    typedef FUNC						functor_type;
-    typedef typename FUNC::result_type				result_type;
-    typedef boost::tuple<typename FUNC::first_argument_type,
-			 typename FUNC::second_argument_type,
-			 typename FUNC::third_argument_type>	argument_type;
-    
-    class mm_ : public unarize3<typename FUNC::mm_>
+    template <class E, class ITER>
+    struct element_t
     {
-      private:
-	typedef unarize3<typename FUNC::mm_>		super;
-
-      public:
-	mm_(const unarize3& u)	:super(u.functor())	{}
+	typedef typename std::iterator_traits<ITER>::value_type	F;
+	typedef typename element_t<
+	    F, typename const_iterator_t<F>::type>::type	type;
     };
+    template <class E>
+    struct element_t<E, void> : identity<E>			{};
 
-  public:
-    unarize3(const FUNC& func=FUNC())	:_func(func)	{}
-
-    result_type	operator ()(const argument_type& arg) const
-		{
-		    return _func(boost::get<0>(arg),
-				 boost::get<1>(arg), boost::get<2>(arg));
-		}
-
-    const FUNC&	functor()			const	{return _func;}
-
-  private:
-    const FUNC	_func;
-};
-
-template <class FUNC> inline unarize3<FUNC>
-make_unary_function3(const FUNC& func)
-{
-    return unarize3<FUNC>(func);
-}
-    
-/************************************************************************
-*  class unarize4<FUNC>							*
-************************************************************************/
-//! 引数をtupleにまとめることによって4変数関数を1変数関数に変換
-template <class FUNC>
-class unarize4
-{
-  public:
-    typedef FUNC						functor_type;
-    typedef typename FUNC::result_type				result_type;
-    typedef boost::tuple<typename FUNC::first_argument_type,
-			 typename FUNC::second_argument_type,
-			 typename FUNC::third_argument_type,
-			 typename FUNC::fourth_argument_type>	argument_type;
-    
-    class mm_ : public unarize4<typename FUNC::mm_>
+    template <class E>
+    struct result_t
     {
-      private:
-	typedef unarize3<typename FUNC::mm_>		super;
-
-      public:
-	mm_(const unarize4& u)	:super(u.functor())	{}
+	typedef typename E::result_type				type;
     };
-
-  public:
-    unarize4(const FUNC& func=FUNC())	:_func(func)	{}
-
-    result_type	operator ()(const argument_type& arg) const
-		{
-		    return _func(boost::get<0>(arg), boost::get<1>(arg),
-				 boost::get<2>(arg), boost::get<3>(arg));
-		}
-
-    const FUNC&	functor()			const	{return _func;}
-
-  private:
-    const FUNC	_func;
-};
-
-template <class FUNC> inline unarize4<FUNC>
-make_unary_function4(const FUNC& func)
-{
-    return unarize4<FUNC>(func);
-}
+  }
     
+  /**********************************************************************
+  *  type aliases							*
+  **********************************************************************/
+  //! 式が持つ定数反復子の型を返す
+  /*!
+    \param E	式の型
+    \return	E が定数反復子を持てばその型，持たなければ void
+  */
+  template <class E>
+  using const_iterator_t = typename impl::const_iterator_t<E>::type;
+
+  //! 式が定数反復子を持つか判定する
+  template <class E>
+  using is_range = decltype(impl::has_begin::check<E>(nullptr));
+    
+  //! 式が演算子であるか判定する
+  template <class E>
+  using is_opnode = std::integral_constant<
+			bool, std::is_convertible<E, detail::opnode>::value>;
+
+  //! 式が持つ定数反復子が指す型を返す
+  /*!
+    定数反復子を持たない式を与えるとコンパイルエラーとなる.
+    \param E	定数反復子を持つ式の型
+    \return	E の定数反復子が指す型
+  */
+  template <class E>
+  using value_t = typename std::iterator_traits<
+			       const_iterator_t<E> >::value_type;
+
+  //! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
+  /*!
+    \param E	式の型
+    \return	E が定数反復子を持てばそれが指す型を再帰的に辿って到達する型，
+		持たなければ E 自身
+  */
+  template <class E>
+  using element_t = typename impl::element_t<E, const_iterator_t<E> >::type;
+
+  //! 式の評価結果の型を返す
+  /*!
+    \param E	式の型
+    \return	E が演算子ならば E::result_type, そうでなければ E
+  */
+  template <class E>
+  using	result_t = typename std::conditional<is_opnode<E>::value,
+					     impl::result_t<E>,
+					     impl::identity<E> >::type::type;
+    
+  //! 演算子の仮引数として与えられた式の型を返す
+  /*!
+    \param E	式の型
+    \param EVAL	式の評価結果の型を得るならtrue, そうでなければfalse
+    \return	E が演算子でなければ const E&, 演算子かつ EVAL == true なら
+		E::result_type, 演算子かつ EVAL == false なら const E
+  */
+  template <class E, bool EVAL>
+  using argument_t = typename std::conditional<
+			 is_opnode<E>::value,
+			 typename std::conditional<
+			     EVAL,
+			     impl::result_t<E>,
+			     impl::identity<const E> >::type,
+			 impl::identity<const E&> >::type::type;
+    
+  /**********************************************************************
+  *  class unary_operator<OP, E>					*
+  **********************************************************************/
+  //! コンテナ式に対する単項演算子を表すクラス
+  /*!
+    \param OP	各成分に適用される単項演算子の型
+    \param E	単項演算子の引数となる式の実体の型
+  */
+  template <class OP, class E>
+  class unary_operator : public opnode
+  {
+    private:
+      typedef value_t<E>		evalue_type;
+      typedef is_range<evalue_type>	evalue_is_range;
+      typedef argument_t<E, false>	argument_type;
+      typedef const_iterator_t<E>	base_iterator;
+
+    public:
+    //! 評価結果の型
+      typedef result_t<E>		result_type;
+    //! 要素の型
+      typedef typename std::conditional<
+	  evalue_is_range::value,
+	  unary_operator<OP, evalue_type>,
+	  evalue_type>::type		value_type;
+  //! 定数反復子
+      class const_iterator
+	  : public boost::iterator_adaptor<const_iterator,
+					   base_iterator,
+					   value_type,
+					   boost::use_default,
+					   value_type>
+      {
+	private:
+	  typedef boost::iterator_adaptor<const_iterator,
+					  base_iterator,
+					  value_type,
+					  boost::use_default,
+					  value_type>	super;
+
+	public:
+	  typedef typename super::reference	reference;
+
+	  friend class	boost::iterator_core_access;
+	
+	public:
+			const_iterator(base_iterator iter, const OP& op)
+			    :super(iter), _op(op)			{}
+	
+	private:
+	  reference	dereference(std::true_type) const
+			{
+			    return reference(*super::base(), _op);
+			}
+	  reference	dereference(std::false_type) const
+			{
+			    return _op(*super::base());
+			}
+	  reference	dereference() const
+			{
+			    return dereference(evalue_is_range());
+			}
+
+	private:
+	  const OP&	_op;	//!< 単項演算子
+      };
+
+      typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+    public:
+    //! 単項演算子を生成する.
+			unary_operator(const E& expr, const OP& op)
+			    :_e(expr), _op(op)				{}
+
+    //! 演算結果の先頭要素を指す定数反復子を返す.
+      const_iterator	begin() const
+			{
+			    return const_iterator(_e.begin(), _op);
+			}
+    //! 演算結果の末尾を指す定数反復子を返す.
+      const_iterator	end() const
+			{
+			    return const_iterator(_e.end(), _op);
+			}
+    //! 演算結果の要素数を返す.
+      size_t		size() const
+			{
+			    return _e.size();
+			}
+	    
+    private:
+      argument_type	_e;	//!< 引数となる式の実体
+      const OP		_op;	//!< 単項演算子
+  };
+
+  template <class OP, class E>
+  inline typename std::enable_if<detail::is_range<E>::value,
+				 unary_operator<OP, E> >::type
+  make_unary_operator(const E& expr, const OP& op)
+  {
+      return unary_operator<OP, E>(expr, op);
+  }
+    
+  template <template <class, class> class OP, class E>
+  inline typename std::enable_if<detail::is_range<E>::value, E&>::type
+  op_assign(E& expr, const detail::element_t<E>& c)
+  {
+      for (auto dst = expr.begin(); dst != expr.end(); ++dst)
+	  OP<decltype(c), decltype(*dst)>()(c, *dst);
+
+      return expr;
+  }
+
+  /**********************************************************************
+  *  class binary_operator<OP, L, R>					*
+  **********************************************************************/
+  //! コンテナ式に対する2項演算子を表すクラス
+  /*!
+    \param OP	各成分に適用される2項演算子の型
+    \param L	2項演算子の第1引数となる式の実体の型
+    \param R	2項演算子の第2引数となる式の実体の型
+  */
+  template <class OP, class L, class R>
+  class binary_operator : public opnode
+  {
+    private:
+      typedef value_t<L>		lvalue_type;
+      typedef value_t<R>		rvalue_type;
+      typedef is_range<rvalue_type>	rvalue_is_range;
+      typedef argument_t<L, false>	largument_type;
+      typedef argument_t<R, false>	rargument_type;
+      typedef const_iterator_t<L>	lbase_iterator;
+      typedef const_iterator_t<R>	rbase_iterator;
+
+    public:
+    //! 評価結果の型
+      typedef result_t<R>		result_type;
+    //! 要素の型
+      typedef typename std::conditional<
+	  rvalue_is_range::value,
+	  binary_operator<
+	      OP, lvalue_type, rvalue_type>,
+	  rvalue_type>::type		value_type;
+    //! 定数反復子
+      class const_iterator
+	  : public boost::iterator_adaptor<const_iterator,
+					   lbase_iterator,
+					   value_type,
+					   boost::use_default,
+					   value_type>
+      {
+	private:
+	  typedef boost::iterator_adaptor<const_iterator,
+					  lbase_iterator,
+					  value_type,
+					  boost::use_default,
+					  value_type>	super;
+	
+	public:
+	  typedef typename super::difference_type	difference_type;
+	  typedef typename super::reference		reference;
+
+	  friend class	boost::iterator_core_access;
+	
+	public:
+			const_iterator(lbase_iterator liter,
+				       rbase_iterator riter, const OP& op)
+			    :super(liter), _riter(riter), _op(op)	{}
+	
+	private:
+	  reference	dereference(std::true_type) const
+			{
+			    return reference(*super::base(), *_riter, _op);
+			}
+	  reference	dereference(std::false_type) const
+			{
+			    return _op(*super::base(), *_riter);
+			}
+	  reference	dereference() const
+			{
+			    return dereference(rvalue_is_range());
+			}
+	  void		advance(difference_type n)
+			{
+			    super::base_reference() += n;
+			    _riter += n;
+			}
+	  void		increment()
+			{
+			    ++super::base_reference();
+			    ++_riter;
+			}
+	  void		decrement()
+			{
+			    --super::base_reference();
+			    --_riter;
+			}
+	
+	private:
+	  rbase_iterator	_riter;	//!< 第2引数となる式の実体を指す反復子
+	  const OP&		_op;	//!< 2項演算子
+      };
+
+      typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+    public:
+    //! 2項演算子を生成する.
+			binary_operator(const L& l, const R& r, const OP& op)
+			    :_l(l), _r(r), _op(op)
+			{
+			    assert(_l.size() == _r.size());
+			}
+
+    //! 演算結果の先頭要素を指す定数反復子を返す.
+      const_iterator	begin() const
+			{
+			    return const_iterator(_l.begin(), _r.begin(), _op);
+			}
+    //! 演算結果の末尾を指す定数反復子を返す.
+      const_iterator	end() const
+			{
+			    return const_iterator(_l.end(), _r.end(), _op);
+			}
+    //! 演算結果の要素数を返す.
+      size_t		size() const
+			{
+			    return _l.size();
+			}
+    
+    private:
+      largument_type	_l;	//!< 第1引数となる式の実体
+      rargument_type	_r;	//!< 第2引数となる式の実体
+      const OP		_op;	//!< 2項演算子
+  };
+
+  template <class OP, class L, class R>
+  inline typename std::enable_if<(detail::is_range<L>::value &&
+				  detail::is_range<R>::value),
+				 binary_operator<OP, L, R> >::type
+  make_binary_operator(const L& l, const R& r, const OP& op)
+  {
+      return binary_operator<OP, L, R>(l, r, op);
+  }
+
+  template <template <class, class> class OP, class L, class R>
+  inline typename std::enable_if<(detail::is_range<L>::value &&
+				  detail::is_range<R>::value), L&>::type
+  op_assign(L& l, const R& r)
+  {
+      assert(l.size() == r.size());
+      auto	src = r.begin();
+      for (auto dst = l.begin(); dst != l.end(); ++dst, ++src)
+	  OP<decltype(*src), decltype(*dst)>()(*src, *dst);
+
+      return l;
+  }
+}
+
+//! 与えられた式の各要素の符号を反転する.
+/*!
+  \param expr	式
+  \return	符号反転演算子ノード
+*/
+template <class E,
+	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+inline auto
+operator -(const E& expr)
+    -> decltype(detail::make_unary_operator(
+		    expr, std::negate<detail::element_t<E> >()))
+{
+    return detail::make_unary_operator(expr,
+				       std::negate<detail::element_t<E> >());
+}
+
+//! 与えられた式の各要素に定数を掛ける.
+/*!
+  \param expr	式
+  \param c	乗数
+  \return	乗算演算子ノード
+*/
+template <class E,
+	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+inline auto
+operator *(const E& expr, const detail::element_t<E>& c)
+    -> decltype(detail::make_unary_operator(
+		    expr, std::bind(std::multiplies<decltype(c)>(),
+				    std::placeholders::_1, c)))
+{
+    return detail::make_unary_operator(expr,
+				       std::bind(std::multiplies<decltype(c)>(),
+						 std::placeholders::_1, c));
+}
+
+//! 与えられた式の各要素に定数を掛ける.
+/*!
+  \param c	乗数
+  \param expr	式
+  \return	乗算演算子ノード
+*/
+template <class E,
+	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+inline auto
+operator *(const detail::element_t<E>& c, const E& expr)
+    -> decltype(detail::make_unary_operator(
+		    expr, std::bind(std::multiplies<decltype(c)>(),
+				    c, std::placeholders::_1)))
+{
+    return detail::make_unary_operator(expr,
+				       std::bind(std::multiplies<decltype(c)>(),
+						 c, std::placeholders::_1));
+}
+
+//! 与えられた式の各要素を定数で割る.
+/*!
+  \param expr	式
+  \param c	除数
+  \return	除算演算子ノード
+*/
+template <class E,
+	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+inline auto
+operator /(const E& expr, const detail::element_t<E>& c)
+    -> decltype(detail::make_unary_operator(
+		    expr, std::bind(std::divides<decltype(c)>(),
+				    std::placeholders::_1, c)))
+{
+    return detail::make_unary_operator(expr,
+				       std::bind(std::divides<decltype(c)>(),
+						 std::placeholders::_1, c));
+}
+
+//! 与えられた式の各要素に定数を掛ける.
+/*!
+  \param expr	式
+  \param c	乗数
+  \return	各要素にcが掛けられた結果の式
+*/
+template <class E>
+inline typename std::enable_if<
+    detail::is_range<typename std::decay<E>::type>::value, E&>::type
+operator *=(E&& expr, const detail::element_t<typename std::decay<E>::type>& c)
+{
+    return detail::op_assign<multiplies_assign>(expr, c);
+}
+
+//! 与えられた式の各要素を定数で割る.
+/*!
+  \param expr	式
+  \param c	除数
+  \return	各要素がcで割られた結果の式
+*/
+template <class E>
+inline typename std::enable_if<
+    detail::is_range<typename std::decay<E>::type>::value, E&>::type
+operator /=(E&& expr, const detail::element_t<typename std::decay<E>::type>& c)
+{
+    return detail::op_assign<divides_assign>(expr, c);
+}
+
+//! 与えられた2つの式の各要素の和をとる.
+/*!
+  \param l	左辺の式
+  \param r	右辺の式
+  \return	加算演算子ノード
+*/
+template <class L, class R,
+	  class=typename std::enable_if<(detail::is_range<L>::value &&
+					 detail::is_range<R>::value)>::type>
+inline auto
+operator +(const L& l, const R& r)
+    -> decltype(detail::make_binary_operator(
+		    l, r, std::plus<detail::element_t<R> >()))
+{
+    return detail::make_binary_operator(l, r,
+					std::plus<detail::element_t<R> >());
+}
+
+//! 与えられた2つの式の各要素の差をとる.
+/*!
+  \param l	左辺の式
+  \param r	右辺の式
+  \return	減算演算子ノード
+*/
+template <class L, class R,
+	  class=typename std::enable_if<(detail::is_range<L>::value &&
+					 detail::is_range<R>::value)>::type>
+inline auto
+operator -(const L& l, const R& r)
+    -> decltype(detail::make_binary_operator(
+		    l, r, std::minus<detail::element_t<R> >()))
+{
+    return detail::make_binary_operator(l, r,
+					std::minus<detail::element_t<R> >());
+}
+
+//! 与えられた左辺の式の各要素に右辺の式の各要素を加える.
+/*!
+  \param l	左辺の式
+  \param r	右辺の式
+  \return	各要素が加算された左辺の式
+*/
+template <class L, class R>
+inline typename std::enable_if<
+    (detail::is_range<typename std::decay<L>::type>::value &&
+     detail::is_range<R>::value), L&>::type
+operator +=(L&& l, const R& r)
+{
+    return detail::op_assign<plus_assign>(l, r);
+}
+
+//! 与えられた左辺の式の各要素から右辺の式の各要素を減じる.
+/*!
+  \param l	左辺の式
+  \param r	右辺の式
+  \return	各要素が減じられた左辺の式
+*/
+template <class L, class R>
+inline typename std::enable_if<
+    (detail::is_range<typename std::decay<L>::type>::value &&
+     detail::is_range<R>::value), L&>::type
+operator -=(L&& l, const R& r)
+{
+    return detail::op_assign<minus_assign>(l, r);
+}
+
 /************************************************************************
-*  class mem_var_t							*
+*  various numeric functions						*
 ************************************************************************/
-//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R/W)する関数オブジェクト
-/*
-  \param S	T型オブジェクトのメンバ変数の型
-  \param T	S型メンバ変数を所有するオブジェクトの型
-*/ 
-template <class S, class T>
-class mem_var_t : public std::unary_function<T*, S>
+//! 与えられた式の各要素の自乗和を求める.
+/*!
+  \param x	式
+  \return	式の各要素の自乗和
+*/
+template <class T>
+inline typename std::enable_if<!detail::is_range<T>::value, T>::type
+square(const T& x)
 {
-  public:
-    typedef S T::*	mem_ptr;
+    return x * x;
+}
+template <class E>
+inline typename std::enable_if<detail::is_range<E>::value,
+			       detail::element_t<E> >::type
+square(const E& expr)
+{
+    typedef detail::element_t<E>	element_type;
+    typedef typename E::value_type	value_type;
     
-    explicit mem_var_t(mem_ptr m)	:_m(m)		{}
-
-    S&		operator ()(T* p)		const	{return p->*_m;}
-
-  private:
-    const mem_ptr	_m;
-};
-
-//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R/W)する関数オブジェクトを生成する
-template <class S, class T> inline mem_var_t<S, T>
-mem_var(S T::*m)
-{
-    return mem_var_t<S, T>(m);
+    return std::accumulate(expr.begin(), expr.end(), element_type(0),
+			   [](const element_type& init, const value_type& val)
+			   { return init + square(val); });
 }
 
-/************************************************************************
-*  class const_mem_var_t						*
-************************************************************************/
-//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R)する関数オブジェクト
-/*
-  \param S	T型オブジェクトのメンバ変数の型
-  \param T	S型メンバ変数を所有するオブジェクトの型
-*/ 
-template <class S, class T>
-class const_mem_var_t : public std::unary_function<const T*, S>
+//! 与えられた式の各要素の自乗和の平方根を求める.
+/*!
+  \param x	式
+  \return	式の各要素の自乗和の平方根
+*/
+template <class T> inline auto
+length(const T& x) -> decltype(std::sqrt(square(x)))
 {
-  public:
-    typedef S T::*	mem_ptr;
-    
-    explicit const_mem_var_t(mem_ptr m)		:_m(m)	{}
-
-    const S&	operator ()(const T* p)		const	{return p->*_m;}
-
-  private:
-    const mem_ptr	_m;
-};
-
-//! S型のメンバ変数を持つT型オブジェクトへのポインタからそのメンバに直接アクセス(R)する関数オブジェクトを生成する
-template <class S, class T> inline const_mem_var_t<S, T>
-const_mem_var(S const T::* m)
-{
-    return const_mem_var_t<S, T>(m);
+    return std::sqrt(square(x));
 }
-
-/************************************************************************
-*  class mem_var_ref_t							*
-************************************************************************/
-//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R/W)する関数オブジェクト
-/*
-  \param S	T型オブジェクトのメンバ変数の型
-  \param T	S型メンバ変数を所有するオブジェクトの型
-*/ 
-template <class S, class T>
-class mem_var_ref_t : public std::unary_function<T&, S>
-{
-  public:
-    typedef S T::*	mem_ptr;
     
-    explicit mem_var_ref_t(mem_ptr m)		:_m(m)	{}
-
-    S&		operator ()(T& p)		const	{return p.*_m;}
-
-  private:
-    const mem_ptr	_m;
-};
-    
-//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R/W)する関数オブジェクトを生成する
-template <class S, class T> inline mem_var_ref_t<S, T>
-mem_var_ref(S T::*m)
+//! 与えられた二つの式の各要素の差の自乗和を求める.
+/*!
+  \param x	第1の式
+  \param y	第2の式
+  \return	xとyの各要素の差の自乗和
+*/
+template <class L, class R> inline auto
+sqdist(const L& x, const R& y) -> decltype(square(x - y))
 {
-    return mem_var_ref_t<S, T>(m);
+    return square(x - y);
 }
-
-/************************************************************************
-*  class const_mem_var_ref_t						*
-************************************************************************/
-//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R)する関数オブジェクト
-/*
-  \param S	T型オブジェクトのメンバ変数の型
-  \param T	S型メンバ変数を所有するオブジェクトの型
-*/ 
-template <class S, class T>
-class const_mem_var_ref_t : public std::unary_function<const T&, S>
-{
-  public:
-    typedef S const T::*	mem_ptr;
     
-    explicit const_mem_var_ref_t(mem_ptr m)	:_m(m)	{}
-
-    const S&	operator ()(const T& p)		const	{return p.*_m;}
-
-  private:
-    const mem_ptr	_m;
-};
-    
-//! S型のメンバ変数を持つT型オブジェクトへの参照からそのメンバに直接アクセス(R)する関数オブジェクトを生成する
-template <class S, class T> inline const_mem_var_ref_t<S, T>
-const_mem_var_ref(S const T::* m)
+//! 与えられた二つの式の各要素の差の自乗和の平方根を求める.
+/*!
+  \param x	第1の式
+  \param y	第2の式
+  \return	xとyの各要素の差の自乗和の平方根
+*/
+template <class L, class R> inline auto
+dist(const L& x, const R& y) -> decltype(std::sqrt(sqdist(x, y)))
 {
-    return const_mem_var_ref_t<S, T>(m);
+    return std::sqrt(sqdist(x, y));
 }
-
+    
 }	// namespace TU
 #endif	// !__TU_FUNCTIONAL_H

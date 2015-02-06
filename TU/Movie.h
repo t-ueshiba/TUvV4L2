@@ -71,7 +71,7 @@ template <class T> class Movie
 	typedef Array<T>				super;
 
       public:
-	explicit Frame(size_t n=0)	:super(n)	{super::operator =(0);}
+	explicit Frame(size_t n=0)	:super(n)	{}
     };
 
     typedef std::list<Frame>				Frames;

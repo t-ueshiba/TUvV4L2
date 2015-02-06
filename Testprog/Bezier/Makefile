@@ -10,7 +10,7 @@ PROGRAM		= $(shell basename $(PWD))
 IDLDIR		= .
 IDLS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g

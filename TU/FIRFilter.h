@@ -64,7 +64,7 @@ class fir_filter_iterator
     typedef boost::iterator_adaptor<
 		fir_filter_iterator, ITER, T,
 		boost::forward_traversal_tag, T>	super;
-    typedef Array<T, FixedSizedBuf<T, D, true> >	buf_type;
+    typedef FixedSizedArray<T, D>			buf_type;
     typedef typename buf_type::const_iterator		buf_iterator;
 
   public:
@@ -283,7 +283,7 @@ template <size_t D, class T> template <class IN, class OUT> inline void
 FIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     std::advance(out, D/2);
-    super::convolve(ib, ie, make_row_iterator<boost::use_default>(out, D/2));
+    super::convolve(ib, ie, make_row_iterator(D/2, size_t(0), out));
 }
 
 }

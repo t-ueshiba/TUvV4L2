@@ -65,7 +65,7 @@ class iir_filter_iterator
     typedef boost::iterator_adaptor<
 		iir_filter_iterator, ITER, T,
 		boost::single_pass_traversal_tag, T>	super;
-    typedef Array<T, FixedSizedBuf<T, D, true> >	buf_type;
+    typedef FixedSizedArray<T, D>			buf_type;
     typedef typename buf_type::const_iterator		buf_iterator;
 
     template <size_t DD, bool FF>
@@ -88,11 +88,11 @@ class iir_filter_iterator
   private:
     static value_type	inpro(COEFF c, buf_iterator b, size_t i)
 			{
-			    buf_iterator const	bi  = b + i;
-			    value_type		val = *c * *bi;
-			    for (buf_iterator p = bi; ++p != b + D; )
+			    const auto	bi  = b + i;
+			    value_type	val = *c * *bi;
+			    for (auto p = bi; ++p != b + D; )
 				val += *++c * *p;
-			    for (buf_iterator p = b; p != bi; ++p)
+			    for (auto p = b; p != bi; ++p)
 				val += *++c * *p;
 
 			    return val;
@@ -129,7 +129,7 @@ class iir_filter_iterator
     template <size_t DD>
     value_type	update(selector<DD, true>) const
 		{
-		    size_t const	i = _i;
+		    const auto	i = _i;
 		    if (++_i == D)
 			_i = 0;
 		    _ibuf[i] = *super::base();
@@ -140,8 +140,8 @@ class iir_filter_iterator
     template <size_t DD>
     value_type	update(selector<DD, false>) const
 		{
-		    value_type const	val = inpro(_co, _obuf.cbegin(), _i)
-					    + inpro(_ci, _ibuf.cbegin(), _i);
+		    const auto	val = inpro(_co, _obuf.cbegin(), _i)
+				    + inpro(_ci, _ibuf.cbegin(), _i);
 		    _obuf[_i] = val;
 		    _ibuf[_i] = *super::base();
 		    if (++_i == D)
