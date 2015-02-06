@@ -590,7 +590,7 @@ class Array : public B
   */
     void	fill(const element_type& c)
 		{
-		    fill(c, typename has_fill<value_type>::type());
+		    fill_impl(c, typename has_fill<value_type>::type());
 		}
     
     using	super::data;
@@ -742,29 +742,29 @@ class Array : public B
 
     void		init()
 			{
-			    init(typename
-				     std::is_arithmetic<element_type>::type());
+			    init_impl(typename std::is_arithmetic<element_type>
+						  ::type());
 			}
     
   private:
-    void		fill(const element_type& c, std::true_type)
+    void		fill_impl(const element_type& c, std::true_type)
 			{
 			    for (iterator iter = begin(), iend = end();
 				 iter != iend; ++iter)
 				iter->fill(c);
 			}
-    void		fill(const element_type& c, std::false_type)
+    void		fill_impl(const element_type& c, std::false_type)
 			{
 			    for (iterator iter = begin(), iend = end();
 				 iter != iend; ++iter)
 				*iter = c;
 			}
 
-    void		init(std::true_type)
+    void		init_impl(std::true_type)
 			{
 			    fill(element_type(0));
 			}
-    void		init(std::false_type)
+    void		init_impl(std::false_type)
 			{
 			}
 };
@@ -966,6 +966,7 @@ class Array2 : public Array<T, R>
 		    return *this;
 		}
 
+    using		super::fill;
     using		super::begin;
     using		super::cbegin;
     using		super::end;
