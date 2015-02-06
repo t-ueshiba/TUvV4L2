@@ -34,94 +34,265 @@
 #ifndef __TU_ITERATOR_H
 #define __TU_ITERATOR_H
 
-#include <cstddef>				// for including size_t
+#include <boost/version.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/zip_iterator.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/mpl/if.hpp>
-#include "TU/functional.h"
+#include "TU/tuple.h"
 
 namespace TU
 {
-//! S型のメンバ変数を持つT型オブジェクトへの反復子からそのメンバに直接アクセス(R/W)する反復子を作る．
-template <class Iterator, class S, class T>
-inline boost::transform_iterator<mem_var_ref_t<S, T>, Iterator>
-make_mbr_iterator(Iterator i, S T::* m)
+//! T型のメンバ変数を持つオブジェクトへの反復子からそのメンバに直接アクセスする反復子を作る．
+/*!
+  \param iter	ベースとなる反復子
+  \param mbr	iterが指すオブジェクトのメンバへのポインタ
+*/
+template <class ITER, class T> inline auto
+make_mbr_iterator(ITER iter, T std::iterator_traits<ITER>::value_type::* mbr)
+    -> decltype(boost::make_transform_iterator(
+		    iter,
+		    std::function<
+			typename std::conditional<
+			    std::is_same<
+				typename std::iterator_traits<ITER>::pointer,
+				typename std::iterator_traits<ITER>::value_type*>
+				::value,
+			    T&, const T&>::type
+		        (typename std::iterator_traits<ITER>::reference)>(
+			    std::mem_fn(mbr))))
 {
-    return boost::make_transform_iterator(i, mem_var_ref(m));
-}
-    
-//! S型のメンバ変数を持つT型オブジェクトへの反復子からそのメンバに直接アクセス(R)する反復子を作る．
-template <class Iterator, class S, class T>
-inline boost::transform_iterator<const_mem_var_ref_t<S, T>, Iterator>
-make_const_mbr_iterator(Iterator i, S const T::* m)
-{
-    return boost::make_transform_iterator(i, const_mem_var_ref(m));
+    return boost::make_transform_iterator(
+	       iter,
+	       std::function<
+		   typename std::conditional<
+		       std::is_same<
+			   typename std::iterator_traits<ITER>::pointer,
+			   typename std::iterator_traits<ITER>::value_type*>
+			   ::value,
+	           T&, const T&>::type
+	       (typename std::iterator_traits<ITER>::reference)>(
+		   std::mem_fn(mbr)));
 }
 
-//! std::pairへの反復子からその第1要素に直接アクセス(R/W)する反復子を作る．
+//! std::pairへの反復子からその第1要素に直接アクセスする反復子を作る．
 /*!
-  \param i	ベースとなる反復子
+  \param iter	ベースとなる反復子
 */
-template <class Iterator>
-inline boost::transform_iterator<
-    mem_var_ref_t<
-	typename std::iterator_traits<Iterator>::value_type::first_type,
-	typename std::iterator_traits<Iterator>::value_type>,
-    Iterator>
-make_first_iterator(Iterator i)
+template <class ITER> inline auto
+make_first_iterator(ITER iter)
+    -> decltype(make_mbr_iterator(
+		    iter, &std::iterator_traits<ITER>::value_type::first))
 {
     return make_mbr_iterator(
-		i, &std::iterator_traits<Iterator>::value_type::first);
+		iter, &std::iterator_traits<ITER>::value_type::first);
 }
     
-//! std::pairへの反復子からその第1要素に直接アクセス(R)する反復子を作る．
+//! std::pairへの反復子からその第2要素に直接アクセスする反復子を作る．
 /*!
-  \param i	ベースとなる反復子
+  \param iter	ベースとなる反復子
 */
-template <class Iterator>
-inline boost::transform_iterator<
-    const_mem_var_ref_t<
-	typename std::iterator_traits<Iterator>::value_type::first_type,
-	typename std::iterator_traits<Iterator>::value_type>,
-    Iterator>
-make_const_first_iterator(Iterator i)
-{
-    return make_const_mbr_iterator(
-		i, &std::iterator_traits<Iterator>::value_type::first);
-}
-    
-//! std::pairへの反復子からその第2要素に直接アクセス(R/W)する反復子を作る．
-/*!
-  \param i	ベースとなる反復子
-*/
-template <class Iterator>
-inline boost::transform_iterator<
-    mem_var_ref_t<
-	typename std::iterator_traits<Iterator>::value_type::second_type,
-	typename std::iterator_traits<Iterator>::value_type>,
-    Iterator>
-make_second_iterator(Iterator i)
+template <class ITER> inline auto
+make_second_iterator(ITER iter)
+    -> decltype(make_mbr_iterator(
+		    iter, &std::iterator_traits<ITER>::value_type::second))
 {
     return make_mbr_iterator(
-		i, &std::iterator_traits<Iterator>::value_type::second);
+		iter, &std::iterator_traits<ITER>::value_type::second);
 }
     
-//! std::pairへの反復子からその第2要素に直接アクセス(R)する反復子を作る．
-/*!
-  \param i	ベースとなる反復子
-*/
-template <class Iterator>
-inline boost::transform_iterator<
-    const_mem_var_ref_t<
-	typename std::iterator_traits<Iterator>::value_type::second_type,
-	typename std::iterator_traits<Iterator>::value_type>,
-    Iterator>
-make_const_second_iterator(Iterator i)
+/************************************************************************
+*  class fast_zip_iterator<ITER_TUPLE>					*
+************************************************************************/
+//! iterator tupleの最初の成分のみを同一性判定に使うことにより boost::zip_iterator<ITER_TUPLE> を高速化した反復子
+template <class ITER_TUPLE>
+class fast_zip_iterator
+    : public boost::iterator_adaptor<fast_zip_iterator<ITER_TUPLE>,
+				     boost::zip_iterator<ITER_TUPLE> >
 {
-    return make_const_mbr_iterator(
-		i, &std::iterator_traits<Iterator>::value_type::second);
+  private:
+    typedef boost::iterator_adaptor<fast_zip_iterator<ITER_TUPLE>,
+				    boost::zip_iterator<ITER_TUPLE> >	super;
+
+  public:
+    typedef ITER_TUPLE	iterator_tuple;
+    
+    friend class	boost::iterator_core_access;
+
+  public:
+    fast_zip_iterator(const ITER_TUPLE& t)	:super(t)	{}
+
+    const ITER_TUPLE&	get_iterator_tuple() const
+			{
+			    return super::base().get_iterator_tuple();
+			}
+    
+  private:
+    bool		equal(const fast_zip_iterator& iter) const
+			{
+			    return boost::get<0>(get_iterator_tuple()) ==
+				   boost::get<0>(iter.get_iterator_tuple());
+			}
+};
+
+template <class ITER_TUPLE> fast_zip_iterator<ITER_TUPLE>
+make_fast_zip_iterator(const ITER_TUPLE& t)
+{
+    return fast_zip_iterator<ITER_TUPLE>(t);
 }
+
+namespace detail
+{
+  /**********************************************************************
+  *  struct detail::[Begin|End]						*
+  **********************************************************************/
+  struct Begin
+  {
+      template <class T> auto
+      operator ()(const T& x) const -> decltype(std::begin(x))
+      {
+	  return std::begin(x);
+      }
+      template <class T> auto
+      operator ()(T& x) const -> decltype(std::begin(x))
+      {
+	  return std::begin(x);
+      }
+  };
+    
+  struct End
+  {
+      template <class T> auto
+      operator ()(const T& x) const -> decltype(std::end(x))
+      {
+	  return std::end(x);
+      }
+      template <class T> auto
+      operator ()(T& x) const -> decltype(std::end(x))
+      {
+	  return std::end(x);
+      }
+  };
+
+}
+}
+
+namespace std
+{
+/************************************************************************
+*  std::[begin|end](boost::tuples::cons<HEAD, TAIL>)			*
+************************************************************************/
+template <class HEAD, class TAIL> inline auto
+begin(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(TU::make_fast_zip_iterator(
+		    boost::tuples::transform(x, TU::detail::Begin())))
+{
+    return TU::make_fast_zip_iterator(
+	       boost::tuples::transform(x, TU::detail::Begin()));
+}
+    
+template <class HEAD, class TAIL> inline auto
+end(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(TU::make_fast_zip_iterator(
+		    boost::tuples::transform(x, TU::detail::End())))
+{
+    return TU::make_fast_zip_iterator(
+	       boost::tuples::transform(x, TU::detail::End()));
+}
+
+}
+
+namespace TU
+{
+/************************************************************************
+*  size(T)								*
+************************************************************************/
+template <class T> inline size_t
+size(const T& x)
+{
+    return x.size();
+}
+template <class HEAD, class TAIL> inline size_t
+size(const boost::tuples::cons<HEAD, TAIL>& x)
+{
+    return size(boost::get<0>(x));
+}
+      
+/************************************************************************
+*  ncol(T)								*
+************************************************************************/
+template <class T> inline size_t
+ncol(const T& x)
+{
+    return (x.begin() != x.end() ? size(*x.begin()) : 0);
+}
+      
+namespace detail
+{
+  template <class ITER_TUPLE, class UNARY_META_FUNC>
+  using	tuple_meta_transform =
+#if BOOST_VERSION < 105700
+		    boost::detail::tuple_impl_specific::
+#else
+		    boost::iterators::detail::tuple_impl_specific::
+#endif
+		    tuple_meta_transform<ITER_TUPLE, UNARY_META_FUNC>;
+
+  template <class ITER>
+  struct iterator_value
+  {
+      typedef typename std::iterator_traits<ITER>::value_type	type;
+  };
+  template <class ITER_TUPLE>
+  struct iterator_value<boost::zip_iterator<ITER_TUPLE> >
+      : detail::tuple_meta_transform<ITER_TUPLE, iterator_value<boost::mpl::_1> >
+  {
+  };
+  template <class ITER_TUPLE>
+  struct iterator_value<fast_zip_iterator<ITER_TUPLE> >
+      : detail::tuple_meta_transform<ITER_TUPLE, iterator_value<boost::mpl::_1> >
+  {
+  };
+
+  template <class S, class T>
+  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
+  {
+  };
+  template <class HEAD, class TAIL, class T>
+  struct tuple_replace<boost::tuples::cons<HEAD, TAIL>, T>
+      : detail::tuple_meta_transform<boost::tuples::cons<HEAD, TAIL>,
+				     tuple_replace<boost::mpl::_1, T> >
+  {
+  };
+  template <BOOST_PP_ENUM_PARAMS(10, class S), class T>
+  struct tuple_replace<boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>, T>
+      : tuple_replace<
+	    typename boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>::inherited, T>
+  {
+  };
+}
+    
+/************************************************************************
+*  struct iterator_value<ITER>						*
+************************************************************************/
+//! 与えられた反復子が指す値の型を返す．
+/*!
+  zip_iteratorとfast_zip_iteratorのvalue_typeは参照のtupleとして定義されているが，
+  本メタ関数は値のtupleを返す．
+  \param ITER	反復子の型
+*/
+template <class ITER>
+using iterator_value = typename detail::iterator_value<ITER>::type;
+    
+/************************************************************************
+*  struct tuple_replace<S, T>						*
+************************************************************************/
+//! 与えられた型がtupleまたはconsならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
+/*!
+  Sがboost::tupleであっても帰される型はdetail::consになることに注意．
+  \param S	要素型置換の対象となる型
+  \param T	置換後の要素の型．voidならば置換しない．
+*/
+template <class S, class T=void>
+using tuple_replace = typename detail::tuple_replace<S, T>::type;
     
 /************************************************************************
 *  class assignment_iterator<FUNC, ITER>				*
@@ -135,7 +306,7 @@ namespace detail
 	typedef assignment_proxy	self;
 
       public:
-	assignment_proxy(ITER const& iter, FUNC const& func)
+	assignment_proxy(const ITER& iter, const FUNC& func)
 	    :_iter(iter), _func(func)					{}
 
 	template <class T>
@@ -188,8 +359,8 @@ namespace detail
 		}
 
       private:
-	ITER const&	_iter;
-	FUNC const&	_func;
+	const ITER&	_iter;
+	const FUNC&	_func;
     };
 }
 
@@ -216,14 +387,13 @@ class assignment_iterator
 
   public:
     typedef typename super::reference	reference;
-    
-    friend class	boost::iterator_core_access;
+    friend class			boost::iterator_core_access;
 
   public:
-    assignment_iterator(ITER const& iter, FUNC const& func=FUNC())
+    assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
 	:super(iter), _func(func)			{}
 
-    FUNC const&	functor()	const			{ return _func; }
+    const FUNC&	functor()	const			{ return _func; }
 	
   private:
     reference	dereference() const
@@ -236,15 +406,9 @@ class assignment_iterator
 };
     
 template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
-make_assignment_iterator(ITER iter, FUNC func)
+make_assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
 {
     return assignment_iterator<FUNC, ITER>(iter, func);
-}
-
-template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
-make_assignment_iterator(ITER iter)
-{
-    return assignment_iterator<FUNC, ITER>(iter);
 }
 
 /************************************************************************
@@ -330,321 +494,180 @@ make_assignment2_iterator(ITER iter)
 }
 
 /************************************************************************
-*  class fast_zip_iterator<TUPLE>					*
+*  alias subiterator<ITER>						*
 ************************************************************************/
-//! iterator tupleの最初の成分のみを同一性判定に使うことにより boost::zip_iterator<TUPLE> を高速化した反復子
-template <class TUPLE>
-class fast_zip_iterator
-    : public boost::iterator_adaptor<fast_zip_iterator<TUPLE>,
-				     boost::zip_iterator<TUPLE> >
-{
-  private:
-    typedef boost::iterator_adaptor<fast_zip_iterator<TUPLE>,
-				    boost::zip_iterator<TUPLE> >	super;
-
-  public:
-    typedef TUPLE	iterator_tuple;
-    
-    friend class	boost::iterator_core_access;
-
-  public:
-    fast_zip_iterator(TUPLE const& t)	:super(t)	{}
-
-    TUPLE const&	get_iterator_tuple() const
-			{
-			    return super::base().get_iterator_tuple();
-			}
-    
-  private:
-    bool		equal(fast_zip_iterator const& iter) const
-			{
-			    return boost::get<0>(get_iterator_tuple()) ==
-				   boost::get<0>(iter.get_iterator_tuple());
-			}
-};
-
-template <class TUPLE> fast_zip_iterator<TUPLE>
-make_fast_zip_iterator(TUPLE t)
-{
-    return fast_zip_iterator<TUPLE>(t);
-}
-
-/************************************************************************
-*  struct subiterator<ITER>						*
-************************************************************************/
-//! 反復子 ITER が指す値が持つ iterator もしくは const_iterator
 template <class ITER>
-struct subiterator
-{
-    typedef typename boost::mpl::if_<
-	boost::is_same<typename std::iterator_traits<ITER>::pointer,
-		       typename std::iterator_traits<ITER>::value_type*>,
-	typename std::iterator_traits<ITER>::value_type::iterator,
-	typename std::iterator_traits<ITER>::value_type::const_iterator>
-	::type						type;
-    
-    typedef typename std::iterator_traits<type>::difference_type
-							difference_type;
-    typedef typename std::iterator_traits<type>::value_type
-							value_type;
-    typedef typename std::iterator_traits<type>::pointer
-							pointer;
-    typedef typename std::iterator_traits<type>::reference
-							reference;
-    typedef typename std::iterator_traits<type>::iterator_category
-							iterator_category;
-};
-
-template <class TUPLE>
-struct subiterator<boost::zip_iterator<TUPLE> >
-{
-    typedef boost::zip_iterator<
-		typename boost::detail::tuple_impl_specific
-			      ::tuple_meta_transform<
-		    TUPLE, subiterator<boost::mpl::_1> >::type>	type;
-
-    typedef typename std::iterator_traits<type>::difference_type
-							difference_type;
-    typedef typename std::iterator_traits<type>::value_type
-							value_type;
-    typedef typename std::iterator_traits<type>::pointer
-							pointer;
-    typedef typename std::iterator_traits<type>::reference
-							reference;
-    typedef typename std::iterator_traits<type>::iterator_category
-							iterator_category;
-};
-
-template <class TUPLE>
-struct subiterator<fast_zip_iterator<TUPLE> >
-{
-    typedef fast_zip_iterator<
-		typename boost::detail::tuple_impl_specific
-			      ::tuple_meta_transform<
-		    TUPLE, subiterator<boost::mpl::_1> >::type>	type;
-
-    typedef typename std::iterator_traits<type>::difference_type
-							difference_type;
-    typedef typename std::iterator_traits<type>::value_type
-							value_type;
-    typedef typename std::iterator_traits<type>::pointer
-							pointer;
-    typedef typename std::iterator_traits<type>::reference
-							reference;
-    typedef typename std::iterator_traits<type>::iterator_category
-							iterator_category;
-};
+using subiterator = decltype(std::begin(*std::declval<ITER>()));
 
 /************************************************************************
-*  class row_iterator<ROW, COL, ARG>					*
+*  class range<ITER>							*
 ************************************************************************/
-namespace detail
+template <class ITER>
+class range
 {
-    template <class ROW,
-	      class COL=boost::use_default, class ARG=boost::tuples::null_type>
-    class row_proxy : public container<row_proxy<ROW, COL, ARG> >
-    {
-      private:
-	typedef typename subiterator<ROW>::type		subiter_t;
-	
-	struct invoke_begin
-	{
-	    template <class _ROW>
-	    struct apply { typedef typename subiterator<_ROW>::type type; };
+  public:
+    typedef ITER					iterator;
+    typedef iterator					const_iterator;
+    typedef std::reverse_iterator<iterator>		reverse_iterator;
+    typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
+    typedef typename std::iterator_traits<iterator>::value_type
+							value_type;
+    typedef typename std::iterator_traits<iterator>::reference
+							reference;
+      
+  public:
+    range(const iterator& begin, const iterator& end)
+	:_begin(begin), _end(end)			{}
 
-	    invoke_begin(size_t j)	:_j(j)		{}
-	    template <class _ROW> typename apply<_ROW>::type
-	    operator ()(_ROW const& row) const
-	    {
-		typename apply<_ROW>::type	col = row->begin();
-		std::advance(col, _j);
-		return col;
-	    }
-
-	    size_t const	_j;
-	};
-	
-	struct invoke_end
-	{
-	    template <class _ROW>
-	    struct apply { typedef typename subiterator<_ROW>::type type; };
-
-	    invoke_end(size_t)				{}
-	    template <class _ROW> typename apply<_ROW>::type
-	    operator ()(_ROW const& row)	const	{return row->end();}
-	};
-
-	template <class _COL, class _ARG, class=void>
-	struct col_iterator
-	{
-	    static _COL
-	    make(subiter_t col, _ARG const& arg)
-	    {
-		return _COL(col, arg);
-	    }
-	};
-	template <class _COL, class DUMMY>
-	struct col_iterator<_COL, boost::tuples::null_type, DUMMY>
-	{
-	    static _COL
-	    make(subiter_t col, boost::tuples::null_type)
-	    {
-		return _COL(col);
-	    }
-	};
-	template <class DUMMY>
-	struct col_iterator<boost::use_default,
-			    boost::tuples::null_type, DUMMY>
-	{
-	    static subiter_t
-	    make(subiter_t col, boost::tuples::null_type)
-	    {
-		return col;
-	    }
-	};
-
-	template <class INVOKE, class _ROW>
-	static typename subiterator<_ROW>::type
-	make_subiterator(_ROW const& row, size_t j)
-	{
-	    return INVOKE(j)(row);
-	}
-	template <class INVOKE, class TUPLE>
-	static typename subiterator<fast_zip_iterator<TUPLE> >::type
-	make_subiterator(fast_zip_iterator<TUPLE> const& row, size_t j)
-	{
-	    return make_fast_zip_iterator(
-		boost::detail::tuple_impl_specific::
-		tuple_transform(row.get_iterator_tuple(), INVOKE(j)));
-	}
-
-      public:
-	typedef typename boost::mpl::if_<
-	    boost::is_same<COL, boost::use_default>,
-	    subiter_t, COL>::type			iterator;
-	typedef iterator				const_iterator;
-
-      public:
-	row_proxy(ROW const& row, ARG const& arg, size_t jb, size_t je)
-	    :_row(row), _arg(arg), _jb(jb), _je(je)			{}
-
-	size_t
-	size() const
-	{
-	    return std::distance(begin(), end());
-	}
-
-	size_t
-	ncol() const
-	{
-	    return (size() ? begin()->size() : 0);
-	}
-	
-	iterator
-	begin() const
-	{
-	    return col_iterator<COL, ARG>::make(
-		make_subiterator<invoke_begin>(_row, _jb), _arg);
-	}
-
-	iterator
-	end() const
-	{
-	    if (_je != 0)
-		return col_iterator<COL, ARG>::make(
-		    make_subiterator<invoke_begin>(_row, _je), _arg);
-	    else
-		return col_iterator<COL, ARG>::make(
-		    make_subiterator<invoke_end>(_row, 0), _arg);
-	}
-
-      private:
-	ROW const&	_row;
-	ARG const&	_arg;
-	size_t const	_jb;
-	size_t const	_je;
-    };
-}
+    size_t		size()	 const	{ return std::distance(_begin, _end); }
+    iterator		begin()	 const	{ return _begin; }
+    iterator		end()	 const	{ return _end; }
+    reverse_iterator	rbegin() const	{ return reverse_iterator(_end); }
+    reverse_iterator	rend()	 const	{ return reverse_iterator(_begin); }
+    reference		operator [](size_t i) const
+			{
+			    return *(_begin + i);
+			}
+      
+  private:
+    const iterator	_begin;
+    const iterator	_end;
+};
     
+/************************************************************************
+*  class row_iterator<COL, ROW, ARG...>					*
+************************************************************************/
 //! コンテナを指す反復子に対して，取り出した値を変換したり値を変換してから格納する作業をサポートする反復子
 /*!
-  \param ROW	begin(), end()をサポートするコンテナを指す反復子
-  \param COL	コンテナ中の個々の値に対して変換を行う反復子
-  \param ARG	変換関数
+  \param OUT	コンテナ中の個々の値に対して変換を行う反復子の型
+  \param ROW	begin(), end()をサポートするコンテナを指す反復子の型
+  \param ARG	OUTを生成するための引数の型
 */ 
-template <class ROW,
-	  class COL=boost::use_default, class ARG=boost::tuples::null_type>
+template <class OUT, class ROW, class ...ARG>
 class row_iterator
-    : public boost::iterator_adaptor<row_iterator<ROW, COL, ARG>,
+    : public boost::iterator_adaptor<row_iterator<OUT, ROW, ARG...>,
 				     ROW,
-				     detail::row_proxy<ROW, COL, ARG>,
+				     range<typename std::conditional<
+					       std::is_void<OUT>::value,
+					       subiterator<ROW>, OUT>::type>,
 				     boost::use_default,
-				     detail::row_proxy<ROW, COL, ARG> >
+				     range<typename std::conditional<
+					       std::is_void<OUT>::value,
+					       subiterator<ROW>, OUT>::type> >
 {
   private:
+    typedef typename std::conditional<std::is_void<OUT>::value,
+				      subiterator<ROW>, OUT>::type
+								out_iterator;
     typedef boost::iterator_adaptor<row_iterator,
 				    ROW,
-				    detail::row_proxy<ROW, COL, ARG>,
+				    range<out_iterator>,
 				    boost::use_default,
-				    detail::row_proxy<ROW, COL, ARG> >	super;
+				    range<out_iterator> >
+								super;
 
   public:
-    typedef typename super::reference	reference;
-    
+    typedef typename super::reference				reference;
+
     friend class	boost::iterator_core_access;
 
-  public:
-    row_iterator(ROW const& row,
-		 ARG const& arg, size_t jb=0, size_t je=0)
-	:super(row), _arg(arg), _jb(jb), _je(je)		{}
-    row_iterator(ROW const& row, size_t jb, size_t je=0)
-	:super(row), _arg(), _jb(jb), _je(je)			{}
-
-    reference	operator [](size_t i) const
-		{
-		    return reference(super::base() + i, _arg, _jb, _je);
-		}
-    
   private:
     reference	dereference() const
 		{
-		    return reference(super::base(), _arg, _jb, _je);
+		    return dereference(super::base());
+		}
+    reference	dereference(const ROW& row) const
+		{
+		    auto	col_begin = std::begin(*row);
+		    std::advance(col_begin, _jb);
+
+		    if (_je != 0)
+		    {
+			auto	col_end = std::begin(*row);
+			std::advance(col_end, _je);
+			return reference(_make_out_iterator(col_begin),
+					 _make_out_iterator(col_end));
+		    }
+		    else
+			return reference(_make_out_iterator(col_begin),
+					 _make_out_iterator(std::end(*row)));
+		}
+    static out_iterator
+		make_out_iterator(const subiterator<ROW>& col,
+				  const ARG& ...arg)
+		{
+		    return make_out_iterator_impl(
+			       typename std::is_void<OUT>::type(), col, arg...);
+		}
+    static out_iterator
+		make_out_iterator_impl(std::true_type,
+				       const subiterator<ROW>& col,
+				       const ARG& ...arg)
+		{
+		    return col;
+		}
+    static out_iterator
+		make_out_iterator_impl(std::false_type,
+				       const subiterator<ROW>& col,
+				       const ARG& ...arg)
+		{
+		    return out_iterator(col, arg...);
+		}
+    
+  public:
+    row_iterator(const ROW& row, size_t jb, size_t je, const ARG& ...arg)
+	:super(row),
+	 _make_out_iterator(std::bind(&row_iterator::make_out_iterator,
+				      std::placeholders::_1, arg...)),
+	 _jb(jb), _je(je)						{}
+    row_iterator(const ROW& row, const ARG& ...arg)
+	:row_iterator(row, 0, 0, arg...)				{}
+
+    reference	operator [](size_t i) const
+		{
+		    return dereference(super::base() + i);
 		}
 
   private:
-    ARG 	_arg;	// 代入を可能にするためconstは付けない
-    size_t	_jb;	// 同上
-    size_t	_je;	// 同上
+    decltype(std::bind(&row_iterator::make_out_iterator,
+		       std::placeholders::_1,
+		       std::declval<const ARG&>()...))	_make_out_iterator;
+    size_t						_jb;
+    size_t						_je;
 };
 
-template <template <class, class> class COL, class ARG, class ROW>
-inline row_iterator<ROW, COL<ARG, typename subiterator<ROW>::type>, ARG>
-make_row_iterator(ROW row, ARG arg=ARG(), size_t jb=0, size_t je=0)
+template <class OUT=void, class ROW, class ...ARG>
+inline row_iterator<OUT, ROW, ARG...>
+make_row_iterator(ROW row, const ARG& ...arg)
 {
-    typedef typename subiterator<ROW>::type	col_iterator;
-
-    return row_iterator<ROW, COL<ARG, col_iterator>, ARG>(row, arg, jb, je);
+    return row_iterator<OUT, ROW, ARG...>(row, arg...);
 }
 
-template <class COL, class ROW>
-inline row_iterator<ROW, COL>
-make_row_iterator(ROW row, size_t jb=0, size_t je=0)
+template <class OUT=void, class ROW, class ...ARG>
+inline row_iterator<OUT, ROW, ARG...>
+make_row_iterator(size_t jb, size_t je, ROW row, const ARG& ...arg)
 {
-    return row_iterator<ROW, COL>(row, boost::tuples::null_type(), jb, je);
+    return row_iterator<OUT, ROW, ARG...>(row, jb, je, arg...);
 }
 
 template <class FUNC, class ROW>
-inline row_iterator<ROW, boost::transform_iterator<
-			     FUNC, typename subiterator<ROW>::type>, FUNC>
-make_row_transform_iterator(ROW row, FUNC func=FUNC(),
-			    size_t jb=0, size_t je=0)
+inline row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
+		    ROW, FUNC>
+make_row_transform_iterator(ROW row, const FUNC& func)
 {
-    typedef typename subiterator<ROW>::type	subiter_t;
-
-    return row_iterator<ROW, boost::transform_iterator<FUNC, subiter_t>,
-			FUNC>(row, func, jb, je);
+    return row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
+			ROW, FUNC>(row, func);
 }
-		    
+
+template <class FUNC, class ROW>
+inline row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
+		    ROW, FUNC>
+make_row_transform_iterator(size_t jb, size_t je, ROW row, const FUNC& func)
+{
+    return row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
+			ROW, FUNC>(row, jb, je, func);
+}
+
 /************************************************************************
 *  class row2col<ROW>							*
 ************************************************************************/
@@ -655,41 +678,42 @@ make_row_transform_iterator(ROW row, FUNC func=FUNC(),
 template <class ROW>
 class row2col
 {
-  private:
-    typedef typename subiterator<ROW>::type			COL;
-
   public:
     typedef typename std::iterator_traits<ROW>::reference	argument_type;
-    typedef typename std::iterator_traits<COL>::reference	result_type;
+    typedef typename std::iterator_traits<subiterator<ROW> >::reference
+								result_type;
     
   public:
-    row2col(size_t idx)	:_idx(idx)				{}
+    row2col(size_t col)	:_col(col)				{}
     
     result_type	operator ()(argument_type row) const
 		{
-		    return *(row.begin() + _idx);
+		    return *(std::begin(row) + _col);
 		}
     
   private:
-    size_t const	_idx;	//!< 列を指定するindex
+    const size_t	_col;	//!< 列を指定するindex
 };
 
 template <class ROW>
 struct vertical_iterator
-    : public boost::transform_iterator<
-	row2col<ROW>, ROW, boost::use_default,
-	typename std::iterator_traits<
-	    typename subiterator<ROW>::type>::value_type>
+    : public boost::transform_iterator<row2col<ROW>,
+				       ROW,
+				       boost::use_default,
+				       typename std::iterator_traits<
+					   subiterator<ROW> >::value_type>
 {
     typedef boost::transform_iterator<
-	row2col<ROW>, ROW, boost::use_default,
-	typename std::iterator_traits<
-	    typename subiterator<ROW>::type>::value_type>	super;
+		row2col<ROW>,
+		ROW,
+		boost::use_default,
+		typename std::iterator_traits<
+		subiterator<ROW> >::value_type>			super;
 
     vertical_iterator(ROW row, size_t idx)
 	:super(row, row2col<ROW>(idx))				{}
     vertical_iterator(super const& iter)	:super(iter)	{}
-    vertical_iterator&	operator =(super const& iter)
+    vertical_iterator&	operator =(const super& iter)
 			{
 			    super::operator =(iter);
 			    return *this;
@@ -703,300 +727,143 @@ make_vertical_iterator(ROW row, size_t idx)
 }
 
 /************************************************************************
-*  class column_iterator<A>						*
+*  class column_iterator<OUT, ROW, ARG...>				*
 ************************************************************************/
-namespace detail
-{
-  //! 2次元配列の列を表す代理オブジェクト
-  /*!
-    \param A	2次元配列の型
-  */
-    template <class A>
-    class column_proxy : public container<column_proxy<A> >
-    {
-      public:
-      //! 定数反復子
-	typedef vertical_iterator<typename A::const_iterator>
-							const_iterator;
-      //! 反復子
-	typedef vertical_iterator<typename A::iterator>	iterator;
-      //! 定数逆反復子
-	typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
-      //! 逆反復子
-	typedef std::reverse_iterator<iterator>		reverse_iterator;
-      //! 要素の型
-	typedef typename iterator::value_type		value_type;
-      //! 定数要素への参照
-	typedef typename const_iterator::reference	const_reference;
-      //! 要素への参照
-	typedef typename iterator::reference		reference;
-      //! 評価結果の型
-	typedef column_proxy<typename A::result_type>	result_type;
-      //! 成分の型
-	typedef typename A::element_type		element_type;
-    
-      public:
-      //! 2次元配列の列を表す代理オブジェクトを生成する.
-      /*!
-	\param a	2次元配列
-	\param col	列を指定するindex
-      */
-	column_proxy(A* a, size_t col)	:_a(a), _col(col)		{}
-
-      //! この列に他の配列を代入する.
-      /*!
-	\param expr	代入元の配列を表す式
-	\return		この列
-      */
-	template <class E>
-	column_proxy&		operator =(const container<E>& expr)
-				{
-#if !defined(NO_CHECK_SIZE)
-				    if (expr().size() != size())
-					throw std::logic_error("column_proxy<A>::operator =: mismatched size!");
-#endif
-				    std::copy(expr().begin(), expr().end(),
-					      begin());
-				    return *this;
-				}
-	
-      //! 列の要素数すなわち行数を返す.
-	size_t			size() const
-				{
-				    return _a->size();
-				}
-	size_t			ncol() const
-				{
-				    return (size() ? begin()->size() : 0);
-				}
-      //! 列の先頭要素を指す定数反復子を返す.
-	const_iterator		begin() const
-				{
-				    return const_iterator(_a->begin(), _col);
-				}
-      //! 列の先頭要素を指す定数反復子を返す.
-	const_iterator		cbegin() const
-				{
-				    return begin();
-				}
-      //! 列の先頭要素を指す反復子を返す.
-	iterator		begin()
-				{
-				    return iterator(_a->begin(), _col);
-				}
-      //! 列の末尾を指す定数反復子を返す.
-	const_iterator		end() const
-				{
-				    return const_iterator(_a->end(), _col);
-				}
-      //! 列の末尾を指す定数反復子を返す.
-	const_iterator		cend() const
-				{
-				    return end();
-				}
-      //! 列の末尾を指す反復子を返す.
-	iterator		end()
-				{
-				    return iterator(_a->end(), _col);
-				}
-      //! 列の末尾要素を指す定数逆反復子を返す.
-	const_reverse_iterator	rbegin() const
-				{
-				    return const_reverse_iterator(end());
-				}
-      //! 列の末尾要素を指す定数逆反復子を返す.
-	const_reverse_iterator	crbegin() const
-				{
-				    return rbegin();
-				}
-      //! 列の末尾要素を指す逆反復子を返す.
-	reverse_iterator	rbegin()
-				{
-				    return reverse_iterator(end());
-				}
-      //! 列の先頭を指す定数逆反復子を返す.
-	const_reverse_iterator	rend() const
-				{
-				    return const_reverse_iterator(begin());
-				}
-      //! 列の先頭を指す定数逆反復子を返す.
-	const_reverse_iterator	crend() const
-				{
-				    return rend();
-				}
-      //! 列の先頭を指す逆反復子を返す.
-	reverse_iterator	rend()
-				{
-				    return reverse_iterator(begin());
-				}
-      //! 列の定数要素にアクセスする.
-      /*!
-	\param i	要素を指定するindex
-	\return		indexによって指定された定数要素
-      */
-	const_reference		operator [](size_t i) const
-				{
-				    return *(cbegin() + i);
-				}
-      //! 列の要素にアクセスする.
-      /*!
-	\param i	要素を指定するindex
-	\return		indexによって指定された要素
-      */
-	reference		operator [](size_t i)
-				{
-				    return *(begin() + i);
-				}
-
-      private:
-	A* const	_a;	//!< 2次元配列へのポインタ
-	size_t const	_col;	//!< 列を指定するindex
-    };
-}
-
 //! 2次元配列の列を指す反復子
 /*!
-  \param A	2次元配列の型
-*/
-template <class A>
+  \param OUT	コンテナ中の個々の値に対して変換を行う反復子の型
+  \param ROW	begin(), end()をサポートするコンテナを指す反復子の型
+  \param ARG	OUTを生成するための引数の型
+*/ 
+template <class OUT, class ROW, class ...ARG>
 class column_iterator
-    : public boost::iterator_facade<column_iterator<A>,
-				    detail::column_proxy<A>,
+    : public boost::iterator_facade<column_iterator<OUT, ROW, ARG...>,
+				    range<typename std::conditional<
+					      std::is_void<OUT>::value,
+					      vertical_iterator<ROW>,
+					      OUT>::type>,
 				    std::random_access_iterator_tag,
-				    detail::column_proxy<A> >
+				    range<typename std::conditional<
+					      std::is_void<OUT>::value,
+					      vertical_iterator<ROW>,
+					      OUT>::type> >
 {
   private:
+    typedef typename std::conditional<std::is_void<OUT>::value,
+				      vertical_iterator<ROW>, OUT>::type
+								out_iterator;
     typedef boost::iterator_facade<column_iterator,
-				   detail::column_proxy<A>,
+				   range<out_iterator>,
 				   std::random_access_iterator_tag,
-				   detail::column_proxy<A> >	super;
+				   range<out_iterator> >	super;
 
   public:
     typedef typename super::reference		reference;
     typedef typename super::difference_type	difference_type;
-    typedef typename super::iterator_category	iterator_category;
     
     friend class	boost::iterator_core_access;
+
+  private:
+    reference	dereference() const
+		{
+		    return (*this)[_col];
+		}
+    bool	equal(const column_iterator& iter) const
+		{
+		    return _col == iter._col;
+		}
+    void	increment()
+		{
+		    ++_col;
+		}
+    void	decrement()
+		{
+		    --_col;
+		}
+    void	advance(difference_type n)
+		{
+		    _col += n;
+		}
+    difference_type
+		distance_to(const column_iterator& iter) const
+		{
+		    return iter._col - _col;
+		}
+    static out_iterator
+		make_out_iterator(const vertical_iterator<ROW>& row,
+				  const ARG& ...arg)
+		{
+		    return make_out_iterator_impl(
+			       typename std::is_void<OUT>::type(), row, arg...);
+		}
+    static out_iterator
+		make_out_iterator_impl(std::true_type,
+				       const vertical_iterator<ROW>& row,
+				       const ARG& ...arg)
+		{
+		    return row;
+		}
+    static out_iterator
+		make_out_iterator_impl(std::false_type,
+				       const vertical_iterator<ROW>& row,
+				       const ARG& ...arg)
+		{
+		    return out_iterator(row, arg...);
+		}
     
   public:
-    column_iterator(A& a, size_t col)	:_a(&a), _col(col)		{}
+    column_iterator(const ROW& begin,
+		    const ROW& end, size_t col, const ARG& ...arg)
+	:_begin(begin), _end(end), _col(col),
+	 _make_out_iterator(std::bind(&column_iterator::make_out_iterator,
+				      std::placeholders::_1, arg...))	{}
 
-    reference		dereference() const
-			{
-			    return reference(_a, _col);
-			}
-    bool		equal(const column_iterator& iter) const
-			{
-			    return _col == iter._col;
-			}
-    void		increment()
-			{
-			    ++_col;
-			}
-    void		decrement()
-			{
-			    --_col;
-			}
-    void		advance(difference_type n)
-			{
-			    _col += n;
-			}
-    difference_type	distance_to(const column_iterator& iter) const
-			{
-			    return iter._col - _col;
-			}
-    
+    reference	operator [](size_t j) const
+		{
+		    return reference(_make_out_iterator(
+					 make_vertical_iterator(_begin, j)),
+				     _make_out_iterator(
+					 make_vertical_iterator(_end, j)));
+		}
+
   private:
-    A*			_a;
-    difference_type	_col;
+    ROW							_begin;
+    ROW							_end;
+    difference_type					_col;
+    decltype(std::bind(&column_iterator::make_out_iterator,
+		       std::placeholders::_1,
+		       std::declval<const ARG&>()...))	_make_out_iterator;
 };
 
-//! 2次元配列の先頭の列を指す定数反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	先頭の列を指す定数反復子
-*/
-template <class A> column_iterator<const A>
-column_cbegin(const A& a)
+template <class OUT=void, class ROW, class ...ARG>
+inline column_iterator<OUT, ROW, ARG...>
+make_column_iterator(ROW begin, ROW end, size_t col, const ARG& ...arg)
 {
-    return column_iterator<const A>(a, 0);
+    return column_iterator<OUT, ROW, ARG...>(begin, end, col, arg...);
+}
+
+template <class ROW> inline auto
+column_begin(const ROW& begin, const ROW& end)
+    -> decltype(make_column_iterator(begin, end, 0))
+{
+    return make_column_iterator(begin, end, 0);
 }
     
-//! 2次元配列の先頭の列を指す反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	先頭の列を指す反復子
-*/
-template <class A> column_iterator<A>
-column_begin(A& a)
+template <class ROW> inline auto
+column_end(const ROW& begin, const ROW& end)
+    -> decltype(make_column_iterator(begin, end, 0))
 {
-    return column_iterator<A>(a, 0);
+    return make_column_iterator(begin, end, (begin != end ? size(*begin) : 0));
 }
-    
-//! 2次元配列の末尾の列を指す定数反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	末尾の列を指す定数反復子
-*/
-template <class A> column_iterator<const A>
-column_cend(const A& a)
+
+template <class FUNC, class ROW>
+inline column_iterator<boost::transform_iterator<FUNC, vertical_iterator<ROW> >,
+		       ROW, FUNC>
+make_column_transform_iterator(ROW begin, ROW end, size_t col, const FUNC& func)
 {
-    return column_iterator<const A>(a, a.ncol());
-}
-    
-//! 2次元配列の末尾の列を指す反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	末尾の列を指す反復子
-*/
-template <class A> column_iterator<A>
-column_end(A& a)
-{
-    return column_iterator<A>(a, a.ncol());
-}
-    
-//! 2次元配列の末尾の列を指す定数逆反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	末尾の列を指す定数逆反復子
-*/
-template <class A> std::reverse_iterator<column_iterator<const A> >
-column_crbegin(const A& a)
-{
-    return std::reverse_iterator<column_iterator<const A> >(column_cend(a));
-}
-    
-//! 2次元配列の末尾の列を指す逆反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	末尾の列を指す逆反復子
-*/
-template <class A> std::reverse_iterator<column_iterator<A> >
-column_rbegin(A& a)
-{
-    return std::reverse_iterator<column_iterator<A> >(column_end(a));
-}
-    
-//! 2次元配列の先頭の列を指す定数逆反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	先頭の列を指す定数逆反復子
-*/
-template <class A> std::reverse_iterator<column_iterator<const A> >
-column_crend(const A& a)
-{
-    return std::reverse_iterator<column_iterator<const A> >(column_cbegin(a));
-}
-    
-//! 2次元配列の先頭の列を指す逆反復子を返す.
-/*!
-  \param a	2次元配列
-  \return	先頭の列を指す逆反復子
-*/
-template <class A> std::reverse_iterator<column_iterator<A> >
-column_rend(A& a)
-{
-    return std::reverse_iterator<column_iterator<A> >(column_begin(a));
+    return column_iterator<
+	       boost::transform_iterator<FUNC, vertical_iterator<ROW> >,
+	       ROW, FUNC>(begin, end, col, func);
 }
 
 /************************************************************************
@@ -1061,40 +928,6 @@ template <class ITER> ring_iterator<ITER>
 make_ring_iterator(ITER begin, ITER end)
 {
     return ring_iterator<ITER>(begin, end);
-}
-
-/************************************************************************
-*  struct iterator_tuple<ITER, N>					*
-************************************************************************/
-template <class ITER, size_t N>
-struct iterator_tuple
-{
-    typedef iterator_tuple<ITER, N-1>				tail;
-    typedef boost::tuples::cons<ITER, typename tail::type>	type;
-
-    static type	make(ITER iter)
-		{
-		    ITER	iter0 = iter;
-		    return type(iter0, tail::make(++iter));
-		}
-};
-template <class ITER>
-struct iterator_tuple<ITER, 0>
-{
-    typedef boost::tuples::null_type	type;
-    
-    static type	make(ITER)		{ return type(); }
-};
-
-//! 連続するN個の反復子をまとめて1つのboost::tupleを作る
-/*
- \param iter	前進反復子
- \return	iter, iter+1,..., iter+N-1 から成るboost::tuple
-*/
-template <size_t N, class ITER> typename iterator_tuple<ITER, N>::type
-make_iterator_tuple(ITER iter)
-{
-    return iterator_tuple<ITER, N>::make(iter);
 }
 
 }	// namespace TU

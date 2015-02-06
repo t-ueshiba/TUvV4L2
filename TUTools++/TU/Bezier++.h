@@ -50,8 +50,9 @@ template <class C>
 class BezierCurve : private Array<C>
 {
   public:
+    typedef Array<C>				coord_array;
     typedef C					coord_type;
-    typedef Array<coord_type>			coord_array;
+    typedef coord_type				value_type;
     typedef typename coord_type::element_type	element_type;
 
   private:

@@ -75,7 +75,7 @@ XvDC::createXvImage(const Image<S>& image)
 	ImageLine<YUV422> imageLine((YUV422*)_xvimage->data +
 				    v * _xvimage->width,
 				    _xvimage->width);
-	imageLine.fill(image[v].data());
+	imageLine.copy(image[v].data());
     }
 }
 

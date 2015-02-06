@@ -34,37 +34,36 @@
 #ifndef __TU_ARRAYPP_H
 #define __TU_ARRAYPP_H
 
-#include <algorithm>
+#include <initializer_list>
+#include <memory>			// std::allocator<T>
+#include <algorithm>			// std::copy(), std::fill()
+#include <numeric>			// std::inner_product()
 #include <stdexcept>
 #include <cassert>
 #include <iostream>
 #include <iomanip>
-#include <memory>
 #include "TU/iterator.h"
 #include "TU/mmInstructions.h"
-#if (__cplusplus > 199711L) || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  define __CXX0X
+
 //#  define __CXX0X_MOVE		// 移動コンストラクタ/代入を使用
-#  include <initializer_list>
-#endif
 
 namespace TU
 {
 /************************************************************************
-*  class BufTraits<T, ALIGNED>						*
+*  class BufTraits<T>							*
 ************************************************************************/
-template <class T, bool ALIGNED>
+template <class T>
 struct BufTraits
 {
-    typedef const T*					const_iterator;
-    typedef T*						iterator;
+    typedef const T*				const_iterator;
+    typedef T*					iterator;
 };
-#if defined(MMX)			// MMX が定義されているときは...
-template <class T, bool ALIGNED>
-struct BufTraits<mm::vec<T>, ALIGNED>	// 要素がvec<T>の配列の反復子を特別版に
+#if defined(MMX)		// MMX が定義されているときは...
+template <class T>
+struct BufTraits<mm::vec<T> >	// 要素がvec<T>の配列の反復子を特別版に
 {
-    typedef mm::load_iterator<const T*, ALIGNED>	const_iterator;
-    typedef mm::store_iterator<T*, ALIGNED>		iterator;
+    typedef mm::load_iterator<const T*, true>	const_iterator;
+    typedef mm::store_iterator<T*, true>	iterator;
 };
 #endif
 
@@ -78,24 +77,22 @@ struct BufTraits<mm::vec<T>, ALIGNED>	// 要素がvec<T>の配列の反復子を
   \param T		要素の型
   \param ALLOC		アロケータの型
 */
+#if defined(MMX)
+template <class T,
+	  class ALLOC=typename std::conditional<mm::is_vec<T>::value,
+						mm::allocator<T>,
+						std::allocator<T> >::type>
+#else
 template <class T, class ALLOC=std::allocator<T> >
-class Buf
-    : public BufTraits<T, !boost::is_same<ALLOC, std::allocator<T> >::value>
+#endif
+class Buf : public BufTraits<T>
 {
-  private:
-    enum
-    {
-	ALIGNED = !boost::is_same<ALLOC, std::allocator<T> >::value
-    };
-    
-    typedef BufTraits<T, ALIGNED>			super;
-
   public:
     typedef T						value_type;
     typedef value_type*					pointer;
     typedef const value_type*				const_pointer;
-    typedef typename super::iterator			iterator;
-    typedef typename super::const_iterator		const_iterator;
+    typedef typename BufTraits<T>::iterator		iterator;
+    typedef typename BufTraits<T>::const_iterator	const_iterator;
     typedef typename std::iterator_traits<iterator>::reference
 							reference;
     typedef typename std::iterator_traits<const_iterator>::reference
@@ -103,45 +100,126 @@ class Buf
     typedef ALLOC					allocator_type;
     
   public:
-    explicit		Buf(size_t siz=0)			;
-			Buf(pointer p, size_t siz)		;
-			Buf(const Buf& b)			;
-    Buf&		operator =(const Buf& b)		;
-#if defined(__CXX0X) && defined(__CXX0X_MOVE)
-			Buf(Buf&& b)				;
-    Buf&		operator =(Buf&& b)			;
-#endif
-			~Buf()					;
+    explicit		Buf(size_t siz=0)	//!< デフォルトコンストラクタ
+			    :_size(siz), _p(alloc(_size)),
+			     _shared(0), _capacity(_size)	{}
 
-    pointer		data()					;
-    const_pointer	data()				const	;
-    iterator		begin()					;
-    const_iterator	begin()				const	;
-    const_iterator	cbegin()			const	;
-    iterator		end()					;
-    const_iterator	end()				const	;
-    const_iterator	cend()				const	;
-    size_t		size()				const	;
-    bool		resize(size_t siz)			;
-    void		resize(pointer p, size_t siz)		;
-    static size_t	stride(size_t siz)			;
+			Buf(const Buf& b)	//!< コピーコンストラクタ
+			    :_size(b._size), _p(alloc(_size)),
+			     _shared(0), _capacity(_size)
+			{
+			    std::copy(b.begin(), b.end(), begin());
+			}
+    Buf&		operator =(const Buf& b)	//!< 代入演算子
+			{
+			    if (this != &b)
+			    {
+				resize(b._size);
+				std::copy(b.begin(), b.end(), begin());
+			    }
+			    return *this;
+			}
+#if defined(__CXX0X_MOVE)
+			Buf(Buf&& b)		//!< 移動コンストラクタ
+			    :_size(b._size), _p(b._p),
+			     _shared(b._shared), _capacity(b._capacity)
+			{
+			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
+			    b._size	= 0;
+			    b._p	= nullptr;
+			    b._capacity	= 0;
+			}
+    Buf&		operator =(Buf&& b)	//!< 移動代入演算子
+			{
+			    if (_shared)
+				return operator =(static_cast<const Buf&>(b));
+			    
+			    free(_p, _size);
+			    _size     = b._size;
+			    _p	      = b._p;
+			    _capacity = b._capacity;
+
+			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
+			    b._size	= 0;
+			    b._p	= nullptr;
+			    b._capacity	= 0;
+    
+			    return *this;
+			}
+#endif
+			~Buf()			//!< デストラクタ
+			{
+			    if (!_shared)
+				free(_p, _size);
+			}
+
+			Buf(pointer p, size_t siz)
+			    :_size(siz), _p(p),
+			     _shared(1), _capacity(_size)	{}
+
+    pointer		data()			{ return _p; }
+    const_pointer	data()		const	{ return _p; }
+    iterator		begin()			{ return _p; }
+    const_iterator	begin()		const	{ return _p; }
+    const_iterator	cbegin()	const	{ return _p; }
+    iterator		end()			{ return _p + _size; }
+    const_iterator	end()		const	{ return _p + _size; }
+    const_iterator	cend()		const	{ return _p + _size; }
+    size_t		size()		const	{ return _size; }
+    
+  //! バッファの要素数を変更する．
+  /*!
+    ただし，他のオブジェクトと記憶領域を共有しているバッファの要素数を
+    変更することはできない．
+    \param siz			新しい要素数
+    \return			sizが元の要素数よりも大きければtrue，そう
+				でなければfalse
+    \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
+				に送出
+  */
+    bool		resize(size_t siz)
+			{
+			    if (_size == siz)
+				return false;
+    
+			    if (_shared)
+				throw std::logic_error("Buf<T, ALLOC>::resize: cannot change size of shared buffer!");
+
+			    const size_t	old_size = _size;
+			    _size = siz;
+			    if (_capacity < _size)
+			    {
+				free(_p, old_size);
+				_p = alloc(_size);
+				_capacity = _size;
+			    }
+			    return _size > old_size;
+			}
+	
+  //! バッファが内部で使用する記憶領域を指定したものに変更する．
+  /*!
+    \param p	新しい記憶領域へのポインタ
+    \param siz	新しい要素数
+  */
+    void		resize(pointer p, size_t siz)
+			{
+			    if (!_shared)
+				free(_p, _size);
+			    _size     = siz;
+			    _p	      = p;
+			    _shared   = 1;
+			    _capacity = _size;
+			}
+
     std::istream&	get(std::istream& in, size_t m=0)	;
 
   protected:
     template <class OP, class ITER>
     void		for_each(ITER src, const OP& op)
 			{
-			    for (iterator dst = begin(), last = end();
-				 dst != last; ++dst, ++src)
+			    for (iterator dst = begin(), e = end();
+				 dst != e; ++dst, ++src)
 				op(*src, *dst);
-			}
-    template <class OP>
-    void		for_each1(const typename OP::first_argument_type& c,
-				  const OP& op)
-			{
-			    for (iterator dst = begin(), last = end();
-				 dst != last; ++dst)
-				op(c, *dst);
 			}
     
   private:
@@ -158,24 +236,7 @@ class Buf
 				_allocator.destroy(q);
 			    _allocator.deallocate(p, siz);
 			}
-
-  private:
-    template <size_t I, size_t J>
-    struct GCD		// 最大公約数を求める template meta-function
-    {
-	enum	{value = GCD<(I > J ? I % J : I), (I > J ? J : J % I)>::value};
-    };
-    template <size_t I>
-    struct GCD<I, 0>
-    {
-	enum	{value = I};
-    };
-    template <size_t J>
-    struct GCD<0, J>
-    {
-	enum	{value = J};
-    };
-
+    
   private:
     allocator_type	_allocator;
     size_t		_size;			//!< 要素数
@@ -184,225 +245,6 @@ class Buf
     size_t		_capacity : 8*sizeof(size_t)-1;	//!< 要素数単位の容量
 };
 
-//! 指定した要素数のバッファを生成する．
-/*!
-  \param siz	要素数
-*/
-template <class T, class ALLOC> inline
-Buf<T, ALLOC>::Buf(size_t siz)
-    :_allocator(), _size(siz), _p(alloc(_size)), _shared(0), _capacity(_size)
-{
-}
-
-//! 外部の領域と要素数を指定してバッファを生成する．
-/*!
-  \param p	外部領域へのポインタ
-  \param siz	要素数
-*/
-template <class T, class ALLOC> inline
-Buf<T, ALLOC>::Buf(pointer p, size_t siz)
-    :_allocator(), _size(siz), _p(p), _shared(1), _capacity(_size)
-{
-}
-    
-//! コピーコンストラクタ
-template <class T, class ALLOC>
-Buf<T, ALLOC>::Buf(const Buf& b)
-    :_allocator(), _size(b._size),
-     _p(alloc(_size)), _shared(0), _capacity(_size)
-{
-    std::copy(b.begin(), b.end(), begin());
-}
-
-//! 標準代入演算子
-template <class T, class ALLOC> Buf<T, ALLOC>&
-Buf<T, ALLOC>::operator =(const Buf& b)
-{
-    if (this != &b)
-    {
-	resize(b._size);
-	std::copy(b.begin(), b.end(), begin());
-    }
-    return *this;
-}
-
-#if defined(__CXX0X) && defined(__CXX0X_MOVE)
-/*
- *  [注意] 移動コンストラクタ/代入を使った場合，Array2<Array<T> >&&型右辺値
- *  x をArray<Array<T> >型左辺値 y に移動させるとArray<Array<T> >部分が
- *  shallow copyされるだけなので，y の各要素が使用する記憶領域は x._buf の
- *  ままである．よって，x が破壊されるときに一緒に x._buf も破壊されると
- *  dangling pointer が生じる．いっぽう，y がArray2<Array<T> >型ならば，
- *  x._buf も一緒に y._buf にshallow copyされるので，問題は生じない．
- */
-//! 移動コンストラクタ
-template <class T, class ALLOC> inline
-Buf<T, ALLOC>::Buf(Buf&& b)
-    :_allocator(), _size(b._size),
-     _p(b._p), _shared(b._shared), _capacity(b._capacity)
-{
-    b._p = nullptr;	// b の 破壊時に b._p がdeleteされることを防ぐ．
-}
-
-//! 移動代入演算子
-template <class T, class ALLOC> inline Buf<T, ALLOC>&
-Buf<T, ALLOC>::operator =(Buf&& b)
-{
-    if (_shared)
-	return operator =(static_cast<const Buf&>(b));
-
-    free(_p, _size);
-    _size     = b._size;
-    _p	      = b._p;
-    _capacity = b._capacity;
-
-    b._p = nullptr;	// b の 破壊時に b._p がdeleteされることを防ぐ．
-    
-    return *this;
-}
-#endif
-
-//! デストラクタ
-template <class T, class ALLOC> inline
-Buf<T, ALLOC>::~Buf()
-{
-    if (!_shared)
-	free(_p, _size);
-}
-    
-//! バッファが使用する内部記憶領域へのポインタを返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::pointer
-Buf<T, ALLOC>::data()
-{
-    return _p;
-}
-
-//! バッファが使用する内部記憶領域への定数ポインタを返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_pointer
-Buf<T, ALLOC>::data() const
-{
-    return _p;
-}
-    
-//! バッファの先頭要素を指す反復子を返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::iterator
-Buf<T, ALLOC>::begin()
-{
-    return data();
-}
-
-//! バッファの先頭要素を指す定数反復子を返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
-Buf<T, ALLOC>::begin() const
-{
-    return data();
-}
-
-//! バッファの先頭要素を指す定数反復子を返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
-Buf<T, ALLOC>::cbegin() const
-{
-    return begin();
-}
-
-//! バッファの末尾を指す反復子を返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::iterator
-Buf<T, ALLOC>::end()
-{
-    return begin() + size();
-}
-
-//! バッファの末尾を指す定数反復子を返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
-Buf<T, ALLOC>::end() const
-{
-    return begin() + size();
-}
-
-//! バッファの末尾を指す定数反復子を返す．
-template <class T, class ALLOC> inline typename Buf<T, ALLOC>::const_iterator
-Buf<T, ALLOC>::cend() const
-{
-    return end();
-}
-
-//! バッファの要素数を返す．
-template <class T, class ALLOC> inline size_t
-Buf<T, ALLOC>::size() const
-{
-    return _size;
-}
-    
-//! バッファの要素数を変更する．
-/*!
-  ただし，他のオブジェクトと記憶領域を共有しているバッファの要素数を
-  変更することはできない．
-  \param siz			新しい要素数
-  \return			sizが元の要素数よりも大きければtrue，そう
-				でなければfalse
-  \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
-				に送出
-*/
-template <class T, class ALLOC> bool
-Buf<T, ALLOC>::resize(size_t siz)
-{
-    if (_size == siz)
-	return false;
-    
-    if (_shared)
-	throw std::logic_error("Buf<T, ALLOC>::resize: cannot change size of shared buffer!");
-
-    const size_t	old_size = _size;
-    _size = siz;
-    if (_capacity < _size)
-    {
-	free(_p, old_size);
-	_p = alloc(_size);
-	_capacity = _size;
-    }
-    return _size > old_size;
-}
-
-//! バッファが内部で使用する記憶領域を指定したものに変更する．
-/*!
-  \param p	新しい記憶領域へのポインタ
-  \param siz	新しい要素数
-*/
-template <class T, class ALLOC> inline void
-Buf<T, ALLOC>::resize(pointer p, size_t siz)
-{
-    if (!_shared)
-	free(_p, _size);
-    _size     = siz;
-    _p	      = p;
-    _shared   = 1;
-    _capacity = _size;
-}
-
-//! 記憶領域をalignするために必要な要素数を返す．
-/*!
-  必要な記憶容量がバッファによって決まる特定の値の倍数になるよう，与えられた
-  要素数を繰り上げる．
-  \param siz	要素数
-  \return	alignされた要素数
-*/
-template <class T, class ALLOC> inline size_t
-Buf<T, ALLOC>::stride(size_t siz)
-{
-#if defined(MMX)
-    if (ALIGNED)
-    {
-	const size_t	LCM = mm::ALIGN * sizeof(T)
-			    / GCD<sizeof(T), mm::ALIGN>::value;
-      // LCM * m >= sizeof(T) * siz なる最小の m を求める．
-	const size_t	m = (sizeof(T)*siz + LCM - 1) / LCM;
-	return (LCM * m) / sizeof(T);
-    }
-    else
-#endif
-	return siz;
-}
-    
 //! 入力ストリームから指定した箇所に配列を読み込む(ASCII)．
 /*!
   \param in	入力ストリーム
@@ -414,7 +256,7 @@ Buf<T, ALLOC>::get(std::istream& in, size_t m)
 {
     const size_t	BufSiz = (sizeof(value_type) < 2048 ?
 				  2048 / sizeof(value_type) : 1);
-    pointer const	tmp = new value_type[BufSiz];
+    const pointer	tmp = new value_type[BufSiz];
     size_t		n = 0;
     
     while (n < BufSiz)
@@ -445,7 +287,7 @@ Buf<T, ALLOC>::get(std::istream& in, size_t m)
 }
     
 /************************************************************************
-*  class FixedSizedBuf<T, D, ALIGNED>					*
+*  class FixedSizedBuf<T, D>						*
 ************************************************************************/
 //! 定数サイズのバッファクラス
 /*!
@@ -453,45 +295,100 @@ Buf<T, ALLOC>::get(std::istream& in, size_t m)
   ことによって TU::Array の基底クラスとして使う．
   \param T		要素の型
   \param D		バッファ中の要素数
-  \param ALIGNED	バッファのアドレスがalignされていれば true,
-			そうでなければ false
 */
-template <class T, size_t D, bool ALIGNED=false>
-class FixedSizedBuf : public BufTraits<T, ALIGNED>
+template <class T, size_t D>
+class FixedSizedBuf : public BufTraits<T>
 {
-  private:
-    typedef BufTraits<T, ALIGNED>			super;
-
   public:
     typedef T						value_type;
     typedef value_type*					pointer;
     typedef const value_type*				const_pointer;
-    typedef typename super::iterator			iterator;
-    typedef typename super::const_iterator		const_iterator;
+    typedef typename BufTraits<T>::iterator		iterator;
+    typedef typename BufTraits<T>::const_iterator	const_iterator;
     typedef typename std::iterator_traits<iterator>::reference
 							reference;
     typedef typename std::iterator_traits<const_iterator>::reference
 							const_reference;
+    typedef void					allocator_type;
     
   public:
-    explicit		FixedSizedBuf(size_t siz=D)		;
-			FixedSizedBuf(pointer, size_t)		;
-			FixedSizedBuf(const FixedSizedBuf& b)	;
-    FixedSizedBuf&	operator =(const FixedSizedBuf& b)	;
+    explicit		FixedSizedBuf(size_t siz=D)
+			{
+			    resize(siz);
+			}
+
+			FixedSizedBuf(const FixedSizedBuf& b)
+			{
+			    for_each(b.begin(),
+				     assign<value_type, reference>());
+			}
+    FixedSizedBuf&	operator =(const FixedSizedBuf& b)
+			{
+			    if (this != &b)
+				for_each(b.begin(),
+					 assign<value_type, reference>());
+			    return *this;
+			}
     
-    pointer		data()					;
-    const_pointer	data()				const	;
-    iterator		begin()					;
-    const_iterator	begin()				const	;
-    const_iterator	cbegin()			const	;
-    iterator		end()					;
-    const_iterator	end()				const	;
-    const_iterator	cend()				const	;
-    static size_t	size()					;
-    static bool		resize(size_t siz)			;
-    void		resize(pointer p, size_t siz)		;
-    static size_t	stride(size_t siz)			;
-    std::istream&	get(std::istream& in)			;
+  //! 外部の領域と要素数を指定してバッファを生成する（ダミー関数）．
+  /*!
+    実際はバッファが使用する記憶領域は固定されていて変更できないので，
+    この関数は常に例外を送出する．
+    \throw std::logic_error	この関数が呼ばれたら必ず送出
+  */
+			FixedSizedBuf(pointer, size_t)
+			{
+			    throw std::logic_error("FixedSizedBuf<T, D>::FixedSizedBuf(pointer, size_t): cannot specify a pointer to external storage!!");
+			}
+
+    pointer		data()			{ return _buf.p; }
+    const_pointer	data()		const	{ return _buf.p; }
+    iterator		begin()			{ return _buf.p; }
+    const_iterator	begin()		const	{ return _buf.p; }
+    const_iterator	cbegin()	const	{ return _buf.p; }
+    iterator		end()			{ return _buf.p + D; }
+    const_iterator	end()		const	{ return _buf.p + D; }
+    const_iterator	cend()		const	{ return _buf.p + D; }
+    constexpr static size_t
+			size()			{ return D; }
+
+  //! バッファの要素数を変更する．
+  /*!
+    実際にはバッファの要素数を変更することはできないので，与えられた要素数が
+    このバッファの要素数に等しい場合のみ，通常どおりにこの関数から制御が返る．
+    \param siz	新しい要素数
+    \return	常にfalse
+  */
+    static bool		resize(size_t siz)
+			{
+			    assert(siz == D);
+			    return false;
+			}
+	
+  //! バッファが内部で使用する記憶領域を指定したものに変更する．
+  /*!
+    実際にはバッファの記憶領域を変更することはできないので，与えられたポインタ
+    と要素数がこのバッファのそれらに等しい場合のみ，通常どおりにこの関数から制御
+    が返る．
+    \param p	新しい記憶領域へのポインタ
+    \param siz	新しい要素数
+  */
+    void		resize(pointer p, size_t siz)
+			{
+			    assert(p == _buf.p && siz == D);
+			}
+
+  //! 入力ストリームから配列を読み込む(ASCII)．
+  /*!
+    \param in	入力ストリーム
+    \return	inで指定した入力ストリーム
+  */
+    std::istream&	get(std::istream& in)
+			{
+			    for (auto& x : *this)
+				in >> x;
+			    return in;
+			}
 
   protected:
     template <class OP, class ITER>
@@ -499,212 +396,39 @@ class FixedSizedBuf : public BufTraits<T, ALIGNED>
 			{
 			    for_each_impl<0, OP>::exec(src, begin(), op);
 			}
-    template <class OP>
-    void		for_each1(const typename OP::first_argument_type& c,
-				  const OP& op)
-			{
-			    for_each_impl<0, OP>::exec(c, begin(), op);
-			}
     
   private:
     template <size_t N, class OP>
     struct for_each_impl
     {
-	template <class _ITER>
-	static void	exec(_ITER src, iterator dst, const OP& op)
+	template <class ITER_>
+	static void	exec(ITER_ src, iterator dst, const OP& op)
 			{
 			    op(*src, *dst);
 			    for_each_impl<N+1, OP>::exec(++src, ++dst, op);
-			}
-	static void	exec(const typename OP::first_argument_type& c,
-			     iterator dst, const OP& op)
-			{
-			    op(c, *dst);
-			    for_each_impl<N+1, OP>::exec(c, ++dst, op);
 			}
     };
     template <class OP>
     struct for_each_impl<D, OP>
     {
-	template <class _ANY>
-	static void	exec(_ANY, iterator, const OP&)		{}
+	template <class ITER_>
+	static void	exec(ITER_, iterator, const OP&)		{}
     };
     
-    template <bool _ALIGNED, class=void>
-    struct Buffer		{ value_type	p[D]; };
+    template <bool, class=void>
+    struct Buffer			{ value_type	p[D]; };
 #if defined(MMX)
     template <class DUMMY>
-    struct Buffer<true, DUMMY>	{ __declspec(align(32)) value_type p[D]; };
+    struct Buffer<true, DUMMY>		{ alignas(mm::ALIGN) value_type	p[D]; };
 #endif
 
   private:
-    Buffer<ALIGNED>	_buf;				// D-sized buffer
+#if defined(MMX)
+    Buffer<mm::is_vec<T>::value>	_buf;		// D-sized buffer
+#else
+    Buffer<false>			_buf;
+#endif
 };
-
-//! バッファを生成する．
-/*!
-  \param siz			要素数
-  \throw std::logic_error	sizがテンプレートパラメータDに一致しない場合に
-				送出
-*/
-template <class T, size_t D, bool ALIGNED> inline
-FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(size_t siz)
-{
-    resize(siz);
-}
-
-//! 外部の領域と要素数を指定してバッファを生成する（ダミー関数）．
-/*!
-  実際はバッファが使用する記憶領域は固定されていて変更できないので，
-  この関数は常に例外を送出する．
-  \throw std::logic_error	この関数が呼ばれたら必ず送出
-*/
-template <class T, size_t D, bool ALIGNED> inline
-FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(pointer, size_t)
-{
-    throw std::logic_error("FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(pointer, size_t): cannot specify a pointer to external storage!!");
-}
-
-//! コピーコンストラクタ
-template <class T, size_t D, bool ALIGNED>
-FixedSizedBuf<T, D, ALIGNED>::FixedSizedBuf(const FixedSizedBuf& b)
-{
-    for_each(b.begin(), assign<value_type, reference>());
-}
-
-//! 標準代入演算子
-template <class T, size_t D, bool ALIGNED> FixedSizedBuf<T, D, ALIGNED>&
-FixedSizedBuf<T, D, ALIGNED>::operator =(const FixedSizedBuf& b)
-{
-    if (this != &b)
-	for_each(b.begin(), assign<value_type, reference>());
-    return *this;
-}
-
-//! バッファが使用する内部記憶領域へのポインタを返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::pointer
-FixedSizedBuf<T, D, ALIGNED>::data()
-{
-    return _buf.p;
-}
-
-//! バッファが使用する内部記憶領域への定数ポインタを返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::const_pointer
-FixedSizedBuf<T, D, ALIGNED>::data() const
-{
-    return _buf.p;
-}
-    
-//! バッファの先頭要素を指す反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::iterator
-FixedSizedBuf<T, D, ALIGNED>::begin()
-{
-    return data();
-}
-
-//! バッファの先頭要素を指す定数反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
-FixedSizedBuf<T, D, ALIGNED>::begin() const
-{
-    return data();
-}
-
-//! バッファの先頭要素を指す定数反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
-FixedSizedBuf<T, D, ALIGNED>::cbegin() const
-{
-    return begin();
-}
-
-//! バッファの末尾を指す反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::iterator
-FixedSizedBuf<T, D, ALIGNED>::end()
-{
-    return begin() + size();
-}
-
-//! バッファの末尾を指す定数反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
-FixedSizedBuf<T, D, ALIGNED>::end() const
-{
-    return begin() + size();
-}
-
-//! バッファの末尾を指す定数反復子を返す．
-template <class T, size_t D, bool ALIGNED>
-inline typename FixedSizedBuf<T, D, ALIGNED>::const_iterator
-FixedSizedBuf<T, D, ALIGNED>::cend() const
-{
-    return end();
-}
-
-//! バッファの要素数を返す．
-template <class T, size_t D, bool ALIGNED> inline size_t
-FixedSizedBuf<T, D, ALIGNED>::size()
-{
-    return D;
-}
-    
-//! バッファの要素数を変更する．
-/*!
-  実際にはバッファの要素数を変更することはできないので，与えられた要素数が
-  このバッファの要素数に等しい場合のみ，通常どおりにこの関数から制御が返る．
-  \param siz	新しい要素数
-  \return	常にfalse
-*/
-template <class T, size_t D, bool ALIGNED> inline bool
-FixedSizedBuf<T, D, ALIGNED>::resize(size_t siz)
-{
-    assert(siz == D);
-    return false;
-}
-    
-//! バッファが内部で使用する記憶領域を指定したものに変更する．
-/*!
-  実際にはバッファの記憶領域を変更することはできないので，与えられたポインタ
-  と要素数がこのバッファのそれらに等しい場合のみ，通常どおりにこの関数から制御
-  が返る．
-  \param p	新しい記憶領域へのポインタ
-  \param siz	新しい要素数
-*/
-template <class T, size_t D, bool ALIGNED> inline void
-FixedSizedBuf<T, D, ALIGNED>::resize(pointer p, size_t siz)
-{
-    assert(p == _buf.p && siz == D);
-}
-    
-//! 記憶領域をalignするために必要な要素数を返す．
-/*!
-  必要な記憶容量がバッファによって決まる特定の値の倍数になるよう，与えられた
-  要素数を繰り上げる．
-  \param siz	要素数
-  \return	alignされた要素数
-*/
-template <class T, size_t D, bool ALIGNED> inline size_t
-FixedSizedBuf<T, D, ALIGNED>::stride(size_t siz)
-{
-    return siz;
-}
-    
-//! 入力ストリームから配列を読み込む(ASCII)．
-/*!
-  \param in	入力ストリーム
-  \return	inで指定した入力ストリーム
-*/
-template <class T, size_t D, bool ALIGNED> std::istream&
-FixedSizedBuf<T, D, ALIGNED>::get(std::istream& in)
-{
-    for (size_t i = 0; i < D; ++i)
-	in >> _buf.p[i];
-    return in;
-}
 
 /************************************************************************
 *  class Array<T, B>							*
@@ -715,23 +439,14 @@ FixedSizedBuf<T, D, ALIGNED>::get(std::istream& in)
   \param B	バッファ
 */
 template <class T, class B=Buf<T> >
-class Array : public B, public container<Array<T, B> >
+class Array : public B
 {
   private:
     typedef B						super;
-    template <class _T>
-    struct ElementType
-    {
-	typedef typename _T::element_type		type;
-    };
-
+    
   public:
-  //! この配列を評価した結果の型
-    typedef Array					result_type;
   //! 成分の型
-    typedef typename boost::mpl::eval_if<
-	detail::is_container<T>,
-	ElementType<T>, boost::mpl::identity<T> >::type	element_type;
+    typedef detail::element_t<T>			element_type;
   //! 要素の型    
     typedef typename super::value_type			value_type;
   //! 要素へのポインタ
@@ -752,27 +467,132 @@ class Array : public B, public container<Array<T, B> >
     typedef typename super::const_reference		const_reference;
   //! ポインタ間の差
     typedef std::ptrdiff_t				difference_type;
+
+  private:
+    struct has_fill_impl
+    {
+	template <class E_> static auto
+	check(E_*) -> decltype(std::declval<E_&>().fill(
+				   std::declval<const element_type&>()),
+			       std::true_type());
+	template <class E_> static auto
+	check(...) -> std::false_type;
+    };
+    template <class E>
+    using has_fill = decltype(has_fill_impl::template check<E>(nullptr));
     
   public:
-		Array()							;
-    explicit	Array(size_t d)						;
-		Array(pointer p, size_t d)				;
-    template <class B2>
-		Array(Array<T, B2>& a, size_t i, size_t d)		;
-    template <class E>
-		Array(const container<E>& expr)			;
-    template <class E>
-    Array&	operator =(const container<E>& expr)			;
-#if defined(__CXX0X)
-#  if defined(__CXX0X_MOVE)
-		Array(Array&& a)					;
-    Array&	operator =(Array&& a)					;
-#  endif
-		Array(std::initializer_list<value_type> args)		;
-    Array&	operator =(std::initializer_list<value_type> args)	;
+  //! 配列を生成する．
+    Array() :super()						{ init(); }
+    
+#if defined(__CXX0X_MOVE)
+  /*
+   *  [注意1] 移動コンストラクタ/移動代入演算子を定義するなら
+   *  コピーコンストラクタ/標準代入演算子も陽に定義する必要あり
+   *  
+   *  [注意2] 移動コンストラクタ/移動代入を定義した場合，
+   *  Array2<Array<T> >&&型右辺値 x をArray<Array<T> >型左辺値 y に
+   *  移動させると x の Array<Array<T> > 部分がshallow copyされるだけ
+   *  なので，y の各要素が使用する記憶領域は x._buf のままである．よって，
+   *  x が破壊されるときに一緒に x._buf も破壊されると y に dangling pointer
+   *  が生じる．いっぽう，y がArray2<Array<T> >型ならば，x._buf も一緒に
+   *  y._buf にshallow copyされるので，問題は生じない．
+   *
+   *  [注意3] 一般コンストラクタ/代入演算子である Array(const E& expr) と
+   *  operator =(const E& expr) が定義されていれば，Array2<Array<T> >&&型
+   *  右辺値に対しては(Array<Array<T> >&&型に変換されることなく)これらが直接
+   *  呼ばれるので，各要素はdeep copyされ[注意2]の問題は生じない．
+   */
+		Array(const Array& a)	:super(a)		{}
+    Array&	operator =(const Array& a)
+		{
+		    super::operator =(a);
+		    return *this;
+		}
+		Array(Array&& a)	:super(std::move(a))	{}
+    Array&	operator =(Array&& a)
+		{
+		    super::operator =(std::move(a));
+		    return *this;
+		}
 #endif
-    Array&	operator =(const element_type& c)			;
+		Array(std::initializer_list<value_type> args)
+		    :super(args.size())
+		{
+		    std::copy(args.begin(), args.end(), begin());
+		}
 
+    Array&	operator =(std::initializer_list<value_type> args)
+		{
+		    super::resize(args.size());
+		    std::copy(args.begin(), args.end(), begin());
+		    return *this;
+		}
+
+  //! 指定した要素数の配列を生成する．
+  /*!
+    \param d	配列の要素数
+  */
+    explicit	Array(size_t d)	:super(d)			{ init(); }
+
+  //! 外部の領域と要素数を指定して配列を生成する．
+  /*!
+    \param p	外部領域へのポインタ
+    \param d	配列の要素数
+  */
+		Array(pointer p, size_t d) :super(p, d)		{}
+
+  //! 記憶領域を元の配列と共有した部分配列を作る．
+  /*!
+    \param a	配列
+    \param i	部分配列の第0要素を指定するindex
+    \param d	部分配列の次元(要素数)
+  */
+    template <class B2>
+		Array(Array<T, B2>& a, size_t i, size_t d)
+		    :super((i < a.size() ? &a[i] : nullptr),
+			   partial_size(i, d, a.size()))	{}
+
+  //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
+  /*!
+    コピーコンストラクタは別個自動的に生成される．
+    \param expr	コピー元の配列
+  */
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+		Array(const E& expr)
+		    :super(expr.size())
+		{
+		    super::for_each(expr.begin(),
+				    assign<detail::value_t<E>, reference>());
+
+		}
+
+  //! 他の配列を自分に代入する（標準代入演算子の拡張）．
+  /*!
+    標準代入演算子は別個自動的に生成される．
+    \param expr	コピー元の配列
+    \return	この配列
+  */
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Array&	operator =(const E& expr)
+		{
+		    super::resize(expr.size());
+		    super::for_each(expr.begin(),
+				    assign<detail::value_t<E>, reference>());
+		    return *this;
+		}
+
+  //! 全ての要素に同一の値を代入する．
+  /*!
+    \param c	代入する値
+  */
+    void	fill(const element_type& c)
+		{
+		    fill(c, typename has_fill<value_type>::type());
+		}
+    
     using	super::data;
     using	super::begin;
     using	super::cbegin;
@@ -780,397 +600,193 @@ class Array : public B, public container<Array<T, B> >
     using	super::cend;
     using	super::size;
     using	super::resize;
+    
+    size_t			dim() const
+				{
+				    return size();
+				}
+    reverse_iterator		rbegin()
+				{
+				    return reverse_iterator(end());
+				}
+    const_reverse_iterator	rbegin() const
+				{
+				    return const_reverse_iterator(end());
+				}
+    const_reverse_iterator	crbegin() const
+				{
+				    return rbegin();
+				}
+    reverse_iterator		rend()
+				{
+				    return reverse_iterator(begin());
+				}
+    const_reverse_iterator	rend() const
+				{
+				    return const_reverse_iterator(begin());
+				}
+    const_reverse_iterator	crend() const
+				{
+				    return rend();
+				}
+    reference			operator [](size_t i)
+				{
+				    assert(i < size());
+				    return *(begin() + i);
+				}
+    const_reference		operator [](size_t i) const
+				{
+				    assert(i < size());
+				    return *(begin() + i);
+				}
+    	
+  //! 2つの配列を要素毎に比較し，同じであるか調べる．
+  /*!
+    \param expr	比較対象となる配列
+    \return	全ての要素が同じならばtrue，そうでなければfalse
+  */
+    template <class E>
+    typename std::enable_if<detail::is_range<E>::value, bool>::type
+			operator ==(const E& expr) const
+			{
+			    if (size() != expr.size())
+				return false;
+			    auto	p = expr.begin();
+			    for (const auto& x : *this)
+			    {
+				if (x != *p)
+				    return false;
+				++p;
+			    }
+			    return true;
+			}
 
-    size_t			dim()				const	;
-    size_t			ncol()				const	;
-    reverse_iterator		rbegin()				;
-    const_reverse_iterator	rbegin()			const	;
-    const_reverse_iterator	crbegin()			const	;
-    reverse_iterator		rend()					;
-    const_reverse_iterator	rend()				const	;
-    const_reverse_iterator	crend()				const	;
+  //! 2つの配列を要素毎に比較し，異なるものが存在するか調べる．
+  /*!
+    \param expr	比較対象となる配列
+    \return	異なる要素が存在すればtrue，そうでなければfalse
+  */
+    template <class E>
+    typename std::enable_if<detail::is_range<E>::value, bool>::type
+			operator !=(const E& expr) const
+			{
+			    return !(*this == expr);
+			}
 
-    reference		operator [](size_t i)				;
-    const_reference	operator [](size_t i)			const	;
-    Array&		operator *=(const element_type& c)		;
-    Array&		operator /=(const element_type& c)		;
-    template <class E>
-    Array&		operator +=(const container<E>& expr)		;
-    template <class E>
-    Array&		operator -=(const container<E>& expr)		;
-    template <class E>
-    bool		operator ==(const container<E>& expr)	const	;
-    template <class E>
-    bool		operator !=(const container<E>& expr)	const	;
-    std::istream&	get(std::istream& in)				;
-    std::ostream&	put(std::ostream& out)			const	;
-    std::istream&	restore(std::istream& in)			;
-    std::ostream&	save(std::ostream& out)			const	;
-    void		check_size(size_t d)			const	;
+    bool		resize(size_t siz)
+			{
+			    bool enlarged = super::resize(siz);
+			    init();
+			    return enlarged;
+			}
+
+    void		resize(pointer p, size_t siz)
+			{
+			    super::resize(p, siz);
+			}
+
+  //! 出力ストリームに配列を書き出す(ASCII)．
+  /*!
+    \param out	出力ストリーム
+    \return	outで指定した出力ストリーム
+  */
+    std::ostream&	put(std::ostream& out) const
+			{
+			    for (const auto& x : *this)
+				out << ' ' << x;
+			    return out;
+			}
+
+  //! 入力ストリームから配列を読み込む(binary)．
+  /*!
+    \param in	入力ストリーム
+    \return	inで指定した入力ストリーム
+  */
+    std::istream&	restore(std::istream& in)
+			{
+			    in.read(reinterpret_cast<char*>(data()),
+				    sizeof(value_type) * size());
+			    return in;
+			}
+
+  //! 出力ストリームに配列を書き出す(binary)．
+  /*!
+    \param out	出力ストリーム
+    \return	outで指定した出力ストリーム
+  */
+    std::ostream&	save(std::ostream& out) const
+			{
+			    out.write(reinterpret_cast<const char*>(data()),
+				      sizeof(value_type) * size());
+			    return out;
+			}
+
+  //! 指定した値がこの配列の要素数に一致するか調べる．
+  /*!
+    \param d			調べたい値
+    \throw std::logic_error	d != size()の場合に送出
+  */
+    void		check_size(size_t d) const
+			{
+#if !defined(NO_CHECK_SIZE)
+			    if (d != size())
+				throw std::logic_error("Array<T, B>::check_size: mismatched size!");
+#endif
+			}
 
   protected:
-    static size_t	partial_size(size_t i, size_t d, size_t a)	;
+    static size_t	partial_size(size_t i, size_t d, size_t a)
+			{
+			    return (i+d <= a ? d : i < a ? a-i : 0);
+			}
+
+    void		init()
+			{
+			    init(typename
+				     std::is_arithmetic<element_type>::type());
+			}
+    
+  private:
+    void		fill(const element_type& c, std::true_type)
+			{
+			    for (iterator iter = begin(), iend = end();
+				 iter != iend; ++iter)
+				iter->fill(c);
+			}
+    void		fill(const element_type& c, std::false_type)
+			{
+			    for (iterator iter = begin(), iend = end();
+				 iter != iend; ++iter)
+				*iter = c;
+			}
+
+    void		init(std::true_type)
+			{
+			    fill(element_type(0));
+			}
+    void		init(std::false_type)
+			{
+			}
 };
 
-//! 配列を生成する．
-template <class T, class B> inline
-Array<T, B>::Array()
-    :super()
-{
-}
+/************************************************************************
+*  typedef FixedSizedArray<T, D>					*
+************************************************************************/
+template <class T, size_t D>
+using FixedSizedArray = Array<T, FixedSizedBuf<T, D> >;
 
-//! 指定した要素数の配列を生成する．
-/*!
-  \param d	配列の要素数
-*/
-template <class T, class B> inline
-Array<T, B>::Array(size_t d)
-    :super(d)
+namespace detail
 {
-}
-
-//! 外部の領域と要素数を指定して配列を生成する．
-/*!
-  \param p	外部領域へのポインタ
-  \param d	配列の要素数
-*/
-template <class T, class B> inline
-Array<T, B>::Array(pointer p, size_t d)
-    :super(p, d)
-{
-}
-
-//! 記憶領域を元の配列と共有した部分配列を作る．
-/*!
-  \param a	配列
-  \param i	部分配列の第0要素を指定するindex
-  \param d	部分配列の次元(要素数)
-*/
-template <class T, class B> template <class B2> inline
-Array<T, B>::Array(Array<T, B2>& a, size_t i, size_t d)
-    :super(i < a.size() ? pointer(&a[i]) : pointer((element_type*)0),
-	   partial_size(i, d, a.size()))
-{
-}
-
-//! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
-/*!
-  コピーコンストラクタは別個自動的に生成される．
-  \param expr	コピー元の配列
-*/
-template <class T, class B> template <class E>
-Array<T, B>::Array(const container<E>& expr)
-    :super(expr().size())
-{
-    super::for_each(expr().begin(),
-		    assign<typename E::value_type, reference>());
-}
-	
-//! 他の配列を自分に代入する（標準代入演算子の拡張）．
-/*!
-  標準代入演算子は別個自動的に生成される．
-  \param expr	コピー元の配列
-  \return	この配列
-*/
-template <class T, class B> template <class E> Array<T, B>&
-Array<T, B>::operator =(const container<E>& expr)
-{
-    resize(expr().size());
-    super::for_each(expr().begin(),
-		    assign<typename E::value_type, reference>());
-    return *this;
-}
-
-#if defined(__CXX0X)
-#  if defined(__CXX0X_MOVE)
-template <class T, class B> inline
-Array<T, B>::Array(Array&& a)
-    :super(std::move(a))
-{
-}
-
-template <class T, class B> inline Array<T, B>&
-Array<T, B>::operator =(Array&& a)
-{
-    super::operator =(std::move(a));
-}
-#  endif
-
-template <class T, class B> inline
-Array<T, B>::Array(std::initializer_list<value_type> args)
-    :super(args.size())
-{
-    std::copy(args.begin(), args.end(), begin());
-}
-
-template <class T, class B> inline Array<T, B>&
-Array<T, B>::operator =(std::initializer_list<value_type> args)
-{
-    resize(args.size());
-    std::copy(args.begin(), args.end(), begin());
-    return *this;
-}
-#endif
-    
-//! 全ての要素に同一の値を代入する．
-/*!
-  \param c	代入する値
-  \return	この配列
-*/
-template <class T, class B> Array<T, B>&
-Array<T, B>::operator =(const element_type& c)
-{
-    super::for_each1(c, assign<element_type, reference>());
-    return *this;
-}
-
-//! 要素数を返す．
-template <class T, class B> inline size_t
-Array<T, B>::dim() const
-{
-    return size();
+  /**********************************************************************
+  *  nbytes<T>()							*
+  **********************************************************************/
+  template <class T> inline size_t
+  nbytes(size_t siz, size_t align)
+  {
+      return align * ((sizeof(T)*siz + align - 1) / align);
+  }
 }
     
-//! Tが配列型である場合，列数を返す．
-template <class T, class B> inline size_t
-Array<T, B>::ncol() const
-{
-    return (size() ? begin()->size() : 0);
-}
-    
-//! 配列の末尾要素を指す逆反復子を返す．
-/*!
-  \return	末尾要素を指す逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::reverse_iterator
-Array<T, B>::rbegin()
-{
-    return reverse_iterator(end());
-}
-
-//! 配列の末尾要素を指す定数逆反復子を返す．
-/*!
-  \return	末尾要素を指す定数逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::rbegin() const
-{
-    return const_reverse_iterator(end());
-}
-
-//! 配列の末尾要素を指す定数逆反復子を返す．
-/*!
-  \return	末尾要素を指す定数逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::crbegin() const
-{
-    return rbegin();
-}
-
-//! 配列の先頭を指す逆反復子を返す．
-/*!
-  \return	先頭を指す逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::reverse_iterator
-Array<T, B>::rend()
-{
-    return reverse_iterator(begin());
-}
-
-//! 配列の先頭を指す定数逆反復子を返す．
-/*!
-  \return	先頭を指す定数逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::rend() const
-{
-    return const_reverse_iterator(begin());
-}
-
-//! 配列の先頭を指す定数逆反復子を返す．
-/*!
-  \return	先頭を指す定数逆反復子
-*/
-template <class T, class B> inline typename Array<T, B>::const_reverse_iterator
-Array<T, B>::crend() const
-{
-    return rend();
-}
-
-//! 配列の要素へアクセスする
-/*!
-  \param i	要素を指定するindex
-  \return	indexによって指定された要素
-*/
-template <class T, class B> inline typename Array<T, B>::reference
-Array<T, B>::operator [](size_t i)
-{
-    assert(i < size());
-    return *(begin() + i);
-}
-
-//! 配列の要素へアクセスする
-/*!
-  \param i	要素を指定するindex
-  \return	indexによって指定された要素
-*/
-template <class T, class B> inline typename Array<T, B>::const_reference
-Array<T, B>::operator [](size_t i) const
-{
-    assert(i < size());
-    return *(begin() + i);
-}
-
-//! 全ての要素に同一の数値を掛ける．
-/*!
-  \param c	掛ける数値
-  \return	この配列
-*/
-template <class T, class B> inline Array<T, B>&
-Array<T, B>::operator *=(const element_type& c)
-{
-    super::for_each1(c, multiplies_assign<element_type, reference>());
-    return *this;
-}
-
-//! 全ての要素を同一の数値で割る．
-/*!
-  \param c	割る数値
-  \return	この配列
-*/
-template <class T, class B> inline Array<T, B>&
-Array<T, B>::operator /=(const element_type& c)
-{
-    super::for_each1(c, divides_assign<element_type, reference>());
-    return *this;
-}
-
-//! この配列に他の配列を足す．
-/*!
-  \param expr	足す配列
-  \return	この配列
-*/
-template <class T, class B> template <class E> inline Array<T, B>&
-Array<T, B>::operator +=(const container<E>& expr)
-{
-    assert(size() == expr().size());
-    super::for_each(expr().begin(),
-		    plus_assign<typename E::value_type, reference>());
-    return *this;
-}
-
-//! この配列から他の配列を引く．
-/*!
-  \param expr	引く配列
-  \return	この配列
-*/
-template <class T, class B> template <class E> inline Array<T, B>&
-Array<T, B>::operator -=(const container<E>& expr)
-{
-    assert(size() == expr().size());
-    super::for_each(expr().begin(),
-		    minus_assign<typename E::value_type, reference>());
-    return *this;
-}
-
-//! 2つの配列を要素毎に比較し，同じであるか調べる．
-/*!
-  \param expr	比較対象となる配列
-  \return	全ての要素が同じならばtrue，そうでなければfalse
-*/
-template <class T, class B> template <class E> bool
-Array<T, B>::operator ==(const container<E>& expr) const
-{
-    if (size() != expr().size())
-	return false;
-    typename E::const_iterator	p = expr().begin();
-    for (const_iterator q = begin(); q != end(); ++q, ++p)
-	if (*q != *p)
-	    return false;
-    return true;
-}
-
-//! 2つの配列を要素毎に比較し，異なるものが存在するか調べる．
-/*!
-  \param expr	比較対象となる配列
-  \return	異なる要素が存在すればtrue，そうでなければfalse
-*/
-template <class T, class B> template <class E> inline bool
-Array<T, B>::operator !=(const container<E>& expr) const
-{
-    return !(*this == expr);
-}
-
-//! 入力ストリームから指定した箇所に配列を読み込む(ASCII)．
-/*!
-  \param in	入力ストリーム
-  \param m	読み込み先の先頭を指定するindex
-  \return	inで指定した入力ストリーム
-*/
-template <class T, class B> inline std::istream&
-Array<T, B>::get(std::istream& in)
-{
-    return super::get(in);
-}
-
-//! 出力ストリームに配列を書き出す(ASCII)．
-/*!
-  \param out	出力ストリーム
-  \return	outで指定した出力ストリーム
-*/
-template <class T, class B> std::ostream&
-Array<T, B>::put(std::ostream& out) const
-{
-    for (const_iterator q = begin(), qe = end(); q != qe; ++q)
-	out << ' ' << *q;
-    return out;
-}
-
-//! 入力ストリームから配列を読み込む(binary)．
-/*!
-  \param in	入力ストリーム
-  \return	inで指定した入力ストリーム
-*/
-template <class T, class B> inline std::istream&
-Array<T, B>::restore(std::istream& in)
-{
-    in.read((char*)data(), sizeof(value_type) * size());
-    return in;
-}
-
-//! 出力ストリームに配列を書き出す(binary)．
-/*!
-  \param out	出力ストリーム
-  \return	outで指定した出力ストリーム
-*/
-template <class T, class B> inline std::ostream&
-Array<T, B>::save(std::ostream& out) const
-{
-    out.write((const char*)data(), sizeof(value_type) * size());
-    return out;
-}
-
-//! 指定した値がこの配列の要素数に一致するか調べる．
-/*!
-  \param d			調べたい値
-  \throw std::logic_error	d != size()の場合に送出
-*/
-template <class T, class B> inline void
-Array<T, B>::check_size(size_t d) const
-{
-#if !defined(NO_CHECK_SIZE)
-    if (d != size())
-	throw std::logic_error("Array<T, B>::check_size: mismatched size!");
-#endif
-}
-
-template <class T, class B> inline size_t
-Array<T, B>::partial_size(size_t i, size_t d, size_t a)
-{
-    return (i+d <= a ? d : i < a ? a-i : 0);
-}
-
 /************************************************************************
 *  class Array2<T, B, R>						*
 ************************************************************************/
@@ -1210,30 +826,146 @@ class Array2 : public Array<T, R>
     typedef typename buf_type::const_pointer		const_pointer;
   //! ポインタ間の差    
     typedef std::ptrdiff_t				difference_type;
-
+    
   public:
-		Array2()						;
-		Array2(size_t r, size_t c)				;
-		Array2(pointer p, size_t r, size_t c)			;
-		Array2(buf_type buf, size_t r, size_t c)		;
+		Array2()			// !< デフォルトコンストラクタ
+		    :super(), _ncol(0), _align(align(1)), _buf()
+		{
+		    if (size() > 0)
+			_ncol = _buf.size() / size();
+		    set_rows();
+		    super::init();
+		}
+
+		Array2(const Array2& a)		//!< コピーコンストラクタ
+		    :super(a.size()),
+		     _ncol(a.ncol()), _align(a.align()), _buf(a._buf.size())
+		{
+		    set_rows();
+		    super::operator =(static_cast<const super&>(a));
+		}    
+
+    Array2&	operator =(const Array2& a)	//!< 標準代入演算子
+		{
+		    resize(a.size(), a.ncol(), a.align());
+		    super::operator =(static_cast<const super&>(a));
+		    return *this;
+		}
+
+#if defined(__CXX0X_MOVE)
+		Array2(Array2&& a)		//!< 移動コンストラクタ
+		    :super(), _ncol(a.ncol()), _buf(std::move(a._buf))
+		{
+		    super::operator =(std::move(static_cast<super&>(a)));
+		}
+    Array2&	operator =(Array2&& a)		//!< 移動代入演算子
+		{
+		    _ncol = a.ncol();
+		    _buf  = std::move(a._buf);
+		    super::operator =(std::move(static_cast<super&>(a)));
+		    return *this;
+		}
+#endif
+		Array2(std::initializer_list<value_type> args, size_t a=1)
+		    :super(args.size()),
+		     _ncol(args.size() ? args.begin()->size() : 0),
+		     _align(align(a)),
+		     _buf(buf_size())
+		{
+		    set_rows();
+		    std::copy(args.begin(), args.end(), begin());
+		}
+		
+    Array2&	operator =(std::initializer_list<value_type> args)
+		{
+		    resize(args.size(),
+			   (args.size() ? args.begin()->size() : 0));
+		    std::copy(args.begin(), args.end(), begin());
+		    return *this;
+		}
+    
+  //! 行数と列数を指定して2次元配列を生成する．
+  /*!
+    \param r	行数
+    \param c	列数
+    \param a	各行においてalignするバイト数(1ならalignしない)
+  */
+		Array2(size_t r, size_t c, size_t a=1)
+		    :super(r), _ncol(c), _align(align(a)), _buf(buf_size())
+		{
+		    set_rows();
+		    super::init();
+		}
+
+  //! 外部の領域と行数および列数を指定して2次元配列を生成する．
+  /*!
+    \param p	外部領域へのポインタ
+    \param r	行数
+    \param c	列数
+    \param a	各行においてalignするバイト数(1ならalignしない)
+  */
+		Array2(pointer p, size_t r, size_t c, size_t a=1)
+		    :super(r), _ncol(c), _align(align(a)), _buf(p, buf_size())
+		{
+		    set_rows();
+		}
+
+  //! 記憶領域を元の配列と共有した部分配列を作る.
+  /*!
+    \param a	配列
+    \param i	部分配列の左上隅要素の行を指定するindex
+    \param j	部分配列の左上隅要素の列を指定するindex
+    \param r	部分配列の行数
+    \param c	部分配列の列数
+  */
     template <class B2, class R2>
 		Array2(Array2<T, B2, R2>& a,
-		       size_t i, size_t j, size_t r, size_t c)		;
-		Array2(const Array2& a)					;
-    Array2&	operator =(const Array2& a)				;
+		       size_t i, size_t j, size_t r, size_t c)
+		    :super(super::partial_size(i, r, a.size())),
+		     _ncol(super::partial_size(j, c, a.ncol())),
+		     _align(a.align()),
+		     _buf((size() > 0 && ncol() > 0 ? a[i].data() + j
+						    : nullptr),
+			  size()*(a.ncol() - j))
+		{
+		    for (size_t ii = 0; ii < size(); ++ii)
+			(*this)[ii].resize(a[i+ii].data() + j, ncol());
+		}    
+
+  //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
+  /*!
+    コピーコンストラクタを定義しないと自動的に作られてしまうので，
+    このコンストラクタがあってもコピーコンストラクタを別個に定義
+    しなければならない．
+    \param expr	コピー元の配列
+    \param a	各行においてalignするバイト数(1ならalignしない)
+  */
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+		Array2(const E& expr, size_t a=1)
+		    :super(expr.size()),
+		     _ncol(TU::ncol(expr)), _align(align(a)), _buf(buf_size())
+		{
+		    set_rows();
+		    super::operator =(expr);
+		}
+
+  //! 他の配列を自分に代入する（標準代入演算子の拡張）．
+  /*!
+    標準代入演算子を定義しないと自動的に作られてしまうので，この代入演算子が
+    あっても標準代入演算子を別個に定義しなければならない．
+    \param expr		コピー元の配列
+    \return		この配列
+  */
     template <class E>
-		Array2(const container<E>& expr)			;
-    template <class E>
-    Array2&	operator =(const container<E>& expr)			;
-    Array2&	operator =(const element_type& c)			;
-#if defined(__CXX0X)
-#  if defined(__CXX0X_MOVE)
-    Array2(Array2&& a)							;
-    Array2&	operator =(Array2&& a)					;
-#  endif
-    Array2(std::initializer_list<value_type> args)			;
-    Array2&	operator =(std::initializer_list<value_type> args)	;
-#endif
+    typename std::enable_if<detail::is_range<E>::value, Array2&>::type
+		operator =(const E& expr)
+		{
+		    resize(expr.size(), TU::ncol(expr));
+		    super::operator =(expr);
+		    return *this;
+		}
+
     using		super::begin;
     using		super::cbegin;
     using		super::end;
@@ -1245,294 +977,115 @@ class Array2 : public Array<T, R>
     using		super::size;
     using		super::dim;
 
-    pointer		data()						;
-    const_pointer	data()					const	;
-    size_t		nrow()					const	;
-    size_t		ncol()					const	;
-    size_t		stride()				const	;
-    bool		resize(size_t r, size_t c)			;
-    void		resize(pointer p, size_t r, size_t c)		;
-    std::istream&	restore(std::istream& in)			;
-    std::ostream&	save(std::ostream& out)			const	;
+    pointer		data()		{ return _buf.data(); }
+    const_pointer	data()	const	{ return _buf.data(); }
+    size_t		nrow()	const	{ return size(); }
+    size_t		ncol()	const	{ return _ncol; }
+    size_t		align()	const	{ return _align; }
+
+  //! 配列のサイズを変更する．
+  /*!
+    \param r	新しい行数
+    \param c	新しい列数
+    \param a	各行においてalignするバイト数(1ならalignしない)
+    \return	rが元の行数より大きい又はcが元の列数と異なればtrue，
+		そうでなければfalse
+  */
+    bool		resize(size_t r, size_t c, size_t a=1)
+			{
+			    if (!super::resize(r) && ncol() == c)
+				return false;
+			    
+			    _ncol = c;
+			    _align = align(a);
+			    _buf.resize(buf_size());
+			    set_rows();
+			    super::init();
+			    return true;
+			}
+	
+  //! 配列が内部で使用する記憶領域を指定したものに変更する．
+  /*!
+    \param p	新しい記憶領域へのポインタ
+    \param r	新しい行数
+    \param a	各行においてalignするバイト数(1ならalignしない)
+    \param c	新しい列数
+  */
+    void		resize(pointer p, size_t r, size_t c, size_t a=1)
+			{
+			    super::resize(r);
+			    _ncol = c;
+			    _align = align(a);
+			    _buf.resize(p, buf_size());
+			    set_rows();
+			}
+
+  //! 入力ストリームから配列を読み込む(binary)．
+  /*!
+    \param in	入力ストリーム
+    \return	inで指定した入力ストリーム
+  */
+    std::istream&	restore(std::istream& in)
+			{
+			    for (auto& row : *this)
+				row.restore(in);
+			    return in;
+			}
+
+  //! 出力ストリームに配列を書き出す(binary)．
+  /*!
+    \param out	出力ストリーム
+    \return	outで指定した出力ストリーム
+  */
+    std::ostream&	save(std::ostream& out) const
+			{
+			    for (const auto& row : *this)
+				row.save(out);
+			    return out;
+			}
+
     std::istream&	get(std::istream& in,
 			    size_t i=0, size_t j=0, size_t jmax=0)	;
+    
+  private:
+    void		set_rows()
+			{
+			    typedef typename buf_type::value_type	S;
+			    
+			    const auto	n = detail::nbytes<S>(_ncol, _align);
+			    auto	p = _buf.data();
+			    for (auto& row : *this)
+			    {
+				row.resize(p, ncol());
+				reinterpret_cast<unsigned char*&>(p) += n;
+			    }
+			}
+
+    size_t		buf_size()
+			{
+			    typedef typename buf_type::value_type	S;
+			    
+			    const auto	n = detail::nbytes<S>(_ncol, _align);
+			    return (size()*n + sizeof(S) - 1) / sizeof(S);
+			}
+
+    static size_t	align(size_t a)
+			{
+#if defined(MMX)
+			    typedef typename buf_type::value_type	S;
+
+			    if (std::is_same<typename buf_type::allocator_type,
+					     mm::allocator<S> >::value)
+				return mm::ALIGN;
+#endif
+			    return (a == 0 ? 1 : a);
+			}
 
   private:
-    void		set_rows()					;
-    
     size_t		_ncol;
+    size_t		_align;
     buf_type		_buf;
 };
-
-//! 2次元配列を生成する．
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2()
-    :super(), _ncol(0), _buf()
-{
-    if (size() > 0)
-	_ncol = _buf.size() / size();
-    set_rows();
-}
-
-//! 行数と列数を指定して2次元配列を生成する．
-/*!
-  \param r	行数
-  \param c	列数
-*/
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2(size_t r, size_t c)
-    :super(r), _ncol(c), _buf(size()*_buf.stride(ncol()))
-{
-    set_rows();
-}
-
-//! 外部の領域と行数および列数を指定して2次元配列を生成する．
-/*!
-  \param p	外部領域へのポインタ
-  \param r	行数
-  \param c	列数
-*/
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2(pointer p, size_t r, size_t c)
-    :super(r), _ncol(c), _buf(p, size()*_buf.stride(ncol()))
-{
-    set_rows();
-}
-
-//! 記憶領域を元の配列と共有した部分配列を作る.
-/*!
-  \param a	配列
-  \param i	部分配列の左上隅要素の行を指定するindex
-  \param j	部分配列の左上隅要素の列を指定するindex
-  \param r	部分配列の行数
-  \param c	部分配列の列数
-*/
-template <class T, class B, class R> template <class B2, class R2>
-Array2<T, B, R>::Array2(Array2<T, B2, R2>& a,
-			size_t i, size_t j, size_t r, size_t c)
-    :super(super::partial_size(i, r, a.size())),
-     _ncol(super::partial_size(j, c, a.ncol())),
-     _buf((size() > 0 && ncol() > 0 ? a[i].data() + j : pointer(0)),
-	  size()*_buf.stride(ncol()))
-{
-    for (size_t ii = 0; ii < size(); ++ii)
-	(*this)[ii].resize(a[i+ii].data() + j, ncol());
-}    
-
-//! コピーコンストラクタ
-/*!
-  \param a	コピー元の配列
-*/
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2(const Array2& a)
-    :super(a.size()), _ncol(a.ncol()), _buf(size()*_buf.stride(ncol()))
-{
-    set_rows();
-    super::operator =((const super&)a);
-}    
-
-//! 標準代入演算子
-/*!
-  \param a	コピー元の配列
-  \return	この配列
-*/
-template <class T, class B, class R> inline Array2<T, B, R>&
-Array2<T, B, R>::operator =(const Array2& a)
-{
-    resize(a.size(), a.ncol());
-    super::operator =((const super&)a);
-    return *this;
-}
-
-//! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
-/*!
-  コピーコンストラクタを定義しないと自動的に作られてしまうので，
-  このコンストラクタがあってもコピーコンストラクタを別個に定義
-  しなければならない．
-  \param expr	コピー元の配列
-*/
-template <class T, class B, class R> template <class E> inline
-Array2<T, B, R>::Array2(const container<E>& expr)
-    :super(expr().size()), _ncol(expr().ncol()),
-     _buf(size()*_buf.stride(ncol()))
-{
-    set_rows();
-    super::operator =(expr);
-}    
-
-//! 他の配列を自分に代入する（標準代入演算子の拡張）．
-/*!
-  標準代入演算子を定義しないと自動的に作られてしまうので，この代入演算子が
-  あっても標準代入演算子を別個に定義しなければならない．
-  \param expr	コピー元の配列
-  \return	この配列
-*/
-template <class T, class B, class R> template <class E> inline Array2<T, B, R>&
-Array2<T, B, R>::operator =(const container<E>& expr)
-{
-    resize(expr().size(), expr().ncol());
-    super::operator =(expr);
-    return *this;
-}
-
-#if defined(__CXX0X)
-#  if defined(__CXX0X_MOVE)
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2(Array2&& a)
-    :super(std::move(a)), _ncol(a._ncol), _buf(std::move(a._buf))
-{
-}
-
-template <class T, class B, class R> inline Array2<T, B, R>&
-Array2<T, B, R>::operator =(Array2&& a)
-{
-    super::operator =(std::move(a));
-    _ncol = a._ncol;
-    _buf  = std::move(a._buf);
-    return *this;
-}
-#  endif
-
-template <class T, class B, class R> inline
-Array2<T, B, R>::Array2(std::initializer_list<value_type> args)
-    :super(args.size()), _ncol(args.size() ? args.begin()->size() : 0),
-     _buf(size()*_buf.stride(ncol()))
-{
-    set_rows();
-    std::copy(args.begin(), args.end(), begin());
-}
-
-template <class T, class B, class R> inline Array2<T, B, R>&
-Array2<T, B, R>::operator =(std::initializer_list<value_type> args)
-{
-    resize(args.size(), (args.size() ? args.begin()->size() : 0));
-    std::copy(args.begin(), args.end(), begin());
-    return *this;
-}
-#endif
-
-//! 全ての要素に同一の値を代入する．
-/*!
-  \param c	代入する値
-  \return	この配列
-*/
-template <class T, class B, class R> Array2<T, B, R>&
-Array2<T, B, R>::operator =(const element_type& c)
-{
-    super::operator =(c);
-    return *this;
-}
-
-//! 2次元配列の内部記憶領域へのポインタを返す．
-/*!
-  \return	内部記憶領域へのポインタ
-*/
-template <class T, class B, class R> inline typename Array2<T, B, R>::pointer
-Array2<T, B, R>::data()
-{
-    return _buf.data();
-}
-
-//! 2次元配列の内部記憶領域への定数ポインタを返す．
-/*!
-  \return	内部記憶領域への定数ポインタ
-*/
-template <class T, class B, class R>
-inline typename Array2<T, B, R>::const_pointer
-Array2<T, B, R>::data() const
-{
-    return _buf.data();
-}
-
-//! 2次元配列の行数を返す．
-/*!
-  \return	行数
-*/
-template <class T, class B, class R> inline size_t
-Array2<T, B, R>::nrow() const
-{
-    return size();
-}
-
-//! 2次元配列の列数を返す．
-/*!
-  \return	列数
-*/
-template <class T, class B, class R> inline size_t
-Array2<T, B, R>::ncol() const
-{
-    return _ncol;
-}
-
-//! 2次元配列の隣接する行の間隔を要素数単位で返す．
-/*!
-  \return	間隔
-*/
-template <class T, class B, class R> inline size_t
-Array2<T, B, R>::stride() const
-{
-    return (size() > 1 ? (*this)[1].data() - (*this)[0].data() : _ncol);
-}
-
-//! 配列のサイズを変更する．
-/*!
-  \param r	新しい行数
-  \param c	新しい列数
-  \return	rが元の行数より大きい又はcが元の列数と異なればtrue，
-		そうでなければfalse
-*/
-template <class T, class B, class R> bool
-Array2<T, B, R>::resize(size_t r, size_t c)
-{
-    if (!super::resize(r) && ncol() == c)
-	return false;
-
-    _ncol = c;
-    _buf.resize(size()*_buf.stride(ncol()));
-    set_rows();
-    return true;
-}
-
-//! 配列が内部で使用する記憶領域を指定したものに変更する．
-/*!
-  \param p	新しい記憶領域へのポインタ
-  \param r	新しい行数
-  \param c	新しい列数
-*/
-template <class T, class B, class R> void
-Array2<T, B, R>::resize(pointer p, size_t r, size_t c)
-{
-    super::resize(r);
-    _ncol = c;
-    _buf.resize(p, size()*_buf.stride(ncol()));
-    set_rows();
-}
-
-//! 入力ストリームから配列を読み込む(binary)．
-/*!
-  \param in	入力ストリーム
-  \return	inで指定した入力ストリーム
-*/
-template <class T, class B, class R> std::istream&
-Array2<T, B, R>::restore(std::istream& in)
-{
-    for (iterator q = begin(), qe = end(); q != qe; ++q)
-	q->restore(in);
-    return in;
-}
-
-//! 出力ストリームに配列を書き出す(binary)．
-/*!
-  \param out	出力ストリーム
-  \return	outで指定した出力ストリーム
-*/
-template <class T, class B, class R> std::ostream&
-Array2<T, B, R>::save(std::ostream& out) const
-{
-    for (const_iterator q = begin(), qe = end(); q != qe; ++q)
-	q->save(out);
-    return out;
-}
 
 //! 入力ストリームから指定した箇所に2次元配列を読み込む(ASCII)．
 /*!
@@ -1577,42 +1130,23 @@ Array2<T, B, R>::get(std::istream& in, size_t i, size_t j, size_t jmax)
     return in;
 }    
 
-template <class T, class B, class R> void
-Array2<T, B, R>::set_rows()
-{
-    const size_t	stride = _buf.stride(ncol());
-    for (size_t i = 0; i < size(); ++i)
-	(*this)[i].resize(_buf.data() + i*stride, ncol());
-}
-    
 /************************************************************************
 *  I/O functions							*
 ************************************************************************/
-//! 出力ストリームへ配列式を書き出し(ASCII)，さらに改行コードを出力する．
+//! 出力ストリームへ式の演算結果を書き出し(ASCII)，さらに改行コードを出力する．
 /*!
   \param out	出力ストリーム
-  \param expr	書き出す配列式
+  \param expr	その結果を書き出す式
   \return	outで指定した出力ストリーム
 */
-template <class E> std::ostream&
-operator <<(std::ostream& out, const container<E>& expr)
+template <class E,
+	  class=typename std::enable_if<detail::is_opnode<E>::value>::type>
+std::ostream&
+operator <<(std::ostream& out, const E& expr)
 {
-    typedef typename E::const_iterator	const_iterator;
-    for (const_iterator iter = expr().begin(); iter != expr().end(); ++iter)
-	out << ' ' << *iter;
+    for (const auto& x : expr)
+	out << ' ' << x;
     return out << std::endl;
-}
-
-//! 入力ストリームから配列を読み込む(ASCII)．
-/*!
-  \param in	入力ストリーム
-  \param a	配列の読み込み先
-  \return	inで指定した入力ストリーム
-*/
-template <class T, class B> inline std::istream&
-operator >>(std::istream& in, Array<T, B>& a)
-{
-    return a.get(in >> std::ws);
 }
 
 //! 出力ストリームへ配列を書き出し(ASCII)，さらに改行コードを出力する．
@@ -1627,6 +1161,18 @@ operator <<(std::ostream& out, const Array<T, B>& a)
     return a.put(out) << std::endl;
 }
 
+//! 入力ストリームから配列を読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \param a	配列の読み込み先
+  \return	inで指定した入力ストリーム
+*/
+template <class T, class B> inline std::istream&
+operator >>(std::istream& in, Array<T, B>& a)
+{
+    return a.get(in >> std::ws);
+}
+
 //! 入力ストリームから2次元配列を読み込む(ASCII)．
 /*!
   \param in	入力ストリーム
@@ -1637,6 +1183,485 @@ template <class T, class B, class R> inline std::istream&
 operator >>(std::istream& in, Array2<T, B, R>& a)
 {
     return a.get(in >> std::ws);
+}
+
+namespace detail
+{
+  /**********************************************************************
+  *  class Product<L, R>						*
+  **********************************************************************/
+  //! 2つの配列式の積演算を表すクラス
+  template <class L, class R>
+  class Product : public opnode
+  {
+    private:
+      typedef is_range<value_t<L> >			lvalue_is_range;
+      typedef is_range<value_t<R> >			rvalue_is_range;
+      typedef element_t<R>				element_type;
+      
+    // 左辺が多次元配列ならあらかじめ右辺を評価する: A*b, A*B
+      typedef argument_t<R, lvalue_is_range::value>	rargument_type;
+      typedef typename std::decay<rargument_type>::type	right_type;
+    
+    // 右辺のみが多次元配列ならあらかじめ左辺を評価する: a*B
+    // (両辺とも多次元配列ならあらかじめ右辺のみを評価する: A*B)
+      typedef argument_t<L, (!lvalue_is_range::value &&
+			      rvalue_is_range::value)>	largument_type;
+      typedef typename std::decay<largument_type>::type	left_type;
+
+      template <class L_>
+      struct RowIterator
+      {
+	  typedef typename L_::const_iterator			type;
+      };
+
+      template <class R_>
+      struct ColumnIterator
+      {
+	  typedef column_iterator<void,
+				  typename R_::const_iterator>	type;
+      };
+
+    // 左辺が多次元配列なら左辺の各行を反復: A*b, A*B
+    // そうでないなら右辺の各列を反復: a*B
+      typedef typename std::conditional<
+	  lvalue_is_range::value, RowIterator<left_type>,
+	  ColumnIterator<right_type> >::type::type	base_iterator;
+
+      template <class R_>
+      struct ColumnType
+      {
+	  typedef typename std::iterator_traits<
+	      typename ColumnIterator<R_>::type>::value_type	type;
+      };
+      
+    // 右辺の反復単位は，右辺が多次元配列なら列: b，そうでないなら右辺自体: B
+      typedef typename std::conditional<
+	  rvalue_is_range::value, ColumnType<right_type>,
+	  impl::identity<right_type> >::type::type	rcolumn_type;
+
+    // 反復子が返すProduct演算子は，
+    // 左辺が多次元配列なら"左辺の行x右辺": a*B，a*b
+    // そうでないなら"左辺x右辺の列": a*b
+      typedef typename std::conditional<
+	  lvalue_is_range::value,
+	  Product<value_t<left_type>, right_type>,
+	  Product<left_type, rcolumn_type> >::type	product_type;
+    
+    public:
+    //! value()の戻り値の型
+      typedef typename std::conditional<
+	  (lvalue_is_range::value || rvalue_is_range::value),
+	  Product<L, R>, element_type>::type		type;
+    //! 要素の型
+      typedef typename product_type::type		value_type;
+    //! 評価結果の型
+      typedef typename std::conditional<
+	  (lvalue_is_range::value || rvalue_is_range::value),
+	  Array<result_t<value_type> >,
+	  element_type>::type				result_type;
+
+    //! 定数反復子
+      class const_iterator
+	  : public boost::iterator_adaptor<const_iterator,
+					   base_iterator,
+					   value_type,
+					   boost::use_default,
+					   value_type>
+      {
+	private:
+	  typedef boost::iterator_adaptor<const_iterator,
+					  base_iterator,
+					  value_type,
+					  boost::use_default,
+					  value_type>	super;
+	  typedef typename std::conditional<
+		      lvalue_is_range::value,
+		      right_type, left_type>::type	other_type;
+	
+	public:
+	  typedef typename super::reference		reference;
+
+	  friend class	boost::iterator_core_access;
+	
+	public:
+	  const_iterator(base_iterator iter, const other_type& other)
+	      :super(iter), _other(other)				{}
+	
+	private:
+	  reference	dereference(std::true_type) const	// A*b, A*B
+			{
+			    return product_type::value(*super::base(), _other);
+			}
+	  reference	dereference(std::false_type) const	// a*B
+			{
+			    return product_type::value(_other, *super::base());
+			}
+	  reference	dereference() const
+			{
+			    return dereference(lvalue_is_range());
+			}
+	
+	private:
+	  const other_type&	_other;
+      };
+
+      typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+    private:
+      static type	value(const L& l, const R& r, std::true_type)
+			{
+			    return Product(l, r);	// A*b, a*B, A*B
+			}
+      static type	value(const L& l, const R& r, std::false_type)	// a*b
+			{
+			    return std::inner_product(l.begin(), l.end(),
+						      r.begin(),
+						      element_type(0));
+			}
+      const_iterator	begin(std::true_type) const
+			{
+			    return const_iterator(_l.begin(), _r);
+			}
+      const_iterator	begin(std::false_type) const
+			{
+			    return const_iterator(
+				       column_begin(_r.begin(), _r.end()), _l);
+			}
+      const_iterator	end(std::true_type) const
+			{
+			    return const_iterator(_l.end(), _r);
+			}
+      const_iterator	end(std::false_type) const
+			{
+			    return const_iterator(
+				       column_end(_r.begin(), _r.end()), _l);
+			}
+      size_t		size(std::true_type) const	// A*b, A*B
+			{
+			    return _l.size();
+			}
+      size_t		size(std::false_type) const	// a*B
+			{
+			    return ncol(_r);
+			}
+      void		check_size(size_t size, std::true_type) const
+			{
+			    if (ncol(_l) != size)
+				throw std::logic_error("Product<L, R>::check_size: mismatched size!");
+			}
+      void		check_size(size_t size, std::false_type) const
+			{
+			    if (_l.size() != size)
+				throw std::logic_error("Product<L, R>::check_size: mismatched size!");
+			}
+    
+    public:
+			Product(const L& l, const R& r)
+			    :_l(l), _r(r)
+			{
+			    check_size(_r.size(), lvalue_is_range());
+			}
+
+      static type	value(const L& l, const R& r)
+			{
+			    return value(l, r,
+					 std::integral_constant<
+					     bool,
+					     (lvalue_is_range::value ||
+					      rvalue_is_range::value)>());
+			}
+    
+    //! 演算結果の先頭要素を指す定数反復子を返す.
+      const_iterator	begin() const
+			{
+			    return begin(lvalue_is_range());
+			}
+    //! 演算結果の末尾を指す定数反復子を返す.
+      const_iterator	end() const
+			{
+			    return end(lvalue_is_range());
+			}
+    //! 演算結果の要素数を返す.
+      size_t		size() const
+			{
+			    return size(lvalue_is_range());
+			}
+    
+    private:
+      largument_type	_l;
+      rargument_type	_r;
+  };
+
+  /**********************************************************************
+  *  class ExteriorProduct<L, R>					*
+  **********************************************************************/
+  //! 2つの配列型の式の外積演算を表すクラス
+  template <class L, class R>
+  class ExteriorProduct : public opnode
+  {
+    private:
+    // 左右両辺をあらかじめ評価する
+      typedef argument_t<L, true>			largument_type;
+      typedef argument_t<R, true>			rargument_type;
+      typedef typename std::decay<rargument_type>::type	right_type;
+      typedef typename std::decay<largument_type>::type
+			  ::const_iterator		base_iterator;
+    
+    public:
+    //! 評価結果の型
+      typedef Array<right_type>				result_type;
+    //! 要素の型
+      typedef decltype(std::declval<element_t<L> >() *
+		       std::declval<right_type>())	value_type;
+      
+    //! 定数反復子
+      class const_iterator
+	  : public boost::iterator_adaptor<const_iterator,
+					   base_iterator,
+					   value_type,
+					   boost::use_default,
+					   value_type>
+      {
+	private:
+	  typedef boost::iterator_adaptor<const_iterator,
+					  base_iterator,
+					  value_type,
+					  boost::use_default,
+					  value_type>	super;
+	
+	public:
+	  typedef typename super::reference		reference;
+
+	friend class	boost::iterator_core_access;
+	
+	public:
+	  const_iterator(base_iterator iter, const right_type& r)
+	      :super(iter), _r(r)				{}
+	
+	private:
+	  reference	dereference() const
+			{
+			    return *super::base() * _r;
+			}
+	
+	private:
+	  const right_type&	_r;
+      };
+
+      typedef const_iterator	iterator;	//!< 定数反復子の別名
+    
+    public:
+			ExteriorProduct(const L& l, const R& r)
+			    :_l(l), _r(r)			{}
+
+    //! 演算結果の先頭要素を指す定数反復子を返す.
+      const_iterator	begin() const
+			{
+			    return const_iterator(_l.begin(), _r);
+			}
+    //! 演算結果の末尾を指す定数反復子を返す.
+      const_iterator	end() const
+			{
+			    return const_iterator(_l.end(), _r);
+			}
+    //! 演算結果の要素数を返す.
+      size_t		size() const
+			{
+			    return _l.size();
+			}
+    
+    private:
+      largument_type	_l;
+      rargument_type	_r;
+  };
+
+  /**********************************************************************
+  *  class CrossProduct<L, R>						*
+  **********************************************************************/
+  //! 2つの配列型の式のベクトル積演算を表すクラス
+  template <class L, class R>
+  class CrossProduct : public detail::opnode
+  {
+    private:
+    // 左辺が1次元配列ならあらかじめ評価する
+      typedef value_t<L>				lvalue_type;
+      typedef is_range<lvalue_type>			lvalue_is_range;
+      typedef argument_t<L, !lvalue_is_range::value>	largument_type;
+
+    // あらかじめ右辺を評価する
+      typedef argument_t<R, true>			rargument_type;
+      typedef typename std::decay<rargument_type>::type	right_type;
+
+    // 3次元ベクトル型
+      typedef value_t<right_type>			rvalue_type;
+      typedef Array<rvalue_type, FixedSizedBuf<rvalue_type, 3> >
+							array3_type;
+
+    // 左辺が多次元配列ならその行と右辺のベクトル積を返す反復子を定義
+      typedef const_iterator_t<L>			base_iterator;
+      typedef CrossProduct<lvalue_type, right_type>	product_type;
+
+    public:
+    //! value()の戻り値の型
+      typedef typename std::conditional<
+	  lvalue_is_range::value,
+	  CrossProduct<L, R>, array3_type>::type	type;
+    //! 要素の型(左辺が1次元配列なら product_type は評価できないことに注意)
+      typedef typename std::conditional<
+	  lvalue_is_range::value,
+	  product_type,
+	  impl::identity<array3_type> >::type::type	value_type;
+    //! 評価結果の型
+      typedef typename std::conditional<
+	  lvalue_is_range::value,
+	  Array<result_t<value_type> >,
+	  array3_type>::type				result_type;
+    
+    //! 定数反復子
+      class const_iterator
+	  : public boost::iterator_adaptor<const_iterator,
+					   base_iterator,
+					   value_type,
+					   boost::use_default,
+					   value_type>
+      {
+	private:
+	  typedef boost::iterator_adaptor<const_iterator,
+					  base_iterator,
+					  value_type,
+					  boost::use_default,
+					  value_type>	super;
+
+	public:
+	  typedef typename super::difference_type	difference_type;
+	  typedef typename super::reference		reference;
+	  typedef typename super::iterator_category	iterator_category;
+
+	  friend class	boost::iterator_core_access;
+
+	public:
+	  const_iterator(base_iterator iter, const right_type& r)
+	      :super(iter), _r(r)					{}
+
+	private:
+	  reference	dereference() const
+			{
+			    return product_type(*super::base(), _r).value();
+			}
+
+	private:
+	  const right_type&	_r;
+      };
+
+      typedef const_iterator	iterator;	//!< 定数反復子の別名
+
+    private:
+      void		check_size(size_t size, std::true_type) const
+			{
+			    if (ncol(_l) != size)
+				throw std::logic_error("CrossProduct<L, R>::check_size: mismatched size!");
+			}
+      void		check_size(size_t size, std::false_type) const
+			{
+			    if (_l.size() != size)
+				throw std::logic_error("CrossProduct<L, R>::check_size: mismatched size!");
+			}
+      type		value(std::true_type) const
+			{
+			    return *this;
+			}
+      type		value(std::false_type) const
+			{
+			    return { _l[1] * _r[2] - _l[2] * _r[1],
+				     _l[2] * _r[0] - _l[0] * _r[2],
+				     _l[0] * _r[1] - _l[1] * _r[0] };
+			}
+    
+    public:
+			CrossProduct(const L& l, const R& r)
+			    :_l(l), _r(r)
+			{
+			    check_size(3, lvalue_is_range());
+			    check_size(_r.size(), lvalue_is_range());
+			}
+
+      type		value()
+			{
+			    return value(lvalue_is_range());
+			}
+
+    //! 演算結果の先頭要素を指す定数反復子を返す.
+      const_iterator	begin() const
+			{
+			    return const_iterator(_l.begin(), _r);
+			}
+    //! 演算結果の末尾を指す定数反復子を返す.
+      const_iterator	end() const
+			{
+			    return const_iterator(_l.end(), _r);
+			}
+    //! 演算結果の要素数を返す.
+      size_t		size() const
+			{
+			    return _l.size();
+			}
+    
+    private:
+      largument_type	_l;
+      rargument_type	_r;
+  };
+}
+
+/************************************************************************
+*  numerical operators							*
+************************************************************************/
+//! 2つの配列式の積をとる.
+/*!
+  aliasingを防ぐため，積演算子ノードではなく評価結果そのものを返す.
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	積の評価結果
+*/
+template <class L, class R,
+	  class=typename std::enable_if<(detail::is_range<L>::value &&
+					 detail::is_range<R>::value)>::type>
+inline typename detail::Product<L, R>::result_type
+operator *(const L& l, const R& r)
+{
+    return detail::Product<L, R>::value(l, r);
+}
+
+//! 2つの配列タイプの式の外積をとる.
+/*!
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	外積演算子ノード
+*/
+template <class L, class R,
+	  class=typename std::enable_if<(detail::is_range<L>::value &&
+					 detail::is_range<R>::value)>::type>
+inline auto
+operator %(const L& l, const R& r)
+    -> decltype(detail::ExteriorProduct<L, R>(l, r))
+{
+    return detail::ExteriorProduct<L, R>(l, r);
+}
+
+//! 2つの配列タイプの式のベクトル積をとる.
+/*!
+  aliasingを防ぐため，積演算子ノードではなく評価結果そのものを返す.
+  \param l	左辺の配列式
+  \param r	右辺の配列式
+  \return	ベクトル積
+*/
+template <class L, class R,
+	  class=typename std::enable_if<(detail::is_range<L>::value &&
+					 detail::is_range<R>::value)>::type>
+inline typename detail::CrossProduct<L, R>::result_type
+operator ^(const L& l, const R& r)
+{
+    return detail::CrossProduct<L, R>(l, r).value();
 }
 
 }

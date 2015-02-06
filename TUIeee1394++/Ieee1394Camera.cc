@@ -1419,28 +1419,28 @@ Ieee1394Camera::operator >>(Image<T>& image) const
       {
 	const YUV444*	src = (const YUV444*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
       case YUV_422:
       {
 	const YUV422*	src = (const YUV422*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
       case YUV_411:
       {
 	const YUV411*	src = (const YUV411*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
       case RGB_24:
       {
 	const RGB*	src = (const RGB*)_img;
 	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
       case MONO_8:
@@ -1448,7 +1448,7 @@ Ieee1394Camera::operator >>(Image<T>& image) const
       {
 	const u_char*	src = _img;
 	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
       case MONO_16:
@@ -1457,13 +1457,13 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 	{
 	    const u_short*	src = (const u_short*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].fill(src);
+		src = image[v].copy(src);
 	}
 	else
 	{
 	    const Mono16*	src = (const Mono16*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].fill(src);
+		src = image[v].copy(src);
 	}
 	break;
       case SIGNED_MONO_16:
@@ -1471,13 +1471,13 @@ Ieee1394Camera::operator >>(Image<T>& image) const
 	{
 	    const short*	src = (const short*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].fill(src);
+		src = image[v].copy(src);
 	}
 	else
 	{
 	    const Mono16*	src = (const Mono16*)_img;
 	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].fill(src);
+		src = image[v].copy(src);
 	}
 	break;
       default:

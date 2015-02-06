@@ -4,33 +4,41 @@
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/bin
+PROGRAM		= $(shell basename $(PWD))
+#LIBRARY		= lib$(shell basename $(PWD))
+
+VPATH		=
+
+IDLS		=
+MOCHDRS		=
+
 INCDIRS		= -I. -I$(PREFIX)/include
-
-PROGRAM		= firfprof
-LIBS		= -lTUTools++ -ltbb
-ifeq ($(OSTYPE), darwin)
-  LIBS	       +=
-#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
-
-CPPFLAGS	= -DUSE_TBB
+CPPFLAGS	= -DNDEBUGS -DUSE_TBB
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-  CFLAGS	= -O3 #-xAVX
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DSSE3 #-DAVX
+ifneq ($(findstring icpc,$(CXX)),)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O			# must < -O2
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		= -lTUTools++ -ltbb -ltbbmalloc
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/FIRFilter.h \
 		/usr/local/include/TU/FIRGaussianConvolver.h \
@@ -43,18 +51,23 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
 
-include $(PROJECT)/lib/p.mk
-
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/mmInstructions.h \
+main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/FIRGaussianConvolver.h \
 	/usr/local/include/TU/FIRFilter.h \

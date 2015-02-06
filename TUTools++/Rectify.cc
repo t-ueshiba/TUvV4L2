@@ -169,8 +169,9 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
     _H[2][0] = -_H[0][1];
     _H[2][1] =  _H[0][0];
     _H[2][2] =  _H[0][2];
-    _H[2] *= (cameraL.K() * cameraL.Rt() *
-	      cameraV.Rt().trns() * cameraV.Kinv());
+    auto	H2 = _H[2] * (cameraL.K() * cameraL.Rt() *
+			      cameraV.Rt().trns() * cameraV.Kinv());
+    _H[2] = H2;
 }
     
 void

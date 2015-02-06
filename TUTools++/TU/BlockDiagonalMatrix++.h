@@ -77,52 +77,6 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
     size_t			nrow()				const	;
     size_t			ncol()				const	;
     BlockDiagonalMatrix		trns()				const	;
-    BlockDiagonalMatrix&	operator =(element_type c)		;
-
-  //! このブロック対角行列の全ての成分に同一の数値を掛ける．
-  /*!
-    \param c	掛ける数値
-    \return	このブロック対角行列
-  */
-    BlockDiagonalMatrix&	operator *=(element_type c)
-				{
-				    super::operator *=(c);
-				    return *this;
-				}
-
-  //! このブロック対角行列の全ての成分を同一の数値で割る．
-  /*!
-    \param c	割る数値
-    \return	このブロック対角行列
-  */
-    template <class T2>
-    BlockDiagonalMatrix&	operator /=(T2 c)
-				{
-				    super::operator /=(c);
-				    return *this;
-				}
-
-  //! このブロック対角行列に他のブロック対角行列を足す．
-  /*!
-    \param b	足すブロック対角行列
-    \return	このブロック対角行列
-  */
-    BlockDiagonalMatrix&	operator +=(const BlockDiagonalMatrix& b)
-				{
-				    super::operator +=(b);
-				    return *this;
-				}
-
-  //! このブロック対角行列から他のブロック対角行列を引く．
-  /*!
-    \param b	引くブロック対角行列
-    \return	このブロック対角行列
-  */
-    BlockDiagonalMatrix&	operator -=(const BlockDiagonalMatrix& b)
-				{
-				    super::operator -=(b);
-				    return *this;
-				}
 };
 
 //! 各小行列のサイズを指定してブロック対角行列を生成し，全要素を0で初期化する．
@@ -138,10 +92,7 @@ BlockDiagonalMatrix<T>::BlockDiagonalMatrix(const Array<size_t>& nrows,
     if (nrows.size() != ncols.size())
 	throw std::invalid_argument("TU::BlockDiagonalMatrix<T>::BlockDiagonalMatrix: dimension mismatch between nrows and ncols!!");
     for (size_t i = 0; i < size(); ++i)
-    {
 	(*this)[i].resize(nrows[i], ncols[i]);
-	(*this)[i] = element_type(0);
-    }
 }
 
 //! ブロック対角行列の総行数を返す．
@@ -188,19 +139,6 @@ BlockDiagonalMatrix<T>::trns() const
     for (size_t i = 0; i < val.size(); ++i)
 	val[i] = (*this)[i].trns();
     return val;
-}
-
-//! このブロック対角行列の全ての小行列の全要素に同一の数値を代入する．
-/*!
-  \param c	代入する数値
-  \return	このブロック対角行列
-*/
-template <class T> BlockDiagonalMatrix<T>&
-BlockDiagonalMatrix<T>::operator =(element_type c)
-{
-    for (size_t i = 0; i < size(); ++i)
-	(*this)[i] = c;
-    return *this;
 }
 
 //! ブロック対角行列から通常の行列を生成する.

@@ -21,7 +21,7 @@ ifneq ($(findstring icpc,$(CXX)),)
   NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
-CCFLAGS		= $(CFLAGS) -std=c++11
+CCFLAGS		= $(CFLAGS)
 
 LIBS		=
 ifneq ($(findstring darwin,$(OSTYPE)),)
@@ -154,60 +154,59 @@ include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
 BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h
 ConversionFromYUV.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h
 CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/types.h \
-	TU/Geometry++.h TU/Vector++.h TU/Array++.h TU/iterator.h \
-	TU/functional.h TU/mmInstructions.h TU/tuple.h TU/Minimize.h
+	TU/Geometry++.h TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h \
+	TU/functional.h TU/mmInstructions.h TU/Minimize.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/Geometry++.h \
-	TU/Vector++.h TU/Array++.h TU/iterator.h TU/functional.h \
-	TU/mmInstructions.h TU/tuple.h TU/Minimize.h
+	TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
-	TU/SeparableFilter2.h TU/Array++.h TU/iterator.h TU/functional.h \
-	TU/mmInstructions.h TU/tuple.h
+	TU/SeparableFilter2.h TU/Array++.h TU/iterator.h TU/tuple.h \
+	TU/functional.h TU/mmInstructions.h
 FeatureMatch.o: TU/FeatureMatch.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h TU/Random.h TU/types.h TU/Ransac.h \
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h TU/Random.h TU/types.h TU/Ransac.h \
 	TU/Manip.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
-	TU/iterator.h TU/functional.h TU/mmInstructions.h TU/tuple.h \
+	TU/iterator.h TU/tuple.h TU/functional.h TU/mmInstructions.h \
 	TU/IIRFilter.h TU/SeparableFilter2.h TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h
 Image++.inst.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h
 ImageBase.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h TU/Camera++.h TU/Manip.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h TU/Camera++.h TU/Manip.h
 ImageLine.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
-Profiler.o: TU/Profiler.h TU/types.h TU/Array++.h TU/iterator.h \
-	TU/functional.h TU/mmInstructions.h TU/tuple.h windows/fakeWindows.h
+Profiler.o: TU/Profiler.h TU/types.h TU/Array++.h TU/iterator.h TU/tuple.h \
+	TU/functional.h TU/mmInstructions.h windows/fakeWindows.h
 Random.o: TU/Random.h TU/types.h windows/fakeWindows.h
 Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h \
-	TU/Vector++.h TU/Array++.h TU/iterator.h TU/functional.h \
-	TU/mmInstructions.h TU/tuple.h TU/Minimize.h TU/Camera++.h \
-	TU/algorithm.h
+	TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h TU/Camera++.h TU/algorithm.h
 SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 SURFCreator.o: TU/SURFCreator.h TU/Feature.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h TU/Manip.h TU/types.h TU/IntegralImage.h \
-	TU/Image++.h TU/Heap.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h TU/Manip.h TU/types.h \
+	TU/IntegralImage.h TU/Image++.h TU/Heap.h
 Serial.o: TU/Serial.h TU/fdstream.h TU/types.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
 	TU/types.h TU/Manip.h
-Vector++.inst.o: TU/Vector++.h TU/Array++.h TU/iterator.h TU/functional.h \
-	TU/mmInstructions.h TU/tuple.h
+Vector++.inst.o: TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h \
+	TU/functional.h TU/mmInstructions.h
 Warp.o: TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/functional.h TU/mmInstructions.h \
-	TU/tuple.h TU/Minimize.h TU/Camera++.h
+	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
+	TU/mmInstructions.h TU/Minimize.h TU/Camera++.h
 fdstream.o: TU/fdstream.h TU/types.h
 io.o: TU/io.h
 manipulators.o: TU/Manip.h TU/types.h

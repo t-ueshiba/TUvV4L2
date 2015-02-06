@@ -37,620 +37,12 @@
 #include "TU/Array++.h"
 #include <numeric>
 #include <cmath>
+#include <utility>	// std::declval<T>
 
 namespace TU
 {
-/************************************************************************
-*  class Product<L, R>							*
-************************************************************************/
-//! 2つの配列式の積演算を表すクラス
-template <class L, class R>
-class Product : public container<Product<L, R> >,
-		public op_node
-{
-  private:
-    typedef typename detail::ValueType<L>::type		lvalue_type;
-    typedef typename detail::ValueType<R>::type		rvalue_type;
-
-    enum
-    {
-	lvalue_is_expr = detail::is_container<lvalue_type>::value,
-	rvalue_is_expr = detail::is_container<rvalue_type>::value,
-    };
-
-  // 左辺が多次元配列ならあらかじめ右辺を評価する.
-    typedef typename detail::ArgumentType<
-	R, lvalue_is_expr>::type			rargument_type;
-    typedef typename boost::remove_cv<
-	typename boost::remove_reference<
-	    rargument_type>::type>::type		right_type;
-    
-  // 右辺のみが多次元配列ならあらかじめ左辺を評価する.
-    typedef typename detail::ArgumentType<
-	L, (!lvalue_is_expr && rvalue_is_expr)>::type	largument_type;
-    typedef typename boost::remove_cv<
-	typename boost::remove_reference<
-	    largument_type>::type>::type		left_type;
-
-    template <class _L>
-    struct RowIterator
-    {
-	typedef typename _L::const_iterator		type;
-    };
-
-    template <class _R>
-    struct ColumnIterator
-    {
-	typedef column_iterator<const _R>		type;
-    };
-
-  // 左辺が多次元配列なら左辺の各行を反復. そうでないなら右辺の各列を反復.
-    typedef typename boost::mpl::eval_if_c<
-	lvalue_is_expr, RowIterator<left_type>,
-	ColumnIterator<right_type> >::type		base_iterator;
-    typedef typename boost::mpl::if_c<
-	rvalue_is_expr, detail::column_proxy<const right_type>,
-	right_type>::type				rcolumn_type;
-    typedef typename boost::mpl::if_c<
-	lvalue_is_expr,
-	Product<lvalue_type, right_type>,
-	Product<left_type, rcolumn_type> >::type	product_type;
-    
-    template <class _L, class _R>
-    class ResultType
-    {
-      private:
-	template <class _T>
-	struct _Array
-	{
-	    typedef Array<typename _T::type>		type;
-	};
-	typedef typename _L::value_type			lvalue_type;
-	typedef typename boost::mpl::eval_if<
-	    detail::is_container<_R>,
-	    detail::ResultType<_R>,
-	    boost::mpl::identity<_R> >::type		rvalue_type;
-
-      public:
-	typedef typename boost::mpl::eval_if<
-	    detail::is_container<lvalue_type>,
-	    _Array<ResultType<lvalue_type, _R> >,
-	    boost::mpl::identity<rvalue_type> >::type	type;
-    };
-	
-  public:
-  //! 評価結果の型
-    typedef typename ResultType<L, rvalue_type>::type	result_type;
-  //! 成分の型
-    typedef typename R::element_type			element_type;
-  //! value()が返す値の型
-    typedef typename boost::mpl::if_c<
-	(lvalue_is_expr || rvalue_is_expr),
-	Product<L, R>, element_type>::type		type;
-  //! 要素の型
-    typedef typename product_type::type			value_type;
-
-  //! 定数反復子
-    class const_iterator
-	: public boost::iterator_adaptor<const_iterator,
-					 base_iterator,
-					 value_type,
-					 boost::use_default,
-					 value_type>
-    {
-      private:
-	typedef boost::iterator_adaptor<const_iterator,
-					base_iterator,
-					value_type,
-					boost::use_default,
-					value_type>	super;
-	typedef typename boost::mpl::if_c<
-		    lvalue_is_expr,
-		    right_type, left_type>::type	other_type;
-	
-      public:
-	typedef typename super::difference_type		difference_type;
-	typedef typename super::pointer			pointer;
-	typedef typename super::reference		reference;
-	typedef typename super::iterator_category	iterator_category;
-
-	friend class	boost::iterator_core_access;
-	
-      public:
-	const_iterator(base_iterator iter, const other_type& other)
-	    :super(iter), _other(other)					{}
-	
-      private:
-	reference	dereference(boost::mpl::true_) const
-			{
-			    return product_type::value(*super::base(), _other);
-			}
-	reference	dereference(boost::mpl::false_) const
-			{
-			    return product_type::value(_other, *super::base());
-			}
-	reference	dereference() const
-			{
-			    return dereference(boost::mpl::
-					       bool_<lvalue_is_expr>());
-			}
-	
-      private:
-	const other_type&	_other;
-    };
-
-    typedef const_iterator	iterator;	//!< 定数反復子の別名
-    
-  private:
-    static type		value(const container<L>& l,
-			      const container<R>& r, boost::mpl::true_)
-			{
-			    return Product(l, r);
-			}
-    static type		value(const container<L>& l,
-			      const container<R>& r, boost::mpl::false_)
-			{
-			    return std::inner_product(l().begin(), l().end(),
-						      r().begin(),
-						      element_type(0));
-			}
-    const_iterator	begin(boost::mpl::true_) const
-			{
-			    return const_iterator(_l.begin(), _r);
-			}
-    const_iterator	begin(boost::mpl::false_) const
-			{
-			    return const_iterator(column_cbegin(_r), _l);
-			}
-    const_iterator	end(boost::mpl::true_) const
-			{
-			    return const_iterator(_l.end(), _r);
-			}
-    const_iterator	end(boost::mpl::false_) const
-			{
-			    return const_iterator(column_cend(_r), _l);
-			}
-    size_t		size(boost::mpl::true_) const
-			{
-			    return _l.size();
-			}
-    size_t		size(boost::mpl::false_) const
-			{
-			    return _r.ncol();
-			}
-    void		check_size(size_t size, boost::mpl::true_) const
-			{
-			    if (_l.ncol() != size)
-				throw std::logic_error("Product<L, R>::check_size: mismatched size!");
-			}
-    void		check_size(size_t size, boost::mpl::false_) const
-			{
-			    if (_l.size() != size)
-				throw std::logic_error("Product<L, R>::check_size: mismatched size!");
-			}
-    
-  public:
-    Product(const container<L>& l, const container<R>& r)
-	:_l(l()), _r(r())
-			{
-			    check_size(_r.size(),
-				       boost::mpl::bool_<lvalue_is_expr>());
-			}
-
-    static type		value(const container<L>& l, const container<R>& r)
-			{
-			    return value(l, r,
-					 boost::mpl::bool_<(lvalue_is_expr ||
-							    rvalue_is_expr)>());
-			}
-    
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	begin() const
-			{
-			    return begin(boost::mpl::bool_<lvalue_is_expr>());
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return begin();
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	end() const
-			{
-			    return end(boost::mpl::bool_<lvalue_is_expr>());
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
-			{
-			    return end();
-			}
-  //! 演算結果の要素数を返す.
-    size_t		size() const
-			{
-			    return size(boost::mpl::bool_<lvalue_is_expr>());
-			}
-  //! 演算結果の列数を返す.
-    size_t		ncol() const
-			{
-			    return _r.ncol();
-			}
-    
-  private:
-    largument_type	_l;
-    rargument_type	_r;
-};
-
-/************************************************************************
-*  class ExteriorProduct<L, R>						*
-************************************************************************/
-//! 2つの配列型の式の外積演算を表すクラス
-template <class L, class R>
-class ExteriorProduct : public container<ExteriorProduct<L, R> >,
-			public op_node
-{
-  private:
-    typedef typename detail::ArgumentType<L, true>::type	largument_type;
-    typedef typename detail::ArgumentType<R, true>::type	rargument_type;
-    typedef typename L::result_type::const_iterator		base_iterator;
-    typedef typename R::result_type				right_type;
-    
-  public:
-  //! 評価結果の型
-    typedef Array<right_type>					result_type;
-  //! 成分の型
-    typedef typename result_type::element_type			element_type;
-  //! 要素の型
-    typedef unary_operator<std::binder1st<std::multiplies<element_type> >,
-			   right_type>				value_type;
-  //! 定数反復子
-    class const_iterator
-	: public boost::iterator_adaptor<const_iterator,
-					 base_iterator,
-					 value_type,
-					 boost::use_default,
-					 value_type>
-    {
-      private:
-	typedef boost::iterator_adaptor<const_iterator,
-					base_iterator,
-					value_type,
-					boost::use_default,
-					value_type>	super;
-	
-      public:
-	typedef typename super::difference_type		difference_type;
-	typedef typename super::pointer			pointer;
-	typedef typename super::reference		reference;
-	typedef typename super::iterator_category	iterator_category;
-
-	friend class	boost::iterator_core_access;
-	
-      public:
-	const_iterator(base_iterator iter, const right_type& r)
-	    :super(iter), _r(r)						{}
-	
-      private:
-	reference	dereference() const
-			{
-			    return *super::base() * _r;
-			}
-	
-      private:
-	const right_type&	_r;
-    };
-
-    typedef const_iterator	iterator;	//!< 定数反復子の別名
-    
-  public:
-    ExteriorProduct(const container<L>& l, const container<R>& r)
-	:_l(l()), _r(r())						{}
-
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	begin() const
-			{
-			    return const_iterator(_l.begin(), _r);
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return begin();
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	end() const
-			{
-			    return const_iterator(_l.end(), _r);
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
-			{
-			    return end();
-			}
-  //! 演算結果の要素数を返す.
-    size_t		size() const
-			{
-			    return _l.size();
-			}
-  //! 演算結果の列数を返す.
-    size_t		ncol() const
-			{
-			    return _r.size();
-			}
-    
-  private:
-    largument_type	_l;
-    rargument_type	_r;
-};
-
-/************************************************************************
-*  class VectorProduct<L, R>						*
-************************************************************************/
-//! 2つの配列型の式のベクトル積演算を表すクラス
-template <class L, class R>
-class VectorProduct : public container<VectorProduct<L, R> >,
-		      public op_node
-{
-  private:
-    typedef typename detail::ValueType<L>::type		lvalue_type;
-
-    enum
-    {
-	lvalue_is_expr = detail::is_container<lvalue_type>::value,
-    };
-    
-    typedef typename detail::ArgumentType<L, !lvalue_is_expr>::type
-							largument_type;
-    typedef typename detail::ArgumentType<R, true>::type
-							rargument_type;
-    typedef typename boost::remove_cv<
-	typename boost::remove_reference<
-	    rargument_type>::type>::type		right_type;
-    typedef typename right_type::value_type		rvalue_type;
-    typedef typename L::const_iterator			base_iterator;
-    typedef Array<rvalue_type, FixedSizedBuf<rvalue_type, 3> >
-							array3_type;
-    typedef VectorProduct<lvalue_type, right_type>	product_type;
-    
-    template <class _L>
-    class ResultType
-    {
-      private:
-	template <class _T>
-	struct _Array
-	{
-	    typedef Array<typename _T::type>		type;
-	};
-	typedef typename _L::value_type			lvalue_type;
-
-      public:
-	typedef typename boost::mpl::eval_if<
-	    detail::is_container<lvalue_type>,
-	    _Array<ResultType<lvalue_type> >,
-	    boost::mpl::identity<array3_type> >::type	type;
-    };
-	
-  public:
-  //! 評価結果の型
-    typedef typename ResultType<L>::type		result_type;
-  //! 成分の型
-    typedef typename result_type::element_type		element_type;
-  //! value()が返す値の型
-    typedef typename boost::mpl::if_c<
-	lvalue_is_expr,
-	VectorProduct<L, R>, array3_type>::type		type;
-  //! 要素の型
-    typedef typename boost::mpl::eval_if_c<
-	lvalue_is_expr, product_type,
-	boost::mpl::identity<array3_type> >::type	value_type;
-    
-  //! 定数反復子
-    class const_iterator
-	: public boost::iterator_adaptor<const_iterator,
-					 base_iterator,
-					 value_type,
-					 boost::use_default,
-					 value_type>
-    {
-      private:
-	typedef boost::iterator_adaptor<const_iterator,
-					base_iterator,
-					value_type,
-					boost::use_default,
-					value_type>	super;
-
-      public:
-	typedef typename super::difference_type		difference_type;
-	typedef typename super::pointer			pointer;
-	typedef typename super::reference		reference;
-	typedef typename super::iterator_category	iterator_category;
-
-	friend class	boost::iterator_core_access;
-
-      public:
-	const_iterator(base_iterator iter, const right_type& r)
-	    :super(iter), _r(r)						{}
-
-      private:
-	reference	dereference() const
-			{
-			    return product_type(*super::base(), _r).value();
-			}
-
-      private:
-	const right_type&	_r;
-    };
-
-    typedef const_iterator	iterator;	//!< 定数反復子の別名
-
-  private:
-    void		check_size(size_t size, boost::mpl::true_) const
-			{
-			    if (_l.ncol() != size)
-				throw std::logic_error("VectorProduct<L, R>::check_size: mismatched size!");
-			}
-    void		check_size(size_t size, boost::mpl::false_) const
-			{
-			    if (_l.size() != size)
-				throw std::logic_error("VectorProduct<L, R>::check_size: mismatched size!");
-			}
-    type		value(boost::mpl::true_) const
-			{
-			    return *this;
-			}
-    type		value(boost::mpl::false_) const
-			{
-			    type	val(3);
-
-			    val[0] = _l[1] * _r[2] - _l[2] * _r[1];
-			    val[1] = _l[2] * _r[0] - _l[0] * _r[2];
-			    val[2] = _l[0] * _r[1] - _l[1] * _r[0];
-
-			    return val;
-			}
-    size_t		ncol(boost::mpl::true_) const
-			{
-			    return 3;
-			}
-    size_t		ncol(boost::mpl::false_) const
-			{
-			    return _r.ncol();
-			}
-    
-  public:
-    VectorProduct(const container<L>& l, const container<R>& r)
-	:_l(l()), _r(r())
-			{
-			    check_size(3, boost::mpl::bool_<lvalue_is_expr>());
-			    check_size(_r.size(),
-				       boost::mpl::bool_<lvalue_is_expr>());
-			}
-
-    type		value()
-			{
-			    return value(boost::mpl::bool_<lvalue_is_expr>());
-			}
-
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	begin() const
-			{
-			    return const_iterator(_l.begin(), _r);
-			}
-  //! 演算結果の先頭要素を指す定数反復子を返す.
-    const_iterator	cbegin() const
-			{
-			    return begin();
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	end() const
-			{
-			    return const_iterator(_l.end(), _r);
-			}
-  //! 演算結果の末尾を指す定数反復子を返す.
-    const_iterator	cend() const
-			{
-			    return end();
-			}
-  //! 演算結果の要素数を返す.
-    size_t		size() const
-			{
-			    return _l.size();
-			}
-  //! 演算結果の列数を返す.
-    size_t		ncol() const
-			{
-			    return ncol(boost::mpl::bool_<lvalue_is_expr>());
-			}
-    
-  private:
-    largument_type	_l;
-    rargument_type	_r;
-};
-
 template <class T, class B=Buf<T> >				class Vector;
 template <class T, class B=Buf<T>, class R=Buf<Vector<T> > >	class Matrix;
-
-namespace detail
-{
-template <class L, class R>
-class ProductType
-{
-  private:
-    enum
-    {
-	lvalue_is_expr = detail::is_container<typename L::value_type>::value,
-	rvalue_is_expr = detail::is_container<typename R::value_type>::value,
-    };
-    typedef typename R::element_type				element_type;
-    
-  public:
-    typedef typename boost::mpl::if_c<
-	lvalue_is_expr,
-	typename boost::mpl::if_c<
-	    rvalue_is_expr,
-	    Matrix<element_type>, Vector<element_type> >::type,
-	typename boost::mpl::if_c<
-	    rvalue_is_expr,
-	    Vector<element_type>, element_type>::type>::type	type;
-};
-
-template <class L, class R>
-class VectorProductType
-{
-  private:
-    enum
-    {
-	lvalue_is_expr = detail::is_container<typename L::value_type>::value,
-	rvalue_is_expr = detail::is_container<typename R::value_type>::value,
-    };
-    typedef typename R::element_type				element_type;
-    
-  public:
-    typedef typename boost::mpl::if_c<
-	(lvalue_is_expr || rvalue_is_expr),
-	Matrix<element_type>,
-	Vector<element_type, FixedSizedBuf<element_type, 3> > >::type	type;
-};
-
-}
-/************************************************************************
-*  numerical operators							*
-************************************************************************/
-//! 2つの配列式の積をとる.
-/*!
-  aliasingを防ぐため，積演算子ノードではなく評価結果そのものを返す.
-  \param l	左辺の配列式
-  \param r	右辺の配列式
-  \return	積の評価結果
-*/
-template <class L, class R> inline typename detail::ProductType<L, R>::type
-operator *(const container<L>& l, const container<R>& r)
-{
-    return Product<L, R>::value(l, r);
-}
-
-//! 2つの配列タイプの式の外積をとる.
-/*!
-  \param l	左辺の配列式
-  \param r	右辺の配列式
-  \return	外積演算子ノード
-*/
-template <class L, class R> inline Matrix<typename R::element_type>
-operator %(const container<L>& l, const container<R>& r)
-{
-    return ExteriorProduct<L, R>(l, r);
-}
-
-//! 2つの配列タイプの式のベクトル積をとる.
-/*!
-  \param l	左辺の配列式
-  \param r	右辺の配列式
-  \return	ベクトル積
-*/
-template <class L, class R>
-inline typename detail::VectorProductType<L, R>::type
-operator ^(const container<L>& l, const container<R>& r)
-{
-    return VectorProduct<L, R>(l, r).value();
-}
 
 /************************************************************************
 *  class Rotation<T>							*
@@ -787,8 +179,6 @@ class Vector : public Array<T, B>
     typedef typename super::difference_type		difference_type;
     typedef typename super::reference			reference;
     typedef typename super::const_reference		const_reference;
-    typedef typename super::pointer			pointer;
-    typedef typename super::const_pointer		const_pointer;
     typedef typename super::iterator			iterator;
     typedef typename super::const_iterator		const_iterator;
     typedef typename super::reverse_iterator		reverse_iterator;
@@ -805,12 +195,15 @@ class Vector : public Array<T, B>
     Vector(T* p, size_t d)						;
     template <class B2>
     Vector(Vector<T, B2>& v, size_t i, size_t d)			;
-    template <class E>
-    Vector(const container<E>& v)					;
-    template <class B2, class R2>
-    Vector(const Matrix<T, B2, R2>& m)					;
-    template <class E>
-    Vector&		operator =(const container<E>& v)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Vector(const E& v)							;
+    Vector(std::initializer_list<value_type> args)			;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Vector&		operator =(const E& v)				;
+    Vector&		operator =(std::
+				   initializer_list<value_type> args)	;
     
     using		super::begin;
     using		super::cbegin;
@@ -826,32 +219,28 @@ class Vector : public Array<T, B>
     
     const Vector<T>	operator ()(size_t i, size_t d)		const	;
     Vector<T>		operator ()(size_t i, size_t d)			;
-    Vector&		operator  =(const element_type& c)		;
-    Vector&		operator *=(const element_type& c)		;
-    Vector&		operator /=(const element_type& c)		;
-    template <class E>
-    Vector&		operator +=(const container<E>& v)		;
-    template <class E>
-    Vector&		operator -=(const container<E>& v)		;
-    template <class E>
-    Vector&		operator *=(const container<E>& m)		;
-    template <class E>
-    Vector&		operator ^=(const container<E>& v)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Vector&		operator *=(const E& m)				;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Vector&		operator ^=(const E& v)				;
     T			square()				const	;
     double		length()				const	;
-    template <class E>
-    T			sqdist(const container<E>& v)		const	;
-    template <class E>
-    double		dist(const container<E>& v)		const	;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    T			sqdist(const E& v)			const	;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    double		dist(const E& v)			const	;
     Vector&		normalize()					;
     Vector		normal()				const	;
-    template <class E>
-    Vector&		solve(const container<E>& m)			;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Vector&		solve(const E& m)				;
     matrix33_type	skew()					const	;
     Vector<T>		homogeneous()				const	;
     Vector<T>		inhomogeneous()				const	;
-    void		resize(size_t d)				;
-    void		resize(T* p, size_t d)				;
 };
 
 //! ベクトルを生成し，全成分を0で初期化する．
@@ -859,7 +248,6 @@ template <class T, class B>
 Vector<T, B>::Vector()
     :super()
 {
-    *this = element_type(0);
 }
 
 //! 指定された次元のベクトルを生成し，全成分を0で初期化する．
@@ -870,7 +258,6 @@ template <class T, class B> inline
 Vector<T, B>::Vector(size_t d)
     :super(d)
 {
-    *this = element_type(0);
 }
 
 //! 外部記憶領域と次元を指定してベクトルを生成する．
@@ -900,9 +287,15 @@ Vector<T, B>::Vector(Vector<T, B2>& v, size_t i, size_t d)
 /*!
   \param v	コピー元ベクトル
 */
-template <class T, class B> template <class E> inline
-Vector<T, B>::Vector(const container<E>& v)
+template <class T, class B> template <class E, class> inline
+Vector<T, B>::Vector(const E& v)
     :super(v)
+{
+}
+    
+template <class T, class B> inline
+Vector<T, B>::Vector(std::initializer_list<value_type> args)
+    :super(args)
 {
 }
     
@@ -911,10 +304,17 @@ Vector<T, B>::Vector(const container<E>& v)
   \param v	コピー元ベクトル
   \return	このベクトル
 */
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator =(const container<E>& v)
+template <class T, class B> template <class E, class> inline Vector<T, B>&
+Vector<T, B>::operator =(const E& v)
 {
     super::operator =(v);
+    return *this;
+}
+
+template <class T, class B> inline Vector<T, B>&
+Vector<T, B>::operator =(std::initializer_list<value_type> args)
+{
+    super::operator =(args);
     return *this;
 }
 
@@ -942,77 +342,14 @@ Vector<T, B>::operator ()(size_t i, size_t d) const
     return Vector<T>(const_cast<Vector<T, B>&>(*this), i, d);
 }
 
-//! このベクトルの全ての成分に同一の数値を代入する．
-/*!
-  \param c	代入する数値
-  \return	このベクトル
-*/
-template <class T, class B> inline Vector<T, B>&
-Vector<T, B>::operator =(const element_type& c)
-{
-    super::operator =(c);
-    return *this;
-}
-
-//! このベクトルに指定された数値を掛ける．
-/*!
-  \param c	掛ける数値
-  \return	このベクトル，すなわち\f$\TUvec{u}{}\leftarrow c\TUvec{u}{}\f$
-*/
-template <class T, class B> inline Vector<T, B>&
-Vector<T, B>::operator *=(const element_type& c)
-{
-    super::operator *=(c);
-    return *this;
-}
-
-//! このベクトルを指定された数値で割る．
-/*!
-  \param c	割る数値
-  \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \frac{\TUvec{u}{}}{c}\f$
-*/
-template <class T, class B> inline Vector<T, B>&
-Vector<T, B>::operator /=(const element_type& c)
-{
-    super::operator /=(c);
-    return *this;
-}
-
-//! このベクトルに他のベクトルを足す．
-/*!
-  \param v	足すベクトル
-  \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} + \TUvec{v}{}\f$
-*/
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator +=(const container<E>& v)
-{
-    super::operator +=(v);
-    return *this;
-}
-
-//! このベクトルから他のベクトルを引く．
-/*!
-  \param v	引くベクトル
-  \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} - \TUvec{v}{}\f$
-*/
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator -=(const container<E>& v)
-{
-    super::operator -=(v);
-    return *this;
-}
-
 //! このベクトルの右から行列を掛ける．
 /*!
   \param m	掛ける行列
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\TUvec{M}{}\f$
 */
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator *=(const container<E>& m)
+template <class T, class B> template <class E, class> inline Vector<T, B>&
+Vector<T, B>::operator *=(const E& m)
 {
     return *this = *this * m;
 }
@@ -1023,8 +360,8 @@ Vector<T, B>::operator *=(const container<E>& m)
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} \times \TUvec{v}{}\f$
 */
-template <class T, class B> template <class E> inline Vector<T, B>&
-Vector<T, B>::operator ^=(const container<E>& v)
+template <class T, class B> template <class E, class> inline Vector<T, B>&
+Vector<T, B>::operator ^=(const E& v)
 {
     return *this = *this ^ v;
 }
@@ -1055,8 +392,8 @@ Vector<T, B>::length() const
   \return	ベクトル間の差の2乗，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
 */
-template <class T, class B> template <class E> inline T
-Vector<T, B>::sqdist(const container<E>& v) const
+template <class T, class B> template <class E, class> inline T
+Vector<T, B>::sqdist(const E& v) const
 {
     return Vector(*this - v).square();
 }
@@ -1067,8 +404,8 @@ Vector<T, B>::sqdist(const container<E>& v) const
   \return	ベクトル間の差，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
-template <class T, class B> template <class E> inline double
-Vector<T, B>::dist(const container<E>& v) const
+template <class T, class B> template <class E, class> inline double
+Vector<T, B>::dist(const E& v) const
 {
     return std::sqrt(double(sqdist(v)));
 }
@@ -1133,7 +470,7 @@ Vector<T, B>::homogeneous() const
 {
     Vector<T>	v(size() + 1);
     v(0, size()) = *this;
-    v[size()]	= 1;
+    v[size()]	 = 1;
     return v;
 }
 
@@ -1145,30 +482,6 @@ template <class T, class B> inline Vector<T>
 Vector<T, B>::inhomogeneous() const
 {
     return (*this)(0, size()-1) / (*this)[size()-1];
-}
-
-//! ベクトルの次元を変更し，全成分を0に初期化する．
-/*!
-  ただし，他のオブジェクトと記憶領域を共有しているベクトルの次元を
-  変更することはできない．
-  \param d	新しい次元
-*/
-template <class T, class B> inline void
-Vector<T, B>::resize(size_t d)
-{
-    super::resize(d);
-    *this = 0;
-}
-
-//! ベクトルが内部で使用する記憶領域を指定したものに変更する．
-/*!
-  \param p	新しい記憶領域へのポインタ
-  \param d	新しい次元
-*/
-template <class T, class B> inline void
-Vector<T, B>::resize(T* p, size_t d)
-{
-    super::resize(p, d);
 }
 
 /************************************************************************
@@ -1197,8 +510,6 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef typename super::difference_type		difference_type;
     typedef typename super::reference			reference;
     typedef typename super::const_reference		const_reference;
-    typedef typename super::pointer			pointer;
-    typedef typename super::const_pointer		const_pointer;
     typedef typename super::iterator			iterator;
     typedef typename super::const_iterator		const_iterator;
     typedef typename super::reverse_iterator		reverse_iterator;
@@ -1220,11 +531,20 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix(T* p, size_t r, size_t c)					;
     template <class B2, class R2>
     Matrix(Matrix<T, B2, R2>& m, size_t i, size_t j, size_t r, size_t c);
-    template <class E>
-    Matrix(const container<E>& m)					;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Matrix(const E& m)	:super(m)					{}
+    Matrix(std::initializer_list<value_type> args)			;
     Matrix(const BlockDiagonalMatrix<T>& m)				;
-    template <class E>
-    Matrix&		operator =(const container<E>& m)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Matrix&		operator =(const E& m)
+			{
+			    super::operator =(m);
+			    return *this;
+			}
+    Matrix&		operator =(std::
+				   initializer_list<value_type> arg)	;
     Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
 
     using		super::begin;
@@ -1245,22 +565,18 @@ class Matrix : public Array2<Vector<T>, B, R>
 				    size_t r, size_t c)		const	;
     Matrix<T>		operator ()(size_t i, size_t j,
 				    size_t r, size_t c)			;
-    Matrix&		operator  =(const element_type& c)		;
-    Matrix&		operator *=(const element_type& c)		;
-    Matrix&		operator /=(const element_type& c)		;
-    template <class E>
-    Matrix&		operator +=(const container<E>& m)		;
-    template <class E>
-    Matrix&		operator -=(const container<E>& m)		;
-    template <class E>
-    Matrix&		operator *=(const container<E>& m)		;
-    template <class E>
-    Matrix&		operator ^=(const container<E>& v)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Matrix&		operator *=(const E& m)				;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Matrix&		operator ^=(const E& v)				;
     Matrix&		diag(T c)					;
     Matrix<T>		trns()					const	;
     Matrix		inv()					const	;
-    template <class E>
-    Matrix&		solve(const container<E>& m)			;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Matrix&		solve(const E& m)				;
     T			det()					const	;
     T			det(size_t p, size_t q)			const	;
     T			trace()					const	;
@@ -1292,9 +608,6 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class T2, class B2>
     static matrix33_type
 			Rt(const Vector<T2, B2>& v)			;
-
-    void		resize(size_t r, size_t c)			;
-    void		resize(T* p, size_t r, size_t c)		;
 };
 
 //! 行列を生成し，全成分を0で初期化する．
@@ -1302,7 +615,6 @@ template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix()
     :super()
 {
-    *this = element_type(0);
 }
 
 //! 指定されたサイズの行列を生成し，全成分を0で初期化する．
@@ -1314,7 +626,6 @@ template <class T, class B, class R> inline
 Matrix<T, B, R>::Matrix(size_t r, size_t c)
     :super(r, c)
 {
-    *this = element_type(0);
 }
 
 //! 外部記憶領域とサイズを指定して行列を生成する．
@@ -1344,25 +655,16 @@ Matrix<T, B, R>::Matrix(Matrix<T, B2, R2>& m,
 {
 }
 
-//! 他の行列と同一成分を持つ行列を作る(コピーコンストラクタの拡張)．
-/*!
-  \param m	コピー元行列
-*/
-template <class T, class B, class R> template <class E> inline
-Matrix<T, B, R>::Matrix(const container<E>& m)
-    :super(m)
+template <class T, class B, class R> inline
+Matrix<T, B, R>::Matrix(std::initializer_list<value_type> args)
+    :super(args)
 {
 }
 
-//! 他の行列を自分に代入する(代入演算子の拡張)．
-/*!
-  \param m	コピー元行列
-  \return	この行列
-*/
-template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator =(const container<E>& m)
+template <class T, class B, class R> inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator =(std::initializer_list<value_type> args)
 {
-    super::operator =(m);
+    super::operator =(args);
     return *this;
 }
 
@@ -1394,78 +696,15 @@ Matrix<T, B, R>::operator ()(size_t i, size_t j, size_t r, size_t c) const
     return Matrix<T>(const_cast<Matrix<T, B, R>&>(*this), i, j, r, c);
 }
 
-//! この行列の全ての成分に同一の数値を代入する．
-/*!
-  \param c	代入する数値
-  \return	この行列
-*/
-template <class T, class B, class R> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator =(const element_type& c)
-{
-    super::operator =(c);
-    return *this;
-}
-
-//! この行列に指定された数値を掛ける．
-/*!
-  \param c	掛ける数値
-  \return	この行列，すなわち\f$\TUvec{A}{}\leftarrow c\TUvec{A}{}\f$
-*/
-template <class T, class B, class R> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator *=(const element_type& c)
-{
-    super::operator *=(c);
-    return *this;
-}
-
-//! この行列を指定された数値で割る．
-/*!
-  \param c	割る数値
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \frac{\TUvec{A}{}}{c}\f$
-*/
-template <class T, class B, class R> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator /=(const element_type& c)
-{
-    super::operator /=(c);
-    return *this;
-}
-
-//! この行列に他の行列を足す．
-/*!
-  \param m	足す行列
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} + \TUvec{M}{}\f$
-*/
-template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator +=(const container<E>& m)
-{
-    super::operator +=(m);
-    return *this;
-}
-
-//! この行列から他の行列を引く．
-/*!
-  \param m	引く行列
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \TUvec{A}{} - \TUvec{M}{}\f$
-*/
-template <class T, class B, class R> template <class E>
-inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator -=(const container<E>& m)
-{
-    super::operator -=(m);
-    return *this;
-}
-
 //! この行列の右から他の行列を掛ける．
 /*!
   \param m	掛ける行列
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
 */
-template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator *=(const container<E>& m)
+template <class T, class B, class R> template <class E, class>
+inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator *=(const E& m)
 {
     return *this = *this * m;
 }
@@ -1476,8 +715,9 @@ Matrix<T, B, R>::operator *=(const container<E>& m)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
-template <class T, class B, class R> template <class E> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator ^=(const container<E>& v)
+template <class T, class B, class R> template <class E, class>
+inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator ^=(const E& v)
 {
     return *this = *this ^ v;
 }
@@ -1491,7 +731,7 @@ template <class T, class B, class R> Matrix<T, B, R>&
 Matrix<T, B, R>::diag(T c)
 {
     check_size(ncol());
-    *this = element_type(0);
+    fill(element_type(0));
     for (size_t i = 0; i < nrow(); ++i)
 	(*this)[i][i] = c;
     return *this;
@@ -2078,40 +1318,6 @@ Matrix<T, B, R>::Rt(const Vector<T2, B2>& v)
     }
 }
 
-//! 行列のサイズを変更し，0に初期化する．
-/*!
-  \param r	新しい行数
-  \param c	新しい列数
-*/
-template <class T, class B, class R> inline void
-Matrix<T, B, R>::resize(size_t r, size_t c)
-{
-    super::resize(r, c);
-    *this = element_type(0);
-}
-
-//! 行列の内部記憶領域とサイズを変更する．
-/*!
-  \param p	新しい内部記憶領域へのポインタ
-  \param r	新しい行数
-  \param c	新しい列数
-*/
-template <class T, class B, class R> inline void
-Matrix<T, B, R>::resize(T* p, size_t r, size_t c)
-{
-    super::resize(p, r, c);
-}
-
-//! 与えられた行列と記憶領域を共有するベクトルを生成する.
-/*!
-  \param m	元の行列
-*/
-template <class T, class B> template <class B2, class R2> inline
-Vector<T, B>::Vector(const Matrix<T, B2, R2>& m)
-    :super(const_cast<T*>(m.data()), m.nrow() * m.ncol())
-{
-}
-
 /************************************************************************
 *  class LUDecomposition<T>						*
 ************************************************************************/
@@ -2124,8 +1330,9 @@ class LUDecomposition : private Array2<Vector<T> >
     typedef Array2<Vector<T> >				super;
     
   public:
-    template <class E>
-    LUDecomposition(const container<E>& m)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    LUDecomposition(const E& m)				;
 
     template <class T2, class B2>
     void	substitute(Vector<T2, B2>& b)	const	;
@@ -2149,8 +1356,8 @@ class LUDecomposition : private Array2<Vector<T> >
  \param m			LU分解する正方行列
  \throw std::invalid_argument	mが正方行列でない場合に送出
 */
-template <class T> template <class E>
-LUDecomposition<T>::LUDecomposition(const container<E>& m)
+template <class T> template <class E, class>
+LUDecomposition<T>::LUDecomposition(const E& m)
     :super(m), _index(ncol()), _det(1.0)
 {
     using namespace	std;
@@ -2257,9 +1464,9 @@ LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
 		の解を納めたこのベクトル，すなわち
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
 */
-template <class T, class B> template <class E>
+template <class T, class B> template <class E, class>
 inline Vector<T, B>&
-Vector<T, B>::solve(const container<E>& m)
+Vector<T, B>::solve(const E& m)
 {
     LUDecomposition<T>(m).substitute(*this);
     return *this;
@@ -2272,9 +1479,9 @@ Vector<T, B>::solve(const container<E>& m)
 		の解を納めたこの行列，すなわち
 		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
 */
-template <class T, class B, class R> template <class E>
+template <class T, class B, class R> template <class E, class>
 Matrix<T, B, R>&
-Matrix<T, B, R>::solve(const container<E>& m)
+Matrix<T, B, R>::solve(const E& m)
 {
     LUDecomposition<T>	lu(m);
     
@@ -2312,8 +1519,9 @@ class Householder : public Matrix<T>
   private:
     Householder(size_t dd, size_t d)
 	:super(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
-    template <class E>
-    Householder(const container<E>& a, size_t d)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Householder(const E& a, size_t d)				;
 
     using		super::size;
     
@@ -2334,11 +1542,11 @@ class Householder : public Matrix<T>
     friend class	BiDiagonal<T>;
 };
 
-template <class T> template <class E>
-Householder<T>::Householder(const container<E>& a, size_t d)
+template <class T> template <class E, class>
+Householder<T>::Householder(const E& a, size_t d)
     :super(a), _d(d), _sigma(size())
 {
-    if (a().size() != a().ncol())
+    if (a.size() != a.ncol())
 	throw std::invalid_argument("TU::Householder<T>::Householder: Given matrix must be square !!");
 }
 
@@ -2520,8 +1728,9 @@ class QRDecomposition : private Matrix<T>
     typedef T						element_type;
     
   public:
-    template <class E>
-    QRDecomposition(const container<E>& m)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    QRDecomposition(const E& m)				;
 
   //! QR分解の下半三角行列を返す．
   /*!
@@ -2546,9 +1755,9 @@ class QRDecomposition : private Matrix<T>
 /*!
  \param m	QR分解する一般行列
 */
-template <class T> template <class E>
-QRDecomposition<T>::QRDecomposition(const container<E>& m)
-    :super(m), _Qt(m().ncol(), 0)
+template <class T> template <class E, class>
+QRDecomposition<T>::QRDecomposition(const E& m)
+    :super(m), _Qt(m.ncol(), 0)
 {
     size_t	n = std::min(nrow(), ncol());
     for (size_t j = 0; j < n; ++j)
@@ -2578,8 +1787,9 @@ class TriDiagonal
     typedef T		element_type;	//!< 成分の型
     
   public:
-    template <class E>
-    TriDiagonal(const container<E>& a)			;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    TriDiagonal(const E& a)				;
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す．
   /*!
@@ -2624,8 +1834,8 @@ class TriDiagonal
   \param a			3重対角化する対称行列
   \throw std::invalid_argument	aが正方行列でない場合に送出
 */
-template <class T> template <class E>
-TriDiagonal<T>::TriDiagonal(const container<E>& a)
+template <class T> template <class E, class>
+TriDiagonal<T>::TriDiagonal(const E& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
 {
     if (_Ut.nrow() != _Ut.ncol())
@@ -2776,8 +1986,9 @@ class BiDiagonal
     typedef T					element_type;	//!< 成分の型
     
   public:
-    template <class E>
-    BiDiagonal(const container<E>& a)		;
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    BiDiagonal(const E& a)			;
 
   //! 2重対角化される行列の行数を返す．
   /*!
@@ -2838,15 +2049,15 @@ class BiDiagonal
 /*!
   \param a	2重対角化する一般行列
 */
-template <class T> template <class E>
-BiDiagonal<T>::BiDiagonal(const container<E>& a)
-    :_Dt((a().size() < a().ncol() ? a().ncol() : a().size()), 0),
-     _Et((a().size() < a().ncol() ? a().size() : a().ncol()), 1),
+template <class T> template <class E, class>
+BiDiagonal<T>::BiDiagonal(const E& a)
+    :_Dt((a.size() < a.ncol() ? a.ncol() : a.size()), 0),
+     _Et((a.size() < a.ncol() ? a.size() : a.ncol()), 1),
      _diagonal(_Dt.sigma()), _off_diagonal(_Et.sigma()), _anorm(0),
-     _Ut(a().size() < a().ncol() ? _Dt : _Et),
-     _Vt(a().size() < a().ncol() ? _Et : _Dt)
+     _Ut(a.size() < a.ncol() ? _Dt : _Et),
+     _Vt(a.size() < a.ncol() ? _Et : _Dt)
 {
-    typename detail::ArgumentType<E, true>::type	A(a);
+    detail::argument_t<E, true>	A(a);
     
     if (nrow() < ncol())
 	for (size_t i = 0; i < nrow(); ++i)
@@ -3076,8 +2287,9 @@ class SVDecomposition : private BiDiagonal<T>
   /*!
     \param a	特異値分解する一般行列
   */
-    template <class E>
-    SVDecomposition(const container<E>& a)
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    SVDecomposition(const E& a)
 	:super(a)				{super::diagonalize();}
 
     using	super::nrow;
@@ -3095,67 +2307,44 @@ class SVDecomposition : private BiDiagonal<T>
 };
 
 /************************************************************************
-*  typedefs								*
+*  global functions							*
 ************************************************************************/
-typedef Vector<short,  FixedSizedBuf<short,   2> >
-	Vector2s;			//!< short型成分を持つ2次元ベクトル
-typedef Vector<int,    FixedSizedBuf<int,     2> >
-	Vector2i;			//!< int型成分を持つ2次元ベクトル
-typedef Vector<float,  FixedSizedBuf<float,   2> >
-	Vector2f;			//!< float型成分を持つ2次元ベクトル
-typedef Vector<double, FixedSizedBuf<double,  2> >
-	Vector2d;			//!< double型成分を持つ2次元ベクトル
-typedef Vector<short,  FixedSizedBuf<short,   3> >
-	Vector3s;			//!< short型成分を持つ3次元ベクトル
-typedef Vector<int,    FixedSizedBuf<int,     3> >
-	Vector3i;			//!< int型成分を持つ3次元ベクトル
-typedef Vector<float,  FixedSizedBuf<float,   3> >
-	Vector3f;			//!< float型成分を持つ3次元ベクトル
-typedef Vector<double, FixedSizedBuf<double,  3> >
-	Vector3d;			//!< double型成分を持つ3次元ベクトル
-typedef Vector<short,  FixedSizedBuf<short,   4> >
-	Vector4s;			//!< short型成分を持つ4次元ベクトル
-typedef Vector<int,    FixedSizedBuf<int,     4> >
-	Vector4i;			//!< int型成分を持つ4次元ベクトル
-typedef Vector<float,  FixedSizedBuf<float,   4> >
-	Vector4f;			//!< float型成分を持つ4次元ベクトル
-typedef Vector<double, FixedSizedBuf<double,  4> >
-	Vector4d;			//!< double型成分を持つ4次元ベクトル
-typedef Matrix<float,  FixedSizedBuf<float,   4>,
-	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix22f;			//!< float型成分を持つ2x2行列
-typedef Matrix<double, FixedSizedBuf<double,  4>,
-	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix22d;			//!< double型成分を持つ2x2行列
-typedef Matrix<float,  FixedSizedBuf<float,   6>,
-	       FixedSizedBuf<Vector<float>,   2> >
-	Matrix23f;			//!< float型成分を持つ2x3行列
-typedef Matrix<double, FixedSizedBuf<double,  6>,
-	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix23d;			//!< double型成分を持つ2x3行列
-typedef Matrix<float,  FixedSizedBuf<float,   9>,
-	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix33f;			//!< float型成分を持つ3x3行列
-typedef Matrix<double, FixedSizedBuf<double,  9>,
-	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix33d;			//!< double型成分を持つ3x3行列
-typedef Matrix<float,  FixedSizedBuf<float,  12>,
-	       FixedSizedBuf<Vector<float>,   3> >
-	Matrix34f;			//!< float型成分を持つ3x4行列
-typedef Matrix<double, FixedSizedBuf<double, 12>,
-	       FixedSizedBuf<Vector<double>,  3> >
-	Matrix34d;			//!< double型成分を持つ3x4行列
-typedef Matrix<float,  FixedSizedBuf<float,  16>,
-	       FixedSizedBuf<Vector<float>,   4> >
-	Matrix44f;			//!< float型成分を持つ4x4行列
-typedef Matrix<double, FixedSizedBuf<double, 16>,
-	       FixedSizedBuf<Vector<double>,  4> >
-	Matrix44d;			//!< double型成分を持つ4x4行列
-typedef Matrix<float, FixedSizedBuf<float, 12>,
-	       FixedSizedBuf<Vector<float>,  2> >
-	Matrix26f;			//!< float型成分を持つ2x6行列
-typedef Matrix<double, FixedSizedBuf<double, 12>,
-	       FixedSizedBuf<Vector<double>,  2> >
-	Matrix26d;			//!< double型成分を持つ2x6行列
+template <class T, class B> const Vector<T, B>&
+serialize(const Vector<T, B>& x)
+{
+    return x;
+}
+template <class T, class B, class R> Vector<T>
+serialize(const Matrix<T, B, R>& x)
+{
+    return Vector<T>(const_cast<T*>(x.data()), x.nrow() * x.ncol());
+}
+    
+/************************************************************************
+*  type aliases								*
+************************************************************************/
+template <class T, size_t D>
+using FixedSizedVector = Vector<T, FixedSizedBuf<T, D> >;
+template <class T, size_t R, size_t C>
+using FixedSizedMatrix = Matrix<T, FixedSizedBuf<T, R*C>,
+				FixedSizedBuf<Vector<T>, R> >;
+
+typedef FixedSizedVector<float,  2>	Vector2f;
+typedef FixedSizedVector<double, 2>	Vector2d;
+typedef FixedSizedVector<float,  3>	Vector3f;
+typedef FixedSizedVector<double, 3>	Vector3d;
+typedef FixedSizedVector<float,  4>	Vector4f;
+typedef FixedSizedVector<double, 4>	Vector4d;
+typedef FixedSizedMatrix<float,  2, 2>	Matrix22f;
+typedef FixedSizedMatrix<double, 2, 2>	Matrix22d;
+typedef FixedSizedMatrix<float,  2, 3>	Matrix23f;
+typedef FixedSizedMatrix<double, 2, 3>	Matrix23d;
+typedef FixedSizedMatrix<float,  3, 3>	Matrix33f;
+typedef FixedSizedMatrix<double, 3, 3>	Matrix33d;
+typedef FixedSizedMatrix<float,  3, 4>	Matrix34f;
+typedef FixedSizedMatrix<double, 3, 4>	Matrix34d;
+typedef FixedSizedMatrix<float,  4, 3>	Matrix44f;
+typedef FixedSizedMatrix<double, 4, 3>	Matrix44d;
+    
 }
 #endif	// !__TU_VECTORPP_H

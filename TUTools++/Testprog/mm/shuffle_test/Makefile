@@ -21,7 +21,7 @@ ifeq ($(CXX), icpc)
   NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
   CPPFLAGS     += -DSSE3
 endif
-CCFLAGS		= $(CFLAGS)
+CCFLAGS		= $(CFLAGS) -std=c++11
 
 LINKER		= $(CXX)
 

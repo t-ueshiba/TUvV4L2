@@ -1,52 +1,57 @@
 #
-#  $Id: Makefile,v 1.2 2012-08-31 02:37:02 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
-
 PROGRAM		= $(shell basename $(PWD))
-LIBS		= -lTUTools++
-ifeq ($(OSTYPE), darwin)
-  LIBS	       +=
-#  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
+#LIBRARY		= lib$(shell basename $(PWD))
 
-CPPFLAGS	=
+VPATH		=
+
+IDLS		=
+MOCHDRS		=
+
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-#  CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
+ifneq ($(findstring icpc,$(CXX)),)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
+LIBS		= -lTUTools++
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
-EXTHDRS		= /usr/local/include/TU/Manip.h \
-		/usr/local/include/TU/SHOT602.h \
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
+EXTHDRS		= /usr/local/include/TU/SHOT602.h \
 		/usr/local/include/TU/Serial.h \
 		/usr/local/include/TU/fdstream.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= SHOT602.cc \
-		main.cc
-OBJS		= SHOT602.o \
-		main.o
+SRCS		= main.cc
+OBJS		= main.o
 
-include $(PROJECT)/lib/p.mk
-
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
-SHOT602.o: /usr/local/include/TU/SHOT602.h /usr/local/include/TU/Serial.h \
-	/usr/local/include/TU/fdstream.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Manip.h
 main.o: /usr/local/include/TU/SHOT602.h /usr/local/include/TU/Serial.h \
 	/usr/local/include/TU/fdstream.h /usr/local/include/TU/types.h

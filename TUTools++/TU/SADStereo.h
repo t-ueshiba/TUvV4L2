@@ -243,7 +243,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    const ScoreVecArray2&	Q = buffers->Q;
 #endif
 	    start(3);
-	    buffers->RminR = std::numeric_limits<Score>::max();
+	    buffers->RminR.fill(std::numeric_limits<Score>::max());
 	    computeDisparities(Q.crbegin(), Q.crend(),
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
@@ -348,7 +348,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    const ScoreVecArray2&	Q = buffers->Q;
 #endif
 	    start(3);
-	    buffers->RminR = std::numeric_limits<Score>::max();
+	    buffers->RminR.fill(std::numeric_limits<Score>::max());
 	    computeDisparities(Q.crbegin(), Q.crend(),
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
@@ -358,7 +358,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 					   buffers->dminR.end() - D + 1,
 					   make_vertical_iterator(
 					       buffers->dminV.end(), v)))),
-			       make_row_iterator<boost::use_default>(
+			       make_row_iterator(
 				   make_fast_zip_iterator(
 				       boost::make_tuple(
 					   make_dummy_iterator(
@@ -402,15 +402,15 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  col_siterator colP) const
 {
 #if defined(SSE)
-    typedef mm::load_iterator<
-	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
+    typedef mm::load_iterator<typename iterator_value<COL_RV>::iterator>
+								in_iterator;
     typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
 								qiterator;
 #else
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
+    typedef typename iterator_value<COL_RV>::iterator		in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
-    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
+    typedef Diff<iterator_value<in_iterator> >			diff_type;
 
     for (; colL != colLe; ++colL)
     {
@@ -435,15 +435,15 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					      col_siterator colQ) const
 {
 #if defined(SSE)
-    typedef mm::load_iterator<
-	typename iterator_value<COL_RV>::type::iterator>	in_iterator;
+    typedef mm::load_iterator<typename iterator_value<COL_RV>::iterator>
+								in_iterator;
     typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
 								qiterator;
 #else
-    typedef typename iterator_value<COL_RV>::type::iterator	in_iterator;
+    typedef typename iterator_value<COL_RV>::iterator		in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
-    typedef Diff<typename iterator_value<in_iterator>::type>	diff_type;
+    typedef Diff<iterator_value<in_iterator> >			diff_type;
 
     for (; colL != colLe; ++colL)
     {
@@ -484,28 +484,26 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
     {
 #if defined(SSE)
 	typedef mm::store_iterator<
-	    typename iterator_value<DMIN_RV>::type::iterator>	diterator;
+	    typename iterator_value<DMIN_RV>::iterator>		diterator;
 #  if defined(WITHOUT_CVTDOWN)
 	typedef mm::cvtdown_mask_iterator<
 	    Disparity,
 	    mm::mask_iterator<
 		typename ScoreVecArray::const_iterator,
-		typename iterator_value<RMIN_RV>::type::iterator> >
-								miterator;
+		typename iterator_value<RMIN_RV>::iterator> >	miterator;
 #  else
 	typedef mm::mask_iterator<
 	    Disparity,
 	    typename ScoreVecArray::const_iterator,
-	    typename iterator_value<RMIN_RV>::type::iterator>	miterator;
+	    typename iterator_value<RMIN_RV>::iterator>		miterator;
 #  endif
 #else
-	typedef typename iterator_value<DMIN_RV>::type::iterator
-								diterator;
+	typedef typename iterator_value<DMIN_RV>::iterator	diterator;
 	typedef mask_iterator<
 	    typename ScoreVecArray::const_iterator,
-	    typename iterator_value<RMIN_RV>::type::iterator>	miterator;
+	    typename iterator_value<RMIN_RV>::iterator>		miterator;
 #endif
-	typedef typename iterator_value<diterator>::type	dvalue_type;
+	typedef iterator_value<diterator>			dvalue_type;
 
 	Idx<DisparityVec>	index;
 	diterator		dminRVt((--dminRV)->begin());
@@ -564,7 +562,6 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 	    break;
 #else
     Q.resize(W, DD);			// Q(u, *; d)
-    Q = 0;
 #endif
 
     if (dminL.resize(W - N + 1))
@@ -581,7 +578,7 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D,
     
     dminV.resize(dminL.size(), H + D - 1);
     RminV.resize(dminL.size(), RminR.size());
-    RminV = std::numeric_limits<SCORE>::max();
+    RminV.fill(std::numeric_limits<SCORE>::max());
 }
 
 }

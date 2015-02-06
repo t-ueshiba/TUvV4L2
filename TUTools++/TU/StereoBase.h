@@ -44,10 +44,9 @@ class Diff
   public:
     typedef T						first_argument_type;
     typedef T						second_argument_type;
-    typedef typename boost::mpl::eval_if<
-	boost::is_integral<T>,
-	boost::make_signed<T>,
-	boost::mpl::identity<T> >::type			result_type;
+    typedef typename std::conditional<
+	std::is_integral<T>::value,
+	typename std::make_signed<T>::type, T>::type	result_type;
     
   public:
     Diff(T thresh)	:_thresh(thresh)		{}
@@ -111,7 +110,7 @@ class Diff<mm::vec<T> >
   public:
     typedef mm::vec<T>					first_argument_type;
     typedef mm::vec<T>					second_argument_type;
-    typedef typename boost::make_signed<T>::type	signed_type;
+    typedef typename std::make_signed<T>::type		signed_type;
     typedef mm::vec<signed_type>			result_type;
 
   public:
@@ -220,8 +219,8 @@ make_rvcolumn_iterator(COL col)		{ return rvcolumn_iterator<COL>(col); }
 *  class dummy_iterator<ITER>						*
 ************************************************************************/
 template <class ITER>
-class dummy_iterator : public boost::iterator_adaptor<dummy_iterator<ITER>,
-						      ITER>
+class dummy_iterator
+    : public boost::iterator_adaptor<dummy_iterator<ITER>, ITER>
 {
   private:
     typedef boost::iterator_adaptor<dummy_iterator, ITER>	super;
@@ -249,23 +248,21 @@ make_dummy_iterator(ITER iter)		{ return dummy_iterator<ITER>(iter); }
 template <class ITER, class RV_ITER>
 class mask_iterator
     : public boost::iterator_adaptor<
-	  mask_iterator<ITER, RV_ITER>,
-	  ITER,
-	  typename tuple2cons<
-	      typename iterator_value<RV_ITER>::type, bool>::type,
-	  boost::single_pass_traversal_tag,
-	  typename tuple2cons<
-	      typename iterator_value<RV_ITER>::type, bool>::type>
+		 mask_iterator<ITER, RV_ITER>,
+		 ITER,
+		 tuple_replace<iterator_value<RV_ITER>, bool>,
+		 boost::single_pass_traversal_tag,
+		 tuple_replace<iterator_value<RV_ITER>, bool> >
 {
   private:
-    typedef typename iterator_value<RV_ITER>::type	rv_type;
+    typedef iterator_value<RV_ITER>			rv_type;
     typedef boost::iterator_adaptor<
-	mask_iterator,
-	ITER,
-	typename tuple2cons<rv_type, bool>::type,
-	boost::single_pass_traversal_tag,
-	typename tuple2cons<rv_type, bool>::type>	super;
-    typedef typename tuple_head<rv_type>::type		element_type;
+		mask_iterator,
+		ITER,
+		tuple_replace<rv_type, bool>,
+		boost::single_pass_traversal_tag,
+		tuple_replace<rv_type, bool> >		super;
+    typedef tuple_head<rv_type>				element_type;
     
   public:
     typedef typename super::difference_type		difference_type;
@@ -289,8 +286,8 @@ class mask_iterator
 		{
 		    x = val;
 		}
-    template <class _VEC>
-    void	setRMost(element_type val, _VEC& x)
+    template <class VEC_>
+    void	setRMost(element_type val, VEC_& x)
 		{
 		    x = boost::make_tuple(val, val);
 		}
@@ -312,8 +309,8 @@ class mask_iterator
 			mask = false;
 		    }
 		}
-    template <class _VEC>
-    void	update(element_type R, _VEC& mask)
+    template <class VEC_>
+    void	update(element_type R, VEC_& mask)
 		{
 		    using namespace	boost;
 
@@ -497,68 +494,60 @@ namespace mm
     template <class ITER, class RV_ITER>
     class mask_iterator
 	: public boost::iterator_adaptor<
-		mask_iterator<ITER, RV_ITER>,
-		ITER,
-		typename tuple2cons<
-		    typename iterator_value<RV_ITER>::type>::type,
-		boost::single_pass_traversal_tag,
-		typename tuple2cons<
-		    typename iterator_value<RV_ITER>::type>::type>
+		     mask_iterator<ITER, RV_ITER>,
+		     ITER,
+		     tuple_replace<iterator_value<RV_ITER> >,
+		     boost::single_pass_traversal_tag,
+		     tuple_replace<iterator_value<RV_ITER> > >
 #  else
     template <class T, class ITER, class RV_ITER>
     class mask_iterator
 	: public boost::iterator_adaptor<
-		mask_iterator<T, ITER, RV_ITER>,
-		ITER,
-		typename tuple2cons<
-		    typename iterator_value<RV_ITER>::type, vec<T> >::type,
-		boost::single_pass_traversal_tag,
-		typename tuple2cons<
-		    typename iterator_value<RV_ITER>::type, vec<T> >::type>
+		     mask_iterator<T, ITER, RV_ITER>,
+		     ITER,
+		     tuple_replace<iterator_value<RV_ITER>, vec<T> >,
+		     boost::single_pass_traversal_tag,
+		     tuple_replace<iterator_value<RV_ITER>, vec<T> > >
 #  endif
     {
       private:
-	typedef typename iterator_value<RV_ITER>::type	elementary_vec;
-	typedef typename tuple_head<elementary_vec>
-				::type::element_type	element_type;
+	typedef iterator_value<RV_ITER>			elementary_vec;
+	typedef typename tuple_head<elementary_vec>::element_type
+							element_type;
 #  if defined(WITHOUT_CVTDOWN)
 	typedef boost::iterator_adaptor<
 	    mask_iterator,
 	    ITER,
-	    typename tuple2cons<elementary_vec>::type,
+	    tuple_replace<elementary_vec>,
 	    boost::single_pass_traversal_tag,
-	    typename tuple2cons<elementary_vec>::type>	super;
+	    tuple_replace<elementary_vec> >		super;
 #  else
 	typedef boost::iterator_adaptor<
 	    mask_iterator,
 	    ITER,
-	    typename tuple2cons<
-		elementary_vec, vec<T> >::type,
+	    tuple_replace<elementary_vec, vec<T> >,
 	    boost::single_pass_traversal_tag,
-	    typename tuple2cons<
-		elementary_vec, vec<T> >::type>		super;
+	    tuple_replace<elementary_vec, vec<T> > >	super;
 	typedef typename type_traits<element_type>::complementary_mask_type
 							complementary_type;
-	typedef typename tuple2cons<
-	    elementary_vec,
-	    vec<complementary_type> >::type		complementary_vec;
-	typedef typename boost::mpl::if_<
-	    boost::is_floating_point<element_type>,
+	typedef tuple_replace<elementary_vec, vec<complementary_type> >
+							complementary_vec;
+	typedef typename std::conditional<
+	    std::is_floating_point<element_type>::value,
 	    complementary_type, element_type>::type	integral_type;
-	typedef typename tuple2cons<
-	    elementary_vec, vec<integral_type> >::type	integral_vec;
-	typedef typename boost::mpl::if_<
-	    boost::is_signed<integral_type>,
+	typedef tuple_replace<elementary_vec, vec<integral_type> >
+							integral_vec;
+	typedef typename std::conditional<
+	    std::is_signed<integral_type>::value,
 	    typename type_traits<integral_type>::unsigned_type,
 	    typename type_traits<integral_type>::signed_type>::type
 							flipped_type;
-	typedef typename tuple2cons<
-	    elementary_vec, vec<flipped_type> >::type	flipped_vec;
+	typedef tuple_replace<elementary_vec, vec<flipped_type> >
+							flipped_vec;
 	typedef typename type_traits<flipped_type>::lower_type
 							flipped_lower_type;
-	typedef typename tuple2cons<
-	    elementary_vec,
-	    vec<flipped_lower_type> >::type		flipped_lower_vec;
+	typedef tuple_replace<elementary_vec, vec<flipped_lower_type> >
+							flipped_lower_vec;
 #  endif
       
       public:
@@ -586,8 +575,8 @@ namespace mm
 		{
 		    x = set_rmost<element_type>(val);
 		}
-	template <class _VEC>
-	void	setRMost(element_type val, _VEC& x)
+	template <class VEC_>
+	void	setRMost(element_type val, VEC_& x)
 		{
 		    vec<element_type>	next = set_rmost<element_type>(val);
 		    x = boost::make_tuple(next, next);
@@ -604,8 +593,8 @@ namespace mm
 		    
 		    x = (R < RminR);
 		}
-	template <class _VEC>
-	void	update(vec<element_type> R, _VEC& x)
+	template <class VEC_>
+	void	update(vec<element_type> R, VEC_& x)
 		{
 		    using namespace	boost;
 
@@ -655,46 +644,17 @@ namespace mm
 		    cvtdown(z);
 		    x = cvt_mask<flipped_lower_type>(y, z);
 		}
-	template <class _VEC>
-	void	cvtdown(_VEC& x)
+	template <class VEC_>
+	void	cvtdown(VEC_& x)
 		{
-		    typedef typename tuple_head<_VEC>
-					::type::element_type	S;
+		    typedef
+			typename tuple_head<VEC_>::element_type	S;
 		    typedef typename type_traits<S>::upper_type	upper_type;
 		    
-		    typename tuple2cons<
-			elementary_vec, vec<upper_type> >::type	y, z;
+		    tuple_replace<elementary_vec, vec<upper_type> >	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
 		    x = cvt_mask<S>(y, z);
-		}
-
-    // mask と mask tuple に対するcvt
-	template <class _S, class _T> static
-        vec<_S>	cvt_mask(vec<_T> x)
-		{
-		    return mm::cvt_mask<_S>(x);
-		}
-	template <class _S, class _T> static
-	vec<_S>	cvt_mask(vec<_T> x, vec<_T> y)
-		{
-		    return mm::cvt_mask<_S>(x, y);
-		}
-	template <class _S, class _TUPLE> static boost::tuple<vec<_S>, vec<_S> >
-		cvt_mask(const _TUPLE& x)
-		{
-		    using namespace	boost;
-		    
-		    return make_tuple(cvt_mask<_S>(get<0>(x)),
-				      cvt_mask<_S>(get<1>(x)));
-		}
-	template <class _S, class _TUPLE> static boost::tuple<vec<_S>, vec<_S> >
-		cvt_mask(const _TUPLE& x, const _TUPLE& y)
-		{
-		    using namespace	boost;
-		    
-		    return make_tuple(cvt_mask<_S>(get<0>(x), get<0>(y)),
-				      cvt_mask<_S>(get<1>(x), get<1>(y)));
 		}
 #  endif
 	reference
@@ -903,9 +863,9 @@ class StereoBase : public Profiler
 	typedef DISP						result_type;
 
       private:
-	typedef boost::mpl::bool_<
-	  boost::is_floating_point<result_type>::value>	is_floating_point;
-	typedef boost::mpl::bool_<HOR_BACKMATCH>	hor_backmatch;
+	typedef typename std::is_floating_point<result_type>::type
+								is_floating_point;
+	typedef std::integral_constant<bool, HOR_BACKMATCH>	hor_backmatch;
 	
       public:
 	CorrectDisparity(DMIN dminR, DELTA delta,
@@ -921,20 +881,20 @@ class StereoBase : public Profiler
 			}
 
       private:
-	result_type	filter(argument_type dL, boost::mpl::true_) const
+	result_type	filter(argument_type dL, std::true_type) const
 			{
 			    return (diff(dL, *(_dminR + dL)) <= _thr ?
 				    correct(dL, is_floating_point()) : 0);
 			}
-	result_type	filter(argument_type dL, boost::mpl::false_) const
+	result_type	filter(argument_type dL, std::false_type) const
 			{
 			    return correct(dL, is_floating_point());
 			}
-	result_type	correct(argument_type dL, boost::mpl::true_) const
+	result_type	correct(argument_type dL, std::true_type) const
 			{
 			    return result_type(_dmax - dL) - *_delta;
 			}
-	result_type	correct(argument_type dL, boost::mpl::false_) const
+	result_type	correct(argument_type dL, std::false_type) const
 			{
 			    return _dmax - dL;
 			}

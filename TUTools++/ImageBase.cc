@@ -100,7 +100,7 @@ ImageBase::restoreHeader(std::istream& in)
     using namespace	std;
 
   // Reset calibration parameters.
-    P = 0.0;
+    P.fill(0);
     P[0][0] = P[1][1] = P[2][2] = 1.0;
     d1 = d2 = 0.0;
     

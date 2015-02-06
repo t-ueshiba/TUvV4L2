@@ -401,7 +401,7 @@ SURFCreator::detect(size_t o, size_t s,
 *  class Sieve<F>							*
 ************************************************************************/
 template <class F>
-class Sieve : public container<Sieve<F> >
+class Sieve
 {
   private:
     typedef Heap<F, std::greater<F> >		heap_type;
