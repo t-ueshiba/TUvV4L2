@@ -842,7 +842,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const BGR*	src = (const BGR*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
 
@@ -850,7 +850,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const RGB*	src = (const RGB*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
 
@@ -858,7 +858,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const ABGR*	src = (const ABGR*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
 
@@ -866,7 +866,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const RGBA*	src = (const RGBA*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
 
@@ -874,7 +874,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const u_char*	src = (const u_char*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
 
@@ -882,7 +882,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const u_short*	src = (const u_short*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
 
@@ -890,7 +890,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const YUYV422*	src = (const YUYV422*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
         break;
 
@@ -898,7 +898,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       {
 	const YUV422*	src = (const YUV422*)img;
 	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].fill(src);
+	    src = image[v].copy(src);
       }
 	break;
 
