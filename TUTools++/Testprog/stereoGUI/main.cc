@@ -61,6 +61,7 @@ main(int argc, char* argv[])
     typedef GFStereo<float, u_short>	GFStereoType;
 #else    
     typedef SADStereo<short, u_char>	SADStereoType;
+  //typedef SADStereo<float, u_char>	SADStereoType;
     typedef GFStereo<float,  u_char>	GFStereoType;
 #endif
     
@@ -147,9 +148,11 @@ main(int argc, char* argv[])
 	    params.doHorizontalBackMatch = doHorizontalBackMatch;
 	    params.doVerticalBackMatch	 = doVerticalBackMatch;
 	    params.grainSize		 = grainSize;
-	
+
+	    params.put(cerr);
+	    
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<GFStereoType>
+	    v::MyCmdWindow<GFStereoType, u_char, u_char>
 		myWin(vapp, vinfo, textureMapping, parallax, params, scale);
 
 	  // GUIのイベントループ．
@@ -164,7 +167,7 @@ main(int argc, char* argv[])
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<SADStereoType>
+	    v::MyCmdWindow<SADStereoType, u_char, u_char>
 		myWin(vapp, vinfo, textureMapping, parallax, params, scale);
 
 	  // GUIのイベントループ．

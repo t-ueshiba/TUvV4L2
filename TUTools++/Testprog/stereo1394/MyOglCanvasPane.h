@@ -36,18 +36,19 @@ namespace TU
 namespace v
 {
 /************************************************************************
-*  class MyOglCanvasPaneBase						*
+*  class MyOglCanvasPaneBase<D>						*
 ************************************************************************/
+template <class D>
 class MyOglCanvasPaneBase : public CanvasPane
 {
   public:
     enum DrawMode	{Texture, Dot, Polygon, Mesh};
 
   public:
-    MyOglCanvasPaneBase(Window&			parentWin,
-			size_t			width,
-			size_t			height,
-			const Image<float>&	disparityMap)	;
+    MyOglCanvasPaneBase(Window&		parentWin,
+			size_t		width,
+			size_t		height,
+			const Image<D>&	disparityMap)	;
 
     const OglDC&	dc()				const	{return _dc;}
     
@@ -55,30 +56,56 @@ class MyOglCanvasPaneBase : public CanvasPane
 				   const Matrix34d& Pr,
 				   double scale=1.0)		;
     void		setDrawMode(DrawMode)			;
+    void		setCursor(int u, int v, D d)		;
     void		setDistance(double distance)		;
+    void		setParallax(double parallax)		;
     void		resetSwingView()			{_tick = 0;}
     void		swingView()				;
-    void		setParallax(double parallax)		;
-    void		setCursor(int u, int v, float d)	;
+    void		resize(size_t w, size_t h)		;
     template <class T>
     Image<T>		getImage()			const	;
-    
-    void		resize(size_t w, size_t h)		;
     
   protected:
     virtual void	initializeGraphics()			;
 
   protected:
     OglDC		_dc;
-    const Image<float>&	_disparityMap;
+    const Image<D>&	_disparityMap;
     DrawThreeD		_draw;
     DrawMode		_drawMode;
     int			_tick;
     double		_parallax;
 };
 
-inline void
-MyOglCanvasPaneBase::setDrawMode(DrawMode drawMode)
+template <class D>
+MyOglCanvasPaneBase<D>::MyOglCanvasPaneBase(Window&		parentWin,
+					    size_t		width,
+					    size_t		height,
+					    const Image<D>&	disparityMap)
+    :CanvasPane(parentWin, width, height), _draw(), _dc(*this),
+     _disparityMap(disparityMap), _drawMode(Texture), _tick(0), _parallax(-1.0)
+{
+}
+
+template <class D> void
+MyOglCanvasPaneBase<D>::initialize(const Matrix34d& Pl,
+				   const Matrix34d& Pr, double scale)
+{
+    typedef Camera<IntrinsicBase<double> >	camera_type;
+    
+    _draw.initialize(Pl, Pr);
+
+    camera_type	camera(Pl);
+    _dc.setInternal(camera.u0()[0] * scale, camera.u0()[1] * scale,
+		    camera.k() * scale, camera.k() * scale, 0.01)
+       .setExternal(camera.t(), camera.Rt());
+    _dc << distance(1300.0);
+
+    glPushMatrix();
+}
+
+template <class D> inline void
+MyOglCanvasPaneBase<D>::setDrawMode(DrawMode drawMode)
 {
     _drawMode = drawMode;
     switch (_drawMode)
@@ -101,50 +128,97 @@ MyOglCanvasPaneBase::setDrawMode(DrawMode drawMode)
     }
 }
     
-inline void
-MyOglCanvasPaneBase::setDistance(double d)
-{
-    _dc << distance(d);
-}
-
-inline void
-MyOglCanvasPaneBase::setCursor(int u, int v, float d)
+template <class D> inline void
+MyOglCanvasPaneBase<D>::setCursor(int u, int v, D d)
 {
     _draw.setCursor(u, v, d);
 }
     
-inline void
-MyOglCanvasPaneBase::setParallax(double parallax)
+template <class D> inline void
+MyOglCanvasPaneBase<D>::setDistance(double d)
+{
+    _dc << distance(d);
+}
+
+template <class D> inline void
+MyOglCanvasPaneBase<D>::setParallax(double parallax)
 {
     glDrawBuffer(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _parallax = parallax;
 }
 
-inline void
-MyOglCanvasPaneBase::resize(size_t w, size_t h)
+template <class D> void
+MyOglCanvasPaneBase<D>::swingView()
+{
+    const double	RAD = M_PI / 180.0;
+    const double	magnitudeX = 45*RAD, magnitudeY = 45*RAD;
+    const int		periodX = 400, periodY = 600;
+    
+    double		angleX = magnitudeX * sin(2.0*M_PI*_tick / periodX),
+			angleY = magnitudeY * sin(2.0*M_PI*_tick / periodY);
+    glPopMatrix();
+    glPushMatrix();
+    _dc << TU::v::axis(DC3::X) << TU::v::rotate(angleX)
+	<< TU::v::axis(DC3::Y) << TU::v::rotate(angleY);
+    ++_tick;
+}
+
+template <class D> inline void
+MyOglCanvasPaneBase<D>::resize(size_t w, size_t h)
 {
     _dc.setSize(w, h, _dc.mul(), _dc.div());
 }
 
-template <class T> inline Image<T>
-MyOglCanvasPaneBase::getImage() const
+template <class D> template <class T> inline Image<T>
+MyOglCanvasPaneBase<D>::getImage() const
 {
     return _dc.getImage<T>();
 }
 
-/************************************************************************
-*  class MyOglCanvasPane<T>						*
-************************************************************************/
-template <class T>
-class MyOglCanvasPane : public MyOglCanvasPaneBase
+template <class D> void
+MyOglCanvasPaneBase<D>::initializeGraphics()
 {
+  //    glClearColor(0.0, 0.1, 0.0, 1.0);
+    glEnable(GL_DEPTH_TEST);
+
+    glFrontFace(GL_CW);
+    glCullFace(GL_FRONT);
+    glEnable(GL_CULL_FACE);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glDisable(GL_AUTO_NORMAL);
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_FLAT);
+
+    GLfloat	position[] = {1.0, 1.0, -1.0, 0.0};
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+    glEnable(GL_LIGHT0);
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexEnvf(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+    setDrawMode(_drawMode);
+}
+
+/************************************************************************
+*  class MyOglCanvasPane<D, T>						*
+************************************************************************/
+template <class D, class T>
+class MyOglCanvasPane : public MyOglCanvasPaneBase<D>
+{
+  private:
+    typedef MyOglCanvasPaneBase<D>	super;
+    
   public:
 			MyOglCanvasPane(
 			    Window&		parentWin,
 			    size_t		width,
 			    size_t		height,
-			    const Image<float>&	disparityMap,
+			    const Image<D>&	disparityMap,
 			    const Image<T>&	textureImage,
 			    const Warp*		warp)		;
     virtual		~MyOglCanvasPane()			;
@@ -152,31 +226,37 @@ class MyOglCanvasPane : public MyOglCanvasPaneBase
     virtual void	repaintUnderlay()			;
     
   private:
+    using		super::_dc;
+    using		super::_disparityMap;
+    using		super::_draw;
+    using		super::_drawMode;
+    using		super::_parallax;
+    
     const Image<T>&	_textureImage;
     const Warp* const	_warp;
     GLuint		_list;
 };
 
-template <class T> inline
-MyOglCanvasPane<T>::MyOglCanvasPane(Window&		parentWin,
-				    size_t		width,
-				    size_t		height,
-				    const Image<float>&	disparityMap,
-				    const Image<T>&	textureImage,
-				    const Warp*		warp)
-    :MyOglCanvasPaneBase(parentWin, width, height, disparityMap),
+template <class D, class T> inline
+MyOglCanvasPane<D, T>::MyOglCanvasPane(Window&		parentWin,
+				       size_t		width,
+				       size_t		height,
+				       const Image<D>&	disparityMap,
+				       const Image<T>&	textureImage,
+				       const Warp*	warp)
+    :MyOglCanvasPaneBase<D>(parentWin, width, height, disparityMap),
      _textureImage(textureImage), _warp(warp), _list(glGenLists(1))
 {
 }
 
-template <class T>
-MyOglCanvasPane<T>::~MyOglCanvasPane()
+template <class D, class T>
+MyOglCanvasPane<D, T>::~MyOglCanvasPane()
 {
     glDeleteLists(_list, 1);
 }
 
-template <class T> void
-MyOglCanvasPane<T>::repaintUnderlay()
+template <class D, class T> void
+MyOglCanvasPane<D, T>::repaintUnderlay()
 {
     GLuint	list;
     
@@ -192,17 +272,17 @@ MyOglCanvasPane<T>::repaintUnderlay()
 
     switch (_drawMode)
     {
-      case Texture:
+      case super::Texture:
 	if (_warp)
 	    _draw.draw(_disparityMap, _textureImage, *_warp);
 	else
 	    _draw.draw(_disparityMap, _textureImage);
 	break;
-      case Polygon:
-	_draw.draw<DrawThreeD::N3F_V3F>(_disparityMap);
+      case super::Polygon:
+	_draw.template draw<DrawThreeD::N3F_V3F>(_disparityMap);
 	break;
-      case Mesh:
-	_draw.draw<DrawThreeD::V3F>(_disparityMap);
+      case super::Mesh:
+	_draw.template draw<DrawThreeD::V3F>(_disparityMap);
 	break;
     }
 

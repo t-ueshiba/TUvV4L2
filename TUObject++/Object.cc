@@ -107,7 +107,7 @@ Object::restoreObject(std::istream& in)
     Ptr<Object>	obj;
     u_long		objID;
 
-    if (in.read((char*)&objID, sizeof(objID)) == 0 || objID == Eoc)
+    if (!in.read((char*)&objID, sizeof(objID)) || objID == Eoc)
 	RestoreMap::reset();
     else if ((obj = RestoreMap::find(objID)) == (Object*)NotFound)
     {							// not read yet

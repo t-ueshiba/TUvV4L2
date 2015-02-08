@@ -205,7 +205,6 @@ class Vector : public Array<T, B>
     Vector&		operator =(std::
 				   initializer_list<value_type> args)	;
 
-    using		super::fill;
     using		super::data;
     using		super::begin;
     using		super::cbegin;
@@ -216,7 +215,6 @@ class Vector : public Array<T, B>
     using		super::rend;
     using		super::crend;
     using		super::size;
-    using		super::check_size;
     
     const Vector<T>	operator ()(size_t i, size_t d)		const	;
     Vector<T>		operator ()(size_t i, size_t d)			;
@@ -548,7 +546,6 @@ class Matrix : public Array2<Vector<T>, B, R>
 				   initializer_list<value_type> arg)	;
     Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
 
-    using		super::fill;
     using		super::begin;
     using		super::cbegin;
     using		super::end;
@@ -561,7 +558,6 @@ class Matrix : public Array2<Vector<T>, B, R>
     using		super::nrow;
     using		super::ncol;
     using		super::data;
-    using		super::check_size;
 
     const Matrix<T>	operator ()(size_t i, size_t j,
 				    size_t r, size_t c)		const	;
@@ -732,8 +728,8 @@ Matrix<T, B, R>::operator ^=(const E& v)
 template <class T, class B, class R> Matrix<T, B, R>&
 Matrix<T, B, R>::diag(T c)
 {
-    check_size(ncol());
-    fill(element_type(0));
+    super::check_size(ncol());
+    super::fill(element_type(0));
     for (size_t i = 0; i < nrow(); ++i)
 	(*this)[i][i] = c;
     return *this;
@@ -2351,8 +2347,14 @@ typedef FixedSizedMatrix<float,  3, 3>	Matrix33f;
 typedef FixedSizedMatrix<double, 3, 3>	Matrix33d;
 typedef FixedSizedMatrix<float,  3, 4>	Matrix34f;
 typedef FixedSizedMatrix<double, 3, 4>	Matrix34d;
-typedef FixedSizedMatrix<float,  4, 3>	Matrix44f;
-typedef FixedSizedMatrix<double, 4, 3>	Matrix44d;
+typedef FixedSizedMatrix<float,  4, 4>	Matrix44f;
+typedef FixedSizedMatrix<double, 4, 4>	Matrix44d;
     
 }
 #endif	// !__TU_VECTORPP_H
+
+
+
+
+
+

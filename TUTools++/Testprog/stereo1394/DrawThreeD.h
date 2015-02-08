@@ -65,14 +65,14 @@ class DrawThreeD
     
     void	initialize(const Matrix34d& Pl, const Matrix34d& Pr,
 			   float gap=1.0)				;
-    template <class T>
-    void	draw(const Image<float>& disparityMap,
+    template <class D, class T>
+    void	draw(const Image<D>& disparityMap,
 		     const Image<T>& image)				;
-    template <class T>
-    void	draw(const Image<float>& disparityMap,
+    template <class D, class T>
+    void	draw(const Image<D>& disparityMap,
 		     const Image<T>& image, const Warp& warp)		;
-    template <class F>
-    void	draw(const Image<float>& disparityMap)			;
+    template <class F, class D>
+    void	draw(const Image<D>& disparityMap)			;
     void	setCursor(int u, int v, float d)			;
     
   private:

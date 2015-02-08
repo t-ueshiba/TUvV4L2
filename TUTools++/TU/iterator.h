@@ -47,7 +47,8 @@ namespace TU
   \param mbr	iterが指すオブジェクトのメンバへのポインタ
 */
 template <class ITER, class T> inline auto
-make_mbr_iterator(ITER iter, T std::iterator_traits<ITER>::value_type::* mbr)
+make_mbr_iterator(const ITER& iter,
+		  T std::iterator_traits<ITER>::value_type::* mbr)
     -> decltype(boost::make_transform_iterator(
 		    iter,
 		    std::function<
@@ -78,7 +79,7 @@ make_mbr_iterator(ITER iter, T std::iterator_traits<ITER>::value_type::* mbr)
   \param iter	ベースとなる反復子
 */
 template <class ITER> inline auto
-make_first_iterator(ITER iter)
+make_first_iterator(const ITER& iter)
     -> decltype(make_mbr_iterator(
 		    iter, &std::iterator_traits<ITER>::value_type::first))
 {
@@ -91,7 +92,7 @@ make_first_iterator(ITER iter)
   \param iter	ベースとなる反復子
 */
 template <class ITER> inline auto
-make_second_iterator(ITER iter)
+make_second_iterator(const ITER& iter)
     -> decltype(make_mbr_iterator(
 		    iter, &std::iterator_traits<ITER>::value_type::second))
 {
@@ -434,8 +435,8 @@ namespace detail
 		}
 
       private:
-	ITER const&	_iter;
-	FUNC const&	_func;
+	const ITER&	_iter;
+	const FUNC&	_func;
     };
 }
 
@@ -466,10 +467,10 @@ class assignment2_iterator
     friend class	boost::iterator_core_access;
 
   public:
-    assignment2_iterator(ITER const& iter, FUNC const& func=FUNC())
+    assignment2_iterator(const ITER& iter, const FUNC& func=FUNC())
 	:super(iter), _func(func)			{}
 
-    FUNC const&	functor()			const	{ return _func; }
+    const FUNC&	functor()			const	{ return _func; }
 	
   private:
     reference	dereference() const
@@ -482,15 +483,9 @@ class assignment2_iterator
 };
     
 template <class FUNC, class ITER> inline assignment2_iterator<FUNC, ITER>
-make_assignment2_iterator(ITER iter, FUNC func)
+make_assignment2_iterator(const ITER& iter, const FUNC& func=FUNC())
 {
     return assignment2_iterator<FUNC, ITER>(iter, func);
-}
-
-template <class FUNC, class ITER> inline assignment2_iterator<FUNC, ITER>
-make_assignment2_iterator(ITER iter)
-{
-    return assignment2_iterator<FUNC, ITER>(iter);
 }
 
 /************************************************************************
@@ -638,22 +633,36 @@ class row_iterator
 
 template <class OUT=void, class ROW, class ...ARG>
 inline row_iterator<OUT, ROW, ARG...>
-make_row_iterator(ROW row, const ARG& ...arg)
+make_row_iterator(const ROW& row, const ARG& ...arg)
 {
     return row_iterator<OUT, ROW, ARG...>(row, arg...);
 }
 
 template <class OUT=void, class ROW, class ...ARG>
 inline row_iterator<OUT, ROW, ARG...>
-make_row_iterator(size_t jb, size_t je, ROW row, const ARG& ...arg)
+make_row_iterator(size_t jb, size_t je, const ROW& row, const ARG& ...arg)
 {
     return row_iterator<OUT, ROW, ARG...>(row, jb, je, arg...);
+}
+
+template <template <class, class> class OUT, class ROW, class ARG>
+inline row_iterator<OUT<ARG, subiterator<ROW> >, ROW, ARG>
+make_row_uniarg_iterator(const ROW& row, const ARG& arg)
+{
+    return row_iterator<OUT<ARG, subiterator<ROW> >, ROW, ARG>(row, arg);
+}
+
+template <template <class, class> class OUT, class ROW, class ARG>
+inline row_iterator<OUT<ARG, subiterator<ROW> >, ROW, ARG>
+make_row_uniarg_iterator(size_t jb, size_t je, const ROW& row, const ARG& arg)
+{
+    return row_iterator<OUT<ARG, subiterator<ROW> >, ROW, ARG>(row, jb, je, arg);
 }
 
 template <class FUNC, class ROW>
 inline row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
 		    ROW, FUNC>
-make_row_transform_iterator(ROW row, const FUNC& func)
+make_row_transform_iterator(const ROW& row, const FUNC& func)
 {
     return row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
 			ROW, FUNC>(row, func);
@@ -662,7 +671,8 @@ make_row_transform_iterator(ROW row, const FUNC& func)
 template <class FUNC, class ROW>
 inline row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
 		    ROW, FUNC>
-make_row_transform_iterator(size_t jb, size_t je, ROW row, const FUNC& func)
+make_row_transform_iterator(size_t jb, size_t je,
+			    const ROW& row, const FUNC& func)
 {
     return row_iterator<boost::transform_iterator<FUNC, subiterator<ROW> >,
 			ROW, FUNC>(row, jb, je, func);
@@ -696,34 +706,16 @@ class row2col
 };
 
 template <class ROW>
-struct vertical_iterator
-    : public boost::transform_iterator<row2col<ROW>,
-				       ROW,
-				       boost::use_default,
-				       typename std::iterator_traits<
-					   subiterator<ROW> >::value_type>
-{
-    typedef boost::transform_iterator<
-		row2col<ROW>,
-		ROW,
-		boost::use_default,
-		typename std::iterator_traits<
-		subiterator<ROW> >::value_type>			super;
-
-    vertical_iterator(ROW row, size_t idx)
-	:super(row, row2col<ROW>(idx))				{}
-    vertical_iterator(super const& iter)	:super(iter)	{}
-    vertical_iterator&	operator =(const super& iter)
-			{
-			    super::operator =(iter);
-			    return *this;
-			}
-};
+using vertical_iterator = boost::transform_iterator<
+			      row2col<ROW>, ROW,
+			      boost::use_default,
+			      typename std::iterator_traits<subiterator<ROW> >
+					  ::value_type>;
 
 template <class ROW> inline vertical_iterator<ROW>
-make_vertical_iterator(ROW row, size_t idx)
+make_vertical_iterator(const ROW& row, size_t idx)
 {
-    return vertical_iterator<ROW>(row, idx);
+    return vertical_iterator<ROW>(row, row2col<ROW>(idx));
 }
 
 /************************************************************************
@@ -837,9 +829,30 @@ class column_iterator
 
 template <class OUT=void, class ROW, class ...ARG>
 inline column_iterator<OUT, ROW, ARG...>
-make_column_iterator(ROW begin, ROW end, size_t col, const ARG& ...arg)
+make_column_iterator(const ROW& begin,
+		     const ROW& end, size_t col, const ARG& ...arg)
 {
     return column_iterator<OUT, ROW, ARG...>(begin, end, col, arg...);
+}
+
+template <template <class, class> class OUT, class ROW, class ARG>
+inline row_iterator<OUT<ARG, vertical_iterator<ROW> >, ROW, ARG>
+make_column_uniarg_iterator(const ROW& begin,
+			    const ROW& end, size_t col, const ARG& arg)
+{
+    return column_iterator<OUT<ARG, vertical_iterator<ROW> >, ROW, ARG>(
+	       begin, end, col, arg);
+}
+
+template <class FUNC, class ROW>
+inline column_iterator<boost::transform_iterator<FUNC, vertical_iterator<ROW> >,
+		       ROW, FUNC>
+make_column_transform_iterator(const ROW& begin,
+			       const ROW& end, size_t col, const FUNC& func)
+{
+    return column_iterator<
+	       boost::transform_iterator<FUNC, vertical_iterator<ROW> >,
+	       ROW, FUNC>(begin, end, col, func);
 }
 
 template <class ROW> inline auto
@@ -856,16 +869,6 @@ column_end(const ROW& begin, const ROW& end)
     return make_column_iterator(begin, end, (begin != end ? size(*begin) : 0));
 }
 
-template <class FUNC, class ROW>
-inline column_iterator<boost::transform_iterator<FUNC, vertical_iterator<ROW> >,
-		       ROW, FUNC>
-make_column_transform_iterator(ROW begin, ROW end, size_t col, const FUNC& func)
-{
-    return column_iterator<
-	       boost::transform_iterator<FUNC, vertical_iterator<ROW> >,
-	       ROW, FUNC>(begin, end, col, func);
-}
-
 /************************************************************************
 *  class ring_iterator<ITER>						*
 ************************************************************************/
@@ -880,7 +883,7 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
     typedef boost::iterator_adaptor<ring_iterator, ITER>	super;
 
   public:
-    typedef typename super::difference_type	difference_type;
+    typedef typename super::difference_type			difference_type;
     
     friend class	boost::iterator_core_access;
 
@@ -888,7 +891,7 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
     ring_iterator()
 	:super(), _begin(super::base()), _end(super::base())	{}
     
-    ring_iterator(ITER const& begin, ITER const& end)
+    ring_iterator(const ITER& begin, const ITER& end)
 	:super(begin), _begin(begin), _end(end)			{}
 
   private:
@@ -925,7 +928,7 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
 };
 
 template <class ITER> ring_iterator<ITER>
-make_ring_iterator(ITER begin, ITER end)
+make_ring_iterator(const ITER& begin, const ITER& end)
 {
     return ring_iterator<ITER>(begin, end);
 }

@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../stereo1394 -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
+CPPFLAGS	= -DNDEBUG #-DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
@@ -23,8 +23,8 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUOgl++ -lTUv++ -lTUStereo++ -lTUTools++ \
-		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 -ltbb -ltbbmalloc
+LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
+		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 #-ltbb -ltbbmalloc
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
@@ -114,23 +114,24 @@ include $(PROJECT)/lib/common.mk
 ComputeThreeD.o: ../stereo1394/ComputeThreeD.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h
 DrawThreeD.o: ../stereo1394/DrawThreeD.h /usr/local/include/TU/Warp.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h
 MyCanvasPane.o: ../stereo1394/MyCanvasPane.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
@@ -143,8 +144,9 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/Notify.h \
 	/usr/local/include/TU/SADStereo.h /usr/local/include/TU/StereoBase.h \
@@ -168,8 +170,9 @@ MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
@@ -183,8 +186,8 @@ createMenuCmds.o: ../stereo1394/stereo1394.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/Ieee1394++.h
@@ -192,8 +195,9 @@ main.o: /usr/local/include/TU/io.h /usr/local/include/TU/SADStereo.h \
 	/usr/local/include/TU/StereoBase.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/algorithm.h \
 	/usr/local/include/TU/Profiler.h /usr/local/include/TU/BoxFilter.h \
 	/usr/local/include/TU/SeparableFilter2.h \

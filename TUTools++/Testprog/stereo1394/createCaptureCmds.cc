@@ -43,6 +43,12 @@ static CmdDef	CaptureCmds[] =
      0, 0, 1, 1, 0},
     {C_Button,	      c_OneShot,        0, "One shot",	      noProp, CA_None,
      0, 1, 1, 1, 0},
+  /*
+    {C_ToggleButton,  c_DoHorizontalBackMatch,	0,
+     "Hor. back match", noProp, CA_None, 5, 0, 1, 1, 0}, 
+    {C_ToggleButton,  c_DoVerticalBackMatch,	0,
+     "Ver. back match", noProp, CA_None, 6, 0, 1, 1, 0},
+  */
     {C_ToggleButton,  c_Binocular,	0, "Binocular",	      noProp, CA_None,
      1, 0, 1, 1, 0},
     {C_Label,	      c_Cursor,		0, "(   ,   )",	      noProp, CA_None,

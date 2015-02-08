@@ -106,8 +106,8 @@ DrawThreeD::initialize(const Matrix34d& Pl, const Matrix34d& Pr, float gap)
     _gap = gap;
 }
 
-template <class T> void
-DrawThreeD::draw(const Image<float>& disparityMap, const Image<T>& image)
+template <class D, class T> void
+DrawThreeD::draw(const Image<D>& disparityMap, const Image<T>& image)
 {
     typedef C4UB_V3F		Vertex;
     
@@ -121,15 +121,15 @@ DrawThreeD::draw(const Image<float>& disparityMap, const Image<T>& image)
     {
 	const size_t		width = disparityMap.width();
 	const ImageLine<T>	&imgp = image[v-1], &imgq = image[v];
-	const ImageLine<float>	&mapp = disparityMap[v-1],
+	const ImageLine<D>	&mapp = disparityMap[v-1],
 				&mapq = disparityMap[v];
-	float			dp_prev = 0.0, dq_prev = 0.0;
+	D			dp_prev = 0, dq_prev = 0;
 	Vertex* const		vertex0 = (Vertex*)_vertices.data();
 	Vertex*			vertex  = vertex0;
 	for (size_t u = 0; u < width; ++u)
 	{
-	    const float	dp = mapp[u], dq = mapq[u];
-	    if (dp != 0.0 && dq != 0.0 && abs(dp - dq) <= _gap)
+	    const D	dp = mapp[u], dq = mapq[u];
+	    if (dp != 0 && dq != 0 && abs(dp - dq) <= _gap)
 	    {
 		if (abs(dp - dp_prev) > _gap || abs(dq - dq_prev) > _gap)
 		{
@@ -160,8 +160,8 @@ DrawThreeD::draw(const Image<float>& disparityMap, const Image<T>& image)
     glPopMatrix();
 }
 
-template <class T> void
-DrawThreeD::draw(const Image<float>& disparityMap, const Image<T>& image,
+template <class D, class T> void
+DrawThreeD::draw(const Image<D>& disparityMap, const Image<T>& image,
 		 const Warp& warp)
 {
     typedef T2F_V3F	Vertex;
@@ -191,14 +191,14 @@ DrawThreeD::draw(const Image<float>& disparityMap, const Image<T>& image,
     for (size_t v = 1; v < disparityMap.height(); ++v)
     {
 	const size_t		width = disparityMap.width();
-	const ImageLine<float>	&mapp = disparityMap[v-1],
+	const ImageLine<D>	&mapp = disparityMap[v-1],
 				&mapq = disparityMap[v];
-	float			dp_prev = 0.0, dq_prev = 0.0;
+	D			dp_prev = 0.0, dq_prev = 0.0;
 	Vertex* const		vertex0 = (Vertex*)_vertices.data();
 	Vertex*			vertex  = vertex0;
 	for (size_t u = 0; u < width; ++u)
 	{
-	    const float	dp = mapp[u], dq = mapq[u];
+	    const D	dp = mapp[u], dq = mapq[u];
 	    if (dp != 0.0 && dq != 0.0 && std::abs(dp - dq) <= _gap)
 	    {
 		if (std::abs(dp - dp_prev) > _gap ||
@@ -257,8 +257,8 @@ DrawThreeD::draw(const Image<float>& disparityMap, const Image<T>& image,
     glPopMatrix();
 }
 
-template <class F> void
-DrawThreeD::draw(const Image<float>& disparityMap)
+template <class F, class D> void
+DrawThreeD::draw(const Image<D>& disparityMap)
 {
     resize<F>(disparityMap.width());
 
@@ -270,15 +270,15 @@ DrawThreeD::draw(const Image<float>& disparityMap)
     for (size_t v = 1; v < disparityMap.height(); ++v)
     {
 	const size_t		width = disparityMap.width();
-	const ImageLine<float>	&mapp = disparityMap[v-1],
+	const ImageLine<D>	&mapp = disparityMap[v-1],
 				&mapq = disparityMap[v];
-	float			dp_prev = 0.0, dq_prev = 0.0;
+	D			dp_prev = 0.0, dq_prev = 0.0;
 	F*			vertex0 = (F*)_vertices.data();
 	F*			vertex  = vertex0;
 	
 	for (size_t u = 0; u < width; ++u)
 	{
-	    const float	dp = mapp[u], dq = mapq[u];
+	    const D	dp = mapp[u], dq = mapq[u];
 	    if (dp != 0.0 && dq != 0.0 && abs(dp - dq) <= _gap)
 	    {
 		if (abs(dp - dp_prev) > _gap || abs(dq - dq_prev) > _gap)
@@ -382,5 +382,23 @@ DrawThreeD::draw<DrawThreeD::N3F_V3F>(const Image<float>& disparityMap);
     
 template void
 DrawThreeD::draw<DrawThreeD::V3F>(const Image<float>& disparityMap);
+    
+template void
+DrawThreeD::draw(const Image<u_char>& disparityMap, const Image<u_char>& image);
+template void
+DrawThreeD::draw(const Image<u_char>& disparityMap, const Image<ABGR>& image);
+template void
+DrawThreeD::draw(const Image<u_char>& disparityMap, const Image<RGBA>& image);
+template void
+DrawThreeD::draw(const Image<u_char>& disparityMap,
+		 const Image<u_char>& image, const Warp& warp);
+template void
+DrawThreeD::draw(const Image<u_char>& disparityMap,
+		 const Image<RGBA>& image, const Warp& warp);
+template void
+DrawThreeD::draw<DrawThreeD::N3F_V3F>(const Image<u_char>& disparityMap);
+    
+template void
+DrawThreeD::draw<DrawThreeD::V3F>(const Image<u_char>& disparityMap);
     
 }
