@@ -45,7 +45,7 @@
 #include "TU/iterator.h"
 #include "TU/mmInstructions.h"
 
-//#  define __CXX0X_MOVE		// 移動コンストラクタ/代入を使用
+//#define __CXX0X_MOVE			// 移動コンストラクタ/代入を使用
 
 namespace TU
 {
@@ -469,18 +469,32 @@ class Array : public B
     typedef std::ptrdiff_t				difference_type;
 
   private:
-    struct has_fill_impl
-    {
-	template <class E_> static auto
-	check(E_*) -> decltype(std::declval<E_&>().fill(
-				   std::declval<const element_type&>()),
-			       std::true_type());
-	template <class E_> static auto
-	check(...) -> std::false_type;
-    };
-    template <class E>
-    using has_fill = decltype(has_fill_impl::template check<E>(nullptr));
+    typedef std::integral_constant<size_t, 0>		fillable;
+    typedef std::integral_constant<size_t, 1>		assignable;
+    typedef std::integral_constant<size_t, 2>		unassignable;
     
+    template <class T_>
+    static auto	check_fill(T_* p)
+		-> decltype(p->fill(std::declval<const element_type&>()),
+			    std::true_type())				;
+    template <class T_>
+    static auto	check_fill(...) -> std::false_type			;
+
+    template <class T_>
+    static auto	check_assign(T_* p)
+		-> decltype(*p = std::declval<const element_type&>(),
+			    std::true_type())				;
+    template <class T_>
+    static auto	check_assign(...) -> std::false_type			;
+
+    template <class T_>
+    using assignment_prop = std::conditional<
+				decltype(check_fill<T_>(nullptr))::value,
+				fillable,
+				typename std::conditional<
+				    decltype(check_assign<T_>(nullptr))::value,
+					assignable, unassignable>::type>;
+
   public:
   //! 配列を生成する．
     Array() :super()						{ init(); }
@@ -565,7 +579,6 @@ class Array : public B
 		{
 		    super::for_each(expr.begin(),
 				    assign<detail::value_t<E>, reference>());
-
 		}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -590,7 +603,7 @@ class Array : public B
   */
     void	fill(const element_type& c)
 		{
-		    fill_impl(c, typename has_fill<value_type>::type());
+		    fill_impl(c, typename assignment_prop<value_type>::type());
 		}
     
     using	super::data;
@@ -599,7 +612,6 @@ class Array : public B
     using	super::end;
     using	super::cend;
     using	super::size;
-    using	super::resize;
     
     size_t			dim() const
 				{
@@ -742,27 +754,30 @@ class Array : public B
 
     void		init()
 			{
-			    init_impl(typename std::is_arithmetic<element_type>
-						  ::type());
+			    init_impl(typename
+				      std::is_arithmetic<element_type>::type());
 			}
     
   private:
-    void		fill_impl(const element_type& c, std::true_type)
+    void		fill_impl(const element_type& c, fillable)
 			{
 			    for (iterator iter = begin(), iend = end();
 				 iter != iend; ++iter)
 				iter->fill(c);
 			}
-    void		fill_impl(const element_type& c, std::false_type)
+    void		fill_impl(const element_type& c, assignable)
 			{
 			    for (iterator iter = begin(), iend = end();
 				 iter != iend; ++iter)
 				*iter = c;
 			}
+    void		fill_impl(const element_type&, unassignable)
+			{
+			}
 
     void		init_impl(std::true_type)
 			{
-			    fill(element_type(0));
+			    fill(0);
 			}
     void		init_impl(std::false_type)
 			{
@@ -1574,9 +1589,12 @@ namespace detail
 			}
       type		value(std::false_type) const
 			{
-			    return { _l[1] * _r[2] - _l[2] * _r[1],
-				     _l[2] * _r[0] - _l[0] * _r[2],
-				     _l[0] * _r[1] - _l[1] * _r[0] };
+			    type	val;
+			    val[0] = _l[1] * _r[2] - _l[2] * _r[1];
+			    val[1] = _l[2] * _r[0] - _l[0] * _r[2];
+			    val[2] = _l[0] * _r[1] - _l[1] * _r[0];
+
+			    return val;
 			}
     
     public:

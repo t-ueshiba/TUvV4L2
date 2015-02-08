@@ -4,7 +4,7 @@
 #################################
 #  User customizable macros	#
 #################################
-PROGRAM		= $(shell basename $(PWD))
+PROGRAM		= matchTest
 #LIBRARY		= lib$(shell basename $(PWD))
 
 VPATH		=
@@ -12,18 +12,18 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
   NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+#  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		=
+LIBS		= -lTUTools++
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
@@ -39,28 +39,28 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/DericheConvolver.h \
-		/usr/local/include/TU/Feature.h \
-		/usr/local/include/TU/FeatureMatch.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Heap.h \
-		/usr/local/include/TU/ICIA.h \
-		/usr/local/include/TU/IIRFilter.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/IntegralImage.h \
-		/usr/local/include/TU/Manip.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Random.h \
-		/usr/local/include/TU/Ransac.h \
-		/usr/local/include/TU/SURFCreator.h \
-		/usr/local/include/TU/SeparableFilter2.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+EXTHDRS		= ../../TU/Array++.h \
+		../../TU/DericheConvolver.h \
+		../../TU/Feature.h \
+		../../TU/FeatureMatch.h \
+		../../TU/Geometry++.h \
+		../../TU/Heap.h \
+		../../TU/ICIA.h \
+		../../TU/IIRFilter.h \
+		../../TU/Image++.h \
+		../../TU/IntegralImage.h \
+		../../TU/Manip.h \
+		../../TU/Minimize.h \
+		../../TU/Random.h \
+		../../TU/Ransac.h \
+		../../TU/SURFCreator.h \
+		../../TU/SeparableFilter2.h \
+		../../TU/Vector++.h \
+		../../TU/functional.h \
+		../../TU/iterator.h \
+		../../TU/mmInstructions.h \
+		../../TU/tuple.h \
+		../../TU/types.h
 HDRS		= MatchImage.h
 SRCS		= MatchImage.cc \
 		main.cc
@@ -73,26 +73,16 @@ OBJS		= MatchImage.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-MatchImage.o: MatchImage.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/FeatureMatch.h \
-	/usr/local/include/TU/Random.h /usr/local/include/TU/Ransac.h \
-	/usr/local/include/TU/Manip.h
-main.o: /usr/local/include/TU/SURFCreator.h \
-	/usr/local/include/TU/Feature.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/IntegralImage.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/Heap.h \
-	/usr/local/include/TU/FeatureMatch.h /usr/local/include/TU/Random.h \
-	/usr/local/include/TU/Ransac.h /usr/local/include/TU/ICIA.h \
-	/usr/local/include/TU/DericheConvolver.h \
-	/usr/local/include/TU/IIRFilter.h \
-	/usr/local/include/TU/SeparableFilter2.h MatchImage.h
+MatchImage.o: MatchImage.h ../../TU/Image++.h ../../TU/types.h \
+	../../TU/Geometry++.h ../../TU/Vector++.h ../../TU/Array++.h \
+	../../TU/iterator.h ../../TU/tuple.h ../../TU/functional.h \
+	../../TU/mmInstructions.h ../../TU/Minimize.h ../../TU/FeatureMatch.h \
+	../../TU/Random.h ../../TU/Ransac.h ../../TU/Manip.h
+main.o: ../../TU/SURFCreator.h ../../TU/Feature.h ../../TU/Geometry++.h \
+	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
+	../../TU/tuple.h ../../TU/functional.h ../../TU/mmInstructions.h \
+	../../TU/Minimize.h ../../TU/Manip.h ../../TU/types.h \
+	../../TU/IntegralImage.h ../../TU/Image++.h ../../TU/Heap.h \
+	../../TU/FeatureMatch.h ../../TU/Random.h ../../TU/Ransac.h \
+	../../TU/ICIA.h ../../TU/DericheConvolver.h ../../TU/IIRFilter.h \
+	../../TU/SeparableFilter2.h MatchImage.h

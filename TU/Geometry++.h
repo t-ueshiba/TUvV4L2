@@ -1349,7 +1349,7 @@ template<class M> template <class E, class> inline
 Affinity<M>::Affinity(const E& T)
     :super(T)
 {
-    (*this)[outDim()]	       = 0;
+    (*this)[outDim()].fill(0);
     (*this)[outDim()][inDim()] = 1;
 }
 
@@ -1374,7 +1374,7 @@ template<class M> template <class E, class> inline void
 Affinity<M>::set(const E& T)
 {
     super::set(T);
-    (*this)[outDim()]	       = 0;
+    (*this)[outDim()].fill(0);
     (*this)[outDim()][inDim()] = 1;
 }
     

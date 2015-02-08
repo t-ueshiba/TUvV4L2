@@ -48,15 +48,15 @@ namespace v
 CmdDef*		createMenuCmds()					;
 
 /************************************************************************
-*  class MyCmdWindow<STEREO, PIXEL>					*
+*  class MyCmdWindow<STEREO, PIXEL, DISP>				*
 ************************************************************************/
-template <class STEREO, class PIXEL>
-MyCmdWindow<STEREO, PIXEL>::MyCmdWindow(App&			parentApp,
-					const XVisualInfo*	vinfo,
-					bool			textureMapping,
-					double			parallax,
-					const params_type&	params,
-					double			scale)
+template <class STEREO, class PIXEL, class DISP>
+MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(App&		 parentApp,
+					      const XVisualInfo* vinfo,
+					      bool		 textureMapping,
+					      double		 parallax,
+					      const params_type& params,
+					      double		 scale)
     :CmdWindow(parentApp, "Stereo vision", vinfo,
 	       Colormap::RGBColor, 256, 0, 0),
    // Stereo stuffs.
@@ -89,6 +89,8 @@ MyCmdWindow<STEREO, PIXEL>::MyCmdWindow(App&			parentApp,
     show();
 
     const params_type&	p = _stereo.getParameters();
+    _menuCmd.setValue(c_DoHorizontalBackMatch, p.doHorizontalBackMatch);
+    _menuCmd.setValue(c_DoVerticalBackMatch, p.doVerticalBackMatch);
     _menuCmd.setValue(c_WindowSize, int(p.windowSize));
     _menuCmd.setValue(c_DisparitySearchWidth, int(p.disparitySearchWidth));
     _menuCmd.setValue(c_DisparityMax, int(p.disparityMax));
@@ -103,8 +105,8 @@ MyCmdWindow<STEREO, PIXEL>::MyCmdWindow(App&			parentApp,
     colormap().setSaturationF(p.disparityMax);
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 {
     using namespace	std;
     
@@ -178,6 +180,26 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
 	    stereoMatch();
 	    break;
 	
+	  case c_DoHorizontalBackMatch:
+	  {
+	    params_type	params = _stereo.getParameters();
+	    params.doHorizontalBackMatch = val;
+	    _stereo.setParameters(params);
+
+	    stereoMatch();
+	  }
+	    break;
+	    
+	  case c_DoVerticalBackMatch:
+	  {
+	    params_type	params = _stereo.getParameters();
+	    params.doVerticalBackMatch = val;
+	    _stereo.setParameters(params);
+
+	    stereoMatch();
+	  }
+	    break;
+	    
 	  case c_WindowSize:
 	  {
 	    params_type	params = _stereo.getParameters();
@@ -249,11 +271,6 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
 	  }
 	    break;
 
-	  case c_Refresh:
-	    initializeRectification();
-	    stereoMatch();
-	    break;
-
 	  case Id_MouseButton1Drag:
 	    _canvasL.repaintUnderlay();
 	    _canvasR.repaintUnderlay();
@@ -274,7 +291,7 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
 		0 <= val.v && val.v < _disparityMap.height() &&
 		(d = _disparityMap[val.v][val.u]) != 0)
 	    {
-		s.precision(3);
+		s.precision(4);
 		s << d;
 		s.precision(4);
 		s << " (" << _b / d << "m)";
@@ -314,17 +331,20 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
 	    switch (val)
 	    {
 	      case c_Texture:
-		_canvas3D.setDrawMode(MyOglCanvasPaneBase::Texture);
+		_canvas3D.setDrawMode(
+		    MyOglCanvasPaneBase<disparity_type>::Texture);
 		_canvas3D.repaintUnderlay();
 		break;
 	
 	      case c_Polygon:
-		_canvas3D.setDrawMode(MyOglCanvasPaneBase::Polygon);
+		_canvas3D.setDrawMode(
+		    MyOglCanvasPaneBase<disparity_type>::Polygon);
 		_canvas3D.repaintUnderlay();
 		break;
 	
 	      case c_Mesh:
-		_canvas3D.setDrawMode(MyOglCanvasPaneBase::Mesh);
+		_canvas3D.setDrawMode(
+		    MyOglCanvasPaneBase<disparity_type>::Mesh);
 		_canvas3D.repaintUnderlay();
 		break;
 	    }
@@ -343,8 +363,8 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
     }
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::initializeRectification()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::initializeRectification()
 {
     using namespace	std;
 
@@ -414,8 +434,8 @@ MyCmdWindow<STEREO, PIXEL>::initializeRectification()
     _stereo.getParameters().put(std::cerr);
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::stereoMatch()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::stereoMatch()
 {
     if (_menuCmd.getValue(c_Binocular))
     {
@@ -441,8 +461,8 @@ MyCmdWindow<STEREO, PIXEL>::stereoMatch()
     _canvas3D.repaintUnderlay();	// 3次元復元結果を表示．
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::putThreeD(std::ostream& out) const
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::putThreeD(std::ostream& out) const
 {
     using namespace	std;
 
@@ -482,8 +502,8 @@ MyCmdWindow<STEREO, PIXEL>::putThreeD(std::ostream& out) const
 	    }
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::putThreeDImage(std::ostream& out) const
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::putThreeDImage(std::ostream& out) const
 {
     const Image<RGB>&	threeDImage = _canvas3D.template getImage<RGB>();
     
@@ -494,7 +514,13 @@ MyCmdWindow<STEREO, PIXEL>::putThreeDImage(std::ostream& out) const
 *  instantiations							*
 ************************************************************************/
 template class MyCmdWindow<SADStereo<short, u_char> >;
+template class MyCmdWindow<SADStereo<int,   u_short> >;
+  //template class MyCmdWindow<SADStereo<float, u_char> >;
+  //template class MyCmdWindow<SADStereo<float, u_short> >;
 template class MyCmdWindow<GFStereo<float,  u_char> >;
+template class MyCmdWindow<GFStereo<float,  u_short> >;
 
+template class MyCmdWindow<SADStereo<short, u_char>, u_char, u_char>;
+template class MyCmdWindow<GFStereo<float,  u_char>, u_char, u_char>;
 }
 }

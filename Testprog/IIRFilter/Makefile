@@ -40,13 +40,11 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
-		../../TU/Camera++.h \
 		../../TU/DericheConvolver.h \
 		../../TU/GaussianConvolver.h \
 		../../TU/Geometry++.h \
 		../../TU/IIRFilter.h \
 		../../TU/Image++.h \
-		../../TU/Manip.h \
 		../../TU/Minimize.h \
 		../../TU/Profiler.h \
 		../../TU/SeparableFilter2.h \
@@ -58,10 +56,8 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/types.h \
 		../../windows/fakeWindows.h
 HDRS		=
-SRCS		= ImageBase.cc \
-		main.cc
-OBJS		= ImageBase.o \
-		main.o
+SRCS		= main.cc
+OBJS		= main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -69,10 +65,6 @@ OBJS		= ImageBase.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-ImageBase.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
-	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
-	../../TU/tuple.h ../../TU/functional.h ../../TU/mmInstructions.h \
-	../../TU/Minimize.h ../../TU/Camera++.h ../../TU/Manip.h
 main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/mmInstructions.h \

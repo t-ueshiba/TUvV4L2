@@ -4,32 +4,41 @@
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/bin
-INCDIRS		= -I. -I$(PREFIX)/include
-
 PROGRAM		= $(shell basename $(PWD))
-LIBS		=
-ifneq (,$(findstring darwin,$(OSTYPE)))
-  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
+#LIBRARY		= lib$(shell basename $(PWD))
 
+VPATH		=
+
+IDLS		=
+MOCHDRS		=
+
+INCDIRS		= -I. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-  CFLAGS	= -g #O3
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  CPPFLAGS     += -DSSE2
+ifneq ($(findstring icpc,$(CXX)),)
+  CFLAGS	= -O3
+  NVCCFLAGS	= -O			# must < -O2
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS) -std=c++11
 
+LIBS		=
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation \
+		  -framework CoreServices
+endif
+
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC .cpp:sC
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
@@ -38,9 +47,12 @@ HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
 
-include $(PROJECT)/lib/p.mk
-
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 main.o: /usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/tuple.h
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h
