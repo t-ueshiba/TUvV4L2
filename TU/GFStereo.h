@@ -981,6 +981,7 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 	    break;
 #else
     Q.resize(W, 2*DD);			// Q(u, *; d)
+    Q.fill(0);
     F.resize(W);
     F.fill(GuideElement());
 #endif

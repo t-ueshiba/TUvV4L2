@@ -562,6 +562,7 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 	    break;
 #else
     Q.resize(W, DD);			// Q(u, *; d)
+    Q.fill(0);
 #endif
 
     if (dminL.resize(W - N + 1))

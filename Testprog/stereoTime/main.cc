@@ -85,7 +85,7 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
 			rectifiedImages[0], rectifiedImages[1]);
 		profiler.start(1);		// マッチング全体の所要時間
 		stereo(rectifiedImages[0].cbegin(), rectifiedImages[0].cend(),
-		      rectifiedImages[1].cbegin(), disparityMap.begin());
+		       rectifiedImages[1].cbegin(), disparityMap.begin());
 		profiler.nextFrame();
 	    }
 	    cerr << "------------------------------------" << endl;
@@ -103,9 +103,9 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
 			rectifiedImages[2]);
 		profiler.start(1);		// マッチング全体の所要時間
 		stereo(rectifiedImages[0].cbegin(),
-		      rectifiedImages[0].cend(),   rectifiedImages[0].cend(),
-		      rectifiedImages[1].cbegin(), rectifiedImages[2].cbegin(),
-		      disparityMap.begin());
+		       rectifiedImages[0].cend(),   rectifiedImages[0].cend(),
+		       rectifiedImages[1].cbegin(), rectifiedImages[2].cbegin(),
+		       disparityMap.begin());
 		profiler.nextFrame();
 	    }
 	    cerr << "------------------------------------" << endl;
