@@ -30,7 +30,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     typedef Score					ScoreVec;
     typedef Disparity					DisparityVec;
 #endif
-    typedef boost::tuple<ScoreVec, ScoreVec>		ScoreVecTuple;
+    typedef std::tuple<ScoreVec, ScoreVec>		ScoreVecTuple;
 
     class ScoreVecArray
 	: public Array<ScoreVec,
@@ -103,13 +103,13 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
 	    void		operator =(ScoreVecTuple x) const
 				{
-				    *_iter	 = boost::get<0>(x);
-				    *(_iter + 1) = boost::get<1>(x);
+				    *_iter	 = std::get<0>(x);
+				    *(_iter + 1) = std::get<1>(x);
 				}
 	    void		operator +=(ScoreVecTuple x) const
 				{
-				    *_iter	 += boost::get<0>(x);
-				    *(_iter + 1) += boost::get<1>(x);
+				    *_iter	 += std::get<0>(x);
+				    *(_iter + 1) += std::get<1>(x);
 				}
 		
 	  private:
@@ -238,10 +238,10 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
       public:
 	ParamUpdate(Score gn, Score gp)	:_gn(gn), _gp(gp)		{}
 
-	result_type	operator ()(boost::tuple<const ScoreVec&,
+	result_type	operator ()(std::tuple<const ScoreVec&,
 						 const ScoreVec&> p) const
 			{
-			    using namespace	boost;
+			    using namespace	std;
 			    
 			    return result_type(get<0>(p) - get<1>(p),
 					       _gn*get<0>(p) - _gp*get<1>(p));
@@ -262,10 +262,10 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	CoeffInit(Score g_avg, Score g_sqavg, Score e)
 	    :_g_avg(g_avg), _g_rvar(1/(g_sqavg - g_avg*g_avg + e*e))	{}
 
-	result_type	operator ()(boost::tuple<const ScoreVec&,
+	result_type	operator ()(std::tuple<const ScoreVec&,
 						 const ScoreVec&> params) const
 			{
-			    using namespace	boost;
+			    using namespace	std;
 			    
 			    ScoreVec	a = (get<1>(params) -
 					     get<0>(params)*_g_avg) * _g_rvar;
@@ -286,11 +286,11 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
       public:
 	CoeffTrans(Score g) :_g(g)					{}
 
-	result_type	operator ()(boost::tuple<const ScoreVec&,
+	result_type	operator ()(std::tuple<const ScoreVec&,
 						 const ScoreVec&> coeffs) const
 			{
-			    return (boost::get<0>(coeffs) * _g +
-				    boost::get<1>(coeffs));
+			    return (std::get<0>(coeffs) * _g +
+				    std::get<1>(coeffs));
 			}
 	
       private:
@@ -642,7 +642,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    rowL->cbegin(), rowL->cend(),
 	    make_rvcolumn_iterator(
 		make_fast_zip_iterator(
-		    boost::make_tuple(
+		    std::make_tuple(
 			rowR->cbegin(), make_vertical_iterator(rowV, cV)))),
 	    rowP->begin(), rowE->begin());
 	++rowP;
@@ -653,7 +653,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 		rowL->cbegin(), rowL->cend(),
 		make_rvcolumn_iterator(
 		    make_fast_zip_iterator(
-			boost::make_tuple(
+			std::make_tuple(
 			    rowR->cbegin(), make_vertical_iterator(rowV, cV)))),
 		buffers->Q.begin(), buffers->F.begin());
 	else
@@ -661,14 +661,14 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    updateFilterParameters(rowL->cbegin(), rowL->cend(),
 				   make_rvcolumn_iterator(
 				       make_fast_zip_iterator(
-					   boost::make_tuple(
+					   std::make_tuple(
 					       rowR->cbegin(),
 					       make_vertical_iterator(rowV,
 								      cV)))),
 				   rowLp->cbegin(),
 				   make_rvcolumn_iterator(
 				       make_fast_zip_iterator(
-					   boost::make_tuple(
+					   std::make_tuple(
 					       rowRp->cbegin(),
 					       make_vertical_iterator(rowV,
 								      --cVp)))),
@@ -719,13 +719,13 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 				   buffers->delta.rbegin(),
 				   make_rvcolumn_iterator(
 				       make_fast_zip_iterator(
-					   boost::make_tuple(
+					   std::make_tuple(
 					       buffers->dminR.end() - D + 1,
 					       make_vertical_iterator(
 						   buffers->dminV.end(), v)))),
 				   make_row_iterator(
 				       make_fast_zip_iterator(
-					   boost::make_tuple(
+					   std::make_tuple(
 					       make_dummy_iterator(
 						   &(buffers->RminR)),
 					       buffers->RminV.rbegin()))));
@@ -832,7 +832,7 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	
 	const Score	pixLp = *colLp, pixL = *colL;
 	auto		P = make_fast_zip_iterator(
-				boost::make_tuple(
+				std::make_tuple(
 				    boost::make_transform_iterator(
 					in_iterator(colRV->begin()),
 					std::bind(

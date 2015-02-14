@@ -49,24 +49,23 @@ class GuidedFilter : public BoxFilter
     typedef T		value_type;
     
     class Params
-	: public boost::tuple<value_type, value_type, value_type, value_type>
+	: public std::tuple<value_type, value_type, value_type, value_type>
     {
       private:
-	typedef boost::tuple<value_type, value_type,
-			     value_type, value_type>	super;
+	typedef std::tuple<value_type, value_type,
+			   value_type, value_type>	super;
 	
       public:
-	typedef boost::tuple<value_type, value_type>	result_type;
+	typedef std::tuple<value_type, value_type>	result_type;
 	
 	struct Init
 	{
 	    typedef Params	result_type;
 	    
-	    template <class TUPLE_>
-	    result_type	operator ()(TUPLE_ t) const
+	    template <class IN_, class GUIDE_>
+	    result_type	operator ()(const std::tuple<IN_, GUIDE_>& t) const
 			{
-			    return result_type(boost::get<0>(t),
-					       boost::get<1>(t));
+			    return Params(std::get<0>(t), std::get<1>(t));
 			}
 	};
 	
@@ -75,7 +74,7 @@ class GuidedFilter : public BoxFilter
     
 	result_type	coeffs(size_t n, value_type e) const
 			{
-			    using namespace	boost;
+			    using namespace	std;
 
 			    value_type	a = (e == 0 ? 1 :
 					     (n*get<2>(*this)
@@ -88,20 +87,20 @@ class GuidedFilter : public BoxFilter
 			}
     };
     
-    class SimpleParams : public boost::tuple<value_type, value_type>
+    class SimpleParams : public std::tuple<value_type, value_type>
     {
       private:
-	typedef boost::tuple<value_type, value_type>	super;
+	typedef std::tuple<value_type, value_type>	super;
 	
       public:
-	typedef boost::tuple<value_type, value_type>	result_type;
+	typedef std::tuple<value_type, value_type>	result_type;
 	
 	struct Init
 	{
 	    typedef SimpleParams	result_type;
 	    
 	    template <class IN_>
-	    result_type	operator ()(IN_ p) const
+	    result_type	operator ()(const IN_& p) const
 			{
 			    return result_type(p);
 			}
@@ -112,21 +111,21 @@ class GuidedFilter : public BoxFilter
 
 	result_type	coeffs(size_t n, value_type e) const
 			{
-			    using namespace	boost;
+			    using namespace	std;
 			    
 			    value_type	var = n*get<1>(*this)
 					    - get<0>(*this)*get<0>(*this);
 			    value_type	a = (e == 0 ? 1 : var/(var + n*n*e));
-			    value_type	b = (get<0>(*this) - a*get<1>(*this))/n;
+			    value_type	b = (get<0>(*this) - a*get<0>(*this))/n;
 			    
 			    return result_type(a, b);
 			}
     };
 
-    class Coeff : public boost::tuple<value_type, value_type>
+    class Coeff : public std::tuple<value_type, value_type>
     {
       public:
-	typedef boost::tuple<value_type, value_type>	super;
+	typedef std::tuple<value_type, value_type>	super;
 	
 	template <class PARAMS_>
 	class Init
@@ -157,11 +156,10 @@ class GuidedFilter : public BoxFilter
 	  public:
 	    Trans(size_t n)	:_n(n)					{}
 
-	    template <class TUPLE>
-	    result_type	operator ()(first_argument_type coeffs, TUPLE t) const
+	    template <class TUPLE_>
+	    result_type	operator ()(const Coeff& coeffs, TUPLE_&& t) const
 			{
-			    boost::get<1>(t)
-				= coeffs.trans(boost::get<0>(t), _n);
+			    std::get<1>(t) = coeffs.trans(std::get<0>(t), _n);
 			}
 	
 	  private:
@@ -173,11 +171,9 @@ class GuidedFilter : public BoxFilter
 	Coeff(const super& initial_coeffs)	:super(initial_coeffs)	{}
     
 	template <class GUIDE_>
-	value_type	trans(GUIDE_ g, size_t n) const
+	value_type	trans(const GUIDE_& g, size_t n) const
 			{
-			    using namespace	boost;
-			    
-			    return (get<0>(*this)*g + get<1>(*this))/n;
+			    return (std::get<0>(*this)*g + std::get<1>(*this))/n;
 			}
     };
     
@@ -228,19 +224,20 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
   // guided filterの2次元係数ベクトルを計算する．
     carray_type	c(super::outLength(std::distance(ib, ie)));
     super::convolve(boost::make_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ib, gb)),
+			make_fast_zip_iterator(std::make_tuple(ib, gb)),
 			params_init()),
 		    boost::make_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ie, ge)),
+			make_fast_zip_iterator(std::make_tuple(ie, ge)),
 			params_init()),
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(winSize(), _e)));
-
+    std::cerr << c;
+    
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb, winSize() - 1);
     super::convolve(c.begin(), c.end(),
 		    make_assignment2_iterator(
-			make_fast_zip_iterator(boost::make_tuple(out, gb)),
+			make_fast_zip_iterator(std::make_tuple(gb, out)),
 			coeff_trans(winSize())));
 }
 
@@ -267,12 +264,13 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
 		    boost::make_transform_iterator(ie, params_init()),
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(winSize(), _e)));
-
+    std::cerr << c;
+    
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib, winSize() - 1);
     super::convolve(c.begin(), c.end(),
 		    make_assignment2_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ib, out)),
+			make_fast_zip_iterator(std::make_tuple(ib, out)),
 			coeff_trans(winSize())));
 }
 
@@ -342,10 +340,10 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 							    ib->end())));
 
     super::convolve(make_row_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ib, gb)),
+			make_fast_zip_iterator(std::make_tuple(ib, gb)),
 			params_init()),
 		    make_row_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ie, ge)),
+			make_fast_zip_iterator(std::make_tuple(ie, ge)),
 			params_init()),
 		    make_row_uniarg_iterator<assignment_iterator>(
 			c.begin(), coeff_init(n, _e)));
@@ -355,7 +353,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     super::convolve(c.begin(), c.end(),
 		    make_row_uniarg_iterator<assignment2_iterator>(
 			colWinSize() - 1, 0,
-			make_fast_zip_iterator(boost::make_tuple(gb, out)),
+			make_fast_zip_iterator(std::make_tuple(gb, out)),
 			coeff_trans(n)));
 }
 
@@ -392,7 +390,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     super::convolve(c.begin(), c.end(),
 		    make_row_uniarg_iterator<assignment2_iterator>(
 			colWinSize() - 1, 0,
-			make_fast_zip_iterator(boost::make_tuple(ib, out)),
+			make_fast_zip_iterator(std::make_tuple(ib, out)),
 			coeff_trans(n)));
 }
 

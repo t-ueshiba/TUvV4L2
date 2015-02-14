@@ -37,7 +37,6 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <boost/tuple/tuple.hpp>
 #include "TU/Geometry++.h"
 
 namespace TU
@@ -564,7 +563,7 @@ Mesh<V, F, M>::restoreSTL(std::istream& in)
 	    viterator	v = newVertex(vertex);
 
 	    bool	isNew;
-	    boost::tie(vf[e], isNew)
+	    std::tie(vf[e], isNew)
 		= verticesWithFaces.insert(make_pair(v, Faces()));
 	    if (!isNew)
 		deleteVertex(v);

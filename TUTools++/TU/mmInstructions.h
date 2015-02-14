@@ -1745,32 +1745,31 @@ cvt(vec<S> x)
 */
 template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
 
-template <class S, size_t I=0, class HEAD, class TAIL> static inline auto
-cvt(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::transform(
-		    x, cvt<S, I, typename std::decay<HEAD>::type::element_type>))
+namespace detail
 {
-    return boost::tuples::transform(
-	x, cvt<S, I, typename std::decay<HEAD>::type::element_type>);
+  template <class S, size_t I>
+  struct generic_cvt
+  {
+      vec<S>	operator ()(vec<S> x)		  const	{ return x; }
+      template <class T_>
+      vec<S>	operator ()(vec<T_> x)		  const	{ return cvt<S, I>(x); }
+      template <class T_>
+      vec<S>	operator ()(vec<T_> x, vec<T_> y) const	{ return cvt<S>(x, y); }
+  };
 }
     
-template <class S, class HEAD, class TAIL>
-static inline typename std::enable_if<
-    std::is_same<typename std::decay<HEAD>::type, S>::value,
-    const boost::tuples::cons<HEAD, TAIL>&>::type
-cvt(const boost::tuples::cons<HEAD, TAIL>& x)
+template <class S, size_t I=0, class ...T> static inline auto
+cvt(const std::tuple<T...>& x)
+    -> decltype(std::detail::transform(x, detail::generic_cvt<S, I>()))
 {
-    return x;
+    return std::detail::transform(x, detail::generic_cvt<S, I>());
 }
     
-template <class S, class HEAD, class TAIL> static inline auto
-cvt(const boost::tuples::cons<HEAD, TAIL>& x,
-    const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::transform(
-		    x, y, cvt<S, typename std::decay<HEAD>::type::element_type>))
+template <class S, class ...T, class ...U> static inline auto
+cvt(const std::tuple<T...>& x, const std::tuple<U...>& y)
+    -> decltype(std::detail::transform(x, y, detail::generic_cvt<S, 0>()))
 {
-    return boost::tuples::transform(
-	x, y, cvt<S, typename std::decay<HEAD>::type::element_type>);
+    return std::detail::transform(x, y, detail::generic_cvt<S, 0>());
 }
 
 // [1] 整数ベクトル間の変換
@@ -2146,25 +2145,40 @@ cvt_mask(vec<S> x)
 */
 template <class S, class T> static vec<S>	cvt_mask(vec<T> x, vec<T> y);
 
-template <class S, size_t I=0, class HEAD, class TAIL> static inline auto
-cvt_mask(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::transform(
-		    x, cvt_mask<S, I, typename std::decay<HEAD>
-						  ::type::element_type>))
+namespace detail
 {
-    return boost::tuples::transform(
-	x, cvt_mask<S, I, typename std::decay<HEAD>::type::element_type>);
+  template <class S, size_t I>
+  struct generic_cvt_mask
+  {
+      vec<S>	operator ()(vec<S> x) const
+		{
+		    return x;
+		}
+      template <class T_>
+      vec<S>	operator ()(vec<T_> x) const
+		{
+		    return cvt_mask<S, I>(x);
+		}
+      template <class T_>
+      vec<S>	operator ()(vec<T_> x, vec<T_> y) const
+		{
+		    return cvt_mask<S>(x, y);
+		}
+  };
 }
     
-template <class S, class HEAD, class TAIL> static inline auto
-cvt_mask(const boost::tuples::cons<HEAD, TAIL>& x,
-	 const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::transform(
-		    x, y, cvt_mask<S, typename std::decay<HEAD>
-						  ::type::element_type>))
+template <class S, size_t I=0, class ...T> static inline auto
+cvt_mask(const std::tuple<T...>& x)
+    -> decltype(std::detail::transform(x, detail::generic_cvt_mask<S, I>()))
 {
-    return boost::tuples::transform(
-	x, y, cvt_mask<S, typename std::decay<HEAD>::type::element_type>);
+    return std::detail::transform(x, detail::generic_cvt_mask<S, I>());
+}
+    
+template <class S, class ...T, class ...U> static inline auto
+cvt_mask(const std::tuple<T...>& x, const std::tuple<U...>& y)
+    -> decltype(std::detail::transform(x, y, detail::generic_cvt_mask<S, 0>()))
+{
+    return std::detail::transform(x, y, detail::generic_cvt_mask<S, 0>());
 }
 
 // [1] 整数ベクトル間のマスク変換
@@ -3190,12 +3204,12 @@ namespace detail
     
 template <class ITER_TUPLE, bool ALIGNED>
 class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
-    : public fast_zip_iterator<decltype(boost::tuples::transform(
+    : public fast_zip_iterator<decltype(std::detail::transform(
 					    std::declval<ITER_TUPLE>(),
 					    detail::loader<ALIGNED>()))>
 {
   private:
-    typedef fast_zip_iterator<decltype(boost::tuples::transform(
+    typedef fast_zip_iterator<decltype(std::detail::transform(
 					   std::declval<ITER_TUPLE>(),
 					   detail::loader<ALIGNED>()))>	super;
 
@@ -3213,14 +3227,14 @@ class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     
   public:
     load_iterator(const fast_zip_iterator<ITER_TUPLE>& iter)
-	:super(boost::tuples::transform(iter.get_iterator_tuple(),
+	:super(std::detail::transform(iter.get_iterator_tuple(),
 					detail::loader<ALIGNED>()))	{}
     load_iterator(const super& iter)	:super(iter)			{}
 
     base_type	base() const
 		{
-		    return boost::tuples::transform(super::get_iterator_tuple(),
-						    base_iterator());
+		    return std::detail::transform(super::get_iterator_tuple(),
+						  base_iterator());
 		}
 };
 
@@ -3378,14 +3392,14 @@ namespace detail
 
 template <class ITER_TUPLE, bool ALIGNED>
 class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
-    : public fast_zip_iterator<decltype(boost::tuples::transform(
+    : public fast_zip_iterator<decltype(std::detail::transform(
 					    std::declval<ITER_TUPLE>(),
 					    detail::storer<ALIGNED>()))>
 {
   private:
-    typedef fast_zip_iterator<decltype(boost::tuples::transform(
-					    std::declval<ITER_TUPLE>(),
-					    detail::storer<ALIGNED>()))> super;
+    typedef fast_zip_iterator<decltype(std::detail::transform(
+					   std::declval<ITER_TUPLE>(),
+					   detail::storer<ALIGNED>()))> super;
 
     struct base_iterator
     {
@@ -3407,26 +3421,26 @@ class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
 
   public:
     typedef ITER_TUPLE						base_type;
-    typedef decltype(boost::tuples::transform(
+    typedef decltype(std::detail::transform(
 			 std::declval<super>().get_iterator_tuple(),
 			 load()))				value_type;
     
   public:
     store_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
-	:super(boost::tuples::transform(iter.get_iterator_tuple(),
+	:super(std::detail::transform(iter.get_iterator_tuple(),
 					detail::storer<ALIGNED>()))	{}
     store_iterator(super const& iter)	:super(iter)			{}
 
     base_type	base() const
 		{
-		    return boost::tuples::transform(super::get_iterator_tuple(),
-						    base_iterator());
+		    return std::detail::transform(super::get_iterator_tuple(),
+						  base_iterator());
 		}
     
     value_type	operator ()() const
 		{
-		    return boost::tuples::transform(super::get_iterator_tuple(),
-						    load());
+		    return std::detail::transform(super::get_iterator_tuple(),
+						  load());
 		}
 };
 
@@ -4107,11 +4121,9 @@ struct htuple2vec
 {
     typedef vec<T>	result_type;
 
-    template <class HEAD, class TAIL>
-    typename std::enable_if<
-	(1 + boost::tuples::length<TAIL>::value) == vec<T>::size,
-	result_type>::type
-		operator ()(const boost::tuples::cons<HEAD, TAIL>& t) const
+    template <class ...T_>
+    typename std::enable_if<sizeof...(T_) == vec<T>::size, result_type>::type
+		operator ()(const std::tuple<T_...>& t) const
 		{
 		    return exec(t,
 				std::integral_constant<size_t, vec<T>::size>());
@@ -4121,58 +4133,58 @@ struct htuple2vec
     template <class TUPLE>
     result_type	exec(const TUPLE& t, std::integral_constant<size_t, 1>) const
 		{
-		    return result_type(boost::get<0>(t));
+		    return result_type(std::get<0>(t));
 		}
     template <class TUPLE>
     result_type	exec(const TUPLE& t, std::integral_constant<size_t, 2>) const
 		{
-		    return result_type(boost::get<1>(t), boost::get<0>(t));
+		    return result_type(std::get<1>(t), std::get<0>(t));
 		}
     template <class TUPLE>
     result_type	exec(const TUPLE& t, std::integral_constant<size_t, 4>) const
 		{
-		    return result_type(boost::get<3>(t), boost::get<2>(t),
-				       boost::get<1>(t), boost::get<0>(t));
+		    return result_type(std::get<3>(t), std::get<2>(t),
+				       std::get<1>(t), std::get<0>(t));
 		}
     template <class TUPLE>
     result_type	exec(const TUPLE& t, std::integral_constant<size_t, 8>) const
 		{
-		    return result_type(boost::get<7>(t), boost::get<6>(t),
-				       boost::get<5>(t), boost::get<4>(t),
-				       boost::get<3>(t), boost::get<2>(t),
-				       boost::get<1>(t), boost::get<0>(t));
+		    return result_type(std::get<7>(t), std::get<6>(t),
+				       std::get<5>(t), std::get<4>(t),
+				       std::get<3>(t), std::get<2>(t),
+				       std::get<1>(t), std::get<0>(t));
 		}
     template <class TUPLE>
     result_type	exec(const TUPLE& t, std::integral_constant<size_t, 16>) const
 		{
-		    return result_type(boost::get<15>(t), boost::get<14>(t),
-				       boost::get<13>(t), boost::get<12>(t),
-				       boost::get<11>(t), boost::get<10>(t),
-				       boost::get< 9>(t), boost::get< 8>(t),
-				       boost::get< 7>(t), boost::get< 6>(t),
-				       boost::get< 5>(t), boost::get< 4>(t),
-				       boost::get< 3>(t), boost::get< 2>(t),
-				       boost::get< 1>(t), boost::get< 0>(t));
+		    return result_type(std::get<15>(t), std::get<14>(t),
+				       std::get<13>(t), std::get<12>(t),
+				       std::get<11>(t), std::get<10>(t),
+				       std::get< 9>(t), std::get< 8>(t),
+				       std::get< 7>(t), std::get< 6>(t),
+				       std::get< 5>(t), std::get< 4>(t),
+				       std::get< 3>(t), std::get< 2>(t),
+				       std::get< 1>(t), std::get< 0>(t));
 		}
     template <class TUPLE>
     result_type	exec(const TUPLE& t, std::integral_constant<size_t, 32>) const
 		{
-		    return result_type(boost::get<31>(t), boost::get<30>(t),
-				       boost::get<29>(t), boost::get<28>(t),
-				       boost::get<27>(t), boost::get<26>(t),
-				       boost::get<25>(t), boost::get<24>(t),
-				       boost::get<23>(t), boost::get<22>(t),
-				       boost::get<21>(t), boost::get<20>(t),
-				       boost::get<19>(t), boost::get<18>(t),
-				       boost::get<17>(t), boost::get<16>(t),
-				       boost::get<15>(t), boost::get<14>(t),
-				       boost::get<13>(t), boost::get<12>(t),
-				       boost::get<11>(t), boost::get<10>(t),
-				       boost::get< 9>(t), boost::get< 8>(t),
-				       boost::get< 7>(t), boost::get< 6>(t),
-				       boost::get< 5>(t), boost::get< 4>(t),
-				       boost::get< 3>(t), boost::get< 2>(t),
-				       boost::get< 1>(t), boost::get< 0>(t));
+		    return result_type(std::get<31>(t), std::get<30>(t),
+				       std::get<29>(t), std::get<28>(t),
+				       std::get<27>(t), std::get<26>(t),
+				       std::get<25>(t), std::get<24>(t),
+				       std::get<23>(t), std::get<22>(t),
+				       std::get<21>(t), std::get<20>(t),
+				       std::get<19>(t), std::get<18>(t),
+				       std::get<17>(t), std::get<16>(t),
+				       std::get<15>(t), std::get<14>(t),
+				       std::get<13>(t), std::get<12>(t),
+				       std::get<11>(t), std::get<10>(t),
+				       std::get< 9>(t), std::get< 8>(t),
+				       std::get< 7>(t), std::get< 6>(t),
+				       std::get< 5>(t), std::get< 4>(t),
+				       std::get< 3>(t), std::get< 2>(t),
+				       std::get< 1>(t), std::get< 0>(t));
 		}
 };
 
@@ -4186,14 +4198,14 @@ class row_vec_iterator
 		 row_iterator<boost::transform_iterator<
 				  htuple2vec<T>,
 				  subiterator<fast_zip_iterator<
-						  boost::htuple<
+						  std::htuple<
 						      ROW, vec<T>::size> > > >,
 			      fast_zip_iterator<
-				  boost::htuple<ROW, vec<T>::size> >,
+				  std::htuple<ROW, vec<T>::size> >,
 			      htuple2vec<T> > >
 {
   private:
-    typedef fast_zip_iterator<boost::htuple<ROW, vec<T>::size> >
+    typedef fast_zip_iterator<std::htuple<ROW, vec<T>::size> >
 							row_zip_iterator;
     typedef boost::iterator_adaptor<
 		row_vec_iterator,
@@ -4213,7 +4225,7 @@ class row_vec_iterator
     row_vec_iterator(const ROW& row)
 	:super(make_row_transform_iterator(
 		   make_fast_zip_iterator(
-		       boost::make_contiguous_htuple<vec<T>::size>(row)),
+		       std::make_contiguous_htuple<vec<T>::size>(row)),
 		   htuple2vec<T>()))					{}
 
     void		advance(difference_type n)

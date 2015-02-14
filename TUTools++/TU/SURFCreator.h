@@ -33,7 +33,6 @@
 #include "TU/Feature.h"
 #include "TU/IntegralImage.h"
 #include "TU/Heap.h"
-#include <boost/iterator/iterator_adaptor.hpp>
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>
