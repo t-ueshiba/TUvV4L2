@@ -35,7 +35,7 @@
 #define	__TU_FIRFILTER_H
 
 #include <algorithm>
-#include <boost/array.hpp>
+#include <array>
 #include "TU/SeparableFilter2.h"
 
 namespace TU
@@ -147,7 +147,7 @@ class FIRFilter
 {
   public:
     typedef T				coeff_type;
-    typedef boost::array<T, D>		coeffs_type;
+    typedef std::array<T, D>		coeffs_type;
 
     FIRFilter&		initialize(const T c[D])			;
     void		limits(T& limit0, T& limit1, T& limit2)	const	;

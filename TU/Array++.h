@@ -475,25 +475,26 @@ class Array : public B
     
     template <class T_>
     static auto	check_fill(T_* p)
-		-> decltype(p->fill(std::declval<const element_type&>()),
-			    std::true_type())				;
+	-> decltype(p->fill(std::declval<const element_type&>()),
+		    std::true_type())					;
     template <class T_>
     static auto	check_fill(...) -> std::false_type			;
 
     template <class T_>
     static auto	check_assign(T_* p)
-		-> decltype(*p = std::declval<const element_type&>(),
-			    std::true_type())				;
+	-> decltype(*p = std::declval<const element_type&>(),
+		    std::true_type())					;
     template <class T_>
     static auto	check_assign(...) -> std::false_type			;
 
     template <class T_>
-    using assignment_prop = std::conditional<
-				decltype(check_fill<T_>(nullptr))::value,
-				fillable,
-				typename std::conditional<
-				    decltype(check_assign<T_>(nullptr))::value,
-					assignable, unassignable>::type>;
+    using assignment_prop
+	= std::conditional<
+	      decltype(Array::check_fill<T_>(nullptr))::value,
+	      fillable,
+	      typename std::conditional<
+		  decltype(Array::check_assign<T_>(nullptr))::value,
+		  assignable, unassignable>::type>;
 
   public:
   //! 配列を生成する．

@@ -35,7 +35,7 @@
 #define	__TU_IIRFILTER_H
 
 #include <algorithm>
-#include <boost/array.hpp>
+#include <array>
 #include "TU/SeparableFilter2.h"
 
 namespace TU
@@ -310,7 +310,7 @@ template <size_t D, class T=float> class IIRFilter
 {
   public:
     typedef T				coeff_type;
-    typedef boost::array<T, D>		coeffs_type;
+    typedef std::array<T, D>		coeffs_type;
     
     IIRFilter&	initialize(const T c[D+D])				;
     void	limitsF(T& limit0F, T& limit1F, T& limit2F)	const	;

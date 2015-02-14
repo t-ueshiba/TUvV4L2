@@ -81,22 +81,19 @@ class Diff<RGBA>
 };
 
 template <class T>
-class Diff<boost::tuples::cons<
-	       T, boost::tuples::cons<T, boost::tuples::null_type> > >
+class Diff<std::tuple<T, T> >
 {
   public:
     typedef T						first_argument_type;
-    typedef boost::tuple<const T&, const T&>		second_argument_type;
+    typedef std::tuple<const T&, const T&>		second_argument_type;
     typedef typename Diff<T>::result_type		result_type;
 
   public:
     Diff(T thresh)	:_diff(thresh)			{}
 
-    result_type	operator ()(T x, boost::tuple<const T&, const T&> y) const
+    result_type	operator ()(T x, std::tuple<const T&, const T&> y) const
 		{
-		    using namespace	boost;
-		    
-		    return _diff(x, get<0>(y)) + _diff(x, get<1>(y));
+		    return _diff(x, std::get<0>(y)) + _diff(x, std::get<1>(y));
 		}
 
   private:
@@ -159,12 +156,12 @@ namespace detail
     };
     
     template <class COL, class COLV>
-    class rvcolumn_proxy<fast_zip_iterator<boost::tuple<COL, COLV> > >
+    class rvcolumn_proxy<fast_zip_iterator<std::tuple<COL, COLV> > >
     {
       public:
-  	typedef fast_zip_iterator<boost::tuple<COL, COLV> >	base_iterator;
+  	typedef fast_zip_iterator<std::tuple<COL, COLV> >	base_iterator;
   	typedef fast_zip_iterator<
-  	    boost::tuple<
+  	    std::tuple<
   		COL,
 		typename std::iterator_traits<COLV>::pointer> >	iterator;
 
@@ -174,14 +171,13 @@ namespace detail
 
 	iterator	begin() const
 			{
-			    using namespace	boost;
-			    
-			    return make_tuple(get<0>(_rv),
-					      get<1>(_rv).operator ->());
+			    return std::make_tuple(
+				       std::get<0>(_rv),
+				       std::get<1>(_rv).operator ->());
 			}
 	
       private:
-	const boost::tuple<COL, COLV>	_rv;
+	const std::tuple<COL, COLV>	_rv;
     };
 }
 
@@ -289,7 +285,7 @@ class mask_iterator
     template <class VEC_>
     void	setRMost(element_type val, VEC_& x)
 		{
-		    x = boost::make_tuple(val, val);
+		    x = std::make_tuple(val, val);
 		}
     
     void	update(element_type R, bool& mask)
@@ -312,7 +308,7 @@ class mask_iterator
     template <class VEC_>
     void	update(element_type R, VEC_& mask)
 		{
-		    using namespace	boost;
+		    using namespace	std;
 
 		    element_type	RminR = get<0>(*_RminRV),
 					RminV = get<1>(*_RminRV);
@@ -391,10 +387,9 @@ namespace mm
     template <class TUPLE, class T> inline TUPLE
     select(const TUPLE& mask, vec<T> index, const TUPLE& dmin)
     {
-	using namespace	boost;
-      
-	return make_tuple(select(get<0>(mask), index, get<0>(dmin)),
-			  select(get<1>(mask), index, get<1>(dmin)));
+	return std::make_tuple(
+		   select(std::get<0>(mask), index, std::get<0>(dmin)),
+		   select(std::get<1>(mask), index, std::get<1>(dmin)));
     }
 
 #  if !defined(SSE2)
@@ -579,7 +574,7 @@ namespace mm
 	void	setRMost(element_type val, VEC_& x)
 		{
 		    vec<element_type>	next = set_rmost<element_type>(val);
-		    x = boost::make_tuple(next, next);
+		    x = std::make_tuple(next, next);
 		}
 
     // mask と mask tuple に対するupdate
@@ -596,7 +591,7 @@ namespace mm
 	template <class VEC_>
 	void	update(vec<element_type> R, VEC_& x)
 		{
-		    using namespace	boost;
+		    using namespace	std;
 
 		    vec<element_type>
 			RminR = get<0>(_RminRV.get_iterator_tuple())(),
@@ -704,10 +699,8 @@ select(bool mask, Idx<T> index, T dmin)
 template <class MASK, class T, class DMIN> inline DMIN
 select(const MASK& mask, Idx<T> index, const DMIN& dmin)
 {
-    using namespace	boost;
-
-    return make_tuple(select(get<0>(mask), index, get<0>(dmin)),
-		      select(get<1>(mask), index, get<1>(dmin)));
+    return std::make_tuple(select(std::get<0>(mask), index, std::get<0>(dmin)),
+			   select(std::get<1>(mask), index, std::get<1>(dmin)));
 }
 #endif
 

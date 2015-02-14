@@ -302,8 +302,8 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    rowL->cbegin(), rowL->cend(),
 	    make_rvcolumn_iterator(
 		make_fast_zip_iterator(
-		    boost::make_tuple(rowR->cbegin(),
-				      make_vertical_iterator(rowV, cV)))),
+		    std::make_tuple(rowR->cbegin(),
+				    make_vertical_iterator(rowV, cV)))),
 	    rowP->begin());
 	++rowP;
 #else
@@ -312,22 +312,22 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 		rowL->cbegin(), rowL->cend(),
 		make_rvcolumn_iterator(
 		    make_fast_zip_iterator(
-			boost::make_tuple(rowR->cbegin(),
-					  make_vertical_iterator(rowV, cV)))),
+			std::make_tuple(rowR->cbegin(),
+					make_vertical_iterator(rowV, cV)))),
 		buffers->Q.begin());
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
 				  make_rvcolumn_iterator(
 				      make_fast_zip_iterator(
-					  boost::make_tuple(
+					  std::make_tuple(
 					      rowR->cbegin(),
 					      make_vertical_iterator(rowV,
 								     cV)))),
 				  rowLp->cbegin(),
 				  make_rvcolumn_iterator(
 				      make_fast_zip_iterator(
-					  boost::make_tuple(
+					  std::make_tuple(
 					      rowRp->cbegin(),
 					      make_vertical_iterator(rowV,
 								     --cVp)))),
@@ -354,13 +354,13 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 			       buffers->delta.rbegin(),
 			       make_rvcolumn_iterator(
 				   make_fast_zip_iterator(
-				       boost::make_tuple(
+				       std::make_tuple(
 					   buffers->dminR.end() - D + 1,
 					   make_vertical_iterator(
 					       buffers->dminV.end(), v)))),
 			       make_row_iterator(
 				   make_fast_zip_iterator(
-				       boost::make_tuple(
+				       std::make_tuple(
 					   make_dummy_iterator(
 					       &(buffers->RminR)),
 					   buffers->RminV.rbegin()))));
@@ -452,8 +452,8 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	auto	Pp = boost::make_transform_iterator(
 			 in_iterator(colRVp->begin()),
 			 std::bind(diff_type(_params.intensityDiffMax),
-				   *colLp, _1)),
-		Pn = boost::make_transform_iterator(
+				   *colLp, _1));
+	auto	Pn = boost::make_transform_iterator(
 			 in_iterator(colRV->begin()),
 			 std::bind(diff_type(_params.intensityDiffMax),
 				   *colL, _1));
