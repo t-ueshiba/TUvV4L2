@@ -68,8 +68,8 @@ class iir_filter_iterator
     typedef FixedSizedArray<T, D>			buf_type;
     typedef typename buf_type::const_iterator		buf_iterator;
 
-    template <size_t DD, bool FF>
-    struct selector				{enum {dim = DD, fwd = FF};};
+    template <size_t D_, bool FWD_>
+    struct selector				{enum {dim = D_, fwd = FWD_};};
     
   public:
     typedef typename super::value_type	value_type;
@@ -126,8 +126,8 @@ class iir_filter_iterator
 				 + *(c+2) * *(b+1) + *(c+3) * *(b+2);
 			}
 
-    template <size_t DD>
-    value_type	update(selector<DD, true>) const
+    template <size_t D_>
+    value_type	update(selector<D_, true>) const
 		{
 		    const auto	i = _i;
 		    if (++_i == D)
@@ -137,8 +137,8 @@ class iir_filter_iterator
 				     + inpro(_ci, _ibuf.cbegin(), _i));
 		}
     
-    template <size_t DD>
-    value_type	update(selector<DD, false>) const
+    template <size_t D_>
+    value_type	update(selector<D_, false>) const
 		{
 		    const auto	val = inpro(_co, _obuf.cbegin(), _i)
 				    + inpro(_ci, _ibuf.cbegin(), _i);

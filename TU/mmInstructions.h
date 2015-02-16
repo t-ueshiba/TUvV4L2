@@ -3325,7 +3325,8 @@ class store_iterator
 		store_iterator<ITER, ALIGNED>,
 		ITER,
 		typename detail::store_proxy<ITER, ALIGNED>::value_type,
-		boost::use_default,
+  // boost::use_default とすると libc++ で std::fill() に適用できない
+		typename std::iterator_traits<ITER>::iterator_category,
 		detail::store_proxy<ITER, ALIGNED> >
 {
   private:
@@ -3333,7 +3334,7 @@ class store_iterator
 		store_iterator,
 		ITER,
 		typename detail::store_proxy<ITER, ALIGNED>::value_type,
-		boost::use_default,
+		typename std::iterator_traits<ITER>::iterator_category,
 		detail::store_proxy<ITER, ALIGNED> >		super;
 
   public:

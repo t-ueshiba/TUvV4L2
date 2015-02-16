@@ -12,14 +12,14 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DPROFILE #-DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3 -xAVX
   NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DAVX
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -39,27 +39,28 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/BoxFilter.h \
-		/usr/local/include/TU/Camera++.h \
-		/usr/local/include/TU/GFStereo.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Profiler.h \
-		/usr/local/include/TU/Rectify.h \
-		/usr/local/include/TU/SADStereo.h \
-		/usr/local/include/TU/SeparableFilter2.h \
-		/usr/local/include/TU/StereoBase.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/Warp.h \
-		/usr/local/include/TU/algorithm.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/io.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+EXTHDRS		= ../../TU/Array++.h \
+		../../TU/BoxFilter.h \
+		../../TU/Camera++.h \
+		../../TU/GFStereo.h \
+		../../TU/Geometry++.h \
+		../../TU/Image++.h \
+		../../TU/Minimize.h \
+		../../TU/Profiler.h \
+		../../TU/Rectify.h \
+		../../TU/SADStereo.h \
+		../../TU/SeparableFilter2.h \
+		../../TU/StereoBase.h \
+		../../TU/Vector++.h \
+		../../TU/Warp.h \
+		../../TU/algorithm.h \
+		../../TU/functional.h \
+		../../TU/io.h \
+		../../TU/iterator.h \
+		../../TU/mmInstructions.h \
+		../../TU/tuple.h \
+		../../TU/types.h \
+		../../windows/fakeWindows.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -70,16 +71,11 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/io.h /usr/local/include/TU/Rectify.h \
-	/usr/local/include/TU/Warp.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h \
-	/usr/local/include/TU/SADStereo.h /usr/local/include/TU/StereoBase.h \
-	/usr/local/include/TU/algorithm.h /usr/local/include/TU/Profiler.h \
-	/usr/local/include/TU/BoxFilter.h \
-	/usr/local/include/TU/SeparableFilter2.h \
-	/usr/local/include/TU/GFStereo.h
+main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
+	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
+	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
+	../../TU/tuple.h ../../TU/functional.h ../../TU/mmInstructions.h \
+	../../TU/Minimize.h ../../TU/Camera++.h ../../TU/SADStereo.h \
+	../../TU/StereoBase.h ../../TU/algorithm.h ../../TU/Profiler.h \
+	../../windows/fakeWindows.h ../../TU/BoxFilter.h \
+	../../TU/SeparableFilter2.h ../../TU/GFStereo.h
