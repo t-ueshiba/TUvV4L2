@@ -7,6 +7,7 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
+#include <boost/bind.hpp>
 
 namespace TU
 {
@@ -414,12 +415,12 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 
     for (; colL != colLe; ++colL)
     {
-	using namespace	std::placeholders;
-	
+      //using namespace	std::placeholders;
+
 	auto	P = boost::make_transform_iterator(
 			in_iterator(colRV->begin()),
-			std::bind(diff_type(_params.intensityDiffMax),
-				  *colL, _1));
+			boost::bind(diff_type(_params.intensityDiffMax),
+				    *colL, _1));
 	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
 	    exec_assignment<ASSIGN>(*P, *Q);
 	
@@ -447,16 +448,16 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 
     for (; colL != colLe; ++colL)
     {
-	using namespace	std::placeholders;
+      //using namespace	std::placeholders;
 
 	auto	Pp = boost::make_transform_iterator(
 			 in_iterator(colRVp->begin()),
-			 std::bind(diff_type(_params.intensityDiffMax),
-				   *colLp, _1));
+			 boost::bind(diff_type(_params.intensityDiffMax),
+				     *colLp, _1));
 	auto	Pn = boost::make_transform_iterator(
 			 in_iterator(colRV->begin()),
-			 std::bind(diff_type(_params.intensityDiffMax),
-				   *colL, _1));
+			 boost::bind(diff_type(_params.intensityDiffMax),
+				     *colL, _1));
 	for (qiterator Q(colQ->begin()), Qe(colQ->end());
 	     Q != Qe; ++Q, ++Pp, ++Pn)
 	    *Q += (*Pn - *Pp);

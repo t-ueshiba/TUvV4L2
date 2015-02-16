@@ -43,7 +43,6 @@ class Diff
 {
   public:
     typedef T						first_argument_type;
-    typedef T						second_argument_type;
     typedef typename std::conditional<
 	std::is_integral<T>::value,
 	typename std::make_signed<T>::type, T>::type	result_type;
@@ -85,13 +84,13 @@ class Diff<std::tuple<T, T> >
 {
   public:
     typedef T						first_argument_type;
-    typedef std::tuple<const T&, const T&>		second_argument_type;
+    typedef std::tuple<T, T>				second_argument_type;
     typedef typename Diff<T>::result_type		result_type;
 
   public:
     Diff(T thresh)	:_diff(thresh)			{}
 
-    result_type	operator ()(T x, std::tuple<const T&, const T&> y) const
+    result_type	operator ()(T x, const std::tuple<T, T>& y) const
 		{
 		    return _diff(x, std::get<0>(y)) + _diff(x, std::get<1>(y));
 		}
@@ -106,7 +105,6 @@ class Diff<mm::vec<T> >
 {
   public:
     typedef mm::vec<T>					first_argument_type;
-    typedef mm::vec<T>					second_argument_type;
     typedef typename std::make_signed<T>::type		signed_type;
     typedef mm::vec<signed_type>			result_type;
 

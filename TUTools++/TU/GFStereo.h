@@ -7,7 +7,7 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
-#include <typeinfo>
+#include <boost/bind.hpp>
 
 namespace TU
 {
@@ -784,13 +784,13 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 
     for (; colL != colLe; ++colL)
     {
-	using namespace	std::placeholders;
+      //using namespace	std::placeholders;
 	
 	const Score	pixL = *colL;
 	auto		P = boost::make_transform_iterator(
 				in_iterator(colRV->begin()),
-				std::bind(diff_type(_params.intensityDiffMax),
-					  pixL, _1));
+				boost::bind(diff_type(_params.intensityDiffMax),
+					    pixL, _1));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamInit(pixL))),
 		       Qe(make_assignment_iterator(colQ->end2(),
@@ -828,19 +828,19 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
     
     for (; colL != colLe; ++colL)
     {
-	using namespace	std::placeholders;
+      //using namespace	std::placeholders;
 	
 	const Score	pixLp = *colLp, pixL = *colL;
 	auto		P = make_fast_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
 					in_iterator(colRV->begin()),
-					std::bind(
+					boost::bind(
 					    diff_type(_params.intensityDiffMax),
 					    pixL, _1)),
 				    boost::make_transform_iterator(
 					in_iterator(colRVp->begin()),
-					std::bind(
+					boost::bind(
 					    diff_type(_params.intensityDiffMax),
 					    pixLp, _1))));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
