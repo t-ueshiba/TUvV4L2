@@ -303,8 +303,8 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    rowL->cbegin(), rowL->cend(),
 	    make_rvcolumn_iterator(
 		make_fast_zip_iterator(
-		    boost::make_tuple(rowR->cbegin(),
-				      make_vertical_iterator(rowV, cV)))),
+		    std::make_tuple(rowR->cbegin(),
+				    make_vertical_iterator(rowV, cV)))),
 	    rowP->begin());
 	++rowP;
 #else
@@ -313,22 +313,22 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 		rowL->cbegin(), rowL->cend(),
 		make_rvcolumn_iterator(
 		    make_fast_zip_iterator(
-			boost::make_tuple(rowR->cbegin(),
-					  make_vertical_iterator(rowV, cV)))),
+			std::make_tuple(rowR->cbegin(),
+					make_vertical_iterator(rowV, cV)))),
 		buffers->Q.begin());
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
 				  make_rvcolumn_iterator(
 				      make_fast_zip_iterator(
-					  boost::make_tuple(
+					  std::make_tuple(
 					      rowR->cbegin(),
 					      make_vertical_iterator(rowV,
 								     cV)))),
 				  rowLp->cbegin(),
 				  make_rvcolumn_iterator(
 				      make_fast_zip_iterator(
-					  boost::make_tuple(
+					  std::make_tuple(
 					      rowRp->cbegin(),
 					      make_vertical_iterator(rowV,
 								     --cVp)))),
@@ -355,13 +355,13 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 			       buffers->delta.rbegin(),
 			       make_rvcolumn_iterator(
 				   make_fast_zip_iterator(
-				       boost::make_tuple(
+				       std::make_tuple(
 					   buffers->dminR.end() - D + 1,
 					   make_vertical_iterator(
 					       buffers->dminV.end(), v)))),
 			       make_row_iterator(
 				   make_fast_zip_iterator(
-				       boost::make_tuple(
+				       std::make_tuple(
 					   make_dummy_iterator(
 					       &(buffers->RminR)),
 					   buffers->RminV.rbegin()))));
@@ -411,7 +411,7 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
     typedef typename iterator_value<COL_RV>::iterator		in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
-    typedef Diff<iterator_value<in_iterator> >			diff_type;
+    typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
 
     for (; colL != colLe; ++colL)
     {
@@ -444,7 +444,7 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
     typedef typename iterator_value<COL_RV>::iterator		in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
-    typedef Diff<iterator_value<in_iterator> >			diff_type;
+    typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
 
     for (; colL != colLe; ++colL)
     {

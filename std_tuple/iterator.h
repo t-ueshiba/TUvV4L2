@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: iterator.h 1785 2015-02-14 05:43:15Z ueshiba $
  */
 /*!
   \file		iterator.h
@@ -35,7 +35,6 @@
 #define __TU_ITERATOR_H
 
 #include <boost/iterator/transform_iterator.hpp>
-#include <boost/iterator/zip_iterator.hpp>
 #include "TU/tuple.h"
 
 namespace TU
@@ -102,41 +101,131 @@ make_second_iterator(const ITER& iter)
 /************************************************************************
 *  class fast_zip_iterator<ITER_TUPLE>					*
 ************************************************************************/
-//! iterator tupleの最初の成分のみを同一性判定に使うことにより boost::zip_iterator<ITER_TUPLE> を高速化した反復子
+namespace detail
+{
+  struct generic_dereference
+  {
+      template <class ITER> 
+      typename std::enable_if<
+	  !std::is_reference<
+	      typename std::iterator_traits<ITER>::reference>::value,
+	  typename std::iterator_traits<ITER>::reference>::type
+      operator ()(const ITER& iter) const
+      {
+	  return *iter;
+      }
+      template <class ITER> auto
+      operator ()(const ITER& iter) const
+	  -> typename std::enable_if<
+	      std::is_reference<
+		  typename std::iterator_traits<ITER>::reference>::value,
+	      decltype(std::ref(*iter))>::type
+      {
+	  return std::ref(*iter);
+      }
+  };
+}
+    
 template <class ITER_TUPLE>
 class fast_zip_iterator
-    : public boost::iterator_adaptor<fast_zip_iterator<ITER_TUPLE>,
-				     boost::zip_iterator<ITER_TUPLE> >
+    : public boost::iterator_facade<
+	  fast_zip_iterator<ITER_TUPLE>,
+	  decltype(std::detail::transform(std::declval<ITER_TUPLE>(),
+					  detail::generic_dereference())),
+	  typename std::iterator_traits<
+	      typename std::tuple_element<0, ITER_TUPLE>::type>
+	      ::iterator_category,
+	  decltype(std::detail::transform(std::declval<ITER_TUPLE>(),
+					  detail::generic_dereference()))>
 {
   private:
-    typedef boost::iterator_adaptor<fast_zip_iterator<ITER_TUPLE>,
-				    boost::zip_iterator<ITER_TUPLE> >	super;
-
+    typedef boost::iterator_facade<
+	fast_zip_iterator<ITER_TUPLE>,
+        decltype(
+	    std::detail::transform(std::declval<ITER_TUPLE>(),
+				   detail::generic_dereference())),
+        typename std::iterator_traits<
+	    typename std::tuple_element<0, ITER_TUPLE>::type>
+	    ::iterator_category,
+        decltype(
+	    std::detail::transform(std::declval<ITER_TUPLE>(),
+				   detail::generic_dereference()))>	super;
+    
   public:
-    typedef ITER_TUPLE	iterator_tuple;
+    typedef typename super::reference			reference;
+    typedef typename super::difference_type		difference_type;
     
     friend class	boost::iterator_core_access;
 
-  public:
-    fast_zip_iterator(const ITER_TUPLE& t)	:super(t)	{}
+  private:
+    struct Increment
+    {
+	template <class ITER_>
+	void	operator ()(ITER_& iter) const	{ ++iter; }
+    };
 
-    const ITER_TUPLE&	get_iterator_tuple() const
-			{
-			    return super::base().get_iterator_tuple();
-			}
+    struct Decrement
+    {
+	template <class ITER_>
+	void	operator ()(ITER_& iter) const	{ --iter; }
+    };
+
+    struct Advance
+    {
+	Advance(difference_type n)	:_n(n)	{}
+	
+	template <class ITER_>
+	void	operator ()(ITER_& iter) const	{ std::advance(iter, _n); }
+
+      private:
+	const difference_type	_n;
+    };
+    
+  public:
+    fast_zip_iterator(const ITER_TUPLE& iter_tuple)
+	:_iter_tuple(iter_tuple)		{}
+
+    const ITER_TUPLE&
+		get_iterator_tuple()	const	{ return _iter_tuple; }
     
   private:
-    bool		equal(const fast_zip_iterator& iter) const
-			{
-			    return boost::get<0>(get_iterator_tuple()) ==
-				   boost::get<0>(iter.get_iterator_tuple());
-			}
+    reference	dereference() const
+		{
+		    return std::detail::transform(_iter_tuple,
+						  detail::generic_dereference());
+		}
+    bool	equal(const fast_zip_iterator& iter) const
+		{
+		    return std::get<0>(iter.get_iterator_tuple())
+			== std::get<0>(_iter_tuple);
+		}
+    void	increment()
+		{
+		    std::detail::for_each(_iter_tuple, Increment());
+		}
+    void	decrement()
+		{
+		    std::detail::for_each(_iter_tuple, Decrement());
+		}
+    void	advance(difference_type n)
+		{
+		    std::detail::for_each(_iter_tuple, Advance(n));
+		}
+    difference_type
+		distance_to(const fast_zip_iterator& iter) const
+		{
+		    return std::get<0>(iter.get_iterator_tuple())
+			 - std::get<0>(_iter_tuple);
+		}
+
+  private:
+    ITER_TUPLE	_iter_tuple;
 };
 
-template <class ITER_TUPLE> fast_zip_iterator<ITER_TUPLE>
-make_fast_zip_iterator(const ITER_TUPLE& t)
+template <class ITER_TUPLE> inline fast_zip_iterator<ITER_TUPLE>
+make_fast_zip_iterator(const ITER_TUPLE& iter_tuple)
 {
-    return fast_zip_iterator<ITER_TUPLE>(t);
+    return fast_zip_iterator<ITER_TUPLE>(iter_tuple);
 }
 
 }
@@ -144,7 +233,7 @@ make_fast_zip_iterator(const ITER_TUPLE& t)
 namespace std
 {
 /************************************************************************
-*  std::[begin|end](boost::tuple<T...>)					*
+*  std::[begin|end](std::tuple<T...>)					*
 ************************************************************************/
 namespace detail
 {
@@ -167,7 +256,7 @@ namespace detail
       template <class T> auto
       operator ()(const T& x) const -> decltype(std::end(x))
       {
-	  return  std::end(x);
+	  return std::end(x);
       }
       template <class T> auto
       operator ()(T& x) const -> decltype(std::end(x))
@@ -177,21 +266,21 @@ namespace detail
   };
 }
 
-template <class HEAD, class TAIL> inline auto
-begin(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(TU::make_fast_zip_iterator(boost::tuples::transform(
+template <class ...T> inline auto
+begin(const tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(detail::transform(
 					       x, detail::generic_begin())))
 {
-    return TU::make_fast_zip_iterator(boost::tuples::transform(
+    return TU::make_fast_zip_iterator(detail::transform(
 					  x, detail::generic_begin()));
 }
     
-template <class HEAD, class TAIL> inline auto
-end(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(TU::make_fast_zip_iterator(boost::tuples::transform(
+template <class ...T> inline auto
+end(const tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(detail::transform(
 					       x, detail::generic_end())))
 {
-    return TU::make_fast_zip_iterator(boost::tuples::transform(
+    return TU::make_fast_zip_iterator(detail::transform(
 					  x, detail::generic_end()));
 }
     
@@ -207,10 +296,10 @@ size(const T& x)
 {
     return x.size();
 }
-template <class HEAD, class TAIL> inline size_t
-size(const boost::tuples::cons<HEAD, TAIL>& x)
+template <class ...T> inline size_t
+size(const std::tuple<T...>& x)
 {
-    return size(boost::get<0>(x));
+    return size(std::get<0>(x));
 }
       
 /************************************************************************
@@ -245,8 +334,8 @@ namespace detail
   struct iterator_value<fast_zip_iterator<ITER_TUPLE> >
   {
       typedef decltype(
-	  boost::tuples::transform(std::declval<ITER_TUPLE>(),
-				   generic_value()))		type;
+	  std::detail::transform(std::declval<ITER_TUPLE>(),
+				 generic_value()))		type;
   };
 }
     

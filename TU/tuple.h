@@ -29,172 +29,155 @@
  */
 /*!
   \file		tuple.h
-  \brief	std::tupleの用途拡張のためのユティリティ
+  \brief	boost::tupleの用途拡張のためのユティリティ
 */
 #ifndef __TU_TUPLE_H
 #define __TU_TUPLE_H
 
-#include <tuple>
+#include <boost/tuple/tuple.hpp>
 #include <utility>			// std::forward()
-#include <iostream>
 #include "TU/functional.h"
 
-namespace std
+namespace boost
 {
-namespace detail
+namespace tuples
 {
   /**********************************************************************
   *  struct is_tuple<T>							*
   **********************************************************************/
-  template <class ...T>
-  static true_type	tuple_check(tuple<T...>)		;
+  template <class HEAD, class TAIL>
+  static true_type	tuple_check(cons<HEAD, TAIL>)		;
   static false_type	tuple_check(...)			;
     
   template <class T>
-  struct is_tuple : decltype(detail::tuple_check(declval<T>()))	{};
+  struct is_tuple : decltype(tuple_check(declval<T>()))		{};
 
   /**********************************************************************
-  *  typedef TupleIndices<N>						*
+  *  struct index_sequence<size_t ...>					*
   **********************************************************************/
-  template <size_t ...> struct Indices	{};
+  template <size_t ...> struct index_sequence			{};
     
   template <size_t N, size_t I=0, size_t ...IDX>
-  struct MakeIndices : MakeIndices<N, I + 1, IDX..., I>
+  struct make_index_sequence_impl
+      : make_index_sequence_impl<N, I + 1, IDX..., I>
   {
   };
   template <size_t N, size_t ...IDX>
-  struct MakeIndices<N, N, IDX...>
+  struct make_index_sequence_impl<N, N, IDX...>
   {
-      typedef Indices<IDX...>	type;
+      typedef index_sequence<IDX...>	type;
   };
 
   template <size_t N>
-  using TupleIndices = typename MakeIndices<N>::type;
+  using make_index_sequence = typename make_index_sequence_impl<N>::type;
     
   /**********************************************************************
-  *  make_contiguous_htuple(T, Indices<IDX...>)				*
+  *  make_contiguous_htuple(T, index_sequence<IDX...>)			*
   **********************************************************************/
   template <class T, size_t ...IDX> static inline auto
-  make_contiguous_htuple(T&& x, Indices<IDX...>)
-      -> decltype(make_tuple((x + IDX)...))
+  make_contiguous_htuple(T&& x, index_sequence<IDX...>)
+      -> decltype(boost::make_tuple((x + IDX)...))
   {
-      return make_tuple((x + IDX)...);
+      return boost::make_tuple((x + IDX)...);
   }
 
   /**********************************************************************
-  *  for_each(TUPLE, UNARY_FUNC, Indices<IDX...>)			*
+  *  tuples::for_each(cons<HEAD, TAIL>, UNARY_FUNC)			*
   **********************************************************************/
-  template <class TUPLE, class UNARY_FUNC, size_t I, size_t ...IDX> inline void
-  for_each_impl(TUPLE& x, const UNARY_FUNC& f, Indices<I, IDX...>)
+  template <class UNARY_FUNC> inline void
+  for_each(null_type, UNARY_FUNC)
   {
-      f(get<I>(x));
-      for_each_impl(x, f, Indices<IDX...>());
   }
-  template <class TUPLE, class UNARY_FUNC> inline void
-  for_each_impl(TUPLE&, const UNARY_FUNC&, Indices<>)
+  template <class HEAD, class TAIL, class UNARY_FUNC> inline void
+  for_each(cons<HEAD, TAIL>& x, const UNARY_FUNC& f)
   {
+      f(x.get_head());
+      for_each(x.get_tail(), f);
   }
 
-  template <class TUPLE, class UNARY_FUNC,
-	    class=typename enable_if<
-		is_tuple<typename decay<TUPLE>::type>::value>::type>
+  /**********************************************************************
+  *  tuples::for_each(cons<H1, T1>, cons<H2, T2>, BINARY_FUNC)		*
+  **********************************************************************/
+  template <class BINARY_FUNC> inline void
+  for_each(null_type, null_type, BINARY_FUNC)
+  {
+  }
+  template <class H1, class T1, class H2, class T2, class BINARY_FUNC>
   inline void
-  for_each(TUPLE&& x, const UNARY_FUNC& f)
+  for_each(const cons<H1, T1>& x, cons<H2, T2>& y, const BINARY_FUNC& f)
   {
-      for_each_impl(x, f,
-		    TupleIndices<
-		        tuple_size<typename decay<TUPLE>::type>::value>());
-  }
-
-  /**********************************************************************
-  *  for_each(TUPLE0, TUPLE1, BINARY_FUNC, Indices<IDX...>)		*
-  **********************************************************************/
-  template <class TUPLE0, class TUPLE1,
-	    class BINARY_FUNC, size_t I, size_t ...IDX> inline void
-  for_each_impl(TUPLE0& x, TUPLE1& y, const BINARY_FUNC& f, Indices<I, IDX...>)
-  {
-      f(get<I>(x), get<I>(y));
-      for_each_impl(x, y, f, Indices<IDX...>());
-  }
-  template <class TUPLE0, class TUPLE1, class BINARY_FUNC> inline void
-  for_each_impl(TUPLE0&, TUPLE1&, const BINARY_FUNC&, Indices<>)
-  {
-  }
-
-  template <class TUPLE0, class TUPLE1, class BINARY_FUNC,
-	    class=typename enable_if<
-		(is_tuple<typename decay<TUPLE0>::type>::value &&
-		 is_tuple<typename decay<TUPLE1>::type>::value)>::type>
-  inline void
-  for_each(TUPLE0&& x, TUPLE1&& y, const BINARY_FUNC& f)
-  {
-      for_each_impl(x, y, f,
-		    TupleIndices<
-			tuple_size<typename decay<TUPLE0>::type>::value>());
-  }
-
-  /**********************************************************************
-  *  transform(tuple<T...>, UNARY_FUNC)					*
-  **********************************************************************/
-  template <class ...T, class UNARY_FUNC, size_t ...IDX> inline auto
-  transform_impl(const tuple<T...>& x, const UNARY_FUNC& f, Indices<IDX...>)
-      -> decltype(make_tuple(f(get<IDX>(x))...))
-  {
-      return make_tuple(f(get<IDX>(x))...);
-  }
-
-  template <class ...T, class UNARY_FUNC> inline auto
-  transform(const tuple<T...>& x, const UNARY_FUNC& f)
-      -> decltype(transform_impl(x, f, detail::TupleIndices<sizeof...(T)>()))
-  {
-      return transform_impl(x, f, TupleIndices<sizeof...(T)>());
+      f(x.get_head(), y.get_head());
+      for_each(x.get_tail(), y.get_tail(), f);
   }
     
   /**********************************************************************
-  *  transform(tuple<S...>, tuple<T...>, BINARY_FUNC)			*
+  *  tuples::make_cons(HEAD, TAIL)					*
   **********************************************************************/
-  template <class ...S, class ...T, class BINARY_FUNC, size_t ...IDX>
-  inline auto
-  transform_impl(const tuple<S...>& x, const tuple<T...>& y,
-		 const BINARY_FUNC& f, Indices<IDX...>)
-      -> decltype(make_tuple(f(get<IDX>(x), get<IDX>(y))...))
+  template <class HEAD, class TAIL> inline cons<HEAD, TAIL>
+  make_cons(const HEAD& head, const TAIL& tail)
   {
-      return make_tuple(f(get<IDX>(x), get<IDX>(y))...);
+      return cons<HEAD, TAIL>(head, tail);
   }
-
-  template <class ...S, class ...T, class BINARY_FUNC> inline auto
-  transform(const tuple<S...>& x, const tuple<T...>& y, const BINARY_FUNC& f)
-      -> decltype(transform_impl(x, y, f, TupleIndices<sizeof...(S)>()))
+    
+  /**********************************************************************
+  *  tuples::transform(cons<HEAD, TAIL>, UNARY_FUNC)			*
+  **********************************************************************/
+  template <class UNARY_FUNC> inline null_type
+  transform(null_type, UNARY_FUNC)
   {
-      return transform_impl(x, y, f, TupleIndices<sizeof...(S)>());
+      return null_type();
+  }
+  template <class HEAD, class TAIL, class UNARY_FUNC> inline auto
+  transform(const cons<HEAD, TAIL>& x, const UNARY_FUNC& f)
+      -> decltype(make_cons(f(x.get_head()), transform(x.get_tail(), f)))
+  {
+      return make_cons(f(x.get_head()), transform(x.get_tail(), f));
+  }
+    
+  /**********************************************************************
+  *  tuples::transform(cons<H1, T1>, cons<H2, T2>, BINARY_FUNC)		*
+  **********************************************************************/
+  template <class BINARY_FUNC> inline null_type
+  transform(null_type, null_type, BINARY_FUNC)
+  {
+      return null_type();
+  }
+  template <class H1, class T1, class H2, class T2, class BINARY_FUNC>
+  inline auto
+  transform(const cons<H1, T1>& x, const cons<H2, T2>& y, const BINARY_FUNC& f)
+      -> decltype(make_cons(f(x.get_head(), y.get_head()),
+			    transform(x.get_tail(), y.get_tail(), f)))
+  {
+      return make_cons(f(x.get_head(), y.get_head()),
+		       transform(x.get_tail(), y.get_tail(), f));
   }
 
   /**********************************************************************
-  *  transform(tuple<T...>, tuple<T...>,				*
-  *	       tuple<U...>, TRINARY_FUNC)				*
+  *  tuples::transform(cons<H1, T1>, cons<H2, T2>,			*
+  *		     cons<H3, T3>, TRINARY_FUNC)			*
   **********************************************************************/
-  template <class ...S, class ...T, class ...U,
-	    class TRINARY_FUNC, size_t ...IDX>
-  inline auto
-  transform_impl(const tuple<S...>& x, const tuple<T...>& y,
-		 const tuple<U...>& z, const TRINARY_FUNC& f, Indices<IDX...>)
-      -> decltype(make_tuple(f(get<IDX>(x), get<IDX>(y), get<IDX>(z))...))
+  template <class TRINARY_FUNC> inline null_type
+  transform(null_type, null_type, null_type, TRINARY_FUNC)
   {
-      return make_tuple(f(get<IDX>(x), get<IDX>(y), get<IDX>(z))...);
+      return null_type();
   }
-
-  template <class ...S, class ...T, class ...U, class BINARY_FUNC> inline auto
-  transform(const tuple<S...>& x, const tuple<T...>& y,
-	    const tuple<U...>& z, const BINARY_FUNC& f)
-      -> decltype(transform_impl(x, y, z, f, TupleIndices<sizeof...(S)>()))
-  {  
-      return transform_impl(x, y, z, f, TupleIndices<sizeof...(S)>());
+  template <class H1, class T1, class H2, class T2,
+	    class H3, class T3, class TRINARY_FUNC>
+  inline auto
+  transform(const cons<H1, T1>& x, const cons<H2, T2>& y,
+	    const cons<H3, T3>& z, const TRINARY_FUNC& f)
+      -> decltype(make_cons(f(x.get_head(), y.get_head(), z.get_head()),
+			    transform(x.get_tail(),
+				      y.get_tail(), z.get_tail(), f)))
+  {
+      return make_cons(f(x.get_head(), y.get_head(), z.get_head()),
+		       transform(x.get_tail(), y.get_tail(), x.get_tail(), f));
   }
 
   /**********************************************************************
   *  struct generic_function<FUNC>					*
   **********************************************************************/
-  template <template <class...> class FUNC>
+  template <template <class> class FUNC>
   struct generic_function
   {
       template <class T_> auto
@@ -233,7 +216,7 @@ namespace detail
       template <class S_, class T_> T_&
       operator ()(const S_& x, T_&& y) const
       {
-	  return ASSIGN<S_, T_>()(x, forward<T_>(y));
+	  return ASSIGN<S_, T_>()(x, std::forward<T_>(y));
       }
   };
 
@@ -242,347 +225,315 @@ namespace detail
   **********************************************************************/
   struct generic_select
   {
-      template <class S_, class T_> const T_&
-      operator ()(const S_& s, const T_& x, const T_& y) const
+      template <class T_> const T_&
+      operator ()(bool s, const T_& x, const T_& y) const
       {
 	  return select(s, x, y);
       }
   };
 
   /**********************************************************************
-  *  struct generic_put							*
+  *  Arithmetic operators						*
   **********************************************************************/
-  struct generic_put
+  template <class HEAD, class TAIL> inline auto
+  operator -(const cons<HEAD, TAIL>& x)
+      -> decltype(transform(x, generic_function<std::negate>()))
   {
-      generic_put(ostream& out)	:_out(out)	{}
+      return transform(x, generic_function<std::negate>());
+  }
     
-      template <class T_>
-      void	operator ()(const T_& x) const	{ _out << ' ' << x; }
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator +(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_binary_function<TU::plus>()))
+  {
+      return transform(x, y, generic_binary_function<TU::plus>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator -(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_binary_function<TU::minus>()))
+  {
+      return transform(x, y, generic_binary_function<TU::minus>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator *(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_binary_function<TU::multiplies>()))
+  {
+      return transform(x, y, generic_binary_function<TU::multiplies>());
+  }
 
-    private:
-      ostream&	_out;
-  };
+  template <class T, class HEAD, class TAIL,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator *(const T& c, const cons<HEAD, TAIL>& x)
+      -> decltype(transform(
+		      x, std::bind(generic_binary_function<TU::multiplies>(),
+				   c, std::placeholders::_1)))
+  {
+      return transform(x, std::bind(generic_binary_function<TU::multiplies>(),
+				    c, std::placeholders::_1));
+  }
+
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator *(const cons<HEAD, TAIL>& x, const T& c)
+      -> decltype(transform(
+		      x, std::bind(generic_binary_function<TU::multiplies>(),
+				   std::placeholders::_1, c)))
+  {
+      return transform(x, std::bind(generic_binary_function<TU::multiplies>(),
+				    std::placeholders::_1, c));
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator /(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_binary_function<TU::divides>()))
+  {
+      return transform(x, y, generic_binary_function<TU::divides>());
+  }
+    
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator /(const cons<HEAD, TAIL>& x, const T& c)
+      -> decltype(transform(
+		      x, std::bind(generic_binary_function<TU::divides>(),
+				   std::placeholders::_1, c)))
+  {
+      return transform(x, std::bind(generic_binary_function<TU::divides>(),
+				    std::placeholders::_1, c));
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator %(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::modulus>()))
+  {
+      return transform(x, y, generic_function<std::modulus>());
+  }
+
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator +=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::plus_assign>());
+      return y;
+  }
+
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator -=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::minus_assign>());
+      return y;
+  }
+    
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator *=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::multiplies_assign>());
+      return y;
+  }
+    
+  template <class HEAD, class TAIL, class T>
+  inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
+  operator *=(cons<HEAD, TAIL>& y, const T& c)
+  {
+      for_each(y, std::bind(generic_assign<TU::multiplies_assign>(),
+			    c, std::placeholders::_1));
+      return y;
+  }
+    
+  template <class HEAD, class TAIL, class T>
+  inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
+  operator *=(cons<HEAD, TAIL>&& y, const T& c)
+  {
+      for_each(y, std::bind(generic_assign<TU::multiplies_assign>(),
+			    c, std::placeholders::_1));
+      return y;
+  }
+    
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator /=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::divides_assign>());
+      return y;
+  }
+    
+  template <class HEAD, class TAIL, class T>
+  inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
+  operator /=(cons<HEAD, TAIL>& y, const T& c)
+  {
+      for_each(y, std::bind(generic_assign<TU::divides_assign>(),
+			    c, std::placeholders::_1));
+      return y;
+  }
+    
+  template <class HEAD, class TAIL, class T>
+  inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
+  operator /=(cons<HEAD, TAIL>&& y, const T& c)
+  {
+      for_each(y, std::bind(generic_assign<TU::divides_assign>(),
+			    c, std::placeholders::_1));
+      return y;
+  }
+    
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator %=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::modulus_assign>());
+      return y;
+  }
+    
+  /**********************************************************************
+  *  Bit operators							*
+  **********************************************************************/
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator &(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::bit_and>()))
+  {
+      return transform(x, y, generic_function<std::bit_and>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator |(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::bit_or>()))
+  {
+      return transform(x, y, generic_function<std::bit_or>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator ^(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::bit_xor>()))
+  {
+      return transform(x, y, generic_function<std::bit_xor>());
+  }
+    
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator &=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::bit_and_assign>());
+      return y;
+  }
+    
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator |=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::bit_or_assign>());
+      return y;
+  }
+    
+  template <class L, class HEAD, class TAIL>
+  inline typename std::enable_if<
+      is_tuple<typename std::decay<L>::type>::value, L&>::type
+  operator ^=(L&& y, const cons<HEAD, TAIL>& x)
+  {
+      for_each(x, y, generic_assign<TU::bit_xor_assign>());
+      return y;
+  }
+    
+  /**********************************************************************
+  *  Logical operators							*
+  **********************************************************************/
+  template <class HEAD, class TAIL> inline auto
+  operator !(const cons<HEAD, TAIL>& x)
+      -> decltype(transform(x, generic_function<std::logical_not>()))
+  {
+      return transform(x, generic_function<std::logical_not>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator &&(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::logical_and>()))
+  {
+      return transform(x, y, generic_function<std::logical_and>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator ||(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::logical_or>()))
+  {
+      return transform(x, y, generic_function<std::logical_or>());
+  }
+    
+  /**********************************************************************
+  *  Relational operators						*
+  **********************************************************************/
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator ==(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::equal_to>()))
+  {
+      return transform(x, y, generic_function<std::equal_to>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator !=(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::not_equal_to>()))
+  {
+      return transform(x, y, generic_function<std::not_equal_to>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator <(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::less>()))
+  {
+      return transform(x, y, generic_function<std::less>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator >(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::greater>()))
+  {
+      return transform(x, y, generic_function<std::greater>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator <=(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::less_equal>()))
+  {
+      return transform(x, y, generic_function<std::less_equal>());
+  }
+    
+  template <class H1, class T1, class H2, class T2> inline auto
+  operator >=(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(transform(x, y, generic_function<std::greater_equal>()))
+  {
+      return transform(x, y, generic_function<std::greater_equal>());
+  }
 }
 
 /************************************************************************
 *  typedef htuple<T, N>							*
 ************************************************************************/
 template <size_t N, class T> inline auto
-make_contiguous_htuple(const T& x)
-    -> decltype(detail::make_contiguous_htuple(x, detail::TupleIndices<N>()))
+make_contiguous_htuple(T&& x)
+    -> decltype(tuples::make_contiguous_htuple(std::forward<T>(x),
+					       tuples::make_index_sequence<N>()))
 {
-    return detail::make_contiguous_htuple(x, detail::TupleIndices<N>());
+    return tuples::make_contiguous_htuple(std::forward<T>(x),
+					  tuples::make_index_sequence<N>());
 }
 
 template <class T, size_t N>
-using htuple = decltype(make_contiguous_htuple<N>(declval<const T&>()));
+using	htuple = decltype(make_contiguous_htuple<N>(declval<T>()));
 
-/************************************************************************
-*  Arithmetic operators							*
-************************************************************************/
-template <class ...T> inline auto
-operator -(const tuple<T...>& x)
-    -> decltype(detail::transform(x, detail::generic_function<negate>()))
-{
-    return detail::transform(x, detail::generic_function<negate>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator +(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y,
-				  detail::generic_binary_function<TU::plus>()))
-{
-    return detail::transform(x, y, detail::generic_binary_function<TU::plus>());
-}
+}	// End of namespace boost
 
-template <class ...S, class ...T> inline auto
-operator -(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y,
-				  detail::generic_binary_function<TU::minus>()))
+namespace TU
 {
-    return detail::transform(x, y, detail::generic_binary_function<TU::minus>());
-}
-
-template <class ...S, class ...T> inline auto
-operator *(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(
-		    x, y, detail::generic_binary_function<TU::multiplies>()))
-{
-    return detail::transform(x, y,
-			     detail::generic_binary_function<TU::multiplies>());
-}
-
-template <class S, class ...T,
-	  class=typename enable_if<!detail::is_tuple<S>::value>::type>
-inline auto
-operator *(const S& c, const tuple<T...>& x)
-    -> decltype(detail::transform(
-		    x, bind(detail::generic_binary_function<TU::multiplies>(),
-			    c, placeholders::_1)))
-{
-    return detail::transform(
-	       x, bind(detail::generic_binary_function<TU::multiplies>(),
-		       c, placeholders::_1));
-}
-
-template <class ...S, class T,
-	  class=typename enable_if<!detail::is_tuple<T>::value>::type>
-inline auto
-operator *(const tuple<S...>& x, const T& c)
-    -> decltype(detail::transform(
-		    x,
-		    bind(detail::generic_binary_function<TU::multiplies>(),
-			      placeholders::_1, c)))
-{
-    return detail::transform(
-	       x, bind(detail::generic_binary_function<TU::multiplies>(),
-		       placeholders::_1, c));
-}
-    
-template <class ...S, class ...T> inline auto
-operator /(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(
-		    x, y, detail::generic_binary_function<TU::divides>()))
-{
-    return detail::transform(x, y,
-			     detail::generic_binary_function<TU::divides>());
-}
-    
-template <class ...S, class T,
-	  class=typename enable_if<!detail::is_tuple<T>::value>::type>
-inline auto
-operator /(const tuple<S...>& x, const T& c)
-    -> decltype(detail::transform(
-		    x, bind(detail::generic_binary_function<TU::divides>(),
-			    placeholders::_1, c)))
-{
-    return detail::transform(
-	       x, bind(detail::generic_binary_function<TU::divides>(),
-		       placeholders::_1, c));
-}
-    
-template <class ...S, class ...T> inline auto
-operator %(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<modulus>()))
-{
-    return detail::transform(x, y, detail::generic_function<modulus>());
-}
-
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator +=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::plus_assign>());
-    return y;
-}
-
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator -=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::minus_assign>());
-    return y;
-}
-
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator *=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::multiplies_assign>());
-    return y;
-}
-    
-template <class ...S, class T>
-inline typename enable_if<
-    !detail::is_tuple<T>::value, tuple<S...>&>::type
-operator *=(tuple<S...>& y, const T& c)
-{
-    detail::for_each(y, bind(detail::generic_assign<TU::multiplies_assign>(),
-			     c, placeholders::_1));
-    return y;
-}
-    
-template <class ...S, class T>
-inline typename enable_if<
-    !detail::is_tuple<T>::value, tuple<S...>&>::type
-operator *=(tuple<S...>&& y, const T& c)
-{
-    detail::for_each(y, bind(detail::generic_assign<TU::multiplies_assign>(),
-			     c, placeholders::_1));
-    return y;
-}
-    
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator /=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::divides_assign>());
-    return y;
-}
-    
-template <class ...S, class T>
-inline typename enable_if<
-    !detail::is_tuple<T>::value, tuple<S...>&>::type
-operator /=(tuple<S...>& y, const T& c)
-{
-    detail::for_each(y, bind(detail::generic_assign<TU::divides_assign>(),
-			     c, placeholders::_1));
-    return y;
-}
-    
-template <class ...S, class T>
-inline typename enable_if<
-    !detail::is_tuple<T>::value, tuple<S...>&>::type
-operator /=(tuple<S...>&& y, const T& c)
-{
-    detail::for_each(y, bind(detail::generic_assign<TU::divides_assign>(),
-			     c, placeholders::_1));
-    return y;
-}
-    
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator %=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::modulus_assign>());
-    return y;
-}
-    
-/************************************************************************
-*  Bit operators							*
-************************************************************************/
-template <class ...S, class ...T> inline auto
-operator &(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<bit_and>()))
-{
-    return detail::transform(x, y, detail::generic_function<bit_and>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator |(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<bit_or>()))
-{
-    return detail::transform(x, y, detail::generic_function<bit_or>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator ^(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<bit_xor>()))
-{
-    return detail::transform(x, y, detail::generic_function<bit_xor>());
-}
-
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator &=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::bit_and_assign>());
-    return y;
-}
-    
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator |=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::bit_or_assign>());
-    return y;
-}
-    
-template <class L, class ...T>
-inline typename enable_if<
-    detail::is_tuple<typename decay<L>::type>::value, L&>::type
-operator ^=(L&& y, const tuple<T...>& x)
-{
-    detail::for_each(x, forward<L>(y),
-		     detail::generic_assign<TU::bit_xor_assign>());
-    return y;
-}
-    
-/************************************************************************
-*  Logical operators							*
-************************************************************************/
-template <class ...T> inline auto
-operator !(const tuple<T...>& x)
-    -> decltype(detail::transform(x, detail::generic_function<logical_not>()))
-{
-    return detail::transform(x, detail::generic_function<logical_not>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator &&(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<logical_and>()))
-{
-    return detail::transform(x, y, detail::generic_function<logical_and>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator ||(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<logical_or>()))
-{
-    return detail::transform(x, y, detail::generic_function<logical_or>());
-}
-    
-/************************************************************************
-*  Relational operators							*
-************************************************************************/
-template <class ...S, class ...T> inline auto
-operator ==(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<equal_to>()))
-{
-    return detail::transform(x, y, detail::generic_function<equal_to>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator !=(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(
-		    x, y, detail::generic_function<not_equal_to>()))
-{
-    return detail::transform(x, y, detail::generic_function<not_equal_to>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator <(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<less>()))
-{
-    return detail::transform(x, y, detail::generic_function<less>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator >(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<greater>()))
-{
-    return detail::transform(x, y, detail::generic_function<greater>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator <=(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(x, y, detail::generic_function<less_equal>()))
-{
-    return detail::transform(x, y, detail::generic_function<less_equal>());
-}
-    
-template <class ...S, class ...T> inline auto
-operator >=(const tuple<S...>& x, const tuple<T...>& y)
-    -> decltype(detail::transform(
-		    x, y, detail::generic_function<greater_equal>()))
-{
-    return detail::transform(x, y, detail::generic_function<greater_equal>());
-}
-
 /************************************************************************
 *  Selection								*
 ************************************************************************/
@@ -592,30 +543,17 @@ select(bool s, const T& x, const T& y)
     return (s ? x : y);
 }
     
-template <class ...S, class ...T, class ...U> inline auto
-select(const tuple<S...>& s, const tuple<T...>& x, const tuple<U...>& y)
-    -> decltype(detail::transform(s, x, y, detail::generic_select()))
+template <class H1, class T1, class H2, class T2, class H3, class T3>
+inline auto
+select(const boost::tuples::cons<H1, T1>& s,
+       const boost::tuples::cons<H2, T2>& x,
+       const boost::tuples::cons<H3, T3>& y)
+    -> decltype(boost::tuples::transform(s, x, y,
+					 boost::tuples::generic_select()))
 {
-    return detail::transform(s, x, y, detail::generic_select());
+    return boost::tuples::transform(s, x, y, boost::tuples::generic_select());
 }
 
-/************************************************************************
-*  I/O functions							*
-************************************************************************/
-template <class ...T> inline ostream&
-operator <<(ostream& out, const tuple<T...>& x)
-{
-    out << '(';
-    detail::for_each(x, detail::generic_put(out));
-    out << ')';
-
-    return out;
-}
-    
-}	// End of namespace std
-
-namespace TU
-{
 /************************************************************************
 *  class unarizer<FUNC>							*
 ************************************************************************/
@@ -630,19 +568,26 @@ class unarizer
   public:
     unarizer(const FUNC& func=FUNC())	:_func(func)	{}
 
-    template <class ...T>
-    result_type	operator ()(const std::tuple<T...>& arg) const
+    result_type	operator ()(boost::tuples::null_type) const
 		{
-		    return exec(arg, std::detail::TupleIndices<sizeof...(T)>());
+		    return _func();
+		}
+    template <class HEAD, class TAIL>
+    result_type	operator ()(const boost::tuples::cons<HEAD, TAIL>& arg) const
+		{
+		    return exec(arg,
+				boost::tuples::make_index_sequence<
+				    1 + boost::tuples::length<TAIL>::value>());
 		}
 
     const FUNC&	functor()			const	{return _func;}
 
   private:
     template <class TUPLE, size_t ...IDX>
-    result_type	exec(const TUPLE& arg, std::detail::Indices<IDX...>) const
+    result_type	exec(const TUPLE& arg,
+		     boost::tuples::index_sequence<IDX...>) const
 		{
-		    return _func(std::get<IDX>(arg)...);
+		    return _func(boost::get<IDX>(arg)...);
 		}
 
   private:
@@ -661,10 +606,21 @@ make_unarizer(const FUNC& func)
 namespace detail
 {
   template <class T>
-  struct tuple_head : impl::identity<T>					{};
-  template <class ...T>
-  struct tuple_head<std::tuple<T...> >
-      : std::tuple_element<0, std::tuple<T...> >			{};
+  struct tuple_head
+  {
+      typedef T		type;
+  };
+  template <class HEAD, class TAIL>
+  struct tuple_head<boost::tuples::cons<HEAD, TAIL> >
+  {
+      typedef HEAD	type;
+  };
+  template <BOOST_PP_ENUM_PARAMS(10, class T)>
+  struct tuple_head<boost::tuple<BOOST_PP_ENUM_PARAMS(10, T)> >
+      : tuple_head<
+            typename boost::tuple<BOOST_PP_ENUM_PARAMS(10, T)>::inherited>
+  {
+  };
 }
     
 //! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
@@ -680,11 +636,25 @@ using tuple_head = typename detail::tuple_head<T>::type;
 namespace detail
 {
   template <class T, class S>
-  static typename std::conditional<std::is_void<T>::value, S, T>::type
-  tuple_replace(S);
-  template <class T, class ...S> static auto
-  tuple_replace(std::tuple<S...>)
-      -> decltype(std::make_tuple((std::declval<S>(), std::declval<T>())...));
+  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>	{};
+  template <class T>
+  struct tuple_replace<T, boost::tuples::null_type>
+  {
+      typedef boost::tuples::null_type			type;
+  };
+  template <class T, class HEAD, class TAIL>
+  struct tuple_replace<T, boost::tuples::cons<HEAD, TAIL> >
+  {
+      typedef boost::tuples::cons<
+	  typename tuple_replace<T, HEAD>::type,
+	  typename tuple_replace<T, TAIL>::type>	type;
+  };
+  template <class T, BOOST_PP_ENUM_PARAMS(10, class S)>
+  struct tuple_replace<T, boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)> >
+      : tuple_replace<T,
+            typename boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>::inherited>
+  {
+  };
 }
     
 //! 与えられた型がtupleならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
@@ -693,7 +663,7 @@ namespace detail
   \param T	置換後の要素の型．voidならば置換しない．
 */
 template <class S, class T=void>
-using tuple_replace = decltype(detail::tuple_replace<T>(std::declval<S>()));
+using tuple_replace = typename detail::tuple_replace<T, S>::type;
     
 }	// End of namespace TU
 #endif	// !__TU_TUPLE_H
