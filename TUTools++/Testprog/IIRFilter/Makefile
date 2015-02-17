@@ -14,12 +14,12 @@ MOCHDRS		=
 
 INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DUSE_TBB
-CFLAGS		= -g
+CFLAGS		= -g -O
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
+  CFLAGS	= -O3 -xCORE-AVX2
   NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DAVX2
 endif
 CCFLAGS		= $(CFLAGS)
 
