@@ -56,26 +56,26 @@ namespace mm
       const Is16vec	ue = us + Is16vec(1);
 #  if defined(SSE2)
       Iu8vec		uc = cast<u_char>(Iu32vec(
-				*(u_int*)&in[extract<1>(vs)][extract<1>(ue)],
-				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(us)],
 				*(u_int*)&in[extract<1>(vs)][extract<1>(us)],
-				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
+				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+				*(u_int*)&in[extract<1>(vs)][extract<1>(ue)]));
 #  else
       Iu8vec		uc = cast<u_char>(Iu32vec(
-				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
-				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
+				*(u_int*)&in[extract<0>(vs)][extract<0>(us)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)]));
 #  endif
       const Is16vec	ss = linearInterpolate(cvt<short, 0>(uc),
 					       cvt<short, 1>(uc), du);
       vs += Is16vec(1);
 #  if defined(SSE2)
-      uc = cast<u_char>(Iu32vec(*(u_int*)&in[extract<1>(vs)][extract<1>(ue)],
-				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+      uc = cast<u_char>(Iu32vec(*(u_int*)&in[extract<0>(vs)][extract<0>(us)],
 				*(u_int*)&in[extract<1>(vs)][extract<1>(us)],
-				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
+				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
+				*(u_int*)&in[extract<1>(vs)][extract<1>(ue)]));
 #  else
-      uc = cast<u_char>(Iu32vec(*(u_int*)&in[extract<0>(vs)][extract<0>(ue)],
-				*(u_int*)&in[extract<0>(vs)][extract<0>(us)]));
+      uc = cast<u_char>(Iu32vec(*(u_int*)&in[extract<0>(vs)][extract<0>(us)],
+				*(u_int*)&in[extract<0>(vs)][extract<0>(ue)]));
 #  endif
       return linearInterpolate(ss,
 			       linearInterpolate(cvt<short, 0>(uc),
@@ -89,61 +89,61 @@ namespace mm
   {
       const Is16vec	ue = us + Is16vec(1);
 #  if defined(SSE2)
-      Iu8vec		uc(in[extract<7>(vs)][extract<7>(ue)],
-			   in[extract<6>(vs)][extract<6>(ue)],
-			   in[extract<5>(vs)][extract<5>(ue)],
-			   in[extract<4>(vs)][extract<4>(ue)],
-			   in[extract<3>(vs)][extract<3>(ue)],
-			   in[extract<2>(vs)][extract<2>(ue)],
-			   in[extract<1>(vs)][extract<1>(ue)],
-			   in[extract<0>(vs)][extract<0>(ue)],
-			   in[extract<7>(vs)][extract<7>(us)],
-			   in[extract<6>(vs)][extract<6>(us)],
-			   in[extract<5>(vs)][extract<5>(us)],
+      Iu8vec		uc(in[extract<0>(vs)][extract<0>(us)],
+			   in[extract<1>(vs)][extract<1>(us)],
+			   in[extract<2>(vs)][extract<2>(us)],
+			   in[extract<3>(vs)][extract<3>(us)],
 			   in[extract<4>(vs)][extract<4>(us)],
-			   in[extract<3>(vs)][extract<3>(us)],
-			   in[extract<2>(vs)][extract<2>(us)],
-			   in[extract<1>(vs)][extract<1>(us)],
-			   in[extract<0>(vs)][extract<0>(us)]);
-#  else
-      Iu8vec		uc(in[extract<3>(vs)][extract<3>(ue)],
-			   in[extract<2>(vs)][extract<2>(ue)],
-			   in[extract<1>(vs)][extract<1>(ue)],
+			   in[extract<5>(vs)][extract<5>(us)],
+			   in[extract<6>(vs)][extract<6>(us)],
+			   in[extract<7>(vs)][extract<7>(us)],
 			   in[extract<0>(vs)][extract<0>(ue)],
-			   in[extract<3>(vs)][extract<3>(us)],
-			   in[extract<2>(vs)][extract<2>(us)],
+			   in[extract<1>(vs)][extract<1>(ue)],
+			   in[extract<2>(vs)][extract<2>(ue)],
+			   in[extract<3>(vs)][extract<3>(ue)],
+			   in[extract<4>(vs)][extract<4>(ue)],
+			   in[extract<5>(vs)][extract<5>(ue)],
+			   in[extract<6>(vs)][extract<6>(ue)],
+			   in[extract<7>(vs)][extract<7>(ue)]);
+#  else
+      Iu8vec		uc(in[extract<0>(vs)][extract<0>(us)],
 			   in[extract<1>(vs)][extract<1>(us)],
-			   in[extract<0>(vs)][extract<0>(us)]);
+			   in[extract<2>(vs)][extract<2>(us)],
+			   in[extract<3>(vs)][extract<3>(us)],
+			   in[extract<0>(vs)][extract<0>(ue)],
+			   in[extract<1>(vs)][extract<1>(ue)],
+			   in[extract<2>(vs)][extract<2>(ue)],
+			   in[extract<3>(vs)][extract<3>(ue)]);
 #  endif
       const Is16vec	ss = linearInterpolate(cvt<short, 0>(uc),
 					       cvt<short, 1>(uc), du);
       vs += Is16vec(1);
 #  if defined(SSE2)
-      uc = Iu8vec(in[extract<7>(vs)][extract<7>(ue)],
-		  in[extract<6>(vs)][extract<6>(ue)],
-		  in[extract<5>(vs)][extract<5>(ue)],
-		  in[extract<4>(vs)][extract<4>(ue)],
-		  in[extract<3>(vs)][extract<3>(ue)],
-		  in[extract<2>(vs)][extract<2>(ue)],
-		  in[extract<1>(vs)][extract<1>(ue)],
-		  in[extract<0>(vs)][extract<0>(ue)],
-		  in[extract<7>(vs)][extract<7>(us)],
-		  in[extract<6>(vs)][extract<6>(us)],
-		  in[extract<5>(vs)][extract<5>(us)],
+      uc = Iu8vec(in[extract<0>(vs)][extract<0>(us)],
+		  in[extract<1>(vs)][extract<1>(us)],
+		  in[extract<2>(vs)][extract<2>(us)],
+		  in[extract<3>(vs)][extract<3>(us)],
 		  in[extract<4>(vs)][extract<4>(us)],
-		  in[extract<3>(vs)][extract<3>(us)],
-		  in[extract<2>(vs)][extract<2>(us)],
-		  in[extract<1>(vs)][extract<1>(us)],
-		  in[extract<0>(vs)][extract<0>(us)]);
-#  else
-      uc = Iu8vec(in[extract<3>(vs)][extract<3>(ue)],
-		  in[extract<2>(vs)][extract<2>(ue)],
-		  in[extract<1>(vs)][extract<1>(ue)],
+		  in[extract<5>(vs)][extract<5>(us)],
+		  in[extract<6>(vs)][extract<6>(us)],
+		  in[extract<7>(vs)][extract<7>(us)],
 		  in[extract<0>(vs)][extract<0>(ue)],
-		  in[extract<3>(vs)][extract<3>(us)],
-		  in[extract<2>(vs)][extract<2>(us)],
+		  in[extract<1>(vs)][extract<1>(ue)],
+		  in[extract<2>(vs)][extract<2>(ue)],
+		  in[extract<3>(vs)][extract<3>(ue)],
+		  in[extract<4>(vs)][extract<4>(ue)],
+		  in[extract<5>(vs)][extract<5>(ue)],
+		  in[extract<6>(vs)][extract<6>(ue)],
+		  in[extract<7>(vs)][extract<7>(ue)]);
+#  else
+      uc = Iu8vec(in[extract<0>(vs)][extract<0>(us)],
 		  in[extract<1>(vs)][extract<1>(us)],
-		  in[extract<0>(vs)][extract<0>(us)]);
+		  in[extract<2>(vs)][extract<2>(us)],
+		  in[extract<3>(vs)][extract<3>(us)],
+		  in[extract<0>(vs)][extract<0>(ue)],
+		  in[extract<1>(vs)][extract<1>(ue)],
+		  in[extract<2>(vs)][extract<2>(ue)],
+		  in[extract<3>(vs)][extract<3>(ue)]);
 #  endif
       return linearInterpolate(ss,
 			       linearInterpolate(cvt<short, 0>(uc),

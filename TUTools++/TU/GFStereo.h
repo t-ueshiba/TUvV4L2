@@ -7,7 +7,6 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
-#include <boost/bind.hpp>
 
 namespace TU
 {
@@ -32,17 +31,10 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 #endif
     typedef boost::tuple<ScoreVec, ScoreVec>		ScoreVecTuple;
 
-    class ScoreVecArray
-	: public Array<ScoreVec,
-		       Buf<ScoreVec,
-			   typename super::template
-			   Allocator<ScoreVec>::type> >
+    class ScoreVecArray : public Array<ScoreVec>
     {
       private:
-	typedef Array<ScoreVec,
-		      Buf<ScoreVec,
-			  typename super::template
-			  Allocator<ScoreVec>::type> >	array_t;
+	typedef Array<ScoreVec>				array_t;
 	    
       public:
 	typedef typename array_t::iterator		iterator;
@@ -297,19 +289,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	const ScoreVec	_g;
     };
 
-    typedef Array2<ScoreVecArray,
-		   Buf<ScoreVec,
-		       typename super::template
-		       Allocator<ScoreVec>::type>,
-		   Buf<ScoreVecArray,
-		       typename super::template
-		       Allocator<ScoreVecArray>::type> >
-							ScoreVecArray2;
-    typedef Array<ScoreVecArray2,
-		  Buf<ScoreVecArray2,
-		      typename super::template
-		      Allocator<ScoreVecArray2>::type> >
-							ScoreVecArray2Array;
+    typedef Array2<ScoreVecArray>			ScoreVecArray2;
+    typedef Array<ScoreVecArray2>			ScoreVecArray2Array;
     typedef typename ScoreVecArray2::iterator		col_siterator;
     typedef typename ScoreVecArray2::const_iterator
 							const_col_siterator;
@@ -332,25 +313,16 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     typedef typename GuideArray2::const_iterator	const_row_giterator;
     typedef box_filter_iterator<const_col_giterator>	GuideBox;
 
-    typedef Array<Disparity,
-		  Buf<Disparity,
-		      typename super::template
-		      Allocator<Disparity>::type> >	DisparityArray;
-    typedef Array2<DisparityArray,
-		   Buf<Disparity,
-		       typename super::template
-		       Allocator<Disparity>::type> >	DisparityArray2;
+    typedef Array<Disparity>				DisparityArray;
+    typedef Array2<DisparityArray>			DisparityArray2;
     typedef typename DisparityArray::iterator		col_diterator;
     typedef typename DisparityArray::const_iterator	const_col_diterator;
     typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
     typedef typename DisparityArray2::iterator		row_diterator;
     typedef typename DisparityArray2::const_iterator	const_row_diterator;
 
-    typedef Array<float,
-		  Buf<float,
-		      typename super::template
-		      Allocator<float>::type> >		FloatArray;
-    typedef typename FloatArray::reverse_iterator	reverse_col_fiterator;
+    typedef Array<float>				FloatArray;
+    typedef FloatArray::reverse_iterator		reverse_col_fiterator;
     
     struct Buffers
     {
@@ -784,13 +756,13 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 
     for (; colL != colLe; ++colL)
     {
-      //using namespace	std::placeholders;
+	using namespace	std::placeholders;
 	
 	const Score	pixL = *colL;
 	auto		P = boost::make_transform_iterator(
 				in_iterator(colRV->begin()),
-				boost::bind(diff_type(_params.intensityDiffMax),
-					    pixL, _1));
+				std::bind(diff_type(_params.intensityDiffMax),
+					  pixL, _1));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamInit(pixL))),
 		       Qe(make_assignment_iterator(colQ->end2(),
@@ -828,19 +800,19 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
     
     for (; colL != colLe; ++colL)
     {
-      //using namespace	std::placeholders;
+	using namespace	std::placeholders;
 	
 	const Score	pixLp = *colLp, pixL = *colL;
 	auto		P = make_fast_zip_iterator(
 				boost::make_tuple(
 				    boost::make_transform_iterator(
 					in_iterator(colRV->begin()),
-					boost::bind(
+					std::bind(
 					    diff_type(_params.intensityDiffMax),
 					    pixL, _1)),
 				    boost::make_transform_iterator(
 					in_iterator(colRVp->begin()),
-					boost::bind(
+					std::bind(
 					    diff_type(_params.intensityDiffMax),
 					    pixLp, _1))));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),

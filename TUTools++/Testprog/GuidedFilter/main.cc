@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include "TU/types.h"
 #include "TU/GuidedFilter.h"
+#include <boost/tuple/tuple_io.hpp>
 
 int
 main(int argc, char* argv[])
