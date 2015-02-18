@@ -7,7 +7,6 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
-#include <boost/bind.hpp>
 
 namespace TU
 {
@@ -30,26 +29,11 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     typedef Score					ScoreVec;
     typedef Disparity					DisparityVec;
 #endif
-    typedef Array<ScoreVec,
-		  Buf<ScoreVec,
-		      typename super::template
-		      Allocator<ScoreVec>::type> >	ScoreVecArray;
-    typedef Array2<ScoreVecArray,
-		   Buf<ScoreVec,
-		       typename super::template
-		       Allocator<ScoreVec>::type>,
-		   Buf<ScoreVecArray,
-		       typename super::template
-		       Allocator<ScoreVecArray>::type> >
-							ScoreVecArray2;
-    typedef Array<ScoreVecArray2,
-		  Buf<ScoreVecArray2,
-		      typename super::template
-		      Allocator<ScoreVecArray2>::type> >
-							ScoreVecArray2Array;
+    typedef Array<ScoreVec>				ScoreVecArray;
+    typedef Array2<ScoreVecArray>			ScoreVecArray2;
+    typedef Array<ScoreVecArray2>			ScoreVecArray2Array;
     typedef typename ScoreVecArray2::iterator		col_siterator;
-    typedef typename ScoreVecArray2::const_iterator
-							const_col_siterator;
+    typedef typename ScoreVecArray2::const_iterator	const_col_siterator;
     typedef typename ScoreVecArray2::const_reverse_iterator
 						const_reverse_col_siterator;
     typedef ring_iterator<typename ScoreVecArray2Array::iterator>
@@ -58,20 +42,11 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     typedef box_filter_iterator<
 		typename ScoreVecArray2::const_reverse_iterator>
 							ScoreVecArrayBox;
-    typedef Array<Disparity,
-		  Buf<Disparity,
-		      typename super::template
-		      Allocator<Disparity>::type> >	DisparityArray;
-    typedef Array2<DisparityArray,
-		   Buf<Disparity,
-		       typename super::template
-		       Allocator<Disparity>::type> >	DisparityArray2;
+    typedef Array<Disparity>				DisparityArray;
+    typedef Array2<DisparityArray>			DisparityArray2;
     typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
-    typedef Array<float,
-		  Buf<float,
-		      typename super::template
-		      Allocator<float>::type> >		FloatArray;
-    typedef typename FloatArray::reverse_iterator	reverse_col_fiterator;
+    typedef Array<float>				FloatArray;
+    typedef FloatArray::reverse_iterator		reverse_col_fiterator;
 
     struct Buffers
     {
@@ -415,12 +390,12 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 
     for (; colL != colLe; ++colL)
     {
-      //using namespace	std::placeholders;
+	using namespace	std::placeholders;
 
 	auto	P = boost::make_transform_iterator(
 			in_iterator(colRV->begin()),
-			boost::bind(diff_type(_params.intensityDiffMax),
-				    *colL, _1));
+			std::bind(diff_type(_params.intensityDiffMax),
+				  *colL, _1));
 	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
 	    exec_assignment<ASSIGN>(*P, *Q);
 	
@@ -448,16 +423,16 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 
     for (; colL != colLe; ++colL)
     {
-      //using namespace	std::placeholders;
+	using namespace	std::placeholders;
 
 	auto	Pp = boost::make_transform_iterator(
 			 in_iterator(colRVp->begin()),
-			 boost::bind(diff_type(_params.intensityDiffMax),
-				     *colLp, _1));
+			 std::bind(diff_type(_params.intensityDiffMax),
+				   *colLp, _1));
 	auto	Pn = boost::make_transform_iterator(
 			 in_iterator(colRV->begin()),
-			 boost::bind(diff_type(_params.intensityDiffMax),
-				     *colL, _1));
+			 std::bind(diff_type(_params.intensityDiffMax),
+				   *colL, _1));
 	for (qiterator Q(colQ->begin()), Qe(colQ->end());
 	     Q != Qe; ++Q, ++Pp, ++Pn)
 	    *Q += (*Pn - *Pp);

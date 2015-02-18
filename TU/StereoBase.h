@@ -5,7 +5,6 @@
 #ifndef __TU_STEREOBASE_H
 #define __TU_STEREOBASE_H
 
-#include "TU/Image++.h"
 #include "TU/algorithm.h"	// Use std::min(), std::max() and TU::diff().
 #include "TU/tuple.h"
 #include <limits>		// Use std::numeric_limits<T>.
@@ -42,7 +41,6 @@ template <class T>
 class Diff
 {
   public:
-    typedef T						first_argument_type;
     typedef typename std::conditional<
 	std::is_integral<T>::value,
 	typename std::make_signed<T>::type, T>::type	result_type;
@@ -63,8 +61,6 @@ template <>
 class Diff<RGBA>
 {
   public:
-    typedef RGBA	first_argument_type;
-    typedef RGBA	second_argument_type;
     typedef int		result_type;
     
   public:
@@ -84,13 +80,12 @@ class Diff<boost::tuples::cons<
 	       T, boost::tuples::cons<T, boost::tuples::null_type> > >
 {
   public:
-    typedef T						first_argument_type;
     typedef typename Diff<T>::result_type		result_type;
 
   public:
     Diff(T thresh)	:_diff(thresh)			{}
 
-    result_type	operator ()(T x, const boost::tuple<const T&, const T&>& y) const
+    result_type	operator ()(T x, const boost::tuple<T, T>& y) const
 		{
 		    return _diff(x, boost::get<0>(y))
 			 + _diff(x, boost::get<1>(y));
@@ -105,7 +100,6 @@ template <class T>
 class Diff<mm::vec<T> >
 {
   public:
-    typedef mm::vec<T>					first_argument_type;
     typedef typename std::make_signed<T>::type		signed_type;
     typedef mm::vec<signed_type>			result_type;
 
@@ -307,7 +301,7 @@ class mask_iterator
     template <class VEC_>
     void	update(element_type R, VEC_& mask)
 		{
-		    using namespace	std;
+		    using namespace	boost;
 
 		    element_type	RminR = get<0>(*_RminRV),
 					RminV = get<1>(*_RminRV);
@@ -410,35 +404,35 @@ namespace mm
     template <> inline vec<type>					\
     initIdx<type>()							\
     {									\
-	return vec<type>(31,30,29,28,27,26,25,24,			\
-			 23,22,21,20,19,18,17,16,			\
-			 15,14,13,12,11,10, 9, 8,			\
-			  7, 6, 5, 4, 3, 2, 1, 0);			\
+	return vec<type>( 0, 1, 2, 3, 4, 5, 6, 7,			\
+			  8, 9,10,11,12,13,14,15,			\
+			 16,17,18,19,20,21,22,23,			\
+			 24,25,26,27,28,29,30,31);			\
     }
 #  define MM_INITIDX16(type)						\
     template <> inline vec<type>					\
     initIdx<type>()							\
     {									\
-	return vec<type>(15,14,13,12,11,10, 9, 8,			\
-			  7, 6, 5, 4, 3, 2, 1, 0);			\
+	return vec<type>(0, 1, 2, 3, 4, 5, 6, 7,			\
+			 8, 9,10,11,12,13,14,15);			\
     }
 #  define MM_INITIDX8(type)						\
     template <> inline vec<type>					\
     initIdx<type>()							\
     {									\
-	return vec<type>(7, 6, 5, 4, 3, 2, 1, 0);			\
+	return vec<type>(0, 1, 2, 3, 4, 5, 6, 7);			\
     }
 #  define MM_INITIDX4(type)						\
     template <> inline vec<type>					\
     initIdx<type>()							\
     {									\
-	return vec<type>(3, 2, 1, 0);					\
+	return vec<type>(0, 1, 2, 3);					\
     }
 #  define MM_INITIDX2(type)						\
     template <> inline vec<type>					\
     initIdx<type>()							\
     {									\
-	return vec<type>(1, 0);						\
+	return vec<type>(0, 1);						\
     }
     
 #  if defined(AVX2)
@@ -698,9 +692,10 @@ select(bool mask, Idx<T> index, T dmin)
 template <class MASK, class T, class DMIN> inline DMIN
 select(const MASK& mask, Idx<T> index, const DMIN& dmin)
 {
-    return boost::make_tuple(
-	select(boost::get<0>(mask), index, boost::get<0>(dmin)),
-	select(boost::get<1>(mask), index, boost::get<1>(dmin)));
+    using namespace	boost;
+    
+    return make_tuple(select(get<0>(mask), index, get<0>(dmin)),
+		      select(get<1>(mask), index, get<1>(dmin)));
 }
 #endif
 
@@ -756,18 +751,6 @@ class StereoBase : public Profiler
     };
 
   protected:
-    template <class T>
-    struct Allocator
-    {
-#if defined(USE_TBB)
-	typedef tbb::scalable_allocator<T>	type;
-#elif defined(SSE)
-	typedef mm::allocator<T>		type;
-#else
-	typedef std::allocator<T>		type;
-#endif
-    };
-
     template <class T>
     class Pool
     {

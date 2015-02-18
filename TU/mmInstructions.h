@@ -423,37 +423,37 @@ class vec
 
     vec()					{}
     vec(element_type a)				;
-    vec(element_type a1,  element_type a0)	;
-    vec(element_type a3,  element_type a2,
-	element_type a1,  element_type a0)	;
-    vec(element_type a7,  element_type a6,
-	element_type a5,  element_type a4,
-	element_type a3,  element_type a2,
-	element_type a1,  element_type a0)	;
-    vec(element_type a15, element_type a14,
-	element_type a13, element_type a12,
-	element_type a11, element_type a10,
-	element_type a9,  element_type a8,
-	element_type a7,  element_type a6,
-	element_type a5,  element_type a4,
-	element_type a3,  element_type a2,
-	element_type a1,  element_type a0)	;
-    vec(element_type a31, element_type a30,
-	element_type a29, element_type a28,
-	element_type a27, element_type a26,
-	element_type a25, element_type a24,
-	element_type a23, element_type a22,
-	element_type a21, element_type a20,
-	element_type a19, element_type a18,
-	element_type a17, element_type a16,
-	element_type a15, element_type a14,
-	element_type a13, element_type a12,
-	element_type a11, element_type a10,
-	element_type a9,  element_type a8,
-	element_type a7,  element_type a6,
-	element_type a5,  element_type a4,
-	element_type a3,  element_type a2,
-	element_type a1,  element_type a0)	;
+    vec(element_type a0,  element_type a1)	;
+    vec(element_type a0,  element_type a1,
+	element_type a2,  element_type a3)	;
+    vec(element_type a0,  element_type a1,
+	element_type a2,  element_type a3,
+	element_type a4,  element_type a5,
+	element_type a6,  element_type a7)	;
+    vec(element_type a0,  element_type a1,
+	element_type a2,  element_type a3,
+	element_type a4,  element_type a5,
+	element_type a6,  element_type a7,
+	element_type a8,  element_type a9,
+	element_type a10, element_type a11,
+	element_type a12, element_type a13,
+	element_type a14, element_type a15)	;
+    vec(element_type a0,  element_type a1,
+	element_type a2,  element_type a3,
+	element_type a4,  element_type a5,
+	element_type a6,  element_type a7,
+	element_type a8,  element_type a9,
+	element_type a10, element_type a11,
+	element_type a12, element_type a13,
+	element_type a14, element_type a15,
+	element_type a16, element_type a17,
+	element_type a18, element_type a19,
+	element_type a20, element_type a21,
+	element_type a22, element_type a23,
+	element_type a24, element_type a25,
+	element_type a26, element_type a27,
+	element_type a28, element_type a29,
+	element_type a30, element_type a31)	;
     
   // ベース型との間の型変換
     vec(base_type m)	:_base(m)		{}
@@ -677,67 +677,67 @@ template <class T> struct is_vec<vec<T> >	: std::true_type	{};
     }
 #define MM_CONSTRUCTOR_2(type)						\
     inline								\
-    vec<type>::vec(element_type a1, element_type a0)			\
-	:_base(MM_MNEMONIC(set, MM_PREFIX(type), , MM_SIGNED(type))	\
-	       (a1, a0))						\
+    vec<type>::vec(element_type a0, element_type a1)			\
+	:_base(MM_MNEMONIC(setr, MM_PREFIX(type), , MM_SIGNED(type))	\
+	       (a0, a1))						\
     {									\
     }
 #define MM_CONSTRUCTOR_4(type)						\
     inline								\
-    vec<type>::vec(element_type a3, element_type a2,			\
-		   element_type a1, element_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
-	       (a3, a2, a1, a0))					\
+    vec<type>::vec(element_type a0, element_type a1,			\
+		   element_type a2, element_type a3)			\
+	:_base(MM_MNEMONIC(setr,  MM_PREFIX(type), , MM_SIGNED(type))	\
+	       (a0, a1, a2, a3))					\
     {									\
     }
 #define MM_CONSTRUCTOR_8(type)						\
     inline								\
-    vec<type>::vec(element_type a7, element_type a6,			\
-		   element_type a5, element_type a4,			\
-		   element_type a3, element_type a2,			\
-		   element_type a1, element_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
-	       (a7, a6, a5, a4,	a3, a2, a1, a0))			\
+    vec<type>::vec(element_type a0, element_type a1,			\
+		   element_type a2, element_type a3,			\
+		   element_type a4, element_type a5,			\
+		   element_type a6, element_type a7)			\
+	:_base(MM_MNEMONIC(setr,  MM_PREFIX(type), , MM_SIGNED(type))	\
+	       (a0, a1, a2, a3,	a4, a5, a6, a7))			\
     {									\
     }
 #define MM_CONSTRUCTOR_16(type)						\
     inline								\
-    vec<type>::vec(element_type a15, element_type a14,			\
-		   element_type a13, element_type a12,			\
-		   element_type a11, element_type a10,			\
-		   element_type a9,  element_type a8,			\
-		   element_type a7,  element_type a6,			\
-		   element_type a5,  element_type a4,			\
-		   element_type a3,  element_type a2,			\
-		   element_type a1,  element_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
-	       (a15, a14, a13, a12, a11, a10, a9, a8,			\
-		a7,  a6,  a5,  a4,  a3,  a2,  a1, a0))			\
+    vec<type>::vec(element_type a0,  element_type a1,			\
+		   element_type a2,  element_type a3,			\
+		   element_type a4,  element_type a5,			\
+		   element_type a6,  element_type a7,			\
+		   element_type a8,  element_type a9,			\
+		   element_type a10, element_type a11,			\
+		   element_type a12, element_type a13,			\
+		   element_type a14, element_type a15)			\
+	:_base(MM_MNEMONIC(setr,  MM_PREFIX(type), , MM_SIGNED(type))	\
+	       (a0, a1, a2,  a3,  a4,  a5,  a6,  a7,			\
+		a8, a9, a10, a11, a12, a13, a14, a15))			\
     {									\
     }
 #define MM_CONSTRUCTOR_32(type)						\
     inline								\
-    vec<type>::vec(element_type a31, element_type a30,			\
-		   element_type a29, element_type a28,			\
-		   element_type a27, element_type a26,			\
-		   element_type a25, element_type a24,			\
-		   element_type a23, element_type a22,			\
-		   element_type a21, element_type a20,			\
-		   element_type a19, element_type a18,			\
-		   element_type a17, element_type a16,			\
-		   element_type a15, element_type a14,			\
-		   element_type a13, element_type a12,			\
-		   element_type a11, element_type a10,			\
-		   element_type a9,  element_type a8,			\
-		   element_type a7,  element_type a6,			\
-		   element_type a5,  element_type a4,			\
-		   element_type a3,  element_type a2,			\
-		   element_type a1,  element_type a0)			\
-	:_base(MM_MNEMONIC(set,  MM_PREFIX(type), , MM_SIGNED(type))	\
-	       (a31, a30, a29, a28, a27, a26, a25, a24,			\
-		a23, a22, a21, a20, a19, a18, a17, a16,			\
-		a15, a14, a13, a12, a11, a10, a9,  a8,			\
-		a7,  a6,  a5,  a4,  a3,  a2,  a1,  a0))			\
+    vec<type>::vec(element_type a0,  element_type a1,			\
+		   element_type a2,  element_type a3,			\
+		   element_type a4,  element_type a5,			\
+		   element_type a6,  element_type a7,			\
+		   element_type a8,  element_type a9,			\
+		   element_type a10, element_type a11,			\
+		   element_type a12, element_type a13,			\
+		   element_type a14, element_type a15,			\
+		   element_type a16, element_type a17,			\
+		   element_type a18, element_type a19,			\
+		   element_type a20, element_type a21,			\
+		   element_type a22, element_type a23,			\
+		   element_type a24, element_type a25,			\
+		   element_type a26, element_type a27,			\
+		   element_type a28, element_type a29,			\
+		   element_type a30, element_type a31)			\
+	:_base(MM_MNEMONIC(setr,  MM_PREFIX(type), , MM_SIGNED(type))	\
+	       (a0,  a1,  a2,  a3,  a4,  a5,  a6,  a7,			\
+		a8,  a9,  a10, a11, a12, a13, a14, a15,			\
+		a16, a17, a18, a19, a20, a21, a22, a23,			\
+		a24, a25, a26, a27, a28, a29, a30, a31))		\
     {									\
     }
 
@@ -4129,66 +4129,15 @@ struct htuple2vec
 			     == vec<T>::size), result_type>::type
 		operator ()(const boost::tuples::cons<HEAD, TAIL>& t) const
 		{
-		    return exec(t,
-				std::integral_constant<size_t, vec<T>::size>());
+		    return exec(t, boost::tuples::make_index_sequence<
+				       vec<T>::size>());
 		}
 
   private:
-    template <class TUPLE>
-    result_type	exec(const TUPLE& t, std::integral_constant<size_t, 1>) const
+    template <class TUPLE, size_t ...IDX>
+    result_type	exec(const TUPLE& t, boost::tuples::index_sequence<IDX...>) const
 		{
-		    return result_type(boost::get<0>(t));
-		}
-    template <class TUPLE>
-    result_type	exec(const TUPLE& t, std::integral_constant<size_t, 2>) const
-		{
-		    return result_type(boost::get<1>(t), boost::get<0>(t));
-		}
-    template <class TUPLE>
-    result_type	exec(const TUPLE& t, std::integral_constant<size_t, 4>) const
-		{
-		    return result_type(boost::get<3>(t), boost::get<2>(t),
-				       boost::get<1>(t), boost::get<0>(t));
-		}
-    template <class TUPLE>
-    result_type	exec(const TUPLE& t, std::integral_constant<size_t, 8>) const
-		{
-		    return result_type(boost::get<7>(t), boost::get<6>(t),
-				       boost::get<5>(t), boost::get<4>(t),
-				       boost::get<3>(t), boost::get<2>(t),
-				       boost::get<1>(t), boost::get<0>(t));
-		}
-    template <class TUPLE>
-    result_type	exec(const TUPLE& t, std::integral_constant<size_t, 16>) const
-		{
-		    return result_type(boost::get<15>(t), boost::get<14>(t),
-				       boost::get<13>(t), boost::get<12>(t),
-				       boost::get<11>(t), boost::get<10>(t),
-				       boost::get< 9>(t), boost::get< 8>(t),
-				       boost::get< 7>(t), boost::get< 6>(t),
-				       boost::get< 5>(t), boost::get< 4>(t),
-				       boost::get< 3>(t), boost::get< 2>(t),
-				       boost::get< 1>(t), boost::get< 0>(t));
-		}
-    template <class TUPLE>
-    result_type	exec(const TUPLE& t, std::integral_constant<size_t, 32>) const
-		{
-		    return result_type(boost::get<31>(t), boost::get<30>(t),
-				       boost::get<29>(t), boost::get<28>(t),
-				       boost::get<27>(t), boost::get<26>(t),
-				       boost::get<25>(t), boost::get<24>(t),
-				       boost::get<23>(t), boost::get<22>(t),
-				       boost::get<21>(t), boost::get<20>(t),
-				       boost::get<19>(t), boost::get<18>(t),
-				       boost::get<17>(t), boost::get<16>(t),
-				       boost::get<15>(t), boost::get<14>(t),
-				       boost::get<13>(t), boost::get<12>(t),
-				       boost::get<11>(t), boost::get<10>(t),
-				       boost::get< 9>(t), boost::get< 8>(t),
-				       boost::get< 7>(t), boost::get< 6>(t),
-				       boost::get< 5>(t), boost::get< 4>(t),
-				       boost::get< 3>(t), boost::get< 2>(t),
-				       boost::get< 1>(t), boost::get< 0>(t));
+		    return result_type(boost::get<IDX>(t)...);
 		}
 };
 
