@@ -1,6 +1,36 @@
 /*
- *  $Id$
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
+ *  
+ *  創作者：植芝俊夫
+ *
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
+ *  
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
+ *
+ *  Copyright 2002-2007.
+ *  National Institute of Advanced Industrial Science and Technology (AIST)
+ *
+ *  Creator: Toshio UESHIBA
+ *
+ *  [AIST Confidential and all rights reserved.]
+ *  This program is confidential. Any using, copying, changing or
+ *  giving any information concerning with this program to others
+ *  without permission by the copyright holder are strictly prohibited.
+ *
+ *  [No Warranty.]
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
+ *  
+ *  $Id: Array++.h 1785 2015-02-14 05:43:15Z ueshiba $
  */
+/*!
+  \file		SADStereo.h
+  \brief	SADステレオマッチングクラスの定義と実装
+*/
 #ifndef __TU_SADSTEREO_H
 #define __TU_SADSTEREO_H
 
@@ -116,7 +146,7 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     using	super::selectDisparities;
     using	super::pruneDisparities;
     
-    template <template <class, class> class ASSIGN, class COL, class COL_RV>
+    template <class ASSIGN, class COL, class COL_RV>
     void	initializeDissimilarities(COL colL, COL colLe,
 					  COL_RV colRV,
 					  col_siterator colP)	const	;
@@ -187,13 +217,13 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     {
 	start(1);
 #if defined(RING)
-	initializeDissimilarities<assign>(
+	initializeDissimilarities<generic_binary_function<assign> >(
 	    rowL->cbegin(), rowL->cend(),
 	    make_rvcolumn_iterator(rowR->cbegin()), rowP->begin());
 	++rowP;
 #else
 	if (rowL <= rowL0)
-	    initializeDissimilarities<plus_assign>(
+	    initializeDissimilarities<generic_binary_function<plus_assign> >(
 		rowL->cbegin(), rowL->cend(),
 		make_rvcolumn_iterator(rowR->cbegin()), buffers->Q.begin());
 	else
@@ -274,7 +304,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	
 	start(1);
 #if defined(RING)
-	initializeDissimilarities<assign>(
+	initializeDissimilarities<generic_binary_function<assign> >(
 	    rowL->cbegin(), rowL->cend(),
 	    make_rvcolumn_iterator(
 		make_fast_zip_iterator(
@@ -284,7 +314,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	++rowP;
 #else
 	if (rowL <= rowL0)
-	    initializeDissimilarities<plus_assign>(
+	    initializeDissimilarities<generic_binary_function<plus_assign> >(
 		rowL->cbegin(), rowL->cend(),
 		make_rvcolumn_iterator(
 		    make_fast_zip_iterator(
@@ -372,7 +402,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 }
 
 template <class SCORE, class DISP>
-template <template <class, class> class ASSIGN, class COL, class COL_RV> void
+template <class ASSIGN, class COL, class COL_RV> void
 SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colP) const
@@ -388,6 +418,8 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 #endif
     typedef Diff<iterator_value<in_iterator> >			diff_type;
 
+    ASSIGN	assign_op;
+    
     for (; colL != colLe; ++colL)
     {
 	using namespace	std::placeholders;
@@ -397,7 +429,7 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 			std::bind(diff_type(_params.intensityDiffMax),
 				  *colL, _1));
 	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
-	    exec_assignment<ASSIGN>(*P, *Q);
+	    assign_op(*P, *Q);
 	
 	++colRV;
 	++colP;
