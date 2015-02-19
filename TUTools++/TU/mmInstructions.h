@@ -454,7 +454,9 @@ class vec
 	element_type a26, element_type a27,
 	element_type a28, element_type a29,
 	element_type a30, element_type a31)	;
-    
+
+    template <size_t ...IDX>
+    vec(index_sequence<IDX...>)	:vec(IDX...)	{}
   // ベース型との間の型変換
     vec(base_type m)	:_base(m)		{}
 			operator base_type()	{ return _base; }
@@ -487,6 +489,8 @@ class vec
 						  size*((n - 1)/size + 1)); }
 
   private:
+    
+  private:
     base_type		_base;
 };
 
@@ -505,6 +509,13 @@ typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 #  endif
 #endif
 
+//! 連続した整数値で初期化されたSIMDベクトルを生成する．
+template <class T> vec<T>
+make_contiguous_vec()
+{
+    return vec<T>(make_index_sequence<vec<T>::size>());
+}
+    
 //! SIMDベクトルの内容をストリームに出力する．
 /*!
   \param out	出力ストリーム
@@ -4129,13 +4140,12 @@ struct htuple2vec
 			     == vec<T>::size), result_type>::type
 		operator ()(const boost::tuples::cons<HEAD, TAIL>& t) const
 		{
-		    return exec(t, boost::tuples::make_index_sequence<
-				       vec<T>::size>());
+		    return exec(t, make_index_sequence<vec<T>::size>());
 		}
 
   private:
     template <class TUPLE, size_t ...IDX>
-    result_type	exec(const TUPLE& t, boost::tuples::index_sequence<IDX...>) const
+    result_type	exec(const TUPLE& t, index_sequence<IDX...>) const
 		{
 		    return result_type(boost::get<IDX>(t)...);
 		}

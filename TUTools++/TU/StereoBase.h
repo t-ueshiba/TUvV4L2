@@ -1,3 +1,32 @@
+/*
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
+ *  
+ *  創作者：植芝俊夫
+ *
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
+ *  
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
+ *
+ *  Copyright 2002-2007.
+ *  National Institute of Advanced Industrial Science and Technology (AIST)
+ *
+ *  Creator: Toshio UESHIBA
+ *
+ *  [AIST Confidential and all rights reserved.]
+ *  This program is confidential. Any using, copying, changing or
+ *  giving any information concerning with this program to others
+ *  without permission by the copyright holder are strictly prohibited.
+ *
+ *  [No Warranty.]
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
+ *  
+ *  $Id: Array++.h 1785 2015-02-14 05:43:15Z ueshiba $
+ */
 /*!
   \file		StereoBase.h
   \brief	ステレオマッチングクラスの定義と実装
@@ -5,8 +34,8 @@
 #ifndef __TU_STEREOBASE_H
 #define __TU_STEREOBASE_H
 
+#include "TU/Image++.h"		// Use RGBA
 #include "TU/algorithm.h"	// Use std::min(), std::max() and TU::diff().
-#include "TU/tuple.h"
 #include <limits>		// Use std::numeric_limits<T>.
 #include <stack>
 #include <tbb/blocked_range.h>
@@ -41,6 +70,8 @@ template <class T>
 class Diff
 {
   public:
+    typedef T						first_argument_type;
+    typedef first_argument_type				second_argument_type;
     typedef typename std::conditional<
 	std::is_integral<T>::value,
 	typename std::make_signed<T>::type, T>::type	result_type;
@@ -52,7 +83,7 @@ class Diff
 		{
 		    return std::min(diff(x, y), _thresh);
 		}
-    
+
   private:
     const T	_thresh;
 };
@@ -61,7 +92,9 @@ template <>
 class Diff<RGBA>
 {
   public:
-    typedef int		result_type;
+    typedef RGBA					first_argument_type;
+    typedef first_argument_type				second_argument_type;
+    typedef int						result_type;
     
   public:
     Diff(u_char thresh)	:_diff(thresh)			{}
@@ -75,31 +108,13 @@ class Diff<RGBA>
     const Diff<u_char>	_diff;
 };
 
-template <class T>
-class Diff<boost::tuples::cons<
-	       T, boost::tuples::cons<T, boost::tuples::null_type> > >
-{
-  public:
-    typedef typename Diff<T>::result_type		result_type;
-
-  public:
-    Diff(T thresh)	:_diff(thresh)			{}
-
-    result_type	operator ()(T x, const boost::tuple<T, T>& y) const
-		{
-		    return _diff(x, boost::get<0>(y))
-			 + _diff(x, boost::get<1>(y));
-		}
-
-  private:
-    const Diff<T>	_diff;
-};
-
 #if defined(SSE)
 template <class T>
 class Diff<mm::vec<T> >
 {
   public:
+    typedef mm::vec<T>					first_argument_type;
+    typedef first_argument_type				second_argument_type;
     typedef typename std::make_signed<T>::type		signed_type;
     typedef mm::vec<signed_type>			result_type;
 
@@ -118,14 +133,29 @@ class Diff<mm::vec<T> >
 };
 #endif
 
-/************************************************************************
-*  exec_assignment							*
-************************************************************************/
-template <template <class, class> class ASSIGN, class S, class T> void
-exec_assignment(const S& x, T&& y)
+template <class T>
+class Diff<boost::tuples::cons<
+	       T, boost::tuples::cons<T, boost::tuples::null_type> > >
 {
-    ASSIGN<S, T>()(x, std::forward<T>(y));
-}
+  public:
+    typedef T						first_argument_type;
+    typedef boost::tuples::cons<
+	T, boost::tuples::cons<
+	       T, boost::tuples::null_type> >	second_argument_type;
+    typedef typename Diff<T>::result_type		result_type;
+
+  public:
+    Diff(T thresh)	:_diff(thresh)			{}
+
+    result_type	operator ()(T x, const second_argument_type& y) const
+		{
+		    return _diff(x, boost::get<0>(y))
+			 + _diff(x, boost::get<1>(y));
+		}
+
+  private:
+    const Diff<T>	_diff;
+};
 
 /************************************************************************
 *  class rvcolumn_iterator<COL>						*
@@ -372,179 +402,111 @@ struct Idx
 };
 
 #if defined(SSE)
+template <class T>
+struct Idx<mm::vec<T> > : mm::vec<T>
+{
+    typedef mm::vec<T>	super;
+    
+		Idx()	:super(make_index_sequence<super::size>())	{}
+    void	operator ++()		{ *this += super(super::size); }
+};
+
 namespace mm
 {
   /**********************************************************************
   *  SIMD functions							*
   **********************************************************************/
-    template <class TUPLE, class T> inline TUPLE
-    select(const TUPLE& mask, vec<T> index, const TUPLE& dmin)
-    {
-	return boost::make_tuple(
-		   select(boost::get<0>(mask), index, boost::get<0>(dmin)),
-		   select(boost::get<1>(mask), index, boost::get<1>(dmin)));
-    }
-
 #  if !defined(SSE2)
-    template <u_int I> inline int
-    extract(Is32vec x)
-    {					// short用の命令を無理に int に適用
-	return _mm_extract_pi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
-    }					// SHRT_MAX 以下の場合しか有効でない
+  template <u_int I> inline int
+  extract(Is32vec x)
+  {					// short用の命令を無理に int に適用
+      return _mm_extract_pi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
+  }					// SHRT_MAX 以下の場合しか有効でない
 #  elif !defined(SSE4)
-    template <u_int I> inline int
-    extract(Is32vec x)
-    {					// short用の命令を無理に int に適用
-	return _mm_extract_epi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
-    }					// SHRT_MAX 以下の場合しか有効でない
+  template <u_int I> inline int
+  extract(Is32vec x)
+  {					// short用の命令を無理に int に適用
+      return _mm_extract_epi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
+  }					// SHRT_MAX 以下の場合しか有効でない
 #  endif
     
-    template <class T> static vec<T>	initIdx()			;
-#  define MM_INITIDX32(type)						\
-    template <> inline vec<type>					\
-    initIdx<type>()							\
-    {									\
-	return vec<type>( 0, 1, 2, 3, 4, 5, 6, 7,			\
-			  8, 9,10,11,12,13,14,15,			\
-			 16,17,18,19,20,21,22,23,			\
-			 24,25,26,27,28,29,30,31);			\
-    }
-#  define MM_INITIDX16(type)						\
-    template <> inline vec<type>					\
-    initIdx<type>()							\
-    {									\
-	return vec<type>(0, 1, 2, 3, 4, 5, 6, 7,			\
-			 8, 9,10,11,12,13,14,15);			\
-    }
-#  define MM_INITIDX8(type)						\
-    template <> inline vec<type>					\
-    initIdx<type>()							\
-    {									\
-	return vec<type>(0, 1, 2, 3, 4, 5, 6, 7);			\
-    }
-#  define MM_INITIDX4(type)						\
-    template <> inline vec<type>					\
-    initIdx<type>()							\
-    {									\
-	return vec<type>(0, 1, 2, 3);					\
-    }
-#  define MM_INITIDX2(type)						\
-    template <> inline vec<type>					\
-    initIdx<type>()							\
-    {									\
-	return vec<type>(0, 1);						\
-    }
-    
-#  if defined(AVX2)
-    MM_INITIDX32(u_char)
-    MM_INITIDX16(short)
-    MM_INITIDX16(u_short)
-    MM_INITIDX8(int)
-    MM_INITIDX8(u_int)
-#  elif defined(SSE2)
-    MM_INITIDX16(u_char)
-    MM_INITIDX8(short)
-    MM_INITIDX8(u_short)
-    MM_INITIDX4(int)
-    MM_INITIDX4(u_int)
-#  else
-    MM_INITIDX8(u_char)
-    MM_INITIDX4(short)
-    MM_INITIDX4(u_short)
-    MM_INITIDX2(int)
-    MM_INITIDX2(u_int)
-#  endif
-#  if defined(AVX)
-    MM_INITIDX8(float)
-#  elif defined(SSE)
-    MM_INITIDX4(float)
-#  endif
-#  undef MM_INITIDX32
-#  undef MM_INITIDX16
-#  undef MM_INITIDX8
-#  undef MM_INITIDX4
-#  undef MM_INITIDX2
-
-    template <class T, u_int I=vec<T>::size/2> static inline vec<T>
-    minIdx(vec<T> d, vec<T> x)
-    {
-	if (I > 0)
-	{
-	    const vec<T>	y = shift_r<I>(x);
-	    return minIdx<T, (I >> 1)>(select(x < y, d, shift_r<I>(d)),
-				     min(x, y));
-	}
-	else
-	    return d;
-    }
+  template <class T, u_int I=vec<T>::size/2> static inline vec<T>
+  minIdx(vec<T> d, vec<T> x)
+  {
+      if (I > 0)
+      {
+	  const vec<T>	y = shift_r<I>(x);
+	  return minIdx<T, (I >> 1)>(select(x < y, d, shift_r<I>(d)), min(x, y));
+      }
+      else
+	  return d;
+  }
 
 #  if defined(WITHOUT_CVTDOWN)
-    template <class ITER, class RV_ITER>
-    class mask_iterator
-	: public boost::iterator_adaptor<
-		     mask_iterator<ITER, RV_ITER>,
-		     ITER,
-		     tuple_replace<iterator_value<RV_ITER> >,
-		     boost::single_pass_traversal_tag,
-		     tuple_replace<iterator_value<RV_ITER> > >
+  template <class ITER, class RV_ITER>
+  class mask_iterator : public boost::iterator_adaptor<
+			    mask_iterator<ITER, RV_ITER>,
+			    ITER,
+			    tuple_replace<iterator_value<RV_ITER> >,
+			    boost::single_pass_traversal_tag,
+			    tuple_replace<iterator_value<RV_ITER> > >
 #  else
-    template <class T, class ITER, class RV_ITER>
-    class mask_iterator
-	: public boost::iterator_adaptor<
-		     mask_iterator<T, ITER, RV_ITER>,
-		     ITER,
-		     tuple_replace<iterator_value<RV_ITER>, vec<T> >,
-		     boost::single_pass_traversal_tag,
-		     tuple_replace<iterator_value<RV_ITER>, vec<T> > >
+  template <class T, class ITER, class RV_ITER>
+  class mask_iterator : public boost::iterator_adaptor<
+			    mask_iterator<T, ITER, RV_ITER>,
+			    ITER,
+			    tuple_replace<iterator_value<RV_ITER>, vec<T> >,
+			    boost::single_pass_traversal_tag,
+			    tuple_replace<iterator_value<RV_ITER>, vec<T> > >
 #  endif
-    {
-      private:
-	typedef iterator_value<RV_ITER>			elementary_vec;
-	typedef typename tuple_head<elementary_vec>::element_type
+  {
+    private:
+      typedef iterator_value<RV_ITER>			elementary_vec;
+      typedef typename tuple_head<elementary_vec>::element_type
 							element_type;
 #  if defined(WITHOUT_CVTDOWN)
-	typedef boost::iterator_adaptor<
-	    mask_iterator,
-	    ITER,
-	    tuple_replace<elementary_vec>,
-	    boost::single_pass_traversal_tag,
-	    tuple_replace<elementary_vec> >		super;
+      typedef boost::iterator_adaptor<
+	  mask_iterator,
+	  ITER,
+	  tuple_replace<elementary_vec>,
+	  boost::single_pass_traversal_tag,
+	  tuple_replace<elementary_vec> >		super;
 #  else
-	typedef boost::iterator_adaptor<
-	    mask_iterator,
-	    ITER,
-	    tuple_replace<elementary_vec, vec<T> >,
-	    boost::single_pass_traversal_tag,
-	    tuple_replace<elementary_vec, vec<T> > >	super;
-	typedef typename type_traits<element_type>::complementary_mask_type
+      typedef boost::iterator_adaptor<
+	  mask_iterator,
+	  ITER,
+	  tuple_replace<elementary_vec, vec<T> >,
+	  boost::single_pass_traversal_tag,
+	  tuple_replace<elementary_vec, vec<T> > >	super;
+      typedef typename type_traits<element_type>::complementary_mask_type
 							complementary_type;
-	typedef tuple_replace<elementary_vec, vec<complementary_type> >
+      typedef tuple_replace<elementary_vec, vec<complementary_type> >
 							complementary_vec;
-	typedef typename std::conditional<
-	    std::is_floating_point<element_type>::value,
-	    complementary_type, element_type>::type	integral_type;
-	typedef tuple_replace<elementary_vec, vec<integral_type> >
+      typedef typename std::conditional<
+	  std::is_floating_point<element_type>::value,
+	  complementary_type, element_type>::type	integral_type;
+      typedef tuple_replace<elementary_vec, vec<integral_type> >
 							integral_vec;
-	typedef typename std::conditional<
-	    std::is_signed<integral_type>::value,
-	    typename type_traits<integral_type>::unsigned_type,
-	    typename type_traits<integral_type>::signed_type>::type
+      typedef typename std::conditional<
+	  std::is_signed<integral_type>::value,
+	  typename type_traits<integral_type>::unsigned_type,
+	  typename type_traits<integral_type>::signed_type>::type
 							flipped_type;
-	typedef tuple_replace<elementary_vec, vec<flipped_type> >
+      typedef tuple_replace<elementary_vec, vec<flipped_type> >
 							flipped_vec;
-	typedef typename type_traits<flipped_type>::lower_type
+      typedef typename type_traits<flipped_type>::lower_type
 							flipped_lower_type;
-	typedef tuple_replace<elementary_vec, vec<flipped_lower_type> >
+      typedef tuple_replace<elementary_vec, vec<flipped_lower_type> >
 							flipped_lower_vec;
 #  endif
       
-      public:
-	typedef typename super::difference_type		difference_type;
-	typedef typename super::reference		reference;
+    public:
+      typedef typename super::difference_type	difference_type;
+      typedef typename super::reference		reference;
 
-	friend class	boost::iterator_core_access;
+      friend class	boost::iterator_core_access;
 
-      public:
+    public:
 		mask_iterator(ITER R, RV_ITER RminRV)
 		    :super(R),
 		     _index(),
@@ -555,23 +517,23 @@ namespace mm
 		{
 		    setRMost(std::numeric_limits<element_type>::max(), _nextRV);
 		}
-	int	dL()	const	{ return extract<0>(minIdx(_dminL, _RminL)); }
+      int	dL()	const	{ return extract<0>(minIdx(_dminL, _RminL)); }
 	
     private:
     // mask と mask tuple に対するsetRMost
-	void	setRMost(element_type val, vec<element_type>& x)
+      void	setRMost(element_type val, vec<element_type>& x)
 		{
 		    x = set_rmost<element_type>(val);
 		}
-	template <class VEC_>
-	void	setRMost(element_type val, VEC_& x)
+      template <class VEC_>
+      void	setRMost(element_type val, VEC_& x)
 		{
 		    vec<element_type>	next = set_rmost<element_type>(val);
 		    x = boost::make_tuple(next, next);
 		}
 
     // mask と mask tuple に対するupdate
-	void	update(vec<element_type> R, vec<element_type>& x)
+      void	update(vec<element_type> R, vec<element_type>& x)
 		{
 		    vec<element_type>	RminR  = _RminRV();
 		    vec<element_type>	minval = min(R, RminR);
@@ -581,8 +543,8 @@ namespace mm
 		    
 		    x = (R < RminR);
 		}
-	template <class VEC_>
-	void	update(vec<element_type> R, VEC_& x)
+      template <class VEC_>
+      void	update(vec<element_type> R, VEC_& x)
 		{
 		    using namespace	boost;
 
@@ -601,7 +563,7 @@ namespace mm
 		    x = make_tuple(R < RminR, R < RminV);
 		}
 
-	void	cvtdown(elementary_vec& x)
+      void	cvtdown(elementary_vec& x)
 		{
 		    vec<element_type>	R = *super::base();
 		    ++super::base_reference();
@@ -613,27 +575,27 @@ namespace mm
 		    update(R, x);
 		}
 #  if !defined(WITHOUT_CVTDOWN)
-	void	cvtdown(complementary_vec& x)
+      void	cvtdown(complementary_vec& x)
 		{
 		    elementary_vec	y;
 		    cvtdown(y);
 		    x = cvt_mask<complementary_type>(y);
 		}
-	void	cvtdown(flipped_vec& x)
+      void	cvtdown(flipped_vec& x)
 		{
 		    integral_vec	y;
 		    cvtdown(y);
 		    x = cvt_mask<flipped_type>(y);
 		}
-	void	cvtdown(flipped_lower_vec& x)
+      void	cvtdown(flipped_lower_vec& x)
 		{
 		    integral_vec	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
 		    x = cvt_mask<flipped_lower_type>(y, z);
 		}
-	template <class VEC_>
-	void	cvtdown(VEC_& x)
+      template <class VEC_>
+      void	cvtdown(VEC_& x)
 		{
 		    typedef
 			typename tuple_head<VEC_>::element_type	S;
@@ -645,58 +607,32 @@ namespace mm
 		    x = cvt_mask<S>(y, z);
 		}
 #  endif
-	reference
-		dereference() const
+      reference	dereference() const
 		{
 		    reference	mask;
 		    const_cast<mask_iterator*>(this)->cvtdown(mask);
 		    return mask;
 		}
-	void	advance(difference_type)				{}
-	void	increment()						{}
-	void	decrement()						{}
+      void	advance(difference_type)				{}
+      void	increment()						{}
+      void	decrement()						{}
 
-      private:
-	Idx<vec<element_type> >	_index;
-	vec<element_type>	_dminL;
-	vec<element_type>	_RminL;
-	RV_ITER			_RminRV;
-	elementary_vec		_nextRV;
-    };
+    private:
+      Idx<vec<element_type> >	_index;
+      vec<element_type>		_dminL;
+      vec<element_type>		_RminL;
+      RV_ITER			_RminRV;
+      elementary_vec		_nextRV;
+  };
 
 # if defined(WITHOUT_CVTDOWN)
-    template <class ITER, class RV_ITER> mask_iterator<ITER, RV_ITER>
-    make_mask_iterator(ITER R, RV_ITER RminRV)
-    {
-	return mask_iterator<ITER, RV_ITER>(R, RminRV);
-    }
+  template <class ITER, class RV_ITER> mask_iterator<ITER, RV_ITER>
+  make_mask_iterator(ITER R, RV_ITER RminRV)
+  {
+      return mask_iterator<ITER, RV_ITER>(R, RminRV);
+  }
 # endif
 }	// end of namespace mm
-
-template <class T>
-struct Idx<mm::vec<T> > : mm::vec<T>
-{
-    typedef mm::vec<T>	super;
-    
-		Idx() :super(mm::initIdx<T>())	{}
-    void	operator ++()			{*this += super(super::size);}
-};
-
-#else
-template <class T> inline T
-select(bool mask, Idx<T> index, T dmin)
-{
-    return (mask ? index : dmin);
-}
-
-template <class MASK, class T, class DMIN> inline DMIN
-select(const MASK& mask, Idx<T> index, const DMIN& dmin)
-{
-    using namespace	boost;
-    
-    return make_tuple(select(get<0>(mask), index, get<0>(dmin)),
-		      select(get<1>(mask), index, get<1>(dmin)));
-}
 #endif
 
 /************************************************************************

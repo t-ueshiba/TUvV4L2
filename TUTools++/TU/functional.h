@@ -45,6 +45,60 @@
 namespace TU
 {
 /************************************************************************
+*  struct index_sequence<size_t ...>					*
+************************************************************************/
+template <size_t ...> struct index_sequence			{};
+
+namespace detail
+{
+  template <size_t N, size_t I=0, size_t ...IDX>
+  struct make_index_sequence : make_index_sequence<N, I + 1, IDX..., I>
+  {
+  };
+  template <size_t N, size_t ...IDX>
+  struct make_index_sequence<N, N, IDX...>
+  {
+      typedef index_sequence<IDX...>	type;
+  };
+}
+    
+template <size_t N>
+using make_index_sequence = typename detail::make_index_sequence<N>::type;
+    
+/************************************************************************
+*  struct generic_function<FUNC>					*
+************************************************************************/
+template <template <class> class FUNC>
+struct generic_function
+{
+    template <class T_> auto
+    operator ()(T_&& x) const -> decltype(FUNC<T_>()(std::forward<T_>(x)))
+    {
+	return FUNC<T_>()(std::forward<T_>(x));
+    }
+
+    template <class T_> auto
+    operator ()(const T_& x, const T_& y) const -> decltype(FUNC<T_>()(x, y))
+    {
+	return FUNC<T_>()(x, y);
+    }
+};
+
+/************************************************************************
+*  struct generic_binary_function<FUNC>					*
+************************************************************************/
+template <template <class, class> class FUNC>
+struct generic_binary_function
+{
+    template <class S_, class T_> auto
+    operator ()(S_&& x, T_&& y) const
+	-> decltype(FUNC<S_, T_>()(std::forward<S_>(x), std::forward<T_>(y)))
+    {
+	return FUNC<S_, T_>()(std::forward<S_>(x), std::forward<T_>(y));
+    }
+};
+
+/************************************************************************
 *  struct plus<S, T>							*
 ************************************************************************/
 //! 加算
@@ -60,7 +114,7 @@ struct plus
     typedef decltype(std::declval<S>()+
 		     std::declval<T>())	result_type;
     
-    result_type	operator ()(const S& x, const T& y)	const	{ return x + y; }
+    result_type	operator ()(const S& x, const T& y)	const	{return x + y;}
 };
     
 /************************************************************************
@@ -79,7 +133,7 @@ struct minus
     typedef decltype(std::declval<S>()-
 		     std::declval<T>())	result_type;
     
-    result_type	operator ()(const S& x, const T& y)	const	{ return x - y; }
+    result_type	operator ()(const S& x, const T& y)	const	{return x - y;}
 };
     
 /************************************************************************
@@ -98,7 +152,7 @@ struct multiplies
     typedef decltype(std::declval<S>()*
 		     std::declval<T>())	result_type;
     
-    result_type	operator ()(const S& x, const T& y)	const	{ return x * y; }
+    result_type	operator ()(const S& x, const T& y)	const	{return x * y;}
 };
     
 /************************************************************************
@@ -117,7 +171,7 @@ struct divides
     typedef decltype(std::declval<S>()/
 		     std::declval<T>())	result_type;
     
-    result_type	operator ()(const S& x, const T& y)	const	{ return x / y; }
+    result_type	operator ()(const S& x, const T& y)	const	{return x / y;}
 };
     
 /************************************************************************
@@ -296,6 +350,28 @@ struct bit_xor_assign
     typedef T	result_type;
     
     T&	operator ()(const S& x, T&& y)	const	{ y ^= x; return y; }
+};
+
+/************************************************************************
+*  Selection								*
+************************************************************************/
+template <class S, class T> inline auto
+select(bool s, const S& x, const T& y) -> decltype(s ? x : y)
+{
+    return (s ? x : y);
+}
+    
+/************************************************************************
+*  struct generic_select						*
+************************************************************************/
+struct generic_select
+{
+    template <class R_, class S_, class T_> auto
+    operator ()(const R_& s, const S_& x, const T_& y) const
+	-> decltype(select(s, x, y))
+    {
+	return select(s, x, y);
+    }
 };
 
 //! 実装の詳細を収める名前空間
