@@ -83,11 +83,7 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 	void	initialize(size_t N, size_t D, size_t W)		;
 	void	initialize(size_t N, size_t D, size_t W, size_t H)	;
 	
-#if defined(RING)
-	ScoreVecArray2Array	P;	// (N + 1) x W x D
-#else
 	ScoreVecArray2		Q;	// W x D
-#endif
 	DisparityArray		dminL;	// 1 x (W - N + 1)
 	FloatArray		delta;	// 1 x (W - N + 1)
 	DisparityArray		dminR;	// 1 x (W + D - 1)
@@ -126,9 +122,9 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     };
 
   public:
-    SADStereo()	:super(*this, 6), _params()				{}
+    SADStereo()	:super(*this, 5), _params()				{}
     SADStereo(const Parameters& params)
-	:super(*this, 6), _params(params)				{}
+	:super(*this, 5), _params(params)				{}
 
     const Parameters&
 		getParameters()					const	;
@@ -146,7 +142,7 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     using	super::selectDisparities;
     using	super::pruneDisparities;
     
-    template <class ASSIGN, class COL, class COL_RV>
+    template <class COL, class COL_RV>
     void	initializeDissimilarities(COL colL, COL colLe,
 					  COL_RV colRV,
 					  col_siterator colP)	const	;
@@ -206,26 +202,16 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     buffers->initialize(N, D, W);
 
     std::advance(rowD, N/2);	// 出力行をウィンドウサイズの半分だけ進める
-#if defined(RING)
-    ScoreVecArray2Ring	rowP(buffers->P.begin(), buffers->P.end());
-    ScoreVecArray2Box	boxQ;
-#else
     ROW			rowLp = rowL, rowRp = rowR;
-#endif
+
   // 各行に対してステレオマッチングを行い視差を計算
     for (ROW rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
     {
 	start(1);
-#if defined(RING)
-	initializeDissimilarities<generic_binary_function<assign> >(
-	    rowL->cbegin(), rowL->cend(),
-	    make_rvcolumn_iterator(rowR->cbegin()), rowP->begin());
-	++rowP;
-#else
 	if (rowL <= rowL0)
-	    initializeDissimilarities<generic_binary_function<plus_assign> >(
-		rowL->cbegin(), rowL->cend(),
-		make_rvcolumn_iterator(rowR->cbegin()), buffers->Q.begin());
+	    initializeDissimilarities(rowL->cbegin(), rowL->cend(),
+				      make_rvcolumn_iterator(
+					  rowR->cbegin()), buffers->Q.begin());
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
@@ -236,19 +222,12 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    ++rowLp;
 	    ++rowRp;
 	}
-#endif
+
 	if (rowL >= rowL0)
 	{
-#if defined(RING)
-	    start(2);
-	    if (rowL == rowL0)
-		boxQ.initialize(rowP - N, N);
-	    const ScoreVecArray2&	Q = *boxQ;
-	    ++boxQ;
-#else
 	    const ScoreVecArray2&	Q = buffers->Q;
-#endif
-	    start(3);
+
+	    start(2);
 	    buffers->RminR.fill(std::numeric_limits<Score>::max());
 	    computeDisparities(Q.crbegin(), Q.crend(),
 			       buffers->dminL.rbegin(),
@@ -256,7 +235,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 			       make_rvcolumn_iterator(
 				   buffers->dminR.end() - D + 1),
 			       make_dummy_iterator(&(buffers->RminR)));
-	    start(4);
+	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
 			      rowD->begin() + N/2);
@@ -289,13 +268,9 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 
     const ROW_D		rowD0 = rowD;
     size_t		v = H, cV = std::distance(rowL, rowLlast);
-#if defined(RING)
-    ScoreVecArray2Ring	rowP(buffers->P.begin(), buffers->P.end());
-    ScoreVecArray2Box	boxQ;
-#else
     ROW			rowLp = rowL, rowRp = rowR;
     size_t		cVp = cV;
-#endif
+
   // 各行に対してステレオマッチングを行い視差を計算
     for (const ROW rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
     {
@@ -303,24 +278,15 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	--cV;
 	
 	start(1);
-#if defined(RING)
-	initializeDissimilarities<generic_binary_function<assign> >(
-	    rowL->cbegin(), rowL->cend(),
-	    make_rvcolumn_iterator(
-		make_fast_zip_iterator(
-		    boost::make_tuple(rowR->cbegin(),
-				      make_vertical_iterator(rowV, cV)))),
-	    rowP->begin());
-	++rowP;
-#else
 	if (rowL <= rowL0)
-	    initializeDissimilarities<generic_binary_function<plus_assign> >(
-		rowL->cbegin(), rowL->cend(),
-		make_rvcolumn_iterator(
-		    make_fast_zip_iterator(
-			boost::make_tuple(rowR->cbegin(),
-					  make_vertical_iterator(rowV, cV)))),
-		buffers->Q.begin());
+	    initializeDissimilarities(rowL->cbegin(), rowL->cend(),
+				      make_rvcolumn_iterator(
+					  make_fast_zip_iterator(
+					      boost::make_tuple(
+						  rowR->cbegin(),
+						  make_vertical_iterator(
+						      rowV, cV)))),
+				      buffers->Q.begin());
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
@@ -341,19 +307,12 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    ++rowLp;
 	    ++rowRp;
 	}
-#endif
+
 	if (rowL >= rowL0)
 	{
-#if defined(RING)
-	    start(2);
-	    if (rowL == rowL0)
-		boxQ.initialize(rowP - N, N);
-	    const ScoreVecArray2&	Q = *boxQ;
-	    ++boxQ;
-#else
 	    const ScoreVecArray2&	Q = buffers->Q;
-#endif
-	    start(3);
+
+	    start(2);
 	    buffers->RminR.fill(std::numeric_limits<Score>::max());
 	    computeDisparities(Q.crbegin(), Q.crend(),
 			       buffers->dminL.rbegin(),
@@ -370,7 +329,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 					   make_dummy_iterator(
 					       &(buffers->RminR)),
 					   buffers->RminV.rbegin()))));
-	    start(4);
+	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
 			      rowD->begin() + N/2);
@@ -386,7 +345,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
       // 上画像からの逆方向視差探索により誤対応を除去する．マルチスレッドの
       // 場合は短冊を跨がる視差探索ができず各短冊毎に処理せねばならないので，
       // 結果はシングルスレッド時と異なる．
-	start(5);
+	start(4);
 	rowD = rowD0;
 	for (v = H - N + 1; v-- != 0; )
 	{
@@ -402,7 +361,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 }
 
 template <class SCORE, class DISP>
-template <class ASSIGN, class COL, class COL_RV> void
+template <class COL, class COL_RV> void
 SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colP) const
@@ -416,20 +375,15 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
     typedef typename iterator_value<COL_RV>::iterator		in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
-    typedef Diff<iterator_value<in_iterator> >			diff_type;
+    typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
+    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
 
-    ASSIGN	assign_op;
-    
     for (; colL != colLe; ++colL)
     {
-	using namespace	std::placeholders;
-
-	auto	P = boost::make_transform_iterator(
-			in_iterator(colRV->begin()),
-			std::bind(diff_type(_params.intensityDiffMax),
-				  *colL, _1));
+	piterator	P(in_iterator(colRV->begin()),
+			  diff_type(*colL, _params.intensityDiffMax));
 	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
-	    assign_op(*P, *Q);
+	    *Q += *P;
 	
 	++colRV;
 	++colP;
@@ -451,20 +405,15 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
     typedef typename iterator_value<COL_RV>::iterator		in_iterator;
     typedef typename ScoreVecArray::iterator			qiterator;
 #endif
-    typedef Diff<iterator_value<in_iterator> >			diff_type;
+    typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
+    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
 
     for (; colL != colLe; ++colL)
     {
-	using namespace	std::placeholders;
-
-	auto	Pp = boost::make_transform_iterator(
-			 in_iterator(colRVp->begin()),
-			 std::bind(diff_type(_params.intensityDiffMax),
-				   *colLp, _1));
-	auto	Pn = boost::make_transform_iterator(
-			 in_iterator(colRV->begin()),
-			 std::bind(diff_type(_params.intensityDiffMax),
-				   *colL, _1));
+	piterator	Pp(in_iterator(colRVp->begin()),
+			   diff_type(*colLp, _params.intensityDiffMax));
+	piterator	Pn(in_iterator(colRV->begin()),
+			   diff_type(*colL, _params.intensityDiffMax));
 	for (qiterator Q(colQ->begin()), Qe(colQ->end());
 	     Q != Qe; ++Q, ++Pp, ++Pn)
 	    *Q += (*Pn - *Pp);
@@ -563,15 +512,8 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 #else
     const size_t	DD = D;
 #endif
-#if defined(RING)
-    P.resize(N + 1);
-    for (row_siterator rowP = P.begin(); rowP != P.end(); ++rowP)
-	if (!rowP->resize(W, DD))
-	    break;
-#else
     Q.resize(W, DD);			// Q(u, *; d)
     Q.fill(0);
-#endif
 
     if (dminL.resize(W - N + 1))
 	delta.resize(dminL.size());

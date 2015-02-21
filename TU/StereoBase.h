@@ -77,37 +77,23 @@ class Diff
 	typename std::make_signed<T>::type, T>::type	result_type;
     
   public:
-    Diff(T thresh)	:_thresh(thresh)		{}
+    Diff(T x, T thresh)	:_x(x), _thresh(thresh)		{}
     
-    result_type	operator ()(T x, T y) const
+    result_type	operator ()(T y) const
 		{
-		    return std::min(diff(x, y), _thresh);
+		    return std::min(diff(_x, y), _thresh);
 		}
-
+    result_type	operator ()(boost::tuple<T, T> y) const
+		{
+		    return (*this)(boost::get<0>(y))
+			 + (*this)(boost::get<1>(y));
+		}
+    
   private:
+    const T	_x;
     const T	_thresh;
 };
     
-template <>
-class Diff<RGBA>
-{
-  public:
-    typedef RGBA					first_argument_type;
-    typedef first_argument_type				second_argument_type;
-    typedef int						result_type;
-    
-  public:
-    Diff(u_char thresh)	:_diff(thresh)			{}
-    
-    result_type	operator ()(RGBA x, RGBA y) const
-		{
-		    return _diff(x.r, y.r) + _diff(x.g, y.g) + _diff(x.b, y.b);
-		}
-    
-  private:
-    const Diff<u_char>	_diff;
-};
-
 #if defined(SSE)
 template <class T>
 class Diff<mm::vec<T> >
@@ -119,43 +105,25 @@ class Diff<mm::vec<T> >
     typedef mm::vec<signed_type>			result_type;
 
   public:
-    Diff(mm::vec<T> thresh)	:_thresh(thresh)	{}
+    Diff(mm::vec<T> x, mm::vec<T> thresh)	:_x(x), _thresh(thresh)	{}
     
-    result_type	operator ()(mm::vec<T> x, mm::vec<T> y) const
+    result_type	operator ()(mm::vec<T> y) const
 		{
 		    using namespace	mm;
 
-		    return cast<signed_type>(min(diff(x, y), _thresh));
+		    return cast<signed_type>(min(diff(_x, y), _thresh));
+		}
+    result_type	operator ()(boost::tuple<mm::vec<T>, mm::vec<T> > y) const
+		{
+		    return (*this)(boost::get<0>(y))
+			 + (*this)(boost::get<1>(y));
 		}
 
   private:
+    const mm::vec<T>	_x;
     const mm::vec<T>	_thresh;
 };
 #endif
-
-template <class T>
-class Diff<boost::tuples::cons<
-	       T, boost::tuples::cons<T, boost::tuples::null_type> > >
-{
-  public:
-    typedef T						first_argument_type;
-    typedef boost::tuples::cons<
-	T, boost::tuples::cons<
-	       T, boost::tuples::null_type> >	second_argument_type;
-    typedef typename Diff<T>::result_type		result_type;
-
-  public:
-    Diff(T thresh)	:_diff(thresh)			{}
-
-    result_type	operator ()(T x, const second_argument_type& y) const
-		{
-		    return _diff(x, boost::get<0>(y))
-			 + _diff(x, boost::get<1>(y));
-		}
-
-  private:
-    const Diff<T>	_diff;
-};
 
 /************************************************************************
 *  class rvcolumn_iterator<COL>						*

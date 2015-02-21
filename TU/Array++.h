@@ -57,6 +57,7 @@ struct BufTraits
 {
     typedef const T*				const_iterator;
     typedef T*					iterator;
+    typedef std::allocator<T>			allocator_type;
 };
 #if defined(MMX)		// MMX が定義されているときは...
 template <class T>
@@ -64,6 +65,7 @@ struct BufTraits<mm::vec<T> >	// 要素がvec<T>の配列の反復子を特別�
 {
     typedef mm::load_iterator<const T*, true>	const_iterator;
     typedef mm::store_iterator<T*, true>	iterator;
+    typedef mm::allocator<mm::vec<T> >		allocator_type;
 };
 #endif
 
@@ -77,14 +79,7 @@ struct BufTraits<mm::vec<T> >	// 要素がvec<T>の配列の反復子を特別�
   \param T		要素の型
   \param ALLOC		アロケータの型
 */
-#if defined(MMX)
-template <class T,
-	  class ALLOC=typename std::conditional<mm::is_vec<T>::value,
-						mm::allocator<T>,
-						std::allocator<T> >::type>
-#else
-template <class T, class ALLOC=std::allocator<T> >
-#endif
+template <class T, class ALLOC=typename BufTraits<T>::allocator_type>
 class Buf : public BufTraits<T>
 {
   public:
