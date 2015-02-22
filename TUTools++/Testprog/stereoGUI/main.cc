@@ -152,7 +152,7 @@ main(int argc, char* argv[])
 	    params.put(cerr);
 	    
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<GFStereoType, u_char, u_char>
+	    v::MyCmdWindow<GFStereoType, u_char, float>
 		myWin(vapp, vinfo, textureMapping, parallax, params, scale);
 
 	  // GUIのイベントループ．
@@ -167,7 +167,7 @@ main(int argc, char* argv[])
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<SADStereoType, u_char, u_char>
+	    v::MyCmdWindow<SADStereoType, u_char, float>
 		myWin(vapp, vinfo, textureMapping, parallax, params, scale);
 
 	  // GUIのイベントループ．
