@@ -37,6 +37,7 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
+#include <boost/bind.hpp>
 
 namespace TU
 {
@@ -225,11 +226,9 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 
 	if (rowL >= rowL0)
 	{
-	    const ScoreVecArray2&	Q = buffers->Q;
-
 	    start(2);
 	    buffers->RminR.fill(std::numeric_limits<Score>::max());
-	    computeDisparities(Q.crbegin(), Q.crend(),
+	    computeDisparities(buffers->Q.crbegin(), buffers->Q.crend(),
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
 			       make_rvcolumn_iterator(
@@ -310,11 +309,9 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 
 	if (rowL >= rowL0)
 	{
-	    const ScoreVecArray2&	Q = buffers->Q;
-
 	    start(2);
 	    buffers->RminR.fill(std::numeric_limits<Score>::max());
-	    computeDisparities(Q.crbegin(), Q.crend(),
+	    computeDisparities(buffers->Q.crbegin(), buffers->Q.crend(),
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
 			       make_rvcolumn_iterator(

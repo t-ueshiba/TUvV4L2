@@ -377,13 +377,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	void	initialize(size_t N, size_t D, size_t W)		;
 	void	initialize(size_t N, size_t D, size_t W, size_t H)	;
 	
-#  if defined(RING)
-	ScoreVecArray2Array	P;	// (N + 1) x W x 2D
-	GuideArray2		E;	// (N + 1) x W
-#  else
 	ScoreVecArray2		Q;	// W x 2D
 	GuideArray		F;	// 1 x W
-#  endif
 	ScoreVecArray2Array	A;
 	DisparityArray		dminL;	// 1 x (W - N + 1)
 	FloatArray		delta;	// 1 x (W - N + 1)
@@ -538,14 +533,11 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 
 	if (rowL >= rowL0)	// 最初のN行に対してコストPが計算済みならば...
 	{
-	    const ScoreVecArray2&	Q = buffers->Q;
-	    const GuideArray&		F = buffers->F;
-
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(Q.cbegin(), Q.cend(),
-					 F.cbegin(), rowA->begin());
+	    initializeFilterCoefficients(buffers->Q.cbegin(), buffers->Q.cend(),
+					 buffers->F.cbegin(), rowA->begin());
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
@@ -654,14 +646,11 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 
 	if (rowL >= rowL0)	// 最初のN行に対してコストPが計算済みならば...
 	{
-	    const ScoreVecArray2&	Q = buffers->Q;
-	    const GuideArray&		F = buffers->F;
-
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(Q.cbegin(), Q.cend(),
-					 F.cbegin(), rowA->begin());
+	    initializeFilterCoefficients(buffers->Q.cbegin(), buffers->Q.cend(),
+					 buffers->F.cbegin(), rowA->begin());
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
