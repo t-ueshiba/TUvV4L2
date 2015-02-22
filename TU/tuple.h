@@ -114,7 +114,13 @@ namespace tuples
   {
       return make_cons(f(x.get_head()), transform(x.get_tail(), f));
   }
-    
+  template <class HEAD, class TAIL, class UNARY_FUNC> inline auto
+  transform(cons<HEAD, TAIL>& x, const UNARY_FUNC& f)
+      -> decltype(make_cons(f(x.get_head()), transform(x.get_tail(), f)))
+  {
+      return make_cons(f(x.get_head()), transform(x.get_tail(), f));
+  }
+
   /**********************************************************************
   *  transform(cons<H1, T1>, cons<H2, T2>, BINARY_FUNC)			*
   **********************************************************************/
