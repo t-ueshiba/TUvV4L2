@@ -130,26 +130,26 @@ template <class ITER_TUPLE>
 class fast_zip_iterator
     : public boost::iterator_facade<
 	  fast_zip_iterator<ITER_TUPLE>,
-	  decltype(std::detail::transform(std::declval<ITER_TUPLE>(),
-					  detail::generic_dereference())),
+	  decltype(std::tuple_transform(std::declval<ITER_TUPLE>(),
+					detail::generic_dereference())),
 	  typename std::iterator_traits<
 	      typename std::tuple_element<0, ITER_TUPLE>::type>
 	      ::iterator_category,
-	  decltype(std::detail::transform(std::declval<ITER_TUPLE>(),
-					  detail::generic_dereference()))>
+	  decltype(std::tuple_transform(std::declval<ITER_TUPLE>(),
+					detail::generic_dereference()))>
 {
   private:
     typedef boost::iterator_facade<
 	fast_zip_iterator<ITER_TUPLE>,
         decltype(
-	    std::detail::transform(std::declval<ITER_TUPLE>(),
-				   detail::generic_dereference())),
+	    std::tuple_transform(std::declval<ITER_TUPLE>(),
+				 detail::generic_dereference())),
         typename std::iterator_traits<
 	    typename std::tuple_element<0, ITER_TUPLE>::type>
 	    ::iterator_category,
         decltype(
-	    std::detail::transform(std::declval<ITER_TUPLE>(),
-				   detail::generic_dereference()))>	super;
+	    std::tuple_transform(std::declval<ITER_TUPLE>(),
+				 detail::generic_dereference()))>	super;
     
   public:
     typedef typename super::reference			reference;
@@ -180,7 +180,7 @@ class fast_zip_iterator
       private:
 	const difference_type	_n;
     };
-    
+
   public:
     fast_zip_iterator(const ITER_TUPLE& iter_tuple)
 	:_iter_tuple(iter_tuple)		{}
@@ -191,8 +191,8 @@ class fast_zip_iterator
   private:
     reference	dereference() const
 		{
-		    return std::detail::transform(_iter_tuple,
-						  detail::generic_dereference());
+		    return std::tuple_transform(_iter_tuple,
+						detail::generic_dereference());
 		}
     bool	equal(const fast_zip_iterator& iter) const
 		{
@@ -201,15 +201,15 @@ class fast_zip_iterator
 		}
     void	increment()
 		{
-		    std::detail::for_each(_iter_tuple, Increment());
+		    std::tuple_for_each(_iter_tuple, Increment());
 		}
     void	decrement()
 		{
-		    std::detail::for_each(_iter_tuple, Decrement());
+		    std::tuple_for_each(_iter_tuple, Decrement());
 		}
     void	advance(difference_type n)
 		{
-		    std::detail::for_each(_iter_tuple, Advance(n));
+		    std::tuple_for_each(_iter_tuple, Advance(n));
 		}
     difference_type
 		distance_to(const fast_zip_iterator& iter) const
@@ -268,19 +268,19 @@ namespace detail
 
 template <class ...T> inline auto
 begin(const tuple<T...>& x)
-    -> decltype(TU::make_fast_zip_iterator(detail::transform(
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
 					       x, detail::generic_begin())))
 {
-    return TU::make_fast_zip_iterator(detail::transform(
+    return TU::make_fast_zip_iterator(tuple_transform(
 					  x, detail::generic_begin()));
 }
     
 template <class ...T> inline auto
 end(const tuple<T...>& x)
-    -> decltype(TU::make_fast_zip_iterator(detail::transform(
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
 					       x, detail::generic_end())))
 {
-    return TU::make_fast_zip_iterator(detail::transform(
+    return TU::make_fast_zip_iterator(tuple_transform(
 					  x, detail::generic_end()));
 }
     
@@ -334,8 +334,8 @@ namespace detail
   struct iterator_value<fast_zip_iterator<ITER_TUPLE> >
   {
       typedef decltype(
-	  std::detail::transform(std::declval<ITER_TUPLE>(),
-				 generic_value()))		type;
+	  std::tuple_transform(std::declval<ITER_TUPLE>(),
+			       generic_value()))		type;
   };
 }
     

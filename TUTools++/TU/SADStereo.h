@@ -37,7 +37,6 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
-#include <boost/bind.hpp>
 
 namespace TU
 {

@@ -1,13 +1,42 @@
 /*
- *  $Id$
+ *  平成14-19年（独）産業技術総合研究所 著作権所有
+ *  
+ *  創作者：植芝俊夫
+ *
+ *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
+ *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
+ *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
+ *  等の行為を禁止します．
+ *  
+ *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
+ *  よび創作者は責任を負いません。
+ *
+ *  Copyright 2002-2007.
+ *  National Institute of Advanced Industrial Science and Technology (AIST)
+ *
+ *  Creator: Toshio UESHIBA
+ *
+ *  [AIST Confidential and all rights reserved.]
+ *  This program is confidential. Any using, copying, changing or
+ *  giving any information concerning with this program to others
+ *  without permission by the copyright holder are strictly prohibited.
+ *
+ *  [No Warranty.]
+ *  The copyright holder or the creator are not responsible for any
+ *  damages caused by using this program.
+ *  
+ *  $Id: Array++.h 1785 2015-02-14 05:43:15Z ueshiba $
  */
+/*!
+  \file		GFStereo.h
+  \brief	Guided Filterステレオマッチングクラスの定義と実装
+*/
 #ifndef __TU_GFSTEREO_H
 #define __TU_GFSTEREO_H
 
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
-#include <boost/bind.hpp>
 
 namespace TU
 {
@@ -22,6 +51,24 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     typedef DISP					Disparity;
 
   private:
+    template <class ITER>
+    class TupleIterator
+    {
+      public:
+	typedef iterator_value<ITER>			element_type;
+	typedef std::tuple<element_type, element_type>	value_type;
+	typedef value_type				reference;
+
+      public:
+	TupleIterator(const ITER& p, const ITER& q)	:_p(p), _q(q)	{}
+    
+	reference	operator *()	const	{ return reference(*_p, *_q); }
+	TupleIterator&	operator ++()		{ ++_p; ++_q; return *this; }
+
+      private:
+	ITER	_p, _q;
+    };
+    
     typedef StereoBase<GFStereo<Score, Disparity> >	super;
 #if defined(SSE)
     typedef mm::vec<Score>				ScoreVec;
@@ -32,17 +79,10 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 #endif
     typedef std::tuple<ScoreVec, ScoreVec>		ScoreVecTuple;
 
-    class ScoreVecArray
-	: public Array<ScoreVec,
-		       Buf<ScoreVec,
-			   typename super::template
-			   Allocator<ScoreVec>::type> >
+    class ScoreVecArray : public Array<ScoreVec>
     {
       private:
-	typedef Array<ScoreVec,
-		      Buf<ScoreVec,
-			  typename super::template
-			  Allocator<ScoreVec>::type> >	array_t;
+	typedef Array<ScoreVec>				array_t;
 	    
       public:
 	typedef typename array_t::iterator		iterator;
@@ -297,19 +337,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	const ScoreVec	_g;
     };
 
-    typedef Array2<ScoreVecArray,
-		   Buf<ScoreVec,
-		       typename super::template
-		       Allocator<ScoreVec>::type>,
-		   Buf<ScoreVecArray,
-		       typename super::template
-		       Allocator<ScoreVecArray>::type> >
-							ScoreVecArray2;
-    typedef Array<ScoreVecArray2,
-		  Buf<ScoreVecArray2,
-		      typename super::template
-		      Allocator<ScoreVecArray2>::type> >
-							ScoreVecArray2Array;
+    typedef Array2<ScoreVecArray>			ScoreVecArray2;
+    typedef Array<ScoreVecArray2>			ScoreVecArray2Array;
     typedef typename ScoreVecArray2::iterator		col_siterator;
     typedef typename ScoreVecArray2::const_iterator
 							const_col_siterator;
@@ -332,38 +361,24 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     typedef typename GuideArray2::const_iterator	const_row_giterator;
     typedef box_filter_iterator<const_col_giterator>	GuideBox;
 
-    typedef Array<Disparity,
-		  Buf<Disparity,
-		      typename super::template
-		      Allocator<Disparity>::type> >	DisparityArray;
-    typedef Array2<DisparityArray,
-		   Buf<Disparity,
-		       typename super::template
-		       Allocator<Disparity>::type> >	DisparityArray2;
+    typedef Array<Disparity>				DisparityArray;
+    typedef Array2<DisparityArray>			DisparityArray2;
     typedef typename DisparityArray::iterator		col_diterator;
     typedef typename DisparityArray::const_iterator	const_col_diterator;
     typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
     typedef typename DisparityArray2::iterator		row_diterator;
     typedef typename DisparityArray2::const_iterator	const_row_diterator;
 
-    typedef Array<float,
-		  Buf<float,
-		      typename super::template
-		      Allocator<float>::type> >		FloatArray;
-    typedef typename FloatArray::reverse_iterator	reverse_col_fiterator;
+    typedef Array<float>				FloatArray;
+    typedef FloatArray::reverse_iterator		reverse_col_fiterator;
     
     struct Buffers
     {
 	void	initialize(size_t N, size_t D, size_t W)		;
 	void	initialize(size_t N, size_t D, size_t W, size_t H)	;
 	
-#  if defined(RING)
-	ScoreVecArray2Array	P;	// (N + 1) x W x 2D
-	GuideArray2		E;	// (N + 1) x W
-#  else
 	ScoreVecArray2		Q;	// W x 2D
 	GuideArray		F;	// 1 x W
-#  endif
 	ScoreVecArray2Array	A;
 	DisparityArray		dminL;	// 1 x (W - N + 1)
 	FloatArray		delta;	// 1 x (W - N + 1)
@@ -423,7 +438,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     using	super::selectDisparities;
     using	super::pruneDisparities;
 
-    template <template <class, class> class ASSIGN, class COL, class COL_RV>
+    template <class COL, class COL_RV>
     void	initializeFilterParameters(COL colL, COL colLe,
 					   COL_RV colRV,
 					   col_siterator colQ,
@@ -489,14 +504,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     Buffers*	buffers = _bufferPool.get();	// 各種作業領域を確保
     buffers->initialize(N, D, W, H);
     
-#if defined(RING)
-    ScoreVecArray2Ring	rowP(buffers->P.begin(), buffers->P.end());
-    ScoreVecArray2Box	boxQ;
-    GuideArrayRing	rowE(buffers->E.begin(), buffers->E.end());
-    GuideArrayBox	boxF;
-#else
     ROW			rowLp = rowL, rowRp = rowR;
-#endif
     ScoreVecArray2Ring	rowA(buffers->A.begin(), buffers->A.end());
     ScoreVecArray2Box	boxB;
     ROW			rowG  = rowL;
@@ -508,19 +516,10 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
       // 各左画素に対して視差[0, D)の右画素のそれぞれとの間の相違度を計算し，
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
-#if defined(RING)
-	initializeFilterParameters<assign>(
-	    rowL->cbegin(), rowL->cend(),
-	    make_rvcolumn_iterator(rowR->cbegin()),
-	    rowP->begin(), rowE->begin());
-	++rowP;
-	++rowE;
-#else
 	if (rowL <= rowL0)
-	    initializeFilterParameters<plus_assign>(
-		rowL->cbegin(), rowL->cend(),
-		make_rvcolumn_iterator(rowR->cbegin()),
-		buffers->Q.begin(), buffers->F.begin());
+	    initializeFilterParameters(rowL->cbegin(), rowL->cend(),
+				       make_rvcolumn_iterator(rowR->cbegin()),
+				       buffers->Q.begin(), buffers->F.begin());
 	else
 	{
 	    updateFilterParameters(rowL->cbegin(), rowL->cend(),
@@ -531,29 +530,14 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    ++rowLp;
 	    ++rowRp;
 	}
-#endif
+
 	if (rowL >= rowL0)	// 最初のN行に対してコストPが計算済みならば...
 	{
-#if defined(RING)
-	  // コストを縦方向に積算
-	    if (rowL == rowL0)
-	    {
-		boxQ.initialize(rowP - N, N);
-		boxF.initialize(rowE - N, N);
-	    }
-	    const ScoreVecArray2&	Q = *boxQ;
-	    const GuideArray&		F = *boxF;
-	    ++boxQ;
-	    ++boxF;
-#else
-	    const ScoreVecArray2&	Q = buffers->Q;
-	    const GuideArray&		F = buffers->F;
-#endif
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(Q.cbegin(), Q.cend(),
-					 F.cbegin(), rowA->begin());
+	    initializeFilterCoefficients(buffers->Q.cbegin(), buffers->Q.cend(),
+					 buffers->F.cbegin(), rowA->begin());
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
@@ -613,15 +597,8 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
     buffers->initialize(N, D, W, H);		// 各種作業領域を確保
 
     size_t		v = H, cV = std::distance(rowL, rowLlast);
-#if defined(RING)
-    ScoreVecArray2Ring	rowP(buffers->P.begin(), buffers->P.end());
-    ScoreVecArray2Box	boxQ;
-    GuideArrayRing	rowE(buffers->E.begin(), buffers->E.end());
-    GuideArrayBox	boxF;
-#else
     ROW			rowLp = rowL, rowRp = rowR;
     size_t		cVp = cV;
-#endif
     ScoreVecArray2Ring	rowA(buffers->A.begin(), buffers->A.end());
     ScoreVecArray2Box	boxB;
     const ROW_D		rowD0 = rowD + N - 1;
@@ -637,25 +614,15 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
       // 各左画素に対して視差[0, D)の右画素のそれぞれとの間の相違度を計算し，
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
-#if defined(RING)
-	initializeFilterParameters<assign>(
-	    rowL->cbegin(), rowL->cend(),
-	    make_rvcolumn_iterator(
-		make_fast_zip_iterator(
-		    std::make_tuple(
-			rowR->cbegin(), make_vertical_iterator(rowV, cV)))),
-	    rowP->begin(), rowE->begin());
-	++rowP;
-	++rowE;
-#else
 	if (rowL <= rowL0)
-	    initializeFilterParameters<plus_assign>(
-		rowL->cbegin(), rowL->cend(),
-		make_rvcolumn_iterator(
-		    make_fast_zip_iterator(
-			std::make_tuple(
-			    rowR->cbegin(), make_vertical_iterator(rowV, cV)))),
-		buffers->Q.begin(), buffers->F.begin());
+	    initializeFilterParameters(rowL->cbegin(), rowL->cend(),
+				       make_rvcolumn_iterator(
+					   make_fast_zip_iterator(
+					       std::make_tuple(
+						   rowR->cbegin(),
+						   make_vertical_iterator(rowV,
+									  cV)))),
+				       buffers->Q.begin(), buffers->F.begin());
 	else
 	{
 	    updateFilterParameters(rowL->cbegin(), rowL->cend(),
@@ -676,29 +643,14 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    ++rowLp;
 	    ++rowRp;
 	}
-#endif
+
 	if (rowL >= rowL0)	// 最初のN行に対してコストPが計算済みならば...
 	{
-#if defined(RING)
-	  // コストを縦方向に積算
-	    if (rowL == rowL0)
-	    {
-		boxQ.initialize(rowP - N, N);
-		boxF.initialize(rowE - N, N);
-	    }
-	    const ScoreVecArray2&	Q = *boxQ;
-	    const GuideArray&		F = *boxF;
-	    ++boxQ;
-	    ++boxF;
-#else
-	    const ScoreVecArray2&	Q = buffers->Q;
-	    const GuideArray&		F = buffers->F;
-#endif
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(Q.cbegin(), Q.cend(),
-					 F.cbegin(), rowA->begin());
+	    initializeFilterCoefficients(buffers->Q.cbegin(), buffers->Q.cend(),
+					 buffers->F.cbegin(), rowA->begin());
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
@@ -763,7 +715,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 }
 
 template <class SCORE, class DISP>
-template <template <class, class> class ASSIGN, class COL, class COL_RV> void
+template <class COL, class COL_RV> void
 GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colQ,
@@ -781,25 +733,22 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	ParamInit, typename ScoreVecArray::iterator2>		qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
+    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
 
     for (; colL != colLe; ++colL)
     {
-      //using namespace	std::placeholders;
-	
 	const Score	pixL = *colL;
-	auto		P = boost::make_transform_iterator(
-				in_iterator(colRV->begin()),
-				boost::bind(diff_type(_params.intensityDiffMax),
-					    pixL, _1));
+	piterator	P(in_iterator(colRV->begin()),
+			  diff_type(pixL, _params.intensityDiffMax));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamInit(pixL))),
 		       Qe(make_assignment_iterator(colQ->end2(),
 						   ParamInit(pixL)));
 	     Q != Qe; ++Q, ++P)
-	    exec_assignment<ASSIGN>(*P, *Q);
+	    *Q += *P;
 
-	exec_assignment<ASSIGN>(pixL,	     colF->g_sum);
-	exec_assignment<ASSIGN>(pixL * pixL, colF->g_sqsum);
+	colF->g_sum   += pixL;
+	colF->g_sqsum += pixL * pixL;
 	
 	++colRV;
 	++colQ;
@@ -825,24 +774,22 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	ParamUpdate, typename ScoreVecArray::iterator2>		qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
-    
+    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
+  /* 本来は fast_zip_iterator<boost::tuple<piterator, piterator> > として
+   * 定義したいが，fast_zip_iterator を piterator と組み合わせると速度低下が
+   * 著しいので，TupleIterator<ITER> を用いる．
+   */
+    typedef TupleIterator<piterator>				ppiterator;
+
     for (; colL != colLe; ++colL)
     {
-      //using namespace	std::placeholders;
-	
 	const Score	pixLp = *colLp, pixL = *colL;
-	auto		P = make_fast_zip_iterator(
-				std::make_tuple(
-				    boost::make_transform_iterator(
-					in_iterator(colRV->begin()),
-					boost::bind(
-					    diff_type(_params.intensityDiffMax),
-					    pixL, _1)),
-				    boost::make_transform_iterator(
-					in_iterator(colRVp->begin()),
-					boost::bind(
-					    diff_type(_params.intensityDiffMax),
-					    pixLp, _1))));
+	ppiterator	P(piterator(
+			      in_iterator(colRV->begin()),
+			      diff_type(pixL, _params.intensityDiffMax)),
+			  piterator(
+			      in_iterator(colRVp->begin()),
+			      diff_type(pixLp, _params.intensityDiffMax)));
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamUpdate(pixL, pixLp))),
 		       Qe(make_assignment_iterator(colQ->end2(),
@@ -974,17 +921,10 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 #else
     const size_t	DD = D;
 #endif
-#if defined(RING)
-    P.resize(N + 1);
-    for (row_siterator rowP = P.begin(); rowP != P.end(); ++rowP)
-	if (!rowP->resize(W, 2*DD))
-	    break;
-#else
     Q.resize(W, 2*DD);			// Q(u, *; d)
     Q.fill(0);
     F.resize(W);
     F.fill(GuideElement());
-#endif
 
     A.resize(N + 1);
     for (row_siterator rowA = A.begin(); rowA != A.end(); ++rowA)
