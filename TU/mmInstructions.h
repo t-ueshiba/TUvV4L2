@@ -3612,7 +3612,7 @@ namespace detail
 	template <class OP_>
 	void	cvtup(value_type x)
 		{
-		    OP_()(x, *_iter);
+		    OP_()(*_iter, x);
 		    ++_iter;
 		}
 	template <class OP_>
@@ -3657,55 +3657,55 @@ namespace detail
 	template <class VEC_>
 	self&	operator =(VEC_ x)
 		{
-		    cvtup<assign<value_type, reference> >(x);
+		    cvtup<assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator +=(VEC_ x)
 		{
-		    cvtup<plus_assign<value_type, reference> >(x);
+		    cvtup<plus_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator -=(VEC_ x)
 		{
-		    cvtup<minus_assign<value_type, reference> >(x);
+		    cvtup<minus_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator *=(VEC_ x)
 		{
-		    cvtup<multiplies_assign<value_type, reference> >(x);
+		    cvtup<multiplies_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator /=(VEC_ x)
 		{
-		    cvtup<divides_assign<value_type, reference> >(x);
+		    cvtup<divides_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator %=(VEC_ x)
 		{
-		    cvtup<modulus_assign<value_type, reference> >(x);
+		    cvtup<modulus_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator &=(VEC_ x)
 		{
-		    cvtup<bit_and_assign<value_type, reference> >(x);
+		    cvtup<bit_and_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator |=(VEC_ x)
 		{
-		    cvtup<bit_or_assign<value_type, reference> >(x);
+		    cvtup<bit_or_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator ^=(VEC_ x)
 		{
-		    cvtup<bit_xor_assign<value_type, reference> >(x);
+		    cvtup<bit_xor_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	
@@ -3921,7 +3921,7 @@ namespace detail
 	template <class OP_>
 	void	cvtup(value_type x)
 		{
-		    OP_()(x, *_iter);
+		    OP_()(*_iter, x);
 		    ++_iter;
 		}
 	template <class OP_>
@@ -3957,25 +3957,25 @@ namespace detail
 	template <class VEC_>
 	self&	operator =(VEC_ x)
 		{
-		    cvtup<assign<value_type, reference> >(x);
+		    cvtup<assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator &=(VEC_ x)
 		{
-		    cvtup<bit_and_assign<value_type, reference> >(x);
+		    cvtup<bit_and_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator |=(VEC_ x)
 		{
-		    cvtup<bit_or_assign<value_type, reference> >(x);
+		    cvtup<bit_or_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	template <class VEC_>
 	self&	operator ^=(VEC_ x)
 		{
-		    cvtup<bit_xor_assign<value_type, reference> >(x);
+		    cvtup<bit_xor_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	

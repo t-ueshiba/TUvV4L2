@@ -315,7 +315,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator +=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::plus_assign>());
     return y;
 }
@@ -325,7 +325,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator -=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::minus_assign>());
     return y;
 }
@@ -335,7 +335,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator *=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::multiplies_assign>());
     return y;
 }
@@ -346,7 +346,7 @@ inline typename enable_if<
 operator *=(tuple<S...>& y, const T& c)
 {
     tuple_for_each(y, bind(TU::generic_binary_function<TU::multiplies_assign>(),
-			   c, placeholders::_1));
+			   placeholders::_1, c));
     return y;
 }
     
@@ -356,7 +356,7 @@ inline typename enable_if<
 operator *=(tuple<S...>&& y, const T& c)
 {
     tuple_for_each(y, bind(TU::generic_binary_function<TU::multiplies_assign>(),
-			   c, placeholders::_1));
+			   placeholders::_1, c));
     return y;
 }
     
@@ -365,7 +365,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator /=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::divides_assign>());
     return y;
 }
@@ -376,7 +376,7 @@ inline typename enable_if<
 operator /=(tuple<S...>& y, const T& c)
 {
     tuple_for_each(y, bind(TU::generic_binary_function<TU::divides_assign>(),
-			   c, placeholders::_1));
+			   placeholders::_1, c));
     return y;
 }
     
@@ -386,7 +386,7 @@ inline typename enable_if<
 operator /=(tuple<S...>&& y, const T& c)
 {
     tuple_for_each(y, bind(TU::generic_binary_function<TU::divides_assign>(),
-			   c, placeholders::_1));
+			   placeholders::_1, c));
     return y;
 }
     
@@ -395,7 +395,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator %=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::modulus_assign>());
     return y;
 }
@@ -429,7 +429,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator &=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::bit_and_assign>());
     return y;
 }
@@ -439,7 +439,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator |=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::bit_or_assign>());
     return y;
 }
@@ -449,7 +449,7 @@ inline typename enable_if<
     detail::is_tuple<typename decay<L>::type>::value, L&>::type
 operator ^=(L&& y, const tuple<T...>& x)
 {
-    tuple_for_each(x, forward<L>(y),
+    tuple_for_each(forward<L>(y), x,
 		   TU::generic_binary_function<TU::bit_xor_assign>());
     return y;
 }

@@ -14,7 +14,7 @@ MOCHDRS		=
 
 INCDIRS		= -I../stereo1394 -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG #-DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
-CFLAGS		= -g
+CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
@@ -95,6 +95,8 @@ SRCS		= ComputeThreeD.cc \
 		MyCanvasPane.cc \
 		MyCmdWindow.cc \
 		MyOglCanvasPane.cc \
+		Rectify.cc \
+		Warp.cc \
 		createMenuCmds.cc \
 		main.cc
 OBJS		= ComputeThreeD.o \
@@ -102,6 +104,8 @@ OBJS		= ComputeThreeD.o \
 		MyCanvasPane.o \
 		MyCmdWindow.o \
 		MyOglCanvasPane.o \
+		Rectify.o \
+		Warp.o \
 		createMenuCmds.o \
 		main.o
 
@@ -181,6 +185,21 @@ MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
 	../stereo1394/DrawThreeD.h /usr/local/include/TU/Warp.h \
 	/usr/local/include/TU/Camera++.h
+Rectify.o: /usr/local/include/TU/Rectify.h /usr/local/include/TU/Warp.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h \
+	/usr/local/include/TU/algorithm.h
+Warp.o: /usr/local/include/TU/Warp.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h
 createMenuCmds.o: ../stereo1394/stereo1394.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \

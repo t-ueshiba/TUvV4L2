@@ -14,7 +14,7 @@ MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
+CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
@@ -98,15 +98,13 @@ HDRS		= TU/Array++.h \
 		TU/mmInstructions.h \
 		TU/tuple.h \
 		TU/types.h
-SRCS		= BlockDiagonalMatrix++.inst.cc \
-		ConversionFromYUV.cc \
+SRCS		= ConversionFromYUV.cc \
 		CorrectIntensity.cc \
 		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
 		FeatureMatch.cc \
 		GaussianCoefficients.cc \
 		GenericImage.cc \
-		Image++.inst.cc \
 		ImageBase.cc \
 		ImageLine.cc \
 		PM16C_04.cc \
@@ -117,20 +115,17 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		SURFCreator.cc \
 		Serial.cc \
 		TriggerGenerator.cc \
-		Vector++.inst.cc \
 		Warp.cc \
 		fdstream.cc \
 		io.cc \
 		manipulators.cc
-OBJS		= BlockDiagonalMatrix++.inst.o \
-		ConversionFromYUV.o \
+OBJS		= ConversionFromYUV.o \
 		CorrectIntensity.o \
 		EdgeDetector.o \
 		FIRGaussianCoefficients.o \
 		FeatureMatch.o \
 		GaussianCoefficients.o \
 		GenericImage.o \
-		Image++.inst.o \
 		ImageBase.o \
 		ImageLine.o \
 		PM16C_04.o \
@@ -141,7 +136,6 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		SURFCreator.o \
 		Serial.o \
 		TriggerGenerator.o \
-		Vector++.inst.o \
 		Warp.o \
 		fdstream.o \
 		io.o \
@@ -153,9 +147,6 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
-	TU/mmInstructions.h
 ConversionFromYUV.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
 	TU/mmInstructions.h TU/Minimize.h
@@ -176,9 +167,6 @@ GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/iterator.h TU/tuple.h TU/functional.h TU/mmInstructions.h \
 	TU/IIRFilter.h TU/SeparableFilter2.h TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
-	TU/mmInstructions.h TU/Minimize.h
-Image++.inst.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
 	TU/mmInstructions.h TU/Minimize.h
 ImageBase.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
@@ -202,8 +190,6 @@ SURFCreator.o: TU/SURFCreator.h TU/Feature.h TU/Geometry++.h TU/Vector++.h \
 Serial.o: TU/Serial.h TU/fdstream.h TU/types.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
 	TU/types.h TU/Manip.h
-Vector++.inst.o: TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h \
-	TU/functional.h TU/mmInstructions.h
 Warp.o: TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
 	TU/mmInstructions.h TU/Minimize.h TU/Camera++.h

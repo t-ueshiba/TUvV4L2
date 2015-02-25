@@ -214,7 +214,7 @@ class Buf : public BufTraits<T>
 			{
 			    for (iterator dst = begin(), e = end();
 				 dst != e; ++dst, ++src)
-				op(*src, *dst);
+				op(*dst, *src);
 			}
     
   private:
@@ -315,13 +315,13 @@ class FixedSizedBuf : public BufTraits<T>
 			FixedSizedBuf(const FixedSizedBuf& b)
 			{
 			    for_each(b.begin(),
-				     assign<value_type, reference>());
+				     assign<reference, value_type>());
 			}
     FixedSizedBuf&	operator =(const FixedSizedBuf& b)
 			{
 			    if (this != &b)
 				for_each(b.begin(),
-					 assign<value_type, reference>());
+					 assign<reference, value_type>());
 			    return *this;
 			}
     
@@ -399,7 +399,7 @@ class FixedSizedBuf : public BufTraits<T>
 	template <class ITER_>
 	static void	exec(ITER_ src, iterator dst, const OP& op)
 			{
-			    op(*src, *dst);
+			    op(*dst, *src);
 			    for_each_impl<N+1, OP>::exec(++src, ++dst, op);
 			}
     };
@@ -574,7 +574,7 @@ class Array : public B
 		    :super(expr.size())
 		{
 		    super::for_each(expr.begin(),
-				    assign<detail::value_t<E>, reference>());
+				    assign<reference, detail::value_t<E> >());
 		}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -583,13 +583,13 @@ class Array : public B
     \param expr	コピー元の配列
     \return	この配列
   */
-    template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
-    Array&	operator =(const E& expr)
+    template <class E>
+    typename std::enable_if<detail::is_range<E>::value, Array&>::type
+		operator =(const E& expr)
 		{
 		    super::resize(expr.size());
 		    super::for_each(expr.begin(),
-				    assign<detail::value_t<E>, reference>());
+				    assign<reference, detail::value_t<E> >());
 		    return *this;
 		}
 
@@ -1151,9 +1151,8 @@ Array2<T, B, R>::get(std::istream& in, size_t i, size_t j, size_t jmax)
   \param expr	その結果を書き出す式
   \return	outで指定した出力ストリーム
 */
-template <class E,
-	  class=typename std::enable_if<detail::is_opnode<E>::value>::type>
-std::ostream&
+template <class E>
+typename std::enable_if<detail::is_opnode<E>::value, std::ostream&>::type
 operator <<(std::ostream& out, const E& expr)
 {
     for (const auto& x : expr)

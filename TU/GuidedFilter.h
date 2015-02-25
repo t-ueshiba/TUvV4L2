@@ -150,14 +150,14 @@ class GuidedFilter : public BoxFilter
 	class Trans
 	{
 	  public:
-	    typedef Coeff	first_argument_type;
+	    typedef Coeff	second_argument_type;
 	    typedef void	result_type;
 	
 	  public:
 	    Trans(size_t n)	:_n(n)					{}
 
 	    template <class TUPLE_>
-	    result_type	operator ()(const Coeff& coeffs, TUPLE_&& t) const
+	    result_type	operator ()(TUPLE_&& t, const Coeff& coeffs) const
 			{
 			    boost::get<1>(t)
 				= coeffs.trans(boost::get<0>(t), _n);
