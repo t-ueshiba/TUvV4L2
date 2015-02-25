@@ -233,7 +233,58 @@ make_fast_zip_iterator(const ITER_TUPLE& iter_tuple)
 namespace std
 {
 /************************************************************************
-*  std::[begin|end](std::tuple<T...>)					*
+*  std::[rbegin|rend|cbegin|cend|crbegin|crend](T)			*
+************************************************************************/
+template <class T> inline auto
+rbegin(const T& x) -> decltype(x.rbegin())
+{
+    return x.rbegin();
+}
+    
+template <class T> inline auto
+rbegin(T& x) -> decltype(x.rbegin())
+{
+    return x.rbegin();
+}
+    
+template <class T> inline auto
+rend(const T& x) -> decltype(x.rend())
+{
+    return x.rend();
+}
+    
+template <class T> inline auto
+rend(T& x) -> decltype(x.rend())
+{
+    return x.rend();
+}
+    
+template <class T> inline auto
+cbegin(const T& x) -> decltype(std::begin(x))
+{
+    return std::begin(x);
+}
+    
+template <class T> inline auto
+cend(const T& x) -> decltype(std::end(x))
+{
+    return std::end(x);
+}
+
+template <class T> inline auto
+crbegin(const T& x) -> decltype(std::rbegin(x))
+{
+    return std::rbegin(x);
+}
+    
+template <class T> inline auto
+crend(const T& x) -> decltype(std::rend(x))
+{
+    return std::rend(x);
+}
+
+/************************************************************************
+*  std::[begin|end|rbegin|rend](std::tuple<T...>)			*
 ************************************************************************/
 namespace detail
 {
@@ -264,10 +315,47 @@ namespace detail
 	  return std::end(x);
       }
   };
+
+  struct generic_rbegin
+  {
+      template <class T> auto
+      operator ()(const T& x) const -> decltype(std::rbegin(x))
+      {
+	  return std::rbegin(x);
+      }
+      template <class T> auto
+      operator ()(T& x) const -> decltype(std::rbegin(x))
+      {
+	  return std::rbegin(x);
+      }
+  };
+    
+  struct generic_rend
+  {
+      template <class T> auto
+      operator ()(const T& x) const -> decltype(std::rend(x))
+      {
+	  return  std::rend(x);
+      }
+      template <class T> auto
+      operator ()(T& x) const -> decltype(std::rend(x))
+      {
+	  return std::rend(x);
+      }
+  };
 }
 
 template <class ...T> inline auto
 begin(const tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
+					       x, detail::generic_begin())))
+{
+    return TU::make_fast_zip_iterator(tuple_transform(
+					  x, detail::generic_begin()));
+}
+    
+template <class ...T> inline auto
+begin(tuple<T...>& x)
     -> decltype(TU::make_fast_zip_iterator(tuple_transform(
 					       x, detail::generic_begin())))
 {
@@ -282,6 +370,51 @@ end(const tuple<T...>& x)
 {
     return TU::make_fast_zip_iterator(tuple_transform(
 					  x, detail::generic_end()));
+}
+    
+template <class ...T> inline auto
+end(tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
+					       x, detail::generic_end())))
+{
+    return TU::make_fast_zip_iterator(tuple_transform(
+					  x, detail::generic_end()));
+}
+    
+template <class ...T> inline auto
+rbegin(const tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
+					       x, detail::generic_rbegin())))
+{
+    return TU::make_fast_zip_iterator(tuple_transform(
+					  x, detail::generic_rbegin()));
+}
+    
+template <class ...T> inline auto
+rbegin(tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
+					       x, detail::generic_rbegin())))
+{
+    return TU::make_fast_zip_iterator(tuple_transform(
+					  x, detail::generic_rbegin()));
+}
+    
+template <class ...T> inline auto
+rend(const tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
+					       x, detail::generic_rend())))
+{
+    return TU::make_fast_zip_iterator(tuple_transform(
+					  x, detail::generic_rend()));
+}
+    
+template <class ...T> inline auto
+rend(tuple<T...>& x)
+    -> decltype(TU::make_fast_zip_iterator(tuple_transform(
+					       x, detail::generic_rend())))
+{
+    return TU::make_fast_zip_iterator(tuple_transform(
+					  x, detail::generic_rend()));
 }
     
 }
@@ -483,7 +616,7 @@ namespace detail
 	template <class T>
 	self&	operator =(const T& val)
 		{
-		    _func(val, *_iter);
+		    _func(*_iter, val);
 		    return *this;
 		}
 
@@ -502,14 +635,14 @@ template <class FUNC, class ITER>
 class assignment2_iterator
     : public boost::iterator_adaptor<assignment2_iterator<FUNC, ITER>,
 				     ITER,
-				     typename FUNC::first_argument_type,
+				     typename FUNC::second_argument_type,
 				     boost::use_default,
 				     detail::assignment2_proxy<FUNC, ITER> >
 {
   private:
     typedef boost::iterator_adaptor<assignment2_iterator,
 				    ITER,
-				    typename FUNC::first_argument_type,
+				    typename FUNC::second_argument_type,
 				    boost::use_default,
 				    detail::assignment2_proxy<FUNC, ITER> >
 						super;

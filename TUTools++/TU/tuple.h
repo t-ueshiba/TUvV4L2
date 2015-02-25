@@ -85,7 +85,7 @@ namespace tuples
   }
   template <class H1, class T1, class H2, class T2, class BINARY_FUNC>
   inline void
-  for_each(const cons<H1, T1>& x, cons<H2, T2>& y, const BINARY_FUNC& f)
+  for_each(cons<H1, T1>& x, const cons<H2, T2>& y, const BINARY_FUNC& f)
   {
       f(x.get_head(), y.get_head());
       for_each(x.get_tail(), y.get_tail(), f);
@@ -249,7 +249,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator +=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::plus_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::plus_assign>());
       return y;
   }
 
@@ -258,7 +258,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator -=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::minus_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::minus_assign>());
       return y;
   }
     
@@ -267,7 +267,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator *=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::multiplies_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::multiplies_assign>());
       return y;
   }
     
@@ -276,7 +276,7 @@ namespace tuples
   operator *=(cons<HEAD, TAIL>& y, const T& c)
   {
       for_each(y, std::bind(TU::generic_binary_function<TU::multiplies_assign>(),
-			    c, std::placeholders::_1));
+			    std::placeholders::_1, c));
       return y;
   }
     
@@ -285,7 +285,7 @@ namespace tuples
   operator *=(cons<HEAD, TAIL>&& y, const T& c)
   {
       for_each(y, std::bind(TU::generic_binary_function<TU::multiplies_assign>(),
-			    c, std::placeholders::_1));
+			    std::placeholders::_1, c));
       return y;
   }
     
@@ -294,7 +294,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator /=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::divides_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::divides_assign>());
       return y;
   }
     
@@ -303,7 +303,7 @@ namespace tuples
   operator /=(cons<HEAD, TAIL>& y, const T& c)
   {
       for_each(y, std::bind(TU::generic_binary_function<TU::divides_assign>(),
-			    c, std::placeholders::_1));
+			    std::placeholders::_1, c));
       return y;
   }
     
@@ -312,7 +312,7 @@ namespace tuples
   operator /=(cons<HEAD, TAIL>&& y, const T& c)
   {
       for_each(y, std::bind(TU::generic_binary_function<TU::divides_assign>(),
-			    c, std::placeholders::_1));
+			    std::placeholders::_1, c));
       return y;
   }
     
@@ -321,7 +321,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator %=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::modulus_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::modulus_assign>());
       return y;
   }
     
@@ -354,7 +354,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator &=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::bit_and_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::bit_and_assign>());
       return y;
   }
     
@@ -363,7 +363,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator |=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::bit_or_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::bit_or_assign>());
       return y;
   }
     
@@ -372,7 +372,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator ^=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      for_each(x, y, TU::generic_binary_function<TU::bit_xor_assign>());
+      for_each(y, x, TU::generic_binary_function<TU::bit_xor_assign>());
       return y;
   }
     

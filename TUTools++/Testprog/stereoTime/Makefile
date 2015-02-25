@@ -14,7 +14,7 @@ MOCHDRS		=
 
 INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DPROFILE #-DUSE_TBB #-DWITHOUT_CVTDOWN #-DRING
-CFLAGS		= -g
+CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3 -g -xCORE-AVX2
@@ -62,8 +62,10 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/types.h \
 		../../windows/fakeWindows.h
 HDRS		=
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= Rectify.cc \
+		main.cc
+OBJS		= Rectify.o \
+		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -71,6 +73,11 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
+Rectify.o: ../../TU/Rectify.h ../../TU/Warp.h ../../TU/Image++.h \
+	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
+	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
+	../../TU/functional.h ../../TU/mmInstructions.h ../../TU/Minimize.h \
+	../../TU/Camera++.h ../../TU/algorithm.h
 main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \

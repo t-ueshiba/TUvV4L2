@@ -36,6 +36,7 @@
 
 #include "TU/Image++.h"		// Use RGBA
 #include "TU/algorithm.h"	// Use std::min(), std::max() and TU::diff().
+#include "TU/tuple.h"
 #include <limits>		// Use std::numeric_limits<T>.
 #include <stack>
 #include <tbb/blocked_range.h>
@@ -385,29 +386,32 @@ namespace mm
   *  SIMD functions							*
   **********************************************************************/
 #  if !defined(SSE2)
-  template <u_int I> inline int
+  template <size_t I> inline int
   extract(Is32vec x)
   {					// short用の命令を無理に int に適用
       return _mm_extract_pi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
   }					// SHRT_MAX 以下の場合しか有効でない
 #  elif !defined(SSE4)
-  template <u_int I> inline int
+  template <size_t I> inline int
   extract(Is32vec x)
   {					// short用の命令を無理に int に適用
       return _mm_extract_epi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
   }					// SHRT_MAX 以下の場合しか有効でない
 #  endif
-    
-  template <class T, u_int I=vec<T>::size/2> static inline vec<T>
-  minIdx(vec<T> d, vec<T> x)
+
+  template <class T, size_t I=vec<T>::size/2> static inline vec<T>
+  minIdx(vec<T> d, vec<T> x,
+	 std::integral_constant<size_t, I>
+	     dummy=std::integral_constant<size_t, I>())
   {
-      if (I > 0)
-      {
-	  const vec<T>	y = shift_r<I>(x);
-	  return minIdx<T, (I >> 1)>(select(x < y, d, shift_r<I>(d)), min(x, y));
-      }
-      else
-	  return d;
+      const vec<T>	y = shift_r<I>(x);
+      return minIdx<T>(select(x < y, d, shift_r<I>(d)), min(x, y),
+		       std::integral_constant<size_t, I/2>());
+  }
+  template <class T> static inline vec<T>
+  minIdx(vec<T> d, vec<T>, std::integral_constant<size_t, 0>)
+  {
+      return d;
   }
 
 #  if defined(WITHOUT_CVTDOWN)
@@ -469,8 +473,8 @@ namespace mm
 #  endif
       
     public:
-      typedef typename super::difference_type	difference_type;
-      typedef typename super::reference		reference;
+      typedef typename super::difference_type		difference_type;
+      typedef typename super::reference			reference;
 
       friend class	boost::iterator_core_access;
 
