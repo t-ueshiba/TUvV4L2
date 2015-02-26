@@ -278,8 +278,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
       public:
 	ParamUpdate(Score gn, Score gp)	:_gn(gn), _gp(gp)		{}
 
-	result_type	operator ()(std::tuple<const ScoreVec&,
-						 const ScoreVec&> p) const
+      // SIMD使用／不使用の両ケースに対応するため，引数をテンプレートにする．
+	template <class TUPLE_>
+	result_type	operator ()(const TUPLE_& p) const
 			{
 			    using namespace	std;
 			    

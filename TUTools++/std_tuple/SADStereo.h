@@ -284,7 +284,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 						  rowR->cbegin(),
 						  make_vertical_iterator(rowV,
 									 cV)))),
-		buffers->Q.begin());
+				      buffers->Q.begin());
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
