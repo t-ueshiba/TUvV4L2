@@ -47,15 +47,16 @@ namespace TU
 namespace v
 {
 /************************************************************************
-*  class MyCmdWindow<STEREO, PIXEL>					*
+*  class MyCmdWindow<STEREO, PIXEL, DISP>				*
 ************************************************************************/
-template <class STEREO, class PIXEL=u_char>
+template <class STEREO, class PIXEL=u_char, class DISP=float>
 class MyCmdWindow : public CmdWindow
 {
   public:
     typedef STEREO			stereo_type;
     typedef PIXEL			pixel_type;
-
+    typedef DISP			disparity_type;
+    
   private:
     typedef typename STEREO::Parameters	params_type;
 
@@ -88,40 +89,40 @@ class MyCmdWindow : public CmdWindow
 
   private:
   // Stereo stuffs.
-    const V4L2CameraArray&	_cameras;
-    const double		_initialWidth;
-    const double		_initialHeight;
-    const double		_scale;
-    Rectify			_rectify;
-    stereo_type			_stereo;
-    size_t			_nimages;
-    Image<pixel_type>		_images[3];
-    Image<pixel_type>		_rectifiedImages[3];
-    Image<float>		_disparityMap;
+    const V4L2CameraArray&			_cameras;
+    const double				_initialWidth;
+    const double				_initialHeight;
+    const double				_scale;
+    Rectify					_rectify;
+    stereo_type					_stereo;
+    size_t					_nimages;
+    Image<pixel_type>				_images[3];
+    Image<pixel_type>				_rectifiedImages[3];
+    Image<disparity_type>			_disparityMap;
 
   // GUI stuffs.
-    float			_b;
-    CmdPane			_menuCmd;
-    CmdPane			_captureCmd;
-    CmdPane			_featureCmd;
+    float					_b;
+    CmdPane					_menuCmd;
+    CmdPane					_captureCmd;
+    CmdPane					_featureCmd;
 #if defined(DISPLAY_2D)
-    MyCanvasPane<pixel_type>	_canvasL;
+    MyCanvasPane<pixel_type>			_canvasL;
 #  if !defined(NO_RV)
-    MyCanvasPane<pixel_type>	_canvasR;
-    MyCanvasPane<pixel_type>	_canvasV;
+    MyCanvasPane<pixel_type>			_canvasR;
+    MyCanvasPane<pixel_type>			_canvasV;
 #  endif
-    Image<u_char>		_disparityMapUC;
-    MyCanvasPane<u_char>	_canvasD;
+    Image<u_char>				_disparityMapUC;
+    MyCanvasPane<u_char>			_canvasD;
 #endif
 #if defined(DISPLAY_3D)
-    const double		_parallax;
+    const double				_parallax;
 #  if defined(DEMO)
-    MyOglWindow<pixel_type>	_window3D;
+    MyOglWindow<pixel_type>			_window3D;
 #  else
-    MyOglCanvasPane<pixel_type>	_canvas3D;
+    MyOglCanvasPane<disparity_type, pixel_type>	_canvas3D;
 #  endif
 #endif
-    Timer			_timer;
+    Timer					_timer;
 };
 
 }

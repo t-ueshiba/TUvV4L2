@@ -278,8 +278,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
       public:
 	ParamUpdate(Score gn, Score gp)	:_gn(gn), _gp(gp)		{}
 
-	result_type	operator ()(boost::tuple<const ScoreVec&,
-						 const ScoreVec&> p) const
+      // SIMD使用／不使用の両ケースに対応するため，引数をテンプレートにする．
+	template <class TUPLE_>
+	result_type	operator ()(const TUPLE_& p) const
 			{
 			    using namespace	boost;
 			    
@@ -930,7 +931,7 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
     for (row_siterator rowA = A.begin(); rowA != A.end(); ++rowA)
 	if (!rowA->resize(W - N + 1, 2*DD))
 	    break;
-    
+
     if (dminL.resize(W - 2*N + 2))
 	delta.resize(dminL.size());
     dminR.resize(dminL.size() + D - 1);

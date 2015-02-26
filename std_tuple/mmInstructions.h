@@ -4143,7 +4143,7 @@ struct htuple2vec
     template <class TUPLE, size_t ...IDX>
     result_type	exec(const TUPLE& t, index_sequence<IDX...>) const
 		{
-		    return result_type(boost::get<IDX>(t)...);
+		    return result_type(std::get<IDX>(t)...);
 		}
 };
 
