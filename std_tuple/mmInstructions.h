@@ -4136,7 +4136,7 @@ struct htuple2vec
     typename std::enable_if<sizeof...(T_) == vec<T>::size, result_type>::type
 		operator ()(const std::tuple<T_...>& t) const
 		{
-		    return exec(t, make_index_sequence<sizof...(T_)>());
+		    return exec(t, make_index_sequence<sizeof...(T_)>());
 		}
 
   private:

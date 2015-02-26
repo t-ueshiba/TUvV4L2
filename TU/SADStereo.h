@@ -202,7 +202,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     buffers->initialize(N, D, W);
 
     std::advance(rowD, N/2);	// 出力行をウィンドウサイズの半分だけ進める
-    ROW			rowLp = rowL, rowRp = rowR;
+    ROW		rowLp = rowL, rowRp = rowR;
 
   // 各行に対してステレオマッチングを行い視差を計算
     for (ROW rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
@@ -210,8 +210,8 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	start(1);
 	if (rowL <= rowL0)
 	    initializeDissimilarities(rowL->cbegin(), rowL->cend(),
-				      make_rvcolumn_iterator(
-					  rowR->cbegin()), buffers->Q.begin());
+				      make_rvcolumn_iterator(rowR->cbegin()),
+				      buffers->Q.begin());
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
@@ -282,8 +282,8 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 					  make_fast_zip_iterator(
 					      boost::make_tuple(
 						  rowR->cbegin(),
-						  make_vertical_iterator(
-						      rowV, cV)))),
+						  make_vertical_iterator(rowV,
+									 cV)))),
 				      buffers->Q.begin());
 	else
 	{
