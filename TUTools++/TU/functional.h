@@ -52,12 +52,12 @@ template <size_t ...> struct index_sequence			{};
 //! 実装の詳細を収める名前空間
 namespace detail
 {
-  template <size_t N, size_t I=0, size_t ...IDX>
-  struct make_index_sequence : make_index_sequence<N, I + 1, IDX..., I>
+  template <size_t N, size_t ...IDX>
+  struct make_index_sequence : make_index_sequence<N - 1, N - 1, IDX...>
   {
   };
-  template <size_t N, size_t ...IDX>
-  struct make_index_sequence<N, N, IDX...>
+  template <size_t ...IDX>
+  struct make_index_sequence<0, IDX...>
   {
       typedef index_sequence<IDX...>	type;
   };

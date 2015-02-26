@@ -62,10 +62,8 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/types.h \
 		../../windows/fakeWindows.h
 HDRS		=
-SRCS		= Rectify.cc \
-		main.cc
-OBJS		= Rectify.o \
-		main.o
+SRCS		= main.cc
+OBJS		= main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -73,11 +71,6 @@ OBJS		= Rectify.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-Rectify.o: ../../TU/Rectify.h ../../TU/Warp.h ../../TU/Image++.h \
-	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/mmInstructions.h ../../TU/Minimize.h \
-	../../TU/Camera++.h ../../TU/algorithm.h
 main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \

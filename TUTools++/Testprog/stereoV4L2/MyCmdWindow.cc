@@ -103,10 +103,10 @@ CmdDef*	createFeatureCmds(const V4L2CameraArray& cameras)		;
 void	refreshFeatureCmds(const V4L2Camera& camera, CmdPane& cmdPane)	;
     
 /************************************************************************
-*  class MyCmdWindow<STEREO, PIXEL>					*
+*  class MyCmdWindow<STEREO, PIXEL, DISP>				*
 ************************************************************************/
-template <class STEREO, class PIXEL>
-MyCmdWindow<STEREO, PIXEL>::MyCmdWindow(
+template <class STEREO, class PIXEL, class DISP>
+MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(
 				App&			parentApp,
 #if defined(DISPLAY_3D)
 				const XVisualInfo*	vinfo,
@@ -210,8 +210,8 @@ MyCmdWindow<STEREO, PIXEL>::MyCmdWindow(
 #endif
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 {
     using namespace	std;
     
@@ -593,17 +593,17 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
 	    switch (val)
 	    {
 	      case c_Texture:
-		_canvas3D.setDrawMode(MyOglCanvasPaneBase::Texture);
+		_canvas3D.setDrawMode(MyOglCanvasPaneBase<DISP>::Texture);
 		_canvas3D.repaintUnderlay();
 		break;
 	
 	      case c_Polygon:
-		_canvas3D.setDrawMode(MyOglCanvasPaneBase::Polygon);
+		_canvas3D.setDrawMode(MyOglCanvasPaneBase<DISP>::Polygon);
 		_canvas3D.repaintUnderlay();
 		break;
 	      
 	      case c_Mesh:
-		_canvas3D.setDrawMode(MyOglCanvasPaneBase::Mesh);
+		_canvas3D.setDrawMode(MyOglCanvasPaneBase<DISP>::Mesh);
 		_canvas3D.repaintUnderlay();
 		break;
 	    }
@@ -633,8 +633,8 @@ MyCmdWindow<STEREO, PIXEL>::callback(CmdId id, CmdVal val)
     }
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::tick()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::tick()
 {
     countTime();
 
@@ -646,8 +646,8 @@ MyCmdWindow<STEREO, PIXEL>::tick()
     stereoMatch();
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::restoreCalibration()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::restoreCalibration()
 {
     using namespace	std;
 
@@ -666,8 +666,8 @@ MyCmdWindow<STEREO, PIXEL>::restoreCalibration()
     }
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::initializeRectification()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::initializeRectification()
 {
     using namespace	std;
     
@@ -748,8 +748,8 @@ MyCmdWindow<STEREO, PIXEL>::initializeRectification()
     _stereo.getParameters().put(std::cerr);
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::stopContinuousShotIfRunning()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::stopContinuousShotIfRunning()
 {
     if (_captureCmd.getValue(c_ContinuousShot))
     {
@@ -760,8 +760,8 @@ MyCmdWindow<STEREO, PIXEL>::stopContinuousShotIfRunning()
     }
 }
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::stereoMatch()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::stereoMatch()
 {
     if (_captureCmd.getValue(c_Binocular))
     {
@@ -798,8 +798,8 @@ MyCmdWindow<STEREO, PIXEL>::stereoMatch()
 }
 
 #if defined(DISPLAY_2D)
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::scaleDisparity()
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::scaleDisparity()
 {
     const float	s = 255.0 / _stereo.getParameters().disparityMax;
     _disparityMapUC.resize(_disparityMap.height(), _disparityMap.width());
@@ -849,8 +849,8 @@ MyCmdWindow<STEREO, PIXEL>::scaleDisparity()
 }
 #endif
 
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::putThreeD(std::ostream& out) const
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::putThreeD(std::ostream& out) const
 {
     using namespace	std;
 
@@ -891,8 +891,8 @@ MyCmdWindow<STEREO, PIXEL>::putThreeD(std::ostream& out) const
 }
 
 #if defined(DISPLAY_3D)
-template <class STEREO, class PIXEL> void
-MyCmdWindow<STEREO, PIXEL>::putThreeDImage(std::ostream& out) const
+template <class STEREO, class PIXEL, class DISP> void
+MyCmdWindow<STEREO, PIXEL, DISP>::putThreeDImage(std::ostream& out) const
 {
     const Image<RGB>&	threeDImage = _canvas3D.template getImage<RGB>();
     
