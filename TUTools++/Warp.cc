@@ -28,6 +28,8 @@
  *  $Id$
  */
 #if defined(__INTEL_COMPILER)
+#  undef AVX2
+#  undef AVX
 #  undef SSE4
 #  undef SSSE3
 #  undef SSE3
@@ -388,4 +390,5 @@ template __PORT void
 Warp::warpLine(const Image<ABGR>& in, Image<ABGR>& out, size_t v) const;
 template __PORT void
 Warp::warpLine(const Image<BGRA>& in, Image<BGRA>& out, size_t v) const;
+
 }

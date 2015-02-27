@@ -74,8 +74,7 @@ class Diff
     typedef T						first_argument_type;
     typedef first_argument_type				second_argument_type;
     typedef typename std::conditional<
-	std::is_integral<T>::value,
-	typename std::make_signed<T>::type, T>::type	result_type;
+	std::is_integral<T>::value, int, T>::type	result_type;
     
   public:
     Diff(T x, T thresh)	:_x(x), _thresh(thresh)		{}
@@ -231,6 +230,31 @@ template <class ITER> dummy_iterator<ITER>
 make_dummy_iterator(ITER iter)		{ return dummy_iterator<ITER>(iter); }
 
 /************************************************************************
+*  class Idx<T>								*
+************************************************************************/
+template <class T>
+struct Idx
+{
+		Idx()	:_i(0)		{}
+		operator T()	const	{ return _i; }
+    void	operator ++()		{ ++_i; }
+    
+  private:
+    T		_i;
+};
+
+#if defined(SSE)
+template <class T>
+struct Idx<mm::vec<T> > : mm::vec<T>
+{
+    typedef mm::vec<T>	super;
+    
+		Idx()	:super(make_index_sequence<super::size>())	{}
+    void	operator ++()		{ *this += super(super::size); }
+};
+#endif
+
+/************************************************************************
 *  class mask_iterator<ITER, RV_ITER>					*
 ************************************************************************/
 template <class ITER, class RV_ITER>
@@ -356,63 +380,22 @@ class mask_iterator
     rv_type	_nextRV;
 };
 
-/************************************************************************
-*  class Idx<T>								*
-************************************************************************/
-template <class T>
-struct Idx
-{
-		Idx()	:_i(0)		{}
-		operator T()	const	{ return _i; }
-    void	operator ++()		{ ++_i; }
-    
-  private:
-    T		_i;
-};
-
 #if defined(SSE)
-template <class T>
-struct Idx<mm::vec<T> > : mm::vec<T>
-{
-    typedef mm::vec<T>	super;
-    
-		Idx()	:super(make_index_sequence<super::size>())	{}
-    void	operator ++()		{ *this += super(super::size); }
-};
-
 namespace mm
 {
-  /**********************************************************************
-  *  SIMD functions							*
-  **********************************************************************/
 #  if !defined(SSE2)
   template <size_t I> inline int
   extract(Is32vec x)
   {					// short用の命令を無理に int に適用
-      return _mm_extract_pi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
-  }					// SHRT_MAX 以下の場合しか有効でない
+      return _mm_extract_pi16(x, I);	// しているため，x が SHRT_MIN 以上
+  }					// かつ SHRT_MAX 以下の場合のみ有効
 #  elif !defined(SSE4)
   template <size_t I> inline int
   extract(Is32vec x)
   {					// short用の命令を無理に int に適用
-      return _mm_extract_epi16(x, I);	// しているため，x が SHRT_MIN 以上かつ
-  }					// SHRT_MAX 以下の場合しか有効でない
+      return _mm_extract_epi16(x, I);	// しているため，x が SHRT_MIN 以上
+  }					// かつ SHRT_MAX 以下の場合のみ有効
 #  endif
-
-  template <class T, size_t I=vec<T>::size/2> static inline vec<T>
-  minIdx(vec<T> d, vec<T> x,
-	 std::integral_constant<size_t, I>
-	     dummy=std::integral_constant<size_t, I>())
-  {
-      const vec<T>	y = shift_r<I>(x);
-      return minIdx<T>(select(x < y, d, shift_r<I>(d)), min(x, y),
-		       std::integral_constant<size_t, I/2>());
-  }
-  template <class T> static inline vec<T>
-  minIdx(vec<T> d, vec<T>, std::integral_constant<size_t, 0>)
-  {
-      return d;
-  }
 
 #  if defined(WITHOUT_CVTDOWN)
   template <class ITER, class RV_ITER>
@@ -471,6 +454,20 @@ namespace mm
       typedef tuple_replace<elementary_vec, vec<flipped_lower_type> >
 							flipped_lower_vec;
 #  endif
+      template <class T_, size_t I_=vec<T_>::size/2> static inline int
+      minIdx(vec<T_> d, vec<T_> x,
+	     std::integral_constant<size_t, I_>
+	     dummy=std::integral_constant<size_t, I_>())
+      {
+	  const vec<T_>	y = shift_r<I_>(x);
+	  return minIdx<T_>(select(x < y, d, shift_r<I_>(d)), min(x, y),
+			    std::integral_constant<size_t, I_/2>());
+      }
+      template <class T_> static inline int
+      minIdx(vec<T_> d, vec<T_>, std::integral_constant<size_t, 0>)
+      {
+	  return extract<0>(d);
+      }
       
     public:
       typedef typename super::difference_type		difference_type;
@@ -489,7 +486,7 @@ namespace mm
 		{
 		    setRMost(std::numeric_limits<element_type>::max(), _nextRV);
 		}
-      int	dL()	const	{ return extract<0>(minIdx(_dminL, _RminL)); }
+      int	dL()	const	{ return minIdx(_dminL, _RminL); }
 	
     private:
     // mask と mask tuple に対するsetRMost
@@ -597,13 +594,13 @@ namespace mm
       elementary_vec		_nextRV;
   };
 
-# if defined(WITHOUT_CVTDOWN)
+#  if defined(WITHOUT_CVTDOWN)
   template <class ITER, class RV_ITER> mask_iterator<ITER, RV_ITER>
   make_mask_iterator(ITER R, RV_ITER RminRV)
   {
       return mask_iterator<ITER, RV_ITER>(R, RminRV);
   }
-# endif
+#  endif
 }	// end of namespace mm
 #endif
 
