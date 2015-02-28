@@ -1370,6 +1370,23 @@ template <size_t I> float	extract(F32vec x)			;
 */
 template <size_t N, class T> static vec<T>	shift_l(vec<T> x)	;
 
+namespace detail
+{
+  template <size_t N>
+  struct generic_shift_l
+  {
+      template <class T_>
+      vec<T_>	operator ()(vec<T_> x)	const	{ return shift_l<N>(x); }
+  };
+}
+    
+template <size_t N, class HEAD, class TAIL> static inline auto
+shift_l(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(boost::tuples::transform(x, detail::generic_shift_l<N>()))
+{
+    return boost::tuples::transform(x, detail::generic_shift_l<N>());
+}
+    
 //! ベクトルの要素を右シフトする．
 /*!
   シフト後の上位には0が入る．
@@ -1379,6 +1396,23 @@ template <size_t N, class T> static vec<T>	shift_l(vec<T> x)	;
 */
 template <size_t N, class T> static vec<T>	shift_r(vec<T> x)	;
 
+namespace detail
+{
+  template <size_t N>
+  struct generic_shift_r
+  {
+      template <class T_>
+      vec<T_>	operator ()(vec<T_> x)	const	{ return shift_r<N>(x); }
+  };
+}
+    
+template <size_t N, class HEAD, class TAIL> static inline auto
+shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(boost::tuples::transform(x, detail::generic_shift_r<N>()))
+{
+    return boost::tuples::transform(x, detail::generic_shift_r<N>());
+}
+    
 // 整数ベクトルの要素シフト（実装上の注意：MMXでは64bit整数のシフトは
 // bit単位だが，SSE2以上の128bit整数ではbyte単位である．また，AVX2では
 // 上下のlaneに分断されないemulationバージョンを使う．）
@@ -1606,11 +1640,42 @@ shift_rmost_to_lmost(vec<T> x)
   \return	xを右端成分とするベクトル
 */
 template <class T> static inline vec<T>
-set_rmost(typename vec<T>::element_type x)
+set_rmost(T x)
 {
     return shift_lmost_to_rmost(vec<T>(x));
 }
 
+namespace detail
+{
+  struct generic_shift_lmost_to_rmost
+  {
+      template <class T_> vec<T_>
+      operator ()(vec<T_> x)	const	{ return shift_lmost_to_rmost(x); }
+  };
+
+  struct generic_shift_rmost_to_lmost
+  {
+      template <class T_> vec<T_>
+      operator ()(vec<T_> x)	const	{ return shift_rmost_to_lmost(x); }
+  };
+}
+    
+template <class HEAD, class TAIL> static inline auto
+shift_lmost_to_rmost(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(
+	boost::tuples::transform(x, detail::generic_shift_lmost_to_rmost()))
+{
+    return boost::tuples::transform(x, detail::generic_shift_lmost_to_rmost());
+}
+    
+template <class HEAD, class TAIL> static inline auto
+shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(
+	boost::tuples::transform(x, detail::generic_shift_rmost_to_lmost()))
+{
+    return boost::tuples::transform(x, detail::generic_shift_rmost_to_lmost());
+}
+    
 /************************************************************************
 *  Replacing rightmost/leftmost element of x with that of y		*
 ************************************************************************/

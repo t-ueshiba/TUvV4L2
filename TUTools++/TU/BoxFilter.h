@@ -46,7 +46,7 @@ namespace TU
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER, class VAL=typename std::iterator_traits<ITER>::value_type>
+template <class ITER, class VAL=iterator_value<ITER> >
 class box_filter_iterator
     : public boost::iterator_adaptor<box_filter_iterator<ITER, VAL>,
 				     ITER,			// base
@@ -162,10 +162,18 @@ class box_filter_iterator
   \param iter	コンテナ中の要素を指す定数反復子
   \return	box filter反復子
 */
-template <class ITER> box_filter_iterator<ITER>
+template <class VAL=void, class ITER>
+box_filter_iterator<ITER,
+		    typename std::conditional<
+			std::is_void<VAL>::value,
+			iterator_value<ITER>, VAL>::type>
 make_box_filter_iterator(ITER iter, size_t w=0)
 {
-    return box_filter_iterator<ITER>(iter, w);
+    typedef typename std::conditional<std::is_void<VAL>::value,
+				      iterator_value<ITER>,
+				      VAL>::type	value_type;
+    
+    return box_filter_iterator<ITER, value_type>(iter, w);
 }
 
 /************************************************************************

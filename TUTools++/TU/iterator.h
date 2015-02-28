@@ -144,7 +144,7 @@ make_fast_zip_iterator(const ITER_TUPLE& t)
 namespace std
 {
 /************************************************************************
-*  std::[rbegin|rend|cbegin|cend|crbegin|crend](T)			*
+*  std::[rbegin|rend](T)						*
 ************************************************************************/
 template <class T> inline auto
 rbegin(const T& x) -> decltype(x.rbegin())
@@ -170,30 +170,6 @@ rend(T& x) -> decltype(x.rend())
     return x.rend();
 }
     
-template <class T> inline auto
-cbegin(const T& x) -> decltype(std::begin(x))
-{
-    return std::begin(x);
-}
-    
-template <class T> inline auto
-cend(const T& x) -> decltype(std::end(x))
-{
-    return std::end(x);
-}
-
-template <class T> inline auto
-crbegin(const T& x) -> decltype(std::rbegin(x))
-{
-    return std::rbegin(x);
-}
-    
-template <class T> inline auto
-crend(const T& x) -> decltype(std::rend(x))
-{
-    return std::rend(x);
-}
-
 /************************************************************************
 *  std::[begin|end|rbegin|rend](boost::tuple<T...>)			*
 ************************************************************************/
@@ -328,6 +304,33 @@ rend(boost::tuples::cons<HEAD, TAIL>& x)
 					  x, detail::generic_rend()));
 }
     
+/************************************************************************
+*  std::[cbegin|cend|crbegin|crend](T)					*
+************************************************************************/
+template <class T> inline auto
+cbegin(const T& x) -> decltype(std::begin(x))
+{
+    return std::begin(x);
+}
+    
+template <class T> inline auto
+cend(const T& x) -> decltype(std::end(x))
+{
+    return std::end(x);
+}
+
+template <class T> inline auto
+crbegin(const T& x) -> decltype(std::rbegin(x))
+{
+    return std::rbegin(x);
+}
+    
+template <class T> inline auto
+crend(const T& x) -> decltype(std::rend(x))
+{
+    return std::rend(x);
+}
+
 }
 
 namespace TU
