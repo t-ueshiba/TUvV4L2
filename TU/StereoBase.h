@@ -126,82 +126,27 @@ class Diff<mm::vec<T> >
 #endif
 
 /************************************************************************
-*  class rvcolumn_iterator<COL>						*
+*  col2ptr(COL)								*
 ************************************************************************/
-namespace detail
+template <class COL> inline COL
+col2ptr(COL col)
 {
-    template <class COL>
-    class rvcolumn_proxy
-    {
-      public:
-  	typedef COL	base_iterator;
-  	typedef COL	iterator;
-	
-      public:
-  	rvcolumn_proxy(base_iterator col) :_col(col)	{}
-
-  	iterator	begin()			 const	{ return _col; }
-	    
-      private:
-  	const base_iterator	_col;
-    };
-    
-    template <class COL, class COLV>
-    class rvcolumn_proxy<fast_zip_iterator<boost::tuple<COL, COLV> > >
-    {
-      public:
-  	typedef fast_zip_iterator<boost::tuple<COL, COLV> >	base_iterator;
-  	typedef fast_zip_iterator<
-  	    boost::tuple<
-  		COL,
-		typename std::iterator_traits<COLV>::pointer> >	iterator;
-
-      public:
-  	rvcolumn_proxy(base_iterator col)
-	    :_rv(col.get_iterator_tuple())			{}
-
-	iterator	begin() const
-			{
-			    return boost::make_tuple(
-				       boost::get<0>(_rv),
-				       boost::get<1>(_rv).operator ->());
-			}
-	
-      private:
-	const boost::tuple<COL, COLV>	_rv;
-    };
+    return col;
 }
-
-template <class COL>
-class rvcolumn_iterator
-    : public boost::iterator_adaptor<rvcolumn_iterator<COL>,
-				     COL,
-				     detail::rvcolumn_proxy<COL>,
-				     boost::use_default,
-				     detail::rvcolumn_proxy<COL> >
-{
-  private:
-    typedef boost::iterator_adaptor<rvcolumn_iterator<COL>,
-				    COL,
-				    detail::rvcolumn_proxy<COL>,
-				    boost::use_default,
-				    detail::rvcolumn_proxy<COL> >	super;
-
-  public:
-    typedef typename super::reference	reference;
-
-    friend class			boost::iterator_core_access;
-
-  public:
-    rvcolumn_iterator(COL col)	:super(col)			{}
     
-  private:
-    reference	dereference()	const	{ return reference(super::base()); }
-};
-
-template <class COL> rvcolumn_iterator<COL>
-make_rvcolumn_iterator(COL col)		{ return rvcolumn_iterator<COL>(col); }
-
+template <class ITER_TUPLE> inline auto
+col2ptr(const fast_zip_iterator<ITER_TUPLE>& col)
+    -> decltype(make_fast_zip_iterator(
+		    boost::make_tuple(
+			boost::get<0>(col.get_iterator_tuple()),
+			boost::get<1>(col.get_iterator_tuple()).operator ->())))
+{
+    return make_fast_zip_iterator(
+	       boost::make_tuple(
+		   boost::get<0>(col.get_iterator_tuple()),
+		   boost::get<1>(col.get_iterator_tuple()).operator ->()));
+}
+    
 /************************************************************************
 *  class dummy_iterator<ITER>						*
 ************************************************************************/
