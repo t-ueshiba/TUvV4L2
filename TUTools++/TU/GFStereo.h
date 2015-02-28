@@ -875,7 +875,8 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
-	    *dminRVt = select(*maskRV, index, dvalue_type(*dminRVt));
+	  //*dminRVt = select(*maskRV, index, dvalue_type(*dminRVt));
+	    *dminRVt = fast_select(*maskRV, index, dvalue_type(*dminRVt));
 
 	    ++dminRVt;
 	    ++index;
