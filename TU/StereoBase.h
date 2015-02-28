@@ -546,6 +546,20 @@ namespace mm
       return mask_iterator<ITER, RV_ITER>(R, RminRV);
   }
 #  endif
+
+  template <class T> inline vec<T>
+  fast_select(vec<T> mask, vec<T> index, vec<T> dminRV)
+  {
+      return select(mask, index, dminRV);
+  }
+  template <class MASK, class T, class DMIN_RV> inline DMIN_RV
+  fast_select(const MASK& mask, vec<T> index, const DMIN_RV& dminRV)
+  {
+      using namespace	boost;
+
+      return make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
+			select(get<1>(mask), index, get<1>(dminRV)));
+  }
 }	// end of namespace mm
 #endif
 

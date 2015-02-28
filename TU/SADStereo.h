@@ -457,7 +457,8 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
-	    *dminRVt = select(*maskRV, index, dvalue_type(*dminRVt));
+	  //*dminRVt = select(*maskRV, index, dvalue_type(*dminRVt));
+	    *dminRVt = fast_select(*maskRV, index, dvalue_type(*dminRVt));
 
 	    ++dminRVt;
 	    ++index;
