@@ -547,13 +547,13 @@ namespace mm
   }
 #  endif
 
-  template <class T> inline vec<T>
-  fast_select(vec<T> mask, vec<T> index, vec<T> dminRV)
+  template <class T> inline mm::vec<T>
+  fast_select(mm::vec<T> mask, mm::vec<T> index, mm::vec<T> dminRV)
   {
       return select(mask, index, dminRV);
   }
   template <class MASK, class T, class DMIN_RV> inline DMIN_RV
-  fast_select(const MASK& mask, vec<T> index, const DMIN_RV& dminRV)
+  fast_select(const MASK& mask, mm::vec<T> index, const DMIN_RV& dminRV)
   {
       using namespace	boost;
 
@@ -561,8 +561,14 @@ namespace mm
 			select(get<1>(mask), index, get<1>(dminRV)));
   }
 }	// end of namespace mm
+#else
+template <class S, class T, class U> inline auto
+fast_select(const S& s, const T& x, const U& y) -> decltype(select(s, x, y))
+{
+    return select(s, x, y);
+}
 #endif
-
+    
 /************************************************************************
 *  class StereoBase<STEREO>						*
 ************************************************************************/

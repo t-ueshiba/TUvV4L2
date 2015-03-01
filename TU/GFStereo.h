@@ -348,27 +348,21 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     typedef typename ScoreVecArray2Array::iterator	row_siterator;
     typedef typename ScoreVecArray2Array::const_iterator
 							const_row_siterator;
-    typedef ring_iterator<row_siterator>		ScoreVecArray2Ring;
-    typedef box_filter_iterator<ScoreVecArray2Ring>	ScoreVecArray2Box;
-    typedef box_filter_iterator<const_col_siterator>	ScoreVecArrayBox;
+    typedef ring_iterator<row_siterator>		row_sring;
+    typedef box_filter_iterator<row_sring>		row_sbox;
+    typedef box_filter_iterator<const_col_siterator>	const_col_sbox;
     typedef box_filter_iterator<const_reverse_col_siterator>
-							ScoreVecArrayRBox;
+							const_reverse_col_sbox;
 
     typedef Array<GuideElement>				GuideArray;
     typedef Array2<GuideArray>				GuideArray2;
     typedef typename GuideArray::iterator		col_giterator;
     typedef typename GuideArray::const_iterator		const_col_giterator;
-    typedef typename GuideArray2::iterator		row_giterator;
-    typedef typename GuideArray2::const_iterator	const_row_giterator;
-    typedef box_filter_iterator<const_col_giterator>	GuideBox;
+    typedef box_filter_iterator<const_col_giterator>	const_col_gbox;
 
     typedef Array<Disparity>				DisparityArray;
     typedef Array2<DisparityArray>			DisparityArray2;
-    typedef typename DisparityArray::iterator		col_diterator;
-    typedef typename DisparityArray::const_iterator	const_col_diterator;
     typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
-    typedef typename DisparityArray2::iterator		row_diterator;
-    typedef typename DisparityArray2::const_iterator	const_row_diterator;
 
     typedef Array<float>				FloatArray;
     typedef FloatArray::reverse_iterator		reverse_col_fiterator;
@@ -505,11 +499,11 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     Buffers*	buffers = _bufferPool.get();	// 各種作業領域を確保
     buffers->initialize(N, D, W, H);
     
-    ROW			rowLp = rowL, rowRp = rowR;
-    ScoreVecArray2Ring	rowA(buffers->A.begin(), buffers->A.end());
-    ScoreVecArray2Box	boxB;
-    ROW			rowG  = rowL;
-    ROW const		rowL0 = rowL + N - 1, rowL1 = rowL0 + N - 1;
+    ROW		rowLp = rowL, rowRp = rowR;
+    row_sring	rowA(buffers->A.begin(), buffers->A.end());
+    row_sbox	boxB;
+    ROW		rowG  = rowL;
+    const ROW	rowL0 = rowL + N - 1, rowL1 = rowL0 + N - 1;
 
     for (; rowL != rowLe; ++rowL)
     {
@@ -544,7 +538,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 		start(3);
 		if (rowL == rowL1)
 		    boxB.initialize(rowA - N, N);
-		const ScoreVecArray2&	B = *boxB;
+		const auto&	B = *boxB;
 		
 		start(4);
 	      // さらにフィルタ係数を横方向に積算して最終的な係数を求め，
@@ -594,14 +588,14 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
     Buffers*	buffers = _bufferPool.get();
     buffers->initialize(N, D, W, H);		// 各種作業領域を確保
 
-    size_t		v = H, cV = std::distance(rowL, rowLlast);
-    ROW			rowLp = rowL, rowRp = rowR;
-    size_t		cVp = cV;
-    ScoreVecArray2Ring	rowA(buffers->A.begin(), buffers->A.end());
-    ScoreVecArray2Box	boxB;
-    const ROW_D		rowD0 = rowD + N - 1;
-    ROW			rowG  = rowL;
-    const ROW 		rowL0 = rowL + N - 1, rowL1 = rowL0 + N - 1;
+    size_t	v = H, cV = std::distance(rowL, rowLlast);
+    ROW		rowLp = rowL, rowRp = rowR;
+    size_t	cVp = cV;
+    row_sring	rowA(buffers->A.begin(), buffers->A.end());
+    row_sbox	boxB;
+    const ROW_D	rowD0 = rowD + N - 1;
+    ROW		rowG  = rowL;
+    const ROW 	rowL0 = rowL + N - 1, rowL1 = rowL0 + N - 1;
 
     for (; rowL != rowLe; ++rowL)
     {
@@ -653,7 +647,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	      // フィルタ係数を縦方向に積算
 		if (rowL == rowL1)
 		    boxB.initialize(rowA - N, N);
-		const ScoreVecArray2&	B = *boxB;
+		const auto&	B = *boxB;
 		
 		start(4);
 	      // さらにフィルタ係数を横方向に積算して最終的な係数を求め，
@@ -808,8 +802,8 @@ GFStereo<SCORE, DISP>::initializeFilterCoefficients(const_col_siterator colQ,
     const size_t	n = _params.windowSize * _params.windowSize;
 
   // 縦方向に積算したParamsを横方向に積算し，Coeffを初期化する．
-    GuideBox		boxG(colF, _params.windowSize);
-    for (ScoreVecArrayBox boxR(colQ, _params.windowSize), boxRe(colQe);
+    const_col_gbox	boxG(colF, _params.windowSize);
+    for (const_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
     {
 	std::transform(boxR->cbegin2(), boxR->cend2(), colA->begin2(),
@@ -834,7 +828,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
     ScoreVecArray	R(colB->size()/2);
     
   // 評価値を横方向に積算し，最小値を与える視差を双方向に探索する．
-    for (ScoreVecArrayRBox boxC(colB, _params.windowSize), boxCe(colBe);
+    for (const_reverse_col_sbox boxC(colB, _params.windowSize), boxCe(colBe);
 	 boxC != boxCe; ++boxC)
     {
 	std::transform(boxC->cbegin2(), boxC->cend2(),
@@ -847,16 +841,16 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 #  if defined(WITHOUT_CVTDOWN)
 	typedef mm::cvtdown_mask_iterator<
 	    Disparity,
-	    mm::mask_iterator<typename ScoreVecArray::const_iterator,
+	    mm::mask_iterator<subiterator<const_col_siterator>,
 			      subiterator<RMIN_RV> > >		miterator;
 #  else
 	typedef mm::mask_iterator<Disparity,
-				  typename ScoreVecArray::const_iterator,
+				  subiterator<const_col_siterator>,
 				  subiterator<RMIN_RV> >	miterator;
 #  endif
 #else
 	typedef dpointer					diterator;
-	typedef mask_iterator<typename ScoreVecArray::const_iterator,
+	typedef mask_iterator<subiterator<const_col_siterator>,
 			      subiterator<RMIN_RV> >		miterator;
 #endif
 	typedef iterator_value<diterator>			dvalue_type;
@@ -918,8 +912,8 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
     F.fill(GuideElement());
 
     A.resize(N + 1);
-    for (row_siterator rowA = A.begin(); rowA != A.end(); ++rowA)
-	if (!rowA->resize(W - N + 1, 2*DD))
+    for (auto& rowA : A)
+	if (!rowA.resize(W - N + 1, 2*DD))
 	    break;
 
     if (dminL.resize(W - 2*N + 2))
