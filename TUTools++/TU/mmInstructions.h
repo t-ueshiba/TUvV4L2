@@ -1382,9 +1382,9 @@ namespace detail
     
 template <size_t N, class HEAD, class TAIL> static inline auto
 shift_l(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::transform(x, detail::generic_shift_l<N>()))
+    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_l<N>()))
 {
-    return boost::tuples::transform(x, detail::generic_shift_l<N>());
+    return boost::tuples::cons_transform(x, detail::generic_shift_l<N>());
 }
     
 //! ベクトルの要素を右シフトする．
@@ -1408,7 +1408,7 @@ namespace detail
     
 template <size_t N, class HEAD, class TAIL> static inline auto
 shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::transform(x, detail::generic_shift_r<N>()))
+    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_r<N>()))
 {
     return boost::tuples::transform(x, detail::generic_shift_r<N>());
 }
@@ -1663,17 +1663,21 @@ namespace detail
 template <class HEAD, class TAIL> static inline auto
 shift_lmost_to_rmost(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(
-	boost::tuples::transform(x, detail::generic_shift_lmost_to_rmost()))
+	boost::tuples::cons_transform(
+	    x, detail::generic_shift_lmost_to_rmost()))
 {
-    return boost::tuples::transform(x, detail::generic_shift_lmost_to_rmost());
+    return boost::tuples::cons_transform(
+	       x, detail::generic_shift_lmost_to_rmost());
 }
     
 template <class HEAD, class TAIL> static inline auto
 shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(
-	boost::tuples::transform(x, detail::generic_shift_rmost_to_lmost()))
+	boost::tuples::cons_transform(
+	    x, detail::generic_shift_rmost_to_lmost()))
 {
-    return boost::tuples::transform(x, detail::generic_shift_rmost_to_lmost());
+    return boost::tuples::cons_transform(
+	       x, detail::generic_shift_rmost_to_lmost());
 }
     
 /************************************************************************
@@ -1836,16 +1840,17 @@ namespace detail
     
 template <class S, size_t I=0, class HEAD, class TAIL> static inline auto
 cvt(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::transform(x, detail::generic_cvt<S, I>()))
+    -> decltype(boost::tuples::cons_transform(x, detail::generic_cvt<S, I>()))
 {
-    return boost::tuples::transform(x, detail::generic_cvt<S, I>());
+    return boost::tuples::cons_transform(x, detail::generic_cvt<S, I>());
 }
     
 template <class S, class H1, class T1, class H2, class T2> static inline auto
 cvt(const boost::tuples::cons<H1, T1>& x, const boost::tuples::cons<H2, T2>& y)
-    -> decltype(boost::tuples::transform(x, y, detail::generic_cvt<S, 0>()))
+    -> decltype(boost::tuples::cons_transform(x, y,
+					      detail::generic_cvt<S, 0>()))
 {
-    return boost::tuples::transform(x, y, detail::generic_cvt<S, 0>());
+    return boost::tuples::cons_transform(x, y, detail::generic_cvt<S, 0>());
 }
 
 // [1] 整数ベクトル間の変換
@@ -2245,18 +2250,20 @@ namespace detail
     
 template <class S, size_t I=0, class HEAD, class TAIL> static inline auto
 cvt_mask(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::transform(x, detail::generic_cvt_mask<S, I>()))
+    -> decltype(boost::tuples::cons_transform(
+		    x, detail::generic_cvt_mask<S, I>()))
 {
-    return boost::tuples::transform(x, detail::generic_cvt_mask<S, I>());
+    return boost::tuples::cons_transform(x, detail::generic_cvt_mask<S, I>());
 }
     
 template <class S, class H1, class T1, class H2, class T2> static inline auto
 cvt_mask(const boost::tuples::cons<H1, T1>& x,
 	 const boost::tuples::cons<H2, T2>& y)
-    -> decltype(boost::tuples::transform(x, y,
-					 detail::generic_cvt_mask<S, 0>()))
+    -> decltype(boost::tuples::cons_transform(x, y,
+					      detail::generic_cvt_mask<S, 0>()))
 {
-    return boost::tuples::transform(x, y, detail::generic_cvt_mask<S, 0>());
+    return boost::tuples::cons_transform(x, y,
+					 detail::generic_cvt_mask<S, 0>());
 }
 
 // [1] 整数ベクトル間のマスク変換
@@ -3282,12 +3289,12 @@ namespace detail
     
 template <class ITER_TUPLE, bool ALIGNED>
 class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
-    : public fast_zip_iterator<decltype(boost::tuples::transform(
+    : public fast_zip_iterator<decltype(boost::tuples::cons_transform(
 					    std::declval<ITER_TUPLE>(),
 					    detail::loader<ALIGNED>()))>
 {
   private:
-    typedef fast_zip_iterator<decltype(boost::tuples::transform(
+    typedef fast_zip_iterator<decltype(boost::tuples::cons_transform(
 					   std::declval<ITER_TUPLE>(),
 					   detail::loader<ALIGNED>()))>	super;
 
@@ -3305,14 +3312,14 @@ class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     
   public:
     load_iterator(const fast_zip_iterator<ITER_TUPLE>& iter)
-	:super(boost::tuples::transform(iter.get_iterator_tuple(),
-					detail::loader<ALIGNED>()))	{}
+	:super(boost::tuples::cons_transform(iter.get_iterator_tuple(),
+					     detail::loader<ALIGNED>())){}
     load_iterator(const super& iter)	:super(iter)			{}
 
     base_type	base() const
 		{
-		    return boost::tuples::transform(super::get_iterator_tuple(),
-						    base_iterator());
+		    return boost::tuples::cons_transform(
+			       super::get_iterator_tuple(), base_iterator());
 		}
 };
 
@@ -3471,12 +3478,12 @@ namespace detail
 
 template <class ITER_TUPLE, bool ALIGNED>
 class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
-    : public fast_zip_iterator<decltype(boost::tuples::transform(
+    : public fast_zip_iterator<decltype(boost::tuples::cons_transform(
 					    std::declval<ITER_TUPLE>(),
 					    detail::storer<ALIGNED>()))>
 {
   private:
-    typedef fast_zip_iterator<decltype(boost::tuples::transform(
+    typedef fast_zip_iterator<decltype(boost::tuples::cons_transform(
 					   std::declval<ITER_TUPLE>(),
 					   detail::storer<ALIGNED>()))> super;
 
@@ -3500,26 +3507,26 @@ class store_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
 
   public:
     typedef ITER_TUPLE						base_type;
-    typedef decltype(boost::tuples::transform(
+    typedef decltype(boost::tuples::cons_transform(
 			 std::declval<super>().get_iterator_tuple(),
 			 load()))				value_type;
     
   public:
     store_iterator(fast_zip_iterator<ITER_TUPLE> const& iter)
-	:super(boost::tuples::transform(iter.get_iterator_tuple(),
-					detail::storer<ALIGNED>()))	{}
+	:super(boost::tuples::cons_transform(iter.get_iterator_tuple(),
+					     detail::storer<ALIGNED>())){}
     store_iterator(super const& iter)	:super(iter)			{}
 
     base_type	base() const
 		{
-		    return boost::tuples::transform(super::get_iterator_tuple(),
-						    base_iterator());
+		    return boost::tuples::cons_transform(
+			       super::get_iterator_tuple(), base_iterator());
 		}
     
     value_type	operator ()() const
 		{
-		    return boost::tuples::transform(super::get_iterator_tuple(),
-						    load());
+		    return boost::tuples::cons_transform(
+			       super::get_iterator_tuple(), load());
 		}
 };
 

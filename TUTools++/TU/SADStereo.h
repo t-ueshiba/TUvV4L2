@@ -61,17 +61,12 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 #endif
     typedef Array<ScoreVec>				ScoreVecArray;
     typedef Array2<ScoreVecArray>			ScoreVecArray2;
-    typedef Array<ScoreVecArray2>			ScoreVecArray2Array;
     typedef typename ScoreVecArray2::iterator		col_siterator;
     typedef typename ScoreVecArray2::const_iterator	const_col_siterator;
     typedef typename ScoreVecArray2::const_reverse_iterator
 						const_reverse_col_siterator;
-    typedef ring_iterator<typename ScoreVecArray2Array::iterator>
-							ScoreVecArray2Ring;
-    typedef box_filter_iterator<ScoreVecArray2Ring>	ScoreVecArray2Box;
-    typedef box_filter_iterator<
-		typename ScoreVecArray2::const_reverse_iterator>
-							ScoreVecArrayBox;
+    typedef box_filter_iterator<const_reverse_col_siterator>
+							const_reverse_col_sbox;
     typedef Array<Disparity>				DisparityArray;
     typedef Array2<DisparityArray>			DisparityArray2;
     typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
@@ -353,11 +348,10 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
     typedef decltype(col2ptr(colRV))				in_pointer;
 #if defined(SSE)
     typedef mm::load_iterator<in_pointer>			in_iterator;
-    typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
-								qiterator;
+    typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
 #else
     typedef in_pointer						in_iterator;
-    typedef typename ScoreVecArray::iterator			qiterator;
+    typedef subiterator<col_siterator>				qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
     typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
@@ -383,11 +377,10 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
     typedef decltype(col2ptr(colRV))				in_pointer;
 #if defined(SSE)
     typedef mm::load_iterator<in_pointer>			in_iterator;
-    typedef mm::cvtup_iterator<typename ScoreVecArray::iterator>
-								qiterator;
+    typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
 #else
     typedef in_pointer						in_iterator;
-    typedef typename ScoreVecArray::iterator			qiterator;
+    typedef subiterator<col_siterator>				qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
     typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
@@ -420,7 +413,7 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
     const size_t	dsw1 = _params.disparitySearchWidth - 1;
 
   // 評価値を横方向に積算し，最小値を与える視差を双方向に探索する．
-    for (ScoreVecArrayBox boxR(colQ, _params.windowSize), boxRe(colQe);
+    for (const_reverse_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
     {
 	typedef decltype(col2ptr(dminRV))			dpointer;
@@ -429,16 +422,16 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 #  if defined(WITHOUT_CVTDOWN)
 	typedef mm::cvtdown_mask_iterator<
 	    Disparity,
-	    mm::mask_iterator<typename ScoreVecArray::const_iterator,
+	    mm::mask_iterator<subiterator<const_col_siterator>,
 			      subiterator<RMIN_RV> > >		miterator;
 #  else
 	typedef mm::mask_iterator<Disparity,
-				  typename ScoreVecArray::const_iterator,
+				  subiterator<const_col_siterator>,
 				  subiterator<RMIN_RV> >	miterator;
 #  endif
 #else
 	typedef dpointer					diterator;
-	typedef mask_iterator<typename ScoreVecArray::const_iterator,
+	typedef mask_iterator<subiterator<const_col_siterator>,
 			      subiterator<RMIN_RV> >		miterator;
 #endif
 	typedef iterator_value<diterator>			dvalue_type;
