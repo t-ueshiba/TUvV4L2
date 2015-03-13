@@ -140,7 +140,7 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     template <class COL, class COL_RV>
     void	initializeDissimilarities(COL colL, COL colLe,
 					  COL_RV colRV,
-					  col_siterator colP)	const	;
+					  col_siterator colQ)	const	;
     template <class COL, class COL_RV>
     void	updateDissimilarities(COL colL, COL colLe, COL_RV colRV,
 				      COL colLp, COL_RV colRVp,
@@ -343,28 +343,27 @@ template <class SCORE, class DISP>
 template <class COL, class COL_RV> void
 SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
-						  col_siterator colP) const
+						  col_siterator colQ) const
 {
-    typedef decltype(col2ptr(colRV))				in_pointer;
 #if defined(SSE)
-    typedef mm::load_iterator<in_pointer>			in_iterator;
+    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
     typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
 #else
-    typedef in_pointer						in_iterator;
+    typedef decltype(col2ptr(colRV))				in_iterator;
     typedef subiterator<col_siterator>				qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
-    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
 
     for (; colL != colLe; ++colL)
     {
-	piterator	P(in_iterator(col2ptr(colRV)),
-			  diff_type(*colL, _params.intensityDiffMax));
-	for (qiterator Q(colP->begin()), Qe(colP->end()); Q != Qe; ++Q, ++P)
-	    *Q += *P;
+	const diff_type	diff(*colL, _params.intensityDiffMax);
+	in_iterator	in(col2ptr(colRV));
+	
+	for (qiterator Q(colQ->begin()), Qe(colQ->end()); Q != Qe; ++Q, ++in)
+	    *Q += diff(*in);
 	
 	++colRV;
-	++colP;
+	++colQ;
     }
 }
     
@@ -374,26 +373,24 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					      COL colLp, COL_RV colRVp,
 					      col_siterator colQ) const
 {
-    typedef decltype(col2ptr(colRV))				in_pointer;
 #if defined(SSE)
-    typedef mm::load_iterator<in_pointer>			in_iterator;
+    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
     typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
 #else
-    typedef in_pointer						in_iterator;
+    typedef decltype(col2ptr(colRV))				in_iterator;
     typedef subiterator<col_siterator>				qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
-    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
 
     for (; colL != colLe; ++colL)
     {
-	piterator	Pp(in_iterator(col2ptr(colRVp)),
-			   diff_type(*colLp, _params.intensityDiffMax));
-	piterator	Pn(in_iterator(col2ptr(colRV)),
-			   diff_type(*colL, _params.intensityDiffMax));
+	const diff_type	diff_p(*colLp, _params.intensityDiffMax),
+			diff_n(*colL,  _params.intensityDiffMax);
+	in_iterator	in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
+	
 	for (qiterator Q(colQ->begin()), Qe(colQ->end());
-	     Q != Qe; ++Q, ++Pp, ++Pn)
-	    *Q += (*Pn - *Pp);
+	     Q != Qe; ++Q, ++in_p, ++in_n)
+	    *Q += (diff_n(*in_n) - diff_p(*in_p));
 
 	++colRV;
 	++colLp;
@@ -416,9 +413,9 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
     for (const_reverse_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
     {
-	typedef decltype(col2ptr(dminRV))			dpointer;
 #if defined(SSE)
-	typedef mm::store_iterator<dpointer>			diterator;
+	typedef decltype(mm::make_store_iterator(col2ptr(dminRV)))
+								diterator;
 #  if defined(WITHOUT_CVTDOWN)
 	typedef mm::cvtdown_mask_iterator<
 	    Disparity,
@@ -430,7 +427,7 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 				  subiterator<RMIN_RV> >	miterator;
 #  endif
 #else
-	typedef dpointer					diterator;
+	typedef decltype(col2ptr(dminRV))			diterator;
 	typedef mask_iterator<subiterator<const_col_siterator>,
 			      subiterator<RMIN_RV> >		miterator;
 #endif

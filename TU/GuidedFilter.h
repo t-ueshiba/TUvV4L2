@@ -233,7 +233,6 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			params_init()),
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(winSize(), _e)));
-    std::cerr << c;
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb, winSize() - 1);
@@ -266,7 +265,6 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
 		    boost::make_transform_iterator(ie, params_init()),
 		    make_assignment_iterator(c.begin(),
 					     coeff_init(winSize(), _e)));
-    std::cerr << c;
     
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib, winSize() - 1);
@@ -338,8 +336,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
     const size_t	n = rowWinSize() * colWinSize();
     carray2_type	c(super::outRowLength(std::distance(ib, ie)),
-			  super::outColLength(std::distance(ib->begin(),
-							    ib->end())));
+			  super::outColLength(std::distance(std::begin(*ib),
+							    std::end(*ib))));
 
     super::convolve(make_row_transform_iterator(
 			make_fast_zip_iterator(boost::make_tuple(ib, gb)),
@@ -379,8 +377,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     
     const size_t	n = rowWinSize() * colWinSize();
     carray2_type	c(super::outRowLength(std::distance(ib, ie)),
-			  super::outColLength(std::distance(ib->begin(),
-							    ib->end())));
+			  super::outColLength(std::distance(std::begin(*ib),
+							    std::end(*ib))));
 
     super::convolve(make_row_transform_iterator(ib, params_init()),
 		    make_row_transform_iterator(ie, params_init()),
