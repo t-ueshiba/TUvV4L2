@@ -51,24 +51,6 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     typedef DISP					Disparity;
 
   private:
-    template <class ITER>
-    class TupleIterator
-    {
-      public:
-	typedef iterator_value<ITER>				element_type;
-	typedef boost::tuple<element_type, element_type>	value_type;
-	typedef value_type					reference;
-
-      public:
-	TupleIterator(const ITER& p, const ITER& q)	:_p(p), _q(q)	{}
-    
-	reference	operator *()	const	{ return reference(*_p, *_q); }
-	TupleIterator&	operator ++()		{ ++_p; ++_q; return *this; }
-
-      private:
-	ITER	_p, _q;
-    };
-    
     typedef StereoBase<GFStereo<Score, Disparity> >	super;
 #if defined(SSE)
     typedef mm::vec<Score>				ScoreVec;
@@ -278,9 +260,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
       public:
 	ParamUpdate(Score gn, Score gp)	:_gn(gn), _gp(gp)		{}
 
-      // SIMD使用／不使用の両ケースに対応するため，引数をテンプレートにする．
-	template <class TUPLE_>
-	result_type	operator ()(const TUPLE_& p) const
+	result_type	operator ()(const argument_type& p) const
 			{
 			    using namespace	boost;
 			    
@@ -707,31 +687,31 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 						  col_siterator colQ,
 						  col_giterator colF) const
 {
-    typedef decltype(col2ptr(colRV))				in_pointer;
 #if defined(SSE)
-    typedef mm::load_iterator<in_pointer>			in_iterator;
+    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
     typedef mm::cvtup_iterator<
-	assignment_iterator<
-	    ParamInit, typename ScoreVecArray::iterator2> >	qiterator;
+		assignment_iterator<
+		    ParamInit,
+		    typename ScoreVecArray::iterator2> >	qiterator;
 #else
-    typedef in_pointer						in_iterator;
+    typedef decltype(col2ptr(colRV))				in_iterator;
     typedef assignment_iterator<
-	ParamInit, typename ScoreVecArray::iterator2>		qiterator;
+		ParamInit, typename ScoreVecArray::iterator2>	qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
-    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
 
     for (; colL != colLe; ++colL)
     {
 	const Score	pixL = *colL;
-	piterator	P(in_iterator(col2ptr(colRV)),
-			  diff_type(pixL, _params.intensityDiffMax));
+	const diff_type	diff(pixL, _params.intensityDiffMax);
+	in_iterator	in(col2ptr(colRV));
+	
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamInit(pixL))),
 		       Qe(make_assignment_iterator(colQ->end2(),
 						   ParamInit(pixL)));
-	     Q != Qe; ++Q, ++P)
-	    *Q += *P;
+	     Q != Qe; ++Q, ++in)
+	    *Q += diff(*in);
 
 	colF->g_sum   += pixL;
 	colF->g_sqsum += pixL * pixL;
@@ -748,39 +728,32 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 					      col_siterator colQ,
 					      col_giterator colF) const
 {
-    typedef decltype(col2ptr(colRV))				in_pointer;
 #if defined(SSE)
-    typedef mm::load_iterator<in_pointer>			in_iterator;
+    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
     typedef mm::cvtup_iterator<
-	assignment_iterator<
-	    ParamUpdate, typename ScoreVecArray::iterator2> >	qiterator;
+		assignment_iterator<
+		    ParamUpdate,
+		    typename ScoreVecArray::iterator2> >	qiterator;
 #else
-    typedef in_pointer						in_iterator;
+    typedef decltype(col2ptr(colRV))				in_iterator;
     typedef assignment_iterator<
-	ParamUpdate, typename ScoreVecArray::iterator2>		qiterator;
+		ParamUpdate, typename ScoreVecArray::iterator2>	qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
-    typedef boost::transform_iterator<diff_type, in_iterator>	piterator;
-  /* 本来は fast_zip_iterator<boost::tuple<piterator, piterator> > として
-   * 定義したいが，fast_zip_iterator を piterator と組み合わせると速度低下が
-   * 著しいので，TupleIterator<ITER> を用いる．
-   */
-    typedef TupleIterator<piterator>				ppiterator;
 
     for (; colL != colLe; ++colL)
     {
 	const Score	pixLp = *colLp, pixL = *colL;
-	ppiterator	P(piterator(in_iterator(col2ptr(colRV)),
-				    diff_type(pixL, _params.intensityDiffMax)),
-			  piterator(in_iterator(col2ptr(colRVp)),
-				    diff_type(pixLp,
-					      _params.intensityDiffMax)));
+	const diff_type	diff_p(pixLp, _params.intensityDiffMax),
+			diff_n(pixL,  _params.intensityDiffMax);
+	in_iterator	in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
+	
 	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
 						   ParamUpdate(pixL, pixLp))),
 		       Qe(make_assignment_iterator(colQ->end2(),
 						   ParamUpdate(pixL, pixLp)));
-	     Q != Qe; ++Q, ++P)
-	    *Q += *P;
+	     Q != Qe; ++Q, ++in_p, ++in_n)
+	    *Q += boost::make_tuple(diff_n(*in_n), diff_p(*in_p));
 
 	colF->g_sum   += (pixL - pixLp);
 	colF->g_sqsum += (pixL * pixL - pixLp * pixLp);
@@ -835,9 +808,9 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 		       R.begin(), CoeffTrans(*colG));
 	++colG;
 
-	typedef decltype(col2ptr(dminRV))			dpointer;
 #if defined(SSE)
-	typedef mm::store_iterator<dpointer>			diterator;
+	typedef decltype(mm::make_store_iterator(col2ptr(dminRV)))
+								diterator;
 #  if defined(WITHOUT_CVTDOWN)
 	typedef mm::cvtdown_mask_iterator<
 	    Disparity,
@@ -849,7 +822,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 				  subiterator<RMIN_RV> >	miterator;
 #  endif
 #else
-	typedef dpointer					diterator;
+	typedef decltype(col2ptr(dminRV))			diterator;
 	typedef mask_iterator<subiterator<const_col_siterator>,
 			      subiterator<RMIN_RV> >		miterator;
 #endif

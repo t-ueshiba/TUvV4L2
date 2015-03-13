@@ -336,14 +336,14 @@ class FixedSizedBuf : public BufTraits<T>
 			    throw std::logic_error("FixedSizedBuf<T, D>::FixedSizedBuf(pointer, size_t): cannot specify a pointer to external storage!!");
 			}
 
-    pointer		data()			{ return _buf.p; }
-    const_pointer	data()		const	{ return _buf.p; }
-    iterator		begin()			{ return _buf.p; }
-    const_iterator	begin()		const	{ return _buf.p; }
-    const_iterator	cbegin()	const	{ return _buf.p; }
-    iterator		end()			{ return _buf.p + D; }
-    const_iterator	end()		const	{ return _buf.p + D; }
-    const_iterator	cend()		const	{ return _buf.p + D; }
+    pointer		data()			{ return _p; }
+    const_pointer	data()		const	{ return _p; }
+    iterator		begin()			{ return _p; }
+    const_iterator	begin()		const	{ return _p; }
+    const_iterator	cbegin()	const	{ return _p; }
+    iterator		end()			{ return _p + D; }
+    const_iterator	end()		const	{ return _p + D; }
+    const_iterator	cend()		const	{ return _p + D; }
     constexpr static size_t
 			size()			{ return D; }
 
@@ -370,7 +370,7 @@ class FixedSizedBuf : public BufTraits<T>
   */
     void		resize(pointer p, size_t siz)
 			{
-			    assert(p == _buf.p && siz == D);
+			    assert(p == _p && siz == D);
 			}
 
   //! 入力ストリームから配列を読み込む(ASCII)．
@@ -410,19 +410,8 @@ class FixedSizedBuf : public BufTraits<T>
 	static void	exec(ITER_, iterator, const OP&)		{}
     };
     
-    template <bool, class=void>
-    struct Buffer			{ value_type	p[D]; };
-#if defined(MMX)
-    template <class DUMMY>
-    struct Buffer<true, DUMMY>		{ alignas(mm::ALIGN) value_type	p[D]; };
-#endif
-
   private:
-#if defined(MMX)
-    Buffer<mm::is_vec<T>::value>	_buf;		// D-sized buffer
-#else
-    Buffer<false>			_buf;
-#endif
+    alignas(sizeof(value_type)) value_type	_p[D];	// D-sized buffer
 };
 
 /************************************************************************
@@ -1088,7 +1077,7 @@ class Array2 : public Array<T, R>
 
 			    if (std::is_same<typename buf_type::allocator_type,
 					     mm::allocator<S> >::value)
-				return mm::ALIGN;
+				return sizeof(mm::vec<S>);
 #endif
 			    return (a == 0 ? 1 : a);
 			}

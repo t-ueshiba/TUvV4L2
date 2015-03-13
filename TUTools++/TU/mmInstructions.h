@@ -213,9 +213,6 @@ namespace mm
   typedef char		dvec_t;		//!< ダミー
 #endif
 
-constexpr size_t	ALIGN = (sizeof(fvec_t) > sizeof(ivec_t) ?
-				 sizeof(fvec_t) : sizeof(ivec_t));
-    
 /************************************************************************
 *  class allocator<T>							*
 ************************************************************************/
@@ -247,7 +244,7 @@ class allocator
 			    
 			    pointer	p = static_cast<pointer>(
 						_mm_malloc(sizeof(value_type)*n,
-							   ALIGN));
+							   sizeof(value_type)));
 			    if (p == nullptr)
 				throw std::bad_alloc();
 			    return p;
@@ -411,7 +408,8 @@ class vec
     typedef T					element_type;
   //! ベースとなるSIMDデータ型
     typedef typename std::conditional<
-	std::is_same<T, double>::value, dvec_t,
+	std::is_same<T, double>::value,
+	dvec_t,
 	typename std::conditional<
 	    std::is_same<T, float>::value,
 	    fvec_t, ivec_t>::type>::type	base_type;
@@ -474,14 +472,14 @@ class vec
     element_type	operator [](size_t i) const
 			{
 			    assert(i < size);
-			    return *(reinterpret_cast<const element_type*>
-				     (&_base) + i);
+			    return *(reinterpret_cast<const element_type*>(
+					 &_base) + i);
 			}
     element_type&	operator [](size_t i)
 			{
 			    assert(i < size);
-			    return *(reinterpret_cast<element_type*>
-				     (&_base) + i);
+			    return *(reinterpret_cast<element_type*>(&_base)
+				     + i);
 			}
     
     static size_t	floor(size_t n)	{ return size*(n/size); }
@@ -1269,7 +1267,7 @@ template <size_t I, class T> static int	    extract(vec<T> x)		;
 	  return MM_MNEMONIC(extract, _mm_, , MM_SIGNED(type))(		\
 		     _mm256_extractf128_si256(				\
 			 x, I / vec<type>::lane_size),			\
-		     I / vec<type>::lane_size);				\
+		     I % vec<type>::lane_size);				\
       }
 
 #  else
@@ -2480,18 +2478,18 @@ MM_LOGICALS(u_int64_t)
     template <class S> static inline vec<type>				\
     lookup(const S* p, vec<type> idx)					\
     {									\
-	return vec<type>(p[extract<3>(idx)], p[extract<2>(idx)],	\
-			 p[extract<1>(idx)], p[extract<0>(idx)]);	\
+	return vec<type>(p[extract<0>(idx)], p[extract<1>(idx)],	\
+			 p[extract<2>(idx)], p[extract<3>(idx)]);	\
     }
 #  if defined(SSE2)
 #    define MM_LOOKUP8(type)						\
     template <class S> static inline vec<type>				\
     lookup(const S* p, vec<type> idx)					\
     {									\
-	return vec<type>(p[extract<7>(idx)], p[extract<6>(idx)],	\
-			 p[extract<5>(idx)], p[extract<4>(idx)],	\
-			 p[extract<3>(idx)], p[extract<2>(idx)],	\
-			 p[extract<1>(idx)], p[extract<0>(idx)]);	\
+	return vec<type>(p[extract<0>(idx)], p[extract<1>(idx)],	\
+			 p[extract<2>(idx)], p[extract<3>(idx)],	\
+			 p[extract<4>(idx)], p[extract<5>(idx)],	\
+			 p[extract<6>(idx)], p[extract<7>(idx)]);	\
     }
 #  else		// !SSE2
 #    define MM_LOOKUP8(type)						\
@@ -2500,10 +2498,10 @@ MM_LOGICALS(u_int64_t)
     {									\
 	const Is16vec	idx_lo = cvt<int16_t, 0>(idx),			\
 			idx_hi = cvt<int16_t, 1>(idx);			\
-	return vec<type>(p[extract<3>(idx_hi)], p[extract<2>(idx_hi)],	\
-			 p[extract<1>(idx_hi)], p[extract<0>(idx_hi)],	\
-			 p[extract<3>(idx_lo)], p[extract<2>(idx_lo)],	\
-			 p[extract<1>(idx_lo)], p[extract<0>(idx_lo)]);	\
+	return vec<type>(p[extract<0>(idx_lo)], p[extract<1>(idx_lo)],	\
+			 p[extract<2>(idx_lo)], p[extract<3>(idx_lo)],	\
+			 p[extract<0>(idx_hi)], p[extract<1>(idx_hi)],	\
+			 p[extract<2>(idx_hi)], p[extract<3>(idx_hi)]);	\
     }
 #  endif
 #  if defined(SSE4)
@@ -2511,14 +2509,14 @@ MM_LOGICALS(u_int64_t)
     template <class S> static inline vec<type>				\
     lookup(const S* p, vec<type> idx)					\
     {									\
-	return vec<type>(p[extract<15>(idx)], p[extract<14>(idx)],	\
-			 p[extract<13>(idx)], p[extract<12>(idx)],	\
-			 p[extract<11>(idx)], p[extract<10>(idx)],	\
-			 p[extract< 9>(idx)], p[extract< 8>(idx)],	\
-			 p[extract< 7>(idx)], p[extract< 6>(idx)],	\
-			 p[extract< 5>(idx)], p[extract< 4>(idx)],	\
-			 p[extract< 3>(idx)], p[extract< 2>(idx)],	\
-			 p[extract< 1>(idx)], p[extract< 0>(idx)]);	\
+	return vec<type>(p[extract< 0>(idx)], p[extract< 1>(idx)],	\
+			 p[extract< 2>(idx)], p[extract< 3>(idx)],	\
+			 p[extract< 4>(idx)], p[extract< 5>(idx)],	\
+			 p[extract< 6>(idx)], p[extract< 7>(idx)],	\
+			 p[extract< 8>(idx)], p[extract< 9>(idx)],	\
+			 p[extract<10>(idx)], p[extract<11>(idx)],	\
+			 p[extract<12>(idx)], p[extract<13>(idx)],	\
+			 p[extract<14>(idx)], p[extract<15>(idx)]);	\
     }
 #  else		// !SSE4
 #    define MM_LOOKUP16(type)						\
@@ -2527,14 +2525,14 @@ MM_LOGICALS(u_int64_t)
     {									\
 	const Is16vec	idx_lo = cvt<int16_t, 0>(idx),			\
 			idx_hi = cvt<int16_t, 1>(idx);			\
-	return vec<type>(p[extract<7>(idx_hi)], p[extract<6>(idx_hi)],	\
-			 p[extract<5>(idx_hi)], p[extract<4>(idx_hi)],	\
-			 p[extract<3>(idx_hi)], p[extract<2>(idx_hi)],	\
-			 p[extract<1>(idx_hi)], p[extract<0>(idx_hi)],	\
-			 p[extract<7>(idx_lo)], p[extract<6>(idx_lo)],	\
-			 p[extract<5>(idx_lo)], p[extract<4>(idx_lo)],	\
-			 p[extract<3>(idx_lo)], p[extract<2>(idx_lo)],	\
-			 p[extract<1>(idx_lo)], p[extract<0>(idx_lo)]);	\
+	return vec<type>(p[extract<0>(idx_lo)], p[extract<1>(idx_lo)],	\
+			 p[extract<2>(idx_lo)], p[extract<3>(idx_lo)],	\
+			 p[extract<4>(idx_lo)], p[extract<5>(idx_lo)],	\
+			 p[extract<6>(idx_lo)], p[extract<7>(idx_lo)],	\
+			 p[extract<0>(idx_hi)], p[extract<1>(idx_hi)],	\
+			 p[extract<2>(idx_hi)], p[extract<3>(idx_hi)],	\
+			 p[extract<4>(idx_hi)], p[extract<5>(idx_hi)],	\
+			 p[extract<6>(idx_hi)], p[extract<7>(idx_hi)]);	\
     }
 #  endif
 
@@ -3156,60 +3154,129 @@ is_aligned(T* p)
     return (reinterpret_cast<size_t>(p) % sizeof(vec<T>) == 0);
 }
     
-//! 指定されたアドレスの直後のアライメントされているアドレスを返す
-/*!
-  \param p	アドレス
-  \return	pの直後(pを含む)のアライメントされているアドレス
-*/
-template <class T> inline T*
+namespace detail
+{
+  template <class T> inline T*
+  begin(T* p, std::true_type)
+  {
+      constexpr size_t	vsize = vec<T>::size;
+      const size_t	n = (reinterpret_cast<size_t>(p) - 1) / vsize;
+    
+      return reinterpret_cast<T*>(vsize * (n + 1));
+  }
+    
+  template <class T> inline T*
+  begin(T* p, std::false_type)
+  {
+      return p;
+  }
+    
+  template <class T> inline const T*
+  begin(const T* p, std::true_type)
+  {
+      constexpr size_t	vsize = vec<T>::size;
+      const size_t	n = (reinterpret_cast<size_t>(p) - 1) / vsize;
+    
+      return reinterpret_cast<const T*>(vsize * (n + 1));
+  }
+    
+  template <class T> inline const T*
+  begin(const T* p, std::false_type)
+  {
+      return p;
+  }
+    
+  template <class T> inline T*
+  end(T* p, std::true_type)
+  {
+      constexpr size_t	vsize = vec<T>::size;
+      const size_t	n = reinterpret_cast<size_t>(p) / vsize;
+    
+      return reinterpret_cast<T*>(vsize * n);
+  }
+
+  template <class T> inline T*
+  end(T* p, std::false_type)
+  {
+      return p;
+  }
+
+  template <class T> inline const T*
+  end(const T* p, std::true_type)
+  {
+      constexpr size_t	vsize = vec<T>::size;
+      const size_t	n = reinterpret_cast<size_t>(p) / vsize;
+    
+      return reinterpret_cast<const T*>(vsize * n);
+  }
+
+  template <class T> inline const T*
+  end(const T* p, std::false_type)
+  {
+      return p;
+  }
+}
+    
+template <bool ALIGNED=false, class T> inline T*
 begin(T* p)
 {
-    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
-    const size_t	vsize = vec<T>::size;
-    
-    return p + (vsize - 1 - (nelms - 1) % vsize);
+    return detail::begin(p, std::integral_constant<bool, ALIGNED>());
 }
     
-//! 指定されたアドレスの直後のアライメントされているアドレスを返す
-/*!
-  \param p	アドレス
-  \return	pの直後(pを含む)のアライメントされているアドレス
-*/
-template <class T> inline const T*
+template <bool ALIGNED=false, class T> inline const T*
 cbegin(const T* p)
 {
-    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
-    const size_t	vsize = vec<T>::size;
-    
-    return p + (vsize - 1 - (nelms - 1) % vsize);
+    return begin<ALIGNED>(p);
 }
     
-//! 指定されたアドレスの直前のアライメントされているアドレスを返す
-/*!
-  \param p	アドレス
-  \return	pの直前(pを含む)のアライメントされているアドレス
-*/
-template <class T> inline T*
+template <bool ALIGNED=false, class T> inline T*
 end(T* p)
 {
-    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
-    const size_t	vsize = vec<T>::size;
-    
-    return p - (nelms % vsize);
+    return detail::end(p, std::integral_constant<bool, ALIGNED>());
 }
-
-//! 指定されたアドレスの直前のアライメントされているアドレスを返す
-/*!
-  \param p	アドレス
-  \return	pの直前(pを含む)のアライメントされているアドレス
-*/
-template <class T> inline const T*
+    
+template <bool ALIGNED=false, class T> inline const T*
 cend(const T* p)
 {
-    const size_t	nelms = reinterpret_cast<size_t>(p) / sizeof(T);
-    const size_t	vsize = vec<T>::size;
+    return end<ALIGNED>(p);
+}
     
-    return p - (nelms % vsize);
+/************************************************************************
+*  Converting a pointer to that to vec<T>				*
+************************************************************************/
+template <class T> inline vec<T>*
+vecptr(T* p)
+{
+    return reinterpret_cast<vec<T>*>(p);
+}
+    
+template <class T> inline const vec<T>*
+vecptr(const T* p)
+{
+    return reinterpret_cast<const vec<T>*>(p);
+}
+
+namespace detail
+{
+  struct generic_vecptr
+  {
+      template <class ITER_> auto
+      operator ()(ITER_ iter) const -> decltype(vecptr(iter))
+      {
+	  return vecptr(p);
+      }
+  };
+}
+
+template <class ITER_TUPLE> inline auto
+vecptr(fast_zip_iterator<ITER_TUPLE> iter)
+    -> decltype(make_fast_zip_iterator(boost::tuples::cons_transform(
+					   iter.get_iterator_tuple(),
+					   detail::generic_vecptr())))
+{
+    return make_fast_zip_iterator(boost::tuples::cons_transform(
+				      iter.get_iterator_tuple(),
+				      detail::generic_vecptr()));
 }
 
 /************************************************************************
@@ -3276,15 +3343,15 @@ class load_iterator : public boost::iterator_adaptor<
 
 namespace detail
 {
-    template <bool ALIGNED>
-    struct loader
-    {
-	template <class ITER_> load_iterator<ITER_, ALIGNED>
-	operator ()(const ITER_& iter) const
-	{
-	    return load_iterator<ITER_, ALIGNED>(iter);
-	}
-    };
+  template <bool ALIGNED>
+  struct loader
+  {
+      template <class ITER_> load_iterator<ITER_, ALIGNED>
+      operator ()(const ITER_& iter) const
+      {
+	  return load_iterator<ITER_, ALIGNED>(iter);
+      }
+  };
 }	// namespace detail
     
 template <class ITER_TUPLE, bool ALIGNED>
@@ -3340,62 +3407,62 @@ make_load_iterator(const vec<T>* p)
 ************************************************************************/
 namespace detail
 {
-    template <class ITER, bool ALIGNED=false>
-    class store_proxy
-    {
-      public:
-	typedef typename std::iterator_traits<ITER>::value_type	element_type;
-	typedef vec<element_type>				value_type;
-	typedef store_proxy					self;
+  template <class ITER, bool ALIGNED=false>
+  class store_proxy
+  {
+    public:
+      typedef typename std::iterator_traits<ITER>::value_type	element_type;
+      typedef vec<element_type>				value_type;
+      typedef store_proxy					self;
 	
-      public:
-	store_proxy(ITER iter)		:_iter(iter)			{}
+    public:
+      store_proxy(ITER iter)		:_iter(iter)			{}
 
 		operator value_type() const
 		{
 		    return load<ALIGNED>(_iter);
 		}
-	self&	operator =(value_type val)
+      self&	operator =(value_type val)
 		{
 		    store<ALIGNED>(_iter, val);
 		    return *this;
 		}
-	self&	operator +=(value_type val)
+      self&	operator +=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) + val);
 		}
-	self&	operator -=(value_type val)
+      self&	operator -=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) - val);
 		}
-	self&	operator *=(value_type val)
+      self&	operator *=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) * val);
 		}
-	self&	operator /=(value_type val)
+      self&	operator /=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) / val);
 		}
-	self&	operator %=(value_type val)
+      self&	operator %=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) % val);
 		}
-	self&	operator &=(value_type val)
+      self&	operator &=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) & val);
 		}
-	self&	operator |=(value_type val)
+      self&	operator |=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) | val);
 		}
-	self&	operator ^=(value_type val)
+      self&	operator ^=(value_type val)
 		{
 		    return operator =(load<ALIGNED>(_iter) ^ val);
 		}
 
-      private:
-	ITER 	_iter;
-    };
+    private:
+      ITER 	_iter;
+  };
 }	// namespace detail
 
 //! 反復子が指す書き込み先にSIMDベクトルを書き込む反復子
@@ -3465,15 +3532,15 @@ class store_iterator
 
 namespace detail
 {
-    template <bool ALIGNED>
-    struct storer
-    {
-	template <class ITER_> store_iterator<ITER_, ALIGNED>
-	operator ()(const ITER_& iter) const
-	{
-	    return store_iterator<ITER_, ALIGNED>(iter);
-	}
-    };
+  template <bool ALIGNED>
+  struct storer
+  {
+      template <class ITER_> store_iterator<ITER_, ALIGNED>
+      operator ()(const ITER_& iter) const
+      {
+	  return store_iterator<ITER_, ALIGNED>(iter);
+      }
+  };
 }	// namespace detail
 
 template <class ITER_TUPLE, bool ALIGNED>
@@ -3651,69 +3718,69 @@ make_cvtdown_iterator(ITER iter)
 ************************************************************************/
 namespace detail
 {
-    template <class ITER>
-    class cvtup_proxy
-    {
-      public:
-      // xがcons型のとき cvt_mask<S>(x) の結果もcons型になるので，
-      // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
-      // value_typeとしておかないと，cvupの最終ステップで cvtup(value_type)
-      // を呼び出せない．
-	typedef tuple_replace<iterator_value<ITER> >		value_type;
-	typedef typename tuple_head<value_type>::element_type	element_type;
-	typedef cvtup_proxy					self;
+  template <class ITER>
+  class cvtup_proxy
+  {
+    public:
+    // xがcons型のとき cvt_mask<S>(x) の結果もcons型になるので，
+    // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
+    // value_typeとしておかないと，cvupの最終ステップで cvtup(value_type)
+    // を呼び出せない．
+      typedef tuple_replace<iterator_value<ITER> >		value_type;
+      typedef typename tuple_head<value_type>::element_type	element_type;
+      typedef cvtup_proxy					self;
 
-      private:
-	typedef typename std::iterator_traits<ITER>::reference
+    private:
+      typedef typename std::iterator_traits<ITER>::reference
 							reference;
-	typedef typename type_traits<element_type>::complementary_type
+      typedef typename type_traits<element_type>::complementary_type
 							complementary_type;
-	typedef tuple_replace<value_type, vec<complementary_type> >
+      typedef tuple_replace<value_type, vec<complementary_type> >
 							complementary_vec;
-	typedef typename std::conditional<
-		    std::is_floating_point<element_type>::value,
-		    complementary_type,
-		    element_type>::type			integral_type;
-	typedef typename type_traits<
-		    typename type_traits<integral_type>::lower_type>
-		    ::unsigned_type			unsigned_lower_type;
-	typedef tuple_replace<value_type, vec<unsigned_lower_type> >
+      typedef typename std::conditional<
+		  std::is_floating_point<element_type>::value,
+		  complementary_type,
+		  element_type>::type			integral_type;
+      typedef typename type_traits<
+		  typename type_traits<integral_type>::lower_type>
+		  ::unsigned_type			unsigned_lower_type;
+      typedef tuple_replace<value_type, vec<unsigned_lower_type> >
 							unsigned_lower_vec;
 	
-      private:
-	template <class OP_>
-	void	cvtup(value_type x)
+    private:
+      template <class OP_>
+      void	cvtup(value_type x)
 		{
 		    OP_()(*_iter, x);
 		    ++_iter;
 		}
-	template <class OP_>
-	void	cvtup(unsigned_lower_vec x)
+      template <class OP_>
+      void	cvtup(unsigned_lower_vec x)
 		{
 		    cvtup<OP_>(cvt<integral_type, 0>(x));
 		    cvtup<OP_>(cvt<integral_type, 1>(x));
 		}
-	template <class OP_>
-	void	cvtup(complementary_vec x)
+      template <class OP_>
+      void	cvtup(complementary_vec x)
 		{
 		    cvtup<OP_>(x,
 			       std::integral_constant<
 				   bool, (vec<complementary_type>::size ==
 					  vec<element_type>::size)>());
 		}
-	template <class OP_>
-	void	cvtup(complementary_vec x, std::true_type)
+      template <class OP_>
+      void	cvtup(complementary_vec x, std::true_type)
 		{
 		    cvtup<OP_>(cvt<element_type>(x));
 		}
-	template <class OP_>
-	void	cvtup(complementary_vec x, std::false_type)
+      template <class OP_>
+      void	cvtup(complementary_vec x, std::false_type)
 		{
 		    cvtup<OP_>(cvt<element_type, 0>(x));
 		    cvtup<OP_>(cvt<element_type, 1>(x));
 		}
-	template <class OP_, class VEC_>
-	void	cvtup(VEC_ x)
+      template <class OP_, class VEC_>
+      void	cvtup(VEC_ x)
 		{
 		    typedef
 			typename tuple_head<VEC_>::element_type	S;
@@ -3723,67 +3790,67 @@ namespace detail
 		    cvtup<OP_>(cvt<upper_type, 1>(x));
 		}
 
-      public:
-	cvtup_proxy(const ITER& iter) :_iter(const_cast<ITER&>(iter)) {}
+    public:
+      cvtup_proxy(const ITER& iter) :_iter(const_cast<ITER&>(iter)) {}
 	
-	template <class VEC_>
-	self&	operator =(VEC_ x)
+      template <class VEC_>
+      self&	operator =(VEC_ x)
 		{
 		    cvtup<assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator +=(VEC_ x)
+      template <class VEC_>
+      self&	operator +=(VEC_ x)
 		{
 		    cvtup<plus_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator -=(VEC_ x)
+      template <class VEC_>
+      self&	operator -=(VEC_ x)
 		{
 		    cvtup<minus_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator *=(VEC_ x)
+      template <class VEC_>
+      self&	operator *=(VEC_ x)
 		{
 		    cvtup<multiplies_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator /=(VEC_ x)
+      template <class VEC_>
+      self&	operator /=(VEC_ x)
 		{
 		    cvtup<divides_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator %=(VEC_ x)
+      template <class VEC_>
+      self&	operator %=(VEC_ x)
 		{
 		    cvtup<modulus_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator &=(VEC_ x)
+      template <class VEC_>
+      self&	operator &=(VEC_ x)
 		{
 		    cvtup<bit_and_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator |=(VEC_ x)
+      template <class VEC_>
+      self&	operator |=(VEC_ x)
 		{
 		    cvtup<bit_or_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator ^=(VEC_ x)
+      template <class VEC_>
+      self&	operator ^=(VEC_ x)
 		{
 		    cvtup<bit_xor_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	
-      private:
-	ITER&	_iter;
-    };
+    private:
+      ITER&	_iter;
+  };
 }
 
 //! SIMDベクトルを受け取ってより大きな成分を持つ複数のSIMDベクトルに変換し，それらを指定された反復子を介して書き込む反復子
@@ -3955,65 +4022,65 @@ make_cvtdown_mask_iterator(ITER iter)
 ************************************************************************/
 namespace detail
 {
-    template <class ITER>
-    class cvtup_mask_proxy
-    {
-      public:
-      // xがcons型のとき cvt_mask<S>(x) の結果もcons型になるので，
-      // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
-      // value_typeとしておかないと，cvupの最終ステップで cvtup(value_type)
-      // を呼び出せない．
-	typedef tuple_replace<iterator_value<ITER> >		value_type;
-	typedef typename tuple_head<value_type>::element_type	element_type;
-	typedef cvtup_mask_proxy				self;
+  template <class ITER>
+  class cvtup_mask_proxy
+  {
+    public:
+    // xがcons型のとき cvt_mask<S>(x) の結果もcons型になるので，
+    // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
+    // value_typeとしておかないと，cvupの最終ステップで cvtup(value_type)
+    // を呼び出せない．
+      typedef tuple_replace<iterator_value<ITER> >		value_type;
+      typedef typename tuple_head<value_type>::element_type	element_type;
+      typedef cvtup_mask_proxy				self;
 
-      private:
-	typedef typename std::iterator_traits<ITER>::reference
+    private:
+      typedef typename std::iterator_traits<ITER>::reference
 							reference;
-	typedef typename type_traits<element_type>::complementary_mask_type
+      typedef typename type_traits<element_type>::complementary_mask_type
 							complementary_type;
-	typedef tuple_replace<value_type, vec<complementary_type> >
+      typedef tuple_replace<value_type, vec<complementary_type> >
 							complementary_vec;
-	typedef typename std::conditional<
-	    std::is_floating_point<element_type>::value,
-	    complementary_type, element_type>::type	integral_type;
-	typedef typename std::conditional<
-	    std::is_signed<integral_type>::value,
-	    typename type_traits<integral_type>::unsigned_type,
-	    typename type_traits<integral_type>::signed_type>::type
+      typedef typename std::conditional<
+	  std::is_floating_point<element_type>::value,
+	  complementary_type, element_type>::type	integral_type;
+      typedef typename std::conditional<
+	  std::is_signed<integral_type>::value,
+	  typename type_traits<integral_type>::unsigned_type,
+	  typename type_traits<integral_type>::signed_type>::type
 							flipped_type;
-	typedef tuple_replace<value_type, vec<flipped_type> >
+      typedef tuple_replace<value_type, vec<flipped_type> >
 							flipped_vec;
-	typedef typename type_traits<flipped_type>::lower_type
+      typedef typename type_traits<flipped_type>::lower_type
 							flipped_lower_type;
-	typedef tuple_replace<value_type, vec<flipped_lower_type> >
+      typedef tuple_replace<value_type, vec<flipped_lower_type> >
 							flipped_lower_vec;
 	
-      private:
-	template <class OP_>
-	void	cvtup(value_type x)
+    private:
+      template <class OP_>
+      void	cvtup(value_type x)
 		{
 		    OP_()(*_iter, x);
 		    ++_iter;
 		}
-	template <class OP_>
-	void	cvtup(complementary_vec x)
+      template <class OP_>
+      void	cvtup(complementary_vec x)
 		{
 		    cvtup<OP_>(cvt_mask<element_type>(x));
 		}
-	template <class OP_>
-	void	cvtup(flipped_vec x)
+      template <class OP_>
+      void	cvtup(flipped_vec x)
 		{
 		    cvtup<OP_>(cvt_mask<integral_type>(x));
 		}
-	template <class OP_>
-	void	cvtup(flipped_lower_vec x)
+      template <class OP_>
+      void	cvtup(flipped_lower_vec x)
 		{
 		    cvtup<OP_>(cvt_mask<integral_type, 0>(x));
 		    cvtup<OP_>(cvt_mask<integral_type, 1>(x));
 		}
-	template <class OP_, class VEC_>
-	void	cvtup(VEC_ x)
+      template <class OP_, class VEC_>
+      void	cvtup(VEC_ x)
 		{
 		    typedef
 			typename tuple_head<VEC_>::element_type	S;
@@ -4023,37 +4090,37 @@ namespace detail
 		    cvtup<OP_>(cvt_mask<upper_type, 1>(x));
 		}
 
-      public:
-	cvtup_mask_proxy(ITER const& iter) :_iter(const_cast<ITER&>(iter)) {}
+    public:
+      cvtup_mask_proxy(ITER const& iter) :_iter(const_cast<ITER&>(iter)) {}
 	
-	template <class VEC_>
-	self&	operator =(VEC_ x)
+      template <class VEC_>
+      self&	operator =(VEC_ x)
 		{
 		    cvtup<assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator &=(VEC_ x)
+      template <class VEC_>
+      self&	operator &=(VEC_ x)
 		{
 		    cvtup<bit_and_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator |=(VEC_ x)
+      template <class VEC_>
+      self&	operator |=(VEC_ x)
 		{
 		    cvtup<bit_or_assign<reference, value_type> >(x);
 		    return *this;
 		}
-	template <class VEC_>
-	self&	operator ^=(VEC_ x)
+      template <class VEC_>
+      self&	operator ^=(VEC_ x)
 		{
 		    cvtup<bit_xor_assign<reference, value_type> >(x);
 		    return *this;
 		}
 	
-      private:
-	ITER&	_iter;
-    };
+    private:
+      ITER&	_iter;
+  };
 }
 
 //! SIMDベクトルを受け取ってより大きな成分を持つ複数のSIMDベクトルに変換し，それらを指定された反復子を介して書き込む反復子

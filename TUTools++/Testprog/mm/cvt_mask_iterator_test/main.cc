@@ -16,8 +16,8 @@ doJob()
     
     typedef SRC						src_type;
     typedef DST						dst_type;
-    typedef load_iterator<const src_type*>		siterator;
-    typedef store_iterator<dst_type*>			diterator;
+    typedef load_iterator<const vec<src_type>*>		siterator;
+    typedef store_iterator<vec<dst_type>*>		diterator;
     typedef typename boost::mpl::if_c<
 	vec<src_type>::size <= vec<dst_type>::size,
 	cvtdown_mask_iterator<dst_type, siterator>,

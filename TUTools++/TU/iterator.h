@@ -147,25 +147,25 @@ namespace std
 *  std::[rbegin|rend](T)						*
 ************************************************************************/
 template <class T> inline auto
-rbegin(const T& x) -> decltype(x.rbegin())
-{
-    return x.rbegin();
-}
-    
-template <class T> inline auto
 rbegin(T& x) -> decltype(x.rbegin())
 {
     return x.rbegin();
 }
     
 template <class T> inline auto
-rend(const T& x) -> decltype(x.rend())
+rbegin(const T& x) -> decltype(x.rbegin())
+{
+    return x.rbegin();
+}
+    
+template <class T> inline auto
+rend(T& x) -> decltype(x.rend())
 {
     return x.rend();
 }
     
 template <class T> inline auto
-rend(T& x) -> decltype(x.rend())
+rend(const T& x) -> decltype(x.rend())
 {
     return x.rend();
 }
@@ -178,12 +178,12 @@ namespace detail
   struct generic_begin
   {
       template <class T> auto
-      operator ()(const T& x) const -> decltype(std::begin(x))
+      operator ()(T& x) const -> decltype(std::begin(x))
       {
 	  return std::begin(x);
       }
       template <class T> auto
-      operator ()(T& x) const -> decltype(std::begin(x))
+      operator ()(const T& x) const -> decltype(std::begin(x))
       {
 	  return std::begin(x);
       }
@@ -192,12 +192,12 @@ namespace detail
   struct generic_end
   {
       template <class T> auto
-      operator ()(const T& x) const -> decltype(std::end(x))
+      operator ()(T& x) const -> decltype(std::end(x))
       {
-	  return  std::end(x);
+	  return std::end(x);
       }
       template <class T> auto
-      operator ()(T& x) const -> decltype(std::end(x))
+      operator ()(const T& x) const -> decltype(std::end(x))
       {
 	  return std::end(x);
       }
@@ -206,12 +206,12 @@ namespace detail
   struct generic_rbegin
   {
       template <class T> auto
-      operator ()(const T& x) const -> decltype(std::rbegin(x))
+      operator ()(T& x) const -> decltype(std::rbegin(x))
       {
 	  return std::rbegin(x);
       }
       template <class T> auto
-      operator ()(T& x) const -> decltype(std::rbegin(x))
+      operator ()(const T& x) const -> decltype(std::rbegin(x))
       {
 	  return std::rbegin(x);
       }
@@ -220,27 +220,18 @@ namespace detail
   struct generic_rend
   {
       template <class T> auto
-      operator ()(const T& x) const -> decltype(std::rend(x))
+      operator ()(T& x) const -> decltype(std::rend(x))
       {
-	  return  std::rend(x);
+	  return std::rend(x);
       }
       template <class T> auto
-      operator ()(T& x) const -> decltype(std::rend(x))
+      operator ()(const T& x) const -> decltype(std::rend(x))
       {
 	  return std::rend(x);
       }
   };
 }
 
-template <class HEAD, class TAIL> inline auto
-begin(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_begin())))
-{
-    return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_begin()));
-}
-    
 template <class HEAD, class TAIL> inline auto
 begin(boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
@@ -251,12 +242,12 @@ begin(boost::tuples::cons<HEAD, TAIL>& x)
 }
     
 template <class HEAD, class TAIL> inline auto
-end(const boost::tuples::cons<HEAD, TAIL>& x)
+begin(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_end())))
+					       x, detail::generic_begin())))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_end()));
+					  x, detail::generic_begin()));
 }
     
 template <class HEAD, class TAIL> inline auto
@@ -269,12 +260,12 @@ end(boost::tuples::cons<HEAD, TAIL>& x)
 }
     
 template <class HEAD, class TAIL> inline auto
-rbegin(const boost::tuples::cons<HEAD, TAIL>& x)
+end(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_rbegin())))
+					       x, detail::generic_end())))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_rbegin()));
+					  x, detail::generic_end()));
 }
     
 template <class HEAD, class TAIL> inline auto
@@ -287,7 +278,16 @@ rbegin(boost::tuples::cons<HEAD, TAIL>& x)
 }
     
 template <class HEAD, class TAIL> inline auto
-rend(const boost::tuples::cons<HEAD, TAIL>& x)
+rbegin(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
+					       x, detail::generic_rbegin())))
+{
+    return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
+					  x, detail::generic_rbegin()));
+}
+    
+template <class HEAD, class TAIL> inline auto
+rend(boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
 					       x, detail::generic_rend())))
 {
@@ -296,7 +296,7 @@ rend(const boost::tuples::cons<HEAD, TAIL>& x)
 }
     
 template <class HEAD, class TAIL> inline auto
-rend(boost::tuples::cons<HEAD, TAIL>& x)
+rend(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
 					       x, detail::generic_rend())))
 {
