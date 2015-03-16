@@ -31,7 +31,7 @@
   \file		mmInstructions.h
   \brief	Intel CPUのマルチメディア命令に関連するクラスと関数の定義と実装
 */
-#if !defined(__TU_MMINSTRUCTIONS_H) && defined(__INTEL_COMPILER)
+#if !defined(__TU_MMINSTRUCTIONS_H) //&& defined(__INTEL_COMPILER)
 #define __TU_MMINSTRUCTIONS_H
 
 #if defined(AVX2)		// Core-i7 Haswell (2013)
@@ -678,21 +678,21 @@ template <class T> struct is_vec<vec<T> >	: std::true_type	{};
 *  Constructors of vec<T>						*
 ************************************************************************/
 #define MM_CONSTRUCTOR_1(type)						\
-    inline								\
+    template <> inline							\
     vec<type>::vec(element_type a)					\
 	:_base(MM_MNEMONIC(set1, MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a))							\
     {									\
     }
 #define MM_CONSTRUCTOR_2(type)						\
-    inline								\
+    template <> inline							\
     vec<type>::vec(element_type a0, element_type a1)			\
 	:_base(MM_MNEMONIC(setr, MM_PREFIX(type), , MM_SIGNED(type))	\
 	       (a0, a1))						\
     {									\
     }
 #define MM_CONSTRUCTOR_4(type)						\
-    inline								\
+    template <> inline							\
     vec<type>::vec(element_type a0, element_type a1,			\
 		   element_type a2, element_type a3)			\
 	:_base(MM_MNEMONIC(setr,  MM_PREFIX(type), , MM_SIGNED(type))	\
@@ -700,7 +700,7 @@ template <class T> struct is_vec<vec<T> >	: std::true_type	{};
     {									\
     }
 #define MM_CONSTRUCTOR_8(type)						\
-    inline								\
+    template <> inline							\
     vec<type>::vec(element_type a0, element_type a1,			\
 		   element_type a2, element_type a3,			\
 		   element_type a4, element_type a5,			\
@@ -710,7 +710,7 @@ template <class T> struct is_vec<vec<T> >	: std::true_type	{};
     {									\
     }
 #define MM_CONSTRUCTOR_16(type)						\
-    inline								\
+    template <> inline							\
     vec<type>::vec(element_type a0,  element_type a1,			\
 		   element_type a2,  element_type a3,			\
 		   element_type a4,  element_type a5,			\
@@ -725,7 +725,7 @@ template <class T> struct is_vec<vec<T> >	: std::true_type	{};
     {									\
     }
 #define MM_CONSTRUCTOR_32(type)						\
-    inline								\
+    template <> inline							\
     vec<type>::vec(element_type a0,  element_type a1,			\
 		   element_type a2,  element_type a3,			\
 		   element_type a4,  element_type a5,			\
