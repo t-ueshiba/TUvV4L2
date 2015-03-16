@@ -52,7 +52,7 @@ doJob()
 			 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
 			 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f};
 
-    vec<src_type>	x = load<false>((const vec<src_type>*)src);
+    vec<src_type>	x = load<false>(src);
 
     cerr << "src:";
     print(x);
@@ -75,8 +75,8 @@ doJobF()
     src_type	a[] = {0,  0, 0, 0,  0,  0, 0, 0};
     src_type	b[] = {1, -1, 1, 1, -1, -1, 1, 1};
 
-    vec<src_type>	x = load<false>((const vec<src_type>*)a),
-			y = load<false>((const vec<src_type>*)b);
+    vec<src_type>	x = load<false>(a),
+			y = load<false>(b);
 
     cvtup_mask_all<src_type, dst_type>::exec(x < y);
     
