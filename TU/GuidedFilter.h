@@ -74,7 +74,7 @@ class GuidedFilter : public BoxFilter
     
 	result_type	coeffs(size_t n, value_type e) const
 			{
-			    using namespace	std;
+			    using namespace	boost;
 
 			    value_type	a = (e == 0 ? 1 :
 					     (n*get<2>(*this)
@@ -111,7 +111,7 @@ class GuidedFilter : public BoxFilter
 
 	result_type	coeffs(size_t n, value_type e) const
 			{
-			    using namespace	std;
+			    using namespace	boost;
 			    
 			    value_type	var = n*get<1>(*this)
 					    - get<0>(*this)*get<0>(*this);
