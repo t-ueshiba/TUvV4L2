@@ -477,7 +477,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	return;
     
     Buffers*	buffers = _bufferPool.get();	// 各種作業領域を確保
-    buffers->initialize(N, D, W, H);
+    buffers->initialize(N, D, W);
     
     ROW		rowLp = rowL, rowRp = rowR;
     row_sring	rowA(buffers->A.begin(), buffers->A.end());
