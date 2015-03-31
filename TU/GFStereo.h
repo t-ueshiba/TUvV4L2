@@ -525,7 +525,8 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 	  	buffers->RminR.fill(std::numeric_limits<Score>::max());
-		computeDisparities(B.crbegin(), B.crend(), rowG->crbegin(),
+		computeDisparities(B.crbegin(), B.crend(),
+				   rowG->crbegin() + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   buffers->dminR.end() - D + 1,
@@ -634,7 +635,8 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 		buffers->RminR.fill(std::numeric_limits<Score>::max());
-		computeDisparities(B.rbegin(), B.crend(), rowG->crbegin(),
+		computeDisparities(B.rbegin(), B.crend(),
+				   rowG->crbegin() + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   make_fast_zip_iterator(
@@ -665,17 +667,20 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 
 	++rowR;
     }
-#if !defined(NO_VERTICAL_BM)
-    start(6);
-    rowD = rowD0;
-    for (v = H - 2*(N - 1); v-- != 0; )
+
+    if (_params.doVerticalBackMatch)
     {
-	pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
-			 make_vertical_iterator(buffers->dminV.cend(),   v),
-			 rowD->begin() + N - 1);
-	++rowD;
+	start(6);
+	rowD = rowD0;
+	for (v = H - 2*(N - 1); v-- != 0; )
+	{
+	    pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
+			     make_vertical_iterator(buffers->dminV.cend(),   v),
+			     rowD->begin() + N - 1);
+	    ++rowD;
+	}
     }
-#endif
+    
     _bufferPool.put(buffers);
     nextFrame();
 }
