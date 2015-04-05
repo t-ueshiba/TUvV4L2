@@ -38,16 +38,18 @@ namespace v
 /************************************************************************
 *  static data								*
 ************************************************************************/
-enum	{m_X025 = 32400, m_X05, m_X10, m_X15, m_X20, m_X40};
+enum	{m_X0125, m_X025 = 32400, m_X05, m_X10, m_X15, m_X20, m_X40, m_X80};
 
 static MenuDef zoomMenu[] =
 {
-    {"x0.25", m_X025, false, noSub},
-    {"x0.5",  m_X05,  false, noSub},
-    {"x1",    m_X10,  false, noSub},
-    {"x1.5",  m_X15,  false, noSub},
-    {"x2",    m_X20,  false, noSub},
-    {"x4",    m_X40,  false, noSub},
+    {"x0.125", m_X0125, false, noSub},
+    {"x0.25",  m_X025,  false, noSub},
+    {"x0.5",   m_X05,   false, noSub},
+    {"x1",     m_X10,   false, noSub},
+    {"x1.5",   m_X15,   false, noSub},
+    {"x2",     m_X20,   false, noSub},
+    {"x4",     m_X40,   false, noSub},
+    {"x8",     m_X80,   false, noSub},
     EndOfMenu
 };
 
@@ -223,6 +225,9 @@ CanvasPaneDC::callback(CmdId id, CmdVal val)
 	parent().callback(id, val);
 	return;
 
+      case m_X0125:
+	*this << x0_125;
+	break;
       case m_X025:
 	*this << x0_25;
 	break;
@@ -240,6 +245,9 @@ CanvasPaneDC::callback(CmdId id, CmdVal val)
 	break;
       case m_X40:
 	*this << x4;
+	break;
+      case m_X80:
+	*this << x8;
 	break;
     }
 

@@ -160,12 +160,12 @@ inline int
 DC::log2devR(int r)	const	{return r * _mul / _div;}
 
 inline int
-DC::log2devU(int u)	const	{return
-				   log2devR(u + _offset[0]) + _mul/(2*_div);}
+DC::log2devU(int u)	const	{return log2devR(u + _offset[0])
+				      + _mul/(2*_div);}
 
 inline int
-DC::log2devV(int v)	const	{return
-				   log2devR(v + _offset[1]) + _mul/(2*_div);}
+DC::log2devV(int v)	const	{return log2devR(v + _offset[1])
+				      + _mul/(2*_div);}
 
 inline Point2<int>
 DC::log2dev(const Point2<int>& p) const
@@ -180,12 +180,10 @@ inline int
 DC::dev2logR(int r)	const	{return r * _div / _mul;}
 
 inline int
-DC::dev2logU(int u)	const	{return
-				   dev2logR(u - _mul/(2*_div)) - _offset[0];}
+DC::dev2logU(int u)	const	{return dev2logR(u);}
 
 inline int
-DC::dev2logV(int v)	const	{return
-				   dev2logR(v - _mul/(2*_div)) - _offset[1];}
+DC::dev2logV(int v)	const	{return dev2logR(v);}
 
 inline Point2<int>
 DC::dev2log(const Point2<int>& p) const
@@ -215,12 +213,14 @@ inline DC::PointStyle	DC::getPointStyle()	const	{return _pointStyle;}
 /************************************************************************
 *  Manipulators								*
 ************************************************************************/
+extern DC&			x0_125(DC&)		;
 extern DC&			x0_25(DC&)		;
 extern DC&			x0_5(DC&)		;
 extern DC&			x1(DC&)			;
 extern DC&			x1_5(DC&)		;
 extern DC&			x2(DC&)			;
 extern DC&			x4(DC&)			;
+extern DC&			x8(DC&)			;
 extern DC&			underlay(DC&)		;
 extern DC&			overlay(DC&)		;
 extern DC&			dot(DC&)		;

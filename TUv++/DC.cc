@@ -88,6 +88,12 @@ DC::repaintAll() // This action is invoked by Expose events or application.
 *  Manipulators								*
 ************************************************************************/
 DC&
+x0_125(DC& vDC)
+{
+    return vDC.setZoom(1, 8);
+}
+
+DC&
 x0_25(DC& vDC)
 {
     return vDC.setZoom(1, 4);
@@ -121,6 +127,12 @@ DC&
 x4(DC& vDC)
 {
     return vDC.setZoom(4, 1);
+}
+
+DC&
+x8(DC& vDC)
+{
+    return vDC.setZoom(8, 1);
 }
 
 DC&
