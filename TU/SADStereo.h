@@ -487,8 +487,8 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
     Q.resize(W, DD);			// Q(u, *; d)
     Q.fill(0);
 
-    if (dminL.resize(W - N + 1))
-	delta.resize(dminL.size());
+    dminL.resize(W - N + 1);
+    delta.resize(dminL.size());
     dminR.resize(dminL.size() + D - 1);
     RminR.resize(DD);
 }
