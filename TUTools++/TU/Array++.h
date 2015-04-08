@@ -83,16 +83,16 @@ template <class T, class ALLOC=typename BufTraits<T>::allocator_type>
 class Buf : public BufTraits<T>
 {
   public:
-    typedef T						value_type;
-    typedef value_type*					pointer;
-    typedef const value_type*				const_pointer;
+    typedef ALLOC					allocator_type;
+    typedef typename allocator_type::value_type		value_type;
+    typedef typename allocator_type::pointer		pointer;
+    typedef typename allocator_type::const_pointer	const_pointer;
     typedef typename BufTraits<T>::iterator		iterator;
     typedef typename BufTraits<T>::const_iterator	const_iterator;
     typedef typename std::iterator_traits<iterator>::reference
 							reference;
     typedef typename std::iterator_traits<const_iterator>::reference
 							const_reference;
-    typedef ALLOC					allocator_type;
     
   public:
     explicit		Buf(size_t siz=0)	//!< デフォルトコンストラクタ
@@ -983,7 +983,13 @@ class Array2 : public Array<T, R>
     size_t		nrow()	const	{ return size(); }
     size_t		ncol()	const	{ return _ncol; }
     size_t		align()	const	{ return _align; }
-
+    size_t		stride() const
+			{
+			    return (size() > 1 ?
+				    (*this)[1].data() - (*this)[0].data() :
+				    _ncol);
+			}
+    
   //! 配列のサイズを変更する．
   /*!
     \param r	新しい行数

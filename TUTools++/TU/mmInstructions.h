@@ -857,7 +857,8 @@ template <bool ALIGNED=false, class T>
 static void	store(T* p, vec<T> x)					;
 
 #if defined(SSE2)
-#  if defined(SSE3)
+  //#  if defined(SSE3)
+#  if 0
 #    define MM_LOAD_STORE(type)						\
       MM_FUNC(vec<type> load<true>(const type* p), load,		\
 	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\

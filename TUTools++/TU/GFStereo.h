@@ -367,7 +367,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     struct Parameters : public super::Parameters
     {
 	Parameters()	:windowSize(11),
-			 intensityDiffMax(20), epsilon(150)		{}
+			 intensityDiffMax(20), epsilon(20)		{}
 
 	std::istream&	get(std::istream& in)
 			{
@@ -891,11 +891,10 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 
     A.resize(N + 1);
     for (auto& rowA : A)
-	if (!rowA.resize(W - N + 1, 2*DD))
-	    break;
+	rowA.resize(W - N + 1, 2*DD);
 
-    if (dminL.resize(W - 2*N + 2))
-	delta.resize(dminL.size());
+    dminL.resize(W - 2*N + 2);
+    delta.resize(dminL.size());
     dminR.resize(dminL.size() + D - 1);
     RminR.resize(DD);
 }
