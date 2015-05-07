@@ -857,28 +857,16 @@ template <bool ALIGNED=false, class T>
 static void	store(T* p, vec<T> x)					;
 
 #if defined(SSE2)
-  //#  if defined(SSE3)
-#  if 0
-#    define MM_LOAD_STORE(type)						\
-      MM_FUNC(vec<type> load<true>(const type* p), load,		\
-	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(vec<type> load<false>(const type* p), lddqu,		\
-	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(void store<true>(type* p, vec<type> x), store,		\
-	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)	\
-      MM_FUNC(void store<false>(type* p, vec<type> x), storeu,		\
-	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)
-#  else
-#    define MM_LOAD_STORE(type)						\
-      MM_FUNC(vec<type> load<true>(const type* p), load,		\
-	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(vec<type> load<false>(const type* p), loadu,		\
-	      ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
-      MM_FUNC(void store<true>(type* p, vec<type> x), store,		\
-	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)	\
-      MM_FUNC(void store<false>(type* p, vec<type> x), storeu,		\
-	      ((vec<type>::base_type*)p, x), void, type, MM_BASE)
-#  endif
+#  define MM_LOAD_STORE(type)						\
+    MM_FUNC(vec<type> load<true>(const type* p), load,			\
+	    ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+    MM_FUNC(vec<type> load<false>(const type* p), loadu,		\
+	    ((const vec<type>::base_type*)p), void, type, MM_BASE)	\
+    MM_FUNC(void store<true>(type* p, vec<type> x), store,		\
+	    ((vec<type>::base_type*)p, x), void, type, MM_BASE)		\
+    MM_FUNC(void store<false>(type* p, vec<type> x), storeu,		\
+	    ((vec<type>::base_type*)p, x), void, type, MM_BASE)
+
   MM_LOAD_STORE(int8_t)
   MM_LOAD_STORE(int16_t)
   MM_LOAD_STORE(int32_t)
@@ -2728,8 +2716,6 @@ template <class T> static vec<T>	operator *(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator /(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator %(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator -(vec<T> x)		;
-template <class T> static vec<T>	sat_add(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	sat_sub(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	mulhi(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	min(vec<T> x, vec<T> y)		;
 template <class T> static vec<T>	max(vec<T> x, vec<T> y)		;
@@ -2759,29 +2745,20 @@ operator -(vec<T> x)
     MM_NUMERIC_FUNC_2(operator +, add, type)				\
     MM_NUMERIC_FUNC_2(operator -, sub, type)
 
-// 符号なし数は，飽和演算によって operator [+|-] を定義する．
-#define MM_ADD_SUB_U(type)						\
+// 8/16bit整数は，飽和演算によって operator [+|-] を定義する．
+#define MM_SAT_ADD_SUB(type)						\
     MM_NUMERIC_FUNC_2(operator +, adds, type)				\
     MM_NUMERIC_FUNC_2(operator -, subs, type)
-
-// 符号あり数は，飽和演算に sat_[add|sub] という名前を与える．
-#define MM_SAT_ADD_SUB(type)						\
-    MM_NUMERIC_FUNC_2(sat_add, adds, type)				\
-    MM_NUMERIC_FUNC_2(sat_sub, subs, type)
 
 #define MM_MIN_MAX(type)						\
     MM_NUMERIC_FUNC_2(min, min, type)					\
     MM_NUMERIC_FUNC_2(max, max, type)
 
 // 加減算
-MM_ADD_SUB(int8_t)
-MM_ADD_SUB(int16_t)
-MM_ADD_SUB(int32_t)
-MM_ADD_SUB(int64_t)
-MM_ADD_SUB_U(u_int8_t)
-MM_ADD_SUB_U(u_int16_t)
 MM_SAT_ADD_SUB(int8_t)
 MM_SAT_ADD_SUB(int16_t)
+MM_ADD_SUB(int32_t)
+MM_ADD_SUB(int64_t)
 MM_SAT_ADD_SUB(u_int8_t)
 MM_SAT_ADD_SUB(u_int16_t)
 
@@ -2836,7 +2813,6 @@ MM_NUMERIC_FUNC_2(mulhi,      mulhi, int16_t)
 #endif
 
 #undef MM_ADD_SUB
-#undef MM_ADD_SUB_U
 #undef MM_SAT_ADD_SUB
 #undef MM_MIN_MAX
 
@@ -2916,14 +2892,10 @@ template <> inline Iu32vec		abs(Iu32vec x)	{return x;}
 ************************************************************************/
 template <class T> inline vec<T>
 diff(vec<T> x, vec<T> y)	{return select(x > y, x - y, y - x);}
-template <> inline Is8vec
-diff(Is8vec x, Is8vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
 template <> inline Iu8vec
-diff(Iu8vec x, Iu8vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
-template <> inline Is16vec
-diff(Is16vec x, Is16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
+diff(Iu8vec x, Iu8vec y)	{return (x - y) | (y - x);}
 template <> inline Iu16vec
-diff(Iu16vec x, Iu16vec y)	{return sat_sub(x, y) | sat_sub(y, x);}
+diff(Iu16vec x, Iu16vec y)	{return (x - y) | (y - x);}
   
 /************************************************************************
 *  Horizontal sum of vector elements					*

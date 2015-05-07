@@ -65,18 +65,14 @@ struct Profiler
 namespace TU
 {
 /************************************************************************
-*  class Diff<T>							*
+*  struct Diff<T>							*
 ************************************************************************/
 template <class T>
-class Diff
+struct Diff
 {
-  public:
-    typedef T						first_argument_type;
-    typedef first_argument_type				second_argument_type;
     typedef typename std::conditional<
 	std::is_integral<T>::value, int, T>::type	result_type;
     
-  public:
     Diff(T x, T thresh)	:_x(x), _thresh(thresh)		{}
     
     result_type	operator ()(T y) const
@@ -96,15 +92,11 @@ class Diff
     
 #if defined(SSE)
 template <class T>
-class Diff<mm::vec<T> >
+struct Diff<mm::vec<T> >
 {
-  public:
-    typedef mm::vec<T>					first_argument_type;
-    typedef first_argument_type				second_argument_type;
     typedef typename std::make_signed<T>::type		signed_type;
     typedef mm::vec<signed_type>			result_type;
 
-  public:
     Diff(mm::vec<T> x, mm::vec<T> thresh)	:_x(x), _thresh(thresh)	{}
     
     result_type	operator ()(mm::vec<T> y) const
@@ -125,6 +117,74 @@ class Diff<mm::vec<T> >
 };
 #endif
 
+/************************************************************************
+*  struct Minus<T>							*
+************************************************************************/
+template <class T>
+struct Minus
+{
+    typedef typename std::conditional<
+	std::is_integral<T>::value, int, T>::type	result_type;
+    
+    result_type	operator ()(T x, T y) const
+		{
+		    return result_type(x) - result_type(y);
+		}
+};
+    
+#if defined(SSE)
+template <class T>
+struct Minus<mm::vec<T> >
+{
+    typedef typename std::make_signed<T>::type		signed_type;
+    typedef mm::vec<signed_type>			result_type;
+
+    result_type	operator ()(mm::vec<T> x, mm::vec<T> y) const
+		{
+		    return mm::cast<signed_type>(x) - mm::cast<signed_type>(y);
+		}
+};
+#endif
+
+template <class HEAD, class TAIL>
+struct Minus<boost::tuples::cons<HEAD, TAIL> >
+{
+    typedef decltype(boost::tuples::cons_transform(
+			 std::declval<boost::tuples::cons<HEAD, TAIL> >(),
+			 std::declval<boost::tuples::cons<HEAD, TAIL> >(),
+			 Minus<HEAD>()))			result_type;
+
+    result_type	operator ()(const boost::tuples::cons<HEAD, TAIL>& x,
+			    const boost::tuples::cons<HEAD, TAIL>& y) const
+		{
+		    return boost::tuples::cons_transform(x, y, Minus<HEAD>());
+		}
+};
+
+/************************************************************************
+*  struct Blend<T>							*
+************************************************************************/
+template <class T>
+struct Blend
+{
+    typedef boost::tuple<T, T>	argument_type;
+    typedef T			result_type;
+    
+    Blend(T alpha)	:_alpha(alpha)					{}
+
+    result_type	operator ()(T x, T y) const
+		{
+		    return x + _alpha*(y - x);
+		}
+    result_type	operator ()(const argument_type& args) const
+		{
+		    return (*this)(boost::get<0>(args), boost::get<1>(args));
+		}
+
+  private:
+    const T	_alpha;
+};
+    
 /************************************************************************
 *  col2ptr(COL)								*
 ************************************************************************/
@@ -175,7 +235,7 @@ template <class ITER> dummy_iterator<ITER>
 make_dummy_iterator(ITER iter)		{ return dummy_iterator<ITER>(iter); }
 
 /************************************************************************
-*  class Idx<T>								*
+*  struct Idx<T>							*
 ************************************************************************/
 template <class T>
 struct Idx
@@ -715,7 +775,7 @@ class StereoBase : public Profiler
 	
       public:
 	CorrectDisparity(DMIN dminR, DELTA delta,
-			argument_type dmax, argument_type thr)
+			 argument_type dmax, argument_type thr)
 	    :_dminR(dminR), _delta(delta), _dmax(dmax), _thr(thr)	{}
 
 	result_type	operator ()(argument_type dL) const

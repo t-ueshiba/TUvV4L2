@@ -233,39 +233,52 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	Score	g_sqsum;	//!< ガイド画素の二乗和
     };
 
-    class ParamInit
+    struct ParamInit
     {
-      public:
-	typedef ScoreVec	argument_type;
 	typedef ScoreVecTuple	result_type;
+	typedef ScoreVec	argument_type;
 
-      public:
 	ParamInit(Score g)	:_g(g)					{}
 
 	result_type	operator ()(argument_type p) const
 			{
 			    return result_type(p, _g * p);
 			}
-
+	
       private:
 	const ScoreVec	_g;
     };
 
-    class ParamUpdate
+    struct ParamInit2 : public ParamInit
     {
-      public:
-	typedef ScoreVecTuple	argument_type;
-	typedef ScoreVecTuple	result_type;
+	typedef typename ParamInit::result_type	result_type;
+	typedef ScoreVecTuple			argument_type;
 
-      public:
+	ParamInit2(Score g, Score blend) :ParamInit(g), _blend(blend)	{}
+	
+	result_type	operator ()(const argument_type& pp) const
+			{
+			    return ParamInit::operator ()(_blend(pp));
+			}
+	
+      private:
+	const Blend<ScoreVec>	_blend;
+    };
+    
+    struct ParamUpdate
+    {
+	typedef ScoreVecTuple	result_type;
+	typedef ScoreVecTuple	argument_type;
+	
 	ParamUpdate(Score gn, Score gp)	:_gn(gn), _gp(gp)		{}
 
+	result_type	operator ()(ScoreVec pn, ScoreVec pp) const
+			{
+			    return result_type(pn - pp, _gn * pn - _gp * pp);
+			}
 	result_type	operator ()(const argument_type& p) const
 			{
-			    using namespace	boost;
-			    
-			    return result_type(get<0>(p) - get<1>(p),
-					       _gn*get<0>(p) - _gp*get<1>(p));
+			    return (*this)(boost::get<0>(p), boost::get<1>(p));
 			}
 
       private:
@@ -273,18 +286,37 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	const ScoreVec	_gp;
     };
 
-    class CoeffInit
+    struct ParamUpdate2 : public ParamUpdate
     {
-      public:
-	ScoreVecTuple	argument_type;
+	typedef typename ParamUpdate::result_type	result_type;
+	typedef boost::tuple<ScoreVec, ScoreVec,
+			     ScoreVec, ScoreVec>	argument_type;
+
+	ParamUpdate2(Score gn, Score gp, Score blend)
+	    :ParamUpdate(gn, gp), _blend(blend)				{}
+
+	result_type	operator ()(const argument_type& p) const
+			{
+			    using namespace	boost;
+
+			    return ParamUpdate::operator ()(
+				       _blend(get<0>(p), get<1>(p)),
+				       _blend(get<2>(p), get<3>(p)));
+			}
+
+      private:
+	const Blend<ScoreVec>	_blend;
+    };
+
+    struct CoeffInit
+    {
+	typedef ScoreVecTuple	argument_type;
 	typedef ScoreVecTuple	result_type;
 	
-      public:
 	CoeffInit(Score g_avg, Score g_sqavg, Score e)
 	    :_g_avg(g_avg), _g_rvar(1/(g_sqavg - g_avg*g_avg + e*e))	{}
 
-	result_type	operator ()(boost::tuple<const ScoreVec&,
-						 const ScoreVec&> params) const
+	result_type	operator ()(const argument_type& params) const
 			{
 			    using namespace	boost;
 			    
@@ -298,20 +330,18 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	const ScoreVec	_g_rvar;
     };
 
-    class CoeffTrans
+    struct CoeffTrans
     {
-      public:
 	typedef ScoreVecTuple	argument_type;
 	typedef ScoreVec	result_type;
 	
-      public:
 	CoeffTrans(Score g) :_g(g)					{}
 
-	result_type	operator ()(boost::tuple<const ScoreVec&,
-						 const ScoreVec&> coeffs) const
+	result_type	operator ()(const argument_type& coeffs) const
 			{
-			    return (boost::get<0>(coeffs) * _g +
-				    boost::get<1>(coeffs));
+			    using namespace	boost;
+			    
+			    return (get<0>(coeffs) * _g + get<1>(coeffs));
 			}
 	
       private:
@@ -366,8 +396,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
   public:
     struct Parameters : public super::Parameters
     {
-	Parameters()	:windowSize(11),
-			 intensityDiffMax(20), epsilon(20)		{}
+	Parameters()	:windowSize(11), intensityDiffMax(20),
+			 derivativeDiffMax(20), blend(0), epsilon(20)	{}
 
 	std::istream&	get(std::istream& in)
 			{
@@ -383,12 +413,18 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 			    out << windowSize << endl;
 			    cerr << "  maximum intensity difference:       ";
 			    out << intensityDiffMax << endl;
+			    cerr << "  maximum derivative difference:      ";
+			    out << derivativeDiffMax << endl;
+			    cerr << "  blend ratio:                        ";
+			    out << blend << endl;
 			    cerr << "  epsilon for guided filtering:       ";
 			    return out << epsilon << endl;
 			}
 			    
 	size_t	windowSize;		//!< ウィンドウのサイズ
 	size_t	intensityDiffMax;	//!< 輝度差の最大値
+	size_t	derivativeDiffMax;	//!< 輝度勾配差の最大値
+	Score	blend;			//!< 輝度差と輝度勾配差の按分率
 	Score	epsilon;		//!< guided filterの正則化パラメータ
     };
 
@@ -694,36 +730,94 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 {
 #if defined(SSE)
     typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
-    typedef mm::cvtup_iterator<
-		assignment_iterator<
-		    ParamInit,
-		    typename ScoreVecArray::iterator2> >	qiterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
-    typedef assignment_iterator<
-		ParamInit, typename ScoreVecArray::iterator2>	qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
 
-    for (; colL != colLe; ++colL)
+    if (_params.blend > 0)
     {
-	const Score	pixL = *colL;
-	const diff_type	diff(pixL, _params.intensityDiffMax);
-	in_iterator	in(col2ptr(colRV));
+#if defined(SSE)
+	typedef mm::cvtup_iterator<
+	    assignment_iterator<
+		ParamInit2,
+		typename ScoreVecArray::iterator2> >		qiterator;
+#else
+	typedef assignment_iterator<
+	    ParamInit2, typename ScoreVecArray::iterator2>	qiterator;
+#endif
+	typedef Minus<iterator_value<in_iterator> >		minus_type;
+	typedef Diff<
+	    tuple_head<typename minus_type::result_type> >	ddiff_type;
 	
-	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
-						   ParamInit(pixL))),
-		       Qe(make_assignment_iterator(colQ->end2(),
-						   ParamInit(pixL)));
-	     Q != Qe; ++Q, ++in)
-	    *Q += diff(*in);
+	while (++colL != colLe - 1)
+	{
+	    ++colRV;
+	    ++colQ;
+	    ++colF;
+	
+	    const Score	pixL = *colL;
+	    auto	P = make_fast_zip_iterator(
+				boost::make_tuple(
+				    boost::make_transform_iterator(
+					in_iterator(col2ptr(colRV)),
+					diff_type(pixL,
+						  _params.intensityDiffMax)),
+				    boost::make_transform_iterator(
+					boost::make_transform_iterator(
+					    make_fast_zip_iterator(
+						boost::make_tuple(
+						    in_iterator(
+							col2ptr(colRV) + 1),
+						    in_iterator(
+							col2ptr(colRV) - 1))),
+					    make_unarizer(minus_type())),
+					ddiff_type(
+					    *(colL + 1) - *(colL - 1),
+					    _params.derivativeDiffMax))));
+	    for (qiterator Q( make_assignment_iterator(
+				  colQ->begin2(),
+				  ParamInit2(pixL, _params.blend))),
+			   Qe(make_assignment_iterator(
+				  colQ->end2(),
+				  ParamInit2(pixL, _params.blend)));
+		 Q != Qe; ++Q, ++P)
+		*Q += *P;
 
-	colF->g_sum   += pixL;
-	colF->g_sqsum += pixL * pixL;
+	    colF->g_sum   += pixL;
+	    colF->g_sqsum += pixL * pixL;
+	}
+    }
+    else
+    {
+#if defined(SSE)
+	typedef mm::cvtup_iterator<
+	    assignment_iterator<
+		ParamInit, typename ScoreVecArray::iterator2> >	qiterator;
+#else
+	typedef assignment_iterator<
+	    ParamInit, typename ScoreVecArray::iterator2>	qiterator;
+#endif
+	for (; colL != colLe; ++colL)
+	{
+	    const Score		pixL = *colL;
+	    const diff_type	diff(pixL, _params.intensityDiffMax);
+	    in_iterator		in(col2ptr(colRV));
 	
-	++colRV;
-	++colQ;
-	++colF;
+	    for (qiterator Q( make_assignment_iterator(colQ->begin2(),
+						       ParamInit(pixL))),
+			   Qe(make_assignment_iterator(colQ->end2(),
+						       ParamInit(pixL)));
+		 Q != Qe; ++Q, ++in)
+		*Q += diff(*in);
+	    
+	    colF->g_sum   += pixL;
+	    colF->g_sqsum += pixL * pixL;
+	
+	    ++colRV;
+	    ++colQ;
+	    ++colF;
+	}
     }
 }
 
@@ -735,39 +829,115 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 {
 #if defined(SSE)
     typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
-    typedef mm::cvtup_iterator<
-		assignment_iterator<
-		    ParamUpdate,
-		    typename ScoreVecArray::iterator2> >	qiterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
-    typedef assignment_iterator<
-		ParamUpdate, typename ScoreVecArray::iterator2>	qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
 
-    for (; colL != colLe; ++colL)
+    if (_params.blend > 0)
     {
-	const Score	pixLp = *colLp, pixL = *colL;
-	const diff_type	diff_p(pixLp, _params.intensityDiffMax),
-			diff_n(pixL,  _params.intensityDiffMax);
-	in_iterator	in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
+#if defined(SSE)
+	typedef mm::cvtup_iterator<
+	    assignment_iterator<
+		ParamUpdate2,
+		typename ScoreVecArray::iterator2> >		qiterator;
+#else
+	typedef assignment_iterator<
+	    ParamUpdate2, typename ScoreVecArray::iterator2>	qiterator;
+#endif
+	typedef Minus<iterator_value<in_iterator> >		minus_type;
+	typedef Diff<
+	    tuple_head<typename minus_type::result_type> >	ddiff_type;
 	
-	for (qiterator Q( make_assignment_iterator(colQ->begin2(),
-						   ParamUpdate(pixL, pixLp))),
-		       Qe(make_assignment_iterator(colQ->end2(),
-						   ParamUpdate(pixL, pixLp)));
-	     Q != Qe; ++Q, ++in_p, ++in_n)
-	    *Q += boost::make_tuple(diff_n(*in_n), diff_p(*in_p));
+	while (++colL != colLe - 1)
+	{
+	    ++colRV;
+	    ++colLp;
+	    ++colRVp;
+	    ++colQ;
+	    ++colF;
+	
+	    const Score	pixLp = *colLp, pixL = *colL;
+	    auto	P = make_fast_zip_iterator(
+				boost::make_tuple(
+				    boost::make_transform_iterator(
+					in_iterator(col2ptr(colRV)),
+					diff_type(*colL,
+						  _params.intensityDiffMax)),
+				    boost::make_transform_iterator(
+					boost::make_transform_iterator(
+					    make_fast_zip_iterator(
+						boost::make_tuple(
+						    in_iterator(
+							col2ptr(colRV) + 1),
+						    in_iterator(
+							col2ptr(colRV) - 1))),
+					    make_unarizer(minus_type())),
+					ddiff_type(*(colL + 1) - *(colL - 1),
+						   _params.derivativeDiffMax)),
+				    boost::make_transform_iterator(
+					in_iterator(col2ptr(colRVp)),
+					diff_type(*colLp,
+						  _params.intensityDiffMax)),
+				    boost::make_transform_iterator(
+					boost::make_transform_iterator(
+					    make_fast_zip_iterator(
+						boost::make_tuple(
+						    in_iterator(
+							col2ptr(colRVp) + 1),
+						    in_iterator(
+							col2ptr(colRVp) - 1))),
+					    make_unarizer(minus_type())),
+					ddiff_type(
+					    *(colLp + 1) - *(colLp - 1),
+					    _params.derivativeDiffMax))));
+	    for (qiterator Q( make_assignment_iterator(
+				  colQ->begin2(),
+				  ParamUpdate2(pixL, pixLp, _params.blend))),
+			   Qe(make_assignment_iterator(
+				  colQ->end2(),
+				  ParamUpdate2(pixL, pixLp, _params.blend)));
+		 Q != Qe; ++Q, ++P)
+		*Q += *P;
 
-	colF->g_sum   += (pixL - pixLp);
-	colF->g_sqsum += (pixL * pixL - pixLp * pixLp);
+	    colF->g_sum   += (pixL - pixLp);
+	    colF->g_sqsum += (pixL * pixL - pixLp * pixLp);
+	}
+    }
+    else
+    {
+#if defined(SSE)
+	typedef mm::cvtup_iterator<
+	    assignment_iterator<
+		ParamUpdate,
+		typename ScoreVecArray::iterator2> >		qiterator;
+#else
+	typedef assignment_iterator<
+	    ParamUpdate, typename ScoreVecArray::iterator2>	qiterator;
+#endif
+	for (; colL != colLe; ++colL)
+	{
+	    const Score		pixLp = *colLp, pixL = *colL;
+	    const diff_type	diff_p(pixLp, _params.intensityDiffMax),
+				diff_n(pixL,  _params.intensityDiffMax);
+	    in_iterator		in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
+	
+	    for (qiterator Q( make_assignment_iterator(
+				  colQ->begin2(), ParamUpdate(pixL, pixLp))),
+			   Qe(make_assignment_iterator(
+				  colQ->end2(), ParamUpdate(pixL, pixLp)));
+		 Q != Qe; ++Q, ++in_p, ++in_n)
+		*Q += boost::make_tuple(diff_n(*in_n), diff_p(*in_p));
 
-	++colRV;
-	++colLp;
-	++colRVp;
-	++colQ;
-	++colF;
+	    colF->g_sum   += (pixL - pixLp);
+	    colF->g_sqsum += (pixL * pixL - pixLp * pixLp);
+
+	    ++colRV;
+	    ++colLp;
+	    ++colRVp;
+	    ++colQ;
+	    ++colF;
+	}
     }
 }
 

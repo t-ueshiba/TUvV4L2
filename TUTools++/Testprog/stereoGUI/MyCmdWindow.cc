@@ -96,7 +96,9 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(App&		 parentApp,
     _menuCmd.setValue(c_DisparityMax, int(p.disparityMax));
     _menuCmd.setValue(c_DisparityInconsistency, int(p.disparityInconsistency));
     _menuCmd.setValue(c_IntensityDiffMax, int(p.intensityDiffMax));
+    _menuCmd.setValue(c_DerivativeDiffMax, int(p.derivativeDiffMax));
     _menuCmd.setValue(c_Regularization, Epsilon<stereo_type>().get(p));
+    _menuCmd.setValue(c_Blend, float(p.blend));
     
     _canvasL.setZoom(1, 2);
     _canvasR.setZoom(1, 2);
@@ -265,6 +267,26 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  {
 	    params_type	params = _stereo.getParameters();
 	    params.intensityDiffMax = val;
+	    _stereo.setParameters(params);
+
+	    stereoMatch();
+	  }
+	    break;
+
+	  case c_DerivativeDiffMax:
+	  {
+	    params_type	params = _stereo.getParameters();
+	    params.derivativeDiffMax = val;
+	    _stereo.setParameters(params);
+
+	    stereoMatch();
+	  }
+	    break;
+
+	  case c_Blend:
+	  {
+	    params_type	params = _stereo.getParameters();
+	    params.blend = val.f();
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -513,14 +535,14 @@ MyCmdWindow<STEREO, PIXEL, DISP>::putThreeDImage(std::ostream& out) const
 /************************************************************************
 *  instantiations							*
 ************************************************************************/
-template class MyCmdWindow<SADStereo<short, u_char> >;
-template class MyCmdWindow<SADStereo<int,   u_short> >;
-  //template class MyCmdWindow<SADStereo<float, u_char> >;
+  //template class MyCmdWindow<SADStereo<short, u_char> >;
+  //template class MyCmdWindow<SADStereo<int,   u_short> >;
+template class MyCmdWindow<SADStereo<float, u_char> >;
   //template class MyCmdWindow<SADStereo<float, u_short> >;
 template class MyCmdWindow<GFStereo<float,  u_char> >;
-template class MyCmdWindow<GFStereo<float,  u_short> >;
+  //template class MyCmdWindow<GFStereo<float,  u_short> >;
 
-template class MyCmdWindow<SADStereo<short, u_char>, u_char, u_char>;
-template class MyCmdWindow<GFStereo<float,  u_char>, u_char, u_char>;
+  //template class MyCmdWindow<SADStereo<short, u_char>, u_char, u_char>;
+  //template class MyCmdWindow<GFStereo<float,  u_char>, u_char, u_char>;
 }
 }
