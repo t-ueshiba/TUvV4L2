@@ -554,7 +554,7 @@ class unarizer
 		{
 		    return _func(boost::get<IDX>(arg)...);
 		}
-
+    
   private:
     const FUNC&	_func;
 };

@@ -136,7 +136,7 @@ enum
     c_WindowSize,
     c_IntensityDiffMax,
     c_DerivativeDiffMax,
-    c_Alpha,
+    c_Blend,
     c_Regularization,
     c_DepthRange,
     

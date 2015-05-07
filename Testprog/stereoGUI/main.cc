@@ -56,14 +56,8 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
-#if defined(HUGE_IMAGE)
-    typedef SADStereo<int,  u_short>	SADStereoType;
-    typedef GFStereo<float, u_short>	GFStereoType;
-#else    
-    typedef SADStereo<short, u_char>	SADStereoType;
-  //typedef SADStereo<float, u_char>	SADStereoType;
+    typedef SADStereo<float, u_char>	SADStereoType;
     typedef GFStereo<float,  u_char>	GFStereoType;
-#endif
     
     bool	gfstereo		= false;
     bool	doHorizontalBackMatch	= true;

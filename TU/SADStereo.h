@@ -37,6 +37,7 @@
 #include "TU/StereoBase.h"
 #include "TU/Array++.h"
 #include "TU/BoxFilter.h"
+#include <boost/tuple/tuple_io.hpp>
 
 namespace TU
 {
@@ -73,6 +74,26 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     typedef Array<float>				FloatArray;
     typedef FloatArray::reverse_iterator		reverse_col_fiterator;
 
+    struct ScoreUpdate
+    {
+	typedef ScoreVec				result_type;
+	typedef boost::tuple<ScoreVec, ScoreVec,
+			     ScoreVec, ScoreVec>	argument_type;
+	
+	ScoreUpdate(Score blend)	:_blend(blend)	{}
+
+	result_type	operator ()(const argument_type& args) const
+			{
+			    using namespace	boost;
+
+			    return _blend(get<0>(args), get<1>(args))
+				 - _blend(get<2>(args), get<3>(args));
+			}
+	
+      private:
+	const Blend<ScoreVec>	_blend;
+    };
+    
     struct Buffers
     {
 	void	initialize(size_t N, size_t D, size_t W)		;
@@ -90,7 +111,8 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
   public:
     struct Parameters : public super::Parameters
     {
-	Parameters()	:windowSize(11), intensityDiffMax(20)		{}
+	Parameters()	:windowSize(11), intensityDiffMax(20),
+			 derivativeDiffMax(20), blend(0)		{}
 
 	std::istream&	get(std::istream& in)
 			{
@@ -108,12 +130,18 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 			    out << windowSize << endl;
 			    cerr << "  maximum intensity difference:       ";
 			    out << intensityDiffMax << endl;
+			    cerr << "  maximum derivative difference:      ";
+			    out << derivativeDiffMax << endl;
+			    cerr << "  blend ratio:                        ";
+			    out << blend << endl;
 			    
 			    return out;
 			}
 			    
-	size_t	windowSize;			//!< ウィンドウのサイズ
-	size_t	intensityDiffMax;		//!< 輝度差の最大値
+	size_t	windowSize;		//!< ウィンドウのサイズ
+	size_t	intensityDiffMax;	//!< 輝度差の最大値
+	size_t	derivativeDiffMax;	//!< 輝度勾配差の最大値
+	Score	blend;			//!< 輝度差と輝度勾配差の按分率
     };
 
   public:
@@ -347,23 +375,76 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 {
 #if defined(SSE)
     typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
-    typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
-    typedef subiterator<col_siterator>				qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
 
-    for (; colL != colLe; ++colL)
+    if (_params.blend > 0)
     {
-	const diff_type	diff(*colL, _params.intensityDiffMax);
-	in_iterator	in(col2ptr(colRV));
+	typedef Blend<ScoreVec>					blend_type;
+#if defined(SSE)
+	typedef mm::cvtup_iterator<
+	    assignment_iterator<blend_type,
+				subiterator<col_siterator> > >	qiterator;
+#else
+	typedef assignment_iterator<
+	    blend_type, subiterator<col_siterator> >		qiterator;
+#endif
+	typedef Minus<iterator_value<in_iterator> >		minus_type;
+	typedef Diff<
+	    tuple_head<typename minus_type::result_type> >	ddiff_type;
+
+	while (++colL != colLe - 1)
+	{
+	    ++colRV;
+	    ++colQ;
 	
-	for (qiterator Q(colQ->begin()), Qe(colQ->end()); Q != Qe; ++Q, ++in)
-	    *Q += diff(*in);
-	
-	++colRV;
-	++colQ;
+	    auto	P = make_fast_zip_iterator(
+				boost::make_tuple(
+				    boost::make_transform_iterator(
+					in_iterator(col2ptr(colRV)),
+					diff_type(*colL,
+						  _params.intensityDiffMax)),
+				    boost::make_transform_iterator(
+					boost::make_transform_iterator(
+					    make_fast_zip_iterator(
+						boost::make_tuple(
+						    in_iterator(
+							col2ptr(colRV) + 1),
+						    in_iterator(
+							col2ptr(colRV) - 1))),
+					    make_unarizer(minus_type())),
+					ddiff_type(
+					    *(colL + 1) - *(colL - 1),
+					    _params.derivativeDiffMax))));
+	    for (qiterator Q( make_assignment_iterator(
+				  colQ->begin(), blend_type(_params.blend))),
+			   Qe(make_assignment_iterator(
+				  colQ->end(), blend_type(_params.blend)));
+		 Q != Qe; ++Q, ++P)
+		*Q += *P;
+	}
+    }
+    else
+    {
+#if defined(SSE)
+	typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
+#else
+	typedef subiterator<col_siterator>			qiterator;
+#endif
+	for (; colL != colLe; ++colL)
+	{
+	    const diff_type	diff(*colL, _params.intensityDiffMax);
+	    in_iterator	in(col2ptr(colRV));
+	    
+	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
+		 Q != Qe; ++Q, ++in)
+		*Q += diff(*in);
+	    
+	    ++colRV;
+	    ++colQ;
+	}
     }
 }
     
@@ -375,27 +456,95 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 {
 #if defined(SSE)
     typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
-    typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
-    typedef subiterator<col_siterator>				qiterator;
 #endif
     typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
 
-    for (; colL != colLe; ++colL)
+    if (_params.blend > 0)
     {
-	const diff_type	diff_p(*colLp, _params.intensityDiffMax),
-			diff_n(*colL,  _params.intensityDiffMax);
-	in_iterator	in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
-	
-	for (qiterator Q(colQ->begin()), Qe(colQ->end());
-	     Q != Qe; ++Q, ++in_p, ++in_n)
-	    *Q += (diff_n(*in_n) - diff_p(*in_p));
+#if defined(SSE)
+	typedef mm::cvtup_iterator<
+	    assignment_iterator<ScoreUpdate,
+				subiterator<col_siterator> > >	qiterator;
+#else
+	typedef assignment_iterator<
+	    ScoreUpdate, subiterator<col_siterator> >		qiterator;
+#endif
+	typedef Minus<iterator_value<in_iterator> >		minus_type;
+	typedef Diff<
+	    tuple_head<typename minus_type::result_type> >	ddiff_type;
 
-	++colRV;
-	++colLp;
-	++colRVp;
-	++colQ;
+	while (++colL != colLe - 1)
+	{
+	    ++colRV;
+	    ++colLp;
+	    ++colRVp;
+	    ++colQ;
+	    
+	    auto	P = make_fast_zip_iterator(
+				boost::make_tuple(
+				    boost::make_transform_iterator(
+					in_iterator(col2ptr(colRV)),
+					diff_type(
+					    *colL, _params.intensityDiffMax)),
+				    boost::make_transform_iterator(
+					boost::make_transform_iterator(
+					    make_fast_zip_iterator(
+						boost::make_tuple(
+						    in_iterator(
+							col2ptr(colRV) + 1),
+						    in_iterator(
+							col2ptr(colRV) - 1))),
+					    make_unarizer(minus_type())),
+					ddiff_type(*(colL + 1) - *(colL - 1),
+						   _params.derivativeDiffMax)),
+				    boost::make_transform_iterator(
+					in_iterator(col2ptr(colRVp)),
+					diff_type(*colLp,
+						  _params.intensityDiffMax)),
+				    boost::make_transform_iterator(
+					boost::make_transform_iterator(
+					    make_fast_zip_iterator(
+						boost::make_tuple(
+						    in_iterator(
+							col2ptr(colRVp) + 1),
+						    in_iterator(
+							col2ptr(colRVp) - 1))),
+					    make_unarizer(minus_type())),
+					ddiff_type(
+					    *(colLp + 1) - *(colLp - 1),
+					    _params.derivativeDiffMax))));
+	    for (qiterator Q( make_assignment_iterator(
+				  colQ->begin(), ScoreUpdate(_params.blend))),
+			   Qe(make_assignment_iterator(
+				  colQ->end(), ScoreUpdate(_params.blend)));
+		 Q != Qe; ++Q, ++P)
+		*Q += *P;
+	}
+    }
+    else
+    {
+#if defined(SSE)
+	typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
+#else
+	typedef subiterator<col_siterator>			qiterator;
+#endif
+	for (; colL != colLe; ++colL)
+	{
+	    const diff_type	diff_p(*colLp, _params.intensityDiffMax),
+				diff_n(*colL,  _params.intensityDiffMax);
+	    in_iterator		in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
+	
+	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
+		 Q != Qe; ++Q, ++in_p, ++in_n)
+		*Q += (diff_n(*in_n) - diff_p(*in_p));
+
+	    ++colRV;
+	    ++colLp;
+	    ++colRVp;
+	    ++colQ;
+	}
     }
 }
 

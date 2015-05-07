@@ -81,6 +81,9 @@ class SeparableFilter2
 #endif
   public:
     SeparableFilter2() :_filterH(), _filterV(), _grainSize(1)	{}
+    template <class ARG>
+    SeparableFilter2(const ARG& argH, const ARG& argV)
+	:_filterH(argH), _filterV(argV), _grainSize(1)		{}
 
     template <class IN, class OUT>
     void	convolve(IN ib, IN ie, OUT out)	const	;
