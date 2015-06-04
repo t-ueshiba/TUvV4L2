@@ -802,7 +802,7 @@ class row2col
 		}
     
   private:
-    const size_t	_col;	//!< 列を指定するindex
+    size_t	_col;	//!< 列を指定するindex
 };
 
 template <class ROW>
