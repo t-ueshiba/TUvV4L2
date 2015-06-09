@@ -16,6 +16,9 @@ template <class T>
 class QuantizerBase
 {
   public:
+    typedef T	value_type;
+    
+  public:
     const T&	operator [](size_t i)	const	{ return _bins[i]; }
     size_t	size()			const	{ return _bins.size(); }
 
@@ -107,7 +110,12 @@ class Quantizer : public QuantizerBase<T>
 	    typename std::iterator_traits<ITER>::value_type, u_char>::value,
 	const Array<size_t>&>::type
 		operator ()(ITER ib, ITER ie, size_t nbins)	;
-
+    friend std::ostream&
+		operator <<(std::ostream& out, const Quantizer<T>& quantizer)
+		{
+		    return out << quantizer._indices;
+		}
+    
   private:
     Array<size_t>	_indices;
 };
@@ -156,6 +164,11 @@ class Quantizer2 : public QuantizerBase<T>
 	    u_char>::value,
 	const Array2<Array<size_t> >&>::type
 		operator ()(ROW ib, ROW ie, size_t nbins)	;
+    friend std::ostream&
+		operator <<(std::ostream& out, const Quantizer2<T>& quantizer)
+		{
+		    return out << quantizer._indices;
+		}
 	
   private:
     Array2<Array<size_t> >	_indices;
