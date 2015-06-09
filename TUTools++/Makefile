@@ -77,6 +77,7 @@ HDRS		= TU/Array++.h \
 		TU/PM16C_04.h \
 		TU/PSTree.h \
 		TU/Profiler.h \
+		TU/Quantizer.h \
 		TU/Random.h \
 		TU/Ransac.h \
 		TU/Rectify.h \
@@ -90,6 +91,7 @@ HDRS		= TU/Array++.h \
 		TU/TriggerGenerator.h \
 		TU/Vector++.h \
 		TU/Warp.h \
+		TU/WeightedMedianFilter.h \
 		TU/algorithm.h \
 		TU/fdstream.h \
 		TU/functional.h \
