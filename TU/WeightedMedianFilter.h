@@ -11,22 +11,8 @@
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>
-#  undef PROFILE
 #endif
-
-#if defined(PROFILE)
-#  include "TU/Profiler.h"
-#else
-struct Profiler
-{
-    Profiler(size_t)				{}
-
-    void	reset()			const	{}
-    void	print(std::ostream&)	const	{}
-    void	start(int)		const	{}
-    void	nextFrame()		const	{}
-};
-#endif
+#include "TU/Profiler.h"
 
 namespace TU
 {
@@ -39,6 +25,7 @@ template <class W>
 class WeightedMedianFilterBase
 {
   public:
+    typedef typename W::argument_type	guide_type;
     typedef typename W::result_type	weight_type;
     typedef Array<weight_type>		warray_type;
     
@@ -259,11 +246,13 @@ template <class T, class W>
 class WeightedMedianFilter : public detail::WeightedMedianFilterBase<W>
 {
   private:
-    typedef T					value_type;
-    typedef typename W::argument_type		guide_type;
     typedef detail::WeightedMedianFilterBase<W>	super;
     typedef typename super::HistogramArray	HistogramArray;
 
+  public:
+    typedef T					value_type;
+    typedef typename super::guide_type		guide_type;
+    
   public:
     WeightedMedianFilter(const W& wfunc=W(), size_t winSize=3,
 			 size_t nbinsI=256, size_t nbinsG=256)
@@ -328,8 +317,6 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 			      public Profiler
 {
   private:
-    typedef T					value_type;
-    typedef typename W::argument_type		guide_type;
     typedef detail::WeightedMedianFilterBase<W>	super;
     typedef typename super::HistogramArray	HistogramArray;
 #if defined(USE_TBB)
@@ -361,6 +348,9 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 		    return Filter<ROW_I, ROW_G, ROW_O>(*this, rowI, rowG, rowO);
 		}
 #endif
+  public:
+    typedef T					value_type;
+    typedef typename super::guide_type		guide_type;
 
   public:
     WeightedMedianFilter2(const W& wfunc=W(), size_t winSize=3,

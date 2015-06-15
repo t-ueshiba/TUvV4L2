@@ -48,6 +48,7 @@ namespace TU
 /************************************************************************
 *  clsss Profiler							*
 ************************************************************************/
+#if defined(PROFILE)
 //! プログラムの各ステップ毎に実行時間を測定するためのクラス．
 class Profiler
 {
@@ -133,6 +134,16 @@ Profiler::nextFrame() const
     ++_nframes;
     return *this;
 }
+#else
+struct Profiler
+{
+    Profiler(size_t)				{}
 
+    void	reset()			const	{}
+    void	print(std::ostream&)	const	{}
+    void	start(int)		const	{}
+    void	nextFrame()		const	{}
+};
+#endif
 }
 #endif	// !__TU_PROFILER_H

@@ -27,6 +27,8 @@
  *  
  *  $Id$
  */
+#define PROFILE
+
 #include "TU/Profiler.h"
 #include <iomanip>
 
