@@ -45,22 +45,8 @@
 #  include <tbb/parallel_for.h>
 #  include <tbb/spin_mutex.h>
 #  include <tbb/scalable_allocator.h>
-#  undef PROFILE
 #endif
-
-#if defined(PROFILE)
-#  include "TU/Profiler.h"
-#else
-struct Profiler
-{
-    Profiler(size_t)				{}
-
-    void	reset()			const	{}
-    void	print(std::ostream&)	const	{}
-    void	start(int)		const	{}
-    void	nextFrame()		const	{}
-};
-#endif
+#include "TU/Profiler.h"
 
 namespace TU
 {
