@@ -43,48 +43,54 @@
 namespace TU
 {
 /************************************************************************
-*  class Filter2							*
+*  class Filter2<F>							*
 ************************************************************************/
 //! 水平/垂直方向に分離不可能な2次元フィルタを表すクラス
+/*!
+  \param F	2次元フィルタの型
+*/
+template <class F>
 class Filter2
 {
   public:
+    typedef F	filter_type;
 #if defined(USE_TBB)
   private:
     template <class IN, class OUT>
-    class FilterRows
+    class ConvolveRows
     {
       public:
-	FilterRows(IN const& in, OUT const& out) :_in(in), _out(out)	{}
+	ConvolveRows(F const& filter,
+		     IN const& ib, IN const& ie, OUT const& out)
+	    :_filter(filter), _ib(ib), _ie(ie), _out(out)		{}
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    IN	ib = _in, ie = _in;
+		    IN	ib = _ib, ie = _ib;
 		    std::advance(ib, r.begin());
-		    std::advance(ie, r.end());
+		    std::advance(ie, r.end() + _filter.overlap());
 		    OUT	out = _out;
 		    std::advance(out, r.begin());
-		    Filter2::filterRows(ib, ie, out);
+		    _filter.convolveRows(ib, std::min(ie, _ie), out);
 		}
 
       private:
-	IN     const&	_in;
-	OUT    const&	_out;
+	F	const&	_filter;
+	IN	const&	_ib;
+	IN	const&	_ie;
+	OUT	const&	_out;
     };
 #endif
   public:
-    Filter2()	:_grainSize(1)				{}
-
+    template <class ...ARG>
+    Filter2(const ARG& ...arg)	:_filter(arg...), _grainSize(1)	{}
     template <class IN, class OUT>
-    void	operator ()(IN ib, IN ie, OUT out) const;
+    void	convolve(IN ib, IN ie, OUT out)	const	;
     size_t	grainSize()			const	{ return _grainSize; }
     void	setGrainSize(size_t gs)			{ _grainSize = gs; }
-
+	
   private:
-    template <class IN, class OUT>
-    static void	filterRows(IN ib, IN ie, OUT out)	;
-    
-  private:
+    F const&	_filter;	// 2次元フィルタ
     size_t	_grainSize;
 };
     
@@ -94,23 +100,16 @@ class Filter2
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
 */
-template <class IN, class OUT> void
-Filter2::operator ()(IN ib, IN ie, OUT out) const
+template <class F> template <class IN, class OUT> void
+Filter2<F>::convolve(IN ib, IN ie, OUT out) const
 {
 #if defined(USE_TBB)
     tbb::parallel_for(tbb::blocked_range<size_t>(0, std::distance(ib, ie),
 						 _grainSize),
-		      FilterRows<IN, OUT>(ib, out));
+		      ConvolveRows<IN, OUT>(_filter, ib, ie, out));
 #else
-    filterRows(ib, ie, out);
+    _filter.convolveRows(ib, ie, out);
 #endif
-}
-
-template <class IN, class OUT> void
-Filter2::filterRows(IN ib, IN ie, OUT out)
-{
-    for (; ib != ie; ++ib, ++out)
-	std::copy(ib->begin(), ib->end(), out->begin());
 }
 
 }

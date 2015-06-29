@@ -173,7 +173,7 @@ main(int argc, char* argv[])
 	    image.restore(cin);
 	    if (!guide.restore(cin))
 		guide = image;
-	    else if (image.width() != guide.width() ||
+	    else if (image.width()  != guide.width() ||
 		     image.height() != guide.height())
 		throw runtime_error("Mismatched image sizes!");
 	    break;

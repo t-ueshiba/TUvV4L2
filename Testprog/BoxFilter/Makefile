@@ -12,14 +12,14 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG #-DUSE_TBB
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
   NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE4
+#  CPPFLAGS     += -DSSE4
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -39,20 +39,19 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../../TU/Array++.h \
-		../../TU/BoxFilter.h \
-		../../TU/Geometry++.h \
-		../../TU/Image++.h \
-		../../TU/Minimize.h \
-		../../TU/Profiler.h \
-		../../TU/SeparableFilter2.h \
-		../../TU/Vector++.h \
-		../../TU/functional.h \
-		../../TU/iterator.h \
-		../../TU/mmInstructions.h \
-		../../TU/tuple.h \
-		../../TU/types.h \
-		../../windows/fakeWindows.h
+EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/BoxFilter.h \
+		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Minimize.h \
+		/usr/local/include/TU/Profiler.h \
+		/usr/local/include/TU/SeparableFilter2.h \
+		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/mmInstructions.h \
+		/usr/local/include/TU/tuple.h \
+		/usr/local/include/TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -63,8 +62,11 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
-	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
-	../../TU/tuple.h ../../TU/functional.h ../../TU/mmInstructions.h \
-	../../TU/Minimize.h ../../TU/BoxFilter.h ../../TU/SeparableFilter2.h \
-	../../TU/Profiler.h ../../windows/fakeWindows.h
+main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/mmInstructions.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/BoxFilter.h \
+	/usr/local/include/TU/SeparableFilter2.h \
+	/usr/local/include/TU/Profiler.h
