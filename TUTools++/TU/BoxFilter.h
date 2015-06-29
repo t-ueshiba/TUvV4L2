@@ -35,28 +35,29 @@
 #define	__TU_BOXFILTER_H
 
 #include <algorithm>
-#include "TU/SeparableFilter2.h"
+#include "TU/Filter2.h"
+#include "TU/Array++.h"
 
 namespace TU
 {
 /************************************************************************
-*  class box_filter_iterator<ITER, VAL>					*
+*  class box_filter_iterator<ITER, T>					*
 ************************************************************************/
 //! コンテナ中の指定された要素に対してbox filterを適用した結果を返す反復子
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER, class VAL=iterator_value<ITER> >
+template <class ITER, class T=iterator_value<ITER> >
 class box_filter_iterator
-    : public boost::iterator_adaptor<box_filter_iterator<ITER, VAL>,
+    : public boost::iterator_adaptor<box_filter_iterator<ITER, T>,
 				     ITER,			// base
-				     VAL,			// value_type
+				     T,				// value_type
 				     boost::single_pass_traversal_tag>
 {
   private:
     typedef boost::iterator_adaptor<box_filter_iterator,
 				    ITER,
-				    VAL,
+				    T,
 				    boost::single_pass_traversal_tag>	super;
 		    
   public:
@@ -117,8 +118,8 @@ class box_filter_iterator
 			    typename std::iterator_traits<
 				iterator>::value_type>::value>	value_is_expr;
 		    
-		    auto	c = curr->cbegin();
-		    auto	h = head->cbegin();
+		    auto	c = curr->begin();
+		    auto	h = head->begin();
 		    for (iterator v = val->begin(), ve = val->end();
 			 v != ve; ++v, ++c, ++h)
 			update(v, c, h, value_is_expr());
@@ -162,16 +163,15 @@ class box_filter_iterator
   \param iter	コンテナ中の要素を指す定数反復子
   \return	box filter反復子
 */
-template <class VAL=void, class ITER>
+template <class T=void, class ITER>
 box_filter_iterator<ITER,
-		    typename std::conditional<
-			std::is_void<VAL>::value,
-			iterator_value<ITER>, VAL>::type>
+		    typename std::conditional<std::is_void<T>::value,
+					      iterator_value<ITER>, T>::type>
 make_box_filter_iterator(ITER iter, size_t w=0)
 {
-    typedef typename std::conditional<std::is_void<VAL>::value,
+    typedef typename std::conditional<std::is_void<T>::value,
 				      iterator_value<ITER>,
-				      VAL>::type	value_type;
+				      T>::type		value_type;
     
     return box_filter_iterator<ITER, value_type>(iter, w);
 }
@@ -202,7 +202,7 @@ class BoxFilter
    */
     size_t	winSize()		const	{return _winSize;}
 
-    template <class IN, class OUT>
+    template <class T=void, class IN, class OUT>
     void	convolve(IN ib, IN ie, OUT out)	const	;
 
   //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
@@ -222,28 +222,36 @@ class BoxFilter
   \param out	box filterを適用した出力データ列の先頭を示す反復子
   \return	出力データ列の末尾の次を示す反復子
 */
-template <class IN, class OUT> void
+template <class T, class IN, class OUT> void
 BoxFilter::convolve(IN ib, IN ie, OUT out) const
 {
-    std::copy(make_box_filter_iterator(ib, _winSize),
-	      make_box_filter_iterator(ie), out);
+    std::copy(make_box_filter_iterator<T>(ib, _winSize),
+	      make_box_filter_iterator<T>(ie), out);
 }
 
 /************************************************************************
 *  class BoxFilter2							*
 ************************************************************************/
 //! 2次元入力データ列にbox filterを適用するクラス
-class BoxFilter2 : public SeparableFilter2<BoxFilter>
+class BoxFilter2 : public Filter2<BoxFilter2>
 {
+  private:
+    typedef Filter2<BoxFilter2>	super;
+    
   public:
+    using	super::grainSize;
+    using	super::setGrainSize;
+    
   //! box filterを生成する．
   /*!
     \param wrow	box filterのウィンドウの行幅(高さ)
     \param wcol	box filterのウィンドウの列幅(幅)
    */	
 		BoxFilter2(size_t wrow=3, size_t wcol=3)
+		    :super(*this), _rowWinSize(wrow), _colFilter(wcol)
 		{
-		    setRowWinSize(wrow).setColWinSize(wcol);
+		    if (grainSize() < 2*_rowWinSize)
+			setGrainSize(2*_rowWinSize);
 		}
     
   //! box filterのウィンドウの行幅(高さ)を設定する．
@@ -253,7 +261,9 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
    */
     BoxFilter2&	setRowWinSize(size_t wrow)
 		{
-		    filterV().setWinSize(wrow);
+		    _rowWinSize = wrow;
+		    if (grainSize() < 2*_rowWinSize)
+			setGrainSize(2*_rowWinSize);
 		    return *this;
 		}
 
@@ -264,7 +274,7 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
    */
     BoxFilter2&	setColWinSize(size_t wcol)
 		{
-		    filterH().setWinSize(wcol);
+		    _colFilter.setWinSize(wcol);
 		    return *this;
 		}
 
@@ -272,13 +282,13 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
   /*!
     \return	box filterのウィンドウの行幅
    */
-    size_t	rowWinSize()	const	{return filterV().winSize();}
+    size_t	rowWinSize()	const	{ return _rowWinSize; }
 
   //! box filterのウィンドウ列幅(幅)を返す．
   /*!
     \return	box filterのウィンドウの列幅
    */
-    size_t	colWinSize()	const	{return filterH().winSize();}
+    size_t	colWinSize()	const	{ return _colFilter.winSize(); }
 
   //! 与えられた行幅(高さ)を持つ入力データ列に対する出力データ列の行幅を返す．
   /*!
@@ -287,7 +297,7 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
    */
     size_t	outRowLength(size_t inRowLength) const
 		{
-		    return filterV().outLength(inRowLength);
+		    return inRowLength + 1 - rowWinSize();
 		}
     
   //! 与えられた列幅(幅)を持つ入力データ列に対する出力データ列の列幅を返す．
@@ -297,9 +307,37 @@ class BoxFilter2 : public SeparableFilter2<BoxFilter>
    */
     size_t	outColLength(size_t inColLength) const
 		{
-		    return filterH().outLength(inColLength);
+		    return inColLength + 1 - colWinSize();
 		}
+
+    size_t	overlap()	const	{ return rowWinSize() - 1; }
+
+    template <class IN, class OUT>
+    void	convolveRows(IN ib, IN ie, OUT out)	const	;
+    
+  private:
+    size_t	_rowWinSize;
+    BoxFilter	_colFilter;
 };
+
+//! 与えられた2次元配列とこのフィルタの畳み込みを行う
+/*!
+  \param ib	入力2次元データ配列の先頭行を指す反復子
+  \param ie	入力2次元データ配列の末尾の次の行を指す反復子
+  \param out	出力2次元データ配列の先頭行を指す反復子
+*/
+template <class IN, class OUT> void
+BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
+{
+    typedef Array<iterator_value<subiterator<IN> > >	row_type;
+    typedef box_filter_iterator<IN, row_type>		row_iterator;
+
+    if (std::distance(ib, ie) < rowWinSize())
+	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
+    
+    for (row_iterator row(ib, _rowWinSize), rowe(ie); row != rowe; ++row, ++out)
+	_colFilter.convolve(row->begin(), row->end(), out->begin());
+}
 
 }
 #endif	// !__TU_BOXFILTER_H

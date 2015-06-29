@@ -982,49 +982,56 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
   private:
     typedef boost::iterator_adaptor<ring_iterator, ITER>	super;
 
-  public:
-    typedef typename super::difference_type			difference_type;
-    
     friend class	boost::iterator_core_access;
-
+    
+  public:
+    typedef typename super::difference_type	difference_type;
+    
   public:
     ring_iterator()
-	:super(), _begin(super::base()), _end(super::base())	{}
+	:super(), _begin(super::base()), _end(super::base()), _d(0)	{}
     
     ring_iterator(const ITER& begin, const ITER& end)
-	:super(begin), _begin(begin), _end(end)			{}
+	:super(begin),
+	 _begin(begin), _end(end), _d(std::distance(_begin, _end))	{}
 
   private:
-    void	advance(difference_type n)
-		{
-		    difference_type	d = std::distance(_begin, _end);
-		    n %= d;
-		    difference_type	i = std::distance(_begin,
-							  super::base()) + n;
-		    if (i >= d)
-			std::advance(super::base_reference(), n - d);
-		    else if (i < 0)
-			std::advance(super::base_reference(), n + d);
-		    else
-			std::advance(super::base_reference(), n);
-		}
+    void		advance(difference_type n)
+			{
+			    n %= _d;
+			    difference_type
+				i = std::distance(_begin, super::base()) + n;
+			    if (i >= _d)
+				std::advance(super::base_reference(), n - _d);
+			    else if (i < 0)
+				std::advance(super::base_reference(), n + _d);
+			    else
+				std::advance(super::base_reference(), n);
+			}
     
-    void	increment()
-		{
-		    if (++super::base_reference() == _end)
-			super::base_reference() = _begin;
-		}
+    void		increment()
+			{
+			    if (++super::base_reference() == _end)
+				super::base_reference() = _begin;
+			}
 
-    void	decrement()
-		{
-		    if (super::base() == _begin)
-			super::base_reference() = _end;
-		    --super::base_reference();
-		}
+    void		decrement()
+			{
+			    if (super::base() == _begin)
+				super::base_reference() = _end;
+			    --super::base_reference();
+			}
+
+    difference_type	distance_to(const ring_iterator& iter) const
+			{
+			    difference_type	n = iter.base() - super::base();
+			    return (n > 0 ? n - _d : n);
+			}
     
   private:
-    ITER	_begin;	// 代入を可能にするためconstは付けない
-    ITER	_end;	// 同上
+    ITER		_begin;	// 代入を可能にするためconstは付けない
+    ITER		_end;	// 同上
+    difference_type	_d;	// 同上
 };
 
 template <class ITER> ring_iterator<ITER>

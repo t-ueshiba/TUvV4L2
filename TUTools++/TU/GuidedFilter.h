@@ -46,14 +46,15 @@ template <class T>
 class GuidedFilter : public BoxFilter
 {
   public:
-    typedef T		value_type;
+    typedef T					value_type;
+    typedef detail::element_t<value_type>	guide_type;
     
-    class Params
-	: public boost::tuple<value_type, value_type, value_type, value_type>
+    class Params : public boost::tuple<value_type, guide_type,
+				       value_type, guide_type>
     {
       private:
-	typedef boost::tuple<value_type, value_type,
-			     value_type, value_type>	super;
+	typedef boost::tuple<value_type, guide_type,
+			     value_type, guide_type>	super;
 	
       public:
 	typedef boost::tuple<value_type, value_type>	result_type;
@@ -70,18 +71,18 @@ class GuidedFilter : public BoxFilter
 	};
 	
       public:
-	Params(value_type p=0, value_type g=0)	:super(p, g, p*g, g*g)	{}
+	Params(const value_type& p=value_type(), guide_type g=0)
+	    :super(p, g, p*g, g*g)				{}
     
-	result_type	coeffs(size_t n, value_type e) const
+	result_type	coeffs(size_t n, guide_type e) const
 			{
 			    using namespace	boost;
 
-			    value_type	a = (e == 0 ? 1 :
-					     (n*get<2>(*this)
-					      - get<0>(*this)*get<1>(*this)) /
-					     (n*(get<3>(*this) + n*e)
-					      -  get<1>(*this)*get<1>(*this)));
-			    value_type	b = (get<0>(*this) - a*get<1>(*this))/n;
+			    const auto&	a = (n*get<2>(*this)
+					     - get<0>(*this)*get<1>(*this))
+					  / (n*(get<3>(*this) + n*e)
+					     -  get<1>(*this)*get<1>(*this));
+			    const auto&	b = (get<0>(*this) - a*get<1>(*this))/n;
 
 			    return result_type(a, b);
 			}
@@ -107,16 +108,16 @@ class GuidedFilter : public BoxFilter
 	};
 	
       public:
-	SimpleParams(value_type p=0) :super(p, p*p)	{}
+	SimpleParams(const value_type& p=value_type()) :super(p, p*p)	{}
 
-	result_type	coeffs(size_t n, value_type e) const
+	result_type	coeffs(size_t n, guide_type e) const
 			{
 			    using namespace	boost;
 			    
-			    value_type	var = n*get<1>(*this)
+			    auto	var = n*get<1>(*this)
 					    - get<0>(*this)*get<0>(*this);
-			    value_type	a = (e == 0 ? 1 : var/(var + n*n*e));
-			    value_type	b = (get<0>(*this) - a*get<0>(*this))/n;
+			    auto	a = var/(var + n*n*e);
+			    auto	b = (get<0>(*this) - a*get<0>(*this))/n;
 			    
 			    return result_type(a, b);
 			}
@@ -135,7 +136,7 @@ class GuidedFilter : public BoxFilter
 	    typedef Coeff	result_type;
 
 	  public:
-	    Init(size_t n, value_type e) :_n(n), _e(e)			{}
+	    Init(size_t n, guide_type e)	:_n(n), _e(e)		{}
 
 	    result_type	operator ()(const argument_type& params) const
 			{
@@ -144,7 +145,7 @@ class GuidedFilter : public BoxFilter
 
 	  private:
 	    const size_t	_n;
-	    const value_type	_e;
+	    const guide_type	_e;
 	};
 
 	class Trans
@@ -183,14 +184,11 @@ class GuidedFilter : public BoxFilter
     typedef BoxFilter	super;
 
   public:
-    GuidedFilter(size_t w, value_type e) :super(w), _e(e)	{}
+    GuidedFilter(size_t w, guide_type e) :super(w), _e(e)	{}
 
-    value_type		epsilon()			const	{return _e;}
-    GuidedFilter&	setEpsilon(value_type e)
-			{
-			    _e = e;
-			    return *this;
-			}
+    guide_type	epsilon()		const	{return _e;}
+    GuidedFilter&
+		setEpsilon(guide_type e)	{ _e = e; return *this; }
     
     template <class IN, class GUIDE, class OUT>
     void	convolve(IN ib, IN ie,
@@ -204,7 +202,7 @@ class GuidedFilter : public BoxFilter
 		}
     
   private:
-    value_type	_e;
+    guide_type	_e;
 };
 
 //! 1次元入力データ列と1次元ガイドデータ列にguided filterを適用する
@@ -283,6 +281,7 @@ class GuidedFilter2 : private BoxFilter2
 {
   public:
     typedef T							value_type;
+    typedef detail::element_t<value_type>			guide_type;
     typedef typename GuidedFilter<value_type>::Params		Params;
     typedef typename GuidedFilter<value_type>::SimpleParams	SimpleParams;
     typedef typename GuidedFilter<value_type>::Coeff		Coeff;
@@ -291,19 +290,19 @@ class GuidedFilter2 : private BoxFilter2
     typedef BoxFilter2						super;
 
   public:
-    GuidedFilter2(size_t wrow, size_t wcol, value_type e)
+    GuidedFilter2(size_t wrow, size_t wcol, guide_type e)
 	:super(wrow, wcol), _e(e)				{}
 
-    using	super::grainSize;
-    using	super::setGrainSize;
     using	super::rowWinSize;
     using	super::colWinSize;
+    using	super::grainSize;
     using	super::setRowWinSize;
     using	super::setColWinSize;
+    using	super::setGrainSize;
     
-    value_type	epsilon()		const	{return _e;}
+    guide_type	epsilon()		const	{return _e;}
     GuidedFilter2&
-		setEpsilon(value_type e)	{ _e = e; return *this; }
+		setEpsilon(guide_type e)	{ _e = e; return *this; }
     
     template <class IN, class GUIDE, class OUT>
     void	convolve(IN ib, IN ie,
@@ -312,7 +311,7 @@ class GuidedFilter2 : private BoxFilter2
     void	convolve(IN ib, IN ie, OUT out)		const	;
     
   private:
-    value_type	_e;
+    guide_type	_e;
 };
 
 //! 2次元入力データと2次元ガイドデータにguided filterを適用する
@@ -334,7 +333,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     if (ib == ie)
 	return;
     
-    const size_t	n = rowWinSize() * colWinSize();
+    const auto		n = rowWinSize() * colWinSize();
     carray2_type	c(super::outRowLength(std::distance(ib, ie)),
 			  super::outColLength(std::distance(std::begin(*ib),
 							    std::end(*ib))));
@@ -377,7 +376,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     if (ib == ie)
 	return;
     
-    const size_t	n = rowWinSize() * colWinSize();
+    const auto		n = rowWinSize() * colWinSize();
     carray2_type	c(super::outRowLength(std::distance(ib, ie)),
 			  super::outColLength(std::distance(std::begin(*ib),
 							    std::end(*ib))));

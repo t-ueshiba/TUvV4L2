@@ -12,13 +12,15 @@ namespace TU
 *  global functions							*
 ************************************************************************/
 template <class T, class G> void
-doJob(const Image<T>& in, const Image<G>& guide, float epsilon, size_t winSize)
+doJob(const Image<T>& in, const Image<G>& guide,
+      float epsilon, size_t winSize, size_t grainSize)
 {
     using	std::cin;
     using	std::cout;
     using	std::cerr;
 
     GuidedFilter2<float>	gf(winSize, winSize, epsilon);
+    gf.setGrainSize(grainSize);
     Image<T>			out(in.width(), in.height());
     Profiler			profiler(1);
     
@@ -50,6 +52,7 @@ main(int argc, char* argv[])
 
     float		epsilon = 0.5;
     size_t		winSize = 5;
+    size_t		grainSize = 100;
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "e:w:") != -1); )
 	switch (c)
@@ -60,6 +63,9 @@ main(int argc, char* argv[])
 	  case 'w':
 	    winSize = atoi(optarg);
 	    break;
+	  case 'g':
+	    grainSize = atoi(optarg);
+	    break;
 	}
 
     try
@@ -67,9 +73,13 @@ main(int argc, char* argv[])
 	Image<pixel_type>	image;
 	image.restore(cin);
 	Image<guide_type>	guide;
-	guide.restore(cin);
+	if (!guide.restore(cin))
+	    guide = image;
+	else if (image.width()  != guide.width() ||
+		 image.height() != guide.height())
+	    throw std::runtime_error("Mismatched image sizes!");
 
-	doJob(image, guide, epsilon, winSize);
+	doJob(image, guide, epsilon, winSize, grainSize);
     }
     catch (std::exception& err)
     {

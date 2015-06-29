@@ -81,10 +81,10 @@ class SeparableFilter2
 #endif
   public:
     SeparableFilter2() :_filterH(), _filterV(), _grainSize(1)	{}
-    template <class ARG>
-    SeparableFilter2(const ARG& argH, const ARG& argV)
+    template <class ARGH, class ARGV>
+    SeparableFilter2(const ARGH& argH, const ARGV& argV)
 	:_filterH(argH), _filterV(argV), _grainSize(1)		{}
-
+    
     template <class IN, class OUT>
     void	convolve(IN ib, IN ie, OUT out)	const	;
     size_t	grainSize()			const	{ return _grainSize; }
@@ -139,7 +139,8 @@ SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie,
 				  OUT out, size_t, std::true_type) const
 {
     size_t	col = 0;
-#if defined(SSE2)
+  //#if defined(SSE2)
+#if 0
     typedef subiterator<OUT>					col_iterator;
     typedef typename std::iterator_traits<col_iterator>::value_type
 								value_type;
