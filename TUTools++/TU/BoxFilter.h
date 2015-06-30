@@ -118,8 +118,8 @@ class box_filter_iterator
 			    typename std::iterator_traits<
 				iterator>::value_type>::value>	value_is_expr;
 		    
-		    auto	c = curr->begin();
-		    auto	h = head->begin();
+		    auto	c = curr->cbegin();
+		    auto	h = head->cbegin();
 		    for (iterator v = val->begin(), ve = val->end();
 			 v != ve; ++v, ++c, ++h)
 			update(v, c, h, value_is_expr());

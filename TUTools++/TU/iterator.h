@@ -614,11 +614,17 @@ class range
     range(const iterator& begin, const iterator& end)
 	:_begin(begin), _end(end)			{}
 
-    size_t		size()	 const	{ return std::distance(_begin, _end); }
-    iterator		begin()	 const	{ return _begin; }
-    iterator		end()	 const	{ return _end; }
-    reverse_iterator	rbegin() const	{ return reverse_iterator(_end); }
-    reverse_iterator	rend()	 const	{ return reverse_iterator(_begin); }
+    size_t		size()	  const	{ return std::distance(_begin, _end); }
+    iterator		begin()	  const	{ return _begin; }
+    iterator		end()	  const	{ return _end; }
+    const_iterator	cbegin()  const	{ return begin(); }
+    const_iterator	cend()    const	{ return end(); }
+    reverse_iterator	rbegin()  const	{ return reverse_iterator(_end); }
+    reverse_iterator	rend()	  const	{ return reverse_iterator(_begin); }
+    const_reverse_iterator
+			crbegin() const	{ return rbegin(); }
+    const_reverse_iterator
+			crend() const	{ return rend(); }
     reference		operator [](size_t i) const
 			{
 			    return *(_begin + i);
@@ -995,12 +1001,16 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
 	:super(begin),
 	 _begin(begin), _end(end), _d(std::distance(_begin, _end))	{}
 
+    difference_type	position() const
+			{
+			    return std::distance(_begin, super::base());
+			}
+    
   private:
     void		advance(difference_type n)
 			{
 			    n %= _d;
-			    difference_type
-				i = std::distance(_begin, super::base()) + n;
+			    difference_type	i = position() + n;
 			    if (i >= _d)
 				std::advance(super::base_reference(), n - _d);
 			    else if (i < 0)
