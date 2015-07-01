@@ -65,7 +65,7 @@ class diff_iterator
 };
 
 /************************************************************************
-*  class matching_iterator<ITER>					*
+*  class matching_iterator<ITER, A>					*
 ************************************************************************/
 namespace detail
 {
@@ -226,5 +226,30 @@ class matching_iterator
 			_infty = std::numeric_limits<score_type>::max();
 };
     
+/************************************************************************
+*  class MinIdx<A>							*
+************************************************************************/
+template <class A>
+class MinIdx
+{
+  public:
+    typedef A		argument_type;
+    typedef size_t	result_type;
+
+  public:
+    MinIdx(size_t disparityMax)	:_disparityMax(disparityMax)	{}
+    
+    result_type	operator ()(const argument_type& R) const
+		{
+		    auto	RminL = R.begin();
+		    for (auto iter = R.begin(); iter != R.end(); ++iter)
+			if (*iter < *RminL)
+			    RminL = iter;
+		    return _disparityMax - (RminL - R.begin());
+		}
+  private:
+    const size_t	_disparityMax;
+};
+
 }
 #endif	// !__TU_STEREOITERATORS_H
