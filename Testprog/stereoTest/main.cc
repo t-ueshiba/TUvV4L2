@@ -20,18 +20,6 @@ namespace TU
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-template <class T> static void
-scaleDisparity(Image<T>& disparityMap, u_int disparitySearchWidth)
-{
-    const float	k = 255.0 / float(disparitySearchWidth);
-    for (int v = 0; v < disparityMap.height(); ++v)
-    {
-	T*	p = disparityMap[v].data();
-	for (int u = 0; u < disparityMap.width(); ++u)
-	    *p++ *= k;
-    }
-}
-
 template <class STEREO, class T> static void
 doJob(std::istream& in, const typename STEREO::Parameters& params,
       double scale, bool binocular)
@@ -92,12 +80,7 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
 	       rectifiedImages[2].cbegin(), disparityMap.begin());
     }
 
-#if defined(NO_INTERPOLATION)
-    scaleDisparity(disparityMap, params.disparitySearchWidth);
-    disparityMap.save(cout, ImageBase::U_CHAR);
-#else
-    disparityMap.save(cout, ImageBase::FLOAT);
-#endif
+    disparityMap.save(cout);
 }
 
 }
@@ -111,8 +94,8 @@ main(int argc, char* argv[])
     using namespace	TU;
 
 #if defined(HUGE_IMAGE)
-    typedef SADStereo<int,  u_short>	SADStereoType;
-    typedef GFStereo<float, u_short>	GFStereoType;
+    typedef SADStereo<int,   u_short>	SADStereoType;
+    typedef GFStereo<float,  u_short>	GFStereoType;
 #else    
     typedef SADStereo<short, u_char>	SADStereoType;
     typedef GFStereo<float,  u_char>	GFStereoType;
