@@ -13,14 +13,9 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG #-DSSE3
+CPPFLAGS	= -DNDEBUG -DSSE3
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
-#ifneq ($(findstring icpc,$(CXX)),)
-#  CFLAGS	= -O3
-#  NVCCFLAGS	= -O			# must < -O2
-#  CPPFLAGS     += -DSSE3
-#endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUTools++
