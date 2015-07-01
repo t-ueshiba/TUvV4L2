@@ -24,7 +24,7 @@ doJob(size_t winSize, size_t grainSize, int niter)
     
     Image<value_type>	out(in.width(), in.height());
     Profiler		profiler(1);
-    BoxFilter2		box(winSize);
+    BoxFilter2		box(winSize, winSize);
     box.setGrainSize(grainSize);
     
     for (int i = 0; i < 5; ++i)
@@ -39,6 +39,7 @@ doJob(size_t winSize, size_t grainSize, int niter)
 	profiler.print(cerr);
     }
 
+    out *= value_type(1)/(value_type(winSize)*value_type(winSize));
     out.save(cout);
 }
  
