@@ -17,11 +17,15 @@ SUBDIR	= BandMatrix		\
 	  Serial		\
 	  Sparse		\
 	  Spline		\
+	  TreeFilter		\
 	  Vector		\
+	  WeightedMedianFilter	\
 	  mm			\
 	  stereo1394		\
 	  stereoGUI		\
-	  stereoTime
+	  stereoTest		\
+	  stereoTime		\
+	  stereoV4L2
 
 TARGETS	= all clean depend
 

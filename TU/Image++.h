@@ -638,6 +638,7 @@ class ImageLine : public Array<T>
     ImageLine(ImageLine<T>& l, size_t u, size_t d)
 	:super(l, u, d), _lmost(0), _rmost(d)			{}
 
+    ImageLine&		operator =(const element_type& c)	;
     const ImageLine	operator ()(size_t u, size_t d)	const	;
     ImageLine		operator ()(size_t u, size_t d)		;
     
@@ -694,6 +695,13 @@ class ImageLine : public Array<T>
     int			_lmost;
     int			_rmost;
 };
+
+template <class T> inline ImageLine<T>&
+ImageLine<T>::operator =(const element_type& c)
+{
+    super::operator =(c);
+    return *this;
+}
 
 //! このスキャンラインの部分スキャンラインを生成する．
 /*!
@@ -870,6 +878,7 @@ class ImageLine<YUV422> : public Array<YUV422>
 	:super(p, d), _lmost(0), _rmost(d)			{}
     ImageLine(ImageLine<YUV422>& l, size_t u, size_t d)
 	:super(l, u, d), _lmost(0), _rmost(d)			{}
+    ImageLine&		operator =(const YUV422& c)		;
     const ImageLine	operator ()(size_t u, size_t d)	const	;
     ImageLine		operator ()(size_t u, size_t d)		;
 
@@ -896,6 +905,13 @@ class ImageLine<YUV422> : public Array<YUV422>
     int			_rmost;
 };
 
+inline ImageLine<YUV422>&
+ImageLine<YUV422>::operator =(const YUV422& c)
+{
+    super::operator =(c);
+    return *this;
+}
+    
 inline const ImageLine<YUV422>
 ImageLine<YUV422>::operator ()(size_t u, size_t d) const
 {
@@ -960,6 +976,7 @@ class ImageLine<YUYV422> : public Array<YUYV422>
 	:super(p, d), _lmost(0), _rmost(d)			{}
     ImageLine(ImageLine<YUYV422>& l, size_t u, size_t d)
 	:super(l, u, d), _lmost(0), _rmost(d)			{}
+    ImageLine&		operator =(const YUYV422& c)		;
     const ImageLine	operator ()(size_t u, size_t d)	const	;
     ImageLine		operator ()(size_t u, size_t d)		;
 
@@ -985,7 +1002,14 @@ class ImageLine<YUYV422> : public Array<YUYV422>
     int			_lmost;
     int			_rmost;
 };
-
+    
+inline ImageLine<YUYV422>&
+ImageLine<YUYV422>::operator =(const YUYV422& c)
+{
+    super::operator =(c);
+    return *this;
+}
+    
 inline const ImageLine<YUYV422>
 ImageLine<YUYV422>::operator ()(size_t u, size_t d) const
 {
@@ -1050,6 +1074,7 @@ class ImageLine<YUV411> : public Array<YUV411>
 	:super(p, d/2), _lmost(0), _rmost(d)			{}
     ImageLine(ImageLine<YUV411>& l, size_t u, size_t d)
 	:super(l, u/2, d/2), _lmost(0), _rmost(d)		{}
+    ImageLine&		operator =(const YUV411& c)		;
     const ImageLine	operator ()(size_t u, size_t d)	const	;
     ImageLine		operator ()(size_t u, size_t d)		;
     
@@ -1077,6 +1102,13 @@ class ImageLine<YUV411> : public Array<YUV411>
     int			_rmost;
 };
 
+inline ImageLine<YUV411>&
+ImageLine<YUV411>::operator =(const YUV411& c)
+{
+    super::operator =(c);
+    return *this;
+}
+    
 inline const ImageLine<YUV411>
 ImageLine<YUV411>::operator ()(size_t u, size_t d) const
 {
@@ -1202,6 +1234,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     Image(Image<T, B2>& i, size_t u, size_t v, size_t w, size_t h)
 	:super(i, v, u, h, w), ImageBase(i)			{}
 
+    Image&		operator =(const element_type& c)	;
     const Image<T>	operator ()(size_t u, size_t v,
 				    size_t w, size_t h)	const	;
     Image<T>		operator ()(size_t u, size_t v,
@@ -1261,6 +1294,13 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     virtual void	_resize(size_t h, size_t w, const TypeInfo&)	;
 };
 
+template <class T, class B> inline Image<T, B>&
+Image<T, B>::operator =(const element_type& c)
+{
+    super::operator =(c);
+    return *this;
+}
+    
 //! この画像の部分画像を生成する．
 /*!
   \param u	部分画像の左上端の横座標

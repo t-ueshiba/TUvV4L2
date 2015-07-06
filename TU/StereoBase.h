@@ -48,6 +48,12 @@
 #endif
 #include "TU/Profiler.h"
 
+#if defined(PROFILE) && !defined(USE_TBB)
+#  define ENABLE_PROFILER	true
+#else
+#  define ENABLE_PROFILER	false
+#endif
+
 namespace TU
 {
 /************************************************************************
@@ -619,7 +625,7 @@ fast_select(const S& s, const T& x, const U& y) -> decltype(select(s, x, y))
 *  class StereoBase<STEREO>						*
 ************************************************************************/
 template <class STEREO>
-class StereoBase : public Profiler
+class StereoBase : public Profiler<ENABLE_PROFILER>
 {
   public:
   //! ステレオ対応探索の各種パラメータを収めるクラス．
@@ -893,4 +899,8 @@ StereoBase<STEREO>::pruneDisparities(DMINV dminV,
 }
 
 }
+#if defined(PROFILE_BAK)
+#  define PROFILE
+#endif
+
 #endif	// !__TU_STEREOBASE_H

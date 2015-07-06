@@ -560,7 +560,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	      // さらにフィルタ係数を横方向に積算して最終的な係数を求め，
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
-	  	buffers->RminR.fill(std::numeric_limits<Score>::max());
+	  	buffers->RminR = std::numeric_limits<Score>::max();
 		computeDisparities(B.crbegin(), B.crend(),
 				   rowG->crbegin() + N - 1,
 				   buffers->dminL.rbegin(),
@@ -670,7 +670,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	      // さらにフィルタ係数を横方向に積算して最終的な係数を求め，
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
-		buffers->RminR.fill(std::numeric_limits<Score>::max());
+		buffers->RminR = std::numeric_limits<Score>::max();
 		computeDisparities(B.rbegin(), B.crend(),
 				   rowG->crbegin() + N - 1,
 				   buffers->dminL.rbegin(),
@@ -1055,9 +1055,9 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
     const size_t	DD = D;
 #endif
     Q.resize(W, 2*DD);			// Q(u, *; d)
-    Q.fill(0);
+    Q = 0;
     F.resize(W);
-    F.fill(GuideElement());
+    F = GuideElement();
 
     A.resize(N + 1);
     for (auto& rowA : A)
@@ -1077,7 +1077,7 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D,
 
     dminV.resize(dminL.size(), H + D - 1);
     RminV.resize(dminL.size(), RminR.size());
-    RminV.fill(std::numeric_limits<SCORE>::max());
+    RminV = std::numeric_limits<SCORE>::max();
 }
 
 }

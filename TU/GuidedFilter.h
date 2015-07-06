@@ -74,13 +74,13 @@ class GuidedFilter : public BoxFilter
 	Params(const value_type& p=value_type(), guide_type g=0)
 	    :super(p, g, p*g, g*g)				{}
     
-	result_type	coeffs(size_t n, guide_type e) const
+	result_type	coeffs(size_t n, guide_type sq_e) const
 			{
 			    using namespace	boost;
 
 			    const auto&	a = (n*get<2>(*this)
 					     - get<0>(*this)*get<1>(*this))
-					  / (n*(get<3>(*this) + n*e)
+					  / (n*(get<3>(*this) + n*sq_e)
 					     -  get<1>(*this)*get<1>(*this));
 			    const auto&	b = (get<0>(*this) - a*get<1>(*this))/n;
 
@@ -110,13 +110,13 @@ class GuidedFilter : public BoxFilter
       public:
 	SimpleParams(const value_type& p=value_type()) :super(p, p*p)	{}
 
-	result_type	coeffs(size_t n, guide_type e) const
+	result_type	coeffs(size_t n, guide_type sq_e) const
 			{
 			    using namespace	boost;
 			    
 			    auto	var = n*get<1>(*this)
 					    - get<0>(*this)*get<0>(*this);
-			    auto	a = var/(var + n*n*e);
+			    auto	a = var/(var + n*n*sq_e);
 			    auto	b = (get<0>(*this) - a*get<0>(*this))/n;
 			    
 			    return result_type(a, b);
@@ -136,16 +136,16 @@ class GuidedFilter : public BoxFilter
 	    typedef Coeff	result_type;
 
 	  public:
-	    Init(size_t n, guide_type e)	:_n(n), _e(e)		{}
+	    Init(size_t n, guide_type e)	:_n(n), _sq_e(e*e)	{}
 
 	    result_type	operator ()(const argument_type& params) const
 			{
-			    return result_type(params.coeffs(_n, _e));
+			    return result_type(params.coeffs(_n, _sq_e));
 			}
 
 	  private:
 	    const size_t	_n;
-	    const guide_type	_e;
+	    const guide_type	_sq_e;
 	};
 
 	class Trans

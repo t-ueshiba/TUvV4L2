@@ -41,9 +41,9 @@ doJob(const Image<T>& in, const Image<G>& guide,
     typedef Exp<G, float>	wfunc_type;
 
     wfunc_type					wfunc(sigma);
-    WeightedMedianFilter2<T, wfunc_type>	wmf(wfunc, winSize, 256, 16);
+    WeightedMedianFilter2<T, wfunc_type, true>	wmf(wfunc, winSize, 256, 16);
     Image<T>					out(in.width(), in.height());
-    Profiler					profiler(1);
+    Profiler<>					profiler(1);
 
     wmf.setGrainSize(grainSize);
     
@@ -97,7 +97,11 @@ main(int argc, char* argv[])
 	Image<pixel_type>	image;
 	image.restore(cin);
 	Image<guide_type>	guide;
-	guide.restore(cin);
+	if (!guide.restore(cin))
+	    guide = image;
+	else if (image.width()  != guide.width() ||
+		 image.height() != guide.height())
+	    throw std::runtime_error("Mismatched image sizes!");
 
 	doJob(image, guide, sigma, winSize, grainSize);
     }

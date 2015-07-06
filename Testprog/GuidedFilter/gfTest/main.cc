@@ -122,7 +122,7 @@ MyCmdWindow<T, G>::callback(CmdId id, CmdVal val)
 template <class T, class G> void
 MyCmdWindow<T, G>::filter()
 {
-    _filteredImage.fill(0);
+    _filteredImage = 0;
 
     size_t	w = _cmd.getValue(c_WinSize);
     float	s = _cmd.getValue(c_Regularization).f();

@@ -22,7 +22,7 @@ doJob(const Image<T>& in, const Image<G>& guide,
     GuidedFilter2<float>	gf(winSize, winSize, epsilon);
     gf.setGrainSize(grainSize);
     Image<T>			out(in.width(), in.height());
-    Profiler			profiler(1);
+    Profiler<>			profiler(1);
     
     for (size_t n = 0; n < 100; ++n)
     {

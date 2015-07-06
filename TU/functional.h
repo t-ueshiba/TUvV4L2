@@ -436,7 +436,7 @@ namespace detail
   template <class E>
   using const_iterator_t = typename impl::const_iterator_t<E>::type;
 
-  //! 式が定数反復子を持つか判定する
+  //! 式がメンバ関数begin()を持つか判定する
   template <class E>
   using is_range = decltype(impl::has_begin::check<E>(nullptr));
     

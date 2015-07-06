@@ -246,7 +246,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    ifstream		in;
 	    if (fileSelection.open(in))
 	    {
-		_rectifiedImages[2].fill(0);
+		_rectifiedImages[2] = 0;
 	    
 		for (_nimages = 0; _nimages < 3; ++_nimages)
 		    if (!_images[_nimages].restore(in))

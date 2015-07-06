@@ -122,7 +122,7 @@ IntegralImage<T>::initialize(const Image<S, B>& image)
     super::resize(image.height() + 1, image.width() + 1);
 
   // 上と左に余白を入れる
-    (*this)[0].fill(0);					// 0行目はすべて0
+    (*this)[0] = 0;					// 0行目はすべて0
     for (size_t v = 1; v < height(); ++v)
     {
 	T*		dst = (*this)[v].data();

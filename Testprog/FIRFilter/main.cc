@@ -23,7 +23,7 @@ doJob(COEFF alpha, size_t grainSize, int niter)
     in.restore(cin);
     
     Image<value_type>		out(in.width(), in.height());
-    Profiler			profiler(1);
+    Profiler<>			profiler(1);
     FIRGaussianConvolver2<>	convolver(alpha);
     convolver.setGrainSize(grainSize);
     

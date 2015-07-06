@@ -8,7 +8,6 @@
 #include "TU/Rectify.h"
 #include "TU/SADStereo.h"
 #include "TU/GFStereo.h"
-#include "TU/Profiler.h"
 
 #define DEFAULT_PARAM_FILE	"stereo"
 #define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
@@ -59,7 +58,6 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
 			   stereo.getParameters().disparityMax);
 
   // ステレオマッチングを行う．
-    Profiler		profiler(2);
     Image<float>	disparityMap(rectify.width(0), rectify.height(0));
     cerr << "Disparity map: "
 	 << disparityMap.width() << 'x' << disparityMap.height() << endl;

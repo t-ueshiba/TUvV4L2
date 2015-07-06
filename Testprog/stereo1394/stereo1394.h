@@ -127,6 +127,10 @@ enum
     c_BackwardMovie,
 
   // Stereo matching parameters
+    c_Algorithm,
+    c_SAD,
+    c_GuidedFilter,
+    c_TreeFilter,
     c_Binocular,
     c_DoHorizontalBackMatch,
     c_DoVerticalBackMatch,
@@ -139,6 +143,9 @@ enum
     c_Blend,
     c_Regularization,
     c_DepthRange,
+    c_WMF,
+    c_WMFWindowSize,
+    c_WMFSigma,
     
   // Viewing control.
     c_DrawMode,

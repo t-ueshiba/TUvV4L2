@@ -204,7 +204,8 @@ class Vector : public Array<T, B>
     Vector&		operator =(const E& v)				;
     Vector&		operator =(std::
 				   initializer_list<value_type> args)	;
-
+    Vector&		operator =(const element_type& c)		;
+    
     using		super::data;
     using		super::begin;
     using		super::cbegin;
@@ -317,6 +318,13 @@ Vector<T, B>::operator =(std::initializer_list<value_type> args)
     return *this;
 }
 
+template <class T, class B> inline Vector<T, B>&
+Vector<T, B>::operator =(const element_type& c)
+{
+    super::operator =(c);
+    return *this;
+}
+    
 //! このベクトルと記憶領域を共有した部分ベクトルを生成する．
 /*!
     \param i	部分ベクトルの第0成分を指定するindex
@@ -532,20 +540,21 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix(Matrix<T, B2, R2>& m, size_t i, size_t j, size_t r, size_t c);
     template <class E,
 	      class=typename std::enable_if<detail::is_range<E>::value>::type>
-    Matrix(const E& m)	:super(m)					{}
+    Matrix(const E& expr)	:super(expr)				{}
     Matrix(std::initializer_list<value_type> args)			;
     Matrix(const BlockDiagonalMatrix<T>& m)				;
     template <class E,
 	      class=typename std::enable_if<detail::is_range<E>::value>::type>
-    Matrix&		operator =(const E& m)
+    Matrix&		operator =(const E& expr)
 			{
-			    super::operator =(m);
+			    super::operator =(expr);
 			    return *this;
 			}
     Matrix&		operator =(std::
 				   initializer_list<value_type> arg)	;
     Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
-
+    Matrix&		operator =(const element_type& c)		;
+    
     using		super::begin;
     using		super::cbegin;
     using		super::end;
@@ -666,6 +675,13 @@ Matrix<T, B, R>::operator =(std::initializer_list<value_type> args)
     return *this;
 }
 
+template <class T, class B, class R> inline Matrix<T, B, R>&
+Matrix<T, B, R>::operator =(const element_type& c)
+{
+    super::operator =(c);
+    return *this;
+}
+
 //! この行列と記憶領域を共有した部分行列を生成する．
 /*!
     \param i	部分行列の左上隅成分となる行を指定するindex
@@ -729,7 +745,7 @@ template <class T, class B, class R> Matrix<T, B, R>&
 Matrix<T, B, R>::diag(T c)
 {
     super::check_size(ncol());
-    super::fill(element_type(0));
+    *this = element_type(0);
     for (size_t i = 0; i < nrow(); ++i)
 	(*this)[i][i] = c;
     return *this;
