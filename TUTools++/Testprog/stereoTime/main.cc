@@ -58,7 +58,7 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
 			   stereo.getParameters().disparityMax);
 
   // ステレオマッチングを行う．
-    Profiler		profiler(2);
+    Profiler<>		profiler(2);
     Image<float>	disparityMap(rectify.width(0), rectify.height(0));
     cerr << "Disparity map: "
 	 << disparityMap.width() << 'x' << disparityMap.height() << endl;
@@ -66,7 +66,7 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
     if (binocular)    
 	for (size_t i = 0; i < ntrials; ++i)
 	{
-	    for (size_t j = 0; j < 10; ++j)
+	    for (size_t j = 0; j < 1; ++j)
 	    {
 		profiler.start(0);		// rectificationの所要時間
 		rectify(images[0], images[1],

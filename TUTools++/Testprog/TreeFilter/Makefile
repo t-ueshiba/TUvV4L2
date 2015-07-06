@@ -12,18 +12,18 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DUSE_TBB
-CFLAGS		= -g -O3
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG -DPRINT
+CFLAGS		= -O
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3 -g
+  CFLAGS	= -O3
   NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++ -ltbb
+LIBS		=
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
@@ -42,16 +42,28 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/List.h \
+		/usr/local/include/TU/Manip.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Profiler.h \
-		/usr/local/include/TU/Quantizer.h \
+		/usr/local/include/TU/TreeFilter.h \
 		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/WeightedMedianFilter.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+		/usr/local/include/TU/types.h \
+		/usr/local/include/TU/v/App.h \
+		/usr/local/include/TU/v/CanvasPane.h \
+		/usr/local/include/TU/v/CanvasPaneDC.h \
+		/usr/local/include/TU/v/CmdPane.h \
+		/usr/local/include/TU/v/CmdWindow.h \
+		/usr/local/include/TU/v/Colormap.h \
+		/usr/local/include/TU/v/DC.h \
+		/usr/local/include/TU/v/Menu.h \
+		/usr/local/include/TU/v/TUv++.h \
+		/usr/local/include/TU/v/Widget-Xaw.h \
+		/usr/local/include/TU/v/XDC.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -67,6 +79,12 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/WeightedMedianFilter.h \
-	/usr/local/include/TU/Quantizer.h /usr/local/include/TU/Profiler.h
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/v/App.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/CanvasPane.h \
+	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
+	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/TreeFilter.h \
+	/usr/local/include/TU/Profiler.h

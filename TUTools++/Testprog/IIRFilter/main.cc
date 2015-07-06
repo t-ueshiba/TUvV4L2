@@ -23,7 +23,7 @@ doJob(typename CONVOLVER::coeff_type alpha, size_t grainSize)
     in.restore(cin);
     
     Image<value_type>	out(in.width(), in.height());
-    Profiler		profiler(1);
+    Profiler<>		profiler(1);
     CONVOLVER		convolver(alpha);
     convolver.setGrainSize(grainSize);
     

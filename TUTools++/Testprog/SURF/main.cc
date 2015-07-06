@@ -47,7 +47,7 @@ warpImage(const Image<T>& image, Image<T>& warpedImage, const Map& map)
 	.expand(inv(point_type(0,	      image.height())));
   //cerr << bbox.width() << 'x' << bbox.height() << endl;
     warpedImage.resize(size_t(bbox.height()), size_t(bbox.width()));
-    warpedImage.fill(0);
+    warpedImage = 0;
     
   // 変形後の左上隅が(0，0)になるように原点を移動する．
     matrix_type	Ht = map.trns();

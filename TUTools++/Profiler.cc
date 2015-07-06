@@ -38,14 +38,42 @@ namespace TU
 *  clsss Profiler							*
 ************************************************************************/
 //! 全てのタイマをリセットする（蓄積時間を空にし，フレーム番号を0に戻す）．
-const Profiler&
-Profiler::reset() const
+const Profiler<true>&
+Profiler<true>::reset() const
 {
     _active = -1;
     for (size_t n = 0; n < _accums.size(); ++n)
 	_accums[n].tv_sec = _accums[n].tv_usec = 0;
     _t0.tv_sec = _t0.tv_usec = 0;
     _nframes = 0;
+    return *this;
+}
+
+//! 現在動いているタイマがあればそれを停止し，指定されたタイマを起動する．
+/*!
+  \param n	タイマの番号
+ */
+const Profiler<true>&
+Profiler<true>::start(int n) const
+{
+    if (n != _active)
+    {
+	if (_active >= 0)	// 稼働中のタイマがあれば...
+	{			// これまでの稼働時間を加算して停止する．
+	  // 起動時刻から現在までの時間を稼働中のタイマに加算
+	    timeval	t1;
+	    gettimeofday(&t1, NULL);
+	    _accums[_active].tv_sec  += (t1.tv_sec  - _t0.tv_sec);
+	    _accums[_active].tv_usec += (t1.tv_usec - _t0.tv_usec);
+	    _active = -1;		// タイマを停止
+	}
+	if (0 <= n && n < _accums.size())
+	{
+	    gettimeofday(&_t0, NULL);	// 起動時刻を記録
+	    _active = n;		// タイマを起動
+	}
+    }
+
     return *this;
 }
 
@@ -56,7 +84,7 @@ Profiler::reset() const
   \param out	出力ストリーム
  */
 std::ostream&
-Profiler::print(std::ostream& out) const
+Profiler<true>::print(std::ostream& out) const
 {
     using namespace	std;
     
@@ -84,7 +112,7 @@ Profiler::print(std::ostream& out) const
 }
 
 std::ostream&
-Profiler::printTabSeparated(std::ostream& out) const
+Profiler<true>::printTabSeparated(std::ostream& out) const
 {
     timeval		total;
     total.tv_sec = total.tv_usec = 0;

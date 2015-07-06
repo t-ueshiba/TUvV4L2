@@ -25,7 +25,6 @@ template <class W>
 class WeightedMedianFilterBase
 {
   public:
-    typedef typename W::argument_type	guide_type;
     typedef typename W::result_type	weight_type;
     typedef Array<weight_type>		warray_type;
     
@@ -52,7 +51,7 @@ class WeightedMedianFilterBase
 			operator size_t()		const	{ return _n; }
 	void		clear()
 			{
-			    Array<Bin>::fill(Bin());
+			    Array<Bin>::operator =(Bin());
 			    _nonempty_bins.clear();
 			    _n = 0;
 			    _weighted_sum = 0;
@@ -246,13 +245,11 @@ template <class T, class W>
 class WeightedMedianFilter : public detail::WeightedMedianFilterBase<W>
 {
   private:
+    typedef T					value_type;
+    typedef typename W::argument_type		guide_type;
     typedef detail::WeightedMedianFilterBase<W>	super;
     typedef typename super::HistogramArray	HistogramArray;
 
-  public:
-    typedef T					value_type;
-    typedef typename super::guide_type		guide_type;
-    
   public:
     WeightedMedianFilter(const W& wfunc=W(), size_t winSize=3,
 			 size_t nbinsI=256, size_t nbinsG=256)
@@ -310,21 +307,24 @@ WeightedMedianFilter<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
 }
 
 /************************************************************************
-*  class WeightedMedianFilter2<T, W>					*
+*  class WeightedMedianFilter2<T, W, PF>				*
 ************************************************************************/
-template <class T, class W>
+template <class T, class W, bool PF=false>
 class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
-			      public Profiler
+			      public Profiler<PF>
 {
   private:
+    typedef T					value_type;
+    typedef typename W::argument_type		guide_type;
     typedef detail::WeightedMedianFilterBase<W>	super;
+    typedef Profiler<PF>			pf_type;
     typedef typename super::HistogramArray	HistogramArray;
 #if defined(USE_TBB)
     template <class ROW_I, class ROW_G, class ROW_O>
     class Filter
     {
       public:
-	Filter(const WeightedMedianFilter2<T, W>& wmf,
+	Filter(const WeightedMedianFilter2<T, W, PF>& wmf,
 	       ROW_I rowI, ROW_G rowG, ROW_O rowO)
 	    :_wmf(wmf), _rowI(rowI), _rowG(rowG), _rowO(rowO)		{}
 	    
@@ -335,7 +335,7 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 		}
 
       private:
-	const WeightedMedianFilter2<T, W>&	_wmf;
+	const WeightedMedianFilter2<T, W, PF>&	_wmf;
 	ROW_I					_rowI;
 	ROW_G					_rowG;
 	ROW_O					_rowO;
@@ -348,15 +348,12 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 		    return Filter<ROW_I, ROW_G, ROW_O>(*this, rowI, rowG, rowO);
 		}
 #endif
-  public:
-    typedef T					value_type;
-    typedef typename super::guide_type		guide_type;
 
   public:
     WeightedMedianFilter2(const W& wfunc=W(), size_t winSize=3,
 			  size_t nbinsI=256, size_t nbinsG=256)
-	:super(wfunc, winSize, nbinsI, nbinsG),
-	 _grainSize(100), Profiler(4)					{}
+	:super(wfunc, winSize, nbinsI, nbinsG), pf_type(4),
+	 _grainSize(100)						{}
 
     using	super::winSize;
     using	super::nbinsI;
@@ -382,18 +379,19 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
     Quantizer2<guide_type>	_quantizerG;
 };
 
-template <class T, class W>
+template <class T, class W, bool PF>
 template <class IN, class GUIDE, class OUT> void
-WeightedMedianFilter2<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
+WeightedMedianFilter2<T, W, PF>::convolve(IN ib, IN ie,
+					  GUIDE gb, GUIDE ge, OUT out)
 {
     if (std::distance(ib, ie) < winSize() || ib->size() < winSize())
 	return;
 
-    start(0);
+    pf_type::start(0);
     const auto&	indicesI = _quantizerI(ib, ie, nbinsI());	// 入力を量子化
     const auto&	indicesG = _quantizerG(gb, ge, nbinsG());	// ガイドを量子化
 
-    start(1);
+    pf_type::start(1);
     super::setWeights(_quantizerG);	// 重みの2次元lookup tableをセット
 
 #if defined(USE_TBB)
@@ -404,18 +402,18 @@ WeightedMedianFilter2<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
     filter(indicesI.begin(), indicesI.end() + 1 - winSize(),
 	   indicesG.begin(), out);
 #endif
-    nextFrame();
+    pf_type::nextFrame();
 }
 
-template <class T, class W>
+template <class T, class W, bool PF>
 template <class ROW_I, class ROW_G, class ROW_O> void
-WeightedMedianFilter2<T, W>::filter(ROW_I rowI, ROW_I rowIe,
-				    ROW_G rowG, ROW_O rowO) const
+WeightedMedianFilter2<T, W, PF>::filter(ROW_I rowI, ROW_I rowIe,
+					ROW_G rowG, ROW_O rowO) const
 {
     typedef boost::counting_iterator<size_t>	col_iterator;
     typedef std::reverse_iterator<col_iterator>	rcol_iterator;
 
-    start(2);
+    pf_type::start(2);
     auto		endI = rowI;
     auto		midG = rowG;
     const size_t	mid = winSize()/2, rmid = (winSize()-1)/2;
@@ -431,7 +429,7 @@ WeightedMedianFilter2<T, W>::filter(ROW_I rowI, ROW_I rowIe,
 		       make_vertical_iterator(endI, c),
 		       make_vertical_iterator(rowG, c));
     
-    start(3);
+    pf_type::start(3);
   // 左から右／右から左に交互に走査してmedian点を探索
     for (bool reverse = false; rowI != rowIe; ++rowI)
     {
@@ -455,11 +453,11 @@ WeightedMedianFilter2<T, W>::filter(ROW_I rowI, ROW_I rowIe,
     }
 }
 
-template <class T, class W>
+template <class T, class W, bool PF>
 template <class ROW_I, class ROW_G, class COL_C, class COL_G, class COL_O> void
-WeightedMedianFilter2<T, W>::filterRow(HistogramArray& histograms,
-				       ROW_I rowI, ROW_G rowG, COL_C head,
-				       COL_G colG, COL_O colO) const
+WeightedMedianFilter2<T, W, PF>::filterRow(HistogramArray& histograms,
+					   ROW_I rowI, ROW_G rowG, COL_C head,
+					   COL_G colG, COL_O colO) const
 {
     auto	endI = rowI;
     std::advance(endI, winSize() - 1);		// ウィンドウ最下行

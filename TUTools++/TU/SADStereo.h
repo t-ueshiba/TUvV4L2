@@ -246,7 +246,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	if (rowL >= rowL0)
 	{
 	    start(2);
-	    buffers->RminR.fill(std::numeric_limits<Score>::max());
+	    buffers->RminR = std::numeric_limits<Score>::max();
 	    computeDisparities(buffers->Q.crbegin(), buffers->Q.crend(),
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
@@ -323,7 +323,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	if (rowL >= rowL0)
 	{
 	    start(2);
-	    buffers->RminR.fill(std::numeric_limits<Score>::max());
+	    buffers->RminR = std::numeric_limits<Score>::max();
 	    computeDisparities(buffers->Q.crbegin(), buffers->Q.crend(),
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
@@ -634,7 +634,7 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
     const size_t	DD = D;
 #endif
     Q.resize(W, DD);			// Q(u, *; d)
-    Q.fill(0);
+    Q = 0;
 
     dminL.resize(W - N + 1);
     delta.resize(dminL.size());
@@ -650,7 +650,7 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D,
     
     dminV.resize(dminL.size(), H + D - 1);
     RminV.resize(dminL.size(), RminR.size());
-    RminV.fill(std::numeric_limits<SCORE>::max());
+    RminV = std::numeric_limits<SCORE>::max();
 }
 
 }

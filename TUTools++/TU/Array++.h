@@ -83,16 +83,16 @@ template <class T, class ALLOC=typename BufTraits<T>::allocator_type>
 class Buf : public BufTraits<T>
 {
   public:
-    typedef ALLOC					allocator_type;
-    typedef typename allocator_type::value_type		value_type;
-    typedef typename allocator_type::pointer		pointer;
-    typedef typename allocator_type::const_pointer	const_pointer;
+    typedef T						value_type;
+    typedef value_type*					pointer;
+    typedef const value_type*				const_pointer;
     typedef typename BufTraits<T>::iterator		iterator;
     typedef typename BufTraits<T>::const_iterator	const_iterator;
     typedef typename std::iterator_traits<iterator>::reference
 							reference;
     typedef typename std::iterator_traits<const_iterator>::reference
 							const_reference;
+    typedef ALLOC					allocator_type;
     
   public:
     explicit		Buf(size_t siz=0)	//!< デフォルトコンストラクタ
@@ -427,6 +427,21 @@ class Array : public B
 {
   private:
     typedef B						super;
+
+    typedef std::integral_constant<size_t, 0>		value_is_arithmetic;
+    typedef std::integral_constant<size_t, 1>		value_has_init;
+    typedef std::integral_constant<size_t, 2>		otherwise;
+
+    template <class A_>
+    struct has_init
+    {
+	template <class T_>
+	static auto	check(T_* p) -> decltype(p->init(), std::true_type());
+	static auto	check(...)   -> std::false_type;
+
+	constexpr static bool
+	    value = decltype(check(static_cast<A_*>(nullptr)))::value;
+    };
     
   public:
   //! 成分の型
@@ -451,34 +466,6 @@ class Array : public B
     typedef typename super::const_reference		const_reference;
   //! ポインタ間の差
     typedef std::ptrdiff_t				difference_type;
-
-  private:
-    typedef std::integral_constant<size_t, 0>		fillable;
-    typedef std::integral_constant<size_t, 1>		assignable;
-    typedef std::integral_constant<size_t, 2>		unassignable;
-    
-    template <class T_>
-    static auto	check_fill(T_* p)
-	-> decltype(p->fill(std::declval<const element_type&>()),
-		    std::true_type())					;
-    template <class T_>
-    static auto	check_fill(...) -> std::false_type			;
-
-    template <class T_>
-    static auto	check_assign(T_* p)
-	-> decltype(*p = std::declval<const element_type&>(),
-		    std::true_type())					;
-    template <class T_>
-    static auto	check_assign(...) -> std::false_type			;
-
-    template <class T_>
-    using assignment_prop
-	= std::conditional<
-	      decltype(Array::check_fill<T_>(nullptr))::value,
-	      fillable,
-	      typename std::conditional<
-		  decltype(Array::check_assign<T_>(nullptr))::value,
-		  assignable, unassignable>::type>;
 
   public:
   //! 配列を生成する．
@@ -586,9 +573,11 @@ class Array : public B
   /*!
     \param c	代入する値
   */
-    void	fill(const element_type& c)
+    Array&	operator =(const element_type& c)
 		{
-		    fill_impl(c, typename assignment_prop<value_type>::type());
+		    for (auto iter = begin(); iter != end();  ++iter)
+			*iter = c;
+		    return *this;
 		}
     
     using	super::data;
@@ -731,40 +720,36 @@ class Array : public B
 #endif
 			}
 
+    void		init()
+			{
+			    typedef typename std::conditional<
+				std::is_arithmetic<value_type>::value,
+				value_is_arithmetic,
+				typename std::conditional<
+				    has_init<value_type>::value,
+				    value_has_init,
+				    otherwise>::type>::type	value_kind;
+			    
+			    init_impl(value_kind());
+			}
+
   protected:
     static size_t	partial_size(size_t i, size_t d, size_t a)
 			{
 			    return (i+d <= a ? d : i < a ? a-i : 0);
 			}
 
-    void		init()
-			{
-			    init_impl(typename
-				      std::is_arithmetic<element_type>::type());
-			}
-    
   private:
-    void		fill_impl(const element_type& c, fillable)
+    void		init_impl(value_is_arithmetic)
 			{
-			    for (iterator iter = begin(), iend = end();
-				 iter != iend; ++iter)
-				iter->fill(c);
+			    *this = 0;
 			}
-    void		fill_impl(const element_type& c, assignable)
+    void		init_impl(value_has_init)
 			{
-			    for (iterator iter = begin(), iend = end();
-				 iter != iend; ++iter)
-				*iter = c;
+			    for (auto iter = begin(); iter != end();  ++iter)
+				iter->init();
 			}
-    void		fill_impl(const element_type&, unassignable)
-			{
-			}
-
-    void		init_impl(std::true_type)
-			{
-			    fill(0);
-			}
-    void		init_impl(std::false_type)
+    void		init_impl(otherwise)
 			{
 			}
 };
@@ -966,7 +951,13 @@ class Array2 : public Array<T, R>
 		    return *this;
 		}
 
-    using		super::fill;
+    Array2&	operator =(const element_type& c)
+		{
+		    super::operator =(c);
+		    return *this;
+		}
+    
+  //using		super::fill;
     using		super::begin;
     using		super::cbegin;
     using		super::end;
@@ -983,13 +974,7 @@ class Array2 : public Array<T, R>
     size_t		nrow()	const	{ return size(); }
     size_t		ncol()	const	{ return _ncol; }
     size_t		align()	const	{ return _align; }
-    size_t		stride() const
-			{
-			    return (size() > 1 ?
-				    (*this)[1].data() - (*this)[0].data() :
-				    _ncol);
-			}
-    
+
   //! 配列のサイズを変更する．
   /*!
     \param r	新しい行数
@@ -1015,8 +1000,8 @@ class Array2 : public Array<T, R>
   /*!
     \param p	新しい記憶領域へのポインタ
     \param r	新しい行数
-    \param a	各行においてalignするバイト数(1ならalignしない)
     \param c	新しい列数
+    \param a	各行においてalignするバイト数(1ならalignしない)
   */
     void		resize(pointer p, size_t r, size_t c, size_t a=1)
 			{

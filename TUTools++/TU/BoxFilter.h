@@ -104,12 +104,14 @@ class box_filter_iterator
 								value_is_expr;
 
     template <class VITER_, class ITER_>
-    static void	update(VITER_ val, ITER_ curr, ITER_ head, std::false_type)
+    static void	update(const VITER_& val,
+		       const ITER_& curr, const ITER_& head, std::false_type)
 		{
 		    *val += (*curr - *head);
 		}
     template <class VITER_, class ITER_>
-    static void	update(VITER_ val, ITER_ curr, ITER_ head, std::true_type)
+    static void	update(const VITER_& val,
+		       const ITER_& curr, const ITER_& head, std::true_type)
 		{
 		    typedef subiterator<VITER_>			iterator;
 		    typedef std::integral_constant<

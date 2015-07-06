@@ -557,7 +557,7 @@ NDTree<T, D>::Iterator<S>::Iterator(const NDTree& tree)
     if (tree._root)
     {
 	_org = tree._org;
-	_dp.fill(0);
+	_dp = 0;
 	_len = tree._len0;
 	_fringe.push(NodeInfo(tree._root, _dp, _len));
 	++*this;			// 最初の葉を指すまで反復子を進める

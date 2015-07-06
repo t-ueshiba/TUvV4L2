@@ -7,48 +7,40 @@
 #include "TU/v/CmdPane.h"
 #include "TU/v/CanvasPane.h"
 #include "TU/v/CanvasPaneDC.h"
-#include "TU/WeightedMedianFilter.h"
+#include "TU/TreeFilter.h"
 
 namespace TU
 {
 /************************************************************************
-*  class Exp<S, T>							*
+*  class Diff<S, T>							*
 ************************************************************************/
 template <class S, class T>
-class Exp
+struct Diff
 {
-  public:
     typedef S	argument_type;
     typedef T	result_type;
-    
-  public:
-    Exp(result_type sigma=1)	:_sigma(sigma)		{}
 
-    void	setSigma(result_type sigma)		{ _sigma = sigma; }
     result_type	operator ()(argument_type x, argument_type y) const
 		{
-		    return std::exp((result_type(x) - result_type(y))/_sigma);
+		    return std::abs(x - y);
 		}
-
-  private:
-    result_type	_sigma;
 };
-    
+
 namespace v
 {
 /************************************************************************
 *  static data								*
 ************************************************************************/
-enum	{c_WinSize, c_Sigma, c_Saturation};
+enum	{c_Sigma, c_Normalization, c_Saturation};
 
-static int	range[][3] = {{1, 64, 1}, {1, 255, 2}, {1, 255, 1}};
+static int	range[][3] = {{1, 255, 2}, {1, 255, 1}};
 static CmdDef	Cmds[] =
 {
-    {C_Slider, c_WinSize,	 5, "Window size:",	range[0], CA_None,
+    {C_Slider, c_Sigma,		11, "Sigma:",		range[0], CA_None,
      0, 0, 1, 1, 0},
-    {C_Slider, c_Sigma,		11, "Sigma:",		range[1], CA_None,
+    {C_ToggleButton, c_Normalization, 1, "Normalize",	0,	  CA_None,
      1, 0, 1, 1, 0},
-    {C_Slider, c_Saturation,   256, "Saturation:",      range[2], CA_None,
+    {C_Slider, c_Saturation,   256, "Saturation:",      range[1], CA_None,
      2, 0, 1, 1, 0},
     EndOfCmds
 };
@@ -88,24 +80,23 @@ class MyCmdWindow : public CmdWindow
     CmdPane					_cmd;
     const Image<T>&				_image;
     const Image<G>&				_guide;
-    Image<T>					_result;
-    Exp<G, float>				_wfunc;
-    WeightedMedianFilter2<T, Exp<G, float> >	_wmf;
+    Image<float>				_result;
+    Diff<G, float>				_wfunc;
+    boost::TreeFilter<float, Diff<G, float> >	_tf;
     MyCanvasPane<T>				_imageCanvas;
-    MyCanvasPane<T>				_resultCanvas;
+    MyCanvasPane<float>				_resultCanvas;
 };
 
 template <class T, class G>
 MyCmdWindow<T, G>::MyCmdWindow(App& parentApp,
 			       const Image<T>& image, const Image<G>& guide)
-    :CmdWindow(parentApp, "Joint weighted median filter",
-	       Colormap::RGBColor, 16, 0, 0),
+    :CmdWindow(parentApp, "Joint tree filter", Colormap::RGBColor, 16, 0, 0),
      _cmd(*this, Cmds),
      _image(image),
      _guide(guide),
      _result(_image.width(), _image.height()),
      _wfunc(),
-     _wmf(_wfunc),
+     _tf(_wfunc, 0.5),
      _imageCanvas(*this, _image),
      _resultCanvas(*this, _result)
 {
@@ -114,9 +105,7 @@ MyCmdWindow<T, G>::MyCmdWindow(App& parentApp,
     _resultCanvas.place(1, 1, 1, 1);
     show();
 
-    _wmf.setWinSize(_cmd.getValue(c_WinSize));
-    _wfunc.setSigma(_cmd.getValue(c_Sigma).f());
-    _wmf.refreshWeights();
+    _tf.setSigma(_cmd.getValue(c_Sigma).f());
     filter();
 }
 
@@ -131,14 +120,9 @@ MyCmdWindow<T, G>::callback(CmdId id, CmdVal val)
 	app().exit();
 	break;
 
-      case c_WinSize:
-	_wmf.setWinSize(val);
-	filter();
-	break;
-	
       case c_Sigma:
-	_wfunc.setSigma(val.f());
-	_wmf.refreshWeights();
+	_tf.setSigma(val.f());
+      case c_Normalization:
 	filter();
 	break;
 
@@ -154,8 +138,10 @@ MyCmdWindow<T, G>::callback(CmdId id, CmdVal val)
 template <class T, class G> void
 MyCmdWindow<T, G>::filter()
 {
-    _wmf.convolve(_image.cbegin(), _image.cend(),
-		  _guide.cbegin(), _guide.cend(), _result.begin());
+    bool	norm = _cmd.getValue(c_Normalization);
+    
+    _tf.convolve(_image.cbegin(), _image.cend(),
+		 _guide.cbegin(), _guide.cend(), _result.begin(), norm);
     _imageCanvas.repaintUnderlay();
     _resultCanvas.repaintUnderlay();
 }

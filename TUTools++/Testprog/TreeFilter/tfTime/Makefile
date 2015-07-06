@@ -12,18 +12,18 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DUSE_TBB
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3 -g
+  CFLAGS	= -O3
   NVCCFLAGS	= -O			# must < -O2
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++ -ltbb
+LIBS		= -lTUTools++
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
@@ -44,9 +44,8 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Profiler.h \
-		/usr/local/include/TU/Quantizer.h \
+		/usr/local/include/TU/TreeFilter.h \
 		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/WeightedMedianFilter.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/mmInstructions.h \
@@ -67,6 +66,5 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/WeightedMedianFilter.h \
-	/usr/local/include/TU/Quantizer.h /usr/local/include/TU/Profiler.h
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/TreeFilter.h \
+	/usr/local/include/TU/Profiler.h

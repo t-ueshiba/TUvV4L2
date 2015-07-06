@@ -23,7 +23,7 @@ doJob(size_t winSize, size_t grainSize, int niter)
     in.restore(cin);
     
     Image<value_type>	out(in.width(), in.height());
-    Profiler		profiler(1);
+    Profiler<>		profiler(1);
     BoxFilter2		box(winSize, winSize);
     box.setGrainSize(grainSize);
     
