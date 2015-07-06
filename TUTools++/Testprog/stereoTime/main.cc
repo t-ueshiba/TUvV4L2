@@ -66,7 +66,7 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
     if (binocular)    
 	for (size_t i = 0; i < ntrials; ++i)
 	{
-	    for (size_t j = 0; j < 1; ++j)
+	    for (size_t j = 0; j < 10; ++j)
 	    {
 		profiler.start(0);		// rectificationの所要時間
 		rectify(images[0], images[1],
