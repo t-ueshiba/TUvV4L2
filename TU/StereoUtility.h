@@ -6,10 +6,22 @@
 
 #include <limits>
 #include "TU/algorithm.h"	// for TU::diff()
-#include "TU/Array++.h"
+#include "TU/Image++.h"
 
 namespace TU
 {
+inline u_int
+diff(const RGB& x, const RGB& y)
+{
+    return diff(x.r, y.r) + diff(x.g, y.g) + diff(x.b, y.b);
+}
+
+inline u_int
+diff(const ARGB& x, const ARGB& y)
+{
+    return diff(x.r, y.r) + diff(x.g, y.g) + diff(x.b, y.b);
+}
+
 /************************************************************************
 *  struct StereoParameters						*
 ************************************************************************/

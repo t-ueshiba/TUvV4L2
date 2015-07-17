@@ -59,14 +59,14 @@ ICIA<MAP, T>::ICIA(const Image<T>& imageSrc,
 {
     typedef typename MAP::jacobian_type	jacobian_type;
 
-  // ˆÊ’u‚ÉŠÖ‚·‚éŒ´‰æ‘œ‚Ì‹P“xŒù”z‚ğ‹‚ß‚éD
+  // ä½ç½®ã«é–¢ã™ã‚‹åŸç”»åƒã®è¼åº¦å‹¾é…ã‚’æ±‚ã‚ã‚‹ï¼
     Image<float>		edgeH(_imageSrc.width(), _imageSrc.height()),
 				edgeV(_imageSrc.width(), _imageSrc.height());
     DericheConvolver2<float>	convolver(alpha);
     convolver.diffH(_imageSrc.begin(), _imageSrc.end(), edgeH.begin());
     convolver.diffV(_imageSrc.begin(), _imageSrc.end(), edgeV.begin());
 
-  // •ÏŠ·ƒpƒ‰ƒ[ƒ^‚ÉŠÖ‚·‚éŒ´‰æ‘œ‚Ì‹P“xŒù”z‚Æƒ‚[ƒƒ“ƒgs—ñ‚ğ‹‚ß‚éD
+  // å¤‰æ›ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«é–¢ã™ã‚‹åŸç”»åƒã®è¼åº¦å‹¾é…ã¨ãƒ¢ãƒ¼ãƒ¡ãƒ³ãƒˆè¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ï¼
     for (size_t v = 0; v < _grad.nrow(); ++v)
     {
 	const float	*eH = edgeH[v].data(), *eV = edgeV[v].data();
@@ -152,7 +152,7 @@ ICIA<MAP, T>::operator ()(const Image<T>& imageDst,
 	element_type	lambda = 1.0e-4;
 	for (size_t n = 0; n < niter_max; ++n)
 	{
-	  // L-M”½•œ
+	  // L-Måå¾©
 	    for (;;)
 	    {
 		for (size_t i = 0; i < M.size(); ++i)
@@ -168,22 +168,22 @@ ICIA<MAP, T>::operator ()(const Image<T>& imageDst,
 		cerr << "[" << setw(2) << n << "] sqr = " << sqr_new
 		     << ",\tlambda = " << lambda << endl;
 #endif
-	      // “ñæŒë·‚ªŒ¸­‚·‚é‚©’²‚×‚éD
+	      // äºŒä¹—èª¤å·®ãŒæ¸›å°‘ã™ã‚‹ã‹èª¿ã¹ã‚‹ï¼
 		if (sqr_new <= sqr)
 		{
 		    f = f_new;
 
-		  // û‘©”»’è
+		  // åæŸåˆ¤å®š
 		    if (fabs(sqr - sqr_new) <= tol*(sqr_new + sqr + 1.0e-7))
 			return sqr_new;
 		
 		    g   = g_new;
 		    sqr = sqr_new;
-		    lambda *= 0.1;		// L-M”½•œ‚Ìƒpƒ‰ƒ[ƒ^‚ğŒ¸‚ç‚·D
+		    lambda *= 0.1;		// L-Måå¾©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ¸›ã‚‰ã™ï¼
 		    break;
 		}
 		else
-		    lambda *= 10.0;		// L-M”½•œ‚Ìƒpƒ‰ƒ[ƒ^‚ğ‘‚â‚·D
+		    lambda *= 10.0;		// L-Måå¾©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’å¢—ã‚„ã™ï¼
 	    }
 	}
     }
