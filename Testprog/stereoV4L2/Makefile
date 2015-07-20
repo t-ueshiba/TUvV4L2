@@ -24,7 +24,7 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUV4L2++ -lTUOgl++ -lTUv++ -lTUStereo++ -lTUTools++ \
+LIBS		= -lTUV4L2++ -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL \
 		  -lXaw3d -lXt -lXext -lXmu -lX11 -lraw1394 -ltbb -ltbbmalloc
 ifneq ($(findstring darwin,$(OSTYPE)),)
