@@ -121,6 +121,8 @@ class SparseMatrix
 
   // 有限性のチェック
     bool		isfinite()				const	;
+
+    bool		hasnonzero(size_t i)			const	;
     
   // 入出力
     std::istream&	get(std::istream& in)				;
@@ -798,7 +800,7 @@ SparseMatrix<T, SYM>::isfinite() const
 {
     for (size_t n = 0; n < _values.size(); ++n)
 #ifdef __INTEL_COMPILER
-	if (!::isfinite(_values[n]))
+	if (!std::isfinite(_values[n]))
 #else
 	if (_values[n] != _values[n])
 #endif
@@ -806,6 +808,16 @@ SparseMatrix<T, SYM>::isfinite() const
     return true;
 }
 
+template <class T, bool SYM> bool
+SparseMatrix<T, SYM>::hasnonzero(size_t i) const
+{
+    bool	has_nonzero = false;
+    for (size_t n = _rowIndex[i]; n != _rowIndex[i+1]; ++n)
+	if (_values[n] != 0)
+	    has_nonzero = true;
+    return has_nonzero;
+}
+    
 /*
  * ----------------------- 入出力 -----------------------------
  */

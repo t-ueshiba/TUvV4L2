@@ -25,7 +25,7 @@ static CmdDef	Cmds[] =
 {
     {C_Slider, c_WinSize,	 11, "Window size:",	range[0], CA_None,
      0, 0, 1, 1, 0},
-    {C_Slider, c_Regularization, 10, "Regularization:",	range[1], CA_None,
+    {C_Slider, c_Regularization,  5, "Regularization:",	range[1], CA_None,
      1, 0, 1, 1, 0},
     {C_Slider, c_Saturation,     12, "Saturation:",     range[2], CA_None,
      0, 1, 1, 1, 0},
@@ -129,7 +129,7 @@ MyCmdWindow::MyCmdWindow(App& parentApp, const char* name,
     _gf2.setColWinSize(w);
     _gf2.setEpsilon(s*s);
     colormap().setSaturationF(_cmd.getValue(c_Saturation).f());
-    _weightsCanvas.setZoom(4, 1);
+    _weightsCanvas.setZoom(8, 1);
     _weightsCanvas.setSize(2*w - 1, 2*w - 1);
 
     show();
