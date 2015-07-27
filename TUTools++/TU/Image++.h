@@ -619,7 +619,7 @@ class ImageLine : public Array<T>
     \param d	画素数
   */
     explicit ImageLine(size_t d=0)
-        :super(d), _lmost(0), _rmost(d)				{}
+	:super(d), _lmost(0), _rmost(d)				{}
 
   //! 外部の領域と画素数を指定してスキャンラインを生成する．
   /*!
@@ -627,7 +627,7 @@ class ImageLine : public Array<T>
     \param d	画素数
   */
     ImageLine(T* p, size_t d)
-        :super(p, d), _lmost(0), _rmost(d)			{}
+	:super(p, d), _lmost(0), _rmost(d)			{}
 
   //! 指定されたスキャンラインの部分スキャンラインを生成する．
   /*!
@@ -637,6 +637,29 @@ class ImageLine : public Array<T>
   */
     ImageLine(ImageLine<T>& l, size_t u, size_t d)
 	:super(l, u, d), _lmost(0), _rmost(d)			{}
+
+  //! 他の配列と同一要素を持つスキャンラインを作る（コピーコンストラクタの拡張）．
+  /*!
+    コピーコンストラクタは別個自動的に生成される．
+    \param expr	コピー元の配列
+  */
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    ImageLine(const E& expr)	:super(expr)			{}
+
+  //! 他の配列を自分に代入する（標準代入演算子の拡張）．
+  /*!
+    標準代入演算子は別個自動的に生成される．
+    \param expr	コピー元の配列
+    \return	この配列
+  */
+    template <class E>
+    typename std::enable_if<detail::is_range<E>::value, ImageLine&>::type
+			operator =(const E& expr)
+			{
+			    super::operator =(expr);
+			    return *this;
+			}
 
     ImageLine&		operator =(const element_type& c)	;
     const ImageLine	operator ()(size_t u, size_t d)	const	;
@@ -1240,6 +1263,34 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     Image<T>		operator ()(size_t u, size_t v,
 				    size_t w, size_t h)		;
     
+  //! 他の配列と同一要素を持つ画像を作る（コピーコンストラクタの拡張）．
+  /*!
+    コピーコンストラクタを定義しないと自動的に作られてしまうので，
+    このコンストラクタがあってもコピーコンストラクタを別個に定義
+    しなければならない．
+    \param expr	コピー元の配列
+    \param a	各行においてalignするバイト数(1ならalignしない)
+  */
+    template <class E,
+	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+    Image(const E& expr, size_t a=1)
+	:super(expr, 1), ImageBase()				{}
+
+  //! 他の配列を自分に代入する（標準代入演算子の拡張）．
+  /*!
+    標準代入演算子を定義しないと自動的に作られてしまうので，この代入演算子が
+    あっても標準代入演算子を別個に定義しなければならない．
+    \param expr		コピー元の配列
+    \return		この配列
+  */
+    template <class E>
+    typename std::enable_if<detail::is_range<E>::value, Image&>::type
+		operator =(const E& expr)
+		{
+		    super::operator =(expr);
+		    return *this;
+		}
+
     template <class S>
     T		at(const Point2<S>& p)			const	;
 
