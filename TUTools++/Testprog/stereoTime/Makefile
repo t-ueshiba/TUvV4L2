@@ -42,6 +42,7 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/BoxFilter.h \
 		../../TU/Camera++.h \
+		../../TU/Filter2.h \
 		../../TU/GFStereo.h \
 		../../TU/Geometry++.h \
 		../../TU/Image++.h \
@@ -49,7 +50,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/Profiler.h \
 		../../TU/Rectify.h \
 		../../TU/SADStereo.h \
-		../../TU/SeparableFilter2.h \
 		../../TU/StereoBase.h \
 		../../TU/Vector++.h \
 		../../TU/Warp.h \
@@ -84,5 +84,5 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/mmInstructions.h \
 	../../TU/Minimize.h ../../TU/Camera++.h ../../TU/SADStereo.h \
 	../../TU/StereoBase.h ../../TU/algorithm.h ../../TU/Profiler.h \
-	../../windows/fakeWindows.h ../../TU/BoxFilter.h \
-	../../TU/SeparableFilter2.h ../../TU/GFStereo.h
+	../../windows/fakeWindows.h ../../TU/BoxFilter.h ../../TU/Filter2.h \
+	../../TU/GFStereo.h
