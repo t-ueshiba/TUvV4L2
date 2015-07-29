@@ -348,6 +348,56 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 		    return Filter<ROW_I, ROW_G, ROW_O>(*this, rowI, rowG, rowO);
 		}
 #endif
+  // std::reverse_iterator<ITER> はITERが指すオブジェクトへの参照を返すため
+  // counting_iterator に対しては使えないので，独自に定義
+    template <class ITER>
+    class reverse_iterator
+	: public boost::iterator_adaptor<
+		     reverse_iterator<ITER>,
+		     ITER,
+		     boost::use_default,
+		     boost::use_default,
+		     typename std::iterator_traits<ITER>::value_type>
+    {
+      private:
+	typedef boost::iterator_adaptor<
+		    reverse_iterator,
+		    ITER,
+		    boost::use_default,
+		    boost::use_default,
+		    typename std::iterator_traits<ITER>::value_type>	super;
+
+      public:
+	typedef typename super::reference	reference;
+	typedef typename super::difference_type	difference_type;
+	friend class				boost::iterator_core_access;
+
+      public:
+	reverse_iterator(const ITER& iter)	:super(iter)	{}
+
+      private:
+	reference	dereference() const
+			{
+			    auto	tmp = super::base();
+			    return *--tmp;
+			}
+	void		advance(difference_type n)
+			{
+			    std::advance(super::base_reference(), -n);
+			}
+	void		increment()
+			{
+			    --super::base_reference();
+			}
+	void		decrement()
+			{
+			    ++super::base_reference();
+			}
+	difference_type	distance_to(const reverse_iterator& iter) const
+			{
+			    return std::distance(iter.base(), super::base());
+			}
+    };
 
   public:
     WeightedMedianFilter2(const W& wfunc=W(), size_t winSize=3,
@@ -411,7 +461,7 @@ WeightedMedianFilter2<T, W, PF>::filter(ROW_I rowI, ROW_I rowIe,
 					ROW_G rowG, ROW_O rowO) const
 {
     typedef boost::counting_iterator<size_t>	col_iterator;
-    typedef std::reverse_iterator<col_iterator>	rcol_iterator;
+    typedef reverse_iterator<col_iterator>	rcol_iterator;
 
     pf_type::start(2);
     auto		endI = rowI;

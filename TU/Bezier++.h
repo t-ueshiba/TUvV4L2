@@ -54,7 +54,7 @@ class BezierCurve : private Array<C>
     typedef C					coord_type;
     typedef coord_type				value_type;
     typedef typename coord_type::element_type	element_type;
-
+    
   private:
     typedef coord_array				super;
 
