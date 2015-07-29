@@ -1274,7 +1274,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     template <class E,
 	      class=typename std::enable_if<detail::is_range<E>::value>::type>
     Image(const E& expr, size_t a=1)
-	:super(expr, 1), ImageBase()				{}
+	:super(expr, a), ImageBase()				{}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
   /*!
