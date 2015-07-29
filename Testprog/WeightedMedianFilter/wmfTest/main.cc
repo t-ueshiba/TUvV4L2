@@ -172,7 +172,7 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
-    typedef u_char	pixel_type;
+    typedef float	pixel_type;
     typedef u_char	guide_type;
     
     try
