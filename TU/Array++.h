@@ -36,7 +36,7 @@
 
 #include <initializer_list>
 #include <memory>			// std::allocator<T>
-#include <algorithm>			// std::copy(), std::fill()
+#include <algorithm>			// std::copy()
 #include <numeric>			// std::inner_product()
 #include <stdexcept>
 #include <cassert>

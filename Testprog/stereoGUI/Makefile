@@ -13,18 +13,18 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../stereo1394 -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG #-DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
+CPPFLAGS	= -DNDEBUG -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
   NVCCFLAGS	= -O			# must < -O2
-#  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
-		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 #-ltbb -ltbbmalloc
+		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 -ltbb -ltbbmalloc
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
@@ -48,6 +48,7 @@ EXTHDRS		= ../stereo1394/ComputeThreeD.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/BoxFilter.h \
 		/usr/local/include/TU/Camera++.h \
+		/usr/local/include/TU/Filter2.h \
 		/usr/local/include/TU/GFStereo.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Ieee1394++.h \
@@ -58,7 +59,6 @@ EXTHDRS		= ../stereo1394/ComputeThreeD.h \
 		/usr/local/include/TU/Profiler.h \
 		/usr/local/include/TU/Rectify.h \
 		/usr/local/include/TU/SADStereo.h \
-		/usr/local/include/TU/SeparableFilter2.h \
 		/usr/local/include/TU/StereoBase.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/Warp.h \
@@ -95,8 +95,6 @@ SRCS		= ComputeThreeD.cc \
 		MyCanvasPane.cc \
 		MyCmdWindow.cc \
 		MyOglCanvasPane.cc \
-		Rectify.cc \
-		Warp.cc \
 		createMenuCmds.cc \
 		main.cc
 OBJS		= ComputeThreeD.o \
@@ -104,8 +102,6 @@ OBJS		= ComputeThreeD.o \
 		MyCanvasPane.o \
 		MyCmdWindow.o \
 		MyOglCanvasPane.o \
-		Rectify.o \
-		Warp.o \
 		createMenuCmds.o \
 		main.o
 
@@ -155,8 +151,7 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/Notify.h \
 	/usr/local/include/TU/SADStereo.h /usr/local/include/TU/StereoBase.h \
 	/usr/local/include/TU/algorithm.h /usr/local/include/TU/Profiler.h \
-	/usr/local/include/TU/BoxFilter.h \
-	/usr/local/include/TU/SeparableFilter2.h \
+	/usr/local/include/TU/BoxFilter.h /usr/local/include/TU/Filter2.h \
 	/usr/local/include/TU/GFStereo.h ../stereo1394/stereo1394.h \
 	/usr/local/include/TU/Ieee1394++.h MyCmdWindow.h \
 	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/Timer.h \
@@ -185,21 +180,6 @@ MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
 	../stereo1394/DrawThreeD.h /usr/local/include/TU/Warp.h \
 	/usr/local/include/TU/Camera++.h
-Rectify.o: /usr/local/include/TU/Rectify.h /usr/local/include/TU/Warp.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h \
-	/usr/local/include/TU/algorithm.h
-Warp.o: /usr/local/include/TU/Warp.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Camera++.h
 createMenuCmds.o: ../stereo1394/stereo1394.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
@@ -219,11 +199,10 @@ main.o: /usr/local/include/TU/io.h /usr/local/include/TU/SADStereo.h \
 	/usr/local/include/TU/mmInstructions.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/algorithm.h \
 	/usr/local/include/TU/Profiler.h /usr/local/include/TU/BoxFilter.h \
-	/usr/local/include/TU/SeparableFilter2.h \
-	/usr/local/include/TU/GFStereo.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/Filter2.h /usr/local/include/TU/GFStereo.h \
+	MyCmdWindow.h /usr/local/include/TU/v/App.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/Timer.h /usr/local/include/TU/Rectify.h \
 	/usr/local/include/TU/Warp.h /usr/local/include/TU/Camera++.h \
