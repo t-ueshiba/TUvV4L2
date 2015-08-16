@@ -94,7 +94,7 @@ struct BGRA
 }
 
 /************************************************************************
-*  struct RGBB<E>							*
+*  struct RGB_<E>							*
 ************************************************************************/
 struct YUV444;
 
@@ -104,7 +104,8 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
 			boost::equality_comparable<RGB_<E> > > >
 {
     typedef u_char	element_type;
-
+    typedef Vector3f	vector_type;
+    
     RGB_()					     :E(0, 0, 0)	{}
     RGB_(u_char rr, u_char gg, u_char bb)	     :E(rr, gg, bb)	{}
     RGB_(u_char rr, u_char gg, u_char bb, u_char aa) :E(rr, gg, bb, aa)	{}
@@ -115,7 +116,9 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
     RGB_(const RGB_<E1>& p)	:E(p.r, p.g, p.b, p.a)			{}
     template <class T>
     RGB_(const T& p)		:E(u_char(p), u_char(p), u_char(p))	{}
-
+    RGB_(const vector_type& v)
+	:E(u_char(v[0]), u_char(v[1]), u_char(v[2]))			{}
+    
     using	E::r;
     using	E::g;
     using	E::b;
@@ -125,8 +128,15 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
 		operator short()  const	{return short(float(*this));}
 		operator int()	  const	{return int(float(*this));}
 		operator float()  const	{return 0.299f*r + 0.587f*g + 0.114f*b;}
-		operator double() const	{return double(float(*this));}
-    
+		operator double() const	{return 0.299*r + 0.587*g + 0.114*b;}
+		operator vector_type() const
+		{
+		    vector_type	val;
+		    val[0] = r;
+		    val[1] = g;
+		    val[2] = b;
+		    return val;
+		}
     RGB_&	operator +=(const RGB_& p)
 		{
 		    r += p.r;
