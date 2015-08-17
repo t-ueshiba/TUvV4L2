@@ -188,7 +188,7 @@ main(int argc, char* argv[])
     using namespace	TU;
 
     typedef float	pixel_type;
-    typedef u_char	guide_type;
+    typedef RGB		guide_type;
     
     try
     {
