@@ -2,6 +2,7 @@
  *  $Id$
  */
 #include "TU/Image++.h"
+#include "TU/algorithm.h"
 #include "TU/v/App.h"
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CmdPane.h"
@@ -20,18 +21,32 @@ class Exp
   public:
     typedef S	argument_type;
     typedef T	result_type;
-    
-  public:
-    Exp(result_type sigma=1)	:_sigma(sigma)		{}
 
-    void	setSigma(result_type sigma)		{ _sigma = sigma; }
+  public:
+    Exp(result_type sigma=1)	:_nsigma(-sigma)	{}
+
+    void	setSigma(result_type sigma)		{ _nsigma = -sigma; }
     result_type	operator ()(argument_type x, argument_type y) const
 		{
-		    return std::exp((result_type(x) - result_type(y))/_sigma);
+		    return exp(x, y, typename std::is_arithmetic<S>::type());
+		}
+    
+  private:
+    result_type	exp(argument_type x, argument_type y, std::true_type) const
+		{
+		    return std::exp(diff(x, y) / _nsigma);
+		}
+    result_type	exp(argument_type x, argument_type y, std::false_type) const
+		{
+		    Vector<T, FixedSizedBuf<T, 3> >	v;
+		    v[0] = T(x.r) - T(y.r);
+		    v[1] = T(x.g) - T(y.g);
+		    v[2] = T(x.b) - T(y.b);
+		    return std::exp(v.length() / _nsigma);
 		}
 
   private:
-    result_type	_sigma;
+    result_type	_nsigma;
 };
     
 namespace v

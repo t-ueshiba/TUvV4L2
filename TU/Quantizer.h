@@ -5,7 +5,7 @@
 #define __TU_QUANTIZER_H
 
 #include <vector>
-#include "TU/Array++.h"
+#include "TU/Vector++.h"
 
 namespace TU
 {
@@ -26,15 +26,25 @@ class QuantizerBase
     class BinProps
     {
       public:
-	typedef typename T::vector_type		vector_type;
+	typedef Vector3f			vector_type;
 	
       public:
 	BinProps(PITER begin, PITER end)	;
 
 	PITER		begin()		const	{ return _begin; }
 	PITER		end()		const	{ return _end; }
-	T		mean()		const	{ return T(_mean); }
-	float		maxVariance()	const	;
+	T		mean() const
+			{
+			    return T(u_char(_mean[0]),
+				     u_char(_mean[1]),
+				     u_char(_mean[2]));
+			}
+	float		maxVariance() const
+			{
+			    return std::max({_variance[0],
+					     _variance[1],
+					     _variance[2]});
+			}
 	BinProps	split()			;
 	
       private:
@@ -158,11 +168,15 @@ QuantizerBase<T>::quantize(std::vector<PAIR>& io, size_t nbins, std::false_type)
  */
 template <class T> template <class PITER>
 QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end)
-    :_begin(begin), _end(end), _n(0), _mean(0), _variance(0)
+    :_begin(begin), _end(end), _n(0), _mean(), _variance()
 {
     for (auto iter = _begin; iter != _end; ++iter)
     {
-	const vector_type	x = *iter->first;
+	vector_type	x;
+	x[0] = iter->first->r;
+	x[1] = iter->first->g;
+	x[2] = iter->first->b;
+	
 	++_n;
 	_mean     += x;
 	_variance += square(x);
@@ -170,12 +184,6 @@ QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end)
 
     _mean /= _n;
     (_variance /= _n) -= square(_mean);
-}
-    
-template <class T> template <class PITER> inline float
-QuantizerBase<T>::BinProps<PITER>::maxVariance() const
-{
-    return std::max({_variance[0], _variance[1], _variance[2]});
 }
     
 template <class T>
@@ -206,7 +214,10 @@ QuantizerBase<T>::BinProps<PITER>::split()
     float		interVarianceMax = 0;	// クラス間分散の最大値
     for (auto iter = _begin, head = iter; iter != _end; ++iter)
     {
-	const vector_type	x = *iter->first;
+	vector_type	x;
+	x[0] = iter->first->r;
+	x[1] = iter->first->g;
+	x[2] = iter->first->b;
 	
 	if (iter->first->*c != head->first->*c)
 	{
