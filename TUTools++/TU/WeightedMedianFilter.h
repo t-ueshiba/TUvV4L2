@@ -8,6 +8,7 @@
 #include <boost/intrusive/set.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include "TU/Quantizer.h"
+#include "TU/Vector++.h"
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>
@@ -16,6 +17,43 @@
 
 namespace TU
 {
+/************************************************************************
+*  class ExpDiff<S, T>							*
+************************************************************************/
+template <class S, class T>
+class ExpDiff
+{
+  public:
+    typedef S	argument_type;
+    typedef T	result_type;
+
+  public:
+		ExpDiff(T sigma=1) :_nsigma(-sigma)	{}
+
+    void	setSigma(result_type sigma)		{ _nsigma = -sigma; }
+    T		operator ()(S x, S y) const
+		{
+		    return f(x, y, typename std::is_arithmetic<S>::type());
+		}
+    
+  private:
+    T		f(S x, S y, std::true_type) const
+		{
+		    return std::exp(diff(x, y) / _nsigma);
+		}
+    T		f(S x, S y, std::false_type) const
+		{
+		    Vector<T, FixedSizedBuf<T, 3> >	v;
+		    v[0] = T(x.r) - T(y.r);
+		    v[1] = T(x.g) - T(y.g);
+		    v[2] = T(x.b) - T(y.b);
+		    return std::exp(v.length() / _nsigma);
+		}
+
+  private:
+    T		_nsigma;
+};
+    
 namespace detail
 {
 /************************************************************************

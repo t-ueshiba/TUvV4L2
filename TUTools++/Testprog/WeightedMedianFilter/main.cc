@@ -5,7 +5,7 @@
 namespace TU
 {
 template <class T>
-struct IdentityFunc
+struct UnitFunc
 {
     typedef T	result_type;
     typedef T	argument_type;
@@ -24,7 +24,7 @@ main()
     
     typedef float			value_type;
     typedef std::list<value_type>	data_type;
-    typedef IdentityFunc<value_type>	wfunc_type;
+    typedef UnitFunc<value_type>	wfunc_type;
     
     std::default_random_engine			generator;
     std::uniform_real_distribution<value_type>	distribution(0.0, 1.0);
