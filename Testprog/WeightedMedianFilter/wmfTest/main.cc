@@ -12,43 +12,6 @@
 
 namespace TU
 {
-/************************************************************************
-*  class Exp<S, T>							*
-************************************************************************/
-template <class S, class T>
-class Exp
-{
-  public:
-    typedef S	argument_type;
-    typedef T	result_type;
-
-  public:
-    Exp(result_type sigma=1)	:_nsigma(-sigma)	{}
-
-    void	setSigma(result_type sigma)		{ _nsigma = -sigma; }
-    result_type	operator ()(argument_type x, argument_type y) const
-		{
-		    return exp(x, y, typename std::is_arithmetic<S>::type());
-		}
-    
-  private:
-    result_type	exp(argument_type x, argument_type y, std::true_type) const
-		{
-		    return std::exp(diff(x, y) / _nsigma);
-		}
-    result_type	exp(argument_type x, argument_type y, std::false_type) const
-		{
-		    Vector<T, FixedSizedBuf<T, 3> >	v;
-		    v[0] = T(x.r) - T(y.r);
-		    v[1] = T(x.g) - T(y.g);
-		    v[2] = T(x.b) - T(y.b);
-		    return std::exp(v.length() / _nsigma);
-		}
-
-  private:
-    result_type	_nsigma;
-};
-    
 namespace v
 {
 /************************************************************************
@@ -100,14 +63,14 @@ class MyCmdWindow : public CmdWindow
     virtual void	callback(CmdId id, CmdVal val)			;
 
   private:
-    CmdPane					_cmd;
-    const Image<T>&				_image;
-    const Image<G>&				_guide;
-    Image<T>					_result;
-    Exp<G, float>				_wfunc;
-    WeightedMedianFilter2<T, Exp<G, float> >	_wmf;
-    MyCanvasPane<T>				_imageCanvas;
-    MyCanvasPane<T>				_resultCanvas;
+    CmdPane						_cmd;
+    const Image<T>&					_image;
+    const Image<G>&					_guide;
+    Image<T>						_result;
+    ExpDiff<G, float>					_wfunc;
+    WeightedMedianFilter2<T, ExpDiff<G, float> >	_wmf;
+    MyCanvasPane<T>					_imageCanvas;
+    MyCanvasPane<T>					_resultCanvas;
 };
 
 template <class T, class G>
