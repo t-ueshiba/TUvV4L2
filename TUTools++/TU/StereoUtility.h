@@ -32,7 +32,11 @@ struct StereoParameters
 	 disparitySearchWidth(64), disparityMax(64),
 	 disparityInconsistency(2), grainSize(100),
 	 windowSize(11), intensityDiffMax(20), sigma(20)		{}
-    
+
+    size_t		disparityMin() const
+			{
+			    return disparityMax - disparitySearchWidth + 1;
+			}
     std::istream&	get(std::istream& in)
 			{
 			    return in >> disparitySearchWidth

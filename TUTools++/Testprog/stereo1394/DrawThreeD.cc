@@ -129,9 +129,10 @@ DrawThreeD::draw(const Image<D>& disparityMap, const Image<T>& image)
 	for (size_t u = 0; u < width; ++u)
 	{
 	    const D	dp = mapp[u], dq = mapq[u];
-	    if (dp != 0 && dq != 0 && abs(dp - dq) <= _gap)
+	    if (dp != 0 && dq != 0 && std::abs(dp - dq) <= _gap)
 	    {
-		if (abs(dp - dp_prev) > _gap || abs(dq - dq_prev) > _gap)
+		if (std::abs(dp - dp_prev) > _gap ||
+		    std::abs(dq - dq_prev) > _gap)
 		{
 		    glDrawArrays(GL_QUAD_STRIP, 0, vertex - vertex0);
 		    vertex = vertex0;
@@ -279,9 +280,10 @@ DrawThreeD::draw(const Image<D>& disparityMap)
 	for (size_t u = 0; u < width; ++u)
 	{
 	    const D	dp = mapp[u], dq = mapq[u];
-	    if (dp != 0.0 && dq != 0.0 && abs(dp - dq) <= _gap)
+	    if (dp != 0.0 && dq != 0.0 && std::abs(dp - dq) <= _gap)
 	    {
-		if (abs(dp - dp_prev) > _gap || abs(dq - dq_prev) > _gap)
+		if (std::abs(dp - dp_prev) > _gap ||
+		    std::abs(dq - dq_prev) > _gap)
 		{
 		    glDrawArrays(GL_QUAD_STRIP, 0, vertex - vertex0);
 		    vertex = vertex0;
