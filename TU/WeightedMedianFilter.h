@@ -9,6 +9,7 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include "TU/Quantizer.h"
 #include "TU/Vector++.h"
+#include "TU/algorithm.h"	// diff(const T&, const T&)
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>
