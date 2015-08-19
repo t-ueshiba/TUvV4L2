@@ -146,6 +146,7 @@ enum
     c_WMF,
     c_WMFWindowSize,
     c_WMFSigma,
+    c_RefineDisparity,
     
   // Viewing control.
     c_DrawMode,
