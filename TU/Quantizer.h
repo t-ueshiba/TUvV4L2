@@ -30,6 +30,10 @@ class QuantizerBase
 	
       public:
 	BinProps(PITER begin, PITER end)	;
+	BinProps(PITER begin, PITER end,
+		 size_t n,
+		 const vector_type& mean,
+		 const vector_type& variance)	;
 
 	PITER		begin()		const	{ return _begin; }
 	PITER		end()		const	{ return _end; }
@@ -155,6 +159,7 @@ QuantizerBase<T>::quantize(std::vector<PAIR>& io, size_t nbins, std::false_type)
 	std::push_heap(props.begin(), props.end(), comp);
     }
 
+  // 入力データの各元をbinの代表元にマップ
     for (size_t idx = 0; idx < props.size(); ++idx)
     {
 	_bins.push_back(props[idx].mean());
@@ -186,6 +191,15 @@ QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end)
     (_variance /= _n) -= square(_mean);
 }
     
+template <class T> template <class PITER> inline
+QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end,
+					    size_t n,
+					    const vector_type& mean,
+					    const vector_type& variance)
+    :_begin(begin), _end(end), _n(n), _mean(mean), _variance(variance)
+{
+}
+    
 template <class T>
 template <class PITER> typename QuantizerBase<T>::template BinProps<PITER>
 QuantizerBase<T>::BinProps<PITER>::split()
@@ -205,6 +219,7 @@ QuantizerBase<T>::BinProps<PITER>::split()
 			     _variance[0] > _variance[2] ? 0 : 2 :
 			     _variance[1] > _variance[2] ? 1 : 2);
     auto		border = _begin;
+    auto		head   = _begin;
     size_t		m = 0;			// しきい値以下の要素数
     vector_type		sum;			// しきい値以下の累積値
     vector_type		sqrsum;			// しきい値以下の自乗累積値
@@ -212,7 +227,7 @@ QuantizerBase<T>::BinProps<PITER>::split()
     vector_type		mean1;
     vector_type		variance1;
     float		interVarianceMax = 0;	// クラス間分散の最大値
-    for (auto iter = _begin, head = iter; iter != _end; ++iter)
+    for (auto iter = _begin; iter != _end; ++iter)
     {
 	vector_type	x;
 	x[0] = iter->first->r;
@@ -240,7 +255,12 @@ QuantizerBase<T>::BinProps<PITER>::split()
 	sqrsum += square(x);
     }
 
-    BinProps	props(border, _end);
+    const size_t	n2 = _n - n1;
+    const vector_type	mean2 = (_n*_mean - n1*mean1)/n2;
+    const vector_type	variance2 = (_n*(_variance + square(_mean)) -
+				     n1*(variance1 + square(mean1)))/n2
+				  - square(mean2);
+    const BinProps	props(border, _end, n2, mean2, variance2);
     
     _end      = border;
     _n	      = n1;
