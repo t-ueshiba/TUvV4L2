@@ -26,33 +26,31 @@ class QuantizerBase
     class BinProps
     {
       public:
-	typedef Vector3f			vector_type;
+	typedef float					value_type;
+	typedef Vector<value_type,
+		       FixedSizedBuf<value_type, 3> >	vector_type;
 	
       public:
-	BinProps(PITER begin, PITER end)	;
-	BinProps(PITER begin, PITER end,
-		 size_t n,
-		 const vector_type& mean,
-		 const vector_type& variance)	;
+	BinProps(PITER begin, PITER end)				;
+	BinProps(PITER begin, PITER end, size_t n,
+		 const vector_type& sum, const vector_type& sqsum)	;
 
-	PITER		begin()		const	{ return _begin; }
-	PITER		end()		const	{ return _end; }
+	PITER		begin()			const	{ return _begin; }
+	PITER		end()			const	{ return _end; }
 	T		mean() const
 			{
-			    return T(u_char(_mean[0]),
-				     u_char(_mean[1]),
-				     u_char(_mean[2]));
+			    return T(u_char(_sum[0]/_n),
+				     u_char(_sum[1]/_n),
+				     u_char(_sum[2]/_n));
 			}
-	float		maxVariance() const
+	value_type	maxVariance() const
 			{
-			    return std::max({_variance[0],
-					     _variance[1],
-					     _variance[2]});
+			    return std::max({_var[0], _var[1], _var[2]});
 			}
-	BinProps	split()			;
+	BinProps	split()				;
 	
       private:
-	static float		square(float x)	{ return x*x; }
+	static value_type	square(value_type x)	{ return x*x; }
 	static vector_type	square(const vector_type& x)
 				{
 				    return {x[0]*x[0], x[1]*x[1], x[2]*x[2]};
@@ -62,8 +60,8 @@ class QuantizerBase
 	PITER		_begin;
 	PITER		_end;
 	size_t		_n;
-	vector_type	_mean;
-	vector_type	_variance;
+	vector_type	_sum;
+	vector_type	_var;
     };
     
   public:
@@ -173,7 +171,7 @@ QuantizerBase<T>::quantize(std::vector<PAIR>& io, size_t nbins, std::false_type)
  */
 template <class T> template <class PITER>
 QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end)
-    :_begin(begin), _end(end), _n(0), _mean(), _variance()
+    :_begin(begin), _end(end), _n(0)
 {
     for (auto iter = _begin; iter != _end; ++iter)
     {
@@ -183,20 +181,21 @@ QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end)
 	x[2] = iter->first->b;
 	
 	++_n;
-	_mean     += x;
-	_variance += square(x);
+	_sum += x;
+	_var += square(x);
     }
 
-    _mean /= _n;
-    (_variance /= _n) -= square(_mean);
+    if (_n)
+	_var = (_n*_var - square(_sum)) / (_n*_n);
 }
     
 template <class T> template <class PITER> inline
 QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end,
 					    size_t n,
-					    const vector_type& mean,
-					    const vector_type& variance)
-    :_begin(begin), _end(end), _n(n), _mean(mean), _variance(variance)
+					    const vector_type& sum,
+					    const vector_type& sqsum)
+    :_begin(begin), _end(end), _n(n), _sum(sum),
+     _var((n*sqsum - square(sum)) / (n*n))
 {
 }
     
@@ -207,26 +206,27 @@ QuantizerBase<T>::BinProps<PITER>::split()
     typedef typename std::iterator_traits<PITER>::value_type	pair_type;
 
   // 要素への反復子の配列を作り，昇順にソート
-    const u_char T::*	c = (_variance[0] > _variance[1] ?
-			     _variance[0] > _variance[2] ? &T::r : &T::b :
-			     _variance[1] > _variance[2] ? &T::g : &T::b);
+    const u_char T::*	c = (_var[0] > _var[1] ?
+			     _var[0] > _var[2] ? &T::r : &T::b :
+			     _var[1] > _var[2] ? &T::g : &T::b);
     std::sort(_begin, _end,
 	      [=](const pair_type& x, const pair_type& y)
 	      { return (x.first)->*c < (y.first)->*c; });
     
   // 大津の判別基準により最適なしきい値を決定．
-    const size_t	i = (_variance[0] > _variance[1] ?
-			     _variance[0] > _variance[2] ? 0 : 2 :
-			     _variance[1] > _variance[2] ? 1 : 2);
+    const size_t	i = (_var[0] > _var[1] ?
+			     _var[0] > _var[2] ? 0 : 2 :
+			     _var[1] > _var[2] ? 1 : 2);
     auto		border = _begin;
     auto		head   = _begin;
-    size_t		m = 0;			// しきい値以下の要素数
+    const auto		mean = _sum[i]/_n;
+    size_t		n = 0;			// しきい値以下の要素数
     vector_type		sum;			// しきい値以下の累積値
-    vector_type		sqrsum;			// しきい値以下の自乗累積値
+    vector_type		sqsum;			// しきい値以下の自乗累積値
     size_t		n1 = 0;
-    vector_type		mean1;
-    vector_type		variance1;
-    float		interVarianceMax = 0;	// クラス間分散の最大値
+    vector_type		sum1;
+    vector_type		sqsum1;
+    value_type		interVarianceMax = 0;	// クラス間分散の最大値
     for (auto iter = _begin; iter != _end; ++iter)
     {
 	vector_type	x;
@@ -236,36 +236,29 @@ QuantizerBase<T>::BinProps<PITER>::split()
 	
 	if (iter->first->*c != head->first->*c)
 	{
-	    const auto	interVariance = square(sum[i] - m*_mean[i])
-				      / (m*(_n - m));
+	    const auto	interVariance = square(sum[i] - n*mean) / (n*(_n - n));
 	    if (interVariance > interVarianceMax)
 	    {
 		interVarianceMax = interVariance;
 		border		 = iter;
-		n1		 = m;
-		mean1		 = sum/n1;
-		variance1	 = sqrsum/n1 - square(mean1);
-		
+		n1		 = n;
+		sum1		 = sum;
+		sqsum1		 = sqsum;
 	    }
 	    head = iter;
 	}
 	
-	++m;
-	sum    += x;
-	sqrsum += square(x);
+	++n;
+	sum   += x;
+	sqsum += square(x);
     }
 
-    const size_t	n2 = _n - n1;
-    const vector_type	mean2 = (_n*_mean - n1*mean1)/n2;
-    const vector_type	variance2 = (_n*(_variance + square(_mean)) -
-				     n1*(variance1 + square(mean1)))/n2
-				  - square(mean2);
-    const BinProps	props(border, _end, n2, mean2, variance2);
+    const BinProps	props(border, _end, n - n1, sum - sum1, sqsum - sqsum1);
     
-    _end      = border;
-    _n	      = n1;
-    _mean     = mean1;
-    _variance = variance1;
+    _end = border;
+    _n	 = n1;
+    _sum = sum1;
+    _var = (n1*sqsum1 - square(sum1)) / (n1*n1);
     
     return props;
 }

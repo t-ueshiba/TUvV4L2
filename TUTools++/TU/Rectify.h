@@ -119,7 +119,7 @@ class Rectify
 				   element_type detphMin,
 				   element_type depthMax,
 				   size_t& disparitySearchWidth,
-				   size_t& disparityMax)			;
+				   size_t& disparityMax)		;
     element_type	initialize(const camera_type& cameraL,
 				   const camera_type& cameraR,
 				   const camera_type& cameraV,
@@ -139,7 +139,7 @@ class Rectify
 				   element_type detphMin,
 				   element_type depthMax,
 				   size_t& disparitySearchWidth,
-				   size_t& disparityMax)			;
+				   size_t& disparityMax)		;
     element_type	initialize(const ImageBase& imageL,
 				   const ImageBase& imageR,
 				   const ImageBase& imageV,
@@ -153,7 +153,7 @@ class Rectify
 				   element_type detphMin,
 				   element_type depthMax,
 				   size_t& disparitySearchWidth,
-				   size_t& disparityMax)			;
+				   size_t& disparityMax)		;
 
     template <class T>
     void	operator ()(const Image<T>& inL,
