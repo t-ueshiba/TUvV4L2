@@ -477,8 +477,8 @@ WeightedMedianFilter2<T, W, PF>::convolve(IN ib, IN ie,
 	return;
 
     pf_type::start(0);
-    const auto&	indicesI = _quantizerI(ib, ie, nbinsI());	// 入力を量子化
-    const auto&	indicesG = _quantizerG(gb, ge, nbinsG());	// ガイドを量子化
+    const auto&	indicesI = _quantizerI(ib, ie, nbinsI());  // 入力を量子化
+    const auto&	indicesG = _quantizerG(gb, ge, nbinsG());  // ガイドを量子化
 
     pf_type::start(1);
     super::setWeights(_quantizerG);	// 重みの2次元lookup tableをセット

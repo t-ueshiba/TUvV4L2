@@ -32,10 +32,10 @@ class QuantizerBase
 	
       public:
 	BinProps(PITER begin, PITER end)				;
-	BinProps(PITER begin, PITER end, size_t n,
+	BinProps(PITER begin, PITER end, const u_char T::* c, size_t n,
 		 const vector_type& sum, const vector_type& sqsum)
-	    :_begin(begin), _end(end), _n(n), _sum(sum),
-	     _var((n*sqsum - square(sum)) / (n*n))			{}
+	    :_begin(begin), _end(end), _c(c), _n(n),
+	     _sum(sum), _var((n*sqsum - square(sum)) / (n*n))		{}
 
 	PITER		begin()			const	{ return _begin; }
 	PITER		end()			const	{ return _end; }
@@ -59,11 +59,12 @@ class QuantizerBase
 				}
 	
       private:
-	PITER		_begin;
-	PITER		_end;
-	size_t		_n;
-	vector_type	_sum;
-	vector_type	_var;
+	PITER			_begin;
+	PITER			_end;
+	const u_char T::*	_c;
+	size_t			_n;
+	vector_type		_sum;
+	vector_type		_var;
     };
     
   public:
@@ -173,7 +174,7 @@ QuantizerBase<T>::quantize(std::vector<PAIR>& io, size_t nbins, std::false_type)
  */
 template <class T> template <class PITER>
 QuantizerBase<T>::BinProps<PITER>::BinProps(PITER begin, PITER end)
-    :_begin(begin), _end(end), _n(0)
+    :_begin(begin), _end(end), _c(nullptr), _n(0)
 {
     for (auto iter = _begin; iter != _end; ++iter)
     {
@@ -201,9 +202,10 @@ QuantizerBase<T>::BinProps<PITER>::split()
     const u_char T::*	c = (_var[0] > _var[1] ?
 			     _var[0] > _var[2] ? &T::r : &T::b :
 			     _var[1] > _var[2] ? &T::g : &T::b);
-    std::sort(_begin, _end,
-	      [=](const pair_type& x, const pair_type& y)
-	      { return x.first->*c < y.first->*c; });
+    if (c != _c)
+	std::sort(_begin, _end,
+		  [=](const pair_type& x, const pair_type& y)
+		  { return x.first->*c < y.first->*c; });
     
   // 大津の判別基準により最適なしきい値を決定．
     const size_t	i = (_var[0] > _var[1] ?
@@ -245,9 +247,11 @@ QuantizerBase<T>::BinProps<PITER>::split()
 	sqsum += square(x);
     }
 
-    const BinProps	props(border, _end, n - n1, sum - sum1, sqsum - sqsum1);
+    const BinProps	props(border, _end,
+			      c, n - n1, sum - sum1, sqsum - sqsum1);
     
     _end = border;
+    _c	 = c;
     _n	 = n1;
     _sum = sum1;
     _var = (n1*sqsum1 - square(sum1)) / (n1*n1);
