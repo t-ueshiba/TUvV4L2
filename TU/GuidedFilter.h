@@ -76,7 +76,7 @@ class GuidedFilter : public BoxFilter
     
 	result_type	coeffs(size_t n, guide_type sq_e) const
 			{
-			    using namespace	boost;
+			    using 	boost::get;
 
 			    const auto&	a = (n*get<2>(*this)
 					     - get<0>(*this)*get<1>(*this))
@@ -112,7 +112,7 @@ class GuidedFilter : public BoxFilter
 
 	result_type	coeffs(size_t n, guide_type sq_e) const
 			{
-			    using namespace	boost;
+			    using 	boost::get;
 			    
 			    auto	var = n*get<1>(*this)
 					    - get<0>(*this)*get<0>(*this);

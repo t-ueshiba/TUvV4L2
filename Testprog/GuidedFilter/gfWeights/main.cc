@@ -11,8 +11,6 @@
 
 namespace TU
 {
-typedef u_char	PixelType;
-
 namespace v
 {
 /************************************************************************
@@ -88,28 +86,29 @@ MyCanvasPane<T>::callback(CmdId id, CmdVal val)
 }
     
 /************************************************************************
-*  class MyCmdWindow							*
+*  class MyCmdWindow<T>							*
 ************************************************************************/
+template <class T>
 class MyCmdWindow : public CmdWindow
 {
   public:
-    MyCmdWindow(App& parentApp, const char* name,
-		const Image<PixelType>& guide)				;
+    MyCmdWindow(App& parentApp, const char* name, const Image<T>& guide);
 
     void		showWeights(size_t u, size_t v)			;
     virtual void	callback(CmdId id, CmdVal val)			;
 
   private:
-    const Image<PixelType>&	_guide;
+    const Image<T>&		_guide;
     Image<float>		_weights;
     GuidedFilter2<float>	_gf2;
     CmdPane			_cmd;
-    MyCanvasPane<PixelType>	_canvas;
+    MyCanvasPane<T>		_canvas;
     MyCanvasPane<float>		_weightsCanvas;
 };
 
-MyCmdWindow::MyCmdWindow(App& parentApp, const char* name,
-			 const Image<PixelType>& guide)
+template <class T>
+MyCmdWindow<T>::MyCmdWindow(App& parentApp, const char* name,
+			    const Image<T>& guide)
     :CmdWindow(parentApp, name, 0, Colormap::RGBColor, 16, 0, 0),
      _guide(guide),
      _weights(),
@@ -135,28 +134,47 @@ MyCmdWindow::MyCmdWindow(App& parentApp, const char* name,
     show();
 }
 
-void
-MyCmdWindow::showWeights(size_t u, size_t v)
+template <class T> void
+MyCmdWindow<T>::showWeights(size_t u, size_t v)
 {
+    if (u >= _guide.width() || v >= _guide.height())
+	return;
+    
+    const size_t	w = _cmd.getValue(c_WinSize);
+#if 0
+    const size_t	uc = (u < w - 1 ? w - 1 :
+			      u > _guide.width() - w + 1 ?
+			      _guide.width() - w + 1 : u);
+    const size_t	vc = (v < w - 1 ? w - 1 :
+			      v > _guide.height() - w + 1 ?
+			      _guide.height() - w + 1 : v);
     Image<float>	in(_guide.width(), _guide.height()),
-			out(_guide.width(), _guide.height());
-    size_t		w = _cmd.getValue(c_WinSize);
-
+			out(in.width(), in.height());
     in[v][u] = 255;
     _gf2.convolve(in.begin(), in.end(),
 		  _guide.begin(), _guide.end(), out.begin());
-
-    size_t	uc = (u < w -1 ? w - 1 :
-		      u > out.width() - w + 1 ? out.width() - w + 1 : u);
-    size_t	vc = (v < w -1 ? w - 1 :
-		      v > out.height() - w + 1 ? out.height() - w + 1 : v);
     _weights = out(uc - w + 1, vc - w + 1, 2*w - 1, 2*w - 1);
+#else
+    const size_t	ub = std::max(u,  2*w - 2) - 2*w + 2,
+			ue = std::min(u + 2*w - 1, _guide.width()),
+			vb = std::max(v,  2*w - 2) - 2*w + 2,
+			ve = std::min(v + 2*w - 1, _guide.height());
+    Image<float>	in(ue - ub, ve - vb), out(in.width(), in.height());
+    const size_t	uc = (u < w - 1 ? w - 1 : u < 2*w - 2 ? u : 2*w - 2),
+			vc = (v < w - 1 ? w - 1 : v < 2*w - 2 ? v : 2*w - 2);
+    in[vc][uc] = 255;
+    const auto		guide = _guide(ub, vb, in.width(), in.height());
+    _gf2.convolve(in.begin(), in.end(),
+		  guide.begin(), guide.end(), out.begin());
+    _weights = out(uc - w + 1, vc - w + 1,
+		   out.width() - w + 1, out.height() - w + 1);
+#endif
     _weightsCanvas.setSize(2*w - 1, 2*w - 1);
     _weightsCanvas.repaintUnderlay();
 }
     
-void
-MyCmdWindow::callback(CmdId id, CmdVal val)
+template <class T> void
+MyCmdWindow<T>::callback(CmdId id, CmdVal val)
 {
     switch (id)
     {
@@ -209,12 +227,15 @@ main(int argc, char* argv[])
 
     try
     {
-	v::App		vapp(argc, argv);
-	Image<u_char>	guide;
+	typedef u_char	pixel_type;
+	
+	v::App			vapp(argc, argv);
+	Image<pixel_type>	guide;
 	guide.restore(cin);
 
       // GUIオブジェクトを作り，イベントループを起動．
-	v::MyCmdWindow	myWin(vapp, "Weights of guided filter", guide);
+	v::MyCmdWindow<pixel_type>	myWin(vapp, "Weights of guided filter",
+					      guide);
 	vapp.run();
     }
     catch (exception& err)

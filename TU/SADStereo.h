@@ -84,7 +84,7 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 
 	result_type	operator ()(const argument_type& args) const
 			{
-			    using namespace	boost;
+			    using 	boost::get;
 
 			    return _blend(get<0>(args), get<1>(args))
 				 - _blend(get<2>(args), get<3>(args));

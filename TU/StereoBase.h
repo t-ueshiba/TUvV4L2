@@ -321,7 +321,7 @@ class mask_iterator
     template <class VEC_>
     void	update(element_type R, VEC_& mask)
 		{
-		    using namespace	boost;
+		    using 	boost::get;
 
 		    element_type	RminR = get<0>(*_RminRV),
 					RminV = get<1>(*_RminRV);
@@ -607,7 +607,7 @@ namespace mm
   template <class MASK, class T, class DMIN_RV> inline DMIN_RV
   fast_select(const MASK& mask, mm::vec<T> index, const DMIN_RV& dminRV)
   {
-      using namespace	boost;
+      using namespace 	boost;
 
       return make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
 			select(get<1>(mask), index, get<1>(dminRV)));
