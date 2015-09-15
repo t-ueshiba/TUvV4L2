@@ -297,7 +297,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
 	result_type	operator ()(const argument_type& p) const
 			{
-			    using namespace	boost;
+			    using	boost::get;
 
 			    return ParamUpdate::operator ()(
 				       _blend(get<0>(p), get<1>(p)),
@@ -318,7 +318,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
 	result_type	operator ()(const argument_type& params) const
 			{
-			    using namespace	boost;
+			    using	boost::get;
 			    
 			    ScoreVec	a = (get<1>(params) -
 					     get<0>(params)*_g_avg) * _g_rvar;
@@ -339,7 +339,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
 	result_type	operator ()(const argument_type& coeffs) const
 			{
-			    using namespace	boost;
+			    using 	boost::get;
 			    
 			    return (get<0>(coeffs) * _g + get<1>(coeffs));
 			}
