@@ -85,18 +85,18 @@ class SURFCreator
 	value_type	getDyy(size_t x)			const	;
 	value_type	getDxy(size_t x)			const	;
 	value_type	getDet(size_t x)			const	;
-#if defined(SSE)
+#if defined(SIMD)
 	template <size_t O>
-	mm::F32vec	mmCrop2(int umin, int umax,
-				int vmin, int vmax)		const	;
+	simd::F32vec	simdCrop2(int umin, int umax,
+				  int vmin, int vmax)		const	;
 	template <size_t O>
-	mm::F32vec	mmGetDxx(size_t x)			const	;
+	simd::F32vec	simdGetDxx(size_t x)			const	;
 	template <size_t O>
-	mm::F32vec	mmGetDyy(size_t x)			const	;
+	simd::F32vec	simdGetDyy(size_t x)			const	;
 	template <size_t O>
-	mm::F32vec	mmGetDxy(size_t x)			const	;
+	simd::F32vec	simdGetDxy(size_t x)			const	;
 	template <size_t O>
-	mm::F32vec	mmGetDet(size_t x)			const	;
+	simd::F32vec	simdGetDet(size_t x)			const	;
 #endif
 	value_type	getWx(size_t x, size_t y);
 	value_type	getWy(size_t x, size_t y);

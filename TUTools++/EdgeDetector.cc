@@ -28,7 +28,7 @@
  *  $Id$
  */
 #include "TU/EdgeDetector.h"
-#include "TU/mmInstructions.h"
+#include "TU/simd/simd.h"
 
 /************************************************************************
 *  static functions							*
@@ -38,7 +38,7 @@ namespace TU
 static const float	slant = 0.41421356;	// tan(M_PI/8)
 
 #if defined(SSE2)
-namespace mm
+namespace simd
 {
 static inline Is32vec
 dir4(F32vec u, F32vec v)
@@ -111,7 +111,7 @@ eigen(vec<T> a, vec<T> b, vec<T> c)
     return select(avrg > zero<T>(), avrg + frac, avrg - frac);
 }
 
-}	// namespace mm
+}	// namespace simd
 #endif
 
 template <class T> static inline u_int
@@ -262,7 +262,7 @@ EdgeDetector::strength(const Image<float>& edgeH,
 	float*			dst = out[v].data();
 	const float* const	end = dst + out.width();
 #if defined(SSE)
-	using namespace		mm;
+	using namespace		simd;
 	
 	const size_t		nelms = F32vec::size;
 	for (const float* const end2 = dst + F32vec::floor(out.width());
@@ -305,7 +305,7 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
-	using namespace		mm;
+	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
@@ -345,7 +345,7 @@ EdgeDetector::direction4x(const Image<float>& edgeH,
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
-	using namespace		mm;
+	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
@@ -392,7 +392,7 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
-	using namespace		mm;
+	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
@@ -432,7 +432,7 @@ EdgeDetector::direction8x(const Image<float>& edgeH,
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
 #if defined(SSE2)
-	using namespace		mm;
+	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;
 	for (const u_char* const end2 = dst + Iu8vec::floor(out.width());
@@ -480,7 +480,7 @@ EdgeDetector::ridge(const Image<float>& edgeHH,
 	fiterator	str = strength[v].begin();
 	citerator	dir = direction[v].begin();
 #if defined(SSE)
-	using namespace	mm;
+	using namespace	simd;
 
 	const size_t	nelms = F32vec::size;
 	for (citerator end2 = dir + Iu8vec::floor(direction.width());

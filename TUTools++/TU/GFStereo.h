@@ -52,9 +52,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
   private:
     typedef StereoBase<GFStereo<Score, Disparity> >	super;
-#if defined(SSE)
-    typedef mm::vec<Score>				ScoreVec;
-    typedef mm::vec<Disparity>				DisparityVec;
+#if defined(SIMD)
+    typedef simd::vec<Score>				ScoreVec;
+    typedef simd::vec<Disparity>				DisparityVec;
 #else
     typedef Score					ScoreVec;
     typedef Disparity					DisparityVec;
@@ -487,9 +487,9 @@ template <class SCORE, class DISP> inline void
 GFStereo<SCORE, DISP>::setParameters(const Parameters& params)
 {
     _params = params;
-#if defined(SSE)
+#if defined(SIMD)
     _params.disparitySearchWidth
-	= mm::vec<Disparity>::ceil(_params.disparitySearchWidth);
+	= simd::vec<Disparity>::ceil(_params.disparitySearchWidth);
 #endif
     if (_params.disparityMax < _params.disparitySearchWidth)
 	_params.disparityMax = _params.disparitySearchWidth;
@@ -728,8 +728,8 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 						  col_siterator colQ,
 						  col_giterator colF) const
 {
-#if defined(SSE)
-    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
+#if defined(SIMD)
+    typedef decltype(simd::make_load_iterator(col2ptr(colRV)))	in_iterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
 #endif
@@ -737,8 +737,8 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 
     if (_params.blend > 0)
     {
-#if defined(SSE)
-	typedef mm::cvtup_iterator<
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<
 	    assignment_iterator<
 		ParamInit2,
 		typename ScoreVecArray::iterator2> >		qiterator;
@@ -790,8 +790,8 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
     }
     else
     {
-#if defined(SSE)
-	typedef mm::cvtup_iterator<
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<
 	    assignment_iterator<
 		ParamInit, typename ScoreVecArray::iterator2> >	qiterator;
 #else
@@ -827,8 +827,8 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 					      col_siterator colQ,
 					      col_giterator colF) const
 {
-#if defined(SSE)
-    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
+#if defined(SIMD)
+    typedef decltype(simd::make_load_iterator(col2ptr(colRV)))	in_iterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
 #endif
@@ -836,8 +836,8 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 
     if (_params.blend > 0)
     {
-#if defined(SSE)
-	typedef mm::cvtup_iterator<
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<
 	    assignment_iterator<
 		ParamUpdate2,
 		typename ScoreVecArray::iterator2> >		qiterator;
@@ -906,8 +906,8 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
     }
     else
     {
-#if defined(SSE)
-	typedef mm::cvtup_iterator<
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<
 	    assignment_iterator<
 		ParamUpdate,
 		typename ScoreVecArray::iterator2> >		qiterator;
@@ -983,18 +983,18 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 		       R.begin(), CoeffTrans(*colG));
 	++colG;
 
-#if defined(SSE)
-	typedef decltype(mm::make_store_iterator(col2ptr(dminRV)))
+#if defined(SIMD)
+	typedef decltype(simd::make_store_iterator(col2ptr(dminRV)))
 								diterator;
 #  if defined(WITHOUT_CVTDOWN)
-	typedef mm::cvtdown_mask_iterator<
+	typedef simd::cvtdown_mask_iterator<
 	    Disparity,
-	    mm::mask_iterator<subiterator<const_col_siterator>,
-			      subiterator<RMIN_RV> > >		miterator;
+	    simd::mask_iterator<subiterator<const_col_siterator>,
+				subiterator<RMIN_RV> > >	miterator;
 #  else
-	typedef mm::mask_iterator<Disparity,
-				  subiterator<const_col_siterator>,
-				  subiterator<RMIN_RV> >	miterator;
+	typedef simd::mask_iterator<Disparity,
+				    subiterator<const_col_siterator>,
+				    subiterator<RMIN_RV> >	miterator;
 #  endif
 #else
 	typedef decltype(col2ptr(dminRV))			diterator;
@@ -1005,7 +1005,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 
 	Idx<DisparityVec>	index;
 	diterator		dminRVt(col2ptr(--dminRV));
-#if defined(SSE) && defined(WITHOUT_CVTDOWN)
+#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(R.cbegin(),
 						  std::begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(R.cend(),
@@ -1023,12 +1023,12 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 	    ++dminRVt;
 	    ++index;
 	}
-#if defined(SSE) && defined(WITHOUT_CVTDOWN)
+#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
       	const int	dL = maskRV.base().dL();	// 左画像から見た視差
 #else
       	const int	dL = maskRV.dL();		// 左画像から見た視差
 #endif
-#if defined(SSE)
+#if defined(SIMD)
 	const Score*	Rb = R.cbegin().base();
 #else
 	const Score*	Rb = R.cbegin();
@@ -1049,7 +1049,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 template <class SCORE, class DISP> void
 GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 {
-#if defined(SSE)
+#if defined(SIMD)
     const size_t	DD = D / ScoreVec::size;
 #else
     const size_t	DD = D;

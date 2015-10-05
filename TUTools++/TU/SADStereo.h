@@ -53,9 +53,9 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 
   private:
     typedef StereoBase<SADStereo<Score, Disparity> >	super;
-#if defined(SSE)
-    typedef mm::vec<Score>				ScoreVec;
-    typedef mm::vec<Disparity>				DisparityVec;
+#if defined(SIMD)
+    typedef simd::vec<Score>				ScoreVec;
+    typedef simd::vec<Disparity>			DisparityVec;
 #else
     typedef Score					ScoreVec;
     typedef Disparity					DisparityVec;
@@ -196,9 +196,9 @@ template <class SCORE, class DISP> inline void
 SADStereo<SCORE, DISP>::setParameters(const Parameters& params)
 {
     _params = params;
-#if defined(SSE)
+#if defined(SIMD)
     _params.disparitySearchWidth
-	= mm::vec<Disparity>::ceil(_params.disparitySearchWidth);
+	= simd::vec<Disparity>::ceil(_params.disparitySearchWidth);
 #endif
     if (_params.disparityMax < _params.disparitySearchWidth)
 	_params.disparityMax = _params.disparitySearchWidth;
@@ -373,8 +373,8 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colQ) const
 {
-#if defined(SSE)
-    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
+#if defined(SIMD)
+    typedef decltype(simd::make_load_iterator(col2ptr(colRV)))	in_iterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
 #endif
@@ -383,8 +383,8 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
     if (_params.blend > 0)
     {
 	typedef Blend<ScoreVec>					blend_type;
-#if defined(SSE)
-	typedef mm::cvtup_iterator<
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<
 	    assignment_iterator<blend_type,
 				subiterator<col_siterator> > >	qiterator;
 #else
@@ -428,8 +428,9 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
     }
     else
     {
-#if defined(SSE)
-	typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<subiterator<col_siterator> >
+								qiterator;
 #else
 	typedef subiterator<col_siterator>			qiterator;
 #endif
@@ -454,8 +455,8 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					      COL colLp, COL_RV colRVp,
 					      col_siterator colQ) const
 {
-#if defined(SSE)
-    typedef decltype(mm::make_load_iterator(col2ptr(colRV)))	in_iterator;
+#if defined(SIMD)
+    typedef decltype(simd::make_load_iterator(col2ptr(colRV)))	in_iterator;
 #else
     typedef decltype(col2ptr(colRV))				in_iterator;
 #endif
@@ -463,8 +464,8 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 
     if (_params.blend > 0)
     {
-#if defined(SSE)
-	typedef mm::cvtup_iterator<
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<
 	    assignment_iterator<ScoreUpdate,
 				subiterator<col_siterator> > >	qiterator;
 #else
@@ -525,8 +526,9 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
     }
     else
     {
-#if defined(SSE)
-	typedef mm::cvtup_iterator<subiterator<col_siterator> >	qiterator;
+#if defined(SIMD)
+	typedef simd::cvtup_iterator<subiterator<col_siterator> >
+								qiterator;
 #else
 	typedef subiterator<col_siterator>			qiterator;
 #endif
@@ -562,18 +564,18 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
     for (const_reverse_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
     {
-#if defined(SSE)
-	typedef decltype(mm::make_store_iterator(col2ptr(dminRV)))
+#if defined(SIMD)
+	typedef decltype(simd::make_store_iterator(col2ptr(dminRV)))
 								diterator;
 #  if defined(WITHOUT_CVTDOWN)
-	typedef mm::cvtdown_mask_iterator<
+	typedef simd::cvtdown_mask_iterator<
 	    Disparity,
-	    mm::mask_iterator<subiterator<const_col_siterator>,
-			      subiterator<RMIN_RV> > >		miterator;
+	    simd::mask_iterator<subiterator<const_col_siterator>,
+				subiterator<RMIN_RV> > >	miterator;
 #  else
-	typedef mm::mask_iterator<Disparity,
-				  subiterator<const_col_siterator>,
-				  subiterator<RMIN_RV> >	miterator;
+	typedef simd::mask_iterator<Disparity,
+				    subiterator<const_col_siterator>,
+				    subiterator<RMIN_RV> >	miterator;
 #  endif
 #else
 	typedef decltype(col2ptr(dminRV))			diterator;
@@ -584,7 +586,7 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 
 	Idx<DisparityVec>	index;
 	diterator		dminRVt(col2ptr(--dminRV));
-#if defined(SSE) && defined(WITHOUT_CVTDOWN)
+#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
 						  std::begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(boxR->cend(),
@@ -602,12 +604,12 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	    ++dminRVt;
 	    ++index;
 	}
-#if defined(SSE) && defined(WITHOUT_CVTDOWN)
+#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
       	const int	dL = maskRV.base().dL();	// 左画像から見た視差
 #else
       	const int	dL = maskRV.dL();		// 左画像から見た視差
 #endif
-#if defined(SSE)
+#if defined(SIMD)
 	const Score*	R  = boxR->cbegin().base();
 #else
 	const Score*	R  = boxR->cbegin();
@@ -628,7 +630,7 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 template <class SCORE, class DISP> void
 SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 {
-#if defined(SSE)
+#if defined(SIMD)
     const size_t	DD = D / ScoreVec::size;
 #else
     const size_t	DD = D;

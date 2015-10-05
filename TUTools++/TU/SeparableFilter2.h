@@ -145,14 +145,14 @@ SeparableFilter2<F>::convolveRows(F const& filter, IN ib, IN ie,
     typedef typename std::iterator_traits<col_iterator>::value_type
 								value_type;
 
-    const size_t	vsize = mm::vec<value_type>::size;
+    const size_t	vsize = simd::vec<value_type>::size;
     IN			in    = ib;
     col = (std::distance(ib, ie) / vsize) * vsize;
     std::advance(ib, col);
     convolveRows(filter,
-		 mm::make_row_vec_iterator<value_type>(in),
-		 mm::make_row_vec_iterator<value_type>(ib),
-		 make_row_iterator<mm::store_iterator<col_iterator> >(out),
+		 simd::make_row_vec_iterator<value_type>(in),
+		 simd::make_row_vec_iterator<value_type>(ib),
+		 make_row_iterator<simd::store_iterator<col_iterator> >(out),
 		 0, std::false_type());
 #endif
     convolveRows(filter, ib, ie, out, col, std::false_type());

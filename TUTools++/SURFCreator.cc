@@ -198,8 +198,8 @@ SURFCreator::BoxFilter::getDet(size_t x) const
     return ((dxx * dyy) - (dxy * dxy)) * _sqCorrectFactor;
 }
 
-#if defined(SSE)
-namespace mm
+#if defined(SIMD)
+namespace simd
 {
 template <size_t O>
 static inline F32vec	octave_load(const float* p)			;
@@ -217,10 +217,10 @@ octave_load<1>(const float* p)
 }
 }
 
-template <size_t O> inline mm::F32vec
-SURFCreator::BoxFilter::mmCrop2(int umin, int umax, int vmin, int vmax) const
+template <size_t O> inline simd::F32vec
+SURFCreator::BoxFilter::simdCrop2(int umin, int umax, int vmin, int vmax) const
 {
-    using namespace	mm;
+    using namespace	simd;
     
     ++umax;
     ++vmax;
@@ -230,41 +230,41 @@ SURFCreator::BoxFilter::mmCrop2(int umin, int umax, int vmin, int vmax) const
 	 - octave_load<O>(&_integralImage[vmax][umin]);
 }
 
-template <size_t O> inline mm::F32vec
-SURFCreator::BoxFilter::mmGetDxx(size_t x) const
+template <size_t O> inline simd::F32vec
+SURFCreator::BoxFilter::simdGetDxx(size_t x) const
 {
-    using namespace	mm;
+    using namespace	simd;
 
-    return mmCrop2<O>(x - _lr, x + _lr, _y_lb_min, _y_lb_max)
-      - F32vec(3.0) * mmCrop2<O>(x - _lm, x + _lm, _y_lb_min, _y_lb_max);
+    return simdCrop2<O>(x - _lr, x + _lr, _y_lb_min, _y_lb_max)
+      - F32vec(3.0) * simdCrop2<O>(x - _lm, x + _lm, _y_lb_min, _y_lb_max);
 }
 
-template <size_t O> inline mm::F32vec
-SURFCreator::BoxFilter::mmGetDyy(size_t x) const
+template <size_t O> inline simd::F32vec
+SURFCreator::BoxFilter::simdGetDyy(size_t x) const
 {
-    using namespace	mm;
+    using namespace	simd;
 
-    return mmCrop2<O>(x - _lb, x + _lb, _y_lr_min, _y_lr_max)
-      - F32vec(3.0) * mmCrop2<O>(x - _lb, x + _lb, _y_lm_min, _y_lm_max);
+    return simdCrop2<O>(x - _lb, x + _lb, _y_lr_min, _y_lr_max)
+      - F32vec(3.0) * simdCrop2<O>(x - _lb, x + _lb, _y_lm_min, _y_lm_max);
 }
 
-template <size_t O> inline mm::F32vec
-SURFCreator::BoxFilter::mmGetDxy(size_t x) const
+template <size_t O> inline simd::F32vec
+SURFCreator::BoxFilter::simdGetDxy(size_t x) const
 {
-    return mmCrop2<O>(x,	  x + _lc, _y,	      _y_lc_max)
-	 + mmCrop2<O>(x - _lc, x,	   _y_lc_min, _y       )
-	 - mmCrop2<O>(x,	  x + _lc, _y_lc_min, _y       )
-	 - mmCrop2<O>(x - _lc, x,	   _y,	      _y_lc_max);
+    return simdCrop2<O>(x,	  x + _lc, _y,	      _y_lc_max)
+	 + simdCrop2<O>(x - _lc, x,	   _y_lc_min, _y       )
+	 - simdCrop2<O>(x,	  x + _lc, _y_lc_min, _y       )
+	 - simdCrop2<O>(x - _lc, x,	   _y,	      _y_lc_max);
 }
 
-template <size_t O> inline mm::F32vec
-SURFCreator::BoxFilter::mmGetDet(size_t x) const
+template <size_t O> inline simd::F32vec
+SURFCreator::BoxFilter::simdGetDet(size_t x) const
 {
-    using namespace	mm;
+    using namespace	simd;
 
-    const F32vec	dxx = mmGetDxx<O>(x),
-			dyy = mmGetDyy<O>(x),
-			dxy = mmGetDxy<O>(x) * F32vec(0.9 * 2 / 3.0);
+    const F32vec	dxx = simdGetDxx<O>(x),
+			dyy = simdGetDyy<O>(x),
+			dxy = simdGetDxy<O>(x) * F32vec(0.9 * 2 / 3.0);
     return ((dxx * dyy) - (dxy * dxy)) * F32vec(_sqCorrectFactor);
 }
 #endif
@@ -587,15 +587,15 @@ SURFCreator::calcDetsLine(size_t y, size_t o, size_t filterSize,
     BoxFilter		boxFilter(_integralImage, filterSize);
     boxFilter.setY(yy);
     
-#if defined(SSE)
-    using namespace	mm;
+#if defined(SIMD)
+    using namespace	simd;
 
     if (o == 0)
     {
 	const size_t	nelms = vec<value_type>::size;
 	for (value_type* const r = q - nelms; p <= r; p += nelms)
 	{
-	    store(p, boxFilter.mmGetDet<0>(xx));
+	    store(p, boxFilter.simdGetDet<0>(xx));
 	    xx += pixelStep * nelms;
 	}
 	empty();
@@ -605,7 +605,7 @@ SURFCreator::calcDetsLine(size_t y, size_t o, size_t filterSize,
 	const size_t	nelms = vec<value_type>::size;
 	for (value_type* const r = q - nelms; p <= r; p += nelms)
 	{
-	    store(p, boxFilter.mmGetDet<1>(xx));
+	    store(p, boxFilter.simdGetDet<1>(xx));
 	    xx += pixelStep * nelms;
 	}
 	empty();

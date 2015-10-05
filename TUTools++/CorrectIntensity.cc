@@ -28,7 +28,7 @@
  *  $Id$
  */
 #include "TU/CorrectIntensity.h"
-#include "TU/mmInstructions.h"
+#include "TU/simd/simd.h"
 
 /************************************************************************
 *  static functions							*
@@ -36,7 +36,7 @@
 namespace TU
 {
 #if defined(SSE)
-namespace mm
+namespace simd
 {
 template <class T> static inline void
 correct(T* p, F32vec a, F32vec b)
@@ -80,7 +80,7 @@ correct(float* p, F32vec a, F32vec b)
     store<false>(p, a + b * load<false>(p));
 }
 
-}	// namespace mm
+}	// namespace simd
 #endif
 
 static inline u_char
@@ -115,7 +115,7 @@ CorrectIntensity::operator()(Image<T>& image, size_t vs, size_t ve) const
 	T*		p = image[v].data();
 	T* const	q = p + image.width();
 #if defined(SSE)
-	using namespace	mm;
+	using namespace	simd;
 
 	const size_t	nelms = vec<T>::size;
 	const F32vec	a(_offset), b(_gain);
