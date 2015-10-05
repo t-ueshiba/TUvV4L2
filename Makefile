@@ -100,7 +100,6 @@ HDRS		= TU/Array++.h \
 		TU/functional.h \
 		TU/io.h \
 		TU/iterator.h \
-		TU/mmInstructions.h \
 		TU/simd/allocator.h \
 		TU/simd/arithmetic.h \
 		TU/simd/arm/allocator.h \
@@ -115,7 +114,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/arm/load_store.h \
 		TU/simd/arm/logical.h \
 		TU/simd/arm/misc.h \
-		TU/simd/arm/mmInstructions.h \
 		TU/simd/arm/select.h \
 		TU/simd/arm/shift.h \
 		TU/simd/arm/type_traits.h \
@@ -144,7 +142,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/intel/load_store.h \
 		TU/simd/intel/logical.h \
 		TU/simd/intel/misc.h \
-		TU/simd/intel/mmInstructions.h \
 		TU/simd/intel/select.h \
 		TU/simd/intel/shift.h \
 		TU/simd/intel/shuffle.h \
