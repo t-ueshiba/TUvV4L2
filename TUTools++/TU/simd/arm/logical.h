@@ -8,6 +8,12 @@ namespace TU
 {
 namespace simd
 {
+template <class T> inline vec<T>
+andnot(vec<T> x, vec<T> y)
+{
+    return (~x) & y;
+}
+    
 #define SIMD_NOT(type)							\
     SIMD_UNARY_FUNC(operator ~, mvn, type)
 
