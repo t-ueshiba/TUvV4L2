@@ -36,7 +36,6 @@
 
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
-#include "TU/mmInstructions.h"
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>
@@ -59,8 +58,8 @@ class Warp
 	size_t		width()			const	{return us.size();}
 	void		resize(size_t d)		;
 #if defined(MMX)
-	Array<short,  Buf<short,  mm::allocator<short > > >	us, vs;
-	Array<u_char, Buf<u_char, mm::allocator<u_char> > >	du, dv;
+	Array<short,  Buf<short,  simd::allocator<short > > >	us, vs;
+	Array<u_char, Buf<u_char, simd::allocator<u_char> > >	du, dv;
 #else
 	Array<short>						us, vs;
 	Array<u_char>						du, dv;
@@ -122,7 +121,8 @@ class Warp
     void	operator ()(const Image<T>& in, Image<T>& out)	const	;
     Vector2f	operator ()(int u, int v)			const	;
 #if defined(SSE2)
-    mm::F32vec	src(int u, int v)				const	;
+    simd::F32vec
+		src(int u, int v)				const	;
 #endif
 
   private:
@@ -323,10 +323,10 @@ Warp::operator ()(int u, int v) const
   \param v	出力画像点の縦座標
   \return	出力画像点(u, v-1), (u, v)にマップされる入力画像点の2次元座標
 */
-inline mm::F32vec
+inline simd::F32vec
 Warp::src(int u, int v) const
 {
-    using namespace	mm;
+    using namespace	simd;
     
     const FracArray	&fp = _fracs[v-1], &fc = _fracs[v];
     const Is16vec	tmp(fc.dv[u], fc.du[u], fp.dv[u], fp.du[u],

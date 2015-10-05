@@ -207,7 +207,7 @@
   - #TU::Random
 
   <b>SIMD命令</b>
-  - #TU::mm::vec
+  - #TU::simd::vec
   
   \file		types.h
   \brief	基本的なデータ型をグローバルな名前空間に追加

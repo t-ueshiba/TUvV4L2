@@ -43,7 +43,7 @@
 #include <iostream>
 #include <iomanip>
 #include "TU/iterator.h"
-#include "TU/mmInstructions.h"
+#include "TU/simd/simd.h"
 
 //#define __CXX0X_MOVE			// 移動コンストラクタ/代入を使用
 
@@ -59,13 +59,13 @@ struct BufTraits
     typedef T*					iterator;
     typedef std::allocator<T>			allocator_type;
 };
-#if defined(MMX)		// MMX が定義されているときは...
+#if defined(SIMD)		// SIMD が定義されているときは...
 template <class T>
-struct BufTraits<mm::vec<T> >	// 要素がvec<T>の配列の反復子を特別版に
+struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別版に
 {
-    typedef mm::load_iterator<const T*, true>	const_iterator;
-    typedef mm::store_iterator<T*, true>	iterator;
-    typedef mm::allocator<mm::vec<T> >		allocator_type;
+    typedef simd::load_iterator<const T*, true>	const_iterator;
+    typedef simd::store_iterator<T*, true>	iterator;
+    typedef simd::allocator<simd::vec<T> >	allocator_type;
 };
 #endif
 
@@ -1063,13 +1063,22 @@ class Array2 : public Array<T, R>
 
     static size_t	align(size_t a)
 			{
-#if defined(MMX)
+#if defined(SIMD)
 			    typedef typename buf_type::value_type	S;
 
-			    if (std::is_same<typename buf_type::allocator_type,
-					     mm::allocator<S> >::value)
-				return sizeof(mm::vec<S>);
+			    return align(a, simd::is_vec<S>());
+#else
+			    return align(a, false_type());
 #endif
+			}
+    static size_t	align(size_t, std::true_type)
+			{
+			    typedef typename buf_type::value_type	S;
+
+			    return sizeof(S);
+			}
+    static size_t	align(size_t a, std::false_type)
+			{
 			    return (a == 0 ? 1 : a);
 			}
 

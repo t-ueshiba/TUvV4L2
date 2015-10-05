@@ -82,30 +82,30 @@ struct Diff
     const T	_thresh;
 };
     
-#if defined(SSE)
+#if defined(SIMD)
 template <class T>
-struct Diff<mm::vec<T> >
+struct Diff<simd::vec<T> >
 {
     typedef typename std::make_signed<T>::type		signed_type;
-    typedef mm::vec<signed_type>			result_type;
+    typedef simd::vec<signed_type>			result_type;
 
-    Diff(mm::vec<T> x, mm::vec<T> thresh)	:_x(x), _thresh(thresh)	{}
+    Diff(simd::vec<T> x, simd::vec<T> thresh)	:_x(x), _thresh(thresh)	{}
     
-    result_type	operator ()(mm::vec<T> y) const
+    result_type	operator ()(simd::vec<T> y) const
 		{
-		    using namespace	mm;
+		    using namespace	simd;
 
 		    return cast<signed_type>(min(diff(_x, y), _thresh));
 		}
-    result_type	operator ()(boost::tuple<mm::vec<T>, mm::vec<T> > y) const
+    result_type	operator ()(boost::tuple<simd::vec<T>, simd::vec<T> > y) const
 		{
 		    return (*this)(boost::get<0>(y))
 			 + (*this)(boost::get<1>(y));
 		}
 
   private:
-    const mm::vec<T>	_x;
-    const mm::vec<T>	_thresh;
+    const simd::vec<T>	_x;
+    const simd::vec<T>	_thresh;
 };
 #endif
 
@@ -124,16 +124,16 @@ struct Minus
 		}
 };
     
-#if defined(SSE)
+#if defined(SIMD)
 template <class T>
-struct Minus<mm::vec<T> >
+struct Minus<simd::vec<T> >
 {
     typedef typename std::make_signed<T>::type		signed_type;
-    typedef mm::vec<signed_type>			result_type;
+    typedef simd::vec<signed_type>			result_type;
 
-    result_type	operator ()(mm::vec<T> x, mm::vec<T> y) const
+    result_type	operator ()(simd::vec<T> x, simd::vec<T> y) const
 		{
-		    return mm::cast<signed_type>(x) - mm::cast<signed_type>(y);
+		    return simd::cast<signed_type>(x) - simd::cast<signed_type>(y);
 		}
 };
 #endif
@@ -240,11 +240,11 @@ struct Idx
     T		_i;
 };
 
-#if defined(SSE)
+#if defined(SIMD)
 template <class T>
-struct Idx<mm::vec<T> > : mm::vec<T>
+struct Idx<simd::vec<T> > : simd::vec<T>
 {
-    typedef mm::vec<T>	super;
+    typedef simd::vec<T>	super;
     
 		Idx()	:super(make_index_sequence<super::size>())	{}
     void	operator ++()		{ *this += super(super::size); }
@@ -377,8 +377,8 @@ class mask_iterator
     rv_type	_nextRV;
 };
 
-#if defined(SSE)
-namespace mm
+#if defined(SIMD)
+namespace simd
 {
 #  if !defined(SSE2)
   template <size_t I> inline int
@@ -599,20 +599,20 @@ namespace mm
   }
 #  endif
 
-  template <class T> inline mm::vec<T>
-  fast_select(mm::vec<T> mask, mm::vec<T> index, mm::vec<T> dminRV)
+  template <class T> inline simd::vec<T>
+  fast_select(simd::vec<T> mask, simd::vec<T> index, simd::vec<T> dminRV)
   {
       return select(mask, index, dminRV);
   }
   template <class MASK, class T, class DMIN_RV> inline DMIN_RV
-  fast_select(const MASK& mask, mm::vec<T> index, const DMIN_RV& dminRV)
+  fast_select(const MASK& mask, simd::vec<T> index, const DMIN_RV& dminRV)
   {
       using namespace 	boost;
 
       return make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
 			select(get<1>(mask), index, get<1>(dminRV)));
   }
-}	// end of namespace mm
+}	// end of namespace simd
 #else
 template <class S, class T, class U> inline auto
 fast_select(const S& s, const T& x, const U& y) -> decltype(select(s, x, y))

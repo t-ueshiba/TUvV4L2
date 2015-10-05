@@ -43,7 +43,7 @@
 namespace TU
 {
 #if defined(SSE)
-namespace mm
+namespace simd
 {
   static inline Is16vec
   linearInterpolate(Is16vec x, Is16vec y, Is16vec d)
@@ -153,7 +153,7 @@ namespace mm
 			       dv);
   }
 
-}	// namespace mm
+}	// namespace simd
 #endif
 /************************************************************************
 *  static functions							*
@@ -234,7 +234,7 @@ Warp::warpLine(const Image<T>& in, Image<T>& out, size_t v) const
     T			*outp = out[v].data() + _fracs[v].lmost;
     T* const		outq  = outp + _fracs[v].width();
 #if defined(SSE)
-    using namespace	mm;
+    using namespace	simd;
 
     for (T* const outr = outq - Iu8vec::size; outp <= outr; )
     {
@@ -350,7 +350,7 @@ Warp::warpLine(const Image<u_char>& in, Image<u_char>& out, size_t v) const
     u_char		*outp = out[v].data() + _fracs[v].lmost;
     u_char* const	outq  = outp + _fracs[v].width();
 #if defined(SSE)
-    using namespace	mm;
+    using namespace	simd;
 
     for (u_char* const outr = outq - Iu8vec::size; outp <= outr; )
     {
