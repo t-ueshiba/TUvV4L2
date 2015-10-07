@@ -23,9 +23,7 @@ namespace simd
 template <class S, size_t I=0, class T> static inline vec<S>
 cvt(vec<T> x)
 {
-    typedef typename type_traits<S>::lower_type	L;
-    
-    return cvt<S, (I&0x1)>(cvt<L, (I>>1)>(x));
+    return cvt<S, (I&0x1)>(cvt<lower_type<S>, (I>>1)>(x));
 }
 
 //! 2つのT型整数ベクトルをより小さなS型整数ベクトルに型変換する．

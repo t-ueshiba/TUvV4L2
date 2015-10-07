@@ -40,8 +40,7 @@ class cvtdown_iterator
 
     typedef typename tuple_head<elementary_vec>::element_type
 							element_type;
-    typedef typename type_traits<element_type>::complementary_type
-							complementary_type;
+    typedef complementary_type<element_type>		complementary_type;
     typedef tuple_replace<elementary_vec, vec<complementary_type> >
 							complementary_vec;
 
@@ -83,14 +82,14 @@ class cvtdown_iterator
     template <class VEC_>
     void	cvtdown(VEC_& x)
 		{
-		    typedef
-			typename tuple_head<VEC_>::element_type	S;
-		    typedef typename type_traits<S>::upper_type	upper_type;
-		    typedef typename std::conditional<
-				std::is_floating_point<S>::value,
-				upper_type,
-				typename type_traits<upper_type>::signed_type>
-				::type			signed_upper_type;
+		    typedef typename
+			tuple_head<VEC_>::element_type	S;
+		    typedef upper_type<S>		upper_type;
+		    typedef typename
+			std::conditional<std::is_floating_point<S>::value,
+					 upper_type,
+					 signed_type<upper_type> >::type
+							signed_upper_type;
 		    
 		    tuple_replace<elementary_vec, vec<signed_upper_type> > y, z;
 		    cvtdown(y);

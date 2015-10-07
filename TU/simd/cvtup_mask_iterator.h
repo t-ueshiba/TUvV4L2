@@ -26,13 +26,12 @@ namespace detail
     // を呼び出せない．
       typedef tuple_replace<iterator_value<ITER> >		value_type;
       typedef typename tuple_head<value_type>::element_type	element_type;
-      typedef cvtup_mask_proxy				self;
+      typedef cvtup_mask_proxy					self;
 
     private:
       typedef typename std::iterator_traits<ITER>::reference
 							reference;
-      typedef typename type_traits<element_type>::complementary_mask_type
-							complementary_type;
+      typedef complementary_mask_type<element_type>	complementary_type;
       typedef tuple_replace<value_type, vec<complementary_type> >
 							complementary_vec;
       typedef typename std::conditional<
@@ -40,13 +39,11 @@ namespace detail
 	  complementary_type, element_type>::type	integral_type;
       typedef typename std::conditional<
 	  std::is_signed<integral_type>::value,
-	  typename type_traits<integral_type>::unsigned_type,
-	  typename type_traits<integral_type>::signed_type>::type
-							flipped_type;
+	  unsigned_type<integral_type>,
+	  signed_type<integral_type> >::type		flipped_type;
       typedef tuple_replace<value_type, vec<flipped_type> >
 							flipped_vec;
-      typedef typename type_traits<flipped_type>::lower_type
-							flipped_lower_type;
+      typedef lower_type<flipped_type>			flipped_lower_type;
       typedef tuple_replace<value_type, vec<flipped_lower_type> >
 							flipped_lower_vec;
 	
@@ -76,9 +73,8 @@ namespace detail
       template <class OP_, class VEC_>
       void	cvtup(VEC_ x)
 		{
-		    typedef
-			typename tuple_head<VEC_>::element_type	S;
-		    typedef typename type_traits<S>::upper_type	upper_type;
+		    typedef upper_type<typename tuple_head<VEC_>
+				       ::element_type>	upper_type;
 
 		    cvtup<OP_>(cvt_mask<upper_type, 0>(x));
 		    cvtup<OP_>(cvt_mask<upper_type, 1>(x));
