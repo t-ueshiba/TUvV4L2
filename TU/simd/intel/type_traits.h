@@ -44,7 +44,6 @@ template <class T>
 struct type_traits : type_traits_base<T>
 {
     typedef ivec_t		base_type;
-    
 };
     
 template <>
@@ -54,13 +53,6 @@ struct type_traits<int32_t> : type_traits_base<int32_t>
 	(sizeof(fvec_t) == sizeof(ivec_t)) ||	// fvec_t と ivec_tが同サイズ
       	(sizeof(dvec_t) == sizeof(char)),	// または dvec_t が未定義なら...
 	float, double>::type	complementary_type;  //相互変換可能な浮動小数点数
-    typedef complementary_type	complementary_mask_type;
-    typedef ivec_t		base_type;
-};
-    
-template <>
-struct type_traits<int64_t> : type_traits_base<int64_t>
-{
     typedef complementary_type	complementary_mask_type;
     typedef ivec_t		base_type;
 };
@@ -76,14 +68,6 @@ struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
     typedef ivec_t		base_type;
 };
     
-template <>
-struct type_traits<u_int64_t> : type_traits_base<u_int64_t>
-{
-    typedef double		complementary_type;
-    typedef complementary_type	complementary_mask_type;
-    typedef ivec_t		base_type;
-};
-
 template <>
 struct type_traits<float> : type_traits_base<float>
 {
