@@ -18,6 +18,9 @@ template <class T> static vec<T>	operator &(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator |(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	operator ^(vec<T> x, vec<T> y)	;
 template <class T> static vec<T>	andnot(vec<T> x, vec<T> y)	;
+
+template <class T> inline vec<T>&
+vec<T>::andnot(vec<T> x)	{ return *this = simd::andnot(x, *this); }
 }	// namespace simd
 }	// namespace TU
 

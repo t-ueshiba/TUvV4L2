@@ -12,27 +12,27 @@ namespace simd
 *  Arithmetic operators							*
 ************************************************************************/
 #define SIMD_ADD_SUB(type)						\
-    SIMD_BINARY_FUNC(operator +, add, type)				\
-    SIMD_BINARY_FUNC(operator -, sub, type)
+    SIMD_BINARY_FUNC(operator +, addq, type)				\
+    SIMD_BINARY_FUNC(operator -, subq, type)
 
 // 8/16bit整数は，飽和演算によって operator [+|-] を定義する．
 #define SIMD_SAT_ADD_SUB(type)						\
-    SIMD_BINARY_FUNC(operator +, qadd, type)				\
-    SIMD_BINARY_FUNC(operator -, qsub, type)
+    SIMD_BINARY_FUNC(operator +, qaddq, type)				\
+    SIMD_BINARY_FUNC(operator -, qsubq, type)
 
 #define SIMD_MUL(type)							\
-    SIMD_BINARY_FUNC(operator *, mul, type)
+    SIMD_BINARY_FUNC(operator *, mulq, type)
 
 #define SIMD_NEGATE(type)						\
-    SIMD_UNARY_FUNC(operator -, neg, type)
+    SIMD_UNARY_FUNC(operator -, negq, type)
 
 #define SIMD_MIN_MAX(type)						\
-    SIMD_BINARY_FUNC(min, min, type)					\
-    SIMD_BINARY_FUNC(max, max, type)
+    SIMD_BINARY_FUNC(min, minq, type)					\
+    SIMD_BINARY_FUNC(max, maxq, type)
 
 #define SIMD_RCP_RSQRT(type)						\
-    SIMD_UNARY_FUNC(rcp, recpe, type)					\
-    SIMD_UNARY_FUNC(rsqrt, rsqrte, type)
+    SIMD_UNARY_FUNC(rcp, recpeq, type)					\
+    SIMD_UNARY_FUNC(rsqrt, rsqrteq, type)
 
   // 加減算
 SIMD_SAT_ADD_SUB(int8_t)
@@ -83,8 +83,8 @@ SIMD_RCP_RSQRT(float)
 *  Average values							*
 ************************************************************************/
 #define SIMD_AVG_SUB_AVG(type)						\
-    SIMD_BINARY_FUNC(avg, hadd, type)					\
-    SIMD_BINARY_FUNC(sub_avg, hsub, type)
+    SIMD_BINARY_FUNC(avg, haddq, type)					\
+    SIMD_BINARY_FUNC(sub_avg, hsubq, type)
 
 SIMD_AVG_SUB_AVG(int8_t)
 SIMD_AVG_SUB_AVG(int16_t)
@@ -97,7 +97,7 @@ SIMD_AVG_SUB_AVG(u_int32_t)
 *  Absolute values							*
 ************************************************************************/
 #define SIMD_ABS(type)							\
-    SIMD_UNARY_FUNC(abs, abs, type)
+    SIMD_UNARY_FUNC(abs, absq, type)
 
 SIMD_ABS(int8_t)
 SIMD_ABS(int16_t)
@@ -110,7 +110,7 @@ SIMD_ABS(float)
 *  Absolute differences							*
 ************************************************************************/
 #define SIMD_DIFF(type)							\
-    SIMD_BINARY_FUNC(diff, abd, type)
+    SIMD_BINARY_FUNC(diff, abdq, type)
 
 SIMD_DIFF(int8_t)
 SIMD_DIFF(int16_t)

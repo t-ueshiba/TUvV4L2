@@ -380,18 +380,20 @@ class mask_iterator
 #if defined(SIMD)
 namespace simd
 {
-#  if !defined(SSE2)
+#  if defined(MMX)
+#    if !defined(SSE2)
   template <size_t I> inline int
   extract(Is32vec x)
   {					// short用の命令を無理に int に適用
       return _mm_extract_pi16(x, I);	// しているため，x が SHRT_MIN 以上
   }					// かつ SHRT_MAX 以下の場合のみ有効
-#  elif !defined(SSE4)
+#    elif !defined(SSE4)
   template <size_t I> inline int
   extract(Is32vec x)
   {					// short用の命令を無理に int に適用
       return _mm_extract_epi16(x, I);	// しているため，x が SHRT_MIN 以上
   }					// かつ SHRT_MAX 以下の場合のみ有効
+#    endif
 #  endif
 
 #  if defined(WITHOUT_CVTDOWN)

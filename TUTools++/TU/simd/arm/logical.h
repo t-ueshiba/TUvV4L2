@@ -15,12 +15,12 @@ andnot(vec<T> x, vec<T> y)
 }
     
 #define SIMD_NOT(type)							\
-    SIMD_UNARY_FUNC(operator ~, mvn, type)
+    SIMD_UNARY_FUNC(operator ~, mvnq, type)
 
 #define SIMD_LOGICALS(type)						\
-    SIMD_BINARY_FUNC(operator &, and, type)				\
-    SIMD_BINARY_FUNC(operator |, orr, type)				\
-    SIMD_BINARY_FUNC(operator ^, eor, type)
+    SIMD_BINARY_FUNC(operator &, andq, type)				\
+    SIMD_BINARY_FUNC(operator |, orrq, type)				\
+    SIMD_BINARY_FUNC(operator ^, eorq, type)
 
 SIMD_NOT(int8_t)
 SIMD_NOT(int16_t)
