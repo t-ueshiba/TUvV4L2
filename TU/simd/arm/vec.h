@@ -10,6 +10,8 @@ namespace TU
 {
 namespace simd
 {
+typedef vec<float>	F32vec;		//!< 32bit浮動小数点数ベクトル
+
 /************************************************************************
 *  Constructors of vec<T>						*
 ************************************************************************/
@@ -39,7 +41,7 @@ vec<T>::vec(element_type a0,  element_type a1,
 	    element_type a12, element_type a13,
 	    element_type a14, element_type a15)
     :_base{a0, a1, a2,  a3,  a4,  a5,  a6,  a7,
-	a8, a9, a10, a11, a12, a13, a14, a15}		{}
+	   a8, a9, a10, a11, a12, a13, a14, a15}		{}
 
 #define SIMD_CONSTRUCTOR_1(type)					\
     template <> inline vec<type>::vec(type a)				\

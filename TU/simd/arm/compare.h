@@ -12,12 +12,9 @@ template <class T> inline vec<T>
 operator !=(vec<T> x, vec<T> y)		{ return ~(x == y); }
 
 #define SIMD_COMPARE(func, op, type)					\
-    template <> vec<type>						\
-    func(vec<type> x, vec<type> y)					\
-    {									\
-	return								\
-	    cast<type>(SIMD_MNEMONIC(op, , SIMD_SUFFIX(type))(x, y));	\
-    }
+    SIMD_SPECIALIZED_FUNC(						\
+	vec<mask_type<type> > func(vec<type> x, vec<type> y),		\
+	op, (x, y), void, type)
 #define SIMD_COMPARES(type)						\
     SIMD_COMPARE(operator ==, ceqq, type)				\
     SIMD_COMPARE(operator >,  cgtq, type)				\

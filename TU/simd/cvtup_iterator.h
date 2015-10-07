@@ -31,14 +31,15 @@ namespace detail
     private:
       typedef typename std::iterator_traits<ITER>::reference
 							reference;
-      typedef complementary_type<element_type>		complementary_type;
+      typedef simd::complementary_type<element_type>	complementary_type;
       typedef tuple_replace<value_type, vec<complementary_type> >
 							complementary_vec;
       typedef typename std::conditional<
 		  std::is_floating_point<element_type>::value,
 		  complementary_type,
 		  element_type>::type			integral_type;
-      typedef unsigned_type<lower_type<integral_type> >	unsigned_lower_type;
+      typedef simd::unsigned_type<lower_type<integral_type> >
+							unsigned_lower_type;
       typedef tuple_replace<value_type, vec<unsigned_lower_type> >
 							unsigned_lower_vec;
 	

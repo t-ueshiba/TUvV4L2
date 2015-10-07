@@ -17,14 +17,15 @@ select(vec<T> mask, vec<T> x, vec<T> y)
 #if defined(SSE4)
 #  define SIMD_SELECT(type)						\
     template <> inline vec<type>					\
-    select(vec<type> mask, vec<type> x, vec<type> y)			\
+    select(vec<mask_type<type> > mask, vec<type> x, vec<type> y)	\
     {									\
 	   return SIMD_MNEMONIC(blendv, SIMD_PREFIX(type), ,		\
 				SIMD_SIGNED(int8_t))(y, x, mask);	\
     }
 #  define SIMD_SELECT_F(type)						\
     SIMD_SPECIALIZED_FUNC(						\
-	vec<type> select(vec<type> mask, vec<type> x, vec<type> y),	\
+	vec<type> select(vec<mask_type<type> > mask,			\
+			 vec<type> x, vec<type> y),			\
 	blendv, (y, x, mask), void, type, SIMD_BASE)
 
   SIMD_SELECT(int8_t)

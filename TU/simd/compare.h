@@ -13,12 +13,12 @@ namespace simd
 /************************************************************************
 *  Compare operators							*
 ************************************************************************/
-template <class T> static vec<T>	operator ==(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator > (vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator < (vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator !=(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator >=(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator <=(vec<T> x, vec<T> y)	;
+template <class T> vec<mask_type<T> >	operator ==(vec<T> x, vec<T> y)	;
+template <class T> vec<mask_type<T> >	operator > (vec<T> x, vec<T> y)	;
+template <class T> vec<mask_type<T> >	operator < (vec<T> x, vec<T> y)	;
+template <class T> vec<mask_type<T> >	operator !=(vec<T> x, vec<T> y)	;
+template <class T> vec<mask_type<T> >	operator >=(vec<T> x, vec<T> y)	;
+template <class T> vec<mask_type<T> >	operator <=(vec<T> x, vec<T> y)	;
     
 }	// namespace simd
 }	// namespace TU

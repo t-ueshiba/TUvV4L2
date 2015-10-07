@@ -40,7 +40,7 @@ class cvtdown_iterator
 
     typedef typename tuple_head<elementary_vec>::element_type
 							element_type;
-    typedef complementary_type<element_type>		complementary_type;
+    typedef simd::complementary_type<element_type>	complementary_type;
     typedef tuple_replace<elementary_vec, vec<complementary_type> >
 							complementary_vec;
 

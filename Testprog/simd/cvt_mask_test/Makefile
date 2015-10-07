@@ -13,8 +13,8 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g -msse3
+CPPFLAGS	= -DNDEBUG -DNEON
+CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
