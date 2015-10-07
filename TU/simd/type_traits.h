@@ -141,7 +141,7 @@ namespace simd
 template <class T>
 using signed_type		= typename type_traits<T>::singed_type;
 template <class T>
-using unsigned_type		= typename type_traits<T>::unsinged_type;
+using unsigned_type		= typename type_traits<T>::unsigned_type;
 template <class T>
 using lower_type		= typename type_traits<T>::lower_type;
 template <class T>

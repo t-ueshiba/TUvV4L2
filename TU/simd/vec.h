@@ -88,8 +88,7 @@ class vec<T, 1>
     vec&		operator &=(vec x)	{ return *this = *this & x; }
     vec&		operator |=(vec x)	{ return *this = *this | x; }
     vec&		operator ^=(vec x)	{ return *this = *this ^ x; }
-    vec&		andnot(vec x)		{ return *this =
-						      simd::andnot(x, *this); }
+    vec&		andnot(vec x)		;
 
     element_type	operator [](size_t i) const
 			{

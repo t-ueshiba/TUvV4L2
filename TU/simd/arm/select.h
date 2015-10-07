@@ -11,7 +11,7 @@ namespace simd
 #define SIMD_SELECT(type)						\
     SIMD_SPECIALIZED_FUNC(						\
 	vec<type> select(vec<type> mask, vec<type> x, vec<type> y),	\
-	bslq, (cast<unsigned_type<type> >mask, x, y), void, type)	\
+	bslq, (cast<unsigned_type<type> >(mask), x, y), void, type)	\
 
 SIMD_SELECT(int8_t)
 SIMD_SELECT(int16_t)

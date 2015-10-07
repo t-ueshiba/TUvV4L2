@@ -104,7 +104,8 @@ class SparseMatrix
 			operator ()(size_t i, size_t j,
 				    size_t r, size_t c)		const	;
     template <class S, class B>
-    SparseMatrix&	assign(size_t i, size_t j, const Vector<S, B>& v)	;
+    SparseMatrix&	assign(size_t i, size_t j,
+			       const Vector<S, B>& v)			;
     template <class S, class B, class R>
     SparseMatrix&	assign(size_t i, size_t j,
 			       const Matrix<S, B, R>& M)		;
