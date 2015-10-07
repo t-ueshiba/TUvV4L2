@@ -15,7 +15,7 @@ MOCHDRS		=
 INCDIRS		= -I../stereo1394 -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ -DUSE_TBB \
 		  -DDISPLAY_2D -DDISPLAY_3D -DNO_RV
-CFLAGS		= -g
+CFLAGS		= -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3

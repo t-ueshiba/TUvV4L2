@@ -22,6 +22,7 @@ struct type_traits_base<int8_t>
     typedef u_int8_t		unsigned_type;
     typedef void		lower_type;
     typedef int16_t		upper_type;
+    typedef unsigned_type	mask_type;
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -33,6 +34,7 @@ struct type_traits_base<int16_t>
     typedef u_int16_t		unsigned_type;
     typedef int8_t		lower_type;
     typedef int32_t		upper_type;
+    typedef unsigned_type	mask_type;
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -44,6 +46,7 @@ struct type_traits_base<int32_t>
     typedef u_int32_t		unsigned_type;
     typedef int16_t		lower_type;
     typedef int64_t		upper_type;
+    typedef unsigned_type	mask_type;
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -55,6 +58,7 @@ struct type_traits_base<int64_t>
     typedef u_int64_t		unsigned_type;
     typedef int32_t		lower_type;
     typedef void		upper_type;
+    typedef unsigned_type	mask_type;
     typedef double		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -66,6 +70,7 @@ struct type_traits_base<u_int8_t>
     typedef u_int8_t		unsigned_type;
     typedef void		lower_type;
     typedef u_int16_t		upper_type;
+    typedef unsigned_type	mask_type;
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -77,6 +82,7 @@ struct type_traits_base<u_int16_t>
     typedef u_int16_t		unsigned_type;
     typedef u_int8_t		lower_type;
     typedef u_int32_t		upper_type;
+    typedef unsigned_type	mask_type;
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -88,6 +94,7 @@ struct type_traits_base<u_int32_t>
     typedef u_int32_t		unsigned_type;
     typedef u_int16_t		lower_type;
     typedef u_int64_t		upper_type;
+    typedef unsigned_type	mask_type;
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -99,6 +106,7 @@ struct type_traits_base<u_int64_t>
     typedef u_int64_t		unsigned_type;
     typedef u_int32_t		lower_type;
     typedef void		upper_type;
+    typedef unsigned_type	mask_type;
     typedef double		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -110,6 +118,7 @@ struct type_traits_base<float>
     typedef u_int32_t		unsigned_type;
     typedef void		lower_type;
     typedef double		upper_type;
+    typedef unsigned_type	mask_type;
     typedef int32_t		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -121,6 +130,7 @@ struct type_traits_base<double>
     typedef u_int32_t		unsigned_type;
     typedef float		lower_type;
     typedef void		upper_type;
+    typedef unsigned_type	mask_type;
     typedef int32_t		complementary_type;
     typedef complementary_type	complementary_mask_type;
 };
@@ -146,6 +156,8 @@ template <class T>
 using lower_type		= typename type_traits<T>::lower_type;
 template <class T>
 using upper_type		= typename type_traits<T>::upper_type;
+template <class T>
+using mask_type			= typename type_traits<T>::mask_type;
 template <class T>
 using complementary_type	= typename type_traits<T>::complementary_type;
 template <class T>

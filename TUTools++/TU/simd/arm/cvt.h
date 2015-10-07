@@ -17,7 +17,7 @@ namespace detail
 
 #define SIMD_COMBINE_SPLIT(type)					\
     SIMD_SPECIALIZED_FUNC(						\
-	vec<type> combine(half_type<type> x, half_type<type> y),	\
+	vec<type> combine<type>(half_type<type> x, half_type<type> y),	\
 	combine, (x, y), void, type)					\
     SIMD_SPECIALIZED_FUNC(half_type<type> split<0>(vec<type> x),	\
 			  get_low, (x), void, type)			\
@@ -112,7 +112,8 @@ SIMD_CVTF(u_int32_t, float)
 template <class S, class T> inline vec<S>
 cvt(vec<T> x, vec<T> y)
 {
-    return cast<S>(detail::combine(detail::cvtdown(x), detail::cvtdown(y)));
+    return cast<S>(detail::combine<lower_type<T> >(detail::cvtdown(x),
+						   detail::cvtdown(y)));
 }
 
 }	// namespace simd

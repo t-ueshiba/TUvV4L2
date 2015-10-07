@@ -55,7 +55,7 @@ doJob1(size_t winSize, int niter)
     in.restore(cin);
     
     ImageLine<value_type>	out(in.width());
-    Profiler			profiler(1);
+    Profiler<>			profiler(1);
     BoxFilter			box(winSize);
 
     for (int i = 0; i < 5; ++i)

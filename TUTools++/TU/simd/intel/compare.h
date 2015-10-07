@@ -10,11 +10,13 @@ namespace simd
 {
 // MMX, SSE, AVX2 には整数に対する cmplt ("less than") がない！
 #define SIMD_COMPARE(func, op, type)					\
-    SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x, vec<type> y),	\
-	    op, (x, y), void, type, SIMD_SIGNED)
+    SIMD_SPECIALIZED_FUNC(						\
+	vec<mask_type<type> > func(vec<type> x, vec<type> y),		\
+	op, (x, y), void, type, SIMD_SIGNED)
 #define SIMD_COMPARE_R(func, op, type)					\
-    SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x, vec<type> y),	\
-	    op, (y, x), void, type, SIMD_SIGNED)
+    SIMD_SPECIALIZED_FUNC(						\
+	vec<mask_type<type> > func(vec<type> x, vec<type> y),		\
+	op, (y, x), void, type, SIMD_SIGNED)
 #define SIMD_COMPARES(type)						\
     SIMD_COMPARE(  operator ==, cmpeq, type)				\
     SIMD_COMPARE(  operator >,  cmpgt, type)				\
@@ -34,8 +36,9 @@ SIMD_COMPARES(int32_t)
 
 #if defined(AVX)	// AVX の浮動小数点数比較演算子はパラメータ形式
 #  define SIMD_COMPARE_F(func, type, opcode)				\
-    SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x, vec<type> y),	\
-			  cmp, (x, y, opcode), void, type, SIMD_SUFFIX)
+    SIMD_SPECIALIZED_FUNC(						\
+	vec<mask_type<type> > func(vec<type> x, vec<type> y),		\
+	cmp, (x, y, opcode), void, type, SIMD_SUFFIX)
 #  define SIMD_COMPARES_F(type)						\
     SIMD_COMPARE_F(operator ==, type, _CMP_EQ_OQ)			\
     SIMD_COMPARE_F(operator >,  type, _CMP_GT_OS)			\
