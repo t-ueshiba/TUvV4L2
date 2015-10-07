@@ -139,7 +139,7 @@ namespace TU
 namespace simd
 {
 template <class T>
-using signed_type		= typename type_traits<T>::singed_type;
+using signed_type		= typename type_traits<T>::signed_type;
 template <class T>
 using unsigned_type		= typename type_traits<T>::unsigned_type;
 template <class T>

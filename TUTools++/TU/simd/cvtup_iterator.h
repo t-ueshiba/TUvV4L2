@@ -31,17 +31,14 @@ namespace detail
     private:
       typedef typename std::iterator_traits<ITER>::reference
 							reference;
-      typedef typename type_traits<element_type>::complementary_type
-							complementary_type;
+      typedef complementary_type<element_type>		complementary_type;
       typedef tuple_replace<value_type, vec<complementary_type> >
 							complementary_vec;
       typedef typename std::conditional<
 		  std::is_floating_point<element_type>::value,
 		  complementary_type,
 		  element_type>::type			integral_type;
-      typedef typename type_traits<
-		  typename type_traits<integral_type>::lower_type>
-		  ::unsigned_type			unsigned_lower_type;
+      typedef unsigned_type<lower_type<integral_type> >	unsigned_lower_type;
       typedef tuple_replace<value_type, vec<unsigned_lower_type> >
 							unsigned_lower_vec;
 	
@@ -80,9 +77,8 @@ namespace detail
       template <class OP_, class VEC_>
       void	cvtup(VEC_ x)
 		{
-		    typedef
-			typename tuple_head<VEC_>::element_type	S;
-		    typedef typename type_traits<S>::upper_type	upper_type;
+		    typedef upper_type<
+			typename tuple_head<VEC_>::element_type> upper_type;
 
 		    cvtup<OP_>(cvt<upper_type, 0>(x));
 		    cvtup<OP_>(cvt<upper_type, 1>(x));

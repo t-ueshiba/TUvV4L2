@@ -39,24 +39,21 @@ class cvtdown_mask_iterator
     typedef iterator_value<ITER>			elementary_vec;
     typedef typename tuple_head<elementary_vec>::element_type
 							element_type;
-    typedef typename type_traits<element_type>::complementary_mask_type
-							complementary_type;
+    typedef complementary_mask_type<element_type>	complementary_type;
     typedef tuple_replace<elementary_vec, vec<complementary_type> >
 							complementary_vec;
     typedef typename std::conditional<
-	std::is_floating_point<element_type>::value,
-	complementary_type, element_type>::type		integral_type;
+		std::is_floating_point<element_type>::value,
+		complementary_type, element_type>::type	integral_type;
     typedef tuple_replace<elementary_vec, vec<integral_type> >
 							integral_vec;
     typedef typename std::conditional<
-	std::is_signed<integral_type>::value,
-	typename type_traits<integral_type>::unsigned_type,
-	typename type_traits<integral_type>::signed_type>::type
-							flipped_type;
+		std::is_signed<integral_type>::value,
+		unsigned_type<integral_type>,
+		signed_type<integral_type> >::type	flipped_type;
     typedef tuple_replace<elementary_vec, vec<flipped_type> >
 							flipped_vec;
-    typedef typename type_traits<flipped_type>::lower_type
-							flipped_lower_type;
+    typedef lower_type<flipped_type>			flipped_lower_type;
     typedef tuple_replace<elementary_vec, vec<flipped_lower_type> >
 							flipped_lower_vec;
 
@@ -97,9 +94,10 @@ class cvtdown_mask_iterator
     template <class VEC_>
     void	cvtdown(VEC_& x)
 		{
-		    typedef
-			typename tuple_head<VEC_>::element_type	S;
-		    typedef typename type_traits<S>::upper_type	upper_type;
+		    typedef typename
+			tuple_head<VEC_>::element_type	S;
+		    typedef upper_type<S>		upper_type;
+		    
 		    tuple_replace<elementary_vec, vec<upper_type> >	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
