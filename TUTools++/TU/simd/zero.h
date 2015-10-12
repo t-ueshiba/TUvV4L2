@@ -14,7 +14,7 @@ namespace simd
 *  Zero-vector generators						*
 ************************************************************************/
 //! 全成分が0であるベクトルを生成する．
-template <class T> static vec<T>	zero()				;
+template <class T> vec<T>	zero()					;
     
 }	// namespace simd
 }	// namespace TU

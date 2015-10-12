@@ -185,6 +185,11 @@ SIMD_CONSTRUCTOR_1(u_int32_t)
 #undef SIMD_CONSTRUCTOR_16
 #undef SIMD_CONSTRUCTOR_32
 
+/************************************************************************
+*  Control functions							*
+************************************************************************/
+inline void	empty()	{ _mm_empty(); }
+
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_INTEL_VEC_H

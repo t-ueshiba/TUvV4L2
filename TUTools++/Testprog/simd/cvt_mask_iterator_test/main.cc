@@ -2,7 +2,10 @@
  *  $Id$
  */
 #include <iomanip>
-#include "TU/simd/simd.h"
+#include "TU/simd/cvtdown_mask_iterator.h"
+#include "TU/simd/cvtup_mask_iterator.h"
+#include "TU/simd/load_iterator.h"
+#include "TU/simd/store_iterator.h"
 
 namespace TU
 {
@@ -12,7 +15,6 @@ template <class SRC, class DST> void
 doJob()
 {
     using namespace	std;
-    using namespace	simd;
     
     typedef SRC						src_type;
     typedef DST						dst_type;
@@ -27,18 +29,18 @@ doJob()
 	diterator,
 	cvtup_mask_iterator<diterator> >::type		dst_iterator;
 
-    u_char	p[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-		       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-		       0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
-		       0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f};
+    src_type	src[] = {0, ~0, 0, ~0, 0, 0, ~0, ~0,
+			 0, 0, 0, 0, ~0, ~0, ~0, ~0,
+			 0, ~0, 0, ~0, 0, 0, ~0, ~0,
+			 0, 0, 0, 0, ~0, ~0, ~0, ~0};
     dst_type	dst[32];
-    size_t	n = sizeof(p)/sizeof(src_type);
-    
-    copy(src_iterator((const src_type*)p),
-	 src_iterator((const src_type*)p + n), dst_iterator(dst));
+    size_t	n = sizeof(src)/sizeof(src[0]);
+
+    copy(src_iterator(src), src_iterator(src + n),
+	 dst_iterator(dst));
 
     empty();
-    
+
     for (const dst_type* q = dst; q != dst + n; ++q)
 	cout << ' ' << setfill('0') << setw(2*sizeof(dst_type)) << hex
 	     << (u_int64_t(*q) & (u_int64_t(~0) >> (64 - 8*sizeof(dst_type))));
@@ -54,47 +56,11 @@ main()
     using namespace	std;
     using namespace	TU;
 
-    cerr << "--- src: int8_t, dst: singed ---" << endl;
-  //simd::doJob<int8_t,	 int8_t >();
-    simd::doJob<int8_t,	 int16_t>();
-    simd::doJob<int8_t,	 int32_t>();
-    simd::doJob<int8_t,	 int64_t>();
-
-    cerr << "--- src: int8_t, dst: unsinged ---" << endl;
-  //simd::doJob<int8_t,	 u_int8_t >();
-    simd::doJob<int8_t,	 u_int16_t>();
-    simd::doJob<int8_t,	 u_int32_t>();
-    simd::doJob<int8_t,	 u_int64_t>();
-
-    cerr << "--- src: u_int8_t, dst: singed ---" << endl;
-  //simd::doJob<u_int8_t,  int8_t >();
-    simd::doJob<u_int8_t,  int16_t>();
-    simd::doJob<u_int8_t,  int32_t>();
-    simd::doJob<u_int8_t,  int64_t>();
-
     cerr << "--- src: u_int8_t, dst: unsinged ---" << endl;
-  //simd::doJob<u_int8_t,  u_int8_t >();
+    simd::doJob<u_int8_t,  u_int8_t >();
     simd::doJob<u_int8_t,  u_int16_t>();
     simd::doJob<u_int8_t,  u_int32_t>();
     simd::doJob<u_int8_t,  u_int64_t>();
-
-    cerr << "--- src: int16_t, dst: singed ---" << endl;
-    simd::doJob<int16_t,   int8_t >();
-    simd::doJob<int16_t,   int16_t>();
-    simd::doJob<int16_t,   int32_t>();
-    simd::doJob<int16_t,   int64_t>();
-
-    cerr << "--- src: int16_t, dst: unsinged ---" << endl;
-    simd::doJob<int16_t,   u_int8_t >();
-    simd::doJob<int16_t,   u_int16_t>();
-    simd::doJob<int16_t,   u_int32_t>();
-    simd::doJob<int16_t,   u_int64_t>();
-
-    cerr << "--- src: u_int16_t, dst: singed ---" << endl;
-    simd::doJob<u_int16_t, int8_t >();
-    simd::doJob<u_int16_t, int16_t>();
-    simd::doJob<u_int16_t, int32_t>();
-    simd::doJob<u_int16_t, int64_t>();
 
     cerr << "--- src: u_int16_t, dst: unsinged ---" << endl;
     simd::doJob<u_int16_t, u_int8_t >();
@@ -102,70 +68,45 @@ main()
     simd::doJob<u_int16_t, u_int32_t>();
     simd::doJob<u_int16_t, u_int64_t>();
 
-    cerr << "--- src: int32_t, dst: singed ---" << endl;
-    simd::doJob<int32_t,   int8_t >();
-    simd::doJob<int32_t,   int16_t>();
-    simd::doJob<int32_t,   int32_t>();
-    simd::doJob<int32_t,   int64_t>();
-
-    cerr << "--- src: int32_t, dst: unsinged ---" << endl;
-    simd::doJob<int32_t,   u_int8_t >();
-    simd::doJob<int32_t,   u_int16_t>();
-    simd::doJob<int32_t,   u_int32_t>();
-    simd::doJob<int32_t,   u_int64_t>();
-
-    cerr << "--- src: u_int32_t, dst: singed ---" << endl;
-    simd::doJob<u_int32_t, int8_t >();
-    simd::doJob<u_int32_t, int16_t>();
-    simd::doJob<u_int32_t, int32_t>();
-    simd::doJob<u_int32_t, int64_t>();
-
     cerr << "--- src: u_int32_t, dst: unsinged ---" << endl;
     simd::doJob<u_int32_t, u_int8_t >();
     simd::doJob<u_int32_t, u_int16_t>();
-  //simd::doJob<u_int32_t, u_int32_t>();
+    simd::doJob<u_int32_t, u_int32_t>();
     simd::doJob<u_int32_t, u_int64_t>();
 
-    cerr << "--- src: int64_t ---" << endl;
-  //simd::doJob<int64_t,   int64_t>();
-    simd::doJob<int64_t,   u_int64_t>();
-    cerr << "--- src: u_int64_t ---" << endl;
-    simd::doJob<u_int64_t, int64_t>();
-  //simd::doJob<u_int64_t, u_int64_t>();
+    cerr << "--- src: u_int64_t, dst: unsinged ---" << endl;
+#if defined(NEON)
+    simd::doJob<u_int64_t, u_int8_t >();
+    simd::doJob<u_int64_t, u_int16_t>();
+    simd::doJob<u_int64_t, u_int32_t>();
+#endif
+    simd::doJob<u_int64_t, u_int64_t>();
+
+#if defined(SSE2) || defined(NEON)
+    cerr << "--- src: unsigned, dst: float ---" << endl;
+    simd::doJob<u_int8_t,  float>();
+    simd::doJob<u_int16_t, float>();
+#  if !defined(AVX) || defined(AVX2)
+    simd::doJob<u_int32_t, float>();
+#  endif
+    cerr << "--- src: float, dst: unsigned ---" << endl;
+    simd::doJob<float, u_int8_t >();
+    simd::doJob<float, u_int16_t>();
+#  if !defined(AVX) || defined(AVX2)
+    simd::doJob<float, u_int32_t>();
+#  endif
+#endif
 
 #if defined(SSE2)
-    simd::doJob<int8_t,    float    >();
-    simd::doJob<int16_t,   float    >();
+    cerr << "--- src: unsigned, dst: double ---" << endl;
+    simd::doJob<u_int8_t,  double>();
+    simd::doJob<u_int16_t, double>();
+    simd::doJob<u_int32_t, double>();
+#  if !defined(AVX) || defined(AVX2)
+    simd::doJob<u_int64_t, double>();
 
-    simd::doJob<u_int8_t,  float    >();
-    simd::doJob<u_int16_t, float    >();
-
-    simd::doJob<float,     int16_t  >();
-    simd::doJob<float,     int8_t   >();
-
-    simd::doJob<float,     u_int16_t>();
-    simd::doJob<float,     u_int8_t >();
-
-    simd::doJob<int8_t,    double   >();
-    simd::doJob<int16_t,   double   >();
-    simd::doJob<int32_t,   double   >();
-
-    simd::doJob<u_int8_t,  double   >();
-    simd::doJob<u_int16_t, double   >();
-    simd::doJob<u_int32_t, double   >();
-
-#  if defined(AVX2) || !defined(AVX)
-    simd::doJob<int32_t,   float    >();
-    simd::doJob<u_int32_t, float    >();
-
-    simd::doJob<float,     int32_t  >();
-    simd::doJob<float,     u_int32_t>();
-
-    simd::doJob<int64_t,   double   >();
-    simd::doJob<u_int64_t, double   >();
-
-    simd::doJob<double,    int64_t  >();
-    simd::doJob<double,    u_int64_t>();
+    cerr << "--- src: double, dst: unsigned ---" << endl;
+    simd::doJob<double, u_int64_t>();
 #  endif
 #endif
 

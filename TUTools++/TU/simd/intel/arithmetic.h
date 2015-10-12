@@ -101,19 +101,19 @@ SIMD_BINARY_FUNC(mulhi,      mulhi, int16_t)
 #undef SIMD_SAT_ADD_SUB
 #undef SIMD_MIN_MAX
 
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 operator *(T c, vec<T> x)
 {
     return vec<T>(c) * x;
 }
 
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 operator *(vec<T> x, T c)
 {
     return x * vec<T>(c);
 }
 
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 operator /(vec<T> x, T c)
 {
     return x / vec<T>(c);

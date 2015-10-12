@@ -18,16 +18,14 @@ namespace simd
   \param p	ロード元のメモリアドレス
   \return	ロードされたベクトル
 */
-template <bool ALIGNED=false, class T>
-static vec<T>	load(const T* p)					;
+template <bool ALIGNED=false, class T> vec<T>	load(const T* p)	;
 
 //! メモリにベクトルをストアする．
 /*!
   \param p	ストア先のメモリアドレス
   \param x	ストアされるベクトル
 */
-template <bool ALIGNED=false, class T>
-static void	store(T* p, vec<T> x)					;
+template <bool ALIGNED=false, class T> void	store(T* p, vec<T> x)	;
     
 }	// namespace simd
 }	// namespace TU

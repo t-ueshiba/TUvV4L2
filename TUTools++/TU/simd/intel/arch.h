@@ -12,13 +12,13 @@
 ************************************************************************/
 // alignr はSSSE3以降でのみサポートされるが，至便なのでemulationバージョンを定義
 #if !defined(SSSE3)
-  template <size_t N> static inline __m64
+  template <size_t N> inline __m64
   emu_alignr(__m64 y, __m64 x)
   {
       return _mm_or_si64(_mm_slli_si64(y, 8*(8 - N)), _mm_srli_si64(x, 8*N));
   }
 #  if defined(SSE2)
-  template <size_t N> static inline __m128i
+  template <size_t N> inline __m128i
   emu_alignr(__m128i y, __m128i x)
   {
       return _mm_or_si128(_mm_slli_si128(y, 16 - N), _mm_srli_si128(x, N));
@@ -29,19 +29,19 @@
 // AVX以降では alignr が上下のlaneに分断されて使いにくいので，自然なバージョンを定義
 #if defined(AVX)
 #  if defined(AVX2)
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_alignr_impl(__m256i y, __m256i x, std::true_type)
   {
       return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, y, 0x21), x, N);
   }
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_alignr_impl(__m256i y, __m256i x, std::false_type)
   {
       return _mm256_alignr_epi8(y, _mm256_permute2f128_si256(x, y, 0x21),
 				N - 16);
   }
 #  else
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_alignr_impl(__m256i y, __m256i x, std::true_type)
   {
       return _mm256_insertf128_si256(
@@ -56,7 +56,7 @@
 				 N),
 		 0x1);
   }
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_alignr_impl(__m256i y, __m256i x, std::false_type)
   {
       return _mm256_insertf128_si256(
@@ -72,7 +72,7 @@
 		 0x1);
   }
 #  endif
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_alignr(__m256i y, __m256i x)
   {
       return emu_alignr_impl<N>(y, x, std::integral_constant<bool, (N < 16)>());
@@ -83,26 +83,26 @@
 // 自然なバージョンを定義
 #if defined(AVX)
 #  if defined(AVX2)
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_srli(__m256i x)
   {
       return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x81), x, N);
   }
 
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_slli_impl(__m256i x, std::true_type)
   {
       return _mm256_alignr_epi8(x, _mm256_permute2f128_si256(x, x, 0x08),
 				16 - N);
   }
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_slli_impl(__m256i x, std::false_type)
   {
       return _mm256_alignr_epi8(_mm256_permute2f128_si256(x, x, 0x08),
 				_mm256_setzero_si256(), 32 - N);
   }
 #  else
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_srli(__m256i x)
   {
       __m128i	y = _mm256_extractf128_si256(x, 0x1);
@@ -115,7 +115,7 @@
 		 0x1);
   }
 
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_slli_impl(__m256i x, std::true_type)
   {
       __m128i	y = _mm256_extractf128_si256(x, 0x0);
@@ -126,7 +126,7 @@
 		 _mm_alignr_epi8(_mm256_extractf128_si256(x, 0x1), y, 16 - N),
 		 0x1);
   }
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_slli_impl(__m256i x, std::false_type)
   {
       __m128i	y = _mm256_extractf128_si256(x, 0x0);
@@ -137,7 +137,7 @@
 		 0x1);
   }
 #  endif
-  template <size_t N> static inline __m256i
+  template <size_t N> inline __m256i
   emu_slli(__m256i x)
   {
       return emu_slli_impl<N>(x, std::integral_constant<bool, (N < 16)>());
@@ -266,10 +266,6 @@
 #define SIMD_SIGNED_FUNC(func, op, type)				\
     SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x, vec<type> y),	\
 			  op, (x, y), void, type, SIMD_SIGNED)
-
-#define SIMD_BASE_FUNC(func, op, type)					\
-    SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x, vec<type> y),	\
-			  op, (x, y), void, type, SIMD_BASE)
 
 #define SIMD_UNARY_FUNC(func, op, type)					\
     SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x),			\

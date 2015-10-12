@@ -4,14 +4,17 @@
 #if !defined(__TU_SIMD_INTEL_SELECT_H)
 #define __TU_SIMD_INTEL_SELECT_H
 
+#include "TU/simd/intel/logical_base.h"
+
 namespace TU
 {
 namespace simd
 {
 template <class T> inline vec<T>
-select(vec<T> mask, vec<T> x, vec<T> y)
+select(vec<mask_type<T> > mask, vec<T> x, vec<T> y)
 {
-    return (mask & x) | andnot(mask, y);
+    return detail::base_or(detail::base_and(mask, x),
+			   detail::base_andnot(mask, y));
 }
     
 #if defined(SSE4)

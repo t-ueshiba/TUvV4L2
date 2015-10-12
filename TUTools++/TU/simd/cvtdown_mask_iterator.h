@@ -29,33 +29,19 @@ class cvtdown_mask_iterator
 		 tuple_replace<iterator_value<ITER>, vec<T> > >
 {
   private:
+    typedef iterator_value<ITER>			elementary_vec;
     typedef boost::iterator_adaptor<
 		cvtdown_mask_iterator,
 		ITER,
-		tuple_replace<iterator_value<ITER>, vec<T> >,
+		tuple_replace<elementary_vec, vec<T> >,
 		boost::single_pass_traversal_tag,
-		tuple_replace<iterator_value<ITER>, vec<T> > >
+		tuple_replace<elementary_vec, vec<T> > >
 							super;
-    typedef iterator_value<ITER>			elementary_vec;
     typedef typename tuple_head<elementary_vec>::element_type
 							element_type;
     typedef complementary_mask_type<element_type>	complementary_type;
     typedef tuple_replace<elementary_vec, vec<complementary_type> >
 							complementary_vec;
-    typedef typename std::conditional<
-		std::is_floating_point<element_type>::value,
-		complementary_type, element_type>::type	integral_type;
-    typedef tuple_replace<elementary_vec, vec<integral_type> >
-							integral_vec;
-    typedef typename std::conditional<
-		std::is_signed<integral_type>::value,
-		unsigned_type<integral_type>,
-		signed_type<integral_type> >::type	flipped_type;
-    typedef tuple_replace<elementary_vec, vec<flipped_type> >
-							flipped_vec;
-    typedef lower_type<flipped_type>			flipped_lower_type;
-    typedef tuple_replace<elementary_vec, vec<flipped_lower_type> >
-							flipped_lower_vec;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -77,19 +63,6 @@ class cvtdown_mask_iterator
 		    elementary_vec	y;
 		    cvtdown(y);
 		    x = cvt_mask<complementary_type>(y);
-		}
-    void	cvtdown(flipped_vec& x)
-		{
-		    integral_vec	y;
-		    cvtdown(y);
-		    x = cvt_mask<flipped_type>(y);
-		}
-    void	cvtdown(flipped_lower_vec& x)
-		{
-		    integral_vec	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt_mask<flipped_lower_type>(y, z);
 		}
     template <class VEC_>
     void	cvtdown(VEC_& x)

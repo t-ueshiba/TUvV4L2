@@ -432,33 +432,20 @@ namespace simd
 	  tuple_replace<elementary_vec, vec<T> >,
 	  boost::single_pass_traversal_tag,
 	  tuple_replace<elementary_vec, vec<T> > >	super;
-      typedef typename type_traits<element_type>::complementary_mask_type
+      typedef simd::mask_type<element_type>		mask_type;
+      typedef tuple_replace<elementary_vec, vec<mask_type> >
+							mask_vec;
+      typedef simd::mask_type<simd::complementary_type<element_type> >
 							complementary_type;
-      typedef tuple_replace<elementary_vec, vec<complementary_type> >
+      typedef tuple_replace<mask_vec, vec<complementary_type> >
 							complementary_vec;
-      typedef typename std::conditional<
-	  std::is_floating_point<element_type>::value,
-	  complementary_type, element_type>::type	integral_type;
-      typedef tuple_replace<elementary_vec, vec<integral_type> >
-							integral_vec;
-      typedef typename std::conditional<
-	  std::is_signed<integral_type>::value,
-	  typename type_traits<integral_type>::unsigned_type,
-	  typename type_traits<integral_type>::signed_type>::type
-							flipped_type;
-      typedef tuple_replace<elementary_vec, vec<flipped_type> >
-							flipped_vec;
-      typedef typename type_traits<flipped_type>::lower_type
-							flipped_lower_type;
-      typedef tuple_replace<elementary_vec, vec<flipped_lower_type> >
-							flipped_lower_vec;
 #  endif
       template <class T_, size_t I_=vec<T_>::size/2> static inline int
       minIdx(vec<T_> d, vec<T_> x,
 	     std::integral_constant<size_t, I_>
 	     dummy=std::integral_constant<size_t, I_>())
       {
-	  const vec<T_>	y = shift_r<I_>(x);
+	  const auto	y = shift_r<I_>(x);
 	  return minIdx<T_>(select(x < y, d, shift_r<I_>(d)), min(x, y),
 			    std::integral_constant<size_t, I_/2>());
       }
@@ -496,15 +483,15 @@ namespace simd
       template <class VEC_>
       void	setRMost(element_type val, VEC_& x)
 		{
-		    vec<element_type>	next = set_rmost<element_type>(val);
+		    const auto	next = set_rmost<element_type>(val);
 		    x = boost::make_tuple(next, next);
 		}
 
     // mask と mask tuple に対するupdate
-      void	update(vec<element_type> R, vec<element_type>& x)
+      void	update(vec<element_type> R, vec<mask_type>& x)
 		{
-		    vec<element_type>	RminR  = _RminRV();
-		    vec<element_type>	minval = min(R, RminR);
+		    const auto	RminR  = _RminRV();
+		    const auto	minval = min(R, RminR);
 		    *_RminRV = shift_l<1>(minval) | _nextRV;
 		    ++_RminRV;
 		    _nextRV  = shift_lmost_to_rmost(minval);
@@ -516,11 +503,10 @@ namespace simd
 		{
 		    using namespace	boost;
 
-		    vec<element_type>
-			RminR = get<0>(_RminRV.get_iterator_tuple())(),
-			RminV = get<1>(_RminRV.get_iterator_tuple())();
-		    vec<element_type>	minvalR = min(R, RminR),
-					minvalV = min(R, RminV);
+		    const auto	RminR = get<0>(_RminRV.get_iterator_tuple())();
+		    const auto	RminV = get<1>(_RminRV.get_iterator_tuple())();
+		    const auto	minvalR = min(R, RminR);
+		    const auto	minvalV = min(R, RminV);
 		    *_RminRV = make_tuple(
 				   shift_l<1>(minvalR) | get<0>(_nextRV),
 				   shift_l<1>(minvalV) | get<1>(_nextRV));
@@ -531,9 +517,9 @@ namespace simd
 		    x = make_tuple(R < RminR, R < RminV);
 		}
 
-      void	cvtdown(elementary_vec& x)
+      void	cvtdown(mask_vec& x)
 		{
-		    vec<element_type>	R = *super::base();
+		    const auto	R = *super::base();
 		    ++super::base_reference();
 
 		    _dminL = select(R < _RminL, _index, _dminL);
@@ -545,31 +531,18 @@ namespace simd
 #  if !defined(WITHOUT_CVTDOWN)
       void	cvtdown(complementary_vec& x)
 		{
-		    elementary_vec	y;
+		    mask_vec	y;
 		    cvtdown(y);
 		    x = cvt_mask<complementary_type>(y);
-		}
-      void	cvtdown(flipped_vec& x)
-		{
-		    integral_vec	y;
-		    cvtdown(y);
-		    x = cvt_mask<flipped_type>(y);
-		}
-      void	cvtdown(flipped_lower_vec& x)
-		{
-		    integral_vec	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt_mask<flipped_lower_type>(y, z);
 		}
       template <class VEC_>
       void	cvtdown(VEC_& x)
 		{
 		    typedef
 			typename tuple_head<VEC_>::element_type	S;
-		    typedef typename type_traits<S>::upper_type	upper_type;
+		    typedef simd::upper_type<S>			upper_type;
 		    
-		    tuple_replace<elementary_vec, vec<upper_type> >	y, z;
+		    tuple_replace<mask_vec, vec<upper_type> >	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
 		    x = cvt_mask<S>(y, z);
@@ -602,7 +575,8 @@ namespace simd
 #  endif
 
   template <class T> inline simd::vec<T>
-  fast_select(simd::vec<T> mask, simd::vec<T> index, simd::vec<T> dminRV)
+  fast_select(simd::vec<mask_type<T> > mask,
+	      simd::vec<T> index, simd::vec<T> dminRV)
   {
       return select(mask, index, dminRV);
   }

@@ -1068,7 +1068,7 @@ class Array2 : public Array<T, R>
 
 			    return align(a, simd::is_vec<S>());
 #else
-			    return align(a, false_type());
+			    return align(a, std::false_type());
 #endif
 			}
     static size_t	align(size_t, std::true_type)

@@ -1,7 +1,10 @@
 /*
  *  $Id$
  */
-#include "TU/simd/simd.h"
+#include "TU/simd/cvtdown_iterator.h"
+#include "TU/simd/cvtup_iterator.h"
+#include "TU/simd/load_iterator.h"
+#include "TU/simd/store_iterator.h"
 
 namespace TU
 {
@@ -11,7 +14,6 @@ template <class SRC, class DST> void
 doJob()
 {
     using namespace	std;
-    using namespace	simd;
     
     typedef SRC						src_type;
     typedef DST						dst_type;
@@ -61,7 +63,7 @@ main()
     simd::doJob<int32_t, int16_t  >();
     simd::doJob<int32_t, int32_t  >();
     simd::doJob<int32_t, u_int8_t >();
-#if defined(SSE4)
+#if defined(SSE4) || defined(NEON)
     simd::doJob<int32_t, u_int16_t>();
 #endif
     simd::doJob<u_int8_t,  int16_t  >();
@@ -76,8 +78,8 @@ main()
 
     simd::doJob<u_int32_t, u_int32_t>();
 
-#if defined(SSE2)
-#  if defined(SSE4)			// 要 vec<int32_t> -> vec<int64_t>
+#if defined(SSE2) || defined(NEON)
+#  if defined(SSE4) || defined(NEON)	// 要 vec<int32_t> -> vec<int64_t>
     simd::doJob<int8_t,    int64_t>();
     simd::doJob<int16_t,   int64_t>();
     simd::doJob<int32_t,   int64_t>();
@@ -90,7 +92,7 @@ main()
     simd::doJob<u_int32_t, u_int64_t>();
 #endif
 
-#if defined(SSE)
+#if defined(SSE) || defined(NEON)
     simd::doJob<int8_t,    float    >();
     simd::doJob<float,     int8_t   >();
     simd::doJob<int16_t,   float    >();

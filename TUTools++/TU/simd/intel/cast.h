@@ -10,7 +10,7 @@ namespace simd
 {
 namespace detail
 {
-  template <class S, class T> static S	cast_base(T x)			;
+  template <class S, class T> S	cast_base(T x)				;
 
   /*
    *  cast_base() の実装

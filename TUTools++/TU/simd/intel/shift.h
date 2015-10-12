@@ -91,53 +91,53 @@ SIMD_ELM_SHIFTS_I(u_int64_t)
 
 // 浮動小数点数ベクトルの要素シフト
 #if !defined(AVX2) && defined(AVX)
-  template <size_t N> static inline F32vec
+  template <size_t N> inline F32vec
   shift_l(F32vec x)
   {
       return _mm256_castsi256_ps(
 		 emu_slli<N*F32vec::element_size>(_mm256_castps_si256(x)));
   }
 
-  template <size_t N> static inline F32vec
+  template <size_t N> inline F32vec
   shift_r(F32vec x)
   {
       return _mm256_castsi256_ps(
 		 emu_srli<N*F32vec::element_size>(_mm256_castps_si256(x)));
   }
 
-  template <size_t N> static inline F64vec
+  template <size_t N> inline F64vec
   shift_l(F64vec x)
   {
       return _mm256_castsi256_pd(
 		 emu_slli<N*F64vec::element_size>(_mm256_castpd_si256(x)));
   }
 
-  template <size_t N> static inline F64vec
+  template <size_t N> inline F64vec
   shift_r(F64vec x)
   {
       return _mm256_castsi256_pd(
 		 emu_srli<N*F64vec::element_size>(_mm256_castpd_si256(x)));
   }
 #elif defined(SSE2)
-  template <size_t N> static inline F32vec
+  template <size_t N> inline F32vec
   shift_l(F32vec x)
   {
       return cast<float>(shift_l<N>(cast<u_int32_t>(x)));
   }
 
-  template <size_t N> static inline F32vec
+  template <size_t N> inline F32vec
   shift_r(F32vec x)
   {
       return cast<float>(shift_r<N>(cast<u_int32_t>(x)));
   }
 
-  template <size_t N> static inline F64vec
+  template <size_t N> inline F64vec
   shift_l(F64vec x)
   {
       return cast<double>(shift_l<N>(cast<u_int64_t>(x)));
   }
 
-  template <size_t N> static inline F64vec
+  template <size_t N> inline F64vec
   shift_r(F64vec x)
   {
       return cast<double>(shift_r<N>(cast<u_int64_t>(x)));

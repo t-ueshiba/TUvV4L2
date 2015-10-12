@@ -29,7 +29,7 @@
  */
 #include <GL/gl.h>
 #include "DrawThreeD.h"
-#include "TU/mmInstructions.h"
+#include "TU/simd/simd.h"
 
 namespace TU
 {
@@ -182,7 +182,7 @@ DrawThreeD::draw(const Image<D>& disparityMap, const Image<T>& image,
 
 //#if defined(SSE2)
 #if 0
-    using namespace	mm;
+    using namespace	simd;
     
     const F32vec	textureWidthHeight(image.height(), image.width(),
 					   image.height(), image.width());
@@ -251,7 +251,7 @@ DrawThreeD::draw(const Image<D>& disparityMap, const Image<T>& image,
     }
 //#if defined(SSE2)
 #if 0
-    mm::empty();
+    simd::empty();
 #endif
 
     drawCursor();

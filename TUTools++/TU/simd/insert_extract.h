@@ -19,7 +19,7 @@ namespace simd
   \param x	ベクトル
   \return	成分を挿入されたベクトル
 */
-template <size_t I, class T> static vec<T> insert(vec<T> x, int val)	;
+template <size_t I, class T> vec<T>	insert(vec<T> x, int val)	;
 
 //! ベクトルから指定された位置から成分を取り出す．
 /*!
@@ -27,7 +27,7 @@ template <size_t I, class T> static vec<T> insert(vec<T> x, int val)	;
   \param x	ベクトル
   \return	取り出された成分
 */
-template <size_t I, class T> static int	   extract(vec<T> x)		;
+template <size_t I, class T> int	extract(vec<T> x)		;
 
 }	// namespace simd
 }	// namespace TU

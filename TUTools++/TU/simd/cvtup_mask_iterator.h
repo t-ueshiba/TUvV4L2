@@ -34,18 +34,6 @@ namespace detail
       typedef complementary_mask_type<element_type>	complementary_type;
       typedef tuple_replace<value_type, vec<complementary_type> >
 							complementary_vec;
-      typedef typename std::conditional<
-	  std::is_floating_point<element_type>::value,
-	  complementary_type, element_type>::type	integral_type;
-      typedef typename std::conditional<
-	  std::is_signed<integral_type>::value,
-	  unsigned_type<integral_type>,
-	  signed_type<integral_type> >::type		flipped_type;
-      typedef tuple_replace<value_type, vec<flipped_type> >
-							flipped_vec;
-      typedef lower_type<flipped_type>			flipped_lower_type;
-      typedef tuple_replace<value_type, vec<flipped_lower_type> >
-							flipped_lower_vec;
 	
     private:
       template <class OP_>
@@ -58,17 +46,6 @@ namespace detail
       void	cvtup(complementary_vec x)
 		{
 		    cvtup<OP_>(cvt_mask<element_type>(x));
-		}
-      template <class OP_>
-      void	cvtup(flipped_vec x)
-		{
-		    cvtup<OP_>(cvt_mask<integral_type>(x));
-		}
-      template <class OP_>
-      void	cvtup(flipped_lower_vec x)
-		{
-		    cvtup<OP_>(cvt_mask<integral_type, 0>(x));
-		    cvtup<OP_>(cvt_mask<integral_type, 1>(x));
 		}
       template <class OP_, class VEC_>
       void	cvtup(VEC_ x)

@@ -5,6 +5,8 @@
 #define	__TU_SIMD_CVT_H
 
 #include "TU/simd/zero.h"
+#include "TU/simd/cast.h"
+#include "TU/simd/bit_shift.h"
 
 namespace TU
 {
@@ -13,14 +15,14 @@ namespace simd
 /************************************************************************
 *  Type conversion operators						*
 ************************************************************************/
-//! T型ベクトルのI番目の部分をS型ベクトルに型変換する．
+//! T型ベクトルのI番目の部分をより大きなS型ベクトルに型変換する．
 /*!
   整数ベクトル間の変換の場合，SのサイズはTの2/4/8倍である．また，S, Tは
   符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class S, size_t I=0, class T> static inline vec<S>
+template <class S, size_t I=0, class T> inline vec<S>
 cvt(vec<T> x)
 {
     return cvt<S, (I&0x1)>(cvt<lower_type<S>, (I>>1)>(x));
@@ -35,7 +37,7 @@ cvt(vec<T> x)
   \return	xが変換されたものを下位，yが変換されたものを上位に
 		配したベクトル
 */
-template <class S, class T> static vec<S>	cvt(vec<T> x, vec<T> y)	;
+template <class S, class T> vec<S>	cvt(vec<T> x, vec<T> y)		;
 
 namespace detail
 {
@@ -59,14 +61,14 @@ namespace detail
   };
 }	// namespace detail
     
-template <class S, size_t I=0, class HEAD, class TAIL> static inline auto
+template <class S, size_t I=0, class HEAD, class TAIL> inline auto
 cvt(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(x, detail::generic_cvt<S, I>()))
 {
     return boost::tuples::cons_transform(x, detail::generic_cvt<S, I>());
 }
     
-template <class S, class H1, class T1, class H2, class T2> static inline auto
+template <class S, class H1, class T1, class H2, class T2> inline auto
 cvt(const boost::tuples::cons<H1, T1>& x, const boost::tuples::cons<H2, T2>& y)
     -> decltype(boost::tuples::cons_transform(x, y,
 					      detail::generic_cvt<S, 0>()))

@@ -21,7 +21,7 @@ namespace simd
   \param y	上位のベクトル
   \return	シフトされたベクトル
 */
-template <size_t N, class T> static vec<T>
+template <size_t N, class T> vec<T>
 shift_r(vec<T> x, vec<T> y)
 {
     typedef complementary_type<T>	C;
@@ -39,7 +39,7 @@ shift_r(vec<T> x, vec<T> y)
   \param x	シフトされるベクトル
   \return	シフトされたベクトル
 */
-template <size_t N, class T> static vec<T>
+template <size_t N, class T> vec<T>
 shift_l(vec<T> x)
 {
     return shift_r<vec<T>::size - N>(zero<T>(), x);
@@ -55,7 +55,7 @@ namespace detail
   };
 }
     
-template <size_t N, class HEAD, class TAIL> static inline auto
+template <size_t N, class HEAD, class TAIL> inline auto
 shift_l(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_l<N>()))
 {
@@ -69,7 +69,7 @@ shift_l(const boost::tuples::cons<HEAD, TAIL>& x)
   \param x	シフトされるベクトル
   \return	シフトされたベクトル
 */
-template <size_t N, class T> static vec<T>
+template <size_t N, class T> vec<T>
 shift_r(vec<T> x)
 {
     return shift_r<N>(x, zero<T>());
@@ -85,7 +85,7 @@ namespace detail
   };
 }
     
-template <size_t N, class HEAD, class TAIL> static inline auto
+template <size_t N, class HEAD, class TAIL> inline auto
 shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_r<N>()))
 {
@@ -101,7 +101,7 @@ shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
   \param x	シフトされるベクトル
   \return	シフトされたベクトル
 */
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 shift_lmost_to_rmost(vec<T> x)
 {
     return shift_r<vec<T>::size-1>(x);
@@ -113,7 +113,7 @@ shift_lmost_to_rmost(vec<T> x)
   \param x	シフトされるベクトル
   \return	シフトされたベクトル
 */
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 shift_rmost_to_lmost(vec<T> x)
 {
     return shift_l<vec<T>::size-1>(x);
@@ -124,7 +124,7 @@ shift_rmost_to_lmost(vec<T> x)
   \param x	セットされる値
   \return	xを右端成分とするベクトル
 */
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 set_rmost(T x)
 {
     return shift_lmost_to_rmost(vec<T>(x));
@@ -145,7 +145,7 @@ namespace detail
   };
 }
     
-template <class HEAD, class TAIL> static inline auto
+template <class HEAD, class TAIL> inline auto
 shift_lmost_to_rmost(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(
 	boost::tuples::cons_transform(
@@ -155,7 +155,7 @@ shift_lmost_to_rmost(const boost::tuples::cons<HEAD, TAIL>& x)
 	       x, detail::generic_shift_lmost_to_rmost());
 }
     
-template <class HEAD, class TAIL> static inline auto
+template <class HEAD, class TAIL> inline auto
 shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(
 	boost::tuples::cons_transform(
@@ -169,14 +169,14 @@ shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
 *  Rotation and reverse operators					*
 ************************************************************************/
 //! ベクトルの左回転を行なう．
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 rotate_l(vec<T> x)
 {
     return shift_r<vec<T>::size-1>(x, x);
 }
 
 //! ベクトルの右回転を行なう．
-template <class T> static inline vec<T>
+template <class T> inline vec<T>
 rotate_r(vec<T> x)
 {
     return shift_r<1>(x, x);

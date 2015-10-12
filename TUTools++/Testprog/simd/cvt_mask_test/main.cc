@@ -2,7 +2,9 @@
  *  $Id$
  */
 #include <iomanip>
-#include "TU/simd/simd.h"
+#include "TU/simd/cvt_mask.h"
+#include "TU/simd/load_store.h"
+#include "TU/simd/compare.h"
 
 namespace TU
 {
@@ -42,10 +44,9 @@ template <class SRC, class DST> void
 doJob()
 {
     using namespace	std;
-    using namespace	simd;
     
-    typedef SRC						src_type;
-    typedef DST						dst_type;
+    typedef SRC		src_type;
+    typedef DST		dst_type;
 
     u_char	src[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 			 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -67,10 +68,9 @@ template <class SRC> void
 doJobF()
 {
     using namespace	std;
-    using namespace	simd;
     
-    typedef SRC							src_type;
-    typedef typename type_traits<SRC>::complementary_mask_type	dst_type;
+    typedef SRC					src_type;
+    typedef complementary_mask_type<SRC>	dst_type;
 
     src_type	a[] = {0,  0, 0, 0,  0,  0, 0, 0};
     src_type	b[] = {1, -1, 1, 1, -1, -1, 1, 1};
@@ -94,15 +94,15 @@ main()
     using namespace	std;
     using namespace	TU;
     
-    simd::doJob<u_int8_t,  u_int16_t>();
-    simd::doJob<u_int8_t,  u_int32_t>();
-    simd::doJob<u_int8_t,  u_int64_t>();
+    simd::doJob<u_int8_t, u_int16_t>();
+    simd::doJob<u_int8_t, u_int32_t>();
+    simd::doJob<u_int8_t, u_int64_t>();
 
-#if defined(SSE2)
+#if defined(SSE2) || defined(NEON)
     simd::doJobF<float>();
-#  if defined(AVX2) || !defined(AVX)
+#endif
+#if defined(SSE2)
     simd::doJobF<double>();
-#  endif
 #endif
     
     return 0;
