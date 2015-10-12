@@ -13,13 +13,12 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DNEON
+CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
-NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DAVX2
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -40,70 +39,25 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/functional.h \
-		../../../TU/iterator.h \
-		../../../TU/simd/allocator.h \
-		../../../TU/simd/arithmetic.h \
-		../../../TU/simd/arm/allocator.h \
 		../../../TU/simd/arm/arch.h \
-		../../../TU/simd/arm/arithmetic.h \
-		../../../TU/simd/arm/bit_shift.h \
-		../../../TU/simd/arm/cast.h \
 		../../../TU/simd/arm/compare.h \
-		../../../TU/simd/arm/cvt.h \
 		../../../TU/simd/arm/cvt_mask.h \
-		../../../TU/simd/arm/insert_extract.h \
 		../../../TU/simd/arm/load_store.h \
-		../../../TU/simd/arm/logical.h \
-		../../../TU/simd/arm/misc.h \
-		../../../TU/simd/arm/select.h \
-		../../../TU/simd/arm/shift.h \
 		../../../TU/simd/arm/type_traits.h \
 		../../../TU/simd/arm/vec.h \
-		../../../TU/simd/arm/zero.h \
-		../../../TU/simd/bit_shift.h \
-		../../../TU/simd/cast.h \
 		../../../TU/simd/compare.h \
-		../../../TU/simd/cvt.h \
+		../../../TU/simd/config.h \
 		../../../TU/simd/cvt_mask.h \
-		../../../TU/simd/cvtdown_iterator.h \
-		../../../TU/simd/cvtdown_mask_iterator.h \
-		../../../TU/simd/cvtup_iterator.h \
-		../../../TU/simd/cvtup_mask_iterator.h \
-		../../../TU/simd/insert_extract.h \
-		../../../TU/simd/intel/allocator.h \
 		../../../TU/simd/intel/arch.h \
-		../../../TU/simd/intel/arithmetic.h \
-		../../../TU/simd/intel/bit_shift.h \
 		../../../TU/simd/intel/cast.h \
 		../../../TU/simd/intel/compare.h \
-		../../../TU/simd/intel/cvt.h \
 		../../../TU/simd/intel/cvt_mask.h \
-		../../../TU/simd/intel/dup.h \
-		../../../TU/simd/intel/insert_extract.h \
 		../../../TU/simd/intel/load_store.h \
-		../../../TU/simd/intel/logical.h \
-		../../../TU/simd/intel/misc.h \
-		../../../TU/simd/intel/select.h \
-		../../../TU/simd/intel/shift.h \
-		../../../TU/simd/intel/shuffle.h \
-		../../../TU/simd/intel/svml.h \
 		../../../TU/simd/intel/type_traits.h \
-		../../../TU/simd/intel/unpack.h \
 		../../../TU/simd/intel/vec.h \
-		../../../TU/simd/intel/zero.h \
-		../../../TU/simd/load_iterator.h \
 		../../../TU/simd/load_store.h \
-		../../../TU/simd/logical.h \
-		../../../TU/simd/misc.h \
-		../../../TU/simd/row_vec_iterator.h \
-		../../../TU/simd/select.h \
-		../../../TU/simd/shift.h \
-		../../../TU/simd/shift_iterator.h \
-		../../../TU/simd/simd.h \
-		../../../TU/simd/store_iterator.h \
 		../../../TU/simd/type_traits.h \
 		../../../TU/simd/vec.h \
-		../../../TU/simd/zero.h \
 		../../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
@@ -115,38 +69,14 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/simd/simd.h ../../../TU/simd/vec.h ../../../TU/tuple.h \
-	../../../TU/functional.h ../../../TU/simd/type_traits.h \
+main.o: ../../../TU/simd/cvt_mask.h ../../../TU/simd/vec.h \
+	../../../TU/tuple.h ../../../TU/functional.h \
+	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/intel/type_traits.h \
 	../../../TU/simd/arm/type_traits.h ../../../TU/simd/intel/vec.h \
 	../../../TU/simd/intel/arch.h ../../../TU/simd/arm/vec.h \
-	../../../TU/simd/arm/arch.h ../../../TU/simd/allocator.h \
-	../../../TU/simd/intel/allocator.h ../../../TU/simd/arm/allocator.h \
+	../../../TU/simd/arm/arch.h ../../../TU/simd/intel/cvt_mask.h \
+	../../../TU/simd/intel/cast.h ../../../TU/simd/arm/cvt_mask.h \
 	../../../TU/simd/load_store.h ../../../TU/simd/intel/load_store.h \
-	../../../TU/simd/arm/load_store.h ../../../TU/simd/zero.h \
-	../../../TU/simd/intel/zero.h ../../../TU/simd/arm/zero.h \
-	../../../TU/simd/cast.h ../../../TU/simd/intel/cast.h \
-	../../../TU/simd/arm/cast.h ../../../TU/simd/insert_extract.h \
-	../../../TU/simd/intel/insert_extract.h \
-	../../../TU/simd/arm/insert_extract.h ../../../TU/simd/shift.h \
-	../../../TU/simd/intel/shift.h ../../../TU/simd/arm/shift.h \
-	../../../TU/simd/bit_shift.h ../../../TU/simd/intel/bit_shift.h \
-	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/cvt.h \
-	../../../TU/simd/intel/cvt.h ../../../TU/simd/intel/dup.h \
-	../../../TU/simd/intel/unpack.h ../../../TU/simd/arm/cvt.h \
-	../../../TU/simd/cvt_mask.h ../../../TU/simd/intel/cvt_mask.h \
-	../../../TU/simd/arm/cvt_mask.h ../../../TU/simd/logical.h \
-	../../../TU/simd/intel/logical.h ../../../TU/simd/arm/logical.h \
-	../../../TU/simd/compare.h ../../../TU/simd/intel/compare.h \
-	../../../TU/simd/arm/compare.h ../../../TU/simd/select.h \
-	../../../TU/simd/intel/select.h ../../../TU/simd/arm/select.h \
-	../../../TU/simd/arithmetic.h ../../../TU/simd/intel/arithmetic.h \
-	../../../TU/simd/arm/arithmetic.h ../../../TU/simd/misc.h \
-	../../../TU/simd/intel/misc.h ../../../TU/simd/intel/shuffle.h \
-	../../../TU/simd/intel/svml.h ../../../TU/simd/arm/misc.h \
-	../../../TU/simd/load_iterator.h ../../../TU/iterator.h \
-	../../../TU/simd/store_iterator.h ../../../TU/simd/cvtdown_iterator.h \
-	../../../TU/simd/cvtup_iterator.h \
-	../../../TU/simd/cvtdown_mask_iterator.h \
-	../../../TU/simd/cvtup_mask_iterator.h \
-	../../../TU/simd/shift_iterator.h ../../../TU/simd/row_vec_iterator.h
+	../../../TU/simd/arm/load_store.h ../../../TU/simd/compare.h \
+	../../../TU/simd/intel/compare.h ../../../TU/simd/arm/compare.h

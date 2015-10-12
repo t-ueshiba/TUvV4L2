@@ -29,15 +29,13 @@ class cvtdown_iterator
 		 tuple_replace<iterator_value<ITER>, vec<T> > >
 {
   private:
-    typedef boost::iterator_adaptor<
-		cvtdown_iterator,
-		ITER,
-		tuple_replace<iterator_value<ITER>, vec<T> >,
-		boost::single_pass_traversal_tag,
-		tuple_replace<iterator_value<ITER>, vec<T> > >
-							super;
     typedef iterator_value<ITER>			elementary_vec;
-
+    typedef boost::iterator_adaptor<
+	cvtdown_iterator,
+	ITER,
+	tuple_replace<elementary_vec, vec<T> >,
+	boost::single_pass_traversal_tag,
+	tuple_replace<elementary_vec, vec<T> > >	super;
     typedef typename tuple_head<elementary_vec>::element_type
 							element_type;
     typedef simd::complementary_type<element_type>	complementary_type;
@@ -84,11 +82,12 @@ class cvtdown_iterator
 		{
 		    typedef typename
 			tuple_head<VEC_>::element_type	S;
-		    typedef upper_type<S>		upper_type;
+		    typedef simd::upper_type<S>		upper_type;
 		    typedef typename
-			std::conditional<std::is_floating_point<S>::value,
-					 upper_type,
-					 signed_type<upper_type> >::type
+			std::conditional<
+			    std::is_floating_point<S>::value,
+			    upper_type,
+			    simd::signed_type<upper_type> >::type
 							signed_upper_type;
 		    
 		    tuple_replace<elementary_vec, vec<signed_upper_type> > y, z;

@@ -17,7 +17,7 @@ namespace simd
   \param y	その成分を奇数番目に配置するベクトル
   \return	生成されたベクトル
 */
-template <class T> static vec<T>	unpack_low(vec<T> x, vec<T> y)	;
+template <class T> vec<T>	unpack_low(vec<T> x, vec<T> y)		;
 
 //! 2つのベクトルの上位半分の成分を交互に混合する．
 /*!
@@ -25,7 +25,7 @@ template <class T> static vec<T>	unpack_low(vec<T> x, vec<T> y)	;
   \param y	その成分を奇数番目に配置するベクトル
   \return	生成されたベクトル
 */
-template <class T> static vec<T>	unpack_high(vec<T> x, vec<T> y)	;
+template <class T> vec<T>	unpack_high(vec<T> x, vec<T> y)		;
 
 #define SIMD_UNPACK_LOW_HIGH(type)					\
     SIMD_SIGNED_FUNC(unpack_low,  unpacklo, type)			\

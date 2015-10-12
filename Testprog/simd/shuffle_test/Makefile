@@ -14,14 +14,13 @@ MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
-NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
+CFLAGS		= -g -O3
+ifeq ($(shell arch),armv7l)
+  CPPFLAGS     += -DNEON
+else
   CPPFLAGS     += -DSSE3
 endif
-CCFLAGS		= $(CFLAGS) -std=c++11
+CCFLAGS		= $(CFLAGS)
 
 LIBS		=
 ifneq ($(findstring darwin,$(OSTYPE)),)

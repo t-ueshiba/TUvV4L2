@@ -12,43 +12,42 @@ namespace simd
 /************************************************************************
 *  SVML(Short Vector Math Library) functions				*
 ************************************************************************/
-template <class T> static vec<T>	erf(vec<T> x)			;
-template <class T> static vec<T>	erfc(vec<T> x)			;
+template <class T> vec<T>	erf(vec<T> x)				;
+template <class T> vec<T>	erfc(vec<T> x)				;
 
-template <class T> static vec<T>	floor(vec<T> x)			;
-template <class T> static vec<T>	ceil(vec<T> x)			;
+template <class T> vec<T>	floor(vec<T> x)				;
+template <class T> vec<T>	ceil(vec<T> x)				;
 
-template <class T> static vec<T>	exp(vec<T> x)			;
-template <class T> static vec<T>	cexp(vec<T> x)			;
-template <class T> static vec<T>	exp2(vec<T> x)			;
-template <class T> static vec<T>	pow(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	exp(vec<T> x)				;
+template <class T> vec<T>	cexp(vec<T> x)				;
+template <class T> vec<T>	exp2(vec<T> x)				;
+template <class T> vec<T>	pow(vec<T> x, vec<T> y)			;
 
-template <class T> static vec<T>	log(vec<T> x)			;
-template <class T> static vec<T>	log2(vec<T> x)			;
-template <class T> static vec<T>	log10(vec<T> x)			;
-template <class T> static vec<T>	clog(vec<T> x)			;
+template <class T> vec<T>	log(vec<T> x)				;
+template <class T> vec<T>	log2(vec<T> x)				;
+template <class T> vec<T>	log10(vec<T> x)				;
+template <class T> vec<T>	clog(vec<T> x)				;
 
-template <class T> static vec<T>	invsqrt(vec<T> x)		;
-template <class T> static vec<T>	cbrt(vec<T> x)			;
-template <class T> static vec<T>	invcbrt(vec<T> x)		;
-template <class T> static vec<T>	csqrt(vec<T> x)			;
+template <class T> vec<T>	invsqrt(vec<T> x)			;
+template <class T> vec<T>	cbrt(vec<T> x)				;
+template <class T> vec<T>	invcbrt(vec<T> x)			;
+template <class T> vec<T>	csqrt(vec<T> x)				;
 
-template <class T> static vec<T>	cos(vec<T> x)			;
-template <class T> static vec<T>	sin(vec<T> x)			;
-template <class T> static vec<T>	tan(vec<T> x)			;
-template <class T> static vec<T>	sincos(typename
-					       vec<T>::base_type* pcos,
-					       vec<T> x)		;
-template <class T> static vec<T>	acos(vec<T> x)			;
-template <class T> static vec<T>	asin(vec<T> x)			;
-template <class T> static vec<T>	atan(vec<T> x)			;
-template <class T> static vec<T>	atan2(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	cosh(vec<T> x)			;
-template <class T> static vec<T>	sinh(vec<T> x)			;
-template <class T> static vec<T>	tanh(vec<T> x)			;
-template <class T> static vec<T>	acosh(vec<T> x)			;
-template <class T> static vec<T>	asinh(vec<T> x)			;
-template <class T> static vec<T>	atanh(vec<T> x)			;
+template <class T> vec<T>	cos(vec<T> x)				;
+template <class T> vec<T>	sin(vec<T> x)				;
+template <class T> vec<T>	tan(vec<T> x)				;
+template <class T> vec<T>	sincos(typename vec<T>::base_type* pcos,
+				       vec<T> x)			;
+template <class T> vec<T>	acos(vec<T> x)				;
+template <class T> vec<T>	asin(vec<T> x)				;
+template <class T> vec<T>	atan(vec<T> x)				;
+template <class T> vec<T>	atan2(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	cosh(vec<T> x)				;
+template <class T> vec<T>	sinh(vec<T> x)				;
+template <class T> vec<T>	tanh(vec<T> x)				;
+template <class T> vec<T>	acosh(vec<T> x)				;
+template <class T> vec<T>	asinh(vec<T> x)				;
+template <class T> vec<T>	atanh(vec<T> x)				;
 
 #if defined(SSE)
   SIMD_UNARY_FUNC(erf,     erf,		float)
@@ -118,7 +117,7 @@ template <class T> static vec<T>	atanh(vec<T> x)			;
   SIMD_SIGNED_FUNC(operator %, urem, u_int32_t)
 
   // 除算と剰余
-  template <class T> static vec<T>	divrem(vec<T>& r,
+  template <class T>  vec<T>	divrem(vec<T>& r,
 					       vec<T> x, vec<T> y)	;
 
   SIMD_SPECIALIZED_FUNC(Is32vec divrem(Is32vec& r, Is32vec x, Is32vec y),

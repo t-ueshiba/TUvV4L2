@@ -21,7 +21,7 @@ namespace simd
   \param x	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <size_t I3, size_t I2, size_t I1, size_t I0, class T> static vec<T>
+template <size_t I3, size_t I2, size_t I1, size_t I0, class T> vec<T>
 shuffle_low(vec<T> x)							;
 
 //! 8つの成分を持つ整数ベクトルの上位4成分をシャッフルする．
@@ -34,7 +34,7 @@ shuffle_low(vec<T> x)							;
   \param x	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <size_t I3, size_t I2, size_t I1, size_t I0, class T> static vec<T>
+template <size_t I3, size_t I2, size_t I1, size_t I0, class T> vec<T>
 shuffle_high(vec<T> x)							;
 
 //! 4つの成分を持つ整数ベクトルの成分をシャッフルする．
@@ -46,7 +46,7 @@ shuffle_high(vec<T> x)							;
   \param x	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <size_t I3, size_t I2, size_t I1, size_t I0, class T> static vec<T>
+template <size_t I3, size_t I2, size_t I1, size_t I0, class T> vec<T>
 shuffle(vec<T> x)							;
 
 #define SIMD_SHUFFLE_LOW_HIGH_I4(type)					\
@@ -88,7 +88,7 @@ shuffle(vec<T> x)							;
   \param y	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <size_t Yh, size_t Yl, size_t Xh, size_t Xl, class T> static vec<T>
+template <size_t Yh, size_t Yl, size_t Xh, size_t Xl, class T> vec<T>
 shuffle(vec<T> x, vec<T> y)						;
 
 //! 2つの成分を持つ2つの浮動小数点数ベクトルの成分をシャッフルする．
@@ -100,7 +100,7 @@ shuffle(vec<T> x, vec<T> y)						;
   \param y	シャッフルされるベクトル
   \return	シャッフルされたベクトル
 */
-template <size_t Y, size_t X, class T> static vec<T>
+template <size_t Y, size_t X, class T> vec<T>
 shuffle(vec<T> x, vec<T> y)						;
 
 #define _MM_SHUFFLE4(i3, i2, i1, i0)					\

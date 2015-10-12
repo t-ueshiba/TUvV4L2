@@ -4,34 +4,21 @@
 #if !defined(__TU_SIMD_INTEL_LOGICAL_H)
 #define __TU_SIMD_INTEL_LOGICAL_H
 
+#include "TU/simd/intel/logical_base.h"
+
 namespace TU
 {
 namespace simd
 {
-#define SIMD_LOGICALS(type)						\
-    SIMD_BASE_FUNC(operator &, and,    type)				\
-    SIMD_BASE_FUNC(operator |, or,     type)				\
-    SIMD_BASE_FUNC(operator ^, xor,    type)				\
-    SIMD_BASE_FUNC(andnot,     andnot, type)
+template <class T> inline vec<T>
+operator &(vec<T> x, vec<T> y)	{ return detail::base_and(x, y); }
+template <class T> inline vec<T>
+operator |(vec<T> x, vec<T> y)	{ return detail::base_or(x, y); }
+template <class T> inline vec<T>
+operator ^(vec<T> x, vec<T> y)	{ return detail::base_xor(x, y); }
+template <class T> inline vec<T>
+andnot(vec<T> x, vec<T> y)	{ return detail::base_andnot(x, y); }
 
-SIMD_LOGICALS(int8_t)
-SIMD_LOGICALS(int16_t)
-SIMD_LOGICALS(int32_t)
-SIMD_LOGICALS(int64_t)
-SIMD_LOGICALS(u_int8_t)
-SIMD_LOGICALS(u_int16_t)
-SIMD_LOGICALS(u_int32_t)
-SIMD_LOGICALS(u_int64_t)
-
-#if defined(SSE)
-  SIMD_LOGICALS(float)
-#endif
-#if defined(SSE2)
-  SIMD_LOGICALS(double)
-#endif
-
-#undef SIMD_LOGICALS
-    
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_INTEL_LOGICAL_H

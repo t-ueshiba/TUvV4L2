@@ -13,38 +13,38 @@ namespace simd
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-template <class T> static vec<T>	operator +(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator -(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator *(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator /(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator %(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator -(vec<T> x)		;
-template <class T> static vec<T>	mulhi(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	min(vec<T> x, vec<T> y)		;
-template <class T> static vec<T>	max(vec<T> x, vec<T> y)		;
-template <class T> static vec<T>	rcp(vec<T> x)			;
-template <class T> static vec<T>	sqrt(vec<T> x)			;
-template <class T> static vec<T>	rsqrt(vec<T> x)			;
+template <class T> vec<T>	operator +(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator -(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator *(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator /(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator %(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator -(vec<T> x)			;
+template <class T> vec<T>	mulhi(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	min(vec<T> x, vec<T> y)			;
+template <class T> vec<T>	max(vec<T> x, vec<T> y)			;
+template <class T> vec<T>	rcp(vec<T> x)				;
+template <class T> vec<T>	sqrt(vec<T> x)				;
+template <class T> vec<T>	rsqrt(vec<T> x)				;
     
 /************************************************************************
 *  Average values							*
 ************************************************************************/
-template <class T> static vec<T>	avg(vec<T> x, vec<T> y)		;
-template <class T> static vec<T>	sub_avg(vec<T> x, vec<T> y)	;
+template <class T> vec<T>	avg(vec<T> x, vec<T> y)			;
+template <class T> vec<T>	sub_avg(vec<T> x, vec<T> y)		;
 
 /************************************************************************
 *  Absolute values							*
 ************************************************************************/
-template <class T> static vec<T>	abs(vec<T> x)	;
-template <> inline Iu8vec		abs(Iu8vec x)	{return x;}
-template <> inline Iu16vec		abs(Iu16vec x)	{return x;}
-template <> inline Iu32vec		abs(Iu32vec x)	{return x;}
-template <> inline Iu64vec		abs(Iu64vec x)	{return x;}
+template <class T> vec<T>	abs(vec<T> x)		;
+template <> inline Iu8vec	abs(Iu8vec x)		{return x;}
+template <> inline Iu16vec	abs(Iu16vec x)		{return x;}
+template <> inline Iu32vec	abs(Iu32vec x)		{return x;}
+template <> inline Iu64vec	abs(Iu64vec x)		{return x;}
 
 /************************************************************************
 *  Absolute differences							*
 ************************************************************************/
-template <class T> static vec<T>	diff(vec<T> x, vec<T> y)	;
+template <class T> vec<T>	diff(vec<T> x, vec<T> y)		;
   
 }	// namespace simd
 }	// namespace TU

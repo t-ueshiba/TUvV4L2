@@ -22,7 +22,7 @@ namespace simd
 		yからそれぞれ選択して生成されたベクトル
 */
 template <class T>
-static vec<T>	select(vec<mask_type<T> > mask, vec<T> x, vec<T> y)	;
+vec<T>	select(vec<mask_type<T> > mask, vec<T> x, vec<T> y)		;
     
 }	// namespace simd
 }	// namespace TU

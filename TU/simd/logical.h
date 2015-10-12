@@ -13,11 +13,11 @@ namespace simd
 /************************************************************************
 *  Logical operators							*
 ************************************************************************/
-template <class T> static vec<T>	operator ~(vec<T> x)		;
-template <class T> static vec<T>	operator &(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator |(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	operator ^(vec<T> x, vec<T> y)	;
-template <class T> static vec<T>	andnot(vec<T> x, vec<T> y)	;
+template <class T> vec<T>	operator ~(vec<T> x)			;
+template <class T> vec<T>	operator &(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator |(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator ^(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	andnot(vec<T> x, vec<T> y)		;
 
 template <class T> inline vec<T>&
 vec<T>::andnot(vec<T> x)	{ return *this = simd::andnot(x, *this); }

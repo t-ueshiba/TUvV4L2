@@ -38,7 +38,7 @@ namespace detail
 		  std::is_floating_point<element_type>::value,
 		  complementary_type,
 		  element_type>::type			integral_type;
-      typedef simd::unsigned_type<lower_type<integral_type> >
+      typedef simd::unsigned_type<simd::lower_type<integral_type> >
 							unsigned_lower_type;
       typedef tuple_replace<value_type, vec<unsigned_lower_type> >
 							unsigned_lower_vec;

@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include "TU/tuple.h"
+#include "TU/simd/config.h"
 #include "TU/simd/type_traits.h"
 
 namespace TU
@@ -152,6 +153,11 @@ typedef vec<u_int64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
 //! 与えられた型が何らかの mm::vec であるかを判定する meta-programming 用の predicate
 template <class T> struct is_vec		: std::false_type	{};
 template <class T> struct is_vec<vec<T> >	: std::true_type	{};
+
+/************************************************************************
+*  Control functions							*
+************************************************************************/
+void	empty()								;
 
 }	// namespace simd
 }	// namespace TU

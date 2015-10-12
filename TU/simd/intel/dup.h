@@ -15,21 +15,21 @@ namespace simd
 ************************************************************************/
 // 複製数：N = 2, 4, 8, 16,...;
 // 全体をN個の部分に分けたときの複製区間：0 <= I < N
-template <size_t N, size_t I, class T> static vec<T>	n_tuple(vec<T> x);
+template <size_t N, size_t I, class T> vec<T>	n_tuple(vec<T> x)	;
 
-template <size_t I, class T> static inline vec<T>
+template <size_t I, class T> inline vec<T>
 dup(vec<T> x)
 {
     return n_tuple<2, I>(x);
 }
 
-template <size_t I, class T> static inline vec<T>
+template <size_t I, class T> inline vec<T>
 quadup(vec<T> x)
 {
     return n_tuple<4, I>(x);
 }
     
-template <size_t I, class T> static inline vec<T>
+template <size_t I, class T> inline vec<T>
 octup(vec<T> x)
 {
     return n_tuple<8, I>(x);

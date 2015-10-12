@@ -19,7 +19,7 @@ namespace simd
   \param n	シフトするビット数
   \return	シフト後の整数ベクトル
 */
-template <class T> static vec<T>	operator <<(vec<T> x, int n)	;
+template <class T> vec<T>	operator <<(vec<T> x, int n)		;
 
 //! 整数ベクトルの算術右シフトを行なう．
 /*!
@@ -27,7 +27,7 @@ template <class T> static vec<T>	operator <<(vec<T> x, int n)	;
   \param n	シフトするビット数
   \return	シフト後の整数ベクトル
 */
-template <class T> static vec<T>	operator >>(vec<T> x, int n)	;
+template <class T> vec<T>	operator >>(vec<T> x, int n)		;
 
 }	// namespace simd
 }	// namespace TU

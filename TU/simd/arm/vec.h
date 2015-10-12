@@ -65,6 +65,11 @@ SIMD_CONSTRUCTOR_1(float)
 
 #undef SIMD_CONSTRUCTOR_1
 
+/************************************************************************
+*  Control functions							*
+************************************************************************/
+inline void	empty()	{}
+
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_ARM_VEC_H

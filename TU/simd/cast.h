@@ -14,7 +14,7 @@ namespace simd
 *  Cast operators							*
 ************************************************************************/
 //! T型の成分を持つベクトルからS型の成分を持つベクトルへのキャストを行なう．
-template <class S, class T> static vec<S>	cast(vec<T> x)		;
+template <class S, class T> vec<S>	cast(vec<T> x)			;
 
 }	// namespace simd
 }	// namespace TU
