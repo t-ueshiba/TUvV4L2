@@ -45,8 +45,9 @@ doJob()
 {
     using namespace	std;
     
-    typedef SRC		src_type;
-    typedef DST		dst_type;
+    typedef SRC				src_type;
+    typedef DST				dst_type;
+    typedef simd::mask_type<src_type>	mask_type;
 
     u_char	src[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 			 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -57,7 +58,7 @@ doJob()
 
     cerr << "src:";
     print(x);
-    cvtup_mask_all<src_type, dst_type>::exec(x);
+    cvtup_mask_all<mask_type, dst_type>::exec(x);
     
     empty();
 
@@ -71,6 +72,7 @@ doJobF()
     
     typedef SRC					src_type;
     typedef complementary_mask_type<SRC>	dst_type;
+    typedef simd::mask_type<src_type>		mask_type;
 
     src_type	a[] = {0,  0, 0, 0,  0,  0, 0, 0};
     src_type	b[] = {1, -1, 1, 1, -1, -1, 1, 1};
@@ -78,7 +80,7 @@ doJobF()
     vec<src_type>	x = load<false>(a),
 			y = load<false>(b);
 
-    cvtup_mask_all<src_type, dst_type>::exec(x < y);
+    cvtup_mask_all<mask_type, dst_type>::exec(x < y);
     
     empty();
 
