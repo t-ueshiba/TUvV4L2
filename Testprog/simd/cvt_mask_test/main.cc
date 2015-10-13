@@ -87,19 +87,19 @@ main()
     using namespace	std;
     using namespace	TU;
     
-    simd::doJob<u_int8_t, u_int8_t >();
+  //simd::doJob<u_int8_t, u_int8_t >();
     simd::doJob<u_int8_t, u_int16_t>();
     simd::doJob<u_int8_t, u_int32_t>();
     simd::doJob<u_int8_t, u_int64_t>();
 
-    simd::doJob<u_int16_t, u_int16_t>();
+  //simd::doJob<u_int16_t, u_int16_t>();
     simd::doJob<u_int16_t, u_int32_t>();
     simd::doJob<u_int16_t, u_int64_t>();
 
-    simd::doJob<u_int32_t, u_int32_t>();
+  //simd::doJob<u_int32_t, u_int32_t>();
     simd::doJob<u_int32_t, u_int64_t>();
 
-    simd::doJob<u_int64_t, u_int64_t>();
+  //simd::doJob<u_int64_t, u_int64_t>();
 
 #if defined(SSE2) || defined(NEON)
     simd::doJobF<float>();

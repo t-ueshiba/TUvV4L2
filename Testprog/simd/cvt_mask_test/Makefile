@@ -43,14 +43,10 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/arm/bit_shift.h \
 		../../../TU/simd/arm/cast.h \
 		../../../TU/simd/arm/compare.h \
-		../../../TU/simd/arm/cvt.h \
 		../../../TU/simd/arm/cvt_mask.h \
 		../../../TU/simd/arm/load_store.h \
 		../../../TU/simd/arm/type_traits.h \
 		../../../TU/simd/arm/vec.h \
-		../../../TU/simd/arm/zero.h \
-		../../../TU/simd/bit_shift.h \
-		../../../TU/simd/cast.h \
 		../../../TU/simd/compare.h \
 		../../../TU/simd/config.h \
 		../../../TU/simd/cvt.h \
@@ -59,18 +55,15 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/intel/bit_shift.h \
 		../../../TU/simd/intel/cast.h \
 		../../../TU/simd/intel/compare.h \
-		../../../TU/simd/intel/cvt.h \
 		../../../TU/simd/intel/cvt_mask.h \
 		../../../TU/simd/intel/dup.h \
 		../../../TU/simd/intel/load_store.h \
 		../../../TU/simd/intel/type_traits.h \
-		../../../TU/simd/intel/unpack.h \
 		../../../TU/simd/intel/vec.h \
 		../../../TU/simd/intel/zero.h \
 		../../../TU/simd/load_store.h \
 		../../../TU/simd/type_traits.h \
 		../../../TU/simd/vec.h \
-		../../../TU/simd/zero.h \
 		../../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc

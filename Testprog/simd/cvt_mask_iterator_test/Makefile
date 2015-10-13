@@ -64,15 +64,12 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/intel/dup.h \
 		../../../TU/simd/intel/load_store.h \
 		../../../TU/simd/intel/type_traits.h \
-		../../../TU/simd/intel/unpack.h \
 		../../../TU/simd/intel/vec.h \
-		../../../TU/simd/intel/zero.h \
 		../../../TU/simd/load_iterator.h \
 		../../../TU/simd/load_store.h \
 		../../../TU/simd/store_iterator.h \
 		../../../TU/simd/type_traits.h \
 		../../../TU/simd/vec.h \
-		../../../TU/simd/zero.h \
 		../../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
