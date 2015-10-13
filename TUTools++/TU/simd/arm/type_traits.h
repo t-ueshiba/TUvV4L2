@@ -100,7 +100,7 @@ struct type_traits<float> : type_traits_base<float>
 {
     typedef unsigned_type	mask_type;
     typedef int32_t		complementary_type;
-    typedef u_int32_t		complementary_mask_type;
+    typedef complementary_type	complementary_mask_type;
     typedef float32x2_t		half_type;
     typedef float32x4_t		base_type;
 };

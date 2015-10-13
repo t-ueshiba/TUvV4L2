@@ -567,13 +567,14 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 #if defined(SIMD)
 	typedef decltype(simd::make_store_iterator(col2ptr(dminRV)))
 								diterator;
+	typedef simd::mask_type<Disparity>			mask_type;
 #  if defined(WITHOUT_CVTDOWN)
 	typedef simd::cvtdown_mask_iterator<
-	    Disparity,
+	    mask_type,
 	    simd::mask_iterator<subiterator<const_col_siterator>,
 				subiterator<RMIN_RV> > >	miterator;
 #  else
-	typedef simd::mask_iterator<Disparity,
+	typedef simd::mask_iterator<mask_type,
 				    subiterator<const_col_siterator>,
 				    subiterator<RMIN_RV> >	miterator;
 #  endif

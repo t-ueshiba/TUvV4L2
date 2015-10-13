@@ -29,12 +29,13 @@ doJob()
 	diterator,
 	cvtup_mask_iterator<diterator> >::type		dst_iterator;
 
-    src_type	src[] = {0, ~0, 0, ~0, 0, 0, ~0, ~0,
-			 0, 0, 0, 0, ~0, ~0, ~0, ~0,
-			 0, ~0, 0, ~0, 0, 0, ~0, ~0,
-			 0, 0, 0, 0, ~0, ~0, ~0, ~0};
-    dst_type	dst[32];
-    size_t	n = sizeof(src)/sizeof(src[0]);
+    constexpr src_type	f = src_type(~0);
+    src_type		src[] = {0, f, 0, f, 0, 0, f, f,
+				 0, 0, 0, 0, f, f, f, f,
+				 0, f, 0, f, 0, 0, f, f,
+				 0, 0, 0, 0, f, f, f, f};
+    dst_type		dst[32];
+    size_t		n = sizeof(src)/sizeof(src[0]);
 
     copy(src_iterator(src), src_iterator(src + n),
 	 dst_iterator(dst));
@@ -81,7 +82,7 @@ main()
     simd::doJob<u_int64_t, u_int32_t>();
 #endif
     simd::doJob<u_int64_t, u_int64_t>();
-
+  /*
 #if defined(SSE2) || defined(NEON)
     cerr << "--- src: unsigned, dst: float ---" << endl;
     simd::doJob<u_int8_t,  float>();
@@ -96,7 +97,7 @@ main()
     simd::doJob<float, u_int32_t>();
 #  endif
 #endif
-
+  */
 #if defined(SSE2)
     cerr << "--- src: unsigned, dst: double ---" << endl;
     simd::doJob<u_int8_t,  double>();
