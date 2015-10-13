@@ -435,7 +435,7 @@ namespace simd
       typedef simd::mask_type<element_type>		mask_type;
       typedef tuple_replace<elementary_vec, vec<mask_type> >
 							mask_vec;
-      typedef simd::complementary_type<mask_type>	complementary_type;
+      typedef complementary_mask_type<mask_type>	complementary_type;
       typedef tuple_replace<mask_vec, vec<complementary_type> >
 							complementary_vec;
 #  endif

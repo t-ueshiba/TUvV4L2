@@ -98,6 +98,21 @@ main()
 #  endif
 #endif
   */
+#if defined(SSE2) || defined(NEON)
+    cerr << "--- src: unsigned, dst: float ---" << endl;
+    simd::doJob<u_int8_t,  float>();
+    simd::doJob<u_int16_t, float>();
+#  if !defined(AVX) || defined(AVX2)
+    simd::doJob<u_int32_t, float>();
+#  endif
+    cerr << "--- src: float, dst: unsigned ---" << endl;
+    simd::doJob<float, u_int8_t >();
+    simd::doJob<float, u_int16_t>();
+#  if !defined(AVX) || defined(AVX2)
+    simd::doJob<float, u_int32_t>();
+#  endif
+#endif
+
 #if defined(SSE2)
     cerr << "--- src: unsigned, dst: double ---" << endl;
     simd::doJob<u_int8_t,  double>();
