@@ -469,31 +469,31 @@ namespace simd
 		     _RminRV(RminRV),
 		     _nextRV()
 		{
-		    setRMost(std::numeric_limits<element_type>::max(), _nextRV);
+		    init(std::numeric_limits<element_type>::max(), _nextRV);
 		}
       int	dL()	const	{ return minIdx(_dminL, _RminL); }
 	
     private:
-    // mask と mask tuple に対するsetRMost
-      void	setRMost(element_type val, vec<element_type>& x)
+    // _nextRV の初期化
+      void	init(element_type val, vec<element_type>& x)
 		{
-		    x = set_rmost<element_type>(val);
+		    x = val;
 		}
       template <class VEC_>
-      void	setRMost(element_type val, VEC_& x)
+      void	init(element_type val, VEC_& x)
 		{
-		    const auto	next = set_rmost<element_type>(val);
-		    x = boost::make_tuple(next, next);
+		    x = boost::make_tuple(val, val);
 		}
 
     // mask と mask tuple に対するupdate
       void	update(vec<element_type> R, vec<mask_type>& x)
 		{
-		    const auto	RminR  = _RminRV();
-		    const auto	minval = min(R, RminR);
-		    *_RminRV = shift_l<1>(minval) | _nextRV;
+		    constexpr size_t	N = vec<element_type>::size;
+		    const auto		RminR  = _RminRV();
+		    const auto		minval = min(R, RminR);
+		    *_RminRV = shift_r<N-1>(_nextRV, minval);
 		    ++_RminRV;
-		    _nextRV  = shift_lmost_to_rmost(minval);
+		    _nextRV  = minval;
 		    
 		    x = (R < RminR);
 		}
@@ -502,16 +502,16 @@ namespace simd
 		{
 		    using namespace	boost;
 
+		    constexpr size_t	N = vec<element_type>::size;
 		    const auto	RminR = get<0>(_RminRV.get_iterator_tuple())();
 		    const auto	RminV = get<1>(_RminRV.get_iterator_tuple())();
 		    const auto	minvalR = min(R, RminR);
 		    const auto	minvalV = min(R, RminV);
 		    *_RminRV = make_tuple(
-				   shift_l<1>(minvalR) | get<0>(_nextRV),
-				   shift_l<1>(minvalV) | get<1>(_nextRV));
+				   shift_r<N-1>(get<0>(_nextRV), minvalR),
+				   shift_r<N-1>(get<1>(_nextRV), minvalV));
 		    ++_RminRV;
-		    _nextRV = make_tuple(shift_lmost_to_rmost(minvalR),
-					 shift_lmost_to_rmost(minvalV));
+		    _nextRV = make_tuple(minvalR, minvalV);
 		    
 		    x = make_tuple(R < RminR, R < RminV);
 		}
