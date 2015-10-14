@@ -500,11 +500,14 @@ namespace simd
       template <class VEC_>
       void	update(vec<element_type> R, VEC_& x)
 		{
+		    using namespace	boost;
+
 		    constexpr size_t	N = vec<element_type>::size;
-		    const auto		RminRV = boost::make_tuple(
-					  boost::get<0>(
+#if 0
+		    const auto		RminRV = make_tuple(
+					  get<0>(
 					      _RminRV.get_iterator_tuple())(),
-					  boost::get<1>(
+					  get<1>(
 					      _RminRV.get_iterator_tuple())());
 		    const auto		minval = min(R, RminRV);
 		    *_RminRV = shift_r<N-1>(_nextRV, minval);
@@ -512,7 +515,7 @@ namespace simd
 		    _nextRV = minval;
 
 		    x = (R < RminRV);
-		  /*
+#else
 		    const auto	RminR = get<0>(_RminRV.get_iterator_tuple())();
 		    const auto	RminV = get<1>(_RminRV.get_iterator_tuple())();
 		    const auto	minvalR = min(R, RminR);
@@ -524,7 +527,7 @@ namespace simd
 		    _nextRV = make_tuple(minvalR, minvalV);
 
 		    x = make_tuple(R < RminR, R < RminV);
-		  */
+#endif
 		}
 
       void	cvtdown(mask_vec& x)
