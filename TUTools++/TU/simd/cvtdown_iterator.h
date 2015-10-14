@@ -82,12 +82,7 @@ class cvtdown_iterator
 		{
 		    typedef typename
 			tuple_head<VEC_>::element_type	S;
-		    typedef simd::upper_type<S>		upper_type;
-		    typedef typename
-			std::conditional<
-			    std::is_floating_point<S>::value,
-			    upper_type,
-			    simd::signed_type<upper_type> >::type
+		    typedef simd::signed_type<simd::upper_type<S> >
 							signed_upper_type;
 		    
 		    tuple_replace<elementary_vec, vec<signed_upper_type> > y, z;

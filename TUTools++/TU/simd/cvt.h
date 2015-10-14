@@ -6,6 +6,7 @@
 
 #include "TU/simd/zero.h"
 #include "TU/simd/cast.h"
+#include "TU/simd/shift.h"
 #include "TU/simd/bit_shift.h"
 
 namespace TU
