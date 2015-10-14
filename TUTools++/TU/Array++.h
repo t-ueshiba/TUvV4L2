@@ -314,14 +314,12 @@ class FixedSizedBuf : public BufTraits<T>
 
 			FixedSizedBuf(const FixedSizedBuf& b)
 			{
-			    for_each(b.begin(),
-				     assign<reference, value_type>());
+			    for_each(b.begin(), assign());
 			}
     FixedSizedBuf&	operator =(const FixedSizedBuf& b)
 			{
 			    if (this != &b)
-				for_each(b.begin(),
-					 assign<reference, value_type>());
+				for_each(b.begin(), assign());
 			    return *this;
 			}
     
@@ -549,8 +547,7 @@ class Array : public B
 		Array(const E& expr)
 		    :super(expr.size())
 		{
-		    super::for_each(expr.begin(),
-				    assign<reference, detail::value_t<E> >());
+		    super::for_each(expr.begin(), assign());
 		}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -564,8 +561,7 @@ class Array : public B
 		operator =(const E& expr)
 		{
 		    super::resize(expr.size());
-		    super::for_each(expr.begin(),
-				    assign<reference, detail::value_t<E> >());
+		    super::for_each(expr.begin(), assign());
 		    return *this;
 		}
 

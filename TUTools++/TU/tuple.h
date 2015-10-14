@@ -175,75 +175,63 @@ namespace tuples
     
   template <class H1, class T1, class H2, class T2> inline auto
   operator +(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y, TU::generic_binary_function<TU::plus>()))
+      -> decltype(cons_transform(x, y, TU::plus()))
   {
-      return cons_transform(x, y, TU::generic_binary_function<TU::plus>());
+      return cons_transform(x, y, TU::plus());
   }
     
   template <class H1, class T1, class H2, class T2> inline auto
   operator -(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y,
-				 TU::generic_binary_function<TU::minus>()))
+      -> decltype(cons_transform(x, y, TU::minus()))
   {
-      return cons_transform(x, y, TU::generic_binary_function<TU::minus>());
+      return cons_transform(x, y, TU::minus());
   }
     
   template <class H1, class T1, class H2, class T2> inline auto
   operator *(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y,
-			    TU::generic_binary_function<TU::multiplies>()))
+      -> decltype(cons_transform(x, y, TU::multiplies()))
   {
-      return cons_transform(x, y,
-			    TU::generic_binary_function<TU::multiplies>());
+      return cons_transform(x, y, TU::multiplies());
   }
 
   template <class T, class HEAD, class TAIL,
 	    class=typename std::enable_if<!is_tuple<T>::value>::type>
   inline auto
   operator *(const T& c, const cons<HEAD, TAIL>& x)
-      -> decltype(
-	  cons_transform(
-	      x, std::bind(TU::generic_binary_function<TU::multiplies>(),
-			   c, std::placeholders::_1)))
+      -> decltype(cons_transform(x, std::bind(TU::multiplies(),
+					      c, std::placeholders::_1)))
   {
-      return cons_transform(
-		 x, std::bind(TU::generic_binary_function<TU::multiplies>(),
-			      c, std::placeholders::_1));
+      return cons_transform(x, std::bind(TU::multiplies(),
+					 c, std::placeholders::_1));
   }
 
   template <class HEAD, class TAIL, class T,
 	    class=typename std::enable_if<!is_tuple<T>::value>::type>
   inline auto
   operator *(const cons<HEAD, TAIL>& x, const T& c)
-      -> decltype(
-	  cons_transform(
-	      x, std::bind(TU::generic_binary_function<TU::multiplies>(),
-			   std::placeholders::_1, c)))
+      -> decltype(cons_transform(x, std::bind(TU::multiplies(),
+					      std::placeholders::_1, c)))
   {
-      return cons_transform(
-		 x, std::bind(TU::generic_binary_function<TU::multiplies>(),
-			      std::placeholders::_1, c));
+      return cons_transform(x, std::bind(TU::multiplies(),
+					 std::placeholders::_1, c));
   }
     
   template <class H1, class T1, class H2, class T2> inline auto
   operator /(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y,
-				 TU::generic_binary_function<TU::divides>()))
+      -> decltype(cons_transform(x, y, TU::divides()))
   {
-      return cons_transform(x, y, TU::generic_binary_function<TU::divides>());
+      return cons_transform(x, y, TU::divides());
   }
     
   template <class HEAD, class TAIL, class T,
 	    class=typename std::enable_if<!is_tuple<T>::value>::type>
   inline auto
   operator /(const cons<HEAD, TAIL>& x, const T& c)
-      -> decltype(cons_transform(
-		      x, std::bind(TU::generic_binary_function<TU::divides>(),
-				   std::placeholders::_1, c)))
+      -> decltype(cons_transform(x, std::bind(TU::divides(),
+					      std::placeholders::_1, c)))
   {
-      return cons_transform(
-		 x, std::bind(TU::generic_binary_function<TU::divides>(),
-			      std::placeholders::_1, c));
+      return cons_transform(x, std::bind(TU::divides(),
+					 std::placeholders::_1, c));
   }
     
   template <class H1, class T1, class H2, class T2> inline auto
@@ -258,7 +246,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator +=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::plus_assign>());
+      cons_for_each(y, x, TU::plus_assign());
       return y;
   }
 
@@ -267,7 +255,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator -=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::minus_assign>());
+      cons_for_each(y, x, TU::minus_assign());
       return y;
   }
     
@@ -276,7 +264,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator *=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::multiplies_assign>());
+      cons_for_each(y, x, TU::multiplies_assign());
       return y;
   }
     
@@ -284,9 +272,8 @@ namespace tuples
   inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
   operator *=(cons<HEAD, TAIL>& y, const T& c)
   {
-      cons_for_each(
-	  y, std::bind(TU::generic_binary_function<TU::multiplies_assign>(),
-		       std::placeholders::_1, c));
+      cons_for_each(y, std::bind(TU::multiplies_assign(),
+				 std::placeholders::_1, c));
       return y;
   }
     
@@ -294,9 +281,8 @@ namespace tuples
   inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
   operator *=(cons<HEAD, TAIL>&& y, const T& c)
   {
-      cons_for_each(
-	  y, std::bind(TU::generic_binary_function<TU::multiplies_assign>(),
-		       std::placeholders::_1, c));
+      cons_for_each(y, std::bind(TU::multiplies_assign(),
+				 std::placeholders::_1, c));
       return y;
   }
     
@@ -305,7 +291,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator /=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::divides_assign>());
+      cons_for_each(y, x, TU::divides_assign());
       return y;
   }
     
@@ -313,9 +299,8 @@ namespace tuples
   inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
   operator /=(cons<HEAD, TAIL>& y, const T& c)
   {
-      cons_for_each(
-	  y, std::bind(TU::generic_binary_function<TU::divides_assign>(),
-		       std::placeholders::_1, c));
+      cons_for_each(y, std::bind(TU::divides_assign(),
+				 std::placeholders::_1, c));
       return y;
   }
     
@@ -323,9 +308,8 @@ namespace tuples
   inline typename std::enable_if<!is_tuple<T>::value, cons<HEAD, TAIL>&>::type
   operator /=(cons<HEAD, TAIL>&& y, const T& c)
   {
-      cons_for_each(
-	  y, std::bind(TU::generic_binary_function<TU::divides_assign>(),
-		       std::placeholders::_1, c));
+      cons_for_each(y, std::bind(TU::divides_assign(),
+				 std::placeholders::_1, c));
       return y;
   }
     
@@ -334,7 +318,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator %=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::modulus_assign>());
+      cons_for_each(y, x, TU::modulus_assign());
       return y;
   }
     
@@ -367,7 +351,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator &=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::bit_and_assign>());
+      cons_for_each(y, x, TU::bit_and_assign());
       return y;
   }
     
@@ -376,7 +360,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator |=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::bit_or_assign>());
+      cons_for_each(y, x, TU::bit_or_assign());
       return y;
   }
     
@@ -385,7 +369,7 @@ namespace tuples
       is_tuple<typename std::decay<L>::type>::value, L&>::type
   operator ^=(L&& y, const cons<HEAD, TAIL>& x)
   {
-      cons_for_each(y, x, TU::generic_binary_function<TU::bit_xor_assign>());
+      cons_for_each(y, x, TU::bit_xor_assign());
       return y;
   }
     
@@ -419,46 +403,157 @@ namespace tuples
   **********************************************************************/
   template <class H1, class T1, class H2, class T2> inline auto
   operator ==(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y, TU::generic_function<std::equal_to>()))
+      -> decltype(cons_transform(x, y, TU::equal_to()))
   {
-      return cons_transform(x, y, TU::generic_function<std::equal_to>());
+      return cons_transform(x, y, TU::equal_to());
   }
     
+  template <class T, class HEAD, class TAIL,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator ==(const T& c, const cons<HEAD, TAIL>& x)
+      -> decltype(cons_transform(x, std::bind(TU::equal_to(),
+					      c, std::placeholders::_1)))
+  {
+      return cons_transform(x, std::bind(TU::equal_to(),
+					 c, std::placeholders::_1));
+  }
+
   template <class H1, class T1, class H2, class T2> inline auto
   operator !=(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y,
-				 TU::generic_function<std::not_equal_to>()))
+      -> decltype(cons_transform(x, y, TU::not_equal_to()))
   {
-      return cons_transform(x, y, TU::generic_function<std::not_equal_to>());
+      return cons_transform(x, y, TU::not_equal_to());
   }
     
+  template <class T, class HEAD, class TAIL,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator !=(const T& c, const cons<HEAD, TAIL>& x)
+      -> decltype(cons_transform(x, std::bind(TU::not_equal_to(),
+					      c, std::placeholders::_1)))
+  {
+      return cons_transform(x, std::bind(TU::not_equal_to(),
+					 c, std::placeholders::_1));
+  }
+
   template <class H1, class T1, class H2, class T2> inline auto
   operator <(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y, TU::generic_function<std::less>()))
+      -> decltype(cons_transform(x, y, TU::less()))
   {
-      return cons_transform(x, y, TU::generic_function<std::less>());
+      return cons_transform(x, y, TU::less());
   }
     
+  template <class T, class HEAD, class TAIL,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator <(const T& c, const cons<HEAD, TAIL>& x)
+      -> decltype(cons_transform(x, std::bind(TU::less(),
+					      c, std::placeholders::_1)))
+  {
+      return cons_transform(x, std::bind(TU::less(), c, std::placeholders::_1));
+  }
+
   template <class H1, class T1, class H2, class T2> inline auto
   operator >(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y, TU::generic_function<std::greater>()))
+      -> decltype(cons_transform(x, y, TU::greater()))
   {
-      return cons_transform(x, y, TU::generic_function<std::greater>());
+      return cons_transform(x, y, TU::greater());
   }
     
+  template <class T, class HEAD, class TAIL,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator >(const T& c, const cons<HEAD, TAIL>& x)
+      -> decltype(cons_transform(x, std::bind(TU::greater(),
+					      c, std::placeholders::_1)))
+  {
+      return cons_transform(x, std::bind(TU::greater(),
+					 c, std::placeholders::_1));
+  }
+
   template <class H1, class T1, class H2, class T2> inline auto
   operator <=(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y, TU::generic_function<std::less_equal>()))
+      -> decltype(cons_transform(x, y, TU::less_equal()))
   {
-      return cons_transform(x, y, TU::generic_function<std::less_equal>());
+      return cons_transform(x, y, TU::less_equal());
   }
     
+  template <class T, class HEAD, class TAIL,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator <=(const T& c, const cons<HEAD, TAIL>& x)
+      -> decltype(cons_transform(x, std::bind(TU::less_equal(),
+					      c, std::placeholders::_1)))
+  {
+      return cons_transform(x, std::bind(TU::less_equal(),
+					 c, std::placeholders::_1));
+  }
+
   template <class H1, class T1, class H2, class T2> inline auto
   operator >=(const cons<H1, T1>& x, const cons<H2, T2>& y)
-      -> decltype(cons_transform(x, y,
-				 TU::generic_function<std::greater_equal>()))
+      -> decltype(cons_transform(x, y, TU::greater_equal()))
   {
-      return cons_transform(x, y, TU::generic_function<std::greater_equal>());
+      return cons_transform(x, y, TU::greater_equal());
+  }
+
+  template <class T, class HEAD, class TAIL,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator >=(const T& c, const cons<HEAD, TAIL>& x)
+      -> decltype(cons_transform(x, std::bind(TU::greater_equal(),
+					      c, std::placeholders::_1)))
+  {
+      return cons_transform(x, std::bind(TU::greater_equal(),
+					 c, std::placeholders::_1));
+  }
+
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator ==(const cons<HEAD, TAIL>& x, const T& c) -> decltype(c == x)
+  {
+      return c == x;
+  }
+
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator !=(const cons<HEAD, TAIL>& x, const T& c) -> decltype(c != x)
+  {
+      return c != x;
+  }
+
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator <(const cons<HEAD, TAIL>& x, const T& c) -> decltype(c > x)
+  {
+      return c > x;
+  }
+
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator >(const cons<HEAD, TAIL>& x, const T& c) -> decltype(c < x)
+  {
+      return c < x;
+  }
+
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator <=(const cons<HEAD, TAIL>& x, const T& c) -> decltype(c >= x)
+  {
+      return c >= x;
+  }
+
+  template <class HEAD, class TAIL, class T,
+	    class=typename std::enable_if<!is_tuple<T>::value>::type>
+  inline auto
+  operator >=(const cons<HEAD, TAIL>& x, const T& c) -> decltype(c <= x)
+  {
+      return c <= x;
   }
 
   /**********************************************************************
@@ -477,12 +572,12 @@ namespace tuples
   inline auto
   select(const cons<H1, T1>& s, const S& x, const cons<H3, T3>& y)
       -> decltype(cons_transform(s, y, std::bind(TU::generic_select(),
-					    std::placeholders::_1, x,
-					    std::placeholders::_2)))
+						 std::placeholders::_1, x,
+						 std::placeholders::_2)))
   {
       return cons_transform(s, y, std::bind(TU::generic_select(),
-				       std::placeholders::_1, x,
-				       std::placeholders::_2));
+					    std::placeholders::_1, x,
+					    std::placeholders::_2));
   }
 
   template <class H1, class T1, class H2, class T2, class T,
@@ -490,8 +585,8 @@ namespace tuples
   inline auto
   select(const cons<H1, T1>& s, const cons<H2, T2>& x, const T& y)
       -> decltype(cons_transform(s, x, std::bind(TU::generic_select(),
-					    std::placeholders::_1,
-					    std::placeholders::_2, y)))
+						 std::placeholders::_1,
+						 std::placeholders::_2, y)))
   {
       return cons_transform(s, x, std::bind(TU::generic_select(),
 					    std::placeholders::_1,

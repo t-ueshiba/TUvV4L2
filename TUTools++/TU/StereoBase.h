@@ -283,7 +283,7 @@ class mask_iterator
 		mask_iterator(ITER R, RV_ITER RminRV)
 		    :super(R), _Rs(R), _RminL(_Rs), _RminRV(RminRV), _nextRV()
 		{
-		    setRMost(std::numeric_limits<element_type>::max(), _nextRV);
+		    init(std::numeric_limits<element_type>::max(), _nextRV);
 		}
     int		dL() const
 		{
@@ -291,12 +291,12 @@ class mask_iterator
 		}
       
   private:
-    void	setRMost(element_type val, element_type& x)
+    void	init(element_type val, element_type& x)
 		{
 		    x = val;
 		}
     template <class VEC_>
-    void	setRMost(element_type val, VEC_& x)
+    void	init(element_type val, VEC_& x)
 		{
 		    x = boost::make_tuple(val, val);
 		}
@@ -500,9 +500,19 @@ namespace simd
       template <class VEC_>
       void	update(vec<element_type> R, VEC_& x)
 		{
-		    using namespace	boost;
-
 		    constexpr size_t	N = vec<element_type>::size;
+		    const auto		RminRV = boost::make_tuple(
+					  boost::get<0>(
+					      _RminRV.get_iterator_tuple())(),
+					  boost::get<1>(
+					      _RminRV.get_iterator_tuple())());
+		    const auto		minval = min(R, RminRV);
+		    *_RminRV = shift_r<N-1>(_nextRV, minval);
+		    ++_RminRV;
+		    _nextRV = minval;
+
+		    x = (R < RminRV);
+		  /*
 		    const auto	RminR = get<0>(_RminRV.get_iterator_tuple())();
 		    const auto	RminV = get<1>(_RminRV.get_iterator_tuple())();
 		    const auto	minvalR = min(R, RminR);
@@ -512,8 +522,9 @@ namespace simd
 				   shift_r<N-1>(get<1>(_nextRV), minvalV));
 		    ++_RminRV;
 		    _nextRV = make_tuple(minvalR, minvalV);
-		    
+
 		    x = make_tuple(R < RminR, R < RminV);
+		  */
 		}
 
       void	cvtdown(mask_vec& x)

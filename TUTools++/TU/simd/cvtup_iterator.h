@@ -91,55 +91,55 @@ namespace detail
       template <class VEC_>
       self&	operator =(VEC_ x)
 		{
-		    cvtup<assign<reference, value_type> >(x);
+		    cvtup<assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator +=(VEC_ x)
 		{
-		    cvtup<plus_assign<reference, value_type> >(x);
+		    cvtup<plus_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator -=(VEC_ x)
 		{
-		    cvtup<minus_assign<reference, value_type> >(x);
+		    cvtup<minus_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator *=(VEC_ x)
 		{
-		    cvtup<multiplies_assign<reference, value_type> >(x);
+		    cvtup<multiplies_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator /=(VEC_ x)
 		{
-		    cvtup<divides_assign<reference, value_type> >(x);
+		    cvtup<divides_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator %=(VEC_ x)
 		{
-		    cvtup<modulus_assign<reference, value_type> >(x);
+		    cvtup<modulus_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator &=(VEC_ x)
 		{
-		    cvtup<bit_and_assign<reference, value_type> >(x);
+		    cvtup<bit_and_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator |=(VEC_ x)
 		{
-		    cvtup<bit_or_assign<reference, value_type> >(x);
+		    cvtup<bit_or_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
       self&	operator ^=(VEC_ x)
 		{
-		    cvtup<bit_xor_assign<reference, value_type> >(x);
+		    cvtup<bit_xor_assign>(x);
 		    return *this;
 		}
 	
