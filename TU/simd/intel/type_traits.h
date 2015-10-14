@@ -43,8 +43,6 @@ namespace simd
 template <class T>
 struct type_traits : type_traits_base<T>
 {
-    typedef typename type_traits_base<T>
-		::unsigned_type	mask_type;
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
     typedef ivec_t		base_type;
@@ -53,7 +51,6 @@ struct type_traits : type_traits_base<T>
 template <>
 struct type_traits<int32_t> : type_traits_base<int32_t>
 {
-    typedef u_int32_t		mask_type;
     typedef typename std::conditional<
 	(sizeof(fvec_t) == sizeof(ivec_t)) ||	// fvec_t と ivec_tが同サイズ
       	(sizeof(dvec_t) == sizeof(char)),	// または dvec_t が未定義なら...
@@ -65,7 +62,6 @@ struct type_traits<int32_t> : type_traits_base<int32_t>
 template <>
 struct type_traits<int64_t> : type_traits_base<int64_t>
 {
-    typedef u_int64_t		mask_type;
     typedef double		complementary_type;
     typedef complementary_type	complementary_mask_type;
     typedef ivec_t		base_type;
@@ -74,7 +70,6 @@ struct type_traits<int64_t> : type_traits_base<int64_t>
 template <>
 struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
 {
-    typedef u_int32_t		mask_type;
     typedef typename std::conditional<
 	(sizeof(fvec_t) == sizeof(ivec_t)) ||	// fvec_t と ivec_tが同サイズ
 	(sizeof(dvec_t) == sizeof(char)),	// または dvec_t が未定義なら...
@@ -86,7 +81,6 @@ struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
 template <>
 struct type_traits<u_int64_t> : type_traits_base<u_int64_t>
 {
-    typedef u_int64_t		mask_type;
     typedef double		complementary_type;
     typedef complementary_type	complementary_mask_type;
     typedef ivec_t		base_type;
@@ -98,7 +92,8 @@ struct type_traits<float> : type_traits_base<float>
     typedef float		mask_type;
     typedef typename std::conditional<
 	sizeof(ivec_t) == sizeof(fvec_t),
-	int32_t, int16_t>::type	complementary_type;
+	int32_t,
+	int16_t>::type		complementary_type;
     typedef typename std::conditional<
 	sizeof(ivec_t) == sizeof(fvec_t),
 	u_int32_t,
