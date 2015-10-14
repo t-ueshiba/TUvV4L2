@@ -90,6 +90,7 @@ struct type_traits<u_int64_t> : type_traits_base<u_int64_t>
 template <>
 struct type_traits<float> : type_traits_base<float>
 {
+    typedef u_int32_t		mask_type;
     typedef int32_t		complementary_type;
     typedef mask_type		complementary_mask_type;
     typedef float32x2_t		half_type;
