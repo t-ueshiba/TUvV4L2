@@ -314,36 +314,36 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
   
 // [3] 浮動小数点数ベクトル間の変換
 #if defined(AVX)
-  template <> F64vec
+  template <> inline F64vec
   cvt<double, 0>(F32vec x)		// float -> double
   {
       return _mm256_cvtps_pd(_mm256_castps256_ps128(x));
   }
-  template <> F64vec
+  template <> inline F64vec
   cvt<double, 1>(F32vec x)		// float -> double
   {
       return _mm256_cvtps_pd(_mm256_extractf128_ps(x, 1));
   }
 
-  template <> F32vec			// double -> float
+  template <> inline F32vec		// double -> float
   cvt<float>(F64vec x, F64vec y)
   {
       return _mm256_insertf128_ps(_mm256_castps128_ps256(_mm256_cvtpd_ps(x)),
 				  _mm256_cvtpd_ps(y), 1);
   }
 #elif defined(SSE2)
-  template <> F64vec
+  template <> inline F64vec
   cvt<double, 0>(F32vec x)		// float -> double
   {
       return _mm_cvtps_pd(x);
   }
-  template <> F64vec
+  template <> inline F64vec
   cvt<double, 1>(F32vec x)		// float -> double
   {
       return _mm_cvtps_pd(_mm_shuffle_ps(x, x, _MM_SHUFFLE(1, 0, 3, 2)));
   }
 	  
-  template <> F32vec			// double -> float
+  template <> inline F32vec		// double -> float
   cvt<float>(F64vec x, F64vec y)
   {
       return _mm_shuffle_ps(_mm_cvtpd_ps(x), _mm_cvtpd_ps(y),
