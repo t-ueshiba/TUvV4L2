@@ -81,7 +81,15 @@ namespace detail
   struct generic_shift_r
   {
       template <class T_>
-      vec<T_>	operator ()(vec<T_> x)	const	{ return shift_r<N>(x); }
+      vec<T_>	operator ()(vec<T_> x) const
+		{
+		    return shift_r<N>(x);
+		}
+      template <class T_>
+      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const
+		{
+		    return shift_r<N>(x, y);
+		}
   };
 }
     
@@ -90,6 +98,15 @@ shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_r<N>()))
 {
     return boost::tuples::cons_transform(x, detail::generic_shift_r<N>());
+}
+
+template <size_t N, class HEAD, class TAIL> inline auto
+shift_r(const boost::tuples::cons<HEAD, TAIL>& x,
+	const boost::tuples::cons<HEAD, TAIL>& y)
+    -> decltype(boost::tuples::cons_transform(x, y,
+					      detail::generic_shift_r<N>()))
+{
+    return boost::tuples::cons_transform(x, y, detail::generic_shift_r<N>());
 }
 
 /************************************************************************

@@ -113,6 +113,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/arm/insert_extract.h \
 		TU/simd/arm/load_store.h \
 		TU/simd/arm/logical.h \
+		TU/simd/arm/misc.h \
 		TU/simd/arm/select.h \
 		TU/simd/arm/shift.h \
 		TU/simd/arm/type_traits.h \

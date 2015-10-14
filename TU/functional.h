@@ -69,6 +69,7 @@ using make_index_sequence = typename detail::make_index_sequence<N>::type;
 /************************************************************************
 *  struct generic_function<FUNC>					*
 ************************************************************************/
+//! テンプレート引数を1つ持つ関数オブジェクトをgenericにするアダプタ
 template <template <class> class FUNC>
 struct generic_function
 {
@@ -88,6 +89,7 @@ struct generic_function
 /************************************************************************
 *  struct generic_binary_function<FUNC>					*
 ************************************************************************/
+//! テンプレート引数を2つ持つ関数オブジェクトをgenericにするアダプタ
 template <template <class, class> class FUNC>
 struct generic_binary_function
 {
@@ -100,259 +102,235 @@ struct generic_binary_function
 };
 
 /************************************************************************
-*  struct plus<S, T>							*
+*  struct plus								*
 ************************************************************************/
 //! 加算
-/*!
-  \param S	左辺の型
-  \param T	右辺の型
-*/
-template <class S, class T>
 struct plus
 {
-    typedef S				first_argument_type;
-    typedef T				second_argument_type;
-    typedef decltype(std::declval<S>()+
-		     std::declval<T>())	result_type;
-    
-    result_type	operator ()(const S& x, const T& y)	const	{return x + y;}
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x + y)
+		{
+		    return x + y;
+		}
 };
     
 /************************************************************************
-*  struct minus<S, T>							*
+*  struct minus								*
 ************************************************************************/
-//! 加算
-/*!
-  \param S	左辺の型
-  \param T	右辺の型
-*/
-template <class S, class T>
+//! 減算
 struct minus
 {
-    typedef S				first_argument_type;
-    typedef T				second_argument_type;
-    typedef decltype(std::declval<S>()-
-		     std::declval<T>())	result_type;
-    
-    result_type	operator ()(const S& x, const T& y)	const	{return x - y;}
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x - y)
+		{
+		    return x - y;
+		}
 };
     
 /************************************************************************
-*  struct multiplies<S, T>						*
+*  struct multiplies							*
 ************************************************************************/
 //! 乗算
-/*!
-  \param S	左辺の型
-  \param T	右辺の型
-*/
-template <class S, class T>
 struct multiplies
 {
-    typedef S				first_argument_type;
-    typedef T				second_argument_type;
-    typedef decltype(std::declval<S>()*
-		     std::declval<T>())	result_type;
-    
-    result_type	operator ()(const S& x, const T& y)	const	{return x * y;}
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x * y)
+		{
+		    return x * y;
+		}
 };
     
 /************************************************************************
-*  struct divides<S, T>							*
+*  struct divides							*
 ************************************************************************/
 //! 除算
-/*!
-  \param S	左辺の型
-  \param T	右辺の型
-*/
-template <class S, class T>
 struct divides
 {
-    typedef S				first_argument_type;
-    typedef T				second_argument_type;
-    typedef decltype(std::declval<S>()/
-		     std::declval<T>())	result_type;
-    
-    result_type	operator ()(const S& x, const T& y)	const	{return x / y;}
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x / y)
+		{
+		    return x / y;
+		}
 };
     
 /************************************************************************
-*  struct identity<T>							*
+*  struct identity							*
 ************************************************************************/
 //! 恒等関数
-/*!
-  \param T	引数と結果の型
-*/
-template <class T>
 struct identity
 {
-    typedef T	argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& x)		const	{ return x; }
+    template <class T_>
+    T_&	operator ()(T_&& x)			const	{ return x; }
 };
 
 /************************************************************************
-*  struct assign<T, S>							*
+*  struct assign							*
 ************************************************************************/
 //! 代入
-/*!
-  \param T	代入先の型
-  \param S	引数の型
-*/
-template <class T, class S>
 struct assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y = x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y = x; return y; }
 };
 
 /************************************************************************
-*  struct plus_assign<T, S>						*
+*  struct plus_assign							*
 ************************************************************************/
 //! 引数を加算
-/*!
-  \param T	加算対象の型
-  \param S	引数の型
-*/
-template <class T, class S>
 struct plus_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y += x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y += x; return y; }
 };
 
 /************************************************************************
-*  struct minus_assign<T, S>						*
+*  struct minus_assign							*
 ************************************************************************/
 //! 引数を減算
-/*!
-  \param S	引数の型
-  \param T	減算対象の型
-*/
-template <class T, class S>
 struct minus_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y -= x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y -= x; return y; }
 };
 
 /************************************************************************
-*  struct multiplies_assign<T, S>					*
+*  struct multiplies_assign						*
 ************************************************************************/
 //! 引数を乗算
-/*!
-  \param S	引数の型
-  \param T	乗算対象の型
-*/
-template <class T, class S>
 struct multiplies_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y *= x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y *= x; return y; }
 };
 
 /************************************************************************
-*  struct divides_assign<T, S>						*
+*  struct divides_assign						*
 ************************************************************************/
 //! 引数を除算
-/*!
-  \param S	引数の型
-  \param T	除算対象の型
-*/
-template <class T, class S>
 struct divides_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y /= x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y /= x; return y; }
 };
 
 /************************************************************************
-*  struct modulus_assign<T, S>						*
+*  struct modulus_assign						*
 ************************************************************************/
 //! 引数で割った時の剰余を代入
-/*!
-  \param S	引数の型
-  \param T	剰余をとる対象の型
-*/
-template <class T, class S>
 struct modulus_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y %= x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y %= x; return y; }
 };
 
 /************************************************************************
-*  struct bit_and_assign<T, S>						*
+*  struct bit_and_assign						*
 ************************************************************************/
 //! 引数とのAND
-/*!
-  \param S	引数の型
-  \param T	ANDをとる対象の型
-*/
-template <class T, class S>
 struct bit_and_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y &= x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y &= x; return y; }
 };
 
 /************************************************************************
-*  struct bit_or_assign<T, S>						*
+*  struct bit_or_assign							*
 ************************************************************************/
 //! 引数とのOR
-/*!
-  \param S	引数の型
-  \param T	ORをとる対象の型
-*/
-template <class T, class S>
 struct bit_or_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y |= x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y |= x; return y; }
 };
 
 /************************************************************************
-*  struct bit_xor_assign<T, S>						*
+*  struct bit_xor_assign						*
 ************************************************************************/
 //! 引数とのXOR
-/*!
-  \param S	引数の型
-  \param T	XORをとる対象の型
-*/
-template <class T, class S>
 struct bit_xor_assign
 {
-    typedef T	first_argument_type;
-    typedef S	second_argument_type;
-    typedef T	result_type;
-    
-    T&	operator ()(T&& y, const S& x)	const	{ y ^= x; return y; }
+    template <class T_, class S_>
+    T_&	operator ()(T_&& y, const S_& x)	const	{ y ^= x; return y; }
 };
 
+/************************************************************************
+*  struct equal_to							*
+************************************************************************/
+//! 等しい
+struct equal_to
+{
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x == y)
+		{
+		    return x == y;
+		}
+};
+    
+/************************************************************************
+*  struct not_equal_to							*
+************************************************************************/
+//! 等しくない
+struct not_equal_to
+{
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x != y)
+		{
+		    return x != y;
+		}
+};
+    
+/************************************************************************
+*  struct less								*
+************************************************************************/
+//! より小さい
+struct less
+{
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x < y)
+		{
+		    return x < y;
+		}
+};
+    
+/************************************************************************
+*  struct greater							*
+************************************************************************/
+//! より大きい
+struct greater
+{
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x > y)
+		{
+		    return x > y;
+		}
+};
+    
+/************************************************************************
+*  struct less_equal							*
+************************************************************************/
+//! より小さいか等しい
+struct less_equal
+{
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x <= y)
+		{
+		    return x <= y;
+		}
+};
+    
+/************************************************************************
+*  struct greater_equal							*
+************************************************************************/
+//! より大きいか等しい
+struct greater_equal
+{
+    template <class S_, class T_>
+    auto	operator ()(const S_& x, const T_& y) const -> decltype(x >= y)
+		{
+		    return x >= y;
+		}
+};
+    
 /************************************************************************
 *  Selection								*
 ************************************************************************/
@@ -595,12 +573,12 @@ namespace detail
       return unary_operator<OP, E>(expr, op);
   }
     
-  template <template <class, class> class ASSIGN, class E>
+  template <class ASSIGN, class E>
   inline typename std::enable_if<is_range<E>::value, E&>::type
   op_assign(E& expr, const element_t<E>& c)
   {
       for (auto dst = expr.begin(); dst != expr.end(); ++dst)
-	  generic_binary_function<ASSIGN>()(*dst, c);
+	  ASSIGN()(*dst, c);
 
       return expr;
   }
@@ -735,7 +713,7 @@ namespace detail
       return binary_operator<OP, L, R>(l, r, op);
   }
 
-  template <template <class, class> class ASSIGN, class L, class R>
+  template <class ASSIGN, class L, class R>
   inline typename std::enable_if<(is_range<L>::value && is_range<R>::value),
 				 L&>::type
   op_assign(L& l, const R& r)
@@ -744,7 +722,7 @@ namespace detail
       auto	src = r.begin();
       for (auto dst = l.begin(); dst != l.end(); ++dst)
       {
-	  generic_binary_function<ASSIGN>()(*dst, *src);
+	  ASSIGN()(*dst, *src);
 	  ++src;
       }
 
