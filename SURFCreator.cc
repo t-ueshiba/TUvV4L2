@@ -201,8 +201,8 @@ SURFCreator::BoxFilter::getDet(size_t x) const
 #if defined(SIMD)
 namespace simd
 {
-template <size_t O>
-static inline F32vec	octave_load(const float* p)			;
+template <size_t OCTAVE>
+static F32vec	octave_load(const float* p)				;
 
 template <> inline F32vec
 octave_load<0>(const float* p)
@@ -215,56 +215,57 @@ octave_load<1>(const float* p)
 {
     return shuffle<2, 0, 2, 0>(load(p), load(p + 4));
 }
-}
 
-template <size_t O> inline simd::F32vec
+}	// namespace simd
+
+template <size_t OCTAVE> inline simd::F32vec
 SURFCreator::BoxFilter::simdCrop2(int umin, int umax, int vmin, int vmax) const
 {
     using namespace	simd;
     
     ++umax;
     ++vmax;
-    return octave_load<O>(&_integralImage[vmax][umax])
-	 + octave_load<O>(&_integralImage[vmin][umin])
-	 - octave_load<O>(&_integralImage[vmin][umax])
-	 - octave_load<O>(&_integralImage[vmax][umin]);
+    return octave_load<OCTAVE>(&_integralImage[vmax][umax])
+	 + octave_load<OCTAVE>(&_integralImage[vmin][umin])
+	 - octave_load<OCTAVE>(&_integralImage[vmin][umax])
+	 - octave_load<OCTAVE>(&_integralImage[vmax][umin]);
 }
 
-template <size_t O> inline simd::F32vec
+template <size_t OCTAVE> inline simd::F32vec
 SURFCreator::BoxFilter::simdGetDxx(size_t x) const
 {
     using namespace	simd;
 
-    return simdCrop2<O>(x - _lr, x + _lr, _y_lb_min, _y_lb_max)
-      - F32vec(3.0) * simdCrop2<O>(x - _lm, x + _lm, _y_lb_min, _y_lb_max);
+    return simdCrop2<OCTAVE>(x - _lr, x + _lr, _y_lb_min, _y_lb_max)
+      - F32vec(3.0) * simdCrop2<OCTAVE>(x - _lm, x + _lm, _y_lb_min, _y_lb_max);
 }
 
-template <size_t O> inline simd::F32vec
+template <size_t OCTAVE> inline simd::F32vec
 SURFCreator::BoxFilter::simdGetDyy(size_t x) const
 {
     using namespace	simd;
 
-    return simdCrop2<O>(x - _lb, x + _lb, _y_lr_min, _y_lr_max)
-      - F32vec(3.0) * simdCrop2<O>(x - _lb, x + _lb, _y_lm_min, _y_lm_max);
+    return simdCrop2<OCTAVE>(x - _lb, x + _lb, _y_lr_min, _y_lr_max)
+      - F32vec(3.0) * simdCrop2<OCTAVE>(x - _lb, x + _lb, _y_lm_min, _y_lm_max);
 }
 
-template <size_t O> inline simd::F32vec
+template <size_t OCTAVE> inline simd::F32vec
 SURFCreator::BoxFilter::simdGetDxy(size_t x) const
 {
-    return simdCrop2<O>(x,	  x + _lc, _y,	      _y_lc_max)
-	 + simdCrop2<O>(x - _lc, x,	   _y_lc_min, _y       )
-	 - simdCrop2<O>(x,	  x + _lc, _y_lc_min, _y       )
-	 - simdCrop2<O>(x - _lc, x,	   _y,	      _y_lc_max);
+    return simdCrop2<OCTAVE>(x,	      x + _lc, _y,	  _y_lc_max)
+	 + simdCrop2<OCTAVE>(x - _lc, x,       _y_lc_min, _y       )
+	 - simdCrop2<OCTAVE>(x,	      x + _lc, _y_lc_min, _y       )
+	 - simdCrop2<OCTAVE>(x - _lc, x,       _y,	  _y_lc_max);
 }
 
-template <size_t O> inline simd::F32vec
+template <size_t OCTAVE> inline simd::F32vec
 SURFCreator::BoxFilter::simdGetDet(size_t x) const
 {
     using namespace	simd;
 
-    const F32vec	dxx = simdGetDxx<O>(x),
-			dyy = simdGetDyy<O>(x),
-			dxy = simdGetDxy<O>(x) * F32vec(0.9 * 2 / 3.0);
+    const F32vec	dxx = simdGetDxx<OCTAVE>(x),
+			dyy = simdGetDyy<OCTAVE>(x),
+			dxy = simdGetDxy<OCTAVE>(x) * F32vec(0.9 * 2 / 3.0);
     return ((dxx * dyy) - (dxy * dxy)) * F32vec(_sqCorrectFactor);
 }
 #endif
