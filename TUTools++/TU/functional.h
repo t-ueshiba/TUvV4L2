@@ -906,7 +906,7 @@ operator -=(L&& l, const R& r)
   \return	式の各要素の自乗和
 */
 template <class T>
-inline typename std::enable_if<!detail::is_range<T>::value, T>::type
+constexpr inline typename std::enable_if<!detail::is_range<T>::value, T>::type
 square(const T& x)
 {
     return x * x;
@@ -958,6 +958,56 @@ dist(const L& x, const R& y) -> decltype(std::sqrt(sqdist(x, y)))
 {
     return std::sqrt(sqdist(x, y));
 }
-    
+
+//! 与えられた二つの整数の最大公約数を求める．
+/*!
+  \param m	第1の整数
+  \param n	第2の整数
+  \return	mとnの最大公約数
+*/
+template <class S, class T> constexpr typename std::common_type<S, T>::type
+gcd(S m, T n)
+{
+    return (n == 0 ? m : gcd(n, m % n));
+}
+
+//! 与えられた三つ以上の整数の最大公約数を求める．
+/*!
+  \param m	第1の整数
+  \param n	第2の整数
+  \param args	第3, 第4,...の整数
+  \return	m, n, args...の最大公約数
+*/
+template <class S, class T, class... ARGS> constexpr auto
+gcd(S m, T n, ARGS... args) -> decltype(gcd(gcd(m, n), args...))
+{
+    return gcd(gcd(m, n), args...);
+}
+
+//! 与えられた二つの整数の最小公倍数を求める．
+/*!
+  \param m	第1の整数
+  \param n	第2の整数
+  \return	mとnの最小公倍数
+*/
+template <class S, class T> constexpr typename std::common_type<S, T>::type
+lcm(S m, T n)
+{
+    return (m*n == 0 ? 0 : (m / gcd(m, n)) * n);
+}
+
+//! 与えられた三つ以上の整数の最小公倍数を求める．
+/*!
+  \param m	第1の整数
+  \param n	第2の整数
+  \param args	第3, 第4,...の整数
+  \return	m, n, args...の最小公倍数
+*/
+template <class S, class T, class... ARGS> constexpr auto
+lcm(S m, T n, ARGS... args) -> decltype(lcm(lcm(m, n), args...))
+{
+    return lcm(lcm(m, n), args...);
+}
+
 }	// End of namespace TU
 #endif	// !__TU_FUNCTIONAL_H

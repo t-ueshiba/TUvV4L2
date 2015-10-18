@@ -47,7 +47,7 @@ template <> inline Iu64vec	abs(Iu64vec x)		{ return x; }
 template <class T> vec<T>	diff(vec<T> x, vec<T> y)		;
   
 /************************************************************************
-*  tuple arighmetic							*
+*  Arithmetic operators for vec tuples					*
 ************************************************************************/
 namespace detail
 {

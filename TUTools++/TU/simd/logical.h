@@ -21,6 +21,30 @@ template <class T> vec<T>	andnot(vec<T> x, vec<T> y)		;
 
 template <class T> inline vec<T>&
 vec<T>::andnot(vec<T> x)	{ return *this = simd::andnot(x, *this); }
+
+/************************************************************************
+*  Logical operators for vec tuples					*
+************************************************************************/
+namespace detail
+{
+  struct generic_andnot
+  {
+      template <class T_>
+      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const
+		{
+		    return andnot(x, y);
+		}
+  };
+}
+
+template <class HEAD, class TAIL> inline auto
+andnot(const boost::tuples::cons<HEAD, TAIL>& x,
+       const boost::tuples::cons<HEAD, TAIL>& y)
+    -> decltype(boost::tuples::cons_transform(x, y, detail::generic_andnot()))
+{
+    return boost::tuples::cons_transform(x, y, detail::generic_andnot());
+}
+
 }	// namespace simd
 }	// namespace TU
 

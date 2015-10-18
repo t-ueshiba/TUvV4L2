@@ -22,7 +22,7 @@ namespace detail
     public:
     // xがcons型のとき cvt_mask<S>(x) の結果もcons型になるので，
     // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
-    // value_typeとしておかないと，cvupの最終ステップで cvtup(value_type)
+    // value_typeとしておかないと，cvtupの最終ステップで cvtup(value_type)
     // を呼び出せない．
       typedef tuple_replace<iterator_value<ITER> >		value_type;
       typedef typename tuple_head<value_type>::element_type	element_type;

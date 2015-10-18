@@ -40,6 +40,9 @@ cvt(vec<T> x)
 */
 template <class S, class T> vec<S>	cvt(vec<T> x, vec<T> y)		;
 
+/************************************************************************
+*  Converting vec tuples						*
+************************************************************************/
 namespace detail
 {
   template <class S, size_t I>
