@@ -32,6 +32,9 @@ template <class S, size_t I=0, class T> vec<S>	cvt_mask(vec<T> x)	;
 */
 template <class S, class T> vec<S>	cvt_mask(vec<T> x, vec<T> y)	;
 
+/************************************************************************
+*  Converting mask vec tuples						*
+************************************************************************/
 namespace detail
 {
   template <class S, size_t I>

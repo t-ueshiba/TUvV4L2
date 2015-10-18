@@ -45,23 +45,6 @@ shift_l(vec<T> x)
     return shift_r<vec<T>::size - N>(zero<T>(), x);
 }
 
-namespace detail
-{
-  template <size_t N>
-  struct generic_shift_l
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x)	const	{ return shift_l<N>(x); }
-  };
-}
-    
-template <size_t N, class HEAD, class TAIL> inline auto
-shift_l(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_l<N>()))
-{
-    return boost::tuples::cons_transform(x, detail::generic_shift_l<N>());
-}
-    
 //! ベクトルの要素を右シフトする．
 /*!
   シフト後の上位には0が入る．
@@ -73,40 +56,6 @@ template <size_t N, class T> vec<T>
 shift_r(vec<T> x)
 {
     return shift_r<N>(x, zero<T>());
-}
-
-namespace detail
-{
-  template <size_t N>
-  struct generic_shift_r
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x) const
-		{
-		    return shift_r<N>(x);
-		}
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const
-		{
-		    return shift_r<N>(x, y);
-		}
-  };
-}
-    
-template <size_t N, class HEAD, class TAIL> inline auto
-shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_r<N>()))
-{
-    return boost::tuples::cons_transform(x, detail::generic_shift_r<N>());
-}
-
-template <size_t N, class HEAD, class TAIL> inline auto
-shift_r(const boost::tuples::cons<HEAD, TAIL>& x,
-	const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y,
-					      detail::generic_shift_r<N>()))
-{
-    return boost::tuples::cons_transform(x, y, detail::generic_shift_r<N>());
 }
 
 /************************************************************************
@@ -147,41 +96,6 @@ set_rmost(T x)
     return shift_lmost_to_rmost(vec<T>(x));
 }
 
-namespace detail
-{
-  struct generic_shift_lmost_to_rmost
-  {
-      template <class T_> vec<T_>
-      operator ()(vec<T_> x)	const	{ return shift_lmost_to_rmost(x); }
-  };
-
-  struct generic_shift_rmost_to_lmost
-  {
-      template <class T_> vec<T_>
-      operator ()(vec<T_> x)	const	{ return shift_rmost_to_lmost(x); }
-  };
-}
-    
-template <class HEAD, class TAIL> inline auto
-shift_lmost_to_rmost(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(
-	boost::tuples::cons_transform(
-	    x, detail::generic_shift_lmost_to_rmost()))
-{
-    return boost::tuples::cons_transform(
-	       x, detail::generic_shift_lmost_to_rmost());
-}
-    
-template <class HEAD, class TAIL> inline auto
-shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(
-	boost::tuples::cons_transform(
-	    x, detail::generic_shift_rmost_to_lmost()))
-{
-    return boost::tuples::cons_transform(
-	       x, detail::generic_shift_rmost_to_lmost());
-}
-    
 /************************************************************************
 *  Rotation and reverse operators					*
 ************************************************************************/
@@ -199,9 +113,89 @@ rotate_r(vec<T> x)
     return shift_r<1>(x, x);
 }
 
+/************************************************************************
+*  Shift operators for vec tuples					*
+************************************************************************/
+namespace detail
+{
+  template <size_t N>
+  struct generic_shift_l
+  {
+      template <class T_>
+      vec<T_>	operator ()(vec<T_> x)	const	{ return shift_l<N>(x); }
+  };
+
+  template <size_t N>
+  struct generic_shift_r
+  {
+      template <class T_>
+      vec<T_>	operator ()(vec<T_> x) const
+		{
+		    return shift_r<N>(x);
+		}
+      template <class T_>
+      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const
+		{
+		    return shift_r<N>(x, y);
+		}
+  };
+
+  struct generic_shift_lmost_to_rmost
+  {
+      template <class T_> vec<T_>
+      operator ()(vec<T_> x)	const	{ return shift_lmost_to_rmost(x); }
+  };
+
+  struct generic_shift_rmost_to_lmost
+  {
+      template <class T_> vec<T_>
+      operator ()(vec<T_> x)	const	{ return shift_rmost_to_lmost(x); }
+  };
+}
+    
+template <size_t N, class HEAD, class TAIL> inline auto
+shift_r(const boost::tuples::cons<HEAD, TAIL>& x,
+	const boost::tuples::cons<HEAD, TAIL>& y)
+    -> decltype(boost::tuples::cons_transform(x, y,
+					      detail::generic_shift_r<N>()))
+{
+    return boost::tuples::cons_transform(x, y, detail::generic_shift_r<N>());
+}
+
+template <size_t N, class HEAD, class TAIL> inline auto
+shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_r<N>()))
+{
+    return boost::tuples::cons_transform(x, detail::generic_shift_r<N>());
+}
+
+template <size_t N, class HEAD, class TAIL> inline auto
+shift_l(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_l<N>()))
+{
+    return boost::tuples::cons_transform(x, detail::generic_shift_l<N>());
+}
+    
+template <class HEAD, class TAIL> inline auto
+shift_lmost_to_rmost(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(boost::tuples::cons_transform(
+		    x, detail::generic_shift_lmost_to_rmost()))
+{
+    return boost::tuples::cons_transform(
+	       x, detail::generic_shift_lmost_to_rmost());
+}
+    
+template <class HEAD, class TAIL> inline auto
+shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
+    -> decltype(boost::tuples::cons_transform(
+		    x, detail::generic_shift_rmost_to_lmost()))
+{
+    return boost::tuples::cons_transform(
+	       x, detail::generic_shift_rmost_to_lmost());
+}
+
 }	// namespace simd
 }	// namespace TU
-
 #if defined(MMX)
 #  include "TU/simd/intel/shift.h"
 #elif defined(NEON)

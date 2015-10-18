@@ -18,12 +18,18 @@ namespace simd
 ************************************************************************/
 //! T型整数の成分を持つSIMDベクトルを表すクラス
 template <class T, size_t N=1>
-struct vec : boost::tuple<vec<T, (N>>1)>, vec<T, (N>>1)> >
+struct vec : boost::htuple<vec<T>, N>
 {
-    typedef boost::tuple<vec<T, (N>>1)>, vec<T, (N>>1)> >	super;
+    typedef boost::htuple<vec<T>, N>	super;
 
-    vec(const super& x)					  :super(x)	{}
-    vec(const vec<T, (N>>1)>& x, const vec<T, (N>>1)>& y) :super(x, y)	{}
+    vec()	:super()						{}
+    vec(T x)	:super(boost::make_uniform_htuple<N>(vec<T>(x)))	{}
+    vec(const super& x)	:super(x)					{}
+    vec&	operator =(const super& x)
+		{
+		    super::operator =(x);
+		    return *this;
+		}
 };
     
 template <class T>
