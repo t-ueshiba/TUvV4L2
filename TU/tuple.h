@@ -53,6 +53,16 @@ namespace tuples
   struct is_tuple : decltype(tuple_check(std::declval<T>()))	{};
 
   /**********************************************************************
+  *  make_uniform_htuple(T, TU::index_sequence<IDX...>)			*
+  **********************************************************************/
+  template <class T, size_t ...IDX> static inline auto
+  make_uniform_htuple(T&& x, TU::index_sequence<IDX...>)
+      -> decltype(boost::make_tuple((IDX, x)...))
+  {
+      return boost::make_tuple((IDX, x)...);
+  }
+
+  /**********************************************************************
   *  make_contiguous_htuple(T, TU::index_sequence<IDX...>)		*
   **********************************************************************/
   template <class T, size_t ...IDX> static inline auto
@@ -599,17 +609,25 @@ namespace tuples
 *  typedef htuple<T, N>							*
 ************************************************************************/
 template <size_t N, class T> inline auto
+make_uniform_htuple(T&& x)
+    -> decltype(tuples::make_uniform_htuple(std::forward<T>(x),
+					    TU::make_index_sequence<N>()))
+{
+    return tuples::make_uniform_htuple(std::forward<T>(x),
+				       TU::make_index_sequence<N>());
+}
+
+template <size_t N, class T> inline auto
 make_contiguous_htuple(T&& x)
-    -> decltype(
-	tuples::make_contiguous_htuple(std::forward<T>(x),
-				       TU::make_index_sequence<N>()))
+    -> decltype(tuples::make_contiguous_htuple(std::forward<T>(x),
+					       TU::make_index_sequence<N>()))
 {
     return tuples::make_contiguous_htuple(std::forward<T>(x),
 					  TU::make_index_sequence<N>());
 }
 
 template <class T, size_t N>
-using	htuple = decltype(make_contiguous_htuple<N>(std::declval<T>()));
+using	htuple = decltype(boost::make_uniform_htuple<N>(std::declval<T>()));
 
 }	// End of namespace boost
 
