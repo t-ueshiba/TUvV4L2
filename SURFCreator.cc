@@ -198,7 +198,8 @@ SURFCreator::BoxFilter::getDet(size_t x) const
     return ((dxx * dyy) - (dxy * dxy)) * _sqCorrectFactor;
 }
 
-#if defined(SIMD)
+  //#if defined(SIMD)
+#if defined(SSE)
 namespace simd
 {
 template <size_t OCTAVE>
@@ -513,7 +514,7 @@ SURFCreator::makeDescriptor(Feature<T, D>& feature) const
 				     (2.0 * (step + 0.5)));
 
   // ヒストグラムを空に初期化する．
-#if defined(SSE2)
+#if defined(SSE)
     __declspec(align(16)) Histogram	bins;
 #else
     Histogram				bins;
@@ -588,7 +589,8 @@ SURFCreator::calcDetsLine(size_t y, size_t o, size_t filterSize,
     BoxFilter		boxFilter(_integralImage, filterSize);
     boxFilter.setY(yy);
     
-#if defined(SIMD)
+  //#if defined(SIMD)
+#if defined(SSE2)
     using namespace	simd;
 
     if (o == 0)
