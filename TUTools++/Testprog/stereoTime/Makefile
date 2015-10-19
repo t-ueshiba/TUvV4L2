@@ -17,7 +17,7 @@ CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB #-DWITHOUT_CVTDOWN
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch),armv7l)
-#  CPPFLAGS     += -DNEON
+  CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DAVX2
 endif

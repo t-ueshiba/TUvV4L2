@@ -37,7 +37,7 @@ namespace TU
 {
 static const float	slant = 0.41421356;	// tan(M_PI/8)
 
-#if defined(SSE2)
+#if defined(SIMD)
 namespace simd
 {
 static inline Is32vec
@@ -304,7 +304,7 @@ EdgeDetector::direction4(const Image<float>& edgeH,
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
-#if defined(SSE2)
+#if defined(SIMD)
 	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;
@@ -344,7 +344,7 @@ EdgeDetector::direction4x(const Image<float>& edgeH,
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
-#if defined(SSE2)
+#if defined(SIMD)
 	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;
@@ -391,7 +391,7 @@ EdgeDetector::direction8(const Image<float>& edgeH,
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
-#if defined(SSE2)
+#if defined(SIMD)
 	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;
@@ -431,7 +431,7 @@ EdgeDetector::direction8x(const Image<float>& edgeH,
 	const float		*eH = edgeH[v].data(), *eV = edgeV[v].data();
 	u_char*			dst = out[v].data();
 	const u_char* const	end = dst + out.width();
-#if defined(SSE2)
+#if defined(SIMD)
 	using namespace		simd;
 
 	const size_t		nelms = F32vec::size;

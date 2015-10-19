@@ -93,6 +93,12 @@ SIMD_AVG_SUB_AVG(u_int8_t)
 SIMD_AVG_SUB_AVG(u_int16_t)
 SIMD_AVG_SUB_AVG(u_int32_t)
 
+template <> inline F32vec
+avg(F32vec x, F32vec y)			{return (x + y) * F32vec(0.5f);}
+
+template <> inline F32vec
+sub_avg(F32vec x, F32vec y)		{return (x - y) * F32vec(0.5f);}
+    
 /************************************************************************
 *  Absolute values							*
 ************************************************************************/

@@ -85,7 +85,8 @@ class SURFCreator
 	value_type	getDyy(size_t x)			const	;
 	value_type	getDxy(size_t x)			const	;
 	value_type	getDet(size_t x)			const	;
-#if defined(SIMD)
+      //#if defined(SIMD)
+#if defined(SSE)
 	template <size_t O>
 	simd::F32vec	simdCrop2(int umin, int umax,
 				  int vmin, int vmax)		const	;

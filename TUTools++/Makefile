@@ -113,6 +113,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/arm/insert_extract.h \
 		TU/simd/arm/load_store.h \
 		TU/simd/arm/logical.h \
+		TU/simd/arm/lookup.h \
 		TU/simd/arm/misc.h \
 		TU/simd/arm/select.h \
 		TU/simd/arm/shift.h \
@@ -143,6 +144,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/intel/load_store.h \
 		TU/simd/intel/logical.h \
 		TU/simd/intel/logical_base.h \
+		TU/simd/intel/lookup.h \
 		TU/simd/intel/misc.h \
 		TU/simd/intel/select.h \
 		TU/simd/intel/shift.h \
@@ -155,6 +157,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/load_iterator.h \
 		TU/simd/load_store.h \
 		TU/simd/logical.h \
+		TU/simd/lookup.h \
 		TU/simd/misc.h \
 		TU/simd/row_vec_iterator.h \
 		TU/simd/select.h \
