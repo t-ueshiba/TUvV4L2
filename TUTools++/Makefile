@@ -15,7 +15,7 @@ MOCHDRS		=
 INCDIRS		= -I. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -O3
-NVCCFLAGS	= -g
+NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else
@@ -24,11 +24,6 @@ endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
-
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
@@ -100,6 +95,7 @@ HDRS		= TU/Array++.h \
 		TU/functional.h \
 		TU/io.h \
 		TU/iterator.h \
+		TU/pair.h \
 		TU/simd/allocator.h \
 		TU/simd/arithmetic.h \
 		TU/simd/arm/allocator.h \
