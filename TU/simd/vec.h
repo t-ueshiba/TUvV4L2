@@ -5,6 +5,7 @@
 #define __TU_SIMD_VEC_H
 
 #include <iostream>
+#include <boost/tuple/tuple_io.hpp>
 #include "TU/tuple.h"
 #include "TU/simd/config.h"
 #include "TU/simd/type_traits.h"
@@ -20,6 +21,7 @@ namespace simd
 template <class T, size_t N=1>
 struct vec : boost::htuple<vec<T>, N>
 {
+    typedef T				element_type;
     typedef boost::htuple<vec<T>, N>	super;
 
     vec()	:super()						{}
@@ -142,6 +144,14 @@ operator <<(std::ostream& out, const vec<T>& x)
 	out << ' ' << element_type(x[i]);
 
     return out;
+}
+    
+template <class T, size_t N> inline std::ostream&
+operator <<(std::ostream& out, const vec<T, N>& x)
+{
+    typedef typename vec<T, N>::super	super;
+    
+    return out << static_cast<const super&>(x);
 }
     
 typedef vec<int8_t>	Is8vec;		//!< 符号付き8bit整数ベクトル
