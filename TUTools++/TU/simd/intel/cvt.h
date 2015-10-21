@@ -41,7 +41,7 @@ namespace simd
       template <> inline vec<to>					\
       cvt<to, 1>(vec<from> x)						\
       {									\
-	  return cvt<to, 0>(shift_r<vec<from>::size/2>(x));		\
+	  return cvt<to>(shift_r<vec<from>::size/2>(x));		\
       }
 #  endif
   SIMD_CVTUP0(int8_t,    int16_t)	// s_char -> short
@@ -190,9 +190,9 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 
 #    define SIMD_CVTI_F(itype, ftype)					\
       template <> inline vec<ftype>					\
-      cvt<ftype, 0>(vec<itype> x)					\
+      cvt<ftype>(vec<itype> x)						\
       {									\
-	  return cvt<ftype, 0>(cvt<int32_t, 0>(x));			\
+	  return cvt<ftype>(cvt<int32_t>(x));				\
       }
 #  else		// AVX && !AVX2
     template <> inline F32vec		// 2*int  -> float
@@ -217,27 +217,27 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
     SIMD_CVT(int32_t, double)		// int    -> double
 
     template <> inline Is32vec		// double -> int
-    cvt<int32_t, 0>(F64vec x)
+    cvt<int32_t>(F64vec x)
     {
 	return _mm256_cvtpd_epi32(x);
     }
 
     template <> inline Is16vec		// float  -> short
-    cvt<int16_t, 0>(F32vec x)
+    cvt<int16_t>(F32vec x)
     {
 	__m256i	y = _mm256_cvtps_epi32(x);
-	return cvt<int16_t>(vec<int32_t, 0>(_mm256_castsi256_si128(y)),
-			    vec<int32_t, 0>(_mm256_extractf128_si256(y, 0x1)));
+	return cvt<int16_t>(vec<int32_t>(_mm256_castsi256_si128(y)),
+			    vec<int32_t>(_mm256_extractf128_si256(y, 0x1)));
     }
 
 #    define SIMD_CVTI_F(itype, ftype)					\
       template <> inline vec<ftype>					\
-      cvt<ftype, 0>(vec<itype> x)					\
+      cvt<ftype>(vec<itype> x)						\
       {									\
 	  return SIMD_MNEMONIC(cvt, _mm256_, epi32, SIMD_SUFFIX(ftype))	\
 	      (_mm256_insertf128_si256(					\
 		  _mm256_castsi128_si256(cvt<int32_t>(x)),		\
-		  cvt<int32_t, 0>(shift_r<4>(x)), 0x1));		\
+		  cvt<int32_t>(shift_r<4>(x)), 0x1));			\
       }
 #  endif
 
@@ -266,14 +266,14 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 
 #  define SIMD_CVTI_F(itype, suffix)					\
     template <> inline F32vec						\
-    cvt<float, 0>(vec<itype> x)						\
+    cvt<float>(vec<itype> x)						\
     {									\
 	return SIMD_MNEMONIC(cvt, _mm_, suffix, ps)			\
 	    (_mm_movepi64_pi64(x));					\
     }
 #  define SIMD_CVTF_I(itype, suffix)					\
     template <> inline vec<itype>					\
-    cvt<itype, 0>(F32vec x)						\
+    cvt<itype>(F32vec x)						\
     {									\
 	return _mm_movpi64_epi64(SIMD_MNEMONIC(cvt, _mm_, ps, suffix)	\
 				 (x));					\

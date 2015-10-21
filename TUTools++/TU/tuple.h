@@ -111,6 +111,21 @@ namespace tuples
   }
     
   /**********************************************************************
+  *  tuple_cat(const cons<H1, T1>&, const cons<H2, T2>&)		*
+  **********************************************************************/
+  template <class HEAD, class TAIL> inline const cons<HEAD, TAIL>&
+  tuple_cat(null_type, const cons<HEAD, TAIL>& tail)
+  {
+      return tail;
+  }
+  template <class H1, class T1, class H2, class T2> inline auto
+  tuple_cat(const cons<H1, T1>& x, const cons<H2, T2>& y)
+      -> decltype(make_cons(x.get_head(), tuple_cat(x.get_tail(), y)))
+  {
+      return make_cons(x.get_head(), tuple_cat(x.get_tail(), y));
+  }
+
+  /**********************************************************************
   *  cons_transform(cons<HEAD, TAIL>, UNARY_FUNC)			*
   **********************************************************************/
   template <class UNARY_FUNC> inline null_type

@@ -7,25 +7,23 @@
 #PROGRAM		= $(shell basename $(PWD))
 LIBRARY		= lib$(shell basename $(PWD))
 
-IDLDIR		= .
+VPATH		=
+
 IDLS		=
+MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ # -DUSE_VIDEO1394
-CFLAGS		= -g
-NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
+CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ #-DUSE_VIDEO1394
+CFLAGS		= -O3
+NVCCFLAGS	= -O
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
-
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
@@ -35,7 +33,6 @@ INCDIR		= $(PREFIX)/include
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu .idl .hh .so
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
@@ -121,9 +118,10 @@ OBJS		= Ieee1394Camera.o \
 		Ieee1394CameraUtility.o \
 		Ieee1394Node.o
 
-#include $(PROJECT)/lib/rtc.mk		# modified: CPPFLAGS, LIBS
-#include $(PROJECT)/lib/cnoid.mk	# modified: CPPFLAGS, LIBS, LIBDIR
-include $(PROJECT)/lib/lib.mk		# added:    PUBHDRS TARGHDRS
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
 Ieee1394Camera.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
