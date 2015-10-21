@@ -95,7 +95,6 @@ HDRS		= TU/Array++.h \
 		TU/functional.h \
 		TU/io.h \
 		TU/iterator.h \
-		TU/pair.h \
 		TU/simd/allocator.h \
 		TU/simd/arithmetic.h \
 		TU/simd/arm/allocator.h \
