@@ -80,6 +80,47 @@ cvt(const boost::tuples::cons<H1, T1>& x, const boost::tuples::cons<H2, T2>& y)
     return boost::tuples::cons_transform(x, y, detail::generic_cvt<S, 0>());
 }
 
+/************************************************************************
+*  Converting packs							*
+************************************************************************/
+namespace detail
+{
+  template <class S, class T>
+  inline typename std::enable_if<(2*vec<S>::size == vec<T>::size),
+				 std::pair<vec<S>, vec<S> > >::type
+  cvtup(const vec<T>& x)
+  {
+      return std::make_pair(cvt<S, 0>(x), cvt<S, 1>(x));
+  }
+
+  template <class S, class T>
+  inline typename std::enable_if<(vec<S>::size == vec<T>::size), vec<S> >::type
+  cvtup(const vec<T>& x)
+  {
+      return cvt<S>(x);
+  }
+
+  template <class S, class PACK> inline pack_target<S, std::pair<PACK, PACK> >
+  cvtup(const std::pair<PACK, PACK>& x)
+  {
+      return std::make_pair(cvtup<S>(x.first), cvtup<S>(x.second));
+  }
+
+  template <class S, class T>
+  inline typename std::enable_if<(vec<S>::size == 2*vec<T>::size),
+				 vec<S> >::type
+  cvtdown(const std::pair<vec<T>, vec<T> >& x)
+  {
+      return cvt<S>(x.first, x.second);
+  }
+    
+  template <class S, class PACK> inline pack_target<S, std::pair<PACK, PACK> >
+  cvtdown(const std::pair<PACK, PACK>& x)
+  {
+      return std::make_pair(cvtdown<S>(x.first), cvtdown<S>(x.second));
+  }
+}
+    
 }	// namespace simd
 }	// namespace TU
 

@@ -22,8 +22,8 @@ namespace detail
     public:
     // xがcons型のとき cvt_mask<S>(x) の結果もcons型になるので，
     // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
-    // value_typeとしておかないと，cvtupの最終ステップで cvtup(value_type)
-    // を呼び出せない．
+    // value_typeとしておかないと，cvtupの最終ステップで
+    // cvtup(const value_type&) を呼び出せない．
       typedef tuple_replace<iterator_value<ITER> >		value_type;
       typedef typename tuple_head<value_type>::element_type	element_type;
       typedef cvtup_mask_proxy					self;
@@ -37,18 +37,18 @@ namespace detail
 	
     private:
       template <class OP_>
-      void	cvtup(value_type x)
+      void	cvtup(const value_type& x)
 		{
 		    OP_()(*_iter, x);
 		    ++_iter;
 		}
       template <class OP_>
-      void	cvtup(complementary_vec x)
+      void	cvtup(const complementary_vec& x)
 		{
 		    cvtup<OP_>(cvt_mask<element_type>(x));
 		}
       template <class OP_, class VEC_>
-      void	cvtup(VEC_ x)
+      void	cvtup(const VEC_& x)
 		{
 		    typedef upper_type<typename tuple_head<VEC_>
 				       ::element_type>	upper_type;
@@ -61,25 +61,25 @@ namespace detail
       cvtup_mask_proxy(ITER const& iter) :_iter(const_cast<ITER&>(iter)) {}
 	
       template <class VEC_>
-      self&	operator =(VEC_ x)
+      self&	operator =(const VEC_& x)
 		{
 		    cvtup<assign>(x);
 		    return *this;
 		}
       template <class VEC_>
-      self&	operator &=(VEC_ x)
+      self&	operator &=(const VEC_& x)
 		{
 		    cvtup<bit_and_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
-      self&	operator |=(VEC_ x)
+      self&	operator |=(const VEC_& x)
 		{
 		    cvtup<bit_or_assign>(x);
 		    return *this;
 		}
       template <class VEC_>
-      self&	operator ^=(VEC_ x)
+      self&	operator ^=(const VEC_& x)
 		{
 		    cvtup<bit_xor_assign>(x);
 		    return *this;
@@ -119,7 +119,7 @@ class cvtup_mask_iterator
     friend class	boost::iterator_core_access;
 
   public:
-    cvtup_mask_iterator(ITER const& iter)	:super(iter)		{}
+    cvtup_mask_iterator(const ITER& iter)	:super(iter)		{}
 
   private:
     reference		dereference() const
@@ -129,7 +129,7 @@ class cvtup_mask_iterator
     void		advance(difference_type)			{}
     void		increment()					{}
     void		decrement()					{}
-    difference_type	distance_to(cvtup_mask_iterator const& iter) const
+    difference_type	distance_to(const cvtup_mask_iterator& iter) const
 			{
 			    return (iter.base() - super::base())
 				 / value_type::size;

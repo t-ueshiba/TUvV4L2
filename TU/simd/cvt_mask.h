@@ -75,6 +75,48 @@ cvt_mask(const boost::tuples::cons<H1, T1>& x,
 					 detail::generic_cvt_mask<S, 0>());
 }
     
+/************************************************************************
+*  Converting packs							*
+************************************************************************/
+namespace detail
+{
+  template <class S, class T>
+  inline typename std::enable_if<(2*vec<S>::size == vec<T>::size),
+				 std::pair<vec<S>, vec<S> > >::type
+  cvtup_mask(const vec<T>& x)
+  {
+      return std::make_pair(cvt_mask<S, 0>(x), cvt_mask<S, 1>(x));
+  }
+
+  template <class S, class T>
+  inline typename std::enable_if<(vec<S>::size == vec<T>::size), vec<S> >::type
+  cvtup_mask(const vec<T>& x)
+  {
+      return cvt_mask<S>(x);
+  }
+
+  template <class S, class PACK> inline pack_target<S, std::pair<PACK, PACK> >
+  cvtup_mask(const std::pair<PACK, PACK>& x)
+  {
+      return std::make_pair(cvtup_mask<S>(x.first), cvtup_mask<S>(x.second));
+  }
+
+  template <class S, class T>
+  inline typename std::enable_if<(vec<S>::size == 2*vec<T>::size),
+				 vec<S> >::type
+  cvtdown_mask(const std::pair<vec<T>, vec<T> >& x)
+  {
+      return cvt_mask<S>(x.first, x.second);
+  }
+    
+  template <class S, class PACK> inline pack_target<S, std::pair<PACK, PACK> >
+  cvtdown_mask(const std::pair<PACK, PACK>& x)
+  {
+      return std::make_pair(cvtdown_mask<S>(x.first),
+			    cvtdown_mask<S>(x.second));
+  }
+}
+    
 }	// namespace simd
 }	// namespace TU
 

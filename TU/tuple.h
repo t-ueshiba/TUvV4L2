@@ -694,23 +694,35 @@ make_unarizer(const FUNC& func)
 }
 
 /************************************************************************
-*  struct tuple_head<T>							*
+*  struct tuple_head<T>, tuple_leaf<T>, tuple_nelms<T>			*
 ************************************************************************/
 namespace detail
 {
   template <class T>
-  struct tuple_head
+  struct tuple_traits
   {
-      typedef T		type;
+      static constexpr size_t	nelms = 1;
+      typedef T			head_type;
+      typedef T			leftmost_type;
+  };
+  template <>
+  struct tuple_traits<boost::tuples::null_type>
+  {
+      static constexpr size_t	nelms = 0;
+      typedef void		head_type;
+      typedef void		leftmost_type;
   };
   template <class HEAD, class TAIL>
-  struct tuple_head<boost::tuples::cons<HEAD, TAIL> >
+  struct tuple_traits<boost::tuples::cons<HEAD, TAIL> >
   {
-      typedef HEAD	type;
+      static constexpr size_t	nelms = tuple_traits<HEAD>::nelms
+				      + tuple_traits<TAIL>::nelms;
+      typedef HEAD						head_type;
+      typedef typename tuple_traits<HEAD>::leftmost_type	leftmost_type;
   };
   template <BOOST_PP_ENUM_PARAMS(10, class T)>
-  struct tuple_head<boost::tuple<BOOST_PP_ENUM_PARAMS(10, T)> >
-      : tuple_head<
+  struct tuple_traits<boost::tuple<BOOST_PP_ENUM_PARAMS(10, T)> >
+      : tuple_traits<
             typename boost::tuple<BOOST_PP_ENUM_PARAMS(10, T)>::inherited>
   {
   };
@@ -721,15 +733,30 @@ namespace detail
   \param T	その先頭要素の型を調べるべき型
 */
 template <class T>
-using tuple_head = typename detail::tuple_head<T>::type;
+using tuple_head = typename detail::tuple_traits<T>::head_type;
 
+//! 与えられた型がtupleならばその最左要素の型を，そうでなければ元の型を返す．
+/*!
+  \param T	その最左要素の型を調べるべき型
+*/
+template <class T>
+using tuple_leftmost = typename detail::tuple_traits<T>::leftmost_type;
+
+template <class T>
+struct tuple_nelms
+{
+    static constexpr size_t	value = detail::tuple_traits<T>::nelms;
+};
+    
 /************************************************************************
 *  struct tuple_replace<S, T>						*
 ************************************************************************/
 namespace detail
 {
   template <class T, class S>
-  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>	{};
+  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
+  {
+  };
   template <class T>
   struct tuple_replace<T, boost::tuples::null_type>
   {
