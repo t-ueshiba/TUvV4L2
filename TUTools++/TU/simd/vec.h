@@ -7,6 +7,7 @@
 #include <iostream>
 #include <boost/tuple/tuple_io.hpp>
 #include "TU/tuple.h"
+#include "TU/pair.h"
 #include "TU/simd/config.h"
 #include "TU/simd/type_traits.h"
 
@@ -15,27 +16,10 @@ namespace TU
 namespace simd
 {
 /************************************************************************
-*  class vec<T, N>							*
+*  class vec<T>								*
 ************************************************************************/
-//! T型整数の成分を持つSIMDベクトルを表すクラス
-template <class T, size_t N=1>
-struct vec : boost::htuple<vec<T>, N>
-{
-    typedef T				element_type;
-    typedef boost::htuple<vec<T>, N>	super;
-
-    vec()	:super()						{}
-    vec(T x)	:super(boost::make_uniform_htuple<N>(vec<T>(x)))	{}
-    vec(const super& x)	:super(x)					{}
-    vec&	operator =(const super& x)
-		{
-		    super::operator =(x);
-		    return *this;
-		}
-};
-    
 template <class T>
-class vec<T, 1>
+class vec
 {
   public:
     typedef T			element_type;	//!< 成分の型    
@@ -146,14 +130,6 @@ operator <<(std::ostream& out, const vec<T>& x)
     return out;
 }
     
-template <class T, size_t N> inline std::ostream&
-operator <<(std::ostream& out, const vec<T, N>& x)
-{
-    typedef typename vec<T, N>::super	super;
-    
-    return out << static_cast<const super&>(x);
-}
-    
 typedef vec<int8_t>	Is8vec;		//!< 符号付き8bit整数ベクトル
 typedef vec<int16_t>	Is16vec;	//!< 符号付き16bit整数ベクトル
 typedef vec<int32_t>	Is32vec;	//!< 符号付き32bit整数ベクトル
@@ -170,6 +146,28 @@ typedef vec<u_int64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
 template <class T> struct is_vec		: std::false_type	{};
 template <class T> struct is_vec<vec<T> >	: std::true_type	{};
 
+/************************************************************************
+*  class pack<T, N>							*
+************************************************************************/
+template <class T, size_t N=1>
+using pack = pair_tree<vec<T>, N>;
+
+template <class PACK>
+using pack_vec = typename pair_traits<PACK>::leftmost_type;
+
+template <class PACK>
+using pack_element = typename pack_vec<PACK>::element_type;
+
+template <class T, class PACK>
+using pack_target = pack<T, (pair_traits<PACK>::nelms*
+			     pack_vec<PACK>::size)/vec<T>::size>;
+
+template <class PACK> inline std::ostream&
+operator <<(std::ostream& out, const std::pair<PACK, PACK>& x)
+{
+    return out << '[' << x.first << ' ' << x.second << ']';
+}
+    
 /************************************************************************
 *  Control functions							*
 ************************************************************************/
