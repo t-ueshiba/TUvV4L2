@@ -34,8 +34,8 @@ class multiplex_iterator
 	static pack<element_type, N_>
 	exec(ITER& iter)
 	{
-	    const auto&	x = dereference_impl<(N_ >> 1)>::exec(iter);
-	    const auto&	y = dereference_impl<(N_ >> 1)>::exec(iter);
+	    const auto&	x = dereference_impl<(N_>>1)>::exec(iter);
+	    const auto&	y = dereference_impl<(N_>>1)>::exec(iter);
 	    return std::make_pair(x, y);
 	}
     };
