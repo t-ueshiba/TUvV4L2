@@ -45,6 +45,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/simd/allocator.h \
 		/usr/local/include/TU/simd/arithmetic.h \
 		/usr/local/include/TU/simd/arm/allocator.h \
@@ -138,7 +139,7 @@ BrepCanvasPane.o: TU/v/Vision++.h /usr/local/include/TU/Brep/Brep++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h \
+	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
@@ -212,7 +213,7 @@ BrepCmdPane.o: TU/v/Vision++.h /usr/local/include/TU/Brep/Brep++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h \
+	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \

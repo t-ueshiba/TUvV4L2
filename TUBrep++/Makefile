@@ -41,6 +41,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/simd/allocator.h \
 		/usr/local/include/TU/simd/arithmetic.h \
 		/usr/local/include/TU/simd/arm/allocator.h \
@@ -134,7 +135,7 @@ Geometry.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -201,7 +202,7 @@ HalfEdge.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -268,7 +269,7 @@ Loop.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -335,7 +336,7 @@ Neighbor.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -402,7 +403,7 @@ PointB.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -469,7 +470,7 @@ TUBrep++.inst.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -536,7 +537,7 @@ TUBrep++.sa.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \

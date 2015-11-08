@@ -42,6 +42,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/simd/allocator.h \
 		/usr/local/include/TU/simd/arithmetic.h \
 		/usr/local/include/TU/simd/arm/allocator.h \
@@ -130,7 +131,7 @@ Ieee1394Camera.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -197,7 +198,7 @@ Ieee1394CameraArray.o: TU/Ieee1394CameraArray.h TU/Ieee1394++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h \
+	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
@@ -265,7 +266,7 @@ Ieee1394CameraUtility.o: TU/Ieee1394CameraArray.h TU/Ieee1394++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h \
+	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
@@ -333,7 +334,7 @@ Ieee1394Node.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \

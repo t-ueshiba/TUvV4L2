@@ -42,6 +42,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
+		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/simd/allocator.h \
 		/usr/local/include/TU/simd/arithmetic.h \
 		/usr/local/include/TU/simd/arm/allocator.h \
@@ -128,7 +129,7 @@ V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -195,7 +196,7 @@ V4L2CameraArray.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h \
+	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
@@ -263,7 +264,7 @@ V4L2CameraUtility.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h \
+	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
