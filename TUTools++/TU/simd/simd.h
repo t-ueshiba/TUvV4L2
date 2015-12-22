@@ -47,7 +47,6 @@
 #  include "TU/simd/shift.h"
 #  include "TU/simd/bit_shift.h"
 #  include "TU/simd/cvt.h"
-#  include "TU/simd/cvt_mask.h"
 #  include "TU/simd/logical.h"
 #  include "TU/simd/compare.h"
 #  include "TU/simd/select.h"
@@ -58,8 +57,6 @@
 #  include "TU/simd/store_iterator.h"
 #  include "TU/simd/cvtdown_iterator.h"
 #  include "TU/simd/cvtup_iterator.h"
-#  include "TU/simd/cvtdown_mask_iterator.h"
-#  include "TU/simd/cvtup_mask_iterator.h"
 #  include "TU/simd/shift_iterator.h"
 #  include "TU/simd/row_vec_iterator.h"
 #endif

@@ -90,10 +90,7 @@ template <>
 struct type_traits<float> : type_traits_base<float>
 {
     typedef float		mask_type;
-    typedef typename std::conditional<
-	sizeof(ivec_t) == sizeof(fvec_t),
-	int32_t,
-	int16_t>::type		complementary_type;
+    typedef int32_t		complementary_type;
     typedef typename std::conditional<
 	sizeof(ivec_t) == sizeof(fvec_t),
 	u_int32_t,

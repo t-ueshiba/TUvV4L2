@@ -5,9 +5,6 @@
 #define __TU_SIMD_VEC_H
 
 #include <iostream>
-#include <boost/tuple/tuple_io.hpp>
-#include "TU/tuple.h"
-#include "TU/pair.h"
 #include "TU/simd/config.h"
 #include "TU/simd/type_traits.h"
 
@@ -146,28 +143,6 @@ typedef vec<u_int64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
 template <class T> struct is_vec		: std::false_type	{};
 template <class T> struct is_vec<vec<T> >	: std::true_type	{};
 
-/************************************************************************
-*  class pack<T, N>							*
-************************************************************************/
-template <class T, size_t N=1>
-using pack = pair_tree<vec<T>, N>;
-
-template <class PACK>
-using pack_vec = typename pair_traits<PACK>::leftmost_type;
-
-template <class PACK>
-using pack_element = typename pack_vec<PACK>::element_type;
-
-template <class T, class PACK>
-using pack_target = pack<T, (pair_traits<PACK>::nelms*
-			     pack_vec<PACK>::size)/vec<T>::size>;
-
-template <class PACK> inline std::ostream&
-operator <<(std::ostream& out, const std::pair<PACK, PACK>& x)
-{
-    return out << '[' << x.first << ' ' << x.second << ']';
-}
-    
 /************************************************************************
 *  Control functions							*
 ************************************************************************/

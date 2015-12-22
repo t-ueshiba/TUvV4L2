@@ -5,6 +5,7 @@
 #define __TU_SIMD_CVT_MASK_ITERATOR_H
 
 #include "TU/iterator.h"
+#include "TU/simd/pack.h"
 #include "TU/simd/cvt_mask.h"
 
 namespace TU
@@ -58,14 +59,14 @@ class cvt_mask_iterator
 		}
     upmost_vec	up(const complementary_vec& x) const
 		{
-		    return detail::cvtup_mask<upmost_type>(x);
+		    return cvt_mask<upmost_type>(x);
 		}
     template <class VEC_>
     upmost_vec	up(const VEC_& x) const
 		{
 		    typedef simd::upper_type<pack_element<VEC_> > upper_type;
 		    
-		    return up(detail::cvtup_mask<upper_type>(x));
+		    return up(cvt_mask<upper_type>(x));
 		}
 
     void	down(upmost_vec& x)

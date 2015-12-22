@@ -12,77 +12,38 @@ namespace TU
 namespace simd
 {
 /************************************************************************
-*  class cvtup_iterator<ITER>						*
+*  class cvtup_iterator<ITER, MASK>					*
 ************************************************************************/
 namespace detail
 {
-  template <class ITER>
+  template <class ITER, bool MASK>
   class cvtup_proxy
   {
     public:
-    // xがcons型のとき cvt<S>(x) の結果もcons型になるので，
-    // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
-    // value_typeとしておかないと，cvtupの最終ステップで
-    // cvtup(const value_type&) を呼び出せない．
-      typedef tuple_replace<iterator_value<ITER> >		value_type;
-      typedef typename tuple_head<value_type>::element_type	element_type;
+      typedef iterator_value<ITER>				value_type;
       typedef cvtup_proxy					self;
 
     private:
-      typedef typename std::iterator_traits<ITER>::reference
-							reference;
-      typedef simd::complementary_type<element_type>	complementary_type;
-      typedef tuple_replace<value_type, vec<complementary_type> >
-							complementary_vec;
-      typedef typename std::conditional<
-		  std::is_floating_point<element_type>::value,
-		  complementary_type,
-		  element_type>::type			integral_type;
-      typedef simd::unsigned_type<simd::lower_type<integral_type> >
-							unsigned_lower_type;
-      typedef tuple_replace<value_type, vec<unsigned_lower_type> >
-							unsigned_lower_vec;
-	
+      typedef typename tuple_head<value_type>::element_type	T;
+
     private:
-      template <class OP_>
-      void	cvtup(const value_type& x)
+      template <class OP_, class VEC_>
+      typename std::enable_if<(vec<T>::size == tuple_head<VEC_>::size)>::type
+		cvtup(const VEC_& x)
 		{
-		    OP_()(*_iter, x);
+		    OP_()(*_iter, cvt<T, MASK>(x));
 		    ++_iter;
 		}
-      template <class OP_>
-      void	cvtup(const unsigned_lower_vec& x)
-		{
-		    cvtup<OP_>(cvt<integral_type, 0>(x));
-		    cvtup<OP_>(cvt<integral_type, 1>(x));
-		}
-      template <class OP_>
-      void	cvtup(const complementary_vec& x)
-		{
-		    cvtup<OP_>(x,
-			       std::integral_constant<
-				   bool, (vec<complementary_type>::size ==
-					  vec<element_type>::size)>());
-		}
-      template <class OP_>
-      void	cvtup(const complementary_vec& x, std::true_type)
-		{
-		    cvtup<OP_>(cvt<element_type>(x));
-		}
-      template <class OP_>
-      void	cvtup(const complementary_vec& x, std::false_type)
-		{
-		    cvtup<OP_>(cvt<element_type, 0>(x));
-		    cvtup<OP_>(cvt<element_type, 1>(x));
-		}
       template <class OP_, class VEC_>
-      void	cvtup(const VEC_& x)
+      typename std::enable_if<(vec<T>::size < tuple_head<VEC_>::size)>::type
+		cvtup(const VEC_& x)
 		{
-		    typedef upper_type<
-			typename tuple_head<VEC_>::element_type> upper_type;
-
-		    cvtup<OP_>(cvt<upper_type, 0>(x));
-		    cvtup<OP_>(cvt<upper_type, 1>(x));
+		    using U = cvt_upper_type<
+				 T, typename tuple_head<VEC_>::element_type,
+				 MASK>;
+		    
+		    cvtup<OP_>(cvt<U, MASK, false>(x));
+		    cvtup<OP_>(cvt<U, MASK, true >(x));
 		}
 
     public:
@@ -152,22 +113,22 @@ namespace detail
 /*!
   \param ITER	変換されたSIMDベクトルの書き込み先を指す反復子
 */
-template <class ITER>
+template <class ITER, bool MASK=false>
 class cvtup_iterator
     : public boost::iterator_adaptor<
-		 cvtup_iterator<ITER>,
+		 cvtup_iterator<ITER, MASK>,
 		 ITER,
-		 typename detail::cvtup_proxy<ITER>::value_type,
+		 typename detail::cvtup_proxy<ITER, MASK>::value_type,
 		 boost::single_pass_traversal_tag,
-		 detail::cvtup_proxy<ITER> >
+		 detail::cvtup_proxy<ITER, MASK> >
 {
   private:
     typedef boost::iterator_adaptor<
 		cvtup_iterator,
 		ITER,
-		typename detail::cvtup_proxy<ITER>::value_type,
+		typename detail::cvtup_proxy<ITER, MASK>::value_type,
 		boost::single_pass_traversal_tag,
-		detail::cvtup_proxy<ITER> >	super;
+		detail::cvtup_proxy<ITER, MASK> >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -194,10 +155,19 @@ class cvtup_iterator
 			}
 };
 
-template <class ITER> cvtup_iterator<ITER>
+template <class ITER> cvtup_iterator<ITER, false>
 make_cvtup_iterator(ITER iter)
 {
-    return cvtup_iterator<ITER>(iter);
+    return cvtup_iterator<ITER, false>(iter);
+}
+
+template <class ITER>
+using cvtup_mask_iterator = cvtup_iterator<ITER, true>;
+    
+template <class ITER> cvtup_mask_iterator<ITER>
+make_cvtup_mask_iterator(ITER iter)
+{
+    return cvtup_mask_iterator<ITER>(iter);
 }
 
 }	// namespace simd

@@ -4,7 +4,7 @@
 #if !defined(__TU_SIMD_TYPE_TRAITS_H)
 #define __TU_SIMD_TYPE_TRAITS_H
 
-#include <sys/types.h>
+#include <cstdint>
 
 namespace TU
 {
@@ -133,7 +133,10 @@ using complementary_mask_type	= typename
 				      type_traits<T>::complementary_mask_type;
 template <class T>
 using base_type			= typename type_traits<T>::base_type;
-    
+template <class T>
+using integral_type		= typename std::conditional<
+				      std::is_integral<T>::value,
+				      T, complementary_type<T> >::type;
 }	// namespace simd
 }	// namespace TU
 	

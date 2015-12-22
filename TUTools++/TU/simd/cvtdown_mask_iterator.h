@@ -22,26 +22,20 @@ namespace simd
 template <class T, class ITER>
 class cvtdown_mask_iterator
     : public boost::iterator_adaptor<
-		 cvtdown_mask_iterator<T, ITER>,	// self
-		 ITER,					// base
+		 cvtdown_mask_iterator<T, ITER>,		// self
+		 ITER,						// base
 		 tuple_replace<iterator_value<ITER>, vec<T> >,
 		 boost::single_pass_traversal_tag,
 		 tuple_replace<iterator_value<ITER>, vec<T> > >
 {
   private:
-    typedef iterator_value<ITER>			elementary_vec;
+    typedef tuple_head<iterator_value<ITER> >			src_vec;
     typedef boost::iterator_adaptor<
 		cvtdown_mask_iterator,
 		ITER,
-		tuple_replace<elementary_vec, vec<T> >,
+		tuple_replace<iterator_value<ITER>, vec<T> >,
 		boost::single_pass_traversal_tag,
-		tuple_replace<elementary_vec, vec<T> > >
-							super;
-    typedef typename tuple_head<elementary_vec>::element_type
-							element_type;
-    typedef complementary_mask_type<element_type>	complementary_type;
-    typedef tuple_replace<elementary_vec, vec<complementary_type> >
-							complementary_vec;
+		tuple_replace<iterator_value<ITER>, vec<T> > >	super;
 
   public:
     typedef typename super::difference_type	difference_type;
@@ -50,38 +44,33 @@ class cvtdown_mask_iterator
     friend class	boost::iterator_core_access;
 
   public:
-		cvtdown_mask_iterator(ITER const& iter)	:super(iter)	{}
+		cvtdown_mask_iterator(const ITER& iter)	:super(iter)	{}
 
   private:
-    void	cvtdown(elementary_vec& x)
+    template <class T_>
+    typename std::enable_if<(vec<T_>::size == src_vec::size), vec<T_> >::type
+		cvtdown()
 		{
-		    x = *super::base();
+		    auto	x = *super::base();
 		    ++super::base_reference();
+		    return cvt_mask<T_>(x);
 		}
-    void	cvtdown(complementary_vec& x)
+    template <class T_>
+    typename std::enable_if<(vec<T_>::size > src_vec::size), vec<T_> >::type
+		cvtdown()
 		{
-		    elementary_vec	y;
-		    cvtdown(y);
-		    x = cvt_mask<complementary_type>(y);
-		}
-    template <class VEC_>
-    void	cvtdown(VEC_& x)
-		{
-		    typedef typename
-			tuple_head<VEC_>::element_type	S;
-		    typedef upper_type<S>		upper_type;
-		    
-		    tuple_replace<elementary_vec, vec<upper_type> >	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt_mask<S>(y, z);
+		    using A = cvt_mask_above_type<
+				  T_, typename src_vec::element_type>;
+
+		    auto	x = cvtdown<A>();
+		    auto	y = cvtdown<A>();
+		    return cvt_mask<T_>(x, y);
 		}
 
     reference	dereference() const
 		{
-		    reference	x;
-		    const_cast<cvtdown_mask_iterator*>(this)->cvtdown(x);
-		    return x;
+		    return
+			const_cast<cvtdown_mask_iterator*>(this)->cvtdown<T>();
 		}
     void	advance(difference_type)				{}
     void	increment()						{}

@@ -10,7 +10,7 @@ namespace simd
 {
 namespace detail
 {
-  template <class S, class T> S	cast_base(T x)				;
+  template <class T, class S> T	cast_base(S x)				;
 
   /*
    *  cast_base() の実装
@@ -67,10 +67,10 @@ namespace detail
 #endif
 }	// namespace detail
       
-template <class S, class T> inline vec<S>
-cast(vec<T> x)
+template <class T, class S> inline vec<T>
+cast(vec<S> x)
 {
-    return detail::cast_base<base_type<S> >(base_type<T>(x));
+    return detail::cast_base<base_type<T> >(base_type<S>(x));
 }
     
 }	// namespace simd

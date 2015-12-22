@@ -10,17 +10,6 @@ namespace TU
 {
 namespace simd
 {
-template <class S, size_t I, class T> inline vec<S>
-cvt_mask(vec<T> x)
-{
-    return cvt_mask<S, (I&0x1)>(cvt_mask<lower_type<S>, (I>>1)>(x));
-}
-template <class S, size_t=0> inline vec<S>
-cvt_mask(vec<S> x)
-{
-    return x;
-}
-
 // [1] 整数ベクトル間のマスク変換
 #if defined(AVX2)
 #  define SIMD_CVTUP_MASK(from, to)					\
@@ -40,7 +29,7 @@ cvt_mask(vec<S> x)
     }
 #  define SIMD_CVTDOWN_MASK(from, to)					\
     template <> inline vec<to>						\
-    cvt_mask(vec<from> x, vec<from> y)					\
+    cvt_mask<to>(vec<from> x, vec<from> y)				\
     {									\
 	return SIMD_MNEMONIC(packs, _mm256_, , SIMD_SIGNED(from))(	\
 	    _mm256_permute2f128_si256(x, y, 0x20),			\
@@ -61,7 +50,7 @@ cvt_mask(vec<S> x)
 			     _mm_, , SIMD_SIGNED(from))(x, x);		\
     }
 #  define SIMD_CVTDOWN_MASK(from, to)					\
-    SIMD_SPECIALIZED_FUNC(vec<to> cvt_mask(vec<from> x, vec<from> y),	\
+    SIMD_SPECIALIZED_FUNC(vec<to> cvt_mask<to>(vec<from> x, vec<from> y), \
 			  packs, (x, y), void, from, SIMD_SIGNED)
 #endif
 #define SIMD_CVT_MASK(type0, type1)					\

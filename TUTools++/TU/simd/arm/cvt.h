@@ -12,16 +12,16 @@ namespace detail
 {
   template <class T>
   vec<T>	combine(half_type<T> x, half_type<T> y)			;
-  template <size_t I, class T>
+  template <bool HI, class T>
   half_type<T>	split(vec<T> x)						;
 
 #define SIMD_COMBINE_SPLIT(type)					\
     SIMD_SPECIALIZED_FUNC(						\
 	vec<type> combine<type>(half_type<type> x, half_type<type> y),	\
 	combine, (x, y), void, type)					\
-    SIMD_SPECIALIZED_FUNC(half_type<type> split<0>(vec<type> x),	\
+    SIMD_SPECIALIZED_FUNC(half_type<type> split<false>(vec<type> x),	\
 			  get_low, (x), void, type)			\
-    SIMD_SPECIALIZED_FUNC(half_type<type> split<1>(vec<type> x),	\
+    SIMD_SPECIALIZED_FUNC(half_type<type> split<true>(vec<type> x),	\
 			  get_high, (x), void, type)
 
   SIMD_COMBINE_SPLIT(int8_t)
@@ -61,60 +61,43 @@ namespace detail
     
 }	// namespace detail
 
-#define SIMD_CVTEQ(type)						\
-    template <> inline vec<type>					\
-    cvt<type, 0>(vec<type> x)						\
-    {									\
-	return x;							\
-    }
-#define SIMD_CVT(from, to)						\
-    template <> inline vec<to>						\
-    cvt<to, 0>(vec<from> x)						\
-    {									\
-	return cast<to>(detail::cvtup(detail::split<0>(x)));		\
-    }									\
-    template <> inline vec<to>						\
-    cvt<to, 1>(vec<from> x)						\
-    {									\
-	return cast<to>(detail::cvtup(detail::split<1>(x)));		\
-    }
+template <class T, bool MASK, bool HI, class S> inline vec<T>
+cvt(vec<S> x)
+{
+    using F = typename std::conditional<MASK, signed_type<S>, S>::type;
+    
+    return cast<T>(detail::cvtup(detail::split<HI>(cast<F>(x))));
+}
+
+template <class T, bool MASK, class S> inline vec<T>
+cvt(vec<S> x, vec<S> y)
+{
+    using F = typename std::conditional<MASK, signed_type<S>, S>::type;
+    
+    return cast<T>(detail::combine<lower_type<F> >(
+		       detail::cvtdown(cast<F>(x)),
+		       detail::cvtdown(cast<F>(y))));
+}
+
 #define SIMD_CVTF(from, to)						\
     SIMD_SPECIALIZED_FUNC(vec<to> cvt<to>(vec<from> x), cvtq, (x), to, from)
-
-SIMD_CVTEQ(int8_t)		// int8_t    -> int8_t
-SIMD_CVTEQ(int16_t)		// int16_t   -> int16_t
-SIMD_CVTEQ(int32_t)		// int32_t   -> int32_t
-SIMD_CVTEQ(int64_t)		// int64_t   -> int64_t
-SIMD_CVTEQ(u_int8_t)		// u_int8_t  -> u_int8_t
-SIMD_CVTEQ(u_int16_t)		// u_int16_t -> u_int16_t
-SIMD_CVTEQ(u_int32_t)		// u_int32_t -> u_int32_t
-SIMD_CVTEQ(u_int64_t)		// u_int64_t -> u_int64_t
-SIMD_CVTEQ(float)		// float     -> float
-
-SIMD_CVT(int8_t,    int16_t)	// int8_t    -> int16_t
-SIMD_CVT(int16_t,   int32_t)	// int16_t   -> int32_t
-SIMD_CVT(int32_t,   int64_t)	// int32_t   -> int64_t
-SIMD_CVT(u_int8_t,  int16_t)	// u_int8_t  -> int16_t
-SIMD_CVT(u_int8_t,  u_int16_t)	// u_int8_t  -> u_int16_t
-SIMD_CVT(u_int16_t, int32_t)	// u_int16_t -> int32_t
-SIMD_CVT(u_int16_t, u_int32_t)	// u_int16_t -> u_int32_t
-SIMD_CVT(u_int32_t, int64_t)	// u_int32_t -> int64_t
-SIMD_CVT(u_int32_t, u_int64_t)	// u_int32_t -> u_int64_t
 
 SIMD_CVTF(int32_t,   float)	// int32_t   -> float
 SIMD_CVTF(float,     int32_t)	// float     -> int32_t
 SIMD_CVTF(u_int32_t, float)	// u_int32_t -> float
 
-#undef SIMD_CVTEQ
-#undef SIMD_CVT
-#undef SIMD_CVTF
+#define SIMD_CVT_MASK(from, to)						\
+    template <> inline vec<to>						\
+    cvt<to, true>(vec<from> x)						\
+    {									\
+	return cast<to>(x);						\
+    }
 
-template <class S, class T> inline vec<S>
-cvt(vec<T> x, vec<T> y)
-{
-    return cast<S>(detail::combine<lower_type<T> >(detail::cvtdown(x),
-						   detail::cvtdown(y)));
-}
+SIMD_CVT_MASK(u_int32_t, float)
+SIMD_CVT_MASK(float, u_int32_t)
+
+#undef SIMD_CVTF
+#undef SIMD_CVT_MASK
 
 }	// namespace simd
 }	// namespace TU

@@ -13,8 +13,8 @@ namespace simd
 /************************************************************************
 *  Cast operators							*
 ************************************************************************/
-//! T型の成分を持つベクトルからS型の成分を持つベクトルへのキャストを行なう．
-template <class S, class T> vec<S>	cast(vec<T> x)			;
+//! S型の成分を持つベクトルからT型の成分を持つベクトルへのキャストを行なう．
+template <class T, class S> vec<T>	cast(vec<S> x)			;
 
 }	// namespace simd
 }	// namespace TU

@@ -4,7 +4,9 @@
 #if !defined(__TU_SIMD_CVT_MASK_H)
 #define	__TU_SIMD_CVT_MASK_H
 
-#include "TU/simd/cvt.h"
+#include "TU/tuple.h"
+#include "TU/simd/cast.h"
+#include <boost/tuple/tuple_io.hpp>
 
 namespace TU
 {
@@ -13,110 +15,128 @@ namespace simd
 /************************************************************************
 *  Mask conversion operators						*
 ************************************************************************/
-//! T型マスクベクトルのI番目の部分をより大きなS型マスクベクトルに型変換する．
+//! S型マスクベクトルを要素数が同一のT型マスクベクトルに型変換する．
 /*!
-  整数ベクトル間の変換の場合，SのサイズはTの2/4/8倍である．また，S, Tは
-  符号付き／符号なしのいずれでも良い．
   \param x	変換されるマスクベクトル
   \return	変換されたマスクベクトル
 */
-template <class S, size_t I=0, class T> vec<S>	cvt_mask(vec<T> x)	;
+template <class T, class S>
+inline typename std::enable_if<(vec<T>::size == vec<S>::size), vec<T> >::type
+cvt_mask(vec<S> x)
+{
+    return x;	// S == T の場合の実装
+}
 
-//! 2つのT型整数マスクベクトルをより小さなS型整数マスクベクトルに型変換する．
+//! S型マスクベクトルの上位または下位半分を要素数が半分のT型マスクベクトルに型変換する．
 /*!
-  SのサイズはTの倍である．また，S, Tは符号付き／符号なしのいずれでも良い．
+  S, Tは符号付き／符号なしのいずれでも良い．
+  \param I	I=0ならば下位，I=1ならば上位を変換
+  \param x	変換されるマスクベクトル
+  \return	変換されたマスクベクトル
+*/
+template <class T, size_t I, class S> vec<T>	cvt_mask(vec<S> x)	;
+	
+//! 2つのS型マスクベクトルを要素数が2倍のT型マスクベクトルに型変換する．
+/*!
+  S, Tは符号付き／符号なしのいずれでも良い．
   \param x	変換されるマスクベクトル
   \param y	変換されるマスクベクトル
   \return	xが変換されたものを下位，yが変換されたものを上位に
 		配したマスクベクトル
 */
-template <class S, class T> vec<S>	cvt_mask(vec<T> x, vec<T> y)	;
+template <class T, class S> vec<T>	cvt_mask(vec<S> x, vec<S> y)	;
 
 /************************************************************************
 *  Converting mask vec tuples						*
 ************************************************************************/
 namespace detail
 {
-  template <class S, size_t I>
+  template <class T, size_t I>
   struct generic_cvt_mask
   {
-      vec<S>	operator ()(vec<S> x) const
+      template <class S_>
+      typename std::enable_if<(vec<T>::size == vec<S_>::size), vec<T> >::type
+		operator ()(vec<S_> x) const
 		{
-		    return x;
+		    return cvt_mask<T>(x);
 		}
-      template <class T_>
-      vec<S>	operator ()(vec<T_> x) const
+      template <class S_>
+      typename std::enable_if<(vec<T>::size < vec<S_>::size), vec<T> >::type
+		operator ()(vec<S_> x) const
 		{
-		    return cvt_mask<S, I>(x);
+		    return cvt_mask<T, I>(x);
 		}
-      template <class T_>
-      vec<S>	operator ()(vec<T_> x, vec<T_> y) const
+      template <class S_>
+      vec<T>	operator ()(vec<S_> x, vec<S_> y) const
 		{
-		    return cvt_mask<S>(x, y);
+		    return cvt_mask<T>(x, y);
 		}
   };
 }
-    
-template <class S, size_t I=0, class HEAD, class TAIL> inline auto
+
+template <class T, size_t I=0, class HEAD, class TAIL> inline auto
 cvt_mask(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(
-		    x, detail::generic_cvt_mask<S, I>()))
+    -> decltype(boost::tuples::cons_transform(x,
+					      detail::generic_cvt_mask<T, I>()))
 {
-    return boost::tuples::cons_transform(x, detail::generic_cvt_mask<S, I>());
+    return boost::tuples::cons_transform(x, detail::generic_cvt<T, I>());
 }
     
-template <class S, class H1, class T1, class H2, class T2> inline auto
+template <class T, class H1, class T1, class H2, class T2> inline auto
 cvt_mask(const boost::tuples::cons<H1, T1>& x,
 	 const boost::tuples::cons<H2, T2>& y)
     -> decltype(boost::tuples::cons_transform(x, y,
-					      detail::generic_cvt_mask<S, 0>()))
+					      detail::generic_cvt_mask<T, 0>()))
 {
     return boost::tuples::cons_transform(x, y,
-					 detail::generic_cvt_mask<S, 0>());
+					 detail::generic_cvt_mask<T, 0>());
 }
     
 /************************************************************************
-*  Converting packs							*
+*  Adjacent target types of conversions					*
 ************************************************************************/
-namespace detail
-{
-  template <class S, class T>
-  inline typename std::enable_if<(2*vec<S>::size == vec<T>::size),
-				 std::pair<vec<S>, vec<S> > >::type
-  cvtup_mask(const vec<T>& x)
-  {
-      return std::make_pair(cvt_mask<S, 0>(x), cvt_mask<S, 1>(x));
-  }
+//! 要素数がより少ないマスクベクトルへの多段変換において最初の変換先の要素型を返す.
+/*!
+  vec<S> を vec<T> に変換する過程で vec<S> の最初の変換先の要素型を返す.
+  \param S	変換されるマスクベクトルの要素型
+  \param T	最終的な変換先のマスクベクトルの要素型
+  \return	最初の変換先のマスクベクトルの要素型
+*/
+template <class T, class S>
+using cvt_mask_upper_type = typename std::conditional<
+				(std::is_same<T, S>::value ||
+				 std::is_same<
+				     complementary_mask_type<T>, S>::value),
+				T, upper_type<S> >::type;
 
-  template <class S, class T>
-  inline typename std::enable_if<(vec<S>::size == vec<T>::size), vec<S> >::type
-  cvtup_mask(const vec<T>& x)
-  {
-      return cvt_mask<S>(x);
-  }
+//! 要素数がより多いマスクベクトルへの多段変換において最初の変換先の要素型を返す.
+/*!
+  vec<S> を vec<T> に変換する過程で vec<S> の最初の変換先の要素型を返す.
+  \param S	変換されるマスクベクトルの要素型
+  \param T	最終的な変換先のマスクベクトルの要素型
+  \return	最初の変換先のマスクベクトルの要素型
+*/
+template <class T, class S>
+using cvt_mask_lower_type = typename std::conditional<
+				(std::is_integral<T>::value !=
+				 std::is_integral<S>::value),
+				complementary_mask_type<S>,
+				typename std::conditional<
+				    std::is_same<T, S>::value,
+				    T, lower_type<S> >::type>::type;
 
-  template <class S, class PACK> inline pack_target<S, std::pair<PACK, PACK> >
-  cvtup_mask(const std::pair<PACK, PACK>& x)
-  {
-      return std::make_pair(cvtup_mask<S>(x.first), cvtup_mask<S>(x.second));
-  }
-
-  template <class S, class T>
-  inline typename std::enable_if<(vec<S>::size == 2*vec<T>::size),
-				 vec<S> >::type
-  cvtdown_mask(const std::pair<vec<T>, vec<T> >& x)
-  {
-      return cvt_mask<S>(x.first, x.second);
-  }
-    
-  template <class S, class PACK> inline pack_target<S, std::pair<PACK, PACK> >
-  cvtdown_mask(const std::pair<PACK, PACK>& x)
-  {
-      return std::make_pair(cvtdown_mask<S>(x.first),
-			    cvtdown_mask<S>(x.second));
-  }
-}
-    
+//! 要素数がより多いマスクベクトルへの多段変換において最終的な変換先の直前の要素型を返す.
+/*!
+  vec<S> を vec<T> に変換する過程で vec<T> に達する直前のマスクベクトルの要素型を返す.
+  \param S	変換されるマスクベクトルの要素型
+  \param T	最終的な変換先のマスクベクトルの要素型
+  \return	最終的な変換先に達する直前のマスクベクトルの要素型
+*/
+template <class T, class S>
+using cvt_mask_above_type = typename std::conditional<
+				std::is_same<
+				    T, complementary_mask_type<S> >::value,
+				S, upper_type<T> >::type;
 }	// namespace simd
 }	// namespace TU
 
@@ -126,4 +146,4 @@ namespace detail
 #  include "TU/simd/arm/cvt_mask.h"
 #endif
 
-#endif	// !__TU_SIMD_CVT_MASK_H=
+#endif	// !__TU_SIMD_CVT_MASK_H

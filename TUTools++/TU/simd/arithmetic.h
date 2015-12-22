@@ -5,6 +5,7 @@
 #define __TU_SIMD_ARITHMETIC_H
 
 #include "TU/simd/vec.h"
+#include "TU/simd/logical.h"
 
 namespace TU
 {
