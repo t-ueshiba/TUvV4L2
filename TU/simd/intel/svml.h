@@ -5,6 +5,8 @@
 #define __TU_SIMD_INTEL_SVML_H
 
 #if defined(__INTEL_COMPILER)
+#  include "TU/simd/arithmetic.h"
+
 namespace TU
 {
 namespace simd

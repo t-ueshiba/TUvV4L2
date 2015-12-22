@@ -20,41 +20,30 @@ namespace detail
   class cvtup_mask_proxy
   {
     public:
-    // xがcons型のとき cvt_mask<S>(x) の結果もcons型になるので，
-    // iterator_value<ITER> がtuple型のときはそれをcons型に直したものを
-    // value_typeとしておかないと，cvtupの最終ステップで
-    // cvtup(const value_type&) を呼び出せない．
-      typedef tuple_replace<iterator_value<ITER> >		value_type;
+      typedef iterator_value<ITER>				value_type;
       typedef typename tuple_head<value_type>::element_type	element_type;
       typedef cvtup_mask_proxy					self;
 
     private:
-      typedef typename std::iterator_traits<ITER>::reference
-							reference;
-      typedef complementary_mask_type<element_type>	complementary_type;
-      typedef tuple_replace<value_type, vec<complementary_type> >
-							complementary_vec;
-	
-    private:
-      template <class OP_>
-      void	cvtup(const value_type& x)
+      template <class OP_, class VEC_>
+      typename std::enable_if<(tuple_head<value_type>::size ==
+			       tuple_head<VEC_>::size)>::type
+		cvtup(const VEC_& x)
 		{
-		    OP_()(*_iter, x);
+		    OP_()(*_iter, cvt_mask<element_type>(x));
 		    ++_iter;
 		}
-      template <class OP_>
-      void	cvtup(const complementary_vec& x)
-		{
-		    cvtup<OP_>(cvt_mask<element_type>(x));
-		}
       template <class OP_, class VEC_>
-      void	cvtup(const VEC_& x)
+      typename std::enable_if<(tuple_head<value_type>::size <
+			       tuple_head<VEC_>::size)>::type
+		cvtup(const VEC_& x)
 		{
-		    typedef upper_type<typename tuple_head<VEC_>
-				       ::element_type>	upper_type;
+		    using U = cvt_mask_upper_type<
+				  element_type,
+				  typename tuple_head<VEC_>::element_type>;
 
-		    cvtup<OP_>(cvt_mask<upper_type, 0>(x));
-		    cvtup<OP_>(cvt_mask<upper_type, 1>(x));
+		    cvtup<OP_>(cvt_mask<U, 0>(x));
+		    cvtup<OP_>(cvt_mask<U, 1>(x));
 		}
 
     public:

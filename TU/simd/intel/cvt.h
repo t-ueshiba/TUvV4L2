@@ -10,12 +10,15 @@ namespace TU
 {
 namespace simd
 {
+/************************************************************************
+*  Vector conversion operators						*
+************************************************************************/
 // [1] 整数ベクトル間の変換
 #if defined(SSE4)
 #  if defined(AVX2)
 #    define SIMD_CVTUP0(from, to)					\
       template <> inline vec<to>					\
-      cvt<to, 0>(vec<from> x)						\
+      cvt<to, false, false>(vec<from> x)				\
       {									\
 	  return SIMD_MNEMONIC(cvt, _mm256_, SIMD_SUFFIX(from),		\
 			       SIMD_SIGNED(to))				\
@@ -23,7 +26,7 @@ namespace simd
       }
 #    define SIMD_CVTUP1(from, to)					\
       template <> inline vec<to>					\
-      cvt<to, 1>(vec<from> x)						\
+      cvt<to, false, true>(vec<from> x)					\
       {									\
 	  return SIMD_MNEMONIC(cvt, _mm256_, SIMD_SUFFIX(from),		\
 			       SIMD_SIGNED(to))				\
@@ -32,38 +35,38 @@ namespace simd
 #  else	// SSE4 && !AVX2
 #    define SIMD_CVTUP0(from, to)					\
       template <> inline vec<to>					\
-      cvt<to, 0>(vec<from> x)						\
+      cvt<to, false, false>(vec<from> x)				\
       {									\
 	  return SIMD_MNEMONIC(cvt, _mm_,				\
 			       SIMD_SUFFIX(from), SIMD_SIGNED(to))(x);	\
       }
 #    define SIMD_CVTUP1(from, to)					\
       template <> inline vec<to>					\
-      cvt<to, 1>(vec<from> x)						\
+      cvt<to, false, true>(vec<from> x)					\
       {									\
-	  return cvt<to>(shift_r<vec<from>::size/2>(x));		\
+	  return cvt<to, false, false>(shift_r<vec<from>::size/2>(x));	\
       }
 #  endif
-  SIMD_CVTUP0(int8_t,    int16_t)	// s_char -> short
-  SIMD_CVTUP1(int8_t,    int16_t)	// s_char -> short
-  SIMD_CVTUP0(int8_t,    int32_t)	// s_char -> int
-  SIMD_CVTUP0(int8_t,    int64_t)	// s_char -> long
+  SIMD_CVTUP0(int8_t,	 int16_t)	// s_char -> short
+  SIMD_CVTUP1(int8_t,	 int16_t)	// s_char -> short
+  SIMD_CVTUP0(int8_t,	 int32_t)	// s_char -> int
+  SIMD_CVTUP0(int8_t,	 int64_t)	// s_char -> long
   
-  SIMD_CVTUP0(int16_t,   int32_t)	// short  -> int
-  SIMD_CVTUP1(int16_t,   int32_t)	// short  -> int
-  SIMD_CVTUP0(int16_t,   int64_t)	// short  -> long
+  SIMD_CVTUP0(int16_t,	 int32_t)	// short  -> int
+  SIMD_CVTUP1(int16_t,	 int32_t)	// short  -> int
+  SIMD_CVTUP0(int16_t,	 int64_t)	// short  -> long
   
-  SIMD_CVTUP0(int32_t,   int64_t)	// int    -> long
-  SIMD_CVTUP1(int32_t,   int64_t)	// int    -> long
+  SIMD_CVTUP0(int32_t,	 int64_t)	// int    -> long
+  SIMD_CVTUP1(int32_t,	 int64_t)	// int    -> long
 
-  SIMD_CVTUP0(u_int8_t,  int16_t)	// u_char -> short
-  SIMD_CVTUP1(u_int8_t,  int16_t)	// u_char -> short
-  SIMD_CVTUP0(u_int8_t,  u_int16_t)	// u_char -> u_short
-  SIMD_CVTUP1(u_int8_t,  u_int16_t)	// u_char -> u_short
-  SIMD_CVTUP0(u_int8_t,  int32_t)	// u_char -> int
-  SIMD_CVTUP0(u_int8_t,  u_int32_t)	// u_char -> u_int
-  SIMD_CVTUP0(u_int8_t,  int64_t)	// u_char -> long
-  SIMD_CVTUP0(u_int8_t,  u_int64_t)	// u_char -> u_long
+  SIMD_CVTUP0(u_int8_t,	 int16_t)	// u_char -> short
+  SIMD_CVTUP1(u_int8_t,	 int16_t)	// u_char -> short
+  SIMD_CVTUP0(u_int8_t,	 u_int16_t)	// u_char -> u_short
+  SIMD_CVTUP1(u_int8_t,	 u_int16_t)	// u_char -> u_short
+  SIMD_CVTUP0(u_int8_t,	 int32_t)	// u_char -> int
+  SIMD_CVTUP0(u_int8_t,	 u_int32_t)	// u_char -> u_int
+  SIMD_CVTUP0(u_int8_t,	 int64_t)	// u_char -> long
+  SIMD_CVTUP0(u_int8_t,	 u_int64_t)	// u_char -> u_long
   
   SIMD_CVTUP0(u_int16_t, int32_t)	// u_short -> int
   SIMD_CVTUP1(u_int16_t, int32_t)	// u_short -> int
@@ -82,23 +85,23 @@ namespace simd
 #else	// !SSE4
 #  define SIMD_CVTUP_I(from, to)					\
     template <> inline vec<to>						\
-    cvt<to, 0>(vec<from> x)						\
+    cvt<to, false, false>(vec<from> x)					\
     {									\
 	return cast<to>(dup<0>(x)) >> 8*vec<from>::element_size;	\
     }									\
     template <> inline vec<to>						\
-    cvt<to, 1>(vec<from> x)						\
+    cvt<to, false, true>(vec<from> x)					\
     {									\
 	return cast<to>(dup<1>(x)) >> 8*vec<from>::element_size;	\
     }
 #  define SIMD_CVTUP_UI(from, to)					\
     template <> inline vec<to>						\
-    cvt<to, 0>(vec<from> x)						\
+    cvt<to, false, false>(vec<from> x)					\
     {									\
 	return cast<to>(unpack_low(x, zero<from>()));			\
     }									\
     template <> inline vec<to>						\
-    cvt<to, 1>(vec<from> x)						\
+    cvt<to, false, true>(vec<from> x)					\
     {									\
 	return cast<to>(unpack_high(x, zero<from>()));			\
     }
@@ -121,7 +124,7 @@ namespace simd
 #if defined(AVX2)
 #  define SIMD_CVTDOWN_I(from, to)					\
     template <> inline vec<to>						\
-    cvt(vec<from> x, vec<from> y)					\
+    cvt<to>(vec<from> x, vec<from> y)					\
     {									\
 	return SIMD_MNEMONIC(packs, _mm256_, , SIMD_SUFFIX(from))	\
 	    (_mm256_permute2f128_si256(x, y, 0x20),			\
@@ -129,7 +132,7 @@ namespace simd
     }
 #  define SIMD_CVTDOWN_UI(from, to)					\
     template <> inline vec<to>						\
-    cvt(vec<from> x, vec<from> y)					\
+    cvt<to>(vec<from> x, vec<from> y)					\
     {									\
 	return SIMD_MNEMONIC(packus, _mm256_, , SIMD_SUFFIX(from))	\
 	    (_mm256_permute2f128_si256(x, y, 0x20),			\
@@ -150,7 +153,7 @@ SIMD_CVTDOWN_I(int16_t,  int8_t)	// short -> s_char
 SIMD_CVTDOWN_I(int32_t,  int16_t)	// int   -> short
 SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 #if defined(SSE4)
-  SIMD_CVTDOWN_UI(int32_t, u_int16_t)	// int -> u_short
+  SIMD_CVTDOWN_UI(int32_t, u_int16_t)	// int   -> u_short
 #endif
 
 #undef SIMD_CVTDOWN_I
@@ -169,13 +172,13 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
     SIMD_CVT_2(int32_t, float)		// int   <-> float
 
     template <> inline F64vec		// int    -> double
-    cvt<double, 0>(Is32vec x)
+    cvt<double, false, false>(Is32vec x)
     {
 	return _mm256_cvtepi32_pd(_mm256_castsi256_si128(x));
     }
 
     template <> inline F64vec		// int    -> double
-    cvt<double, 1>(Is32vec x)
+    cvt<double, false, true>(Is32vec x)
     {
 	return _mm256_cvtepi32_pd(_mm256_extractf128_si256(x, 0x1));
     }
@@ -194,40 +197,64 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
       {									\
 	  return cvt<ftype>(cvt<int32_t>(x));				\
       }
+
 #  else		// AVX && !AVX2
-    template <> inline F32vec		// 2*int  -> float
+    template <> inline Is32vec		// float  -> int
+    cvt<int32_t, false, false>(F32vec x)
+    {
+	return _mm256_castsi256_si128(_mm256_cvtps_epi32(x));
+    }
+
+    template <> inline Is32vec		// float  -> int
+    cvt<int32_t, false, true>(F32vec x)
+    {
+	return _mm256_extractf128_si256(_mm256_cvtps_epi32(x), 0x1);
+    }
+
+    template <> inline F32vec		// int    -> float
     cvt<float>(Is32vec x, Is32vec y)
     {
 	return _mm256_cvtepi32_ps(
 		   _mm256_insertf128_si256(_mm256_castsi128_si256(x), y, 0x1));
     }
 
-    template <> inline Is32vec		// float  -> int
-    cvt<int32_t, 0>(F32vec x)
+    template <> inline F64vec		// int    -> double
+    cvt<double>(Is32vec x)
     {
-	return _mm256_castsi256_si128(_mm256_cvtps_epi32(x));
+	return _mm256_cvtepi32_pd(x);
     }
-
-    template <> inline Is32vec		// float  -> int
-    cvt<int32_t, 1>(F32vec x)
-    {
-	return _mm256_extractf128_si256(_mm256_cvtps_epi32(x), 0x1);
-    }
-
-    SIMD_CVT(int32_t, double)		// int    -> double
-
+    
     template <> inline Is32vec		// double -> int
     cvt<int32_t>(F64vec x)
     {
 	return _mm256_cvtpd_epi32(x);
     }
 
+    template <> inline F32vec		// short  -> float
+    cvt<float>(Is16vec x)
+    {
+	return _mm256_cvtepi32_ps(_mm256_insertf128_si256(
+				      _mm256_castsi128_si256(
+					  cvt<int32_t, false, false>(x)),
+				      cvt<int32_t, false, true>(x), 0x1));
+    }
+    
     template <> inline Is16vec		// float  -> short
     cvt<int16_t>(F32vec x)
     {
 	__m256i	y = _mm256_cvtps_epi32(x);
 	return cvt<int16_t>(vec<int32_t>(_mm256_castsi256_si128(y)),
 			    vec<int32_t>(_mm256_extractf128_si256(y, 0x1)));
+    }
+
+
+    template <> inline F32vec		// u_short -> float
+    cvt<float>(Iu16vec x)
+    {
+	return _mm256_cvtepi32_ps(_mm256_insertf128_si256(
+				      _mm256_castsi128_si256(
+					  cvt<int32_t, false, false>(x)),
+				      cvt<int32_t, false, true>(x), 0x1));
     }
 
 #    define SIMD_CVTI_F(itype, ftype)					\
@@ -239,21 +266,19 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 		  _mm256_castsi128_si256(cvt<int32_t>(x)),		\
 		  cvt<int32_t>(shift_r<4>(x)), 0x1));			\
       }
+
 #  endif
-
-  SIMD_CVTI_F(int8_t,    float)		// s_char  -> float
-  SIMD_CVTI_F(int16_t,   float)		// short   -> float
-  SIMD_CVTI_F(u_int8_t,  float)		// u_char  -> float
-  SIMD_CVTI_F(u_int16_t, float)		// u_short -> float
-#  undef SIMD_CVTI_F
-
 #elif defined(SSE2)	// !AVX && SSE2
   SIMD_CVT_2(int32_t, float)		// int    <-> float
 
-  SIMD_CVT(int32_t, double)		// int	   -> double
+  template <> inline F64vec		// int	   -> double
+  cvt<double, false, false>(Is32vec x)
+  {
+      return _mm_cvtepi32_pd(x);
+  }
 
   template <> inline F64vec		// int	   -> double
-  cvt<double, 1>(Is32vec x)
+  cvt<double, false, true>(Is32vec x)
   {
       return _mm_cvtepi32_pd(_mm_shuffle_epi32(x, _MM_SHUFFLE(1, 0, 3, 2)));
   }
@@ -266,14 +291,14 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 
 #  define SIMD_CVTI_F(itype, suffix)					\
     template <> inline F32vec						\
-    cvt<float>(vec<itype> x)						\
+    cvt<float, false, false>(vec<itype> x)				\
     {									\
 	return SIMD_MNEMONIC(cvt, _mm_, suffix, ps)			\
 	    (_mm_movepi64_pi64(x));					\
     }
 #  define SIMD_CVTF_I(itype, suffix)					\
     template <> inline vec<itype>					\
-    cvt<itype>(F32vec x)						\
+    cvt<itype, false, false>(F32vec x)					\
     {									\
 	return _mm_movpi64_epi64(SIMD_MNEMONIC(cvt, _mm_, ps, suffix)	\
 				 (x));					\
@@ -292,35 +317,37 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 #  undef SIMD_CVT_2FI
 
 #elif defined(SSE)	// !SSE2 && SSE
-  template <> inline F32vec
-  cvt<float>(Is32vec x, Is32vec y)	// 2*int   -> float
+  template <> inline Is32vec		// float   -> int
+  cvt<int32_t, false, false>(F32vec x)
   {
-      return _mm_cvtpi32x2_ps(x, y);
+      return _mm_cvtps_pi32(x);
   }
 
-  SIMD_CVT(float, int32_t)		// float   -> int
-
   template <> inline Is32vec		// float   -> int
-  cvt<int32_t, 1>(F32vec x)
+  cvt<int32_t, false, true>(F32vec x)
   {
       return _mm_cvtps_pi32(_mm_shuffle_ps(x, x, _MM_SHUFFLE(1, 0, 3, 2)));
   }
 
-  SIMD_CVT_2(int8_t,  float)		// s_char <-> float
+  template <> inline F32vec
+  cvt<float>(Is32vec x, Is32vec y)	// int     -> float
+  {
+      return _mm_cvtpi32x2_ps(x, y);
+  }
+
   SIMD_CVT_2(int16_t, float)		// short  <-> float
-  SIMD_CVT(u_int8_t,  float)		// u_char  -> float
   SIMD_CVT(u_int16_t, float)		// u_short -> float
 #endif
   
 // [3] 浮動小数点数ベクトル間の変換
 #if defined(AVX)
   template <> inline F64vec
-  cvt<double, 0>(F32vec x)		// float -> double
+  cvt<double, false, false>(F32vec x)	// float -> double
   {
       return _mm256_cvtps_pd(_mm256_castps256_ps128(x));
   }
   template <> inline F64vec
-  cvt<double, 1>(F32vec x)		// float -> double
+  cvt<double, false, true>(F32vec x)	// float -> double
   {
       return _mm256_cvtps_pd(_mm256_extractf128_ps(x, 1));
   }
@@ -333,12 +360,12 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
   }
 #elif defined(SSE2)
   template <> inline F64vec
-  cvt<double, 0>(F32vec x)		// float -> double
+  cvt<double, false, false>(F32vec x)	// float -> double
   {
       return _mm_cvtps_pd(x);
   }
   template <> inline F64vec
-  cvt<double, 1>(F32vec x)		// float -> double
+  cvt<double, false, true>(F32vec x)	// float -> double
   {
       return _mm_cvtps_pd(_mm_shuffle_ps(x, x, _MM_SHUFFLE(1, 0, 3, 2)));
   }
@@ -354,6 +381,118 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 #undef SIMD_CVT
 #undef SIMD_CVT_2
 
+/************************************************************************
+*  Mask conversion operators						*
+************************************************************************/
+// [1] 整数ベクトル間のマスク変換
+#if defined(AVX2)
+#  define SIMD_CVTUP_MASK(from, to)					\
+    template <> inline vec<to>						\
+    cvt<to, true, false>(vec<from> x)					\
+    {									\
+	return SIMD_MNEMONIC(cvt, _mm256_,				\
+			     SIMD_SIGNED(from), SIMD_SIGNED(to))(	\
+				 _mm256_castsi256_si128(x));		\
+    }									\
+    template <> inline vec<to>						\
+    cvt<to, true, true>(vec<from> x)					\
+    {									\
+	return SIMD_MNEMONIC(cvt, _mm256_,				\
+			     SIMD_SIGNED(from), SIMD_SIGNED(to))(	\
+				 _mm256_extractf128_si256(x, 0x1));	\
+    }
+#  define SIMD_CVTDOWN_MASK(from, to)					\
+    template <> inline vec<to>						\
+    cvt<to, true>(vec<from> x, vec<from> y)				\
+    {									\
+	return SIMD_MNEMONIC(packs, _mm256_, , SIMD_SIGNED(from))(	\
+	    _mm256_permute2f128_si256(x, y, 0x20),			\
+	    _mm256_permute2f128_si256(x, y, 0x31));			\
+    }
+#else
+#  define SIMD_CVTUP_MASK(from, to)					\
+    template <> inline vec<to>						\
+    cvt<to, true, false>(vec<from> x)					\
+    {									\
+	return SIMD_MNEMONIC(unpacklo,					\
+			     _mm_, , SIMD_SIGNED(from))(x, x);		\
+    }									\
+    template <> inline vec<to>						\
+    cvt<to, true, true>(vec<from> x)					\
+    {									\
+	return SIMD_MNEMONIC(unpackhi,					\
+			     _mm_, , SIMD_SIGNED(from))(x, x);		\
+    }
+#  define SIMD_CVTDOWN_MASK(from, to)					\
+    template <> inline vec<to>						\
+    cvt<to, true>(vec<from> x, vec<from> y)				\
+    {									\
+	return SIMD_MNEMONIC(packs, _mm_, , SIMD_SIGNED(from))(x, y);	\
+    }
+#endif
+#define SIMD_CVT_MASK(type0, type1)					\
+    SIMD_CVTUP_MASK(type0, type1)					\
+    SIMD_CVTDOWN_MASK(type1, type0)
+
+SIMD_CVT_MASK(u_int8_t,	   u_int16_t)	// u_char  <-> u_short
+SIMD_CVT_MASK(u_int16_t,   u_int32_t)	// u_short <-> u_int
+SIMD_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
+
+#undef SIMD_CVTUP_MASK
+#undef SIMD_CVTDOWN_MASK
+#undef SIMD_CVT_MASK
+
+// [2] 整数ベクトルと浮動小数点数ベクトル間のマスク変換
+#if defined(SSE2)
+#  if !defined(AVX) || defined(AVX2)	// Is32vec::size == F32vec::size
+#    define SIMD_CVT_MASK_2FI(itype, ftype)				\
+      template <> inline vec<ftype>					\
+      cvt<ftype, true>(vec<itype> x)	{return cast<ftype>(x);}	\
+      template <> inline vec<itype>					\
+      cvt<itype, true>(vec<ftype> x)	{return cast<itype>(x);}
+
+    SIMD_CVT_MASK_2FI(u_int32_t, float)		// u_int  <-> float
+    SIMD_CVT_MASK_2FI(u_int64_t, double)	// u_long <-> double
+
+#    undef SIMD_CVT_MASK_2FI
+#  else	// AVX && !AVX2
+#    define SIMD_CVT_MASK_IF(itype, ftype)				\
+      template <> inline vec<ftype>					\
+      cvt<ftype, true>(vec<itype> x)					\
+      {									\
+	  typedef upper_type<itype>	upper_type;			\
+      									\
+	  return SIMD_MNEMONIC(cast,					\
+			       _mm256_, si256, SIMD_SUFFIX(ftype))(	\
+				   _mm256_insertf128_si256(		\
+				       _mm256_castsi128_si256(		\
+					   cvt<upper_type, true, false>(x)), \
+				       cvt<upper_type, true, true>(x),	\
+					   0x1));			\
+      }
+#    define SIMD_CVT_MASK_FI(itype)					\
+      template <> inline vec<itype>					\
+      cvt<itype, true>(F32vec x)					\
+      {									\
+	  typedef upper_type<itype>	upper_type;			\
+	  								\
+	  return cvt<itype, true>(					\
+		     vec<upper_type>(					\
+			 _mm256_castsi256_si128(			\
+			     _mm256_castps_si256(x))),			\
+		     vec<upper_type>(					\
+		         _mm256_extractf128_si256(			\
+			     _mm256_castps_si256(x), 0x1)));		\
+      }
+
+    SIMD_CVT_MASK_IF(u_int16_t, float)		// u_short -> float
+    SIMD_CVT_MASK_FI(u_int16_t)			// float   -> u_short
+    SIMD_CVT_MASK_IF(u_int32_t, double)		// u_int   -> double
+
+#    undef SIMD_CVT_MASK_IF
+#    undef SIMD_CVT_MASK_FI
+#  endif
+#endif
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_INTEL_CVT_H

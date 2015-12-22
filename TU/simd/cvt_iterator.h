@@ -5,42 +5,36 @@
 #define __TU_SIMD_CVT_ITERATOR_H
 
 #include "TU/iterator.h"
-#include "TU/simd/cvt.h"
+#include "TU/simd/pack.h"
 
 namespace TU
 {
 namespace simd
 {
 /************************************************************************
-*  class cvt_iterator<T, ITER>						*
+*  class cvt_iterator<T, ITER, MASK>					*
 ************************************************************************/
 //! SIMDベクトルを出力する反復子を介して1つまたは複数のSIMDベクトルを読み込み，指定された成分を持つSIMDベクトルに変換する反復子
 /*!
-  \param T	変換先のSIMDベクトルの成分の型
+  \param S	変換先のSIMDベクトルの成分の型
   \param ITER	SIMDベクトルを出力する反復子
 */
-template <class T, class ITER>
+template <class T, class ITER, bool MASK=false>
 class cvt_iterator
-    : public boost::iterator_adaptor<cvt_iterator<T, ITER>,
+    : public boost::iterator_adaptor<cvt_iterator<T, ITER, MASK>,
 				     ITER,
 				     pack_target<T, iterator_value<ITER> >,
 				     boost::single_pass_traversal_tag,
 				     pack_target<T, iterator_value<ITER> > >
 {
   private:
-    typedef iterator_value<ITER>			src_vec;
-    typedef pack_target<T, src_vec>			dst_vec;
+    typedef iterator_value<ITER>			src_type;
+    typedef pack_target<T, src_type>			dst_type;
     typedef boost::iterator_adaptor<cvt_iterator,
 				    ITER,
-				    dst_vec,
+				    dst_type,
 				    boost::single_pass_traversal_tag,
-				    dst_vec>		super;
-    typedef typename std::conditional<
-		(pack_vec<src_vec>::size <= vec<T>::size),
-		src_vec, dst_vec>::type			upmost_vec;
-    typedef pack_element<upmost_vec>			upmost_type;
-    typedef simd::complementary_type<upmost_type>	complementary_type;
-    typedef pack_target<complementary_type, upmost_vec>	complementary_vec;
+				    dst_type>		super;
 
   public:
     typedef typename super::difference_type		difference_type;
@@ -50,85 +44,42 @@ class cvt_iterator
 
   public:
 		cvt_iterator(const ITER& iter)	:super(iter)	{}
-
+    
   private:
-    upmost_vec	up(const upmost_vec& x) const
+    template <class T_>
+    typename std::enable_if<(vec<T_>::size == src_type::size), vec<T_> >::type
+		cvtdown()
 		{
-		    return x;
-		}
-    upmost_vec	up(const complementary_vec& x) const
-		{
-		    return detail::cvtup<upmost_type>(x);
-		}
-    template <class VEC_>
-    upmost_vec	up(const VEC_& x) const
-		{
-		    typedef typename std::conditional<
-			std::is_floating_point<upmost_type>::value,
-			complementary_type, upmost_type>::type	integral_type;
-		    typedef pack_element<VEC_>			element_type;
-		    typedef typename std::conditional<
-			std::is_same<
-			    element_type,
-			    unsigned_type<lower_type<integral_type> > >::value,
-			integral_type,
-			simd::upper_type<element_type> >::type	upper_type;
-		    
-		    return up(detail::cvtup<upper_type>(x));
-		}
-
-    void	down(upmost_vec& x)
-		{
-		    x = *super::base();
+		    auto	x = *super::base();
 		    ++super::base_reference();
+		    return cvt<T_, MASK>(x);
 		}
-    void	down(complementary_vec& x)
+    template <class T_>
+    typename std::enable_if<(vec<T_>::size > src_type::size), vec<T_> >::type
+		cvtdown()
 		{
-		    down(x,
-			 std::integral_constant<
-			     bool, (vec<complementary_type>::size ==
-				    vec<upmost_type>::size)>());
-		}
-    void	down(complementary_vec& x, std::true_type)
-		{
-		    upmost_vec	y;
-		    down(y);
-		    x = cvt<complementary_type>(y);
-		}
-    void	down(complementary_vec& x, std::false_type)
-		{
-		    upmost_vec	y, z;
-		    down(y);
-		    down(z);
-		    x = cvt<complementary_type>(y, z);
-		}
-    template <class VEC_>
-    void	down(VEC_& x)
-		{
-		    typedef pack_element<VEC_>		element_type;
-		    typedef signed_type<upper_type<element_type> >
-							signed_upper_type;
-		    
-		    pack_target<signed_upper_type, upmost_vec>	y, z;
-		    down(y);
-		    down(z);
-		    x = cvt<element_type>(y, z);
+		    using A = cvt_above_type<
+				  T_ , typename src_type::element_type, MASK>;
+	  
+		    auto	x = cvtdown<A>();
+		    auto	y = cvtdown<A>();
+		    return cvt<T_, MASK>(x, y);
 		}
 
     reference	dereference() const
 		{
 		    return const_cast<cvt_iterator*>(this)
-			->dereference(std::is_same<upmost_vec, src_vec>());
+			->dereference(
+			    std::integral_constant<
+				bool, (vec<T>::size > src_type::size)>());
 		}
     reference	dereference(std::true_type)
 		{
-		    reference	x;
-		    const_cast<cvt_iterator*>(this)->down(x);
-		    return x;
+		    return cvtdown<T>();
 		}
     reference	dereference(std::false_type)
 		{
-		    auto	x = up(*super::base());
+		    auto	x = cvt_pack<T, MASK>(*super::base());
 		    ++super::base_reference();
 		    return x;
 		}
@@ -142,6 +93,15 @@ template <class T, class ITER> cvt_iterator<T, ITER>
 make_cvt_iterator(ITER iter)
 {
     return cvt_iterator<T, ITER>(iter);
+}
+
+template <class T, class ITER>
+using cvt_mask_iterator = cvt_iterator<T, ITER, true>;
+    
+template <class T, class ITER> cvt_mask_iterator<T, ITER>
+make_cvt_mask_iterator(ITER iter)
+{
+    return cvt_mask_iterator<T, ITER>(iter);
 }
     
 }	// namespace simd

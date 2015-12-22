@@ -12,100 +12,82 @@ namespace TU
 namespace simd
 {
 /************************************************************************
-*  class cvtdown_iterator<T, ITER>					*
+*  class cvtdown_iterator<T, ITER, MASK>				*
 ************************************************************************/
 //! SIMDベクトルを出力する反復子を介して複数のSIMDベクトルを読み込み，それをより小さな成分を持つSIMDベクトルに変換する反復子
 /*!
   \param T	変換先のSIMDベクトルの成分の型
   \param ITER	SIMDベクトルを出力する反復子
 */
-template <class T, class ITER>
+template <class T, class ITER, bool MASK=false>
 class cvtdown_iterator
     : public boost::iterator_adaptor<
-		 cvtdown_iterator<T, ITER>,		// self
-		 ITER,					// base
+		 cvtdown_iterator<T, ITER, MASK>,
+		 ITER,
 		 tuple_replace<iterator_value<ITER>, vec<T> >,
 		 boost::single_pass_traversal_tag,
 		 tuple_replace<iterator_value<ITER>, vec<T> > >
 {
   private:
-    typedef iterator_value<ITER>			elementary_vec;
+    typedef typename tuple_head<iterator_value<ITER> >::element_type	S;
     typedef boost::iterator_adaptor<
-	cvtdown_iterator,
-	ITER,
-	tuple_replace<elementary_vec, vec<T> >,
-	boost::single_pass_traversal_tag,
-	tuple_replace<elementary_vec, vec<T> > >	super;
-    typedef typename tuple_head<elementary_vec>::element_type
-							element_type;
-    typedef simd::complementary_type<element_type>	complementary_type;
-    typedef tuple_replace<elementary_vec, vec<complementary_type> >
-							complementary_vec;
+		cvtdown_iterator,
+		ITER,
+		tuple_replace<iterator_value<ITER>, vec<T> >,
+		boost::single_pass_traversal_tag,
+		tuple_replace<iterator_value<ITER>, vec<T> > >		super;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::reference		reference;
+    typedef typename super::difference_type		difference_type;
+    typedef typename super::reference			reference;
 
     friend class	boost::iterator_core_access;
 
   public:
-		cvtdown_iterator(ITER const& iter)	:super(iter)	{}
+		cvtdown_iterator(const ITER& iter)	:super(iter)	{}
 
   private:
-    void	cvtdown(elementary_vec& x)
+    template <class T_>
+    typename std::enable_if<(vec<T_>::size == vec<S>::size), vec<T_> >::type
+		cvtdown()
 		{
-		    x = *super::base();
+		    auto	x = *super::base();
 		    ++super::base_reference();
+		    return cvt<T_, MASK>(x);
 		}
-    void	cvtdown(complementary_vec& x)
+    template <class T_>
+    typename std::enable_if<(vec<T_>::size > vec<S>::size), vec<T_> >::type
+		cvtdown()
 		{
-		    cvtdown(x,
-			    std::integral_constant<
-			        bool, (vec<complementary_type>::size ==
-				       vec<element_type>::size)>());
-		}
-    void	cvtdown(complementary_vec& x, std::true_type)
-		{
-		    elementary_vec	y;
-		    cvtdown(y);
-		    x = cvt<complementary_type>(y);
-		}
-    void	cvtdown(complementary_vec& x, std::false_type)
-		{
-		    elementary_vec	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<complementary_type>(y, z);
-		}
-    template <class VEC_>
-    void	cvtdown(VEC_& x)
-		{
-		    typedef typename
-			tuple_head<VEC_>::element_type	S;
-		    typedef simd::signed_type<simd::upper_type<S> >
-							signed_upper_type;
-		    
-		    tuple_replace<elementary_vec, vec<signed_upper_type> > y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<S>(y, z);
+		    using A = cvt_above_type<T_, S, MASK>;
+	  
+		    auto	x = cvtdown<A>();
+		    auto	y = cvtdown<A>();
+		    return cvt<T_, MASK>(x, y);
 		}
 
     reference	dereference() const
-		{
-		    reference	x;
-		    const_cast<cvtdown_iterator*>(this)->cvtdown(x);
-		    return x;
+		{		    
+		    return const_cast<cvtdown_iterator*>(this)->cvtdown<T>();
 		}
     void	advance(difference_type)				{}
     void	increment()						{}
     void	decrement()						{}
 };
     
-template <class T, class ITER> cvtdown_iterator<T, ITER>
+template <class T, class ITER> cvtdown_iterator<T, ITER, false>
 make_cvtdown_iterator(ITER iter)
 {
-    return cvtdown_iterator<T, ITER>(iter);
+    return cvtdown_iterator<T, ITER, false>(iter);
+}
+
+template <class T, class ITER>
+using cvtdown_mask_iterator = cvtdown_iterator<T, ITER, true>;
+    
+template <class T, class ITER> cvtdown_mask_iterator<T, ITER>
+make_cvtdown_mask_iterator(ITER iter)
+{
+    return cvtdown_mask_iterator<T, ITER>(iter);
 }
     
 }	// namespace simd

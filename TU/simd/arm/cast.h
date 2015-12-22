@@ -1,16 +1,15 @@
 /*
  *  $Id$
  */
+#if !defined(__TU_SIMD_ARM_CAST_H)
+#define __TU_SIMD_ARM_CAST_H
 
 namespace TU
 {
 namespace simd
 {
-template <class S, class T> inline vec<S>	cast(vec<T> x)	{ return x; }
+template <class T, class S> inline vec<T>	cast(vec<S> x)	{ return x; }
     
-#if !defined(__TU_SIMD_ARM_CAST_H)
-#define __TU_SIMD_ARM_CAST_H
-
 #define SIMD_CAST(from, to)						\
     SIMD_SPECIALIZED_FUNC(vec<to> cast<to>(vec<from> x),		\
 			  reinterpretq, (x), to, from)
