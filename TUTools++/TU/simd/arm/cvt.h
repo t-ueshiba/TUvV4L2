@@ -79,6 +79,28 @@ cvt(vec<S> x, vec<S> y)
 		       detail::cvtdown(cast<F>(y))));
 }
 
+#define SIMD_CVTEQ(type)						\
+    template <> inline vec<type>					\
+    cvt<type, false>(vec<type> x)					\
+    {									\
+	return x;							\
+    }									\
+    template <> inline vec<type>					\
+    cvt<type, true>(vec<type> x)					\
+    {									\
+	return x;							\
+    }
+    
+SIMD_CVTEQ(int8_t)		// int8_t    -> int8_t
+SIMD_CVTEQ(int16_t)		// int16_t   -> int16_t
+SIMD_CVTEQ(int32_t)		// int32_t   -> int32_t
+SIMD_CVTEQ(int64_t)		// int64_t   -> int64_t
+SIMD_CVTEQ(u_int8_t)		// u_int8_t  -> u_int8_t
+SIMD_CVTEQ(u_int16_t)		// u_int16_t -> u_int16_t
+SIMD_CVTEQ(u_int32_t)		// u_int32_t -> u_int32_t
+SIMD_CVTEQ(u_int64_t)		// u_int64_t -> u_int64_t
+SIMD_CVTEQ(float)		// float     -> float
+
 #define SIMD_CVTF(from, to)						\
     SIMD_SPECIALIZED_FUNC(vec<to> cvt<to>(vec<from> x), cvtq, (x), to, from)
 
@@ -93,9 +115,10 @@ SIMD_CVTF(u_int32_t, float)	// u_int32_t -> float
 	return cast<to>(x);						\
     }
 
-SIMD_CVT_MASK(u_int32_t, float)
-SIMD_CVT_MASK(float, u_int32_t)
+SIMD_CVT_MASK(u_int32_t, float)	// u_intew_t -> float
+SIMD_CVT_MASK(float, u_int32_t)	// float     -> u_int32_t
 
+#undef SIMD_CVTEQ
 #undef SIMD_CVTF
 #undef SIMD_CVT_MASK
 
