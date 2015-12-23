@@ -34,8 +34,10 @@
 #ifndef __TU_PAIR_H
 #define __TU_PAIR_H
 
+#include <cstdlib>	// for size_t
 #include <utility>
 #include <type_traits>
+#include <iostream>
 
 namespace TU
 {
@@ -43,9 +45,9 @@ namespace TU
 *  struct is_pair<T>							*
 ************************************************************************/
 template <class T>
-struct is_pair				: std::false_type	{};
+struct is_pair				: std::false_type		{};
 template <class S, class T>
-struct is_pair<std::pair<S, T> >	: std::true_type	{};
+struct is_pair<std::pair<S, T> >	: std::true_type		{};
 
 /************************************************************************
 *  struct pair_traits<PAIR>						*
@@ -53,15 +55,15 @@ struct is_pair<std::pair<S, T> >	: std::true_type	{};
 template <class T>
 struct pair_traits
 {
-    static constexpr size_t	nelms = 1;
+    static constexpr size_t	size = 1;
     typedef T						leftmost_type;
     typedef T						rightmost_type;
 };
 template <class S, class T>
 struct pair_traits<std::pair<S, T> >
 {
-    static constexpr size_t	nelms = pair_traits<S>::nelms
-				      + pair_traits<T>::nelms;
+    static constexpr size_t	size = pair_traits<S>::size
+				     + pair_traits<T>::size;
     typedef typename pair_traits<S>::leftmost_type	leftmost_type;
     typedef typename pair_traits<T>::rightmost_type	rightmost_type;
 };
@@ -96,6 +98,17 @@ namespace detail
 */
 template <class T, size_t N=1>
 using pair_tree = typename detail::pair_tree<T, N>::type;
-
+    
 }	// namespace TU
+
+namespace std
+{
+template <class S, class T> inline ostream&
+operator <<(ostream& out, const std::pair<S, T>& x)
+{
+    return out << '[' << x.first << ' ' << x.second << ']';
+}
+    
+}	// namespace std
+
 #endif	// !__TU_PAIR_H

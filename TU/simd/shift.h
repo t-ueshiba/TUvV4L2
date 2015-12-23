@@ -4,6 +4,7 @@
 #if !defined(__TU_SIMD_SHIFT_H)
 #define __TU_SIMD_SHIFT_H
 
+#include "TU/tuple.h"
 #include "TU/simd/zero.h"
 
 namespace TU

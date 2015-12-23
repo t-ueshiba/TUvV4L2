@@ -5,6 +5,7 @@
 #define __TU_SIMD_VEC_H
 
 #include <iostream>
+#include "TU/functional.h"	// for index_sequence<size_t ...>
 #include "TU/simd/config.h"
 #include "TU/simd/type_traits.h"
 

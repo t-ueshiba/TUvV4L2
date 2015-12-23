@@ -18,13 +18,6 @@ namespace simd
 /************************************************************************
 *  Converting vecs							*
 ************************************************************************/
-template <class T, bool MASK=false, class S>
-inline typename std::enable_if<(vec<T>::size == vec<S>::size), vec<T> >::type
-cvt(vec<S> x)
-{
-    return x;
-}
-    
 //! S型ベクトルの上位または下位半分を要素数が半分のT型ベクトルに型変換する．
 /*!
   S, Tは符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
@@ -32,8 +25,8 @@ cvt(vec<S> x)
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class T, bool MASK, bool HI, class S> vec<T>
-cvt(vec<S> x)								;
+template <class T, bool MASK=false, bool HI=false, class S>
+vec<T>	cvt(vec<S> x)							;
 	
 //! 2つのS型ベクトルを要素数が2倍のT型ベクトルに型変換する．
 /*!
@@ -43,8 +36,8 @@ cvt(vec<S> x)								;
   \return	xが変換されたものを下位，yが変換されたものを上位に
 		配したベクトル
 */
-template <class T, bool MASK=false, class S> vec<T>
-cvt(vec<S> x, vec<S> y)							;
+template <class T, bool MASK=false, class S>
+vec<T>	cvt(vec<S> x, vec<S> y)						;
     
 /************************************************************************
 *  Converting vec tuples						*
@@ -55,14 +48,7 @@ namespace detail
   struct generic_cvt
   {
       template <class S_>
-      typename std::enable_if<(vec<T>::size == vec<S_>::size), vec<T> >::type
-		operator ()(vec<S_> x) const
-		{
-		    return cvt<T, MASK>(x);
-		}
-      template <class S_>
-      typename std::enable_if<(vec<T>::size < vec<S_>::size), vec<T> >::type
-		operator ()(vec<S_> x) const
+      vec<T>	operator ()(vec<S_> x) const
 		{
 		    return cvt<T, MASK, HI>(x);
 		}
@@ -87,10 +73,10 @@ template <class T, bool MASK=false, class H1, class T1, class H2, class T2>
 inline auto
 cvt(const boost::tuples::cons<H1, T1>& x, const boost::tuples::cons<H2, T2>& y)
     -> decltype(boost::tuples::cons_transform(
-		    x, y, detail::generic_cvt<T, MASK, 0>()))
+		    x, y, detail::generic_cvt<T, MASK, false>()))
 {
     return boost::tuples::cons_transform(
-	       x, y, detail::generic_cvt<T, MASK, 0>());
+	       x, y, detail::generic_cvt<T, MASK, false>());
 }
     
 /************************************************************************
