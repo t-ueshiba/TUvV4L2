@@ -81,12 +81,12 @@ cvt(vec<S> x, vec<S> y)
 
 #define SIMD_CVTEQ(type)						\
     template <> inline vec<type>					\
-    cvt<type, false>(vec<type> x)					\
+    cvt<type>(vec<type> x)						\
     {									\
 	return x;							\
     }									\
     template <> inline vec<type>					\
-    cvt<type, true>(vec<type> x)					\
+    cvt<type, false, true>(vec<type> x)					\
     {									\
 	return x;							\
     }
@@ -110,7 +110,7 @@ SIMD_CVTF(u_int32_t, float)	// u_int32_t -> float
 
 #define SIMD_CVT_MASK(from, to)						\
     template <> inline vec<to>						\
-    cvt<to, true>(vec<from> x)						\
+    cvt<to, false, true>(vec<from> x)					\
     {									\
 	return cast<to>(x);						\
     }

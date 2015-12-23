@@ -33,7 +33,7 @@ namespace detail
 			{
 			    auto	x = *iter;
 			    ++iter;
-			    return cvt<T_, MASK>(x);
+			    return cvt<T_, false, MASK>(x);
 			}
 	  template <class T_=T, class ITER_>
 	  typename std::enable_if<
@@ -53,7 +53,7 @@ namespace detail
 	  typename std::enable_if<vec<T>::size == vec<S_>::size, vec<T> >::type
 			operator ()(vec<S_> x) const
 			{
-			    return cvt<T, MASK>(x);
+			    return cvt<T, false, MASK>(x);
 			}
       };
 
@@ -83,7 +83,7 @@ namespace detail
 			operator ()(vec<S_> x) const
 			{
 			    return cvt<cvt_upper_type<T, S_, MASK>,
-				       MASK, HI_>(x);
+				       HI_, MASK>(x);
 			}
       };
 

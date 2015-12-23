@@ -31,7 +31,7 @@ namespace detail
       typename std::enable_if<(vec<T>::size == tuple_head<VEC_>::size)>::type
 		cvtup(const VEC_& x)
 		{
-		    OP_()(*_iter, cvt<T, MASK>(x));
+		    OP_()(*_iter, cvt<T, false, MASK>(x));
 		    ++_iter;
 		}
       template <class OP_, class VEC_>
@@ -42,8 +42,8 @@ namespace detail
 				 T, typename tuple_head<VEC_>::element_type,
 				 MASK>;
 		    
-		    cvtup<OP_>(cvt<U, MASK, false>(x));
-		    cvtup<OP_>(cvt<U, MASK, true >(x));
+		    cvtup<OP_>(cvt<U, false, MASK>(x));
+		    cvtup<OP_>(cvt<U, true,  MASK>(x));
 		}
 
     public:

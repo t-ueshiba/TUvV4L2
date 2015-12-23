@@ -52,7 +52,7 @@ class cvt_iterator
 		{
 		    auto	x = *super::base();
 		    ++super::base_reference();
-		    return cvt<T_, MASK>(x);
+		    return cvt<T_, false, MASK>(x);
 		}
     template <class T_>
     typename std::enable_if<(vec<T_>::size > src_type::size), vec<T_> >::type

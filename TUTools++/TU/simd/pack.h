@@ -46,7 +46,7 @@ namespace detail
       typename std::enable_if<(vec<T_>::size == vec<S_>::size), vec<T_> >::type
       cvtadj(vec<S_> x) const
       {
-	  return cvt<T_, MASK>(x);
+	  return cvt<T_, false, MASK>(x);
       }
 
       template <class T_, class S_>
@@ -54,8 +54,8 @@ namespace detail
 			      std::pair<vec<T_>, vec<T_> > >::type
       cvtadj(vec<S_> x) const
       {
-	  return std::make_pair(cvt<T_, MASK, false>(x),
-				cvt<T_, MASK, true >(x));
+	  return std::make_pair(cvt<T_, false, MASK>(x),
+				cvt<T_, true , MASK>(x));
       }
 
       template <class T_, class S_>
