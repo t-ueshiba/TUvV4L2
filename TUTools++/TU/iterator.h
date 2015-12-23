@@ -37,6 +37,7 @@
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include "TU/tuple.h"
+#include "TU/pair.h"
 
 namespace TU
 {
@@ -1048,6 +1049,80 @@ template <class ITER> ring_iterator<ITER>
 make_ring_iterator(const ITER& begin, const ITER& end)
 {
     return ring_iterator<ITER>(begin, end);
+}
+
+/************************************************************************
+*  class multiplex_iterator<ITER>					*
+************************************************************************/
+//! 反復子によって指定された要素を指定された数だけ収めたpair_treeを返す反復子
+/*!
+  \param N	pair_treeの要素数(2のべき乗)
+  \param ITER	pair_treeに収める要素を指す反復子の型
+*/
+template <size_t N, class ITER>
+class multiplex_iterator
+    : public boost::iterator_adaptor<multiplex_iterator<N, ITER>,
+				     ITER,
+				     pair_tree<iterator_value<ITER>, N>,
+				     boost::single_pass_traversal_tag,
+				     pair_tree<iterator_value<ITER>, N> >
+{
+  private:
+    typedef iterator_value<ITER>				element_type;
+    typedef boost::iterator_adaptor<multiplex_iterator,
+				    ITER,
+				    pair_tree<element_type, N>,
+				    boost::single_pass_traversal_tag,
+				    pair_tree<element_type, N> >	super;
+
+    template <size_t N_, class=void>
+    struct dereference_impl
+    {
+	static pair_tree<element_type, N_>
+	exec(ITER& iter)
+	{
+	    const auto&	x = dereference_impl<(N_>>1)>::exec(iter);
+	    const auto&	y = dereference_impl<(N_>>1)>::exec(iter);
+	    return std::make_pair(x, y);
+	}
+    };
+    template <class DUMMY_>
+    struct dereference_impl<1, DUMMY_>
+    {
+	static element_type
+	exec(ITER& iter)
+	{
+	    const auto	x = *iter;
+	    ++iter;
+	    return x;
+	}
+    };
+    
+  public:
+    typedef typename super::difference_type	difference_type;
+    typedef typename super::reference		reference;
+
+    friend class	boost::iterator_core_access;
+    
+  public:
+    multiplex_iterator(const ITER& iter)	:super(iter)		{}
+
+  private:
+    reference	dereference() const
+		{
+		    return dereference_impl<N>::exec(
+			       const_cast<multiplex_iterator*>(this)
+			       ->super::base_reference());
+		}
+    void	advance(difference_type)				{}
+    void	increment()						{}
+    void	decrement()						{}
+};
+
+template <size_t N, class ITER> inline multiplex_iterator<N, ITER>
+make_multiplex_iterator(ITER iter)
+{
+    return multiplex_iterator<N, ITER>(iter);
 }
 
 }	// namespace TU

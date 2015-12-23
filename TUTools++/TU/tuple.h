@@ -55,7 +55,7 @@ namespace tuples
   /**********************************************************************
   *  make_uniform_htuple(T, TU::index_sequence<IDX...>)			*
   **********************************************************************/
-  template <class T, size_t ...IDX> static inline auto
+  template <class T, size_t... IDX> static inline auto
   make_uniform_htuple(T&& x, TU::index_sequence<IDX...>)
       -> decltype(boost::make_tuple((IDX, x)...))
   {
@@ -65,7 +65,7 @@ namespace tuples
   /**********************************************************************
   *  make_contiguous_htuple(T, TU::index_sequence<IDX...>)		*
   **********************************************************************/
-  template <class T, size_t ...IDX> static inline auto
+  template <class T, size_t... IDX> static inline auto
   make_contiguous_htuple(T&& x, TU::index_sequence<IDX...>)
       -> decltype(boost::make_tuple((x + IDX)...))
   {
@@ -73,39 +73,39 @@ namespace tuples
   }
 
   /**********************************************************************
-  *  cons_for_each(cons<HEAD, TAIL>, UNARY_FUNC)			*
+  *  cons_for_each(TUPLE&&, const UNARY_FUNC&)				*
   **********************************************************************/
   template <class UNARY_FUNC> inline void
   cons_for_each(null_type, UNARY_FUNC)
   {
   }
-  template <class HEAD, class TAIL, class UNARY_FUNC> inline void
-  cons_for_each(cons<HEAD, TAIL>& x, const UNARY_FUNC& f)
+  template <class TUPLE, class UNARY_FUNC> inline void
+  cons_for_each(TUPLE&& x, const UNARY_FUNC& f)
   {
       f(x.get_head());
       cons_for_each(x.get_tail(), f);
   }
 
   /**********************************************************************
-  *  cons_for_each(cons<H1, T1>, cons<H2, T2>, BINARY_FUNC)		*
+  *  cons_for_each(TUPLE1&&, TUPLE2&&, const BINARY_FUNC&)		*
   **********************************************************************/
   template <class BINARY_FUNC> inline void
   cons_for_each(null_type, null_type, BINARY_FUNC)
   {
   }
-  template <class H1, class T1, class H2, class T2, class BINARY_FUNC>
+  template <class TUPLE1, class TUPLE2, class BINARY_FUNC>
   inline void
-  cons_for_each(cons<H1, T1>& x, const cons<H2, T2>& y, const BINARY_FUNC& f)
+  cons_for_each(TUPLE1&& x, TUPLE2&& y, const BINARY_FUNC& f)
   {
       f(x.get_head(), y.get_head());
       cons_for_each(x.get_tail(), y.get_tail(), f);
   }
     
   /**********************************************************************
-  *  make_cons(HEAD, TAIL)						*
+  *  make_cons(HEAD&&, TAIL&&)						*
   **********************************************************************/
   template <class HEAD, class TAIL> inline cons<HEAD, TAIL>
-  make_cons(const HEAD& head, const TAIL& tail)
+  make_cons(HEAD&& head, TAIL&& tail)
   {
       return cons<HEAD, TAIL>(head, tail);
   }
@@ -126,38 +126,31 @@ namespace tuples
   }
 
   /**********************************************************************
-  *  cons_transform(cons<HEAD, TAIL>, UNARY_FUNC)			*
+  *  cons_transform(TUPLE&&, const UNARY_FUNC&)				*
   **********************************************************************/
   template <class UNARY_FUNC> inline null_type
   cons_transform(null_type, UNARY_FUNC)
   {
       return null_type();
   }
-  template <class HEAD, class TAIL, class UNARY_FUNC> inline auto
-  cons_transform(const cons<HEAD, TAIL>& x, const UNARY_FUNC& f)
-      -> decltype(make_cons(f(x.get_head()), cons_transform(x.get_tail(), f)))
-  {
-      return make_cons(f(x.get_head()), cons_transform(x.get_tail(), f));
-  }
-  template <class HEAD, class TAIL, class UNARY_FUNC> inline auto
-  cons_transform(cons<HEAD, TAIL>& x, const UNARY_FUNC& f)
+  template <class TUPLE, class UNARY_FUNC> inline auto
+  cons_transform(TUPLE&& x, const UNARY_FUNC& f)
       -> decltype(make_cons(f(x.get_head()), cons_transform(x.get_tail(), f)))
   {
       return make_cons(f(x.get_head()), cons_transform(x.get_tail(), f));
   }
 
   /**********************************************************************
-  *  cons_transform(cons<H1, T1>, cons<H2, T2>, BINARY_FUNC)		*
+  *  cons_transform(TUPLE1&&, TUPLE2&&, const BINARY_FUNC&)		*
   **********************************************************************/
   template <class BINARY_FUNC> inline null_type
   cons_transform(null_type, null_type, BINARY_FUNC)
   {
       return null_type();
   }
-  template <class H1, class T1, class H2, class T2, class BINARY_FUNC>
+  template <class TUPLE1, class TUPLE2, class BINARY_FUNC>
   inline auto
-  cons_transform(const cons<H1, T1>& x,
-		 const cons<H2, T2>& y, const BINARY_FUNC& f)
+  cons_transform(TUPLE1&& x, TUPLE2&& y, const BINARY_FUNC& f)
       -> decltype(make_cons(f(x.get_head(), y.get_head()),
 			    cons_transform(x.get_tail(), y.get_tail(), f)))
   {
@@ -166,19 +159,16 @@ namespace tuples
   }
 
   /**********************************************************************
-  *  cons_transform(cons<H1, T1>, cons<H2, T2>,				*
-  *		    cons<H3, T3>, TRINARY_FUNC)				*
+  *  cons_transform(TUPLE1&&, TUPLE2&&, TUPLE3&&, TRINARY_FUNC)		*
   **********************************************************************/
   template <class TRINARY_FUNC> inline null_type
   cons_transform(null_type, null_type, null_type, TRINARY_FUNC)
   {
       return null_type();
   }
-  template <class H1, class T1, class H2, class T2,
-	    class H3, class T3, class TRINARY_FUNC>
+  template <class TUPLE1, class TUPLE2, class TUPLE3, class TRINARY_FUNC>
   inline auto
-  cons_transform(const cons<H1, T1>& x, const cons<H2, T2>& y,
-	    const cons<H3, T3>& z, const TRINARY_FUNC& f)
+  cons_transform(TUPLE1&& x, TUPLE2&& y, TUPLE3&& z, const TRINARY_FUNC& f)
       -> decltype(make_cons(f(x.get_head(), y.get_head(), z.get_head()),
 			    cons_transform(x.get_tail(),
 					   y.get_tail(), z.get_tail(), f)))
@@ -677,7 +667,7 @@ class unarizer
     const FUNC&	functor()			const	{return _func;}
 
   private:
-    template <class TUPLE, size_t ...IDX>
+    template <class TUPLE, size_t... IDX>
     result_type	exec(const TUPLE& arg, TU::index_sequence<IDX...>) const
 		{
 		    return _func(boost::get<IDX>(arg)...);
@@ -694,7 +684,7 @@ make_unarizer(const FUNC& func)
 }
 
 /************************************************************************
-*  struct tuple_head<T>, tuple_leaf<T>, tuple_nelms<T>			*
+*  struct tuple_head<T>, tuple_leftmost<T>, tuple_nelms<T>		*
 ************************************************************************/
 namespace detail
 {
@@ -720,10 +710,9 @@ namespace detail
       typedef HEAD						head_type;
       typedef typename tuple_traits<HEAD>::leftmost_type	leftmost_type;
   };
-  template <BOOST_PP_ENUM_PARAMS(10, class T)>
-  struct tuple_traits<boost::tuple<BOOST_PP_ENUM_PARAMS(10, T)> >
-      : tuple_traits<
-            typename boost::tuple<BOOST_PP_ENUM_PARAMS(10, T)>::inherited>
+  template <class... T>
+  struct tuple_traits<boost::tuple<T...> >
+      : tuple_traits<typename boost::tuple<T...>::inherited>
   {
   };
 }
@@ -742,10 +731,67 @@ using tuple_head = typename detail::tuple_traits<T>::head_type;
 template <class T>
 using tuple_leftmost = typename detail::tuple_traits<T>::leftmost_type;
 
+//! 与えられた型がtupleまたはnull_typeならばその要素数を，そうでなければ1を返す．
+/*!
+  \param T	その最左要素の型を調べるべき型
+*/
 template <class T>
 struct tuple_nelms
 {
     static constexpr size_t	value = detail::tuple_traits<T>::nelms;
+};
+    
+/************************************************************************
+*  struct tuple_for_all<T, COND, ARGS...>				*
+************************************************************************/
+template <class T, template <class...> class COND, class... ARGS>
+struct tuple_for_all : std::integral_constant<bool, COND<T, ARGS...>::value>
+{
+};
+template <template <class...> class COND, class... ARGS>
+struct tuple_for_all<boost::tuples::null_type, COND, ARGS...>
+    : std::true_type
+{
+};
+template <class HEAD, class TAIL,
+	  template <class...> class COND, class... ARGS>
+struct tuple_for_all<boost::tuples::cons<HEAD, TAIL>, COND,  ARGS...>
+    : std::integral_constant<
+	  bool,
+	  (COND<HEAD, ARGS...>::value &&
+	   tuple_for_all<TAIL, COND, ARGS...>::value)>
+{
+};
+template <BOOST_PP_ENUM_PARAMS(10, class S),
+	  template <class...> class COND, class... ARGS>
+struct tuple_for_all<boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>,
+		     COND, ARGS...>
+    : tuple_for_all<
+	  typename boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>::inherited,
+	  COND, ARGS...>
+{
+};
+    
+/************************************************************************
+*  struct tuple_is_uniform<T>						*
+************************************************************************/
+template <class T>
+struct tuple_is_uniform : std::true_type
+{
+};
+template <class HEAD, class TAIL>
+struct tuple_is_uniform<boost::tuples::cons<HEAD, TAIL> >
+    : std::integral_constant<
+	  bool,
+	  (std::is_same<TAIL, boost::tuples::null_type>::value ||
+	   (std::is_same<HEAD, tuple_head<TAIL> >::value &&
+	    tuple_is_uniform<TAIL>::value))>
+{
+};
+template <class... S>
+struct tuple_is_uniform<boost::tuple<S...> >
+    : tuple_is_uniform<typename boost::tuple<S...>::inherited>
+{
 };
     
 /************************************************************************
@@ -769,10 +815,9 @@ namespace detail
 	  typename tuple_replace<T, HEAD>::type,
 	  typename tuple_replace<T, TAIL>::type>	type;
   };
-  template <class T, BOOST_PP_ENUM_PARAMS(10, class S)>
-  struct tuple_replace<T, boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)> >
-      : tuple_replace<T,
-            typename boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>::inherited>
+  template <class T, class... S>
+  struct tuple_replace<T, boost::tuple<S...> >
+      : tuple_replace<T, typename boost::tuple<S...>::inherited>
   {
   };
 }

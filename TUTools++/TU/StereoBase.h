@@ -546,7 +546,7 @@ namespace simd
 		{
 		    mask_vec	y;
 		    cvtdown(y);
-		    x = cvt_mask<complementary_type>(y);
+		    x = cvt<complementary_type, true>(y);
 		}
       template <class VEC_>
       void	cvtdown(VEC_& x)
@@ -558,7 +558,7 @@ namespace simd
 		    tuple_replace<mask_vec, vec<upper_type> >	y, z;
 		    cvtdown(y);
 		    cvtdown(z);
-		    x = cvt_mask<S>(y, z);
+		    x = cvt<S, true>(y, z);
 		}
 #  endif
       reference	dereference() const

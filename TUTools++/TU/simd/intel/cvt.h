@@ -10,6 +10,12 @@ namespace TU
 {
 namespace simd
 {
+template <class T, bool MASK, bool HI, class S> inline vec<T>
+cvt(vec<S> x)
+{
+    return x;	// T == S の場合の実装
+}
+    
 /************************************************************************
 *  Vector conversion operators						*
 ************************************************************************/
