@@ -253,7 +253,6 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
 			    vec<int32_t>(_mm256_extractf128_si256(y, 0x1)));
     }
 
-
     template <> inline F32vec		// u_short -> float
     cvt<float>(Iu16vec x)
     {

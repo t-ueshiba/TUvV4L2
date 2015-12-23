@@ -61,7 +61,7 @@ namespace detail
     
 }	// namespace detail
 
-template <class T, bool MASK, bool HI, class S> inline vec<T>
+template <class T, bool HI, bool MASK, class S> inline vec<T>
 cvt(vec<S> x)
 {
     using F = typename std::conditional<MASK, signed_type<S>, S>::type;
