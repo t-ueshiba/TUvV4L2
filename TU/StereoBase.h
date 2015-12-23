@@ -546,7 +546,7 @@ namespace simd
 		{
 		    mask_vec	y;
 		    cvtdown(y);
-		    x = cvt<complementary_type, true>(y);
+		    x = cvt<complementary_type, false, true>(y);
 		}
       template <class VEC_>
       void	cvtdown(VEC_& x)

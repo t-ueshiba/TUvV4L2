@@ -52,6 +52,7 @@ main()
     
     simd::doJob<int8_t,  int8_t >();
     simd::doJob<int8_t,  int16_t>();
+
     simd::doJob<int8_t,  int32_t>();
 
     simd::doJob<int16_t, int8_t  >();
@@ -66,6 +67,7 @@ main()
 #if defined(SSE4) || defined(NEON)
     simd::doJob<int32_t, u_int16_t>();
 #endif
+
     simd::doJob<u_int8_t,  int16_t  >();
     simd::doJob<u_int8_t,  int32_t  >();
     simd::doJob<u_int8_t,  u_int8_t >();

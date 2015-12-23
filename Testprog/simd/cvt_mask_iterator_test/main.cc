@@ -2,8 +2,8 @@
  *  $Id$
  */
 #include <iomanip>
-#include "TU/simd/cvtdown_mask_iterator.h"
-#include "TU/simd/cvtup_mask_iterator.h"
+#include "TU/simd/cvtdown_iterator.h"
+#include "TU/simd/cvtup_iterator.h"
 #include "TU/simd/load_iterator.h"
 #include "TU/simd/store_iterator.h"
 

@@ -25,7 +25,7 @@ namespace simd
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class T, bool MASK=false, bool HI=false, class S>
+template <class T, bool HI=false, bool MASK=false, class S>
 vec<T>	cvt(vec<S> x)							;
 	
 //! 2つのS型ベクトルを要素数が2倍のT型ベクトルに型変換する．
@@ -44,13 +44,13 @@ vec<T>	cvt(vec<S> x, vec<S> y)						;
 ************************************************************************/
 namespace detail
 {
-  template <class T, bool MASK, bool HI>
+  template <class T, bool HI, bool MASK>
   struct generic_cvt
   {
       template <class S_>
       vec<T>	operator ()(vec<S_> x) const
 		{
-		    return cvt<T, MASK, HI>(x);
+		    return cvt<T, HI, MASK>(x);
 		}
       template <class S_>
       vec<T>	operator ()(vec<S_> x, vec<S_> y) const
@@ -60,23 +60,23 @@ namespace detail
   };
 }
 
-template <class T, bool MASK=false, bool HI=false, class HEAD, class TAIL>
+template <class T, bool HI=false, bool MASK=false, class HEAD, class TAIL>
 inline auto
 cvt(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(
-		    x, detail::generic_cvt<T, MASK, HI>()))
+		    x, detail::generic_cvt<T, HI, MASK>()))
 {
-    return boost::tuples::cons_transform(x, detail::generic_cvt<T, MASK, HI>());
+    return boost::tuples::cons_transform(x, detail::generic_cvt<T, HI, MASK>());
 }
     
 template <class T, bool MASK=false, class H1, class T1, class H2, class T2>
 inline auto
 cvt(const boost::tuples::cons<H1, T1>& x, const boost::tuples::cons<H2, T2>& y)
     -> decltype(boost::tuples::cons_transform(
-		    x, y, detail::generic_cvt<T, MASK, false>()))
+		    x, y, detail::generic_cvt<T, false, MASK>()))
 {
     return boost::tuples::cons_transform(
-	       x, y, detail::generic_cvt<T, MASK, false>());
+	       x, y, detail::generic_cvt<T, false, MASK>());
 }
     
 /************************************************************************
