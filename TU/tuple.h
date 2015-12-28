@@ -37,8 +37,6 @@
 #include <boost/tuple/tuple.hpp>
 #include <utility>			// std::forward()
 #include "TU/functional.h"
-#include <typeinfo>
-#include <boost/core/demangle.hpp>
 
 namespace boost
 {
