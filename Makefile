@@ -52,7 +52,6 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/arm/cast.h \
 		/usr/local/include/TU/simd/arm/compare.h \
 		/usr/local/include/TU/simd/arm/cvt.h \
-		/usr/local/include/TU/simd/arm/cvt_mask.h \
 		/usr/local/include/TU/simd/arm/insert_extract.h \
 		/usr/local/include/TU/simd/arm/load_store.h \
 		/usr/local/include/TU/simd/arm/logical.h \
@@ -66,11 +65,8 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/compare.h \
 		/usr/local/include/TU/simd/config.h \
 		/usr/local/include/TU/simd/cvt.h \
-		/usr/local/include/TU/simd/cvt_mask.h \
 		/usr/local/include/TU/simd/cvtdown_iterator.h \
-		/usr/local/include/TU/simd/cvtdown_mask_iterator.h \
 		/usr/local/include/TU/simd/cvtup_iterator.h \
-		/usr/local/include/TU/simd/cvtup_mask_iterator.h \
 		/usr/local/include/TU/simd/insert_extract.h \
 		/usr/local/include/TU/simd/intel/allocator.h \
 		/usr/local/include/TU/simd/intel/arch.h \
@@ -79,7 +75,6 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/intel/cast.h \
 		/usr/local/include/TU/simd/intel/compare.h \
 		/usr/local/include/TU/simd/intel/cvt.h \
-		/usr/local/include/TU/simd/intel/cvt_mask.h \
 		/usr/local/include/TU/simd/intel/dup.h \
 		/usr/local/include/TU/simd/intel/insert_extract.h \
 		/usr/local/include/TU/simd/intel/load_store.h \
@@ -127,9 +122,10 @@ V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/simd/simd.h \
-	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/type_traits.h \
+	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
+	/usr/local/include/TU/simd/vec.h \
+	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
 	/usr/local/include/TU/simd/intel/vec.h \
@@ -162,9 +158,6 @@ V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/intel/dup.h \
 	/usr/local/include/TU/simd/intel/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
-	/usr/local/include/TU/simd/cvt_mask.h \
-	/usr/local/include/TU/simd/intel/cvt_mask.h \
-	/usr/local/include/TU/simd/arm/cvt_mask.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/intel/logical.h \
 	/usr/local/include/TU/simd/intel/logical_base.h \
@@ -185,8 +178,6 @@ V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
 	/usr/local/include/TU/simd/cvtup_iterator.h \
-	/usr/local/include/TU/simd/cvtdown_mask_iterator.h \
-	/usr/local/include/TU/simd/cvtup_mask_iterator.h \
 	/usr/local/include/TU/simd/shift_iterator.h \
 	/usr/local/include/TU/simd/row_vec_iterator.h \
 	/usr/local/include/TU/Minimize.h
@@ -195,8 +186,8 @@ V4L2CameraArray.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
+	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
@@ -230,9 +221,6 @@ V4L2CameraArray.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/simd/intel/dup.h \
 	/usr/local/include/TU/simd/intel/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
-	/usr/local/include/TU/simd/cvt_mask.h \
-	/usr/local/include/TU/simd/intel/cvt_mask.h \
-	/usr/local/include/TU/simd/arm/cvt_mask.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/intel/logical.h \
 	/usr/local/include/TU/simd/intel/logical_base.h \
@@ -253,8 +241,6 @@ V4L2CameraArray.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
 	/usr/local/include/TU/simd/cvtup_iterator.h \
-	/usr/local/include/TU/simd/cvtdown_mask_iterator.h \
-	/usr/local/include/TU/simd/cvtup_mask_iterator.h \
 	/usr/local/include/TU/simd/shift_iterator.h \
 	/usr/local/include/TU/simd/row_vec_iterator.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/io.h
@@ -263,8 +249,8 @@ V4L2CameraUtility.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
+	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/intel/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
@@ -298,9 +284,6 @@ V4L2CameraUtility.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/simd/intel/dup.h \
 	/usr/local/include/TU/simd/intel/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
-	/usr/local/include/TU/simd/cvt_mask.h \
-	/usr/local/include/TU/simd/intel/cvt_mask.h \
-	/usr/local/include/TU/simd/arm/cvt_mask.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/intel/logical.h \
 	/usr/local/include/TU/simd/intel/logical_base.h \
@@ -321,8 +304,6 @@ V4L2CameraUtility.o: TU/V4L2CameraArray.h TU/V4L2++.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
 	/usr/local/include/TU/simd/cvtup_iterator.h \
-	/usr/local/include/TU/simd/cvtdown_mask_iterator.h \
-	/usr/local/include/TU/simd/cvtup_mask_iterator.h \
 	/usr/local/include/TU/simd/shift_iterator.h \
 	/usr/local/include/TU/simd/row_vec_iterator.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/io.h
