@@ -45,12 +45,12 @@ namespace tuples
   /**********************************************************************
   *  struct is_tuple<T>							*
   **********************************************************************/
-  template <class T>
-  struct is_tuple			: std::false_type	{};
   template <class HEAD, class TAIL>
-  struct is_tuple<cons<HEAD, TAIL> >	: std::true_type	{};
-  template <class ...T>
-  struct is_tuple<tuple<T...> >		: std::true_type	{};
+  static true_type	tuple_check(cons<HEAD, TAIL>)		;
+  static false_type	tuple_check(...)			;
+    
+  template <class T>
+  struct is_tuple : decltype(tuple_check(std::declval<T>()))	{};
 
   /**********************************************************************
   *  make_uniform_htuple(T, TU::index_sequence<IDX...>)			*
@@ -100,17 +100,15 @@ namespace tuples
   *  get_head(TUPLE&&)							*
   **********************************************************************/
   template <class T>
-  inline typename std::enable_if<
-	     !is_tuple<typename std::decay<T>::type>::value, T>::type
+  inline typename std::enable_if<!is_tuple<T>::value, T>::type
   get_head(T&& x)
   {
       return x;
   }
-  template <class TUPLE,
-	    typename std::enable_if<
-		is_tuple<typename std::decay<TUPLE>::type>::value>::type*
-	    = nullptr> inline auto
-  get_head(TUPLE&& x) -> decltype(x.get_head())
+  template <class T,
+	    typename std::enable_if<is_tuple<T>::value>::type* = nullptr>
+  inline auto
+  get_head(T&& x) -> decltype(x.get_head())
   {
       return x.get_head();
   }
@@ -119,17 +117,15 @@ namespace tuples
   *  get_tail(TUPLE&&)							*
   **********************************************************************/
   template <class T>
-  inline typename std::enable_if<
-	     !is_tuple<typename std::decay<T>::type>::value, T>::type
+  inline typename std::enable_if<!is_tuple<T>::value, T>::type
   get_tail(T&& x)
   {
       return x;
   }
-  template <class TUPLE,
-	    typename std::enable_if<
-		is_tuple<typename std::decay<TUPLE>::type>::value>::type*
-	    = nullptr> inline auto
-  get_tail(TUPLE&& x) -> decltype(x.get_tail())
+  template <class T,
+	    typename std::enable_if<is_tuple<T>::value>::type* = nullptr>
+  inline auto
+  get_tail(T&& x) -> decltype(x.get_tail())
   {
       return x.get_tail();
   }
@@ -138,16 +134,13 @@ namespace tuples
   *  struct contains_tuple<ARGS...>					*
   **********************************************************************/
   template <class... ARGS>
-  struct contains_tuple;
-  template <class ARG, class... ARGS>
-  struct contains_tuple<ARG, ARGS...>
-      : std::integral_constant<
-	    bool, (is_tuple<typename std::decay<ARG>::type>::value ||
-		   contains_tuple<ARGS...>::value)>
+  struct contains_tuple : std::false_type
   {
   };
-  template <>
-  struct contains_tuple<> : std::false_type
+  template <class ARG, class... ARGS>
+  struct contains_tuple<ARG, ARGS...>
+      : std::integral_constant<bool, (is_tuple<ARG>::value ||
+				      contains_tuple<ARGS...>::value)>
   {
   };
     
@@ -244,8 +237,7 @@ namespace tuples
   }
 
   template <class L, class T>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator +=(L&& y, const T& x)
   {
       cons_for_each(TU::plus_assign(), y, x);
@@ -253,8 +245,7 @@ namespace tuples
   }
 
   template <class L, class T>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator -=(L&& y, const T& x)
   {
       cons_for_each(TU::minus_assign(), y, x);
@@ -262,8 +253,7 @@ namespace tuples
   }
     
   template <class L, class T>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator *=(L&& y, const T& x)
   {
       cons_for_each(TU::multiplies_assign(), y, x);
@@ -271,8 +261,7 @@ namespace tuples
   }
     
   template <class L, class T>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator /=(L&& y, const T& x)
   {
       cons_for_each(TU::divides_assign(), y, x);
@@ -280,8 +269,7 @@ namespace tuples
   }
     
   template <class L, class HEAD, class TAIL>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator %=(L&& y, const cons<HEAD, TAIL>& x)
   {
       cons_for_each(TU::modulus_assign(), y, x);
@@ -323,8 +311,7 @@ namespace tuples
   }
     
   template <class L, class T>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator &=(L&& y, const T& x)
   {
       cons_for_each(TU::bit_and_assign(), y, x);
@@ -332,8 +319,7 @@ namespace tuples
   }
     
   template <class L, class T>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator |=(L&& y, const T& x)
   {
       cons_for_each(TU::bit_or_assign(), y, x);
@@ -341,8 +327,7 @@ namespace tuples
   }
     
   template <class L, class T>
-  inline typename std::enable_if<is_tuple<typename std::decay<L>::type>::value,
-				 L&>::type
+  inline typename std::enable_if<is_tuple<L>::value, L&>::type
   operator ^=(L&& y, const T& x)
   {
       cons_for_each(TU::bit_xor_assign(), y, x);

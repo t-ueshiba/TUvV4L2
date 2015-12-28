@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG
+CPPFLAGS	= -DNDEBUG -DWITHOUT_CVTDOWN
 CFLAGS		= -g -O3
 ifeq ($(shell arch),armv7l)
   CPPFLAGS     += -DNEON
