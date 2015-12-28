@@ -38,6 +38,9 @@ operator <<(std::ostream& out, const std::pair<PACK, PACK>& x)
 ************************************************************************/
 namespace detail
 {
+  /**********************************************************************
+  *  class converter<T, MASK>						*
+  **********************************************************************/
   template <class T, bool MASK>
   struct converter
   {
@@ -108,9 +111,9 @@ namespace detail
 
   template <size_t I, class HEAD, class TAIL> inline auto
   get(const boost::tuples::cons<HEAD, TAIL>& x)
-      -> decltype(boost::tuples::cons_transform(x, generic_get<I>()))
+      -> decltype(boost::tuples::cons_transform(generic_get<I>(), x))
   {
-      return boost::tuples::cons_transform(x, generic_get<I>());
+      return boost::tuples::cons_transform(generic_get<I>(), x);
   }
 
   template <class T>
@@ -156,13 +159,13 @@ cvt_pack(const PACK& x)
 
 template <class T, bool MASK=false, class HEAD, class TAIL> inline auto
 cvt_pack(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(detail::rearrange(boost::tuples::cons_transform(
-  				      x, detail::converter<T, MASK>())))
-  //-> decltype(boost::tuples::cons_transform(x, detail::converter<T, MASK>()))
+  //-> decltype(detail::rearrange(boost::tuples::cons_transform(
+  //  				      detail::converter<T, MASK>(), x)))
+    -> decltype(boost::tuples::cons_transform(detail::converter<T, MASK>(), x))
 {
-    return detail::rearrange(boost::tuples::cons_transform(
-  				 x, detail::converter<T, MASK>()));
-  //return boost::tuples::cons_transform(x, detail::converter<T, MASK>());
+  //return detail::rearrange(boost::tuples::cons_transform(
+  //				 detail::converter<T, MASK>(), x));
+    return boost::tuples::cons_transform(detail::converter<T, MASK>(), x);
 }
 
 }	// namespace simd

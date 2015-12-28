@@ -64,19 +64,19 @@ template <class T, bool HI=false, bool MASK=false, class HEAD, class TAIL>
 inline auto
 cvt(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(
-		    x, detail::generic_cvt<T, HI, MASK>()))
+		    detail::generic_cvt<T, HI, MASK>(), x))
 {
-    return boost::tuples::cons_transform(x, detail::generic_cvt<T, HI, MASK>());
+    return boost::tuples::cons_transform(detail::generic_cvt<T, HI, MASK>(), x);
 }
     
 template <class T, bool MASK=false, class H1, class T1, class H2, class T2>
 inline auto
 cvt(const boost::tuples::cons<H1, T1>& x, const boost::tuples::cons<H2, T2>& y)
     -> decltype(boost::tuples::cons_transform(
-		    x, y, detail::generic_cvt<T, false, MASK>()))
+		    detail::generic_cvt<T, false, MASK>(), x, y))
 {
     return boost::tuples::cons_transform(
-	       x, y, detail::generic_cvt<T, false, MASK>());
+	       detail::generic_cvt<T, false, MASK>(), x, y);
 }
     
 /************************************************************************

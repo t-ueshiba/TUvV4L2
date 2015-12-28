@@ -236,73 +236,73 @@ namespace detail
 template <class HEAD, class TAIL> inline auto
 begin(boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_begin())))
+					       detail::generic_begin(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_begin()));
+					  detail::generic_begin(), x));
 }
     
 template <class HEAD, class TAIL> inline auto
 begin(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_begin())))
+					       detail::generic_begin(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_begin()));
+					  detail::generic_begin(), x));
 }
     
 template <class HEAD, class TAIL> inline auto
 end(boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_end())))
+					       detail::generic_end(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_end()));
+					  detail::generic_end(), x));
 }
     
 template <class HEAD, class TAIL> inline auto
 end(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_end())))
+					       detail::generic_end(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_end()));
+					  detail::generic_end(), x));
 }
     
 template <class HEAD, class TAIL> inline auto
 rbegin(boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_rbegin())))
+					       detail::generic_rbegin(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_rbegin()));
+					  detail::generic_rbegin(), x));
 }
     
 template <class HEAD, class TAIL> inline auto
 rbegin(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_rbegin())))
+					       detail::generic_rbegin(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_rbegin()));
+					  detail::generic_rbegin(), x));
 }
     
 template <class HEAD, class TAIL> inline auto
 rend(boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_rend())))
+					       detail::generic_rend(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_rend()));
+					  detail::generic_rend(), x));
 }
     
 template <class HEAD, class TAIL> inline auto
 rend(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					       x, detail::generic_rend())))
+					       detail::generic_rend(), x)))
 {
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
-					  x, detail::generic_rend()));
+					  detail::generic_rend(), x));
 }
     
 /************************************************************************
@@ -376,14 +376,14 @@ namespace detail
   template <class ITER>
   struct iterator_value
   {
-      typedef typename std::iterator_traits<ITER>::value_type	type;
+      typedef typename std::iterator_traits<ITER>::value_type		type;
   };
   template <class ITER_TUPLE>
   struct iterator_value<fast_zip_iterator<ITER_TUPLE> >
   {
       typedef decltype(
-	  boost::tuples::cons_transform(std::declval<ITER_TUPLE>(),
-					generic_value()))	type;
+	  boost::tuples::cons_transform(generic_value(),
+					std::declval<ITER_TUPLE>()))	type;
   };
 }
     
