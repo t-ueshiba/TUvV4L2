@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_COPY_H)
-#define	__TU_SIMD_COPY_H
+#if !defined(__TU_SIMD_TRANSFORM_H)
+#define	__TU_SIMD_TRANSFORM_H
 
 #include "TU/iterator.h"
 #include "TU/simd/cvt.h"
@@ -16,8 +16,8 @@ namespace simd
 {
 namespace detail
 {
-  template <class T, bool MASK, class ITER_TUPLE, class OUT>
-  class copier
+  template <class T, bool MASK, class ITER_TUPLE, class OUT, class FUNC>
+  class transformer
   {
     public:
       using head_iterator = tuple_head<ITER_TUPLE>;
@@ -128,7 +128,8 @@ namespace detail
 		    std::cout << '*' << N << ": " << typeid(TUPLE_).name()
 			      << std::endl;
 #endif
-		    *_out = boost::tuples::cons_transform(generic_cvtdown(), x);
+		    *_out = _func(boost::tuples::cons_transform(
+				      generic_cvtdown(), x));
 		    ++_out;
 		}
       template <class TUPLE_>
@@ -149,8 +150,9 @@ namespace detail
 		}
 
     public:
-		copier(const ITER_TUPLE& t, head_iterator end, OUT out)
-		    :_t(t), _end(end), _out(out)			{}
+		transformer(const ITER_TUPLE& t,
+			    head_iterator end, OUT out, FUNC func)
+		    :_t(t), _end(end), _out(out), _func(func)		{}
 
       OUT	operator ()()
 		{
@@ -173,23 +175,51 @@ namespace detail
       ITER_TUPLE		_t;
       const head_iterator	_end;
       OUT			_out;
+      FUNC			_func;
   };
 }	// namespace detail
 
+template <class T, bool MASK=false,
+	  class FUNC, class OUT, class IN, class... IN_EXTRA> inline OUT
+transform(FUNC func, OUT out, IN in, IN end, IN_EXTRA... in_extra)
+{
+    detail::transformer<T, MASK, boost::tuple<IN, IN_EXTRA...>, OUT, FUNC>
+	trns(boost::make_tuple(in, in_extra...), end, out, func);
+    return trns();
+}
+    
+template <class T, bool MASK=false, class ITER_TUPLE, class OUT, class FUNC>
+inline OUT
+transform(const ITER_TUPLE& ib, const ITER_TUPLE& ie, OUT out, FUNC func)
+{
+    detail::transformer<T, MASK, ITER_TUPLE, OUT, FUNC>
+	trns(ib, boost::get<0>(ie), out, func);
+    return trns();
+}
+    
+template <class T, class ITER_TUPLE, class OUT, class FUNC> inline OUT
+transform(const fast_zip_iterator<ITER_TUPLE>& ib,
+	  const fast_zip_iterator<ITER_TUPLE>& ie, OUT out, FUNC func)
+{
+    return transform(ib.get_iterator_tuple(),
+		     ie.get_iterator_tuple(), out, func);
+}
+    
 template <class T, bool MASK=false, class OUT, class IN, class... IN_EXTRA>
 inline OUT
 copy(OUT out, IN in, IN end, IN_EXTRA... in_extra)
 {
-    detail::copier<T, MASK, boost::tuple<IN, IN_EXTRA...>, OUT>
-	cp(boost::make_tuple(in, in_extra...), end, out);
-    return cp();
+    detail::transformer<T, MASK, boost::tuple<IN, IN_EXTRA...>, OUT, identity>
+	trns(boost::make_tuple(in, in_extra...), end, out, identity());
+    return trns();
 }
     
 template <class T, bool MASK=false, class ITER_TUPLE, class OUT> inline OUT
 copy(const ITER_TUPLE& ib, const ITER_TUPLE& ie, OUT out)
 {
-    detail::copier<T, MASK, ITER_TUPLE, OUT>	cp(ib, boost::get<0>(ie), out);
-    return cp();
+    detail::transformer<T, MASK, ITER_TUPLE, OUT, identity>
+	trns(ib, boost::get<0>(ie), out, identity());
+    return trns();
 }
     
 template <class T, class ITER_TUPLE, class OUT> inline OUT
@@ -202,4 +232,4 @@ copy(const fast_zip_iterator<ITER_TUPLE>& ib,
 }	// namespace simd
 }	// namespace TU
 
-#endif	// !__TU_SIMD_COPY_H
+#endif	// !__TU_SIMD_TRANSFORM_H

@@ -52,6 +52,7 @@
 #  include "TU/simd/select.h"
 #  include "TU/simd/arithmetic.h"
 #  include "TU/simd/misc.h"
+#  include "TU/simd/transform.h"
 
 #  include "TU/simd/load_iterator.h"
 #  include "TU/simd/store_iterator.h"
