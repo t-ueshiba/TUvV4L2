@@ -97,10 +97,10 @@ namespace tuples
   }
 
   /**********************************************************************
-  *  get_head(TUPLE&&)							*
+  *  get_head(T&&)							*
   **********************************************************************/
   template <class T>
-  inline typename std::enable_if<!is_tuple<T>::value, T>::type
+  inline typename std::enable_if<!is_tuple<T>::value, T&>::type
   get_head(T&& x)
   {
       return x;
@@ -114,10 +114,10 @@ namespace tuples
   }
     
   /**********************************************************************
-  *  get_tail(TUPLE&&)							*
+  *  get_tail(T&&)							*
   **********************************************************************/
   template <class T>
-  inline typename std::enable_if<!is_tuple<T>::value, T>::type
+  inline typename std::enable_if<!is_tuple<T>::value, T&>::type
   get_tail(T&& x)
   {
       return x;
@@ -145,37 +145,35 @@ namespace tuples
   };
     
   /**********************************************************************
-  *  cons_for_each(FUNC, TUPLE&&)					*
+  *  cons_for_each(FUNC, T&&)						*
   **********************************************************************/
-  template <class FUNC, class... TUPLE>
-  inline typename std::enable_if<!contains_tuple<TUPLE...>::value,
-				 null_type>::type
-  cons_for_each(FUNC, TUPLE&&...)
+  template <class FUNC, class... T>
+  inline typename std::enable_if<!contains_tuple<T...>::value>::type
+  cons_for_each(FUNC, T&&...)
   {
   }
-  template <class FUNC, class ...TUPLE>
-  inline typename std::enable_if<contains_tuple<TUPLE...>::value>::type
-  cons_for_each(FUNC f, TUPLE&&... x)
+  template <class FUNC, class... T>
+  inline typename std::enable_if<contains_tuple<T...>::value>::type
+  cons_for_each(FUNC f, T&&... x)
   {
       f(get_head(x)...);
       cons_for_each(f, get_tail(x)...);
   }
 
   /**********************************************************************
-  *  cons_transform(FUNC, TUPLE&&...)					*
+  *  cons_transform(FUNC, T&&...)					*
   **********************************************************************/
-  template <class FUNC, class... TUPLE>
-  inline typename std::enable_if<!contains_tuple<TUPLE...>::value,
-				 null_type>::type
-  cons_transform(FUNC, TUPLE&&...)
+  template <class FUNC, class... T>
+  inline typename std::enable_if<!contains_tuple<T...>::value, null_type>::type
+  cons_transform(FUNC, T&&...)
   {
       return null_type();
   }
 
-  template <class FUNC, class... TUPLE,
-	    typename std::enable_if<contains_tuple<TUPLE...>::value>::type*
+  template <class FUNC, class... T,
+	    typename std::enable_if<contains_tuple<T...>::value>::type*
 	    = nullptr> inline auto
-  cons_transform(FUNC f, TUPLE&&... x)
+  cons_transform(FUNC f, T&&... x)
       -> decltype(make_cons(f(get_head(x)...),
 			    cons_transform(f, get_tail(x)...)))
   {
