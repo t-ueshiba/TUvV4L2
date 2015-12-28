@@ -469,7 +469,10 @@ namespace simd
 		     _RminL(std::numeric_limits<score_element>::max()),
 		     _RminRV(RminRV),
 		     _nextRV(init(std::numeric_limits<score_element>::max(),
-				  boost::tuples::is_tuple<mask_vec>()))
+				  std::integral_constant<
+				      bool,
+				      boost::tuples::is_tuple<mask_vec>::value
+				  >()))
 		{
 		}
       int	dL()	const	{ return minIdx(_dminL, _RminL); }

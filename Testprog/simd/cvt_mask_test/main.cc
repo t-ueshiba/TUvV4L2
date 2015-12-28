@@ -2,7 +2,7 @@
  *  $Id$
  */
 #include <iomanip>
-#include "TU/simd/cvt_mask.h"
+#include "TU/simd/cvt.h"
 #include "TU/simd/load_store.h"
 #include "TU/simd/compare.h"
 
