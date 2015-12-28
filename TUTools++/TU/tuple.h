@@ -193,9 +193,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator +(const S& x, const T& y)
       -> decltype(cons_transform(TU::plus(), x, y))
   {
@@ -203,9 +202,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator -(const S& x, const T& y)
       -> decltype(cons_transform(TU::minus(), x, y))
   {
@@ -213,9 +211,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator *(const S& x, const T& y)
       -> decltype(cons_transform(TU::multiplies(), x, y))
   {
@@ -281,9 +278,8 @@ namespace tuples
   **********************************************************************/
 
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator &(const S& x, const T& y)
       -> decltype(cons_transform(TU::generic_function<std::bit_and>(), x, y))
   {
@@ -291,9 +287,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator |(const S& x, const T& y)
       -> decltype(cons_transform(TU::generic_function<std::bit_or>(), x, y))
   {
@@ -301,9 +296,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator ^(const S& x, const T& y)
       -> decltype(cons_transform(TU::generic_function<std::bit_xor>(), x, y))
   {
@@ -345,9 +339,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator &&(const S& x, const T& y)
       -> decltype(cons_transform(TU::generic_function<std::logical_and>(),
 				 x, y))
@@ -356,9 +349,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator ||(const S& x, const T& y)
       -> decltype(cons_transform(TU::generic_function<std::logical_or>(),
 				 x, y))
@@ -370,9 +362,8 @@ namespace tuples
   *  Relational operators						*
   **********************************************************************/
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator ==(const S& x, const T& y)
       -> decltype(cons_transform(TU::equal_to(), x, y))
   {
@@ -380,9 +371,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator !=(const S& x, const T& y)
       -> decltype(cons_transform(TU::not_equal_to(), x, y))
   {
@@ -390,9 +380,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator <(const S& x, const T& y)
       -> decltype(cons_transform(TU::less(), x, y))
   {
@@ -400,9 +389,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator >(const S& x, const T& y)
       -> decltype(cons_transform(TU::greater(), x, y))
   {
@@ -410,9 +398,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator <=(const S& x, const T& y)
       -> decltype(cons_transform(TU::less_equal(), x, y))
   {
@@ -420,9 +407,8 @@ namespace tuples
   }
     
   template <class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   operator >=(const S& x, const T& y)
       -> decltype(cons_transform(TU::greater_equal(), x, y))
   {
@@ -432,11 +418,9 @@ namespace tuples
   /**********************************************************************
   *  Selection								*
   **********************************************************************/
-
   template <class HEAD, class TAIL, class S, class T,
-	    typename std::enable_if<
-		(is_tuple<S>::value || is_tuple<T>::value)>::type* = nullptr>
-  inline auto
+	    typename std::enable_if<contains_tuple<S, T>::value>::type*
+	    = nullptr> inline auto
   select(const cons<HEAD, TAIL>& s, const S& x, const T& y)
       -> decltype(cons_transform(TU::generic_select(), s, x, y))
   {
