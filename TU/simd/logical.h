@@ -40,10 +40,11 @@ namespace detail
 template <class HEAD, class TAIL> inline auto
 andnot(const boost::tuples::cons<HEAD, TAIL>& x,
        const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y, detail::generic_andnot()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_andnot(), x, y))
 {
-    return boost::tuples::cons_transform(x, y, detail::generic_andnot());
+    return boost::tuples::cons_transform(detail::generic_andnot(), x, y);
 }
+    
 
 }	// namespace simd
 }	// namespace TU

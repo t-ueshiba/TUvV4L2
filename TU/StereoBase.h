@@ -133,7 +133,8 @@ struct Minus<simd::vec<T> >
 
     result_type	operator ()(simd::vec<T> x, simd::vec<T> y) const
 		{
-		    return simd::cast<signed_type>(x) - simd::cast<signed_type>(y);
+		    return simd::cast<signed_type>(x) -
+			   simd::cast<signed_type>(y);
 		}
 };
 #endif
@@ -142,14 +143,15 @@ template <class HEAD, class TAIL>
 struct Minus<boost::tuples::cons<HEAD, TAIL> >
 {
     typedef decltype(boost::tuples::cons_transform(
+			 Minus<HEAD>(),
 			 std::declval<boost::tuples::cons<HEAD, TAIL> >(),
-			 std::declval<boost::tuples::cons<HEAD, TAIL> >(),
-			 Minus<HEAD>()))			result_type;
+			 std::declval<boost::tuples::cons<HEAD, TAIL> >()))
+								result_type;
 
     result_type	operator ()(const boost::tuples::cons<HEAD, TAIL>& x,
 			    const boost::tuples::cons<HEAD, TAIL>& y) const
 		{
-		    return boost::tuples::cons_transform(x, y, Minus<HEAD>());
+		    return boost::tuples::cons_transform(Minus<HEAD>(), x, y);
 		}
 };
 
@@ -398,61 +400,60 @@ namespace simd
 
 #  if defined(WITHOUT_CVTDOWN)
   template <class ITER, class RV_ITER>
-  class mask_iterator : public boost::iterator_adaptor<
-			    mask_iterator<ITER, RV_ITER>,
-			    ITER,
-			    tuple_replace<iterator_value<RV_ITER> >,
-			    boost::single_pass_traversal_tag,
-			    tuple_replace<iterator_value<RV_ITER> > >
+  class mask_iterator
+      : public boost::iterator_adaptor<
+	    mask_iterator<ITER, RV_ITER>,
+	    ITER,
+	    tuple_replace<
+		iterator_value<RV_ITER>,
+		vec<mask_type<typename tuple_head<
+				  iterator_value<RV_ITER> >::element_type> > >,
+	    boost::single_pass_traversal_tag,
+	    tuple_replace<
+		iterator_value<RV_ITER>,
+		vec<mask_type<typename tuple_head<
+				  iterator_value<RV_ITER> >::element_type> > > >
 #  else
   template <class T, class ITER, class RV_ITER>
-  class mask_iterator : public boost::iterator_adaptor<
-			    mask_iterator<T, ITER, RV_ITER>,
-			    ITER,
-			    tuple_replace<iterator_value<RV_ITER>, vec<T> >,
-			    boost::single_pass_traversal_tag,
-			    tuple_replace<iterator_value<RV_ITER>, vec<T> > >
+  class mask_iterator
+      : public boost::iterator_adaptor<
+	    mask_iterator<T, ITER, RV_ITER>,
+	    ITER,
+	    tuple_replace<iterator_value<RV_ITER>, vec<T> >,
+	    boost::single_pass_traversal_tag,
+	    tuple_replace<iterator_value<RV_ITER>, vec<T> > >
 #  endif
   {
     private:
-      typedef iterator_value<RV_ITER>			elementary_vec;
-      typedef typename tuple_head<elementary_vec>::element_type
-							element_type;
+      typedef iterator_value<RV_ITER>				score_vec;
+      typedef typename tuple_head<score_vec>::element_type	score_element;
+      typedef mask_type<score_element>				S;
+      typedef tuple_replace<score_vec, vec<S> >			mask_vec;
 #  if defined(WITHOUT_CVTDOWN)
+      typedef S							T;
+#endif
       typedef boost::iterator_adaptor<
-	  mask_iterator,
-	  ITER,
-	  tuple_replace<elementary_vec>,
-	  boost::single_pass_traversal_tag,
-	  tuple_replace<elementary_vec> >		super;
-#  else
-      typedef boost::iterator_adaptor<
-	  mask_iterator,
-	  ITER,
-	  tuple_replace<elementary_vec, vec<T> >,
-	  boost::single_pass_traversal_tag,
-	  tuple_replace<elementary_vec, vec<T> > >	super;
-      typedef simd::mask_type<element_type>		mask_type;
-      typedef tuple_replace<elementary_vec, vec<mask_type> >
-							mask_vec;
-      typedef complementary_mask_type<mask_type>	complementary_type;
-      typedef tuple_replace<mask_vec, vec<complementary_type> >
-							complementary_vec;
-#  endif
+		  mask_iterator,
+		  ITER,
+		  tuple_replace<score_vec, vec<T> >,
+		  boost::single_pass_traversal_tag,
+		  tuple_replace<score_vec, vec<T> > >		super;
+
       template <class T_, size_t I_=vec<T_>::size/2> static inline int
-      minIdx(vec<T_> d, vec<T_> x,
-	     std::integral_constant<size_t, I_>
-	     dummy=std::integral_constant<size_t, I_>())
-      {
-	  const auto	y = shift_r<I_>(x);
-	  return minIdx<T_>(select(x < y, d, shift_r<I_>(d)), min(x, y),
-			    std::integral_constant<size_t, I_/2>());
-      }
+		minIdx(vec<T_> d, vec<T_> x,
+		       std::integral_constant<size_t, I_>
+		       dummy=std::integral_constant<size_t, I_>())
+		{
+		    const auto	y = shift_r<I_>(x);
+		    return minIdx<T_>(select(x < y, d, shift_r<I_>(d)),
+				      min(x, y),
+				      std::integral_constant<size_t, I_/2>());
+		}
       template <class T_> static inline int
-      minIdx(vec<T_> d, vec<T_>, std::integral_constant<size_t, 0>)
-      {
-	  return extract<0>(d);
-      }
+		minIdx(vec<T_> d, vec<T_>, std::integral_constant<size_t, 0>)
+		{
+		    return extract<0>(d);
+		}
       
     public:
       typedef typename super::difference_type		difference_type;
@@ -465,72 +466,33 @@ namespace simd
 		    :super(R),
 		     _index(),
 		     _dminL(_index),
-		     _RminL(std::numeric_limits<element_type>::max()),
+		     _RminL(std::numeric_limits<score_element>::max()),
 		     _RminRV(RminRV),
-		     _nextRV()
+		     _nextRV(init(std::numeric_limits<score_element>::max(),
+				  boost::tuples::is_tuple<mask_vec>()))
 		{
-		    init(std::numeric_limits<element_type>::max(), _nextRV);
 		}
       int	dL()	const	{ return minIdx(_dminL, _RminL); }
 	
     private:
     // _nextRV の初期化
-      void	init(element_type val, vec<element_type>& x)
+      static vec<score_element>
+		init(score_element val, std::false_type)
 		{
-		    x = val;
+		    return vec<score_element>(val);
 		}
-      template <class VEC_>
-      void	init(element_type val, VEC_& x)
+      static boost::tuple<vec<score_element>, vec<score_element> >
+		init(score_element val, std::true_type)
 		{
-		    x = boost::make_tuple(val, val);
+		    return boost::make_tuple(vec<score_element>(val),
+					     vec<score_element>(val));
 		}
 
     // mask と mask tuple に対するupdate
-      void	update(vec<element_type> R, vec<mask_type>& x)
-		{
-		    constexpr size_t	N = vec<element_type>::size;
-		    const auto		RminR  = _RminRV();
-		    const auto		minval = min(R, RminR);
-		    *_RminRV = shift_r<N-1>(_nextRV, minval);
-		    ++_RminRV;
-		    _nextRV  = minval;
-		    
-		    x = (R < RminR);
-		}
-      template <class VEC_>
-      void	update(vec<element_type> R, VEC_& x)
-		{
-		    using namespace	boost;
-
-		    constexpr size_t	N = vec<element_type>::size;
-#if 0
-		    const auto		RminRV = make_tuple(
-					  get<0>(
-					      _RminRV.get_iterator_tuple())(),
-					  get<1>(
-					      _RminRV.get_iterator_tuple())());
-		    const auto		minval = min(R, RminRV);
-		    *_RminRV = shift_r<N-1>(_nextRV, minval);
-		    ++_RminRV;
-		    _nextRV = minval;
-
-		    x = (R < RminRV);
-#else
-		    const auto	RminR = get<0>(_RminRV.get_iterator_tuple())();
-		    const auto	RminV = get<1>(_RminRV.get_iterator_tuple())();
-		    const auto	minvalR = min(R, RminR);
-		    const auto	minvalV = min(R, RminV);
-		    *_RminRV = make_tuple(
-				   shift_r<N-1>(get<0>(_nextRV), minvalR),
-				   shift_r<N-1>(get<1>(_nextRV), minvalV));
-		    ++_RminRV;
-		    _nextRV = make_tuple(minvalR, minvalV);
-
-		    x = make_tuple(R < RminR, R < RminV);
-#endif
-		}
-
-      void	cvtdown(mask_vec& x)
+      template <class T_>
+      typename std::enable_if<(vec<T_>::size == vec<S>::size),
+			      tuple_replace<mask_vec, vec<T_> > >::type
+		cvtdown()
 		{
 		    const auto	R = *super::base();
 		    ++super::base_reference();
@@ -539,44 +501,42 @@ namespace simd
 		    _RminL = min(R, _RminL);
 		    ++_index;
 
-		    update(R, x);
+		    constexpr size_t	N = vec<score_element>::size;
+		    const score_vec	RminRV = *_RminRV;
+		    const auto		minval = min(R, RminRV);
+		    *_RminRV = shift_r<N-1>(_nextRV, minval);
+		    ++_RminRV;
+		    _nextRV  = minval;
+
+		    return cvt<T_, false, true>(R < RminRV);
 		}
 #  if !defined(WITHOUT_CVTDOWN)
-      void	cvtdown(complementary_vec& x)
+      template <class T_>
+      typename std::enable_if<(vec<T_>::size > vec<S>::size),
+			      tuple_replace<mask_vec, vec<T_> > >::type
+		cvtdown()
 		{
-		    mask_vec	y;
-		    cvtdown(y);
-		    x = cvt<complementary_type, false, true>(y);
-		}
-      template <class VEC_>
-      void	cvtdown(VEC_& x)
-		{
-		    typedef
-			typename tuple_head<VEC_>::element_type	S;
-		    typedef simd::upper_type<S>			upper_type;
+		    using	A = cvt_above_type<T_, S, true>;
 		    
-		    tuple_replace<mask_vec, vec<upper_type> >	y, z;
-		    cvtdown(y);
-		    cvtdown(z);
-		    x = cvt<S, true>(y, z);
+		    auto	x = cvtdown<A>();
+		    auto	y = cvtdown<A>();
+		    return cvt<T_, true>(x, y);
 		}
 #  endif
       reference	dereference() const
 		{
-		    reference	mask;
-		    const_cast<mask_iterator*>(this)->cvtdown(mask);
-		    return mask;
+		    return const_cast<mask_iterator*>(this)->cvtdown<T>();
 		}
       void	advance(difference_type)				{}
       void	increment()						{}
       void	decrement()						{}
 
     private:
-      Idx<vec<element_type> >	_index;
-      vec<element_type>		_dminL;
-      vec<element_type>		_RminL;
+      Idx<vec<score_element> >	_index;
+      vec<score_element>	_dminL;
+      vec<score_element>	_RminL;
       RV_ITER			_RminRV;
-      elementary_vec		_nextRV;
+      score_vec			_nextRV;
   };
 
 #  if defined(WITHOUT_CVTDOWN)

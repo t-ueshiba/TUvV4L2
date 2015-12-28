@@ -157,42 +157,42 @@ namespace detail
 template <size_t N, class HEAD, class TAIL> inline auto
 shift_r(const boost::tuples::cons<HEAD, TAIL>& x,
 	const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y,
-					      detail::generic_shift_r<N>()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_shift_r<N>(),
+					      x, y))
 {
-    return boost::tuples::cons_transform(x, y, detail::generic_shift_r<N>());
+    return boost::tuples::cons_transform(detail::generic_shift_r<N>(), x, y);
 }
 
 template <size_t N, class HEAD, class TAIL> inline auto
 shift_r(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_r<N>()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_shift_r<N>(), x))
 {
-    return boost::tuples::cons_transform(x, detail::generic_shift_r<N>());
+    return boost::tuples::cons_transform(detail::generic_shift_r<N>(), x);
 }
 
 template <size_t N, class HEAD, class TAIL> inline auto
 shift_l(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(x, detail::generic_shift_l<N>()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_shift_l<N>(), x))
 {
-    return boost::tuples::cons_transform(x, detail::generic_shift_l<N>());
+    return boost::tuples::cons_transform(detail::generic_shift_l<N>(), x);
 }
     
 template <class HEAD, class TAIL> inline auto
 shift_lmost_to_rmost(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(
-		    x, detail::generic_shift_lmost_to_rmost()))
+		    detail::generic_shift_lmost_to_rmost(), x))
 {
     return boost::tuples::cons_transform(
-	       x, detail::generic_shift_lmost_to_rmost());
+	       detail::generic_shift_lmost_to_rmost(), x);
 }
     
 template <class HEAD, class TAIL> inline auto
 shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
     -> decltype(boost::tuples::cons_transform(
-		    x, detail::generic_shift_rmost_to_lmost()))
+		    detail::generic_shift_rmost_to_lmost(), x))
 {
     return boost::tuples::cons_transform(
-	       x, detail::generic_shift_rmost_to_lmost());
+	       detail::generic_shift_rmost_to_lmost(), x);
 }
 
 }	// namespace simd

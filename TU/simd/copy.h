@@ -128,7 +128,7 @@ namespace detail
 		    std::cout << '*' << N << ": " << typeid(TUPLE_).name()
 			      << std::endl;
 #endif
-		    *_out = boost::tuples::cons_transform(x, generic_cvtdown());
+		    *_out = boost::tuples::cons_transform(generic_cvtdown(), x);
 		    ++_out;
 		}
       template <class TUPLE_>
@@ -141,10 +141,10 @@ namespace detail
 			      << std::endl;
 #endif
 		    auto	y = boost::tuples::cons_transform(
-					x, generic_cvtup<N/2, false>());
+					generic_cvtup<N/2, false>(), x);
 		    cvtup(y);
 		    auto	z = boost::tuples::cons_transform(
-					x, generic_cvtup<N/2, true>());
+					generic_cvtup<N/2, true >(), x);
 		    cvtup(z);
 		}
 
@@ -163,7 +163,7 @@ namespace detail
 				  << std::endl;
 #endif
 			auto	x = boost::tuples::cons_transform(
-					_t, generic_cvtup<N, false>());
+					generic_cvtup<N, false>(), _t);
 			cvtup(x);
 		    }
 		    return _out;

@@ -19,7 +19,7 @@ NVCCFLAGS	= -O
 ifeq ($(shell arch),armv7l)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE4
+  CPPFLAGS     += -DAVX2
 endif
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS       += -xCORE-AVX2

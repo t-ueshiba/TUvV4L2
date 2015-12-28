@@ -314,7 +314,7 @@ Warp::operator ()(int u, int v) const
     return val;
 }
 
-#if defined(SSE2)
+#if defined(SSE2) && !defined(AVX2)
 //! 2つの出力画像点を指定してそれぞれにマップされる2つの入力画像点の2次元座標を返す．
 /*!
   指定された2次元座標(u, v)に対し，2点(u, v-1), (u, v)にマップされる入力画像点の

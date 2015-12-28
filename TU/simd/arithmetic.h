@@ -89,93 +89,57 @@ namespace detail
   };
 }
     
-template <class HEAD, class TAIL> inline auto
-min(const boost::tuples::cons<HEAD, TAIL>& x,
-    const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y, detail::generic_min()))
+template <class S, class T,
+	  typename std::enable_if<
+	      (boost::tuples::is_tuple<S>::value ||
+	       boost::tuples::is_tuple<T>::value)>::type* = nullptr>
+inline auto
+min(const S& x, const T& y)
+    -> decltype(boost::tuples::cons_transform(detail::generic_min(), x, y))
 {
-    return boost::tuples::cons_transform(x, y, detail::generic_min());
+    return boost::tuples::cons_transform(detail::generic_min(), x, y);
 }
 
-template <class T, class HEAD, class TAIL,
-	  class=typename std::enable_if<
-		    !boost::tuples::is_tuple<T>::value>::type> inline auto
-min(const T& c, const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(
-		    x, std::bind(detail::generic_min(),
-				 c, std::placeholders::_1)))
+template <class S, class T,
+	  typename std::enable_if<
+	      (boost::tuples::is_tuple<S>::value ||
+	       boost::tuples::is_tuple<T>::value)>::type* = nullptr>
+inline auto
+max(const S& x, const T& y)
+    -> decltype(boost::tuples::cons_transform(detail::generic_max(), x, y))
 {
-    return boost::tuples::cons_transform(
-	       x, std::bind(detail::generic_min(),
-			    c, std::placeholders::_1));
+    return boost::tuples::cons_transform(detail::generic_max(), x, y);
 }
 
-template <class HEAD, class TAIL, class T,
-	  class=typename std::enable_if<
-		    !boost::tuples::is_tuple<T>::value>::type> inline auto
-min(const boost::tuples::cons<HEAD, TAIL>& x, const T& c) -> decltype(min(c, x))
-{
-    return min(c, x);
-}
-
-template <class HEAD, class TAIL> inline auto
-max(const boost::tuples::cons<HEAD, TAIL>& x,
-    const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y, detail::generic_max()))
-{
-    return boost::tuples::cons_transform(x, y, detail::generic_max());
-}
-
-template <class T, class HEAD, class TAIL,
-	  class=typename std::enable_if<
-		    !boost::tuples::is_tuple<T>::value>::type> inline auto
-max(const T& c, const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(
-		    x, std::bind(detail::generic_max(),
-				 c, std::placeholders::_1)))
-{
-    return boost::tuples::cons_transform(
-	       x, std::bind(detail::generic_max(),
-			    c, std::placeholders::_1));
-}
-
-template <class HEAD, class TAIL, class T,
-	  class=typename std::enable_if<
-		    !boost::tuples::is_tuple<T>::value>::type> inline auto
-max(const boost::tuples::cons<HEAD, TAIL>& x, const T& c) -> decltype(max(c, x))
-{
-    return max(c, x);
-}
-    
 template <class HEAD, class TAIL> inline auto
 avg(const boost::tuples::cons<HEAD, TAIL>& x,
     const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y, detail::generic_avg()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_avg(), x, y))
 {
-    return boost::tuples::cons_transform(x, y, detail::generic_avg());
+    return boost::tuples::cons_transform(detail::generic_avg(), x, y);
 }
     
 template <class HEAD, class TAIL> inline auto
 sub_avg(const boost::tuples::cons<HEAD, TAIL>& x,
 	const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y, detail::generic_sub_avg()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_sub_avg(), x, y))
 {
-    return boost::tuples::cons_transform(x, y, detail::generic_sub_avg());
+    return boost::tuples::cons_transform(detail::generic_sub_avg(), x, y);
 }
 
 template <class HEAD, class TAIL> inline auto
 abs(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(x, detail::generic_abs()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_abs(), x))
 {
-    return boost::tuples::cons_transform(x, detail::generic_abs());
+    return boost::tuples::cons_transform(detail::generic_abs(), x);
 }
     
 template <class HEAD, class TAIL> inline auto
 diff(const boost::tuples::cons<HEAD, TAIL>& x,
      const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(x, y, detail::generic_diff()))
+    -> decltype(boost::tuples::cons_transform(detail::generic_diff(), x, y))
 {
-    return boost::tuples::cons_transform(x, y, detail::generic_diff());
+    return boost::tuples::cons_transform(detail::generic_diff(), x, y);
 }
     
 }	// namespace simd

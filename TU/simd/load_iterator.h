@@ -89,13 +89,13 @@ namespace detail
 template <class ITER_TUPLE, bool ALIGNED>
 class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     : public fast_zip_iterator<decltype(boost::tuples::cons_transform(
-					    std::declval<ITER_TUPLE>(),
-					    detail::loader<ALIGNED>()))>
+					    detail::loader<ALIGNED>(),
+					    std::declval<ITER_TUPLE>()))>
 {
   private:
     typedef fast_zip_iterator<decltype(boost::tuples::cons_transform(
-					   std::declval<ITER_TUPLE>(),
-					   detail::loader<ALIGNED>()))>	super;
+					   detail::loader<ALIGNED>(),
+					   std::declval<ITER_TUPLE>()))> super;
 
     struct base_iterator
     {
@@ -111,14 +111,14 @@ class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
     
   public:
     load_iterator(const fast_zip_iterator<ITER_TUPLE>& iter)
-	:super(boost::tuples::cons_transform(iter.get_iterator_tuple(),
-					     detail::loader<ALIGNED>())){}
+	:super(boost::tuples::cons_transform(detail::loader<ALIGNED>(),
+					     iter.get_iterator_tuple())){}
     load_iterator(const super& iter)	:super(iter)			{}
 
     base_type	base() const
 		{
 		    return boost::tuples::cons_transform(
-			       super::get_iterator_tuple(), base_iterator());
+			       base_iterator(), super::get_iterator_tuple());
 		}
 };
 
