@@ -138,11 +138,13 @@ typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 SIMD_CONSTRUCTOR_1(int8_t)
 SIMD_CONSTRUCTOR_1(int16_t)
 SIMD_CONSTRUCTOR_1(int32_t)
-SIMD_CONSTRUCTOR_1(int64_t)
 SIMD_CONSTRUCTOR_1(u_int8_t)
 SIMD_CONSTRUCTOR_1(u_int16_t)
 SIMD_CONSTRUCTOR_1(u_int32_t)
-SIMD_CONSTRUCTOR_1(u_int64_t)
+#if defined(SSE2)
+  SIMD_CONSTRUCTOR_1(int64_t)
+  SIMD_CONSTRUCTOR_1(u_int64_t)
+#endif
 
 #if defined(AVX2)
   SIMD_CONSTRUCTOR_32(int8_t)	
