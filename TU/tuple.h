@@ -45,28 +45,24 @@ namespace tuples
   /**********************************************************************
   *  struct is_tuple<T>							*
   **********************************************************************/
-  template <class HEAD, class TAIL>
-  static true_type	tuple_check(cons<HEAD, TAIL>)		;
-  static false_type	tuple_check(...)			;
-    
   template <class T>
-  struct is_tuple : decltype(tuple_check(std::declval<T>()))	{};
+  using is_tuple = TU::is_convertible<T, cons>;
 
   /**********************************************************************
-  *  make_uniform_htuple(T, TU::index_sequence<IDX...>)			*
+  *  make_uniform_htuple(T, std::index_sequence<IDX...>)		*
   **********************************************************************/
   template <class T, size_t... IDX> static inline auto
-  make_uniform_htuple(T&& x, TU::index_sequence<IDX...>)
+  make_uniform_htuple(T&& x, std::index_sequence<IDX...>)
       -> decltype(boost::make_tuple((IDX, x)...))
   {
       return boost::make_tuple((IDX, x)...);
   }
 
   /**********************************************************************
-  *  make_contiguous_htuple(T, TU::index_sequence<IDX...>)		*
+  *  make_contiguous_htuple(T, std::index_sequence<IDX...>)		*
   **********************************************************************/
   template <class T, size_t... IDX> static inline auto
-  make_contiguous_htuple(T&& x, TU::index_sequence<IDX...>)
+  make_contiguous_htuple(T&& x, std::index_sequence<IDX...>)
       -> decltype(boost::make_tuple((x + IDX)...))
   {
       return boost::make_tuple((x + IDX)...);
@@ -134,15 +130,11 @@ namespace tuples
   *  struct contains_tuple<ARGS...>					*
   **********************************************************************/
   template <class... ARGS>
-  struct contains_tuple : std::false_type
-  {
-  };
+  struct contains_tuple : std::false_type				{};
   template <class ARG, class... ARGS>
   struct contains_tuple<ARG, ARGS...>
       : std::integral_constant<bool, (is_tuple<ARG>::value ||
-				      contains_tuple<ARGS...>::value)>
-  {
-  };
+				      contains_tuple<ARGS...>::value)>	{};
     
   /**********************************************************************
   *  cons_for_each(FUNC, T&&)						*
@@ -432,19 +424,19 @@ namespace tuples
 template <size_t N, class T> inline auto
 make_uniform_htuple(T&& x)
     -> decltype(tuples::make_uniform_htuple(std::forward<T>(x),
-					    TU::make_index_sequence<N>()))
+					    std::make_index_sequence<N>()))
 {
     return tuples::make_uniform_htuple(std::forward<T>(x),
-				       TU::make_index_sequence<N>());
+				       std::make_index_sequence<N>());
 }
 
 template <size_t N, class T> inline auto
 make_contiguous_htuple(T&& x)
     -> decltype(tuples::make_contiguous_htuple(std::forward<T>(x),
-					       TU::make_index_sequence<N>()))
+					       std::make_index_sequence<N>()))
 {
     return tuples::make_contiguous_htuple(std::forward<T>(x),
-					  TU::make_index_sequence<N>());
+					  std::make_index_sequence<N>());
 }
 
 template <class T, size_t N>
@@ -476,7 +468,7 @@ class unarizer
     result_type	operator ()(const boost::tuples::cons<HEAD, TAIL>& arg) const
 		{
 		    return exec(arg,
-				TU::make_index_sequence<
+				std::make_index_sequence<
 				    1 + boost::tuples::length<TAIL>::value>());
 		}
 
@@ -484,7 +476,7 @@ class unarizer
 
   private:
     template <class TUPLE, size_t... IDX>
-    result_type	exec(const TUPLE& arg, TU::index_sequence<IDX...>) const
+    result_type	exec(const TUPLE& arg, std::index_sequence<IDX...>) const
 		{
 		    return _func(boost::get<IDX>(arg)...);
 		}
@@ -526,7 +518,7 @@ namespace detail
       typedef HEAD						head_type;
       typedef typename tuple_traits<HEAD>::leftmost_type	leftmost_type;
   };
-  template <class ...T>
+  template <class... T>
   struct tuple_traits<boost::tuple<T...> >
       : tuple_traits<typename boost::tuple<T...>::inherited>
   {
@@ -560,26 +552,24 @@ struct tuple_nelms
 /************************************************************************
 *  struct tuple_for_all<T, COND, ARGS...>				*
 ************************************************************************/
-template <class T, template <class ...> class COND, class ...ARGS>
+template <class T, template <class...> class COND, class... ARGS>
 struct tuple_for_all : std::integral_constant<bool, COND<T, ARGS...>::value>
 {
 };
-template <template <class ...> class COND, class ...ARGS>
-struct tuple_for_all<boost::tuples::null_type, COND, ARGS...>
-    : std::true_type
+template <template <class...> class COND, class... ARGS>
+struct tuple_for_all<boost::tuples::null_type, COND, ARGS...> : std::true_type
 {
 };
 template <class HEAD, class TAIL,
-	  template <class ...> class COND, class ...ARGS>
+	  template <class...> class COND, class... ARGS>
 struct tuple_for_all<boost::tuples::cons<HEAD, TAIL>, COND,  ARGS...>
-    : std::integral_constant<
-	  bool,
-	  (COND<HEAD, ARGS...>::value &&
-	   tuple_for_all<TAIL, COND, ARGS...>::value)>
+    : std::integral_constant<bool,
+			     (COND<HEAD, ARGS...>::value &&
+			      tuple_for_all<TAIL, COND, ARGS...>::value)>
 {
 };
 template <BOOST_PP_ENUM_PARAMS(10, class S),
-	  template <class ...> class COND, class ...ARGS>
+	  template <class...> class COND, class... ARGS>
 struct tuple_for_all<boost::tuple<BOOST_PP_ENUM_PARAMS(10, S)>,
 		     COND, ARGS...>
     : tuple_for_all<
@@ -604,7 +594,7 @@ struct tuple_is_uniform<boost::tuples::cons<HEAD, TAIL> >
 	    tuple_is_uniform<TAIL>::value))>
 {
 };
-template <class ...S>
+template <class... S>
 struct tuple_is_uniform<boost::tuple<S...> >
     : tuple_is_uniform<typename boost::tuple<S...>::inherited>
 {
@@ -631,7 +621,7 @@ namespace detail
 	  typename tuple_replace<T, HEAD>::type,
 	  typename tuple_replace<T, TAIL>::type>	type;
   };
-  template <class T, class ...S>
+  template <class T, class... S>
   struct tuple_replace<T, boost::tuple<S...> >
       : tuple_replace<T, typename boost::tuple<S...>::inherited>
   {

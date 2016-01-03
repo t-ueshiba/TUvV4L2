@@ -196,11 +196,11 @@ class Vector : public Array<T, B>
     template <class B2>
     Vector(Vector<T, B2>& v, size_t i, size_t d)			;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector(const E& v)							;
     Vector(std::initializer_list<value_type> args)			;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector&		operator =(const E& v)				;
     Vector&		operator =(std::
 				   initializer_list<value_type> args)	;
@@ -220,23 +220,23 @@ class Vector : public Array<T, B>
     const Vector<T>	operator ()(size_t i, size_t d)		const	;
     Vector<T>		operator ()(size_t i, size_t d)			;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector&		operator *=(const E& m)				;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector&		operator ^=(const E& v)				;
     T			square()				const	;
     double		length()				const	;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     T			sqdist(const E& v)			const	;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     double		dist(const E& v)			const	;
     Vector&		normalize()					;
     Vector		normal()				const	;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector&		solve(const E& m)				;
     matrix33_type	skew()					const	;
     Vector<T>		homogeneous()				const	;
@@ -287,7 +287,8 @@ Vector<T, B>::Vector(Vector<T, B2>& v, size_t i, size_t d)
 /*!
   \param v	コピー元ベクトル
 */
-template <class T, class B> template <class E, class> inline
+template <class T, class B>
+template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
 Vector<T, B>::Vector(const E& v)
     :super(v)
 {
@@ -304,7 +305,10 @@ Vector<T, B>::Vector(std::initializer_list<value_type> args)
   \param v	コピー元ベクトル
   \return	このベクトル
 */
-template <class T, class B> template <class E, class> inline Vector<T, B>&
+
+template <class T, class B>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Vector<T, B>&
 Vector<T, B>::operator =(const E& v)
 {
     super::operator =(v);
@@ -355,7 +359,9 @@ Vector<T, B>::operator ()(size_t i, size_t d) const
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\TUvec{M}{}\f$
 */
-template <class T, class B> template <class E, class> inline Vector<T, B>&
+template <class T, class B>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Vector<T, B>&
 Vector<T, B>::operator *=(const E& m)
 {
     return *this = *this * m;
@@ -367,7 +373,9 @@ Vector<T, B>::operator *=(const E& m)
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} \times \TUvec{v}{}\f$
 */
-template <class T, class B> template <class E, class> inline Vector<T, B>&
+template <class T, class B>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Vector<T, B>&
 Vector<T, B>::operator ^=(const E& v)
 {
     return *this = *this ^ v;
@@ -399,7 +407,9 @@ Vector<T, B>::length() const
   \return	ベクトル間の差の2乗，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
 */
-template <class T, class B> template <class E, class> inline T
+template <class T, class B>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline T
 Vector<T, B>::sqdist(const E& v) const
 {
     return Vector(*this - v).square();
@@ -411,7 +421,9 @@ Vector<T, B>::sqdist(const E& v) const
   \return	ベクトル間の差，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
-template <class T, class B> template <class E, class> inline double
+template <class T, class B>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline double
 Vector<T, B>::dist(const E& v) const
 {
     return std::sqrt(double(sqdist(v)));
@@ -539,12 +551,12 @@ class Matrix : public Array2<Vector<T>, B, R>
     template <class B2, class R2>
     Matrix(Matrix<T, B2, R2>& m, size_t i, size_t j, size_t r, size_t c);
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Matrix(const E& expr)	:super(expr)				{}
     Matrix(std::initializer_list<value_type> args)			;
     Matrix(const BlockDiagonalMatrix<T>& m)				;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Matrix&		operator =(const E& expr)
 			{
 			    super::operator =(expr);
@@ -573,16 +585,16 @@ class Matrix : public Array2<Vector<T>, B, R>
     Matrix<T>		operator ()(size_t i, size_t j,
 				    size_t r, size_t c)			;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Matrix&		operator *=(const E& m)				;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Matrix&		operator ^=(const E& v)				;
     Matrix&		diag(T c)					;
     Matrix<T>		trns()					const	;
     Matrix		inv()					const	;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Matrix&		solve(const E& m)				;
     T			det()					const	;
     T			det(size_t p, size_t q)			const	;
@@ -716,7 +728,8 @@ Matrix<T, B, R>::operator ()(size_t i, size_t j, size_t r, size_t c) const
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
 */
-template <class T, class B, class R> template <class E, class>
+template <class T, class B, class R>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator *=(const E& m)
 {
@@ -729,7 +742,8 @@ Matrix<T, B, R>::operator *=(const E& m)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
-template <class T, class B, class R> template <class E, class>
+template <class T, class B, class R>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 inline Matrix<T, B, R>&
 Matrix<T, B, R>::operator ^=(const E& v)
 {
@@ -1345,7 +1359,7 @@ class LUDecomposition : private Array2<Vector<T> >
     
   public:
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     LUDecomposition(const E& m)				;
 
     template <class T2, class B2>
@@ -1370,7 +1384,8 @@ class LUDecomposition : private Array2<Vector<T> >
  \param m			LU分解する正方行列
  \throw std::invalid_argument	mが正方行列でない場合に送出
 */
-template <class T> template <class E, class>
+template <class T>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 LUDecomposition<T>::LUDecomposition(const E& m)
     :super(m), _index(ncol()), _det(1.0)
 {
@@ -1478,7 +1493,8 @@ LUDecomposition<T>::substitute(Vector<T2, B2>& b) const
 		の解を納めたこのベクトル，すなわち
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
 */
-template <class T, class B> template <class E, class>
+template <class T, class B>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 inline Vector<T, B>&
 Vector<T, B>::solve(const E& m)
 {
@@ -1493,7 +1509,8 @@ Vector<T, B>::solve(const E& m)
 		の解を納めたこの行列，すなわち
 		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
 */
-template <class T, class B, class R> template <class E, class>
+template <class T, class B, class R>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 Matrix<T, B, R>&
 Matrix<T, B, R>::solve(const E& m)
 {
@@ -1534,7 +1551,7 @@ class Householder : public Matrix<T>
     Householder(size_t dd, size_t d)
 	:super(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Householder(const E& a, size_t d)				;
 
     using		super::size;
@@ -1556,7 +1573,8 @@ class Householder : public Matrix<T>
     friend class	BiDiagonal<T>;
 };
 
-template <class T> template <class E, class>
+template <class T>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 Householder<T>::Householder(const E& a, size_t d)
     :super(a), _d(d), _sigma(size())
 {
@@ -1743,7 +1761,7 @@ class QRDecomposition : private Matrix<T>
     
   public:
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     QRDecomposition(const E& m)				;
 
   //! QR分解の下半三角行列を返す．
@@ -1769,7 +1787,8 @@ class QRDecomposition : private Matrix<T>
 /*!
  \param m	QR分解する一般行列
 */
-template <class T> template <class E, class>
+template <class T>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 QRDecomposition<T>::QRDecomposition(const E& m)
     :super(m), _Qt(m.ncol(), 0)
 {
@@ -1802,7 +1821,7 @@ class TriDiagonal
     
   public:
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     TriDiagonal(const E& a)				;
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す．
@@ -1848,7 +1867,8 @@ class TriDiagonal
   \param a			3重対角化する対称行列
   \throw std::invalid_argument	aが正方行列でない場合に送出
 */
-template <class T> template <class E, class>
+template <class T>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 TriDiagonal<T>::TriDiagonal(const E& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
 {
@@ -2001,7 +2021,7 @@ class BiDiagonal
     
   public:
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     BiDiagonal(const E& a)			;
 
   //! 2重対角化される行列の行数を返す．
@@ -2063,7 +2083,8 @@ class BiDiagonal
 /*!
   \param a	2重対角化する一般行列
 */
-template <class T> template <class E, class>
+template <class T>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
 BiDiagonal<T>::BiDiagonal(const E& a)
     :_Dt((a.size() < a.ncol() ? a.ncol() : a.size()), 0),
      _Et((a.size() < a.ncol() ? a.size() : a.ncol()), 1),
@@ -2302,7 +2323,7 @@ class SVDecomposition : private BiDiagonal<T>
     \param a	特異値分解する一般行列
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     SVDecomposition(const E& a)
 	:super(a)				{super::diagonalize();}
 

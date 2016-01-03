@@ -113,7 +113,7 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     \param v	コピー元2次元ベクトル
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Point2(const E& v) :super(v)					{}
 
   //! 他の2次元ベクトルを自分に代入する．
@@ -122,7 +122,7 @@ class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
     \return	この2次元点
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Point2&	operator =(const E& v)
 		{
 		    super::operator =(v);
@@ -323,7 +323,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
     \param v	コピー元3次元ベクトル
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Point3(const E& v) :super(v)				{}
 
   //! 他の3次元ベクトルを自分に代入する．
@@ -332,7 +332,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
     \return	この3次元点
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Point3&	operator =(const E& v)
 		{
 		    super::operator =(v);
@@ -644,7 +644,7 @@ class HyperPlane : public V
     \param p	(d+1)次元ベクトル(dは超平面が存在する射影空間の次元)
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     HyperPlane(const E& p)	:super(p)	{}
 
     template <class Iterator>
@@ -658,7 +658,7 @@ class HyperPlane : public V
     \return	この超平面オブジェクト
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     HyperPlane&	operator =(const E& v)	{super::operator =(v);
 							 return *this;}
 
@@ -834,7 +834,7 @@ class Projectivity : public M
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Projectivity(const E& T) :super(T)					{}
 
     template <class Iterator>
@@ -849,7 +849,7 @@ class Projectivity : public M
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     void	set(const E& T)		{super::operator =(T);}
     
     template <class Iterator>
@@ -1307,7 +1307,7 @@ class Affinity : public Projectivity<M>
     Affinity(size_t inDim, size_t outDim)	:super(inDim, outDim)	{}
 
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Affinity(const E& T)						;
     template <class Iterator>
     Affinity(Iterator begin, Iterator end)				;
@@ -1318,7 +1318,7 @@ class Affinity : public Projectivity<M>
     using	super::Jx;
     
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     void	set(const E& T)						;
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)			;
@@ -1345,7 +1345,8 @@ class Affinity : public Projectivity<M>
   変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
   \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
-template<class M> template <class E, class> inline
+template<class M>
+template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
 Affinity<M>::Affinity(const E& T)
     :super(T)
 {
@@ -1370,7 +1371,9 @@ Affinity<M>::Affinity(Iterator begin, Iterator end)
   変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
   \param T			(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
 */
-template<class M> template <class E, class> inline void
+template<class M>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline void
 Affinity<M>::set(const E& T)
 {
     super::set(T);
@@ -1557,7 +1560,7 @@ class Rigidity : public Affinity<M>
     Rigidity(size_t d)	:super(d, d)					{}
 
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Rigidity(const E& T)						;
     template <class Iterator>
     Rigidity(Iterator begin, Iterator end)				;
@@ -1567,7 +1570,7 @@ class Rigidity : public Affinity<M>
 
     size_t		dim()					const	;
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     void		set(const E& T)					;
     template <class Iterator>
     void		fit(Iterator begin, Iterator end)		;
@@ -1586,7 +1589,8 @@ class Rigidity : public Affinity<M>
 /*!
   \param T	(d+1) x (d+1)行列(dは入力/出力空間の次元)
 */
-template<class M> template <class E, class> inline
+template<class M>
+template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
 Rigidity<M>::Rigidity(const E& T)
 {
     set(T);
@@ -1618,7 +1622,9 @@ Rigidity<M>::dim() const
 /*!
   \param T	(d+1) x (d+1) 行列(dは入力/出力空間の次元)
 */
-template<class M> template <class E, class > inline void
+template<class M>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline void
 Rigidity<M>::set(const E& T)
 {
     if (T().size() != T().ncol())
@@ -1832,7 +1838,7 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
   public:
     Homography()			:super()		{}
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Homography(const E& H)	:super(H)			{}
     template <class Iterator>
     Homography(Iterator begin, Iterator end, bool refine=false)	;
@@ -1958,7 +1964,7 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
   public:
     Affinity2()	:super()					{}
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Affinity2(const E& A)					;
     template <class Iterator>
     Affinity2(Iterator begin, Iterator end)			;
@@ -1977,7 +1983,8 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
     void	compose(const param_type& dt)			;
 };
 
-template <class T> template <class E, class> inline
+template <class T>
+template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
 Affinity2<T>::Affinity2(const E& A)
     :super(A)
 {

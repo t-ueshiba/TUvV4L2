@@ -42,21 +42,21 @@
 #include <cassert>
 #include <boost/iterator/iterator_adaptor.hpp>
 
-namespace TU
+namespace std
 {
+#if __cplusplus <= 201103L
 /************************************************************************
-*  struct index_sequence<size_t ...>					*
+*  struct index_sequence<size_t...>					*
 ************************************************************************/
-template <size_t ...> struct index_sequence			{};
+template <size_t...> struct index_sequence			{};
 
-//! 実装の詳細を収める名前空間
 namespace detail
 {
-  template <size_t N, size_t ...IDX>
+  template <size_t N, size_t... IDX>
   struct make_index_sequence : make_index_sequence<N - 1, N - 1, IDX...>
   {
   };
-  template <size_t ...IDX>
+  template <size_t... IDX>
   struct make_index_sequence<0, IDX...>
   {
       typedef index_sequence<IDX...>	type;
@@ -65,7 +65,29 @@ namespace detail
     
 template <size_t N>
 using make_index_sequence = typename detail::make_index_sequence<N>::type;
-    
+#endif
+}
+
+namespace TU
+{
+/************************************************************************
+*  struct is_convertible<T, C<ARGS...> >				*
+************************************************************************/
+namespace detail
+{
+  template <template <class...> class C>
+  struct is_convertible
+  {
+      template <class... ARGS>
+      static std::true_type	check(C<ARGS...>)			;
+      static std::false_type	check(...)				;
+  };
+}	// namespace detail
+
+template <class T, template <class...> class C>
+struct is_convertible
+    : decltype(detail::is_convertible<C>::check(std::declval<T>()))	{};
+	
 /************************************************************************
 *  struct generic_function<FUNC>					*
 ************************************************************************/
@@ -353,6 +375,7 @@ struct generic_select
     }
 };
 
+//! 実装の詳細を収める名前空間
 namespace detail
 {
   /**********************************************************************
@@ -361,37 +384,64 @@ namespace detail
   //! 演算子のノードを表すクラス
   struct opnode		{};
     
+  /**********************************************************************
+  *  type aliases							*
+  **********************************************************************/
+  //! 式が演算子であるか判定する
+  template <class E>
+  using is_opnode = std::is_convertible<E, opnode>;
+
   namespace impl
   {
     template <class T>	struct identity	{ typedef T	type; };
-    template <class>	struct ignore	{ typedef void	type; };
 
-    struct has_begin
+    struct is_range
     {
 	template <class E_> static auto
-	check(E_*) -> decltype(std::declval<E_&>().begin(), std::true_type());
-	template <class E_> static auto
-	check(...) -> std::false_type;
+	check(const E_& x) -> decltype(x.begin(), x.end(),
+				       std::true_type())	;
+	static std::false_type
+	check(...)						;
+    };
+
+    struct has_const_iterator
+    {
+	template <class E_> static typename E_::const_iterator
+	check(typename E_::const_iterator*)			;
+	template <class E_> static void
+	check(...)						;
+    };
+  }	// namespace impl
+    
+  //! 式がメンバ関数begin()とend()を持つか判定する
+  template <class E>
+  using is_range = decltype(detail::impl::is_range::check(std::declval<E>()));
+
+  //! 式が持つ定数反復子の型を返す
+  /*!
+    \param E	式の型
+    \return	E が定数反復子を持てばその型，持たなければ void
+  */
+  template <class E>
+  using const_iterator_t
+	    = decltype(impl::has_const_iterator::check<E>(nullptr));
+
+  namespace impl
+  {
+    template <class E>
+    struct value_t
+    {
+	typedef typename std::iterator_traits<
+		    decltype(has_const_iterator::
+			     check<E>(nullptr))>::value_type	type;
     };
       
-    template <class E, class=void>
-    struct const_iterator_t
-    {
-	typedef void						type;
-    };
-    template <class E>
-    struct const_iterator_t<
-	E, typename ignore<typename E::const_iterator>::type>
-    {
-	typedef typename E::const_iterator			type;
-    };
-
-    template <class E, class ITER>
+    template <class E, class=const_iterator_t<E> >
     struct element_t
     {
-	typedef typename std::iterator_traits<ITER>::value_type	F;
-	typedef typename element_t<
-	    F, typename const_iterator_t<F>::type>::type	type;
+	typedef typename value_t<E>::type			F;
+	typedef typename element_t<F,
+				   const_iterator_t<F> >::type	type;
     };
     template <class E>
     struct element_t<E, void> : identity<E>			{};
@@ -402,26 +452,6 @@ namespace detail
 	typedef typename E::result_type				type;
     };
   }
-    
-  /**********************************************************************
-  *  type aliases							*
-  **********************************************************************/
-  //! 式が持つ定数反復子の型を返す
-  /*!
-    \param E	式の型
-    \return	E が定数反復子を持てばその型，持たなければ void
-  */
-  template <class E>
-  using const_iterator_t = typename impl::const_iterator_t<E>::type;
-
-  //! 式がメンバ関数begin()を持つか判定する
-  template <class E>
-  using is_range = decltype(impl::has_begin::check<E>(nullptr));
-    
-  //! 式が演算子であるか判定する
-  template <class E>
-  using is_opnode = std::integral_constant<
-			bool, std::is_convertible<E, opnode>::value>;
 
   //! 式が持つ定数反復子が指す型を返す
   /*!
@@ -430,8 +460,7 @@ namespace detail
     \return	E の定数反復子が指す型
   */
   template <class E>
-  using value_t = typename std::iterator_traits<
-			       const_iterator_t<E> >::value_type;
+  using value_t = typename impl::value_t<E>::type;
 
   //! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
   /*!
@@ -440,7 +469,7 @@ namespace detail
 		持たなければ E 自身
   */
   template <class E>
-  using element_t = typename impl::element_t<E, const_iterator_t<E> >::type;
+  using element_t = typename impl::element_t<E>::type;
 
   //! 式の評価結果の型を返す
   /*!
@@ -493,7 +522,7 @@ namespace detail
 	  evalue_is_range::value,
 	  unary_operator<OP, evalue_type>,
 	  evalue_type>::type		value_type;
-  //! 定数反復子
+    //! 定数反復子
       class const_iterator
 	  : public boost::iterator_adaptor<const_iterator,
 					   base_iterator,
@@ -730,20 +759,22 @@ namespace detail
   }
 }	// End of namespace TU::detail
 
+template <class E>	using is_range  = detail::is_range<E>;
+template <class E>	using element_t = detail::element_t<E>;
+    
 //! 与えられた式の各要素の符号を反転する.
 /*!
   \param expr	式
   \return	符号反転演算子ノード
 */
-template <class E,
-	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+template <class E, typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
 operator -(const E& expr)
     -> decltype(detail::make_unary_operator(
-		    expr, std::negate<detail::element_t<E> >()))
+		    expr, std::negate<element_t<E> >()))
 {
     return detail::make_unary_operator(expr,
-				       std::negate<detail::element_t<E> >());
+				       std::negate<element_t<E> >());
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -753,15 +784,15 @@ operator -(const E& expr)
   \return	乗算演算子ノード
 */
 template <class E,
-	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+	  typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
-operator *(const E& expr, const detail::element_t<E>& c)
+operator *(const E& expr, const element_t<E>& c)
     -> decltype(detail::make_unary_operator(
-		    expr, std::bind(std::multiplies<detail::element_t<E> >(),
+		    expr, std::bind(std::multiplies<element_t<E> >(),
 				    std::placeholders::_1, c)))
 {
     return detail::make_unary_operator(
-	       expr, std::bind(std::multiplies<detail::element_t<E> >(),
+	       expr, std::bind(std::multiplies<element_t<E> >(),
 			       std::placeholders::_1, c));
 }
 
@@ -771,16 +802,15 @@ operator *(const E& expr, const detail::element_t<E>& c)
   \param expr	式
   \return	乗算演算子ノード
 */
-template <class E,
-	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+template <class E, typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
-operator *(const detail::element_t<E>& c, const E& expr)
+operator *(const element_t<E>& c, const E& expr)
     -> decltype(detail::make_unary_operator(
-		    expr, std::bind(std::multiplies<detail::element_t<E> >(),
+		    expr, std::bind(std::multiplies<element_t<E> >(),
 				    c, std::placeholders::_1)))
 {
     return detail::make_unary_operator(
-	       expr, std::bind(std::multiplies<detail::element_t<E> >(),
+	       expr, std::bind(std::multiplies<element_t<E> >(),
 			       c, std::placeholders::_1));
 }
 
@@ -791,15 +821,15 @@ operator *(const detail::element_t<E>& c, const E& expr)
   \return	除算演算子ノード
 */
 template <class E,
-	  class=typename std::enable_if<detail::is_range<E>::value>::type>
+	  typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
-operator /(const E& expr, const detail::element_t<E>& c)
+operator /(const E& expr, const element_t<E>& c)
     -> decltype(detail::make_unary_operator(
-		    expr, std::bind(std::divides<detail::element_t<E> >(),
+		    expr, std::bind(std::divides<element_t<E> >(),
 				    std::placeholders::_1, c)))
 {
     return detail::make_unary_operator(
-	       expr, std::bind(std::divides<detail::element_t<E> >(),
+	       expr, std::bind(std::divides<element_t<E> >(),
 			       std::placeholders::_1, c));
 }
 
@@ -811,8 +841,8 @@ operator /(const E& expr, const detail::element_t<E>& c)
 */
 template <class E>
 inline typename std::enable_if<
-    detail::is_range<typename std::decay<E>::type>::value, E&>::type
-operator *=(E&& expr, const detail::element_t<typename std::decay<E>::type>& c)
+    is_range<typename std::decay<E>::type>::value, E&>::type
+operator *=(E&& expr, const element_t<typename std::decay<E>::type>& c)
 {
     return detail::op_assign<multiplies_assign>(expr, c);
 }
@@ -825,8 +855,8 @@ operator *=(E&& expr, const detail::element_t<typename std::decay<E>::type>& c)
 */
 template <class E>
 inline typename std::enable_if<
-    detail::is_range<typename std::decay<E>::type>::value, E&>::type
-operator /=(E&& expr, const detail::element_t<typename std::decay<E>::type>& c)
+    is_range<typename std::decay<E>::type>::value, E&>::type
+operator /=(E&& expr, const element_t<typename std::decay<E>::type>& c)
 {
     return detail::op_assign<divides_assign>(expr, c);
 }
@@ -838,15 +868,14 @@ operator /=(E&& expr, const detail::element_t<typename std::decay<E>::type>& c)
   \return	加算演算子ノード
 */
 template <class L, class R,
-	  class=typename std::enable_if<(detail::is_range<L>::value &&
-					 detail::is_range<R>::value)>::type>
+	  typename std::enable_if<
+	      (is_range<L>::value && is_range<R>::value)>::type* = nullptr>
 inline auto
 operator +(const L& l, const R& r)
-    -> decltype(detail::make_binary_operator(
-		    l, r, std::plus<detail::element_t<R> >()))
+    -> decltype(detail::make_binary_operator(l, r, std::plus<element_t<R> >()))
 {
     return detail::make_binary_operator(l, r,
-					std::plus<detail::element_t<R> >());
+					std::plus<element_t<R> >());
 }
 
 //! 与えられた2つの式の各要素の差をとる.
@@ -856,15 +885,13 @@ operator +(const L& l, const R& r)
   \return	減算演算子ノード
 */
 template <class L, class R,
-	  class=typename std::enable_if<(detail::is_range<L>::value &&
-					 detail::is_range<R>::value)>::type>
+	  typename std::enable_if<
+	      (is_range<L>::value && is_range<R>::value)>::type* = nullptr>
 inline auto
 operator -(const L& l, const R& r)
-    -> decltype(detail::make_binary_operator(
-		    l, r, std::minus<detail::element_t<R> >()))
+    -> decltype(detail::make_binary_operator(l, r, std::minus<element_t<R> >()))
 {
-    return detail::make_binary_operator(l, r,
-					std::minus<detail::element_t<R> >());
+    return detail::make_binary_operator(l, r, std::minus<element_t<R> >());
 }
 
 //! 与えられた左辺の式の各要素に右辺の式の各要素を加える.
@@ -875,8 +902,8 @@ operator -(const L& l, const R& r)
 */
 template <class L, class R>
 inline typename std::enable_if<
-    (detail::is_range<typename std::decay<L>::type>::value &&
-     detail::is_range<R>::value), L&>::type
+    (is_range<typename std::decay<L>::type>::value && is_range<R>::value),
+    L&>::type
 operator +=(L&& l, const R& r)
 {
     return detail::op_assign<plus_assign>(l, r);
@@ -890,8 +917,8 @@ operator +=(L&& l, const R& r)
 */
 template <class L, class R>
 inline typename std::enable_if<
-    (detail::is_range<typename std::decay<L>::type>::value &&
-     detail::is_range<R>::value), L&>::type
+    (is_range<typename std::decay<L>::type>::value && is_range<R>::value),
+    L&>::type
 operator -=(L&& l, const R& r)
 {
     return detail::op_assign<minus_assign>(l, r);
@@ -906,17 +933,17 @@ operator -=(L&& l, const R& r)
   \return	式の各要素の自乗和
 */
 template <class T>
-constexpr inline typename std::enable_if<!detail::is_range<T>::value, T>::type
+constexpr inline typename std::enable_if<!is_range<T>::value, T>::type
 square(const T& x)
 {
     return x * x;
 }
 template <class E>
-inline typename std::enable_if<detail::is_range<E>::value,
-			       detail::element_t<E> >::type
+inline typename std::enable_if<is_range<E>::value,
+			       element_t<E> >::type
 square(const E& expr)
 {
-    typedef detail::element_t<E>	element_type;
+    typedef element_t<E>		element_type;
     typedef typename E::value_type	value_type;
     
     return std::accumulate(expr.begin(), expr.end(), element_type(0),

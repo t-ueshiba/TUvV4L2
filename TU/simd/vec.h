@@ -67,7 +67,7 @@ class vec
     vec&		operator =(element_type a)	;
     
     template <size_t ...IDX>
-    vec(index_sequence<IDX...>)	:vec(IDX...)	{}
+    vec(std::index_sequence<IDX...>)	:vec(IDX...)	{}
   // ベース型との間の型変換
     vec(base_type m)	:_base(m)		{}
 			operator base_type()	{ return _base; }
@@ -106,7 +106,7 @@ class vec
 template <class T> vec<T>
 make_contiguous_vec()
 {
-    return vec<T>(make_index_sequence<vec<T>::size>());
+    return vec<T>(std::make_index_sequence<vec<T>::size>());
 }
     
 //! SIMDベクトルの内容をストリームに出力する．

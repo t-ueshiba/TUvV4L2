@@ -46,8 +46,8 @@ template <class T>
 class GuidedFilter : public BoxFilter
 {
   public:
-    typedef T					value_type;
-    typedef detail::element_t<value_type>	guide_type;
+    typedef T				value_type;
+    typedef element_t<value_type>	guide_type;
     
     class Params : public boost::tuple<value_type, guide_type,
 				       value_type, guide_type>
@@ -281,7 +281,7 @@ class GuidedFilter2 : private BoxFilter2
 {
   public:
     typedef T							value_type;
-    typedef detail::element_t<value_type>			guide_type;
+    typedef element_t<value_type>				guide_type;
     typedef typename GuidedFilter<value_type>::Params		Params;
     typedef typename GuidedFilter<value_type>::SimpleParams	SimpleParams;
     typedef typename GuidedFilter<value_type>::Coeff		Coeff;

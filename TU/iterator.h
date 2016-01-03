@@ -144,6 +144,7 @@ make_fast_zip_iterator(const ITER_TUPLE& t)
 
 namespace std
 {
+#if __cplusplus <= 201103L
 /************************************************************************
 *  std::[rbegin|rend](T)						*
 ************************************************************************/
@@ -170,7 +171,7 @@ rend(const T& x) -> decltype(x.rend())
 {
     return x.rend();
 }
-    
+#endif
 /************************************************************************
 *  std::[begin|end|rbegin|rend](boost::tuple<T...>)			*
 ************************************************************************/
@@ -304,7 +305,8 @@ rend(const boost::tuples::cons<HEAD, TAIL>& x)
     return TU::make_fast_zip_iterator(boost::tuples::cons_transform(
 					  detail::generic_rend(), x));
 }
-    
+
+#if __cplusplus <= 201103L
 /************************************************************************
 *  std::[cbegin|cend|crbegin|crend](T)					*
 ************************************************************************/
@@ -331,7 +333,7 @@ crend(const T& x) -> decltype(std::rend(x))
 {
     return std::rend(x);
 }
-
+#endif
 }
 
 namespace TU
@@ -645,7 +647,7 @@ class range
   \param ROW	begin(), end()をサポートするコンテナを指す反復子の型
   \param ARG	OUTを生成するための引数の型
 */ 
-template <class OUT, class ROW, class ...ARG>
+template <class OUT, class ROW, class... ARG>
 class row_iterator
     : public boost::iterator_adaptor<row_iterator<OUT, ROW, ARG...>,
 				     ROW,
@@ -696,7 +698,7 @@ class row_iterator
 		}
     static out_iterator
 		make_out_iterator(const subiterator<ROW>& col,
-				  const ARG& ...arg)
+				  const ARG&... arg)
 		{
 		    return make_out_iterator_impl(
 			       typename std::is_void<OUT>::type(), col, arg...);
@@ -704,25 +706,25 @@ class row_iterator
     static out_iterator
 		make_out_iterator_impl(std::true_type,
 				       const subiterator<ROW>& col,
-				       const ARG& ...arg)
+				       const ARG&... arg)
 		{
 		    return col;
 		}
     static out_iterator
 		make_out_iterator_impl(std::false_type,
 				       const subiterator<ROW>& col,
-				       const ARG& ...arg)
+				       const ARG&... arg)
 		{
 		    return out_iterator(col, arg...);
 		}
     
   public:
-    row_iterator(const ROW& row, size_t jb, size_t je, const ARG& ...arg)
+    row_iterator(const ROW& row, size_t jb, size_t je, const ARG&... arg)
 	:super(row),
 	 _make_out_iterator(std::bind(&row_iterator::make_out_iterator,
 				      std::placeholders::_1, arg...)),
 	 _jb(jb), _je(je)						{}
-    row_iterator(const ROW& row, const ARG& ...arg)
+    row_iterator(const ROW& row, const ARG&... arg)
 	:row_iterator(row, 0, 0, arg...)				{}
 
     reference	operator [](size_t i) const
@@ -738,16 +740,16 @@ class row_iterator
     size_t						_je;
 };
 
-template <class OUT=void, class ROW, class ...ARG>
+template <class OUT=void, class ROW, class... ARG>
 inline row_iterator<OUT, ROW, ARG...>
-make_row_iterator(const ROW& row, const ARG& ...arg)
+make_row_iterator(const ROW& row, const ARG&... arg)
 {
     return row_iterator<OUT, ROW, ARG...>(row, arg...);
 }
 
-template <class OUT=void, class ROW, class ...ARG>
+template <class OUT=void, class ROW, class... ARG>
 inline row_iterator<OUT, ROW, ARG...>
-make_row_iterator(size_t jb, size_t je, const ROW& row, const ARG& ...arg)
+make_row_iterator(size_t jb, size_t je, const ROW& row, const ARG&... arg)
 {
     return row_iterator<OUT, ROW, ARG...>(row, jb, je, arg...);
 }
@@ -834,7 +836,7 @@ make_vertical_iterator(const ROW& row, size_t idx)
   \param ROW	begin(), end()をサポートするコンテナを指す反復子の型
   \param ARG	OUTを生成するための引数の型
 */ 
-template <class OUT, class ROW, class ...ARG>
+template <class OUT, class ROW, class... ARG>
 class column_iterator
     : public boost::iterator_facade<column_iterator<OUT, ROW, ARG...>,
 				    range<typename std::conditional<
@@ -890,7 +892,7 @@ class column_iterator
 		}
     static out_iterator
 		make_out_iterator(const vertical_iterator<ROW>& row,
-				  const ARG& ...arg)
+				  const ARG&... arg)
 		{
 		    return make_out_iterator_impl(
 			       typename std::is_void<OUT>::type(), row, arg...);
@@ -898,21 +900,21 @@ class column_iterator
     static out_iterator
 		make_out_iterator_impl(std::true_type,
 				       const vertical_iterator<ROW>& row,
-				       const ARG& ...arg)
+				       const ARG&... arg)
 		{
 		    return row;
 		}
     static out_iterator
 		make_out_iterator_impl(std::false_type,
 				       const vertical_iterator<ROW>& row,
-				       const ARG& ...arg)
+				       const ARG&... arg)
 		{
 		    return out_iterator(row, arg...);
 		}
     
   public:
     column_iterator(const ROW& begin,
-		    const ROW& end, size_t col, const ARG& ...arg)
+		    const ROW& end, size_t col, const ARG&... arg)
 	:_begin(begin), _end(end), _col(col),
 	 _make_out_iterator(std::bind(&column_iterator::make_out_iterator,
 				      std::placeholders::_1, arg...))	{}
@@ -934,10 +936,10 @@ class column_iterator
 		       std::declval<const ARG&>()...))	_make_out_iterator;
 };
 
-template <class OUT=void, class ROW, class ...ARG>
+template <class OUT=void, class ROW, class... ARG>
 inline column_iterator<OUT, ROW, ARG...>
 make_column_iterator(const ROW& begin,
-		     const ROW& end, size_t col, const ARG& ...arg)
+		     const ROW& end, size_t col, const ARG&... arg)
 {
     return column_iterator<OUT, ROW, ARG...>(begin, end, col, arg...);
 }

@@ -28,12 +28,12 @@ struct htuple2vec
 			     == vec<T>::size), result_type>::type
 		operator ()(const boost::tuples::cons<HEAD, TAIL>& t) const
 		{
-		    return exec(t, make_index_sequence<vec<T>::size>());
+		    return exec(t, std::make_index_sequence<vec<T>::size>());
 		}
 
   private:
     template <class TUPLE, size_t ...IDX>
-    result_type	exec(const TUPLE& t, index_sequence<IDX...>) const
+    result_type	exec(const TUPLE& t, std::index_sequence<IDX...>) const
 		{
 		    return result_type(boost::get<IDX>(t)...);
 		}

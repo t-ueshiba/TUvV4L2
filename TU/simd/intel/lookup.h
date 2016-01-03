@@ -9,141 +9,74 @@ namespace TU
 namespace simd
 {
 #if defined(AVX2)
-#  define SIMD_LOOKUP(type)						\
-    template <class S> inline vec<type>					\
-    lookup(const S* p, vec<type> idx)					\
-    {									\
-	typedef signed_type<upper_type<type> >	signed_upper_type;	\
-	return cvt<type>(lookup(p, cvt<signed_upper_type, 0>(idx)),	\
-			 lookup(p, cvt<signed_upper_type, 1>(idx)));	\
-    }
+#  define SIMD_LOOKUP32(from, to)					\
+    SIMD_SPECIALIZED_FUNC(vec<to> lookup(const to* p, vec<from> idx),	\
+			  i32gather,					\
+			  ((const signed_type<to>*)p, idx, sizeof(to)), \
+			  void, to, SIMD_SIGNED)
+#  define SIMD_LOOKUP64(from, to)					\
+    SIMD_SPECIALIZED_FUNC(vec<to> lookup(const to* p, vec<from> idx),	\
+			  i64gather,					\
+			  ((const signed_type<to>*)p, idx, sizeof(to)), \
+			  void, to, SIMD_SIGNED)
 
-  namespace detail
-  {
-    template <class S> static inline Is32vec
-    lookup(const S* p, Is32vec idx, std::true_type)
-    {
-	constexpr size_t	n = sizeof(int32_t) - sizeof(S);
-	const void*		q = (const int8_t*)p - n;
-	return  _mm256_srai_epi32(_mm256_i32gather_epi32((const int32_t*)q,
-							 idx, sizeof(S)), 8*n);
-    }
-    template <class S> static inline Is32vec
-    lookup(const S* p, Is32vec idx, std::false_type)
-    {
-	constexpr size_t	n = sizeof(int32_t) - sizeof(S);
-	const void*		q = (const int8_t*)p - n;
-	return _mm256_srli_epi32(_mm256_i32gather_epi32((const int32_t*)q,
-							idx, sizeof(S)), 8*n);
-    }
-  }
-    
-  template <class S> inline Is32vec
-  lookup(const S* p, Is32vec idx)
-  {
-      return detail::lookup(p, idx, std::is_signed<S>());
-  }
+  SIMD_LOOKUP32(int32_t,   int32_t)
+  SIMD_LOOKUP32(u_int32_t, int32_t)
+  SIMD_LOOKUP32(int32_t,   u_int32_t)
+  SIMD_LOOKUP32(u_int32_t, u_int32_t)
+  SIMD_LOOKUP32(int32_t,   float)
+  SIMD_LOOKUP32(u_int32_t, float)
 
-  SIMD_LOOKUP(int16_t)
-  SIMD_LOOKUP(u_int16_t)
-  SIMD_LOOKUP(int8_t)
-  SIMD_LOOKUP(u_int8_t)
-#  undef SIMD_LOOKUP
+  SIMD_LOOKUP64(int64_t,   int64_t)
+  SIMD_LOOKUP64(u_int64_t, int64_t)
+  SIMD_LOOKUP64(int64_t,   u_int64_t)
+  SIMD_LOOKUP64(u_int64_t, u_int64_t)
+  SIMD_LOOKUP64(int64_t,   double)
+  SIMD_LOOKUP64(u_int64_t, double)
 
-  inline F32vec
-  lookup(const float* p, Is32vec idx)
-  {
-      return _mm256_i32gather_ps(p, idx, sizeof(float));
-  }
+#  undef SIMD_LOOKUP32
+#  undef SIMD_LOOKUP64
 
-  inline F64vec
-  lookup(const double* p, Is32vec idx)
-  {
-      return _mm256_i32gather_pd(p, _mm256_extractf128_si256(idx, 0x0),
-				 sizeof(double));
-  }
-    
+template <class A, class S>
+inline typename std::enable_if<vec<element_t<A> >::size == vec<S>::size,
+			       vec<element_t<A> > >::type
+lookup(const A& a, vec<S> row, vec<S> col)
+{
+    return lookup(a.data(), row * vec<S>(a.ncol()) + col);
+}
+
 #else	// !AVX2
-#  define SIMD_LOOKUP4(type)						\
-    template <class S> inline vec<type>					\
-    lookup(const S* p, vec<type> idx)					\
-    {									\
-	return vec<type>(p[extract<0>(idx)], p[extract<1>(idx)],	\
-			 p[extract<2>(idx)], p[extract<3>(idx)]);	\
-    }
-#  if defined(SSE2)
-#    define SIMD_LOOKUP8(type)						\
-    template <class S> inline vec<type>					\
-    lookup(const S* p, vec<type> idx)					\
-    {									\
-	return vec<type>(p[extract<0>(idx)], p[extract<1>(idx)],	\
-			 p[extract<2>(idx)], p[extract<3>(idx)],	\
-			 p[extract<4>(idx)], p[extract<5>(idx)],	\
-			 p[extract<6>(idx)], p[extract<7>(idx)]);	\
-    }
-#  else		// !SSE2
-#    define SIMD_LOOKUP8(type)						\
-    template <class S> inline vec<type>					\
-    lookup(const S* p, vec<type> idx)					\
-    {									\
-	const Is16vec	idx_lo = cvt<int16_t, 0>(idx),			\
-			idx_hi = cvt<int16_t, 1>(idx);			\
-	return vec<type>(p[extract<0>(idx_lo)], p[extract<1>(idx_lo)],	\
-			 p[extract<2>(idx_lo)], p[extract<3>(idx_lo)],	\
-			 p[extract<0>(idx_hi)], p[extract<1>(idx_hi)],	\
-			 p[extract<2>(idx_hi)], p[extract<3>(idx_hi)]);	\
-    }
-#  endif
-#  if defined(SSE4)
-#    define SIMD_LOOKUP16(type)						\
-    template <class S> inline vec<type>					\
-    lookup(const S* p, vec<type> idx)					\
-    {									\
-	return vec<type>(p[extract< 0>(idx)], p[extract< 1>(idx)],	\
-			 p[extract< 2>(idx)], p[extract< 3>(idx)],	\
-			 p[extract< 4>(idx)], p[extract< 5>(idx)],	\
-			 p[extract< 6>(idx)], p[extract< 7>(idx)],	\
-			 p[extract< 8>(idx)], p[extract< 9>(idx)],	\
-			 p[extract<10>(idx)], p[extract<11>(idx)],	\
-			 p[extract<12>(idx)], p[extract<13>(idx)],	\
-			 p[extract<14>(idx)], p[extract<15>(idx)]);	\
-    }
-#  else		// !SSE4
-#    define SIMD_LOOKUP16(type)						\
-    template <class S> inline vec<type>					\
-    lookup(const S* p, vec<type> idx)					\
-    {									\
-	const Is16vec	idx_lo = cvt<int16_t, 0>(idx),			\
-			idx_hi = cvt<int16_t, 1>(idx);			\
-	return vec<type>(p[extract<0>(idx_lo)], p[extract<1>(idx_lo)],	\
-			 p[extract<2>(idx_lo)], p[extract<3>(idx_lo)],	\
-			 p[extract<4>(idx_lo)], p[extract<5>(idx_lo)],	\
-			 p[extract<6>(idx_lo)], p[extract<7>(idx_lo)],	\
-			 p[extract<0>(idx_hi)], p[extract<1>(idx_hi)],	\
-			 p[extract<2>(idx_hi)], p[extract<3>(idx_hi)],	\
-			 p[extract<4>(idx_hi)], p[extract<5>(idx_hi)],	\
-			 p[extract<6>(idx_hi)], p[extract<7>(idx_hi)]);	\
-    }
-#  endif
+namespace detail
+{
+  template <class T, class S, size_t... IDX> inline vec<T>
+  lookup(const T* p, vec<S> idx, std::index_sequence<IDX...>)
+  {
+      return vec<T>(p[extract<IDX>(idx)]...);
+  }
 
-#  if defined(SSE2)
-  SIMD_LOOKUP16(int8_t)
-  SIMD_LOOKUP16(u_int8_t)
-  SIMD_LOOKUP8(int16_t)
-  SIMD_LOOKUP8(u_int16_t)
-#    if defined(SSE4)
-    SIMD_LOOKUP4(u_int32_t)
-    SIMD_LOOKUP4(int32_t)
-#    endif
-#  else		// !SSE2
-  SIMD_LOOKUP8(int8_t)
-  SIMD_LOOKUP8(u_int8_t)
-  SIMD_LOOKUP4(int16_t)
-  SIMD_LOOKUP4(u_int16_t)
-#  endif
-#  undef SIMD_LOOKUP4
-#  undef SIMD_LOOKUP8
-#  undef SIMD_LOOKUP16
+  template <class A, class S, size_t... IDX> inline vec<element_t<A> >
+  lookup(const A& a, vec<S> row, vec<S> col, std::index_sequence<IDX...>)
+  {
+      return vec<element_t<A> >(a[extract<IDX>(row)][extract<IDX>(col)]...);
+  }
+}
+    
+template <class T, class S>
+inline typename std::enable_if<vec<T>::size == vec<S>::size, vec<T> >::type
+lookup(const T* p, vec<S> idx)
+{
+    return detail::lookup(p, idx, std::make_index_sequence<vec<S>::size>());
+}
+
+template <class A, class S>
+inline typename std::enable_if<vec<element_t<A> >::size == vec<S>::size,
+			       vec<element_t<A> > >::type
+lookup(const A& a, vec<S> row, vec<S> col)
+{
+    return detail::lookup(a, row, col,
+			  std::make_index_sequence<vec<S>::size>());
+}
+
 #endif
     
 }	// namespace simd

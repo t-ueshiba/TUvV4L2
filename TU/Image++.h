@@ -643,7 +643,7 @@ class ImageLine : public Array<T>
     \param expr	コピー元の配列
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     ImageLine(const E& expr)	:super(expr)			{}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -653,7 +653,7 @@ class ImageLine : public Array<T>
     \return	この配列
   */
     template <class E>
-    typename std::enable_if<detail::is_range<E>::value, ImageLine&>::type
+    typename std::enable_if<is_range<E>::value, ImageLine&>::type
 			operator =(const E& expr)
 			{
 			    super::operator =(expr);
@@ -1271,7 +1271,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     \param a	各行においてalignするバイト数(1ならalignしない)
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Image(const E& expr, size_t a=1)
 	:super(expr, a), ImageBase()				{}
 
@@ -1283,7 +1283,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     \return		この配列
   */
     template <class E>
-    typename std::enable_if<detail::is_range<E>::value, Image&>::type
+    typename std::enable_if<is_range<E>::value, Image&>::type
 		operator =(const E& expr)
 		{
 		    super::operator =(expr);

@@ -112,6 +112,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/shift_iterator.h \
 		../../TU/simd/simd.h \
 		../../TU/simd/store_iterator.h \
+		../../TU/simd/transform.h \
 		../../TU/simd/type_traits.h \
 		../../TU/simd/vec.h \
 		../../TU/simd/zero.h \
@@ -158,10 +159,10 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/arithmetic.h ../../TU/simd/intel/arithmetic.h \
 	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
 	../../TU/simd/intel/shuffle.h ../../TU/simd/intel/svml.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/Camera++.h ../../TU/SADStereo.h \
-	../../TU/StereoBase.h ../../TU/algorithm.h ../../TU/Profiler.h \
-	../../windows/fakeWindows.h ../../TU/BoxFilter.h ../../TU/Filter2.h \
-	../../TU/GFStereo.h
+	../../TU/simd/transform.h ../../TU/simd/load_iterator.h \
+	../../TU/simd/store_iterator.h ../../TU/simd/cvtdown_iterator.h \
+	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
+	../../TU/simd/row_vec_iterator.h ../../TU/Minimize.h \
+	../../TU/Camera++.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
+	../../TU/algorithm.h ../../TU/Profiler.h ../../windows/fakeWindows.h \
+	../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/GFStereo.h

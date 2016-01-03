@@ -248,7 +248,7 @@ struct Idx<simd::vec<T> > : simd::vec<T>
 {
     typedef simd::vec<T>	super;
     
-		Idx()	:super(make_index_sequence<super::size>())	{}
+		Idx()	:super(std::make_index_sequence<super::size>())	{}
     void	operator ++()		{ *this += super(super::size); }
 };
 #endif
@@ -469,10 +469,7 @@ namespace simd
 		     _RminL(std::numeric_limits<score_element>::max()),
 		     _RminRV(RminRV),
 		     _nextRV(init(std::numeric_limits<score_element>::max(),
-				  std::integral_constant<
-				      bool,
-				      boost::tuples::is_tuple<mask_vec>::value
-				  >()))
+				  boost::tuples::is_tuple<mask_vec>()))
 		{
 		}
       int	dL()	const	{ return minIdx(_dminL, _RminL); }
