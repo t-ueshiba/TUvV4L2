@@ -4,6 +4,7 @@
 #if !defined(__TU_SIMD_LOGICAL_H)
 #define __TU_SIMD_LOGICAL_H
 
+#include "TU/tuple.h"
 #include "TU/simd/vec.h"
 
 namespace TU

@@ -85,9 +85,9 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/iterator.h \
-	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/pair.h \
-	../../../TU/simd/cvt.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
+main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/tuple.h \
+	../../../TU/functional.h ../../../TU/simd/cvt.h \
+	../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/intel/type_traits.h \
 	../../../TU/simd/arm/type_traits.h ../../../TU/simd/intel/vec.h \
@@ -101,5 +101,6 @@ main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/iterator.h \
 	../../../TU/simd/intel/cvt.h ../../../TU/simd/intel/dup.h \
 	../../../TU/simd/intel/unpack.h ../../../TU/simd/arm/cvt.h \
 	../../../TU/simd/cvtup_iterator.h ../../../TU/simd/load_iterator.h \
+	../../../TU/iterator.h ../../../TU/pair.h \
 	../../../TU/simd/load_store.h ../../../TU/simd/intel/load_store.h \
 	../../../TU/simd/arm/load_store.h ../../../TU/simd/store_iterator.h

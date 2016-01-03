@@ -103,7 +103,7 @@ namespace detail
   struct generic_get
   {
       template <class T>
-      auto	operator ()(T&& x)	const -> decltype(std::get<I>(x))
+      auto	operator ()(T&& x) const -> decltype(std::get<I>(x))
 		{
 		    return std::get<I>(x);
 		}
@@ -159,13 +159,13 @@ cvt_pack(const PACK& x)
 
 template <class T, bool MASK=false, class HEAD, class TAIL> inline auto
 cvt_pack(const boost::tuples::cons<HEAD, TAIL>& x)
-  //-> decltype(detail::rearrange(boost::tuples::cons_transform(
-  //  				      detail::converter<T, MASK>(), x)))
-    -> decltype(boost::tuples::cons_transform(detail::converter<T, MASK>(), x))
+    -> decltype(detail::rearrange(boost::tuples::cons_transform(
+    				      detail::converter<T, MASK>(), x)))
+  //-> decltype(boost::tuples::cons_transform(detail::converter<T, MASK>(), x))
 {
-  //return detail::rearrange(boost::tuples::cons_transform(
-  //				 detail::converter<T, MASK>(), x));
-    return boost::tuples::cons_transform(detail::converter<T, MASK>(), x);
+    return detail::rearrange(boost::tuples::cons_transform(
+				 detail::converter<T, MASK>(), x));
+  //return boost::tuples::cons_transform(detail::converter<T, MASK>(), x);
 }
 
 }	// namespace simd

@@ -100,8 +100,7 @@ class box_filter_iterator
 		}
     
   private:
-    typedef std::integral_constant<bool, detail::is_range<value_type>::value>
-								value_is_expr;
+    typedef is_range<value_type>	value_is_expr;
 
     template <class VITER_, class ITER_>
     static void	update(const VITER_& val,
@@ -114,11 +113,9 @@ class box_filter_iterator
 		       const ITER_& curr, const ITER_& head, std::true_type)
 		{
 		    typedef subiterator<VITER_>			iterator;
-		    typedef std::integral_constant<
-			bool,
-			detail::is_range<
-			    typename std::iterator_traits<
-				iterator>::value_type>::value>	value_is_expr;
+		    typedef is_range<
+			typename std::iterator_traits<
+			    iterator>::value_type>		value_is_expr;
 		    
 		    auto	c = curr->cbegin();
 		    auto	h = head->cbegin();

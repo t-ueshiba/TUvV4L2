@@ -34,10 +34,9 @@
 #ifndef __TU_PAIR_H
 #define __TU_PAIR_H
 
-#include <cstdlib>	// for size_t
 #include <utility>
-#include <type_traits>
 #include <iostream>
+#include "TU/functional.h"	// is_convertible<T, C<ARGS...> >
 
 namespace TU
 {
@@ -45,9 +44,7 @@ namespace TU
 *  struct is_pair<T>							*
 ************************************************************************/
 template <class T>
-struct is_pair				: std::false_type		{};
-template <class S, class T>
-struct is_pair<std::pair<S, T> >	: std::true_type		{};
+using is_pair = is_convertible<T, std::pair>;
 
 /************************************************************************
 *  struct pair_traits<PAIR>						*

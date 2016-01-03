@@ -443,7 +443,7 @@ class Array : public B
     
   public:
   //! 成分の型
-    typedef detail::element_t<T>			element_type;
+    typedef element_t<T>				element_type;
   //! 要素の型    
     typedef typename super::value_type			value_type;
   //! 要素へのポインタ
@@ -543,7 +543,7 @@ class Array : public B
     \param expr	コピー元の配列
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
 		Array(const E& expr)
 		    :super(expr.size())
 		{
@@ -557,7 +557,7 @@ class Array : public B
     \return	この配列
   */
     template <class E>
-    typename std::enable_if<detail::is_range<E>::value, Array&>::type
+    typename std::enable_if<is_range<E>::value, Array&>::type
 		operator =(const E& expr)
 		{
 		    super::resize(expr.size());
@@ -628,7 +628,7 @@ class Array : public B
     \return	全ての要素が同じならばtrue，そうでなければfalse
   */
     template <class E>
-    typename std::enable_if<detail::is_range<E>::value, bool>::type
+    typename std::enable_if<is_range<E>::value, bool>::type
 			operator ==(const E& expr) const
 			{
 			    if (size() != expr.size())
@@ -649,7 +649,7 @@ class Array : public B
     \return	異なる要素が存在すればtrue，そうでなければfalse
   */
     template <class E>
-    typename std::enable_if<detail::is_range<E>::value, bool>::type
+    typename std::enable_if<is_range<E>::value, bool>::type
 			operator !=(const E& expr) const
 			{
 			    return !(*this == expr);
@@ -922,7 +922,7 @@ class Array2 : public Array<T, R>
     \param a	各行においてalignするバイト数(1ならalignしない)
   */
     template <class E,
-	      class=typename std::enable_if<detail::is_range<E>::value>::type>
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
 		Array2(const E& expr, size_t a=1)
 		    :super(expr.size()),
 		     _ncol(TU::ncol(expr)), _align(align(a)), _buf(buf_size())
@@ -939,7 +939,7 @@ class Array2 : public Array<T, R>
     \return		この配列
   */
     template <class E>
-    typename std::enable_if<detail::is_range<E>::value, Array2&>::type
+    typename std::enable_if<is_range<E>::value, Array2&>::type
 		operator =(const E& expr)
 		{
 		    resize(expr.size(), TU::ncol(expr));
@@ -1623,8 +1623,8 @@ namespace detail
   \return	積の評価結果
 */
 template <class L, class R,
-	  class=typename std::enable_if<(detail::is_range<L>::value &&
-					 detail::is_range<R>::value)>::type>
+	  typename std::enable_if<(is_range<L>::value &&
+				   is_range<R>::value)>::type* = nullptr>
 inline typename detail::Product<L, R>::result_type
 operator *(const L& l, const R& r)
 {
@@ -1638,8 +1638,8 @@ operator *(const L& l, const R& r)
   \return	外積演算子ノード
 */
 template <class L, class R,
-	  class=typename std::enable_if<(detail::is_range<L>::value &&
-					 detail::is_range<R>::value)>::type>
+	  typename std::enable_if<(is_range<L>::value &&
+				   is_range<R>::value)>::type* = nullptr>
 inline auto
 operator %(const L& l, const R& r)
     -> decltype(detail::ExteriorProduct<L, R>(l, r))
@@ -1655,8 +1655,8 @@ operator %(const L& l, const R& r)
   \return	ベクトル積
 */
 template <class L, class R,
-	  class=typename std::enable_if<(detail::is_range<L>::value &&
-					 detail::is_range<R>::value)>::type>
+	  typename std::enable_if<(is_range<L>::value &&
+				   is_range<R>::value)>::type* = nullptr>
 inline typename detail::CrossProduct<L, R>::result_type
 operator ^(const L& l, const R& r)
 {
