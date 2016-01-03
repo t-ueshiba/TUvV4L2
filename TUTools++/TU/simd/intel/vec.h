@@ -6,6 +6,11 @@
 
 #include "TU/simd/intel/arch.h"
 
+#define _mm_set_epi64		_mm_set_epi64x
+#define _mm_set1_epi64		_mm_set1_epi64x
+#define _mm256_set_epi64	_mm256_set_epi64x
+#define _mm256_set1_epi64	_mm256_set1_epi64x
+
 namespace TU
 {
 namespace simd
@@ -64,16 +69,16 @@ typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 #define SIMD_CONSTRUCTOR_2(type)					\
     template <> inline							\
     vec<type>::vec(element_type a0, element_type a1)			\
-	:_base(SIMD_MNEMONIC(setr, SIMD_PREFIX(type), ,			\
-			     SIMD_SIGNED(type))(a0, a1))		\
+	:_base(SIMD_MNEMONIC(set, SIMD_PREFIX(type), ,			\
+			     SIMD_SIGNED(type))(a1, a0))		\
     {									\
     }
 #define SIMD_CONSTRUCTOR_4(type)					\
     template <> inline							\
     vec<type>::vec(element_type a0, element_type a1,			\
 		   element_type a2, element_type a3)			\
-	:_base(SIMD_MNEMONIC(setr, SIMD_PREFIX(type), ,			\
-			     SIMD_SIGNED(type))(a0, a1, a2, a3))	\
+	:_base(SIMD_MNEMONIC(set, SIMD_PREFIX(type), ,			\
+			     SIMD_SIGNED(type))(a3, a2, a1, a0))	\
     {									\
     }
 #define SIMD_CONSTRUCTOR_8(type)					\
@@ -82,9 +87,9 @@ typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 		   element_type a2, element_type a3,			\
 		   element_type a4, element_type a5,			\
 		   element_type a6, element_type a7)			\
-	:_base(SIMD_MNEMONIC(setr,					\
+	:_base(SIMD_MNEMONIC(set,					\
 			     SIMD_PREFIX(type), , SIMD_SIGNED(type))	\
-	       (a0, a1, a2, a3,	a4, a5, a6, a7))			\
+	       (a7, a6, a5, a4,	a3, a2, a1, a0))			\
     {									\
     }
 #define SIMD_CONSTRUCTOR_16(type)					\
@@ -97,10 +102,10 @@ typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 		   element_type a10, element_type a11,			\
 		   element_type a12, element_type a13,			\
 		   element_type a14, element_type a15)			\
-	:_base(SIMD_MNEMONIC(setr,					\
+	:_base(SIMD_MNEMONIC(set,					\
 			     SIMD_PREFIX(type), , SIMD_SIGNED(type))	\
-	       (a0, a1, a2,  a3,  a4,  a5,  a6,  a7,			\
-		a8, a9, a10, a11, a12, a13, a14, a15))			\
+	       (a15, a14, a13, a12, a11, a10, a9, a8,			\
+		 a7,  a6,  a5,  a4,  a3,  a2, a1, a0))			\
     {									\
     }
 #define SIMD_CONSTRUCTOR_32(type)					\
@@ -121,42 +126,42 @@ typedef vec<double>	F64vec;		//!< 64bit浮動小数点数ベクトル
 		   element_type a26, element_type a27,			\
 		   element_type a28, element_type a29,			\
 		   element_type a30, element_type a31)			\
-	:_base(SIMD_MNEMONIC(setr,					\
+	:_base(SIMD_MNEMONIC(set,					\
 			     SIMD_PREFIX(type), , SIMD_SIGNED(type))	\
-	       (a0,  a1,  a2,  a3,  a4,  a5,  a6,  a7,			\
-		a8,  a9,  a10, a11, a12, a13, a14, a15,			\
-		a16, a17, a18, a19, a20, a21, a22, a23,			\
-		a24, a25, a26, a27, a28, a29, a30, a31))		\
+	       (a31, a30, a29, a28, a27, a26, a25, a24,			\
+		a23, a22, a21, a20, a19, a18, a17, a16,			\
+		a15, a14, a13, a12, a11, a10,  a9,  a8,			\
+		 a7,  a6,  a5,  a4,  a3,  a2,  a1,  a0))		\
     {									\
     }
 
 SIMD_CONSTRUCTOR_1(int8_t)
 SIMD_CONSTRUCTOR_1(int16_t)
 SIMD_CONSTRUCTOR_1(int32_t)
-//SIMD_CONSTRUCTOR_1(int64_t)
+SIMD_CONSTRUCTOR_1(int64_t)
 SIMD_CONSTRUCTOR_1(u_int8_t)
 SIMD_CONSTRUCTOR_1(u_int16_t)
 SIMD_CONSTRUCTOR_1(u_int32_t)
-//SIMD_CONSTRUCTOR_1(u_int64_t)
+SIMD_CONSTRUCTOR_1(u_int64_t)
 
 #if defined(AVX2)
   SIMD_CONSTRUCTOR_32(int8_t)	
   SIMD_CONSTRUCTOR_16(int16_t)	
   SIMD_CONSTRUCTOR_8(int32_t)
-//SIMD_CONSTRUCTOR_4(int64_t)
+  SIMD_CONSTRUCTOR_4(int64_t)
   SIMD_CONSTRUCTOR_32(u_int8_t)	
   SIMD_CONSTRUCTOR_16(u_int16_t)	
   SIMD_CONSTRUCTOR_8(u_int32_t)
-//SIMD_CONSTRUCTOR_4(u_int64_t)
+  SIMD_CONSTRUCTOR_4(u_int64_t)
 #elif defined(SSE2)
   SIMD_CONSTRUCTOR_16(int8_t)
   SIMD_CONSTRUCTOR_8(int16_t)
   SIMD_CONSTRUCTOR_4(int32_t)
-//SIMD_CONSTRUCTOR_2(int64_t)
+  SIMD_CONSTRUCTOR_2(int64_t)
   SIMD_CONSTRUCTOR_16(u_int8_t)
   SIMD_CONSTRUCTOR_8(u_int16_t)
   SIMD_CONSTRUCTOR_4(u_int32_t)
-//SIMD_CONSTRUCTOR_2(u_int64_t)
+  SIMD_CONSTRUCTOR_2(u_int64_t)
 #else
   SIMD_CONSTRUCTOR_8(int8_t)
   SIMD_CONSTRUCTOR_4(int16_t)
