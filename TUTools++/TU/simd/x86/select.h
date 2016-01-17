@@ -1,10 +1,10 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_SELECT_H)
-#define __TU_SIMD_INTEL_SELECT_H
+#if !defined(__TU_SIMD_X86_SELECT_H)
+#define __TU_SIMD_X86_SELECT_H
 
-#include "TU/simd/intel/logical_base.h"
+#include "TU/simd/x86/logical_base.h"
 
 namespace TU
 {
@@ -49,4 +49,4 @@ select(vec<mask_type<T> > mask, vec<T> x, vec<T> y)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_SELECT_H
+#endif	// !__TU_SIMD_X86_SELECT_H

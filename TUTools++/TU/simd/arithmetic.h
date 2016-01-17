@@ -146,7 +146,7 @@ diff(const boost::tuples::cons<HEAD, TAIL>& x,
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/arithmetic.h"
+#  include "TU/simd/x86/arithmetic.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/arithmetic.h"
 #endif

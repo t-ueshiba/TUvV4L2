@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_ALLOCATOR_H)
-#define __TU_SIMD_INTEL_ALLOCATOR_H
+#if !defined(__TU_SIMD_X86_ALLOCATOR_H)
+#define __TU_SIMD_X86_ALLOCATOR_H
 
 #include <limits>
 #include <new>			// for std::bad_alloc()
@@ -72,4 +72,4 @@ class allocator
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_ALLOCATOR_H
+#endif	// !__TU_SIMD_X86_ALLOCATOR_H

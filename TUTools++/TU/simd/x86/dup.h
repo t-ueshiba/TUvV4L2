@@ -1,10 +1,10 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_DUP_H)
-#define __TU_SIMD_INTEL_DUP_H
+#if !defined(__TU_SIMD_X86_DUP_H)
+#define __TU_SIMD_X86_DUP_H
 
-#include "TU/simd/intel/unpack.h"
+#include "TU/simd/x86/unpack.h"
 
 namespace TU
 {
@@ -66,4 +66,4 @@ SIMD_N_TUPLE(u_int32_t)
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_DUP_H
+#endif	// !__TU_SIMD_X86_DUP_H

@@ -51,7 +51,7 @@ andnot(const boost::tuples::cons<HEAD, TAIL>& x,
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/logical.h"
+#  include "TU/simd/x86/logical.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/logical.h"
 #endif

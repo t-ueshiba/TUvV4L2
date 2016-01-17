@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_LOAD_STORE_H)
-#define __TU_SIMD_INTEL_LOAD_STORE_H
+#if !defined(__TU_SIMD_X86_LOAD_STORE_H)
+#define __TU_SIMD_X86_LOAD_STORE_H
 
 namespace TU
 {
@@ -66,4 +66,4 @@ namespace simd
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_LOAD_STORE_H
+#endif	// !__TU_SIMD_X86_LOAD_STORE_H

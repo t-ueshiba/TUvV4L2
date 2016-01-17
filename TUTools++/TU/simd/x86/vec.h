@@ -1,10 +1,10 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_VEC_H)
-#define __TU_SIMD_INTEL_VEC_H
+#if !defined(__TU_SIMD_X86_VEC_H)
+#define __TU_SIMD_X86_VEC_H
 
-#include "TU/simd/intel/arch.h"
+#include "TU/simd/x86/arch.h"
 
 #define _mm_set_epi64		_mm_set_epi64x
 #define _mm_set1_epi64		_mm_set1_epi64x
@@ -205,4 +205,4 @@ inline void	empty()	{ _mm_empty(); }
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_VEC_H
+#endif	// !__TU_SIMD_X86_VEC_H

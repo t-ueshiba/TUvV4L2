@@ -33,7 +33,7 @@ template <class T> vec<T>	operator >>(vec<T> x, int n)		;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/bit_shift.h"
+#  include "TU/simd/x86/bit_shift.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/bit_shift.h"
 #endif

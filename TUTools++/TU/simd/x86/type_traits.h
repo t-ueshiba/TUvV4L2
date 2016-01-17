@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_TYPE_TRAITS_H)
-#define __TU_SIMD_INTEL_TYPE_TRAITS_H
+#if !defined(__TU_SIMD_X86_TYPE_TRAITS_H)
+#define __TU_SIMD_X86_TYPE_TRAITS_H
 
 #include <immintrin.h>
 
@@ -43,26 +43,38 @@ namespace simd
 template <class T>
 struct type_traits : type_traits_base<T>
 {
-    typedef float		complementary_type;
-    typedef complementary_type	complementary_mask_type;
+    typedef void		complementary_type;
+    typedef void		complementary_mask_type;
     typedef ivec_t		base_type;
 };
-    
+
+template <>
+struct type_traits<int16_t> : type_traits_base<int16_t>
+{
+    typedef typename std::conditional<
+	(sizeof(fvec_t) == sizeof(ivec_t)),	// fvec_t と ivec_tが同サイズ
+	void, float>::type	complementary_type;  //相互変換可能な浮動小数点数
+    typedef void		complementary_mask_type;
+    typedef ivec_t		base_type;
+};
+
 template <>
 struct type_traits<int32_t> : type_traits_base<int32_t>
 {
     typedef typename std::conditional<
 	(sizeof(fvec_t) == sizeof(ivec_t)) ||	// fvec_t と ivec_tが同サイズ
-      	(sizeof(dvec_t) == sizeof(char)),	// または dvec_t が未定義なら...
+	(sizeof(dvec_t) == sizeof(char)),	// または dvec_t が未定義なら...
 	float, double>::type	complementary_type;  //相互変換可能な浮動小数点数
-    typedef complementary_type	complementary_mask_type;
+    typedef void		complementary_mask_type;
     typedef ivec_t		base_type;
 };
-    
+
 template <>
-struct type_traits<int64_t> : type_traits_base<int64_t>
+struct type_traits<u_int16_t> : type_traits_base<u_int16_t>
 {
-    typedef double		complementary_type;
+    typedef typename std::conditional<
+	(sizeof(fvec_t) == sizeof(ivec_t)),	// fvec_t と ivec_tが同サイズ
+	void, float>::type	complementary_type;
     typedef complementary_type	complementary_mask_type;
     typedef ivec_t		base_type;
 };
@@ -70,27 +82,31 @@ struct type_traits<int64_t> : type_traits_base<int64_t>
 template <>
 struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
 {
+    typedef void		complementary_type;
     typedef typename std::conditional<
-	(sizeof(fvec_t) == sizeof(ivec_t)) ||	// fvec_t と ivec_tが同サイズ
-	(sizeof(dvec_t) == sizeof(char)),	// または dvec_t が未定義なら...
-	float, double>::type	complementary_type;  // 相互変換可能な浮動小数点数
-    typedef complementary_type	complementary_mask_type;
+	(sizeof(fvec_t) == sizeof(ivec_t)),	// fvec_t と ivec_tが同サイズ
+	float, double>::type	complementary_mask_type;
     typedef ivec_t		base_type;
 };
     
 template <>
 struct type_traits<u_int64_t> : type_traits_base<u_int64_t>
 {
-    typedef double		complementary_type;
-    typedef complementary_type	complementary_mask_type;
+    typedef void		complementary_type;
+    typedef typename std::conditional<
+	(sizeof(fvec_t) == sizeof(ivec_t)),	// fvec_t と ivec_tが同サイズ
+	double, void>::type	complementary_mask_type;
     typedef ivec_t		base_type;
 };
-    
+
 template <>
 struct type_traits<float> : type_traits_base<float>
 {
     typedef float		mask_type;
-    typedef int32_t		complementary_type;
+    typedef typename std::conditional<
+	sizeof(ivec_t) == sizeof(fvec_t),
+	int32_t,
+	int16_t>::type		complementary_type;
     typedef typename std::conditional<
 	sizeof(ivec_t) == sizeof(fvec_t),
 	u_int32_t,
@@ -112,4 +128,4 @@ struct type_traits<double> : type_traits_base<double>
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_TYPE_TRAITS_H
+#endif	// !__TU_SIMD_X86_TYPE_TRAITS_H

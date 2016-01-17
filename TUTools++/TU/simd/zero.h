@@ -20,7 +20,7 @@ template <class T> vec<T>	zero()					;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/zero.h"
+#  include "TU/simd/x86/zero.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/zero.h"
 #endif

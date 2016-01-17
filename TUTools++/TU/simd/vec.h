@@ -153,7 +153,7 @@ void	empty()								;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/vec.h"
+#  include "TU/simd/x86/vec.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/vec.h"
 #endif

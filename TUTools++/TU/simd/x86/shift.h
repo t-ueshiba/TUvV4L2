@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_SHIFT_H)
-#define __TU_SIMD_INTEL_SHIFT_H
+#if !defined(__TU_SIMD_X86_SHIFT_H)
+#define __TU_SIMD_X86_SHIFT_H
 
 namespace TU
 {
@@ -147,4 +147,4 @@ SIMD_ELM_SHIFTS_I(u_int64_t)
 }	// namespace simd
 }	// namespace TU
 
-#endif	// !__TU_SIMD_INTEL_SHIFT_H
+#endif	// !__TU_SIMD_X86_SHIFT_H

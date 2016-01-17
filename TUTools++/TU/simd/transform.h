@@ -6,9 +6,6 @@
 
 #include "TU/iterator.h"
 #include "TU/simd/cvt.h"
-#if defined(TU_SIMD_DEBUG)
-#  include <typeinfo>
-#endif
 
 namespace TU
 {
@@ -21,8 +18,16 @@ namespace detail
   {
     public:
       using head_iterator = tuple_head<ITER_TUPLE>;
+      using result_type =
+		typename std::conditional<
+		    std::is_void<
+			typename std::iterator_traits<OUT>::value_type>::value,
+		    vec<T>,
+		    typename std::iterator_traits<OUT>::value_type>::type;
       
     private:
+      using R = typename result_type::element_type;
+
       struct generic_cvtdown
       {
 	  template <class T_=T, class ITER_>
@@ -87,12 +92,29 @@ namespace detail
 			}
       };
 
+      struct generic_cvtadj
+      {
+	  template <class S_>
+	  auto		operator ()(vec<S_> x) const
+			{
+			    return cvtadj<R, false, MASK>(x);
+			}
+	  template <class S_>
+	  auto		operator ()(vec<S_> x, vec<S_> y) const
+			{
+			    return cvtadj<R, MASK>(x, y);
+			}
+      };
+      
       template <class ITER_, class DUMMY_=void>
       struct max_size
       {
 	  static constexpr size_t
-	      value = std::iterator_traits<typename std::remove_reference<
-					       ITER_>::type>::value_type::size;
+		value = std::iterator_traits<ITER_>::value_type::size;
+      };
+      template <class ITER_>
+      struct max_size<ITER_&> : max_size<ITER_>
+      {
       };
       template <class T_>
       struct max_size<vec<T_> >
@@ -117,36 +139,51 @@ namespace detail
 	  : max_size<typename boost::tuple<T_...>::inherited>
       {
       };
-      
+
     private:
-      template <class TUPLE_>
-      typename std::enable_if<(vec<T>::size == max_size<TUPLE_>::value)>::type
-		cvtup(TUPLE_& x)
+      template <class TUPLE_,
+		typename std::enable_if<
+		    (vec<T>::size == max_size<TUPLE_>::value)>::type* = nullptr>
+      auto	cvtup_down(TUPLE_&& x)
 		{
-#if defined(TU_SIMD_DEBUG)
+		    return cvtadj<R, false, MASK>(
+			       _func(boost::tuples::cons_transform(
+					 generic_cvtdown(), x)));
+		}
+      template <class TUPLE_,
+		typename std::enable_if<
+		    (vec<T>::size < max_size<TUPLE_>::value)>::type* = nullptr>
+      auto	cvtup_down(TUPLE_&& x)
+		{
 		    constexpr size_t	N = max_size<TUPLE_>::value;
-		    std::cout << '*' << N << ": " << typeid(TUPLE_).name()
-			      << std::endl;
-#endif
-		    *_out = _func(boost::tuples::cons_transform(
-				      generic_cvtdown(), x));
+
+		    const auto	y = cvtup_down(boost::tuples::cons_transform(
+						   generic_cvtup<N/2, false>(),
+						   x));
+		    const auto	z = cvtup_down(boost::tuples::cons_transform(
+						   generic_cvtup<N/2, true >(),
+						   x));
+		    return cvtadj<R, MASK>(y, z);
+		}
+
+      template <class TUPLE_>
+      typename std::enable_if<(vec<R>::size == max_size<TUPLE_>::value)>::type
+		cvtup(TUPLE_&& x)
+		{
+		    *_out = cvtup_down(x);
 		    ++_out;
 		}
       template <class TUPLE_>
-      typename std::enable_if<(vec<T>::size < max_size<TUPLE_>::value)>::type
-		cvtup(TUPLE_& x)
+      typename std::enable_if<(vec<T>::size < max_size<TUPLE_>::value &&
+			       vec<R>::size < max_size<TUPLE_>::value)>::type
+		cvtup(TUPLE_&& x)
 		{
 		    constexpr size_t	N = max_size<TUPLE_>::value;
-#if defined(TU_SIMD_DEBUG)
-		    std::cout << ' ' << N << ": " << typeid(TUPLE_).name()
-			      << std::endl;
-#endif
-		    auto	y = boost::tuples::cons_transform(
-					generic_cvtup<N/2, false>(), x);
-		    cvtup(y);
-		    auto	z = boost::tuples::cons_transform(
-					generic_cvtup<N/2, true >(), x);
-		    cvtup(z);
+
+		    cvtup(boost::tuples::cons_transform(
+			      generic_cvtup<N/2, false>(), x));
+		    cvtup(boost::tuples::cons_transform(
+			      generic_cvtup<N/2, true >(), x));
 		}
 
     public:
@@ -159,14 +196,9 @@ namespace detail
 		    while (boost::get<0>(_t) != _end)
 		    {
 			constexpr size_t	N = max_size<ITER_TUPLE>::value;
-#if defined(TU_SIMD_DEBUG)
-			std::cout << '#' << N << ": "
-				  << typeid(decltype(_t)).name()
-				  << std::endl;
-#endif
-			auto	x = boost::tuples::cons_transform(
-					generic_cvtup<N, false>(), _t);
-			cvtup(x);
+
+			cvtup(boost::tuples::cons_transform(
+				  generic_cvtup<N, false>(), _t));
 		    }
 		    return _out;
 		}
