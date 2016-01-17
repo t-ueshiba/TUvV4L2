@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_LOGICAL_BASE_H)
-#define __TU_SIMD_INTEL_LOGICAL_BASE_H
+#if !defined(__TU_SIMD_X86_LOGICAL_BASE_H)
+#define __TU_SIMD_X86_LOGICAL_BASE_H
 
 namespace TU
 {
@@ -33,4 +33,4 @@ SIMD_LOGICALS(ivec_t)
 }	// namespace detail
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_LOGICAL_BASE_H
+#endif	// !__TU_SIMD_X86_LOGICAL_BASE_H

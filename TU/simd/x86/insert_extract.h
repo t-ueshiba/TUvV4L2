@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_INSERT_EXTRACT_H)
-#define __TU_SIMD_INTEL_INSERT_EXTRACT_H
+#if !defined(__TU_SIMD_X86_INSERT_EXTRACT_H)
+#define __TU_SIMD_X86_INSERT_EXTRACT_H
 
 namespace TU
 {
@@ -118,4 +118,4 @@ template <size_t I> float	extract(F32vec x)			;
 #endif  
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_INSERT_EXTRACT_H
+#endif	// !__TU_SIMD_X86_INSERT_EXTRACT_H

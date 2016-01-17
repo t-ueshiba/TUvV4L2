@@ -27,8 +27,8 @@ make_iterator_tuple(ITERS... iters)
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/shuffle.h"
-#  include "TU/simd/intel/svml.h"
+#  include "TU/simd/x86/shuffle.h"
+#  include "TU/simd/x86/svml.h"
 #endif
 
 #endif	// !__TU_SIMD_MISC_H

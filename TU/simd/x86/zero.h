@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_ZERO_H)
-#define __TU_SIMD_INTEL_ZERO_H
+#if !defined(__TU_SIMD_X86_ZERO_H)
+#define __TU_SIMD_X86_ZERO_H
 
 namespace TU
 {
@@ -32,4 +32,4 @@ SIMD_ZERO(u_int64_t)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_ZERO_H
+#endif	// !__TU_SIMD_X86_ZERO_H

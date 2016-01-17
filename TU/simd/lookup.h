@@ -14,9 +14,9 @@ namespace simd
 /************************************************************************
 *  Lookup								*
 ************************************************************************/
-template <class T, class S>
+template <class T, class P, class S>
 typename std::enable_if<vec<T>::size == vec<S>::size, vec<T> >::type
-lookup(const T* p, vec<S> idx)						;
+lookup(const P* p, vec<S> idx)						;
     
 template <class A, class S>
 typename std::enable_if<vec<TU::detail::element_t<A> >::size ==
@@ -27,7 +27,7 @@ lookup(const A& a, vec<S> row, vec<S> col)				;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/lookup.h"
+#  include "TU/simd/x86/lookup.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/lookup.h"
 #endif

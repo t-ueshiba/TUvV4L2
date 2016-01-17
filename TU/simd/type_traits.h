@@ -107,7 +107,7 @@ struct type_traits_base<double>
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/type_traits.h"
+#  include "TU/simd/x86/type_traits.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/type_traits.h"
 #endif

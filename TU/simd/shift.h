@@ -198,7 +198,7 @@ shift_rmost_to_lmost(const boost::tuples::cons<HEAD, TAIL>& x)
 }	// namespace simd
 }	// namespace TU
 #if defined(MMX)
-#  include "TU/simd/intel/shift.h"
+#  include "TU/simd/x86/shift.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/shift.h"
 #endif

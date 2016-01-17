@@ -31,7 +31,7 @@ template <bool ALIGNED=false, class T> void	store(T* p, vec<T> x)	;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/load_store.h"
+#  include "TU/simd/x86/load_store.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/load_store.h"
 #endif

@@ -33,7 +33,7 @@ template <size_t I, class T> int	extract(vec<T> x)		;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/insert_extract.h"
+#  include "TU/simd/x86/insert_extract.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/insert_extract.h"
 #endif

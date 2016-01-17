@@ -24,7 +24,7 @@ template <class T> vec<mask_type<T> >	operator <=(vec<T> x, vec<T> y)	;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/compare.h"
+#  include "TU/simd/x86/compare.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/compare.h"
 #endif

@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_COMPARE_H)
-#define __TU_SIMD_INTEL_COMPARE_H
+#if !defined(__TU_SIMD_X86_COMPARE_H)
+#define __TU_SIMD_X86_COMPARE_H
 
 namespace TU
 {
@@ -73,4 +73,4 @@ SIMD_COMPARES(int32_t)
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_COMPARE_H
+#endif	// !__TU_SIMD_X86_COMPARE_H

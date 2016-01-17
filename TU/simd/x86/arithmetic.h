@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_ARITHMETIC_H)
-#define __TU_SIMD_INTEL_ARITHMETIC_H
+#if !defined(__TU_SIMD_X86_ARITHMETIC_H)
+#define __TU_SIMD_X86_ARITHMETIC_H
 
 namespace TU
 {
@@ -166,4 +166,4 @@ diff(Iu16vec x, Iu16vec y)	{return (x - y) | (y - x);}
   
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_ARITHMETIC_H
+#endif	// !__TU_SIMD_X86_ARITHMETIC_H

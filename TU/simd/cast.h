@@ -20,7 +20,7 @@ template <class T, class S> vec<T>	cast(vec<S> x)			;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/cast.h"
+#  include "TU/simd/x86/cast.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/cast.h"
 #endif

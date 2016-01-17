@@ -1,10 +1,10 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INTEL_CVT_H)
-#define __TU_SIMD_INTEL_CVT_H
+#if !defined(__TU_SIMD_X86_CVT_H)
+#define __TU_SIMD_X86_CVT_H
 
-#include "TU/simd/intel/dup.h"
+#include "TU/simd/x86/dup.h"
 
 namespace TU
 {
@@ -500,4 +500,4 @@ SIMD_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
 #endif
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_INTEL_CVT_H
+#endif	// !__TU_SIMD_X86_CVT_H

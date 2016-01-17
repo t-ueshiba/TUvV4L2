@@ -28,7 +28,7 @@ vec<T>	select(vec<mask_type<T> > mask, vec<T> x, vec<T> y)		;
 }	// namespace TU
 
 #if defined(MMX)
-#  include "TU/simd/intel/select.h"
+#  include "TU/simd/x86/select.h"
 #elif defined(NEON)
 #  include "TU/simd/arm/select.h"
 #endif
