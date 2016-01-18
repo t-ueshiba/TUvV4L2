@@ -69,26 +69,6 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/cvtdown_iterator.h \
 		/usr/local/include/TU/simd/cvtup_iterator.h \
 		/usr/local/include/TU/simd/insert_extract.h \
-		/usr/local/include/TU/simd/intel/allocator.h \
-		/usr/local/include/TU/simd/intel/arch.h \
-		/usr/local/include/TU/simd/intel/arithmetic.h \
-		/usr/local/include/TU/simd/intel/bit_shift.h \
-		/usr/local/include/TU/simd/intel/cast.h \
-		/usr/local/include/TU/simd/intel/compare.h \
-		/usr/local/include/TU/simd/intel/cvt.h \
-		/usr/local/include/TU/simd/intel/dup.h \
-		/usr/local/include/TU/simd/intel/insert_extract.h \
-		/usr/local/include/TU/simd/intel/load_store.h \
-		/usr/local/include/TU/simd/intel/logical.h \
-		/usr/local/include/TU/simd/intel/logical_base.h \
-		/usr/local/include/TU/simd/intel/select.h \
-		/usr/local/include/TU/simd/intel/shift.h \
-		/usr/local/include/TU/simd/intel/shuffle.h \
-		/usr/local/include/TU/simd/intel/svml.h \
-		/usr/local/include/TU/simd/intel/type_traits.h \
-		/usr/local/include/TU/simd/intel/unpack.h \
-		/usr/local/include/TU/simd/intel/vec.h \
-		/usr/local/include/TU/simd/intel/zero.h \
 		/usr/local/include/TU/simd/load_iterator.h \
 		/usr/local/include/TU/simd/load_store.h \
 		/usr/local/include/TU/simd/logical.h \
@@ -102,6 +82,26 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/transform.h \
 		/usr/local/include/TU/simd/type_traits.h \
 		/usr/local/include/TU/simd/vec.h \
+		/usr/local/include/TU/simd/x86/allocator.h \
+		/usr/local/include/TU/simd/x86/arch.h \
+		/usr/local/include/TU/simd/x86/arithmetic.h \
+		/usr/local/include/TU/simd/x86/bit_shift.h \
+		/usr/local/include/TU/simd/x86/cast.h \
+		/usr/local/include/TU/simd/x86/compare.h \
+		/usr/local/include/TU/simd/x86/cvt.h \
+		/usr/local/include/TU/simd/x86/dup.h \
+		/usr/local/include/TU/simd/x86/insert_extract.h \
+		/usr/local/include/TU/simd/x86/load_store.h \
+		/usr/local/include/TU/simd/x86/logical.h \
+		/usr/local/include/TU/simd/x86/logical_base.h \
+		/usr/local/include/TU/simd/x86/select.h \
+		/usr/local/include/TU/simd/x86/shift.h \
+		/usr/local/include/TU/simd/x86/shuffle.h \
+		/usr/local/include/TU/simd/x86/svml.h \
+		/usr/local/include/TU/simd/x86/type_traits.h \
+		/usr/local/include/TU/simd/x86/unpack.h \
+		/usr/local/include/TU/simd/x86/vec.h \
+		/usr/local/include/TU/simd/x86/zero.h \
 		/usr/local/include/TU/simd/zero.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
@@ -252,54 +252,53 @@ App.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -317,54 +316,53 @@ Bitmap.o: TU/v/Bitmap.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -381,54 +379,53 @@ ButtonCmd.o: ButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -446,54 +443,53 @@ CanvasPane.o: TU/v/CanvasPane.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -510,54 +506,53 @@ CanvasPaneDC.o: TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -578,54 +573,53 @@ CanvasPaneDC3.o: TU/v/CanvasPaneDC3.h TU/v/CanvasPaneDC.h TU/v/XDC.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -646,54 +640,53 @@ ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -712,54 +705,53 @@ ChoiceMenuButtonCmd.o: ChoiceMenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -777,54 +769,53 @@ Cmd.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -845,54 +836,53 @@ CmdPane.o: TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -910,54 +900,53 @@ CmdParent.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -975,54 +964,53 @@ CmdWindow.o: TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1040,54 +1028,53 @@ Colormap.o: TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1105,54 +1092,53 @@ Confirm.o: TU/v/Confirm.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1169,54 +1155,53 @@ DC.o: TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1233,54 +1218,53 @@ DC3.o: TU/v/DC3.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1299,54 +1283,53 @@ Dialog.o: TU/v/Dialog.h TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1365,54 +1348,53 @@ FileSelection.o: TU/v/FileSelection.h TU/v/ModalDialog.h TU/v/Dialog.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1430,54 +1412,53 @@ FrameCmd.o: FrameCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1495,54 +1476,53 @@ Icon.o: TU/v/Icon.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1559,54 +1539,53 @@ LabelCmd.o: LabelCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1624,54 +1603,53 @@ ListCmd.o: ListCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1688,54 +1666,53 @@ MemoryDC.o: TU/v/MemoryDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1755,54 +1732,53 @@ Menu.o: TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1820,54 +1796,53 @@ MenuButtonCmd.o: MenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1886,54 +1861,53 @@ ModalDialog.o: TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -1952,54 +1926,53 @@ Notify.o: TU/v/Notify.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2017,54 +1990,53 @@ Object.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2082,54 +2054,53 @@ Pane.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2147,54 +2118,53 @@ RadioButtonCmd.o: TU/v/Bitmap.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2211,54 +2181,53 @@ ShmDC.o: TU/v/ShmDC.h TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2278,54 +2247,53 @@ SliderCmd.o: SliderCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2343,54 +2311,53 @@ TUv++.inst.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2408,54 +2375,53 @@ TextInCmd.o: TextInCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2473,54 +2439,53 @@ Timer.o: TU/v/Timer.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2538,54 +2503,53 @@ ToggleButtonCmd.o: ToggleButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2603,54 +2567,53 @@ Widget-Xaw.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2668,54 +2631,53 @@ Window.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
 	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
@@ -2732,54 +2694,53 @@ XDC.o: TU/v/XDC.h TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
 	/usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
-	/usr/local/include/TU/simd/intel/type_traits.h \
+	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
-	/usr/local/include/TU/simd/intel/vec.h \
-	/usr/local/include/TU/simd/intel/arch.h \
+	/usr/local/include/TU/simd/x86/vec.h \
+	/usr/local/include/TU/simd/x86/arch.h \
 	/usr/local/include/TU/simd/arm/vec.h \
 	/usr/local/include/TU/simd/arm/arch.h \
 	/usr/local/include/TU/simd/allocator.h \
-	/usr/local/include/TU/simd/intel/allocator.h \
+	/usr/local/include/TU/simd/x86/allocator.h \
 	/usr/local/include/TU/simd/arm/allocator.h \
 	/usr/local/include/TU/simd/load_store.h \
-	/usr/local/include/TU/simd/intel/load_store.h \
+	/usr/local/include/TU/simd/x86/load_store.h \
 	/usr/local/include/TU/simd/arm/load_store.h \
 	/usr/local/include/TU/simd/zero.h \
-	/usr/local/include/TU/simd/intel/zero.h \
+	/usr/local/include/TU/simd/x86/zero.h \
 	/usr/local/include/TU/simd/arm/zero.h \
 	/usr/local/include/TU/simd/cast.h \
-	/usr/local/include/TU/simd/intel/cast.h \
+	/usr/local/include/TU/simd/x86/cast.h \
 	/usr/local/include/TU/simd/arm/cast.h \
 	/usr/local/include/TU/simd/insert_extract.h \
-	/usr/local/include/TU/simd/intel/insert_extract.h \
+	/usr/local/include/TU/simd/x86/insert_extract.h \
 	/usr/local/include/TU/simd/arm/insert_extract.h \
 	/usr/local/include/TU/simd/shift.h \
-	/usr/local/include/TU/simd/intel/shift.h \
+	/usr/local/include/TU/simd/x86/shift.h \
 	/usr/local/include/TU/simd/arm/shift.h \
 	/usr/local/include/TU/simd/bit_shift.h \
-	/usr/local/include/TU/simd/intel/bit_shift.h \
+	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h \
-	/usr/local/include/TU/simd/intel/cvt.h \
-	/usr/local/include/TU/simd/intel/dup.h \
-	/usr/local/include/TU/simd/intel/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
-	/usr/local/include/TU/simd/intel/logical.h \
-	/usr/local/include/TU/simd/intel/logical_base.h \
+	/usr/local/include/TU/simd/x86/logical.h \
+	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
 	/usr/local/include/TU/simd/compare.h \
-	/usr/local/include/TU/simd/intel/compare.h \
+	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
 	/usr/local/include/TU/simd/select.h \
-	/usr/local/include/TU/simd/intel/select.h \
+	/usr/local/include/TU/simd/x86/select.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
-	/usr/local/include/TU/simd/intel/arithmetic.h \
+	/usr/local/include/TU/simd/x86/arithmetic.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
-	/usr/local/include/TU/simd/intel/shuffle.h \
-	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/x86/shuffle.h \
+	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
