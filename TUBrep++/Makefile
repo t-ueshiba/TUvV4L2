@@ -97,6 +97,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/shift_iterator.h \
 		/usr/local/include/TU/simd/simd.h \
 		/usr/local/include/TU/simd/store_iterator.h \
+		/usr/local/include/TU/simd/transform.h \
 		/usr/local/include/TU/simd/type_traits.h \
 		/usr/local/include/TU/simd/vec.h \
 		/usr/local/include/TU/simd/zero.h \
@@ -180,6 +181,7 @@ Geometry.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -243,6 +245,7 @@ HalfEdge.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -306,6 +309,7 @@ Loop.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -369,6 +373,7 @@ Neighbor.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -432,6 +437,7 @@ PointB.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -495,6 +501,7 @@ TUBrep++.inst.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -558,6 +565,7 @@ TUBrep++.sa.o: TU/Brep/Brep++.h /usr/local/include/TU/Object++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \

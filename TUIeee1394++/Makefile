@@ -98,6 +98,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/shift_iterator.h \
 		/usr/local/include/TU/simd/simd.h \
 		/usr/local/include/TU/simd/store_iterator.h \
+		/usr/local/include/TU/simd/transform.h \
 		/usr/local/include/TU/simd/type_traits.h \
 		/usr/local/include/TU/simd/vec.h \
 		/usr/local/include/TU/simd/zero.h \
@@ -176,6 +177,7 @@ Ieee1394Camera.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -239,6 +241,7 @@ Ieee1394CameraArray.o: TU/Ieee1394CameraArray.h TU/Ieee1394++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -302,6 +305,7 @@ Ieee1394CameraUtility.o: TU/Ieee1394CameraArray.h TU/Ieee1394++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -365,6 +369,7 @@ Ieee1394Node.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \

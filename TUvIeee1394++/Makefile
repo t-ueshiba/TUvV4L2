@@ -99,6 +99,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/shift_iterator.h \
 		/usr/local/include/TU/simd/simd.h \
 		/usr/local/include/TU/simd/store_iterator.h \
+		/usr/local/include/TU/simd/transform.h \
 		/usr/local/include/TU/simd/type_traits.h \
 		/usr/local/include/TU/simd/vec.h \
 		/usr/local/include/TU/simd/zero.h \
@@ -183,6 +184,7 @@ createFeatureCmds.o: TU/v/vIeee1394++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -250,6 +252,7 @@ createFormatMenu.o: TU/v/vIeee1394++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -317,6 +320,7 @@ setSpecialFormat.o: TU/v/vIeee1394++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
