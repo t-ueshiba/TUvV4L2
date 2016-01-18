@@ -99,6 +99,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/shift_iterator.h \
 		/usr/local/include/TU/simd/simd.h \
 		/usr/local/include/TU/simd/store_iterator.h \
+		/usr/local/include/TU/simd/transform.h \
 		/usr/local/include/TU/simd/type_traits.h \
 		/usr/local/include/TU/simd/vec.h \
 		/usr/local/include/TU/simd/zero.h \
@@ -299,6 +300,7 @@ App.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -363,6 +365,7 @@ Bitmap.o: TU/v/Bitmap.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -426,6 +429,7 @@ ButtonCmd.o: ButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -490,6 +494,7 @@ CanvasPane.o: TU/v/CanvasPane.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -553,6 +558,7 @@ CanvasPaneDC.o: TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -620,6 +626,7 @@ CanvasPaneDC3.o: TU/v/CanvasPaneDC3.h TU/v/CanvasPaneDC.h TU/v/XDC.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -687,6 +694,7 @@ ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -752,6 +760,7 @@ ChoiceMenuButtonCmd.o: ChoiceMenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -816,6 +825,7 @@ Cmd.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -883,6 +893,7 @@ CmdPane.o: TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -947,6 +958,7 @@ CmdParent.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1011,6 +1023,7 @@ CmdWindow.o: TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1075,6 +1088,7 @@ Colormap.o: TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1139,6 +1153,7 @@ Confirm.o: TU/v/Confirm.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1202,6 +1217,7 @@ DC.o: TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1265,6 +1281,7 @@ DC3.o: TU/v/DC3.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1330,6 +1347,7 @@ Dialog.o: TU/v/Dialog.h TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1395,6 +1413,7 @@ FileSelection.o: TU/v/FileSelection.h TU/v/ModalDialog.h TU/v/Dialog.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1459,6 +1478,7 @@ FrameCmd.o: FrameCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1523,6 +1543,7 @@ Icon.o: TU/v/Icon.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1586,6 +1607,7 @@ LabelCmd.o: LabelCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1650,6 +1672,7 @@ ListCmd.o: ListCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1713,6 +1736,7 @@ MemoryDC.o: TU/v/MemoryDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1779,6 +1803,7 @@ Menu.o: TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1843,6 +1868,7 @@ MenuButtonCmd.o: MenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1908,6 +1934,7 @@ ModalDialog.o: TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1973,6 +2000,7 @@ Notify.o: TU/v/Notify.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2037,6 +2065,7 @@ Object.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2101,6 +2130,7 @@ Pane.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2165,6 +2195,7 @@ RadioButtonCmd.o: TU/v/Bitmap.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2228,6 +2259,7 @@ ShmDC.o: TU/v/ShmDC.h TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2294,6 +2326,7 @@ SliderCmd.o: SliderCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2358,6 +2391,7 @@ TUv++.inst.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2422,6 +2456,7 @@ TextInCmd.o: TextInCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2486,6 +2521,7 @@ Timer.o: TU/v/Timer.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2550,6 +2586,7 @@ ToggleButtonCmd.o: ToggleButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2614,6 +2651,7 @@ Widget-Xaw.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2678,6 +2716,7 @@ Window.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2741,6 +2780,7 @@ XDC.o: TU/v/XDC.h TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/intel/shuffle.h \
 	/usr/local/include/TU/simd/intel/svml.h \
+	/usr/local/include/TU/simd/transform.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
