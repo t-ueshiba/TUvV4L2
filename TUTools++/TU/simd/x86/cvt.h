@@ -104,12 +104,12 @@ cvt(vec<S> x)
     template <> inline vec<to>						\
     cvt<to, false>(vec<from> x)						\
     {									\
-	return cast<to>(unpack_low(x, zero<from>()));			\
+	return cast<to>(unpack<false>(x, zero<from>()));		\
     }									\
     template <> inline vec<to>						\
     cvt<to, true>(vec<from> x)						\
     {									\
-	return cast<to>(unpack_high(x, zero<from>()));			\
+	return cast<to>(unpack<true>(x, zero<from>()));			\
     }
 
   SIMD_CVTUP_I(int8_t,     int16_t)	// s_char  -> short

@@ -37,9 +37,9 @@ octup(vec<T> x)
     
 #define SIMD_N_TUPLE(type)						\
     template <> inline vec<type>					\
-    n_tuple<2, 0>(vec<type> x)		{return unpack_low(x, x);}	\
+    n_tuple<2, 0>(vec<type> x)		{return unpack<false>(x, x);}	\
     template <> inline vec<type>					\
-    n_tuple<2, 1>(vec<type> x)		{return unpack_high(x, x);}
+    n_tuple<2, 1>(vec<type> x)		{return unpack<true>(x, x);}
 
 template <size_t N, size_t I, class T> inline vec<T>
 n_tuple(vec<T> x)

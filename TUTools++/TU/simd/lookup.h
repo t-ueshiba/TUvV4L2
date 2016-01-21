@@ -4,6 +4,7 @@
 #if !defined(__TU_SIMD_LOOKUP_H)
 #define __TU_SIMD_LOOKUP_H
 
+#include "TU/simd/cvt.h"
 #include "TU/simd/insert_extract.h"
 #include "TU/simd/arithmetic.h"
 
@@ -14,14 +15,26 @@ namespace simd
 /************************************************************************
 *  Lookup								*
 ************************************************************************/
-template <class T, class P, class S>
-typename std::enable_if<vec<T>::size == vec<S>::size, vec<T> >::type
-lookup(const P* p, vec<S> idx)						;
-    
-template <class A, class S>
-typename std::enable_if<vec<TU::detail::element_t<A> >::size ==
-			vec<S>::size, vec<TU::detail::element_t<A> > >::type
-lookup(const A& a, vec<S> row, vec<S> col)				;
+template <class P, class T,
+	  typename std::enable_if<(vec<P>::size == vec<T>::size)>::type*
+	  = nullptr>
+vec<P>	lookup(const P* p, vec<T> idx)					;
+
+template <class P, class T,
+	  typename std::enable_if<(vec<P>::size > vec<T>::size)>::type*
+	  = nullptr>
+vec<T>	lookup(const P* p, vec<T> idx)					;
+
+template <class P> inline auto
+lookup(const P* p, Is32vec row, Is32vec col, int stride)
+    -> decltype(lookup(p, row*stride + col))
+{
+    return lookup(p, row*stride + col);
+}
+
+template <class P> auto
+lookup(const P* p, Is16vec row, Is16vec col, int stride)
+    -> decltype(lookup(p, col))						;
 
 }	// namespace simd
 }	// namespace TU
