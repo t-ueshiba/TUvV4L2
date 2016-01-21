@@ -11,25 +11,21 @@ namespace simd
 /************************************************************************
 *  Unpack operators							*
 ************************************************************************/
-//! 2つのベクトルの下位半分の成分を交互に混合する．
+//! 2つのベクトルの下位または上位半分の成分を交互に混合する．
 /*!
   \param x	その成分を偶数番目に配置するベクトル
   \param y	その成分を奇数番目に配置するベクトル
   \return	生成されたベクトル
 */
-template <class T> vec<T>	unpack_low(vec<T> x, vec<T> y)		;
-
-//! 2つのベクトルの上位半分の成分を交互に混合する．
-/*!
-  \param x	その成分を偶数番目に配置するベクトル
-  \param y	その成分を奇数番目に配置するベクトル
-  \return	生成されたベクトル
-*/
-template <class T> vec<T>	unpack_high(vec<T> x, vec<T> y)		;
+template <bool HI, class T> vec<T>	unpack(vec<T> x, vec<T> y)	;
 
 #define SIMD_UNPACK_LOW_HIGH(type)					\
-    SIMD_SIGNED_FUNC(unpack_low,  unpacklo, type)			\
-    SIMD_SIGNED_FUNC(unpack_high, unpackhi, type)
+    SIMD_SPECIALIZED_FUNC(vec<type>					\
+			  unpack<false>(vec<type> x, vec<type> y),	\
+			  unpacklo, (x, y), void, type, SIMD_SIGNED)	\
+    SIMD_SPECIALIZED_FUNC(vec<type>					\
+			  unpack<true>(vec<type> x, vec<type> y),	\
+			  unpackhi, (x, y), void, type, SIMD_SIGNED)
 
 SIMD_UNPACK_LOW_HIGH(int8_t)
 SIMD_UNPACK_LOW_HIGH(int16_t)

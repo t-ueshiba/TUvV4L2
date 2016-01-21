@@ -515,9 +515,9 @@ SURFCreator::makeDescriptor(Feature<T, D>& feature) const
 
   // ヒストグラムを空に初期化する．
 #if defined(SSE)
-    __declspec(align(16)) Histogram	bins;
+    alignas(16) Histogram	bins;
 #else
-    Histogram				bins;
+    Histogram			bins;
 #endif
     for (int y = 0; y < NSubRegions + 2; ++y)
 	for (int x = 0; x < NSubRegions + 2; ++x)

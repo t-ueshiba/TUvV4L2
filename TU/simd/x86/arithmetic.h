@@ -4,10 +4,15 @@
 #if !defined(__TU_SIMD_X86_ARITHMETIC_H)
 #define __TU_SIMD_X86_ARITHMETIC_H
 
+#include "TU/simd/x86/unpack.h"
+
 namespace TU
 {
 namespace simd
 {
+/************************************************************************
+*  Arithmetic and max/min operators					*
+************************************************************************/
 template <class T> inline vec<T>
 min(vec<T> x, vec<T> y)
 {
@@ -117,6 +122,12 @@ template <class T> inline vec<T>
 operator /(vec<T> x, T c)
 {
     return x / vec<T>(c);
+}
+
+template <bool HI, class T> inline vec<upper_type<T> >
+mul(vec<T> x, vec<T> y)
+{
+    return unpack<HI>(x * y, mulhi(x, y));
 }
     
 /************************************************************************

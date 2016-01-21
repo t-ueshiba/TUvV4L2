@@ -9,6 +9,10 @@ namespace TU
 namespace simd
 {
 #if defined(SSE)
+/************************************************************************
+*  Insertion/Extraction operators					*
+************************************************************************/
+// [1] 整数ベクトルに対するinsert/extract
 #  if defined(AVX2)
 #    define SIMD_INSERT_EXTRACT(type)					\
       template <size_t I> inline vec<type>				\
@@ -52,6 +56,7 @@ namespace simd
 
 #  undef SIMD_INSERT_EXTRACT
 
+// [2] vec<float> に対するinsert/extract
 #  if defined(AVX)
     template <size_t I> inline F32vec
     insert(F32vec x, float val)
@@ -93,6 +98,7 @@ template <size_t I> float	extract(F32vec x)			;
     }
 #  endif
 
+// [3] vec<double> に対するinsert/extract
 #  if defined(SSE2)
     template <size_t I> double	extract(F64vec x)			;
 #    if defined(AVX)
