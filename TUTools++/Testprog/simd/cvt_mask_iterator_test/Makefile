@@ -18,7 +18,7 @@ CFLAGS		= -g
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE2
+  CPPFLAGS     += -DAVX2
 endif
 CCFLAGS		= $(CFLAGS)
 
