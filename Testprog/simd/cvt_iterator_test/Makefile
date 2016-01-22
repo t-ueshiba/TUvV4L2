@@ -56,23 +56,23 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/cvt.h \
 		../../../TU/simd/cvtdown_iterator.h \
 		../../../TU/simd/cvtup_iterator.h \
-		../../../TU/simd/intel/arch.h \
-		../../../TU/simd/intel/bit_shift.h \
-		../../../TU/simd/intel/cast.h \
-		../../../TU/simd/intel/cvt.h \
-		../../../TU/simd/intel/dup.h \
-		../../../TU/simd/intel/load_store.h \
-		../../../TU/simd/intel/shift.h \
-		../../../TU/simd/intel/type_traits.h \
-		../../../TU/simd/intel/unpack.h \
-		../../../TU/simd/intel/vec.h \
-		../../../TU/simd/intel/zero.h \
 		../../../TU/simd/load_iterator.h \
 		../../../TU/simd/load_store.h \
 		../../../TU/simd/shift.h \
 		../../../TU/simd/store_iterator.h \
 		../../../TU/simd/type_traits.h \
 		../../../TU/simd/vec.h \
+		../../../TU/simd/x86/arch.h \
+		../../../TU/simd/x86/bit_shift.h \
+		../../../TU/simd/x86/cast.h \
+		../../../TU/simd/x86/cvt.h \
+		../../../TU/simd/x86/dup.h \
+		../../../TU/simd/x86/load_store.h \
+		../../../TU/simd/x86/shift.h \
+		../../../TU/simd/x86/type_traits.h \
+		../../../TU/simd/x86/unpack.h \
+		../../../TU/simd/x86/vec.h \
+		../../../TU/simd/x86/zero.h \
 		../../../TU/simd/zero.h \
 		../../../TU/tuple.h
 HDRS		=
@@ -85,22 +85,21 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/tuple.h \
-	../../../TU/functional.h ../../../TU/simd/cvt.h \
-	../../../TU/simd/zero.h ../../../TU/simd/vec.h \
+main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/iterator.h \
+	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/pair.h \
+	../../../TU/simd/cvt.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
-	../../../TU/simd/intel/type_traits.h \
-	../../../TU/simd/arm/type_traits.h ../../../TU/simd/intel/vec.h \
-	../../../TU/simd/intel/arch.h ../../../TU/simd/arm/vec.h \
-	../../../TU/simd/arm/arch.h ../../../TU/simd/intel/zero.h \
-	../../../TU/simd/arm/zero.h ../../../TU/simd/cast.h \
-	../../../TU/simd/intel/cast.h ../../../TU/simd/arm/cast.h \
-	../../../TU/simd/shift.h ../../../TU/simd/intel/shift.h \
-	../../../TU/simd/arm/shift.h ../../../TU/simd/bit_shift.h \
-	../../../TU/simd/intel/bit_shift.h ../../../TU/simd/arm/bit_shift.h \
-	../../../TU/simd/intel/cvt.h ../../../TU/simd/intel/dup.h \
-	../../../TU/simd/intel/unpack.h ../../../TU/simd/arm/cvt.h \
-	../../../TU/simd/cvtup_iterator.h ../../../TU/simd/load_iterator.h \
-	../../../TU/iterator.h ../../../TU/pair.h \
-	../../../TU/simd/load_store.h ../../../TU/simd/intel/load_store.h \
-	../../../TU/simd/arm/load_store.h ../../../TU/simd/store_iterator.h
+	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
+	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \
+	../../../TU/simd/arm/vec.h ../../../TU/simd/arm/arch.h \
+	../../../TU/simd/x86/zero.h ../../../TU/simd/arm/zero.h \
+	../../../TU/simd/cast.h ../../../TU/simd/x86/cast.h \
+	../../../TU/simd/arm/cast.h ../../../TU/simd/shift.h \
+	../../../TU/simd/x86/shift.h ../../../TU/simd/arm/shift.h \
+	../../../TU/simd/bit_shift.h ../../../TU/simd/x86/bit_shift.h \
+	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/x86/cvt.h \
+	../../../TU/simd/x86/dup.h ../../../TU/simd/x86/unpack.h \
+	../../../TU/simd/arm/cvt.h ../../../TU/simd/cvtup_iterator.h \
+	../../../TU/simd/load_iterator.h ../../../TU/simd/load_store.h \
+	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h \
+	../../../TU/simd/store_iterator.h

@@ -17,13 +17,13 @@ namespace simd
   \param y	その成分を奇数番目に配置するベクトル
   \return	生成されたベクトル
 */
-template <bool HI, class T> vec<T>	unpack(vec<T> x, vec<T> y)	;
+template <bool HI, class T> base_type<T> unpack(vec<T> x, vec<T> y)	;
 
 #define SIMD_UNPACK_LOW_HIGH(type)					\
-    SIMD_SPECIALIZED_FUNC(vec<type>					\
+    SIMD_SPECIALIZED_FUNC(base_type<type>				\
 			  unpack<false>(vec<type> x, vec<type> y),	\
 			  unpacklo, (x, y), void, type, SIMD_SIGNED)	\
-    SIMD_SPECIALIZED_FUNC(vec<type>					\
+    SIMD_SPECIALIZED_FUNC(base_type<type>				\
 			  unpack<true>(vec<type> x, vec<type> y),	\
 			  unpackhi, (x, y), void, type, SIMD_SIGNED)
 

@@ -26,14 +26,14 @@ template <class P, class T,
 vec<T>	lookup(const P* p, vec<T> idx)					;
 
 template <class P> inline auto
-lookup(const P* p, Is32vec row, Is32vec col, int stride)
+lookup(const P* p, Is32vec row, Is32vec col, int32_t stride)
     -> decltype(lookup(p, row*stride + col))
 {
     return lookup(p, row*stride + col);
 }
 
 template <class P> auto
-lookup(const P* p, Is16vec row, Is16vec col, int stride)
+lookup(const P* p, Is16vec row, Is16vec col, int32_t stride)
     -> decltype(lookup(p, col))						;
 
 }	// namespace simd
