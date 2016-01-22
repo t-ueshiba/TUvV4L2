@@ -4,7 +4,7 @@
 #if !defined(__TU_SIMD_X86_CVT_H)
 #define __TU_SIMD_X86_CVT_H
 
-#include "TU/simd/x86/dup.h"
+#include "TU/simd/x86/unpack.h"
 
 namespace TU
 {
@@ -93,23 +93,25 @@ cvt(vec<S> x)
     template <> inline vec<to>						\
     cvt<to, false>(vec<from> x)						\
     {									\
-	return cast<to>(dup<0>(x)) >> 8*vec<from>::element_size;	\
+	return vec<to>(unpack<false>(x, x))				\
+		   >> 8*vec<from>::element_size;			\
     }									\
     template <> inline vec<to>						\
     cvt<to, true>(vec<from> x)						\
     {									\
-	return cast<to>(dup<1>(x)) >> 8*vec<from>::element_size;	\
+	return vec<to>(unpack<true>(x, x))				\
+		   >> 8*vec<from>::element_size;			\
     }
 #  define SIMD_CVTUP_UI(from, to)					\
     template <> inline vec<to>						\
     cvt<to, false>(vec<from> x)						\
     {									\
-	return cast<to>(unpack<false>(x, zero<from>()));		\
+	return unpack<false>(x, zero<from>());				\
     }									\
     template <> inline vec<to>						\
     cvt<to, true>(vec<from> x)						\
     {									\
-	return cast<to>(unpack<true>(x, zero<from>()));			\
+	return unpack<true>(x, zero<from>());				\
     }
 
   SIMD_CVTUP_I(int8_t,     int16_t)	// s_char  -> short

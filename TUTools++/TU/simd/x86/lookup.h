@@ -106,7 +106,7 @@ namespace simd
     }
 
     template <class P, size_t... IDX> inline auto
-    lookup(const P* p, Is16vec row, Is16vec col, int stride,
+    lookup(const P* p, Is16vec row, Is16vec col, int32_t stride,
 	   std::index_sequence<IDX...>) -> decltype(lookup(p, col))
     {
 	using VAL = decltype(lookup(p, col));
@@ -135,21 +135,21 @@ namespace simd
 
 #if defined(SSE4)
   template <class P> inline auto
-  lookup(const P* p, Is16vec row, Is16vec col, int stride)
+  lookup(const P* p, Is16vec row, Is16vec col, int32_t stride)
       -> decltype(lookup(p, col))
   {
       using T = typename decltype(lookup(p, col))::element_type;
 
       return cvt<T>(lookup(p,
-			   cvt<int32_t, false>(row) * int32_t(stride) +
+			   cvt<int32_t, false>(row)*stride +
 			   cvt<int32_t, false>(col)),
 		    lookup(p,
-			   cvt<int32_t, true >(row) * int32_t(stride) +
+			   cvt<int32_t, true >(row)*stride +
 			   cvt<int32_t, true >(col)));
   }
 #else
   template <class P> inline auto
-  lookup(const P* p, Is16vec row, Is16vec col, int stride)
+  lookup(const P* p, Is16vec row, Is16vec col, int32_t stride)
       -> decltype(lookup(p, col))
   {
       return lookup(p, row, col, stride,
