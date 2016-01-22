@@ -58,6 +58,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/arm/insert_extract.h \
 		../../TU/simd/arm/load_store.h \
 		../../TU/simd/arm/logical.h \
+		../../TU/simd/arm/lookup.h \
 		../../TU/simd/arm/select.h \
 		../../TU/simd/arm/shift.h \
 		../../TU/simd/arm/type_traits.h \
@@ -74,6 +75,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/load_iterator.h \
 		../../TU/simd/load_store.h \
 		../../TU/simd/logical.h \
+		../../TU/simd/lookup.h \
 		../../TU/simd/misc.h \
 		../../TU/simd/row_vec_iterator.h \
 		../../TU/simd/select.h \
@@ -81,6 +83,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/shift_iterator.h \
 		../../TU/simd/simd.h \
 		../../TU/simd/store_iterator.h \
+		../../TU/simd/transform.h \
 		../../TU/simd/type_traits.h \
 		../../TU/simd/vec.h \
 		../../TU/simd/x86/allocator.h \
@@ -94,6 +97,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/load_store.h \
 		../../TU/simd/x86/logical.h \
 		../../TU/simd/x86/logical_base.h \
+		../../TU/simd/x86/lookup.h \
 		../../TU/simd/x86/select.h \
 		../../TU/simd/x86/shift.h \
 		../../TU/simd/x86/shuffle.h \
@@ -143,6 +147,8 @@ main.o: ../../TU/types.h ../../TU/GuidedFilter.h ../../TU/BoxFilter.h \
 	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
 	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
 	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
+	../../TU/simd/transform.h ../../TU/simd/lookup.h \
+	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
 	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h

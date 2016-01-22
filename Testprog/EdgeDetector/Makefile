@@ -97,7 +97,6 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/x86/cast.h \
 		/usr/local/include/TU/simd/x86/compare.h \
 		/usr/local/include/TU/simd/x86/cvt.h \
-		/usr/local/include/TU/simd/x86/dup.h \
 		/usr/local/include/TU/simd/x86/insert_extract.h \
 		/usr/local/include/TU/simd/x86/load_store.h \
 		/usr/local/include/TU/simd/x86/logical.h \
@@ -161,8 +160,6 @@ EdgeDetector.o: /usr/local/include/TU/EdgeDetector.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
 	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
-	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -176,6 +173,7 @@ EdgeDetector.o: /usr/local/include/TU/EdgeDetector.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
 	/usr/local/include/TU/simd/x86/arithmetic.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
@@ -223,8 +221,6 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
 	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
-	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -238,6 +234,7 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/simd/arm/select.h \
 	/usr/local/include/TU/simd/arithmetic.h \
 	/usr/local/include/TU/simd/x86/arithmetic.h \
+	/usr/local/include/TU/simd/x86/unpack.h \
 	/usr/local/include/TU/simd/arm/arithmetic.h \
 	/usr/local/include/TU/simd/misc.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \

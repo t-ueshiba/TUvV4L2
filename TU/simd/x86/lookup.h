@@ -109,9 +109,7 @@ namespace simd
     lookup(const P* p, Is16vec row, Is16vec col, int32_t stride,
 	   std::index_sequence<IDX...>) -> decltype(lookup(p, col))
     {
-	using VAL = decltype(lookup(p, col));
-	
-	return VAL(p[extract<IDX>(row)*stride + extract<IDX>(col)]...);
+	return {p[extract<IDX>(row)*stride + extract<IDX>(col)]...};
     }
   }	// namespace detail
     
@@ -152,8 +150,8 @@ namespace simd
   lookup(const P* p, Is16vec row, Is16vec col, int32_t stride)
       -> decltype(lookup(p, col))
   {
-      return lookup(p, row, col, stride,
-		    std::make_index_sequence<Is16vec::size>());
+      return detail::lookup(p, row, col, stride,
+			    std::make_index_sequence<Is16vec::size>());
   }
 #endif
 }	// namespace simd
