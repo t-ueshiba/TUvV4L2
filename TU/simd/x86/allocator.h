@@ -6,7 +6,7 @@
 
 #include <limits>
 #include <new>			// for std::bad_alloc()
-#include <immintrin.h>
+#include <type_traits>
 
 namespace TU
 {
@@ -27,7 +27,18 @@ class allocator
     typedef size_t	size_type;
     typedef ptrdiff_t	difference_type;
 
-    template <class U>	struct rebind	{ typedef allocator<U>	other; };
+    template <class T_>	struct rebind	{ typedef allocator<T_>	other; };
+
+    template <class T_>
+    struct align
+    {
+	constexpr static size_t	value = sizeof(T_);
+    };
+    template <class T_>
+    struct align<vec<T_> >
+    {
+	constexpr static size_t	value = sizeof(vec<T_>);
+    };
     
   public:
 			allocator()					{}
@@ -43,7 +54,7 @@ class allocator
 			    
 			    pointer	p = static_cast<pointer>(
 						_mm_malloc(sizeof(value_type)*n,
-							   sizeof(value_type)));
+							   align<T>::value));
 			    if (p == nullptr)
 				throw std::bad_alloc();
 			    return p;
@@ -61,7 +72,7 @@ class allocator
 			{
 			    p->~value_type();
 			}
-    size_type		max_size() const
+    constexpr size_type	max_size() const
 			{
 			    return std::numeric_limits<size_type>::max()
 				 / sizeof(value_type);
