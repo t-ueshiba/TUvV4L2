@@ -46,6 +46,7 @@
 #  include "TU/simd/insert_extract.h"
 #  include "TU/simd/shift.h"
 #  include "TU/simd/bit_shift.h"
+#  include "TU/simd/dup.h"
 #  include "TU/simd/cvt.h"
 #  include "TU/simd/logical.h"
 #  include "TU/simd/compare.h"

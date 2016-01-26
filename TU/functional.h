@@ -1005,8 +1005,9 @@ gcd(S m, T n)
   \param args	第3, 第4,...の整数
   \return	m, n, args...の最大公約数
 */
-template <class S, class T, class... ARGS> constexpr auto
-gcd(S m, T n, ARGS... args) -> decltype(gcd(gcd(m, n), args...))
+template <class S, class T, class... ARGS>
+constexpr typename std::common_type<S, T, ARGS...>::type
+gcd(S m, T n, ARGS... args)
 {
     return gcd(gcd(m, n), args...);
 }
@@ -1030,8 +1031,9 @@ lcm(S m, T n)
   \param args	第3, 第4,...の整数
   \return	m, n, args...の最小公倍数
 */
-template <class S, class T, class... ARGS> constexpr auto
-lcm(S m, T n, ARGS... args) -> decltype(lcm(lcm(m, n), args...))
+template <class S, class T, class... ARGS>
+constexpr typename std::common_type<S, T, ARGS...>::type
+lcm(S m, T n, ARGS... args)
 {
     return lcm(lcm(m, n), args...);
 }

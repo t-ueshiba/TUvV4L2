@@ -88,6 +88,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/cvt.h \
 		../../TU/simd/cvtdown_iterator.h \
 		../../TU/simd/cvtup_iterator.h \
+		../../TU/simd/dup.h \
 		../../TU/simd/insert_extract.h \
 		../../TU/simd/load_iterator.h \
 		../../TU/simd/load_store.h \
@@ -110,6 +111,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/cast.h \
 		../../TU/simd/x86/compare.h \
 		../../TU/simd/x86/cvt.h \
+		../../TU/simd/x86/dup.h \
 		../../TU/simd/x86/insert_extract.h \
 		../../TU/simd/x86/load_store.h \
 		../../TU/simd/x86/logical.h \
@@ -199,8 +201,9 @@ ComputeThreeD.o: ../stereo1394/ComputeThreeD.h ../../TU/Geometry++.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -234,8 +237,9 @@ DrawThreeD.o: ../stereo1394/DrawThreeD.h ../../TU/Warp.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -271,8 +275,9 @@ MyCanvasPane.o: ../stereo1394/MyCanvasPane.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -314,8 +319,9 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -367,8 +373,9 @@ MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -409,8 +416,9 @@ createCaptureCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -449,8 +457,9 @@ createFeatureCmds.o: /usr/local/include/TU/v/CmdPane.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -488,8 +497,9 @@ createMenuCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
@@ -526,8 +536,9 @@ main.o: ../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Image++.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \

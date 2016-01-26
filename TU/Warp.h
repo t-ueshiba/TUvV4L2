@@ -57,37 +57,147 @@ class Warp
 
 	size_t		width()			const	{return us.size();}
 	void		resize(size_t d)		;
-#if defined(MMX)
+#if defined(SIMD)
 	Array<short,  Buf<short,  simd::allocator<short > > >	us, vs;
 	Array<u_char, Buf<u_char, simd::allocator<u_char> > >	du, dv;
 #else
 	Array<short>						us, vs;
 	Array<u_char>						du, dv;
 #endif
-	int							lmost;
+	size_t							lmost;
+    };
+    
+    template <class IN>
+    class Interpolate
+    {
+      public:
+	using value_type = typename std::iterator_traits<IN>::value_type
+							    ::value_type;
+    
+      public:
+	Interpolate(IN in)
+	    :_in(in),
+	     _stride(std::distance(std::cbegin(*_in),
+				   std::cbegin(*(_in + 1))))		{}
+
+	template <class S, class T>
+	auto	operator ()(S u, S v, T du, T dv) const
+		{
+		    const auto	ue = u + S(1);
+		    const auto	ve = v + S(1);
+		    
+		    return interpolate(interpolate(lookup(u,  v),
+						   lookup(ue, v), du),
+				       interpolate(lookup(u,  ve),
+						   lookup(ue, ve), du),
+				       dv);
+		}
+	template <class S, class TAIL>
+	auto	operator ()(const boost::tuples::cons<S, TAIL>& arg) const
+		{
+		    return (*this)(boost::get<0>(arg), boost::get<1>(arg),
+				   boost::get<2>(arg), boost::get<3>(arg));
+		}
+    
+      private:
+	value_type	lookup(int u, int v) const
+			{
+			    return _in[v][u];
+			}
+
+	template <class S>
+	static S	interpolate(S x, S y, S d)
+			{
+			    return x + (d*(y - x) >> 7);
+			}
+	template <class E, class T>
+	static RGB_<E>	interpolate(const RGB_<E>& x, const RGB_<E>& y, T d)
+			{
+			    return {interpolate(x.r, y.r, d),
+				    interpolate(x.g, y.g, d),
+				    interpolate(x.b, y.b, d)};
+			}
+	template <class T>
+	static YUV444	interpolate(const YUV444& x, const YUV444& y, T d)
+			{
+			    return {interpolate(x.y, y.y, d),
+				    interpolate(x.u, y.u, d),
+				    interpolate(x.v, y.v, d)};
+			}
+#if defined(SIMD)
+	template <class V=value_type, class T>
+	typename std::enable_if<std::is_integral<V>::value,
+				simd::vec<T> >::type
+			lookup(simd::vec<T> u, simd::vec<T> v) const
+			{
+			    return simd::lookup(std::begin(*_in),
+						v, u, _stride);
+			}
+	template <class V=value_type>
+	typename std::enable_if<!std::is_integral<V>::value,
+				simd::Is32vec>::type
+			lookup(simd::Is32vec u, simd::Is32vec v) const
+			{
+			    return simd::lookup(
+				       reinterpret_cast<const int32_t*>(
+					   std::begin(*_in)),
+				       v, u, _stride);
+			}
+	template <class V=value_type>
+	static typename std::enable_if<!std::is_integral<V>::value,
+				       simd::Is32vec>::type
+			interpolate(simd::Is32vec x,
+				    simd::Is32vec y, simd::Is32vec d)
+			{
+			    using namespace	simd;
+
+			    const auto	dl = dup<false>(d);
+			    const auto	dh = dup<true >(d);
+
+			    return cast<int32_t>(
+				cvt<u_int8_t>(
+				    interpolate(
+					cvt<int16_t, false>(cast<u_int8_t>(x)),
+					cvt<int16_t, false>(cast<u_int8_t>(y)),
+					cvt<int16_t>(dup<false>(dl),
+						     dup<true >(dl))),
+				    interpolate(
+					cvt<int16_t, true >(cast<u_int8_t>(x)),
+					cvt<int16_t, true >(cast<u_int8_t>(y)),
+					cvt<int16_t>(dup<false>(dh),
+						     dup<true >(dh)))));
+			}
+#endif
+      private:
+	const IN	_in;
+	const int	_stride;
     };
 
 #if defined(USE_TBB)
-    template <class T>
+    template <class IN, class OUT>
     class WarpLine
     {
       public:
-	WarpLine(const Warp& warp, const Image<T>& in, Image<T>& out)
+	WarpLine(const Warp& warp, IN in, OUT out)
 	    :_warp(warp), _in(in), _out(out)				{}
 	
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    for (size_t v = r.begin(); v != r.end(); ++v)
-			_warp.warpLine(_in, _out, v);
+		    auto	out = _out + r.begin();
+		    for (auto v = r.begin(); v != r.end(); ++v)
+		    {
+			_warp.warpLine(_in, std::begin(*out), _warp._fracs[v]);
+			++out;
+		    }
 		}
 
       private:
 	const Warp&	_warp;
-	const Image<T>&	_in;
-	Image<T>&	_out;
+	const IN	_in;
+	const OUT	_out;
     };
 #endif
-    
+
   public:
   //! 画像変形オブジェクトを生成する．
     Warp()	:_fracs(), _width(0)			{}
@@ -104,12 +214,11 @@ class Warp
   */
     size_t	height()			const	{return _fracs.size();}
     
-    int		lmost(int v)			const	;
-    int		rmost(int v)			const	;
+    size_t	lmost(size_t v)			const	;
+    size_t	rmost(size_t v)			const	;
 
     template <class T>
-    void	initialize(const Matrix<T, FixedSizedBuf<T, 9>,
-			   FixedSizedBuf<Vector<T>, 3> >& Htinv,
+    void	initialize(const FixedSizedMatrix<T, 3, 3>& Htinv,
 			   size_t inWidth,  size_t inHeight,
 			   size_t outWidth, size_t outHeight)		;
     template <class I>
@@ -117,18 +226,13 @@ class Warp
 			   const I& intrinsic,
 			   size_t inWidth,  size_t inHeight,
 			   size_t outWidth, size_t outHeight)		;
-    template <class T>
-    void	operator ()(const Image<T>& in, Image<T>& out)	const	;
-    Vector2f	operator ()(int u, int v)			const	;
-#if defined(SSE2)
-    simd::F32vec
-		src(int u, int v)				const	;
-#endif
+    template <class IN, class OUT>
+    void	operator ()(IN in, OUT out)			const	;
+    Vector2f	operator ()(size_t u, size_t v)			const	;
 
   private:
-    template <class T>
-    void	warpLine(const Image<T>& in,
-			 Image<T>& out, size_t v)		const	;
+    template <class IN, class OUT>
+    void	warpLine(IN in, OUT out, const FracArray& frac)	const	;
     
   private:
     Array<FracArray>	_fracs;
@@ -149,11 +253,11 @@ Warp::FracArray::resize(size_t d)
   入力画像が矩形でも出力画像も矩形とは限らないので，出力画像の一部しか
   入力画像の値域(有効領域)とならない．本関数は，出力画像の指定された行
   について，その有効領域の左端となる画素位置を返す．
-  \param v	行を指定するintex
+  \param v	行を指定するindex
   \return	左端位置
 */
-inline int
-Warp::lmost(int v) const
+inline size_t
+Warp::lmost(size_t v) const
 {
     return _fracs[v].lmost;
 }
@@ -163,11 +267,11 @@ Warp::lmost(int v) const
   入力画像が矩形でも出力画像も矩形とは限らないので，出力画像の一部しか
   入力画像の値域(有効領域)とならない．本関数は，出力画像の指定された行
   について，その有効領域の右端の右隣となる画素位置を返す．
-  \param v	行を指定するintex
+  \param v	行を指定するindex
   \return	右端位置の次
 */
-inline int
-Warp::rmost(int v) const
+inline size_t
+Warp::rmost(size_t v) const
 {
     return _fracs[v].lmost + _fracs[v].width();
 }
@@ -188,8 +292,7 @@ Warp::rmost(int v) const
   \param outHeight	出力画像の高さ
 */
 template <class T> inline void
-Warp::initialize(const Matrix<T, FixedSizedBuf<T, 9>,
-			      FixedSizedBuf<Vector<T>, 3> >& Htinv,
+Warp::initialize(const FixedSizedMatrix<T, 3, 3>& Htinv,
 		 size_t inWidth,  size_t inHeight,
 		 size_t outWidth, size_t outHeight)
 {
@@ -277,24 +380,23 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
     }
 }
 
-//! 出力画像の範囲を指定して画像を変形する．
+//! 入力画像を変形して出力画像に出力する．
 /*!
-  \param in	入力画像
-  \param out	出力画像
+  \param in	入力画像の最初の行を指す反復子
+  \param out	出力画像の最初の行を指す反復子
 */
-template <class T> void
-Warp::operator ()(const Image<T>& in, Image<T>& out) const
+template <class IN, class OUT> void
+Warp::operator ()(IN in, OUT out) const
 {
-    out.resize(height(), width());
-
 #if defined(USE_TBB)
-    using namespace	tbb;
-
-    parallel_for(blocked_range<size_t>(0, out.height(), 1),
-		 WarpLine<T>(*this, in, out));
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, _fracs.size(), 1),
+		      WarpLine<IN, OUT>(*this, in, out));
 #else
-    for (size_t v = 0; v < out.height(); ++v)
-	warpLine(in, out, v);
+    for (const auto& frac : _fracs)
+    {
+	warpLine(in, std::begin(*out), frac);
+	++out;
+    }
 #endif
 }
     
@@ -305,7 +407,7 @@ Warp::operator ()(const Image<T>& in, Image<T>& out) const
   \return	出力画像点(u, v)にマップされる入力画像点の2次元座標
 */
 inline Vector2f
-Warp::operator ()(int u, int v) const
+Warp::operator ()(size_t u, size_t v) const
 {
     Vector2f		val;
     const FracArray&	fracs = _fracs[v];
@@ -314,26 +416,45 @@ Warp::operator ()(int u, int v) const
     return val;
 }
 
-#if defined(SSE2) && !defined(AVX2)
-//! 2つの出力画像点を指定してそれぞれにマップされる2つの入力画像点の2次元座標を返す．
-/*!
-  指定された2次元座標(u, v)に対し，2点(u, v-1), (u, v)にマップされる入力画像点の
-  2次元座標が返される．
-  \param u	出力画像点の横座標
-  \param v	出力画像点の縦座標
-  \return	出力画像点(u, v-1), (u, v)にマップされる入力画像点の2次元座標
-*/
-inline simd::F32vec
-Warp::src(int u, int v) const
+template <class IN, class OUT> void
+Warp::warpLine(IN in, OUT out, const FracArray& frac) const
 {
-    using namespace	simd;
+    Interpolate<IN>	interpolate(in);
     
-    const FracArray	&fp = _fracs[v-1], &fc = _fracs[v];
-    const Is16vec	tmp(fc.dv[u], fc.du[u], fp.dv[u], fp.du[u],
-			    fc.vs[u], fc.us[u], fp.vs[u], fp.us[u]);
-    return cvt<float>(tmp) + cvt<float>(shift_r<4>(tmp)) / F32vec(128.0);
-}
-#endif
+    auto	u  = std::cbegin(frac.us);
+    auto	ue = std::cend(  frac.us);
+    auto	v  = std::cbegin(frac.vs);
+    auto	du = std::cbegin(frac.du);
+    auto	dv = std::cbegin(frac.dv);
+    out += frac.lmost;
+#if defined(SIMD)
+    using value_type = typename Interpolate<IN>::value_type;
+    using T = typename std::conditional<(sizeof(value_type) > sizeof(int16_t)),
+					int32_t, int16_t>::type;
+    using O = typename std::conditional<(sizeof(value_type) > sizeof(int16_t)),
+					int32_t*, OUT>::type;
+	
+    const auto	n = simd::vec<u_char>::floor(std::distance(u, ue));
 
+    simd::transform<T>(interpolate,
+		       simd::make_store_iterator<false>(
+			   reinterpret_cast<O>(out)),
+		       simd::make_load_iterator<false>(u),
+		       simd::make_load_iterator<false>(u + n),
+		       simd::make_load_iterator<false>(v),
+		       simd::make_load_iterator<false>(du),
+		       simd::make_load_iterator<false>(dv));
+    simd::empty();
+
+    std::advance(u,   n);
+    std::advance(v,   n);
+    std::advance(du,  n);
+    std::advance(dv,  n);
+    std::advance(out, n);
+#endif
+    while (u != ue)
+	*out++ = interpolate(*u++, *v++, *du++, *dv++);
 }
+
+}	// namespace TU
 #endif	// !__TU_WARP_H

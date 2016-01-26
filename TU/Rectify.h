@@ -379,8 +379,11 @@ template <class T> inline void
 Rectify::operator ()(const Image<T>& inL, const Image<T>& inR,
 		     Image<T>& outL, Image<T>& outR) const
 {
-    _warp[0](inL, outL);
-    _warp[1](inR, outR);
+    outL.resize(_warp[0].height(), _warp[0].width());
+    outR.resize(_warp[1].height(), _warp[1].width());
+    
+    _warp[0](inL.cbegin(), outL.begin());
+    _warp[1](inR.cbegin(), outR.begin());
 }
 
 template <class T> inline void
@@ -391,9 +394,13 @@ Rectify::operator ()(const Image<T>& inL,
 		     Image<T>& outR,
 		     Image<T>& outV) const
 {
-    _warp[0](inL, outL);
-    _warp[1](inR, outR);
-    _warp[2](inV, outV);
+    outL.resize(_warp[0].height(), _warp[0].width());
+    outR.resize(_warp[1].height(), _warp[1].width());
+    outV.resize(_warp[2].height(), _warp[2].width());
+    
+    _warp[0](inL.cbegin(), outL.begin());
+    _warp[1](inR.cbegin(), outR.begin());
+    _warp[2](inV.cbegin(), outV.begin());
 }
 
 }

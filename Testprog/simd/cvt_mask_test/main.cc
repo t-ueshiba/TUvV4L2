@@ -36,7 +36,7 @@ cvtup_mask_all(vec<T> x)
     using namespace	std;
 
     cout << "  " << N << ':';
-    print(cvt_mask<S, N>(x));
+    print(cvt<S, N>(x));
 
     cvtup_mask_all<S, N+1>(x);
 }
@@ -46,19 +46,19 @@ doJob()
 {
     using namespace	std;
     
-    SRC		src[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+    const SRC	src[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 			 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 			 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
 			 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f};
-    vec<SRC>	x = load<false>(src);
+    const auto	x = load(src);
 
     cout << "src:";
     print(x);
 
     cvtup_mask_all<DST>(x);
+    cout << endl;
 
     empty();
-    cout << endl;
 }
     
 template <class SRC> void
@@ -68,14 +68,15 @@ doJobF()
     
     typedef complementary_mask_type<SRC>	DST;
 
-    SRC		a[] = {0,  0, 0, 0,  0,  0, 0, 0};
-    SRC		b[] = {1, -1, 1, 1, -1, -1, 1, 1};
-    vec<SRC>	x = load<false>(a), y = load<false>(b);
+    const SRC	a[] = {0,  0, 0, 0,  0,  0, 0, 0};
+    const SRC	b[] = {1, -1, 1, 1, -1, -1, 1, 1};
+    const auto	x = load(a);
+    const auto	y = load(b);
 
     cvtup_mask_all<DST>(x < y);
-    empty();
-
     cout << endl;
+
+    empty();
 }
     
 }

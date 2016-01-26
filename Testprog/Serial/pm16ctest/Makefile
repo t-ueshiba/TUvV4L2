@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -39,10 +39,10 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/PM16C_04.h \
-		/usr/local/include/TU/Serial.h \
-		/usr/local/include/TU/fdstream.h \
-		/usr/local/include/TU/types.h
+EXTHDRS		= ../../../TU/PM16C_04.h \
+		../../../TU/Serial.h \
+		../../../TU/fdstream.h \
+		../../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -53,5 +53,5 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/PM16C_04.h /usr/local/include/TU/Serial.h \
-	/usr/local/include/TU/fdstream.h /usr/local/include/TU/types.h
+main.o: ../../../TU/PM16C_04.h ../../../TU/Serial.h ../../../TU/fdstream.h \
+	../../../TU/types.h
