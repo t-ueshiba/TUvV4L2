@@ -66,7 +66,6 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/x86/bit_shift.h \
 		../../../TU/simd/x86/cast.h \
 		../../../TU/simd/x86/cvt.h \
-		../../../TU/simd/x86/dup.h \
 		../../../TU/simd/x86/load_store.h \
 		../../../TU/simd/x86/shift.h \
 		../../../TU/simd/x86/type_traits.h \
@@ -98,8 +97,7 @@ main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/iterator.h \
 	../../../TU/simd/x86/shift.h ../../../TU/simd/arm/shift.h \
 	../../../TU/simd/bit_shift.h ../../../TU/simd/x86/bit_shift.h \
 	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/x86/cvt.h \
-	../../../TU/simd/x86/dup.h ../../../TU/simd/x86/unpack.h \
-	../../../TU/simd/arm/cvt.h ../../../TU/simd/cvtup_iterator.h \
-	../../../TU/simd/load_iterator.h ../../../TU/simd/load_store.h \
-	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h \
-	../../../TU/simd/store_iterator.h
+	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
+	../../../TU/simd/cvtup_iterator.h ../../../TU/simd/load_iterator.h \
+	../../../TU/simd/load_store.h ../../../TU/simd/x86/load_store.h \
+	../../../TU/simd/arm/load_store.h ../../../TU/simd/store_iterator.h

@@ -56,6 +56,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/arm/insert_extract.h \
 		/usr/local/include/TU/simd/arm/load_store.h \
 		/usr/local/include/TU/simd/arm/logical.h \
+		/usr/local/include/TU/simd/arm/lookup.h \
 		/usr/local/include/TU/simd/arm/select.h \
 		/usr/local/include/TU/simd/arm/shift.h \
 		/usr/local/include/TU/simd/arm/type_traits.h \
@@ -68,10 +69,12 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/cvt.h \
 		/usr/local/include/TU/simd/cvtdown_iterator.h \
 		/usr/local/include/TU/simd/cvtup_iterator.h \
+		/usr/local/include/TU/simd/dup.h \
 		/usr/local/include/TU/simd/insert_extract.h \
 		/usr/local/include/TU/simd/load_iterator.h \
 		/usr/local/include/TU/simd/load_store.h \
 		/usr/local/include/TU/simd/logical.h \
+		/usr/local/include/TU/simd/lookup.h \
 		/usr/local/include/TU/simd/misc.h \
 		/usr/local/include/TU/simd/row_vec_iterator.h \
 		/usr/local/include/TU/simd/select.h \
@@ -94,6 +97,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/x86/load_store.h \
 		/usr/local/include/TU/simd/x86/logical.h \
 		/usr/local/include/TU/simd/x86/logical_base.h \
+		/usr/local/include/TU/simd/x86/lookup.h \
 		/usr/local/include/TU/simd/x86/select.h \
 		/usr/local/include/TU/simd/x86/shift.h \
 		/usr/local/include/TU/simd/x86/shuffle.h \
@@ -279,9 +283,9 @@ App.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -300,6 +304,9 @@ App.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -343,9 +350,9 @@ Bitmap.o: TU/v/Bitmap.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -364,6 +371,9 @@ Bitmap.o: TU/v/Bitmap.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -406,9 +416,9 @@ ButtonCmd.o: ButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -427,6 +437,9 @@ ButtonCmd.o: ButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -470,9 +483,9 @@ CanvasPane.o: TU/v/CanvasPane.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -491,6 +504,9 @@ CanvasPane.o: TU/v/CanvasPane.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -533,9 +549,9 @@ CanvasPaneDC.o: TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -554,6 +570,9 @@ CanvasPaneDC.o: TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -600,9 +619,9 @@ CanvasPaneDC3.o: TU/v/CanvasPaneDC3.h TU/v/CanvasPaneDC.h TU/v/XDC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -621,6 +640,9 @@ CanvasPaneDC3.o: TU/v/CanvasPaneDC3.h TU/v/CanvasPaneDC.h TU/v/XDC.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -667,9 +689,9 @@ ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -688,6 +710,9 @@ ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -732,9 +757,9 @@ ChoiceMenuButtonCmd.o: ChoiceMenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -753,6 +778,9 @@ ChoiceMenuButtonCmd.o: ChoiceMenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -796,9 +824,9 @@ Cmd.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -817,6 +845,9 @@ Cmd.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -863,9 +894,9 @@ CmdPane.o: TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -884,6 +915,9 @@ CmdPane.o: TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -927,9 +961,9 @@ CmdParent.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -948,6 +982,9 @@ CmdParent.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -991,9 +1028,9 @@ CmdWindow.o: TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1012,6 +1049,9 @@ CmdWindow.o: TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1055,9 +1095,9 @@ Colormap.o: TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1076,6 +1116,9 @@ Colormap.o: TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1119,9 +1162,9 @@ Confirm.o: TU/v/Confirm.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1140,6 +1183,9 @@ Confirm.o: TU/v/Confirm.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1182,9 +1228,9 @@ DC.o: TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1203,6 +1249,9 @@ DC.o: TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1245,9 +1294,9 @@ DC3.o: TU/v/DC3.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1266,6 +1315,9 @@ DC3.o: TU/v/DC3.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1310,9 +1362,9 @@ Dialog.o: TU/v/Dialog.h TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1331,6 +1383,9 @@ Dialog.o: TU/v/Dialog.h TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1375,9 +1430,9 @@ FileSelection.o: TU/v/FileSelection.h TU/v/ModalDialog.h TU/v/Dialog.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1396,6 +1451,9 @@ FileSelection.o: TU/v/FileSelection.h TU/v/ModalDialog.h TU/v/Dialog.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1439,9 +1497,9 @@ FrameCmd.o: FrameCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1460,6 +1518,9 @@ FrameCmd.o: FrameCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1503,9 +1564,9 @@ Icon.o: TU/v/Icon.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1524,6 +1585,9 @@ Icon.o: TU/v/Icon.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1566,9 +1630,9 @@ LabelCmd.o: LabelCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1587,6 +1651,9 @@ LabelCmd.o: LabelCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1630,9 +1697,9 @@ ListCmd.o: ListCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1651,6 +1718,9 @@ ListCmd.o: ListCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1693,9 +1763,9 @@ MemoryDC.o: TU/v/MemoryDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1714,6 +1784,9 @@ MemoryDC.o: TU/v/MemoryDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1759,9 +1832,9 @@ Menu.o: TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1780,6 +1853,9 @@ Menu.o: TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1823,9 +1899,9 @@ MenuButtonCmd.o: MenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1844,6 +1920,9 @@ MenuButtonCmd.o: MenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1888,9 +1967,9 @@ ModalDialog.o: TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1909,6 +1988,9 @@ ModalDialog.o: TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -1953,9 +2035,9 @@ Notify.o: TU/v/Notify.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -1974,6 +2056,9 @@ Notify.o: TU/v/Notify.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2017,9 +2102,9 @@ Object.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2038,6 +2123,9 @@ Object.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2081,9 +2169,9 @@ Pane.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2102,6 +2190,9 @@ Pane.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2145,9 +2236,9 @@ RadioButtonCmd.o: TU/v/Bitmap.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2166,6 +2257,9 @@ RadioButtonCmd.o: TU/v/Bitmap.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2208,9 +2302,9 @@ ShmDC.o: TU/v/ShmDC.h TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2229,6 +2323,9 @@ ShmDC.o: TU/v/ShmDC.h TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2274,9 +2371,9 @@ SliderCmd.o: SliderCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2295,6 +2392,9 @@ SliderCmd.o: SliderCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2338,9 +2438,9 @@ TUv++.inst.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2359,6 +2459,9 @@ TUv++.inst.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2402,9 +2505,9 @@ TextInCmd.o: TextInCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2423,6 +2526,9 @@ TextInCmd.o: TextInCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2466,9 +2572,9 @@ Timer.o: TU/v/Timer.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2487,6 +2593,9 @@ Timer.o: TU/v/Timer.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2530,9 +2639,9 @@ ToggleButtonCmd.o: ToggleButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2551,6 +2660,9 @@ ToggleButtonCmd.o: ToggleButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2594,9 +2706,9 @@ Widget-Xaw.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2615,6 +2727,9 @@ Widget-Xaw.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2658,9 +2773,9 @@ Window.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2679,6 +2794,9 @@ Window.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \
@@ -2721,9 +2839,9 @@ XDC.o: TU/v/XDC.h TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
-	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
+	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -2742,6 +2860,9 @@ XDC.o: TU/v/XDC.h TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/x86/shuffle.h \
 	/usr/local/include/TU/simd/x86/svml.h \
 	/usr/local/include/TU/simd/transform.h \
+	/usr/local/include/TU/simd/lookup.h \
+	/usr/local/include/TU/simd/x86/lookup.h \
+	/usr/local/include/TU/simd/arm/lookup.h \
 	/usr/local/include/TU/simd/load_iterator.h \
 	/usr/local/include/TU/simd/store_iterator.h \
 	/usr/local/include/TU/simd/cvtdown_iterator.h \

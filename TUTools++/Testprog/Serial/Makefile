@@ -1,6 +1,7 @@
-SUBDIR	= cvt_iterator_test		\
-	  cvt_mask_iterator_test	\
-	  cvt_mask_test
+SUBDIR	= pm16ctest	\
+	  serialtest	\
+	  shot602test	\
+	  triggertest
 
 TARGETS	= all clean depend
 

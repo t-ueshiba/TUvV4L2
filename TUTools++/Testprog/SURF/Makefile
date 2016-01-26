@@ -84,6 +84,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/cvt.h \
 		../../TU/simd/cvtdown_iterator.h \
 		../../TU/simd/cvtup_iterator.h \
+		../../TU/simd/dup.h \
 		../../TU/simd/insert_extract.h \
 		../../TU/simd/load_iterator.h \
 		../../TU/simd/load_store.h \
@@ -106,6 +107,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/cast.h \
 		../../TU/simd/x86/compare.h \
 		../../TU/simd/x86/cvt.h \
+		../../TU/simd/x86/dup.h \
 		../../TU/simd/x86/insert_extract.h \
 		../../TU/simd/x86/load_store.h \
 		../../TU/simd/x86/logical.h \
@@ -152,24 +154,24 @@ MatchImage.o: MatchImage.h ../../TU/Image++.h ../../TU/types.h \
 	../../TU/simd/arm/insert_extract.h ../../TU/simd/shift.h \
 	../../TU/simd/x86/shift.h ../../TU/simd/arm/shift.h \
 	../../TU/simd/bit_shift.h ../../TU/simd/x86/bit_shift.h \
-	../../TU/simd/arm/bit_shift.h ../../TU/simd/cvt.h \
-	../../TU/simd/x86/cvt.h ../../TU/simd/x86/unpack.h \
-	../../TU/simd/arm/cvt.h ../../TU/simd/logical.h \
-	../../TU/simd/x86/logical.h ../../TU/simd/x86/logical_base.h \
-	../../TU/simd/arm/logical.h ../../TU/simd/compare.h \
-	../../TU/simd/x86/compare.h ../../TU/simd/arm/compare.h \
-	../../TU/simd/select.h ../../TU/simd/x86/select.h \
-	../../TU/simd/arm/select.h ../../TU/simd/arithmetic.h \
-	../../TU/simd/x86/arithmetic.h ../../TU/simd/arm/arithmetic.h \
-	../../TU/simd/misc.h ../../TU/simd/x86/shuffle.h \
-	../../TU/simd/x86/svml.h ../../TU/simd/transform.h \
-	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
-	../../TU/simd/arm/lookup.h ../../TU/simd/load_iterator.h \
-	../../TU/simd/store_iterator.h ../../TU/simd/cvtdown_iterator.h \
-	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
-	../../TU/simd/row_vec_iterator.h ../../TU/Minimize.h \
-	../../TU/FeatureMatch.h ../../TU/Random.h ../../TU/Ransac.h \
-	../../TU/Manip.h
+	../../TU/simd/arm/bit_shift.h ../../TU/simd/dup.h \
+	../../TU/simd/x86/dup.h ../../TU/simd/x86/unpack.h \
+	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
+	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
+	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
+	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
+	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
+	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
+	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
+	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
+	../../TU/simd/transform.h ../../TU/simd/lookup.h \
+	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
+	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
+	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
+	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
+	../../TU/Minimize.h ../../TU/FeatureMatch.h ../../TU/Random.h \
+	../../TU/Ransac.h ../../TU/Manip.h
 main.o: ../../TU/SURFCreator.h ../../TU/Feature.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
@@ -188,8 +190,9 @@ main.o: ../../TU/SURFCreator.h ../../TU/Feature.h ../../TU/Geometry++.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \

@@ -301,5 +301,4 @@ copy(const fast_zip_iterator<ITER_TUPLE>& ib,
     
 }	// namespace simd
 }	// namespace TU
-
 #endif	// !__TU_SIMD_TRANSFORM_H
