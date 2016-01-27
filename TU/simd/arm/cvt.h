@@ -28,10 +28,10 @@ namespace detail
   SIMD_COMBINE_SPLIT(int16_t)
   SIMD_COMBINE_SPLIT(int32_t)
   SIMD_COMBINE_SPLIT(int64_t)
-  SIMD_COMBINE_SPLIT(u_int8_t)
-  SIMD_COMBINE_SPLIT(u_int16_t)
-  SIMD_COMBINE_SPLIT(u_int32_t)
-  SIMD_COMBINE_SPLIT(u_int64_t)
+  SIMD_COMBINE_SPLIT(uint8_t)
+  SIMD_COMBINE_SPLIT(uint16_t)
+  SIMD_COMBINE_SPLIT(uint32_t)
+  SIMD_COMBINE_SPLIT(uint64_t)
   SIMD_COMBINE_SPLIT(float)
 
 #undef SIMD_COMBINE_SPLIT
@@ -46,15 +46,15 @@ namespace detail
   SIMD_CVTUP(int8_t)
   SIMD_CVTUP(int16_t)
   SIMD_CVTUP(int32_t)
-  SIMD_CVTUP(u_int8_t)
-  SIMD_CVTUP(u_int16_t)
-  SIMD_CVTUP(u_int32_t)
+  SIMD_CVTUP(uint8_t)
+  SIMD_CVTUP(uint16_t)
+  SIMD_CVTUP(uint32_t)
   SIMD_CVTDOWN(int16_t)
   SIMD_CVTDOWN(int32_t)
   SIMD_CVTDOWN(int64_t)
-  SIMD_CVTDOWN(u_int16_t)
-  SIMD_CVTDOWN(u_int32_t)
-  SIMD_CVTDOWN(u_int64_t)
+  SIMD_CVTDOWN(uint16_t)
+  SIMD_CVTDOWN(uint32_t)
+  SIMD_CVTDOWN(uint64_t)
 
 #undef SIMD_CVTUP
 #undef SIMD_CVTDOWN
@@ -91,22 +91,22 @@ cvt(vec<S> x, vec<S> y)
 	return x;							\
     }
     
-SIMD_CVTEQ(int8_t)		// int8_t    -> int8_t
-SIMD_CVTEQ(int16_t)		// int16_t   -> int16_t
-SIMD_CVTEQ(int32_t)		// int32_t   -> int32_t
-SIMD_CVTEQ(int64_t)		// int64_t   -> int64_t
-SIMD_CVTEQ(u_int8_t)		// u_int8_t  -> u_int8_t
-SIMD_CVTEQ(u_int16_t)		// u_int16_t -> u_int16_t
-SIMD_CVTEQ(u_int32_t)		// u_int32_t -> u_int32_t
-SIMD_CVTEQ(u_int64_t)		// u_int64_t -> u_int64_t
-SIMD_CVTEQ(float)		// float     -> float
+SIMD_CVTEQ(int8_t)		// int8_t   -> int8_t
+SIMD_CVTEQ(int16_t)		// int16_t  -> int16_t
+SIMD_CVTEQ(int32_t)		// int32_t  -> int32_t
+SIMD_CVTEQ(int64_t)		// int64_t  -> int64_t
+SIMD_CVTEQ(uint8_t)		// uint8_t  -> uint8_t
+SIMD_CVTEQ(uint16_t)		// uint16_t -> uint16_t
+SIMD_CVTEQ(uint32_t)		// uint32_t -> uint32_t
+SIMD_CVTEQ(uint64_t)		// uint64_t -> uint64_t
+SIMD_CVTEQ(float)		// float    -> float
 
 #define SIMD_CVTF(from, to)						\
     SIMD_SPECIALIZED_FUNC(vec<to> cvt<to>(vec<from> x), cvtq, (x), to, from)
 
-SIMD_CVTF(int32_t,   float)	// int32_t   -> float
-SIMD_CVTF(float,     int32_t)	// float     -> int32_t
-SIMD_CVTF(u_int32_t, float)	// u_int32_t -> float
+SIMD_CVTF(int32_t,   float)	// int32_t  -> float
+SIMD_CVTF(float,     int32_t)	// float    -> int32_t
+SIMD_CVTF(uint32_t, float)	// uint32_t -> float
 
 #define SIMD_CVT_MASK(from, to)						\
     template <> inline vec<to>						\
@@ -115,8 +115,8 @@ SIMD_CVTF(u_int32_t, float)	// u_int32_t -> float
 	return cast<to>(x);						\
     }
 
-SIMD_CVT_MASK(u_int32_t, float)	// u_intew_t -> float
-SIMD_CVT_MASK(float, u_int32_t)	// float     -> u_int32_t
+SIMD_CVT_MASK(uint32_t, float)	// uint32_t -> float
+SIMD_CVT_MASK(float, uint32_t)	// float    -> uint32_t
 
 #undef SIMD_CVTEQ
 #undef SIMD_CVTF

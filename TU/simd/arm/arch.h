@@ -13,10 +13,10 @@
 #define SIMD_SUFFIX_int16_t	_s16
 #define SIMD_SUFFIX_int32_t	_s32
 #define SIMD_SUFFIX_int64_t	_s64
-#define SIMD_SUFFIX_u_int8_t	_u8
-#define SIMD_SUFFIX_u_int16_t	_u16
-#define SIMD_SUFFIX_u_int32_t	_u32
-#define SIMD_SUFFIX_u_int64_t	_u64
+#define SIMD_SUFFIX_uint8_t	_u8
+#define SIMD_SUFFIX_uint16_t	_u16
+#define SIMD_SUFFIX_uint32_t	_u32
+#define SIMD_SUFFIX_uint64_t	_u64
 #define SIMD_SUFFIX_float	_f32
 #define SIMD_SUFFIX_void
 

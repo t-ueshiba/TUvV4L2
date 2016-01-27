@@ -23,11 +23,11 @@ namespace simd
     SIMD_COMPARE_R(operator <,  cmpgt, type)
 
 // 符号なし数に対しては等値性チェックしかできない！
-SIMD_COMPARE(operator ==, cmpeq, u_int8_t)
-SIMD_COMPARE(operator ==, cmpeq, u_int16_t)
-SIMD_COMPARE(operator ==, cmpeq, u_int32_t)
+SIMD_COMPARE(operator ==, cmpeq, uint8_t)
+SIMD_COMPARE(operator ==, cmpeq, uint16_t)
+SIMD_COMPARE(operator ==, cmpeq, uint32_t)
 #if defined(SSE4)
-  SIMD_COMPARE(operator ==, cmpeq, u_int64_t)
+  SIMD_COMPARE(operator ==, cmpeq, uint64_t)
 #endif
 
 SIMD_COMPARES(int8_t)

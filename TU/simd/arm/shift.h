@@ -17,10 +17,10 @@ SIMD_SHIFT_R(int8_t)
 SIMD_SHIFT_R(int16_t)
 SIMD_SHIFT_R(int32_t)
 SIMD_SHIFT_R(int64_t)
-SIMD_SHIFT_R(u_int8_t)
-SIMD_SHIFT_R(u_int16_t)
-SIMD_SHIFT_R(u_int32_t)
-SIMD_SHIFT_R(u_int64_t)
+SIMD_SHIFT_R(uint8_t)
+SIMD_SHIFT_R(uint16_t)
+SIMD_SHIFT_R(uint32_t)
+SIMD_SHIFT_R(uint64_t)
 
 #undef SIMD_SHIFT_R
     

@@ -66,12 +66,12 @@ shuffle(vec<T> x)							;
 
 #if defined(SSE2)
   SIMD_SHUFFLE_I4(int32_t)
-  SIMD_SHUFFLE_I4(u_int32_t)
+  SIMD_SHUFFLE_I4(uint32_t)
   SIMD_SHUFFLE_LOW_HIGH_I4(int16_t)
-  SIMD_SHUFFLE_LOW_HIGH_I4(u_int16_t)
+  SIMD_SHUFFLE_LOW_HIGH_I4(uint16_t)
 #elif defined(SSE)
   SIMD_SHUFFLE_I4(int16_t)
-  SIMD_SHUFFLE_I4(u_int16_t)
+  SIMD_SHUFFLE_I4(uint16_t)
 #endif
   
 #undef SIMD_SHUFFLE_LOW_HIGH_I4

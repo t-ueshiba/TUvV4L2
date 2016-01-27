@@ -120,7 +120,7 @@ operator <<(std::ostream& out, const vec<T>& x)
 {
     typedef typename std::conditional<
 	(std::is_same<T, int8_t  >::value ||
-	 std::is_same<T, u_int8_t>::value), int32_t, T>::type	element_type;
+	 std::is_same<T, uint8_t>::value), int32_t, T>::type	element_type;
 
     for (size_t i = 0; i < vec<T>::size; ++i)
 	out << ' ' << element_type(x[i]);
@@ -132,10 +132,10 @@ typedef vec<int8_t>	Is8vec;		//!< 符号付き8bit整数ベクトル
 typedef vec<int16_t>	Is16vec;	//!< 符号付き16bit整数ベクトル
 typedef vec<int32_t>	Is32vec;	//!< 符号付き32bit整数ベクトル
 typedef vec<int64_t>	Is64vec;	//!< 符号付き64bit整数ベクトル
-typedef vec<u_int8_t>	Iu8vec;		//!< 符号なし8bit整数ベクトル
-typedef vec<u_int16_t>	Iu16vec;	//!< 符号なし16bit整数ベクトル
-typedef vec<u_int32_t>	Iu32vec;	//!< 符号なし32bit整数ベクトル
-typedef vec<u_int64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
+typedef vec<uint8_t>	Iu8vec;		//!< 符号なし8bit整数ベクトル
+typedef vec<uint16_t>	Iu16vec;	//!< 符号なし16bit整数ベクトル
+typedef vec<uint32_t>	Iu32vec;	//!< 符号なし32bit整数ベクトル
+typedef vec<uint64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
 
 /************************************************************************
 *  Predicates for template meta-programming				*

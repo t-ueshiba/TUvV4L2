@@ -53,38 +53,38 @@ cvt(vec<S> x)
 	  return cvt<to, false>(shift_r<vec<from>::size/2>(x));		\
       }
 #  endif
-  SIMD_CVTUP0(int8_t,	 int16_t)	// s_char -> short
-  SIMD_CVTUP1(int8_t,	 int16_t)	// s_char -> short
-  SIMD_CVTUP0(int8_t,	 int32_t)	// s_char -> int
-  SIMD_CVTUP0(int8_t,	 int64_t)	// s_char -> long
+  SIMD_CVTUP0(int8_t,	int16_t)	// s_char -> short
+  SIMD_CVTUP1(int8_t,	int16_t)	// s_char -> short
+  SIMD_CVTUP0(int8_t,	int32_t)	// s_char -> int
+  SIMD_CVTUP0(int8_t,	int64_t)	// s_char -> long
   
-  SIMD_CVTUP0(int16_t,	 int32_t)	// short  -> int
-  SIMD_CVTUP1(int16_t,	 int32_t)	// short  -> int
-  SIMD_CVTUP0(int16_t,	 int64_t)	// short  -> long
+  SIMD_CVTUP0(int16_t,	int32_t)	// short  -> int
+  SIMD_CVTUP1(int16_t,	int32_t)	// short  -> int
+  SIMD_CVTUP0(int16_t,	int64_t)	// short  -> long
   
-  SIMD_CVTUP0(int32_t,	 int64_t)	// int    -> long
-  SIMD_CVTUP1(int32_t,	 int64_t)	// int    -> long
+  SIMD_CVTUP0(int32_t,	int64_t)	// int    -> long
+  SIMD_CVTUP1(int32_t,	int64_t)	// int    -> long
 
-  SIMD_CVTUP0(u_int8_t,	 int16_t)	// u_char -> short
-  SIMD_CVTUP1(u_int8_t,	 int16_t)	// u_char -> short
-  SIMD_CVTUP0(u_int8_t,	 u_int16_t)	// u_char -> u_short
-  SIMD_CVTUP1(u_int8_t,	 u_int16_t)	// u_char -> u_short
-  SIMD_CVTUP0(u_int8_t,	 int32_t)	// u_char -> int
-  SIMD_CVTUP0(u_int8_t,	 u_int32_t)	// u_char -> u_int
-  SIMD_CVTUP0(u_int8_t,	 int64_t)	// u_char -> long
-  SIMD_CVTUP0(u_int8_t,	 u_int64_t)	// u_char -> u_long
+  SIMD_CVTUP0(uint8_t,	int16_t)	// u_char -> short
+  SIMD_CVTUP1(uint8_t,	int16_t)	// u_char -> short
+  SIMD_CVTUP0(uint8_t,	uint16_t)	// u_char -> u_short
+  SIMD_CVTUP1(uint8_t,	uint16_t)	// u_char -> u_short
+  SIMD_CVTUP0(uint8_t,	int32_t)	// u_char -> int
+  SIMD_CVTUP0(uint8_t,	uint32_t)	// u_char -> u_int
+  SIMD_CVTUP0(uint8_t,	int64_t)	// u_char -> long
+  SIMD_CVTUP0(uint8_t,	uint64_t)	// u_char -> u_long
   
-  SIMD_CVTUP0(u_int16_t, int32_t)	// u_short -> int
-  SIMD_CVTUP1(u_int16_t, int32_t)	// u_short -> int
-  SIMD_CVTUP0(u_int16_t, u_int32_t)	// u_short -> u_int
-  SIMD_CVTUP1(u_int16_t, u_int32_t)	// u_short -> u_int
-  SIMD_CVTUP0(u_int16_t, int64_t)	// u_short -> long
-  SIMD_CVTUP0(u_int16_t, u_int64_t)	// u_short -> u_long
+  SIMD_CVTUP0(uint16_t, int32_t)	// u_short -> int
+  SIMD_CVTUP1(uint16_t, int32_t)	// u_short -> int
+  SIMD_CVTUP0(uint16_t, uint32_t)	// u_short -> u_int
+  SIMD_CVTUP1(uint16_t, uint32_t)	// u_short -> u_int
+  SIMD_CVTUP0(uint16_t, int64_t)	// u_short -> long
+  SIMD_CVTUP0(uint16_t, uint64_t)	// u_short -> u_long
   
-  SIMD_CVTUP0(u_int32_t, int64_t)	// u_int -> long
-  SIMD_CVTUP1(u_int32_t, int64_t)	// u_int -> long
-  SIMD_CVTUP0(u_int32_t, u_int64_t)	// u_int -> u_long
-  SIMD_CVTUP1(u_int32_t, u_int64_t)	// u_int -> u_long
+  SIMD_CVTUP0(uint32_t, int64_t)	// u_int -> long
+  SIMD_CVTUP1(uint32_t, int64_t)	// u_int -> long
+  SIMD_CVTUP0(uint32_t, uint64_t)	// u_int -> u_long
+  SIMD_CVTUP1(uint32_t, uint64_t)	// u_int -> u_long
 
 #  undef SIMD_CVTUP0
 #  undef SIMF_CVTUP1
@@ -118,12 +118,12 @@ cvt(vec<S> x)
   SIMD_CVTUP_I(int16_t,    int32_t)	// short   -> int
   // epi64の算術右シフトが未サポートなので int -> long は実装できない
 
-  SIMD_CVTUP_UI(u_int8_t,  int16_t)	// u_char  -> short
-  SIMD_CVTUP_UI(u_int8_t,  u_int16_t)	// u_char  -> u_short
-  SIMD_CVTUP_UI(u_int16_t, int32_t)	// u_short -> int
-  SIMD_CVTUP_UI(u_int16_t, u_int32_t)	// u_short -> u_int
-  SIMD_CVTUP_UI(u_int32_t, int64_t)	// u_int   -> long
-  SIMD_CVTUP_UI(u_int32_t, u_int64_t)	// u_int   -> u_long
+  SIMD_CVTUP_UI(uint8_t,  int16_t)	// u_char  -> short
+  SIMD_CVTUP_UI(uint8_t,  uint16_t)	// u_char  -> u_short
+  SIMD_CVTUP_UI(uint16_t, int32_t)	// u_short -> int
+  SIMD_CVTUP_UI(uint16_t, uint32_t)	// u_short -> u_int
+  SIMD_CVTUP_UI(uint32_t, int64_t)	// u_int   -> long
+  SIMD_CVTUP_UI(uint32_t, uint64_t)	// u_int   -> u_long
 
 #  undef SIMD_CVTUP_I
 #  undef SIMD_CVTUP_UI
@@ -159,9 +159,9 @@ cvt(vec<S> x)
 
 SIMD_CVTDOWN_I(int16_t,  int8_t)	// short -> s_char
 SIMD_CVTDOWN_I(int32_t,  int16_t)	// int   -> short
-SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
+SIMD_CVTDOWN_UI(int16_t, uint8_t)	// short -> u_char
 #if defined(SSE4)
-  SIMD_CVTDOWN_UI(int32_t, u_int16_t)	// int   -> u_short
+  SIMD_CVTDOWN_UI(int32_t, uint16_t)	// int   -> u_short
 #endif
 
 #undef SIMD_CVTDOWN_I
@@ -314,10 +314,10 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
     SIMD_CVTI_F(itype, suffix)						\
     SIMD_CVTF_I(itype, suffix)
 
-  SIMD_CVT_2FI(int8_t,   pi8)		// s_char <-> float
-  SIMD_CVT_2FI(int16_t,  pi16)		// short  <-> float
-  SIMD_CVTI_F(u_int8_t,  pu8)		// u_char  -> float
-  SIMD_CVTI_F(u_int16_t, pu16)		// u_short -> float
+  SIMD_CVT_2FI(int8_t,  pi8)		// s_char <-> float
+  SIMD_CVT_2FI(int16_t, pi16)		// short  <-> float
+  SIMD_CVTI_F(uint8_t,  pu8)		// u_char  -> float
+  SIMD_CVTI_F(uint16_t, pu16)		// u_short -> float
 
 #  undef SIMD_CVTI_F
 #  undef SIMD_CVTF_I
@@ -343,7 +343,7 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
   }
 
   SIMD_CVT_2(int16_t, float)		// short  <-> float
-  SIMD_CVT(u_int16_t, float)		// u_short -> float
+  SIMD_CVT(uint16_t,  float)		// u_short -> float
 #endif
   
 // [3] 浮動小数点数ベクトル間の変換
@@ -441,9 +441,9 @@ SIMD_CVTDOWN_UI(int16_t, u_int8_t)	// short -> u_char
     SIMD_CVTUP_MASK(type0, type1)					\
     SIMD_CVTDOWN_MASK(type1, type0)
 
-SIMD_CVT_MASK(u_int8_t,	   u_int16_t)	// u_char  <-> u_short
-SIMD_CVT_MASK(u_int16_t,   u_int32_t)	// u_short <-> u_int
-SIMD_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
+SIMD_CVT_MASK(uint8_t,	  uint16_t)	// u_char  <-> u_short
+SIMD_CVT_MASK(uint16_t,   uint32_t)	// u_short <-> u_int
+SIMD_CVTUP_MASK(uint32_t, uint64_t)	// u_int    -> u_long
 
 #undef SIMD_CVTUP_MASK
 #undef SIMD_CVTDOWN_MASK
@@ -458,8 +458,8 @@ SIMD_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
       template <> inline vec<itype>					\
       cvt<itype, false, true>(vec<ftype> x) {return cast<itype>(x);}
 
-    SIMD_CVT_MASK_2FI(u_int32_t, float)		// u_int  <-> float
-    SIMD_CVT_MASK_2FI(u_int64_t, double)	// u_long <-> double
+    SIMD_CVT_MASK_2FI(uint32_t, float)		// u_int  <-> float
+    SIMD_CVT_MASK_2FI(uint64_t, double)		// u_long <-> double
 
 #    undef SIMD_CVT_MASK_2FI
 #  else	// AVX && !AVX2
@@ -492,9 +492,9 @@ SIMD_CVTUP_MASK(u_int32_t, u_int64_t)	// u_int    -> u_long
 			     _mm256_castps_si256(x), 0x1)));		\
       }
 
-    SIMD_CVT_MASK_IF(u_int16_t, float)		// u_short -> float
-    SIMD_CVT_MASK_FI(u_int16_t)			// float   -> u_short
-    SIMD_CVT_MASK_IF(u_int32_t, double)		// u_int   -> double
+    SIMD_CVT_MASK_IF(uint16_t, float)		// u_short -> float
+    SIMD_CVT_MASK_FI(uint16_t)			// float   -> u_short
+    SIMD_CVT_MASK_IF(uint32_t, double)		// u_int   -> double
 
 #    undef SIMD_CVT_MASK_IF
 #    undef SIMD_CVT_MASK_FI

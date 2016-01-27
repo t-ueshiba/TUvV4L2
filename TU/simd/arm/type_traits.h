@@ -52,7 +52,7 @@ struct type_traits<int64_t> : type_traits_base<int64_t>
 };
     
 template <>
-struct type_traits<u_int8_t> : type_traits_base<u_int8_t>
+struct type_traits<uint8_t> : type_traits_base<uint8_t>
 {
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
@@ -61,7 +61,7 @@ struct type_traits<u_int8_t> : type_traits_base<u_int8_t>
 };
     
 template <>
-struct type_traits<u_int16_t> : type_traits_base<u_int16_t>
+struct type_traits<uint16_t> : type_traits_base<uint16_t>
 {
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
@@ -70,7 +70,7 @@ struct type_traits<u_int16_t> : type_traits_base<u_int16_t>
 };
     
 template <>
-struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
+struct type_traits<uint32_t> : type_traits_base<uint32_t>
 {
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
@@ -79,7 +79,7 @@ struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
 };
     
 template <>
-struct type_traits<u_int64_t> : type_traits_base<u_int64_t>
+struct type_traits<uint64_t> : type_traits_base<uint64_t>
 {
     typedef float		complementary_type;
     typedef complementary_type	complementary_mask_type;
@@ -90,7 +90,7 @@ struct type_traits<u_int64_t> : type_traits_base<u_int64_t>
 template <>
 struct type_traits<float> : type_traits_base<float>
 {
-    typedef u_int32_t		mask_type;
+    typedef uint32_t		mask_type;
     typedef int32_t		complementary_type;
     typedef mask_type		complementary_mask_type;
     typedef float32x2_t		half_type;
