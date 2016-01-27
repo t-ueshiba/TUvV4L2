@@ -68,7 +68,8 @@ unpack(vec<T> x, vec<T> y)
 {
     return detail::unpack<HI>(x, y);
 }
-    
+
+#if defined(AVX)
 template <bool HI, class T>
 inline typename std::enable_if<(sizeof(vec<T>) >= 32), base_type<T> >::type
 unpack(vec<T> x, vec<T> y)
@@ -76,7 +77,7 @@ unpack(vec<T> x, vec<T> y)
     return detail::permute<(HI ? 0x31 : 0x20)>(detail::unpack<false>(x, y),
 					       detail::unpack<true >(x, y));
 }
-    
+#endif    
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_X86_UNPACK_H
