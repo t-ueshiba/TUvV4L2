@@ -27,6 +27,24 @@ template <class T> vec<T>	rcp(vec<T> x)				;
 template <class T> vec<T>	sqrt(vec<T> x)				;
 template <class T> vec<T>	rsqrt(vec<T> x)				;
 
+template <class T> inline vec<T>
+operator *(T c, vec<T> x)
+{
+    return vec<T>(c) * x;
+}
+
+template <class T> inline vec<T>
+operator *(vec<T> x, T c)
+{
+    return x * vec<T>(c);
+}
+
+template <class T> inline vec<T>
+operator /(vec<T> x, T c)
+{
+    return x / vec<T>(c);
+}
+
 /************************************************************************
 *  Average values							*
 ************************************************************************/
