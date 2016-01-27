@@ -4,7 +4,6 @@
 #if !defined(__TU_SIMD_LOAD_STORE_H)
 #define __TU_SIMD_LOAD_STORE_H
 
-#include "TU/iterator.h"
 #include "TU/simd/vec.h"
 
 namespace TU
