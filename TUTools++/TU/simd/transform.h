@@ -28,16 +28,25 @@ namespace detail
   {
     public:
       using head_iterator = tuple_head<ITER_TUPLE>;
-      using result_type =
-		typename std::conditional<
-		    std::is_void<
-		        typename std::iterator_traits<OUT>::value_type>::value,
-		    vec<T>,
-		    typename std::iterator_traits<OUT>::value_type>::type;
       
     private:
+      template <class T_, class=void>
+      struct vec_element
+      {
+	  using type = typename T_::element_type;
+      };
+      template <class DUMMY_>
+      struct vec_element<void, DUMMY_>
+      {
+	  using type = void;
+      };
+      
+      using E = typename vec_element<
+		    tuple_head<
+			typename std::iterator_traits<OUT>::value_type> >::type;
+      
     //! 出力反復子に書き出すSIMDベクトルの要素型
-      using R = typename tuple_head<result_type>::element_type;
+      using R = typename std::conditional<std::is_void<E>::value, T, E>::type;
     //! 変換関数に入力するSIMDベクトルの要素型
       using U = typename std::conditional<std::is_void<T>::value, R, T>::type;
     //! vec<S> を vec<R> に変換する過程において vec<S> の直後の変換先の要素型
