@@ -21,7 +21,7 @@ struct type_traits_base<int8_t>
     typedef int8_t		signed_type;
     typedef void		lower_type;
     typedef int16_t		upper_type;
-    typedef u_int8_t		mask_type;
+    typedef uint8_t		mask_type;
 };
     
 template <>
@@ -30,7 +30,7 @@ struct type_traits_base<int16_t>
     typedef int16_t		signed_type;
     typedef int8_t		lower_type;
     typedef int32_t		upper_type;
-    typedef u_int16_t		mask_type;
+    typedef uint16_t		mask_type;
 };
     
 template <>
@@ -39,7 +39,7 @@ struct type_traits_base<int32_t>
     typedef int32_t		signed_type;
     typedef int16_t		lower_type;
     typedef int64_t		upper_type;
-    typedef u_int32_t		mask_type;
+    typedef uint32_t		mask_type;
 };
     
 template <>
@@ -48,43 +48,43 @@ struct type_traits_base<int64_t>
     typedef int64_t		signed_type;
     typedef int32_t		lower_type;
     typedef void		upper_type;
-    typedef u_int64_t		mask_type;
+    typedef uint64_t		mask_type;
 };
     
 template <>
-struct type_traits_base<u_int8_t>
+struct type_traits_base<uint8_t>
 {
     typedef int8_t		signed_type;
     typedef void		lower_type;
-    typedef u_int16_t		upper_type;
-    typedef u_int8_t		mask_type;
+    typedef uint16_t		upper_type;
+    typedef uint8_t		mask_type;
 };
     
 template <>
-struct type_traits_base<u_int16_t>
+struct type_traits_base<uint16_t>
 {
     typedef int16_t		signed_type;
-    typedef u_int8_t		lower_type;
-    typedef u_int32_t		upper_type;
-    typedef u_int16_t		mask_type;
+    typedef uint8_t		lower_type;
+    typedef uint32_t		upper_type;
+    typedef uint16_t		mask_type;
 };
     
 template <>
-struct type_traits_base<u_int32_t>
+struct type_traits_base<uint32_t>
 {
     typedef int32_t		signed_type;
-    typedef u_int16_t		lower_type;
-    typedef u_int64_t		upper_type;
-    typedef u_int32_t		mask_type;
+    typedef uint16_t		lower_type;
+    typedef uint64_t		upper_type;
+    typedef uint32_t		mask_type;
 };
     
 template <>
-struct type_traits_base<u_int64_t>
+struct type_traits_base<uint64_t>
 {
     typedef int64_t		signed_type;
-    typedef u_int32_t		lower_type;
+    typedef uint32_t		lower_type;
     typedef void		upper_type;
-    typedef u_int64_t		mask_type;
+    typedef uint64_t		mask_type;
 };
 
 template <>

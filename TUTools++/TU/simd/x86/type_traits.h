@@ -70,7 +70,7 @@ struct type_traits<int32_t> : type_traits_base<int32_t>
 };
 
 template <>
-struct type_traits<u_int16_t> : type_traits_base<u_int16_t>
+struct type_traits<uint16_t> : type_traits_base<uint16_t>
 {
     typedef typename std::conditional<
 	(sizeof(fvec_t) == sizeof(ivec_t)),	// fvec_t と ivec_tが同サイズ
@@ -80,7 +80,7 @@ struct type_traits<u_int16_t> : type_traits_base<u_int16_t>
 };
     
 template <>
-struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
+struct type_traits<uint32_t> : type_traits_base<uint32_t>
 {
     typedef void		complementary_type;
     typedef typename std::conditional<
@@ -90,7 +90,7 @@ struct type_traits<u_int32_t> : type_traits_base<u_int32_t>
 };
     
 template <>
-struct type_traits<u_int64_t> : type_traits_base<u_int64_t>
+struct type_traits<uint64_t> : type_traits_base<uint64_t>
 {
     typedef void		complementary_type;
     typedef typename std::conditional<
@@ -109,8 +109,8 @@ struct type_traits<float> : type_traits_base<float>
 	int16_t>::type		complementary_type;
     typedef typename std::conditional<
 	sizeof(ivec_t) == sizeof(fvec_t),
-	u_int32_t,
-	u_int16_t>::type	complementary_mask_type;
+	uint32_t,
+	uint16_t>::type		complementary_mask_type;
     typedef fvec_t		base_type;
 };
 
@@ -121,8 +121,8 @@ struct type_traits<double> : type_traits_base<double>
     typedef int32_t		complementary_type;
     typedef typename std::conditional<
 	sizeof(ivec_t) == sizeof(dvec_t),
-	u_int64_t,
-	u_int32_t>::type	complementary_mask_type;
+	uint64_t,
+	int32_t>::type		complementary_mask_type;
     typedef dvec_t		base_type;
 };
     

@@ -20,9 +20,7 @@ ifeq ($(shell arch),armv7l)
   CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DAVX2
-endif
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS       += -xCORE-AVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -70,6 +68,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/arm/cast.h \
 		../../TU/simd/arm/compare.h \
 		../../TU/simd/arm/cvt.h \
+		../../TU/simd/arm/dup.h \
 		../../TU/simd/arm/insert_extract.h \
 		../../TU/simd/arm/load_store.h \
 		../../TU/simd/arm/logical.h \
@@ -157,8 +156,8 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
 	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
 	../../TU/simd/dup.h ../../TU/simd/x86/dup.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/cvt.h \
-	../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
+	../../TU/simd/x86/unpack.h ../../TU/simd/arm/dup.h \
+	../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h ../../TU/simd/arm/cvt.h \
 	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
 	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
 	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \

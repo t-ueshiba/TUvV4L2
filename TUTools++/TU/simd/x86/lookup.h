@@ -21,11 +21,11 @@ namespace simd
 			   idx, sizeof(to)), void, to, SIMD_SIGNED)
 
   SIMD_LOOKUP32(int32_t)
-  SIMD_LOOKUP32(u_int32_t)
+  SIMD_LOOKUP32(uint32_t)
   SIMD_LOOKUP32(float)
 
-  SIMD_LOOKUP64(int64_t)
-  SIMD_LOOKUP64(u_int64_t)
+//SIMD_LOOKUP64(int64_t)
+//SIMD_LOOKUP64(uint64_t)
   SIMD_LOOKUP64(double)
 
 #  undef SIMD_LOOKUP32

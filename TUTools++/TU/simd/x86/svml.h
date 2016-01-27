@@ -100,23 +100,23 @@ template <class T> vec<T>	atanh(vec<T> x)				;
   // 整数除算
   SIMD_BINARY_FUNC(operator /, div, int8_t)
   SIMD_BINARY_FUNC(operator /, div, int16_t)
-  SIMD_BINARY_FUNC(operator /, div, u_int8_t)
-  SIMD_BINARY_FUNC(operator /, div, u_int16_t)
+  SIMD_BINARY_FUNC(operator /, div, uint8_t)
+  SIMD_BINARY_FUNC(operator /, div, uint16_t)
 
   // 剰余
   SIMD_BINARY_FUNC(operator %, rem, int8_t)
   SIMD_BINARY_FUNC(operator %, rem, int16_t)
-  SIMD_BINARY_FUNC(operator %, rem, u_int8_t)
-  SIMD_BINARY_FUNC(operator %, rem, u_int16_t)
+  SIMD_BINARY_FUNC(operator %, rem, uint8_t)
+  SIMD_BINARY_FUNC(operator %, rem, uint16_t)
 #  endif
   
   // 整数除算
   SIMD_SIGNED_FUNC(operator /, idiv, int32_t)
-  SIMD_SIGNED_FUNC(operator /, udiv, u_int32_t)
+  SIMD_SIGNED_FUNC(operator /, udiv, uint32_t)
 
   // 剰余
   SIMD_SIGNED_FUNC(operator %, irem, int32_t)
-  SIMD_SIGNED_FUNC(operator %, urem, u_int32_t)
+  SIMD_SIGNED_FUNC(operator %, urem, uint32_t)
 
   // 除算と剰余
   template <class T>  vec<T>	divrem(vec<T>& r,
@@ -127,7 +127,7 @@ template <class T> vec<T>	atanh(vec<T> x)				;
 			void, int32_t, SIMD_SIGNED)
   SIMD_SPECIALIZED_FUNC(Iu32vec divrem(Iu32vec& r, Iu32vec x, Iu32vec y),
 			udivrem, ((ivec_t*)&r, x, y),
-			void, u_int32_t, SIMD_SIGNED)
+			void, uint32_t, SIMD_SIGNED)
 
   SIMD_UNARY_FUNC(erf,     erf,		double)
   SIMD_UNARY_FUNC(erfc,    erfc,	double)

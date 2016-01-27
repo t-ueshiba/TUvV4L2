@@ -38,14 +38,14 @@ namespace detail
 SIMD_UNPACK_LOW_HIGH(int8_t)
 SIMD_UNPACK_LOW_HIGH(int16_t)
 SIMD_UNPACK_LOW_HIGH(int32_t)
-SIMD_UNPACK_LOW_HIGH(u_int8_t)
-SIMD_UNPACK_LOW_HIGH(u_int16_t)
-SIMD_UNPACK_LOW_HIGH(u_int32_t)
+SIMD_UNPACK_LOW_HIGH(uint8_t)
+SIMD_UNPACK_LOW_HIGH(uint16_t)
+SIMD_UNPACK_LOW_HIGH(uint32_t)
 #if defined(SSE)
   SIMD_UNPACK_LOW_HIGH(float)
 #  if defined(SSE2)
     SIMD_UNPACK_LOW_HIGH(int64_t)
-    SIMD_UNPACK_LOW_HIGH(u_int64_t)
+    SIMD_UNPACK_LOW_HIGH(uint64_t)
     SIMD_UNPACK_LOW_HIGH(double)
 #  endif
 #endif

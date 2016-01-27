@@ -26,10 +26,10 @@ SIMD_ELM_SHIFT_R_I2(int8_t)
 SIMD_ELM_SHIFT_R_I2(int16_t)
 SIMD_ELM_SHIFT_R_I2(int32_t)
 SIMD_ELM_SHIFT_R_I2(int64_t)
-SIMD_ELM_SHIFT_R_I2(u_int8_t)
-SIMD_ELM_SHIFT_R_I2(u_int16_t)
-SIMD_ELM_SHIFT_R_I2(u_int32_t)
-SIMD_ELM_SHIFT_R_I2(u_int64_t)
+SIMD_ELM_SHIFT_R_I2(uint8_t)
+SIMD_ELM_SHIFT_R_I2(uint16_t)
+SIMD_ELM_SHIFT_R_I2(uint32_t)
+SIMD_ELM_SHIFT_R_I2(uint64_t)
 
 #undef MM_ELM_SHIFT_R_I2
 
@@ -82,10 +82,10 @@ SIMD_ELM_SHIFTS_I(int8_t)
 SIMD_ELM_SHIFTS_I(int16_t)
 SIMD_ELM_SHIFTS_I(int32_t)
 SIMD_ELM_SHIFTS_I(int64_t)
-SIMD_ELM_SHIFTS_I(u_int8_t)
-SIMD_ELM_SHIFTS_I(u_int16_t)
-SIMD_ELM_SHIFTS_I(u_int32_t)
-SIMD_ELM_SHIFTS_I(u_int64_t)
+SIMD_ELM_SHIFTS_I(uint8_t)
+SIMD_ELM_SHIFTS_I(uint16_t)
+SIMD_ELM_SHIFTS_I(uint32_t)
+SIMD_ELM_SHIFTS_I(uint64_t)
 
 #undef SIMD_ELM_SHIFTS_I
 
@@ -122,25 +122,25 @@ SIMD_ELM_SHIFTS_I(u_int64_t)
   template <size_t N> inline F32vec
   shift_l(F32vec x)
   {
-      return cast<float>(shift_l<N>(cast<u_int32_t>(x)));
+      return cast<float>(shift_l<N>(cast<uint32_t>(x)));
   }
 
   template <size_t N> inline F32vec
   shift_r(F32vec x)
   {
-      return cast<float>(shift_r<N>(cast<u_int32_t>(x)));
+      return cast<float>(shift_r<N>(cast<uint32_t>(x)));
   }
 
   template <size_t N> inline F64vec
   shift_l(F64vec x)
   {
-      return cast<double>(shift_l<N>(cast<u_int64_t>(x)));
+      return cast<double>(shift_l<N>(cast<uint64_t>(x)));
   }
 
   template <size_t N> inline F64vec
   shift_r(F64vec x)
   {
-      return cast<double>(shift_r<N>(cast<u_int64_t>(x)));
+      return cast<double>(shift_r<N>(cast<uint64_t>(x)));
   }
 #endif
     

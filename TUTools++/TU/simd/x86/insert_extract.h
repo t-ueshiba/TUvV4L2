@@ -46,12 +46,12 @@ namespace simd
 #  endif
 
   SIMD_INSERT_EXTRACT(int16_t)
-  SIMD_INSERT_EXTRACT(u_int16_t)
+  SIMD_INSERT_EXTRACT(uint16_t)
 #  if defined(SSE4)
     SIMD_INSERT_EXTRACT(int8_t)
-    SIMD_INSERT_EXTRACT(u_int8_t)
+    SIMD_INSERT_EXTRACT(uint8_t)
     SIMD_INSERT_EXTRACT(int32_t)
-    SIMD_INSERT_EXTRACT(u_int32_t)
+    SIMD_INSERT_EXTRACT(uint32_t)
 #  endif
 
 #  undef SIMD_INSERT_EXTRACT

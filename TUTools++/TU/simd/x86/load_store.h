@@ -27,10 +27,10 @@ namespace simd
   SIMD_LOAD_STORE(int16_t)
   SIMD_LOAD_STORE(int32_t)
   SIMD_LOAD_STORE(int64_t)
-  SIMD_LOAD_STORE(u_int8_t)
-  SIMD_LOAD_STORE(u_int16_t)
-  SIMD_LOAD_STORE(u_int32_t)
-  SIMD_LOAD_STORE(u_int64_t)
+  SIMD_LOAD_STORE(uint8_t)
+  SIMD_LOAD_STORE(uint16_t)
+  SIMD_LOAD_STORE(uint32_t)
+  SIMD_LOAD_STORE(uint64_t)
 
 #  undef SIMD_LOAD_STORE  
 #else

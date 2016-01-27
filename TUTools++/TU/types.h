@@ -235,10 +235,10 @@ typedef signed char		int8_t;		//!< 符号付き8bit整数
 typedef short			int16_t;	//!< 符号付き16bit整数
 typedef int			int32_t;	//!< 符号付き32bit整数
 typedef long long		int64_t;	//!< 符号付き64bit整数
-typedef unsigned char		u_int8_t;	//!< 符号なし8bit整数
-typedef unsigned short		u_int16_t;	//!< 符号なし16bit整数
-typedef unsigned int		u_int32_t;	//!< 符号なし32bit整数
-typedef unsigned long long	u_int64_t;	//!< 符号なし64bit整数
+typedef unsigned char		uint8_t;	//!< 符号なし8bit整数
+typedef unsigned short		uint16_t;	//!< 符号なし16bit整数
+typedef unsigned int		uint32_t;	//!< 符号なし32bit整数
+typedef unsigned long long	uint64_t;	//!< 符号なし64bit整数
 #else
 #  define __PORT
 #  include <sys/types.h>

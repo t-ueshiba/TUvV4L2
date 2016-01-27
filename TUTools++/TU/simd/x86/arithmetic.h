@@ -49,8 +49,8 @@ SIMD_SAT_ADD_SUB(int8_t)
 SIMD_SAT_ADD_SUB(int16_t)
 SIMD_ADD_SUB(int32_t)
 SIMD_ADD_SUB(int64_t)
-SIMD_SAT_ADD_SUB(u_int8_t)
-SIMD_SAT_ADD_SUB(u_int16_t)
+SIMD_SAT_ADD_SUB(uint8_t)
+SIMD_SAT_ADD_SUB(uint16_t)
 
 // 乗算
 SIMD_BINARY_FUNC(operator *, mullo, int16_t)
@@ -65,7 +65,7 @@ SIMD_BINARY_FUNC(mulhi,      mulhi, int16_t)
   SIMD_BINARY_FUNC(operator /, div, float)
 
   // Min/Max
-  SIMD_MIN_MAX(u_int8_t)
+  SIMD_MIN_MAX(uint8_t)
   SIMD_MIN_MAX(int16_t)
   SIMD_MIN_MAX(float)
 
@@ -80,7 +80,7 @@ SIMD_BINARY_FUNC(mulhi,      mulhi, int16_t)
   SIMD_ADD_SUB(double)
 
   // 乗除算
-  SIMD_BINARY_FUNC(operator *, mul, u_int32_t)
+  SIMD_BINARY_FUNC(operator *, mul, uint32_t)
   SIMD_BINARY_FUNC(operator *, mul, double)
   SIMD_BINARY_FUNC(operator /, div, double)
 
@@ -98,8 +98,8 @@ SIMD_BINARY_FUNC(mulhi,      mulhi, int16_t)
   // Min/Max
   SIMD_MIN_MAX(int8_t)
   SIMD_MIN_MAX(int32_t)
-  SIMD_MIN_MAX(u_int16_t)
-  SIMD_MIN_MAX(u_int32_t)
+  SIMD_MIN_MAX(uint16_t)
+  SIMD_MIN_MAX(uint32_t)
 #endif
 
 #undef SIMD_ADD_SUB
@@ -139,8 +139,8 @@ template <class T> inline vec<T>
 sub_avg(vec<T> x, vec<T> y)		{return (x - y) >> 1;}
 
 #if defined(SSE)
-  SIMD_BINARY_FUNC(avg, avg, u_int8_t)
-  SIMD_BINARY_FUNC(avg, avg, u_int16_t)
+  SIMD_BINARY_FUNC(avg, avg, uint8_t)
+  SIMD_BINARY_FUNC(avg, avg, uint16_t)
   template <> inline F32vec
   avg(F32vec x, F32vec y)		{return (x + y) * F32vec(0.5f);}
   template <> inline F32vec

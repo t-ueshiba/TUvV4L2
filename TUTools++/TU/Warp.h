@@ -155,15 +155,15 @@ class Warp
 			    const auto	dh = dup<true >(d);
 
 			    return cast<int32_t>(
-				cvt<u_int8_t>(
+				cvt<uint8_t>(
 				    interpolate(
-					cvt<int16_t, false>(cast<u_int8_t>(x)),
-					cvt<int16_t, false>(cast<u_int8_t>(y)),
+					cvt<int16_t, false>(cast<uint8_t>(x)),
+					cvt<int16_t, false>(cast<uint8_t>(y)),
 					cvt<int16_t>(dup<false>(dl),
 						     dup<true >(dl))),
 				    interpolate(
-					cvt<int16_t, true >(cast<u_int8_t>(x)),
-					cvt<int16_t, true >(cast<u_int8_t>(y)),
+					cvt<int16_t, true >(cast<uint8_t>(x)),
+					cvt<int16_t, true >(cast<uint8_t>(y)),
 					cvt<int16_t>(dup<false>(dh),
 						     dup<true >(dh)))));
 			}

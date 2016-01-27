@@ -157,20 +157,20 @@
 #  define SIMD_PREFIX_int16_t	_mm256_
 #  define SIMD_PREFIX_int32_t	_mm256_
 #  define SIMD_PREFIX_int64_t	_mm256_
-#  define SIMD_PREFIX_u_int8_t	_mm256_
-#  define SIMD_PREFIX_u_int16_t	_mm256_
-#  define SIMD_PREFIX_u_int32_t	_mm256_
-#  define SIMD_PREFIX_u_int64_t	_mm256_
+#  define SIMD_PREFIX_uint8_t	_mm256_
+#  define SIMD_PREFIX_uint16_t	_mm256_
+#  define SIMD_PREFIX_uint32_t	_mm256_
+#  define SIMD_PREFIX_uint64_t	_mm256_
 #  define SIMD_PREFIX_ivec_t	_mm256_
 #else
 #  define SIMD_PREFIX_int8_t	_mm_
 #  define SIMD_PREFIX_int16_t	_mm_
 #  define SIMD_PREFIX_int32_t	_mm_
 #  define SIMD_PREFIX_int64_t	_mm_
-#  define SIMD_PREFIX_u_int8_t	_mm_
-#  define SIMD_PREFIX_u_int16_t	_mm_
-#  define SIMD_PREFIX_u_int32_t	_mm_
-#  define SIMD_PREFIX_u_int64_t	_mm_
+#  define SIMD_PREFIX_uint8_t	_mm_
+#  define SIMD_PREFIX_uint16_t	_mm_
+#  define SIMD_PREFIX_uint32_t	_mm_
+#  define SIMD_PREFIX_uint64_t	_mm_
 #  define SIMD_PREFIX_ivec_t	_mm_
 #endif
 
@@ -179,10 +179,10 @@
 #  define SIMD_SUFFIX_int16_t	epi16
 #  define SIMD_SUFFIX_int32_t	epi32
 #  define SIMD_SUFFIX_int64_t	epi64
-#  define SIMD_SUFFIX_u_int8_t	epu8
-#  define SIMD_SUFFIX_u_int16_t	epu16
-#  define SIMD_SUFFIX_u_int32_t	epu32
-#  define SIMD_SUFFIX_u_int64_t	epi64
+#  define SIMD_SUFFIX_uint8_t	epu8
+#  define SIMD_SUFFIX_uint16_t	epu16
+#  define SIMD_SUFFIX_uint32_t	epu32
+#  define SIMD_SUFFIX_uint64_t	epi64
 #  if defined(AVX2)
 #    define SIMD_SUFFIX_ivec_t	si256
 #  else
@@ -193,10 +193,10 @@
 #  define SIMD_SUFFIX_int16_t	pi16
 #  define SIMD_SUFFIX_int32_t	pi32
 #  define SIMD_SUFFIX_int64_t	si64
-#  define SIMD_SUFFIX_u_int8_t	pu8
-#  define SIMD_SUFFIX_u_int16_t	pu16
-#  define SIMD_SUFFIX_u_int32_t	pu32
-#  define SIMD_SUFFIX_u_int64_t	si64
+#  define SIMD_SUFFIX_uint8_t	pu8
+#  define SIMD_SUFFIX_uint16_t	pu16
+#  define SIMD_SUFFIX_uint32_t	pu32
+#  define SIMD_SUFFIX_uint64_t	si64
 #  define SIMD_SUFFIX_ivec_t	si64
 #endif
 #define SIMD_SUFFIX_void
@@ -205,19 +205,19 @@
 #define SIMD_SIGNED_int16_t	SIMD_SUFFIX_int16_t
 #define SIMD_SIGNED_int32_t	SIMD_SUFFIX_int32_t
 #define SIMD_SIGNED_int64_t	SIMD_SUFFIX_int64_t
-#define SIMD_SIGNED_u_int8_t	SIMD_SUFFIX_int8_t
-#define SIMD_SIGNED_u_int16_t	SIMD_SUFFIX_int16_t
-#define SIMD_SIGNED_u_int32_t	SIMD_SUFFIX_int32_t
-#define SIMD_SIGNED_u_int64_t	SIMD_SUFFIX_int64_t
+#define SIMD_SIGNED_uint8_t	SIMD_SUFFIX_int8_t
+#define SIMD_SIGNED_uint16_t	SIMD_SUFFIX_int16_t
+#define SIMD_SIGNED_uint32_t	SIMD_SUFFIX_int32_t
+#define SIMD_SIGNED_uint64_t	SIMD_SUFFIX_int64_t
     
 #define SIMD_BASE_int8_t	SIMD_SUFFIX_ivec_t
 #define SIMD_BASE_int16_t	SIMD_SUFFIX_ivec_t
 #define SIMD_BASE_int32_t	SIMD_SUFFIX_ivec_t
 #define SIMD_BASE_int64_t	SIMD_SUFFIX_ivec_t
-#define SIMD_BASE_u_int8_t	SIMD_SUFFIX_ivec_t
-#define SIMD_BASE_u_int16_t	SIMD_SUFFIX_ivec_t
-#define SIMD_BASE_u_int32_t	SIMD_SUFFIX_ivec_t
-#define SIMD_BASE_u_int64_t	SIMD_SUFFIX_ivec_t
+#define SIMD_BASE_uint8_t	SIMD_SUFFIX_ivec_t
+#define SIMD_BASE_uint16_t	SIMD_SUFFIX_ivec_t
+#define SIMD_BASE_uint32_t	SIMD_SUFFIX_ivec_t
+#define SIMD_BASE_uint64_t	SIMD_SUFFIX_ivec_t
 #define SIMD_BASE_ivec_t	SIMD_SUFFIX_ivec_t
 
 #if defined(AVX)

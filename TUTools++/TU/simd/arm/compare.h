@@ -25,9 +25,9 @@ operator !=(vec<T> x, vec<T> y)		{ return ~(x == y); }
 SIMD_COMPARES(int8_t)
 SIMD_COMPARES(int16_t)
 SIMD_COMPARES(int32_t)
-SIMD_COMPARES(u_int8_t)
-SIMD_COMPARES(u_int16_t)
-SIMD_COMPARES(u_int32_t)
+SIMD_COMPARES(uint8_t)
+SIMD_COMPARES(uint16_t)
+SIMD_COMPARES(uint32_t)
 SIMD_COMPARES(float)
 
 #undef SIMD_COMPARE
