@@ -1,6 +1,11 @@
-SUBDIR	= cvt_iterator_test		\
+SUBDIR	= cvt_iterator			\
+	  cvt_iterator_test		\
+	  cvt_mask_iterator		\
 	  cvt_mask_iterator_test	\
-	  cvt_mask_test
+	  cvt_pack			\
+	  dup				\
+	  lookup			\
+	  transform
 
 TARGETS	= all clean depend
 
