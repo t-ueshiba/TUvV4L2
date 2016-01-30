@@ -105,6 +105,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/arm/cast.h \
 		TU/simd/arm/compare.h \
 		TU/simd/arm/cvt.h \
+		TU/simd/arm/dup.h \
 		TU/simd/arm/insert_extract.h \
 		TU/simd/arm/load_store.h \
 		TU/simd/arm/logical.h \
@@ -231,10 +232,10 @@ BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -256,10 +257,10 @@ ConversionFromYUV.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -281,10 +282,10 @@ CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/types.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -306,10 +307,10 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/Geometry++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -331,10 +332,10 @@ FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -356,10 +357,10 @@ FeatureMatch.o: TU/FeatureMatch.h TU/Geometry++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -382,10 +383,10 @@ GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -408,10 +409,10 @@ GenericImage.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -433,10 +434,10 @@ Image++.inst.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -458,10 +459,10 @@ ImageBase.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -483,10 +484,10 @@ ImageLine.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -508,10 +509,10 @@ Profiler.o: TU/Profiler.h TU/types.h TU/Array++.h TU/iterator.h TU/tuple.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -534,10 +535,10 @@ Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -560,10 +561,10 @@ SURFCreator.o: TU/SURFCreator.h TU/Feature.h TU/Geometry++.h TU/Vector++.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
@@ -588,10 +589,10 @@ Vector++.inst.o: TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
 	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
 	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/x86/dup.h TU/simd/x86/unpack.h TU/simd/cvt.h \
-	TU/simd/x86/cvt.h TU/simd/arm/cvt.h TU/simd/logical.h \
-	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
-	TU/simd/arm/logical.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \

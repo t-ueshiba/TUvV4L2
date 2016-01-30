@@ -62,6 +62,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/arm/cast.h \
 		/usr/local/include/TU/simd/arm/compare.h \
 		/usr/local/include/TU/simd/arm/cvt.h \
+		/usr/local/include/TU/simd/arm/dup.h \
 		/usr/local/include/TU/simd/arm/insert_extract.h \
 		/usr/local/include/TU/simd/arm/load_store.h \
 		/usr/local/include/TU/simd/arm/logical.h \
@@ -167,7 +168,8 @@ EdgeDetector.o: /usr/local/include/TU/EdgeDetector.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
 	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/arm/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
@@ -233,7 +235,8 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
 	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
+	/usr/local/include/TU/simd/arm/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
