@@ -13,14 +13,14 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB #-DWITHOUT_CVTDOWN
+CPPFLAGS	= -DNDEBUG -DPROFILE #-DUSE_TBB #-DWITHOUT_CVTDOWN
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch),armv7l)
 #  CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DAVX2
-  CFLAGS       += -march=core-avx2
+#  CPPFLAGS     += -DAVX2
+#  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -68,7 +68,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/arm/cast.h \
 		../../TU/simd/arm/compare.h \
 		../../TU/simd/arm/cvt.h \
-		../../TU/simd/arm/dup.h \
 		../../TU/simd/arm/insert_extract.h \
 		../../TU/simd/arm/load_store.h \
 		../../TU/simd/arm/logical.h \

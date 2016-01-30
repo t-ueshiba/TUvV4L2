@@ -20,6 +20,7 @@ SUBDIR	= BandMatrix		\
 	  TreeFilter		\
 	  Vector		\
 	  WeightedMedianFilter	\
+	  simd			\
 	  stereo1394		\
 	  stereoGUI		\
 	  stereoTest		\
