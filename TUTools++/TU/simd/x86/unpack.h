@@ -25,7 +25,7 @@ namespace detail
 #  undef SIMD_PERMUTE
 #endif
 
-  template <bool HI, class T> base_type<T> unpack(vec<T> x, vec<T> y)	;
+template <bool HI, class T> base_type<T> unpack(vec<T> x, vec<T> y)	;
 
 #define SIMD_UNPACK_LOW_HIGH(type)					\
     SIMD_SPECIALIZED_FUNC(base_type<type>				\
@@ -51,7 +51,7 @@ SIMD_UNPACK_LOW_HIGH(uint32_t)
 #endif
 
 #undef SIMD_UNPACK_LOW_HIGH
-}
+}	// namespace detail
     
 /************************************************************************
 *  Unpack operators							*

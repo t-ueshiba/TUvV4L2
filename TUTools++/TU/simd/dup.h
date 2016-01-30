@@ -4,7 +4,8 @@
 #if !defined(__TU_SIMD_DUP_H)
 #define __TU_SIMD_DUP_H
 
-#include "TU/simd/vec.h"
+#include "TU/simd/cvt.h"
+#include "TU/simd/logical.h"
 
 namespace TU
 {
