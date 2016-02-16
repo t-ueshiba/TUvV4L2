@@ -47,29 +47,26 @@ namespace TU
 		有理曲線であれば(d+1)次元ベクトル．
 */
 template <class C>
-class BezierCurve : private Array<C>
+class BezierCurve
 {
   public:
-    typedef Array<C>				coord_array;
     typedef C					coord_type;
+    typedef Array<coord_type>			coord_array;
     typedef coord_type				value_type;
     typedef typename coord_type::element_type	element_type;
-    
-  private:
-    typedef coord_array				super;
 
   public:
   //! 指定した次数のBezier曲線を作る．
   /*!
     \param p	次数
   */
-    BezierCurve(size_t p=0)	:super(p+1)	{}
+    explicit BezierCurve(size_t p=0)	:_c(p + 1)	{}
 
   //! 指定した制御点を持つBezier曲線を作る．
   /*!
     \param b	サイズが(次数+1)個である制御点の1次元配列
   */
-    BezierCurve(const coord_array& b) :super(b)	{}
+    BezierCurve(const coord_array& c)	:_c(c)		{}
 
   //! 曲線が属す空間の次元を調べる．
   /*!
@@ -81,25 +78,39 @@ class BezierCurve : private Array<C>
   /*!
     \return	次数
   */
-    size_t	degree()		const	{return super::size()-1;}
+    size_t		degree()	const	{return _c.size() - 1;}
 
-    coord_type	operator ()(element_type t)		const	;
-    coord_array	deCasteljau(element_type t, size_t r)	const	;
-    void	elevateDegree()					;
+    coord_type		operator ()(element_type t)		const	;
+    coord_array		deCasteljau(element_type t, size_t r)	const	;
+    void		elevateDegree()					;
 
   //! 制御点の1次元配列へのポインタを返す．
   /*!
     \return	制御点の配列へのポインタ
   */
-    const element_type*	data()		const	{return (*this)[0].data();}
+    const element_type*	data()		const	{return _c[0].data();}
 
     friend	class Array2<BezierCurve>;	// allow access to resize.
+
     
-    using	super::operator [];
-    using	super::operator ==;
-    using	super::operator !=;
-    using	super::save;
-    using	super::restore;
+    coord_type&		operator [](size_t i)		{return _c[i];}
+    const coord_type&	operator [](size_t i)	const	{return _c[i];}
+    bool		operator ==(const BezierCurve& b) const
+			{
+			    return _c == b._c;
+			}
+    bool		operator !=(const BezierCurve& b) const
+			{
+			    return _c != b._c;
+			}
+    std::ostream&	save(std::ostream& out) const
+			{
+			    return _c.save(out);
+			}
+    std::istream&	restore(std::istream& in)
+			{
+			    return _c.restore(in);
+			}
 
   //! ストリームからBezier曲線を読み込む．
   /*!
@@ -108,8 +119,7 @@ class BezierCurve : private Array<C>
     \return	inで指定した入力ストリーム
   */
     friend std::istream&
-    operator >>(std::istream& in, BezierCurve& b)
-	{return in >> (super&)b;}
+    operator >>(std::istream& in, BezierCurve& b)	{return in >> b._c;}
 
   //! ストリームにBezier曲線を書き出す．
   /*!
@@ -118,8 +128,13 @@ class BezierCurve : private Array<C>
     \return	outで指定した出力ストリーム
   */
     friend std::ostream&
-    operator <<(std::ostream& out, const BezierCurve& b)
-	{return out << (const super&)b;}
+    operator <<(std::ostream& out, const BezierCurve& b){return out << b._c;}
+
+  private:
+    void	resize(coord_type* p, size_t siz)	{_c.resize(p, siz);}
+		
+  private:
+    coord_array	_c;
 };
 
 //! 指定したパラメータ値に対応する曲線上の点を調べる．
@@ -130,9 +145,9 @@ class BezierCurve : private Array<C>
 template <class C> typename BezierCurve<C>::coord_type
 BezierCurve<C>::operator ()(element_type t) const
 {
-    element_type	s = 1.0 - t, fact = 1.0;
+    element_type	s = element_type(1) - t, fact = 1;
     int			nCi = 1;
-    coord_type	b((*this)[0] * s);
+    coord_type		b(_c[0] * s);
     for (size_t i = 1; i < degree(); ++i)
     {
 	fact *= t;
@@ -141,9 +156,9 @@ BezierCurve<C>::operator ()(element_type t) const
        * must not produce remainder
        */
 	nCi = nCi * (degree() - i + 1) / i;
-	(b += fact * nCi * (*this)[i]) *= s;
+	(b += fact * nCi * _c[i]) *= s;
     }
-    b += fact * t * (*this)[degree()];
+    b += fact * t * _c[degree()];
     return b;
 }
 
@@ -158,8 +173,8 @@ BezierCurve<C>::deCasteljau(element_type t, size_t r) const
     if (r > degree())
 	r = degree();
 
-    const element_type	s = 1.0 - t;
-    Array<coord_type>	b_tmp(*this);
+    const element_type	s = element_type(1) - t;
+    coord_array		b_tmp(_c);
     for (size_t k = 1; k <= r; ++k)
 	for (size_t i = 0; i <= degree() - k; ++i)
 	    (b_tmp[i] *= s) += t * b_tmp[i+1];
@@ -171,16 +186,16 @@ BezierCurve<C>::deCasteljau(element_type t, size_t r) const
 template <class C> void
 BezierCurve<C>::elevateDegree()
 {
-    coord_array	b_tmp(*this);
-    super::resize(degree() + 2);
-    (*this)[0] = b_tmp[0];
+    const coord_array	b_tmp(_c);
+    _c.resize(degree() + 2);
+    _c[0] = b_tmp[0];
     for (size_t i = 1; i < degree(); ++i)
     {
 	element_type	alpha = element_type(i) / element_type(degree());
 	
-	(*this)[i] = alpha * b_tmp[i-1] + (1.0 - alpha) * b_tmp[i];
+	_c[i] = alpha * b_tmp[i-1] + (element_type(1) - alpha) * b_tmp[i];
     }
-    (*this)[degree()] = b_tmp[degree()-1];
+    _c[degree()] = b_tmp[degree()-1];
 }
 
 typedef BezierCurve<Vector2f>	BezierCurve2f;
@@ -201,16 +216,15 @@ typedef BezierCurve<Vector4d>	RationalBezierCurve3d;
 		有理曲面であれば(d+1)次元ベクトル．
 */
 template <class C>
-class BezierSurface : private Array2<BezierCurve<C> >
+class BezierSurface
 {
   public:
     typedef C						coord_type;
     typedef BezierCurve<coord_type>			curve_type;
-    typedef Array2<Array<coord_type> >			coord_array2;
+    typedef Array<coord_type>				coord_array;
+    typedef Array2<coord_array>				coord_array2;
+    typedef Array2<curve_type>				curve_array;
     typedef typename coord_type::element_type		element_type;
-
-  private:
-    typedef Array2<curve_type>				super;
 
   public:
   //! 指定した次数のBezier曲面を作る．
@@ -218,7 +232,7 @@ class BezierSurface : private Array2<BezierCurve<C> >
     \param p	横方向次数
     \param q	縦方向次数
   */
-    BezierSurface(size_t p, size_t q) :super(q+1, p+1)	{}
+    BezierSurface(size_t p, size_t q) :_c(q+1, p+1)	{}
 
     BezierSurface(const coord_array2& b)		;
 
@@ -232,32 +246,45 @@ class BezierSurface : private Array2<BezierCurve<C> >
   /*!
     \return	横方向次数
   */
-    size_t	uDegree()		const	{return super::ncol()-1;}
+    size_t		uDegree()	const	{return _c.ncol()-1;}
 
   //! 曲面の縦方向次数を調べる．
   /*!
     \return	縦方向次数
   */
-    size_t	vDegree()		const	{return super::nrow()-1;}
+    size_t		vDegree()	const	{return _c.nrow()-1;}
 
-    coord_type	operator ()(element_type u, element_type v)	const	;
-    coord_array2
-		deCasteljau(element_type u, element_type v,
-			    size_t r)				const	;
-    void	uElevateDegree()					;
-    void	vElevateDegree()					;
+    coord_type		operator ()(element_type u,
+				    element_type v)		const	;
+    coord_array2	deCasteljau(element_type u,
+				    element_type v, size_t r)	const	;
+    void		uElevateDegree()				;
+    void		vElevateDegree()				;
 
   //! 制御点の2次元配列へのポインタを返す．
   /*!
     \return	制御点の配列へのポインタ
   */
-    const element_type*	data()		const	{return (*this)[0][0].data();}
+    const element_type*	data()		const	{return _c[0][0].data();}
 
-    using	super::operator [];
-    using	super::operator ==;
-    using	super::operator !=;
-    using	super::save;
-    using	super::restore;
+    curve_type&		operator [](size_t i)		{return _c[i];}
+    const curve_type&	operator [](size_t i)	const	{return _c[i];}
+    bool		operator ==(const BezierSurface& b) const
+			{
+			    return _c == b._c;
+			}
+    bool		operator !=(const BezierSurface& b) const
+			{
+			    return _c != b._c;
+			}
+    std::ostream&	save(std::ostream& out) const
+			{
+			    return _c.save(out);
+			}
+    std::istream&	restore(std::istream& in)
+			{
+			    return _c.restore(in);
+			}
     
   //! ストリームからBezier曲面を読み込む．
   /*!
@@ -266,8 +293,7 @@ class BezierSurface : private Array2<BezierCurve<C> >
     \return	inで指定した入力ストリーム
   */
     friend std::istream&
-    operator >>(std::istream& in, BezierSurface& b)
-	{return in >> (super&)b;}
+    operator >>(std::istream& in, BezierSurface& b)	{return in >> b._c;}
 
   //! ストリームにBezier曲面を書き出す．
   /*!
@@ -276,8 +302,10 @@ class BezierSurface : private Array2<BezierCurve<C> >
     \return	outで指定した出力ストリーム
   */
     friend std::ostream&
-    operator <<(std::ostream& out, const BezierSurface& b)
-	{return out << (const super&)b;}
+    operator <<(std::ostream& out, const BezierSurface& b) {return out << b._c;}
+
+  private:
+    curve_array	_c;
 };
 
 //! 指定した制御点を持つBezier曲面を作る．
@@ -286,11 +314,11 @@ class BezierSurface : private Array2<BezierCurve<C> >
 */
 template <class C>
 BezierSurface<C>::BezierSurface(const coord_array2& b)
-    :super(b.nrow(), b.ncol())
+    :_c(b.nrow(), b.ncol())
 {
     for (size_t j = 0; j <= vDegree(); ++j)
 	for (size_t i = 0; i <= uDegree(); ++i)
-	    (*this)[j][i] = b[j][i];
+	    _c[j][i] = b[j][i];
 }
 
 //! 指定したパラメータ値に対応する曲面上の点を調べる．
@@ -304,7 +332,7 @@ BezierSurface<C>::operator ()(element_type u, element_type v) const
 {
     curve_type	vCurve(vDegree());
     for (size_t j = 0; j <= vDegree(); ++j)
-	vCurve[j] = (*this)[j](u);
+	vCurve[j] = _c[j](u);
     return vCurve(v);
 }
  
