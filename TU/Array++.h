@@ -426,19 +426,17 @@ class Array : public B
   private:
     typedef B						super;
 
-    typedef std::integral_constant<size_t, 0>		value_is_arithmetic;
-    typedef std::integral_constant<size_t, 1>		value_has_init;
-    typedef std::integral_constant<size_t, 2>		otherwise;
-
-    template <class A_>
-    struct has_init
+    template <class T_>
+    struct assignable
     {
-	template <class T_>
-	static auto	check(T_* p) -> decltype(p->init(), std::true_type());
-	static auto	check(...)   -> std::false_type;
+	template <class S_>
+	static auto	check(T* q, const S_* p)
+			    -> decltype(*q = *p, std::true_type());
+	static auto	check(...) -> std::false_type;
 
-	constexpr static bool
-	    value = decltype(check(static_cast<A_*>(nullptr)))::value;
+	typedef decltype(check(static_cast<T*>(nullptr),
+			       static_cast<const T_*>(nullptr)))	type;
+	constexpr static bool	value = type::value;
     };
     
   public:
@@ -569,10 +567,12 @@ class Array : public B
   /*!
     \param c	代入する値
   */
-    Array&	operator =(const element_type& c)
+    template <class T_>
+    typename std::enable_if<(!is_range<T_>::value && assignable<T_>::value),
+			    Array&>::type
+		operator =(const T_& c)
 		{
-		    for (auto iter = begin(); iter != end();  ++iter)
-			*iter = c;
+		    std::fill(begin(), end(), c);
 		    return *this;
 		}
     
@@ -718,15 +718,7 @@ class Array : public B
 
     void		init()
 			{
-			    typedef typename std::conditional<
-				std::is_arithmetic<value_type>::value,
-				value_is_arithmetic,
-				typename std::conditional<
-				    has_init<value_type>::value,
-				    value_has_init,
-				    otherwise>::type>::type	value_kind;
-			    
-			    init_impl(value_kind());
+			    init_impl(typename assignable<int>::type());
 			}
 
   protected:
@@ -736,16 +728,11 @@ class Array : public B
 			}
 
   private:
-    void		init_impl(value_is_arithmetic)
+    void		init_impl(std::true_type)
 			{
 			    *this = 0;
 			}
-    void		init_impl(value_has_init)
-			{
-			    for (auto iter = begin(); iter != end();  ++iter)
-				iter->init();
-			}
-    void		init_impl(otherwise)
+    void		init_impl(std::false_type)
 			{
 			}
 };
