@@ -28,7 +28,7 @@ doJob()
     array2_type	a(p, 8, 8);
     T		j[] = {7, 5, 3, 1, 6, 4, 2, 0, 1, 3, 5, 7, 0, 2, 4, 6};
     auto	col = load(j);
-    cout << lookup(a.data(), idx, col, a.ncol()) << endl;
+    cout << lookup(a.data(), idx, col, a.ncol()) << endl << endl;
 
 }
     
@@ -38,7 +38,19 @@ doJob()
 int
 main()
 {
-    TU::simd::doJob<u_int8_t, int16_t>();
+    using namespace	std;
+    
+    cerr << "--- idx: int16_t ---" << endl;
+    TU::simd::doJob<u_int8_t,  int16_t>();
+    TU::simd::doJob<u_int16_t, int16_t>();
 
+#if defined(SSE4)
+    cerr << "--- idx: int32_t ---" << endl;
+    TU::simd::doJob<u_int8_t,  int32_t>();
+    TU::simd::doJob<u_int16_t, int32_t>();
+    TU::simd::doJob<u_int32_t, int32_t>();
+    TU::simd::doJob<float,     int32_t>();
+#endif
+    
     return 0;
 }

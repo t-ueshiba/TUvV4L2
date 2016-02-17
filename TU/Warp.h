@@ -58,13 +58,13 @@ class Warp
 	size_t		width()			const	{return us.size();}
 	void		resize(size_t d)		;
 #if defined(SIMD)
-	Array<short,  Buf<short,  simd::allocator<short > > >	us, vs;
-	Array<u_char, Buf<u_char, simd::allocator<u_char> > >	du, dv;
+	Array<short,  Buf<short,  0, simd::allocator<short > > >	us, vs;
+	Array<u_char, Buf<u_char, 0, simd::allocator<u_char> > >	du, dv;
 #else
-	Array<short>						us, vs;
-	Array<u_char>						du, dv;
+	Array<short>							us, vs;
+	Array<u_char>							du, dv;
 #endif
-	size_t							lmost;
+	size_t								lmost;
     };
     
     template <class IN>

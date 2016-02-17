@@ -55,7 +55,7 @@ class BandMatrix
     typedef Matrix<element_type>	matrix_type;	//!< 同型の成分を持つ行列
     
   private:
-    typedef Vector<T, FixedSizedBuf<T, P+Q+1> >	RowData;
+    typedef Vector<T, Buf<T, P+Q+1> >	RowData;
     
   public:
   // 構造操作
