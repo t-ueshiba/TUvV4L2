@@ -47,11 +47,11 @@ template <class T, size_t D>
 class Feature : public Point2f
 {
   public:
-    typedef T						value_type;
-    enum		{DescriptorDim = D};
+    typedef T				value_type;
+    enum	{DescriptorDim = D};
     
   //! 特徴ベクトルの型
-    typedef Vector<T, FixedSizedBuf<T, D> >		Descriptor;
+    typedef Vector<T, Buf<T, D> >	Descriptor;
 
   public:
     Feature(float x=0, float y=0,

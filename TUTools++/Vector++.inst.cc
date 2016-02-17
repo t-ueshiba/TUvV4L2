@@ -31,35 +31,25 @@
 
 namespace TU
 {
-template class Vector<float,  FixedSizedBuf<float,  2> >;
-template class Vector<double, FixedSizedBuf<double, 2> >;
+template class Vector<float,  Buf<float,  2> >;
+template class Vector<double, Buf<double, 2> >;
 
-template class Vector<float,  FixedSizedBuf<float,  3> >;
-template class Vector<double, FixedSizedBuf<double, 3> >;
+template class Vector<float,  Buf<float,  3> >;
+template class Vector<double, Buf<double, 3> >;
 
-template class Vector<float,  FixedSizedBuf<float,  4> >;
-template class Vector<double, FixedSizedBuf<double, 4> >;
+template class Vector<float,  Buf<float,  4> >;
+template class Vector<double, Buf<double, 4> >;
 
-template class Matrix<float,  FixedSizedBuf<float,   4>,
-		      FixedSizedBuf<Vector<float>,   2> >;
-template class Matrix<double, FixedSizedBuf<double,  4>,
-		      FixedSizedBuf<Vector<double>,  2> >;
-template class Matrix<float,  FixedSizedBuf<float,   6>,
-		      FixedSizedBuf<Vector<float>,   2> >;
-template class Matrix<double, FixedSizedBuf<double,  6>,
-		      FixedSizedBuf<Vector<double>,  2> >;
-template class Matrix<float,  FixedSizedBuf<float,   9>,
-		      FixedSizedBuf<Vector<float>,   3> >;
-template class Matrix<double, FixedSizedBuf<double,  9>,
-		      FixedSizedBuf<Vector<double>,  3> >;
-template class Matrix<float,  FixedSizedBuf<float,  12>,
-		      FixedSizedBuf<Vector<float>,   3> >;
-template class Matrix<double, FixedSizedBuf<double, 12>,
-		      FixedSizedBuf<Vector<double>,  3> >;
-template class Matrix<float,  FixedSizedBuf<float,  16>,
-		      FixedSizedBuf<Vector<float>,   4> >;
-template class Matrix<double, FixedSizedBuf<double, 16>,
-		      FixedSizedBuf<Vector<double>,  4> >;
+template class Matrix<float,  Buf<float,   4>, Buf<Vector<float>,   2> >;
+template class Matrix<double, Buf<double,  4>, Buf<Vector<double>,  2> >;
+template class Matrix<float,  Buf<float,   6>, Buf<Vector<float>,   2> >;
+template class Matrix<double, Buf<double,  6>, Buf<Vector<double>,  2> >;
+template class Matrix<float,  Buf<float,   9>, Buf<Vector<float>,   3> >;
+template class Matrix<double, Buf<double,  9>, Buf<Vector<double>,  3> >;
+template class Matrix<float,  Buf<float,  12>, Buf<Vector<float>,   3> >;
+template class Matrix<double, Buf<double, 12>, Buf<Vector<double>,  3> >;
+template class Matrix<float,  Buf<float,  16>, Buf<Vector<float>,   4> >;
+template class Matrix<double, Buf<double, 16>, Buf<Vector<double>,  4> >;
 
 template class Vector<float>;
 template class Vector<double>;

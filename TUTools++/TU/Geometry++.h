@@ -48,10 +48,10 @@ namespace TU
   \param T	座標の型
  */
 template <class T>
-class Point1 : public Vector<T, FixedSizedBuf<T, 1> >
+class Point1 : public Vector<T, Buf<T, 1> >
 {
   private:
-    typedef Vector<T, FixedSizedBuf<T, 1> >	super;
+    typedef Vector<T, Buf<T, 1> >	super;
     
   public:
     Point1(T u=0)							;
@@ -100,10 +100,10 @@ typedef Point1<double>	Point1d;		//!< double型座標を持つ1次元点
   \param T	座標の型
  */
 template <class T>
-class Point2 : public Vector<T, FixedSizedBuf<T, 2> >
+class Point2 : public Vector<T, Buf<T, 2> >
 {
   private:
-    typedef Vector<T, FixedSizedBuf<T, 2> >	super;
+    typedef Vector<T, Buf<T, 2> >	super;
     
   public:
     Point2(T u=0, T v=0)						;
@@ -310,10 +310,10 @@ typedef Point2<double>	Point2d;		//!< double型座標を持つ2次元点
   \param T	座標の型
  */
 template <class T>
-class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
+class Point3 : public Vector<T, Buf<T, 3> >
 {
   private:
-    typedef Vector<T, FixedSizedBuf<T, 3> >	super;
+    typedef Vector<T, Buf<T, 3> >	super;
     
   public:
     Point3(T x=0, T y=0, T z=0)						;
@@ -324,7 +324,7 @@ class Point3 : public Vector<T, FixedSizedBuf<T, 3> >
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Point3(const E& v) :super(v)				{}
+    Point3(const E& v) :super(v)					{}
 
   //! 他の3次元ベクトルを自分に代入する．
   /*!
@@ -1815,12 +1815,11 @@ typedef Rigidity<Matrix44d>	Rigidity33d;
   に写す．
 */
 template <class T>
-class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
-					      FixedSizedBuf<Vector<T>, 3> > >
+class Homography : public Projectivity<Matrix<T, Buf<T, 9>,
+					      Buf<Vector<T>, 3> > >
 {
   private:
-    typedef Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
-				FixedSizedBuf<Vector<T>, 3> > >	super;
+    typedef Projectivity<Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> > >	super;
     
   public:
     enum	{DOF=8};
@@ -1830,10 +1829,9 @@ class Homography : public Projectivity<Matrix<T, FixedSizedBuf<T, 9>,
     typedef typename super::matrix_type				matrix_type;
     typedef typename super::element_type			element_type;
     typedef Point2<element_type>				point_type;
-    typedef Vector<element_type,
-		   FixedSizedBuf<element_type, DOF> >		param_type;
-    typedef Matrix<element_type, FixedSizedBuf<element_type, 2*DOF>,
-		   FixedSizedBuf<Vector<element_type>, 2> >	jacobian_type;
+    typedef Vector<element_type, Buf<element_type, DOF> >	param_type;
+    typedef Matrix<element_type, Buf<element_type, 2*DOF>,
+		   Buf<Vector<element_type>, 2> >		jacobian_type;
 
   public:
     Homography()			:super()		{}
@@ -1941,12 +1939,10 @@ Homography<T>::compose(const param_type& dt)
   に写す．
 */
 template <class T>
-class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
-					 FixedSizedBuf<Vector<T>, 3> > >
+class Affinity2 : public Affinity<Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> > >
 {
   private:
-    typedef Affinity<Matrix<T, FixedSizedBuf<T, 9>,
-			    FixedSizedBuf<Vector<T>, 3> > >	super;
+    typedef Affinity<Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> > >	super;
     
   public:
     enum	{DOF=6};
@@ -1955,11 +1951,10 @@ class Affinity2 : public Affinity<Matrix<T, FixedSizedBuf<T, 9>,
     typedef typename super::vector_type				vector_type;
     typedef typename super::matrix_type				matrix_type;
     typedef typename super::element_type			element_type;
-    typedef Vector<element_type,
-		   FixedSizedBuf<element_type, DOF> >		param_type;
+    typedef Vector<element_type, Buf<element_type, DOF> >	param_type;
     typedef Point2<element_type>				point_type;
-    typedef Matrix<element_type, FixedSizedBuf<element_type, 2*DOF>,
-		   FixedSizedBuf<Vector<element_type>, 2> >	jacobian_type;
+    typedef Matrix<element_type, Buf<element_type, 2*DOF>,
+		   Buf<Vector<element_type>, 2> >		jacobian_type;
 
   public:
     Affinity2()	:super()					{}

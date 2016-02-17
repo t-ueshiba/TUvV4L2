@@ -58,8 +58,7 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
 {
     typedef Vector<element_type>			vector_type;
     typedef Matrix<element_type>			matrix_type;
-    typedef Vector<element_type,
-		   FixedSizedBuf<element_type, 3> >	vector3_type;
+    typedef Vector<element_type, Buf<element_type, 3> >	vector3_type;
 
   // _H[2] is not used, but initialized with an identiy matrix.
     _H[2] = matrix_type::I(3);

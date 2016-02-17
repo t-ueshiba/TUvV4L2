@@ -52,6 +52,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/arm/cast.h \
 		/usr/local/include/TU/simd/arm/compare.h \
 		/usr/local/include/TU/simd/arm/cvt.h \
+		/usr/local/include/TU/simd/arm/dup.h \
 		/usr/local/include/TU/simd/arm/insert_extract.h \
 		/usr/local/include/TU/simd/arm/load_store.h \
 		/usr/local/include/TU/simd/arm/logical.h \
@@ -160,14 +161,16 @@ Ieee1394Camera.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -226,14 +229,16 @@ Ieee1394CameraArray.o: TU/Ieee1394CameraArray.h TU/Ieee1394++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -292,14 +297,16 @@ Ieee1394CameraUtility.o: TU/Ieee1394CameraArray.h TU/Ieee1394++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -358,14 +365,16 @@ Ieee1394Node.o: TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \

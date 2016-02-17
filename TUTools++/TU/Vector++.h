@@ -184,10 +184,9 @@ class Vector : public Array<T, B>
     typedef typename super::reverse_iterator		reverse_iterator;
     typedef typename super::const_reverse_iterator	const_reverse_iterator;
   //! 成分の型が等しい3次元ベクトルの型
-    typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
+    typedef Vector<T, Buf<T, 3> >			vector3_type;
   //! 成分の型が等しい3x3行列の型
-    typedef Matrix<T, FixedSizedBuf<T, 9>,
-		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
+    typedef Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> >	matrix33_type;
     
   public:
     Vector()								;
@@ -464,8 +463,7 @@ Vector<T, B>::normal() const
   \f]
   \throw std::invalid_argument	3次元ベクトルでない場合に送出
 */
-template <class T, class B>
-Matrix<T, FixedSizedBuf<T, 9>, FixedSizedBuf<Vector<T>, 3> >
+template <class T, class B> Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> >
 Vector<T, B>::skew() const
 {
     if (size() != 3)
@@ -534,15 +532,13 @@ class Matrix : public Array2<Vector<T>, B, R>
     typedef typename super::reverse_iterator		reverse_iterator;
     typedef typename super::const_reverse_iterator	const_reverse_iterator;
   //! 成分の型が等しい3次元ベクトルの型
-    typedef Vector<T, FixedSizedBuf<T, 3> >		vector3_type;
+    typedef Vector<T, Buf<T, 3> >			vector3_type;
   //! 成分の型が等しい4次元ベクトルの型
-    typedef Vector<T, FixedSizedBuf<T, 4> >		vector4_type;
+    typedef Vector<T, Buf<T, 4> >			vector4_type;
   //! 成分の型が等しい2x2行列の型
-    typedef Matrix<T, FixedSizedBuf<T, 4>,
-		   FixedSizedBuf<Vector<T>, 2> >	matrix22_type;
+    typedef Matrix<T, Buf<T, 4>, Buf<Vector<T>, 2> >	matrix22_type;
   //! 成分の型が等しい3x3行列の型
-    typedef Matrix<T, FixedSizedBuf<T, 9>,
-		   FixedSizedBuf<Vector<T>, 3> >	matrix33_type;
+    typedef Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> >	matrix33_type;
     
   public:
     Matrix()								;
@@ -1132,7 +1128,7 @@ Matrix<T, B, R>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
  \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
  \throw std::invalid_argument	3x3行列でない場合に送出
 */
-template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3> >
+template <class T, class B, class R> Vector<T, Buf<T, 3> >
 Matrix<T, B, R>::rot2axis(T& c, T& s) const
 {
     if (nrow() != 3 || ncol() != 3)
@@ -1167,7 +1163,7 @@ Matrix<T, B, R>::rot2axis(T& c, T& s) const
 				\f$\theta\TUvec{n}{}\f$
  \throw invalid_argument	3x3行列でない場合に送出
 */
-template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 3> >
+template <class T, class B, class R> Vector<T, Buf<T, 3> >
 Matrix<T, B, R>::rot2axis() const
 {
     if (nrow() != 3 || ncol() != 3)
@@ -1205,7 +1201,7 @@ Matrix<T, B, R>::rot2axis() const
  \return			四元数を表す4次元単位ベクトル
  \throw invalid_argument	3x3行列でない場合に送出
 */
-template <class T, class B, class R> Vector<T, FixedSizedBuf<T, 4u> >
+template <class T, class B, class R> Vector<T, Buf<T, 4u> >
 Matrix<T, B, R>::rot2quaternion() const
 {
     if (nrow() != 3 || ncol() != 3)
@@ -2359,10 +2355,9 @@ serialize(const Matrix<T, B, R>& x)
 *  type aliases								*
 ************************************************************************/
 template <class T, size_t D>
-using FixedSizedVector = Vector<T, FixedSizedBuf<T, D> >;
+using FixedSizedVector = Vector<T, Buf<T, D> >;
 template <class T, size_t R, size_t C>
-using FixedSizedMatrix = Matrix<T, FixedSizedBuf<T, R*C>,
-				FixedSizedBuf<Vector<T>, R> >;
+using FixedSizedMatrix = Matrix<T, Buf<T, R*C>, Buf<Vector<T>, R> >;
 
 typedef FixedSizedVector<short,  2>	Vector2s;
 typedef FixedSizedVector<int,    2>	Vector2i;

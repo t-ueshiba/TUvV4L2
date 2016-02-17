@@ -37,8 +37,8 @@ class ICIA
   private:
     typedef typename MAP::param_type				 param_type;
     typedef Matrix<element_type,
-		   FixedSizedBuf<element_type, MAP::DOF * MAP::DOF>,
-		   FixedSizedBuf<Vector<element_type>, MAP::DOF> > matrix_type;
+		   Buf<element_type, MAP::DOF * MAP::DOF>,
+		   Buf<Vector<element_type>, MAP::DOF> >	matrix_type;
 
     element_type	sqrerr(const Image<T>& imageDst,
 			       int u0, int v0, size_t w, size_t h,

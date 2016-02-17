@@ -70,8 +70,140 @@ struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別
 #endif
 
 /************************************************************************
-*  class Buf<T, ALLOC>							*
+*  class Buf<T, D, ALLOC>						*
 ************************************************************************/
+template <class T, size_t D=0,
+	  class ALLOC=typename BufTraits<T>::allocator_type>
+class Buf;
+    
+//! 定数サイズのバッファクラス
+/*!
+  単独で使用することはなく， TU::Array の第2テンプレート引数に指定する
+  ことによって TU::Array の基底クラスとして使う．
+  \param T		要素の型
+  \param D		バッファ中の要素数
+*/
+template <class T, size_t D, class ALLOC>
+class Buf : public BufTraits<T>
+{
+  public:
+    typedef T						value_type;
+    typedef value_type*					pointer;
+    typedef const value_type*				const_pointer;
+    typedef typename BufTraits<T>::iterator		iterator;
+    typedef typename BufTraits<T>::const_iterator	const_iterator;
+    typedef typename std::iterator_traits<iterator>::reference
+							reference;
+    typedef typename std::iterator_traits<const_iterator>::reference
+							const_reference;
+    typedef void					allocator_type;
+    
+  public:
+    explicit		Buf(size_t siz=D)
+			{
+			    resize(siz);
+			}
+
+			Buf(const Buf& b)
+			{
+			    for_each(b.begin(), assign());
+			}
+    Buf&		operator =(const Buf& b)
+			{
+			    if (this != &b)
+				for_each(b.begin(), assign());
+			    return *this;
+			}
+    
+  //! 外部の領域と要素数を指定してバッファを生成する（ダミー関数）．
+  /*!
+    実際はバッファが使用する記憶領域は固定されていて変更できないので，
+    この関数は常に例外を送出する．
+    \throw std::logic_error	この関数が呼ばれたら必ず送出
+  */
+			Buf(pointer, size_t)
+			{
+			    throw std::logic_error("Buf<T, D>::Buf(pointer, size_t): cannot specify a pointer to external storage!!");
+			}
+
+    pointer		data()			{ return _p; }
+    const_pointer	data()		const	{ return _p; }
+    iterator		begin()			{ return _p; }
+    const_iterator	begin()		const	{ return _p; }
+    const_iterator	cbegin()	const	{ return _p; }
+    iterator		end()			{ return _p + D; }
+    const_iterator	end()		const	{ return _p + D; }
+    const_iterator	cend()		const	{ return _p + D; }
+    constexpr static size_t
+			size()			{ return D; }
+
+  //! バッファの要素数を変更する．
+  /*!
+    実際にはバッファの要素数を変更することはできないので，与えられた要素数が
+    このバッファの要素数に等しい場合のみ，通常どおりにこの関数から制御が返る．
+    \param siz	新しい要素数
+    \return	常にfalse
+  */
+    static bool		resize(size_t siz)
+			{
+			    assert(siz == D);
+			    return false;
+			}
+	
+  //! バッファが内部で使用する記憶領域を指定したものに変更する．
+  /*!
+    実際にはバッファの記憶領域を変更することはできないので，与えられたポインタ
+    と要素数がこのバッファのそれらに等しい場合のみ，通常どおりにこの関数から制御
+    が返る．
+    \param p	新しい記憶領域へのポインタ
+    \param siz	新しい要素数
+  */
+    void		resize(pointer p, size_t siz)
+			{
+			    assert(p == _p && siz == D);
+			}
+
+  //! 入力ストリームから配列を読み込む(ASCII)．
+  /*!
+    \param in	入力ストリーム
+    \return	inで指定した入力ストリーム
+  */
+    std::istream&	get(std::istream& in)
+			{
+			    for (auto& x : *this)
+				in >> x;
+			    return in;
+			}
+
+  protected:
+    template <class OP, class ITER>
+    void		for_each(ITER src, const OP& op)
+			{
+			    for_each_impl<0, OP>::exec(src, begin(), op);
+			}
+    
+  private:
+    template <size_t N, class OP>
+    struct for_each_impl
+    {
+	template <class ITER_>
+	static void	exec(ITER_ src, iterator dst, const OP& op)
+			{
+			    op(*dst, *src);
+			    for_each_impl<N+1, OP>::exec(++src, ++dst, op);
+			}
+    };
+    template <class OP>
+    struct for_each_impl<D, OP>
+    {
+	template <class ITER_>
+	static void	exec(ITER_, iterator, const OP&)		{}
+    };
+    
+  private:
+    alignas(sizeof(value_type)) value_type	_p[D];	// D-sized buffer
+};
+
 //! 可変長バッファクラス
 /*!
   単独で使用することはなく，TU::Array または TU::Array2 の
@@ -79,8 +211,8 @@ struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別
   \param T		要素の型
   \param ALLOC		アロケータの型
 */
-template <class T, class ALLOC=typename BufTraits<T>::allocator_type>
-class Buf : public BufTraits<T>
+template <class T, class ALLOC>
+class Buf<T, 0, ALLOC> : public BufTraits<T>
 {
   public:
     typedef T						value_type;
@@ -247,7 +379,7 @@ class Buf : public BufTraits<T>
   \return	inで指定した入力ストリーム
 */
 template <class T, class ALLOC> std::istream&
-Buf<T, ALLOC>::get(std::istream& in, size_t m)
+Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
 {
     const size_t	BufSiz = (sizeof(value_type) < 2048 ?
 				  2048 / sizeof(value_type) : 1);
@@ -281,137 +413,6 @@ Buf<T, ALLOC>::get(std::istream& in, size_t m)
     return in;
 }
     
-/************************************************************************
-*  class FixedSizedBuf<T, D>						*
-************************************************************************/
-//! 定数サイズのバッファクラス
-/*!
-  単独で使用することはなく， TU::Array の第2テンプレート引数に指定する
-  ことによって TU::Array の基底クラスとして使う．
-  \param T		要素の型
-  \param D		バッファ中の要素数
-*/
-template <class T, size_t D>
-class FixedSizedBuf : public BufTraits<T>
-{
-  public:
-    typedef T						value_type;
-    typedef value_type*					pointer;
-    typedef const value_type*				const_pointer;
-    typedef typename BufTraits<T>::iterator		iterator;
-    typedef typename BufTraits<T>::const_iterator	const_iterator;
-    typedef typename std::iterator_traits<iterator>::reference
-							reference;
-    typedef typename std::iterator_traits<const_iterator>::reference
-							const_reference;
-    typedef void					allocator_type;
-    
-  public:
-    explicit		FixedSizedBuf(size_t siz=D)
-			{
-			    resize(siz);
-			}
-
-			FixedSizedBuf(const FixedSizedBuf& b)
-			{
-			    for_each(b.begin(), assign());
-			}
-    FixedSizedBuf&	operator =(const FixedSizedBuf& b)
-			{
-			    if (this != &b)
-				for_each(b.begin(), assign());
-			    return *this;
-			}
-    
-  //! 外部の領域と要素数を指定してバッファを生成する（ダミー関数）．
-  /*!
-    実際はバッファが使用する記憶領域は固定されていて変更できないので，
-    この関数は常に例外を送出する．
-    \throw std::logic_error	この関数が呼ばれたら必ず送出
-  */
-			FixedSizedBuf(pointer, size_t)
-			{
-			    throw std::logic_error("FixedSizedBuf<T, D>::FixedSizedBuf(pointer, size_t): cannot specify a pointer to external storage!!");
-			}
-
-    pointer		data()			{ return _p; }
-    const_pointer	data()		const	{ return _p; }
-    iterator		begin()			{ return _p; }
-    const_iterator	begin()		const	{ return _p; }
-    const_iterator	cbegin()	const	{ return _p; }
-    iterator		end()			{ return _p + D; }
-    const_iterator	end()		const	{ return _p + D; }
-    const_iterator	cend()		const	{ return _p + D; }
-    constexpr static size_t
-			size()			{ return D; }
-
-  //! バッファの要素数を変更する．
-  /*!
-    実際にはバッファの要素数を変更することはできないので，与えられた要素数が
-    このバッファの要素数に等しい場合のみ，通常どおりにこの関数から制御が返る．
-    \param siz	新しい要素数
-    \return	常にfalse
-  */
-    static bool		resize(size_t siz)
-			{
-			    assert(siz == D);
-			    return false;
-			}
-	
-  //! バッファが内部で使用する記憶領域を指定したものに変更する．
-  /*!
-    実際にはバッファの記憶領域を変更することはできないので，与えられたポインタ
-    と要素数がこのバッファのそれらに等しい場合のみ，通常どおりにこの関数から制御
-    が返る．
-    \param p	新しい記憶領域へのポインタ
-    \param siz	新しい要素数
-  */
-    void		resize(pointer p, size_t siz)
-			{
-			    assert(p == _p && siz == D);
-			}
-
-  //! 入力ストリームから配列を読み込む(ASCII)．
-  /*!
-    \param in	入力ストリーム
-    \return	inで指定した入力ストリーム
-  */
-    std::istream&	get(std::istream& in)
-			{
-			    for (auto& x : *this)
-				in >> x;
-			    return in;
-			}
-
-  protected:
-    template <class OP, class ITER>
-    void		for_each(ITER src, const OP& op)
-			{
-			    for_each_impl<0, OP>::exec(src, begin(), op);
-			}
-    
-  private:
-    template <size_t N, class OP>
-    struct for_each_impl
-    {
-	template <class ITER_>
-	static void	exec(ITER_ src, iterator dst, const OP& op)
-			{
-			    op(*dst, *src);
-			    for_each_impl<N+1, OP>::exec(++src, ++dst, op);
-			}
-    };
-    template <class OP>
-    struct for_each_impl<D, OP>
-    {
-	template <class ITER_>
-	static void	exec(ITER_, iterator, const OP&)		{}
-    };
-    
-  private:
-    alignas(sizeof(value_type)) value_type	_p[D];	// D-sized buffer
-};
-
 /************************************************************************
 *  class Array<T, B>							*
 ************************************************************************/
@@ -741,7 +742,7 @@ class Array : public B
 *  typedef FixedSizedArray<T, D>					*
 ************************************************************************/
 template <class T, size_t D>
-using FixedSizedArray = Array<T, FixedSizedBuf<T, D> >;
+using FixedSizedArray = Array<T, Buf<T, D> >;
 
 namespace detail
 {
@@ -1478,8 +1479,7 @@ namespace detail
 
     // 3次元ベクトル型
       typedef value_t<right_type>			rvalue_type;
-      typedef Array<rvalue_type, FixedSizedBuf<rvalue_type, 3> >
-							array3_type;
+      typedef Array<rvalue_type, Buf<rvalue_type, 3> >	array3_type;
 
     // 左辺が多次元配列ならその行と右辺のベクトル積を返す反復子を定義
       typedef const_iterator_t<L>			base_iterator;
