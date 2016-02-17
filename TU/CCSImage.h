@@ -1,15 +1,15 @@
 /*
- *  •½¬21-22”Ni“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š ’˜ìŒ Š—L
+ *  å¹³æˆ21-22å¹´ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ è‘—ä½œæ¨©æ‰€æœ‰
  *  
- *  ‘nìÒFAÅr•v
+ *  å‰µä½œè€…ï¼šæ¤èŠä¿Šå¤«
  *
- *  –{ƒvƒƒOƒ‰ƒ€‚Íi“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ÌEˆõ‚Å‚ ‚éAÅr•v‚ª‘nì‚µC
- *  i“ÆjY‹Æ‹Zp‘‡Œ¤‹†Š‚ª’˜ìŒ ‚ğŠ—L‚·‚é”é–§î•ñ‚Å‚·D’˜ìŒ Š—L
- *  Ò‚É‚æ‚é‹–‰Â‚È‚µ‚É–{ƒvƒƒOƒ‰ƒ€‚ğg—pC•¡»C‰ü•ÏC‘æOÒ‚ÖŠJ¦‚·‚é
- *  “™‚Ìsˆ×‚ğ‹Ö~‚µ‚Ü‚·D
+ *  æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ã®è·å“¡ã§ã‚ã‚‹æ¤èŠä¿Šå¤«ãŒå‰µä½œã—ï¼Œ
+ *  ï¼ˆç‹¬ï¼‰ç”£æ¥­æŠ€è¡“ç·åˆç ”ç©¶æ‰€ãŒè‘—ä½œæ¨©ã‚’æ‰€æœ‰ã™ã‚‹ç§˜å¯†æƒ…å ±ã§ã™ï¼è‘—ä½œæ¨©æ‰€æœ‰
+ *  è€…ã«ã‚ˆã‚‹è¨±å¯ãªã—ã«æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ä½¿ç”¨ï¼Œè¤‡è£½ï¼Œæ”¹å¤‰ï¼Œç¬¬ä¸‰è€…ã¸é–‹ç¤ºã™ã‚‹
+ *  ç­‰ã®è¡Œç‚ºã‚’ç¦æ­¢ã—ã¾ã™ï¼
  *  
- *  ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‚æ‚Á‚Ä¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ‚É‘Î‚µ‚Ä‚àC’˜ìŒ Š—LÒ‚¨
- *  ‚æ‚Ñ‘nìÒ‚ÍÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB
+ *  ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æå®³ã«å¯¾ã—ã¦ã‚‚ï¼Œè‘—ä½œæ¨©æ‰€æœ‰è€…ãŠ
+ *  ã‚ˆã³å‰µä½œè€…ã¯è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚
  *
  *  Copyright 2009-2010.
  *  National Institute of Advanced Industrial Science and Technology (AIST)
@@ -48,7 +48,7 @@ setSign(T& val)
 /************************************************************************
 *  class CCSImageLine<T>						*
 ************************************************************************/
-//! ‚»‚Ì—£Uƒt[ƒŠƒG•ÏŠ·‚ª complex conjugate symmetrical Œ`®‚Å•\‚³‚ê‚éÀ”’l1ŸŒ³”z—ñ
+//! ãã®é›¢æ•£ãƒ•ãƒ¼ãƒªã‚¨å¤‰æ›ãŒ complex conjugate symmetrical å½¢å¼ã§è¡¨ã•ã‚Œã‚‹å®Ÿæ•°å€¤1æ¬¡å…ƒé…åˆ—
 template <class T>
 class CCSImageLine : public ImageLine<T>
 {
@@ -60,11 +60,11 @@ class CCSImageLine : public ImageLine<T>
     typedef typename line_type::const_reverse_iterator	const_reverse_iterator;
     
   public:
-  //! CCSŒ`®‚Ì1ŸŒ³”z—ñ‚ğ¶¬‚·‚éD
+  //! CCSå½¢å¼ã®1æ¬¡å…ƒé…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param d	”z—ñ‚Ì—v‘f”
+    \param d	é…åˆ—ã®è¦ç´ æ•°
   */
-    explicit CCSImageLine(u_int d=0) :line_type(d)			{}
+    explicit CCSImageLine(size_t d=0) :line_type(d)			{}
 
     using		line_type::begin;
     using		line_type::end;
@@ -73,8 +73,8 @@ class CCSImageLine : public ImageLine<T>
     using		line_type::size;
     using		line_type::check_size;
     
-    std::complex<T>	operator ()(u_int u)			const	;
-    std::complex<T>	conj(u_int u)				const	;
+    std::complex<T>	operator ()(size_t u)			const	;
+    std::complex<T>	conj(size_t u)				const	;
     CCSImageLine<T>	mag()					const	;
     CCSImageLine<T>	specmag()				const	;
     CCSImageLine<T>&	pdiff(const CCSImageLine<T>& spectrum)		;
@@ -84,48 +84,48 @@ class CCSImageLine : public ImageLine<T>
     T			maximum()				const	;
 };
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«Cw’è‚³‚ê‚½index‚É‘Î‚·‚é’li•¡‘f”j‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼ŒæŒ‡å®šã•ã‚ŒãŸindexã«å¯¾ã™ã‚‹å€¤ï¼ˆè¤‡ç´ æ•°ï¼‰ã‚’è¿”ã™ï¼
 /*!
   \param u	index
-  \return	u ‚É‚æ‚Á‚Äw’è‚³‚ê‚½—v‘f‚Ì’l
+  \return	u ã«ã‚ˆã£ã¦æŒ‡å®šã•ã‚ŒãŸè¦ç´ ã®å€¤
 */
 template <class T> inline std::complex<T>
-CCSImageLine<T>::operator ()(u_int u) const
+CCSImageLine<T>::operator ()(size_t u) const
 {
     using namespace	std;
 
-    const u_int	u2 = size() / 2;
+    const size_t	u2 = size() / 2;
     if (u == 0)
 	return (*this)[0];
     else if (u < u2)
     {
-	const u_int	uu = 2*u;
+	const size_t	uu = 2*u;
 	return complex<T>((*this)[uu-1], (*this)[uu]);
     }
     else if (u == u2)
 	return (*this)[size() - 1];
     else
     {
-	const u_int	uu = 2*(size() - u);
+	const size_t	uu = 2*(size() - u);
 	return complex<T>((*this)[uu-1], (*this)[uu]);
     }
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«Cw’è‚³‚ê‚½index‚É‘Î‚·‚é’l‚Ì‹¤–ğ•¡‘f”’l‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼ŒæŒ‡å®šã•ã‚ŒãŸindexã«å¯¾ã™ã‚‹å€¤ã®å…±å½¹è¤‡ç´ æ•°å€¤ã‚’è¿”ã™ï¼
 /*!
   \param u	index
-  \return	u ‚É‚æ‚Á‚Äw’è‚³‚ê‚½—v‘f‚Ì’l‚Ì‹¤–ğ•¡‘f”’l
+  \return	u ã«ã‚ˆã£ã¦æŒ‡å®šã•ã‚ŒãŸè¦ç´ ã®å€¤ã®å…±å½¹è¤‡ç´ æ•°å€¤
 */
 template <class T> inline std::complex<T>
-CCSImageLine<T>::conj(u_int u) const
+CCSImageLine<T>::conj(size_t u) const
 {
     return std::complex<T>((*this)[u]);
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ª‹óŠÔ—Ìˆæ‚É‚ ‚é‚Æ‚«CŠe—v‘f‚ÌU•‚ğ—v‘f‚Æ‚·‚é1ŸŒ³”z—ñ‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒç©ºé–“é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œå„è¦ç´ ã®æŒ¯å¹…ã‚’è¦ç´ ã¨ã™ã‚‹1æ¬¡å…ƒé…åˆ—ã‚’è¿”ã™ï¼
 /*!
-  •Ô‚³‚ê‚é1ŸŒ³”z—ñ‚Í‹óŠÔ—Ìˆæ‚É‘®‚·‚éD‚Ü‚½CŒ´“_‚Í”z—ñ‚Ì¶’[‚Æ‚È‚éD
-  \return	U•‚ğ—v‘f‚Æ‚·‚é1ŸŒ³”z—ñ
+  è¿”ã•ã‚Œã‚‹1æ¬¡å…ƒé…åˆ—ã¯ç©ºé–“é ˜åŸŸã«å±ã™ã‚‹ï¼ã¾ãŸï¼ŒåŸç‚¹ã¯é…åˆ—ã®å·¦ç«¯ã¨ãªã‚‹ï¼
+  \return	æŒ¯å¹…ã‚’è¦ç´ ã¨ã™ã‚‹1æ¬¡å…ƒé…åˆ—
 */
 template <class T> CCSImageLine<T>
 CCSImageLine<T>::mag() const
@@ -140,10 +140,10 @@ CCSImageLine<T>::mag() const
     return ccs;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«CŠe—v‘f‚ÌU•‚ğ—v‘f‚Æ‚·‚é1ŸŒ³”z—ñ‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œå„è¦ç´ ã®æŒ¯å¹…ã‚’è¦ç´ ã¨ã™ã‚‹1æ¬¡å…ƒé…åˆ—ã‚’è¿”ã™ï¼
 /*!
-  •Ô‚³‚ê‚é1ŸŒ³”z—ñ‚Í‹óŠÔ—Ìˆæ‚É‘®‚·‚éD‚Ü‚½CŒ´“_‚ª”z—ñ‚Ì¶’[‚©‚ç’†‰›‚ÉˆÚ‚³‚ê‚éD
-  \return	U•‚ğ—v‘f‚Æ‚·‚é1ŸŒ³”z—ñ
+  è¿”ã•ã‚Œã‚‹1æ¬¡å…ƒé…åˆ—ã¯ç©ºé–“é ˜åŸŸã«å±ã™ã‚‹ï¼ã¾ãŸï¼ŒåŸç‚¹ãŒé…åˆ—ã®å·¦ç«¯ã‹ã‚‰ä¸­å¤®ã«ç§»ã•ã‚Œã‚‹ï¼
+  \return	æŒ¯å¹…ã‚’è¦ç´ ã¨ã™ã‚‹1æ¬¡å…ƒé…åˆ—
 */
 template <class T> CCSImageLine<T>
 CCSImageLine<T>::specmag() const
@@ -151,7 +151,7 @@ CCSImageLine<T>::specmag() const
     using namespace	std;
     
     CCSImageLine<T>	ccs(size());
-    const u_int		u2 = ccs.size() / 2;
+    const size_t	u2 = ccs.size() / 2;
     iterator		pF = ccs.begin() + u2;
     iterator		pB = pF;
     for (const_iterator p = begin() + 1, pe = end() - 1; p != pe; p += 2)
@@ -164,10 +164,10 @@ CCSImageLine<T>::specmag() const
     return ccs;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«C—^‚¦‚ç‚ê‚½‚à‚¤‚Ğ‚Æ‚Â‚ÌCCS”z—ñ‚Æ‚ÌˆÊ‘Š·‚É•ÏŠ·‚·‚éD
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œä¸ãˆã‚‰ã‚ŒãŸã‚‚ã†ã²ã¨ã¤ã®CCSé…åˆ—ã¨ã®ä½ç›¸å·®ã«å¤‰æ›ã™ã‚‹ï¼
 /*!
-  \param spectrum	ü”g”—Ìˆæ‚É‚ ‚éCCS”z—ñ	
-  \return		ˆÊ‘Š·‚ğ•\‚·1ŸŒ³”z—ñ
+  \param spectrum	å‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹CCSé…åˆ—	
+  \return		ä½ç›¸å·®ã‚’è¡¨ã™1æ¬¡å…ƒé…åˆ—
 */
 template <class T> CCSImageLine<T>&
 CCSImageLine<T>::pdiff(const CCSImageLine<T>& spectrum)
@@ -186,17 +186,17 @@ CCSImageLine<T>::pdiff(const CCSImageLine<T>& spectrum)
 	*p++ = val.real();
 	*p++ = val.imag();
     }
-    const u_int	u1 = size() - 1;
+    const size_t	u1 = size() - 1;
     setSign((*this)[0]  *= spectrum[0]);
     setSign((*this)[u1] *= spectrum[u1]);
 
     return *this;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«C‚±‚ê‚É•Ê‚ÌCCS”z—ñ‚Ì•¡‘f‹¤–ğ‚ğŠ|‚¯‚éD
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œã“ã‚Œã«åˆ¥ã®CCSé…åˆ—ã®è¤‡ç´ å…±å½¹ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param spectrum	ü”g”—Ìˆæ‚É‚ ‚éCCS”z—ñ	
-  \return		specturm‚Ì•¡‘f‹¤–ğ‚ğŠ|‚¯‚½Œã‚Ì‚±‚Ì”z—ñ
+  \param spectrum	å‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹CCSé…åˆ—	
+  \return		specturmã®è¤‡ç´ å…±å½¹ã‚’æ›ã‘ãŸå¾Œã®ã“ã®é…åˆ—
 */
 template <class T> CCSImageLine<T>&
 CCSImageLine<T>::operator *=(const CCSImageLine<T>& spectrum)
@@ -213,17 +213,17 @@ CCSImageLine<T>::operator *=(const CCSImageLine<T>& spectrum)
 	*p++ = val.real();
 	*p++ = val.imag();
     }
-    const u_int	u1 = size() - 1;
+    const size_t	u1 = size() - 1;
     (*this)[0]  *= spectrum[0];
     (*this)[u1] *= spectrum[u1];
 
     return *this;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ª‹óŠÔ—Ìˆæ‚É‚ ‚é‚Æ‚«C‚à‚¤‚Ğ‚Æ‚Â‚ÌCCS”z—ñ‚ÅŠ„‚éD
+//! ã“ã®CCSé…åˆ—ãŒç©ºé–“é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œã‚‚ã†ã²ã¨ã¤ã®CCSé…åˆ—ã§å‰²ã‚‹ï¼
 /*!
-  \param spectrum	‹óŠÔ—Ìˆæ‚É‚ ‚éCCS”z—ñ	
-  \return		¤‚ğ‚Æ‚Á‚½Œã‚Ì‚±‚ÌCCS”z—ñ
+  \param spectrum	ç©ºé–“é ˜åŸŸã«ã‚ã‚‹CCSé…åˆ—	
+  \return		å•†ã‚’ã¨ã£ãŸå¾Œã®ã“ã®CCSé…åˆ—
 */
 template <class T> CCSImageLine<T>&
 CCSImageLine<T>::operator /=(const CCSImageLine<T>& magnitude)
@@ -246,10 +246,10 @@ CCSImageLine<T>::operator /=(const CCSImageLine<T>& magnitude)
     return *this;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ª‹óŠÔ—Ìˆæ‚É‚ ‚é‚Æ‚«C”z—ñ—v‘f’†‚ÌÅ‘å’l‚Æ‚»‚ÌˆÊ’u‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒç©ºé–“é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œé…åˆ—è¦ç´ ä¸­ã®æœ€å¤§å€¤ã¨ãã®ä½ç½®ã‚’è¿”ã™ï¼
 /*!
-  \param uMax	Å‘å’l‚ğ—^‚¦‚é—v‘f‚ÌˆÊ’u
-  \return	Å‘å’l
+  \param uMax	æœ€å¤§å€¤ã‚’ä¸ãˆã‚‹è¦ç´ ã®ä½ç½®
+  \return	æœ€å¤§å€¤
 */
 template <class T> T
 CCSImageLine<T>::maximum(T& uMax) const
@@ -257,7 +257,7 @@ CCSImageLine<T>::maximum(T& uMax) const
     using namespace	std;
     
     T	valMax = numeric_limits<T>::min();
-    for (u_int u = 0; u < size(); ++u)
+    for (size_t u = 0; u < size(); ++u)
     {
 	const T	val = (*this)[u];
 	if (val > valMax)
@@ -268,7 +268,7 @@ CCSImageLine<T>::maximum(T& uMax) const
     }
 #if _DEBUG >= 2
     Image<T>	tmp(50, size());
-    for (u_int t = 0; t < tmp.height(); ++t)
+    for (size_t t = 0; t < tmp.height(); ++t)
 	tmp[t] = (*this)[t] * T(255) / valMax;
     tmp.save(cout, ImageBase::FLOAT);
     cerr << "CCSImageLine<T>::maximum()..." << endl;
@@ -286,7 +286,7 @@ CCSImageLine<T>::maximum() const
     using namespace	std;
     
     T	valMax = numeric_limits<T>::min();
-    for (u_int u = 0; u < size(); ++u)
+    for (size_t u = 0; u < size(); ++u)
     {
 	const T	val = (*this)[u];
 	if (val > valMax)
@@ -299,7 +299,7 @@ CCSImageLine<T>::maximum() const
 /************************************************************************
 *  class CCSImage<T>							*
 ************************************************************************/
-//! ‚»‚Ì—£Uƒt[ƒŠƒG•ÏŠ·‚ª complex conjugate symmetrical Œ`®‚Å•\‚³‚ê‚éÀ”’l2ŸŒ³”z—ñ
+//! ãã®é›¢æ•£ãƒ•ãƒ¼ãƒªã‚¨å¤‰æ›ãŒ complex conjugate symmetrical å½¢å¼ã§è¡¨ã•ã‚Œã‚‹å®Ÿæ•°å€¤2æ¬¡å…ƒé…åˆ—
 template <class T>
 class CCSImage : public Image<T>
 {
@@ -316,12 +316,12 @@ class CCSImage : public Image<T>
     typedef typename line_type::const_reverse_iterator	const_reverse_pixel_iterator;
     
   public:
-  //! CCSŒ`®‚Ì2ŸŒ³”z—ñ‚ğ¶¬‚·‚éD
+  //! CCSå½¢å¼ã®2æ¬¡å…ƒé…åˆ—ã‚’ç”Ÿæˆã™ã‚‹ï¼
   /*!
-    \param w	”z—ñ‚Ì•
-    \param h	”z—ñ‚Ì‚‚³
+    \param w	é…åˆ—ã®å¹…
+    \param h	é…åˆ—ã®é«˜ã•
   */
-    explicit CCSImage(u_int w=0, u_int h=0) :image_type(w, h)		{}
+    explicit CCSImage(size_t w=0, size_t h=0) :image_type(w, h)		{}
 
     using		image_type::begin;
     using		image_type::end;
@@ -332,8 +332,8 @@ class CCSImage : public Image<T>
     using		image_type::height;
     using		image_type::check_size;
 
-    std::complex<T>	operator ()(u_int u, u_int v)		const	;
-    std::complex<T>	conj(u_int u, u_int v)			const	;
+    std::complex<T>	operator ()(size_t u, size_t v)		const	;
+    std::complex<T>	conj(size_t u, size_t v)		const	;
     CCSImage<T>		specmag()				const	;
     CCSImage<T>		logpolar()				const	;
     CCSImageLine<T>	intpolar()				const	;
@@ -343,19 +343,19 @@ class CCSImage : public Image<T>
     T			maximum()				const	;
 };
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«Cw’è‚³‚ê‚½index‚É‘Î‚·‚é’li•¡‘f”j‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼ŒæŒ‡å®šã•ã‚ŒãŸindexã«å¯¾ã™ã‚‹å€¤ï¼ˆè¤‡ç´ æ•°ï¼‰ã‚’è¿”ã™ï¼
 /*!
-  \param u	‰¡index
-  \param v	cindex
-  \return	u, v ‚É‚æ‚Á‚Äw’è‚³‚ê‚½—v‘f‚Ì’l
+  \param u	æ¨ªindex
+  \param v	ç¸¦index
+  \return	u, v ã«ã‚ˆã£ã¦æŒ‡å®šã•ã‚ŒãŸè¦ç´ ã®å€¤
 */
 template <class T> std::complex<T>
-CCSImage<T>::operator ()(u_int u, u_int v) const
+CCSImage<T>::operator ()(size_t u, size_t v) const
 {
     using namespace	std;
     
-    const u_int	u2 = width() / 2;
-    u_int	uu;
+    const size_t	u2 = width() / 2;
+    size_t		uu;
     if (u == 0)
 	uu = 0;
     else if (u < u2)
@@ -371,8 +371,8 @@ CCSImage<T>::operator ()(u_int u, u_int v) const
 	return complex<T>((*this)[v][uu-1], -(*this)[v][uu]);
     }
 
-    const u_int	v2 = height() / 2;
-    u_int	vv;
+    const size_t	v2 = height() / 2;
+    size_t		vv;
     if (v == 0)
 	return (*this)[0][uu];
     else if (v < v2)
@@ -389,36 +389,36 @@ CCSImage<T>::operator ()(u_int u, u_int v) const
     }
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«Cw’è‚³‚ê‚½index‚É‘Î‚·‚é’l‚Ì‹¤–ğ•¡‘f”’l‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼ŒæŒ‡å®šã•ã‚ŒãŸindexã«å¯¾ã™ã‚‹å€¤ã®å…±å½¹è¤‡ç´ æ•°å€¤ã‚’è¿”ã™ï¼
 /*!
-  \param u	‰¡index
-  \param v	cindex
-  \return	u, v ‚É‚æ‚Á‚Äw’è‚³‚ê‚½—v‘f‚Ì’l
+  \param u	æ¨ªindex
+  \param v	ç¸¦index
+  \return	u, v ã«ã‚ˆã£ã¦æŒ‡å®šã•ã‚ŒãŸè¦ç´ ã®å€¤
 */
 template <class T> inline std::complex<T>
-CCSImage<T>::conj(u_int u, u_int v) const
+CCSImage<T>::conj(size_t u, size_t v) const
 {
     return std::conj((*this)(u, v));
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«CŠe—v‘f‚ÌU•‚ğ—v‘f‚Æ‚·‚é2ŸŒ³”z—ñ‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œå„è¦ç´ ã®æŒ¯å¹…ã‚’è¦ç´ ã¨ã™ã‚‹2æ¬¡å…ƒé…åˆ—ã‚’è¿”ã™ï¼
 /*!
-  •Ô‚³‚ê‚é2ŸŒ³”z—ñ‚Í‹óŠÔ—Ìˆæ‚É‘®‚µCŒ´“_‚É‘Î‚µ‚Ä‘ÎÌ‚Å‚ ‚éD‚±‚ÌŒ´“_‚Í”z—ñ‚Ì
-  ¶ã‹÷‚Å‚Í‚È‚­’†‰›‚ÉˆÊ’u‚·‚éD
-  \return	U•‚ğ—v‘f‚Æ‚·‚é2ŸŒ³”z—ñ
+  è¿”ã•ã‚Œã‚‹2æ¬¡å…ƒé…åˆ—ã¯ç©ºé–“é ˜åŸŸã«å±ã—ï¼ŒåŸç‚¹ã«å¯¾ã—ã¦å¯¾ç§°ã§ã‚ã‚‹ï¼ã“ã®åŸç‚¹ã¯é…åˆ—ã®
+  å·¦ä¸Šéš…ã§ã¯ãªãä¸­å¤®ã«ä½ç½®ã™ã‚‹ï¼
+  \return	æŒ¯å¹…ã‚’è¦ç´ ã¨ã™ã‚‹2æ¬¡å…ƒé…åˆ—
 */
 template <class T> CCSImage<T>
 CCSImage<T>::specmag() const
 {
     using namespace	std;
     
-  // CCSs—ñ‚©‚çU•î•ñ‚ğæ‚èo‚·D
-  // 1. CCSs—ñ‚ÌÅ‰‚ÆÅŒã‚Ì—ñˆÈŠO‚ÌU•‚ğŒvZ‚·‚éD
+  // CCSè¡Œåˆ—ã‹ã‚‰æŒ¯å¹…æƒ…å ±ã‚’å–ã‚Šå‡ºã™ï¼
+  // 1. CCSè¡Œåˆ—ã®æœ€åˆã¨æœ€å¾Œã®åˆ—ä»¥å¤–ã®æŒ¯å¹…ã‚’è¨ˆç®—ã™ã‚‹ï¼
     CCSImage<T>	ccs(width(), height());
-    const u_int	u2 = ccs.width()  / 2;
-    const u_int	v2 = ccs.height() / 2;
-    iterator	lF = ccs.begin() + v2;
-    iterator	lB = lF;
+    const size_t	u2 = ccs.width()  / 2;
+    const size_t	v2 = ccs.height() / 2;
+    iterator		lF = ccs.begin() + v2;
+    iterator		lB = lF;
     for (const_iterator l = begin(); l != end(); ++l)
     {
 	if (lF == ccs.end())
@@ -435,8 +435,8 @@ CCSImage<T>::specmag() const
 	}
     }
 
-  // 2. CCSs—ñ‚ÌÅ‰‚ÆÅŒã‚Ì—ñiÅ‰‚ÆÅŒã‚ÌsˆÈŠOj‚ÌU•‚ğŒvZ‚·‚éD
-    const u_int	u1 = width() - 1;
+  // 2. CCSè¡Œåˆ—ã®æœ€åˆã¨æœ€å¾Œã®åˆ—ï¼ˆæœ€åˆã¨æœ€å¾Œã®è¡Œä»¥å¤–ï¼‰ã®æŒ¯å¹…ã‚’è¨ˆç®—ã™ã‚‹ï¼
+    const size_t	u1 = width() - 1;
     lF = ccs.begin() + v2;
     lB = lF;
     for (const_iterator l = begin() + 1; l != end() - 1; l += 2)
@@ -445,8 +445,8 @@ CCSImage<T>::specmag() const
 	(*lF)[0]    = (*lB)[0]    = abs(complex<T>((*l)[u1], (*(l+1))[u1]));
     }
 
-  // 3. CCSs—ñ‚Ìl‹÷‚ÌU•‚ğŒvZ‚·‚éD
-    const u_int	v1 = height() - 1;
+  // 3. CCSè¡Œåˆ—ã®å››éš…ã®æŒ¯å¹…ã‚’è¨ˆç®—ã™ã‚‹ï¼
+    const size_t	v1 = height() - 1;
     ccs[v2][u2] = abs((*this)[0][0]);
     ccs[v2][0]  = abs((*this)[0][u1]);
     ccs[0][u2]  = abs((*this)[v1][0]);
@@ -461,16 +461,16 @@ CCSImage<T>::specmag() const
     return ccs;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ª‹óŠÔ—Ìˆæ‚É‚ ‚é‚Æ‚«C‚»‚Ìlog-polar•\Œ»‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒç©ºé–“é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œãã®log-polarè¡¨ç¾ã‚’è¿”ã™ï¼
 /*!
-  \return		log-polarÀ•WŒn‚Å•\Œ»‚³‚ê‚½2ŸŒ³”z—ñ
+  \return		log-polaråº§æ¨™ç³»ã§è¡¨ç¾ã•ã‚ŒãŸ2æ¬¡å…ƒé…åˆ—
 */
 template <class T> CCSImage<T>
 CCSImage<T>::logpolar() const
 {
     using namespace	std;
 
-    const u_int		size = max(width(), height()) / 2;
+    const size_t	size = max(width(), height()) / 2;
 
     static Array<T>	windowR;
     initializeHanningWindow(windowR, size);
@@ -480,13 +480,13 @@ CCSImage<T>::logpolar() const
 		u1 = width() - 1, v1 = height() - 1;
     const T	base = pow(T(lp.width() - 1), T(1)/T(lp.width() - 1));
     const T	step = T(M_PI) / T(lp.height());
-    for (u_int t = 0; t < lp.height(); ++t)
+    for (size_t t = 0; t < lp.height(); ++t)
     {
 	line_type&	line = lp[t];
 	const T		ang = t * step;
 	Point2<T>	p(cos(ang), sin(ang));
 
-	for (u_int r = 0; r < lp.width(); ++r)
+	for (size_t r = 0; r < lp.width(); ++r)
 	{
 	    Point2<T>	q(p[0] + u2, p[1] + v2);
 
@@ -507,16 +507,16 @@ CCSImage<T>::logpolar() const
     return lp;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ª‹óŠÔ—Ìˆæ‚É‚ ‚Á‚ÄŒ´“_‚ª”z—ñ’†‰›‚É‚ ‚é‚Æ‚«C”¼Œa•ûŒü‚ÉÏ•ª‚µ‚½polar•\Œ»‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒç©ºé–“é ˜åŸŸã«ã‚ã£ã¦åŸç‚¹ãŒé…åˆ—ä¸­å¤®ã«ã‚ã‚‹ã¨ãï¼ŒåŠå¾„æ–¹å‘ã«ç©åˆ†ã—ãŸpolarè¡¨ç¾ã‚’è¿”ã™ï¼
 /*!
-  \return		”¼Œa•ûŒü‚ÉÏ•ª‚³‚êpolarÀ•WŒn‚Å•\Œ»‚³‚ê‚½1ŸŒ³”z—ñ
+  \return		åŠå¾„æ–¹å‘ã«ç©åˆ†ã•ã‚Œpolaråº§æ¨™ç³»ã§è¡¨ç¾ã•ã‚ŒãŸ1æ¬¡å…ƒé…åˆ—
 */
 template <class T> CCSImageLine<T>
 CCSImage<T>::intpolar() const
 {
     using namespace	std;
 
-    const u_int		size = max(width(), height());
+    const size_t	size = max(width(), height());
 
     static Array<T>	windowR;
     initializeHanningWindow(windowR, size);
@@ -526,12 +526,12 @@ CCSImage<T>::intpolar() const
 			u1 = width() - 1, v1 = height() - 1;
     const T		base = pow(T(ip.size() - 1), T(1)/T(ip.size() - 1));
     const T		step = T(M_PI) / T(ip.size());
-    for (u_int t = 0; t < ip.size(); ++t)
+    for (size_t t = 0; t < ip.size(); ++t)
     {
 	T&		pix = ip[t];
 	const T		ang = t * step;
 	const Point2<T>	p(cos(ang), sin(ang));
-	for (u_int r = 1; r < ip.size(); ++r)
+	for (size_t r = 1; r < ip.size(); ++r)
 	{
 	    Point2<T>	q(r*p[0] + u2, r*p[1] + v2);
 	    if (0 <= q[0] && q[0] <= u1 && 0 <= q[1] && q[1] <= v1)
@@ -544,7 +544,7 @@ CCSImage<T>::intpolar() const
 #if _DEBUG >= 1
     T		maxVal = ip.maximum();
     Image<T>	tmp(50, ip.size());
-    for (u_int t = 0; t < tmp.height(); ++t)
+    for (size_t t = 0; t < tmp.height(); ++t)
 	tmp[t] = ip[t] * T(255) / maxVal;
     tmp.save(cout, ImageBase::FLOAT);
     cerr << "CCSImage<T>::intpolar()..." << endl;
@@ -552,10 +552,10 @@ CCSImage<T>::intpolar() const
     return ip;
 }
     
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«C—^‚¦‚ç‚ê‚½‚à‚¤‚Ğ‚Æ‚Â‚ÌCCS”z—ñ‚Æ‚ÌˆÊ‘Š·‚É•ÏŠ·‚·‚éD
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œä¸ãˆã‚‰ã‚ŒãŸã‚‚ã†ã²ã¨ã¤ã®CCSé…åˆ—ã¨ã®ä½ç›¸å·®ã«å¤‰æ›ã™ã‚‹ï¼
 /*!
-  \param spectrum	ü”g”—Ìˆæ‚É‚ ‚éCCS”z—ñ	
-  \return		specturm‚Æ‚ÌˆÊ‘Š·‚É•ÏŠ·‚µ‚½Œã‚Ì‚±‚Ì”z—ñ
+  \param spectrum	å‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹CCSé…åˆ—	
+  \return		specturmã¨ã®ä½ç›¸å·®ã«å¤‰æ›ã—ãŸå¾Œã®ã“ã®é…åˆ—
 */
 template <class T> CCSImage<T>&
 CCSImage<T>::pdiff(const CCSImage<T>& spectrum)
@@ -564,7 +564,7 @@ CCSImage<T>::pdiff(const CCSImage<T>& spectrum)
 
     check_size(spectrum.size());
     
-  // 1. CCSs—ñ‚ÌÅ‰‚ÆÅŒã‚Ì—ñˆÈŠO‚ÌÏ‚ÌˆÊ‘Š‚ğ‹‚ß‚éD
+  // 1. CCSè¡Œåˆ—ã®æœ€åˆã¨æœ€å¾Œã®åˆ—ä»¥å¤–ã®ç©ã®ä½ç›¸ã‚’æ±‚ã‚ã‚‹ï¼
     iterator	l = begin();
     for (const_iterator m = spectrum.begin(); m != spectrum.end(); ++m)
     {
@@ -580,13 +580,13 @@ CCSImage<T>::pdiff(const CCSImage<T>& spectrum)
 	}
     }
 
-  // 2. CCSs—ñ‚ÌÅ‰‚ÆÅŒã‚Ì—ñiÅ‰‚ÆÅŒã‚ÌsˆÈŠOj‚ÌÏ‚ÌˆÊ‘Š‚ğ‹‚ß‚éD
-    const u_int	u1 = width() - 1;
+  // 2. CCSè¡Œåˆ—ã®æœ€åˆã¨æœ€å¾Œã®åˆ—ï¼ˆæœ€åˆã¨æœ€å¾Œã®è¡Œä»¥å¤–ï¼‰ã®ç©ã®ä½ç›¸ã‚’æ±‚ã‚ã‚‹ï¼
+    const size_t	u1 = width() - 1;
     l = begin() + 1;
     for (const_iterator m  = spectrum.begin() + 1;
 			m != spectrum.end()   - 1; m += 2)
     {
-      // Å‰‚Ì—ñ‚Ì—v‘f‚ÌÀ•”‚Æ‹••”‚ğŠÜ‚Ş 2x1 •”•ªs—ñ‚ğ‚Æ‚Á‚ÄÏ‚ğ‹‚ß‚éD
+      // æœ€åˆã®åˆ—ã®è¦ç´ ã®å®Ÿéƒ¨ã¨è™šéƒ¨ã‚’å«ã‚€ 2x1 éƒ¨åˆ†è¡Œåˆ—ã‚’ã¨ã£ã¦ç©ã‚’æ±‚ã‚ã‚‹ï¼
 	complex<T>	val = complex<T>((*l)[0],  (*(l+1))[0])
 			    * complex<T>((*m)[0], -(*(m+1))[0]);
 	if (val != T(0))
@@ -594,7 +594,7 @@ CCSImage<T>::pdiff(const CCSImage<T>& spectrum)
 	(*l)[0]     = val.real();
 	(*(l+1))[0] = val.imag();
 	
-      // ÅŒã‚Ì—ñ‚Ì—v‘f‚ÌÀ•”‚Æ‹••”‚ğŠÜ‚Ş 2x1 •”•ªs—ñ‚ğ‚Æ‚Á‚ÄÏ‚ÌˆÊ‘Š‚ğ‹‚ß‚éD
+      // æœ€å¾Œã®åˆ—ã®è¦ç´ ã®å®Ÿéƒ¨ã¨è™šéƒ¨ã‚’å«ã‚€ 2x1 éƒ¨åˆ†è¡Œåˆ—ã‚’ã¨ã£ã¦ç©ã®ä½ç›¸ã‚’æ±‚ã‚ã‚‹ï¼
 	val = complex<T>((*l)[u1],  (*(l+1))[u1])
 	    * complex<T>((*m)[u1], -(*(m+1))[u1]);
 	if (val != T(0))
@@ -603,8 +603,8 @@ CCSImage<T>::pdiff(const CCSImage<T>& spectrum)
 	(*l++)[u1] = val.imag();
     }
 
-  // 3. CCSs—ñ‚Ìl‹÷‚ÌÏ‚ÌˆÊ‘Š‚ğ‹‚ß‚éD
-    const u_int	v1 = height() - 1;
+  // 3. CCSè¡Œåˆ—ã®å››éš…ã®ç©ã®ä½ç›¸ã‚’æ±‚ã‚ã‚‹ï¼
+    const size_t	v1 = height() - 1;
     setSign((*this)[0][0]   *= spectrum[0][0]);
     setSign((*this)[0][u1]  *= spectrum[0][u1]);
     setSign((*this)[v1][0]  *= spectrum[v1][0]);
@@ -613,10 +613,10 @@ CCSImage<T>::pdiff(const CCSImage<T>& spectrum)
     return *this;
 }
     
-//! ‚±‚ÌCCS”z—ñ‚ªü”g”—Ìˆæ‚É‚ ‚é‚Æ‚«C‚±‚ê‚É•Ê‚ÌCCS”z—ñ‚Ì•¡‘f‹¤–ğ‚ğŠ|‚¯‚éD
+//! ã“ã®CCSé…åˆ—ãŒå‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œã“ã‚Œã«åˆ¥ã®CCSé…åˆ—ã®è¤‡ç´ å…±å½¹ã‚’æ›ã‘ã‚‹ï¼
 /*!
-  \param spectrum	ü”g”—Ìˆæ‚É‚ ‚éCCS”z—ñ	
-  \return		specturm‚Ì•¡‘f‹¤–ğ‚ğŠ|‚¯‚½Œã‚Ì‚±‚Ì”z—ñ
+  \param spectrum	å‘¨æ³¢æ•°é ˜åŸŸã«ã‚ã‚‹CCSé…åˆ—	
+  \return		specturmã®è¤‡ç´ å…±å½¹ã‚’æ›ã‘ãŸå¾Œã®ã“ã®é…åˆ—
 */
 template <class T> CCSImage<T>&
 CCSImage<T>::operator *=(const CCSImage<T>& spectrum)
@@ -625,7 +625,7 @@ CCSImage<T>::operator *=(const CCSImage<T>& spectrum)
 
     check_size(spectrum.size());
     
-  // 1. CCSs—ñ‚ÌÅ‰‚ÆÅŒã‚Ì—ñˆÈŠO‚ÌÏ‚ğ‹‚ß‚éD
+  // 1. CCSè¡Œåˆ—ã®æœ€åˆã¨æœ€å¾Œã®åˆ—ä»¥å¤–ã®ç©ã‚’æ±‚ã‚ã‚‹ï¼
     iterator	l = begin();
     for (const_iterator m = spectrum.begin(); m != spectrum.end(); ++m)
     {
@@ -639,27 +639,27 @@ CCSImage<T>::operator *=(const CCSImage<T>& spectrum)
 	}
     }
 
-  // 2. CCSs—ñ‚ÌÅ‰‚ÆÅŒã‚Ì—ñiÅ‰‚ÆÅŒã‚ÌsˆÈŠOj‚ÌÏ‚ğ‹‚ß‚éD
-    const u_int	u1 = width() - 1;
+  // 2. CCSè¡Œåˆ—ã®æœ€åˆã¨æœ€å¾Œã®åˆ—ï¼ˆæœ€åˆã¨æœ€å¾Œã®è¡Œä»¥å¤–ï¼‰ã®ç©ã‚’æ±‚ã‚ã‚‹ï¼
+    const size_t	u1 = width() - 1;
     l = begin() + 1;
     for (const_iterator m  = spectrum.begin() + 1;
 			m != spectrum.end()   - 1; m += 2)
     {
-      // Å‰‚Ì—ñ‚Ì—v‘f‚ÌÀ•”‚Æ‹••”‚ğŠÜ‚Ş 2x1 •”•ªs—ñ‚ğ‚Æ‚Á‚ÄÏ‚ğ‹‚ß‚éD
+      // æœ€åˆã®åˆ—ã®è¦ç´ ã®å®Ÿéƒ¨ã¨è™šéƒ¨ã‚’å«ã‚€ 2x1 éƒ¨åˆ†è¡Œåˆ—ã‚’ã¨ã£ã¦ç©ã‚’æ±‚ã‚ã‚‹ï¼
 	complex<T>	val = complex<T>((*l)[0],  (*(l+1))[0])
 			    * complex<T>((*m)[0], -(*(m+1))[0]);
 	(*l)[0]     = val.real();
 	(*(l+1))[0] = val.imag();
 	
-      // ÅŒã‚Ì—ñ‚Ì—v‘f‚ÌÀ•”‚Æ‹••”‚ğŠÜ‚Ş 2x1 •”•ªs—ñ‚ğ‚Æ‚Á‚ÄÏ‚ğ‹‚ß‚éD
+      // æœ€å¾Œã®åˆ—ã®è¦ç´ ã®å®Ÿéƒ¨ã¨è™šéƒ¨ã‚’å«ã‚€ 2x1 éƒ¨åˆ†è¡Œåˆ—ã‚’ã¨ã£ã¦ç©ã‚’æ±‚ã‚ã‚‹ï¼
 	val = complex<T>((*l)[u1],  (*(l+1))[u1])
 	    * complex<T>((*m)[u1], -(*(m+1))[u1]);
 	(*l++)[u1] = val.real();
 	(*l++)[u1] = val.imag();
     }
 
-  // 3. CCSs—ñ‚Ìl‹÷‚ÌÏ‚ğ‹‚ß‚éD
-    const u_int	v1 = height() - 1;
+  // 3. CCSè¡Œåˆ—ã®å››éš…ã®ç©ã‚’æ±‚ã‚ã‚‹ï¼
+    const size_t	v1 = height() - 1;
     (*this)[0][0]   *= spectrum[0][0];
     (*this)[0][u1]  *= spectrum[0][u1];
     (*this)[v1][0]  *= spectrum[v1][0];
@@ -668,10 +668,10 @@ CCSImage<T>::operator *=(const CCSImage<T>& spectrum)
     return *this;
 }
 
-//! ‚±‚ÌCCS”z—ñ‚ª‹óŠÔ—Ìˆæ‚É‚ ‚é‚Æ‚«C”z—ñ—v‘f’†‚ÌÅ‘å’l‚Æ‚»‚ÌˆÊ’u‚ğ•Ô‚·D
+//! ã“ã®CCSé…åˆ—ãŒç©ºé–“é ˜åŸŸã«ã‚ã‚‹ã¨ãï¼Œé…åˆ—è¦ç´ ä¸­ã®æœ€å¤§å€¤ã¨ãã®ä½ç½®ã‚’è¿”ã™ï¼
 /*!
-  \param pMax	Å‘å’l‚ğ—^‚¦‚é—v‘f‚ÌˆÊ’u
-  \return	Å‘å’l
+  \param pMax	æœ€å¤§å€¤ã‚’ä¸ãˆã‚‹è¦ç´ ã®ä½ç½®
+  \return	æœ€å¤§å€¤
 */
 template <class T> T
 CCSImage<T>::maximum(Point2<T>& pMax) const
@@ -680,10 +680,10 @@ CCSImage<T>::maximum(Point2<T>& pMax) const
     
     T	valMax = numeric_limits<T>::min();
 
-    for (u_int v = 0; v < height(); ++v)
+    for (size_t v = 0; v < height(); ++v)
     {
 	const ImageLine<T>&	line = (*this)[v];
-	for (u_int u = 0; u < width(); ++u)
+	for (size_t u = 0; u < width(); ++u)
 	{
 	    const T	val = line[u];
 	    if (val > valMax)
@@ -715,10 +715,10 @@ CCSImage<T>::maximum() const
     
     T	valMax = numeric_limits<T>::min();
 
-    for (u_int v = 0; v < height(); ++v)
+    for (size_t v = 0; v < height(); ++v)
     {
 	const ImageLine<T>&	line = (*this)[v];
-	for (u_int u = 0; u < width(); ++u)
+	for (size_t u = 0; u < width(); ++u)
 	{
 	    const T	val = line[u];
 	    if (val > valMax)
