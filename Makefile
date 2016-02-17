@@ -53,6 +53,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/arm/cast.h \
 		/usr/local/include/TU/simd/arm/compare.h \
 		/usr/local/include/TU/simd/arm/cvt.h \
+		/usr/local/include/TU/simd/arm/dup.h \
 		/usr/local/include/TU/simd/arm/insert_extract.h \
 		/usr/local/include/TU/simd/arm/load_store.h \
 		/usr/local/include/TU/simd/arm/logical.h \
@@ -283,14 +284,16 @@ App.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -350,14 +353,16 @@ Bitmap.o: TU/v/Bitmap.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -416,14 +421,16 @@ ButtonCmd.o: ButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -483,14 +490,16 @@ CanvasPane.o: TU/v/CanvasPane.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -549,14 +558,16 @@ CanvasPaneDC.o: TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -619,14 +630,16 @@ CanvasPaneDC3.o: TU/v/CanvasPaneDC3.h TU/v/CanvasPaneDC.h TU/v/XDC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -689,14 +702,16 @@ ChoiceFrameCmd.o: ChoiceFrameCmd_.h FrameCmd_.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -757,14 +772,16 @@ ChoiceMenuButtonCmd.o: ChoiceMenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -824,14 +841,16 @@ Cmd.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -894,14 +913,16 @@ CmdPane.o: TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -961,14 +982,16 @@ CmdParent.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1028,14 +1051,16 @@ CmdWindow.o: TU/v/CmdWindow.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1095,14 +1120,16 @@ Colormap.o: TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1162,14 +1189,16 @@ Confirm.o: TU/v/Confirm.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1228,14 +1257,16 @@ DC.o: TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1294,14 +1325,16 @@ DC3.o: TU/v/DC3.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1362,14 +1395,16 @@ Dialog.o: TU/v/Dialog.h TU/v/CmdPane.h TU/v/CmdWindow.h TU/v/TUv++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1430,14 +1465,16 @@ FileSelection.o: TU/v/FileSelection.h TU/v/ModalDialog.h TU/v/Dialog.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1497,14 +1534,16 @@ FrameCmd.o: FrameCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1564,14 +1603,16 @@ Icon.o: TU/v/Icon.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1630,14 +1671,16 @@ LabelCmd.o: LabelCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1697,14 +1740,16 @@ ListCmd.o: ListCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1763,14 +1808,16 @@ MemoryDC.o: TU/v/MemoryDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1832,14 +1879,16 @@ Menu.o: TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1899,14 +1948,16 @@ MenuButtonCmd.o: MenuButtonCmd_.h TU/v/Menu.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -1967,14 +2018,16 @@ ModalDialog.o: TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2035,14 +2088,16 @@ Notify.o: TU/v/Notify.h TU/v/ModalDialog.h TU/v/Dialog.h TU/v/CmdPane.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2102,14 +2157,16 @@ Object.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2169,14 +2226,16 @@ Pane.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2236,14 +2295,16 @@ RadioButtonCmd.o: TU/v/Bitmap.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2302,14 +2363,16 @@ ShmDC.o: TU/v/ShmDC.h TU/v/CanvasPaneDC.h TU/v/XDC.h TU/v/DC.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2371,14 +2434,16 @@ SliderCmd.o: SliderCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2438,14 +2503,16 @@ TUv++.inst.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2505,14 +2572,16 @@ TextInCmd.o: TextInCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2572,14 +2641,16 @@ Timer.o: TU/v/Timer.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2639,14 +2710,16 @@ ToggleButtonCmd.o: ToggleButtonCmd_.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2706,14 +2779,16 @@ Widget-Xaw.o: TU/v/TUv++.h TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2773,14 +2848,16 @@ Window.o: TU/v/App.h TU/v/TUv++.h TU/v/Colormap.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
@@ -2839,14 +2916,16 @@ XDC.o: TU/v/XDC.h TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/simd/bit_shift.h \
 	/usr/local/include/TU/simd/x86/bit_shift.h \
 	/usr/local/include/TU/simd/arm/bit_shift.h \
-	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/dup.h /usr/local/include/TU/simd/cvt.h \
+	/usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/x86/unpack.h \
-	/usr/local/include/TU/simd/cvt.h /usr/local/include/TU/simd/x86/cvt.h \
 	/usr/local/include/TU/simd/arm/cvt.h \
 	/usr/local/include/TU/simd/logical.h \
 	/usr/local/include/TU/simd/x86/logical.h \
 	/usr/local/include/TU/simd/x86/logical_base.h \
 	/usr/local/include/TU/simd/arm/logical.h \
+	/usr/local/include/TU/simd/x86/dup.h \
+	/usr/local/include/TU/simd/arm/dup.h \
 	/usr/local/include/TU/simd/compare.h \
 	/usr/local/include/TU/simd/x86/compare.h \
 	/usr/local/include/TU/simd/arm/compare.h \
