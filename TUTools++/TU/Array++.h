@@ -72,10 +72,6 @@ struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別
 /************************************************************************
 *  class Buf<T, D, ALLOC>						*
 ************************************************************************/
-template <class T, size_t D=0,
-	  class ALLOC=typename BufTraits<T>::allocator_type>
-class Buf;
-    
 //! 定数サイズのバッファクラス
 /*!
   単独で使用することはなく， TU::Array の第2テンプレート引数に指定する
@@ -83,7 +79,8 @@ class Buf;
   \param T		要素の型
   \param D		バッファ中の要素数
 */
-template <class T, size_t D, class ALLOC>
+template <class T, size_t D=0,
+	  class ALLOC=typename BufTraits<T>::allocator_type>
 class Buf : public BufTraits<T>
 {
   public:
@@ -428,16 +425,13 @@ class Array : public B
     typedef B						super;
 
     template <class T_>
-    struct assignable
+    struct zero_assignable
     {
 	template <class S_>
-	static auto	check(T* q, const S_* p)
-			    -> decltype(*q = *p, std::true_type());
-	static auto	check(...) -> std::false_type;
+	static auto	check(S_* p) -> decltype(*p = 0, std::true_type());
+	static auto	check(...)   -> std::false_type;
 
-	typedef decltype(check(static_cast<T*>(nullptr),
-			       static_cast<const T_*>(nullptr)))	type;
-	constexpr static bool	value = type::value;
+	typedef decltype(check(static_cast<T_*>(nullptr)))	type;
     };
     
   public:
@@ -568,12 +562,10 @@ class Array : public B
   /*!
     \param c	代入する値
   */
-    template <class T_>
-    typename std::enable_if<(!is_range<T_>::value && assignable<T_>::value),
-			    Array&>::type
-		operator =(const T_& c)
+    Array&	operator =(const element_type& c)
 		{
-		    std::fill(begin(), end(), c);
+		    for (auto iter = begin(); iter != end(); ++iter)
+			*iter = c;
 		    return *this;
 		}
     
@@ -719,7 +711,8 @@ class Array : public B
 
     void		init()
 			{
-			    init_impl(typename assignable<int>::type());
+			    init_impl(typename zero_assignable<
+						   value_type>::type());
 			}
 
   protected:
@@ -731,7 +724,7 @@ class Array : public B
   private:
     void		init_impl(std::true_type)
 			{
-			    *this = 0;
+			    *this = element_type(0);
 			}
     void		init_impl(std::false_type)
 			{

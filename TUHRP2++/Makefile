@@ -40,8 +40,7 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/include/math.h \
-		/usr/local/include/TU/Array++.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
@@ -114,28 +113,11 @@ EXTHDRS		= /usr/include/math.h \
 		/usr/local/include/bodyinfo_HRP2DOF7.h \
 		/usr/local/include/bodyinfo_HRP2YH.h \
 		/usr/local/include/bodyinfo_HRP2toHRP3.h \
-		/usr/local/include/bodyinfo_HRP3.h \
-		/usr/local/include/misc.h
+		/usr/local/include/bodyinfo_HRP3.h
 HDRS		= TU/HRP2++.h \
 		bodyinfo_HRP2SH.h
-SRCS		= ForwardKinematicsServiceDynSK.cc \
-		ForwardKinematicsServiceSK.cc \
-		HRP2.cc \
-		ReachingServiceDynSK.cc \
-		ReachingServiceSK.cc \
-		SequencePlayerServiceDynSK.cc \
-		SequencePlayerServiceSK.cc \
-		WalkGeneratorServiceDynSK.cc \
-		WalkGeneratorServiceSK.cc
-OBJS		= ForwardKinematicsServiceDynSK.o \
-		ForwardKinematicsServiceSK.o \
-		HRP2.o \
-		ReachingServiceDynSK.o \
-		ReachingServiceSK.o \
-		SequencePlayerServiceDynSK.o \
-		SequencePlayerServiceSK.o \
-		WalkGeneratorServiceDynSK.o \
-		WalkGeneratorServiceSK.o
+SRCS		= HRP2.cc
+OBJS		= HRP2.o
 
 include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -143,15 +125,11 @@ include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-ForwardKinematicsServiceDynSK.o: ForwardKinematicsService.hh
-ForwardKinematicsServiceSK.o: ForwardKinematicsService.hh
-HRP2.o: TU/HRP2++.h ReachingService.hh SequencePlayerService.hh \
-	ForwardKinematicsService.hh WalkGeneratorService.hh \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/simd/simd.h /usr/local/include/TU/simd/config.h \
-	/usr/local/include/TU/simd/vec.h \
+HRP2.o: TU/HRP2++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/simd/simd.h \
+	/usr/local/include/TU/simd/config.h /usr/local/include/TU/simd/vec.h \
 	/usr/local/include/TU/simd/type_traits.h \
 	/usr/local/include/TU/simd/x86/type_traits.h \
 	/usr/local/include/TU/simd/arm/type_traits.h \
@@ -212,13 +190,7 @@ HRP2.o: TU/HRP2++.h ReachingService.hh SequencePlayerService.hh \
 	/usr/local/include/TU/simd/cvtup_iterator.h \
 	/usr/local/include/TU/simd/shift_iterator.h \
 	/usr/local/include/TU/simd/row_vec_iterator.h \
-	/usr/local/include/bodyinfo_HRP3.h /usr/local/include/misc.h \
-	/usr/include/math.h /usr/local/include/bodyinfo_HRP2toHRP3.h \
+	/usr/local/include/bodyinfo_HRP3.h \
+	/usr/local/include/bodyinfo_HRP2toHRP3.h \
 	/usr/local/include/bodyinfo_HRP2YH.h bodyinfo_HRP2SH.h \
 	/usr/local/include/bodyinfo_HRP2DOF7.h
-ReachingServiceDynSK.o: ReachingService.hh
-ReachingServiceSK.o: ReachingService.hh
-SequencePlayerServiceDynSK.o: SequencePlayerService.hh
-SequencePlayerServiceSK.o: SequencePlayerService.hh
-WalkGeneratorServiceDynSK.o: WalkGeneratorService.hh
-WalkGeneratorServiceSK.o: WalkGeneratorService.hh
