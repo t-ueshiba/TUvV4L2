@@ -12,8 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-#INCDIRS		= -I../.. -I$(PREFIX)/include
-INCDIRS		= -I$(PREFIX)/include
+INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g

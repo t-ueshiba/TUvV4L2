@@ -84,7 +84,7 @@ class Rotation
     
   public:
     Rotation(size_t p, size_t q, element_type x, element_type y)	;
-    Rotation(size_t p, size_t q, element_type theta)		;
+    Rotation(size_t p, size_t q, element_type theta)			;
 
   //! p軸を返す．
   /*!
@@ -1201,7 +1201,7 @@ Matrix<T, B, R>::rot2axis() const
  \return			四元数を表す4次元単位ベクトル
  \throw invalid_argument	3x3行列でない場合に送出
 */
-template <class T, class B, class R> Vector<T, Buf<T, 4u> >
+template <class T, class B, class R> Vector<T, Buf<T, 4> >
 Matrix<T, B, R>::rot2quaternion() const
 {
     if (nrow() != 3 || ncol() != 3)
