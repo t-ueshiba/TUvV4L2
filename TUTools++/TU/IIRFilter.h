@@ -626,7 +626,7 @@ BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
 #if defined(SIMD)
     typedef Array<value_type,
-		  Buf<value_type,
+		  Buf<value_type, 0,
 		      simd::allocator<value_type> > >		buf_type;
 #else
     typedef Array<value_type>					buf_type;
