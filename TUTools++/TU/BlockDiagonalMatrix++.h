@@ -145,8 +145,8 @@ BlockDiagonalMatrix<T>::trns() const
 /*!
   \param m	ブロック対角行列
 */
-template <class T, class B, class R> inline
-Matrix<T, B, R>::Matrix(const BlockDiagonalMatrix<T>& m)
+template <class T, size_t R, size_t C> inline
+Matrix<T, R, C>::Matrix(const BlockDiagonalMatrix<T>& m)
     :super(m.nrow(), m.ncol())
 {
     size_t	r = 0, c = 0;
@@ -163,8 +163,8 @@ Matrix<T, B, R>::Matrix(const BlockDiagonalMatrix<T>& m)
   \param m	ブロック対角行列
   \return	この行列
 */
-template <class T, class B, class R> inline Matrix<T, B, R>&
-Matrix<T, B, R>::operator =(const BlockDiagonalMatrix<T>& m)
+template <class T, size_t R, size_t C> inline Matrix<T, R, C>&
+Matrix<T, R, C>::operator =(const BlockDiagonalMatrix<T>& m)
 {
     super::resize(m.nrow(), m.ncol());
     size_t	r = 0, c = 0;

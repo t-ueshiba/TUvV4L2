@@ -65,7 +65,7 @@ class iir_filter_iterator
     typedef boost::iterator_adaptor<
 		iir_filter_iterator, ITER, T,
 		boost::single_pass_traversal_tag, T>	super;
-    typedef FixedSizedArray<T, D>			buf_type;
+    typedef Array<T, D>					buf_type;
     typedef typename buf_type::const_iterator		buf_iterator;
 
     template <size_t D_, bool FWD_>
@@ -625,9 +625,7 @@ BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef typename std::iterator_traits<OUT>::value_type	value_type;
 #if defined(SIMD)
-    typedef Array<value_type,
-		  Buf<value_type, 0,
-		      simd::allocator<value_type> > >		buf_type;
+    typedef Array<value_type, 0, simd::allocator<value_type> >	buf_type;
 #else
     typedef Array<value_type>					buf_type;
 #endif

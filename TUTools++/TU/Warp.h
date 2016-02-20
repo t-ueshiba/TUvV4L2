@@ -58,13 +58,13 @@ class Warp
 	size_t		width()			const	{return us.size();}
 	void		resize(size_t d)		;
 #if defined(SIMD)
-	Array<short,  Buf<short,  0, simd::allocator<short > > >	us, vs;
-	Array<u_char, Buf<u_char, 0, simd::allocator<u_char> > >	du, dv;
+	Array<short,  0, simd::allocator<short > >	us, vs;
+	Array<u_char, 0, simd::allocator<u_char> >	du, dv;
 #else
-	Array<short>							us, vs;
-	Array<u_char>							du, dv;
+	Array<short>					us, vs;
+	Array<u_char>					du, dv;
 #endif
-	size_t								lmost;
+	size_t						lmost;
     };
     
     template <class IN>
@@ -218,7 +218,7 @@ class Warp
     size_t	rmost(size_t v)			const	;
 
     template <class T>
-    void	initialize(const FixedSizedMatrix<T, 3, 3>& Htinv,
+    void	initialize(const Matrix<T, 3, 3>& Htinv,
 			   size_t inWidth,  size_t inHeight,
 			   size_t outWidth, size_t outHeight)		;
     template <class I>
@@ -292,7 +292,7 @@ Warp::rmost(size_t v) const
   \param outHeight	出力画像の高さ
 */
 template <class T> inline void
-Warp::initialize(const FixedSizedMatrix<T, 3, 3>& Htinv,
+Warp::initialize(const Matrix<T, 3, 3>& Htinv,
 		 size_t inWidth,  size_t inHeight,
 		 size_t outWidth, size_t outHeight)
 {

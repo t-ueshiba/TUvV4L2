@@ -85,11 +85,11 @@ class SparseMatrix
     SparseMatrix&	operator -=(const SparseMatrix& A)		;
     SparseMatrix	operator  +(const SparseMatrix& A)	const	;
     SparseMatrix	operator  -(const SparseMatrix& A)	const	;
-    template <class S, class B>
+    template <class S, size_t D>
     Vector<element_type>
-			operator  *(const Vector<S, B>& v)	const	;
-    template <class S, class B, class T2, bool SYM2>
-    friend Vector<S>	operator  *(const Vector<S, B>& v,
+			operator  *(const Vector<S, D>& v)	const	;
+    template <class S, size_t D, class T2, bool SYM2>
+    friend Vector<S>	operator  *(const Vector<S, D>& v,
 				    const SparseMatrix<T2, SYM2>& A)	;
     SparseMatrix<element_type, true>
 			compose()				const	;
@@ -103,18 +103,18 @@ class SparseMatrix
     Matrix<element_type>
 			operator ()(size_t i, size_t j,
 				    size_t r, size_t c)		const	;
-    template <class S, class B>
+    template <class S, size_t D>
     SparseMatrix&	assign(size_t i, size_t j,
-			       const Vector<S, B>& v)			;
-    template <class S, class B, class R>
+			       const Vector<S, D>& v)			;
+    template <class S, size_t R, size_t C>
     SparseMatrix&	assign(size_t i, size_t j,
-			       const Matrix<S, B, R>& M)		;
-    template <class OP, class S, class B>
+			       const Matrix<S, R, C>& M)		;
+    template <class OP, class S, size_t D>
     SparseMatrix&	apply(size_t i, size_t j,
-			      OP op, const Vector<S, B>& v)		;
-    template <class OP, class S, class B, class R>
+			      OP op, const Vector<S, D>& v)		;
+    template <class OP, class S, size_t R, size_t C>
     SparseMatrix&	apply(size_t i, size_t j,
-			      OP op, const Matrix<S, B, R>& M)		;
+			      OP op, const Matrix<S, R, C>& M)		;
 
   // 連立一次方程式
     Vector<element_type>
@@ -457,8 +457,8 @@ SparseMatrix<T, SYM>::operator -(const SparseMatrix& A) const
   \param v	ベクトル
   \return	結果のベクトル
 */
-template <class T, bool SYM> template <class S, class B> Vector<T>
-SparseMatrix<T, SYM>::operator *(const Vector<S, B>& v) const
+template <class T, bool SYM> template <class S, size_t D> Vector<T>
+SparseMatrix<T, SYM>::operator *(const Vector<S, D>& v) const
 {
     v.check_size(ncol());
     
@@ -624,9 +624,9 @@ SparseMatrix<T, SYM>::operator ()(size_t i, size_t j,
   \param v	代入するベクトル
   \return	この疎対称行列
 */
-template <class T, bool SYM> template <class S, class B>
+template <class T, bool SYM> template <class S, size_t D>
 inline SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Vector<S, B>& v)
+SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Vector<S, D>& v)
 {
     return apply(i, j, Assign<S>(), v);
 }
@@ -639,9 +639,9 @@ SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Vector<S, B>& v)
   \param M	代入する行列
   \return	この疎対称行列
 */
-template <class T, bool SYM> template <class S, class B, class R>
+template <class T, bool SYM> template <class S, size_t R, size_t C>
 inline SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Matrix<S, B, R>& M)
+SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Matrix<S, R, C>& M)
 {
     return apply(i, j, Assign<S>(), M);
 }
@@ -654,9 +654,9 @@ SparseMatrix<T, SYM>::assign(size_t i, size_t j, const Matrix<S, B, R>& M)
   \param v	その各成分がfの第2引数となるベクトル
   \return	この疎対称行列
 */
-template <class T, bool SYM> template <class OP, class S, class B>
+template <class T, bool SYM> template <class OP, class S, size_t D>
 SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Vector<S, B>& v)
+SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Vector<S, D>& v)
 {
     T*		p = &(*this)(i, j);
     size_t	dj = 0;
@@ -693,9 +693,9 @@ SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Vector<S, B>& v)
   \param M	その各成分がfの第2引数となる行列
   \return	この疎対称行列
 */
-template <class T, bool SYM> template <class OP, class S, class B, class R>
+template <class T, bool SYM> template <class OP, class S, size_t R, size_t C>
 SparseMatrix<T, SYM>&
-SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Matrix<S, B, R>& M)
+SparseMatrix<T, SYM>::apply(size_t i, size_t j, OP op, const Matrix<S, R, C>& M)
 {
     if (SYM && i > j)
     {
@@ -1055,8 +1055,8 @@ SparseMatrix<T, SYM>::skipws(std::istream& in)
   \param A	疎行列
   \return	結果のベクトル
 */
-template <class S, class B, class T2, bool SYM2> Vector<S>
-operator *(const Vector<S, B>& v, const SparseMatrix<T2, SYM2>& A)
+template <class S, size_t D, class T2, bool SYM2> Vector<S>
+operator *(const Vector<S, D>& v, const SparseMatrix<T2, SYM2>& A)
 {
     v.check_size(A.nrow());
     

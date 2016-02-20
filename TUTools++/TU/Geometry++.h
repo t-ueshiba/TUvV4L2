@@ -48,10 +48,10 @@ namespace TU
   \param T	座標の型
  */
 template <class T>
-class Point1 : public Vector<T, Buf<T, 1> >
+class Point1 : public Vector<T, 1>
 {
   private:
-    typedef Vector<T, Buf<T, 1> >	super;
+    typedef Vector<T, 1>	super;
     
   public:
     Point1(T u=0)							;
@@ -60,16 +60,16 @@ class Point1 : public Vector<T, Buf<T, 1> >
   /*!
     \param v	コピー元1次元ベクトル
   */
-    template <class T2, class B2>
-    Point1(const Vector<T2, B2>& v) :super(v)				{}
+    template <class T2, size_t D2>
+    Point1(const Vector<T2, D2>& v) :super(v)				{}
 
   //! 他の1次元ベクトルを自分に代入する．
   /*!
     \param v	コピー元1次元ベクトル
     \return	この1次元点
   */
-    template <class T2, class B2>
-    Point1&	operator =(const Vector<T2, B2>& v)
+    template <class T2, size_t D2>
+    Point1&	operator =(const Vector<T2, D2>& v)
 		{
 		    super::operator =(v);
 		    return *this;
@@ -100,10 +100,10 @@ typedef Point1<double>	Point1d;		//!< double型座標を持つ1次元点
   \param T	座標の型
  */
 template <class T>
-class Point2 : public Vector<T, Buf<T, 2> >
+class Point2 : public Vector<T, 2>
 {
   private:
-    typedef Vector<T, Buf<T, 2> >	super;
+    typedef Vector<T, 2>	super;
     
   public:
     Point2(T u=0, T v=0)						;
@@ -310,10 +310,10 @@ typedef Point2<double>	Point2d;		//!< double型座標を持つ2次元点
   \param T	座標の型
  */
 template <class T>
-class Point3 : public Vector<T, Buf<T, 3> >
+class Point3 : public Vector<T, 3>
 {
   private:
-    typedef Vector<T, Buf<T, 3> >	super;
+    typedef Vector<T, 3>	super;
     
   public:
     Point3(T x=0, T y=0, T z=0)						;
@@ -403,10 +403,12 @@ class Normalize
     void		update(Iterator first, Iterator last)		;
 
     size_t		spaceDim()				const	;
-    template <class S2, class B2>
-    vector_type		operator ()(const Vector<S2, B2>& x)	const	;
-    template <class S2, class B2>
-    vector_type		normalizeP(const Vector<S2, B2>& x)	const	;
+    template <class S2, size_t D2>
+    vector_type		operator ()(const Vector<S2, D2>& x)
+								const	;
+    template <class S2, size_t D2>
+    vector_type		normalizeP(const Vector<S2, D2>& x)
+								const	;
     
     matrix_type		T()					const	;
     matrix_type		Tt()					const	;
@@ -479,9 +481,9 @@ Normalize<S>::spaceDim() const
   \param x	点の非同次座標(spaceDim() 次元)
   \return	正規化された点の非同次座標(spaceDim() 次元)
 */
-template <class S>
-template <class S2, class B2> inline typename Normalize<S>::vector_type
-Normalize<S>::operator ()(const Vector<S2, B2>& x) const
+template <class S> template <class S2, size_t D2>
+inline typename Normalize<S>::vector_type
+Normalize<S>::operator ()(const Vector<S2, D2>& x) const
 {
     return (vector_type(x) -= _centroid) /= _scale;
 }
@@ -491,9 +493,9 @@ Normalize<S>::operator ()(const Vector<S2, B2>& x) const
   \param x	点の非同次座標(spaceDim() 次元)
   \return	正規化された点の同次座標(spaceDim()+1次元)
 */
-template <class S>
-template <class S2, class B2> inline typename Normalize<S>::vector_type
-Normalize<S>::normalizeP(const Vector<S2, B2>& x) const
+template <class S> template <class S2, size_t D2>
+inline typename Normalize<S>::vector_type
+Normalize<S>::normalizeP(const Vector<S2, D2>& x) const
 {
     return (*this)(x).homogeneous();
 }
@@ -678,10 +680,10 @@ class HyperPlane : public V
   */
     size_t	ndataMin()			const	{return spaceDim();}
 
-    template <class T, class B>
-    element_type	sqdist(const Vector<T, B>& x)	const	;
-    template <class T, class B>
-    element_type	dist(const Vector<T, B>& x)	const	;
+    template <class T, size_t D>
+    element_type	sqdist(const Vector<T, D>& x)	const	;
+    template <class T, size_t D>
+    element_type	dist(const Vector<T, D>& x)	const	;
 };
 
 //! 超平面オブジェクトを生成する．
@@ -763,9 +765,9 @@ HyperPlane<V>::fit(Iterator begin, Iterator end)
 		(spaceDim()+1次元)
   \return	点と超平面の距離の2乗
 */
-template <class V> template <class T, class B>
+template <class V> template <class T, size_t D>
 inline typename HyperPlane<V>::element_type
-HyperPlane<V>::sqdist(const Vector<T, B>& x) const
+HyperPlane<V>::sqdist(const Vector<T, D>& x) const
 {
     const element_type	d = dist(x);
     return d*d;
@@ -780,9 +782,9 @@ HyperPlane<V>::sqdist(const Vector<T, B>& x) const
 				spaceDim()+1のいずれでもない場合，もしくは
 				この点が無限遠点である場合に送出．
 */
-template <class V> template <class T, class B>
+template <class V> template <class T, size_t D>
 typename HyperPlane<V>::element_type
-HyperPlane<V>::dist(const Vector<T, B>& x) const
+HyperPlane<V>::dist(const Vector<T, D>& x) const
 {
     const vector_type&	p = (*this)(0, spaceDim());
     if (x.size() == spaceDim())
@@ -870,14 +872,15 @@ class Projectivity : public M
     size_t	ndataMin()			const	;
 
     Projectivity	inv()					const	;
-    template <class S, class B>
-    vector_type		operator ()(const Vector<S, B>& x)	const	;
-    template <class S, class B>
-    vector_type		mapP(const Vector<S, B>& x)		const	;
-    template <class S, class B>
-    matrix_type		jacobian(const Vector<S, B>& x)		const	;
-    template <class S, class B>
-    matrix_type		Jx(const Vector<S, B>& x)		const	;
+    template <class S, size_t D>
+    vector_type		operator ()(const Vector<S, D>& x)
+								const	;
+    template <class S, size_t D>
+    vector_type		mapP(const Vector<S, D>& x)		const	;
+    template <class S, size_t D>
+    matrix_type		jacobian(const Vector<S, D>& x)		const	;
+    template <class S, size_t D>
+    matrix_type		Jx(const Vector<S, D>& x)		const	;
     template <class In, class Out>
     element_type	sqdist(const std::pair<In, Out>& pair)	const	;
     template <class In, class Out>
@@ -886,8 +889,7 @@ class Projectivity : public M
     void		update(const vector_type& dt)			;
 
     template <class Iterator>
-    element_type	rmsError(Iterator begin,
-					  Iterator end)		const	;
+    element_type	rmsError(Iterator begin, Iterator end)	const	;
     
   protected:
   //! 射影変換行列の最尤推定のためのコスト関数
@@ -1054,9 +1056,9 @@ Projectivity<M>::ndataMin() const
   \param x	点の非同次座標(inDim()次元)または同次座標(inDim()+1 次元)
   \return	射影変換された点の非同次座標(outDim() 次元)
 */
-template <class M> template <class S, class B>
+template <class M> template <class S, size_t D>
 inline typename Projectivity<M>::vector_type
-Projectivity<M>::operator ()(const Vector<S, B>& x) const
+Projectivity<M>::operator ()(const Vector<S, D>& x) const
 {
     if (x.size() == inDim())
     {
@@ -1082,9 +1084,9 @@ Projectivity<M>::operator ()(const Vector<S, B>& x) const
   \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
   \return	射影変換された点の同次座標(outDim()+1 次元)
 */
-template <class M> template <class S, class B>
+template <class M> template <class S, size_t D>
 inline typename Projectivity<M>::vector_type
-Projectivity<M>::mapP(const Vector<S, B>& x) const
+Projectivity<M>::mapP(const Vector<S, D>& x) const
 {
     if (x.size() == inDim())
     {
@@ -1107,9 +1109,9 @@ Projectivity<M>::mapP(const Vector<S, B>& x) const
   \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
   \return	outDim() x ((outDim()+1)x(inDim()+1)) ヤコビ行列
 */
-template <class M> template <class S, class B>
+template <class M> template <class S, size_t D>
 typename Projectivity<M>::matrix_type
-Projectivity<M>::jacobian(const Vector<S, B>& x) const
+Projectivity<M>::jacobian(const Vector<S, D>& x) const
 {
     vector_type	xP;
     if (x.size() == inDim())
@@ -1133,9 +1135,9 @@ Projectivity<M>::jacobian(const Vector<S, B>& x) const
   \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
   \return	outDim() x inDim() ヤコビ行列
 */
-template <class M> template <class S, class B>
+template <class M> template <class S, size_t D>
 typename Projectivity<M>::matrix_type
-Projectivity<M>::Jx(const Vector<S, B>& x) const
+Projectivity<M>::Jx(const Vector<S, D>& x) const
 {
     const vector_type&	y = mapP(x);
     matrix_type		J(outDim(), inDim());
@@ -1325,8 +1327,8 @@ class Affinity : public Projectivity<M>
     Affinity	inv()						const	;
     size_t	ndataMin()					const	;
 
-    template <class S, class B>
-    matrix_type	jacobian(const Vector<S, B>& x)			const	;
+    template <class S, size_t D>
+    matrix_type	jacobian(const Vector<S, D>& x)			const	;
     size_t	nparams()					const	;
     void	update(const vector_type& dt)				;
     
@@ -1474,9 +1476,9 @@ Affinity<M>::ndataMin() const
   \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1次元)
   \return	outDim() x (outDim()x(inDim()+1)) ヤコビ行列
 */
-template <class M> template <class S, class B>
+template <class M> template <class S, size_t D>
 typename Affinity<M>::matrix_type
-Affinity<M>::jacobian(const Vector<S, B>& x) const
+Affinity<M>::jacobian(const Vector<S, D>& x) const
 {
     vector_type	xP;
     if (x.size() == inDim())
@@ -1576,8 +1578,8 @@ class Rigidity : public Affinity<M>
     void		fit(Iterator begin, Iterator end)		;
     Rigidity		inv()					const	;
     size_t		ndataMin()				const	;
-    template <class S, class B>
-    matrix_type		jacobian(const Vector<S, B>& x)		const	;
+    template <class S, size_t D>
+    matrix_type		jacobian(const Vector<S, D>& x)	const	;
     size_t		nparams()				const	;
     void		update(const vector_type& dt)			;
     
@@ -1732,9 +1734,9 @@ Rigidity<M>::ndataMin() const
   \param x	点の非同次座標(dim() 次元)または同次座標(dim()+1 次元)
   \return	dim()xdim() x (dim()+1)/2 ヤコビ行列
 */
-template <class M> template <class S, class B>
+template <class M> template <class S, size_t D>
 typename Rigidity<M>::matrix_type
-Rigidity<M>::jacobian(const Vector<S, B>& x) const
+Rigidity<M>::jacobian(const Vector<S, D>& x) const
 {
     vector_type	xx;
     if (x.size() == dim())
@@ -1815,23 +1817,21 @@ typedef Rigidity<Matrix44d>	Rigidity33d;
   に写す．
 */
 template <class T>
-class Homography : public Projectivity<Matrix<T, Buf<T, 9>,
-					      Buf<Vector<T>, 3> > >
+class Homography : public Projectivity<Matrix<T, 3, 3> >
 {
   private:
-    typedef Projectivity<Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> > >	super;
+    typedef Projectivity<Matrix<T, 3, 3> >	super;
     
   public:
     enum	{DOF=8};
 
-    typedef typename super::base_type				base_type;
-    typedef typename super::vector_type				vector_type;
-    typedef typename super::matrix_type				matrix_type;
-    typedef typename super::element_type			element_type;
-    typedef Point2<element_type>				point_type;
-    typedef Vector<element_type, Buf<element_type, DOF> >	param_type;
-    typedef Matrix<element_type, Buf<element_type, 2*DOF>,
-		   Buf<Vector<element_type>, 2> >		jacobian_type;
+    typedef typename super::base_type		base_type;
+    typedef typename super::vector_type		vector_type;
+    typedef typename super::matrix_type		matrix_type;
+    typedef typename super::element_type	element_type;
+    typedef Point2<element_type>		point_type;
+    typedef Vector<element_type, DOF>		param_type;
+    typedef Matrix<element_type, 2, DOF>	jacobian_type;
 
   public:
     Homography()			:super()		{}
@@ -1939,22 +1939,21 @@ Homography<T>::compose(const param_type& dt)
   に写す．
 */
 template <class T>
-class Affinity2 : public Affinity<Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> > >
+class Affinity2 : public Affinity<Matrix<T, 3, 3> >
 {
   private:
-    typedef Affinity<Matrix<T, Buf<T, 9>, Buf<Vector<T>, 3> > >	super;
+    typedef Affinity<Matrix<T, 3, 3> >		super;
     
   public:
     enum	{DOF=6};
 
-    typedef typename super::base_type				base_type;
-    typedef typename super::vector_type				vector_type;
-    typedef typename super::matrix_type				matrix_type;
-    typedef typename super::element_type			element_type;
-    typedef Vector<element_type, Buf<element_type, DOF> >	param_type;
-    typedef Point2<element_type>				point_type;
-    typedef Matrix<element_type, Buf<element_type, 2*DOF>,
-		   Buf<Vector<element_type>, 2> >		jacobian_type;
+    typedef typename super::base_type		base_type;
+    typedef typename super::vector_type		vector_type;
+    typedef typename super::matrix_type		matrix_type;
+    typedef typename super::element_type	element_type;
+    typedef Vector<element_type, DOF>		param_type;
+    typedef Point2<element_type>		point_type;
+    typedef Matrix<element_type, 2, DOF>	jacobian_type;
 
   public:
     Affinity2()	:super()					{}
@@ -2119,19 +2118,19 @@ class BoundingBox
   */
     element_type	depth()		const	{return length(2);}
 
-    template <class S, class B>
-    bool		include(const Vector<S, B>& p)			;
-    BoundingBox&	clear()						;
-    template <class S, class B>
-    BoundingBox&	expand(const Vector<S, B>& p)			;
-    template <class S, class B>
-    BoundingBox&	operator +=(const Vector<S, B>& dt)		;
-    template <class S, class B>
-    BoundingBox&	operator -=(const Vector<S, B>& dt)		;
+    template <class S, size_t D>
+    bool		include(const Vector<S, D>& p)		;
+    BoundingBox&	clear()					;
+    template <class S, size_t D>
+    BoundingBox&	expand(const Vector<S, D>& p)		;
+    template <class S, size_t D>
+    BoundingBox&	operator +=(const Vector<S, D>& dt)	;
+    template <class S, size_t D>
+    BoundingBox&	operator -=(const Vector<S, D>& dt)	;
     template <class S>
-    BoundingBox&	operator *=(S c)				;
-    BoundingBox&	operator |=(const BoundingBox& bbox)		;
-    BoundingBox&	operator &=(const BoundingBox& bbox)		;
+    BoundingBox&	operator *=(S c)			;
+    BoundingBox&	operator |=(const BoundingBox& bbox)	;
+    BoundingBox&	operator &=(const BoundingBox& bbox)	;
     
   private:
   //! 入力ストリームからbounding boxを成す2つの点の座標を入力する(ASCII)．
@@ -2187,8 +2186,8 @@ BoundingBox<P>::operator !() const
   \param p	点の座標
   \return	含めばtrue, そうでなければfalse
 */
-template <class P> template <class S, class B> bool
-BoundingBox<P>::include(const Vector<S, B>& p)
+template <class P> template <class S, size_t D> bool
+BoundingBox<P>::include(const Vector<S, D>& p)
 {
     for (size_t i = 0; i < dim(); ++i)
 	if (p[i] < _min[i] || p[i] > _max[i])
@@ -2218,8 +2217,8 @@ BoundingBox<P>::clear()
   \param p	点の座標
   \return	拡張されたこのbounding box
 */
-template <class P> template <class S, class B> BoundingBox<P>&
-BoundingBox<P>::expand(const Vector<S, B>& p)
+template <class P> template <class S, size_t D> BoundingBox<P>&
+BoundingBox<P>::expand(const Vector<S, D>& p)
 {
     for (int i = 0; i < dim(); ++i)
     {
@@ -2234,8 +2233,9 @@ BoundingBox<P>::expand(const Vector<S, B>& p)
   \param dt	変位
   \return	平行移動されたこのbounding box
 */
-template <class P> template <class S, class B> inline BoundingBox<P>&
-BoundingBox<P>::operator +=(const Vector<S, B>& dt)
+template <class P> template <class S, size_t D>
+inline BoundingBox<P>&
+BoundingBox<P>::operator +=(const Vector<S, D>& dt)
 {
     _min += dt;
     _max += dt;
@@ -2247,8 +2247,9 @@ BoundingBox<P>::operator +=(const Vector<S, B>& dt)
   \param dt	変位
   \return	平行移動されたこのbounding box
 */
-template <class P> template <class S, class B> inline BoundingBox<P>&
-BoundingBox<P>::operator -=(const Vector<S, B>& dt)
+template <class P> template <class S, size_t D>
+inline BoundingBox<P>&
+BoundingBox<P>::operator -=(const Vector<S, D>& dt)
 {
     _min -= dt;
     _max -= dt;

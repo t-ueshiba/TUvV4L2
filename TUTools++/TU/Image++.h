@@ -462,7 +462,7 @@ RGB_<E>::RGB_(const YUV444& p)
 class __PORT ImageBase
 {
   public:
-    typedef FixedSizedMatrix<double, 3, 4>	matrix34_type;
+    typedef Matrix<double, 3, 4>	matrix34_type;
     
   //! 外部記憶に読み書きする際の画素のタイプ
     enum Type
@@ -1203,13 +1203,12 @@ namespace detail
 //! T型の画素を持つ画像を表すクラス
 /*!
   \param T	画素の型
-  \param B	バッファの型
 */
-template <class T, class B=Buf<T> >
-class Image : public Array2<ImageLine<T>, B>, public ImageBase
+template <class T>
+class Image : public Array2<ImageLine<T> >, public ImageBase
 {
   private:
-    typedef Array2<ImageLine<T>, B>			super;
+    typedef Array2<ImageLine<T> >			super;
     
   public:
     typedef typename super::element_type		element_type;
@@ -1252,8 +1251,7 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     \param w	部分画像の幅
     \param h	部分画像の高さ
   */
-    template <class B2>
-    Image(Image<T, B2>& i, size_t u, size_t v, size_t w, size_t h)
+    Image(Image<T>& i, size_t u, size_t v, size_t w, size_t h)
 	:super(i, v, u, h, w), ImageBase(i)			{}
 
     Image&		operator =(const element_type& c)	;
@@ -1344,8 +1342,8 @@ class Image : public Array2<ImageLine<T>, B>, public ImageBase
     virtual void	_resize(size_t h, size_t w, const TypeInfo&)	;
 };
 
-template <class T, class B> inline Image<T, B>&
-Image<T, B>::operator =(const element_type& c)
+template <class T> inline Image<T>&
+Image<T>::operator =(const element_type& c)
 {
     super::operator =(c);
     return *this;
@@ -1359,8 +1357,8 @@ Image<T, B>::operator =(const element_type& c)
   \param h	部分画像の高さ
   \return	生成された部分画像
 */
-template <class T, class B> inline const Image<T>
-Image<T, B>::operator ()(size_t u, size_t v, size_t w, size_t h) const
+template <class T> inline const Image<T>
+Image<T>::operator ()(size_t u, size_t v, size_t w, size_t h) const
 {
     return Image<T>(const_cast<Image<T>&>(*this), u, v, w, h);
 }
@@ -1373,8 +1371,8 @@ Image<T, B>::operator ()(size_t u, size_t v, size_t w, size_t h) const
   \param h	部分画像の高さ
   \return	生成された部分画像
 */
-template <class T, class B> inline Image<T>
-Image<T, B>::operator ()(size_t u, size_t v, size_t w, size_t h)
+template <class T> inline Image<T>
+Image<T>::operator ()(size_t u, size_t v, size_t w, size_t h)
 {
     return Image<T>(*this, u, v, w, h);
 }
@@ -1385,8 +1383,8 @@ Image<T, B>::operator ()(size_t u, size_t v, size_t w, size_t h)
   \param p	サブピクセルで指定された位置
   \return	双線形補間された画素値
 */
-template <class T, class B> template <class S> inline T
-Image<T, B>::at(const Point2<S>& p) const
+template <class T> template <class S> inline T
+Image<T>::at(const Point2<S>& p) const
 {
     const int	v    = floor(p[1]);
     const T	out0 = (*this)[v].at(p[0]);
@@ -1399,8 +1397,8 @@ Image<T, B>::at(const Point2<S>& p) const
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-template <class T, class B> inline std::istream&
-Image<T, B>::restore(std::istream& in)
+template <class T> inline std::istream&
+Image<T>::restore(std::istream& in)
 {
     return restoreData(in, restoreHeader(in));
 }
@@ -1412,8 +1410,8 @@ Image<T, B>::restore(std::istream& in)
 		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */
-template <class T, class B> inline std::ostream&
-Image<T, B>::save(std::ostream& out, Type type) const
+template <class T> inline std::ostream&
+Image<T>::save(std::ostream& out, Type type) const
 {
     return saveData(out, saveHeader(out, type));
 }
@@ -1425,8 +1423,8 @@ Image<T, B>::save(std::ostream& out, Type type) const
 			(読み込み先の画像の画素タイプではない)
   \return		inで指定した入力ストリーム
 */
-template <class T, class B> std::istream&
-Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
+template <class T> std::istream&
+Image<T>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 {
     switch (typeInfo.type)
     {
@@ -1459,7 +1457,7 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
       case BMP_32:
 	return restoreRows<BGRA>(in, typeInfo);
       default:
-	throw std::runtime_error("Image<T, B>::restoreData(): unknown pixel type!!");
+	throw std::runtime_error("Image<T>::restoreData(): unknown pixel type!!");
     }
     return in;
 }
@@ -1471,8 +1469,8 @@ Image<T, B>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */
-template <class T, class B> std::ostream&
-Image<T, B>::saveData(std::ostream& out, Type type) const
+template <class T> std::ostream&
+Image<T>::saveData(std::ostream& out, Type type) const
 {
     if (type == DEFAULT)
 	type = defaultType();
@@ -1506,13 +1504,13 @@ Image<T, B>::saveData(std::ostream& out, Type type) const
       case BMP_32:
 	return saveRows<BGRA, BGRA>(out, type);
       default:
-	throw std::runtime_error("Image<T, B>::saveData(): unknown pixel type!!");
+	throw std::runtime_error("Image<T>::saveData(): unknown pixel type!!");
     }
     return out;
 }
 
-template <class T, class B> template <class S> std::istream&
-Image<T, B>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
+template <class T> template <class S> std::istream&
+Image<T>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
 {
     const size_t		npads = type2nbytes(typeInfo.type, true);
     ImageLine<S>	buf(width());
@@ -1538,8 +1536,8 @@ Image<T, B>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
     return in;
 }
 
-template <class T, class B> template <class S, class L> std::istream&
-Image<T, B>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
+template <class T> template <class S, class L> std::istream&
+Image<T>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
 {
     Array<L>	colormap(typeInfo.ncolors);
     colormap.restore(in);
@@ -1568,8 +1566,8 @@ Image<T, B>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
     return in;
 }
 
-template <class T, class B> template <class D, class L> std::ostream&
-Image<T, B>::saveRows(std::ostream& out, Type type) const
+template <class T> template <class D, class L> std::ostream&
+Image<T>::saveRows(std::ostream& out, Type type) const
 {
     TypeInfo	typeInfo(type);
 
@@ -1602,88 +1600,88 @@ Image<T, B>::saveRows(std::ostream& out, Type type) const
     return out;
 }
 
-template <class T, class B> size_t
-Image<T, B>::_width() const
+template <class T> size_t
+Image<T>::_width() const
 {
-    return Image<T, B>::width();	// Don't call ImageBase::width!
+    return Image<T>::width();	// Don't call ImageBase::width!
 }
 
-template <class T, class B> size_t
-Image<T, B>::_height() const
+template <class T> size_t
+Image<T>::_height() const
 {
-    return Image<T, B>::height();	// Don't call ImageBase::height!
+    return Image<T>::height();	// Don't call ImageBase::height!
 }
 
-template <class T, class B> ImageBase::Type
-Image<T, B>::_defaultType() const
+template <class T> ImageBase::Type
+Image<T>::_defaultType() const
 {
-    return Image<T, B>::defaultType();
+    return Image<T>::defaultType();
 }
 
-template <class T, class B> inline ImageBase::Type
-Image<T, B>::defaultType() const
+template <class T> inline ImageBase::Type
+Image<T>::defaultType() const
 {
     return RGB_24;
 }
 
 template <> inline ImageBase::Type
-Image<u_char, Buf<u_char> >::defaultType() const
+Image<u_char>::defaultType() const
 {
     return U_CHAR;
 }
 
 template <> inline ImageBase::Type
-Image<short, Buf<short> >::defaultType() const
+Image<short>::defaultType() const
 {
     return SHORT;
 }
 
 template <> inline ImageBase::Type
-Image<int, Buf<int> >::defaultType() const
+Image<int>::defaultType() const
 {
     return INT;
 }
 
 template <> inline ImageBase::Type
-Image<float, Buf<float> >::defaultType() const
+Image<float>::defaultType() const
 {
     return FLOAT;
 }
 
 template <> inline ImageBase::Type
-Image<double, Buf<double> >::defaultType() const
+Image<double>::defaultType() const
 {
     return DOUBLE;
 }
 
 template <> inline ImageBase::Type
-Image<YUV444, Buf<YUV444> >::defaultType() const
+Image<YUV444>::defaultType() const
 {
     return YUV_444;
 }
 
 template <> inline ImageBase::Type
-Image<YUV422, Buf<YUV422> >::defaultType() const
+Image<YUV422>::defaultType() const
 {
     return YUV_422;
 }
 
 template <> inline ImageBase::Type
-Image<YUYV422, Buf<YUYV422> >::defaultType() const
+Image<YUYV422>::defaultType() const
 {
     return YUYV_422;
 }
 
 template <> inline ImageBase::Type
-Image<YUV411, Buf<YUV411> >::defaultType() const
+Image<YUV411>::defaultType() const
 {
     return YUV_411;
 }
 
-template <class T, class B> void
-Image<T, B>::_resize(size_t h, size_t w, const TypeInfo&)
+template <class T> void
+Image<T>::_resize(size_t h, size_t w, const TypeInfo&)
 {
-    Image<T, B>::resize(h, w);		// Don't call ImageBase::resize!
+    Image<T>::resize(h, w);		// Don't call ImageBase::resize!
 }
 
 /************************************************************************
