@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <array>
 #include "TU/SeparableFilter2.h"
+#include "TU/simd/simd.h"
 
 namespace TU
 {

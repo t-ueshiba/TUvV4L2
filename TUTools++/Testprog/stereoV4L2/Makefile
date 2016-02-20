@@ -187,80 +187,12 @@ include $(PROJECT)/lib/common.mk
 ComputeThreeD.o: ../stereo1394/ComputeThreeD.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
-	../../TU/simd/simd.h ../../TU/simd/config.h ../../TU/simd/vec.h \
-	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
-	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
-	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
-	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/x86/allocator.h ../../TU/simd/arm/allocator.h \
-	../../TU/simd/load_store.h ../../TU/simd/x86/load_store.h \
-	../../TU/simd/arm/load_store.h ../../TU/simd/zero.h \
-	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
-	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
-	../../TU/simd/arm/cast.h ../../TU/simd/insert_extract.h \
-	../../TU/simd/x86/insert_extract.h ../../TU/simd/arm/insert_extract.h \
-	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
-	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
-	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/dup.h ../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
-	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
-	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
-	../../TU/simd/x86/dup.h ../../TU/simd/arm/dup.h \
-	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
-	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
-	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
-	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
-	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
 	../../TU/Minimize.h
 DrawThreeD.o: ../stereo1394/DrawThreeD.h ../../TU/Warp.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
-	../../TU/simd/simd.h ../../TU/simd/config.h ../../TU/simd/vec.h \
-	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
-	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
-	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
-	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/x86/allocator.h ../../TU/simd/arm/allocator.h \
-	../../TU/simd/load_store.h ../../TU/simd/x86/load_store.h \
-	../../TU/simd/arm/load_store.h ../../TU/simd/zero.h \
-	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
-	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
-	../../TU/simd/arm/cast.h ../../TU/simd/insert_extract.h \
-	../../TU/simd/x86/insert_extract.h ../../TU/simd/arm/insert_extract.h \
-	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
-	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
-	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/dup.h ../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
-	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
-	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
-	../../TU/simd/x86/dup.h ../../TU/simd/arm/dup.h \
-	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
-	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
-	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
-	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
-	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/Camera++.h
-MyCanvasPane.o: ../stereo1394/MyCanvasPane.h \
-	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
-	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/simd/simd.h \
+	../../TU/Minimize.h ../../TU/Camera++.h ../../TU/simd/simd.h \
 	../../TU/simd/config.h ../../TU/simd/vec.h \
 	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
 	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
@@ -291,9 +223,14 @@ MyCanvasPane.o: ../stereo1394/MyCanvasPane.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h
+MyCanvasPane.o: ../stereo1394/MyCanvasPane.h \
+	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
+	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
+	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
+	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h
@@ -304,8 +241,14 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/simd/simd.h \
-	../../TU/simd/config.h ../../TU/simd/vec.h \
+	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/Notify.h stereoV4L2.h \
+	/usr/local/include/TU/V4L2CameraArray.h \
+	/usr/local/include/TU/V4L2++.h ../../TU/io.h MyCmdWindow.h \
+	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/Timer.h \
+	../../TU/Rectify.h ../../TU/Warp.h ../../TU/Camera++.h \
+	../../TU/simd/simd.h ../../TU/simd/config.h ../../TU/simd/vec.h \
 	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
 	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
 	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
@@ -336,12 +279,6 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
 	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/Notify.h \
-	stereoV4L2.h /usr/local/include/TU/V4L2CameraArray.h \
-	/usr/local/include/TU/V4L2++.h ../../TU/io.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/Timer.h \
-	../../TU/Rectify.h ../../TU/Warp.h ../../TU/Camera++.h \
 	../stereo1394/MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
@@ -358,51 +295,15 @@ MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/simd/simd.h \
-	../../TU/simd/config.h ../../TU/simd/vec.h \
-	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
-	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
-	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
-	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/x86/allocator.h ../../TU/simd/arm/allocator.h \
-	../../TU/simd/load_store.h ../../TU/simd/x86/load_store.h \
-	../../TU/simd/arm/load_store.h ../../TU/simd/zero.h \
-	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
-	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
-	../../TU/simd/arm/cast.h ../../TU/simd/insert_extract.h \
-	../../TU/simd/x86/insert_extract.h ../../TU/simd/arm/insert_extract.h \
-	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
-	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
-	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/dup.h ../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
-	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
-	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
-	../../TU/simd/x86/dup.h ../../TU/simd/arm/dup.h \
-	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
-	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
-	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
-	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
-	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/OglDC.h \
+	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	../stereo1394/DrawThreeD.h ../../TU/Warp.h ../../TU/Camera++.h
-createCaptureCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
-	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/simd/simd.h \
-	../../TU/simd/config.h ../../TU/simd/vec.h \
+	../stereo1394/DrawThreeD.h ../../TU/Warp.h ../../TU/Camera++.h \
+	../../TU/simd/simd.h ../../TU/simd/config.h ../../TU/simd/vec.h \
 	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
 	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
 	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
@@ -432,9 +333,13 @@ createCaptureCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h
+createCaptureCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
+	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
+	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
+	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
+	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
 	/usr/local/include/TU/V4L2++.h ../../TU/io.h
 createFeatureCmds.o: /usr/local/include/TU/v/CmdPane.h \
@@ -442,118 +347,54 @@ createFeatureCmds.o: /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/simd/simd.h \
-	../../TU/simd/config.h ../../TU/simd/vec.h \
-	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
-	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
-	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
-	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/x86/allocator.h ../../TU/simd/arm/allocator.h \
-	../../TU/simd/load_store.h ../../TU/simd/x86/load_store.h \
-	../../TU/simd/arm/load_store.h ../../TU/simd/zero.h \
-	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
-	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
-	../../TU/simd/arm/cast.h ../../TU/simd/insert_extract.h \
-	../../TU/simd/x86/insert_extract.h ../../TU/simd/arm/insert_extract.h \
-	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
-	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
-	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/dup.h ../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
-	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
-	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
-	../../TU/simd/x86/dup.h ../../TU/simd/arm/dup.h \
-	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
-	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
-	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
-	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
-	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h stereoV4L2.h \
+	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h stereoV4L2.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
 	/usr/local/include/TU/V4L2++.h ../../TU/io.h
 createMenuCmds.o: stereoV4L2.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/simd/simd.h \
-	../../TU/simd/config.h ../../TU/simd/vec.h \
-	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
-	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
-	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
-	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/x86/allocator.h ../../TU/simd/arm/allocator.h \
-	../../TU/simd/load_store.h ../../TU/simd/x86/load_store.h \
-	../../TU/simd/arm/load_store.h ../../TU/simd/zero.h \
-	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
-	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
-	../../TU/simd/arm/cast.h ../../TU/simd/insert_extract.h \
-	../../TU/simd/x86/insert_extract.h ../../TU/simd/arm/insert_extract.h \
-	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
-	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
-	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/dup.h ../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
-	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
-	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
-	../../TU/simd/x86/dup.h ../../TU/simd/arm/dup.h \
-	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
-	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
-	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
-	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
-	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
 	/usr/local/include/TU/V4L2++.h ../../TU/io.h
 main.o: ../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/simd/simd.h \
-	../../TU/simd/config.h ../../TU/simd/vec.h \
-	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
-	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
-	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
-	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/x86/allocator.h ../../TU/simd/arm/allocator.h \
-	../../TU/simd/load_store.h ../../TU/simd/x86/load_store.h \
-	../../TU/simd/arm/load_store.h ../../TU/simd/zero.h \
-	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
-	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
-	../../TU/simd/arm/cast.h ../../TU/simd/insert_extract.h \
-	../../TU/simd/x86/insert_extract.h ../../TU/simd/arm/insert_extract.h \
-	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
-	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
-	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/dup.h ../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
-	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
-	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
-	../../TU/simd/x86/dup.h ../../TU/simd/arm/dup.h \
-	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
-	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
-	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
-	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
-	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/algorithm.h ../../TU/Profiler.h \
+	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
+	../../TU/algorithm.h ../../TU/simd/simd.h ../../TU/simd/config.h \
+	../../TU/simd/vec.h ../../TU/simd/type_traits.h \
+	../../TU/simd/x86/type_traits.h ../../TU/simd/arm/type_traits.h \
+	../../TU/simd/x86/vec.h ../../TU/simd/x86/arch.h \
+	../../TU/simd/arm/vec.h ../../TU/simd/arm/arch.h \
+	../../TU/simd/allocator.h ../../TU/simd/x86/allocator.h \
+	../../TU/simd/arm/allocator.h ../../TU/simd/load_store.h \
+	../../TU/simd/x86/load_store.h ../../TU/simd/arm/load_store.h \
+	../../TU/simd/zero.h ../../TU/simd/x86/zero.h \
+	../../TU/simd/arm/zero.h ../../TU/simd/cast.h \
+	../../TU/simd/x86/cast.h ../../TU/simd/arm/cast.h \
+	../../TU/simd/insert_extract.h ../../TU/simd/x86/insert_extract.h \
+	../../TU/simd/arm/insert_extract.h ../../TU/simd/shift.h \
+	../../TU/simd/x86/shift.h ../../TU/simd/arm/shift.h \
+	../../TU/simd/bit_shift.h ../../TU/simd/x86/bit_shift.h \
+	../../TU/simd/arm/bit_shift.h ../../TU/simd/dup.h ../../TU/simd/cvt.h \
+	../../TU/simd/x86/cvt.h ../../TU/simd/x86/unpack.h \
+	../../TU/simd/arm/cvt.h ../../TU/simd/logical.h \
+	../../TU/simd/x86/logical.h ../../TU/simd/x86/logical_base.h \
+	../../TU/simd/arm/logical.h ../../TU/simd/x86/dup.h \
+	../../TU/simd/arm/dup.h ../../TU/simd/compare.h \
+	../../TU/simd/x86/compare.h ../../TU/simd/arm/compare.h \
+	../../TU/simd/select.h ../../TU/simd/x86/select.h \
+	../../TU/simd/arm/select.h ../../TU/simd/arithmetic.h \
+	../../TU/simd/x86/arithmetic.h ../../TU/simd/arm/arithmetic.h \
+	../../TU/simd/misc.h ../../TU/simd/x86/shuffle.h \
+	../../TU/simd/x86/svml.h ../../TU/simd/transform.h \
+	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
+	../../TU/simd/arm/lookup.h ../../TU/simd/load_iterator.h \
+	../../TU/simd/store_iterator.h ../../TU/simd/cvtdown_iterator.h \
+	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
+	../../TU/simd/row_vec_iterator.h ../../TU/Profiler.h \
 	../../windows/fakeWindows.h ../../TU/BoxFilter.h ../../TU/Filter2.h \
 	../../TU/GFStereo.h MyCmdWindow.h /usr/local/include/TU/v/App.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \

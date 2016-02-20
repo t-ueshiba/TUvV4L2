@@ -138,7 +138,8 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
-	../../TU/simd/simd.h ../../TU/simd/config.h ../../TU/simd/vec.h \
+	../../TU/Minimize.h ../../TU/Camera++.h ../../TU/simd/simd.h \
+	../../TU/simd/config.h ../../TU/simd/vec.h \
 	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
 	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
 	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
@@ -169,7 +170,6 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
 	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Minimize.h ../../TU/Camera++.h ../../TU/SADStereo.h \
-	../../TU/StereoBase.h ../../TU/algorithm.h ../../TU/Profiler.h \
-	../../windows/fakeWindows.h ../../TU/BoxFilter.h ../../TU/Filter2.h \
-	../../TU/GFStereo.h
+	../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/algorithm.h \
+	../../TU/Profiler.h ../../windows/fakeWindows.h ../../TU/BoxFilter.h \
+	../../TU/Filter2.h ../../TU/GFStereo.h

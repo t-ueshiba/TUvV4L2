@@ -1,4 +1,5 @@
 #include "TU/Array++.h"
+#include "TU/simd/load_store.h"
 #include "TU/simd/lookup.h"
 
 namespace TU
@@ -29,7 +30,6 @@ doJob()
     T		j[] = {7, 5, 3, 1, 6, 4, 2, 0, 1, 3, 5, 7, 0, 2, 4, 6};
     auto	col = load(j);
     cout << lookup(a.data(), idx, col, a.ncol()) << endl << endl;
-
 }
     
 }

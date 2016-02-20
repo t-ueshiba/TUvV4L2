@@ -43,7 +43,6 @@
 #include <iostream>
 #include <iomanip>
 #include "TU/iterator.h"
-#include "TU/simd/simd.h"
 
 //#define __CXX0X_MOVE			// 移動コンストラクタ/代入を使用
 
@@ -55,19 +54,10 @@ namespace TU
 template <class T>
 struct BufTraits
 {
-    typedef const T*				const_iterator;
-    typedef T*					iterator;
-    typedef std::allocator<T>			allocator_type;
+    typedef const T*		const_iterator;
+    typedef T*			iterator;
+    typedef std::allocator<T>	allocator_type;
 };
-#if defined(SIMD)		// SIMD が定義されているときは...
-template <class T>
-struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別版に
-{
-    typedef simd::load_iterator<const T*, true>	const_iterator;
-    typedef simd::store_iterator<T*, true>	iterator;
-    typedef simd::allocator<simd::vec<T> >	allocator_type;
-};
-#endif
 
 /************************************************************************
 *  class Buf<T, D, ALLOC>						*
@@ -78,10 +68,10 @@ class Buf;
     
 //! 定数サイズのバッファクラス
 /*!
-  単独で使用することはなく， TU::Array の第2テンプレート引数に指定する
-  ことによって TU::Array の基底クラスとして使う．
-  \param T		要素の型
-  \param D		バッファ中の要素数
+  単独で使用することはなく，TU::Array の基底クラスまたは TU::Array2 の
+  内部バッファクラスとして使う．
+  \param T	要素の型
+  \param D	バッファ中の要素数
 */
 template <class T, size_t D, class>
 class Buf : public BufTraits<T>
@@ -208,8 +198,8 @@ class Buf : public BufTraits<T>
 /*!
   単独で使用することはなく，TU::Array の基底クラスまたは TU::Array2 の
   内部バッファクラスとして使う．
-  \param T		要素の型
-  \param ALLOC		アロケータの型
+  \param T	要素の型
+  \param ALLOC	アロケータの型
 */
 template <class T, class ALLOC>
 class Buf<T, 0, ALLOC> : public BufTraits<T>
@@ -419,7 +409,8 @@ Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
 //! B型バッファによって実装されるT型オブジェクトの1次元配列クラス
 /*!
   \param T	要素の型
-  \param B	バッファ
+  \param D	次元(0ならば可変)
+  \param ALLOC	アロケータの型
 */
 template <class T, size_t D=0,
 	  class ALLOC=typename BufTraits<T>::allocator_type>
@@ -744,9 +735,9 @@ namespace detail
   *  nbytes<T>()							*
   **********************************************************************/
   template <class T> inline size_t
-  nbytes(size_t siz, size_t align)
+  nbytes(size_t siz, size_t unit)
   {
-      return align * ((sizeof(T)*siz + align - 1) / align);
+      return unit * ((sizeof(T)*siz + unit - 1) / unit);
   }
 }
 
@@ -756,8 +747,8 @@ namespace detail
 //! 1次元配列Tの1次元配列として定義された2次元配列クラス
 /*!
   \param T	1次元配列の型
-  \param R	行数, 0ならば可変
-  \param C	列数, 0ならば可変
+  \param R	行数(0ならば可変)
+  \param C	列数(0ならば可変)
 */
 template <class T, size_t R=0, size_t C=0>
 class Array2 : public Array<T, R, std::allocator<T> >
@@ -793,7 +784,7 @@ class Array2 : public Array<T, R, std::allocator<T> >
     
   public:
 		Array2()			// !< デフォルトコンストラクタ
-		    :super(), _ncol(0), _align(align(1)), _buf()
+		    :super(), _ncol(0), _unit(1), _buf()
 		{
 		    if (size() > 0)
 			_ncol = _buf.size() / size();
@@ -803,7 +794,7 @@ class Array2 : public Array<T, R, std::allocator<T> >
 
 		Array2(const Array2& a)		//!< コピーコンストラクタ
 		    :super(a.size()),
-		     _ncol(a.ncol()), _align(a.align()), _buf(a._buf.size())
+		     _ncol(a.ncol()), _unit(a.unit()), _buf(a._buf.size())
 		{
 		    set_rows();
 		    super::operator =(static_cast<const super&>(a));
@@ -811,7 +802,7 @@ class Array2 : public Array<T, R, std::allocator<T> >
 
     Array2&	operator =(const Array2& a)	//!< 標準代入演算子
 		{
-		    resize(a.size(), a.ncol(), a.align());
+		    resize(a.size(), a.ncol(), a.unit());
 		    super::operator =(static_cast<const super&>(a));
 		    return *this;
 		}
@@ -830,10 +821,10 @@ class Array2 : public Array<T, R, std::allocator<T> >
 		    return *this;
 		}
 #endif
-		Array2(std::initializer_list<value_type> args, size_t a=1)
+		Array2(std::initializer_list<value_type> args, size_t unit=1)
 		    :super(args.size()),
 		     _ncol(args.size() ? args.begin()->size() : 0),
-		     _align(align(a)),
+		     _unit(unit == 0 ? 1 : unit),
 		     _buf(buf_size())
 		{
 		    set_rows();
@@ -852,10 +843,11 @@ class Array2 : public Array<T, R, std::allocator<T> >
   /*!
     \param r	行数
     \param c	列数
-    \param a	各行においてalignするバイト数(1ならalignしない)
+    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-		Array2(size_t r, size_t c, size_t a=1)
-		    :super(r), _ncol(c), _align(align(a)), _buf(buf_size())
+		Array2(size_t r, size_t c, size_t unit=1)
+		    :super(r), _ncol(c), _unit(unit == 0 ? 1 : unit),
+		     _buf(buf_size())
 		{
 		    set_rows();
 		    super::init();
@@ -866,10 +858,11 @@ class Array2 : public Array<T, R, std::allocator<T> >
     \param p	外部領域へのポインタ
     \param r	行数
     \param c	列数
-    \param a	各行においてalignするバイト数(1ならalignしない)
+    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-		Array2(pointer p, size_t r, size_t c, size_t a=1)
-		    :super(r), _ncol(c), _align(align(a)), _buf(p, buf_size())
+		Array2(pointer p, size_t r, size_t c, size_t unit=1)
+		    :super(r), _ncol(c), _unit(unit == 0 ? 1 : unit),
+		     _buf(p, buf_size())
 		{
 		    set_rows();
 		}
@@ -887,7 +880,7 @@ class Array2 : public Array<T, R, std::allocator<T> >
 		       size_t i, size_t j, size_t r, size_t c)
 		    :super(super::partial_size(i, r, a.size())),
 		     _ncol(super::partial_size(j, c, a.ncol())),
-		     _align(a.align()),
+		     _unit(a.unit()),
 		     _buf((size() > 0 && ncol() > 0 ? a[i].data() + j
 						    : nullptr),
 			  size()*(a.ncol() - j))
@@ -902,13 +895,13 @@ class Array2 : public Array<T, R, std::allocator<T> >
     このコンストラクタがあってもコピーコンストラクタを別個に定義
     しなければならない．
     \param expr	コピー元の配列
-    \param a	各行においてalignするバイト数(1ならalignしない)
+    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-		Array2(const E& expr, size_t a=1)
-		    :super(expr.size()),
-		     _ncol(TU::ncol(expr)), _align(align(a)), _buf(buf_size())
+		Array2(const E& expr, size_t unit=1)
+		    :super(expr.size()), _ncol(TU::ncol(expr)),
+		     _unit(unit == 0 ? 1 : unit), _buf(buf_size())
 		{
 		    set_rows();
 		    super::operator =(expr);
@@ -952,29 +945,29 @@ class Array2 : public Array<T, R, std::allocator<T> >
     const_pointer	data()	const	{ return _buf.data(); }
     size_t		nrow()	const	{ return size(); }
     size_t		ncol()	const	{ return _ncol; }
-    size_t		align()	const	{ return _align; }
+    size_t		unit()	const	{ return _unit; }
     size_t		stride() const
 			{
 			    typedef typename buf_type::value_type	S;
 			    
-			    return detail::nbytes<S>(_ncol, _align) / sizeof(S);
+			    return detail::nbytes<S>(_ncol, _unit) / sizeof(S);
 			}
 
   //! 配列のサイズを変更する．
   /*!
     \param r	新しい行数
     \param c	新しい列数
-    \param a	各行においてalignするバイト数(1ならalignしない)
+    \param unit	1行あたりのバイト数がこの値の倍数になる
     \return	rが元の行数より大きい又はcが元の列数と異なればtrue，
 		そうでなければfalse
   */
-    bool		resize(size_t r, size_t c, size_t a=1)
+    bool		resize(size_t r, size_t c, size_t unit=1)
 			{
 			    if (!super::resize(r) && ncol() == c)
 				return false;
 			    
 			    _ncol = c;
-			    _align = align(a);
+			    _unit = (unit == 0 ? 1 : unit);
 			    _buf.resize(buf_size());
 			    set_rows();
 			    super::init();
@@ -986,13 +979,13 @@ class Array2 : public Array<T, R, std::allocator<T> >
     \param p	新しい記憶領域へのポインタ
     \param r	新しい行数
     \param c	新しい列数
-    \param a	各行においてalignするバイト数(1ならalignしない)
+    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-    void		resize(pointer p, size_t r, size_t c, size_t a=1)
+    void		resize(pointer p, size_t r, size_t c, size_t unit=1)
 			{
 			    super::resize(r);
 			    _ncol = c;
-			    _align = align(a);
+			    _unit = (unit == 0 ? 1 : unit);
 			    _buf.resize(p, buf_size());
 			    set_rows();
 			}
@@ -1029,7 +1022,7 @@ class Array2 : public Array<T, R, std::allocator<T> >
 			{
 			    typedef typename buf_type::value_type	S;
 			    
-			    const auto	n = detail::nbytes<S>(_ncol, _align);
+			    const auto	n = detail::nbytes<S>(_ncol, _unit);
 			    auto	p = _buf.data();
 			    for (auto& row : *this)
 			    {
@@ -1042,34 +1035,13 @@ class Array2 : public Array<T, R, std::allocator<T> >
 			{
 			    typedef typename buf_type::value_type	S;
 			    
-			    const auto	n = detail::nbytes<S>(_ncol, _align);
+			    const auto	n = detail::nbytes<S>(_ncol, _unit);
 			    return (size()*n + sizeof(S) - 1) / sizeof(S);
-			}
-
-    static size_t	align(size_t a)
-			{
-#if defined(SIMD)
-			    typedef typename buf_type::value_type	S;
-
-			    return align(a, simd::is_vec<S>());
-#else
-			    return align(a, std::false_type());
-#endif
-			}
-    static size_t	align(size_t, std::true_type)
-			{
-			    typedef typename buf_type::value_type	S;
-
-			    return sizeof(S);
-			}
-    static size_t	align(size_t a, std::false_type)
-			{
-			    return (a == 0 ? 1 : a);
 			}
 
   private:
     size_t		_ncol;
-    size_t		_align;
+    size_t		_unit;
     buf_type		_buf;
 };
 
