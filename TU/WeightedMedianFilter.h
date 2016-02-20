@@ -44,7 +44,7 @@ class ExpDiff
 		}
     T		f(S x, S y, std::false_type) const
 		{
-		    Vector<T, Buf<T, 3> >	v;
+		    Vector<T, 3>	v;
 		    v[0] = T(x.r) - T(y.r);
 		    v[1] = T(x.g) - T(y.g);
 		    v[2] = T(x.b) - T(y.b);

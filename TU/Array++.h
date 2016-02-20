@@ -72,6 +72,10 @@ struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別
 /************************************************************************
 *  class Buf<T, D, ALLOC>						*
 ************************************************************************/
+template <class T, size_t D=0,
+	  class ALLOC=typename BufTraits<T>::allocator_type>
+class Buf;
+    
 //! 定数サイズのバッファクラス
 /*!
   単独で使用することはなく， TU::Array の第2テンプレート引数に指定する
@@ -79,11 +83,11 @@ struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別
   \param T		要素の型
   \param D		バッファ中の要素数
 */
-template <class T, size_t D=0,
-	  class ALLOC=typename BufTraits<T>::allocator_type>
+template <class T, size_t D, class>
 class Buf : public BufTraits<T>
 {
   public:
+    typedef void					allocator_type;
     typedef T						value_type;
     typedef value_type*					pointer;
     typedef const value_type*				const_pointer;
@@ -93,7 +97,6 @@ class Buf : public BufTraits<T>
 							reference;
     typedef typename std::iterator_traits<const_iterator>::reference
 							const_reference;
-    typedef void					allocator_type;
     
   public:
     explicit		Buf(size_t siz=D)
@@ -203,8 +206,8 @@ class Buf : public BufTraits<T>
 
 //! 可変長バッファクラス
 /*!
-  単独で使用することはなく，TU::Array または TU::Array2 の
-  第2テンプレート引数に指定することによって，それらの基底クラスとして使う．
+  単独で使用することはなく，TU::Array の基底クラスまたは TU::Array2 の
+  内部バッファクラスとして使う．
   \param T		要素の型
   \param ALLOC		アロケータの型
 */
@@ -212,16 +215,16 @@ template <class T, class ALLOC>
 class Buf<T, 0, ALLOC> : public BufTraits<T>
 {
   public:
-    typedef T						value_type;
-    typedef value_type*					pointer;
-    typedef const value_type*				const_pointer;
+    typedef ALLOC					allocator_type;
+    typedef typename allocator_type::value_type		value_type;
+    typedef typename allocator_type::pointer		pointer;
+    typedef typename allocator_type::const_pointer	const_pointer;
     typedef typename BufTraits<T>::iterator		iterator;
     typedef typename BufTraits<T>::const_iterator	const_iterator;
     typedef typename std::iterator_traits<iterator>::reference
 							reference;
     typedef typename std::iterator_traits<const_iterator>::reference
 							const_reference;
-    typedef ALLOC					allocator_type;
     
   public:
     explicit		Buf(size_t siz=0)	//!< デフォルトコンストラクタ
@@ -411,30 +414,23 @@ Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
 }
     
 /************************************************************************
-*  class Array<T, B>							*
+*  class Array<T, D, ALLOC>						*
 ************************************************************************/
 //! B型バッファによって実装されるT型オブジェクトの1次元配列クラス
 /*!
   \param T	要素の型
   \param B	バッファ
 */
-template <class T, class B=Buf<T> >
-class Array : public B
+template <class T, size_t D=0,
+	  class ALLOC=typename BufTraits<T>::allocator_type>
+class Array : public Buf<T, D, ALLOC>
 {
   private:
-    typedef B						super;
+    typedef Buf<T, D, ALLOC>				super;
 
-    template <class T_>
-    struct zero_assignable
-    {
-	template <class S_>
-	static auto	check(S_* p) -> decltype(*p = 0, std::true_type());
-	static auto	check(...)   -> std::false_type;
-
-	typedef decltype(check(static_cast<T_*>(nullptr)))	type;
-    };
-    
   public:
+  //! アロケータの型
+    typedef typename super::allocator_type		allocator_type;
   //! 成分の型
     typedef element_t<T>				element_type;
   //! 要素の型    
@@ -525,8 +521,8 @@ class Array : public B
     \param i	部分配列の第0要素を指定するindex
     \param d	部分配列の次元(要素数)
   */
-    template <class B2>
-		Array(Array<T, B2>& a, size_t i, size_t d)
+    template <size_t D2, class ALLOC2>
+		Array(Array<T, D2, ALLOC2>& a, size_t i, size_t d)
 		    :super((i < a.size() ? &a[i] : nullptr),
 			   partial_size(i, d, a.size()))	{}
 
@@ -709,33 +705,38 @@ class Array : public B
 #endif
 			}
 
+  protected:
     void		init()
 			{
-			    init_impl(typename zero_assignable<
-						   value_type>::type());
+			    init(*this);
 			}
 
-  protected:
     static size_t	partial_size(size_t i, size_t d, size_t a)
 			{
 			    return (i+d <= a ? d : i < a ? a-i : 0);
 			}
 
   private:
-    void		init_impl(std::true_type)
+    template <class T_>
+    static typename std::enable_if<std::is_arithmetic<T_>::value>::type
+			init(T_& x)
 			{
-			    *this = element_type(0);
+			    x = 0;
 			}
-    void		init_impl(std::false_type)
+    template <class T_>
+    static typename std::enable_if<is_range<T_>::value>::type
+			init(T_& x)
+			{
+			    for (auto iter = x.begin(); iter != x.end(); ++iter)
+				init(*iter);
+			}
+    template <class T_>
+    static typename std::enable_if<(!std::is_arithmetic<T_>::value &&
+				    !is_range<T_>::value)>::type
+			init(T_)
 			{
 			}
 };
-
-/************************************************************************
-*  typedef FixedSizedArray<T, D>					*
-************************************************************************/
-template <class T, size_t D>
-using FixedSizedArray = Array<T, Buf<T, D> >;
 
 namespace detail
 {
@@ -748,22 +749,23 @@ namespace detail
       return align * ((sizeof(T)*siz + align - 1) / align);
   }
 }
-    
+
 /************************************************************************
-*  class Array2<T, B, R>						*
+*  class Array2<T, R, C>						*
 ************************************************************************/
 //! 1次元配列Tの1次元配列として定義された2次元配列クラス
 /*!
   \param T	1次元配列の型
-  \param B	バッファ
-  \param R	行バッファ
+  \param R	行数, 0ならば可変
+  \param C	列数, 0ならば可変
 */
-template <class T, class B=Buf<typename T::value_type>, class R=Buf<T> >
-class Array2 : public Array<T, R>
+template <class T, size_t R=0, size_t C=0>
+class Array2 : public Array<T, R, std::allocator<T> >
 {
   private:
-    typedef Array<T, R>					super;
-    typedef B						buf_type;
+    typedef Array<T, R, std::allocator<T> >		super;
+    typedef Buf<typename T::value_type, R*C,
+		typename T::allocator_type>	 	buf_type;
     
   public:
   //! 成分の型    
@@ -880,8 +882,8 @@ class Array2 : public Array<T, R>
     \param r	部分配列の行数
     \param c	部分配列の列数
   */
-    template <class B2, class R2>
-		Array2(Array2<T, B2, R2>& a,
+    template <size_t R2, size_t C2>
+		Array2(Array2<T, R2, C2>& a,
 		       size_t i, size_t j, size_t r, size_t c)
 		    :super(super::partial_size(i, r, a.size())),
 		     _ncol(super::partial_size(j, c, a.ncol())),
@@ -951,6 +953,12 @@ class Array2 : public Array<T, R>
     size_t		nrow()	const	{ return size(); }
     size_t		ncol()	const	{ return _ncol; }
     size_t		align()	const	{ return _align; }
+    size_t		stride() const
+			{
+			    typedef typename buf_type::value_type	S;
+			    
+			    return detail::nbytes<S>(_ncol, _align) / sizeof(S);
+			}
 
   //! 配列のサイズを変更する．
   /*!
@@ -1073,8 +1081,8 @@ class Array2 : public Array<T, R>
   \param jmax	これまでに読んできた要素の列番号の最大値
   \return	inで指定した入力ストリーム
 */
-template <class T, class B, class R> std::istream&
-Array2<T, B, R>::get(std::istream& in, size_t i, size_t j, size_t jmax)
+template <class T, size_t R, size_t C> std::istream&
+Array2<T, R, C>::get(std::istream& in, size_t i, size_t j, size_t jmax)
 {
     char	c;
 
@@ -1132,8 +1140,8 @@ operator <<(std::ostream& out, const E& expr)
   \param a	書き出す配列
   \return	outで指定した出力ストリーム
 */
-template <class T, class B> inline std::ostream&
-operator <<(std::ostream& out, const Array<T, B>& a)
+template <class T, size_t D, class ALLOC> inline std::ostream&
+operator <<(std::ostream& out, const Array<T, D, ALLOC>& a)
 {
     return a.put(out) << std::endl;
 }
@@ -1144,8 +1152,8 @@ operator <<(std::ostream& out, const Array<T, B>& a)
   \param a	配列の読み込み先
   \return	inで指定した入力ストリーム
 */
-template <class T, class B> inline std::istream&
-operator >>(std::istream& in, Array<T, B>& a)
+template <class T, size_t D, class ALLOC> inline std::istream&
+operator >>(std::istream& in, Array<T, D, ALLOC>& a)
 {
     return a.get(in >> std::ws);
 }
@@ -1156,8 +1164,8 @@ operator >>(std::istream& in, Array<T, B>& a)
   \param a	配列の読み込み先
   \return	inで指定した入力ストリーム
 */
-template <class T, class B, class R> inline std::istream&
-operator >>(std::istream& in, Array2<T, B, R>& a)
+template <class T, size_t R, size_t C> inline std::istream&
+operator >>(std::istream& in, Array2<T, R, C>& a)
 {
     return a.get(in >> std::ws);
 }
@@ -1472,7 +1480,7 @@ namespace detail
 
     // 3次元ベクトル型
       typedef value_t<right_type>			rvalue_type;
-      typedef Array<rvalue_type, Buf<rvalue_type, 3> >	array3_type;
+      typedef Array<rvalue_type, 3>			array3_type;
 
     // 左辺が多次元配列ならその行と右辺のベクトル積を返す反復子を定義
       typedef const_iterator_t<L>			base_iterator;

@@ -64,7 +64,7 @@ class fir_filter_iterator
     typedef boost::iterator_adaptor<
 		fir_filter_iterator, ITER, T,
 		boost::forward_traversal_tag, T>	super;
-    typedef FixedSizedArray<T, D>			buf_type;
+    typedef Array<T, D>					buf_type;
     typedef typename buf_type::const_iterator		buf_iterator;
 
   public:

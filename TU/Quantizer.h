@@ -26,8 +26,8 @@ class QuantizerBase
     class BinProps
     {
       public:
-	typedef float						element_type;
-	typedef Vector<element_type, Buf<element_type, 3> >	vector_type;
+	typedef float			element_type;
+	typedef Vector<element_type, 3>	vector_type;
 	
       public:
 	BinProps(PITER begin, PITER end)				;

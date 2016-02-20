@@ -53,11 +53,11 @@ class IntegralImage : public Image<T>
     typedef Image<T>	super;
 
 #ifdef USE_TBB
-    template <class S, class B>
+    template <class S>
     class CrossVal
     {
       public:
-	CrossVal(const IntegralImage& in, Image<S, B>& out, int cropSize)
+	CrossVal(const IntegralImage& in, Image<S>& out, int cropSize)
 	    :_in(in), _out(out), _cropSize(cropSize)			{}
     
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
@@ -69,23 +69,23 @@ class IntegralImage : public Image<T>
 
       private:
 	const IntegralImage&	_in;
-	Image<S, B>&		_out;
+	Image<S>&		_out;
 	const int		_cropSize;
     };
 #endif
     
   public:
     IntegralImage()							;
-    template <class S, class B>
-    IntegralImage(const Image<S, B>& image)				;
+    template <class S>
+    IntegralImage(const Image<S>& image)				;
 
-    template <class S, class B> IntegralImage&
-		initialize(const Image<S, B>& image)			;
+    template <class S> IntegralImage&
+		initialize(const Image<S>& image)			;
     T		crop(int u, int v, int w, int h)		const	;
     T		crop2(int umin, int umax, int vmin, int vmax)	const	;
     T		crossVal(int u, int v, int cropSize)		const	;
-    template <class S, class B> const IntegralImage&
-		crossVal(Image<S, B>& out, int cropSize)	const	;
+    template <class S> const IntegralImage&
+		crossVal(Image<S>& out, int cropSize)		const	;
 
     size_t	originalWidth()					const	;
     size_t	originalHeight()				const	;
@@ -104,8 +104,8 @@ IntegralImage<T>::IntegralImage()
 /*!
   \param image		入力画像
 */
-template <class T> template <class S, class B> inline
-IntegralImage<T>::IntegralImage(const Image<S, B>& image)
+template <class T> template <class S> inline
+IntegralImage<T>::IntegralImage(const Image<S>& image)
 {
     initialize(image);
 }
@@ -115,8 +115,8 @@ IntegralImage<T>::IntegralImage(const Image<S, B>& image)
   \param image		入力画像
   \return		この積分画像
 */
-template <class T> template <class S, class B> IntegralImage<T>&
-IntegralImage<T>::initialize(const Image<S, B>& image)
+template <class T> template <class S> IntegralImage<T>&
+IntegralImage<T>::initialize(const Image<S>& image)
 {
   // 原画像よりも上と左に１ピクセルずつ大きいサイズを用意
     super::resize(image.height() + 1, image.width() + 1);
@@ -204,13 +204,13 @@ IntegralImage<T>::crossVal(int u, int v, int cropSize) const
 			テンプレートは一辺 2*cropSize+1 の正方形
   \return		この積分画像
 */
-template <class T> template <class S, class B> const IntegralImage<T>&
-IntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
+template <class T> template <class S> const IntegralImage<T>&
+IntegralImage<T>::crossVal(Image<S>& out, int cropSize) const
 {
     out.resize(originalHeight(), originalWidth());
 #ifdef USE_TBB
     tbb::parallel_for(tbb::blocked_range<size_t>(0, out.height() - 1, 1),
-		      CrossVal<S, B>(*this, out, cropSize));
+		      CrossVal<S>(*this, out, cropSize));
 #else
     for (size_t v = 0; v < out.height(); ++v)
 	for (size_t u = 0; u < out.width(); ++u)
@@ -251,12 +251,12 @@ class DiagonalIntegralImage : public Image<T>
     typedef Image<T>	super;
 
 #ifdef USE_TBB
-    template <class S, class B>
+    template <class S>
     class CrossVal
     {
       public:
 	CrossVal(const DiagonalIntegralImage& in,
-		 Image<S, B>& out, int cropSize)
+		 Image<S>& out, int cropSize)
 	    :_in(in), _out(out), _cropSize(cropSize)			{}
     
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
@@ -268,22 +268,22 @@ class DiagonalIntegralImage : public Image<T>
 
       private:
 	const DiagonalIntegralImage&	_in;
-	Image<S, B>&			_out;
+	Image<S>&			_out;
 	const int			_cropSize;
     };
 #endif
     
   public:
     DiagonalIntegralImage()						;
-    template <class S, class B>
-    DiagonalIntegralImage(const Image<S, B>& image)			;
+    template <class S>
+    DiagonalIntegralImage(const Image<S>& image)			;
 
-    template <class S, class B> DiagonalIntegralImage&
-		initialize(const Image<S, B>& image)			;
+    template <class S> DiagonalIntegralImage&
+		initialize(const Image<S>& image)			;
     T		crop(int u, int v, int w, int h)		const	;
     T		crossVal(int u, int v, int cropSize)		const	;
-    template <class S, class B> const DiagonalIntegralImage&
-		crossVal(Image<S, B>& out, int cropSize)	const	;
+    template <class S> const DiagonalIntegralImage&
+		crossVal(Image<S>& out, int cropSize)		const	;
 
     size_t	originalWidth()					const	;
     size_t	originalHeight()				const	;
@@ -305,8 +305,8 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage()
 /*!
   \param image		入力画像
 */
-template <class T> template <class S, class B> inline
-DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
+template <class T> template <class S> inline
+DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S>& image)
 {
     initialize(image);
 }
@@ -316,8 +316,8 @@ DiagonalIntegralImage<T>::DiagonalIntegralImage(const Image<S, B>& image)
   \param image		入力画像
   \return		この対角積分画像
 */
-template <class T> template <class S, class B> DiagonalIntegralImage<T>&
-DiagonalIntegralImage<T>::initialize(const Image<S, B>& image)
+template <class T> template <class S> DiagonalIntegralImage<T>&
+DiagonalIntegralImage<T>::initialize(const Image<S>& image)
 {
     super::resize(image.height(), image.width());
     
@@ -397,15 +397,15 @@ DiagonalIntegralImage<T>::crossVal(int u, int v, int cropSize) const
 			テンプレートは一辺 2*cropSize+1 の正方形
   \return		この対角積分画像
 */
-template <class T> template <class S, class B> const DiagonalIntegralImage<T>&
-DiagonalIntegralImage<T>::crossVal(Image<S, B>& out, int cropSize) const
+template <class T> template <class S> const DiagonalIntegralImage<T>&
+DiagonalIntegralImage<T>::crossVal(Image<S>& out, int cropSize) const
 {
     out.resize(height(), width());
 #ifdef USE_TBB
     tbb::parallel_for(tbb::blocked_range<size_t>(0,
 						 out.height() - 2*cropSize - 1,
 						 1),
-		      CrossVal<S, B>(*this, out, cropSize));
+		      CrossVal<S>(*this, out, cropSize));
 #else
     for (size_t v = 0; v < out.height() - 2*cropSize - 1; ++v)
 	for (size_t u = 0; u < out.width(); ++u)

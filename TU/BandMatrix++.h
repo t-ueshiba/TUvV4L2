@@ -55,7 +55,7 @@ class BandMatrix
     typedef Matrix<element_type>	matrix_type;	//!< 同型の成分を持つ行列
     
   private:
-    typedef Vector<T, Buf<T, P+Q+1> >	RowData;
+    typedef Vector<T, P+Q+1>		RowData;
     
   public:
   // 構造操作
@@ -75,8 +75,8 @@ class BandMatrix
   // 演算
     BandMatrix&		operator =(element_type c)			;
     BandMatrix&		decompose()					;
-    template <class T2, class B2>
-    void		substitute(Vector<T2, B2>& b)		const	;
+    template <class T2, size_t D2>
+    void		substitute(Vector<T2, D2>& b)		const	;
     
   // 出力
     std::ostream&	put(std::ostream& out)			const	;
@@ -287,8 +287,8 @@ BandMatrix<T, P, Q>::decompose()
 				しない場合に送出
   \throw std::runtime_error	もとの正方行列が正則でない場合に送出
 */
-template <class T, size_t P, size_t Q> template <class T2, class B2> void
-BandMatrix<T, P, Q>::substitute(Vector<T2, B2>& b) const
+template <class T, size_t P, size_t Q> template <class T2, size_t D2> void
+BandMatrix<T, P, Q>::substitute(Vector<T2, D2>& b) const
 {
     if (b.size() != size())
 	throw std::invalid_argument("TU::BandMatrix<T, P, Q>::substitute(): Dimension of given vector is not equalt to mine!");

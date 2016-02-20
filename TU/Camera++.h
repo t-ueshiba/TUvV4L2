@@ -47,19 +47,17 @@ class IntrinsicBase
 {
   public:
   //! 数値計算全般のベースとなる型
-    typedef T						element_type;
+    typedef T				element_type;
   //! 2次元点の型
-    typedef Point2<element_type>			point2_type;
+    typedef Point2<element_type>	point2_type;
   //! ベクトルの型
-    typedef Vector<element_type>			vector_type;
+    typedef Vector<element_type>	vector_type;
   //! 行列の型
-    typedef Matrix<element_type>			matrix_type;
+    typedef Matrix<element_type>	matrix_type;
   //! 2x2行列の型
-    typedef Matrix<element_type, Buf<element_type, 4>,
-		   Buf<vector_type, 2> >		matrix22_type;
+    typedef Matrix<element_type, 2, 2>	matrix22_type;
   //! 3x3行列の型
-    typedef Matrix<element_type, Buf<element_type, 9>,
-		   Buf<vector_type, 3> >		matrix33_type;
+    typedef Matrix<element_type, 3, 3>	matrix33_type;
 
   public:
     IntrinsicBase(element_type k=1,
@@ -1104,33 +1102,28 @@ class CanonicalCamera
 {
   public:
   //! 数値計算全般のベースとなる型
-    typedef T							element_type;
+    typedef T						element_type;
   //! 2次元点の型
-    typedef Point2<element_type>				point2_type;
+    typedef Point2<element_type>			point2_type;
   //! 3次元点の型
-    typedef Point3<element_type>				point3_type;
+    typedef Point3<element_type>			point3_type;
   //! 2次元直線の型
-    typedef HyperPlane<Vector<element_type, Buf<element_type, 3> > >
-								line_type;
+    typedef HyperPlane<Vector<element_type, 3> >
+							line_type;
   //! 3次元平面の型
-    typedef HyperPlane<Vector<element_type, Buf<element_type, 4> > >
-								plane_type;
+    typedef HyperPlane<Vector<element_type, 4> >	plane_type;
   //! ベクトルの型
-    typedef Vector<element_type>				vector_type;
+    typedef Vector<element_type>			vector_type;
   //! 行列の型
-    typedef Matrix<element_type>				matrix_type;
+    typedef Matrix<element_type>			matrix_type;
   //! 2x3行列の型
-    typedef Matrix<element_type, Buf<element_type, 6>,
-		   Buf<vector_type, 2> >			matrix23_type;
+    typedef Matrix<element_type, 2, 3>			matrix23_type;
   //! 3x3行列の型
-    typedef Matrix<element_type, Buf<element_type, 9>,
-		   Buf<vector_type, 3> >			matrix33_type;
+    typedef Matrix<element_type, 3, 3>			matrix33_type;
   //! 3x4行列の型
-    typedef Matrix<element_type, Buf<element_type, 12>,
-		   Buf<vector_type, 3> >			matrix34_type;
+    typedef Matrix<element_type, 3, 4>			matrix34_type;
   //! 4x4行列の型
-    typedef Matrix<element_type, Buf<element_type, 16>,
-		   Buf<vector_type, 4> >			matrix44_type;
+    typedef Matrix<element_type, 4, 4>			matrix44_type;
 
   public:
     CanonicalCamera(const point3_type& t=point3_type(0, 0, 0),
@@ -1224,7 +1217,7 @@ template <class T> typename CanonicalCamera<T>::point2_type
 CanonicalCamera<T>::x(const point3_type& X,
 		      matrix_type* J, matrix_type* H) const
 {
-    typedef Vector<element_type, Buf<element_type, 3> >	vector3_type;
+    typedef Vector<element_type, 3>	vector3_type;
 
     const vector3_type&	dX = X - _t;
     const vector_type&	Xc = _Rt * dX;
@@ -1263,7 +1256,7 @@ CanonicalCamera<T>::x(const point3_type& X,
 template <class T> inline typename CanonicalCamera<T>::matrix23_type
 CanonicalCamera<T>::Jx(const point3_type& X) const
 {
-    typedef Vector<element_type, Buf<element_type, 3> >	vector3_type;
+    typedef Vector<element_type, 3>	vector3_type;
 
     const vector3_type&	dX = X - _t;
     const vector_type&	Xc = _Rt * dX;
@@ -1441,7 +1434,7 @@ CanonicalCamera<T>::updateFCC(const vector_type& dp)
 template <class T> inline std::istream&
 CanonicalCamera<T>::get(std::istream& in)
 {
-    typedef Vector<element_type, Buf<element_type, 3> >	vector3_type;
+    typedef Vector<element_type, 3>	vector3_type;
     
     const element_type	RAD = element_type(M_PI) / element_type(180);
     vector3_type	axis;
@@ -1686,7 +1679,7 @@ Camera<I>::P() const
 template <class I> void
 Camera<I>::setProjection(const matrix34_type& P)
 {
-    typedef Vector<element_type, Buf<element_type, 3> >	vector3_type;
+    typedef Vector<element_type, 3>	vector3_type;
 
     matrix33_type	K;		// camera intrinsic parameters.
     K[0]    = P[2](0, 3);

@@ -509,22 +509,14 @@ BSplineCurve<C>::elevateDegree()
 	    removeKnot(k);
 }
 
-typedef BSplineCurve<Vector<float, Buf<float, 2> > >
-BSplineCurve2f;
-typedef BSplineCurve<Vector<float, Buf<float, 3> > >
-RationalBSplineCurve2f;
-typedef BSplineCurve<Vector<float, Buf<float, 3> > >
-BSplineCurve3f;
-typedef BSplineCurve<Vector<float, Buf<float, 4> > >
-RationalBSplineCurve3f;
-typedef BSplineCurve<Vector<double, Buf<double, 2> > >
-BSplineCurve2d;
-typedef BSplineCurve<Vector<double, Buf<double, 3> > >
-RationalBSplineCurve2d;
-typedef BSplineCurve<Vector<double, Buf<double, 3> > >
-BSplineCurve3d;
-typedef BSplineCurve<Vector<double, Buf<double, 4> > >
-RationalBSplineCurve3d;
+typedef BSplineCurve<Vector<float, 2> >		BSplineCurve2f;
+typedef BSplineCurve<Vector<float, 3> >		RationalBSplineCurve2f;
+typedef BSplineCurve<Vector<float, 3> >		BSplineCurve3f;
+typedef BSplineCurve<Vector<float, 4> >		RationalBSplineCurve3f;
+typedef BSplineCurve<Vector<double, 2> >	BSplineCurve2d;
+typedef BSplineCurve<Vector<double, 3> >	RationalBSplineCurve2d;
+typedef BSplineCurve<Vector<double, 3> >	BSplineCurve3d;
+typedef BSplineCurve<Vector<double, 4> >	RationalBSplineCurve3d;
     
 /************************************************************************
 *  class BSplineSurface<C>						*

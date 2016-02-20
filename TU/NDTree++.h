@@ -58,12 +58,12 @@ class NDTree
     class	Leaf;
     
   public:
-    typedef T				value_type;	//!< 要素の型
-    typedef value_type&			reference;	//!< 要素への参照
-    typedef const value_type&		const_reference;//!< 定数要素への参照
-    typedef value_type*			pointer;	//!< 要素へのポインタ
-    typedef const value_type*		const_pointer;	//!< 定数要素へのポインタ
-    typedef Array<int, Buf<int, D> >	position_type;	//!< 空間中の位置
+    typedef T			value_type;	//!< 要素の型
+    typedef value_type&		reference;	//!< 要素への参照
+    typedef const value_type&	const_reference;//!< 定数要素への参照
+    typedef value_type*		pointer;	//!< 要素へのポインタ
+    typedef const value_type*	const_pointer;	//!< 定数要素へのポインタ
+    typedef Array<int, D>	position_type;	//!< 空間中の位置
 
   //! 2^D分木のための前進反復子
     template <class S>
