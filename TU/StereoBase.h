@@ -37,6 +37,7 @@
 #include "TU/Image++.h"		// Use RGBA
 #include "TU/algorithm.h"	// Use std::min(), std::max() and TU::diff().
 #include "TU/tuple.h"
+#include "TU/simd/simd.h"
 #include <limits>		// Use std::numeric_limits<T>.
 #include <stack>
 #include <tbb/blocked_range.h>

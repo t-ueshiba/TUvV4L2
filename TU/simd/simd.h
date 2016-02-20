@@ -62,6 +62,18 @@
 #  include "TU/simd/cvtup_iterator.h"
 #  include "TU/simd/shift_iterator.h"
 #  include "TU/simd/row_vec_iterator.h"
+
+namespace TU
+{
+template <class T>	struct BufTraits;
+template <class T>
+struct BufTraits<simd::vec<T> >	// 要素がvec<T>の配列の反復子を特別版に
+{
+    typedef simd::load_iterator<const T*, true>	const_iterator;
+    typedef simd::store_iterator<T*, true>	iterator;
+    typedef simd::allocator<simd::vec<T> >	allocator_type;
+};
+}
 #endif
 
 #endif	// !__TU_SIMD_SIMD_H
