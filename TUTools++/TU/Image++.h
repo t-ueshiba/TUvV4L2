@@ -1697,29 +1697,31 @@ Image<T>::_resize(size_t h, size_t w, const TypeInfo&)
 */
 class GenericImage : public ImageBase
 {
-  public:
+  private:
     typedef Array2<Array<u_char> >	array2_type;
+
+  public:
     typedef array2_type::pointer	pointer;
     typedef array2_type::const_pointer	const_pointer;
     
   public:
   //! 総称画像を生成する．
-    GenericImage() :_a(), _typeInfo(U_CHAR), _colormap(0)	{}
+    GenericImage() :_a(), _typeInfo(U_CHAR), _colormap(0)		{}
 
-    pointer		data()					;
-    const_pointer	data()				const	;
-    const TypeInfo&	typeInfo()			const	;
-    std::istream&	restore(std::istream& in)		;
-    std::ostream&	save(std::ostream& out)		const	;
-    std::istream&	restoreData(std::istream& in)		;
-    std::ostream&	saveData(std::ostream& out)	const	;
+    pointer		data()						;
+    const_pointer	data()					const	;
+    const TypeInfo&	typeInfo()				const	;
+    std::istream&	restore(std::istream& in)			;
+    std::ostream&	save(std::ostream& out)			const	;
+    std::istream&	restoreData(std::istream& in)			;
+    std::ostream&	saveData(std::ostream& out)		const	;
     
   private:
-    virtual size_t	_width()			const	;
-    virtual size_t	_height()			const	;
-    virtual Type	_defaultType()			const	;
+    virtual size_t	_width()				const	;
+    virtual size_t	_height()				const	;
+    virtual Type	_defaultType()				const	;
     virtual void	_resize(size_t h, size_t w,
-				const TypeInfo& typeInfo)	;
+				const TypeInfo& typeInfo)		;
 
   private:
     array2_type		_a;
