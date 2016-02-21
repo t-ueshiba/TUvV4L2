@@ -1695,34 +1695,50 @@ Image<T>::_resize(size_t h, size_t w, const TypeInfo&)
 /*!
   個々の行や画素にアクセスすることはできない．
 */
-class GenericImage : private Array2<Array<u_char> >, public ImageBase
+class GenericImage : public ImageBase
 {
-  private:
-    typedef Array2<Array<u_char> >	super;
+  public:
+    typedef Array2<Array<u_char> >	array2_type;
+    typedef array2_type::pointer	pointer;
+    typedef array2_type::const_pointer	const_pointer;
     
   public:
   //! 総称画像を生成する．
-    GenericImage() :_typeInfo(U_CHAR), _colormap(0)			{}
+    GenericImage() :_a(), _typeInfo(U_CHAR), _colormap(0)	{}
 
-    using			super::data;
-    
-    const TypeInfo&		typeInfo()			const	;
-    std::istream&		restore(std::istream& in)		;
-    std::ostream&		save(std::ostream& out)		const	;
-    __PORT std::istream&	restoreData(std::istream& in)		;
-    __PORT std::ostream&	saveData(std::ostream& out)	const	;
+    pointer		data()					;
+    const_pointer	data()				const	;
+    const TypeInfo&	typeInfo()			const	;
+    std::istream&	restore(std::istream& in)		;
+    std::ostream&	save(std::ostream& out)		const	;
+    std::istream&	restoreData(std::istream& in)		;
+    std::ostream&	saveData(std::ostream& out)	const	;
     
   private:
-    __PORT virtual size_t	_width()			const	;
-    __PORT virtual size_t	_height()			const	;
-    __PORT virtual Type		_defaultType()			const	;
-    __PORT virtual void		_resize(size_t h, size_t w,
-					const TypeInfo& typeInfo)	;
+    virtual size_t	_width()			const	;
+    virtual size_t	_height()			const	;
+    virtual Type	_defaultType()			const	;
+    virtual void	_resize(size_t h, size_t w,
+				const TypeInfo& typeInfo)	;
 
-    TypeInfo			_typeInfo;
-    Array<BGRA>			_colormap;
+  private:
+    array2_type		_a;
+    TypeInfo		_typeInfo;
+    Array<BGRA>		_colormap;
 };
 
+inline GenericImage::pointer
+GenericImage::data()
+{
+    return _a.data();
+}
+    
+inline GenericImage::const_pointer
+GenericImage::data() const
+{
+    return _a.data();
+}
+    
 //! 現在保持している画像のタイプ情報を返す．
 /*!
   \return	タイプ情報
