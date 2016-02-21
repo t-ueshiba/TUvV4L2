@@ -1089,7 +1089,7 @@ Array2<T, R, C>::get(std::istream& in, size_t i, size_t j, size_t jmax)
 	}
     }
     in.putback(c);
-    element_type	val;
+    typename buf_type::value_type	val;
     in >> val;
     get(in, i, j + 1, jmax);
     (*this)[i][j] = val;

@@ -12,7 +12,7 @@ SUBDIR	= TUTools++		\
 	  TUV4L2++		\
 	  TUvV4L2++		\
 	  TUUSB++		\
-	  TUHRP2++
+#	  TUHRP2++
 
 TARGETS	= all install clean depend
 
