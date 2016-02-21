@@ -66,9 +66,9 @@ template <class T, size_t D=0,
 	  class ALLOC=typename BufTraits<T>::allocator_type>
 class Buf;
     
-//! 定数サイズのバッファクラス
+//! 定数長バッファクラス
 /*!
-  単独で使用することはなく，TU::Array の基底クラスまたは TU::Array2 の
+  単独で使用することはなく，#TU::Array の基底クラスまたは #TU::Array2 の
   内部バッファクラスとして使う．
   \param T	要素の型
   \param D	バッファ中の要素数
@@ -196,7 +196,7 @@ class Buf : public BufTraits<T>
 
 //! 可変長バッファクラス
 /*!
-  単独で使用することはなく，TU::Array の基底クラスまたは TU::Array2 の
+  単独で使用することはなく，#TU::Array の基底クラスまたは #TU::Array2 の
   内部バッファクラスとして使う．
   \param T	要素の型
   \param ALLOC	アロケータの型
@@ -217,17 +217,17 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 							const_reference;
     
   public:
-    explicit		Buf(size_t siz=0)	//!< デフォルトコンストラクタ
+    explicit		Buf(size_t siz=0)
 			    :_size(siz), _p(alloc(_size)),
 			     _shared(0), _capacity(_size)	{}
 
-			Buf(const Buf& b)	//!< コピーコンストラクタ
+			Buf(const Buf& b)
 			    :_size(b._size), _p(alloc(_size)),
 			     _shared(0), _capacity(_size)
 			{
 			    std::copy(b.begin(), b.end(), begin());
 			}
-    Buf&		operator =(const Buf& b)	//!< 代入演算子
+    Buf&		operator =(const Buf& b)
 			{
 			    if (this != &b)
 			    {
@@ -237,7 +237,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			    return *this;
 			}
 #if defined(__CXX0X_MOVE)
-			Buf(Buf&& b)		//!< 移動コンストラクタ
+			Buf(Buf&& b)
 			    :_size(b._size), _p(b._p),
 			     _shared(b._shared), _capacity(b._capacity)
 			{
@@ -246,7 +246,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			    b._p	= nullptr;
 			    b._capacity	= 0;
 			}
-    Buf&		operator =(Buf&& b)	//!< 移動代入演算子
+    Buf&		operator =(Buf&& b)
 			{
 			    if (_shared)
 				return operator =(static_cast<const Buf&>(b));
@@ -264,7 +264,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			    return *this;
 			}
 #endif
-			~Buf()			//!< デストラクタ
+			~Buf()
 			{
 			    if (!_shared)
 				free(_p, _size);
@@ -355,7 +355,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			}
     
   private:
-    allocator_type	_allocator;
+    allocator_type	_allocator;		//!< アロケータ
     size_t		_size;			//!< 要素数
     pointer		_p;			//!< 記憶領域の先頭ポインタ
     size_t		_shared	  : 1;		//!< 記憶領域の共有を示すフラグ
@@ -517,6 +517,7 @@ class Array : public Buf<T, D, ALLOC>
 		    :super((i < a.size() ? &a[i] : nullptr),
 			   partial_size(i, d, a.size()))	{}
 
+#if !defined(__NVCC__)
   //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
   /*!
     コピーコンストラクタは別個自動的に生成される．
@@ -529,7 +530,7 @@ class Array : public Buf<T, D, ALLOC>
 		{
 		    super::for_each(expr.begin(), assign());
 		}
-
+    
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
   /*!
     標準代入演算子は別個自動的に生成される．
@@ -544,6 +545,7 @@ class Array : public Buf<T, D, ALLOC>
 		    super::for_each(expr.begin(), assign());
 		    return *this;
 		}
+#endif	// !__NVCC__
 
   //! 全ての要素に同一の値を代入する．
   /*!
@@ -601,7 +603,8 @@ class Array : public Buf<T, D, ALLOC>
 				    assert(i < size());
 				    return *(begin() + i);
 				}
-    	
+
+#if !defined(__NVCC__)
   //! 2つの配列を要素毎に比較し，同じであるか調べる．
   /*!
     \param expr	比較対象となる配列
@@ -634,7 +637,7 @@ class Array : public Buf<T, D, ALLOC>
 			{
 			    return !(*this == expr);
 			}
-
+#endif	// !__NVCC__
     bool		resize(size_t siz)
 			{
 			    bool enlarged = super::resize(siz);
@@ -697,14 +700,18 @@ class Array : public Buf<T, D, ALLOC>
 			}
 
   protected:
-    void		init()
-			{
-			    init(*this);
-			}
-
     static size_t	partial_size(size_t i, size_t d, size_t a)
 			{
 			    return (i+d <= a ? d : i < a ? a-i : 0);
+			}
+#if defined(__NVCC__)
+    static void		init()
+			{
+			}
+#else
+    void		init()
+			{
+			    init(*this);
 			}
 
   private:
@@ -727,6 +734,7 @@ class Array : public Buf<T, D, ALLOC>
 			init(T_)
 			{
 			}
+#endif
 };
 
 namespace detail
@@ -889,6 +897,7 @@ class Array2 : public Array<T, R, std::allocator<T> >
 			(*this)[ii].resize(a[i+ii].data() + j, ncol());
 		}    
 
+#if !defined(__NVCC__)
   //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
   /*!
     コピーコンストラクタを定義しないと自動的に作られてしまうので，
@@ -922,14 +931,13 @@ class Array2 : public Array<T, R, std::allocator<T> >
 		    super::operator =(expr);
 		    return *this;
 		}
-
+#endif	// !__NVCC__
     Array2&	operator =(const element_type& c)
 		{
 		    super::operator =(c);
 		    return *this;
 		}
     
-  //using		super::fill;
     using		super::begin;
     using		super::cbegin;
     using		super::end;
@@ -1142,6 +1150,7 @@ operator >>(std::istream& in, Array2<T, R, C>& a)
     return a.get(in >> std::ws);
 }
 
+#if !defined(__NVCC__)
 namespace detail
 {
   /**********************************************************************
@@ -1622,6 +1631,6 @@ operator ^(const L& l, const R& r)
 {
     return detail::CrossProduct<L, R>(l, r).value();
 }
-
+#endif	// !__NVCC__
 }
 #endif	// !__TU_ARRAYPP_H

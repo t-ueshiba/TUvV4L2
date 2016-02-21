@@ -194,13 +194,7 @@ class Vector : public Array<T, D>
     Vector(T* p, size_t d)						;
     template <size_t D2>
     Vector(Vector<T, D2>& v, size_t i, size_t d)			;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Vector(const E& v)							;
     Vector(std::initializer_list<value_type> args)			;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Vector&		operator =(const E& v)				;
     Vector&		operator =(std::
 				   initializer_list<value_type> args)	;
     Vector&		operator =(const element_type& c)		;
@@ -218,28 +212,36 @@ class Vector : public Array<T, D>
     
     const Vector<T>	operator ()(size_t i, size_t d)		const	;
     Vector<T>		operator ()(size_t i, size_t d)			;
+    T			square()				const	;
+    double		length()				const	;
+    Vector&		normalize()					;
+    Vector		normal()				const	;
+    matrix33_type	skew()					const	;
+    Vector<T>		homogeneous()				const	;
+    Vector<T>		inhomogeneous()				const	;
+#if !defined(__NVCC__)
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    Vector(const E& v)							;
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    Vector&		operator =(const E& v)				;
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector&		operator *=(const E& m)				;
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector&		operator ^=(const E& v)				;
-    T			square()				const	;
-    double		length()				const	;
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     T			sqdist(const E& v)			const	;
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     double		dist(const E& v)			const	;
-    Vector&		normalize()					;
-    Vector		normal()				const	;
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector&		solve(const E& m)				;
-    matrix33_type	skew()					const	;
-    Vector<T>		homogeneous()				const	;
-    Vector<T>		inhomogeneous()				const	;
+#endif
 };
 
 //! ベクトルを生成し，全成分を0で初期化する．
@@ -282,38 +284,12 @@ Vector<T, D>::Vector(Vector<T, D2>& v, size_t i, size_t d)
 {
 }
 
-//! 他のベクトルと同一成分を持つベクトルを作る(コピーコンストラクタの拡張)．
-/*!
-  \param v	コピー元ベクトル
-*/
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
-Vector<T, D>::Vector(const E& v)
-    :super(v)
-{
-}
-    
 template <class T, size_t D> inline
 Vector<T, D>::Vector(std::initializer_list<value_type> args)
     :super(args)
 {
 }
     
-//! 他のベクトルを自分に代入する(代入演算子の拡張)．
-/*!
-  \param v	コピー元ベクトル
-  \return	このベクトル
-*/
-
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Vector<T, D>&
-Vector<T, D>::operator =(const E& v)
-{
-    super::operator =(v);
-    return *this;
-}
-
 template <class T, size_t D> inline Vector<T, D>&
 Vector<T, D>::operator =(std::initializer_list<value_type> args)
 {
@@ -352,34 +328,6 @@ Vector<T, D>::operator ()(size_t i, size_t d) const
     return Vector<T>(const_cast<Vector<T, D>&>(*this), i, d);
 }
 
-//! このベクトルの右から行列を掛ける．
-/*!
-  \param m	掛ける行列
-  \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\TUvec{M}{}\f$
-*/
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Vector<T, D>&
-Vector<T, D>::operator *=(const E& m)
-{
-    return *this = *this * m;
-}
-
-//! このベクトルと他の3次元ベクトルとのベクトル積をとる．
-/*!
-  \param v	他のベクトル
-  \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} \times \TUvec{v}{}\f$
-*/
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Vector<T, D>&
-Vector<T, D>::operator ^=(const E& v)
-{
-    return *this = *this ^ v;
-}
-
 //! このベクトルの長さの2乗を返す．
 /*!
   \return	ベクトルの長さの2乗，すなわち\f$\TUnorm{\TUvec{u}{}}^2\f$
@@ -398,34 +346,6 @@ template <class T, size_t D> inline double
 Vector<T, D>::length() const
 {
     return std::sqrt(double(square()));
-}
-
-//! このベクトルと他のベクトルの差の長さの2乗を返す．
-/*!
-  \param v	比較対象となるベクトル
-  \return	ベクトル間の差の2乗，すなわち
-		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
-*/
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline T
-Vector<T, D>::sqdist(const E& v) const
-{
-    return Vector(*this - v).square();
-}
-
-//! このベクトルと他のベクトルの差の長さを返す．
-/*!
-  \param v	比較対象となるベクトル
-  \return	ベクトル間の差，すなわち
-		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
-*/
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline double
-Vector<T, D>::dist(const E& v) const
-{
-    return std::sqrt(double(sqdist(v)));
 }
 
 //! このベクトルの長さを1に正規化する．
@@ -501,6 +421,89 @@ Vector<T, D>::inhomogeneous() const
     return (*this)(0, size()-1) / (*this)[size()-1];
 }
 
+#if !defined(__NVCC__)
+//! 他のベクトルと同一成分を持つベクトルを作る(コピーコンストラクタの拡張)．
+/*!
+  \param v	コピー元ベクトル
+*/
+template <class T, size_t D>
+template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
+Vector<T, D>::Vector(const E& v)
+    :super(v)
+{
+}
+    
+//! 他のベクトルを自分に代入する(代入演算子の拡張)．
+/*!
+  \param v	コピー元ベクトル
+  \return	このベクトル
+*/
+template <class T, size_t D>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Vector<T, D>&
+Vector<T, D>::operator =(const E& v)
+{
+    super::operator =(v);
+    return *this;
+}
+
+//! このベクトルの右から行列を掛ける．
+/*!
+  \param m	掛ける行列
+  \return	このベクトル，すなわち
+		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\TUvec{M}{}\f$
+*/
+template <class T, size_t D>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Vector<T, D>&
+Vector<T, D>::operator *=(const E& m)
+{
+    return *this = *this * m;
+}
+
+//! このベクトルと他の3次元ベクトルとのベクトル積をとる．
+/*!
+  \param v	他のベクトル
+  \return	このベクトル，すなわち
+		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} \times \TUvec{v}{}\f$
+*/
+template <class T, size_t D>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Vector<T, D>&
+Vector<T, D>::operator ^=(const E& v)
+{
+    return *this = *this ^ v;
+}
+
+//! このベクトルと他のベクトルの差の長さの2乗を返す．
+/*!
+  \param v	比較対象となるベクトル
+  \return	ベクトル間の差の2乗，すなわち
+		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
+*/
+template <class T, size_t D>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline T
+Vector<T, D>::sqdist(const E& v) const
+{
+    return Vector(*this - v).square();
+}
+
+//! このベクトルと他のベクトルの差の長さを返す．
+/*!
+  \param v	比較対象となるベクトル
+  \return	ベクトル間の差，すなわち
+		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
+*/
+template <class T, size_t D>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline double
+Vector<T, D>::dist(const E& v) const
+{
+    return std::sqrt(double(sqdist(v)));
+}
+#endif	// !__NVCC__
+    
 /************************************************************************
 *  class Matrix<T, R, C>						*
 ************************************************************************/
@@ -546,18 +549,8 @@ class Matrix : public Array2<Vector<T>, R, C>
     Matrix(T* p, size_t r, size_t c)					;
     template <size_t R2, size_t C2>
     Matrix(Matrix<T, R2, C2>& m, size_t i, size_t j, size_t r, size_t c);
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix(const E& expr)	:super(expr)				{}
     Matrix(std::initializer_list<value_type> args)			;
     Matrix(const BlockDiagonalMatrix<T>& m)				;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		operator =(const E& expr)
-			{
-			    super::operator =(expr);
-			    return *this;
-			}
     Matrix&		operator =(std::
 				   initializer_list<value_type> arg)	;
     Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
@@ -580,18 +573,9 @@ class Matrix : public Array2<Vector<T>, R, C>
 				    size_t r, size_t c)		const	;
     Matrix<T>		operator ()(size_t i, size_t j,
 				    size_t r, size_t c)			;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		operator *=(const E& m)				;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		operator ^=(const E& v)				;
     Matrix&		diag(T c)					;
     Matrix<T>		trns()					const	;
     Matrix		inv()					const	;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		solve(const E& m)				;
     T			det()					const	;
     T			det(size_t p, size_t q)			const	;
     T			trace()					const	;
@@ -623,6 +607,27 @@ class Matrix : public Array2<Vector<T>, R, C>
     template <class T2, size_t D2>
     static matrix33_type
 			Rt(const Vector<T2, D2>& v)			;
+#if !defined(__NVCC__)
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    Matrix(const E& expr)	:super(expr)				{}
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    Matrix&		operator =(const E& expr)
+			{
+			    super::operator =(expr);
+			    return *this;
+			}
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    Matrix&		operator *=(const E& m)				;
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    Matrix&		operator ^=(const E& v)				;
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    Matrix&		solve(const E& m)				;
+#endif	// !__NVCC__
 };
 
 //! 行列を生成し，全成分を0で初期化する．
@@ -719,34 +724,6 @@ template <class T, size_t R, size_t C> inline const Matrix<T>
 Matrix<T, R, C>::operator ()(size_t i, size_t j, size_t r, size_t c) const
 {
     return Matrix<T>(const_cast<Matrix<T, R, C>&>(*this), i, j, r, c);
-}
-
-//! この行列の右から他の行列を掛ける．
-/*!
-  \param m	掛ける行列
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
-*/
-template <class T, size_t R, size_t C>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Matrix<T, R, C>&
-Matrix<T, R, C>::operator *=(const E& m)
-{
-    return *this = *this * m;
-}
-
-//! この?x3行列と3次元ベクトルとのベクトル積をとる．
-/*!
-  \param v	3次元ベクトル
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
-*/
-template <class T, size_t R, size_t C>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Matrix<T, R, C>&
-Matrix<T, R, C>::operator ^=(const E& v)
-{
-    return *this = *this ^ v;
 }
 
 //! この正方行列を全て同一の対角成分値を持つ対角行列にする．
@@ -1348,6 +1325,35 @@ Matrix<T, R, C>::Rt(const Vector<T2, D2>& v)
     }
 }
 
+#if !defined(__NVCC__)
+//! この行列の右から他の行列を掛ける．
+/*!
+  \param m	掛ける行列
+  \return	この行列，すなわち
+		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
+*/
+template <class T, size_t R, size_t C>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Matrix<T, R, C>&
+Matrix<T, R, C>::operator *=(const E& m)
+{
+    return *this = *this * m;
+}
+
+//! この?x3行列と3次元ベクトルとのベクトル積をとる．
+/*!
+  \param v	3次元ベクトル
+  \return	この行列，すなわち
+		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
+*/
+template <class T, size_t R, size_t C>
+template <class E, typename std::enable_if<is_range<E>::value>::type*>
+inline Matrix<T, R, C>&
+Matrix<T, R, C>::operator ^=(const E& v)
+{
+    return *this = *this ^ v;
+}
+    
 /************************************************************************
 *  class LUDecomposition<T>						*
 ************************************************************************/
@@ -1522,7 +1528,7 @@ Matrix<T, R, C>::solve(const E& m)
 	lu.substitute((*this)[i]);
     return *this;
 }
-
+    
 //! この行列の行列式を返す．
 /*!
   \return	行列式，すなわち\f$\det\TUvec{A}{}\f$
@@ -2342,6 +2348,7 @@ class SVDecomposition : private BiDiagonal<T>
   */
     const T&	operator [](int i)	const	{return diagonal()[i];}
 };
+#endif	// !__NVCC__
 
 /************************************************************************
 *  global functions							*

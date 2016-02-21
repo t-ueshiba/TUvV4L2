@@ -637,6 +637,7 @@ class ImageLine : public Array<T>
     ImageLine(ImageLine<T>& l, size_t u, size_t d)
 	:super(l, u, d), _lmost(0), _rmost(d)			{}
 
+#if !defined(__NVCC__)
   //! 他の配列と同一要素を持つスキャンラインを作る（コピーコンストラクタの拡張）．
   /*!
     コピーコンストラクタは別個自動的に生成される．
@@ -659,7 +660,8 @@ class ImageLine : public Array<T>
 			    super::operator =(expr);
 			    return *this;
 			}
-
+#endif	// !__NVCC__
+    
     ImageLine&		operator =(const element_type& c)	;
     const ImageLine	operator ()(size_t u, size_t d)	const	;
     ImageLine		operator ()(size_t u, size_t d)		;
@@ -1259,7 +1261,8 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
 				    size_t w, size_t h)	const	;
     Image<T>		operator ()(size_t u, size_t v,
 				    size_t w, size_t h)		;
-    
+
+#if !defined(__NVCC__)
   //! 他の配列と同一要素を持つ画像を作る（コピーコンストラクタの拡張）．
   /*!
     コピーコンストラクタを定義しないと自動的に作られてしまうので，
@@ -1287,7 +1290,8 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
 		    super::operator =(expr);
 		    return *this;
 		}
-
+#endif	// !__NVCC__
+    
     template <class S>
     T		at(const Point2<S>& p)			const	;
 

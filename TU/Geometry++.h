@@ -54,14 +54,18 @@ class Point1 : public Vector<T, 1>
     typedef Vector<T, 1>	super;
     
   public:
-    Point1(T u=0)							;
+  //! 指定された座標成分を持つ1次元点を作る．
+  /*!
+    \param u	u座標
+  */
+    explicit Point1(T u=0)	:super()		{(*this)[0] = u;}
 
   //! 他の1次元ベクトルと同一要素を持つ1次元点を作る．
   /*!
     \param v	コピー元1次元ベクトル
   */
     template <class T2, size_t D2>
-    Point1(const Vector<T2, D2>& v) :super(v)				{}
+    Point1(const Vector<T2, D2>& v) :super(v)		{}
 
   //! 他の1次元ベクトルを自分に代入する．
   /*!
@@ -75,17 +79,6 @@ class Point1 : public Vector<T, 1>
 		    return *this;
 		}
 };
-
-//! 指定された座標成分を持つ1次元点を作る．
-/*!
-  \param u	u座標
-*/
-template <class T> inline
-Point1<T>::Point1(T u)
-    :super()
-{
-    (*this)[0] = u;
-}
 
 typedef Point1<short>	Point1s;		//!< short型座標を持つ1次元点
 typedef Point1<int>	Point1i;		//!< int型座標を持つ1次元点
@@ -106,15 +99,24 @@ class Point2 : public Vector<T, 2>
     typedef Vector<T, 2>	super;
     
   public:
-    Point2(T u=0, T v=0)						;
+  //! 指定された座標成分を持つ2次元点を作る．
+  /*!
+    \param u	u座標
+    \param v	v座標
+  */
+    explicit	Point2(T u=0, T v=0) :super()
+		{
+		    (*this)[0] = u; (*this)[1] = v;
+		}
 
+#if !defined(__NVCC__)
   //! 他の2次元ベクトルと同一要素を持つ2次元点を作る．
   /*!
     \param v	コピー元2次元ベクトル
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Point2(const E& v) :super(v)					{}
+		Point2(const E& v) :super(v)	{}
 
   //! 他の2次元ベクトルを自分に代入する．
   /*!
@@ -123,41 +125,21 @@ class Point2 : public Vector<T, 2>
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Point2&	operator =(const E& v)
-		{
-		    super::operator =(v);
-		    return *this;
-		}
-    Point2	neighbor(int)					const	;
-    Point2&	move(int)						;
-    int		adj(const Point2&)				const	;
-    int		dir(const Point2&)				const	;
-    int		angle(const Point2&, const Point2&)		const	;
+    Point2&	operator =(const E& v)	{ super::operator =(v); return *this; }
+#endif	// !__NVCC__
+
+  //! 指定された方向の8近傍点を返す．
+  /*!
+    \param dir	8近傍点の方向(mod 8で解釈．右隣を0とし，時計回りに1づつ増加)
+    \return	8近傍点
+  */
+    Point2	neighbor(int dir) const	{ return Point2(*this).move(dir); }
+
+    Point2&	move(int dir)					;
+    int		adj(const Point2& p)			const	;
+    int		dir(const Point2& p)			const	;
+    int		angle(const Point2& p, const Point2& q)	const	;
 };
-
-//! 指定された座標成分を持つ2次元点を作る．
-/*!
-  \param u	u座標
-  \param v	v座標
-*/
-template <class T> inline
-Point2<T>::Point2(T u, T v)
-    :super()
-{
-    (*this)[0] = u;
-    (*this)[1] = v;
-}
-
-//! 指定された方向の8近傍点を返す．
-/*!
-  \param dir	8近傍点の方向(mod 8で解釈．右隣を0とし，時計回りに1づつ増加)
-  \return	8近傍点
-*/
-template <class T> inline Point2<T>
-Point2<T>::neighbor(int dir) const
-{
-    return Point2(*this).move(dir);
-}
 
 //! 指定された方向の8近傍点に自身を移動する．
 /*!
@@ -231,8 +213,6 @@ Point2<T>::adj(const Point2<T>& p) const
           case 0:
           case 1:
             return 1;
-          default:
-            return 0;
         }
         break;
     }
@@ -276,16 +256,16 @@ Point2<T>::dir(const Point2<T>& p) const
 
 //! この2次元点と指定された2つの2次元点がなす角度を返す．
 /*!
-  \param pp	2次元点
-  \param pn	2次元点
-  \return	pp->*this->pnがなす角度を-180degから180degまでを8等分した
-		区間で表した-4から3までの整数値．特に，pp, pnの少なくとも
+  \param p	2次元点
+  \param q	2次元点
+  \return	p->*this->qがなす角度を-180degから180degまでを8等分した
+		区間で表した-4から3までの整数値．特に，p, qの少なくとも
 		一方がこの点に一致するならば4
 */
 template <class T> int
-Point2<T>::angle(const Point2<T>& pp, const Point2<T>& pn) const
+Point2<T>::angle(const Point2<T>& p, const Point2<T>& q) const
 {
-    int dp = pp.dir(*this), ang = dir(pn);
+    int dp = p.dir(*this), ang = dir(q);
     
     if (dp == 4 || ang == 4)
         return 4;
@@ -316,15 +296,25 @@ class Point3 : public Vector<T, 3>
     typedef Vector<T, 3>	super;
     
   public:
-    Point3(T x=0, T y=0, T z=0)						;
+  //! 指定された座標成分を持つ3次元点を作る．
+  /*!
+    \param x	x座標
+    \param y	y座標
+    \param z	z座標
+  */
+    explicit	Point3(T x=0, T y=0, T z=0) :super()
+		{
+		    (*this)[0] = x; (*this)[1] = y; (*this)[2] = z;
+		}
 
+#if !defined(__NVCC__)
   //! 他の3次元ベクトルと同一要素を持つ3次元点を作る．
   /*!
     \param v	コピー元3次元ベクトル
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Point3(const E& v) :super(v)					{}
+		Point3(const E& v) :super(v)				{}
 
   //! 他の3次元ベクトルを自分に代入する．
   /*!
@@ -333,27 +323,9 @@ class Point3 : public Vector<T, 3>
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Point3&	operator =(const E& v)
-		{
-		    super::operator =(v);
-		    return *this;
-		}
+    Point3&	operator =(const E& v)	{ super::operator =(v); return *this; }
+#endif	// !__NVCC__
 };
-
-//! 指定された座標成分を持つ3次元点を作る．
-/*!
-  \param x	x座標
-  \param y	y座標
-  \param z	z座標
-*/
-template <class T> inline
-Point3<T>::Point3(T x, T y, T z)
-    :super()
-{
-    (*this)[0] = x;
-    (*this)[1] = y;
-    (*this)[2] = z;
-}
 
 typedef Point3<short>	Point3s;		//!< short型座標を持つ3次元点
 typedef Point3<int>	Point3i;		//!< int型座標を持つ3次元点
@@ -638,21 +610,44 @@ class HyperPlane : public V
     typedef Matrix<element_type>		matrix_type;
     
   public:
-    HyperPlane()					;
-    explicit HyperPlane(size_t d)			;
+  //! 超平面オブジェクトを生成する．
+  /*!
+    無限遠超平面([0, 0,..., 0, 1])に初期化される．
+  */
+		HyperPlane()
+		    :super()
+		{
+		    if (super::size() > 0)
+			(*this)[super::size()-1] = 1;
+		}
 
+  //! 空間の次元を指定して超平面オブジェクトを生成する．
+  /*!
+    無限遠超平面([0, 0,..., 0, 1])に初期化される．
+    \param d	この超平面が存在する射影空間の次元
+  */
+    explicit	HyperPlane(size_t d) :super(d + 1)	{ (*this)[d] = 1; }
+    
+  //! 与えられた点列の非同次座標に当てはめられた超平面オブジェクトを生成する．
+  /*!
+    \param begin			点列の先頭を示す反復子
+    \param end				点列の末尾を示す反復子
+    \throw std::invalid_argument	点の数が ndataMin() に満たない場合に送出
+  */
+    template <class Iterator>
+		HyperPlane(Iterator begin, Iterator end)
+		{
+		    fit(begin, end);
+		}
+
+#if !defined(__NVCC__)
   //! 同次座標ベクトルを指定して超平面オブジェクトを生成する．
   /*!
     \param p	(d+1)次元ベクトル(dは超平面が存在する射影空間の次元)
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    HyperPlane(const E& p)	:super(p)	{}
-
-    template <class Iterator>
-    HyperPlane(Iterator begin, Iterator end)		;
-
-    using	super::size;
+		HyperPlane(const E& p)	:super(p)	{}
 
   //! 超平面オブジェクトの同次座標ベクトルを指定する．
   /*!
@@ -661,8 +656,10 @@ class HyperPlane : public V
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    HyperPlane&	operator =(const E& v)	{super::operator =(v);
-							 return *this;}
+    HyperPlane&	operator =(const E& v)	{super::operator =(v); return *this;}
+#endif	// !__NVCC__
+    
+    using	super::size;
 
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)	;
@@ -685,42 +682,6 @@ class HyperPlane : public V
     template <class T, size_t D>
     element_type	dist(const Vector<T, D>& x)	const	;
 };
-
-//! 超平面オブジェクトを生成する．
-/*!
-  無限遠超平面([0, 0,..., 0, 1])に初期化される．
-*/
-template <class V> inline
-HyperPlane<V>::HyperPlane()
-    :super()
-{
-    if (super::size() > 0)
-	(*this)[super::size()-1] = 1;
-}
-    
-//! 空間の次元を指定して超平面オブジェクトを生成する．
-/*!
-  無限遠超平面([0, 0,..., 0, 1])に初期化される．
-  \param d	この超平面が存在する射影空間の次元
-*/
-template <class V> inline
-HyperPlane<V>::HyperPlane(size_t d)
-    :super(d + 1)
-{
-    (*this)[d] = 1;
-}
-    
-//! 与えられた点列の非同次座標に当てはめられた超平面オブジェクトを生成する．
-/*!
-  \param begin			点列の先頭を示す反復子
-  \param end			点列の末尾を示す反復子
-  \throw std::invalid_argument	点の数が ndataMin() に満たない場合に送出
-*/
-template <class V> template <class Iterator> inline
-HyperPlane<V>::HyperPlane(Iterator begin, Iterator end)
-{
-    fit(begin, end);
-}
 
 //! 与えられた点列の非同次座標に超平面を当てはめる．
 /*!
@@ -830,7 +791,10 @@ class Projectivity : public M
 
     Projectivity()							;
     Projectivity(size_t inDim, size_t outDim)				;
+    template <class Iterator>
+    Projectivity(Iterator begin, Iterator end, bool refine=false)	;
 
+#if !defined(__NVCC__)
   //! 変換行列を指定して射影変換オブジェクトを生成する．
   /*!
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
@@ -839,13 +803,6 @@ class Projectivity : public M
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Projectivity(const E& T) :super(T)					{}
 
-    template <class Iterator>
-    Projectivity(Iterator begin, Iterator end, bool refine=false)	;
-
-    using	super::nrow;
-    using	super::ncol;
-    using	super::operator ();
-    
   //! 変換行列を指定する．
   /*!
     \param T	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
@@ -853,6 +810,11 @@ class Projectivity : public M
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     void	set(const E& T)		{super::operator =(T);}
+#endif	// !__NVCC__
+    
+    using	super::nrow;
+    using	super::ncol;
+    using	super::operator ();
     
     template <class Iterator>
     void	fit(Iterator begin, Iterator end, bool refine=false)	;
@@ -1298,7 +1260,7 @@ class Affinity : public Projectivity<M>
     typedef typename super::matrix_type		matrix_type;
 
   //! アフィン変換オブジェクトを生成する．
-    Affinity()	:super()						{}
+		Affinity()	:super()				{}
     
   //! 入力空間と出力空間の次元を指定してアフィン変換オブジェクトを生成する．
   /*!
@@ -1306,22 +1268,56 @@ class Affinity : public Projectivity<M>
     \param inDim	入力空間の次元
     \param outDim	出力空間の次元
   */
-    Affinity(size_t inDim, size_t outDim)	:super(inDim, outDim)	{}
+		Affinity(size_t inDim, size_t outDim)
+		    :super(inDim, outDim)				{}
 
+  //! 与えられた点対列の非同次座標からアフィン変換オブジェクトを生成する．
+  /*!
+    \param begin			点対列の先頭を示す反復子
+    \param end				点対列の末尾を示す反復子
+    \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
+  */
+    template <class Iterator>
+		Affinity(Iterator begin, Iterator end)
+		{
+		    fit(begin, end);
+		}
+
+#if !defined(__NVCC__)
+  //! 変換行列を指定してアフィン変換オブジェクトを生成する．
+  /*!
+    変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
+    \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
+  */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Affinity(const E& T)						;
-    template <class Iterator>
-    Affinity(Iterator begin, Iterator end)				;
-
+		Affinity(const E& T)
+		    :super(T)
+		{
+		    (*this)[outDim()] = 0;
+		    (*this)[outDim()][inDim()] = 1;
+		}
+    
+  //! 変換行列を指定する．
+  /*!
+    変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
+    \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
+  */
+    template <class E,
+	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    void	set(const E& T)
+		{
+		    super::set(T);
+		    (*this)[outDim()] = 0;
+		    (*this)[outDim()][inDim()] = 1;
+		}
+#endif	// !__NVCC__
+    
     using	super::inDim;
     using	super::outDim;
     using	super::mapP;
     using	super::Jx;
     
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    void	set(const E& T)						;
     template <class Iterator>
     void	fit(Iterator begin, Iterator end)			;
     Affinity	inv()						const	;
@@ -1342,47 +1338,6 @@ class Affinity : public Projectivity<M>
     vector_type	b()	const	;
 };
 
-//! 変換行列を指定してアフィン変換オブジェクトを生成する．
-/*!
-  変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
-  \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
-*/
-template<class M>
-template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
-Affinity<M>::Affinity(const E& T)
-    :super(T)
-{
-    (*this)[outDim()] = 0;
-    (*this)[outDim()][inDim()] = 1;
-}
-
-//! 与えられた点対列の非同次座標からアフィン変換オブジェクトを生成する．
-/*!
-  \param begin			点対列の先頭を示す反復子
-  \param end			点対列の末尾を示す反復子
-  \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
-*/
-template<class M> template <class Iterator> inline
-Affinity<M>::Affinity(Iterator begin, Iterator end)
-{
-    fit(begin, end);
-}
-
-//! 変換行列を指定する．
-/*!
-  変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
-  \param T			(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
-*/
-template<class M>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline void
-Affinity<M>::set(const E& T)
-{
-    super::set(T);
-    (*this)[outDim()] = 0;
-    (*this)[outDim()][inDim()] = 1;
-}
-    
 //! 与えられた点対列の非同次座標からアフィン変換を計算する．
 /*!
   \param begin			点対列の先頭を示す反復子
@@ -1552,88 +1507,81 @@ class Rigidity : public Affinity<M>
   /*!
     恒等変換として初期化される．
   */
-    Rigidity()		:super()					{}
+			Rigidity() :super()		{}
     
   //! 入力空間と出力空間の次元を指定して剛体変換オブジェクトを生成する．
   /*!
     恒等変換として初期化される．
     \param d	入力/出力空間の次元
   */
-    Rigidity(size_t d)	:super(d, d)					{}
+    explicit		Rigidity(size_t d) :super(d, d)	{}
 
+  //! 与えられた点対列の非同次座標から剛体変換オブジェクトを生成する．
+  /*!
+    \param begin			点対列の先頭を示す反復子
+    \param end				点対列の末尾を示す反復子
+    \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
+  */
+    template <class Iterator>
+			Rigidity(Iterator begin, Iterator end)
+			{
+			    fit(begin, end);
+			}
+
+#if !defined(__NVCC__)
+  //! 変換行列を指定して剛体変換オブジェクトを生成する．
+  /*!
+    \param T	(d+1) x (d+1)行列(dは入力/出力空間の次元)
+  */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Rigidity(const E& T)						;
-    template <class Iterator>
-    Rigidity(Iterator begin, Iterator end)				;
+			Rigidity(const E& T)			{ set(T); }
+
+  //! 変換行列を指定する．
+  /*!
+    \param T	(d+1) x (d+1) 行列(dは入力/出力空間の次元)
+  */
+    template <class E>
+    typename std::enable_if<is_range<E>::value>::type
+			set(const E& T)
+			{
+			    if (T().size() != T().ncol())
+				throw std::invalid_argument("Rigidity::set(): non-square matrix!!");
+			    super::set(T);
+			}
+#endif
 
     using		super::inDim;
     using		super::outDim;
 
-    size_t		dim()					const	;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    void		set(const E& T)					;
+  //! この剛体変換の入力/出力空間の次元を返す．
+  /*! 
+    \return	入力/出力空間の次元(同次座標のベクトルとしての次元は dim()+1)
+  */
+    size_t		dim()			const	{ return inDim(); };
+    
+  //! この剛体変換の回転部分を表現する回転行列を返す．
+  /*! 
+    \return	dim() x dim() 行列
+  */
+    const matrix_type	R()			const	{ return super::A(); }
+
+  //! この剛体変換の並行移動部分を表現するベクトルを返す．
+  /*! 
+    \return	dim() 次元ベクトル
+  */
+    vector_type		t()			const	{ return super::b(); }
+
     template <class Iterator>
-    void		fit(Iterator begin, Iterator end)		;
-    Rigidity		inv()					const	;
-    size_t		ndataMin()				const	;
+    void		fit(Iterator begin, Iterator end)	;
+    Rigidity		inv()				const	;
+    size_t		ndataMin()			const	;
     template <class S, size_t D>
     matrix_type		jacobian(const Vector<S, D>& x)	const	;
-    size_t		nparams()				const	;
-    void		update(const vector_type& dt)			;
-    
-    const matrix_type	R()					const	;
-    vector_type		t()					const	;
+    size_t		nparams()			const	;
+    void		update(const vector_type& dt)		;
 };
 
-//! 変換行列を指定して剛体変換オブジェクトを生成する．
-/*!
-  \param T	(d+1) x (d+1)行列(dは入力/出力空間の次元)
-*/
-template<class M>
-template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
-Rigidity<M>::Rigidity(const E& T)
-{
-    set(T);
-}
-
-//! 与えられた点対列の非同次座標から剛体変換オブジェクトを生成する．
-/*!
-  \param begin			点対列の先頭を示す反復子
-  \param end			点対列の末尾を示す反復子
-  \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
-*/
-template<class M> template <class Iterator> inline
-Rigidity<M>::Rigidity(Iterator begin, Iterator end)
-{
-    fit(begin, end);
-}
-
-//! この剛体変換の入力/出力空間の次元を返す．
-/*! 
-  \return	入力/出力空間の次元(同次座標のベクトルとしての次元は dim()+1)
-*/
-template<class M> inline size_t
-Rigidity<M>::dim() const
-{
-    return inDim();
-}
-
-//! 変換行列を指定する．
-/*!
-  \param T	(d+1) x (d+1) 行列(dは入力/出力空間の次元)
-*/
-template<class M>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline void
-Rigidity<M>::set(const E& T)
-{
-    if (T().size() != T().ncol())
-	throw std::invalid_argument("Rigidity::set(): non-square matrix!!");
-    super::set(T);
-}
-    
 //! 与えられた点対列の非同次座標から剛体変換を計算する．
 /*!
   \param begin			点対列の先頭を示す反復子
@@ -1675,26 +1623,6 @@ Rigidity<M>::fit(Iterator begin, Iterator end)
     for (size_t i = 0; i < d; ++i)
 	(*this)[i][d] = yc[i] - (*this)[i](0, d) * xc;
     (*this)[d][d] = 1;
-}
-
-//! この剛体変換の回転部分を表現する回転行列を返す．
-/*! 
-  \return	dim() x dim() 行列
-*/
-template <class M> const typename Rigidity<M>::matrix_type
-Rigidity<M>::R() const
-{
-    return super::A();
-}
-
-//! この剛体変換の並行移動部分を表現するベクトルを返す．
-/*! 
-  \return	dim() 次元ベクトル
-*/
-template <class M> typename Rigidity<M>::vector_type
-Rigidity<M>::t() const
-{
-    return super::b();
 }
 
 //! この剛体変換の逆変換を返す．
@@ -1760,7 +1688,6 @@ Rigidity<M>::jacobian(const Vector<S, D>& x) const
 	break;
       default:
 	throw std::runtime_error("Rigidity<M>::jacobian(): sorry, not implemented yet...");
-	break;
     }
 
     return J;
@@ -1790,14 +1717,15 @@ Rigidity<M>::update(const vector_type& dt)
     switch (dim())
     {
       case 2:
-	(*this)(0, 0, 2, 2) = matrix_type::Rt(vector_type(-dt[2])) * (*this)(0, 0, 2, 2);
+	(*this)(0, 0, 2, 2) = matrix_type::Rt(vector_type(-dt[2]))
+			    * (*this)(0, 0, 2, 2);
 	break;
       case 3:
-	(*this)(0, 0, 3, 3) = matrix_type::Rt(vector_type(-dt(3, 3))) * (*this)(0, 0, 3, 3);
+	(*this)(0, 0, 3, 3) = matrix_type::Rt(vector_type(-dt(3, 3)))
+			    * (*this)(0, 0, 3, 3);
 	break;
       default:
 	throw std::runtime_error("Rigidity<M>::update(): sorry, not implemented yet...");
-	break;
     }
 }
 
@@ -1835,11 +1763,13 @@ class Homography : public Projectivity<Matrix<T, 3, 3> >
 
   public:
     Homography()			:super()		{}
+    template <class Iterator>
+    Homography(Iterator begin, Iterator end, bool refine=false)	;
+#if !defined(__NVCC__)
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Homography(const E& H)	:super(H)			{}
-    template <class Iterator>
-    Homography(Iterator begin, Iterator end, bool refine=false)	;
+#endif	// !__NVCC__
 
     using	super::operator ();
     using	super::inDim;
@@ -1854,6 +1784,7 @@ class Homography : public Projectivity<Matrix<T, 3, 3> >
     
     void	compose(const param_type& dt)			;
 };
+
 
 //! 与えられた点対列の非同次座標から2次元射影変換オブジェクトを生成する．
 /*!
@@ -1956,12 +1887,29 @@ class Affinity2 : public Affinity<Matrix<T, 3, 3> >
     typedef Matrix<element_type, 2, DOF>	jacobian_type;
 
   public:
-    Affinity2()	:super()					{}
+		Affinity2()	:super()			{}
+
+  //! 与えられた点対列の非同次座標から2次元アフィン変換オブジェクトを生成する．
+  /*!
+    \param begin			点対列の先頭を示す反復子
+    \param end				点対列の末尾を示す反復子
+    \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
+  */
+    template <class Iterator>
+		Affinity2(Iterator begin, Iterator end)
+		{
+		    fit(begin, end);
+		}
+
+#if !defined(__NVCC__)
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Affinity2(const E& A)					;
-    template <class Iterator>
-    Affinity2(Iterator begin, Iterator end)			;
+		Affinity2(const E& A)
+		    :super(A)
+		{
+		    (*this)[2][0] = (*this)[2][1] = 0; (*this)[2][2] = 1;
+		}
+#endif	// !__NVCC__
 
     using	super::operator ();
     using	super::inDim;
@@ -1976,27 +1924,6 @@ class Affinity2 : public Affinity<Matrix<T, 3, 3> >
     
     void	compose(const param_type& dt)			;
 };
-
-template <class T>
-template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
-Affinity2<T>::Affinity2(const E& A)
-    :super(A)
-{
-    (*this)[2][0] = (*this)[2][1] = 0;
-    (*this)[2][2] = 1;
-}
-    
-//! 与えられた点対列の非同次座標から2次元アフィン変換オブジェクトを生成する．
-/*!
-  \param begin			点対列の先頭を示す反復子
-  \param end			点対列の末尾を示す反復子
-  \throw std::invalid_argument	点対の数が ndataMin() に満たない場合に送出
-*/
-template<class T> template <class Iterator> inline
-Affinity2<T>::Affinity2(Iterator begin, Iterator end)
-{
-    fit(begin, end);
-}
 
 //! この2次元アフィン変換の逆変換を返す．
 /*!
