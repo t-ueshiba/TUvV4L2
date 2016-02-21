@@ -496,7 +496,8 @@ namespace detail
 			     impl::result_t<E>,
 			     impl::identity<const E> >::type,
 			 impl::identity<const E&> >::type::type;
-    
+
+#if !defined(__NVCC__)
   /**********************************************************************
   *  class unary_operator<OP, E>					*
   **********************************************************************/
@@ -757,11 +758,13 @@ namespace detail
 
       return l;
   }
+#endif	// !__NVCC__
 }	// End of namespace TU::detail
 
 template <class E>	using is_range  = detail::is_range<E>;
 template <class E>	using element_t = detail::element_t<E>;
-    
+
+#if !defined(__NVCC__)
 //! 与えられた式の各要素の符号を反転する.
 /*!
   \param expr	式
@@ -939,8 +942,7 @@ square(const T& x)
     return x * x;
 }
 template <class E>
-inline typename std::enable_if<is_range<E>::value,
-			       element_t<E> >::type
+inline typename std::enable_if<is_range<E>::value, element_t<E> >::type
 square(const E& expr)
 {
     typedef element_t<E>		element_type;
@@ -985,6 +987,7 @@ dist(const L& x, const R& y) -> decltype(std::sqrt(sqdist(x, y)))
 {
     return std::sqrt(sqdist(x, y));
 }
+#endif	// !__NVCC__
 
 //! 与えられた二つの整数の最大公約数を求める．
 /*!
