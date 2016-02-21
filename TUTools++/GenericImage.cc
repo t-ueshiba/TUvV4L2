@@ -39,7 +39,7 @@ namespace TU
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-__PORT std::istream&
+std::istream&
 GenericImage::restoreData(std::istream& in)
 {
     _colormap.resize(_typeInfo.ncolors);
@@ -48,13 +48,13 @@ GenericImage::restoreData(std::istream& in)
     size_t	npads = type2nbytes(_typeInfo.type, true);
     if (_typeInfo.bottomToTop)
     {
-	for (reverse_iterator line = rbegin(); line != rend(); ++line)
+	for (auto line = _a.rbegin(); line != _a.rend(); ++line)
 	    if (!line->restore(in) || !in.ignore(npads))
 		break;
     }
     else
     {
-	for (iterator line = begin(); line != end(); ++line)
+	for (auto line = _a.begin(); line != _a.end(); ++line)
 	    if (!line->restore(in) || !in.ignore(npads))
 		break;
     }
@@ -67,7 +67,7 @@ GenericImage::restoreData(std::istream& in)
   \param out	出力ストリーム
   \return	outで指定した出力ストリーム
 */
-__PORT std::ostream&
+std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {
     if (_colormap.size() > 0)
@@ -80,13 +80,13 @@ GenericImage::saveData(std::ostream& out) const
     Array<u_char>	pad(type2nbytes(_typeInfo.type, true));
     if (_typeInfo.bottomToTop)
     {
-	for (const_reverse_iterator line = rbegin(); line != rend(); ++line)
+	for (auto line = _a.rbegin(); line != _a.rend(); ++line)
 	    if (!line->save(out) || !pad.save(out))
 		break;
     }
     else
     {
-	for (const_iterator line = begin(); line != end(); ++line)
+	for (auto line = _a.begin(); line != _a.end(); ++line)
 	    if (!line->save(out) || !pad.save(out))
 		break;
     }
@@ -94,30 +94,30 @@ GenericImage::saveData(std::ostream& out) const
     return out;
 }
 
-__PORT size_t
+size_t
 GenericImage::_width() const
 {
-    return (ncol()*8) / type2depth(_typeInfo.type);
+    return (_a.ncol()*8) / type2depth(_typeInfo.type);
 }
 
-__PORT size_t
+size_t
 GenericImage::_height() const
 {
-    return nrow();
+    return _a.nrow();
 }
 
-__PORT ImageBase::Type
+ImageBase::Type
 GenericImage::_defaultType() const
 {
     return _typeInfo.type;
 }
 
-__PORT void
+void
 GenericImage::_resize(size_t h, size_t w, const TypeInfo& typeInfo)
 {
     _typeInfo = typeInfo;
     w = (type2depth(_typeInfo.type)*w + 7) / 8;
-    super::resize(h, w);
+    _a.resize(h, w);
 }
 
 }
