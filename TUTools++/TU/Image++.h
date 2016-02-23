@@ -1190,15 +1190,6 @@ ImageLine<YUV411>::resize(YUV411* p, size_t d)
     super::resize(p, d/2);
 }
 
-namespace detail
-{
-  template <> inline size_t
-  nbytes<YUV411>(size_t siz, size_t align)
-  {
-      return align * ((sizeof(YUV411)*siz/2 + align - 1) / align);
-  }
-}
-    
 /************************************************************************
 *  class Image<T>:							*
 ************************************************************************/
@@ -1230,20 +1221,19 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
   /*!
     \param w	画像の幅
     \param h	画像の高さ
-    \param a	各行においてalignするバイト数(1ならalignしない)
+    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-    explicit Image(size_t w=0, size_t h=0, size_t a=1)
-	:super(h, w, a), ImageBase()				{}
+    explicit Image(size_t w=0, size_t h=0, size_t unit=1)
+	:super(h, w, unit), ImageBase()				{}
 
   //! 外部の領域と幅および高さを指定して画像を生成する．
   /*!
     \param p	外部領域へのポインタ
     \param w	画像の幅
     \param h	画像の高さ
-    \param a	各行においてalignするバイト数(1ならalignしない)
   */
-    Image(T* p, size_t w, size_t h, size_t a=1)
-	:super(p, h, w, a), ImageBase()				{}
+    Image(T* p, size_t w, size_t h)
+	:super(p, h, w), ImageBase()				{}
 
   //! 指定された画像の部分画像を生成する．
   /*!
@@ -1269,12 +1259,11 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     このコンストラクタがあってもコピーコンストラクタを別個に定義
     しなければならない．
     \param expr	コピー元の配列
-    \param a	各行においてalignするバイト数(1ならalignしない)
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Image(const E& expr, size_t a=1)
-	:super(expr, a), ImageBase()				{}
+    Image(const E& expr)
+	:super(expr), ImageBase()				{}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
   /*!
