@@ -28,42 +28,53 @@
  *  $Id: mmInstructions.h 1826 2015-05-07 01:47:56Z ueshiba $
  */
 /*!
-  \file		simd.h
+  \file		BufTraits.h
   \brief	CPUのSIMD命令に関連するクラスと関数の定義と実装
 */
-#if !defined(__TU_SIMD_SIMD_H)
-#define __TU_SIMD_SIMD_H
+#if !defined(__TU_SIMD_BUFTRAITS_H)
+#define __TU_SIMD_BUFTRAITS_H
 
-#include "TU/simd/config.h"
+#include <algorithm>
+#include "TU/simd/store_iterator.h"
+#include "TU/simd/load_iterator.h"
 
-#if defined(SIMD)
-#  include "TU/simd/vec.h"
-#  include "TU/simd/allocator.h"
+namespace TU
+{
+template <class T, class ALLOC>	struct BufTraits;
+template <class T, class ALLOC>
+struct BufTraits<simd::vec<T>, ALLOC>
+{
+    typedef simd::allocator<simd::vec<T> >	allocator_type;
+    typedef typename allocator_type::pointer	pointer;
+    typedef simd::store_iterator<T*, true>	iterator;
+    typedef simd::load_iterator<const T*, true>	const_iterator;
 
-#  include "TU/simd/load_store.h"
-#  include "TU/simd/zero.h"
-#  include "TU/simd/cast.h"
-#  include "TU/simd/insert_extract.h"
-#  include "TU/simd/shift.h"
-#  include "TU/simd/bit_shift.h"
-#  include "TU/simd/dup.h"
-#  include "TU/simd/cvt.h"
-#  include "TU/simd/logical.h"
-#  include "TU/simd/compare.h"
-#  include "TU/simd/select.h"
-#  include "TU/simd/arithmetic.h"
-#  include "TU/simd/misc.h"
-#  include "TU/simd/transform.h"
-#  include "TU/simd/lookup.h"
+    static pointer	alloc(allocator_type& allocator, size_t siz)
+			{
+			    pointer	p = allocator.allocate(siz);
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				allocator.construct(q, T());
+			    return p;
+			}
+    
+    static void		free(allocator_type& allocator, pointer p, size_t siz)
+			{
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				allocator.destroy(q);
+			    allocator.deallocate(p, siz);
+			}
 
-#  include "TU/simd/load_iterator.h"
-#  include "TU/simd/store_iterator.h"
-#  include "TU/simd/cvtdown_iterator.h"
-#  include "TU/simd/cvtup_iterator.h"
-#  include "TU/simd/shift_iterator.h"
-#  include "TU/simd/row_vec_iterator.h"
+    template <class IN_, class OUT_>
+    static OUT_		copy(IN_ ib, IN_ ie, OUT_ out)
+			{
+			    return std::copy(ib, ie, out);
+			}
 
-#  include "TU/simd/BufTraits.h"
-#endif
-
-#endif	// !__TU_SIMD_SIMD_H
+    template <class ITER_, class T_>
+    static void		fill(ITER_ ib, ITER_ ie, const T_& c)
+			{
+			    std::fill(ib, ie, c);
+			}
+};
+}	// namespace TU
+#endif	// !__TU_SIMD_BUFTRAITS_H

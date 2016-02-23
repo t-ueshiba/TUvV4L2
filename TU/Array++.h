@@ -51,42 +51,65 @@ namespace TU
 /************************************************************************
 *  class BufTraits<T>							*
 ************************************************************************/
-template <class T>
+template <class T, class ALLOC>
 struct BufTraits
 {
-    typedef const T*		const_iterator;
-    typedef T*			iterator;
-    typedef std::allocator<T>	allocator_type;
+    typedef ALLOC					allocator_type;
+    typedef typename allocator_type::pointer		pointer;
+    typedef typename allocator_type::pointer		iterator;
+    typedef typename allocator_type::const_pointer	const_iterator;
+
+    static pointer	alloc(allocator_type& allocator, size_t siz)
+			{
+			    pointer	p = allocator.allocate(siz);
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				allocator.construct(q, T());
+			    return p;
+			}
+    
+    static void		free(allocator_type& allocator, pointer p, size_t siz)
+			{
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				allocator.destroy(q);
+			    allocator.deallocate(p, siz);
+			}
+
+    template <class IN_, class OUT_>
+    static OUT_		copy(IN_ ib, IN_ ie, OUT_ out)
+			{
+			    return std::copy(ib, ie, out);
+			}
+
+    template <class ITER_, class T_>
+    static void		fill(ITER_ ib, ITER_ ie, const T_& c)
+			{
+			    std::fill(ib, ie, c);
+			}
 };
 
 /************************************************************************
 *  class Buf<T, D, ALLOC>						*
 ************************************************************************/
-template <class T, size_t D=0,
-	  class ALLOC=typename BufTraits<T>::allocator_type>
-class Buf;
-    
-//! 定数長バッファクラス
+//! 固定長バッファクラス
 /*!
   単独で使用することはなく，#TU::Array の基底クラスまたは #TU::Array2 の
   内部バッファクラスとして使う．
   \param T	要素の型
   \param D	バッファ中の要素数
 */
-template <class T, size_t D, class>
-class Buf : public BufTraits<T>
+template <class T, size_t D, class ALLOC>
+class Buf : public BufTraits<T, ALLOC>
 {
+  private:
+    typedef BufTraits<T, ALLOC>			super;
+
   public:
-    typedef void					allocator_type;
-    typedef T						value_type;
-    typedef value_type*					pointer;
-    typedef const value_type*				const_pointer;
-    typedef typename BufTraits<T>::iterator		iterator;
-    typedef typename BufTraits<T>::const_iterator	const_iterator;
-    typedef typename std::iterator_traits<iterator>::reference
-							reference;
-    typedef typename std::iterator_traits<const_iterator>::reference
-							const_reference;
+    typedef void				allocator_type;
+    typedef T					value_type;
+    typedef value_type*				pointer;
+    typedef const value_type*			const_pointer;
+    typedef typename super::iterator		iterator;
+    typedef typename super::const_iterator	const_iterator;
     
   public:
     explicit		Buf(size_t siz=D)
@@ -104,7 +127,7 @@ class Buf : public BufTraits<T>
 				for_each(b.begin(), assign());
 			    return *this;
 			}
-    
+
   //! 外部の領域と要素数を指定してバッファを生成する（ダミー関数）．
   /*!
     実際はバッファが使用する記憶領域は固定されていて変更できないので，
@@ -148,7 +171,7 @@ class Buf : public BufTraits<T>
     \param p	新しい記憶領域へのポインタ
     \param siz	新しい要素数
   */
-    void		resize(pointer p, size_t siz)
+    void		resize(pointer p, size_t siz) const
 			{
 			    assert(p == _p && siz == D);
 			}
@@ -202,37 +225,38 @@ class Buf : public BufTraits<T>
   \param ALLOC	アロケータの型
 */
 template <class T, class ALLOC>
-class Buf<T, 0, ALLOC> : public BufTraits<T>
+class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 {
+  private:
+    typedef BufTraits<T, ALLOC>				super;
+    
   public:
-    typedef ALLOC					allocator_type;
+    typedef typename super::allocator_type		allocator_type;
     typedef typename allocator_type::value_type		value_type;
     typedef typename allocator_type::pointer		pointer;
     typedef typename allocator_type::const_pointer	const_pointer;
-    typedef typename BufTraits<T>::iterator		iterator;
-    typedef typename BufTraits<T>::const_iterator	const_iterator;
-    typedef typename std::iterator_traits<iterator>::reference
-							reference;
-    typedef typename std::iterator_traits<const_iterator>::reference
-							const_reference;
+    typedef typename super::iterator			iterator;
+    typedef typename super::const_iterator		const_iterator;
     
   public:
     explicit		Buf(size_t siz=0)
-			    :_size(siz), _p(alloc(_size)),
+			    :_size(siz),
+			     _p(super::alloc(_allocator, _size)),
 			     _shared(0), _capacity(_size)	{}
 
 			Buf(const Buf& b)
-			    :_size(b._size), _p(alloc(_size)),
+			    :_size(b._size),
+			     _p(super::alloc(_allocator, _size)),
 			     _shared(0), _capacity(_size)
 			{
-			    std::copy(b.begin(), b.end(), begin());
+			    super::copy(b.begin(), b.end(), begin());
 			}
     Buf&		operator =(const Buf& b)
 			{
 			    if (this != &b)
 			    {
 				resize(b._size);
-				std::copy(b.begin(), b.end(), begin());
+				super::copy(b.begin(), b.end(), begin());
 			    }
 			    return *this;
 			}
@@ -251,7 +275,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			    if (_shared)
 				return operator =(static_cast<const Buf&>(b));
 			    
-			    free(_p, _size);
+			    super::free(_allocator, _p, _size);
 			    _size     = b._size;
 			    _p	      = b._p;
 			    _capacity = b._capacity;
@@ -267,7 +291,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			~Buf()
 			{
 			    if (!_shared)
-				free(_p, _size);
+				super::free(_allocator, _p, _size);
 			}
 
 			Buf(pointer p, size_t siz)
@@ -306,8 +330,8 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			    _size = siz;
 			    if (_capacity < _size)
 			    {
-				free(_p, old_size);
-				_p = alloc(_size);
+				super::free(_allocator, _p, old_size);
+				_p = super::alloc(_allocator, _size);
 				_capacity = _size;
 			    }
 			    return _size > old_size;
@@ -321,7 +345,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
     void		resize(pointer p, size_t siz)
 			{
 			    if (!_shared)
-				free(_p, _size);
+				super::free(_allocator, _p, _size);
 			    _size     = siz;
 			    _p	      = p;
 			    _shared   = 1;
@@ -337,21 +361,6 @@ class Buf<T, 0, ALLOC> : public BufTraits<T>
 			    for (iterator dst = begin(), e = end();
 				 dst != e; ++dst, ++src)
 				op(*dst, *src);
-			}
-    
-  private:
-    pointer		alloc(size_t siz)
-			{
-			    pointer	p = _allocator.allocate(siz);
-			    for (pointer q = p, qe = q + siz; q != qe; ++q)
-				_allocator.construct(q, value_type());
-			    return p;
-			}
-    void		free(pointer p, size_t siz)
-			{
-			    for (pointer q = p, qe = q + siz; q != qe; ++q)
-				_allocator.destroy(q);
-			    _allocator.deallocate(p, siz);
 			}
     
   private:
@@ -412,8 +421,7 @@ Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
   \param D	次元(0ならば可変)
   \param ALLOC	アロケータの型
 */
-template <class T, size_t D=0,
-	  class ALLOC=typename BufTraits<T>::allocator_type>
+template <class T, size_t D=0, class ALLOC=std::allocator<T> >
 class Array : public Buf<T, D, ALLOC>
 {
   private:
@@ -439,9 +447,11 @@ class Array : public Buf<T, D, ALLOC>
   //! 定数逆反復子    
     typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
   //! 要素への参照
-    typedef typename super::reference			reference;
+    typedef typename std::iterator_traits<iterator>::reference
+							reference;
   //! 定数要素への参照
-    typedef typename super::const_reference		const_reference;
+    typedef typename std::iterator_traits<const_iterator>::reference
+							const_reference;
   //! ポインタ間の差
     typedef std::ptrdiff_t				difference_type;
 
@@ -483,13 +493,13 @@ class Array : public Buf<T, D, ALLOC>
 		Array(std::initializer_list<value_type> args)
 		    :super(args.size())
 		{
-		    std::copy(args.begin(), args.end(), begin());
+		    super::copy(args.begin(), args.end(), begin());
 		}
 
     Array&	operator =(std::initializer_list<value_type> args)
 		{
 		    super::resize(args.size());
-		    std::copy(args.begin(), args.end(), begin());
+		    super::copy(args.begin(), args.end(), begin());
 		    return *this;
 		}
 
@@ -517,7 +527,28 @@ class Array : public Buf<T, D, ALLOC>
 		    :super((i < a.size() ? &a[i] : nullptr),
 			   partial_size(i, d, a.size()))	{}
 
-#if !defined(__NVCC__)
+#if defined(__NVCC__)
+    template <size_t D_, class ALLOC_>
+		Array(const Array<T, D_, ALLOC_>& a)
+		    :super(a.size())
+		{
+		    super::copy(a.begin(), a.end(), begin());
+		}
+    template <size_t D_, class ALLOC_>
+    Array&	operator =(const Array<T, D_, ALLOC_>& a)
+		{
+		    super::resize(a.size());
+		    super::copy(a.begin(), a.end(), begin());
+		    return *this;
+		}
+    template <size_t D_, class ALLOC_> const Array&
+		write(Array<T, D_, ALLOC_>& a) const
+		{
+		    a.resize(size());
+		    super::copy(begin(), end(), a.begin());
+		    return *this;
+		}
+#else
   //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
   /*!
     コピーコンストラクタは別個自動的に生成される．
@@ -545,6 +576,20 @@ class Array : public Buf<T, D, ALLOC>
 		    super::for_each(expr.begin(), assign());
 		    return *this;
 		}
+
+  //! 他の配列に自分を代入する．
+  /*!
+    \param expr	コピー先の配列
+    \return	この配列
+  */
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Array&>::type
+		write(E& expr) const
+		{
+		    expr.resize(size());
+		    super::copy(begin(), end(), expr.begin());
+		    return *this;
+		}
 #endif	// !__NVCC__
 
   //! 全ての要素に同一の値を代入する．
@@ -553,8 +598,7 @@ class Array : public Buf<T, D, ALLOC>
   */
     Array&	operator =(const element_type& c)
 		{
-		    for (auto iter = begin(); iter != end(); ++iter)
-			*iter = c;
+		    super::fill(begin(), end(), c);
 		    return *this;
 		}
     
@@ -704,50 +748,21 @@ class Array : public Buf<T, D, ALLOC>
 			{
 			    return (i+d <= a ? d : i < a ? a-i : 0);
 			}
-#if defined(__NVCC__)
-    static void		init()
-			{
-			}
-#else
-    void		init()
-			{
-			    init(*this);
-			}
 
   private:
-    template <class T_>
-    static typename std::enable_if<std::is_arithmetic<T_>::value>::type
-			init(T_& x)
+    void		init()
 			{
-			    x = 0;
+			    init(typename
+				 std::is_arithmetic<value_type>::type());
 			}
-    template <class T_>
-    static typename std::enable_if<is_range<T_>::value>::type
-			init(T_& x)
+    void		init(std::true_type)
 			{
-			    for (auto iter = x.begin(); iter != x.end(); ++iter)
-				init(*iter);
+			    super::fill(begin(), end(), 0);
 			}
-    template <class T_>
-    static typename std::enable_if<(!std::is_arithmetic<T_>::value &&
-				    !is_range<T_>::value)>::type
-			init(T_)
+    void		init(std::false_type)
 			{
 			}
-#endif
 };
-
-namespace detail
-{
-  /**********************************************************************
-  *  nbytes<T>()							*
-  **********************************************************************/
-  template <class T> inline size_t
-  nbytes(size_t siz, size_t unit)
-  {
-      return unit * ((sizeof(T)*siz + unit - 1) / unit);
-  }
-}
 
 /************************************************************************
 *  class Array2<T, R, C>						*
@@ -759,10 +774,10 @@ namespace detail
   \param C	列数(0ならば可変)
 */
 template <class T, size_t R=0, size_t C=0>
-class Array2 : public Array<T, R, std::allocator<T> >
+class Array2 : public Array<T, R>
 {
   private:
-    typedef Array<T, R, std::allocator<T> >		super;
+    typedef Array<T, R>					super;
     typedef Buf<typename T::value_type, R*C,
 		typename T::allocator_type>	 	buf_type;
     
@@ -791,18 +806,16 @@ class Array2 : public Array<T, R, std::allocator<T> >
     typedef std::ptrdiff_t				difference_type;
     
   public:
-		Array2()			// !< デフォルトコンストラクタ
-		    :super(), _ncol(0), _unit(1), _buf()
+		Array2()			//!< デフォルトコンストラクタ
+		    :super(), _ncol(0), _buf()
 		{
 		    if (size() > 0)
 			_ncol = _buf.size() / size();
 		    set_rows();
-		    super::init();
 		}
 
 		Array2(const Array2& a)		//!< コピーコンストラクタ
-		    :super(a.size()),
-		     _ncol(a.ncol()), _unit(a.unit()), _buf(a._buf.size())
+		    :super(a.size()), _ncol(a.ncol()), _buf(size()*a.stride())
 		{
 		    set_rows();
 		    super::operator =(static_cast<const super&>(a));
@@ -810,8 +823,16 @@ class Array2 : public Array<T, R, std::allocator<T> >
 
     Array2&	operator =(const Array2& a)	//!< 標準代入演算子
 		{
-		    resize(a.size(), a.ncol(), a.unit());
-		    super::operator =(static_cast<const super&>(a));
+		    if (this != &a)
+		    {
+			if (super::resize(a.size()) || _ncol != a.ncol())
+			{
+			    _ncol = a.ncol();
+			    _buf.resize(size()*a.stride());
+			    set_rows();
+			}
+			super::operator =(static_cast<const super&>(a));
+		    }
 		    return *this;
 		}
 
@@ -829,21 +850,20 @@ class Array2 : public Array<T, R, std::allocator<T> >
 		    return *this;
 		}
 #endif
-		Array2(std::initializer_list<value_type> args, size_t unit=1)
+		Array2(std::initializer_list<value_type> args)
 		    :super(args.size()),
 		     _ncol(args.size() ? args.begin()->size() : 0),
-		     _unit(unit == 0 ? 1 : unit),
-		     _buf(buf_size())
+		     _buf(size()*stride(1))
 		{
 		    set_rows();
-		    std::copy(args.begin(), args.end(), begin());
+		    super::copy(args.begin(), args.end(), begin());
 		}
 		
     Array2&	operator =(std::initializer_list<value_type> args)
 		{
 		    resize(args.size(),
-			   (args.size() ? args.begin()->size() : 0));
-		    std::copy(args.begin(), args.end(), begin());
+			   (args.size() ? args.begin()->size() : 0), 1);
+		    super::copy(args.begin(), args.end(), begin());
 		    return *this;
 		}
     
@@ -854,11 +874,9 @@ class Array2 : public Array<T, R, std::allocator<T> >
     \param unit	1行あたりのバイト数がこの値の倍数になる
   */
 		Array2(size_t r, size_t c, size_t unit=1)
-		    :super(r), _ncol(c), _unit(unit == 0 ? 1 : unit),
-		     _buf(buf_size())
+		    :super(r), _ncol(c), _buf(size()*stride(unit))
 		{
 		    set_rows();
-		    super::init();
 		}
 
   //! 外部の領域と行数および列数を指定して2次元配列を生成する．
@@ -866,11 +884,9 @@ class Array2 : public Array<T, R, std::allocator<T> >
     \param p	外部領域へのポインタ
     \param r	行数
     \param c	列数
-    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-		Array2(pointer p, size_t r, size_t c, size_t unit=1)
-		    :super(r), _ncol(c), _unit(unit == 0 ? 1 : unit),
-		     _buf(p, buf_size())
+		Array2(pointer p, size_t r, size_t c)
+		    :super(r), _ncol(c), _buf(p, size()*stride(1))
 		{
 		    set_rows();
 		}
@@ -888,13 +904,10 @@ class Array2 : public Array<T, R, std::allocator<T> >
 		       size_t i, size_t j, size_t r, size_t c)
 		    :super(super::partial_size(i, r, a.size())),
 		     _ncol(super::partial_size(j, c, a.ncol())),
-		     _unit(a.unit()),
-		     _buf((size() > 0 && ncol() > 0 ? a[i].data() + j
-						    : nullptr),
-			  size()*(a.ncol() - j))
+		     _buf((size() > 0 && _ncol > 0 ? a[i].data() + j : nullptr),
+			  size()*a.stride())
 		{
-		    for (size_t ii = 0; ii < size(); ++ii)
-			(*this)[ii].resize(a[i+ii].data() + j, ncol());
+		    set_rows();
 		}    
 
 #if !defined(__NVCC__)
@@ -904,13 +917,12 @@ class Array2 : public Array<T, R, std::allocator<T> >
     このコンストラクタがあってもコピーコンストラクタを別個に定義
     しなければならない．
     \param expr	コピー元の配列
-    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-		Array2(const E& expr, size_t unit=1)
+		Array2(const E& expr)
 		    :super(expr.size()), _ncol(TU::ncol(expr)),
-		     _unit(unit == 0 ? 1 : unit), _buf(buf_size())
+		     _buf(size()*stride(1))
 		{
 		    set_rows();
 		    super::operator =(expr);
@@ -927,7 +939,7 @@ class Array2 : public Array<T, R, std::allocator<T> >
     typename std::enable_if<is_range<E>::value, Array2&>::type
 		operator =(const E& expr)
 		{
-		    resize(expr.size(), TU::ncol(expr));
+		    resize(expr.size(), TU::ncol(expr), 1);
 		    super::operator =(expr);
 		    return *this;
 		}
@@ -950,17 +962,12 @@ class Array2 : public Array<T, R, std::allocator<T> >
     using		super::dim;
 
     pointer		data()		{ return _buf.data(); }
-    const_pointer	data()	const	{ return _buf.data(); }
-    size_t		nrow()	const	{ return size(); }
-    size_t		ncol()	const	{ return _ncol; }
-    size_t		unit()	const	{ return _unit; }
-    size_t		stride() const
-			{
-			    typedef typename buf_type::value_type	S;
-			    
-			    return detail::nbytes<S>(_ncol, _unit) / sizeof(S);
-			}
-
+    const_pointer	data()	 const	{ return _buf.data(); }
+    size_t		nrow()	 const	{ return size(); }
+    size_t		ncol()	 const	{ return _ncol; }
+    size_t		stride() const	{ return (size() ? _buf.size()/size()
+							 : 0); }
+    
   //! 配列のサイズを変更する．
   /*!
     \param r	新しい行数
@@ -971,14 +978,12 @@ class Array2 : public Array<T, R, std::allocator<T> >
   */
     bool		resize(size_t r, size_t c, size_t unit=1)
 			{
-			    if (!super::resize(r) && ncol() == c)
+			    if (!super::resize(r) && _ncol == c)
 				return false;
-			    
+
 			    _ncol = c;
-			    _unit = (unit == 0 ? 1 : unit);
-			    _buf.resize(buf_size());
+			    _buf.resize(size()*stride(unit));
 			    set_rows();
-			    super::init();
 			    return true;
 			}
 	
@@ -987,14 +992,12 @@ class Array2 : public Array<T, R, std::allocator<T> >
     \param p	新しい記憶領域へのポインタ
     \param r	新しい行数
     \param c	新しい列数
-    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-    void		resize(pointer p, size_t r, size_t c, size_t unit=1)
+    void		resize(pointer p, size_t r, size_t c)
 			{
 			    super::resize(r);
 			    _ncol = c;
-			    _unit = (unit == 0 ? 1 : unit);
-			    _buf.resize(p, buf_size());
+			    _buf.resize(p, size()*stride(1));
 			    set_rows();
 			}
 
@@ -1028,29 +1031,30 @@ class Array2 : public Array<T, R, std::allocator<T> >
   private:
     void		set_rows()
 			{
-			    typedef typename buf_type::value_type	S;
-			    
-			    const auto	n = detail::nbytes<S>(_ncol, _unit);
-			    auto	p = _buf.data();
+			    auto	p    = _buf.data();
+			    const auto	strd = stride();
 			    for (auto& row : *this)
 			    {
-				row.resize(p, ncol());
-				reinterpret_cast<unsigned char*&>(p) += n;
+				row.resize(p, _ncol);
+				p += strd;
 			    }
 			}
 
-    size_t		buf_size()
+    size_t		stride(size_t unit) const
 			{
-			    typedef typename buf_type::value_type	S;
-			    
-			    const auto	n = detail::nbytes<S>(_ncol, _unit);
-			    return (size()*n + sizeof(S) - 1) / sizeof(S);
+			    constexpr size_t
+				siz = sizeof(typename buf_type::value_type);
+
+			    if (unit == 0)
+				unit = 1;
+			    const auto	n = lcm(siz, unit)/siz;
+
+			    return n*((_ncol + n - 1)/n);
 			}
 
   private:
-    size_t		_ncol;
-    size_t		_unit;
-    buf_type		_buf;
+    size_t		_ncol;		//!< 列数
+    buf_type		_buf;		//!< データを格納するバッファ
 };
 
 //! 入力ストリームから指定した箇所に2次元配列を読み込む(ASCII)．
