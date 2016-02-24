@@ -55,38 +55,22 @@ template <class T, class ALLOC>
 struct BufTraits
 {
     typedef ALLOC					allocator_type;
-    typedef typename allocator_type::pointer		pointer;
     typedef typename allocator_type::pointer		iterator;
     typedef typename allocator_type::const_pointer	const_iterator;
 
-    static pointer	alloc(allocator_type& allocator, size_t siz)
-			{
-			    pointer	p = allocator.allocate(siz);
-			    for (pointer q = p, qe = q + siz; q != qe; ++q)
-				allocator.construct(q, T());
-			    return p;
-			}
-    
-    static void		free(allocator_type& allocator, pointer p, size_t siz)
-			{
-			    for (pointer q = p, qe = q + siz; q != qe; ++q)
-				allocator.destroy(q);
-			    allocator.deallocate(p, siz);
-			}
-
     template <class IN_, class OUT_>
-    static OUT_		copy(IN_ ib, IN_ ie, OUT_ out)
-			{
-			    return std::copy(ib, ie, out);
-			}
+    static OUT_	copy(IN_ ib, IN_ ie, OUT_ out)
+		{
+		    return std::copy(ib, ie, out);
+		}
 
     template <class ITER_, class T_>
-    static void		fill(ITER_ ib, ITER_ ie, const T_& c)
-			{
-			    std::fill(ib, ie, c);
-			}
+    static void	fill(ITER_ ib, ITER_ ie, const T_& c)
+		{
+		    std::fill(ib, ie, c);
+		}
 };
-
+    
 /************************************************************************
 *  class Buf<T, D, ALLOC>						*
 ************************************************************************/
@@ -240,13 +224,11 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
     
   public:
     explicit		Buf(size_t siz=0)
-			    :_size(siz),
-			     _p(super::alloc(_allocator, _size)),
+			    :_size(siz), _p(alloc(_size)),
 			     _shared(0), _capacity(_size)	{}
 
 			Buf(const Buf& b)
-			    :_size(b._size),
-			     _p(super::alloc(_allocator, _size)),
+			    :_size(b._size), _p(alloc(_size)),
 			     _shared(0), _capacity(_size)
 			{
 			    super::copy(b.begin(), b.end(), begin());
@@ -275,7 +257,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    if (_shared)
 				return operator =(static_cast<const Buf&>(b));
 			    
-			    super::free(_allocator, _p, _size);
+			    free(_p, _size);
 			    _size     = b._size;
 			    _p	      = b._p;
 			    _capacity = b._capacity;
@@ -291,7 +273,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			~Buf()
 			{
 			    if (!_shared)
-				super::free(_allocator, _p, _size);
+				free(_p, _size);
 			}
 
 			Buf(pointer p, size_t siz)
@@ -330,8 +312,8 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    _size = siz;
 			    if (_capacity < _size)
 			    {
-				super::free(_allocator, _p, old_size);
-				_p = super::alloc(_allocator, _size);
+				free(_p, old_size);
+				_p = alloc(_size);
 				_capacity = _size;
 			    }
 			    return _size > old_size;
@@ -345,7 +327,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
     void		resize(pointer p, size_t siz)
 			{
 			    if (!_shared)
-				super::free(_allocator, _p, _size);
+				free(_p, _size);
 			    _size     = siz;
 			    _p	      = p;
 			    _shared   = 1;
@@ -361,6 +343,22 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    for (iterator dst = begin(), e = end();
 				 dst != e; ++dst, ++src)
 				op(*dst, *src);
+			}
+
+  private:
+    pointer		alloc(size_t siz)
+			{
+			    pointer	p = _allocator.allocate(siz);
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				_allocator.construct(q, value_type());
+			    return p;
+			}
+    
+    void		free(pointer p, size_t siz)
+			{
+			    for (pointer q = p, qe = q + siz; q != qe; ++q)
+				_allocator.destroy(q);
+			    _allocator.deallocate(p, siz);
 			}
     
   private:
@@ -910,7 +908,53 @@ class Array2 : public Array<T, R>
 		    set_rows();
 		}    
 
-#if !defined(__NVCC__)
+#if defined(__NVCC__)
+    template <class T_, size_t R_, size_t C_>
+		Array2(const Array2<T_, R_, C_>& a)
+		    :super(a.size()), _ncol(a.ncol()),
+		     _buf(size()*a.stride())
+		{
+		    set_rows();
+
+		    auto	iter = a.begin();
+		    for (auto& row : *this)
+		    {
+			row = *iter;
+			++iter;
+		    }
+		}
+    template <class T_, size_t R_, size_t C_>
+    Array2&	operator =(const Array2<T_, R_, C_>& a)
+		{
+		    if (super::resize(a.size()) || _ncol != a.ncol())
+		    {
+			_ncol = a.ncol();
+			_buf.resize(size()*a.stride());
+			set_rows();
+		    }
+
+		    auto	iter = a.begin();
+		    for (auto& row : *this)
+		    {
+			row = *iter;
+			++iter;
+		    }
+		    return *this;
+		}
+    template <class T_, size_t R_, size_t C_> const Array2&
+		write(Array2<T_, R_, C_>& a) const
+		{
+		    a.resize(size(), _ncol);
+
+		    auto	iter = a.begin();
+		    for (const auto& row : *this)
+		    {
+			row.write(*iter);
+			++iter;
+		    }
+		    return *this;
+		}
+#else
   //! 他の配列と同一要素を持つ配列を作る（コピーコンストラクタの拡張）．
   /*!
     コピーコンストラクタを定義しないと自動的に作られてしまうので，
