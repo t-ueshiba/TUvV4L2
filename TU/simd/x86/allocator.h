@@ -41,11 +41,10 @@ class allocator
     };
     
   public:
-			allocator()					{}
-    template <class U>	allocator(const allocator<U>&)			{}
-			~allocator()					{}
+			allocator()				{}
+    template <class U>	allocator(const allocator<U>&)		{}
 
-    pointer		allocate(size_type n,
+    static pointer	allocate(size_type n,
 				 typename std::allocator<void>
 					     ::const_pointer=nullptr)
 			{
@@ -59,26 +58,28 @@ class allocator
 				throw std::bad_alloc();
 			    return p;
 			}
-    void		deallocate(pointer p, size_type)
+    static void		deallocate(pointer p, size_type)
 			{
 			    if (p != nullptr)
 				_mm_free(p);
 			}
-    void		construct(pointer p, const_reference val)
+    static void		construct(pointer p, const_reference val)
 			{
 			    new(p) value_type(val);
 			}
-    void		destroy(pointer p)
+    static void		destroy(pointer p)
 			{
 			    p->~value_type();
 			}
-    constexpr size_type	max_size() const
+    constexpr
+    static size_type	max_size()
 			{
 			    return std::numeric_limits<size_type>::max()
 				 / sizeof(value_type);
 			}
-    pointer		address(reference r)		const	{ return &r; }
-    const_pointer	address(const_reference r)	const	{ return &r; }
+    static pointer	address(reference r)			{ return &r; }
+    static const_pointer
+			address(const_reference r)		{ return &r; }
 };
     
 }	// namespace simd
