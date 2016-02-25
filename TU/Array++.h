@@ -63,14 +63,13 @@ struct BufTraits
 		{
 		    return std::copy(ib, ie, out);
 		}
-
     template <class ITER_, class T_>
     static void	fill(ITER_ ib, ITER_ ie, const T_& c)
 		{
 		    std::fill(ib, ie, c);
 		}
 };
-    
+
 /************************************************************************
 *  class Buf<T, D, ALLOC>						*
 ************************************************************************/
@@ -111,7 +110,7 @@ class Buf : public BufTraits<T, ALLOC>
 				for_each(b.begin(), assign());
 			    return *this;
 			}
-
+    
   //! 外部の領域と要素数を指定してバッファを生成する（ダミー関数）．
   /*!
     実際はバッファが使用する記憶領域は固定されていて変更できないので，
@@ -344,7 +343,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 				 dst != e; ++dst, ++src)
 				op(*dst, *src);
 			}
-
+    
   private:
     pointer		alloc(size_t siz)
 			{
@@ -353,7 +352,6 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 				_allocator.construct(q, value_type());
 			    return p;
 			}
-    
     void		free(pointer p, size_t siz)
 			{
 			    for (pointer q = p, qe = q + siz; q != qe; ++q)
@@ -747,19 +745,37 @@ class Array : public Buf<T, D, ALLOC>
 			    return (i+d <= a ? d : i < a ? a-i : 0);
 			}
 
-  private:
+#if defined(__NVCC__)
+    static void		init()
+			{
+			}
+#else
     void		init()
 			{
-			    init(typename
-				 std::is_arithmetic<value_type>::type());
+			    init(*this);
 			}
-    void		init(std::true_type)
+
+  private:
+    template <class T_>
+    static typename std::enable_if<std::is_arithmetic<T_>::value>::type
+			init(T_& x)
 			{
-			    super::fill(begin(), end(), 0);
+			    x = 0;
 			}
-    void		init(std::false_type)
+    template <class T_>
+    static typename std::enable_if<is_range<T_>::value>::type
+			init(T_& x)
+			{
+			    for (auto iter = x.begin(); iter != x.end(); ++iter)
+				init(*iter);
+			}
+    template <class T_>
+    static typename std::enable_if<(!std::is_arithmetic<T_>::value &&
+				    !is_range<T_>::value)>::type
+			init(T_)
 			{
 			}
+#endif
 };
 
 /************************************************************************
@@ -810,6 +826,7 @@ class Array2 : public Array<T, R>
 		    if (size() > 0)
 			_ncol = _buf.size() / size();
 		    set_rows();
+		    super::init();
 		}
 
 		Array2(const Array2& a)		//!< コピーコンストラクタ
@@ -875,6 +892,7 @@ class Array2 : public Array<T, R>
 		    :super(r), _ncol(c), _buf(size()*stride(unit))
 		{
 		    set_rows();
+		    super::init();
 		}
 
   //! 外部の領域と行数および列数を指定して2次元配列を生成する．
@@ -902,8 +920,9 @@ class Array2 : public Array<T, R>
 		       size_t i, size_t j, size_t r, size_t c)
 		    :super(super::partial_size(i, r, a.size())),
 		     _ncol(super::partial_size(j, c, a.ncol())),
-		     _buf((size() > 0 && _ncol > 0 ? a[i].data() + j : nullptr),
-			  size()*a.stride())
+		     _buf((size() > 0 && ncol() > 0 ? a[i].data() + j
+						    : nullptr),
+			  (size() > 0 ? (size() - 1)*a.stride() + _ncol : 0))
 		{
 		    set_rows();
 		}    
@@ -912,7 +931,7 @@ class Array2 : public Array<T, R>
     template <class T_, size_t R_, size_t C_>
 		Array2(const Array2<T_, R_, C_>& a)
 		    :super(a.size()), _ncol(a.ncol()),
-		     _buf(size()*a.stride())
+		     _buf(size()*a.stride(1))
 		{
 		    set_rows();
 
@@ -929,7 +948,7 @@ class Array2 : public Array<T, R>
 		    if (super::resize(a.size()) || _ncol != a.ncol())
 		    {
 			_ncol = a.ncol();
-			_buf.resize(size()*a.stride());
+			_buf.resize(size()*a.stride(1));
 			set_rows();
 		    }
 
@@ -1009,9 +1028,13 @@ class Array2 : public Array<T, R>
     const_pointer	data()	 const	{ return _buf.data(); }
     size_t		nrow()	 const	{ return size(); }
     size_t		ncol()	 const	{ return _ncol; }
-    size_t		stride() const	{ return (size() ? _buf.size()/size()
-							 : 0); }
-    
+    size_t		stride() const
+			{
+			    return (size() == 0 ? 0 :
+				    size() == 1 ? _ncol :
+				    (_buf.size() - _ncol)/(size() - 1));
+			}
+
   //! 配列のサイズを変更する．
   /*!
     \param r	新しい行数
@@ -1024,10 +1047,11 @@ class Array2 : public Array<T, R>
 			{
 			    if (!super::resize(r) && _ncol == c)
 				return false;
-
+			    
 			    _ncol = c;
 			    _buf.resize(size()*stride(unit));
 			    set_rows();
+			    super::init();
 			    return true;
 			}
 	
