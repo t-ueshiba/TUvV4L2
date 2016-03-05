@@ -421,6 +421,12 @@ template <class T, size_t D=0, class ALLOC=std::allocator<T> >
 class Array : public Buf<T, D, ALLOC>
 {
   private:
+    template <class T_, size_t D_, class ALLOC_>
+    static std::true_type	check(Array<T_, D_, ALLOC_>)	;
+    static std::false_type	check(...)			;
+
+    typedef decltype(check(std::declval<T>()))		is_array;
+    typedef typename std::is_arithmetic<T>::type	is_arithmetic;
     typedef Buf<T, D, ALLOC>				super;
 
   public:
@@ -689,7 +695,7 @@ class Array : public Buf<T, D, ALLOC>
 			{
 			    super::resize(p, siz);
 			}
-
+    
   //! 出力ストリームに配列を書き出す(ASCII)．
   /*!
     \param out	出力ストリーム
@@ -739,43 +745,37 @@ class Array : public Buf<T, D, ALLOC>
 #endif
 			}
 
+    void		init()
+			{
+#if !defined(__NVCC__)
+			    init(is_array());
+#endif
+			}
+
   protected:
     static size_t	partial_size(size_t i, size_t d, size_t a)
 			{
 			    return (i+d <= a ? d : i < a ? a-i : 0);
 			}
 
-#if defined(__NVCC__)
-    static void		init()
+  private:
+    void		init(std::true_type)
 			{
+			    for (auto& x : *this)
+				x.init();
 			}
-#else
-    void		init()
+    void		init(std::false_type)
 			{
-			    init(*this);
+			    init_nonarray(is_arithmetic());
 			}
 
-  private:
-    template <class T_>
-    static typename std::enable_if<std::is_arithmetic<T_>::value>::type
-			init(T_& x)
+    void		init_nonarray(std::true_type)
 			{
-			    x = 0;
+			    *this = 0;
 			}
-    template <class T_>
-    static typename std::enable_if<is_range<T_>::value>::type
-			init(T_& x)
-			{
-			    for (auto iter = x.begin(); iter != x.end(); ++iter)
-				init(*iter);
-			}
-    template <class T_>
-    static typename std::enable_if<(!std::is_arithmetic<T_>::value &&
-				    !is_range<T_>::value)>::type
-			init(T_)
+    void		init_nonarray(std::false_type)
 			{
 			}
-#endif
 };
 
 /************************************************************************
@@ -930,8 +930,7 @@ class Array2 : public Array<T, R>
 #if defined(__NVCC__)
     template <class T_, size_t R_, size_t C_>
 		Array2(const Array2<T_, R_, C_>& a)
-		    :super(a.size()), _ncol(a.ncol()),
-		     _buf(size()*a.stride(1))
+		    :super(a.size()), _ncol(a.ncol()), _buf(size()*stride(1))
 		{
 		    set_rows();
 
@@ -948,7 +947,7 @@ class Array2 : public Array<T, R>
 		    if (super::resize(a.size()) || _ncol != a.ncol())
 		    {
 			_ncol = a.ncol();
-			_buf.resize(size()*a.stride(1));
+			_buf.resize(size()*stride(1));
 			set_rows();
 		    }
 
@@ -1031,7 +1030,7 @@ class Array2 : public Array<T, R>
     size_t		stride() const
 			{
 			    return (size() == 0 ? 0 :
-				    size() == 1 ? _ncol :
+				    size() == 1 ? _ncol : 
 				    (_buf.size() - _ncol)/(size() - 1));
 			}
 

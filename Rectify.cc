@@ -64,7 +64,7 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
     _H[2] = matrix_type::I(3);
     
   // Compute basic homographies.
-    const vector_type&	eR = (cameraL.K() * cameraL.Rt() *
+    vector3_type	eR = (cameraL.K() * cameraL.Rt() *
 			      (cameraR.t() - cameraL.t()));
     _H[0][0]    =  eR;
     _H[0][1][0] = -eR[1];
@@ -106,9 +106,9 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
 	matrix_type	Hessian = Cl - (Cl*w)%(w*Dl) - (Dl*w)%(w*Cl)
 				+ Cr - (Cr*w)%(w*Dr) - (Dr*w)%(w*Cr);
 	grad = grad * Hessian.pinv(1.0e6);
-      /*#if defined(_DEBUG)
+#if defined(_DEBUG)
 	cerr << grad;
-	#endif*/
+#endif
 	if (grad.length() < 1.0e-12)
 	    break;
 	(w -= grad).normalize();
@@ -150,12 +150,15 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
 				 const camera_type& cameraR,
 				 const camera_type& cameraV)
 {
-    typedef Vector<element_type>	vector_type;
-    
-    const vector_type&	eR = (cameraL.K() * cameraL.Rt() *
-			      (cameraR.t() - cameraL.t()));
-    const vector_type&	eV = (cameraL.K() * cameraL.Rt() *
-			      (cameraV.t() - cameraL.t()));
+    using namespace	std;
+
+    typedef Vector<element_type, 3>	vector3_type;
+    typedef Matrix<element_type, 3, 3>	matrix33_type;
+
+    const vector3_type	eR = cameraL.K() * cameraL.Rt()
+			   * (cameraR.t() - cameraL.t());
+    const vector3_type	eV = cameraL.K() * cameraL.Rt()
+			   * (cameraV.t() - cameraL.t());
     _H[0][0][0] = -eV[1];	// eV[1] < 0 assumed.
     _H[0][0][1] =  eV[0];
     _H[0][0][2] =  0.0;
@@ -163,12 +166,14 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
     _H[0][1][1] =  eR[0];
     _H[0][1][2] =  0.0;
     _H[0][2] = eV ^ eR;
+
     _H[1] = _H[0] * cameraL.K() * cameraL.Rt()
 		  * cameraR.Rt().trns() * cameraR.Kinv();
+
     _H[2][0] = -_H[0][1];
     _H[2][1] =  _H[0][0];
     _H[2][2] =  _H[0][2];
-    auto	H2 = _H[2] * (cameraL.K() * cameraL.Rt() *
+    matrix33_type	H2 = _H[2] * (cameraL.K() * cameraL.Rt() *
 			      cameraV.Rt().trns() * cameraV.Kinv());
     _H[2] = H2;
 }
@@ -176,23 +181,23 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
 void
 Rectify::scaleHomographies(size_t widthL, size_t heightL, element_type scale)
 {
-    typedef Vector<element_type>	vector_type;
+    typedef Vector<element_type, 3>	vector3_type;
 
   // 左画像について，変換後の四隅の点が成す四角形の面積を求める．
-    vector_type	p[4];
+    vector3_type	p[4];
     p[0] = _H[0](   0.0,     0.0).homogeneous();
     p[1] = _H[0](widthL,     0.0).homogeneous();
     p[2] = _H[0](   0.0, heightL).homogeneous();
     p[3] = _H[0](widthL, heightL).homogeneous();
     element_type
-	area = (vector_type((p[0] ^ p[1]) +
-			    (p[1] ^ p[2]) + (p[2] ^ p[0])).length() +
-		vector_type((p[1] ^ p[2]) +
-			    (p[2] ^ p[3]) + (p[3] ^ p[1])).length()) / 2;
+	area = (vector3_type((p[0] ^ p[1]) +
+			     (p[1] ^ p[2]) + (p[2] ^ p[0])).length() +
+		vector3_type((p[1] ^ p[2]) +
+			     (p[2] ^ p[3]) + (p[3] ^ p[1])).length()) / 2;
 
   // 変換前後の面積比がscaleに一致するように射影変換をスケーリングする．
     element_type	k = scale * sqrt(widthL*heightL / area);
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
 	_H[i][0] *= k;
 	_H[i][1] *= k;
@@ -239,7 +244,10 @@ Rectify::translateHomographies(const camera_type& cameraL,
     size_t	heightOut = size_t(v0 + min(bboxL.max(1), bboxR.max(1)));
 #if defined(_DEBUG)
     cerr << "(u0, v0): (" << u0 << ", " << v0 << ")\n"
-	 << "u0R:       " << u0R << endl;
+	 << "u0R:       " << u0R
+	 << "\nleft image:  " << widthOutL << 'x' << heightOut
+	 << "\nright image: " << widthOutR << 'x' << heightOut
+	 << endl;
 #endif    
 
   // Translation.
@@ -254,11 +262,6 @@ Rectify::translateHomographies(const camera_type& cameraL,
     _warp[1].initialize(_H[1].trns().inv(), cameraR,
 			widthR, heightR, widthOutR, heightOut);
 
-#if defined(_DEBUG)
-    cerr <<   "left image:  " << widthOutL << 'x' << heightOut
-	 << "\nright image: " << widthOutR << 'x' << heightOut
-	 << endl;
-#endif
     return u0 - u0R;
 }
     
@@ -318,7 +321,11 @@ Rectify::translateHomographies(const camera_type& cameraL,
     cerr << "(u0, v0): (" << u0 << ", " << v0 << ")\n"
 	 << "u0R:       " << u0R << '\n'
 	 << "u0V:       " << u0V << '\n'
-	 << "triInv.:   " << u0 - u0R + v0 + u0V << endl;
+	 << "triInv.:   " << u0 - u0R + v0 + u0V
+	 << "\n0th image: " << widthOutL << 'x' << heightOutL
+	 << "\n1st image: " << widthOutR << 'x' << heightOutR
+	 << "\n2nd image: " << widthOutV << 'x' << heightOutV
+	 << endl;
 #endif    
 
   // Translation.
@@ -336,12 +343,7 @@ Rectify::translateHomographies(const camera_type& cameraL,
 			widthR, heightR, widthOutR, heightOutR);
     _warp[2].initialize(_H[2].trns().inv(), cameraV,
 			widthV, heightV, widthOutV, heightOutV);
-#if defined(_DEBUG)
-    cerr <<   "0th image: " << widthOutL << 'x' << heightOutL
-	 << "\n1st image: " << widthOutR << 'x' << heightOutR
-	 << "\n2nd image: " << widthOutV << 'x' << heightOutV
-	 << endl;
-#endif
+
     return u0 - u0R;
 }
 

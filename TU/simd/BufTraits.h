@@ -21,13 +21,20 @@ struct BufTraits<simd::vec<T>, ALLOC>
     template <class IN_, class OUT_>
     static OUT_	copy(IN_ ib, IN_ ie, OUT_ out)
 		{
-		    return std::copy(ib, ie, out);
+		  // MacOS Xでは simd::store_iterator に対して
+		  // std::copy() を適用しても働かない
+		    for (; ib != ie; ++ib, ++out)
+			*out = *ib;
+		    return out;
 		}
 
     template <class ITER_, class T_>
     static void	fill(ITER_ ib, ITER_ ie, const T_& c)
 		{
-		    std::fill(ib, ie, c);
+		  // MacOS Xでは simd::store_iterator に対して
+		  // std::fill() を適用しても働かない
+		    for (; ib != ie; ++ib)
+			*ib = c;
 		}
 };
     

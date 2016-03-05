@@ -78,7 +78,7 @@ doJob(std::istream& in, const typename STEREO::Parameters& params,
 	       rectifiedImages[2].cbegin(), disparityMap.begin());
     }
 
-    disparityMap.save(cout);
+  //disparityMap.save(cout);
 }
 
 }
