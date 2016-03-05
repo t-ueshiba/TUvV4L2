@@ -11,11 +11,16 @@
 
 namespace TU
 {
+//! SIMD命令を利用するためのクラスや関数が定義されている名前空間
 namespace simd
 {
 /************************************************************************
 *  class vec<T>								*
 ************************************************************************/
+//! SIMDベクトル型
+/*!
+ \param T	SIMDベクトルの成分の型
+*/
 template <class T>
 class vec
 {
@@ -140,7 +145,7 @@ typedef vec<uint64_t>	Iu64vec;	//!< 符号なし64bit整数ベクトル
 /************************************************************************
 *  Predicates for template meta-programming				*
 ************************************************************************/
-//! 与えられた型が何らかの mm::vec であるかを判定する meta-programming 用の predicate
+//! 与えられた型が何らかの simd::vec であるかを判定する meta-programming 用の predicate
 template <class T> struct is_vec		: std::false_type	{};
 template <class T> struct is_vec<vec<T> >	: std::true_type	{};
 

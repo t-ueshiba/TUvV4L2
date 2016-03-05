@@ -40,8 +40,7 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/include/math.h \
-		/usr/local/include/TU/Array++.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
@@ -50,8 +49,7 @@ EXTHDRS		= /usr/include/math.h \
 		/usr/local/include/bodyinfo_HRP2DOF7.h \
 		/usr/local/include/bodyinfo_HRP2YH.h \
 		/usr/local/include/bodyinfo_HRP2toHRP3.h \
-		/usr/local/include/bodyinfo_HRP3.h \
-		/usr/local/include/misc.h
+		/usr/local/include/bodyinfo_HRP3.h
 HDRS		= TU/HRP2++.h \
 		bodyinfo_HRP2SH.h
 SRCS		= ForwardKinematicsServiceDynSK.cc \
@@ -86,8 +84,8 @@ HRP2.o: TU/HRP2++.h ReachingService.hh SequencePlayerService.hh \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
-	/usr/local/include/bodyinfo_HRP3.h /usr/local/include/misc.h \
-	/usr/include/math.h /usr/local/include/bodyinfo_HRP2toHRP3.h \
+	/usr/local/include/bodyinfo_HRP3.h \
+	/usr/local/include/bodyinfo_HRP2toHRP3.h \
 	/usr/local/include/bodyinfo_HRP2YH.h bodyinfo_HRP2SH.h \
 	/usr/local/include/bodyinfo_HRP2DOF7.h
 ReachingServiceDynSK.o: ReachingService.hh

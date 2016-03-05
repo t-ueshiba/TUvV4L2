@@ -104,16 +104,19 @@
   - #TU::ImageLine
   - #TU::Image
   - #TU::GenericImage
+  - #TU::ComplexImage
+  - #TU::CCSImage
   - #TU::Movie
 
   <b>画像処理</b>
+  - #TU::Rectify
   - #TU::EdgeDetector
   - #TU::CorrectIntensity
-  - #TU::Warp
   - #TU::IntegralImage
   - #TU::DiagonalIntegralImage
   
   <b>画像に限らない信号処理</b>
+  - #TU::Warp
   - #TU::Filter2
   - #TU::SeparableFilter2
   - #TU::IIRFilter
@@ -127,6 +130,10 @@
   - #TU::BoxFilter2
   - #TU::GuidedFilter
   - #TU::GuidedFilter2
+  - #TU::FIRFilter
+  - #TU::FIRGaussianConvolver
+  - #TU::WeightedMedianFilter
+  - #TU::TreeFilter
 
   <b>特殊データ構造</b>
   - #TU::List
@@ -160,28 +167,48 @@
   - #TU::mopClose(Iterator begin, Iterator end, size_t niter)
 
   <b>関数オブジェクト</b>
-  - #TU::unarize2
-  - #TU::unarize3
-  - #TU::unarize4
-  - #TU::mem_var_t
-  - #TU::const_mem_var_t
-  - #TU::mem_var_ref_t
-  - #TU::const_mem_var_ref_t
+  - #TU::generic_function
+  - #TU::generic_binary_function
+  - #TU::plus
+  - #TU::minus
+  - #TU::multiplies
+  - #TU::divides
+  - #TU::identity
+  - #TU::plus_assign
+  - #TU::minus_assign
+  - #TU::multiplies_assign
+  - #TU::divides_assign
+  - #TU::modulus_assign
+  - #TU::bit_and_assign
+  - #TU::bit_or_assign
+  - #TU::bit_xor_assign
+  - #TU::equal_to
+  - #TU::not_equal_to
+  - #TU::less
+  - #TU::greater
+  - #TU::less_equal
+  - #TU::greater_equal
+  - #TU::square()
+  - #TU::length()
+  - #TU::sqdist()
+  - #TU::dist()
+  - #TU::gcd()
+  - #TU::lcm()
 
   <b>反復子</b>
-  - #TU::make_mbr_iterator(Iterator i, S T::* m)
-  - #TU::make_const_mbr_iterator(Iterator i, S const T::* m)
-  - #TU::make_first_iterator(Iterator i)
-  - #TU::make_const_first_iterator(Iterator i)
-  - #TU::make_second_iterator(Iterator i)
-  - #TU::make_const_second_iterator(Iterator i)
+  - #TU::make_mbr_iterator()
+  - #TU::make_first_iterator()
+  - #TU::make_second_iterator()
+  - #TU::fast_zip_iterator
   - #TU::assignment_iterator
   - #TU::assignment2_iterator
   - #TU::row_iterator
-  - #TU::vertical_iterator
+  - #TU::row2col
+  - #TU::column_iterator
+  - #TU::ring_iterator
+  - #TU::multiplex_iterator
   - #TU::box_filter_iterator
   - #TU::iir_filter_iterator
-  - #TU::ring_iterator
   
   <b>マニピュレータ</b>
   - #TU::skipl(std::istream&)
