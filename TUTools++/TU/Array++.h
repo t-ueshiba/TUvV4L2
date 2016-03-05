@@ -58,15 +58,20 @@ struct BufTraits
     typedef typename allocator_type::pointer		iterator;
     typedef typename allocator_type::const_pointer	const_iterator;
 
+  protected:
     template <class IN_, class OUT_>
     static OUT_	copy(IN_ ib, IN_ ie, OUT_ out)
 		{
 		    return std::copy(ib, ie, out);
 		}
-    template <class ITER_, class T_>
-    static void	fill(ITER_ ib, ITER_ ie, const T_& c)
+    template <class T_>
+    static void	fill(iterator ib, iterator ie, const T_& c)
 		{
 		    std::fill(ib, ie, c);
+		}
+    static void	init(iterator ib, iterator ie)
+		{
+		    std::fill(ib, ie, 0);
 		}
 };
 
@@ -411,7 +416,7 @@ Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
 /************************************************************************
 *  class Array<T, D, ALLOC>						*
 ************************************************************************/
-//! B型バッファによって実装されるT型オブジェクトの1次元配列クラス
+//! T型オブジェクトの1次元配列クラス
 /*!
   \param T	要素の型
   \param D	次元(0ならば可変)
@@ -425,8 +430,8 @@ class Array : public Buf<T, D, ALLOC>
     static std::true_type	check(Array<T_, D_, ALLOC_>)	;
     static std::false_type	check(...)			;
 
-    typedef decltype(check(std::declval<T>()))		is_array;
-    typedef typename std::is_arithmetic<T>::type	is_arithmetic;
+    typedef decltype(check(std::declval<T>()))		value_is_array;
+    typedef typename std::is_arithmetic<T>::type	value_is_arithmetic;
     typedef Buf<T, D, ALLOC>				super;
 
   public:
@@ -747,9 +752,7 @@ class Array : public Buf<T, D, ALLOC>
 
     void		init()
 			{
-#if !defined(__NVCC__)
-			    init(is_array());
-#endif
+			    init(value_is_array());
 			}
 
   protected:
@@ -766,12 +769,12 @@ class Array : public Buf<T, D, ALLOC>
 			}
     void		init(std::false_type)
 			{
-			    init_nonarray(is_arithmetic());
+			    init_nonarray(value_is_arithmetic());
 			}
 
     void		init_nonarray(std::true_type)
 			{
-			    *this = 0;
+			    super::init(begin(), end());
 			}
     void		init_nonarray(std::false_type)
 			{
