@@ -333,6 +333,8 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
 		 size_t inWidth,  size_t inHeight,
 		 size_t outWidth, size_t outHeight)
 {
+    using namespace std;
+    
     typedef I						intrinsic_type;
     typedef typename intrinsic_type::point2_type	point2_type;
     typedef typename intrinsic_type::vector_type	vector_type;
@@ -369,6 +371,7 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
 
 	_fracs[v].resize(n);
 	_fracs[v].lmost = frac.lmost;
+
 	for (size_t u = 0; u < n; ++u)
 	{
 	    _fracs[v].us[u] = frac.us[u];

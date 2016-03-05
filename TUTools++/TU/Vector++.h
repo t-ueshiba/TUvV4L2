@@ -223,24 +223,24 @@ class Vector : public Array<T, D>
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Vector(const E& v)							;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Vector&		operator =(const E& v)				;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Vector&		operator *=(const E& m)				;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Vector&		operator ^=(const E& v)				;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    T			sqdist(const E& v)			const	;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    double		dist(const E& v)			const	;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Vector&		solve(const E& m)				;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Vector&>::type
+			operator =(const E& v)				;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Vector&>::type
+			operator *=(const E& m)				;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Vector&>::type
+			operator ^=(const E& v)				;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, T>::type
+    			sqdist(const E& v)			const	;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, double>::type
+			dist(const E& v)			const	;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Vector&>::type
+			solve(const E& m)				;
 #endif
 };
 
@@ -438,9 +438,8 @@ Vector<T, D>::Vector(const E& v)
   \param v	コピー元ベクトル
   \return	このベクトル
 */
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Vector<T, D>&
+template <class T, size_t D> template <class E>
+inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
 Vector<T, D>::operator =(const E& v)
 {
     super::operator =(v);
@@ -453,9 +452,8 @@ Vector<T, D>::operator =(const E& v)
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\TUvec{M}{}\f$
 */
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Vector<T, D>&
+template <class T, size_t D> template <class E>
+inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
 Vector<T, D>::operator *=(const E& m)
 {
     return *this = *this * m;
@@ -467,9 +465,8 @@ Vector<T, D>::operator *=(const E& m)
   \return	このベクトル，すなわち
 		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} \times \TUvec{v}{}\f$
 */
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Vector<T, D>&
+template <class T, size_t D> template <class E>
+inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
 Vector<T, D>::operator ^=(const E& v)
 {
     return *this = *this ^ v;
@@ -481,9 +478,8 @@ Vector<T, D>::operator ^=(const E& v)
   \return	ベクトル間の差の2乗，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
 */
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline T
+template <class T, size_t D> template <class E>
+inline typename std::enable_if<is_range<E>::value, T>::type
 Vector<T, D>::sqdist(const E& v) const
 {
     return Vector(*this - v).square();
@@ -495,9 +491,8 @@ Vector<T, D>::sqdist(const E& v) const
   \return	ベクトル間の差，すなわち
 		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
 */
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline double
+template <class T, size_t D> template <class E>
+inline typename std::enable_if<is_range<E>::value, double>::type
 Vector<T, D>::dist(const E& v) const
 {
     return std::sqrt(double(sqdist(v)));
@@ -611,22 +606,22 @@ class Matrix : public Array2<Vector<T>, R, C>
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
     Matrix(const E& expr)	:super(expr)				{}
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		operator =(const E& expr)
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Matrix&>::type
+			operator =(const E& expr)
 			{
 			    super::operator =(expr);
 			    return *this;
 			}
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		operator *=(const E& m)				;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		operator ^=(const E& v)				;
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix&		solve(const E& m)				;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Matrix&>::type
+			operator *=(const E& m)				;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Matrix&>::type
+			operator ^=(const E& v)				;
+    template <class E>
+    typename std::enable_if<is_range<E>::value, Matrix&>::type
+			solve(const E& m)				;
 #endif	// !__NVCC__
 };
 
@@ -1332,9 +1327,8 @@ Matrix<T, R, C>::Rt(const Vector<T2, D2>& v)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
 */
-template <class T, size_t R, size_t C>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Matrix<T, R, C>&
+template <class T, size_t R, size_t C> template <class E>
+inline typename std::enable_if<is_range<E>::value, Matrix<T, R, C>&>::type
 Matrix<T, R, C>::operator *=(const E& m)
 {
     return *this = *this * m;
@@ -1346,9 +1340,8 @@ Matrix<T, R, C>::operator *=(const E& m)
   \return	この行列，すなわち
 		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
 */
-template <class T, size_t R, size_t C>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Matrix<T, R, C>&
+template <class T, size_t R, size_t C> template <class E>
+inline typename std::enable_if<is_range<E>::value, Matrix<T, R, C>&>::type
 Matrix<T, R, C>::operator ^=(const E& v)
 {
     return *this = *this ^ v;
@@ -1501,9 +1494,8 @@ LUDecomposition<T>::substitute(Vector<T2, D2>& b) const
 		の解を納めたこのベクトル，すなわち
 		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
 */
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-inline Vector<T, D>&
+template <class T, size_t D> template <class E>
+inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
 Vector<T, D>::solve(const E& m)
 {
     LUDecomposition<T>(m).substitute(*this);
@@ -1517,9 +1509,8 @@ Vector<T, D>::solve(const E& m)
 		の解を納めたこの行列，すなわち
 		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
 */
-template <class T, size_t R, size_t C>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-Matrix<T, R, C>&
+template <class T, size_t R, size_t C> template <class E>
+typename std::enable_if<is_range<E>::value, Matrix<T, R, C>&>::type
 Matrix<T, R, C>::solve(const E& m)
 {
     LUDecomposition<T>	lu(m);
