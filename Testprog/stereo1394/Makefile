@@ -27,10 +27,6 @@ CCFLAGS		= $(CFLAGS)
 LIBS		= -lTUIeee1394++ -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL \
 		  -lXaw3d -lXt -lXext -lXmu -lX11 -lraw1394 -ltbb -ltbbmalloc
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
 
 LINKER		= $(CXX)
 
