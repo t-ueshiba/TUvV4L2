@@ -57,20 +57,29 @@ struct BufTraits
     typedef typename allocator_type::const_pointer	const_iterator;
 
   protected:
+    typedef typename allocator_type::pointer		pointer;
+
+    static pointer	null()
+			{
+			    return nullptr;
+			}
+    
     template <class IN_, class OUT_>
-    static OUT_	copy(IN_ ib, IN_ ie, OUT_ out)
-		{
-		    return std::copy(ib, ie, out);
-		}
+    static OUT_		copy(IN_ ib, IN_ ie, OUT_ out)
+			{
+			    return std::copy(ib, ie, out);
+			}
+
     template <class T_>
-    static void	fill(iterator ib, iterator ie, const T_& c)
-		{
-		    std::fill(ib, ie, c);
-		}
-    static void	init(iterator ib, iterator ie)
-		{
-		    std::fill(ib, ie, 0);
-		}
+    static void		fill(iterator ib, iterator ie, const T_& c)
+			{
+			    std::fill(ib, ie, c);
+			}
+
+    static void		init(iterator ib, iterator ie)
+			{
+			    std::fill(ib, ie, 0);
+			}
 };
 
 /************************************************************************
@@ -278,7 +287,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    {
 			      // b の 破壊時に this->_p がdeleteされることを防ぐ．
 				b._size	    = 0;
-				b._p	    = nullptr;
+				b._p	    = super::null();
 				b._capacity = 0;
 			    }
 			}
@@ -299,7 +308,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 
 			      // b の 破壊時に this->_p がdeleteされることを防ぐ．
 				b._size	    = 0;
-				b._p	    = nullptr;
+				b._p	    = super::null();
 				b._capacity = 0;
 			    }
 
@@ -537,7 +546,7 @@ class Array : public Buf<T, D, ALLOC>
   */
     template <size_t D2, class ALLOC2>
 		Array(Array<T, D2, ALLOC2>& a, size_t i, size_t d)
-		    :super((i < a.size() ? &a[i] : nullptr),
+		    :super((i < a.size() ? &a[i] : super::null()),
 			   partial_size(i, d, a.size()))	{}
 
 #if defined(__NVCC__)
