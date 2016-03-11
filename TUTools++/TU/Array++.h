@@ -44,8 +44,6 @@
 #include <iomanip>
 #include "TU/iterator.h"
 
-//#define __CXX0X_MOVE			// 移動コンストラクタ/代入を使用
-
 namespace TU
 {
 /************************************************************************
@@ -176,6 +174,11 @@ class Buf : public BufTraits<T, ALLOC>
 			    return in;
 			}
 
+    static bool		shared()
+			{
+			    return true;
+			}
+    
   protected:
     template <class OP, class ITER>
     void		for_each(ITER src, const OP& op)
@@ -246,34 +249,63 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    }
 			    return *this;
 			}
-#if defined(__CXX0X_MOVE)
+  /*
+   *  [注意1] 移動コンストラクタ/移動代入演算子を定義するなら
+   *  コピーコンストラクタ/標準代入演算子も陽に定義する必要あり
+   *  
+   *  [注意2] Buf型オブジェクト x が x._shared == 1 である場合，
+   *  x はそのデータの寿命を管理していない．したがって，xを右辺値として
+   *  他のBuf型オブジェクト y に移動させる場合，shallow copy すると
+   *  x の寿命と無関係に y のデータが無効になる可能性があるので，deep copy
+   *  しなければならない．
+   *
+   *  [注意3] このことは，Array2<Array<T> >型オブジェクト a を
+   *  Array<Array<T> >型オブジェクト b に移動させる時に重要である．
+   *  a の各行 row について row._shared == 1 であるが，これをそのまま
+   *  b の各行に shallow copy してしまうと，b の各要素が使用する記憶領域は
+   *  a._buf のままである．よって，a が破壊されるときに一緒に a._buf も
+   *  破壊されると b に dangling pointer が生じる．
+   */
 			Buf(Buf&& b)
-			    :_size(b._size), _p(b._p),
-			     _shared(b._shared), _capacity(b._capacity)
+			    :_size(b._size),
+			     _p(b._shared ? alloc(_size) : b._p),
+			     _shared(0),
+			     _capacity(b._shared ? _size : b._capacity)
 			{
-			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
-			    b._size	= 0;
-			    b._p	= nullptr;
-			    b._capacity	= 0;
+			    if (b._shared)
+				super::copy(b.begin(), b.end(), begin());
+			    else
+			    {
+			      // b の 破壊時に this->_p がdeleteされることを防ぐ．
+				b._size	    = 0;
+				b._p	    = nullptr;
+				b._capacity = 0;
+			    }
 			}
+
     Buf&		operator =(Buf&& b)
 			{
-			    if (_shared)
-				return operator =(static_cast<const Buf&>(b));
-			    
-			    free(_p, _size);
-			    _size     = b._size;
-			    _p	      = b._p;
-			    _capacity = b._capacity;
+			    if (_shared || b._shared)
+			    {
+				resize(b._size);
+				super::copy(b.begin(), b.end(), begin());
+			    }
+			    else
+			    {
+				free(_p, _size);
+				_size     = b._size;
+				_p	  = b._p;
+				_capacity = b._capacity;
 
-			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
-			    b._size	= 0;
-			    b._p	= nullptr;
-			    b._capacity	= 0;
-    
+			      // b の 破壊時に this->_p がdeleteされることを防ぐ．
+				b._size	    = 0;
+				b._p	    = nullptr;
+				b._capacity = 0;
+			    }
+
 			    return *this;
 			}
-#endif
+
 			~Buf()
 			{
 			    if (!_shared)
@@ -340,6 +372,11 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 
     std::istream&	get(std::istream& in, size_t m=0)	;
 
+    bool		shared() const
+			{
+			    return _shared;
+			}
+    
   protected:
     template <class OP, class ITER>
     void		for_each(ITER src, const OP& op)
@@ -464,39 +501,8 @@ class Array : public Buf<T, D, ALLOC>
 
   public:
   //! 配列を生成する．
-    Array() :super()						{ init(); }
+		Array() :super()				{ init(); }
     
-#if defined(__CXX0X_MOVE)
-  /*
-   *  [注意1] 移動コンストラクタ/移動代入演算子を定義するなら
-   *  コピーコンストラクタ/標準代入演算子も陽に定義する必要あり
-   *  
-   *  [注意2] 移動コンストラクタ/移動代入を定義した場合，
-   *  Array2<Array<T> >&&型右辺値 x をArray<Array<T> >型左辺値 y に
-   *  移動させると x の Array<Array<T> > 部分がshallow copyされるだけ
-   *  なので，y の各要素が使用する記憶領域は x._buf のままである．よって，
-   *  x が破壊されるときに一緒に x._buf も破壊されると y に dangling pointer
-   *  が生じる．いっぽう，y がArray2<Array<T> >型ならば，x._buf も一緒に
-   *  y._buf にshallow copyされるので，問題は生じない．
-   *
-   *  [注意3] 一般コンストラクタ/代入演算子である Array(const E& expr) と
-   *  operator =(const E& expr) が定義されていれば，Array2<Array<T> >&&型
-   *  右辺値に対しては(Array<Array<T> >&&型に変換されることなく)これらが直接
-   *  呼ばれるので，各要素はdeep copyされ[注意2]の問題は生じない．
-   */
-		Array(const Array& a)	:super(a)		{}
-    Array&	operator =(const Array& a)
-		{
-		    super::operator =(a);
-		    return *this;
-		}
-		Array(Array&& a)	:super(std::move(a))	{}
-    Array&	operator =(Array&& a)
-		{
-		    super::operator =(std::move(a));
-		    return *this;
-		}
-#endif
 		Array(std::initializer_list<value_type> args)
 		    :super(args.size())
 		{
@@ -541,6 +547,7 @@ class Array : public Buf<T, D, ALLOC>
 		{
 		    super::copy(a.begin(), a.end(), begin());
 		}
+
     template <size_t D_, class ALLOC_>
     Array&	operator =(const Array<T, D_, ALLOC_>& a)
 		{
@@ -548,6 +555,7 @@ class Array : public Buf<T, D, ALLOC>
 		    super::copy(a.begin(), a.end(), begin());
 		    return *this;
 		}
+
     template <size_t D_, class ALLOC_> const Array&
 		write(Array<T, D_, ALLOC_>& a) const
 		{
@@ -853,18 +861,25 @@ class Array2 : public Array<T, R>
 		    }
 		    return *this;
 		}
-
-#if defined(__CXX0X_MOVE)
+#if 0	// これを 1 にして planeCalib -d をすると結果が異なる(2016.3.11)
 		Array2(Array2&& a)		//!< 移動コンストラクタ
-		    :super(), _ncol(a.ncol()), _buf(std::move(a._buf))
+		    :super(), _ncol(0), _buf()
 		{
-		    super::operator =(std::move(static_cast<super&>(a)));
+		    operator =(std::move(a));
 		}
+
     Array2&	operator =(Array2&& a)		//!< 移動代入演算子
 		{
-		    _ncol = a.ncol();
-		    _buf  = std::move(a._buf);
-		    super::operator =(std::move(static_cast<super&>(a)));
+		  // 代入元と代入先のいずれかが shared buffer なら deep copy
+		    if (_buf.shared() || a._buf.shared())
+			operator =(static_cast<const Array2&>(a));
+		    else
+		    {
+			_ncol = a.ncol();
+			_buf  = std::move(a._buf);
+			super::operator =(std::move(
+					      static_cast<const super&>(a)));
+		    }
 		    return *this;
 		}
 #endif
