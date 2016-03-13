@@ -53,12 +53,12 @@ template <class T, class ALLOC>
 struct BufTraits
 {
     typedef ALLOC					allocator_type;
-    typedef typename allocator_type::pointer		iterator;
-    typedef typename allocator_type::const_pointer	const_iterator;
+    typedef typename allocator_type::pointer		pointer;
+    typedef typename allocator_type::const_pointer	const_pointer;
+    typedef pointer					iterator;
+    typedef const_pointer				const_iterator;
 
   protected:
-    typedef typename allocator_type::pointer		pointer;
-
     static pointer	null()
 			{
 			    return nullptr;
@@ -101,8 +101,8 @@ class Buf : public BufTraits<T, ALLOC>
   public:
     typedef void				allocator_type;
     typedef T					value_type;
-    typedef value_type*				pointer;
-    typedef const value_type*			const_pointer;
+    typedef typename super::pointer		pointer;
+    typedef typename super::const_pointer	const_pointer;
     typedef typename super::iterator		iterator;
     typedef typename super::const_iterator	const_iterator;
     
@@ -230,15 +230,15 @@ template <class T, class ALLOC>
 class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 {
   private:
-    typedef BufTraits<T, ALLOC>				super;
+    typedef BufTraits<T, ALLOC>			super;
     
   public:
-    typedef typename super::allocator_type		allocator_type;
-    typedef typename allocator_type::value_type		value_type;
-    typedef typename allocator_type::pointer		pointer;
-    typedef typename allocator_type::const_pointer	const_pointer;
-    typedef typename super::iterator			iterator;
-    typedef typename super::const_iterator		const_iterator;
+    typedef typename super::allocator_type	allocator_type;
+    typedef T					value_type;
+    typedef typename super::pointer		pointer;
+    typedef typename super::const_pointer	const_pointer;
+    typedef typename super::iterator		iterator;
+    typedef typename super::const_iterator	const_iterator;
     
   public:
     explicit		Buf(size_t siz=0)

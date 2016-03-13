@@ -16,12 +16,12 @@ template <class T, class ALLOC>
 struct BufTraits<simd::vec<T>, ALLOC>
 {
     typedef simd::allocator<simd::vec<T> >		allocator_type;
+    typedef typename allocator_type::pointer		pointer;
+    typedef typename allocator_type::const_pointer	const_pointer;
     typedef simd::store_iterator<T*, true>		iterator;
     typedef simd::load_iterator<const T*, true>		const_iterator;
 
   protected:
-    typedef typename allocator_type::pointer		pointer;
-
     static pointer	null()
 			{
 			    return nullptr;
