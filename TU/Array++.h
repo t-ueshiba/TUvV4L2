@@ -185,6 +185,8 @@ class Buf : public BufTraits<T, ALLOC>
 
     static bool		shared()
 			{
+			  // この型の引数に対して移動コンストラクタ/移動代入を
+			  // 呼んでもshallow copyはできないので，trueを返す．
 			    return true;
 			}
     
@@ -870,7 +872,7 @@ class Array2 : public Array<T, R>
 		    }
 		    return *this;
 		}
-#if 0	// これを 1 にして planeCalib -d をすると結果が異なる(2016.3.11)
+
 		Array2(Array2&& a)		//!< 移動コンストラクタ
 		    :super(), _ncol(0), _buf()
 		{
@@ -884,14 +886,14 @@ class Array2 : public Array<T, R>
 			operator =(static_cast<const Array2&>(a));
 		    else
 		    {
+		      // a をmoveする前にa._ncolとa._bufをコピーしておく
 			_ncol = a.ncol();
 			_buf  = std::move(a._buf);
-			super::operator =(std::move(
-					      static_cast<const super&>(a)));
+			super::operator =(static_cast<super&&>(a));
 		    }
 		    return *this;
 		}
-#endif
+
 		Array2(std::initializer_list<value_type> args)
 		    :super(args.size()),
 		     _ncol(args.size() ? args.begin()->size() : 0),
