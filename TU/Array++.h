@@ -550,7 +550,6 @@ class Array : public Buf<T, D, ALLOC>
 		Array(Array<T, D2, ALLOC2>& a, size_t i, size_t d)
 		    :super((i < a.size() ? &a[i] : super::null()),
 			   partial_size(i, d, a.size()))	{}
-
 #if defined(__NVCC__)
     template <size_t D_, class ALLOC_>
 		Array(const Array<T, D_, ALLOC_>& a)
@@ -564,14 +563,6 @@ class Array : public Buf<T, D, ALLOC>
 		{
 		    super::resize(a.size());
 		    super::copy(a.begin(), a.end(), begin());
-		    return *this;
-		}
-
-    template <size_t D_, class ALLOC_> const Array&
-		write(Array<T, D_, ALLOC_>& a) const
-		{
-		    a.resize(size());
-		    super::copy(begin(), end(), a.begin());
 		    return *this;
 		}
 #else
@@ -602,21 +593,18 @@ class Array : public Buf<T, D, ALLOC>
 		    super::for_each(expr.begin(), assign());
 		    return *this;
 		}
-
+#endif	// __NVCC__
   //! 他の配列に自分を代入する．
   /*!
     \param expr	コピー先の配列
     \return	この配列
   */
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Array&>::type
-		write(E& expr) const
+    template <size_t D_, class ALLOC_>
+    void	write(Array<T, D_, ALLOC_>& a) const
 		{
-		    expr.resize(size());
-		    super::copy(begin(), end(), expr.begin());
-		    return *this;
+		    a.resize(size());
+		    super::copy(begin(), end(), a.begin());
 		}
-#endif	// !__NVCC__
 
   //! 全ての要素に同一の値を代入する．
   /*!
@@ -970,6 +958,7 @@ class Array2 : public Array<T, R>
 			++iter;
 		    }
 		}
+
     template <class T_, size_t R_, size_t C_>
     Array2&	operator =(const Array2<T_, R_, C_>& a)
 		{
@@ -984,19 +973,6 @@ class Array2 : public Array<T, R>
 		    for (auto& row : *this)
 		    {
 			row = *iter;
-			++iter;
-		    }
-		    return *this;
-		}
-    template <class T_, size_t R_, size_t C_> const Array2&
-		write(Array2<T_, R_, C_>& a) const
-		{
-		    a.resize(size(), _ncol);
-
-		    auto	iter = a.begin();
-		    for (const auto& row : *this)
-		    {
-			row.write(*iter);
 			++iter;
 		    }
 		    return *this;
@@ -1034,7 +1010,25 @@ class Array2 : public Array<T, R>
 		    super::operator =(expr);
 		    return *this;
 		}
-#endif	// !__NVCC__
+#endif	// __NVCC__
+  //! 他の配列に自分を代入する．
+  /*!
+    \param a	コピー先の配列
+    \return	この配列
+  */
+    template <class T_, size_t R_, size_t C_>
+    void	write(Array2<T_, R_, C_>& a) const
+		{
+		    a.resize(size(), _ncol);
+
+		    auto	iter = a.begin();
+		    for (const auto& row : *this)
+		    {
+			row.write(*iter);
+			++iter;
+		    }
+		}
+
     Array2&	operator =(const element_type& c)
 		{
 		    super::operator =(c);
