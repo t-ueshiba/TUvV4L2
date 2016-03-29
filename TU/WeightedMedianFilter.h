@@ -348,22 +348,22 @@ WeightedMedianFilter<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
 /************************************************************************
 *  class WeightedMedianFilter2<T, W, PF>				*
 ************************************************************************/
-template <class T, class W, bool PF=false>
+template <class T, class W, class CLOCK=void>
 class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
-			      public Profiler<PF>
+			      public Profiler<CLOCK>
 {
   private:
     typedef T					value_type;
     typedef typename W::argument_type		guide_type;
     typedef detail::WeightedMedianFilterBase<W>	super;
-    typedef Profiler<PF>			pf_type;
+    typedef Profiler<CLOCK>			pf_type;
     typedef typename super::HistogramArray	HistogramArray;
 #if defined(USE_TBB)
     template <class ROW_I, class ROW_G, class ROW_O>
     class Filter
     {
       public:
-	Filter(const WeightedMedianFilter2<T, W, PF>& wmf,
+	Filter(const WeightedMedianFilter2<T, W, CLOCK>& wmf,
 	       ROW_I rowI, ROW_G rowG, ROW_O rowO)
 	    :_wmf(wmf), _rowI(rowI), _rowG(rowG), _rowO(rowO)		{}
 	    
@@ -374,10 +374,10 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 		}
 
       private:
-	const WeightedMedianFilter2<T, W, PF>&	_wmf;
-	ROW_I					_rowI;
-	ROW_G					_rowG;
-	ROW_O					_rowO;
+	const WeightedMedianFilter2<T, W, CLOCK>&	_wmf;
+	ROW_I						_rowI;
+	ROW_G						_rowG;
+	ROW_O						_rowO;
     };
 
     template <class ROW_I, class ROW_G, class ROW_O>
@@ -468,9 +468,9 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
     Quantizer2<guide_type>	_quantizerG;
 };
 
-template <class T, class W, bool PF>
+template <class T, class W, class CLOCK>
 template <class IN, class GUIDE, class OUT> void
-WeightedMedianFilter2<T, W, PF>::convolve(IN ib, IN ie,
+WeightedMedianFilter2<T, W, CLOCK>::convolve(IN ib, IN ie,
 					  GUIDE gb, GUIDE ge, OUT out)
 {
     if (std::distance(ib, ie) < winSize() || ib->size() < winSize())
@@ -494,9 +494,9 @@ WeightedMedianFilter2<T, W, PF>::convolve(IN ib, IN ie,
     pf_type::nextFrame();
 }
 
-template <class T, class W, bool PF>
+template <class T, class W, class CLOCK>
 template <class ROW_I, class ROW_G, class ROW_O> void
-WeightedMedianFilter2<T, W, PF>::filter(ROW_I rowI, ROW_I rowIe,
+WeightedMedianFilter2<T, W, CLOCK>::filter(ROW_I rowI, ROW_I rowIe,
 					ROW_G rowG, ROW_O rowO) const
 {
     typedef boost::counting_iterator<size_t>	col_iterator;
@@ -542,11 +542,12 @@ WeightedMedianFilter2<T, W, PF>::filter(ROW_I rowI, ROW_I rowIe,
     }
 }
 
-template <class T, class W, bool PF>
+template <class T, class W, class CLOCK>
 template <class ROW_I, class ROW_G, class COL_C, class COL_G, class COL_O> void
-WeightedMedianFilter2<T, W, PF>::filterRow(HistogramArray& histograms,
-					   ROW_I rowI, ROW_G rowG, COL_C head,
-					   COL_G colG, COL_O colO) const
+WeightedMedianFilter2<T, W, CLOCK>::filterRow(HistogramArray& histograms,
+					      ROW_I rowI, ROW_G rowG,
+					      COL_C head,
+					      COL_G colG, COL_O colO) const
 {
     auto	endI = rowI;
     std::advance(endI, winSize() - 1);		// ウィンドウ最下行

@@ -32,10 +32,10 @@ BOOST_INSTALL_PROPERTY(vertex, upward_edge);
 BOOST_INSTALL_PROPERTY(edge,   tree);
     
 /************************************************************************
-*  class TreeFilter<T, W, PF>						*
+*  class TreeFilter<T, W, CLOCK>					*
 ************************************************************************/
-template <class T, class W, bool PF=false>
-class TreeFilter : public TU::Profiler<PF>
+template <class T, class W, class CLOCK=void>
+class TreeFilter : public TU::Profiler<CLOCK>
 {
   public:
     typedef T							value_type;
@@ -43,7 +43,7 @@ class TreeFilter : public TU::Profiler<PF>
     typedef typename W::result_type				weight_type;
     
   private:
-    typedef TU::Profiler<PF>					pf_type;
+    typedef TU::Profiler<CLOCK>					pf_type;
     typedef adjacency_list_traits<vecS, vecS, undirectedS>	traits_t;
     typedef traits_t::vertex_descriptor				vertex_t;
     typedef traits_t::edge_descriptor				edge_t;
@@ -338,10 +338,10 @@ class TreeFilter : public TU::Profiler<PF>
     grid_t	_grid;
 };
 
-template <class T, class W, bool PF>
+template <class T, class W, class CLOCK>
 template <class ROW_I, class ROW_G, class ROW_O> void
-TreeFilter<T, W, PF>::convolve(ROW_I rowI, ROW_I rowIe, ROW_G rowG, ROW_G rowGe,
-			       ROW_O rowO, bool normalize)
+TreeFilter<T, W, CLOCK>::convolve(ROW_I rowI, ROW_I rowIe, ROW_G rowG,
+				  ROW_G rowGe, ROW_O rowO, bool normalize)
 {
     pf_type::start(0);
     const size_t	nrows = std::distance(rowI, rowIe);
@@ -387,8 +387,8 @@ TreeFilter<T, W, PF>::convolve(ROW_I rowI, ROW_I rowIe, ROW_G rowG, ROW_G rowGe,
     pf_type::nextFrame();
 }
 
-template <class T, class W, bool PF> void
-TreeFilter<T, W, PF>::resize(size_t nrows, size_t ncols)
+template <class T, class W, class CLOCK> void
+TreeFilter<T, W, CLOCK>::resize(size_t nrows, size_t ncols)
 {
     if (nrows == _nrow && ncols == _ncol)
 	return;
@@ -415,8 +415,8 @@ TreeFilter<T, W, PF>::resize(size_t nrows, size_t ncols)
     }
 }
     
-template <class T, class W, bool PF> template <class ROW_I> void
-TreeFilter<T, W, PF>::initializeVertices(ROW_I rowI, ROW_I rowIe)
+template <class T, class W, class CLOCK> template <class ROW_I> void
+TreeFilter<T, W, CLOCK>::initializeVertices(ROW_I rowI, ROW_I rowIe)
 {
     auto	v = vertices(_grid).first;
 
@@ -425,8 +425,8 @@ TreeFilter<T, W, PF>::initializeVertices(ROW_I rowI, ROW_I rowIe)
 	    initializeVertex(*v, *colI);
 }
     
-template <class T, class W, bool PF> template <class ROW_G> void
-TreeFilter<T, W, PF>::initializeEdges(ROW_G rowG, ROW_G rowGe)
+template <class T, class W, class CLOCK> template <class ROW_G> void
+TreeFilter<T, W, CLOCK>::initializeEdges(ROW_G rowG, ROW_G rowGe)
 {
     auto	e = edges(_grid).first;
     auto	colG = rowG->begin();
@@ -449,8 +449,8 @@ TreeFilter<T, W, PF>::initializeEdges(ROW_G rowG, ROW_G rowGe)
     }
 }
 
-template <class T, class W, bool PF> template <class ROW_O> void
-TreeFilter<T, W, PF>::outputResults(ROW_O rowO) const
+template <class T, class W, class CLOCK> template <class ROW_O> void
+TreeFilter<T, W, CLOCK>::outputResults(ROW_O rowO) const
 {
     auto	v = vertices(_grid).first;
     auto	vals = get(vertex_aggr_val, _grid);
@@ -464,8 +464,8 @@ TreeFilter<T, W, PF>::outputResults(ROW_O rowO) const
     }
 }
     
-template <class T, class W, bool PF> template <class ROW_O> void
-TreeFilter<T, W, PF>::outputNormalizedResults(ROW_O rowO) const
+template <class T, class W, class CLOCK> template <class ROW_O> void
+TreeFilter<T, W, CLOCK>::outputNormalizedResults(ROW_O rowO) const
 {
     auto	v	= vertices(_grid).first;
     auto	vals	= get(vertex_aggr_val,    _grid);
@@ -480,22 +480,22 @@ TreeFilter<T, W, PF>::outputNormalizedResults(ROW_O rowO) const
     }
 }
     
-template <class T, class W, bool PF> void
-TreeFilter<T, W, PF>::printVertices(std::ostream& out) const
+template <class T, class W, class CLOCK> void
+TreeFilter<T, W, CLOCK>::printVertices(std::ostream& out) const
 {
     BOOST_FOREACH (vertex_t v, vertices(_grid))
 	printVertex(out, _grid, v) << std::endl;
 }
 
-template <class T, class W, bool PF> void
-TreeFilter<T, W, PF>::printEdges(std::ostream& out) const
+template <class T, class W, class CLOCK> void
+TreeFilter<T, W, CLOCK>::printEdges(std::ostream& out) const
 {
     BOOST_FOREACH (edge_t e, edges(_grid))
 	printEdge(out, _grid, e) << std::endl;
 }
 
-template <class T, class W, bool PF> void
-TreeFilter<T, W, PF>::saveGrid(std::ostream& out) const
+template <class T, class W, class CLOCK> void
+TreeFilter<T, W, CLOCK>::saveGrid(std::ostream& out) const
 {
     write_graphviz(out, _grid);
 }
