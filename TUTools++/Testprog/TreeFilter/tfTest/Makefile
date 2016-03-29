@@ -50,10 +50,9 @@ EXTHDRS		= ../../../TU/Array++.h \
 		../../../TU/Vector++.h \
 		../../../TU/functional.h \
 		../../../TU/iterator.h \
-		../../../TU/mmInstructions.h \
+		../../../TU/pair.h \
 		../../../TU/tuple.h \
 		../../../TU/types.h \
-		../../../windows/fakeWindows.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -77,14 +76,13 @@ include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/Image++.h ../../../TU/types.h ../../../TU/Geometry++.h \
 	../../../TU/Vector++.h ../../../TU/Array++.h ../../../TU/iterator.h \
-	../../../TU/tuple.h ../../../TU/functional.h \
-	../../../TU/mmInstructions.h ../../../TU/Minimize.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h ../../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/pair.h \
+	../../../TU/Minimize.h /usr/local/include/TU/v/App.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+	../../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h ../../../TU/TreeFilter.h \
-	../../../TU/Profiler.h ../../../windows/fakeWindows.h
+	../../../TU/Profiler.h

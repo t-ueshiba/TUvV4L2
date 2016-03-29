@@ -17,10 +17,11 @@ doJob(const Image<T>& in, const Image<G>& guide,
 {
     typedef ExpDiff<G, float>	wfunc_type;
 
-    wfunc_type					wfunc(sigma);
-    WeightedMedianFilter2<T, wfunc_type, true>	wmf(wfunc, winSize, 256, 256);
-    Image<T>					out(in.width(), in.height());
-    Profiler<>					profiler(1);
+    wfunc_type	wfunc(sigma);
+    WeightedMedianFilter2<T, wfunc_type, std::chrono::system_clock>
+		wmf(wfunc, winSize, 256, 256);
+    Image<T>	out(in.width(), in.height());
+    Profiler<>	profiler(1);
 
     wmf.setGrainSize(grainSize);
     

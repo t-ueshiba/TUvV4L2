@@ -50,9 +50,9 @@
 #include "TU/Profiler.h"
 
 #if defined(PROFILE) && !defined(USE_TBB)
-#  define ENABLE_PROFILER	true
+#  define ENABLE_PROFILER
 #else
-#  define ENABLE_PROFILER	false
+#  define ENABLE_PROFILER	void
 #endif
 
 namespace TU

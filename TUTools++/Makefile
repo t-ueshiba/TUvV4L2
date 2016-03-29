@@ -179,7 +179,6 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		ImageBase.cc \
 		ImageLine.cc \
 		PM16C_04.cc \
-		Profiler.cc \
 		Random.cc \
 		Rectify.cc \
 		SHOT602.cc \
@@ -202,7 +201,6 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		ImageBase.o \
 		ImageLine.o \
 		PM16C_04.o \
-		Profiler.o \
 		Random.o \
 		Rectify.o \
 		SHOT602.o \
@@ -250,7 +248,7 @@ CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/types.h \
 	TU/simd/x86/lookup.h TU/simd/arm/lookup.h TU/simd/load_iterator.h \
 	TU/simd/store_iterator.h TU/simd/cvtdown_iterator.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h \
-	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h
+	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h TU/simd/zero.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/Geometry++.h \
 	TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
 	TU/pair.h TU/Minimize.h TU/simd/simd.h TU/simd/config.h TU/simd/vec.h \
@@ -275,7 +273,7 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/Geometry++.h \
 	TU/simd/x86/lookup.h TU/simd/arm/lookup.h TU/simd/load_iterator.h \
 	TU/simd/store_iterator.h TU/simd/cvtdown_iterator.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h \
-	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h
+	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h TU/simd/zero.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/iterator.h TU/tuple.h \
 	TU/functional.h TU/pair.h
@@ -306,7 +304,8 @@ GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/simd/x86/lookup.h TU/simd/arm/lookup.h TU/simd/load_iterator.h \
 	TU/simd/store_iterator.h TU/simd/cvtdown_iterator.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h \
-	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h TU/Minimize.h
+	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h TU/simd/zero.h \
+	TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h TU/pair.h \
 	TU/Minimize.h
@@ -320,8 +319,6 @@ ImageLine.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h TU/pair.h \
 	TU/Minimize.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
-Profiler.o: TU/Profiler.h TU/types.h TU/Array++.h TU/iterator.h TU/tuple.h \
-	TU/functional.h TU/pair.h windows/fakeWindows.h
 Random.o: TU/Random.h TU/types.h windows/fakeWindows.h
 Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h \
 	TU/Vector++.h TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h \
@@ -347,7 +344,8 @@ Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h \
 	TU/simd/x86/lookup.h TU/simd/arm/lookup.h TU/simd/load_iterator.h \
 	TU/simd/store_iterator.h TU/simd/cvtdown_iterator.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h \
-	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h TU/algorithm.h
+	TU/simd/row_vec_iterator.h TU/simd/BufTraits.h TU/simd/zero.h \
+	TU/algorithm.h
 SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 SURFCreator.o: TU/SURFCreator.h TU/Feature.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h TU/pair.h \

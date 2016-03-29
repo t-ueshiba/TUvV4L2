@@ -27,10 +27,10 @@ doJob(const Image<T>& image, const Image<G>& guide, U sigma, bool normalize)
     typedef U					weight_type;
     typedef Diff<guide_type, weight_type>	wfunc_type;
     
-    boost::TreeFilter<weight_type,
-		      wfunc_type, true>	tf(wfunc_type(), sigma);
-    Image<weight_type>			out(image.width(), image.height());
-    Profiler<>				profiler(1);
+    boost::TreeFilter<weight_type, wfunc_type, std::chrono::system_clock>
+			tf(wfunc_type(), sigma);
+    Image<weight_type>	out(image.width(), image.height());
+    Profiler<>		profiler(1);
     
     for (size_t n = 0; n < 10; ++n)
     {
