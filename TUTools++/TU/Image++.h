@@ -44,100 +44,182 @@ namespace TU
 namespace detail
 {
 /************************************************************************
-*  struct RGB, BGR, RGBA, ARGB, ABGR, BGRA				*
+*  class detail::ColorConverter						*
+************************************************************************/
+class ColorConverter
+{
+  private:
+    constexpr static float	_yr = 0.299f;		// ITU-R BT.601, PAL
+    constexpr static float	_yb = 0.114f;		// ITU-R BT.601, PAL
+    constexpr static float	_yg = 1.0f - _yr - _yb;	// ITU-R BT.601, PAL
+    constexpr static float	_ku = 0.4921f;		// ITU-R BT.601, PAL
+    constexpr static float	_kv = 0.877314f;	// ITU-R BT.601, PAL
+    
+  public:
+		ColorConverter()					;
+
+    int		r(int y, int v) const
+		{
+		    return limit(y + _r[v]);
+		}
+    int		g(int y, int u, int v) const
+		{
+		    return limit(y - scaleDown(_gu[u] - _gv[v]));
+		}
+    int		b(int y, int u) const
+		{
+		    return limit(y + _b[u]);
+		}
+    template <class T>
+    static T	y(int r, int g, int b)
+		{
+		    return T(_yr*r + _yg*g + _yb*b);
+		}
+    int		u(int b, int y) const
+		{
+		    return _u[255 + b - y];
+		}
+    int		v(int r, int y) const
+		{
+		    return _v[255 + r - y];
+		}
+    
+  private:
+    template <class T>
+    static int	limit(T val)
+		{
+		    return (val < 0 ? 0 : val > 255 ? 255 : int(val));
+		}
+    static int	scaleUp(float val)
+		{
+		    return int(val * (1 << 10));
+		}
+    static int	scaleDown(int val)
+		{
+		    return val >> 10;
+		}
+    
+  private:
+    int		_u[255 + 1 + 255];
+    int		_v[255 + 1 + 255];
+
+    int		_r[256];
+    int		_gu[256];
+    int		_gv[256];
+    int		_b[256];
+};
+
+extern const ColorConverter	colorConverter;
+    
+/************************************************************************
+*  struct detail::[RGB|BGR|RGBA|ARGB|ABGR|BGRA]				*
 ************************************************************************/
 struct RGB
 {
-    RGB(u_char rr, u_char gg, u_char bb)	:r(rr), g(gg), b(bb)	{}
+    typedef u_char	element_type;
     
-    u_char r, g, b;
+    RGB(element_type rr, element_type gg, element_type bb)
+	:r(rr), g(gg), b(bb)						{}
+    
+    element_type r, g, b;
 };
 
 struct BGR
 {
-    BGR(u_char rr, u_char gg, u_char bb)	:b(bb), g(gg), r(rr)	{}
+    typedef u_char	element_type;
     
-    u_char b, g, r;
+    BGR(element_type rr, element_type gg, element_type bb)
+	:b(bb), g(gg), r(rr)						{}
+    
+    element_type b, g, r;
 };
 
 struct RGBA
 {
-    RGBA(u_char rr, u_char gg, u_char bb, u_char aa=255)
-	:r(rr), g(gg), b(bb), a(aa)					{}
+    typedef u_char	element_type;
     
-    u_char r, g, b, a;
+    RGBA(element_type rr, element_type gg, element_type bb,
+	 element_type aa=255)	:r(rr), g(gg), b(bb), a(aa)		{}
+    
+    element_type r, g, b, a;
 };
 
 struct ABGR
 {
-    ABGR(u_char rr, u_char gg, u_char bb, u_char aa=255)
-	:a(aa), b(bb), g(gg), r(rr)					{}
+    typedef u_char	element_type;
     
-    u_char a, b, g, r;
+    ABGR(element_type rr, element_type gg, element_type bb,
+	 element_type aa=255)	:a(aa), b(bb), g(gg), r(rr)		{}
+    
+    element_type a, b, g, r;
 };
 
 struct ARGB
 {
-    ARGB(u_char rr, u_char gg, u_char bb, u_char aa=255)
-	:a(aa), r(rr), g(gg), b(bb)					{}
+    typedef u_char	element_type;
     
-    u_char a, r, g, b;
+    ARGB(element_type rr, element_type gg, element_type bb,
+	 element_type aa=255)	:a(aa), r(rr), g(gg), b(bb)		{}
+    
+    element_type a, r, g, b;
 };
 
 struct BGRA
 {
-    BGRA(u_char rr, u_char gg, u_char bb, u_char aa=255)
-	:b(bb), g(gg), r(rr), a(aa)					{}
+    typedef u_char	element_type;
     
-    u_char b, g, r, a;
+    BGRA(element_type rr, element_type gg, element_type bb,
+	 element_type aa=255)	:b(bb), g(gg), r(rr), a(aa)		{}
+    
+    element_type b, g, r, a;
 };
-}
+}	// namespace detail
 
 /************************************************************************
 *  struct RGB_<E>							*
 ************************************************************************/
 struct YUV444;
-
+    
 template <class E>
 struct RGB_ : public E, boost::additive<RGB_<E>,
 			boost::multiplicative<RGB_<E>, float,
 			boost::equality_comparable<RGB_<E> > > >
 {
-    typedef u_char	element_type;
+    typedef typename E::element_type	element_type;
     
-    RGB_()					     :E(0, 0, 0)	{}
-    RGB_(u_char rr, u_char gg, u_char bb)	     :E(rr, gg, bb)	{}
-    RGB_(u_char rr, u_char gg, u_char bb, u_char aa) :E(rr, gg, bb, aa)	{}
-    RGB_(const RGB_<detail::RGB>& p)		     :E(p.r, p.g, p.b)	{}
-    RGB_(const RGB_<detail::BGR>& p)		     :E(p.r, p.g, p.b)	{}
+    RGB_()				:E(0, 0, 0)			{}
+    RGB_(element_type rr, element_type gg, element_type bb)
+					:E(rr, gg, bb)			{}
+    RGB_(element_type rr, element_type gg, element_type bb,
+	 element_type aa)		:E(rr, gg, bb, aa)		{}
+    RGB_(const RGB_<detail::RGB>& p)	:E(p.r, p.g, p.b)		{}
+    RGB_(const RGB_<detail::BGR>& p)	:E(p.r, p.g, p.b)		{}
+    template <class E_>
+    RGB_(const RGB_<E_>& p)		:E(p.r, p.g, p.b, p.a)		{}
+    template <class T_>
+    RGB_(const T_& p)
+	:E(element_type(p), element_type(p), element_type(p))		{}
     RGB_(const YUV444& p)						;
-    template <class E1>
-    RGB_(const RGB_<E1>& p)	:E(p.r, p.g, p.b, p.a)			{}
-    template <class T>
-    RGB_(const T& p)		:E(u_char(p), u_char(p), u_char(p))	{}
     
     using	E::r;
     using	E::g;
     using	E::b;
-	   
-		operator u_char() const	{return u_char(float(*this));}
-		operator s_char() const	{return s_char(float(*this));}
-		operator short()  const	{return short(float(*this));}
-		operator int()	  const	{return int(float(*this));}
-		operator float()  const	{return 0.299f*r + 0.587f*g + 0.114f*b;}
-		operator double() const	{return 0.299*r + 0.587*g + 0.114*b;}
+
+    template <class T_,
+	      typename std::enable_if<std::is_arithmetic<T_>::value>::type*
+	      = nullptr>
+		operator T_() const
+		{
+		    return detail::colorConverter.y<T_>(r, g, b);
+		}
     RGB_&	operator +=(const RGB_& p)
 		{
-		    r += p.r;
-		    g += p.g;
-		    b += p.b;
+		    r += p.r; g += p.g; b += p.b;
 		    return *this;
 		}
     RGB_&	operator -=(const RGB_& p)
 		{
-		    r -= p.r;
-		    g -= p.g;
-		    b -= p.b;
+		    r -= p.r; g -= p.g; b -= p.b;
 		    return *this;
 		}
     RGB_&	operator *=(float c)
@@ -165,10 +247,10 @@ operator >>(std::istream& in, RGB_<E>& p)
 template <class E> inline std::ostream&
 operator <<(std::ostream& out, const RGB_<E>& p)
 {
-    return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b
-	       << (u_int)p.a;
+    return out << u_int(p.r) << ' ' << u_int(p.g) << ' ' << u_int(p.b) << ' '
+	       << u_int(p.a);
 }
-
+    
 /************************************************************************
 *  struct RGB								*
 ************************************************************************/
@@ -193,7 +275,7 @@ operator >>(std::istream& in, RGB& p)
 inline std::ostream&
 operator <<(std::ostream& out, const RGB& p)
 {
-    return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b;
+    return out << u_int(p.r) << ' ' << u_int(p.g) << ' ' << u_int(p.b);
 }
 
 /************************************************************************
@@ -220,7 +302,7 @@ operator >>(std::istream& in, BGR& p)
 inline std::ostream&
 operator <<(std::ostream& out, const BGR& p)
 {
-    return out << (u_int)p.r << ' ' << (u_int)p.g << ' ' << (u_int)p.b;
+    return out << u_int(p.r) << ' ' << u_int(p.g) << ' ' << u_int(p.b);
 }
 
 /************************************************************************
@@ -238,29 +320,33 @@ typedef RGB_<detail::BGRA>	BGRA;
 /************************************************************************
 *  struct YUV444, YUV422, YUYV422, YUV411				*
 ************************************************************************/
-struct YUYV422;
-
-//! Y, U, V（各8bit）の順で並んだカラー画素
+//! U, Y, V（各8bit）の順で並んだカラー画素
 struct YUV444
 {
-    YUV444(u_char yy=0, u_char uu=128, u_char vv=128)
-			:u(uu), y(yy), v(vv)		{}
-    template <class T> 
-    YUV444(const T& p)	:u(128), y(u_char(p)), v(128)	{}
-
-		operator u_char()		const	{return u_char(y);}
-		operator s_char()		const	{return s_char(y);}
-		operator short()		const	{return short(y);}
-		operator int()			const	{return int(y);}
-		operator float()		const	{return float(y);}
-		operator double()		const	{return double(y);}
+    typedef u_char	element_type;
+    
+    YUV444(element_type yy=0, element_type uu=128, element_type vv=128)
+	:u(uu), y(yy), v(vv)						{}
+    template <class E>
+    YUV444(const RGB_<E>& p)
+	:y(detail::colorConverter.y<element_type>(p.r, p.g, p.b))
+		{
+		    u = detail::colorConverter.u(p.b, y);
+		    v = detail::colorConverter.v(p.r, y);
+		}
+    template <class T>
+    YUV444(const T& p)	:u(128), y(p), v(128)				{}
+    
+    template <class T,
+	      typename std::enable_if<std::is_arithmetic<T>::value>::type*
+	      = nullptr>
+		operator T()			const	{return T(y);}
     bool	operator ==(const YUV444& yuv)	const	{return (u == yuv.u &&
 								 y == yuv.y &&
 								 v == yuv.v);}
     bool	operator !=(const YUV444& yuv)	const	{return !(*this==yuv);}
-    
 
-    u_char	u, y, v;
+    element_type	u, y, v;
 };
     
 inline std::istream&
@@ -272,28 +358,36 @@ operator >>(std::istream& in, YUV444& yuv)
 inline std::ostream&
 operator <<(std::ostream& out, const YUV444& yuv)
 {
-    return out << (u_int)yuv.y << ' ' << (u_int)yuv.u << ' ' << (u_int)yuv.v;
+    return out << u_int(yuv.y) << ' ' << u_int(yuv.u) << ' ' << u_int(yuv.v);
 }
+
+template <class E> inline
+RGB_<E>::RGB_(const YUV444& p)
+    :E(detail::colorConverter.r(p.y, p.v),
+       detail::colorConverter.g(p.y, p.u, p.v),
+       detail::colorConverter.b(p.y, p.u))
+{
+}
+
+struct YUYV422;
 
 //! [U, Y0], [V, Y1]（各8bit）の順で並んだカラー画素(16bits/pixel)
 struct YUV422
 {
-    YUV422(u_char yy=0, u_char xx=128)	:x(xx), y(yy)	{}
-    YUV422(const YUYV422& p)				;
-    template <class T>
-    YUV422(const T& p)		:x(128), y(u_char(p))	{}
+    typedef u_char	element_type;
 
-		operator u_char()		const	{return u_char(y);}
-		operator s_char()		const	{return s_char(y);}
-		operator short()		const	{return short(y);}
-		operator int()			const	{return int(y);}
-		operator float()		const	{return float(y);}
-		operator double()		const	{return double(y);}
+    YUV422(element_type yy=0, element_type xx=128)	:x(xx), y(yy)	{}
+    YUV422(const YUYV422& p)						;
+
+    template <class T,
+	      typename std::enable_if<std::is_arithmetic<T>::value>::type*
+	      = nullptr>
+		operator T()			const	{return T(y);}
     bool	operator ==(const YUV422& p)	const	{return (x == p.x &&
 								 y == p.y);}
     bool	operator !=(const YUV422& p)	const	{return !(*this == p);}
     
-    u_char	x, y;
+    element_type	x, y;
 };
 
 inline std::istream&
@@ -305,28 +399,26 @@ operator >>(std::istream& in, YUV422& yuv)
 inline std::ostream&
 operator <<(std::ostream& out, const YUV422& yuv)
 {
-    return out << (u_int)yuv.y << ' ' << (u_int)yuv.x;
+    return out << u_int(yuv.y) << ' ' << u_int(yuv.x);
 }
 
 //! [Y0, U], [Y1, V]（各8bit）の順で並んだカラー画素(16bits/pixel)
 struct YUYV422
 {
-    YUYV422(u_char yy=0, u_char xx=128)	:y(yy), x(xx)	{}
-    YUYV422(const YUV422& p)				;
-    template <class T>
-    YUYV422(const T& p)		:y(u_char(p)), x(128) 	{}
+    typedef u_char	element_type;
 
-		operator u_char()		const	{return u_char(y);}
-		operator s_char()		const	{return s_char(y);}
-		operator short()		const	{return short(y);}
-		operator int()			const	{return int(y);}
-		operator float()		const	{return float(y);}
-		operator double()		const	{return double(y);}
+    YUYV422(element_type yy=0, element_type xx=128)	:y(yy), x(xx)	{}
+    YUYV422(const YUV422& p)				:y(p.y), x(p.x)	{}
+
+    template <class T,
+	      typename std::enable_if<std::is_arithmetic<T>::value>::type*
+	      = nullptr>
+		operator T()			const	{return T(y);}
     bool	operator ==(const YUYV422& p)	const	{return (y == p.y &&
 								 x == p.x);}
     bool	operator !=(const YUYV422& p)	const	{return !(*this == p);}
     
-    u_char	y, x;
+    element_type	y, x;
 };
 
 inline std::istream&
@@ -338,23 +430,28 @@ operator >>(std::istream& in, YUYV422& yuv)
 inline std::ostream&
 operator <<(std::ostream& out, const YUYV422& yuv)
 {
-    return out << (u_int)yuv.y << ' ' << (u_int)yuv.x;
+    return out << u_int(yuv.y) << ' ' << u_int(yuv.x);
 }
+
+inline
+YUV422::YUV422(const YUYV422& p)  :x(p.x), y(p.y)	{}
 
 //! [U, Y0, Y1], [V, Y2, Y3]（各8bit）の順で並んだカラー画素(12bits/pixel)
 struct YUV411
 {
-    YUV411(u_char yy0=0, u_char yy1=0, u_char xx=128)
-			:x(xx), y0(yy0), y1(yy1)			{}
+    typedef u_char	element_type;
+
+    YUV411(element_type yy0=0, element_type yy1=0, element_type xx=128)
+	:x(xx), y0(yy0), y1(yy1)					{}
     template <class T>
-    YUV411(const T& p)	:x(128), y0(u_char(p)), y1(u_char(*(&p+1)))	{}
+    YUV411(const T& p)	:x(128), y0(p), y1((&p)[1])			{}
 
     bool	operator ==(const YUV411& p)	const	{return (x  == p.x  &&
 								 y0 == p.y0 &&
 								 y1 == p.y1);}
     bool	operator !=(const YUV411& p)	const	{return !(*this == p);}
     
-    u_char	x, y0, y1;
+    element_type	x, y0, y1;
 };
 
 inline std::istream&
@@ -366,93 +463,7 @@ operator >>(std::istream& in, YUV411& yuv)
 inline std::ostream&
 operator <<(std::ostream& out, const YUV411& yuv)
 {
-    return out << (u_int)yuv.y0 << ' ' << (u_int)yuv.y1 << ' ' << (u_int)yuv.x;
-}
-
-inline
-YUV422::YUV422(const YUYV422& p)  :x(p.x), y(p.y)	{}
-
-inline
-YUYV422::YUYV422(const YUV422& p) :y(p.y), x(p.x)	{}
-
-/************************************************************************
-*  function fromYUV<T>()						*
-************************************************************************/
-//! カラーのY, U, V値を与えて他のカラー表現に変換するクラス
-class __PORT ConversionFromYUV
-{
-  public:
-    ConversionFromYUV()					;
-
-  private:
-    template <class T>
-    friend T	fromYUV(u_char y, u_char u, u_char v)	;
-    
-    int		_r[256], _g0[256], _g1[256], _b[256];
-};
-
-__PORT extern const ConversionFromYUV	conversionFromYUV;
-
-template <class T> inline T
-fromYUV(u_char y, u_char u, u_char v)
-{
-    T	val;
-    int	tmp = y + conversionFromYUV._r[v];
-    val.r = (tmp > 255 ? 255 : tmp < 0 ? 0 : tmp);
-    tmp   =
-	y - (int(conversionFromYUV._g0[v] + conversionFromYUV._g1[u]) >> 10);
-    val.g = (tmp > 255 ? 255 : tmp < 0 ? 0 : tmp);
-    tmp   = y + conversionFromYUV._b[u];
-    val.b = (tmp > 255 ? 255 : tmp < 0 ? 0 : tmp);
-    return val;
-}
-
-template <> inline u_char
-fromYUV<u_char>(u_char y, u_char, u_char)
-{
-    return y;
-}
-
-template <> inline s_char
-fromYUV<s_char>(u_char y, u_char, u_char)
-{
-    return y;
-}
-
-template <> inline short
-fromYUV<short>(u_char y, u_char, u_char)
-{
-    return y;
-}
-
-template <> inline int
-fromYUV<int>(u_char y, u_char, u_char)
-{
-    return y;
-}
-
-template <> inline float
-fromYUV<float>(u_char y, u_char, u_char)
-{
-    return y;
-}
-
-template <> inline double
-fromYUV<double>(u_char y, u_char, u_char)
-{
-    return y;
-}
-
-template <> inline YUV444
-fromYUV<YUV444>(u_char y, u_char u, u_char v)
-{
-    return YUV444(y, u, v);
-}
-
-template <class E> inline
-RGB_<E>::RGB_(const YUV444& p)
-    :E(fromYUV<RGB_>(p.y, p.u, p.v))
-{
+    return out << u_int(yuv.y0) << ' ' << u_int(yuv.y1) << ' ' << u_int(yuv.x);
 }
 
 /************************************************************************
@@ -492,6 +503,28 @@ class __PORT ImageBase
 	bool	bottomToTop;	//!< 行が下から上へ収められているならtrue
 	size_t	ncolors;	//!< カラーパレットの色数
     };
+
+  protected:
+    template <class _T, class _DUMMY=void>
+    struct type2type			{static constexpr Type value=RGB_24;};
+    template <class _DUMMY>
+    struct type2type<u_char, _DUMMY>	{static constexpr Type value=U_CHAR;};
+    template <class _DUMMY>
+    struct type2type<short, _DUMMY>	{static constexpr Type value=SHORT;};
+    template <class _DUMMY>
+    struct type2type<int, _DUMMY>	{static constexpr Type value=INT;};
+    template <class _DUMMY>
+    struct type2type<float, _DUMMY>	{static constexpr Type value=FLOAT;};
+    template <class _DUMMY>
+    struct type2type<double, _DUMMY>	{static constexpr Type value=DOUBLE;};
+    template <class _DUMMY>
+    struct type2type<YUV444, _DUMMY>	{static constexpr Type value=YUV_444;};
+    template <class _DUMMY>
+    struct type2type<YUV422, _DUMMY>	{static constexpr Type value=YUV_422;};
+    template <class _DUMMY>
+    struct type2type<YUYV422, _DUMMY>	{static constexpr Type value=YUYV_422;};
+    template <class _DUMMY>
+    struct type2type<YUV411, _DUMMY>	{static constexpr Type value=YUV_411;};
     
   protected:
   //! 画像を生成し投影行列と放射歪曲係数を初期化する．
@@ -524,15 +557,6 @@ class __PORT ImageBase
   */
     size_t		height()		const	{return _height();}
 
-  //! 画像のサイズを変更する．
-  /*!
-    \param h	新しい幅
-    \param w	新しい高さ
-  */
-  /*
-    void		resize(size_t h, size_t w)	{_resize(h, w,
-								 DEFAULT);}
-  */
     size_t		npixelsToBorder(size_t u, size_t v,
 					size_t dir)	const	;
     
@@ -587,46 +611,36 @@ ImageBase::npixelsToBorder(size_t u, size_t v, size_t dir) const
 }
 
 /************************************************************************
-*  class ImageLine<T>:	Generic image scanline class			*
+*  class ImageLine<T, ALLOC>:	Generic image scanline class		*
 ************************************************************************/
 //! T型の画素を持つ画像のスキャンラインを表すクラス
 /*!
   \param T	画素の型
+  \param ALLOC	アロケータの型
 */
-template <class T>
-class ImageLine : public Array<T>
+template <class T, class ALLOC=std::allocator<T> >
+class ImageLine : public Array<T, 0, ALLOC>
 {
   private:
-    typedef Array<T>					super;
+    typedef Array<T, 0, ALLOC>			super;
 
   public:
-    typedef typename super::element_type		element_type;
-    typedef typename super::value_type			value_type;
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::reference			reference;
-    typedef typename super::const_reference		const_reference;
-    typedef typename super::pointer			pointer;
-    typedef typename super::const_pointer		const_pointer;
-    typedef typename super::iterator			iterator;
-    typedef typename super::const_iterator		const_iterator;
-    typedef typename super::reverse_iterator		reverse_iterator;
-    typedef typename super::const_reverse_iterator	const_reverse_iterator;
+    typedef typename super::element_type	element_type;
+    typedef typename super::pointer		pointer;
     
   public:
   //! 指定した画素数のスキャンラインを生成する．
   /*!
     \param d	画素数
   */
-    explicit ImageLine(size_t d=0)
-	:super(d), _lmost(0), _rmost(d)				{}
+    explicit ImageLine(size_t d=0)	:super(d)			{}
 
   //! 外部の領域と画素数を指定してスキャンラインを生成する．
   /*!
     \param p	外部領域へのポインタ
     \param d	画素数
   */
-    ImageLine(T* p, size_t d)
-	:super(p, d), _lmost(0), _rmost(d)			{}
+    ImageLine(pointer p, size_t d)	:super(p, d)			{}
 
   //! 指定されたスキャンラインの部分スキャンラインを生成する．
   /*!
@@ -634,8 +648,7 @@ class ImageLine : public Array<T>
     \param u	部分スキャンラインの左端の座標
     \param d	部分スキャンラインの画素数
   */
-    ImageLine(ImageLine<T>& l, size_t u, size_t d)
-	:super(l, u, d), _lmost(0), _rmost(d)			{}
+    ImageLine(ImageLine& l, size_t u, size_t d) :super(l, u, d)		{}
 
 #if !defined(__NVCC__)
   //! 他の配列と同一要素を持つスキャンラインを作る（コピーコンストラクタの拡張）．
@@ -645,7 +658,7 @@ class ImageLine : public Array<T>
   */
     template <class E,
 	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    ImageLine(const E& expr)	:super(expr)			{}
+    ImageLine(const E& expr)	:super(expr)				{}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
   /*!
@@ -662,66 +675,28 @@ class ImageLine : public Array<T>
 			}
 #endif	// !__NVCC__
     
-    ImageLine&		operator =(const element_type& c)	;
-    const ImageLine	operator ()(size_t u, size_t d)	const	;
-    ImageLine		operator ()(size_t u, size_t d)		;
+    ImageLine&		operator =(const element_type& c)		;
+    const ImageLine	operator ()(size_t u, size_t d)		const	;
+    ImageLine		operator ()(size_t u, size_t d)			;
     
-    using		super::begin;
-    using		super::end;
-    using		super::rbegin;
-    using		super::rend;
     using		super::size;
     using		super::data;
+    using		super::begin;
+    using		super::end;
 
     template <class S>
-    T			at(S uf)		const	;
-    const YUV422*	copy(const YUV422* src)		;
-    const YUYV422*	copy(const YUYV422* src)	;
-    const YUV411*	copy(const YUV411* src)		;
-    const T*		copy(const T* src)		;
-    template <class S>
-    const S*		copy(const S* src)		;
-    template <class S, class L>
-    const S*		lookup(const S* src,
-			       const L* tbl)		;
-
-  //! 左端の有効画素の位置を返す．
-  /*!
-    \return	左端の有効画素の位置
-  */
-    int			lmost()			const	{return _lmost;}
-
-  //! 右端の有効画素の次の位置を返す．
-  /*!
-    \return	右端の有効画素の次の位置
-  */
-    int			rmost()			const	{return _rmost;}
-
-  //! 有効画素の範囲を設定する．
-  /*!
-    \param l	有効画素の左端
-    \param r	有効画素の右端の次
-  */
-    void		setLimits(int l, int r)		{_lmost = l;
-							 _rmost = r;}
-  //! 指定された位置の画素が有効か判定する．
-  /*!
-    \param u	画素の位置
-    \return	有効ならばtrue，無効ならばfalse
-  */
-    bool		valid(int u)		const	{return (u >= _lmost &&
-								 u <  _rmost);}
-	
-    bool		resize(size_t d)		;
-    void		resize(T* p, size_t d)		;
-
-  private:
-    int			_lmost;
-    int			_rmost;
+    T			at(S uf)				const	;
+    const YUV422*	copy(const YUV422* src)				;
+    const YUYV422*	copy(const YUYV422* src)			;
+    const YUV411*	copy(const YUV411* src)				;
+    template <class ITER>
+    ITER		copy(ITER src)					;
+    template <class ITER, class TBL>
+    ITER		lookup(ITER src, TBL tbl)			;
 };
 
-template <class T> inline ImageLine<T>&
-ImageLine<T>::operator =(const element_type& c)
+template <class T, class ALLOC> inline ImageLine<T, ALLOC>&
+ImageLine<T, ALLOC>::operator =(const element_type& c)
 {
     super::operator =(c);
     return *this;
@@ -733,10 +708,10 @@ ImageLine<T>::operator =(const element_type& c)
   \param d	部分スキャンラインの画素数
   \return	生成された部分スキャンライン
 */
-template <class T> inline const ImageLine<T>
-ImageLine<T>::operator ()(size_t u, size_t d) const
+template <class T, class ALLOC> inline const ImageLine<T, ALLOC>
+ImageLine<T, ALLOC>::operator ()(size_t u, size_t d) const
 {
-    return ImageLine<T>(const_cast<ImageLine<T>&>(*this), u, d);
+    return ImageLine(const_cast<ImageLine&>(*this), u, d);
 }
 
 //! このスキャンラインの部分スキャンラインを生成する．
@@ -745,10 +720,10 @@ ImageLine<T>::operator ()(size_t u, size_t d) const
   \param d	部分スキャンラインの画素数
   \return	生成された部分スキャンライン
 */
-template <class T> inline ImageLine<T>
-ImageLine<T>::operator ()(size_t u, size_t d)
+template <class T, class ALLOC> inline ImageLine<T, ALLOC>
+ImageLine<T, ALLOC>::operator ()(size_t u, size_t d)
 {
-    return ImageLine<T>(*this, u, d);
+    return ImageLine(*this, u, d);
 }
     
 //! サブピクセル位置の画素値を線形補間で求める．
@@ -757,8 +732,8 @@ ImageLine<T>::operator ()(size_t u, size_t d)
   \param uf	サブピクセルで指定された位置
   \return	線形補間された画素値
 */
-template <class T> template <class S> inline T
-ImageLine<T>::at(S uf) const
+template <class T, class ALLOC> template <class S> inline T
+ImageLine<T, ALLOC>::at(S uf) const
 {
     const int	u  = floor(uf);
     const T*	in = data() + u;
@@ -771,13 +746,13 @@ ImageLine<T>::at(S uf) const
   \param src	読み込み元の先頭を指すポインタ
   \return	最後に読み込まれた画素の次の画素へのポインタ
 */
-template <class T> const YUV422*
-ImageLine<T>::copy(const YUV422* src)
+template <class T, class ALLOC> const YUV422*
+ImageLine<T, ALLOC>::copy(const YUV422* src)
 {
-    for (iterator dst = begin(); dst < end() - 1; )
+    for (auto dst = begin(); dst < end() - 1; )
     {
-	*dst++ = fromYUV<T>(src[0].y, src[0].x, src[1].x);
-	*dst++ = fromYUV<T>(src[1].y, src[0].x, src[1].x);
+	*dst++ = YUV444(src[0].y, src[0].x, src[1].x);
+	*dst++ = YUV444(src[1].y, src[0].x, src[1].x);
 	src += 2;
     }
     return src;
@@ -788,13 +763,13 @@ ImageLine<T>::copy(const YUV422* src)
   \param src	読み込み元の先頭を指すポインタ
   \return	最後に読み込まれた画素の次の画素へのポインタ
 */
-template <class T> const YUYV422*
-ImageLine<T>::copy(const YUYV422* src)
+template <class T, class ALLOC> const YUYV422*
+ImageLine<T, ALLOC>::copy(const YUYV422* src)
 {
-    for (iterator dst = begin(); dst < end() - 1; )
+    for (auto dst = begin(); dst < end() - 1; )
     {
-	*dst++ = fromYUV<T>(src[0].y, src[0].x, src[1].x);
-	*dst++ = fromYUV<T>(src[1].y, src[0].x, src[1].x);
+	*dst++ = YUV444(src[0].y, src[0].x, src[1].x);
+	*dst++ = YUV444(src[1].y, src[0].x, src[1].x);
 	src += 2;
     }
     return src;
@@ -805,15 +780,15 @@ ImageLine<T>::copy(const YUYV422* src)
   \param src	読み込み元の先頭を指すポインタ
   \return	最後に読み込まれた画素の次の画素へのポインタ
 */
-template <class T> const YUV411*
-ImageLine<T>::copy(const YUV411* src)
+template <class T, class ALLOC> const YUV411*
+ImageLine<T, ALLOC>::copy(const YUV411* src)
 {
-    for (iterator dst = begin(); dst < end() - 3; )
+    for (auto dst = begin(); dst < end() - 3; )
     {
-	*dst++ = fromYUV<T>(src[0].y0, src[0].x, src[1].x);
-	*dst++ = fromYUV<T>(src[0].y1, src[0].x, src[1].x);
-	*dst++ = fromYUV<T>(src[1].y0, src[0].x, src[1].x);
-	*dst++ = fromYUV<T>(src[1].y1, src[0].x, src[1].x);
+	*dst++ = YUV444(src[0].y0, src[0].x, src[1].x);
+	*dst++ = YUV444(src[0].y1, src[0].x, src[1].x);
+	*dst++ = YUV444(src[1].y0, src[0].x, src[1].x);
+	*dst++ = YUV444(src[1].y1, src[0].x, src[1].x);
 	src += 2;
     }
     return src;
@@ -824,397 +799,286 @@ ImageLine<T>::copy(const YUV411* src)
   \param src	読み込み元の先頭を指すポインタ
   \return	最後に読み込まれた画素の次の画素へのポインタ
 */
-template <class T> template <class S> const S*
-ImageLine<T>::copy(const S* src)
+template <class T, class ALLOC> template <class ITER> ITER
+ImageLine<T, ALLOC>::copy(ITER src)
 {
-    for (iterator dst = begin(); dst != end(); )
-	*dst++ = T(*src++);
+    for (auto dst = begin(); dst != end(); ++dst, ++src)
+	*dst = *src;
     return src;
 }
 
 //! インデックスを読み込み，ルックアップテーブルで変換する．
 /*!
-  \param src	読み込み元の先頭を指すポインタ
-  \param tbl	ルックアップテーブルの先頭を指すポインタ
-  \return	最後に読み込まれた画素の次の画素へのポインタ
+  \param src	読み込み元の先頭を指す反復子
+  \param tbl	ルックアップテーブルの先頭を指す反復子
+  \return	最後に読み込まれた画素の次の画素への反復子
 */
-template <class T> template <class S, class L> const S*
-ImageLine<T>::lookup(const S* src, const L* tbl)
+template <class T, class ALLOC> template <class ITER, class TBL> ITER 
+ImageLine<T, ALLOC>::lookup(ITER src, TBL tbl)
 {
-    for (iterator dst = begin(); dst != end(); )
-	*dst++ = T(*(tbl + *src++));
+    for (auto dst = begin(); dst != end(); ++dst, ++src)
+	*dst = T(tbl[*src]);
     return src;
 }
 
-//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
-/*!
-  \param src	読み込み元の先頭を指すポインタ
-  \return	最後に読み込まれた画素の次の画素へのポインタ
-*/
-template <class T> inline const T*
-ImageLine<T>::copy(const T* src)
-{
-    memcpy(data(), src, size() * sizeof(T));
-    return src + size();
-}
-
-//! スキャンラインの画素数を変更する．
-/*!
-  ただし，他のオブジェクトと記憶領域を共有しているスキャンラインの画素数を
-  変更することはできない．
-  \param d			新しい画素数
-  \return			dが元の画素数よりも大きければtrue，そう
-				でなければfalse
-  \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
-				に送出
-*/
-template <class T> inline bool
-ImageLine<T>::resize(size_t d)
-{
-    _lmost = 0;
-    _rmost = d;
-    return super::resize(d);
-}
-
-//! スキャンラインが内部で使用する記憶領域を指定したものに変更する．
-/*!
-  \param p	新しい記憶領域へのポインタ
-  \param d	新しい画素数
-*/
-template <class T> inline void
-ImageLine<T>::resize(T* p, size_t d)
-{
-    _lmost = 0;
-    _rmost = d;
-    super::resize(p, d);
-}
-
-template <>
-class ImageLine<YUV422> : public Array<YUV422>
+template <class ALLOC>
+class ImageLine<YUV422, ALLOC> : public Array<YUV422, 0, ALLOC>
 {
   private:
-    typedef Array<YUV422>			super;
+    typedef Array<YUV422, 0, ALLOC>	super;
 
   public:
-    explicit ImageLine(size_t d=0)
-	:super(d), _lmost(0), _rmost(d)				{}
-    ImageLine(YUV422* p, size_t d)
-	:super(p, d), _lmost(0), _rmost(d)			{}
-    ImageLine(ImageLine<YUV422>& l, size_t u, size_t d)
-	:super(l, u, d), _lmost(0), _rmost(d)			{}
-    ImageLine&		operator =(const YUV422& c)		;
-    const ImageLine	operator ()(size_t u, size_t d)	const	;
-    ImageLine		operator ()(size_t u, size_t d)		;
+    typedef typename super::pointer	pointer;
+    
+  public:
+    explicit ImageLine(size_t d=0)		:super(d)		{}
+    ImageLine(pointer p, size_t d)		:super(p, d)		{}
+    ImageLine(ImageLine& l, size_t u, size_t d) :super(l, u, d)		{}
+    ImageLine&		operator =(const YUV422& c)			;
+    const ImageLine	operator ()(size_t u, size_t d)		const	;
+    ImageLine		operator ()(size_t u, size_t d)			;
 
-    const YUV444*	copy(const YUV444* src)		;
-    const YUV422*	copy(const YUV422* src)		;
-    const YUV411*	copy(const YUV411* src)		;
-    template <class S>
-    const S*		copy(const S* src)		;
-    template <class S, class L>
-    const S*		lookup(const S* src,
-			       const L* tbl)		;
-    int			lmost()			const	{return _lmost;}
-    int			rmost()			const	{return _rmost;}
-    void		setLimits(int l, int r)		{_lmost = l;
-							 _rmost = r;}
-    bool		valid(int u)		const	{return (u >= _lmost &&
-								 u <  _rmost);}
-	
-    bool		resize(size_t d)			;
-    void		resize(YUV422* p, size_t d)	;
-
-  private:
-    int			_lmost;
-    int			_rmost;
+    using		super::data;
+    using		super::size;
+    using		super::begin;
+    using		super::end;
+    
+    const YUV444*	copy(const YUV444* src)				;
+    const YUV422*	copy(const YUV422* src)				;
+    const YUV411*	copy(const YUV411* src)				;
+    template <class ITER>
+    ITER		copy(ITER src)					;
+    template <class ITER, class TBL>
+    ITER		lookup(ITER src, TBL tbl)			;
 };
 
-inline ImageLine<YUV422>&
-ImageLine<YUV422>::operator =(const YUV422& c)
+template <class ALLOC> inline ImageLine<YUV422, ALLOC>&
+ImageLine<YUV422, ALLOC>::operator =(const YUV422& c)
 {
     super::operator =(c);
     return *this;
 }
     
-inline const ImageLine<YUV422>
-ImageLine<YUV422>::operator ()(size_t u, size_t d) const
+template <class ALLOC> inline const ImageLine<YUV422, ALLOC>
+ImageLine<YUV422, ALLOC>::operator ()(size_t u, size_t d) const
 {
-    return ImageLine<YUV422>(const_cast<ImageLine<YUV422>&>(*this), u, d);
+    return ImageLine(const_cast<ImageLine&>(*this), u, d);
 }
     
-inline ImageLine<YUV422>
-ImageLine<YUV422>::operator ()(size_t u, size_t d)
+template <class ALLOC> inline ImageLine<YUV422, ALLOC>
+ImageLine<YUV422, ALLOC>::operator ()(size_t u, size_t d)
 {
-    return ImageLine<YUV422>(*this, u, d);
+    return ImageLine<YUV422, ALLOC>(*this, u, d);
 }
     
-inline const YUV422*
-ImageLine<YUV422>::copy(const YUV422* src)
+template <class ALLOC> inline const YUV422*
+ImageLine<YUV422, ALLOC>::copy(const YUV422* src)
 {
     memcpy(data(), src, size() * sizeof(YUV422));
     return src + size();
 }
 
-template <class S> const S*
-ImageLine<YUV422>::copy(const S* src)
+template <class ALLOC> template <class ITER> ITER
+ImageLine<YUV422, ALLOC>::copy(ITER src)
 {
-    for (iterator dst = begin(); dst < end(); )
-	*dst++ = YUV422(*src++);
+    for (auto dst = begin(); dst < end(); ++dst, ++src)
+	*dst = YUV422(*src);
     return src;
 }
 
-template <class S, class L> const S*
-ImageLine<YUV422>::lookup(const S* src, const L* tbl)
+template <class ALLOC> template <class ITER, class TBL> ITER
+ImageLine<YUV422, ALLOC>::lookup(ITER src, TBL tbl)
 {
-    for (iterator dst = begin(); dst < end(); )
-	*dst++ = YUV422(*(tbl + *src++));
+    for (auto dst = begin(); dst < end(); ++dst, ++src)
+	*dst = YUV422(tbl[*src]);
     return src;
 }
 
-inline bool
-ImageLine<YUV422>::resize(size_t d)
-{
-    _lmost = 0;
-    _rmost = d;
-    return super::resize(d);
-}
-
-inline void
-ImageLine<YUV422>::resize(YUV422* p, size_t d)
-{
-    _lmost = 0;
-    _rmost = d;
-    super::resize(p, d);
-}
-
-template <>
-class ImageLine<YUYV422> : public Array<YUYV422>
+template <class ALLOC>
+class ImageLine<YUYV422, ALLOC> : public Array<YUYV422, 0, ALLOC>
 {
   private:
-    typedef Array<YUYV422>			super;
+    typedef Array<YUYV422, 0, ALLOC>	super;
 
   public:
-    explicit ImageLine(size_t d=0)
-	:super(d), _lmost(0), _rmost(d)				{}
-    ImageLine(YUYV422* p, size_t d)
-	:super(p, d), _lmost(0), _rmost(d)			{}
-    ImageLine(ImageLine<YUYV422>& l, size_t u, size_t d)
-	:super(l, u, d), _lmost(0), _rmost(d)			{}
-    ImageLine&		operator =(const YUYV422& c)		;
-    const ImageLine	operator ()(size_t u, size_t d)	const	;
-    ImageLine		operator ()(size_t u, size_t d)		;
+    typedef typename super::pointer	pointer;
+    
+  public:
+    explicit ImageLine(size_t d=0)		:super(d)		{}
+    ImageLine(pointer p, size_t d)		:super(p, d)		{}
+    ImageLine(ImageLine& l, size_t u, size_t d)	:super(l, u, d)		{}
+    ImageLine&		operator =(const YUYV422& c)			;
+    const ImageLine	operator ()(size_t u, size_t d)		const	;
+    ImageLine		operator ()(size_t u, size_t d)			;
 
-    const YUV444*	copy(const YUV444* src)		;
-    const YUYV422*	copy(const YUYV422* src)	;
-    const YUV411*	copy(const YUV411* src)		;
-    template <class S>
-    const S*		copy(const S* src)		;
-    template <class S, class L>
-    const S*		lookup(const S* src,
-			       const L* tbl)		;
-    int			lmost()			const	{return _lmost;}
-    int			rmost()			const	{return _rmost;}
-    void		setLimits(int l, int r)		{_lmost = l;
-							 _rmost = r;}
-    bool		valid(int u)		const	{return (u >= _lmost &&
-								 u <  _rmost);}
-	
-    bool		resize(size_t d)		;
-    void		resize(YUYV422* p, size_t d)	;
-
-  private:
-    int			_lmost;
-    int			_rmost;
+    using		super::size;
+    using		super::data;
+    using		super::begin;
+    using		super::end;
+    
+    const YUV444*	copy(const YUV444* src)				;
+    const YUYV422*	copy(const YUYV422* src)			;
+    const YUV411*	copy(const YUV411* src)				;
+    template <class ITER>
+    ITER		copy(ITER src)					;
+    template <class ITER, class TBL>
+    ITER		lookup(ITER src, TBL tbl)			;
 };
     
-inline ImageLine<YUYV422>&
-ImageLine<YUYV422>::operator =(const YUYV422& c)
+template <class ALLOC> inline ImageLine<YUYV422, ALLOC>&
+ImageLine<YUYV422, ALLOC>::operator =(const YUYV422& c)
 {
     super::operator =(c);
     return *this;
 }
     
-inline const ImageLine<YUYV422>
-ImageLine<YUYV422>::operator ()(size_t u, size_t d) const
+template <class ALLOC> inline const ImageLine<YUYV422, ALLOC>
+ImageLine<YUYV422, ALLOC>::operator ()(size_t u, size_t d) const
 {
-    return ImageLine<YUYV422>(const_cast<ImageLine<YUYV422>&>(*this), u, d);
+    return ImageLine(const_cast<ImageLine&>(*this), u, d);
 }
     
-inline ImageLine<YUYV422>
-ImageLine<YUYV422>::operator ()(size_t u, size_t d)
+template <class ALLOC> inline ImageLine<YUYV422, ALLOC>
+ImageLine<YUYV422, ALLOC>::operator ()(size_t u, size_t d)
 {
-    return ImageLine<YUYV422>(*this, u, d);
+    return ImageLine(*this, u, d);
 }
     
-inline const YUYV422*
-ImageLine<YUYV422>::copy(const YUYV422* src)
+template <class ALLOC> inline const YUYV422*
+ImageLine<YUYV422, ALLOC>::copy(const YUYV422* src)
 {
     memcpy(data(), src, size() * sizeof(YUYV422));
     return src + size();
 }
 
-template <class S> const S*
-ImageLine<YUYV422>::copy(const S* src)
+template <class ALLOC> template <class ITER> ITER
+ImageLine<YUYV422, ALLOC>::copy(ITER src)
 {
-    for (iterator dst = begin(); dst < end(); )
-	*dst++ = YUYV422(*src++);
+    for (auto dst = begin(); dst < end(); ++dst, ++src)
+	*dst = YUYV422(*src);
     return src;
 }
 
-template <class S, class L> const S*
-ImageLine<YUYV422>::lookup(const S* src, const L* tbl)
+template <class ALLOC> template <class ITER, class TBL> ITER
+ImageLine<YUYV422, ALLOC>::lookup(ITER src, TBL tbl)
 {
-    for (iterator dst = begin(); dst < end(); )
-	*dst++ = YUYV422(*(tbl + *src++));
+    for (auto dst = begin(); dst < end(); ++dst, ++src)
+	*dst = YUYV422(tbl[*src]);
     return src;
 }
 
-inline bool
-ImageLine<YUYV422>::resize(size_t d)
-{
-    _lmost = 0;
-    _rmost = d;
-    return super::resize(d);
-}
-
-inline void
-ImageLine<YUYV422>::resize(YUYV422* p, size_t d)
-{
-    _lmost = 0;
-    _rmost = d;
-    super::resize(p, d);
-}
-
-template <>
-class ImageLine<YUV411> : public Array<YUV411>
+template <class ALLOC>
+class ImageLine<YUV411, ALLOC> : public Array<YUV411, 0, ALLOC>
 {
   private:
-    typedef Array<YUV411>			super;
+    typedef Array<YUV411, 0, ALLOC>	super;
 
   public:
-    explicit ImageLine(size_t d=0)
-	:super(d/2), _lmost(0), _rmost(d)			{}
-    ImageLine(YUV411* p, size_t d)
-	:super(p, d/2), _lmost(0), _rmost(d)			{}
-    ImageLine(ImageLine<YUV411>& l, size_t u, size_t d)
-	:super(l, u/2, d/2), _lmost(0), _rmost(d)		{}
-    ImageLine&		operator =(const YUV411& c)		;
-    const ImageLine	operator ()(size_t u, size_t d)	const	;
-    ImageLine		operator ()(size_t u, size_t d)		;
+    typedef typename super::pointer	pointer;
     
-    const YUV444*	copy(const YUV444* src)		;
-    const YUV422*	copy(const YUV422* src)		;
-    const YUYV422*	copy(const YUYV422* src)	;
-    const YUV411*	copy(const YUV411* src)		;
-    template <class S>
-    const S*		copy(const S* src)		;
-    template <class S, class L>
-    const S*		lookup(const S* src,
-			       const L* tbl)		;
-    int			lmost()			const	{return _lmost;}
-    int			rmost()			const	{return _rmost;}
-    void		setLimits(int l, int r)		{_lmost = l;
-							 _rmost = r;}
-    bool		valid(int u)		const	{return (u >= _lmost &&
-								 u <  _rmost);}
-	
-    bool		resize(size_t d)		;
-    void		resize(YUV411* p, size_t d)	;
+  public:
+    explicit ImageLine(size_t d=0)		:super(d/2)		{}
+    ImageLine(pointer p, size_t d)		:super(p, d/2)		{}
+    ImageLine(ImageLine& l, size_t u, size_t d)	:super(l, u/2, d/2)	{}
+    ImageLine&		operator =(const YUV411& c)			;
+    const ImageLine	operator ()(size_t u, size_t d)		const	;
+    ImageLine		operator ()(size_t u, size_t d)			;
 
-  private:
-    int			_lmost;
-    int			_rmost;
+    using		super::data;
+    using		super::size;
+    using		super::begin;
+    using		super::end;
+    
+    const YUV444*	copy(const YUV444* src)				;
+    const YUV422*	copy(const YUV422* src)				;
+    const YUYV422*	copy(const YUYV422* src)			;
+    const YUV411*	copy(const YUV411* src)				;
+    template <class ITER>
+    ITER		copy(ITER src)					;
+    template <class ITER, class TBL>
+    ITER		lookup(ITER src, TBL tbl)			;
+
+    bool		resize(size_t d)				;
+    void		resize(pointer p, size_t d)			;
 };
 
-inline ImageLine<YUV411>&
-ImageLine<YUV411>::operator =(const YUV411& c)
+template <class ALLOC> inline ImageLine<YUV411, ALLOC>&
+ImageLine<YUV411, ALLOC>::operator =(const YUV411& c)
 {
     super::operator =(c);
     return *this;
 }
     
-inline const ImageLine<YUV411>
-ImageLine<YUV411>::operator ()(size_t u, size_t d) const
+template <class ALLOC> inline const ImageLine<YUV411, ALLOC>
+ImageLine<YUV411, ALLOC>::operator ()(size_t u, size_t d) const
 {
-    return ImageLine<YUV411>(const_cast<ImageLine<YUV411>&>(*this), u, d);
+    return ImageLine(const_cast<ImageLine&>(*this), u, d);
 }
     
-inline ImageLine<YUV411>
-ImageLine<YUV411>::operator ()(size_t u, size_t d)
+template <class ALLOC> inline ImageLine<YUV411, ALLOC>
+ImageLine<YUV411, ALLOC>::operator ()(size_t u, size_t d)
 {
-    return ImageLine<YUV411>(*this, u, d);
+    return ImageLine(*this, u, d);
 }
     
-inline const YUV411*
-ImageLine<YUV411>::copy(const YUV411* src)
+template <class ALLOC> inline const YUV411*
+ImageLine<YUV411, ALLOC>::copy(const YUV411* src)
 {
     memcpy(data(), src, size() * sizeof(YUV411));
     return src + size();
 }
 
-template <class S> const S*
-ImageLine<YUV411>::copy(const S* src)
+template <class ALLOC> template <class ITER> ITER
+ImageLine<YUV411, ALLOC>::copy(ITER src)
 {
-    for (iterator dst = begin(); dst < end(); )
+    for (auto dst = begin(); dst < end(); ++dst)
     {
-	*dst++ = YUV411(*src);
+	*dst = YUV411(*src);
 	src += 2;
     }
     return src;
 }
 
-template <class S, class L> const S*
-ImageLine<YUV411>::lookup(const S* src, const L* tbl)
+template <class ALLOC> template <class ITER, class TBL> ITER
+ImageLine<YUV411, ALLOC>::lookup(ITER src, TBL tbl)
 {
-    for (iterator dst = begin(); dst < end(); )
+    for (auto dst = begin(); dst < end(); ++dst)
     {
-	*dst++ = YUV411(*(tbl + *src));
+	*dst = YUV411(tbl[*src]);
 	src += 2;
     }
     return src;
 }
 
-inline bool
-ImageLine<YUV411>::resize(size_t d)
+template <class ALLOC> inline bool
+ImageLine<YUV411, ALLOC>::resize(size_t d)
 {
-    _lmost = 0;
-    _rmost = d;
     return super::resize(d/2);
 }
 
-inline void
-ImageLine<YUV411>::resize(YUV411* p, size_t d)
+template <class ALLOC> inline void
+ImageLine<YUV411, ALLOC>::resize(pointer p, size_t d)
 {
-    _lmost = 0;
-    _rmost = d;
     super::resize(p, d/2);
 }
 
 /************************************************************************
-*  class Image<T>:							*
+*  class Image<T, ALLOC>						*
 ************************************************************************/
 //! T型の画素を持つ画像を表すクラス
 /*!
   \param T	画素の型
+  \param ALLOC	アロケータの型
 */
-template <class T>
-class Image : public Array2<ImageLine<T> >, public ImageBase
+template <class T, class ALLOC=std::allocator<T> >
+class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
 {
   private:
-    typedef Array2<ImageLine<T> >			super;
+    typedef Array2<ImageLine<T, ALLOC> >		super;
     
   public:
     typedef typename super::element_type		element_type;
-    typedef typename super::value_type			value_type;
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::reference			reference;
-    typedef typename super::const_reference		const_reference;
     typedef typename super::pointer			pointer;
-    typedef typename super::const_pointer		const_pointer;
-    typedef typename super::iterator			iterator;
-    typedef typename super::const_iterator		const_iterator;
-    typedef typename super::reverse_iterator		reverse_iterator;
-    typedef typename super::const_reverse_iterator	const_reverse_iterator;
 
   public:
   //! 幅と高さを指定して画像を生成する．
@@ -1232,7 +1096,7 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     \param w	画像の幅
     \param h	画像の高さ
   */
-    Image(T* p, size_t w, size_t h)
+    Image(pointer p, size_t w, size_t h)
 	:super(p, h, w), ImageBase()				{}
 
   //! 指定された画像の部分画像を生成する．
@@ -1243,13 +1107,13 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     \param w	部分画像の幅
     \param h	部分画像の高さ
   */
-    Image(Image<T>& i, size_t u, size_t v, size_t w, size_t h)
+    Image(Image& i, size_t u, size_t v, size_t w, size_t h)
 	:super(i, v, u, h, w), ImageBase(i)			{}
 
     Image&		operator =(const element_type& c)	;
-    const Image<T>	operator ()(size_t u, size_t v,
+    const Image		operator ()(size_t u, size_t v,
 				    size_t w, size_t h)	const	;
-    Image<T>		operator ()(size_t u, size_t v,
+    Image		operator ()(size_t u, size_t v,
 				    size_t w, size_t h)		;
 
 #if !defined(__NVCC__)
@@ -1303,12 +1167,15 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     
     size_t	width()			const	{return super::ncol();}
     size_t	height()		const	{return super::nrow();}
-    
+
     using	super::begin;
+    using	super::cbegin;
     using	super::end;
+    using	super::cend;
     using	super::rbegin;
+    using	super::crbegin;
     using	super::rend;
-    using	super::data;
+    using	super::crend;
 
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out,
@@ -1335,8 +1202,8 @@ class Image : public Array2<ImageLine<T> >, public ImageBase
     virtual void	_resize(size_t h, size_t w, const TypeInfo&)	;
 };
 
-template <class T> inline Image<T>&
-Image<T>::operator =(const element_type& c)
+template <class T, class ALLOC> inline Image<T, ALLOC>&
+Image<T, ALLOC>::operator =(const element_type& c)
 {
     super::operator =(c);
     return *this;
@@ -1350,10 +1217,10 @@ Image<T>::operator =(const element_type& c)
   \param h	部分画像の高さ
   \return	生成された部分画像
 */
-template <class T> inline const Image<T>
-Image<T>::operator ()(size_t u, size_t v, size_t w, size_t h) const
+template <class T, class ALLOC> inline const Image<T, ALLOC>
+Image<T, ALLOC>::operator ()(size_t u, size_t v, size_t w, size_t h) const
 {
-    return Image<T>(const_cast<Image<T>&>(*this), u, v, w, h);
+    return Image(const_cast<Image&>(*this), u, v, w, h);
 }
     
 //! この画像の部分画像を生成する．
@@ -1364,10 +1231,10 @@ Image<T>::operator ()(size_t u, size_t v, size_t w, size_t h) const
   \param h	部分画像の高さ
   \return	生成された部分画像
 */
-template <class T> inline Image<T>
-Image<T>::operator ()(size_t u, size_t v, size_t w, size_t h)
+template <class T, class ALLOC> inline Image<T, ALLOC>
+Image<T, ALLOC>::operator ()(size_t u, size_t v, size_t w, size_t h)
 {
-    return Image<T>(*this, u, v, w, h);
+    return Image(*this, u, v, w, h);
 }
     
 //! サブピクセル位置の画素値を双線形補間で求める．
@@ -1376,8 +1243,8 @@ Image<T>::operator ()(size_t u, size_t v, size_t w, size_t h)
   \param p	サブピクセルで指定された位置
   \return	双線形補間された画素値
 */
-template <class T> template <class S> inline T
-Image<T>::at(const Point2<S>& p) const
+template <class T, class ALLOC> template <class S> inline T
+Image<T, ALLOC>::at(const Point2<S>& p) const
 {
     const int	v    = floor(p[1]);
     const T	out0 = (*this)[v].at(p[0]);
@@ -1390,8 +1257,8 @@ Image<T>::at(const Point2<S>& p) const
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-template <class T> inline std::istream&
-Image<T>::restore(std::istream& in)
+template <class T, class ALLOC> inline std::istream&
+Image<T, ALLOC>::restore(std::istream& in)
 {
     return restoreData(in, restoreHeader(in));
 }
@@ -1403,8 +1270,8 @@ Image<T>::restore(std::istream& in)
 		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */
-template <class T> inline std::ostream&
-Image<T>::save(std::ostream& out, Type type) const
+template <class T, class ALLOC> inline std::ostream&
+Image<T, ALLOC>::save(std::ostream& out, Type type) const
 {
     return saveData(out, saveHeader(out, type));
 }
@@ -1416,8 +1283,8 @@ Image<T>::save(std::ostream& out, Type type) const
 			(読み込み先の画像の画素タイプではない)
   \return		inで指定した入力ストリーム
 */
-template <class T> std::istream&
-Image<T>::restoreData(std::istream& in, const TypeInfo& typeInfo)
+template <class T, class ALLOC> std::istream&
+Image<T, ALLOC>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 {
     switch (typeInfo.type)
     {
@@ -1450,7 +1317,7 @@ Image<T>::restoreData(std::istream& in, const TypeInfo& typeInfo)
       case BMP_32:
 	return restoreRows<BGRA>(in, typeInfo);
       default:
-	throw std::runtime_error("Image<T>::restoreData(): unknown pixel type!!");
+	throw std::runtime_error("Image<T, ALLOC>::restoreData(): unknown pixel type!!");
     }
     return in;
 }
@@ -1462,8 +1329,8 @@ Image<T>::restoreData(std::istream& in, const TypeInfo& typeInfo)
 		この画像オブジェクトの画素タイプで書き出される．
   \return	outで指定した出力ストリーム
 */
-template <class T> std::ostream&
-Image<T>::saveData(std::ostream& out, Type type) const
+template <class T, class ALLOC> std::ostream&
+Image<T, ALLOC>::saveData(std::ostream& out, Type type) const
 {
     if (type == DEFAULT)
 	type = defaultType();
@@ -1497,70 +1364,71 @@ Image<T>::saveData(std::ostream& out, Type type) const
       case BMP_32:
 	return saveRows<BGRA, BGRA>(out, type);
       default:
-	throw std::runtime_error("Image<T>::saveData(): unknown pixel type!!");
+	throw std::runtime_error("Image<T, ALLOC>::saveData(): unknown pixel type!!");
     }
     return out;
 }
 
-template <class T> template <class S> std::istream&
-Image<T>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
+template <class T, class ALLOC> template <class S> std::istream&
+Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
 {
-    const size_t		npads = type2nbytes(typeInfo.type, true);
+    const size_t	npads = type2nbytes(typeInfo.type, true);
     ImageLine<S>	buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (reverse_iterator line = rbegin(); line != rend(); ++line)
+	for (auto line = rbegin(); line != rend(); ++line)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->copy(buf.data());
+	    line->copy(buf.cbegin());
 	}
     }
     else
     {
-	for (iterator line = begin(); line != end(); ++line)
+	for (auto line = begin(); line != end(); ++line)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->copy(buf.data());
+	    line->copy(buf.cbegin());
 	}
     }
 
     return in;
 }
 
-template <class T> template <class S, class L> std::istream&
-Image<T>::restoreAndLookupRows(std::istream& in, const TypeInfo& typeInfo)
+template <class T, class ALLOC> template <class S, class L> std::istream&
+Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
+				      const TypeInfo& typeInfo)
 {
     Array<L>	colormap(typeInfo.ncolors);
     colormap.restore(in);
 	
-    const size_t		npads = type2nbytes(typeInfo.type, true);
+    const size_t	npads = type2nbytes(typeInfo.type, true);
     ImageLine<S>	buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (reverse_iterator line = rbegin(); line != rend(); ++line)    
+	for (auto line = rbegin(); line != rend(); ++line)    
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->lookup(buf.data(), colormap.data());
+	    line->lookup(buf.cbegin(), colormap.cbegin());
 	}
     }
     else
     {
-	for (iterator line = begin(); line != end(); ++line)    
+	for (auto line = begin(); line != end(); ++line)    
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->lookup(buf.data(), colormap.data());
+	    line->lookup(buf.cbegin(), colormap.cbegin());
 	}
     }
 
     return in;
 }
 
-template <class T> template <class D, class L> std::ostream&
-Image<T>::saveRows(std::ostream& out, Type type) const
+template <class T, class ALLOC> template <class D, class L> std::ostream&
+Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
 {
     TypeInfo	typeInfo(type);
 
@@ -1573,18 +1441,18 @@ Image<T>::saveRows(std::ostream& out, Type type) const
     ImageLine<D>	buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (const_reverse_iterator line = rbegin(); line != rend(); ++line)
+	for (auto line = crbegin(); line != crend(); ++line)
 	{
-	    buf.copy(line->data());
+	    buf.copy(line->cbegin());
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}
     }
     else
     {
-	for (const_iterator line = begin(); line != end(); ++line)
+	for (auto line = cbegin(); line != cend(); ++line)
 	{
-	    buf.copy(line->data());
+	    buf.copy(line->cbegin());
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}
@@ -1593,88 +1461,34 @@ Image<T>::saveRows(std::ostream& out, Type type) const
     return out;
 }
 
-template <class T> size_t
-Image<T>::_width() const
+template <class T, class ALLOC> size_t
+Image<T, ALLOC>::_width() const
 {
-    return Image<T>::width();	// Don't call ImageBase::width!
+    return Image::width();		// Don't call ImageBase::width!
 }
 
-template <class T> size_t
-Image<T>::_height() const
+template <class T, class ALLOC> size_t
+Image<T, ALLOC>::_height() const
 {
-    return Image<T>::height();	// Don't call ImageBase::height!
+    return Image::height();		// Don't call ImageBase::height!
 }
 
-template <class T> ImageBase::Type
-Image<T>::_defaultType() const
+template <class T, class ALLOC> ImageBase::Type
+Image<T, ALLOC>::_defaultType() const
 {
-    return Image<T>::defaultType();
+    return Image::defaultType();
 }
 
-template <class T> inline ImageBase::Type
-Image<T>::defaultType() const
+template <class T, class ALLOC> inline ImageBase::Type
+Image<T, ALLOC>::defaultType() const
 {
-    return RGB_24;
+    return ImageBase::type2type<T>::value;
 }
 
-template <> inline ImageBase::Type
-Image<u_char>::defaultType() const
+template <class T, class ALLOC> void
+Image<T, ALLOC>::_resize(size_t h, size_t w, const TypeInfo&)
 {
-    return U_CHAR;
-}
-
-template <> inline ImageBase::Type
-Image<short>::defaultType() const
-{
-    return SHORT;
-}
-
-template <> inline ImageBase::Type
-Image<int>::defaultType() const
-{
-    return INT;
-}
-
-template <> inline ImageBase::Type
-Image<float>::defaultType() const
-{
-    return FLOAT;
-}
-
-template <> inline ImageBase::Type
-Image<double>::defaultType() const
-{
-    return DOUBLE;
-}
-
-template <> inline ImageBase::Type
-Image<YUV444>::defaultType() const
-{
-    return YUV_444;
-}
-
-template <> inline ImageBase::Type
-Image<YUV422>::defaultType() const
-{
-    return YUV_422;
-}
-
-template <> inline ImageBase::Type
-Image<YUYV422>::defaultType() const
-{
-    return YUYV_422;
-}
-
-template <> inline ImageBase::Type
-Image<YUV411>::defaultType() const
-{
-    return YUV_411;
-}
-
-template <class T> void
-Image<T>::_resize(size_t h, size_t w, const TypeInfo&)
-{
-    Image<T>::resize(h, w);		// Don't call ImageBase::resize!
+    Image<T, ALLOC>::resize(h, w);	// Don't call ImageBase::resize!
 }
 
 /************************************************************************

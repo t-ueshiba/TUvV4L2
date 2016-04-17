@@ -594,6 +594,29 @@ class Array : public Buf<T, D, ALLOC>
 		    return *this;
 		}
 #endif	// __NVCC__
+  //! この配列と記憶領域を共有した部分配列を生成する．
+  /*!
+    \param i	部分配列の第0成分を指定するindex
+    \param d	部分配列の次元(要素数)
+    \return	生成された部分配列
+  */
+    Array<T>	operator ()(size_t i, size_t d)
+		{
+		    return Array<T>(*this, i, d);
+		}
+
+  //! この配列と記憶領域を共有した部分配列を生成する．
+  /*!
+    \param i	部分配列の第0成分を指定するindex
+    \param d	部分配列の次元(要素数)
+    \return	生成された部分配列
+  */
+    const Array<T>
+		operator ()(size_t i, size_t d) const
+		{
+		    return Array<T>(const_cast<Array&>(*this), i, d);
+		}
+    
   //! 他の配列に自分を代入する．
   /*!
     \param expr	コピー先の配列
@@ -1011,6 +1034,32 @@ class Array2 : public Array<T, R>
 		    return *this;
 		}
 #endif	// __NVCC__
+  //! この配列と記憶領域を共有した部分配列を生成する．
+  /*!
+    \param i	部分配列の左上隅成分となる行を指定するindex
+    \param j	部分配列の左上隅成分となる列を指定するindex
+    \param r	部分配列の行数
+    \param c	部分配列の列数
+    \return	生成された部分配列
+  */
+    Array2<T>	operator ()(size_t i, size_t j, size_t r, size_t c)
+		{
+		    return Array2<T>(*this, i, j, r, c);
+		}
+
+  /*!
+    \param i	部分配列の左上隅成分となる行を指定するindex
+    \param j	部分配列の左上隅成分となる列を指定するindex
+    \param r	部分配列の行数
+    \param c	部分配列の列数
+    \return	生成された部分配列
+  */
+    const Array2<T>
+		operator ()(size_t i, size_t j, size_t r, size_t c) const
+		{
+		    return Array2<T>(const_cast<Array2&>(*this), i, j, r, c);
+		}
+    
   //! 他の配列に自分を代入する．
   /*!
     \param a	コピー先の配列

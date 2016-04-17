@@ -92,7 +92,7 @@ class Profiler
 		    if (n != _active)
 		    {
 			if (_active >= 0)	// 稼働中のタイマがあれば...
-			{			// 起動時刻から現在までの時間を稼働中のタイマに加算
+			{	// 起動時刻から現在までの時間を稼働中のタイマに加算
 			    auto	t1 = clock::now();
 			    _accums[_active] += (t1 - _t0);
 			    _active = -1;		// タイマを停止
