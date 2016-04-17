@@ -871,11 +871,50 @@ ImageLine<YUV422, ALLOC>::operator ()(size_t u, size_t d)
     return ImageLine<YUV422, ALLOC>(*this, u, d);
 }
     
+template <class ALLOC> const YUV444*
+ImageLine<YUV422, ALLOC>::copy(const YUV444* src)
+{
+    for (auto dst = begin(); dst < end() - 1; )
+    {
+	dst->x = src->u;
+	dst->y = src->y;
+	++dst;
+	dst->x = src->v;
+	++src;
+	dst->y = src->y;
+	++dst;
+	++src;
+    }
+    return src;
+}
+
 template <class ALLOC> inline const YUV422*
 ImageLine<YUV422, ALLOC>::copy(const YUV422* src)
 {
     memcpy(data(), src, size() * sizeof(YUV422));
     return src + size();
+}
+
+template <class ALLOC> const YUV411*
+ImageLine<YUV422, ALLOC>::copy(const YUV411* src)
+{
+    for (auto dst = begin(); dst < end() - 3; )
+    {
+	dst->x = src[0].x;
+	dst->y = src[0].y0;
+	++dst;
+	dst->x = src[1].x;
+	dst->y = src[0].y1;
+	++dst;
+	dst->x = src[0].x;
+	dst->y = src[1].y0;
+	++dst;
+	dst->x = src[1].x;
+	dst->y = src[1].y1;
+	++dst;
+	src += 2;
+    }
+    return src;
 }
 
 template <class ALLOC> template <class ITER> ITER
@@ -944,11 +983,50 @@ ImageLine<YUYV422, ALLOC>::operator ()(size_t u, size_t d)
     return ImageLine(*this, u, d);
 }
     
+template <class ALLOC> const YUV444*
+ImageLine<YUYV422, ALLOC>::copy(const YUV444* src)
+{
+    for (auto dst = begin(); dst < end() - 1; )
+    {
+	dst->y = src->y;
+	dst->x = src->u;
+	++dst;
+	dst->x = src->v;
+	++src;
+	dst->y = src->y;
+	++dst;
+	++src;
+    }
+    return src;
+}
+
 template <class ALLOC> inline const YUYV422*
 ImageLine<YUYV422, ALLOC>::copy(const YUYV422* src)
 {
     memcpy(data(), src, size() * sizeof(YUYV422));
     return src + size();
+}
+
+template <class ALLOC> const YUV411*
+ImageLine<YUYV422, ALLOC>::copy(const YUV411* src)
+{
+    for (auto dst = begin(); dst < end() - 3; )
+    {
+	dst->y = src[0].y0;
+	dst->x = src[0].x;
+	++dst;
+	dst->y = src[0].y1;
+	dst->x = src[1].x;
+	++dst;
+	dst->y = src[1].y0;
+	dst->x = src[0].x;
+	++dst;
+	dst->y = src[1].y1;
+	dst->x = src[1].x;
+	++dst;
+	src += 2;
+    }
+    return src;
 }
 
 template <class ALLOC> template <class ITER> ITER
@@ -1021,6 +1099,60 @@ ImageLine<YUV411, ALLOC>::operator ()(size_t u, size_t d)
     return ImageLine(*this, u, d);
 }
     
+template <class ALLOC> const YUV444*
+ImageLine<YUV411, ALLOC>::copy(const YUV444* src)
+{
+    for (auto dst = begin(); dst < end() - 1; )
+    {
+	dst->x  = src[0].u;
+	dst->y0 = src[0].y;
+	dst->y1 = src[1].y;
+	++dst;
+	dst->x  = src[0].v;
+	dst->y0 = src[2].y;
+	dst->y1 = src[3].y;
+	++dst;
+	src += 4;
+    }
+    return src;
+}
+
+template <class ALLOC> const YUV422*
+ImageLine<YUV411, ALLOC>::copy(const YUV422* src)
+{
+    for (auto dst = begin(); dst < end() - 1; )
+    {
+	dst->x  = src[0].x;
+	dst->y0 = src[0].y;
+	dst->y1 = src[1].y;
+	++dst;
+	dst->x  = src[1].x;
+	dst->y0 = src[2].y;
+	dst->y1 = src[3].y;
+	++dst;
+	src += 4;
+    }
+    return src;
+}
+ 
+template <class ALLOC> const YUYV422*
+ImageLine<YUV411, ALLOC>::copy(const YUYV422* src)
+{
+    for (auto dst = begin(); dst < end() - 1; )
+    {
+	dst->x  = src[0].x;
+	dst->y0 = src[0].y;
+	dst->y1 = src[1].y;
+	++dst;
+	dst->x  = src[1].x;
+	dst->y0 = src[2].y;
+	dst->y1 = src[3].y;
+	++dst;
+	src += 4;
+    }
+    return src;
+}
+ 
 template <class ALLOC> inline const YUV411*
 ImageLine<YUV411, ALLOC>::copy(const YUV411* src)
 {

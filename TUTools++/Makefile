@@ -177,7 +177,6 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		GenericImage.cc \
 		Image++.inst.cc \
 		ImageBase.cc \
-		ImageLine.cc \
 		PM16C_04.cc \
 		Random.cc \
 		Rectify.cc \
@@ -199,7 +198,6 @@ OBJS		= BlockDiagonalMatrix++.inst.o \
 		GenericImage.o \
 		Image++.inst.o \
 		ImageBase.o \
-		ImageLine.o \
 		PM16C_04.o \
 		Random.o \
 		Rectify.o \
@@ -315,9 +313,6 @@ Image++.inst.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 ImageBase.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h TU/pair.h \
 	TU/Minimize.h TU/Camera++.h TU/Manip.h
-ImageLine.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
-	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h TU/pair.h \
-	TU/Minimize.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 Random.o: TU/Random.h TU/types.h windows/fakeWindows.h
 Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/Geometry++.h \
