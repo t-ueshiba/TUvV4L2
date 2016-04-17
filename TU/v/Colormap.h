@@ -275,37 +275,25 @@ Colormap::getUnderlayPixel(T val, u_int u, u_int v) const
 template <> inline u_long
 Colormap::getUnderlayPixel<YUV444>(YUV444 yuv, u_int u, u_int v) const
 {
-    return getUnderlayPixel(fromYUV<BGR>(yuv.y, yuv.u, yuv.v), u, v);
+    return getUnderlayPixel(BGR(yuv), u, v);
 }
 
 inline u_long
 Colormap::getUnderlayPixel(const YUV422& yuv, u_int u, u_int v) const
 {
     if (u & 0x1)
-    {
-	u_char	uu = (&yuv)[-1].x;
-	return getUnderlayPixel(fromYUV<BGR>(yuv.y, uu, yuv.x), u, v);
-    }
+	return getUnderlayPixel(BGR(YUV444(yuv.y, (&yuv)[-1].x, yuv.x)), u, v);
     else
-    {
-	u_char	vv = (&yuv)[1].x;
-	return getUnderlayPixel(fromYUV<BGR>(yuv.y, yuv.x, vv), u, v);
-    }
+	return getUnderlayPixel(BGR(YUV444(yuv.y, yuv.x, (&yuv)[1].x)), u, v);
 }
 
 inline u_long
 Colormap::getUnderlayPixel(const YUYV422& yuv, u_int u, u_int v) const
 {
     if (u & 0x1)
-    {
-	u_char	uu = (&yuv)[-1].x;
-	return getUnderlayPixel(fromYUV<BGR>(yuv.y, uu, yuv.x), u, v);
-    }
+	return getUnderlayPixel(BGR(YUV444(yuv.y, (&yuv)[-1].x, yuv.x)), u, v);
     else
-    {
-	u_char	vv = (&yuv)[1].x;
-	return getUnderlayPixel(fromYUV<BGR>(yuv.y, yuv.x, vv), u, v);
-    }
+	return getUnderlayPixel(BGR(YUV444(yuv.y, yuv.x, (&yuv)[1].x)), u, v);
 }
 
 inline u_long
@@ -314,24 +302,13 @@ Colormap::getUnderlayPixel(const YUV411& yuv, u_int u, u_int v) const
     switch (u % 4)
     {
       case 0:
-      {
-	u_char	vv = (&yuv)[1].x;
-	return getUnderlayPixel(fromYUV<BGR>(yuv.y0, yuv.x, vv), u, v);
-      }
+	return getUnderlayPixel(BGR(YUV444(yuv.y0, yuv.x, (&yuv)[1].x)), u, v);
       case 1:
-      {
-	u_char	vv = (&yuv)[1].x;
-	return getUnderlayPixel(fromYUV<BGR>(yuv.y1, yuv.x, vv),
-				u, v);
-      }
+	return getUnderlayPixel(BGR(YUV444(yuv.y1, yuv.x, (&yuv)[1].x)), u, v);
       case 2:
-      {
-	u_char	uu = (&yuv)[-1].x;
-	return getUnderlayPixel(fromYUV<BGR>(yuv.y0, uu, yuv.x), u, v);
-      }
+	return getUnderlayPixel(BGR(YUV444(yuv.y0, (&yuv)[-1].x, yuv.x)), u, v);
     }
-    u_char	uu = (&yuv)[-1].x;
-    return getUnderlayPixel(fromYUV<BGR>(yuv.y1, uu, yuv.x), u, v);
+    return getUnderlayPixel(BGR(YUV444(yuv.y1, (&yuv)[-1].x, yuv.x)), u, v);
 }
 
 inline u_long
