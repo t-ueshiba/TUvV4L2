@@ -168,7 +168,7 @@ HDRS		= TU/Array++.h \
 		TU/tuple.h \
 		TU/types.h
 SRCS		= BlockDiagonalMatrix++.inst.cc \
-		ConversionFromYUV.cc \
+		ColorConverter.cc \
 		CorrectIntensity.cc \
 		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
@@ -190,7 +190,7 @@ SRCS		= BlockDiagonalMatrix++.inst.cc \
 		io.cc \
 		manipulators.cc
 OBJS		= BlockDiagonalMatrix++.inst.o \
-		ConversionFromYUV.o \
+		ColorConverter.o \
 		CorrectIntensity.o \
 		EdgeDetector.o \
 		FIRGaussianCoefficients.o \
@@ -220,7 +220,7 @@ include $(PROJECT)/lib/common.mk
 ###
 BlockDiagonalMatrix++.inst.o: TU/BlockDiagonalMatrix++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h TU/pair.h
-ConversionFromYUV.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
+ColorConverter.o: TU/Image++.h TU/types.h TU/Geometry++.h TU/Vector++.h \
 	TU/Array++.h TU/iterator.h TU/tuple.h TU/functional.h TU/pair.h \
 	TU/Minimize.h
 CorrectIntensity.o: TU/CorrectIntensity.h TU/Image++.h TU/types.h \
