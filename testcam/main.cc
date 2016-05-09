@@ -31,7 +31,7 @@ main(int argc, char* argv[])
     try
     {
 	V4L2Camera				camera(dev);
-	v::MyCmdWindow<V4L2Camera, u_char>	myWin(vapp, camera);
+	v::MyCmdWindow<V4L2Camera, RGB>		myWin(vapp, camera);
 	vapp.run();
 
 	cout << camera;
