@@ -4,18 +4,18 @@
 #################################
 #  User customizable macros	#
 #################################
-PROGRAM		= $(shell basename $(PWD))
-#LIBRARY		= lib$(shell basename $(PWD))
+#PROGRAM		= $(shell basename $(PWD))
+LIBRARY		= lib$(shell basename $(PWD))
 
 VPATH		=
 
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I$(PREFIX)/include -I$(CUDAHOME)/include
+INCDIRS		= -I. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__
 CFLAGS		= -O3
-NVCCFLAGS	= -O
+NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else
@@ -23,10 +23,9 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUIeee1394++ -lTUTools++ -lTUCuda++ \
-		  -lraw1394 -ltbb -lintlc
+LIBS		=
 
-LINKER		= $(NVCC)
+LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
 LIBDIR		= $(PREFIX)/lib
@@ -36,47 +35,56 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../../TU/cuda/Array++.h \
-		../../TU/cuda/allocator.h \
-		../../TU/cuda/chrono.h \
-		/usr/local/include/TU/Array++.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Ieee1394++.h \
-		/usr/local/include/TU/Ieee1394CameraArray.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Profiler.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
-HDRS		=
-SRCS		= cuda_image_interpolate.cu \
-		main.cc
-OBJS		= cuda_image_interpolate.o \
-		main.o
+HDRS		= TU/FireWireNode_.h \
+		TU/IIDC++.h \
+		TU/USBNode_.h
+SRCS		= FireWireNode.cc \
+		IIDCCamera.cc \
+		IIDCNode.cc \
+		USBNode.cc
+OBJS		= FireWireNode.o \
+		IIDCCamera.o \
+		IIDCNode.o \
+		USBNode.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
 #include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
-#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-cuda_image_interpolate.o: /usr/local/include/TU/Image++.h \
+FireWireNode.o: TU/FireWireNode_.h TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
+IIDCCamera.o: TU/FireWireNode_.h TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
+	TU/USBNode_.h
+IIDCNode.o: TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Profiler.h \
-	../../TU/cuda/Array++.h ../../TU/cuda/allocator.h \
-	../../TU/cuda/chrono.h
-main.o: /usr/local/include/TU/Ieee1394CameraArray.h \
-	/usr/local/include/TU/Ieee1394++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/Minimize.h
+USBNode.o: TU/USBNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Minimize.h ../../TU/cuda/Array++.h \
-	../../TU/cuda/allocator.h
+	/usr/local/include/TU/Minimize.h
