@@ -34,7 +34,7 @@
 #ifndef	__TU_IMAGEPP_H
 #define	__TU_IMAGEPP_H
 
-#include <string.h>
+#include <cstring>		// for memcpy()
 #include <boost/operators.hpp>
 #include "TU/types.h"
 #include "TU/Geometry++.h"
