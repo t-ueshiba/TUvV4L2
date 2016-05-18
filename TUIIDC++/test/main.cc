@@ -35,7 +35,10 @@ flow(uint64_t uniqId)
     using namespace	std;
     
     IIDCCamera	camera(IIDCCamera::Monocular, uniqId);
-
+#if 1
+    camera.setFormatAndFrameRate(IIDCCamera::MONO8_1280x960,
+				 IIDCCamera::FrameRate_30);
+#endif
     cerr << "0x" << hex << setw(16) << setfill('0')
 	 << camera.globalUniqueId() << dec << ' ' << camera;
 
@@ -59,9 +62,9 @@ flow(uint64_t uniqId)
 int
 main()
 {
-    uint64_t	uniqId = 0x00b09d0100be72c3LL;
-    
-  //TU::snap(uniqId);
+    uint64_t	uniqId = 0x00b09d0100be72c5LL;
+  //uint64_t	uniqId = 0x00b09d0100be72c3LL;
+    //TU::snap(uniqId);
     TU::flow(uniqId);
     
     return 0;

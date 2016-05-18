@@ -368,7 +368,7 @@ IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed, u_int delay)
      _bayer(YYYY), _littleEndian(false)
 {
   // Set speed of isochronous transmission.
-  //setSpeed(speed);
+    setSpeed(speed);
 
   // Map video1394 buffer according to current format and frame rate.
     setFormatAndFrameRate(getFormat(), getFrameRate());
@@ -540,6 +540,7 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
     
     if (cont)
 	stopContinuousShot();
+    
     u_int	rt = 0;
     for (u_int bit = FrameRate_1_875; bit != rate; bit >>= 1)
 	++rt;
@@ -740,6 +741,8 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
       case YUV_411:
 	(_img_size *= 3) /= 2;
 	break;
+      default:
+	break;
     }
   // buf_sizeをpacket_sizeの整数倍にしてからmapする.
     const u_int	 buf_size = packet_size * ((_img_size - 1) / packet_size + 1);
@@ -794,6 +797,8 @@ IIDCCamera::getFrameRate() const
       case Format_7_6:
       case Format_7_7:
 	return FrameRate_x;
+      default:
+	break;
     }
     return
 	uintToFrameRate(0x1u << 
@@ -2298,6 +2303,8 @@ IIDCCamera::inquireFrameRate(Format format) const
 	if (quad != 0)
 	    return FrameRate_x;
 	break;
+      default:
+	break;
     }
 
     return quad;
@@ -2643,7 +2650,6 @@ static const struct
     {IIDCCamera::Format_7_6,		"Format_7_6"},
     {IIDCCamera::Format_7_7,		"Format_7_7"}
 };
-static const int	NFORMATS = sizeof(formats) / sizeof(formats[0]);
 
 static const struct
 {
@@ -2661,7 +2667,6 @@ static const struct
     {IIDCCamera::FrameRate_240,		"240fps"},
     {IIDCCamera::FrameRate_x,		"custom_frame_rate"}
 };
-static const int	NRATES = sizeof(rates) / sizeof(rates[0]);
 
 static const struct
 {
@@ -2685,7 +2690,6 @@ static const struct
     {IIDCCamera::PAN,			"PAN"},
     {IIDCCamera::TILT,			"TILT"}
 };
-static const int	NFEATURES = sizeof(features) / sizeof(features[0]);
 
 /************************************************************************
 *  global functions							*

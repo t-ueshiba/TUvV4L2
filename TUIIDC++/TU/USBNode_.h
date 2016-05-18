@@ -58,7 +58,7 @@ class USBNode : public IIDCNode
 	using value_type = libusb_device*;
 	
       public:
-	DeviceIterator(const Context& ctx)
+	DeviceIterator(libusb_context* ctx)
 	    :_devs(nullptr), _dev(_devs)
 	{
 	    exec(libusb_get_device_list(ctx, &_devs),
@@ -82,19 +82,18 @@ class USBNode : public IIDCNode
     class Buffer
     {
       public:
-	enum Status	{ FILLED, CORRUPT, ERROR };
+			Buffer()				;
+			~Buffer()				;
+			Buffer(Buffer&& buffer)			;
+	Buffer&		operator =(Buffer&& buffer)		;
+			Buffer(const Buffer&)		= delete;
+	Buffer&		operator =(const Buffer&)	= delete;
 	
-      public:
-	Buffer()					;
-	~Buffer()					;
-	
-	size_t		size()			const	{ return _size; }
-	const u_char*	data()			const	{ return _p; }
-
+	const u_char*	data()				const	{ return _p; }
 	void		map(USBNode* parent, size_t size)	;
 	void		unmap()					;
 	void		enqueue()			const	;
-	
+	    
       private:
 	static void	callback(libusb_transfer* transger)	;
 	
@@ -106,29 +105,10 @@ class USBNode : public IIDCNode
     };
 	
   public:
-  //! isochronous転送の速度
-    enum Speed
-    {
-	SPD_100M	= 0,			//!< 100Mbps
-	SPD_200M	= 1,			//!< 200Mbps
-	SPD_400M	= 2,			//!< 400Mbps
-	SPD_800M	= 3,			//!< 800Mbps
-	SPD_1_6G	= 4,			//!< 1.6Gbps
-	SPD_3_2G	= 5			//!< 3.2Gbps
-    };
-
-  public:
-    USBNode(uint32_t unit_spec_ID, uint64_t uniqId)			;
-    USBNode(uint16_t idVendor, uint16_t idProduct, uint32_t serialNumber);
-    virtual ~USBNode()							;
-    USBNode(const USBNode&)					= delete;
-    USBNode&	operator =(const USBNode&)			= delete;
-
-  //! このノードのisochronous受信用バッファにフレームの先頭パケットが到着した時刻を返す
-  /*!
-    \return	受信用バッファにフレームの先頭パケットが到着した時刻
-   */
-    uint64_t		arrivaltime()		const	{return _arrivaltime;}
+			USBNode(uint32_t unit_spec_ID, uint64_t uniqId)	;
+    virtual		~USBNode()					;
+			USBNode(const USBNode&)			= delete;
+    USBNode&		operator =(const USBNode&)		= delete;
 
     virtual nodeid_t	nodeId()				const	;
     virtual quadlet_t	readQuadlet(nodeaddr_t addr)		const	;
@@ -136,28 +116,27 @@ class USBNode : public IIDCNode
     virtual u_char	mapListenBuffer(u_int packet_size,
 					u_int buf_size,
 					u_int nb_buffers)		;
+    virtual void	unmapListenBuffer()				;
     virtual const u_char*
 			waitListenBuffer()				;
     virtual void	requeueListenBuffer()				;
     virtual void	flushListenBuffer()				;
-    virtual void	unmapListenBuffer()				;
-    uint64_t		cycletimeToLocaltime(uint32_t cycletime)  const	;
-    uint64_t		cycleToLocaltime(uint32_t cycle)	  const	;
     
   private:
-    static void		mainLoop(USBNode* node)				;
+    libusb_device_handle*	get_iso_handle()		const	;
+    static void			mainLoop(USBNode* node)			;
     
   private:
     libusb_device_handle*	_handle;
+    Context			_iso_ctx;
+    libusb_device_handle* 	_iso_handle;
     std::vector<Buffer>		_buffers;
-    std::queue<Buffer*>		_ready;
+    std::queue<const Buffer*>	_ready;
     std::atomic_bool		_run;
     std::mutex			_mutex;
     std::condition_variable	_cond;
     std::thread			_thread;
-    uint64_t			_arrivaltime;	// time of buffer captured
-    uint64_t			_arrivaltime_next;
-
+    
     static constexpr u_int	REQUEST_TIMEOUT_MS = 1000;
     static Context		_ctx;
 };

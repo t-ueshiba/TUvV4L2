@@ -157,6 +157,8 @@ typedef uint64_t	nodeaddr_t;
 class IIDCNode
 {
   public:
+    virtual		~IIDCNode()					;
+    
     uint64_t		globalUniqueId()			const	;
     uint32_t		unitSpecId()				const	;
     nodeaddr_t		commandRegisterBase()			const	;
@@ -191,6 +193,9 @@ class IIDCNode
 					u_int buf_size,
 					u_int nb_buffers)		= 0;
 
+  //! ノードに割り当てたすべての受信用バッファを廃棄する
+    virtual void	unmapListenBuffer()				= 0;
+    
   //! isochronousデータが受信されるのを待つ
   /*!
     実際にデータが受信されるまで, 本関数は呼び出し側に制御を返さない. 
@@ -205,9 +210,6 @@ class IIDCNode
   //! すべての受信用バッファの内容を空にする
     virtual void	flushListenBuffer()				= 0;
 
-  //! ノードに割り当てたすべての受信用バッファを廃棄する
-    virtual void	unmapListenBuffer()				= 0;
-    
   private:
     uint32_t		readValueFromUnitDependentDirectory(uint8_t key)
 								  const	;

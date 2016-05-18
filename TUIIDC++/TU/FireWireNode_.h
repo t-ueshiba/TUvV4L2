@@ -113,11 +113,11 @@ class FireWireNode : public IIDCNode
     virtual u_char	mapListenBuffer(u_int packet_size,
 					u_int buf_size,
 					u_int nb_buffers)		;
+    virtual void	unmapListenBuffer()				;
     virtual const u_char*
 			waitListenBuffer()				;
     virtual void	requeueListenBuffer()				;
     virtual void	flushListenBuffer()				;
-    virtual void	unmapListenBuffer()				;
     uint64_t		cycletimeToLocaltime(uint32_t cycletime) const	;
     uint64_t		cycleToLocaltime(uint32_t cycle)	 const	;
     
