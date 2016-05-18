@@ -350,6 +350,29 @@ FireWireNode::mapListenBuffer(u_int packet_size,
 #endif
 }
 
+void
+FireWireNode::unmapListenBuffer()
+{
+    using namespace	std;
+
+    if (_buf != 0)
+    {
+#if defined(USE_VIDEO1394)
+	munmap(_buf, _mmap.nb_buffers * _mmap.buf_size);
+	_buf = 0;				// Reset buffer status.
+	_buf_size = _current = 0;		// ibid.
+	if (ioctl(_port->fd(), VIDEO1394_IOC_UNLISTEN_CHANNEL, &_mmap.channel) < 0)
+	    throw runtime_error(string("TU::FireWireNode::unmapListenBuffer: VIDEO1394_IOC_UNLISTEN_CHANNEL failed!! ") + strerror(errno));
+#else
+	raw1394_iso_stop(_handle);
+	raw1394_iso_shutdown(_handle);
+
+	delete [] _buf;
+	_buf = _mid = _end = _current = 0;
+#endif
+    }
+}
+
 const u_char*
 FireWireNode::waitListenBuffer()
 {
@@ -433,29 +456,6 @@ FireWireNode::flushListenBuffer()
 	throw runtime_error(string("TU::FireWireNode::flushListenBuffer: failed to flush iso receive buffer!! ") + strerror(errno));
     _current = _buf;
 #endif    
-}
-
-void
-FireWireNode::unmapListenBuffer()
-{
-    using namespace	std;
-
-    if (_buf != 0)
-    {
-#if defined(USE_VIDEO1394)
-	munmap(_buf, _mmap.nb_buffers * _mmap.buf_size);
-	_buf = 0;				// Reset buffer status.
-	_buf_size = _current = 0;		// ibid.
-	if (ioctl(_port->fd(), VIDEO1394_IOC_UNLISTEN_CHANNEL, &_mmap.channel) < 0)
-	    throw runtime_error(string("TU::FireWireNode::unmapListenBuffer: VIDEO1394_IOC_UNLISTEN_CHANNEL failed!! ") + strerror(errno));
-#else
-	raw1394_iso_stop(_handle);
-	raw1394_iso_shutdown(_handle);
-
-	delete [] _buf;
-	_buf = _mid = _end = _current = 0;
-#endif
-    }
 }
 
 uint64_t

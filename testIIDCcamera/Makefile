@@ -12,16 +12,11 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG #-DHAVE_LIBTUTOOLS__ #-DG_DISABLE_DETPRECATED -DGTK_DISABLE_DEPRECATED #-DUSE_VIDEO1394
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ #-DG_DISABLE_DETPRECATED -DGTK_DISABLE_DEPRECATED #-DUSE_VIDEO1394
 CFLAGS		= -g
 
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
-endif
 CFLAGS	       += $(shell pkg-config gtk+-2.0 --cflags)
 CCFLAGS		= $(CFLAGS)
 
@@ -42,9 +37,9 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../TU/IIDC++.h \
-		/usr/local/include/TU/Array++.h \
+EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
+		/usr/local/include/TU/IIDC++.h \
 		/usr/local/include/TU/Image++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
@@ -72,34 +67,34 @@ OBJS		= MyDialog.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-MyDialog.o: MyDialog.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Minimize.h
-MyIIDCCamera.o: MyIIDCCamera.h ../TU/IIDC++.h \
+MyDialog.o: MyDialog.h /usr/local/include/TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
-createCommands.o: MyIIDCCamera.h ../TU/IIDC++.h \
+MyIIDCCamera.o: MyIIDCCamera.h /usr/local/include/TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
-createMenubar.o: MyIIDCCamera.h ../TU/IIDC++.h \
+createCommands.o: MyIIDCCamera.h /usr/local/include/TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
+createMenubar.o: MyIIDCCamera.h /usr/local/include/TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
 	MyDialog.h
-main.o: MyIIDCCamera.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Minimize.h
+main.o: MyIIDCCamera.h /usr/local/include/TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
