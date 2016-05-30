@@ -117,7 +117,7 @@ CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
   \param speed	データ転送速度
 */
 MyIIDCCamera::MyIIDCCamera(u_int64_t uniqId, Speed speed)
-    :IIDCCamera(IIDCCamera::Monocular, uniqId, speed, 1),
+    :IIDCCamera(IIDCCamera::Monocular, uniqId, speed),
      _canvas(gtk_drawing_area_new()),
      _buf(0),
      _rgb(0)

@@ -73,7 +73,7 @@ class FireWireNode : public IIDCNode
     };
 
   public:
-    FireWireNode(uint32_t unit_spec_ID, uint64_t uniqId, u_int delay
+    FireWireNode(uint32_t unit_spec_ID, uint64_t uniqId
 #if defined(USE_VIDEO1394)
 		 , int sync_tag, int flag
 #endif
@@ -98,12 +98,6 @@ class FireWireNode : public IIDCNode
     u_char		channel()		const	{return _channel;}
 #endif
 
-  //! このノードに割り当てられたasynchronous通信の遅延量を返す
-  /*!
-    \return	遅延量（単位：micro seconds）
-   */
-    u_int		delay()			const	{return _delay;}
-    
     virtual nodeid_t	nodeId()				const	;
 #if defined(__APPLE__)
     nodeaddr_t		commandRegisterBase()			const	;
@@ -136,7 +130,6 @@ class FireWireNode : public IIDCNode
 #endif
     raw1394handle_t	_handle;
     nodeid_t		_nodeId;
-    const u_int		_delay;
     u_char*		_buf;		// mapped buffer
     uint64_t		_arrivaltime;	// time of buffer captured
 #if defined(USE_VIDEO1394)
