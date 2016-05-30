@@ -1,11 +1,12 @@
 /*
  *  $Id$: IIDCCamera.cc 1777 2015-02-06 10:54:01Z ueshiba $
  */
-#include "TU/FireWireNode_.h"
-#include "TU/USBNode_.h"
+#include "FireWireNode_.h"
+#include "USBNode_.h"
 #include <libraw1394/csr.h>
 #include <algorithm>
 #include <cstring>
+#include <sys/time.h>
 
 #define XY_YZ(X, Y, Z)						\
 {								\
@@ -285,11 +286,11 @@ triggerModeInq(quadlet_t val)
 }
 
 static IIDCNode*
-getNode(IIDCCamera::Type type, uint64_t uniqId, u_int delay)
+getNode(IIDCCamera::Type type, uint64_t uniqId)
 {
     try
     {
-	return new FireWireNode(type, uniqId, delay);
+	return new FireWireNode(type, uniqId);
     }
     catch(const std::exception& err)
     {
@@ -299,45 +300,77 @@ getNode(IIDCCamera::Type type, uint64_t uniqId, u_int delay)
     return nullptr;
 }
     
+static inline uint32_t
+cycletime_to_subcycle(uint32_t cycletime)
+{
+    uint32_t	sec	 = (cycletime & 0xfe000000) >> 25;
+    uint32_t	cycle	 = (cycletime & 0x01fff000) >> 12;
+    uint32_t	subcycle = (cycletime & 0x00000fff);
+
+    return subcycle + 3072*(cycle + 8000*sec);
+}
+
+#if defined(DEBUG)
+static std::ostream&
+print_time(std::ostream& out, uint64_t localtime)
+{
+    uint32_t	usec = localtime % 1000;
+    uint32_t	msec = (localtime / 1000) % 1000;
+    uint32_t	sec  = localtime / 1000000;
+    return out << sec << '.' << msec << '.' << usec;
+}
+#endif
 /************************************************************************
 *  local constants							*
 ************************************************************************/
-static const uint32_t	Cur_V_Frm_Rate		= 0x600;
-static const uint32_t	Cur_V_Mode		= 0x604;
-static const uint32_t	Cur_V_Format		= 0x608;
-static const uint32_t	ISO_Channel		= 0x60c;
-static const uint32_t	Camera_Power		= 0x610;
-static const uint32_t	ISO_EN			= 0x614;
-static const uint32_t	Memory_Save		= 0x618;
-static const uint32_t	One_Shot		= 0x61c;
-static const uint32_t	Mem_Save_Ch		= 0x620;
-static const uint32_t	Cur_Mem_Ch		= 0x624;
+static const uint32_t	Advanced_Feature_Quadlet_Offset	= 0x480;
+    
+static const uint32_t	Cur_V_Frm_Rate			= 0x600;
+static const uint32_t	Cur_V_Mode			= 0x604;
+static const uint32_t	Cur_V_Format			= 0x608;
+static const uint32_t	ISO_Channel			= 0x60c;
+static const uint32_t	Camera_Power			= 0x610;
+static const uint32_t	ISO_EN				= 0x614;
+static const uint32_t	Memory_Save			= 0x618;
+static const uint32_t	One_Shot			= 0x61c;
+static const uint32_t	Mem_Save_Ch			= 0x620;
+static const uint32_t	Cur_Mem_Ch			= 0x624;
+static const uint32_t	Software_Trigger		= 0x62c;
 
-static const quadlet_t	One_Push		= 0x1u << 26;
-static const quadlet_t	ON_OFF			= 0x1u << 25;
-static const quadlet_t	A_M_Mode		= 0x1u << 24;
+static const quadlet_t	One_Push			= 0x1u << 26;
+static const quadlet_t	ON_OFF				= 0x1u << 25;
+static const quadlet_t	A_M_Mode			= 0x1u << 24;
 
 // Video Mode CSR for Format_7.
-static const uint32_t	MAX_IMAGE_SIZE_INQ	= 0x000;
-static const uint32_t	UNIT_SIZE_INQ		= 0x004;
-static const uint32_t	IMAGE_POSITION		= 0x008;
-static const uint32_t	IMAGE_SIZE		= 0x00c;
-static const uint32_t	COLOR_CODING_ID		= 0x010;
-static const uint32_t	COLOR_CODING_INQ	= 0x014;
-static const uint32_t	PIXEL_NUMBER_INQ	= 0x034;
-static const uint32_t	TOTAL_BYTES_HI_INQ	= 0x038;
-static const uint32_t	TOTAL_BYTES_LO_INQ	= 0x03c;
-static const uint32_t	PACKET_PARA_INQ		= 0x040;
-static const uint32_t	BYTE_PER_PACKET		= 0x044;
-static const uint32_t	PACKET_PER_FRAME_INQ	= 0x048;
-static const uint32_t	UNIT_POSITION_INQ	= 0x04c;
-static const uint32_t	VALUE_SETTING		= 0x07c;
+static const uint32_t	MAX_IMAGE_SIZE_INQ		= 0x000;
+static const uint32_t	UNIT_SIZE_INQ			= 0x004;
+static const uint32_t	IMAGE_POSITION			= 0x008;
+static const uint32_t	IMAGE_SIZE			= 0x00c;
+static const uint32_t	COLOR_CODING_ID			= 0x010;
+static const uint32_t	COLOR_CODING_INQ		= 0x014;
+static const uint32_t	PIXEL_NUMBER_INQ		= 0x034;
+static const uint32_t	TOTAL_BYTES_HI_INQ		= 0x038;
+static const uint32_t	TOTAL_BYTES_LO_INQ		= 0x03c;
+static const uint32_t	PACKET_PARA_INQ			= 0x040;
+static const uint32_t	BYTE_PER_PACKET			= 0x044;
+static const uint32_t	PACKET_PER_FRAME_INQ		= 0x048;
+static const uint32_t	UNIT_POSITION_INQ		= 0x04c;
+static const uint32_t	VALUE_SETTING			= 0x07c;
 
 // NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
-static const u_int	NBUFFERS		= 4;
+static const u_int	NBUFFERS			= 4;
 
-static const uint64_t	PointGrey_Feature_ID	= 0x00b09d000004ull;
+static const uint64_t	PointGrey_Feature_ID		= 0x00b09d000004ull;
 
+// Access control register offsets (PointGrey specific)
+static const uint32_t	BAYER_TILE_MAPPING		= 0x040;
+static const uint32_t	IMAGE_DATA_FORMAT		= 0x048;
+static const uint32_t	FRAME_INFO			= 0x2f8;
+static const uint32_t	CYCLE_TIME			= 0xea8;
+
+// GPIO control pins
+static const uint32_t	GPIO_CTRL_PIN_0			= 0x1110;
+    
 /************************************************************************
 *  class IIDCCamera							*
 ************************************************************************/
@@ -352,18 +385,14 @@ static const uint64_t	PointGrey_Feature_ID	= 0x00b09d000004ull;
 			つけられる. オブジェクト生成後は, globalUniqueId()
 			によってこの値を知ることができる.
   \param speed		FireWireバスの転送速度(1394bモードの場合は800Mbps)
-  \param delay		FireWireカードの種類によっては, レジスタの読み書き
-			(IIDCNode::readQuadlet(),
-			IIDCNode::writeQuadlet())時に遅延を入れないと
-			動作しないことがある. この遅延量をmicro second単位
-			で指定する. (例: メルコのIFC-ILP3では1, DragonFly
-			付属のボードでは0)
 */
-IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed, u_int delay)
-    :_node(getNode(type, uniqId, delay)),
+IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed)
+    :_node(getNode(type, uniqId)),
      _cmdRegBase(_node->commandRegisterBase()),
      _acRegBase(inquireBasicFunction() & Advanced_Feature_Inq ?
-		CSR_REGISTER_BASE + 4 * readQuadletFromRegister(0x480) : 0),
+		CSR_REGISTER_BASE +
+		4 * readQuadletFromRegister(Advanced_Feature_Quadlet_Offset) :
+		0),
      _w(0), _h(0), _p(MONO_8), _img(0), _img_size(0),
      _bayer(YYYY), _littleEndian(false)
 {
@@ -376,7 +405,7 @@ IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed, u_int delay)
   // Get Bayer pattern supported by this camera.
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
-	switch (_node->readQuadlet(_acRegBase + 0x40))
+	switch (readQuadletFromACRegister(BAYER_TILE_MAPPING))
 	{
 	  case RGGB:
 	    _bayer = RGGB;
@@ -392,7 +421,7 @@ IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed, u_int delay)
 	    break;
 	}
 
-	u_int	y16_data_format = _node->readQuadlet(_acRegBase + 0x48);
+	u_int	y16_data_format = readQuadletFromACRegister(IMAGE_DATA_FORMAT);
 	if ((y16_data_format & 0x80000001) == 0x80000001)
 	    _littleEndian = true;
     }
@@ -744,13 +773,11 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
       default:
 	break;
     }
-  // buf_sizeをpacket_sizeの整数倍にしてからmapする.
-    const u_int	 buf_size = packet_size * ((_img_size - 1) / packet_size + 1);
 #ifdef DEBUG
-    cerr << "  packetsize = " << packet_size << ", buf_size = " << buf_size
+    cerr << "  packetsize = " << packet_size << ", _img_size = " << _img_size
 	 << endl;
 #endif
-    const u_char ch = _node->mapListenBuffer(packet_size, buf_size, NBUFFERS);
+    const u_char ch = _node->mapListenBuffer(packet_size, _img_size, NBUFFERS);
 
   // map時に割り当てられたチャンネル番号をカメラに設定する.
     quadlet_t	 quad = readQuadletFromRegister(ISO_Channel);
@@ -819,12 +846,15 @@ IIDCCamera::getFormat_7_Info(Format format7)
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
     quadlet_t		quad;
     Format_7_Info	fmt7info;
+
     quad = _node->readQuadlet(base + MAX_IMAGE_SIZE_INQ);
     fmt7info.maxWidth  = ((quad >> 16) & 0xffff);
     fmt7info.maxHeight = (quad & 0xffff);
+
     quad = _node->readQuadlet(base + UNIT_SIZE_INQ);
     fmt7info.unitWidth  = ((quad >> 16) & 0xffff);
     fmt7info.unitHeight = (quad & 0xffff);
+
     quad = _node->readQuadlet(base + UNIT_POSITION_INQ);
     fmt7info.unitU0 = ((quad >> 16) & 0xffff);
     if (fmt7info.unitU0 == 0)
@@ -832,9 +862,11 @@ IIDCCamera::getFormat_7_Info(Format format7)
     fmt7info.unitV0 = (quad & 0xffff);
     if (fmt7info.unitV0 == 0)
 	fmt7info.unitV0 = fmt7info.unitHeight;
+
     quad = _node->readQuadlet(base + IMAGE_POSITION);
     fmt7info.u0 = ((quad >> 16) & 0xffff);
     fmt7info.v0 = (quad & 0xffff);
+
     quad = _node->readQuadlet(base + IMAGE_SIZE);
     fmt7info.width  = ((quad >> 16) & 0xffff);
     fmt7info.height = (quad & 0xffff);
@@ -846,11 +878,13 @@ IIDCCamera::getFormat_7_Info(Format format7)
 			    ((fmt7info.width << 16) & 0xffff0000) |
 			    (fmt7info.height & 0xffff));
     }
+
     quad = _node->readQuadlet(base + COLOR_CODING_ID);
     const u_int colorCodingID = ((quad >> 24) & 0xff);
     if (colorCodingID > 31)
 	throw std::runtime_error("IIDCCamera::getFormat_7_Info: Sorry, unsupported COLOR_CODING_ID!!");
     fmt7info.pixelFormat = uintToPixelFormat(0x1u << (31 - colorCodingID));
+
     quad = _node->readQuadlet(base + COLOR_CODING_INQ);
     fmt7info.availablePixelFormats = quad;
 #ifdef DEBUG
@@ -1258,6 +1292,28 @@ IIDCCamera::getTriggerPolarity() const
 	return HighActiveInput;
     else
 	return LowActiveInput;
+}
+
+//! ソフトウェアトリガ信号をセットする
+/*!
+  \return	このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setSoftwareTrigger()
+{
+    writeQuadletToRegister(Software_Trigger, 0x1u << 31);
+    return *this;
+}
+
+//! ソフトウェアトリガ信号をリセットする
+/*!
+  \return	このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::resetSoftwareTrigger()
+{
+    writeQuadletToRegister(Software_Trigger, 0);
+    return *this;
 }
 
 //! カメラからの画像の連続的出力を開始する
@@ -1999,9 +2055,9 @@ IIDCCamera::embedTimestamp()
 {
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
-	quadlet_t	val = _node->readQuadlet(_acRegBase + 0x02f8);
-	if (val & (0x1u << 31))
-	    _node->writeQuadlet(_acRegBase + 0x02f8, val | 0x1u);
+	quadlet_t	val = readQuadletFromACRegister(FRAME_INFO);
+	if (val & Presence)
+	    writeQuadletToACRegister(FRAME_INFO, val | 0x1u);
     }
     return *this;
 }
@@ -2016,9 +2072,9 @@ IIDCCamera::unembedTimestamp()
 {
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
-	quadlet_t	val = _node->readQuadlet(_acRegBase + 0x02f8);
-	if (val & (0x1u << 31))
-	    _node->writeQuadlet(_acRegBase + 0x02f8, val & ~0x1u);
+	quadlet_t	val = readQuadletFromACRegister(FRAME_INFO);
+	if (val & Presence)
+	    writeQuadletToACRegister(FRAME_INFO, val & ~0x1u);
     }
     return *this;
 }
@@ -2330,9 +2386,9 @@ IIDCCamera::setFormat_7_PacketSize(Format format7)
     const quadlet_t	Setting_1   = 0x1u << 30;
     const quadlet_t	ErrorFlag_1 = 0x1u << 23;
     const quadlet_t	ErrorFlag_2 = 0x1u << 22;
-    const nodeaddr_t	base	= getFormat_7_BaseAddr(format7);
-    const bool		present = _node->readQuadlet(base + VALUE_SETTING)
-				& Presence;
+    const nodeaddr_t	base	    = getFormat_7_BaseAddr(format7);
+    const bool		present	    = _node->readQuadlet(base + VALUE_SETTING)
+				    & Presence;
     if (present)
     {
 	_node->writeQuadlet(base + VALUE_SETTING, Setting_1);
@@ -2589,25 +2645,42 @@ IIDCCamera::inquireFrameRate_or_Format_7_Offset(Format format) const
 			存在しなければfalseを返す.
 */
 bool
-IIDCCamera::unlockAdvancedFeature(uint64_t featureId, u_int timeout)
+IIDCCamera::unlockAdvancedFeature(uint64_t featureId, u_int timeout) const
 {
+    return _acRegBase;
+  /*
     if (_acRegBase == 0)
 	return false;
-    _node->writeQuadlet(_acRegBase, featureId >> 16);	// upper 32bits
-    _node->writeQuadlet(_acRegBase + 4,
-			(featureId << 16) | 0xf000 | (timeout & 0xfff));
-    u_int	busId_nodeId = _node->readQuadlet(_acRegBase) >> 16;
 
+    writeQuadletToACRegister(0, featureId >> 16);	// upper 32bits
+    writeQuadletToACRegister(4, (featureId << 16) | 0xf000 | (timeout & 0xfff));
+    u_int	busId_nodeId = readQuadletFromACRegister(0) >> 16;
+
+    std::cerr << "nodeId: " << std::hex << _node->nodeId() << std::endl;
+    std::cerr << "busId_nodeId: " << std::hex << busId_nodeId << std::endl;
+    
     return _node->nodeId() == busId_nodeId;
+  */
 }
 
+uint32_t
+IIDCCamera::getCycleTime(uint64_t& localtime) const
+{
+    timeval	t;
+    gettimeofday(&t, NULL);
+    uint32_t	cycletime = readQuadletFromACRegister(CYCLE_TIME);
+    localtime = t.tv_sec * 1000000ULL + t.tv_usec;
+
+    return cycletime;
+}
+    
 /************************************************************************
 *  global functions							*
 ************************************************************************/
 static const struct
 {
     IIDCCamera::Format	format;
-    const char*			name;
+    const char*		name;
 } formats[] =
 {
     {IIDCCamera::YUV444_160x120,	"160x120-YUV(4:4:4)"},
@@ -2671,7 +2744,7 @@ static const struct
 static const struct
 {
     IIDCCamera::Feature	feature;
-    const char*			name;
+    const char*		name;
 } features[] =
 {
     {IIDCCamera::BRIGHTNESS,		"BRIGHTNESS"},

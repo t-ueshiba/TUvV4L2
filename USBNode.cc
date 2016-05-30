@@ -2,14 +2,14 @@
  *  $Id: USBNode.cc 1655 2014-10-03 01:37:50Z ueshiba $
  */
 #include <iostream>
-#include "TU/USBNode_.h"
+#include "USBNode_.h"
 
 namespace TU
 {
 /************************************************************************
 *  static data								*
 ************************************************************************/
-static struct
+static constexpr struct
 {
     uint16_t	idVendor;
     uint16_t	idProduct;
@@ -28,7 +28,12 @@ static struct
     {0x1e10, 0x3008},	// Point Grey Flea 3 (FL3-U3_88S2C)
     {0x1e10, 0x300a},	// Point Grey Flea 3 (FL3-U3_13E4C)
     {0x1e10, 0x300b},	// Point Grey Flea 3 (FL3-U3_13E4M)
+    {0x1e10, 0x3103},	// Point Grey Grasshopper 3 (GS3-U3-23S6M)
+    {0x1e10, 0x3300},	// Point Grey Flea 3 (FL3-U3_13Y3M, Firmware-2.x.x)
 };
+
+static constexpr u_int		RequestTimeout	= 1000;
+static constexpr uint8_t	EndpointAddress	= 0x81;
     
 /************************************************************************
 *  static functions							*
@@ -68,48 +73,15 @@ USBNode::Context	USBNode::_ctx;
 			いない機器のうち, 一番最初にみつかったものがこの
 			オブジェクトと結びつけられる. 
 */
-USBNode::USBNode(u_int unit_spec_ID, uint64_t uniqId)
-    :_handle(nullptr), _iso_ctx(), _iso_handle(nullptr), _run(false)
+USBNode::USBNode(uint32_t unit_spec_ID, uint64_t uniqId)
+    :_handle(nullptr), _interface(-1), _altsetting(-1), _iso_handle(nullptr),
+     _nbuffers(0), _buffers(nullptr), _ready(),
+     _run(false), _mutex(), _cond(), _thread()
 {
     try
     {
-	for (DeviceIterator dev(_ctx); *dev; ++dev)	// for each device...
-	{
-	    using namespace	std;
-
-	    libusb_device_descriptor	desc;
-	    exec(libusb_get_device_descriptor(*dev, &desc),
-		 "Failed to get device descriptor!!");
-#if defined(DEBUG)
-	    cerr << endl;
-	    cerr << "Bus:\t\t" << dec << int(libusb_get_bus_number(*dev))
-		 << endl;
-	    cerr << "Address:\t" << int(libusb_get_device_address(*dev))
-		 << endl;
-	    cerr << "idVendor:\t" << hex << desc.idVendor << endl;
-	    cerr << "idProduct:\t" << hex << desc.idProduct << endl;
-#endif
-	    for (const auto& product : usbProducts)
-		if (desc.idVendor  == product.idVendor &&
-		    desc.idProduct == product.idProduct)
-		{
-		    exec(libusb_open(*dev, &_handle),
-			 "Failed to open device!!");
-	    
-		    if (unitSpecId() == unit_spec_ID &&
-			(uniqId == 0 || globalUniqueId() == uniqId))
-		    {
-			exec(libusb_set_configuration(_handle, 1),
-			     "Failed to set configuration!!");
-			return;
-		    }
-
-		    libusb_close(_handle);
-		    _handle = nullptr;
-		}
-	}
-
-	throw std::runtime_error("No device with specified unit_spec_ID and globalUniqId found!!");
+	set_handle(unit_spec_ID, uniqId);
+	set_endpoint();
     }
     catch (const std::runtime_error& err)
     {
@@ -147,8 +119,8 @@ USBNode::readQuadlet(nodeaddr_t addr) const
     exec(libusb_control_transfer(_handle, 0xc0, request,
 				 addr & 0xffff, (addr >> 16) & 0xffff,
 				 reinterpret_cast<u_char*>(&quad),
-				 sizeof(quad), REQUEST_TIMEOUT_MS),
-	 "TU::USBNode::readQuadlet: failed to read from port!!");
+				 sizeof(quad), RequestTimeout),
+	 "USBNode::readQuadlet: failed to read from port!!");
     return quad;
 }
 
@@ -164,8 +136,8 @@ USBNode::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
     exec(libusb_control_transfer(_handle, 0x40, request,
 				 addr & 0xffff, (addr >> 16) & 0xffff,
 				 reinterpret_cast<u_char*>(&quad),
-				 sizeof(quad), REQUEST_TIMEOUT_MS),
-	 "TU::USBNode::writeQuadlet: failed to write to port!!");
+				 sizeof(quad), RequestTimeout),
+	 "USBNode::writeQuadlet: failed to write to port!!");
 }
 
 //! isochronous受信用のバッファを割り当てる
@@ -180,19 +152,26 @@ USBNode::mapListenBuffer(u_int packet_size, u_int buf_size, u_int nb_buffers)
 {
     unmapListenBuffer();
 
-    _iso_handle = get_iso_handle();
-    exec(libusb_claim_interface(_iso_handle, 0), "Failed to claim interface!!");
+    _nbuffers = nb_buffers;
+    _buffers  = new Buffer[_nbuffers];
 
-    _buffers.resize(nb_buffers);
-    for (auto& buffer : _buffers)
+    start_iso();
+
+  // バッファサイズをendpointのパケットサイズの整数倍にしてoverrunを阻止する
+    const auto	maxPacketSize = libusb_get_max_packet_size(
+				    libusb_get_device(_iso_handle),
+				    EndpointAddress);
+    buf_size = maxPacketSize * ((buf_size - 1) / maxPacketSize + 1);
+
+    for (size_t i = 0; i < _nbuffers; ++i)
     {
-	buffer.map(this, buf_size);
-	buffer.enqueue();			// 待機queueに入れる
+	_buffers[i].map(this, buf_size);
+	_buffers[i].enqueue();			// 待機queueに入れる
     }
 
-    _run = true;				// 稼働フラグを立てる
+    _run    = true;				// 稼働フラグを立てる
     _thread = std::thread(mainLoop, this);	// 子スレッドを起動
-
+    
     return 0;
 }
 
@@ -200,21 +179,22 @@ USBNode::mapListenBuffer(u_int packet_size, u_int buf_size, u_int nb_buffers)
 void
 USBNode::unmapListenBuffer()
 {
-    if (_run)				// 子スレッドが走っていたら...
+    if (_run)					// 子スレッドが走っていたら...
     {
-	_run = false;			// 稼働フラグを落とす
-	_thread.join();			// 子スレッドの終了を待つ
+	for (size_t i = 0; i < _nbuffers; ++i)
+	    _buffers[i].cancel();
 
-	libusb_release_interface(_iso_handle, 0);
-	libusb_close(_iso_handle);
-	_iso_handle = nullptr;
+	_run = false;				// 稼働フラグを落とす
+	_thread.join();				// 子スレッドの終了を待つ
+	stop_iso();
     }
     
     while (!_ready.empty())
 	_ready.pop();
 
-    for (auto& buffer : _buffers)
-	buffer.unmap();
+    delete [] _buffers;
+    _buffers  = nullptr;
+    _nbuffers = 0;
 }
 
 //! isochronousデータが受信されるのを待つ
@@ -248,26 +228,113 @@ USBNode::flushListenBuffer()
 {
 }
 
-//! _iso_ctx上に同じデバイスのハンドルを作る
-libusb_device_handle*
-USBNode::get_iso_handle() const
+void
+USBNode::set_handle(uint32_t unit_spec_ID, uint64_t uniqId)
+{
+    for (DeviceIterator dev(_ctx); *dev; ++dev)	// for each device...
+    {
+	libusb_device_descriptor	desc;
+	exec(libusb_get_device_descriptor(*dev, &desc),
+	     "Failed to get device descriptor!!");
+#if defined(DEBUG)
+	using namespace	std;
+
+	cerr << showbase << hex
+	     << "\nBus:\t\t"	 << int(libusb_get_bus_number(*dev))
+	     << "\nAddress:\t"   << int(libusb_get_device_address(*dev))
+	     << "\nidVendor:\t"  << desc.idVendor
+	     << "\nidProduct:\t" << desc.idProduct << dec << endl;
+#endif
+	for (const auto& product : usbProducts)
+	    if (desc.idVendor  == product.idVendor &&
+		desc.idProduct == product.idProduct)
+	    {
+		exec(libusb_open(*dev, &_handle), "Failed to open device!!");
+	    
+		if (unitSpecId() == unit_spec_ID &&
+		    (uniqId == 0 || globalUniqueId() == uniqId))
+		{
+		    if (libusb_kernel_driver_active(_handle, 0))
+			exec(libusb_detach_kernel_driver(_handle, 0),
+			     "Fialed to detach kernel driver!!");
+		    exec(libusb_set_configuration(_handle, 1),
+			 "Failed to set configuration!!");
+
+		    return;
+		}
+
+		libusb_close(_handle);
+		_handle = nullptr;
+	    }
+    }
+
+    throw std::runtime_error("No device with specified unit_spec_ID and globalUniqId found!!");
+}
+
+void
+USBNode::set_endpoint()
+{
+    libusb_config_descriptor*	config;
+    exec(libusb_get_active_config_descriptor(libusb_get_device(_handle),
+					     &config),
+	 "Failed to get config descriptor!!");
+
+    for (uint8_t i = 0; i < config->bNumInterfaces; ++i)
+    {
+	const auto&	interface = config->interface[i];
+	
+	for (int j = 0; j < interface.num_altsetting; ++j)
+	{
+	    const auto&	altsetting = interface.altsetting[j];
+
+	    for (uint8_t k = 0; k < altsetting.bNumEndpoints; ++k)
+	    {
+		const auto&	endpoint = altsetting.endpoint[k];
+		
+		if (endpoint.bEndpointAddress == EndpointAddress)
+		{
+		    _interface  = i;
+		    _altsetting = j;
+		    
+		    libusb_free_config_descriptor(config);
+		    return;
+		}
+	    }
+	}
+    }
+
+    libusb_free_config_descriptor(config);
+}
+    
+void
+USBNode::start_iso()
 {
     const auto	bus  = libusb_get_bus_number(libusb_get_device(_handle));
     const auto	addr = libusb_get_device_address(libusb_get_device(_handle));
     
-    for (DeviceIterator dev(_iso_ctx); *dev; ++dev)	// for each device...
+    for (DeviceIterator dev(_ctx); *dev; ++dev)	// for each device...
 	if ((libusb_get_bus_number(*dev)     == bus ) &&
 	    (libusb_get_device_address(*dev) == addr))
 	{
-	    libusb_device_handle*	handle;
-	    exec(libusb_open(*dev, &handle), "Failed to open device!!");
-	    return handle;
+	    exec(libusb_open(*dev, &_iso_handle), "Failed to open device!!");
+	    exec(libusb_claim_interface(_iso_handle, _interface),
+		 "USBNode::start_iso: Failed to claim interface!!");
+	    exec(libusb_set_interface_alt_setting(_iso_handle,
+						  _interface, _altsetting),
+		 "USBNode::start_iso: Failed to set interface alt setting!!");
+
+	    return;
 	}
-    
-    throw std::runtime_error("No device with specified bus number and address found!!");
-    return nullptr;
 }
 
+void
+USBNode::stop_iso()
+{
+    libusb_release_interface(_iso_handle, _interface);
+    libusb_close(_iso_handle);
+    _iso_handle = nullptr;
+}
+    
 //! capture threadのmain loop
 void
 USBNode::mainLoop(USBNode* node)
@@ -275,7 +342,7 @@ USBNode::mainLoop(USBNode* node)
     while (node->_run)
     {
 	timeval	timeout{0, 100000};
-	libusb_handle_events_timeout(node->_iso_ctx, &timeout);
+	libusb_handle_events_timeout(node->_ctx, &timeout);
 	node->_cond.notify_all();	// イベントが処理されたことを親に伝える
     }
 }
@@ -284,7 +351,7 @@ USBNode::mainLoop(USBNode* node)
 *  class USBNode::Buffer						*
 ************************************************************************/
 USBNode::Buffer::Buffer()
-    :_parent(nullptr), _size(0), _p(nullptr), _transfer(nullptr)
+    :_node(nullptr), _p(nullptr), _transfer(nullptr)
 {
 }
 
@@ -293,44 +360,16 @@ USBNode::Buffer::~Buffer()
     unmap();
 }
     
-USBNode::Buffer::Buffer(Buffer&& buffer)
-    :_parent(buffer._parent), _size(buffer._size),
-     _p(buffer._p), _transfer(buffer._transfer)
-{
-    buffer._parent   = nullptr;
-    buffer._size     = 0;
-    buffer._p	     = nullptr;
-    buffer._transfer = nullptr;
-}
-
-USBNode::Buffer&
-USBNode::Buffer::operator =(Buffer&& buffer)
-{
-    _parent   = buffer._parent;
-    _size     = buffer._size;
-    _p	      = buffer._p;
-    _transfer = buffer._transfer;
-
-    buffer._parent   = nullptr;
-    buffer._size     = 0;
-    buffer._p	     = nullptr;
-    buffer._transfer = nullptr;
-    
-    return *this;
-}
-
 void
-USBNode::Buffer::map(USBNode* parent, size_t size)
+USBNode::Buffer::map(USBNode* node, u_int size)
 {
     unmap();
     
-    _parent   = parent;
-    _size     = size;
-    _p	      = new u_char[_size];
+    _node     = node;
+    _p	      = new u_char[size];
     _transfer = libusb_alloc_transfer(0);
-    
-    libusb_fill_bulk_transfer(_transfer, _parent->_iso_handle, 0x81,
-			      _p, _size, callback, this, 0);
+    libusb_fill_bulk_transfer(_transfer, _node->_iso_handle, EndpointAddress,
+			      _p, size, callback, this, 0);
 }
     
 void
@@ -342,9 +381,8 @@ USBNode::Buffer::unmap()
 	_transfer = nullptr;
     }
     delete [] _p;
-    _p	    = nullptr;
-    _size   = 0;
-    _parent = nullptr;
+    _p	  = nullptr;
+    _node = nullptr;
 }
     
 void
@@ -354,6 +392,12 @@ USBNode::Buffer::enqueue() const
 }
 
 void
+USBNode::Buffer::cancel() const
+{
+    libusb_cancel_transfer(_transfer);
+}
+    
+void
 USBNode::Buffer::callback(libusb_transfer* transfer)
 {
     using namespace	std;
@@ -361,7 +405,7 @@ USBNode::Buffer::callback(libusb_transfer* transfer)
     if (transfer->status == LIBUSB_TRANSFER_CANCELLED)
     {
 #if defined(DEBUG)
-	cerr << "USBNode::Buffer::callback(): CANCELLED" << endl;
+	cerr << "USBNode::Buffer::callback(): CANCELLED: " << transfer << endl;
 #endif
 	return;
     }
@@ -371,23 +415,20 @@ USBNode::Buffer::callback(libusb_transfer* transfer)
     if (transfer->status != LIBUSB_TRANSFER_COMPLETED)
     {
 #if defined(DEBUG)
-	cerr << "USBNode::Buffer::callback(): ERROR" << endl;
-#endif
-	buffer->enqueue();
-	return;
-    }
-    else if (transfer->actual_length != transfer->length)
-    {
-#if defined(DEBUG)
-	cerr << "USBNode::Buffer::callback(): CORRUPT" << endl;
+	cerr << "USBNode::Buffer::callback(): ERROR: " << transfer << endl;
 #endif
 	buffer->enqueue();
 	return;
     }
 
-    auto	node = buffer->_parent;
-    std::lock_guard<std::mutex>	lock(node->_mutex);
-    node->_ready.push(buffer);
+#if defined(DEBUG)
+    cerr << "USBNode::Buffer::callback(): buffer_length = "
+	 << transfer->length
+	 << ", autual_lenth = " << transfer->actual_length
+	 << endl;
+#endif
+    std::lock_guard<std::mutex>	lock(buffer->_node->_mutex);
+    buffer->_node->_ready.push(buffer);
 }
     
 }

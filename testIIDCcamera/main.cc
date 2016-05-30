@@ -138,6 +138,9 @@ main(int argc, char* argv[])
 	gtk_widget_show_all(window);
 
 	gtk_main();
+    
+	cout << "0x" << hex << setw(16) << setfill('0')
+	     << camera.globalUniqueId() << dec << ' ' << camera;
     }
     catch (exception& err)
     {

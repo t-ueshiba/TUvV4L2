@@ -273,13 +273,7 @@ CBsave(GtkMenuItem*, gpointer userdata)
 static void
 CBexit(GtkMenuItem*, gpointer userdata)
 {
-    using namespace	std;
-    
-    MyIIDCCamera*	camera = (MyIIDCCamera*)userdata;
-    camera->stopContinuousShot();
-    cout << "0x" << hex << setw(16) << setfill('0')
-	 << camera->globalUniqueId() << dec << ' ' << *camera;
-    gtk_exit(0);
+    gtk_main_quit();
 }
 
 /************************************************************************

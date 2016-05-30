@@ -1,7 +1,7 @@
 /*
  *  $Id: FireWireNode.cc 1655 2014-10-03 01:37:50Z ueshiba $
  */
-#include "TU/FireWireNode_.h"
+#include "FireWireNode_.h"
 #include <unistd.h>
 #include <errno.h>
 #include <cstring>
@@ -129,12 +129,6 @@ std::map<int, FireWireNode::Port*>	FireWireNode::_portMap;
 			まだ#FireWireNodeオブジェクトを割り当てられて
 			いない機器のうち, 一番最初にみつかったものがこの
 			オブジェクトと結びつけられる. 
-  \param delay		FireWireカードの種類によっては, レジスタの読み書き
-			(FireWireNode::readQuadlet(),
-			FireWireNode::writeQuadlet())時に遅延を入れないと
-			動作しないことがある. この遅延量をmicro second単位
-			で指定する. (例: メルコのIFC-ILP3では1, DragonFly
-			付属のボードでは0)
   \param sync_tag	1まとまりのデータを複数のパケットに分割して
 			isochronousモードで受信する際に, 最初のパケットに
 			同期用のtagがついている場合は1を指定. そうでなけれ
@@ -143,7 +137,7 @@ std::map<int, FireWireNode::Port*>	FireWireNode::_portMap;
 			VIDEO1394_INCLUDE_ISO_HEADERS,
 			VIDEO1394_VARIABLE_PACKET_SIZEの組合わせ. 
 */
-FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId, u_int delay
+FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId
 #if defined(USE_VIDEO1394)
 			   , int sync_tag, int flags
 #endif
@@ -154,7 +148,7 @@ FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId, u_int delay
 #else
     :_port(0), _handle(raw1394_new_handle()), _nodeId(0),
 #endif
-     _delay(delay), _buf(0), _arrivaltime(0),
+     _buf(0), _arrivaltime(0),
 #if defined(USE_VIDEO1394)
      _mmap(), _current(0), _buf_size(0)
 #else
@@ -264,8 +258,6 @@ FireWireNode::readQuadlet(nodeaddr_t addr) const
     quadlet_t	quad;
     if (raw1394_read(_handle, _nodeId, addr, 4, &quad) < 0)
 	throw runtime_error(string("TU::FireWireNode::readQuadlet: failed to read from port!! ") + strerror(errno));
-    if (_delay != 0)
-	::usleep(_delay);
     return quadlet_t(ntohl(quad));
 }
 
@@ -277,8 +269,6 @@ FireWireNode::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
     quad = htonl(quad);
     if (raw1394_write(_handle, _nodeId, addr, 4, &quad) < 0)
 	throw runtime_error(string("TU::FireWireNode::writeQuadlet: failed to write to port!! ") + strerror(errno));
-    if (_delay != 0)
-	::usleep(_delay);
 }
 
 u_char
@@ -289,6 +279,9 @@ FireWireNode::mapListenBuffer(u_int packet_size,
     
   // Unmap previously mapped buffer and unlisten the channel.
     unmapListenBuffer();
+
+  // buf_sizeをpacket_sizeの整数倍にしてからmapする.
+    buf_size = packet_size * ((buf_size - 1) / packet_size + 1);
 
 #if defined(USE_VIDEO1394)
   // Change buffer size and listen to the channel.

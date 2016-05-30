@@ -40,7 +40,6 @@
   - #TU::IIDCNode::globalUniqueId()
   - #TU::IIDCNode::arrivaltime()
   - #TU::IIDCNode::channel()
-  - #TU::IIDCNode::delay()
 
   #TU::IIDCCamera - IIDCデジタルカメラを表すクラス
 
@@ -424,6 +423,19 @@ class IIDCCamera
 	YYYY = 0x59595959	//!< すべてY(monochrome)
     };
 
+    enum AbsoluteValue
+    {
+	ABS_VAL_AUTO_EXPOSURE	= 0x900,	//!< 自動露出の絶対値
+	ABS_VAL_SHUTTER		= 0x910,	//!< シャッタースピードの絶対値
+	ABS_VAL_GAIN		= 0x920,	//!< ゲインの絶対値
+	ABS_VAL_BRIGHTNESS	= 0x930,	//!< 明るさの絶対値
+	ABS_VAL_GAMMA		= 0x940,	//!< ガンマ補正の絶対値
+	ABS_VAL_TRIGGER_DELAY	= 0x950,	//!< トリガ遅れの絶対値
+	ABS_VAL_FRAME_RATE	= 0x960,	//!< フレームレートの絶対値
+	ABS_VAL_HUE		= 0x970,	//!< 色の色相の絶対値
+	ABS_VAL_SATURATION	= 0x980,	//!< 色の飽和度の絶対値
+    };
+
   private:
     struct Mono16
     {
@@ -439,8 +451,7 @@ class IIDCCamera
     };
 
   public:
-    IIDCCamera(Type type=Monocular, uint64_t uniqId=0,
-	       Speed=SPD_400M, u_int delay=5)				;
+    IIDCCamera(Type type=Monocular, uint64_t uniqId=0, Speed=SPD_400M)	;
     ~IIDCCamera()							;
 
     uint64_t		globalUniqueId()			const	;
@@ -486,19 +497,26 @@ class IIDCCamera
     void		getMinMax(Feature feature,
 				  u_int& min, u_int& max)	const	;
     u_int		getValue(Feature feature)		const	;
-
+    
   // White balance stuffs.
     IIDCCamera&		setWhiteBalance(u_int ub, u_int vr)		;
     void		getWhiteBalance(u_int& ub, u_int& vr)	const	;
     
   // Temperature stuffs.
     u_int		getAimedTemperature()			const	;
-    
+
+  // Absolute value stuffs.
+    void		getAbsMinMax(AbsoluteValue abs,
+				     float& min, float& max)	const	;
+    float		getAbsValue(AbsoluteValue abs)		const	;
+
   // Trigger stuffs.
     IIDCCamera&		setTriggerMode(TriggerMode mode)		;
     TriggerMode		getTriggerMode()			const	;
     IIDCCamera&		setTriggerPolarity(TriggerPolarity polarity)	;
     TriggerPolarity	getTriggerPolarity()			const	;
+    IIDCCamera&		setSoftwareTrigger()				;
+    IIDCCamera&		resetSoftwareTrigger()				;
     
   // Shotting stuffs.
     IIDCCamera&		continuousShot()				;
@@ -511,21 +529,19 @@ class IIDCCamera
     IIDCCamera&		saveConfig(u_int mem_ch)			;
     IIDCCamera&		restoreConfig(u_int mem_ch)			;
     u_int		getMemoryChannelMax()			const	;
-
+    
   // Capture stuffs.
     IIDCCamera&		snap()						;
 #ifdef HAVE_LIBTUTOOLS__
-    template <class T> const IIDCCamera&
-			operator >>(Image<T>& image)		const	;
-    template <class T> const IIDCCamera&
-			captureRGBImage(Image<T>& image)	const	;
-    template <class T> const IIDCCamera&
-			captureDirectly(Image<T>& image)	const	;
+    template <class T>
+    const IIDCCamera&	operator >>(Image<T>& image)		const	;
+    template <class T>
+    const IIDCCamera&	captureRGBImage(Image<T>& image)	const	;
+    template <class T>
+    const IIDCCamera&	captureDirectly(Image<T>& image)	const	;
 #endif
-    const IIDCCamera&
-			captureRaw(void* image)			const	;
-    const IIDCCamera&
-			captureBayerRaw(void* image)		const	;
+    const IIDCCamera&	captureRaw(void* image)			const	;
+    const IIDCCamera&	captureBayerRaw(void* image)		const	;
     IIDCCamera&		embedTimestamp()				;
     IIDCCamera&		unembedTimestamp()				;
     uint64_t		getTimestamp()				const	;
@@ -537,17 +553,22 @@ class IIDCCamera
     static TriggerMode	uintToTriggerMode(u_int triggerMode)		;
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
 
+    uint32_t	getCycleTime(uint64_t& localtime)		 const	;
+
   private:
     nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
     u_int	setFormat_7_PacketSize(Format format7)			;
     quadlet_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
     bool	unlockAdvancedFeature(uint64_t featureId,
-				      u_int timeout)			;
+				      u_int timeout)		 const	;
     void	checkAvailability(Format format, FrameRate rate) const	;
     quadlet_t	checkAvailability(Feature feature, uint32_t inq) const	;
     void	checkAvailability(BasicFunction func)		 const	;
     quadlet_t	readQuadletFromRegister(uint32_t offset)	 const	;
     void	writeQuadletToRegister(uint32_t offset, quadlet_t quad)	;
+    quadlet_t	readQuadletFromACRegister(uint32_t offset)	 const	;
+    void	writeQuadletToACRegister(uint32_t offset,
+					 quadlet_t quad)		;
 
   private:
     IIDCNode* const	_node;
@@ -720,6 +741,18 @@ inline void
 IIDCCamera::writeQuadletToRegister(uint32_t offset, quadlet_t quad)
 {
     _node->writeQuadlet(_cmdRegBase + offset, quad);
+}
+
+inline quadlet_t
+IIDCCamera::readQuadletFromACRegister(uint32_t offset) const
+{
+    return _node->readQuadlet(_acRegBase + offset);
+}
+
+inline void
+IIDCCamera::writeQuadletToACRegister(uint32_t offset, quadlet_t quad)
+{
+    _node->writeQuadlet(_acRegBase + offset, quad);
 }
 
 /************************************************************************
