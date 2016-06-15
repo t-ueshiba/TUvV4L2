@@ -2,11 +2,7 @@
  *  $Id: FireWireNode.cc 1655 2014-10-03 01:37:50Z ueshiba $
  */
 #include "FireWireNode_.h"
-#include <unistd.h>
-#include <errno.h>
-#include <cstring>
-#include <algorithm>
-#include <libraw1394/csr.h>
+#include <cstring>		// for strerror()
 
 namespace TU
 {
