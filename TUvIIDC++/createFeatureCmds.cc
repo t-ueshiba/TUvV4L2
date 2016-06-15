@@ -1,7 +1,7 @@
 /*
  *  $Id: createFeatureCmds.cc,v 1.2 2012-06-20 07:50:08 ueshiba Exp $
 */
-#include "TU/v/vIeee1394++.h"
+#include "TU/v/vIIDC++.h"
 
 namespace TU
 {
@@ -10,61 +10,60 @@ namespace v
 /************************************************************************
 *  local data								*
 ************************************************************************/
-struct Feature
+static struct
 {
-    Ieee1394Camera::Feature	id;
-    const char*			name;
-    int				prop[3];
-};
-static Feature		features[] =
+    IIDCCamera::Feature	id;
+    const char*		name;
+    int			prop[3];
+} features[] =
 {
-    {Ieee1394Camera::TRIGGER_MODE,	"Trigger mode"	 },
-    {Ieee1394Camera::BRIGHTNESS,	"Brightness"	 },
-    {Ieee1394Camera::AUTO_EXPOSURE,	"Auto exposure"	 },
-    {Ieee1394Camera::SHARPNESS,		"Sharpness"	 },
-    {Ieee1394Camera::WHITE_BALANCE,	"White bal.(U/B)"},
-    {Ieee1394Camera::WHITE_BALANCE,	"White bal.(V/R)"},
-    {Ieee1394Camera::HUE,		"Hue"		 },
-    {Ieee1394Camera::SATURATION,	"Saturation"	 },
-    {Ieee1394Camera::GAMMA,		"Gamma"		 },
-    {Ieee1394Camera::SHUTTER,		"Shutter"	 },
-    {Ieee1394Camera::GAIN,		"Gain"		 },
-    {Ieee1394Camera::IRIS,		"Iris"		 },
-    {Ieee1394Camera::FOCUS,		"Focus"		 },
-    {Ieee1394Camera::TEMPERATURE,	"Temperature"	 },
-    {Ieee1394Camera::ZOOM,		"Zoom"		 },
-  //{Ieee1394Camera::PAN,		"Pan"		 },
-  //{Ieee1394Camera::TILT,		"Tilt"		 },
+    {IIDCCamera::TRIGGER_MODE,	"Trigger mode"	 },
+    {IIDCCamera::BRIGHTNESS,	"Brightness"	 },
+    {IIDCCamera::AUTO_EXPOSURE,	"Auto exposure"	 },
+    {IIDCCamera::SHARPNESS,	"Sharpness"	 },
+    {IIDCCamera::WHITE_BALANCE,	"White bal.(U/B)"},
+    {IIDCCamera::WHITE_BALANCE,	"White bal.(V/R)"},
+    {IIDCCamera::HUE,		"Hue"		 },
+    {IIDCCamera::SATURATION,	"Saturation"	 },
+    {IIDCCamera::GAMMA,		"Gamma"		 },
+    {IIDCCamera::SHUTTER,	"Shutter"	 },
+    {IIDCCamera::GAIN,		"Gain"		 },
+    {IIDCCamera::IRIS,		"Iris"		 },
+    {IIDCCamera::FOCUS,		"Focus"		 },
+    {IIDCCamera::TEMPERATURE,	"Temperature"	 },
+    {IIDCCamera::ZOOM,		"Zoom"		 },
+  //{IIDCCamera::PAN,		"Pan"		 },
+  //{IIDCCamera::TILT,		"Tilt"		 },
 };
-static const size_t		NFEATURES = sizeof(features)
+static constexpr size_t		NFEATURES = sizeof(features)
 					  / sizeof(features[0]);
 static CmdDef			featureCmds[3*NFEATURES + 2];
 static Array<CmdDef>		cameraChoiceCmds;
 static Array<std::string>	cameraChoiceTitles;
-static const CmdId		CAMERA_CHOICE = Ieee1394Camera::BRIGHTNESS + 2;
+static constexpr CmdId		CAMERA_CHOICE = IIDCCamera::BRIGHTNESS + 2;
 
 /************************************************************************
 *  static functions							*
 ************************************************************************/
 static CmdDef*
-createFeatureCmds(const Ieee1394Camera& camera, size_t ncmds)
+createFeatureCmds(const IIDCCamera& camera, size_t ncmds)
 {
     u_int	y = ncmds;
     for (size_t i = 0; i < NFEATURES; ++i)
     {
-	Feature&	feature = features[i];
-	const u_int	inq = camera.inquireFeatureFunction(feature.id);
+	auto&		feature = features[i];
+	const auto	inq = camera.inquireFeatureFunction(feature.id);
 	
-	if (inq & Ieee1394Camera::Presence)
+	if (inq & IIDCCamera::Presence)
 	{
 	    u_int	x = 1;
 	    
-	    if (inq & Ieee1394Camera::OnOff)
+	    if (inq & IIDCCamera::OnOff)
 	    {
 	      // Create toggle button for turning on/off this feature.
 		featureCmds[ncmds].type	      = C_ToggleButton;
 		featureCmds[ncmds].id	      = feature.id
-					      + IEEE1394CAMERA_OFFSET_ONOFF;
+					      + IIDCCAMERA_OFFSET_ONOFF;
 		featureCmds[ncmds].val	      = camera.isTurnedOn(feature.id);
 		featureCmds[ncmds].title      = "On";
 		featureCmds[ncmds].prop       = noProp;
@@ -77,7 +76,7 @@ createFeatureCmds(const Ieee1394Camera& camera, size_t ncmds)
 		++ncmds;
 	    }
 
-	    if (feature.id == Ieee1394Camera::TRIGGER_MODE)
+	    if (feature.id == IIDCCamera::TRIGGER_MODE)
 	    {
 		featureCmds[ncmds].type	      = C_Label;
 		featureCmds[ncmds].id	      = feature.id;
@@ -92,14 +91,14 @@ createFeatureCmds(const Ieee1394Camera& camera, size_t ncmds)
 		featureCmds[ncmds].size	      = 0;
 		++ncmds;
 	    }
-	    else if (inq & Ieee1394Camera::Manual)
+	    else if (inq & IIDCCamera::Manual)
 	    {
-		if (inq & Ieee1394Camera::Auto)
+		if (inq & IIDCCamera::Auto)
 		{
 		  // Create toggle button for setting manual/auto mode.
 		    featureCmds[ncmds].type	  = C_ToggleButton;
 		    featureCmds[ncmds].id	  = feature.id
-						  + IEEE1394CAMERA_OFFSET_AUTO;
+						  + IIDCCAMERA_OFFSET_AUTO;
 		    featureCmds[ncmds].val	  = camera.isAuto(feature.id);
 		    featureCmds[ncmds].title	  = "Auto";
 		    featureCmds[ncmds].prop       = noProp;
@@ -120,7 +119,7 @@ createFeatureCmds(const Ieee1394Camera& camera, size_t ncmds)
 		featureCmds[ncmds].gridHeight = 1;
 		featureCmds[ncmds].size	      = 0;
 		
-		if (inq & Ieee1394Camera::ReadOut)
+		if (inq & IIDCCamera::ReadOut)
 		{
 		  // Create sliders for setting values.
 		    featureCmds[ncmds].type  = C_Slider;
@@ -133,7 +132,7 @@ createFeatureCmds(const Ieee1394Camera& camera, size_t ncmds)
 		    feature.prop[1] = max - min;
 		    feature.prop[2] = 1;
 
-		    if (feature.id == Ieee1394Camera::WHITE_BALANCE)
+		    if (feature.id == IIDCCamera::WHITE_BALANCE)
 		    {
 			++ncmds;
 			++i;
@@ -182,13 +181,13 @@ createFeatureCmds(const Ieee1394Camera& camera, size_t ncmds)
 *  global functions							*
 ************************************************************************/
 CmdDef*
-createFeatureCmds(const Ieee1394Camera& camera)
+createFeatureCmds(const IIDCCamera& camera)
 {
     return createFeatureCmds(camera, 0);
 }
 
 CmdDef*
-createFeatureCmds(const Array<Ieee1394Camera*>& cameras)
+createFeatureCmds(const Array<IIDCCamera*>& cameras)
 {
     cameraChoiceCmds  .resize(cameras.size() + 2);
     cameraChoiceTitles.resize(cameras.size() + 1);
@@ -241,24 +240,24 @@ createFeatureCmds(const Array<Ieee1394Camera*>& cameras)
 }
 	
 void
-refreshFeatureCmds(const Ieee1394Camera& camera, CmdPane& cmdPane)
+refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 {
     for (CmdDef* featureCmd = featureCmds + 1;
 	 featureCmd->type != C_EndOfList; ++featureCmd)
     {
 	const u_int	id = featureCmd->id;
 	
-	if (id >= Ieee1394Camera::BRIGHTNESS + IEEE1394CAMERA_OFFSET_AUTO)
+	if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_AUTO)
 	    cmdPane.setValue(id,
 			     int(camera.isAuto(
-				     Ieee1394Camera::uintToFeature(
-					 id - IEEE1394CAMERA_OFFSET_AUTO))));
-	else if (id >= Ieee1394Camera::BRIGHTNESS + IEEE1394CAMERA_OFFSET_ONOFF)
+				     IIDCCamera::uintToFeature(
+					 id - IIDCCAMERA_OFFSET_AUTO))));
+	else if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ONOFF)
 	    cmdPane.setValue(id,
 			     int(camera.isTurnedOn(
-				     Ieee1394Camera::uintToFeature(
-					 id - IEEE1394CAMERA_OFFSET_ONOFF))));
-	else if (id == Ieee1394Camera::WHITE_BALANCE)
+				     IIDCCamera::uintToFeature(
+					 id - IIDCCAMERA_OFFSET_ONOFF))));
+	else if (id == IIDCCamera::WHITE_BALANCE)
 	{
 	    u_int	ub, vr;
 	    camera.getWhiteBalance(ub, vr);
@@ -266,14 +265,14 @@ refreshFeatureCmds(const Ieee1394Camera& camera, CmdPane& cmdPane)
 	    ++featureCmd;
 	    cmdPane.setValue(featureCmd->id, int(vr));
 	}
-	else if (id != Ieee1394Camera::TRIGGER_MODE)
+	else if (id != IIDCCamera::TRIGGER_MODE)
 	    cmdPane.setValue(id, int(camera.getValue(
-					 Ieee1394Camera::uintToFeature(id))));
+					 IIDCCamera::uintToFeature(id))));
     }
 }
 
 void
-refreshFeatureCmds(const Array<Ieee1394Camera*>& cameras, CmdPane& cmdPane)
+refreshFeatureCmds(const Array<IIDCCamera*>& cameras, CmdPane& cmdPane)
 {
     if (cameras.size() == 0)
 	return;
@@ -286,7 +285,7 @@ refreshFeatureCmds(const Array<Ieee1394Camera*>& cameras, CmdPane& cmdPane)
 }
 
 bool
-setFeatureValue(const Array<Ieee1394Camera*>& cameras,
+setFeatureValue(const Array<IIDCCamera*>& cameras,
 		u_int id, int val, CmdPane& cmdPane)
 {
     if (cameras.size() == 0)

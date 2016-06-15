@@ -1,7 +1,7 @@
 /*
  *  $Id$
  */
-#include "TU/v/vIeee1394++.h"
+#include "TU/v/vIIDC++.h"
 #include "TU/v/ModalDialog.h"
 
 namespace TU
@@ -14,18 +14,12 @@ namespace v
 class MyModalDialog : public ModalDialog
 {
   public:
-    typedef Ieee1394Camera::Format_7_Info	Format_7_Info;
-    typedef Ieee1394Camera::PixelFormat		PixelFormat;
+    typedef IIDCCamera::Format_7_Info	Format_7_Info;
+    typedef IIDCCamera::PixelFormat	PixelFormat;
     
   private:
     enum	{c_U0, c_V0, c_Width, c_Height, c_PixelFormat, c_OK};
 
-    struct _PixelFormat
-    {
-	PixelFormat	pixelFormat;
-	const char*	name;
-    };
-    
   public:
     MyModalDialog(Window& parentWindow, const Format_7_Info& fmt7info)	;
     
@@ -47,7 +41,7 @@ MyModalDialog::MyModalDialog(Window& parentWindow,
 {
 }
     
-Ieee1394Camera::PixelFormat
+IIDCCamera::PixelFormat
 MyModalDialog::getROI(u_int& u0, u_int& v0, u_int& width, u_int& height)
 {
     show();
@@ -56,7 +50,7 @@ MyModalDialog::getROI(u_int& u0, u_int& v0, u_int& width, u_int& height)
     width	= pane().getValue(c_Width);
     height	= pane().getValue(c_Height);
 
-    return Ieee1394Camera::uintToPixelFormat(pane().getValue(c_PixelFormat));
+    return IIDCCamera::uintToPixelFormat(pane().getValue(c_PixelFormat));
 }
 
 void
@@ -102,25 +96,29 @@ MyModalDialog::callback(CmdId id, CmdVal val)
 CmdDef*
 MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
 {
-    static int		prop[4][3];
-    static _PixelFormat	pixelFormat[] =
+    static int			prop[4][3];
+    static constexpr struct
     {
-	{Ieee1394Camera::MONO_8,	"Y(mono)"},
-	{Ieee1394Camera::YUV_411,	"YUV(4:1:1)"},
-	{Ieee1394Camera::YUV_422,	"YUV(4:2:2)"},
-	{Ieee1394Camera::YUV_444,	"YUV(4:4:4)"},
-	{Ieee1394Camera::RGB_24,	"RGB"},
-	{Ieee1394Camera::MONO_16,	"Y(mono16)"},
-	{Ieee1394Camera::RGB_48,	"RGB(color48)"},
-	{Ieee1394Camera::SIGNED_MONO_16,"Y(signed mono16)"},
-	{Ieee1394Camera::SIGNED_RGB_48,	"RGB(signed color48)"},
-	{Ieee1394Camera::RAW_8,		"RAW(raw8)"},
-	{Ieee1394Camera::RAW_16,	"RAW(raw16)"}
+	IIDCCamera::PixelFormat	pixelFormat;
+	const char*		name;
+    } pixelFormats[] =
+    {
+	{IIDCCamera::MONO_8,		"Y(mono)"},
+	{IIDCCamera::YUV_411,		"YUV(4:1:1)"},
+	{IIDCCamera::YUV_422,		"YUV(4:2:2)"},
+	{IIDCCamera::YUV_444,		"YUV(4:4:4)"},
+	{IIDCCamera::RGB_24,		"RGB"},
+	{IIDCCamera::MONO_16,		"Y(mono16)"},
+	{IIDCCamera::RGB_48,		"RGB(color48)"},
+	{IIDCCamera::SIGNED_MONO_16,	"Y(signed mono16)"},
+	{IIDCCamera::SIGNED_RGB_48,	"RGB(signed color48)"},
+	{IIDCCamera::RAW_8,		"RAW(raw8)"},
+	{IIDCCamera::RAW_16,		"RAW(raw16)"}
     };
-    static const size_t	NPIXELFORMATS = sizeof(pixelFormat)
-				      / sizeof(pixelFormat[0]);
-    static MenuDef	pixelFormatMenu[NPIXELFORMATS + 1];
-    static CmdDef	cmds[] =
+    static constexpr size_t	NPIXELFORMATS = sizeof(pixelFormats)
+					      / sizeof(pixelFormats[0]);
+    static MenuDef		pixelFormatMenus[NPIXELFORMATS + 1];
+    static CmdDef		cmds[] =
     {
 	{C_Slider, c_U0,     fmt7info.u0,     "    u0", prop[0], CA_None,
 	 0, 0, 1, 1, 0},
@@ -130,7 +128,7 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
 	 0, 2, 1, 1, 0},
 	{C_Slider, c_Height, fmt7info.height, "height", prop[3], CA_None,
 	 0, 3, 1, 1, 0},
-	{C_ChoiceMenuButton, c_PixelFormat, 0, "pixel format", pixelFormatMenu,
+	{C_ChoiceMenuButton, c_PixelFormat, 0, "pixel format", pixelFormatMenus,
 	 CA_None,
 	 0, 4, 1, 1, 0},
 	{C_Button, c_OK,     0,		      "OK",	noProp,	 CA_None,
@@ -158,17 +156,17 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
     
   // Create a menu button for setting pixel format.
     size_t	npixelformats = 0;
-    for (size_t i = 0; i < NPIXELFORMATS; ++i)
-	if (fmt7info.availablePixelFormats & pixelFormat[i].pixelFormat)
+    for (const auto& pixelFormat : pixelFormats)
+	if (fmt7info.availablePixelFormats & pixelFormat.pixelFormat)
 	{
-	    pixelFormatMenu[npixelformats].label   = pixelFormat[i].name;
-	    pixelFormatMenu[npixelformats].id	   = pixelFormat[i].pixelFormat;
-	    pixelFormatMenu[npixelformats].checked
-		= (fmt7info.pixelFormat == pixelFormat[i].pixelFormat);
-	    pixelFormatMenu[npixelformats].submenu = noSub;
+	    pixelFormatMenus[npixelformats].label = pixelFormat.name;
+	    pixelFormatMenus[npixelformats].id	  = pixelFormat.pixelFormat;
+	    pixelFormatMenus[npixelformats].checked
+		= (fmt7info.pixelFormat == pixelFormat.pixelFormat);
+	    pixelFormatMenus[npixelformats].submenu = noSub;
 	    ++npixelformats;
 	}
-    pixelFormatMenu[npixelformats].label = 0;
+    pixelFormatMenus[npixelformats].label = 0;
     
     return cmds;
 }
@@ -177,31 +175,27 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
 *  global functions							*
 ************************************************************************/
 bool
-setSpecialFormat(Ieee1394Camera& camera, u_int id, int val, Window& window)
+setSpecialFormat(IIDCCamera& camera, u_int id, int val, Window& window)
 {
     switch (id)
     {
-      case Ieee1394Camera::Format_7_0:
-      case Ieee1394Camera::Format_7_1:
-      case Ieee1394Camera::Format_7_2:
-      case Ieee1394Camera::Format_7_3:
-      case Ieee1394Camera::Format_7_4:
-      case Ieee1394Camera::Format_7_5:
-      case Ieee1394Camera::Format_7_6:
-      case Ieee1394Camera::Format_7_7:
+      case IIDCCamera::Format_7_0:
+      case IIDCCamera::Format_7_1:
+      case IIDCCamera::Format_7_2:
+      case IIDCCamera::Format_7_3:
+      case IIDCCamera::Format_7_4:
+      case IIDCCamera::Format_7_5:
+      case IIDCCamera::Format_7_6:
+      case IIDCCamera::Format_7_7:
       {
-	Ieee1394Camera::Format	format7 = Ieee1394Camera::uintToFormat(id);
-	Ieee1394Camera::Format_7_Info
-				fmt7info = camera.getFormat_7_Info(format7);
-	v::MyModalDialog	modalDialog(window, fmt7info);
-	u_int			u0, v0, width, height;
-	Ieee1394Camera::PixelFormat
-				pixelFormat = modalDialog.getROI(u0, v0,
-								 width, height);
+	auto	format7 = IIDCCamera::uintToFormat(id);
+	v::MyModalDialog
+		modalDialog(window, camera.getFormat_7_Info(format7));
+	u_int	u0, v0, width, height;
+	auto	pixelFormat = modalDialog.getROI(u0, v0, width, height);
 	camera.setFormat_7_ROI(format7, u0, v0, width, height)
 	      .setFormat_7_PixelFormat(format7, pixelFormat)
-	      .setFormatAndFrameRate(format7,
-				     Ieee1394Camera::uintToFrameRate(val));
+	      .setFormatAndFrameRate(format7, IIDCCamera::uintToFrameRate(val));
       }
 	return true;
     }
@@ -210,34 +204,30 @@ setSpecialFormat(Ieee1394Camera& camera, u_int id, int val, Window& window)
 }
 
 bool
-setSpecialFormat(const Array<Ieee1394Camera*>& cameras,
+setSpecialFormat(const Array<IIDCCamera*>& cameras,
 		 u_int id, int val, Window& window)
 {
     switch (id)
     {
-      case Ieee1394Camera::Format_7_0:
-      case Ieee1394Camera::Format_7_1:
-      case Ieee1394Camera::Format_7_2:
-      case Ieee1394Camera::Format_7_3:
-      case Ieee1394Camera::Format_7_4:
-      case Ieee1394Camera::Format_7_5:
-      case Ieee1394Camera::Format_7_6:
-      case Ieee1394Camera::Format_7_7:
+      case IIDCCamera::Format_7_0:
+      case IIDCCamera::Format_7_1:
+      case IIDCCamera::Format_7_2:
+      case IIDCCamera::Format_7_3:
+      case IIDCCamera::Format_7_4:
+      case IIDCCamera::Format_7_5:
+      case IIDCCamera::Format_7_6:
+      case IIDCCamera::Format_7_7:
       {
-	Ieee1394Camera::Format	format7 = Ieee1394Camera::uintToFormat(id);
-	Ieee1394Camera::Format_7_Info
-				fmt7info
-				    = cameras[0]->getFormat_7_Info(format7);
-	v::MyModalDialog	modalDialog(window, fmt7info);
-	u_int			u0, v0, width, height;
-	Ieee1394Camera::PixelFormat
-				pixelFormat = modalDialog.getROI(u0, v0,
-								 width, height);
-	for (size_t i = 0; i < cameras.size(); ++i)
-	    cameras[i]->setFormat_7_ROI(format7, u0, v0, width, height)
-		       .setFormat_7_PixelFormat(format7, pixelFormat)
-		       .setFormatAndFrameRate(
-			   format7, Ieee1394Camera::uintToFrameRate(val));
+	auto	format7 = IIDCCamera::uintToFormat(id);
+	v::MyModalDialog
+		modalDialog(window, cameras[0]->getFormat_7_Info(format7));
+	u_int	u0, v0, width, height;
+	auto	pixelFormat = modalDialog.getROI(u0, v0, width, height);
+	for (auto camera : cameras)
+	    camera->setFormat_7_ROI(format7, u0, v0, width, height)
+		   .setFormat_7_PixelFormat(format7, pixelFormat)
+		   .setFormatAndFrameRate(format7,
+					  IIDCCamera::uintToFrameRate(val));
       }
 	return true;
     }
