@@ -1,3 +1,7 @@
+/*
+ *  $Id$
+ */
+#include <sys/time.h>
 #include <signal.h>
 #include <iostream>
 #include <iomanip>
@@ -6,6 +10,28 @@
 namespace TU
 {
 bool	active = true;
+
+/************************************************************************
+*  static functions							*
+************************************************************************/
+static void
+count_time()
+{
+    static int		nframes = 0;
+    static timeval	start;
+    
+    if (nframes == 10)
+    {
+	timeval	end;
+	gettimeofday(&end, NULL);
+	double	interval = (end.tv_sec  - start.tv_sec)
+			 + (end.tv_usec - start.tv_usec) / 1.0e6;
+	std::cerr << nframes / interval << " frames/sec" << std::endl;
+	nframes = 0;
+    }
+    if (nframes++ == 0)
+	gettimeofday(&start, NULL);
+}
 
 static std::ostream&
 print_cycletime(std::ostream& out, uint32_t cycletime)
@@ -24,7 +50,7 @@ handler(int sig)
     active = false;
 }
 
-void
+static void
 flow(uint64_t uniqId)
 {
     using namespace	std;
@@ -48,8 +74,8 @@ flow(uint64_t uniqId)
     {
 	camera.snap();
 	camera >> image;
-	cerr << "capture time:\t";
 
+	cerr << "capture time:\t";
 	print_cycletime(cerr,
 			ntohl(*reinterpret_cast<uint32_t*>(image.data())));
 	cerr << endl;
@@ -57,6 +83,8 @@ flow(uint64_t uniqId)
 	cerr << "current time:\t";
 	uint64_t	localtime;
 	print_cycletime(cerr, camera.getCycleTime(localtime)) << endl << endl;
+
+	count_time();
 	
 	image.saveData(cout);
     }
@@ -67,13 +95,17 @@ flow(uint64_t uniqId)
 
 }
 
+/************************************************************************
+*  global functions							*
+************************************************************************/
 int
-main()
+main(int argc, char* argv[])
 {
-  //uint64_t	uniqId = 0x00b09d0100be72c3LL;
     uint64_t	uniqId = 0;
+    extern int	optind;
+    if (optind < argc)
+	uniqId = strtoull(argv[optind], 0, 0);
     
-  //TU::snap(uniqId);
     TU::flow(uniqId);
     
     return 0;

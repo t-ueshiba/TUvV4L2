@@ -124,6 +124,9 @@
 #ifndef __TU_IIDCPP_H
 #define __TU_IIDCPP_H
 
+#if defined(HAVE_CONFIG_H)
+#  include <config.h>
+#endif
 #include <cstddef>	// for size_t
 #include <cstdint>	// for uintXX_t
 #include <sys/types.h>	// for u_int
@@ -138,7 +141,7 @@
 /*!
   \namespace	TU
   \brief	本ライブラリで定義されたクラスおよび関数を納める名前空間
- */
+*/
 namespace TU
 {
 typedef uint32_t	quadlet_t;
