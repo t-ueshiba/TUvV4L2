@@ -80,8 +80,8 @@ USBNode::USBNode(uint32_t unit_spec_ID, uint64_t uniqId)
 {
     try
     {
-	set_handle(unit_spec_ID, uniqId);
-	set_endpoint();
+	setHandle(unit_spec_ID, uniqId);
+	setEndpoint();
     }
     catch (const std::runtime_error& err)
     {
@@ -116,11 +116,11 @@ USBNode::readQuadlet(nodeaddr_t addr) const
 {
     const auto	request = address_to_request(addr);
     quadlet_t	quad;
-    exec(libusb_control_transfer(_handle, 0xc0, request,
-				 addr & 0xffff, (addr >> 16) & 0xffff,
-				 reinterpret_cast<u_char*>(&quad),
-				 sizeof(quad), RequestTimeout),
-	 "USBNode::readQuadlet: failed to read from port!!");
+    check(libusb_control_transfer(_handle, 0xc0, request,
+				  addr & 0xffff, (addr >> 16) & 0xffff,
+				  reinterpret_cast<u_char*>(&quad),
+				  sizeof(quad), RequestTimeout),
+	  "USBNode::readQuadlet: failed to read from port!!");
     return quad;
 }
 
@@ -133,11 +133,11 @@ void
 USBNode::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
 {
     const auto	request = address_to_request(addr);
-    exec(libusb_control_transfer(_handle, 0x40, request,
-				 addr & 0xffff, (addr >> 16) & 0xffff,
-				 reinterpret_cast<u_char*>(&quad),
-				 sizeof(quad), RequestTimeout),
-	 "USBNode::writeQuadlet: failed to write to port!!");
+    check(libusb_control_transfer(_handle, 0x40, request,
+				  addr & 0xffff, (addr >> 16) & 0xffff,
+				  reinterpret_cast<u_char*>(&quad),
+				  sizeof(quad), RequestTimeout),
+	  "USBNode::writeQuadlet: failed to write to port!!");
 }
 
 //! isochronous受信用のバッファを割り当てる
@@ -155,7 +155,7 @@ USBNode::mapListenBuffer(u_int packet_size, u_int buf_size, u_int nb_buffers)
     _nbuffers = nb_buffers;
     _buffers  = new Buffer[_nbuffers];
 
-    start_iso();
+    startIso();
 
   // バッファサイズをendpointのパケットサイズの整数倍にしてoverrunを阻止する
     const auto	maxPacketSize = libusb_get_max_packet_size(
@@ -186,7 +186,7 @@ USBNode::unmapListenBuffer()
 
 	_run = false;				// 稼働フラグを落とす
 	_thread.join();				// 子スレッドの終了を待つ
-	stop_iso();
+	stopIso();
     }
     
     while (!_ready.empty())
@@ -229,13 +229,13 @@ USBNode::flushListenBuffer()
 }
 
 void
-USBNode::set_handle(uint32_t unit_spec_ID, uint64_t uniqId)
+USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 {
     for (DeviceIterator dev(_ctx); *dev; ++dev)	// for each device...
     {
 	libusb_device_descriptor	desc;
-	exec(libusb_get_device_descriptor(*dev, &desc),
-	     "Failed to get device descriptor!!");
+	check(libusb_get_device_descriptor(*dev, &desc),
+	      "Failed to get device descriptor!!");
 #if defined(DEBUG)
 	using namespace	std;
 
@@ -249,16 +249,16 @@ USBNode::set_handle(uint32_t unit_spec_ID, uint64_t uniqId)
 	    if (desc.idVendor  == product.idVendor &&
 		desc.idProduct == product.idProduct)
 	    {
-		exec(libusb_open(*dev, &_handle), "Failed to open device!!");
+		check(libusb_open(*dev, &_handle), "Failed to open device!!");
 	    
 		if (unitSpecId() == unit_spec_ID &&
 		    (uniqId == 0 || globalUniqueId() == uniqId))
 		{
 		    if (libusb_kernel_driver_active(_handle, 0))
-			exec(libusb_detach_kernel_driver(_handle, 0),
-			     "Fialed to detach kernel driver!!");
-		    exec(libusb_set_configuration(_handle, 1),
-			 "Failed to set configuration!!");
+			check(libusb_detach_kernel_driver(_handle, 0),
+			      "Fialed to detach kernel driver!!");
+		    check(libusb_set_configuration(_handle, 1),
+			  "Failed to set configuration!!");
 
 		    return;
 		}
@@ -272,12 +272,12 @@ USBNode::set_handle(uint32_t unit_spec_ID, uint64_t uniqId)
 }
 
 void
-USBNode::set_endpoint()
+USBNode::setEndpoint()
 {
     libusb_config_descriptor*	config;
-    exec(libusb_get_active_config_descriptor(libusb_get_device(_handle),
-					     &config),
-	 "Failed to get config descriptor!!");
+    check(libusb_get_active_config_descriptor(libusb_get_device(_handle),
+					      &config),
+	  "Failed to get config descriptor!!");
 
     for (uint8_t i = 0; i < config->bNumInterfaces; ++i)
     {
@@ -307,7 +307,7 @@ USBNode::set_endpoint()
 }
     
 void
-USBNode::start_iso()
+USBNode::startIso()
 {
     const auto	bus  = libusb_get_bus_number(libusb_get_device(_handle));
     const auto	addr = libusb_get_device_address(libusb_get_device(_handle));
@@ -316,19 +316,19 @@ USBNode::start_iso()
 	if ((libusb_get_bus_number(*dev)     == bus ) &&
 	    (libusb_get_device_address(*dev) == addr))
 	{
-	    exec(libusb_open(*dev, &_iso_handle), "Failed to open device!!");
-	    exec(libusb_claim_interface(_iso_handle, _interface),
-		 "USBNode::start_iso: Failed to claim interface!!");
-	    exec(libusb_set_interface_alt_setting(_iso_handle,
-						  _interface, _altsetting),
-		 "USBNode::start_iso: Failed to set interface alt setting!!");
+	    check(libusb_open(*dev, &_iso_handle), "Failed to open device!!");
+	    check(libusb_claim_interface(_iso_handle, _interface),
+		  "USBNode::startIso: Failed to claim interface!!");
+	    check(libusb_set_interface_alt_setting(_iso_handle,
+						   _interface, _altsetting),
+		  "USBNode::startIso: Failed to set interface alt setting!!");
 
 	    return;
 	}
 }
 
 void
-USBNode::stop_iso()
+USBNode::stopIso()
 {
     libusb_release_interface(_iso_handle, _interface);
     libusb_close(_iso_handle);
@@ -388,7 +388,7 @@ USBNode::Buffer::unmap()
 void
 USBNode::Buffer::enqueue() const
 {
-    exec(libusb_submit_transfer(_transfer), "libusb_submit_transfer failed!!");
+    check(libusb_submit_transfer(_transfer), "libusb_submit_transfer failed!!");
 }
 
 void

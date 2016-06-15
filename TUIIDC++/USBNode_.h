@@ -29,7 +29,7 @@ class USBNode : public IIDCNode
 {
   private:
     static void
-    exec(int err, const std::string& msg)
+    check(int err, const std::string& msg)
     {
 	if (err < 0)
 	    throw std::runtime_error(msg + ' ' + libusb_error_name(err));
@@ -41,7 +41,7 @@ class USBNode : public IIDCNode
 	Context()
 	    :_ctx(nullptr)
 	{
-	    exec(libusb_init(&_ctx), "Failed to initialize libusb!!");
+	    check(libusb_init(&_ctx), "Failed to initialize libusb!!");
 	    libusb_set_debug(_ctx, 3);
 	}
 	~Context()				{ libusb_exit(_ctx); }
@@ -124,11 +124,11 @@ class USBNode : public IIDCNode
     virtual void	flushListenBuffer()				;
     
   private:
-    void		set_handle(uint32_t unit_spec_ID,
-				   uint64_t uniqId)			;
-    void		set_endpoint()					;
-    void		start_iso()					;
-    void		stop_iso()					;
+    void		setHandle(uint32_t unit_spec_ID,
+				  uint64_t uniqId)			;
+    void		setEndpoint()					;
+    void		startIso()					;
+    void		stopIso()					;
     static void		mainLoop(USBNode* node)				;
     
   private:

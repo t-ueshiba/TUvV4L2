@@ -9,7 +9,7 @@ namespace TU
 *  static functions							*
 ************************************************************************/
 template <class CAMERAS> static bool
-setFormat1394(CAMERAS& cameras, u_int id, u_int val)
+setFormatIIDC(CAMERAS& cameras, u_int id, u_int val)
 {
     switch (id)
     {
@@ -46,7 +46,7 @@ setFormat1394(CAMERAS& cameras, u_int id, u_int val)
 }
     
 template <class CAMERAS> static bool
-setFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
+setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
 {
     switch (id)
     {
@@ -154,7 +154,7 @@ setFeatureValue1394(CAMERAS& cameras, u_int id, u_int val, int n)
 }
 
 template <class CAMERAS> static u_int
-getFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
+getFeatureValueIIDC(const CAMERAS& cameras, u_int id, int n)
 {
     switch (id)
     {
@@ -239,7 +239,7 @@ getFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
 	return exec(cameras, &IIDCCamera::getTriggerPolarity, n);
     }
 
-    throw std::invalid_argument("getFeatureValue1394(): unknown feature!!");
+    throw std::invalid_argument("getFeatureValueIIDC(): unknown feature!!");
     
     return 0;
 }
@@ -250,39 +250,39 @@ getFeatureValue1394(const CAMERAS& cameras, u_int id, int n)
 bool
 setFormat(IIDCCamera& camera, u_int id, int val)
 {
-    return setFormat1394(camera, id, val);
+    return setFormatIIDC(camera, id, val);
 }
 
 bool
 setFeatureValue(IIDCCamera& camera, u_int id, int val, int)
 {
-    return setFeatureValue1394(camera, id, val, -1);
+    return setFeatureValueIIDC(camera, id, val, -1);
 }
 
 u_int
 getFeatureValue(const IIDCCamera& camera, u_int id, int)
 {
-    return getFeatureValue1394(camera, id, -1);
+    return getFeatureValueIIDC(camera, id, -1);
 }
     
 #ifdef HAVE_LIBTUTOOLS__
 bool
 setFormat(const Array<IIDCCamera*>& cameras, u_int id, int val)
 {
-    return setFormat1394(cameras, id, val);
+    return setFormatIIDC(cameras, id, val);
 }
 
 bool
 setFeatureValue(const Array<IIDCCamera*>& cameras,
 		u_int id, int val, int n)
 {
-    return setFeatureValue1394(cameras, id, val, n);
+    return setFeatureValueIIDC(cameras, id, val, n);
 }
 
 u_int
 getFeatureValue(const Array<IIDCCamera*>& cameras, u_int id, int n)
 {
-    return getFeatureValue1394(cameras, id, n);
+    return getFeatureValueIIDC(cameras, id, n);
 }
 
 void

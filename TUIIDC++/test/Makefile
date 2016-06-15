@@ -23,7 +23,10 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUIIDC++ -lTUTools++ -lraw1394 -lusb-1.0
+LIBS		= -lTUTools++ -lraw1394 -lusb-1.0
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework CoreServices
+endif
 
 LINKER		= $(CXX)
 
