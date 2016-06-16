@@ -251,7 +251,8 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
     const int	nports = raw1394_get_port_info(_handle, NULL, 0);
     check(nports < 0, "FireWireNode::FireWireNode: failed to get port info!!");
     raw1394_destroy_handle(_handle);
-
+    _handle = nullptr;
+    
   // Find the specified node yet registered.
     for (int i = 0; i < nports; ++i)		// for each port...
     {
