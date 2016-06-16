@@ -120,19 +120,18 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
     static MenuDef		pixelFormatMenus[NPIXELFORMATS + 1];
     static CmdDef		cmds[] =
     {
-	{C_Slider, c_U0,     fmt7info.u0,     "    u0", prop[0], CA_None,
-	 0, 0, 1, 1, 0},
-	{C_Slider, c_V0,     fmt7info.v0,     "    v0", prop[1], CA_None,
-	 0, 1, 1, 1, 0},
-	{C_Slider, c_Width,  fmt7info.width,  " width", prop[2], CA_None,
-	 0, 2, 1, 1, 0},
-	{C_Slider, c_Height, fmt7info.height, "height", prop[3], CA_None,
-	 0, 3, 1, 1, 0},
-	{C_ChoiceMenuButton, c_PixelFormat, 0, "pixel format", pixelFormatMenus,
-	 CA_None,
-	 0, 4, 1, 1, 0},
-	{C_Button, c_OK,     0,		      "OK",	noProp,	 CA_None,
-	 0, 5, 1, 1, 0},
+	{C_Slider, c_U0,     static_cast<int>(fmt7info.u0),
+	 "    u0", prop[0], CA_None, 0, 0, 1, 1, 0},
+	{C_Slider, c_V0,     static_cast<int>(fmt7info.v0),
+	 "    v0", prop[1], CA_None, 0, 1, 1, 1, 0},
+	{C_Slider, c_Width,  static_cast<int>(fmt7info.width),
+	 " width", prop[2], CA_None, 0, 2, 1, 1, 0},
+	{C_Slider, c_Height, static_cast<int>(fmt7info.height),
+	 "height", prop[3], CA_None, 0, 3, 1, 1, 0},
+	{C_ChoiceMenuButton, c_PixelFormat,
+	 0, "pixel format", pixelFormatMenus, CA_None, 0, 4, 1, 1, 0},
+	{C_Button, c_OK,     0,
+	 "OK",	noProp,	 CA_None, 0, 5, 1, 1, 0},
 	EndOfCmds
     };
 
