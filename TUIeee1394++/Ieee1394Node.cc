@@ -68,9 +68,9 @@ video1394_get_fd_and_check(int port_number)
 static inline u_int32_t
 cycletime_to_subcycle(u_int32_t cycletime)
 {
-    u_int32_t	sec	 = (cycletime & 0xe000000) >> 25;
-    u_int32_t	cycle	 = (cycletime & 0x1fff000) >> 12;
-    u_int32_t	subcycle = (cycletime & 0x0000fff);
+    u_int32_t	sec	 = (cycletime & 0xfe000000) >> 25;
+    u_int32_t	cycle	 = (cycletime & 0x01fff000) >> 12;
+    u_int32_t	subcycle = (cycletime & 0x00000fff);
 
     return subcycle + 3072*(cycle + 8000*sec);
 }
