@@ -379,7 +379,7 @@ class IIDCCamera
     enum FeatureFunction
     {
 	Presence	= (0x1u << 31),	//!< この属性そのものをサポート
-      //Abs_Control	= (0x1u << 30),	//!< この属性を値によって制御可能
+	Abs_Control	= (0x1u << 30),	//!< この属性を値によって制御可能
 	One_Push	= (0x1u << 28),	//!< one pushモードをサポート
 	ReadOut		= (0x1u << 27),	//!< この属性の値の読み出しが可能
 	OnOff		= (0x1u << 26),	//!< この属性のon/offが可能

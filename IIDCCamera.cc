@@ -2439,6 +2439,8 @@ IIDCCamera::inquireFrameRate(Format format) const
 uint32_t
 IIDCCamera::getAbsValueOffset(Feature feature) const
 {
+    checkAvailability(feature, Abs_Control);
+    
     uint32_t	offset = 0;
     
     switch (feature)
@@ -2451,17 +2453,6 @@ IIDCCamera::getAbsValueOffset(Feature feature) const
       default:
 	offset = readQuadletFromRegister(feature - 0x100);
 	break;
-    }
-    if (!offset)
-    {
-	using namespace	std;
-	
-	ostringstream	s;
-
-	s << "IIDCCamera::getAbsValueOffset: This feature["
-	  << showbase << hex << feature
-	  << "] does not support absolute value mode!!";
-      	throw runtime_error(s.str());
     }
 
     return CSR_REGISTER_BASE + 4*offset - _cmdRegBase;
