@@ -55,7 +55,7 @@
 namespace TU
 {
 GtkWidget*	createMenubar(MyIIDCCamera& camera)			;
-GtkWidget*	createCommands(MyIIDCCamera& camera)			;
+GtkWidget*	createCommands(MyIIDCCamera& camera, bool abs)		;
 
 /************************************************************************
 *  static functions							*
@@ -98,12 +98,16 @@ main(int argc, char* argv[])
     gtk_init(&argc, &argv);	// GTK+ の初期化.
 
     IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
+    bool		abs   = false;
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "bh")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "bah")) != EOF; )
 	switch (c)
 	{
 	  case 'b':
 	    speed = IIDCCamera::SPD_800M;
+	    break;
+	  case 'a':
+	    abs = true;
 	    break;
 	  case 'h':
 	    usage(argv[0]);
@@ -129,12 +133,12 @@ main(int argc, char* argv[])
 
 	GtkWidget*	table = gtk_table_new(2, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
-	gtk_table_attach(GTK_TABLE(table), createMenubar(camera), 0, 2, 0, 1,
-			 GTK_FILL, GTK_SHRINK, 0, 0);
-	gtk_table_attach(GTK_TABLE(table), createCommands(camera), 1, 2, 1, 2,
-			 GTK_SHRINK, GTK_SHRINK, 5, 0);
-	gtk_table_attach(GTK_TABLE(table), camera.canvas(), 0, 1, 1, 2,
-			 GTK_SHRINK, GTK_SHRINK, 0, 0);
+	gtk_table_attach(GTK_TABLE(table), createMenubar(camera),
+			 0, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+	gtk_table_attach(GTK_TABLE(table), createCommands(camera, abs),
+			 1, 2, 1, 2, GTK_SHRINK, GTK_SHRINK, 5, 0);
+	gtk_table_attach(GTK_TABLE(table), camera.canvas(),
+			 0, 1, 1, 2, GTK_SHRINK, GTK_SHRINK, 0, 0);
 	gtk_widget_show_all(window);
 
 	gtk_main();

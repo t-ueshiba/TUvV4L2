@@ -25,6 +25,7 @@
 #  include <config.h>
 #endif
 #include "MyIIDCCamera.h"
+#include <cmath>
 
 namespace TU
 {
@@ -54,6 +55,9 @@ static const MyFeature	feature[] =
     {IIDCCamera::IRIS,		"Iris:"},
     {IIDCCamera::FOCUS,		"Focus:"},
     {IIDCCamera::TEMPERATURE,	"Temperature:"},
+    {IIDCCamera::TRIGGER_DELAY,	"Trigger delay:"},
+    {IIDCCamera::FRAME_RATE,	"Frame rate:"},
+    {IIDCCamera::TEMPERATURE,	"Temperature:"},
     {IIDCCamera::ZOOM,		"Zoom:"}
 };
 static const int		NFEATURES = sizeof(feature)/sizeof(feature[0]);
@@ -64,8 +68,8 @@ static const int		NFEATURES = sizeof(feature)/sizeof(feature[0]);
  */
 struct CameraAndFeature
 {
-    IIDCCamera*		camera;		//!< カメラ
-    IIDCCamera::Feature	feature;	//!< 操作したい機能
+    IIDCCamera*			camera;		//!< カメラ
+    IIDCCamera::Feature		feature;	//!< 操作したい機能
 };
 static CameraAndFeature		cameraAndFeature[NFEATURES];
 
@@ -174,6 +178,21 @@ CBsetValue(GtkAdjustment* adj, gpointer userdata)
     cameraAndFeature->camera->setValue(cameraAndFeature->feature, adj->value);
 }
 
+//! adjustment widget が動かされると呼ばれるコールバック関数．
+/*!
+  あるカメラ機能の値を絶対値で設定する．
+  \param adj		設定値を与える adjuster
+  \param userdata	CameraAndFeature (IEEE1394カメラと値を設定したい
+			機能の2ツ組)
+*/
+static void
+CBsetAbsValue(GtkAdjustment* adj, gpointer userdata)
+{
+    CameraAndFeature*	cameraAndFeature = (CameraAndFeature*)userdata;
+    cameraAndFeature->camera->setAbsValue(cameraAndFeature->feature,
+					  adj->value);
+}
+
 //! U/B値用 adjustment widget が動かされると呼ばれるコールバック関数．
 /*!
   ホワイトバランスのU/B値を設定する．
@@ -213,10 +232,11 @@ CBsetWhiteBalanceVR(GtkAdjustment* adj, gpointer userdata)
 /*!
   IEEE1394カメラがサポートしている機能を調べて生成するコマンドを決定する．
   \param camera		IEEE1394カメラ
+  \param abs		trueならば絶対値モード
   \return		生成されたコマンド群が貼りつけられたテーブル
 */
 GtkWidget*
-createCommands(MyIIDCCamera& camera)
+createCommands(MyIIDCCamera& camera, bool abs)
 {
     GtkWidget*	commands = gtk_table_new(4, 2 + NFEATURES, FALSE);
     u_int	y = 0;
@@ -301,67 +321,99 @@ createCommands(MyIIDCCamera& camera)
 					  0, 1, y, y+1);
 		if (inq & IIDCCamera::ReadOut)
 		{
-		  // この機能が取り得る値の範囲を調べる．
-		    u_int	min, max;
-		    camera.getMinMax(feature[i].feature, min, max);
-		    if (feature[i].feature == IIDCCamera::WHITE_BALANCE)
+		    if (abs)
 		    {
-		      // white balanceの現在の値を調べる．
-			u_int	ub, vr;
-			camera.getWhiteBalance(ub, vr);
-		      // white balanceのUB値を与えるためのadjustment widgetを生成．
-			GtkObject*	adj = gtk_adjustment_new(ub, min, max,
-								 1.0, 1.0, 0.0);
-		      // コールバック関数の登録．
-			gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-					   GTK_SIGNAL_FUNC(CBsetWhiteBalanceUB),
-					   &camera);
-		      // adjustmentを操作するためのscale widgetを生成．
-			GtkWidget*	scale = gtk_hscale_new(
-						    GTK_ADJUSTMENT(adj));
-			gtk_scale_set_digits(GTK_SCALE(scale), 0);
-			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
-			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
-						  1, 2, y, y+1);
-			++i;
-			++y;
-			GtkWidget*	label = gtk_label_new(feature[i].name);
-			gtk_table_attach_defaults(GTK_TABLE(commands), label,
-						  0, 1, y, y+1);
-		      // white balanceのVR値を与えるためのadjustment widgetを生成．
-			adj = gtk_adjustment_new(vr, min, max, 1.0, 1.0, 0.0);
-		      // コールバック関数の登録．
-			gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-					   GTK_SIGNAL_FUNC(CBsetWhiteBalanceVR),
-					   &camera);
-		      // adjustmentを操作するためのscale widgetを生成．
-			scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-			gtk_scale_set_digits(GTK_SCALE(scale), 0);
-			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
-			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
-						  1, 2, y, y+1);
-		    }
-		    else
-		    {
+		      // この機能が取り得る値の範囲を調べる．
+			float	min, max;
+			camera.getAbsMinMax(feature[i].feature, min, max);
 		      // この機能の現在の値を調べる．
-			int	val = camera.getValue(feature[i].feature);
+			float	val = camera.getAbsValue(feature[i].feature);
 		      // この機能に値を与えるためのadjustment widgetを生成．
+			float	step = (max - min)/100;
 			GtkObject*
-				adj = gtk_adjustment_new(val, min, max,
-							 1.0, 1.0, 0.0);
+			    adj = gtk_adjustment_new(val, min, max,
+						     step, step, 0.0);
 		      // コールバック関数の登録．
 			cameraAndFeature[i].camera = &camera;
 			cameraAndFeature[i].feature = feature[i].feature;
 			gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-					   GTK_SIGNAL_FUNC(CBsetValue),
+					   GTK_SIGNAL_FUNC(CBsetAbsValue),
 					   (gpointer)&cameraAndFeature[i]);
 		      // adjustmentを操作するためのscale widgetを生成．
+			int	digits = std::max(3, int(-log10(step)) + 2);
+			std::cerr << feature[i].name << ": "
+				  << step << ", " << digits << std::endl;
 			GtkWidget*
-				scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-			gtk_scale_set_digits(GTK_SCALE(scale), 0);
+			    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+			gtk_scale_set_digits(GTK_SCALE(scale), digits);
 			gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
-			gtk_table_attach_defaults(GTK_TABLE(commands), scale,
-						  1, 2, y, y+1);
+			gtk_table_attach_defaults(GTK_TABLE(commands),
+						  scale, 1, 2, y, y+1);
+		    }
+		    else
+		    {
+		      // この機能が取り得る値の範囲を調べる．
+			u_int	min, max;
+			camera.getMinMax(feature[i].feature, min, max);
+			if (feature[i].feature == IIDCCamera::WHITE_BALANCE)
+			{
+			  // white balanceの現在の値を調べる．
+			    u_int	ub, vr;
+			    camera.getWhiteBalance(ub, vr);
+			  // UB値を与えるためのadjustment widgetを生成．
+			    GtkObject*	adj = gtk_adjustment_new(ub, min, max,
+								 1.0, 1.0, 0.0);
+			  // コールバック関数の登録．
+			    gtk_signal_connect(
+				GTK_OBJECT(adj), "value_changed",
+				GTK_SIGNAL_FUNC(CBsetWhiteBalanceUB), &camera);
+			  // adjustmentを操作するためのscale widgetを生成．
+			    GtkWidget*	scale = gtk_hscale_new(
+						    GTK_ADJUSTMENT(adj));
+			    gtk_scale_set_digits(GTK_SCALE(scale), 0);
+			    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
+			    gtk_table_attach_defaults(GTK_TABLE(commands),
+						      scale, 1, 2, y, y+1);
+			    ++i;
+			    ++y;
+			    GtkWidget*	label = gtk_label_new(feature[i].name);
+			    gtk_table_attach_defaults(GTK_TABLE(commands),
+						      label, 0, 1, y, y+1);
+			  // VR値を与えるためのadjustment widgetを生成．
+			    adj = gtk_adjustment_new(vr, min, max,
+						     1.0, 1.0, 0.0);
+			  // コールバック関数の登録．
+			    gtk_signal_connect(
+				GTK_OBJECT(adj), "value_changed",
+				GTK_SIGNAL_FUNC(CBsetWhiteBalanceVR), &camera);
+			  // adjustmentを操作するためのscale widgetを生成．
+			    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+			    gtk_scale_set_digits(GTK_SCALE(scale), 0);
+			    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
+			    gtk_table_attach_defaults(GTK_TABLE(commands),
+						      scale, 1, 2, y, y+1);
+			}
+			else
+			{
+			  // この機能の現在の値を調べる．
+			    int	val = camera.getValue(feature[i].feature);
+			  // この機能に値を与えるためのadjustment widgetを生成．
+			    GtkObject*	adj = gtk_adjustment_new(val, min, max,
+								 1.0, 1.0, 0.0);
+			  // コールバック関数の登録．
+			    cameraAndFeature[i].camera = &camera;
+			    cameraAndFeature[i].feature = feature[i].feature;
+			    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
+					       GTK_SIGNAL_FUNC(CBsetValue),
+					       (gpointer)&cameraAndFeature[i]);
+			  // adjustmentを操作するためのscale widgetを生成．
+			    GtkWidget*
+				scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+			    gtk_scale_set_digits(GTK_SCALE(scale), 0);
+			    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
+			    gtk_table_attach_defaults(GTK_TABLE(commands),
+						      scale, 1, 2, y, y+1);
+			}
 		    }
 		}
 	    }
