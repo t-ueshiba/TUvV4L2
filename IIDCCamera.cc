@@ -2441,21 +2441,10 @@ IIDCCamera::getAbsValueOffset(Feature feature) const
 {
     checkAvailability(feature, Abs_Control);
     
-    uint32_t	offset = 0;
-    
-    switch (feature)
-    {
-      case ZOOM:
-      case PAN:
-      case TILT:
-	offset = readQuadletFromRegister(feature - 0xc0);
-	break;
-      default:
-	offset = readQuadletFromRegister(feature - 0x100);
-	break;
-    }
+    uint32_t	offset = (feature < ZOOM ? 0x100 : 0xc0);
 
-    return CSR_REGISTER_BASE + 4*offset - _cmdRegBase;
+    return CSR_REGISTER_BASE + 4 * readQuadletFromRegister(feature - offset)
+	 - _cmdRegBase;
 }
     
 nodeaddr_t
