@@ -237,6 +237,7 @@ MyIIDCCamera::draw()
 			   GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
       }
 	break;
+
       case YUV_422:
       {
 	const u_char*	p = _buf;
@@ -254,6 +255,7 @@ MyIIDCCamera::draw()
 			   GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
       }
 	break;
+
       case YUV_411:
       {
 	const u_char*	p = _buf;
@@ -273,12 +275,14 @@ MyIIDCCamera::draw()
 			   GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
       }
 	break;
+
       case RGB_24:
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			   0, 0, width(), height(),
 			   GDK_RGB_DITHER_NONE, (guchar*)_buf, 3*width());
 	break;
+
       case MONO_8:
       case RAW_8:
 	if ((bayerTileMapping() != IIDCCamera::YYYY) && (pixelFormat() != RAW_8))
@@ -294,6 +298,7 @@ MyIIDCCamera::draw()
 				0, 0, width(), height(),
 				GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
 	break;
+
       case MONO_16:
       case SIGNED_MONO_16:
       case RAW_16:
@@ -321,6 +326,9 @@ MyIIDCCamera::draw()
 				0, 0, width(), height(),
 				GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
 	}
+	break;
+
+      default:
 	break;
     }
 }
@@ -385,6 +393,9 @@ MyIIDCCamera::save(std::ostream& out) const
 		<< endl;
 	    out.write((const char*)_buf, width()*height());
 	}
+	break;
+
+      default:
 	break;
     }
     
