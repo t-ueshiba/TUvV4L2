@@ -159,7 +159,10 @@ typedef uint64_t	nodeaddr_t;
 class IIDCNode
 {
   public:
+			IIDCNode()					{}
     virtual		~IIDCNode()					;
+			IIDCNode(const IIDCNode&)		= delete;
+    IIDCNode&		operator =(const IIDCNode&)		= delete;
     
     uint64_t		globalUniqueId()			const	;
     uint32_t		unitSpecId()				const	;
@@ -212,6 +215,13 @@ class IIDCNode
   //! すべての受信用バッファの内容を空にする
     virtual void	flushListenBuffer()				= 0;
 
+  //! バスのサイクルタイムとOSのローカルタイムを取得する
+  /*!
+    \param localtime	OSのローカルタイムが返される.
+    \return		バスのサイクルタイム.
+  */
+    virtual uint32_t	getCycleTime(uint64_t& localtime)	const	= 0;
+    
   private:
     uint32_t		readValueFromUnitDependentDirectory(uint8_t key)
 								  const	;
@@ -426,19 +436,6 @@ class IIDCCamera
 	YYYY = 0x59595959	//!< すべてY(monochrome)
     };
 
-    enum AbsoluteValue
-    {
-	ABS_VAL_AUTO_EXPOSURE	= 0x900,	//!< 自動露出の絶対値
-	ABS_VAL_SHUTTER		= 0x910,	//!< シャッタースピードの絶対値
-	ABS_VAL_GAIN		= 0x920,	//!< ゲインの絶対値
-	ABS_VAL_BRIGHTNESS	= 0x930,	//!< 明るさの絶対値
-	ABS_VAL_GAMMA		= 0x940,	//!< ガンマ補正の絶対値
-	ABS_VAL_TRIGGER_DELAY	= 0x950,	//!< トリガ遅れの絶対値
-	ABS_VAL_FRAME_RATE	= 0x960,	//!< フレームレートの絶対値
-	ABS_VAL_HUE		= 0x970,	//!< 色の色相の絶対値
-	ABS_VAL_SATURATION	= 0x980,	//!< 色の飽和度の絶対値
-    };
-
   private:
     struct Mono16
     {
@@ -509,9 +506,10 @@ class IIDCCamera
     u_int		getAimedTemperature()			const	;
 
   // Absolute value stuffs.
-    void		getAbsMinMax(AbsoluteValue abs,
+    IIDCCamera&		setAbsValue(Feature feature, float value)	;
+    void		getAbsMinMax(Feature feature,
 				     float& min, float& max)	const	;
-    float		getAbsValue(AbsoluteValue abs)		const	;
+    float		getAbsValue(Feature feature)		const	;
 
   // Trigger stuffs.
     IIDCCamera&		setTriggerMode(TriggerMode mode)		;
@@ -548,7 +546,9 @@ class IIDCCamera
     IIDCCamera&		embedTimestamp()				;
     IIDCCamera&		unembedTimestamp()				;
     uint64_t		getTimestamp()				const	;
-
+    uint32_t		getCycleTime(uint64_t& localtime)	const	;
+    uint64_t		cycletimeToLocaltime(uint32_t cycletime) const	;
+    
   // Utility functions.
     static Format	uintToFormat(u_int format)			;
     static FrameRate	uintToFrameRate(u_int frameRate)		;
@@ -556,9 +556,8 @@ class IIDCCamera
     static TriggerMode	uintToTriggerMode(u_int triggerMode)		;
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
 
-    uint32_t	getCycleTime(uint64_t& localtime)		 const	;
-
   private:
+    uint32_t	getAbsValueOffset(Feature feature)		 const	;
     nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
     u_int	setFormat_7_PacketSize(Format format7)			;
     quadlet_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
@@ -693,9 +692,9 @@ IIDCCamera::checkAvailability(Format format, FrameRate rate) const
     {
 	ostringstream	s;
 	
-	s << "IIDCCamera::checkAvailability: Incompatible combination of format[0x"
-	  << hex << format << "] and frame rate[0x" << hex << rate << "]!!";
-      	throw runtime_error(s.str().c_str());
+	s << "IIDCCamera::checkAvailability: Incompatible combination of format["
+	  << showbase << hex << format << "] and frame rate[" << rate << "]!!";
+      	throw runtime_error(s.str());
     }
 }
 
@@ -709,10 +708,10 @@ IIDCCamera::checkAvailability(Feature feature, uint32_t inq) const
     {
 	ostringstream	s;
 	
-	s << "IIDCCamera::checkAvailability: This feature[0x"
-	  << hex << feature
-	  << "] is not present or this field is unavailable (quad: 0x"
-	  << hex << quad << ", inq: 0x" << hex << inq << ")!!";
+	s << "IIDCCamera::checkAvailability: This feature["
+	  << showbase << hex << feature
+	  << "] is not present or this field is unavailable (quad: "
+	  << quad << ", inq: " << inq << ")!!";
       	throw runtime_error(s.str());
     }
     return quad;
@@ -728,8 +727,8 @@ IIDCCamera::checkAvailability(BasicFunction func) const
     {
 	ostringstream	s;
 
-	s << "IIDCCamera::checkAvailabilityOfBasicFuntion: This fucntion is not present (quad: 0x"
-	  << hex << quad << ", func: " << hex << func << ")!!";
+	s << "IIDCCamera::checkAvailabilityOfBasicFuntion: This fucntion is not present (quad: "
+	  << showbase << hex << quad << ", func: " << func << ")!!";
       	throw runtime_error(s.str());
     }
 }

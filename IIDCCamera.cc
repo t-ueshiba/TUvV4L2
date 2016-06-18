@@ -310,16 +310,6 @@ cycletime_to_subcycle(uint32_t cycletime)
     return subcycle + 3072*(cycle + 8000*sec);
 }
 
-#if defined(DEBUG)
-static std::ostream&
-print_time(std::ostream& out, uint64_t localtime)
-{
-    uint32_t	usec = localtime % 1000;
-    uint32_t	msec = (localtime / 1000) % 1000;
-    uint32_t	sec  = localtime / 1000000;
-    return out << sec << '.' << msec << '.' << usec;
-}
-#endif
 /************************************************************************
 *  local constants							*
 ************************************************************************/
@@ -366,10 +356,18 @@ static const uint64_t	PointGrey_Feature_ID		= 0x00b09d000004ull;
 static const uint32_t	BAYER_TILE_MAPPING		= 0x040;
 static const uint32_t	IMAGE_DATA_FORMAT		= 0x048;
 static const uint32_t	FRAME_INFO			= 0x2f8;
-static const uint32_t	CYCLE_TIME			= 0xea8;
 
 // GPIO control pins
 static const uint32_t	GPIO_CTRL_PIN_0			= 0x1110;
+    
+/************************************************************************
+*  union AbsValue							*
+************************************************************************/
+union AbsValue
+{
+    uint32_t	i;
+    float	f;
+};
     
 /************************************************************************
 *  class IIDCCamera							*
@@ -1235,6 +1233,54 @@ IIDCCamera::getAimedTemperature() const
     return (readQuadletFromRegister(TEMPERATURE) >> 12) & 0xfff;
 }
 
+//! 指定された属性の値を絶対値で設定する
+/*!
+  \param feature	値を設定したい属性
+  \param value		設定する値
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setAbsValue(Feature feature, float value)
+{
+    checkAvailability(feature, Manual);
+    AbsValue	val;
+    val.f = value;
+    writeQuadletToRegister(getAbsValueOffset(feature) + 8, val.i);
+    return *this;
+}
+    
+//! 指定された属性がとり得る値の範囲を絶対値で調べる
+/*!
+  \param feature	対象となる属性
+  \param min		とり得る値の最小値が返される. 
+  \param max		とり得る値の最大値が返される. 
+*/
+void
+IIDCCamera::getAbsMinMax(Feature feature, float& min, float& max) const
+{
+    checkAvailability(feature, Presence);
+    AbsValue	val;
+    uint32_t	offset = getAbsValueOffset(feature);
+    val.i = readQuadletFromRegister(offset);
+    min = val.f;
+    val.i = readQuadletFromRegister(offset + 4);
+    max = val.f;
+}
+    
+//! 指定された属性の現在の値を絶対値で調べる
+/*!
+  \param feature	対象となる属性
+  \return		現在の値
+*/
+float
+IIDCCamera::getAbsValue(Feature feature) const
+{
+    checkAvailability(feature, ReadOut);
+    AbsValue	val;
+    val.i = readQuadletFromRegister(getAbsValueOffset(feature) + 8);
+    return val.f;
+}
+
 //! トリガモードを設定する
 /*!
   実際にカメラが外部トリガによって駆動されるためには, この関数でモード設定
@@ -2079,6 +2125,30 @@ IIDCCamera::unembedTimestamp()
     return *this;
 }
 
+uint32_t
+IIDCCamera::getCycleTime(uint64_t& localtime) const
+{
+    return _node->getCycleTime(localtime);
+}
+
+uint64_t
+IIDCCamera::cycletimeToLocaltime(uint32_t cycletime) const
+{
+  // 現在のcycletimeとlocaltimeを獲得する.
+    uint64_t	localtime0;
+    uint32_t	cycletime0 = getCycleTime(localtime0);
+
+  // 現時刻と指定された時刻のサイクル時刻をサブサイクル値に直し，
+  // 両者のずれを求める.
+    u_int32_t	subcycle0 = cycletime_to_subcycle(cycletime0);
+    u_int32_t	subcycle  = cycletime_to_subcycle(cycletime);
+    u_int64_t	diff	  = (subcycle0 + (128LL*8000LL*3072LL) - subcycle)
+			  % (128LL*8000LL*3072LL);
+
+  // ずれをmicro sec単位に直して(1 subcycle = 125/3072 usec)現在時刻から差し引く.
+    return localtime0 - (125LL*diff)/3072LL;
+}
+    
 //! unsinged intの値を同じビットパターンを持つ #Format に直す
 /*!
   \param format	#Format に直したいunsigned int値
@@ -2366,6 +2436,37 @@ IIDCCamera::inquireFrameRate(Format format) const
     return quad;
 }
 
+uint32_t
+IIDCCamera::getAbsValueOffset(Feature feature) const
+{
+    uint32_t	offset = 0;
+    
+    switch (feature)
+    {
+      case ZOOM:
+      case PAN:
+      case TILT:
+	offset = readQuadletFromRegister(feature - 0xc0);
+	break;
+      default:
+	offset = readQuadletFromRegister(feature - 0x100);
+	break;
+    }
+    if (!offset)
+    {
+	using namespace	std;
+	
+	ostringstream	s;
+
+	s << "IIDCCamera::getAbsValueOffset: This feature["
+	  << showbase << hex << feature
+	  << "] does not support absolute value mode!!";
+      	throw runtime_error(s.str());
+    }
+
+    return CSR_REGISTER_BASE + 4*offset - _cmdRegBase;
+}
+    
 nodeaddr_t
 IIDCCamera::getFormat_7_BaseAddr(Format format7) const
 {
@@ -2663,17 +2764,6 @@ IIDCCamera::unlockAdvancedFeature(uint64_t featureId, u_int timeout) const
   */
 }
 
-uint32_t
-IIDCCamera::getCycleTime(uint64_t& localtime) const
-{
-    timeval	t;
-    gettimeofday(&t, NULL);
-    uint32_t	cycletime = readQuadletFromACRegister(CYCLE_TIME);
-    localtime = t.tv_sec * 1000000ULL + t.tv_usec;
-
-    return cycletime;
-}
-    
 /************************************************************************
 *  global functions							*
 ************************************************************************/

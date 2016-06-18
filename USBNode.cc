@@ -38,7 +38,7 @@ static constexpr uint8_t	EndpointAddress	= 0x81;
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-static inline int32_t
+static inline uint8_t
 address_to_request(nodeaddr_t addr)
 {
     switch (addr >> 32)
@@ -55,7 +55,7 @@ address_to_request(nodeaddr_t addr)
 
     throw std::runtime_error("Invalid high address for request!!");
 
-    return -1;
+    return 0;
 }
     
 /************************************************************************
@@ -107,16 +107,15 @@ USBNode::nodeId() const
     return libusb_get_device_address(libusb_get_device(_handle));
 }
     
-//! ノード内の指定されたアドレスから4byteの値を読み出す
-/*!
-  \param addr	個々のノード内の絶対アドレス
- */
 quadlet_t
 USBNode::readQuadlet(nodeaddr_t addr) const
 {
-    const auto	request = address_to_request(addr);
     quadlet_t	quad;
-    check(libusb_control_transfer(_handle, 0xc0, request,
+    check(libusb_control_transfer(_handle,
+				  LIBUSB_ENDPOINT_IN |
+				  LIBUSB_REQUEST_TYPE_VENDOR |
+				  LIBUSB_RECIPIENT_DEVICE,
+				  address_to_request(addr),
 				  addr & 0xffff, (addr >> 16) & 0xffff,
 				  reinterpret_cast<u_char*>(&quad),
 				  sizeof(quad), RequestTimeout),
@@ -124,29 +123,20 @@ USBNode::readQuadlet(nodeaddr_t addr) const
     return quad;
 }
 
-//! ノード内の指定されたアドレスに4byteの値を書き込む
-/*!
-  \param addr	個々のノード内の絶対アドレス
-  \param quad	書き込む4byteの値
- */
 void
 USBNode::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
 {
-    const auto	request = address_to_request(addr);
-    check(libusb_control_transfer(_handle, 0x40, request,
+    check(libusb_control_transfer(_handle,
+				  LIBUSB_ENDPOINT_OUT |
+				  LIBUSB_REQUEST_TYPE_VENDOR |
+				  LIBUSB_RECIPIENT_DEVICE,
+				  address_to_request(addr),
 				  addr & 0xffff, (addr >> 16) & 0xffff,
 				  reinterpret_cast<u_char*>(&quad),
 				  sizeof(quad), RequestTimeout),
 	  "USBNode::writeQuadlet: failed to write to port!!");
 }
 
-//! isochronous受信用のバッファを割り当てる
-/*!
-  \param packet_size	受信するパケット1つあたりのサイズ(単位: byte)
-  \param buf_size	バッファ1つあたりのサイズ(単位: byte)
-  \param nb_buffers	割り当てるバッファ数
-  \return		割り当てられたisochronous受信用のチャンネル
- */
 u_char
 USBNode::mapListenBuffer(u_int packet_size, u_int buf_size, u_int nb_buffers)
 {
@@ -175,7 +165,6 @@ USBNode::mapListenBuffer(u_int packet_size, u_int buf_size, u_int nb_buffers)
     return 0;
 }
 
-//! ノードに割り当てたすべての受信用バッファを廃棄する
 void
 USBNode::unmapListenBuffer()
 {
@@ -197,11 +186,6 @@ USBNode::unmapListenBuffer()
     _nbuffers = 0;
 }
 
-//! isochronousデータが受信されるのを待つ
-/*!
-  実際にデータが受信されるまで, 本関数は呼び出し側に制御を返さない. 
-  \return	データの入ったバッファの先頭アドレス. 
- */
 const u_char*
 USBNode::waitListenBuffer()
 {
@@ -210,7 +194,6 @@ USBNode::waitListenBuffer()
     return _ready.front()->data();	// 受信済みqueueの先頭データを返す
 }
 
-//! データ受信済みのバッファを再びキューイングして次の受信データに備える
 void
 USBNode::requeueListenBuffer()
 {
@@ -222,12 +205,25 @@ USBNode::requeueListenBuffer()
     }
 }
 
-//! すべての受信用バッファの内容を空にする
 void
 USBNode::flushListenBuffer()
 {
 }
 
+uint32_t
+USBNode::getCycleTime(uint64_t& localtime) const
+{
+    constexpr nodeaddr_t	CMD_REG_BASE = 0xfffff0f00000ULL;
+    constexpr uint32_t		CYCLE_TIME   = 0x1ea8;
+    
+    uint32_t	cycletime = readQuadlet(CMD_REG_BASE + CYCLE_TIME);
+    timeval	t;
+    gettimeofday(&t, NULL);
+    localtime = t.tv_sec * 1000000ULL + t.tv_usec;
+
+    return cycletime;
+}
+    
 void
 USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 {
