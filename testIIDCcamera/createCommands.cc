@@ -25,7 +25,8 @@
 #  include <config.h>
 #endif
 #include "MyIIDCCamera.h"
-#include <cmath>
+#include <cmath>		// for log10()
+#include <algorithm>		// for std::max()
 
 namespace TU
 {
@@ -232,11 +233,10 @@ CBsetWhiteBalanceVR(GtkAdjustment* adj, gpointer userdata)
 /*!
   IEEE1394カメラがサポートしている機能を調べて生成するコマンドを決定する．
   \param camera		IEEE1394カメラ
-  \param abs		trueならば絶対値モード
   \return		生成されたコマンド群が貼りつけられたテーブル
 */
 GtkWidget*
-createCommands(MyIIDCCamera& camera, bool abs)
+createCommands(MyIIDCCamera& camera)
 {
     GtkWidget*	commands = gtk_table_new(4, 2 + NFEATURES, FALSE);
     u_int	y = 0;
@@ -321,7 +321,7 @@ createCommands(MyIIDCCamera& camera, bool abs)
 					  0, 1, y, y+1);
 		if (inq & IIDCCamera::ReadOut)
 		{
-		    if (abs)
+		    if (inq & IIDCCamera::Abs_Control)
 		    {
 		      // この機能が取り得る値の範囲を調べる．
 			float	min, max;
@@ -341,8 +341,6 @@ createCommands(MyIIDCCamera& camera, bool abs)
 					   (gpointer)&cameraAndFeature[i]);
 		      // adjustmentを操作するためのscale widgetを生成．
 			int	digits = std::max(3, int(-log10(step)) + 2);
-			std::cerr << feature[i].name << ": "
-				  << step << ", " << digits << std::endl;
 			GtkWidget*
 			    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 			gtk_scale_set_digits(GTK_SCALE(scale), digits);
