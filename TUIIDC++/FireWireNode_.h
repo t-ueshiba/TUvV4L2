@@ -42,10 +42,9 @@ class FireWireNode : public IIDCNode
 #endif	// !__APPLE__
 
   public:
-    FireWireNode(uint32_t unit_spec_ID, uint64_t uniqId)		;
-    ~FireWireNode()							;
-    FireWireNode(const FireWireNode&)				= delete;
-    FireWireNode&	operator =(const FireWireNode&)		= delete;
+			FireWireNode(uint32_t unit_spec_ID,
+				     uint64_t uniqId)			;
+    virtual		~FireWireNode()					;
 
   //! このノードに割り当てられたisochronousチャンネルを返す
   /*!
@@ -54,9 +53,6 @@ class FireWireNode : public IIDCNode
     u_char		channel()		const	{return _channel;}
 
     virtual nodeid_t	nodeId()				const	;
-#if defined(__APPLE__)
-    nodeaddr_t		commandRegisterBase()			const	;
-#endif
     virtual quadlet_t	readQuadlet(nodeaddr_t addr)		const	;
     virtual void	writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;
     virtual u_char	mapListenBuffer(u_int packet_size,
@@ -67,8 +63,7 @@ class FireWireNode : public IIDCNode
 			waitListenBuffer()				;
     virtual void	requeueListenBuffer()				;
     virtual void	flushListenBuffer()				;
-    uint64_t		cycletimeToLocaltime(uint32_t cycletime) const	;
-    uint64_t		cycleToLocaltime(uint32_t cycle)	 const	;
+    virtual uint32_t	getCycleTime(uint64_t& localtime)	const	;
     
   private:
     static raw1394_iso_disposition

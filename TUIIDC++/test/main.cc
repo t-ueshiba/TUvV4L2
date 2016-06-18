@@ -60,10 +60,13 @@ flow(uint64_t uniqId)
     signal(SIGPIPE, handler);
 
     IIDCCamera	camera(IIDCCamera::Monocular, uniqId);
-#if 0
-    camera.setFormatAndFrameRate(IIDCCamera::MONO8_1280x960,
-				 IIDCCamera::FrameRate_30);
-#endif
+  /*
+    float	min, max;
+    camera.getAbsMinMax(IIDCCamera::BRIGHTNESS, min, max);
+    cerr << "Brightness: min = " << min << ", max = " << max << endl;
+    camera.setAbsValue(IIDCCamera::BRIGHTNESS, 11.1);
+    cerr << "Brightness = " << camera.getAbsValue(IIDCCamera::BRIGHTNESS) << endl;
+  */
     camera.embedTimestamp();
 
     camera.continuousShot();

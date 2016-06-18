@@ -106,10 +106,6 @@ class USBNode : public IIDCNode
   public:
 			USBNode(uint32_t unit_spec_ID, uint64_t uniqId)	;
     virtual		~USBNode()					;
-			USBNode(const USBNode&)			= delete;
-			USBNode(USBNode&&)			= delete;
-    USBNode&		operator =(const USBNode&)		= delete;
-    USBNode&		operator =(USBNode&&)			= delete;
 
     virtual nodeid_t	nodeId()				const	;
     virtual quadlet_t	readQuadlet(nodeaddr_t addr)		const	;
@@ -122,6 +118,7 @@ class USBNode : public IIDCNode
 			waitListenBuffer()				;
     virtual void	requeueListenBuffer()				;
     virtual void	flushListenBuffer()				;
+    virtual uint32_t	getCycleTime(uint64_t& localtime)	const	;
     
   private:
     void		setHandle(uint32_t unit_spec_ID,

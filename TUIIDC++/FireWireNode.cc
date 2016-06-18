@@ -102,14 +102,6 @@ FireWireNode::~FireWireNode()
     raw1394_destroy_handle(_handle);
 }
 
-#if defined(__APPLE__)
-nodeaddr_t
-FireWireNode::commandRegisterBase() const
-{
-    return raw1394_command_register_base(_handle);
-}
-#endif
-
 nodeid_t
 FireWireNode::nodeId() const
 {
@@ -203,6 +195,15 @@ FireWireNode::flushListenBuffer()
 {
 }
 
+uint32_t
+FireWireNode::getCycleTime(uint64_t& localtime) const
+{
+    uint32_t	cycletime;
+    raw1394_read_cycle_timer(_handle, &cycletime, &localtime);
+
+    return cycletime;
+}
+    
 //! このノードに割り当てられたisochronous受信用バッファにパケットデータを転送する
 /*!
   本ハンドラは，パケットが1つ受信されるたびに呼び出される．また，mapListenBuffer()

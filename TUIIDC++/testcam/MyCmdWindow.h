@@ -191,7 +191,7 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 
     _canvas.resize();
 
-    int	props[] = {0, _movie.nframes() - 1, 1};
+    int	props[] = {0, static_cast<int>(_movie.nframes() - 1), 1};
     _captureCmd.setProp(c_StatusMovie, props);
     
     repaintCanvas();
