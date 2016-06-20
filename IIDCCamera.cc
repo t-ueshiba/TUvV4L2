@@ -1064,6 +1064,34 @@ IIDCCamera::turnOff(Feature feature)
     return *this;
 }
 
+//! 指定された属性を絶対値操作モードにする
+/*!
+  \param feature	絶対値操作モードにしたい属性
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setAbsControlMode(Feature feature)
+{
+    checkAvailability(feature, Abs_Control);
+    writeQuadletToRegister(feature,
+			   readQuadletFromRegister(feature) | Abs_Control);
+    return *this;
+}
+
+//! 指定された属性を相対値操作モードにする
+/*!
+  \param feature	相対値操作モードにしたい属性
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setRelControlMode(Feature feature)
+{
+    checkAvailability(feature, Presence);
+    writeQuadletToRegister(feature,
+			   readQuadletFromRegister(feature) & ~Abs_Control);
+    return *this;
+}
+
 //! 指定された属性を自動設定モードにする
 /*!
   自動設定にすると, この属性の値は環境の変化に追従して継続的に自動的に調整
@@ -1142,6 +1170,19 @@ IIDCCamera::isTurnedOn(Feature feature) const
 {
     checkAvailability(feature, OnOff);
     return readQuadletFromRegister(feature) & (0x1u << 25);
+}
+
+//! 指定された属性が絶対値操作モードになっているか調べる
+/*!
+  \param feature	対象となる属性
+  \return		絶対値操作モードになっていればtrueを,
+			そうでなければfalseを返す.
+*/
+bool
+IIDCCamera::isAbsControl(Feature feature) const
+{
+    checkAvailability(feature, Presence);
+    return readQuadletFromRegister(feature) & (0x1u << 30);
 }
 
 //! 指定された属性が自動設定モードになっているか調べる

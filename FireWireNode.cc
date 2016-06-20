@@ -187,7 +187,8 @@ FireWireNode::waitListenBuffer()
 void
 FireWireNode::requeueListenBuffer()
 {
-    _len -= _buf_size;
+    _len = 0;
+    _p   = _buf;
 }
 
 void
@@ -221,11 +222,17 @@ FireWireNode::receive(raw1394handle_t handle,
 		      u_char channel, u_char tag, u_char sy,
 		      u_int cycle, u_int dropped)
 {
+    if (dropped)
+	std::cerr << "recieve: dropped = " << dropped << std::endl;
+    
     const auto	node = reinterpret_cast<FireWireNode*>(
 			   raw1394_get_userdata(handle));
 
     if (sy)
-	node->_p = node->_buf;
+    {
+	node->_len = 0;
+	node->_p   = node->_buf;
+    }
 
     if (node->_p + len <= node->_buf + node->_buf_size)
     {
