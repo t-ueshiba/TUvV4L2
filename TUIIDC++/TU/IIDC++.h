@@ -488,11 +488,14 @@ class IIDCCamera
     IIDCCamera&		onePush(Feature feature)			;
     IIDCCamera&		turnOn(Feature feature)				;
     IIDCCamera&		turnOff(Feature feature)			;
+    IIDCCamera&		setAbsControlMode(Feature feature)		;
+    IIDCCamera&		setRelControlMode(Feature feature)		;
     IIDCCamera&		setAutoMode(Feature feature)			;
     IIDCCamera&		setManualMode(Feature feature)			;
     IIDCCamera&		setValue(Feature feature, u_int value)		;
     bool		inOnePushOperation(Feature feature)	const	;
     bool		isTurnedOn(Feature feature)		const	;
+    bool		isAbsControl(Feature feautre)		const	;
     bool		isAuto(Feature feautre)			const	;
     void		getMinMax(Feature feature,
 				  u_int& min, u_int& max)	const	;
