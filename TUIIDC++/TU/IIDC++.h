@@ -530,6 +530,7 @@ class IIDCCamera
     IIDCCamera&		multiShot(u_short nframes)			;
 
   // Configuration saving/restoring stuffs.
+    IIDCCamera&		reset()						;
     IIDCCamera&		saveConfig(u_int mem_ch)			;
     IIDCCamera&		restoreConfig(u_int mem_ch)			;
     u_int		getMemoryChannelMax()			const	;
@@ -678,13 +679,12 @@ IIDCCamera::captureDirectly(Image<T>& image) const
   予め embedTimestamp() によって画像への撮影時刻埋め込みを指示しなければならない．
   \return	micro second単位で表した画像の撮影時刻
 */
-  /*
 inline uint64_t
 IIDCCamera::getTimestamp() const
 {
     return (_img != 0 ? cycletimeToLocaltime(ntohl(*((uint32_t*)_img))) : 0);
 }
-  */
+
 inline void
 IIDCCamera::checkAvailability(Format format, FrameRate rate) const
 {

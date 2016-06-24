@@ -5,9 +5,6 @@
 #define __TU_FIREWIRENode__H
 
 #include <libraw1394/raw1394.h>
-#if !defined(__APPLE__)
-#  include <map>
-#endif
 #include "TU/IIDC++.h"
 
 namespace TU
@@ -22,25 +19,6 @@ namespace TU
 */
 class FireWireNode : public IIDCNode
 {
-  private:
-#if !defined(__APPLE__)
-    class Port
-    {
-      public:
-	Port(int portNumber)						;
-
-	int		portNumber()		const	{return _portNumber;}
-	
-	u_char		registerNode(const FireWireNode& node)		;
-	bool		unregisterNode(const FireWireNode& node)	;
-	bool		isRegisteredNode(const FireWireNode& node) const;
-    
-      private:
-	const int	_portNumber;
-	uint64_t	_nodes;		// a bitmap for the registered nodes
-    };
-#endif	// !__APPLE__
-
   public:
 			FireWireNode(uint32_t unit_spec_ID,
 				     uint64_t uniqId)			;
@@ -78,18 +56,13 @@ class FireWireNode : public IIDCNode
 #endif
 
   private:
-#if !defined(__APPLE__)
-    static std::map<int, Port*>	_portMap;
-
-    Port*			_port;
-#endif
-    raw1394handle_t		_handle;
-    nodeid_t			_nodeId;
-    u_char			_channel;
-    size_t			_buf_size;
-    u_char*			_buf;
-    size_t			_len;
-    u_char*			_p;
+    raw1394handle_t	_handle;
+    nodeid_t		_nodeId;
+    u_char		_channel;
+    size_t		_buf_size;
+    u_char*		_buf;
+    size_t		_len;
+    u_char*		_p;
 };
     
 
