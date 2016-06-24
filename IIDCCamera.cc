@@ -508,7 +508,7 @@ IIDCCamera::setSpeed(Speed speed)
 
     if (cont)
 	continuousShot();
-    
+
     return *this;
 }
     
@@ -1478,6 +1478,13 @@ IIDCCamera::multiShot(u_short nframes)
     return *this;
 }
 
+IIDCCamera&
+IIDCCamera::reset()
+{
+    writeQuadletToRegister(Memory_Save, 0xdeafbeef);
+    return *this;
+}
+    
 //! 現在のカメラの設定を指定されたメモリチャンネルに記憶する
 /*!
   IIDCカメラの一部には, カメラに設定した画像フォーマットや属性値などを

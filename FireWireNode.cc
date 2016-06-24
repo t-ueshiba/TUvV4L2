@@ -6,47 +6,9 @@
 
 namespace TU
 {
-#if !defined(__APPLE__)
-/************************************************************************
-*  class FireWireNode::Port						*
-************************************************************************/
-FireWireNode::Port::Port(int portNumber)
-    :_portNumber(portNumber), _nodes(0)
-{
-}
-
-u_char
-FireWireNode::Port::registerNode(const FireWireNode& node)
-{
-  // Count the number of nodes already registered.
-    u_char	nnodes = 0;
-    for (int i = 0; i < 8*sizeof(_nodes); ++i)
-	if ((_nodes & (0x1ULL << i)) != 0)
-	    ++nnodes;
-
-    _nodes |= (0x1ULL << (node.nodeId() & 0x3f));	// Register this node.
-
-    return nnodes;
-}
-
-bool
-FireWireNode::Port::unregisterNode(const FireWireNode& node)
-{
-    return (_nodes &= ~(0x1ULL << (node.nodeId() & 0x3f))) != 0;
-}
-
-bool
-FireWireNode::Port::isRegisteredNode(const FireWireNode& node) const
-{
-    return (_nodes & (0x1ULL << (node.nodeId() & 0x3f))) != 0;
-}
-
 /************************************************************************
 *  class FireWireNode							*
 ************************************************************************/
-std::map<int, FireWireNode::Port*>	FireWireNode::_portMap;
-#endif	// !__APPLE__
-
 //! FireWireノードオブジェクトを生成する
 /*!
   \param unit_spec_ID	このノードの種類を示すID(ex. FireWireデジタルカメラ
@@ -64,7 +26,8 @@ FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId)
     :_handle(raw1394_new_handle(unit_spec_ID, uniqId)),
      _nodeId(raw1394_get_remote_id(_handle)),
 #else
-    :_port(0), _handle(raw1394_new_handle()), _nodeId(0),
+    :_handle(raw1394_new_handle()),
+     _nodeId(0),
 #endif
      _channel(0), _buf_size(0), _buf(nullptr), _len(0), _p(nullptr)
 {
@@ -92,13 +55,7 @@ FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId)
 FireWireNode::~FireWireNode()
 {
     unmapListenBuffer();
-#if !defined(__APPLE__)
-    if (!_port->unregisterNode(*this))		// If no nodes on this port,
-    {						//
-	_portMap.erase(_port->portNumber());	// erase it from the map
-	delete _port;				// and delete.
-    }
-#endif
+    raw1394_channel_modify(_handle, _channel, RAW1394_MODIFY_FREE);
     raw1394_destroy_handle(_handle);
 }
 
@@ -112,7 +69,7 @@ quadlet_t
 FireWireNode::readQuadlet(nodeaddr_t addr) const
 {
     quadlet_t	quad;
-    check(raw1394_read(_handle, _nodeId, addr, 4, &quad) < 0,
+    check(raw1394_read(_handle, _nodeId, addr, 4, &quad),
 	  "FireWireNode::readQuadlet: failed to read from port!!");
     return quadlet_t(ntohl(quad));
 }
@@ -121,7 +78,7 @@ void
 FireWireNode::writeQuadlet(nodeaddr_t addr, quadlet_t quad)
 {
     quad = htonl(quad);
-    check(raw1394_write(_handle, _nodeId, addr, 4, &quad) < 0,
+    check(raw1394_write(_handle, _nodeId, addr, 4, &quad),
 	  "TU::FireWireNode::writeQuadlet: failed to write to port!!");
 }
 
@@ -147,13 +104,23 @@ FireWireNode::mapListenBuffer(u_int packet_size,
 #if defined(__APPLE__)
     const u_int	interval = npackets;
 #else
-    const u_int	interval = std::min(npackets/4, 512U);
+    const u_int	interval  = std::min(npackets/4, 512U);
+  /*
+    const int	speed	  = raw1394_get_speed(_handle, _nodeId);
+    u_int	bandwidth = packet_size/4 + 3;
+    if (speed > RAW1394_ISO_SPEED_400)
+	bandwidth >>= (speed - RAW1394_ISO_SPEED_400);
+    else
+	bandwidth <<= (RAW1394_ISO_SPEED_400 - speed);
+    check(raw1394_bandwidth_modify(_handle, bandwidth, RAW1394_MODIFY_ALLOC),
+	  "FireWireNode::mapListenBuffer: failed to allocate bandwidth!!");
+  */
 #endif
     check(raw1394_iso_recv_init(_handle, receive,
 				nb_buffers * npackets, packet_size, _channel,
-				RAW1394_DMA_BUFFERFILL, interval) < 0,
+				RAW1394_DMA_BUFFERFILL, interval),
 	  "FireWireNode::mapListenBuffer: failed to initialize iso reception!!");
-    check(raw1394_iso_recv_start(_handle, -1, -1, 0) < 0,
+    check(raw1394_iso_recv_start(_handle, -1, -1, 0),
 	  "FireWireNode::mapListenBuffer: failed to start iso reception!!");
 
     return _channel;
@@ -166,6 +133,7 @@ FireWireNode::unmapListenBuffer()
     {
 	raw1394_iso_stop(_handle);
 	raw1394_iso_shutdown(_handle);
+      //raw1394_bandwidth_modify(_handle, 4915, RAW1394_MODIFY_FREE);
 
 	delete [] _buf;
 	_buf_size = 0;
@@ -264,10 +232,6 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
   // Find the specified node yet registered.
     for (int i = 0; i < nports; ++i)		// for each port...
     {
-      // Has the i-th port already been created?
-	auto	p = _portMap.find(i);
-	_port = (p == _portMap.end() ? 0 : p->second);
-	
 	check(!(_handle = raw1394_new_handle_on_port(i)),
 	      "FireWireNode::FireWireNode: failed to get raw1394handle and set it to the port!!");
 	nodeid_t	localId = raw1394_get_local_id(_handle);
@@ -278,16 +242,12 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 
 	    if (_nodeId != localId && unitSpecId() == unit_spec_ID &&
 		(uniqId == 0 || globalUniqueId() == uniqId))
-	    {
-		if (_port == 0)		// If i-th port is not present,
-		{				//
-		    _port = new Port(i);	// create
-		    _portMap[i] = _port;	// and insert it to the map.
-		    return _port->registerNode(*this);
+		for (int channel = 0; channel < 64; ++channel)
+		{
+		    if (raw1394_channel_modify(_handle, channel,
+					       RAW1394_MODIFY_ALLOC) == 0)
+			return channel;
 		}
-		else if (!_port->isRegisteredNode(*this))
-		    return _port->registerNode(*this);
-	    }
 	}
 	raw1394_destroy_handle(_handle);
 	_handle = nullptr;
