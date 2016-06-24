@@ -55,7 +55,9 @@ FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId)
 FireWireNode::~FireWireNode()
 {
     unmapListenBuffer();
+#if !defined(__APPLE__)
     raw1394_channel_modify(_handle, _channel, RAW1394_MODIFY_FREE);
+#endif
     raw1394_destroy_handle(_handle);
 }
 
