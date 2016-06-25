@@ -40,6 +40,9 @@ setFormatIIDC(CAMERAS& cameras, u_int id, u_int val)
 	     IIDCCamera::uintToFormat(id),
 	     IIDCCamera::uintToFrameRate(val));
 	return true;
+
+      default:
+	break;
     }
 
     return false;
@@ -105,14 +108,9 @@ setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ONOFF:
-      {
-	IIDCCamera::Feature	feature = IIDCCamera::uintToFeature(
-					      id - IIDCCAMERA_OFFSET_ONOFF);
-	if (val)
-	    exec(cameras, &IIDCCamera::turnOn,  feature, n);
-	else
-	    exec(cameras, &IIDCCamera::turnOff, feature, n);
-      }
+	exec(cameras, &IIDCCamera::setActive,
+	     IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ONOFF),
+	     bool(val), n);
 	return true;
 
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_AUTO:
@@ -130,24 +128,19 @@ setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_AUTO:
-      {
-	IIDCCamera::Feature	feature = IIDCCamera::uintToFeature(
-					      id - IIDCCAMERA_OFFSET_AUTO);
-	if (val)
-	    exec(cameras, &IIDCCamera::setAutoMode,   feature, n);
-	else
-	    exec(cameras, &IIDCCamera::setManualMode, feature, n);
-      }
+	exec(cameras, &IIDCCamera::setAuto,
+	     IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_AUTO),
+	     bool(val), n);
         return true;
 
       case IIDCCamera::TRIGGER_MODE  + IIDCCAMERA_OFFSET_AUTO:
-	if (val)
-	    exec(cameras, &IIDCCamera::setTriggerPolarity,
-		 IIDCCamera::HighActiveInput, n);
-	else
-	    exec(cameras, &IIDCCamera::setTriggerPolarity,
-		 IIDCCamera::LowActiveInput, n);
+	exec(cameras, &IIDCCamera::setTriggerPolarity,
+	     (val ? IIDCCamera::HighActiveInput : IIDCCamera::LowActiveInput),
+	     n);
 	return true;
+
+      default:
+	break;
     }
 
     return false;
@@ -208,12 +201,9 @@ getFeatureValueIIDC(const CAMERAS& cameras, u_int id, int n)
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ONOFF:
-      {
-	IIDCCamera::Feature	feature = IIDCCamera::uintToFeature(
-					      id - IIDCCAMERA_OFFSET_ONOFF);
-	return exec(cameras, &IIDCCamera::isTurnedOn, feature, n);
-      }
-
+	return exec(cameras, &IIDCCamera::isActive,
+		    IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ONOFF), n);
+	
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::AUTO_EXPOSURE + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::SHARPNESS     + IIDCCAMERA_OFFSET_AUTO:
@@ -229,14 +219,14 @@ getFeatureValueIIDC(const CAMERAS& cameras, u_int id, int n)
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_AUTO:
-      {
-	IIDCCamera::Feature	feature = IIDCCamera::uintToFeature(
-					      id - IIDCCAMERA_OFFSET_AUTO);
-	return exec(cameras, &IIDCCamera::isAuto, feature, n);
-      }
+	return exec(cameras, &IIDCCamera::isAuto,
+		    IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_AUTO), n);
 
       case IIDCCamera::TRIGGER_MODE  + IIDCCAMERA_OFFSET_AUTO:
 	return exec(cameras, &IIDCCamera::getTriggerPolarity, n);
+
+      default:
+	break;
     }
 
     throw std::invalid_argument("getFeatureValueIIDC(): unknown feature!!");
@@ -286,8 +276,7 @@ getFeatureValue(const Array<IIDCCamera*>& cameras, u_int id, int n)
 }
 
 void
-exec(const Array<IIDCCamera*>& cameras,
-     IIDCCamera& (IIDCCamera::*mf)(), int n)
+exec(const Array<IIDCCamera*>& cameras, IIDCCamera& (IIDCCamera::*mf)(), int n)
 {
     if (0 <= n && n < cameras.size())
 	(cameras[n]->*mf)();

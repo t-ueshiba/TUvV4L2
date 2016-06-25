@@ -105,13 +105,13 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	  case c_ContinuousShot:
 	    if (val)
 	    {
-		_camera.continuousShot();
+		_camera.continuousShot(true);
 		_timer.start(1);
 	    }
 	    else
 	    {
 		_timer.stop();
-		_camera.stopContinuousShot();
+		_camera.continuousShot(false);
 	    }
 	    break;
 	  /*
@@ -217,7 +217,7 @@ MyCmdWindow<CAMERA, PIXEL>::stopContinuousShotIfRunning()
     if (_captureCmd.getValue(c_ContinuousShot))
     {
 	_timer.stop();
-	_camera.stopContinuousShot();
+	_camera.continuousShot(false);
 	_captureCmd.setValue(c_ContinuousShot, 0);
     }
 }

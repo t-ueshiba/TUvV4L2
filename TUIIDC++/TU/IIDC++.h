@@ -2,7 +2,7 @@
  *  $Id: IIDC++.h,v 1.1.1.1 2012-09-15 08:03:09 ueshiba Exp $
  */
 /*!
-  \mainpage	libTUIIDC++ - IIDC 1394ベースのデジタルカメラを制御するC++ライブラリ
+  \mainpage	libTUIIDC++ - IIDCに準拠したFireWireまたはUSBベースのデジタルカメラを制御するC++ライブラリ
   \anchor	libTUIIDC
 
   \section copyright 著作権
@@ -26,27 +26,19 @@
   USA
 
   \section abstract 概要
-  libTUIIDC+は，
-  <a href="http://www.1394ta.com/Technology/Specifications/specifications.htm">
-  IIDC 1394ベースのデジタルカメラ</a>を制御するC++ライブラリである. 同
-  一または異なるFireWireバスに接続された複数のカメラを，それぞれ独立に
-  コントロールすることができる. 
+  libTUIIDC+は，IIDCに準拠したFireWireまたはUSBベースのデジタルカメラを
+  制御するC++ライブラリである. 同一または異なるバスに接続された複数のカメラを，
+  それぞれ独立にコントロールすることができる. 
 
   実装されている主要なクラスおよびそのpublicなメンバ関数は，おおまかに
   以下のように分類される. 
 
-  #TU::IIDCNode - バスに接続される様々な機器のベースとなるクラス
-  - #TU::IIDCNode::nodeId()
-  - #TU::IIDCNode::globalUniqueId()
-  - #TU::IIDCNode::arrivaltime()
-  - #TU::IIDCNode::channel()
-
   #TU::IIDCCamera - IIDCデジタルカメラを表すクラス
 
   - <b>基本機能</b>
+    - #TU::IIDCCamera::globalUniqueId()
     - #TU::IIDCCamera::inquireBasicFunction()
-    - #TU::IIDCCamera::powerOn()
-    - #TU::IIDCCamera::powerOff()
+    - #TU::IIDCCamera::setPower()
     - #TU::IIDCCamera::bayerTileMapping()
     - #TU::IIDCCamera::isLittleEndian()
     - #TU::IIDCCamera::setSpeed()
@@ -68,7 +60,6 @@
 
   - <b>画像の撮影モードの設定</b>
     - #TU::IIDCCamera::continuousShot()
-    - #TU::IIDCCamera::stopContinuousShot()
     - #TU::IIDCCamera::inContinuousShot()
     - #TU::IIDCCamera::oneShot()
     - #TU::IIDCCamera::multiShot()
@@ -83,28 +74,29 @@
     - #TU::IIDCCamera::captureRaw()
     - #TU::IIDCCamera::captureBayerRaw()
     - #TU::IIDCCamera::embedTimestamp()
-    - #TU::IIDCCamera::unembedTimestamp()
     - #TU::IIDCCamera::getTimestamp()
 
   - <b>カメラの様々な機能の制御</b>
     - #TU::IIDCCamera::inquireFeatureFunction()
     - #TU::IIDCCamera::onePush()
     - #TU::IIDCCamera::inOnePushOperation()
-    - #TU::IIDCCamera::turnOn()
-    - #TU::IIDCCamera::turnOff()
-    - #TU::IIDCCamera::isTurnedOn()
-    - #TU::IIDCCamera::setAutoMode()
-    - #TU::IIDCCamera::setManualMode()
+    - #TU::IIDCCamera::setActive()
+    - #TU::IIDCCamera::isActive()
+    - #TU::IIDCCamera::setAbsControl()
+    - #TU::IIDCCamera::isAbsControl()
+    - #TU::IIDCCamera::setAuto()
     - #TU::IIDCCamera::isAuto()
     - #TU::IIDCCamera::setValue()
     - #TU::IIDCCamera::getValue()
     - #TU::IIDCCamera::getMinMax()
+    - #TU::IIDCCamera::setAbsValue()
+    - #TU::IIDCCamera::getAbsValue()
+    - #TU::IIDCCamera::getAbsMinMax()
     - #TU::IIDCCamera::setWhiteBalance()
     - #TU::IIDCCamera::getWhiteBalance()
     - #TU::IIDCCamera::getAimedTemperature()
 
   - <b>トリガモード</b>
-    - #TU::IIDCCamera::inquireTriggerMode()
     - #TU::IIDCCamera::setTriggerMode()
     - #TU::IIDCCamera::getTriggerMode()
     - #TU::IIDCCamera::setTriggerPolarity()
@@ -458,8 +450,7 @@ class IIDCCamera
 
   // Basic function stuffs.
     quadlet_t		inquireBasicFunction()			const	;
-    IIDCCamera&		powerOn()					;
-    IIDCCamera&		powerOff()					;
+    IIDCCamera&		setPower(bool enable)				;
     Bayer		bayerTileMapping()			const	;
     bool		isLittleEndian()			const	;
     IIDCCamera&		setSpeed(Speed speed)				;
@@ -486,15 +477,12 @@ class IIDCCamera
   // Feature stuffs.
     quadlet_t		inquireFeatureFunction(Feature feature)	const	;
     IIDCCamera&		onePush(Feature feature)			;
-    IIDCCamera&		turnOn(Feature feature)				;
-    IIDCCamera&		turnOff(Feature feature)			;
-    IIDCCamera&		setAbsControlMode(Feature feature)		;
-    IIDCCamera&		setRelControlMode(Feature feature)		;
-    IIDCCamera&		setAutoMode(Feature feature)			;
-    IIDCCamera&		setManualMode(Feature feature)			;
+    IIDCCamera&		setActive(Feature feature, bool enable)		;
+    IIDCCamera&		setAbsControl(Feature feature, bool enable)	;
+    IIDCCamera&		setAuto(Feature feature, bool enable)		;
     IIDCCamera&		setValue(Feature feature, u_int value)		;
     bool		inOnePushOperation(Feature feature)	const	;
-    bool		isTurnedOn(Feature feature)		const	;
+    bool		isActive(Feature feature)		const	;
     bool		isAbsControl(Feature feautre)		const	;
     bool		isAuto(Feature feautre)			const	;
     void		getMinMax(Feature feature,
@@ -523,8 +511,7 @@ class IIDCCamera
     IIDCCamera&		resetSoftwareTrigger()				;
     
   // Shotting stuffs.
-    IIDCCamera&		continuousShot()				;
-    IIDCCamera&		stopContinuousShot()				;
+    IIDCCamera&		continuousShot(bool enable)			;
     bool		inContinuousShot()			const	;
     IIDCCamera&		oneShot()					;
     IIDCCamera&		multiShot(u_short nframes)			;
@@ -547,8 +534,7 @@ class IIDCCamera
 #endif
     const IIDCCamera&	captureRaw(void* image)			const	;
     const IIDCCamera&	captureBayerRaw(void* image)		const	;
-    IIDCCamera&		embedTimestamp()				;
-    IIDCCamera&		unembedTimestamp()				;
+    IIDCCamera&		embedTimestamp(bool enable)			;
     uint64_t		getTimestamp()				const	;
     uint32_t		getCycleTime(uint64_t& localtime)	const	;
     uint64_t		cycletimeToLocaltime(uint32_t cycletime) const	;

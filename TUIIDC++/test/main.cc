@@ -67,9 +67,9 @@ flow(uint64_t uniqId)
     camera.setAbsValue(IIDCCamera::BRIGHTNESS, 11.1);
     cerr << "Brightness = " << camera.getAbsValue(IIDCCamera::BRIGHTNESS) << endl;
   */
-    camera.embedTimestamp();
+    camera.embedTimestamp(true);
 
-    camera.continuousShot();
+    camera.continuousShot(true);
     cout << "M1" << endl;
     Image<u_char>	image(camera.width(), camera.height());
     image.saveHeader(cout);

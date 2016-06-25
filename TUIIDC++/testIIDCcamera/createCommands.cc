@@ -64,8 +64,8 @@ static const int		NFEATURES = sizeof(features)
 					  / sizeof(features[0]);
 
 /*!
-  カメラとその機能の2ツ組．3つのコールバック関数: CBturnOnOff(),
-  CBsetAutoManual(), CBsetValue() の引数として渡される．
+  カメラとその機能の2ツ組．3つのコールバック関数: CBsetActive(),
+  CBsetAuto(), CBsetValue() の引数として渡される．
  */
 struct CameraAndFeature
 {
@@ -136,12 +136,12 @@ CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
     {
 	idleTag = gtk_idle_add(CBidle, camera);	// idle処理を開始する．
-	camera->continuousShot();	// カメラからの画像出力を開始する．
+	camera->continuousShot(true);	// カメラからの画像出力を開始する．
     }
     else
     {
 	gtk_idle_remove(idleTag);	// idle処理を中止する．
-	camera->stopContinuousShot();	// カメラからの画像出力を停止する．
+	camera->continuousShot(false);	// カメラからの画像出力を停止する．
     }
 }
 
@@ -155,11 +155,8 @@ static void
 CBtriggerMode(GtkWidget* toggle, gpointer userdata)
 {
     auto	camera = static_cast<MyIIDCCamera*>(userdata);
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
-	camera->turnOn(IIDCCamera::TRIGGER_MODE)
-	       .setTriggerMode(IIDCCamera::Trigger_Mode0);
-    else
-	camera->turnOff(IIDCCamera::TRIGGER_MODE);
+    camera->setActive(IIDCCamera::TRIGGER_MODE,
+		      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)));
 }
 
 //! on/off ボタンの状態が変更されると呼ばれるコールバック関数．
@@ -170,15 +167,13 @@ CBtriggerMode(GtkWidget* toggle, gpointer userdata)
 			したい機能の2ツ組)
 */
 static void
-CBturnOnOff(GtkWidget* toggle, gpointer userdata)
+CBsetActive(GtkWidget* toggle, gpointer userdata)
 {
     auto	cameraAndFeature = static_cast<CameraAndFeature*>(userdata);
     auto	camera  = cameraAndFeature->camera;
     auto	feature = cameraAndFeature->feature;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
-	camera->turnOn(feature);
-    else
-	camera->turnOff(feature);
+    camera->setActive(feature,
+		      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)));
 }
 
 //! auto/manual ボタンの状態が変更されると呼ばれるコールバック関数．
@@ -189,15 +184,13 @@ CBturnOnOff(GtkWidget* toggle, gpointer userdata)
 			モードにしたい機能の2ツ組)
 */
 static void
-CBsetAutoManual(GtkWidget* toggle, gpointer userdata)
+CBsetAuto(GtkWidget* toggle, gpointer userdata)
 {
     auto	cameraAndFeature = static_cast<CameraAndFeature*>(userdata);
     auto	camera  = cameraAndFeature->camera;
     auto	feature = cameraAndFeature->feature;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
-	camera->setAutoMode(feature);
-    else
-	camera->setManualMode(feature);
+    camera->setAuto(feature,
+		    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)));
 }
 
 //! absolute/relative ボタンの状態が変更されると呼ばれるコールバック関数．
@@ -208,16 +201,13 @@ CBsetAutoManual(GtkWidget* toggle, gpointer userdata)
 			モードにしたい機能の2ツ組)
 */
 static void
-CBsetAbsRel(GtkWidget* toggle, gpointer userdata)
+CBsetAbsControl(GtkWidget* toggle, gpointer userdata)
 {
     auto	cameraAndFeature = static_cast<CameraAndFeature*>(userdata);
     auto	camera  = cameraAndFeature->camera;
     auto	feature = cameraAndFeature->feature;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
-	camera->setAbsControlMode(feature);
-    else
-	camera->setRelControlMode(feature);
-
+    camera->setAbsControl(
+	feature, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)));
     setScale(*camera, feature, cameraAndFeature->scale);
 }
 
@@ -312,7 +302,7 @@ createCommands(MyIIDCCamera& camera)
 			   GTK_SIGNAL_FUNC(CBtriggerMode), &camera);
       // カメラの現在のtrigger modeをtoggle buttonに反映．
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
-	     (camera.isTurnedOn(IIDCCamera::TRIGGER_MODE) ? TRUE : FALSE));
+	     (camera.isActive(IIDCCamera::TRIGGER_MODE) ? TRUE : FALSE));
 	gtk_table_attach_defaults(GTK_TABLE(commands), toggle, 1, 2, y, y+1);
 	++y;
     }
@@ -331,11 +321,11 @@ createCommands(MyIIDCCamera& camera)
 		auto	toggle = gtk_toggle_button_new_with_label("On");
 	      // コールバック関数の登録．
 		gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
-				   GTK_SIGNAL_FUNC(CBturnOnOff),
+				   GTK_SIGNAL_FUNC(CBsetActive),
 				   &cameraAndFeatures[i]);
 	      // カメラの現在のon/off状態をtoggle buttonに反映．
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
-		    (camera.isTurnedOn(features[i].feature) ? TRUE : FALSE));
+		    (camera.isActive(features[i].feature) ? TRUE : FALSE));
 		gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
 					  2, 3, y, y+1);
 	    }
@@ -346,7 +336,7 @@ createCommands(MyIIDCCamera& camera)
 		auto	toggle = gtk_toggle_button_new_with_label("Auto");
 	      // コールバック関数の登録．
 		gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
-				   GTK_SIGNAL_FUNC(CBsetAutoManual),
+				   GTK_SIGNAL_FUNC(CBsetAuto),
 				   &cameraAndFeatures[i]);
 	      // カメラの現在のauto/manual状態をtoggle buttonに反映．
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
@@ -419,7 +409,7 @@ createCommands(MyIIDCCamera& camera)
 		      // コールバック関数の登録．
 			cameraAndFeatures[i].scale = scale;
 			gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
-					   GTK_SIGNAL_FUNC(CBsetAbsRel),
+					   GTK_SIGNAL_FUNC(CBsetAbsControl),
 					   &cameraAndFeatures[i]);
 		      // カメラの現在のabsolute/relative状態をtoggle buttonに反映．
 			gtk_toggle_button_set_active(
