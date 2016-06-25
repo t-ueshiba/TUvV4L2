@@ -64,7 +64,7 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncmds)
 		featureCmds[ncmds].type	      = C_ToggleButton;
 		featureCmds[ncmds].id	      = feature.id
 					      + IIDCCAMERA_OFFSET_ONOFF;
-		featureCmds[ncmds].val	      = camera.isTurnedOn(feature.id);
+		featureCmds[ncmds].val	      = camera.isActive(feature.id);
 		featureCmds[ncmds].title      = "On";
 		featureCmds[ncmds].prop       = noProp;
 		featureCmds[ncmds].attrs      = CA_None;
@@ -254,7 +254,7 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 					 id - IIDCCAMERA_OFFSET_AUTO))));
 	else if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ONOFF)
 	    cmdPane.setValue(id,
-			     int(camera.isTurnedOn(
+			     int(camera.isActive(
 				     IIDCCamera::uintToFeature(
 					 id - IIDCCAMERA_OFFSET_ONOFF))));
 	else if (id == IIDCCamera::WHITE_BALANCE)
