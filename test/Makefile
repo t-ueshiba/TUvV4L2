@@ -12,11 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-CC		= gcc
-CXX		= g++
-INCDIRS		= -I.. -I$(PREFIX)/include \
-		  -I$(PREFIX)/Make/libraw1394-2.1.2/src \
-		  -I$(PREFIX)/Make/libraw1394-2.1.2
+INCDIRS		= -I.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ #-DDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -27,7 +23,7 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++ -lusb-1.0
+LIBS		= -lTUTools++ -lusb-1.0 -lraw1394
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework CoreServices
 endif
@@ -45,16 +41,6 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../FireWireNode_.h \
 		../TU/IIDC++.h \
 		../USBNode_.h \
-		/usr/local/Make/libraw1394-2.1.2/config.h \
-		/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-		/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-		/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-		/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-		/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-		/usr/local/Make/libraw1394-2.1.2/src/ieee1394.h \
-		/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-		/usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-		/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -70,34 +56,12 @@ SRCS		= FireWireNode.cc \
 		IIDCCamera.cc \
 		IIDCNode.cc \
 		USBNode.cc \
-		arm.c \
-		dispatch.c \
-		errors.c \
-		eventloop.c \
-		fcp.c \
-		fw-iso.c \
-		fw.c \
-		iso.c \
-		libraw1394-main.c \
-		main.cc \
-		readwrite.c \
-		version.c
+		main.cc
 OBJS		= FireWireNode.o \
 		IIDCCamera.o \
 		IIDCNode.o \
 		USBNode.o \
-		arm.o \
-		dispatch.o \
-		errors.o \
-		eventloop.o \
-		fcp.o \
-		fw-iso.o \
-		fw.o \
-		iso.o \
-		libraw1394-main.o \
-		main.o \
-		readwrite.o \
-		version.o
+		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -130,100 +94,9 @@ USBNode.o: ../USBNode_.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/Minimize.h
-arm.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h
-dispatch.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h
-errors.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394.h
-eventloop.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h
-fcp.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h
-fw-iso.o: /usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h
-fw.o: /usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h
-iso.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h
-libraw1394-main.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h
 main.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/Minimize.h
-readwrite.o: /usr/local/Make/libraw1394-2.1.2/src/raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/kernel-raw1394.h \
-	/usr/local/Make/libraw1394-2.1.2/src/ieee1394-ioctl.h \
-	/usr/local/Make/libraw1394-2.1.2/src/raw1394_private.h \
-	/usr/local/Make/libraw1394-2.1.2/src/csr.h \
-	/usr/local/Make/libraw1394-2.1.2/src/fw.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-constants.h \
-	/usr/local/Make/libraw1394-2.1.2/src/firewire-cdev.h \
-	/usr/local/Make/libraw1394-2.1.2/config.h

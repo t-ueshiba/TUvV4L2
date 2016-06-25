@@ -36,7 +36,9 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../TU/IIDC++.h \
+EXTHDRS		= ../FireWireNode_.h \
+		../TU/IIDC++.h \
+		../USBNode_.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -49,13 +51,21 @@ EXTHDRS		= ../TU/IIDC++.h \
 		/usr/local/include/TU/types.h
 HDRS		= MyDialog.h \
 		MyIIDCCamera.h
-SRCS		= MyDialog.cc \
+SRCS		= FireWireNode.cc \
+		IIDCCamera.cc \
+		IIDCNode.cc \
+		MyDialog.cc \
 		MyIIDCCamera.cc \
+		USBNode.cc \
 		createCommands.cc \
 		createMenubar.cc \
 		main.cc
-OBJS		= MyDialog.o \
+OBJS		= FireWireNode.o \
+		IIDCCamera.o \
+		IIDCNode.o \
+		MyDialog.o \
 		MyIIDCCamera.o \
+		USBNode.o \
 		createCommands.o \
 		createMenubar.o \
 		main.o
@@ -66,6 +76,25 @@ OBJS		= MyDialog.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
+FireWireNode.o: ../FireWireNode_.h ../TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
+IIDCCamera.o: ../FireWireNode_.h ../TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
+	../USBNode_.h
+IIDCNode.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/Minimize.h
 MyDialog.o: MyDialog.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
@@ -78,6 +107,12 @@ MyIIDCCamera.o: MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
+USBNode.o: ../USBNode_.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/Minimize.h
 createCommands.o: MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \

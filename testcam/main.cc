@@ -40,7 +40,7 @@ main(int argc, char* argv[])
 	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, camera);
 	vapp.run();
 
-	camera.stopContinuousShot();
+	camera.continuousShot(false);
 
 	cerr << "0x" << hex << setw(16) << setfill('0')
 	     << camera.globalUniqueId() << dec << ' ' << camera;

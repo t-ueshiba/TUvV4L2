@@ -48,7 +48,7 @@ main(int argc, char* argv[])
 	v::MyCmdWindow<u_char>	myWin(vapp, camera, type);
 	vapp.run();
 
-	camera.stopContinuousShot();
+	camera.continuousShot(false);
     }
     catch (exception& err)
     {

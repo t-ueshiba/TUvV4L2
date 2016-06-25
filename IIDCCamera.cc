@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cstring>
 #include <sys/time.h>
+#include <iostream>
 
 #define XY_YZ(X, Y, Z)						\
 {								\
@@ -431,8 +432,8 @@ IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed)
 */
 IIDCCamera::~IIDCCamera()
 {
-    stopContinuousShot();
-    unembedTimestamp();
+    continuousShot(false);
+    embedTimestamp(false);
     delete _node;
 }
 
@@ -446,27 +447,16 @@ IIDCCamera::globalUniqueId() const
     return _node->globalUniqueId();
 }
     
-//! IIDCカメラの電源をonにする
+//! IIDCカメラの電源をon/offする
 /*!
+  \param onOff	trueならばon, falseならばoff
   \return	このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::powerOn()
+IIDCCamera::setPower(bool enable)
 {
     checkAvailability(Cam_Power_Cntl_Inq);
-    writeQuadletToRegister(Camera_Power, 0x1u << 31);
-    return *this;
-}
-
-//! IIDCカメラの電源をoffにする
-/*!
-  \return	このIIDCカメラオブジェクト. 
-*/
-IIDCCamera&
-IIDCCamera::powerOff()
-{
-    checkAvailability(Cam_Power_Cntl_Inq);
-    writeQuadletToRegister(Camera_Power, 0x00000000);
+    writeQuadletToRegister(Camera_Power, (enable ? 0x1u << 31 : 0x0));
     return *this;
 }
 
@@ -499,15 +489,13 @@ IIDCCamera::setSpeed(Speed speed)
     }
 
     const bool	cont = inContinuousShot();
-    if (cont)
-	stopContinuousShot();
+    continuousShot(false);
 
     writeQuadletToRegister(ISO_Channel,
 			   (readQuadletFromRegister(ISO_Channel)
 			    & 0xf0003f00) | quad);
 
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
 
     return *this;
 }
@@ -565,8 +553,7 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
 		mode = (u_int(format) - u_int(YUV444_160x120)) % 0x20 / 4;
     const bool	cont = inContinuousShot();
     
-    if (cont)
-	stopContinuousShot();
+    continuousShot(false);
     
     u_int	rt = 0;
     for (u_int bit = FrameRate_1_875; bit != rate; bit >>= 1)
@@ -782,8 +769,7 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
     (quad &= 0x0fffc0ff) |= ((ch << 28) | (ch << 8));
     writeQuadletToRegister(ISO_Channel, quad);
 
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
     
 #ifdef DEBUG
     cerr << "*** END [setFormatAndFrameRate] ***" << endl;
@@ -940,8 +926,7 @@ IIDCCamera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
 
   // 画像出力中はROIを変更できないので, もしそうであれば停止する.
     const bool	cont = inContinuousShot();
-    if (cont)
-	stopContinuousShot();
+    continuousShot(false);
 
   // ROIを指定する.
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
@@ -952,8 +937,7 @@ IIDCCamera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
     if (getFormat() == format7)
 	setFormatAndFrameRate(format7, FrameRate_x);
     
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
     
     return *this;
 }
@@ -975,8 +959,7 @@ IIDCCamera::setFormat_7_PixelFormat(Format format7,
 
   // 画像出力中はpixel formatを変更できないので, もしそうであれば停止する.
     const bool	cont = inContinuousShot();
-    if (cont)
-	stopContinuousShot();
+    continuousShot(false);
 
   // pixel formatを指定する.
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
@@ -987,8 +970,7 @@ IIDCCamera::setFormat_7_PixelFormat(Format format7,
     if (getFormat() == format7)
 	setFormatAndFrameRate(format7, FrameRate_x);
     
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
     
     return *this;
 }
@@ -1037,88 +1019,52 @@ IIDCCamera::onePush(Feature feature)
     return *this;
 }
 
-//! 指定された属性をonにする
+//! 指定された属性をon/offする
 /*!
-  \param feature	onにしたい属性
+  \param feature	on/offしたい属性
+  \param enable		trueならばon, falseならばoff
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::turnOn(Feature feature)
+IIDCCamera::setActive(Feature feature, bool enable)
 {
     checkAvailability(feature, OnOff);
-    writeQuadletToRegister(feature, readQuadletFromRegister(feature) | ON_OFF);
+    auto	quad = readQuadletFromRegister(feature);
+    writeQuadletToRegister(feature, (enable ? quad | ON_OFF : quad & ~ON_OFF));
     return *this;
 }
 
-//! 指定された属性をoffにする
+//! 指定された属性を絶対値/相対値操作モードにする
 /*!
-  \param feature	offにしたい属性
+  \param feature	絶対値/相対値操作モードにしたい属性
+  \param enable		trueならば絶対値操作モード, falseならば相対値操作モード
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::turnOff(Feature feature)
-{
-    checkAvailability(feature, OnOff);
-    writeQuadletToRegister(feature,
-			   readQuadletFromRegister(feature) & ~ON_OFF);
-    return *this;
-}
-
-//! 指定された属性を絶対値操作モードにする
-/*!
-  \param feature	絶対値操作モードにしたい属性
-  \return		このIIDCカメラオブジェクト
-*/
-IIDCCamera&
-IIDCCamera::setAbsControlMode(Feature feature)
+IIDCCamera::setAbsControl(Feature feature, bool enable)
 {
     checkAvailability(feature, Abs_Control);
+    auto	quad = readQuadletFromRegister(feature);
     writeQuadletToRegister(feature,
-			   readQuadletFromRegister(feature) | Abs_Control);
+			   (enable ? quad | Abs_Control : quad & ~Abs_Control));
     return *this;
 }
 
-//! 指定された属性を相対値操作モードにする
-/*!
-  \param feature	相対値操作モードにしたい属性
-  \return		このIIDCカメラオブジェクト
-*/
-IIDCCamera&
-IIDCCamera::setRelControlMode(Feature feature)
-{
-    checkAvailability(feature, Presence);
-    writeQuadletToRegister(feature,
-			   readQuadletFromRegister(feature) & ~Abs_Control);
-    return *this;
-}
-
-//! 指定された属性を自動設定モードにする
+//! 指定された属性を自動/手動設定モードにする
 /*!
   自動設定にすると, この属性の値は環境の変化に追従して継続的に自動的に調整
   される.
-  \param feature	自動設定モードにしたい属性
+  \param feature	自動/手動設定モードにしたい属性
+  \param enable		trueならば自動設定モード, falseならば手動設定モード
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::setAutoMode(Feature feature)
+IIDCCamera::setAuto(Feature feature, bool enable)
 {
     checkAvailability(feature, Auto);
+    auto	quad = readQuadletFromRegister(feature);
     writeQuadletToRegister(feature,
-			   readQuadletFromRegister(feature) | A_M_Mode);
-    return *this;
-}
-
-//! 指定された属性を手動設定モードにする
-/*!
-  \param feature	手動設定モードにしたい属性
-  \return		このIIDCカメラオブジェクト
-*/
-IIDCCamera&
-IIDCCamera::setManualMode(Feature feature)
-{
-    checkAvailability(feature, Manual);
-    writeQuadletToRegister(feature,
-			   readQuadletFromRegister(feature) & ~A_M_Mode);
+			   (enable ? quad | A_M_Mode : quad & ~A_M_Mode));
     return *this;
 }
 
@@ -1166,7 +1112,7 @@ IIDCCamera::inOnePushOperation(Feature feature) const
   \return		onになっていればtrueを, そうでなければfalseを返す.
 */
 bool
-IIDCCamera::isTurnedOn(Feature feature) const
+IIDCCamera::isActive(Feature feature) const
 {
     checkAvailability(feature, OnOff);
     return readQuadletFromRegister(feature) & (0x1u << 25);
@@ -1403,35 +1349,30 @@ IIDCCamera::resetSoftwareTrigger()
     return *this;
 }
 
-//! カメラからの画像の連続的出力を開始する
+//! カメラからの画像の連続的出力を開始/終了する
 /*!
   #TRIGGER_MODE がonであれば, 撮影のタイミングは外部トリガ信号によって制御さ
-  れる. 
+  れる.
+  \param enable	trueならば出力を開始、falseならば終了
   \return	このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::continuousShot()
+IIDCCamera::continuousShot(bool enable)
 {
-    if (!inContinuousShot())
-	writeQuadletToRegister(ISO_EN, 0x1u << 31);
-    return *this;
-}
-
-//! カメラからの画像の連続的出力を停止する
-/*!
-  \return	このIIDCカメラオブジェクト
-*/
-IIDCCamera&
-IIDCCamera::stopContinuousShot()
-{
-    if (inContinuousShot())
+    if (enable != inContinuousShot())
     {
-	writeQuadletToRegister(ISO_EN, 0x0);
-      //flushListenBuffer();
-	_img = 0;
-      // 再び continuoutShot() した時に	captureRaw()で使用するので, 
-      // _img_size の値は0にせずに保持する.
+	if (enable)
+	    writeQuadletToRegister(ISO_EN, 0x1u << 31);
+	else
+	{
+	    writeQuadletToRegister(ISO_EN, 0x0);
+	  //flushListenBuffer();
+	    _img = 0;
+	  // 再び continuoutShot() した時に captureRaw() で使用するので, 
+	  // _img_size の値は0にせずに保持する.
+	}
     }
+    
     return *this;
 }
 
@@ -1456,7 +1397,7 @@ IIDCCamera&
 IIDCCamera::oneShot()
 {
     checkAvailability(One_Shot_Inq);
-    stopContinuousShot();
+    continuousShot(false);
     writeQuadletToRegister(One_Shot, 0x1u << 31);
     return *this;
 }
@@ -1473,7 +1414,7 @@ IIDCCamera&
 IIDCCamera::multiShot(u_short nframes)
 {
     checkAvailability(Multi_Shot_Inq);
-    stopContinuousShot();
+    continuousShot(false);
     writeQuadletToRegister(One_Shot, (0x1u << 30) | (nframes & 0xffff));
     return *this;
 }
@@ -2139,36 +2080,21 @@ IIDCCamera::captureBayerRaw(void* image) const
     return *this;
 }
 
-//! IIDCカメラからの画像の先頭4byteにタイムスタンプを埋め込む
+//! IIDCカメラからの画像の先頭4byteにタイムスタンプを埋め込む/埋め込まないを指定する
 /*!
-  Point Grey社のカメラのみに有効．
-  \return	このIIDCカメラオブジェクト. 
+  Point Grey社のカメラのみに有効
+  \param enable	trueならば埋め込む, falseならば埋め込まない
+  \return	このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::embedTimestamp()
+IIDCCamera::embedTimestamp(bool enable)
 {
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
 	quadlet_t	val = readQuadletFromACRegister(FRAME_INFO);
 	if (val & Presence)
-	    writeQuadletToACRegister(FRAME_INFO, val | 0x1u);
-    }
-    return *this;
-}
-
-//! IIDCカメラからの画像の先頭4byteへのタイムスタンプ埋め込みを解除する
-/*!
-  Point Grey社のカメラのみに有効．
-  \return	このIIDCカメラオブジェクト. 
-*/
-IIDCCamera&
-IIDCCamera::unembedTimestamp()
-{
-    if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
-    {
-	quadlet_t	val = readQuadletFromACRegister(FRAME_INFO);
-	if (val & Presence)
-	    writeQuadletToACRegister(FRAME_INFO, val & ~0x1u);
+	    writeQuadletToACRegister(FRAME_INFO,
+				     (enable ? val | 0x1u : val & ~0x1u));
     }
     return *this;
 }
@@ -2987,13 +2913,13 @@ operator >>(std::istream& in, IIDCCamera& camera)
 		    if (val == -1)
 		    {
 			if (inq & IIDCCamera::Auto)
-			    camera.setAutoMode(feature.feature);
+			    camera.setAuto(feature.feature, true);
 		    }
 		    else
 		    {
 			if (inq & IIDCCamera::Manual)
 			{
-			    camera.setManualMode(feature.feature);
+			    camera.setAuto(feature.feature, false);
 			    if (feature.feature == IIDCCamera::WHITE_BALANCE)
 				camera.setWhiteBalance(val, val2);
 			    else
