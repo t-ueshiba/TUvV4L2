@@ -630,7 +630,7 @@ IIDCCamera::inquireBasicFunction() const
 inline IIDCCamera&
 IIDCCamera::snap()
 {
-    if (_img != 0)
+    if (_img)
 	_node->requeueListenBuffer();
     _img = _node->waitListenBuffer();
     return *this;
@@ -652,9 +652,9 @@ IIDCCamera::snap()
 template <class T> const IIDCCamera&
 IIDCCamera::captureDirectly(Image<T>& image) const
 {
-    if (_img == 0)
+    if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureDirectly: no images snapped!!");
-    image.resize((T*)_img, height(), width());
+    image.resize(reinterpret_cast<T*>(_img), height(), width());
 
     return *this;
 }
@@ -668,7 +668,8 @@ IIDCCamera::captureDirectly(Image<T>& image) const
 inline uint64_t
 IIDCCamera::getTimestamp() const
 {
-    return (_img != 0 ? cycletimeToLocaltime(ntohl(*((uint32_t*)_img))) : 0);
+    return (_img ? cycletimeToLocaltime(
+		       ntohl(*reinterpret_cast<const uint32_t*>(_img))) : 0);
 }
 
 inline void
