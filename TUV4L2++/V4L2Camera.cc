@@ -832,7 +832,7 @@ V4L2Camera::operator >>(Image<T>& image) const
 {
     if (_current == ~0)
 	throw std::runtime_error("TU::V4L2Camera::operator >>(): no images snapped!!");
-    const u_char* const	img = (u_char*)_buffers[_current].p();
+    const auto	img = static_cast<const u_char*>(_buffers[_current].p());
     
   // Transfer image data from current buffer.
     image.resize(height(), width());
@@ -840,65 +840,97 @@ V4L2Camera::operator >>(Image<T>& image) const
     {
       case BGR24:
       {
-	const BGR*	src = (const BGR*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const BGR*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
 
       case RGB24:
       {
-	const RGB*	src = (const RGB*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const RGB*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
 
       case BGR32:
       {
-	const ABGR*	src = (const ABGR*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const ABGR*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
 
       case RGB32:
       {
-	const RGBA*	src = (const RGBA*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const RGBA*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
 
       case GREY:
       {
-	const u_char*	src = (const u_char*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const u_char*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
 
       case Y16:
       {
-	const u_short*	src = (const u_short*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const u_short*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
 
       case YUYV:
       {
-	const YUYV422*	src = (const YUYV422*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const YUYV422*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
         break;
 
       case UYVY:
       {
-	const YUV422*	src = (const YUV422*)img;
-	for (size_t v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const YUV422*>(img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
 
