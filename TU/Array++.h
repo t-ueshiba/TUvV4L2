@@ -39,6 +39,7 @@
 #include <algorithm>			// std::copy()
 #include <numeric>			// std::inner_product()
 #include <stdexcept>
+#include <cmath>			// floor()
 #include <cassert>
 #include <iostream>
 #include <iomanip>
@@ -684,6 +685,16 @@ class Array : public Buf<T, D, ALLOC>
 				    assert(i < size());
 				    return *(begin() + i);
 				}
+    template <class S>
+    value_type			at(S uf) const
+				{
+				    const auto	u  = floor(uf);
+				    const auto	p  = data()
+						   + difference_type(u);
+				    const auto	du = uf - u;
+				    return (du ?
+					    (1.0 - du)*p[0] + du*p[1] : p[0]);
+				}
 
 #if !defined(__NVCC__)
   //! 2つの配列を要素毎に比較し，同じであるか調べる．
@@ -1104,6 +1115,16 @@ class Array2 : public Array<T, R>
 			    return (size() == 0 ? 0 :
 				    size() == 1 ? _ncol : 
 				    (_buf.size() - _ncol)/(size() - 1));
+			}
+    template <class S> typename T::value_type
+			at(const Array<S, 2>& p) const
+			{
+			    const auto	v  = difference_type(floor(p[1]));
+			    const auto	a0 = (*this)[v].at(p[0]);
+			    const auto	dv = p[1] - v;
+			    return (dv ?
+				    (1.0 - dv)*a0 + dv*(*this)[v+1].at(p[0]) :
+				    a0);
 			}
 
   //! 配列のサイズを変更する．

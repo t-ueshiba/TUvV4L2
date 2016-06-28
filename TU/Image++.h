@@ -64,7 +64,7 @@ class ColorConverter
 		}
     int		g(int y, int u, int v) const
 		{
-		    return limit(y - scaleDown(_gu[u] - _gv[v]));
+		    return limit(y - scaleDown(_gu[u] + _gv[v]));
 		}
     int		b(int y, int u) const
 		{
@@ -73,7 +73,7 @@ class ColorConverter
     template <class T>
     static T	y(int r, int g, int b)
 		{
-		    return T(_yr*r + _yg*g + _yb*b);
+		    return round<T>(_yr*r + _yg*g + _yb*b);
 		}
     int		u(int b, int y) const
 		{
@@ -85,18 +85,29 @@ class ColorConverter
 		}
     
   private:
-    template <class T>
-    static int	limit(T val)
+    static int	limit(int val)
 		{
-		    return (val < 0 ? 0 : val > 255 ? 255 : int(val));
+		    return (val < 0 ? 0 : val > 255 ? 255 : val);
 		}
     static int	scaleUp(float val)
 		{
-		    return int(val * (1 << 10));
+		    return round<int>(val * (1 << 10));
 		}
     static int	scaleDown(int val)
 		{
 		    return val >> 10;
+		}
+    template <class T>
+    static typename std::enable_if<std::is_integral<T>::value, T>::type
+		round(float val)
+		{
+		    return T(::round(val));
+		}
+    template <class T>
+    static typename std::enable_if<std::is_floating_point<T>::value, T>::type
+		round(float val)
+		{
+		    return T(val);
 		}
     
   private:
@@ -467,6 +478,300 @@ operator <<(std::ostream& out, const YUV411& yuv)
 }
 
 /************************************************************************
+*  class pixel_iterator<ITER>						*
+************************************************************************/
+namespace detail
+{
+  template <class ITER, class T=typename std::iterator_traits<ITER>::value_type>
+  class pixel_proxy
+  {
+    public:
+      using self	= pixel_proxy;
+      using value_type	= T;
+
+      static constexpr size_t	npixels = 1;
+      
+    public:
+      pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
+
+      template <class ITER_, class T_>
+      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+			{
+			    using N = std::integral_constant<
+					  size_t,
+					  pixel_proxy<ITER_, T_>::npixels>;
+
+			    assign(proxy.value(N()));
+			    return *this;
+			}
+      
+      value_type	value(std::integral_constant<size_t, npixels>) const
+			{
+			    const auto	val = *_iter;
+			    ++_iter;
+			    return val;
+			}
+      template <size_t N>
+      TU::pair_tree<T, N>
+			value(std::integral_constant<size_t, N>) const
+			{
+			    using N2 = std::integral_constant<size_t, N/2>;
+		    
+			    const auto	val0 = value(N2());
+			    return std::make_pair(val0, value(N2()));
+			}
+
+    private:
+      template <class T_>
+      void		assign(const T_& val)
+			{
+			    *_iter = val;
+			    ++_iter;
+			}
+      template <class T_>
+      void		assign(const std::pair<T_, T_>& val)
+			{
+			    assign(val.first);
+			    assign(val.second);
+			}
+
+    private:
+      ITER&	_iter;
+  };
+    
+  template <class ITER>
+  class pixel_proxy<ITER, YUV422>
+  {
+    public:
+      using self		= pixel_proxy;
+      using value_type		= TU::pair_tree<YUV444, 2>;
+      using element_type	= YUV422::element_type;
+      
+      static constexpr size_t	npixels = 2;
+      
+    public:
+      pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
+
+      template <class ITER_, class T_>
+      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+			{
+			    constexpr size_t
+				Np = pixel_proxy<ITER_, T_>::npixels;
+			    using N = std::integral_constant<
+					  size_t,
+					  (npixels > Np ? npixels : Np)>;
+		    
+			    assign(proxy.value(N()));
+			    return *this;
+			}
+
+      value_type	value(std::integral_constant<size_t, npixels>) const
+			{
+			    const auto	val0 = *_iter;
+			    const auto	val1 = *(++_iter);
+			    ++_iter;
+			    return {{val0.y, val0.x, val1.x},
+				    {val1.y, val0.x, val1.x}};
+			}
+      template <size_t N>
+      TU::pair_tree<YUV444, N>
+			value(std::integral_constant<size_t, N>) const
+			{
+			    using N2 = std::integral_constant<size_t, N/2>;
+		    
+			    const auto	val0 = value(N2());
+			    return std::make_pair(val0, value(N2()));
+			}
+
+    private:
+      template <class T_>
+      typename std::enable_if<!is_pair<T_>::value>::type
+			assign(const std::pair<T_, T_>& val)
+			{
+			    YUV444	val0(val.first);
+			    *_iter     = {val0.y, val0.u};
+			    *(++_iter) = {element_type(val.second), val0.v};
+			    ++_iter;
+			}
+      template <class T_>
+      typename std::enable_if<is_pair<T_>::value>::type
+			assign(const std::pair<T_, T_>& val)
+			{
+			    assign(val.first);
+			    assign(val.second);
+			}
+
+    private:
+      ITER&	_iter;
+  };
+
+  template <class ITER>
+  class pixel_proxy<ITER, YUYV422>
+  {
+    public:
+      using self		= pixel_proxy;
+      using value_type		= TU::pair_tree<YUV444, 2>;
+      using element_type	= YUYV422::element_type;
+      
+      static constexpr size_t	npixels = 2;
+      
+    public:
+      pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
+
+      template <class ITER_, class T_>
+      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+			{
+			    constexpr size_t
+				Np = pixel_proxy<ITER_, T_>::npixels;
+			    using N = std::integral_constant<
+					  size_t,
+					  (npixels > Np ? npixels : Np)>;
+		    
+			    assign(proxy.value(N()));
+			    return *this;
+			}
+
+      value_type	value(std::integral_constant<size_t, npixels>) const
+			{
+			    const auto	val0 = *_iter;
+			    const auto	val1 = *(++_iter);
+			    ++_iter;
+			    return {{val0.y, val0.x, val1.x},
+				    {val1.y, val0.x, val1.x}};
+			}
+      template <size_t N>
+      TU::pair_tree<YUV444, N>
+			value(std::integral_constant<size_t, N>) const
+			{
+			    using N2 = std::integral_constant<size_t, N/2>;
+		    
+			    const auto	val0 = value(N2());
+			    return std::make_pair(val0, value(N2()));
+			}
+
+    private:
+      template <class T_>
+      typename std::enable_if<!is_pair<T_>::value>::type
+			assign(const std::pair<T_, T_>& val)
+			{
+			    YUV444	val0(val.first);
+			    *_iter     = {val0.y, val0.u};
+			    *(++_iter) = {element_type(val.second), val0.v};
+			    ++_iter;
+			}
+      template <class T_>
+      typename std::enable_if<is_pair<T_>::value>::type
+			assign(const std::pair<T_, T_>& val)
+			{
+			    assign(val.first);
+			    assign(val.second);
+			}
+
+    private:
+      ITER&	_iter;
+  };
+
+  template <class ITER>
+  class pixel_proxy<ITER, YUV411>
+  {
+    public:
+      using self		= pixel_proxy;
+      using value_type		= TU::pair_tree<YUV444, 4>;
+      using element_type	= YUV411::element_type;
+      
+      static constexpr size_t	npixels = 4;
+      
+    public:
+      pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
+
+      template <class ITER_, class T_>
+      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+			{
+			    constexpr size_t
+				Np = pixel_proxy<ITER_, T_>::npixels;
+			    using N = std::integral_constant<
+					  size_t,
+					  (npixels > Np ? npixels : Np)>;
+		    
+			    assign(proxy.value(N()));
+			    return *this;
+			}
+
+      value_type	value(std::integral_constant<size_t, npixels>) const
+			{
+			    const auto	val0 = *_iter;
+			    const auto	val1 = *(++_iter);
+			    ++_iter;
+			    return {{{val0.y0, val0.x, val1.x},
+				     {val0.y1, val0.x, val1.x}},
+				    {{val1.y0, val0.x, val1.x},
+				     {val1.y1, val0.x, val1.x}}};
+			}
+
+    private:
+      template <class T_>
+      void		assign(const std::pair<std::pair<T_, T_>,
+					       std::pair<T_, T_> >& val)
+			{
+			    YUV444	val0(val.first.first);
+			    *_iter     = {val0.y,
+					  element_type(val.first.second),
+					  val0.u};
+			    *(++_iter) = {element_type(val.second.first),
+					  element_type(val.second.second),
+					  val0.v};
+			    ++_iter;
+			}
+
+    private:
+      ITER&	_iter;
+  };
+}
+
+template <class ITER>
+class pixel_iterator
+    : public boost::iterator_adaptor<pixel_iterator<ITER>,
+				     ITER,
+				     detail::pixel_proxy<ITER>,
+				     std::forward_iterator_tag,
+				     detail::pixel_proxy<ITER> >
+{
+  private:
+    using super	= boost::iterator_adaptor<pixel_iterator,
+					  ITER,
+					  detail::pixel_proxy<ITER>,
+					  std::forward_iterator_tag,
+					  detail::pixel_proxy<ITER> >;
+    
+  public:
+    using reference	= typename super::reference;
+
+    friend class	boost::iterator_core_access;
+    
+  public:
+		pixel_iterator(ITER iter)	:super(iter)		{}
+
+  private:
+    reference	dereference() const
+		{
+		    return reference(super::base());
+		}
+    void	increment()
+		{
+		}
+    bool	equal(const pixel_iterator& iter) const
+		{
+		    return super::base() > iter.base() - reference::npixels;
+		}
+};
+
+template <class ITER> inline pixel_iterator<ITER>
+make_pixel_iterator(ITER iter)
+{
+    return pixel_iterator<ITER>(iter);
+}
+
+/************************************************************************
 *  class ImageBase:	basic image class				*
 ************************************************************************/
 //! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
@@ -683,16 +988,6 @@ class ImageLine : public Array<T, 0, ALLOC>
     using		super::data;
     using		super::begin;
     using		super::end;
-
-    template <class S>
-    T			at(S uf)				const	;
-    const YUV422*	copy(const YUV422* src)				;
-    const YUYV422*	copy(const YUYV422* src)			;
-    const YUV411*	copy(const YUV411* src)				;
-    template <class ITER>
-    ITER		copy(ITER src)					;
-    template <class ITER, class TBL>
-    ITER		lookup(ITER src, TBL tbl)			;
 };
 
 template <class T, class ALLOC> inline ImageLine<T, ALLOC>&
@@ -726,325 +1021,6 @@ ImageLine<T, ALLOC>::operator ()(size_t u, size_t d)
     return ImageLine(*this, u, d);
 }
     
-//! サブピクセル位置の画素値を線形補間で求める．
-/*!
-  指定された位置の両側の画素値を線形補間して出力する．
-  \param uf	サブピクセルで指定された位置
-  \return	線形補間された画素値
-*/
-template <class T, class ALLOC> template <class S> inline T
-ImageLine<T, ALLOC>::at(S uf) const
-{
-    const int	u  = floor(uf);
-    const T*	in = data() + u;
-    const float	du = uf - u;
-    return (du ? (1.0f - du) * *in + du * *(in + 1) : *in);
-}
-
-//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
-/*!
-  \param src	読み込み元の先頭を指すポインタ
-  \return	最後に読み込まれた画素の次の画素へのポインタ
-*/
-template <class T, class ALLOC> const YUV422*
-ImageLine<T, ALLOC>::copy(const YUV422* src)
-{
-    for (auto dst = begin(); dst < end() - 1; )
-    {
-	*dst++ = YUV444(src[0].y, src[0].x, src[1].x);
-	*dst++ = YUV444(src[1].y, src[0].x, src[1].x);
-	src += 2;
-    }
-    return src;
-}
-
-//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
-/*!
-  \param src	読み込み元の先頭を指すポインタ
-  \return	最後に読み込まれた画素の次の画素へのポインタ
-*/
-template <class T, class ALLOC> const YUYV422*
-ImageLine<T, ALLOC>::copy(const YUYV422* src)
-{
-    for (auto dst = begin(); dst < end() - 1; )
-    {
-	*dst++ = YUV444(src[0].y, src[0].x, src[1].x);
-	*dst++ = YUV444(src[1].y, src[0].x, src[1].x);
-	src += 2;
-    }
-    return src;
-}
-
-//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
-/*!
-  \param src	読み込み元の先頭を指すポインタ
-  \return	最後に読み込まれた画素の次の画素へのポインタ
-*/
-template <class T, class ALLOC> const YUV411*
-ImageLine<T, ALLOC>::copy(const YUV411* src)
-{
-    for (auto dst = begin(); dst < end() - 3; )
-    {
-	*dst++ = YUV444(src[0].y0, src[0].x, src[1].x);
-	*dst++ = YUV444(src[0].y1, src[0].x, src[1].x);
-	*dst++ = YUV444(src[1].y0, src[0].x, src[1].x);
-	*dst++ = YUV444(src[1].y1, src[0].x, src[1].x);
-	src += 2;
-    }
-    return src;
-}
-
-//! ポインタで指定された位置からスキャンラインの画素数分の画素を読み込む．
-/*!
-  \param src	読み込み元の先頭を指すポインタ
-  \return	最後に読み込まれた画素の次の画素へのポインタ
-*/
-template <class T, class ALLOC> template <class ITER> ITER
-ImageLine<T, ALLOC>::copy(ITER src)
-{
-    for (auto dst = begin(); dst != end(); ++dst, ++src)
-	*dst = *src;
-    return src;
-}
-
-//! インデックスを読み込み，ルックアップテーブルで変換する．
-/*!
-  \param src	読み込み元の先頭を指す反復子
-  \param tbl	ルックアップテーブルの先頭を指す反復子
-  \return	最後に読み込まれた画素の次の画素への反復子
-*/
-template <class T, class ALLOC> template <class ITER, class TBL> ITER 
-ImageLine<T, ALLOC>::lookup(ITER src, TBL tbl)
-{
-    for (auto dst = begin(); dst != end(); ++dst, ++src)
-	*dst = T(tbl[*src]);
-    return src;
-}
-
-template <class ALLOC>
-class ImageLine<YUV422, ALLOC> : public Array<YUV422, 0, ALLOC>
-{
-  private:
-    typedef Array<YUV422, 0, ALLOC>	super;
-
-  public:
-    typedef typename super::pointer	pointer;
-    
-  public:
-    explicit ImageLine(size_t d=0)		:super(d)		{}
-    ImageLine(pointer p, size_t d)		:super(p, d)		{}
-    ImageLine(ImageLine& l, size_t u, size_t d) :super(l, u, d)		{}
-    ImageLine&		operator =(const YUV422& c)			;
-    const ImageLine	operator ()(size_t u, size_t d)		const	;
-    ImageLine		operator ()(size_t u, size_t d)			;
-
-    using		super::data;
-    using		super::size;
-    using		super::begin;
-    using		super::end;
-    
-    const YUV444*	copy(const YUV444* src)				;
-    const YUV422*	copy(const YUV422* src)				;
-    const YUV411*	copy(const YUV411* src)				;
-    template <class ITER>
-    ITER		copy(ITER src)					;
-    template <class ITER, class TBL>
-    ITER		lookup(ITER src, TBL tbl)			;
-};
-
-template <class ALLOC> inline ImageLine<YUV422, ALLOC>&
-ImageLine<YUV422, ALLOC>::operator =(const YUV422& c)
-{
-    super::operator =(c);
-    return *this;
-}
-    
-template <class ALLOC> inline const ImageLine<YUV422, ALLOC>
-ImageLine<YUV422, ALLOC>::operator ()(size_t u, size_t d) const
-{
-    return ImageLine(const_cast<ImageLine&>(*this), u, d);
-}
-    
-template <class ALLOC> inline ImageLine<YUV422, ALLOC>
-ImageLine<YUV422, ALLOC>::operator ()(size_t u, size_t d)
-{
-    return ImageLine<YUV422, ALLOC>(*this, u, d);
-}
-    
-template <class ALLOC> const YUV444*
-ImageLine<YUV422, ALLOC>::copy(const YUV444* src)
-{
-    for (auto dst = begin(); dst < end() - 1; )
-    {
-	dst->x = src->u;
-	dst->y = src->y;
-	++dst;
-	dst->x = src->v;
-	++src;
-	dst->y = src->y;
-	++dst;
-	++src;
-    }
-    return src;
-}
-
-template <class ALLOC> inline const YUV422*
-ImageLine<YUV422, ALLOC>::copy(const YUV422* src)
-{
-    memcpy(data(), src, size() * sizeof(YUV422));
-    return src + size();
-}
-
-template <class ALLOC> const YUV411*
-ImageLine<YUV422, ALLOC>::copy(const YUV411* src)
-{
-    for (auto dst = begin(); dst < end() - 3; )
-    {
-	dst->x = src[0].x;
-	dst->y = src[0].y0;
-	++dst;
-	dst->x = src[1].x;
-	dst->y = src[0].y1;
-	++dst;
-	dst->x = src[0].x;
-	dst->y = src[1].y0;
-	++dst;
-	dst->x = src[1].x;
-	dst->y = src[1].y1;
-	++dst;
-	src += 2;
-    }
-    return src;
-}
-
-template <class ALLOC> template <class ITER> ITER
-ImageLine<YUV422, ALLOC>::copy(ITER src)
-{
-    for (auto dst = begin(); dst < end(); ++dst, ++src)
-	*dst = YUV422(*src);
-    return src;
-}
-
-template <class ALLOC> template <class ITER, class TBL> ITER
-ImageLine<YUV422, ALLOC>::lookup(ITER src, TBL tbl)
-{
-    for (auto dst = begin(); dst < end(); ++dst, ++src)
-	*dst = YUV422(tbl[*src]);
-    return src;
-}
-
-template <class ALLOC>
-class ImageLine<YUYV422, ALLOC> : public Array<YUYV422, 0, ALLOC>
-{
-  private:
-    typedef Array<YUYV422, 0, ALLOC>	super;
-
-  public:
-    typedef typename super::pointer	pointer;
-    
-  public:
-    explicit ImageLine(size_t d=0)		:super(d)		{}
-    ImageLine(pointer p, size_t d)		:super(p, d)		{}
-    ImageLine(ImageLine& l, size_t u, size_t d)	:super(l, u, d)		{}
-    ImageLine&		operator =(const YUYV422& c)			;
-    const ImageLine	operator ()(size_t u, size_t d)		const	;
-    ImageLine		operator ()(size_t u, size_t d)			;
-
-    using		super::size;
-    using		super::data;
-    using		super::begin;
-    using		super::end;
-    
-    const YUV444*	copy(const YUV444* src)				;
-    const YUYV422*	copy(const YUYV422* src)			;
-    const YUV411*	copy(const YUV411* src)				;
-    template <class ITER>
-    ITER		copy(ITER src)					;
-    template <class ITER, class TBL>
-    ITER		lookup(ITER src, TBL tbl)			;
-};
-    
-template <class ALLOC> inline ImageLine<YUYV422, ALLOC>&
-ImageLine<YUYV422, ALLOC>::operator =(const YUYV422& c)
-{
-    super::operator =(c);
-    return *this;
-}
-    
-template <class ALLOC> inline const ImageLine<YUYV422, ALLOC>
-ImageLine<YUYV422, ALLOC>::operator ()(size_t u, size_t d) const
-{
-    return ImageLine(const_cast<ImageLine&>(*this), u, d);
-}
-    
-template <class ALLOC> inline ImageLine<YUYV422, ALLOC>
-ImageLine<YUYV422, ALLOC>::operator ()(size_t u, size_t d)
-{
-    return ImageLine(*this, u, d);
-}
-    
-template <class ALLOC> const YUV444*
-ImageLine<YUYV422, ALLOC>::copy(const YUV444* src)
-{
-    for (auto dst = begin(); dst < end() - 1; )
-    {
-	dst->y = src->y;
-	dst->x = src->u;
-	++dst;
-	dst->x = src->v;
-	++src;
-	dst->y = src->y;
-	++dst;
-	++src;
-    }
-    return src;
-}
-
-template <class ALLOC> inline const YUYV422*
-ImageLine<YUYV422, ALLOC>::copy(const YUYV422* src)
-{
-    memcpy(data(), src, size() * sizeof(YUYV422));
-    return src + size();
-}
-
-template <class ALLOC> const YUV411*
-ImageLine<YUYV422, ALLOC>::copy(const YUV411* src)
-{
-    for (auto dst = begin(); dst < end() - 3; )
-    {
-	dst->y = src[0].y0;
-	dst->x = src[0].x;
-	++dst;
-	dst->y = src[0].y1;
-	dst->x = src[1].x;
-	++dst;
-	dst->y = src[1].y0;
-	dst->x = src[0].x;
-	++dst;
-	dst->y = src[1].y1;
-	dst->x = src[1].x;
-	++dst;
-	src += 2;
-    }
-    return src;
-}
-
-template <class ALLOC> template <class ITER> ITER
-ImageLine<YUYV422, ALLOC>::copy(ITER src)
-{
-    for (auto dst = begin(); dst < end(); ++dst, ++src)
-	*dst = YUYV422(*src);
-    return src;
-}
-
-template <class ALLOC> template <class ITER, class TBL> ITER
-ImageLine<YUYV422, ALLOC>::lookup(ITER src, TBL tbl)
-{
-    for (auto dst = begin(); dst < end(); ++dst, ++src)
-	*dst = YUYV422(tbl[*src]);
-    return src;
-}
-
 template <class ALLOC>
 class ImageLine<YUV411, ALLOC> : public Array<YUV411, 0, ALLOC>
 {
@@ -1066,15 +1042,6 @@ class ImageLine<YUV411, ALLOC> : public Array<YUV411, 0, ALLOC>
     using		super::size;
     using		super::begin;
     using		super::end;
-    
-    const YUV444*	copy(const YUV444* src)				;
-    const YUV422*	copy(const YUV422* src)				;
-    const YUYV422*	copy(const YUYV422* src)			;
-    const YUV411*	copy(const YUV411* src)				;
-    template <class ITER>
-    ITER		copy(ITER src)					;
-    template <class ITER, class TBL>
-    ITER		lookup(ITER src, TBL tbl)			;
 
     bool		resize(size_t d)				;
     void		resize(pointer p, size_t d)			;
@@ -1099,89 +1066,6 @@ ImageLine<YUV411, ALLOC>::operator ()(size_t u, size_t d)
     return ImageLine(*this, u, d);
 }
     
-template <class ALLOC> const YUV444*
-ImageLine<YUV411, ALLOC>::copy(const YUV444* src)
-{
-    for (auto dst = begin(); dst < end() - 1; )
-    {
-	dst->x  = src[0].u;
-	dst->y0 = src[0].y;
-	dst->y1 = src[1].y;
-	++dst;
-	dst->x  = src[0].v;
-	dst->y0 = src[2].y;
-	dst->y1 = src[3].y;
-	++dst;
-	src += 4;
-    }
-    return src;
-}
-
-template <class ALLOC> const YUV422*
-ImageLine<YUV411, ALLOC>::copy(const YUV422* src)
-{
-    for (auto dst = begin(); dst < end() - 1; )
-    {
-	dst->x  = src[0].x;
-	dst->y0 = src[0].y;
-	dst->y1 = src[1].y;
-	++dst;
-	dst->x  = src[1].x;
-	dst->y0 = src[2].y;
-	dst->y1 = src[3].y;
-	++dst;
-	src += 4;
-    }
-    return src;
-}
- 
-template <class ALLOC> const YUYV422*
-ImageLine<YUV411, ALLOC>::copy(const YUYV422* src)
-{
-    for (auto dst = begin(); dst < end() - 1; )
-    {
-	dst->x  = src[0].x;
-	dst->y0 = src[0].y;
-	dst->y1 = src[1].y;
-	++dst;
-	dst->x  = src[1].x;
-	dst->y0 = src[2].y;
-	dst->y1 = src[3].y;
-	++dst;
-	src += 4;
-    }
-    return src;
-}
- 
-template <class ALLOC> inline const YUV411*
-ImageLine<YUV411, ALLOC>::copy(const YUV411* src)
-{
-    memcpy(data(), src, size() * sizeof(YUV411));
-    return src + size();
-}
-
-template <class ALLOC> template <class ITER> ITER
-ImageLine<YUV411, ALLOC>::copy(ITER src)
-{
-    for (auto dst = begin(); dst < end(); ++dst)
-    {
-	*dst = YUV411(*src);
-	src += 2;
-    }
-    return src;
-}
-
-template <class ALLOC> template <class ITER, class TBL> ITER
-ImageLine<YUV411, ALLOC>::lookup(ITER src, TBL tbl)
-{
-    for (auto dst = begin(); dst < end(); ++dst)
-    {
-	*dst = YUV411(tbl[*src]);
-	src += 2;
-    }
-    return src;
-}
-
 template <class ALLOC> inline bool
 ImageLine<YUV411, ALLOC>::resize(size_t d)
 {
@@ -1242,11 +1126,11 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
     Image(Image& i, size_t u, size_t v, size_t w, size_t h)
 	:super(i, v, u, h, w), ImageBase(i)			{}
 
-    Image&		operator =(const element_type& c)	;
-    const Image		operator ()(size_t u, size_t v,
-				    size_t w, size_t h)	const	;
-    Image		operator ()(size_t u, size_t v,
-				    size_t w, size_t h)		;
+    Image&	operator =(const element_type& c)		;
+    const Image	operator ()(size_t u, size_t v,
+			    size_t w, size_t h)		const	;
+    Image	operator ()(size_t u, size_t v,
+			    size_t w, size_t h)			;
 
 #if !defined(__NVCC__)
   //! 他の配列と同一要素を持つ画像を作る（コピーコンストラクタの拡張）．
@@ -1277,9 +1161,6 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
 		}
 #endif	// !__NVCC__
     
-    template <class S>
-    T		at(const Point2<S>& p)			const	;
-
   //! 指定された位置の画素にアクセスする．
   /*!
     \param p	画素の位置
@@ -1369,21 +1250,6 @@ Image<T, ALLOC>::operator ()(size_t u, size_t v, size_t w, size_t h)
     return Image(*this, u, v, w, h);
 }
     
-//! サブピクセル位置の画素値を双線形補間で求める．
-/*!
-  指定された位置を囲む4つの画素値を双線形補間して出力する．
-  \param p	サブピクセルで指定された位置
-  \return	双線形補間された画素値
-*/
-template <class T, class ALLOC> template <class S> inline T
-Image<T, ALLOC>::at(const Point2<S>& p) const
-{
-    const int	v    = floor(p[1]);
-    const T	out0 = (*this)[v].at(p[0]);
-    const float	dv   = p[1] - v;
-    return (dv ? (1.0f - dv)*out0 + dv*(*this)[v+1].at(p[0]) : out0);
-}
-
 //! 入力ストリームから画像を読み込む．
 /*!
   \param in	入力ストリーム
@@ -1505,14 +1371,16 @@ template <class T, class ALLOC> template <class S> std::istream&
 Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
 {
     const size_t	npads = type2nbytes(typeInfo.type, true);
-    ImageLine<S>	buf(width());
+    Array<S>		buf(width());
     if (typeInfo.bottomToTop)
     {
 	for (auto line = rbegin(); line != rend(); ++line)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->copy(buf.cbegin());
+	    std::copy(make_pixel_iterator(buf.cbegin()),
+		      make_pixel_iterator(buf.cend()),
+		      make_pixel_iterator(line->begin()));
 	}
     }
     else
@@ -1521,7 +1389,9 @@ Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->copy(buf.cbegin());
+	    std::copy(make_pixel_iterator(buf.cbegin()),
+		      make_pixel_iterator(buf.cend()),
+		      make_pixel_iterator(line->begin()));
 	}
     }
 
@@ -1536,14 +1406,19 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
     colormap.restore(in);
 	
     const size_t	npads = type2nbytes(typeInfo.type, true);
-    ImageLine<S>	buf(width());
+    Array<S>		buf(width());
+    const auto		lookup = [&colormap](int i){ return colormap[i]; };
     if (typeInfo.bottomToTop)
     {
 	for (auto line = rbegin(); line != rend(); ++line)    
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->lookup(buf.cbegin(), colormap.cbegin());
+	    std::copy(make_pixel_iterator(boost::make_transform_iterator(
+					      buf.cbegin(), lookup)),
+		      make_pixel_iterator(boost::make_transform_iterator(
+					      buf.cend(), lookup)),
+		      make_pixel_iterator(line->begin()));
 	}
     }
     else
@@ -1552,7 +1427,11 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    line->lookup(buf.cbegin(), colormap.cbegin());
+	    std::copy(make_pixel_iterator(boost::make_transform_iterator(
+					      buf.cbegin(), lookup)),
+		      make_pixel_iterator(boost::make_transform_iterator(
+					      buf.cend(), lookup)),
+		      make_pixel_iterator(line->begin()));
 	}
     }
 
@@ -1570,12 +1449,14 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     colormap.save(out);
     
     Array<u_char>	pad(type2nbytes(type, true));
-    ImageLine<D>	buf(width());
+    Array<D>		buf(width());
     if (typeInfo.bottomToTop)
     {
 	for (auto line = crbegin(); line != crend(); ++line)
 	{
-	    buf.copy(line->cbegin());
+	    std::copy(make_pixel_iterator(line->cbegin()),
+		      make_pixel_iterator(line->cend()),
+		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}
@@ -1584,7 +1465,9 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     {
 	for (auto line = cbegin(); line != cend(); ++line)
 	{
-	    buf.copy(line->cbegin());
+	    std::copy(make_pixel_iterator(line->cbegin()),
+		      make_pixel_iterator(line->cend()),
+		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;
 	}

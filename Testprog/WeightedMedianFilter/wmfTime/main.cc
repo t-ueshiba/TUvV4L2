@@ -53,7 +53,7 @@ main(int argc, char* argv[])
     using		std::endl;
 
     typedef float	pixel_type;
-    typedef RGB		guide_type;
+    typedef float	guide_type;
 
     float		sigma = 5.5;
     size_t		winSize = 5;
