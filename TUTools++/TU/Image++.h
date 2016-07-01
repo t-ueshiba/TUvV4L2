@@ -1007,6 +1007,16 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
 {
   private:
     typedef Array2<ImageLine<T, ALLOC> >		super;
+
+    template <class L>
+    struct Colormap : public Array<L>
+    {
+	typedef L					result_type;
+
+	Colormap(size_t d)	:Array<L>(d)		{}
+	
+	result_type	operator ()(size_t i)	const	{ return (*this)[i]; }
+    };
     
   public:
     typedef typename super::element_type		element_type;
@@ -1318,12 +1328,11 @@ template <class T, class ALLOC> template <class S, class L> std::istream&
 Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 				      const TypeInfo& typeInfo)
 {
-    Array<L>	colormap(typeInfo.ncolors);
+    Colormap<L>	colormap(typeInfo.ncolors);
     colormap.restore(in);
 	
     const size_t	npads = type2nbytes(typeInfo.type, true);
     Array<S>		buf(width());
-    const auto		lookup = [&colormap](int i){ return colormap[i]; };
     if (typeInfo.bottomToTop)
     {
 	for (auto line = rbegin(); line != rend(); ++line)    
@@ -1331,9 +1340,9 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(boost::make_transform_iterator(
-					      buf.cbegin(), lookup)),
+					      buf.cbegin(), colormap)),
 		      make_pixel_iterator(boost::make_transform_iterator(
-					      buf.cend(), lookup)),
+					      buf.cend(), colormap)),
 		      make_pixel_iterator(line->begin()));
 	}
     }
@@ -1344,9 +1353,9 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(boost::make_transform_iterator(
-					      buf.cbegin(), lookup)),
+					      buf.cbegin(), colormap)),
 		      make_pixel_iterator(boost::make_transform_iterator(
-					      buf.cend(), lookup)),
+					      buf.cend(), colormap)),
 		      make_pixel_iterator(line->begin()));
 	}
     }
@@ -1359,7 +1368,7 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
 {
     TypeInfo	typeInfo(type);
 
-    Array<L>	colormap(typeInfo.ncolors);
+    Colormap<L>	colormap(typeInfo.ncolors);
     for (size_t i = 0; i < colormap.size(); ++i)
 	colormap[i] = i;
     colormap.save(out);
