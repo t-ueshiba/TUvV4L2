@@ -27,7 +27,7 @@
  *  
  *  $Id: createFeatureCmds.cc 1495 2014-02-27 15:07:51Z ueshiba $
  */
-#include "stereo1394.h"
+#include "stereoIIDC.h"
 
 namespace TU
 {
@@ -38,26 +38,26 @@ namespace v
 ************************************************************************/
 struct Feature
 {
-    Ieee1394Camera::Feature	feature;
-    const char*			name;
-    int				prop[3];
+    IIDCCamera::Feature	feature;
+    const char*		name;
+    int			prop[3];
 };
 static Feature		feature[] =
 {
-    {Ieee1394Camera::BRIGHTNESS,	"Brightness"	 },
-    {Ieee1394Camera::AUTO_EXPOSURE,	"Auto exposure"	 },
-    {Ieee1394Camera::SHARPNESS,		"Sharpness"	 },
-    {Ieee1394Camera::WHITE_BALANCE,	"White bal.(U/B)"},
-    {Ieee1394Camera::WHITE_BALANCE,	"White bal.(V/R)"},
-    {Ieee1394Camera::HUE,		"Hue"		 },
-    {Ieee1394Camera::SATURATION,	"Saturation"	 },
-    {Ieee1394Camera::GAMMA,		"Gamma"		 },
-    {Ieee1394Camera::SHUTTER,		"Shutter"	 },
-    {Ieee1394Camera::GAIN,		"Gain"		 },
-    {Ieee1394Camera::IRIS,		"Iris"		 },
-    {Ieee1394Camera::FOCUS,		"Focus"		 },
-    {Ieee1394Camera::TEMPERATURE,	"Temperature"	 },
-    {Ieee1394Camera::ZOOM,		"Zoom"		 }
+    {IIDCCamera::BRIGHTNESS,	"Brightness"	 },
+    {IIDCCamera::AUTO_EXPOSURE,	"Auto exposure"	 },
+    {IIDCCamera::SHARPNESS,	"Sharpness"	 },
+    {IIDCCamera::WHITE_BALANCE,	"White bal.(U/B)"},
+    {IIDCCamera::WHITE_BALANCE,	"White bal.(V/R)"},
+    {IIDCCamera::HUE,		"Hue"		 },
+    {IIDCCamera::SATURATION,	"Saturation"	 },
+    {IIDCCamera::GAMMA,		"Gamma"		 },
+    {IIDCCamera::SHUTTER,	"Shutter"	 },
+    {IIDCCamera::GAIN,		"Gain"		 },
+    {IIDCCamera::IRIS,		"Iris"		 },
+    {IIDCCamera::FOCUS,		"Focus"		 },
+    {IIDCCamera::TEMPERATURE,	"Temperature"	 },
+    {IIDCCamera::ZOOM,		"Zoom"		 }
 };
 static const int	NFEATURES = sizeof(feature)/sizeof(feature[0]);
 static CmdDef		featureCmds[3*NFEATURES + 1];
@@ -65,30 +65,30 @@ static CmdDef		featureCmds[3*NFEATURES + 1];
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-Ieee1394Camera::Feature
+IIDCCamera::Feature
 id2feature(CmdId id)
 {
     return feature[id - c_Brightness].feature;
 }
 
 CmdDef*
-createFeatureCmds(const Ieee1394Camera& camera)
+createFeatureCmds(const IIDCCamera& camera)
 {
-    size_t		ncmds = 0, y = 0;
+    size_t	ncmds = 0, y = 0;
     for (size_t i = 0; i < NFEATURES; ++i)
     {
 	u_int	inq = camera.inquireFeatureFunction(feature[i].feature);
-	if (inq & Ieee1394Camera::Presence)
+	if (inq & IIDCCamera::Presence)
 	{
 	    size_t	x = 1;
 	    
-	    if (inq & Ieee1394Camera::OnOff)
+	    if (inq & IIDCCamera::OnOff)
 	    {
 	      // Create toggle button for turning on/off this feature.
 		featureCmds[ncmds].type	      = C_ToggleButton;
 		featureCmds[ncmds].id	      = c_Brightness+i+OFFSET_ONOFF;
-		featureCmds[ncmds].val	      = camera.isTurnedOn(feature[i]
-								  .feature);
+		featureCmds[ncmds].val	      = camera.isActive(feature[i]
+								.feature);
 		featureCmds[ncmds].title      = "On";
 		featureCmds[ncmds].prop       = noProp;
 		featureCmds[ncmds].attrs      = CA_None;
@@ -100,9 +100,9 @@ createFeatureCmds(const Ieee1394Camera& camera)
 		++ncmds;
 	    }
 
-	    if (inq & Ieee1394Camera::Manual)
+	    if (inq & IIDCCamera::Manual)
 	    {
-		if (inq & Ieee1394Camera::Auto)
+		if (inq & IIDCCamera::Auto)
 		{
 		  // Create toggle button for setting manual/auto mode.
 		    featureCmds[ncmds].type	  = C_ToggleButton;
@@ -136,7 +136,7 @@ createFeatureCmds(const Ieee1394Camera& camera)
 		featureCmds[ncmds].gridWidth  = 1;
 		featureCmds[ncmds].gridHeight = 1;
 		featureCmds[ncmds].size	      = 0;
-		if (feature[i].feature == Ieee1394Camera::WHITE_BALANCE)
+		if (feature[i].feature == IIDCCamera::WHITE_BALANCE)
 		{
 		    ++ncmds;
 		    ++i;

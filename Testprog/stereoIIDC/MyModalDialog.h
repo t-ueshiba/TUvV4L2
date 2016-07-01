@@ -27,7 +27,7 @@
  *  
  *  $Id: MyModalDialog.h 1495 2014-02-27 15:07:51Z ueshiba $
  */
-#include "TU/Ieee1394++.h"
+#include "TU/IIDC++.h"
 #include "TU/v/ModalDialog.h"
 
 namespace TU
@@ -41,14 +41,14 @@ class MyModalDialog : public ModalDialog
 {
   public:
     MyModalDialog(Window& parentWindow,
-		  const Ieee1394Camera::Format_7_Info& fmt7info)	;
+		  const IIDCCamera::Format_7_Info& fmt7info)	;
     
-    Ieee1394Camera::PixelFormat	getROI(size_t& u0, size_t& v0,
+    IIDCCamera::PixelFormat	getROI(size_t& u0, size_t& v0,
 				       size_t& width, size_t& height)	;
     virtual void		callback(CmdId id, CmdVal val)		;
 
   private:
-    const Ieee1394Camera::Format_7_Info&	_fmt7info;
+    const IIDCCamera::Format_7_Info&	_fmt7info;
 };
     
 }

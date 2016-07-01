@@ -40,27 +40,27 @@ enum	{c_U0, c_V0, c_Width, c_Height, c_PixelFormat, c_Set};
 
 struct PixelFormat
 {
-    Ieee1394Camera::PixelFormat	pixelFormat;
+    IIDCCamera::PixelFormat	pixelFormat;
     const char*			name;
 };
     
 static CmdDef*
-createROICmds(const Ieee1394Camera::Format_7_Info& fmt7info)
+createROICmds(const IIDCCamera::Format_7_Info& fmt7info)
 {
     static int		prop[4][3];
     static PixelFormat	pixelFormat[] =
     {
-	{Ieee1394Camera::MONO_8,	"Y(mono)"},
-	{Ieee1394Camera::YUV_411,	"YUV(4:1:1)"},
-	{Ieee1394Camera::YUV_422,	"YUV(4:2:2)"},
-	{Ieee1394Camera::YUV_444,	"YUV(4:4:4)"},
-	{Ieee1394Camera::RGB_24,	"RGB"},
-	{Ieee1394Camera::MONO_16,	"Y(mono16)"},
-	{Ieee1394Camera::RGB_48,	"RGB(color48)"},
-	{Ieee1394Camera::SIGNED_MONO_16,"Y(signed mono16)"},
-	{Ieee1394Camera::SIGNED_RGB_48,	"RGB(signed color48)"},
-	{Ieee1394Camera::RAW_8,		"RAW(raw8)"},
-	{Ieee1394Camera::RAW_16,	"RAW(raw16)"}
+	{IIDCCamera::MONO_8,		"Y(mono)"},
+	{IIDCCamera::YUV_411,		"YUV(4:1:1)"},
+	{IIDCCamera::YUV_422,		"YUV(4:2:2)"},
+	{IIDCCamera::YUV_444,		"YUV(4:4:4)"},
+	{IIDCCamera::RGB_24,		"RGB"},
+	{IIDCCamera::MONO_16,		"Y(mono16)"},
+	{IIDCCamera::RGB_48,		"RGB(color48)"},
+	{IIDCCamera::SIGNED_MONO_16,	"Y(signed mono16)"},
+	{IIDCCamera::SIGNED_RGB_48,	"RGB(signed color48)"},
+	{IIDCCamera::RAW_8,		"RAW(raw8)"},
+	{IIDCCamera::RAW_16,		"RAW(raw16)"}
     };
     static const int	NPIXELFORMATS = sizeof(pixelFormat)/sizeof(pixelFormat[0]);
     static MenuDef	pixelFormatMenu[NPIXELFORMATS + 1];
@@ -120,13 +120,13 @@ createROICmds(const Ieee1394Camera::Format_7_Info& fmt7info)
 *  class MyModalDialog							*
 ************************************************************************/
 MyModalDialog::MyModalDialog(Window& parentWindow,
-			     const Ieee1394Camera::Format_7_Info& fmt7info)
+			     const IIDCCamera::Format_7_Info& fmt7info)
     :ModalDialog(parentWindow, "ROI for Format_7_x", createROICmds(fmt7info)),
      _fmt7info(fmt7info)
 {
 }
     
-Ieee1394Camera::PixelFormat
+IIDCCamera::PixelFormat
 MyModalDialog::getROI(size_t& u0, size_t& v0, size_t& width, size_t& height)
 {
     show();
@@ -135,7 +135,7 @@ MyModalDialog::getROI(size_t& u0, size_t& v0, size_t& width, size_t& height)
     width	= pane().getValue(c_Width);
     height	= pane().getValue(c_Height);
 
-    return Ieee1394Camera::uintToPixelFormat(pane().getValue(c_PixelFormat));
+    return IIDCCamera::uintToPixelFormat(pane().getValue(c_PixelFormat));
 }
 
 void

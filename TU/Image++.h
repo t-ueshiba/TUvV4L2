@@ -772,6 +772,85 @@ make_pixel_iterator(ITER iter)
 }
 
 /************************************************************************
+*  class Array<YUV411, 0, ALLOC>					*
+************************************************************************/
+template <class ALLOC>
+class Array<YUV411, 0, ALLOC> : public Buf<YUV411, 0, ALLOC>
+{
+  private:
+    typedef Buf<YUV411, 0, ALLOC>	super;
+
+  public:
+    typedef typename super::value_type	value_type;
+    typedef typename super::pointer	pointer;
+    
+  public:
+    explicit		Array(size_t d=0)		:super(d/2)	{}
+			Array(pointer p, size_t d)	:super(p, d/2)	{}
+    Array&		operator =(const YUV411& c)
+			{
+			    super::fill(begin(), end(), c);
+			    return *this;
+			}
+    
+    using		super::data;
+    using		super::begin;
+    using		super::cbegin;
+    using		super::end;
+    using		super::cend;
+
+    size_t		size() const
+			{
+			    return 2*super::size();
+			}
+    bool		resize(size_t d)
+			{
+			    return super::resize(d/2);
+			}
+    void		resize(pointer p, size_t d)
+			{
+			    super::resize(p, d/2);
+			}
+    std::istream&	restore(std::istream& in)
+			{
+			    in.read(reinterpret_cast<char*>(data()),
+				    sizeof(value_type) * super::size());
+			    return in;
+			}
+    std::ostream&	save(std::ostream& out) const
+			{
+			    out.write(reinterpret_cast<const char*>(data()),
+				      sizeof(value_type) * super::size());
+			    return out;
+			}
+    void		init()
+			{
+			}
+};
+
+template <> inline size_t
+Array2<Array<YUV411> >::stride() const
+{
+    return (size() == 0 ? 0 :
+	    size() == 1 ? _ncol/2 : (_buf.size() - _ncol/2)/(size() - 1));
+}
+    
+template <> inline size_t
+Array2<Array<YUV411> >::stride(size_t unit) const
+{
+    constexpr size_t	siz = sizeof(YUV411);
+
+    if (unit == 0)
+	unit = 1;
+    const auto	n = lcm(siz, unit)/siz;
+
+    return n*((_ncol/2 + n - 1)/n);
+}
+    
+template <class T, class ALLOC=std::allocator<T> >
+using ImageLine = Array<T, 0, ALLOC>;
+    
+/************************************************************************
 *  class ImageBase:	basic image class				*
 ************************************************************************/
 //! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
@@ -913,169 +992,6 @@ ImageBase::npixelsToBorder(size_t u, size_t v, size_t dir) const
     }
 
     return std::min(width() - u, v + 1);
-}
-
-/************************************************************************
-*  class ImageLine<T, ALLOC>:	Generic image scanline class		*
-************************************************************************/
-//! T型の画素を持つ画像のスキャンラインを表すクラス
-/*!
-  \param T	画素の型
-  \param ALLOC	アロケータの型
-*/
-template <class T, class ALLOC=std::allocator<T> >
-class ImageLine : public Array<T, 0, ALLOC>
-{
-  private:
-    typedef Array<T, 0, ALLOC>			super;
-
-  public:
-    typedef typename super::element_type	element_type;
-    typedef typename super::pointer		pointer;
-    
-  public:
-  //! 指定した画素数のスキャンラインを生成する．
-  /*!
-    \param d	画素数
-  */
-    explicit ImageLine(size_t d=0)	:super(d)			{}
-
-  //! 外部の領域と画素数を指定してスキャンラインを生成する．
-  /*!
-    \param p	外部領域へのポインタ
-    \param d	画素数
-  */
-    ImageLine(pointer p, size_t d)	:super(p, d)			{}
-
-  //! 指定されたスキャンラインの部分スキャンラインを生成する．
-  /*!
-    \param l	元のスキャンライン
-    \param u	部分スキャンラインの左端の座標
-    \param d	部分スキャンラインの画素数
-  */
-    ImageLine(ImageLine& l, size_t u, size_t d) :super(l, u, d)		{}
-
-#if !defined(__NVCC__)
-  //! 他の配列と同一要素を持つスキャンラインを作る（コピーコンストラクタの拡張）．
-  /*!
-    コピーコンストラクタは別個自動的に生成される．
-    \param expr	コピー元の配列
-  */
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    ImageLine(const E& expr)	:super(expr)				{}
-
-  //! 他の配列を自分に代入する（標準代入演算子の拡張）．
-  /*!
-    標準代入演算子は別個自動的に生成される．
-    \param expr	コピー元の配列
-    \return	この配列
-  */
-    template <class E>
-    typename std::enable_if<is_range<E>::value, ImageLine&>::type
-			operator =(const E& expr)
-			{
-			    super::operator =(expr);
-			    return *this;
-			}
-#endif	// !__NVCC__
-    
-    ImageLine&		operator =(const element_type& c)		;
-    const ImageLine	operator ()(size_t u, size_t d)		const	;
-    ImageLine		operator ()(size_t u, size_t d)			;
-    
-    using		super::size;
-    using		super::data;
-    using		super::begin;
-    using		super::end;
-};
-
-template <class T, class ALLOC> inline ImageLine<T, ALLOC>&
-ImageLine<T, ALLOC>::operator =(const element_type& c)
-{
-    super::operator =(c);
-    return *this;
-}
-
-//! このスキャンラインの部分スキャンラインを生成する．
-/*!
-  \param u	部分スキャンラインの左端の座標
-  \param d	部分スキャンラインの画素数
-  \return	生成された部分スキャンライン
-*/
-template <class T, class ALLOC> inline const ImageLine<T, ALLOC>
-ImageLine<T, ALLOC>::operator ()(size_t u, size_t d) const
-{
-    return ImageLine(const_cast<ImageLine&>(*this), u, d);
-}
-
-//! このスキャンラインの部分スキャンラインを生成する．
-/*!
-  \param u	部分スキャンラインの左端の座標
-  \param d	部分スキャンラインの画素数
-  \return	生成された部分スキャンライン
-*/
-template <class T, class ALLOC> inline ImageLine<T, ALLOC>
-ImageLine<T, ALLOC>::operator ()(size_t u, size_t d)
-{
-    return ImageLine(*this, u, d);
-}
-    
-template <class ALLOC>
-class ImageLine<YUV411, ALLOC> : public Array<YUV411, 0, ALLOC>
-{
-  private:
-    typedef Array<YUV411, 0, ALLOC>	super;
-
-  public:
-    typedef typename super::pointer	pointer;
-    
-  public:
-    explicit ImageLine(size_t d=0)		:super(d/2)		{}
-    ImageLine(pointer p, size_t d)		:super(p, d/2)		{}
-    ImageLine(ImageLine& l, size_t u, size_t d)	:super(l, u/2, d/2)	{}
-    ImageLine&		operator =(const YUV411& c)			;
-    const ImageLine	operator ()(size_t u, size_t d)		const	;
-    ImageLine		operator ()(size_t u, size_t d)			;
-
-    using		super::data;
-    using		super::size;
-    using		super::begin;
-    using		super::end;
-
-    bool		resize(size_t d)				;
-    void		resize(pointer p, size_t d)			;
-};
-
-template <class ALLOC> inline ImageLine<YUV411, ALLOC>&
-ImageLine<YUV411, ALLOC>::operator =(const YUV411& c)
-{
-    super::operator =(c);
-    return *this;
-}
-    
-template <class ALLOC> inline const ImageLine<YUV411, ALLOC>
-ImageLine<YUV411, ALLOC>::operator ()(size_t u, size_t d) const
-{
-    return ImageLine(const_cast<ImageLine&>(*this), u, d);
-}
-    
-template <class ALLOC> inline ImageLine<YUV411, ALLOC>
-ImageLine<YUV411, ALLOC>::operator ()(size_t u, size_t d)
-{
-    return ImageLine(*this, u, d);
-}
-    
-template <class ALLOC> inline bool
-ImageLine<YUV411, ALLOC>::resize(size_t d)
-{
-    return super::resize(d/2);
-}
-
-template <class ALLOC> inline void
-ImageLine<YUV411, ALLOC>::resize(pointer p, size_t d)
-{
-    super::resize(p, d/2);
 }
 
 /************************************************************************

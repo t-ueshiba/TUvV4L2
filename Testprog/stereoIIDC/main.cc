@@ -32,7 +32,7 @@
   本プログラムは，Point Grey Research Inc.のデジタルカメラ
   DragonflyまたはDragonfly2を用いて2眼または3眼リアルタイムステレオ
   ビジョンを実現するソフトウェアである．これらの機種に限らず，カメ
-  ラ間同期機能を持つ1394-based Digital Camera Specification
+  ラ間同期機能を持つIIDC-based Digital Camera Specification
   ver. 1.30に準拠したデジタルカメラであれば，本プロブラムによって
   リアルタイムに3次元情報を復元することができる．
 */ 
@@ -119,7 +119,7 @@ main(int argc, char* argv[])
     double		scale			= DEFAULT_SCALE;
     bool		textureMapping		= false;
     double		parallax		= -1.0;
-    Ieee1394Node::Speed	speed			= Ieee1394Node::SPD_400M;
+    IIDCCamera::Speed	speed			= IIDCCamera::SPD_400M;
     size_t		grainSize		= DEFAULT_GRAINSIZE;
     
   // コマンド行の解析．
@@ -143,7 +143,7 @@ main(int argc, char* argv[])
 	    cameraName = optarg;
 	    break;
 	  case 'B':
-	    speed = Ieee1394Node::SPD_800M;
+	    speed = IIDCCamera::SPD_800M;
 	    break;
 	  case 'p':
 	    paramFile = optarg;
@@ -194,8 +194,8 @@ main(int argc, char* argv[])
 	if (vinfo == 0)
 	    throw runtime_error("No appropriate visual!!");
 #endif
-      // IEEE1394カメラのオープン．
-	Ieee1394CameraArray	cameras(cameraName, configDirs, speed);
+      // IIDCカメラのオープン．
+	IIDCCameraArray	cameras(cameraName, configDirs, speed);
 	
       // ステレオマッチングパラメータの読み込み．
 	ifstream		in;
