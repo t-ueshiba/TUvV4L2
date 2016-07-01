@@ -1417,67 +1417,103 @@ Ieee1394Camera::operator >>(Image<T>& image) const
     {
       case YUV_444:
       {
-	const YUV444*	src = (const YUV444*)_img;
-	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const YUV444*>(_img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
       case YUV_422:
       {
-	const YUV422*	src = (const YUV422*)_img;
-	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const YUV422*>(_img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
       case YUV_411:
       {
-	const YUV411*	src = (const YUV411*)_img;
-	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const YUV411*>(_img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
       case RGB_24:
       {
-	const RGB*	src = (const RGB*)_img;
-	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = reinterpret_cast<const RGB*>(_img);
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
       case MONO_8:
       case RAW_8:
       {
-	const u_char*	src = _img;
-	for (u_int v = 0; v < image.height(); ++v)
-	    src = image[v].copy(src);
+	auto	src = _img;
+	for (auto& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(src), line.size(),
+			make_pixel_iterator(line.begin()));
+	    src += line.size();
+	}
       }
 	break;
       case MONO_16:
       case RAW_16:
 	if (_littleEndian)
 	{
-	    const u_short*	src = (const u_short*)_img;
-	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].copy(src);
+	    auto	src = reinterpret_cast<const u_short*>(_img);
+	    for (auto& line : image)
+	    {
+		std::copy_n(make_pixel_iterator(src), line.size(),
+			    make_pixel_iterator(line.begin()));
+		src += line.size();
+	    }
 	}
 	else
 	{
-	    const Mono16*	src = (const Mono16*)_img;
-	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].copy(src);
+	    auto	src = reinterpret_cast<const Mono16*>(_img);
+	    for (auto& line : image)
+	    {
+		std::copy_n(make_pixel_iterator(src), line.size(),
+			    make_pixel_iterator(line.begin()));
+		src += line.size();
+	    }
 	}
 	break;
       case SIGNED_MONO_16:
 	if (_littleEndian)
 	{
-	    const short*	src = (const short*)_img;
-	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].copy(src);
+	    auto	src = reinterpret_cast<const short*>(_img);
+	    for (auto& line : image)
+	    {
+		std::copy_n(make_pixel_iterator(src), line.size(),
+			    make_pixel_iterator(line.begin()));
+		src += line.size();
+	    }
 	}
 	else
 	{
-	    const Mono16*	src = (const Mono16*)_img;
-	    for (u_int v = 0; v < image.height(); ++v)
-		src = image[v].copy(src);
+	    auto	src = reinterpret_cast<const Mono16*>(_img);
+	    for (auto& line : image)
+	    {
+		std::copy_n(make_pixel_iterator(src), line.size(),
+			    make_pixel_iterator(line.begin()));
+		src += line.size();
+	    }
 	}
 	break;
       default:
