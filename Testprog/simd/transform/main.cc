@@ -61,6 +61,6 @@ doJob()
 int
 main()
 {
-    TU::simd::doJob<double, int8_t, int8_t, int16_t, int32_t>();
+    TU::simd::doJob<float, int8_t, int8_t, int16_t, int32_t>();
     return 0;
 }
