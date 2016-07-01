@@ -293,8 +293,7 @@ class V4L2Camera
     std::ostream&	put(std::ostream& out, Feature feature)	const	;
     
   // Capture stuffs.
-    V4L2Camera&		continuousShot()				;
-    V4L2Camera&		stopContinuousShot()				;
+    V4L2Camera&		continuousShot(bool enable)			;
     bool		inContinuousShot()			const	;
     V4L2Camera&		snap()						;
 #ifdef HAVE_LIBTUTOOLS__

@@ -100,7 +100,7 @@ CBexit(GtkMenuItem*, gpointer userdata)
     using namespace	std;
     
     MyV4L2Camera*	camera = (MyV4L2Camera*)userdata;
-    camera->stopContinuousShot();
+    camera->continuousShot(false);
     cout << camera->dev() << ' ' << *camera;
     gtk_exit(0);
 }
