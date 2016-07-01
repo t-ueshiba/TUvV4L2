@@ -31,7 +31,7 @@
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CmdPane.h"
 #include "TU/v/Timer.h"
-#include "TU/Ieee1394CameraArray.h"
+#include "TU/IIDCCameraArray.h"
 #include "TU/Rectify.h"
 #include "MyCanvasPane.h"
 #if defined(DISPLAY_3D)
@@ -67,7 +67,7 @@ class MyCmdWindow : public CmdWindow
 		bool				textureMapping,
 		double				parallax,
 #endif
-		const Ieee1394CameraArray&	cameras,
+		const IIDCCameraArray&	cameras,
 		const params_type&		params,
 		double				scale)			;
 
@@ -90,7 +90,7 @@ class MyCmdWindow : public CmdWindow
 
   private:
   // Stereo stuffs.
-    const Ieee1394CameraArray&			_cameras;
+    const IIDCCameraArray&			_cameras;
     const double				_initialWidth;
     const double				_initialHeight;
     const double				_scale;

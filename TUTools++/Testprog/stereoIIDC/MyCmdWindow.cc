@@ -33,7 +33,7 @@
 #include <sstream>
 #include "TU/v/FileSelection.h"
 #include "TU/v/Notify.h"
-#include "stereo1394.h"
+#include "stereoIIDC.h"
 #include "MyCmdWindow.h"
 #include "MyModalDialog.h"
 #include "ComputeThreeD.h"
@@ -98,10 +98,10 @@ struct Epsilon<GFStereo<SCORE, DISP> >
     
 namespace v
 {
-Ieee1394Camera::Feature	id2feature(CmdId id)				;
-CmdDef*			createMenuCmds(Ieee1394Camera& camera)		;
+IIDCCamera::Feature	id2feature(CmdId id)				;
+CmdDef*			createMenuCmds(IIDCCamera& camera)		;
 CmdDef*			createCaptureCmds()				;
-CmdDef*			createFeatureCmds(const Ieee1394Camera& camera)	;
+CmdDef*			createFeatureCmds(const IIDCCamera& camera)	;
     
 /************************************************************************
 *  class MyCmdWindow<STEREO, PIXEL, DISP>				*
@@ -114,10 +114,10 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(
 				bool				textureMapping,
 				double				parallax,
 #endif
-				const Ieee1394CameraArray&	cameras,	
+				const IIDCCameraArray&	cameras,	
 				const params_type&		params,
 				double				scale)
-    :CmdWindow(parentApp, "Real-time stereo vision using IEEE1394 cameras",
+    :CmdWindow(parentApp, "Real-time stereo vision using IIDC cameras",
 #if defined(DISPLAY_3D) && !defined(DEMO)
 	       vinfo,
 #endif
@@ -199,11 +199,11 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(
 
 #if defined(COLOR)
   // カラー画像の場合は，フォーマットをYUV422とし基準カメラ以外の画像サイズを半分にする．
-    for (int i = 0; i < cameras.dim(); ++i)
+    for (size_t i = 0; i < cameras.dim(); ++i)
 	_cameras[i]->setFormatAndFrameRate((i == 0 ?
-					    Ieee1394Camera::YUV422_640x480 :
-					    Ieee1394Camera::YUV422_320x240),
-					   Ieee1394Camera::FrameRate_30);
+					    IIDCCamera::YUV422_640x480 :
+					    IIDCCamera::YUV422_320x240),
+					   IIDCCamera::FrameRate_30);
 #endif
 
   // ステレオマッチング処理のためのパラメータをGUIに表示．
@@ -261,7 +261,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  {
 #if defined(DIRECT_CAPTURE)
 	    Notify	notify(*this);
-	    notify << "Cannot save images when using Ieee1394Camera::captureDirectry()!!";
+	    notify << "Cannot save images when using IIDCCamera::captureDirectry()!!";
 	    notify.show();
 #else
 	    stopContinuousShotIfRunning();
@@ -271,7 +271,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    if (fileSelection.open(out))
 	    {
 		size_t	nimages = (_captureCmd.getValue(c_Binocular) ? 2 : 3);
-		for (int i = 0; i < nimages; ++i)
+		for (size_t i = 0; i < nimages; ++i)
 		    _images[i].save(out);
 	    }
 #endif
@@ -287,7 +287,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    if (fileSelection.open(out))
 	    {
 		size_t	nimages = (_captureCmd.getValue(c_Binocular) ? 2 : 3);
-		for (int i = 0; i < nimages; ++i)
+		for (size_t i = 0; i < nimages; ++i)
 		    _rectifiedImages[i].save(out);
 	    }
 	  }
@@ -322,8 +322,8 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    ofstream	out(_cameras.configFile().c_str());
 	    if (!out)
 		throw runtime_error("Failed to open camera configuration file!!");
-	    out << _cameras[0]->delay() << ' ' << _cameras.dim() << endl;
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    out << _cameras.dim() << endl;
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		out << "0x" << setw(16) << setfill('0')
 		    << hex << _cameras[i]->globalUniqueId() << ' '
 		    << dec << *_cameras[i];
@@ -336,7 +336,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	      ofstream		out;
 	      if (fileSelection.open(out))
 	      {
-		  for (int i = 0; i < _nimages; ++i)
+		  for (size_t i = 0; i < _nimages; ++i)
 		      out << _rectifiedImages[i].P;
 	      }
 	  }
@@ -365,11 +365,11 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_MONO8_1600x1200:
 	  case c_MONO16_1280x960:
 	  case c_MONO16_1600x1200:
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		_cameras[i]->
 		    setFormatAndFrameRate(
-			Ieee1394Camera::uintToFormat(id),
-			Ieee1394Camera::uintToFrameRate(val));
+			IIDCCamera::uintToFormat(id),
+			IIDCCamera::uintToFrameRate(val));
 	    break;
 
 	  case c_Format_7_0:
@@ -381,19 +381,18 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Format_7_6:
 	  case c_Format_7_7:
 	  {
-	    Ieee1394Camera::Format
-		format7 = Ieee1394Camera::uintToFormat(id);
-	    Ieee1394Camera::Format_7_Info
+	    IIDCCamera::Format	format7 = IIDCCamera::uintToFormat(id);
+	    IIDCCamera::Format_7_Info
 		fmt7info = _cameras[0]->getFormat_7_Info(format7);
 	    MyModalDialog	modalDialog(*this, fmt7info);
 	    size_t		u0, v0, width, height;
-	    Ieee1394Camera::PixelFormat
+	    IIDCCamera::PixelFormat
 		pixelFormat = modalDialog.getROI(u0, v0, width, height);
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		_cameras[i]->setFormat_7_ROI(format7, u0, v0, width, height)
 		    .setFormat_7_PixelFormat(format7, pixelFormat)
 		    .setFormatAndFrameRate(
-			format7, Ieee1394Camera::uintToFrameRate(val));
+			format7, IIDCCamera::uintToFrameRate(val));
 	  }
 	    break;
 
@@ -408,18 +407,18 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Iris:
 	  case c_Focus:
 	  case c_Zoom:
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		_cameras[i]->setValue(id2feature(id), val);
 	    break;
       
 	  case c_WhiteBalance_UB:
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		_cameras[i]
 		    ->setWhiteBalance(val,
 				      _featureCmd.getValue(c_WhiteBalance_VR));
 	    break;
 	  case c_WhiteBalance_VR:
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		_cameras[i]
 		    ->setWhiteBalance(_featureCmd.getValue(c_WhiteBalance_UB),
 				      val);
@@ -439,13 +438,9 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Focus		 + OFFSET_ONOFF:
 	  case c_Zoom		 + OFFSET_ONOFF:
 	  {
-	    Ieee1394Camera::Feature	feature = id2feature(id - OFFSET_ONOFF);
-	    if (val)
-		for (int i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->turnOn(feature);
-	    else
-		for (int i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->turnOff(feature);
+	    IIDCCamera::Feature	feature = id2feature(id - OFFSET_ONOFF);
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
+		_cameras[i]->setActive(feature, val);
 	  }
 	    break;
       
@@ -463,15 +458,13 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Focus		 + OFFSET_AUTO:
 	  case c_Zoom		 + OFFSET_AUTO:
 	  {
-	    Ieee1394Camera::Feature	feature = id2feature(id - OFFSET_AUTO);
-	    if (val)
-		for (int i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->setAutoMode(feature);
-	    else
-		for (int i = 0; i < _cameras.dim(); ++i)
-		{
-		    _cameras[i]->setManualMode(feature);
-		    if (feature == Ieee1394Camera::WHITE_BALANCE)
+	    IIDCCamera::Feature	feature = id2feature(id - OFFSET_AUTO);
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
+	    {
+		_cameras[i]->setAuto(feature, val);
+
+		if (val)
+		    if (feature == IIDCCamera::WHITE_BALANCE)
 			_cameras[i]->
 			    setWhiteBalance(
 				_featureCmd.getValue(c_WhiteBalance_UB),
@@ -480,7 +473,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 			_cameras[i]->
 			    setValue(feature,
 				     _featureCmd.getValue(id - OFFSET_AUTO));
-		}
+	    }
 	  }
 	    break;
 
@@ -489,15 +482,15 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    {
 		restoreCalibration();
 		initializeRectification();
-		for (int i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->continuousShot();
+		for (size_t i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->continuousShot(true);
 		_timer.start(1);
 	    }
 	    else
 	    {
 		_timer.stop();
-		for (int i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->stopContinuousShot();
+		for (size_t i = 0; i < _cameras.dim(); ++i)
+		    _cameras[i]->continuousShot(false);
 	    }
 	    break;
 	
@@ -505,11 +498,11 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    stopContinuousShotIfRunning();
 	    restoreCalibration();
 	    initializeRectification();
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		_cameras[i]->oneShot();
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		_cameras[i]->snap();		// カメラに画像取り込みを指示．
-	    for (int i = 0; i < _cameras.dim(); ++i)
+	    for (size_t i = 0; i < _cameras.dim(); ++i)
 		*_cameras[i] >> _images[i];	// カメラから画像転送．
 	    stereoMatch();
 	    break;
@@ -714,7 +707,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::tick()
     countTime();
 
     syncronizedSnap();				// カメラに画像取り込みを指示．
-    for (int i = 0; i < _cameras.dim(); ++i)
+    for (size_t i = 0; i < _cameras.dim(); ++i)
 #if defined(DIRECT_CAPTURE)
 	_cameras[i]->captureDirectly(_images[i]);
 #else
@@ -731,7 +724,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::syncronizedSnap()
 #if 0
     const u_int64_t	margin = 2000;
     u_int64_t		last = 0;
-    for (int i = 0; i < _cameras.dim(); ++i)
+    for (size_t i = 0; i < _cameras.dim(); ++i)
     {
 	u_int64_t	arrivaltime = _cameras[i]->snap().arrivaltime();
 	if (last + margin < arrivaltime)
@@ -750,7 +743,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::syncronizedSnap()
 	    } while (arrivaltime + margin < last);
     }
 #else
-    for (int i = 0; i < _cameras.dim(); ++i)
+    for (size_t i = 0; i < _cameras.dim(); ++i)
 	_cameras[i]->snap();
 #endif
 }
@@ -863,8 +856,8 @@ MyCmdWindow<STEREO, PIXEL, DISP>::stopContinuousShotIfRunning()
     if (_captureCmd.getValue(c_ContinuousShot))
     {
 	_timer.stop();
-	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->stopContinuousShot();
+	for (size_t i = 0; i < _cameras.dim(); ++i)
+	    _cameras[i]->continuousShot(false);
 	_captureCmd.setValue(c_ContinuousShot, 0);
     }
 }

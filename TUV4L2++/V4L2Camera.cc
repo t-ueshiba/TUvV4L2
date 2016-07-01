@@ -439,7 +439,7 @@ V4L2Camera::V4L2Camera(const char* dev)
 //! Video for Linux v.2カメラオブジェクトを破壊する
 V4L2Camera::~V4L2Camera()
 {
-    stopContinuousShot();
+    continuousShot(false);
     close(_fd);
 }
 
@@ -499,8 +499,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, size_t width, size_t height,
   // 画素フォーマットと画像サイズを設定
   ok:
     const bool	cont = inContinuousShot();
-    if (cont)			// 画像を出力中であれば...
-	stopContinuousShot();	// 止める
+    continuousShot(false);	// 画像出力を止める
 
     unmapBuffers();
     
@@ -529,8 +528,7 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, size_t width, size_t height,
   // バッファをマップ
     mapBuffers(NB_BUFFERS);
     
-    if (cont)			// 画像を出力中だったなら...
-	continuousShot();	// 再び出力させる
+    continuousShot(cont);	// 以前に画像を出力していたら再び出力させる
 
     return *this;
 }
@@ -573,8 +571,7 @@ V4L2Camera::setROI(size_t u0, size_t v0, size_t width, size_t height)
     using namespace	std;
 
     const bool	cont = inContinuousShot();
-    if (cont)			// 画像を出力中であれば...
-	stopContinuousShot();	// 止める
+    continuousShot(false);
 
     unmapBuffers();
     
@@ -591,8 +588,7 @@ V4L2Camera::setROI(size_t u0, size_t v0, size_t width, size_t height)
 
     mapBuffers(NB_BUFFERS);
 
-    if (cont)			// 画像を出力中だったなら...
-	continuousShot();	// 再び出力させる
+    continuousShot(cont);
     
     return *this;
 }
@@ -762,42 +758,32 @@ V4L2Camera::getMinMaxStep(Feature feature, int& min, int& max, int& step) const
  */
 //! カメラからの画像の連続的出力を開始する
 /*!
+  \param enable	trueならば出力を開始，falseならば終了
   \return	このカメラオブジェクト
 */
 V4L2Camera&
-V4L2Camera::continuousShot()
+V4L2Camera::continuousShot(bool enable)
 {
-    if (!_inContinuousShot)
-    {
-	using namespace	std;
-    
-	int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	if (ioctl(VIDIOC_STREAMON, &type))
-	    throw runtime_error(string("V4L2Camera::continuousShot(): VIDIOC_STREAMON failed!! ") + strerror(errno));
-
-	_inContinuousShot = true;
-    }
-    
-    return *this;
-}
-
-//! カメラからの画像の連続的出力を停止する
-/*!
-  \return	このカメラオブジェクト
-*/
-V4L2Camera&
-V4L2Camera::stopContinuousShot()
-{
-    if (_inContinuousShot)
+    if (enable != _inContinuousShot)
     {
 	using namespace	std;
 
-	int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	if (ioctl(VIDIOC_STREAMOFF, &type))
-	    throw runtime_error(string("V4L2Camera::stopContinuousShot(): VIDIOC_STREAMOFF failed!! ") + strerror(errno));
-	unmapBuffers();
-	mapBuffers(NB_BUFFERS);
-	_inContinuousShot = false;
+	if (enable)
+	{
+	    int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	    if (ioctl(VIDIOC_STREAMON, &type))
+		throw runtime_error(string("V4L2Camera::continuousShot(): VIDIOC_STREAMON failed!! ") + strerror(errno));
+	}
+	else
+	{
+	    int	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	    if (ioctl(VIDIOC_STREAMOFF, &type))
+		throw runtime_error(string("V4L2Camera::stopContinuousShot(): VIDIOC_STREAMOFF failed!! ") + strerror(errno));
+	    unmapBuffers();
+	    mapBuffers(NB_BUFFERS);
+	}
+
+	_inContinuousShot = enable;
     }
     
     return *this;

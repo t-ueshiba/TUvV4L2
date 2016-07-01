@@ -27,7 +27,7 @@
  *  
  *  $Id: createMenuCmds.cc 1495 2014-02-27 15:07:51Z ueshiba $
  */
-#include "stereo1394.h"
+#include "stereoIIDC.h"
 
 namespace TU
 {
@@ -38,60 +38,60 @@ namespace v
 ************************************************************************/
 struct Format
 {
-    Ieee1394Camera::Format	format;
+    IIDCCamera::Format	format;
     const char*			name;
     
 };
 static Format format[] =
 {
-    {Ieee1394Camera::YUV444_160x120,	"160x120-YUV(4:4:4)"},
-    {Ieee1394Camera::YUV422_320x240,	"320x240-YUV(4:2:2)"},
-    {Ieee1394Camera::YUV411_640x480,	"640x480-YUV(4:1:1)"},
-    {Ieee1394Camera::YUV422_640x480,	"640x480-YUV(4:2:2)"},
-    {Ieee1394Camera::RGB24_640x480,	"640x480-RGB"},
-    {Ieee1394Camera::MONO8_640x480,	"640x480-Y(mono)"},
-    {Ieee1394Camera::MONO16_640x480,	"640x480-Y(mono16)"},
-    {Ieee1394Camera::YUV422_800x600,	"800x600-YUV(4:2:2)"},
-    {Ieee1394Camera::RGB24_800x600,	"800x600-RGB"},
-    {Ieee1394Camera::MONO8_800x600,	"800x600-Y(mono)"},
-    {Ieee1394Camera::YUV422_1024x768,	"1024x768-YUV(4:2:2)"},
-    {Ieee1394Camera::RGB24_1024x768,	"1024x768-RGB"},
-    {Ieee1394Camera::MONO8_1024x768,	"1024x768-Y(mono)"},
-    {Ieee1394Camera::MONO16_800x600,	"800x600-Y(mono16)"},
-    {Ieee1394Camera::MONO16_1024x768,	"1024x768-Y(mono16)"},
-    {Ieee1394Camera::YUV422_1280x960,	"1280x960-YUV(4:2:2)"},
-    {Ieee1394Camera::RGB24_1280x960,	"1280x960-RGB"},
-    {Ieee1394Camera::MONO8_1280x960,	"1280x960-Y(mono)"},
-    {Ieee1394Camera::YUV422_1600x1200,	"1600x1200-YUV(4:2:2)"},
-    {Ieee1394Camera::RGB24_1600x1200,	"1600x1200-RGB"},
-    {Ieee1394Camera::MONO8_1600x1200,	"1600x1200-Y(mono)"},
-    {Ieee1394Camera::MONO16_1280x960,	"1280x960-Y(mono16)"},
-    {Ieee1394Camera::MONO16_1600x1200,	"1600x1200-Y(mono16)"},
-    {Ieee1394Camera::Format_7_0,	"Format_7_0"},
-    {Ieee1394Camera::Format_7_1,	"Format_7_1"},
-    {Ieee1394Camera::Format_7_2,	"Format_7_2"},
-    {Ieee1394Camera::Format_7_3,	"Format_7_3"},
-    {Ieee1394Camera::Format_7_4,	"Format_7_4"},
-    {Ieee1394Camera::Format_7_5,	"Format_7_5"},
-    {Ieee1394Camera::Format_7_6,	"Format_7_6"},
-    {Ieee1394Camera::Format_7_6,	"Format_7_7"}
+    {IIDCCamera::YUV444_160x120,	"160x120-YUV(4:4:4)"},
+    {IIDCCamera::YUV422_320x240,	"320x240-YUV(4:2:2)"},
+    {IIDCCamera::YUV411_640x480,	"640x480-YUV(4:1:1)"},
+    {IIDCCamera::YUV422_640x480,	"640x480-YUV(4:2:2)"},
+    {IIDCCamera::RGB24_640x480,		"640x480-RGB"},
+    {IIDCCamera::MONO8_640x480,		"640x480-Y(mono)"},
+    {IIDCCamera::MONO16_640x480,	"640x480-Y(mono16)"},
+    {IIDCCamera::YUV422_800x600,	"800x600-YUV(4:2:2)"},
+    {IIDCCamera::RGB24_800x600,		"800x600-RGB"},
+    {IIDCCamera::MONO8_800x600,		"800x600-Y(mono)"},
+    {IIDCCamera::YUV422_1024x768,	"1024x768-YUV(4:2:2)"},
+    {IIDCCamera::RGB24_1024x768,	"1024x768-RGB"},
+    {IIDCCamera::MONO8_1024x768,	"1024x768-Y(mono)"},
+    {IIDCCamera::MONO16_800x600,	"800x600-Y(mono16)"},
+    {IIDCCamera::MONO16_1024x768,	"1024x768-Y(mono16)"},
+    {IIDCCamera::YUV422_1280x960,	"1280x960-YUV(4:2:2)"},
+    {IIDCCamera::RGB24_1280x960,	"1280x960-RGB"},
+    {IIDCCamera::MONO8_1280x960,	"1280x960-Y(mono)"},
+    {IIDCCamera::YUV422_1600x1200,	"1600x1200-YUV(4:2:2)"},
+    {IIDCCamera::RGB24_1600x1200,	"1600x1200-RGB"},
+    {IIDCCamera::MONO8_1600x1200,	"1600x1200-Y(mono)"},
+    {IIDCCamera::MONO16_1280x960,	"1280x960-Y(mono16)"},
+    {IIDCCamera::MONO16_1600x1200,	"1600x1200-Y(mono16)"},
+    {IIDCCamera::Format_7_0,		"Format_7_0"},
+    {IIDCCamera::Format_7_1,		"Format_7_1"},
+    {IIDCCamera::Format_7_2,		"Format_7_2"},
+    {IIDCCamera::Format_7_3,		"Format_7_3"},
+    {IIDCCamera::Format_7_4,		"Format_7_4"},
+    {IIDCCamera::Format_7_5,		"Format_7_5"},
+    {IIDCCamera::Format_7_6,		"Format_7_6"},
+    {IIDCCamera::Format_7_6,		"Format_7_7"}
 };
 static const int	NFORMATS = sizeof(format)/sizeof(format[0]);
 
 struct FrameRate
 {
-    Ieee1394Camera::FrameRate	frameRate;
+    IIDCCamera::FrameRate	frameRate;
     const char*			name;
 };
 static FrameRate frameRate[] =
 {
-    {Ieee1394Camera::FrameRate_1_875,	"1.875fps"},
-    {Ieee1394Camera::FrameRate_3_75,	"3.75fps"},
-    {Ieee1394Camera::FrameRate_7_5,	"7.5fps"},
-    {Ieee1394Camera::FrameRate_15,	"15fps"},
-    {Ieee1394Camera::FrameRate_30,	"30fps"},
-    {Ieee1394Camera::FrameRate_60,	"60fps"},
-    {Ieee1394Camera::FrameRate_x,	"custom frame rate"}
+    {IIDCCamera::FrameRate_1_875,	"1.875fps"},
+    {IIDCCamera::FrameRate_3_75,	"3.75fps"},
+    {IIDCCamera::FrameRate_7_5,		"7.5fps"},
+    {IIDCCamera::FrameRate_15,		"15fps"},
+    {IIDCCamera::FrameRate_30,		"30fps"},
+    {IIDCCamera::FrameRate_60,		"60fps"},
+    {IIDCCamera::FrameRate_x,		"custom frame rate"}
 };
 static const int	NRATES=sizeof(frameRate)/sizeof(frameRate[0]);
 
@@ -149,10 +149,10 @@ static CmdDef MenuCmds[] =
 *  global functions							*
 ************************************************************************/
 CmdDef*
-createMenuCmds(Ieee1394Camera& camera)
+createMenuCmds(IIDCCamera& camera)
 {
-    Ieee1394Camera::Format	current_format = camera.getFormat();
-    Ieee1394Camera::FrameRate	current_rate   = camera.getFrameRate();
+    IIDCCamera::Format		current_format = camera.getFormat();
+    IIDCCamera::FrameRate	current_rate   = camera.getFrameRate();
     size_t			nitems = 0;
     for (size_t i = 0; i < NFORMATS; ++i)
     {

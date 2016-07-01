@@ -27,7 +27,7 @@
  *  
  *  $Id: createCaptureCmds.cc 1246 2012-11-30 06:23:09Z ueshiba $
  */
-#include "stereo1394.h"
+#include "stereoIIDC.h"
 
 namespace TU
 {

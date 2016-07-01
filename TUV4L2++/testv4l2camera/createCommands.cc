@@ -52,12 +52,12 @@ CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle)))
     {
 	idleTag = gtk_idle_add(CBidle, camera);	// idle処理を開始する．
-	camera->continuousShot();	// カメラからの画像出力を開始する．
+	camera->continuousShot(true);	// カメラからの画像出力を開始する．
     }
     else
     {
 	gtk_idle_remove(idleTag);	// idle処理を中止する．
-	camera->stopContinuousShot();	// カメラからの画像出力を停止する．
+	camera->continuousShot(false);	// カメラからの画像出力を停止する．
     }
 }
 

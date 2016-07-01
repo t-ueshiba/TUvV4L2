@@ -30,7 +30,7 @@
 #include <fstream>
 #include <string>
 #include "TU/v/TUv++.h"
-#include "TU/Ieee1394++.h"
+#include "TU/IIDC++.h"
 
 /************************************************************************
 *  global data and definitions						*
@@ -61,7 +61,7 @@ enum
     c_CameraSelection,
 
   // Camera feasures.
-    c_Brightness = Ieee1394Camera::BRIGHTNESS,
+    c_Brightness = IIDCCamera::BRIGHTNESS,
     c_AutoExposure,
     c_Sharpness,
     c_WhiteBalance_UB,
@@ -78,37 +78,37 @@ enum
 
   // Camera video format.
     c_Format,
-    c_YUV444_160x120	= Ieee1394Camera::YUV444_160x120,
-    c_YUV422_320x240	= Ieee1394Camera::YUV422_320x240,
-    c_YUV411_640x480	= Ieee1394Camera::YUV411_640x480,
-    c_YUV422_640x480	= Ieee1394Camera::YUV422_640x480,
-    c_RGB24_640x480	= Ieee1394Camera::RGB24_640x480,
-    c_MONO8_640x480	= Ieee1394Camera::MONO8_640x480,
-    c_MONO16_640x480	= Ieee1394Camera::MONO16_640x480,
-    c_YUV422_800x600	= Ieee1394Camera::YUV422_800x600,
-    c_RGB24_800x600	= Ieee1394Camera::RGB24_800x600,
-    c_MONO8_800x600	= Ieee1394Camera::MONO8_800x600,
-    c_YUV422_1024x768	= Ieee1394Camera::YUV422_1024x768,
-    c_RGB24_1024x768	= Ieee1394Camera::RGB24_1024x768,
-    c_MONO8_1024x768	= Ieee1394Camera::MONO8_1024x768,
-    c_MONO16_800x600	= Ieee1394Camera::MONO16_800x600,
-    c_MONO16_1024x768	= Ieee1394Camera::MONO16_1024x768,
-    c_YUV422_1280x960	= Ieee1394Camera::YUV422_1280x960,
-    c_RGB24_1280x960	= Ieee1394Camera::RGB24_1280x960,
-    c_MONO8_1280x960	= Ieee1394Camera::MONO8_1280x960,
-    c_YUV422_1600x1200	= Ieee1394Camera::YUV422_1600x1200,
-    c_RGB24_1600x1200	= Ieee1394Camera::RGB24_1600x1200,
-    c_MONO8_1600x1200	= Ieee1394Camera::MONO8_1600x1200,
-    c_MONO16_1280x960	= Ieee1394Camera::MONO16_1280x960,
-    c_MONO16_1600x1200	= Ieee1394Camera::MONO16_1600x1200,
-    c_Format_7_0	= Ieee1394Camera::Format_7_0,
-    c_Format_7_1	= Ieee1394Camera::Format_7_1,
-    c_Format_7_2	= Ieee1394Camera::Format_7_2,
-    c_Format_7_3	= Ieee1394Camera::Format_7_3,
-    c_Format_7_4	= Ieee1394Camera::Format_7_4,
-    c_Format_7_5	= Ieee1394Camera::Format_7_5,
-    c_Format_7_6	= Ieee1394Camera::Format_7_6,
-    c_Format_7_7	= Ieee1394Camera::Format_7_7,
+    c_YUV444_160x120	= IIDCCamera::YUV444_160x120,
+    c_YUV422_320x240	= IIDCCamera::YUV422_320x240,
+    c_YUV411_640x480	= IIDCCamera::YUV411_640x480,
+    c_YUV422_640x480	= IIDCCamera::YUV422_640x480,
+    c_RGB24_640x480	= IIDCCamera::RGB24_640x480,
+    c_MONO8_640x480	= IIDCCamera::MONO8_640x480,
+    c_MONO16_640x480	= IIDCCamera::MONO16_640x480,
+    c_YUV422_800x600	= IIDCCamera::YUV422_800x600,
+    c_RGB24_800x600	= IIDCCamera::RGB24_800x600,
+    c_MONO8_800x600	= IIDCCamera::MONO8_800x600,
+    c_YUV422_1024x768	= IIDCCamera::YUV422_1024x768,
+    c_RGB24_1024x768	= IIDCCamera::RGB24_1024x768,
+    c_MONO8_1024x768	= IIDCCamera::MONO8_1024x768,
+    c_MONO16_800x600	= IIDCCamera::MONO16_800x600,
+    c_MONO16_1024x768	= IIDCCamera::MONO16_1024x768,
+    c_YUV422_1280x960	= IIDCCamera::YUV422_1280x960,
+    c_RGB24_1280x960	= IIDCCamera::RGB24_1280x960,
+    c_MONO8_1280x960	= IIDCCamera::MONO8_1280x960,
+    c_YUV422_1600x1200	= IIDCCamera::YUV422_1600x1200,
+    c_RGB24_1600x1200	= IIDCCamera::RGB24_1600x1200,
+    c_MONO8_1600x1200	= IIDCCamera::MONO8_1600x1200,
+    c_MONO16_1280x960	= IIDCCamera::MONO16_1280x960,
+    c_MONO16_1600x1200	= IIDCCamera::MONO16_1600x1200,
+    c_Format_7_0	= IIDCCamera::Format_7_0,
+    c_Format_7_1	= IIDCCamera::Format_7_1,
+    c_Format_7_2	= IIDCCamera::Format_7_2,
+    c_Format_7_3	= IIDCCamera::Format_7_3,
+    c_Format_7_4	= IIDCCamera::Format_7_4,
+    c_Format_7_5	= IIDCCamera::Format_7_5,
+    c_Format_7_6	= IIDCCamera::Format_7_6,
+    c_Format_7_7	= IIDCCamera::Format_7_7,
 
   // # of movie frames.
     c_NFrames,
