@@ -102,6 +102,21 @@
     - #TU::IIDCCamera::setTriggerPolarity()
     - #TU::IIDCCamera::getTriggerPolarity()
 
+  - <b>ストロボ</b>
+    - #TU::IIDCCamera::inquireStrobeFunction()
+    - #TU::IIDCCamera::setActive(Strobe, bool)
+    - #TU::IIDCCamera::setPolarity()
+    - #TU::IIDCCamera::setDelay()
+    - #TU::IIDCCamera::setDuration()
+    - #TU::IIDCCamera::isStrobeActive()
+    - #TU::IIDCCamera::getPolarity()
+    - #TU::IIDCCamera::getMinMax(Strobe, u_int&, u_int&)
+    - #TU::IIDCCamera::getDelay()
+    - #TU::IIDCCamera::getDuration()
+    
+  - <b>GPIOピン</b>
+    - #TU::IIDCCamera::setOutputVoltage()
+
   - <b>カメラ設定の保存</b>
     - #TU::IIDCCamera::saveConfig()
     - #TU::IIDCCamera::restoreConfig()
@@ -394,13 +409,26 @@ class IIDCCamera
 	Trigger_Mode15	= 0x1u
     };
 
-  //! カメラの外部トリガー信号の極性
-    enum TriggerPolarity
+  //! カメラのストロボ出力
+    enum Strobe
     {
-	LowActiveInput	= 0,		//!< lowでトリガon
-	HighActiveInput	= (0x1u << 24)	//!< highでトリガon
+	Strobe_0	= 0x100,		//!< ストロボ信号0
+	Strobe_1	= 0x104,		//!< ストロボ信号1
+	Strobe_2	= 0x108,		//!< ストロボ信号2
+	Strobe_3	= 0x10c,		//!< ストロボ信号3
     };
-
+	
+  //! 各ストロボ信号( Strobe)についてカメラがサポートしている機能を表すビットマップ
+  /*! どのような機能がサポートされているかは, inquireStrobeFunction() に
+      よって知ることができる. */
+    enum StrobeFunction
+    {
+	Strobe_Presence	= (0x1u << 31),	//!< このストロボ信号そのものをサポート
+	Strobe_ReadOut	= (0x1u << 27),	//!< このストロボ信号の値の読み出しが可能
+	Strobe_OnOff	= (0x1u << 26),	//!< このストロボ信号のon/offが可能
+	Strobe_Polarity	= (0x1u << 25),	//!< このストロボ信号の極性設定が可能
+    };
+    
   //! 本カメラがサポートするFormat_7に関する情報(getFormat_7_Info() で得られる)
     struct Format_7_Info
     {
@@ -481,13 +509,17 @@ class IIDCCamera
     IIDCCamera&		setAbsControl(Feature feature, bool enable)	;
     IIDCCamera&		setAuto(Feature feature, bool enable)		;
     IIDCCamera&		setValue(Feature feature, u_int value)		;
+    IIDCCamera&		setAbsValue(Feature feature, float value)	;
     bool		inOnePushOperation(Feature feature)	const	;
     bool		isActive(Feature feature)		const	;
     bool		isAbsControl(Feature feautre)		const	;
     bool		isAuto(Feature feautre)			const	;
     void		getMinMax(Feature feature,
 				  u_int& min, u_int& max)	const	;
+    void		getAbsMinMax(Feature feature,
+				     float& min, float& max)	const	;
     u_int		getValue(Feature feature)		const	;
+    float		getAbsValue(Feature feature)		const	;
     
   // White balance stuffs.
     IIDCCamera&		setWhiteBalance(u_int ub, u_int vr)		;
@@ -496,19 +528,29 @@ class IIDCCamera
   // Temperature stuffs.
     u_int		getAimedTemperature()			const	;
 
-  // Absolute value stuffs.
-    IIDCCamera&		setAbsValue(Feature feature, float value)	;
-    void		getAbsMinMax(Feature feature,
-				     float& min, float& max)	const	;
-    float		getAbsValue(Feature feature)		const	;
-
   // Trigger stuffs.
     IIDCCamera&		setTriggerMode(TriggerMode mode)		;
     TriggerMode		getTriggerMode()			const	;
-    IIDCCamera&		setTriggerPolarity(TriggerPolarity polarity)	;
-    TriggerPolarity	getTriggerPolarity()			const	;
+    IIDCCamera&		setTriggerPolarity(bool highActive)		;
+    bool		getTriggerPolarity()			const	;
     IIDCCamera&		setSoftwareTrigger()				;
     IIDCCamera&		resetSoftwareTrigger()				;
+
+  // Strobe stuffs.
+    quadlet_t		inquireStrobeFunction(Strobe strobe)	const	;
+    IIDCCamera&		setActive(Strobe strobe, bool enable)		;
+    IIDCCamera&		setPolarity(Strobe strobe, bool highActive)	;
+    IIDCCamera&		setDelay(Strobe strobe, u_int delay)		;
+    IIDCCamera&		setDuration(Strobe strobe, u_int duration)	;
+    bool		isStrobeActive(Strobe strobe)		const	;
+    bool		getPolarity(Strobe strobe)		const	;
+    void		getMinMax(Strobe strobe,
+				  u_int& min, u_int& max)	const	;
+    u_int		getDelay(Strobe strobe)			const	;
+    u_int		getDuration(Strobe strobe)		const	;
+
+  // Output voltage stuffs. (Blackfly only)
+    IIDCCamera&		setOutputVoltage(bool enable)			;
     
   // Shotting stuffs.
     IIDCCamera&		continuousShot(bool enable)			;
@@ -548,6 +590,7 @@ class IIDCCamera
 
   private:
     uint32_t	getAbsValueOffset(Feature feature)		 const	;
+    uint32_t	getStrobeOffset(Strobe strobe)			 const	;
     nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
     u_int	setFormat_7_PacketSize(Format format7)			;
     quadlet_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
@@ -555,6 +598,7 @@ class IIDCCamera
 				      u_int timeout)		 const	;
     void	checkAvailability(Format format, FrameRate rate) const	;
     quadlet_t	checkAvailability(Feature feature, uint32_t inq) const	;
+    quadlet_t	checkAvailability(Strobe strove, uint32_t inq)	 const	;
     void	checkAvailability(BasicFunction func)		 const	;
     quadlet_t	readQuadletFromRegister(uint32_t offset)	 const	;
     void	writeQuadletToRegister(uint32_t offset, quadlet_t quad)	;
@@ -707,6 +751,25 @@ IIDCCamera::checkAvailability(Feature feature, uint32_t inq) const
     return quad;
 }
 
+inline quadlet_t
+IIDCCamera::checkAvailability(Strobe strobe, uint32_t inq) const
+{
+    using namespace	std;
+    
+    quadlet_t	quad = inquireStrobeFunction(strobe);
+    if ((quad & inq) != inq)
+    {
+	ostringstream	s;
+	
+	s << "IIDCCamera::checkAvailability: This strobe["
+	  << showbase << hex << strobe
+	  << "] is not present or this field is unavailable (quad: "
+	  << quad << ", inq: " << inq << ")!!";
+      	throw runtime_error(s.str());
+    }
+    return quad;
+}
+
 inline void
 IIDCCamera::checkAvailability(BasicFunction func) const
 {
@@ -717,7 +780,7 @@ IIDCCamera::checkAvailability(BasicFunction func) const
     {
 	ostringstream	s;
 
-	s << "IIDCCamera::checkAvailabilityOfBasicFuntion: This fucntion is not present (quad: "
+	s << "IIDCCamera::checkAvailability: This fucntion is not present (quad: "
 	  << showbase << hex << quad << ", func: " << func << ")!!";
       	throw runtime_error(s.str());
     }

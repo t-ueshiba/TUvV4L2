@@ -315,6 +315,9 @@ cycletime_to_subcycle(uint32_t cycletime)
 *  local constants							*
 ************************************************************************/
 static const uint32_t	Advanced_Feature_Quadlet_Offset	= 0x480;
+static const uint32_t	PIO_Control_Quadlet_Offset	= 0x484;
+static const uint32_t	SIO_Control_Quadlet_Offset	= 0x488;
+static const uint32_t	Strobe_Output_Quadlet_Offset	= 0x48c;
     
 static const uint32_t	Cur_V_Frm_Rate			= 0x600;
 static const uint32_t	Cur_V_Mode			= 0x604;
@@ -327,10 +330,6 @@ static const uint32_t	One_Shot			= 0x61c;
 static const uint32_t	Mem_Save_Ch			= 0x620;
 static const uint32_t	Cur_Mem_Ch			= 0x624;
 static const uint32_t	Software_Trigger		= 0x62c;
-
-static const quadlet_t	One_Push			= 0x1u << 26;
-static const quadlet_t	ON_OFF				= 0x1u << 25;
-static const quadlet_t	A_M_Mode			= 0x1u << 24;
 
 // Video Mode CSR for Format_7.
 static const uint32_t	MAX_IMAGE_SIZE_INQ		= 0x000;
@@ -356,10 +355,9 @@ static const uint64_t	PointGrey_Feature_ID		= 0x00b09d000004ull;
 // Access control register offsets (PointGrey specific)
 static const uint32_t	BAYER_TILE_MAPPING		= 0x040;
 static const uint32_t	IMAGE_DATA_FORMAT		= 0x048;
+static const uint32_t	PIO_DIRECTION			= 0x1f8;
 static const uint32_t	FRAME_INFO			= 0x2f8;
-
-// GPIO control pins
-static const uint32_t	GPIO_CTRL_PIN_0			= 0x1110;
+static const uint32_t	OUTPUT_VOLTAGE_ENABLE		= 0x9d0;
     
 /************************************************************************
 *  union AbsValue							*
@@ -1028,6 +1026,8 @@ IIDCCamera::onePush(Feature feature)
 IIDCCamera&
 IIDCCamera::setActive(Feature feature, bool enable)
 {
+    constexpr quadlet_t	ON_OFF = 0x1u << 25;
+
     checkAvailability(feature, OnOff);
     auto	quad = readQuadletFromRegister(feature);
     writeQuadletToRegister(feature, (enable ? quad | ON_OFF : quad & ~ON_OFF));
@@ -1061,6 +1061,8 @@ IIDCCamera::setAbsControl(Feature feature, bool enable)
 IIDCCamera&
 IIDCCamera::setAuto(Feature feature, bool enable)
 {
+    constexpr quadlet_t	A_M_Mode = 0x1u << 24;
+    
     checkAvailability(feature, Auto);
     auto	quad = readQuadletFromRegister(feature);
     writeQuadletToRegister(feature,
@@ -1093,6 +1095,22 @@ IIDCCamera::setValue(Feature feature, u_int value)
     return *this;
 }
 
+//! 指定された属性の値を絶対値で設定する
+/*!
+  \param feature	値を設定したい属性
+  \param value		設定する値
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setAbsValue(Feature feature, float value)
+{
+    checkAvailability(feature, Manual);
+    AbsValue	val;
+    val.f = value;
+    writeQuadletToRegister(getAbsValueOffset(feature) + 8, val.i);
+    return *this;
+}
+    
 //! 指定された属性が1回だけの自動設定の最中であるか調べる
 /*!
   \param feature	対象となる属性
@@ -1103,7 +1121,7 @@ bool
 IIDCCamera::inOnePushOperation(Feature feature) const
 {
     checkAvailability(feature, One_Push);
-    return readQuadletFromRegister(feature) & (0x1u << 26);
+    return readQuadletFromRegister(feature) & One_Push;
 }
 
 //! 指定された属性がonになっているか調べる
@@ -1141,7 +1159,7 @@ bool
 IIDCCamera::isAuto(Feature feature) const
 {
     checkAvailability(feature, Auto);
-    return readQuadletFromRegister(feature) & (0x1u << 24);
+    return readQuadletFromRegister(feature) & (0x1u << 25);
 }
 
 //! 指定された属性がとり得る値の範囲を調べる
@@ -1159,6 +1177,24 @@ IIDCCamera::getMinMax(Feature feature, u_int& min, u_int& max) const
     max = quad & 0xfff;
 }
 
+//! 指定された属性がとり得る値の範囲を絶対値で調べる
+/*!
+  \param feature	対象となる属性
+  \param min		とり得る値の最小値が返される. 
+  \param max		とり得る値の最大値が返される. 
+*/
+void
+IIDCCamera::getAbsMinMax(Feature feature, float& min, float& max) const
+{
+    checkAvailability(feature, Presence);
+    AbsValue	val;
+    uint32_t	offset = getAbsValueOffset(feature);
+    val.i = readQuadletFromRegister(offset);
+    min = val.f;
+    val.i = readQuadletFromRegister(offset + 4);
+    max = val.f;
+}
+    
 //! 指定された属性の現在の値を調べる
 /*!
   feature = #TEMPERATURE の場合は, #setValue() で設定した目標値ではなく, 
@@ -1176,6 +1212,20 @@ IIDCCamera::getValue(Feature feature) const
 	throw std::invalid_argument("TU::IIDCCamera::getValue: cannot get WHITE_BALANCE/TRIGGER_MODE value using this method!!");
     checkAvailability(feature, ReadOut);
     return readQuadletFromRegister(feature) & 0xfff;	// 12bit value.
+}
+
+//! 指定された属性の現在の値を絶対値で調べる
+/*!
+  \param feature	対象となる属性
+  \return		現在の値
+*/
+float
+IIDCCamera::getAbsValue(Feature feature) const
+{
+    checkAvailability(feature, ReadOut);
+    AbsValue	val;
+    val.i = readQuadletFromRegister(getAbsValueOffset(feature) + 8);
+    return val.f;
 }
 
 //! ホワイトバランスの値を設定する
@@ -1220,54 +1270,6 @@ IIDCCamera::getAimedTemperature() const
     return (readQuadletFromRegister(TEMPERATURE) >> 12) & 0xfff;
 }
 
-//! 指定された属性の値を絶対値で設定する
-/*!
-  \param feature	値を設定したい属性
-  \param value		設定する値
-  \return		このIIDCカメラオブジェクト
-*/
-IIDCCamera&
-IIDCCamera::setAbsValue(Feature feature, float value)
-{
-    checkAvailability(feature, Manual);
-    AbsValue	val;
-    val.f = value;
-    writeQuadletToRegister(getAbsValueOffset(feature) + 8, val.i);
-    return *this;
-}
-    
-//! 指定された属性がとり得る値の範囲を絶対値で調べる
-/*!
-  \param feature	対象となる属性
-  \param min		とり得る値の最小値が返される. 
-  \param max		とり得る値の最大値が返される. 
-*/
-void
-IIDCCamera::getAbsMinMax(Feature feature, float& min, float& max) const
-{
-    checkAvailability(feature, Presence);
-    AbsValue	val;
-    uint32_t	offset = getAbsValueOffset(feature);
-    val.i = readQuadletFromRegister(offset);
-    min = val.f;
-    val.i = readQuadletFromRegister(offset + 4);
-    max = val.f;
-}
-    
-//! 指定された属性の現在の値を絶対値で調べる
-/*!
-  \param feature	対象となる属性
-  \return		現在の値
-*/
-float
-IIDCCamera::getAbsValue(Feature feature) const
-{
-    checkAvailability(feature, ReadOut);
-    AbsValue	val;
-    val.i = readQuadletFromRegister(getAbsValueOffset(feature) + 8);
-    return val.f;
-}
-
 //! トリガモードを設定する
 /*!
   実際にカメラが外部トリガによって駆動されるためには, この関数でモード設定
@@ -1300,31 +1302,32 @@ IIDCCamera::getTriggerMode() const
 
 //! トリガ信号の極性を設定する
 /*!
-  \param polarity	設定したい極性
+  \param highActive	trueならばhighでトリガon, falseならばlowでトリガon
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::setTriggerPolarity(TriggerPolarity polarity)
+IIDCCamera::setTriggerPolarity(bool highActive)
 {
-    const quadlet_t	Polarity_Inq = 0x1u << 25;
+    constexpr quadlet_t	Polarity_Inq    = 0x1u << 25;
+    constexpr quadlet_t	HighActiveInput = 0x1u << 24;
+    
     checkAvailability(TRIGGER_MODE, Polarity_Inq);
-    writeQuadletToRegister(TRIGGER_MODE, (readQuadletFromRegister(TRIGGER_MODE)
-					  & ~HighActiveInput) | polarity);
+    const auto		quad = readQuadletFromRegister(TRIGGER_MODE);
+    writeQuadletToRegister(TRIGGER_MODE,
+			   (highActive ?
+			    quad | HighActiveInput : quad & ~HighActiveInput));
     return *this;
 }
 
 //! 現在設定されているトリガ信号の極性を調べる
 /*!
-  \return	現在設定されているトリガ信号の極性
+  \return	trueならばhighでトリガon, falseならばlowでトリガon
 */
-IIDCCamera::TriggerPolarity
+bool
 IIDCCamera::getTriggerPolarity() const
 {
     checkAvailability(TRIGGER_MODE, ReadOut);
-    if (readQuadletFromRegister(TRIGGER_MODE) & HighActiveInput)
-	return HighActiveInput;
-    else
-	return LowActiveInput;
+    return readQuadletFromRegister(TRIGGER_MODE) & (0x1u << 24);
 }
 
 //! ソフトウェアトリガ信号をセットする
@@ -1349,6 +1352,188 @@ IIDCCamera::resetSoftwareTrigger()
     return *this;
 }
 
+//! 指定されたストロボにおいてカメラがサポートする機能を返す
+/*!
+  \param strobe		対象となるストロボ
+  \return		サポートされている機能を #StrobeFunction 型の列挙値
+			のorとして返す
+ */
+quadlet_t
+IIDCCamera::inquireStrobeFunction(Strobe strobe) const
+{
+    return readQuadletFromRegister(getStrobeOffset(strobe));
+}
+
+//! 指定されたストロボをon/offする
+/*!
+  \param strobe		on/offしたいストロボ
+  \param enable		trueならばon, falseならばoff
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setActive(Strobe strobe, bool enable)
+{
+    constexpr quadlet_t	ON_OFF = 0x1u << 25;
+
+    if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
+    {
+	const auto	val = readQuadletFromACRegister(PIO_DIRECTION);
+	const uint32_t	bit = 0x1u << (31 - ((strobe - Strobe_0) >> 2));
+
+	using namespace	std;
+	cerr << "PIO_DIRECTION: " << showbase << hex << val << dec << endl;
+	
+	writeQuadletToACRegister(PIO_DIRECTION,
+				 (enable ? val | bit : val & ~bit));
+    }
+    
+    checkAvailability(strobe, Strobe_Presence | Strobe_OnOff);
+    
+    const auto	offset = getStrobeOffset(strobe);
+    const auto	val    = readQuadletFromRegister(offset + 0x100);
+    writeQuadletToRegister(offset + 0x100,
+			   (enable ? val | ON_OFF : val & ~ON_OFF));
+    return *this;
+}
+
+//! ストロボ信号の極性を設定する
+/*!
+  \param strobe		極性を設定したいストロボ
+  \param highActive	trueならばストロボonでhigh, falseならばストロボonでlow
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setPolarity(Strobe strobe, bool highActive)
+{
+    constexpr quadlet_t	POLARITY = 0x1u << 24;
+
+    checkAvailability(strobe, Strobe_Presence | Strobe_Polarity);
+    
+    const auto	offset = getStrobeOffset(strobe);
+    const auto	val    = readQuadletFromRegister(offset + 0x100);
+    writeQuadletToRegister(offset + 0x100,
+			   (highActive ? val | POLARITY : val & ~POLARITY));
+    return *this;
+}
+    
+//! 露光が開始されてからストロボ信号がonになるまでの遅延時間を設定する
+/*!
+  \param strobe		遅延時間を設定したいストロボ
+  \param delay		遅延時間
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setDelay(Strobe strobe, u_int delay)
+{
+    const auto	offset = getStrobeOffset(strobe);
+    const auto	val    = readQuadletFromRegister(offset + 0x100);
+    writeQuadletToRegister(offset + 0x100,
+			   (val & 0xff000fff) | ((delay & 0xfff) << 12));
+    return *this;
+}
+
+//! ストロボ信号がonになる継続時間を設定する
+/*!
+  \param strobe		継続時間を設定したいストロボ
+  \param duration	継続時間
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setDuration(Strobe strobe, u_int duration)
+{
+    const auto	offset = getStrobeOffset(strobe);
+    const auto	val    = readQuadletFromRegister(offset + 0x100);
+    writeQuadletToRegister(offset + 0x100,
+			   (val & ~0xfff) | (duration & 0xfff));
+    return *this;
+}
+
+//! 指定されたストロボがonになっているか調べる
+/*!
+  \param strobe		対象となるストロボ
+  \return		onになっていればtrueを, そうでなければfalseを返す.
+*/
+bool
+IIDCCamera::isStrobeActive(Strobe strobe) const
+{
+    constexpr quadlet_t	ON_OFF = 0x1u << 25;
+
+    const auto	offset = getStrobeOffset(strobe);
+    return readQuadletFromRegister(offset + 0x100) & ON_OFF;
+}
+
+//! 現在設定されているストロボ信号の極性を調べる
+/*!
+  \param strobe		対象となるストロボ
+  \return		trueならばストロボonでhigh, falseならばストロボonでlow
+*/
+bool
+IIDCCamera::getPolarity(Strobe strobe) const
+{
+    constexpr quadlet_t	POLARITY = 0x1u << 24;
+
+    const auto	offset = getStrobeOffset(strobe);
+    return readQuadletFromRegister(offset + 0x100) & POLARITY;
+}
+
+//! 指定されたストロボの遅延時間および継続時間がとり得る値の範囲を調べる
+/*!
+  \param strobe		対象となるストロボ
+  \param min		とり得る値の最小値が返される. 
+  \param max		とり得る値の最大値が返される. 
+*/
+void
+IIDCCamera::getMinMax(Strobe strobe, u_int& min, u_int& max) const
+{
+    const auto	val = inquireStrobeFunction(strobe);
+    min = (val >> 12) & 0xfff;
+    max = val & 0xfff;
+}
+
+//! 指定されたストロボに設定されている遅延時間を調べる
+/*!
+  \param strobe		対象となるストロボ
+  \return		遅延時間
+*/
+u_int
+IIDCCamera::getDelay(Strobe strobe) const
+{
+    const auto	offset = getStrobeOffset(strobe);
+    return (readQuadletFromRegister(offset + 0x100) >> 12) & 0xfff;
+}
+
+//! 指定されたストロボに設定されている継続時間を調べる
+/*!
+  \param strobe		対象となるストロボ
+  \return		継続時間
+*/
+u_int
+IIDCCamera::getDuration(Strobe strobe) const
+{
+    const auto	offset = getStrobeOffset(strobe);
+    return readQuadletFromRegister(offset + 0x100) & 0xfff;
+}
+
+//! カメラのGPIOピンからのDC3.3V出力をon/offする
+/*!
+  \param enable		trueならばon, falseならばoff
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setOutputVoltage(bool enable)
+{
+    if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
+    {
+	const auto	val = readQuadletFromACRegister(OUTPUT_VOLTAGE_ENABLE);
+
+	if (val & Presence)
+	    writeQuadletToACRegister(OUTPUT_VOLTAGE_ENABLE,
+				     (enable ? val | 0x1u : val & ~0x1u));
+    }
+    
+    return *this;
+}
+    
 //! カメラからの画像の連続的出力を開始/終了する
 /*!
   #TRIGGER_MODE がonであれば, 撮影のタイミングは外部トリガ信号によって制御さ
@@ -2127,7 +2312,7 @@ IIDCCamera::embedTimestamp(bool enable)
 {
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
-	quadlet_t	val = readQuadletFromACRegister(FRAME_INFO);
+	const quadlet_t	val = readQuadletFromACRegister(FRAME_INFO);
 	if (val & Presence)
 	    writeQuadletToACRegister(FRAME_INFO,
 				     (enable ? val | 0x1u : val & ~0x1u));
@@ -2379,7 +2564,7 @@ IIDCCamera::uintToTriggerMode(u_int triggerMode)
 /*!
   \param pixelFormat	#PixelFormat に直したいunsigned int値
   \return		#PixelFormat 型のenum値
- */
+*/
 IIDCCamera::PixelFormat
 IIDCCamera::uintToPixelFormat(u_int pixelFormat)
 {
@@ -2457,13 +2642,21 @@ IIDCCamera::getAbsValueOffset(Feature feature) const
 	 - _cmdRegBase;
 }
     
+uint32_t
+IIDCCamera::getStrobeOffset(Strobe strobe) const
+{
+    return CSR_REGISTER_BASE
+	 + 4 * readQuadletFromRegister(Strobe_Output_Quadlet_Offset) + strobe
+	 - _cmdRegBase;
+}
+    
 nodeaddr_t
 IIDCCamera::getFormat_7_BaseAddr(Format format7) const
 {
     if (format7 < Format_7_0)
 	throw std::invalid_argument("IIDCCamera::getFormat_7_BaseAddr: not Format_7_x!!");
 
-    const quadlet_t offset = inquireFrameRate_or_Format_7_Offset(format7) * 4;
+    const quadlet_t offset = 4 * inquireFrameRate_or_Format_7_Offset(format7);
     if (offset == 0)
 	throw std::invalid_argument("IIDCCamera::getFormat_7_BaseAddr: unsupported Format_7_x!!");
     

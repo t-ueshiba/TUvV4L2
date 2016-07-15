@@ -134,9 +134,7 @@ setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
         return true;
 
       case IIDCCamera::TRIGGER_MODE  + IIDCCAMERA_OFFSET_AUTO:
-	exec(cameras, &IIDCCamera::setTriggerPolarity,
-	     (val ? IIDCCamera::HighActiveInput : IIDCCamera::LowActiveInput),
-	     n);
+	exec(cameras, &IIDCCamera::setTriggerPolarity, bool(val), n);
 	return true;
 
       default:
