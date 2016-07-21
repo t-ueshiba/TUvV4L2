@@ -788,6 +788,79 @@ make_row_transform_iterator(size_t jb, size_t je,
 }
 
 /************************************************************************
+*  class flat_row_iterator<ITER>					*
+************************************************************************/
+//! 1次元配列の要素を指す反復子に対して，配列を一定間隔に切り分けて2次元配列として扱うための反復子
+/*!
+  \param ITER	1次元配列の要素を指す反復子の型
+*/ 
+template <class ITER>
+class flat_row_iterator
+    : public boost::iterator_adaptor<flat_row_iterator<ITER>,
+				     ITER,
+				     range<ITER>,
+				     boost::use_default,
+				     range<ITER> >
+{
+  private:
+    using	super = boost::iterator_adaptor<flat_row_iterator<ITER>,
+						ITER,
+						range<ITER>,
+						boost::use_default,
+						range<ITER> >;
+
+  public:
+    using	reference	= typename super::reference;
+    using	difference_type = typename super::difference_type;
+
+    friend class	boost::iterator_core_access;
+    
+  public:
+    flat_row_iterator(ITER iter, size_t ncol, size_t stride=0)
+	:super(iter), _ncol(ncol), _stride(stride ? stride : _ncol)	{}
+    
+  private:
+    reference		dereference() const
+			{
+			    return reference(super::base(),
+					     super::base() + _ncol);
+			}
+    void		increment()
+			{
+			    std::advance(super::base_reference(), _stride);
+			}
+    void		decrement()
+			{
+			    std::advance(super::base_reference(), -_stride);
+			}
+    void		advance(difference_type n)
+			{
+			    std::advance(super::base_reference(), n*_stride);
+			}
+    difference_type	distance_to(const flat_row_iterator& iter) const
+			{
+			    return std::distance(super::base(),
+						 iter.base()) / _stride;
+			}
+    bool		equal(const flat_row_iterator& iter) const
+			{
+			    return (super::base() == iter.base() &&
+				    _ncol   == iter._ncol	 &&
+				    _stride == iter._stride);
+			}
+    
+  private:
+    difference_type	_ncol;
+    difference_type	_stride;
+};
+
+template <class ITER> inline flat_row_iterator<ITER>
+make_flat_row_iterator(ITER iter, size_t ncol, size_t stride=0)
+{
+    return flat_row_iterator<ITER>(iter, ncol, stride);
+}
+
+/************************************************************************
 *  class row2col<ROW>							*
 ************************************************************************/
 //! 行への参照を与えられると予め指定された列indexに対応する要素への参照を返す関数オブジェクト
