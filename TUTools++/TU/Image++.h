@@ -772,6 +772,319 @@ make_pixel_iterator(ITER iter)
 }
 
 /************************************************************************
+*  Bayer pattern decoding functions					*
+************************************************************************/
+namespace detail
+{
+template <class IN, class OUT, class C> void
+bayerDecodeRowXGGY(IN inY, IN inYe, IN inXp, IN inXn, OUT out, C X, C Y)
+{
+    if (inY == inYe)
+	return;
+    
+    auto	x0 = (*inXp + *inXn) >> 1;
+    auto	g0 = *inY;
+    auto	y1 = *++inY;
+    out->*X = x0;
+    out->g  = g0;
+    out->*Y = y1;
+    ++out;
+    
+    while (++inY != inYe)
+    {
+	const auto	g2 = *inY;
+	out->g  = (*++inXp + *++inXn + g0 + g2) >> 2;
+	const auto	x2 = (*++inXp + *++inXn) >> 1;
+	out->*X = (x0 + x2) >> 1;
+	out->*Y = y1;
+	++out;
+
+	const auto	y3 = *++inY;
+	out->*X = x2;
+	out->g  = g2;
+	out->*Y = (y1 + y3) >> 1;
+	++out;
+
+	x0 = x2;
+	g0 = g2;
+	y1 = y3;
+    }
+
+    out->*X = x0;
+    out->g  = (*++inXp + *++inXn) >> 1;
+    out->*Y = y1;
+}
+    
+template <class IN, class OUT, class C> void
+bayerDecodeRowGXYG(IN inY, IN inYe, IN inXp, IN inXn, OUT out, C X, C Y)
+{
+    if (inY == inYe)
+	return;
+    
+    out->g  = (*inXp + *inXn) >> 1;
+    auto	y0 = *inY;
+    auto	x1 = (*++inXp + *++inXn) >> 1;
+    auto	g1 = *++inY;
+    out->*X = x1;
+    out->*Y = y0;
+    ++out;
+    
+    while (++inY != inYe)
+    {
+	const auto	y2 = *inY;
+	out->*X = x1;
+	out->g  = g1;
+	out->*Y = (y0 + y2) >> 1;
+	++out;
+
+	const auto	g3 = *++inY;
+	out->g  = (*++inXp + *++inXn + g1 + g3) >> 2;
+	const auto	x3 = (*++inXp + *++inXn) >> 1;
+	out->*X = (x1 + x3) >> 1;
+	out->*Y = y2;
+	++out;
+
+	y0 = y2;
+	x1 = x3;
+	g1 = g3;
+    }
+
+    out->*X = x1;
+    out->g  = g1;
+    out->*Y = y0;
+}
+    
+template <class IN, class OUT, class C> void
+bayerDecodeBorderRowXGGY(IN inX, IN inXe, IN inY, OUT out, C X, C Y)
+{
+    if (inX == inXe)
+	return;
+    
+    auto	x0 = *inX;
+    auto	g1 = *++inX;
+    auto	y1 = *++inY;
+    out->*X = x0;
+    out->g  = g1;
+    out->*Y = y1;
+    ++out;
+    
+    while (++inX != inXe)
+    {
+	const auto	x2 = *inX;
+	out->*X = (x0 + x2) >> 1;
+	out->g  = g1;
+	out->*Y = y1;
+	++out;
+
+	const auto	g3 = *++inX;
+	++inY;
+	const auto	y3 = *++inY;
+	out->*X = x2;
+	out->g  = (g1 + g3) >> 1;
+	out->*Y = (y1 + y3) >> 1;
+	++out;
+
+	x0 = x2;
+	g1 = g3;
+	y1 = y3;
+    }
+
+    out->*X = x0;
+    out->g  = g1;
+    out->*Y = y1;
+}
+
+template <class IN, class OUT, class C> void
+bayerDecodeBorderRowGXYG(IN inX, IN inXe, IN inY, OUT out, C X, C Y)
+{
+    if (inX == inXe)
+	return;
+    
+    auto	g0 = *inX;
+    auto	x1 = *++inX;
+    auto	y0 = *inY;
+    out->*X = x1;
+    out->g  = g0;
+    out->*Y = y0;
+    ++out;
+    
+    while (++inX != inXe)
+    {
+	const auto	g2 = *inX;
+	++inY;
+	const auto	y2 = *++inY;
+	out->*X = x1;
+	out->g  = (g0 + g2) >> 1;
+	out->*Y = (y0 + y2) >> 1;
+	++out;
+
+	const auto	x3 = *++inX;
+	out->*X = (x1 + x3) >> 1;
+	out->g  = g2;
+	out->*Y = y2;
+	++out;
+
+	g0 = g2;
+	x1 = x3;
+	y0 = y2;
+    }
+
+    out->*X = x1;
+    out->g  = g0;
+    out->*Y = y0;
+}
+
+}	// namespace detail
+    
+template <class IN, class OUT> OUT
+bayerDecodeRGGB(IN in, IN ie, OUT out)
+{
+    using	COLOR = typename std::iterator_traits<OUT>::value_type
+							  ::value_type;
+
+    if (in == ie)
+	return out;
+
+    auto	ic = in;
+    ++in;
+    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*in), std::begin(*out),
+				     &COLOR::r, &COLOR::b);
+    ++out;
+    auto	ip = ic;
+    for (++ic; ++in != ie; ++ip, ++ic)
+    {
+	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::r, &COLOR::b);
+	++out;
+	++ip;
+	++ic;
+	++in;
+	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::b, &COLOR::r);
+	++out;
+    }
+    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*ip), std::begin(*out),
+				     &COLOR::b, &COLOR::r);
+
+    return ++out;
+}
+
+template <class IN, class OUT> OUT
+bayerDecodeBGGR(IN in, IN ie, OUT out)
+{
+    using	COLOR = typename std::iterator_traits<OUT>::value_type
+							  ::value_type;
+
+    if (in == ie)
+	return out;
+
+    auto	ic = in;
+    ++in;
+    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*in), std::begin(*out),
+				     &COLOR::b, &COLOR::r);
+    ++out;
+    auto	ip = ic;
+    for (++ic; ++in != ie; ++ip, ++ic)
+    {
+	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::b, &COLOR::r);
+	++out;
+	++ip;
+	++ic;
+	++in;
+	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::r, &COLOR::b);
+	++out;
+    }
+    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*ip), std::begin(*out),
+				     &COLOR::r, &COLOR::b);
+
+    return ++out;
+}
+
+template <class IN, class OUT> OUT
+bayerDecodeGRBG(IN in, IN ie, OUT out)
+{
+    using	COLOR = typename std::iterator_traits<OUT>::value_type
+							  ::value_type;
+
+    if (in == ie)
+	return out;
+
+    auto	ic = in;
+    ++in;
+    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*in), std::begin(*out),
+				     &COLOR::r, &COLOR::b);
+    ++out;
+    auto	ip = ic;
+    for (++ic; ++in != ie; ++ip, ++ic)
+    {
+	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::r, &COLOR::b);
+	++out;
+	++ip;
+	++ic;
+	++in;
+	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::b, &COLOR::r);
+	++out;
+    }
+    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*ip), std::begin(*out),
+				     &COLOR::b, &COLOR::r);
+
+    return ++out;
+}
+
+template <class IN, class OUT> OUT
+bayerDecodeGBRG(IN in, IN ie, OUT out)
+{
+    using	COLOR = typename std::iterator_traits<OUT>::value_type
+							  ::value_type;
+
+    if (in == ie)
+	return out;
+
+    auto	ic = in;
+    ++in;
+    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*in), std::begin(*out),
+				     &COLOR::b, &COLOR::r);
+    ++out;
+    auto	ip = ic;
+    for (++ic; ++in != ie; ++ip, ++ic)
+    {
+	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::b, &COLOR::r);
+	++out;
+	++ip;
+	++ic;
+	++in;
+	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				   std::cbegin(*ip), std::cbegin(*in),
+				   std::begin(*out), &COLOR::r, &COLOR::b);
+	++out;
+    }
+    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
+				     std::cbegin(*ip), std::begin(*out),
+				     &COLOR::r, &COLOR::b);
+
+    return ++out;
+}
+
+/************************************************************************
 *  class Array<YUV411, 0, ALLOC>					*
 ************************************************************************/
 template <class ALLOC>
