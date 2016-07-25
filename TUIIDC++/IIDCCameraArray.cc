@@ -1,7 +1,6 @@
 /*
  *  $Id: IIDCCameraArray.cc 1681 2014-10-17 02:16:17Z ueshiba $
  */
-#ifdef HAVE_LIBTUTOOLS__
 #include <cstdlib>
 #include <iomanip>
 #include "TU/IIDCCameraArray.h"
@@ -121,4 +120,3 @@ operator <<(std::ostream& out, const IIDCCameraArray& cameras)
 }
 
 }
-#endif	/* HAVE_LIBTUTOOLS__	*/    

@@ -83,7 +83,6 @@ getFeatureValue(const V4L2Camera& camera, u_int id, int)
     return getFeatureValueV4L2(camera, id, -1);
 }
     
-#ifdef HAVE_LIBTUTOOLS__
 bool
 setFormat(const Array<V4L2Camera*>& cameras, u_int id, int val)
 {
@@ -111,5 +110,5 @@ exec(const Array<V4L2Camera*>& cameras, V4L2Camera& (V4L2Camera::*mf)(), int n)
 	for (size_t i = 0; i < cameras.size(); ++i)
 	    (cameras[i]->*mf)();
 }
-#endif
+
 }

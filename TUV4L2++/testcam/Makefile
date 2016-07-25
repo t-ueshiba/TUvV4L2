@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I$(HOME)/src/TUIeee1394++/testcam -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__ 
+CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)

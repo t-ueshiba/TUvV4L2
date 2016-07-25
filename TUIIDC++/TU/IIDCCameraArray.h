@@ -10,13 +10,12 @@
 
 #include "TU/IIDC++.h"
 
-#ifdef HAVE_LIBTUTOOLS__
-#  include <string>
+#include <string>
 
 //! デフォルトのカメラ名
-#  define DEFAULT_CAMERA_NAME	"IIDCCamera"
+#define DEFAULT_CAMERA_NAME	"IIDCCamera"
 //! カメラ設定ファイルを収めるデフォルトのディレクトリ名
-#  define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
+#define DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
 
 namespace TU
 {
@@ -95,5 +94,4 @@ std::ostream&
 operator <<(std::ostream& out, const IIDCCameraArray& cameras)		;
 
 }
-#endif	// HAVE_LIBTUTOOLS__
 #endif	// ! __TU_IIDCCAMERAARRAY_H

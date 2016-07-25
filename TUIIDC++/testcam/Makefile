@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 
 INCDIRS		= -I.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__
+CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)

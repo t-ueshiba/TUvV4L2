@@ -253,7 +253,6 @@ getFeatureValue(const IIDCCamera& camera, u_int id, int)
     return getFeatureValueIIDC(camera, id, -1);
 }
     
-#ifdef HAVE_LIBTUTOOLS__
 bool
 setFormat(const Array<IIDCCamera*>& cameras, u_int id, int val)
 {
@@ -282,5 +281,5 @@ exec(const Array<IIDCCamera*>& cameras, IIDCCamera& (IIDCCamera::*mf)(), int n)
 	for (size_t i = 0; i < cameras.size(); ++i)
 	    (cameras[i]->*mf)();
 }
-#endif
+
 }
