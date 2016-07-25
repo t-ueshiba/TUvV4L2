@@ -4,8 +4,6 @@
 #include <cstdlib>
 #include "TU/V4L2CameraArray.h"
 
-#ifdef HAVE_LIBTUTOOLS__
-
 namespace TU
 {
 /************************************************************************
@@ -114,4 +112,3 @@ operator <<(std::ostream& out, const V4L2CameraArray& cameras)
 }
 
 }
-#endif	/* HAVE_LIBTUTOOLS__	*/    

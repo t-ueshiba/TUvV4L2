@@ -9,13 +9,12 @@
 #define __TU_V4L2CAMERAARRAY_H
 
 #include "TU/V4L2++.h"
-#ifdef HAVE_LIBTUTOOLS__
-#  include "TU/io.h"
+#include "TU/io.h"
 
 //! デフォルトのカメラ名
-#  define TU_V4L2_DEFAULT_CAMERA_NAME	"V4L2Camera"
+#define TU_V4L2_DEFAULT_CAMERA_NAME	"V4L2Camera"
 //! カメラ設定ファイルを収めるデフォルトのディレクトリ名
-#  define TU_V4L2_DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
+#define TU_V4L2_DEFAULT_CONFIG_DIRS	".:/usr/local/etc/cameras"
 
 namespace TU
 {
@@ -89,5 +88,4 @@ V4L2CameraArray::calibFile() const
 std::ostream&	operator <<(std::ostream& out, const V4L2CameraArray& cameras);
 
 }
-#endif	// HAVE_LIBTUTOOLS__
 #endif	// ! __TU_IEEE1394CAMERAARRAY_H

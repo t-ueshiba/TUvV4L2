@@ -13,9 +13,7 @@
 #include <vector>
 #include <string>
 #include <boost/iterator_adaptors.hpp>
-#ifdef HAVE_LIBTUTOOLS__
-#  include "TU/Image++.h"
-#endif
+#include "TU/Image++.h"
 
 /*!
   \namespace	TU
@@ -296,14 +294,12 @@ class V4L2Camera
     V4L2Camera&		continuousShot(bool enable)			;
     bool		inContinuousShot()			const	;
     V4L2Camera&		snap()						;
-#ifdef HAVE_LIBTUTOOLS__
     template <class T> const V4L2Camera&
 			operator >>(Image<T>& image)		const	;
     template <class T> const V4L2Camera&
 			captureRGBImage(Image<T>& image)	const	;
     template <class T> const V4L2Camera&
 			captureDirectly(Image<T>& image)	const	;
-#endif
     const V4L2Camera&	captureRaw(void* image)			const	;
     const V4L2Camera&	captureBayerRaw(void* image)		const	;
     u_int64_t		arrivaltime()				const	;
@@ -512,7 +508,6 @@ V4L2Camera::snap()
     return *this;
 }
 
-#ifdef HAVE_LIBTUTOOLS__
 //! カメラから出力された画像を直接的に取り込む
 /*!
   #operator >>() との違いは, 画像形式の変換を行わないことと, Image<T> 構造体
@@ -534,7 +529,6 @@ V4L2Camera::captureDirectly(Image<T>& image) const
 
     return *this;
 }
-#endif
 
 //! 画像データがホストに到着した時刻を取得する
 /*!
@@ -620,7 +614,6 @@ exec(const V4L2Camera& camera, RESULT (V4L2Camera::*mf)(ARG) const,
     return (camera.*mf)(arg);
 }
 
-#ifdef HAVE_LIBTUTOOLS__
 bool	setFormat(const Array<V4L2Camera*>& cameras, u_int id, int val)	;
 bool	setFeatureValue(const Array<V4L2Camera*>& cameras,
 			u_int id, int val, int n=-1)			;
@@ -666,7 +659,6 @@ exec(const Array<V4L2Camera*>& cameras,
     size_t	i = (0 <= n && n < cameras.size() ? n : 0);
     return (cameras[i]->*mf)(arg);
 }
-#endif    
     
 }
 #endif	// !__TU_V4L2PP_H

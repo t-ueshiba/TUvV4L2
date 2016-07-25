@@ -1,43 +1,39 @@
 #
-#  $Id: Makefile,v 1.19 2012-08-29 19:35:49 ueshiba Exp $
+#  $Id$
 #
 #################################
 #  User customizable macros	#
 #################################
-DEST		= $(PREFIX)/bin
-INCDIRS		= -I$(PREFIX)/include
-
 PROGRAM		= $(shell basename $(PWD))
-LIBS		= -lTUV4L2++ -lTUTools++ $(shell pkg-config gtk+-2.0 --libs)
-ifeq ($(OSTYPE), darwin)
-  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
-endif
+#LIBRARY		= lib$(shell basename $(PWD))
 
-#CXX		= g++
-CPPFLAGS	= #-DG_DISABLE_DETPRECATED -DGTK_DISABLE_DEPRECATED
-CFLAGS		= -g
-NVCCFLAGS	= -g
-ifeq ($(CXX), icpc)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O		# -O2以上にするとコンパイルエラーになる．
-  ifeq ($(OSTYPE), darwin)
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  else
-    CPPFLAGS   += -DSSE3
-    CFLAGS     += -xSSE3
-  endif
+VPATH		=
+
+IDLS		=
+MOCHDRS		=
+
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG
+CFLAGS		= -O3 $(shell pkg-config gtk+-2.0 --cflags)
+NVCCFLAGS	= -O
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DSSE3
 endif
-CFLAGS	       += $(shell pkg-config gtk+-2.0 --cflags)
 CCFLAGS		= $(CFLAGS)
 
+LIBS		= -lTUV4L2++ -lTUTools++ $(shell pkg-config gtk+-2.0 --libs)
 LINKER		= $(CXX)
+
+BINDIR		= $(PREFIX)/bin
+LIBDIR		= $(PREFIX)/lib
+INCDIR		= $(PREFIX)/include
 
 #########################
 #  Macros set by mkmf	#
 #########################
-.SUFFIXES:	.cu
-SUFFIX		= .cc:sC .cu:sC
+SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -62,20 +58,11 @@ OBJS		= MyDialog.o \
 		createMenubar.o \
 		main.o
 
-#########################
-#  Macros used by RCS	#
-#########################
-REV		= $(shell echo $Revision: 1.19 $	|		\
-		  sed 's/evision://'		|		\
-		  awk -F"."					\
-		  '{						\
-		      for (count = 1; count < NF; count++)	\
-			  printf("%d.", $$count);		\
-		      printf("%d", $$count + 1);		\
-		  }')
-
-include $(PROJECT)/lib/p.mk
-
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
 MyDialog.o: MyDialog.h /usr/local/include/TU/V4L2++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
