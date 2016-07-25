@@ -141,9 +141,7 @@
 #include <sstream>
 #include <iomanip>
 #include <netinet/in.h>
-#if defined(HAVE_LIBTUTOOLS__)
-#  include "TU/Image++.h"
-#endif
+#include "TU/Image++.h"
 
 /*!
   \namespace	TU
@@ -459,14 +457,8 @@ class IIDCCamera
   private:
     struct Mono16
     {
-	operator u_char()		const	{return u_char(ntohs(s));}
 	operator short()		const	{return ntohs(s);}
-	operator u_short()		const	{return u_short(ntohs(s));}
-	operator int()			const	{return int(ntohs(s));}
-	operator u_int()		const	{return u_int(ntohs(s));}
-	operator float()		const	{return float(ntohs(s));}
-	operator double()		const	{return double(ntohs(s));}
-	      
+	
 	short	s;
     };
 
@@ -566,14 +558,12 @@ class IIDCCamera
     
   // Capture stuffs.
     IIDCCamera&		snap()						;
-#ifdef HAVE_LIBTUTOOLS__
     template <class T>
     const IIDCCamera&	operator >>(Image<T>& image)		const	;
     template <class T>
     const IIDCCamera&	captureRGBImage(Image<T>& image)	const	;
     template <class T>
     const IIDCCamera&	captureDirectly(Image<T>& image)	const	;
-#endif
     const IIDCCamera&	captureRaw(void* image)			const	;
     const IIDCCamera&	captureBayerRaw(void* image)		const	;
     IIDCCamera&		embedTimestamp(bool enable)			;
@@ -680,7 +670,6 @@ IIDCCamera::snap()
     return *this;
 }
 
-#ifdef HAVE_LIBTUTOOLS__
 //! IIDCカメラから出力された画像を直接的に取り込む
 /*!
   #operator >>() との違いは, 画像形式の変換を行わないことと, Image<T> 構造体
@@ -698,11 +687,10 @@ IIDCCamera::captureDirectly(Image<T>& image) const
 {
     if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureDirectly: no images snapped!!");
-    image.resize(reinterpret_cast<T*>(_img), height(), width());
+    image.resize((T*)_img, height(), width());
 
     return *this;
 }
-#endif
 
 //! 画像に埋め込まれた撮影時刻を得る．
 /*!
@@ -868,7 +856,6 @@ exec(const IIDCCamera& camera, RESULT (IIDCCamera::*mf)(ARG0&, ARG1&) const,
     (camera.*mf)(arg0, arg1);
 }
 
-#if defined(HAVE_LIBTUTOOLS__)
 bool	setFormat(const Array<IIDCCamera*>& cameras,
 		  u_int id, int val)					;
 bool	setFeatureValue(const Array<IIDCCamera*>& cameras,
@@ -876,7 +863,7 @@ bool	setFeatureValue(const Array<IIDCCamera*>& cameras,
 u_int	getFeatureValue(const Array<IIDCCamera*>& cameras,
 			u_int id, int n=-1)				;
 void	exec(const Array<IIDCCamera*>& cameras,
-	     IIDCCamera& (IIDCCamera::*mf)(), int n=-1)		;
+	     IIDCCamera& (IIDCCamera::*mf)(), int n=-1)			;
     
 template <class ARG> void
 exec(const Array<IIDCCamera*>& cameras,
@@ -925,6 +912,6 @@ exec(const Array<IIDCCamera*>& cameras,
     size_t	i = (0 <= n && n < cameras.size() ? n : 0);
     (cameras[i]->*mf)(arg0, arg1);
 }
-#endif
+
 }
 #endif	// !__TU_IIDCPP_H

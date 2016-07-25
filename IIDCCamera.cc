@@ -9,267 +9,11 @@
 #include <sys/time.h>
 #include <iostream>
 
-#define XY_YZ(X, Y, Z)						\
-{								\
-    rgb->X = *buf;						\
-    rgb->Y = (u_int(*(buf+1)) + u_int(*nxt)) >> 1;		\
-    rgb->Z = *(nxt+1);						\
-    ++rgb;							\
-    ++buf;							\
-    ++nxt;							\
-}
-
-#define YX_ZY(X, Y, Z)						\
-{								\
-    rgb->X = *(buf+1);						\
-    rgb->Y = (u_int(*buf) + u_int(*(nxt+1))) >> 1;		\
-    rgb->Z = *nxt;						\
-    ++rgb;							\
-    ++buf;							\
-    ++nxt;							\
-}
-
-#define XYX_YZY_XYX(X, Y, Z)					\
-{								\
-    rgb->X = (u_int(*(prv-1)) + u_int(*(prv+1)) +		\
-	       u_int(*(nxt-1)) + u_int(*(nxt+1))) >> 2;		\
-    rgb->Y = (u_int(*(buf-1)) +u_int(*(buf+1)) +		\
-	       u_int(*prv) + u_int(*nxt)) >> 2;			\
-    rgb->Z = *buf;						\
-    ++rgb;							\
-    ++prv;							\
-    ++buf;							\
-    ++nxt;							\
-}
-
-#define yXy_ZYZ_yXy(X, Y, Z)					\
-{								\
-    rgb->X = (u_int(*prv) + u_int(*nxt)) >> 1;			\
-    rgb->Y = *buf;						\
-    rgb->Z = (u_int(*(buf-1)) + u_int(*(buf+1))) >> 1;		\
-    ++rgb;							\
-    ++prv;							\
-    ++buf;							\
-    ++nxt;							\
-}
-
 namespace TU
 {
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-template <class S, class T> static const S*
-bayerRGGB2x2(const S* buf, T* rgb, int w)
-{
-    const S*	nxt = buf + w;			// next line
-    while ((w -= 2) > 0)
-    {
-	XY_YZ(r, g, b)
-	YX_ZY(r, g, b)
-    }
-    XY_YZ(r, g, b)
-    --buf;
-    --nxt;
-    XY_YZ(r, g, b)
-    
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerRGGBOdd3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    YX_ZY(b, g, r)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理
-    {
-	XYX_YZY_XYX(r, g, b)
-	yXy_ZYZ_yXy(r, g, b)
-    }
-    --buf;
-    --nxt;
-    YX_ZY(b, g, r)				// 右端の画素は2x2で処理
-    
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerRGGBEven3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    XY_YZ(r, g, b)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理
-    {
-	yXy_ZYZ_yXy(b, g, r)
-	XYX_YZY_XYX(b, g, r)
-    }
-    --buf;
-    --nxt;
-    XY_YZ(r, g, b)				// 右端の画素は2x2で処理
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerBGGR2x2(const S* buf, T* rgb, int w)
-{
-    const S*	nxt = buf + w;			// next line
-    while ((w -= 2) > 0)
-    {
-	XY_YZ(b, g, r)
-	YX_ZY(b, g, r)
-    }
-    XY_YZ(b, g, r)
-    --buf;
-    --nxt;
-    XY_YZ(b, g, r)
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerBGGROdd3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    YX_ZY(r, g, b)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理
-    {
-	XYX_YZY_XYX(b, g, r)
-	yXy_ZYZ_yXy(b, g, r)
-    }
-    --buf;
-    --nxt;
-    YX_ZY(r, g, b)				// 右端の画素は2x2で処理
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerBGGREven3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    XY_YZ(b, g, r)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理
-    {
-	yXy_ZYZ_yXy(r, g, b)
-	XYX_YZY_XYX(r, g, b)
-    }
-    --buf;
-    --nxt;
-    XY_YZ(b, g, r)				// 右端の画素は2x2で処理
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerGRBG2x2(const S* buf, T* rgb, int w)
-{
-    const S*	nxt = buf + w;			// next line
-    while ((w -= 2) > 0)
-    {
-	YX_ZY(r, g, b)
-	XY_YZ(r, g, b)
-    }
-    YX_ZY(r, g, b)
-    --buf;
-    --nxt;
-    YX_ZY(r, g, b)
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerGRBGOdd3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    XY_YZ(b, g, r)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理
-    {
-	yXy_ZYZ_yXy(r, g, b)
-	XYX_YZY_XYX(r, g, b)
-    }
-    --buf;
-    --nxt;
-    XY_YZ(b, g, r)				// 右端の画素は2x2で処理
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerGRBGEven3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    YX_ZY(r, g, b)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理
-    {
-	XYX_YZY_XYX(b, g, r)
-	yXy_ZYZ_yXy(b, g, r)
-    }
-    --buf;
-    --nxt;
-    YX_ZY(r, g, b)				// 右端の画素は2x2で処理
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerGBRG2x2(const S* buf, T* rgb, int w)
-{
-    const S*	nxt = buf + w;			// next line
-    while ((w -= 2) > 0)
-    {
-	YX_ZY(b, g, r)
-	XY_YZ(b, g, r)
-    }
-    YX_ZY(b, g, r)
-    --buf;
-    --nxt;
-    YX_ZY(b, g, r)
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerGBRGOdd3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    XY_YZ(r, g, b)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 奇数行中間の列を処理
-    {
-	yXy_ZYZ_yXy(b, g, r)
-	XYX_YZY_XYX(b, g, r)
-    }
-    --buf;
-    --nxt;
-    XY_YZ(r, g, b)				// 右端の画素は2x2で処理
-
-    return buf + 1;
-}
-
-template <class S, class T> static const S*
-bayerGBRGEven3x3(const S* buf, T* rgb, int w)
-{
-    const S	*nxt = buf + w;			// next line
-    YX_ZY(b, g, r)				// 左端の画素は2x2で処理
-    const S	*prv = buf - w;			// previous line
-    while ((w -= 2) > 0)			// 偶数行中間の列を処理
-    {
-	XYX_YZY_XYX(r, g, b)
-	yXy_ZYZ_yXy(r, g, b)
-    }
-    --buf;
-    --nxt;
-    YX_ZY(b, g, r)				// 右端の画素は2x2で処理
-
-    return buf + 1;
-}
-
 static quadlet_t
 triggerModeValue(IIDCCamera::TriggerMode mode)
 {
@@ -415,6 +159,8 @@ IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed)
 	    break;
 	  case GBRG:
 	    _bayer = GBRG;
+	    break;
+	  default:
 	    break;
 	}
 
@@ -1666,7 +1412,6 @@ IIDCCamera::getMemoryChannelMax() const
 /*
  *  Capture stuffs.
  */
-#ifdef HAVE_LIBTUTOOLS__
 //! IIDCカメラから出力された画像1枚分のデータを適当な形式に変換して取り込む
 /*!
   テンプレートパラメータTは, 格納先の画像の画素形式を表す. なお, 本関数を
@@ -1831,57 +1576,29 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 	switch (_bayer)
 	{
 	  case RGGB:
-	  {
-	    const u_char*	p = bayerRGGB2x2(_img, &image[0][0], width());
-	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理
-	    {
-		p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
-		p = bayerRGGBEven3x3(p, &image[v++][0], width());
-	    }
-	    bayerRGGB2x2(p - width(), &image[v][0], width());
-	  }
+	    bayerDecodeRGGB(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    image.begin());
 	    break;
-
 	  case BGGR:
-	  {
-	    const u_char*	p = bayerBGGR2x2(_img, &image[0][0], width());
-	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理
-	    {
-		p = bayerBGGROdd3x3 (p, &image[v++][0], width());
-		p = bayerBGGREven3x3(p, &image[v++][0], width());
-	    }
-	    bayerBGGR2x2(p - width(), &image[v][0], width());
-	  }
+	    bayerDecodeBGGR(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    image.begin());
 	    break;
-
 	  case GRBG:
-	  {
-	    const u_char*	p = bayerGRBG2x2(_img, &image[0][0], width());
-	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理
-	    {
-		p = bayerGRBGOdd3x3 (p, &image[v++][0], width());
-		p = bayerGRBGEven3x3(p, &image[v++][0], width());
-	    }
-	    bayerGRBG2x2(p - width(), &image[v][0], width());
-	  }
+	    bayerDecodeGRBG(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    image.begin());
 	    break;
-
 	  case GBRG:
-	  {
-	    const u_char*	p = bayerGBRG2x2(_img, &image[0][0], width());
-	    int			v = 1;
-	    while (v < image.height() - 1)	// 中間の行を処理
-	    {
-		p = bayerGBRGOdd3x3 (p, &image[v++][0], width());
-		p = bayerGBRGEven3x3(p, &image[v++][0], width());
-	    }
-	    bayerGBRG2x2(p - width(), &image[v][0], width());
-	  }
+	    bayerDecodeGBRG(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    image.begin());
 	    break;
-
 	  default:
 	    *this >> image;
 	    break;
@@ -1889,119 +1606,75 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 	break;
 	
       case MONO_16:
-	switch (_bayer)
+	if (_littleEndian)
 	{
-	  case RGGB:
-	    if (_littleEndian)
+	    auto	p = reinterpret_cast<const u_short*>(_img);
+	  
+	    switch (_bayer)
 	    {
-		const u_short*	p = bayerRGGB2x2((const u_short*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
-		    p = bayerRGGBEven3x3(p, &image[v++][0], width());
-		}
-		bayerRGGB2x2(p - width(), &image[v][0], width());
+	      case RGGB:
+		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				image.begin());
+		break;
+	      case BGGR:
+		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				image.begin());
+		break;
+	      case GRBG:
+		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				image.begin());
+		break;
+	      case GBRG:
+		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				image.begin());
+		break;
+	      default:
+		*this >> image;
+		break;
 	    }
-	    else
-	    {
-		const Mono16*	p = bayerRGGB2x2((const Mono16*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerRGGBOdd3x3 (p, &image[v++][0], width());
-		    p = bayerRGGBEven3x3(p, &image[v++][0], width());
-		}
-		bayerRGGB2x2(p - width(), &image[v][0], width());
-	    }
-	    break;
+	}
+	else
+	{
+	    auto	p = reinterpret_cast<const Mono16*>(_img);
 
-	  case BGGR:
-	    if (_littleEndian)
+	    switch (_bayer)
 	    {
-		const u_short*	p = bayerBGGR2x2((const u_short*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
-		    p = bayerBGGREven3x3(p, &image[v++][0], width());
-		}
-		bayerBGGR2x2(p - width(), &image[v][0], width());
+	      case RGGB:
+		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   image.begin());
+		break;
+	      case BGGR:
+		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
+				   make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   image.begin());
+		break;
+	      case GRBG:
+		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
+				   make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   image.begin());
+		break;
+	      case GBRG:
+		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
+				   make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   image.begin());
+		break;
+	      default:
+		*this >> image;
+		break;
 	    }
-	    else
-	    {
-		const Mono16*	p = bayerBGGR2x2((const Mono16*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerBGGROdd3x3 (p, &image[v++][0], width());
-		    p = bayerBGGREven3x3(p, &image[v++][0], width());
-		}
-		bayerBGGR2x2(p - width(), &image[v][0], width());
-	    }
-	    break;
-
-	  case GRBG:
-	    if (_littleEndian)
-	    {
-		const u_short*	p = bayerGRBG2x2((const u_short*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerGRBGOdd3x3 (p, &image[v++][0], width());
-		    p = bayerGRBGEven3x3(p, &image[v++][0], width());
-		}
-		bayerGRBG2x2(p - width(), &image[v][0], width());
-	    }
-	    else
-	    {
-		const Mono16*	p = bayerGRBG2x2((const Mono16*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerGRBGOdd3x3 (p, &image[v++][0], width());
-		    p = bayerGRBGEven3x3(p, &image[v++][0], width());
-		}
-		bayerGRBG2x2(p - width(), &image[v][0], width());
-	    }
-	    break;
-
-	  case GBRG:
-	    if (_littleEndian)
-	    {
-		const u_short*	p = bayerGBRG2x2((const u_short*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerGBRGOdd3x3 (p, &image[v++][0], width());
-		    p = bayerGBRGEven3x3(p, &image[v++][0], width());
-		}
-		bayerGBRG2x2(p - width(), &image[v][0], width());
-	    }
-	    else
-	    {
-		const Mono16*	p = bayerGBRG2x2((const Mono16*)_img,
-						 &image[0][0], width());
-		int		v = 1;
-		while (v < image.height() - 1)	// 中間の行を処理
-		{
-		    p = bayerGBRGOdd3x3 (p, &image[v++][0], width());
-		    p = bayerGBRGEven3x3(p, &image[v++][0], width());
-		}
-		bayerGBRG2x2(p - width(), &image[v][0], width());
-	    }
-	    break;
-
-	  default:
-	    *this >> image;
-	    break;
 	}
 	break;
 
@@ -2012,12 +1685,6 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 
     return *this;
 }
-#else
-struct RGB
-{
-    u_char	r, g, b;
-};
-#endif	// HAVE_LIBTUTOOLS__
 
 //! IIDCカメラから出力された画像1枚分のデータをなんら変換を行わずに取り込む
 /*!
@@ -2057,6 +1724,8 @@ IIDCCamera::captureBayerRaw(void* image) const
     if (_img == 0)
 	throw std::runtime_error("TU::IIDCCamera::captureBayerRaw: no images snapped!!");
 
+    auto	rgb = static_cast<RGB*>(image);
+
   // Transfer image data from current buffer.
     switch (pixelFormat())
     {
@@ -2064,72 +1733,32 @@ IIDCCamera::captureBayerRaw(void* image) const
 	switch (_bayer)
 	{
 	  case RGGB:
-	  {
-	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerRGGB2x2(_img, rgb, width());
-	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理 
-	    {
-		p = bayerRGGBOdd3x3 (p, rgb, width());
-		rgb += width();
-		p = bayerRGGBEven3x3(p, rgb, width());
-		rgb += width();
-	    }
-	    bayerRGGB2x2(p - width(), rgb, width());
-	  }
+	    bayerDecodeRGGB(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    make_flat_row_iterator(rgb, width()));
 	    break;
-
 	  case BGGR:
-	  {
-	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerBGGR2x2(_img, rgb, width());
-	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-	    {
-		p = bayerBGGROdd3x3 (p, rgb, width());
-		rgb += width();
-		p = bayerBGGREven3x3(p, rgb, width());
-		rgb += width();
-	    }
-	    bayerBGGR2x2(p - width(), rgb, width());
-	  }
+	    bayerDecodeBGGR(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    make_flat_row_iterator(rgb, width()));
 	    break;
 
 	  case GRBG:
-	  {
-	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerGRBG2x2(_img, rgb, width());
-	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-	    {
-		p = bayerGRBGOdd3x3 (p, rgb, width());
-		rgb += width();
-		p = bayerGRBGEven3x3(p, rgb, width());
-		rgb += width();
-	    }
-	    bayerGRBG2x2(p - width(), rgb, width());
-	  }
+	    bayerDecodeGRBG(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    make_flat_row_iterator(rgb, width()));
 	    break;
-
 	  case GBRG:
-	  {
-	    RGB*		rgb = (RGB*)image;
-	    const u_char*	p = bayerGBRG2x2(_img, rgb, width());
-	    rgb += width();
-	    for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-	    {
-		p = bayerGBRGOdd3x3 (p, rgb, width());
-		rgb += width();
-		p = bayerGBRGEven3x3(p, rgb, width());
-		rgb += width();
-	    }
-	    bayerGBRG2x2(p - width(), rgb, width());
-	  }
+	    bayerDecodeGBRG(make_flat_row_iterator(_img, width()),
+			    make_flat_row_iterator(_img + height()*width(),
+						   width()),
+			    make_flat_row_iterator(rgb, width()));
 	    break;
-
 	  default:
 	  {
-	    RGB*		rgb = (RGB*)image;
 	    const u_char*	p = _img;
 	    for (int n = width() * height(); n-- > 0; )
 	    {
@@ -2142,154 +1771,89 @@ IIDCCamera::captureBayerRaw(void* image) const
 	break;
 	
       case MONO_16:
-	switch (_bayer)
+	if (_littleEndian)
 	{
-	  case RGGB:
-	    if (_littleEndian)
+	    auto	p = reinterpret_cast<const u_short*>(_img);
+	    
+	    switch (_bayer)
 	    {
-		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerRGGB2x2((const u_short*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
+	      case RGGB:
+		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				make_flat_row_iterator(rgb, width()));
+		break;
+	      case BGGR:
+		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				make_flat_row_iterator(rgb, width()));
+		break;
+	      case GRBG:
+		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				make_flat_row_iterator(rgb, width()));
+		break;
+	      case GBRG:
+		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
+				make_flat_row_iterator(p + height()*width(),
+						       width()),
+				make_flat_row_iterator(rgb, width()));
+		break;
+	      default:
+	      {
+		const u_char*	p = _img;
+		for (int n = width() * height(); n-- > 0; )
 		{
-		    p = bayerRGGBOdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerRGGBEven3x3(p, rgb, width());
-		    rgb += width();
+		    rgb->r = rgb->g = rgb->b = *p++;
+		    ++rgb;
 		}
-		bayerRGGB2x2(p - width(), rgb, width());
+	      }
+	        break;
 	    }
-	    else
-	    {
-		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerRGGB2x2((const Mono16*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-		{
-		    p = bayerRGGBOdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerRGGBEven3x3(p, rgb, width());
-		    rgb += width();
-		}
-		bayerRGGB2x2(p - width(), rgb, width());
-	    }
-	    break;
+	}
+	else
+	{
+	    auto	p = reinterpret_cast<const Mono16*>(_img);
 
-	  case BGGR:
-	    if (_littleEndian)
+	    switch (_bayer)
 	    {
-		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerBGGR2x2((const u_short*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-		{
-		    p = bayerBGGROdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerBGGREven3x3(p, rgb, width());
-		    rgb += width();
-		}
-		bayerBGGR2x2(p - width(), rgb, width());
-	    }
-	    else
-	    {
-		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerBGGR2x2((const Mono16*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-		{
-		    p = bayerBGGROdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerBGGREven3x3(p, rgb, width());
-		    rgb += width();
-		}
-		bayerBGGR2x2(p - width(), rgb, width());
-	    }
-	    break;
-	    
-	  case GRBG:
-	    if (_littleEndian)
-	    {
-		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerGRBG2x2((const u_short*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-		{
-		    p = bayerGRBGOdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerGRBGEven3x3(p, rgb, width());
-		    rgb += width();
-		}
-		bayerGRBG2x2(p - width(), rgb, width());
-	    }
-	    else
-	    {
-		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerGRBG2x2((const Mono16*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-		{
-		    p = bayerGRBGOdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerGRBGEven3x3(p, rgb, width());
-		    rgb += width();
-		}
-		bayerGRBG2x2(p - width(), rgb, width());
-	    }
-	    break;
-	    
-	  case GBRG:
-	    if (_littleEndian)
-	    {
-		RGB*		rgb = (RGB*)image;
-		const u_short*	p = bayerGBRG2x2((const u_short*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-		{
-		    p = bayerGBRGOdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerGBRGEven3x3(p, rgb, width());
-		    rgb += width();
-		}
-		bayerGBRG2x2(p - width(), rgb, width());
-	    }
-	    else
-	    {
-		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = bayerGBRG2x2((const Mono16*)_img, rgb, width());
-		rgb += width();
-		for (int n = height(); (n -= 2) > 0; )	// 中間の行を処理
-		{
-		    p = bayerGBRGOdd3x3 (p, rgb, width());
-		    rgb += width();
-		    p = bayerGBRGEven3x3(p, rgb, width());
-		    rgb += width();
-		}
-		bayerGBRG2x2(p - width(), rgb, width());
-	    }
-	    break;
-	    
-	  default:
-	    if (_littleEndian)
-	    {
-		RGB*		rgb = (RGB*)image;
-		const u_short*	p = (const u_short*)_img;
+	      case RGGB:
+		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
+				   make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   make_flat_row_iterator(rgb, width()));
+		break;
+	      case BGGR:
+		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
+				   make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   make_flat_row_iterator(rgb, width()));
+		break;
+	      case GRBG:
+		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
+				   make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   make_flat_row_iterator(rgb, width()));
+		break;
+	      case GBRG:
+		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
+				   make_flat_row_iterator(p + height()*width(),
+							  width()),
+				   make_flat_row_iterator(rgb, width()));
+		break;
+	      default:
+	      {
+		const u_char*	p = _img;
 		for (int n = width() * height(); n-- > 0; )
 		{
 		    rgb->r = rgb->g = rgb->b = *p++;
 		    ++rgb;
 		}
+	      }
+	        break;
 	    }
-	    else
-	    {
-		RGB*		rgb = (RGB*)image;
-		const Mono16*	p = (const Mono16*)_img;
-		for (int n = width() * height(); n-- > 0; )
-		{
-		    rgb->r = rgb->g = rgb->b = *p++;
-		    ++rgb;
-		}
-	    }
-	    break;
 	}
 	break;
 	
@@ -2297,7 +1861,7 @@ IIDCCamera::captureBayerRaw(void* image) const
 	throw std::domain_error("TU::IIDCCamera::captureBayerRaw: must be MONO_8 or MONO_16 format!!");
 	break;
     }
-
+    
     return *this;
 }
 
@@ -3165,7 +2729,6 @@ operator >>(std::istream& in, IIDCCamera& camera)
     return in;
 }
  
-#ifdef HAVE_LIBTUTOOLS__
 template const IIDCCamera&
 IIDCCamera::operator >>(Image<u_char>& image)	const	;
 template const IIDCCamera&
@@ -3196,5 +2759,4 @@ template const IIDCCamera&
 IIDCCamera::captureRGBImage(Image<BGR>& image)	const	;
 template const IIDCCamera&
 IIDCCamera::captureRGBImage(Image<ABGR>& image)	const	;
-#endif		// HAVE_LIBTUTOOLS__
 }

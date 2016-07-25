@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../testcam -I$(HOME)/multicam/server -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DHAVE_LIBTUTOOLS__
+CPPFLAGS	= -DNDEBUG
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
