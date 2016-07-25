@@ -1,1 +1,1 @@
-../stereo1394/MyOglCanvasPane.cc
+../stereoIIDC/MyOglCanvasPane.cc

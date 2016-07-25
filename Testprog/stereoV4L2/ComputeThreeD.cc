@@ -1,1 +1,1 @@
-../stereo1394/ComputeThreeD.cc
+../stereoIIDC/ComputeThreeD.cc

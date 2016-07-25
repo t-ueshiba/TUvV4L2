@@ -21,7 +21,7 @@ SUBDIR	= BandMatrix		\
 	  Vector		\
 	  WeightedMedianFilter	\
 	  simd			\
-	  stereo1394		\
+	  stereoIIDC		\
 	  stereoGUI		\
 	  stereoTest		\
 	  stereoTime		\

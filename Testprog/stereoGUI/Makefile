@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I../stereo1394 -I$(PREFIX)/include
+INCDIRS		= -I../.. -I../stereoIIDC -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
@@ -57,6 +57,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/io.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
+		../../TU/simd/BufTraits.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
 		../../TU/simd/arm/allocator.h \
@@ -121,15 +122,15 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/vec.h \
 		../../TU/simd/x86/zero.h \
 		../../TU/simd/zero.h \
+		../../TU/simd/zero.h \
 		../../TU/tuple.h \
 		../../TU/types.h \
-		../../windows/fakeWindows.h \
-		../stereo1394/ComputeThreeD.h \
-		../stereo1394/DrawThreeD.h \
-		../stereo1394/MyCanvasPane.h \
-		../stereo1394/MyOglCanvasPane.h \
-		../stereo1394/stereo1394.h \
-		/usr/local/include/TU/Ieee1394++.h \
+		../stereoIIDC/ComputeThreeD.h \
+		../stereoIIDC/DrawThreeD.h \
+		../stereoIIDC/MyCanvasPane.h \
+		../stereoIIDC/MyOglCanvasPane.h \
+		../stereoIIDC/stereoIIDC.h \
+		/usr/local/include/TU/IIDC++.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -172,11 +173,11 @@ OBJS		= ComputeThreeD.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-ComputeThreeD.o: ../stereo1394/ComputeThreeD.h ../../TU/Geometry++.h \
+ComputeThreeD.o: ../stereoIIDC/ComputeThreeD.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
 	../../TU/Minimize.h
-DrawThreeD.o: ../stereo1394/DrawThreeD.h ../../TU/Warp.h \
+DrawThreeD.o: ../stereoIIDC/DrawThreeD.h ../../TU/Warp.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
@@ -211,8 +212,9 @@ DrawThreeD.o: ../stereo1394/DrawThreeD.h ../../TU/Warp.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h
-MyCanvasPane.o: ../stereo1394/MyCanvasPane.h \
+	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
+	../../TU/simd/BufTraits.h ../../TU/simd/zero.h
+MyCanvasPane.o: ../stereoIIDC/MyCanvasPane.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
@@ -264,19 +266,20 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
 	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Profiler.h ../../windows/fakeWindows.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/GFStereo.h ../stereo1394/stereo1394.h \
-	/usr/local/include/TU/Ieee1394++.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/Timer.h \
-	../../TU/Rectify.h ../../TU/Warp.h ../../TU/Camera++.h \
-	../stereo1394/MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
+	../../TU/simd/BufTraits.h ../../TU/simd/zero.h ../../TU/Profiler.h \
+	../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/GFStereo.h \
+	../stereoIIDC/stereoIIDC.h /usr/local/include/TU/IIDC++.h \
+	MyCmdWindow.h /usr/local/include/TU/v/App.h \
+	/usr/local/include/TU/v/Timer.h ../../TU/Rectify.h ../../TU/Warp.h \
+	../../TU/Camera++.h ../stereoIIDC/MyCanvasPane.h \
+	/usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
-	../stereo1394/MyOglCanvasPane.h /usr/local/include/TU/v/OglDC.h \
+	../stereoIIDC/MyOglCanvasPane.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h /usr/local/include/TU/v/DC3.h \
-	../stereo1394/DrawThreeD.h ../stereo1394/ComputeThreeD.h
-MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
+	../stereoIIDC/DrawThreeD.h ../stereoIIDC/ComputeThreeD.h
+MyOglCanvasPane.o: ../stereoIIDC/MyOglCanvasPane.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
@@ -288,7 +291,7 @@ MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	../stereo1394/DrawThreeD.h ../../TU/Warp.h ../../TU/Camera++.h \
+	../stereoIIDC/DrawThreeD.h ../../TU/Warp.h ../../TU/Camera++.h \
 	../../TU/simd/simd.h ../../TU/simd/config.h ../../TU/simd/vec.h \
 	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
 	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
@@ -319,15 +322,15 @@ MyOglCanvasPane.o: ../stereo1394/MyOglCanvasPane.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h
-createMenuCmds.o: ../stereo1394/stereo1394.h \
+	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
+	../../TU/simd/BufTraits.h ../../TU/simd/zero.h
+createMenuCmds.o: ../stereoIIDC/stereoIIDC.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
 	../../TU/Minimize.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/Ieee1394++.h
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/IIDC++.h
 main.o: ../../TU/io.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
@@ -364,18 +367,18 @@ main.o: ../../TU/io.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
 	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/Profiler.h ../../windows/fakeWindows.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/GFStereo.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
-	/usr/local/include/TU/v/Colormap.h ../../TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/simd/BufTraits.h ../../TU/simd/zero.h ../../TU/Profiler.h \
+	../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/GFStereo.h \
+	MyCmdWindow.h /usr/local/include/TU/v/App.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/Timer.h ../../TU/Rectify.h ../../TU/Warp.h \
-	../../TU/Camera++.h ../stereo1394/MyCanvasPane.h \
+	../../TU/Camera++.h ../stereoIIDC/MyCanvasPane.h \
 	/usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
-	../stereo1394/MyOglCanvasPane.h /usr/local/include/TU/v/OglDC.h \
+	../stereoIIDC/MyOglCanvasPane.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h /usr/local/include/TU/v/DC3.h \
-	../stereo1394/DrawThreeD.h
+	../stereoIIDC/DrawThreeD.h

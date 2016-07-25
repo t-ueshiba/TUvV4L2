@@ -444,14 +444,14 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 		restoreCalibration();
 		initializeRectification();
 		for (int i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->continuousShot();
+		    _cameras[i]->continuousShot(true);
 		_timer.start(1);
 	    }
 	    else
 	    {
 		_timer.stop();
 		for (int i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->stopContinuousShot();
+		    _cameras[i]->continuousShot(false);
 	    }
 	    break;
 	
@@ -755,7 +755,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::stopContinuousShotIfRunning()
     {
 	_timer.stop();
 	for (int i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->stopContinuousShot();
+	    _cameras[i]->continuousShot(false);
 	_captureCmd.setValue(c_ContinuousShot, 0);
     }
 }
