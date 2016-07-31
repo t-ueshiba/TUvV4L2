@@ -17,6 +17,8 @@ CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DAVX2
 endif

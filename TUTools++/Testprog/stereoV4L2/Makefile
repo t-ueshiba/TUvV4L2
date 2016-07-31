@@ -15,11 +15,14 @@ MOCHDRS		=
 INCDIRS		= -I../.. -I../stereoIIDC -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DUSE_TBB -DDISPLAY_2D -DDISPLAY_3D -DNO_RV
 CFLAGS		= -O3
-NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+NVCCFLAGS	= -O
+ifeq ($(shell arch),armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DAVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -29,6 +32,9 @@ LIBS		= -lTUV4L2++ -lTUOgl++ -lTUv++ -lTUTools++ \
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
+endif
+ifeq ($(shell arch), aarch64)
+  LIBS	       += -ldrm
 endif
 
 LINKER		= $(CXX)

@@ -52,8 +52,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
 		../../TU/tuple.h \
-		../../TU/types.h \
-		../../windows/fakeWindows.h
+		../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -68,5 +67,4 @@ main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
 	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
 	../../TU/Minimize.h ../../TU/FIRGaussianConvolver.h \
-	../../TU/FIRFilter.h ../../TU/SeparableFilter2.h ../../TU/Profiler.h \
-	../../windows/fakeWindows.h
+	../../TU/FIRFilter.h ../../TU/SeparableFilter2.h ../../TU/Profiler.h

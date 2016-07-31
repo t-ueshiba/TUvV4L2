@@ -15,18 +15,24 @@ MOCHDRS		=
 INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DUSE_TBB -DNO_RV -DDISPLAY_2D -DDISPLAY_3D \
 		#-DUSE_VIDEO1394 -DDIRECT_CAPTURE
-CFLAGS		= -g
-NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3 -xAVX
-  NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DAVX
+CFLAGS		= -O3
+NVCCFLAGS	= -O
+ifeq ($(shell arch),armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DAVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUIIDC++ -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 \
 		  -lraw1394 -lusb-1.0 -ltbb -ltbbmalloc
+ifeq ($(shell arch), aarch64)
+  LIBS	       += -ldrm
+endif
 
 LINKER		= $(CXX)
 
