@@ -12,11 +12,13 @@ IDLS		=
 
 INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
-NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
+CFLAGS		= -O
+NVCCFLAGS	= -O
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
@@ -25,6 +27,9 @@ LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+endif
+ifeq ($(shell arch), aarch64)
+  LIBS	       += -ldrm
 endif
 
 LINKER		= $(CXX)

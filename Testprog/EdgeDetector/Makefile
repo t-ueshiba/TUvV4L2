@@ -14,21 +14,18 @@ MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
-NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-#  CPPFLAGS     += -DSSE3
+CFLAGS		= -O3
+NVCCFLAGS	= -O
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUTools++
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
-
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
@@ -51,8 +48,8 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
 		/usr/local/include/TU/pair.h \
+		/usr/local/include/TU/simd/BufTraits.h \
 		/usr/local/include/TU/simd/allocator.h \
 		/usr/local/include/TU/simd/arithmetic.h \
 		/usr/local/include/TU/simd/arm/allocator.h \
@@ -117,13 +114,12 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/simd/x86/vec.h \
 		/usr/local/include/TU/simd/x86/zero.h \
 		/usr/local/include/TU/simd/zero.h \
+		/usr/local/include/TU/simd/zero.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= EdgeDetector.cc \
-		main.cc
-OBJS		= EdgeDetector.o \
-		main.o
+SRCS		= main.cc
+OBJS		= main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -131,13 +127,6 @@ OBJS		= EdgeDetector.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-EdgeDetector.o: /usr/local/include/TU/EdgeDetector.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/mmInstructions.h
 main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
@@ -208,5 +197,7 @@ main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/simd/cvtup_iterator.h \
 	/usr/local/include/TU/simd/shift_iterator.h \
 	/usr/local/include/TU/simd/row_vec_iterator.h \
+	/usr/local/include/TU/simd/BufTraits.h \
+	/usr/local/include/TU/simd/zero.h \
 	/usr/local/include/TU/DericheConvolver.h \
 	/usr/local/include/TU/EdgeDetector.h

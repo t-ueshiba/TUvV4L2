@@ -16,15 +16,20 @@ INCDIRS		= -I../.. -I../stereoIIDC -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DUSE_TBB #-DWITHOUT_CVTDOWN -DRING
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
   CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 -ltbb -ltbbmalloc
+ifeq ($(shell arch), aarch64)
+  LIBS	       += -ldrm
+endif
 
 LINKER		= $(CXX)
 

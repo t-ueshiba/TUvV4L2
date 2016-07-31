@@ -46,8 +46,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
 		../../TU/tuple.h \
-		../../TU/types.h \
-		../../windows/fakeWindows.h
+		../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -60,4 +59,4 @@ include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
 	../../TU/functional.h ../../TU/pair.h ../../TU/TreeFilter.h \
-	../../TU/Profiler.h ../../TU/types.h ../../windows/fakeWindows.h
+	../../TU/Profiler.h ../../TU/types.h

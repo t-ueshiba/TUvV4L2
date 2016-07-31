@@ -52,6 +52,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/functional.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
+		../../TU/simd/BufTraits.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
 		../../TU/simd/arm/allocator.h \
@@ -116,9 +117,9 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/vec.h \
 		../../TU/simd/x86/zero.h \
 		../../TU/simd/zero.h \
+		../../TU/simd/zero.h \
 		../../TU/tuple.h \
-		../../TU/types.h \
-		../../windows/fakeWindows.h
+		../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -165,5 +166,5 @@ main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
 	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/GaussianConvolver.h ../../TU/Profiler.h \
-	../../windows/fakeWindows.h
+	../../TU/simd/BufTraits.h ../../TU/simd/zero.h \
+	../../TU/GaussianConvolver.h ../../TU/Profiler.h

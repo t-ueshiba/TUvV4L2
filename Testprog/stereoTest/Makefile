@@ -17,6 +17,8 @@ CPPFLAGS	= -DNDEBUG -DWITHOUT_CVTDOWN
 CFLAGS		= -g -O3
 ifeq ($(shell arch),armv7l)
   CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DSSE3
 endif
@@ -118,9 +120,9 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/vec.h \
 		../../TU/simd/x86/zero.h \
 		../../TU/simd/zero.h \
+		../../TU/simd/zero.h \
 		../../TU/tuple.h \
-		../../TU/types.h \
-		../../windows/fakeWindows.h
+		../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -167,6 +169,6 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
 	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/simd/BufTraits.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
-	../../TU/algorithm.h ../../TU/Profiler.h ../../windows/fakeWindows.h \
+	../../TU/simd/BufTraits.h ../../TU/simd/zero.h ../../TU/SADStereo.h \
+	../../TU/StereoBase.h ../../TU/algorithm.h ../../TU/Profiler.h \
 	../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/GFStereo.h
