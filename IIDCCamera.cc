@@ -1126,9 +1126,6 @@ IIDCCamera::setActive(Strobe strobe, bool enable)
 	const auto	val = readQuadletFromACRegister(PIO_DIRECTION);
 	const uint32_t	bit = 0x1u << (31 - ((strobe - Strobe_0) >> 2));
 
-	using namespace	std;
-	cerr << "PIO_DIRECTION: " << showbase << hex << val << dec << endl;
-	
 	writeQuadletToACRegister(PIO_DIRECTION,
 				 (enable ? val | bit : val & ~bit));
     }
