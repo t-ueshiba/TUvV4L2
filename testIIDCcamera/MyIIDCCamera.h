@@ -26,16 +26,6 @@
 
 namespace TU
 {
-/*!
-  RGB カラー画像の画素を表す構造体．
-*/
-struct MyRGB
-{
-    u_char	r;	//!< 赤
-    u_char	g;	//!< 青
-    u_char	b;	//!< 緑
-};
-
 /************************************************************************
 *  class MyIIDCCamera							*
 ************************************************************************/
@@ -61,7 +51,7 @@ class MyIIDCCamera : public IIDCCamera
   private:
     GtkWidget* const	_canvas;	// 画像を表示する領域
     u_char*		_buf;		// 入力画像用バッファ
-    MyRGB*		_rgb;		// RGB カラー画像(表示用)バッファ
+    RGB*		_rgb;		// RGB カラー画像(表示用)バッファ
 };
 
 inline GtkWidget*
