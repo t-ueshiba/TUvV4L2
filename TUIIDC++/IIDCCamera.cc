@@ -2353,7 +2353,7 @@ IIDCCamera::inquireFrameRate_or_Format_7_Offset(Format format) const
     const quadlet_t	Mode_4		= 0x1u << 27;
     const quadlet_t	Mode_5		= 0x1u << 26;
     const quadlet_t	Mode_6		= 0x1u << 25;
-    const quadlet_t	Mode_7		= 0x1u << 26;
+    const quadlet_t	Mode_7		= 0x1u << 24;
     inq = 0;
     switch (format)	// Check presence of mode.
     {
