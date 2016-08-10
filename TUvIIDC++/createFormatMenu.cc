@@ -47,7 +47,7 @@ static constexpr struct
     {IIDCCamera::Format_7_4,		"Format_7_4"},
     {IIDCCamera::Format_7_5,		"Format_7_5"},
     {IIDCCamera::Format_7_6,		"Format_7_6"},
-    {IIDCCamera::Format_7_6,		"Format_7_7"}
+    {IIDCCamera::Format_7_7,		"Format_7_7"}
 };
 static constexpr int	NFORMATS = sizeof(formats)/sizeof(formats[0]);
 
