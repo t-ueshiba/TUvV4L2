@@ -14,7 +14,7 @@ MOCHDRS		=
 
 INCDIRS		= -I.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG #-DG_DISABLE_DETPRECATED -DGTK_DISABLE_DEPRECATED #-DUSE_VIDEO1394
-CFLAGS		= -g
+CFLAGS		= -O
 
 NVCCFLAGS	= -O
 CFLAGS	       += $(shell pkg-config gtk+-2.0 --cflags)
