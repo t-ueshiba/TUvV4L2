@@ -475,11 +475,6 @@ template <class T, size_t D=0, class ALLOC=std::allocator<T> >
 class Array : public Buf<T, D, ALLOC>
 {
   private:
-    template <class T_, size_t D_, class ALLOC_>
-    static std::true_type	check(Array<T_, D_, ALLOC_>)	;
-    static std::false_type	check(...)			;
-
-    typedef decltype(check(std::declval<T>()))		value_is_array;
     typedef typename std::is_arithmetic<T>::type	value_is_arithmetic;
     typedef Buf<T, D, ALLOC>				super;
 
@@ -793,7 +788,7 @@ class Array : public Buf<T, D, ALLOC>
 
     void		init()
 			{
-			    init(value_is_array());
+			    init(value_is_arithmetic());
 			}
 
   protected:
@@ -805,19 +800,9 @@ class Array : public Buf<T, D, ALLOC>
   private:
     void		init(std::true_type)
 			{
-			    for (auto& x : *this)
-				x.init();
-			}
-    void		init(std::false_type)
-			{
-			    init_nonarray(value_is_arithmetic());
-			}
-
-    void		init_nonarray(std::true_type)
-			{
 			    super::init(begin(), end());
 			}
-    void		init_nonarray(std::false_type)
+    void		init(std::false_type)
 			{
 			}
 };
@@ -870,7 +855,8 @@ class Array2 : public Array<T, R>
 		    if (size() > 0)
 			_ncol = _buf.size() / size();
 		    set_rows();
-		    super::init();
+		    for (auto& x : *this)
+			x.init();
 		}
 
 		Array2(const Array2& a)		//!< コピーコンストラクタ
@@ -943,7 +929,8 @@ class Array2 : public Array<T, R>
 		    :super(r), _ncol(c), _buf(size()*stride(unit))
 		{
 		    set_rows();
-		    super::init();
+		    for (auto& x : *this)
+			x.init();
 		}
 
   //! 外部の領域と行数および列数を指定して2次元配列を生成する．
@@ -1137,14 +1124,17 @@ class Array2 : public Array<T, R>
   */
     bool		resize(size_t r, size_t c, size_t unit=1)
 			{
-			    if (!super::resize(r) && _ncol == c)
-				return false;
-			    
-			    _ncol = c;
-			    _buf.resize(size()*stride(unit));
-			    set_rows();
-			    super::init();
-			    return true;
+			    bool	enlarged = false;
+			    if (super::resize(r) || _ncol != c)
+			    {
+				enlarged = true;
+				_ncol = c;
+				_buf.resize(size()*stride(unit));
+				set_rows();
+			    }
+			    for (auto& x : *this)
+				x.init();
+			    return enlarged;
 			}
 	
   //! 配列が内部で使用する記憶領域を指定したものに変更する．
