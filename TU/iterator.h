@@ -144,7 +144,7 @@ make_fast_zip_iterator(const ITER_TUPLE& t)
 
 namespace std
 {
-#if __cplusplus <= 201103L
+#if __cplusplus < 201402L
 /************************************************************************
 *  std::[rbegin|rend](T)						*
 ************************************************************************/
@@ -306,7 +306,7 @@ rend(const boost::tuples::cons<HEAD, TAIL>& x)
 					  detail::generic_rend(), x));
 }
 
-#if __cplusplus <= 201103L
+#if __cplusplus < 201402L
 /************************************************************************
 *  std::[cbegin|cend|crbegin|crend](T)					*
 ************************************************************************/
