@@ -133,6 +133,7 @@ class BezierCurve
 
   private:
     void	resize(coord_type* p, size_t siz)	{_c.resize(p, siz);}
+    void	init()					{_c.init();}
 		
   private:
     coord_array	_c;
