@@ -92,7 +92,7 @@ static const uint32_t	UNIT_POSITION_INQ		= 0x04c;
 static const uint32_t	VALUE_SETTING			= 0x07c;
 
 // NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
-static const u_int	NBUFFERS			= 4;
+static const u_int	NBUFFERS			= 2;
 
 static const uint64_t	PointGrey_Feature_ID		= 0x00b09d000004ull;
 
@@ -189,6 +189,23 @@ uint64_t
 IIDCCamera::globalUniqueId() const
 {
     return _node->globalUniqueId();
+}
+
+//! IIDCカメラの設定を工場出荷時に戻す
+/*!
+  \return	このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::initialize()
+{
+    constexpr uint32_t	INITIALIZE = 0x0;
+    constexpr quadlet_t	Reset = 0x1u << 31;
+
+    writeQuadletToRegister(INITIALIZE, Reset);
+    while (readQuadletFromRegister(INITIALIZE) & Reset)
+	;
+
+    return *this;
 }
     
 //! IIDCカメラの電源をon/offする
