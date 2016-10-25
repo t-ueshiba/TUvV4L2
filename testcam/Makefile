@@ -73,14 +73,26 @@ EXTHDRS		= ../TU/IIDC++.h \
 HDRS		= MyCanvasPane.h \
 		MyCmdWindow.h \
 		testcam.h
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= createFormatMenu.cc \
+		main.cc
+OBJS		= createFormatMenu.o \
+		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# modified: CPPFLAGS, LIBS
 #include $(PROJECT)/lib/cnoid.mk	# modified: CPPFLAGS, LIBS, LIBDIR
 #include $(PROJECT)/lib/lib.mk		# added:    PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
+createFormatMenu.o: /usr/local/include/TU/v/vIIDC++.h \
+	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+	../TU/IIDC++.h
 main.o: /usr/local/include/TU/v/vIIDC++.h \
 	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \

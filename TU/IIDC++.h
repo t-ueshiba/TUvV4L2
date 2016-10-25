@@ -467,6 +467,7 @@ class IIDCCamera
     ~IIDCCamera()							;
 
     uint64_t		globalUniqueId()			const	;
+    IIDCCamera&		initialize()					;
 
   // Basic function stuffs.
     quadlet_t		inquireBasicFunction()			const	;
