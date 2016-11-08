@@ -167,7 +167,7 @@ FireWireNode::flushListenBuffer()
 }
 
 uint32_t
-FireWireNode::getCycleTime(uint64_t& localtime) const
+FireWireNode::getCycletime(uint64_t& localtime) const
 {
     uint32_t	cycletime;
     raw1394_read_cycle_timer(_handle, &cycletime, &localtime);

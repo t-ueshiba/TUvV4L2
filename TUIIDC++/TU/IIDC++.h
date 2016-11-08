@@ -225,7 +225,7 @@ class IIDCNode
     \param localtime	OSのローカルタイムが返される.
     \return		バスのサイクルタイム.
   */
-    virtual uint32_t	getCycleTime(uint64_t& localtime)	const	= 0;
+    virtual uint32_t	getCycletime(uint64_t& localtime)	const	= 0;
     
   private:
     uint32_t		readValueFromUnitDependentDirectory(uint8_t key)
@@ -568,17 +568,21 @@ class IIDCCamera
     const IIDCCamera&	captureRaw(void* image)			const	;
     const IIDCCamera&	captureBayerRaw(void* image)		const	;
     IIDCCamera&		embedTimestamp(bool enable)			;
-    uint64_t		getTimestamp()				const	;
-    uint32_t		getCycleTime(uint64_t& localtime)	const	;
+    uint32_t		getTimestamp()				const	;
+    uint32_t		getCycletime(uint64_t& localtime)	const	;
     uint64_t		cycletimeToLocaltime(uint32_t cycletime) const	;
     
   // Utility functions.
-    static Format	uintToFormat(u_int format)			;
-    static FrameRate	uintToFrameRate(u_int frameRate)		;
-    static Feature	uintToFeature(u_int feature)			;
-    static TriggerMode	uintToTriggerMode(u_int triggerMode)		;
-    static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
-
+    static Format		uintToFormat(u_int format)		;
+    static FrameRate		uintToFrameRate(u_int frameRate)	;
+    static Feature		uintToFeature(u_int feature)		;
+    static TriggerMode		uintToTriggerMode(u_int triggerMode)	;
+    static PixelFormat		uintToPixelFormat(u_int pixelFormat)	;
+    static std::ostream&	printCycletime(std::ostream& out,
+					       uint32_t cycletime)	;
+    static std::ostream&	printLocaltime(std::ostream& out,
+					       uint64_t localtime)	;
+    
   private:
     uint32_t	getAbsValueOffset(Feature feature)		 const	;
     uint32_t	getStrobeOffset(Strobe strobe)			 const	;
@@ -688,7 +692,7 @@ IIDCCamera::captureDirectly(Image<T>& image) const
 {
     if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureDirectly: no images snapped!!");
-    image.resize((T*)_img, height(), width());
+    image.resize(reinterpret_cast<T*>(_img), height(), width());
 
     return *this;
 }
@@ -696,13 +700,23 @@ IIDCCamera::captureDirectly(Image<T>& image) const
 //! 画像に埋め込まれた撮影時刻を得る．
 /*!
   予め embedTimestamp() によって画像への撮影時刻埋め込みを指示しなければならない．
-  \return	micro second単位で表した画像の撮影時刻
+  \return	サイクル時刻単位で表した画像の撮影時刻
 */
-inline uint64_t
+inline uint32_t
 IIDCCamera::getTimestamp() const
 {
-    return (_img ? cycletimeToLocaltime(
-		       ntohl(*reinterpret_cast<const uint32_t*>(_img))) : 0);
+    return (_img ? ntohl(*reinterpret_cast<const uint32_t*>(_img)) : 0);
+}
+
+//! 同時にサイクル時刻とシステム時刻を得る．
+/*!
+  \param localtime	マイクロ秒単位でシステム時刻が返される
+  \return		サイクル時刻
+*/
+inline uint32_t
+IIDCCamera::getCycletime(uint64_t& localtime) const
+{
+    return _node->getCycletime(localtime);
 }
 
 inline void
