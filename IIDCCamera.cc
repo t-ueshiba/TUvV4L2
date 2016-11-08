@@ -45,14 +45,14 @@ getNode(IIDCCamera::Type type, uint64_t uniqId)
     return nullptr;
 }
     
-static inline uint32_t
-cycletime_to_subcycle(uint32_t cycletime)
+static inline uint64_t
+cycletime_to_cycle(uint32_t cycletime)
 {
     uint32_t	sec	 = (cycletime & 0xfe000000) >> 25;
     uint32_t	cycle	 = (cycletime & 0x01fff000) >> 12;
     uint32_t	subcycle = (cycletime & 0x00000fff);
 
-    return subcycle + 3072*(cycle + 8000*sec);
+    return cycle + 8000*sec;
 }
 
 /************************************************************************
@@ -291,6 +291,38 @@ IIDCCamera::getSpeed() const
     throw std::runtime_error("Unknown speed!!");
 
     return SPD_100M;
+}
+
+//! 指定された画像フォーマットにおいてサポートされているフレームレートを調べる
+/*!
+  \param format	対象となるフォーマット
+  \return	サポートされているフレームレートを #FrameRate 型の列挙値
+		のorとして返す. 指定されたフォーマット自体がこのカメラでサ
+		ポートされていなければ, 0が返される.
+*/
+quadlet_t
+IIDCCamera::inquireFrameRate(Format format) const
+{
+    quadlet_t	quad = inquireFrameRate_or_Format_7_Offset(format);
+
+    switch (format)
+    {
+      case Format_7_0:
+      case Format_7_1:
+      case Format_7_2:
+      case Format_7_3:
+      case Format_7_4:
+      case Format_7_5:
+      case Format_7_6:
+      case Format_7_7:
+	if (quad != 0)
+	    return FrameRate_x;
+	break;
+      default:
+	break;
+    }
+
+    return quad;
 }
 
 //! 画像フォーマットとフレームレートを設定する
@@ -1898,28 +1930,25 @@ IIDCCamera::embedTimestamp(bool enable)
     return *this;
 }
 
-uint32_t
-IIDCCamera::getCycleTime(uint64_t& localtime) const
-{
-    return _node->getCycleTime(localtime);
-}
-
 uint64_t
 IIDCCamera::cycletimeToLocaltime(uint32_t cycletime) const
 {
   // 現在のcycletimeとlocaltimeを獲得する.
     uint64_t	localtime0;
-    uint32_t	cycletime0 = getCycleTime(localtime0);
+    uint32_t	cycletime0 = getCycletime(localtime0);
 
+    printCycletime(std::cerr, cycletime) << std::endl;
+    printCycletime(std::cerr, cycletime0) << '\t';
+    printLocaltime(std::cerr, localtime0) << std::endl << "\t\t";
+    
   // 現時刻と指定された時刻のサイクル時刻をサブサイクル値に直し，
   // 両者のずれを求める.
-    u_int32_t	subcycle0 = cycletime_to_subcycle(cycletime0);
-    u_int32_t	subcycle  = cycletime_to_subcycle(cycletime);
-    u_int64_t	diff	  = (subcycle0 + (128LL*8000LL*3072LL) - subcycle)
-			  % (128LL*8000LL*3072LL);
+    u_int64_t	cycle0 = cycletime_to_cycle(cycletime0);
+    u_int64_t	cycle  = cycletime_to_cycle(cycletime);
+    u_int64_t	diff   = (cycle0 + (128LL*8000LL) - cycle) % (128LL*8000LL);
 
-  // ずれをmicro sec単位に直して(1 subcycle = 125/3072 usec)現在時刻から差し引く.
-    return localtime0 - (125LL*diff)/3072LL;
+  // ずれをmicro sec単位に直して(1 cycle = 125 usec)現在時刻から差し引く.
+    return localtime0 - 125LL*diff;
 }
     
 //! unsinged intの値を同じビットパターンを持つ #Format に直す
@@ -2177,38 +2206,39 @@ IIDCCamera::uintToPixelFormat(u_int pixelFormat)
     return MONO_8;
 }
 
-//! 指定された画像フォーマットにおいてサポートされているフレームレートを調べる
+//! 指定された出力ストリームにサイクルタイムを出力する．
 /*!
-  \param format	対象となるフォーマット
-  \return	サポートされているフレームレートを #FrameRate 型の列挙値
-		のorとして返す. 指定されたフォーマット自体がこのカメラでサ
-		ポートされていなければ, 0が返される.
+ \param	out		出力ストリーム
+ \param cycletime	サイクルタイム(sec: 7, cycle: 13, subcycle: 12 bits)
+ \return		outに指定した出力ストリーム
 */
-quadlet_t
-IIDCCamera::inquireFrameRate(Format format) const
+std::ostream&
+IIDCCamera::printCycletime(std::ostream& out, uint32_t cycletime)
 {
-    quadlet_t	quad = inquireFrameRate_or_Format_7_Offset(format);
+    uint32_t	sec	 = (cycletime & 0xfe000000) >> 25;
+    uint32_t	cycle	 = (cycletime & 0x01fff000) >> 12;
+    uint32_t	subcycle = (cycletime & 0x00000fff);
 
-    switch (format)
-    {
-      case Format_7_0:
-      case Format_7_1:
-      case Format_7_2:
-      case Format_7_3:
-      case Format_7_4:
-      case Format_7_5:
-      case Format_7_6:
-      case Format_7_7:
-	if (quad != 0)
-	    return FrameRate_x;
-	break;
-      default:
-	break;
-    }
-
-    return quad;
+    return out << sec << '.' << cycle << '.' << subcycle;
 }
+    
+//! 指定された出力ストリームにホストのローカルタイムを出力する．
+/*!
+ \param	out		出力ストリーム
+ \param cycletime	ローカルタイム(microseconds)
+ \return		outに指定した出力ストリーム
+*/
+std::ostream&
+IIDCCamera::printLocaltime(std::ostream& out, uint64_t localtime)
+{
+    uint64_t	usec = localtime % 1000;
+    uint64_t	tmp  = localtime / 1000;
+    uint64_t	msec = tmp % 1000;
+    uint64_t	sec  = tmp / 1000;
 
+    return out << sec << '.' << msec << '.' << usec;
+}
+    
 uint32_t
 IIDCCamera::getAbsValueOffset(Feature feature) const
 {
