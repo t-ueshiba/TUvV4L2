@@ -303,12 +303,9 @@ syncedSnap(const Array<IIDCCamera*>& cameras, uint64_t thresh)
 	    last = timestamp;
     }
 
-    for (timestamp_t timestamp = timestamps.pop();
-	 last.first - timestamp.first > thresh; timestamps.push(last))
-    {
-	timestamp.first = timestamp.second->snap().getTimestamp();
-	last = timestamp;
-    }
+    for (timestamp_t top; last.first - (top = timestamps.pop()).first > thresh;
+	 timestamps.push(last))
+	last = {top.second->snap().getTimestamp(), top.second};
 }
     
 }
