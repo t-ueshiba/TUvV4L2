@@ -568,7 +568,7 @@ class IIDCCamera
     const IIDCCamera&	captureRaw(void* image)			const	;
     const IIDCCamera&	captureBayerRaw(void* image)		const	;
     IIDCCamera&		embedTimestamp(bool enable)			;
-    uint32_t		getTimestamp()				const	;
+    uint64_t		getTimestamp()				const	;
     uint32_t		getCycletime(uint64_t& localtime)	const	;
     uint64_t		cycletimeToLocaltime(uint32_t cycletime) const	;
     
@@ -702,10 +702,12 @@ IIDCCamera::captureDirectly(Image<T>& image) const
   予め embedTimestamp() によって画像への撮影時刻埋め込みを指示しなければならない．
   \return	サイクル時刻単位で表した画像の撮影時刻
 */
-inline uint32_t
+inline uint64_t
 IIDCCamera::getTimestamp() const
 {
-    return (_img ? ntohl(*reinterpret_cast<const uint32_t*>(_img)) : 0);
+    return (_img ?
+	    cycletimeToLocaltime(
+		ntohl(*reinterpret_cast<const uint32_t*>(_img))) : 0);
 }
 
 //! 同時にサイクル時刻とシステム時刻を得る．
@@ -830,7 +832,9 @@ bool		setFeatureValue(IIDCCamera& camera,
 				u_int id, int val, int=-1);
 u_int		getFeatureValue(const IIDCCamera& camera,
 				u_int id, int=-1);
-
+void		syncedSnap(const Array<IIDCCamera*>& cameras,
+			   uint64_t thresh=1000)			;
+				   
 inline void
 exec(IIDCCamera& camera, IIDCCamera& (IIDCCamera::*mf)(), int=-1)
 {

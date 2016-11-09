@@ -2,6 +2,7 @@
  *  $Id$
  */
 #include "TU/IIDCCameraArray.h"
+#include "TU/Heap.h"
 
 namespace TU
 {
@@ -282,4 +283,32 @@ exec(const Array<IIDCCamera*>& cameras, IIDCCamera& (IIDCCamera::*mf)(), int n)
 	    (cameras[i]->*mf)();
 }
 
+void
+syncedSnap(const Array<IIDCCamera*>& cameras, uint64_t thresh)
+{
+    typedef std::pair<uint64_t, IIDCCamera*>	timestamp_t;
+    
+    Heap<timestamp_t, std::greater<timestamp_t> >
+			timestamps(cameras.size());
+    
+    for (size_t i = 0; i < cameras.size(); ++i)
+	cameras[i]->snap();
+
+    timestamp_t		last(0, cameras[0]);
+    for (size_t i = 0; i < cameras.size(); ++i)
+    {
+	timestamp_t	timestamp(cameras[i]->getTimestamp(), cameras[i]);
+	timestamps.push(timestamp);
+	if (timestamp > last)
+	    last = timestamp;
+    }
+
+    for (timestamp_t timestamp = timestamps.pop();
+	 last.first - timestamp.first > thresh; timestamps.push(last))
+    {
+	timestamp.first = timestamp.second->snap().getTimestamp();
+	last = timestamp;
+    }
+}
+    
 }

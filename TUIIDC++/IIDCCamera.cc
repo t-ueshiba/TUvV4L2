@@ -1937,10 +1937,6 @@ IIDCCamera::cycletimeToLocaltime(uint32_t cycletime) const
     uint64_t	localtime0;
     uint32_t	cycletime0 = getCycletime(localtime0);
 
-    printCycletime(std::cerr, cycletime) << std::endl;
-    printCycletime(std::cerr, cycletime0) << '\t';
-    printLocaltime(std::cerr, localtime0) << std::endl << "\t\t";
-    
   // 現時刻と指定された時刻のサイクル時刻をサブサイクル値に直し，
   // 両者のずれを求める.
     u_int64_t	cycle0 = cycletime_to_cycle(cycletime0);
