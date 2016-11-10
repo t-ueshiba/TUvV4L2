@@ -283,8 +283,13 @@ exec(const Array<IIDCCamera*>& cameras, IIDCCamera& (IIDCCamera::*mf)(), int n)
 	    (cameras[i]->*mf)();
 }
 
+//! 複数のカメラから同期した画像を保持する．
+/*!
+  \param cameras	カメラへのポインタの配列
+  \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
+*/
 void
-syncedSnap(const Array<IIDCCamera*>& cameras, uint64_t thresh)
+syncedSnap(const Array<IIDCCamera*>& cameras, uint64_t maxSkew)
 {
     typedef std::pair<uint64_t, IIDCCamera*>	timestamp_t;
     
@@ -303,7 +308,7 @@ syncedSnap(const Array<IIDCCamera*>& cameras, uint64_t thresh)
 	    last = timestamp;
     }
 
-    for (timestamp_t top; last.first - (top = timestamps.pop()).first > thresh;
+    for (timestamp_t top; last.first - (top = timestamps.pop()).first > maxSkew;
 	 timestamps.push(last))
 	last = {top.second->snap().getTimestamp(), top.second};
 }
