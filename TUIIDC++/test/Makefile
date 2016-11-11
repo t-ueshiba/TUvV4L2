@@ -40,6 +40,7 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../FireWireNode_.h \
 		../TU/IIDC++.h \
+		../TU/IIDCCameraArray.h \
 		../USBNode_.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
@@ -47,6 +48,7 @@ EXTHDRS		= ../FireWireNode_.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/tuple.h \
@@ -54,11 +56,13 @@ EXTHDRS		= ../FireWireNode_.h \
 HDRS		=
 SRCS		= FireWireNode.cc \
 		IIDCCamera.cc \
+		IIDCCameraArray.cc \
 		IIDCNode.cc \
 		USBNode.cc \
 		main.cc
 OBJS		= FireWireNode.o \
 		IIDCCamera.o \
+		IIDCCameraArray.o \
 		IIDCNode.o \
 		USBNode.o \
 		main.o
@@ -82,6 +86,13 @@ IIDCCamera.o: ../FireWireNode_.h ../TU/IIDC++.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
 	../USBNode_.h
+IIDCCameraArray.o: ../TU/IIDCCameraArray.h ../TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/io.h
 IIDCNode.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
@@ -94,9 +105,9 @@ USBNode.o: ../USBNode_.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/Minimize.h
-main.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Minimize.h
+main.o: ../TU/IIDCCameraArray.h ../TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h

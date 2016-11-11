@@ -296,13 +296,13 @@ syncedSnap(const Array<IIDCCamera*>& cameras, uint64_t maxSkew)
     Heap<timestamp_t, std::greater<timestamp_t> >
 			timestamps(cameras.size());
     
-    for (size_t i = 0; i < cameras.size(); ++i)
-	cameras[i]->snap();
+    for (auto camera : cameras)
+	camera->snap();
 
-    timestamp_t		last(0, cameras[0]);
-    for (size_t i = 0; i < cameras.size(); ++i)
+    timestamp_t		last(0, nullptr);
+    for (auto camera : cameras)
     {
-	timestamp_t	timestamp(cameras[i]->getTimestamp(), cameras[i]);
+	timestamp_t	timestamp(camera->getTimestamp(), camera);
 	timestamps.push(timestamp);
 	if (timestamp > last)
 	    last = timestamp;
