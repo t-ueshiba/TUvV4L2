@@ -2752,7 +2752,8 @@ operator >>(std::istream& in, IIDCCamera& camera)
 		    {
 			if (inq & IIDCCamera::Manual)
 			{
-			    camera.setAuto(feature.feature, false);
+			    if (inq & IIDCCamera::Auto)
+				camera.setAuto(feature.feature, false);
 			    if (feature.feature == IIDCCamera::WHITE_BALANCE)
 				camera.setWhiteBalance(val, val2);
 			    else
