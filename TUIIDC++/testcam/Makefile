@@ -13,7 +13,7 @@ IDLS		=
 
 INCDIRS		= -I.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
+CFLAGS		= -O
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
@@ -22,10 +22,13 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUvIIDC++ -lTUXv++ -lTUv++ -lTUIIDC++ -lTUTools++ \
-		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
 ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+  LIBS		= -lusb-1.0 \
+		  -lTUXv++ -lTUv++ -lTUIIDC++ -lTUvIIDC++ -lTUTools++ \
+		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
+else
+  LIBS		= -lTUXv++ -lTUv++ -lTUIIDC++ -lTUvIIDC++ -lTUTools++ \
+		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
 endif
 
 LINKER		= $(CXX)
@@ -73,26 +76,14 @@ EXTHDRS		= ../TU/IIDC++.h \
 HDRS		= MyCanvasPane.h \
 		MyCmdWindow.h \
 		testcam.h
-SRCS		= createFormatMenu.cc \
-		main.cc
-OBJS		= createFormatMenu.o \
-		main.o
+SRCS		= main.cc
+OBJS		= main.o
 
 #include $(PROJECT)/lib/rtc.mk		# modified: CPPFLAGS, LIBS
 #include $(PROJECT)/lib/cnoid.mk	# modified: CPPFLAGS, LIBS, LIBDIR
 #include $(PROJECT)/lib/lib.mk		# added:    PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-createFormatMenu.o: /usr/local/include/TU/v/vIIDC++.h \
-	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
-	../TU/IIDC++.h
 main.o: /usr/local/include/TU/v/vIIDC++.h \
 	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \

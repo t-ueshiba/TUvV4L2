@@ -108,13 +108,17 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	  case c_ContinuousShot:
 	    if (val)
 	    {
-		exec(_cameras, &CAMERA::continuousShot, true);
+		for_each(_cameras.begin(), _cameras.end(),
+			 bind(&CAMERA::continuousShot,
+			      placeholders::_1, true));
 		_timer.start(1);
 	    }
 	    else
 	    {
 		_timer.stop();
-		exec(_cameras, &CAMERA::continuousShot, false);
+		for_each(_cameras.begin(), _cameras.end(),
+			 bind(&CAMERA::continuousShot,
+			      placeholders::_1, false));
 	    }
 	    break;
 	
@@ -148,8 +152,8 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	  case c_StatusMovie:
 	    stopContinuousShotIfRunning();
 	    _movie.setFrame(val);
-	    for (size_t i = 0; i < _canvases.size(); ++i)
-		_canvases[i]->repaintUnderlay();
+	    for (auto canvas : _canvases)
+		canvas->repaintUnderlay();
 	    break;
 	}
     }
@@ -168,7 +172,8 @@ MyCmdWindow<CAMERA, PIXEL>::tick()
 
     if (!_captureCmd.getValue(c_PlayMovie))
     {
-	exec(_cameras, &CAMERA::snap);
+	std::for_each(_cameras.begin(), _cameras.end(),
+		      std::bind(&CAMERA::snap, std::placeholders::_1));
 	for (size_t i = 0; i < _cameras.size(); ++i)
 	    *_cameras[i] >> _movie.image(i);
     }
@@ -189,13 +194,13 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 
     if (_canvases.size() != _movie.nviews())
     {
-	for (size_t i = 0; i < _canvases.size(); ++i)
-	    delete _canvases[i];
+	for (auto canvas : _canvases)
+	    delete canvas;
 
 	_canvases.resize(_movie.nviews());
 	for (size_t i = 0; i < _canvases.size(); ++i)
 	{
-	    Image<PIXEL>&	image = _movie.image(i);
+	    auto&	image = _movie.image(i);
 	    _canvases[i] = new MyCanvasPane<PIXEL>(*this, image.width(),
 						   image.height(), image);
 	    _canvases[i]->place(i % 2, 2 + i / 2, 1, 1);
@@ -203,11 +208,11 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
     }
     else
     {
-	for (u_int i = 0; i < _canvases.size(); ++i)
-	    _canvases[i]->resize();
+	for (auto canvas : _canvases)
+	    canvas->resize();
     }
 
-    int	props[] = {0, _movie.nframes() - 1, 1};
+    int	props[] = {0, int(_movie.nframes()) - 1, 1};
     _captureCmd.setProp(c_StatusMovie, props);
     
     repaintCanvases();
@@ -216,8 +221,8 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 template <class CAMERA, class PIXEL> void
 MyCmdWindow<CAMERA, PIXEL>::repaintCanvases()
 {
-    for (size_t i = 0; i < _canvases.size(); ++i)
-	_canvases[i]->repaintUnderlay();
+    for (auto canvas : _canvases)
+	canvas->repaintUnderlay();
     _captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
 }
 
@@ -225,8 +230,8 @@ template <class CAMERA, class PIXEL> void
 MyCmdWindow<CAMERA, PIXEL>::setFrame()
 {
     _movie.setFrame(_captureCmd.getValue(c_StatusMovie));
-    for (size_t i = 0; i < _canvases.size(); ++i)
-	_canvases[i]->repaintUnderlay();
+    for (auto canvas : _canvases)
+	canvas->repaintUnderlay();
 }
 
 template <class CAMERA, class PIXEL> void
@@ -235,7 +240,9 @@ MyCmdWindow<CAMERA, PIXEL>::stopContinuousShotIfRunning()
     if (_captureCmd.getValue(c_ContinuousShot))
     {
 	_timer.stop();
-	exec(_cameras, &CAMERA::continuousShot, false);
+	std::for_each(_cameras.begin(), _cameras.end(),
+		      std::bind(&CAMERA::continuousShot,
+				std::placeholders::_1, false));
 	_captureCmd.setValue(c_ContinuousShot, 0);
     }
 }

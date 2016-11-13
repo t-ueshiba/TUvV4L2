@@ -149,10 +149,6 @@
 */
 namespace TU
 {
-typedef uint32_t	quadlet_t;
-typedef uint16_t	nodeid_t;
-typedef uint64_t	nodeaddr_t;
-    
 /************************************************************************
 *  class IIDCNode							*
 ************************************************************************/
@@ -163,6 +159,11 @@ typedef uint64_t	nodeaddr_t;
 */
 class IIDCNode
 {
+  public:
+    typedef uint32_t	quadlet_t;
+    typedef uint16_t	nodeid_t;
+    typedef uint64_t	nodeaddr_t;
+    
   public:
 			IIDCNode()					{}
     virtual		~IIDCNode()					;
@@ -245,7 +246,13 @@ class IIDCNode
 */
 class IIDCCamera
 {
+  private:
+    typedef IIDCNode::nodeid_t		nodeid_t;
+    typedef IIDCNode::nodeaddr_t	nodeaddr_t;
+    
   public:
+    typedef IIDCNode::quadlet_t		quadlet_t;
+
   //! カメラのタイプ
     enum Type
     {
@@ -320,6 +327,13 @@ class IIDCCamera
 	Format_7_7	 = 0x2fc,	//!< Format_7_7: カメラ機種に依存
     };
 
+  //! 画像の形式とその名称
+    struct FormatName
+    {
+	const Format		format;		//!< 画像の形式
+	const char* const	name;		//!< 名称
+    };
+
   //! カメラのフレームレートを表すビットマップ
   /*! どのようなフレームレートがサポートされているかは, inquireFrameRate()
       によって知ることができる. */
@@ -336,6 +350,13 @@ class IIDCCamera
 	FrameRate_x	= (0x1u << 23)	//!< 特殊なフレームレート
     };
     
+  //! フレームレートとその名称
+    struct FrameRateName
+    {
+	const FrameRate		frameRate;	//!< フレームレート
+	const char* const	name;		//!< 名称
+    };
+
   //! 出力画像の画素の形式
     enum PixelFormat
     {
@@ -350,6 +371,13 @@ class IIDCCamera
 	SIGNED_RGB_48	= (0x1u << 23),	//!< SIGNED RGB	 48bit/pixel
 	RAW_8		= (0x1u << 22),	//!< RAW	  8bit/pixel
 	RAW_16		= (0x1u << 21)	//!< RAW	 16bit/pixel
+    };
+
+  //! 画素の形式とその名称
+    struct PixelFormatName
+    {
+	const PixelFormat	pixelFormat;	//!< 画素の形式
+	const char* const	name;		//!< 名称
     };
 
   //! 値を設定できるカメラの属性
@@ -392,6 +420,13 @@ class IIDCCamera
 	Manual		= (0x1u << 24)	//!< この属性の値の手動設定が可能
     };
     
+  //! 属性とその名称
+    struct FeatureName
+    {
+	const Feature		feature;	//!< 属性
+	const char* const	name;		//!< 名称
+    };
+
   //! カメラの外部トリガーモード
   /*! どのトリガーモードがサポートされているかは, inquireTriggerMode() に
       よって知ることができる. */
@@ -407,6 +442,13 @@ class IIDCCamera
 	Trigger_Mode15	= 0x1u
     };
 
+  //! トリガーモードとその名称
+    struct TriggerModeName
+    {
+	const TriggerMode	mode;		//!< トリガーモード
+	const char* const	name;		//!< 名称
+    };
+    
   //! カメラのストロボ出力
     enum Strobe
     {
@@ -470,7 +512,7 @@ class IIDCCamera
     IIDCCamera&		initialize()					;
 
   // Basic function stuffs.
-    quadlet_t		inquireBasicFunction()			const	;
+    uint32_t		inquireBasicFunction()			const	;
     IIDCCamera&		setPower(bool enable)				;
     Bayer		bayerTileMapping()			const	;
     bool		isLittleEndian()			const	;
@@ -478,7 +520,7 @@ class IIDCCamera
     Speed		getSpeed()				const	;
     
   // Format and frame rate stuffs.
-    quadlet_t		inquireFrameRate(Format format)		const	;
+    uint32_t		inquireFrameRate(Format format)		const	;
     IIDCCamera&		setFormatAndFrameRate(Format format,
 					      FrameRate rate)		;
     Format		getFormat()				const	;
@@ -496,7 +538,7 @@ class IIDCCamera
 						PixelFormat pixelFormat);
     
   // Feature stuffs.
-    quadlet_t		inquireFeatureFunction(Feature feature)	const	;
+    uint32_t		inquireFeatureFunction(Feature feature)	const	;
     IIDCCamera&		onePush(Feature feature)			;
     IIDCCamera&		setActive(Feature feature, bool enable)		;
     IIDCCamera&		setAbsControl(Feature feature, bool enable)	;
@@ -530,7 +572,7 @@ class IIDCCamera
     IIDCCamera&		resetSoftwareTrigger()				;
 
   // Strobe stuffs.
-    quadlet_t		inquireStrobeFunction(Strobe strobe)	const	;
+    uint32_t		inquireStrobeFunction(Strobe strobe)	const	;
     IIDCCamera&		setActive(Strobe strobe, bool enable)		;
     IIDCCamera&		setPolarity(Strobe strobe, bool highActive)	;
     IIDCCamera&		setDelay(Strobe strobe, u_int delay)		;
@@ -588,12 +630,12 @@ class IIDCCamera
     uint32_t	getStrobeOffset(Strobe strobe)			 const	;
     nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
     u_int	setFormat_7_PacketSize(Format format7)			;
-    quadlet_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
+    uint32_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
     bool	unlockAdvancedFeature(uint64_t featureId,
 				      u_int timeout)		 const	;
     void	checkAvailability(Format format, FrameRate rate) const	;
-    quadlet_t	checkAvailability(Feature feature, uint32_t inq) const	;
-    quadlet_t	checkAvailability(Strobe strove, uint32_t inq)	 const	;
+    uint32_t	checkAvailability(Feature feature, uint32_t inq) const	;
+    void	checkAvailability(Strobe strove, uint32_t inq)	 const	;
     void	checkAvailability(BasicFunction func)		 const	;
     quadlet_t	readQuadletFromRegister(uint32_t offset)	 const	;
     void	writeQuadletToRegister(uint32_t offset, quadlet_t quad)	;
@@ -611,6 +653,127 @@ class IIDCCamera
     u_int		_img_size;	// image data size.
     Bayer		_bayer;		// Bayer pattern supported by this camera.
     bool		_littleEndian;	// true if MONO16 is in little endian format.
+
+  public:
+    static constexpr FormatName
+    formatNames[] =
+    {
+	{YUV444_160x120,	"160x120-YUV(4:4:4)"},
+	{YUV422_320x240,	"320x240-YUV(4:2:2)"},
+	{YUV411_640x480,	"640x480-YUV(4:1:1)"},
+	{YUV422_640x480,	"640x480-YUV(4:2:2)"},
+	{RGB24_640x480,		"640x480-RGB"},
+	{MONO8_640x480,		"640x480-Y(mono)"},
+	{MONO16_640x480,	"640x480-Y(mono16)"},
+	{YUV422_800x600,	"800x600-YUV(4:2:2)"},
+	{RGB24_800x600,		"800x600-RGB"},
+	{MONO8_800x600,		"800x600-Y(mono)"},
+	{YUV422_1024x768,	"1024x768-YUV(4:2:2)"},
+	{RGB24_1024x768,	"1024x768-RGB"},
+	{MONO8_1024x768,	"1024x768-Y(mono)"},
+	{MONO16_800x600,	"800x600-Y(mono16)"},
+	{MONO16_1024x768,	"1024x768-Y(mono16)"},
+	{YUV422_1280x960,	"1280x960-YUV(4:2:2)"},
+	{RGB24_1280x960,	"1280x960-RGB"},
+	{MONO8_1280x960,	"1280x960-Y(mono)"},
+	{YUV422_1600x1200,	"1600x1200-YUV(4:2:2)"},
+	{RGB24_1600x1200,	"1600x1200-RGB"},
+	{MONO8_1600x1200,	"1600x1200-Y(mono)"},
+	{MONO16_1280x960,	"1280x960-Y(mono16)"},
+	{MONO16_1600x1200,	"1600x1200-Y(mono16)"},
+	{Format_5_0,		"Format_5_0"},
+	{MONO8_640x480x2,	"640x480x2-Y(mono)"},
+	{Format_5_2,		"Format_5_2"},
+	{Format_5_3,		"Format_5_3"},
+	{Format_5_4,		"Format_5_4"},
+	{Format_5_5,		"Format_5_5"},
+	{Format_5_6,		"Format_5_6"},
+	{Format_5_7,		"Format_5_7"},
+	{Format_7_0,		"Format_7_0"},
+	{Format_7_1,		"Format_7_1"},
+	{Format_7_2,		"Format_7_2"},
+	{Format_7_3,		"Format_7_3"},
+	{Format_7_4,		"Format_7_4"},
+	{Format_7_5,		"Format_7_5"},
+	{Format_7_6,		"Format_7_6"},
+	{Format_7_7,		"Format_7_7"}
+    };
+    static constexpr size_t	NFORMATS = sizeof(formatNames)
+					 / sizeof(formatNames[0]);
+    
+    static constexpr FrameRateName
+    frameRateNames[] =
+    {
+	{FrameRate_1_875,	"1.875fps"},
+	{FrameRate_3_75,	"3.75fps"},
+	{FrameRate_7_5,		"7.5fps"},
+	{FrameRate_15,		"15fps"},
+	{FrameRate_30,		"30fps"},
+	{FrameRate_60,		"60fps"},
+	{FrameRate_120,		"120fps"},
+	{FrameRate_240,		"240fps"},
+	{FrameRate_x,		"custom_frame_rate"}
+    };
+    static constexpr size_t	NRATES = sizeof(frameRateNames)
+				       / sizeof(frameRateNames[0]);
+    
+    static constexpr PixelFormatName
+    pixelFormatNames[] =
+    {
+	{MONO_8,		"Y(mono)"},
+	{YUV_411,		"YUV(4:1:1)"},
+	{YUV_422,		"YUV(4:2:2)"},
+	{YUV_444,		"YUV(4:4:4)"},
+	{RGB_24,		"RGB"},
+	{MONO_16,		"Y(mono16)"},
+	{RGB_48,		"RGB(color48)"},
+	{SIGNED_MONO_16,	"Y(signed mono16)"},
+	{SIGNED_RGB_48,		"RGB(signed color48)"},
+	{RAW_8,			"RAW(raw8)"},
+	{RAW_16,		"RAW(raw16)"}
+    };
+    static constexpr size_t	NPIXELFORMATS = sizeof(pixelFormatNames)
+					      / sizeof(pixelFormatNames[0]);
+    
+    static constexpr FeatureName
+    featureNames[] = 
+    {
+	{BRIGHTNESS,		"BRIGHTNESS"},
+	{AUTO_EXPOSURE,		"AUTO_EXPOSURE"},
+	{SHARPNESS,		"SHARPNESS"},
+	{WHITE_BALANCE,		"WHITE_BALANCE"},
+	{HUE,			"HUE"},
+	{SATURATION,		"SATURATION"},
+	{GAMMA,			"GAMMA"},
+	{SHUTTER,		"SHUTTER"},
+	{GAIN,			"GAIN"},
+	{IRIS,			"IRIS"},
+	{FOCUS,			"FOCUS"},
+	{TEMPERATURE,		"TEMPERATURE"},
+	{TRIGGER_MODE,		"TRIGGER_MODE"},
+	{TRIGGER_DELAY,		"TRIGGER_DELAY"},
+	{FRAME_RATE,		"FRAME_RATE"},
+	{ZOOM,			"ZOOM"},
+	{PAN,			"PAN"},
+	{TILT,			"TILT"}
+    };
+    static constexpr size_t	NFEATURES = sizeof(featureNames)
+					  / sizeof(featureNames[0]);
+
+    static constexpr TriggerModeName
+    triggerModeNames[] =
+    {
+	{Trigger_Mode0,		"Trigger_Mode0" },
+	{Trigger_Mode1,		"Trigger_Mode1" },
+	{Trigger_Mode2,		"Trigger_Mode2" },
+	{Trigger_Mode3,		"Trigger_Mode3" },
+	{Trigger_Mode4,		"Trigger_Mode4" },
+	{Trigger_Mode5,		"Trigger_Mode5" },
+	{Trigger_Mode14,	"Trigger_Mode14"},
+	{Trigger_Mode15,	"Trigger_Mode15"},
+    };
+    static constexpr size_t	NTRIGGERMODES = sizeof(triggerModeNames)
+					      / sizeof(triggerModeNames[0]);
 };
 
 //! このカメラがサポートするBayerパターン(#Bayer)を返す
@@ -653,7 +816,7 @@ IIDCCamera::pixelFormat() const
   \return	サポートされている機能を #BasicFunction 型の列挙値のorとして
 		返す
  */
-inline quadlet_t
+inline uint32_t
 IIDCCamera::inquireBasicFunction() const
 {
     return readQuadletFromRegister(0x400);
@@ -692,7 +855,8 @@ IIDCCamera::captureDirectly(Image<T>& image) const
 {
     if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureDirectly: no images snapped!!");
-    image.resize(reinterpret_cast<T*>(_img), height(), width());
+    image.resize(reinterpret_cast<T*>(const_cast<u_char*>(_img)),
+		 height(), width());
 
     return *this;
 }
@@ -724,29 +888,27 @@ IIDCCamera::getCycletime(uint64_t& localtime) const
 inline void
 IIDCCamera::checkAvailability(Format format, FrameRate rate) const
 {
-    using namespace	std;
-    
-    quadlet_t	quad = inquireFrameRate(format);
+    auto	quad = inquireFrameRate(format);
     if (!(quad & rate))
     {
+	using namespace	std;
+    
 	ostringstream	s;
-	
 	s << "IIDCCamera::checkAvailability: Incompatible combination of format["
 	  << showbase << hex << format << "] and frame rate[" << rate << "]!!";
       	throw runtime_error(s.str());
     }
 }
 
-inline quadlet_t
+inline uint32_t
 IIDCCamera::checkAvailability(Feature feature, uint32_t inq) const
 {
-    using namespace	std;
-    
-    quadlet_t	quad = inquireFeatureFunction(feature);
+    auto	quad = inquireFeatureFunction(feature);
     if ((quad & inq) != inq)
     {
+	using namespace	std;
+    
 	ostringstream	s;
-	
 	s << "IIDCCamera::checkAvailability: This feature["
 	  << showbase << hex << feature
 	  << "] is not present or this field is unavailable (quad: "
@@ -756,42 +918,39 @@ IIDCCamera::checkAvailability(Feature feature, uint32_t inq) const
     return quad;
 }
 
-inline quadlet_t
+inline void
 IIDCCamera::checkAvailability(Strobe strobe, uint32_t inq) const
 {
-    using namespace	std;
-    
-    quadlet_t	quad = inquireStrobeFunction(strobe);
+    auto	quad = inquireStrobeFunction(strobe);
     if ((quad & inq) != inq)
     {
+	using namespace	std;
+    
 	ostringstream	s;
-	
 	s << "IIDCCamera::checkAvailability: This strobe["
 	  << showbase << hex << strobe
 	  << "] is not present or this field is unavailable (quad: "
 	  << quad << ", inq: " << inq << ")!!";
       	throw runtime_error(s.str());
     }
-    return quad;
 }
 
 inline void
 IIDCCamera::checkAvailability(BasicFunction func) const
 {
-    using namespace	std;
-
-    quadlet_t	quad = inquireBasicFunction();
+    auto	quad = inquireBasicFunction();
     if (!(quad & func))
     {
-	ostringstream	s;
+	using namespace	std;
 
+	ostringstream	s;
 	s << "IIDCCamera::checkAvailability: This fucntion is not present (quad: "
 	  << showbase << hex << quad << ", func: " << func << ")!!";
       	throw runtime_error(s.str());
     }
 }
 
-inline quadlet_t
+inline IIDCCamera::quadlet_t
 IIDCCamera::readQuadletFromRegister(uint32_t offset) const
 {
     return _node->readQuadlet(_cmdRegBase + offset);
@@ -803,7 +962,7 @@ IIDCCamera::writeQuadletToRegister(uint32_t offset, quadlet_t quad)
     _node->writeQuadlet(_cmdRegBase + offset, quad);
 }
 
-inline quadlet_t
+inline IIDCCamera::quadlet_t
 IIDCCamera::readQuadletFromACRegister(uint32_t offset) const
 {
     return _node->readQuadlet(_acRegBase + offset);
@@ -820,6 +979,7 @@ IIDCCamera::writeQuadletToACRegister(uint32_t offset, quadlet_t quad)
 ************************************************************************/
 const u_int	IIDCCAMERA_OFFSET_ONOFF = 0x100;
 const u_int	IIDCCAMERA_OFFSET_AUTO  = 0x200;
+const u_int	IIDCCAMERA_OFFSET_ABS   = 0x300;
 const u_int	IIDCCAMERA_OFFSET_VR    = 0x2;
 
 /************************************************************************

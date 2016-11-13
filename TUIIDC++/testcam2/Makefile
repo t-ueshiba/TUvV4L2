@@ -23,11 +23,13 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ \
-		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
 ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
+  LIBS		= -lusb-1.0 \
+		  -lTUvIIDC++ -lTUXv++ -lTUv++ -lTUIIDC++ -lTUTools++ \
+		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
+else
+  LIBS		= -lTUvIIDC++ -lTUXv++ -lTUv++ -lTUIIDC++ -lTUTools++ \
+		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
 endif
 
 LINKER		= $(CXX)

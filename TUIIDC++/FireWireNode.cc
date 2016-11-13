@@ -61,13 +61,13 @@ FireWireNode::~FireWireNode()
     raw1394_destroy_handle(_handle);
 }
 
-nodeid_t
+IIDCNode::nodeid_t
 FireWireNode::nodeId() const
 {
     return _nodeId;
 }
     
-quadlet_t
+IIDCNode::quadlet_t
 FireWireNode::readQuadlet(nodeaddr_t addr) const
 {
     quadlet_t	quad;

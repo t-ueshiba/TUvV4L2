@@ -81,6 +81,8 @@ static CameraAndFeature		cameraAndFeatures[NFEATURES];
 static void
 setScale(IIDCCamera& camera, IIDCCamera::Feature feature, GtkWidget* scale)
 {
+    using namespace	std;
+    
     if (camera.isAbsControl(feature))
     {
 	float	min, max;
@@ -311,119 +313,114 @@ createCommands(MyIIDCCamera& camera)
     {
 	cameraAndFeatures[i].camera  = &camera;
 	cameraAndFeatures[i].feature = features[i].feature;
-	
+
 	auto	inq = camera.inquireFeatureFunction(features[i].feature);
-	if (inq & IIDCCamera::Presence)  // この機能が存在？
+
+	if (!((inq & IIDCCamera::Presence) &&
+	      (inq & IIDCCamera::Manual)   &&
+	      (inq & IIDCCamera::ReadOut)))
+	    continue;
+	
+	auto	label = gtk_label_new(features[i].name);
+	gtk_table_attach_defaults(GTK_TABLE(commands), label, 0, 1, y, y+1);
+	    
+	if (features[i].feature == IIDCCamera::WHITE_BALANCE)
 	{
-	    if (inq & IIDCCamera::OnOff)  // on/off操作が可能？
-	    {
-	      // on/offを切り替えるtoggle buttonを生成．
-		auto	toggle = gtk_toggle_button_new_with_label("On");
-	      // コールバック関数の登録．
-		gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
-				   GTK_SIGNAL_FUNC(CBsetActive),
-				   &cameraAndFeatures[i]);
-	      // カメラの現在のon/off状態をtoggle buttonに反映．
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
-		    (camera.isActive(features[i].feature) ? TRUE : FALSE));
-		gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
-					  2, 3, y, y+1);
-	    }
+	    u_int	min, max;
+	    camera.getMinMax(features[i].feature, min, max);
+	    u_int	ub, vr;
+	    camera.getWhiteBalance(ub, vr);
 
-	    if (inq & IIDCCamera::Auto)  // 自動設定が可能？
-	    {
-	      // manual/autoを切り替えるtoggle buttonを生成．
-		auto	toggle = gtk_toggle_button_new_with_label("Auto");
-	      // コールバック関数の登録．
-		gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
-				   GTK_SIGNAL_FUNC(CBsetAuto),
-				   &cameraAndFeatures[i]);
-	      // カメラの現在のauto/manual状態をtoggle buttonに反映．
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
-		    (camera.isAuto(features[i].feature) ? TRUE : FALSE));
-		gtk_table_attach_defaults(GTK_TABLE(commands), toggle,
-					  3, 4, y, y+1);
-	    }
-	    
-	    if ((inq & IIDCCamera::Manual) && (inq & IIDCCamera::ReadOut))
-	    {
-		auto	label = gtk_label_new(features[i].name);
-		gtk_table_attach_defaults(GTK_TABLE(commands), label,
-					  0, 1, y, y+1);
-	    
-		if (features[i].feature == IIDCCamera::WHITE_BALANCE)
-		{
-		    u_int	min, max;
-		    camera.getMinMax(features[i].feature, min, max);
-		    u_int	ub, vr;
-		    camera.getWhiteBalance(ub, vr);
-
-		    auto	adj = gtk_adjustment_new(ub, min, max, 1, 1, 0);
-		  // コールバック関数の登録．
-		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-				       GTK_SIGNAL_FUNC(CBsetWhiteBalanceUB),
-				       &camera);
-		  // adjustmentを操作するためのscale widgetを生成．
-		    auto	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
-		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
-		    gtk_table_attach_defaults(GTK_TABLE(commands),
-					      scale, 1, 2, y, y+1);
-		    ++i;
-		    ++y;
-
-		    label = gtk_label_new(features[i].name);
-		    gtk_table_attach_defaults(GTK_TABLE(commands), label,
-					      0, 1, y, y+1);
-		    adj = gtk_adjustment_new(vr, min, max, 1, 1, 0);
-		  // コールバック関数の登録．
-		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-				       GTK_SIGNAL_FUNC(CBsetWhiteBalanceVR),
-				       &camera);
-		  // adjustmentを操作するためのscale widgetを生成．
-		    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-		    gtk_scale_set_digits(GTK_SCALE(scale), 0);
-		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
-		    gtk_table_attach_defaults(GTK_TABLE(commands),
-					      scale, 1, 2, y, y+1);
-		}
-		else
-		{
-		    auto	adj = gtk_adjustment_new(0, 0, 1, 1, 1, 0);
-		    auto	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
-		    setScale(camera, features[i].feature, scale);
-
-		  // コールバック関数の登録．
-		    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
-				       GTK_SIGNAL_FUNC(CBsetValue),
-				       &cameraAndFeatures[i]);
-
-		    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
-		    gtk_table_attach_defaults(GTK_TABLE(commands),
-					      scale, 1, 2, y, y+1);
-
-		    if (inq & IIDCCamera::Abs_Control)  // 絶対値での操作が可能？
-		    {
-		      // absolute/relativeを切り替えるtoggle buttonを生成．
-			auto toggle = gtk_toggle_button_new_with_label("Abs");
-		      // コールバック関数の登録．
-			cameraAndFeatures[i].scale = scale;
-			gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
-					   GTK_SIGNAL_FUNC(CBsetAbsControl),
-					   &cameraAndFeatures[i]);
-		      // カメラの現在のabsolute/relative状態をtoggle buttonに反映．
-			gtk_toggle_button_set_active(
-			    GTK_TOGGLE_BUTTON(toggle),
-			    (camera.isAbsControl(features[i].feature) ?
-			     TRUE : FALSE));
-			gtk_table_attach_defaults(GTK_TABLE(commands),
-						  toggle, 4, 5, y, y+1);
-		    }
-		}
-	    }
-
+	    auto	adj = gtk_adjustment_new(ub, min, max, 1, 1, 0);
+	  // コールバック関数の登録．
+	    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
+			       GTK_SIGNAL_FUNC(CBsetWhiteBalanceUB), &camera);
+	  // adjustmentを操作するためのscale widgetを生成．
+	    auto	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+	    gtk_scale_set_digits(GTK_SCALE(scale), 0);
+	    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
+	    gtk_table_attach_defaults(GTK_TABLE(commands), scale, 1, 2, y, y+1);
+	    ++i;
 	    ++y;
+
+	    label = gtk_label_new(features[i].name);
+	    gtk_table_attach_defaults(GTK_TABLE(commands), label, 0, 1, y, y+1);
+	    adj = gtk_adjustment_new(vr, min, max, 1, 1, 0);
+	  // コールバック関数の登録．
+	    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
+			       GTK_SIGNAL_FUNC(CBsetWhiteBalanceVR), &camera);
+	  // adjustmentを操作するためのscale widgetを生成．
+	    scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+	    gtk_scale_set_digits(GTK_SCALE(scale), 0);
+	    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
+	    gtk_table_attach_defaults(GTK_TABLE(commands), scale, 1, 2, y, y+1);
 	}
+	else
+	{
+	    auto	adj = gtk_adjustment_new(0, 0, 1, 1, 1, 0);
+	    auto	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
+
+	    setScale(camera, features[i].feature, scale);
+
+	  // コールバック関数の登録．
+	    cameraAndFeatures[i].scale = scale;
+	    gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
+			       GTK_SIGNAL_FUNC(CBsetValue),
+			       &cameraAndFeatures[i]);
+
+	    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 40);
+	    gtk_table_attach_defaults(GTK_TABLE(commands), scale, 1, 2, y, y+1);
+
+	    if (inq & IIDCCamera::Abs_Control)  // 絶対値での操作が可能？
+	    {
+	      // absolute/relativeを切り替えるtoggle buttonを生成．
+		auto toggle = gtk_toggle_button_new_with_label("Abs");
+	      // コールバック関数の登録．
+		gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
+				   GTK_SIGNAL_FUNC(CBsetAbsControl),
+				   &cameraAndFeatures[i]);
+	      // カメラの現在のabsolute/relative状態をtoggle buttonに反映．
+		gtk_toggle_button_set_active(
+		    GTK_TOGGLE_BUTTON(toggle),
+		    (camera.isAbsControl(features[i].feature) ? TRUE : FALSE));
+		gtk_table_attach_defaults(GTK_TABLE(commands),
+					  toggle, 4, 5, y, y+1);
+	    }
+	}
+
+	if (inq & IIDCCamera::OnOff)  // on/off操作が可能？
+	{
+	  // on/offを切り替えるtoggle buttonを生成．
+	    auto	toggle = gtk_toggle_button_new_with_label("On");
+	  // コールバック関数の登録．
+	    gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
+			       GTK_SIGNAL_FUNC(CBsetActive),
+			       &cameraAndFeatures[i]);
+	  // カメラの現在のon/off状態をtoggle buttonに反映．
+	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
+					 (camera.isActive(features[i].feature) ?
+					  TRUE : FALSE));
+	    gtk_table_attach_defaults(GTK_TABLE(commands),
+				      toggle, 2, 3, y, y+1);
+	}
+
+	if (inq & IIDCCamera::Auto)  // 自動設定が可能？
+	{
+	  // manual/autoを切り替えるtoggle buttonを生成．
+	    auto	toggle = gtk_toggle_button_new_with_label("Auto");
+	  // コールバック関数の登録．
+	    gtk_signal_connect(GTK_OBJECT(toggle), "toggled",
+			       GTK_SIGNAL_FUNC(CBsetAuto),
+			       &cameraAndFeatures[i]);
+	  // カメラの現在のauto/manual状態をtoggle buttonに反映．
+	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle),
+					 (camera.isAuto(features[i].feature) ?
+					  TRUE : FALSE));
+	    gtk_table_attach_defaults(GTK_TABLE(commands),
+				      toggle, 3, 4, y, y+1);
+	}
+
+	++y;
     }
 
     gtk_widget_show_all(commands);
