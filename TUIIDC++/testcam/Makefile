@@ -24,10 +24,10 @@ CCFLAGS		= $(CFLAGS)
 
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS		= -lusb-1.0 \
-		  -lTUXv++ -lTUv++ -lTUIIDC++ -lTUvIIDC++ -lTUTools++ \
+		  -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ \
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
 else
-  LIBS		= -lTUXv++ -lTUv++ -lTUIIDC++ -lTUvIIDC++ -lTUTools++ \
+  LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ \
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
 endif
 
