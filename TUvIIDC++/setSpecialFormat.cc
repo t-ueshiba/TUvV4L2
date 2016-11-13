@@ -96,29 +96,9 @@ MyModalDialog::callback(CmdId id, CmdVal val)
 CmdDef*
 MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
 {
-    static int			prop[4][3];
-    static constexpr struct
-    {
-	IIDCCamera::PixelFormat	pixelFormat;
-	const char*		name;
-    } pixelFormats[] =
-    {
-	{IIDCCamera::MONO_8,		"Y(mono)"},
-	{IIDCCamera::YUV_411,		"YUV(4:1:1)"},
-	{IIDCCamera::YUV_422,		"YUV(4:2:2)"},
-	{IIDCCamera::YUV_444,		"YUV(4:4:4)"},
-	{IIDCCamera::RGB_24,		"RGB"},
-	{IIDCCamera::MONO_16,		"Y(mono16)"},
-	{IIDCCamera::RGB_48,		"RGB(color48)"},
-	{IIDCCamera::SIGNED_MONO_16,	"Y(signed mono16)"},
-	{IIDCCamera::SIGNED_RGB_48,	"RGB(signed color48)"},
-	{IIDCCamera::RAW_8,		"RAW(raw8)"},
-	{IIDCCamera::RAW_16,		"RAW(raw16)"}
-    };
-    static constexpr size_t	NPIXELFORMATS = sizeof(pixelFormats)
-					      / sizeof(pixelFormats[0]);
-    static MenuDef		pixelFormatMenus[NPIXELFORMATS + 1];
-    static CmdDef		cmds[] =
+    static int		prop[4][3];
+    static MenuDef	pixelFormatMenus[IIDCCamera::NPIXELFORMATS + 1];
+    static CmdDef	cmds[] =
     {
 	{C_Slider, c_U0,     static_cast<int>(fmt7info.u0),
 	 "    u0", prop[0], CA_None, 0, 0, 1, 1, 0},
@@ -155,7 +135,7 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
     
   // Create a menu button for setting pixel format.
     size_t	npixelformats = 0;
-    for (const auto& pixelFormat : pixelFormats)
+    for (const auto& pixelFormat : IIDCCamera::pixelFormatNames)
 	if (fmt7info.availablePixelFormats & pixelFormat.pixelFormat)
 	{
 	    pixelFormatMenus[npixelformats].label = pixelFormat.name;
@@ -165,7 +145,7 @@ MyModalDialog::createROICmds(const Format_7_Info& fmt7info)
 	    pixelFormatMenus[npixelformats].submenu = noSub;
 	    ++npixelformats;
 	}
-    pixelFormatMenus[npixelformats].label = 0;
+    pixelFormatMenus[npixelformats].label = nullptr;
     
     return cmds;
 }
