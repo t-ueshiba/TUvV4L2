@@ -174,6 +174,7 @@ Matrix<T, R, C>::operator =(const BlockDiagonalMatrix<T>& m)
 	r += m[i].nrow();
 	c += m[i].ncol();
     }
+    return *this;
 }
     
 /************************************************************************
