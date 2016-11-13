@@ -65,6 +65,8 @@ setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
       case IIDCCamera::IRIS:
       case IIDCCamera::FOCUS:
       case IIDCCamera::TEMPERATURE:
+      case IIDCCamera::TRIGGER_DELAY:
+      case IIDCCamera::FRAME_RATE:
       case IIDCCamera::ZOOM:
       case IIDCCamera::PAN:
       case IIDCCamera::TILT:
@@ -78,18 +80,14 @@ setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
 	return true;
 
       case IIDCCamera::WHITE_BALANCE:
-      {
-	u_int	ub, vr;
-	exec(cameras, &IIDCCamera::getWhiteBalance, ub,  vr, n);
-	exec(cameras, &IIDCCamera::setWhiteBalance, val, vr, n);
-      }
-	return true;
-      
       case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR:
       {
 	u_int	ub, vr;
-	exec(cameras, &IIDCCamera::getWhiteBalance, ub, vr,  n);
-	exec(cameras, &IIDCCamera::setWhiteBalance, ub, val, n);
+	exec(cameras, &IIDCCamera::getWhiteBalance, ub,  vr, n);
+	if (id == IIDCCamera::WHITE_BALANCE)
+	    exec(cameras, &IIDCCamera::setWhiteBalance, val, vr, n);
+	else
+	    exec(cameras, &IIDCCamera::setWhiteBalance, ub, val, n);
       }
 	return true;
       
@@ -106,6 +104,8 @@ setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
       case IIDCCamera::FOCUS	     + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::TEMPERATURE   + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::TRIGGER_MODE  + IIDCCAMERA_OFFSET_ONOFF:
+      case IIDCCamera::TRIGGER_DELAY + IIDCCAMERA_OFFSET_ONOFF:
+      case IIDCCamera::FRAME_RATE    + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ONOFF:
@@ -126,11 +126,34 @@ setFeatureValueIIDC(CAMERAS& cameras, u_int id, u_int val, int n)
       case IIDCCamera::IRIS	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::FOCUS	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::TEMPERATURE   + IIDCCAMERA_OFFSET_AUTO:
+      case IIDCCamera::FRAME_RATE    + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_AUTO:
 	exec(cameras, &IIDCCamera::setAuto,
 	     IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_AUTO),
+	     bool(val), n);
+        return true;
+
+      case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::AUTO_EXPOSURE + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::SHARPNESS     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::HUE	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::SATURATION    + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::GAMMA	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::SHUTTER	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::GAIN	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::IRIS	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::FOCUS	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::TEMPERATURE   + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::TRIGGER_DELAY + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::FRAME_RATE    + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_ABS:
+      case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ABS:
+	exec(cameras, &IIDCCamera::setAbsControl,
+	     IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ABS),
 	     bool(val), n);
         return true;
 
@@ -245,6 +268,10 @@ setFormat(IIDCCamera& camera, u_int id, int val)
 bool
 setFeatureValue(IIDCCamera& camera, u_int id, int val, int)
 {
+    using namespace	std;
+    cerr << "id: " << showbase << hex << id << dec << ", val: " << val
+	 << endl;
+	
     return setFeatureValueIIDC(camera, id, val, -1);
 }
 
@@ -279,8 +306,8 @@ exec(const Array<IIDCCamera*>& cameras, IIDCCamera& (IIDCCamera::*mf)(), int n)
     if (0 <= n && n < cameras.size())
 	(cameras[n]->*mf)();
     else
-	for (size_t i = 0; i < cameras.size(); ++i)
-	    (cameras[i]->*mf)();
+	for (auto camera : cameras)
+	    (camera->*mf)();
 }
 
 //! 複数のカメラから同期した画像を保持する．

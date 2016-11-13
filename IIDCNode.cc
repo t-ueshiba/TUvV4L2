@@ -30,7 +30,7 @@ IIDCNode::unitSpecId() const
 }
 
 //! このノードのコマンドレジスタのベースアドレスを返す
-nodeaddr_t
+IIDCNode::nodeaddr_t
 IIDCNode::commandRegisterBase() const
 {
     return CSR_REGISTER_BASE + 4 * readValueFromUnitDependentDirectory(0x40);
@@ -43,7 +43,7 @@ IIDCNode::commandRegisterBase() const
 uint32_t
 IIDCNode::readValueFromUnitDependentDirectory(uint8_t key) const
 {
-    uint32_t	offset = readValueFromUnitDirectory(0xd4);
+    auto	offset = readValueFromUnitDirectory(0xd4);
     
     return readValueFromDirectory(key, offset);
 }
@@ -57,7 +57,7 @@ IIDCNode::readValueFromUnitDirectory(uint8_t key) const
 {
   // Read length of Bus Info Block and skip it.
     uint32_t	offset = 0;
-    quadlet_t	quad = readQuadletFromConfigROM(offset);
+    auto	quad = readQuadletFromConfigROM(offset);
     offset += 4 * (1 + (quad >> 24));
 
   // Read unit_directory_offset.
@@ -72,7 +72,7 @@ uint32_t
 IIDCNode::readValueFromDirectory(uint8_t key, uint32_t& offset) const
 {
   // Read length of the directory in quadlets.
-    quadlet_t	quad = readQuadletFromConfigROM(offset);
+    auto	quad = readQuadletFromConfigROM(offset);
     uint32_t	length = quad >> 16;
     offset += 4;
 
@@ -90,7 +90,7 @@ IIDCNode::readValueFromDirectory(uint8_t key, uint32_t& offset) const
     return ~0;
 }
 
-quadlet_t
+IIDCNode::quadlet_t
 IIDCNode::readQuadletFromConfigROM(uint32_t offset) const
 {
     return readQuadlet(CSR_REGISTER_BASE + CSR_CONFIG_ROM + offset);

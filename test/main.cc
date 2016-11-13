@@ -32,14 +32,23 @@ main(int argc, char* argv[])
 	
     try
     {
-#if 1
+#if 0
+#  if 1
 	IIDCCameraArray	cameras(cameraName, configDirs, speed, ncameras);
-#else
+#  else
 	IIDCCameraArray	cameras;
 	cin >> cameras;
-#endif
+#  endif
 	for (auto camera : cameras)
 	    cerr << hex << camera->globalUniqueId() << endl;
+#else
+	uint64_t	uniqId0 = 0x00b09d0100f908b2;
+	uint64_t	uniqId1 = 0x00b09d0100f908b3;
+	IIDCCamera	cameras[] = {{IIDCCamera::Monocular, uniqId0},
+				     {IIDCCamera::Monocular, uniqId1}};
+	for (const auto& camera : cameras)
+	    cerr << hex << camera.globalUniqueId() << endl;
+#endif
     }
     catch (exception& err)
     {

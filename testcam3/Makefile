@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../testcam -I$(HOME)/multicam/server -I$(PREFIX)/include
+INCDIRS		= -I../testcam -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -O3
 NVCCFLAGS	= -O
@@ -23,8 +23,14 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ \
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS		= -lusb-1.0 \
+		  -lTUvIIDC++ -lTUXv++ -lTUv++ -lTUIIDC++ -lTUTools++ \
+		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
+else
+  LIBS		= -lTUvIIDC++ -lTUXv++ -lTUv++ -lTUIIDC++ -lTUTools++ \
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
+endif
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin

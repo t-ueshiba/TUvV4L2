@@ -20,10 +20,12 @@ NVCCFLAGS	= -O
 CFLAGS	       += $(shell pkg-config gtk+-2.0 --cflags)
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUIIDC++ -lTUTools++ -lraw1394 -lusb-1.0 \
-		  $(shell pkg-config gtk+-2.0 --libs)
 ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+  LIBS		= -lusb-1.0 -lTUIIDC++ -lTUTools++ -lraw1394 \
+		  $(shell pkg-config gtk+-2.0 --libs)
+else
+  LIBS		= -lTUIIDC++ -lTUTools++ -lraw1394 -lusb-1.0 \
+		  $(shell pkg-config gtk+-2.0 --libs)
 endif
 
 LINKER		= $(CXX)

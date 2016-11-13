@@ -6,7 +6,6 @@
 #include <libraw1394/csr.h>
 #include <algorithm>
 #include <cstring>
-#include <sys/time.h>
 #include <iostream>
 
 namespace TU
@@ -14,10 +13,10 @@ namespace TU
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-static quadlet_t
+static uint32_t
 triggerModeValue(IIDCCamera::TriggerMode mode)
 {
-    quadlet_t	val = 0;
+    uint32_t	val = 0;
     for (u_int n = mode; n >>= 1; )
 	++val;
 
@@ -25,7 +24,7 @@ triggerModeValue(IIDCCamera::TriggerMode mode)
 }
 
 static inline u_int
-triggerModeInq(quadlet_t val)
+triggerModeInq(uint32_t val)
 {
     return 0x1u << (15 - val);
 }
@@ -48,9 +47,9 @@ getNode(IIDCCamera::Type type, uint64_t uniqId)
 static inline uint64_t
 cycletime_to_cycle(uint32_t cycletime)
 {
-    uint32_t	sec	 = (cycletime & 0xfe000000) >> 25;
-    uint32_t	cycle	 = (cycletime & 0x01fff000) >> 12;
-    uint32_t	subcycle = (cycletime & 0x00000fff);
+    const uint64_t	sec	 = (cycletime & 0xfe000000) >> 25;
+    const uint64_t	cycle	 = (cycletime & 0x01fff000) >> 12;
+    const uint64_t	subcycle = (cycletime & 0x00000fff);
 
     return cycle + 8000*sec;
 }
@@ -58,51 +57,59 @@ cycletime_to_cycle(uint32_t cycletime)
 /************************************************************************
 *  local constants							*
 ************************************************************************/
-static const uint32_t	Advanced_Feature_Quadlet_Offset	= 0x480;
-static const uint32_t	PIO_Control_Quadlet_Offset	= 0x484;
-static const uint32_t	SIO_Control_Quadlet_Offset	= 0x488;
-static const uint32_t	Strobe_Output_Quadlet_Offset	= 0x48c;
-    
-static const uint32_t	Cur_V_Frm_Rate			= 0x600;
-static const uint32_t	Cur_V_Mode			= 0x604;
-static const uint32_t	Cur_V_Format			= 0x608;
-static const uint32_t	ISO_Channel			= 0x60c;
-static const uint32_t	Camera_Power			= 0x610;
-static const uint32_t	ISO_EN				= 0x614;
-static const uint32_t	Memory_Save			= 0x618;
-static const uint32_t	One_Shot			= 0x61c;
-static const uint32_t	Mem_Save_Ch			= 0x620;
-static const uint32_t	Cur_Mem_Ch			= 0x624;
-static const uint32_t	Software_Trigger		= 0x62c;
+// Offsets concerning with GPIO pins.
+static constexpr uint32_t	Advanced_Feature_Quadlet_Offset	= 0x480;
+static constexpr uint32_t	PIO_Control_Quadlet_Offset	= 0x484;
+static constexpr uint32_t	SIO_Control_Quadlet_Offset	= 0x488;
+static constexpr uint32_t	Strobe_Output_Quadlet_Offset	= 0x48c;
+
+// Offsets concerning with image capturing.
+static constexpr uint32_t	Cur_V_Frm_Rate			= 0x600;
+static constexpr uint32_t	Cur_V_Mode			= 0x604;
+static constexpr uint32_t	Cur_V_Format			= 0x608;
+static constexpr uint32_t	ISO_Channel			= 0x60c;
+static constexpr uint32_t	Camera_Power			= 0x610;
+static constexpr uint32_t	ISO_EN				= 0x614;
+static constexpr uint32_t	Memory_Save			= 0x618;
+static constexpr uint32_t	One_Shot			= 0x61c;
+static constexpr uint32_t	Mem_Save_Ch			= 0x620;
+static constexpr uint32_t	Cur_Mem_Ch			= 0x624;
+static constexpr uint32_t	Software_Trigger		= 0x62c;
 
 // Video Mode CSR for Format_7.
-static const uint32_t	MAX_IMAGE_SIZE_INQ		= 0x000;
-static const uint32_t	UNIT_SIZE_INQ			= 0x004;
-static const uint32_t	IMAGE_POSITION			= 0x008;
-static const uint32_t	IMAGE_SIZE			= 0x00c;
-static const uint32_t	COLOR_CODING_ID			= 0x010;
-static const uint32_t	COLOR_CODING_INQ		= 0x014;
-static const uint32_t	PIXEL_NUMBER_INQ		= 0x034;
-static const uint32_t	TOTAL_BYTES_HI_INQ		= 0x038;
-static const uint32_t	TOTAL_BYTES_LO_INQ		= 0x03c;
-static const uint32_t	PACKET_PARA_INQ			= 0x040;
-static const uint32_t	BYTE_PER_PACKET			= 0x044;
-static const uint32_t	PACKET_PER_FRAME_INQ		= 0x048;
-static const uint32_t	UNIT_POSITION_INQ		= 0x04c;
-static const uint32_t	VALUE_SETTING			= 0x07c;
+static constexpr uint32_t	MAX_IMAGE_SIZE_INQ		= 0x000;
+static constexpr uint32_t	UNIT_SIZE_INQ			= 0x004;
+static constexpr uint32_t	IMAGE_POSITION			= 0x008;
+static constexpr uint32_t	IMAGE_SIZE			= 0x00c;
+static constexpr uint32_t	COLOR_CODING_ID			= 0x010;
+static constexpr uint32_t	COLOR_CODING_INQ		= 0x014;
+static constexpr uint32_t	PIXEL_NUMBER_INQ		= 0x034;
+static constexpr uint32_t	TOTAL_BYTES_HI_INQ		= 0x038;
+static constexpr uint32_t	TOTAL_BYTES_LO_INQ		= 0x03c;
+static constexpr uint32_t	PACKET_PARA_INQ			= 0x040;
+static constexpr uint32_t	BYTE_PER_PACKET			= 0x044;
+static constexpr uint32_t	PACKET_PER_FRAME_INQ		= 0x048;
+static constexpr uint32_t	UNIT_POSITION_INQ		= 0x04c;
+static constexpr uint32_t	VALUE_SETTING			= 0x07c;
+
+static constexpr uint64_t	PointGrey_Feature_ID	= 0x00b09d000004ull;
+
+// Offsets of access control registers (PointGrey specific)
+static constexpr uint32_t	BAYER_TILE_MAPPING		= 0x040;
+static constexpr uint32_t	IMAGE_DATA_FORMAT		= 0x048;
+static constexpr uint32_t	PIO_DIRECTION			= 0x1f8;
+static constexpr uint32_t	FRAME_INFO			= 0x2f8;
+static constexpr uint32_t	OUTPUT_VOLTAGE_ENABLE		= 0x9d0;
+
+// Bit fields of feature status/control registers.
+static constexpr uint32_t	Abs_Control_bit			= 0x1u << 30;
+static constexpr uint32_t	One_Push_bit			= 0x1u << 28;
+static constexpr uint32_t	ON_OFF_bit			= 0x1u << 25;
+static constexpr uint32_t	A_M_Mode_bit			= 0x1u << 24;
 
 // NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
-static const u_int	NBUFFERS			= 2;
+static constexpr u_int		NBUFFERS			= 2;
 
-static const uint64_t	PointGrey_Feature_ID		= 0x00b09d000004ull;
-
-// Access control register offsets (PointGrey specific)
-static const uint32_t	BAYER_TILE_MAPPING		= 0x040;
-static const uint32_t	IMAGE_DATA_FORMAT		= 0x048;
-static const uint32_t	PIO_DIRECTION			= 0x1f8;
-static const uint32_t	FRAME_INFO			= 0x2f8;
-static const uint32_t	OUTPUT_VOLTAGE_ENABLE		= 0x9d0;
-    
 /************************************************************************
 *  union AbsValue							*
 ************************************************************************/
@@ -134,7 +141,7 @@ IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed)
 		CSR_REGISTER_BASE +
 		4 * readQuadletFromRegister(Advanced_Feature_Quadlet_Offset) :
 		0),
-     _w(0), _h(0), _p(MONO_8), _img(0), _img_size(0),
+     _w(0), _h(0), _p(MONO_8), _img(nullptr), _img_size(0),
      _bayer(YYYY), _littleEndian(false)
 {
   // Set speed of isochronous transmission.
@@ -229,7 +236,7 @@ IIDCCamera::setPower(bool enable)
 IIDCCamera&
 IIDCCamera::setSpeed(Speed speed)
 {
-    quadlet_t	quad;
+    uint32_t	quad;
     if (inquireBasicFunction() & I1394b_mode_Capability)
     {
 	quad = ((0x1u << 15) | speed);
@@ -249,7 +256,7 @@ IIDCCamera::setSpeed(Speed speed)
 	}
     }
 
-    const bool	cont = inContinuousShot();
+    const auto	cont = inContinuousShot();
     continuousShot(false);
 
     writeQuadletToRegister(ISO_Channel,
@@ -268,8 +275,8 @@ IIDCCamera::setSpeed(Speed speed)
 IIDCCamera::Speed
 IIDCCamera::getSpeed() const
 {
-    quadlet_t	quad  = readQuadletFromRegister(ISO_Channel);
-    quadlet_t	speed = (quad & (0x1u << 15) ? quad & 0x7
+    const auto	quad  = readQuadletFromRegister(ISO_Channel);
+    const auto	speed = (quad & (0x1u << 15) ? quad & 0x7
 					     : (quad >> 24) & 0x3);
     
     switch (speed)
@@ -300,10 +307,10 @@ IIDCCamera::getSpeed() const
 		のorとして返す. 指定されたフォーマット自体がこのカメラでサ
 		ポートされていなければ, 0が返される.
 */
-quadlet_t
+uint32_t
 IIDCCamera::inquireFrameRate(Format format) const
 {
-    quadlet_t	quad = inquireFrameRate_or_Format_7_Offset(format);
+    const auto	quad = inquireFrameRate_or_Format_7_Offset(format);
 
     switch (format)
     {
@@ -344,7 +351,7 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
     checkAvailability(format, rate);
     const u_int	fmt  = (u_int(format) - u_int(YUV444_160x120)) / 0x20,
 		mode = (u_int(format) - u_int(YUV444_160x120)) % 0x20 / 4;
-    const bool	cont = inContinuousShot();
+    const auto	cont = inContinuousShot();
     
     continuousShot(false);
     
@@ -515,7 +522,7 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
       case Format_7_6:
       case Format_7_7:
       {
-	const Format_7_Info	fmt7info = getFormat_7_Info(format);
+	const auto	fmt7info = getFormat_7_Info(format);
 	_w	    = fmt7info.width;
 	_h	    = fmt7info.height;
 	_p	    = fmt7info.pixelFormat;
@@ -558,7 +565,7 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
     const u_char ch = _node->mapListenBuffer(packet_size, _img_size, NBUFFERS);
 
   // map時に割り当てられたチャンネル番号をカメラに設定する.
-    quadlet_t	 quad = readQuadletFromRegister(ISO_Channel);
+    auto	 quad = readQuadletFromRegister(ISO_Channel);
     (quad &= 0x0fffc0ff) |= ((ch << 28) | (ch << 8));
     writeQuadletToRegister(ISO_Channel, quad);
 
@@ -620,7 +627,7 @@ IIDCCamera::getFrameRate() const
 IIDCCamera::Format_7_Info
 IIDCCamera::getFormat_7_Info(Format format7)
 {
-    const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
+    const auto		base = getFormat_7_BaseAddr(format7);
     quadlet_t		quad;
     Format_7_Info	fmt7info;
 
@@ -697,7 +704,7 @@ IIDCCamera&
 IIDCCamera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
 				u_int width, u_int height)
 {
-    const Format_7_Info	fmt7info = getFormat_7_Info(format7);
+    const auto	fmt7info = getFormat_7_Info(format7);
 
     const u_int	u1 = u0 + width;		    // 右端の希望値
     u0 = fmt7info.unitU0 * (u0 / fmt7info.unitU0);  // 左端を最小単位の倍数に
@@ -718,11 +725,11 @@ IIDCCamera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
 	height -= fmt7info.unitHeight;	// 最大高さに収まるよう高さを修正
 
   // 画像出力中はROIを変更できないので, もしそうであれば停止する.
-    const bool	cont = inContinuousShot();
+    const auto	cont = inContinuousShot();
     continuousShot(false);
 
   // ROIを指定する.
-    const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
+    const auto	base = getFormat_7_BaseAddr(format7);
     _node->writeQuadlet(base + IMAGE_POSITION,
 			((u0 << 16) & 0xffff0000) | (v0 & 0xffff));
     _node->writeQuadlet(base + IMAGE_SIZE,
@@ -746,7 +753,7 @@ IIDCCamera&
 IIDCCamera::setFormat_7_PixelFormat(Format format7,
 					PixelFormat pixelFormat)
 {
-    const Format_7_Info	fmt7info = getFormat_7_Info(format7);
+    const auto	fmt7info = getFormat_7_Info(format7);
     if (!(pixelFormat & fmt7info.availablePixelFormats))
 	throw std::invalid_argument("IIDCCamera::setFormat_7_pixelFormat: unsupported pixel format!!");
 
@@ -755,8 +762,8 @@ IIDCCamera::setFormat_7_PixelFormat(Format format7,
     continuousShot(false);
 
   // pixel formatを指定する.
-    const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
-    u_int		colorCodingID = 0;
+    const auto	base = getFormat_7_BaseAddr(format7);
+    u_int	colorCodingID = 0;
     while ((0x1u << (31 - colorCodingID)) != pixelFormat)
 	++colorCodingID;
     _node->writeQuadlet(base + COLOR_CODING_ID, (colorCodingID << 24));
@@ -774,19 +781,19 @@ IIDCCamera::setFormat_7_PixelFormat(Format format7,
   \return		サポートされている機能を #FeatureFunction 型の列挙値
 			のorとして返す
  */
-quadlet_t
+uint32_t
 IIDCCamera::inquireFeatureFunction(Feature feature) const
 {
     u_int	n   = (u_int(feature) - 0x800) >> 2;
     quadlet_t	inq = 0;
     if (n < 32)		// FEATURE_HI
     {
-	const u_int	Feature_Hi_Inq	= 0x404;
+	constexpr uint32_t	Feature_Hi_Inq	= 0x404;
 	inq = readQuadletFromRegister(Feature_Hi_Inq) & (0x1u << (31 - n));
     }
     else		// FEATURE_LO
     {
-	const u_int	Feature_Lo_Inq	= 0x408;
+	constexpr uint32_t	Feature_Lo_Inq	= 0x408;
 	n -= 32;
 	inq = readQuadletFromRegister(Feature_Lo_Inq) & (0x1u << (31 - n));
     }
@@ -806,9 +813,9 @@ IIDCCamera::inquireFeatureFunction(Feature feature) const
 IIDCCamera&
 IIDCCamera::onePush(Feature feature)
 {
-    checkAvailability(feature, One_Push);
+    checkAvailability(feature, Presence | One_Push);
     writeQuadletToRegister(feature,
-			   readQuadletFromRegister(feature) | One_Push);
+			   readQuadletFromRegister(feature) | One_Push_bit);
     return *this;
 }
 
@@ -821,11 +828,13 @@ IIDCCamera::onePush(Feature feature)
 IIDCCamera&
 IIDCCamera::setActive(Feature feature, bool enable)
 {
-    constexpr quadlet_t	ON_OFF = 0x1u << 25;
-
-    checkAvailability(feature, OnOff);
-    auto	quad = readQuadletFromRegister(feature);
-    writeQuadletToRegister(feature, (enable ? quad | ON_OFF : quad & ~ON_OFF));
+    if (isActive(feature) != enable)
+    {
+	checkAvailability(feature, Presence | OnOff);
+	const auto	quad = readQuadletFromRegister(feature);
+	writeQuadletToRegister(feature, (enable ? quad |  ON_OFF_bit
+						: quad & ~ON_OFF_bit));
+    }
     return *this;
 }
 
@@ -838,10 +847,13 @@ IIDCCamera::setActive(Feature feature, bool enable)
 IIDCCamera&
 IIDCCamera::setAbsControl(Feature feature, bool enable)
 {
-    checkAvailability(feature, Abs_Control);
-    auto	quad = readQuadletFromRegister(feature);
-    writeQuadletToRegister(feature,
-			   (enable ? quad | Abs_Control : quad & ~Abs_Control));
+    if (isAbsControl(feature) != enable)
+    {
+	checkAvailability(feature, Presence | Abs_Control);
+	const auto	quad = readQuadletFromRegister(feature);
+	writeQuadletToRegister(feature, (enable ? quad |  Abs_Control_bit
+						: quad & ~Abs_Control_bit));
+    }
     return *this;
 }
 
@@ -856,12 +868,13 @@ IIDCCamera::setAbsControl(Feature feature, bool enable)
 IIDCCamera&
 IIDCCamera::setAuto(Feature feature, bool enable)
 {
-    constexpr quadlet_t	A_M_Mode = 0x1u << 24;
-    
-    checkAvailability(feature, Auto);
-    auto	quad = readQuadletFromRegister(feature);
-    writeQuadletToRegister(feature,
-			   (enable ? quad | A_M_Mode : quad & ~A_M_Mode));
+    if (isAuto(feature) != enable)
+    {
+	checkAvailability(feature, Presence | Auto);
+	const auto	quad = readQuadletFromRegister(feature);
+	writeQuadletToRegister(feature, (enable ? quad |  A_M_Mode_bit
+						: quad & ~A_M_Mode_bit));
+    }
     return *this;
 }
 
@@ -878,7 +891,7 @@ IIDCCamera::setValue(Feature feature, u_int value)
 {
     if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
 	throw std::invalid_argument("TU::IIDCCamera::setValue: cannot set WHITE_BALANCE/TRIGGER_MODE value using this method!!");
-    checkAvailability(feature, Manual);
+    checkAvailability(feature, Presence | Manual);
     if (feature == TEMPERATURE)
 	writeQuadletToRegister(TEMPERATURE,
 			       (readQuadletFromRegister(TEMPERATURE) &
@@ -899,7 +912,7 @@ IIDCCamera::setValue(Feature feature, u_int value)
 IIDCCamera&
 IIDCCamera::setAbsValue(Feature feature, float value)
 {
-    checkAvailability(feature, Manual);
+    checkAvailability(feature, Presence | Abs_Control | Manual);
     AbsValue	val;
     val.f = value;
     writeQuadletToRegister(getAbsValueOffset(feature) + 8, val.i);
@@ -915,8 +928,8 @@ IIDCCamera::setAbsValue(Feature feature, float value)
 bool
 IIDCCamera::inOnePushOperation(Feature feature) const
 {
-    checkAvailability(feature, One_Push);
-    return readQuadletFromRegister(feature) & One_Push;
+    checkAvailability(feature, Presence);	// One_Push を調べる必要なし
+    return readQuadletFromRegister(feature) & One_Push_bit;
 }
 
 //! 指定された属性がonになっているか調べる
@@ -927,8 +940,8 @@ IIDCCamera::inOnePushOperation(Feature feature) const
 bool
 IIDCCamera::isActive(Feature feature) const
 {
-    checkAvailability(feature, OnOff);
-    return readQuadletFromRegister(feature) & (0x1u << 25);
+    checkAvailability(feature, Presence);	// OnOff を調べる必要なし
+    return readQuadletFromRegister(feature) & ON_OFF_bit;
 }
 
 //! 指定された属性が絶対値操作モードになっているか調べる
@@ -940,8 +953,8 @@ IIDCCamera::isActive(Feature feature) const
 bool
 IIDCCamera::isAbsControl(Feature feature) const
 {
-    checkAvailability(feature, Presence);
-    return readQuadletFromRegister(feature) & (0x1u << 30);
+    checkAvailability(feature, Presence);	// Abs_Control を調べる必要なし
+    return readQuadletFromRegister(feature) & Abs_Control_bit;
 }
 
 //! 指定された属性が自動設定モードになっているか調べる
@@ -953,8 +966,8 @@ IIDCCamera::isAbsControl(Feature feature) const
 bool
 IIDCCamera::isAuto(Feature feature) const
 {
-    checkAvailability(feature, Auto);
-    return readQuadletFromRegister(feature) & (0x1u << 25);
+    checkAvailability(feature, Presence);	// Auto を調べる必要なし
+    return readQuadletFromRegister(feature) & A_M_Mode_bit;
 }
 
 //! 指定された属性がとり得る値の範囲を調べる
@@ -966,8 +979,7 @@ IIDCCamera::isAuto(Feature feature) const
 void
 IIDCCamera::getMinMax(Feature feature, u_int& min, u_int& max) const
 {
-    
-    quadlet_t	quad = checkAvailability(feature, Presence);
+    const auto	quad = checkAvailability(feature, Presence);
     min = (quad >> 12) & 0xfff;
     max = quad & 0xfff;
 }
@@ -981,9 +993,9 @@ IIDCCamera::getMinMax(Feature feature, u_int& min, u_int& max) const
 void
 IIDCCamera::getAbsMinMax(Feature feature, float& min, float& max) const
 {
-    checkAvailability(feature, Presence);
-    AbsValue	val;
-    uint32_t	offset = getAbsValueOffset(feature);
+    checkAvailability(feature, Presence | Abs_Control);
+    AbsValue		val;
+    const uint32_t	offset = getAbsValueOffset(feature);
     val.i = readQuadletFromRegister(offset);
     min = val.f;
     val.i = readQuadletFromRegister(offset + 4);
@@ -1005,7 +1017,7 @@ IIDCCamera::getValue(Feature feature) const
 {
     if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
 	throw std::invalid_argument("TU::IIDCCamera::getValue: cannot get WHITE_BALANCE/TRIGGER_MODE value using this method!!");
-    checkAvailability(feature, ReadOut);
+    checkAvailability(feature, Presence | ReadOut);
     return readQuadletFromRegister(feature) & 0xfff;	// 12bit value.
 }
 
@@ -1017,7 +1029,7 @@ IIDCCamera::getValue(Feature feature) const
 float
 IIDCCamera::getAbsValue(Feature feature) const
 {
-    checkAvailability(feature, ReadOut);
+    checkAvailability(feature, Presence | Abs_Control | ReadOut);
     AbsValue	val;
     val.i = readQuadletFromRegister(getAbsValueOffset(feature) + 8);
     return val.f;
@@ -1032,7 +1044,7 @@ IIDCCamera::getAbsValue(Feature feature) const
 IIDCCamera&
 IIDCCamera::setWhiteBalance(u_int ub, u_int vr)
 {
-    checkAvailability(WHITE_BALANCE, Manual);
+    checkAvailability(WHITE_BALANCE, Presence | Manual);
     writeQuadletToRegister(WHITE_BALANCE,
 			   (readQuadletFromRegister(WHITE_BALANCE) &
 			    0xff000000) | ((ub & 0xfff) << 12) | (vr & 0xfff));
@@ -1047,8 +1059,8 @@ IIDCCamera::setWhiteBalance(u_int ub, u_int vr)
 void
 IIDCCamera::getWhiteBalance(u_int &ub, u_int& vr) const
 {
-    checkAvailability(WHITE_BALANCE, ReadOut);
-    quadlet_t	quad = readQuadletFromRegister(WHITE_BALANCE);
+    checkAvailability(WHITE_BALANCE, Presence | ReadOut);
+    const auto	quad = readQuadletFromRegister(WHITE_BALANCE);
     ub = (quad >> 12) & 0xfff;
     vr = quad & 0xfff;
 }
@@ -1061,7 +1073,7 @@ IIDCCamera::getWhiteBalance(u_int &ub, u_int& vr) const
 u_int
 IIDCCamera::getAimedTemperature() const
 {
-    checkAvailability(TEMPERATURE, ReadOut);
+    checkAvailability(TEMPERATURE, Presence | ReadOut);
     return (readQuadletFromRegister(TEMPERATURE) >> 12) & 0xfff;
 }
 
@@ -1089,7 +1101,7 @@ IIDCCamera::setTriggerMode(TriggerMode mode)
 IIDCCamera::TriggerMode
 IIDCCamera::getTriggerMode() const
 {
-    checkAvailability(TRIGGER_MODE, ReadOut);
+    checkAvailability(TRIGGER_MODE, Presence | ReadOut);
     return uintToTriggerMode(
 	       triggerModeInq(
 		   (readQuadletFromRegister(TRIGGER_MODE) >> 16) & 0xf));
@@ -1106,8 +1118,8 @@ IIDCCamera::setTriggerPolarity(bool highActive)
     constexpr quadlet_t	Polarity_Inq    = 0x1u << 25;
     constexpr quadlet_t	HighActiveInput = 0x1u << 24;
     
-    checkAvailability(TRIGGER_MODE, Polarity_Inq);
-    const auto		quad = readQuadletFromRegister(TRIGGER_MODE);
+    checkAvailability(TRIGGER_MODE, Presence | Polarity_Inq);
+    const auto	quad = readQuadletFromRegister(TRIGGER_MODE);
     writeQuadletToRegister(TRIGGER_MODE,
 			   (highActive ?
 			    quad | HighActiveInput : quad & ~HighActiveInput));
@@ -1121,7 +1133,7 @@ IIDCCamera::setTriggerPolarity(bool highActive)
 bool
 IIDCCamera::getTriggerPolarity() const
 {
-    checkAvailability(TRIGGER_MODE, ReadOut);
+    checkAvailability(TRIGGER_MODE, Presence | ReadOut);
     return readQuadletFromRegister(TRIGGER_MODE) & (0x1u << 24);
 }
 
@@ -1153,7 +1165,7 @@ IIDCCamera::resetSoftwareTrigger()
   \return		サポートされている機能を #StrobeFunction 型の列挙値
 			のorとして返す
  */
-quadlet_t
+uint32_t
 IIDCCamera::inquireStrobeFunction(Strobe strobe) const
 {
     return readQuadletFromRegister(getStrobeOffset(strobe));
@@ -1168,8 +1180,6 @@ IIDCCamera::inquireStrobeFunction(Strobe strobe) const
 IIDCCamera&
 IIDCCamera::setActive(Strobe strobe, bool enable)
 {
-    constexpr quadlet_t	ON_OFF = 0x1u << 25;
-
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
 	const auto	val = readQuadletFromACRegister(PIO_DIRECTION);
@@ -1180,11 +1190,10 @@ IIDCCamera::setActive(Strobe strobe, bool enable)
     }
     
     checkAvailability(strobe, Strobe_Presence | Strobe_OnOff);
-    
     const auto	offset = getStrobeOffset(strobe);
     const auto	val    = readQuadletFromRegister(offset + 0x100);
     writeQuadletToRegister(offset + 0x100,
-			   (enable ? val | ON_OFF : val & ~ON_OFF));
+			   (enable ? val | ON_OFF_bit : val & ~ON_OFF_bit));
     return *this;
 }
 
@@ -1200,7 +1209,6 @@ IIDCCamera::setPolarity(Strobe strobe, bool highActive)
     constexpr quadlet_t	POLARITY = 0x1u << 24;
 
     checkAvailability(strobe, Strobe_Presence | Strobe_Polarity);
-    
     const auto	offset = getStrobeOffset(strobe);
     const auto	val    = readQuadletFromRegister(offset + 0x100);
     writeQuadletToRegister(offset + 0x100,
@@ -1217,6 +1225,7 @@ IIDCCamera::setPolarity(Strobe strobe, bool highActive)
 IIDCCamera&
 IIDCCamera::setDelay(Strobe strobe, u_int delay)
 {
+    checkAvailability(strobe, Strobe_Presence);
     const auto	offset = getStrobeOffset(strobe);
     const auto	val    = readQuadletFromRegister(offset + 0x100);
     writeQuadletToRegister(offset + 0x100,
@@ -1233,6 +1242,7 @@ IIDCCamera::setDelay(Strobe strobe, u_int delay)
 IIDCCamera&
 IIDCCamera::setDuration(Strobe strobe, u_int duration)
 {
+    checkAvailability(strobe, Strobe_Presence);
     const auto	offset = getStrobeOffset(strobe);
     const auto	val    = readQuadletFromRegister(offset + 0x100);
     writeQuadletToRegister(offset + 0x100,
@@ -1248,10 +1258,9 @@ IIDCCamera::setDuration(Strobe strobe, u_int duration)
 bool
 IIDCCamera::isStrobeActive(Strobe strobe) const
 {
-    constexpr quadlet_t	ON_OFF = 0x1u << 25;
-
+    checkAvailability(strobe, Strobe_Presence);
     const auto	offset = getStrobeOffset(strobe);
-    return readQuadletFromRegister(offset + 0x100) & ON_OFF;
+    return readQuadletFromRegister(offset + 0x100) & ON_OFF_bit;
 }
 
 //! 現在設定されているストロボ信号の極性を調べる
@@ -1264,6 +1273,7 @@ IIDCCamera::getPolarity(Strobe strobe) const
 {
     constexpr quadlet_t	POLARITY = 0x1u << 24;
 
+    checkAvailability(strobe, Strobe_Presence);
     const auto	offset = getStrobeOffset(strobe);
     return readQuadletFromRegister(offset + 0x100) & POLARITY;
 }
@@ -1277,6 +1287,7 @@ IIDCCamera::getPolarity(Strobe strobe) const
 void
 IIDCCamera::getMinMax(Strobe strobe, u_int& min, u_int& max) const
 {
+    checkAvailability(strobe, Strobe_Presence);
     const auto	val = inquireStrobeFunction(strobe);
     min = (val >> 12) & 0xfff;
     max = val & 0xfff;
@@ -1290,6 +1301,7 @@ IIDCCamera::getMinMax(Strobe strobe, u_int& min, u_int& max) const
 u_int
 IIDCCamera::getDelay(Strobe strobe) const
 {
+    checkAvailability(strobe, Strobe_Presence);
     const auto	offset = getStrobeOffset(strobe);
     return (readQuadletFromRegister(offset + 0x100) >> 12) & 0xfff;
 }
@@ -1302,6 +1314,7 @@ IIDCCamera::getDelay(Strobe strobe) const
 u_int
 IIDCCamera::getDuration(Strobe strobe) const
 {
+    checkAvailability(strobe, Strobe_Presence);
     const auto	offset = getStrobeOffset(strobe);
     return readQuadletFromRegister(offset + 0x100) & 0xfff;
 }
@@ -1344,7 +1357,7 @@ IIDCCamera::continuousShot(bool enable)
 	{
 	    writeQuadletToRegister(ISO_EN, 0x0);
 	  //flushListenBuffer();
-	    _img = 0;
+	    _img = nullptr;
 	  // 再び continuoutShot() した時に captureRaw() で使用するので, 
 	  // _img_size の値は0にせずに保持する.
 	}
@@ -1414,7 +1427,7 @@ IIDCCamera::reset()
 IIDCCamera&
 IIDCCamera::saveConfig(u_int mem_ch)
 {
-    u_int	max = getMemoryChannelMax();
+    const u_int	max = getMemoryChannelMax();
     if (mem_ch == 0 || mem_ch > max)
 	throw std::invalid_argument("TU::IIDCCamera::saveConfig: invalid memory channel!!");
     writeQuadletToRegister(Mem_Save_Ch, mem_ch << 28);
@@ -1436,7 +1449,7 @@ IIDCCamera::saveConfig(u_int mem_ch)
 IIDCCamera&
 IIDCCamera::restoreConfig(u_int mem_ch)
 {
-    u_int	max = getMemoryChannelMax();
+    const u_int	max = getMemoryChannelMax();
     if (mem_ch > max)
 	throw std::invalid_argument("TU::IIDCCamera::restoreConfig: invalid memory channel!!");
     writeQuadletToRegister(Cur_Mem_Ch, mem_ch << 28);
@@ -1482,7 +1495,7 @@ IIDCCamera::getMemoryChannelMax() const
 template <class T> const IIDCCamera&
 IIDCCamera::operator >>(Image<T>& image) const
 {
-    if (_img == 0)
+    if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::operator >>: no images snapped!!");
   // Transfer image data from current buffer.
     image.resize(height(), width());
@@ -1612,7 +1625,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 template <class T> const IIDCCamera&
 IIDCCamera::captureRGBImage(Image<T>& image) const
 {
-    if (_img == 0)
+    if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureRGBImage: no images snapped!!");
   // Transfer image data from current buffer.
     image.resize(height(), width());
@@ -1744,7 +1757,7 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 const IIDCCamera&
 IIDCCamera::captureRaw(void* image) const
 {
-    if (_img == 0)
+    if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureRaw: no images snapped!!");
   // Transfer image data from current buffer.
     memcpy(image, _img, _img_size);
@@ -1767,7 +1780,7 @@ IIDCCamera::captureRaw(void* image) const
 const IIDCCamera&
 IIDCCamera::captureBayerRaw(void* image) const
 {
-    if (_img == 0)
+    if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureBayerRaw: no images snapped!!");
 
     auto	rgb = static_cast<RGB*>(image);
@@ -1805,7 +1818,7 @@ IIDCCamera::captureBayerRaw(void* image) const
 	    break;
 	  default:
 	  {
-	    const u_char*	p = _img;
+	    auto	p = _img;
 	    for (int n = width() * height(); n-- > 0; )
 	    {
 		rgb->r = rgb->g = rgb->b = *p++;
@@ -1849,7 +1862,7 @@ IIDCCamera::captureBayerRaw(void* image) const
 		break;
 	      default:
 	      {
-		const u_char*	p = _img;
+		auto	p = _img;
 		for (int n = width() * height(); n-- > 0; )
 		{
 		    rgb->r = rgb->g = rgb->b = *p++;
@@ -1891,7 +1904,7 @@ IIDCCamera::captureBayerRaw(void* image) const
 		break;
 	      default:
 	      {
-		const u_char*	p = _img;
+		auto	p = _img;
 		for (int n = width() * height(); n-- > 0; )
 		{
 		    rgb->r = rgb->g = rgb->b = *p++;
@@ -1922,7 +1935,7 @@ IIDCCamera::embedTimestamp(bool enable)
 {
     if (unlockAdvancedFeature(PointGrey_Feature_ID, 10))
     {
-	const quadlet_t	val = readQuadletFromACRegister(FRAME_INFO);
+	const auto	val = readQuadletFromACRegister(FRAME_INFO);
 	if (val & Presence)
 	    writeQuadletToACRegister(FRAME_INFO,
 				     (enable ? val | 0x1u : val & ~0x1u));
@@ -1935,13 +1948,13 @@ IIDCCamera::cycletimeToLocaltime(uint32_t cycletime) const
 {
   // 現在のcycletimeとlocaltimeを獲得する.
     uint64_t	localtime0;
-    uint32_t	cycletime0 = getCycletime(localtime0);
+    const auto	cycletime0 = getCycletime(localtime0);
 
   // 現時刻と指定された時刻のサイクル時刻をサブサイクル値に直し，
   // 両者のずれを求める.
-    u_int64_t	cycle0 = cycletime_to_cycle(cycletime0);
-    u_int64_t	cycle  = cycletime_to_cycle(cycletime);
-    u_int64_t	diff   = (cycle0 + (128LL*8000LL) - cycle) % (128LL*8000LL);
+    const auto	cycle0 = cycletime_to_cycle(cycletime0);
+    const auto	cycle  = cycletime_to_cycle(cycletime);
+    const auto	diff   = (cycle0 + (128LL*8000LL) - cycle) % (128LL*8000LL);
 
   // ずれをmicro sec単位に直して(1 cycle = 125 usec)現在時刻から差し引く.
     return localtime0 - 125LL*diff;
@@ -2113,6 +2126,10 @@ IIDCCamera::uintToFeature(u_int feature)
 	return TEMPERATURE;
       case TRIGGER_MODE:
 	return TRIGGER_MODE;
+      case TRIGGER_DELAY:
+	return TRIGGER_DELAY;
+      case FRAME_RATE:
+	return FRAME_RATE;
       case ZOOM:
 	return ZOOM;
       case PAN:
@@ -2211,9 +2228,9 @@ IIDCCamera::uintToPixelFormat(u_int pixelFormat)
 std::ostream&
 IIDCCamera::printCycletime(std::ostream& out, uint32_t cycletime)
 {
-    uint32_t	sec	 = (cycletime & 0xfe000000) >> 25;
-    uint32_t	cycle	 = (cycletime & 0x01fff000) >> 12;
-    uint32_t	subcycle = (cycletime & 0x00000fff);
+    const auto	sec	 = (cycletime & 0xfe000000) >> 25;
+    const auto	cycle	 = (cycletime & 0x01fff000) >> 12;
+    const auto	subcycle = (cycletime & 0x00000fff);
 
     return out << sec << '.' << cycle << '.' << subcycle;
 }
@@ -2227,10 +2244,10 @@ IIDCCamera::printCycletime(std::ostream& out, uint32_t cycletime)
 std::ostream&
 IIDCCamera::printLocaltime(std::ostream& out, uint64_t localtime)
 {
-    uint64_t	usec = localtime % 1000;
-    uint64_t	tmp  = localtime / 1000;
-    uint64_t	msec = tmp % 1000;
-    uint64_t	sec  = tmp / 1000;
+    const auto	usec = localtime % 1000;
+    const auto	tmp  = localtime / 1000;
+    const auto	msec = tmp % 1000;
+    const auto	sec  = tmp / 1000;
 
     return out << sec << '.' << msec << '.' << usec;
 }
@@ -2238,9 +2255,7 @@ IIDCCamera::printLocaltime(std::ostream& out, uint64_t localtime)
 uint32_t
 IIDCCamera::getAbsValueOffset(Feature feature) const
 {
-    checkAvailability(feature, Abs_Control);
-    
-    uint32_t	offset = (feature < ZOOM ? 0x100 : 0xc0);
+    const uint32_t	offset = (feature < ZOOM ? 0x100 : 0xc0);
 
     return CSR_REGISTER_BASE + 4 * readQuadletFromRegister(feature - offset)
 	 - _cmdRegBase;
@@ -2254,13 +2269,13 @@ IIDCCamera::getStrobeOffset(Strobe strobe) const
 	 - _cmdRegBase;
 }
     
-nodeaddr_t
+IIDCCamera::nodeaddr_t
 IIDCCamera::getFormat_7_BaseAddr(Format format7) const
 {
     if (format7 < Format_7_0)
 	throw std::invalid_argument("IIDCCamera::getFormat_7_BaseAddr: not Format_7_x!!");
 
-    const quadlet_t offset = 4 * inquireFrameRate_or_Format_7_Offset(format7);
+    const auto	offset = 4 * inquireFrameRate_or_Format_7_Offset(format7);
     if (offset == 0)
 	throw std::invalid_argument("IIDCCamera::getFormat_7_BaseAddr: unsupported Format_7_x!!");
     
@@ -2270,11 +2285,11 @@ IIDCCamera::getFormat_7_BaseAddr(Format format7) const
 u_int
 IIDCCamera::setFormat_7_PacketSize(Format format7)
 {
-    const quadlet_t	Presence    = 0x1u << 31;
-    const quadlet_t	Setting_1   = 0x1u << 30;
-    const quadlet_t	ErrorFlag_1 = 0x1u << 23;
-    const quadlet_t	ErrorFlag_2 = 0x1u << 22;
-    const nodeaddr_t	base	    = getFormat_7_BaseAddr(format7);
+    constexpr quadlet_t	Presence    = 0x1u << 31;
+    constexpr quadlet_t	Setting_1   = 0x1u << 30;
+    constexpr quadlet_t	ErrorFlag_1 = 0x1u << 23;
+    constexpr quadlet_t	ErrorFlag_2 = 0x1u << 22;
+    const auto		base	    = getFormat_7_BaseAddr(format7);
     const bool		present	    = _node->readQuadlet(base + VALUE_SETTING)
 				    & Presence;
     if (present)
@@ -2299,13 +2314,13 @@ IIDCCamera::setFormat_7_PacketSize(Format format7)
 	    return recBytePerPacket;
     }
 
-    const quadlet_t	quad = _node->readQuadlet(base + PACKET_PARA_INQ);
-    const u_int		unitBytePerPacket = (quad & 0xffff0000) >> 16,
-			maxBytePerPacket  = (quad & 0xffff);
+    const auto	quad = _node->readQuadlet(base + PACKET_PARA_INQ);
+    const auto	unitBytePerPacket = (quad & 0xffff0000) >> 16;
+    const auto	maxBytePerPacket  = (quad & 0xffff);
     for (u_int n = (unitBytePerPacket != 0 ?
 		    maxBytePerPacket / unitBytePerPacket : 0); n > 0; --n)
     {
-	const u_int	bytePerPacket = n * unitBytePerPacket;
+	const auto	bytePerPacket = n * unitBytePerPacket;
 	_node->writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);
 
 	if (!present ||
@@ -2317,7 +2332,7 @@ IIDCCamera::setFormat_7_PacketSize(Format format7)
     return 0;
 }
 
-quadlet_t
+uint32_t
 IIDCCamera::inquireFrameRate_or_Format_7_Offset(Format format) const
 {
     const u_int		V_FORMAT_INQ	= 0x100;
@@ -2552,94 +2567,13 @@ IIDCCamera::unlockAdvancedFeature(uint64_t featureId, u_int timeout) const
 }
 
 /************************************************************************
-*  global functions							*
+*  static member variables of IIDCCamera				*
 ************************************************************************/
-static const struct
-{
-    IIDCCamera::Format	format;
-    const char*		name;
-} formats[] =
-{
-    {IIDCCamera::YUV444_160x120,	"160x120-YUV(4:4:4)"},
-    {IIDCCamera::YUV422_320x240,	"320x240-YUV(4:2:2)"},
-    {IIDCCamera::YUV411_640x480,	"640x480-YUV(4:1:1)"},
-    {IIDCCamera::YUV422_640x480,	"640x480-YUV(4:2:2)"},
-    {IIDCCamera::RGB24_640x480,		"640x480-RGB"},
-    {IIDCCamera::MONO8_640x480,		"640x480-Y(mono)"},
-    {IIDCCamera::MONO16_640x480,	"640x480-Y(mono16)"},
-    {IIDCCamera::YUV422_800x600,	"800x600-YUV(4:2:2)"},
-    {IIDCCamera::RGB24_800x600,		"800x600-RGB"},
-    {IIDCCamera::MONO8_800x600,		"800x600-Y(mono)"},
-    {IIDCCamera::YUV422_1024x768,	"1024x768-YUV(4:2:2)"},
-    {IIDCCamera::RGB24_1024x768,	"1024x768-RGB"},
-    {IIDCCamera::MONO8_1024x768,	"1024x768-Y(mono)"},
-    {IIDCCamera::MONO16_800x600,	"800x600-Y(mono16)"},
-    {IIDCCamera::MONO16_1024x768,	"1024x768-Y(mono16)"},
-    {IIDCCamera::YUV422_1280x960,	"1280x960-YUV(4:2:2)"},
-    {IIDCCamera::RGB24_1280x960,	"1280x960-RGB"},
-    {IIDCCamera::MONO8_1280x960,	"1280x960-Y(mono)"},
-    {IIDCCamera::YUV422_1600x1200,	"1600x1200-YUV(4:2:2)"},
-    {IIDCCamera::RGB24_1600x1200,	"1600x1200-RGB"},
-    {IIDCCamera::MONO8_1600x1200,	"1600x1200-Y(mono)"},
-    {IIDCCamera::MONO16_1280x960,	"1280x960-Y(mono16)"},
-    {IIDCCamera::MONO16_1600x1200,	"1600x1200-Y(mono16)"},
-    {IIDCCamera::Format_5_0,		"Format_5_0"},
-    {IIDCCamera::MONO8_640x480x2,	"640x480x2-Y(mono)"},
-    {IIDCCamera::Format_5_2,		"Format_5_2"},
-    {IIDCCamera::Format_5_3,		"Format_5_3"},
-    {IIDCCamera::Format_5_4,		"Format_5_4"},
-    {IIDCCamera::Format_5_5,		"Format_5_5"},
-    {IIDCCamera::Format_5_6,		"Format_5_6"},
-    {IIDCCamera::Format_5_7,		"Format_5_7"},
-    {IIDCCamera::Format_7_0,		"Format_7_0"},
-    {IIDCCamera::Format_7_1,		"Format_7_1"},
-    {IIDCCamera::Format_7_2,		"Format_7_2"},
-    {IIDCCamera::Format_7_3,		"Format_7_3"},
-    {IIDCCamera::Format_7_4,		"Format_7_4"},
-    {IIDCCamera::Format_7_5,		"Format_7_5"},
-    {IIDCCamera::Format_7_6,		"Format_7_6"},
-    {IIDCCamera::Format_7_7,		"Format_7_7"}
-};
-
-static const struct
-{
-    IIDCCamera::FrameRate	rate;
-    const char*			name;
-} rates[] =
-{
-    {IIDCCamera::FrameRate_1_875,	"1.875fps"},
-    {IIDCCamera::FrameRate_3_75,	"3.75fps"},
-    {IIDCCamera::FrameRate_7_5,		"7.5fps"},
-    {IIDCCamera::FrameRate_15,		"15fps"},
-    {IIDCCamera::FrameRate_30,		"30fps"},
-    {IIDCCamera::FrameRate_60,		"60fps"},
-    {IIDCCamera::FrameRate_120,		"120fps"},
-    {IIDCCamera::FrameRate_240,		"240fps"},
-    {IIDCCamera::FrameRate_x,		"custom_frame_rate"}
-};
-
-static const struct
-{
-    IIDCCamera::Feature	feature;
-    const char*		name;
-} features[] =
-{
-    {IIDCCamera::BRIGHTNESS,		"BRIGHTNESS"},
-    {IIDCCamera::AUTO_EXPOSURE,		"AUTO_EXPOSURE"},
-    {IIDCCamera::SHARPNESS,		"SHARPNESS"},
-    {IIDCCamera::WHITE_BALANCE,		"WHITE_BALANCE"},
-    {IIDCCamera::HUE,			"HUE"},
-    {IIDCCamera::SATURATION,		"SATURATION"},
-    {IIDCCamera::GAMMA,			"GAMMA"},
-    {IIDCCamera::SHUTTER,		"SHUTTER"},
-    {IIDCCamera::GAIN,			"GAIN"},
-    {IIDCCamera::IRIS,			"IRIS"},
-    {IIDCCamera::FOCUS,			"FOCUS"},
-    {IIDCCamera::TEMPERATURE,		"TEMPERATURE"},
-    {IIDCCamera::ZOOM,			"ZOOM"},
-    {IIDCCamera::PAN,			"PAN"},
-    {IIDCCamera::TILT,			"TILT"}
-};
+constexpr IIDCCamera::FormatName	IIDCCamera::formatNames[];
+constexpr IIDCCamera::FrameRateName	IIDCCamera::frameRateNames[];
+constexpr IIDCCamera::PixelFormatName	IIDCCamera::pixelFormatNames[];
+constexpr IIDCCamera::FeatureName	IIDCCamera::featureNames[];
+constexpr IIDCCamera::TriggerModeName	IIDCCamera::triggerModeNames[];
 
 /************************************************************************
 *  global functions							*
@@ -2655,44 +2589,56 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 {
     using namespace	std;
     
-    for (const auto& format : formats)
-	if (camera.getFormat() == format.format)
-	{
-	    out << format.name;
-	    break;
-	}
+    out << find_if(begin(IIDCCamera::formatNames),
+		   end(IIDCCamera::formatNames),
+		   [&](IIDCCamera::FormatName fmt)
+		   {
+		       return camera.getFormat() == fmt.format;
+		   })->name
+	<< ' '
+	<< find_if(begin(IIDCCamera::frameRateNames),
+		   end(IIDCCamera::frameRateNames),
+		   [&](IIDCCamera::FrameRateName rt)
+		   {
+		       return camera.getFrameRate() == rt.frameRate;
+		   })->name;
 
-    for (const auto& rate : rates)
-	if (camera.getFrameRate() == rate.rate)
-	{
-	    out << ' ' << rate.name;
-	    break;
-	}
-
-    for (const auto& feature : features)
+    for (const auto& feature : IIDCCamera::featureNames)
     {
-	u_int	inq = camera.inquireFeatureFunction(feature.feature);
+	const auto	inq = camera.inquireFeatureFunction(feature.feature);
 
-	if ((inq & IIDCCamera::Presence) &&
-	    (inq & IIDCCamera::Manual)   &&
-	    (inq & IIDCCamera::ReadOut))
+	if ((inq & IIDCCamera::Presence) && (inq & IIDCCamera::ReadOut))
 	{
-	    out << ' ' << feature.name;
+	    const auto	abs = camera.isAbsControl(feature.feature);
 	    
-	    if ((inq & IIDCCamera::Auto) &&
-		camera.isAuto(feature.feature))
+	    out << ' ';
+	    if (abs)
+		out << '*';
+	    out << feature.name;
+	    
+	    if (camera.isAuto(feature.feature))
 		out << ' ' << -1;
 	    else
-	    {
-		if (feature.feature == IIDCCamera::WHITE_BALANCE)
+		switch (feature.feature)
 		{
+		  case IIDCCamera::WHITE_BALANCE:
+		  {
 		    u_int	ub, vr;
 		    camera.getWhiteBalance(ub, vr);
 		    out << ' ' << ub << ' ' << vr;
+		  }
+		    break;
+		  case IIDCCamera::TRIGGER_MODE:
+		    out << ' ' << camera.getTriggerMode();
+		    break;
+		  default:
+		    out << ' ';
+		    if (abs)
+			out << camera.getAbsValue(feature.feature);
+		    else
+			out << camera.getValue(feature.feature);
+		    break;
 		}
-		else
-		    out << ' ' << camera.getValue(feature.feature);
-	    }
 	}
     }
 
@@ -2709,20 +2655,22 @@ std::istream&
 operator >>(std::istream& in, IIDCCamera& camera)
 {
     using namespace	std;
-
+    
   // Read format.
     string	s;
     in >> s;
-    auto	format = std::find_if(std::begin(formats), std::end(formats),
-				      [&](decltype(formats[0]) fmt)
-				      {
-					  return s == fmt.name;
-				      });
+    const auto	format = find_if(begin(IIDCCamera::formatNames),
+				 end(IIDCCamera::formatNames),
+				 [&](IIDCCamera::FormatName fmt)
+				 {
+				     return s == fmt.name;
+				 });
 
   // Read frame rate.
     in >> s;
-    auto	rate = std::find_if(std::begin(rates), std::end(rates),
-				    [&](decltype(rates[0]) rt)
+    const auto	frameRate = find_if(begin(IIDCCamera::frameRateNames),
+				    end(IIDCCamera::frameRateNames),
+				    [&](IIDCCamera::FrameRateName rt)
 				    {
 					return s == rt.name;
 				    });
@@ -2730,42 +2678,71 @@ operator >>(std::istream& in, IIDCCamera& camera)
   // Read features.
     for (char c; in.get(c) && c != '\n'; )
     {
-	in.putback(c);
-	int	val, val2;
-	in >> s >> val;
-	if (s == "WHITE_BALANCE" && val != -1)
-	    in >> val2;
-	
-	for (const auto& feature : features)
-	    if (s == feature.name)
-	    {
-		u_int inq = camera.inquireFeatureFunction(feature.feature);
+	int	val = 0, val2 = 0;
+	float	fval = 0;
+	bool	abs = false;
 
-		if (inq & IIDCCamera::Presence)
+	if (c == '*')
+	{
+	    abs = true;
+	    in >> s >> fval;
+	    val = int(fval);
+	}
+	else
+	{
+	    in.putback(c);
+	    in >> s >> val;
+	    if (s == "WHITE_BALANCE" && val != -1)
+		in >> val2;
+	}
+
+	const auto	feature = find_if(begin(IIDCCamera::featureNames),
+					  end(IIDCCamera::featureNames),
+					  [&](IIDCCamera::FeatureName ftr)
+					  {
+					      return s == ftr.name;
+					  });
+
+	if (feature != end(IIDCCamera::featureNames))
+	{
+	    const auto	inq = camera.inquireFeatureFunction(feature->feature);
+
+	    if (inq & IIDCCamera::Presence)
+	    {
+		camera.setAbsControl(feature->feature, abs);
+
+		if (val == -1)
+		    camera.setAuto(feature->feature, true);
+		else if (inq & IIDCCamera::Manual)
 		{
-		    if (val == -1)
+		    camera.setAuto(feature->feature, false);
+		    
+		    switch (feature->feature)
 		    {
-			if (inq & IIDCCamera::Auto)
-			    camera.setAuto(feature.feature, true);
-		    }
-		    else
-		    {
-			if (inq & IIDCCamera::Manual)
-			{
-			    if (inq & IIDCCamera::Auto)
-				camera.setAuto(feature.feature, false);
-			    if (feature.feature == IIDCCamera::WHITE_BALANCE)
-				camera.setWhiteBalance(val, val2);
-			    else
-				camera.setValue(feature.feature, val);
-			}
+		      case IIDCCamera::WHITE_BALANCE:
+			camera.setWhiteBalance(val, val2);
+			break;
+			
+		      case IIDCCamera::TRIGGER_MODE:
+			camera.setTriggerMode(
+			    IIDCCamera::uintToTriggerMode(val));
+			break;
+			
+		      default:
+			if (abs)
+			    camera.setAbsValue(feature->feature, fval);
+			else
+			    camera.setValue(feature->feature, val);
+			break;
 		    }
 		}
 	    }
+	}
     }
     
-    if (format != std::end(formats) && rate != std::end(rates))
-	camera.setFormatAndFrameRate(format->format, rate->rate);
+    if (format	  != end(IIDCCamera::formatNames) &&
+	frameRate != end(IIDCCamera::frameRateNames))
+	camera.setFormatAndFrameRate(format->format, frameRate->frameRate);
         
     return in;
 }

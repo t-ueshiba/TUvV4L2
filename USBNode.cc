@@ -40,7 +40,7 @@ static constexpr uint8_t	EndpointAddress	= 0x81;
 *  static functions							*
 ************************************************************************/
 static inline uint8_t
-address_to_request(nodeaddr_t addr)
+address_to_request(IIDCNode::nodeaddr_t addr)
 {
     switch (addr >> 32)
     {
@@ -102,13 +102,13 @@ USBNode::~USBNode()
     libusb_close(_handle);
 }
 
-nodeid_t
+IIDCNode::nodeid_t
 USBNode::nodeId() const
 {
     return libusb_get_device_address(libusb_get_device(_handle));
 }
     
-quadlet_t
+IIDCNode::quadlet_t
 USBNode::readQuadlet(nodeaddr_t addr) const
 {
     quadlet_t	quad;
