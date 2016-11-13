@@ -25,12 +25,13 @@ CCFLAGS		= $(CFLAGS)
 
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS		= -lusb-1.0 \
-		  -lTUvIIDC++ -lTUXv++ -lTUv++ -lTUIIDC++ -lTUTools++ \
+		  -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ \
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
 else
-  LIBS		= -lTUvIIDC++ -lTUXv++ -lTUv++ -lTUIIDC++ -lTUTools++ \
+  LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ \
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
 endif
+
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
