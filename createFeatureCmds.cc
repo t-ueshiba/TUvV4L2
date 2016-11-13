@@ -31,6 +31,8 @@ static struct
     {IIDCCamera::IRIS,		"Iris"		 },
     {IIDCCamera::FOCUS,		"Focus"		 },
     {IIDCCamera::TEMPERATURE,	"Temperature"	 },
+    {IIDCCamera::TRIGGER_DELAY,	"Trigger delay"	 },
+    {IIDCCamera::FRAME_RATE,	"Frame rate"	 },
     {IIDCCamera::ZOOM,		"Zoom"		 },
   //{IIDCCamera::PAN,		"Pan"		 },
   //{IIDCCamera::TILT,		"Tilt"		 },
@@ -41,7 +43,8 @@ static CmdDef			featureCmds[3*NFEATURES + 2];
 static Array<CmdDef>		cameraChoiceCmds;
 static Array<std::string>	cameraChoiceTitles;
 static constexpr CmdId		CAMERA_CHOICE = IIDCCamera::BRIGHTNESS + 2;
-
+static MenuDef			triggerModeMenus[IIDCCamera::NTRIGGERMODES];
+    
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -54,132 +57,158 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncmds)
 	auto&		feature = features[i];
 	const auto	inq = camera.inquireFeatureFunction(feature.id);
 	
-	if (inq & IIDCCamera::Presence)
-	{
-	    u_int	x = 1;
-	    
-	    if (inq & IIDCCamera::OnOff)
-	    {
-	      // Create toggle button for turning on/off this feature.
-		featureCmds[ncmds].type	      = C_ToggleButton;
-		featureCmds[ncmds].id	      = feature.id
-					      + IIDCCAMERA_OFFSET_ONOFF;
-		featureCmds[ncmds].val	      = camera.isActive(feature.id);
-		featureCmds[ncmds].title      = "On";
-		featureCmds[ncmds].prop       = noProp;
-		featureCmds[ncmds].attrs      = CA_None;
-		featureCmds[ncmds].gridx      = x++;
-		featureCmds[ncmds].gridy      = y;
-		featureCmds[ncmds].gridWidth  = 1;
-		featureCmds[ncmds].gridHeight = 1;
-		featureCmds[ncmds].size	      = 0;
-		++ncmds;
-	    }
+	if (!((inq & IIDCCamera::Presence) &&
+	      (inq & IIDCCamera::Manual)   &&
+	      (inq & IIDCCamera::ReadOut)))
+	    continue;
+	
+	featureCmds[ncmds].id	      = feature.id;
+	featureCmds[ncmds].title      = feature.name;
+	featureCmds[ncmds].prop	      = feature.prop;
+	featureCmds[ncmds].attrs      = CA_None;
+	featureCmds[ncmds].gridx      = 0;
+	featureCmds[ncmds].gridy      = y;
+	featureCmds[ncmds].gridWidth  = 1;
+	featureCmds[ncmds].gridHeight = 1;
+	featureCmds[ncmds].size	      = 0;
 
-	    if (feature.id == IIDCCamera::TRIGGER_MODE)
+	if (feature.id == IIDCCamera::TRIGGER_MODE)
+	{
+	    featureCmds[ncmds].type = C_ChoiceMenuButton;
+	    featureCmds[ncmds].prop = triggerModeMenus;
+
+	    size_t	nmodes = 0;
+	    for (const auto& triggerMode : IIDCCamera::triggerModeNames)
+		if (inq & triggerMode.mode)
+		{
+		    triggerModeMenus[nmodes].label = triggerMode.name;
+		    triggerModeMenus[nmodes].id	   = triggerMode.mode;
+		    triggerModeMenus[nmodes].checked
+			= (camera.getTriggerMode() == triggerMode.mode);
+		    triggerModeMenus[nmodes].submenu = noSub;
+		    ++nmodes;
+		}
+			
+	    triggerModeMenus[nmodes] = EndOfMenu;
+	}
+	else
+	{
+	  // Create sliders for setting values.
+	    featureCmds[ncmds].type = C_Slider;
+
+	    u_int	min, max;
+	    camera.getMinMax(feature.id, min, max);
+	    feature.prop[0] = min;
+	    feature.prop[1] = max - min;
+	    feature.prop[2] = 1;
+	    
+	    if (feature.id == IIDCCamera::WHITE_BALANCE)
 	    {
-		featureCmds[ncmds].type	      = C_Label;
-		featureCmds[ncmds].id	      = feature.id;
-		featureCmds[ncmds].val	      = 0;
-		featureCmds[ncmds].title      = feature.name;
-		featureCmds[ncmds].prop       = noProp;
-		featureCmds[ncmds].attrs      = CA_NoBorder;
+		++ncmds;
+		++i;
+		++y;
+		features[i].prop[0]	      = min;
+		features[i].prop[1]	      = max - min;
+		features[i].prop[2]	      = 1;
+		featureCmds[ncmds].type	      = C_Slider;
+		featureCmds[ncmds].id	      = features[i].id
+					      + IIDCCAMERA_OFFSET_VR;
+		featureCmds[ncmds].title      = features[i].name;
+		featureCmds[ncmds].prop       = features[i].prop;
+		featureCmds[ncmds].attrs      = CA_None;
 		featureCmds[ncmds].gridx      = 0;
 		featureCmds[ncmds].gridy      = y;
 		featureCmds[ncmds].gridWidth  = 1;
 		featureCmds[ncmds].gridHeight = 1;
 		featureCmds[ncmds].size	      = 0;
-		++ncmds;
+		u_int	ub, vr;
+		camera.getWhiteBalance(ub, vr);
+		featureCmds[ncmds-1].val = ub;
+		featureCmds[ncmds  ].val = vr;
 	    }
-	    else if (inq & IIDCCamera::Manual)
+	    else
 	    {
-		if (inq & IIDCCamera::Auto)
+		featureCmds[ncmds].val = camera.getValue(feature.id);
+
+		if (inq & IIDCCamera::Abs_Control)
 		{
-		  // Create toggle button for setting manual/auto mode.
+		    ++ncmds;
+
+		  // Create toggle button for turning on/off abs. value mode.
 		    featureCmds[ncmds].type	  = C_ToggleButton;
 		    featureCmds[ncmds].id	  = feature.id
-						  + IIDCCAMERA_OFFSET_AUTO;
-		    featureCmds[ncmds].val	  = camera.isAuto(feature.id);
-		    featureCmds[ncmds].title	  = "Auto";
+						  + IIDCCAMERA_OFFSET_ABS;
+		    featureCmds[ncmds].val	  = camera.isAbsControl(
+							feature.id);
+		    featureCmds[ncmds].title      = "Abs.";
 		    featureCmds[ncmds].prop       = noProp;
 		    featureCmds[ncmds].attrs      = CA_None;
-		    featureCmds[ncmds].gridx      = x;
+		    featureCmds[ncmds].gridx      = 3;
 		    featureCmds[ncmds].gridy      = y;
 		    featureCmds[ncmds].gridWidth  = 1;
 		    featureCmds[ncmds].gridHeight = 1;
 		    featureCmds[ncmds].size	  = 0;
-		    ++ncmds;
 		}
-
-		featureCmds[ncmds].id	      = feature.id;
-		featureCmds[ncmds].title      = feature.name;
-		featureCmds[ncmds].gridx      = 0;
-		featureCmds[ncmds].gridy      = y;
-		featureCmds[ncmds].gridWidth  = 1;
-		featureCmds[ncmds].gridHeight = 1;
-		featureCmds[ncmds].size	      = 0;
-		
-		if (inq & IIDCCamera::ReadOut)
-		{
-		  // Create sliders for setting values.
-		    featureCmds[ncmds].type  = C_Slider;
-		    featureCmds[ncmds].prop  = feature.prop;
-		    featureCmds[ncmds].attrs = CA_None;
-
-		    u_int	min, max;
-		    camera.getMinMax(feature.id, min, max);
-		    feature.prop[0] = min;
-		    feature.prop[1] = max - min;
-		    feature.prop[2] = 1;
-
-		    if (feature.id == IIDCCamera::WHITE_BALANCE)
-		    {
-			++ncmds;
-			++i;
-			++y;
-			features[i].prop[0]	      = min;
-			features[i].prop[1]	      = max - min;
-			features[i].prop[2]	      = 1;
-			featureCmds[ncmds].type	      = C_Slider;
-			featureCmds[ncmds].id	      = features[i].id + 0x02;
-			featureCmds[ncmds].title      = features[i].name;
-			featureCmds[ncmds].prop       = features[i].prop;
-			featureCmds[ncmds].attrs      = CA_None;
-			featureCmds[ncmds].gridx      = 0;
-			featureCmds[ncmds].gridy      = y;
-			featureCmds[ncmds].gridWidth  = 1;
-			featureCmds[ncmds].gridHeight = 1;
-			featureCmds[ncmds].size	      = 0;
-			u_int	ub, vr;
-			camera.getWhiteBalance(ub, vr);
-			featureCmds[ncmds-1].val = ub;
-			featureCmds[ncmds  ].val = vr;
-		    }
-		    else
-			featureCmds[ncmds].val = camera.getValue(feature.id);
-		}
-		else
-		{
-		  // Create a label for setting on/off and manual/auto modes.
-		    featureCmds[ncmds].type  = C_Label;
-		    featureCmds[ncmds].prop  = noProp;
-		    featureCmds[ncmds].attrs = CA_NoBorder;
-		}
-		
-		++ncmds;
 	    }
-
-	    ++y;
 	}
+		
+	++ncmds;
+	
+	if (inq & IIDCCamera::OnOff)
+	{
+	  // Create toggle button for turning on/off this feature.
+	    featureCmds[ncmds].type	  = C_ToggleButton;
+	    featureCmds[ncmds].id	  = feature.id
+					  + IIDCCAMERA_OFFSET_ONOFF;
+	    featureCmds[ncmds].val	  = camera.isActive(feature.id);
+	    featureCmds[ncmds].title      = "On";
+	    featureCmds[ncmds].prop       = noProp;
+	    featureCmds[ncmds].attrs      = CA_None;
+	    featureCmds[ncmds].gridx      = 1;
+	    featureCmds[ncmds].gridy      = y;
+	    featureCmds[ncmds].gridWidth  = 1;
+	    featureCmds[ncmds].gridHeight = 1;
+	    featureCmds[ncmds].size	  = 0;
+	    ++ncmds;
+	}
+
+	if (inq & IIDCCamera::Auto)
+	{
+	  // Create toggle button for setting manual/auto mode.
+	    featureCmds[ncmds].type	  = C_ToggleButton;
+	    featureCmds[ncmds].id	  = feature.id
+		+ IIDCCAMERA_OFFSET_AUTO;
+	    if (feature.id == IIDCCamera::TRIGGER_MODE)
+	    {
+		featureCmds[ncmds].val	  = camera.getTriggerPolarity();
+		featureCmds[ncmds].title  = "(+)";
+	    }
+	    else
+	    {
+		featureCmds[ncmds].val	  = camera.isAuto(feature.id);
+		featureCmds[ncmds].title  = "Auto";
+	    }
+	    featureCmds[ncmds].prop       = noProp;
+	    featureCmds[ncmds].attrs      = CA_None;
+	    featureCmds[ncmds].gridx      = 2;
+	    featureCmds[ncmds].gridy      = y;
+	    featureCmds[ncmds].gridWidth  = 1;
+	    featureCmds[ncmds].gridHeight = 1;
+	    featureCmds[ncmds].size	  = 0;
+	    ++ncmds;
+	}
+
+	++y;
     }
+
     featureCmds[ncmds].type = C_EndOfList;
 
     return featureCmds;
 }
 
 /************************************************************************
-*  global functions							*
-************************************************************************/
+ *  global functions							*
+ ************************************************************************/
 CmdDef*
 createFeatureCmds(const IIDCCamera& camera)
 {
@@ -236,7 +265,7 @@ createFeatureCmds(const Array<IIDCCamera*>& cameras)
     featureCmds[0].gridHeight	= 1;
     featureCmds[0].size		= 0;
 
-    createFeatureCmds(*cameras[0], 1);
+    return createFeatureCmds(*cameras[0], 1);
 }
 	
 void
@@ -247,7 +276,12 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
     {
 	const u_int	id = featureCmd->id;
 	
-	if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_AUTO)
+	if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
+	    cmdPane.setValue(id,
+			     int(camera.isAbsControl(
+				     IIDCCamera::uintToFeature(
+					 id - IIDCCAMERA_OFFSET_ABS))));
+	else if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_AUTO)
 	    cmdPane.setValue(id,
 			     int(camera.isAuto(
 				     IIDCCamera::uintToFeature(
@@ -257,6 +291,8 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 			     int(camera.isActive(
 				     IIDCCamera::uintToFeature(
 					 id - IIDCCAMERA_OFFSET_ONOFF))));
+	else if (id == IIDCCamera::TRIGGER_MODE)
+	    cmdPane.setValue(id, int(camera.getTriggerMode()));
 	else if (id == IIDCCamera::WHITE_BALANCE)
 	{
 	    u_int	ub, vr;
@@ -265,7 +301,7 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 	    ++featureCmd;
 	    cmdPane.setValue(featureCmd->id, int(vr));
 	}
-	else if (id != IIDCCamera::TRIGGER_MODE)
+	else
 	    cmdPane.setValue(id, int(camera.getValue(
 					 IIDCCamera::uintToFeature(id))));
     }
