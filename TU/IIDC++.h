@@ -176,12 +176,6 @@ class IIDCNode
     uint32_t		unitSpecId()				const	;
     nodeaddr_t		commandRegisterBase()			const	;
 
-  //! ノードがオープンされているか調べる
-  /*!
-    \return		オープンされていればtrue, そうでなければfalse
-  */
-    virtual bool	isOpened()				const	= 0;
-
   //! このノードのID(bus上のアドレス)を返す
   /*!
     \return		このノードのID
@@ -237,7 +231,7 @@ class IIDCNode
 
   protected:
     bool		isUnique()				const	;
-    void		open()					const	;
+    void		addToList()				const	;
     
   private:
     uint32_t		readValueFromUnitDependentDirectory(uint8_t key)

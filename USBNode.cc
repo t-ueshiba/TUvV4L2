@@ -102,12 +102,6 @@ USBNode::~USBNode()
     libusb_close(_handle);
 }
 
-bool
-USBNode::isOpened() const
-{
-    return _handle;
-}
-    
 IIDCNode::nodeid_t
 USBNode::nodeId() const
 {
@@ -263,7 +257,7 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 		    check(libusb_set_configuration(_handle, 1),
 			  "Failed to set configuration!!");
 
-		    open();
+		    addToList();
 		    return;
 		}
 
@@ -271,6 +265,8 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 		_handle = nullptr;
 	    }
     }
+
+    throw std::runtime_error("No device with specidied unit_spec_ID and globalUniqId found!!");
 }
 
 void
