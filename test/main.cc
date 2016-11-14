@@ -15,7 +15,6 @@ main(int argc, char* argv[])
 
     const char*		cameraName = "BlackFly";
     const char*		configDirs = nullptr;
-    IIDCCamera::Speed	speed	   = IIDCCamera::SPD_400M;
     int			ncameras   = -1;
 
     extern char*	optarg;
@@ -32,23 +31,10 @@ main(int argc, char* argv[])
 	
     try
     {
-#if 0
-#  if 1
-	IIDCCameraArray	cameras(cameraName, configDirs, speed, ncameras);
-#  else
-	IIDCCameraArray	cameras;
-	cin >> cameras;
-#  endif
-	for (auto camera : cameras)
-	    cerr << hex << camera->globalUniqueId() << endl;
-#else
-	uint64_t	uniqId0 = 0x00b09d0100f908b2;
-	uint64_t	uniqId1 = 0x00b09d0100f908b3;
-	IIDCCamera	cameras[] = {{IIDCCamera::Monocular, uniqId0},
-				     {IIDCCamera::Monocular, uniqId1}};
+	IIDCCamera	cameras[2];
+
 	for (const auto& camera : cameras)
-	    cerr << hex << camera.globalUniqueId() << endl;
-#endif
+	    cerr << camera;
     }
     catch (exception& err)
     {

@@ -1,5 +1,5 @@
 /*
- * testIIDCcamera: test program controlling an IIDC 1394-based Digital Camera
+ * testIIDCcamera: test program controlling an IIDC-based Digital Camera
  * Copyright (C) 2003 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
  *
@@ -36,8 +36,11 @@ namespace TU
 ************************************************************************/
 //! ループ10回に要した時間の平均をとることにより，フレームレートを測定する．
 static void
-countTime(int& nframes, struct timeval& start)
+countTime()
 {
+    static int			nframes = 0;
+    static struct timeval	start;
+
     if (nframes == 10)
     {
 	struct timeval	end;
@@ -55,29 +58,27 @@ countTime(int& nframes, struct timeval& start)
 /*!
   \param widget		DrawingArea widget
   \param event		イベント
-  \param userdata	MyIIDCCamera (IEEE1394カメラ)
+  \param userdata	MyIIDCCamera (IIDCカメラ)
   \return		TRUEを返す
 */
 static gboolean
 CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
 {
-    MyIIDCCamera*	camera = (MyIIDCCamera*)userdata;
-    camera->draw();
+    static_cast<MyIIDCCamera*>(userdata)->draw();
     return TRUE;
 }
 
 /************************************************************************
 *  class MyIIDCCamera							*
 ************************************************************************/
-//! IEEE1394カメラノードを生成する
+//! IIDCカメラノードを生成する
 /*!
-  \param uniqId	個々のカメラ固有の64bit ID．同一のIEEE1394 busに
+  \param uniqId	個々のカメラ固有の64bit ID．同一のIIDC busに
 		複数のカメラが接続されている場合，これによって
 		同定を行う．
-  \param speed	データ転送速度
 */
-MyIIDCCamera::MyIIDCCamera(u_int64_t uniqId, Speed speed)
-    :IIDCCamera(IIDCCamera::Monocular, uniqId, speed),
+MyIIDCCamera::MyIIDCCamera(u_int64_t uniqId)
+    :IIDCCamera(uniqId),
      _canvas(gtk_drawing_area_new()),
      _buf(0),
      _rgb(0)
@@ -90,7 +91,7 @@ MyIIDCCamera::MyIIDCCamera(u_int64_t uniqId, Speed speed)
     setFormatAndFrameRate(getFormat(), getFrameRate());
 }
 
-//! IEEE1394カメラオブジェクトを破壊する
+//! IIDCカメラオブジェクトを破壊する
 MyIIDCCamera::~MyIIDCCamera()
 {
     delete [] _rgb;
@@ -102,12 +103,12 @@ MyIIDCCamera::~MyIIDCCamera()
   さらに入力画像バッファとRGBバッファを確保し直し，canvasの大きさを変更する．
   \param format	設定したい画像フォーマット．
   \param rate	設定したいフレームレート．
-  \return	このIEEE1394カメラオブジェクト．
+  \return	このIIDCカメラオブジェクト．
 */
 IIDCCamera&
 MyIIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
 {
-  // IEEE1394カメラに対して画像フォーマットとフレームレートを指定する．
+  // IIDCカメラに対して画像フォーマットとフレームレートを指定する．
     IIDCCamera::setFormatAndFrameRate(format, rate);
 
   // 指定したフォーマットに合わせて入力画像バッファとRGBバッファを再確保する．
@@ -156,11 +157,9 @@ void
 MyIIDCCamera::idle()
 {
   // フレームレートの測定．
-    static int			nframes = 0;
-    static struct timeval	start;
-    countTime(nframes, start);
+    countTime();
 
-  // IEEE1394Camera から画像データを読み込む．
+  // カメラから画像データを読み込む．
     if (bayerTileMapping() != IIDCCamera::YYYY &&
 	((pixelFormat() == MONO_8)  ||
 	 (pixelFormat() == MONO_16) || (pixelFormat() == SIGNED_MONO_16)))
@@ -184,7 +183,7 @@ MyIIDCCamera::draw()
       {
 	auto	p = reinterpret_cast<const YUV444*>(_buf);
 	auto	q = _rgb;
-	for (u_int y = 0; y < height(); ++y)
+	for (size_t y = 0; y < height(); ++y)
 	{
 	    std::copy(make_pixel_iterator(p), make_pixel_iterator(p + width()),
 		      make_pixel_iterator(q));
@@ -193,8 +192,8 @@ MyIIDCCamera::draw()
 	}
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			   0, 0, width(), height(),
-			   GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
+			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
+			   reinterpret_cast<guchar*>(_rgb), 3*width());
       }
 	break;
 
@@ -202,7 +201,7 @@ MyIIDCCamera::draw()
       {
 	auto	p = reinterpret_cast<const YUV422*>(_buf);
 	auto	q = _rgb;
-	for (u_int y = 0; y < height(); ++y)
+	for (size_t y = 0; y < height(); ++y)
 	{
 	    std::copy(make_pixel_iterator(p), make_pixel_iterator(p + width()),
 		      make_pixel_iterator(q));
@@ -211,8 +210,8 @@ MyIIDCCamera::draw()
 	}
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			   0, 0, width(), height(),
-			   GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
+			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
+			   reinterpret_cast<guchar*>(_rgb), 3*width());
       }
 	break;
 
@@ -220,7 +219,7 @@ MyIIDCCamera::draw()
       {
 	auto	p = reinterpret_cast<const YUV411*>(_buf);
 	auto	q = _rgb;
-	for (u_int y = 0; y < height(); ++y)
+	for (size_t y = 0; y < height(); ++y)
 	{
 	    std::copy(make_pixel_iterator(p),
 		      make_pixel_iterator(p + width()/2),
@@ -230,16 +229,16 @@ MyIIDCCamera::draw()
 	}
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			   0, 0, width(), height(),
-			   GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
+			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
+			   reinterpret_cast<guchar*>(_rgb), 3*width());
       }
 	break;
 
       case RGB_24:
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			   0, 0, width(), height(),
-			   GDK_RGB_DITHER_NONE, (guchar*)_buf, 3*width());
+			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
+			   _buf, 3*width());
 	break;
 
       case MONO_8:
@@ -248,14 +247,14 @@ MyIIDCCamera::draw()
 	    gdk_draw_rgb_image(_canvas->window,
 			       _canvas->style
 				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			       0, 0, width(), height(),
-			       GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
+			       0, 0, width(), height(), GDK_RGB_DITHER_NONE,
+			       reinterpret_cast<guchar*>(_rgb), 3*width());
 	else
 	    gdk_draw_gray_image(_canvas->window,
 				_canvas->style
 				       ->fg_gc[GTK_WIDGET_STATE(_canvas)],
-				0, 0, width(), height(),
-				GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
+				0, 0, width(), height(), GDK_RGB_DITHER_NONE,
+				_buf, width());
 	break;
 
       case MONO_16:
@@ -265,25 +264,25 @@ MyIIDCCamera::draw()
 	    gdk_draw_rgb_image(_canvas->window,
 			       _canvas->style
 				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
-			       0, 0, width(), height(),
-			       GDK_RGB_DITHER_NONE, (guchar*)_rgb, 3*width());
+			       0, 0, width(), height(), GDK_RGB_DITHER_NONE,
+			       reinterpret_cast<guchar*>(_rgb), 3*width());
 	else
 	{
-	    const u_short*	p = (u_short*)_buf;
-	    u_char*		q = _buf;
+	    auto	p = reinterpret_cast<const u_short*>(_buf);
+	    auto	q = _buf;
 	    if (isLittleEndian())
-		for (u_int y = 0; y < height(); ++y)
-		    for (u_int x = 0; x < width(); ++x)
+		for (size_t y = 0; y < height(); ++y)
+		    for (size_t x = 0; x < width(); ++x)
 			*q++ = *p++;
 	    else
-		for (u_int y = 0; y < height(); ++y)
-		    for (u_int x = 0; x < width(); ++x)
+		for (size_t y = 0; y < height(); ++y)
+		    for (size_t x = 0; x < width(); ++x)
 			*q++ = htons(*p++);
 	    gdk_draw_gray_image(_canvas->window,
 				_canvas->style
 				       ->fg_gc[GTK_WIDGET_STATE(_canvas)],
 				0, 0, width(), height(),
-				GDK_RGB_DITHER_NONE, (guchar*)_buf, width());
+				GDK_RGB_DITHER_NONE, _buf, width());
 	}
 	break;
 
@@ -337,15 +336,15 @@ MyIIDCCamera::save(std::ostream& out) const
 		(pixelFormat() == SIGNED_MONO_16) ||
 		(pixelFormat() == RAW_16))
 	    {
-		const u_short*	p = (u_short*)_buf;
-		u_char*		q = _buf;
+		auto	p = reinterpret_cast<const u_short*>(_buf);
+		auto	q = _buf;
 		if (isLittleEndian())
-		    for (u_int y = 0; y < height(); ++y)
-			for (u_int x = 0; x < width(); ++x)
+		    for (size_t y = 0; y < height(); ++y)
+			for (size_t x = 0; x < width(); ++x)
 			    *q++ = *p++;
 		else
-		    for (u_int y = 0; y < height(); ++y)
-			for (u_int x = 0; x < width(); ++x)
+		    for (size_t y = 0; y < height(); ++y)
+			for (size_t x = 0; x < width(); ++x)
 			    *q++ = htons(*p++);
 	    }
 	    out << "P5" << '\n' << width() << ' ' << height() << '\n' << 255

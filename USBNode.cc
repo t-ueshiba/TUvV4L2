@@ -102,6 +102,12 @@ USBNode::~USBNode()
     libusb_close(_handle);
 }
 
+bool
+USBNode::isOpened() const
+{
+    return _handle;
+}
+    
 IIDCNode::nodeid_t
 USBNode::nodeId() const
 {
@@ -187,7 +193,7 @@ USBNode::unmapListenBuffer()
     _nbuffers = 0;
 }
 
-const u_char*
+const void*
 USBNode::waitListenBuffer()
 {
     std::unique_lock<std::mutex>	lock(_mutex);
@@ -223,7 +229,7 @@ USBNode::getCycletime(uint64_t& localtime) const
 		    high_resolution_clock::now().time_since_epoch()).count();
     return readQuadlet(CMD_REG_BASE + CYCLE_TIME);
 }
-    
+
 void
 USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 {
@@ -247,8 +253,9 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 	    {
 		check(libusb_open(*dev, &_handle), "Failed to open device!!");
 	    
-		if (unitSpecId() == unit_spec_ID &&
-		    (uniqId == 0 || globalUniqueId() == uniqId))
+		if ((unitSpecId() == unit_spec_ID)		&&
+		    (uniqId == 0 || globalUniqueId() == uniqId)	&&
+		    isUnique())
 		{
 		    if (libusb_kernel_driver_active(_handle, 0))
 			check(libusb_detach_kernel_driver(_handle, 0),
@@ -256,6 +263,7 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 		    check(libusb_set_configuration(_handle, 1),
 			  "Failed to set configuration!!");
 
+		    open();
 		    return;
 		}
 
@@ -263,8 +271,6 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 		_handle = nullptr;
 	    }
     }
-
-    throw std::runtime_error("No device with specified unit_spec_ID and globalUniqId found!!");
 }
 
 void
@@ -406,7 +412,7 @@ USBNode::Buffer::callback(libusb_transfer* transfer)
 	return;
     }
     
-    auto	buffer = reinterpret_cast<const Buffer*>(transfer->user_data);
+    auto	buffer = static_cast<const Buffer*>(transfer->user_data);
 
     if (transfer->status != LIBUSB_TRANSFER_COMPLETED)
     {

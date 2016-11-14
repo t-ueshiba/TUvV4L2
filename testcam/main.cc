@@ -15,35 +15,23 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
     
-    v::App		vapp(argc, argv);
-    IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
-
-  // Parse command line.
-    extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "b")) != EOF; )
-	switch (c)
-	{
-	  case 'b':
-	    speed = IIDCCamera::SPD_800M;
-	    break;
-	}
-    extern int	optind;
+    v::App	vapp(argc, argv);
     u_int64_t	uniqId = 0;
+    extern int	optind;
     if (optind < argc)
 	uniqId = strtoull(argv[optind], 0, 0);
     
   // Main job.
     try
     {
-	IIDCCamera	camera(IIDCCamera::Monocular, uniqId, speed);
+	IIDCCamera	camera(uniqId);
 
 	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, camera);
 	vapp.run();
 
 	camera.continuousShot(false);
 
-	cerr << "0x" << hex << setw(16) << setfill('0')
-	     << camera.globalUniqueId() << dec << ' ' << camera;
+	cerr << camera;
     }
     catch (exception& err)
     {

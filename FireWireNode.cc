@@ -11,8 +11,6 @@ namespace TU
 ************************************************************************/
 //! FireWireノードオブジェクトを生成する
 /*!
-  \param unit_spec_ID	このノードの種類を示すID(ex. FireWireデジタルカメラ
-			であれば, 0x00a02d)
   \param uniqId		個々の機器固有の64bit ID. 同一のFireWire busに
 			同一のunit_spec_IDを持つ複数の機器が接続されて
 			いる場合, これによって同定を行う. 
@@ -20,6 +18,8 @@ namespace TU
 			まだ#FireWireNodeオブジェクトを割り当てられて
 			いない機器のうち, 一番最初にみつかったものがこの
 			オブジェクトと結びつけられる. 
+  \param unit_spec_ID	このノードの種類を示すID(ex. FireWireデジタルカメラ
+			であれば, 0x00a02d)
 */
 FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId)
 #if defined(__APPLE__)
@@ -61,6 +61,12 @@ FireWireNode::~FireWireNode()
     raw1394_destroy_handle(_handle);
 }
 
+bool
+FireWireNode::isOpened() const
+{
+    return _handle;
+}
+    
 IIDCNode::nodeid_t
 FireWireNode::nodeId() const
 {
@@ -145,7 +151,7 @@ FireWireNode::unmapListenBuffer()
     }
 }
 
-const u_char*
+const void*
 FireWireNode::waitListenBuffer()
 {
     while (_len < _buf_size)
@@ -195,7 +201,7 @@ FireWireNode::receive(raw1394handle_t handle,
     if (dropped)
 	std::cerr << "recieve: dropped = " << dropped << std::endl;
     
-    const auto	node = reinterpret_cast<FireWireNode*>(
+    const auto	node = static_cast<FireWireNode*>(
 			   raw1394_get_userdata(handle));
 
     if (sy)
@@ -242,20 +248,26 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 	{
 	    _nodeId = (j | 0xffc0);
 
-	    if (_nodeId != localId && unitSpecId() == unit_spec_ID &&
-		(uniqId == 0 || globalUniqueId() == uniqId))
+	    if ((_nodeId != localId)			    &&
+		(unitSpecId() == unit_spec_ID)		    &&
+		(uniqId == 0 || globalUniqueId() == uniqId) &&
+		isUnique())
+	    {
 		for (int channel = 0; channel < 64; ++channel)
 		{
 		    if (raw1394_channel_modify(_handle, channel,
 					       RAW1394_MODIFY_ALLOC) == 0)
+		    {
+			open();
 			return channel;
+		    }
 		}
+	    }
 	}
 	raw1394_destroy_handle(_handle);
 	_handle = nullptr;
     }
 
-    throw std::runtime_error("No device with specified unit_spec_ID and globalUniqId found!!");
     return 0;
 }
 #endif

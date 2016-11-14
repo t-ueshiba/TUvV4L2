@@ -1,5 +1,5 @@
 /*
- * testIIDCcamera: test program controlling an IIDC 1394-based Digital Camera
+ * testIIDCcamera: test program controlling an IIDC-based Digital Camera
  * Copyright (C) 2003 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
  *

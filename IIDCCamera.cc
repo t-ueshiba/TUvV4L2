@@ -5,6 +5,7 @@
 #include "USBNode_.h"
 #include <libraw1394/csr.h>
 #include <algorithm>
+#include <cctype>	// for isspace()
 #include <cstring>
 #include <iostream>
 
@@ -29,21 +30,6 @@ triggerModeInq(uint32_t val)
     return 0x1u << (15 - val);
 }
 
-static IIDCNode*
-getNode(IIDCCamera::Type type, uint64_t uniqId)
-{
-    try
-    {
-	return new FireWireNode(type, uniqId);
-    }
-    catch(const std::exception& err)
-    {
-	return new USBNode(type, uniqId);
-    }
-
-    return nullptr;
-}
-    
 static inline uint64_t
 cycletime_to_cycle(uint32_t cycletime)
 {
@@ -54,6 +40,15 @@ cycletime_to_cycle(uint32_t cycletime)
     return cycle + 8000*sec;
 }
 
+static std::istream&
+skipws(std::istream& in)
+{
+    for (char c; in.get(c); )
+	if (!isspace(c) || c == '\n')
+	    break;
+    return in;
+}
+    
 /************************************************************************
 *  local constants							*
 ************************************************************************/
@@ -124,7 +119,6 @@ union AbsValue
 ************************************************************************/
 //! IIDCカメラノードを生成する
 /*!
-  \param type		カメラのタイプ
   \param uniqId		個々のカメラ固有の64bit ID. 同一のバスに
 			複数のカメラが接続されている場合, これによって
 			同定を行う. 0が与えられると, まだ IIDCCamera
@@ -132,20 +126,94 @@ union AbsValue
 			一番最初にみつかったものがこのオブジェクトと結び
 			つけられる. オブジェクト生成後は, globalUniqueId()
 			によってこの値を知ることができる.
-  \param speed		FireWireバスの転送速度(1394bモードの場合は800Mbps)
+  \param type		カメラのタイプ
 */
-IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed)
-    :_node(getNode(type, uniqId)),
-     _cmdRegBase(_node->commandRegisterBase()),
-     _acRegBase(inquireBasicFunction() & Advanced_Feature_Inq ?
-		CSR_REGISTER_BASE +
-		4 * readQuadletFromRegister(Advanced_Feature_Quadlet_Offset) :
-		0),
-     _w(0), _h(0), _p(MONO_8), _img(nullptr), _img_size(0),
-     _bayer(YYYY), _littleEndian(false)
+IIDCCamera::IIDCCamera(uint64_t uniqId, Type type)
+    :_node(nullptr), _cmdRegBase(0), _acRegBase(0), _w(0), _h(0), _p(MONO_8),
+     _img(nullptr), _img_size(0), _bayer(YYYY), _littleEndian(false)
 {
-  // Set speed of isochronous transmission.
-    setSpeed(speed);
+    initialize(uniqId, type);
+}
+
+//! IIDCカメラオブジェクトを破壊する
+/*!
+  画像データ出力中であった場合は, それを停止する. 
+*/
+IIDCCamera::~IIDCCamera()
+{
+}
+
+//! 移動コンストラクタ
+IIDCCamera::IIDCCamera(IIDCCamera&& camera)
+    :_node(std::move(camera._node)),
+     _cmdRegBase(camera._cmdRegBase), _acRegBase(camera._acRegBase),
+     _w(camera._w), _h(camera._h), _p(camera._p),
+     _img(camera._img), _img_size(camera._img_size),
+     _bayer(camera._bayer), _littleEndian(camera._littleEndian)
+{
+}
+
+//! 移動代入演算子
+IIDCCamera&
+IIDCCamera::operator =(IIDCCamera&& camera)
+{
+    _node	  = std::move(camera._node);
+    _cmdRegBase	  = camera._cmdRegBase;
+    _acRegBase	  = camera._acRegBase;
+    _w		  = camera._w;
+    _h		  = camera._h;
+    _p		  = camera._p;
+    _img	  = camera._img;
+    _img_size	  = camera._img_size;
+    _bayer	  = camera._bayer;
+    _littleEndian = camera._littleEndian;
+
+    return *this;
+}
+    
+//! IIDCカメラのglobal unique IDを返す
+/*!
+  \return	このIIDCカメラのglobal unique ID
+*/
+uint64_t
+IIDCCamera::globalUniqueId() const
+{
+    return _node->globalUniqueId();
+}
+
+//! IIDCカメラの設定を工場出荷時に戻す
+/*!
+  \return	このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::initialize(uint64_t uniqId, Type type)
+{
+    try
+    {
+	_node.reset(new FireWireNode(type, uniqId));
+
+	if (!_node->isOpened())
+	{
+	    _node.reset(new USBNode(type, uniqId));
+
+	    if (!_node->isOpened())
+		throw std::runtime_error("IIDCCamera::initialize(): failed to open IIDCNode!");
+	}
+    }
+    catch (const std::exception& err)
+    {
+	throw err;
+    }
+    
+    _cmdRegBase  = _node->commandRegisterBase();
+    const auto	inq = inquireBasicFunction();
+    _acRegBase   = (inq & Advanced_Feature_Inq ?
+		    CSR_REGISTER_BASE +
+		    4*readQuadletFromRegister(Advanced_Feature_Quadlet_Offset) :
+		    0);
+    _img	  = nullptr;
+    _bayer	  = YYYY;
+    _littleEndian = false;
 
   // Map video1394 buffer according to current format and frame rate.
     setFormatAndFrameRate(getFormat(), getFrameRate());
@@ -175,43 +243,26 @@ IIDCCamera::IIDCCamera(Type type, uint64_t uniqId, Speed speed)
 	if ((y16_data_format & 0x80000001) == 0x80000001)
 	    _littleEndian = true;
     }
+    return *this;
 }
-
-//! IIDCカメラオブジェクトを破壊する
-/*!
-  画像データ出力中であった場合は, それを停止する. 
-*/
-IIDCCamera::~IIDCCamera()
-{
-    continuousShot(false);
-    embedTimestamp(false);
-    delete _node;
-}
-
-//! IIDCカメラのglobal unique IDを返す
-/*!
-  \return	このIIDCカメラのglobal unique ID
-*/
-uint64_t
-IIDCCamera::globalUniqueId() const
-{
-    return _node->globalUniqueId();
-}
-
+    
 //! IIDCカメラの設定を工場出荷時に戻す
 /*!
   \return	このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::initialize()
+IIDCCamera::reset()
 {
+#if 1
     constexpr uint32_t	INITIALIZE = 0x0;
     constexpr quadlet_t	Reset = 0x1u << 31;
 
     writeQuadletToRegister(INITIALIZE, Reset);
     while (readQuadletFromRegister(INITIALIZE) & Reset)
 	;
-
+#else
+    writeQuadletToRegister(Memory_Save, 0xdeafbeef);
+#endif    
     return *this;
 }
     
@@ -1409,13 +1460,6 @@ IIDCCamera::multiShot(u_short nframes)
     return *this;
 }
 
-IIDCCamera&
-IIDCCamera::reset()
-{
-    writeQuadletToRegister(Memory_Save, 0xdeafbeef);
-    return *this;
-}
-    
 //! 現在のカメラの設定を指定されたメモリチャンネルに記憶する
 /*!
   IIDCカメラの一部には, カメラに設定した画像フォーマットや属性値などを
@@ -1503,7 +1547,7 @@ IIDCCamera::operator >>(Image<T>& image) const
     {
       case YUV_444:
       {
-	auto	src = reinterpret_cast<const YUV444*>(_img);
+	auto	src = static_cast<const YUV444*>(_img);
 	for (auto& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1514,7 +1558,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	break;
       case YUV_422:
       {
-	auto	src = reinterpret_cast<const YUV422*>(_img);
+	auto	src = static_cast<const YUV422*>(_img);
 	for (auto& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1525,7 +1569,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	break;
       case YUV_411:
       {
-	auto	src = reinterpret_cast<const YUV411*>(_img);
+	auto	src = static_cast<const YUV411*>(_img);
 	for (auto& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1536,7 +1580,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	break;
       case RGB_24:
       {
-	auto	src = reinterpret_cast<const RGB*>(_img);
+	auto	src = static_cast<const RGB*>(_img);
 	for (auto& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1548,7 +1592,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case MONO_8:
       case RAW_8:
       {
-	auto	src = _img;
+	auto	src = static_cast<const u_char*>(_img);
 	for (auto& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1561,7 +1605,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case RAW_16:
 	if (_littleEndian)
 	{
-	    auto	src = reinterpret_cast<const u_short*>(_img);
+	    auto	src = static_cast<const u_short*>(_img);
 	    for (auto& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1571,7 +1615,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	}
 	else
 	{
-	    auto	src = reinterpret_cast<const Mono16*>(_img);
+	    auto	src = static_cast<const Mono16*>(_img);
 	    for (auto& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1583,7 +1627,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case SIGNED_MONO_16:
 	if (_littleEndian)
 	{
-	    auto	src = reinterpret_cast<const short*>(_img);
+	    auto	src = static_cast<const short*>(_img);
 	    for (auto& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1593,7 +1637,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	}
 	else
 	{
-	    auto	src = reinterpret_cast<const Mono16*>(_img);
+	    auto	src = static_cast<const Mono16*>(_img);
 	    for (auto& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
@@ -1632,29 +1676,32 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
     switch (pixelFormat())
     {
       case MONO_8:
+      {
+	auto	p = static_cast<const u_char*>(_img);
+	  
 	switch (_bayer)
 	{
 	  case RGGB:
-	    bayerDecodeRGGB(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeRGGB(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    image.begin());
 	    break;
 	  case BGGR:
-	    bayerDecodeBGGR(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeBGGR(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    image.begin());
 	    break;
 	  case GRBG:
-	    bayerDecodeGRBG(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeGRBG(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    image.begin());
 	    break;
 	  case GBRG:
-	    bayerDecodeGBRG(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeGBRG(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    image.begin());
 	    break;
@@ -1662,12 +1709,13 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 	    *this >> image;
 	    break;
 	}
+      }
 	break;
 	
       case MONO_16:
 	if (_littleEndian)
 	{
-	    auto	p = reinterpret_cast<const u_short*>(_img);
+	    auto	p = static_cast<const u_short*>(_img);
 	  
 	    switch (_bayer)
 	    {
@@ -1702,7 +1750,7 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 	}
 	else
 	{
-	    auto	p = reinterpret_cast<const Mono16*>(_img);
+	    auto	p = static_cast<const Mono16*>(_img);
 
 	    switch (_bayer)
 	    {
@@ -1789,50 +1837,51 @@ IIDCCamera::captureBayerRaw(void* image) const
     switch (pixelFormat())
     {
       case MONO_8:
+      {
+	auto	p = static_cast<const u_char*>(_img);
+	  
 	switch (_bayer)
 	{
 	  case RGGB:
-	    bayerDecodeRGGB(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeRGGB(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    make_flat_row_iterator(rgb, width()));
 	    break;
 	  case BGGR:
-	    bayerDecodeBGGR(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeBGGR(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    make_flat_row_iterator(rgb, width()));
 	    break;
 
 	  case GRBG:
-	    bayerDecodeGRBG(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeGRBG(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    make_flat_row_iterator(rgb, width()));
 	    break;
 	  case GBRG:
-	    bayerDecodeGBRG(make_flat_row_iterator(_img, width()),
-			    make_flat_row_iterator(_img + height()*width(),
+	    bayerDecodeGBRG(make_flat_row_iterator(p, width()),
+			    make_flat_row_iterator(p + height()*width(),
 						   width()),
 			    make_flat_row_iterator(rgb, width()));
 	    break;
 	  default:
-	  {
-	    auto	p = _img;
 	    for (int n = width() * height(); n-- > 0; )
 	    {
 		rgb->r = rgb->g = rgb->b = *p++;
 		++rgb;
 	    }
-	  }
 	    break;
 	}
+      }
 	break;
 	
       case MONO_16:
 	if (_littleEndian)
 	{
-	    auto	p = reinterpret_cast<const u_short*>(_img);
+	    auto	p = static_cast<const u_short*>(_img);
 	    
 	    switch (_bayer)
 	    {
@@ -1861,20 +1910,17 @@ IIDCCamera::captureBayerRaw(void* image) const
 				make_flat_row_iterator(rgb, width()));
 		break;
 	      default:
-	      {
-		auto	p = _img;
 		for (int n = width() * height(); n-- > 0; )
 		{
 		    rgb->r = rgb->g = rgb->b = *p++;
 		    ++rgb;
 		}
-	      }
 	        break;
 	    }
 	}
 	else
 	{
-	    auto	p = reinterpret_cast<const Mono16*>(_img);
+	    auto	p = static_cast<const Mono16*>(_img);
 
 	    switch (_bayer)
 	    {
@@ -1903,14 +1949,11 @@ IIDCCamera::captureBayerRaw(void* image) const
 				   make_flat_row_iterator(rgb, width()));
 		break;
 	      default:
-	      {
-		auto	p = _img;
 		for (int n = width() * height(); n-- > 0; )
 		{
 		    rgb->r = rgb->g = rgb->b = *p++;
 		    ++rgb;
 		}
-	      }
 	        break;
 	    }
 	}
@@ -2588,37 +2631,42 @@ std::ostream&
 operator <<(std::ostream& out, const IIDCCamera& camera)
 {
     using namespace	std;
-    
-    out << find_if(begin(IIDCCamera::formatNames),
+
+    out << showbase << hex << camera.globalUniqueId()	// Write glob. uniq. ID.
+	<< ' '
+	<< find_if(begin(IIDCCamera::formatNames),	// Write format.
 		   end(IIDCCamera::formatNames),
 		   [&](IIDCCamera::FormatName fmt)
 		   {
 		       return camera.getFormat() == fmt.format;
 		   })->name
 	<< ' '
-	<< find_if(begin(IIDCCamera::frameRateNames),
+	<< find_if(begin(IIDCCamera::frameRateNames),	// Write frame rate.
 		   end(IIDCCamera::frameRateNames),
 		   [&](IIDCCamera::FrameRateName rt)
 		   {
 		       return camera.getFrameRate() == rt.frameRate;
-		   })->name;
-
+		   })->name
+	<< dec;
+    
     for (const auto& feature : IIDCCamera::featureNames)
     {
 	const auto	inq = camera.inquireFeatureFunction(feature.feature);
 
 	if ((inq & IIDCCamera::Presence) && (inq & IIDCCamera::ReadOut))
 	{
-	    const auto	abs = camera.isAbsControl(feature.feature);
-	    
+	    const auto	amode = camera.isAuto(feature.feature);
+	    const auto	abs   = camera.isAbsControl(feature.feature);
+
 	    out << ' ';
-	    if (abs)
-		out << '*';
-	    out << feature.name;
-	    
-	    if (camera.isAuto(feature.feature))
-		out << ' ' << -1;
+	    if (amode)
+		out << '*' << feature.name;
 	    else
+	    {
+		if (abs)
+		    out << '%';
+		out << feature.name;
+		
 		switch (feature.feature)
 		{
 		  case IIDCCamera::WHITE_BALANCE:
@@ -2639,6 +2687,7 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 			out << camera.getValue(feature.feature);
 		    break;
 		}
+	    }
 	}
     }
 
@@ -2656,9 +2705,12 @@ operator >>(std::istream& in, IIDCCamera& camera)
 {
     using namespace	std;
     
-  // Read format.
-    string	s;
-    in >> s;
+    string		s;
+    in >> s;						// Read glob. uniq. ID.
+    const uint64_t	uniqId = strtoull(s.c_str(), 0, 0);
+    camera.initialize(uniqId);
+    
+    in >> s;						// Read format.
     const auto	format = find_if(begin(IIDCCamera::formatNames),
 				 end(IIDCCamera::formatNames),
 				 [&](IIDCCamera::FormatName fmt)
@@ -2666,8 +2718,7 @@ operator >>(std::istream& in, IIDCCamera& camera)
 				     return s == fmt.name;
 				 });
 
-  // Read frame rate.
-    in >> s;
+    in >> s;						// Read frame rate.
     const auto	frameRate = find_if(begin(IIDCCamera::frameRateNames),
 				    end(IIDCCamera::frameRateNames),
 				    [&](IIDCCamera::FrameRateName rt)
@@ -2675,8 +2726,7 @@ operator >>(std::istream& in, IIDCCamera& camera)
 					return s == rt.name;
 				    });
 
-  // Read features.
-    for (char c; in.get(c) && c != '\n'; )
+    for (char c; in >> TU::skipws >> c && c != '\n'; )	// Read features.
     {
 	int	val = 0, val2 = 0;
 	float	fval = 0;

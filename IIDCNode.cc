@@ -3,14 +3,20 @@
  */
 #include "TU/IIDC++.h"
 #include <libraw1394/csr.h>
+#include <algorithm>		// for std::find_if()
 
 namespace TU
 {
 /************************************************************************
 *  class IIDCNode							*
 ************************************************************************/
+IIDCNode::IIDCNode()
+{
+}
+    
 IIDCNode::~IIDCNode()
 {
+    _nodes.remove(this);
 }
     
 //! このノードに結び付けられている機器固有の64bit IDを返す
@@ -36,6 +42,27 @@ IIDCNode::commandRegisterBase() const
     return CSR_REGISTER_BASE + 4 * readValueFromUnitDependentDirectory(0x40);
 }
 
+//! この機器のglobal unique IDが既に登録されているか調べる
+/*
+  \return	登録されていればtrue, そうでなければfalse
+*/
+bool
+IIDCNode::isUnique() const
+{
+    return std::find_if(_nodes.begin(), _nodes.end(),
+			[=](const IIDCNode* node)
+			{
+			    return node->globalUniqueId() == globalUniqueId();
+			}) == _nodes.end();
+}
+
+//! この機器を新たに登録する
+void
+IIDCNode::open() const
+{
+    _nodes.push_back(this);
+}
+    
 //! 与えられたkeyに対する値をUnit Dependent Directoryから読み出す
 /*!
   \param key	keyすなわち4byteの並びのMSB側8bit
@@ -95,5 +122,6 @@ IIDCNode::readQuadletFromConfigROM(uint32_t offset) const
 {
     return readQuadlet(CSR_REGISTER_BASE + CSR_CONFIG_ROM + offset);
 }
-    
+
+std::list<const IIDCNode*>	IIDCNode::_nodes;
 }
