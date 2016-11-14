@@ -30,7 +30,6 @@ class FireWireNode : public IIDCNode
    */
     u_char		channel()		const	{return _channel;}
 
-    virtual bool	isOpened()				const	;
     virtual nodeid_t	nodeId()				const	;
     virtual quadlet_t	readQuadlet(nodeaddr_t addr)		const	;
     virtual void	writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;

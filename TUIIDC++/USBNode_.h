@@ -107,7 +107,6 @@ class USBNode : public IIDCNode
 			USBNode(uint32_t unit_spec_ID, uint64_t uniqId)	;
     virtual		~USBNode()					;
 
-    virtual bool	isOpened()				const	;
     virtual nodeid_t	nodeId()				const	;
     virtual quadlet_t	readQuadlet(nodeaddr_t addr)		const	;
     virtual void	writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;

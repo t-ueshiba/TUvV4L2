@@ -191,18 +191,10 @@ IIDCCamera::initialize(uint64_t uniqId, Type type)
     try
     {
 	_node.reset(new FireWireNode(type, uniqId));
-
-	if (!_node->isOpened())
-	{
-	    _node.reset(new USBNode(type, uniqId));
-
-	    if (!_node->isOpened())
-		throw std::runtime_error("IIDCCamera::initialize(): failed to open IIDCNode!");
-	}
     }
     catch (const std::exception& err)
     {
-	throw err;
+	_node.reset(new USBNode(type, uniqId));
     }
     
     _cmdRegBase  = _node->commandRegisterBase();

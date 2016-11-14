@@ -58,7 +58,7 @@ IIDCNode::isUnique() const
 
 //! この機器を新たに登録する
 void
-IIDCNode::open() const
+IIDCNode::addToList() const
 {
     _nodes.push_back(this);
 }

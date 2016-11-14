@@ -61,12 +61,6 @@ FireWireNode::~FireWireNode()
     raw1394_destroy_handle(_handle);
 }
 
-bool
-FireWireNode::isOpened() const
-{
-    return _handle;
-}
-    
 IIDCNode::nodeid_t
 FireWireNode::nodeId() const
 {
@@ -258,7 +252,7 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 		    if (raw1394_channel_modify(_handle, channel,
 					       RAW1394_MODIFY_ALLOC) == 0)
 		    {
-			open();
+			addToList();
 			return channel;
 		    }
 		}
@@ -267,6 +261,8 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 	raw1394_destroy_handle(_handle);
 	_handle = nullptr;
     }
+
+    throw std::runtime_error("No device with specidied unit_spec_ID and globalUniqId found!!");
 
     return 0;
 }
