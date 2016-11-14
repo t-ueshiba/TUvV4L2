@@ -19,8 +19,8 @@ static MenuDef	rateMenus[IIDCCamera::NFORMATS][IIDCCamera::NRATES + 1];
 MenuDef*
 createFormatMenu(const IIDCCamera& camera)
 {
-    auto	current_format = camera.getFormat();
-    auto	current_rate   = camera.getFrameRate();
+    const auto	current_format = camera.getFormat();
+    const auto	current_rate   = camera.getFrameRate();
     size_t	nitems = 0;
     for (const auto& format : IIDCCamera::formatNames)
     {
