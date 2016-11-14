@@ -2,7 +2,7 @@
  *  $Id: main.cc,v 1.11 2012-08-29 19:35:49 ueshiba Exp $
  */
 /*!
-  \mainpage	testIIDCcamera - program for testing an IIDC 1394-based Digital Camera
+  \mainpage	testIIDCcamera - program for testing an IIDC-based Digital Camera
   \anchor	testIIDCcamera
 
   \section copyright 著作権
@@ -35,9 +35,8 @@
 
   \section invocation コマンド呼び出しの形式
   \verbatim
-  testIIDCcamera [-b] [uniqueID]\endverbatim
+  testIIDCcamera [uniqueID]\endverbatim
 
-    - [<tt>-b</tt>] IEEE1394b (FireWire 800)モードを使用
     - [<tt>uniqueID</tt>] カメラが複数ある場合に特定のカメラを指定するためのglobal
 	uniqne IDを16進形式(0x####)で与える
 
@@ -71,10 +70,9 @@ usage(const char* s)
     
     cerr << "\nControl an IIDC digital camera.\n"
 	 << endl;
-    cerr << " Usage: " << s << " [-b] [uniqueID]"
+    cerr << " Usage: " << s << " [uniqueID]"
          << endl;
     cerr << " arguments.\n"
-         << "  -b:       IEEE1394b(800Mbps) mode\n"
          << "  uniqueID: camera unique-ID in hex format"
 	 << " (i.e. 0x####, default: arbitrary)\n"
          << endl;
@@ -97,14 +95,10 @@ main(int argc, char* argv[])
     
     gtk_init(&argc, &argv);	// GTK+ の初期化.
 
-    IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "bh")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "h")) != EOF; )
 	switch (c)
 	{
-	  case 'b':
-	    speed = IIDCCamera::SPD_800M;
-	    break;
 	  case 'h':
 	    usage(argv[0]);
 	    return 1;
@@ -117,9 +111,9 @@ main(int argc, char* argv[])
   // 本業を行う．
     try
     {
-	MyIIDCCamera	camera(uniqId, speed);		// カメラを開く．
+	MyIIDCCamera	camera(uniqId);		// カメラを開く．
 
-	GtkWidget*	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	const auto	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(window), "IIDC camera controller");
 	gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, TRUE);
 	gtk_signal_connect(GTK_OBJECT(window), "destroy",
@@ -127,7 +121,7 @@ main(int argc, char* argv[])
 	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
 			   GTK_SIGNAL_FUNC(gtk_exit), NULL);
 
-	GtkWidget*	table = gtk_table_new(2, 2, FALSE);
+	const auto	table = gtk_table_new(2, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 	gtk_table_attach(GTK_TABLE(table), createMenubar(camera),
 			 0, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
@@ -139,8 +133,7 @@ main(int argc, char* argv[])
 
 	gtk_main();
     
-	cout << "0x" << hex << setw(16) << setfill('0')
-	     << camera.globalUniqueId() << dec << ' ' << camera;
+	cout << camera;
     }
     catch (exception& err)
     {

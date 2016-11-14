@@ -84,11 +84,11 @@ class USBNode : public IIDCNode
 			Buffer()				;
 			~Buffer()				;
 			Buffer(const Buffer&)		= delete;
-			Buffer(Buffer&& buffer)		= delete;
+			Buffer(Buffer&&)		= delete;
 	Buffer&		operator =(const Buffer&)	= delete;
-	Buffer&		operator =(Buffer&& buffer)	= delete;
+	Buffer&		operator =(Buffer&&)		= delete;
 	
-	const u_char*	data()				const	{ return _p; }
+	const void*	data()				const	{ return _p; }
 	void		map(USBNode* node, u_int size)		;
 	void		unmap()					;
 	void		enqueue()			const	;
@@ -99,7 +99,7 @@ class USBNode : public IIDCNode
 	
       private:
 	USBNode*		_node;
-	u_char*			_p;
+	u_char*			_p;	// libusbのAPIのため，void*にできない
 	libusb_transfer*	_transfer;
     };
 	
@@ -107,6 +107,7 @@ class USBNode : public IIDCNode
 			USBNode(uint32_t unit_spec_ID, uint64_t uniqId)	;
     virtual		~USBNode()					;
 
+    virtual bool	isOpened()				const	;
     virtual nodeid_t	nodeId()				const	;
     virtual quadlet_t	readQuadlet(nodeaddr_t addr)		const	;
     virtual void	writeQuadlet(nodeaddr_t addr, quadlet_t quad)	;
@@ -114,8 +115,7 @@ class USBNode : public IIDCNode
 					u_int buf_size,
 					u_int nb_buffers)		;
     virtual void	unmapListenBuffer()				;
-    virtual const u_char*
-			waitListenBuffer()				;
+    virtual const void*	waitListenBuffer()				;
     virtual void	requeueListenBuffer()				;
     virtual void	flushListenBuffer()				;
     virtual uint32_t	getCycletime(uint64_t& localtime)	const	;

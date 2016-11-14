@@ -137,6 +137,8 @@
 #include <cstddef>	// for size_t
 #include <cstdint>	// for uintXX_t
 #include <sys/types.h>	// for u_int
+#include <memory>	// for std::unique_ptr<T>
+#include <list>
 #include <stdexcept>
 #include <sstream>
 #include <iomanip>
@@ -165,7 +167,7 @@ class IIDCNode
     typedef uint64_t	nodeaddr_t;
     
   public:
-			IIDCNode()					{}
+			IIDCNode()					;
     virtual		~IIDCNode()					;
 			IIDCNode(const IIDCNode&)		= delete;
     IIDCNode&		operator =(const IIDCNode&)		= delete;
@@ -173,6 +175,12 @@ class IIDCNode
     uint64_t		globalUniqueId()			const	;
     uint32_t		unitSpecId()				const	;
     nodeaddr_t		commandRegisterBase()			const	;
+
+  //! ノードがオープンされているか調べる
+  /*!
+    \return		オープンされていればtrue, そうでなければfalse
+  */
+    virtual bool	isOpened()				const	= 0;
 
   //! このノードのID(bus上のアドレス)を返す
   /*!
@@ -212,8 +220,7 @@ class IIDCNode
     実際にデータが受信されるまで, 本関数は呼び出し側に制御を返さない. 
     \return		データの入ったバッファの先頭アドレス. 
   */
-    virtual const u_char*
-			waitListenBuffer()				= 0;
+    virtual const void*	waitListenBuffer()				= 0;
 
   //! データ受信済みのバッファを再びキューイングして次の受信データに備える
     virtual void	requeueListenBuffer()				= 0;
@@ -227,6 +234,10 @@ class IIDCNode
     \return		バスのサイクルタイム.
   */
     virtual uint32_t	getCycletime(uint64_t& localtime)	const	= 0;
+
+  protected:
+    bool		isUnique()				const	;
+    void		open()					const	;
     
   private:
     uint32_t		readValueFromUnitDependentDirectory(uint8_t key)
@@ -235,6 +246,9 @@ class IIDCNode
     uint32_t		readValueFromDirectory(uint8_t key,
 					       uint32_t& offset)  const	;
     quadlet_t		readQuadletFromConfigROM(uint32_t offset) const	;
+
+  private:
+    static std::list<const IIDCNode*>	_nodes;
 };
 
 /************************************************************************
@@ -505,11 +519,17 @@ class IIDCCamera
     };
 
   public:
-    IIDCCamera(Type type=Monocular, uint64_t uniqId=0, Speed=SPD_400M)	;
-    ~IIDCCamera()							;
+			IIDCCamera(uint64_t uniqId=0,
+				   Type type=Monocular)			;
+			~IIDCCamera()					;
+			IIDCCamera(const IIDCCamera&)		= delete;
+    IIDCCamera&		operator =(const IIDCCamera&)		= delete;
+			IIDCCamera(IIDCCamera&& camera)			;
+    IIDCCamera&		operator =(IIDCCamera&& camera)			;
 
     uint64_t		globalUniqueId()			const	;
-    IIDCCamera&		initialize()					;
+    IIDCCamera&		initialize(uint64_t uniqId, Type type=Monocular);
+    IIDCCamera&		reset()						;
 
   // Basic function stuffs.
     uint32_t		inquireBasicFunction()			const	;
@@ -525,8 +545,8 @@ class IIDCCamera
 					      FrameRate rate)		;
     Format		getFormat()				const	;
     FrameRate		getFrameRate()				const	;
-    u_int		width()					const	;
-    u_int		height()				const	;
+    size_t		width()					const	;
+    size_t		height()				const	;
     PixelFormat		pixelFormat()				const	;
 
   // Format_7 stuffs.
@@ -594,7 +614,6 @@ class IIDCCamera
     IIDCCamera&		multiShot(u_short nframes)			;
 
   // Configuration saving/restoring stuffs.
-    IIDCCamera&		reset()						;
     IIDCCamera&		saveConfig(u_int mem_ch)			;
     IIDCCamera&		restoreConfig(u_int mem_ch)			;
     u_int		getMemoryChannelMax()			const	;
@@ -644,15 +663,15 @@ class IIDCCamera
 					 quadlet_t quad)		;
 
   private:
-    IIDCNode* const	_node;
-    const nodeaddr_t	_cmdRegBase;
-    const nodeaddr_t	_acRegBase;
-    u_int		_w, _h;		// width and height of current image format.
-    PixelFormat		_p;		// pixel format of current image format.
-    const u_char*	_img;		// currently available image data.
-    u_int		_img_size;	// image data size.
-    Bayer		_bayer;		// Bayer pattern supported by this camera.
-    bool		_littleEndian;	// true if MONO16 is in little endian format.
+    std::unique_ptr<IIDCNode>	_node;
+    nodeaddr_t			_cmdRegBase;
+    nodeaddr_t			_acRegBase;
+    size_t			_w, _h;
+    PixelFormat			_p;
+    const void*			_img;
+    size_t			_img_size;
+    Bayer			_bayer;
+    bool			_littleEndian;	//!<  MONO16 がlittle endian
 
   public:
     static constexpr FormatName
@@ -791,14 +810,14 @@ IIDCCamera::isLittleEndian() const
 }
 
 //! 現在設定されている画像フォーマット(#Format)の幅を返す
-inline u_int
+inline size_t
 IIDCCamera::width() const
 {
     return _w;
 }
 
 //! 現在設定されている画像フォーマット(#Format)の高さを返す
-inline u_int
+inline size_t
 IIDCCamera::height() const
 {
     return _h;
@@ -855,7 +874,7 @@ IIDCCamera::captureDirectly(Image<T>& image) const
 {
     if (!_img)
 	throw std::runtime_error("TU::IIDCCamera::captureDirectly: no images snapped!!");
-    image.resize(reinterpret_cast<T*>(const_cast<u_char*>(_img)),
+    image.resize(static_cast<T*>(const_cast<void*>(_img)),
 		 height(), width());
 
     return *this;
@@ -870,8 +889,8 @@ inline uint64_t
 IIDCCamera::getTimestamp() const
 {
     return (_img ?
-	    cycletimeToLocaltime(
-		ntohl(*reinterpret_cast<const uint32_t*>(_img))) : 0);
+	    cycletimeToLocaltime(ntohl(*static_cast<const uint32_t*>(_img))) :
+	    0);
 }
 
 //! 同時にサイクル時刻とシステム時刻を得る．

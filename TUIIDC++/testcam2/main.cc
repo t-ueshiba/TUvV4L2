@@ -22,8 +22,7 @@ CameraArray::CameraArray(char* argv[], int argc, IIDCCamera::Speed speed)
     :Array<IIDCCamera*>(argc)
 {
     for (size_t i = 0; i < size(); ++i)
-	(*this)[i] = new IIDCCamera(IIDCCamera::Monocular,
-				    strtoull(argv[i], 0, 0), speed);
+	(*this)[i] = new IIDCCamera(strtoull(argv[i], 0, 0));
 }
 
 CameraArray::~CameraArray()

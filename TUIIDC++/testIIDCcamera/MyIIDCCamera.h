@@ -1,5 +1,5 @@
 /*
- * test1394camera: test program controlling an IIDC 1394-based Digital Camera
+ * testIIDCcamera: test program controlling an IIDC-based Digital Camera
  * Copyright (C) 2003 Toshio UESHIBA
  *   National Institute of Advanced Industrial Science and Technology (AIST)
  *
@@ -30,14 +30,14 @@ namespace TU
 *  class MyIIDCCamera							*
 ************************************************************************/
 /*!
-  IEEE1394デジタルカメラを表すクラス．さらに，GTK+ を用いた画像表示のための
+  IIDCデジタルカメラを表すクラス．さらに，GTK+ を用いた画像表示のための
   canvas (GTK+ の drawing area widget)，入力画像バッファ，RGB カラー画像
   表示用のバッファを確保する機能を持つ．
 */
 class MyIIDCCamera : public IIDCCamera
 {
   public:
-    MyIIDCCamera(uint64_t uniqId, Speed speed)				;
+    MyIIDCCamera(uint64_t uniqId)					;
     ~MyIIDCCamera()							;
 
   //! 画像の表示領域となるキャンバスを返す．
