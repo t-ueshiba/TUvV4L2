@@ -22,7 +22,6 @@ static struct
     {IIDCCamera::AUTO_EXPOSURE,	"Auto exposure"	 },
     {IIDCCamera::SHARPNESS,	"Sharpness"	 },
     {IIDCCamera::WHITE_BALANCE,	"White bal.(U/B)"},
-    {IIDCCamera::WHITE_BALANCE,	"White bal.(V/R)"},
     {IIDCCamera::HUE,		"Hue"		 },
     {IIDCCamera::SATURATION,	"Saturation"	 },
     {IIDCCamera::GAMMA,		"Gamma"		 },
@@ -52,9 +51,8 @@ static CmdDef*
 createFeatureCmds(const IIDCCamera& camera, size_t ncmds)
 {
     u_int	y = ncmds;
-    for (size_t i = 0; i < NFEATURES; ++i)
+    for (auto& feature : features)
     {
-	auto&		feature = features[i];
 	const auto	inq = camera.inquireFeatureFunction(feature.id);
 	
 	if (!((inq & IIDCCamera::Presence) &&
@@ -105,16 +103,11 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncmds)
 	    if (feature.id == IIDCCamera::WHITE_BALANCE)
 	    {
 		++ncmds;
-		++i;
 		++y;
-		features[i].prop[0]	      = min;
-		features[i].prop[1]	      = max - min;
-		features[i].prop[2]	      = 1;
 		featureCmds[ncmds].type	      = C_Slider;
-		featureCmds[ncmds].id	      = features[i].id
-					      + IIDCCAMERA_OFFSET_VR;
-		featureCmds[ncmds].title      = features[i].name;
-		featureCmds[ncmds].prop       = features[i].prop;
+		featureCmds[ncmds].id	      = feature.id + IIDCCAMERA_OFFSET_VR;
+		featureCmds[ncmds].title      = "White bal.(V/R)";
+		featureCmds[ncmds].prop       = feature.prop;
 		featureCmds[ncmds].attrs      = CA_None;
 		featureCmds[ncmds].gridx      = 0;
 		featureCmds[ncmds].gridy      = y;
@@ -158,8 +151,7 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncmds)
 	{
 	  // Create toggle button for turning on/off this feature.
 	    featureCmds[ncmds].type	  = C_ToggleButton;
-	    featureCmds[ncmds].id	  = feature.id
-					  + IIDCCAMERA_OFFSET_ONOFF;
+	    featureCmds[ncmds].id	  = feature.id + IIDCCAMERA_OFFSET_ONOFF;
 	    featureCmds[ncmds].val	  = camera.isActive(feature.id);
 	    featureCmds[ncmds].title      = "On";
 	    featureCmds[ncmds].prop       = noProp;
@@ -274,7 +266,7 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
     for (CmdDef* featureCmd = featureCmds + 1;
 	 featureCmd->type != C_EndOfList; ++featureCmd)
     {
-	const u_int	id = featureCmd->id;
+	const auto	id = featureCmd->id;
 	
 	if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
 	    cmdPane.setValue(id,
