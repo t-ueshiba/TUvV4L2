@@ -13,8 +13,12 @@ main(int argc, char* argv[])
     {
 	TU::IIDCCamera	cameras[2];
 
-	for (const auto& camera : cameras)
-	    std::cerr << camera;
+	
+	for (auto& camera : cameras)
+	{
+	    camera.initialize();
+	    std::cout << camera;
+	}
     }
     catch (std::exception& err)
     {

@@ -12,7 +12,6 @@
 int
 main(int argc, char* argv[])
 {
-    using namespace	std;
     using namespace	TU;
     
     v::App	vapp(argc, argv);
@@ -24,18 +23,17 @@ main(int argc, char* argv[])
   // Main job.
     try
     {
-	IIDCCamera	camera(uniqId);
-
+	IIDCCamera				camera(uniqId);
 	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, camera);
 	vapp.run();
 
 	camera.continuousShot(false);
 
-	cerr << camera;
+	std::cout << camera;
     }
-    catch (exception& err)
+    catch (std::exception& err)
     {
-	cerr << err.what() << endl;
+	std::cerr << err.what() << std::endl;
 	return 1;
     }
 

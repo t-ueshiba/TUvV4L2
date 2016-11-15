@@ -513,7 +513,8 @@ class IIDCCamera
     };
 
   public:
-			IIDCCamera(uint64_t uniqId=0,
+			IIDCCamera()					;
+			IIDCCamera(uint64_t uniqId,
 				   Type type=Monocular)			;
 			~IIDCCamera()					;
 			IIDCCamera(const IIDCCamera&)		= delete;
@@ -522,7 +523,9 @@ class IIDCCamera
     IIDCCamera&		operator =(IIDCCamera&& camera)			;
 
     uint64_t		globalUniqueId()			const	;
-    IIDCCamera&		initialize(uint64_t uniqId, Type type=Monocular);
+    IIDCCamera&		initialize(uint64_t uniqId=0,
+				   Type type=Monocular)			;
+    IIDCCamera&		terminate()					;
     IIDCCamera&		reset()						;
 
   // Basic function stuffs.
@@ -572,7 +575,9 @@ class IIDCCamera
     
   // White balance stuffs.
     IIDCCamera&		setWhiteBalance(u_int ub, u_int vr)		;
+    IIDCCamera&		setAbsWhiteBalance(float ub, float vr)		;
     void		getWhiteBalance(u_int& ub, u_int& vr)	const	;
+    void		getAbsWhiteBalance(float& ub, float& vr) const	;
     
   // Temperature stuffs.
     u_int		getAimedTemperature()			const	;

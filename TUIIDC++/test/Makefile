@@ -35,7 +35,9 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../TU/IIDC++.h \
+EXTHDRS		= ../FireWireNode_.h \
+		../TU/IIDC++.h \
+		../USBNode_.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
@@ -56,6 +58,18 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
+main.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/Minimize.h
+USBNode.o: ../USBNode_.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/Minimize.h
 main.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
