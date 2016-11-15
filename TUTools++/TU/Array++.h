@@ -455,7 +455,7 @@ Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
 	get(in, m + n);
 
     for (size_t i = 0; i < n; ++i)
-	_p[m + i] = tmp[i];
+	_p[m + i] = std::move(tmp[i]);
 
     delete [] tmp;
     
@@ -1246,7 +1246,7 @@ Array2<T, R, C>::get(std::istream& in, size_t i, size_t j, size_t jmax)
     typename buf_type::value_type	val;
     in >> val;
     get(in, i, j + 1, jmax);
-    (*this)[i][j] = val;
+    (*this)[i][j] = std::move(val);
     return in;
 }    
 
