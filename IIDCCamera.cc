@@ -35,7 +35,7 @@ cycletime_to_cycle(uint32_t cycletime)
 {
     const uint64_t	sec	 = (cycletime & 0xfe000000) >> 25;
     const uint64_t	cycle	 = (cycletime & 0x01fff000) >> 12;
-    const uint64_t	subcycle = (cycletime & 0x00000fff);
+  //const uint64_t	subcycle = (cycletime & 0x00000fff);
 
     return cycle + 8000*sec;
 }
@@ -119,6 +119,16 @@ union AbsValue
 ************************************************************************/
 //! IIDCカメラノードを生成する
 /*!
+  カメラデバイスと結びつけて使用するには initialize() する必要がある
+*/
+IIDCCamera::IIDCCamera()
+    :_node(nullptr), _cmdRegBase(0), _acRegBase(0), _w(0), _h(0), _p(MONO_8),
+     _img(nullptr), _img_size(0), _bayer(YYYY), _littleEndian(false)
+{
+}
+
+//! IIDCカメラノードを生成する
+/*!
   \param uniqId		個々のカメラ固有の64bit ID. 同一のバスに
 			複数のカメラが接続されている場合, これによって
 			同定を行う. 0が与えられると, まだ IIDCCamera
@@ -129,8 +139,7 @@ union AbsValue
   \param type		カメラのタイプ
 */
 IIDCCamera::IIDCCamera(uint64_t uniqId, Type type)
-    :_node(nullptr), _cmdRegBase(0), _acRegBase(0), _w(0), _h(0), _p(MONO_8),
-     _img(nullptr), _img_size(0), _bayer(YYYY), _littleEndian(false)
+    :IIDCCamera()
 {
     initialize(uniqId, type);
 }
@@ -181,9 +190,17 @@ IIDCCamera::globalUniqueId() const
     return _node->globalUniqueId();
 }
 
-//! IIDCカメラの設定を工場出荷時に戻す
+//! IIDCカメラを初期化して使用可能な状態にする
 /*!
-  \return	このIIDCカメラオブジェクト
+  \param uniqId		個々のカメラ固有の64bit ID. 同一のバスに
+			複数のカメラが接続されている場合, これによって
+			同定を行う. 0が与えられると, まだ IIDCCamera
+			オブジェクトを割り当てられていないカメラのうち, 
+			一番最初にみつかったものがこのオブジェクトと結び
+			つけられる. オブジェクト生成後は, globalUniqueId()
+			によってこの値を知ることができる.
+  \param type		カメラのタイプ
+  \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
 IIDCCamera::initialize(uint64_t uniqId, Type type)
@@ -235,6 +252,28 @@ IIDCCamera::initialize(uint64_t uniqId, Type type)
 	if ((y16_data_format & 0x80000001) == 0x80000001)
 	    _littleEndian = true;
     }
+    return *this;
+}
+    
+//! IIDCカメラの使用を終了して待機状態にする
+/*!
+  再びカメラデバイスと結びつけて使用するには initialize() する必要がある
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::terminate()
+{
+    _node	  = nullptr;
+    _cmdRegBase	  = 0;
+    _acRegBase	  = 0;
+    _w		  = 0;
+    _h		  = 0;
+    _p		  = MONO_8;
+    _img	  = nullptr;
+    _img_size	  = 0;
+    _bayer	  = YYYY;
+    _littleEndian = false;
+
     return *this;
 }
     
@@ -1094,6 +1133,24 @@ IIDCCamera::setWhiteBalance(u_int ub, u_int vr)
     return *this;
 }
 
+//! ホワイトバランスの値を絶対値で設定する
+/*!
+  \param ub		設定するU/B値
+  \param vr		設定するV/R値
+  \return		このIIDCカメラオブジェクト
+*/
+IIDCCamera&
+IIDCCamera::setAbsWhiteBalance(float ub, float vr)
+{
+    checkAvailability(WHITE_BALANCE, Presence | Abs_Control | Manual);
+    AbsValue	fub, fvr;
+    fub.f = ub;
+    fvr.f = vr;
+    writeQuadletToRegister(getAbsValueOffset(WHITE_BALANCE) +  8, fub.i);
+    writeQuadletToRegister(getAbsValueOffset(WHITE_BALANCE) + 20, fvr.i);
+    return *this;
+}
+
 //! ホワイトバランスの値を調べる
 /*!
   \param ub		U/B値が返される
@@ -1108,6 +1165,22 @@ IIDCCamera::getWhiteBalance(u_int &ub, u_int& vr) const
     vr = quad & 0xfff;
 }
 
+//! ホワイトバランスの値を絶対値で調べる
+/*!
+  \param ub		U/B値が返される
+  \param vr		V/R値が返される
+*/
+void
+IIDCCamera::getAbsWhiteBalance(float& ub, float& vr) const
+{
+    checkAvailability(WHITE_BALANCE, Presence | Abs_Control | ReadOut);
+    AbsValue	val;
+    val.i = readQuadletFromRegister(getAbsValueOffset(WHITE_BALANCE) +  8);
+    ub = val.f;
+    val.i = readQuadletFromRegister(getAbsValueOffset(WHITE_BALANCE) + 20);
+    vr = val.f;
+}
+    
 //! 色温度の目標値を調べる
 /*!
   色温度の実際値を知るには, 代わりに #getValue() を用いよ.
@@ -2647,38 +2720,45 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 
 	if ((inq & IIDCCamera::Presence) && (inq & IIDCCamera::ReadOut))
 	{
-	    const auto	amode = camera.isAuto(feature.feature);
-	    const auto	abs   = camera.isAbsControl(feature.feature);
+	    const auto	abs = camera.isAbsControl(feature.feature);
+	    const auto	aut = (feature.feature == IIDCCamera::TRIGGER_MODE ?
+			       camera.getTriggerPolarity()		   :
+			       camera.isAuto(feature.feature));
 
 	    out << ' ';
-	    if (amode)
-		out << '*' << feature.name;
-	    else
+	    if (camera.isActive(feature.feature))
+		out << '*';
+	    if (abs)
+		out << '%';
+	    if (aut)
+		out << '+';
+	    out << feature.name << ' ';
+	    
+	    switch (feature.feature)
 	    {
+	      case IIDCCamera::TRIGGER_MODE:
+		out << camera.getTriggerMode();
+		break;
+	      case IIDCCamera::WHITE_BALANCE:
 		if (abs)
-		    out << '%';
-		out << feature.name;
-		
-		switch (feature.feature)
 		{
-		  case IIDCCamera::WHITE_BALANCE:
-		  {
+		    float	ub, vr;
+		    camera.getAbsWhiteBalance(ub, vr);
+		    out << ub << ' ' << vr;
+		}
+		else
+		{
 		    u_int	ub, vr;
 		    camera.getWhiteBalance(ub, vr);
-		    out << ' ' << ub << ' ' << vr;
-		  }
-		    break;
-		  case IIDCCamera::TRIGGER_MODE:
-		    out << ' ' << camera.getTriggerMode();
-		    break;
-		  default:
-		    out << ' ';
-		    if (abs)
-			out << camera.getAbsValue(feature.feature);
-		    else
-			out << camera.getValue(feature.feature);
-		    break;
+		    out << ub << ' ' << vr;
 		}
+	        break;
+	      default:
+		if (abs)
+		    out << camera.getAbsValue(feature.feature);
+		else
+		    out << camera.getValue(feature.feature);
+		break;
 	    }
 	}
     }
@@ -2720,66 +2800,73 @@ operator >>(std::istream& in, IIDCCamera& camera)
 
     for (char c; in >> TU::skipws >> c && c != '\n'; )	// Read features.
     {
-	int	val = 0, val2 = 0;
-	float	fval = 0;
-	bool	abs = false;
-
-	if (c == '*')
+	bool	on = false, aut = false, abs = false;
+	do
 	{
-	    abs = true;
-	    in >> s >> fval;
-	    val = int(fval);
-	}
+	    switch (c)
+	    {
+	      case '*':
+		on = true;
+		break;
+	      case '%':
+		abs = true;
+		break;
+	      case '+':
+		aut = true;
+		break;
+	      default:
+		in.putback(c);
+		goto done;
+	    }
+	} while (in >> c);
+      done:
+	int	val  = 0, val2  = 0;
+	float	fval = 0, fval2 = 0;
+	if (abs)
+	    in >> fval;
 	else
-	{
-	    in.putback(c);
-	    in >> s >> val;
-	    if (s == "WHITE_BALANCE" && val != -1)
+	    in >> val;
+	if (s == "WHITE_BALANCE")
+	    if (abs)
+		in >> fval2;
+	    else
 		in >> val2;
-	}
 
+	in >> s;					// Read feature.
 	const auto	feature = find_if(begin(IIDCCamera::featureNames),
 					  end(IIDCCamera::featureNames),
 					  [&](IIDCCamera::FeatureName ftr)
 					  {
 					      return s == ftr.name;
 					  });
+	if (feature == end(IIDCCamera::featureNames))
+	    continue;
+	
+	camera.setActive(feature->feature, on)
+	      .setAbsControl(feature->feature, abs)
+	       .setAuto(feature->feature, aut);
+	
+	const auto	inq = camera.inquireFeatureFunction(feature->feature);
 
-	if (feature != end(IIDCCamera::featureNames))
-	{
-	    const auto	inq = camera.inquireFeatureFunction(feature->feature);
-
-	    if (inq & IIDCCamera::Presence)
+	if ((inq & IIDCCamera::Presence) && (inq & IIDCCamera::Manual))
+	    switch (feature->feature)
 	    {
-		camera.setAbsControl(feature->feature, abs);
-
-		if (val == -1)
-		    camera.setAuto(feature->feature, true);
-		else if (inq & IIDCCamera::Manual)
-		{
-		    camera.setAuto(feature->feature, false);
-		    
-		    switch (feature->feature)
-		    {
-		      case IIDCCamera::WHITE_BALANCE:
-			camera.setWhiteBalance(val, val2);
-			break;
-			
-		      case IIDCCamera::TRIGGER_MODE:
-			camera.setTriggerMode(
-			    IIDCCamera::uintToTriggerMode(val));
-			break;
-			
-		      default:
-			if (abs)
-			    camera.setAbsValue(feature->feature, fval);
-			else
-			    camera.setValue(feature->feature, val);
-			break;
-		    }
-		}
+	      case IIDCCamera::TRIGGER_MODE:
+		camera.setTriggerMode(IIDCCamera::uintToTriggerMode(val));
+		break;
+	      case IIDCCamera::WHITE_BALANCE:
+		if (abs)
+		    camera.setAbsWhiteBalance(fval, fval2);
+		else
+		    camera.setWhiteBalance(val, val2);
+		break;
+	      default:
+		if (abs)
+		    camera.setAbsValue(feature->feature, fval);
+		else
+		    camera.setValue(feature->feature, val);
+		break;
 	    }
-	}
     }
     
     if (format	  != end(IIDCCamera::formatNames) &&

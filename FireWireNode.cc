@@ -49,6 +49,8 @@ FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId)
     }
 #endif	// !__APPLE__
     raw1394_set_userdata(_handle, this);
+
+    addToList();	// コンストラクタが成功したので、ノードリストに登録
 }
 	     
 //! FireWireノードオブジェクトを破壊する
@@ -252,7 +254,6 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 		    if (raw1394_channel_modify(_handle, channel,
 					       RAW1394_MODIFY_ALLOC) == 0)
 		    {
-			addToList();
 			return channel;
 		    }
 		}

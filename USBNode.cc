@@ -93,6 +93,8 @@ USBNode::USBNode(uint32_t unit_spec_ID, uint64_t uniqId)
 	}
 	throw err;
     }
+
+    addToList();	// コンストラクタが成功したので、ノードリストに登録
 }
 	     
 //! USBノードオブジェクトを破壊する
@@ -257,7 +259,6 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 		    check(libusb_set_configuration(_handle, 1),
 			  "Failed to set configuration!!");
 
-		    addToList();
 		    return;
 		}
 
