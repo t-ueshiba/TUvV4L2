@@ -38,39 +38,12 @@ namespace TU
 */
 struct CameraAndTriggerMode
 {
-    IIDCCamera*			camera;		//!< カメラ
-    IIDCCamera::TriggerMode	mode;		//!< トリガモード
+    IIDCCamera*				camera;		//!< カメラ
+    const IIDCCamera::TriggerModeName*	mode;		//!< トリガモード
+    GtkWidget*				button;
 };
 static CameraAndTriggerMode	cameraAndTriggerModes[IIDCCamera::NTRIGGERMODES];
     
-/*!
-  カメラがサポートする機能とその名称．
-*/
-static constexpr struct
-{
-    const IIDCCamera::Feature	feature;	//!< カメラの機能
-    const char* const		name;		//!< その名称
-} features[] =
-{
-    {IIDCCamera::TRIGGER_MODE,	"Trigger mode"},
-    {IIDCCamera::BRIGHTNESS,	"Brightness"},
-    {IIDCCamera::AUTO_EXPOSURE,	"Auto exposure"},
-    {IIDCCamera::SHARPNESS,	"Sharpness"},
-    {IIDCCamera::WHITE_BALANCE,	"White bal.(U/B)"},
-    {IIDCCamera::HUE,		"Hue"},
-    {IIDCCamera::SATURATION,	"Saturation"},
-    {IIDCCamera::GAMMA,		"Gamma"},
-    {IIDCCamera::SHUTTER,	"Shutter"},
-    {IIDCCamera::GAIN,		"Gain"},
-    {IIDCCamera::IRIS,		"Iris"},
-    {IIDCCamera::FOCUS,		"Focus"},
-    {IIDCCamera::TEMPERATURE,	"Temperature"},
-    {IIDCCamera::TRIGGER_DELAY,	"Trigger delay"},
-    {IIDCCamera::FRAME_RATE,	"Frame rate"},
-    {IIDCCamera::ZOOM,		"Zoom"}
-};
-static constexpr size_t	NFEATURES = sizeof(features) / sizeof(features[0]);
-
 /*!
   カメラとその機能およびそれを操作するscaleウィジェットの3ツ組．
   コールバック関数: CBsetActive(), CBsetAuto(), CBsetAbsControl(), CBsetValue()
@@ -82,7 +55,7 @@ struct CameraAndFeature
     IIDCCamera::Feature		feature;	//!< 操作したい機能
     GtkWidget*			scale;
 };
-static CameraAndFeature		cameraAndFeatures[NFEATURES];
+static CameraAndFeature		cameraAndFeatures[IIDCCamera::NFEATURES];
 
 /************************************************************************
 *  static functions							*
@@ -156,6 +129,25 @@ CBcontinuousShot(GtkWidget* toggle, gpointer userdata)
     }
 }
 
+//! メニューボタンが押されるとメニューをポップアップするコールバック関数．
+/*!
+  \param menu		ポップアップするメニュー
+  \param event		ボタンが押された時のイベント
+*/
+static gboolean
+CBbuttonPress(GtkWidget* menu, GdkEvent* event)
+{
+    if (event->type == GDK_BUTTON_PRESS)
+    {
+	const auto bevent = reinterpret_cast<GdkEventButton*>(event);
+	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+		       bevent->button, bevent->time);
+	return TRUE;
+    }
+    else
+	return FALSE;
+}
+    
 //! トリガモード選択のメニューボタンの状態が変更されると呼ばれるコールバック関数．
 /*!
   トリガモードを選択する．
@@ -169,7 +161,9 @@ CBsetTriggerMode(GtkWidget* item, gpointer userdata)
 		    = static_cast<CameraAndTriggerMode*>(userdata);
     const auto	camera = cameraAndTriggerMode->camera;
     const auto	mode   = cameraAndTriggerMode->mode;
-    camera->setTriggerMode(mode);
+    const auto	button = cameraAndTriggerMode->button;
+    camera->setTriggerMode(mode->mode);
+    gtk_button_set_label(GTK_BUTTON(button), mode->name);
 }
     
 //! トリガ極性選択ボタンの状態が変更されると呼ばれるコールバック関数．
@@ -301,7 +295,7 @@ CBsetWhiteBalanceVR(GtkAdjustment* adj, gpointer userdata)
 GtkWidget*
 createCommands(MyIIDCCamera& camera)
 {
-    const auto	commands = gtk_table_new(4, 2 + NFEATURES, FALSE);
+    const auto	commands = gtk_table_new(4, 2 + IIDCCamera::NFEATURES, FALSE);
     u_int	y = 0;
 
     gtk_table_set_row_spacings(GTK_TABLE(commands), 2);
@@ -319,7 +313,7 @@ createCommands(MyIIDCCamera& camera)
     ++y;
 
     size_t	ncmds = 0;
-    for (const auto& feature : features)
+    for (const auto& feature : IIDCCamera::featureNames)
     {
 	auto	inq = camera.inquireFeatureFunction(feature.feature);
 
@@ -331,35 +325,37 @@ createCommands(MyIIDCCamera& camera)
 	cameraAndFeatures[ncmds].camera  = &camera;
 	cameraAndFeatures[ncmds].feature = feature.feature;
 
+	auto	label = gtk_label_new(feature.name);
+	gtk_table_attach_defaults(GTK_TABLE(commands), label, 0, 1, y, y+1);
+
 	if (feature.feature == IIDCCamera::TRIGGER_MODE)
 	{
-#if 1
-	    auto	label = gtk_label_new(feature.name);
-	    gtk_table_attach_defaults(GTK_TABLE(commands),
-				      label, 0, 1, y, y+1);
-#else
+	  // カメラのtrigger modeをon/offするtoggle buttonを生成．
+	    const auto	button = gtk_button_new();
 	    const auto	menu = gtk_menu_new();
 	    size_t	nmodes = 0;
 	    for (const auto& triggerMode : IIDCCamera::triggerModeNames)
 		if (inq & triggerMode.mode)
 		{
+		    if (camera.getTriggerMode() == triggerMode.mode)
+			gtk_button_set_label(GTK_BUTTON(button), triggerMode.name);
 		    const auto
 			item = gtk_menu_item_new_with_label(triggerMode.name);
 		    gtk_menu_append(GTK_MENU(menu), item);
+		  // コールバック関数の登録．
 		    cameraAndTriggerModes[nmodes].camera = &camera;
-		    cameraAndTriggerModes[nmodes].mode   = triggerMode.mode;
+		    cameraAndTriggerModes[nmodes].mode   = &triggerMode;
+		    cameraAndTriggerModes[nmodes].button = button;
 		    gtk_signal_connect(GTK_OBJECT(item), "activate",
 				       GTK_SIGNAL_FUNC(CBsetTriggerMode),
 				       &cameraAndTriggerModes[nmodes]);
+		    gtk_widget_show(item);
 		    ++nmodes;
 		}
-	  // カメラのtrigger modeをon/offするtoggle buttonを生成．
-	    const auto	menu_button = gtk_menu_button_new();
-	  // コールバック関数の登録．
-	    gtk_menu_button_set_popup(GTK_MENU_BUTTON(menu_button), menu);
-	    gtk_table_attach_defaults(GTK_TABLE(commands), menu_button,
-				      1, 2, y, y+1);
-#endif
+	  // ポップアップのためのコールバック関数の登録．
+	    g_signal_connect_swapped(button, "event",
+				     G_CALLBACK(CBbuttonPress), menu);
+	    gtk_table_attach_defaults(GTK_TABLE(commands), button, 1, 2, y, y+1);
 	}
 	else
 	{
@@ -370,9 +366,6 @@ createCommands(MyIIDCCamera& camera)
 		u_int	ub, vr;
 		camera.getWhiteBalance(ub, vr);
 
-		auto	label = gtk_label_new(feature.name);
-		gtk_table_attach_defaults(GTK_TABLE(commands),
-					  label, 0, 1, y, y+1);
 		auto	adj = gtk_adjustment_new(ub, min, max, 1, 1, 0);
 	      // コールバック関数の登録．
 		gtk_signal_connect(GTK_OBJECT(adj), "value_changed",
@@ -402,10 +395,6 @@ createCommands(MyIIDCCamera& camera)
 	    }
 	    else
 	    {
-		const auto	label = gtk_label_new(feature.name);
-		gtk_table_attach_defaults(GTK_TABLE(commands),
-					  label, 0, 1, y, y+1);
-
 		const auto	adj = gtk_adjustment_new(0, 0, 1, 1, 1, 0);
 		const auto	scale = gtk_hscale_new(GTK_ADJUSTMENT(adj));
 		setScale(camera, feature.feature, scale);
