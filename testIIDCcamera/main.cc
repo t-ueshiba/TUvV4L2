@@ -68,12 +68,18 @@ usage(const char* s)
 {
     using namespace	std;
     
-    cerr << "\nControl an IIDC digital camera.\n"
+    cerr << "\nControl an IIDC digital camera."
 	 << endl;
-    cerr << " Usage: " << s << " [uniqueID]"
+    cerr << " Usage: " << s << " [options] [uniqueID]"
          << endl;
-    cerr << " arguments.\n"
-         << "  uniqueID: camera unique-ID in hex format"
+    cerr << "  options.\n"
+	 << "   -1:       set FireWire speed to 100Mb/s\n"
+	 << "   -2:       set FireWire speed to 200Mb/s\n"
+	 << "   -4:       set FireWire speed to 400Mb/s (default)\n"
+	 << "   -8:       set FireWire speed to 800Mb/s"
+	 << endl;
+    cerr << "  arguments.\n"
+         << "   uniqueID: camera unique-ID in hex format"
 	 << " (i.e. 0x####, default: arbitrary)\n"
          << endl;
 }
@@ -95,10 +101,23 @@ main(int argc, char* argv[])
     
     gtk_init(&argc, &argv);	// GTK+ の初期化.
 
+    IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "h")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "1248h")) != EOF; )
 	switch (c)
 	{
+	  case '1':
+	    speed = IIDCCamera::SPD_100M;
+	    break;
+	  case '2':
+	    speed = IIDCCamera::SPD_200M;
+	    break;
+	  case '4':
+	    speed = IIDCCamera::SPD_400M;
+	    break;
+	  case '8':
+	    speed = IIDCCamera::SPD_800M;
+	    break;
 	  case 'h':
 	    usage(argv[0]);
 	    return 1;
@@ -111,8 +130,11 @@ main(int argc, char* argv[])
   // 本業を行う．
     try
     {
+
 	MyIIDCCamera	camera(uniqId);		// カメラを開く．
 
+	camera.setSpeed(speed);
+	
 	const auto	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(window), "IIDC camera controller");
 	gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, TRUE);
