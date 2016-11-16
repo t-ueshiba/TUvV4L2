@@ -45,7 +45,10 @@ skipws(std::istream& in)
 {
     for (char c; in.get(c); )
 	if (!isspace(c) || c == '\n')
+	{
+	    in.putback(c);
 	    break;
+	}
     return in;
 }
     
@@ -2718,7 +2721,9 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
     {
 	const auto	inq = camera.inquireFeatureFunction(feature.feature);
 
-	if ((inq & IIDCCamera::Presence) && (inq & IIDCCamera::ReadOut))
+	if ((inq & IIDCCamera::Presence) &&
+	    (inq & IIDCCamera::ReadOut)  &&
+	    (inq & IIDCCamera::Manual))
 	{
 	    const auto	abs = camera.isAbsControl(feature.feature);
 	    const auto	aut = (feature.feature == IIDCCamera::TRIGGER_MODE ?
@@ -2737,7 +2742,12 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	    switch (feature.feature)
 	    {
 	      case IIDCCamera::TRIGGER_MODE:
-		out << camera.getTriggerMode();
+		out << find_if(begin(IIDCCamera::triggerModeNames),
+			       end(IIDCCamera::triggerModeNames),
+			       [&](IIDCCamera::TriggerModeName mode)
+			       {
+				   return camera.getTriggerMode() == mode.mode;
+			       })->name;
 		break;
 	      case IIDCCamera::WHITE_BALANCE:
 		if (abs)
@@ -2776,30 +2786,38 @@ std::istream&
 operator >>(std::istream& in, IIDCCamera& camera)
 {
     using namespace	std;
-    
-    string		s;
-    in >> s;						// Read glob. uniq. ID.
-    const uint64_t	uniqId = strtoull(s.c_str(), 0, 0);
+
+  // global unique IDを読み込む
+    string	s;
+    in >> s;
+    const auto	uniqId = strtoull(s.c_str(), 0, 0);
     camera.initialize(uniqId);
     
-    in >> s;						// Read format.
+  // formatを読み込む
+    in >> s;
     const auto	format = find_if(begin(IIDCCamera::formatNames),
 				 end(IIDCCamera::formatNames),
 				 [&](IIDCCamera::FormatName fmt)
 				 {
 				     return s == fmt.name;
 				 });
+    if (format == end(IIDCCamera::formatNames))
+	throw runtime_error("IIDCCamera: Unknown format[" + s + ']');
 
-    in >> s;						// Read frame rate.
+  // frame rateを読み込む
+    in >> s;
     const auto	frameRate = find_if(begin(IIDCCamera::frameRateNames),
 				    end(IIDCCamera::frameRateNames),
 				    [&](IIDCCamera::FrameRateName rt)
 				    {
 					return s == rt.name;
 				    });
+    if (frameRate == end(IIDCCamera::frameRateNames))
+	throw runtime_error("IIDCCamera: Unknown frame rate[" + s + ']');
 
-    for (char c; in >> TU::skipws >> c && c != '\n'; )	// Read features.
+    for (char c; (in >> TU::skipws).get(c) && (c != '\n'); )	// Parse rest
     {
+      // featureのOn/Off, AUTO/Manual, Absolute/Relative を読み込む
 	bool	on = false, aut = false, abs = false;
 	do
 	{
@@ -2819,20 +2837,10 @@ operator >>(std::istream& in, IIDCCamera& camera)
 		goto done;
 	    }
 	} while (in >> c);
-      done:
-	int	val  = 0, val2  = 0;
-	float	fval = 0, fval2 = 0;
-	if (abs)
-	    in >> fval;
-	else
-	    in >> val;
-	if (s == "WHITE_BALANCE")
-	    if (abs)
-		in >> fval2;
-	    else
-		in >> val2;
 
-	in >> s;					// Read feature.
+      done:
+      // feature名を読み込む
+	in >> s;					// Read feature name.
 	const auto	feature = find_if(begin(IIDCCamera::featureNames),
 					  end(IIDCCamera::featureNames),
 					  [&](IIDCCamera::FeatureName ftr)
@@ -2840,39 +2848,64 @@ operator >>(std::istream& in, IIDCCamera& camera)
 					      return s == ftr.name;
 					  });
 	if (feature == end(IIDCCamera::featureNames))
-	    continue;
-	
+	    throw runtime_error("IIDCCamera: Unknown feature[" + s + ']');
+
+      // featureのOn/Off, AUTO/Manual, Absolute/Relative をセットする
 	camera.setActive(feature->feature, on)
 	      .setAbsControl(feature->feature, abs)
-	       .setAuto(feature->feature, aut);
-	
-	const auto	inq = camera.inquireFeatureFunction(feature->feature);
+	      .setAuto(feature->feature, aut);
 
-	if ((inq & IIDCCamera::Presence) && (inq & IIDCCamera::Manual))
-	    switch (feature->feature)
+      // featureの値を読み込んでセットする
+	switch (feature->feature)
+	{
+	  case IIDCCamera::TRIGGER_MODE:
+	  {
+	      in >> s;
+	      const auto mode = find_if(begin(IIDCCamera::triggerModeNames),
+					end(IIDCCamera::triggerModeNames),
+					[&](IIDCCamera::TriggerModeName md)
+					{
+					    return s == md.name;
+					});
+	      if (mode == end(IIDCCamera::triggerModeNames))
+		  throw runtime_error("IIDCCamera: Unknown trigger mode[" +
+				      s + ']');
+	      camera.setTriggerMode(mode->mode);
+	  }
+	    break;
+	  case IIDCCamera::WHITE_BALANCE:
+	    if (abs)
 	    {
-	      case IIDCCamera::TRIGGER_MODE:
-		camera.setTriggerMode(IIDCCamera::uintToTriggerMode(val));
-		break;
-	      case IIDCCamera::WHITE_BALANCE:
-		if (abs)
-		    camera.setAbsWhiteBalance(fval, fval2);
-		else
-		    camera.setWhiteBalance(val, val2);
-		break;
-	      default:
-		if (abs)
-		    camera.setAbsValue(feature->feature, fval);
-		else
-		    camera.setValue(feature->feature, val);
-		break;
+		float	ub, vr;
+		in >> ub >> vr;
+		camera.setAbsWhiteBalance(ub, vr);
 	    }
+	    else
+	    {
+		int	ub, vr;
+		in >> ub >> vr;
+		camera.setWhiteBalance(ub, vr);
+	    }
+	    break;
+	  default:
+	    if (abs)
+	    {
+		float	val;
+		in >> val;
+		camera.setAbsValue(feature->feature, val);
+	    }
+	    else
+	    {
+		int	val;
+		in >> val;
+		camera.setValue(feature->feature, val);
+	    }
+	    break;
+	}
     }
     
-    if (format	  != end(IIDCCamera::formatNames) &&
-	frameRate != end(IIDCCamera::frameRateNames))
-	camera.setFormatAndFrameRate(format->format, frameRate->frameRate);
-        
+    camera.setFormatAndFrameRate(format->format, frameRate->frameRate);
+
     return in;
 }
  
