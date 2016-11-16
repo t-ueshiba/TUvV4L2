@@ -49,8 +49,16 @@ EXTHDRS		= ../FireWireNode_.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h
 HDRS		=
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= FireWireNode.cc \
+		IIDCCamera.cc \
+		IIDCNode.cc \
+		USBNode.cc \
+		main.cc
+OBJS		= FireWireNode.o \
+		IIDCCamera.o \
+		IIDCNode.o \
+		USBNode.o \
+		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -58,7 +66,20 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
+FireWireNode.o: ../FireWireNode_.h ../TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h
+IIDCCamera.o: ../FireWireNode_.h ../TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
+	../USBNode_.h
+IIDCNode.o: ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
