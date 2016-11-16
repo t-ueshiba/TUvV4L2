@@ -346,6 +346,11 @@ size(const T& x)
 {
     return x.size();
 }
+template <class T, size_t N> inline constexpr size_t
+size(const T (&array)[N]) noexcept
+{
+    return N;
+}
 template <class HEAD, class TAIL> inline size_t
 size(const boost::tuples::cons<HEAD, TAIL>& x)
 {
