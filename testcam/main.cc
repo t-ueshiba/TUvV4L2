@@ -14,8 +14,18 @@ main(int argc, char* argv[])
 {
     using namespace	TU;
     
-    v::App	vapp(argc, argv);
-    u_int64_t	uniqId = 0;
+    v::App		vapp(argc, argv);
+    int			speed = 400;
+    u_int64_t		uniqId = 0;
+    extern char*	optarg;
+    for (int c; (c = getopt(argc, argv, "s:")) != -1; )
+	switch (c)
+	{
+	  case 's':
+	    speed = atoi(optarg);
+	    break;
+	}
+    
     extern int	optind;
     if (optind < argc)
 	uniqId = strtoull(argv[optind], 0, 0);
@@ -23,7 +33,30 @@ main(int argc, char* argv[])
   // Main job.
     try
     {
-	IIDCCamera				camera(uniqId);
+	IIDCCamera	camera(uniqId);
+
+	switch (speed)
+	{
+	  case 100:
+	    camera.setSpeed(IIDCCamera::SPD_100M);
+	    break;
+	  case 200:
+	    camera.setSpeed(IIDCCamera::SPD_200M);
+	    break;
+	  default:
+	    camera.setSpeed(IIDCCamera::SPD_400M);
+	    break;
+	  case 800:
+	    camera.setSpeed(IIDCCamera::SPD_800M);
+	    break;
+	  case 1600:
+	    camera.setSpeed(IIDCCamera::SPD_1_6G);
+	    break;
+	  case 3200:
+	    camera.setSpeed(IIDCCamera::SPD_3_2G);
+	    break;
+	}
+	
 	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, camera);
 	vapp.run();
 
