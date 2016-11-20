@@ -18,10 +18,10 @@ namespace v
 ************************************************************************/
 enum	{c_Slider};
 
-static int	range[] = {0, 100, 50};
+static float	range[] = {0, 2, 0.1};
 static CmdDef	Cmds[] =
 {
-    {C_Slider, c_Slider, 50, "Zoom:", range, CA_None, 0, 0, 1, 1, 0},
+    {C_Slider, c_Slider, 1.0f, "Zoom:", range, CA_None, 0, 0, 1, 1, 0},
     EndOfCmds
 };
 
@@ -84,7 +84,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
     switch (id)
     {
       case c_Slider:
-	_canvas.dc().setZoom(val, range[2]).repaintAll();
+	_canvas.dc().setZoom(val.f).repaintAll();
 	break;
     }
 }

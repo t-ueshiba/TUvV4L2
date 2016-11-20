@@ -39,8 +39,8 @@ namespace v
 /*
  *  Public member functions
  */
-MemoryDC::MemoryDC(Colormap& cmap, u_int w, u_int h, u_int mul, u_int div)
-    :XDC(w, h, mul, div, cmap, XDefaultGC(cmap.display(), cmap.vinfo().screen)),
+    MemoryDC::MemoryDC(Colormap& cmap, u_int w, u_int h, float zoom)
+    :XDC(w, h, zoom, cmap, XDefaultGC(cmap.display(), cmap.vinfo().screen)),
      _pixmap(XCreatePixmap(colormap().display(),
 			   DefaultRootWindow(colormap().display()), w, h,
 			   colormap().vinfo().depth))
@@ -53,9 +53,9 @@ MemoryDC::~MemoryDC()
 }
 
 DC&
-MemoryDC::setSize(u_int width, u_int height, u_int mul, u_int div)
+MemoryDC::setSize(u_int width, u_int height, float zoom)
 {
-    XDC::setSize(width, height, mul, div);
+    XDC::setSize(width, height, zoom);
   // Viewport の中でこの widget を小さくするとき, 以前描画したものの残
   // 骸が余白に残るのは見苦しいので、widget 全体をクリアしておく。また、
   // 直接 graphic hardware にアクセスする API （XIL など）と実行順序が

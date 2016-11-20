@@ -48,76 +48,73 @@ class DC
     enum PointStyle	{DOT, CROSS, CIRCLE};
     
   public:
-    DC(u_int width, u_int height, u_int mul, u_int div)
-	:_width(width), _height(height),
-	 _mul(mul), _div(div), _offset(0, 0),
-	_layer(UNDERLAY), _pointStyle(DOT)		{}
-    virtual		~DC()				;
+    DC(u_int width, u_int height, float zoom)
+	:_width(width), _height(height), _zoom(zoom),
+	 _offset(0, 0), _layer(UNDERLAY), _pointStyle(DOT)		{}
+    virtual		~DC()						;
     
-    u_int		width()			const	{return _width;}
-    u_int		height()		const	{return _height;}
-    u_int		mul()			const	{return _mul;}
-    u_int		div()			const	{return _div;}
-    const Point2<int>&	offset()		const	{return _offset;}
+    u_int		width()				const	{return _width;}
+    u_int		height()			const	{return _height;}
+    float		zoom()				const	{return _zoom;}
+    const Point2<int>&	offset()			const	{return _offset;}
 
-    virtual DC&		setSize(u_int width, u_int height,
-				u_int mul,   u_int div)		;
-	    DC&		setZoom(u_int mul,   u_int div)		;
-    virtual DC&		setOffset(int u0, int v0)		;
-    virtual DC&		setLayer(Layer layer)			;
-	    DC&		setPointStyle(PointStyle pointStyle)	;
-    virtual DC&		setThickness(u_int thickness)		= 0;
-    virtual DC&		setForeground(const BGR& fg)		= 0;
-    virtual DC&		setBackground(const BGR& bg)		= 0;
-    virtual DC&		setForeground(u_int index)		= 0;
-    virtual DC&		setBackground(u_int index)		= 0;
-    virtual DC&		setSaturation(u_int saturation)		= 0;
-    virtual DC&		setSaturationF(float saturation)	= 0;
+    virtual DC&		setSize(u_int width, u_int height, float zoom)	;
+	    DC&		setZoom(float zoom)				;
+    virtual DC&		setOffset(int u0, int v0)			;
+    virtual DC&		setLayer(Layer layer)				;
+	    DC&		setPointStyle(PointStyle pointStyle)		;
+    virtual DC&		setThickness(u_int thickness)			= 0;
+    virtual DC&		setForeground(const BGR& fg)			= 0;
+    virtual DC&		setBackground(const BGR& bg)			= 0;
+    virtual DC&		setForeground(u_int index)			= 0;
+    virtual DC&		setBackground(u_int index)			= 0;
+    virtual DC&		setSaturation(u_int saturation)			= 0;
+    virtual DC&		setSaturationF(float saturation)		= 0;
     
-    virtual DC&		clear()					= 0;
-	    DC&		repaint()				;
-	    DC&		repaintAll()				;
-    virtual DC&		sync()					= 0;
+    virtual DC&		clear()						= 0;
+	    DC&		repaint()					;
+	    DC&		repaintAll()					;
+    virtual DC&		sync()						= 0;
     
-    virtual DC&		operator <<(const Point2<int>& p)	= 0;
+    virtual DC&		operator <<(const Point2<int>& p)		= 0;
     template <class T>
-	    DC&		operator <<(const Point2<T>& p)		;
-    virtual DC&		operator <<(const LineP2f& l)		= 0;
-    virtual DC&		operator <<(const LineP2d& l)		= 0;
-    virtual DC&		operator <<(const Image<u_char>& image)	= 0;
-    virtual DC&		operator <<(const Image<s_char>& image)	= 0;
-    virtual DC&		operator <<(const Image<short>&  image)	= 0;
-    virtual DC&		operator <<(const Image<float>&  image)	= 0;
-    virtual DC&		operator <<(const Image<BGR>&    image)	= 0;
-    virtual DC&		operator <<(const Image<ABGR>&   image)	= 0;
-    virtual DC&		operator <<(const Image<BGRA>&   image)	= 0;
-    virtual DC&		operator <<(const Image<RGB>&    image)	= 0;
-    virtual DC&		operator <<(const Image<RGBA>&   image)	= 0;
-    virtual DC&		operator <<(const Image<ARGB>&   image)	= 0;
-    virtual DC&		operator <<(const Image<YUV444>& image)	= 0;
-    virtual DC&		operator <<(const Image<YUV422>& image)	= 0;
-    virtual DC&		operator <<(const Image<YUYV422>& image)= 0;
-    virtual DC&		operator <<(const Image<YUV411>& image)	= 0;
+	    DC&		operator <<(const Point2<T>& p)			;
+    virtual DC&		operator <<(const LineP2f& l)			= 0;
+    virtual DC&		operator <<(const LineP2d& l)			= 0;
+    virtual DC&		operator <<(const Image<u_char>& image)		= 0;
+    virtual DC&		operator <<(const Image<s_char>& image)		= 0;
+    virtual DC&		operator <<(const Image<short>&  image)		= 0;
+    virtual DC&		operator <<(const Image<float>&  image)		= 0;
+    virtual DC&		operator <<(const Image<BGR>&    image)		= 0;
+    virtual DC&		operator <<(const Image<ABGR>&   image)		= 0;
+    virtual DC&		operator <<(const Image<BGRA>&   image)		= 0;
+    virtual DC&		operator <<(const Image<RGB>&    image)		= 0;
+    virtual DC&		operator <<(const Image<RGBA>&   image)		= 0;
+    virtual DC&		operator <<(const Image<ARGB>&   image)		= 0;
+    virtual DC&		operator <<(const Image<YUV444>& image)		= 0;
+    virtual DC&		operator <<(const Image<YUV422>& image)		= 0;
+    virtual DC&		operator <<(const Image<YUYV422>& image)	= 0;
+    virtual DC&		operator <<(const Image<YUV411>& image)		= 0;
     virtual DC&		drawLine(const Point2<int>& p,
-				 const Point2<int>& q)		= 0;
+				 const Point2<int>& q)			= 0;
     template <class T>
 	    DC&		drawLine(const Point2<T>& p,
-				 const Point2<T>& q)		;
-    virtual DC&		draw(const char* s, int u, int v)	= 0;
+				 const Point2<T>& q)			;
+    virtual DC&		draw(const char* s, int u, int v)		= 0;
 
-    int			log2devR(int r)			const	;
-    int			log2devU(int u)			const	;
-    int			log2devV(int v)			const	;
-    Point2<int>		log2dev(const Point2<int>& p)	const	;
-    int			dev2logR(int r)			const	;
-    int			dev2logU(int u)			const	;
-    int			dev2logV(int v)			const	;
-    Point2<int>		dev2log(const Point2<int>& p)	const	;
+    int			log2devR(int r)				const	;
+    int			log2devU(int u)				const	;
+    int			log2devV(int v)				const	;
+    Point2<int>		log2dev(const Point2<int>& p)		const	;
+    int			dev2logR(int r)				const	;
+    int			dev2logU(int u)				const	;
+    int			dev2logV(int v)				const	;
+    Point2<int>		dev2log(const Point2<int>& p)		const	;
 
   protected:
     enum		{PRADIUS = 5};		// radius of marker points
 	    
-    int			hasScale()		const	{return _mul != _div;}
+    int			hasScale()		const	{return _zoom != 1.0f;}
     u_int		deviceWidth()		const	;
     u_int		deviceHeight()		const	;
 
@@ -131,7 +128,7 @@ class DC
   private:
     u_int		_width;		// logical width  of DC
     u_int		_height;	// logical height of DC
-    u_int		_mul, _div;	// zooming factors 
+    float		_zoom;		// zooming factor 
     Point2<int>		_offset;	// logical coordinates of the
 					// temporary offset
     Layer		_layer;		// flag indicating underlay/overlay
@@ -139,9 +136,9 @@ class DC
 };
 
 inline DC&
-DC::setZoom(u_int mul, u_int div)
+DC::setZoom(float zoom)
 {
-    return setSize(width(), height(), mul, div);
+    return setSize(_width, _height, zoom);
 }
     
 template <class T> inline DC&
@@ -157,15 +154,13 @@ DC::drawLine(const Point2<T>& p, const Point2<T>& q)
 }
 
 inline int
-DC::log2devR(int r)	const	{return r * _mul / _div;}
+DC::log2devR(int r)	const	{return int(r * _zoom);}
 
 inline int
-DC::log2devU(int u)	const	{return log2devR(u + _offset[0])
-				      + _mul/(2*_div);}
+DC::log2devU(int u)	const	{return log2devR(u + _offset[0]) + 0.5f*_zoom;}
 
 inline int
-DC::log2devV(int v)	const	{return log2devR(v + _offset[1])
-				      + _mul/(2*_div);}
+DC::log2devV(int v)	const	{return log2devR(v + _offset[1]) + 0.5f*_zoom;}
 
 inline Point2<int>
 DC::log2dev(const Point2<int>& p) const
@@ -177,7 +172,7 @@ DC::log2dev(const Point2<int>& p) const
 }
 
 inline int
-DC::dev2logR(int r)	const	{return r * _div / _mul;}
+DC::dev2logR(int r)	const	{return int(r / _zoom);}
 
 inline int
 DC::dev2logU(int u)	const	{return dev2logR(u);}

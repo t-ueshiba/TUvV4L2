@@ -44,8 +44,7 @@ class CanvasPaneDC3 : virtual public CanvasPaneDC, public DC3
 {
   public:
     CanvasPaneDC3(CanvasPane& parentCanvasPane,
-		  u_int width=0, u_int height=0,
-		  u_int mul=1, u_int div=1)				;
+		  u_int width=0, u_int height=0, float zppm=1)		;
     virtual		~CanvasPaneDC3()				;
     virtual void	callback(CmdId id, CmdVal val)			;
 

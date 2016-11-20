@@ -50,16 +50,19 @@ namespace v
 ************************************************************************/
 typedef int	CmdId;			// ID for each item command or menu
 
-struct CmdVal
+union CmdVal
 {
     CmdVal(int val)		:u(val), v(1)			{}
     CmdVal(int uu, int vv)	:u(uu), v(vv)			{}
-    CmdVal(float val)		:u(int(10000*val)), v(10000)	{}
+    CmdVal(float fval)		:f(fval)			{}
     
-		operator int()		const	{return u;}
-    float	f()			const	{return (float)u / (float)v;}
-    
-    const int	u, v;
+		operator int()				const	{return u;}
+
+    struct
+    {
+	const int	u, v;
+    };
+    float		f;
 };
 
 /************************************************************************
@@ -100,7 +103,7 @@ struct CmdDef
 {
     CmdType	type;		// what kind of item is this
     CmdId	id;		// unique id for the item
-    int		val;		// value returned when picked (might be < 0)
+    CmdVal	val;		// value returned when picked (might be < 0)
     const char*	title;		// string
     void*	prop;		// a list of stuff to use for the cmd
     u_int	attrs;		// bit map of attributes

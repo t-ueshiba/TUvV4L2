@@ -118,7 +118,7 @@ XDC::fillBuff(const Image<S>& image)
 	{
 	    const S*	p = image[v].data();
 	    T*		q = (T*)(buff + v * bytesPerLine);
-	    for (register int u = 0; u < image.width(); ++u)
+	    for (int u = 0; u < image.width(); ++u)
 		*q++ = _colormap.getUnderlayPixel(p[uu<S>(u)], u, v);
 	}
     }
@@ -284,7 +284,7 @@ XDC::operator <<(const Point2<int>& p)
       {
 	XGCValues	values;
 	XGetGCValues(_colormap.display(), _gc, GCLineWidth, &values);
-	u_int	w = (mul() > div() ? mul() / div() : 1) *
+	u_int	w = (zoom() > 1 ? int(zoom()) : 1) *
 		    (values.line_width > 0 ? values.line_width : 1);
 	XFillRectangle(_colormap.display(), drawable(), _gc,
 		       log2devR(p[0] + offset()[0]),
@@ -605,9 +605,8 @@ XDC::dump(std::ostream& out) const
 /*
  *  Protected member functions
  */
-XDC::XDC(u_int width, u_int height, u_int mul, u_int div,
-	 Colormap& colormap, GC gc)
-    :DC(width, height, mul, div),
+XDC::XDC(u_int width, u_int height, float zoom, Colormap& colormap, GC gc)
+    :DC(width, height, zoom),
      _colormap(colormap), _gc(gc), _buff(0), _ximage(0)
 {
     setLayer(getLayer());	// Set plane mask of GC correctly.

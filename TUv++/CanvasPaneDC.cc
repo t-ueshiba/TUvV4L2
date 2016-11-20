@@ -157,11 +157,11 @@ CBcanvasPaneDC(::Widget, XtPointer client_data, XtPointer)
  *  Public member functions
  */
 CanvasPaneDC::CanvasPaneDC(CanvasPane& parentCanvasPane,
-			   u_int w, u_int h, u_int mul, u_int div)
+			   u_int w, u_int h, float zoom)
     :Object(parentCanvasPane),
      XDC(w != 0 ? w : parentCanvasPane.widget().width(),
 	 h != 0 ? h : parentCanvasPane.widget().height(),
-	 mul, div,
+	 zoom,
 	 window().colormap(),
 	 XtAllocateGC(window().widget(), 0, 0, 0, 0, 0)),
      _widget(XtVaCreateManagedWidget("TUvCanvasPaneDC",	   // widget name
@@ -203,9 +203,9 @@ CanvasPaneDC::widget() const
 }
 
 DC&
-CanvasPaneDC::setSize(u_int width, u_int height, u_int mul, u_int div)
+CanvasPaneDC::setSize(u_int width, u_int height, float zoom)
 {
-    XDC::setSize(width, height, mul, div);
+    XDC::setSize(width, height, zoom);
   // Viewport の中でこの widget を小さくするとき, 以前描画したものの残
   // 骸が余白に残るのは見苦しいので、widget 全体をクリアしておく。また、
   // 直接 graphic hardware にアクセスする API （XIL など）と実行順序が

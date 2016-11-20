@@ -59,10 +59,10 @@ class SliderCmd : public Cmd
     const Widget	_title;				// labelWidget
     const Widget	_slider;			// slider3dWidget
     const Widget	_text;				// labelWidget
-    int			_min;
-    u_int		_range;
-    u_int		_div;
-    int			_val;
+    float		_min;
+    float		_max;
+    float		_step;
+    float		_val;
 };
 
 }

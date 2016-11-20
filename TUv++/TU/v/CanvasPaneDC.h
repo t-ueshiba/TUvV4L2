@@ -45,14 +45,12 @@ class CanvasPaneDC : public Object, public XDC
 {
   public:
     CanvasPaneDC(CanvasPane& parentCanvasPane,
-		 u_int width=0, u_int height=0,
-		 u_int mul=1, u_int div=1)				;
+		 u_int width=0, u_int height=0, float zoom=1)		;
     virtual		~CanvasPaneDC()					;
     
     virtual const Widget&	widget()			const	;
 
-    virtual DC&		setSize(u_int width, u_int height,
-				u_int mul,   u_int div)			;
+    virtual DC&		setSize(u_int width, u_int height, float zoom)	;
     virtual void	callback(CmdId id, CmdVal val)			;
 	    void	grabKeyboard()				const	;
 

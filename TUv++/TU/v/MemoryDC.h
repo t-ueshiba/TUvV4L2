@@ -43,18 +43,16 @@ namespace v
 class MemoryDC : public XDC
 {
   public:
-    MemoryDC(Colormap& colormap,
-	     u_int width, u_int height, u_int mul=1, u_int div=1)	;
-    virtual		~MemoryDC()					;
+    MemoryDC(Colormap& colormap, u_int width, u_int height, float zoom=1)	;
+    virtual		~MemoryDC()						;
 
-    DC&			setSize(u_int width, u_int height,
-				u_int mul, u_int div)			;
+    DC&			setSize(u_int width, u_int height, float zoom)		;
 
   protected:
-    virtual Drawable	drawable()				const	;
-    virtual void	initializeGraphics()				;
-    virtual DC&		repaintUnderlay()				;
-    virtual DC&		repaintOverlay()				;
+    virtual Drawable	drawable()					const	;
+    virtual void	initializeGraphics()					;
+    virtual DC&		repaintUnderlay()					;
+    virtual DC&		repaintOverlay()					;
 
   private:
     Pixmap	_pixmap;
