@@ -494,7 +494,7 @@ class IIDCCamera
 	u_int		availablePixelFormats;	//!< 利用できる画素形式
     };
     
-  //! Dragonfly(Pointgrey Research Inc.)のBayerパターン
+  //! Bayerパターン
     enum Bayer
     {
 	RGGB = 0x52474742,	//!< 左上から右下に向かってR, G, G, B
@@ -561,23 +561,23 @@ class IIDCCamera
     IIDCCamera&		setAbsControl(Feature feature, bool enable)	;
     IIDCCamera&		setAuto(Feature feature, bool enable)		;
     IIDCCamera&		setValue(Feature feature, u_int value)		;
-    IIDCCamera&		setAbsValue(Feature feature, float value)	;
+    IIDCCamera&		setValue(Feature feature, float value)		;
     bool		inOnePushOperation(Feature feature)	const	;
     bool		isActive(Feature feature)		const	;
     bool		isAbsControl(Feature feautre)		const	;
     bool		isAuto(Feature feautre)			const	;
     void		getMinMax(Feature feature,
 				  u_int& min, u_int& max)	const	;
-    void		getAbsMinMax(Feature feature,
-				     float& min, float& max)	const	;
-    u_int		getValue(Feature feature)		const	;
-    float		getAbsValue(Feature feature)		const	;
+    void		getMinMax(Feature feature,
+				  float& min, float& max)	const	;
+    template <class T=u_int>
+    T			getValue(Feature feature)		const	;
     
   // White balance stuffs.
     IIDCCamera&		setWhiteBalance(u_int ub, u_int vr)		;
-    IIDCCamera&		setAbsWhiteBalance(float ub, float vr)		;
+    IIDCCamera&		setWhiteBalance(float ub, float vr)		;
     void		getWhiteBalance(u_int& ub, u_int& vr)	const	;
-    void		getAbsWhiteBalance(float& ub, float& vr) const	;
+    void		getWhiteBalance(float& ub, float& vr)	const	;
     
   // Temperature stuffs.
     u_int		getAimedTemperature()			const	;
@@ -993,122 +993,10 @@ IIDCCamera::writeQuadletToACRegister(uint32_t offset, quadlet_t quad)
 }
 
 /************************************************************************
-*  global data								*
-************************************************************************/
-const u_int	IIDCCAMERA_OFFSET_ONOFF = 0x100;
-const u_int	IIDCCAMERA_OFFSET_AUTO  = 0x200;
-const u_int	IIDCCAMERA_OFFSET_ABS   = 0x300;
-const u_int	IIDCCAMERA_OFFSET_VR    = 0x2;
-
-/************************************************************************
 *  global functions							*
 ************************************************************************/
 std::ostream&	operator <<(std::ostream& out, const IIDCCamera& camera);
-std::istream&	operator >>(std::istream& in, IIDCCamera& camera);
-bool		setFormat(IIDCCamera& camera, u_int id, int val);
-bool		setFeatureValue(IIDCCamera& camera,
-				u_int id, int val, int=-1);
-u_int		getFeatureValue(const IIDCCamera& camera,
-				u_int id, int=-1);
-void		syncedSnap(const Array<IIDCCamera*>& cameras,
-			   uint64_t thresh=1000)			;
-				   
-inline void
-exec(IIDCCamera& camera, IIDCCamera& (IIDCCamera::*mf)(), int=-1)
-{
-    (camera.*mf)();
-}
-
-template <class ARG> inline void
-exec(IIDCCamera& camera, IIDCCamera& (IIDCCamera::*mf)(ARG),
-     ARG arg, int=-1)
-{
-    (camera.*mf)(arg);
-}
-
-template <class ARG0, class ARG1> inline void
-exec(IIDCCamera& camera, IIDCCamera& (IIDCCamera::*mf)(ARG0, ARG1),
-     ARG0 arg0, ARG1 arg1, int=-1)
-{
-    (camera.*mf)(arg0, arg1);
-}
-
-template <class RESULT> inline RESULT
-exec(const IIDCCamera& camera, RESULT (IIDCCamera::*mf)() const, int=-1)
-{
-    return (camera.*mf)();
-}
-
-template <class ARG, class RESULT> inline RESULT
-exec(const IIDCCamera& camera, RESULT (IIDCCamera::*mf)(ARG) const,
-     ARG arg, int=-1)
-{
-    return (camera.*mf)(arg);
-}
-
-template <class ARG0, class ARG1, class RESULT> inline void
-exec(const IIDCCamera& camera, RESULT (IIDCCamera::*mf)(ARG0&, ARG1&) const,
-     ARG0& arg0, ARG1& arg1, int=-1)
-{
-    (camera.*mf)(arg0, arg1);
-}
-
-bool	setFormat(const Array<IIDCCamera*>& cameras,
-		  u_int id, int val)					;
-bool	setFeatureValue(const Array<IIDCCamera*>& cameras,
-			u_int id, int val, int n=-1)			;
-u_int	getFeatureValue(const Array<IIDCCamera*>& cameras,
-			u_int id, int n=-1)				;
-void	exec(const Array<IIDCCamera*>& cameras,
-	     IIDCCamera& (IIDCCamera::*mf)(), int n=-1)			;
-    
-template <class ARG> void
-exec(const Array<IIDCCamera*>& cameras,
-     IIDCCamera& (IIDCCamera::*mf)(ARG), ARG arg, int n=-1)
-{
-    if (0 <= n && n < cameras.size())
-	(cameras[n]->*mf)(arg);
-    else
-	for (size_t i = 0; i < cameras.size(); ++i)
-	    (cameras[i]->*mf)(arg);
-}
-
-template <class ARG0, class ARG1> void
-exec(const Array<IIDCCamera*>& cameras,
-     IIDCCamera& (IIDCCamera::*mf)(ARG0, ARG1),
-     ARG0 arg0, ARG1 arg1, int n=-1)
-{
-    if (0 <= n && n < cameras.size())
-	(cameras[n]->*mf)(arg0, arg1);
-    else
-	for (size_t i = 0; i < cameras.size(); ++i)
-	    (cameras[i]->*mf)(arg0, arg1);
-}
-
-template <class RESULT> RESULT
-exec(const Array<IIDCCamera*>& cameras,
-     RESULT (IIDCCamera::*mf)() const, int n=-1)
-{
-    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
-    return (cameras[i]->*mf)();
-}
-
-template <class ARG, class RESULT> RESULT
-exec(const Array<IIDCCamera*>& cameras,
-     RESULT (IIDCCamera::*mf)(ARG) const, ARG arg, int n=-1)
-{
-    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
-    return (cameras[i]->*mf)(arg);
-}
-
-template <class ARG0, class ARG1, class RESULT> void
-exec(const Array<IIDCCamera*>& cameras,
-     RESULT (IIDCCamera::*mf)(ARG0&, ARG1&) const,
-     ARG0& arg0, ARG1& arg1, int n=-1)
-{
-    size_t	i = (0 <= n && n < cameras.size() ? n : 0);
-    (cameras[i]->*mf)(arg0, arg1);
-}
+std::istream&	operator >>(std::istream& in, IIDCCamera& camera)	;
 
 }
 #endif	// !__TU_IIDCPP_H

@@ -995,8 +995,10 @@ IIDCCamera::setValue(Feature feature, u_int value)
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::setAbsValue(Feature feature, float value)
+IIDCCamera::setValue(Feature feature, float value)
 {
+    if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
+	throw std::invalid_argument("TU::IIDCCamera::setValue: cannot set WHITE_BALANCE/TRIGGER_MODE value using this method!!");
     checkAvailability(feature, Presence | Abs_Control | Manual);
     AbsValue	val;
     val.f = value;
@@ -1076,7 +1078,7 @@ IIDCCamera::getMinMax(Feature feature, u_int& min, u_int& max) const
   \param max		とり得る値の最大値が返される. 
 */
 void
-IIDCCamera::getAbsMinMax(Feature feature, float& min, float& max) const
+IIDCCamera::getMinMax(Feature feature, float& min, float& max) const
 {
     checkAvailability(feature, Presence | Abs_Control);
     AbsValue		val;
@@ -1097,8 +1099,8 @@ IIDCCamera::getAbsMinMax(Feature feature, float& min, float& max) const
   \param feature	対象となる属性
   \return		現在の値
 */
-u_int
-IIDCCamera::getValue(Feature feature) const
+template <> u_int
+IIDCCamera::getValue<u_int>(Feature feature) const
 {
     if (feature == WHITE_BALANCE || feature == TRIGGER_MODE)
 	throw std::invalid_argument("TU::IIDCCamera::getValue: cannot get WHITE_BALANCE/TRIGGER_MODE value using this method!!");
@@ -1111,8 +1113,8 @@ IIDCCamera::getValue(Feature feature) const
   \param feature	対象となる属性
   \return		現在の値
 */
-float
-IIDCCamera::getAbsValue(Feature feature) const
+template <> float
+IIDCCamera::getValue<float>(Feature feature) const
 {
     checkAvailability(feature, Presence | Abs_Control | ReadOut);
     AbsValue	val;
@@ -1143,7 +1145,7 @@ IIDCCamera::setWhiteBalance(u_int ub, u_int vr)
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::setAbsWhiteBalance(float ub, float vr)
+IIDCCamera::setWhiteBalance(float ub, float vr)
 {
     checkAvailability(WHITE_BALANCE, Presence | Abs_Control | Manual);
     AbsValue	fub, fvr;
@@ -1174,7 +1176,7 @@ IIDCCamera::getWhiteBalance(u_int &ub, u_int& vr) const
   \param vr		V/R値が返される
 */
 void
-IIDCCamera::getAbsWhiteBalance(float& ub, float& vr) const
+IIDCCamera::getWhiteBalance(float& ub, float& vr) const
 {
     checkAvailability(WHITE_BALANCE, Presence | Abs_Control | ReadOut);
     AbsValue	val;
@@ -2725,18 +2727,18 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	    (inq & IIDCCamera::ReadOut)  &&
 	    (inq & IIDCCamera::Manual))
 	{
-	    const auto	abs = camera.isAbsControl(feature.feature);
 	    const auto	aut = (feature.feature == IIDCCamera::TRIGGER_MODE ?
 			       camera.getTriggerPolarity()		   :
 			       camera.isAuto(feature.feature));
+	    const auto	abs = camera.isAbsControl(feature.feature);
 
 	    out << ' ';
 	    if (camera.isActive(feature.feature))
 		out << '*';
-	    if (abs)
-		out << '%';
 	    if (aut)
 		out << '+';
+	    if (abs)
+		out << '%';
 	    out << feature.name << ' ';
 	    
 	    switch (feature.feature)
@@ -2753,7 +2755,7 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 		if (abs)
 		{
 		    float	ub, vr;
-		    camera.getAbsWhiteBalance(ub, vr);
+		    camera.getWhiteBalance(ub, vr);
 		    out << ub << ' ' << vr;
 		}
 		else
@@ -2765,9 +2767,9 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	        break;
 	      default:
 		if (abs)
-		    out << camera.getAbsValue(feature.feature);
+		    out << camera.getValue<float>(feature.feature);
 		else
-		    out << camera.getValue(feature.feature);
+		    out << camera.getValue<u_int>(feature.feature);
 		break;
 	    }
 	}
@@ -2826,11 +2828,11 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	      case '*':
 		on = true;
 		break;
-	      case '%':
-		abs = true;
-		break;
 	      case '+':
 		aut = true;
+		break;
+	      case '%':
+		abs = true;
 		break;
 	      default:
 		in.putback(c);
@@ -2878,11 +2880,11 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	    {
 		float	ub, vr;
 		in >> ub >> vr;
-		camera.setAbsWhiteBalance(ub, vr);
+		camera.setWhiteBalance(ub, vr);
 	    }
 	    else
 	    {
-		int	ub, vr;
+		u_int	ub, vr;
 		in >> ub >> vr;
 		camera.setWhiteBalance(ub, vr);
 	    }
@@ -2892,11 +2894,11 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	    {
 		float	val;
 		in >> val;
-		camera.setAbsValue(feature->feature, val);
+		camera.setValue(feature->feature, val);
 	    }
 	    else
 	    {
-		int	val;
+		u_int	val;
 		in >> val;
 		camera.setValue(feature->feature, val);
 	    }

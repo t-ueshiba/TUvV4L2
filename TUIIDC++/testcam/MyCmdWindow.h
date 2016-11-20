@@ -81,7 +81,7 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	    initializeMovie();
 	    return;
 	}
-	else if (setFeatureValue(_camera, id, val))
+	else if (setFeature(_camera, id, int(val), float(val)))
 	    return;
 	
 	switch (id)

@@ -65,13 +65,11 @@ main(int argc, char* argv[])
     try
     {
 	CameraArray	cameras(argv + optind, argc - optind, speed);
-	for (size_t i = 0; i < cameras.dim(); ++i)
-	    cerr << "camera " << i << ": uniqId = "
-		 << hex << setw(16) << setfill('0')
-		 << cameras[i]->globalUniqueId() << dec << endl;
-	
 	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, cameras);
 	vapp.run();
+
+	for (auto camera : cameras)
+	    cout << *camera;
     }
     catch (exception& err)
     {
