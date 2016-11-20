@@ -25,19 +25,19 @@ struct Epsilon
 {
     typedef typename STEREO::Parameters			params_type;
 
-    int		get(const params_type& params)	  const	{ return 0; }
-    void	set(int val, params_type& params) const	{}
+    float	get(const params_type& params)		const	{ return 0; }
+    void	set(float val, params_type& params)	const	{}
 };
 template <class SCORE, class DISP>
 struct Epsilon<GFStereo<SCORE, DISP> >
 {
     typedef typename GFStereo<SCORE, DISP>::Parameters	params_type;
 	
-    int		get(const params_type& params) const
+    float	get(const params_type& params) const
 		{
 		    return params.epsilon;
 		}
-    void	set(int val, params_type& params) const
+    void	set(float val, params_type& params) const
 		{
 		    params.epsilon = val;
 		}
@@ -91,19 +91,19 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(App&		 parentApp,
     const params_type&	p = _stereo.getParameters();
     _menuCmd.setValue(c_DoHorizontalBackMatch, p.doHorizontalBackMatch);
     _menuCmd.setValue(c_DoVerticalBackMatch, p.doVerticalBackMatch);
-    _menuCmd.setValue(c_WindowSize, int(p.windowSize));
-    _menuCmd.setValue(c_DisparitySearchWidth, int(p.disparitySearchWidth));
-    _menuCmd.setValue(c_DisparityMax, int(p.disparityMax));
-    _menuCmd.setValue(c_DisparityInconsistency, int(p.disparityInconsistency));
-    _menuCmd.setValue(c_IntensityDiffMax, int(p.intensityDiffMax));
-    _menuCmd.setValue(c_DerivativeDiffMax, int(p.derivativeDiffMax));
+    _menuCmd.setValue(c_WindowSize, float(p.windowSize));
+    _menuCmd.setValue(c_DisparitySearchWidth, float(p.disparitySearchWidth));
+    _menuCmd.setValue(c_DisparityMax, float(p.disparityMax));
+    _menuCmd.setValue(c_DisparityInconsistency, float(p.disparityInconsistency));
+    _menuCmd.setValue(c_IntensityDiffMax, float(p.intensityDiffMax));
+    _menuCmd.setValue(c_DerivativeDiffMax, float(p.derivativeDiffMax));
     _menuCmd.setValue(c_Regularization, Epsilon<stereo_type>().get(p));
     _menuCmd.setValue(c_Blend, float(p.blend));
     
-    _canvasL.setZoom(1, 2);
-    _canvasR.setZoom(1, 2);
-    _canvasV.setZoom(1, 2);
-    _canvasD.setZoom(1, 2);
+    _canvasL.setZoom(0.5);
+    _canvasR.setZoom(0.5);
+    _canvasV.setZoom(0.5);
+    _canvasD.setZoom(0.5);
     colormap().setSaturationF(p.disparityMax);
 }
 
@@ -195,7 +195,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DoVerticalBackMatch:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.doVerticalBackMatch = val;
+	    params.doVerticalBackMatch = u_int(val.f);
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -205,7 +205,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_WindowSize:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.windowSize = val;
+	    params.windowSize = u_int(val.f);
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -215,13 +215,13 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DisparitySearchWidth:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.disparitySearchWidth = val;
+	    params.disparitySearchWidth = u_int(val.f);
 	    _stereo.setParameters(params);
 	    initializeRectification();
 	    params = _stereo.getParameters();
 	    _menuCmd.setValue(c_DisparitySearchWidth,
-			      int(params.disparitySearchWidth));
-	    _menuCmd.setValue(c_DisparityMax, int(params.disparityMax));
+			      float(params.disparitySearchWidth));
+	    _menuCmd.setValue(c_DisparityMax, float(params.disparityMax));
 
 	    initializeRectification();
 	    stereoMatch();
@@ -231,11 +231,11 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DisparityMax:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.disparityMax = val;
+	    params.disparityMax = u_int(val.f);
 	    _stereo.setParameters(params);
 	    initializeRectification();
 	    params = _stereo.getParameters();
-	    _menuCmd.setValue(c_DisparityMax, int(params.disparityMax));
+	    _menuCmd.setValue(c_DisparityMax, float(params.disparityMax));
 	    colormap().setSaturationF(params.disparityMax);
 
 	    initializeRectification();
@@ -246,7 +246,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Regularization:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    Epsilon<stereo_type>().set(val, params);
+	    Epsilon<stereo_type>().set(val.f, params);
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -256,7 +256,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DisparityInconsistency:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.disparityInconsistency = val;
+	    params.disparityInconsistency = u_int(val);
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -266,7 +266,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_IntensityDiffMax:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.intensityDiffMax = val;
+	    params.intensityDiffMax = u_int(val.f);
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -276,7 +276,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DerivativeDiffMax:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.derivativeDiffMax = val;
+	    params.derivativeDiffMax = u_int(val.f);
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -286,7 +286,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Blend:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.blend = val.f();
+	    params.blend = val.f;
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -373,7 +373,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    break;
 	
 	  case c_GazeDistance:
-	    _canvas3D.setDistance(1000.0 * val.f());
+	    _canvas3D.setDistance(1000.0 * val.f);
 	    break;
 	}
     }

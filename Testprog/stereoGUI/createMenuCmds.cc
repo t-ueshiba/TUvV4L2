@@ -22,8 +22,6 @@ static MenuDef	fileMenu[] =
     EndOfMenu
 };
 
-static int	range[] = {50, 1000, 100};
-
 static CmdDef	RadioButtonCmds[] =
 {
     {C_RadioButton, c_Texture, 0, "Texture", noProp, CA_None,
@@ -35,7 +33,7 @@ static CmdDef	RadioButtonCmds[] =
     EndOfCmds
 };
     
-static int	prop[8][3];
+static float	prop[9][3];
 static CmdDef	MenuCmds[] =
 {
     {C_MenuButton,   M_File,		0, "File",	fileMenu, CA_None,
@@ -87,7 +85,7 @@ static CmdDef	MenuCmds[] =
 
     {C_ChoiceFrame,  c_DrawMode, c_Texture, "", RadioButtonCmds,  CA_NoBorder,
      7, 1, 1, 1, 0},
-    {C_Slider,	     c_GazeDistance,  130, "Gaze distance", range,  CA_None,
+    {C_Slider,	     c_GazeDistance,  1.3f, "Gaze distance", prop[8],  CA_None,
      7, 2, 1, 1, 0},
     EndOfCmds
 };
@@ -100,17 +98,17 @@ createMenuCmds()
 {
   // Disparity search width
     prop[0][0]  = 16;
-    prop[0][1]  = 192;
+    prop[0][1]  = 208;
     prop[0][2]  = 1;
 
   // Max. disparity
     prop[1][0]  = 48;
-    prop[1][1]  = 768;
+    prop[1][1]  = 816;
     prop[1][2]  = 1;
 
   // Window size
     prop[2][0]  = 3;
-    prop[2][1]  = 81;
+    prop[2][1]  = 84;
     prop[2][2]  = 1;
 
   // Max. intensity diff.
@@ -125,8 +123,8 @@ createMenuCmds()
 
   // blend ratio
     prop[5][0]  = 0;
-    prop[5][1]  = 100;
-    prop[5][2]  = 100;
+    prop[5][1]  = 1;
+    prop[5][2]  = 0.01;
 
   // Disparity inconsistency
     prop[6][0]  = 0;
@@ -135,8 +133,13 @@ createMenuCmds()
 
   // Regularization
     prop[7][0]  = 1;
-    prop[7][1]  = 255;
+    prop[7][1]  = 256;
     prop[7][2]  = 1;
+
+  // Gaze distance
+    prop[8][0]  = 0.5;
+    prop[8][1]  = 10;
+    prop[8][2]  = 0.1;
 
     return MenuCmds;
 }
