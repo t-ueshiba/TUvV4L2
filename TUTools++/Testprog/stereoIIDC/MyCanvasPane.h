@@ -46,8 +46,8 @@ class MyCanvasPaneBase : public CanvasPane
 	 _dc(*this)					{_dc << cross;}
     
     void		resize(size_t w, size_t h)			;
-    void		setZoom(size_t mul, size_t div)			;
-    void		setSaturation(size_t saturation)			;
+    void		setZoom(float zoom)				;
+    void		setSaturation(size_t saturation)		;
     void		drawEpipolarLine(int v)				;
     void		eraseEpipolarLine(int v)			;
     void		drawEpipolarLineV(int u)			;
@@ -68,13 +68,13 @@ class MyCanvasPaneBase : public CanvasPane
 inline void
 MyCanvasPaneBase::resize(size_t w, size_t h)
 {
-    _dc.setSize(w, h, _dc.mul(), _dc.div());
+    _dc.setSize(w, h, _dc.zoom());
 }
 
 inline void
-MyCanvasPaneBase::setZoom(size_t mul, size_t div)
+MyCanvasPaneBase::setZoom(float zoom)
 {
-    _dc.setSize(_dc.width(), _dc.height(), mul, div);
+    _dc.setSize(_dc.width(), _dc.height(), zoom);
 }
 
 inline void

@@ -189,12 +189,12 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(
     show();
 
 #if defined(DISPLAY_2D)
-    _canvasL.setZoom(1, 2);
+    _canvasL.setZoom(0.5);
 #  if !defined(NO_RV)
-    _canvasR.setZoom(1, 2);
-    _canvasV.setZoom(1, 2);
+    _canvasR.setZoom(0.5);
+    _canvasV.setZoom(0.5);
 #  endif    
-    _canvasD.setZoom(1, 2);
+    _canvasD.setZoom(0.5);
 #endif
 
 #if defined(COLOR)

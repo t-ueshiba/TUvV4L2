@@ -167,7 +167,7 @@ MyOglCanvasPaneBase<D>::swingView()
 template <class D> inline void
 MyOglCanvasPaneBase<D>::resize(size_t w, size_t h)
 {
-    _dc.setSize(w, h, _dc.mul(), _dc.div());
+    _dc.setSize(w, h, _dc.zoom());
 }
 
 template <class D> template <class T> inline Image<T>
