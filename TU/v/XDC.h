@@ -134,7 +134,7 @@ class XDC : public DC
     void		dump(std::ostream& out)			const	;
 
   protected:
-    XDC(u_int width, u_int height, u_int mul, u_int div,
+    XDC(u_int width, u_int height, float zoom,
 	Colormap& colormap, GC gc)					;
     virtual		~XDC()						;
 

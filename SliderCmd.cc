@@ -31,6 +31,7 @@
 #include "vSlider_.h"
 #include "vGridbox_.h"
 #include <X11/Xaw3d/Label.h>
+#include <cmath>
 #include <sstream>
 #include <iomanip>
 
@@ -65,7 +66,7 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				    XtNgravity,		EastGravity,
 				    XtNgridx,		0,
 				    XtNweightx,		1,
-				    Null)),
+				    nullptr)),
      _slider(XtVaCreateManagedWidget("TUvSliderCmd-slider",
 				     sliderWidgetClass,
 				     _widget,
@@ -82,7 +83,7 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				     XtNgravity,	EastGravity,
 				     XtNgridx,		1,
 				     XtNweightx,	0,
-				     Null)),
+				     nullptr)),
      _text(XtVaCreateManagedWidget("TUvSliderCmd-text",
 				   labelWidgetClass,
 				   _widget,
@@ -91,16 +92,16 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				   XtNgravity,		EastGravity,
 				   XtNgridx,		2,
 				   XtNweightx,		0,
-				   Null)),
-     _min  (cmd.prop != 0 ? ((int*)cmd.prop)[0] :   0),
-     _range(cmd.prop != 0 ? ((int*)cmd.prop)[1] : 100),
-     _div  (cmd.prop != 0 ? ((int*)cmd.prop)[2] : 100),
-     _val(cmd.val)
+				   nullptr)),
+     _min (cmd.prop ? static_cast<const float*>(cmd.prop)[0] :   0),
+     _max (cmd.prop ? static_cast<const float*>(cmd.prop)[1] : 100),
+     _step(cmd.prop ? static_cast<const float*>(cmd.prop)[2] :   1),
+     _val (cmd.val.f)
 {
-    XtVaSetValues(_slider, XtNgridx, 1, Null);
+    XtVaSetValues(_slider, XtNgridx, 1, nullptr);
     XtAddCallback(_slider, XtNjumpProc, CBsliderCmdJumpProc, this);
     
-    setValue(CmdVal(_val, _div));
+    setValue(CmdVal(_val));
 }
 
 SliderCmd::~SliderCmd()
@@ -116,51 +117,51 @@ SliderCmd::widget() const
 CmdVal
 SliderCmd::getValue() const
 {
-    return CmdVal(_val, _div);
+    return CmdVal(_val);
 }
 
 void
 SliderCmd::setValue(CmdVal val)
 {
     setValueInternal(val);
-    float	percent = (_val - _min) / (float)_range;
+    float	percent = (_val - _min) / (_max - _min);
     vSliderSetThumb(_slider, percent, 0.0);
 }
 
 void
 SliderCmd::setProp(void* prop)
 {
-    if (prop != 0)
+    if (prop)
     {
-	int*	ip = (int*)prop;
-	_min   = ip[0];
-	_range = ip[1];
-	_div   = ip[2];
+	const auto	fp = static_cast<const float*>(prop);
+	_min  = fp[0];
+	_max  = fp[1];
+	_step = fp[2];
     }
     else
     {
-	_min   = 0;
-	_range = 100;
-	_div   = 1;
+	_min  = 0;
+	_max  = 100;
+	_step = 1;
     }
 }
 
 void
 SliderCmd::setPercent(float percent)
 {
-    setValueInternal(CmdVal(_min + int(percent * _range), _div));
+    setValueInternal(CmdVal(_min + percent * (_max - _min)));
 }
 
 void
 SliderCmd::setValueInternal(CmdVal val)
 {
-    _val = int(val.f() * _div);
-    std::ostringstream	s;
-    if (_div == 1)
-	s << std::setw(4) << _val;
+    if (_step != 0)
+	_val = _min + std::floor((val.f - _min)/_step)*_step;
     else
-	s << std::setw(4) << (float)_val / (float)_div;
-    XtVaSetValues(_text, XtNlabel, s.str().c_str(), Null);
+	_val = val.f;
+    std::ostringstream	s;
+    s << std::setw(4) << _val;
+    XtVaSetValues(_text, XtNlabel, s.str().c_str(), nullptr);
 }
 
 }

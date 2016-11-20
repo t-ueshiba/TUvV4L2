@@ -40,9 +40,8 @@ namespace v
 /************************************************************************
 *  class ShmDC								*
 ************************************************************************/
-ShmDC::ShmDC(CanvasPane& parentCanvasPane, u_int width, u_int height,
-	     u_int mul, u_int div)
-    :CanvasPaneDC(parentCanvasPane, width, height, mul, div),
+ShmDC::ShmDC(CanvasPane& parentCanvasPane, u_int width, u_int height, float zoom)
+    :CanvasPaneDC(parentCanvasPane, width, height, zoom),
      _xShmInfo(), _xShmSize(0), _xShmAvailable(true)
 {
     int	ignore;

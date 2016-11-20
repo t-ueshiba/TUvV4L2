@@ -44,7 +44,7 @@ class ShmDC : public CanvasPaneDC
 {
   public:
     ShmDC(CanvasPane& parentCanvasPane, u_int width=0, u_int height=0,
-	  u_int mul=1, u_int div=1)					;
+	  float zoom=1)							;
     virtual		~ShmDC()					;
 
   protected:

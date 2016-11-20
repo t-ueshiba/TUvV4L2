@@ -41,12 +41,11 @@ DC::~DC()
 }
 
 DC&
-DC::setSize(u_int width, u_int height, u_int mul, u_int div)
+DC::setSize(u_int width, u_int height, float zoom)
 {
     _width  = width;
     _height = height;
-    _mul    = mul;
-    _div    = div;
+    _zoom   = zoom;
     return *this;
 }
 
@@ -90,49 +89,49 @@ DC::repaintAll() // This action is invoked by Expose events or application.
 DC&
 x0_125(DC& vDC)
 {
-    return vDC.setZoom(1, 8);
+    return vDC.setZoom(0.125);
 }
 
 DC&
 x0_25(DC& vDC)
 {
-    return vDC.setZoom(1, 4);
+    return vDC.setZoom(0.25);
 }
 
 DC&
 x0_5(DC& vDC)
 {
-    return vDC.setZoom(1, 2);
+    return vDC.setZoom(0.5);
 }
 
 DC&
 x1(DC& vDC)
 {
-    return vDC.setZoom(1, 1);
+    return vDC.setZoom(1);
 }
 
 DC&
 x1_5(DC& vDC)
 {
-    return vDC.setZoom(3, 2);
+    return vDC.setZoom(1.5);
 }
 
 DC&
 x2(DC& vDC)
 {
-    return vDC.setZoom(2, 1);
+    return vDC.setZoom(2);
 }
 
 DC&
 x4(DC& vDC)
 {
-    return vDC.setZoom(4, 1);
+    return vDC.setZoom(4);
 }
 
 DC&
 x8(DC& vDC)
 {
-    return vDC.setZoom(8, 1);
+    return vDC.setZoom(8);
 }
 
 DC&
