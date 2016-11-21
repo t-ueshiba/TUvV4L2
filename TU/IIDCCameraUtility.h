@@ -1,16 +1,15 @@
 /*
- *  $Id: IIDCCameraArray.h 1681 2014-10-17 02:16:17Z ueshiba $
+ *  $Id: IIDCCameraUtility.h 1681 2014-10-17 02:16:17Z ueshiba $
  */
 /*!
-  \file		IIDCCameraArray.h
+  \file		IIDCCameraUtility.h
   \brief	クラス TU::IIDCCameraArray の定義と実装
 */
-#ifndef __TU_IIDCCAMERAARRAY_H
-#define __TU_IIDCCAMERAARRAY_H
+#ifndef __TU_IIDCCAMERAUTILITY_H
+#define __TU_IIDCCAMERAUTILITY_H
 
-#include "TU/algorithm.h"
 #include "TU/IIDC++.h"
-#include "TU/io.h"
+#include "TU/algorithm.h"
 #include "TU/Heap.h"
 #include <string>
 
@@ -52,61 +51,6 @@ class IIDCCameraArray : public Array<IIDCCamera>
   private:
     std::string		_fullName;	//!< カメラのfull path名
 };
-
-//! IIDCデジタルカメラの配列を生成し，設定ファイルを読み込んで初期化する.
-/*!
-  \param name		カメラ名
-  \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
-  \param speed		FireWireバスの速度
-*/
-inline
-IIDCCameraArray::IIDCCameraArray(const char* name, const char* dirs,
-				 IIDCCamera::Speed speed)
-    :Array<IIDCCamera>(), _fullName()
-{
-    restore(name, dirs, speed);
-}
-    
-//! IIDCデジタルカメラの配列の設定を設定ファイルに書き込む.
-inline void
-IIDCCameraArray::save() const
-{
-    std::ofstream	out(_fullName.c_str());
-    if (!out)
-	throw std::runtime_error("IIDCCameraArray::save(): cannot open " +
-				 _fullName);
-    out << *this;
-}
-
-//! カメラのfull path名を返す.
-/*!
-  \return	カメラのfull path名
-*/
-inline const std::string&
-IIDCCameraArray::fullName() const
-{
-    return _fullName;
-}
-    
-//! カメラ設定ファイル名を返す.
-/*!
-  \return	カメラ設定ファイル名
-*/
-inline std::string
-IIDCCameraArray::configFile() const
-{
-    return _fullName + ".conf";
-}
-    
-//! キャリブレーションファイル名を返す.
-/*!
-  \return	キャリブレーションファイル名
-*/
-inline std::string
-IIDCCameraArray::calibFile() const
-{
-    return _fullName + ".calib";
-}
 
 /************************************************************************
 *  global data								*
@@ -344,4 +288,4 @@ syncedSnap(ITER camera, size_t ncameras, uint64_t maxSkew=1000)
 }
     
 }
-#endif	// ! __TU_IIDCCAMERAARRAY_H
+#endif	// ! __TU_IIDCCAMERAUTILITY_H
