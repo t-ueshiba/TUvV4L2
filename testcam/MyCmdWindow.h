@@ -71,6 +71,8 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 
     try
     {
+	cerr << "id = " << hex << id << dec << ", fval = " << val.f << endl;
+	
 	if (setFormat(_camera, id, val))
 	{
 	    initializeMovie();
@@ -81,7 +83,7 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	    initializeMovie();
 	    return;
 	}
-	else if (setFeature(_camera, id, int(val), float(val)))
+	else if (setFeature(_camera, id, int(val), val.f))
 	    return;
 	
 	switch (id)
@@ -114,13 +116,13 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 		_camera.continuousShot(false);
 	    }
 	    break;
-	  /*
+
 	  case c_OneShot:
 	    stopContinuousShotIfRunning();
 	    _camera.oneShot();
 	    tick();
 	    break;
-	  */
+
 	  case c_NFrames:
 	    stopContinuousShotIfRunning();
 	    initializeMovie();
@@ -191,7 +193,7 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 
     _canvas.resize();
 
-    int	props[] = {0, static_cast<int>(_movie.nframes() - 1), 1};
+    float	props[] = {0, static_cast<float>(_movie.nframes() - 1), 1};
     _captureCmd.setProp(c_StatusMovie, props);
     
     repaintCanvas();
@@ -201,7 +203,7 @@ template <class CAMERA, class PIXEL> void
 MyCmdWindow<CAMERA, PIXEL>::repaintCanvas()
 {
     _canvas.repaintUnderlay();
-    _captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
+    _captureCmd.setValue(c_StatusMovie, float(_movie.currentFrame()));
 }
 
 template <class CAMERA, class PIXEL> void

@@ -93,7 +93,8 @@ setScale(const CameraAndFeature& cameraAndFeature)
 	    gtk_range_set_value(GTK_RANGE(scale2), vr);
 	}
 	else
-	    gtk_range_set_value(GTK_RANGE(scale), camera->getValue<float>(feature));
+	    gtk_range_set_value(GTK_RANGE(scale),
+				camera->getValue<float>(feature));
     }
     else
     {
@@ -115,7 +116,8 @@ setScale(const CameraAndFeature& cameraAndFeature)
 	    gtk_range_set_value(GTK_RANGE(scale2), vr);
 	}
 	else
-	    gtk_range_set_value(GTK_RANGE(scale), camera->getValue<u_int>(feature));
+	    gtk_range_set_value(GTK_RANGE(scale),
+				camera->getValue<u_int>(feature));
     }
 }
     
@@ -277,20 +279,20 @@ CBsetValue(GtkScale* scale, gpointer userdata)
     const auto	feature = cameraAndFeature->feature;
     if (feature == IIDCCamera::WHITE_BALANCE)
 	if (camera->isAbsControl(feature))
-	    camera->setWhiteBalance(float(gtk_range_get_value(
-					      GTK_RANGE(cameraAndFeature->scale))),
-				    float(gtk_range_get_value(
-					      GTK_RANGE(cameraAndFeature->scale2))));
+	    camera->setWhiteBalance(
+		float(gtk_range_get_value(GTK_RANGE(cameraAndFeature->scale))),
+		float(gtk_range_get_value(GTK_RANGE(cameraAndFeature->scale2))));
 	else
-	    camera->setWhiteBalance(u_int(gtk_range_get_value(
-					      GTK_RANGE(cameraAndFeature->scale))),
-				    u_int(gtk_range_get_value(
-					      GTK_RANGE(cameraAndFeature->scale2))));
+	    camera->setWhiteBalance(
+		u_int(gtk_range_get_value(GTK_RANGE(cameraAndFeature->scale))),
+		u_int(gtk_range_get_value(GTK_RANGE(cameraAndFeature->scale2))));
     else
 	if (camera->isAbsControl(feature))
-	    camera->setValue(feature, float(gtk_range_get_value(GTK_RANGE(scale))));
+	    camera->setValue(feature,
+			     float(gtk_range_get_value(GTK_RANGE(scale))));
 	else
-	    camera->setValue(feature, u_int(gtk_range_get_value(GTK_RANGE(scale))));
+	    camera->setValue(feature,
+			     u_int(gtk_range_get_value(GTK_RANGE(scale))));
 }
 
 /************************************************************************
