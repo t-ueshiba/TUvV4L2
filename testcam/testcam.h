@@ -30,7 +30,7 @@ enum
 inline const CmdDef*
 createCaptureCmds()
 {
-    static CmdDef captureCmds[] =
+    static constexpr CmdDef captureCmds[] =
     {
 	{C_ToggleButton, c_ContinuousShot, 0, "Continuous shot", noProp,
 	 CA_None, 0, 0, 1, 1, 0},
@@ -53,7 +53,7 @@ createCaptureCmds()
 template <class CAMERA> inline const CmdDef*
 createMenuCmds(const CAMERA& camera)
 {
-    static MenuDef nframesMenu[] =
+    static constexpr MenuDef nframesMenu[] =
     {
 	{" 10",  10, false, noSub},
 	{"100", 100, true,  noSub},
@@ -62,15 +62,15 @@ createMenuCmds(const CAMERA& camera)
 	EndOfMenu
     };
 
-    static MenuDef fileMenu[] =
+    static constexpr MenuDef fileMenu[] =
     {
-	{"Save",			M_Save,		 false, noSub},
-	{"-",				M_Line,		 false, noSub},
-	{"Quit",			M_Exit,		 false, noSub},
+	{"Save", M_Save, false, noSub},
+	{"-",	 M_Line, false, noSub},
+	{"Quit", M_Exit, false, noSub},
 	EndOfMenu
     };
 
-    static CmdDef menuCmds[] =
+    static constepxr CmdDef menuCmds[] =
     {
 	{C_MenuButton, M_File,   0, "File",   fileMenu, CA_None, 0, 0, 1, 1, 0},
 	{C_MenuButton, M_Format, 0, "Format", noProp,   CA_None, 1, 0, 1, 1, 0},
@@ -90,8 +90,11 @@ createMenuCmds(const CAMERA& camera)
 *  global functions							*
 ************************************************************************/
 inline void
-countTime(int& nframes, timeval& start)
+countTime()
 {
+    static int		nframes = 0;
+    static timeval	start;
+    
     if (nframes == 10)
     {
 	timeval	end;
