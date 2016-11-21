@@ -43,6 +43,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/List.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
+		/usr/local/include/TU/algorithm.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
@@ -56,11 +57,11 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/v/TUv++.h \
 		/usr/local/include/TU/v/Widget-Xaw.h
 HDRS		= TU/v/vIIDC++.h
-SRCS		= createFeatureCmds.cc \
-		createFormatMenu.cc \
+SRCS		= featureCmds.cc \
+		formatMenu.cc \
 		setSpecialFormat.cc
-OBJS		= createFeatureCmds.o \
-		createFormatMenu.o \
+OBJS		= featureCmds.o \
+		formatMenu.o \
 		setSpecialFormat.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
@@ -69,7 +70,7 @@ OBJS		= createFeatureCmds.o \
 include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-createFeatureCmds.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
+featureCmds.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
@@ -77,8 +78,9 @@ createFeatureCmds.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/IIDC++.h
-createFormatMenu.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/IIDC++.h \
+	/usr/local/include/TU/algorithm.h
+formatMenu.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/Geometry++.h \
@@ -86,7 +88,8 @@ createFormatMenu.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
-	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/IIDC++.h
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/IIDC++.h \
+	/usr/local/include/TU/algorithm.h
 setSpecialFormat.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
@@ -96,5 +99,6 @@ setSpecialFormat.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/List.h \
 	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/IIDC++.h \
+	/usr/local/include/TU/algorithm.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h
