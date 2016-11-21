@@ -12,7 +12,7 @@ namespace v
 ************************************************************************/
 static struct
 {
-    IIDCCamera::Feature	id;
+    IIDCCamera::Feature	feature;
     const char*		name;
     float		prop[3];
 } features[] =
@@ -49,21 +49,35 @@ static Array<std::string>	cameraChoiceTitles;
 static void
 setSlider(const IIDCCamera& camera, IIDCCamera::Feature feature, CmdDef* cmd)
 {
+    const auto	fp = static_cast<float*>(cmd[0].prop);
+
     if (cmd->id == IIDCCamera::WHITE_BALANCE)
     {
 	if (camera.isAbsControl(IIDCCamera::WHITE_BALANCE))
 	{
 	    float	min, max;
 	    camera.getMinMax(IIDCCamera::WHITE_BALANCE, min, max);
+	    fp[0] = min;
+	    fp[1] = max;
+	    fp[2] = 0;
+	    
 	    float	ub, vr;
 	    camera.getWhiteBalance(ub, vr);
+	    cmd[0].val = ub;
+	    cmd[1].val = vr;
 	}
 	else
 	{
 	    u_int	min, max;
 	    camera.getMinMax(IIDCCamera::WHITE_BALANCE, min, max);
+	    fp[0] = min;
+	    fp[1] = max;
+	    fp[2] = 1;
+	    
 	    u_int	ub, vr;
 	    camera.getWhiteBalance(ub, vr);
+	    cmd[0].val = ub;
+	    cmd[1].val = vr;
 	}
     }
     else
@@ -74,13 +88,23 @@ setSlider(const IIDCCamera& camera, IIDCCamera::Feature feature, CmdDef* cmd)
 	{
 	    float	min, max;
 	    camera.getMinMax(feature, min, max);
+	    fp[0] = min;
+	    fp[1] = max;
+	    fp[2] = 0;
+
 	    const auto	val = camera.getValue<float>(feature);
+	    cmd->val = val;
 	}
 	else
 	{
 	    u_int	min, max;
 	    camera.getMinMax(feature, min, max);
+	    fp[0] = min;
+	    fp[1] = max;
+	    fp[2] = 1;
+
 	    const auto	val = camera.getValue<u_int>(feature);
+	    cmd->val = val;
 	}
     }
     
@@ -150,14 +174,14 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 
     for (auto& feature : features)
     {
-	const auto	inq = camera.inquireFeatureFunction(feature.id);
+	const auto	inq = camera.inquireFeatureFunction(feature.feature);
 	
 	if (!((inq & IIDCCamera::Presence) &&
 	      (inq & IIDCCamera::Manual)   &&
 	      (inq & IIDCCamera::ReadOut)))
 	    continue;
 	
-	featureCmds[ncmds].id	      = feature.id;
+	featureCmds[ncmds].id	      = feature.feature;
 	featureCmds[ncmds].title      = feature.name;
 	featureCmds[ncmds].prop	      = feature.prop;
 	featureCmds[ncmds].attrs      = CA_None;
@@ -167,7 +191,7 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 	featureCmds[ncmds].gridHeight = 1;
 	featureCmds[ncmds].size	      = 0;
 
-	switch (feature.id)
+	switch (feature.feature)
 	{
 	  case IIDCCamera::TRIGGER_MODE:
 	  {
@@ -191,20 +215,14 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 	    break;
 
 	  case IIDCCamera::WHITE_BALANCE:
-	  {
 	  // Create sliders for setting values.
 	    featureCmds[ncmds].type = C_Slider;
-
-	    u_int	min, max;
-	    camera.getMinMax(feature.id, min, max);
-	    feature.prop[0] = min;
-	    feature.prop[1] = max;
-	    feature.prop[2] = 1;
+	    setSlider(camera, feature.feature, featureCmds + ncmds);
 	    
 	    ++ncmds;
 	    ++y;
 	    featureCmds[ncmds].type	  = C_Slider;
-	    featureCmds[ncmds].id	  = feature.id + IIDCCAMERA_OFFSET_VR;
+	    featureCmds[ncmds].id	  = feature.feature + IIDCCAMERA_OFFSET_VR;
 	    featureCmds[ncmds].title      = "White bal.(V/R)";
 	    featureCmds[ncmds].prop       = feature.prop;
 	    featureCmds[ncmds].attrs      = CA_None;
@@ -213,24 +231,11 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 	    featureCmds[ncmds].gridWidth  = 1;
 	    featureCmds[ncmds].gridHeight = 1;
 	    featureCmds[ncmds].size	  = 0;
-	    u_int	ub, vr;
-	    camera.getWhiteBalance(ub, vr);
-	    featureCmds[ncmds-1].val	  = float(ub);
-	    featureCmds[ncmds  ].val	  = float(vr);
-	  }
 	    break;
 
 	  default:
-	  {
-	    u_int	min, max;
-	    camera.getMinMax(feature.id, min, max);
-	    feature.prop[0] = min;
-	    feature.prop[1] = max;
-	    feature.prop[2] = 1;
-	    
 	    featureCmds[ncmds].type = C_Slider;
-	    featureCmds[ncmds].val  = float(camera.getValue(feature.id));
-	  }
+	    setSlider(camera, feature.feature, featureCmds + ncmds);
 	    break;
 	}
 
@@ -240,8 +245,8 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 	{
 	  // Create toggle button for turning on/off this feature.
 	    featureCmds[ncmds].type	  = C_ToggleButton;
-	    featureCmds[ncmds].id	  = feature.id + IIDCCAMERA_OFFSET_ONOFF;
-	    featureCmds[ncmds].val	  = camera.isActive(feature.id);
+	    featureCmds[ncmds].id	  = feature.feature + IIDCCAMERA_OFFSET_ONOFF;
+	    featureCmds[ncmds].val	  = camera.isActive(feature.feature);
 	    featureCmds[ncmds].title      = "On";
 	    featureCmds[ncmds].prop       = noProp;
 	    featureCmds[ncmds].attrs      = CA_None;
@@ -257,16 +262,15 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 	{
 	  // Create toggle button for setting manual/auto mode.
 	    featureCmds[ncmds].type	  = C_ToggleButton;
-	    featureCmds[ncmds].id	  = feature.id
-		+ IIDCCAMERA_OFFSET_AUTO;
-	    if (feature.id == IIDCCamera::TRIGGER_MODE)
+	    featureCmds[ncmds].id	  = feature.feature + IIDCCAMERA_OFFSET_AUTO;
+	    if (feature.feature == IIDCCamera::TRIGGER_MODE)
 	    {
 		featureCmds[ncmds].val	  = camera.getTriggerPolarity();
 		featureCmds[ncmds].title  = "(+)";
 	    }
 	    else
 	    {
-		featureCmds[ncmds].val	  = camera.isAuto(feature.id);
+		featureCmds[ncmds].val	  = camera.isAuto(feature.feature);
 		featureCmds[ncmds].title  = "Auto";
 	    }
 	    featureCmds[ncmds].prop       = noProp;
@@ -283,8 +287,8 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 	{
 		// Create toggle button for turning on/off abs. value mode.
 	    featureCmds[ncmds].type	  = C_ToggleButton;
-	    featureCmds[ncmds].id	  = feature.id + IIDCCAMERA_OFFSET_ABS;
-	    featureCmds[ncmds].val	  = camera.isAbsControl(feature.id);
+	    featureCmds[ncmds].id	  = feature.feature + IIDCCAMERA_OFFSET_ABS;
+	    featureCmds[ncmds].val	  = camera.isAbsControl(feature.feature);
 	    featureCmds[ncmds].title      = "Abs.";
 	    featureCmds[ncmds].prop       = noProp;
 	    featureCmds[ncmds].attrs      = CA_None;
@@ -312,9 +316,7 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
     {
 	const auto	id = featureCmd->id;
 
-	if (id == IIDCCAMERA_CHOICE)
-	    continue;
-	else if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
+	if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
 	    cmdPane.setValue(id,
 			     int(camera.isAbsControl(
 				     IIDCCamera::uintToFeature(
@@ -329,6 +331,8 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 			     int(camera.isActive(
 				     IIDCCamera::uintToFeature(
 					 id - IIDCCAMERA_OFFSET_ONOFF))));
+	else if (id == IIDCCAMERA_CHOICE)
+	    continue;
 	else if (id == IIDCCamera::TRIGGER_MODE)
 	    cmdPane.setValue(id, int(camera.getTriggerMode()));
 	else if (id == IIDCCamera::WHITE_BALANCE)
@@ -344,8 +348,8 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 	    {
 		u_int	ub, vr;
 		camera.getWhiteBalance(ub, vr);
-		cmdPane.setValue(id, int(ub));
-		cmdPane.setValue(id + IIDCCAMERA_OFFSET_VR, int(vr));
+		cmdPane.setValue(id, ub);
+		cmdPane.setValue(id + IIDCCAMERA_OFFSET_VR, vr);
 	    }
 	}
 	else
@@ -353,9 +357,9 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 	    const auto	feature = IIDCCamera::uintToFeature(id);
 
 	    if (camera.isAbsControl(feature))
-		cmdPane.setValue(id, float(camera.getValue<float>(feature)));
+		cmdPane.setValue(id, camera.getValue<float>(feature));
 	    else
-		cmdPane.setValue(id, float(camera.getValue<u_int>(feature)));
+		cmdPane.setValue(id, camera.getValue<u_int>(feature));
 	}
     }
 }
@@ -363,9 +367,76 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 bool
 setFeatureCmds(IIDCCamera& camera, CmdId id, CmdVal val, CmdPane& cmdPane)
 {
-    setFeature(&camera, &camera + 1, id, int(val), float(val));
-
-    return true;
+    if (setFeature(&camera, &camera + 1, id, int(val), val.f()))
+    {
+	if (id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
+	{
+	    float	props[3];
+	    
+	    if (id == IIDCCamera::WHITE_BALANCE)
+	    {
+		if (camera.isAbsControl(IIDCCamera::WHITE_BALANCE))
+		{
+		    float	min, max;
+		    camera.getMinMax(IIDCCamera::WHITE_BALANCE, min, max);
+		    props[0] = min;
+		    props[1] = max;
+		    props[2] = 0;
+		    cmdPane.setProp(id, props);
+		    cmdPane.setProp(id + IIDCCAMERA_OFFSET_VR, props);
+		    
+		    float	ub, vr;
+		    camera.getWhiteBalance(ub, vr);
+		    cmdPane.setValue(id, ub);
+		    cmdPane.setValue(id + IIDCCAMERA_OFFSET_VR, ub);
+		}
+		else
+		{
+		    u_int	min, max;
+		    camera.getMinMax(IIDCCamera::WHITE_BALANCE, min, max);
+		    props[0] = min;
+		    props[1] = max;
+		    props[2] = 0;
+		    cmdPane.setProp(id, props);
+		    cmdPane.setProp(id + IIDCCAMERA_OFFSET_VR, props);
+		    
+		    u_int	ub, vr;
+		    camera.getWhiteBalance(ub, vr);
+		    cmdPane.setValue(id, ub);
+		    cmdPane.setValue(id + IIDCCAMERA_OFFSET_VR, ub);
+		}
+	    }
+	    else
+	    {
+		const auto	feature = IIDCCamera::uintToFeature(id);
+	  
+		if (camera.isAbsControl(feature))
+		{
+		    float	min, max;
+		    camera.getMinMax(feature, min, max);
+		    props[0] = min;
+		    props[1] = max;
+		    props[2] = 0;
+		    cmdPane.setProp(id, props);
+		    cmdPane.setValue(feature, camera.getValue<float>(feature));
+		}
+		else
+		{
+		    u_int	min, max;
+		    camera.getMinMax(feature, min, max);
+		    props[0] = min;
+		    props[1] = max;
+		    props[2] = 0;
+		    cmdPane.setProp(id, props);
+		    cmdPane.setValue(feature, camera.getValue<u_int>(feature));
+		}
+	    }
+	}
+	
+	return true;
+    }
+    else
+	return false;
 }
     
 }	// namespace v
