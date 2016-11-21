@@ -52,17 +52,16 @@ typedef int	CmdId;			// ID for each item command or menu
 
 union CmdVal
 {
-    CmdVal(int val)		:u(val), v(1)			{}
-    CmdVal(int uu, int vv)	:u(uu), v(vv)			{}
+    CmdVal(int uu=0, int vv=1)	:u(uu), v(vv)			{}
     CmdVal(float fval)		:f(fval)			{}
     
 		operator int()				const	{return u;}
-
+	
     struct
     {
-	const int	u, v;
+	int	u, v;
     };
-    float		f;
+    float	f;
 };
 
 /************************************************************************

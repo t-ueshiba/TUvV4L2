@@ -48,6 +48,9 @@ CBsliderCmdJumpProc(Widget, XtPointer This, XtPointer pc_ptr)
     SliderCmd*	vSliderCmd = (SliderCmd*)This;
     float	percent = *(float*)pc_ptr;	// get the percent back
     vSliderCmd->setPercent(percent);
+    auto	val = vSliderCmd->getValue();
+    std::cerr << "CBsliderCmdJumpProc: val = " << int(val) << ", fval = " << val.f
+	      << std::endl;
     vSliderCmd->callback(vSliderCmd->id(), vSliderCmd->getValue());
 }
 
@@ -123,7 +126,7 @@ SliderCmd::getValue() const
 void
 SliderCmd::setValue(CmdVal val)
 {
-    setValueInternal(val);
+    setValueInternal(val.f);
     float	percent = (_val - _min) / (_max - _min);
     vSliderSetThumb(_slider, percent, 0.0);
 }
@@ -149,16 +152,16 @@ SliderCmd::setProp(void* prop)
 void
 SliderCmd::setPercent(float percent)
 {
-    setValueInternal(CmdVal(_min + percent * (_max - _min)));
+    setValueInternal(_min + percent * (_max - _min));
 }
 
 void
-SliderCmd::setValueInternal(CmdVal val)
+SliderCmd::setValueInternal(float val)
 {
     if (_step != 0)
-	_val = _min + std::floor((val.f - _min)/_step)*_step;
+	_val = _min + std::floor((val - _min)/_step)*_step;
     else
-	_val = val.f;
+	_val = val;
     std::ostringstream	s;
     s << std::setw(4) << _val;
     XtVaSetValues(_text, XtNlabel, s.str().c_str(), nullptr);

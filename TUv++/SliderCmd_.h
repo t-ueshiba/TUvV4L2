@@ -53,7 +53,7 @@ class SliderCmd : public Cmd
     void			setPercent(float percent)	;
     
   private:
-    void			setValueInternal(CmdVal val)	;
+    void			setValueInternal(float val)	;
 
     const Widget	_widget;			// gridboxWidget
     const Widget	_title;				// labelWidget
