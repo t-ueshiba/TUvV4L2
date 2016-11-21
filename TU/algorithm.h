@@ -73,7 +73,7 @@ max(const T& a, const T& b, const T& c, const T& d)
     return max(max(a, b, c), d);
 }
 
-#if __cplusplus <= 201402L
+#if __cplusplus < 201700L
 template <class ITER, class SIZE, class FUNC> ITER
 for_each_n(ITER iter, SIZE n, FUNC func)
 {
