@@ -44,7 +44,7 @@ class XvDC : public ShmDC, public List<XvDC>::Node
 {
   public:
     XvDC(CanvasPane& parentCanvasPane,
-	 u_int width=0, u_int height=0, u_int mul=1, u_int div=1)	;
+	 u_int width=0, u_int height=0, float zoom=1)			;
     virtual		~XvDC()						;
 
     using		ShmDC::operator <<;

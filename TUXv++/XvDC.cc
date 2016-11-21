@@ -81,9 +81,8 @@ XvDC::createXvImage(const Image<S>& image)
     }
 }
 
-XvDC::XvDC(CanvasPane& parentCanvasPane,
-	   u_int width, u_int height, u_int mul, u_int div)
-    :ShmDC(parentCanvasPane, width, height, mul, div),
+XvDC::XvDC(CanvasPane& parentCanvasPane, u_int width, u_int height, float zoom)
+    :ShmDC(parentCanvasPane, width, height, zoom),
      _port(~0), _xvimage(0)
 {
     u_int		nadaptors;
