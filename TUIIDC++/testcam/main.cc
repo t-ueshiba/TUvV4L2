@@ -57,7 +57,7 @@ main(int argc, char* argv[])
 	    break;
 	}
 	
-	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, camera);
+	v::MyCmdWindow<IIDCCamera, RGB>	myWin(vapp, camera);
 	vapp.run();
 
 	camera.continuousShot(false);
