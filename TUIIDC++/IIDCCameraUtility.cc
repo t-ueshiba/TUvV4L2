@@ -17,7 +17,7 @@ constexpr const char*	IIDCCameraArray::DEFAULT_CONFIG_DIRS;
   \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
   \param speed		FireWireバスの速度
 */
-inline void
+void
 IIDCCameraArray::restore(const char* name, const char* dirs,
 			 IIDCCamera::Speed speed)
 {
