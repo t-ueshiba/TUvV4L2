@@ -30,13 +30,8 @@
 #ifndef __TU_VPP_H
 #define __TU_VPP_H
 
-#ifdef UseGtk
-#  include <gtk/gtk.h>
-#  include "TU/v/Colormap.h"
-#else
-#  include <X11/Intrinsic.h>
-#  include <X11/StringDefs.h>
-#endif
+#include <X11/Intrinsic.h>
+#include <X11/StringDefs.h>
 #include "TU/List.h"
 #include "TU/Geometry++.h"
 #include "TU/types.h"
@@ -50,18 +45,23 @@ namespace v
 ************************************************************************/
 typedef int	CmdId;			// ID for each item command or menu
 
-union CmdVal
+class CmdVal
 {
-    CmdVal(int uu=0, int vv=1)	:u(uu), v(vv)			{}
-    CmdVal(float fval)		:f(fval)			{}
+  public:
+    CmdVal(int u=0, int v=0)	:_u(u), _v(v), _f(u)		{}
+    template <class T,
+	      class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    CmdVal(T val)		:_u(int(val)), _v(0), _f(val)	{}
     
-		operator int()				const	{return u;}
+		operator int()				const	{return _u;}
+    int		u()					const	{return _u;}
+    int		v()					const	{return _v;}
+    float	f()					const	{return _f;}
 	
-    struct
-    {
-	int	u, v;
-    };
-    float	f;
+  private:
+    int		_u;
+    int		_v;
+    float	_f;
 };
 
 /************************************************************************
@@ -113,7 +113,7 @@ struct CmdDef
     u_int	size;		// width in pixels
 };
 
-void* const	noProp	= 0;
+void* const	noProp	= nullptr;
 
 #define EndOfCmds	{C_EndOfList, 0, 0, 0, noProp, CA_None, 0, 0, 0, 0, 0}
 
@@ -128,7 +128,7 @@ struct MenuDef
     MenuDef*	submenu;
 };
 
-MenuDef* const	noSub			= 0;
+MenuDef* const	noSub			= nullptr;
 
 // standard menu item definitions
 const CmdId	M_File			= 32000;
@@ -205,9 +205,6 @@ const CmdId	Id_KeyPress		= 32300;  // mouse leaved the window
 const int	VKM_Ctrl		= 0x100;
 const int	VKM_Alt			= 0x200;
 
-// null pointer
-const void* const	Null = 0;
-    
 /************************************************************************
 *  class Object								*
 ************************************************************************/
@@ -384,7 +381,7 @@ CmdParent::addCmd(Cmd* vcmd)
 inline Cmd*
 CmdParent::detachCmd()
 {
-    return (_cmdList.empty() ? 0 : &_cmdList.pop_front());
+    return (_cmdList.empty() ? nullptr : &_cmdList.pop_front());
 }
 
 }	// namespace v

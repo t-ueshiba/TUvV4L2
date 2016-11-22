@@ -46,7 +46,7 @@ ToggleButtonCmd::ToggleButtonCmd(Object& parentObject, const CmdDef& cmd)
     setValue(cmd.val);
     setDefaultCallback(_widget);
     if (_bitmap != 0)
-	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), Null);
+	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), nullptr);
 }
 
 ToggleButtonCmd::~ToggleButtonCmd()
@@ -64,14 +64,14 @@ CmdVal
 ToggleButtonCmd::getValue() const
 {
     Boolean	state;
-    XtVaGetValues(_widget, XtNstate, &state, Null);
+    XtVaGetValues(_widget, XtNstate, &state, nullptr);
     return (state == TRUE ? 1 : 0);
 }
 
 void
 ToggleButtonCmd::setValue(CmdVal val)
 {
-    XtVaSetValues(_widget, XtNstate, (val != 0 ? TRUE : FALSE), Null);
+    XtVaSetValues(_widget, XtNstate, (val != 0 ? TRUE : FALSE), nullptr);
 }
 
 }

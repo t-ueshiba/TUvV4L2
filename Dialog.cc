@@ -49,7 +49,7 @@ Dialog::Dialog(Window& parentWindow, const char* myName, const CmdDef cmd[])
 				  XtNvisual,	colormap().vinfo().visual,
 				  XtNdepth,	colormap().vinfo().depth,
 				  XtNcolormap,	(::Colormap)colormap(),
-				  Null)),
+				  nullptr)),
      _pane(*this, cmd)
 {
 }

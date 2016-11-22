@@ -62,7 +62,7 @@ class SliderCmd : public Cmd
     float		_min;
     float		_max;
     float		_step;
-    float		_val;
+    CmdVal		_val;
 };
 
 }

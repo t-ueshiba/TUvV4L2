@@ -52,7 +52,7 @@ void
 Pane::place(u_int left, u_int top, u_int width, u_int height)
 {
     XtVaSetValues(widget(), XtNgridx, left, XtNgridy, top,
-		  XtNgridWidth, width, XtNgridHeight, height, Null);
+		  XtNgridWidth, width, XtNgridHeight, height, nullptr);
 }
 
 }

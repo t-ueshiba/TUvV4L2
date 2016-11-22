@@ -67,14 +67,14 @@ TextInCmd::widget() const
 void
 TextInCmd::setString(const char* str)
 {
-    XtVaSetValues(_widget, XtNstring, str, Null);
+    XtVaSetValues(_widget, XtNstring, str, nullptr);
 }
 
 const char*
 TextInCmd::getString() const
 {
     const char*	str;
-    XtVaGetValues(_widget, XtNstring, &str, Null);
+    XtVaGetValues(_widget, XtNstring, &str, nullptr);
     return str;
 }
 

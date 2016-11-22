@@ -73,7 +73,7 @@ bool
 Window::isFullScreen() const
 {
     Boolean	overrideRedirect;
-    XtVaGetValues(widget(), XtNoverrideRedirect, &overrideRedirect, Null);
+    XtVaGetValues(widget(), XtNoverrideRedirect, &overrideRedirect, nullptr);
     return (overrideRedirect == TRUE);
 }
 
