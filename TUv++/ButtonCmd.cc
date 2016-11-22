@@ -44,7 +44,7 @@ ButtonCmd::ButtonCmd(Object& parentObject, const CmdDef& cmd)
 {
     setDefaultCallback(_widget);
     if (_bitmap != 0)
-	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), Null);
+	XtVaSetValues(_widget, XtNbitmap, _bitmap->xpixmap(), nullptr);
 }
 
 ButtonCmd::~ButtonCmd()

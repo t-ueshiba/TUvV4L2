@@ -56,10 +56,10 @@ CanvasPane::CanvasPane(Window& parentWin, u_int devWidth, u_int devHeight)
 				   // height of Paned.
 				     XtNweightx,	1,
 				     XtNweighty,	1,
-				     Null))
+				     nullptr))
 {
     if (window().isFullScreen())
-	XtVaSetValues(_widget, XtNborderWidth, 0, Null);
+	XtVaSetValues(_widget, XtNborderWidth, 0, nullptr);
 }
 
 CanvasPane::~CanvasPane()

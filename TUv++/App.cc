@@ -43,7 +43,7 @@ static XVisualInfo
 vinfoOfWidget(Widget widget)
 {
     Visual*		visual;
-    XtVaGetValues(widget, XtNvisual, &visual, Null);
+    XtVaGetValues(widget, XtNvisual, &visual, nullptr);
     XVisualInfo		vinfo_template;
     vinfo_template.visualid
 	= XVisualIDFromVisual(visual != 0 ? visual :
@@ -75,20 +75,20 @@ submenuPopup(Widget menu, XEvent* event, String*, Cardinal*)
 
   /* Check current mouse position relative to the above item. */
     Dimension	width;
-    XtVaGetValues(menuItem, XtNwidth, &width, Null);
+    XtVaGetValues(menuItem, XtNwidth, &width, nullptr);
 
     if (event->xmotion.x < width - (width / 3) || event->xmotion.x >= width)
 	return;
 
   /* Get submenu widget and pop it up. */
     char*	name;
-    XtVaGetValues(menuItem, XtNlabel, &name, Null);
+    XtVaGetValues(menuItem, XtNlabel, &name, nullptr);
     Widget	submenu = XtNameToWidget(menu, name);
     if (submenu != 0)
     {
 	Position	x, y;
 	XtTranslateCoords(menuItem, event->xmotion.x - 10, 0, &x, &y);
-	XtVaSetValues(submenu, XtNx, x, XtNy, y, Null);
+	XtVaSetValues(submenu, XtNx, x, XtNy, y, nullptr);
 	XtPopup(submenu, XtGrabExclusive);
     }
 }
@@ -156,11 +156,11 @@ App::App(int& argc, char* argv[])
 			       XtNmappedWhenManaged,	FALSE,	// invisible
 			       XtNwidth,		1,
 			       XtNheight,		1,	// very small
-			       Null)),
+			       nullptr)),
      _colormap(XtDisplay(_widget), vinfoOfWidget(_widget)),
      _active(0)
 {
-    XtVaSetValues(_widget, XtNcolormap, (::Colormap)_colormap, Null);
+    XtVaSetValues(_widget, XtNcolormap, (::Colormap)_colormap, nullptr);
     XtRealizeWidget(_widget);
     
   // Add the delete protocol.

@@ -74,6 +74,9 @@ cmdWidgetClass(CmdType type)
 	
       case C_List:
 	return vViewportWidgetClass;
+
+      default:
+	break;
     }
     
     throw std::domain_error("cmdWidgetClass: Unkown command type!!");
@@ -103,7 +106,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 				     parentWidget,
 	/* for vViewportWidget */    XtNforceBars,	TRUE,
 	/* for vViewportWidget */    XtNallowVert,	TRUE,
-				     Null))
+				     nullptr))
 {
 #ifdef DEBUG
     using namespace	std;
@@ -123,7 +126,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 		  XtNgridy,		cmd.gridy,
                   XtNgridWidth,		cmd.gridWidth,
 		  XtNgridHeight,	cmd.gridHeight,
-                  Null);
+                  nullptr);
 
     switch (cmd.type)
     {
@@ -132,7 +135,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNinternalWidth,		0,
 		      XtNinternalHeight,	0,
 		      XtNbitmap,		cmd.prop,
-		      Null);
+		      nullptr);
 	break;
 	
       case C_Label:
@@ -143,7 +146,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 					 XtReliefNone : XtReliefSunken),
 		      XtNshadowWidth,	2,
 		      XtNlabel, (cmd.prop != 0 ? (char*)cmd.prop : cmd.title),
-		      Null);
+		      nullptr);
       }
 	break;
 	
@@ -152,7 +155,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 	{
 	    XtAccelerators	button = XtParseAcceleratorTable
 		("<Key>Return: set() notify() unset()\n");
-	    XtVaSetValues(_widget, XtNaccelerators, button, Null);
+	    XtVaSetValues(_widget, XtNaccelerators, button, nullptr);
 	}
       // Fall through to the next case block.
       case C_ToggleButton:
@@ -161,7 +164,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNrelief,	(cmd.attrs & CA_NoBorder ?
 					 XtReliefNone : XtReliefRaised),
 		      XtNlabel,		cmd.title,
-		      Null);
+		      nullptr);
 	break;
 
       case C_Frame:
@@ -169,7 +172,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 	XtVaSetValues(_widget,
 		      XtNdefaultDistance,   (cmd.attrs & CA_NoSpace  ? 0 : 4),
 		      XtNbackground,	    parentWidget.background(),
-		      Null);
+		      nullptr);
 	break;
 
       case C_RadioButton:
@@ -177,13 +180,13 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNbackground,		parentWidget.background(),
 		      XtNborderWidth,		0,
 		      XtNdefaultDistance,	0,
-		      Null);
+		      nullptr);
 	break;
 	
       case C_Slider:
 	XtVaSetValues(_widget,
 		      XtNdefaultDistance,	2,
-		      Null);
+		      nullptr);
 	break;
 	
       case C_TextIn:
@@ -194,7 +197,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNstring,	cmd.title,
 		      XtNinsertPosition,0,
 		    //XtNecho,		!(cmd.attrs & CA_Password),
-		      Null);
+		      nullptr);
 	break;
 
       case C_MenuButton:
@@ -205,7 +208,7 @@ Object::Widget::Widget(const Widget& parentWidget,
 					 XtReliefNone : XtReliefRaised),
 		      XtNlabel,		cmd.title,
 		      XtNmenuName,	"TUvMenu",
-		      Null);
+		      nullptr);
 	break;
 
       case C_List:
@@ -213,12 +216,15 @@ Object::Widget::Widget(const Widget& parentWidget,
 		      XtNwidth,		60,
 		      XtNuseBottom,	TRUE,
 		      XtNuseRight,	TRUE,
-		      Null);
+		      nullptr);
+	break;
+
+      default:
 	break;
     }
 
     if (cmd.size > 0)
-	XtVaSetValues(_widget, XtNwidth, cmd.size, Null);
+	XtVaSetValues(_widget, XtNwidth, cmd.size, nullptr);
 }
 
 Object::Widget::~Widget()
@@ -239,7 +245,7 @@ u_int
 Object::Widget::width() const
 {
     Dimension	w;
-    XtVaGetValues(_widget, XtNwidth, &w, Null);
+    XtVaGetValues(_widget, XtNwidth, &w, nullptr);
     return w;
 }
 
@@ -247,7 +253,7 @@ u_int
 Object::Widget::height() const
 {
     Dimension	h;
-    XtVaGetValues(_widget, XtNheight, &h, Null);
+    XtVaGetValues(_widget, XtNheight, &h, nullptr);
     return h;
 }
 
@@ -255,7 +261,7 @@ Point2<int>
 Object::Widget::position() const
 {
     Position	x, y;
-    XtVaGetValues(_widget, XtNx, &x, XtNy, &y, Null);
+    XtVaGetValues(_widget, XtNx, &x, XtNy, &y, nullptr);
     return Point2<int>(x, y);
 }
 
@@ -263,21 +269,21 @@ u_long
 Object::Widget::background() const
 {
     Pixel	bg;
-    XtVaGetValues(_widget, XtNbackground, &bg, Null);
+    XtVaGetValues(_widget, XtNbackground, &bg, nullptr);
     return bg;
 }
 
 Object::Widget&
 Object::Widget::setWidth(u_int w)
 {
-    XtVaSetValues(_widget, XtNwidth, (Dimension)w, Null);
+    XtVaSetValues(_widget, XtNwidth, (Dimension)w, nullptr);
     return *this;
 }
 
 Object::Widget&
 Object::Widget::setHeight(u_int h)
 {
-    XtVaSetValues(_widget, XtNheight, (Dimension)h, Null);
+    XtVaSetValues(_widget, XtNheight, (Dimension)h, nullptr);
     return *this;
 }
 
@@ -285,7 +291,7 @@ Object::Widget&
 Object::Widget::setPosition(const Point2<int>& p)
 {
     Position	x = p[0], y = p[1];
-    XtVaSetValues(_widget, XtNx, x, XtNy, y, Null);
+    XtVaSetValues(_widget, XtNx, x, XtNy, y, nullptr);
     return *this;
 }
 

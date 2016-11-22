@@ -75,7 +75,7 @@ RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
 				     parent().widget().background(),
 				     XtNrelief,			XtReliefNone,
 				     XtNborderWidth,		0,
-				     Null)),
+				     nullptr)),
      _label(XtVaCreateManagedWidget("TUvRadioButtonCmd-label",
 				    labelWidgetClass,
 				    _widget,
@@ -87,7 +87,7 @@ RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
 				    XtNborderWidth,		0,
 				    XtNhighlightThickness,	0,
 				    XtNgridx,			1,
-				    Null))
+				    nullptr))
 {
     if (_nitems++ == 0)
     {
@@ -118,7 +118,7 @@ CmdVal
 RadioButtonCmd::getValue() const
 {
     Pixmap	bitmap;
-    XtVaGetValues(_button, XtNbitmap, &bitmap, Null);
+    XtVaGetValues(_button, XtNbitmap, &bitmap, nullptr);
     return (bitmap == onBitmap->xpixmap() ? 1 : 0);
 }
 
@@ -128,7 +128,7 @@ RadioButtonCmd::setValue(CmdVal val)
     XtVaSetValues(_button,
 		  XtNbitmap,	(val != 0 ?
 				 onBitmap->xpixmap() : offBitmap->xpixmap()),
-		  Null);
+		  nullptr);
 }
 
 }

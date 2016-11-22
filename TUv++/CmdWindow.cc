@@ -170,7 +170,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 				  XtNvisual,	_colormap.vinfo().visual,
 				  XtNdepth,	_colormap.vinfo().depth,
 				  XtNcolormap,	(::Colormap)_colormap,
-				  Null)),
+				  nullptr)),
      _paned(*this)
 {
     if (fullScreen)
@@ -182,7 +182,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		      XtNwidth,		    WidthOfScreen(XtScreen(_widget)),
 		      XtNheight,	    HeightOfScreen(XtScreen(_widget)),
 		      XtNoverrideRedirect,  TRUE,
-		      Null);
+		      nullptr);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }
 
@@ -209,7 +209,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 				  XtNvisual,	_colormap.vinfo().visual,
 				  XtNdepth,	_colormap.vinfo().depth,
 				  XtNcolormap,	(::Colormap)_colormap,
-				  Null)),
+				  nullptr)),
      _paned(*this)
 {
     if (fullScreen)
@@ -221,7 +221,7 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		      XtNwidth,		    WidthOfScreen(XtScreen(_widget)),
 		      XtNheight,	    HeightOfScreen(XtScreen(_widget)),
 		      XtNoverrideRedirect,  TRUE,
-		      Null);
+		      nullptr);
     XtAddEventHandler(_widget, 0L, TRUE, EVcmdWindow, this);
 }
 
@@ -301,7 +301,7 @@ CmdWindow::Paned::Paned(CmdWindow& parentCmdWindow)
 				     gridboxWidgetClass,
 				     parent().widget(),
 				     XtNdefaultDistance,	0,
-				     Null))
+				     nullptr))
 {
     XtAddEventHandler(_widget, KeyPressMask, FALSE, EVkeyPress,
 		      (XtPointer)this);

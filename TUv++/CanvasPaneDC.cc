@@ -174,7 +174,7 @@ CanvasPaneDC::CanvasPaneDC(CanvasPane& parentCanvasPane,
 				     XtNbackground,
 				         colormap().getUnderlayPixel(u_char(0),
 								     0, 0),
-				     Null)),
+				     nullptr)),
      _popup(*this, zoomMenu),
      _u_last(0), _v_last(0)
 {
@@ -298,7 +298,7 @@ CanvasPaneDC::setDeviceSize()
     XtVaSetValues(canvasPane().widget(),
 		  XtNchildMinWidth,	deviceWidth(),
 		  XtNchildMinHeight,	deviceHeight(),
-		  Null);
+		  nullptr);
 }
 
 u_int

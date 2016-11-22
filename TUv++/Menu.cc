@@ -53,7 +53,7 @@ Menu::Menu(Object& parentObject, const MenuDef menu[])
 				// This resource setting cannot be ommited.
 				  XtNvisual,
 				      window().colormap().vinfo().visual,
-				  Null))
+				  nullptr))
 {
     for (int i = 0; menu[i].label != 0; ++i)
 	addCmd(new Item(*this, menu[i]));
@@ -70,7 +70,7 @@ Menu::Menu(Object& parentObject, const MenuDef menu[],
 				// This resource setting cannot be ommited.
 				  XtNvisual,
 				      window().colormap().vinfo().visual,
-				  Null))
+				  nullptr))
 {
     for (int i = 0; menu[i].label != 0; ++i)
 	addCmd(new Item(*this, menu[i]));
@@ -129,7 +129,7 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
 				     XtNrightMargin,	15,
 				     XtNbackground,
 				     parent().widget().background(), 
-				     Null) :
+				     nullptr) :
 	     XtVaCreateManagedWidget("TUvMenu-Item",	//menuItem.label,
 				     smeBSBObjectClass,
 				     parent().widget(),
@@ -139,7 +139,7 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
 				     XtNrightMargin,	15,
 				     XtNbackground,
 				     parent().widget().background(), 
-				     Null))
+				     nullptr))
 {
     if (_nitems++ == 0)
     {
@@ -149,6 +149,7 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
     }
 
     if (menuItem.id != M_Line)
+    {
 	if (menuItem.submenu != 0)
 	{
 	    if (menuItem.checked)  // If checked, submenu is a choice menu.
@@ -159,13 +160,14 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
 		addCmd(new Menu(*this, menuItem.submenu,
 				menuItem.label, parent().widget()));
 	    XtVaSetValues(_widget, XtNrightBitmap, arrowBitmap->xpixmap(),
-			  Null);
+			  nullptr);
 	}
 	else
 	{
 	    setValue(menuItem.checked);		// Show check mark.
 	    setDefaultCallback(_widget);
 	}
+    }
 }
 
 Menu::Item::~Item()
@@ -207,7 +209,7 @@ Menu::Item::getValue() const
     else
     {
 	Pixmap	bitmap;
-	XtVaGetValues(_widget, XtNleftBitmap, &bitmap, Null);
+	XtVaGetValues(_widget, XtNleftBitmap, &bitmap, nullptr);
 	return (bitmap == checkBitmap->xpixmap() ? 1 : 0);
     }
 }
@@ -222,7 +224,7 @@ Menu::Item::setValue(CmdVal val)
 	XtVaSetValues(_widget,
 		      XtNleftBitmap, (val != 0 ? checkBitmap->xpixmap() :
 						 clearBitmap->xpixmap()),
-		      Null);
+		      nullptr);
 }
 
 /************************************************************************

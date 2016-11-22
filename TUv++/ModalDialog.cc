@@ -52,7 +52,7 @@ ModalDialog::show()
     Point2<int>	p = parent().widget().position();
     p[0] += 10;
     p[1] += 10;
-    XtVaSetValues(widget(), XtNx, p[0], XtNy, p[1], Null);
+    XtVaSetValues(widget(), XtNx, p[0], XtNy, p[1], nullptr);
     XtPopup(widget(), XtGrabExclusive);
 
     XtAppContext	appContext = XtWidgetToApplicationContext(widget());

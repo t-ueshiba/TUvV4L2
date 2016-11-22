@@ -105,6 +105,9 @@ Cmd::newCmd(Object& parentObject, const CmdDef& cmd)
 
       case C_TextIn:		// TextIn
 	return new TextInCmd(parentObject, cmd);
+
+      default:
+	break;
     }
 
     throw std::domain_error("TU::v::Cmd::newCmd: Unknown command type!!");
@@ -127,14 +130,14 @@ const char*
 Cmd::getString() const
 {
     const char*	str;
-    XtVaGetValues(widget(), XtNlabel, &str, Null);
+    XtVaGetValues(widget(), XtNlabel, &str, nullptr);
     return str;
 }
 
 void
 Cmd::setString(const char* str)
 {
-    XtVaSetValues(widget(), XtNlabel, str, Null);
+    XtVaSetValues(widget(), XtNlabel, str, nullptr);
 }
 
 void

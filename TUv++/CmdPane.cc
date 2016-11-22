@@ -45,7 +45,7 @@ CmdPane::CmdPane(Window& parentWindow, const CmdDef cmd[])
 				   // Expand/shrink according to the width
 				   // of Paned.
 				     XtNweightx,		1,
-				     Null))
+				     nullptr))
 {
     for (int i = 0; cmd[i].type != C_EndOfList; ++i)
 	addCmd(Cmd::newCmd(*this, cmd[i]));

@@ -70,7 +70,7 @@ ListCmd::ListCmd(Object& parentObject, const CmdDef& cmd)
 				   XtNforceColumns,	TRUE,
 				   XtNverticalList,	TRUE,
 				   XtNinternalHeight,	0,
-				   Null)),
+				   nullptr)),
      _top(0),
      _nitems(0),
      _nitemsShown(cmd.size > 0 ? cmd.size : 10)
@@ -120,11 +120,11 @@ ListCmd::setProp(void* prop)
 	XawListChange(_list, (String*)prop, 0, 0, TRUE);
 
 	Dimension	height;
-	XtVaGetValues(_list, XtNheight, &height, Null);
+	XtVaGetValues(_list, XtNheight, &height, nullptr);
 	XtVaSetValues(_widget,
 		      XtNheight, (_nitems > _nitemsShown ?
 				  height * _nitemsShown / _nitems : height),
-		      Null);
+		      nullptr);
     }
 }
 
@@ -132,8 +132,8 @@ void
 ListCmd::setPercent(float percent)
 {
     Dimension	viewportHeight, listHeight;
-    XtVaGetValues(_widget, XtNheight, &viewportHeight, Null);
-    XtVaGetValues(_list, XtNheight, &listHeight, Null);
+    XtVaGetValues(_widget, XtNheight, &viewportHeight, nullptr);
+    XtVaGetValues(_list, XtNheight, &listHeight, nullptr);
     u_int	nshown = _nitems * viewportHeight / listHeight;
     _top = int(_nitems * percent + 0.5);
     if (_top < 0)
