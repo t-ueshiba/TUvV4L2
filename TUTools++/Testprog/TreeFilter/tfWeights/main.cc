@@ -33,7 +33,7 @@ namespace v
 ************************************************************************/
 enum	{c_Sigma, c_Normalization, c_Saturation, c_Cursor};
 
-static int	range[][3] = {{1, 255, 2}, {1, 256, 4}};
+static float	range[][3] = {{1, 255, 2}, {1, 256, 4}};
 static CmdDef	Cmds[] =
 {
     {C_Slider, c_Sigma,		11, "Sigma:",		range[0], CA_None,
@@ -65,11 +65,11 @@ class MyCanvasPane : public CanvasPane
 			    _dc << foreground(BGR(255, 255, 0))
 				<< Point2<int>(u, v);
 			}
-    void		setZoom(u_int mul, u_int div)
+    void		setZoom(float zoom)
 			{
-			    _dc.setZoom(mul, div);
+			    _dc.setZoom(zoom);
 			}
-    void		moveDC(u_int u, u_int v)
+    void		moveDC(size_t u, size_t v)
 			{
 			    CanvasPane::moveDC(_dc.log2devU(u),
 					       _dc.log2devV(v));
@@ -92,7 +92,7 @@ MyCanvasPane<T>::callback(CmdId id, CmdVal val)
       case Id_MouseButton1Drag:
       case Id_MouseButton1Release:
       {
-	CmdVal	logicalPosition(_dc.dev2logU(val.u), _dc.dev2logV(val.v));
+	CmdVal	logicalPosition(_dc.dev2logU(val.u()), _dc.dev2logV(val.v()));
 	parent().callback(id, logicalPosition);
       }
         return;
@@ -140,7 +140,7 @@ MyCmdWindow<T, G>::MyCmdWindow(App& parentApp, const Image<G>& guide)
     
     _tf.setSigma(_cmd.getValue(c_Sigma).f());
     colormap().setSaturationF(_cmd.getValue(c_Saturation).f());
-    _weightsCanvas.setZoom(4, 1);
+    _weightsCanvas.setZoom(4);
     
     show();
 }
@@ -179,12 +179,12 @@ MyCmdWindow<T, G>::callback(CmdId id, CmdVal val)
 
       case Id_MouseButton1Press:
       case Id_MouseButton1Drag:
-	showWeights(val.u, val.v);
-	_weightsCanvas.drawPoint(val.u, val.v);
+	showWeights(val.u(), val.v());
+	_weightsCanvas.drawPoint(val.u(), val.v());
       case Id_MouseMove:
       {
 	std::ostringstream	s;
-	s << '(' << val.u << ',' << val.v << ')';
+	s << '(' << val.u() << ',' << val.v() << ')';
 	_cmd.setString(c_Cursor, s.str().c_str());
       }
         break;

@@ -195,7 +195,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DoVerticalBackMatch:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.doVerticalBackMatch = u_int(val.f);
+	    params.doVerticalBackMatch = val;
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -205,7 +205,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_WindowSize:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.windowSize = u_int(val.f);
+	    params.windowSize = val;
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -215,7 +215,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DisparitySearchWidth:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.disparitySearchWidth = u_int(val.f);
+	    params.disparitySearchWidth = val;
 	    _stereo.setParameters(params);
 	    initializeRectification();
 	    params = _stereo.getParameters();
@@ -231,7 +231,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DisparityMax:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.disparityMax = u_int(val.f);
+	    params.disparityMax = val;
 	    _stereo.setParameters(params);
 	    initializeRectification();
 	    params = _stereo.getParameters();
@@ -246,7 +246,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Regularization:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    Epsilon<stereo_type>().set(val.f, params);
+	    Epsilon<stereo_type>().set(val.f(), params);
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -256,7 +256,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DisparityInconsistency:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.disparityInconsistency = u_int(val);
+	    params.disparityInconsistency = val;
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -266,7 +266,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_IntensityDiffMax:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.intensityDiffMax = u_int(val.f);
+	    params.intensityDiffMax = val;
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -276,7 +276,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_DerivativeDiffMax:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.derivativeDiffMax = u_int(val.f);
+	    params.derivativeDiffMax = val;
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -286,7 +286,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Blend:
 	  {
 	    params_type	params = _stereo.getParameters();
-	    params.blend = val.f;
+	    params.blend = val.f();
 	    _stereo.setParameters(params);
 
 	    stereoMatch();
@@ -301,28 +301,28 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  // 次の case に継続
 	  case Id_MouseButton1Press:
 	  {
-	    _canvasL.drawEpipolarLine(val.v);
-	    _canvasL.drawEpipolarLineV(val.u);
-	    _canvasR.drawEpipolarLine(val.v);
-	    _canvasV.drawEpipolarLine(val.u);
-	    _canvasD.drawEpipolarLine(val.v);
-	    _canvasD.drawEpipolarLineV(val.u);
+	    _canvasL.drawEpipolarLine(val.v());
+	    _canvasL.drawEpipolarLineV(val.u());
+	    _canvasR.drawEpipolarLine(val.v());
+	    _canvasV.drawEpipolarLine(val.u());
+	    _canvasD.drawEpipolarLine(val.v());
+	    _canvasD.drawEpipolarLineV(val.u());
 	    ostringstream	s;
 	    float		d;
-	    if (0 <= val.u && val.u < _disparityMap.width() &&
-		0 <= val.v && val.v < _disparityMap.height() &&
-		(d = _disparityMap[val.v][val.u]) != 0)
+	    if (0 <= val.u() && val.u() < _disparityMap.width() &&
+		0 <= val.v() && val.v() < _disparityMap.height() &&
+		(d = _disparityMap[val.v()][val.u()]) != 0)
 	    {
 		s.precision(4);
 		s << d;
 		s.precision(4);
 		s << " (" << _b / d << "m)";
 		int	dc = int(_stereo.getParameters().disparityMax - d + 0.5);
-		_canvasR.drawPoint(val.u + dc, val.v);
+		_canvasR.drawPoint(val.u() + dc, val.v());
 		_canvasV.drawPoint(_rectifiedImages[0].height() - 1
-				   - val.v + dc,
-				   val.u);
-		_canvas3D.setCursor(val.u, val.v, d);
+				   - val.v() + dc,
+				   val.u());
+		_canvas3D.setCursor(val.u(), val.v(), d);
 	    }
 	    else
 		_canvas3D.setCursor(0, 0, 0.0);
@@ -333,10 +333,10 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case Id_MouseMove:
 	  {
 	    ostringstream	s;
-	    s << '(' << val.u << ',' << val.v << ')';
+	    s << '(' << val.u() << ',' << val.v() << ')';
 	    _menuCmd.setString(c_Cursor, s.str().c_str());
-	    u_prev = val.u;
-	    v_prev = val.v;
+	    u_prev = val.u();
+	    v_prev = val.v();
 	  }
 	    break;
 	
@@ -373,7 +373,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    break;
 	
 	  case c_GazeDistance:
-	    _canvas3D.setDistance(1000.0 * val.f);
+	    _canvas3D.setDistance(1000.0 * val.f());
 	    break;
 	}
     }

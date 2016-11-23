@@ -642,7 +642,13 @@ class range
     const iterator	_begin;
     const iterator	_end;
 };
-    
+
+template <class ITER> range<ITER>
+make_range(const ITER& begin, const ITER& end)
+{
+    return range<ITER>(begin, end);
+}
+
 /************************************************************************
 *  class row_iterator<COL, ROW, ARG...>					*
 ************************************************************************/
