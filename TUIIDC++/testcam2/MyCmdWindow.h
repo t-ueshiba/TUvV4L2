@@ -15,13 +15,16 @@ namespace TU
 namespace v
 {
 /************************************************************************
-*  class MyCmdWindow<CAMERA, PIXEL>					*
+*  class MyCmdWindow<CAMERAS, PIXEL>					*
 ************************************************************************/
-template <class CAMERA, class PIXEL>
+template <class CAMERAS, class PIXEL>
 class MyCmdWindow : public CmdWindow
 {
+  private:
+    typedef typename CAMERAS::value_type	camera_type;
+    
   public:
-    MyCmdWindow(App& parentApp, Array<CAMERA>& cameras)		;
+    MyCmdWindow(App& parentApp, CAMERAS& cameras)		;
 
     virtual void	callback(CmdId, CmdVal)			;
     virtual void	tick()					;
@@ -33,7 +36,7 @@ class MyCmdWindow : public CmdWindow
     void		stopContinuousShotIfRunning()		;
 
   private:
-    Array<CAMERA>&		_cameras;
+    CAMERAS&			_cameras;
     Movie<PIXEL>		_movie;
     Array<MyCanvasPane<PIXEL>*>	_canvases;
     CmdPane			_menuCmd;
@@ -42,15 +45,15 @@ class MyCmdWindow : public CmdWindow
     Timer			_timer;
 };
 
-template <class CAMERA, class PIXEL>
-MyCmdWindow<CAMERA, PIXEL>::MyCmdWindow(App& parentApp, Array<CAMERA>& cameras)
+template <class CAMERAS, class PIXEL>
+MyCmdWindow<CAMERAS, PIXEL>::MyCmdWindow(App& parentApp, CAMERAS& cameras)
     :CmdWindow(parentApp, "Camera controller", Colormap::RGBColor, 16, 0, 0),
      _cameras(cameras),
-     _movie(_cameras.size()),
+     _movie(size(_cameras)),
      _canvases(0),
-     _menuCmd(*this, createMenuCmds(_cameras[0])),
+     _menuCmd(*this, createMenuCmds(*std::begin(_cameras))),
      _captureCmd(*this, createCaptureCmds()),
-     _featureCmd(*this, createFeatureCmds(_cameras[0], cameras.size())),
+     _featureCmd(*this, createFeatureCmds(*std::begin(_cameras), size(cameras))),
      _timer(*this, 0)
 {
     _menuCmd.place(0, 0, 2, 1);
@@ -63,11 +66,9 @@ MyCmdWindow<CAMERA, PIXEL>::MyCmdWindow(App& parentApp, Array<CAMERA>& cameras)
     _movie.setCircularMode(true);
 }
 
-template <class CAMERA, class PIXEL> void
-MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
+template <class CAMERAS, class PIXEL> void
+MyCmdWindow<CAMERAS, PIXEL>::callback(CmdId id, CmdVal val)
 {
-    using namespace	std;
-
     try
     {
 	if (setFormat(_cameras, id, val, *this))
@@ -90,7 +91,7 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	    setFrame();
 
 	    FileSelection	fileSelection(*this);
-	    ofstream		out;
+	    std::ofstream	out;
 	    if (fileSelection.open(out))
 	    {
 		for (size_t i = 0; i < _movie.nviews(); ++i)
@@ -102,17 +103,17 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	  case c_ContinuousShot:
 	    if (val)
 	    {
-		for_each(_cameras.begin(), _cameras.end(),
-			 bind(&CAMERA::continuousShot,
-			      placeholders::_1, true));
+		std::for_each(std::begin(_cameras), std::end(_cameras),
+			      std::bind(&camera_type::continuousShot,
+					std::placeholders::_1, true));
 		_timer.start(1);
 	    }
 	    else
 	    {
 		_timer.stop();
-		for_each(_cameras.begin(), _cameras.end(),
-			 bind(&CAMERA::continuousShot,
-			      placeholders::_1, false));
+		std::for_each(std::begin(_cameras), std::end(_cameras),
+			      std::bind(&camera_type::continuousShot,
+					std::placeholders::_1, false));
 	    }
 	    break;
 	
@@ -151,22 +152,22 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	    break;
 	}
     }
-    catch (exception& err)
+    catch (std::exception& err)
     {
-	cerr << err.what();
+	std::cerr << err.what() << std::endl;
     }
 }
 
-template <class CAMERA, class PIXEL> void
-MyCmdWindow<CAMERA, PIXEL>::tick()
+template <class CAMERAS, class PIXEL> void
+MyCmdWindow<CAMERAS, PIXEL>::tick()
 {
     countTime();
 
     if (!_captureCmd.getValue(c_PlayMovie))
     {
-	std::for_each(_cameras.begin(), _cameras.end(),
-		      std::bind(&CAMERA::snap, std::placeholders::_1));
-	for (size_t i = 0; i < _cameras.size(); ++i)
+	std::for_each(std::begin(_cameras), std::end(_cameras),
+		      std::bind(&camera_type::snap, std::placeholders::_1));
+	for (size_t i = 0; i < size(_cameras); ++i)
 	    _cameras[i] >> _movie.image(i);
     }
 
@@ -175,12 +176,16 @@ MyCmdWindow<CAMERA, PIXEL>::tick()
     ++_movie;
 }
 
-template <class CAMERA, class PIXEL> void
-MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
+template <class CAMERAS, class PIXEL> void
+MyCmdWindow<CAMERAS, PIXEL>::initializeMovie()
 {
-    Array<typename Movie<PIXEL>::Size>	sizes(_cameras.size());
-    for (size_t i = 0; i < sizes.size(); ++i)
-	sizes[i] = std::make_pair(_cameras[i].width(), _cameras[i].height());
+    Array<typename Movie<PIXEL>::Size>	sizes(size(_cameras));
+    auto				camera = std::cbegin(_cameras);
+    for (auto& size : sizes)
+    {
+	size = std::make_pair(camera->width(), camera->height());
+	++camera;
+    }
     _movie.setSizes(sizes);
     _movie.insert(_menuCmd.getValue(c_NFrames));
 
@@ -210,30 +215,30 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
     repaintCanvases();
 }
     
-template <class CAMERA, class PIXEL> void
-MyCmdWindow<CAMERA, PIXEL>::repaintCanvases()
+template <class CAMERAS, class PIXEL> void
+MyCmdWindow<CAMERAS, PIXEL>::repaintCanvases()
 {
     for (auto canvas : _canvases)
 	canvas->repaintUnderlay();
     _captureCmd.setValue(c_StatusMovie, _movie.currentFrame());
 }
 
-template <class CAMERA, class PIXEL> void
-MyCmdWindow<CAMERA, PIXEL>::setFrame()
+template <class CAMERAS, class PIXEL> void
+MyCmdWindow<CAMERAS, PIXEL>::setFrame()
 {
     _movie.setFrame(_captureCmd.getValue(c_StatusMovie));
     for (auto canvas : _canvases)
 	canvas->repaintUnderlay();
 }
 
-template <class CAMERA, class PIXEL> void
-MyCmdWindow<CAMERA, PIXEL>::stopContinuousShotIfRunning()
+template <class CAMERAS, class PIXEL> void
+MyCmdWindow<CAMERAS, PIXEL>::stopContinuousShotIfRunning()
 {
     if (_captureCmd.getValue(c_ContinuousShot))
     {
 	_timer.stop();
-	std::for_each(_cameras.begin(), _cameras.end(),
-		      std::bind(&CAMERA::continuousShot,
+	std::for_each(std::begin(_cameras), std::end(_cameras),
+		      std::bind(&camera_type::continuousShot,
 				std::placeholders::_1, false));
 	_captureCmd.setValue(c_ContinuousShot, 0);
     }
