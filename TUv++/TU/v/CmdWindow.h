@@ -59,18 +59,18 @@ class CmdWindow : public Window
     CmdWindow(Window&			parentWindow,
 	      const char*		myName,
 	      Colormap::Mode		mode,
-	      u_int			resolution,
-	      u_int			underlayCmapDim,
-	      u_int			overlayDepth,
+	      size_t			resolution,
+	      size_t			underlayCmapDim,
+	      size_t			overlayDepth,
 	      int			screen=-1,
 	      bool			fullScreen=false)	;
     CmdWindow(Window&			parentWindow,
 	      const char*		myName,
 	      const XVisualInfo*	vinfo,
 	      Colormap::Mode		mode,
-	      u_int			resolution,
-	      u_int			underlayCmapDim,
-	      u_int			overlayDepth,
+	      size_t			resolution,
+	      size_t			underlayCmapDim,
+	      size_t			overlayDepth,
 	      bool			fullScreen=false)	;
     virtual			~CmdWindow()			;
 

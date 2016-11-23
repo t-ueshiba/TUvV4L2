@@ -241,7 +241,7 @@ Object::Widget::~Widget()
 #endif
 }
 
-u_int
+size_t
 Object::Widget::width() const
 {
     Dimension	w;
@@ -249,7 +249,7 @@ Object::Widget::width() const
     return w;
 }
 
-u_int
+size_t
 Object::Widget::height() const
 {
     Dimension	h;
@@ -274,14 +274,14 @@ Object::Widget::background() const
 }
 
 Object::Widget&
-Object::Widget::setWidth(u_int w)
+Object::Widget::setWidth(size_t w)
 {
     XtVaSetValues(_widget, XtNwidth, (Dimension)w, nullptr);
     return *this;
 }
 
 Object::Widget&
-Object::Widget::setHeight(u_int h)
+Object::Widget::setHeight(size_t h)
 {
     XtVaSetValues(_widget, XtNheight, (Dimension)h, nullptr);
     return *this;

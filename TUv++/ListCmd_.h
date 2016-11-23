@@ -49,7 +49,7 @@ class ListCmd : public Cmd
 
     virtual CmdVal		getValue()		const	;
     virtual void		setValue(CmdVal val)		;
-    virtual void		setProp(void* prop)		;
+    virtual void		setProp(const void* prop)	;
     void			setPercent(float percent)	;
     void			scroll(int n)			;
     
@@ -57,8 +57,8 @@ class ListCmd : public Cmd
     const Widget	_widget;			// viewportWidget
     const Widget	_list;				// listWidget
     int			_top;
-    u_int		_nitems;
-    const u_int		_nitemsShown;
+    size_t		_nitems;
+    const size_t	_nitemsShown;
 };
 
 }

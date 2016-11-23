@@ -41,7 +41,7 @@ DC::~DC()
 }
 
 DC&
-DC::setSize(u_int width, u_int height, float zoom)
+DC::setSize(size_t width, size_t height, float zoom)
 {
     _width  = width;
     _height = height;
@@ -200,28 +200,28 @@ background(const BGR& bg)
     return OManip1<DC, const BGR&>(&DC::setBackground, bg);
 }
 
-OManip1<DC, u_int>
-foreground(u_int fg)
+OManip1<DC, size_t>
+foreground(size_t fg)
 {
-    return OManip1<DC, u_int>(&DC::setForeground, fg);
+    return OManip1<DC, size_t>(&DC::setForeground, fg);
 }
 
-OManip1<DC, u_int>
-background(u_int bg)
+OManip1<DC, size_t>
+background(size_t bg)
 {
-    return OManip1<DC, u_int>(&DC::setBackground, bg);
+    return OManip1<DC, size_t>(&DC::setBackground, bg);
 }
 
-OManip1<DC, u_int>
-thickness(u_int thick)
+OManip1<DC, size_t>
+thickness(size_t thick)
 {
-    return OManip1<DC, u_int>(&DC::setThickness, thick);
+    return OManip1<DC, size_t>(&DC::setThickness, thick);
 }
 
-OManip1<DC, u_int>
-saturation(u_int s)
+OManip1<DC, size_t>
+saturation(size_t s)
 {
-    return OManip1<DC, u_int>(&DC::setSaturation, s);
+    return OManip1<DC, size_t>(&DC::setSaturation, s);
 }
 
 OManip1<DC, float>

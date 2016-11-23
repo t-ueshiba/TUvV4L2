@@ -94,7 +94,7 @@ CmdParent::setString(CmdId id, const char* str)
 }
 
 void
-CmdParent::setProp(CmdId id, void* prop)
+CmdParent::setProp(CmdId id, const void* prop)
 {
     Cmd*	vcmd = findDescendant(id);
     if (vcmd == 0)

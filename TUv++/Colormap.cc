@@ -39,8 +39,8 @@ namespace v
 ************************************************************************/
 inline float	slant(int b, int a)	{return (a > 0 && b > 0 ?
 						 float(b) / float(a) : 0.0);}
-static u_int
-underlayResolution(u_int resolutionRequired, const XVisualInfo& vinfo)
+static size_t
+underlayResolution(size_t resolutionRequired, const XVisualInfo& vinfo)
 {
     switch (vinfo.c_class)
     {
@@ -88,9 +88,9 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo)
 }
 
 Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
-		   Mode mode, u_int resolution,
-		   u_int underlayCmapDim, u_int overlayDepth,
-		   u_int rDim, u_int gDim, u_int bDim)
+		   Mode mode, size_t resolution,
+		   size_t underlayCmapDim, size_t overlayDepth,
+		   size_t rDim, size_t gDim, size_t bDim)
     :_display(display),
      _vinfo(vinfo),
      _colormap(XCreateColormap(_display, RootWindow(_display, _vinfo.screen),
@@ -160,18 +160,18 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
 	}
 
       // Set overlay pixel values by ORing planes obtained.
-	for (u_int overlay = 1; overlay < _pixels.nrow(); ++overlay)
+	for (size_t overlay = 1; overlay < _pixels.nrow(); ++overlay)
 	{
 	    u_long	mask = 0;
-	    for (u_int i = 0; i < overlayDepth; ++i)
+	    for (size_t i = 0; i < overlayDepth; ++i)
 		if ((overlay >> i) & 0x01)
 		    mask |= planes[i];
-	    for (u_int underlay = 0; underlay < _pixels.ncol(); ++underlay)
+	    for (size_t underlay = 0; underlay < _pixels.ncol(); ++underlay)
 		_pixels[overlay][underlay] = _pixels[0][underlay] | mask;
 	}
 
       // Set overlay planes.
-	for (u_int i = 0; i < overlayDepth; ++i)
+	for (size_t i = 0; i < overlayDepth; ++i)
 	    _overlayPlanes |= planes[i];
       }
       break;
@@ -185,8 +185,8 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
 
   // Setup the overlay lookup table.
     float	delta = slant(_pixels.nrow() - 1, 255);
-    for (u_int i = 0; i < 256; ++i)
-	_overlayTable[i] = _pixels[u_int(0.5 + i*delta)][0] & _overlayPlanes;
+    for (size_t i = 0; i < 256; ++i)
+	_overlayTable[i] = _pixels[size_t(0.5 + i*delta)][0] & _overlayPlanes;
 }
 
 Colormap::~Colormap()
@@ -233,22 +233,22 @@ Colormap::setColorcube()
 }
 
 void
-Colormap::setSaturation(u_int saturation)
+Colormap::setSaturation(size_t saturation)
 {
     using namespace	std;
     
     if (_resolution == 0)
 	throw out_of_range("TU::v::Colormap::setSaturation: resolution must be positive!!");
     
-    _saturation = min(saturation, u_int(UnderlayTableSize / 2));
+    _saturation = min(saturation, size_t(UnderlayTableSize / 2));
 
     if (_map == Signedmap && _vinfo.c_class == PseudoColor)
     {
-	const u_int	range = (_resolution + 1) / 2;
+	const size_t	range = (_resolution + 1) / 2;
 	float		delta = slant(range - 1, _saturation - 1);
-	u_int		val = 0;
+	size_t		val = 0;
 	for (; val < _saturation; ++val)
-	    _underlayTable[val] = _pixels[0][u_int(0.5 + val*delta)];
+	    _underlayTable[val] = _pixels[0][size_t(0.5 + val*delta)];
 	for (; val < UnderlayTableSize / 2; ++val)
 	    _underlayTable[val] = _pixels[0][range - 1];
 	for (; val < UnderlayTableSize - _saturation; ++val)
@@ -257,19 +257,19 @@ Colormap::setSaturation(u_int saturation)
 	for (; val < UnderlayTableSize; ++val)
 	    _underlayTable[val]
 		= _pixels[0][_resolution - 1 - 
-			     u_int(0.5 + (UnderlayTableSize - 1 - val)*delta)];
+			     size_t(0.5 + (UnderlayTableSize - 1 - val)*delta)];
     }
     else
     {
 	const float	delta = slant(_resolution - 1, _saturation - 1);
-	u_int		val = 0;
+	size_t		val = 0;
 	for (; val < _saturation; ++val)
-	    _underlayTable[val] = _pixels[0][u_int(0.5 + val*delta)];
+	    _underlayTable[val] = _pixels[0][size_t(0.5 + val*delta)];
 	for (; val <= UnderlayTableSize - _saturation; ++val)
 	    _underlayTable[val] = _pixels[0][_resolution - 1];
 	for (; val < UnderlayTableSize; ++val)
 	    _underlayTable[val]
-		= _pixels[0][u_int(0.5 + (UnderlayTableSize - val)*delta)];
+		= _pixels[0][size_t(0.5 + (UnderlayTableSize - val)*delta)];
     }
 }
 
@@ -277,7 +277,7 @@ Colormap::setSaturation(u_int saturation)
  *  underlay stuffs
  */
 u_long
-Colormap::getUnderlayPixel(u_int index) const
+Colormap::getUnderlayPixel(size_t index) const
 {
     using namespace	std;
     
@@ -297,7 +297,7 @@ Colormap::getUnderlayPixel(u_int index) const
 }
 
 BGR
-Colormap::getUnderlayValue(u_int index) const
+Colormap::getUnderlayValue(size_t index) const
 {
     XColor	color;
     color.pixel = getUnderlayPixel(index);
@@ -310,7 +310,7 @@ Colormap::getUnderlayValue(u_int index) const
 }
 
 void
-Colormap::setUnderlayValue(u_int index, BGR bgr)
+Colormap::setUnderlayValue(size_t index, BGR bgr)
 {
     using namespace	std;
     
@@ -343,7 +343,7 @@ Colormap::getUnderlayPixels() const
     if (_mode == IndexedColor)
     {
 	Array<u_long>	pixels(_pixels.ncol() - _resolution);
-	for (u_int i = 0; i < pixels.dim(); ++i)
+	for (size_t i = 0; i < pixels.dim(); ++i)
 	    pixels[i] = _pixels[0][_resolution + i];	// user-defined pixels.
 	return pixels;
     }
@@ -351,7 +351,7 @@ Colormap::getUnderlayPixels() const
     {
 	Array<u_long>	pixels(_vinfo.c_class == PseudoColor ?
 			       _colorcubeNPixels : _resolution);
-	for (u_int i = 0; i < pixels.dim(); ++i)
+	for (size_t i = 0; i < pixels.dim(); ++i)
 	    pixels[i] = _pixels[0][i];			// ordinary pixels.
 	return pixels;
     }
@@ -361,7 +361,7 @@ Colormap::getUnderlayPixels() const
  *  overlay stuffs
  */
 u_long
-Colormap::getOverlayPixel(u_int index) const
+Colormap::getOverlayPixel(size_t index) const
 {
     using namespace	std;
     
@@ -381,7 +381,7 @@ Colormap::getOverlayPixel(u_int index) const
 }
 
 BGR
-Colormap::getOverlayValue(u_int index) const
+Colormap::getOverlayValue(size_t index) const
 {
     XColor	color;
     color.pixel = getOverlayPixel(index);
@@ -394,7 +394,7 @@ Colormap::getOverlayValue(u_int index) const
 }
 
 void
-Colormap::setOverlayValue(u_int index, BGR bgr)
+Colormap::setOverlayValue(size_t index, BGR bgr)
 {
     using namespace	std;
     
@@ -416,7 +416,7 @@ Colormap::setOverlayValue(u_int index, BGR bgr)
     color.green	= bgr.g << 8;
     color.blue	= bgr.b << 8;
     color.flags = DoRed | DoGreen | DoBlue;
-    for (u_int i = 0; i < _pixels.ncol(); ++i)
+    for (size_t i = 0; i < _pixels.ncol(); ++i)
     {
 	color.pixel = _pixels[index][i];
 	XStoreColor(_display, _colormap, &color);
@@ -427,7 +427,7 @@ Array<u_long>
 Colormap::getOverlayPixels() const
 {
     Array<u_long>	pixels(_pixels.nrow());
-    for (u_int i = 0; i < pixels.dim(); ++i)
+    for (size_t i = 0; i < pixels.dim(); ++i)
 	pixels[i] = _pixels[i][0];	// transparent and user-defined pixels.
     return pixels;
 }
@@ -447,7 +447,7 @@ Colormap::setGraymapInternal()
       case GrayScale:
       case PseudoColor:
       case DirectColor:
-	for (u_int i = 0; i < _resolution; ++i)
+	for (size_t i = 0; i < _resolution; ++i)
 	{
 	    XColor	color;
 	    color.red = color.green = color.blue = u_short(0.5 + i*delta);
@@ -458,7 +458,7 @@ Colormap::setGraymapInternal()
 	break;
 	
       default:
-	for (u_int i = 0; i < _resolution; ++i)
+	for (size_t i = 0; i < _resolution; ++i)
 	{
 	    XColor	color;
 	    color.red = color.green = color.blue = u_short(0.5 + i*delta);
@@ -474,12 +474,12 @@ Colormap::setGraymapInternal()
 
   // Set overlay gray map.    
     delta = slant(USHRT_MAX, _pixels.nrow() - 1);
-    for (u_int i = 1; i < _pixels.nrow(); ++i)	// Keep transparency pixel:i=0.
+    for (size_t i = 1; i < _pixels.nrow(); ++i)	// Keep transparency pixel:i=0.
     {
 	XColor	color;
 	color.red = color.green = color.blue = u_short(0.5 + i*delta);
 	color.flags = DoRed | DoGreen | DoBlue;
-	for (u_int j = 0; j < _pixels.ncol(); ++j)
+	for (size_t j = 0; j < _pixels.ncol(); ++j)
 	{
 	    color.pixel = _pixels[i][j];
 	    XStoreColor(_display, _colormap, &color);
@@ -492,10 +492,10 @@ Colormap::setSignedmapInternal()
 {
     if (_vinfo.c_class == PseudoColor)
     {
-	const u_int	range  = (_resolution + 1) / 2;
+	const size_t	range  = (_resolution + 1) / 2;
 	const float	delta  = slant(USHRT_MAX, range - 1),
 			delta2 = slant(USHRT_MAX, _resolution - 1 - range);
-	for (u_int i = 0; i < _resolution; ++i)
+	for (size_t i = 0; i < _resolution; ++i)
 	{
 	    XColor	color;
 	    color.red = color.green = color.blue = 0;
@@ -518,16 +518,16 @@ Colormap::setColorcubeInternal()
     const float	rStep = (rDim() > 1 ? float(USHRT_MAX) / (rDim()-1) : 0.0),
 		gStep = (gDim() > 1 ? float(USHRT_MAX) / (gDim()-1) : 0.0),
 		bStep = (bDim() > 1 ? float(USHRT_MAX) / (bDim()-1) : 0.0);
-    for (u_int b = 0; b < bDim(); ++b)
+    for (size_t b = 0; b < bDim(); ++b)
     {
 	XColor	color;
 	color.flags = DoRed | DoGreen | DoBlue;
 	
 	color.blue = u_short(0.5 + b * bStep);
-	for (u_int g = 0; g < gDim(); ++g)
+	for (size_t g = 0; g < gDim(); ++g)
 	{
 	    color.green = u_short(0.5 + g * gStep);
-	    for (u_int r = 0; r < rDim(); ++r)
+	    for (size_t r = 0; r < rDim(); ++r)
 	    {
 		color.red = u_short(0.5 + r * rStep);
 		color.pixel = _pixels[0][r + g*_gStride + b*_bStride];

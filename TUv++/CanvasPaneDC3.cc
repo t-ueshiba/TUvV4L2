@@ -40,7 +40,8 @@ namespace v
 /*
  *  Public member functions
  */
-CanvasPaneDC3::CanvasPaneDC3(CanvasPane& parentCanvasPane, u_int w, u_int h, float zoom)
+CanvasPaneDC3::CanvasPaneDC3(CanvasPane& parentCanvasPane,
+			     size_t w, size_t h, float zoom)
     :CanvasPaneDC(parentCanvasPane, w, h, zoom),
      DC3(DC3::X, 128.0)
 {

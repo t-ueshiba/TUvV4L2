@@ -48,27 +48,27 @@ class DC
     enum PointStyle	{DOT, CROSS, CIRCLE};
     
   public:
-    DC(u_int width, u_int height, float zoom)
+    DC(size_t width, size_t height, float zoom)
 	:_width(width), _height(height), _zoom(zoom),
 	 _offset(0, 0), _layer(UNDERLAY), _pointStyle(DOT)		{}
     virtual		~DC()						;
     
-    u_int		width()				const	{return _width;}
-    u_int		height()			const	{return _height;}
+    size_t		width()				const	{return _width;}
+    size_t		height()			const	{return _height;}
     float		zoom()				const	{return _zoom;}
     const Point2<int>&	offset()			const	{return _offset;}
 
-    virtual DC&		setSize(u_int width, u_int height, float zoom)	;
+    virtual DC&		setSize(size_t width, size_t height, float zoom);
 	    DC&		setZoom(float zoom)				;
     virtual DC&		setOffset(int u0, int v0)			;
     virtual DC&		setLayer(Layer layer)				;
 	    DC&		setPointStyle(PointStyle pointStyle)		;
-    virtual DC&		setThickness(u_int thickness)			= 0;
+    virtual DC&		setThickness(size_t thickness)			= 0;
     virtual DC&		setForeground(const BGR& fg)			= 0;
     virtual DC&		setBackground(const BGR& bg)			= 0;
-    virtual DC&		setForeground(u_int index)			= 0;
-    virtual DC&		setBackground(u_int index)			= 0;
-    virtual DC&		setSaturation(u_int saturation)			= 0;
+    virtual DC&		setForeground(size_t index)			= 0;
+    virtual DC&		setBackground(size_t index)			= 0;
+    virtual DC&		setSaturation(size_t saturation)		= 0;
     virtual DC&		setSaturationF(float saturation)		= 0;
     
     virtual DC&		clear()						= 0;
@@ -115,19 +115,19 @@ class DC
     enum		{PRADIUS = 5};		// radius of marker points
 	    
     int			hasScale()		const	{return _zoom != 1.0f;}
-    u_int		deviceWidth()		const	;
-    u_int		deviceHeight()		const	;
+    size_t		deviceWidth()		const	;
+    size_t		deviceHeight()		const	;
 
     Layer		getLayer()		const	;
     PointStyle		getPointStyle()		const	;
-    virtual u_int	getThickness()		const	= 0;
+    virtual size_t	getThickness()		const	= 0;
     
     virtual DC&		repaintUnderlay()		= 0;
     virtual DC&		repaintOverlay()		= 0;
     
   private:
-    u_int		_width;		// logical width  of DC
-    u_int		_height;	// logical height of DC
+    size_t		_width;		// logical width  of DC
+    size_t		_height;	// logical height of DC
     float		_zoom;		// zooming factor 
     Point2<int>		_offset;	// logical coordinates of the
 					// temporary offset
@@ -189,10 +189,10 @@ DC::dev2log(const Point2<int>& p) const
 	return Point2<int>(p[0] - _offset[0], p[1] - _offset[1]);
 }
 
-inline u_int
+inline size_t
 DC::deviceWidth()	const	{return log2devR(_width);}
 
-inline u_int
+inline size_t
 DC::deviceHeight()	const	{return log2devR(_height);}
 
 inline DC&
@@ -227,10 +227,10 @@ extern DC&			repaintAll(DC&)		;
 extern DC&			sync(DC&)		;
 extern OManip1<DC, const BGR&>	foreground(const BGR&)	;
 extern OManip1<DC, const BGR&>	background(const BGR&)	;
-extern OManip1<DC, u_int>	foreground(u_int)	;
-extern OManip1<DC, u_int>	background(u_int)	;
-extern OManip1<DC, u_int>	thickness(u_int)	;
-extern OManip1<DC, u_int>	saturation(u_int)	;
+extern OManip1<DC, size_t>	foreground(size_t)	;
+extern OManip1<DC, size_t>	background(size_t)	;
+extern OManip1<DC, size_t>	thickness(size_t)	;
+extern OManip1<DC, size_t>	saturation(size_t)	;
 extern OManip1<DC, float>	saturationF(float)	;
 extern OManip2<DC, int, int>	offset(int, int)	;
 

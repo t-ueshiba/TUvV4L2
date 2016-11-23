@@ -42,7 +42,7 @@ namespace v
 ************************************************************************/
 static XVisualInfo
 selectVisual(Display* display, int screen,
-	     Colormap::Mode mode, u_int overlayDepth)
+	     Colormap::Mode mode, size_t overlayDepth)
 {
     XVisualInfo		vinfo_template[5];
     long		vinfo_mask[5];
@@ -147,9 +147,9 @@ EVcmdWindow(::Widget widget, XtPointer cmdWindowPtr, XEvent* event, Boolean*)
 CmdWindow::CmdWindow(Window&		parentWindow,
 		     const char*	myName,
 		     Colormap::Mode	mode,
-		     u_int		resolution,
-		     u_int		underlayCmapDim,
-		     u_int		overlayDepth,
+		     size_t		resolution,
+		     size_t		underlayCmapDim,
+		     size_t		overlayDepth,
 		     int		screen,
 		     bool		fullScreen)
     :Window(parentWindow),
@@ -190,9 +190,9 @@ CmdWindow::CmdWindow(Window&		parentWindow,
 		     const char*	myName,
 		     const XVisualInfo*	xvinfo,
 		     Colormap::Mode	mode,
-		     u_int		resolution,
-		     u_int		underlayCmapDim,
-		     u_int		overlayDepth,
+		     size_t		resolution,
+		     size_t		underlayCmapDim,
+		     size_t		overlayDepth,
 		     bool		fullScreen)
     :Window(parentWindow),
      _colormap(parentWindow.colormap().display(), 

@@ -110,14 +110,14 @@ ListCmd::setValue(CmdVal val)
 }
 
 void
-ListCmd::setProp(void* prop)
+ListCmd::setProp(const void* prop)
 {
     if (prop != 0)
     {
-	String*	s = (String*)prop;
+	const auto	s = static_cast<const String*>(prop);
 	for (_nitems = 0; s[_nitems] != 0; )
 	    ++_nitems;
-	XawListChange(_list, (String*)prop, 0, 0, TRUE);
+	XawListChange(_list, const_cast<String*>(s), 0, 0, TRUE);
 
 	Dimension	height;
 	XtVaGetValues(_list, XtNheight, &height, nullptr);
@@ -134,7 +134,7 @@ ListCmd::setPercent(float percent)
     Dimension	viewportHeight, listHeight;
     XtVaGetValues(_widget, XtNheight, &viewportHeight, nullptr);
     XtVaGetValues(_list, XtNheight, &listHeight, nullptr);
-    u_int	nshown = _nitems * viewportHeight / listHeight;
+    size_t	nshown = _nitems * viewportHeight / listHeight;
     _top = int(_nitems * percent + 0.5);
     if (_top < 0)
 	_top = 0;

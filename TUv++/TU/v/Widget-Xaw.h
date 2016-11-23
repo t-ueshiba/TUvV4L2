@@ -37,12 +37,12 @@ class Widget
 
 			operator ::Widget()	const	{return _widget;}
 
-    u_int		width()				const	;
-    u_int		height()			const	;
+    size_t		width()				const	;
+    size_t		height()			const	;
     Point2<int>		position()			const	;
     u_long		background()			const	;
-    Widget&		setWidth(u_int w)			;
-    Widget&		setHeight(u_int h)			;
+    Widget&		setWidth(size_t w)			;
+    Widget&		setHeight(size_t h)			;
     Widget&		setPosition(const Point2<int>&)		;
     
   private:

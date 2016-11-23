@@ -129,7 +129,7 @@ SliderCmd::setValue(CmdVal val)
 }
 
 void
-SliderCmd::setProp(void* prop)
+SliderCmd::setProp(const void* prop)
 {
     if (prop)
     {
@@ -160,7 +160,7 @@ SliderCmd::setValueInternal(float val)
     else
 	_val = val;
     std::ostringstream	s;
-    s << std::setw(4) << _val.f();
+    s << std::setw(5) << std::setfill(' ') << std::setprecision(4) << _val.f();
     XtVaSetValues(_text, XtNlabel, s.str().c_str(), nullptr);
 }
 

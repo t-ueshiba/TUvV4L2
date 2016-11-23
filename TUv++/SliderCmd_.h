@@ -49,7 +49,7 @@ class SliderCmd : public Cmd
 
     virtual CmdVal		getValue()		const	;
     virtual void		setValue(CmdVal val)		;
-    virtual void		setProp(void* prop)		;
+    virtual void		setProp(const void* prop)	;
     void			setPercent(float percent)	;
     
   private:

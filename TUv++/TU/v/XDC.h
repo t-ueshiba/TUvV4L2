@@ -98,12 +98,12 @@ class XDC : public DC
     
   public:
     virtual DC&		setLayer(Layer layer)				;
-    virtual DC&		setThickness(u_int thickness)			;
+    virtual DC&		setThickness(size_t thickness)			;
     virtual DC&		setForeground(const BGR& fg)			;
     virtual DC&		setBackground(const BGR& bg)			;
-    virtual DC&		setForeground(u_int fg)				;
-    virtual DC&		setBackground(u_int bg)				;
-    virtual DC&		setSaturation(u_int saturation)			;
+    virtual DC&		setForeground(size_t fg)			;
+    virtual DC&		setBackground(size_t bg)			;
+    virtual DC&		setSaturation(size_t saturation)		;
     virtual DC&		setSaturationF(float saturation)		;
     
     virtual DC&		clear()						;
@@ -134,7 +134,7 @@ class XDC : public DC
     void		dump(std::ostream& out)			const	;
 
   protected:
-    XDC(u_int width, u_int height, float zoom,
+    XDC(size_t width, size_t height, float zoom,
 	Colormap& colormap, GC gc)					;
     virtual		~XDC()						;
 
@@ -148,11 +148,11 @@ class XDC : public DC
     virtual void	allocateXImage(int buffWidth, int buffHeight)	;
     virtual void	putXImage()				const	;
     
-    virtual u_int	getThickness()				const	;
+    virtual size_t	getThickness()				const	;
 
   private:
-    virtual u_int	realWidth()				const	;
-    virtual u_int	realHeight()				const	;
+    virtual size_t	realWidth()				const	;
+    virtual size_t	realHeight()				const	;
     template <class S>
     void		createXImage(const Image<S>& image)		;
     template <class S, class T>

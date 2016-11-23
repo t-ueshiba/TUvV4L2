@@ -106,11 +106,11 @@ struct CmdDef
     const char*	title;		// string
     void*	prop;		// a list of stuff to use for the cmd
     u_int	attrs;		// bit map of attributes
-    u_int	gridx;		// x-position in the parent grid.
-    u_int	gridy;		// y-position in the parent grid.
-    u_int	gridWidth;	// width  in # of cells of the parent grid.
-    u_int	gridHeight;	// height in # of cells of the parent grid.
-    u_int	size;		// width in pixels
+    size_t	gridx;		// x-position in the parent grid.
+    size_t	gridy;		// y-position in the parent grid.
+    size_t	gridWidth;	// width  in # of cells of the parent grid.
+    size_t	gridHeight;	// height in # of cells of the parent grid.
+    size_t	size;		// width in pixels
 };
 
 void* const	noProp	= nullptr;
@@ -257,8 +257,8 @@ class Pane : public Object, public List<Pane>::Node
     Pane(Window& parentWin)					;
     virtual	 ~Pane()					;
 
-    void	place(u_int gridx=0, u_int gridy=0,
-		      u_int gridWidth=1, u_int gridHeight=1)	;
+    void	place(size_t gridx=0, size_t gridy=0,
+		      size_t gridWidth=1, size_t gridHeight=1)	;
 };
 
 /************************************************************************
@@ -331,7 +331,7 @@ class CmdParent
     void	setValue(CmdId id, CmdVal val)			;
     const char*	getString(CmdId id)			const	;
     void	setString(CmdId id, const char* str)		;
-    void	setProp(CmdId id, void* prop)			;
+    void	setProp(CmdId id, const void* prop)		;
     
   protected:
     void	addCmd(Cmd* vcmd)				;
@@ -361,10 +361,10 @@ class Cmd : public Object, public CmdParent, public List<Cmd>::Node
     virtual void	setValue(CmdVal val)			;
     virtual const char*	getString()			const	;
     virtual void	setString(const char* str)		;
-    virtual void	setProp(void* prop)			;
+    virtual void	setProp(const void* prop)		;
      
   protected:
-    Cmd(Object& parentObject, CmdId id)			;
+    Cmd(Object& parentObject, CmdId id)				;
 
     void	setDefaultCallback(const Widget& widget)	;
      

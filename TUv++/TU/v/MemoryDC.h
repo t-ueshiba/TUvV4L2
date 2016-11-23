@@ -43,10 +43,10 @@ namespace v
 class MemoryDC : public XDC
 {
   public:
-    MemoryDC(Colormap& colormap, u_int width, u_int height, float zoom=1)	;
+    MemoryDC(Colormap& colormap, size_t width, size_t height, float zoom=1)	;
     virtual		~MemoryDC()						;
 
-    DC&			setSize(u_int width, u_int height, float zoom)		;
+    DC&			setSize(size_t width, size_t height, float zoom)	;
 
   protected:
     virtual Drawable	drawable()					const	;

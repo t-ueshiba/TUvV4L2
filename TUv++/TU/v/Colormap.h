@@ -53,9 +53,9 @@ class Colormap
   public:
     Colormap(Display* display, const XVisualInfo& vinfo)		;
     Colormap(Display* display, const XVisualInfo& vinfo,
-	     Mode mode, u_int resolution,
-	     u_int underlayCmapDim, u_int overlayDepth,
-	     u_int rDim, u_int gDim, u_int bDim)			;
+	     Mode mode, size_t resolution,
+	     size_t underlayCmapDim, size_t overlayDepth,
+	     size_t rDim, size_t gDim, size_t bDim)			;
     ~Colormap()								;
 
   // X stuffs
@@ -68,45 +68,45 @@ class Colormap
     void		setGraymap()					;
     void		setSignedmap()					;
     void		setColorcube()					;
-    u_int		getSaturation()				const	;
-    void		setSaturation(u_int saturation)			;
+    size_t		getSaturation()				const	;
+    void		setSaturation(size_t saturation)		;
     float		getSaturationF()			const	;
     void		setSaturationF(float saturation)		;
     
   // underlay stuffs
     template <class T>
     u_long		getUnderlayPixel(T val,
-					 u_int u, u_int v)	const	;
+					 size_t u, size_t v)	const	;
     u_long		getUnderlayPixel(const YUV422& yuv,
-					 u_int u, u_int v)	const	;
+					 size_t u, size_t v)	const	;
     u_long		getUnderlayPixel(const YUYV422& yuv,
-					 u_int u, u_int v)	const	;
+					 size_t u, size_t v)	const	;
     u_long		getUnderlayPixel(const YUV411& yuv,
-					 u_int u, u_int v)	const	;
-    u_long		getUnderlayPixel(u_int index)		const	;
-    BGR			getUnderlayValue(u_int index)		const	;
-    void		setUnderlayValue(u_int index, BGR bgr)		;
+					 size_t u, size_t v)	const	;
+    u_long		getUnderlayPixel(size_t index)		const	;
+    BGR			getUnderlayValue(size_t index)		const	;
+    void		setUnderlayValue(size_t index, BGR bgr)		;
     Array<u_long>	getUnderlayPixels()			const	;
     u_long		getUnderlayPlanes()			const	;
 
   // overlay stuffs
     template <class T>
     u_long		getOverlayPixel(T bgr)			const	;
-    u_long		getOverlayPixel(u_int index)		const	;
-    BGR			getOverlayValue(u_int index)		const	;
-    void		setOverlayValue(u_int index, BGR bgr)		;
+    u_long		getOverlayPixel(size_t index)		const	;
+    BGR			getOverlayValue(size_t index)		const	;
+    void		setOverlayValue(size_t index, BGR bgr)		;
     Array<u_long>	getOverlayPixels()			const	;
     u_long		getOverlayPlanes()			const	;
 
   // colorcube stuffs
-    u_int		rDim()					const	;
-    u_int		gDim()					const	;
-    u_int		bDim()					const	;
-    u_int		rStride()				const	;
-    u_int		gStride()				const	;
-    u_int		bStride()				const	;
+    size_t		rDim()					const	;
+    size_t		gDim()					const	;
+    size_t		bDim()					const	;
+    size_t		rStride()				const	;
+    size_t		gStride()				const	;
+    size_t		bStride()				const	;
 
-    u_int		npixels()				const	;
+    size_t		npixels()				const	;
     
   private:
     Colormap(const Colormap&)						;
@@ -124,8 +124,8 @@ class Colormap
   // underlay stuffs
     enum		{UnderlayTableSize = 65536};
     
-    const u_int		_resolution;
-    u_int		_saturation;
+    const size_t		_resolution;
+    size_t		_saturation;
     float		_gain;
     u_long		_underlayTable[UnderlayTableSize];
 
@@ -136,8 +136,8 @@ class Colormap
   // colorcube stuffs
     enum		{DITHERMASK_SIZE = 4};
 
-    const u_int		_colorcubeNPixels;
-    const u_int		_gStride, _bStride;
+    const size_t	_colorcubeNPixels;
+    const size_t	_gStride, _bStride;
     const float		_rMul, _gMul, _bMul;
     float		_dithermask[DITHERMASK_SIZE][DITHERMASK_SIZE];
 
@@ -173,7 +173,7 @@ Colormap::getMode() const
     return _mode;
 }
 
-inline u_int
+inline size_t
 Colormap::getSaturation() const
 {
     return _saturation;
@@ -197,13 +197,13 @@ Colormap::setSaturationF(float saturation)
 }
 
 template <> inline u_long
-Colormap::getUnderlayPixel<u_char>(u_char val, u_int, u_int) const
+Colormap::getUnderlayPixel<u_char>(u_char val, size_t, size_t) const
 {
     return _underlayTable[val];
 }
 
 template <> inline u_long
-Colormap::getUnderlayPixel<s_char>(s_char val, u_int, u_int) const
+Colormap::getUnderlayPixel<s_char>(s_char val, size_t, size_t) const
 {
     return (val < 0 ?
 	    _underlayTable[val+UnderlayTableSize] & _vinfo.red_mask :
@@ -211,7 +211,7 @@ Colormap::getUnderlayPixel<s_char>(s_char val, u_int, u_int) const
 }
 
 template <> inline u_long
-Colormap::getUnderlayPixel<short>(short val, u_int, u_int) const
+Colormap::getUnderlayPixel<short>(short val, size_t, size_t) const
 {
     return (val < 0 ?
 	    _underlayTable[val+UnderlayTableSize] & _vinfo.red_mask :
@@ -219,7 +219,7 @@ Colormap::getUnderlayPixel<short>(short val, u_int, u_int) const
 }
 
 template <> inline u_long
-Colormap::getUnderlayPixel<float>(float val, u_int, u_int) const
+Colormap::getUnderlayPixel<float>(float val, size_t, size_t) const
 {
     float	fidx = _gain * val;
     int		idx = (fidx > float(INT_MAX) ? INT_MAX :
@@ -245,7 +245,7 @@ Colormap::getUnderlayPixel<float>(float val, u_int, u_int) const
 }
 
 template <class T> inline u_long
-Colormap::getUnderlayPixel(T val, u_int u, u_int v) const
+Colormap::getUnderlayPixel(T val, size_t u, size_t v) const
 {
     switch (_vinfo.c_class)
     {
@@ -253,8 +253,8 @@ Colormap::getUnderlayPixel(T val, u_int u, u_int v) const
       {
 	float		r = val.r * _rMul, g = val.g * _gMul,
 			b = val.b * _bMul;
-	const u_int	rIndex = u_int(r), gIndex = u_int(g),
-			bIndex = u_int(b);
+	const size_t	rIndex = size_t(r), gIndex = size_t(g),
+			bIndex = size_t(b);
 	r -= rIndex;
 	g -= gIndex;
 	b -= bIndex;
@@ -273,13 +273,13 @@ Colormap::getUnderlayPixel(T val, u_int u, u_int v) const
 }
 
 template <> inline u_long
-Colormap::getUnderlayPixel<YUV444>(YUV444 yuv, u_int u, u_int v) const
+Colormap::getUnderlayPixel<YUV444>(YUV444 yuv, size_t u, size_t v) const
 {
     return getUnderlayPixel(BGR(yuv), u, v);
 }
 
 inline u_long
-Colormap::getUnderlayPixel(const YUV422& yuv, u_int u, u_int v) const
+Colormap::getUnderlayPixel(const YUV422& yuv, size_t u, size_t v) const
 {
     if (u & 0x1)
 	return getUnderlayPixel(BGR(YUV444(yuv.y, (&yuv)[-1].x, yuv.x)), u, v);
@@ -288,7 +288,7 @@ Colormap::getUnderlayPixel(const YUV422& yuv, u_int u, u_int v) const
 }
 
 inline u_long
-Colormap::getUnderlayPixel(const YUYV422& yuv, u_int u, u_int v) const
+Colormap::getUnderlayPixel(const YUYV422& yuv, size_t u, size_t v) const
 {
     if (u & 0x1)
 	return getUnderlayPixel(BGR(YUV444(yuv.y, (&yuv)[-1].x, yuv.x)), u, v);
@@ -297,7 +297,7 @@ Colormap::getUnderlayPixel(const YUYV422& yuv, u_int u, u_int v) const
 }
 
 inline u_long
-Colormap::getUnderlayPixel(const YUV411& yuv, u_int u, u_int v) const
+Colormap::getUnderlayPixel(const YUV411& yuv, size_t u, size_t v) const
 {
     switch (u % 4)
     {
@@ -331,43 +331,43 @@ Colormap::getOverlayPlanes() const
     return _overlayPlanes;
 }
 
-inline u_int
+inline size_t
 Colormap::rDim() const
 {
     return _gStride;
 }
 
-inline u_int
+inline size_t
 Colormap::gDim() const
 {
     return (_gStride != 0 ? _bStride / _gStride : 0);
 }
 
-inline u_int
+inline size_t
 Colormap::bDim() const
 {
     return (_bStride != 0 ? _colorcubeNPixels / _bStride : 0);
 }
 
-inline u_int
+inline size_t
 Colormap::rStride() const
 {
     return 1;
 }
 
-inline u_int
+inline size_t
 Colormap::gStride() const
 {
     return _gStride;
 }
 
-inline u_int
+inline size_t
 Colormap::bStride() const
 {
     return _bStride;
 }
 
-inline u_int
+inline size_t
 Colormap::npixels() const
 {
     return _pixels.nrow() * _pixels.ncol();

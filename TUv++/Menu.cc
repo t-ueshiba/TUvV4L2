@@ -116,7 +116,7 @@ static Bitmap*	arrowBitmap = 0;
 /************************************************************************
 *  class Menu:Item							*
 ************************************************************************/
-u_int			Menu::Item::_nitems = 0;
+size_t			Menu::Item::_nitems = 0;
 
 Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
     :Cmd(parentMenu, menuItem.id),

@@ -63,7 +63,7 @@ static Bitmap*	offBitmap = 0;
 /************************************************************************
 *  class RadioButtonCmd							*
 ************************************************************************/
-u_int		RadioButtonCmd::_nitems = 0;
+size_t		RadioButtonCmd::_nitems = 0;
 
 RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
     :Cmd(parentObject, cmd.id),

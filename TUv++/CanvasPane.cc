@@ -38,7 +38,7 @@ namespace v
 /************************************************************************
 *  class CanvasPane							*
 ************************************************************************/
-CanvasPane::CanvasPane(Window& parentWin, u_int devWidth, u_int devHeight)
+CanvasPane::CanvasPane(Window& parentWin, size_t devWidth, size_t devHeight)
     :Pane(parentWin),
      _widget(XtVaCreateManagedWidget("TUvCanvasPane",
 				     vViewportWidgetClass,  // widget class 

@@ -39,7 +39,7 @@ namespace v
 /*
  *  Public member functions
  */
-    MemoryDC::MemoryDC(Colormap& cmap, u_int w, u_int h, float zoom)
+    MemoryDC::MemoryDC(Colormap& cmap, size_t w, size_t h, float zoom)
     :XDC(w, h, zoom, cmap, XDefaultGC(cmap.display(), cmap.vinfo().screen)),
      _pixmap(XCreatePixmap(colormap().display(),
 			   DefaultRootWindow(colormap().display()), w, h,
@@ -53,7 +53,7 @@ MemoryDC::~MemoryDC()
 }
 
 DC&
-MemoryDC::setSize(u_int width, u_int height, float zoom)
+MemoryDC::setSize(size_t width, size_t height, float zoom)
 {
     XDC::setSize(width, height, zoom);
   // Viewport の中でこの widget を小さくするとき, 以前描画したものの残

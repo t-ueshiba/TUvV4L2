@@ -45,12 +45,12 @@ class CanvasPaneDC : public Object, public XDC
 {
   public:
     CanvasPaneDC(CanvasPane& parentCanvasPane,
-		 u_int width=0, u_int height=0, float zoom=1)		;
+		 size_t width=0, size_t height=0, float zoom=1)		;
     virtual		~CanvasPaneDC()					;
     
     virtual const Widget&	widget()			const	;
 
-    virtual DC&		setSize(u_int width, u_int height, float zoom)	;
+    virtual DC&		setSize(size_t width, size_t height, float zoom);
     virtual void	callback(CmdId id, CmdVal val)			;
 	    void	grabKeyboard()				const	;
 
@@ -70,8 +70,8 @@ class CanvasPaneDC : public Object, public XDC
 				       XtPointer)			;
 
     void		setDeviceSize()					;
-    virtual u_int	realWidth()				const	;
-    virtual u_int	realHeight()				const	;
+    virtual size_t	realWidth()				const	;
+    virtual size_t	realHeight()				const	;
 
     const Widget	_widget;		// vCanvasWidget
     Menu		_popup;

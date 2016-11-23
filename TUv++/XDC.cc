@@ -28,6 +28,7 @@
  *  $Id$  
  */
 #include "TU/v/XDC.h"
+#include <algorithm>	// for std::max()
 #include <stdexcept>
 #include <X11/XWDFile.h>
 #include <arpa/inet.h>
@@ -114,7 +115,7 @@ XDC::fillBuff(const Image<S>& image)
     
     if (image.width() == buffWidth && image.height() == buffHeight)
     {
-	for (u_int v = 0; v < image.height(); ++v)
+	for (size_t v = 0; v < image.height(); ++v)
 	{
 	    const S*	p = image[v].data();
 	    T*		q = (T*)(buff + v * bytesPerLine);
@@ -174,7 +175,7 @@ XDC::setLayer(Layer layer)
 }
 
 DC&
-XDC::setThickness(u_int thickness)
+XDC::setThickness(size_t thickness)
 {
     XGCValues       values;
     XGetGCValues(_colormap.display(), _gc, GCLineWidth, &values);
@@ -205,7 +206,7 @@ XDC::setBackground(const BGR& bg)
 }
 
 DC&
-XDC::setForeground(u_int fg)
+XDC::setForeground(size_t fg)
 {
     XSetForeground(_colormap.display(), _gc, (getLayer() == DC::UNDERLAY ?
 					      _colormap.getUnderlayPixel(fg) :
@@ -214,7 +215,7 @@ XDC::setForeground(u_int fg)
 }
 
 DC&
-XDC::setBackground(u_int bg)
+XDC::setBackground(size_t bg)
 {
     XSetBackground(_colormap.display(), _gc, (getLayer() == DC::UNDERLAY ?
 					      _colormap.getUnderlayPixel(bg) :
@@ -223,7 +224,7 @@ XDC::setBackground(u_int bg)
 }
 
 DC&
-XDC::setSaturation(u_int saturation)
+XDC::setSaturation(size_t saturation)
 {
     _colormap.setSaturation(saturation);
     return *this;
@@ -284,8 +285,7 @@ XDC::operator <<(const Point2<int>& p)
       {
 	XGCValues	values;
 	XGetGCValues(_colormap.display(), _gc, GCLineWidth, &values);
-	u_int	w = (zoom() > 1 ? int(zoom()) : 1) *
-		    (values.line_width > 0 ? values.line_width : 1);
+	const size_t	w = std::max(int(zoom() * std::max(values.line_width, 1)), 1);
 	XFillRectangle(_colormap.display(), drawable(), _gc,
 		       log2devR(p[0] + offset()[0]),
 		       log2devR(p[1] + offset()[1]), w, w);
@@ -605,7 +605,7 @@ XDC::dump(std::ostream& out) const
 /*
  *  Protected member functions
  */
-XDC::XDC(u_int width, u_int height, float zoom, Colormap& colormap, GC gc)
+XDC::XDC(size_t width, size_t height, float zoom, Colormap& colormap, GC gc)
     :DC(width, height, zoom),
      _colormap(colormap), _gc(gc), _buff(0), _ximage(0)
 {
@@ -674,7 +674,7 @@ XDC::putXImage() const
 	      _ximage->width, _ximage->height);
 }
 
-u_int
+size_t
 XDC::getThickness() const
 {
     XGCValues       values;
@@ -682,13 +682,13 @@ XDC::getThickness() const
     return values.line_width;
 }
 
-u_int
+size_t
 XDC::realWidth() const
 {
     return deviceWidth();
 }
 
-u_int
+size_t
 XDC::realHeight() const
 {
     return deviceHeight();

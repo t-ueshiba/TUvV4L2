@@ -49,7 +49,7 @@ Pane::~Pane()
 }
 
 void
-Pane::place(u_int left, u_int top, u_int width, u_int height)
+Pane::place(size_t left, size_t top, size_t width, size_t height)
 {
     XtVaSetValues(widget(), XtNgridx, left, XtNgridy, top,
 		  XtNgridWidth, width, XtNgridHeight, height, nullptr);
