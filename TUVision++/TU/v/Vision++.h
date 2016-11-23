@@ -69,7 +69,7 @@ class BrepCanvasPane : public CanvasPane
     enum DrawMode	{Erase, Draw, Highlight1, Highlight2, Highlight3};
 
     BrepCanvasPane(Window& parentWindow,
-		   u_int width, u_int height, Brep::Root* root)		;
+		   size_t width, size_t height, Brep::Root* root)	;
     ~BrepCanvasPane()							;
     
     virtual void	callback(CmdId id, CmdVal val)			;

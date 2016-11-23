@@ -14,7 +14,7 @@ namespace v
 *  class BrepCanvasPane							*
 ************************************************************************/
 BrepCanvasPane::BrepCanvasPane(Window& parentWindow,
-			       u_int width, u_int height, Root* root)
+			       size_t width, size_t height, Root* root)
     :CanvasPane(parentWindow, width, height),
      _dc(*this), _root(root), _h_cache(0), _cmd(0)
 {
@@ -38,19 +38,19 @@ BrepCanvasPane::callback(CmdId id, CmdVal val)
 	{
 	    const Geometry*	g = _cmd->getGeometry();
 	    DrawMode		mode = Draw;
-	    if (g == 0)
+	    if (g == nullptr)
 		mode = Draw;
 	    else if (_h_cache == g->parent())
 		mode = Highlight2;
 	    else if (_h_cache->parent() == g->parent()->parent())
 		mode = Highlight1;
 	    draw(_h_cache, mode);
-	    if (g != 0)
+	    if (g != nullptr)
 		draw(g, Highlight3);
 	}
-	const Geometry*	g = findGeometry(_dc.dev2logU(val.u),
-					 _dc.dev2logV(val.v));
-	if (g != 0)
+	const Geometry*		g = findGeometry(_dc.dev2logU(val.u()),
+						 _dc.dev2logV(val.v()));
+	if (g!= nullptr)
 	{
 	    _h_cache = g->parent();
 	    draw(_h_cache, Highlight3);
@@ -64,9 +64,9 @@ BrepCanvasPane::callback(CmdId id, CmdVal val)
 
       case Id_MouseButton1Press:
       {
-	const Geometry*	g = findGeometry(_dc.dev2logU(val.u),
-					 _dc.dev2logV(val.v));
-	if (g != 0)
+	  const Geometry*	g = findGeometry(_dc.dev2logU(val.u()),
+						 _dc.dev2logV(val.v()));
+	if (g != nullptr)
 	    _cmd->setGeometry(g);
       }
 	break;
@@ -96,7 +96,7 @@ void
 BrepCanvasPane::draw(const HalfEdge* h, DrawMode mode)
 {
 #ifdef UseOverlay
-    u_int	jnc = Color_BG, pnt = Color_BG;
+    size_t	jnc = Color_BG, pnt = Color_BG;
 #else
     BGR		jnc = Color_BG, pnt = Color_BG;
 #endif
@@ -118,6 +118,8 @@ BrepCanvasPane::draw(const HalfEdge* h, DrawMode mode)
 	jnc = Color_BLUE;
 	pnt = Color_GREEN;
 	break;
+      default:
+	break;
     }
     
     _dc << foreground(jnc);
@@ -131,7 +133,7 @@ void
 BrepCanvasPane::draw(const Geometry* g, DrawMode mode)
 {
 #ifdef UseOverlay
-    u_int	pnt = Color_BG;
+    size_t	pnt = Color_BG;
 #else
     BGR		jnc = Color_BG, pnt = Color_BG;
 #endif
@@ -148,6 +150,8 @@ BrepCanvasPane::draw(const Geometry* g, DrawMode mode)
 	break;
       case Highlight3:
 	pnt = Color_GREEN;
+	break;
+      default:
 	break;
     }
     _dc << foreground(pnt) << *g->point();
