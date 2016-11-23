@@ -128,7 +128,7 @@ MyCanvasPaneBase::callback(CmdId id, CmdVal val)
       case Id_MouseButton1Release:
       case Id_MouseMove:
       {
-	  CmdVal logicalPosition(_dc.dev2logU(val.u), _dc.dev2logV(val.v));
+	  CmdVal logicalPosition(_dc.dev2logU(val.u()), _dc.dev2logV(val.v()));
 	  parent().callback(id, logicalPosition);
       }
 	return;

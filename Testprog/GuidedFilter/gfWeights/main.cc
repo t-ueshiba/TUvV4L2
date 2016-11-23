@@ -18,7 +18,7 @@ namespace v
 ************************************************************************/
 enum	{c_WinSize, c_Regularization, c_Saturation, c_Cursor};
 
-static int	range[][3] = {{1, 64, 1}, {0, 255, 1}, {1, 64, 4}};
+static float	range[][3] = {{1, 64, 1}, {0, 255, 1}, {1, 64, 4}};
 static CmdDef	Cmds[] =
 {
     {C_Slider, c_WinSize,	 11, "Window size:",	range[0], CA_None,
@@ -40,7 +40,7 @@ class MyCanvasPane : public CanvasPane
 {
   public:
     MyCanvasPane(Window& parentWin, const Image<T>& image,
-		 u_int width, u_int height)
+		 size_t width, size_t height)
 	:CanvasPane(parentWin, width, height),
 	 _dc(*this, width, height), _image(image)	{}
 
@@ -51,13 +51,13 @@ class MyCanvasPane : public CanvasPane
 			    _dc << foreground(BGR(255, 255, 0))
 				<< Point2<int>(u, v);
 			}
-    void		setZoom(u_int mul, u_int div)
+    void		setZoom(float zoom)
 			{
-			    _dc.setZoom(mul, div);
+			    _dc.setZoom(zoom);
 			}
-    void		setSize(u_int width, u_int height)
+    void		setSize(size_t width, size_t height)
 			{
-			    _dc.setSize(width, height, _dc.mul(), _dc.div());
+			    _dc.setSize(width, height, _dc.zoom());
 			}
     virtual void	callback(CmdId id, CmdVal val)	;
     
@@ -76,7 +76,7 @@ MyCanvasPane<T>::callback(CmdId id, CmdVal val)
       case Id_MouseButton1Drag:
       case Id_MouseButton1Release:
       {
-	CmdVal	logicalPosition(_dc.dev2logU(val.u), _dc.dev2logV(val.v));
+	CmdVal	logicalPosition(_dc.dev2logU(val.u()), _dc.dev2logV(val.v()));
 	parent().callback(id, logicalPosition);
       }
         return;
@@ -128,7 +128,7 @@ MyCmdWindow<T>::MyCmdWindow(App& parentApp, const char* name,
     _gf2.setColWinSize(w);
     _gf2.setEpsilon(s*s);
     colormap().setSaturationF(_cmd.getValue(c_Saturation).f());
-    _weightsCanvas.setZoom(8, 1);
+    _weightsCanvas.setZoom(8);
     _weightsCanvas.setSize(2*w - 1, 2*w - 1);
 
     show();
@@ -198,14 +198,14 @@ MyCmdWindow<T>::callback(CmdId id, CmdVal val)
 	
       case Id_MouseButton1Press:
       case Id_MouseButton1Drag:
-	showWeights(val.u, val.v);
+	showWeights(val.u(), val.v());
       case Id_MouseMove:
       {
 	int	w = _cmd.getValue(c_WinSize);
 	_weightsCanvas.drawPoint(w - 1, w - 1);
 	  
 	std::ostringstream	s;
-	s << '(' << val.u << ',' << val.v << ')';
+	s << '(' << val.u() << ',' << val.v() << ')';
 	_cmd.setString(c_Cursor, s.str().c_str());
       }
         break;
