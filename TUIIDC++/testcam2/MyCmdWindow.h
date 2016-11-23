@@ -21,7 +21,7 @@ template <class CAMERA, class PIXEL>
 class MyCmdWindow : public CmdWindow
 {
   public:
-    MyCmdWindow(App& parentApp, const Array<CAMERA*>& cameras)	;
+    MyCmdWindow(App& parentApp, Array<CAMERA>& cameras)		;
 
     virtual void	callback(CmdId, CmdVal)			;
     virtual void	tick()					;
@@ -33,7 +33,7 @@ class MyCmdWindow : public CmdWindow
     void		stopContinuousShotIfRunning()		;
 
   private:
-    const Array<CAMERA*>&	_cameras;
+    Array<CAMERA>&		_cameras;
     Movie<PIXEL>		_movie;
     Array<MyCanvasPane<PIXEL>*>	_canvases;
     CmdPane			_menuCmd;
@@ -43,15 +43,14 @@ class MyCmdWindow : public CmdWindow
 };
 
 template <class CAMERA, class PIXEL>
-MyCmdWindow<CAMERA, PIXEL>::MyCmdWindow(App& parentApp,
-					const Array<CAMERA*>& cameras)
+MyCmdWindow<CAMERA, PIXEL>::MyCmdWindow(App& parentApp, Array<CAMERA>& cameras)
     :CmdWindow(parentApp, "Camera controller", Colormap::RGBColor, 16, 0, 0),
      _cameras(cameras),
      _movie(_cameras.size()),
      _canvases(0),
-     _menuCmd(*this, createMenuCmds(*_cameras[0])),
+     _menuCmd(*this, createMenuCmds(_cameras[0])),
      _captureCmd(*this, createCaptureCmds()),
-     _featureCmd(*this, createFeatureCmds(_cameras)),
+     _featureCmd(*this, createFeatureCmds(_cameras[0], cameras.size())),
      _timer(*this, 0)
 {
     _menuCmd.place(0, 0, 2, 1);
@@ -71,17 +70,12 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 
     try
     {
-	if (setFormat(_cameras, id, val))
+	if (setFormat(_cameras, id, val, *this))
 	{
 	    initializeMovie();
 	    return;
 	}
-	else if (setSpecialFormat(_cameras, id, val, *this))
-	{
-	    initializeMovie();
-	    return;
-	}
-	else if (setFeatureValue(_cameras, id, val, _featureCmd))
+	else if (setFeature(_cameras, id, val, _featureCmd))
 	    return;
 	
 	switch (id)
@@ -166,16 +160,14 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 template <class CAMERA, class PIXEL> void
 MyCmdWindow<CAMERA, PIXEL>::tick()
 {
-    static int		nframes = 0;
-    static timeval	start;
-    countTime(nframes, start);
+    countTime();
 
     if (!_captureCmd.getValue(c_PlayMovie))
     {
 	std::for_each(_cameras.begin(), _cameras.end(),
 		      std::bind(&CAMERA::snap, std::placeholders::_1));
 	for (size_t i = 0; i < _cameras.size(); ++i)
-	    *_cameras[i] >> _movie.image(i);
+	    _cameras[i] >> _movie.image(i);
     }
 
     repaintCanvases();
@@ -188,7 +180,7 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 {
     Array<typename Movie<PIXEL>::Size>	sizes(_cameras.size());
     for (size_t i = 0; i < sizes.size(); ++i)
-	sizes[i] = std::make_pair(_cameras[i]->width(), _cameras[i]->height());
+	sizes[i] = std::make_pair(_cameras[i].width(), _cameras[i].height());
     _movie.setSizes(sizes);
     _movie.insert(_menuCmd.getValue(c_NFrames));
 
@@ -212,7 +204,7 @@ MyCmdWindow<CAMERA, PIXEL>::initializeMovie()
 	    canvas->resize();
     }
 
-    int	props[] = {0, int(_movie.nframes()) - 1, 1};
+    float	props[] = {0, float(_movie.nframes()) - 1, 1};
     _captureCmd.setProp(c_StatusMovie, props);
     
     repaintCanvases();
@@ -223,7 +215,7 @@ MyCmdWindow<CAMERA, PIXEL>::repaintCanvases()
 {
     for (auto canvas : _canvases)
 	canvas->repaintUnderlay();
-    _captureCmd.setValue(c_StatusMovie, int(_movie.currentFrame()));
+    _captureCmd.setValue(c_StatusMovie, _movie.currentFrame());
 }
 
 template <class CAMERA, class PIXEL> void

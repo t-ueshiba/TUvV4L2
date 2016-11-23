@@ -267,7 +267,7 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 	    }
     }
 
-    throw std::runtime_error("No device with specidied unit_spec_ID and globalUniqId found!!");
+    throw std::runtime_error("No device with specified unit_spec_ID and globalUniqId found!!");
 }
 
 void

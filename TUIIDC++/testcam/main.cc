@@ -2,7 +2,6 @@
  *  $Id: main.cc,v 1.4 2012-08-13 07:15:07 ueshiba Exp $
  */
 #include <cstdlib>
-#include <iomanip>
 #include "TU/v/vIIDC++.h"
 #include "MyCmdWindow.h"
 
@@ -15,14 +14,16 @@ main(int argc, char* argv[])
     using namespace	TU;
     
     v::App		vapp(argc, argv);
-    int			speed = 400;
+    IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
     u_int64_t		uniqId = 0;
+    
+  // Parse command options.
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "s:")) != -1; )
+    for (int c; (c = getopt(argc, argv, "b")) != -1; )
 	switch (c)
 	{
-	  case 's':
-	    speed = atoi(optarg);
+	  case 'b':
+	    speed = IIDCCamera::SPD_800M;
 	    break;
 	}
     
@@ -34,33 +35,10 @@ main(int argc, char* argv[])
     try
     {
 	IIDCCamera	camera(uniqId);
-
-	switch (speed)
-	{
-	  case 100:
-	    camera.setSpeed(IIDCCamera::SPD_100M);
-	    break;
-	  case 200:
-	    camera.setSpeed(IIDCCamera::SPD_200M);
-	    break;
-	  default:
-	    camera.setSpeed(IIDCCamera::SPD_400M);
-	    break;
-	  case 800:
-	    camera.setSpeed(IIDCCamera::SPD_800M);
-	    break;
-	  case 1600:
-	    camera.setSpeed(IIDCCamera::SPD_1_6G);
-	    break;
-	  case 3200:
-	    camera.setSpeed(IIDCCamera::SPD_3_2G);
-	    break;
-	}
+	camera.setSpeed(speed);
 	
-	v::MyCmdWindow<IIDCCamera, RGB>	myWin(vapp, camera);
+	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, camera);
 	vapp.run();
-
-	camera.continuousShot(false);
 
 	std::cout << camera;
     }
