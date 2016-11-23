@@ -57,7 +57,7 @@ class Menu : public Cmd
       private:
 	const Widget	_widget;	// smeLineObject or smeBSBObject
 
-	static u_int	_nitems;
+	static size_t	_nitems;
     };
 
   public:

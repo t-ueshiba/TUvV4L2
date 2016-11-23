@@ -42,7 +42,7 @@ namespace v
 class CanvasPane : public Pane
 {
   public:
-    CanvasPane(Window& parentWin, u_int devWidth=0, u_int devHeight=0)	;
+    CanvasPane(Window& parentWin, size_t devWidth=0, size_t devHeight=0);
     virtual			~CanvasPane()				;
 
     virtual const Widget&	widget()			const	;

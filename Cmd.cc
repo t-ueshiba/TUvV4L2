@@ -141,7 +141,7 @@ Cmd::setString(const char* str)
 }
 
 void
-Cmd::setProp(void*)
+Cmd::setProp(const void*)
 {
 }
 

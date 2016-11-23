@@ -40,7 +40,7 @@ namespace v
 /************************************************************************
 *  class ShmDC								*
 ************************************************************************/
-ShmDC::ShmDC(CanvasPane& parentCanvasPane, u_int width, u_int height, float zoom)
+ShmDC::ShmDC(CanvasPane& parentCanvasPane, size_t width, size_t height, float zoom)
     :CanvasPaneDC(parentCanvasPane, width, height, zoom),
      _xShmInfo(), _xShmSize(0), _xShmAvailable(true)
 {
@@ -101,7 +101,7 @@ ShmDC::putXImage() const
 }
 
 char*
-ShmDC::attachShm(u_int size)
+ShmDC::attachShm(size_t size)
 {
     if (_xShmSize != 0)
     {

@@ -55,7 +55,7 @@ class RadioButtonCmd : public Cmd
     const Widget	_button;			// commandWidget
     const Widget	_label;				// labelWidget
 
-    static u_int	_nitems;
+    static size_t	_nitems;
 };
 
 }

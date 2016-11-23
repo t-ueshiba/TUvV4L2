@@ -43,20 +43,20 @@ namespace v
 class ShmDC : public CanvasPaneDC
 {
   public:
-    ShmDC(CanvasPane& parentCanvasPane, u_int width=0, u_int height=0,
+    ShmDC(CanvasPane& parentCanvasPane, size_t width=0, size_t height=0,
 	  float zoom=1)							;
     virtual		~ShmDC()					;
 
   protected:
     virtual void	allocateXImage(int buffWidth, int buffHeight)	;
     virtual void	putXImage()				const	;
-    char*		attachShm(u_int size)				;
+    char*		attachShm(size_t size)				;
     virtual void	destroyShmImage()				;
     XShmSegmentInfo*	xShmInfo()					;
     
   private:
     XShmSegmentInfo	_xShmInfo;
-    u_int		_xShmSize;	// Size of shm currently allocated.
+    size_t		_xShmSize;	// Size of shm currently allocated.
     bool		_xShmAvailable;
 };
 

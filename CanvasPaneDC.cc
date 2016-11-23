@@ -157,7 +157,7 @@ CBcanvasPaneDC(::Widget, XtPointer client_data, XtPointer)
  *  Public member functions
  */
 CanvasPaneDC::CanvasPaneDC(CanvasPane& parentCanvasPane,
-			   u_int w, u_int h, float zoom)
+			   size_t w, size_t h, float zoom)
     :Object(parentCanvasPane),
      XDC(w != 0 ? w : parentCanvasPane.widget().width(),
 	 h != 0 ? h : parentCanvasPane.widget().height(),
@@ -203,7 +203,7 @@ CanvasPaneDC::widget() const
 }
 
 DC&
-CanvasPaneDC::setSize(u_int width, u_int height, float zoom)
+CanvasPaneDC::setSize(size_t width, size_t height, float zoom)
 {
     XDC::setSize(width, height, zoom);
   // Viewport の中でこの widget を小さくするとき, 以前描画したものの残
@@ -301,13 +301,13 @@ CanvasPaneDC::setDeviceSize()
 		  nullptr);
 }
 
-u_int
+size_t
 CanvasPaneDC::realWidth() const		// widget width: for XDC::clear()
 {
     return widget().width();
 }
 
-u_int
+size_t
 CanvasPaneDC::realHeight() const	// widget height: for XDC::clear()
 {
     return widget().height();
