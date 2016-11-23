@@ -70,7 +70,7 @@ XvDC::createXvImage(const Image<S>& image)
 	}
     }
 
-    for (int v = 0; v < image.height(); ++v)
+    for (size_t v = 0; v < image.height(); ++v)
     {
 	ImageLine<YUV422> imageLine((YUV422*)_xvimage->data +
 				    v * _xvimage->width,
@@ -81,7 +81,7 @@ XvDC::createXvImage(const Image<S>& image)
     }
 }
 
-XvDC::XvDC(CanvasPane& parentCanvasPane, u_int width, u_int height, float zoom)
+XvDC::XvDC(CanvasPane& parentCanvasPane, size_t width, size_t height, float zoom)
     :ShmDC(parentCanvasPane, width, height, zoom),
      _port(~0), _xvimage(0)
 {
