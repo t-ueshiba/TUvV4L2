@@ -34,12 +34,9 @@ class IIDCCameraArray : public Array<IIDCCamera>
     static constexpr const char* DEFAULT_CONFIG_DIRS = ".:/usr/local/etc/cameras";
     
   public:
-    IIDCCameraArray(const char* name=DEFAULT_CAMERA_NAME,
-		    const char* dirs=DEFAULT_CONFIG_DIRS,
-		    IIDCCamera::Speed speed=IIDCCamera::SPD_400M)	;
-    ~IIDCCameraArray()							;
-
-    void		restore(const char* name,
+    explicit		IIDCCameraArray(size_t ncameras=0)		;
+    
+    void		restore(const char* name=nullptr,
 				const char* dirs=nullptr,
 				IIDCCamera::Speed
 				speed=IIDCCamera::SPD_400M)		;
@@ -168,8 +165,7 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 		    = &IIDCCamera::setValue;
 	  
 		std::for_each(std::begin(cameras), std::end(cameras),
-			      std::bind(pf, std::placeholders::_1,
-					feature, u_int(fval)));
+			      std::bind(pf, std::placeholders::_1, feature, val));
 	    }
 	}
 	return true;
@@ -274,7 +270,7 @@ setFeature(IIDCCamera& camera, u_int id, u_int val, float fval)
 
 //! 複数のカメラから同期した画像を保持する．
 /*!
-  \param cameras	カメラへのポインタの配列
+  \param cameras	カメラの配列
   \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
 */
 template <class CAMERAS>

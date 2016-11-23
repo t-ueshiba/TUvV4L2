@@ -26,24 +26,21 @@ main(int argc, char* argv[])
 	    break;
 	}
 
-    extern int		optind;
-    if (argc - optind == 0)
-    {
-	std::cerr << "One or more cameras must be specified!!" << std::endl;
-	return 1;
-    }
-
   // Main job.
     try
     {
+	extern int		optind;
 	Array<IIDCCamera>	cameras(argc - optind);
 	for (auto& camera : cameras)
 	{
-	    camera.initialize(strtoull(argv[optind], 0, 0));
+	    camera.initialize(strtoull(argv[optind++], 0, 0));
 	    camera.setSpeed(speed);
 	}
 
-	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, cameras);
+	if (cameras.size() == 0)
+	    throw std::runtime_error("One or more cameras must be specified!!");
+
+	v::MyCmdWindow<Array<IIDCCamera>, u_char>	myWin(vapp, cameras);
 	vapp.run();
 
 	std::cout << cameras;
