@@ -30,7 +30,7 @@ enum
 inline const CmdDef*
 createCaptureCmds()
 {
-    static constexpr CmdDef captureCmds[] =
+    static const CmdDef captureCmds[] =
     {
 	{C_ToggleButton, c_ContinuousShot, 0, "Continuous shot", noProp,
 	 CA_None, 0, 0, 1, 1, 0},
@@ -53,7 +53,7 @@ createCaptureCmds()
 template <class CAMERA> inline const CmdDef*
 createMenuCmds(const CAMERA& camera)
 {
-    static constexpr MenuDef nframesMenu[] =
+    static MenuDef nframesMenu[] =
     {
 	{" 10",  10, false, noSub},
 	{"100", 100, true,  noSub},
@@ -62,7 +62,7 @@ createMenuCmds(const CAMERA& camera)
 	EndOfMenu
     };
 
-    static constexpr MenuDef fileMenu[] =
+    static MenuDef fileMenu[] =
     {
 	{"Save", M_Save, false, noSub},
 	{"-",	 M_Line, false, noSub},
@@ -70,7 +70,7 @@ createMenuCmds(const CAMERA& camera)
 	EndOfMenu
     };
 
-    static constepxr CmdDef menuCmds[] =
+    static CmdDef menuCmds[] =
     {
 	{C_MenuButton, M_File,   0, "File",   fileMenu, CA_None, 0, 0, 1, 1, 0},
 	{C_MenuButton, M_Format, 0, "Format", noProp,   CA_None, 1, 0, 1, 1, 0},

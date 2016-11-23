@@ -786,8 +786,8 @@ IIDCCamera::getFormat_7_Info(Format format7)
   \return	 このIIDCカメラオブジェクト
  */
 IIDCCamera&
-IIDCCamera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
-				u_int width, u_int height)
+IIDCCamera::setFormat_7_ROI(Format format7,
+			    u_int u0, u_int v0, u_int width, u_int height)
 {
     const auto	fmt7info = getFormat_7_Info(format7);
 
@@ -835,8 +835,7 @@ IIDCCamera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
   \return		このIIDCカメラオブジェクト
  */
 IIDCCamera&
-IIDCCamera::setFormat_7_PixelFormat(Format format7,
-					PixelFormat pixelFormat)
+IIDCCamera::setFormat_7_PixelFormat(Format format7, PixelFormat pixelFormat)
 {
     const auto	fmt7info = getFormat_7_Info(format7);
     if (!(pixelFormat & fmt7info.availablePixelFormats))

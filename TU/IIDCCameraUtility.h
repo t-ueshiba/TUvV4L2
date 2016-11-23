@@ -59,16 +59,17 @@ constexpr u_int	IIDCCAMERA_OFFSET_ONOFF = 0x100;
 constexpr u_int	IIDCCAMERA_OFFSET_AUTO  = 0x200;
 constexpr u_int	IIDCCAMERA_OFFSET_ABS   = 0x300;
 constexpr u_int	IIDCCAMERA_OFFSET_VR    = 0x2;
-constexpr u_int	IIDCCAMERA_CHOICE	= IIDCCamera::BRIGHTNESS + 2;
+constexpr u_int	IIDCCAMERA_CHOICE	= IIDCCamera::BRIGHTNESS + 1;
+constexpr u_int	IIDCCAMERA_ALL		= IIDCCamera::BRIGHTNESS + 2;
     
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-template <class ITER>
+template <class CAMERAS>
 typename std::enable_if<std::is_convertible<
-			    typename std::iterator_traits<ITER>::value_type,
+			    typename std::remove_reference<CAMERAS>::type::value_type,
 			    IIDCCamera>::value, bool>::type
-setFormat(ITER begin, ITER end, u_int id, u_int val)
+setFormat(CAMERAS&& cameras, u_int id, u_int val)
 {
     switch (id)
     {
@@ -95,10 +96,19 @@ setFormat(ITER begin, ITER end, u_int id, u_int val)
       case IIDCCamera::MONO8_1600x1200:
       case IIDCCamera::MONO16_1280x960:
       case IIDCCamera::MONO16_1600x1200:
-	std::for_each(begin, end, std::bind(&IIDCCamera::setFormatAndFrameRate,
-					    std::placeholders::_1,
-					    IIDCCamera::uintToFormat(id),
-					    IIDCCamera::uintToFrameRate(val)));
+      case IIDCCamera::Format_7_0:
+      case IIDCCamera::Format_7_1:
+      case IIDCCamera::Format_7_2:
+      case IIDCCamera::Format_7_3:
+      case IIDCCamera::Format_7_4:
+      case IIDCCamera::Format_7_5:
+      case IIDCCamera::Format_7_6:
+      case IIDCCamera::Format_7_7:
+	std::for_each(std::begin(cameras), std::end(cameras),
+		      std::bind(&IIDCCamera::setFormatAndFrameRate,
+				std::placeholders::_1,
+				IIDCCamera::uintToFormat(id),
+				IIDCCamera::uintToFrameRate(val)));
 	return true;
 
       default:
@@ -111,17 +121,15 @@ setFormat(ITER begin, ITER end, u_int id, u_int val)
 inline bool
 setFormat(IIDCCamera& camera, u_int id, u_int val)
 {
-    return setFormat(&camera, &camera + 1, id, val);
+    return setFormat(make_range(&camera, &camera + 1), id, val);
 }
 
-template <class ITER>
+template <class CAMERAS>
 typename std::enable_if<std::is_convertible<
-			    typename std::iterator_traits<ITER>::value_type,
+			    typename std::remove_reference<CAMERAS>::type::value_type,
 			    IIDCCamera>::value, bool>::type
-setFeature(ITER begin, ITER end, u_int id, u_int val, float fval)
+setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 {
-    using namespace	std;
-    
     switch (id)
     {
       case IIDCCamera::BRIGHTNESS:
@@ -142,28 +150,34 @@ setFeature(ITER begin, ITER end, u_int id, u_int val, float fval)
       case IIDCCamera::ZOOM:
       case IIDCCamera::PAN:
       case IIDCCamera::TILT:
-      {
-	const auto	feature = IIDCCamera::uintToFeature(id);
+	if (size(cameras) > 0)
+	{
+	    const auto	feature = IIDCCamera::uintToFeature(id);
 
-	if (begin->isAbsControl(feature))
-	{
-	    IIDCCamera& (IIDCCamera::*pf)(IIDCCamera::Feature, float)
-		= &IIDCCamera::setValue;
+	    if (std::begin(cameras)->isAbsControl(feature))
+	    {
+		IIDCCamera& (IIDCCamera::*pf)(IIDCCamera::Feature, float)
+		    = &IIDCCamera::setValue;
 	  
-	    for_each(begin, end, bind(pf, placeholders::_1, feature, fval));
-	}
-	else
-	{
-	    IIDCCamera& (IIDCCamera::*pf)(IIDCCamera::Feature, u_int)
-		= &IIDCCamera::setValue;
+		std::for_each(std::begin(cameras), std::end(cameras),
+			      std::bind(pf, std::placeholders::_1, feature, fval));
+	    }
+	    else
+	    {
+		IIDCCamera& (IIDCCamera::*pf)(IIDCCamera::Feature, u_int)
+		    = &IIDCCamera::setValue;
 	  
-	    for_each(begin, end, bind(pf, placeholders::_1, feature, u_int(fval)));
+		std::for_each(std::begin(cameras), std::end(cameras),
+			      std::bind(pf, std::placeholders::_1,
+					feature, u_int(fval)));
+	    }
 	}
-      }
 	return true;
+	
       case IIDCCamera::TRIGGER_MODE:
-	for_each(begin, end, bind(&IIDCCamera::setTriggerMode, placeholders::_1,
-				  IIDCCamera::uintToTriggerMode(val)));
+	std::for_each(std::begin(cameras), std::end(cameras),
+		      std::bind(&IIDCCamera::setTriggerMode, std::placeholders::_1,
+				IIDCCamera::uintToTriggerMode(val)));
 	return true;
       
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ONOFF:
@@ -187,10 +201,10 @@ setFeature(ITER begin, ITER end, u_int id, u_int val, float fval)
       {
 	IIDCCamera& (IIDCCamera::*pf)(IIDCCamera::Feature, bool)
 	    = &IIDCCamera::setActive;
-	for_each(begin, end,
-		 bind(pf, placeholders::_1,
-		      IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ONOFF),
-		      bool(val)));
+	std::for_each(std::begin(cameras), std::end(cameras),
+		      std::bind(pf, std::placeholders::_1,
+				IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ONOFF),
+				bool(val)));
       }
 	return true;
 
@@ -210,16 +224,16 @@ setFeature(ITER begin, ITER end, u_int id, u_int val, float fval)
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_AUTO:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_AUTO:
-	for_each(begin, end,
-		 bind(&IIDCCamera::setAuto, placeholders::_1,
-		      IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_AUTO),
-		      bool(val)));
+	std::for_each(std::begin(cameras), std::end(cameras),
+		      std::bind(&IIDCCamera::setAuto, std::placeholders::_1,
+				IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_AUTO),
+				bool(val)));
         return true;
 
       case IIDCCamera::TRIGGER_MODE  + IIDCCAMERA_OFFSET_AUTO:
-	for_each(begin, end,
-		 bind(&IIDCCamera::setTriggerPolarity, placeholders::_1,
-		      bool(val)));
+	std::for_each(std::begin(cameras), std::end(cameras),
+		      std::bind(&IIDCCamera::setTriggerPolarity, std::placeholders::_1,
+				bool(val)));
 	return true;
 
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ABS:
@@ -239,10 +253,10 @@ setFeature(ITER begin, ITER end, u_int id, u_int val, float fval)
       case IIDCCamera::ZOOM	     + IIDCCAMERA_OFFSET_ABS:
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_ABS:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ABS:
-	for_each(begin, end,
-		 bind(&IIDCCamera::setAbsControl, placeholders::_1,
-		      IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ABS),
-		      bool(val)));
+	std::for_each(std::begin(cameras), std::end(cameras),
+		      std::bind(&IIDCCamera::setAbsControl, std::placeholders::_1,
+				IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ABS),
+				bool(val)));
         return true;
 
       default:
@@ -255,7 +269,7 @@ setFeature(ITER begin, ITER end, u_int id, u_int val, float fval)
 inline bool
 setFeature(IIDCCamera& camera, u_int id, u_int val, float fval)
 {
-    return setFeature(&camera, &camera + 1, id, val, fval);
+    return setFeature(make_range(&camera, &camera + 1), id, val, fval);
 }
 
 //! 複数のカメラから同期した画像を保持する．
@@ -263,18 +277,21 @@ setFeature(IIDCCamera& camera, u_int id, u_int val, float fval)
   \param cameras	カメラへのポインタの配列
   \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
 */
-template <class ITER> void
-syncedSnap(ITER camera, size_t ncameras, uint64_t maxSkew=1000)
+template <class CAMERAS>
+typename std::enable_if<std::is_convertible<
+			    typename std::remove_reference<CAMERAS>::type::value_type,
+			    IIDCCamera>::value, bool>::type
+syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
 {
-    typedef std::pair<uint64_t, ITER>	timestamp_t;
+    typedef std::pair<uint64_t, typename CAMERAS::iterator>	timestamp_t;
     
-    Heap<timestamp_t, std::greater<timestamp_t> >	timestamps(ncameras);
+    Heap<timestamp_t, std::greater<timestamp_t> >	timestamps(size(cameras));
 
-    std::for_each_n(camera, ncameras,
-		    std::bind(&IIDCCamera::snap, std::placeholders::_1));
+    std::for_each(std::begin(cameras), std::end(cameras),
+		  std::bind(&IIDCCamera::snap, std::placeholders::_1));
 
     timestamp_t	last(0, nullptr);
-    for (; ncameras--; ++camera)
+    for (auto camera = std::begin(cameras); camera != std::end(cameras); ++camera)
     {
 	timestamp_t	timestamp(camera->getTimestamp(), camera);
 	timestamps.push(timestamp);
