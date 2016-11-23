@@ -6,38 +6,29 @@
 
 #include "TU/v/CmdPane.h"
 #include "TU/IIDCCameraUtility.h"
-#include "TU/algorithm.h"
 
 namespace TU
 {
 namespace v
 {
 /************************************************************************
-*  static constant variables						*
-************************************************************************/
-static constexpr CmdId		CAMERA_CHOICE = IIDCCamera::BRIGHTNESS + 2;
-
-/************************************************************************
 *  global functions							*
 ************************************************************************/
-/*
- *  functions for a single camera
- */
 MenuDef*	createFormatMenu(const IIDCCamera& camera)			;
-bool		setSpecialFormat(IIDCCamera& camera,
-				 CmdId id, CmdVal val, Window& window)		;
+IIDCCamera::PixelFormat
+		getFormat7ROI(IIDCCamera& camera, IIDCCamera::Format format7,
+			      size_t& u0, size_t& v0,
+			      size_t& width, size_t& height, Window& window)	;
 CmdDef*		createFeatureCmds(const IIDCCamera& camera, size_t ncameras=1)	;
 void		refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)	;
-bool		setFeatureCmds(const IIDCCamera& camera,
-			       CmdId id, CmdVal val, CmdPane& cmdPane)		;
+void		refreshSliderCmd(const IIDCCamera& camera,
+				 CmdId id, CmdPane& cmdPane)			;
     
-/*
- *  functions for multiple cameras
- */
-#if 0
 template <class CAMERAS>
-typename std::enable_if<is_range<CAMERAS>::value, bool>::type
-setSpecialFormat(const CAMERAS& cameras, CmdId id, CmdVal val, Window& window)
+typename std::enable_if<std::is_convertible<
+			    typename std::remove_reference<CAMERAS>::type::value_type,
+			    IIDCCamera>::value, bool>::type
+setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
 {
     switch (id)
     {
@@ -49,86 +40,71 @@ setSpecialFormat(const CAMERAS& cameras, CmdId id, CmdVal val, Window& window)
       case IIDCCamera::Format_7_5:
       case IIDCCamera::Format_7_6:
       case IIDCCamera::Format_7_7:
-      {
-	auto	format7 = IIDCCamera::uintToFormat(id);
-	v::MyModalDialog
-		modalDialog(window,
-			    std::begin(cameras)->getFormat_7_Info(format7));
-	u_int	u0, v0, width, height;
-	auto	pixelFormat = modalDialog.getROI(u0, v0, width, height);
-	for (auto& camera : cameras)
-	    camera.setFormat_7_ROI(format7, u0, v0, width, height)
-		  .setFormat_7_PixelFormat(format7, pixelFormat)
-		  .setFormatAndFrameRate(format7,
-					 IIDCCamera::uintToFrameRate(val));
-      }
+	if (size(cameras) != 0)
+	{
+	    const auto	format7 = IIDCCamera::uintToFormat(id);
+	    size_t	u0, v0, width, height;
+	    const auto	pixelFormat = getFormat7ROI(*std::begin(cameras), format7,
+						    u0, v0, width, height, window);
+	    for (auto& camera : cameras)
+		camera.setFormat_7_ROI(format7, u0, v0, width, height)
+		      .setFormat_7_PixelFormat(format7, pixelFormat);
+	}
+        break;
+
+      default:
+	break;
+    }
+    
+    return setFormat(cameras, id, val);
+}
+
+inline bool
+setFormat(IIDCCamera& camera, CmdId id, CmdVal val, Window& window)
+{
+    return setFormat(make_range(&camera, &camera + 1), id, val, window);
+}
+
+template <class CAMERAS>
+typename std::enable_if<std::is_convertible<
+			    typename std::remove_reference<CAMERAS>::type::value_type,
+			    IIDCCamera>::value, bool>::type
+setFeature(CAMERAS&& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
+{
+    auto	camera = std::begin(cameras);
+    
+    if (id == IIDCCAMERA_CHOICE)		// 選択カメラが変更されたら...
+    {
+	std::advance(camera, val);
+	refreshFeatureCmds(*camera, cmdPane);	// カメラの全属性をGUIに反映
 	return true;
     }
-    
-    return false;
-}
-#endif
-template <class CAMERAS>
-inline typename std::enable_if<is_range<CAMERAS>::value, CmdDef*>::type
-createFeatureCmds(const CAMERAS& cameras)
-{
-    const auto	ncameras = size(cameras);
 
-    if (ncameras == 0)
-	return nullptr;
-    
-    return createFeatureCmds(*cameras.begin(), ncameras);
-}
-
-template <class CAMERAS>
-typename std::enable_if<is_range<CAMERAS>::value>::type
-refreshFeatureCmds(const CAMERAS& cameras, CmdPane& cmdPane)
-{
-    const auto	ncameras = size(cameras);
-    
-    if (ncameras == 0)
-	return;
-
-    int	i = cmdPane.getValue(IIDCCAMERA_CHOICE);
-    if (i < 0 || i >= ncameras)
-	i = 0;
-
-    auto	camera = std::begin(cameras);
-    std::advance(camera, i);
-    refreshFeatureCmds(*camera, cmdPane);
-}
-
-template <class CAMERAS>
-typename std::enable_if<is_range<CAMERAS>::value, bool>::type
-setFeatureCmds(CAMERAS& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
-{
-    const auto	ncameras = size(cameras);
-    
-    if (ncameras == 0)
+    if (size(cameras) > 1 &&			// カメラが複数かつ
+	!cmdPane.getValue(IIDCCAMERA_ALL))	// 全カメラ操作モードでなければ...
+    {
+	std::advance(camera, cmdPane.getValue(IIDCCAMERA_CHOICE));
+	if (!setFeature(*camera, id, int(val), val.f()))   // 選択カメラの属性を設定
+	    return false;
+    }
+    else if (!setFeature(cameras, id, int(val), val.f()))  // 全カメラの属性を設定
 	return false;
-
-    if (id == IIDCCAMERA_CHOICE)
-    {
-	const auto	i = (0 <= int(val) && int(val) < ncameras ? int(val) : 0);
-	auto		camera = std::begin(cameras);
-	std::advance(camera, i);
-	refreshFeatureCmds(*camera, cmdPane);
-    }
-    else
-    {
-	const int	i     = cmdPane.getValue(IIDCCAMERA_CHOICE);
-	auto		begin = std::begin(cameras);
-	auto		end   = std::end(cameras);
-	if (0 <= i && i < ncameras)
-	{
-	    std::advance(begin, i);
-	    (end = begin)++;
-	}
-
-	setFeature(begin, end, id, int(val), float(val));
-    }
-
+    
+  // idが属性の絶対値指定でなければGUIを更新する必要はない
+    if (camera == std::end(cameras) ||
+	id < IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
+	return true;
+    
+  // 属性の絶対値指定が変更されたら、sliderコマンドの定義域と値を更新する
+    refreshSliderCmd(*camera, id - IIDCCAMERA_OFFSET_ABS, cmdPane);
+	
     return true;
+}
+
+inline bool
+setFeature(IIDCCamera& camera, CmdId id, CmdVal val, CmdPane& cmdPane)
+{
+    return setFeature(make_range(&camera, &camera + 1), id, val, cmdPane);
 }
 
 }	// namespace v
