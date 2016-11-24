@@ -37,7 +37,7 @@ main(int argc, char* argv[])
 	IIDCCamera	camera(uniqId);
 	camera.setSpeed(speed);
 	
-	v::MyCmdWindow<IIDCCamera, u_char>	myWin(vapp, camera);
+	v::MyCmdWindow<IIDCCamera, RGB>	myWin(vapp, camera);
 	vapp.run();
 
 	std::cout << camera;
