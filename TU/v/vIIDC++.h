@@ -24,12 +24,13 @@ void		refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)	;
 void		refreshSliderCmd(const IIDCCamera& camera,
 				 CmdId id, CmdPane& cmdPane)			;
     
-template <class CAMERAS>
-typename std::enable_if<
-	     std::is_convertible<
-		 typename std::remove_reference<CAMERAS>::type::value_type,
-		 IIDCCamera>::value, bool>::type
+template <class CAMERAS> auto
 setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
+    -> typename std::enable_if<
+	  std::is_convertible<
+	      typename std::remove_reference<
+		  decltype(*std::begin(cameras))>::type, IIDCCamera>::value,
+	      bool>::type
 {
     switch (id)
     {
@@ -45,8 +46,10 @@ setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
 	{
 	    const auto	format7 = IIDCCamera::uintToFormat(id);
 	    size_t	u0, v0, width, height;
-	    const auto	pixelFormat = getFormat7ROI(*std::begin(cameras), format7,
-						    u0, v0, width, height, window);
+	    const auto	pixelFormat = getFormat7ROI(*std::begin(cameras),
+						    format7,
+						    u0, v0, width, height,
+						    window);
 	    for (auto& camera : cameras)
 		camera.setFormat_7_ROI(format7, u0, v0, width, height)
 		      .setFormat_7_PixelFormat(format7, pixelFormat);
@@ -66,10 +69,13 @@ setFormat(IIDCCamera& camera, CmdId id, CmdVal val, Window& window)
     return setFormat(make_range(&camera, &camera + 1), id, val, window);
 }
 
-template <class CAMERAS>
-typename std::enable_if<std::is_convertible<typename CAMERAS::value_type,
-					    IIDCCamera>::value>::type
+template <class CAMERAS> auto
 refreshFeatureCmds(const CAMERAS& cameras, CmdPane& cmdPane)
+    -> typename std::enable_if<
+	  std::is_convertible<
+	      typename std::remove_reference<
+		  decltype(*std::begin(cameras))>::type,
+	      IIDCCamera>::value>::type
 {
     auto	camera = std::begin(cameras);
     
@@ -87,12 +93,13 @@ refreshFeatureCmds(const CAMERAS& cameras, CmdPane& cmdPane)
     refreshFeatureCmds(*camera, cmdPane);
 }
     
-template <class CAMERAS>
-typename std::enable_if<
-	     std::is_convertible<
-		 typename std::remove_reference<CAMERAS>::type::value_type,
-		 IIDCCamera>::value, bool>::type
+template <class CAMERAS> auto
 setFeature(CAMERAS&& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
+    -> typename std::enable_if<
+	  std::is_convertible<
+	      typename std::remove_reference<
+		  decltype(*std::begin(cameras))>::type, IIDCCamera>::value,
+	      bool>::type
 {
     auto	camera = std::begin(cameras);
     
