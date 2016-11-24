@@ -14,7 +14,7 @@ MOCHDRS		=
 
 INCDIRS		= -I. -I../testcam -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
+CFLAGS		= -O
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
