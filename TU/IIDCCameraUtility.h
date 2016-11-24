@@ -63,9 +63,10 @@ constexpr u_int	IIDCCAMERA_ALL		= IIDCCamera::BRIGHTNESS + 2;
 *  global functions							*
 ************************************************************************/
 template <class CAMERAS>
-typename std::enable_if<std::is_convertible<
-			    typename std::remove_reference<CAMERAS>::type::value_type,
-			    IIDCCamera>::value, bool>::type
+typename std::enable_if<
+	     std::is_convertible<
+		 typename std::remove_reference<CAMERAS>::type::value_type,
+		 IIDCCamera>::value, bool>::type
 setFormat(CAMERAS&& cameras, u_int id, u_int val)
 {
     switch (id)
@@ -122,9 +123,10 @@ setFormat(IIDCCamera& camera, u_int id, u_int val)
 }
 
 template <class CAMERAS>
-typename std::enable_if<std::is_convertible<
-			    typename std::remove_reference<CAMERAS>::type::value_type,
-			    IIDCCamera>::value, bool>::type
+typename std::enable_if<
+	     std::is_convertible<
+		 typename std::remove_reference<CAMERAS>::type::value_type,
+		 IIDCCamera>::value, bool>::type
 setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 {
     switch (id)
@@ -132,8 +134,6 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
       case IIDCCamera::BRIGHTNESS:
       case IIDCCamera::AUTO_EXPOSURE:
       case IIDCCamera::SHARPNESS:
-      case IIDCCamera::WHITE_BALANCE:
-      case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR:
       case IIDCCamera::HUE:
       case IIDCCamera::SATURATION:
       case IIDCCamera::GAMMA:
@@ -175,7 +175,34 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 		      std::bind(&IIDCCamera::setTriggerMode, std::placeholders::_1,
 				IIDCCamera::uintToTriggerMode(val)));
 	return true;
-      
+
+      case IIDCCamera::WHITE_BALANCE:
+      case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR:
+	if (size(cameras) > 0)
+	{
+	    if (std::begin(cameras)->isAbsControl(IIDCCamera::WHITE_BALANCE))
+		for (auto& camera : cameras)
+		{
+		    float	ub, vr;
+		    camera.getWhiteBalance(ub, vr);
+		    if (id == IIDCCamera::WHITE_BALANCE)
+			camera.setWhiteBalance(fval, vr);
+		    else
+			camera.setWhiteBalance(ub, fval);
+		}
+	    else
+		for (auto& camera : cameras)
+		{
+		    u_int	ub, vr;
+		    camera.getWhiteBalance(ub, vr);
+		    if (id == IIDCCamera::WHITE_BALANCE)
+			camera.setWhiteBalance(val, vr);
+		    else
+			camera.setWhiteBalance(ub, val);
+		}
+	}
+	return true;
+	
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::AUTO_EXPOSURE + IIDCCAMERA_OFFSET_ONOFF:
       case IIDCCamera::SHARPNESS     + IIDCCAMERA_OFFSET_ONOFF:
@@ -199,8 +226,8 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 	    = &IIDCCamera::setActive;
 	std::for_each(std::begin(cameras), std::end(cameras),
 		      std::bind(pf, std::placeholders::_1,
-				IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ONOFF),
-				bool(val)));
+				IIDCCamera::uintToFeature(
+				    id - IIDCCAMERA_OFFSET_ONOFF), bool(val)));
       }
 	return true;
 
@@ -222,14 +249,14 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_AUTO:
 	std::for_each(std::begin(cameras), std::end(cameras),
 		      std::bind(&IIDCCamera::setAuto, std::placeholders::_1,
-				IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_AUTO),
-				bool(val)));
+				IIDCCamera::uintToFeature(
+				    id - IIDCCAMERA_OFFSET_AUTO), bool(val)));
         return true;
 
       case IIDCCamera::TRIGGER_MODE  + IIDCCAMERA_OFFSET_AUTO:
 	std::for_each(std::begin(cameras), std::end(cameras),
-		      std::bind(&IIDCCamera::setTriggerPolarity, std::placeholders::_1,
-				bool(val)));
+		      std::bind(&IIDCCamera::setTriggerPolarity,
+				std::placeholders::_1, bool(val)));
 	return true;
 
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ABS:
@@ -251,8 +278,8 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ABS:
 	std::for_each(std::begin(cameras), std::end(cameras),
 		      std::bind(&IIDCCamera::setAbsControl, std::placeholders::_1,
-				IIDCCamera::uintToFeature(id - IIDCCAMERA_OFFSET_ABS),
-				bool(val)));
+				IIDCCamera::uintToFeature(
+				    id - IIDCCAMERA_OFFSET_ABS), bool(val)));
         return true;
 
       default:
@@ -274,9 +301,10 @@ setFeature(IIDCCamera& camera, u_int id, u_int val, float fval)
   \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
 */
 template <class CAMERAS>
-typename std::enable_if<std::is_convertible<
-			    typename std::remove_reference<CAMERAS>::type::value_type,
-			    IIDCCamera>::value, bool>::type
+typename std::enable_if<
+	     std::is_convertible<
+		 typename std::remove_reference<CAMERAS>::type::value_type,
+		 IIDCCamera>::value, bool>::type
 syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
 {
     typedef std::pair<uint64_t, typename CAMERAS::iterator>	timestamp_t;

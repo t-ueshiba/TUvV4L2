@@ -41,8 +41,10 @@ HDRSDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../TU/IIDC++.h \
+EXTHDRS		= ../FireWireNode_.h \
+		../TU/IIDC++.h \
 		../TU/IIDCCameraUtility.h \
+		../USBNode_.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Heap.h \
@@ -54,7 +56,6 @@ EXTHDRS		= ../TU/IIDC++.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/algorithm.h \
 		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/tuple.h \
@@ -80,27 +81,36 @@ EXTHDRS		= ../TU/IIDC++.h \
 HDRS		= MyCanvasPane.h \
 		MyCmdWindow.h \
 		testcam.h
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= IIDCCamera.cc \
+		main.cc
+OBJS		= IIDCCamera.o \
+		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# modified: CPPFLAGS, LIBS
 #include $(PROJECT)/lib/cnoid.mk	# modified: CPPFLAGS, LIBS, LIBDIR
 #include $(PROJECT)/lib/lib.mk		# added:    PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/v/vIIDC++.h \
-	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
+IIDCCamera.o: ../FireWireNode_.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
-	../TU/IIDCCameraUtility.h /usr/local/include/TU/algorithm.h \
-	../TU/IIDC++.h /usr/local/include/TU/io.h \
-	/usr/local/include/TU/Heap.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/FileSelection.h \
+	../USBNode_.h
+main.o: /usr/local/include/TU/v/vIIDC++.h \
+	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
+	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/List.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
+	../TU/IIDCCameraUtility.h ../TU/IIDC++.h \
+	/usr/local/include/TU/algorithm.h /usr/local/include/TU/Heap.h \
+	MyCmdWindow.h /usr/local/include/TU/v/App.h \
+	/usr/local/include/TU/v/FileSelection.h \
 	/usr/local/include/TU/v/ModalDialog.h \
 	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/Timer.h \
 	/usr/local/include/TU/Movie.h /usr/local/include/TU/Manip.h testcam.h \
