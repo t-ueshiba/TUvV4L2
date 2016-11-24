@@ -367,6 +367,7 @@ class Cmd : public Object, public CmdParent, public List<Cmd>::Node
     Cmd(Object& parentObject, CmdId id)				;
 
     void	setDefaultCallback(const Widget& widget)	;
+    void	removeDefaultCallback(const Widget& widget)	;
      
   private:
     const CmdId		_id;			// unique ID for this command

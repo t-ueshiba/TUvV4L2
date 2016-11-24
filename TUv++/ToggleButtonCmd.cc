@@ -51,6 +51,8 @@ ToggleButtonCmd::ToggleButtonCmd(Object& parentObject, const CmdDef& cmd)
 
 ToggleButtonCmd::~ToggleButtonCmd()
 {
+    removeDefaultCallback(_widget);
+
     delete _bitmap;
 }
 

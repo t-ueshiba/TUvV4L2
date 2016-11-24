@@ -86,6 +86,7 @@ ListCmd::ListCmd(Object& parentObject, const CmdDef& cmd)
 
 ListCmd::~ListCmd()
 {
+    removeDefaultCallback(_list);
 }
 
 const Object::Widget&

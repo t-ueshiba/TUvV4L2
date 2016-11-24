@@ -172,8 +172,12 @@ Menu::Item::Item(Menu& parentMenu, const MenuDef& menuItem)
 
 Menu::Item::~Item()
 {
-    delete detachCmd();
-
+    Cmd*	submenu = detachCmd();
+    if (submenu != 0)
+	delete submenu;
+    else
+	removeDefaultCallback(_widget);
+    
     if (--_nitems == 0)
     {
 	delete arrowBitmap;
