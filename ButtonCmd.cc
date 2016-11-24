@@ -50,6 +50,7 @@ ButtonCmd::ButtonCmd(Object& parentObject, const CmdDef& cmd)
 ButtonCmd::~ButtonCmd()
 {
     delete _bitmap;
+    removeDefaultCallback(_widget);
 }
 
 const Object::Widget&

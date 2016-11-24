@@ -151,5 +151,11 @@ Cmd::setDefaultCallback(const Widget& widget)
     XtAddCallback(widget, XtNcallback, CBvCmd, (XtPointer)this);
 }
 
+void
+Cmd::removeDefaultCallback(const Widget& widget)
+{
+    XtRemoveCallback(widget, XtNcallback, CBvCmd, (XtPointer)this);
+}
+
 }
 }

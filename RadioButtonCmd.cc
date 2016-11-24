@@ -101,6 +101,8 @@ RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
 
 RadioButtonCmd::~RadioButtonCmd()
 {
+    removeDefaultCallback(_button);
+
     if (--_nitems == 0)
     {
 	delete offBitmap;
