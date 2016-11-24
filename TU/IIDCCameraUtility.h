@@ -62,12 +62,13 @@ constexpr u_int	IIDCCAMERA_ALL		= IIDCCamera::BRIGHTNESS + 2;
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-template <class CAMERAS>
-typename std::enable_if<
-	     std::is_convertible<
-		 typename std::remove_reference<CAMERAS>::type::value_type,
-		 IIDCCamera>::value, bool>::type
+template <class CAMERAS> auto
 setFormat(CAMERAS&& cameras, u_int id, u_int val)
+    -> typename std::enable_if<
+	  std::is_convertible<
+	      typename std::remove_reference<
+		  decltype(*std::begin(cameras))>::type, IIDCCamera>::value,
+	      bool>::type
 {
     switch (id)
     {
@@ -122,12 +123,13 @@ setFormat(IIDCCamera& camera, u_int id, u_int val)
     return setFormat(make_range(&camera, &camera + 1), id, val);
 }
 
-template <class CAMERAS>
-typename std::enable_if<
-	     std::is_convertible<
-		 typename std::remove_reference<CAMERAS>::type::value_type,
-		 IIDCCamera>::value, bool>::type
+template <class CAMERAS> auto
 setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
+    -> typename std::enable_if<
+	  std::is_convertible<
+	      typename std::remove_reference<
+		  decltype(*std::begin(cameras))>::type, IIDCCamera>::value,
+	      bool>::type
 {
     switch (id)
     {
@@ -157,7 +159,8 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 		    = &IIDCCamera::setValue;
 	  
 		std::for_each(std::begin(cameras), std::end(cameras),
-			      std::bind(pf, std::placeholders::_1, feature, fval));
+			      std::bind(pf, std::placeholders::_1,
+					feature, fval));
 	    }
 	    else
 	    {
@@ -165,14 +168,16 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 		    = &IIDCCamera::setValue;
 	  
 		std::for_each(std::begin(cameras), std::end(cameras),
-			      std::bind(pf, std::placeholders::_1, feature, val));
+			      std::bind(pf, std::placeholders::_1,
+					feature, val));
 	    }
 	}
 	return true;
 	
       case IIDCCamera::TRIGGER_MODE:
 	std::for_each(std::begin(cameras), std::end(cameras),
-		      std::bind(&IIDCCamera::setTriggerMode, std::placeholders::_1,
+		      std::bind(&IIDCCamera::setTriggerMode,
+				std::placeholders::_1,
 				IIDCCamera::uintToTriggerMode(val)));
 	return true;
 
@@ -277,7 +282,8 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
       case IIDCCamera::PAN	     + IIDCCAMERA_OFFSET_ABS:
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ABS:
 	std::for_each(std::begin(cameras), std::end(cameras),
-		      std::bind(&IIDCCamera::setAbsControl, std::placeholders::_1,
+		      std::bind(&IIDCCamera::setAbsControl,
+				std::placeholders::_1,
 				IIDCCamera::uintToFeature(
 				    id - IIDCCAMERA_OFFSET_ABS), bool(val)));
         return true;
@@ -300,22 +306,26 @@ setFeature(IIDCCamera& camera, u_int id, u_int val, float fval)
   \param cameras	カメラの配列
   \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
 */
-template <class CAMERAS>
-typename std::enable_if<
-	     std::is_convertible<
-		 typename std::remove_reference<CAMERAS>::type::value_type,
-		 IIDCCamera>::value, bool>::type
+template <class CAMERAS> auto
 syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
+    -> typename std::enable_if<
+	  std::is_convertible<
+	      typename std::remove_reference<
+		  decltype(*std::begin(cameras))>::type,
+	      IIDCCamera>::value>::type
 {
-    typedef std::pair<uint64_t, typename CAMERAS::iterator>	timestamp_t;
+    typedef decltype(std::begin(cameras))	iterator;
+    typedef std::pair<uint64_t, iterator>	timestamp_t;
     
-    Heap<timestamp_t, std::greater<timestamp_t> >	timestamps(size(cameras));
+    Heap<timestamp_t,
+	 std::greater<timestamp_t> >	timestamps(size(cameras));
 
     std::for_each(std::begin(cameras), std::end(cameras),
 		  std::bind(&IIDCCamera::snap, std::placeholders::_1));
 
-    timestamp_t	last(0, nullptr);
-    for (auto camera = std::begin(cameras); camera != std::end(cameras); ++camera)
+    timestamp_t	last(0, std::end(cameras));
+    for (auto camera = std::begin(cameras); camera != std::end(cameras);
+	 ++camera)
     {
 	timestamp_t	timestamp(camera->getTimestamp(), camera);
 	timestamps.push(timestamp);
@@ -323,7 +333,7 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
 	    last = timestamp;
     }
 
-    for (timestamp_t top; last.first - (top = timestamps.pop()).first > maxSkew;
+    for (timestamp_t top; last.first > (top = timestamps.pop()).first + maxSkew;
 	 timestamps.push(last))
 	last = {top.second->snap().getTimestamp(), top.second};
 }
