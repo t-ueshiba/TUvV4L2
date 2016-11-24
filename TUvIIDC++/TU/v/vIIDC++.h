@@ -25,9 +25,10 @@ void		refreshSliderCmd(const IIDCCamera& camera,
 				 CmdId id, CmdPane& cmdPane)			;
     
 template <class CAMERAS>
-typename std::enable_if<std::is_convertible<
-			    typename std::remove_reference<CAMERAS>::type::value_type,
-			    IIDCCamera>::value, bool>::type
+typename std::enable_if<
+	     std::is_convertible<
+		 typename std::remove_reference<CAMERAS>::type::value_type,
+		 IIDCCamera>::value, bool>::type
 setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
 {
     switch (id)
@@ -87,9 +88,10 @@ refreshFeatureCmds(const CAMERAS& cameras, CmdPane& cmdPane)
 }
     
 template <class CAMERAS>
-typename std::enable_if<std::is_convertible<
-			    typename std::remove_reference<CAMERAS>::type::value_type,
-			    IIDCCamera>::value, bool>::type
+typename std::enable_if<
+	     std::is_convertible<
+		 typename std::remove_reference<CAMERAS>::type::value_type,
+		 IIDCCamera>::value, bool>::type
 setFeature(CAMERAS&& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
 {
     auto	camera = std::begin(cameras);
