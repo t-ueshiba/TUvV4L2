@@ -453,7 +453,7 @@ class IIDCCamera
   //! トリガーモードとその名称
     struct TriggerModeName
     {
-	const TriggerMode	mode;		//!< トリガーモード
+	const TriggerMode	triggerMode;	//!< トリガーモード
 	const char* const	name;		//!< 名称
     };
     

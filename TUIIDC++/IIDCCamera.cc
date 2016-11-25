@@ -15,10 +15,10 @@ namespace TU
 *  static functions							*
 ************************************************************************/
 static uint32_t
-triggerModeValue(IIDCCamera::TriggerMode mode)
+triggerModeValue(IIDCCamera::TriggerMode triggerMode)
 {
     uint32_t	val = 0;
-    for (u_int n = mode; n >>= 1; )
+    for (u_int n = triggerMode; n >>= 1; )
 	++val;
 
     return 15 - val;
@@ -426,14 +426,14 @@ IIDCCamera::inquireFrameRate(Format format) const
   \return	このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
+IIDCCamera::setFormatAndFrameRate(Format format, FrameRate frameRate)
 {
 #ifdef DEBUG
     using namespace	std;
     
     cerr << "*** BEGIN [setFormatAndFrameRate] ***" << endl;
 #endif
-    checkAvailability(format, rate);
+    checkAvailability(format, frameRate);
     const u_int	fmt  = (u_int(format) - u_int(YUV444_160x120)) / 0x20,
 		mode = (u_int(format) - u_int(YUV444_160x120)) % 0x20 / 4;
     const auto	cont = inContinuousShot();
@@ -441,7 +441,7 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
     continuousShot(false);
     
     u_int	rt = 0;
-    for (u_int bit = FrameRate_1_875; bit != rate; bit >>= 1)
+    for (u_int bit = FrameRate_1_875; bit != frameRate; bit >>= 1)
 	++rt;
 #ifdef DEBUG
     cerr << "  rt = " << dec << rt << endl;
@@ -1201,16 +1201,16 @@ IIDCCamera::getAimedTemperature() const
 /*!
   実際にカメラが外部トリガによって駆動されるためには, この関数でモード設定
   を行った後に #turnOn(#TRIGGER_MODE) を行わなければならない.
-  \param mode	設定したいトリガモード
-  \return	このIIDCカメラオブジェクト
+  \param triggerMode	設定したいトリガモード
+  \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
-IIDCCamera::setTriggerMode(TriggerMode mode)
+IIDCCamera::setTriggerMode(TriggerMode triggerMode)
 {
-    checkAvailability(TRIGGER_MODE, mode);
+    checkAvailability(TRIGGER_MODE, triggerMode);
     writeQuadletToRegister(TRIGGER_MODE,
 			   (readQuadletFromRegister(TRIGGER_MODE) & ~0xf0000) |
-			   triggerModeValue(mode) << 16);
+			   triggerModeValue(triggerMode) << 16);
     return *this;
 }
 
@@ -2169,13 +2169,13 @@ IIDCCamera::uintToFormat(u_int format)
 
 //! unsinged intの値を同じビットパターンを持つ #FrameRate に直す
 /*!
-  \param rate	#FrameRate に直したいunsigned int値
-  \return	#FrameRate 型のenum値
+  \param frameRate	#FrameRate に直したいunsigned int値
+  \return		#FrameRate 型のenum値
  */
 IIDCCamera::FrameRate
-IIDCCamera::uintToFrameRate(u_int rate)
+IIDCCamera::uintToFrameRate(u_int frameRate)
 {
-    switch (rate)
+    switch (frameRate)
     {
       case FrameRate_1_875:
 	return FrameRate_1_875;
@@ -2705,16 +2705,16 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	<< ' '
 	<< find_if(begin(IIDCCamera::formatNames),	// Write format.
 		   end(IIDCCamera::formatNames),
-		   [&](IIDCCamera::FormatName fmt)
+		   [&](IIDCCamera::FormatName format)
 		   {
-		       return camera.getFormat() == fmt.format;
+		       return camera.getFormat() == format.format;
 		   })->name
 	<< ' '
 	<< find_if(begin(IIDCCamera::frameRateNames),	// Write frame rate.
 		   end(IIDCCamera::frameRateNames),
-		   [&](IIDCCamera::FrameRateName rt)
+		   [&](IIDCCamera::FrameRateName frameRate)
 		   {
-		       return camera.getFrameRate() == rt.frameRate;
+		       return camera.getFrameRate() == frameRate.frameRate;
 		   })->name
 	<< dec;
     
@@ -2745,9 +2745,10 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	      case IIDCCamera::TRIGGER_MODE:
 		out << find_if(begin(IIDCCamera::triggerModeNames),
 			       end(IIDCCamera::triggerModeNames),
-			       [&](IIDCCamera::TriggerModeName mode)
+			       [&](IIDCCamera::TriggerModeName triggerMode)
 			       {
-				   return camera.getTriggerMode() == mode.mode;
+				   return camera.getTriggerMode()
+					      == triggerMode.triggerMode;
 			       })->name;
 		break;
 	      case IIDCCamera::WHITE_BALANCE:
@@ -2862,16 +2863,17 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	  case IIDCCamera::TRIGGER_MODE:
 	  {
 	      in >> s;
-	      const auto mode = find_if(begin(IIDCCamera::triggerModeNames),
+	      const auto
+		  triggerMode = find_if(begin(IIDCCamera::triggerModeNames),
 					end(IIDCCamera::triggerModeNames),
 					[&](IIDCCamera::TriggerModeName md)
 					{
 					    return s == md.name;
 					});
-	      if (mode == end(IIDCCamera::triggerModeNames))
+	      if (triggerMode == end(IIDCCamera::triggerModeNames))
 		  throw runtime_error("IIDCCamera: Unknown trigger mode[" +
 				      s + ']');
-	      camera.setTriggerMode(mode->mode);
+	      camera.setTriggerMode(triggerMode->triggerMode);
 	  }
 	    break;
 	  case IIDCCamera::WHITE_BALANCE:
