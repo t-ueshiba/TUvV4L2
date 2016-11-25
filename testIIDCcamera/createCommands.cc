@@ -39,7 +39,7 @@ namespace TU
 struct CameraAndTriggerMode
 {
     IIDCCamera*				camera;		//!< カメラ
-    const IIDCCamera::TriggerModeName*	mode;		//!< トリガモード
+    const IIDCCamera::TriggerModeName*	triggerMode;	//!< トリガモード
     GtkWidget*				button;
 };
 static CameraAndTriggerMode	cameraAndTriggerModes[IIDCCamera::NTRIGGERMODES];
@@ -191,11 +191,11 @@ CBsetTriggerMode(GtkWidget* item, gpointer userdata)
 {
     const auto	cameraAndTriggerMode
 		    = static_cast<const CameraAndTriggerMode*>(userdata);
-    const auto	camera = cameraAndTriggerMode->camera;
-    const auto	mode   = cameraAndTriggerMode->mode;
-    const auto	button = cameraAndTriggerMode->button;
-    camera->setTriggerMode(mode->mode);
-    gtk_button_set_label(GTK_BUTTON(button), mode->name);
+    const auto	camera	    = cameraAndTriggerMode->camera;
+    const auto	triggerMode = cameraAndTriggerMode->triggerMode;
+    const auto	button	    = cameraAndTriggerMode->button;
+    camera->setTriggerMode(triggerMode->triggerMode);
+    gtk_button_set_label(GTK_BUTTON(button), triggerMode->name);
 }
     
 //! トリガ極性選択ボタンの状態が変更されると呼ばれるコールバック関数．
@@ -349,17 +349,17 @@ createCommands(MyIIDCCamera& camera)
 	    const auto	menu   = gtk_menu_new();
 	    size_t	nmodes = 0;
 	    for (const auto& triggerMode : IIDCCamera::triggerModeNames)
-		if (inq & triggerMode.mode)
+		if (inq & triggerMode.triggerMode)
 		{
-		    if (camera.getTriggerMode() == triggerMode.mode)
+		    if (camera.getTriggerMode() == triggerMode.triggerMode)
 			gtk_button_set_label(GTK_BUTTON(button), triggerMode.name);
 		    const auto
 			item = gtk_menu_item_new_with_label(triggerMode.name);
 		    gtk_menu_append(GTK_MENU(menu), item);
 		  // コールバック関数の登録．
-		    cameraAndTriggerModes[nmodes].camera = &camera;
-		    cameraAndTriggerModes[nmodes].mode   = &triggerMode;
-		    cameraAndTriggerModes[nmodes].button = button;
+		    cameraAndTriggerModes[nmodes].camera      = &camera;
+		    cameraAndTriggerModes[nmodes].triggerMode = &triggerMode;
+		    cameraAndTriggerModes[nmodes].button      = button;
 		    gtk_signal_connect(GTK_OBJECT(item), "activate",
 				       GTK_SIGNAL_FUNC(CBsetTriggerMode),
 				       &cameraAndTriggerModes[nmodes]);
