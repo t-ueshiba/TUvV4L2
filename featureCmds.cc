@@ -201,12 +201,12 @@ createFeatureCmds(const IIDCCamera& camera, size_t ncameras)
 
 	    size_t	nmodes = 0;
 	    for (const auto& triggerMode : IIDCCamera::triggerModeNames)
-		if (inq & triggerMode.mode)
+		if (inq & triggerMode.triggerMode)
 		{
 		    triggerModeMenus[nmodes].label = triggerMode.name;
-		    triggerModeMenus[nmodes].id	   = triggerMode.mode;
+		    triggerModeMenus[nmodes].id	   = triggerMode.triggerMode;
 		    triggerModeMenus[nmodes].checked
-			= (camera.getTriggerMode() == triggerMode.mode);
+			= (camera.getTriggerMode() == triggerMode.triggerMode);
 		    triggerModeMenus[nmodes].submenu = noSub;
 		    ++nmodes;
 		}
