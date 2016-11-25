@@ -710,7 +710,7 @@ IIDCCamera::getFrameRate() const
   \return	 指定されたフォーマットの内容
  */
 IIDCCamera::Format_7_Info
-IIDCCamera::getFormat_7_Info(Format format7)
+IIDCCamera::getFormat_7_Info(Format format7) const
 {
     const auto		base = getFormat_7_BaseAddr(format7);
     quadlet_t		quad;
