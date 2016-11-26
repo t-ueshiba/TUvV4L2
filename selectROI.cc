@@ -23,8 +23,8 @@ class IIDCModalDialog : public ModalDialog
   public:
     IIDCModalDialog(Window& parentWindow, const Format_7_Info& fmt7info);
     
-    PixelFormat		getROI(size_t& u0, size_t& v0,
-			       size_t& width, size_t& height)		;
+    PixelFormat		selectROI(size_t& u0, size_t& v0,
+				  size_t& width, size_t& height)	;
     virtual void	callback(CmdId id, CmdVal val)			;
 
   private:
@@ -34,14 +34,16 @@ class IIDCModalDialog : public ModalDialog
     const Format_7_Info&	_fmt7info;
 };
     
-IIDCModalDialog::IIDCModalDialog(Window& parentWindow, const Format_7_Info& fmt7info)
+IIDCModalDialog::IIDCModalDialog(Window& parentWindow,
+				 const Format_7_Info& fmt7info)
     :ModalDialog(parentWindow, "ROI for Format_7_x", createROICmds(fmt7info)),
      _fmt7info(fmt7info)
 {
 }
     
 IIDCCamera::PixelFormat
-IIDCModalDialog::getROI(size_t& u0, size_t& v0, size_t& width, size_t& height)
+IIDCModalDialog::selectROI(size_t& u0, size_t& v0,
+			   size_t& width, size_t& height)
 {
     show();
     u0		= pane().getValue(c_U0);
@@ -153,8 +155,8 @@ IIDCModalDialog::createROICmds(const Format_7_Info& fmt7info)
 *  global functions							*
 ************************************************************************/
 IIDCCamera::PixelFormat
-getFormat7ROI(IIDCCamera& camera, IIDCCamera::Format format,
-	      size_t& u0, size_t& v0, size_t& width, size_t& height, Window& window)
+selectROI(IIDCCamera& camera, IIDCCamera::Format format,
+	  size_t& u0, size_t& v0, size_t& width, size_t& height, Window& window)
 {
     switch (format)
     {
@@ -167,8 +169,9 @@ getFormat7ROI(IIDCCamera& camera, IIDCCamera::Format format,
       case IIDCCamera::Format_7_6:
       case IIDCCamera::Format_7_7:
       {
-	  IIDCModalDialog	modalDialog(window, camera.getFormat_7_Info(format));
-	  return modalDialog.getROI(u0, v0, width, height);
+	  IIDCModalDialog	modalDialog(window,
+					    camera.getFormat_7_Info(format));
+	  return modalDialog.selectROI(u0, v0, width, height);
       }
 
       default:
