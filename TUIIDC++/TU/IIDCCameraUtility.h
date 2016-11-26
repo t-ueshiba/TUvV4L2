@@ -25,13 +25,12 @@ namespace TU
 class IIDCCameraArray : public Array<IIDCCamera>
 {
   public:
-    typedef IIDCCamera	camera_type;
-
-  public:
   //! デフォルトのカメラ名
-    static constexpr const char* DEFAULT_CAMERA_NAME = "IIDCCamera";
+    static constexpr const char*
+			DEFAULT_CAMERA_NAME = "IIDCCamera";
   //! カメラ設定ファイルを収めるデフォルトのディレクトリ名
-    static constexpr const char* DEFAULT_CONFIG_DIRS = ".:/usr/local/etc/cameras";
+    static constexpr const char*
+			DEFAULT_CONFIG_DIRS = ".:/usr/local/etc/cameras";
     
   public:
     explicit		IIDCCameraArray(size_t ncameras=0)		;
@@ -48,6 +47,36 @@ class IIDCCameraArray : public Array<IIDCCamera>
   private:
     std::string		_fullName;	//!< カメラのfull path名
 };
+
+//! カメラのfull path名を返す.
+/*!
+  \return	カメラのfull path名
+*/
+inline const std::string&
+IIDCCameraArray::fullName() const
+{
+    return _fullName;
+}
+    
+//! カメラ設定ファイル名を返す.
+/*!
+  \return	カメラ設定ファイル名
+*/
+inline std::string
+IIDCCameraArray::configFile() const
+{
+    return _fullName + ".conf";
+}
+    
+//! キャリブレーションファイル名を返す.
+/*!
+  \return	キャリブレーションファイル名
+*/
+inline std::string
+IIDCCameraArray::calibFile() const
+{
+    return _fullName + ".calib";
+}
 
 /************************************************************************
 *  global data								*

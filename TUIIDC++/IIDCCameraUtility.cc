@@ -50,36 +50,6 @@ IIDCCameraArray::save() const
     out << *this;
 }
 
-//! カメラのfull path名を返す.
-/*!
-  \return	カメラのfull path名
-*/
-const std::string&
-IIDCCameraArray::fullName() const
-{
-    return _fullName;
-}
-    
-//! カメラ設定ファイル名を返す.
-/*!
-  \return	カメラ設定ファイル名
-*/
-std::string
-IIDCCameraArray::configFile() const
-{
-    return _fullName + ".conf";
-}
-    
-//! キャリブレーションファイル名を返す.
-/*!
-  \return	キャリブレーションファイル名
-*/
-std::string
-IIDCCameraArray::calibFile() const
-{
-    return _fullName + ".calib";
-}
-
 /************************************************************************
 *  global functions							*
 ************************************************************************/
