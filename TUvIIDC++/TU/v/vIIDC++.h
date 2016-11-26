@@ -14,15 +14,18 @@ namespace v
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-MenuDef*	createFormatMenu(const IIDCCamera& camera)			;
+MenuDef*	createFormatMenu(const IIDCCamera& camera)		;
 IIDCCamera::PixelFormat
-		getFormat7ROI(IIDCCamera& camera, IIDCCamera::Format format7,
-			      size_t& u0, size_t& v0,
-			      size_t& width, size_t& height, Window& window)	;
-CmdDef*		createFeatureCmds(const IIDCCamera& camera, size_t ncameras=1)	;
-void		refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)	;
+		getFormat7ROI(IIDCCamera& camera,
+			      IIDCCamera::Format format7,
+			      size_t& u0, size_t& v0, size_t& width,
+			      size_t& height, Window& window)		;
+CmdDef*		createFeatureCmds(const IIDCCamera& camera,
+				  size_t ncameras=1)			;
+void		refreshFeatureCmds(const IIDCCamera& camera,
+				   CmdPane& cmdPane)			;
 void		refreshSliderCmd(const IIDCCamera& camera,
-				 CmdId id, CmdPane& cmdPane)			;
+				 CmdId id, CmdPane& cmdPane)		;
     
 template <class CAMERAS> auto
 setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
