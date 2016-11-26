@@ -50,7 +50,7 @@ class CmdVal
   public:
     CmdVal(int u=0, int v=0)	:_u(u), _v(v), _f(u)		{}
     template <class T,
-	      class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+	      class=typename std::enable_if<std::is_arithmetic<T>::value>::type>
     CmdVal(T val)		:_u(int(val)), _v(0), _f(val)	{}
     
 		operator int()				const	{return _u;}
@@ -100,6 +100,21 @@ enum CmdAttributes
 
 struct CmdDef
 {
+    CmdDef(CmdType	type_=C_EndOfList,
+	   CmdId	id_=0,
+	   CmdVal	val_=0,
+	   const char*	title_=nullptr,
+	   void*	prop_=nullptr,
+	   u_int	attrs_=CA_None,
+	   size_t	gridx_=0,
+	   size_t	gridy_=0,
+	   size_t	gridWidth_=1,
+	   size_t	gridHeight_=1,
+	   size_t	size_=0)
+	:type(type_), id(id_), val(val_), title(title_),
+	 prop(prop_), attrs(attrs_), gridx(gridx_), gridy(gridy_),
+	 gridWidth(gridWidth_), gridHeight(gridHeight_), size(size_)	{}
+	 
     CmdType	type;		// what kind of item is this
     CmdId	id;		// unique id for the item
     CmdVal	val;		// value returned when picked (might be < 0)
@@ -115,13 +130,19 @@ struct CmdDef
 
 void* const	noProp	= nullptr;
 
-#define EndOfCmds	{C_EndOfList, 0, 0, 0, noProp, CA_None, 0, 0, 0, 0, 0}
+#define EndOfCmds	{C_EndOfList, 0, 0, 0, noProp, CA_None, 0, 0, 1, 1, 0}
 
 /************************************************************************
 *  struct MenuDef							*
 ************************************************************************/
 struct MenuDef
 {
+    MenuDef(const char*	label_=nullptr,
+	    CmdId	id_=0,
+	    bool	checked_=false,
+	    MenuDef*	submenu_=nullptr)
+	:label(label_), id(id_), checked(checked_), submenu(submenu_)	{}
+    
     const char*	label;
     CmdId	id;
     bool	checked;
