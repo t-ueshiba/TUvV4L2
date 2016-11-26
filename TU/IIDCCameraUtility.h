@@ -301,6 +301,9 @@ setFeature(IIDCCamera& camera, u_int id, u_int val, float fval)
     return setFeature(make_range(&camera, &camera + 1), id, val, fval);
 }
 
+bool
+getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)	;
+
 //! 複数のカメラから同期した画像を保持する．
 /*!
   \param cameras	カメラの配列

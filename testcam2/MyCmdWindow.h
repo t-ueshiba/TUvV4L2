@@ -62,6 +62,8 @@ MyCmdWindow<CAMERAS, PIXEL>::MyCmdWindow(App& parentApp, CAMERAS& cameras)
 
     show();
 
+    refreshFeatureCmds(_cameras, _featureCmd);	// カメラ属性の初期値をGUIにセット
+    
     initializeMovie();
     _movie.setCircularMode(true);
 }
