@@ -61,10 +61,10 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 HDRS		= TU/v/vIIDC++.h
 SRCS		= createFormatMenu.cc \
 		featureCmds.cc \
-		getFormat7ROI.cc
+		selectROI.cc
 OBJS		= createFormatMenu.o \
 		featureCmds.o \
-		getFormat7ROI.o
+		selectROI.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -96,7 +96,7 @@ featureCmds.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/IIDCCameraUtility.h \
 	/usr/local/include/TU/IIDC++.h /usr/local/include/TU/algorithm.h \
 	/usr/local/include/TU/Heap.h
-getFormat7ROI.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
+selectROI.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
 	/usr/local/include/TU/List.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \

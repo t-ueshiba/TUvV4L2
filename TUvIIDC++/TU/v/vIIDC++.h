@@ -16,10 +16,10 @@ namespace v
 ************************************************************************/
 MenuDef*	createFormatMenu(const IIDCCamera& camera)		;
 IIDCCamera::PixelFormat
-		getFormat7ROI(IIDCCamera& camera,
-			      IIDCCamera::Format format7,
-			      size_t& u0, size_t& v0, size_t& width,
-			      size_t& height, Window& window)		;
+		selectROI(IIDCCamera& camera,
+			  IIDCCamera::Format format7,
+			  size_t& u0, size_t& v0, size_t& width,
+			  size_t& height, Window& window)		;
 CmdDef*		createFeatureCmds(const IIDCCamera& camera,
 				  size_t ncameras=1)			;
 void		refreshFeatureCmds(const IIDCCamera& camera,
@@ -49,10 +49,8 @@ setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
 	{
 	    const auto	format7 = IIDCCamera::uintToFormat(id);
 	    size_t	u0, v0, width, height;
-	    const auto	pixelFormat = getFormat7ROI(*std::begin(cameras),
-						    format7,
-						    u0, v0, width, height,
-						    window);
+	    const auto	pixelFormat = selectROI(*std::begin(cameras), format7,
+						u0, v0, width, height, window);
 	    for (auto& camera : cameras)
 		camera.setFormat_7_ROI(format7, u0, v0, width, height)
 		      .setFormat_7_PixelFormat(format7, pixelFormat);
