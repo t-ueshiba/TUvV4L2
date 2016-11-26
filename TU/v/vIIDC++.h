@@ -71,8 +71,9 @@ setFormat(IIDCCamera& camera, CmdId id, CmdVal val, Window& window)
 
 template <class CAMERAS> auto
 refreshFeatureCmds(const CAMERAS& cameras, CmdPane& cmdPane)
-    -> typename std::enable_if<std::is_convertible<decltype(*std::begin(cameras)),
-						   const IIDCCamera&>::value>::type
+    -> typename std::enable_if<std::is_convertible<
+				   decltype(*std::begin(cameras)),
+				   const IIDCCamera&>::value>::type
 {
     auto	camera = std::begin(cameras);
     
