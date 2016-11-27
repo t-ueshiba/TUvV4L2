@@ -103,26 +103,26 @@ IIDCModalDialog::createROICmds(const Format_7_Info& fmt7info)
 {
   // Create commands for setting ROI.
     _ranges[0][0] = 0;
-    _ranges[0][1] = fmt7info.maxWidth - 1;
-    _ranges[0][2] = 1;
+    _ranges[0][1] = fmt7info.maxWidth;
+    _ranges[0][2] = fmt7info.unitU0;
     _cmds[0]	  = {C_Slider, c_U0,	 fmt7info.u0,	  "    u0", _ranges[0],
 		     CA_None, 0, 0, 1, 1, 0};
     
     _ranges[1][0] = 0;
-    _ranges[1][1] = fmt7info.maxHeight - 1;
-    _ranges[1][2] = 1;
+    _ranges[1][1] = fmt7info.maxHeight;
+    _ranges[1][2] = fmt7info.unitV0;
     _cmds[1]	  = {C_Slider, c_V0,	 fmt7info.v0,	  "    v0", _ranges[1],
 		     CA_None, 0, 1, 1, 1, 0};
     
     _ranges[2][0] = 0;
-    _ranges[2][1] = fmt7info.maxWidth - 1;
-    _ranges[2][2] = 1;
+    _ranges[2][1] = fmt7info.maxWidth;
+    _ranges[2][2] = fmt7info.unitWidth;
     _cmds[2]	  = {C_Slider, c_Width,  fmt7info.width,  " width", _ranges[2],
 		     CA_None, 0, 2, 1, 1, 0};
     
     _ranges[3][0] = 0;
-    _ranges[3][1] = fmt7info.maxHeight - 1;
-    _ranges[3][2] = 1;
+    _ranges[3][1] = fmt7info.maxHeight;
+    _ranges[3][2] = fmt7info.unitHeight;
     _cmds[3]	  = {C_Slider, c_Height, fmt7info.height, "height", _ranges[3],
 		     CA_None, 0, 3, 1, 1, 0};
 
