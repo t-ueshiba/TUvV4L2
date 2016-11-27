@@ -28,10 +28,14 @@ class IIDCModalDialog : public ModalDialog
     virtual void	callback(CmdId id, CmdVal val)			;
 
   private:
-    static CmdDef*	createROICmds(const Format_7_Info& fmt7info)	;
+    CmdDef*		createROICmds(const Format_7_Info& fmt7info)	;
     
   private:
     const Format_7_Info&	_fmt7info;
+    float			_ranges[4][3];
+    MenuDef			_pixelFormatMenus[IIDCCamera::NPIXELFORMATS+1];
+    CmdDef			_cmds[7];
+    
 };
     
 IIDCModalDialog::IIDCModalDialog(Window& parentWindow,
@@ -97,58 +101,51 @@ IIDCModalDialog::callback(CmdId id, CmdVal val)
 CmdDef*
 IIDCModalDialog::createROICmds(const Format_7_Info& fmt7info)
 {
-    static float	prop[4][3];
-    static MenuDef	pixelFormatMenus[IIDCCamera::NPIXELFORMATS + 1];
-    static CmdDef	cmds[] =
-    {
-	{C_Slider, c_U0, fmt7info.u0, "    u0", prop[0],
-	 CA_None, 0, 0, 1, 1, 0},
-	{C_Slider, c_V0, fmt7info.v0, "    v0", prop[1],
-	 CA_None, 0, 1, 1, 1, 0},
-	{C_Slider, c_Width, fmt7info.width, " width", prop[2],
-	 CA_None, 0, 2, 1, 1, 0},
-	{C_Slider, c_Height, fmt7info.height, "height", prop[3],
-	 CA_None, 0, 3, 1, 1, 0},
-	{C_ChoiceMenuButton, c_PixelFormat, 0, "pixel format", pixelFormatMenus,
-	 CA_None, 0, 4, 1, 1, 0},
-	{C_Button, c_OK, 0, "OK", noProp,
-	 CA_None, 0, 5, 1, 1, 0},
-	EndOfCmds
-    };
-
   // Create commands for setting ROI.
-    cmds[0].val = fmt7info.u0;
-    prop[0][0]  = 0;
-    prop[0][1]  = fmt7info.maxWidth - 1;
-    prop[0][2]  = 1;
-    cmds[1].val = fmt7info.v0;
-    prop[1][0]  = 0;
-    prop[1][1]  = fmt7info.maxHeight - 1;
-    prop[1][2]  = 1;
-    cmds[2].val = fmt7info.width;
-    prop[2][0]  = 0;
-    prop[2][1]  = fmt7info.maxWidth;
-    prop[2][2]  = 1;
-    cmds[3].val = fmt7info.height;
-    prop[3][0]  = 0;
-    prop[3][1]  = fmt7info.maxHeight;
-    prop[3][2]  = 1;
+    _ranges[0][0] = 0;
+    _ranges[0][1] = fmt7info.maxWidth - 1;
+    _ranges[0][2] = 1;
+    _cmds[0]	  = {C_Slider, c_U0,	 fmt7info.u0,	  "    u0", _ranges[0],
+		     CA_None, 0, 0, 1, 1, 0};
     
+    _ranges[1][0] = 0;
+    _ranges[1][1] = fmt7info.maxHeight - 1;
+    _ranges[1][2] = 1;
+    _cmds[1]	  = {C_Slider, c_V0,	 fmt7info.v0,	  "    v0", _ranges[1],
+		     CA_None, 0, 1, 1, 1, 0};
+    
+    _ranges[2][0] = 0;
+    _ranges[2][1] = fmt7info.maxWidth - 1;
+    _ranges[2][2] = 1;
+    _cmds[2]	  = {C_Slider, c_Width,  fmt7info.width,  " width", _ranges[2],
+		     CA_None, 0, 2, 1, 1, 0};
+    
+    _ranges[3][0] = 0;
+    _ranges[3][1] = fmt7info.maxHeight - 1;
+    _ranges[3][2] = 1;
+    _cmds[3]	  = {C_Slider, c_Height, fmt7info.height, "height", _ranges[3],
+		     CA_None, 0, 3, 1, 1, 0};
+
+    _cmds[4]	  = {C_ChoiceMenuButton, c_PixelFormat, 0, "pixel format",
+		     _pixelFormatMenus, CA_None, 0, 4, 1, 1, 0};
+    _cmds[5]	  = {C_Button, c_OK, 0, "OK", noProp, CA_None, 0, 5, 1, 1, 0},
+    _cmds[6]	  = EndOfCmds;
+
   // Create a menu button for setting pixel format.
     size_t	npixelformats = 0;
     for (const auto& pixelFormat : IIDCCamera::pixelFormatNames)
 	if (fmt7info.availablePixelFormats & pixelFormat.pixelFormat)
 	{
-	    pixelFormatMenus[npixelformats].label = pixelFormat.name;
-	    pixelFormatMenus[npixelformats].id	  = pixelFormat.pixelFormat;
-	    pixelFormatMenus[npixelformats].checked
+	    _pixelFormatMenus[npixelformats].label = pixelFormat.name;
+	    _pixelFormatMenus[npixelformats].id	   = pixelFormat.pixelFormat;
+	    _pixelFormatMenus[npixelformats].checked
 		= (fmt7info.pixelFormat == pixelFormat.pixelFormat);
-	    pixelFormatMenus[npixelformats].submenu = noSub;
+	    _pixelFormatMenus[npixelformats].submenu = noSub;
 	    ++npixelformats;
 	}
-    pixelFormatMenus[npixelformats].label = nullptr;
+    _pixelFormatMenus[npixelformats].label = nullptr;
     
-    return cmds;
+    return _cmds;
 }
 
 /************************************************************************
