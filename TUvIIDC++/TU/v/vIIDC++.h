@@ -5,7 +5,7 @@
 #define __TU_V_VIIDCPP_H
 
 #include "TU/v/CmdPane.h"
-#include "TU/IIDCCameraUtility.h"
+#include "TU/IIDCCameraArray.h"
 
 namespace TU
 {
@@ -113,10 +113,10 @@ setFeature(CAMERAS&& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
 	!cmdPane.getValue(IIDCCAMERA_ALL))	// 全カメラ操作モードでなければ...
     {
 	std::advance(camera, cmdPane.getValue(IIDCCAMERA_CHOICE));
-	if (!setFeature(*camera, id, int(val), val.f()))   // 選択カメラの属性を設定
+	if (!setFeature(*camera, id, int(val), val.f()))   // 選択カメラの属性設定
 	    return false;
     }
-    else if (!setFeature(cameras, id, int(val), val.f()))  // 全カメラの属性を設定
+    else if (!setFeature(cameras, id, int(val), val.f()))  // 全カメラの属性設定
 	return false;
     
   // idが属性の絶対値指定でなければGUIを更新する必要はない
