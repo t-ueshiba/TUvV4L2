@@ -211,7 +211,8 @@ refreshFeatureCmds(const IIDCCamera& camera, CmdPane& cmdPane)
 	    if ((id >= IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ONOFF) ||
 		(id == IIDCCamera::TRIGGER_MODE))
 		cmdPane.setValue(id, val);
-	    else
+	  // White bal.(V/R)は id == WHITE_BALANDE の時に一緒にrefreshされる
+	    else if (id != IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR)
 		refreshSliderCmd(camera, id, cmdPane);
 	}
     }
