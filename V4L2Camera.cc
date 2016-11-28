@@ -58,6 +58,7 @@ V4L2Camera::V4L2Camera(V4L2Camera&& camera)
      _inContinuousShot(camera._inContinuousShot),
      _arrivaltime(camera._arrivaltime)
 {
+    camera._fd = -1;	// cameraが破壊される時にcamera._fdのcloseを抑制
 }
     
 //! 移動代入演算子
@@ -76,6 +77,8 @@ V4L2Camera::operator =(V4L2Camera&& camera)
     _inContinuousShot	= camera._inContinuousShot;
     _arrivaltime	= camera._arrivaltime;
 
+    camera._fd = -1;	// cameraが破壊される時にcamera._fdのcloseを抑制
+    
     return *this;
 }
     
