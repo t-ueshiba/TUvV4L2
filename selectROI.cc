@@ -19,15 +19,15 @@ class MyModalDialog : public ModalDialog
   public:
     MyModalDialog(Window& parentWindow, const V4L2Camera& camera)	;
     
-    void		getROI(size_t& u0, size_t& v0,
-			       size_t& width, size_t& height)		;
+    void		selectROI(size_t& u0, size_t& v0,
+				  size_t& width, size_t& height)	;
     virtual void	callback(CmdId id, CmdVal val)			;
 
   private:
     CmdDef*		createROICmds(const V4L2Camera& camera)		;
 
   private:
-    int		_props[4][3];
+    float	_ranges[4][3];
     CmdDef	_cmds[6];
 };
     
@@ -37,7 +37,7 @@ MyModalDialog::MyModalDialog(Window& parentWindow, const V4L2Camera& camera)
 }
     
 void
-MyModalDialog::getROI(size_t& u0, size_t& v0, size_t& width, size_t& height)
+MyModalDialog::selectROI(size_t& u0, size_t& v0, size_t& width, size_t& height)
 {
     show();
     u0	   = pane().getValue(c_U0);
@@ -66,33 +66,33 @@ MyModalDialog::createROICmds(const V4L2Camera& camera)
     camera.getROI(u0, v0, width, height);
     
   // Create commands for setting ROI.
-    _props[0][0] = minU0;
-    _props[0][1] = maxWidth - minU0 - 1;
-    _props[0][2] = 1;
-    _cmds[0]	 = {C_Slider, c_U0,	int(u0),     "    u0", _props[0],
-		    CA_None, 0, 0, 1, 1, 0};
+    _ranges[0][0] = minU0;
+    _ranges[0][1] = maxWidth - 1;
+    _ranges[0][2] = 1;
+    _cmds[0]	  = {C_Slider, c_U0,	 int(u0),     "    u0", _ranges[0],
+		     CA_None, 0, 0, 1, 1, 0};
 
-    _props[1][0] = minV0;
-    _props[1][1] = maxHeight - minV0 - 1;
-    _props[1][2] = 1;
-    _cmds[1]	 = {C_Slider, c_V0,	int(v0),     "    v0", _props[1],
-		    CA_None, 0, 1, 1, 1, 0};
+    _ranges[1][0] = minV0;
+    _ranges[1][1] = maxHeight - 1;
+    _ranges[1][2] = 1;
+    _cmds[1]	  = {C_Slider, c_V0,	 int(v0),     "    v0", _ranges[1],
+		     CA_None, 0, 1, 1, 1, 0};
 
-    _props[2][0] = 0;
-    _props[2][1] = maxWidth;
-    _props[2][2] = 1;
-    _cmds[2]	 = {C_Slider, c_Width,	int(width),  " width", _props[2],
-		    CA_None, 0, 2, 1, 1, 0};
+    _ranges[2][0] = 0;
+    _ranges[2][1] = maxWidth;
+    _ranges[2][2] = 1;
+    _cmds[2]	  = {C_Slider, c_Width,	 int(width),  " width", _ranges[2],
+		     CA_None, 0, 2, 1, 1, 0};
     
-    _props[3][0] = 0;
-    _props[3][1] = maxHeight;
-    _props[3][2] = 1;
-    _cmds[3]	 = {C_Slider, c_Height,	int(height), "height", _props[3],
-		    CA_None, 0, 3, 1, 1, 0};
+    _ranges[3][0] = 0;
+    _ranges[3][1] = maxHeight;
+    _ranges[3][2] = 1;
+    _cmds[3]	  = {C_Slider, c_Height, int(height), "height", _ranges[3],
+		     CA_None, 0, 3, 1, 1, 0};
 
-    _cmds[4]	 = {C_Button, c_OK, 0, "OK", noProp,
-		    CA_None, 0, 4, 1, 1, 0};
-    _cmds[5]	 = EndOfCmds;
+    _cmds[4]	  = {C_Button, c_OK, 0, "OK", noProp,
+		     CA_None, 0, 4, 1, 1, 0};
+    _cmds[5]	  = EndOfCmds;
 	
     return _cmds;
 }
@@ -101,44 +101,22 @@ MyModalDialog::createROICmds(const V4L2Camera& camera)
 *  global functions							*
 ************************************************************************/
 bool
-setSpecialFormat(V4L2Camera& camera, u_int id, int val, Window& window)
+selectROI(V4L2Camera& camera, u_int id,
+	  size_t& u0, size_t& v0, size_t& width, size_t& height, Window& window)
 {
     if (id == V4L2Camera::UNKNOWN_PIXEL_FORMAT)
     {
-	size_t	u0, v0, width, height;
 	if (camera.getROI(u0, v0, width, height))
 	{
 	    MyModalDialog	modalDialog(window, camera);
-	    modalDialog.getROI(u0, v0, width, height);
+	    modalDialog.selectROI(u0, v0, width, height);
 	    camera.setROI(u0, v0, width, height);
 	}
 
 	return true;
     }
-
-    return false;
-}
-
-bool
-setSpecialFormat(const Array<V4L2Camera*>& cameras,
-		 u_int id, int val, Window& window)
-{
-    if (id == V4L2Camera::UNKNOWN_PIXEL_FORMAT)
-    {
-	size_t	u0, v0, width, height;
-	if (cameras[0]->getROI(u0, v0, width, height))
-	{
-	    MyModalDialog	modalDialog(window, *cameras[0]);
-	    modalDialog.getROI(u0, v0, width, height);
-
-	    for (size_t i = 0; i < cameras.size(); ++i)
-		cameras[i]->setROI(u0, v0, width, height);
-	}
-
-	return true;
-    }
-
-    return false;
+    else
+	return false;
 }
 
 }
