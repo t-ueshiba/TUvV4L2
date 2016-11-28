@@ -1,114 +1,52 @@
 /*
- *  $Id: V4L2CameraArray.cc 1219 2012-11-09 05:45:49Z ueshiba $
+ *  $Id$
  */
-#include <cstdlib>
-#include "TU/V4L2CameraArray.h"
+#include "TU/V4L2CameraUtility.h"
+#include "TU/io.h"
 
 namespace TU
 {
 /************************************************************************
 *  class V4L2CameraArray						*
 ************************************************************************/
-//! 空のIEEE1394デジタルカメラの配列を生成する.
-V4L2CameraArray::V4L2CameraArray()
-    :Array<V4L2Camera*>()
+constexpr const char*	V4L2CameraArray::DEFAULT_CAMERA_NAME;
+constexpr const char*	V4L2CameraArray::DEFAULT_CONFIG_DIRS;
+    
+//! 空のVideo for Linux v.2カメラの配列を生成する.
+V4L2CameraArray::V4L2CameraArray(size_t ncameras)
+    :Array<V4L2Camera>(ncameras), _fullName()
 {
 }
     
-//! IEEE1394デジタルカメラの配列を生成する.
+//! 設定ファイルを読み込んでVideo for Linux v.2カメラの配列を初期化する.
 /*!
   \param name		カメラ名
   \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
-  \param ncameras	生成するカメラ台数. 設定ファイルに記されている最初の
-			ncameras台が生成される. -1を指定すると, 設定ファイル
-			中の全カメラが生成される. 
-*/
-V4L2CameraArray::V4L2CameraArray(const char* name, const char* dirs,
-				 int ncameras)
-    :Array<V4L2Camera*>(), _fullName()
-{
-    initialize(name, dirs, ncameras);
-}
-    
-//! IEEE1394デジタルカメラの配列を初期化する.
-/*!
-  \param name		カメラ名
-  \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
-  \param ncameras	生成するカメラ台数. 設定ファイルに記されている最初の
-			ncameras台が生成される. -1を指定すると, 設定ファイル
-			中の全カメラが生成される. 
 */
 void
-V4L2CameraArray::initialize(const char* name, const char* dirs, int ncameras)
+V4L2CameraArray::restore(const char* name, const char* dirs)
 {
-    using namespace	std;
-    
   // 設定ファイルのfull path名を生成し, ファイルをオープンする.
-    ifstream	in;
+    std::ifstream	in;
     _fullName = openFile(in,
-			 string(name != 0 ? name : TU_V4L2_DEFAULT_CAMERA_NAME),
-			 string(dirs != 0 ? dirs : TU_V4L2_DEFAULT_CONFIG_DIRS),
+			 std::string(name ? name : DEFAULT_CAMERA_NAME),
+			 std::string(dirs ? dirs : DEFAULT_CONFIG_DIRS),
 			 ".conf");
     
-  // 設定ファイルから遅延パラメータとカメラ数を読み込む.
-    int	n;
-    in >> n;
-    if ((ncameras < 0) || (ncameras > n))
-	ncameras = n;
-    
   // 設定ファイルに記された全カメラを生成する.
-    restore(in, ncameras);
+    in >> *this;
 }
 
-//! IEEE1394デジタルカメラの配列を破壊する.
-V4L2CameraArray::~V4L2CameraArray()
+//! 設定ファイルにVideo for Linux v.2カメラ配列の設定を書き込む.
+void
+V4L2CameraArray::save() const
 {
-    for (size_t i = 0; i < size(); ++i)
-	delete (*this)[i];
-}
+    std::ofstream	out(configFile().c_str());
+    if (!out)
+	throw std::runtime_error("V4L2CameraArray::save(): cannot open " +
+				 configFile());
 
-std::istream&
-V4L2CameraArray::restore(std::istream& in, int ncameras)
-{
-  // 現在設定されている全カメラを廃棄する.
-    for (size_t i = 0; i < size(); ++i)
-	delete (*this)[i];
-
-  // カメラ数を設定する．
-    resize(ncameras);
-    
-  // 設定ファイルに記された全カメラを生成する.
-    for (size_t i = 0; i < size(); ++i)
-    {
-	std::string	dev;
-	in >> dev;			// device file名の読み込み
-	(*this)[i] = new V4L2Camera(dev.c_str());
-	in >> *(*this)[i];		// カメラパラメータの読み込みと設定
-    }
-
-    return in;
+    out << *this;
 }
     
-/************************************************************************
-*  global functions							*
-************************************************************************/
-std::istream&
-operator >>(std::istream& in, V4L2CameraArray& cameras)
-{
-    int	n;
-    in >> n;		// カメラ数を読み込む.
-
-    return cameras.restore(in, n);
-}
-
-std::ostream&
-operator <<(std::ostream& out, const V4L2CameraArray& cameras)
-{
-    out << cameras.size() << std::endl;
-    for (size_t i = 0; i < cameras.size(); ++i)
-	out << cameras[i]->dev() << ' ' << *cameras[i];
-
-    return out;
-}
-
 }

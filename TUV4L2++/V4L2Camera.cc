@@ -17,100 +17,6 @@ namespace TU
 ************************************************************************/
 static const int	CONTROL_IO_ERROR_RETRIES = 2;
 static const int	NB_BUFFERS		 = 4;
-static const struct
-{
-    V4L2Camera::Feature	feature;
-    const char*		name;
-} features[] =
-{
-    {V4L2Camera::BRIGHTNESS,			"BRIGHTNESS"},
-    {V4L2Camera::BRIGHTNESS_AUTO,		"BRIGHTNESS_AUTO"},
-    {V4L2Camera::CONTRAST,			"CONTRAST"},
-    {V4L2Camera::GAIN,				"GAIN"},
-    {V4L2Camera::GAIN_AUTO,			"GAIN_AUTO"},
-    {V4L2Camera::SATURATION,			"SATURATION"},
-    {V4L2Camera::HUE,				"HUE"},
-    {V4L2Camera::HUE_AUTO,			"HUE_AUTO"},
-    {V4L2Camera::GAMMA,				"GAMMA"},
-    {V4L2Camera::SHARPNESS,			"SHARPNESS"},
-    {V4L2Camera::BLACK_LEVEL,			"BLACK_LEVEL"},
-    {V4L2Camera::WHITE_BALANCE_TEMPERATURE,	"WHITE_BALANCE_TEMPERATURE"},
-    {V4L2Camera::WHITE_BALANCE_AUTO,		"WHITE_BALANCE_AUTO"},
-    {V4L2Camera::RED_BALANCE,			"RED_BALANCE"},
-    {V4L2Camera::BLUE_BALANCE,			"BLUE_BALANCE"},
-    {V4L2Camera::HFLIP,				"HFLIP"},
-    {V4L2Camera::VFLIP,				"VFLIP"},
-    {V4L2Camera::BACKLIGHT_COMPENSATION,	"BACKLIGHT_COMPENSATION"},
-    {V4L2Camera::POWER_LINE_FREQUENCY,		"POWER_LINE_FREQUENCY"},
-    {V4L2Camera::EXPOSURE_AUTO,			"EXPOSURE_AUTO"},
-    {V4L2Camera::EXPOSURE_AUTO_PRIORITY,	"EXPOSURE_AUTO_PRIORITY"},
-    {V4L2Camera::EXPOSURE_ABSOLUTE,		"EXPOSURE_ABSOLUTE"},
-    {V4L2Camera::FOCUS_ABSOLUTE,		"FOCUS_ABSOLUTE"},
-    {V4L2Camera::FOCUS_RELATIVE,		"FOCUS_RELATIVE"},
-    {V4L2Camera::FOCUS_AUTO,			"FOCUS_AUTO"},
-    {V4L2Camera::ZOOM_ABSOLUTE,			"ZOOM_ABSOLUTE"},
-    {V4L2Camera::ZOOM_RELATIVE,			"ZOOM_RELATIVE"},
-    {V4L2Camera::ZOOM_CONTINUOUS,		"ZOOM_CONTINUOUS"},
-#ifdef V4L2_CID_IRIS_ABSOLUTE
-    {V4L2Camera::IRIS_ABSOLUTE,			"IRIS_ABSOLUTE"},
-#endif
-#ifdef V4L2_CID_IRIS_RELATIVE
-    {V4L2Camera::IRIS_RELATIVE,			"IRIS_RELATIVE"},
-#endif
-    {V4L2Camera::PAN_ABSOLUTE,			"PAN_ABSOLUTE"},
-    {V4L2Camera::PAN_RELATIVE,			"PAN_RELATIVE"},
-    {V4L2Camera::PAN_RESET,			"PAN_RESET"},
-    {V4L2Camera::TILT_ABSOLUTE,			"TILT_ABSOLUTE"},
-    {V4L2Camera::TILT_RELATIVE,			"TILT_RELATIVE"},
-    {V4L2Camera::TILT_RESET,			"TILT_RESET"},
-
-    {V4L2Camera::CID_PRIVATE0,			"CID_PRIVATE0"},
-    {V4L2Camera::CID_PRIVATE1,			"CID_PRIVATE1"},
-    {V4L2Camera::CID_PRIVATE2,			"CID_PRIVATE2"},
-    {V4L2Camera::CID_PRIVATE3,			"CID_PRIVATE3"},
-    {V4L2Camera::CID_PRIVATE4,			"CID_PRIVATE4"},
-    {V4L2Camera::CID_PRIVATE5,			"CID_PRIVATE5"},
-    {V4L2Camera::CID_PRIVATE6,			"CID_PRIVATE6"},
-    {V4L2Camera::CID_PRIVATE7,			"CID_PRIVATE7"},
-    {V4L2Camera::CID_PRIVATE8,			"CID_PRIVATE8"},
-    {V4L2Camera::CID_PRIVATE9,			"CID_PRIVATE9"},
-    {V4L2Camera::CID_PRIVATE10,			"CID_PRIVATE10"},
-    {V4L2Camera::CID_PRIVATE11,			"CID_PRIVATE11"},
-    {V4L2Camera::CID_PRIVATE12,			"CID_PRIVATE12"},
-    {V4L2Camera::CID_PRIVATE13,			"CID_PRIVATE13"},
-    {V4L2Camera::CID_PRIVATE14,			"CID_PRIVATE14"},
-    {V4L2Camera::CID_PRIVATE15,			"CID_PRIVATE15"},
-    {V4L2Camera::CID_PRIVATE16,			"CID_PRIVATE16"},
-    {V4L2Camera::CID_PRIVATE17,			"CID_PRIVATE17"},
-    {V4L2Camera::CID_PRIVATE18,			"CID_PRIVATE18"},
-    {V4L2Camera::CID_PRIVATE19,			"CID_PRIVATE19"},
-    {V4L2Camera::CID_PRIVATE20,			"CID_PRIVATE20"},
-    {V4L2Camera::CID_PRIVATE21,			"CID_PRIVATE21"},
-    {V4L2Camera::CID_PRIVATE22,			"CID_PRIVATE22"},
-    {V4L2Camera::CID_PRIVATE23,			"CID_PRIVATE23"},
-    {V4L2Camera::CID_PRIVATE24,			"CID_PRIVATE24"},
-    {V4L2Camera::CID_PRIVATE25,			"CID_PRIVATE25"},
-    {V4L2Camera::CID_PRIVATE26,			"CID_PRIVATE26"},
-    {V4L2Camera::CID_PRIVATE27,			"CID_PRIVATE27"},
-    {V4L2Camera::CID_PRIVATE28,			"CID_PRIVATE28"},
-    {V4L2Camera::CID_PRIVATE29,			"CID_PRIVATE29"},
-};
-static const int	NFEATURES = sizeof(features) / sizeof(features[0]);
-
-/************************************************************************
-*  static functions							*
-************************************************************************/
-static int
-v4l2_get_fd(const char* dev)
-{
-    using namespace	std;
-    
-    int		fd = ::open(dev, O_RDWR);
-    if (fd < 0)
-	throw runtime_error(string("TU::v4l2_get_fd(): failed to open ")
-			    + dev + "!! " + strerror(errno));
-    return fd;
-}
 
 /************************************************************************
 *  class V4L2Camera							*
@@ -120,15 +26,93 @@ v4l2_get_fd(const char* dev)
  */
 //! Video for Linux v.2 カメラノードを生成する
 /*!
-  \param dev	デバイス名
+  カメラデバイスと結びつけて使用するには initialize() する必要がある
 */
-V4L2Camera::V4L2Camera(const char* dev)
-    :_fd(v4l2_get_fd(dev)), _dev(dev), _formats(), _controls(),
+V4L2Camera::V4L2Camera()
+    :_fd(-1), _dev(), _formats(), _controls(),
      _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
      _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime(0)
 {
+}
+    
+//! Video for Linux v.2 カメラノードを生成する
+/*!
+  \param dev	デバイス名
+*/
+V4L2Camera::V4L2Camera(const char* dev)
+    :_fd(-1), _dev(), _formats(), _controls(),
+     _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
+     _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime(0)
+{
+    initialize(dev);
+}
+
+//! 移動コンストラクタ
+V4L2Camera::V4L2Camera(V4L2Camera&& camera)
+    :_fd(camera._fd), _dev(std::move(camera._dev)),
+     _formats(std::move(camera._formats)),
+     _controls(std::move(camera._controls)),
+     _width(camera._width), _height(camera._height),
+     _pixelFormat(camera._pixelFormat),
+     _buffers(std::move(camera._buffers)), _current(camera._current),
+     _inContinuousShot(camera._inContinuousShot),
+     _arrivaltime(camera._arrivaltime)
+{
+}
+    
+//! 移動代入演算子
+V4L2Camera&
+V4L2Camera::operator =(V4L2Camera&& camera)
+{
+    _fd			= camera._fd;
+    _dev		= std::move(camera._dev);
+    _formats		= std::move(camera._formats);
+    _controls		= std::move(camera._controls);
+    _width		= camera._width;
+    _height		= camera._height;
+    _pixelFormat	= camera._pixelFormat;
+    _buffers		= std::move(camera._buffers);
+    _current		= camera._current;
+    _inContinuousShot	= camera._inContinuousShot;
+    _arrivaltime	= camera._arrivaltime;
+
+    return *this;
+}
+    
+//! Video for Linux v.2 カメラノードを破壊する
+V4L2Camera::~V4L2Camera()
+{
+    if (_fd >= 0)
+    {
+	continuousShot(false);
+	close(_fd);
+    }
+}
+
+//! Video for Linux v.2 カメラを初期化して使用可能な状態にする
+/*!
+  \param dev	デバイス名
+  \return	このVideo for Linux v.2カメラノード
+*/
+V4L2Camera&
+V4L2Camera::initialize(const char* dev)
+{
     using namespace	std;
 
+    if (_fd >= 0)
+    {
+	continuousShot(false);
+	close(_fd);
+    }
+    
+  // デバイスをオープン
+    _fd = ::open(dev, O_RDWR);
+    if (_fd < 0)
+	throw runtime_error(string("V4L2Camera::initialize(): failed to open ")
+			    + dev + "!! " + strerror(errno));
+
+    _dev = dev;
+    
   // デバイスの能力を調査
     v4l2_capability	cap;
     memset(&cap, 0, sizeof(cap));
@@ -143,7 +127,7 @@ V4L2Camera::V4L2Camera(const char* dev)
     enumerateControls();	// カメラのコントロール=属性
 
   // このカメラのどの画素フォーマットも本ライブラリで未サポートならば例外を送出
-    PixelFormatRange	pixelFormats = availablePixelFormats();
+    const auto	pixelFormats = availablePixelFormats();
     if (pixelFormats.first == pixelFormats.second)
 	throw runtime_error("V4L2Camera::V4L2Camera(): no available pixel formats!");
     
@@ -166,25 +150,18 @@ V4L2Camera::V4L2Camera(const char* dev)
     if (_pixelFormat == UNKNOWN_PIXEL_FORMAT)
     {
 	_pixelFormat = *pixelFormats.first;
-	const FrameSize&
-	    frameSize = *availableFrameSizes(_pixelFormat).first;
+	const auto&	frameSize = *availableFrameSizes(_pixelFormat).first;
 	_width  = frameSize.width.max;
 	_height = frameSize.height.max;
-	const FrameRate&
-	    frameRate = *frameSize.availableFrameRates().first;
+	const auto&	frameRate = *frameSize.availableFrameRates().first;
 	fps_n = frameRate.fps_n.min;
 	fps_d = frameRate.fps_d.max;
     }
     
   // 画素フォーマット，画像サイズ，フレームレートをセット
     setFormat(_pixelFormat, _width, _height, fps_n, fps_d);
-}
 
-//! Video for Linux v.2カメラオブジェクトを破壊する
-V4L2Camera::~V4L2Camera()
-{
-    continuousShot(false);
-    close(_fd);
+    return *this;
 }
 
 /*
@@ -198,7 +175,7 @@ V4L2Camera::~V4L2Camera()
 bool
 V4L2Camera::isAvailable(PixelFormat pixelFormat) const
 {
-    BOOST_FOREACH (const Format& format, _formats)
+    BOOST_FOREACH (const auto& format, _formats)
 	if (format.pixelFormat != UNKNOWN_PIXEL_FORMAT &&
 	    format.pixelFormat == pixelFormat)
 	    return true;
@@ -222,13 +199,12 @@ V4L2Camera::setFormat(PixelFormat pixelFormat, size_t width, size_t height,
     using namespace	std;
 
   // 指定された画素フォーマット，画像サイズ，フレーム間隔の組み合わせが有効かチェック
-    BOOST_FOREACH (const FrameSize& frameSize,
-		   availableFrameSizes(pixelFormat))
+    BOOST_FOREACH (const auto& frameSize, availableFrameSizes(pixelFormat))
     {
 	if (frameSize.width .involves(width) &&
 	    frameSize.height.involves(height))
 	{
-	    BOOST_FOREACH (const FrameRate& frameRate,
+	    BOOST_FOREACH (const auto& frameRate,
 			   frameSize.availableFrameRates())
 	    {
 		if (frameRate.fps_n.involves(fps_n) &&
@@ -314,7 +290,7 @@ V4L2Camera::setROI(size_t u0, size_t v0, size_t width, size_t height)
 {
     using namespace	std;
 
-    const bool	cont = inContinuousShot();
+    const auto	cont = inContinuousShot();
     continuousShot(false);
 
     unmapBuffers();
@@ -417,7 +393,7 @@ V4L2Camera::getROILimits(size_t& minU0, size_t& minV0,
 bool
 V4L2Camera::isAvailable(Feature feature) const
 {
-    BOOST_FOREACH (const Control& control, _controls)
+    BOOST_FOREACH (const auto& control, _controls)
 	if (control.feature != UNKNOWN_FEATURE && control.feature == feature)
 	    return true;
 
@@ -435,7 +411,7 @@ V4L2Camera::setValue(Feature feature, int value)
 {
     using namespace	std;
     
-    const Control&	control = featureToControl(feature);
+    const auto&	control = featureToControl(feature);
     
     if (control.flags & V4L2_CTRL_FLAG_READ_ONLY)
 	throw runtime_error("V4L2Camera::setValue(): read only feature!! ");
@@ -466,7 +442,7 @@ V4L2Camera::getValue(Feature feature) const
 {
     using namespace	std;
     
-    const Control&	control = featureToControl(feature);
+    const auto&	control = featureToControl(feature);
 
     if (control.flags & V4L2_CTRL_FLAG_WRITE_ONLY)
 	throw runtime_error("V4L2Camera::getValue(): write only feature!! ");
@@ -490,7 +466,7 @@ V4L2Camera::getValue(Feature feature) const
 void
 V4L2Camera::getMinMaxStep(Feature feature, int& min, int& max, int& step) const
 {
-    const Control&	control = featureToControl(feature);
+    const auto&	control = featureToControl(feature);
 
     min  = control.range.min;
     max  = control.range.max;
@@ -693,7 +669,7 @@ V4L2Camera::captureRGBImage(Image<T>& image) const
 {
     if (_current == ~0)
 	throw std::runtime_error("TU::V4L2Camera::captureRGBImage: no images snapped!!");
-    const u_char* const	img = (const u_char*)_buffers[_current].p();
+    const auto	img = static_cast<const u_char*>(_buffers[_current].p());
     
   // Transfer image data from current buffer.
     image.resize(height(), width());
@@ -1031,12 +1007,12 @@ V4L2Camera::enumerateFormats()
     for (fmtdesc.index = 0; ioctl(VIDIOC_ENUM_FMT, &fmtdesc) == 0;
 	 ++fmtdesc.index)
     {
-	PixelFormat	pixelFormat = uintToPixelFormat(fmtdesc.pixelformat);
+	const auto	pixelFormat = uintToPixelFormat(fmtdesc.pixelformat);
 	if (pixelFormat == UNKNOWN_PIXEL_FORMAT)  // 未知のフォーマットならば...
 	    continue;				  // スキップする
 	
 	_formats.push_back(Format());
-	Format&	format = _formats.back();
+	auto&	format = _formats.back();
 
 	format.pixelFormat = pixelFormat;
 	if (fmtdesc.description[0])
@@ -1059,7 +1035,7 @@ V4L2Camera::enumerateFormats()
 	     ++fsize.index)
 	{
 	    format.frameSizes.push_back(FrameSize());
-	    FrameSize&	frameSize = format.frameSizes.back();
+	    auto&	frameSize = format.frameSizes.back();
 
 	    if (fsize.type == V4L2_FRMSIZE_TYPE_DISCRETE)
 	    {
@@ -1103,7 +1079,7 @@ V4L2Camera::enumerateFormats()
 		 ++fival.index)
 	    {
 		frameSize.frameRates.push_back(FrameRate());
-		FrameRate&	frameRate = frameSize.frameRates.back();
+		auto&	frameRate = frameSize.frameRates.back();
 
 		if (fival.type == V4L2_FRMIVAL_TYPE_DISCRETE)
 		{
@@ -1160,13 +1136,13 @@ V4L2Camera::enumerateControls()
 	    
 	    id = ctrl.id;	// 次のidをセットする．
 
-	    Feature	feature = uintToFeature(ctrl.id);
+	    const auto	feature = uintToFeature(ctrl.id);
 	    if (ctrl.flags & V4L2_CTRL_FLAG_DISABLED ||	// 無効化されているか
 		feature == UNKNOWN_FEATURE)		// 未知の属性ならば...
 		continue;				// スキップして次へ
 
 	    _controls.push_back(Control());
-	    Control&	control = _controls.back();
+	    auto&	control = _controls.back();
 	    
 	    control.feature = feature;
 	    control.name    = (char*)ctrl.name;
@@ -1231,14 +1207,14 @@ V4L2Camera::addControl(u_int id)
 	return false;
 
   // コントロールが有効かつ既知であるか調査
-    Feature	feature = uintToFeature(ctrl.id);
+    const auto	feature = uintToFeature(ctrl.id);
     if (ctrl.flags & V4L2_CTRL_FLAG_DISABLED ||	// 無効化されているか
 	feature == UNKNOWN_FEATURE)		// 未知の属性ならば...
 	return true;				// 直ちにリターン
 
   // コントロールの諸性質を保存
     _controls.push_back(Control());
-    Control&	control = _controls.back();
+    auto&	control = _controls.back();
 	    
     control.feature = feature;
     control.name    = (char*)ctrl.name;
@@ -1294,7 +1270,7 @@ V4L2Camera::enumerateMenuItems(const v4l2_queryctrl& ctrl,
 	ioctl(VIDIOC_QUERYMENU, &menu);
 #endif
 	menuItems.push_back(MenuItem());
-	MenuItem&	menuItem = menuItems.back();
+	auto&	menuItem = menuItems.back();
 
 	menuItem.index = menu.index;
 	menuItem.name  = (char*)menu.name;
@@ -1306,7 +1282,7 @@ V4L2Camera::enumerateMenuItems(const v4l2_queryctrl& ctrl,
 const V4L2Camera::Format&
 V4L2Camera::pixelFormatToFormat(PixelFormat pixelFormat) const
 {
-    BOOST_FOREACH (const Format& format, _formats)
+    BOOST_FOREACH (const auto& format, _formats)
 	if (format.pixelFormat != UNKNOWN_PIXEL_FORMAT &&
 	    format.pixelFormat == pixelFormat)
 	    return format;
@@ -1321,7 +1297,7 @@ V4L2Camera::featureToControl(Feature feature) const
 {
     using namespace	std;
     
-    BOOST_FOREACH (const Control& control, _controls)
+    BOOST_FOREACH (const auto& control, _controls)
 	if (control.feature != UNKNOWN_FEATURE && control.feature == feature)
 	{
 	    if (control.flags & V4L2_CTRL_FLAG_DISABLED)
@@ -1536,7 +1512,7 @@ operator <<(std::ostream& out, const V4L2Camera::Format& format)
     fourcc[4] = '\0';
     out << " [id:" << fourcc << ']' << std::endl;
     
-    BOOST_FOREACH (const V4L2Camera::FrameSize& frameSize, format.frameSizes)
+    BOOST_FOREACH (const auto& frameSize, format.frameSizes)
 	out << "  " << frameSize << std::endl;
 
     return out ;
@@ -1580,13 +1556,17 @@ operator <<(std::ostream& out, const V4L2Camera::Control& control)
 	out << " W/O";
     out << endl;
     if (control.type == V4L2_CTRL_TYPE_MENU)
-	BOOST_FOREACH (const V4L2Camera::MenuItem& menuItem,
-		       control.menuItems)
+	BOOST_FOREACH (const auto& menuItem, control.menuItems)
 	    out << "    " << menuItem << endl;
 
     return out;
 }
 
+/************************************************************************
+*  static member variables of V4L2Camera				*
+************************************************************************/
+constexpr V4L2Camera::FeatureName	V4L2Camera::featureNames[];
+    
 /************************************************************************
 *  global functions							*
 ************************************************************************/
@@ -1618,8 +1598,7 @@ operator <<(std::ostream& out, const V4L2Camera::FrameSize& frameSize)
 {
     out << frameSize.width << 'x' << frameSize.height << ':';
 
-    BOOST_FOREACH (const V4L2Camera::FrameRate& frameRate,
-		   frameSize.availableFrameRates())
+    BOOST_FOREACH (const auto& frameRate, frameSize.availableFrameRates())
 	out << ' ' << frameRate;
     return out;
 }
@@ -1657,15 +1636,18 @@ operator <<(std::ostream& out, const V4L2Camera::MenuItem& menuItem)
 std::ostream&
 operator <<(std::ostream& out, const V4L2Camera& camera)
 {
+  // デバイス名を書き出す
+    out << camera.dev();
+    
   // 画素フォーマットと画像サイズを書き出す．
-    V4L2Camera::PixelFormat	pixelFormat = camera.pixelFormat();
-    char			fourcc[5];
+    const auto	pixelFormat = camera.pixelFormat();
+    char	fourcc[5];
     fourcc[0] =	 pixelFormat	    & 0xff;
     fourcc[1] = (pixelFormat >>  8) & 0xff;
     fourcc[2] = (pixelFormat >> 16) & 0xff;
     fourcc[3] = (pixelFormat >> 24) & 0xff;
     fourcc[4] = '\0';
-    out << fourcc << ' ' << camera.width() << 'x' << camera.height();
+    out << ' ' << fourcc << ' ' << camera.width() << 'x' << camera.height();
 
   // フレームレートを書き出す．
     u_int	fps_n, fps_d;
@@ -1673,11 +1655,11 @@ operator <<(std::ostream& out, const V4L2Camera& camera)
     out << ' ' << fps_n << '/' << fps_d;
 
   // 各カメラ属性の値を書き出す．
-    BOOST_FOREACH (V4L2Camera::Feature feature, camera.availableFeatures())
-	for (size_t i = 0; i < NFEATURES; ++i)
-	    if (feature == features[i].feature)
+    BOOST_FOREACH (auto feature, camera.availableFeatures())
+	for (const auto& featureName : V4L2Camera::featureNames)
+	    if (feature == featureName.feature)
 	    {
-		out << ' ' << features[i].name
+		out << ' ' << featureName.name
 		    << ' ' << camera.getValue(feature);
 		break;
 	    }
@@ -1694,10 +1676,14 @@ operator <<(std::ostream& out, const V4L2Camera& camera)
 std::istream&
 operator >>(std::istream& in, V4L2Camera& camera)
 {
-  // 画素フォーマット，画像サイズ，フレームレートを読み込んでカメラに設定する．
+  // デバイス名を読み込んでカメラを初期化する.
     std::string	s;
+    in >> s;
+    camera.initialize(s.c_str());
+    
+  // 画素フォーマット，画像サイズ，フレームレートを読み込んでカメラに設定する．
     in >> s;				// 画素フォーマット
-    V4L2Camera::PixelFormat	pixelFormat
+    const auto	pixelFormat
 	= V4L2Camera::uintToPixelFormat( s[0]	     | (s[1] <<  8) |
 					(s[2] << 16) | (s[3] << 24));
     char	c;
@@ -1713,12 +1699,12 @@ operator >>(std::istream& in, V4L2Camera& camera)
 	in.putback(c);
 	in >> s;
 
-	for (size_t i = 0; i < NFEATURES; ++i)
-	    if (s == features[i].name)
+	for (const auto& featureName : V4L2Camera::featureNames)
+	    if (s == featureName.name)
 	    {
 		int	val;
 		in >> val;
-		camera.setValue(features[i].feature, val);
+		camera.setValue(featureName.feature, val);
 		break;
 	    }
     }

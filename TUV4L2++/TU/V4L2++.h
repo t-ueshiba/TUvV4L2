@@ -129,6 +129,12 @@ class V4L2Camera
 	UNKNOWN_FEATURE			= V4L2_CID_LASTP1
     };
 
+    struct FeatureName
+    {
+	const Feature		feature;	//!< 属性
+	const char* const	name;		//!< 名称
+    };
+    
   //! 値の範囲
     template <class T>
     struct Range
@@ -247,10 +253,16 @@ class V4L2Camera
     typedef std::pair<FeatureIterator, FeatureIterator>	FeatureRange;
     
   public:
-    V4L2Camera(const char* dev)						;
-    ~V4L2Camera()							;
+			V4L2Camera()					;
+			V4L2Camera(const char* dev)			;
+			~V4L2Camera()					;
+			V4L2Camera(const V4L2Camera&)		= delete;
+    V4L2Camera&		operator =(const V4L2Camera&)		= delete;
+			V4L2Camera(V4L2Camera&& camera)			;
+    V4L2Camera&		operator =(V4L2Camera&& camera)			;
 
     const std::string&	dev()					const	;
+    V4L2Camera&		initialize(const char* dev="/dev/video")	;
     
   // Format stuffs.
     PixelFormatRange	availablePixelFormats()			const	;
@@ -334,8 +346,8 @@ class V4L2Camera
 	operator <<(std::ostream& out, const Control& control)		;
     
   private:
-    const int			_fd;
-    const std::string		_dev;
+    int				_fd;
+    std::string			_dev;
     std::vector<Format>		_formats;
     std::vector<Control>	_controls;
     size_t			_width;
@@ -345,6 +357,86 @@ class V4L2Camera
     u_int			_current;	// キューから取り出されている
     bool			_inContinuousShot;
     u_int64_t			_arrivaltime;
+
+  public:
+    static constexpr FeatureName
+    featureNames[] =
+    {
+	{BRIGHTNESS,			"BRIGHTNESS"},
+	{BRIGHTNESS_AUTO,		"BRIGHTNESS_AUTO"},
+	{CONTRAST,			"CONTRAST"},
+	{GAIN,				"GAIN"},
+	{GAIN_AUTO,			"GAIN_AUTO"},
+	{SATURATION,			"SATURATION"},
+	{HUE,				"HUE"},
+	{HUE_AUTO,			"HUE_AUTO"},
+	{GAMMA,				"GAMMA"},
+	{SHARPNESS,			"SHARPNESS"},
+	{BLACK_LEVEL,			"BLACK_LEVEL"},
+	{WHITE_BALANCE_TEMPERATURE,	"WHITE_BALANCE_TEMPERATURE"},
+	{WHITE_BALANCE_AUTO,		"WHITE_BALANCE_AUTO"},
+	{RED_BALANCE,			"RED_BALANCE"},
+	{BLUE_BALANCE,			"BLUE_BALANCE"},
+	{HFLIP,				"HFLIP"},
+	{VFLIP,				"VFLIP"},
+	{BACKLIGHT_COMPENSATION,	"BACKLIGHT_COMPENSATION"},
+	{POWER_LINE_FREQUENCY,		"POWER_LINE_FREQUENCY"},
+	{EXPOSURE_AUTO,			"EXPOSURE_AUTO"},
+	{EXPOSURE_AUTO_PRIORITY,	"EXPOSURE_AUTO_PRIORITY"},
+	{EXPOSURE_ABSOLUTE,		"EXPOSURE_ABSOLUTE"},
+	{FOCUS_ABSOLUTE,		"FOCUS_ABSOLUTE"},
+	{FOCUS_RELATIVE,		"FOCUS_RELATIVE"},
+	{FOCUS_AUTO,			"FOCUS_AUTO"},
+	{ZOOM_ABSOLUTE,			"ZOOM_ABSOLUTE"},
+	{ZOOM_RELATIVE,			"ZOOM_RELATIVE"},
+	{ZOOM_CONTINUOUS,		"ZOOM_CONTINUOUS"},
+#ifdef V4L2_CID_IRIS_ABSOLUTE
+	{IRIS_ABSOLUTE,			"IRIS_ABSOLUTE"},
+#endif
+#ifdef V4L2_CID_IRIS_RELATIVE
+	{IRIS_RELATIVE,			"IRIS_RELATIVE"},
+#endif
+	{PAN_ABSOLUTE,			"PAN_ABSOLUTE"},
+	{PAN_RELATIVE,			"PAN_RELATIVE"},
+	{PAN_RESET,			"PAN_RESET"},
+	{TILT_ABSOLUTE,			"TILT_ABSOLUTE"},
+	{TILT_RELATIVE,			"TILT_RELATIVE"},
+	{TILT_RESET,			"TILT_RESET"},
+
+	{CID_PRIVATE0,			"CID_PRIVATE0"},
+	{CID_PRIVATE1,			"CID_PRIVATE1"},
+	{CID_PRIVATE2,			"CID_PRIVATE2"},
+	{CID_PRIVATE3,			"CID_PRIVATE3"},
+	{CID_PRIVATE4,			"CID_PRIVATE4"},
+	{CID_PRIVATE5,			"CID_PRIVATE5"},
+	{CID_PRIVATE6,			"CID_PRIVATE6"},
+	{CID_PRIVATE7,			"CID_PRIVATE7"},
+	{CID_PRIVATE8,			"CID_PRIVATE8"},
+	{CID_PRIVATE9,			"CID_PRIVATE9"},
+	{CID_PRIVATE10,			"CID_PRIVATE10"},
+	{CID_PRIVATE11,			"CID_PRIVATE11"},
+	{CID_PRIVATE12,			"CID_PRIVATE12"},
+	{CID_PRIVATE13,			"CID_PRIVATE13"},
+	{CID_PRIVATE14,			"CID_PRIVATE14"},
+	{CID_PRIVATE15,			"CID_PRIVATE15"},
+	{CID_PRIVATE16,			"CID_PRIVATE16"},
+	{CID_PRIVATE17,			"CID_PRIVATE17"},
+	{CID_PRIVATE18,			"CID_PRIVATE18"},
+	{CID_PRIVATE19,			"CID_PRIVATE19"},
+	{CID_PRIVATE20,			"CID_PRIVATE20"},
+	{CID_PRIVATE21,			"CID_PRIVATE21"},
+	{CID_PRIVATE22,			"CID_PRIVATE22"},
+	{CID_PRIVATE23,			"CID_PRIVATE23"},
+	{CID_PRIVATE24,			"CID_PRIVATE24"},
+	{CID_PRIVATE25,			"CID_PRIVATE25"},
+	{CID_PRIVATE26,			"CID_PRIVATE26"},
+	{CID_PRIVATE27,			"CID_PRIVATE27"},
+	{CID_PRIVATE28,			"CID_PRIVATE28"},
+	{CID_PRIVATE29,			"CID_PRIVATE29"},
+    };
+    static constexpr size_t	NFEATURES = sizeof(featureNames)
+					  / sizeof(featureNames[0]);
+    
 };
 
 //! このカメラのデバイスファイル名を取得する
