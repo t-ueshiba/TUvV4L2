@@ -1,5 +1,5 @@
 /*
- *  $Id$
+ *  $Id: main.cc,v 1.2 2012-08-13 07:13:12 ueshiba Exp $
  */
 #include <cstdlib>
 #include "TU/v/vV4L2++.h"
@@ -13,27 +13,23 @@ main(int argc, char* argv[])
 {
     using namespace	TU;
     
-    v::App		vapp(argc, argv);
-    const char*		dev = "/dev/video0";
-
-  // Parse command line.
-    extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "d:")) != -1; )
-	switch (c)
-	{
-	  case 'd':
-	    dev = optarg;
-	    break;
-	}
-
+    v::App	vapp(argc, argv);
+    
   // Main job.
     try
     {
-	V4L2Camera				camera(dev);
-	v::MyCmdWindow<V4L2Camera, RGB>		myWin(vapp, camera);
+	extern int		optind;
+	Array<V4L2Camera>	cameras(argc - optind);
+	for (auto& camera : cameras)
+	    camera.initialize(argv[optind++]);
+
+	if (cameras.size() == 0)
+	    throw std::runtime_error("One or more cameras must be specified!!");
+
+	v::MyCmdWindow<Array<V4L2Camera>, u_char>	myWin(vapp, cameras);
 	vapp.run();
 
-	std::cout << camera;
+	std::cout << cameras;
     }
     catch (std::exception& err)
     {

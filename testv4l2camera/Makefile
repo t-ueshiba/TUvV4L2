@@ -14,7 +14,7 @@ MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -O3 $(shell pkg-config gtk+-2.0 --cflags)
+CFLAGS		= -O $(shell pkg-config gtk+-2.0 --cflags)
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
