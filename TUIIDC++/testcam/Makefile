@@ -13,7 +13,7 @@ IDLS		=
 
 INCDIRS		= -I.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -O
+CFLAGS		= -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
@@ -42,7 +42,7 @@ HDRSDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../TU/IIDC++.h \
-		../TU/IIDCCameraUtility.h \
+		../TU/IIDCCameraArray.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Heap.h \
@@ -96,7 +96,7 @@ main.o: /usr/local/include/TU/v/vIIDC++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
-	../TU/IIDCCameraUtility.h ../TU/IIDC++.h \
+	../TU/IIDCCameraArray.h ../TU/IIDC++.h \
 	/usr/local/include/TU/algorithm.h /usr/local/include/TU/Heap.h \
 	MyCmdWindow.h /usr/local/include/TU/v/App.h \
 	/usr/local/include/TU/v/FileSelection.h \
