@@ -111,13 +111,13 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 		_camera.continuousShot(false);
 	    }
 	    break;
-
+	  /*
 	  case c_OneShot:
 	    stopContinuousShotIfRunning();
 	    _camera.oneShot();
 	    tick();
 	    break;
-
+	  */
 	  case c_NFrames:
 	    stopContinuousShotIfRunning();
 	    initializeMovie();

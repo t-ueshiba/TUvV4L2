@@ -1,7 +1,7 @@
 /*
  *  $Id$
  */
-#include "TU/IIDCCameraUtility.h"
+#include "TU/IIDCCameraArray.h"
 #include "TU/io.h"
 
 namespace TU

@@ -52,16 +52,16 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/types.h
 HDRS		= FireWireNode_.h \
 		TU/IIDC++.h \
-		TU/IIDCCameraUtility.h \
+		TU/IIDCCameraArray.h \
 		USBNode_.h
 SRCS		= FireWireNode.cc \
 		IIDCCamera.cc \
-		IIDCCameraUtility.cc \
+		IIDCCameraArray.cc \
 		IIDCNode.cc \
 		USBNode.cc
 OBJS		= FireWireNode.o \
 		IIDCCamera.o \
-		IIDCCameraUtility.o \
+		IIDCCameraArray.o \
 		IIDCNode.o \
 		USBNode.o
 
@@ -83,7 +83,7 @@ IIDCCamera.o: FireWireNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/functional.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/Minimize.h USBNode_.h
-IIDCCameraUtility.o: TU/IIDCCameraUtility.h TU/IIDC++.h \
+IIDCCameraArray.o: TU/IIDCCameraArray.h TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
