@@ -9,6 +9,7 @@
 #define __TU_V4L2CAMERAUTILITY_H
 
 #include "TU/V4L2++.h"
+#include "TU/Heap.h"
 #include <algorithm>	// for std::for_each()
 #include <functional>	// for std::bind()
 
@@ -156,5 +157,42 @@ getFeature(const V4L2Camera& camera, u_int id, int& val)
     return true;
 }
 
+//! 複数のカメラから同期した画像を保持する．
+/*!
+  \param cameras	カメラの配列
+  \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
+*/
+template <class CAMERAS> auto
+syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
+    -> typename std::enable_if<
+	  std::is_convertible<
+	      typename std::remove_reference<
+		  decltype(*std::begin(cameras))>::type,
+	      V4L2Camera>::value>::type
+{
+    typedef decltype(std::begin(cameras))	iterator;
+    typedef std::pair<uint64_t, iterator>	timestamp_t;
+    
+    Heap<timestamp_t,
+	 std::greater<timestamp_t> >	timestamps(size(cameras));
+
+    std::for_each(std::begin(cameras), std::end(cameras),
+		  std::bind(&V4L2Camera::snap, std::placeholders::_1));
+
+    timestamp_t	last(0, std::end(cameras));
+    for (auto camera = std::begin(cameras); camera != std::end(cameras);
+	 ++camera)
+    {
+	timestamp_t	timestamp(camera->arrivaltime(), camera);
+	timestamps.push(timestamp);
+	if (timestamp > last)
+	    last = timestamp;
+    }
+
+    for (timestamp_t top; last.first > (top = timestamps.pop()).first + maxSkew;
+	 timestamps.push(last))
+	last = {top.second->snap().arrivaltime(), top.second};
+}
+    
 }
 #endif	// ! __TU_IEEE1394CAMERAUTILITY_H
