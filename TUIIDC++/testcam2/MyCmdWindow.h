@@ -24,19 +24,20 @@ class MyCmdWindow : public CmdWindow
     typedef typename CAMERAS::value_type	camera_type;
     
   public:
-    MyCmdWindow(App& parentApp, CAMERAS& cameras)		;
+    MyCmdWindow(App& parentApp, CAMERAS& cameras, uint64_t maxSkew)	;
 
-    virtual void	callback(CmdId, CmdVal)			;
-    virtual void	tick()					;
+    virtual void	callback(CmdId, CmdVal)				;
+    virtual void	tick()						;
     
   private:
-    void		initializeMovie()			;
-    void		repaintCanvases()			;
-    void		setFrame()				;
-    void		stopContinuousShotIfRunning()		;
+    void		initializeMovie()				;
+    void		repaintCanvases()				;
+    void		setFrame()					;
+    void		stopContinuousShotIfRunning()			;
 
   private:
     CAMERAS&			_cameras;
+    const uint64_t		_maxSkew;
     Movie<PIXEL>		_movie;
     Array<MyCanvasPane<PIXEL>*>	_canvases;
     CmdPane			_menuCmd;
@@ -46,9 +47,11 @@ class MyCmdWindow : public CmdWindow
 };
 
 template <class CAMERAS, class PIXEL>
-MyCmdWindow<CAMERAS, PIXEL>::MyCmdWindow(App& parentApp, CAMERAS& cameras)
+MyCmdWindow<CAMERAS, PIXEL>::MyCmdWindow(App& parentApp,
+					 CAMERAS& cameras, uint64_t maxSkew)
     :CmdWindow(parentApp, "Camera controller", Colormap::RGBColor, 16, 0, 0),
      _cameras(cameras),
+     _maxSkew(maxSkew),
      _movie(size(_cameras)),
      _canvases(0),
      _menuCmd(*this, createMenuCmds(*std::begin(_cameras))),
@@ -167,8 +170,11 @@ MyCmdWindow<CAMERAS, PIXEL>::tick()
 
     if (!_captureCmd.getValue(c_PlayMovie))
     {
-	std::for_each(std::begin(_cameras), std::end(_cameras),
-		      std::bind(&camera_type::snap, std::placeholders::_1));
+	if (_maxSkew)
+	    syncedSnap(_cameras, _maxSkew);
+	else
+	    std::for_each(std::begin(_cameras), std::end(_cameras),
+			  std::bind(&camera_type::snap, std::placeholders::_1));
 	for (size_t i = 0; i < size(_cameras); ++i)
 	    _cameras[i] >> _movie.image(i);
     }

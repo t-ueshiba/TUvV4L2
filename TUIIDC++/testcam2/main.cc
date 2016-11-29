@@ -15,14 +15,18 @@ main(int argc, char* argv[])
     
     v::App		vapp(argc, argv);
     IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
-    
+    uint64_t		maxSkew = 0;
+
   // Parse command options.
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "b")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "bs:")) != EOF; )
 	switch (c)
 	{
 	  case 'b':
 	    speed = IIDCCamera::SPD_800M;
+	    break;
+	  case 's':
+	    maxSkew = atoi(optarg);
 	    break;
 	}
 
@@ -40,7 +44,7 @@ main(int argc, char* argv[])
 	if (cameras.size() == 0)
 	    throw std::runtime_error("One or more cameras must be specified!!");
 
-	v::MyCmdWindow<Array<IIDCCamera>, u_char>	myWin(vapp, cameras);
+	v::MyCmdWindow<Array<IIDCCamera>, u_char> myWin(vapp, cameras, maxSkew);
 	vapp.run();
 
 	std::cout << cameras;
