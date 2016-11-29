@@ -14,7 +14,18 @@ main(int argc, char* argv[])
     using namespace	TU;
     
     v::App	vapp(argc, argv);
-    
+    uint64_t	maxSkew = 0;
+
+  // Parse command options.
+    extern char*	optarg;
+    for (int c; (c = getopt(argc, argv, "s:")) != EOF; )
+	switch (c)
+	{
+	  case 's':
+	    maxSkew = atoi(optarg);
+	    break;
+	}
+
   // Main job.
     try
     {
@@ -26,7 +37,7 @@ main(int argc, char* argv[])
 	if (cameras.size() == 0)
 	    throw std::runtime_error("One or more cameras must be specified!!");
 
-	v::MyCmdWindow<Array<V4L2Camera>, u_char>	myWin(vapp, cameras);
+	v::MyCmdWindow<Array<V4L2Camera>, u_char> myWin(vapp, cameras, maxSkew);
 	vapp.run();
 
 	std::cout << cameras;

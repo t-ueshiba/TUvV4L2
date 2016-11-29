@@ -18,6 +18,84 @@ namespace TU
 static const int	CONTROL_IO_ERROR_RETRIES = 2;
 static const int	NB_BUFFERS		 = 4;
 
+static constexpr struct
+{
+    const V4L2Camera::Feature	feature;	//!< 属性
+    const char* const		name;		//!< 名称
+} featureNames[] =
+{
+    {V4L2Camera::BRIGHTNESS,			"BRIGHTNESS"},
+    {V4L2Camera::BRIGHTNESS_AUTO,		"BRIGHTNESS_AUTO"},
+    {V4L2Camera::CONTRAST,			"CONTRAST"},
+    {V4L2Camera::GAIN,				"GAIN"},
+    {V4L2Camera::GAIN_AUTO,			"GAIN_AUTO"},
+    {V4L2Camera::SATURATION,			"SATURATION"},
+    {V4L2Camera::HUE,				"HUE"},
+    {V4L2Camera::HUE_AUTO,			"HUE_AUTO"},
+    {V4L2Camera::GAMMA,				"GAMMA"},
+    {V4L2Camera::SHARPNESS,			"SHARPNESS"},
+    {V4L2Camera::BLACK_LEVEL,			"BLACK_LEVEL"},
+    {V4L2Camera::WHITE_BALANCE_TEMPERATURE,	"WHITE_BALANCE_TEMPERATURE"},
+    {V4L2Camera::WHITE_BALANCE_AUTO,		"WHITE_BALANCE_AUTO"},
+    {V4L2Camera::RED_BALANCE,			"RED_BALANCE"},
+    {V4L2Camera::BLUE_BALANCE,			"BLUE_BALANCE"},
+    {V4L2Camera::HFLIP,				"HFLIP"},
+    {V4L2Camera::VFLIP,				"VFLIP"},
+    {V4L2Camera::BACKLIGHT_COMPENSATION,	"BACKLIGHT_COMPENSATION"},
+    {V4L2Camera::POWER_LINE_FREQUENCY,		"POWER_LINE_FREQUENCY"},
+    {V4L2Camera::EXPOSURE_AUTO,			"EXPOSURE_AUTO"},
+    {V4L2Camera::EXPOSURE_AUTO_PRIORITY,	"EXPOSURE_AUTO_PRIORITY"},
+    {V4L2Camera::EXPOSURE_ABSOLUTE,		"EXPOSURE_ABSOLUTE"},
+    {V4L2Camera::FOCUS_ABSOLUTE,		"FOCUS_ABSOLUTE"},
+    {V4L2Camera::FOCUS_RELATIVE,		"FOCUS_RELATIVE"},
+    {V4L2Camera::FOCUS_AUTO,			"FOCUS_AUTO"},
+    {V4L2Camera::ZOOM_ABSOLUTE,			"ZOOM_ABSOLUTE"},
+    {V4L2Camera::ZOOM_RELATIVE,			"ZOOM_RELATIVE"},
+    {V4L2Camera::ZOOM_CONTINUOUS,		"ZOOM_CONTINUOUS"},
+#ifdef V4L2_CID_IRIS_ABSOLUTE
+    {V4L2Camera::IRIS_ABSOLUTE,			"IRIS_ABSOLUTE"},
+#endif
+#ifdef V4L2_CID_IRIS_RELATIVE
+    {V4L2Camera::IRIS_RELATIVE,			"IRIS_RELATIVE"},
+#endif
+    {V4L2Camera::PAN_ABSOLUTE,			"PAN_ABSOLUTE"},
+    {V4L2Camera::PAN_RELATIVE,			"PAN_RELATIVE"},
+    {V4L2Camera::PAN_RESET,			"PAN_RESET"},
+    {V4L2Camera::TILT_ABSOLUTE,			"TILT_ABSOLUTE"},
+    {V4L2Camera::TILT_RELATIVE,			"TILT_RELATIVE"},
+    {V4L2Camera::TILT_RESET,			"TILT_RESET"},
+    {V4L2Camera::CID_PRIVATE0,			"CID_PRIVATE0"},
+    {V4L2Camera::CID_PRIVATE1,			"CID_PRIVATE1"},
+    {V4L2Camera::CID_PRIVATE2,			"CID_PRIVATE2"},
+    {V4L2Camera::CID_PRIVATE3,			"CID_PRIVATE3"},
+    {V4L2Camera::CID_PRIVATE4,			"CID_PRIVATE4"},
+    {V4L2Camera::CID_PRIVATE5,			"CID_PRIVATE5"},
+    {V4L2Camera::CID_PRIVATE6,			"CID_PRIVATE6"},
+    {V4L2Camera::CID_PRIVATE7,			"CID_PRIVATE7"},
+    {V4L2Camera::CID_PRIVATE8,			"CID_PRIVATE8"},
+    {V4L2Camera::CID_PRIVATE9,			"CID_PRIVATE9"},
+    {V4L2Camera::CID_PRIVATE10,			"CID_PRIVATE10"},
+    {V4L2Camera::CID_PRIVATE11,			"CID_PRIVATE11"},
+    {V4L2Camera::CID_PRIVATE12,			"CID_PRIVATE12"},
+    {V4L2Camera::CID_PRIVATE13,			"CID_PRIVATE13"},
+    {V4L2Camera::CID_PRIVATE14,			"CID_PRIVATE14"},
+    {V4L2Camera::CID_PRIVATE15,			"CID_PRIVATE15"},
+    {V4L2Camera::CID_PRIVATE16,			"CID_PRIVATE16"},
+    {V4L2Camera::CID_PRIVATE17,			"CID_PRIVATE17"},
+    {V4L2Camera::CID_PRIVATE18,			"CID_PRIVATE18"},
+    {V4L2Camera::CID_PRIVATE19,			"CID_PRIVATE19"},
+    {V4L2Camera::CID_PRIVATE20,			"CID_PRIVATE20"},
+    {V4L2Camera::CID_PRIVATE21,			"CID_PRIVATE21"},
+    {V4L2Camera::CID_PRIVATE22,			"CID_PRIVATE22"},
+    {V4L2Camera::CID_PRIVATE23,			"CID_PRIVATE23"},
+    {V4L2Camera::CID_PRIVATE24,			"CID_PRIVATE24"},
+    {V4L2Camera::CID_PRIVATE25,			"CID_PRIVATE25"},
+    {V4L2Camera::CID_PRIVATE26,			"CID_PRIVATE26"},
+    {V4L2Camera::CID_PRIVATE27,			"CID_PRIVATE27"},
+    {V4L2Camera::CID_PRIVATE28,			"CID_PRIVATE28"},
+    {V4L2Camera::CID_PRIVATE29,			"CID_PRIVATE29"},
+};
+    
 /************************************************************************
 *  class V4L2Camera							*
 ************************************************************************/
@@ -167,6 +245,33 @@ V4L2Camera::initialize(const char* dev)
     return *this;
 }
 
+//! Video for Linux v.2 カメラの使用を終了して待機状態にする
+/*!
+  再びカメラデバイスと結びつけて使用するには initialize() する必要がある
+  \return		この Video for Linux v.2 カメラオブジェクト
+*/
+V4L2Camera&
+V4L2Camera::terminate()
+{
+    if (_fd >= 0)
+    {
+	continuousShot(false);
+	close(_fd);
+    }
+
+    _fd = -1;
+    _dev.clear();
+    _formats.clear();
+    _controls.clear();
+    _width = 0;
+    _height = 0;
+    _pixelFormat = UNKNOWN_PIXEL_FORMAT;
+    _buffers.clear();
+    _current = ~0;
+    _inContinuousShot = false;
+    _arrivaltime = 0;
+}
+    
 /*
  *  Format stuffs.
  */
@@ -1566,11 +1671,6 @@ operator <<(std::ostream& out, const V4L2Camera::Control& control)
 }
 
 /************************************************************************
-*  static member variables of V4L2Camera				*
-************************************************************************/
-constexpr V4L2Camera::FeatureName	V4L2Camera::featureNames[];
-    
-/************************************************************************
 *  global functions							*
 ************************************************************************/
 //! 値の範囲を出力ストリームに出力する
@@ -1659,7 +1759,7 @@ operator <<(std::ostream& out, const V4L2Camera& camera)
 
   // 各カメラ属性の値を書き出す．
     BOOST_FOREACH (auto feature, camera.availableFeatures())
-	for (const auto& featureName : V4L2Camera::featureNames)
+	for (const auto& featureName : featureNames)
 	    if (feature == featureName.feature)
 	    {
 		out << ' ' << featureName.name
@@ -1702,7 +1802,7 @@ operator >>(std::istream& in, V4L2Camera& camera)
 	in.putback(c);
 	in >> s;
 
-	for (const auto& featureName : V4L2Camera::featureNames)
+	for (const auto& featureName : featureNames)
 	    if (s == featureName.name)
 	    {
 		int	val;
