@@ -153,6 +153,8 @@ IIDCCamera::IIDCCamera(uint64_t uniqId, Type type)
 */
 IIDCCamera::~IIDCCamera()
 {
+    if (_node)
+	continuousShot(false);
 }
 
 //! 移動コンストラクタ
