@@ -2719,6 +2719,35 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 		       return camera.getFrameRate() == frameRate.frameRate;
 		   })->name
 	<< dec;
+
+    switch (camera.getFormat())
+    {
+      case IIDCCamera::Format_7_0:
+      case IIDCCamera::Format_7_1:
+      case IIDCCamera::Format_7_2:
+      case IIDCCamera::Format_7_3:
+      case IIDCCamera::Format_7_4:
+      case IIDCCamera::Format_7_5:
+      case IIDCCamera::Format_7_6:
+      case IIDCCamera::Format_7_7:
+      {
+	const auto	fmt7info = camera.getFormat_7_Info(camera.getFormat());
+	out << ' ' << fmt7info.u0 << ' ' << fmt7info.v0
+	    << ' ' << fmt7info.width << ' ' << fmt7info.height
+	    << ' '
+	    << find_if(begin(IIDCCamera::pixelFormatNames),
+		       end(IIDCCamera::pixelFormatNames),
+		       [&](IIDCCamera::PixelFormatName pixelFormat)
+		       {
+			   return fmt7info.pixelFormat
+			       == pixelFormat.pixelFormat;
+		       })->name;
+      }
+        break;
+
+      default:
+	break;
+    }
     
     for (const auto& feature : IIDCCamera::featureNames)
     {
@@ -2818,6 +2847,36 @@ operator >>(std::istream& in, IIDCCamera& camera)
 				    });
     if (frameRate == end(IIDCCamera::frameRateNames))
 	throw runtime_error("IIDCCamera: Unknown frame rate[" + s + ']');
+
+    switch (format->format)
+    {
+      case IIDCCamera::Format_7_0:
+      case IIDCCamera::Format_7_1:
+      case IIDCCamera::Format_7_2:
+      case IIDCCamera::Format_7_3:
+      case IIDCCamera::Format_7_4:
+      case IIDCCamera::Format_7_5:
+      case IIDCCamera::Format_7_6:
+      case IIDCCamera::Format_7_7:
+      {
+	size_t	u0, v0, width, height;
+	in >> u0 >> v0 >> width >> height >> s;
+
+	const auto	pixelFormat
+			    = find_if(begin(IIDCCamera::pixelFormatNames),
+				      end(IIDCCamera::pixelFormatNames),
+				      [&](IIDCCamera::PixelFormatName pixfmt)
+				      {
+					  return s == pixfmt.name;
+				      })->pixelFormat;
+	camera.setFormat_7_ROI(format->format, u0, v0, width, height)
+	      .setFormat_7_PixelFormat(format->format, pixelFormat);
+      }
+        break;
+
+      default:
+	break;
+    }
 
     for (char c; (in >> TU::skipws).get(c) && (c != '\n'); )	// Parse rest
     {
