@@ -8,6 +8,9 @@
 #ifndef __TU_V4L2PP_H
 #define __TU_V4L2PP_H
 
+#include <cstddef>		// for size_t
+#include <cstdint>		// for uintXX_t
+#include <sys/types.h>		// for u_int
 #include <asm/types.h>		// for videodev2.h
 #include <linux/videodev2.h>
 #include <vector>
@@ -309,7 +312,7 @@ class V4L2Camera
 			captureDirectly(Image<T>& image)	const	;
     const V4L2Camera&	captureRaw(void* image)			const	;
     const V4L2Camera&	captureBayerRaw(void* image)		const	;
-    u_int64_t		arrivaltime()				const	;
+    uint64_t		arrivaltime()				const	;
 
   // Utility functions.
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
@@ -351,7 +354,7 @@ class V4L2Camera
     std::vector<Buffer>		_buffers;
     u_int			_current;	// キューから取り出されている
     bool			_inContinuousShot;
-    u_int64_t			_arrivaltime;
+    uint64_t			_arrivaltime;
 };
 
 //! このカメラのデバイスファイル名を取得する
@@ -541,7 +544,7 @@ V4L2Camera::captureDirectly(Image<T>& image) const
 /*!
   \return	画像データがホストに到着した時刻
 */
-inline u_int64_t
+inline uint64_t
 V4L2Camera::arrivaltime() const
 {
     return _arrivaltime;

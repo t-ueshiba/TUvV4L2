@@ -1513,8 +1513,8 @@ V4L2Camera::dequeueBuffer()
     buf.memory = V4L2_MEMORY_MMAP;
     if (ioctl(VIDIOC_DQBUF, &buf))
 	throw runtime_error(string("TU::V4L2Camera::waitBuffer(): ioctl(VIDIOC_DQBUF) failed!! ") + strerror(errno));
-    _arrivaltime = u_int64_t(buf.timestamp.tv_sec) * 1000000LL
-		 + u_int64_t(buf.timestamp.tv_usec);
+    _arrivaltime = uint64_t(buf.timestamp.tv_sec) * 1000000LL
+		 + uint64_t(buf.timestamp.tv_usec);
 #ifdef _DEBUG
     cerr << "VIDIOC_DQBUF(" << buf.index << ")" << endl;
 #endif
