@@ -31,7 +31,7 @@ class MyCmdWindow : public CmdWindow
     void		repaintCanvas()				;
     void		setFrame()				;
     void		stopContinuousShotIfRunning()		;
-
+    
   private:
     CAMERA&		_camera;
     Movie<PIXEL>	_movie;
@@ -99,6 +99,15 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	  }
 	    break;
 
+	  case M_SaveAs:
+	    saveCameraConfig(_camera);
+	    break;
+	    
+	  case M_Open:
+	    restoreCameraConfig(_camera);
+	    refreshFeatureCmds(_camera, _featureCmd);
+	    break;
+	    
 	  case c_ContinuousShot:
 	    if (val)
 	    {

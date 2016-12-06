@@ -105,6 +105,19 @@ MyCmdWindow<CAMERAS, PIXEL>::callback(CmdId id, CmdVal val)
 	  }
 	    break;
 
+	  case M_SaveAs:
+	    std::for_each(std::begin(_cameras), std::end(_cameras),
+			  std::bind(&saveCameraConfig<camera_type>,
+				    std::placeholders::_1));
+	    break;
+	    
+	  case M_Open:
+	    std::for_each(std::begin(_cameras), std::end(_cameras),
+			  std::bind(&restoreCameraConfig<camera_type>,
+				    std::placeholders::_1));
+	    refreshFeatureCmds(_cameras, _featureCmd);
+	    break;
+	    
 	  case c_ContinuousShot:
 	    if (val)
 	    {

@@ -1536,7 +1536,9 @@ IIDCCamera::multiShot(u_short nframes)
   IIDCカメラの一部には, カメラに設定した画像フォーマットや属性値などを
   カメラ内部のメモリチャンネルに記憶できるものがある. 
   \param mem_ch		値を記憶するメモリチャンネル番号. 0以上の値をとり, 
-			最大値は #getMemoryChannelMax() で調べられる. 
+			最大値は #getMemoryChannelMax() で調べられる.
+			0は工場出荷時設定に予約されているので，ユーザが
+			このチャンネルにセーブすることはできない．
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
@@ -1558,7 +1560,7 @@ IIDCCamera::saveConfig(u_int mem_ch)
   カメラ内部のメモリチャンネルに記憶できるものがある.
   \param mem_ch		設定したい値を記憶しているメモリチャンネル番号. 0以上
 			の値をとり, 最大値は #getMemoryChannelMax() で調べら
-			れる.
+			れる. 0は工場出荷時の設定に予約されている．
   \return		このIIDCカメラオブジェクト
 */
 IIDCCamera&
