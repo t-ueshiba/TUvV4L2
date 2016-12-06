@@ -64,10 +64,13 @@ createMenuCmds(const CAMERA& camera)
 
     static MenuDef fileMenu[] =
     {
-	{"Save", M_Save, false, noSub},
-	{"-",	 M_Line, false, noSub},
-	{"Quit", M_Exit, false, noSub},
+	{"Save",		   M_Save,   false, noSub},
+	{"Save camera config.",    M_SaveAs, false, noSub},
+	{"Restore camera config.", M_Open,   false, noSub},
+	{"-",			   M_Line,   false, noSub},
+	{"Quit",		   M_Exit,   false, noSub},
 	EndOfMenu
+
     };
 
     static CmdDef menuCmds[] =
@@ -89,6 +92,30 @@ createMenuCmds(const CAMERA& camera)
 /************************************************************************
 *  global functions							*
 ************************************************************************/
+template <class CAMERA> inline void
+saveCameraConfig(CAMERA& camera)
+{
+}
+    
+template <class CAMERA> inline void
+restoreCameraConfig(CAMERA& camera)
+{
+}
+    
+#ifdef __TU_IIDCPP_H
+inline void
+saveCameraConfig(IIDCCamera& camera)
+{
+    camera.saveConfig(1);
+}
+	
+inline void
+restoreCameraConfig(IIDCCamera& camera)
+{
+    camera.restoreConfig(1);
+}
+#endif
+    
 inline void
 countTime()
 {

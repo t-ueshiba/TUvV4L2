@@ -420,7 +420,8 @@ USBNode::Buffer::callback(libusb_transfer* transfer)
 	return;
     }
 
-#if defined(DEBUG)
+//#if defined(DEBUG)
+#if 0
     cerr << "USBNode::Buffer::callback(): buffer_length = "
 	 << transfer->length
 	 << ", autual_lenth = " << transfer->actual_length
