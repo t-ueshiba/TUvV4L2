@@ -11,14 +11,10 @@ main(int argc, char* argv[])
 {
     try
     {
-	TU::IIDCCamera	cameras[2];
+	TU::Array<TU::IIDCCamera>	cameras;
 
-	
-	for (auto& camera : cameras)
-	{
-	    camera.initialize();
-	    std::cout << camera;
-	}
+	std::cin >> cameras;
+	std::cout << cameras;
     }
     catch (std::exception& err)
     {
