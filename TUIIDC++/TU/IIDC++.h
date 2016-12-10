@@ -87,11 +87,9 @@
     - #TU::IIDCCamera::setAuto()
     - #TU::IIDCCamera::isAuto()
     - #TU::IIDCCamera::setValue()
-    - #TU::IIDCCamera::getValue()
+    - #TU::IIDCCamera::getValue<u_int>()
+    - #TU::IIDCCamera::getValue<float>()
     - #TU::IIDCCamera::getMinMax()
-    - #TU::IIDCCamera::setAbsValue()
-    - #TU::IIDCCamera::getAbsValue()
-    - #TU::IIDCCamera::getAbsMinMax()
     - #TU::IIDCCamera::setWhiteBalance()
     - #TU::IIDCCamera::getWhiteBalance()
     - #TU::IIDCCamera::getAimedTemperature()
@@ -108,7 +106,7 @@
     - #TU::IIDCCamera::setPolarity()
     - #TU::IIDCCamera::setDelay()
     - #TU::IIDCCamera::setDuration()
-    - #TU::IIDCCamera::isStrobeActive()
+    - #TU::IIDCCamera::isActive(Strobe)
     - #TU::IIDCCamera::getPolarity()
     - #TU::IIDCCamera::getMinMax(Strobe, u_int&, u_int&)
     - #TU::IIDCCamera::getDelay()
@@ -596,7 +594,7 @@ class IIDCCamera
     IIDCCamera&		setPolarity(Strobe strobe, bool highActive)	;
     IIDCCamera&		setDelay(Strobe strobe, u_int delay)		;
     IIDCCamera&		setDuration(Strobe strobe, u_int duration)	;
-    bool		isStrobeActive(Strobe strobe)		const	;
+    bool		isActive(Strobe strobe)			const	;
     bool		getPolarity(Strobe strobe)		const	;
     void		getMinMax(Strobe strobe,
 				  u_int& min, u_int& max)	const	;

@@ -1378,7 +1378,7 @@ IIDCCamera::setDuration(Strobe strobe, u_int duration)
   \return		onになっていればtrueを, そうでなければfalseを返す.
 */
 bool
-IIDCCamera::isStrobeActive(Strobe strobe) const
+IIDCCamera::isActive(Strobe strobe) const
 {
     checkAvailability(strobe, Strobe_Presence);
     const auto	offset = getStrobeOffset(strobe);
@@ -2880,7 +2880,11 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	break;
     }
 
-    for (char c; (in >> TU::skipws).get(c) && (c != '\n'); )	// Parse rest
+  // formatとframe rateをセットする
+    camera.setFormatAndFrameRate(format->format, frameRate->frameRate);
+
+  // featureを読み込んでセットする
+    for (char c; (in >> TU::skipws).get(c) && (c != '\n'); )
     {
       // featureのOn/Off, AUTO/Manual, Absolute/Relative を読み込む
 	bool	on = false, aut = false, abs = false;
@@ -2970,8 +2974,6 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	}
     }
     
-    camera.setFormatAndFrameRate(format->format, frameRate->frameRate);
-
     return in;
 }
  
