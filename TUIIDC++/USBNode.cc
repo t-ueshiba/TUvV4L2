@@ -203,8 +203,9 @@ USBNode::requeueListenBuffer()
     std::lock_guard<std::mutex>	lock(_mutex);
     if (!_ready.empty())
     {
-	_ready.front()->enqueue();	// 受信済みqueueの先頭を待機queueに入れて
-	_ready.pop();			// 受信済みqueueから取り除く
+	const auto	buffer = _ready.front();	// 受信済みqueueの先頭を
+	_ready.pop();					// queueから取り除いて
+	buffer->enqueue();				// 待機queueに入れる
     }
 }
 
@@ -409,7 +410,7 @@ USBNode::Buffer::callback(libusb_transfer* transfer)
 	return;
     }
     
-    auto	buffer = static_cast<const Buffer*>(transfer->user_data);
+    const auto	buffer = static_cast<const Buffer*>(transfer->user_data);
 
     if (transfer->status != LIBUSB_TRANSFER_COMPLETED)
     {
