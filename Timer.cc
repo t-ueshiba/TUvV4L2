@@ -52,8 +52,7 @@ CBtimer(XtPointer vTimer, XtIntervalId*)
 Timer::Timer(Object& vObject, u_long interval)
     :_vObject(vObject), _interval(interval), _id(0)
 {
-    if (_interval != 0)
-	start();
+    start();
 }
 
 Timer::~Timer()
@@ -66,8 +65,7 @@ Timer::start(u_long interval)
 {
     stop();
     _interval = interval;
-    if (_interval != 0)
-	start();
+    start();
 }
 
 void
@@ -76,6 +74,7 @@ Timer::stop()
     if (_id != 0)
     {
 	XtRemoveTimeOut(_id);
+	_interval = 0;
 	_id = 0;
     }
 }
@@ -86,8 +85,9 @@ Timer::stop()
 void
 Timer::start()
 {
-    _id = XtAppAddTimeOut(XtWidgetToApplicationContext(_vObject.widget()),
-			  _interval, CBtimer, (XtPointer)this);
+    if (_interval != 0)
+	_id = XtAppAddTimeOut(XtWidgetToApplicationContext(_vObject.widget()),
+			      _interval, CBtimer, (XtPointer)this);
 }
 
 void
