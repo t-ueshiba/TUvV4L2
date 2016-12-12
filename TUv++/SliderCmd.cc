@@ -93,9 +93,9 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				   XtNgridx,		2,
 				   XtNweightx,		0,
 				   nullptr)),
-     _min (cmd.prop ? static_cast<const float*>(cmd.prop)[0] :   0),
-     _max (cmd.prop ? static_cast<const float*>(cmd.prop)[1] : 100),
-     _step(cmd.prop ? static_cast<const float*>(cmd.prop)[2] :   1),
+     _min (cmd.prop ? static_cast<const float*>(cmd.prop)[0] : 0),
+     _max (cmd.prop ? static_cast<const float*>(cmd.prop)[1] : 1),
+     _step(cmd.prop ? static_cast<const float*>(cmd.prop)[2] : 0),
      _val (cmd.val)
 {
     XtVaSetValues(_slider, XtNgridx, 1, nullptr);
@@ -124,7 +124,7 @@ void
 SliderCmd::setValue(CmdVal val)
 {
     setValueInternal(val.f());
-    float	percent = (_val - _min) / (_max - _min);
+    float	percent = (_val.f() - _min) / (_max - _min);
     vSliderSetThumb(_slider, percent, 0.0);
 }
 
