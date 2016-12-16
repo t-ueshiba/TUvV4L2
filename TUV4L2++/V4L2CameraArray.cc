@@ -10,11 +10,10 @@ namespace TU
 *  class V4L2CameraArray						*
 ************************************************************************/
 constexpr const char*	V4L2CameraArray::DEFAULT_CAMERA_NAME;
-constexpr const char*	V4L2CameraArray::DEFAULT_CONFIG_DIRS;
     
 //! 空のVideo for Linux v.2カメラの配列を生成する.
 V4L2CameraArray::V4L2CameraArray(size_t ncameras)
-    :Array<V4L2Camera>(ncameras), _fullName()
+    :Array<V4L2Camera>(ncameras), _name()
 {
 }
     
@@ -24,14 +23,15 @@ V4L2CameraArray::V4L2CameraArray(size_t ncameras)
   \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
 */
 void
-V4L2CameraArray::restore(const char* name, const char* dirs)
+V4L2CameraArray::restore(const char* name)
 {
+    _name = name;
+    
   // 設定ファイルのfull path名を生成し, ファイルをオープンする.
-    std::ifstream	in;
-    _fullName = openFile(in,
-			 std::string(name ? name : DEFAULT_CAMERA_NAME),
-			 std::string(dirs ? dirs : DEFAULT_CONFIG_DIRS),
-			 ".conf");
+    std::ifstream	in(configFile().c_str());
+    if (!in)
+	throw std::runtime_error("V4L2CameraArray::restore(): cannot open " +
+				 configFile());
     
   // 設定ファイルに記された全カメラを生成する.
     in >> *this;

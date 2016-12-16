@@ -24,33 +24,29 @@ class V4L2CameraArray : public Array<V4L2Camera>
   public:
   //! デフォルトのカメラ名
     static constexpr const char*
-			DEFAULT_CAMERA_NAME = "V4L2Camera";
-  //! カメラ設定ファイルを収めるデフォルトのディレクトリ名
-    static constexpr const char*
-			DEFAULT_CONFIG_DIRS = ".:/usr/local/etc/cameras";
+	DEFAULT_CAMERA_NAME = "/usr/local/etc/cameras/V4L2Camera";
 
   public:
     explicit		V4L2CameraArray(size_t ncameras=0)		;
 
-    void		restore(const char* name=nullptr,
-				const char* dirs=nullptr)		;
+    void		restore(const char* name=DEFAULT_CAMERA_NAME)	;
     void		save()					const	;
-    const std::string&	fullName()				const	;
+    const std::string&	name()					const	;
     std::string		configFile()				const	;
     std::string		calibFile()				const	;
     
   private:
-    std::string		_fullName;	//!< カメラのfull path名
+    std::string		_name;	//!< カメラのfull path名
 };
 
-//! カメラのfull path名を返す.
+//! カメラ名を返す.
 /*!
-  \return	カメラのfull path名
+  \return	カメラ名
 */
 inline const std::string&
-V4L2CameraArray::fullName() const
+V4L2CameraArray::name() const
 {
-    return _fullName;
+    return _name;
 }
     
 //! カメラ設定ファイル名を返す.
@@ -60,7 +56,7 @@ V4L2CameraArray::fullName() const
 inline std::string
 V4L2CameraArray::configFile() const
 {
-    return _fullName + ".conf";
+    return _name + ".conf";
 }
     
 //! キャリブレーションファイル名を返す.
@@ -70,7 +66,7 @@ V4L2CameraArray::configFile() const
 inline std::string
 V4L2CameraArray::calibFile() const
 {
-    return _fullName + ".calib";
+    return _name + ".calib";
 }
 
 /************************************************************************
