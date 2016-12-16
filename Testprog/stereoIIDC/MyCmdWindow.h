@@ -31,7 +31,7 @@
 #include "TU/v/CmdWindow.h"
 #include "TU/v/CmdPane.h"
 #include "TU/v/Timer.h"
-#include "TU/IIDCCameraArray.h"
+#include "TU/IIDCCameraUtility.h"
 #include "TU/Rectify.h"
 #include "MyCanvasPane.h"
 #if defined(DISPLAY_3D)
@@ -61,15 +61,15 @@ class MyCmdWindow : public CmdWindow
     typedef typename STEREO::Parameters	params_type;
 
   public:
-    MyCmdWindow(App&				parentApp,
+    MyCmdWindow(App&			parentApp,
 #if defined(DISPLAY_3D)
-		const XVisualInfo*		vinfo,
-		bool				textureMapping,
-		double				parallax,
+		const XVisualInfo*	vinfo,
+		bool			textureMapping,
+		double			parallax,
 #endif
-		const IIDCCameraArray&	cameras,
-		const params_type&		params,
-		double				scale)			;
+		IIDCCameraArray&	cameras,
+		const params_type&	params,
+		double			scale)				;
 
     virtual void	callback(CmdId, CmdVal)				;
     virtual void	tick()						;
@@ -90,40 +90,40 @@ class MyCmdWindow : public CmdWindow
 
   private:
   // Stereo stuffs.
-    const IIDCCameraArray&			_cameras;
-    const double				_initialWidth;
-    const double				_initialHeight;
-    const double				_scale;
-    Rectify					_rectify;
-    stereo_type					_stereo;
-    size_t					_nimages;
-    Image<pixel_type>				_images[3];
-    Image<pixel_type>				_rectifiedImages[3];
-    Image<disparity_type>			_disparityMap;
+    IIDCCameraArray&		_cameras;
+    const double		_initialWidth;
+    const double		_initialHeight;
+    const double		_scale;
+    Rectify			_rectify;
+    stereo_type			_stereo;
+    size_t			_nimages;
+    Image<pixel_type>		_images[3];
+    Image<pixel_type>		_rectifiedImages[3];
+    Image<disparity_type>	_disparityMap;
 
   // GUI stuffs.
-    float					_b;
-    CmdPane					_menuCmd;
-    CmdPane					_captureCmd;
-    CmdPane					_featureCmd;
+    float			_b;
+    CmdPane			_menuCmd;
+    CmdPane			_captureCmd;
+    CmdPane			_featureCmd;
 #if defined(DISPLAY_2D)
-    MyCanvasPane<pixel_type>			_canvasL;
+    MyCanvasPane<pixel_type>	_canvasL;
 #  if !defined(NO_RV)
-    MyCanvasPane<pixel_type>			_canvasR;
-    MyCanvasPane<pixel_type>			_canvasV;
+    MyCanvasPane<pixel_type>	_canvasR;
+    MyCanvasPane<pixel_type>	_canvasV;
 #  endif
-    Image<u_char>				_disparityMapUC;
-    MyCanvasPane<u_char>			_canvasD;
+    Image<u_char>		_disparityMapUC;
+    MyCanvasPane<u_char>	_canvasD;
 #endif
 #if defined(DISPLAY_3D)
-    const double				_parallax;
+    const double		_parallax;
 #  if defined(DEMO)
-    MyOglWindow<pixel_type>			_window3D;
+    MyOglWindow<pixel_type>	_window3D;
 #  else
     MyOglCanvasPane<disparity_type, pixel_type>	_canvas3D;
 #  endif
 #endif
-    Timer					_timer;
+    Timer			_timer;
 };
 
 }

@@ -40,7 +40,7 @@ struct Feature
 {
     IIDCCamera::Feature	feature;
     const char*		name;
-    int			prop[3];
+    float		prop[3];
 };
 static Feature		feature[] =
 {

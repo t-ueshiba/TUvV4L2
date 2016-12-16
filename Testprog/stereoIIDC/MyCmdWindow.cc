@@ -107,16 +107,15 @@ CmdDef*			createFeatureCmds(const IIDCCamera& camera)	;
 *  class MyCmdWindow<STEREO, PIXEL, DISP>				*
 ************************************************************************/
 template <class STEREO, class PIXEL, class DISP>
-MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(
-				App&				parentApp,
+MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(App&		 parentApp,
 #if defined(DISPLAY_3D)
-				const XVisualInfo*		vinfo,
-				bool				textureMapping,
-				double				parallax,
+					      const XVisualInfo* vinfo,
+					      bool		 textureMapping,
+					      double		 parallax,
 #endif
-				const IIDCCameraArray&	cameras,	
-				const params_type&		params,
-				double				scale)
+					      IIDCCameraArray&	 cameras,	
+					      const params_type& params,
+					      double		 scale)
     :CmdWindow(parentApp, "Real-time stereo vision using IIDC cameras",
 #if defined(DISPLAY_3D) && !defined(DEMO)
 	       vinfo,
@@ -124,17 +123,17 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(
 	       Colormap::RGBColor, 256, 0, 0),
    // Stereo stuffs.
      _cameras(cameras),
-     _initialWidth(_cameras[0]->width()),
-     _initialHeight(_cameras[0]->height()),
+     _initialWidth(_cameras[0].width()),
+     _initialHeight(_cameras[0].height()),
      _scale(scale),
      _rectify(),
      _stereo(params),
      _nimages(_cameras.size()),
    // GUI stuffs.
      _b(0.0),
-     _menuCmd(*this, createMenuCmds(*_cameras[0])),
+     _menuCmd(*this, createMenuCmds(_cameras[0])),
      _captureCmd(*this, createCaptureCmds()),
-     _featureCmd(*this, createFeatureCmds(*_cameras[0])),
+     _featureCmd(*this, createFeatureCmds(_cameras[0])),
 #if defined(DISPLAY_2D)
      _disparityMapUC(),
      _canvasL(*this, 320, 240, _rectifiedImages[0]),
@@ -200,9 +199,9 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(
 #if defined(COLOR)
   // カラー画像の場合は，フォーマットをYUV422とし基準カメラ以外の画像サイズを半分にする．
     for (size_t i = 0; i < cameras.dim(); ++i)
-	_cameras[i]->setFormatAndFrameRate((i == 0 ?
-					    IIDCCamera::YUV422_640x480 :
-					    IIDCCamera::YUV422_320x240),
+	_cameras[i].setFormatAndFrameRate((i == 0 ?
+					   IIDCCamera::YUV422_640x480 :
+					   IIDCCamera::YUV422_320x240),
 					   IIDCCamera::FrameRate_30);
 #endif
 
@@ -322,11 +321,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    ofstream	out(_cameras.configFile().c_str());
 	    if (!out)
 		throw runtime_error("Failed to open camera configuration file!!");
-	    out << _cameras.dim() << endl;
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		out << "0x" << setw(16) << setfill('0')
-		    << hex << _cameras[i]->globalUniqueId() << ' '
-		    << dec << *_cameras[i];
+	    out << _cameras;
 	  }
 	    break;
 
@@ -365,11 +360,9 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_MONO8_1600x1200:
 	  case c_MONO16_1280x960:
 	  case c_MONO16_1600x1200:
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->
-		    setFormatAndFrameRate(
-			IIDCCamera::uintToFormat(id),
-			IIDCCamera::uintToFrameRate(val));
+	    for (auto& camera : _cameras)
+		camera.setFormatAndFrameRate(IIDCCamera::uintToFormat(id),
+					     IIDCCamera::uintToFrameRate(val));
 	    break;
 
 	  case c_Format_7_0:
@@ -383,16 +376,16 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  {
 	    IIDCCamera::Format	format7 = IIDCCamera::uintToFormat(id);
 	    IIDCCamera::Format_7_Info
-		fmt7info = _cameras[0]->getFormat_7_Info(format7);
+		fmt7info = _cameras[0].getFormat_7_Info(format7);
 	    MyModalDialog	modalDialog(*this, fmt7info);
 	    size_t		u0, v0, width, height;
 	    IIDCCamera::PixelFormat
 		pixelFormat = modalDialog.getROI(u0, v0, width, height);
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->setFormat_7_ROI(format7, u0, v0, width, height)
-		    .setFormat_7_PixelFormat(format7, pixelFormat)
-		    .setFormatAndFrameRate(
-			format7, IIDCCamera::uintToFrameRate(val));
+	    for (auto& camera : _cameras)
+		camera.setFormat_7_ROI(format7, u0, v0, width, height)
+		      .setFormat_7_PixelFormat(format7, pixelFormat)
+		      .setFormatAndFrameRate(format7,
+					     IIDCCamera::uintToFrameRate(val));
 	  }
 	    break;
 
@@ -407,21 +400,19 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Iris:
 	  case c_Focus:
 	  case c_Zoom:
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->setValue(id2feature(id), val);
+	    for (auto& camera : _cameras)
+		camera.setValue(id2feature(id), u_int(val));
 	    break;
       
 	  case c_WhiteBalance_UB:
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]
-		    ->setWhiteBalance(val,
-				      _featureCmd.getValue(c_WhiteBalance_VR));
+	    for (auto& camera : _cameras)
+		camera.setWhiteBalance(val,
+				       _featureCmd.getValue(c_WhiteBalance_VR));
 	    break;
 	  case c_WhiteBalance_VR:
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]
-		    ->setWhiteBalance(_featureCmd.getValue(c_WhiteBalance_UB),
-				      val);
+	    for (auto& camera : _cameras)
+		camera.setWhiteBalance(_featureCmd.getValue(c_WhiteBalance_UB),
+				       val);
 	    break;
       
 	  case c_Brightness	 + OFFSET_ONOFF:
@@ -439,8 +430,8 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Zoom		 + OFFSET_ONOFF:
 	  {
 	    IIDCCamera::Feature	feature = id2feature(id - OFFSET_ONOFF);
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->setActive(feature, val);
+	    for (auto& camera : _cameras)
+		camera.setActive(feature, val);
 	  }
 	    break;
       
@@ -459,20 +450,18 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case c_Zoom		 + OFFSET_AUTO:
 	  {
 	    IIDCCamera::Feature	feature = id2feature(id - OFFSET_AUTO);
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
+	    for (auto& camera : _cameras)
 	    {
-		_cameras[i]->setAuto(feature, val);
+		camera.setAuto(feature, val);
 
 		if (val)
 		    if (feature == IIDCCamera::WHITE_BALANCE)
-			_cameras[i]->
-			    setWhiteBalance(
-				_featureCmd.getValue(c_WhiteBalance_UB),
-				_featureCmd.getValue(c_WhiteBalance_VR));
+			camera.setWhiteBalance(
+			    _featureCmd.getValue(c_WhiteBalance_UB),
+			    _featureCmd.getValue(c_WhiteBalance_VR));
 		    else
-			_cameras[i]->
-			    setValue(feature,
-				     _featureCmd.getValue(id - OFFSET_AUTO));
+			camera.setValue(feature,
+					_featureCmd.getValue(id - OFFSET_AUTO));
 	    }
 	  }
 	    break;
@@ -482,15 +471,15 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    {
 		restoreCalibration();
 		initializeRectification();
-		for (size_t i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->continuousShot(true);
+		for (auto& camera : _cameras)
+		    camera.continuousShot(true);
 		_timer.start(1);
 	    }
 	    else
 	    {
 		_timer.stop();
-		for (size_t i = 0; i < _cameras.dim(); ++i)
-		    _cameras[i]->continuousShot(false);
+		for (auto& camera : _cameras)
+		    camera.continuousShot(false);
 	    }
 	    break;
 	
@@ -498,12 +487,12 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    stopContinuousShotIfRunning();
 	    restoreCalibration();
 	    initializeRectification();
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->oneShot();
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		_cameras[i]->snap();		// カメラに画像取り込みを指示．
-	    for (size_t i = 0; i < _cameras.dim(); ++i)
-		*_cameras[i] >> _images[i];	// カメラから画像転送．
+	    for (auto& camera : _cameras)
+		camera.oneShot();
+	    for (auto& camera : _cameras)
+		cameras.snap();			// カメラに画像取り込みを指示．
+	    for (size_t i = 0; i < _cameras.size(); ++i)
+		_cameras[i] >> _images[i];	// カメラから画像転送．
 	    stereoMatch();
 	    break;
 
@@ -595,19 +584,19 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	    _canvasD.repaintUnderlay();
 	  case Id_MouseButton1Press:
 	  {
-	    _canvasL.drawEpipolarLine(val.v);
-	    _canvasL.drawEpipolarLineV(val.u);
+	    _canvasL.drawEpipolarLine(val.v());
+	    _canvasL.drawEpipolarLineV(val.u());
 #  if !defined(NO_RV)
-	    _canvasR.drawEpipolarLine(val.v);
-	    _canvasV.drawEpipolarLine(val.u);
+	    _canvasR.drawEpipolarLine(val.v());
+	    _canvasV.drawEpipolarLine(val.u());
 #  endif
-	    _canvasD.drawEpipolarLine(val.v);
-	    _canvasD.drawEpipolarLineV(val.u);
+	    _canvasD.drawEpipolarLine(val.v());
+	    _canvasD.drawEpipolarLineV(val.u());
 	    ostringstream	s;
 	    disparity_type	d;
-	    if (0 <= val.u && val.u < _disparityMap.width()  &&
-		0 <= val.v && val.v < _disparityMap.height() &&
-		(d = _disparityMap[val.v][val.u]) != 0)
+	    if (0 <= val.u() && val.u() < _disparityMap.width()  &&
+		0 <= val.v() && val.v() < _disparityMap.height() &&
+		(d = _disparityMap[val.v()][val.u()]) != 0)
 	    {
 		s.precision(4);
 		s << d;
@@ -616,13 +605,13 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 #  if !defined(NO_RV)
 		const int	dc = int(_stereo.getParameters().disparityMax
 					 - d + 0.5);
-		_canvasR.drawPoint(val.u + dc, val.v);
+		_canvasR.drawPoint(val.u() + dc, val.v());
 		_canvasV.drawPoint(_rectifiedImages[0].height() - 1
-				   - val.v + dc,
-				   val.u);
+				   - val.v() + dc,
+				   val.u());
 #  endif
 #  if defined(DISPLAY_3D)
-		_canvas3D.setCursor(val.u, val.v, d);
+		_canvas3D.setCursor(val.u(), val.v(), d);
 	    }
 	    else
 		_canvas3D.setCursor(0, 0, 0.0);
@@ -636,10 +625,10 @@ MyCmdWindow<STEREO, PIXEL, DISP>::callback(CmdId id, CmdVal val)
 	  case Id_MouseMove:
 	  {
 	    ostringstream	s;
-	    s << '(' << val.u << ',' << val.v << ')';
+	    s << '(' << val.u() << ',' << val.v() << ')';
 	    _captureCmd.setString(c_Cursor, s.str().c_str());
-	    u_prev = val.u;
-	    v_prev = val.v;
+	    u_prev = val.u();
+	    v_prev = val.v();
 	  }
 	    break;
 	
@@ -707,11 +696,11 @@ MyCmdWindow<STEREO, PIXEL, DISP>::tick()
     countTime();
 
     syncronizedSnap();				// カメラに画像取り込みを指示．
-    for (size_t i = 0; i < _cameras.dim(); ++i)
+    for (size_t i = 0; i < _cameras.size(); ++i)
 #if defined(DIRECT_CAPTURE)
-	_cameras[i]->captureDirectly(_images[i]);
+	_cameras[i].captureDirectly(_images[i]);
 #else
-	*_cameras[i] >> _images[i];		// カメラから画像転送．
+	_cameras[i] >> _images[i];		// カメラから画像転送．
 #endif
     stereoMatch();
 }
@@ -719,33 +708,7 @@ MyCmdWindow<STEREO, PIXEL, DISP>::tick()
 template <class STEREO, class PIXEL, class DISP> void
 MyCmdWindow<STEREO, PIXEL, DISP>::syncronizedSnap()
 {
-  //#if defined(USE_VIDEO1394)
-  //#if !defined(__APPLE__)
-#if 0
-    const u_int64_t	margin = 2000;
-    u_int64_t		last = 0;
-    for (size_t i = 0; i < _cameras.dim(); ++i)
-    {
-	u_int64_t	arrivaltime = _cameras[i]->snap().arrivaltime();
-	if (last + margin < arrivaltime)
-	{
-	    last = arrivaltime;
-	    for (int j = 0; j < i; ++j)
-		do
-		{
-		    arrivaltime = _cameras[j]->snap().arrivaltime();
-		} while (arrivaltime + margin < last);
-	}
-	else if (arrivaltime + margin < last)
-	    do
-	    {
-		arrivaltime = _cameras[i]->snap().arrivaltime();
-	    } while (arrivaltime + margin < last);
-    }
-#else
-    for (size_t i = 0; i < _cameras.dim(); ++i)
-	_cameras[i]->snap();
-#endif
+    syncedSnap(_cameras);
 }
 
 template <class STEREO, class PIXEL, class DISP> void
@@ -856,8 +819,8 @@ MyCmdWindow<STEREO, PIXEL, DISP>::stopContinuousShotIfRunning()
     if (_captureCmd.getValue(c_ContinuousShot))
     {
 	_timer.stop();
-	for (size_t i = 0; i < _cameras.dim(); ++i)
-	    _cameras[i]->continuousShot(false);
+	for (auto& camera : _cameras)
+	    camera.continuousShot(false);
 	_captureCmd.setValue(c_ContinuousShot, 0);
     }
 }
