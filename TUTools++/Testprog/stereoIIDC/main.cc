@@ -64,11 +64,11 @@ usage(const char* s)
     cerr << " configuration options.\n"
 	 << "  -d configDirs:  list of directories for camera {conf|calib} file\n"
 	 << "                  (default: \""
-	 << DEFAULT_CONFIG_DIRS
+	 << IIDCCameraArray::DEFAULT_CONFIG_DIRS
 	 << "\")\n"
 	 << "  -c cameraName:  prefix of camera {conf|calib} file\n"
 	 << "                  (default: \""
-	 << DEFAULT_CAMERA_NAME
+	 << IIDCCameraArray::DEFAULT_CAMERA_NAME
 	 << "\")\n"
 	 << "  -B:             IEEE1394b mode (default: off)\n"
 	 << endl;
@@ -113,8 +113,10 @@ main(int argc, char* argv[])
     bool		gfstereo		= false;
     bool		doHorizontalBackMatch	= true;
     bool		doVerticalBackMatch	= true;
-    const char*		cameraName		= DEFAULT_CAMERA_NAME;
-    const char*		configDirs		= DEFAULT_CONFIG_DIRS;
+    const char*		cameraName		= IIDCCameraArray
+						::DEFAULT_CAMERA_NAME;
+    const char*		configDirs		= IIDCCameraArray
+						::DEFAULT_CONFIG_DIRS;
     string		paramFile		= DEFAULT_PARAM_FILE;
     double		scale			= DEFAULT_SCALE;
     bool		textureMapping		= false;
@@ -198,7 +200,7 @@ main(int argc, char* argv[])
 	IIDCCameraArray	cameras(cameraName, configDirs, speed);
 	
       // ステレオマッチングパラメータの読み込み．
-	ifstream		in;
+	ifstream	in;
 	openFile(in, paramFile, configDirs, ".params");
 
 	if (gfstereo)
