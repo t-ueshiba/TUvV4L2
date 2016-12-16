@@ -141,8 +141,8 @@ SliderCmd::setProp(const void* prop)
     else
     {
 	_min  = 0;
-	_max  = 100;
-	_step = 1;
+	_max  = 1;
+	_step = 0;
     }
 }
 
