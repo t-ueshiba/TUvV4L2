@@ -76,40 +76,35 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
       {
 	const auto	feature = IIDCCamera::uintToFeature(id);
 	  
-	if (camera.isAbsControl(feature))
-	{
-	    fval = camera.getValue<float>(feature);
-	    val  = u_int(fval);
-	}
-	else
-	{
-	    val  = camera.getValue<u_int>(feature);
-	    fval = val;
-	}
+	val  = camera.getValue<u_int>(feature);
+	fval = camera.getValue<float>(feature);
       }
 	return true;
 	
       case IIDCCamera::TRIGGER_MODE:
-	val = camera.getTriggerMode();
+	val  = camera.getTriggerMode();
 	fval = val;
 	return true;
 
       case IIDCCamera::WHITE_BALANCE:
       case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR:
-	if (camera.isAbsControl(IIDCCamera::WHITE_BALANCE))
+      {
+	u_int	ub, vr;
+	camera.getWhiteBalance(ub, vr);
+	float	fub, fvr;
+	camera.getWhiteBalance(fub, fvr);
+
+	if (id == IIDCCamera::WHITE_BALANCE)
 	{
-	    float	ub, vr;
-	    camera.getWhiteBalance(ub, vr);
-	    fval = (id == IIDCCamera::WHITE_BALANCE ? ub : vr);
-	    val  = u_int(fval);
+	    val  = ub;
+	    fval = fub;
 	}
 	else
 	{
-	    u_int	ub, vr;
-	    camera.getWhiteBalance(ub, vr);
-	    val  = (id == IIDCCamera::WHITE_BALANCE ? ub : vr);
-	    fval = fval;
+	    val  = vr;
+	    fval = fvr;
 	}
+      }
 	return true;
 	
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ONOFF:
