@@ -77,7 +77,9 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
 	const auto	feature = IIDCCamera::uintToFeature(id);
 	  
 	val  = camera.getValue<u_int>(feature);
-	fval = camera.getValue<float>(feature);
+	fval = (camera.inquireFeatureFunction(feature) &
+		IIDCCamera::Abs_Control ?
+		camera.getValue<float>(feature) : 0.0f);
       }
 	return true;
 	
@@ -91,8 +93,10 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
       {
 	u_int	ub, vr;
 	camera.getWhiteBalance(ub, vr);
-	float	fub, fvr;
-	camera.getWhiteBalance(fub, fvr);
+	float	fub = 0, fvr = 0;
+	if (camera.inquireFeatureFunction(IIDCCamera::WHITE_BALANCE) &
+	    IIDCCamera::Abs_Control)
+	    camera.getWhiteBalance(fub, fvr);
 
 	if (id == IIDCCamera::WHITE_BALANCE)
 	{
