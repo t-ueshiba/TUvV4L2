@@ -1,7 +1,8 @@
 /*
  *  $Id: createMenuCmds.cc 1246 2012-11-30 06:23:09Z ueshiba $
  */
-#include "stereoIIDC.h"
+#include "TU/v/TUv++.h"
+#include "stereoGUI.h"
 
 namespace TU
 {

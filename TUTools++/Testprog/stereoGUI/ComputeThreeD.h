@@ -25,17 +25,24 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: MyOglCanvasPane.cc 1495 2014-02-27 15:07:51Z ueshiba $
+ *  $Id: ComputeThreeD.h 1246 2012-11-30 06:23:09Z ueshiba $
  */
-#include "MyOglCanvasPane.h"
+#include "TU/Geometry++.h"
 
 namespace TU
 {
-namespace v
-{
 /************************************************************************
-*  class MyOglCanvasPaneBase						*
+*  class ComputeThreeD							*
 ************************************************************************/
-
-}
+class ComputeThreeD
+{
+  public:
+    ComputeThreeD(const Matrix34d& Pl, const Matrix34d& Pr)		;
+    
+    Point3d	operator ()(int u, int v, float d)		const	;
+    
+  private:
+    Matrix44d	_Mt;
+};
+    
 }
