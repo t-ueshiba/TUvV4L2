@@ -28,15 +28,13 @@
  *  $Id: main.cc 1495 2014-02-27 15:07:51Z ueshiba $
  */
 /*!
-  \mainpage	corrStereo
-  本プログラムは，Point Grey Research Inc.のデジタルカメラ
-  DragonflyまたはDragonfly2を用いて2眼または3眼リアルタイムステレオ
-  ビジョンを実現するソフトウェアである．これらの機種に限らず，カメ
-  ラ間同期機能を持つIIDC-based Digital Camera Specification
-  ver. 1.30に準拠したデジタルカメラであれば，本プロブラムによって
-  リアルタイムに3次元情報を復元することができる．
+  \mainpage	stereoIIDC
+  本プログラムは，IIDC Specification ver. 1.30に準拠したデジタルカメラ
+  を用いて2眼または3眼リアルタイムステレオビジョンを実現するソフトウェアである．
+  カメラ間の同期がとれていれば，本プロブラムによってリアルタイムに3次元情報を
+  復元することができる．
 */ 
-#include <unistd.h>
+#include <cstdlib>
 #include "TU/SADStereo.h"
 #include "TU/GFStereo.h"
 #include "TU/io.h"

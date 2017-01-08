@@ -163,8 +163,7 @@ HDRS		= ComputeThreeD.h \
 		MyCmdWindow.h \
 		MyModalDialog.h \
 		MyOglCanvasPane.h \
-		MyOglWindow.h \
-		stereoIIDC.h
+		MyOglWindow.h
 SRCS		= ComputeThreeD.cc \
 		DrawThreeD.cc \
 		MyCanvasPane.cc \
@@ -343,4 +342,4 @@ main.o: ../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Image++.h \
 	ComputeThreeD.h MyOglWindow.h MyOglCanvasPane.h \
 	/usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h /usr/local/include/TU/v/DC3.h \
-	DrawThreeD.h stereoIIDC.h
+	DrawThreeD.h
