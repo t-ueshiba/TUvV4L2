@@ -27,17 +27,17 @@
  *  
  *  $Id: corrStereo.h 1456 2013-11-12 23:54:08Z ueshiba $
  */
+#ifndef __TU_STEREOIIDC_H
+#define __TU_STEREOIIDC_H
+
 #include <fstream>
 #include <string>
+#include <sys/time.h>
 #include "TU/v/TUv++.h"
-#include "TU/IIDC++.h"
 
 /************************************************************************
 *  global data and definitions						*
 ************************************************************************/
-#define OFFSET_ONOFF	0x100
-#define OFFSET_AUTO	0x200
-
 namespace TU
 {
 namespace v
@@ -55,64 +55,6 @@ enum
     c_SaveThreeD,
     c_SaveThreeDImage,
     
-  // Camera selection.
-    c_SelectionSchemes,
-    c_TripletSelection,
-    c_CameraSelection,
-
-  // Camera feasures.
-    c_Brightness = IIDCCamera::BRIGHTNESS,
-    c_AutoExposure,
-    c_Sharpness,
-    c_WhiteBalance_UB,
-    c_WhiteBalance_VR,
-    c_Hue,
-    c_Saturation,
-    c_Gamma,
-    c_Shutter,
-    c_Gain,
-    c_Iris,
-    c_Focus,
-    c_Temperature,
-    c_Zoom,
-
-  // Camera video format.
-    c_Format,
-    c_YUV444_160x120	= IIDCCamera::YUV444_160x120,
-    c_YUV422_320x240	= IIDCCamera::YUV422_320x240,
-    c_YUV411_640x480	= IIDCCamera::YUV411_640x480,
-    c_YUV422_640x480	= IIDCCamera::YUV422_640x480,
-    c_RGB24_640x480	= IIDCCamera::RGB24_640x480,
-    c_MONO8_640x480	= IIDCCamera::MONO8_640x480,
-    c_MONO16_640x480	= IIDCCamera::MONO16_640x480,
-    c_YUV422_800x600	= IIDCCamera::YUV422_800x600,
-    c_RGB24_800x600	= IIDCCamera::RGB24_800x600,
-    c_MONO8_800x600	= IIDCCamera::MONO8_800x600,
-    c_YUV422_1024x768	= IIDCCamera::YUV422_1024x768,
-    c_RGB24_1024x768	= IIDCCamera::RGB24_1024x768,
-    c_MONO8_1024x768	= IIDCCamera::MONO8_1024x768,
-    c_MONO16_800x600	= IIDCCamera::MONO16_800x600,
-    c_MONO16_1024x768	= IIDCCamera::MONO16_1024x768,
-    c_YUV422_1280x960	= IIDCCamera::YUV422_1280x960,
-    c_RGB24_1280x960	= IIDCCamera::RGB24_1280x960,
-    c_MONO8_1280x960	= IIDCCamera::MONO8_1280x960,
-    c_YUV422_1600x1200	= IIDCCamera::YUV422_1600x1200,
-    c_RGB24_1600x1200	= IIDCCamera::RGB24_1600x1200,
-    c_MONO8_1600x1200	= IIDCCamera::MONO8_1600x1200,
-    c_MONO16_1280x960	= IIDCCamera::MONO16_1280x960,
-    c_MONO16_1600x1200	= IIDCCamera::MONO16_1600x1200,
-    c_Format_7_0	= IIDCCamera::Format_7_0,
-    c_Format_7_1	= IIDCCamera::Format_7_1,
-    c_Format_7_2	= IIDCCamera::Format_7_2,
-    c_Format_7_3	= IIDCCamera::Format_7_3,
-    c_Format_7_4	= IIDCCamera::Format_7_4,
-    c_Format_7_5	= IIDCCamera::Format_7_5,
-    c_Format_7_6	= IIDCCamera::Format_7_6,
-    c_Format_7_7	= IIDCCamera::Format_7_7,
-
-  // # of movie frames.
-    c_NFrames,
-
   // Camera control.
     c_ContinuousShot,
     c_OneShot,
@@ -120,11 +62,6 @@ enum
     c_DisparityLabel,
     c_Disparity,
     c_Trigger,
-    c_PlayMovie,
-    c_RecordMovie,
-    c_StatusMovie,
-    c_ForwardMovie,
-    c_BackwardMovie,
 
   // Stereo matching parameters
     c_Algorithm,
@@ -160,5 +97,158 @@ enum
     c_Refresh,
 };
 
+/************************************************************************
+*  global functions							*
+************************************************************************/
+template <class CAMERA> CmdDef*
+createMenuCmds(CAMERA& camera)
+{
+    static MenuDef fileMenu[] =
+    {
+	{"Open stereo images",		M_Open,			false, noSub},
+	{"Save stereo images",		M_Save,			false, noSub},
+	{"Save rectified images",	c_SaveRectifiedImages,	false, noSub},
+	{"Save 3D data",		c_SaveThreeD,		false, noSub},
+#if defined(DISPLAY_3D)
+	{"Save 3D-rendered image",	c_SaveThreeDImage,	false, noSub},
+#endif
+	{"-",				M_Line,			false, noSub},
+	{"Save camera config.",		c_SaveConfig,		false, noSub},
+	{"Save camera matrices",	c_SaveMatrices,		false, noSub},
+	{"-",				M_Line,			false, noSub},
+	{"Quit",			M_Exit,			false, noSub},
+	EndOfMenu
+    };
+
+    static float  range[] = {0.5, 3.0, 0};
+
+    static CmdDef radioButtonCmds[] =
+    {
+	{C_RadioButton, c_Texture, 0, "Texture", noProp, CA_None,
+	 0, 0, 1, 1, 0},
+	{C_RadioButton, c_Polygon, 0, "Polygon", noProp, CA_None,
+	 1, 0, 1, 1, 0},
+	{C_RadioButton, c_Mesh,    0, "Mesh",    noProp, CA_None,
+	 2, 0, 1, 1, 0},
+	EndOfCmds
+    };
+    
+    static CmdDef menuCmds[] =
+    {
+	{C_MenuButton, M_File,		0,
+	 "File",			fileMenu, CA_None, 0, 0, 1, 1, 0},
+	{C_MenuButton, M_Format, 0,
+	 "Format",			noProp, CA_None, 1, 0, 1, 1, 0},
+#if defined(DISPLAY_3D)
+	{C_ChoiceFrame,  c_DrawMode,	 c_Texture,
+	 "",		radioButtonCmds,	CA_NoBorder, 2, 0, 1, 1, 0},
+	{C_Slider, c_GazeDistance,	1.3,
+	 "Gaze distance",		range,	CA_None, 3, 0, 1, 1, 0},
+	{C_ToggleButton, c_SwingView,   0,
+	 "Swing view",			noProp,	CA_None, 4, 0, 1, 1, 0},
+	{C_ToggleButton, c_StereoView,	0,
+	 "Stereo view",			noProp, CA_None, 5, 0, 1, 1, 0},
+#endif
+	EndOfCmds
+    };
+
+    menuCmds[1].prop = createFormatMenu(camera);
+
+    return menuCmds;
 }
+
+inline CmdDef*
+createCaptureCmds()
+{
+    static float	prop[6][3];
+    static CmdDef	captureCmds[] =
+    {
+	{C_ToggleButton, c_ContinuousShot, 0,
+	 "Continuous shot",		noProp,  CA_None,     0, 0, 1, 1, 0},
+	{C_Button, c_OneShot,		0,
+	 "One shot",			noProp,  CA_None,     0, 1, 1, 1, 0},
+	{C_ToggleButton,  c_DoHorizontalBackMatch,	0,
+	 "Hor. back match",		noProp,  CA_None,     5, 0, 1, 1, 0}, 
+	{C_ToggleButton,  c_DoVerticalBackMatch,	0,
+	"Ver. back match",		noProp,  CA_None,     6, 0, 1, 1, 0},
+	{C_ToggleButton,c_Binocular,	0,
+	 "Binocular",			noProp,  CA_None,     1, 0, 1, 1, 0},
+	{C_Label, c_Cursor,		0,
+	 "(   ,   )",			noProp,  CA_None,     2, 0, 1, 1, 0},
+	{C_Label, c_DisparityLabel,	0,
+	 "Disparity:",			noProp,  CA_NoBorder, 1, 1, 1, 1, 0},
+	{C_Label, c_Disparity,		0,
+	 "     ",			noProp,  CA_None,     2, 1, 1, 1, 0},
+	{C_Label, c_DepthRange,		0,
+	 "",				noProp,	 CA_NoBorder, 0, 8, 3, 1, 0},
+	{C_Slider, c_WindowSize,	0,
+	 "Window size",			prop[0], CA_None,     0, 2, 3, 1, 0},
+	{C_Slider, c_DisparitySearchWidth,	0,
+	 "Disparity search width",	prop[1], CA_None,     0, 3, 3, 1, 0},
+	{C_Slider, c_DisparityMax,	0,
+	 "Maximum disparity",		prop[2], CA_None,     0, 4, 3, 1, 0},
+	{C_Slider, c_DisparityInconsistency,	0,
+	 "Disparity inconsistency",	prop[3], CA_None,     0, 5, 3, 1, 0},
+	{C_Slider, c_IntensityDiffMax,	0,
+	 "Maximum intensity diff.",	prop[4], CA_None,     0, 6, 3, 1, 0},
+	{C_Slider, c_Regularization,	0,
+	 "Regularization",		prop[5], CA_None,     0, 7, 3, 1, 0},
+	EndOfCmds
+    };
+    
+  // Window size
+    prop[0][0]  = 3;
+    prop[0][1]  = 31;
+    prop[0][2]  = 1;
+
+  // Disparity search width
+    prop[1][0]  = 16;
+    prop[1][1]  = 192;
+    prop[1][2]  = 1;
+
+  // Max. disparity
+    prop[2][0]  = 48;
+    prop[2][1]  = 192;
+    prop[2][2]  = 1;
+
+  // Disparity inconsistency
+    prop[3][0]  = 0;
+    prop[3][1]  = 20;
+    prop[3][2]  = 1;
+
+  // Max. intensity diff.
+    prop[4][0]  = 0;
+    prop[4][1]  = 100;
+    prop[4][2]  = 1;
+    
+  // Regularization
+    prop[5][0]  = 1;
+    prop[5][1]  = 255;
+    prop[5][2]  = 1;
+
+    return captureCmds;
 }
+
+}	// namespace v
+
+inline void
+countTime()
+{
+    static int		nframes = 0;
+    static timeval	start;
+    
+    if (nframes == 10)
+    {
+	timeval	end;
+	gettimeofday(&end, NULL);
+	double	interval = (end.tv_sec  - start.tv_sec) +
+	    (end.tv_usec - start.tv_usec) / 1.0e6;
+	std::cerr << nframes / interval << " frames/sec" << std::endl;
+	nframes = 0;
+    }
+    if (nframes++ == 0)
+	gettimeofday(&start, NULL);
+}
+
+}	// namespace TU
+#endif
