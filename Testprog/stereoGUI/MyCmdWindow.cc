@@ -6,7 +6,7 @@
 #include "TU/v/Notify.h"
 #include "TU/SADStereo.h"
 #include "TU/GFStereo.h"
-#include "stereoIIDC.h"
+#include "stereoGUI.h"
 #include "MyCmdWindow.h"
 #include "ComputeThreeD.h"
 

@@ -25,17 +25,75 @@
  *  The copyright holders or the creator are not responsible for any
  *  damages in the use of this program.
  *  
- *  $Id: MyOglCanvasPane.cc 1495 2014-02-27 15:07:51Z ueshiba $
+ *  $Id: DrawThreeD.h 1495 2014-02-27 15:07:51Z ueshiba $
  */
-#include "MyOglCanvasPane.h"
+#include "TU/Warp.h"
 
 namespace TU
 {
-namespace v
-{
 /************************************************************************
-*  class MyOglCanvasPaneBase						*
+*  class DrawThreeD							*
 ************************************************************************/
+class DrawThreeD
+{
+  public:
+    struct C4UB_V3F
+    {
+	u_char		r, g, b, a;
+	float		u, v, d;
+    };
 
+    struct T2F_V3F
+    {
+	Vector2f	st;
+	float		u, v, d;
+    };
+    
+    struct N3F_V3F
+    {
+	float		nu, nv, nd;
+	float		u, v, d;
+    };
+
+    struct V3F
+    {
+	float	u, v, d;
+    };
+
+  public:
+    DrawThreeD()							;
+    
+    void	initialize(const Matrix34d& Pl, const Matrix34d& Pr,
+			   float gap=1.0)				;
+    template <class D, class T>
+    void	draw(const Image<D>& disparityMap,
+		     const Image<T>& image)				;
+    template <class D, class T>
+    void	draw(const Image<D>& disparityMap,
+		     const Image<T>& image, const Warp& warp)		;
+    template <class F, class D>
+    void	draw(const Image<D>& disparityMap)			;
+    void	setCursor(int u, int v, float d)			;
+    
+  private:
+    template <class F>
+    void	resize(size_t width)					;
+    template <class F>
+    void	setNormal(F* vq)					;
+    void	drawCursor()					const	;
+    
+    Array<u_char>	_vertices;
+    Matrix44d		_Mt;
+    float		_gap;
+    float		_u, _v, _d;
+};
+
+inline void
+DrawThreeD::setCursor(int u, int v, float d)
+{
+    _u = u;
+    _v = v;
+    _d = d;
 }
+    
 }
