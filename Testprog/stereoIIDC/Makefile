@@ -27,7 +27,7 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUIIDC++ -lTUOgl++ -lTUv++ -lTUTools++ \
+LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 \
 		  -lraw1394 -lusb-1.0 -ltbb -ltbbmalloc
 ifeq ($(shell arch), aarch64)
@@ -50,6 +50,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/Filter2.h \
 		../../TU/GFStereo.h \
 		../../TU/Geometry++.h \
+		../../TU/Heap.h \
 		../../TU/Image++.h \
 		../../TU/List.h \
 		../../TU/Manip.h \
@@ -134,6 +135,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/tuple.h \
 		../../TU/types.h \
 		/usr/local/include/TU/IIDC++.h \
+		/usr/local/include/TU/IIDCCameraArray.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -153,7 +155,8 @@ EXTHDRS		= ../../TU/Array++.h \
 		/usr/local/include/TU/v/TUv++.h \
 		/usr/local/include/TU/v/Timer.h \
 		/usr/local/include/TU/v/Widget-Xaw.h \
-		/usr/local/include/TU/v/XDC.h
+		/usr/local/include/TU/v/XDC.h \
+		/usr/local/include/TU/v/vIIDC++.h
 HDRS		= ComputeThreeD.h \
 		DrawThreeD.h \
 		MyCanvasPane.h \
@@ -165,22 +168,14 @@ HDRS		= ComputeThreeD.h \
 SRCS		= ComputeThreeD.cc \
 		DrawThreeD.cc \
 		MyCanvasPane.cc \
-		MyCmdWindow.cc \
 		MyModalDialog.cc \
 		MyOglCanvasPane.cc \
-		createCaptureCmds.cc \
-		createFeatureCmds.cc \
-		createMenuCmds.cc \
 		main.cc
 OBJS		= ComputeThreeD.o \
 		DrawThreeD.o \
 		MyCanvasPane.o \
-		MyCmdWindow.o \
 		MyModalDialog.o \
 		MyOglCanvasPane.o \
-		createCaptureCmds.o \
-		createFeatureCmds.o \
-		createMenuCmds.o \
 		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
@@ -239,60 +234,6 @@ MyCanvasPane.o: MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Image++.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/v/Menu.h \
 	/usr/local/include/TU/v/ShmDC.h
-MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
-	/usr/local/include/TU/v/ModalDialog.h \
-	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/CmdPane.h \
-	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
-	../../TU/List.h ../../TU/Geometry++.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
-	../../TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
-	/usr/local/include/TU/v/Notify.h stereoIIDC.h \
-	/usr/local/include/TU/IIDC++.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/Timer.h \
-	../../TU/Rectify.h ../../TU/Warp.h ../../TU/Camera++.h \
-	../../TU/simd/simd.h ../../TU/simd/config.h ../../TU/simd/vec.h \
-	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
-	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
-	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
-	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/x86/allocator.h ../../TU/simd/arm/allocator.h \
-	../../TU/simd/load_store.h ../../TU/simd/x86/load_store.h \
-	../../TU/simd/arm/load_store.h ../../TU/simd/zero.h \
-	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
-	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
-	../../TU/simd/arm/cast.h ../../TU/simd/insert_extract.h \
-	../../TU/simd/x86/insert_extract.h ../../TU/simd/arm/insert_extract.h \
-	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
-	../../TU/simd/arm/shift.h ../../TU/simd/bit_shift.h \
-	../../TU/simd/x86/bit_shift.h ../../TU/simd/arm/bit_shift.h \
-	../../TU/simd/dup.h ../../TU/simd/cvt.h ../../TU/simd/x86/cvt.h \
-	../../TU/simd/x86/unpack.h ../../TU/simd/arm/cvt.h \
-	../../TU/simd/logical.h ../../TU/simd/x86/logical.h \
-	../../TU/simd/x86/logical_base.h ../../TU/simd/arm/logical.h \
-	../../TU/simd/x86/dup.h ../../TU/simd/arm/dup.h \
-	../../TU/simd/compare.h ../../TU/simd/x86/compare.h \
-	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
-	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
-	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
-	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/simd/BufTraits.h ../../TU/simd/zero.h MyCanvasPane.h \
-	/usr/local/include/TU/v/CanvasPane.h \
-	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
-	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
-	MyOglWindow.h MyOglCanvasPane.h /usr/local/include/TU/v/OglDC.h \
-	/usr/local/include/TU/v/CanvasPaneDC3.h /usr/local/include/TU/v/DC3.h \
-	DrawThreeD.h MyModalDialog.h ComputeThreeD.h ../../TU/SADStereo.h \
-	../../TU/StereoBase.h ../../TU/algorithm.h ../../TU/Profiler.h \
-	../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/GFStereo.h
 MyModalDialog.o: MyModalDialog.h /usr/local/include/TU/IIDC++.h \
 	../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
@@ -346,24 +287,6 @@ MyOglCanvasPane.o: MyOglCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
 	../../TU/simd/row_vec_iterator.h ../../TU/simd/BufTraits.h \
 	../../TU/simd/zero.h
-createCaptureCmds.o: stereoIIDC.h /usr/local/include/TU/v/TUv++.h \
-	../../TU/List.h ../../TU/Geometry++.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
-	../../TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/IIDC++.h ../../TU/Image++.h
-createFeatureCmds.o: stereoIIDC.h /usr/local/include/TU/v/TUv++.h \
-	../../TU/List.h ../../TU/Geometry++.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
-	../../TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/IIDC++.h ../../TU/Image++.h
-createMenuCmds.o: stereoIIDC.h /usr/local/include/TU/v/TUv++.h \
-	../../TU/List.h ../../TU/Geometry++.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/Minimize.h \
-	../../TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/IIDC++.h ../../TU/Image++.h
 main.o: ../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Image++.h \
 	../../TU/types.h ../../TU/Geometry++.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
@@ -401,17 +324,23 @@ main.o: ../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Image++.h \
 	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
 	../../TU/simd/row_vec_iterator.h ../../TU/simd/BufTraits.h \
 	../../TU/simd/zero.h ../../TU/Profiler.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/GFStereo.h ../../TU/io.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
+	../../TU/Filter2.h ../../TU/GFStereo.h ../../TU/io.h \
+	/usr/local/include/TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
+	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
 	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
-	/usr/local/include/TU/v/Timer.h ../../TU/Rectify.h ../../TU/Warp.h \
-	../../TU/Camera++.h MyCanvasPane.h \
+	/usr/local/include/TU/IIDCCameraArray.h \
+	/usr/local/include/TU/IIDC++.h ../../TU/Heap.h MyCmdWindow.h \
+	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/Timer.h \
+	/usr/local/include/TU/v/FileSelection.h \
+	/usr/local/include/TU/v/ModalDialog.h \
+	/usr/local/include/TU/v/Dialog.h /usr/local/include/TU/v/Notify.h \
+	../../TU/Rectify.h ../../TU/Warp.h ../../TU/Camera++.h MyCanvasPane.h \
 	/usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/ShmDC.h \
-	MyOglWindow.h MyOglCanvasPane.h /usr/local/include/TU/v/OglDC.h \
+	ComputeThreeD.h MyOglWindow.h MyOglCanvasPane.h \
+	/usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h /usr/local/include/TU/v/DC3.h \
-	DrawThreeD.h
+	DrawThreeD.h stereoIIDC.h

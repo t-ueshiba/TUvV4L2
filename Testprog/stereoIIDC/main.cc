@@ -40,6 +40,7 @@
 #include "TU/SADStereo.h"
 #include "TU/GFStereo.h"
 #include "TU/io.h"
+#include "TU/v/vIIDC++.h"
 #include "MyCmdWindow.h"
 
 #define DEFAULT_PARAM_FILE	"stereo"
@@ -62,10 +63,6 @@ usage(const char* s)
     cerr << " Usage: " << s << " [options]\n"
 	 << endl;
     cerr << " configuration options.\n"
-	 << "  -d configDirs:  list of directories for camera {conf|calib} file\n"
-	 << "                  (default: \""
-	 << IIDCCameraArray::DEFAULT_CONFIG_DIRS
-	 << "\")\n"
 	 << "  -c cameraName:  prefix of camera {conf|calib} file\n"
 	 << "                  (default: \""
 	 << IIDCCameraArray::DEFAULT_CAMERA_NAME
@@ -115,8 +112,7 @@ main(int argc, char* argv[])
     bool		doVerticalBackMatch	= true;
     const char*		cameraName		= IIDCCameraArray
 						::DEFAULT_CAMERA_NAME;
-    const char*		configDirs		= IIDCCameraArray
-						::DEFAULT_CONFIG_DIRS;
+    const char*		configDirs		= "/usr/local/etc/cameras";
     string		paramFile		= DEFAULT_PARAM_FILE;
     double		scale			= DEFAULT_SCALE;
     bool		textureMapping		= false;
@@ -126,7 +122,7 @@ main(int argc, char* argv[])
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "GHVd:c:Bp:s:xq:g:h")) != -1; )
+    for (int c; (c = getopt(argc, argv, "GHVc:Bp:s:xq:g:h")) != -1; )
 	switch (c)
 	{
 	  case 'G':
@@ -137,9 +133,6 @@ main(int argc, char* argv[])
 	    break;
 	  case 'V':
 	    doVerticalBackMatch = false;
-	    break;
-	  case 'd':
-	    configDirs = optarg;
 	    break;
 	  case 'c':
 	    cameraName = optarg;
@@ -197,7 +190,8 @@ main(int argc, char* argv[])
 	    throw runtime_error("No appropriate visual!!");
 #endif
       // IIDCカメラのオープン．
-	IIDCCameraArray	cameras(cameraName, configDirs, speed);
+	IIDCCameraArray	cameras;
+	cameras.restore(cameraName, speed);
 	
       // ステレオマッチングパラメータの読み込み．
 	ifstream	in;
@@ -212,7 +206,7 @@ main(int argc, char* argv[])
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<GFStereoType>
+	    v::MyCmdWindow<GFStereoType, IIDCCameraArray>
 		myWin(vapp,
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,
@@ -231,7 +225,7 @@ main(int argc, char* argv[])
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<SADStereoType>
+	    v::MyCmdWindow<SADStereoType, IIDCCameraArray>
 		myWin(vapp,
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,
