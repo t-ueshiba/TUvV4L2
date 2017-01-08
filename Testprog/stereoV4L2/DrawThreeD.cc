@@ -1,1 +1,1 @@
-../stereoIIDC/DrawThreeD.cc
+../stereoGUI/DrawThreeD.cc
