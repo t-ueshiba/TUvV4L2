@@ -29,16 +29,16 @@
  */
 /*!
   \mainpage	corrStereo
-  本プログラムは，Point Grey Research Inc.のデジタルカメラ
-  DragonflyまたはDragonfly2を用いて2眼または3眼リアルタイムステレオ
-  ビジョンを実現するソフトウェアである．これらの機種に限らず，カメ
-  ラ間同期機能を持つ1394-based Digital Camera Specification
-  ver. 1.30に準拠したデジタルカメラであれば，本プロブラムによって
-  リアルタイムに3次元情報を復元することができる．
+  本プログラムは，Video for Linux version 2に準拠したデジタルカメラ
+  を用いて2眼または3眼リアルタイムステレオビジョンを実現するソフトウェアである．
+  カメラ間の同期がとれていれば，本プロブラムによってリアルタイムに3次元情報を
+  復元することができる．
 */ 
-#include <unistd.h>
+#include <cstdlib>
 #include "TU/SADStereo.h"
 #include "TU/GFStereo.h"
+#include "TU/io.h"
+#include "TU/v/vV4L2++.h"
 #include "MyCmdWindow.h"
 
 #define DEFAULT_PARAM_FILE	"stereo"
@@ -61,14 +61,10 @@ usage(const char* s)
     cerr << " Usage: " << s << " [options]\n"
 	 << endl;
     cerr << " configuration options.\n"
-	 << "  -d configDirs:  list of directories for camera {conf|calib} file\n"
-	 << "                  (default: \""
-	 << TU_V4L2_DEFAULT_CONFIG_DIRS
-	 << "\")\n"
 	 << "  -c cameraName:  prefix of camera {conf|calib} file\n"
 	 << "                  (default: \""
-	 << TU_V4L2_DEFAULT_CAMERA_NAME
-	 << "\")"
+	 << V4L2CameraArray::DEFAULT_CAMERA_NAME
+	 << "\")\n"
 	 << endl;
     cerr << " stereo options.\n"
 	 << "  -p params:      stereo parameter file (default: \""
@@ -108,20 +104,21 @@ main(int argc, char* argv[])
     typedef GFStereo<float,  u_char>	GFStereoType;
 #endif
 
-    bool	gfstereo		= false;
-    bool	doHorizontalBackMatch	= true;
-    bool	doVerticalBackMatch	= true;
-    const char*	cameraName		= TU_V4L2_DEFAULT_CAMERA_NAME;
-    const char*	configDirs		= TU_V4L2_DEFAULT_CONFIG_DIRS;
-    string	paramFile		= DEFAULT_PARAM_FILE;
-    double	scale			= DEFAULT_SCALE;
-    bool	textureMapping		= false;
-    double	parallax		= -1.0;
-    size_t	grainSize		= DEFAULT_GRAINSIZE;
+    bool		gfstereo		= false;
+    bool		doHorizontalBackMatch	= true;
+    bool		doVerticalBackMatch	= true;
+    const char*		cameraName		= V4L2CameraArray
+						::DEFAULT_CAMERA_NAME;
+    const char*		configDirs		= "/usr/local/etc/cameras";
+    string		paramFile		= DEFAULT_PARAM_FILE;
+    double		scale			= DEFAULT_SCALE;
+    bool		textureMapping		= false;
+    double		parallax		= -1.0;
+    size_t		grainSize		= DEFAULT_GRAINSIZE;
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "GHVd:c:p:s:xq:g:h")) != -1; )
+    for (int c; (c = getopt(argc, argv, "GHVc:p:s:xq:g:h")) != -1; )
 	switch (c)
 	{
 	  case 'G':
@@ -132,9 +129,6 @@ main(int argc, char* argv[])
 	    break;
 	  case 'V':
 	    doVerticalBackMatch = false;
-	    break;
-	  case 'd':
-	    configDirs = optarg;
 	    break;
 	  case 'c':
 	    cameraName = optarg;
@@ -188,8 +182,9 @@ main(int argc, char* argv[])
 	if (vinfo == 0)
 	    throw runtime_error("No appropriate visual!!");
 #endif
-      // IEEE1394カメラのオープン．
-	V4L2CameraArray	cameras(cameraName, configDirs);
+      // V4L2カメラのオープン．
+	V4L2CameraArray	cameras;
+	cameras.restore(cameraName);
 	
       // ステレオマッチングパラメータの読み込み．
 	ifstream	in;
@@ -204,7 +199,7 @@ main(int argc, char* argv[])
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<GFStereoType>
+	    v::MyCmdWindow<GFStereoType, V4L2CameraArray>
 		myWin(vapp,
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,
@@ -223,7 +218,7 @@ main(int argc, char* argv[])
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
-	    v::MyCmdWindow<SADStereoType>
+	    v::MyCmdWindow<SADStereoType, V4L2CameraArray>
 		myWin(vapp,
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,

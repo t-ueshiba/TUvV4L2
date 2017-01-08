@@ -1,1 +1,1 @@
-../stereoIIDC/ComputeThreeD.cc
+../stereoGUI/ComputeThreeD.cc

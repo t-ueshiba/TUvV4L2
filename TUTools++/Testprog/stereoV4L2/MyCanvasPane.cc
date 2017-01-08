@@ -1,1 +1,1 @@
-../stereoIIDC/MyCanvasPane.cc
+../stereoGUI/MyCanvasPane.cc
