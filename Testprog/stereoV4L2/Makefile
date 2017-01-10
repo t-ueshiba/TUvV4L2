@@ -167,7 +167,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		/usr/local/include/TU/v/Widget-Xaw.h \
 		/usr/local/include/TU/v/XDC.h \
 		/usr/local/include/TU/v/vV4L2++.h
-HDRS		= stereoV4L2.h
+HDRS		=
 SRCS		= ComputeThreeD.cc \
 		DrawThreeD.cc \
 		MyCanvasPane.cc \
