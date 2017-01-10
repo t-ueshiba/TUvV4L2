@@ -291,7 +291,7 @@ SURFCreator::createSURFs(const Image<T>& image, OUT out) const
     Sieve<F>	sieve(image.height(), image.width(), 10, 10, 10);
     Inserter	insert(sieve);
     detectFeatures(image, insert);
-
+    
   // 各SURF特徴点に向きと特徴ベクトルを与える．
 #if defined(USE_TBB)		  // Sieveの反復子はrandom access不可
     Array<F>	features(sieve);  // なので並列処理時はArrayに移す．
@@ -460,8 +460,6 @@ class Sieve
 		{
 		    if (isBegin)
 			checkBucketEnd();
-		    else
-			checkBucketBegin();
 		}
 
       private:

@@ -14,8 +14,8 @@ MOCHDRS		=
 
 INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
-NVCCFLAGS	= -g
+CFLAGS		= -O3
+NVCCFLAGS	= -O
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
   NVCCFLAGS	= -O			# must < -O2
