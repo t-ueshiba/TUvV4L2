@@ -8,16 +8,6 @@
 namespace TU
 {
 /************************************************************************
-*  struct assign							*
-************************************************************************/
-//! 代入
-struct assign
-{
-    template <class T_, class S_>
-    T_&	operator ()(T_&& y, const S_& x)	const	{ y = x; return y; }
-};
-
-/************************************************************************
 *  class BufTraits<T>							*
 ************************************************************************/
 template <class T, class ALLOC>
@@ -26,7 +16,9 @@ struct BufTraits
     using allocator_type = ALLOC;
     using pointer	 = typename allocator_type::pointer;
     using const_pointer	 = typename allocator_type::const_pointer;
-
+    using iterator	 = pointer;
+    using const_iterator = const_pointer;
+    
   protected:
     static pointer	null()
 			{
@@ -40,12 +32,12 @@ struct BufTraits
 			}
 
     template <class T_>
-    static void		fill(pointer ib, pointer ie, const T_& c)
+    static void		fill(iterator ib, iterator ie, const T_& c)
 			{
 			    std::fill(ib, ie, c);
 			}
 
-    static void		init(pointer ib, pointer ie)
+    static void		init(iterator ib, iterator ie)
 			{
 			    std::fill(ib, ie, 0);
 			}
@@ -59,83 +51,44 @@ struct BufTraits
   単独で使用することはなく，#TU::Array の基底クラスまたは #TU::Array2 の
   内部バッファクラスとして使う．
   \param T	要素の型
-  \param D	バッファ中の要素数
+  \param N	バッファ中の要素数
 */
-template <class T, size_t D, class ALLOC>
+template <class T, size_t N, class ALLOC>
 class Buf : public BufTraits<T, ALLOC>
 {
   private:
     using super		 = BufTraits<T, ALLOC>;
-    using _0		 = std::integral_constant<size_t, 0>;
-    using _D		 = std::integral_constant<size_t, D>;
     
   public:
     using allocator_type = void;
     using value_type	 = T;
     using pointer	 = typename super::pointer;
     using const_pointer	 = typename super::const_pointer;
+    using iterator	 = typename super::iterator;
+    using const_iterator = typename super::const_iterator;
     
   public:
-    explicit		Buf(size_t siz=D)
-			{
-			    resize(siz);
-			}
+    explicit		Buf(size_t siz=N)	{ resize(siz); }
+			Buf(const Buf&)		= default;
+    Buf&		operator =(const Buf&)	= default;
+			Buf(Buf&&)		= default;
+    Buf&		operator =(Buf&&)	= default;
 
-			Buf(const Buf& b)
-			{
-			    for_each(b._p, _p, assign(), _0());
-			}
-    Buf&		operator =(const Buf& b)
-			{
-			    if (this != &b)
-				for_each(b._p, _p, assign(), _0());
-			    return *this;
-			}
-    
-    pointer		data()			{ return _p; }
-    const_pointer	data()		const	{ return _p; }
+    iterator		begin()			{ return _a.begin(); }
+    const_iterator	begin()		const	{ return _a.begin(); }
     constexpr static size_t
-			size()			{ return D; }
-
+			size()			{ return N; }
+    
   //! バッファの要素数を変更する．
   /*!
     実際にはバッファの要素数を変更することはできないので，与えられた要素数が
-    このバッファの要素数を越えない場合のみ，通常どおりにこの関数から制御が返る．
+    このバッファの要素数に一致する場合のみ，通常どおりにこの関数から制御が返る．
     \param siz	新しい要素数
   */
-    static void		resize(size_t siz)
-			{
-			    assert(siz <= D);
-			}
-	
-  //! 入力ストリームから配列を読み込む(ASCII)．
-  /*!
-    \param in	入力ストリーム
-    \return	inで指定した入力ストリーム
-  */
-    std::istream&	get(std::istream& in)
-			{
-			    for (auto& x : *this)
-				in >> x;
-			    return in;
-			}
+    static void		resize(size_t siz)	{ assert(siz == N); }
 
   private:
-    template <class OP, size_t N>
-    static void		for_each(pointer p, pointer q, const OP& op,
-				 std::integral_constant<size_t, N>)
-			{
-			    op(*q, *p);
-			    for_each(++p, ++q, op,
-				     std::integral_constant<size_t, N+1>());
-			}
-    template <class OP>
-    static void		for_each(pointer, pointer, const OP&, _D)
-			{
-			}
-    
-  private:
-    alignas(sizeof(value_type)) value_type	_p[D];	// D-sized buffer
+    alignas(sizeof(T))	std::array<T, N>	_a;
 };
 
 //! 可変長バッファクラス
@@ -149,13 +102,15 @@ template <class T, class ALLOC>
 class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 {
   private:
-    using super = BufTraits<T, ALLOC>;
+    using super		 = BufTraits<T, ALLOC>;
     
   public:
     using allocator_type = typename super::allocator_type;
     using value_type	 = T;
     using pointer	 = typename super::pointer;
     using const_pointer	 = typename super::const_pointer;
+    using iterator	 = typename super::iterator;
+    using const_iterator = typename super::const_iterator;
     
   public:
     explicit		Buf(size_t siz=0)
@@ -201,8 +156,8 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    free(_p, _size);
 			}
 
-    pointer		data()			{ return _p; }
-    const_pointer	data()		const	{ return _p; }
+    iterator		begin()			{ return _p; }
+    const_iterator	begin()		const	{ return _p; }
     size_t		size()		const	{ return _size; }
     
   //! バッファの要素数を変更する．
@@ -223,17 +178,6 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    _p	  = alloc(_size);
 			}
 	
-    std::istream&	get(std::istream& in, size_t m=0)	;
-
-  protected:
-    template <class OP, class ITER>
-    void		for_each(ITER src, const OP& op)
-			{
-			    for (pointer dst = _p, e = _p + _size;
-				 dst != e; ++dst, ++src)
-				op(*dst, *src);
-			}
-    
   private:
     pointer		alloc(size_t siz)
 			{
@@ -255,47 +199,6 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
     pointer		_p;			//!< 記憶領域の先頭ポインタ
 };
 
-//! 入力ストリームから指定した箇所に配列を読み込む(ASCII)．
-/*!
-  \param in	入力ストリーム
-  \param m	読み込み先の先頭を指定するindex
-  \return	inで指定した入力ストリーム
-*/
-template <class T, class ALLOC> std::istream&
-Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
-{
-    constexpr size_t	BufSiz = (sizeof(value_type) < 2048 ?
-				  2048 / sizeof(value_type) : 1);
-    const pointer	tmp = new value_type[BufSiz];
-    size_t		n = 0;
-    
-    while (n < BufSiz)
-    {
-	char	c;
-	while (in.get(c))		// skip white spaces other than '\n'
-	    if (!isspace(c) || c == '\n')
-		break;
-
-	if (!in || c == '\n')
-	{
-	    resize(m + n);
-	    break;
-	}
-
-	in.putback(c);
-	in >> tmp[n++];
-    }
-    if (n == BufSiz)
-	get(in, m + n);
-
-    for (size_t i = 0; i < n; ++i)
-	_p[m + i] = std::move(tmp[i]);
-
-    delete [] tmp;
-    
-    return in;
-}
-    
 /************************************************************************
 *  class new_array<D, BUF>						*
 ************************************************************************/
@@ -317,9 +220,11 @@ template <size_t D, class BUF>
 class new_array
 {
   private:
-    using _0	= std::integral_constant<size_t, 0>;
-    using _1	= std::integral_constant<size_t, 1>;
-    using _D1	= std::integral_constant<size_t, D-1>;
+    using base_iterator		= typename BUF::iterator;
+    using const_base_iterator	= typename BUF::const_iterator;
+    using _0			= std::integral_constant<size_t, 0>;
+    using _1			= std::integral_constant<size_t, 1>;
+    using _D1			= std::integral_constant<size_t, D-1>;
 
     template <class ITER_>
     static auto	make_iterator_dummy(ITER_ iter, _D1)
@@ -340,12 +245,14 @@ class new_array
     using element_type		 = typename BUF::value_type;
     using pointer		 = typename BUF::pointer;
     using const_pointer		 = typename BUF::const_pointer;
-  /*
-    using iterator		 = decltype(make_iterator_dummy(
-						std::declval<pointer>(), _1()));
-    using const_iterator	 = decltype(make_iterator_dummy(
-						std::declval<const_pointer>(),
-						_1()));
+#ifndef __INTEL_COMPILER
+    using iterator		 = decltype(
+				       make_iterator_dummy(
+					   std::declval<base_iterator>(), _1()));
+    using const_iterator	 = decltype(
+				       make_iterator_dummy(
+					   std::declval<const_base_iterator>(),
+					   _1()));
     using reverse_iterator	 = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using value_type		 = typename std::iterator_traits<iterator>
@@ -354,7 +261,7 @@ class new_array
 					       ::reference;
     using const_reference	 = typename std::iterator_traits<const_iterator>
 					       ::reference;
-  */
+#endif
   public:
     template <class... ARGS_,
 	      typename std::enable_if<sizeof...(ARGS_) == D>::type* = nullptr>
@@ -440,12 +347,12 @@ class new_array
 		    return _sizes[I_];
 		}
 
-    auto	begin()		{ return make_iterator(_buf.data(), _1()); }
-    auto	begin()	  const	{ return make_iterator(_buf.data(), _1()); }
+    auto	begin()		{ return make_iterator(_buf.begin(), _1()); }
+    auto	begin()	  const	{ return make_iterator(_buf.begin(), _1()); }
     auto	cbegin()  const	{ return begin(); }
-    auto	end()		{ return make_iterator(_buf.data() + capacity(),
+    auto	end()		{ return make_iterator(_buf.begin() + capacity(),
 						       _1()); }
-    auto	end()	  const	{ return make_iterator(_buf.data() + capacity(),
+    auto	end()	  const	{ return make_iterator(_buf.begin() + capacity(),
 						       _1()); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return std::make_reverse_iterator(end()); }
@@ -591,11 +498,11 @@ class new_array<1, BUF>
 		    return size();
 		}
 
-    auto	begin()		{ return _buf.data(); }
-    auto	begin()	  const	{ return _buf.data(); }
+    auto	begin()		{ return _buf.begin(); }
+    auto	begin()	  const	{ return _buf.begin(); }
     auto	cbegin()  const	{ return begin(); }
-    auto	end()		{ return _buf.data() + size(); }
-    auto	end()	  const	{ return _buf.data() + size(); }
+    auto	end()		{ return _buf.begin() + size(); }
+    auto	end()	  const	{ return _buf.begin() + size(); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return std::make_reverse_iterator(end()); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
