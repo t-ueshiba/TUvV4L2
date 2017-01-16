@@ -42,7 +42,7 @@ createCaptureCmds()
 	 CA_None, 2, 0, 1, 1, 0},
 	{C_Button,	 c_ForwardMovie,   0, ">",		 noProp,
 	 CA_None, 3, 0, 1, 1, 0},
-	{C_Slider,	 c_StatusMovie,    0, "",		 noProp,
+	{C_Slider,	 c_StatusMovie,    0, "Frame",		 noProp,
 	 CA_None, 1, 1, 3, 1, 0},
 	EndOfCmds
     };
