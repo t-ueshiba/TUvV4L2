@@ -593,10 +593,10 @@ make_dense_range_iterator(ITER iter, size_t size)
     return {iter, size, size};
 }
     
-template <class ITER, class... ARGS> inline auto
-make_dense_range_iterator(ITER iter, size_t size, ARGS... args)
+template <class ITER, class... SIZES> inline auto
+make_dense_range_iterator(ITER iter, size_t size, SIZES... sizes)
 {
-    return make_dense_range_iterator(make_dense_range_iterator(iter, args...),
+    return make_dense_range_iterator(make_dense_range_iterator(iter, sizes...),
 				     size);
 }
     
@@ -606,10 +606,10 @@ make_dense_range(ITER iter, size_t size)
     return {iter, iter + size};
 }
 
-template <class ITER, class... ARGS> inline auto
-make_dense_range(ITER iter, size_t size, ARGS... args)
+template <class ITER, class... SIZES> inline auto
+make_dense_range(ITER iter, size_t size, SIZES... sizes)
 {
-    return make_dense_range(make_dense_range_iterator(iter, args...), size);
+    return make_dense_range(make_dense_range_iterator(iter, sizes...), size);
 }
 
 /************************************************************************

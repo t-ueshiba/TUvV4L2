@@ -91,17 +91,19 @@ operator <<(std::ostream& out, const sizes_and_strides_holder<E>& holder)
 template <class BUF> static void
 doJob(BUF& buf)
 {
-    size_t	i0, i1, i2;
+    size_t	size_x, size_y, size_z;
 
   // buf を2次元行列と見なす
-    i0 = 6;
-    auto	a2 = make_dense_range(buf.begin(), buf.size()/i0, i0);
-    std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2 << std::endl;
+    size_x = 6;
+    auto	a2 = make_dense_range(buf.begin(), buf.size()/size_x, size_x);
+    std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2
+	      << std::endl;
 
   // buf を3次元行列と見なす
-    i0 = 2;
-    i1 = 3;
-    auto	a3 = make_dense_range(buf.begin(), buf.size()/i1/i0, i1, i0);
+    size_x = 2;
+    size_y = 3;
+    auto	a3 = make_dense_range(buf.begin(),
+				      buf.size()/size_y/size_x, size_y, size_x);
     std::cout << "--- a3 (" << sizes_and_strides(a3) << ") ---\n"
 	      << a3
 	      << "--- a3[1][2] ---\n" << a3[1][2]
@@ -111,10 +113,11 @@ doJob(BUF& buf)
   //std::cout << a3;
     
   // buf の一部分を3次元行列と見なす
-    i0 = 3;
-    i1 = 2;
-    i2 = 2;
-    auto	b3 = make_range(buf.begin() + 1, i2, i1, i1, i0, 6);
+    size_x = 3;
+    size_y = 2;
+    size_z = 2;
+    auto	b3 = make_range(buf.begin() + 1,
+				size_z, size_y, size_y, size_x, 6);
     std::cout << "--- b3(" << sizes_and_strides(b3) << ") ---\n" << b3;
 
     b3[1][1][2] = 100;

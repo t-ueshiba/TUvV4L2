@@ -92,17 +92,6 @@ class Buf : public BufTraits<T, ALLOC>
 			    return *this;
 			}
     
-  //! 外部の領域と要素数を指定してバッファを生成する（ダミー関数）．
-  /*!
-    実際はバッファが使用する記憶領域は固定されていて変更できないので，
-    この関数は常に例外を送出する．
-    \throw std::logic_error	この関数が呼ばれたら必ず送出
-  */
-			Buf(pointer, size_t)
-			{
-			    throw std::logic_error("Buf<T, D>::Buf(pointer, size_t): cannot specify a pointer to external storage!!");
-			}
-
     pointer		data()			{ return _p; }
     const_pointer	data()		const	{ return _p; }
     constexpr static size_t
@@ -111,28 +100,14 @@ class Buf : public BufTraits<T, ALLOC>
   //! バッファの要素数を変更する．
   /*!
     実際にはバッファの要素数を変更することはできないので，与えられた要素数が
-    このバッファの要素数に等しい場合のみ，通常どおりにこの関数から制御が返る．
+    このバッファの要素数を越えない場合のみ，通常どおりにこの関数から制御が返る．
     \param siz	新しい要素数
-    \return	常にfalse
   */
     static void		resize(size_t siz)
 			{
-			    assert(siz == D);
+			    assert(siz <= D);
 			}
 	
-  //! バッファが内部で使用する記憶領域を指定したものに変更する．
-  /*!
-    実際にはバッファの記憶領域を変更することはできないので，与えられたポインタ
-    と要素数がこのバッファのそれらに等しい場合のみ，通常どおりにこの関数から制御
-    が返る．
-    \param p	新しい記憶領域へのポインタ
-    \param siz	新しい要素数
-  */
-    void		resize(pointer p, size_t siz) const
-			{
-			    assert(p == _p && siz == D);
-			}
-
   //! 入力ストリームから配列を読み込む(ASCII)．
   /*!
     \param in	入力ストリーム
@@ -184,12 +159,10 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
     
   public:
     explicit		Buf(size_t siz=0)
-			    :_size(siz), _p(alloc(_size)),
-			     _shared(0), _capacity(_size)	{}
+			    :_size(siz), _p(alloc(_size))	{}
 
 			Buf(const Buf& b)
-			    :_size(b._size), _p(alloc(_size)),
-			     _shared(0), _capacity(_size)
+			    :_size(b._size), _p(alloc(_size))
 			{
 			    super::copy(b._p, b._p + b._size, _p);
 			}
@@ -202,72 +175,31 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			    }
 			    return *this;
 			}
-  /*
-   *  [注意1] 移動コンストラクタ/移動代入演算子を定義するなら
-   *  コピーコンストラクタ/標準代入演算子も陽に定義する必要あり
-   *  
-   *  [注意2] Buf型オブジェクト x が x._shared == 1 である場合，
-   *  x はそのデータの寿命を管理していない．したがって，xを右辺値として
-   *  他のBuf型オブジェクト y に移動させる場合，shallow copy すると
-   *  x の寿命と無関係に y のデータが無効になる可能性があるので，deep copy
-   *  しなければならない．
-   *
-   *  [注意3] このことは，Array2<Array<T> >型オブジェクト a を
-   *  Array<Array<T> >型オブジェクト b に移動させる時に重要である．
-   *  a の各行 row について row._shared == 1 であるが，これをそのまま
-   *  b の各行に shallow copy してしまうと，b の各要素が使用する記憶領域は
-   *  a._buf のままである．よって，a が破壊されるときに一緒に a._buf も
-   *  破壊されると b に dangling pointer が生じる．
-   */
 			Buf(Buf&& b)
-			    :_size(b._size),
-			     _p(b._shared ? alloc(_size) : b._p),
-			     _shared(0),
-			     _capacity(b._shared ? _size : b._capacity)
+			    :_size(b._size), _p(b._p)
 			{
-			    if (b._shared)
-				super::copy(b._p, b._p + b._size, _p);
-			    else
-			    {
-			      // b の 破壊時に b._p がdeleteされることを防ぐ．
-				b._size	    = 0;
-				b._p	    = super::null();
-				b._capacity = 0;
-			    }
+			  // b の 破壊時に b._p がdeleteされることを防ぐ．
+			    b._size = 0;
+			    b._p    = super::null();
 			}
 
     Buf&		operator =(Buf&& b)
 			{
-			    if (_shared || b._shared)
-			    {
-				resize(b._size);
-				super::copy(b._p, b._p + b._size, _p);
-			    }
-			    else
-			    {
-				free(_p, _capacity);
-				_size     = b._size;
-				_p	  = b._p;
-				_capacity = b._capacity;
-
-			      // b の 破壊時に this->_p がdeleteされることを防ぐ．
-				b._size	    = 0;
-				b._p	    = super::null();
-				b._capacity = 0;
-			    }
+			    free(_p, _size);
+			    _size = b._size;
+			    _p	  = b._p;
+			    
+			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
+			    b._size = 0;
+			    b._p    = super::null();
 
 			    return *this;
 			}
 
 			~Buf()
 			{
-			    if (!_shared)
-				free(_p, _capacity);
+			    free(_p, _size);
 			}
-
-			Buf(pointer p, size_t siz)
-			    :_size(siz), _p(p),
-			     _shared(1), _capacity(_size)	{}
 
     pointer		data()			{ return _p; }
     const_pointer	data()		const	{ return _p; }
@@ -283,47 +215,21 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
   */
     void		resize(size_t siz)
 			{
-			    if (_size == siz)
+			    if (siz <= _size)
 				return;
     
-			    if (_shared)
-				throw std::logic_error("Buf<T, ALLOC>::resize: cannot change size of shared buffer!");
+			    free(_p, _size);
 			    _size = siz;
-			    if (_capacity < _size)
-			    {
-				free(_p, _capacity);
-				_p	  = alloc(_size);
-				_capacity = _size;
-			    }
+			    _p	  = alloc(_size);
 			}
 	
-  //! バッファが内部で使用する記憶領域を指定したものに変更する．
-  /*!
-    \param p	新しい記憶領域へのポインタ
-    \param siz	新しい要素数
-  */
-    void		resize(pointer p, size_t siz)
-			{
-			    if (!_shared)
-				free(_p, _capacity);
-			    _size     = siz;
-			    _p	      = p;
-			    _shared   = 1;
-			    _capacity = _size;
-			}
-
     std::istream&	get(std::istream& in, size_t m=0)	;
 
-    bool		shared() const
-			{
-			    return _shared;
-			}
-    
   protected:
     template <class OP, class ITER>
     void		for_each(ITER src, const OP& op)
 			{
-			    for (pointer dst = _p, e = _p +_size;
+			    for (pointer dst = _p, e = _p + _size;
 				 dst != e; ++dst, ++src)
 				op(*dst, *src);
 			}
@@ -347,8 +253,6 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
     allocator_type	_allocator;		//!< アロケータ
     size_t		_size;			//!< 要素数
     pointer		_p;			//!< 記憶領域の先頭ポインタ
-    size_t		_shared	  : 1;		//!< 記憶領域の共有を示すフラグ
-    size_t		_capacity : 8*sizeof(size_t)-1;	//!< 要素数単位の容量
 };
 
 //! 入力ストリームから指定した箇所に配列を読み込む(ASCII)．
@@ -360,7 +264,7 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 template <class T, class ALLOC> std::istream&
 Buf<T, 0, ALLOC>::get(std::istream& in, size_t m)
 {
-    const size_t	BufSiz = (sizeof(value_type) < 2048 ?
+    constexpr size_t	BufSiz = (sizeof(value_type) < 2048 ?
 				  2048 / sizeof(value_type) : 1);
     const pointer	tmp = new value_type[BufSiz];
     size_t		n = 0;
@@ -468,6 +372,22 @@ class new_array
 		     _buf(capacity())
 		{
 		}
+    template <class... ARGS_,
+	      typename std::enable_if<sizeof...(ARGS_) == D>::type* = nullptr>
+		new_array(pointer p, ARGS_... args)
+		    :_sizes{cvt_to_size(args)...},
+		     _stride(_sizes[D-1]),
+		     _buf(p, capacity())
+		{
+		}
+    template <class... ARGS_,
+	      typename std::enable_if<sizeof...(ARGS_) == D>::type* = nullptr>
+		new_array(pointer p, size_t stride, ARGS_... args)
+		    :_sizes{cvt_to_size(args)...},
+		     _stride(stride),
+		     _buf(p, capacity())
+		{
+		}
 
 		new_array()
 		    :_stride(0), _buf()
@@ -500,9 +420,10 @@ class new_array
 		    return *this;
 		}
     
-    auto	size()		const	{ return _sizes[0]; }
-    auto	nrow()		const	{ return _sizes[0]; }
-    auto	ncol()		const	{ return _sizes[1]; }
+    auto	size()	  const	{ return _sizes[0]; }
+    auto	nrow()	  const	{ return _sizes[0]; }
+    auto	ncol()	  const	{ return _sizes[1]; }
+    auto	stride()  const	{ return _stride; }
 	
     template <size_t I_>
     auto	size(std::integral_constant<size_t, I_>) const
@@ -546,20 +467,20 @@ class new_array
 
     template <class... ARGS_>
     typename std::enable_if<sizeof...(ARGS_) == D>::type
-		resize(pointer p, ARGS_... args)
+		resize(ARGS_... args)
 		{
 		    _sizes  = {cvt_to_size(args)...};
 		    _stride = _sizes[D-1];
-		    _buf.resize(p, capacity());
+		    _buf.resize(capacity());
 		}
     
     template <class... ARGS_>
     typename std::enable_if<sizeof...(ARGS_) == D>::type
-		resize(pointer p, size_t stride, ARGS_... args)
+		resize(size_t stride, ARGS_... args)
 		{
 		    _sizes  = {cvt_to_size(args)...};
 		    _stride = stride;
-		    _buf.resize(p, capacity());
+		    _buf.resize(capacity());
 		}
     
   private:
@@ -634,10 +555,8 @@ class new_array<1, BUF>
 					       ::reference;
 
   public:
-    explicit	new_array(size_t size)
-		    :_buf(size)
-		{
-		}
+    explicit	new_array(size_t siz)		 :_buf(siz)	{}
+		new_array(pointer p, size_t siz) :_buf(p, siz)	{}
 
 		new_array()					= default;
 		new_array(const new_array&)			= default;
@@ -678,27 +597,21 @@ class new_array<1, BUF>
     auto	end()		{ return _buf.data() + size(); }
     auto	end()	  const	{ return _buf.data() + size(); }
     auto	cend()	  const	{ return end(); }
-    auto	rbegin()	{ return reverse_iterator(end()); }
-    auto	rbegin()  const	{ return const_reverse_iterator(end()); }
+    auto	rbegin()	{ return std::make_reverse_iterator(end()); }
+    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
     auto	crbegin() const	{ return rbegin(); }
-    auto	rend()		{ return reverse_iterator(begin()); }
-    auto	rend()	  const	{ return const_reverse_iterator(begin()); }
+    auto	rend()		{ return std::make_reverse_iterator(begin()); }
+    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
     auto	crend()	  const	{ return rend(); }
     reference	operator [](size_t i)
 		{
 		    assert(i < size());
 		    return *(begin() + i);
 		}
-    const_reference
-		operator [](size_t i) const
+    const auto&	operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(begin() + i);
-		}
-
-    void	resize(pointer p, size_t size)
-		{
-		    _buf.resize(p, size);
 		}
     
   private:
