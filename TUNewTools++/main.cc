@@ -144,6 +144,11 @@ doJob(BUF& buf)
 
     auto	f = make_range<2, 2, 2, 3, 6>(buf.begin());
     std::cout << "--- f(" << sizes_and_strides(f) << ") ---\n" << f;
+
+    auto	g = subrange(a2, 1, 2, 1, 2);
+    std::cout << "--- a2 (" << sizes_and_strides(a2) << ") ---\n" << a2
+	      << "--- subrange(a2, 1, 2, 1, 2) (" << sizes_and_strides(g)
+	      << ") ---\n" << g;
 }
 
 }	// namespace TU

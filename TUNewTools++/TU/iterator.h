@@ -627,5 +627,20 @@ stride(const range<ITER>& r)
     return r.begin(std::integral_constant<size_t, I>()).stride();
 }
 
+/************************************************************************
+*  subrange extraction							*
+************************************************************************/
+template <class RANGE> inline auto
+subrange(const RANGE& r, size_t idx, size_t size)
+{
+    return make_range(r.begin() + idx, size);
+}
+
+template <class RANGE, class... ARGS> inline auto
+subrange(const RANGE& r, size_t idx, size_t size, ARGS... args)
+{
+    return subrange(make_range(r.begin() + idx, size), args...);
+}
+
 }	// namespace TU
 	
