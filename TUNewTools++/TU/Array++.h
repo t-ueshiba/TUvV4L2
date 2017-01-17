@@ -48,8 +48,7 @@ struct BufTraits
 ************************************************************************/
 //! 固定長バッファクラス
 /*!
-  単独で使用することはなく，#TU::Array の基底クラスまたは #TU::Array2 の
-  内部バッファクラスとして使う．
+  単独で使用することはなく，#new_array の内部バッファクラスとして使う．
   \param T	要素の型
   \param N	バッファ中の要素数
 */
@@ -74,10 +73,12 @@ class Buf : public BufTraits<T, ALLOC>
 			Buf(Buf&&)		= default;
     Buf&		operator =(Buf&&)	= default;
 
-    iterator		begin()			{ return _a.begin(); }
-    const_iterator	begin()		const	{ return _a.begin(); }
     constexpr static size_t
 			size()			{ return N; }
+    iterator		begin()			{ return _a.begin(); }
+    const_iterator	begin()		const	{ return _a.begin(); }
+    iterator		end()			{ return _a.end(); }
+    const_iterator	end()		const	{ return _a.end(); }
     
   //! バッファの要素数を変更する．
   /*!
@@ -93,8 +94,7 @@ class Buf : public BufTraits<T, ALLOC>
 
 //! 可変長バッファクラス
 /*!
-  単独で使用することはなく，#TU::Array の基底クラスまたは #TU::Array2 の
-  内部バッファクラスとして使う．
+  単独で使用することはなく，#new_array の内部バッファクラスとして使う．
   \param T	要素の型
   \param ALLOC	アロケータの型
 */
@@ -115,7 +115,6 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
   public:
     explicit		Buf(size_t siz=0)
 			    :_size(siz), _p(alloc(_size))	{}
-
 			Buf(const Buf& b)
 			    :_size(b._size), _p(alloc(_size))
 			{
@@ -133,11 +132,10 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			Buf(Buf&& b)
 			    :_size(b._size), _p(b._p)
 			{
-			  // b の 破壊時に b._p がdeleteされることを防ぐ．
+			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
 			    b._size = 0;
 			    b._p    = super::null();
 			}
-
     Buf&		operator =(Buf&& b)
 			{
 			    free(_p, _size);
@@ -150,15 +148,13 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 
 			    return *this;
 			}
+			~Buf()			{ free(_p, _size); }
 
-			~Buf()
-			{
-			    free(_p, _size);
-			}
-
+    size_t		size()		const	{ return _size; }
     iterator		begin()			{ return _p; }
     const_iterator	begin()		const	{ return _p; }
-    size_t		size()		const	{ return _size; }
+    iterator		end()			{ return _p + _size; }
+    const_iterator	end()		const	{ return _p + _size; }
     
   //! バッファの要素数を変更する．
   /*!
@@ -170,9 +166,6 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
   */
     void		resize(size_t siz)
 			{
-			    if (siz <= _size)
-				return;
-    
 			    free(_p, _size);
 			    _size = siz;
 			    _p	  = alloc(_size);
@@ -188,9 +181,12 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
 			}
     void		free(pointer p, size_t siz)
 			{
-			    for (pointer q = p, qe = q + siz; q != qe; ++q)
-				_allocator.destroy(q);
-			    _allocator.deallocate(p, siz);
+			    if (p)
+			    {
+				for (pointer q = p, qe = q + siz; q != qe; ++q)
+				    _allocator.destroy(q);
+				_allocator.deallocate(p, siz);
+			    }
 			}
     
   private:
@@ -220,8 +216,9 @@ template <size_t D, class BUF>
 class new_array
 {
   private:
-    using base_iterator		= typename BUF::iterator;
-    using const_base_iterator	= typename BUF::const_iterator;
+    using buf_type		= BUF;
+    using buf_iterator		= typename buf_type::iterator;
+    using const_buf_iterator	= typename buf_type::const_iterator;
     using _0			= std::integral_constant<size_t, 0>;
     using _1			= std::integral_constant<size_t, 1>;
     using _D1			= std::integral_constant<size_t, D-1>;
@@ -237,21 +234,22 @@ class new_array
 		{
 		    return make_range_iterator(
 			       make_iterator_dummy(
-				   iter, std::integral_constant<size_t, I_+1>()),
+				   iter,
+				   std::integral_constant<size_t, I_+1>()),
 			       0, 0);
 		}
     
   public:
-    using element_type		 = typename BUF::value_type;
-    using pointer		 = typename BUF::pointer;
-    using const_pointer		 = typename BUF::const_pointer;
+    using element_type		 = typename buf_type::value_type;
+    using pointer		 = typename buf_type::pointer;
+    using const_pointer		 = typename buf_type::const_pointer;
 #ifndef __INTEL_COMPILER
     using iterator		 = decltype(
 				       make_iterator_dummy(
-					   std::declval<base_iterator>(), _1()));
+					   std::declval<buf_iterator>(), _1()));
     using const_iterator	 = decltype(
 				       make_iterator_dummy(
-					   std::declval<const_base_iterator>(),
+					   std::declval<const_buf_iterator>(),
 					   _1()));
     using reverse_iterator	 = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
@@ -350,10 +348,8 @@ class new_array
     auto	begin()		{ return make_iterator(_buf.begin(), _1()); }
     auto	begin()	  const	{ return make_iterator(_buf.begin(), _1()); }
     auto	cbegin()  const	{ return begin(); }
-    auto	end()		{ return make_iterator(_buf.begin() + capacity(),
-						       _1()); }
-    auto	end()	  const	{ return make_iterator(_buf.begin() + capacity(),
-						       _1()); }
+    auto	end()		{ return make_iterator(_buf.end(), _1()); }
+    auto	end()	  const	{ return make_iterator(_buf.end(), _1()); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return std::make_reverse_iterator(end()); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
@@ -440,18 +436,21 @@ class new_array
   private:
     std::array<size_t, D>	_sizes;
     size_t			_stride;
-    BUF				_buf;
+    buf_type			_buf;
 };
 
 template <class BUF>
 class new_array<1, BUF>
 {
+  private:
+    using buf_type		= BUF;
+
   public:
-    using element_type		 = typename BUF::value_type;
-    using pointer		 = typename BUF::pointer;
-    using const_pointer		 = typename BUF::const_pointer;
-    using iterator		 = pointer;
-    using const_iterator	 = const_pointer;
+    using element_type		 = typename buf_type::value_type;
+    using pointer		 = typename buf_type::pointer;
+    using const_pointer		 = typename buf_type::const_pointer;
+    using iterator		 = typename buf_type::iterator;
+    using const_iterator	 = typename buf_type::const_iterator;
     using reverse_iterator	 = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using value_type		 = typename std::iterator_traits<iterator>
@@ -501,8 +500,8 @@ class new_array<1, BUF>
     auto	begin()		{ return _buf.begin(); }
     auto	begin()	  const	{ return _buf.begin(); }
     auto	cbegin()  const	{ return begin(); }
-    auto	end()		{ return _buf.begin() + size(); }
-    auto	end()	  const	{ return _buf.begin() + size(); }
+    auto	end()		{ return _buf.end(); }
+    auto	end()	  const	{ return _buf.end(); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return std::make_reverse_iterator(end()); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
@@ -522,7 +521,7 @@ class new_array<1, BUF>
 		}
     
   private:
-    BUF		_buf;
+    buf_type	_buf;
 };
 
 template <class T, class ALLOC=std::allocator<T> >

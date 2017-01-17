@@ -85,6 +85,11 @@ operator <<(std::ostream& out, const sizes_and_strides_holder<E>& holder)
     return holder(out);
 }
 
+template <size_t NROW, size_t NCOL>
+struct WindowGenerator
+{
+};
+    
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -154,6 +159,9 @@ doJob(BUF& buf)
     std::cout << "--- a2 (" << sizes_and_strides(a2) << ") ---\n" << a2
 	      << "--- subrange(a2, 1, 2, 2, 3) (" << sizes_and_strides(h)
 	      << ") ---\n" << h;
+
+    for (auto iter = a2[0].begin(), end = a2[0].end() - 1; iter != end; ++iter)
+	std::cout << make_range<3, 2>(iter, stride<1>(a2));
 }
 
 }	// namespace TU
