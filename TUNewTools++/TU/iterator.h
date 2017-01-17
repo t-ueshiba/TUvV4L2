@@ -562,12 +562,12 @@ make_range_iterator(ITER iter, size_t size, size_t stride)
   \param iter		レンジの先頭要素を指す反復子
   \param size		最上位次元のレンジ長
   \param stride		最上位次元のストライド
-  \param args		2番目以降の次元の(レンジ長, ストライド)の並び
+  \param ss		2番目以降の次元の(レンジ長, ストライド)の並び
 */
-template <class ITER, class... ARGS> inline auto
-make_range_iterator(ITER iter, size_t size, size_t stride, ARGS... args)
+template <class ITER, class... SS> inline auto
+make_range_iterator(ITER iter, size_t size, size_t stride, SS... ss)
 {
-    return make_range_iterator(make_range_iterator(iter, args...),
+    return make_range_iterator(make_range_iterator(iter, ss...),
 			       size, stride);
 }
 
@@ -577,10 +577,10 @@ make_range(ITER iter, size_t size)
     return {iter, iter + size};
 }
 
-template <class ITER, class... ARGS> inline auto
-make_range(ITER iter, size_t size, ARGS... args)
+template <class ITER, class... SS> inline auto
+make_range(ITER iter, size_t size, SS... ss)
 {
-    return make_range(make_range_iterator(iter, args...), size);
+    return make_range(make_range_iterator(iter, ss...), size);
 }
 
 /************************************************************************
@@ -630,16 +630,46 @@ stride(const range<ITER>& r)
 /************************************************************************
 *  subrange extraction							*
 ************************************************************************/
-template <class RANGE> inline auto
-subrange(const RANGE& r, size_t idx, size_t size)
+template <class ITER> inline ITER
+make_subrange_iterator(ITER iter)
 {
-    return make_range(r.begin() + idx, size);
+    return iter;
 }
 
-template <class RANGE, class... ARGS> inline auto
-subrange(const RANGE& r, size_t idx, size_t size, ARGS... args)
+template <class ITER, class... IS> inline auto
+make_subrange_iterator(const range_iterator<ITER>& iter,
+		       size_t idx, size_t size, IS... is)
 {
-    return subrange(make_range(r.begin() + idx, size), args...);
+    return make_range_iterator(make_subrange_iterator(
+				   iter->begin() + idx, is...),
+			       size, iter.stride());
+}
+
+template <class RANGE, class... IS> inline auto
+make_subrange(const RANGE& r, size_t idx, size_t size, IS... is)
+{
+    return make_range(make_subrange_iterator(r.begin() + idx, is...), size);
+}
+
+template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES,
+	  typename std::enable_if<
+	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
+inline auto
+make_subrange_iterator(const ITER& iter, size_t idx, INDICES... indices)
+{
+    return make_range_iterator<SIZE>(make_subrange_iterator<SIZES...>(
+					 iter->begin() + idx, indices...),
+				     iter.stride());
+}
+    
+template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
+	  typename std::enable_if<
+	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
+inline auto
+make_subrange(const RANGE& r, size_t idx, INDICES... indices)
+{
+    return make_range<SIZE>(make_subrange_iterator<SIZES...>(
+				r.begin() + idx, indices...));
 }
 
 }	// namespace TU
