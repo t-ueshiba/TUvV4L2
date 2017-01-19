@@ -2,8 +2,8 @@
  *  $Id$
  */
 /*!
-  \file		iterator.h
-  \brief	各種反復子の定義と実装
+  \file		range.h
+  \brief	2つの反復子によって指定されるレンジの定義と実装
 */
 #include <iostream>
 #include <cstddef>	// for size_t
@@ -16,7 +16,7 @@ namespace std
 {
 #if __cplusplus < 201700L
 /************************************************************************
-*  function std::size(E)						*
+*  function std::size(T)						*
 ************************************************************************/
 template <class T> inline size_t
 size(const T& x)
@@ -146,6 +146,13 @@ class range
 		    assert(i < size());
 		    return *(_begin + i);
 		}
+    template <size_t I_>
+    auto	begin() const
+		{
+		    return begin(std::integral_constant<size_t, I_>());
+		}
+
+  private:
     const auto*	begin(std::integral_constant<size_t, 0>) const
 		{
 		    return this;
@@ -267,27 +274,64 @@ make_range(ITER begin, ITER end)
 /************************************************************************
 *  class range_iterator<ITER, SIZE, STRIDE>				*
 ************************************************************************/
+namespace detail
+{
+  template <size_t SIZE, size_t STRIDE>
+  struct size_and_stride
+  {
+      constexpr static size_t	size()		{ return SIZE; }
+      constexpr static size_t	stride()	{ return STRIDE; }
+  };
+  template <size_t SIZE>
+  struct size_and_stride<SIZE, 0>
+  {
+      size_and_stride(size_t stride)
+	  :_stride(stride)			{}
+      constexpr static size_t	size()		{ return SIZE; }
+      size_t			stride() const	{ return _stride; }
+
+    private:
+      const size_t	_stride;
+  };
+  template <size_t STRIDE>
+  struct size_and_stride<0, STRIDE>
+  {
+      size_and_stride(size_t size)
+	  :_size(size)				{}
+      size_t			size()	 const	{ return _size; }
+      constexpr static size_t	stride()	{ return STRIDE; }
+
+    private:
+      const size_t	_size;
+  };
+  template <>
+  struct size_and_stride<0, 0>
+  {
+      size_and_stride(size_t size, size_t stride)
+	  :_size(size), _stride(stride)		{}
+      size_t			size()	 const	{ return _size; }
+      size_t			stride() const	{ return _stride; }
+
+    private:
+      const size_t	_size;
+      const size_t	_stride;
+  };
+}	// namespace detail
+    
 //! 配列を一定間隔に切り分けたレンジを指す反復子
 /*!
   \param ITER	配列の要素を指す反復子の型
   \param SIZE	レンジ長(0ならば可変長)
   \param STRIDE	インクリメントしたときに進める要素数(0ならば可変)
 */
-template <class ITER, size_t SIZE=0, size_t STRIDE=0>    class range_iterator;
-    
-//! 固定長のレンジを指し，インクリメント時に固定した要素数だけ進める反復子
-/*!
-  \param ITER	配列の要素を指す反復子の型
-  \param SIZE	レンジ長
-  \param STRIDE	インクリメントしたときに進める要素数
-*/
-template <class ITER, size_t SIZE, size_t STRIDE>
+template <class ITER, size_t SIZE=0, size_t STRIDE=0>
 class range_iterator
     : public boost::iterator_adaptor<range_iterator<ITER, SIZE, STRIDE>,
 						    ITER,
 						    range<ITER, SIZE>,
 						    boost::use_default,
-						    range<ITER, SIZE> >
+						    range<ITER, SIZE> >,
+      public detail::size_and_stride<SIZE, STRIDE>
 {
   private:
     using super	= boost::iterator_adaptor<range_iterator,
@@ -295,7 +339,8 @@ class range_iterator
 					  range<ITER, SIZE>,
 					  boost::use_default,
 					  range<ITER, SIZE> >;
-
+    using ss	= detail::size_and_stride<SIZE, STRIDE>;
+    
   public:
     using reference	  = typename super::reference;
     using difference_type = typename super::difference_type;
@@ -303,162 +348,60 @@ class range_iterator
     friend class	boost::iterator_core_access;
 	  
   public:
-		range_iterator()			= default;
-		range_iterator(ITER iter) :super(iter)	{}
+    template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
+	      typename std::enable_if<
+		  (SIZE_ != 0) && (STRIDE_ != 0)>::type* = nullptr>
+	range_iterator(ITER iter)
+	    :super(iter), ss()						{}
+    template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
+	      typename std::enable_if<
+		  (SIZE_ != 0) && (STRIDE_ == 0)>::type* = nullptr>
+	range_iterator(ITER iter, size_t stride)
+	    :super(iter), ss(stride)					{}
+    template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
+	      typename std::enable_if<
+		  (SIZE_ == 0) && (STRIDE_ != 0)>::type* = nullptr>
+	range_iterator(ITER iter, size_t size)
+	    :super(iter), ss(size)					{}
+    template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
+	      typename std::enable_if<
+		  (SIZE_ == 0) && (STRIDE_ == 0)>::type* = nullptr>
+	range_iterator(ITER iter, size_t size, size_t stride)
+	    :super(iter), ss(size, stride)				{}
 
-    static constexpr size_t	size()			{ return SIZE; }
-    static constexpr size_t	stride()		{ return STRIDE; }
-	      
+    using	ss::size;
+    using	ss::stride;
+    
   private:
-    reference	dereference() const
+    template <size_t SIZE_=SIZE>
+    typename std::enable_if<SIZE_ == 0, reference>::type
+		dereference() const
+		{
+		    return {super::base(), super::base() + size()};
+		}
+    template <size_t SIZE_=SIZE>
+    typename std::enable_if<SIZE_ != 0, reference>::type
+		dereference() const
 		{
 		    return {super::base()};
 		}
     void	increment()
 		{
-		    std::advance(super::base_reference(), STRIDE);
+		    std::advance(super::base_reference(), stride());
 		}
     void	decrement()
 		{
-		    std::advance(super::base_reference(), -STRIDE);
+		    std::advance(super::base_reference(), -stride());
 		}
     void	advance(difference_type n)
 		{
-		    std::advance(super::base_reference(), n*STRIDE);
+		    std::advance(super::base_reference(), n*stride());
 		}
     difference_type
 		distance_to(const range_iterator& iter) const
 		{
-		    return std::distance(super::base(), iter.base()) / STRIDE;
+		    return std::distance(super::base(), iter.base()) / stride();
 		}
-};
-
-//! 固定長のレンジを指し，インクリメント時に指定した要素数(可変)だけ進める反復子
-/*!
-  \param ITER	配列の要素を指す反復子の型
-  \param SIZE	レンジ長
-*/
-template <class ITER, size_t SIZE>
-class range_iterator<ITER, SIZE, 0>
-    : public boost::iterator_adaptor<range_iterator<ITER, SIZE, 0>,
-						    ITER,
-						    range<ITER, SIZE>,
-						    boost::use_default,
-						    range<ITER, SIZE> >
-{
-  private:
-    using super	= boost::iterator_adaptor<range_iterator,
-					  ITER,
-					  range<ITER, SIZE>,
-					  boost::use_default,
-					  range<ITER, SIZE> >;
-
-  public:
-    using reference	  = typename super::reference;
-    using difference_type = typename super::difference_type;
-
-    friend class	boost::iterator_core_access;
-	  
-  public:
-		range_iterator() :super(), _stride(0)	{}
-		range_iterator(ITER iter, size_t stride)
-		    :super(iter), _stride(stride)	{}
-
-    static constexpr size_t	size()			{ return SIZE; }
-    size_t			stride()	const	{ return _stride; }
-	      
-  private:
-    reference	dereference() const
-		{
-		    return {super::base()};
-		}
-    void	increment()
-		{
-		    std::advance(super::base_reference(), _stride);
-		}
-    void	decrement()
-		{
-		    std::advance(super::base_reference(), -_stride);
-		}
-    void	advance(difference_type n)
-		{
-		    std::advance(super::base_reference(), n*_stride);
-		}
-    difference_type
-		distance_to(const range_iterator& iter) const
-		{
-		    return std::distance(super::base(), iter.base()) / _stride;
-		}
-
-  private:
-    size_t	_stride;
-};
-
-//! 可変長のレンジを指し，インクリメント時に指定した要素数(可変)だけ進める反復子
-/*!
-  \param ITER	配列の要素を指す反復子の型
-*/
-template <class ITER>
-class range_iterator<ITER, 0, 0>
-    : public boost::iterator_adaptor<range_iterator<ITER, 0, 0>,
-						    ITER,
-						    range<ITER>,
-						    boost::use_default,
-						    range<ITER> >
-{
-  private:
-    using super	= boost::iterator_adaptor<range_iterator,
-					  ITER,
-					  range<ITER>,
-					  boost::use_default,
-					  range<ITER> >;
-
-  public:
-    using reference	  = typename super::reference;
-    using difference_type = typename super::difference_type;
-
-    friend class	boost::iterator_core_access;
-	  
-  public:
-    range_iterator()	:super(), _size(0), _stride(0)			{}
-    range_iterator(ITER iter, size_t size, size_t stride)
-	:super(iter), _size(size), _stride(stride)			{}
-
-    size_t	size()			const	{ return _size; }
-    size_t	stride()		const	{ return _stride; }
-	      
-  private:
-    reference	dereference() const
-		{
-		    return {super::base(), super::base() + _size};
-		}
-    void	increment()
-		{
-		    std::advance(super::base_reference(), _stride);
-		}
-    void	decrement()
-		{
-		    std::advance(super::base_reference(), -_stride);
-		}
-    void	advance(difference_type n)
-		{
-		    std::advance(super::base_reference(), n*_stride);
-		}
-    difference_type
-		distance_to(const range_iterator& iter) const
-		{
-		    return std::distance(super::base(), iter.base()) / _stride;
-		}
-    bool	equal(const range_iterator& iter) const
-		{
-		    return (super::base() == iter.base() &&
-			    _size	  == iter._size  &&
-			    _stride	  == iter._stride);
-		}
-
-  private:
-    size_t	_size;
-    size_t	_stride;
 };
 
 /************************************************************************
@@ -672,5 +615,22 @@ make_subrange(const RANGE& r, size_t idx, INDICES... indices)
 				r.begin() + idx, indices...));
 }
 
+/************************************************************************
+*  generic algorithms for ranges					*
+************************************************************************/
+template <class E, class T>
+typename std::enable_if<!is_range<typename std::decay<E>::type>::value>::type
+fill(E&& expr, const T& val)
+{
+    expr = val;
+}
+template <class E, class T>
+typename std::enable_if<is_range<typename std::decay<E>::type>::value>::type
+fill(E&& expr, const T& val)
+{
+    for (auto iter = std::begin(expr); iter != std::end(expr); ++iter)
+	fill(*iter, val);
+}
+    
 }	// namespace TU
 	

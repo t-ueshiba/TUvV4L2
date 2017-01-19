@@ -129,7 +129,9 @@ doJob(BUF& buf)
     std::cout << "--- b3(modified) ---\n" << b3;
 
   // stride = 4 の2次元行列を生成する
-    Array2<int>	c(4, 2, 3);
+  //Array2<int>	c(4, 2, 3);
+    Array2<int, 4, 6>	c;
+    fill(c, 5);
     std::cout << "--- c(" << sizes_and_strides(c) << ") ---\n" << c;
     c[1][2] = 10;
 

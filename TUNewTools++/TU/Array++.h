@@ -1,9 +1,9 @@
 /*
  *  $Id$
  */
-#include "TU/utility.h"
-#include "TU/iterator.h"
 #include <array>
+#include "TU/range.h"
+#include "TU/utility.h"		// for std::index_sequence<Ints...>
 
 namespace TU
 {
@@ -44,19 +44,54 @@ struct BufTraits
 };
 
 /************************************************************************
-*  class Buf<T, N, ALLOC>						*
+*  class Buf<T, ALLOC, N...>						*
 ************************************************************************/
 //! 固定長バッファクラス
 /*!
-  単独で使用することはなく，#new_array の内部バッファクラスとして使う．
+  単独で使用することはなく，#array の内部バッファクラスとして使う．
   \param T	要素の型
-  \param N	バッファ中の要素数
+  \param ALLOC	アロケータの型
+  \param N	各軸の要素数
 */
-template <class T, size_t N, class ALLOC>
+template <class T, class ALLOC, size_t... N>
 class Buf : public BufTraits<T, ALLOC>
 {
   private:
     using super		 = BufTraits<T, ALLOC>;
+    template <size_t I_>
+    using axis		 = std::integral_constant<size_t, I_>;
+
+  // このバッファの総容量をコンパイル時に計算
+    template <size_t M_, size_t... N_>
+    struct prod
+    {
+	constexpr static size_t	value = M_ * prod<N_...>::value;
+    };
+    template <size_t M_>
+    struct prod<M_>
+    {
+	constexpr static size_t value = M_;
+    };
+
+    constexpr static size_t	Capacity = prod<N...>::value;
+
+  // このバッファの各軸のサイズをコンパイル時に計算
+    template <size_t I_, size_t M_, size_t... N_>
+    struct nth
+    {
+	constexpr static size_t	value = nth<I_-1, N_...>::value;
+    };
+    template <size_t M_, size_t... N_>
+    struct nth<0, M_, N_...>
+    {
+	constexpr static size_t	value = M_;
+    };
+
+    template <size_t I_>
+    using	siz = nth<I_, N...>;
+
+  protected:
+    constexpr static size_t	D = sizeof...(N);
     
   public:
     using allocator_type = void;
@@ -65,45 +100,75 @@ class Buf : public BufTraits<T, ALLOC>
     using const_pointer	 = typename super::const_pointer;
     using iterator	 = typename super::iterator;
     using const_iterator = typename super::const_iterator;
-    
-  public:
-    explicit		Buf(size_t siz=N)	{ resize(siz); }
-			Buf(const Buf&)		= default;
-    Buf&		operator =(const Buf&)	= default;
-			Buf(Buf&&)		= default;
-    Buf&		operator =(Buf&&)	= default;
 
-    constexpr static size_t
-			size()			{ return N; }
-    iterator		begin()			{ return _a.begin(); }
-    const_iterator	begin()		const	{ return _a.begin(); }
-    iterator		end()			{ return _a.end(); }
-    const_iterator	end()		const	{ return _a.end(); }
+  public:
+  // 標準コンストラクタ/代入演算子およびデストラクタ
+		Buf()				= default;
+		Buf(const Buf&)			= default;
+    Buf&	operator =(const Buf&)		= default;
+		Buf(Buf&&)			= default;
+    Buf&	operator =(Buf&&)		= default;
     
-  //! バッファの要素数を変更する．
-  /*!
-    実際にはバッファの要素数を変更することはできないので，与えられた要素数が
-    このバッファの要素数に一致する場合のみ，通常どおりにこの関数から制御が返る．
-    \param siz	新しい要素数
-  */
-    static void		resize(size_t siz)	{ assert(siz == N); }
+  // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
+    explicit	Buf(const std::array<size_t, D>& sizes, size_t=0)
+		{
+		    if (!check_sizes(sizes, axis<D>()))
+			throw std::logic_error("Buf<T, ALLOC, N...>::Buf(): mismatched size!");
+		}
+    void	resize(const std::array<size_t, D>& sizes, size_t=0)
+		{
+		    if (!check_sizes(sizes, axis<D>()))
+			throw std::logic_error("Buf<T, ALLOC, N...>::resize(): mismatched size!");
+		}
+
+    template <size_t I_>
+    constexpr static auto	size(axis<I_>)	{ return siz<I_>::value; }
+    template <size_t I_>
+    constexpr static auto	stride(axis<I_>){ return siz<I_>::value; }
+    constexpr static auto	size()		{ return siz<0>::value; }
+    constexpr static auto	nrow()		{ return siz<0>::value; }
+    constexpr static auto	ncol()		{ return siz<1>::value; }
+    iterator			begin()		{ return _a.begin(); }
+    const_iterator		begin()	const	{ return _a.begin(); }
+    iterator			end()		{ return _a.end(); }
+    const_iterator		end()	const	{ return _a.end(); }
 
   private:
-    alignas(sizeof(T))	std::array<T, N>	_a;
+    template <size_t I_>
+    static bool	check_sizes(const std::array<size_t, D>& sizes, axis<I_>)
+		{
+		    return (sizes[I_-1] != size(axis<I_-1>()) ? false :
+			    check_sizes(sizes, axis<I_-1>()));
+		}
+    static bool	check_sizes(const std::array<size_t, D>& sizes, axis<0>)
+		{
+		    return true;
+		}
+    
+  private:
+    alignas(sizeof(T)) std::array<T, Capacity>	_a;
 };
 
 //! 可変長バッファクラス
 /*!
-  単独で使用することはなく，#new_array の内部バッファクラスとして使う．
+  単独で使用することはなく，#array の内部バッファクラスとして使う．
   \param T	要素の型
   \param ALLOC	アロケータの型
+  \param N	ダミー(各軸の要素数は動的に決定される)
 */
-template <class T, class ALLOC>
-class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
+template <class T, class ALLOC, size_t... N>
+class Buf<T, ALLOC, 0, N...> : public BufTraits<T, ALLOC>
 {
   private:
     using super		 = BufTraits<T, ALLOC>;
-    
+    template <size_t I_>
+    using axis		 = std::integral_constant<size_t, I_>;
+    using _0		 = axis<0>;
+    using _1		 = axis<1>;
+
+  protected:
+    constexpr static size_t	D = 1 + sizeof...(N);
+
   public:
     using allocator_type = typename super::allocator_type;
     using value_type	 = T;
@@ -111,142 +176,168 @@ class Buf<T, 0, ALLOC> : public BufTraits<T, ALLOC>
     using const_pointer	 = typename super::const_pointer;
     using iterator	 = typename super::iterator;
     using const_iterator = typename super::const_iterator;
-    
+
   public:
-    explicit		Buf(size_t siz=0)
-			    :_size(siz), _p(alloc(_size))	{}
-			Buf(const Buf& b)
-			    :_size(b._size), _p(alloc(_size))
-			{
-			    super::copy(b._p, b._p + b._size, _p);
-			}
-    Buf&		operator =(const Buf& b)
-			{
-			    if (this != &b)
-			    {
-				resize(b._size);
-				super::copy(b._p, b._p + b._size, _p);
-			    }
-			    return *this;
-			}
-			Buf(Buf&& b)
-			    :_size(b._size), _p(b._p)
-			{
-			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
-			    b._size = 0;
-			    b._p    = super::null();
-			}
-    Buf&		operator =(Buf&& b)
-			{
-			    free(_p, _size);
-			    _size = b._size;
-			    _p	  = b._p;
-			    
-			  // b の 破壊時に this->_p がdeleteされることを防ぐ．
-			    b._size = 0;
-			    b._p    = super::null();
+  // 標準コンストラクタ/代入演算子およびデストラクタ
+		Buf()
+		    :_stride(0), _capacity(0), _p(super::null())
+		{
+		    _sizes.fill(0);
+		}
+		Buf(const Buf& b)
+		    :_sizes(b._sizes), _stride(b._stride),
+		     _capacity(b._capacity), _p(alloc(_capacity))
+		{
+		    super::copy(b.begin(), b.end(), begin());
+		}
+    Buf&	operator =(const Buf& b)
+		{
+		    if (this != &b)
+		    {
+			resize(b._sizes, b._stride);
+			super::copy(b.begin(), b.end(), begin());
+		    }
+		    return *this;
+		}
+		Buf(Buf&& b)
+		    :_sizes(b._sizes), _stride(b._stride),
+		     _capacity(b._capacity), _p(b._p)
+		{
+		  // b の 破壊時に this->_p がdeleteされることを防ぐ．
+		    b._p = super::null();
+		}
+    Buf&	operator =(Buf&& b)
+		{
+		    _sizes    = b._sizes;
+		    _stride   = b._stride;
+		    _capacity = b._capacity;
+		    _p        = b._p;
+		    
+		  // b の 破壊時に this->_p がdeleteされることを防ぐ．
+		    b._p = super::null();
+		}
+		~Buf()
+		{
+		    free(_p, _capacity);
+		}
 
-			    return *this;
-			}
-			~Buf()			{ free(_p, _size); }
+  // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
+    explicit	Buf(const std::array<size_t, D>& sizes, size_t stride=0)
+		    :_sizes(sizes),
+		     _stride(stride ? stride : _sizes[D-1]),
+		     _capacity(capacity(_0())),
+		     _p(alloc(_capacity))
+		{
+		}
+    void	resize(const std::array<size_t, D>& sizes, size_t stride=0)
+		{
+		    free(_p, _capacity);
+		    _sizes    = sizes;
+		    _stride   = (stride ? stride : _sizes[D-1]);
+		    _capacity = capacity(_0());
+		    _p	      = alloc(_capacity);
+		}
 
-    size_t		size()		const	{ return _size; }
+    template <size_t I_>
+    auto		size(axis<I_>)	  const	{ return _sizes[I_]; }
+    template <size_t I_>
+    auto		stride(axis<I_>)  const	{ return _sizes[I_]; }
+    auto		stride(axis<D-1>) const	{ return _stride; }
+    auto		size()		  const	{ return _sizes[0]; }
+    auto		nrow()		  const	{ return _sizes[0]; }
+    auto		ncol()		  const	{ return _sizes[1]; }
     iterator		begin()			{ return _p; }
-    const_iterator	begin()		const	{ return _p; }
-    iterator		end()			{ return _p + _size; }
-    const_iterator	end()		const	{ return _p + _size; }
-    
-  //! バッファの要素数を変更する．
-  /*!
-    ただし，他のオブジェクトと記憶領域を共有しているバッファの要素数を
-    変更することはできない．
-    \param siz			新しい要素数
-    \throw std::logic_error	記憶領域を他のオブジェクトと共有している場合
-				に送出
-  */
-    void		resize(size_t siz)
-			{
-			    free(_p, _size);
-			    _size = siz;
-			    _p	  = alloc(_size);
-			}
-	
+    const_iterator	begin()		  const	{ return _p; }
+    iterator		end()			{ return _p + _capacity; }
+    const_iterator	end()		  const	{ return _p + _capacity; }
+
   private:
-    pointer		alloc(size_t siz)
-			{
-			    pointer	p = _allocator.allocate(siz);
-			    for (pointer q = p, qe = q + siz; q != qe; ++q)
-				_allocator.construct(q, value_type());
-			    return p;
-			}
-    void		free(pointer p, size_t siz)
-			{
-			    if (p)
-			    {
-				for (pointer q = p, qe = q + siz; q != qe; ++q)
-				    _allocator.destroy(q);
-				_allocator.deallocate(p, siz);
-			    }
-			}
-    
+    size_t	capacity(axis<D-1>) const
+		{
+		    return _stride;
+		}
+    template <size_t I_>
+    size_t	capacity(axis<I_>) const
+		{
+		    return _sizes[I_] * capacity(axis<I_+1>());
+		}
+    pointer	alloc(size_t siz)
+		{
+		    const auto	p = _allocator.allocate(siz);
+		    for (pointer q = p, qe = q + siz; q != qe; ++q)
+			_allocator.construct(q, value_type());
+		    return p;
+		}
+    void	free(pointer p, size_t siz)
+		{
+		    if (p != super::null())
+		    {
+			for (pointer q = p, qe = q + siz; q != qe; ++q)
+			    _allocator.destroy(q);
+			_allocator.deallocate(p, siz);
+		    }
+		}
+
   private:
-    allocator_type	_allocator;		//!< アロケータ
-    size_t		_size;			//!< 要素数
-    pointer		_p;			//!< 記憶領域の先頭ポインタ
+    allocator_type		_allocator;
+    std::array<size_t, D>	_sizes;
+    size_t			_stride;
+    size_t			_capacity;
+    pointer			_p;
 };
-
+    
 /************************************************************************
-*  class new_array<D, BUF>						*
+*  class array<BUF>							*
 ************************************************************************/
-template <size_t D, class BUF>	class new_array;
-
-template <size_t I, size_t D, class BUF> inline size_t
-size(const new_array<D, BUF>& a)
+template <class BUF>	class array;
+    
+template <size_t I, class BUF> inline size_t
+size(const array<BUF>& a)
 {
     return a.size(std::integral_constant<size_t, I>());
 }
 
-template <size_t I, size_t D, class BUF> inline size_t
-stride(const new_array<D, BUF>& a)
+template <size_t I, class BUF> inline size_t
+stride(const array<BUF>& a)
 {
     return a.stride(std::integral_constant<size_t, I>());
 }
 
-template <size_t D, class BUF>
-class new_array
+template <class BUF>
+class array : public BUF
 {
   private:
-    using buf_type		= BUF;
-    using buf_iterator		= typename buf_type::iterator;
-    using const_buf_iterator	= typename buf_type::const_iterator;
-    using _0			= std::integral_constant<size_t, 0>;
-    using _1			= std::integral_constant<size_t, 1>;
-    using _D1			= std::integral_constant<size_t, D-1>;
-
+    using super			= BUF;
+    using buf_iterator		= typename super::iterator;
+    using const_buf_iterator	= typename super::const_iterator;
+    template <size_t I_>
+    using axis			= std::integral_constant<size_t, I_>;
+    using _0			= axis<0>;
+    using _1			= axis<1>;
+    
+    constexpr static size_t	D = super::D;
+    
     template <class ITER_>
-    static auto	make_iterator_dummy(ITER_ iter, _D1)
+    static auto	make_iterator_dummy(ITER_ iter, axis<D-1>)
 		{
 		    return make_range_iterator(iter, 0, 0);
 		}
     template <class ITER_, size_t I_>
-    static auto	make_iterator_dummy(ITER_ iter,
-				    std::integral_constant<size_t, I_>)
+    static auto	make_iterator_dummy(ITER_ iter, axis<I_>)
 		{
 		    return make_range_iterator(
-			       make_iterator_dummy(
-				   iter,
-				   std::integral_constant<size_t, I_+1>()),
-			       0, 0);
+			       make_iterator_dummy(iter, axis<I_+1>()), 0, 0);
 		}
-    
+
   public:
-    using element_type		 = typename buf_type::value_type;
-    using pointer		 = typename buf_type::pointer;
-    using const_pointer		 = typename buf_type::const_pointer;
+    using element_type		 = typename super::value_type;
+    using pointer		 = typename super::pointer;
+    using const_pointer		 = typename super::const_pointer;
 #ifndef __INTEL_COMPILER
     using iterator		 = decltype(
 				       make_iterator_dummy(
-					   std::declval<buf_iterator>(), _1()));
+					   std::declval<buf_iterator>(),
+					   _1()));
     using const_iterator	 = decltype(
 				       make_iterator_dummy(
 					   std::declval<const_buf_iterator>(),
@@ -261,95 +352,65 @@ class new_array
 					       ::reference;
 #endif
   public:
-    template <class... ARGS_,
-	      typename std::enable_if<sizeof...(ARGS_) == D>::type* = nullptr>
-    explicit	new_array(ARGS_... args)
-		    :_sizes{cvt_to_size(args)...},
-		     _stride(_sizes[D-1]),
-		     _buf(capacity())
+		array()				= default;
+		array(const array&)		= default;
+    array&	operator =(const array&)	= default;
+		array(array&&)			= default;
+    array&	operator =(array&&)		= default;
+    
+    template <class... SIZES_,
+	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+    explicit	array(SIZES_... sizes)
+		    :super({cvt_to_size(sizes)...}, stride)
 		{
 		}
-    template <class... ARGS_,
-	      typename std::enable_if<sizeof...(ARGS_) == D>::type* = nullptr>
-    explicit	new_array(size_t stride, ARGS_... args)
-		    :_sizes{cvt_to_size(args)...},
-		     _stride(stride),
-		     _buf(capacity())
+    template <class... SIZES_,
+	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+    explicit	array(size_t stride, SIZES_... sizes)
+		    :super({cvt_to_size(sizes)...}, stride)
 		{
 		}
-    template <class... ARGS_,
-	      typename std::enable_if<sizeof...(ARGS_) == D>::type* = nullptr>
-		new_array(pointer p, ARGS_... args)
-		    :_sizes{cvt_to_size(args)...},
-		     _stride(_sizes[D-1]),
-		     _buf(p, capacity())
+    template <class... SIZES_>
+    typename std::enable_if<sizeof...(SIZES_) == D>::type
+		resize(SIZES_... sizes)
 		{
+		    super::resize({cvt_to_size(sizes)...});
 		}
-    template <class... ARGS_,
-	      typename std::enable_if<sizeof...(ARGS_) == D>::type* = nullptr>
-		new_array(pointer p, size_t stride, ARGS_... args)
-		    :_sizes{cvt_to_size(args)...},
-		     _stride(stride),
-		     _buf(p, capacity())
+    
+    template <class... SIZES_>
+    typename std::enable_if<sizeof...(SIZES_) == D>::type
+		resize(size_t stride, SIZES_... sizes)
 		{
+		    super::resize({cvt_to_size(sizes)...}, stride);
 		}
 
-		new_array()
-		    :_stride(0), _buf()
-		{
-		    _sizes.fill(0);
-		}
-		new_array(const new_array&)			= default;
-    new_array&	operator =(const new_array&)			= default;
-		new_array(new_array&&)				= default;
-    new_array&	operator =(new_array&&)				= default;
-    
     template <class E_,
 	      typename std::enable_if<is_range<E_>::value>::type* = nullptr>
-		new_array(const E_& expr)
-		    :_sizes(sizes(expr, std::make_index_sequence<D>())),
-		     _stride(_sizes[D-1]),
-		     _buf(capacity())
+		array(const E_& expr)
+		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
 		    std::copy(std::begin(expr), std::end(expr), begin());
 		}
     template <class E_>
-    typename std::enable_if<is_range<E_>::value, new_array&>::type
+    typename std::enable_if<is_range<E_>::value, array&>::type
 		operator =(const E_& expr)
 		{
-		    _sizes  = sizes(expr, std::make_index_sequence<D>());
-		    _stride = _sizes[D-1];
-		    _buf.resize(capacity());
+		    super::resize(sizes(expr, std::make_index_sequence<D>()));
 		    std::copy(std::begin(expr), std::end(expr), begin());
 
 		    return *this;
 		}
-    
-    auto	size()	  const	{ return _sizes[0]; }
-    auto	nrow()	  const	{ return _sizes[0]; }
-    auto	ncol()	  const	{ return _sizes[1]; }
-    auto	stride()  const	{ return _stride; }
-	
-    template <size_t I_>
-    auto	size(std::integral_constant<size_t, I_>) const
-		{
-		    return _sizes[I_];
-		}
-    auto	stride(_D1) const
-		{
-		    return _stride;
-		}
-    template <size_t I_>
-    auto	stride(std::integral_constant<size_t, I_>) const
-		{
-		    return _sizes[I_];
-		}
 
-    auto	begin()		{ return make_iterator(_buf.begin(), _1()); }
-    auto	begin()	  const	{ return make_iterator(_buf.begin(), _1()); }
+    using	super::size;
+    using	super::stride;
+    using	super::nrow;
+    using	super::ncol;
+
+    auto	begin()		{ return make_iterator(super::begin(), _1()); }
+    auto	begin()	  const	{ return make_iterator(super::begin(), _1()); }
     auto	cbegin()  const	{ return begin(); }
-    auto	end()		{ return make_iterator(_buf.end(), _1()); }
-    auto	end()	  const	{ return make_iterator(_buf.end(), _1()); }
+    auto	end()		{ return make_iterator(super::end(), _1()); }
+    auto	end()	  const	{ return make_iterator(super::end(), _1()); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return std::make_reverse_iterator(end()); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
@@ -367,23 +428,9 @@ class new_array
 		    assert(i < size());
 		    return *(begin() + i);
 		}
-
-    template <class... ARGS_>
-    typename std::enable_if<sizeof...(ARGS_) == D>::type
-		resize(ARGS_... args)
+    void	fill(const element_type& val)
 		{
-		    _sizes  = {cvt_to_size(args)...};
-		    _stride = _sizes[D-1];
-		    _buf.resize(capacity());
-		}
-    
-    template <class... ARGS_>
-    typename std::enable_if<sizeof...(ARGS_) == D>::type
-		resize(size_t stride, ARGS_... args)
-		{
-		    _sizes  = {cvt_to_size(args)...};
-		    _stride = stride;
-		    _buf.resize(capacity());
+		    super::fill(begin(), end(), val);
 		}
     
   private:
@@ -401,137 +448,29 @@ class new_array
 		    return {TU::size<I_>(expr)...};
 		}
     
-    size_t	capacity() const
-		{
-		    return capacity(_0());
-		}
-    size_t	capacity(_D1) const
-		{
-		    return _stride;
-		    
-		}
-    template <size_t I_>
-    size_t	capacity(std::integral_constant<size_t, I_>) const
-		{
-		    return _sizes[I_]
-			 * capacity(std::integral_constant<size_t, I_+1>());
-		}
-
     template <class ITER_>
-    auto	make_iterator(ITER_ iter, _D1) const
+    ITER_	make_iterator(ITER_ iter, axis<D>) const
 		{
-		    return make_range_iterator(iter, _sizes[D-1], _stride);
+		    return iter;
 		}
     template <class ITER_, size_t I_>
-    auto	make_iterator(ITER_ iter,
-			      std::integral_constant<size_t, I_>) const
+    auto	make_iterator(ITER_ iter, axis<I_>) const
 		{
 		    return make_range_iterator(
-			       make_iterator(
-				   iter,
-				   std::integral_constant<size_t, I_+1>()),
-			       _sizes[I_], _sizes[I_]);
+			       make_iterator(iter, axis<I_+1>()),
+			       size(axis<I_>()), stride(axis<I_>()));
 		}
-    
-  private:
-    std::array<size_t, D>	_sizes;
-    size_t			_stride;
-    buf_type			_buf;
 };
 
-template <class BUF>
-class new_array<1, BUF>
-{
-  private:
-    using buf_type		= BUF;
+template <class T, size_t N=0, class ALLOC=std::allocator<T> >
+using Array = array<Buf<T, ALLOC, N> >;
 
-  public:
-    using element_type		 = typename buf_type::value_type;
-    using pointer		 = typename buf_type::pointer;
-    using const_pointer		 = typename buf_type::const_pointer;
-    using iterator		 = typename buf_type::iterator;
-    using const_iterator	 = typename buf_type::const_iterator;
-    using reverse_iterator	 = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-    using value_type		 = typename std::iterator_traits<iterator>
-					       ::value_type;
-    using reference		 = typename std::iterator_traits<iterator>
-					       ::reference;
-    using const_reference	 = typename std::iterator_traits<const_iterator>
-					       ::reference;
+template <class T, size_t R=0, size_t C=0, class ALLOC=std::allocator<T> >
+using Array2 = array<Buf<T, ALLOC, R, C> >;
 
-  public:
-    explicit	new_array(size_t siz)		 :_buf(siz)	{}
-		new_array(pointer p, size_t siz) :_buf(p, siz)	{}
-
-		new_array()					= default;
-		new_array(const new_array&)			= default;
-    new_array&	operator =(const new_array&)			= default;
-		new_array(new_array&&)				= default;
-    new_array&	operator =(new_array&&)				= default;
-    
-    template <class E_,
-	      typename std::enable_if<is_range<E_>::value>::type* = nullptr>
-		new_array(const E_& expr)
-		    :_buf(std::size(expr))
-		{
-		    std::copy(std::begin(expr), std::end(expr), begin());
-		}
-    template <class E_>
-    typename std::enable_if<is_range<E_>::value, new_array&>::type
-		operator =(const E_& expr)
-		{
-		    _buf.resize(std::size(expr));
-		    std::copy(std::begin(expr), std::end(expr), begin());
-
-		    return *this;
-		}
-    
-    auto	size()	  const	{ return _buf.size(); }
-    auto	size(std::integral_constant<size_t, 0>) const
-		{
-		    return size();
-		}
-    auto	stride(std::integral_constant<size_t, 0>) const
-		{
-		    return size();
-		}
-
-    auto	begin()		{ return _buf.begin(); }
-    auto	begin()	  const	{ return _buf.begin(); }
-    auto	cbegin()  const	{ return begin(); }
-    auto	end()		{ return _buf.end(); }
-    auto	end()	  const	{ return _buf.end(); }
-    auto	cend()	  const	{ return end(); }
-    auto	rbegin()	{ return std::make_reverse_iterator(end()); }
-    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
-    auto	crbegin() const	{ return rbegin(); }
-    auto	rend()		{ return std::make_reverse_iterator(begin()); }
-    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
-    auto	crend()	  const	{ return rend(); }
-    reference	operator [](size_t i)
-		{
-		    assert(i < size());
-		    return *(begin() + i);
-		}
-    const auto&	operator [](size_t i) const
-		{
-		    assert(i < size());
-		    return *(begin() + i);
-		}
-    
-  private:
-    buf_type	_buf;
-};
-
-template <class T, class ALLOC=std::allocator<T> >
-using Array = new_array<1, Buf<T, 0, ALLOC> >;
-
-template <class T, class ALLOC=std::allocator<T> >
-using Array2 = new_array<2, Buf<T, 0, ALLOC> >;
-
-template <class T, class ALLOC=std::allocator<T> >
-using Array3 = new_array<3, Buf<T, 0, ALLOC> >;
+template <class T,
+	  size_t Z=0, size_t Y=0, size_t X=0, class ALLOC=std::allocator<T> >
+using Array3 = array<Buf<T, ALLOC, Z, Y, X> >;
 
 }	// namespace TU
 
