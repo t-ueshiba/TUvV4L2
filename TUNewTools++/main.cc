@@ -146,7 +146,7 @@ doJob(BUF& buf)
     for (auto iter = c.rbegin(); iter != c.rend(); ++iter)
 	std::cout << *iter;
 
-    Array3<float>	e(b3);
+    Array3<float, 2, 2, 3>	e(b3);
     std::cout << "--- e(" << sizes_and_strides(e) << ") ---\n" << e;
 
     auto	f = make_range<2, 2, 2, 3, 6>(buf.begin());

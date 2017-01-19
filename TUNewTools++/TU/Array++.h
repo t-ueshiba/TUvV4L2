@@ -51,16 +51,13 @@ struct BufTraits
   単独で使用することはなく，#array の内部バッファクラスとして使う．
   \param T	要素の型
   \param ALLOC	アロケータの型
-  \param SIZES	各軸の要素数
+  \param SIZE	最初の軸の要素数
+  \param SIZES	2番目以降の各軸の要素数
 */
-template <class T, class ALLOC, size_t... SIZES>
+template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
 class Buf : public BufTraits<T, ALLOC>
 {
   private:
-    using super		 = BufTraits<T, ALLOC>;
-    template <size_t I_>
-    using axis		 = std::integral_constant<size_t, I_>;
-
   // このバッファの総容量をコンパイル時に計算
     template <size_t SIZE_, size_t... SIZES_>
     struct prod
@@ -73,7 +70,7 @@ class Buf : public BufTraits<T, ALLOC>
 	constexpr static size_t value = SIZE_;
     };
 
-    constexpr static size_t	Capacity = prod<SIZES...>::value;
+    constexpr static size_t	Capacity = prod<SIZE, SIZES...>::value;
 
   // このバッファの各軸のサイズをコンパイル時に計算
     template <size_t I_, size_t SIZE_, size_t... SIZES_>
@@ -88,18 +85,21 @@ class Buf : public BufTraits<T, ALLOC>
     };
 
     template <size_t I_>
-    using	siz = nth<I_, SIZES...>;
-
+    using siz			= nth<I_, SIZE, SIZES...>;
+    template <size_t I_>
+    using axis			= std::integral_constant<size_t, I_>;
+    using super			= BufTraits<T, ALLOC>;
+    using base_iterator		= typename super::iterator;
+    using const_base_iterator	= typename super::const_iterator;
+    
   protected:
-    constexpr static size_t	D = sizeof...(SIZES);
+    constexpr static size_t	D = 1 + sizeof...(SIZES);
     
   public:
-    using allocator_type = void;
-    using value_type	 = T;
-    using pointer	 = typename super::pointer;
-    using const_pointer	 = typename super::const_pointer;
-    using iterator	 = typename super::iterator;
-    using const_iterator = typename super::const_iterator;
+    using allocator_type	= void;
+    using value_type		= T;
+    using pointer		= typename super::pointer;
+    using const_pointer		= typename super::const_pointer;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -113,12 +113,12 @@ class Buf : public BufTraits<T, ALLOC>
     explicit	Buf(const std::array<size_t, D>& sizes, size_t=0)
 		{
 		    if (!check_sizes(sizes, axis<D>()))
-			throw std::logic_error("Buf<T, ALLOC, SIZES...>::Buf(): mismatched size!");
+			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
 		}
     void	resize(const std::array<size_t, D>& sizes, size_t=0)
 		{
 		    if (!check_sizes(sizes, axis<D>()))
-			throw std::logic_error("Buf<T, ALLOC, SIZES...>::resize(): mismatched size!");
+			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
 		}
 
     template <size_t I_>
@@ -128,10 +128,11 @@ class Buf : public BufTraits<T, ALLOC>
     constexpr static auto	size()		{ return siz<0>::value; }
     constexpr static auto	nrow()		{ return siz<0>::value; }
     constexpr static auto	ncol()		{ return siz<1>::value; }
-    iterator			begin()		{ return _a.begin(); }
-    const_iterator		begin()	const	{ return _a.begin(); }
-    iterator			end()		{ return _a.end(); }
-    const_iterator		end()	const	{ return _a.end(); }
+
+    auto	begin()		{ return make_iterator<SIZES...>(_a.begin()); }
+    auto	begin()	const	{ return make_iterator<SIZES...>(_a.begin()); }
+    auto	end()		{ return make_iterator<SIZES...>(_a.end()); }
+    auto	end()	const	{ return make_iterator<SIZES...>(_a.end()); }
 
   private:
     template <size_t I_>
@@ -145,8 +146,28 @@ class Buf : public BufTraits<T, ALLOC>
 		    return true;
 		}
     
+    template <class ITER_>
+    static auto	make_iterator(ITER_ iter)
+		{
+		    return iter;
+		}
+    template <size_t SIZE_, size_t... SIZES_, class ITER_>
+    static auto	make_iterator(ITER_ iter)
+		{
+		    return make_range_iterator<SIZE_, SIZE_>(
+			       make_iterator<SIZES_...>(iter));
+		}
+
   private:
     alignas(sizeof(T)) std::array<T, Capacity>	_a;
+
+#ifndef __INTEL_COMPILER
+  public:
+    using iterator	 = decltype(make_iterator<SIZES...>(
+					std::declval<base_iterator>()));
+    using const_iterator = decltype(make_iterator<SIZES...>(
+					std::declval<const_base_iterator>()));
+#endif
 };
 
 //! 可変長バッファクラス
@@ -160,22 +181,20 @@ template <class T, class ALLOC, size_t... SIZES>
 class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 {
   private:
-    using super		 = BufTraits<T, ALLOC>;
+    using super			= BufTraits<T, ALLOC>;
+    using base_iterator		= typename super::iterator;
+    using const_base_iterator	= typename super::const_iterator;
     template <size_t I_>
-    using axis		 = std::integral_constant<size_t, I_>;
-    using _0		 = axis<0>;
-    using _1		 = axis<1>;
+    using axis			= std::integral_constant<size_t, I_>;
 
   protected:
     constexpr static size_t	D = 1 + sizeof...(SIZES);
 
   public:
-    using allocator_type = typename super::allocator_type;
-    using value_type	 = T;
-    using pointer	 = typename super::pointer;
-    using const_pointer	 = typename super::const_pointer;
-    using iterator	 = typename super::iterator;
-    using const_iterator = typename super::const_iterator;
+    using allocator_type	= typename super::allocator_type;
+    using value_type		= T;
+    using pointer		= typename super::pointer;
+    using const_pointer		= typename super::const_pointer;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -225,7 +244,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     explicit	Buf(const std::array<size_t, D>& sizes, size_t stride=0)
 		    :_sizes(sizes),
 		     _stride(stride ? stride : _sizes[D-1]),
-		     _capacity(capacity(_0())),
+		     _capacity(capacity(axis<0>())),
 		     _p(alloc(_capacity))
 		{
 		}
@@ -234,22 +253,35 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    free(_p, _capacity);
 		    _sizes    = sizes;
 		    _stride   = (stride ? stride : _sizes[D-1]);
-		    _capacity = capacity(_0());
+		    _capacity = capacity(axis<0>());
 		    _p	      = alloc(_capacity);
 		}
 
     template <size_t I_>
-    auto		size(axis<I_>)	  const	{ return _sizes[I_]; }
+    auto	size(axis<I_>)	  const	{ return _sizes[I_]; }
     template <size_t I_>
-    auto		stride(axis<I_>)  const	{ return _sizes[I_]; }
-    auto		stride(axis<D-1>) const	{ return _stride; }
-    auto		size()		  const	{ return _sizes[0]; }
-    auto		nrow()		  const	{ return _sizes[0]; }
-    auto		ncol()		  const	{ return _sizes[1]; }
-    iterator		begin()			{ return _p; }
-    const_iterator	begin()		  const	{ return _p; }
-    iterator		end()			{ return _p + _capacity; }
-    const_iterator	end()		  const	{ return _p + _capacity; }
+    auto	stride(axis<I_>)  const	{ return _sizes[I_]; }
+    auto	stride(axis<D-1>) const	{ return _stride; }
+    auto	size()		  const	{ return _sizes[0]; }
+    auto	nrow()		  const	{ return _sizes[0]; }
+    auto	ncol()		  const	{ return _sizes[1]; }
+    auto	begin()
+		{
+		    return make_iterator<SIZES...>(base_iterator(_p));
+		}
+    auto	begin() const
+		{
+		    return make_iterator<SIZES...>(const_base_iterator(_p));
+		}
+    auto	end()
+		{
+		    return make_iterator<SIZES...>(base_iterator(_p + _capacity));
+		}
+    auto	end() const
+		{
+		    return make_iterator<SIZES...>(const_base_iterator(
+						       _p + _capacity));
+		}
 
   private:
     size_t	capacity(axis<D-1>) const
@@ -261,6 +293,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		{
 		    return _sizes[I_] * capacity(axis<I_+1>());
 		}
+
     pointer	alloc(size_t siz)
 		{
 		    const auto	p = _allocator.allocate(siz);
@@ -278,12 +311,50 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    }
 		}
 
+    template <class ITER_>
+    static auto	make_iterator(ITER_ iter)
+		{
+		    return iter;
+		}
+    template <size_t SIZE_, size_t... SIZES_, class ITER_>
+    auto	make_iterator(ITER_ iter) const
+		{
+		    constexpr size_t	I = D - sizeof...(SIZES_);
+		    
+		    return make_range_iterator(
+			       make_iterator<SIZES_...>(iter),
+			       size(axis<I>()), stride(axis<I>()));
+		}
+
   private:
     allocator_type		_allocator;
     std::array<size_t, D>	_sizes;
     size_t			_stride;
     size_t			_capacity;
     pointer			_p;
+
+#ifndef __INTEL_COMPILER
+  private:
+    template <class ITER_>
+    static auto	make_iterator_dummy(ITER_ iter)
+		{
+		    return iter;
+		}
+    template <size_t SIZE_, size_t... SIZES_, class ITER_>
+    static auto	make_iterator_dummy(ITER_ iter)
+		{
+		    constexpr size_t	I = D - sizeof...(SIZES_);
+		    
+		    return make_range_iterator(
+			       make_iterator_dummy<SIZES_...>(iter), 0, 0);
+		}
+
+  public:
+    using iterator	 = decltype(make_iterator_dummy<SIZES...>(
+					std::declval<base_iterator>()));
+    using const_iterator = decltype(make_iterator_dummy<SIZES...>(
+					std::declval<const_base_iterator>()));
+#endif
 };
     
 /************************************************************************
@@ -312,36 +383,16 @@ class array : public BUF
     using const_buf_iterator	= typename super::const_iterator;
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
-    using _0			= axis<0>;
-    using _1			= axis<1>;
     
     constexpr static size_t	D = super::D;
     
-    template <class ITER_>
-    static auto	make_iterator_dummy(ITER_ iter, axis<D-1>)
-		{
-		    return make_range_iterator(iter, 0, 0);
-		}
-    template <class ITER_, size_t I_>
-    static auto	make_iterator_dummy(ITER_ iter, axis<I_>)
-		{
-		    return make_range_iterator(
-			       make_iterator_dummy(iter, axis<I_+1>()), 0, 0);
-		}
-
   public:
     using element_type		 = typename super::value_type;
     using pointer		 = typename super::pointer;
     using const_pointer		 = typename super::const_pointer;
 #ifndef __INTEL_COMPILER
-    using iterator		 = decltype(
-				       make_iterator_dummy(
-					   std::declval<buf_iterator>(),
-					   _1()));
-    using const_iterator	 = decltype(
-				       make_iterator_dummy(
-					   std::declval<const_buf_iterator>(),
-					   _1()));
+    using iterator		 = typename super::iterator;
+    using const_iterator	 = typename super::const_iterator;
     using reverse_iterator	 = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using value_type		 = typename std::iterator_traits<iterator>
@@ -405,12 +456,10 @@ class array : public BUF
     using	super::stride;
     using	super::nrow;
     using	super::ncol;
-
-    auto	begin()		{ return make_iterator(super::begin(), _1()); }
-    auto	begin()	  const	{ return make_iterator(super::begin(), _1()); }
+    using	super::begin;
+    using	super::end;
+    
     auto	cbegin()  const	{ return begin(); }
-    auto	end()		{ return make_iterator(super::end(), _1()); }
-    auto	end()	  const	{ return make_iterator(super::end(), _1()); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return std::make_reverse_iterator(end()); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
@@ -446,19 +495,6 @@ class array : public BUF
 		sizes(const E_& expr, std::index_sequence<I_...>)
 		{
 		    return {TU::size<I_>(expr)...};
-		}
-    
-    template <class ITER_>
-    ITER_	make_iterator(ITER_ iter, axis<D>) const
-		{
-		    return iter;
-		}
-    template <class ITER_, size_t I_>
-    auto	make_iterator(ITER_ iter, axis<I_>) const
-		{
-		    return make_range_iterator(
-			       make_iterator(iter, axis<I_+1>()),
-			       size(axis<I_>()), stride(axis<I_>()));
 		}
 };
 
