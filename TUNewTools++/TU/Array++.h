@@ -357,7 +357,6 @@ class array : public BUF
     using element_type		 = typename super::value_type;
     using pointer		 = typename super::pointer;
     using const_pointer		 = typename super::const_pointer;
-#ifndef __INTEL_COMPILER
     using iterator		 = decltype(std::declval<super*>()->begin());
     using const_iterator	 = decltype(std::declval<const super*>()
 					    ->begin());
@@ -369,7 +368,7 @@ class array : public BUF
 					       ::reference;
     using const_reference	 = typename std::iterator_traits<const_iterator>
 					       ::reference;
-#endif
+    
   public:
 		array()				= default;
 		array(const array&)		= default;
