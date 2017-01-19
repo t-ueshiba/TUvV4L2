@@ -44,16 +44,16 @@ struct BufTraits
 };
 
 /************************************************************************
-*  class Buf<T, ALLOC, N...>						*
+*  class Buf<T, ALLOC, SIZES...>					*
 ************************************************************************/
 //! 固定長バッファクラス
 /*!
   単独で使用することはなく，#array の内部バッファクラスとして使う．
   \param T	要素の型
   \param ALLOC	アロケータの型
-  \param N	各軸の要素数
+  \param SIZES	各軸の要素数
 */
-template <class T, class ALLOC, size_t... N>
+template <class T, class ALLOC, size_t... SIZES>
 class Buf : public BufTraits<T, ALLOC>
 {
   private:
@@ -62,36 +62,36 @@ class Buf : public BufTraits<T, ALLOC>
     using axis		 = std::integral_constant<size_t, I_>;
 
   // このバッファの総容量をコンパイル時に計算
-    template <size_t M_, size_t... N_>
+    template <size_t SIZE_, size_t... SIZES_>
     struct prod
     {
-	constexpr static size_t	value = M_ * prod<N_...>::value;
+	constexpr static size_t	value = SIZE_ * prod<SIZES_...>::value;
     };
-    template <size_t M_>
-    struct prod<M_>
+    template <size_t SIZE_>
+    struct prod<SIZE_>
     {
-	constexpr static size_t value = M_;
+	constexpr static size_t value = SIZE_;
     };
 
-    constexpr static size_t	Capacity = prod<N...>::value;
+    constexpr static size_t	Capacity = prod<SIZES...>::value;
 
   // このバッファの各軸のサイズをコンパイル時に計算
-    template <size_t I_, size_t M_, size_t... N_>
+    template <size_t I_, size_t SIZE_, size_t... SIZES_>
     struct nth
     {
-	constexpr static size_t	value = nth<I_-1, N_...>::value;
+	constexpr static size_t	value = nth<I_-1, SIZES_...>::value;
     };
-    template <size_t M_, size_t... N_>
-    struct nth<0, M_, N_...>
+    template <size_t SIZE_, size_t... SIZES_>
+    struct nth<0, SIZE_, SIZES_...>
     {
-	constexpr static size_t	value = M_;
+	constexpr static size_t	value = SIZE_;
     };
 
     template <size_t I_>
-    using	siz = nth<I_, N...>;
+    using	siz = nth<I_, SIZES...>;
 
   protected:
-    constexpr static size_t	D = sizeof...(N);
+    constexpr static size_t	D = sizeof...(SIZES);
     
   public:
     using allocator_type = void;
@@ -113,12 +113,12 @@ class Buf : public BufTraits<T, ALLOC>
     explicit	Buf(const std::array<size_t, D>& sizes, size_t=0)
 		{
 		    if (!check_sizes(sizes, axis<D>()))
-			throw std::logic_error("Buf<T, ALLOC, N...>::Buf(): mismatched size!");
+			throw std::logic_error("Buf<T, ALLOC, SIZES...>::Buf(): mismatched size!");
 		}
     void	resize(const std::array<size_t, D>& sizes, size_t=0)
 		{
 		    if (!check_sizes(sizes, axis<D>()))
-			throw std::logic_error("Buf<T, ALLOC, N...>::resize(): mismatched size!");
+			throw std::logic_error("Buf<T, ALLOC, SIZES...>::resize(): mismatched size!");
 		}
 
     template <size_t I_>
@@ -154,10 +154,10 @@ class Buf : public BufTraits<T, ALLOC>
   単独で使用することはなく，#array の内部バッファクラスとして使う．
   \param T	要素の型
   \param ALLOC	アロケータの型
-  \param N	ダミー(各軸の要素数は動的に決定される)
+  \param SIZES	ダミー(各軸の要素数は動的に決定される)
 */
-template <class T, class ALLOC, size_t... N>
-class Buf<T, ALLOC, 0, N...> : public BufTraits<T, ALLOC>
+template <class T, class ALLOC, size_t... SIZES>
+class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 {
   private:
     using super		 = BufTraits<T, ALLOC>;
@@ -167,7 +167,7 @@ class Buf<T, ALLOC, 0, N...> : public BufTraits<T, ALLOC>
     using _1		 = axis<1>;
 
   protected:
-    constexpr static size_t	D = 1 + sizeof...(N);
+    constexpr static size_t	D = 1 + sizeof...(SIZES);
 
   public:
     using allocator_type = typename super::allocator_type;
