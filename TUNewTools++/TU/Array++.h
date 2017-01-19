@@ -89,8 +89,6 @@ class Buf : public BufTraits<T, ALLOC>
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
     using super			= BufTraits<T, ALLOC>;
-    using base_iterator		= typename super::iterator;
-    using const_base_iterator	= typename super::const_iterator;
     
   protected:
     constexpr static size_t	D = 1 + sizeof...(SIZES);
@@ -160,14 +158,6 @@ class Buf : public BufTraits<T, ALLOC>
 
   private:
     alignas(sizeof(T)) std::array<T, Capacity>	_a;
-
-#ifndef __INTEL_COMPILER
-  public:
-    using iterator	 = decltype(make_iterator<SIZES...>(
-					std::declval<base_iterator>()));
-    using const_iterator = decltype(make_iterator<SIZES...>(
-					std::declval<const_base_iterator>()));
-#endif
 };
 
 //! 可変長バッファクラス
@@ -327,34 +317,11 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
 
   private:
-    allocator_type		_allocator;
-    std::array<size_t, D>	_sizes;
-    size_t			_stride;
-    size_t			_capacity;
-    pointer			_p;
-
-#ifndef __INTEL_COMPILER
-  private:
-    template <class ITER_>
-    static auto	make_iterator_dummy(ITER_ iter)
-		{
-		    return iter;
-		}
-    template <size_t SIZE_, size_t... SIZES_, class ITER_>
-    static auto	make_iterator_dummy(ITER_ iter)
-		{
-		    constexpr size_t	I = D - sizeof...(SIZES_);
-		    
-		    return make_range_iterator(
-			       make_iterator_dummy<SIZES_...>(iter), 0, 0);
-		}
-
-  public:
-    using iterator	 = decltype(make_iterator_dummy<SIZES...>(
-					std::declval<base_iterator>()));
-    using const_iterator = decltype(make_iterator_dummy<SIZES...>(
-					std::declval<const_base_iterator>()));
-#endif
+    allocator_type		_allocator;	//!< 要素を確保するアロケータ
+    std::array<size_t, D>	_sizes;		//!< 各軸の要素数
+    size_t			_stride;	//!< 最終軸のストライド
+    size_t			_capacity;	//!< バッファ中に収めらる総要素数
+    pointer			_p;		//!< 先頭要素へのポインタ
 };
     
 /************************************************************************
@@ -391,8 +358,9 @@ class array : public BUF
     using pointer		 = typename super::pointer;
     using const_pointer		 = typename super::const_pointer;
 #ifndef __INTEL_COMPILER
-    using iterator		 = typename super::iterator;
-    using const_iterator	 = typename super::const_iterator;
+    using iterator		 = decltype(std::declval<super*>()->begin());
+    using const_iterator	 = decltype(std::declval<const super*>()
+					    ->begin());
     using reverse_iterator	 = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using value_type		 = typename std::iterator_traits<iterator>
