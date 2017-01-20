@@ -1,9 +1,13 @@
 /*
  *  $Id$
  */
+#ifndef __TU_ARRAY_H
+#define __TU_ARRAY_H
+
 #include <array>
 #include "TU/range.h"
 #include "TU/utility.h"		// for std::index_sequence<Ints...>
+#include "TU/functional.h"	// for TU::lcm()
 
 namespace TU
 {
@@ -46,7 +50,7 @@ struct BufTraits
 /************************************************************************
 *  class Buf<T, ALLOC, SIZES...>					*
 ************************************************************************/
-//! 固定長バッファクラス
+//! 固定長多次元バッファクラス
 /*!
   単独で使用することはなく，#array の内部バッファクラスとして使う．
   \param T	要素の型
@@ -160,7 +164,7 @@ class Buf : public BufTraits<T, ALLOC>
     alignas(sizeof(T)) std::array<T, Capacity>	_a;
 };
 
-//! 可変長バッファクラス
+//! 可変長多次元バッファクラス
 /*!
   単独で使用することはなく，#array の内部バッファクラスとして使う．
   \param T	要素の型
@@ -265,7 +269,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
     auto	end()
 		{
-		    return make_iterator<SIZES...>(base_iterator(_p + _capacity));
+		    return make_iterator<SIZES...>(base_iterator(
+						       _p + _capacity));
 		}
     auto	end() const
 		{
@@ -309,7 +314,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     template <size_t SIZE_, size_t... SIZES_, class ITER_>
     auto	make_iterator(ITER_ iter) const
 		{
-		    constexpr size_t	I = D - sizeof...(SIZES_);
+		    constexpr size_t	I = D - 1 - sizeof...(SIZES_);
 		    
 		    return make_range_iterator(
 			       make_iterator<SIZES_...>(iter),
@@ -341,6 +346,10 @@ stride(const array<BUF>& a)
     return a.stride(std::integral_constant<size_t, I>());
 }
 
+//! 多次元配列を表すクラス
+/*!
+  \param BUF	内部バッファの型
+*/
 template <class BUF>
 class array : public BUF
 {
@@ -379,13 +388,14 @@ class array : public BUF
     template <class... SIZES_,
 	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
     explicit	array(SIZES_... sizes)
-		    :super({cvt_to_size(sizes)...}, stride)
+		    :super({cvt_to_size(sizes)...})
 		{
 		}
     template <class... SIZES_,
 	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
-    explicit	array(size_t stride, SIZES_... sizes)
-		    :super({cvt_to_size(sizes)...}, stride)
+    explicit	array(size_t unit, SIZES_... sizes)
+		    :super({cvt_to_size(sizes)...},
+			   unit_to_stride(unit, sizes...))
 		{
 		}
     template <class... SIZES_>
@@ -397,9 +407,10 @@ class array : public BUF
     
     template <class... SIZES_>
     typename std::enable_if<sizeof...(SIZES_) == D>::type
-		resize(size_t stride, SIZES_... sizes)
+		resize(size_t unit, SIZES_... sizes)
 		{
-		    super::resize({cvt_to_size(sizes)...}, stride);
+		    super::resize({cvt_to_size(sizes)...},
+				  unit_to_stride(unit, sizes...));
 		}
 
     template <class E_,
@@ -463,6 +474,22 @@ class array : public BUF
 		{
 		    return {TU::size<I_>(expr)...};
 		}
+
+    static auto	unit_to_stride(size_t unit, size_t size)
+		{
+		    constexpr auto	elmsiz = sizeof(element_type);
+
+		    if (unit == 0)
+			unit = 1;
+		    const auto	n = lcm(elmsiz, unit)/elmsiz;
+
+		    return n*((size + n - 1)/n);
+		}
+    template <class... SIZES>
+    static auto	unit_to_stride(size_t unit, size_t size, SIZES... sizes)
+		{
+		    return unit_to_stride(unit, sizes...);
+		}
 };
 
 template <class T, size_t N=0, class ALLOC=std::allocator<T> >
@@ -476,4 +503,4 @@ template <class T,
 using Array3 = array<Buf<T, ALLOC, Z, Y, X> >;
 
 }	// namespace TU
-
+#endif	// !__TU_ARRAY_H

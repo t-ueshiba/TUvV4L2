@@ -5,6 +5,9 @@
   \file		range.h
   \brief	2つの反復子によって指定されるレンジの定義と実装
 */
+#ifndef __TU_RANGE_H
+#define __TU_RANGE_H
+
 #include <iostream>
 #include <cstddef>	// for size_t
 #include <cassert>
@@ -122,7 +125,7 @@ class range
 		    return *this;
 		}
 		
-    static constexpr
+    constexpr static
     size_t	size()	  	{ return SIZE; }
     auto	begin()	  	{ return _begin; }
     auto	end()	  	{ return _begin + SIZE; }
@@ -633,4 +636,4 @@ fill(E&& expr, const T& val)
 }
     
 }	// namespace TU
-	
+#endif	// !__TU_RANGE_H

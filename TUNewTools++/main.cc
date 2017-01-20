@@ -98,13 +98,13 @@ doJob(BUF& buf)
 {
     size_t	size_x, size_y, size_z;
 
-  // buf を2次元行列と見なす
+  // buf を2次元配列と見なす
     size_x = 6;
     auto	a2 = make_dense_range(buf.begin(), buf.size()/size_x, size_x);
     std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2
 	      << std::endl;
 
-  // buf を3次元行列と見なす
+  // buf を3次元配列と見なす
     size_x = 2;
     size_y = 3;
     auto	a3 = make_dense_range(buf.begin(),
@@ -117,7 +117,7 @@ doJob(BUF& buf)
     a3[1][2] = a3[2][1];
   //std::cout << a3;
     
-  // buf の一部分を3次元行列と見なす
+  // buf の一部分を3次元配列と見なす
     size_x = 3;
     size_y = 2;
     size_z = 2;
@@ -128,18 +128,18 @@ doJob(BUF& buf)
     b3[1][1][2] = 100;
     std::cout << "--- b3(modified) ---\n" << b3;
 
-  // stride = 4 の2次元行列を生成する
-  //Array2<int>	c(4, 2, 3);
-    Array2<int, 4, 6>	c;
+  // unit = 8 の2次元配列を生成する
+    Array2<int>	c(8, 2, 3);
+  //Array2<int, 4, 6>	c;
     fill(c, 5);
     std::cout << "--- c(" << sizes_and_strides(c) << ") ---\n" << c;
     c[1][2] = 10;
 
     std::cout << c[1] << std::endl;
 
-  // 2次元行列を複製する
+  // 2次元配列を複製する
   //new_array<2, BUF>	d;
-    Array2<int>	d;
+    Array2<int>	d(3, 3);
     d = c;
     std::cout << "--- d(" << sizes_and_strides(d) << ") ---\n" << d;
 

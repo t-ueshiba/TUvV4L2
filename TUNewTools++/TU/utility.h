@@ -1,6 +1,9 @@
 /*
  *  $Id$
  */
+#ifndef __TU_UTILITY_H
+#define __TU_UTILITY_H
+
 #include <cstddef>	// for size_t
 #include <utility>
 
@@ -23,9 +26,10 @@ namespace detail
   {
       typedef index_sequence<IDX...>	type;
   };
-}
+}	// namespace detail
     
 template <size_t N>
 using make_index_sequence = typename detail::make_index_sequence<N>::type;
 #endif
-}
+}	// namespace std
+#endif	// !__TU_UTILITY_H
