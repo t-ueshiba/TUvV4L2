@@ -12,6 +12,7 @@
 #include <cstddef>	// for size_t
 #include <cassert>
 #include <algorithm>
+#include <initializer_list>
 #include <type_traits>
 #include <boost/iterator/iterator_adaptor.hpp>
 
@@ -124,6 +125,18 @@ class range
 		    std::copy_n(std::begin(expr), SIZE, _begin);
 		    return *this;
 		}
+
+		range(std::initializer_list<value_type> args)
+		    :_begin(args.begin())
+    		{
+		    assert(args.size() == SIZE);
+		}
+    range&	operator =(std::initializer_list<value_type> args)
+		{
+		    assert(args.size() == SIZE);
+		    std::copy(args.begin(), args.end(), begin());
+		    return *this;
+		}
 		
     constexpr static
     size_t	size()	  	{ return SIZE; }
@@ -210,6 +223,18 @@ class range<ITER, 0>
 		{
 		    assert(std::size(expr) == size());
 		    std::copy(std::begin(expr), std::end(expr), _begin);
+		    return *this;
+		}
+		
+		range(std::initializer_list<value_type> args)
+		    :_begin(const_cast<value_type*>(args.begin())),
+		     _end(  const_cast<value_type*>(args.end()))
+    		{
+		}
+    range&	operator =(std::initializer_list<value_type> args)
+		{
+		    assert(args.size() == size());
+		    std::copy(args.begin(), args.end(), begin());
 		    return *this;
 		}
 		

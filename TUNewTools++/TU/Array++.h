@@ -100,7 +100,7 @@ class Buf : public BufTraits<T, ALLOC>
     
   protected:
     constexpr static size_t	D = 1 + sizeof...(SIZES);
-    
+
   public:
     using allocator_type	= void;
     using value_type		= T;
@@ -434,6 +434,19 @@ class array : public BUF
 		    return *this;
 		}
 
+		array(std::initializer_list<value_type> args)
+		    :super(sizes(args))
+		{
+		    std::copy(args.begin(), args.end(), begin());
+		}
+    array&	operator =(std::initializer_list<value_type> args)
+		{
+		    super::resize(sizes(args));
+		    std::copy(args.begin(), args.end(), begin());
+
+		    return *this;
+		}
+    
     using	super::size;
     using	super::stride;
     using	super::nrow;
@@ -465,6 +478,8 @@ class array : public BUF
 		}
     
   private:
+    using	sizes_iterator = typename std::array<size_t, D>::iterator;
+    
     template <class T_>
     static typename std::enable_if<std::is_integral<T_>::value, size_t>::type
 		cvt_to_size(const T_& arg)
@@ -479,6 +494,31 @@ class array : public BUF
 		    return {TU::size<I_>(expr)...};
 		}
 
+    template <class T_>
+    static typename std::enable_if<!is_range<T_>::value>::type
+		set_sizes(sizes_iterator iter,
+			  sizes_iterator end, const T_& val)
+		{
+		    throw std::runtime_error("array<BUF>::set_sizes(): too shallow initializer list!");
+		}
+    template <class T_>
+    static typename std::enable_if<is_range<T_>::value>::type
+		set_sizes(sizes_iterator iter,
+			  sizes_iterator end, const T_& r)
+		{
+		    *iter = r.size();
+		    if (++iter != end)
+			set_sizes(iter, end, *r.begin());
+		}
+    static std::array<size_t, D>
+		sizes(std::initializer_list<value_type> args)
+		{
+		    std::array<size_t, D>	sizs;
+		    set_sizes(sizs.begin(), sizs.end(), args);
+
+		    return sizs;
+		}
+    
     static auto	unit_to_stride(size_t unit, size_t size)
 		{
 		    constexpr auto	elmsiz = sizeof(element_type);

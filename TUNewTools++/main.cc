@@ -164,6 +164,9 @@ doJob(BUF& buf)
 
     for (auto iter = a2[0].begin(), end = a2[0].end() - 1; iter != end; ++iter)
 	std::cout << make_range<3, 2>(iter, stride<1>(a2));
+
+    Array2<int>	a1({{10, 20, 30},{100, 200, 300}});
+    std::cout << a1;
 }
 
 }	// namespace TU
