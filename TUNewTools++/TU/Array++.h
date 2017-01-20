@@ -1,6 +1,10 @@
 /*
  *  $Id$
  */
+/*!
+  \file		Array++.h
+  \brief	多次元配列クラスの定義と実装
+*/
 #ifndef __TU_ARRAY_H
 #define __TU_ARRAY_H
 
