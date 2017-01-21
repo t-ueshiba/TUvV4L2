@@ -364,8 +364,8 @@ class range_iterator
     using ss	= detail::size_and_stride<SIZE, STRIDE>;
     
   public:
-    using reference	  = typename super::reference;
-    using difference_type = typename super::difference_type;
+    using		typename super::reference;
+    using		typename super::difference_type;
 
     friend class	boost::iterator_core_access;
 	  

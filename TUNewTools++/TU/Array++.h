@@ -9,6 +9,8 @@
 #define __TU_ARRAY_H
 
 #include <array>
+#include <iomanip>		// for std::ws
+#include <memory>		// for std::unique_ptr<T>
 #include "TU/range.h"
 #include "TU/utility.h"		// for std::index_sequence<Ints...>
 #include "TU/functional.h"	// for TU::lcm()
@@ -102,10 +104,11 @@ class Buf : public BufTraits<T, ALLOC>
     constexpr static size_t	D = 1 + sizeof...(SIZES);
 
   public:
-    using allocator_type	= void;
+    using sizes_type		= std::array<size_t, D>;
     using value_type		= T;
-    using pointer		= typename super::pointer;
-    using const_pointer		= typename super::const_pointer;
+    using allocator_type	= void;
+    using typename super::pointer;
+    using typename super::const_pointer;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -116,12 +119,12 @@ class Buf : public BufTraits<T, ALLOC>
     Buf&	operator =(Buf&&)		= default;
     
   // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
-    explicit	Buf(const std::array<size_t, D>& sizes, size_t=0)
+    explicit	Buf(const sizes_type& sizes, size_t=0)
 		{
 		    if (!check_sizes(sizes, axis<D>()))
 			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
 		}
-    void	resize(const std::array<size_t, D>& sizes, size_t=0)
+    void	resize(const sizes_type& sizes, size_t=0)
 		{
 		    if (!check_sizes(sizes, axis<D>()))
 			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
@@ -142,15 +145,22 @@ class Buf : public BufTraits<T, ALLOC>
     auto	end()	const	{ return make_iterator<SIZES...>(_a.end()); }
 
     void	fill(const T& c)		{ _a.fill(c); }
-	
+    std::istream&
+		get(std::istream& in)
+		{
+		    for (auto& val : _a)
+			in >> val;
+		    return in;
+		}
+    
   private:
     template <size_t I_>
-    static bool	check_sizes(const std::array<size_t, D>& sizes, axis<I_>)
+    static bool	check_sizes(const sizes_type& sizes, axis<I_>)
 		{
 		    return (sizes[I_-1] != size<I_-1>() ? false :
 			    check_sizes(sizes, axis<I_-1>()));
 		}
-    static bool	check_sizes(const std::array<size_t, D>& sizes, axis<0>)
+    static bool	check_sizes(const sizes_type& sizes, axis<0>)
 		{
 		    return true;
 		}
@@ -192,10 +202,11 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     constexpr static size_t	D = 1 + sizeof...(SIZES);
 
   public:
-    using allocator_type	= typename super::allocator_type;
+    using sizes_type		= std::array<size_t, D>;
     using value_type		= T;
-    using pointer		= typename super::pointer;
-    using const_pointer		= typename super::const_pointer;
+    using typename super::allocator_type;
+    using typename super::pointer;
+    using typename super::const_pointer;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -242,14 +253,14 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
 
   // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
-    explicit	Buf(const std::array<size_t, D>& sizes, size_t stride=0)
+    explicit	Buf(const sizes_type& sizes, size_t stride=0)
 		    :_sizes(sizes),
 		     _stride(stride ? stride : _sizes[D-1]),
 		     _capacity(capacity(axis<0>())),
 		     _p(alloc(_capacity))
 		{
 		}
-    void	resize(const std::array<size_t, D>& sizes, size_t stride=0)
+    void	resize(const sizes_type& sizes, size_t stride=0)
 		{
 		    free(_p, _capacity);
 		    _sizes    = sizes;
@@ -291,11 +302,11 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     std::istream&
 		get(std::istream& in)
 		{
-		    std::array<size_t, D>	indices, sizes;
-		    indices.fill(0);
+		    sizes_type	nvalues, sizes;
+		    nvalues.fill(0);
 		    sizes.fill(0);
 
-		    get(in, indices, sizes);
+		    get(in >> std::ws, nvalues, sizes);
 
 		    return in;
 		}
@@ -347,55 +358,64 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 			       size<I>(), stride<I>());
 		}
 
-    auto	get(std::istream& in, std::array<size_t, D>& indices,
-		    std::array<size_t, D>& sizes)
+    base_iterator
+		get(std::istream& in, sizes_type& nvalues, sizes_type& sizes)
 		{
-		    const auto	getc = [](std::istream& in)
-				{
-				    for (char c; in.get(c); )
-					if (!isspace(c) || c == '\n')
-					    return c;
-				    return '\n';
-				};
-		    char	c;
-
-		    for (size_t d = D - 1; ; )
+		    constexpr size_t	BufSiz = (sizeof(value_type) < 2048 ?
+						  2048/sizeof(value_type) : 1);
+		    std::unique_ptr<value_type[]>
+					tmp(new value_type[BufSiz]);
+		    base_iterator	iter;
+		    size_t		n = 0;
+		    
+		    for (size_t d = D - 1; n < BufSiz; )
 		    {
-			if ((c = getc(in)) != '\n')
-			    break;
+			char	c;
 			
-			if (indices[d] > sizes[d])
-			    sizes[d] = indices[d];	// d軸のサイズを更新
-
-			if (d == 0)
+			while (in.get(c))
+			    if (!isspace(c) || c == '\n')
+				break;
+			
+			if (in && c != '\n')	// 現在軸の末尾でなければ...
 			{
-			    resize(sizes);
-			    return base_iterator(_p + _capacity);
+			    in.putback(c);	// 1文字読み戻して
+			    in >> tmp[n++];	// 改めて要素をバッファに読み込む
+
+			    d = D - 1;		// 最下位軸に戻して
+			    ++nvalues[d];	// 要素数を1だけ増やす
 			}
-	
-			indices[d] = 0;
-			++indices[--d];
+			else			// 現在軸の末尾に到達したなら...
+			{
+			    if (nvalues[d] > sizes[d])
+				sizes[d] = nvalues[d];	// 現在軸の要素数を記録
+
+			    if (d == 0)		// 最上位軸の末尾ならば...
+			    {
+				resize(sizes);	// 領域を確保して
+				iter = base_iterator(_p + _capacity);
+				break;		// その末端をiterにセットして返す
+			    }
+		
+			    nvalues[d] = 0;	// 現在軸を先頭に戻し
+			    ++nvalues[--d];	// 直上軸に移動して1つ進める
+			}
 		    }
 
-		    ++indices[D-1];
+		    if (n == BufSiz)		// バッファが一杯ならば...
+			iter = get(in, nvalues, sizes);	// 再帰してさらに読み込む
 
-		    in.putback(c);
-		    value_type	val;
-		    in >> val;
+		    while (n--)
+			*(--iter) = std::move(tmp[n]);	// バッファの内容を移す
 
-		  // 現在軸上で1つ先に進む
-		    auto	iter = get(in, indices, sizes);
-		    *(--iter) = std::move(val);
-    
-		    return iter;
+		    return iter;		// 読み込まれた先頭位置を返す
 		}
 
   private:
-    allocator_type		_allocator;	//!< 要素を確保するアロケータ
-    std::array<size_t, D>	_sizes;		//!< 各軸の要素数
-    size_t			_stride;	//!< 最終軸のストライド
-    size_t			_capacity;	//!< バッファ中に収めらる総要素数
-    pointer			_p;		//!< 先頭要素へのポインタ
+    allocator_type	_allocator;	//!< 要素を確保するアロケータ
+    sizes_type		_sizes;		//!< 各軸の要素数
+    size_t		_stride;	//!< 最終軸のストライド
+    size_t		_capacity;	//!< バッファ中に収めらる総要素数
+    pointer		_p;		//!< 先頭要素へのポインタ
 };
     
 /************************************************************************
@@ -426,6 +446,7 @@ class array : public BUF
     using super			= BUF;
     using buf_iterator		= typename super::iterator;
     using const_buf_iterator	= typename super::const_iterator;
+    using sizes_type		= typename super::sizes_type;
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
     
@@ -433,8 +454,8 @@ class array : public BUF
     
   public:
     using element_type		 = typename super::value_type;
-    using pointer		 = typename super::pointer;
-    using const_pointer		 = typename super::const_pointer;
+    using typename super::pointer;
+    using typename super::const_pointer;
     using iterator		 = decltype(std::declval<super*>()->begin());
     using const_iterator	 = decltype(std::declval<const super*>()
 					    ->begin());
@@ -562,7 +583,7 @@ class array : public BUF
 		}
     
   private:
-    using	sizes_iterator = typename std::array<size_t, D>::iterator;
+    using	sizes_iterator = typename sizes_type::iterator;
     
     template <class T_>
     static typename std::enable_if<std::is_integral<T_>::value, size_t>::type
@@ -572,7 +593,7 @@ class array : public BUF
 		}
 
     template <class E_, size_t... I_>
-    static std::array<size_t, D>
+    static sizes_type
 		sizes(const E_& expr, std::index_sequence<I_...>)
 		{
 		    return {TU::size<I_>(expr)...};
@@ -592,10 +613,10 @@ class array : public BUF
 		    if (++iter != end)
 			set_sizes(iter, end, *r.begin());
 		}
-    static std::array<size_t, D>
+    static sizes_type
 		sizes(std::initializer_list<const_value_type> args)
 		{
-		    std::array<size_t, D>	sizs;
+		    sizes_type	sizs;
 		    set_sizes(sizs.begin(), sizs.end(), args);
 
 		    return sizs;
@@ -641,6 +662,12 @@ class array : public BUF
 			save(out, begin->begin(), begin->end());
 		}
 };
+
+template <class BUF> inline std::istream&
+operator >>(std::istream& in, array<BUF>& a)
+{
+    return a.get(in);
+}
 
 /************************************************************************
 *  type definitions for convenience					*

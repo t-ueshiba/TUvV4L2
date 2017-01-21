@@ -218,7 +218,7 @@ test_text_io(const BUF& buf)
 
     std::ifstream	in("text1.txt");
     Array<value_type>	a1;
-    a1.get(in);
+    in >> a1;
     std::cout << "--- a1(" << sizes_and_strides(a1) << ") ---\n" << a1;
     in.close();
     
@@ -228,7 +228,7 @@ test_text_io(const BUF& buf)
 
     in.open("text2.txt");
     Array2<value_type>	a2;
-    a2.get(in);
+    in >> a2;
     std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
     in.close();
 
@@ -238,7 +238,7 @@ test_text_io(const BUF& buf)
 
     in.open("text3.txt");
     Array3<value_type>	a3;
-    a3.get(in);
+    in >> a3;
     std::cout << "--- a3(" << sizes_and_strides(a3) << ") ---\n" << a3;
     in.close();
 }
