@@ -127,24 +127,27 @@ class Buf : public BufTraits<T, ALLOC>
 			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
 		}
 
-    template <size_t I_>
-    constexpr static auto	size(axis<I_>)	{ return siz<I_>::value; }
-    template <size_t I_>
-    constexpr static auto	stride(axis<I_>){ return siz<I_>::value; }
-    constexpr static auto	size()		{ return siz<0>::value; }
+    template <size_t I_=0>
+    constexpr static auto	size()		{ return siz<I_>::value; }
+    template <size_t I_=D-1>
+    constexpr static auto	stride()	{ return siz<I_>::value; }
     constexpr static auto	nrow()		{ return siz<0>::value; }
     constexpr static auto	ncol()		{ return siz<1>::value; }
 
+    auto	data()		{ return _a.data(); }
+    auto	data()	const	{ return _a.data(); }
     auto	begin()		{ return make_iterator<SIZES...>(_a.begin()); }
     auto	begin()	const	{ return make_iterator<SIZES...>(_a.begin()); }
     auto	end()		{ return make_iterator<SIZES...>(_a.end()); }
     auto	end()	const	{ return make_iterator<SIZES...>(_a.end()); }
 
+    void	fill(const T& c)		{ _a.fill(c); }
+	
   private:
     template <size_t I_>
     static bool	check_sizes(const std::array<size_t, D>& sizes, axis<I_>)
 		{
-		    return (sizes[I_-1] != size(axis<I_-1>()) ? false :
+		    return (sizes[I_-1] != size<I_-1>() ? false :
 			    check_sizes(sizes, axis<I_-1>()));
 		}
     static bool	check_sizes(const std::array<size_t, D>& sizes, axis<0>)
@@ -255,14 +258,14 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    _p	      = alloc(_capacity);
 		}
 
-    template <size_t I_>
-    auto	size(axis<I_>)	  const	{ return _sizes[I_]; }
-    template <size_t I_>
-    auto	stride(axis<I_>)  const	{ return _sizes[I_]; }
-    auto	stride(axis<D-1>) const	{ return _stride; }
-    auto	size()		  const	{ return _sizes[0]; }
+    template <size_t I_=0>
+    auto	size()		  const	{ return _sizes[I_]; }
+    template <size_t I_=D-1>
+    auto	stride()	  const	{ return stride_impl(axis<I_>()); }
     auto	nrow()		  const	{ return _sizes[0]; }
     auto	ncol()		  const	{ return _sizes[1]; }
+    auto	data()			{ return _p; }
+    auto	data()		  const	{ return _p; }
     auto	begin()
 		{
 		    return make_iterator<SIZES...>(base_iterator(_p));
@@ -281,8 +284,16 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    return make_iterator<SIZES...>(const_base_iterator(
 						       _p + _capacity));
 		}
-
+    void	fill(const T& c)
+		{
+		    super::fill(_p, _p + _capacity, c);
+		}
+    
   private:
+    template <size_t I_>
+    auto	stride_impl(axis<I_>)		const	{ return _sizes[I_]; }
+    auto	stride_impl(axis<D-1>)		const	{ return _stride; }
+
     size_t	capacity(axis<D-1>) const
 		{
 		    return _stride;
@@ -322,7 +333,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    
 		    return make_range_iterator(
 			       make_iterator<SIZES_...>(iter),
-			       size(axis<I>()), stride(axis<I>()));
+			       size<I>(), stride<I>());
 		}
 
   private:
@@ -341,13 +352,13 @@ template <class BUF>	class array;
 template <size_t I, class BUF> inline size_t
 size(const array<BUF>& a)
 {
-    return a.size(std::integral_constant<size_t, I>());
+    return a.template size<I>();
 }
 
 template <size_t I, class BUF> inline size_t
 stride(const array<BUF>& a)
 {
-    return a.stride(std::integral_constant<size_t, I>());
+    return a.template stride<I>();
 }
 
 //! 多次元配列を表すクラス
@@ -377,6 +388,8 @@ class array : public BUF
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using value_type		 = typename std::iterator_traits<iterator>
 					       ::value_type;
+    using const_value_type	 = typename std::iterator_traits<const_iterator>
+					       ::value_type;
     using reference		 = typename std::iterator_traits<iterator>
 					       ::reference;
     using const_reference	 = typename std::iterator_traits<const_iterator>
@@ -392,29 +405,27 @@ class array : public BUF
     template <class... SIZES_,
 	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
     explicit	array(SIZES_... sizes)
-		    :super({cvt_to_size(sizes)...})
+		    :super({to_size(sizes)...})
 		{
 		}
     template <class... SIZES_,
 	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
     explicit	array(size_t unit, SIZES_... sizes)
-		    :super({cvt_to_size(sizes)...},
-			   unit_to_stride(unit, sizes...))
+		    :super({to_size(sizes)...}, to_stride(unit, sizes...))
 		{
 		}
     template <class... SIZES_>
     typename std::enable_if<sizeof...(SIZES_) == D>::type
 		resize(SIZES_... sizes)
 		{
-		    super::resize({cvt_to_size(sizes)...});
+		    super::resize({to_size(sizes)...});
 		}
     
     template <class... SIZES_>
     typename std::enable_if<sizeof...(SIZES_) == D>::type
 		resize(size_t unit, SIZES_... sizes)
 		{
-		    super::resize({cvt_to_size(sizes)...},
-				  unit_to_stride(unit, sizes...));
+		    super::resize({to_size(sizes)...}, to_stride(unit, sizes...));
 		}
 
     template <class E_,
@@ -434,12 +445,12 @@ class array : public BUF
 		    return *this;
 		}
 
-		array(std::initializer_list<value_type> args)
+		array(std::initializer_list<const_value_type> args)
 		    :super(sizes(args))
 		{
 		    std::copy(args.begin(), args.end(), begin());
 		}
-    array&	operator =(std::initializer_list<value_type> args)
+    array&	operator =(std::initializer_list<const_value_type> args)
 		{
 		    super::resize(sizes(args));
 		    std::copy(args.begin(), args.end(), begin());
@@ -451,9 +462,15 @@ class array : public BUF
     using	super::stride;
     using	super::nrow;
     using	super::ncol;
+    using	super::data;
     using	super::begin;
     using	super::end;
-    
+
+    range<iterator>
+		operator ()()		{ return {begin(), end()}; }
+    range<const_iterator>
+		operator ()()	const	{ return {begin(), end()}; }
+	    
     auto	cbegin()  const	{ return begin(); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return std::make_reverse_iterator(end()); }
@@ -474,7 +491,19 @@ class array : public BUF
 		}
     void	fill(const element_type& val)
 		{
-		    super::fill(begin(), end(), val);
+		    super::fill(val);
+		}
+    std::istream&
+		restore(std::istream& in)
+		{
+		    restore(in, begin(), end());
+		    return in;
+		}
+    std::ostream&
+		save(std::ostream& out) const
+		{
+		    save(out, begin(), end());
+		    return out;
 		}
     
   private:
@@ -482,7 +511,7 @@ class array : public BUF
     
     template <class T_>
     static typename std::enable_if<std::is_integral<T_>::value, size_t>::type
-		cvt_to_size(const T_& arg)
+		to_size(const T_& arg)
 		{
 		    return size_t(arg);
 		}
@@ -496,22 +525,20 @@ class array : public BUF
 
     template <class T_>
     static typename std::enable_if<!is_range<T_>::value>::type
-		set_sizes(sizes_iterator iter,
-			  sizes_iterator end, const T_& val)
+		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& val)
 		{
 		    throw std::runtime_error("array<BUF>::set_sizes(): too shallow initializer list!");
 		}
     template <class T_>
     static typename std::enable_if<is_range<T_>::value>::type
-		set_sizes(sizes_iterator iter,
-			  sizes_iterator end, const T_& r)
+		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& r)
 		{
 		    *iter = r.size();
 		    if (++iter != end)
 			set_sizes(iter, end, *r.begin());
 		}
     static std::array<size_t, D>
-		sizes(std::initializer_list<value_type> args)
+		sizes(std::initializer_list<const_value_type> args)
 		{
 		    std::array<size_t, D>	sizs;
 		    set_sizes(sizs.begin(), sizs.end(), args);
@@ -519,7 +546,7 @@ class array : public BUF
 		    return sizs;
 		}
     
-    static auto	unit_to_stride(size_t unit, size_t size)
+    static auto	to_stride(size_t unit, size_t size)
 		{
 		    constexpr auto	elmsiz = sizeof(element_type);
 
@@ -530,9 +557,44 @@ class array : public BUF
 		    return n*((size + n - 1)/n);
 		}
     template <class... SIZES>
-    static auto	unit_to_stride(size_t unit, size_t size, SIZES... sizes)
+    static auto	to_stride(size_t unit, size_t size, SIZES... sizes)
 		{
-		    return unit_to_stride(unit, sizes...);
+		    return to_stride(unit, sizes...);
+		}
+
+    static void	restore(std::istream& in, pointer begin, pointer end)
+		{
+		    if (!in)
+			std::cerr << "Before: bad!" << std::endl;
+		    
+		    std::cerr << "restore " << (end - begin) << "elements."
+			      << std::endl;
+		    
+		    if (!in.read(reinterpret_cast<char*>(begin),
+				 sizeof(element_type) * std::distance(begin, end)))
+			std::cerr << "bad!" << std::endl;
+		    
+		    for (; begin != end; ++begin)
+			std::cerr << ' ' << *begin;
+		    std::cerr << std::endl;
+		}
+    template <class ITER_>
+    static void	restore(std::istream& in, ITER_ begin, ITER_ end)
+		{
+		    for (; begin != end; ++begin)
+			restore(in, begin->begin(), begin->end());
+		}
+
+    static void	save(std::ostream& out, const_pointer begin, const_pointer end)
+		{
+		    out.write(reinterpret_cast<const char*>(begin),
+			      sizeof(element_type) * std::distance(begin, end));
+		}
+    template <class ITER_>
+    static void	save(std::ostream& out, ITER_ begin, ITER_ end)
+		{
+		    for (; begin != end; ++begin)
+			save(out, begin->begin(), begin->end());
 		}
 };
 

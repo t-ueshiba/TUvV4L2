@@ -66,15 +66,6 @@ namespace detail
 template <class E>
 using is_range = decltype(detail::is_range::check(std::declval<E>()));
 
-template <class E>
-typename std::enable_if<is_range<E>::value, std::ostream&>::type
-operator <<(std::ostream& out, const E& expr)
-{
-    for (const auto& elm : expr)
-	out << ' ' << elm;
-    return out << std::endl;
-}
-    
 /************************************************************************
 *  class range<ITER, SIZE>						*
 ************************************************************************/
@@ -227,8 +218,7 @@ class range<ITER, 0>
 		}
 		
 		range(std::initializer_list<value_type> args)
-		    :_begin(const_cast<value_type*>(args.begin())),
-		     _end(  const_cast<value_type*>(args.end()))
+		    :_begin(args.begin()), _end(args.end())
     		{
 		}
     range&	operator =(std::initializer_list<value_type> args)
@@ -586,18 +576,18 @@ make_dense_range(ITER iter, size_t size, SIZES... sizes)
 /************************************************************************
 *  sizes and strides of multidimensional ranges				*
 ************************************************************************/
-template <size_t I=0, class ITER> inline size_t
-size(const range<ITER>& r)
+template <size_t I=0, class ITER, size_t SIZE> inline size_t
+size(const range<ITER, SIZE>& r)
 {
     return r.begin(std::integral_constant<size_t, I>())->size();
 }
-
-template <size_t I, class ITER> inline size_t
-stride(const range<ITER>& r)
+/*
+template <size_t I, class ITER, size_t SIZE> inline size_t
+stride(const range<ITER, SIZE>& r)
 {
     return r.begin(std::integral_constant<size_t, I>()).stride();
 }
-
+*/
 /************************************************************************
 *  subrange extraction							*
 ************************************************************************/
@@ -646,6 +636,15 @@ make_subrange(const RANGE& r, size_t idx, INDICES... indices)
 /************************************************************************
 *  generic algorithms for ranges					*
 ************************************************************************/
+template <class E>
+typename std::enable_if<is_range<E>::value, std::ostream&>::type
+operator <<(std::ostream& out, const E& expr)
+{
+    for (const auto& elm : expr)
+	out << ' ' << elm;
+    return out << std::endl;
+}
+    
 template <class E, class T>
 typename std::enable_if<!is_range<typename std::decay<E>::type>::value>::type
 fill(E&& expr, const T& val)

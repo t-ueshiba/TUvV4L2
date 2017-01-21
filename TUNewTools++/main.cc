@@ -1,6 +1,7 @@
 /*
  *  $Id$
  */
+#include <fstream>
 #include <vector>
 #include "TU/Array++.h"
 
@@ -94,29 +95,17 @@ struct WindowGenerator
 *  static functions							*
 ************************************************************************/
 template <class BUF> static void
-doJob(BUF& buf)
+test_range3(BUF buf)
 {
-    size_t	size_x, size_y, size_z;
-
-  // buf を2次元配列と見なす
-    size_x = 6;
-    auto	a2 = make_dense_range(buf.begin(), buf.size()/size_x, size_x);
-    std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2
-	      << std::endl;
-
-  // buf を3次元配列と見なす
-    size_x = 2;
-    size_y = 3;
+    std::cout << "*** 3D range/array test ***" << std::endl;
+    
+    size_t	size_x = 6, size_y = 2, size_z;
     auto	a3 = make_dense_range(buf.begin(),
 				      buf.size()/size_y/size_x, size_y, size_x);
-    std::cout << "--- a3 (" << sizes_and_strides(a3) << ") ---\n"
-	      << a3
-	      << "--- a3[1][2] ---\n" << a3[1][2]
+    std::cout << "--- a3(" << sizes_and_strides(a3) << ") ---\n" << a3
+	      << "--- a3[1][0] ---\n" << a3[1][0]
 	      << std::endl;
 
-    a3[1][2] = a3[2][1];
-  //std::cout << a3;
-    
   // buf の一部分を3次元配列と見なす
     size_x = 3;
     size_y = 2;
@@ -128,45 +117,81 @@ doJob(BUF& buf)
     b3[1][1][2] = 100;
     std::cout << "--- b3(modified) ---\n" << b3;
 
+    Array3<int, 2, 2, 3>	c3(b3);
+    std::cout << "--- c3(" << sizes_and_strides(c3) << ") ---\n" << c3;
+}
+
+static void
+test_stride()
+{
+    std::cout << "*** stride test ***" << std::endl;
+    
   // unit = 8 の2次元配列を生成する
     Array2<int>	c(8, 2, 3);
   //Array2<int, 4, 6>	c;
+
     fill(c, 5);
     std::cout << "--- c(" << sizes_and_strides(c) << ") ---\n" << c;
+
     c[1][2] = 10;
-
     std::cout << c[1] << std::endl;
+}
+    
+static void
+test_initializer_list()
+{
+    std::cout << "*** initializer_list<T> test ***" << std::endl;
+    
+    Array2<int>	a2({{10, 20, 30},{100, 200, 300}});
+    std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
+}
+    
+template <class BUF> static void
+test_subrange(const BUF& buf)
+{
+    using value_type	= typename BUF::value_type;
+    
+    std::cout << "*** subrange test ***" << std::endl;
 
-  // 2次元配列を複製する
-  //new_array<2, BUF>	d;
-    Array2<int>	d(3, 3);
-    d = c;
-    std::cout << "--- d(" << sizes_and_strides(d) << ") ---\n" << d;
+    auto	r = make_range<2, 2, 2, 3, 6>(buf.begin());
+    std::cout << "--- make_range<2, 2, 2, 3, 6>(" << sizes_and_strides(r)
+	      << ") ---\n" << r;
 
-    for (auto iter = c.rbegin(); iter != c.rend(); ++iter)
-	std::cout << *iter;
-
-    Array3<float, 2, 2, 3>	e(b3);
-    std::cout << "--- e(" << sizes_and_strides(e) << ") ---\n" << e;
-
-    auto	f = make_range<2, 2, 2, 3, 6>(buf.begin());
-    std::cout << "--- f(" << sizes_and_strides(f) << ") ---\n" << f;
-
-    auto	g = make_subrange(a2, 1, 2, 2, 3);
+    size_t		ncol = 6;
+    Array2<value_type>	a2(make_dense_range(buf.begin(), buf.size()/ncol, ncol));
+    auto		s2 = make_subrange(a2, 1, 2, 2, 3);
     std::cout << "--- a2 (" << sizes_and_strides(a2) << ") ---\n" << a2
-	      << "--- subrange(a2, 1, 2, 2, 3) (" << sizes_and_strides(g)
-	      << ") ---\n" << g;
+	      << "--- subrange(a2, 1, 2, 2, 3) (" << sizes_and_strides(s2)
+	      << ") ---\n" << s2;
 
-    auto	h = make_subrange<2, 3>(a2, 1, 2);
-    std::cout << "--- a2 (" << sizes_and_strides(a2) << ") ---\n" << a2
-	      << "--- subrange(a2, 1, 2, 2, 3) (" << sizes_and_strides(h)
-	      << ") ---\n" << h;
+    auto		s3 = make_subrange<2, 3>(a2, 1, 2);
+    std::cout << "--- subrange<2, 3>(a2, 1, 2) (" << sizes_and_strides(s3)
+	      << ") ---\n" << s3;
 
-    for (auto iter = a2[0].begin(), end = a2[0].end() - 1; iter != end; ++iter)
+    for (auto iter = a2[0].rbegin(), end = a2[0].rend() - 1; iter != end; ++iter)
 	std::cout << make_range<3, 2>(iter, stride<1>(a2));
+}
 
-    Array2<int>	a1({{10, 20, 30},{100, 200, 300}});
-    std::cout << a1;
+template <class BUF> static void
+test_binary_io(const BUF& buf)
+{
+    std::cout << "*** binary I/O test ***" << std::endl;
+    
+    using value_type	= typename BUF::value_type;
+
+    size_t		ncol = 6;
+    Array2<value_type>	a2(make_dense_range(buf.begin(), buf.size()/ncol, ncol));
+
+    std::ofstream	out("tmp.data", std::ios::binary);
+    a2.save(out);
+    std::cout << "--- save: a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
+
+    a2.fill(1000);
+    std::cout << "--- modified: a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
+
+    std::ifstream	in("tmp.data", std::ios::binary|std::ios::ate);
+    a2.restore(in);
+    std::cout << "--- restore: a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
 }
 
 }	// namespace TU
@@ -174,11 +199,15 @@ doJob(BUF& buf)
 int
 main()
 {
-    std::vector<int>	a{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
-			  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-			  20, 21, 22, 23};
+    std::vector<int>	buf{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
+			    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+			    20, 21, 22, 23};
 
-    TU::doJob(a);
+    TU::test_range3(buf);
+    TU::test_stride();
+    TU::test_initializer_list();
+    TU::test_subrange(buf);
+    TU::test_binary_io(buf);
     
     return 0;
 }
