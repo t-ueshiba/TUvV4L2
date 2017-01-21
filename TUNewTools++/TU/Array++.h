@@ -288,6 +288,17 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		{
 		    super::fill(_p, _p + _capacity, c);
 		}
+    std::istream&
+		get(std::istream& in)
+		{
+		    std::array<size_t, D>	indices, sizes;
+		    indices.fill(0);
+		    sizes.fill(0);
+
+		    get(in, indices, sizes);
+
+		    return in;
+		}
     
   private:
     template <size_t I_>
@@ -334,6 +345,49 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    return make_range_iterator(
 			       make_iterator<SIZES_...>(iter),
 			       size<I>(), stride<I>());
+		}
+
+    auto	get(std::istream& in, std::array<size_t, D>& indices,
+		    std::array<size_t, D>& sizes)
+		{
+		    const auto	getc = [](std::istream& in)
+				{
+				    for (char c; in.get(c); )
+					if (!isspace(c) || c == '\n')
+					    return c;
+				    return '\n';
+				};
+		    char	c;
+
+		    for (size_t d = D - 1; ; )
+		    {
+			if ((c = getc(in)) != '\n')
+			    break;
+			
+			if (indices[d] > sizes[d])
+			    sizes[d] = indices[d];	// d軸のサイズを更新
+
+			if (d == 0)
+			{
+			    resize(sizes);
+			    return base_iterator(_p + _capacity);
+			}
+	
+			indices[d] = 0;
+			++indices[--d];
+		    }
+
+		    ++indices[D-1];
+
+		    in.putback(c);
+		    value_type	val;
+		    in >> val;
+
+		  // 現在軸上で1つ先に進む
+		    auto	iter = get(in, indices, sizes);
+		    *(--iter) = std::move(val);
+    
+		    return iter;
 		}
 
   private:
@@ -479,12 +533,13 @@ class array : public BUF
     auto	rend()		{ return std::make_reverse_iterator(begin()); }
     auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
     auto	crend()	  const	{ return rend(); }
-    auto	operator [](size_t i)
+    reference	operator [](size_t i)
 		{
 		    assert(i < size());
 		    return *(begin() + i);
 		}
-    const auto&	operator [](size_t i) const
+    const_reference
+		operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(begin() + i);
@@ -587,6 +642,9 @@ class array : public BUF
 		}
 };
 
+/************************************************************************
+*  type definitions for convenience					*
+************************************************************************/
 template <class T, size_t N=0, class ALLOC=std::allocator<T> >
 using Array = array<Buf<T, ALLOC, N> >;
 

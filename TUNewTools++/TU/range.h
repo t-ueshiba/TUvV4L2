@@ -93,7 +93,8 @@ class range
 					       ::value_type;
     using reference		 = typename std::iterator_traits<iterator>
 					       ::reference;
-    using const_reference	 = const reference&;
+    using const_reference	 = typename std::iterator_traits<const_iterator>
+					       ::reference;
 
   public:
 		range(iterator begin)	:_begin(begin)	{}
@@ -148,7 +149,8 @@ class range
 		    assert(i < size());
 		    return *(_begin + i);
 		}
-    const auto&	operator [](size_t i) const
+    const_reference
+		operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);
@@ -191,7 +193,8 @@ class range<ITER, 0>
 					       ::value_type;
     using reference		 = typename std::iterator_traits<iterator>
 					       ::reference;
-    using const_reference	 = const reference&;
+    using const_reference	 = typename std::iterator_traits<const_iterator>
+					       ::reference;
 
   public:
 		range(iterator begin, iterator end)
@@ -246,7 +249,8 @@ class range<ITER, 0>
 		    assert(i < size());
 		    return *(_begin + i);
 		}
-    const auto&	operator [](size_t i) const
+    const_reference
+		operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);

@@ -167,18 +167,28 @@ test_subrange(const BUF& buf)
     auto		s3 = make_subrange<2, 3>(a2, 1, 2);
     std::cout << "--- subrange<2, 3>(a2, 1, 2) (" << sizes_and_strides(s3)
 	      << ") ---\n" << s3;
+}
 
-    for (auto iter = a2[0].rbegin(), end = a2[0].rend() - 1; iter != end; ++iter)
+template <class BUF> static void
+test_window(const BUF& buf)
+{
+    using value_type	= typename BUF::value_type;
+    
+    std::cout << "*** window test ***" << std::endl;
+
+    size_t	ncol = 6;
+    const auto	a2 = make_dense_range(buf.begin(), buf.size()/ncol, ncol);
+    for (auto iter = a2[0].begin(), end = a2[0].end() - 1; iter != end; ++iter)
 	std::cout << make_range<3, 2>(iter, stride<1>(a2));
 }
 
 template <class BUF> static void
 test_binary_io(const BUF& buf)
 {
-    std::cout << "*** binary I/O test ***" << std::endl;
-    
     using value_type	= typename BUF::value_type;
 
+    std::cout << "*** binary I/O test ***" << std::endl;
+    
     size_t		ncol = 6;
     Array2<value_type>	a2(make_dense_range(buf.begin(), buf.size()/ncol, ncol));
 
@@ -195,6 +205,44 @@ test_binary_io(const BUF& buf)
     std::cout << "--- restore: a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
 }
 
+template <class BUF> static void
+test_text_io(const BUF& buf)
+{
+    using value_type	= typename BUF::value_type;
+    
+    std::cout << "*** text io test ***" << std::endl;
+    
+    std::ofstream	out("text1.txt");
+    out << buf;
+    out.close();
+
+    std::ifstream	in("text1.txt");
+    Array<value_type>	a1;
+    a1.get(in);
+    std::cout << "--- a1(" << sizes_and_strides(a1) << ") ---\n" << a1;
+    in.close();
+    
+    out.open("text2.txt");
+    out << make_dense_range(buf.begin(), 8, 3);
+    out.close();
+
+    in.open("text2.txt");
+    Array2<value_type>	a2;
+    a2.get(in);
+    std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
+    in.close();
+
+    out.open("text3.txt");
+    out << make_dense_range(buf.begin(), 3, 4, 2);
+    out.close();
+
+    in.open("text3.txt");
+    Array3<value_type>	a3;
+    a3.get(in);
+    std::cout << "--- a3(" << sizes_and_strides(a3) << ") ---\n" << a3;
+    in.close();
+}
+
 }	// namespace TU
 
 int
@@ -208,7 +256,9 @@ main()
     TU::test_stride();
     TU::test_initializer_list();
     TU::test_subrange(buf);
+    TU::test_window(buf);
     TU::test_binary_io(buf);
+    TU::test_text_io(buf);
     
     return 0;
 }
