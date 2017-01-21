@@ -581,13 +581,13 @@ size(const range<ITER, SIZE>& r)
 {
     return r.begin(std::integral_constant<size_t, I>())->size();
 }
-/*
+
 template <size_t I, class ITER, size_t SIZE> inline size_t
 stride(const range<ITER, SIZE>& r)
 {
     return r.begin(std::integral_constant<size_t, I>()).stride();
 }
-*/
+
 /************************************************************************
 *  subrange extraction							*
 ************************************************************************/

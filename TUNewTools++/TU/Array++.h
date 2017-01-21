@@ -564,19 +564,8 @@ class array : public BUF
 
     static void	restore(std::istream& in, pointer begin, pointer end)
 		{
-		    if (!in)
-			std::cerr << "Before: bad!" << std::endl;
-		    
-		    std::cerr << "restore " << (end - begin) << "elements."
-			      << std::endl;
-		    
-		    if (!in.read(reinterpret_cast<char*>(begin),
-				 sizeof(element_type) * std::distance(begin, end)))
-			std::cerr << "bad!" << std::endl;
-		    
-		    for (; begin != end; ++begin)
-			std::cerr << ' ' << *begin;
-		    std::cerr << std::endl;
+		    in.read(reinterpret_cast<char*>(begin),
+			    sizeof(element_type) * std::distance(begin, end));
 		}
     template <class ITER_>
     static void	restore(std::istream& in, ITER_ begin, ITER_ end)

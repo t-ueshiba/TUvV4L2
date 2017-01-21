@@ -185,11 +185,12 @@ test_binary_io(const BUF& buf)
     std::ofstream	out("tmp.data", std::ios::binary);
     a2.save(out);
     std::cout << "--- save: a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
+    out.close();	// 入力ストリームを開く前にcloseしておくこと
 
     a2.fill(1000);
     std::cout << "--- modified: a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
-
-    std::ifstream	in("tmp.data", std::ios::binary|std::ios::ate);
+    
+    std::ifstream	in("tmp.data", std::ios::binary);
     a2.restore(in);
     std::cout << "--- restore: a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
 }
