@@ -313,7 +313,7 @@ namespace detail
       size_t			stride() const	{ return _stride; }
 
     private:
-      const size_t	_stride;
+      size_t	_stride;
   };
   template <size_t STRIDE>
   struct size_and_stride<0, STRIDE>
@@ -324,7 +324,7 @@ namespace detail
       constexpr static size_t	stride()	{ return STRIDE; }
 
     private:
-      const size_t	_size;
+      size_t	_size;
   };
   template <>
   struct size_and_stride<0, 0>
@@ -335,8 +335,8 @@ namespace detail
       size_t			stride() const	{ return _stride; }
 
     private:
-      const size_t	_size;
-      const size_t	_stride;
+      size_t	_size;
+      size_t	_stride;
   };
 }	// namespace detail
     
@@ -444,9 +444,9 @@ make_range_iterator(ITER iter)
 
 //! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
 /*!
-  \param SIZE	最上位次元のレンジ長
-  \param STRIDE	インクリメント時に進める最上位次元のブロック数
-  \param SS	2番目以降の次元の(レンジ長，ストライド)の並び
+  \param SIZE	最上位軸のレンジ長
+  \param STRIDE	インクリメント時に進める最上位軸のブロック数
+  \param SS	2番目以降の軸の(レンジ長，ストライド)の並び
   \param iter	レンジの先頭要素を指す反復子
 */
 template <size_t SIZE, size_t STRIDE, size_t... SS, class ITER,
@@ -482,10 +482,10 @@ make_range_iterator(ITER iter, size_t stride)
     
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
-  \param SIZE		最上位次元のレンジ長
-  \param SIZES		2番目以降の次元のレンジ長の並び
-  \param stride		最上位次元のストライド
-  \param strides	2番目以降の次元のストライドの並び
+  \param SIZE		最上位軸のレンジ長
+  \param SIZES		2番目以降の軸のレンジ長の並び
+  \param stride		最上位軸のストライド
+  \param strides	2番目以降の軸のストライドの並び
   \param iter		レンジの先頭要素を指す反復子
 */
 template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
@@ -525,9 +525,9 @@ make_range_iterator(ITER iter, size_t size, size_t stride)
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param iter		レンジの先頭要素を指す反復子
-  \param size		最上位次元のレンジ長
-  \param stride		最上位次元のストライド
-  \param ss		2番目以降の次元の(レンジ長, ストライド)の並び
+  \param size		最上位軸のレンジ長
+  \param stride		最上位軸のストライド
+  \param ss		2番目以降の軸の(レンジ長, ストライド)の並び
 */
 template <class ITER, class... SS> inline auto
 make_range_iterator(ITER iter, size_t size, size_t stride, SS... ss)

@@ -10,7 +10,7 @@
 
 #include <array>
 #include <iomanip>		// for std::ws
-#include <memory>		// for std::unique_ptr<T>
+#include <memory>		// for std::allocator<T>, std::unique_ptr<T>
 #include "TU/range.h"
 #include "TU/utility.h"		// for std::index_sequence<Ints...>
 #include "TU/functional.h"	// for TU::lcm()
@@ -444,11 +444,7 @@ class array : public BUF
 {
   private:
     using super			= BUF;
-    using buf_iterator		= typename super::iterator;
-    using const_buf_iterator	= typename super::const_iterator;
     using sizes_type		= typename super::sizes_type;
-    template <size_t I_>
-    using axis			= std::integral_constant<size_t, I_>;
     
     constexpr static size_t	D = super::D;
     
