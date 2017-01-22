@@ -34,7 +34,7 @@ size(const T (&array)[N]) noexcept
 }
 #endif
 
-#if __cplusplus <= 201103L
+#if __cplusplus < 201402L && !defined(__INTEL_COMPILER)
 /************************************************************************
 *  function std::make_reverse_iterator(ITER)				*
 ************************************************************************/
