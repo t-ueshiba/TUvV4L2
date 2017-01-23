@@ -623,11 +623,11 @@ class array : public BUF
 	    
     auto	cbegin()  const	{ return begin(); }
     auto	cend()	  const	{ return end(); }
-    auto	rbegin()	{ return std::make_reverse_iterator(end()); }
-    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
+    auto	rbegin()	{ return reverse_iterator(end()); }
+    auto	rbegin()  const	{ return const_reverse_iterator(end()); }
     auto	crbegin() const	{ return rbegin(); }
-    auto	rend()		{ return std::make_reverse_iterator(begin()); }
-    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
+    auto	rend()		{ return reverse_iterator(begin()); }
+    auto	rend()	  const	{ return const_reverse_iterator(begin()); }
     auto	crend()	  const	{ return rend(); }
     reference	operator [](size_t i)
 		{

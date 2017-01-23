@@ -33,17 +33,6 @@ size(const T (&array)[N]) noexcept
     return N;
 }
 #endif
-
-#if __cplusplus < 201402L && !defined(__INTEL_COMPILER)
-/************************************************************************
-*  function std::make_reverse_iterator(ITER)				*
-************************************************************************/
-template <class ITER> inline std::reverse_iterator<ITER>
-make_reverse_iterator(ITER iter)
-{
-    return std::reverse_iterator<ITER>(iter);
-}
-#endif
 }	// namespace std
 
 namespace TU
@@ -135,15 +124,15 @@ class range
 		}
 
     constexpr static
-    size_t	size()	  	{ return SIZE; }
-    auto	begin()	  const	{ return _begin; }
-    auto	end()	  const	{ return _begin + SIZE; }
-    auto	cbegin()  const	{ return begin(); }
-    auto	cend()    const	{ return end(); }
-    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
-    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
-    auto	crbegin() const	{ return rbegin(); }
-    auto	crend()	  const	{ return rend(); }
+    size_t	size()			{ return SIZE; }
+    auto	begin()		const	{ return _begin; }
+    auto	end()		const	{ return _begin + SIZE; }
+    auto	cbegin()	const	{ return begin(); }
+    auto	cend()		const	{ return end(); }
+    auto	rbegin()	const	{ return reverse_iterator(end()); }
+    auto	rend()		const	{ return reverse_iterator(begin()); }
+    auto	crbegin()	const	{ return rbegin(); }
+    auto	crend()		const	{ return rend(); }
     reference	operator [](size_t i) const
 		{
 		    assert(i < size());
@@ -230,15 +219,15 @@ class range<ITER, 0>
 		    return *this;
 		}
 		
-    size_t	size()	  const	{ return std::distance(_begin, _end); }
-    auto	begin()	  const	{ return _begin; }
-    auto	end()	  const	{ return _end; }
-    auto	cbegin()  const	{ return begin(); }
-    auto	cend()    const	{ return end(); }
-    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
-    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
-    auto	crbegin() const	{ return std::make_reverse_iterator(end()); }
-    auto	crend()	  const	{ return std::make_reverse_iterator(begin()); }
+    size_t	size()		const	{ return std::distance(_begin, _end); }
+    auto	begin()		const	{ return _begin; }
+    auto	end()		const	{ return _end; }
+    auto	cbegin()	const	{ return begin(); }
+    auto	cend()		const	{ return end(); }
+    auto	rbegin()	const	{ return reverse_iterator(end()); }
+    auto	rend()		const	{ return reverse_iterator(begin()); }
+    auto	crbegin()	const	{ return rbegin(); }
+    auto	crend()		const	{ return rend(); }
     reference	operator [](size_t i) const
 		{
 		    assert(i < size());
@@ -633,7 +622,7 @@ make_subrange_iterator(const ITER& iter, size_t idx, INDICES... indices)
 					 iter->begin() + idx, indices...),
 				     iter.stride());
 }
-    
+
 template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 	  typename std::enable_if<
 	      is_range<typename std::decay<RANGE>::type>::value &&
