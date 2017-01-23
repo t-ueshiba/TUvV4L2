@@ -85,16 +85,12 @@ template <class ITER, size_t SIZE>
 class range
 {
   public:
-    using iterator		 = ITER;
-    using const_iterator	 = iterator;
-    using reverse_iterator	 = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-    using value_type		 = typename std::iterator_traits<iterator>
-					       ::value_type;
-    using reference		 = typename std::iterator_traits<iterator>
-					       ::reference;
-    using const_reference	 = typename std::iterator_traits<const_iterator>
-					       ::reference;
+    using iterator		= ITER;
+    using reverse_iterator	= std::reverse_iterator<iterator>;
+    using value_type		= typename std::iterator_traits<iterator>
+					      ::value_type;
+    using reference		= typename std::iterator_traits<iterator>
+					      ::reference;
 
   public:
 		range(iterator begin)	:_begin(begin)	{}
@@ -109,6 +105,14 @@ class range
 		range(range&&)				= default;
     range&	operator =(range&&)			= default;
     
+    template <class ITER_,
+	      typename std::enable_if<
+		  std::is_convertible<ITER_, iterator>::value>::type* = nullptr>
+		range(const range<ITER_, SIZE>& r)
+		    :_begin(r.begin())
+		{
+		}
+
     template <class E_>
     typename std::enable_if<is_range<E_>::value, range&>::type
 		operator =(const E_& expr)
@@ -119,38 +123,28 @@ class range
 		}
 
 		range(std::initializer_list<value_type> args)
-		    :_begin(args.begin())
+		    :_begin(const_cast<iterator>(args.begin()))
     		{
 		    assert(args.size() == SIZE);
 		}
     range&	operator =(std::initializer_list<value_type> args)
 		{
 		    assert(args.size() == SIZE);
-		    std::copy(args.begin(), args.end(), begin());
+		    std::copy_n(args.begin(), SIZE, begin());
 		    return *this;
 		}
-		
+
     constexpr static
     size_t	size()	  	{ return SIZE; }
-    auto	begin()	  	{ return _begin; }
-    auto	end()	  	{ return _begin + SIZE; }
     auto	begin()	  const	{ return _begin; }
     auto	end()	  const	{ return _begin + SIZE; }
     auto	cbegin()  const	{ return begin(); }
     auto	cend()    const	{ return end(); }
-    auto	rbegin()  	{ return std::make_reverse_iterator(end()); }
-    auto	rend()	  	{ return std::make_reverse_iterator(begin()); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
     auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
     auto	crbegin() const	{ return rbegin(); }
     auto	crend()	  const	{ return rend(); }
-    reference	operator [](size_t i) 
-		{
-		    assert(i < size());
-		    return *(_begin + i);
-		}
-    const_reference
-		operator [](size_t i) const
+    reference	operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);
@@ -185,16 +179,12 @@ template <class ITER>
 class range<ITER, 0>
 {
   public:
-    using iterator		 = ITER;
-    using const_iterator	 = iterator;
-    using reverse_iterator	 = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-    using value_type		 = typename std::iterator_traits<iterator>
-					       ::value_type;
-    using reference		 = typename std::iterator_traits<iterator>
-					       ::reference;
-    using const_reference	 = typename std::iterator_traits<const_iterator>
-					       ::reference;
+    using iterator		= ITER;
+    using reverse_iterator	= std::reverse_iterator<iterator>;
+    using value_type		= typename std::iterator_traits<iterator>
+					      ::value_type;
+    using reference		= typename std::iterator_traits<iterator>
+					      ::reference;
 
   public:
 		range(iterator begin, iterator end)
@@ -211,6 +201,14 @@ class range<ITER, 0>
 		range(range&&)				= default;
     range&	operator =(range&&)			= default;
     
+    template <class ITER_,
+	      typename std::enable_if<
+		  std::is_convertible<ITER_, iterator>::value>::type* = nullptr>
+		range(const range<ITER_, 0>& r)
+		    :_begin(r.begin()), _end(r.end())
+		{
+		}
+
     template <class E_>
     typename std::enable_if<is_range<E_>::value, range&>::type
 		operator =(const E_& expr)
@@ -221,7 +219,8 @@ class range<ITER, 0>
 		}
 		
 		range(std::initializer_list<value_type> args)
-		    :_begin(args.begin()), _end(args.end())
+		    :_begin(const_cast<iterator>(args.begin())),
+		     _end(  const_cast<iterator>(args.end()))
     		{
 		}
     range&	operator =(std::initializer_list<value_type> args)
@@ -232,25 +231,15 @@ class range<ITER, 0>
 		}
 		
     size_t	size()	  const	{ return std::distance(_begin, _end); }
-    auto	begin()	  	{ return _begin; }
-    auto	end()	  	{ return _end; }
     auto	begin()	  const	{ return _begin; }
     auto	end()	  const	{ return _end; }
     auto	cbegin()  const	{ return begin(); }
     auto	cend()    const	{ return end(); }
-    auto	rbegin()  	{ return std::make_reverse_iterator(end()); }
-    auto	rend()	  	{ return std::make_reverse_iterator(begin()); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
     auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
     auto	crbegin() const	{ return std::make_reverse_iterator(end()); }
     auto	crend()	  const	{ return std::make_reverse_iterator(begin()); }
-    reference	operator [](size_t i) 
-		{
-		    assert(i < size());
-		    return *(_begin + i);
-		}
-    const_reference
-		operator [](size_t i) const
+    reference	operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);
@@ -373,23 +362,30 @@ class range_iterator
     template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
 	      typename std::enable_if<
 		  (SIZE_ != 0) && (STRIDE_ != 0)>::type* = nullptr>
-	range_iterator(ITER iter)
-	    :super(iter), ss()						{}
+		range_iterator(ITER iter)
+		    :super(iter), ss()					{}
     template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
 	      typename std::enable_if<
 		  (SIZE_ != 0) && (STRIDE_ == 0)>::type* = nullptr>
-	range_iterator(ITER iter, size_t stride)
-	    :super(iter), ss(stride)					{}
+		range_iterator(ITER iter, size_t stride)
+		    :super(iter), ss(stride)				{}
     template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
 	      typename std::enable_if<
 		  (SIZE_ == 0) && (STRIDE_ != 0)>::type* = nullptr>
-	range_iterator(ITER iter, size_t size)
-	    :super(iter), ss(size)					{}
+		range_iterator(ITER iter, size_t size)
+		    :super(iter), ss(size)				{}
     template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
 	      typename std::enable_if<
 		  (SIZE_ == 0) && (STRIDE_ == 0)>::type* = nullptr>
-	range_iterator(ITER iter, size_t size, size_t stride)
-	    :super(iter), ss(size, stride)				{}
+		range_iterator(ITER iter, size_t size, size_t stride)
+		    :super(iter), ss(size, stride)			{}
+
+    template <class ITER_,
+	      typename std::enable_if<
+		  std::is_convertible<ITER_, ITER>::value>::type* = nullptr>
+		range_iterator(
+		    const range_iterator<ITER_, SIZE, STRIDE>& iter)
+		    :super(iter), ss(iter)				{}
 
     using	ss::size;
     using	ss::stride;
@@ -610,7 +606,18 @@ make_subrange_iterator(const range_iterator<ITER>& iter,
 			       size, iter.stride());
 }
 
-template <class RANGE, class... IS> inline auto
+template <class RANGE, class... IS,
+	  typename std::enable_if<
+	      is_range<typename std::decay<RANGE>::type>::value>::type* = nullptr>
+inline auto
+make_subrange(RANGE&& r, size_t idx, size_t size, IS... is)
+{
+    return make_range(make_subrange_iterator(r.begin() + idx, is...), size);
+}
+
+template <class RANGE, class... IS,
+	  typename std::enable_if<is_range<RANGE>::value>::type* = nullptr>
+inline auto
 make_subrange(const RANGE& r, size_t idx, size_t size, IS... is)
 {
     return make_range(make_subrange_iterator(r.begin() + idx, is...), size);
@@ -629,7 +636,19 @@ make_subrange_iterator(const ITER& iter, size_t idx, INDICES... indices)
     
 template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 	  typename std::enable_if<
-	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
+	      is_range<typename std::decay<RANGE>::type>::value &&
+	      (sizeof...(SIZES) == sizeof...(INDICES))>::type* = nullptr>
+inline auto
+make_subrange(RANGE&& r, size_t idx, INDICES... indices)
+{
+    return make_range<SIZE>(make_subrange_iterator<SIZES...>(
+				r.begin() + idx, indices...));
+}
+
+template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
+	  typename std::enable_if<
+	      is_range<RANGE>::value &&
+	      (sizeof...(SIZES) == sizeof...(INDICES))>::type* = nullptr>
 inline auto
 make_subrange(const RANGE& r, size_t idx, INDICES... indices)
 {

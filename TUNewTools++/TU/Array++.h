@@ -18,6 +18,51 @@
 namespace TU
 {
 /************************************************************************
+*  class external_allocator<T>						*
+************************************************************************/
+template <class T>
+class external_allocator
+{
+  public:
+    using value_type		= T;
+    using pointer		= T*;
+    using const_pointer		= const T*;
+    using reference		= T&;
+    using const_reference	= const T&;
+    using size_type		= size_t;
+    using difference_type	= ptrdiff_t;
+    
+    template <class T_>
+    struct rebind	{ using other = external_allocator<T_>; };
+
+  public:
+			external_allocator(pointer p, size_type size)
+			    :_p(p), _size(size)				{}
+
+    pointer		allocate(size_type n,
+				 typename std::allocator<void>
+					     ::const_pointer=nullptr) const
+			{
+			    if (n > _size)
+				throw std::runtime_error("TU::external_allocator<T>::allocate(): too large memory requested!");
+			    
+			    return _p;
+			}
+    static void		deallocate(pointer, size_type)			{}
+    static void		construct(pointer p, const_reference val)	{}
+    static void		destroy(pointer p)				{}
+    constexpr
+    size_type		max_size()		const	{ return _size; }
+    static pointer	address(reference r)		{ return &r; }
+    static const_pointer
+			address(const_reference r)	{ return &r; }
+
+  private:
+    const pointer	_p;
+    const size_type	_size;
+};
+    
+/************************************************************************
 *  class BufTraits<T>							*
 ************************************************************************/
 template <class T, class ALLOC>
@@ -269,14 +314,24 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    _p	      = alloc(_capacity);
 		}
 
+		Buf(pointer p, const sizes_type& sizes, size_t stride=0)
+		    :_sizes(sizes),
+		     _stride(stride ? stride : _sizes[D-1]),
+		     _capacity(capacity(axis<0>())),
+		     _allocator(p, _capacity),
+		     _p(alloc(_capacity))
+		{
+		}
+
+    const auto&	sizes()		const	{ return _sizes; }
     template <size_t I_=0>
-    auto	size()		  const	{ return _sizes[I_]; }
+    auto	size()		const	{ return _sizes[I_]; }
     template <size_t I_=D-1>
-    auto	stride()	  const	{ return stride_impl(axis<I_>()); }
-    auto	nrow()		  const	{ return _sizes[0]; }
-    auto	ncol()		  const	{ return _sizes[1]; }
+    auto	stride()	const	{ return stride_impl(axis<I_>()); }
+    auto	nrow()		const	{ return _sizes[0]; }
+    auto	ncol()		const	{ return _sizes[1]; }
     auto	data()			{ return _p; }
-    auto	data()		  const	{ return _p; }
+    auto	data()		const	{ return _p; }
     auto	begin()
 		{
 		    return make_iterator<SIZES...>(base_iterator(_p));
@@ -411,10 +466,10 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
 
   private:
-    allocator_type	_allocator;	//!< 要素を確保するアロケータ
     sizes_type		_sizes;		//!< 各軸の要素数
     size_t		_stride;	//!< 最終軸のストライド
     size_t		_capacity;	//!< バッファ中に収めらる総要素数
+    allocator_type	_allocator;	//!< 要素を確保するアロケータ
     pointer		_p;		//!< 先頭要素へのポインタ
 };
     
@@ -444,12 +499,12 @@ class array : public BUF
 {
   private:
     using super			= BUF;
-    using sizes_type		= typename super::sizes_type;
     
     constexpr static size_t	D = super::D;
     
   public:
     using element_type		 = typename super::value_type;
+    using typename super::sizes_type;
     using typename super::pointer;
     using typename super::const_pointer;
     using iterator		 = decltype(std::declval<super*>()->begin());
@@ -479,6 +534,13 @@ class array : public BUF
 		    :super({to_size(sizes)...})
 		{
 		}
+    template <class... SIZES_>
+    typename std::enable_if<sizeof...(SIZES_) == D>::type
+		resize(SIZES_... sizes)
+		{
+		    super::resize({to_size(sizes)...});
+		}
+    
     template <class... SIZES_,
 	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
     explicit	array(size_t unit, SIZES_... sizes)
@@ -487,16 +549,10 @@ class array : public BUF
 		}
     template <class... SIZES_>
     typename std::enable_if<sizeof...(SIZES_) == D>::type
-		resize(SIZES_... sizes)
-		{
-		    super::resize({to_size(sizes)...});
-		}
-    
-    template <class... SIZES_>
-    typename std::enable_if<sizeof...(SIZES_) == D>::type
 		resize(size_t unit, SIZES_... sizes)
 		{
-		    super::resize({to_size(sizes)...}, to_stride(unit, sizes...));
+		    super::resize({to_size(sizes)...},
+				  to_stride(unit, sizes...));
 		}
 
     template <class E_,
@@ -528,7 +584,30 @@ class array : public BUF
 
 		    return *this;
 		}
-    
+
+    template <class... SIZES_,
+	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+    explicit	array(pointer p, SIZES_... sizes)
+		    :super(p, {to_size(sizes)...})
+		{
+		}
+
+    template <class... SIZES_,
+	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+    explicit	array(pointer p, size_t unit, SIZES_... sizes)
+		    :super(p, {to_size(sizes)...}, to_stride(unit, sizes...))
+		{
+		}
+
+    template <class BUF_>
+    typename std::enable_if<std::is_same<typename array<BUF_>::element_type,
+					 element_type>::value>::type
+		write(array<BUF_>& a) const
+		{
+		    a.resize(sizes(), a.stride());
+		    super::copy(begin(), end(), a.begin());
+		}
+
     using	super::size;
     using	super::stride;
     using	super::nrow;

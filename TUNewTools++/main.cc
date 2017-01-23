@@ -210,7 +210,7 @@ test_text_io(const BUF& buf)
 {
     using value_type	= typename BUF::value_type;
     
-    std::cout << "*** text io test ***" << std::endl;
+    std::cout << "*** text I/O test ***" << std::endl;
     
     std::ofstream	out("text1.txt");
     out << buf;
@@ -243,6 +243,22 @@ test_text_io(const BUF& buf)
     in.close();
 }
 
+template <class BUF> static void
+test_external_allocator(BUF buf)
+{
+    using	value_type = typename BUF::value_type;
+    
+    std::cout << "*** external allocator test ***" << std::endl;
+    
+    Array2<value_type, 0, 0, external_allocator<value_type> >
+	a2(buf.data(), buf.size()/6, 6);
+  //make_subrange(a2[0], 1, 3) = {1000, 2000, 300};
+    make_subrange<2, 3>(a2, 1, 2) = {{100, 200, 300}, {400, 500, 600}};
+    std::cout << "--- a2(" << sizes_and_strides(a2) << ") ---\n" << a2;
+
+    std::cout << std::is_convertible<range<range_iterator<int*> >, range<range_iterator<const int*> > >::value << std::endl;
+}
+    
 }	// namespace TU
 
 int
@@ -259,6 +275,7 @@ main()
     TU::test_window(buf);
     TU::test_binary_io(buf);
     TU::test_text_io(buf);
+    TU::test_external_allocator(buf);
     
     return 0;
 }
