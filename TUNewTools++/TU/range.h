@@ -652,8 +652,8 @@ template <class E>
 typename std::enable_if<is_range<E>::value, std::ostream&>::type
 operator <<(std::ostream& out, const E& expr)
 {
-    for (const auto& elm : expr)
-	out << ' ' << elm;
+    for (const auto& val : expr)
+	out << ' ' << val;
     return out << std::endl;
 }
     

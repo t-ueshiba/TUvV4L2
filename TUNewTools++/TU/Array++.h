@@ -99,7 +99,7 @@ struct BufTraits
 };
 
 /************************************************************************
-*  class Buf<T, ALLOC, SIZES...>					*
+*  class Buf<T, ALLOC, SIZE, SIZES...>					*
 ************************************************************************/
 //! 固定長多次元バッファクラス
 /*!
@@ -145,10 +145,9 @@ class Buf : public BufTraits<T, ALLOC>
     using axis			= std::integral_constant<size_t, I_>;
     using super			= BufTraits<T, ALLOC>;
     
-  protected:
+  public:
     constexpr static size_t	D = 1 + sizeof...(SIZES);
 
-  public:
     using sizes_type		= std::array<size_t, D>;
     using value_type		= T;
     using allocator_type	= void;
@@ -249,10 +248,9 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
 
-  protected:
+  public:
     constexpr static size_t	D = 1 + sizeof...(SIZES);
 
-  public:
     using sizes_type		= std::array<size_t, D>;
     using value_type		= T;
     using typename super::allocator_type;
@@ -480,36 +478,40 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 };
     
 /************************************************************************
-*  class array<BUF>							*
+*  class array<T, ALLOC, SIZE, SIZES...>				*
 ************************************************************************/
-template <class BUF>	class array;
+template <class T, class ALLOC, size_t SIZE, size_t... SIZES>	class array;
     
-template <size_t I, class BUF> inline size_t
-size(const array<BUF>& a)
+template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
+inline size_t
+size(const array<T, ALLOC, SIZE, SIZES...>& a)
 {
     return a.template size<I>();
 }
 
-template <size_t I, class BUF> inline size_t
-stride(const array<BUF>& a)
+template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
+inline size_t
+stride(const array<T, ALLOC, SIZE, SIZES...>& a)
 {
     return a.template stride<I>();
 }
 
 //! 多次元配列を表すクラス
 /*!
-  \param BUF	内部バッファの型
+  \param T	要素の型
+  \param ALLOC	アロケータの型
+  \param SIZE	最初の軸の要素数
+  \param SIZES	2番目以降の各軸の要素数
 */
-template <class BUF>
-class array : public BUF
+template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
+class array : public Buf<T, ALLOC, SIZE, SIZES...>
 {
   private:
-    using super			= BUF;
-    
-    constexpr static size_t	D = super::D;
+    using super			= Buf<T, ALLOC, SIZE, SIZES...>;
     
   public:
-    using element_type		 = typename super::value_type;
+    using super::D;
+    using element_type		 = T;
     using typename super::sizes_type;
     using typename super::pointer;
     using typename super::const_pointer;
@@ -605,15 +607,19 @@ class array : public BUF
 		{
 		}
 
-    template <class BUF_>
-    typename std::enable_if<std::is_same<typename array<BUF_>::element_type,
-					 element_type>::value>::type
-		write(array<BUF_>& a) const
+    template <class T_, class ALLOC_, size_t SIZE_, size_t... SIZES_>
+    typename std::enable_if<std::is_same<
+				typename array<T_, ALLOC_, SIZE_, SIZES_...>
+				::element_type,
+				element_type>::value>::type
+		write(array<T_, ALLOC_, SIZE_, SIZES_...>& a) const
 		{
 		    a.resize(sizes(), a.stride());
 		    super::copy(begin(), end(), a.begin());
 		}
 
+    constexpr size_t
+		dimension()		{ return D; }
     using	super::size;
     using	super::stride;
     using	super::nrow;
@@ -713,8 +719,8 @@ class array : public BUF
 
 		    return n*((size + n - 1)/n);
 		}
-    template <class... SIZES>
-    static auto	to_stride(size_t unit, size_t size, SIZES... sizes)
+    template <class... SIZES_>
+    static auto	to_stride(size_t unit, size_t size, SIZES_... sizes)
 		{
 		    return to_stride(unit, sizes...);
 		}
@@ -744,8 +750,9 @@ class array : public BUF
 		}
 };
 
-template <class BUF> inline std::istream&
-operator >>(std::istream& in, array<BUF>& a)
+template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
+inline std::istream&
+operator >>(std::istream& in, array<T, ALLOC, SIZE, SIZES...>& a)
 {
     return a.get(in);
 }
@@ -754,14 +761,14 @@ operator >>(std::istream& in, array<BUF>& a)
 *  type definitions for convenience					*
 ************************************************************************/
 template <class T, size_t N=0, class ALLOC=std::allocator<T> >
-using Array = array<Buf<T, ALLOC, N> >;
+using Array = array<T, ALLOC, N>;
 
 template <class T, size_t R=0, size_t C=0, class ALLOC=std::allocator<T> >
-using Array2 = array<Buf<T, ALLOC, R, C> >;
+using Array2 = array<T, ALLOC, R, C>;
 
 template <class T,
 	  size_t Z=0, size_t Y=0, size_t X=0, class ALLOC=std::allocator<T> >
-using Array3 = array<Buf<T, ALLOC, Z, Y, X> >;
+using Array3 = array<T, ALLOC, Z, Y, X>;
 
 }	// namespace TU
 #endif	// !__TU_ARRAY_H
