@@ -157,7 +157,10 @@ class Buf : public BufTraits<T, ALLOC>
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
-		Buf()				= default;
+		Buf()
+		{
+		    init(typename std::is_arithmetic<value_type>::type());
+		}
 		Buf(const Buf&)			= default;
     Buf&	operator =(const Buf&)		= default;
 		Buf(Buf&&)			= default;
@@ -199,6 +202,9 @@ class Buf : public BufTraits<T, ALLOC>
 		}
     
   private:
+    void	init(std::true_type)		{ _a.fill(0); }
+    void	init(std::false_type)		{}
+
     template <size_t I_>
     static bool	check_sizes(const sizes_type& sizes, axis<I_>)
 		{

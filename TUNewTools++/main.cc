@@ -117,7 +117,7 @@ test_range3(BUF buf)
     b3[1][1][2] = 100;
     std::cout << "--- b3(modified) ---\n" << b3;
 
-    Array3<int, 2, 2, 3>	c3(b3);
+    Array3<double, 2, 2, 3>	c3(b3);
     std::cout << "--- c3(" << sizes_and_strides(c3) << ") ---\n" << c3;
 }
 
