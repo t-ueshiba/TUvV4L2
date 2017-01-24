@@ -38,7 +38,7 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		=
 HDRS		= TU/Array++.h \
-		TU/functional.h \
+		TU/algorithm.h \
 		TU/range.h \
 		TU/utility.h
 SRCS		= main.cc
@@ -50,4 +50,4 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: TU/Array++.h TU/range.h TU/utility.h TU/functional.h
+main.o: TU/Array++.h TU/range.h TU/utility.h TU/algorithm.h

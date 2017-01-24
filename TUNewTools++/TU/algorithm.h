@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TU_FUNCTIONAL_H
-#define __TU_FUNCTIONAL_H
+#ifndef __TU_ALGORITHM_H
+#define __TU_ALGORITHM_H
 
 namespace TU
 {
@@ -59,4 +59,4 @@ lcm(S m, T n, ARGS... args)
 }
 
 }	// namespace TU
-#endif	// !__TU_FUNCTIONAL_H
+#endif	// !__TU_ALGORITHM_H

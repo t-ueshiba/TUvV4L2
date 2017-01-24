@@ -32,12 +32,4 @@ template <size_t N>
 using make_index_sequence = typename detail::make_index_sequence<N>::type;
 #endif
 }	// namespace std
-
-namespace TU
-{
-namespace detail
-{
-  template <class T>	struct identity	{ typedef T	type; };
-}	// namespace detail
-}	// namespace TU
 #endif	// !__TU_UTILITY_H
