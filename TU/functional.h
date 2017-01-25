@@ -41,6 +41,7 @@
 #include <numeric>				// std::accumulate()
 #include <cassert>
 #include <boost/iterator/iterator_adaptor.hpp>
+#include "TU/range.h"
 
 namespace std
 {
@@ -395,15 +396,6 @@ namespace detail
   {
     template <class T>	struct identity	{ typedef T	type; };
 
-    struct is_range
-    {
-	template <class E_> static auto
-	check(const E_& x) -> decltype(x.begin(), x.end(),
-				       std::true_type())	;
-	static std::false_type
-	check(...)						;
-    };
-
     struct has_const_iterator
     {
 	template <class E_> static typename E_::const_iterator
@@ -412,10 +404,6 @@ namespace detail
 	check(...)						;
     };
   }	// namespace impl
-    
-  //! 式がメンバ関数begin()とend()を持つか判定する
-  template <class E>
-  using is_range = decltype(detail::impl::is_range::check(std::declval<E>()));
 
   //! 式が持つ定数反復子の型を返す
   /*!
@@ -760,8 +748,6 @@ namespace detail
   }
 #endif	// !__NVCC__
 }	// End of namespace TU::detail
-
-template <class E>	using is_range  = detail::is_range<E>;
 template <class E>	using element_t = detail::element_t<E>;
 
 #if !defined(__NVCC__)

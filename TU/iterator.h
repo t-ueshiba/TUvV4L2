@@ -38,6 +38,7 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include "TU/tuple.h"
 #include "TU/pair.h"
+#include "TU/range.h"
 
 namespace TU
 {
@@ -334,7 +335,7 @@ crend(const T& x) -> decltype(std::rend(x))
     return std::rend(x);
 }
 #endif
-}
+}	// namespace std
 
 namespace TU
 {
@@ -602,6 +603,7 @@ make_assignment2_iterator(const ITER& iter, const FUNC& func=FUNC())
 template <class ITER>
 using subiterator = decltype(std::begin(*std::declval<ITER>()));
 
+#if 0
 /************************************************************************
 *  class range<ITER>							*
 ************************************************************************/
@@ -648,7 +650,7 @@ make_range(const ITER& begin, const ITER& end)
 {
     return range<ITER>(begin, end);
 }
-
+#endif
 /************************************************************************
 *  class row_iterator<COL, ROW, ARG...>					*
 ************************************************************************/
