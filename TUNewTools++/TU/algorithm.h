@@ -4,6 +4,8 @@
 #ifndef __TU_ALGORITHM_H
 #define __TU_ALGORITHM_H
 
+#include <type_traits>	// for std::common_type<TYPES....>
+
 namespace TU
 {
 //! 与えられた二つの整数の最大公約数を求める．
