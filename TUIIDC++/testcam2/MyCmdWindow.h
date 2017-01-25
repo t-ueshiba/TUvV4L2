@@ -91,7 +91,19 @@ MyCmdWindow<CAMERAS, PIXEL>::callback(CmdId id, CmdVal val)
 	    app().exit();
 	    break;
 
+	  case M_Open:
+	    stopContinuousShotIfRunning();
+	    for (auto& camera : _cameras)
+	  	restoreCameraConfig(camera);
+	    refreshFeatureCmds(_cameras, _featureCmd);
+	    break;
+	    
 	  case M_Save:
+	    for (auto& camera : _cameras)
+	  	saveCameraConfig(camera);
+	    break;
+	    
+	  case M_SaveAs:
 	  {
 	    stopContinuousShotIfRunning();
 	    setFrame();
@@ -106,33 +118,18 @@ MyCmdWindow<CAMERAS, PIXEL>::callback(CmdId id, CmdVal val)
 	  }
 	    break;
 
-	  case M_SaveAs:
-	    std::for_each(std::begin(_cameras), std::end(_cameras),
-			  std::bind(&saveCameraConfig<camera_type>,
-				    std::placeholders::_1));
-	    break;
-	    
-	  case M_Open:
-	    std::for_each(std::begin(_cameras), std::end(_cameras),
-			  std::bind(&restoreCameraConfig<camera_type>,
-				    std::placeholders::_1));
-	    refreshFeatureCmds(_cameras, _featureCmd);
-	    break;
-	    
 	  case c_ContinuousShot:
 	    if (val)
 	    {
-		std::for_each(std::begin(_cameras), std::end(_cameras),
-			      std::bind(&camera_type::continuousShot,
-					std::placeholders::_1, true));
+		for (auto& camera : _cameras)
+		    camera.continuousShot(true);
 		_timer.start(1);
 	    }
 	    else
 	    {
 		_timer.stop();
-		std::for_each(std::begin(_cameras), std::end(_cameras),
-			      std::bind(&camera_type::continuousShot,
-					std::placeholders::_1, false));
+		for (auto& camera : _cameras)
+		    camera.continuousShot(false);
 	    }
 	    break;
 	
@@ -187,8 +184,8 @@ MyCmdWindow<CAMERAS, PIXEL>::tick()
 	if (_maxSkew)
 	    syncedSnap(_cameras, _maxSkew);
 	else
-	    std::for_each(std::begin(_cameras), std::end(_cameras),
-			  std::bind(&camera_type::snap, std::placeholders::_1));
+	    for (auto& camera : _cameras)
+		camera.snape();
 	for (size_t i = 0; i < size(_cameras); ++i)
 	    _cameras[i] >> _movie.image(i);
     }
@@ -259,9 +256,8 @@ MyCmdWindow<CAMERAS, PIXEL>::stopContinuousShotIfRunning()
     if (_captureCmd.getValue(c_ContinuousShot))
     {
 	_timer.stop();
-	std::for_each(std::begin(_cameras), std::end(_cameras),
-		      std::bind(&camera_type::continuousShot,
-				std::placeholders::_1, false));
+	for (auto& camera : _cameras)
+	    camera.continuousShot(false);
 	_captureCmd.setValue(c_ContinuousShot, 0);
     }
 }

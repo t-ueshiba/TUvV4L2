@@ -64,11 +64,11 @@ createMenuCmds(const CAMERA& camera)
 
     static MenuDef fileMenu[] =
     {
-	{"Save current image",			M_Save,   false, noSub},
-	{"Save camera config. to memory",	M_SaveAs, false, noSub},
-	{"Restore camera config. from memory",	M_Open,   false, noSub},
-	{"-",					M_Line,   false, noSub},
-	{"Quit",				M_Exit,   false, noSub},
+	{"Restore camera config. from memory",	M_Open,		false, noSub},
+	{"Save camera config. to memory",	M_Save,		false, noSub},
+	{"Save current image",			M_SaveAs,	false, noSub},
+	{"-",					M_Line,		false, noSub},
+	{"Quit",				M_Exit,		false, noSub},
 	EndOfMenu
 
     };

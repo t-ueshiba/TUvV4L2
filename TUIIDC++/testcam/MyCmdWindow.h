@@ -88,7 +88,16 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	    app().exit();
 	    break;
 
+	  case M_Open:
+	    restoreCameraConfig(_camera);
+	    refreshFeatureCmds(_camera, _featureCmd);
+	    break;
+	    
 	  case M_Save:
+	    saveCameraConfig(_camera);
+	    break;
+	    
+	  case M_SaveAs:
 	  {
 	    stopContinuousShotIfRunning();
 	    setFrame();
@@ -100,15 +109,6 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
 	  }
 	    break;
 
-	  case M_SaveAs:
-	    saveCameraConfig(_camera);
-	    break;
-	    
-	  case M_Open:
-	    restoreCameraConfig(_camera);
-	    refreshFeatureCmds(_camera, _featureCmd);
-	    break;
-	    
 	  case c_ContinuousShot:
 	    if (val)
 	    {
