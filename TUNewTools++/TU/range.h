@@ -37,11 +37,11 @@ size(const T (&array)[N]) noexcept
 
 namespace TU
 {
-namespace detail
-{
 /************************************************************************
 *  predicate is_range<E>						*
 ************************************************************************/
+namespace impl
+{
   struct is_range
   {
       template <class E> static auto
@@ -50,10 +50,10 @@ namespace detail
       static std::false_type
       check(...)							;
   };
-}	// namespace detail
+}	// namespace impl
 
 template <class E>
-using is_range = decltype(detail::is_range::check(std::declval<E>()));
+using is_range = decltype(impl::is_range::check(std::declval<E>()));
 
 /************************************************************************
 *  class range<ITER, SIZE>						*
@@ -271,6 +271,14 @@ make_range(ITER begin, ITER end)
     return {begin, end};
 }
 
+template <class ITER, size_t SIZE> std::ostream&
+operator <<(std::ostream& out, const range<ITER, SIZE>& r)
+{
+    for (const auto& val : r)
+	out << ' ' << val;
+    return out << std::endl;
+}
+    
 /************************************************************************
 *  class range_iterator<ITER, SIZE, STRIDE>				*
 ************************************************************************/
@@ -648,15 +656,6 @@ make_subrange(const RANGE& r, size_t idx, INDICES... indices)
 /************************************************************************
 *  generic algorithms for ranges					*
 ************************************************************************/
-template <class E>
-typename std::enable_if<is_range<E>::value, std::ostream&>::type
-operator <<(std::ostream& out, const E& expr)
-{
-    for (const auto& val : expr)
-	out << ' ' << val;
-    return out << std::endl;
-}
-    
 template <class E, class T>
 typename std::enable_if<!is_range<typename std::decay<E>::type>::value>::type
 fill(E&& expr, const T& val)

@@ -750,6 +750,14 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 };
 
+template <class T, class ALLOC, size_t SIZE, size_t... SIZES> std::ostream&
+operator <<(std::ostream& out, const array<T, ALLOC, SIZE, SIZES...>& a)
+{
+    for (const auto& val : a)
+	out << ' ' << val;
+    return out << std::endl;
+}
+    
 template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
 inline std::istream&
 operator >>(std::istream& in, array<T, ALLOC, SIZE, SIZES...>& a)

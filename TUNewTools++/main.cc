@@ -213,7 +213,7 @@ test_text_io(const BUF& buf)
     std::cout << "*** text I/O test ***" << std::endl;
     
     std::ofstream	out("text1.txt");
-    out << buf;
+    out << make_dense_range(buf.begin(), buf.size());
     out.close();
 
     std::ifstream	in("text1.txt");
