@@ -252,7 +252,7 @@ USBNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 	    
 		if ((unitSpecId() == unit_spec_ID)		&&
 		    (uniqId == 0 || globalUniqueId() == uniqId)	&&
-		    isUnique())
+		    !inList())
 		{
 		    if (libusb_kernel_driver_active(_handle, 0))
 			check(libusb_detach_kernel_driver(_handle, 0),
