@@ -18,13 +18,15 @@ class IIDCModalDialog : public ModalDialog
     typedef IIDCCamera::PixelFormat	PixelFormat;
     
   private:
-    enum	{c_U0, c_V0, c_Width, c_Height, c_PixelFormat, c_OK};
+    enum	{c_U0, c_V0, c_Width, c_Height,
+		 c_PixelFormat, c_PacketSize, c_OK};
 
   public:
     IIDCModalDialog(Window& parentWindow, const Format_7_Info& fmt7info);
     
     PixelFormat		selectROI(size_t& u0, size_t& v0,
-				  size_t& width, size_t& height)	;
+				  size_t& width, size_t& height,
+				  size_t& packetSize)			;
     virtual void	callback(CmdId id, CmdVal val)			;
 
   private:
@@ -32,10 +34,9 @@ class IIDCModalDialog : public ModalDialog
     
   private:
     const Format_7_Info&	_fmt7info;
-    float			_ranges[4][3];
+    float			_ranges[5][3];
     MenuDef			_pixelFormatMenus[IIDCCamera::NPIXELFORMATS+1];
-    CmdDef			_cmds[7];
-    
+    CmdDef			_cmds[8];
 };
     
 IIDCModalDialog::IIDCModalDialog(Window& parentWindow,
@@ -47,14 +48,15 @@ IIDCModalDialog::IIDCModalDialog(Window& parentWindow,
     
 IIDCCamera::PixelFormat
 IIDCModalDialog::selectROI(size_t& u0, size_t& v0,
-			   size_t& width, size_t& height)
+			   size_t& width, size_t& height, size_t& packetSize)
 {
     show();
     u0		= pane().getValue(c_U0);
     v0		= pane().getValue(c_V0);
     width	= pane().getValue(c_Width);
     height	= pane().getValue(c_Height);
-
+    packetSize	= pane().getValue(c_PacketSize);
+    
     return IIDCCamera::uintToPixelFormat(pane().getValue(c_PixelFormat));
 }
 
@@ -89,6 +91,14 @@ IIDCModalDialog::callback(CmdId id, CmdVal val)
 	size_t	h = _fmt7info.unitHeight
 		  * ((val + _fmt7info.unitHeight/2) / _fmt7info.unitHeight);
 	pane().setValue(c_Height, h);
+      }
+	break;
+      case c_PacketSize:
+      {
+	size_t	s = _fmt7info.unitBytePerPacket
+		  * ((val + _fmt7info.unitBytePerPacket/2) /
+		     _fmt7info.unitBytePerPacket);
+	pane().setValue(c_PacketSize, s);
       }
 	break;
 	
@@ -126,10 +136,16 @@ IIDCModalDialog::createROICmds(const Format_7_Info& fmt7info)
     _cmds[3]	  = {C_Slider, c_Height, fmt7info.height, "height", _ranges[3],
 		     CA_None, 0, 3, 1, 1, 0};
 
-    _cmds[4]	  = {C_ChoiceMenuButton, c_PixelFormat, 0, "pixel format",
-		     _pixelFormatMenus, CA_None, 0, 4, 1, 1, 0};
-    _cmds[5]	  = {C_Button, c_OK, 0, "OK", noProp, CA_None, 0, 5, 1, 1, 0},
-    _cmds[6]	  = EndOfCmds;
+    _ranges[4][0] = fmt7info.unitBytePerPacket;
+    _ranges[4][1] = fmt7info.maxBytePerPacket;
+    _ranges[4][2] = fmt7info.unitBytePerPacket;
+    _cmds[4]	  = {C_Slider, c_PacketSize, fmt7info.bytePerPacket,
+		     "packet size", _ranges[4], CA_None, 0, 4, 1, 1, 0};
+
+    _cmds[5]	  = {C_ChoiceMenuButton, c_PixelFormat, 0, "pixel format",
+		     _pixelFormatMenus, CA_None, 0, 5, 1, 1, 0};
+    _cmds[6]	  = {C_Button, c_OK, 0, "OK", noProp, CA_None, 0, 6, 1, 1, 0},
+    _cmds[7]	  = EndOfCmds;
 
   // Create a menu button for setting pixel format.
     size_t	npixelformats = 0;
@@ -153,7 +169,8 @@ IIDCModalDialog::createROICmds(const Format_7_Info& fmt7info)
 ************************************************************************/
 IIDCCamera::PixelFormat
 selectROI(IIDCCamera& camera, IIDCCamera::Format format,
-	  size_t& u0, size_t& v0, size_t& width, size_t& height, Window& window)
+	  size_t& u0, size_t& v0, size_t& width, size_t& height,
+	  size_t& packetSize, Window& window)
 {
     switch (format)
     {
@@ -168,13 +185,14 @@ selectROI(IIDCCamera& camera, IIDCCamera::Format format,
       {
 	  IIDCModalDialog	modalDialog(window,
 					    camera.getFormat_7_Info(format));
-	  return modalDialog.selectROI(u0, v0, width, height);
+	  return modalDialog.selectROI(u0, v0, width, height, packetSize);
       }
 
       default:
 	u0 = v0 = 0;
 	width  = camera.width();
 	height = camera.height();
+	packetSize = 0;
 	break;
     }
     
