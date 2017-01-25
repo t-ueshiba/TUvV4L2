@@ -47,13 +47,13 @@ IIDCNode::commandRegisterBase() const
   \return	登録されていればtrue, そうでなければfalse
 */
 bool
-IIDCNode::isUnique() const
+IIDCNode::inList() const
 {
     return std::find_if(_nodes.begin(), _nodes.end(),
 			[=](const IIDCNode* node)
 			{
 			    return node->globalUniqueId() == globalUniqueId();
-			}) == _nodes.end();
+			}) != _nodes.end();
 }
 
 //! この機器を新たに登録する

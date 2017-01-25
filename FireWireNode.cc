@@ -244,10 +244,10 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 	{
 	    _nodeId = (j | 0xffc0);
 
-	    if ((_nodeId != localId)			    &&
+	    if ((_nodeId      != localId)		    &&
 		(unitSpecId() == unit_spec_ID)		    &&
 		(uniqId == 0 || globalUniqueId() == uniqId) &&
-		isUnique())
+		!inList())
 	    {
 		for (int channel = 0; channel < 64; ++channel)
 		{

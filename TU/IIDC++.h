@@ -228,7 +228,7 @@ class IIDCNode
     virtual uint32_t	getCycletime(uint64_t& localtime)	const	= 0;
 
   protected:
-    bool		isUnique()				const	;
+    bool		inList()				const	;
     void		addToList()				const	;
     
   private:
