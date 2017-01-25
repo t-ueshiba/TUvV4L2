@@ -59,6 +59,7 @@ EXTHDRS		= ../testcam/MyCanvasPane.h \
 		/usr/local/include/TU/functional.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
+		/usr/local/include/TU/range.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/types.h \
 		/usr/local/include/TU/v/App.h \
@@ -95,8 +96,9 @@ main.o: /usr/local/include/TU/v/vIIDC++.h \
 	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/range.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/IIDCCameraArray.h \
 	/usr/local/include/TU/IIDC++.h /usr/local/include/TU/algorithm.h \
