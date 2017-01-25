@@ -75,6 +75,7 @@ MyCmdWindow<CAMERA, PIXEL>::callback(CmdId id, CmdVal val)
     {
 	if (setFormat(_camera, id, val, *this))
 	{
+	    refreshFeatureCmds(_camera, _featureCmd);
 	    initializeMovie();
 	    return;
 	}
