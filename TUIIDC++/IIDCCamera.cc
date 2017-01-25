@@ -106,7 +106,7 @@ static constexpr uint32_t	ON_OFF_bit			= 0x1u << 25;
 static constexpr uint32_t	A_M_Mode_bit			= 0x1u << 24;
 
 // NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
-static constexpr u_int		NBUFFERS			= 2;
+static constexpr u_int		NBUFFERS			= 4;
 
 /************************************************************************
 *  union AbsValue							*
@@ -613,7 +613,8 @@ IIDCCamera::setFormatAndFrameRate(Format format, FrameRate frameRate)
 	_w	    = fmt7info.width;
 	_h	    = fmt7info.height;
 	_p	    = fmt7info.pixelFormat;
-	packet_size = setFormat_7_PacketSize(format);
+      //packet_size = setFormat_7_PacketSize(format);
+	packet_size = fmt7info.bytePerPacket;
 	rt = 7;		// frameRateによってpacket_sizeを変えないようにする.
       }
 	break;
@@ -758,6 +759,15 @@ IIDCCamera::getFormat_7_Info(Format format7) const
 
     quad = _node->readQuadlet(base + COLOR_CODING_INQ);
     fmt7info.availablePixelFormats = quad;
+
+    quad = _node->readQuadlet(base + PACKET_PARA_INQ);
+    fmt7info.maxBytePerPacket  = (quad & 0xffff);
+    fmt7info.unitBytePerPacket = (quad & 0xffff0000) >> 16;
+
+    quad = _node->readQuadlet(base + BYTE_PER_PACKET);
+    fmt7info.recBytePerPacket = (quad & 0xffff);
+    fmt7info.bytePerPacket    =  (quad & 0xffff0000) >> 16;
+    
 #ifdef DEBUG
     using namespace	std;
     
@@ -766,6 +776,10 @@ IIDCCamera::getFormat_7_Info(Format format7) const
 	 << "\norigin unit: " << fmt7info.unitU0 << 'x' << fmt7info.unitV0
 	 << "\norigin:      " << fmt7info.u0	 << ',' << fmt7info.v0
 	 << "\nsize:        " << fmt7info.width	 << 'x' << fmt7info.height
+	 << "\npacket size: " << '[' << fmt7info.unitBytePerPacket
+			      << ',' << fmt7info.maxBytePerPacket
+			      << ':' << fmt7info.unitBytePerPacket
+			      << "] (rec. " << fmt7info.recBytePerPacket << ')'
 	 << endl;
 #endif
     return fmt7info;
@@ -858,6 +872,54 @@ IIDCCamera::setFormat_7_PixelFormat(Format format7, PixelFormat pixelFormat)
     
     continuousShot(cont);
     
+    return *this;
+}
+
+IIDCCamera&
+IIDCCamera::setFormat_7_PacketSize(Format format7, u_int packetSize)
+{
+    constexpr quadlet_t	Presence    = 0x1u << 31;
+    constexpr quadlet_t	Setting_1   = 0x1u << 30;
+    constexpr quadlet_t	ErrorFlag_1 = 0x1u << 23;
+    constexpr quadlet_t	ErrorFlag_2 = 0x1u << 22;
+
+    const auto	fmt7info = getFormat_7_Info(format7);
+    const auto	base	 = getFormat_7_BaseAddr(format7);
+    const bool	present	 = _node->readQuadlet(base + VALUE_SETTING) & Presence;
+
+    if (present)
+    {
+	_node->writeQuadlet(base + VALUE_SETTING, Setting_1);
+	quadlet_t	quad;
+	while ((quad = _node->readQuadlet(base + VALUE_SETTING)) & Setting_1)
+	    ;
+	if (quad & ErrorFlag_1)
+	    throw std::runtime_error("IIDCCamera::setFormat_7_PacketSize: failed to read bytePerPacket value!!");
+    }
+
+    if (packetSize == 0)		// 指定されたパケットサイズが0ならば...
+    {
+	if (fmt7info.recBytePerPacket != 0)		// 推奨値が有効ならば...
+	    packetSize = fmt7info.recBytePerPacket;	// それを設定する
+	else						// 推奨値が無効ならば...
+	    packetSize = fmt7info.maxBytePerPacket;	// 最大値を設定する
+    }
+    else				// そうでないなら最小単位の整数倍にする
+	packetSize = fmt7info.unitBytePerPacket
+		   * (packetSize / fmt7info.unitBytePerPacket);
+    
+    for (; packetSize >= fmt7info.unitBytePerPacket;
+	   packetSize -= fmt7info.unitBytePerPacket)
+    {
+	_node->writeQuadlet(base + BYTE_PER_PACKET,
+			    (packetSize << 16) | fmt7info.recBytePerPacket);
+
+	if (!present ||
+	    !(_node->readQuadlet(base + VALUE_SETTING) & ErrorFlag_2))
+	    return *this;
+    }
+
+    throw std::runtime_error("IIDCCamera::setFormat_7_PacketSize: failed to set bytePerPacket!!");
     return *this;
 }
 
@@ -2398,56 +2460,6 @@ IIDCCamera::getFormat_7_BaseAddr(Format format7) const
     return CSR_REGISTER_BASE + offset;
 }
 
-u_int
-IIDCCamera::setFormat_7_PacketSize(Format format7)
-{
-    constexpr quadlet_t	Presence    = 0x1u << 31;
-    constexpr quadlet_t	Setting_1   = 0x1u << 30;
-    constexpr quadlet_t	ErrorFlag_1 = 0x1u << 23;
-    constexpr quadlet_t	ErrorFlag_2 = 0x1u << 22;
-    const auto		base	    = getFormat_7_BaseAddr(format7);
-    const bool		present	    = _node->readQuadlet(base + VALUE_SETTING)
-				    & Presence;
-    if (present)
-    {
-	_node->writeQuadlet(base + VALUE_SETTING, Setting_1);
-	quadlet_t	quad;
-	while ((quad = _node->readQuadlet(base + VALUE_SETTING)) & Setting_1)
-	    ;
-	if (quad & ErrorFlag_1)
-	    throw std::runtime_error("IIDCCamera::setFormat_7_PacketSize: failed to read bytePerPacket value!!");
-    }
-
-    const u_int	recBytePerPacket = _node->readQuadlet(base + BYTE_PER_PACKET)
-				 & 0xffff;
-    if (recBytePerPacket != 0)	// 推奨値が有効ならば...
-    {
-      // 推奨値を設定
-	_node->writeQuadlet(base + BYTE_PER_PACKET, recBytePerPacket << 16);
-
-	if (!present ||
-	    !(_node->readQuadlet(base + VALUE_SETTING) & ErrorFlag_2))
-	    return recBytePerPacket;
-    }
-
-    const auto	quad = _node->readQuadlet(base + PACKET_PARA_INQ);
-    const auto	unitBytePerPacket = (quad & 0xffff0000) >> 16;
-    const auto	maxBytePerPacket  = (quad & 0xffff);
-    for (u_int n = (unitBytePerPacket != 0 ?
-		    maxBytePerPacket / unitBytePerPacket : 0); n > 0; --n)
-    {
-	const auto	bytePerPacket = n * unitBytePerPacket;
-	_node->writeQuadlet(base + BYTE_PER_PACKET, bytePerPacket << 16);
-
-	if (!present ||
-	    !(_node->readQuadlet(base + VALUE_SETTING) & ErrorFlag_2))
-	    return bytePerPacket;
-    }
-
-    throw std::runtime_error("IIDCCamera::setFormat_7_PacketSize: failed to set bytePerPacket!!");
-    return 0;
-}
-
 uint32_t
 IIDCCamera::inquireFrameRate_or_Format_7_Offset(Format format) const
 {
@@ -2736,6 +2748,7 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	const auto	fmt7info = camera.getFormat_7_Info(camera.getFormat());
 	out << ' ' << fmt7info.u0 << ' ' << fmt7info.v0
 	    << ' ' << fmt7info.width << ' ' << fmt7info.height
+	    << ' ' << fmt7info.bytePerPacket
 	    << ' '
 	    << find_if(begin(IIDCCamera::pixelFormatNames),
 		       end(IIDCCamera::pixelFormatNames),
@@ -2861,8 +2874,8 @@ operator >>(std::istream& in, IIDCCamera& camera)
       case IIDCCamera::Format_7_6:
       case IIDCCamera::Format_7_7:
       {
-	size_t	u0, v0, width, height;
-	in >> u0 >> v0 >> width >> height >> s;
+	size_t	u0, v0, width, height, packetSize;
+	in >> u0 >> v0 >> width >> height >> packetSize >> s;
 
 	const auto	pixelFormat
 			    = find_if(begin(IIDCCamera::pixelFormatNames),
@@ -2872,7 +2885,8 @@ operator >>(std::istream& in, IIDCCamera& camera)
 					  return s == pixfmt.name;
 				      })->pixelFormat;
 	camera.setFormat_7_ROI(format->format, u0, v0, width, height)
-	      .setFormat_7_PixelFormat(format->format, pixelFormat);
+	      .setFormat_7_PixelFormat(format->format, pixelFormat)
+	      .setFormat_7_PacketSize(format->format, packetSize);
       }
         break;
 

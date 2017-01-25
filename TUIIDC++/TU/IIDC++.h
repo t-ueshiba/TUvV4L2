@@ -490,6 +490,10 @@ class IIDCCamera
 	u_int		height;			//!< 画像の高さ
 	PixelFormat	pixelFormat;		//!< 画像の画素形式
 	u_int		availablePixelFormats;	//!< 利用できる画素形式
+	u_int		maxBytePerPacket;	//!< パケットサイズの最大値
+	u_int		unitBytePerPacket;	//!< パケットサイズの最小単位
+	u_int		recBytePerPacket;	//!< パケットサイズの推奨値
+	u_int		bytePerPacket;		//!< パケットサイズ
     };
     
   //! Bayerパターン
@@ -551,6 +555,8 @@ class IIDCCamera
 					u_int width, u_int height)	;
     IIDCCamera&		setFormat_7_PixelFormat(Format format7, 
 						PixelFormat pixelFormat);
+    IIDCCamera&		setFormat_7_PacketSize(Format format7,
+					       u_int packetSize)	;
     
   // Feature stuffs.
     uint32_t		inquireFeatureFunction(Feature feature)	const	;
@@ -645,7 +651,6 @@ class IIDCCamera
     uint32_t	getAbsValueOffset(Feature feature)		 const	;
     uint32_t	getStrobeOffset(Strobe strobe)			 const	;
     nodeaddr_t	getFormat_7_BaseAddr(Format format7)		 const	;
-    u_int	setFormat_7_PacketSize(Format format7)			;
     uint32_t	inquireFrameRate_or_Format_7_Offset(Format format) const;
     bool	unlockAdvancedFeature(uint64_t featureId,
 				      u_int timeout)		 const	;
