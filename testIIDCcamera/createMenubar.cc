@@ -77,11 +77,13 @@ CBmenuitem(GtkMenuItem*, gpointer userdata)
     {
 	MyDialog	dialog(fmtAndFRate->camera->
 			       getFormat_7_Info(fmtAndFRate->format));
-	u_int		u0, v0, width, height;
-	const auto	pixelFormat = dialog.getROI(u0, v0, width, height);
+	u_int		u0, v0, width, height, packetSize;
+	const auto	pixelFormat = dialog.getROI(u0, v0, width, height,
+						    packetSize);
 	fmtAndFRate->camera->
 	    setFormat_7_ROI(fmtAndFRate->format, u0, v0, width, height).
-	    setFormat_7_PixelFormat(fmtAndFRate->format, pixelFormat);
+	    setFormat_7_PixelFormat(fmtAndFRate->format, pixelFormat).
+	    setFormat_7_PacketSize(fmtAndFRate->format, packetSize);
     }
     fmtAndFRate->camera->setFormatAndFrameRate(fmtAndFRate->format,
 					       fmtAndFRate->frameRate);

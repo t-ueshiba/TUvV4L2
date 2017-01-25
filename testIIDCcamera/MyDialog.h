@@ -36,11 +36,12 @@ namespace TU
 class MyDialog
 {
   public:
-    MyDialog(const IIDCCamera::Format_7_Info& fmt7info)		;
+    MyDialog(const IIDCCamera::Format_7_Info& fmt7info)			;
     ~MyDialog()								;
     
     IIDCCamera::PixelFormat	getROI(u_int& u0, u_int& v0,
-				       u_int& width, u_int& height)	;
+				       u_int& width, u_int& height,
+				       u_int& packetSize)		;
     
   private:
     const IIDCCamera::Format_7_Info&	_fmt7info;
@@ -49,6 +50,7 @@ class MyDialog
     GtkObject* const			_v0;
     GtkObject* const			_width;
     GtkObject* const			_height;
+    GtkObject* const			_packetSize;
     IIDCCamera::PixelFormat		_pixelFormat;
 };
  

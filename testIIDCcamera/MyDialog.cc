@@ -69,7 +69,7 @@ static void
 CBadjust(GtkAdjustment* adj, gpointer userdata)
 {
     const auto	step = *static_cast<u_int*>(userdata);
-    const auto	val = gfloat(step * ((u_int(adj->value) + step/2) / step));
+    const auto	val  = gfloat(step * ((u_int(adj->value) + step/2) / step));
     gtk_adjustment_set_value(adj, val);
 }
     
@@ -103,6 +103,11 @@ MyDialog::MyDialog(const IIDCCamera::Format_7_Info& fmt7info)
      _height(gtk_adjustment_new(_fmt7info.height, 0, _fmt7info.maxHeight,
 				_fmt7info.unitHeight, _fmt7info.unitHeight,
 				0.0)),
+     _packetSize(gtk_adjustment_new(_fmt7info.bytePerPacket,
+				    _fmt7info.unitBytePerPacket,
+				    _fmt7info.maxBytePerPacket,
+				    _fmt7info.unitBytePerPacket,
+				    _fmt7info.unitBytePerPacket, 0.0)),
      _pixelFormat(_fmt7info.pixelFormat)
 {
   // dialogの属性を設定．
@@ -123,9 +128,12 @@ MyDialog::MyDialog(const IIDCCamera::Format_7_Info& fmt7info)
     gtk_signal_connect(GTK_OBJECT(_height), "value_changed",
 		       GTK_SIGNAL_FUNC(CBadjust),
 		       (gpointer)&_fmt7info.unitHeight);
+    gtk_signal_connect(GTK_OBJECT(_packetSize), "value_changed",
+		       GTK_SIGNAL_FUNC(CBadjust),
+		       (gpointer)&_fmt7info.unitBytePerPacket);
     
   // widgetを並べるためのtable．
-    const auto	table = gtk_table_new(2, 5, FALSE);
+    const auto	table = gtk_table_new(2, 6, FALSE);
 
   // 4つのadjustmentのためのlabelと操作用scaleを生成してtableにパック．
     auto	label = gtk_label_new("u0:");
@@ -156,6 +164,13 @@ MyDialog::MyDialog(const IIDCCamera::Format_7_Info& fmt7info)
     gtk_widget_set_usize(GTK_WIDGET(scale), 200, 50);
     gtk_table_attach_defaults(GTK_TABLE(table), scale, 1, 2, 3, 4);
 
+    label = gtk_label_new("packet size:");
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 4, 5);
+    scale = gtk_hscale_new(GTK_ADJUSTMENT(_packetSize));
+    gtk_scale_set_digits(GTK_SCALE(scale), 0);
+    gtk_widget_set_usize(GTK_WIDGET(scale), 200, 50);
+    gtk_table_attach_defaults(GTK_TABLE(table), scale, 1, 2, 4, 5);
+
   // PixelFormat設定用のオプションメニューを生成してtableにパック．
     const auto	menu = gtk_menu_new();
     guint	current = 0;
@@ -176,13 +191,13 @@ MyDialog::MyDialog(const IIDCCamera::Format_7_Info& fmt7info)
     const auto	option_menu = gtk_option_menu_new();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), menu);
     gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), current);
-    gtk_table_attach_defaults(GTK_TABLE(table), option_menu, 1, 2, 4, 5);
+    gtk_table_attach_defaults(GTK_TABLE(table), option_menu, 1, 2, 5, 6);
     
   // ROI設定用のボタンを生成してtableにパック．
     const auto	button = gtk_button_new_with_label("Set");
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
 		       GTK_SIGNAL_FUNC(gtk_main_quit), _dialog);
-    gtk_table_attach_defaults(GTK_TABLE(table), button, 0, 2, 5, 6);
+    gtk_table_attach_defaults(GTK_TABLE(table), button, 0, 2, 6, 7);
 
   // tableをdialogに収める．
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(_dialog)->action_area), table);
@@ -210,12 +225,14 @@ MyDialog::~MyDialog()
   \param height	ROIの高さ．
  */
 IIDCCamera::PixelFormat
-MyDialog::getROI(u_int& u0, u_int& v0, u_int& width, u_int& height)
+MyDialog::getROI(u_int& u0, u_int& v0,
+		 u_int& width, u_int& height, u_int& packetSize)
 {
-    u0	   = u_int(GTK_ADJUSTMENT(_u0)->value);
-    v0	   = u_int(GTK_ADJUSTMENT(_v0)->value);
-    width  = u_int(GTK_ADJUSTMENT(_width)->value);
-    height = u_int(GTK_ADJUSTMENT(_height)->value);
+    u0		= u_int(GTK_ADJUSTMENT(_u0)->value);
+    v0		= u_int(GTK_ADJUSTMENT(_v0)->value);
+    width	= u_int(GTK_ADJUSTMENT(_width)->value);
+    height	= u_int(GTK_ADJUSTMENT(_height)->value);
+    packetSize	= u_int(GTK_ADJUSTMENT(_packetSize)->value);
 
     return _pixelFormat;
 }
