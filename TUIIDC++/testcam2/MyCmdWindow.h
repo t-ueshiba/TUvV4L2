@@ -185,7 +185,7 @@ MyCmdWindow<CAMERAS, PIXEL>::tick()
 	    syncedSnap(_cameras, _maxSkew);
 	else
 	    for (auto& camera : _cameras)
-		camera.snape();
+		camera.snap();
 	for (size_t i = 0; i < size(_cameras); ++i)
 	    _cameras[i] >> _movie.image(i);
     }
