@@ -31,6 +31,10 @@ else
 		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lusb-1.0
 endif
 
+ifneq ($(findstring darwin,$(OSTYPE)),)
+  LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices
+endif
+
 LINKER		= $(CXX)
 
 PROGDIR		= $(PREFIX)/bin
