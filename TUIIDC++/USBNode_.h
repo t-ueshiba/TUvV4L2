@@ -5,6 +5,7 @@
 #define __TU_USBNODE__H
 
 #include <libusb-1.0/libusb.h>
+#include <vector>
 #include <queue>
 #include <thread>
 #include <condition_variable>
@@ -84,11 +85,14 @@ class USBNode : public IIDCNode
 			Buffer()				;
 			~Buffer()				;
 			Buffer(const Buffer&)		= delete;
-			Buffer(Buffer&&)		= delete;
 	Buffer&		operator =(const Buffer&)	= delete;
-	Buffer&		operator =(Buffer&&)		= delete;
+			Buffer(Buffer&&)		= default;
+	Buffer&		operator =(Buffer&&)		= default;
 	
-	const void*	data()				const	{ return _p; }
+	const void*	data() const
+			{
+			    return _data.data();
+			}
 	void		map(USBNode* node, u_int size)		;
 	void		unmap()					;
 	void		enqueue()			const	;
@@ -99,7 +103,7 @@ class USBNode : public IIDCNode
 	
       private:
 	USBNode*		_node;
-	u_char*			_p;	// libusbのAPIのため，void*にできない
+	std::vector<u_char>	_data;
 	libusb_transfer*	_transfer;
     };
 	
@@ -132,14 +136,13 @@ class USBNode : public IIDCNode
     int				_interface;
     int				_altsetting;
     libusb_device_handle*	_iso_handle;
-    size_t			_nbuffers;
-    Buffer*			_buffers;
+    std::vector<Buffer>		_buffers;
     std::queue<const Buffer*>	_ready;
     std::atomic_bool		_run;
     std::mutex			_mutex;
     std::condition_variable	_cond;
     std::thread			_thread;
-    
+
     static Context		_ctx;
 };
 

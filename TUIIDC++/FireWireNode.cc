@@ -2,6 +2,7 @@
  *  $Id: FireWireNode.cc 1655 2014-10-03 01:37:50Z ueshiba $
  */
 #include "FireWireNode_.h"
+#include <algorithm>		// for std::copy()
 #include <cstring>		// for strerror()
 
 namespace TU
@@ -29,7 +30,7 @@ FireWireNode::FireWireNode(u_int unit_spec_ID, uint64_t uniqId)
     :_handle(raw1394_new_handle()),
      _nodeId(0),
 #endif
-     _channel(0), _buf_size(0), _buf(nullptr), _len(0), _p(nullptr)
+     _channel(0), _buffers(), _ready()
 {
 #if !defined(__APPLE__)
     try
@@ -92,14 +93,19 @@ FireWireNode::mapListenBuffer(u_int packet_size,
 {
     unmapListenBuffer();
 
+    _buffers.resize(nb_buffers);
+
   // バッファ1つ分のデータを転送するために必要なパケット数
     const u_int	npackets = (buf_size - 1) / packet_size + 1;
 
   // buf_sizeをpacket_sizeの整数倍にしてからmapする.
-    _buf_size = packet_size * npackets;
-    _buf      = new u_char[_buf_size];
-    _len      = 0;
-    _p	      = _buf;
+    buf_size = packet_size * npackets;
+    
+    for (auto buffer = _buffers.begin(); buffer != _buffers.end(); ++buffer)
+    {
+	buffer->map(this, buf_size);
+	_wait.push(buffer);
+    }
     
   // raw1394_loop_iterate()は，interval個のパケットを受信するたびにユーザ側に
   // 制御を返す．libraw1394ではこのデフォルト値はパケット数の1/4である．ただし，
@@ -133,39 +139,50 @@ FireWireNode::mapListenBuffer(u_int packet_size,
 void
 FireWireNode::unmapListenBuffer()
 {
-    if (_buf)
+    if (!_buffers.empty())
     {
 	raw1394_iso_stop(_handle);
 	raw1394_iso_shutdown(_handle);
-      //raw1394_bandwidth_modify(_handle, 4915, RAW1394_MODIFY_FREE);
 
-	delete [] _buf;
-	_buf_size = 0;
-	_buf	  = nullptr;
-	_len	  = 0;
-	_p	  = nullptr;
+	while (!_ready.empty())
+	    _ready.pop();
+	while (!_wait.empty())
+	    _wait.pop();
+	_buffers.clear();
     }
 }
 
 const void*
 FireWireNode::waitListenBuffer()
 {
-    while (_len < _buf_size)
+    while (_ready.empty())		// ready queueにバッファが登録されるまで
 	raw1394_loop_iterate(_handle);	// パケットを受信する．
 
-    return _buf;
+    return _ready.front()->data();	// 最古のバッファのデータを返す
 }
 
 void
 FireWireNode::requeueListenBuffer()
 {
-    _len = 0;
-    _p   = _buf;
+    if (!_ready.empty())
+    {
+	const auto	buffer = _ready.front();	// 最古のバッファを
+	_ready.pop();			// ready queueから取り出し
+	buffer->clear();		// 空にして
+	_wait.push(buffer);		// wait queueに移す
+    }
 }
 
 void
 FireWireNode::flushListenBuffer()
 {
+    while (!_ready.empty())
+    {
+	const auto	buffer = _ready.front();
+	_ready.pop();			// バッファをready queueから取り出し
+	buffer->clear();		// 空にして
+	_wait.push(buffer);		// wait queueに移す
+    }
 }
 
 uint32_t
@@ -177,7 +194,7 @@ FireWireNode::getCycletime(uint64_t& localtime) const
     return cycletime;
 }
     
-//! このノードに割り当てられたisochronous受信用バッファにパケットデータを転送する
+//! isochronous受信用バッファにパケットデータを転送する
 /*!
   本ハンドラは，パケットが1つ受信されるたびに呼び出される．また，mapListenBuffer()
   内の raw1394_iso_recv_init() を呼んだ時点で既にisochronous転送が始まっている
@@ -190,32 +207,30 @@ FireWireNode::getCycletime(uint64_t& localtime) const
 */
 raw1394_iso_disposition
 FireWireNode::receive(raw1394handle_t handle,
-		      u_char* data, u_int len,
-		      u_char channel, u_char tag, u_char sy,
-		      u_int cycle, u_int dropped)
+		      u_char* data, u_int len, u_char channel,
+		      u_char tag, u_char sy, u_int cycle, u_int dropped)
 {
-    if (dropped)
-	std::cerr << "recieve: dropped = " << dropped << std::endl;
-    
     const auto	node = static_cast<FireWireNode*>(
 			   raw1394_get_userdata(handle));
 
-    if (sy)
-    {
-	node->_len = 0;
-	node->_p   = node->_buf;
-    }
+    if (node->_wait.empty())			// wait queueが空なら
+	return RAW1394_ISO_DEFER;		// ready queueは空でないはず
+    
+    const auto	buffer = node->_wait.front();	// 現在受信中のバッファ
+    
+    if (sy)					// 新しいフレームが来たら...
+	buffer->clear();			// これまでの内容を捨てる
 
-    if (node->_p + len <= node->_buf + node->_buf_size)
+  // 受信データをバッファにコピー
+    if (buffer->receive(data, len))		// バッファが一杯になったら...
     {
-	memcpy(node->_p, data, len);
-	node->_p += len;
+	node->_wait.pop();			// wait queueから
+	node->_ready.push(buffer);		// ready queueに移す
     }
-    node->_len += len;
 
     return RAW1394_ISO_OK;
 }
-
+    
 void
 FireWireNode::check(bool err, const std::string& msg)
 {
@@ -268,5 +283,40 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
     return 0;
 }
 #endif
+
+/************************************************************************
+*  class FireWireNode::Buffer						*
+************************************************************************/
+FireWireNode::Buffer::Buffer()
+    :_node(nullptr), _data(), _ndata(0)
+{
+}
+
+void
+FireWireNode::Buffer::map(FireWireNode* node, u_int size)
+{
+    _node = node;
+    _data.resize(size);
+    _ndata = 0;
+}
+    
+bool
+FireWireNode::Buffer::receive(u_char* data, u_int len)
+{
+    const auto	rest = _data.size() - _ndata;
+
+    if (len < rest)
+    {
+	std::copy_n(data, len, _data.begin() + _ndata);
+	_ndata += len;
+	return false;
+    }
+    else
+    {
+	std::copy_n(data, rest, _data.begin() + _ndata);
+	_ndata += rest;
+	return true;
+    }
+}
     
 }
