@@ -76,8 +76,7 @@ USBNode::Context	USBNode::_ctx;
 */
 USBNode::USBNode(uint32_t unit_spec_ID, uint64_t uniqId)
     :_handle(nullptr), _interface(-1), _altsetting(-1), _iso_handle(nullptr),
-     _nbuffers(0), _buffers(nullptr), _ready(),
-     _run(false), _mutex(), _cond(), _thread()
+     _buffers(), _ready(), _run(false), _mutex(), _cond(), _thread()
 {
     try
     {
@@ -145,8 +144,7 @@ USBNode::mapListenBuffer(u_int packet_size, u_int buf_size, u_int nb_buffers)
 {
     unmapListenBuffer();
 
-    _nbuffers = nb_buffers;
-    _buffers  = new Buffer[_nbuffers];
+    _buffers.resize(nb_buffers);
 
     startIso();
 
@@ -156,10 +154,10 @@ USBNode::mapListenBuffer(u_int packet_size, u_int buf_size, u_int nb_buffers)
 				    EndpointAddress);
     buf_size = maxPacketSize * ((buf_size - 1) / maxPacketSize + 1);
 
-    for (size_t i = 0; i < _nbuffers; ++i)
+    for (auto& buffer : _buffers)
     {
-	_buffers[i].map(this, buf_size);
-	_buffers[i].enqueue();			// 待機queueに入れる
+	buffer.map(this, buf_size);
+	buffer.enqueue();			// 待機queueに入れる
     }
 
     _run    = true;				// 稼働フラグを立てる
@@ -173,8 +171,8 @@ USBNode::unmapListenBuffer()
 {
     if (_run)					// 子スレッドが走っていたら...
     {
-	for (size_t i = 0; i < _nbuffers; ++i)
-	    _buffers[i].cancel();
+	for (auto& buffer : _buffers)
+	    buffer.cancel();
 
 	_run = false;				// 稼働フラグを落とす
 	_thread.join();				// 子スレッドの終了を待つ
@@ -183,10 +181,6 @@ USBNode::unmapListenBuffer()
     
     while (!_ready.empty())
 	_ready.pop();
-
-    delete [] _buffers;
-    _buffers  = nullptr;
-    _nbuffers = 0;
 }
 
 const void*
@@ -351,7 +345,7 @@ USBNode::mainLoop(USBNode* node)
 *  class USBNode::Buffer						*
 ************************************************************************/
 USBNode::Buffer::Buffer()
-    :_node(nullptr), _p(nullptr), _transfer(nullptr)
+    :_node(nullptr), _data(), _transfer(nullptr)
 {
 }
 
@@ -365,11 +359,11 @@ USBNode::Buffer::map(USBNode* node, u_int size)
 {
     unmap();
     
-    _node     = node;
-    _p	      = new u_char[size];
+    _node = node;
+    _data.resize(size);
     _transfer = libusb_alloc_transfer(0);
     libusb_fill_bulk_transfer(_transfer, _node->_iso_handle, EndpointAddress,
-			      _p, size, callback, this, 0);
+			      _data.data(), _data.size(), callback, this, 0);
 }
     
 void
@@ -380,8 +374,6 @@ USBNode::Buffer::unmap()
 	libusb_free_transfer(_transfer);
 	_transfer = nullptr;
     }
-    delete [] _p;
-    _p	  = nullptr;
     _node = nullptr;
 }
     

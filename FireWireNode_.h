@@ -5,6 +5,8 @@
 #define __TU_FIREWIRENode__H
 
 #include <libraw1394/raw1394.h>
+#include <vector>
+#include <queue>
 #include "TU/IIDC++.h"
 
 namespace TU
@@ -19,6 +21,28 @@ namespace TU
 */
 class FireWireNode : public IIDCNode
 {
+  private:
+    class Buffer
+    {
+      public:
+			Buffer()			;
+			~Buffer()			= default;
+			Buffer(const Buffer&)		= delete;
+	Buffer&		operator =(const Buffer&)	= delete;
+			Buffer(Buffer&&)		= default;
+	Buffer&		operator =(Buffer&&)		= default;
+	
+	const void*	data()			const	{ return _data.data(); }
+	void		clear()				{ _ndata = 0; }
+	void		map(FireWireNode* node, u_int size)		;
+	bool		receive(u_char* data, u_int len)		;
+	
+      private:
+	FireWireNode*		_node;
+	std::vector<u_char>	_data;	//!< 受信データを収めるバッファ
+	u_int			_ndata;	//!< バッファ中の受信データ個数
+    };
+    
   public:
 			FireWireNode(uint32_t unit_spec_ID,
 				     uint64_t uniqId)			;
@@ -44,9 +68,9 @@ class FireWireNode : public IIDCNode
     
   private:
     static raw1394_iso_disposition
-			receive(raw1394handle_t handle, u_char* data,
-				u_int len, u_char channel,
-				u_char tag, u_char sy,
+			receive(raw1394handle_t handle,
+				u_char* data, u_int len,
+				u_char channel, u_char tag, u_char sy,
 				u_int cycle, u_int dropped)		;
     static void		check(bool err, const std::string& msg)		;
 #if !defined(__APPLE__)
@@ -55,13 +79,14 @@ class FireWireNode : public IIDCNode
 #endif
 
   private:
-    raw1394handle_t	_handle;
-    nodeid_t		_nodeId;
-    u_char		_channel;
-    size_t		_buf_size;
-    u_char*		_buf;
-    size_t		_len;
-    u_char*		_p;
+    using biterator	= std::vector<Buffer>::iterator;
+    
+    raw1394handle_t		_handle;
+    nodeid_t			_nodeId;
+    u_char			_channel;
+    std::vector<Buffer>		_buffers;
+    std::queue<biterator>	_wait;
+    std::queue<biterator>	_ready;
 };
     
 
