@@ -106,7 +106,7 @@ static constexpr uint32_t	ON_OFF_bit			= 0x1u << 25;
 static constexpr uint32_t	A_M_Mode_bit			= 0x1u << 24;
 
 // NOTE: Two buffers are not enough under kernel-2.4.6 (2001.8.24).
-static constexpr u_int		NBUFFERS			= 2;
+static constexpr u_int		NBUFFERS			= 3;
 
 /************************************************************************
 *  union AbsValue							*
@@ -1536,11 +1536,14 @@ IIDCCamera::continuousShot(bool enable)
     if (enable != inContinuousShot())
     {
 	if (enable)
+	{
+	    _node->flushListenBuffer();
 	    writeQuadletToRegister(ISO_EN, 0x1u << 31);
+	}
 	else
 	{
 	    writeQuadletToRegister(ISO_EN, 0x0);
-	  //flushListenBuffer();
+	    _node->flushListenBuffer();
 	    _img = nullptr;
 	  // 再び continuoutShot() した時に captureRaw() で使用するので, 
 	  // _img_size の値は0にせずに保持する.

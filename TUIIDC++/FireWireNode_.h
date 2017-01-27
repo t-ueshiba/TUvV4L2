@@ -6,7 +6,6 @@
 
 #include <libraw1394/raw1394.h>
 #include <vector>
-#include <queue>
 #include "TU/IIDC++.h"
 
 namespace TU
@@ -22,6 +21,47 @@ namespace TU
 class FireWireNode : public IIDCNode
 {
   private:
+    template <class ITER>
+    class RingQueue
+    {
+      public:
+	using iterator	 = ITER;
+	using reference	 = typename std::iterator_traits<iterator>::reference;
+
+      public:
+	void		initialize(iterator begin, iterator end)
+			{
+			    _begin = begin;
+			    _end   = end;
+			    _front = _begin;
+			    _back  = _begin;
+			}
+	bool		empty()		const	{ return _front == _back; }
+	reference	front()		const	{ return *_front; }
+	reference	back()		const	{ return *_back; }
+	void		pop()
+			{
+			    if (++_front == _end)
+				_front = _begin;	// 循環反復子
+			}
+	void		push()
+			{
+			    auto	back = _back;
+			    if (++back == _end)
+				back = _begin;		// 循環反復子
+
+			  // wait状態のバッファが少なくとも1つなければならない
+			    if (back != _front)	// wait状態のバッファが残るなら...
+				_back = back;	// ready状態のバッファを増やす
+			}
+	    
+      private:
+	iterator	_begin;	//!< 記憶領域の先頭
+	iterator	_end;	//!< 記憶領域の末尾
+	iterator	_front;	//!< [_front, _back) がready状態
+	iterator	_back;	//!< [_back, _front) がwait状態
+    };
+    
     class Buffer
     {
       public:
@@ -85,8 +125,7 @@ class FireWireNode : public IIDCNode
     nodeid_t			_nodeId;
     u_char			_channel;
     std::vector<Buffer>		_buffers;
-    std::queue<biterator>	_wait;
-    std::queue<biterator>	_ready;
+    RingQueue<biterator>	_ready;
 };
     
 
