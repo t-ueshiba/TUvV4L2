@@ -233,6 +233,13 @@ class range<ITER, 0>
 		    assert(i < size());
 		    return *(_begin + i);
 		}
+    template <size_t I_>
+    auto	begin() const
+		{
+		    return begin(std::integral_constant<size_t, I_>());
+		}
+
+  private:
     const auto*	begin(std::integral_constant<size_t, 0>) const
 		{
 		    return this;
@@ -243,7 +250,7 @@ class range<ITER, 0>
 		    return begin(std::integral_constant<size_t, I_-1>())
 			 ->begin();
 		}
-    
+
   private:
     const iterator	_begin;
     const iterator	_end;
@@ -576,13 +583,13 @@ make_dense_range(ITER iter, size_t size, SIZES... sizes)
 template <size_t I=0, class ITER, size_t SIZE> inline size_t
 size(const range<ITER, SIZE>& r)
 {
-    return r.begin(std::integral_constant<size_t, I>())->size();
+    return r.template begin<I>()->size();
 }
 
 template <size_t I, class ITER, size_t SIZE> inline size_t
 stride(const range<ITER, SIZE>& r)
 {
-    return r.begin(std::integral_constant<size_t, I>()).stride();
+    return r.template begin<I>().stride();
 }
 
 /************************************************************************
