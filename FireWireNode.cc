@@ -94,18 +94,16 @@ FireWireNode::mapListenBuffer(u_int packet_size,
     unmapListenBuffer();
 
     _buffers.resize(nb_buffers);
+    _ready.initialize(_buffers.begin(), _buffers.end());
 
   // バッファ1つ分のデータを転送するために必要なパケット数
     const u_int	npackets = (buf_size - 1) / packet_size + 1;
 
   // buf_sizeをpacket_sizeの整数倍にしてからmapする.
     buf_size = packet_size * npackets;
-    
-    for (auto buffer = _buffers.begin(); buffer != _buffers.end(); ++buffer)
-    {
-	buffer->map(this, buf_size);
-	_wait.push(buffer);
-    }
+    for (auto& buffer : _buffers)
+	buffer.map(this, buf_size);
+
     
   // raw1394_loop_iterate()は，interval個のパケットを受信するたびにユーザ側に
   // 制御を返す．libraw1394ではこのデフォルト値はパケット数の1/4である．ただし，
@@ -144,11 +142,8 @@ FireWireNode::unmapListenBuffer()
 	raw1394_iso_stop(_handle);
 	raw1394_iso_shutdown(_handle);
 
-	while (!_ready.empty())
-	    _ready.pop();
-	while (!_wait.empty())
-	    _wait.pop();
 	_buffers.clear();
+	_ready.initialize(_buffers.begin(), _buffers.end());
     }
 }
 
@@ -158,7 +153,7 @@ FireWireNode::waitListenBuffer()
     while (_ready.empty())		// ready queueにバッファが登録されるまで
 	raw1394_loop_iterate(_handle);	// パケットを受信する．
 
-    return _ready.front()->data();	// 最古のバッファのデータを返す
+    return _ready.front().data();	// 最古のバッファのデータを返す
 }
 
 void
@@ -166,10 +161,8 @@ FireWireNode::requeueListenBuffer()
 {
     if (!_ready.empty())
     {
-	const auto	buffer = _ready.front();	// 最古のバッファを
-	_ready.pop();			// ready queueから取り出し
-	buffer->clear();		// 空にして
-	_wait.push(buffer);		// wait queueに移す
+	_ready.front().clear();		// 最古のバッファを空にして
+	_ready.pop();			// ready queueから取り出す
     }
 }
 
@@ -178,10 +171,8 @@ FireWireNode::flushListenBuffer()
 {
     while (!_ready.empty())
     {
-	const auto	buffer = _ready.front();
-	_ready.pop();			// バッファをready queueから取り出し
-	buffer->clear();		// 空にして
-	_wait.push(buffer);		// wait queueに移す
+	_ready.front().clear();		// バッファを空にして
+	_ready.pop();			// ready queueから取り出す
     }
 }
 
@@ -212,21 +203,14 @@ FireWireNode::receive(raw1394handle_t handle,
 {
     const auto	node = static_cast<FireWireNode*>(
 			   raw1394_get_userdata(handle));
-
-    if (node->_wait.empty())			// wait queueが空なら
-	return RAW1394_ISO_DEFER;		// ready queueは空でないはず
-    
-    const auto	buffer = node->_wait.front();	// 現在受信中のバッファ
+    auto&	buffer = node->_ready.back();	// 現在受信中のバッファ
     
     if (sy)					// 新しいフレームが来たら...
-	buffer->clear();			// これまでの内容を捨てる
+	buffer.clear();				// これまでの内容を捨てる
 
   // 受信データをバッファにコピー
-    if (buffer->receive(data, len))		// バッファが一杯になったら...
-    {
-	node->_wait.pop();			// wait queueから
-	node->_ready.push(buffer);		// ready queueに移す
-    }
+    if (buffer.receive(data, len))		// バッファが一杯になったら...
+	node->_ready.push();			// ready queueに移す
 
     return RAW1394_ISO_OK;
 }
