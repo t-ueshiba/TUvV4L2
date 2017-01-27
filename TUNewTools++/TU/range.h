@@ -278,6 +278,23 @@ make_range(ITER begin, ITER end)
     return {begin, end};
 }
 
+//! 可変長レンジを生成する
+/*!
+  \param iter	レンジの先頭要素を指す反復子
+  \param size	レンジの要素数
+*/
+template <class ITER> inline range<ITER>
+make_range(ITER iter, size_t size)
+{
+    return {iter, iter + size};
+}
+
+//! 出力ストリームにレンジの内容を書き出す
+/*!
+  \param out	出力ストリーム
+  \param r	レンジ
+  \return	outで指定した出力ストリーム
+*/
 template <class ITER, size_t SIZE> std::ostream&
 operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 {
@@ -426,9 +443,6 @@ class range_iterator
 		}
 };
 
-/************************************************************************
-*  fixed size & fixed stride ranges and associated iterators		*
-************************************************************************/
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
 /*!
   \param SIZE	レンジ長
@@ -442,6 +456,33 @@ make_range_iterator(ITER iter)
     return {iter};
 }
 
+//! 固定長レンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
+/*!
+  \param SIZE	レンジ長
+  \param iter	レンジの先頭要素を指す反復子
+  \param stride	インクリメント時に進める要素数
+*/
+template <size_t SIZE, class ITER> inline range_iterator<ITER, SIZE>
+make_range_iterator(ITER iter, size_t stride)
+{
+    return {iter, stride};
+}
+    
+//! 指定された長さのレンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
+/*!
+  \param iter	レンジの先頭要素を指す反復子
+  \param size	レンジ長
+  \param stride	インクリメント時に進める要素数
+*/
+template <class ITER> inline range_iterator<ITER>
+make_range_iterator(ITER iter, size_t size, size_t stride)
+{
+    return {iter, size, stride};
+}
+    
+/************************************************************************
+*  fixed size & fixed stride ranges and associated iterators		*
+************************************************************************/
 //! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
 /*!
   \param SIZE	最上位軸のレンジ長
@@ -468,18 +509,6 @@ make_range(ITER iter)
 /************************************************************************
 *  fixed size & variable stride ranges and associated iterators		*
 ************************************************************************/
-//! 固定長レンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
-/*!
-  \param SIZE	レンジ長
-  \param iter	レンジの先頭要素を指す反復子
-  \param stride	インクリメント時に進める要素数
-*/
-template <size_t SIZE, class ITER> inline range_iterator<ITER, SIZE>
-make_range_iterator(ITER iter, size_t stride)
-{
-    return {iter, stride};
-}
-    
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param SIZE		最上位軸のレンジ長
@@ -510,18 +539,6 @@ make_range(ITER iter, STRIDES... strides)
 /************************************************************************
 *  variable size & variable stride ranges and associated iterators	*
 ************************************************************************/
-//! 指定された長さのレンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
-/*!
-  \param iter	レンジの先頭要素を指す反復子
-  \param size	レンジ長
-  \param stride	インクリメント時に進める要素数
-*/
-template <class ITER> inline range_iterator<ITER>
-make_range_iterator(ITER iter, size_t size, size_t stride)
-{
-    return {iter, size, stride};
-}
-    
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param iter		レンジの先頭要素を指す反復子
@@ -536,12 +553,6 @@ make_range_iterator(ITER iter, size_t size, size_t stride, SS... ss)
 			       size, stride);
 }
 
-template <class ITER> inline range<ITER>
-make_range(ITER iter, size_t size)
-{
-    return {iter, iter + size};
-}
-
 template <class ITER, class... SS> inline auto
 make_range(ITER iter, size_t size, SS... ss)
 {
@@ -552,29 +563,23 @@ make_range(ITER iter, size_t size, SS... ss)
 *  ranges with variable but identical size and stride			*
 *  and associated iterators						*
 ************************************************************************/
-template <class ITER> inline range_iterator<ITER>
-make_dense_range_iterator(ITER iter, size_t size)
+template <class ITER> inline ITER
+make_dense_range_iterator(ITER iter)
 {
-    return {iter, size, size};
+    return iter;
 }
     
 template <class ITER, class... SIZES> inline auto
 make_dense_range_iterator(ITER iter, size_t size, SIZES... sizes)
 {
-    return make_dense_range_iterator(make_dense_range_iterator(iter, sizes...),
-				     size);
-}
-    
-template <class ITER> inline range<ITER>
-make_dense_range(ITER iter, size_t size)
-{
-    return {iter, iter + size};
+    return make_range_iterator(make_dense_range_iterator(iter, sizes...),
+			       size, size);
 }
 
 template <class ITER, class... SIZES> inline auto
 make_dense_range(ITER iter, size_t size, SIZES... sizes)
 {
-    return make_dense_range(make_dense_range_iterator(iter, sizes...), size);
+    return make_range(make_dense_range_iterator(iter, sizes...), size);
 }
 
 /************************************************************************
