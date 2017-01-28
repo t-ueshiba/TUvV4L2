@@ -106,8 +106,6 @@ main(int argc, char* argv[])
 #endif
 
     bool		gfstereo		= false;
-    bool		doHorizontalBackMatch	= true;
-    bool		doVerticalBackMatch	= true;
     const char*		cameraName		= IIDCCameraArray
 						::DEFAULT_CAMERA_NAME;
     const char*		configDirs		= "/usr/local/etc/cameras";
@@ -117,20 +115,17 @@ main(int argc, char* argv[])
     double		parallax		= -1.0;
     IIDCCamera::Speed	speed			= IIDCCamera::SPD_400M;
     size_t		grainSize		= DEFAULT_GRAINSIZE;
+    bool		sync			= false;
+    float		shutter			= 0.002;
+    float		frameRate		= 50.0;
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "GHVc:Bp:s:xq:g:h")) != -1; )
+    for (int c; (c = getopt(argc, argv, "Gc:Bp:s:xq:g:Sh")) != -1; )
 	switch (c)
 	{
 	  case 'G':
 	    gfstereo = true;
-	    break;
-	  case 'H':
-	    doHorizontalBackMatch = false;
-	    break;
-	  case 'V':
-	    doVerticalBackMatch = false;
 	    break;
 	  case 'c':
 	    cameraName = optarg;
@@ -152,6 +147,9 @@ main(int argc, char* argv[])
 	    break;
 	  case 'g':
 	    grainSize = atoi(optarg);
+	    break;
+	  case 'S':
+	    sync = true;
 	    break;
 	  case 'h':
 	    usage(argv[0]);
@@ -190,6 +188,49 @@ main(int argc, char* argv[])
       // IIDCカメラのオープン．
 	IIDCCameraArray	cameras;
 	cameras.restore(cameraName, speed);
+
+      // カメラの同期設定
+	if (sync)
+	{
+	    for (auto& camera : cameras)
+		camera.reset()
+		    .setActive(IIDCCamera::TRIGGER_MODE, false)
+		    .setTriggerMode(IIDCCamera::Trigger_Mode14)
+		    .setActive(IIDCCamera::Strobe_1, true)
+		    .setDuration(IIDCCamera::Strobe_1, 2000)
+		    .setOutputVoltage(false)
+		    .setActive(IIDCCamera::AUTO_EXPOSURE, false)
+		    .setAuto(IIDCCamera::AUTO_EXPOSURE, false)
+		    .setAuto(IIDCCamera::SHUTTER, false)
+		    .setAbsControl(IIDCCamera::SHUTTER, true)
+		    .setValue(IIDCCamera::SHUTTER, shutter)
+		    .setActive(IIDCCamera::FRAME_RATE, true)
+		    .setAuto(IIDCCamera::FRAME_RATE, false)
+		    .setAbsControl(IIDCCamera::FRAME_RATE, true)
+		    .setValue(IIDCCamera::FRAME_RATE, frameRate)
+		    .embedTimestamp(true);
+	  /*
+	    switch (trigger)
+	    {
+	      case None:
+		for (auto& camera : cameras)
+		    camera.setActive(IIDCCamera::TRIGGER_MODE, false);
+		break;
+	
+	      case Internal:
+		for (auto& camera : cameras)
+		    camera.setActive(IIDCCamera::TRIGGER_MODE, true);
+		std::begin(cameras)->setActive(IIDCCamera::TRIGGER_MODE, false)
+		    .setOutputVoltage(true);
+		break;
+		
+	      case External:
+		for (auto& camera : cameras)
+		    camera.setActive(IIDCCamera::TRIGGER_MODE, true);
+		break;
+	    }
+	  */
+	}
 	
       // ステレオマッチングパラメータの読み込み．
 	ifstream	in;
@@ -199,8 +240,6 @@ main(int argc, char* argv[])
 	{
 	    GFStereoType::Parameters	params;
 	    params.get(in);
-	    params.doHorizontalBackMatch = doHorizontalBackMatch;
-	    params.doVerticalBackMatch	 = doVerticalBackMatch;
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
@@ -209,7 +248,7 @@ main(int argc, char* argv[])
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,
 #endif
-		      cameras, params, scale);
+		      cameras, params, scale, sync);
 
 	  // GUIのイベントループ．
 	    vapp.run();
@@ -218,8 +257,6 @@ main(int argc, char* argv[])
 	{
 	    SADStereoType::Parameters	params;
 	    params.get(in);
-	    params.doHorizontalBackMatch = doHorizontalBackMatch;
-	    params.doVerticalBackMatch	 = doVerticalBackMatch;
 	    params.grainSize		 = grainSize;
 	
 	  // GUIのwidgetを作成．
@@ -228,7 +265,7 @@ main(int argc, char* argv[])
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,
 #endif
-		      cameras, params, scale);
+		      cameras, params, scale, sync);
 
 	  // GUIのイベントループ．
 	    vapp.run();

@@ -13,8 +13,8 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../.. -I../stereoGUI -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DUSE_TBB -DNO_RV -DDISPLAY_2D -DDISPLAY_3D \
-		#-DUSE_VIDEO1394 -DDIRECT_CAPTURE
+CPPFLAGS	= -DNDEBUG -DUSE_TBB -DDISPLAY_2D -DDISPLAY_3D \
+		#-DNO_RV -DUSE_VIDEO1394 -DDIRECT_CAPTURE
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch),armv7l)
@@ -22,8 +22,8 @@ ifeq ($(shell arch),armv7l)
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DAVX2
-  CFLAGS       += -march=core-avx2
+  CPPFLAGS     += -DSSE3
+#  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 

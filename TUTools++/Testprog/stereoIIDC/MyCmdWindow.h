@@ -261,13 +261,13 @@ class MyCmdWindow : public CmdWindow
 #endif
 		CAMERAS&		cameras,
 		const params_type&	params,
-		double			scale)				;
+		double			scale,
+		bool			sync)				;
 
     virtual void	callback(CmdId, CmdVal)				;
     virtual void	tick()						;
     
   private:
-    void		syncronizedSnap()				;
     void		restoreCalibration()				;
     void		initializeRectification()			;
     void		stopContinuousShotIfRunning()			;
@@ -286,6 +286,7 @@ class MyCmdWindow : public CmdWindow
     const double		_initialWidth;
     const double		_initialHeight;
     const double		_scale;
+    const bool			_sync;
     Rectify			_rectify;
     stereo_type			_stereo;
     size_t			_nimages;
@@ -330,7 +331,8 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::MyCmdWindow(App&	 parentApp,
 #endif
 					      CAMERAS&		 cameras,	
 					      const params_type& params,
-					      double		 scale)
+					      double		 scale,
+					      bool		 sync)
     :CmdWindow(parentApp, "Real-time stereo vision using IIDC cameras",
 #if defined(DISPLAY_3D) && !defined(DEMO)
 	       vinfo,
@@ -341,6 +343,7 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::MyCmdWindow(App&	 parentApp,
      _initialWidth(_cameras[0].width()),
      _initialHeight(_cameras[0].height()),
      _scale(scale),
+     _sync(sync),
      _rectify(),
      _stereo(params),
      _nimages(_cameras.size()),
@@ -449,7 +452,10 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::callback(CmdId id, CmdVal val)
     try
     {
 	if (setFormat(_cameras, id, val, *this))
+	{
+	    refreshFeatureCmds(_cameras, _featureCmd);
 	    return;
+	}
 	else if (setFeature(_cameras, id, val, _featureCmd))
 	    return;
 	
@@ -789,7 +795,12 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::tick()
 {
     countTime();
 
-    syncronizedSnap();				// カメラに画像取り込みを指示．
+    if (_sync)
+	syncedSnap(_cameras);
+    else
+	for (auto& camera : _cameras)
+	    camera.snap();
+    
     for (size_t i = 0; i < _cameras.size(); ++i)
 #if defined(DIRECT_CAPTURE)
 	_cameras[i].captureDirectly(_images[i]);
@@ -797,12 +808,6 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::tick()
 	_cameras[i] >> _images[i];		// カメラから画像転送．
 #endif
     stereoMatch();
-}
-
-template <class STEREO, class CAMERAS, class PIXEL, class DISP> void
-MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::syncronizedSnap()
-{
-    syncedSnap(_cameras);
 }
 
 template <class STEREO, class CAMERAS, class PIXEL, class DISP> void
@@ -890,7 +895,7 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::initializeRectification()
     const Matrix34d&	Pl = _rectifiedImages[0].P;
     _b = (Pl[0]*tR) / Pl[2](0, 3).length() / 1000;
 
-    int			range[3];
+    float	range[3];
     range[0] = 100 * _b / _stereo.getParameters().disparityMax;
     range[1] = 100 * _b / _stereo.getParameters().disparityMin() - range[0];
     range[2] = 100;
