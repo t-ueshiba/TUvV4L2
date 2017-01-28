@@ -447,6 +447,48 @@ make_range_iterator(ITER iter, size_t size, size_t stride)
 }
     
 /************************************************************************
+*  sizes and strides of multidimensional ranges				*
+************************************************************************/
+namespace detail
+{
+  template <class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, 0>)
+  {
+      return std::size(expr);
+  }
+  template <size_t I, class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+
+  template <class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, 1>)
+  {
+      return std::begin(expr).stride();
+  }
+  template <size_t I, class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+}	// namespace detail
+
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+size(const E& expr)
+{
+    return detail::size(expr, std::integral_constant<size_t, I>());
+}
+
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+stride(const E& expr)
+{
+    return detail::stride(expr, std::integral_constant<size_t, I>());
+}
+
+/************************************************************************
 *  fixed size & fixed stride ranges and associated iterators		*
 ************************************************************************/
 //! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
@@ -546,48 +588,6 @@ template <class ITER, class... SIZES> inline auto
 make_dense_range(ITER iter, size_t size, SIZES... sizes)
 {
     return make_range(make_dense_range_iterator(iter, sizes...), size);
-}
-
-/************************************************************************
-*  sizes and strides of multidimensional ranges				*
-************************************************************************/
-namespace detail
-{
-  template <class E> inline size_t
-  size(const E& expr, std::integral_constant<size_t, 0>)
-  {
-      return std::size(expr);
-  }
-  template <size_t I, class E> inline size_t
-  size(const E& expr, std::integral_constant<size_t, I>)
-  {
-      return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
-  }
-
-  template <class E> inline size_t
-  stride(const E& expr, std::integral_constant<size_t, 1>)
-  {
-      return std::begin(expr).stride();
-  }
-  template <size_t I, class E> inline size_t
-  stride(const E& expr, std::integral_constant<size_t, I>)
-  {
-      return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
-  }
-}	// namespace detail
-
-template <size_t I, class E>
-inline typename std::enable_if<is_range<E>::value, size_t>::type
-size(const E& expr)
-{
-    return detail::size(expr, std::integral_constant<size_t, I>());
-}
-
-template <size_t I, class E>
-inline typename std::enable_if<is_range<E>::value, size_t>::type
-stride(const E& expr)
-{
-    return detail::stride(expr, std::integral_constant<size_t, I>());
 }
 
 /************************************************************************
