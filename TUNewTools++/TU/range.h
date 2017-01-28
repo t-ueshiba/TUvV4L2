@@ -138,23 +138,6 @@ class range
 		    assert(i < size());
 		    return *(_begin + i);
 		}
-    template <size_t I_>
-    auto	begin() const
-		{
-		    return begin(std::integral_constant<size_t, I_>());
-		}
-
-  private:
-    const auto*	begin(std::integral_constant<size_t, 0>) const
-		{
-		    return this;
-		}
-    template <size_t I_>
-    auto	begin(std::integral_constant<size_t, I_>) const
-		{
-		    return begin(std::integral_constant<size_t, I_-1>())
-			 ->begin();
-		}
     
   private:
     const iterator	_begin;
@@ -232,23 +215,6 @@ class range<ITER, 0>
 		{
 		    assert(i < size());
 		    return *(_begin + i);
-		}
-    template <size_t I_>
-    auto	begin() const
-		{
-		    return begin(std::integral_constant<size_t, I_>());
-		}
-
-  private:
-    const auto*	begin(std::integral_constant<size_t, 0>) const
-		{
-		    return this;
-		}
-    template <size_t I_>
-    auto	begin(std::integral_constant<size_t, I_>) const
-		{
-		    return begin(std::integral_constant<size_t, I_-1>())
-			 ->begin();
 		}
 
   private:
@@ -585,16 +551,43 @@ make_dense_range(ITER iter, size_t size, SIZES... sizes)
 /************************************************************************
 *  sizes and strides of multidimensional ranges				*
 ************************************************************************/
-template <size_t I=0, class ITER, size_t SIZE> inline size_t
-size(const range<ITER, SIZE>& r)
+namespace detail
 {
-    return r.template begin<I>()->size();
+  template <class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, 0>)
+  {
+      return std::size(expr);
+  }
+  template <size_t I, class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+
+  template <class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, 1>)
+  {
+      return std::begin(expr).stride();
+  }
+  template <size_t I, class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+}	// namespace detail
+
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+size(const E& expr)
+{
+    return detail::size(expr, std::integral_constant<size_t, I>());
 }
 
-template <size_t I, class ITER, size_t SIZE> inline size_t
-stride(const range<ITER, SIZE>& r)
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+stride(const E& expr)
 {
-    return r.template begin<I>().stride();
+    return detail::stride(expr, std::integral_constant<size_t, I>());
 }
 
 /************************************************************************

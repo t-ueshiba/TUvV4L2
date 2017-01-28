@@ -480,22 +480,6 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 /************************************************************************
 *  class array<T, ALLOC, SIZE, SIZES...>				*
 ************************************************************************/
-template <class T, class ALLOC, size_t SIZE, size_t... SIZES>	class array;
-    
-template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
-inline size_t
-size(const array<T, ALLOC, SIZE, SIZES...>& a)
-{
-    return a.template size<I>();
-}
-
-template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
-inline size_t
-stride(const array<T, ALLOC, SIZE, SIZES...>& a)
-{
-    return a.template stride<I>();
-}
-
 //! 多次元配列を表すクラス
 /*!
   \param T	要素の型
@@ -507,14 +491,14 @@ template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
 class array : public Buf<T, ALLOC, SIZE, SIZES...>
 {
   private:
-    using super			= Buf<T, ALLOC, SIZE, SIZES...>;
+    using super	= Buf<T, ALLOC, SIZE, SIZES...>;
     
   public:
     using super::D;
-    using element_type		 = T;
     using typename super::sizes_type;
     using typename super::pointer;
     using typename super::const_pointer;
+    using element_type		 = T;
     using iterator		 = decltype(std::declval<super*>()->begin());
     using const_iterator	 = decltype(std::declval<const super*>()
 					    ->begin());
