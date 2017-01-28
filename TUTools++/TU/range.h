@@ -16,6 +16,25 @@
 #include <type_traits>
 #include <boost/iterator/iterator_adaptor.hpp>
 
+namespace std
+{
+#if __cplusplus < 201700L
+/************************************************************************
+*  function std::size(T)						*
+************************************************************************/
+template <class T> inline size_t
+size(const T& x)
+{
+    return x.size();
+}
+template <class T, size_t N> inline constexpr size_t
+size(const T (&array)[N]) noexcept
+{
+    return N;
+}
+#endif
+}	// namespace std
+
 namespace TU
 {
 /************************************************************************
@@ -107,35 +126,22 @@ class range
 
     constexpr static
     size_t	size()			{ return SIZE; }
-    auto	begin()		const	{ return _begin; }
-    auto	end()		const	{ return _begin + SIZE; }
-    auto	cbegin()	const	{ return begin(); }
-    auto	cend()		const	{ return end(); }
-    auto	rbegin()	const	{ return reverse_iterator(end()); }
-    auto	rend()		const	{ return reverse_iterator(begin()); }
-    auto	crbegin()	const	{ return rbegin(); }
-    auto	crend()		const	{ return rend(); }
+    iterator	begin()		const	{ return _begin; }
+    iterator	end()		const	{ return _begin + SIZE; }
+    iterator	cbegin()	const	{ return begin(); }
+    iterator	cend()		const	{ return end(); }
+    reverse_iterator
+		rbegin()	const	{ return reverse_iterator(end()); }
+    reverse_iterator
+		rend()		const	{ return reverse_iterator(begin()); }
+    reverse_iterator
+		crbegin()	const	{ return rbegin(); }
+    reverse_iterator
+		crend()		const	{ return rend(); }
     reference	operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);
-		}
-    template <size_t I_>
-    auto	begin() const
-		{
-		    return begin(std::integral_constant<size_t, I_>());
-		}
-
-  private:
-    const auto*	begin(std::integral_constant<size_t, 0>) const
-		{
-		    return this;
-		}
-    template <size_t I_>
-    auto	begin(std::integral_constant<size_t, I_>) const
-		{
-		    return begin(std::integral_constant<size_t, I_-1>())
-			 ->begin();
 		}
     
   private:
@@ -203,28 +209,22 @@ class range<ITER, 0>
 		}
 		
     size_t	size()		const	{ return std::distance(_begin, _end); }
-    auto	begin()		const	{ return _begin; }
-    auto	end()		const	{ return _end; }
-    auto	cbegin()	const	{ return begin(); }
-    auto	cend()		const	{ return end(); }
-    auto	rbegin()	const	{ return reverse_iterator(end()); }
-    auto	rend()		const	{ return reverse_iterator(begin()); }
-    auto	crbegin()	const	{ return rbegin(); }
-    auto	crend()		const	{ return rend(); }
+    iterator	begin()		const	{ return _begin; }
+    iterator	end()		const	{ return _end; }
+    iterator	cbegin()	const	{ return begin(); }
+    iterator	cend()		const	{ return end(); }
+    reverse_iterator
+		rbegin()	const	{ return reverse_iterator(end()); }
+    reverse_iterator
+		rend()		const	{ return reverse_iterator(begin()); }
+    reverse_iterator
+		crbegin()	const	{ return rbegin(); }
+    reverse_iterator
+		crend()		const	{ return rend(); }
     reference	operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);
-		}
-    const auto*	begin(std::integral_constant<size_t, 0>) const
-		{
-		    return this;
-		}
-    template <size_t I_>
-    auto	begin(std::integral_constant<size_t, I_>) const
-		{
-		    return begin(std::integral_constant<size_t, I_-1>())
-			 ->begin();
 		}
     
   private:
@@ -254,6 +254,23 @@ make_range(ITER begin, ITER end)
     return {begin, end};
 }
 
+//! 可変長レンジを生成する
+/*!
+  \param iter	レンジの先頭要素を指す反復子
+  \param size	レンジの要素数
+*/
+template <class ITER> inline range<ITER>
+make_range(ITER iter, size_t size)
+{
+    return {iter, iter + size};
+}
+
+//! 出力ストリームにレンジの内容を書き出す
+/*!
+  \param out	出力ストリーム
+  \param r	レンジ
+  \return	outで指定した出力ストリーム
+*/
 template <class ITER, size_t SIZE> std::ostream&
 operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 {
@@ -402,9 +419,6 @@ class range_iterator
 		}
 };
 
-/************************************************************************
-*  fixed size & fixed stride ranges and associated iterators		*
-************************************************************************/
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
 /*!
   \param SIZE	レンジ長
@@ -418,32 +432,6 @@ make_range_iterator(ITER iter)
     return {iter};
 }
 
-//! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
-/*!
-  \param SIZE	最上位軸のレンジ長
-  \param STRIDE	インクリメント時に進める最上位軸のブロック数
-  \param SS	2番目以降の軸の(レンジ長，ストライド)の並び
-  \param iter	レンジの先頭要素を指す反復子
-*/
-template <size_t SIZE, size_t STRIDE, size_t... SS, class ITER,
-	  typename std::enable_if<sizeof...(SS) != 0>::type* = nullptr>
-inline auto
-make_range_iterator(ITER iter)
-{
-    return make_range_iterator<SIZE, STRIDE>(make_range_iterator<SS...>(iter));
-}
-
-template <size_t SIZE, size_t... SS, class ITER,
-	  typename std::enable_if<sizeof...(SS) != 0>::type* = nullptr>
-inline auto
-make_range(ITER iter)
-{
-    return make_range<SIZE>(make_range_iterator<SS...>(iter));
-}
-
-/************************************************************************
-*  fixed size & variable stride ranges and associated iterators		*
-************************************************************************/
 //! 固定長レンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
 /*!
   \param SIZE	レンジ長
@@ -456,6 +444,93 @@ make_range_iterator(ITER iter, size_t stride)
     return {iter, stride};
 }
     
+//! 指定された長さのレンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
+/*!
+  \param iter	レンジの先頭要素を指す反復子
+  \param size	レンジ長
+  \param stride	インクリメント時に進める要素数
+*/
+template <class ITER> inline range_iterator<ITER>
+make_range_iterator(ITER iter, size_t size, size_t stride)
+{
+    return {iter, size, stride};
+}
+    
+/************************************************************************
+*  sizes and strides of multidimensional ranges				*
+************************************************************************/
+namespace detail
+{
+  template <class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, 0>)
+  {
+      return std::size(expr);
+  }
+  template <size_t I, class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+
+  template <class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, 1>)
+  {
+      return std::begin(expr).stride();
+  }
+  template <size_t I, class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+}	// namespace detail
+
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+size(const E& expr)
+{
+    return detail::size(expr, std::integral_constant<size_t, I>());
+}
+
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+stride(const E& expr)
+{
+    return detail::stride(expr, std::integral_constant<size_t, I>());
+}
+
+/************************************************************************
+*  fixed size & fixed stride ranges and associated iterators		*
+************************************************************************/
+//! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
+/*!
+  \param SIZE	最上位軸のレンジ長
+  \param STRIDE	インクリメント時に進める最上位軸のブロック数
+  \param SS	2番目以降の軸の(レンジ長，ストライド)の並び
+  \param iter	レンジの先頭要素を指す反復子
+*/
+template <size_t SIZE, size_t STRIDE, size_t... SS, class ITER,
+	  typename std::enable_if<sizeof...(SS) != 0>::type* = nullptr>
+inline auto
+make_range_iterator(ITER iter)
+    -> decltype(make_range_iterator<SIZE, STRIDE>(
+  		    make_range_iterator<SS...>(iter)))
+{
+    return make_range_iterator<SIZE, STRIDE>(make_range_iterator<SS...>(iter));
+}
+
+template <size_t SIZE, size_t... SS, class ITER,
+	  typename std::enable_if<sizeof...(SS) != 0>::type* = nullptr>
+inline auto
+make_range(ITER iter)
+    -> decltype(make_range<SIZE>(make_range_iterator<SS...>(iter)))
+{
+    return make_range<SIZE>(make_range_iterator<SS...>(iter));
+}
+
+#if !defined(__NVCC__)
+/************************************************************************
+*  fixed size & variable stride ranges and associated iterators		*
+************************************************************************/
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param SIZE		最上位軸のレンジ長
@@ -469,6 +544,8 @@ template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
 	      sizeof...(SIZES) == sizeof...(STRIDES)>::type* = nullptr>
 inline auto
 make_range_iterator(ITER iter, size_t stride, STRIDES... strides)
+    -> decltype(make_range_iterator<SIZE>(
+  		    make_range_iterator<SIZES...>(iter, strides...), stride))
 {
     return make_range_iterator<SIZE>(
 	       make_range_iterator<SIZES...>(iter, strides...), stride);
@@ -479,6 +556,9 @@ template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
 	      sizeof...(SIZES) == sizeof...(STRIDES)>::type* = nullptr>
 inline auto
 make_range(ITER iter, STRIDES... strides)
+  // g++-5.4.0 のバグのためコメントアウト
+  //-> decltype(make_range<SIZE>(
+  //		    make_range_iterator<SIZES...>(iter, strides...)))
 {
     return make_range<SIZE>(make_range_iterator<SIZES...>(iter, strides...));
 }
@@ -486,18 +566,6 @@ make_range(ITER iter, STRIDES... strides)
 /************************************************************************
 *  variable size & variable stride ranges and associated iterators	*
 ************************************************************************/
-//! 指定された長さのレンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
-/*!
-  \param iter	レンジの先頭要素を指す反復子
-  \param size	レンジ長
-  \param stride	インクリメント時に進める要素数
-*/
-template <class ITER> inline range_iterator<ITER>
-make_range_iterator(ITER iter, size_t size, size_t stride)
-{
-    return {iter, size, stride};
-}
-    
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param iter		レンジの先頭要素を指す反復子
@@ -507,19 +575,16 @@ make_range_iterator(ITER iter, size_t size, size_t stride)
 */
 template <class ITER, class... SS> inline auto
 make_range_iterator(ITER iter, size_t size, size_t stride, SS... ss)
+    -> decltype(make_range_iterator(make_range_iterator(iter, ss...),
+				    size, stride))
 {
     return make_range_iterator(make_range_iterator(iter, ss...),
 			       size, stride);
 }
 
-template <class ITER> inline range<ITER>
-make_range(ITER iter, size_t size)
-{
-    return {iter, iter + size};
-}
-
 template <class ITER, class... SS> inline auto
 make_range(ITER iter, size_t size, SS... ss)
+    -> decltype(make_range(make_range_iterator(iter, ss...), size))
 {
     return make_range(make_range_iterator(iter, ss...), size);
 }
@@ -528,44 +593,27 @@ make_range(ITER iter, size_t size, SS... ss)
 *  ranges with variable but identical size and stride			*
 *  and associated iterators						*
 ************************************************************************/
-template <class ITER> inline range_iterator<ITER>
-make_dense_range_iterator(ITER iter, size_t size)
+template <class ITER> inline ITER
+make_dense_range_iterator(ITER iter)
 {
-    return {iter, size, size};
+    return iter;
 }
     
 template <class ITER, class... SIZES> inline auto
 make_dense_range_iterator(ITER iter, size_t size, SIZES... sizes)
+  // g++-5.4.0 のバグのためコメントアウト
+  //-> decltype(make_range_iterator(
+  //		    make_dense_range_iterator(iter, sizes...), size, size))
 {
-    return make_dense_range_iterator(make_dense_range_iterator(iter, sizes...),
-				     size);
+    return make_range_iterator(make_dense_range_iterator(iter, sizes...),
+			       size, size);
 }
     
-template <class ITER> inline range<ITER>
-make_dense_range(ITER iter, size_t size)
-{
-    return {iter, iter + size};
-}
-
 template <class ITER, class... SIZES> inline auto
 make_dense_range(ITER iter, size_t size, SIZES... sizes)
+    -> decltype(make_range(make_dense_range_iterator(iter, sizes...), size))
 {
-    return make_dense_range(make_dense_range_iterator(iter, sizes...), size);
-}
-
-/************************************************************************
-*  sizes and strides of multidimensional ranges				*
-************************************************************************/
-template <size_t I=0, class ITER, size_t SIZE> inline size_t
-size(const range<ITER, SIZE>& r)
-{
-    return r.begin(std::integral_constant<size_t, I>())->size();
-}
-
-template <size_t I, class ITER, size_t SIZE> inline size_t
-stride(const range<ITER, SIZE>& r)
-{
-    return r.begin(std::integral_constant<size_t, I>()).stride();
+    return make_range(make_dense_range_iterator(iter, sizes...), size);
 }
 
 /************************************************************************
@@ -580,6 +628,9 @@ make_subrange_iterator(ITER iter)
 template <class ITER, class... IS> inline auto
 make_subrange_iterator(const range_iterator<ITER>& iter,
 		       size_t idx, size_t size, IS... is)
+    -> decltype(make_range_iterator(
+		    make_subrange_iterator(iter->begin() + idx, is...),
+		    size, iter.stride()))
 {
     return make_range_iterator(make_subrange_iterator(
 				   iter->begin() + idx, is...),
@@ -591,6 +642,8 @@ template <class RANGE, class... IS,
 	      is_range<typename std::decay<RANGE>::type>::value>::type* = nullptr>
 inline auto
 make_subrange(RANGE&& r, size_t idx, size_t size, IS... is)
+    -> decltype(make_range(make_subrange_iterator(
+			       r.begin() + idx, is...), size))
 {
     return make_range(make_subrange_iterator(r.begin() + idx, is...), size);
 }
@@ -599,6 +652,8 @@ template <class RANGE, class... IS,
 	  typename std::enable_if<is_range<RANGE>::value>::type* = nullptr>
 inline auto
 make_subrange(const RANGE& r, size_t idx, size_t size, IS... is)
+    -> decltype(make_range(
+		    make_subrange_iterator(r.begin() + idx, is...), size))
 {
     return make_range(make_subrange_iterator(r.begin() + idx, is...), size);
 }
@@ -608,6 +663,10 @@ template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES,
 	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
 inline auto
 make_subrange_iterator(const ITER& iter, size_t idx, INDICES... indices)
+  // g++-5.4.0 のバグのためコメントアウト
+  //-> decltype(make_range_iterator<SIZE>(
+  //		    make_subrange_iterator<SIZES...>(
+  //			iter->begin() + idx, indices...), iter.stride()))
 {
     return make_range_iterator<SIZE>(make_subrange_iterator<SIZES...>(
 					 iter->begin() + idx, indices...),
@@ -620,6 +679,8 @@ template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 	      (sizeof...(SIZES) == sizeof...(INDICES))>::type* = nullptr>
 inline auto
 make_subrange(RANGE&& r, size_t idx, INDICES... indices)
+    -> decltype(make_range<SIZE>(make_subrange_iterator<SIZES...>(
+  				     r.begin() + idx, indices...)))
 {
     return make_range<SIZE>(make_subrange_iterator<SIZES...>(
 				r.begin() + idx, indices...));
@@ -631,11 +692,14 @@ template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 	      (sizeof...(SIZES) == sizeof...(INDICES))>::type* = nullptr>
 inline auto
 make_subrange(const RANGE& r, size_t idx, INDICES... indices)
+    -> decltype(make_range<SIZE>(make_subrange_iterator<SIZES...>(
+				     r.begin() + idx, indices...)))
 {
     return make_range<SIZE>(make_subrange_iterator<SIZES...>(
 				r.begin() + idx, indices...));
 }
-
+#endif	// !__NVCC__
+    
 /************************************************************************
 *  generic algorithms for ranges					*
 ************************************************************************/

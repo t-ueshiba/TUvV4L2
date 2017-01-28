@@ -364,7 +364,7 @@ size(const boost::tuples::cons<HEAD, TAIL>& x)
 template <class T> inline size_t
 ncol(const T& x)
 {
-    return (x.begin() != x.end() ? size(*x.begin()) : 0);
+    return (x.begin() != x.end() ? TU::size(*x.begin()) : 0);
 }
       
 /************************************************************************
