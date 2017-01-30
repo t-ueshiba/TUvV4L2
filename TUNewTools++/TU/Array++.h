@@ -591,12 +591,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		}
 
-    template <class T_, class ALLOC_, size_t SIZE_, size_t... SIZES_>
-    typename std::enable_if<std::is_same<
-				typename array<T_, ALLOC_, SIZE_, SIZES_...>
-				::element_type,
-				element_type>::value>::type
-		write(array<T_, ALLOC_, SIZE_, SIZES_...>& a) const
+    template <class ALLOC_>
+    void	write(array<T, ALLOC_, SIZE, SIZES...>& a) const
 		{
 		    a.resize(sizes(), a.stride());
 		    super::copy(begin(), end(), a.begin());
@@ -733,6 +729,20 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 			save(out, begin->begin(), begin->end());
 		}
 };
+
+template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
+inline size_t
+size(const array<T, ALLOC, SIZE, SIZES...>& a)
+{
+    return a.template size<I>();
+}
+
+template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
+inline size_t
+stride(const array<T, ALLOC, SIZE, SIZES...>& a)
+{
+    return a.template stride<I>();
+}
 
 template <class T, class ALLOC, size_t SIZE, size_t... SIZES> std::ostream&
 operator <<(std::ostream& out, const array<T, ALLOC, SIZE, SIZES...>& a)

@@ -38,6 +38,7 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		=
 HDRS		= TU/Array++.h \
+		TU/Array++11.h \
 		TU/algorithm.h \
 		TU/range.h \
 		TU/utility.h
