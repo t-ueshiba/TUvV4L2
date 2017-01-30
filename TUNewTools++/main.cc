@@ -3,8 +3,11 @@
  */
 #include <fstream>
 #include <vector>
-#include "TU/Array++.h"
-//#include "TU/Array++11.h"
+#ifdef CPP11
+#  include "TU/Array++11.h"
+#else
+#  include "TU/Array++.h"
+#endif
 
 namespace TU
 {
