@@ -13,7 +13,6 @@
 #include <memory>		// for std::allocator<T>, std::unique_ptr<T>
 #include "TU/range.h"
 #include "TU/utility.h"		// for std::index_sequence<Ints...>
-#include "TU/algorithm.h"	// for TU::lcm()
 
 namespace TU
 {
@@ -51,8 +50,7 @@ class external_allocator
     static void		deallocate(pointer, size_type)			{}
     static void		construct(pointer p, const_reference val)	{}
     static void		destroy(pointer p)				{}
-    constexpr
-    size_type		max_size()		const	{ return _size; }
+    constexpr size_type	max_size()		const	{ return _size; }
     static pointer	address(reference r)		{ return &r; }
     static const_pointer
 			address(const_reference r)	{ return &r; }
@@ -268,10 +266,14 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    :_sizes(b._sizes), _stride(b._stride),
 		     _capacity(b._capacity), _p(alloc(_capacity))
 		{
+		    std::cout << "Buf<0>::Buf(const Buf&) ["
+		  	      << print_sizes_and_strides(b) << ']' << std::endl;
 		    super::copy(b.begin(), b.end(), begin());
 		}
     Buf&	operator =(const Buf& b)
 		{
+		    std::cout << "Buf<0>::operator =(const Buf&) ["
+		  	      << print_sizes_and_strides(b) << ']' << std::endl;
 		    if (this != &b)
 		    {
 			resize(b._sizes, b._stride);
@@ -295,6 +297,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    
 		  // b の 破壊時に this->_p がdeleteされることを防ぐ．
 		    b._p = super::null();
+
+		    return *this;
 		}
 		~Buf()
 		{
@@ -513,6 +517,9 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     using const_reference	 = typename std::iterator_traits<const_iterator>
 					       ::reference;
     
+    constexpr static size_t	dimension	= D;	//!< 配列の次元
+    constexpr static size_t	size0		= SIZE;	//!< 最上位軸のサイズ
+    
   public:
 		array()				= default;
 		array(const array&)		= default;
@@ -552,14 +559,18 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
-		    std::copy(std::begin(expr), std::end(expr), begin());
+		    std::cout << "array::array(const E_&) ["
+			      << print_sizes(expr) << ']' << std::endl;
+		    copy<SIZE>(std::begin(expr), std::end(expr), begin());
 		}
     template <class E_>
     typename std::enable_if<is_range<E_>::value, array&>::type
 		operator =(const E_& expr)
 		{
+		    std::cout << "array::operator =(const E_&) ["
+		  	      << print_sizes(expr) << ']' << std::endl;
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
-		    std::copy(std::begin(expr), std::end(expr), begin());
+		    copy<SIZE>(std::begin(expr), std::end(expr), begin());
 
 		    return *this;
 		}
@@ -567,12 +578,12 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(std::initializer_list<const_value_type> args)
 		    :super(sizes(args))
 		{
-		    std::copy(args.begin(), args.end(), begin());
+		    copy<SIZE>(args.begin(), args.end(), begin());
 		}
     array&	operator =(std::initializer_list<const_value_type> args)
 		{
 		    super::resize(sizes(args));
-		    std::copy(args.begin(), args.end(), begin());
+		    copy<SIZE>(args.begin(), args.end(), begin());
 
 		    return *this;
 		}
@@ -598,8 +609,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    super::copy(begin(), end(), a.begin());
 		}
 
-    constexpr size_t
-		dimension()		{ return D; }
     using	super::size;
     using	super::stride;
     using	super::nrow;
@@ -771,6 +780,147 @@ using Array2 = array<T, ALLOC, R, C>;
 template <class T,
 	  size_t Z=0, size_t Y=0, size_t X=0, class ALLOC=std::allocator<T> >
 using Array3 = array<T, ALLOC, Z, Y, X>;
+
+/************************************************************************
+*  evaluation of multi-dimensional ranges				*
+************************************************************************/
+namespace detail
+{
+  template <class E>
+  struct result_t
+  {
+      using type = E;
+  };
+  template <class ITER, size_t SIZE>
+  struct result_t<range<ITER, SIZE> >
+  {
+    private:
+      template <size_t SIZE_, class T_>
+      struct cat
+      {
+	  using type = array<T_, std::allocator<T_>, SIZE_>;
+      };
+      template <size_t SIZE_, class T_, size_t... SIZES_>
+      struct cat<SIZE_, array<T_, std::allocator<T_>, SIZES_...> >
+      {
+	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
+      };
+
+    public:
+      using type = typename cat<
+		       SIZE,
+		       typename result_t<
+			   typename std::iterator_traits<ITER>::value_type>
+		       ::type>::type;
+  };
+
+}	// namespace detail
+
+template <class E>
+using result_t	= typename detail::result_t<E>::type;
+
+template <class ITER, size_t SIZE> inline result_t<range<ITER, SIZE> >
+eval(const range<ITER, SIZE>& r)
+{
+    return {r};
+}
+    
+template <class E> inline const E&
+eval(const E& expr)
+{
+    return expr;
+}
+    
+/************************************************************************
+*  products of two ranges						*
+************************************************************************/
+template <class L, class R,
+	  typename std::enable_if<
+	      (is_range1<L>::value && is_range1<R>::value)>::type* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    return std::inner_product(std::begin(l), std::end(l), std::begin(r), 0);
+}
+
+namespace detail
+{
+  template <class ITER, class T>
+  class prod_operator
+  {
+    private:
+      using argument_t	= TU::result_t<T>;
+      using cache_t	= typename std::conditional<
+			      std::is_same<T, argument_t>::value,
+			      const argument_t&, const argument_t>::type;
+
+      class prod
+      {
+	public:
+		prod(const argument_t& arg)
+		    :_arg(arg)
+		{
+		}
+
+	  template <class S_>
+	  auto	operator ()(const S_& val) const
+		{
+		    return val * _arg;
+		}
+	  
+	private:
+	  const argument_t&	_arg;
+      };
+      
+    public:
+		prod_operator(ITER begin, ITER end, const T& arg)
+		    :_begin(begin), _end(end), _arg(arg)
+		{
+		}
+
+      auto	begin() const
+		{
+		    return boost::make_transform_iterator(_begin, prod(_arg));
+		}
+      auto	end() const
+		{
+		    return boost::make_transform_iterator(_end, prod(_arg));
+		}
+      size_t	size() const
+		{
+		    return end() - begin();
+		}
+      
+    private:
+      const ITER	_begin;
+      const ITER	_end;
+      cache_t		_arg;	// Tが演算子ならばその評価結果をキャッシュする
+  };
+
+  template <class ITER, class T> inline auto
+  make_prod_operator(ITER begin, ITER end, const T& arg)
+  {
+      return prod_operator<ITER, T>(begin, end, arg);
+  }
+}
+
+template <class L, class R,
+	  typename std::enable_if<
+	      (is_range2<L>::value && is_range<R>::value)>::type* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    return detail::make_prod_operator(std::begin(l), std::end(l), r);
+}
+
+template <class L, class R,
+	  typename std::enable_if<
+	      (is_range1<L>::value && is_range2<R>::value)>::type* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    return detail::make_prod_operator(column_begin(r), column_end(r), l);
+}
 
 }	// namespace TU
 #endif	// !__TU_ARRAY_H

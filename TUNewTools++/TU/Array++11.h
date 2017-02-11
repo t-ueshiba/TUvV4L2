@@ -11,7 +11,7 @@
 #include <array>
 #include <iomanip>		// for std::ws
 #include <memory>		// for std::allocator<T>, std::unique_ptr<T>
-#include "TU/range.h"
+#include "TU/range++11.h"
 #include "TU/utility.h"		// for std::index_sequence<Ints...>
 #include "TU/algorithm.h"	// for TU::lcm()
 
@@ -181,16 +181,16 @@ class Buf : public BufTraits<T, ALLOC>
 		}
     template <size_t SIZE_, size_t... SIZES_, class ITER_>
     static auto	make_iterator(ITER_ iter)
-      //-> decltype(make_range_iterator<SIZE_, SIZE_>(
-      //	Buf::make_iterator<SIZES_...>(iter)))
+		    -> decltype(make_range_iterator<SIZE_, SIZE_>(
+				    Buf::make_iterator<SIZES_...>(iter)))
 		{
 		    return make_range_iterator<SIZE_, SIZE_>(
 			       make_iterator<SIZES_...>(iter));
 		}
 
-    using iterator	 = decltype(make_iterator<SIZES...>(
+    using iterator	 = decltype(Buf::make_iterator<SIZES...>(
 					std::declval<base_iterator>()));
-    using const_iterator = decltype(make_iterator<SIZES...>(
+    using const_iterator = decltype(Buf::make_iterator<SIZES...>(
 					std::declval<const_base_iterator>()));
     
   public:
@@ -263,6 +263,15 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
 
+    template <class ITER_>
+    static ITER_
+		make_iterator_dummy(ITER_)			;
+    template <size_t SIZE_, size_t... SIZES_, class ITER_>
+    static auto	make_iterator_dummy(ITER_ iter)
+		    -> decltype(make_range_iterator(
+				    Buf::make_iterator_dummy<SIZES_...>(iter),
+				    0, 0));
+
   public:
     constexpr static size_t	D = 1 + sizeof...(SIZES);
 
@@ -271,7 +280,13 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     using typename super::allocator_type;
     using typename super::pointer;
     using typename super::const_pointer;
-
+    using iterator
+		= decltype(Buf::make_iterator_dummy<SIZES...>(
+				       std::declval<base_iterator>()));
+    using const_iterator
+		= decltype(Buf::make_iterator_dummy<SIZES...>(
+			       std::declval<const_base_iterator>()));
+    
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
 		Buf()
@@ -342,29 +357,33 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		{
 		}
 
-    const auto&	sizes()		const	{ return _sizes; }
+    const sizes_type&
+		sizes()		const	{ return _sizes; }
     template <size_t I_=0>
-    auto	size()		const	{ return _sizes[I_]; }
+    size_t	size()		const	{ return _sizes[I_]; }
     template <size_t I_=D-1>
-    auto	stride()	const	{ return stride_impl(axis<I_>()); }
-    auto	nrow()		const	{ return _sizes[0]; }
-    auto	ncol()		const	{ return _sizes[1]; }
-    auto	data()			{ return _p; }
-    auto	data()		const	{ return _p; }
-    auto	begin()
+    size_t	stride()	const	{ return stride_impl(axis<I_>()); }
+    size_t	nrow()		const	{ return _sizes[0]; }
+    size_t	ncol()		const	{ return _sizes[1]; }
+    pointer	data()			{ return _p; }
+    const_pointer
+		data()		const	{ return _p; }
+    iterator	begin()
 		{
 		    return make_iterator<SIZES...>(base_iterator(_p));
 		}
-    auto	begin() const
+    const_iterator
+		begin() const
 		{
 		    return make_iterator<SIZES...>(const_base_iterator(_p));
 		}
-    auto	end()
+    iterator	end()
 		{
 		    return make_iterator<SIZES...>(base_iterator(
 						       _p + _capacity));
 		}
-    auto	end() const
+    const_iterator
+		end() const
 		{
 		    return make_iterator<SIZES...>(const_base_iterator(
 						       _p + _capacity));
@@ -387,8 +406,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     
   private:
     template <size_t I_>
-    auto	stride_impl(axis<I_>)		const	{ return _sizes[I_]; }
-    auto	stride_impl(axis<D-1>)		const	{ return _stride; }
+    size_t	stride_impl(axis<I_>)		const	{ return _sizes[I_]; }
+    size_t	stride_impl(axis<D-1>)		const	{ return _stride; }
 
     size_t	capacity(axis<D-1>) const
 		{
@@ -418,12 +437,17 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
 
     template <class ITER_>
-    static auto	make_iterator(ITER_ iter)
+    static ITER_
+		make_iterator(ITER_ iter)
 		{
 		    return iter;
 		}
     template <size_t SIZE_, size_t... SIZES_, class ITER_>
     auto	make_iterator(ITER_ iter) const
+		    -> decltype(make_range_iterator(
+				    make_iterator<SIZES_...>(iter),
+				    size<D-1-sizeof...(SIZES_)>(),
+				    stride<D-1-sizeof...(SIZES_)>()))
 		{
 		    constexpr size_t	I = D - 1 - sizeof...(SIZES_);
 		    
@@ -513,10 +537,9 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     using typename super::sizes_type;
     using typename super::pointer;
     using typename super::const_pointer;
+    using typename super::iterator;
+    using typename super::const_iterator;
     using element_type		 = T;
-    using iterator		 = decltype(std::declval<super*>()->begin());
-    using const_iterator	 = decltype(std::declval<const super*>()
-					    ->begin());
     using reverse_iterator	 = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using value_type		 = typename std::iterator_traits<iterator>
@@ -613,7 +636,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    super::copy(begin(), end(), a.begin());
 		}
 
-    constexpr size_t
+    constexpr static size_t
 		dimension()		{ return D; }
     using	super::size;
     using	super::stride;
@@ -628,14 +651,22 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     range<const_iterator>
 		operator ()()	const	{ return {begin(), end()}; }
 	    
-    auto	cbegin()  const	{ return begin(); }
-    auto	cend()	  const	{ return end(); }
-    auto	rbegin()	{ return reverse_iterator(end()); }
-    auto	rbegin()  const	{ return const_reverse_iterator(end()); }
-    auto	crbegin() const	{ return rbegin(); }
-    auto	rend()		{ return reverse_iterator(begin()); }
-    auto	rend()	  const	{ return const_reverse_iterator(begin()); }
-    auto	crend()	  const	{ return rend(); }
+    const_iterator
+		cbegin()  const	{ return begin(); }
+    const_iterator
+		cend()	  const	{ return end(); }
+    reverse_iterator
+		rbegin()	{ return reverse_iterator(end()); }
+    const_reverse_iterator
+		rbegin()  const	{ return const_reverse_iterator(end()); }
+    const_reverse_iterator
+		crbegin() const	{ return rbegin(); }
+    reverse_iterator
+		rend()		{ return reverse_iterator(begin()); }
+    const_reverse_iterator
+		rend()	  const	{ return const_reverse_iterator(begin()); }
+    const_reverse_iterator
+		crend()	  const	{ return rend(); }
     reference	operator [](size_t i)
 		{
 		    assert(i < size());
@@ -704,7 +735,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    return sizs;
 		}
     
-    static auto	to_stride(size_t unit, size_t size)
+    static size_t
+		to_stride(size_t unit, size_t size)
 		{
 		    constexpr auto	elmsiz = sizeof(element_type);
 
@@ -715,7 +747,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    return n*((size + n - 1)/n);
 		}
     template <class... SIZES_>
-    static auto	to_stride(size_t unit, size_t size, SIZES_... sizes)
+    static size_t
+		to_stride(size_t unit, size_t size, SIZES_... sizes)
 		{
 		    return to_stride(unit, sizes...);
 		}
