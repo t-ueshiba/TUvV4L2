@@ -10,6 +10,7 @@
 #  include "TU/Array++.h"
 #endif
 #include "TU/functional.h"
+#include <boost/core/demangle.hpp>
 
 namespace TU
 {
@@ -78,9 +79,11 @@ test_subrange(const BUF& buf)
     auto	r = make_range<2, 2, 2, 3, 6>(buf.begin());
     std::cout << "--- make_range<2, 2, 2, 3, 6>(" << print_sizes_and_strides(r)
 	      << ") ---\n" << r;
-
+    using	boost::core::demangle;
+    
     size_t		ncol = 6;
-    Array2<value_type>	a2(make_dense_range(buf.begin(), buf.size()/ncol, ncol));
+    Array2<value_type>	a2(make_dense_range(buf.begin(),
+					    buf.size()/ncol, ncol));
     auto		s2 = make_subrange(a2, 1, 2, 2, 3);
     std::cout << "--- a2 (" << print_sizes_and_strides(a2) << ") ---\n" << a2
 	      << "--- subrange(a2, 1, 2, 2, 3) (" << print_sizes_and_strides(s2)
@@ -112,7 +115,8 @@ test_binary_io(const BUF& buf)
     std::cout << "*** binary I/O test ***" << std::endl;
     
     size_t		ncol = 6;
-    Array2<value_type>	a2(make_dense_range(buf.begin(), buf.size()/ncol, ncol));
+    Array2<value_type>	a2(make_dense_range(buf.begin(),
+					    buf.size()/ncol, ncol));
 
     std::ofstream	out("tmp.data", std::ios::binary);
     a2.save(out);
@@ -180,8 +184,6 @@ test_external_allocator(BUF buf)
   //make_subrange(a2[0], 1, 3) = {1000, 2000, 300};
     make_subrange<2, 3>(a2, 1, 2) = {{100, 200, 300}, {400, 500, 600}};
     std::cout << "--- a2(" << print_sizes_and_strides(a2) << ") ---\n" << a2;
-
-    std::cout << std::is_convertible<range<range_iterator<int*> >, range<range_iterator<const int*> > >::value << std::endl;
 }
 
 template <class BUF> static void
@@ -191,7 +193,7 @@ test_numeric(const BUF& buf)
 
     std::cout << "*** numeric test ***" << std::endl;
     
-    auto		a = make_dense_range(buf.begin(), 2, 6);
+    auto		a = make_range<2, 6, 6>(buf.begin());
     Array2<value_type>	b{{{100, 110, 120, 130, 140, 150},
 			   {160, 170, 180, 190, 200, 210}}};
     Array2<float>	c;
@@ -201,10 +203,36 @@ test_numeric(const BUF& buf)
     auto		d = transpose(c);
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
 
-    std::cout << std::is_same<result_t<decltype(d)>, Array2<float> >::value
-	      << std::endl;
-}
+    using	boost::core::demangle;
+    
+    auto	x = a + b + b;
+    std::cout << is_rangeobj<decltype(b)>::value << std::endl;
+    std::cout << is_rangeobj<decltype(x)>::value << std::endl;
 
+    std::cout << demangle(typeid(result_t<decltype(a)>).name()) << std::endl;
+    std::cout << demangle(typeid(result_t<decltype(x)>).name()) << std::endl;
+}
+  /*
+static void
+test_numeric2()
+{
+    using value_type = int;
+
+    std::cout << "*** numeric test2 ***" << std::endl;
+    
+    std::array<std::array<int, 6>, 2>		a{{{0, 1, 2, 3, 4, 5}, {6, 7, 8, 9, 10, 11}}};
+    float	b[][6]{{100, 110, 120, 130, 140, 150},
+		       {160, 170, 180, 190, 200, 210}};
+    double	c[2][6];
+    std::cout << is_range<decltype(a)>::value << std::endl;
+    c = TU::operator +(a, b);
+    std::cout << c;
+  //std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
+
+    auto		d = transpose(c);
+    std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
+}
+  */
 static void
 test_prod()
 {
@@ -214,7 +242,10 @@ test_prod()
 
     std::cout << "*** prod test ***" << std::endl;
     
-    vector_type	a = {1, 2, 3}, b = {4, 5, 6}, c;
+  //const vector_type	a = {1, 2, 3};
+    const Array<int, 3>	a = {1, 2, 3};
+    const vector_type	b = {4, 5, 6};
+    vector_type		c;
 
     std::cout << "*** t = a * a ***" << std::endl;
     element_type	t = a * a;
@@ -224,9 +255,9 @@ test_prod()
     c = a * t;
     std::cout << c << std::endl;
 
-    matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
-    matrix_type	B = {{1, 2}, {10, 20}, {100, 200}};
-    matrix_type	C;
+    const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
+    const matrix_type	B = {{1, 2}, {10, 20}, {100, 200}};
+    matrix_type		C, D;
 
     std::cout << "*** C = -(A + A + A) ***" << std::endl;
     C = -(A + A + A);
@@ -236,7 +267,7 @@ test_prod()
     c = A * (a + b);
   //c = A * a;
     std::cout << c << std::endl;
-
+#if 0
     C = B;
     std::cout << "*** c = a * (B + C) ***" << std::endl;
     c = a * (B + C);
@@ -245,7 +276,7 @@ test_prod()
     std::cout << "*** C = A * (B + C) ***" << std::endl;
     C = A * (B + C);
     std::cout << C;
-#if 0
+
     std::cout << "*** C = (a + b) % c ***" << std::endl;
     C = (a + b) % c;
     std::cout << C;
@@ -274,6 +305,7 @@ main()
     TU::test_text_io(buf);
     TU::test_external_allocator(buf);
     TU::test_numeric(buf);
+  //TU::test_numeric2();
     TU::test_prod();
     
     return 0;

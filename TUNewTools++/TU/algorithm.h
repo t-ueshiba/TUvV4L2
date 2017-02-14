@@ -65,7 +65,10 @@ namespace detail
   template <class IN, class OUT> inline OUT
   copy(IN ib, IN ie, OUT out, std::integral_constant<size_t, 0>)
   {
-      return std::copy(ib, ie, out);
+      for (; ib != ie; ++ib, ++out)
+	  *out = *ib;
+      return out;
+    //return std::copy(ib, ie, out);
   }
   template <class IN, class OUT, size_t N> inline OUT
   copy(IN ib, IN, OUT out, std::integral_constant<size_t, 1>)

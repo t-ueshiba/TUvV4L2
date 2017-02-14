@@ -518,7 +518,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 					       ::reference;
     
     constexpr static size_t	dimension	= D;	//!< 配列の次元
-    constexpr static size_t	size0		= SIZE;	//!< 最上位軸のサイズ
+    constexpr static size_t	size0		= SIZE;	//!< 最初の軸の要素数
     
   public:
 		array()				= default;
@@ -561,7 +561,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		    std::cout << "array::array(const E_&) ["
 			      << print_sizes(expr) << ']' << std::endl;
-		    copy<SIZE>(std::begin(expr), std::end(expr), begin());
+		    constexpr size_t	SIZ = std::max(size0, E_::size0);
+		    copy<SIZ>(std::begin(expr), std::end(expr), begin());
 		}
     template <class E_>
     typename std::enable_if<is_range<E_>::value, array&>::type
@@ -570,7 +571,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    std::cout << "array::operator =(const E_&) ["
 		  	      << print_sizes(expr) << ']' << std::endl;
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
-		    copy<SIZE>(std::begin(expr), std::end(expr), begin());
+		    constexpr size_t	siz0 = std::max(size0, E_::size0);
+		    copy<siz0>(std::begin(expr), std::end(expr), begin());
 
 		    return *this;
 		}
@@ -578,12 +580,12 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(std::initializer_list<const_value_type> args)
 		    :super(sizes(args))
 		{
-		    copy<SIZE>(args.begin(), args.end(), begin());
+		    copy<size0>(args.begin(), args.end(), begin());
 		}
     array&	operator =(std::initializer_list<const_value_type> args)
 		{
 		    super::resize(sizes(args));
-		    copy<SIZE>(args.begin(), args.end(), begin());
+		    copy<size0>(args.begin(), args.end(), begin());
 
 		    return *this;
 		}
@@ -782,51 +784,43 @@ template <class T,
 using Array3 = array<T, ALLOC, Z, Y, X>;
 
 /************************************************************************
-*  evaluation of multi-dimensional ranges				*
+*  evaluation of opnodes						*
 ************************************************************************/
 namespace detail
 {
-  template <class E>
+  template <class E, bool=is_opnode<E>::value>
   struct result_t
   {
       using type = E;
   };
-  template <class ITER, size_t SIZE>
-  struct result_t<range<ITER, SIZE> >
+  template <class E>
+  struct result_t<E, true>
   {
     private:
-      template <size_t SIZE_, class T_>
+      template <class T_, size_t SIZE_>
       struct cat
       {
 	  using type = array<T_, std::allocator<T_>, SIZE_>;
       };
-      template <size_t SIZE_, class T_, size_t... SIZES_>
-      struct cat<SIZE_, array<T_, std::allocator<T_>, SIZES_...> >
+      template <class T_, size_t SIZE_, size_t... SIZES_>
+      struct cat<array<T_, std::allocator<T_>, SIZES_...>, SIZE_>
       {
 	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
       };
 
     public:
-      using type = typename cat<
-		       SIZE,
-		       typename result_t<
-			   typename std::iterator_traits<ITER>::value_type>
-		       ::type>::type;
+      using type = typename cat<typename result_t<TU::value_t<E> >::type,
+				E::size0>::type;
   };
-
 }	// namespace detail
 
 template <class E>
 using result_t	= typename detail::result_t<E>::type;
 
-template <class ITER, size_t SIZE> inline result_t<range<ITER, SIZE> >
-eval(const range<ITER, SIZE>& r)
-{
-    return {r};
-}
-    
-template <class E> inline const E&
-eval(const E& expr)
+template <class E>
+inline typename std::conditional<detail::is_opnode<E>::value,
+				 result_t<E>, const E&>::type
+evaluate(const E& expr)
 {
     return expr;
 }
@@ -836,73 +830,74 @@ eval(const E& expr)
 ************************************************************************/
 template <class L, class R,
 	  typename std::enable_if<
-	      (is_range1<L>::value && is_range1<R>::value)>::type* = nullptr>
+	      is_range1<L>::value && is_range1<R>::value>::type* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
-    return std::inner_product(std::begin(l), std::end(l), std::begin(r), 0);
+    using value_type = typename std::common_type<value_t<L>, value_t<R> >::type;
+
+    constexpr size_t	size0 = std::max(L::size0, R::size0);
+    
+    return inner_product<size0>(std::begin(l), std::end(l), std::begin(r),
+				value_type(0));
 }
 
 namespace detail
 {
-  template <class ITER, class T>
-  class prod_operator
+  template <class T>
+  struct cache
   {
-    private:
-      using argument_t	= TU::result_t<T>;
-      using cache_t	= typename std::conditional<
-			      std::is_same<T, argument_t>::value,
-			      const argument_t&, const argument_t>::type;
+      using value_type	= TU::result_t<T>;
+      using cache_type	= typename std::conditional<
+			      (std::is_same<T, value_type>::value &&
+			       !TU::is_rangeobj<T>::value),
+			      const value_type&, const value_type>::type;
 
-      class prod
-      {
-	public:
-		prod(const argument_t& arg)
-		    :_arg(arg)
-		{
-		}
-
-	  template <class S_>
-	  auto	operator ()(const S_& val) const
-		{
-		    return val * _arg;
-		}
-	  
-	private:
-	  const argument_t&	_arg;
-      };
+      cache(const T& arg_)	:arg(arg_)		{}
       
+      cache_type	arg;
+  };
+    
+  template <class T>
+  class product
+  {
     public:
-		prod_operator(ITER begin, ITER end, const T& arg)
-		    :_begin(begin), _end(end), _arg(arg)
-		{
-		}
-
-      auto	begin() const
-		{
-		    return boost::make_transform_iterator(_begin, prod(_arg));
-		}
-      auto	end() const
-		{
-		    return boost::make_transform_iterator(_end, prod(_arg));
-		}
-      size_t	size() const
-		{
-		    return end() - begin();
-		}
-      
+      product(const T& arg)	:_arg(arg)		{}
+	      
+      template <class S_>
+      auto	operator ()(const S_& val)	const	{ return val * _arg; }
+	  
     private:
-      const ITER	_begin;
-      const ITER	_end;
-      cache_t		_arg;	// Tが演算子ならばその評価結果をキャッシュする
+      const T&	_arg;
   };
 
-  template <class ITER, class T> inline auto
-  make_prod_operator(ITER begin, ITER end, const T& arg)
+  template <class ITER, class T>
+  class product_operator
+      : private cache<T>,
+	public  range<boost::transform_iterator<
+			  product<typename cache<T>::value_type>, ITER> >,
+	public  opnode
   {
-      return prod_operator<ITER, T>(begin, end, arg);
+    private:
+      using cache_t	= cache<T>;
+      using range_t	= range<boost::transform_iterator<
+				    product<typename cache_t::value_type>,
+				    ITER> >;
+
+    public:
+		product_operator(ITER begin, ITER end, const T& arg)
+		    :cache_t(arg),
+		     range_t({begin, {cache_t::arg}}, {end, {cache_t::arg}})
+		{
+		}
+  };
+
+  template <class ITER, class T> inline product_operator<ITER, T>
+  make_product_operator(ITER begin, ITER end, const T& arg)
+  {
+      return {begin, end, arg};
   }
-}
+}	// namespace detail
 
 template <class L, class R,
 	  typename std::enable_if<
@@ -910,7 +905,7 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    return detail::make_prod_operator(std::begin(l), std::end(l), r);
+    return detail::make_product_operator(std::begin(l), std::end(l), r);
 }
 
 template <class L, class R,
@@ -919,7 +914,7 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    return detail::make_prod_operator(column_begin(r), column_end(r), l);
+    return detail::make_product_operator(column_begin(r), column_end(r), l);
 }
 
 }	// namespace TU
