@@ -68,21 +68,26 @@ lcm(S m, T n, ARGS... args)
 namespace detail
 {
   template <class IN, class OUT> inline OUT
-  copy(IN ib, IN ie, OUT out, std::integral_constant<size_t, 0>)
+  copy(IN in, IN ie, OUT out, std::integral_constant<size_t, 0>)
   {
-      return std::copy(ib, ie, out);
+      return std::copy(in, ie, out);
   }
-  template <class IN, class OUT, size_t N> inline OUT
-  copy(IN ib, IN, OUT out, std::integral_constant<size_t, 1>)
+  template <class IN, class OUT> inline OUT
+  copy(IN in, size_t n, OUT out, std::integral_constant<size_t, 0>)
   {
-      *out = *ib;
+      return std::copy_n(in, n, out);
+  }
+  template <class IN, class ARG, class OUT> inline OUT
+  copy(IN in, ARG, OUT out, std::integral_constant<size_t, 1>)
+  {
+      *out = *in;
       return ++out;
   }
-  template <class IN, class OUT, size_t N> inline OUT
-  copy(IN ib, IN ie, OUT out, std::integral_constant<size_t, N>)
+  template <class IN, class ARG, class OUT, size_t N> inline OUT
+  copy(IN in, ARG arg, OUT out, std::integral_constant<size_t, N>)
   {
-      *out = *ib;
-      return copy(++ib, ie, ++out, std::integral_constant<size_t, N-1>());
+      *out = *in;
+      return copy(++in, arg, ++out, std::integral_constant<size_t, N-1>());
   }
 
   template <class ITER, class T> inline void
@@ -90,59 +95,21 @@ namespace detail
   {
       std::fill(begin, end, val);
   }
+  template <class ITER, class T> inline void
+  fill(ITER begin, size_t n, const T& val, std::integral_constant<size_t, 0>)
+  {
+      std::fill_n(begin, n, val);
+  }
   template <class ITER, class T, size_t N> inline void
   fill(ITER begin, ITER, const T& val, std::integral_constant<size_t, 1>)
   {
       *begin = val;
   }
-  template <class ITER, class T, size_t N> inline void
-  fill(ITER begin, ITER end, const T& val, std::integral_constant<size_t, N>)
+  template <class ITER, class ARG, class T, size_t N> inline void
+  fill(ITER begin, ARG arg, const T& val, std::integral_constant<size_t, N>)
   {
       *begin = val;
-      fill(++begin, end, val, std::integral_constant<size_t, N-1>());
-  }
-    
-  template <class ITER, class FUNC> inline FUNC
-  for_each(ITER begin, ITER end, FUNC func, std::integral_constant<size_t, 0>)
-  {
-      return std::for_each(begin, end, func);
-  }
-  template <class ITER, class FUNC, size_t N> inline FUNC
-  for_each(ITER begin, ITER, FUNC func, std::integral_constant<size_t, 1>)
-  {
-      func(*begin);
-      return func;
-  }
-  template <class ITER, class FUNC, size_t N> inline FUNC
-  for_each(ITER begin, ITER end, FUNC func, std::integral_constant<size_t, N>)
-  {
-      func(*begin);
-      return for_each(++begin, end, func,
-		      std::integral_constant<size_t, N-1>());
-  }
-    
-  template <class ITER0, class ITER1, class FUNC> inline FUNC
-  for_each(ITER0 begin0, ITER0 end0, ITER1 begin1, FUNC func,
-	   std::integral_constant<size_t, 0>)
-  {
-      for (; begin0 != end0; ++begin0, ++begin1)
-	  func(*begin0, *begin1);
-      return func;
-  }
-  template <class ITER0, class ITER1, class FUNC> inline FUNC
-  for_each(ITER0 begin0, ITER0, ITER1 begin1, FUNC func,
-	   std::integral_constant<size_t, 1>)
-  {
-      func(*begin0, *begin1);
-      return func;
-  }
-  template <class ITER0, class ITER1, class FUNC, size_t N> inline FUNC
-  for_each(ITER0 begin0, ITER0 end0, ITER1 begin1, FUNC func,
-	   std::integral_constant<size_t, N>)
-  {
-      func(*begin0, *begin1);
-      return for_each(++begin0, end0, ++begin1, func,
-		      std::integral_constant<size_t, N-1>());
+      fill(++begin, arg, val, std::integral_constant<size_t, N-1>());
   }
     
   template <class ITER0, class ITER1, class T> inline T
@@ -152,17 +119,26 @@ namespace detail
       return std::inner_product(begin0, end0, begin1, init);
   }
   template <class ITER0, class ITER1, class T> inline T
-  inner_product(ITER0 begin0, ITER0, ITER1 begin1, const T& init,
+  inner_product(ITER0 begin0, size_t n, ITER1 begin1, const T& init,
+		std::integral_constant<size_t, 0>)
+  {
+      auto	val = init;
+      for (size_t i = 0; i != n; ++i, ++begin0, ++begin1)
+	  val += *begin0 * *begin1;
+      return val;
+  }
+  template <class ITER0, class ARG, class ITER1, class T> inline T
+  inner_product(ITER0 begin0, ARG, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, 1>)
   {
       return init + *begin0 * *begin1;
   }
-  template <class ITER0, class ITER1, class T, size_t N> inline T
-  inner_product(ITER0 begin0, ITER0 end0, ITER1 begin1, const T& init,
+  template <class ITER0, class ARG, class ITER1, class T, size_t N> inline T
+  inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, N>)
   {
       const T	tmp = init + *begin0 * *begin1;
-      return inner_product(++begin0, end0, ++begin1, tmp,
+      return inner_product(++begin0, arg, ++begin1, tmp,
 			   std::integral_constant<size_t, N-1>());
   }
 
@@ -177,107 +153,93 @@ namespace detail
   {
       using value_type	= typename std::iterator_traits<ITER>::value_type;
     
-      return std::accumulate(begin, end, value_type(0),
-			     [](const value_type& init, const value_type& val)
-			     { return init + square(val); });
+      value_type	val = 0;
+      for (; begin != end; ++begin)
+	  val += square(*begin);
+      return val;
   }
   template <class ITER> inline auto
-  square(ITER begin, ITER, std::integral_constant<size_t, 1>)
+  square(ITER begin, size_t n, std::integral_constant<size_t, 0>)
+  {
+      using value_type	= typename std::iterator_traits<ITER>::value_type;
+
+      value_type	val = 0;
+      for (size_t i = 0; i != n; ++i, ++begin)
+	  val += square(*begin);
+      return val;
+  }
+  template <class ITER, class ARG> inline auto
+  square(ITER begin, ARG, std::integral_constant<size_t, 1>)
   {
       return square(*begin);
   }
-  template <class ITER, size_t N> inline auto
-  square(ITER begin, ITER end, std::integral_constant<size_t, N>)
+  template <class ITER, class ARG, size_t N> inline auto
+  square(ITER begin, ARG arg, std::integral_constant<size_t, N>)
   {
       const auto	tmp = square(*begin);
-      return tmp + square(++begin, end, std::integral_constant<size_t, N-1>());
+      return tmp + square(++begin, arg, std::integral_constant<size_t, N-1>());
   }
 }	// namespace detail
 
 //! 指定された範囲をコピーする
 /*!
-  N = 0なら末尾の次をieで指定，N != 0 ならNで指定した要素数をコピーし，ieは無視
-  \param ib	コピー元の先頭を指す反復子
-  \param ie	コピー元の末尾の次を指す反復子
+  N != 0 の場合，Nで指定した要素数をコピーし，argは無視．
+  N = 0 の場合，ARG = INならコピー元の末尾の次を，ARG = size_tなら要素数をargで指定，
+  \param in	コピー元の先頭を指す反復子
+  \param arg	コピー元の末尾の次を指す反復子またはコピーする要素数
   \param out	コピー先の先頭を指す反復子
   \return	コピー先の末尾の次
 */
-template <size_t N, class IN, class OUT> inline OUT
-copy(IN ib, IN ie, OUT out)
+template <size_t N, class IN, class ARG, class OUT> inline OUT
+copy(IN in, ARG arg, OUT out)
 {
-    return detail::copy(ib, ie, out, std::integral_constant<size_t, N>());
+    return detail::copy(in, arg, out, std::integral_constant<size_t, N>());
 }
     
 //! 指定された範囲を与えられた値で埋める
 /*!
-  N = 0なら末尾の次をendで指定，N != 0 ならNで指定した要素数だけ埋め，endは無視
+  N != 0 の場合，Nで指定した要素数だけ埋め，argは無視．
+  N = 0 の場合，ARG = INなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
   \param begin	埋める範囲の先頭を指す反復子
-  \param end	埋める範囲の末尾の次を指す反復子
+  \param arg	埋める範囲の末尾の次を指す反復子または埋める要素数
   \param val	埋める値
 */
-template <size_t N, class ITER, class T> inline void
-fill(ITER begin, ITER end, const T& val)
+template <size_t N, class ITER, class ARG, class T> inline void
+fill(ITER begin, ARG arg, const T& val)
 {
-    return detail::fill(begin, end, val, std::integral_constant<size_t, N>());
-}
-    
-//! 指定された範囲に1変数関数を適用する
-/*!
-  N = 0なら末尾の次をendで指定，N != 0 ならNで指定した要素数だけ適用し，endは無視
-  \param begin	適用範囲の先頭を指す反復子
-  \param end	適用範囲の末尾の次を指す反復子
-  \param func	適用する1変数関数
-*/
-template <size_t N, class ITER, class FUNC> inline FUNC
-for_each(ITER begin, ITER end, FUNC func)
-{
-    return detail::for_each(begin, end, func,
-			    std::integral_constant<size_t, N>());
-}
-    
-//! 指定された範囲に2変数関数を適用する
-/*!
-  N = 0なら末尾の次をend0で指定，N != 0 ならNで指定した要素数だけ適用し，end0は無視
-  \param begin0	適用範囲の第1変数の先頭を指す反復子
-  \param end0	適用範囲の第1変数の末尾の次を指す反復子
-  \param begin1	適用範囲の第2変数の先頭を指す反復子
-  \param func	適用する2変数関数
-*/
-template <size_t N, class ITER0, class ITER1, class FUNC> inline FUNC
-for_each(ITER0 begin0, ITER0 end0, ITER1 begin1, FUNC func)
-{
-    return detail::for_each(begin0, end0, begin1, func,
-			    std::integral_constant<size_t, N>());
+    return detail::fill(begin, arg, val, std::integral_constant<size_t, N>());
 }
     
 //! 指定された範囲の内積の値を返す
 /*!
-  N = 0なら末尾の次をend0で指定，N != 0 ならNで指定した要素数だけ適用し，end0は無視
+  N != 0 の場合，Nで指定した要素数の範囲の内積を求め，argは無視．
+  N = 0 の場合，ARG = INなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
   \param begin0	適用範囲の第1変数の先頭を指す反復子
-  \param end0	適用範囲の第1変数の末尾の次を指す反復子
+  \param arg	適用範囲の第1変数の末尾の次を指す反復子または要素数
   \param begin1	適用範囲の第2変数の先頭を指す反復子
   \param init	初期値
   \return	内積の値
 */
-template <size_t N, class ITER0, class ITER1, class T> inline T
-inner_product(ITER0 begin0, ITER0 end0, ITER1 begin1, const T& init)
+template <size_t N, class ITER0, class ARG, class ITER1, class T> inline T
+inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init)
 {
-    return detail::inner_product(begin0, end0, begin1, init,
+    return detail::inner_product(begin0, arg, begin1, init,
 				 std::integral_constant<size_t, N>());
 }
     
-//! 指定された範囲にある要素2乗和を返す
+//! 指定された範囲にある要素の2乗和を返す
 /*!
-  N = 0なら末尾の次をendで指定，N != 0 ならNで指定した要素数だけ適用し，endは無視
-  \param begin	範囲の先頭を指す反復子
-  \param end	範囲の末尾の次を指す反復子
+  N != 0 の場合，Nで指定した要素数の範囲の2乗和を求め，argは無視．
+  N = 0 の場合，ARG = INなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  \param begin	適用範囲の先頭を指す反復子
+  \param arg	適用範囲の末尾の次を指す反復子または要素数
   \return	2乗和の値
 */
-template <size_t N, class ITER>
+template <size_t N, class ITER, class ARG>
 inline typename std::iterator_traits<ITER>::value_type
-square(ITER begin, ITER end)
+square(ITER begin, ARG arg)
 {
-    return detail::square(begin, end, std::integral_constant<size_t, N>());
+    return detail::square(begin, arg, std::integral_constant<size_t, N>());
 }
     
 }	// namespace TU

@@ -302,7 +302,7 @@ class range
 
   public:
 		range(iterator begin)		:_begin(begin)	{}
-		range(iterator begin, iterator)	:_begin(begin)	{}
+		range(iterator begin, size_t)	:_begin(begin)	{}
     
 		range()						= delete;
 		range(const range&)				= default;
@@ -312,7 +312,7 @@ class range
 		    std::cout << "range<SIZE>::operator =(const range&) ["
 			      << print_sizes_and_strides(r) << ']' << std::endl;
 #endif
-		    copy<SIZE>(r.begin(), r.end(), _begin);
+		    copy<SIZE>(r.begin(), size(), begin());
 		    return *this;
 		}
 		range(range&&)					= default;
@@ -335,20 +335,20 @@ class range
 			      << print_sizes_and_strides(expr) << ']'
 			      << std::endl;
 #endif
-		    assert(std::size(expr) == SIZE);
-		    copy<SIZE>(std::begin(expr), std::end(expr), _begin);
+		    assert(std::size(expr) == size());
+		    copy<SIZE>(std::begin(expr), size(), begin());
 		    return *this;
 		}
 
 		range(std::initializer_list<value_type> args)
 		    :_begin(const_cast<iterator>(args.begin()))
     		{
-		    assert(args.size() == SIZE);
+		    assert(args.size() == size());
 		}
     range&	operator =(std::initializer_list<value_type> args)
 		{
-		    assert(args.size() == SIZE);
-		    copy<SIZE>(args.begin(), args.end(), begin());
+		    assert(args.size() == size());
+		    copy<SIZE>(args.begin(), size(), begin());
 		    return *this;
 		}
 
@@ -390,8 +390,8 @@ class range<ITER, 0>
 					      ::reference;
 
   public:
-		range(iterator begin, iterator end)
-		    :_begin(begin), _end(end)			{}
+		range(iterator begin, size_t size)
+		    :_begin(begin), _size(size)			{}
     
 		range()						= delete;
 		range(const range&)				= default;
@@ -402,7 +402,7 @@ class range<ITER, 0>
 			      << print_sizes_and_strides(r) << ']' << std::endl;
 #endif
 		    assert(r.size() == size());
-		    copy<0>(r._begin, r._end, _begin);
+		    copy<0>(r._begin, size(), begin());
 		    return *this;
 		}
 		range(range&&)					= default;
@@ -412,7 +412,7 @@ class range<ITER, 0>
 	      typename std::enable_if<
 		  std::is_convertible<ITER_, iterator>::value>::type* = nullptr>
 		range(const range<ITER_, 0>& r)
-		    :_begin(r.begin()), _end(r.end())
+		    :_begin(r.begin()), _size(r.size())
 		{
 		}
 
@@ -426,28 +426,27 @@ class range<ITER, 0>
 			      << std::endl;
 #endif
 		    assert(std::size(expr) == size());
-		    copy<TU::size0<E_>()>(std::begin(expr), std::end(expr),
-					  _begin);
+		    copy<TU::size0<E_>()>(std::begin(expr), size(), begin());
 		    return *this;
 		}
 		
 		range(std::initializer_list<value_type> args)
 		    :_begin(const_cast<iterator>(args.begin())),
-		     _end(  const_cast<iterator>(args.end()))
+		     _size(args.size())
     		{
 		}
     range&	operator =(std::initializer_list<value_type> args)
 		{
 		    assert(args.size() == size());
-		    copy<0>(args.begin(), args.end(), begin());
+		    copy<0>(args.begin(), size(), begin());
 		    return *this;
 		}
 		
     constexpr static
     size_t	size0()			{ return 0; }
-    size_t	size()		const	{ return std::distance(_begin, _end); }
+    size_t	size()		const	{ return _size; }
     auto	begin()		const	{ return _begin; }
-    auto	end()		const	{ return _end; }
+    auto	end()		const	{ return _begin + _size; }
     auto	cbegin()	const	{ return begin(); }
     auto	cend()		const	{ return end(); }
     auto	rbegin()	const	{ return reverse_iterator(end()); }
@@ -462,7 +461,7 @@ class range<ITER, 0>
 
   private:
     const iterator	_begin;
-    const iterator	_end;
+    const size_t	_size;
 };
 
 //! 固定長レンジを生成する
@@ -478,24 +477,13 @@ make_range(ITER iter)
     
 //! 可変長レンジを生成する
 /*!
-  \param begin	レンジの先頭要素を指す反復子
-  \param end	レンジの末尾要素の次を指す反復子
-*/
-template <size_t SIZE=0, class ITER> inline range<ITER, SIZE>
-make_range(ITER begin, ITER end)
-{
-    return {begin, end};
-}
-
-//! 可変長レンジを生成する
-/*!
   \param iter	レンジの先頭要素を指す反復子
   \param size	レンジの要素数
 */
-template <class ITER> inline range<ITER>
+template <size_t SIZE=0, class ITER> inline range<ITER, SIZE>
 make_range(ITER iter, size_t size)
 {
-    return {iter, iter + size};
+    return {iter, size};
 }
 
 //! 出力ストリームにレンジの内容を書き出す
@@ -622,17 +610,9 @@ class range_iterator
     using	ss::stride;
     
   private:
-    template <size_t SIZE_=SIZE>
-    typename std::enable_if<SIZE_ == 0, reference>::type
-		dereference() const
+    reference	dereference() const
 		{
-		    return {super::base(), super::base() + size()};
-		}
-    template <size_t SIZE_=SIZE>
-    typename std::enable_if<SIZE_ != 0, reference>::type
-		dereference() const
-		{
-		    return {super::base()};
+		    return {super::base(), size()};
 		}
     void	increment()
 		{
@@ -862,69 +842,69 @@ make_subrange(const RANGE& r, size_t idx, INDICES... indices)
 }
 
 /************************************************************************
-*  class column_iterator<ROW, SIZE>					*
+*  class column_iterator<ROW, NROWS>					*
 ************************************************************************/
 //! 2次元配列の列を指す反復子
 /*!
   \param ROW	begin(), end()をサポートするコンテナを指す反復子の型
   \param SIZE	begin()とend()間の距離(0ならば可変長)
 */ 
-template <class ROW, size_t SIZE>
+template <class ROW, size_t NROWS>
 class column_iterator
-    : public boost::iterator_adaptor<column_iterator<ROW, SIZE>,
+    : public boost::iterator_adaptor<column_iterator<ROW, NROWS>,
 				     size_t,
-				     range<vertical_iterator<ROW>, SIZE>,
+				     range<vertical_iterator<ROW>, NROWS>,
 				     std::random_access_iterator_tag,
-				     range<vertical_iterator<ROW>, SIZE>,
+				     range<vertical_iterator<ROW>, NROWS>,
 				     ptrdiff_t>
 {
   private:
     using super	= boost::iterator_adaptor<column_iterator,
 					  size_t,
-					  range<vertical_iterator<ROW>, SIZE>,
+					  range<vertical_iterator<ROW>, NROWS>,
 					  std::random_access_iterator_tag,
-					  range<vertical_iterator<ROW>, SIZE>,
+					  range<vertical_iterator<ROW>, NROWS>,
 					  ptrdiff_t>;
 
   public:
-    using	reference = range<vertical_iterator<ROW>, SIZE>;
+    using	typename super::reference;
 
     friend	class boost::iterator_core_access;
 
   public:
-		column_iterator(ROW begin, ROW end, size_t col)
-		    :super(col), _begin(begin), _end(end)
+		column_iterator(ROW row, size_t nrows, size_t col)
+		    :super(col), _row(row), _nrows(nrows)
 		{
 		}
 
   private:
     reference	dereference() const
 		{
-		    return {{_begin, super::base()}, {_end, super::base()}};
+		    return {{_row, super::base()}, _nrows};
 		}
     
   private:
-    ROW		_begin;
-    ROW		_end;
+    ROW		_row;
+    size_t	_nrows;
 };
 
 template <size_t SIZE=0, class ROW> inline column_iterator<ROW, SIZE>
-make_column_iterator(ROW begin, ROW end, size_t col)
+make_column_iterator(ROW row, size_t nrows, size_t col)
 {
-    return {begin, end, col};
+    return {row, nrows, col};
 }
 
 template <class E> inline auto
 column_begin(E& expr)
 {
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
 					    0);
 }
     
 template <class E> inline auto
 column_begin(const E& expr)
 {
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
 					    0);
 }
     
@@ -937,14 +917,14 @@ column_cbegin(const E& expr)
 template <class E> inline auto
 column_end(E& expr)
 {
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
 					    size<1>(expr));
 }
 
 template <class E> inline auto
 column_end(const E& expr)
 {
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
 					    size<1>(expr));
 }
 
@@ -986,7 +966,7 @@ namespace detail
 				OP, const_iterator_t<E> >, size0<E>()>;
       
       unary_opnode(const E& expr, const OP& op)
-	  :range_t({std::begin(expr), op}, {std::end(expr), op})	{}
+	  :range_t({std::begin(expr), op}, std::size(expr))		{}
   };
     
   template <class OP, class E> inline unary_opnode<OP, E>
@@ -1016,8 +996,7 @@ namespace detail
 			    std::max(size0<L>(), size0<R>())>;
 
       binary_opnode(const L& l, const R& r, const OP& op)
-	  :range_t({std::begin(l), std::begin(r), op},
-		   {std::end(l),   std::end(r),   op})
+	  :range_t({std::begin(l), std::begin(r), op}, std::size(l))
       {
 	  assert(std::size(l) == std::size(r));
       }
@@ -1221,7 +1200,7 @@ inline auto
 transpose(const E& expr)
 {
     constexpr size_t	siz0 = size0<value_t<E> >();
-    return make_range<siz0>(column_begin(expr), column_end(expr));
+    return make_range<siz0>(column_begin(expr), size<1>(expr));
 }
 
 //! 与えられた式の各要素の自乗和を求める.
@@ -1234,7 +1213,7 @@ template <class E,
 inline auto
 square(const E& expr)
 {
-    return square<size0<E>()>(std::begin(expr), std::end(expr));
+    return square<size0<E>()>(std::begin(expr), std::size(expr));
 }
 
 //! 与えられた式の各要素の自乗和の平方根を求める.

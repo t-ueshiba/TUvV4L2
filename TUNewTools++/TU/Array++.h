@@ -79,20 +79,27 @@ struct BufTraits
 			}
     
     template <class IN_, class OUT_>
-    static OUT_		copy(IN_ ib, IN_ ie, OUT_ out)
+    static OUT_		copy(IN_ in, IN_ ie, OUT_ out)
 			{
-			    return std::copy(ib, ie, out);
+			    return std::copy(in, ie, out);
+			}
+
+    template <class IN_, class OUT_>
+    static OUT_		copy(IN_ in, size_t n, OUT_ out)
+			{
+			    return std::copy_n(in, n, out);
 			}
 
     template <class T_>
-    static void		fill(iterator ib, iterator ie, const T_& c)
+    static void		fill(iterator in, iterator ie, const T_& c)
 			{
-			    std::fill(ib, ie, c);
+			    std::fill(in, ie, c);
 			}
 
-    static void		init(iterator ib, iterator ie)
+    template <class T_>
+    static void		fill(iterator in, size_t n, const T_& c)
 			{
-			    std::fill(ib, ie, 0);
+			    std::fill_n(in, n, c);
 			}
 };
 
@@ -270,7 +277,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    std::cout << "Buf<0>::Buf(const Buf&) ["
 		  	      << print_sizes_and_strides(b) << ']' << std::endl;
 #endif
-		    super::copy(b.begin(), b.end(), begin());
+		    super::copy(b.begin(), size(), begin());
 		}
     Buf&	operator =(const Buf& b)
 		{
@@ -281,7 +288,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    if (this != &b)
 		    {
 			resize(b._sizes, b._stride);
-			super::copy(b.begin(), b.end(), begin());
+			super::copy(b.begin(), size(), begin());
 		    }
 		    return *this;
 		}
@@ -364,7 +371,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
     void	fill(const T& c)
 		{
-		    super::fill(_p, _p + _capacity, c);
+		    super::fill(_p, _capacity, c);
 		}
     std::istream&
 		get(std::istream& in)
@@ -565,7 +572,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 			      << print_sizes(expr) << ']' << std::endl;
 #endif
 		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
-		    copy<S>(std::begin(expr), std::end(expr), begin());
+		    copy<S>(std::begin(expr), size(), begin());
 		}
     template <class E_>
     typename std::enable_if<is_range<E_>::value, array&>::type
@@ -577,7 +584,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 #endif
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
 		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
-		    copy<S>(std::begin(expr), std::end(expr), begin());
+		    copy<S>(std::begin(expr), size(), begin());
 
 		    return *this;
 		}
@@ -585,12 +592,12 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(std::initializer_list<const_value_type> args)
 		    :super(sizes(args))
 		{
-		    copy<size0()>(args.begin(), args.end(), begin());
+		    copy<size0()>(args.begin(), size(), begin());
 		}
     array&	operator =(std::initializer_list<const_value_type> args)
 		{
 		    super::resize(sizes(args));
-		    copy<size0()>(args.begin(), args.end(), begin());
+		    copy<size0()>(args.begin(), size(), begin());
 
 		    return *this;
 		}
@@ -613,7 +620,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     void	write(array<T, ALLOC_, SIZE, SIZES...>& a) const
 		{
 		    a.resize(sizes(), a.stride());
-		    super::copy(begin(), end(), a.begin());
+		    super::copy_n(begin(), size(), a.begin());
 		}
 
     using	super::size;
@@ -625,9 +632,9 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     using	super::end;
 
     range<iterator>
-		operator ()()		{ return {begin(), end()}; }
+		operator ()()		{ return {begin(), size()}; }
     range<const_iterator>
-		operator ()()	const	{ return {begin(), end()}; }
+		operator ()()	const	{ return {begin(), size()}; }
 
     constexpr static
     size_t	dimension()	{ return D; }
@@ -659,13 +666,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     std::istream&
 		restore(std::istream& in)
 		{
-		    restore(in, begin(), end());
+		    restore(in, begin(), size());
 		    return in;
 		}
     std::ostream&
 		save(std::ostream& out) const
 		{
-		    save(out, begin(), end());
+		    save(out, begin(), size());
 		    return out;
 		}
     
@@ -725,28 +732,28 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    return to_stride(unit, sizes...);
 		}
 
-    static void	restore(std::istream& in, pointer begin, pointer end)
+    static void	restore(std::istream& in, pointer begin, size_t n)
 		{
 		    in.read(reinterpret_cast<char*>(begin),
-			    sizeof(element_type) * std::distance(begin, end));
+			    sizeof(element_type) * n);
 		}
     template <class ITER_>
-    static void	restore(std::istream& in, ITER_ begin, ITER_ end)
+    static void	restore(std::istream& in, ITER_ begin, size_t n)
 		{
-		    for (; begin != end; ++begin)
-			restore(in, begin->begin(), begin->end());
+		    for (size_t i = 0; i != n; ++i, ++begin)
+			restore(in, begin->begin(), begin->size());
 		}
 
-    static void	save(std::ostream& out, const_pointer begin, const_pointer end)
+    static void	save(std::ostream& out, const_pointer begin, size_t n)
 		{
 		    out.write(reinterpret_cast<const char*>(begin),
-			      sizeof(element_type) * std::distance(begin, end));
+			      sizeof(element_type) * n);
 		}
     template <class ITER_>
-    static void	save(std::ostream& out, ITER_ begin, ITER_ end)
+    static void	save(std::ostream& out, ITER_ begin, size_t n)
 		{
-		    for (; begin != end; ++begin)
-			save(out, begin->begin(), begin->end());
+		    for (size_t i = 0; i != n; ++i, ++begin)
+			save(out, begin->begin(), begin->size());
 		}
 };
 
@@ -941,10 +948,9 @@ namespace detail
 				binder2nd<OP, TU::result_t<E> >, ITER>, SIZE>;
 
     public:
-      cache2nd_opnode(ITER begin, ITER end, const E& expr, const OP& op)
+      cache2nd_opnode(ITER begin, size_t size, const E& expr, const OP& op)
 	  :cache_t(expr),
-	   range_t({begin, {op, cache_t::val}},
-		   {end,   {op, cache_t::val}})			{}
+	   range_t({begin, {op, cache_t::val}}, size)		{}
   };
 
   //! 評価後に固定された第2引数を持つ関数適用反復子のレンジである演算子を生成する
@@ -957,9 +963,9 @@ namespace detail
    */
   template <size_t SIZE, class OP, class ITER, class E>
   inline cache2nd_opnode<SIZE, OP, ITER, E>
-  make_cache2nd_opnode(ITER begin, ITER end, const E& expr, const OP& op)
+  make_cache2nd_opnode(ITER begin, size_t size, const E& expr, const OP& op)
   {
-      return {begin, end, expr, op};
+      return {begin, size, expr, op};
   }
 }	// namespace detail
 
@@ -979,9 +985,9 @@ operator *(const L& l, const R& r)
     using value_type = typename std::common_type<value_t<L>, value_t<R> >::type;
 
     assert(size<0>(l) == size<0>(r));
-    constexpr size_t	siz0 = std::max(size0<L>(), size0<R>());
-    return inner_product<siz0>(std::begin(l), std::end(l), std::begin(r),
-			       value_type(0));
+    constexpr size_t	S = std::max(size0<L>(), size0<R>());
+    return inner_product<S>(std::begin(l), std::size(l), std::begin(r),
+			    value_type(0));
 }
 
 //! 2次元配列式と1または2次元配列式の積をとる.
@@ -996,7 +1002,7 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::end(l),
+    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::size(l),
 						    r, multiplies());
 }
 
@@ -1012,9 +1018,9 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    constexpr size_t	siz0 = size0<value_t<R> >();
-    return detail::make_cache2nd_opnode<siz0>(column_begin(r), column_end(r),
-					      l, multiplies());
+    constexpr size_t	S = size0<value_t<R> >();
+    return detail::make_cache2nd_opnode<S>(column_begin(r), size<1>(r),
+					   l, multiplies());
 }
 
 //! 2つの1次元配列式の外積をとる.
@@ -1029,7 +1035,7 @@ template <class L, class R,
 inline auto
 operator %(const L& l, const R& r)
 {
-    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::end(l),
+    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::size(l),
 						    r, multiplies());
 }
     
@@ -1071,7 +1077,7 @@ operator ^(const L& l, const R& r)
 {
     assert(size<1>(l) == 3 && size<0>(r) == 3);
     
-    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::end(l),
+    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::size(l),
 						    r, bit_xor());
 }
 
