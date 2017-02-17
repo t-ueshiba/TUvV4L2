@@ -1,6 +1,10 @@
 /*
  *  $Id$
  */
+/*!
+  \file		utility.h
+  \brief	プログラミングに便利な種々のクラスの定義と実装
+*/
 #ifndef __TU_UTILITY_H
 #define __TU_UTILITY_H
 

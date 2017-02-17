@@ -58,6 +58,7 @@ size(const T (&array)[N]) noexcept
 #endif
 }	// namespace std
 
+//! libTUTools++ のクラスや関数等を収める名前空間
 namespace TU
 {
 /************************************************************************
@@ -69,17 +70,17 @@ class transform_iterator2
 		 transform_iterator2<FUNC, ITER0, ITER1>,
 		 ITER0,
 		 typename std::result_of<FUNC(
-		     typename std::iterator_traits<ITER0>::value_type,
-		     typename std::iterator_traits<ITER1>::value_type)>::type,
+		     typename std::iterator_traits<ITER0>::reference,
+		     typename std::iterator_traits<ITER1>::reference)>::type,
 		 boost::use_default,
 		 typename std::result_of<FUNC(
-		     typename std::iterator_traits<ITER0>::value_type,
-		     typename std::iterator_traits<ITER1>::value_type)>::type>
+		     typename std::iterator_traits<ITER0>::reference,
+		     typename std::iterator_traits<ITER1>::reference)>::type>
 {
   private:
     using ref	= typename std::result_of<FUNC(
-		      typename std::iterator_traits<ITER0>::value_type,
-		      typename std::iterator_traits<ITER1>::value_type)>::type;
+		      typename std::iterator_traits<ITER0>::reference,
+		      typename std::iterator_traits<ITER1>::reference)>::type;
     using super	= boost::iterator_adaptor<transform_iterator2,
 					  ITER0,
 					  ref,

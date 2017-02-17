@@ -10,7 +10,6 @@
 
 #include <iostream>
 #include <cassert>
-#include <algorithm>
 #include <initializer_list>
 #include "TU/iterator.h"
 #include "TU/functional.h"
@@ -19,33 +18,157 @@
 namespace TU
 {
 /************************************************************************
-*  predicate is_range<E>						*
+*  predicates is_range<E>, is_range1<E>, is_range2<E>			*
 ************************************************************************/
 namespace detail
 {
-  template <class E_> static auto
-  is_range(const E_* x) -> decltype(std::begin(*x), std::end(*x),
-				    std::true_type())			;
-  template <class E_> static std::false_type
+  template <class E> static auto
+  is_range(const E& x) -> decltype(std::begin(x), std::true_type())	;
+  static std::false_type
   is_range(...)								;
 
-  template <class E_> static auto
-  is_range2(const E_* x) -> decltype(std::begin(*std::begin(*x)),
-				     std::true_type())			;
-  template <class E_> static std::false_type
+  template <class E> static auto
+  is_range2(const E& x) -> decltype(std::begin(*std::begin(x)),
+				    std::true_type())			;
+  static std::false_type
   is_range2(...)							;
 }	// namespace detail
 
 template <class E>
-using is_range	= decltype(detail::is_range<E>(nullptr));
+using is_range	= decltype(detail::is_range(std::declval<E>()));
 
 template <class E>
-using is_range2	= decltype(detail::is_range2<E>(nullptr));
+using is_range2	= decltype(detail::is_range2(std::declval<E>()));
 
 template <class E>
 using is_range1	= std::integral_constant<bool, (is_range<E>::value &&
 						!is_range2<E>::value)>;
     
+/************************************************************************
+*  type aliases								*
+************************************************************************/
+namespace detail
+{
+  template <class E_> static auto
+  has_const_iterator(const E_& x) -> decltype(std::begin(x))		;
+  static void
+  has_const_iterator(...)						;
+}	// namespace detail
+    
+//! 式が持つ定数反復子の型を返す
+/*!
+  \param E	式の型
+  \return	E が定数反復子を持てばその型，持たなければ void
+*/
+template <class E>
+using const_iterator_t	= decltype(detail::has_const_iterator(
+				       std::declval<E>()));
+
+namespace detail
+{
+  template <class T>
+  struct identity
+  {
+      using type = T;
+  };
+
+  template <class E>
+  struct value_t
+  {
+      using type = typename std::iterator_traits<const_iterator_t<E> >
+			       ::value_type;
+  };
+      
+  template <class E, class=const_iterator_t<E> >
+  struct element_t
+  {
+      using F	 = typename value_t<E>::type;
+      using type = typename element_t<F, const_iterator_t<F> >::type;
+  };
+  template <class E>
+  struct element_t<E, void> : identity<E>				{};
+}	// namespace detail
+    
+//! 式が持つ定数反復子が指す型を返す
+/*!
+  定数反復子を持たない式を与えるとコンパイルエラーとなる.
+  \param E	定数反復子を持つ式の型
+  \return	E の定数反復子が指す型
+*/
+template <class E>
+using value_t	= typename detail::value_t<E>::type;
+
+//! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
+/*!
+  \param E	式の型
+  \return	E が定数反復子を持てばそれが指す型を再帰的に辿って到達する型，
+		持たなければ E 自身
+*/
+template <class E>
+using element_t	= typename detail::element_t<E>::type;
+
+/************************************************************************
+*  sizes and strides of multidimensional ranges				*
+************************************************************************/
+namespace detail
+{
+  template <class E> static auto
+  has_size0(const E& x) -> decltype(E::size0(), std::true_type())	;
+  static std::false_type
+  has_size0(...)							;
+
+  template <class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, 0>)
+  {
+      return std::size(expr);
+  }
+  template <size_t I, class E> inline size_t
+  size(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+
+  template <class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, 1>)
+  {
+      return std::begin(expr).stride();
+  }
+  template <size_t I, class E> inline size_t
+  stride(const E& expr, std::integral_constant<size_t, I>)
+  {
+      return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
+  }
+}	// namespace detail
+
+template <class E>
+constexpr inline typename std::enable_if<decltype(
+    detail::has_size0(std::declval<E>()))::value, size_t>::type
+size0()
+{
+    return E::size0();
+}
+template <class E>
+constexpr inline typename std::enable_if<!decltype(
+    detail::has_size0(std::declval<E>()))::value, size_t>::type
+size0()
+{
+    return 0;
+}
+    
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+size(const E& expr)
+{
+    return detail::size(expr, std::integral_constant<size_t, I>());
+}
+
+template <size_t I, class E>
+inline typename std::enable_if<is_range<E>::value, size_t>::type
+stride(const E& expr)
+{
+    return detail::stride(expr, std::integral_constant<size_t, I>());
+}
+
 /************************************************************************
 *  manipulator sizes_and_strides					*
 ************************************************************************/
@@ -86,8 +209,8 @@ class sizes_holder
 			print_size(std::ostream& out, const E_& expr)
 			{
 			    return print_size(print_x(out << std::size(expr),
-						      *expr.begin()),
-					      *expr.begin());
+						      *std::begin(expr)),
+					      *std::begin(expr));
 			}
 
   protected:
@@ -166,14 +289,7 @@ operator <<(std::ostream& out, const sizes_and_strides_holder<E>& holder)
   \param ITER	反復子の型
   \param SIZE	レンジに含まれる要素数(0ならば可変長)
 */
-template <class ITER, size_t SIZE=0>	class range;
-
-//! 固定長レンジ
-/*!
-  \param ITER	反復子の型
-  \param SIZE	レンジに含まれる要素数
-*/
-template <class ITER, size_t SIZE>
+template <class ITER, size_t SIZE=0>
 class range
 {
   public:
@@ -184,8 +300,6 @@ class range
     using reference		= typename std::iterator_traits<iterator>
 					      ::reference;
 
-    constexpr static size_t	size0 = SIZE;
-    
   public:
 		range(iterator begin)		:_begin(begin)	{}
 		range(iterator begin, iterator)	:_begin(begin)	{}
@@ -194,8 +308,10 @@ class range
 		range(const range&)				= default;
     range&	operator =(const range& r)
 		{
+#ifdef TU_DEBUG
 		    std::cout << "range<SIZE>::operator =(const range&) ["
 			      << print_sizes_and_strides(r) << ']' << std::endl;
+#endif
 		    copy<SIZE>(r.begin(), r.end(), _begin);
 		    return *this;
 		}
@@ -214,9 +330,11 @@ class range
     typename std::enable_if<is_range<E_>::value, range&>::type
 		operator =(const E_& expr)
 		{
+#ifdef TU_DEBUG
 		    std::cout << "range<SIZE>::operator =(const E_&) ["
 			      << print_sizes_and_strides(expr) << ']'
 			      << std::endl;
+#endif
 		    assert(std::size(expr) == SIZE);
 		    copy<SIZE>(std::begin(expr), std::end(expr), _begin);
 		    return *this;
@@ -234,6 +352,8 @@ class range
 		    return *this;
 		}
 
+    constexpr static
+    size_t	size0()			{ return SIZE; }
     constexpr static
     size_t	size()			{ return SIZE; }
     auto	begin()		const	{ return _begin; }
@@ -269,8 +389,6 @@ class range<ITER, 0>
     using reference		= typename std::iterator_traits<iterator>
 					      ::reference;
 
-    constexpr static size_t	size0 = 0;
-    
   public:
 		range(iterator begin, iterator end)
 		    :_begin(begin), _end(end)			{}
@@ -279,8 +397,10 @@ class range<ITER, 0>
 		range(const range&)				= default;
     range&	operator =(const range& r)
 		{
+#ifdef TU_DEBUG
 		    std::cout << "range<0>::operator =(const range&) ["
 			      << print_sizes_and_strides(r) << ']' << std::endl;
+#endif
 		    assert(r.size() == size());
 		    copy<0>(r._begin, r._end, _begin);
 		    return *this;
@@ -300,11 +420,14 @@ class range<ITER, 0>
     typename std::enable_if<is_range<E_>::value, range&>::type
 		operator =(const E_& expr)
 		{
+#ifdef TU_DEBUG
 		    std::cout << "range<0>::operator =(const E_&) ["
 			      << print_sizes_and_strides(expr) << ']'
 			      << std::endl;
+#endif
 		    assert(std::size(expr) == size());
-		    copy<E_::size0>(std::begin(expr), std::end(expr), _begin);
+		    copy<TU::size0<E_>()>(std::begin(expr), std::end(expr),
+					  _begin);
 		    return *this;
 		}
 		
@@ -320,6 +443,8 @@ class range<ITER, 0>
 		    return *this;
 		}
 		
+    constexpr static
+    size_t	size0()			{ return 0; }
     size_t	size()		const	{ return std::distance(_begin, _end); }
     auto	begin()		const	{ return _begin; }
     auto	end()		const	{ return _end; }
@@ -356,7 +481,7 @@ make_range(ITER iter)
   \param begin	レンジの先頭要素を指す反復子
   \param end	レンジの末尾要素の次を指す反復子
 */
-template <class ITER> inline range<ITER>
+template <size_t SIZE=0, class ITER> inline range<ITER, SIZE>
 make_range(ITER begin, ITER end)
 {
     return {begin, end};
@@ -444,10 +569,10 @@ namespace detail
 template <class ITER, size_t SIZE=0, size_t STRIDE=0>
 class range_iterator
     : public boost::iterator_adaptor<range_iterator<ITER, SIZE, STRIDE>,
-						    ITER,
-						    range<ITER, SIZE>,
-						    boost::use_default,
-						    range<ITER, SIZE> >,
+				     ITER,
+				     range<ITER, SIZE>,
+				     boost::use_default,
+				     range<ITER, SIZE> >,
       public detail::size_and_stride<SIZE, STRIDE>
 {
   private:
@@ -566,48 +691,6 @@ make_range_iterator(ITER iter, size_t size, size_t stride)
 }
     
 /************************************************************************
-*  sizes and strides of multidimensional ranges				*
-************************************************************************/
-namespace detail
-{
-  template <class E> inline size_t
-  size(const E& expr, std::integral_constant<size_t, 0>)
-  {
-      return std::size(expr);
-  }
-  template <size_t I, class E> inline size_t
-  size(const E& expr, std::integral_constant<size_t, I>)
-  {
-      return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
-  }
-
-  template <class E> inline size_t
-  stride(const E& expr, std::integral_constant<size_t, 1>)
-  {
-      return std::begin(expr).stride();
-  }
-  template <size_t I, class E> inline size_t
-  stride(const E& expr, std::integral_constant<size_t, I>)
-  {
-      return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
-  }
-}	// namespace detail
-
-template <size_t I, class E>
-inline typename std::enable_if<is_range<E>::value, size_t>::type
-size(const E& expr)
-{
-    return detail::size(expr, std::integral_constant<size_t, I>());
-}
-
-template <size_t I, class E>
-inline typename std::enable_if<is_range<E>::value, size_t>::type
-stride(const E& expr)
-{
-    return detail::stride(expr, std::integral_constant<size_t, I>());
-}
-
-/************************************************************************
 *  fixed size & fixed stride ranges and associated iterators		*
 ************************************************************************/
 //! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
@@ -666,7 +749,7 @@ make_range(ITER iter, STRIDES... strides)
 /************************************************************************
 *  variable size & variable stride ranges and associated iterators	*
 ************************************************************************/
-//! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
+//! 多次元可変長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param iter		レンジの先頭要素を指す反復子
   \param size		最上位軸のレンジ長
@@ -779,71 +862,53 @@ make_subrange(const RANGE& r, size_t idx, INDICES... indices)
 }
 
 /************************************************************************
-*  class column_iterator<ROW>						*
+*  class column_iterator<ROW, SIZE>					*
 ************************************************************************/
 //! 2次元配列の列を指す反復子
 /*!
   \param ROW	begin(), end()をサポートするコンテナを指す反復子の型
+  \param SIZE	begin()とend()間の距離(0ならば可変長)
 */ 
-template <class ROW>
+template <class ROW, size_t SIZE>
 class column_iterator
-    : public boost::iterator_facade<column_iterator<ROW>,
-				    range<vertical_iterator<ROW> >,
-				    std::random_access_iterator_tag,
-				    range<vertical_iterator<ROW> > >
+    : public boost::iterator_adaptor<column_iterator<ROW, SIZE>,
+				     size_t,
+				     range<vertical_iterator<ROW>, SIZE>,
+				     std::random_access_iterator_tag,
+				     range<vertical_iterator<ROW>, SIZE>,
+				     ptrdiff_t>
 {
   private:
-    using super	= boost::iterator_facade<column_iterator,
-					 range<vertical_iterator<ROW> >,
-					 std::random_access_iterator_tag,
-					 range<vertical_iterator<ROW> > >;
+    using super	= boost::iterator_adaptor<column_iterator,
+					  size_t,
+					  range<vertical_iterator<ROW>, SIZE>,
+					  std::random_access_iterator_tag,
+					  range<vertical_iterator<ROW>, SIZE>,
+					  ptrdiff_t>;
 
   public:
-    using	typename super::reference;
-    using	typename super::difference_type;
-    
+    using	reference = range<vertical_iterator<ROW>, SIZE>;
+
     friend	class boost::iterator_core_access;
 
   public:
-			column_iterator(ROW begin, ROW end, size_t col)
-			    :_begin(begin), _end(end), _col(col)
-			{
-			}
+		column_iterator(ROW begin, ROW end, size_t col)
+		    :super(col), _begin(begin), _end(end)
+		{
+		}
 
   private:
-    reference		dereference() const
-			{
-			    return {make_vertical_iterator(_begin, _col),
-				    make_vertical_iterator(_end,   _col)};
-			}
-    bool		equal(const column_iterator& iter) const
-			{
-			    return _col == iter._col;
-			}
-    void		increment()
-			{
-			    ++_col;
-			}
-    void		decrement()
-			{
-			    --_col;
-			}
-    void		advance(difference_type n)
-			{
-			    _col += n;
-			}
-    difference_type	distance_to(const column_iterator& iter) const
-			{
-			    return iter._col - _col;
-			}
+    reference	dereference() const
+		{
+		    return {{_begin, super::base()}, {_end, super::base()}};
+		}
     
   private:
-    ROW			_begin;
-    ROW			_end;
-    difference_type	_col;
+    ROW		_begin;
+    ROW		_end;
 };
 
-template <class ROW> inline column_iterator<ROW>
+template <size_t SIZE=0, class ROW> inline column_iterator<ROW, SIZE>
 make_column_iterator(ROW begin, ROW end, size_t col)
 {
     return {begin, end, col};
@@ -852,13 +917,15 @@ make_column_iterator(ROW begin, ROW end, size_t col)
 template <class E> inline auto
 column_begin(E& expr)
 {
-    return make_column_iterator(std::begin(expr), std::end(expr), 0);
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+					    0);
 }
     
 template <class E> inline auto
 column_begin(const E& expr)
 {
-    return make_column_iterator(std::begin(expr), std::end(expr), 0);
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+					    0);
 }
     
 template <class E> inline auto
@@ -870,15 +937,15 @@ column_cbegin(const E& expr)
 template <class E> inline auto
 column_end(E& expr)
 {
-    return make_column_iterator(std::begin(expr), std::end(expr),
-				size<1>(expr));
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+					    size<1>(expr));
 }
 
 template <class E> inline auto
 column_end(const E& expr)
 {
-    return make_column_iterator(std::begin(expr), std::end(expr),
-				size<1>(expr));
+    return make_column_iterator<size0<E>()>(std::begin(expr), std::end(expr),
+					    size<1>(expr));
 }
 
 template <class E> inline auto
@@ -887,82 +954,6 @@ column_cend(const E& expr)
     return column_end(expr);
 }
 
-/************************************************************************
-*  type aliases								*
-************************************************************************/
-namespace detail
-{
-  template <class E_> static auto
-  has_const_iterator(const E_* x) -> decltype(std::begin(*x))		;
-  template <class E_> static void
-  has_const_iterator(...)						;
-}	// namespace detail
-    
-//! 式が持つ定数反復子の型を返す
-/*!
-  \param E	式の型
-  \return	E が定数反復子を持てばその型，持たなければ void
-*/
-template <class E>
-using const_iterator_t	= decltype(detail::has_const_iterator<E>(nullptr));
-
-namespace detail
-{
-  template <class T>
-  struct identity
-  {
-      using type = T;
-  };
-
-  template <class E>
-  struct value_t
-  {
-      using type = typename std::iterator_traits<const_iterator_t<E> >
-			       ::value_type;
-  };
-      
-  template <class E, class=const_iterator_t<E> >
-  struct element_t
-  {
-      using F	 = typename value_t<E>::type;
-      using type = typename element_t<F, const_iterator_t<F> >::type;
-  };
-  template <class E>
-  struct element_t<E, void> : identity<E>			{};
-
-  template <class ITER, size_t SIZE>
-  std::true_type	is_rangeobj(range<ITER, SIZE>)		;
-  std::false_type	is_rangeobj(...)			;
-}	// namespace detail
-    
-//! 式が持つ定数反復子が指す型を返す
-/*!
-  定数反復子を持たない式を与えるとコンパイルエラーとなる.
-  \param E	定数反復子を持つ式の型
-  \return	E の定数反復子が指す型
-*/
-template <class E>
-using value_t	= typename detail::value_t<E>::type;
-
-//! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
-/*!
-  \param E	式の型
-  \return	E が定数反復子を持てばそれが指す型を再帰的に辿って到達する型，
-		持たなければ E 自身
-*/
-template <class E>
-using element_t	= typename detail::element_t<E>::type;
-
-//! 式が range<ITER, SIZE> 型に変換可能であるか判定する
-/*!
-  \param E	式の型
-  \return	E が range<ITER, SIZE> 型に変換可能ならば std::true_type,
-		そうでなければ std::false_type
-*/
-template <class E>
-struct is_rangeobj
-    : decltype(detail::is_rangeobj(std::declval<E>()))		{};
-    
 /************************************************************************
 *  various numeric functions						*
 ************************************************************************/
@@ -979,7 +970,7 @@ namespace detail
   using is_opnode = std::is_convertible<E, opnode>;
 
   /**********************************************************************
-  *  class unary_operator<OP, E>					*
+  *  class unary_opnode<OP, E>						*
   **********************************************************************/
   //! コンテナ式に対する単項演算子を表すクラス
   /*!
@@ -987,26 +978,25 @@ namespace detail
     \param E	単項演算子の引数となる式の実体の型
   */
   template <class OP, class E>
-  struct unary_operator : public range<boost::transform_iterator<
-					   OP, const_iterator_t<E> >,
-				       E::size0>,
-			  public opnode
+  struct unary_opnode : public range<boost::transform_iterator<
+					 OP, const_iterator_t<E> >, size0<E>()>,
+			public opnode
   {
       using range_t = range<boost::transform_iterator<
-				OP, const_iterator_t<E> >, E::size0>;
+				OP, const_iterator_t<E> >, size0<E>()>;
       
-      unary_operator(const E& expr, const OP& op)
+      unary_opnode(const E& expr, const OP& op)
 	  :range_t({std::begin(expr), op}, {std::end(expr), op})	{}
   };
     
-  template <class OP, class E> inline unary_operator<OP, E>
-  make_unary_operator(const E& expr, const OP& op)
+  template <class OP, class E> inline unary_opnode<OP, E>
+  make_unary_opnode(const E& expr, const OP& op)
   {
       return {expr, op};
   }
 
   /**********************************************************************
-  *  class binary_operator<OP, L, R>					*
+  *  class binary_opnode<OP, L, R>					*
   **********************************************************************/
   //! コンテナ式に対する2項演算子を表すクラス
   /*!
@@ -1015,23 +1005,26 @@ namespace detail
     \param R	2項演算子の第2引数となる式の実体の型
   */
   template <class OP, class L, class R>
-  struct binary_operator : public range<transform_iterator2<
-					    OP, const_iterator_t<L>,
-						const_iterator_t<R> >,
-					std::max(L::size0, R::size0)>,
-			   public opnode
+  struct binary_opnode : public range<transform_iterator2<
+					  OP, const_iterator_t<L>,
+					      const_iterator_t<R> >,
+				      std::max(size0<L>(), size0<R>())>,
+			 public opnode
   {
       using range_t = range<transform_iterator2<OP, const_iterator_t<L>,
 						    const_iterator_t<R> >,
-			    std::max(L::size0, R::size0)>;
+			    std::max(size0<L>(), size0<R>())>;
 
-      binary_operator(const L& l, const R& r, const OP& op)
+      binary_opnode(const L& l, const R& r, const OP& op)
 	  :range_t({std::begin(l), std::begin(r), op},
-		   {std::end(l),   std::end(r),   op})			{}
+		   {std::end(l),   std::end(r),   op})
+      {
+	  assert(std::size(l) == std::size(r));
+      }
   };
     
-  template <class OP, class L, class R> inline binary_operator<OP, L, R>
-  make_binary_operator(const L& l, const R& r, const OP& op)
+  template <class OP, class L, class R> inline binary_opnode<OP, L, R>
+  make_binary_opnode(const L& l, const R& r, const OP& op)
   {
       return {l, r, op};
   }
@@ -1069,7 +1062,7 @@ template <class E, typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
 operator -(const E& expr)
 {
-    return detail::make_unary_operator(expr, negate());
+    return detail::make_unary_opnode(expr, negate());
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1082,9 +1075,8 @@ template <class E, typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
 operator *(const E& expr, const element_t<E>& c)
 {
-    return detail::make_unary_operator(expr,
-				       std::bind(multiplies(),
-						 std::placeholders::_1, c));
+    return detail::make_unary_opnode(expr, std::bind(multiplies(),
+						     std::placeholders::_1, c));
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1097,9 +1089,8 @@ template <class E, typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
 operator *(const element_t<E>& c, const E& expr)
 {
-    return detail::make_unary_operator(expr,
-				       std::bind(multiplies(),
-						 c, std::placeholders::_1));
+    return detail::make_unary_opnode(expr, std::bind(multiplies(),
+						     c, std::placeholders::_1));
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1112,9 +1103,8 @@ template <class E, typename std::enable_if<is_range<E>::value>::type* = nullptr>
 inline auto
 operator /(const E& expr, const element_t<E>& c)
 {
-    return detail::make_unary_operator(expr,
-				       std::bind(divides(),
-						 std::placeholders::_1, c));
+    return detail::make_unary_opnode(expr, std::bind(divides(),
+						     std::placeholders::_1, c));
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1152,12 +1142,12 @@ operator /=(E&& expr, const element_t<typename std::decay<E>::type>& c)
   \return	加算演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<
-	      (is_range<L>::value && is_range<R>::value)>::type* = nullptr>
+	  typename std::enable_if<is_range<L>::value &&
+				  is_range<R>::value>::type* = nullptr>
 inline auto
 operator +(const L& l, const R& r)
 {
-    return detail::make_binary_operator(l, r, plus());
+    return detail::make_binary_opnode(l, r, plus());
 }
 
 //! 与えられた2つの式の各要素の差をとる.
@@ -1167,12 +1157,12 @@ operator +(const L& l, const R& r)
   \return	減算演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<
-	      (is_range<L>::value && is_range<R>::value)>::type* = nullptr>
+	  typename std::enable_if<is_range<L>::value &&
+				  is_range<R>::value>::type* = nullptr>
 inline auto
 operator -(const L& l, const R& r)
 {
-    return detail::make_binary_operator(l, r, minus());
+    return detail::make_binary_opnode(l, r, minus());
 }
 
 //! 与えられた左辺の式の各要素に右辺の式の各要素を加える.
@@ -1182,9 +1172,8 @@ operator -(const L& l, const R& r)
   \return	各要素が加算された左辺の式
 */
 template <class L, class R>
-inline typename std::enable_if<
-    (is_range<typename std::decay<L>::type>::value && is_range<R>::value),
-    L&>::type
+inline typename std::enable_if<is_range<typename std::decay<L>::type>::value &&
+			       is_range<R>::value, L&>::type
 operator +=(L&& l, const R& r)
 {
     return detail::op_assign<plus_assign>(l, r);
@@ -1197,9 +1186,8 @@ operator +=(L&& l, const R& r)
   \return	各要素が減じられた左辺の式
 */
 template <class L, class R>
-inline typename std::enable_if<
-    (is_range<typename std::decay<L>::type>::value && is_range<R>::value),
-    L&>::type
+inline typename std::enable_if<is_range<typename std::decay<L>::type>::value &&
+			       is_range<R>::value, L&>::type
 operator -=(L&& l, const R& r)
 {
     return detail::op_assign<minus_assign>(l, r);
@@ -1221,12 +1209,19 @@ fill(E&& expr, const T& val)
     for (auto iter = std::begin(expr); iter != std::end(expr); ++iter)
 	fill(*iter, val);
 }
-    
-template <class E, typename std::enable_if<is_range2<E>::value>::type* = nullptr>
+
+//! 与えられた2次元配列式の転置を返す
+/*
+  \param expr	2次元配列式
+  \return	expr を転置した2次元配列式
+ */ 
+template <class E,
+	  typename std::enable_if<is_range2<E>::value>::type* = nullptr>
 inline auto
 transpose(const E& expr)
 {
-    return make_range(column_begin(expr), column_end(expr));
+    constexpr size_t	siz0 = size0<value_t<E> >();
+    return make_range<siz0>(column_begin(expr), column_end(expr));
 }
 
 //! 与えられた式の各要素の自乗和を求める.
@@ -1234,22 +1229,12 @@ transpose(const E& expr)
   \param x	式
   \return	式の各要素の自乗和
 */
-template <class T>
-constexpr inline typename std::enable_if<!is_range<T>::value, T>::type
-square(const T& x)
-{
-    return x * x;
-}
-template <class E>
-inline typename std::enable_if<is_range<E>::value, element_t<E> >::type
+template <class E,
+	  typename std::enable_if<is_range<E>::value>::type* = nullptr>
+inline auto
 square(const E& expr)
 {
-    typedef element_t<E>		element_type;
-    typedef typename E::value_type	value_type;
-    
-    return std::accumulate(std::begin(expr), std::end(expr), element_type(0),
-			   [](const element_type& init, const value_type& val)
-			   { return init + square(val); });
+    return square<size0<E>()>(std::begin(expr), std::end(expr));
 }
 
 //! 与えられた式の各要素の自乗和の平方根を求める.

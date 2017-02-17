@@ -266,14 +266,18 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    :_sizes(b._sizes), _stride(b._stride),
 		     _capacity(b._capacity), _p(alloc(_capacity))
 		{
+#ifdef TU_DEBUG
 		    std::cout << "Buf<0>::Buf(const Buf&) ["
 		  	      << print_sizes_and_strides(b) << ']' << std::endl;
+#endif
 		    super::copy(b.begin(), b.end(), begin());
 		}
     Buf&	operator =(const Buf& b)
 		{
+#ifdef TU_DEBUG
 		    std::cout << "Buf<0>::operator =(const Buf&) ["
 		  	      << print_sizes_and_strides(b) << ']' << std::endl;
+#endif
 		    if (this != &b)
 		    {
 			resize(b._sizes, b._stride);
@@ -496,9 +500,9 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 {
   private:
     using super	= Buf<T, ALLOC, SIZE, SIZES...>;
+    using super::D;
     
   public:
-    using super::D;
     using typename super::sizes_type;
     using typename super::pointer;
     using typename super::const_pointer;
@@ -516,9 +520,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 					       ::reference;
     using const_reference	 = typename std::iterator_traits<const_iterator>
 					       ::reference;
-    
-    constexpr static size_t	dimension	= D;	//!< 配列の次元
-    constexpr static size_t	size0		= SIZE;	//!< 最初の軸の要素数
     
   public:
 		array()				= default;
@@ -559,20 +560,24 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
+#ifdef TU_DEBUG
 		    std::cout << "array::array(const E_&) ["
 			      << print_sizes(expr) << ']' << std::endl;
-		    constexpr size_t	SIZ = std::max(size0, E_::size0);
-		    copy<SIZ>(std::begin(expr), std::end(expr), begin());
+#endif
+		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
+		    copy<S>(std::begin(expr), std::end(expr), begin());
 		}
     template <class E_>
     typename std::enable_if<is_range<E_>::value, array&>::type
 		operator =(const E_& expr)
 		{
+#ifdef TU_DEBUG
 		    std::cout << "array::operator =(const E_&) ["
 		  	      << print_sizes(expr) << ']' << std::endl;
+#endif
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
-		    constexpr size_t	siz0 = std::max(size0, E_::size0);
-		    copy<siz0>(std::begin(expr), std::end(expr), begin());
+		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
+		    copy<S>(std::begin(expr), std::end(expr), begin());
 
 		    return *this;
 		}
@@ -580,12 +585,12 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(std::initializer_list<const_value_type> args)
 		    :super(sizes(args))
 		{
-		    copy<size0>(args.begin(), args.end(), begin());
+		    copy<size0()>(args.begin(), args.end(), begin());
 		}
     array&	operator =(std::initializer_list<const_value_type> args)
 		{
 		    super::resize(sizes(args));
-		    copy<size0>(args.begin(), args.end(), begin());
+		    copy<size0()>(args.begin(), args.end(), begin());
 
 		    return *this;
 		}
@@ -623,7 +628,11 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		operator ()()		{ return {begin(), end()}; }
     range<const_iterator>
 		operator ()()	const	{ return {begin(), end()}; }
-	    
+
+    constexpr static
+    size_t	dimension()	{ return D; }
+    constexpr static
+    size_t	size0()		{ return SIZE; }
     auto	cbegin()  const	{ return begin(); }
     auto	cend()	  const	{ return end(); }
     auto	rbegin()	{ return reverse_iterator(end()); }
@@ -741,6 +750,12 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 };
 
+//! 多次元配列の指定された軸の要素数を返す
+/*!
+  軸はテンプレートパラメータ I で指定する
+  \param a	多次元配列
+  \return	第 I 軸の要素数
+ */
 template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
 inline size_t
 size(const array<T, ALLOC, SIZE, SIZES...>& a)
@@ -748,6 +763,12 @@ size(const array<T, ALLOC, SIZE, SIZES...>& a)
     return a.template size<I>();
 }
 
+//! 多次元配列の指定された軸のストライドを返す
+/*!
+  軸はテンプレートパラメータ I で指定する
+  \param a	多次元配列
+  \return	第 I 軸のストライド
+ */
 template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
 inline size_t
 stride(const array<T, ALLOC, SIZE, SIZES...>& a)
@@ -755,6 +776,12 @@ stride(const array<T, ALLOC, SIZE, SIZES...>& a)
     return a.template stride<I>();
 }
 
+//! 出力ストリームへ配列を書き出し(ASCII)，さらに改行コードを出力する．
+/*!
+  \param out	出力ストリーム
+  \param a	書き出す配列
+  \return	outで指定した出力ストリーム
+*/
 template <class T, class ALLOC, size_t SIZE, size_t... SIZES> std::ostream&
 operator <<(std::ostream& out, const array<T, ALLOC, SIZE, SIZES...>& a)
 {
@@ -763,6 +790,12 @@ operator <<(std::ostream& out, const array<T, ALLOC, SIZE, SIZES...>& a)
     return out << std::endl;
 }
     
+//! 入力ストリームから配列を読み込む(ASCII)．
+/*!
+  \param in	入力ストリーム
+  \param a	配列の読み込み先
+  \return	inで指定した入力ストリーム
+*/
 template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
 inline std::istream&
 operator >>(std::istream& in, array<T, ALLOC, SIZE, SIZES...>& a)
@@ -774,14 +807,14 @@ operator >>(std::istream& in, array<T, ALLOC, SIZE, SIZES...>& a)
 *  type definitions for convenience					*
 ************************************************************************/
 template <class T, size_t N=0, class ALLOC=std::allocator<T> >
-using Array = array<T, ALLOC, N>;
+using Array = array<T, ALLOC, N>;				//!< 1次元配列
 
 template <class T, size_t R=0, size_t C=0, class ALLOC=std::allocator<T> >
-using Array2 = array<T, ALLOC, R, C>;
+using Array2 = array<T, ALLOC, R, C>;				//!< 2次元配列
 
 template <class T,
 	  size_t Z=0, size_t Y=0, size_t X=0, class ALLOC=std::allocator<T> >
-using Array3 = array<T, ALLOC, Z, Y, X>;
+using Array3 = array<T, ALLOC, Z, Y, X>;			//!< 3次元配列
 
 /************************************************************************
 *  evaluation of opnodes						*
@@ -791,32 +824,43 @@ namespace detail
   template <class E, bool=is_opnode<E>::value>
   struct result_t
   {
-      using type = E;
+      using type = E;		// E が opnode でなければ E そのもの
   };
   template <class E>
   struct result_t<E, true>
   {
     private:
       template <class T_, size_t SIZE_>
-      struct cat
+      struct array_t
       {
 	  using type = array<T_, std::allocator<T_>, SIZE_>;
       };
       template <class T_, size_t SIZE_, size_t... SIZES_>
-      struct cat<array<T_, std::allocator<T_>, SIZES_...>, SIZE_>
+      struct array_t<array<T_, std::allocator<T_>, SIZES_...>, SIZE_>
       {
 	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
       };
 
     public:
-      using type = typename cat<typename result_t<TU::value_t<E> >::type,
-				E::size0>::type;
+      using type = typename array_t<typename result_t<TU::value_t<E> >::type,
+				    size0<E>()>::type;
   };
 }	// namespace detail
 
+//! 演算子の評価結果の型を返す
+/*!
+  Eの型が演算子ならばその評価結果である配列の型を，そうでなければEそのものを返す
+  \param E	配列式の型
+*/
 template <class E>
 using result_t	= typename detail::result_t<E>::type;
 
+//! 配列式の評価結果を返す
+/*!
+  \param expr	配列式
+  \return	exprが演算子ならばその評価結果である配列を，そうでなければ
+		expr自体の参照を返す
+*/
 template <class E>
 inline typename std::conditional<detail::is_opnode<E>::value,
 				 result_t<E>, const E&>::type
@@ -828,93 +872,207 @@ evaluate(const E& expr)
 /************************************************************************
 *  products of two ranges						*
 ************************************************************************/
+namespace detail
+{
+  //! 与えられた配列式が演算子ならば，その評価値を保持するキャッシュオブジェクト
+  /*!
+    配列式が演算子でない場合，配列ならばその参照を，レンジならばその実態を保持
+    \param E		配列式
+   */
+  template <class E>
+  class cache
+  {
+    private:
+      template <class ITER_, size_t SIZE_>
+      static std::true_type	is_range(range<ITER_, SIZE_>)	;
+      static std::false_type	is_range(...)			;
+
+      using value_type	= TU::result_t<E>;
+
+    // Eが演算子ならば評価結果の実体，演算子でないレンジならばレンジ自体の実体，
+    // レンジでなければEへの参照
+      using cache_type	= typename std::conditional<
+			      is_opnode<E>::value || 
+			      decltype(is_range(std::declval<E>()))::value,
+			      const value_type, const value_type&>::type;
+
+    public:
+      cache(const E& expr)	:val(expr)			{}
+      
+      cache_type	val;
+  };
+
+  //! 2変数関数の第2引数を定数参照として固定して1変数関数を生成する関数オブジェクト
+  /*!
+    \param OP		2変数関数
+    \param T		OP の第2引数の型
+   */
+  template <class OP, class T>
+  class binder2nd
+  {
+    public:
+      binder2nd(const OP& op, const T& c)	:_op(op), _c(c)	{}
+	      
+      template <class S_>
+      auto	operator ()(const S_& arg)	const	{ return _op(arg, _c); }
+	  
+    private:
+      const OP	_op;
+      const T&	_c;
+  };
+
+  //! 評価後に固定された第2引数を持つ関数適用反復子のレンジである演算子
+  /*!
+    \param SIZE		レンジのサイズ
+    \param OP		2変数関数
+    \param ITER		OP の第1引数を供給する反復子
+    \param E		OP の第2引数となる配列式の型
+   */
+  template <size_t SIZE, class OP, class ITER, class E>
+  class cache2nd_opnode : private cache<E>,
+			  public  range<boost::transform_iterator<
+					    binder2nd<OP, TU::result_t<E> >,
+					    ITER>, SIZE>,
+			  public  opnode
+  {
+    private:
+      using cache_t = cache<E>;
+      using range_t = range<boost::transform_iterator<
+				binder2nd<OP, TU::result_t<E> >, ITER>, SIZE>;
+
+    public:
+      cache2nd_opnode(ITER begin, ITER end, const E& expr, const OP& op)
+	  :cache_t(expr),
+	   range_t({begin, {op, cache_t::val}},
+		   {end,   {op, cache_t::val}})			{}
+  };
+
+  //! 評価後に固定された第2引数を持つ関数適用反復子のレンジである演算子を生成する
+  /*!
+    \param begin	op の第1引数の先頭を指す反復子
+    \param end		op の第1引数の末尾の次を指す反復子
+    \param op		2変数関数
+    \param expr		OP の第2引数となる配列式
+    \return		生成された演算子
+   */
+  template <size_t SIZE, class OP, class ITER, class E>
+  inline cache2nd_opnode<SIZE, OP, ITER, E>
+  make_cache2nd_opnode(ITER begin, ITER end, const E& expr, const OP& op)
+  {
+      return {begin, end, expr, op};
+  }
+}	// namespace detail
+
+//! 2つの1次元配列式の内積をとる.
+/*!
+  演算子ノードではなく，評価結果のスカラー値が返される.
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	内積の評価結果
+*/
 template <class L, class R,
-	  typename std::enable_if<
-	      is_range1<L>::value && is_range1<R>::value>::type* = nullptr>
+	  typename std::enable_if<is_range1<L>::value &&
+				  is_range1<R>::value>::type* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
     using value_type = typename std::common_type<value_t<L>, value_t<R> >::type;
 
-    constexpr size_t	size0 = std::max(L::size0, R::size0);
-    
-    return inner_product<size0>(std::begin(l), std::end(l), std::begin(r),
-				value_type(0));
+    assert(size<0>(l) == size<0>(r));
+    constexpr size_t	siz0 = std::max(size0<L>(), size0<R>());
+    return inner_product<siz0>(std::begin(l), std::end(l), std::begin(r),
+			       value_type(0));
 }
 
-namespace detail
-{
-  template <class T>
-  struct cache
-  {
-      using value_type	= TU::result_t<T>;
-      using cache_type	= typename std::conditional<
-			      (std::is_same<T, value_type>::value &&
-			       !TU::is_rangeobj<T>::value),
-			      const value_type&, const value_type>::type;
-
-      cache(const T& arg_)	:arg(arg_)		{}
-      
-      cache_type	arg;
-  };
-    
-  template <class T>
-  class product
-  {
-    public:
-      product(const T& arg)	:_arg(arg)		{}
-	      
-      template <class S_>
-      auto	operator ()(const S_& val)	const	{ return val * _arg; }
-	  
-    private:
-      const T&	_arg;
-  };
-
-  template <class ITER, class T>
-  class product_operator
-      : private cache<T>,
-	public  range<boost::transform_iterator<
-			  product<typename cache<T>::value_type>, ITER> >,
-	public  opnode
-  {
-    private:
-      using cache_t	= cache<T>;
-      using range_t	= range<boost::transform_iterator<
-				    product<typename cache_t::value_type>,
-				    ITER> >;
-
-    public:
-		product_operator(ITER begin, ITER end, const T& arg)
-		    :cache_t(arg),
-		     range_t({begin, {cache_t::arg}}, {end, {cache_t::arg}})
-		{
-		}
-  };
-
-  template <class ITER, class T> inline product_operator<ITER, T>
-  make_product_operator(ITER begin, ITER end, const T& arg)
-  {
-      return {begin, end, arg};
-  }
-}	// namespace detail
-
+//! 2次元配列式と1または2次元配列式の積をとる.
+/*!
+  \param l	左辺の2次元配列式
+  \param r	右辺の1または2次元配列式
+  \return	積を表す演算子ノード
+*/
 template <class L, class R,
-	  typename std::enable_if<
-	      (is_range2<L>::value && is_range<R>::value)>::type* = nullptr>
+	  typename std::enable_if<is_range2<L>::value &&
+				  is_range<R>::value>::type* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
-    return detail::make_product_operator(std::begin(l), std::end(l), r);
+    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::end(l),
+						    r, multiplies());
 }
 
+//! 1次元配列式と2次元配列式の積をとる.
+/*!
+  \param l	左辺の1次元配列式
+  \param r	右辺の2次元配列式
+  \return	積を表す演算子ノード
+*/
 template <class L, class R,
-	  typename std::enable_if<
-	      (is_range1<L>::value && is_range2<R>::value)>::type* = nullptr>
+	  typename std::enable_if<is_range1<L>::value &&
+				  is_range2<R>::value>::type* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
-    return detail::make_product_operator(column_begin(r), column_end(r), l);
+    constexpr size_t	siz0 = size0<value_t<R> >();
+    return detail::make_cache2nd_opnode<siz0>(column_begin(r), column_end(r),
+					      l, multiplies());
+}
+
+//! 2つの1次元配列式の外積をとる.
+/*!
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	外積を表す演算子ノード
+*/
+template <class L, class R,
+	  typename std::enable_if<is_range1<L>::value &&
+				  is_range1<R>::value>::type* = nullptr>
+inline auto
+operator %(const L& l, const R& r)
+{
+    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::end(l),
+						    r, multiplies());
+}
+    
+//! 2つの1次元配列式のベクトル積をとる.
+/*!
+  演算子ノードではなく，評価結果の3次元配列が返される.
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	ベクトル積
+*/
+template <class L, class R>
+inline typename std::enable_if<
+	   (is_range1<L>::value && is_range1<R>::value),
+	   Array<typename std::common_type<element_t<L>, element_t<R> >::type,
+		 3> >::type
+operator ^(const L& l, const R& r)
+{
+    assert(size<0>(l) == 3 && size<0>(r) == 3);
+    
+    const auto&	el = evaluate(l);
+    const auto&	er = evaluate(r);
+
+    return {el[1] * er[2] - el[2] * er[1],
+	    el[2] * er[0] - el[0] * er[2],
+	    el[0] * er[1] - el[1] * er[0]};
+}
+
+//! 2次元配列式の各行と1次元配列式のベクトル積をとる.
+/*!
+  \param l	左辺の2次元配列式
+  \param r	右辺の1次元配列式
+  \return	ベクトル積を表す演算子ノード
+*/
+template <class L, class R,
+	  typename std::enable_if<is_range2<L>::value &&
+				  is_range1<R>::value>::type* = nullptr>
+inline auto
+operator ^(const L& l, const R& r)
+{
+    assert(size<1>(l) == 3 && size<0>(r) == 3);
+    
+    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::end(l),
+						    r, bit_xor());
 }
 
 }	// namespace TU

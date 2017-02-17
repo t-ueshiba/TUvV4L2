@@ -196,7 +196,7 @@ test_numeric(const BUF& buf)
     auto		a = make_range<2, 6, 6>(buf.begin());
     Array2<value_type>	b{{{100, 110, 120, 130, 140, 150},
 			   {160, 170, 180, 190, 200, 210}}};
-    Array2<float>	c;
+    Array2<float, 2, 6>	c;
     c = a + 2*b;
     std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
 
@@ -206,33 +206,43 @@ test_numeric(const BUF& buf)
     using	boost::core::demangle;
     
     auto	x = a + b + b;
-    std::cout << is_rangeobj<decltype(b)>::value << std::endl;
-    std::cout << is_rangeobj<decltype(x)>::value << std::endl;
-
     std::cout << demangle(typeid(result_t<decltype(a)>).name()) << std::endl;
     std::cout << demangle(typeid(result_t<decltype(x)>).name()) << std::endl;
 }
-  /*
+
 static void
 test_numeric2()
 {
     using value_type = int;
-
+#if 0
     std::cout << "*** numeric test2 ***" << std::endl;
-    
-    std::array<std::array<int, 6>, 2>		a{{{0, 1, 2, 3, 4, 5}, {6, 7, 8, 9, 10, 11}}};
-    float	b[][6]{{100, 110, 120, 130, 140, 150},
-		       {160, 170, 180, 190, 200, 210}};
-    double	c[2][6];
+#  if 1
+    std::array<std::array<int, 6>, 2>	a{{{0, 1, 2, 3, 4, 5},
+					   {6, 7, 8, 9, 10, 11}}};
+#  else
+    int				a[][6]{{0, 1, 2, 3, 4, 5},
+					   {6, 7, 8, 9, 10, 11}};
+#  endif
+    std::array<std::array<float, 6>, 2>	b{{{100, 110, 120, 130, 140, 150},
+					   {160, 170, 180, 190, 200, 210}}};
+    Array2<float, 2, 6>	c;
+
     std::cout << is_range<decltype(a)>::value << std::endl;
-    c = TU::operator +(a, b);
+    c = a + 2*b;
     std::cout << c;
   //std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
 
-    auto		d = transpose(c);
+    auto		d = transpose(a);
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
+#  if 0
+    int	x[] = {1, 2, 3}, y[] = {4, 5, 6};
+    std::cout << is_range<decltype(x)>::value << std::endl;
+    Array<float>	z = x;
+    std::cout << "--- z(" << print_sizes(z) << ") ---\n" << z;
+#  endif
+#endif
 }
-  */
+    
 static void
 test_prod()
 {
@@ -247,44 +257,52 @@ test_prod()
     const vector_type	b = {4, 5, 6};
     vector_type		c;
 
-    std::cout << "*** t = a * a ***" << std::endl;
+    std::cout << "--- t = a * a ---" << std::endl;
     element_type	t = a * a;
     std::cout << t << std::endl << std::endl;
 
-    std::cout << "*** c = a * t ***" << std::endl;
+    std::cout << "--- c = a * t ---" << std::endl;
     c = a * t;
     std::cout << c << std::endl;
 
     const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
+  //const Array2<float, 2, 3>	A = {{1, 2, 3}, {10, 20, 30}};
     const matrix_type	B = {{1, 2}, {10, 20}, {100, 200}};
     matrix_type		C, D;
 
-    std::cout << "*** C = -(A + A + A) ***" << std::endl;
-    C = -(A + A + A);
+    std::cout << "--- C = -(A + A + A) ---" << std::endl;
+  //C = -(A + A + A);
+    c = -b;
+    using iter = std::decay<decltype((-b).begin())>::type;
+    
+    std::cout << boost::core::demangle(typeid(iter).name()) << std::endl;
+    std::cout << boost::core::demangle(typeid(std::iterator_traits<iter>::iterator_category).name()) << std::endl;
+
+    C = A + A;
     std::cout << C;
 
-    std::cout << "*** c = A * (a + b) ***" << std::endl;
+    std::cout << "--- c = A * (a + b) ---" << std::endl;
     c = A * (a + b);
-  //c = A * a;
-    std::cout << c << std::endl;
-#if 0
-    C = B;
-    std::cout << "*** c = a * (B + C) ***" << std::endl;
-    c = a * (B + C);
     std::cout << c << std::endl;
 
-    std::cout << "*** C = A * (B + C) ***" << std::endl;
+    C = B;
+    std::cout << "--- c = a * (B + C) ---" << std::endl;
+    
+    c = a * (B + C);
+  //c = a * B;
+    std::cout << c << std::endl;
+
+    std::cout << "--- C = A * (B + C) ---" << std::endl;
     C = A * (B + C);
     std::cout << C;
 
-    std::cout << "*** C = (a + b) % c ***" << std::endl;
+    std::cout << "--- C = (a + b) % c ---" << std::endl;
     C = (a + b) % c;
     std::cout << C;
 
-    std::cout << "*** C = a ^ B ***" << std::endl;
+    std::cout << "--- C = A ^ b ---" << std::endl;
     C = A ^ b;
     std::cout << C;
-#endif
 }
 
 }	// namespace TU
@@ -305,7 +323,7 @@ main()
     TU::test_text_io(buf);
     TU::test_external_allocator(buf);
     TU::test_numeric(buf);
-  //TU::test_numeric2();
+    TU::test_numeric2();
     TU::test_prod();
     
     return 0;

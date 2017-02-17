@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I.
-CPPFLAGS	= #-DCPP11
+CPPFLAGS	= -DTU_DEBUG #-DCPP11
 CFLAGS		= -std=c++1y -g
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
@@ -38,12 +38,9 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		=
 HDRS		= TU/Array++.h \
-		TU/Array++11.h \
 		TU/algorithm.h \
 		TU/functional.h \
 		TU/iterator.h \
-		TU/range++11.h \
-		TU/range-DEBUG.h \
 		TU/range.h \
 		TU/utility.h
 SRCS		= main.cc
@@ -165,5 +162,5 @@ moc_%.cc: %.h
 %.o: %.cu
 	$(NVCC) $(CPPFLAGS) $(INCDIRS) $(NVCCFLAGS) -Xcompiler $(PIC) -c $<
 ###
-main.o: TU/Array++11.h TU/range++11.h TU/utility.h TU/algorithm.h \
-	TU/Array++.h TU/range.h TU/iterator.h TU/functional.h
+main.o: TU/Array++.h TU/range.h TU/iterator.h TU/functional.h \
+	TU/algorithm.h TU/utility.h
