@@ -273,18 +273,10 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    :_sizes(b._sizes), _stride(b._stride),
 		     _capacity(b._capacity), _p(alloc(_capacity))
 		{
-#ifdef TU_DEBUG
-		    std::cout << "Buf<0>::Buf(const Buf&) ["
-		  	      << print_sizes_and_strides(b) << ']' << std::endl;
-#endif
 		    super::copy(b.begin(), size(), begin());
 		}
     Buf&	operator =(const Buf& b)
 		{
-#ifdef TU_DEBUG
-		    std::cout << "Buf<0>::operator =(const Buf&) ["
-		  	      << print_sizes_and_strides(b) << ']' << std::endl;
-#endif
 		    if (this != &b)
 		    {
 			resize(b._sizes, b._stride);
@@ -567,10 +559,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
-#ifdef TU_DEBUG
-		    std::cout << "array::array(const E_&) ["
-			      << print_sizes(expr) << ']' << std::endl;
-#endif
 		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
 		    copy<S>(std::begin(expr), size(), begin());
 		}
@@ -578,10 +566,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     typename std::enable_if<is_range<E_>::value, array&>::type
 		operator =(const E_& expr)
 		{
-#ifdef TU_DEBUG
-		    std::cout << "array::operator =(const E_&) ["
-		  	      << print_sizes(expr) << ']' << std::endl;
-#endif
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
 		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
 		    copy<S>(std::begin(expr), size(), begin());
@@ -1038,7 +1022,7 @@ operator %(const L& l, const R& r)
     return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::size(l),
 						    r, multiplies());
 }
-    
+
 //! 2つの1次元配列式のベクトル積をとる.
 /*!
   演算子ノードではなく，評価結果の3次元配列が返される.
@@ -1053,6 +1037,9 @@ inline typename std::enable_if<
 		 3> >::type
 operator ^(const L& l, const R& r)
 {
+#ifdef TU_DEBUG
+    std::cout << "operator ^ [" << print_sizes(l) << ']' << std::endl;
+#endif
     assert(size<0>(l) == 3 && size<0>(r) == 3);
     
     const auto&	el = evaluate(l);

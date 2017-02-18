@@ -117,6 +117,24 @@ namespace detail
   static std::false_type
   has_size0(...)							;
 
+  /*
+   *  A ^ b において opnode: cache2nd_opnode<SIZE, bit_xor, ITER, E> が
+   *  生成されるが，これを評価して2次元配列に代入する際に代入先の領域確保のため
+   *  size<0>(opnode), size<1>(opnode) が呼び出される．後者はopnodeの反復子が
+   *  指す先を評価するが，これは2つの3次元ベクトルのベクトル積を評価することに
+   *  等しく，コストが高い処理である．そこで，ベクトル積を評価せずその評価結果の
+   *  サイズだけを得るために，以下のオーバーロードを導入する．
+   */
+  template <size_t SIZE, class OP, class ITER, class E>
+  class cache2nd_opnode;
+    
+  template <size_t SIZE, class ITER, class E> constexpr size_t
+  size(const cache2nd_opnode<SIZE, bit_xor, ITER, E>&,
+       std::integral_constant<size_t, 1>)
+  {
+      return 3;
+  }
+
   template <class E> inline size_t
   size(const E& expr, std::integral_constant<size_t, 0>)
   {
@@ -308,10 +326,6 @@ class range
 		range(const range&)				= default;
     range&	operator =(const range& r)
 		{
-#ifdef TU_DEBUG
-		    std::cout << "range<SIZE>::operator =(const range&) ["
-			      << print_sizes_and_strides(r) << ']' << std::endl;
-#endif
 		    copy<SIZE>(r.begin(), size(), begin());
 		    return *this;
 		}
@@ -330,11 +344,6 @@ class range
     typename std::enable_if<is_range<E_>::value, range&>::type
 		operator =(const E_& expr)
 		{
-#ifdef TU_DEBUG
-		    std::cout << "range<SIZE>::operator =(const E_&) ["
-			      << print_sizes_and_strides(expr) << ']'
-			      << std::endl;
-#endif
 		    assert(std::size(expr) == size());
 		    copy<SIZE>(std::begin(expr), size(), begin());
 		    return *this;
@@ -397,10 +406,6 @@ class range<ITER, 0>
 		range(const range&)				= default;
     range&	operator =(const range& r)
 		{
-#ifdef TU_DEBUG
-		    std::cout << "range<0>::operator =(const range&) ["
-			      << print_sizes_and_strides(r) << ']' << std::endl;
-#endif
 		    assert(r.size() == size());
 		    copy<0>(r._begin, size(), begin());
 		    return *this;
@@ -420,11 +425,6 @@ class range<ITER, 0>
     typename std::enable_if<is_range<E_>::value, range&>::type
 		operator =(const E_& expr)
 		{
-#ifdef TU_DEBUG
-		    std::cout << "range<0>::operator =(const E_&) ["
-			      << print_sizes_and_strides(expr) << ']'
-			      << std::endl;
-#endif
 		    assert(std::size(expr) == size());
 		    copy<TU::size0<E_>()>(std::begin(expr), size(), begin());
 		    return *this;

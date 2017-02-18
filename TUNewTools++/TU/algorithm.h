@@ -13,6 +13,16 @@
 
 namespace TU
 {
+#ifdef TU_DEBUG
+template <class ITER, size_t SIZE>	class range;
+template <class E>			class sizes_holder;
+
+template <class E>
+sizes_holder<E>	print_sizes(const E& expr);
+template <class E>
+std::ostream&	operator <<(std::ostream& out, const sizes_holder<E>& holder);
+#endif
+
 //! 与えられた二つの整数の最大公約数を求める．
 /*!
   \param m	第1の整数
@@ -118,7 +128,7 @@ namespace detail
   {
       return std::inner_product(begin0, end0, begin1, init);
   }
-  template <class ITER0, class ITER1, class T> inline T
+  template <class ITER0, class ITER1, class T> T
   inner_product(ITER0 begin0, size_t n, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, 0>)
   {
@@ -148,7 +158,7 @@ namespace detail
   {
       return val * val;
   }
-  template <class ITER> inline auto
+  template <class ITER> auto
   square(ITER begin, ITER end, std::integral_constant<size_t, 0>)
   {
       using value_type	= typename std::iterator_traits<ITER>::value_type;
@@ -158,7 +168,7 @@ namespace detail
 	  val += square(*begin);
       return val;
   }
-  template <class ITER> inline auto
+  template <class ITER> auto
   square(ITER begin, size_t n, std::integral_constant<size_t, 0>)
   {
       using value_type	= typename std::iterator_traits<ITER>::value_type;
@@ -193,6 +203,10 @@ namespace detail
 template <size_t N, class IN, class ARG, class OUT> inline OUT
 copy(IN in, ARG arg, OUT out)
 {
+#ifdef TU_DEBUG
+    std::cout << "copy<" << N << "> ["
+	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
+#endif
     return detail::copy(in, arg, out, std::integral_constant<size_t, N>());
 }
     
@@ -223,6 +237,10 @@ fill(ITER begin, ARG arg, const T& val)
 template <size_t N, class ITER0, class ARG, class ITER1, class T> inline T
 inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init)
 {
+#ifdef TU_DEBUG
+    std::cout << "inner_product<" << N << "> ["
+	      << print_sizes(range<ITER0, N>(begin0, arg)) << ']' << std::endl;
+#endif
     return detail::inner_product(begin0, arg, begin1, init,
 				 std::integral_constant<size_t, N>());
 }

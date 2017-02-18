@@ -265,20 +265,13 @@ test_prod()
     c = a * t;
     std::cout << c << std::endl;
 
-    const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
-  //const Array2<float, 2, 3>	A = {{1, 2, 3}, {10, 20, 30}};
+  //const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
+    const Array2<float, 2, 3>	A = {{1, 2, 3}, {10, 20, 30}};
     const matrix_type	B = {{1, 2}, {10, 20}, {100, 200}};
     matrix_type		C, D;
 
     std::cout << "--- C = -(A + A + A) ---" << std::endl;
-  //C = -(A + A + A);
-    c = -b;
-    using iter = std::decay<decltype((-b).begin())>::type;
-    
-    std::cout << boost::core::demangle(typeid(iter).name()) << std::endl;
-    std::cout << boost::core::demangle(typeid(std::iterator_traits<iter>::iterator_category).name()) << std::endl;
-
-    C = A + A;
+    C = -(A + A + A);
     std::cout << C;
 
     std::cout << "--- c = A * (a + b) ---" << std::endl;
@@ -287,17 +280,15 @@ test_prod()
 
     C = B;
     std::cout << "--- c = a * (B + C) ---" << std::endl;
-    
     c = a * (B + C);
-  //c = a * B;
     std::cout << c << std::endl;
 
     std::cout << "--- C = A * (B + C) ---" << std::endl;
     C = A * (B + C);
     std::cout << C;
 
-    std::cout << "--- C = (a + b) % c ---" << std::endl;
-    C = (a + b) % c;
+    std::cout << "--- C = c % (a + b) ---" << std::endl;
+    C = c % (a + b);
     std::cout << C;
 
     std::cout << "--- C = A ^ b ---" << std::endl;
