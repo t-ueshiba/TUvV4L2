@@ -214,14 +214,13 @@ static void
 test_numeric2()
 {
     using value_type = int;
-#if 0
+
     std::cout << "*** numeric test2 ***" << std::endl;
-#  if 1
+#  if 0
     std::array<std::array<int, 6>, 2>	a{{{0, 1, 2, 3, 4, 5},
 					   {6, 7, 8, 9, 10, 11}}};
 #  else
-    int				a[][6]{{0, 1, 2, 3, 4, 5},
-					   {6, 7, 8, 9, 10, 11}};
+    int		a[][6]{{0, 1, 2, 3, 4, 5}, {6, 7, 8, 9, 10, 11}};
 #  endif
     std::array<std::array<float, 6>, 2>	b{{{100, 110, 120, 130, 140, 150},
 					   {160, 170, 180, 190, 200, 210}}};
@@ -229,18 +228,17 @@ test_numeric2()
 
     std::cout << is_range<decltype(a)>::value << std::endl;
     c = a + 2*b;
-    std::cout << c;
-  //std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
-
+    std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
+    std::cout << boost::core::demangle(typeid(value_t<decltype(a)>).name())
+	      << std::endl;
+    
     auto		d = transpose(a);
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
-#  if 0
+
     int	x[] = {1, 2, 3}, y[] = {4, 5, 6};
     std::cout << is_range<decltype(x)>::value << std::endl;
-    Array<float>	z = x;
+    Array<float>	z = x; // + y;
     std::cout << "--- z(" << print_sizes(z) << ") ---\n" << z;
-#  endif
-#endif
 }
     
 static void
@@ -284,7 +282,8 @@ test_prod()
     std::cout << c << std::endl;
 
     std::cout << "--- C = A * (B + C) ---" << std::endl;
-    C = A * (B + C);
+  //C = A * (B + C);
+    C = A * B;
     std::cout << C;
 
     std::cout << "--- C = c % (a + b) ---" << std::endl;
