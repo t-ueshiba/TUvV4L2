@@ -273,14 +273,14 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    :_sizes(b._sizes), _stride(b._stride),
 		     _capacity(b._capacity), _p(alloc(_capacity))
 		{
-		    super::copy(b.begin(), size(), begin());
+		    copy<0>(b.begin(), size(), begin());
 		}
     Buf&	operator =(const Buf& b)
 		{
 		    if (this != &b)
 		    {
 			resize(b._sizes, b._stride);
-			super::copy(b.begin(), size(), begin());
+			copy<0>(b.begin(), size(), begin());
 		    }
 		    return *this;
 		}
@@ -559,7 +559,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
-		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
+		    constexpr size_t	S = detail::max<size0(),
+							TU::size0<E_>()>::value;
 		    copy<S>(std::begin(expr), size(), begin());
 		}
     template <class E_>
@@ -567,7 +568,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		operator =(const E_& expr)
 		{
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
-		    constexpr size_t	S = std::max(size0(), TU::size0<E_>());
+		    constexpr size_t	S = detail::max<size0(),
+							TU::size0<E_>()>::value;
 		    copy<S>(std::begin(expr), size(), begin());
 
 		    return *this;
@@ -604,7 +606,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     void	write(array<T, ALLOC_, SIZE, SIZES...>& a) const
 		{
 		    a.resize(sizes(), a.stride());
-		    super::copy_n(begin(), size(), a.begin());
+		    super::copy<SIZE>(begin(), size(), a.begin());
 		}
 
     using	super::size;
@@ -865,91 +867,64 @@ evaluate(const E& expr)
 ************************************************************************/
 namespace detail
 {
-  //! 与えられた配列式が演算子ならば，その評価値を保持するキャッシュオブジェクト
+  //! 2つの配列式に対する積演算子を表すクラス
   /*!
-    配列式が演算子でない場合，配列ならばその参照を，レンジならばその実態を保持
-    \param E		配列式
+    \param OP	積演算子の型
+    \param L	積演算子の第1引数となる式の型
+    \param R	積演算子の第2引数となる式の型
    */
-  template <class E>
-  class cache
+  template <class OP, class L, class R>
+  class product_opnode : public opnode
   {
     private:
-      template <class ITER_, size_t SIZE_>
-      static std::true_type	is_range(range<ITER_, SIZE_>)	;
-      static std::false_type	is_range(...)			;
+      class binder2nd
+      {
+	private:
+	// 右辺が opnode の場合：その評価結果
+	// 右辺が opnode でない場合：
+	//	右辺が range<ITER, SIZE> に変換可能ならば右辺そのもの
+	//	そうでなければそれへの定数参照
+	  using cache_t	= typename std::conditional<
+			      is_opnode<R>::value || is_rangeobj<R>::value,
+			      const TU::result_t<R>, const R&>::type;
 
-      using value_type	= TU::result_t<E>;
+	public:
+		binder2nd(const OP& op, const R& r)
+		    :_r(r), _op(op) 			{}
 
-    // Eが演算子ならば評価結果の実体，演算子でないレンジならばレンジ自体の実体，
-    // レンジでなければEへの参照
-      using cache_type	= typename std::conditional<
-			      is_opnode<E>::value || 
-			      decltype(is_range(std::declval<E>()))::value,
-			      const value_type, const value_type&>::type;
+	  template <class T_>
+	  auto	operator ()(const T_& arg)	const	{ return _op(arg, _r); }
+
+	private:
+	  cache_t	_r;	// 評価後に固定された第2引数
+	  const OP	_op;
+      };
 
     public:
-      cache(const E& expr)	:val(expr)			{}
+    // transform_iterator への第1テンプレートパラメータを，binder2nd そのもの
+    // ではなく，それへの定数参照とすることにより cache のコピーを防ぐ
+      using iterator = boost::transform_iterator<const binder2nd&,
+						 const_iterator_t<L> >;
       
-      cache_type	val;
-  };
-
-  //! 2変数関数の第2引数を定数参照として固定して1変数関数を生成する関数オブジェクト
-  /*!
-    \param OP		2変数関数
-    \param T		OP の第2引数の型
-   */
-  template <class OP, class T>
-  class binder2nd
-  {
     public:
-      binder2nd(const OP& op, const T& c)	:_op(op), _c(c)	{}
-	      
-      template <class S_>
-      auto	operator ()(const S_& arg)	const	{ return _op(arg, _c); }
-	  
+		product_opnode(const L& l, const R& r, const OP& op)
+		    :_l(l), _binder(op, r)				{}
+
+      constexpr static size_t
+		size0()		{ return TU::size0<L>(); }
+      iterator	begin()	const	{ return {std::begin(_l), _binder}; }
+      iterator	end()	const	{ return {std::end(_l),   _binder}; }
+      size_t	size()	const	{ return std::size(_l); }
+
     private:
-      const OP	_op;
-      const T&	_c;
+      argument_t<L>	_l;
+      const binder2nd	_binder;
   };
 
-  //! 評価後に固定された第2引数を持つ関数適用反復子のレンジである演算子
-  /*!
-    \param SIZE		レンジのサイズ
-    \param OP		2変数関数
-    \param ITER		OP の第1引数を供給する反復子
-    \param E		OP の第2引数となる配列式の型
-   */
-  template <size_t SIZE, class OP, class ITER, class E>
-  class cache2nd_opnode : private cache<E>,
-			  public  range<boost::transform_iterator<
-					    binder2nd<OP, TU::result_t<E> >,
-					    ITER>, SIZE>,
-			  public  opnode
+  template <class OP, class L, class R> inline product_opnode<OP, L, R>
+  make_product_opnode(const L& l, const R& r, const OP& op)
   {
-    private:
-      using cache_t = cache<E>;
-      using range_t = range<boost::transform_iterator<
-				binder2nd<OP, TU::result_t<E> >, ITER>, SIZE>;
-
-    public:
-      cache2nd_opnode(ITER begin, size_t size, const E& expr, const OP& op)
-	  :cache_t(expr),
-	   range_t({begin, {op, cache_t::val}}, size)		{}
-  };
-
-  //! 評価後に固定された第2引数を持つ関数適用反復子のレンジである演算子を生成する
-  /*!
-    \param begin	op の第1引数の先頭を指す反復子
-    \param end		op の第1引数の末尾の次を指す反復子
-    \param op		2変数関数
-    \param expr		OP の第2引数となる配列式
-    \return		生成された演算子
-   */
-  template <size_t SIZE, class OP, class ITER, class E>
-  inline cache2nd_opnode<SIZE, OP, ITER, E>
-  make_cache2nd_opnode(ITER begin, size_t size, const E& expr, const OP& op)
-  {
-      return {begin, size, expr, op};
+      return {l, r, op};
   }
 }	// namespace detail
 
@@ -969,7 +944,7 @@ operator *(const L& l, const R& r)
     using value_type = typename std::common_type<value_t<L>, value_t<R> >::type;
 
     assert(size<0>(l) == size<0>(r));
-    constexpr size_t	S = std::max(size0<L>(), size0<R>());
+    constexpr size_t	S = detail::max<size0<L>(),size0<R>()>::value;
     return inner_product<S>(std::begin(l), std::size(l), std::begin(r),
 			    value_type(0));
 }
@@ -986,8 +961,7 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::size(l),
-						    r, multiplies());
+    return detail::make_product_opnode(l, r, multiplies());
 }
 
 //! 1次元配列式と2次元配列式の積をとる.
@@ -1003,10 +977,10 @@ inline auto
 operator *(const L& l, const R& r)
 {
     constexpr size_t	S = size0<value_t<R> >();
-    return detail::make_cache2nd_opnode<S>(column_begin(r), size<1>(r),
-					   l, multiplies());
+    return detail::make_product_opnode(
+      	       make_range<S>(column_begin(r), size<1>(r)), l, multiplies());
 }
-
+    
 //! 2つの1次元配列式の外積をとる.
 /*!
   \param l	左辺の1次元配列式
@@ -1019,8 +993,7 @@ template <class L, class R,
 inline auto
 operator %(const L& l, const R& r)
 {
-    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::size(l),
-						    r, multiplies());
+    return detail::make_product_opnode(l, r, multiplies());
 }
 
 //! 2つの1次元配列式のベクトル積をとる.
@@ -1064,9 +1037,9 @@ operator ^(const L& l, const R& r)
 {
     assert(size<1>(l) == 3 && size<0>(r) == 3);
     
-    return detail::make_cache2nd_opnode<size0<L>()>(std::begin(l), std::size(l),
-						    r, bit_xor());
+    return detail::make_product_opnode(l, r, bit_xor());
 }
+
 
 }	// namespace TU
 #endif	// !__TU_ARRAY_H

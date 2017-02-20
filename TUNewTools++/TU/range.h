@@ -118,19 +118,17 @@ namespace detail
   has_size0(...)							;
 
   /*
-   *  A ^ b において opnode: cache2nd_opnode<SIZE, bit_xor, ITER, E> が
+   *  A ^ b において opnode: product_opnode<bit_xor, L, R> が
    *  生成されるが，これを評価して2次元配列に代入する際に代入先の領域確保のため
    *  size<0>(opnode), size<1>(opnode) が呼び出される．後者はopnodeの反復子が
    *  指す先を評価するが，これは2つの3次元ベクトルのベクトル積を評価することに
    *  等しく，コストが高い処理である．そこで，ベクトル積を評価せずその評価結果の
    *  サイズだけを得るために，以下のオーバーロードを導入する．
    */
-  template <size_t SIZE, class OP, class ITER, class E>
-  class cache2nd_opnode;
+  template <class OP, class L, class R>	class product_opnode;
     
-  template <size_t SIZE, class ITER, class E> constexpr size_t
-  size(const cache2nd_opnode<SIZE, bit_xor, ITER, E>&,
-       std::integral_constant<size_t, 1>)
+  template <class L, class R> constexpr size_t
+  size(const product_opnode<bit_xor, L, R>&, std::integral_constant<size_t, 1>)
   {
       return 3;
   }
@@ -226,9 +224,9 @@ class sizes_holder
     static typename std::enable_if<is_range<E_>::value, std::ostream&>::type
 			print_size(std::ostream& out, const E_& expr)
 			{
+			    const auto&	val = *std::begin(expr);
 			    return print_size(print_x(out << std::size(expr),
-						      *std::begin(expr)),
-					      *std::begin(expr));
+						      val), val);
 			}
 
   protected:
@@ -888,7 +886,7 @@ class column_iterator
     size_t	_nrows;
 };
 
-template <size_t SIZE=0, class ROW> inline column_iterator<ROW, SIZE>
+template <size_t NROWS=0, class ROW> inline column_iterator<ROW, NROWS>
 make_column_iterator(ROW row, size_t nrows, size_t col)
 {
     return {row, nrows, col};
@@ -940,33 +938,63 @@ column_cend(const E& expr)
 namespace detail
 {
   /**********************************************************************
+  *  type aliases							*
+  **********************************************************************/
+  template <size_t I, size_t J>
+  using max = std::integral_constant<size_t, (I > J ? I : J)>;
+
+  /**********************************************************************
   *  struct opnode							*
   **********************************************************************/
-  //! 演算子のノードを表すクラス
-  struct opnode	{};
+  class opnode;
 
-  //! 式が演算子であるか判定する
   template <class E>
   using is_opnode = std::is_convertible<E, opnode>;
+    
+  //! 演算子のノードを表すクラス
+  class opnode
+  {
+    protected:
+      template <class ITER_, size_t SIZE_>
+      static std::true_type	check_range(range<ITER_, SIZE_>)	;
+      static std::false_type	check_range(...)			;
+
+      template <class E_>
+      using is_rangeobj	= decltype(check_range(std::declval<E_>()));
+
+      template <class E_>
+      using argument_t	= typename std::conditional<is_opnode<E_>::value ||
+						    is_rangeobj<E_>::value,
+						    const E_, const E_&>::type;
+  };
 
   /**********************************************************************
   *  class unary_opnode<OP, E>						*
   **********************************************************************/
-  //! コンテナ式に対する単項演算子を表すクラス
+  //! 配列式に対する単項演算子を表すクラス
   /*!
     \param OP	各成分に適用される単項演算子の型
-    \param E	単項演算子の引数となる式の実体の型
+    \param E	単項演算子の引数となる式の型
   */
   template <class OP, class E>
-  struct unary_opnode : public range<boost::transform_iterator<
-					 OP, const_iterator_t<E> >, size0<E>()>,
-			public opnode
+  class unary_opnode : public opnode
   {
-      using range_t = range<boost::transform_iterator<
-				OP, const_iterator_t<E> >, size0<E>()>;
-      
-      unary_opnode(const E& expr, const OP& op)
-	  :range_t({std::begin(expr), op}, std::size(expr))		{}
+    public:
+      using iterator = boost::transform_iterator<OP, const_iterator_t<E> >;
+
+    public:
+		unary_opnode(const E& expr, const OP& op)
+		    :_expr(expr), _op(op)				{}
+
+      constexpr static size_t
+		size0()		{ return TU::size0<E>(); }
+      iterator	begin()	const	{ return {std::begin(_expr), _op}; }
+      iterator	end()	const	{ return {std::end(_expr),   _op}; }
+      size_t	size()	const	{ return std::size(_expr); }
+
+    private:
+      argument_t<E>	_expr;
+      const OP		_op;
   };
     
   template <class OP, class E> inline unary_opnode<OP, E>
@@ -978,28 +1006,39 @@ namespace detail
   /**********************************************************************
   *  class binary_opnode<OP, L, R>					*
   **********************************************************************/
-  //! コンテナ式に対する2項演算子を表すクラス
+  //! 配列式に対する2項演算子を表すクラス
   /*!
     \param OP	各成分に適用される2項演算子の型
-    \param L	2項演算子の第1引数となる式の実体の型
-    \param R	2項演算子の第2引数となる式の実体の型
+    \param L	2項演算子の第1引数となる式の型
+    \param R	2項演算子の第2引数となる式の型
   */
   template <class OP, class L, class R>
-  struct binary_opnode : public range<transform_iterator2<
-					  OP, const_iterator_t<L>,
-					      const_iterator_t<R> >,
-				      std::max(size0<L>(), size0<R>())>,
-			 public opnode
+  struct binary_opnode : public opnode
   {
-      using range_t = range<transform_iterator2<OP, const_iterator_t<L>,
-						    const_iterator_t<R> >,
-			    std::max(size0<L>(), size0<R>())>;
+    public:
+      using iterator = transform_iterator2<OP, const_iterator_t<L>,
+					       const_iterator_t<R> >;
 
-      binary_opnode(const L& l, const R& r, const OP& op)
-	  :range_t({std::begin(l), std::begin(r), op}, std::size(l))
-      {
-	  assert(std::size(l) == std::size(r));
-      }
+    public:
+		binary_opnode(const L& l, const R& r, const OP& op)
+		    :_l(l), _r(r), _op(op)
+		{
+		    assert(std::size(_l) == std::size(_r));
+		}
+
+      constexpr static size_t
+		size0()
+	  	{
+		    return max<TU::size0<L>(), TU::size0<R>()>::value;
+		}
+      iterator	begin()	const	{ return {std::begin(_l), std::begin(_r), _op};}
+      iterator	end()	const	{ return {std::end(_l),   std::end(_r),   _op};}
+      size_t	size()	const	{ return std::size(_l); }
+
+    private:
+      argument_t<L>	_l;
+      argument_t<R>	_r;
+      const OP		_op;
   };
     
   template <class OP, class L, class R> inline binary_opnode<OP, L, R>

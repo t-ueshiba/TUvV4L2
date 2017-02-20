@@ -209,7 +209,7 @@ test_numeric(const BUF& buf)
     std::cout << demangle(typeid(result_t<decltype(a)>).name()) << std::endl;
     std::cout << demangle(typeid(result_t<decltype(x)>).name()) << std::endl;
 }
-
+  /*
 static void
 test_numeric2()
 {
@@ -240,7 +240,7 @@ test_numeric2()
     Array<float>	z = x; // + y;
     std::cout << "--- z(" << print_sizes(z) << ") ---\n" << z;
 }
-    
+  */
 static void
 test_prod()
 {
@@ -263,8 +263,8 @@ test_prod()
     c = a * t;
     std::cout << c << std::endl;
 
-  //const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
-    const Array2<float, 2, 3>	A = {{1, 2, 3}, {10, 20, 30}};
+    const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
+  //const Array2<float, 2, 3>	A = {{1, 2, 3}, {10, 20, 30}};
     const matrix_type	B = {{1, 2}, {10, 20}, {100, 200}};
     matrix_type		C, D;
 
@@ -274,16 +274,18 @@ test_prod()
 
     std::cout << "--- c = A * (a + b) ---" << std::endl;
     c = A * (a + b);
+  //c = A * a;
     std::cout << c << std::endl;
 
     C = B;
-    std::cout << "--- c = a * (B + C) ---" << std::endl;
-    c = a * (B + C);
+    std::cout << "--- c = (a + b) * B ---" << std::endl;
+    c = (a + b) * B;
+  //c = a * B;
     std::cout << c << std::endl;
 
     std::cout << "--- C = A * (B + C) ---" << std::endl;
-  //C = A * (B + C);
-    C = A * B;
+    C = A * (B + C);
+  //C = A * B;
     std::cout << C;
 
     std::cout << "--- C = c % (a + b) ---" << std::endl;
@@ -313,7 +315,7 @@ main()
     TU::test_text_io(buf);
     TU::test_external_allocator(buf);
     TU::test_numeric(buf);
-    TU::test_numeric2();
+  //TU::test_numeric2();
     TU::test_prod();
     
     return 0;
