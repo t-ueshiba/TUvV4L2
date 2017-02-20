@@ -890,7 +890,7 @@ namespace detail
 
 	public:
 		binder2nd(const OP& op, const R& r)
-		    :_r(r), _op(op) 			{}
+		    :_r(evaluate(r)), _op(op) 		{}
 
 	  template <class T_>
 	  auto	operator ()(const T_& arg)	const	{ return _op(arg, _r); }

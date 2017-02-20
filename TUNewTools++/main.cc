@@ -10,7 +10,7 @@
 #  include "TU/Array++.h"
 #endif
 #include "TU/functional.h"
-#include <boost/core/demangle.hpp>
+//#include <boost/core/demangle.hpp>
 
 namespace TU
 {
@@ -79,7 +79,6 @@ test_subrange(const BUF& buf)
     auto	r = make_range<2, 2, 2, 3, 6>(buf.begin());
     std::cout << "--- make_range<2, 2, 2, 3, 6>(" << print_sizes_and_strides(r)
 	      << ") ---\n" << r;
-    using	boost::core::demangle;
     
     size_t		ncol = 6;
     Array2<value_type>	a2(make_dense_range(buf.begin(),
@@ -202,12 +201,13 @@ test_numeric(const BUF& buf)
 
     auto		d = transpose(c);
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
-
+  /*
     using	boost::core::demangle;
     
     auto	x = a + b + b;
     std::cout << demangle(typeid(result_t<decltype(a)>).name()) << std::endl;
     std::cout << demangle(typeid(result_t<decltype(x)>).name()) << std::endl;
+  */
 }
   /*
 static void
