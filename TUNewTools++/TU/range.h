@@ -191,42 +191,52 @@ stride(const E& expr)
 template <class E>
 class sizes_holder
 {
+  private:
+    template <class ITER_>
+    using refers_range	= is_range<typename std::iterator_traits<ITER_>
+					       ::value_type>;
+    
   public:
 			sizes_holder(const E& expr)	:_expr(expr)	{}
 
     std::ostream&	operator ()(std::ostream& out) const
 			{
-			    return print_size(out, _expr);
+			    return print_size(out, &_expr);
 			}
     
   protected:
-    template <class E_>
-    static typename std::enable_if<!is_range<E_>::value, std::ostream&>::type
-			print_x(std::ostream& out, const E_& expr)
+    template <class ITER_>
+    static typename std::enable_if<!refers_range<ITER_>::value,
+				   std::ostream&>::type
+			print_x(std::ostream& out, ITER_ iter)
 			{
 			    return out;
 			}
-    template <class E_>
-    static typename std::enable_if<is_range<E_>::value, std::ostream&>::type
-			print_x(std::ostream& out, const E_& expr)
+    template <class ITER_>
+    static typename std::enable_if<refers_range<ITER_>::value,
+				   std::ostream&>::type
+			print_x(std::ostream& out, ITER_)
 			{
 			    return out << 'x';
 			}
 
   private:
-    template <class E_>
-    static typename std::enable_if<!is_range<E_>::value, std::ostream&>::type
-			print_size(std::ostream& out, const E_& expr)
+    template <class ITER_>
+    static typename std::enable_if<!refers_range<ITER_>::value,
+				   std::ostream&>::type
+			print_size(std::ostream& out, ITER_)
 			{
 			    return out;
 			}
-    template <class E_>
-    static typename std::enable_if<is_range<E_>::value, std::ostream&>::type
-			print_size(std::ostream& out, const E_& expr)
+    template <class ITER_>
+    static typename std::enable_if<refers_range<ITER_>::value,
+				   std::ostream&>::type
+			print_size(std::ostream& out, ITER_ iter)
 			{
-			    const auto&	val = *std::begin(expr);
-			    return print_size(print_x(out << std::size(expr),
-						      val), val);
+			    const auto&	val = *iter;
+			    return print_size(print_x(out << std::size(val),
+						      std::begin(val)),
+					      std::begin(val));
 			}
 
   protected:
@@ -238,6 +248,9 @@ class sizes_and_strides_holder : public sizes_holder<E>
 {
   private:
     using super		= sizes_holder<E>;
+    template <class ITER_>
+    using refers_range	= is_range<typename std::iterator_traits<ITER_>
+					       ::value_type>;
     
   public:
 			sizes_and_strides_holder(const E& expr)
@@ -246,30 +259,27 @@ class sizes_and_strides_holder : public sizes_holder<E>
     std::ostream&	operator ()(std::ostream& out) const
 			{
 			    return print_stride(super::operator ()(out) << ':',
-						super::_expr.begin());
+						std::begin(super::_expr));
 			}
     
   private:
     template <class ITER_>
-    static typename std::enable_if<!is_range<
-				       typename std::iterator_traits<ITER_>
-				       ::value_type>::value,
+    static typename std::enable_if<!refers_range<ITER_>::value,
 				   std::ostream&>::type
-			print_stride(std::ostream& out, const ITER_& iter)
+			print_stride(std::ostream& out, ITER_)
 			{
 			    return out;
 			}
     template <class ITER_>
-    static typename std::enable_if<is_range<
-				       typename std::iterator_traits<ITER_>
-				       ::value_type>::value,
+    static typename std::enable_if<refers_range<ITER_>::value,
 				   std::ostream&>::type
-			print_stride(std::ostream& out, const ITER_& iter)
+			print_stride(std::ostream& out, ITER_ iter)
 			{
+			    const auto&	val = *iter;
 			    return print_stride(super::print_x(
 						    out << iter.stride(),
-						    *iter->begin()),
-						iter->begin());
+						    std::begin(val)),
+						std::begin(val));
 			}
 };
 

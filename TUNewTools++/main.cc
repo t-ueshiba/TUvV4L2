@@ -216,12 +216,12 @@ test_numeric2()
     using value_type = int;
 
     std::cout << "*** numeric test2 ***" << std::endl;
-#  if 0
+#if 1
     std::array<std::array<int, 6>, 2>	a{{{0, 1, 2, 3, 4, 5},
 					   {6, 7, 8, 9, 10, 11}}};
-#  else
+#else
     int		a[][6]{{0, 1, 2, 3, 4, 5}, {6, 7, 8, 9, 10, 11}};
-#  endif
+#endif
     std::array<std::array<float, 6>, 2>	b{{{100, 110, 120, 130, 140, 150},
 					   {160, 170, 180, 190, 200, 210}}};
     Array2<float, 2, 6>	c;
@@ -235,7 +235,7 @@ test_numeric2()
     auto		d = transpose(a);
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
 
-    int	x[] = {1, 2, 3}, y[] = {4, 5, 6};
+    int			x[] = {1, 2, 3}, y[] = {4, 5, 6};
     std::cout << is_range<decltype(x)>::value << std::endl;
     Array<float>	z = x; // + y;
     std::cout << "--- z(" << print_sizes(z) << ") ---\n" << z;
@@ -263,8 +263,8 @@ test_prod()
     c = a * t;
     std::cout << c << std::endl;
 
-    const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
-  //const Array2<float, 2, 3>	A = {{1, 2, 3}, {10, 20, 30}};
+  //const matrix_type	A = {{1, 2, 3}, {10, 20, 30}};
+    const Array2<float, 2, 3>	A = {{1, 2, 3}, {10, 20, 30}};
     const matrix_type	B = {{1, 2}, {10, 20}, {100, 200}};
     matrix_type		C, D;
 

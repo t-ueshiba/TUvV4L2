@@ -606,7 +606,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     void	write(array<T, ALLOC_, SIZE, SIZES...>& a) const
 		{
 		    a.resize(sizes(), a.stride());
-		    super::copy<SIZE>(begin(), size(), a.begin());
+		    super::copy(begin(), size(), a.begin());
 		}
 
     using	super::size;
