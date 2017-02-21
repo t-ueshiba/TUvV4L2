@@ -225,13 +225,13 @@ test_numeric2()
     std::array<std::array<float, 6>, 2>	b{{{100, 110, 120, 130, 140, 150},
 					   {160, 170, 180, 190, 200, 210}}};
     Array2<float, 2, 6>	c;
-
+#if 0
     std::cout << is_range<decltype(a)>::value << std::endl;
     c = a + 2*b;
     std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
     std::cout << boost::core::demangle(typeid(value_t<decltype(a)>).name())
 	      << std::endl;
-    
+#endif
     auto		d = transpose(a);
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
 

@@ -38,6 +38,7 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		=
 HDRS		= TU/Array++.h \
+		TU/Array++11.h \
 		TU/algorithm.h \
 		TU/functional.h \
 		TU/iterator.h \
@@ -162,5 +163,5 @@ moc_%.cc: %.h
 %.o: %.cu
 	$(NVCC) $(CPPFLAGS) $(INCDIRS) $(NVCCFLAGS) -Xcompiler $(PIC) -c $<
 ###
-main.o: TU/Array++.h TU/range.h TU/iterator.h TU/functional.h \
-	TU/algorithm.h TU/utility.h
+main.o: TU/Array++11.h TU/utility.h TU/algorithm.h TU/range.h \
+	TU/iterator.h TU/functional.h TU/Array++.h
