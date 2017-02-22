@@ -4,7 +4,7 @@
 #################################
 #  User customizable macros	#
 #################################
-PROGRAM		= array
+PROGRAM		= array_test
 #LIBRARY		= lib$(shell basename $(PWD))
 
 VPATH		=
