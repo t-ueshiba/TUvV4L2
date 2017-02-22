@@ -18,14 +18,13 @@
 namespace TU
 {
 /************************************************************************
-*  predicate has_begin<E>, is_range<E>					*
+*  type aliases								*
 ************************************************************************/
 namespace detail
 {
   template <class E>
-  static auto	check_const_iterator(const E& x)
-		    -> decltype(std::begin(x))				;
-  static void	check_const_iterator(...)				;
+  static auto	check_begin(const E& x) -> decltype(std::begin(x))	;
+  static void	check_begin(...)					;
 }	// namespace detail
     
 //! 式が持つ定数反復子の型を返す
@@ -34,12 +33,8 @@ namespace detail
   \return	E が定数反復子を持てばその型，持たなければ void
 */
 template <class E>
-using const_iterator_t = decltype(detail::check_const_iterator(
-				      std::declval<E>()));
+using const_iterator_t = decltype(detail::check_begin(std::declval<E>()));
 
-/************************************************************************
-*  type aliases								*
-************************************************************************/
 namespace detail
 {
   template <class T>
@@ -175,6 +170,123 @@ inline typename std::enable_if<dimension<E>() != 0, size_t>::type
 stride(const E& expr)
 {
     return detail::stride(expr, std::integral_constant<size_t, I>());
+}
+
+/************************************************************************
+*  manipulator print_sizes() and print_sizes_and_strides()		*
+************************************************************************/
+template <class E>
+class sizes_holder
+{
+  public:
+			sizes_holder(const E& expr)	:_expr(expr)	{}
+
+    std::ostream&	operator ()(std::ostream& out) const
+			{
+			    return print_size(out, &_expr);
+			}
+    
+  protected:
+    template <class ITER_> constexpr
+    static size_t	dimension()
+			{
+			    using value_type = typename std::iterator_traits<
+						   ITER_>::value_type;
+			    return TU::dimension<value_type>();
+			}
+    template <class ITER_>
+    static typename std::enable_if<dimension<ITER_>() == 0, std::ostream&>::type
+			print_x(std::ostream& out, ITER_)
+			{
+			    return out;
+			}
+    template <class ITER_>
+    static typename std::enable_if<dimension<ITER_>() != 0, std::ostream&>::type
+			print_x(std::ostream& out, ITER_)
+			{
+			    return out << 'x';
+			}
+
+  private:
+    template <class ITER_>
+    static typename std::enable_if<dimension<ITER_>() == 0, std::ostream&>::type
+			print_size(std::ostream& out, ITER_)
+			{
+			    return out;
+			}
+    template <class ITER_>
+    static typename std::enable_if<dimension<ITER_>() != 0, std::ostream&>::type
+			print_size(std::ostream& out, ITER_ iter)
+			{
+			    const auto&	val = *iter;
+			    return print_size(print_x(out << std::size(val),
+						      std::begin(val)),
+					      std::begin(val));
+			}
+
+  protected:
+    const E&	_expr;
+};
+    
+template <class E>
+class sizes_and_strides_holder : public sizes_holder<E>
+{
+  private:
+    using super	= sizes_holder<E>;
+    
+  public:
+			sizes_and_strides_holder(const E& expr)
+			    :super(expr)				{}
+
+    std::ostream&	operator ()(std::ostream& out) const
+			{
+			    return print_stride(super::operator ()(out) << ':',
+						std::begin(super::_expr));
+			}
+    
+  private:
+    template <class ITER_>
+    static typename std::enable_if<super::template dimension<ITER_>() == 0,
+				   std::ostream&>::type
+			print_stride(std::ostream& out, ITER_)
+			{
+			    return out;
+			}
+    template <class ITER_>
+    static typename std::enable_if<super::template dimension<ITER_>() != 0,
+				   std::ostream&>::type
+			print_stride(std::ostream& out, ITER_ iter)
+			{
+			    const auto&	val = *iter;
+			    return print_stride(super::print_x(
+						    out << iter.stride(),
+						    std::begin(val)),
+						std::begin(val));
+			}
+};
+
+template <class E> sizes_holder<E>
+print_sizes(const E& expr)
+{
+    return sizes_holder<E>(expr);
+}
+
+template <class E> std::ostream&
+operator <<(std::ostream& out, const sizes_holder<E>& holder)
+{
+    return holder(out);
+}
+
+template <class E> sizes_and_strides_holder<E>
+print_sizes_and_strides(const E& expr)
+{
+    return sizes_and_strides_holder<E>(expr);
+}
+
+template <class E> std::ostream&
+operator <<(std::ostream& out, const sizes_and_strides_holder<E>& holder)
+{
+    return holder(out);
 }
 
 /************************************************************************
@@ -549,123 +661,6 @@ make_range_iterator(ITER iter, size_t size, size_t stride)
 }
     
 /************************************************************************
-*  manipulator sizes_and_strides					*
-************************************************************************/
-template <class E>
-class sizes_holder
-{
-  public:
-			sizes_holder(const E& expr)	:_expr(expr)	{}
-
-    std::ostream&	operator ()(std::ostream& out) const
-			{
-			    return print_size(out, &_expr);
-			}
-    
-  protected:
-    template <class ITER_> constexpr
-    static size_t	dimension()
-			{
-			    using value_type = typename std::iterator_traits<
-						   ITER_>::value_type;
-			    return TU::dimension<value_type>();
-			}
-    template <class ITER_>
-    static typename std::enable_if<dimension<ITER_>() == 0, std::ostream&>::type
-			print_x(std::ostream& out, ITER_)
-			{
-			    return out;
-			}
-    template <class ITER_>
-    static typename std::enable_if<dimension<ITER_>() != 0, std::ostream&>::type
-			print_x(std::ostream& out, ITER_)
-			{
-			    return out << 'x';
-			}
-
-  private:
-    template <class ITER_>
-    static typename std::enable_if<dimension<ITER_>() == 0, std::ostream&>::type
-			print_size(std::ostream& out, ITER_)
-			{
-			    return out;
-			}
-    template <class ITER_>
-    static typename std::enable_if<dimension<ITER_>() != 0, std::ostream&>::type
-			print_size(std::ostream& out, ITER_ iter)
-			{
-			    const auto&	val = *iter;
-			    return print_size(print_x(out << std::size(val),
-						      std::begin(val)),
-					      std::begin(val));
-			}
-
-  protected:
-    const E&	_expr;
-};
-    
-template <class E>
-class sizes_and_strides_holder : public sizes_holder<E>
-{
-  private:
-    using super	= sizes_holder<E>;
-    
-  public:
-			sizes_and_strides_holder(const E& expr)
-			    :super(expr)				{}
-
-    std::ostream&	operator ()(std::ostream& out) const
-			{
-			    return print_stride(super::operator ()(out) << ':',
-						std::begin(super::_expr));
-			}
-    
-  private:
-    template <class ITER_>
-    static typename std::enable_if<super::template dimension<ITER_>() == 0,
-				   std::ostream&>::type
-			print_stride(std::ostream& out, ITER_)
-			{
-			    return out;
-			}
-    template <class ITER_>
-    static typename std::enable_if<super::template dimension<ITER_>() != 0,
-				   std::ostream&>::type
-			print_stride(std::ostream& out, ITER_ iter)
-			{
-			    const auto&	val = *iter;
-			    return print_stride(super::print_x(
-						    out << iter.stride(),
-						    std::begin(val)),
-						std::begin(val));
-			}
-};
-
-template <class E> sizes_holder<E>
-print_sizes(const E& expr)
-{
-    return sizes_holder<E>(expr);
-}
-
-template <class E> std::ostream&
-operator <<(std::ostream& out, const sizes_holder<E>& holder)
-{
-    return holder(out);
-}
-
-template <class E> sizes_and_strides_holder<E>
-print_sizes_and_strides(const E& expr)
-{
-    return sizes_and_strides_holder<E>(expr);
-}
-
-template <class E> std::ostream&
-operator <<(std::ostream& out, const sizes_and_strides_holder<E>& holder)
-{
-    return holder(out);
-}
-
-/************************************************************************
 *  fixed size & fixed stride ranges and associated iterators		*
 ************************************************************************/
 //! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
@@ -984,8 +979,6 @@ namespace detail
 		    :_expr(expr), _op(op)				{}
 
       constexpr static size_t
-		dimension()	{ return TU::dimension<E>(); }
-      constexpr static size_t
 		size0()		{ return TU::size0<E>(); }
       iterator	begin()	const	{ return {std::begin(_expr), _op}; }
       iterator	end()	const	{ return {std::end(_expr),   _op}; }
@@ -1025,8 +1018,6 @@ namespace detail
 		    assert(std::size(_l) == std::size(_r));
 		}
 
-      constexpr static size_t
-		dimension()	{ return TU::dimension<L>(); }
       constexpr static size_t
 		size0()
 	  	{
