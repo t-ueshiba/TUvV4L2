@@ -8,6 +8,7 @@
 #ifndef __TU_ALGORITHM_H
 #define __TU_ALGORITHM_H
 
+#include <cstddef>		// for size_t
 #include <type_traits>		// for std::common_type<TYPES....>
 #include <algorithm>
 

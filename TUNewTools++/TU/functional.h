@@ -34,32 +34,12 @@
 #ifndef __TU_FUNCTIONAL_H
 #define __TU_FUNCTIONAL_H
 
-#include <cstddef>				// size_t
-#include <cmath>				// std::sqrt()
-#include <functional>				// std::bind()
-#include <type_traits>				// std::integral_constant
-#include <numeric>				// std::accumulate()
+#include <cstddef>			// for size_t
+#include <utility>			// for std::forward()
+#include <functional>
 
 namespace TU
 {
-/************************************************************************
-*  struct is_convertible<T, C<ARGS...> >				*
-************************************************************************/
-namespace detail
-{
-  template <template <class...> class C>
-  struct is_convertible
-  {
-      template <class... ARGS>
-      static std::true_type	check(C<ARGS...>)			;
-      static std::false_type	check(...)				;
-  };
-}	// namespace detail
-
-template <class T, template <class...> class C>
-struct is_convertible
-    : decltype(detail::is_convertible<C>::check(std::declval<T>()))	{};
-	
 /************************************************************************
 *  struct generic_function<FUNC>					*
 ************************************************************************/
@@ -397,7 +377,6 @@ struct generic_select
 	return select(s, x, y);
     }
 };
-
 
 }	// End of namespace TU
 #endif	// !__TU_FUNCTIONAL_H

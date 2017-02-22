@@ -34,9 +34,10 @@
 #ifndef __TU_ITERATOR_H
 #define __TU_ITERATOR_H
 
-#include <cstddef>	// for size_t
+#include <cstddef>			// for size_t
+#include <type_traits>			// for std::result_of<F(ARGS...)>
+#include <utility>			// for std::declval<T>
 #include <iterator>
-#include <type_traits>
 #include <boost/iterator/transform_iterator.hpp>
 
 namespace std
@@ -61,6 +62,68 @@ size(const T (&array)[N]) noexcept
 //! libTUTools++ のクラスや関数等を収める名前空間
 namespace TU
 {
+/************************************************************************
+*  type aliases								*
+************************************************************************/
+//! libTUTools++ のクラスや関数 の実相の詳細を収める名前空間
+namespace detail
+{
+  template <class E>
+  static auto	check_begin(const E& x) -> decltype(std::begin(x))	;
+  static void	check_begin(...)					;
+}	// namespace detail
+    
+//! 式が持つ定数反復子の型を返す
+/*!
+  \param E	式の型
+  \return	E が定数反復子を持てばその型，持たなければ void
+*/
+template <class E>
+using const_iterator_t = decltype(detail::check_begin(std::declval<E>()));
+
+namespace detail
+{
+  template <class T>
+  struct identity
+  {
+      using type = T;
+  };
+
+  template <class E>
+  struct value_t
+  {
+      using type = typename std::iterator_traits<const_iterator_t<E> >
+			       ::value_type;
+  };
+      
+  template <class E, class=const_iterator_t<E> >
+  struct element_t
+  {
+      using F	 = typename value_t<E>::type;
+      using type = typename element_t<F, const_iterator_t<F> >::type;
+  };
+  template <class E>
+  struct element_t<E, void> : identity<E>				{};
+}	// namespace detail
+    
+//! 式が持つ定数反復子が指す型を返す
+/*!
+  定数反復子を持たない式を与えるとコンパイルエラーとなる.
+  \param E	定数反復子を持つ式の型
+  \return	E の定数反復子が指す型
+*/
+template <class E>
+using value_t	= typename detail::value_t<E>::type;
+
+//! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
+/*!
+  \param E	式の型
+  \return	E が定数反復子を持てばそれが指す型を再帰的に辿って到達する型，
+		持たなければ E 自身
+*/
+template <class E>
+using element_t	= typename detail::element_t<E>::type;
+
 /************************************************************************
 *  transform_iterator2<FUNC, ITER0, ITER1>				*
 ************************************************************************/
@@ -129,7 +192,7 @@ template <class FUNC, class ITER0, class ITER1>
 inline transform_iterator2<FUNC, ITER0, ITER1>
 make_transform_iterator2(ITER0 iter0, ITER1 iter1, const FUNC& func)
 {
-    return transform_iterator2<FUNC, ITER0, ITER1>(iter0, iter1, func);
+    return {iter0, iter1, func};
 }
     
 /************************************************************************
@@ -178,7 +241,7 @@ using vertical_iterator = boost::transform_iterator<
 template <class ROW> inline vertical_iterator<ROW>
 make_vertical_iterator(ROW row, size_t col)
 {
-    return vertical_iterator<ROW>(row, row2col<ROW>(col));
+    return {row, {col}};
 }
 
 }	// namespace TU

@@ -555,7 +555,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class E_,
-	      typename std::enable_if<dimension<E_>() == D>::type* = nullptr>
+	      typename std::enable_if<rank<E_>() == D>::type* = nullptr>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
@@ -564,7 +564,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    copy<S>(std::begin(expr), size(), begin());
 		}
     template <class E_>
-    typename std::enable_if<dimension<E_>() == D, array&>::type
+    typename std::enable_if<rank<E_>() == D, array&>::type
 		operator =(const E_& expr)
 		{
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
@@ -678,13 +678,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class T_>
-    static typename std::enable_if<dimension<T_>() == 0>::type
+    static typename std::enable_if<rank<T_>() == 0>::type
 		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& val)
 		{
 		    throw std::runtime_error("array<BUF>::set_sizes(): too shallow initializer list!");
 		}
     template <class T_>
-    static typename std::enable_if<dimension<T_>() != 0>::type
+    static typename std::enable_if<rank<T_>() != 0>::type
 		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& r)
 		{
 		    *iter = r.size();
@@ -934,8 +934,8 @@ namespace detail
   \return	内積の評価結果
 */
 template <class L, class R,
-	  typename std::enable_if<dimension<L>() == 1 &&
-				  dimension<R>() == 1>::type* = nullptr>
+	  typename std::enable_if<rank<L>() == 1 &&
+				  rank<R>() == 1>::type* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
@@ -954,9 +954,9 @@ operator *(const L& l, const R& r)
   \return	積を表す演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<dimension<L>() == 2 &&
-				  dimension<R>() >= 1 &&
-				  dimension<R>() <= 2>::type* = nullptr>
+	  typename std::enable_if<rank<L>() == 2 &&
+				  rank<R>() >= 1 &&
+				  rank<R>() <= 2>::type* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
@@ -970,8 +970,8 @@ operator *(const L& l, const R& r)
   \return	積を表す演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<dimension<L>() == 1 &&
-				  dimension<R>() == 2>::type* = nullptr>
+	  typename std::enable_if<rank<L>() == 1 &&
+				  rank<R>() == 2>::type* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
@@ -987,8 +987,8 @@ operator *(const L& l, const R& r)
   \return	外積を表す演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<dimension<L>() == 1 &&
-				  dimension<R>() == 1>::type* = nullptr>
+	  typename std::enable_if<rank<L>() == 1 &&
+				  rank<R>() == 1>::type* = nullptr>
 inline auto
 operator %(const L& l, const R& r)
 {
@@ -1004,7 +1004,7 @@ operator %(const L& l, const R& r)
 */
 template <class L, class R>
 inline typename std::enable_if<
-	   dimension<L>() == 1 && dimension<R>() == 1,
+	   rank<L>() == 1 && rank<R>() == 1,
 	   Array<typename std::common_type<element_t<L>, element_t<R> >::type,
 		 3> >::type
 operator ^(const L& l, const R& r)
@@ -1029,8 +1029,8 @@ operator ^(const L& l, const R& r)
   \return	ベクトル積を表す演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<dimension<L>() == 2 &&
-				  dimension<R>() == 1>::type* = nullptr>
+	  typename std::enable_if<rank<L>() == 2 &&
+				  rank<R>() == 1>::type* = nullptr>
 inline auto
 operator ^(const L& l, const R& r)
 {
