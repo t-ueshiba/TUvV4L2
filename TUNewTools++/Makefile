@@ -4,17 +4,17 @@
 #################################
 #  User customizable macros	#
 #################################
-PROGRAM		= new_array
-#LIBRARY		= lib$(shell basename $(PWD))
+#PROGRAM		= $(shell basename $(PWD))
+LIBRARY		= lib$(shell basename $(PWD))
 
 VPATH		=
 
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I.
-CPPFLAGS	= -DTU_DEBUG #-DCPP11
-CFLAGS		= -std=c++1y -g
+INCDIRS		= -I. -I$(PREFIX)/include
+CPPFLAGS	= -DNDEBUG
+CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
@@ -38,130 +38,17 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		=
 HDRS		= TU/Array++.h \
-		TU/Array++11.h \
 		TU/algorithm.h \
 		TU/functional.h \
 		TU/iterator.h \
 		TU/range.h \
 		TU/utility.h
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		=
+OBJS		=
 
-#########################
-#  Common macros	#
-#########################
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  ifneq ($(strip $(LIBRARY)),)
-    LIBRARY    := $(LIBRARY).dylib
-  endif
-  PIC		= -dynamic
-  NVCCFLAGS    += -m64
-  ifneq ($(findstring nvcc,$(LINKER)),)
-    SHFLAGS	= $(NVCCFLAGS) -shared -Xlinker "-dynamic -undefined dynamic_lookup"
-  else
-    SHFLAGS	= -dynamiclib -undefined dynamic_lookup 
-  endif
-else
-  ifneq ($(strip $(LIBRARY)),)
-    LIBRARY    := $(LIBRARY).so
-  endif
-  PIC		= -fPIC
-  SHFLAGS	= -shared
-endif
-
-ifneq ($(strip $(PROGRAM)),)
-  TARGPROG	= $(BINDIR)/$(PROGRAM)
-endif
-ifneq ($(strip $(LIBRARY)),)
-  TARGLIB	= $(LIBDIR)/$(LIBRARY)
-endif
-
-INSTALL		= install
-MAKEFILE	= Makefile
-
-ifeq ($(shell arch), armv7l)
-  CFLAGS       += -mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=neon -funsafe-math-optimizations #-mfloat-abi=softfp
-else ifeq ($(shell arch), aarch64)
-  CFLAGS       += -funsafe-math-optimizations
-endif
-
-ifneq ($(findstring icpc,$(CXX)),)
-    LIBS       += -lsvml -lintlc
-endif
-
-#########################
-#  Making rules		#
-#########################
-.PHONY: all
-all: $(PROGRAM) $(LIBRARY)
-
-$(SRCS): $(IDLHDRS)
-
-$(PROGRAM): $(OBJS)
-	$(LINKER) $(LDFLAGS) $^ -o $@ $(LIBS)
-
-$(LIBRARY): $(OBJS)
-	$(LINKER) $(SHFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
-
-$(TARGPROG): $(PROGRAM)
-	$(INSTALL) -m 0755 $< $@
-
-$(TARGLIB): $(LIBRARY)
-	$(INSTALL) -m 0755 $< $@
-
-.PHONY: install
-install: $(TARGPROG) $(TARGLIB) $(TARGHDRS)
-
-.PHONY:	clean
-clean:
-	$(RM) -r $(IDLSRCS) $(IDLHDRS) $(MOCSRCS) $(OBJS) $(PROGRAM) $(LIBRARY)
-
-.PHONY: depend
-depend:
-	mkmf $(INCDIRS) -f $(MAKEFILE)
-
-.PHONY: index
-index:
-	ctags -wx $(HDRS) $(SRCS)
-
-tags: $(HDRS) $(SRCS)
-	ctags $(HDRS) $(SRCS)
-
-.PHONY: link
-link:
-	$(RM) $(PROGRAM) $(LIBRARY)
-	make $(PROGRAM) $(LIBRARY)
-
-.PHONY:	doc
-doc: $(HDRS) $(SRCS) doxygen.cfg
-	doxygen doxygen.cfg
-
-doxygen.cfg:
-	doxygen -g $@
-
-#########################
-#  Implicit rules	#
-#########################
-$(INCDIR)/%: %
-	$(INSTALL) -m 0644 $< $@
-
-%.hh %SK.cc %DynSK.cc: %.idl
-	$(IDLC) $(IDLFLAGS) $<
-
-moc_%.cc: %.h
-	$(MOC) $< -o $@
-
-%.o: %.c
-	$(CC) $(CPPFLAGS) $(INCDIRS) $(CFLAGS) $(PIC) -c $<
-
-%.o: %.cc
-	$(CXX) $(CPPFLAGS) $(INCDIRS) $(CCFLAGS) $(PIC) -c $<
-
-%.o: %.cpp
-	$(CXX) $(CPPFLAGS) $(INCDIRS) $(CCFLAGS) $(PIC) -c $<
-
-%.o: %.cu
-	$(NVCC) $(CPPFLAGS) $(INCDIRS) $(NVCCFLAGS) -Xcompiler $(PIC) -c $<
+#include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
+#include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
+#include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
+include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+include $(PROJECT)/lib/common.mk
 ###
-main.o: TU/Array++11.h TU/utility.h TU/algorithm.h TU/range.h \
-	TU/iterator.h TU/functional.h TU/Array++.h
