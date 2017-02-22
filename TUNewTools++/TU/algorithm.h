@@ -9,8 +9,11 @@
 #define __TU_ALGORITHM_H
 
 #include <cstddef>		// for size_t
+#include <cmath>		// for std::sqrt()
+#include <iterator>		// for std::iterator_traits<ITER>
 #include <type_traits>		// for std::common_type<TYPES....>
-#include <algorithm>
+#include <algorithm>		// for std::copy(), std::copy_n(),...
+#include <numeric>		// for std::inner_product()
 
 namespace TU
 {
