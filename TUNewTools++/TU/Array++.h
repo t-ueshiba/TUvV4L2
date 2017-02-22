@@ -555,7 +555,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class E_,
-	      typename std::enable_if<dimension<E_>() != 0>::type* = nullptr>
+	      typename std::enable_if<dimension<E_>() == D>::type* = nullptr>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
@@ -564,7 +564,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    copy<S>(std::begin(expr), size(), begin());
 		}
     template <class E_>
-    typename std::enable_if<dimension<E_>() != 0, array&>::type
+    typename std::enable_if<dimension<E_>() == D, array&>::type
 		operator =(const E_& expr)
 		{
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
