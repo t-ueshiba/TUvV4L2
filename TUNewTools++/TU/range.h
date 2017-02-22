@@ -18,7 +18,7 @@
 namespace TU
 {
 /************************************************************************
-*  rank<E>(), size0<E>(), size<E>() and stride<E>()		*
+*  rank<E>(), size0<E>(), size<E>() and stride<E>()			*
 ************************************************************************/
 template <class E>
 constexpr typename std::enable_if<

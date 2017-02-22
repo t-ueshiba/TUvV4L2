@@ -209,38 +209,25 @@ test_numeric(const BUF& buf)
     std::cout << demangle(typeid(result_t<decltype(x)>).name()) << std::endl;
   */
 }
-  /*
+
 static void
 test_numeric2()
 {
-    using value_type = int;
-
     std::cout << "*** numeric test2 ***" << std::endl;
-#if 1
-    std::array<std::array<int, 6>, 2>	a{{{0, 1, 2, 3, 4, 5},
-					   {6, 7, 8, 9, 10, 11}}};
-#else
-    int		a[][6]{{0, 1, 2, 3, 4, 5}, {6, 7, 8, 9, 10, 11}};
-#endif
+
+    int					a[][6]{{0, 1, 2, 3,  4,  5},
+					       {6, 7, 8, 9, 10, 11}};
     std::array<std::array<float, 6>, 2>	b{{{100, 110, 120, 130, 140, 150},
 					   {160, 170, 180, 190, 200, 210}}};
-    Array2<float, 2, 6>	c;
-#if 0
-    std::cout << is_range<decltype(a)>::value << std::endl;
-    c = a + 2*b;
+    std::cout << "rank(a) = " << rank<decltype(a)>() << std::endl;
+  //Array2<float, 2, 6>	c = a + 2*b;	// clang++でコンパイルできない
+    Array2<float, 2, 6>	c = a;
     std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
-    std::cout << boost::core::demangle(typeid(value_t<decltype(a)>).name())
-	      << std::endl;
-#endif
-    auto		d = transpose(a);
-    std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
 
-    int			x[] = {1, 2, 3}, y[] = {4, 5, 6};
-    std::cout << is_range<decltype(x)>::value << std::endl;
-    Array<float>	z = x; // + y;
-    std::cout << "--- z(" << print_sizes(z) << ") ---\n" << z;
+    auto	d = transpose(a);
+    std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
 }
-  */
+
 static void
 test_prod()
 {
@@ -315,7 +302,7 @@ main()
     TU::test_text_io(buf);
     TU::test_external_allocator(buf);
     TU::test_numeric(buf);
-  //TU::test_numeric2();
+    TU::test_numeric2();
     TU::test_prod();
     
     return 0;
