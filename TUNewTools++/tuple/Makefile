@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I..
-CPPFLAGS	= -DNDEBUG
+CPPFLAGS	= -DTU_DEBUG
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
@@ -41,8 +41,7 @@ EXTHDRS		= ../TU/Array++.h \
 		../TU/functional.h \
 		../TU/iterator.h \
 		../TU/range.h \
-		../TU/tuple.h \
-		../TU/utility.h
+		../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -53,5 +52,5 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../TU/tuple.h ../TU/functional.h ../TU/iterator.h ../TU/Array++.h \
-	../TU/range.h ../TU/algorithm.h ../TU/utility.h
+main.o: ../TU/Array++.h ../TU/range.h ../TU/functional.h ../TU/algorithm.h \
+	../TU/iterator.h ../TU/tuple.h

@@ -41,7 +41,7 @@ EXTHDRS		= ../TU/Array++.h \
 		../TU/functional.h \
 		../TU/iterator.h \
 		../TU/range.h \
-		../TU/utility.h
+		../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -162,5 +162,5 @@ moc_%.cc: %.h
 %.o: %.cu
 	$(NVCC) $(CPPFLAGS) $(INCDIRS) $(NVCCFLAGS) -Xcompiler $(PIC) -c $<
 ###
-main.o: ../TU/Array++.h ../TU/range.h ../TU/iterator.h ../TU/functional.h \
-	../TU/algorithm.h ../TU/utility.h
+main.o: ../TU/Array++.h ../TU/range.h ../TU/functional.h ../TU/algorithm.h \
+	../TU/iterator.h ../TU/tuple.h

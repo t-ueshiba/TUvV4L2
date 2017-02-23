@@ -51,20 +51,14 @@ namespace detail
   static std::true_type		check_tuple(std::tuple<T...>)		;
   static std::false_type	check_tuple(...)			;
 
-  template <class T, size_t I> static auto
-  check_begin_tuple(const T& x, std::index_sequence<I>)
-      -> decltype(std::begin(std::get<I>(x)), std::true_type())		;
-  template <class T, size_t I, size_t... IDX> static auto
-  check_begin_tuple(const T& x, std::index_sequence<I, IDX...>)
-      -> decltype(std::begin(std::get<I>(x)),
-		  check_begin_tuple(x, std::index_sequence<IDX...>()))	;
-  static std::false_type
-  check_begin_tuple(...)						;
+  template <class T, size_t... IDX> static auto
+  check_tuple(const T& x, std::index_sequence<IDX...>)
+      -> decltype(std::make_tuple(std::begin(std::get<IDX>(x))...),
+		  std::true_type())					;
   template <class T> static auto
   check_begin_tuple(const T& x)
-      -> decltype(check_begin_tuple(x,
-				    std::make_index_sequence<
-					std::tuple_size<T>::value>()))	;
+      -> decltype(check_tuple(x, std::make_index_sequence<
+				     std::tuple_size<T>::value>()))	;
 }	// namespace detail
     
 template <class T>
@@ -770,11 +764,11 @@ make_fast_zip_iterator(const ITER_TUPLE& iter_tuple)
 
 namespace std
 {
-namespace detail
-{
 /************************************************************************
 *  std::[begin|end|rbegin|rend](std::tuple<T...>)			*
 ************************************************************************/
+namespace detail
+{
   struct generic_begin
   {
       template <class T>

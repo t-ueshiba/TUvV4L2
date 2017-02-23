@@ -18,7 +18,7 @@ arithmetic_test()
     std::cout << x + 2*y << std::endl;
 
     std::tuple<ivec_t, dvec_t>	ax{a, x}, by{b, y};
-    std::cout << (ax * by) << std::endl;
+    std::cout << (ax *= by) << std::endl;
 
     x += a;
     std::cout << x << std::endl;
@@ -41,6 +41,7 @@ zip_iterator_test()
 	    b[i][j] = i + 0.1*j;
 
     const auto	t = std::make_tuple(std::cref(a), std::cref(b));
+
     using	tuple_t = decltype(t);
     std::cout << rank<tuple_t>() << std::endl;
     std::cout << demangle(typeid(tuple_t).name())
@@ -50,6 +51,7 @@ zip_iterator_test()
     std::cout << demangle(typeid(decltype(std::begin(*std::begin(t)))).name())
 	      << std::endl;
   //const auto	u = make_subrange<2, 4>(t, 1, 3);
+
     for (const auto& row : t)
     {
 	for (const auto& col : row)

@@ -83,6 +83,11 @@ using element_t	= typename detail::element_t<E>::type;
 /************************************************************************
 *  rank<E>(), size0<E>(), size<E>() and stride<E>()			*
 ************************************************************************/
+//! 式の次元数(軸の個数)を返す
+/*!
+  \param E	式の型
+  \return	式の次元数
+ */
 template <class E>
 constexpr typename std::enable_if<std::is_void<const_iterator_t<E> >::value,
 				  size_t>::type
@@ -147,6 +152,12 @@ namespace detail
 template <class E>
 using has_size0 = decltype(detail::has_size0(std::declval<E>()));
     
+//! 式の最上位軸の要素数を返す
+/*!
+  本関数で返されるのは静的なサイズであり，式が可変個の要素を持つ場合，0が返される
+  \param E	式の型
+  \return	最上位軸の静的な要素数(可変サイズの場合0)
+ */
 template <class E>
 constexpr typename std::enable_if<!has_size0<E>::value, size_t>::type
 size0()
@@ -160,6 +171,12 @@ size0()
     return E::size0();
 }
     
+//! 与えられた式について，指定された軸の要素数を返す
+/*!
+  \param I	軸を指定するindex
+  \param E	式の型
+  \return	軸Iの要素数
+ */
 template <size_t I, class E>
 inline typename std::enable_if<rank<E>() != 0, size_t>::type
 size(const E& expr)
@@ -167,6 +184,12 @@ size(const E& expr)
     return detail::size(expr, std::integral_constant<size_t, I>());
 }
 
+//! 与えられた式について，指定された軸のストライドを返す
+/*!
+  \param I	軸を指定するindex
+  \param E	式の型
+  \return	軸Iのストライド
+ */
 template <size_t I, class E>
 inline typename std::enable_if<rank<E>() != 0, size_t>::type
 stride(const E& expr)
@@ -773,8 +796,7 @@ make_subrange_iterator(ITER iter)
 }
 
 template <class ITER, class... IS> inline auto
-make_subrange_iterator(const range_iterator<ITER>& iter,
-		       size_t idx, size_t size, IS... is)
+make_subrange_iterator(const ITER& iter, size_t idx, size_t size, IS... is)
 {
     return make_range_iterator(make_subrange_iterator(
 				   iter->begin() + idx, is...),
