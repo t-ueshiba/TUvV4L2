@@ -37,23 +37,41 @@
 #include <tuple>
 #include <utility>		// std::forward(), std::index_sequence<...>
 #include <iostream>
+#include <boost/iterator/iterator_facade.hpp>
 #include "TU/functional.h"
-#include "TU/iterator.h"
 
 namespace TU
 {
 /************************************************************************
-*  predicate is_tuple<T>						*
+*  predicate is_tuple<T>, is_range_tuple<T>				*
 ************************************************************************/
 namespace detail
 {
-  template <class ...T>
+  template <class... T>
   static std::true_type		check_tuple(std::tuple<T...>)		;
   static std::false_type	check_tuple(...)			;
+
+  template <class T, size_t I> static auto
+  check_begin_tuple(const T& x, std::index_sequence<I>)
+      -> decltype(std::begin(std::get<I>(x)), std::true_type())		;
+  template <class T, size_t I, size_t... IDX> static auto
+  check_begin_tuple(const T& x, std::index_sequence<I, IDX...>)
+      -> decltype(std::begin(std::get<I>(x)),
+		  check_begin_tuple(x, std::index_sequence<IDX...>()))	;
+  static std::false_type
+  check_begin_tuple(...)						;
+  template <class T> static auto
+  check_begin_tuple(const T& x)
+      -> decltype(check_begin_tuple(x,
+				    std::make_index_sequence<
+					std::tuple_size<T>::value>()))	;
 }	// namespace detail
     
 template <class T>
-using is_tuple = decltype(detail::check_tuple(std::declval<T>()));
+using is_tuple	     = decltype(detail::check_tuple(std::declval<T>()))	;
+    
+template <class T>
+using is_range_tuple = decltype(detail::check_begin_tuple(std::declval<T>()));
 
 /************************************************************************
 *  tuple_for_each(TUPLE, UNARY_FUNC)					*
@@ -64,7 +82,7 @@ namespace detail
   tuple_for_each(TUPLE&, const UNARY_FUNC&, std::index_sequence<>)
   {
   }
-  template <class TUPLE, class UNARY_FUNC, size_t I, size_t ...IDX> inline void
+  template <class TUPLE, class UNARY_FUNC, size_t I, size_t... IDX> inline void
   tuple_for_each(TUPLE& x, const UNARY_FUNC& f, std::index_sequence<I, IDX...>)
   {
       f(std::get<I>(x));
@@ -73,8 +91,7 @@ namespace detail
 }	// namespace detail
     
 template <class TUPLE, class UNARY_FUNC>
-inline typename std::enable_if<
-		    is_tuple<typename std::decay<TUPLE>::type>::value>::type
+inline typename std::enable_if<is_tuple<TUPLE>::value>::type
 tuple_for_each(TUPLE&& x, const UNARY_FUNC& f)
 {
     detail::tuple_for_each(
@@ -92,9 +109,9 @@ namespace detail
   {
   }
   template <class TUPLE0, class TUPLE1,
-	    class BINARY_FUNC, size_t I, size_t ...IDX> inline void
+	    class BINARY_FUNC, size_t I, size_t... IDX> inline void
   tuple_for_each(TUPLE0& x, TUPLE1& y,
-		      const BINARY_FUNC& f, std::index_sequence<I, IDX...>)
+		 const BINARY_FUNC& f, std::index_sequence<I, IDX...>)
   {
       f(std::get<I>(x), std::get<I>(y));
       tuple_for_each(x, y, f, std::index_sequence<IDX...>());
@@ -102,57 +119,22 @@ namespace detail
 }	// namespace detail
 
 template <class TUPLE0, class TUPLE1, class BINARY_FUNC>
-inline typename std::enable_if<
-		    is_tuple<typename std::decay<TUPLE0>::type>::value &&
-		    is_tuple<typename std::decay<TUPLE1>::type>::value>::type
+inline typename std::enable_if<TU::is_tuple<TUPLE0>::value &&
+			       TU::is_tuple<TUPLE1>::value>::type
 tuple_for_each(TUPLE0&& x, TUPLE1&& y, const BINARY_FUNC& f)
 {
     detail::tuple_for_each(
-	x, y, f,
-	std::make_index_sequence<
-	    std::tuple_size<typename std::decay<TUPLE0>::type>::value>());
+	x, y, f, std::make_index_sequence<
+	std::tuple_size<typename std::decay<TUPLE0>::type>::value>());
 }
 
-/************************************************************************
-*  I/O functions							*
-************************************************************************/
-namespace detail
-{
-  struct generic_put
-  {
-      generic_put(std::ostream& out)	:_out(out)	{}
-    
-      template <class T_>
-      void	operator ()(const T_& x) const		{ _out << ' ' << x; }
-
-    private:
-      std::ostream&	_out;
-  };
-}	// namespace detail
-}	// namespace TU
-
-namespace std
-{
-template <class TUPLE>
-inline typename enable_if<TU::is_tuple<TUPLE>::value, ostream&>::type
-operator <<(ostream& out, const TUPLE& x)
-{
-    out << '(';
-    TU::tuple_for_each(x, TU::detail::generic_put(out));
-    out << ')';
-
-    return out;
-}
-}	// namespace std
-
-namespace TU
-{
 /************************************************************************
 *  tuple_transform(TUPLE, UNARY_FUNC)					*
 ************************************************************************/
 namespace detail
 {
-  template <class TUPLE, class UNARY_FUNC, size_t ...IDX> inline auto
+  template <class TUPLE, class UNARY_FUNC, size_t... IDX>
+  inline auto
   tuple_transform(TUPLE& x, const UNARY_FUNC& f, std::index_sequence<IDX...>)
   {
       return std::make_tuple(f(std::get<IDX>(x))...);
@@ -160,16 +142,15 @@ namespace detail
 }	// namespace detail
     
 template <class TUPLE, class UNARY_FUNC,
-	  typename std::enable_if<
-	      is_tuple<typename std::decay<TUPLE>::type>::value>::type*
-	  = nullptr>
+	  typename std::enable_if<is_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
 tuple_transform(TUPLE&& x, const UNARY_FUNC& f)
 {
     return detail::tuple_transform(
-	       x, f, std::make_index_sequence<
-			 std::tuple_size<typename std::decay<TUPLE>::type>
-			    ::value>());
+		x, f,
+		std::make_index_sequence<
+		    std::tuple_size<
+			typename std::decay<TUPLE>::type>::value>());
 }
 
 /************************************************************************
@@ -177,7 +158,7 @@ tuple_transform(TUPLE&& x, const UNARY_FUNC& f)
 ************************************************************************/
 namespace detail
 {
-  template <class TUPLE0, class TUPLE1, class BINARY_FUNC, size_t ...IDX>
+  template <class TUPLE0, class TUPLE1, class BINARY_FUNC, size_t... IDX>
   inline auto
   tuple_transform(TUPLE0& x, TUPLE1& y,
 		  const BINARY_FUNC& f, std::index_sequence<IDX...>)
@@ -187,17 +168,16 @@ namespace detail
 }	// namespace detail
     
 template <class TUPLE0, class TUPLE1, class BINARY_FUNC,
-	  typename std::enable_if<
-	      is_tuple<typename std::decay<TUPLE0>::type>::value &&
-	      is_tuple<typename std::decay<TUPLE1>::type>::value>::type*
-	  = nullptr>
+	  typename std::enable_if<is_tuple<TUPLE0>::value &&
+				  is_tuple<TUPLE1>::value>::type* = nullptr>
 inline auto
 tuple_transform(TUPLE0&& x, TUPLE1&& y, const BINARY_FUNC& f)
 {
     return detail::tuple_transform(
-		x, y, f, std::make_index_sequence<
-			     std::tuple_size<typename std::decay<TUPLE0>::type>
-				::value>());
+		x, y, f,
+		std::make_index_sequence<
+		    std::tuple_size<
+			typename std::decay<TUPLE0>::type>::value>());
 }
 
 /************************************************************************
@@ -206,29 +186,27 @@ tuple_transform(TUPLE0&& x, TUPLE1&& y, const BINARY_FUNC& f)
 namespace detail
 {
   template <class TUPLE0, class TUPLE1, class TUPLE2,
-	    class TRINARY_FUNC, size_t ...IDX> inline auto
+	    class TRINARY_FUNC, size_t... IDX> inline auto
   tuple_transform(TUPLE0& x, TUPLE1& y, TUPLE2& z,
 		  const TRINARY_FUNC& f, std::index_sequence<IDX...>)
   {
-      return std::make_tuple(
-		 f(std::get<IDX>(x), std::get<IDX>(y), std::get<IDX>(z))...);
+      return std::make_tuple(f(std::get<IDX>(x), std::get<IDX>(y),
+			       std::get<IDX>(z))...);
   }
 }	// namespace detail
     
 template <class TUPLE0, class TUPLE1, class TUPLE2, class TRINARY_FUNC,
-	  typename std::enable_if<
-	      is_tuple<typename std::decay<TUPLE0>::type>::value &&
-	      is_tuple<typename std::decay<TUPLE1>::type>::value &&
-	      is_tuple<typename std::decay<TUPLE2>::type>::value>::type*
-	  = nullptr>
+	  typename std::enable_if<is_tuple<TUPLE0>::value &&
+				  is_tuple<TUPLE1>::value &&
+				  is_tuple<TUPLE2>::value>::type* = nullptr>
 inline auto
 tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, const TRINARY_FUNC& f)
 {
     return detail::tuple_transform(
 		x, y, z, f,
 		std::make_index_sequence<
-		    std::tuple_size<typename std::decay<TUPLE0>::type>
-		       ::value>());
+		    std::tuple_size<
+			typename std::decay<TUPLE0>::type>::value>());
 }
 
 }	// namespace TU
@@ -240,6 +218,34 @@ tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, const TRINARY_FUNC& f)
 namespace std
 {
 /************************************************************************
+*  I/O functions							*
+************************************************************************/
+namespace detail
+{
+  struct generic_put
+  {
+      generic_put(ostream& out)	:_out(out)	{}
+    
+      template <class T_>
+      void	operator ()(const T_& x) const		{ _out << ' ' << x; }
+
+    private:
+      ostream&	_out;
+  };
+}	// namespace detail
+
+template <class TUPLE>
+inline typename enable_if<TU::is_tuple<TUPLE>::value, ostream&>::type
+operator <<(ostream& out, const TUPLE& x)
+{
+    out << '(';
+    TU::tuple_for_each(x, detail::generic_put(out));
+    out << ')';
+
+    return out;
+}
+
+/************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
 template <class TUPLE,
@@ -249,10 +255,10 @@ operator -(const TUPLE& t)
 {
     return TU::tuple_transform(t, TU::negate());
 }
-    
+
 template <class L, class R,
 	  typename enable_if<TU::is_tuple<L>::value &&
-				  TU::is_tuple<R>::value>::type* = nullptr>
+			     TU::is_tuple<R>::value>::type* = nullptr>
 inline auto
 operator +(const L& l, const R& r)
 {
@@ -332,63 +338,63 @@ operator %(const TUPLE& t, const T& c)
 }
 
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator +=(L&& y, const R& x)
 {
-    tuple_for_each(forward<L>(y), x, TU::plus_assign());
+    TU::tuple_for_each(forward<L>(y), x, TU::plus_assign());
     return y;
 }
 
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator -=(L&& y, const R& x)
 {
-    tuple_for_each(forward<L>(y), x, TU::minus_assign());
+    TU::tuple_for_each(forward<L>(y), x, TU::minus_assign());
     return y;
 }
 
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator *=(L&& y, const R& x)
 {
-    tuple_for_each(forward<L>(y), x, TU::multiplies_assign());
+    TU::tuple_for_each(forward<L>(y), x, TU::multiplies_assign());
     return y;
 }
 
 template <class TUPLE, class T>
-inline typename enable_if<TU::is_tuple<typename decay<TUPLE>::type>::value &&
+inline typename enable_if<TU::is_tuple<TUPLE>::value &&
 			  !TU::is_tuple<T>::value, TUPLE&>::type
 operator *=(TUPLE&& t, const T& c)
 {
-    tuple_for_each(forward<TUPLE>(t),
-		   bind(TU::multiplies_assign(), placeholders::_1, c));
+    TU::tuple_for_each(forward<TUPLE>(t),
+		       bind(TU::multiplies_assign(), placeholders::_1, c));
     return t;
 }
 
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator /=(L&& y, const R& x)
 {
-    tuple_for_each(forward<L>(y), x, TU::divides_assign());
+    TU::tuple_for_each(forward<L>(y), x, TU::divides_assign());
     return y;
 }
 
 template <class TUPLE, class T>
-inline typename enable_if<TU::is_tuple<typename decay<TUPLE>::type>::value &&
+inline typename enable_if<TU::is_tuple<TUPLE>::value &&
 			  !TU::is_tuple<T>::value, TUPLE&>::type
 operator /=(TUPLE&& t, const T& c)
 {
-    tuple_for_each(forward<TUPLE>(t),
-		   bind(TU::divides_assign(), placeholders::_1, c));
+    TU::tuple_for_each(forward<TUPLE>(t),
+		       bind(TU::divides_assign(), placeholders::_1, c));
     return t;
 }
 
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator %=(L&& y, const R& x)
 {
@@ -397,7 +403,7 @@ operator %=(L&& y, const R& x)
 }
 
 template <class TUPLE, class T>
-inline typename enable_if<TU::is_tuple<typename decay<TUPLE>::type>::value &&
+inline typename enable_if<TU::is_tuple<TUPLE>::value &&
 			  !TU::is_tuple<T>::value, TUPLE&>::type
 operator %=(TUPLE&& t, const T& c)
 {
@@ -437,29 +443,29 @@ operator ^(const L& l, const R& r)
 }
     
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator &=(L&& y, const R& x)
 {
-    tuple_for_each(forward<L>(y), x, TU::bit_and_assign());
+    TU::tuple_for_each(forward<L>(y), x, TU::bit_and_assign());
     return y;
 }
 
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator |=(L&& y, const R& x)
 {
-    tuple_for_each(forward<L>(y), x, TU::bit_or_assign());
+    TU::tuple_for_each(forward<L>(y), x, TU::bit_or_assign());
     return y;
 }
 
 template <class L, class R>
-inline typename enable_if<TU::is_tuple<typename decay<L>::type>::value &&
+inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
 operator ^=(L&& y, const R& x)
 {
-    tuple_for_each(forward<L>(y), x, TU::bit_xor_assign());
+    TU::tuple_for_each(forward<L>(y), x, TU::bit_xor_assign());
     return y;
 }
 
@@ -563,7 +569,7 @@ template <class S, class T, class U,
 inline auto
 select(const S& s, const T& x, const U& y)
 {
-    return TU::tuple_transform(s, x, y, generic_select());
+    return tuple_transform(s, x, y, generic_select());
 }
 
 template <class S, class T, class U,
@@ -614,7 +620,7 @@ class unarizer
     const FUNC&	functor()			const	{return _func;}
 
   private:
-    template <class TUPLE_, size_t ...IDX_>
+    template <class TUPLE_, size_t... IDX_>
     auto	exec(const TUPLE_& arg, std::index_sequence<IDX_...>) const
 		{
 		    return _func(std::get<IDX_>(arg)...);
@@ -656,7 +662,7 @@ namespace detail
 	  return std::ref(*iter);
       }
   };
-}
+}	// namespace detail
     
 template <class ITER_TUPLE>
 class fast_zip_iterator
@@ -678,14 +684,14 @@ class fast_zip_iterator
 					  detail::generic_dereference())),
 		      typename std::iterator_traits<
 			  typename std::tuple_element<0, ITER_TUPLE>::type>
-		      ::iterator_category,
+			  ::iterator_category,
 		      decltype(
 			  tuple_transform(std::declval<ITER_TUPLE>(),
 					  detail::generic_dereference()))>;
     
   public:
-    using typename super::reference;
-    using typename super::difference_type;
+    using		typename super::reference;
+    using		typename super::difference_type;
     
     friend class	boost::iterator_core_access;
 
@@ -764,127 +770,71 @@ make_fast_zip_iterator(const ITER_TUPLE& iter_tuple)
 
 namespace std
 {
+namespace detail
+{
 /************************************************************************
 *  std::[begin|end|rbegin|rend](std::tuple<T...>)			*
 ************************************************************************/
-namespace detail
-{
   struct generic_begin
   {
       template <class T>
-      auto	operator ()(const T& x)	const	{ return std::begin(x); }
-      template <class T>
-      auto	operator ()(T& x)	const	{ return std::begin(x); }
+      auto	operator ()(T&& x)	const	{ return std::begin(x); }
   };
     
   struct generic_end
   {
       template <class T>
-      auto	operator ()(const T& x)	const	{ return std::end(x); }
-      template <class T>
-      auto	operator ()(T& x)	const	{ return std::end(x); }
+      auto	operator ()(T&& x)	const	{ return std::end(x); }
   };
 
   struct generic_rbegin
   {
       template <class T>
-      auto	operator ()(const T& x)	const	{ return std::rbegin(x); }
-      template <class T>
-      auto	operator ()(T& x)	const	{ return std::rbegin(x); }
+      auto	operator ()(T&& x)	const	{ return std::rbegin(x); }
   };
     
   struct generic_rend
   {
       template <class T>
-      auto	operator ()(const T& x)	const	{ return  std::rend(x); }
-      template <class T>
-      auto	operator ()(T& x)	const	{ return std::rend(x); }
+      auto	operator ()(T&& x)	const	{ return std::rend(x); }
   };
-}
+}	// namespace detail
 
 template <class TUPLE,
-	  typename enable_if<TU::is_tuple<TUPLE>::value>::type* = nullptr>
-inline auto
-begin(const TUPLE& x)
-{
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  x, detail::generic_begin()));
-}
-    
-template <class TUPLE,
-	  typename enable_if<
-	      TU::is_tuple<typename decay<TUPLE>::type>::value>::type*
-	  = nullptr>
+	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
 begin(TUPLE&& x)
 {
     return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  forward<TUPLE>(x),
-					  detail::generic_begin()));
+					  x, detail::generic_begin()));
 }
-    
+
 template <class TUPLE,
-	  typename enable_if<TU::is_tuple<TUPLE>::value>::type* = nullptr>
+	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
-end(const TUPLE& x)
+end(TUPLE&& x)
 {
     return TU::make_fast_zip_iterator(TU::tuple_transform(
 					  x, detail::generic_end()));
 }
     
 template <class TUPLE,
-	  typename enable_if<
-	      TU::is_tuple<typename decay<TUPLE>::type>::value>::type*
-	  = nullptr>
+	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
-end(TUPLE&& x)
-{
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  forward<TUPLE>(x),
-					  detail::generic_end()));
-}
-    
-template <class TUPLE,
-	  typename enable_if<TU::is_tuple<TUPLE>::value>::type* = nullptr>
-inline auto
-rbegin(const TUPLE& x)
+rbegin(TUPLE&& x)
 {
     return TU::make_fast_zip_iterator(TU::tuple_transform(
 					  x, detail::generic_rbegin()));
 }
     
 template <class TUPLE,
-	  typename enable_if<
-	      TU::is_tuple<typename decay<TUPLE>::type>::value>::type*
-	  = nullptr>
-inline auto
-rbegin(TUPLE&& x)
-{
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  forward<TUPLE>(x),
-					  detail::generic_rbegin()));
-}
-    
-template <class TUPLE,
-	  typename enable_if<TU::is_tuple<TUPLE>::value>::type* = nullptr>
-inline auto
-rend(const TUPLE& x)
-{
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  x, detail::generic_rend()));
-}
-    
-template <class TUPLE,
-	  typename enable_if<
-	      TU::is_tuple<typename decay<TUPLE>::type>::value>::type*
-	  = nullptr>
+	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
 rend(TUPLE&& x)
 {
     return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  forward<TUPLE>(x),
-					  detail::generic_rend()));
+					  x, detail::generic_rend()));
 }
-    
+
 }	// namespace std
 #endif	// !__TU_TUPLE_H

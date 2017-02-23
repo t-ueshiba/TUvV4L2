@@ -12,7 +12,6 @@
 #include <iomanip>		// for std::ws
 #include <memory>		// for std::allocator<T>, std::unique_ptr<T>
 #include "TU/range.h"
-#include "TU/utility.h"		// for std::index_sequence<Ints...>
 
 namespace TU
 {

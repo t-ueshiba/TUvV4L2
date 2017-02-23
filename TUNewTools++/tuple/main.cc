@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#include "TU/tuple.h"
 #include "TU/Array++.h"
+#include <boost/core/demangle.hpp>
 
 namespace TU
 {
@@ -27,20 +27,29 @@ arithmetic_test()
 void
 zip_iterator_test()
 {
-    std::tuple<Array2<int>, Array2<double> >	t;
+    using	boost::core::demangle;
     
-    auto&	a = std::get<0>(t);
-    a.resize(10, 8);
+    Array2<int>		a(10, 8);
     for (size_t i = 0; i < a.nrow(); ++i)
 	for (size_t j = 0; j < a.ncol(); ++j)
 	    a[i][j] = 10*i + j;
 
-    auto&	b = std::get<1>(t);
+    Array2<double>	b(10, 8);
     b.resize(10, 8);
     for (size_t i = 0; i < b.nrow(); ++i)
 	for (size_t j = 0; j < b.ncol(); ++j)
 	    b[i][j] = i + 0.1*j;
 
+    const auto	t = std::make_tuple(std::cref(a), std::cref(b));
+    using	tuple_t = decltype(t);
+    std::cout << rank<tuple_t>() << std::endl;
+    std::cout << demangle(typeid(tuple_t).name())
+	      << std::endl;
+    std::cout << demangle(typeid(decltype(std::begin(t))).name())
+	      << std::endl;
+    std::cout << demangle(typeid(decltype(std::begin(*std::begin(t)))).name())
+	      << std::endl;
+  //const auto	u = make_subrange<2, 4>(t, 1, 3);
     for (const auto& row : t)
     {
 	for (const auto& col : row)
@@ -48,7 +57,7 @@ zip_iterator_test()
 	std::cout << std::endl;
     }
 }
-    
+
 }
     
 int
