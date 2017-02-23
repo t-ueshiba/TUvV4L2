@@ -631,7 +631,7 @@ make_unarizer(const FUNC& func)
 }
     
 /************************************************************************
-*  class fast_zip_iterator<ITER_TUPLE>					*
+*  class zip_iterator<ITER_TUPLE>					*
 ************************************************************************/
 namespace detail
 {
@@ -659,9 +659,9 @@ namespace detail
 }	// namespace detail
     
 template <class ITER_TUPLE>
-class fast_zip_iterator
+class zip_iterator
     : public boost::iterator_facade<
-	  fast_zip_iterator<ITER_TUPLE>,
+	  zip_iterator<ITER_TUPLE>,
 	  decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 				   detail::generic_dereference())),
 	  typename std::iterator_traits<
@@ -672,7 +672,7 @@ class fast_zip_iterator
 {
   private:
     using super = boost::iterator_facade<
-		      fast_zip_iterator,
+		      zip_iterator,
 		      decltype(
 			  tuple_transform(std::declval<ITER_TUPLE>(),
 					  detail::generic_dereference())),
@@ -714,7 +714,7 @@ class fast_zip_iterator
     };
 
   public:
-    fast_zip_iterator(const ITER_TUPLE& iter_tuple)
+    zip_iterator(const ITER_TUPLE& iter_tuple)
 	:_iter_tuple(iter_tuple)		{}
 
     const ITER_TUPLE&
@@ -726,7 +726,7 @@ class fast_zip_iterator
 		    return tuple_transform(_iter_tuple,
 					   detail::generic_dereference());
 		}
-    bool	equal(const fast_zip_iterator& iter) const
+    bool	equal(const zip_iterator& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
 			== std::get<0>(_iter_tuple);
@@ -744,7 +744,7 @@ class fast_zip_iterator
 		    tuple_for_each(_iter_tuple, Advance(n));
 		}
     difference_type
-		distance_to(const fast_zip_iterator& iter) const
+		distance_to(const zip_iterator& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
 			 - std::get<0>(_iter_tuple);
@@ -754,8 +754,8 @@ class fast_zip_iterator
     ITER_TUPLE	_iter_tuple;
 };
 
-template <class ITER_TUPLE> inline fast_zip_iterator<ITER_TUPLE>
-make_fast_zip_iterator(const ITER_TUPLE& iter_tuple)
+template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
+make_zip_iterator(const ITER_TUPLE& iter_tuple)
 {
     return {iter_tuple};
 }
@@ -799,8 +799,7 @@ template <class TUPLE,
 inline auto
 begin(TUPLE&& x)
 {
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  x, detail::generic_begin()));
+    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_begin()));
 }
 
 template <class TUPLE,
@@ -808,8 +807,7 @@ template <class TUPLE,
 inline auto
 end(TUPLE&& x)
 {
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  x, detail::generic_end()));
+    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_end()));
 }
     
 template <class TUPLE,
@@ -817,8 +815,7 @@ template <class TUPLE,
 inline auto
 rbegin(TUPLE&& x)
 {
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  x, detail::generic_rbegin()));
+    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_rbegin()));
 }
     
 template <class TUPLE,
@@ -826,8 +823,7 @@ template <class TUPLE,
 inline auto
 rend(TUPLE&& x)
 {
-    return TU::make_fast_zip_iterator(TU::tuple_transform(
-					  x, detail::generic_rend()));
+    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_rend()));
 }
 
 }	// namespace std
