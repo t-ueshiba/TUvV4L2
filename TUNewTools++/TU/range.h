@@ -767,60 +767,67 @@ make_range(ITER iter, size_t size, SS... ss)
 *  ranges with variable but identical size and stride			*
 *  and associated iterators						*
 ************************************************************************/
-template <class ITER> inline ITER
-make_dense_range_iterator(ITER iter)
+namespace detail
 {
-    return iter;
-}
+  template <class ITER> inline ITER
+  make_dense_range_iterator(ITER iter)
+  {
+      return iter;
+  }
     
-template <class ITER, class... SIZES> inline auto
-make_dense_range_iterator(ITER iter, size_t size, SIZES... sizes)
-{
-    return make_range_iterator(make_dense_range_iterator(iter, sizes...),
-			       size, size);
-}
+  template <class ITER, class... SIZES> inline auto
+  make_dense_range_iterator(ITER iter, size_t size, SIZES... sizes)
+  {
+      return make_range_iterator(make_dense_range_iterator(iter, sizes...),
+				 size, size);
+  }
+}	// namespace detail
 
 template <class ITER, class... SIZES> inline auto
 make_dense_range(ITER iter, size_t size, SIZES... sizes)
 {
-    return make_range(make_dense_range_iterator(iter, sizes...), size);
+    return make_range(detail::make_dense_range_iterator(iter, sizes...), size);
 }
 
 /************************************************************************
 *  subrange extraction							*
 ************************************************************************/
-template <class ITER> inline ITER
-make_subrange_iterator(ITER iter)
+namespace detail
 {
-    return iter;
-}
+  template <class ITER> inline ITER
+  make_subrange_iterator(ITER iter)
+  {
+      return iter;
+  }
 
-template <class ITER, class... IS> inline auto
-make_subrange_iterator(ITER iter, size_t idx, size_t size, IS... is)
-{
-    return make_range_iterator(make_subrange_iterator(
-				   iter->begin() + idx, is...),
-			       size, iter.stride());
-}
+  template <class ITER, class... IS> inline auto
+  make_subrange_iterator(ITER iter, size_t idx, size_t size, IS... is)
+  {
+      return make_range_iterator(make_subrange_iterator(
+				     iter->begin() + idx, is...),
+				 size, iter.stride());
+  }
 
+  template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES,
+	    typename std::enable_if<
+		sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
+  inline auto
+  make_subrange_iterator(ITER iter, size_t idx, INDICES... indices)
+  {
+      return make_range_iterator<SIZE>(make_subrange_iterator<SIZES...>(
+					   iter->begin() + idx, indices...),
+				       iter.stride());
+  }
+}	// namespace detail
+    
 template <class RANGE, class... IS,
 	  typename std::enable_if<
 	      rank<typename std::decay<RANGE>::type>() != 0>::type* = nullptr>
 inline auto
 make_subrange(RANGE&& r, size_t idx, size_t size, IS... is)
 {
-    return make_range(make_subrange_iterator(std::begin(r) + idx, is...), size);
-}
-
-template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES,
-	  typename std::enable_if<
-	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
-inline auto
-make_subrange_iterator(ITER iter, size_t idx, INDICES... indices)
-{
-    return make_range_iterator<SIZE>(make_subrange_iterator<SIZES...>(
-					 iter->begin() + idx, indices...),
-				     iter.stride());
+    return make_range(detail::make_subrange_iterator(
+			  std::begin(r) + idx, is...), size);
 }
 
 template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
@@ -830,7 +837,7 @@ template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 inline auto
 make_subrange(RANGE&& r, size_t idx, INDICES... indices)
 {
-    return make_range<SIZE>(make_subrange_iterator<SIZES...>(
+    return make_range<SIZE>(detail::make_subrange_iterator<SIZES...>(
 				std::begin(r) + idx, indices...));
 }
 
