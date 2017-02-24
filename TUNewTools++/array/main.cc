@@ -4,12 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <typeinfo>
-#ifdef CPP11
-#  include "TU/Array++11.h"
-#else
-#  include "TU/Array++.h"
-#endif
-#include "TU/functional.h"
+#include "TU/Array++.h"
 //#include <boost/core/demangle.hpp>
 
 namespace TU

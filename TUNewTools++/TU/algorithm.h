@@ -27,6 +27,20 @@ template <class E>
 std::ostream&	operator <<(std::ostream& out, const sizes_holder<E>& holder);
 #endif
 
+template <class ITER0, class ITER1, class FUNC> FUNC
+for_each(ITER0 begin0, ITER0 end0, ITER1 begin1, FUNC func)
+{
+    for (; begin0 != end0; ++begin0, ++begin1)
+	func(*begin0, *begin1);
+    return std::move(func);
+}
+    
+template <class X, class Y> inline auto
+select(bool s, const X& x, const Y& y)
+{
+    return (s ? x : y);
+}
+    
 //! 与えられた二つの整数の最大公約数を求める．
 /*!
   \param m	第1の整数

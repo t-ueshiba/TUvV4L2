@@ -14,6 +14,7 @@ arithmetic_test()
     
     ivec_t	a(1, 2), b(10, 20);
     dvec_t	x(1.1, 2.2), y(10.1, 20.2);
+    std::cout << -a << std::endl;
     std::cout << a*a + b << std::endl;
     std::cout << x + 2*y << std::endl;
 

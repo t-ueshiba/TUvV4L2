@@ -923,6 +923,15 @@ namespace detail
   {
       return {l, r, op};
   }
+
+  struct bit_xor
+  {
+      template <class X_, class Y_>
+      auto	operator ()(const X_& x, const Y_& y) const
+		{
+		    return x ^ y;
+		}
+  };
 }	// namespace detail
 
 //! 2つの1次元配列式の内積をとる.
@@ -959,7 +968,8 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    return detail::make_product_opnode(l, r, multiplies());
+    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
+					     { return x * y; });
 }
 
 //! 1次元配列式と2次元配列式の積をとる.
@@ -976,7 +986,8 @@ operator *(const L& l, const R& r)
 {
     constexpr size_t	S = size0<value_t<R> >();
     return detail::make_product_opnode(
-      	       make_range<S>(column_begin(r), size<1>(r)), l, multiplies());
+      	       make_range<S>(column_begin(r), size<1>(r)), l,
+	       [](const auto& x, const auto& y){ return x * y; });
 }
     
 //! 2つの1次元配列式の外積をとる.
@@ -991,7 +1002,8 @@ template <class L, class R,
 inline auto
 operator %(const L& l, const R& r)
 {
-    return detail::make_product_opnode(l, r, multiplies());
+    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
+					     { return x * y; });
 }
 
 //! 2つの1次元配列式のベクトル積をとる.
@@ -1033,11 +1045,8 @@ template <class L, class R,
 inline auto
 operator ^(const L& l, const R& r)
 {
-    assert(size<1>(l) == 3 && size<0>(r) == 3);
-    
-    return detail::make_product_opnode(l, r, bit_xor());
+    return detail::make_product_opnode(l, r, detail::bit_xor());
 }
-
 
 }	// namespace TU
 #endif	// !__TU_ARRAY_H

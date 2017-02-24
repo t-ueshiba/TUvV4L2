@@ -38,7 +38,6 @@
 #include <utility>		// std::forward(), std::index_sequence<...>
 #include <iostream>
 #include <boost/iterator/iterator_facade.hpp>
-#include "TU/functional.h"
 
 namespace TU
 {
@@ -214,26 +213,12 @@ namespace std
 /************************************************************************
 *  I/O functions							*
 ************************************************************************/
-namespace detail
-{
-  struct generic_put
-  {
-      generic_put(ostream& out)	:_out(out)	{}
-    
-      template <class T_>
-      void	operator ()(const T_& x) const		{ _out << ' ' << x; }
-
-    private:
-      ostream&	_out;
-  };
-}	// namespace detail
-
 template <class TUPLE>
 inline typename enable_if<TU::is_tuple<TUPLE>::value, ostream&>::type
-operator <<(ostream& out, const TUPLE& x)
+operator <<(ostream& out, const TUPLE& t)
 {
     out << '(';
-    TU::tuple_for_each(x, detail::generic_put(out));
+    TU::tuple_for_each(t, [&](const auto& x){ out << ' ' << x; });
     out << ')';
 
     return out;
@@ -247,7 +232,7 @@ template <class TUPLE,
 inline auto
 operator -(const TUPLE& t)
 {
-    return TU::tuple_transform(t, TU::negate());
+    return TU::tuple_transform(t, [](const auto& x){ return -x; });
 }
 
 template <class L, class R,
@@ -256,7 +241,8 @@ template <class L, class R,
 inline auto
 operator +(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::plus());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x + y; });
 }
 
 template <class L, class R,
@@ -265,7 +251,8 @@ template <class L, class R,
 inline auto
 operator -(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::minus());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x - y; });
 }
 
 template <class L, class R,
@@ -274,7 +261,8 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::multiplies());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x * y; });
 }
 
 template <class TUPLE, class T,
@@ -283,7 +271,7 @@ template <class TUPLE, class T,
 inline auto
 operator *(const TUPLE& t, const T& c)
 {
-    return TU::tuple_transform(t, bind(TU::multiplies(), placeholders::_1, c));
+    return TU::tuple_transform(t, [&](const auto& x){ return x * c; });
 }
 
 template <class T, class TUPLE,
@@ -292,7 +280,7 @@ template <class T, class TUPLE,
 inline auto
 operator *(const T& c, const TUPLE& t)
 {
-    return TU::tuple_transform(t, bind(TU::multiplies(), c, placeholders::_1));
+    return TU::tuple_transform(t, [&](const auto& x){ return c * x; });
 }
 
 template <class L, class R,
@@ -301,7 +289,8 @@ template <class L, class R,
 inline auto
 operator /(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::divides());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x / y; });
 }
 
 template <class TUPLE, class T,
@@ -310,7 +299,7 @@ template <class TUPLE, class T,
 inline auto
 operator /(const TUPLE& t, const T& c)
 {
-    return TU::tuple_transform(t, bind(TU::divides(), placeholders::_1, c));
+    return TU::tuple_transform(t, [&](const auto& x){ return x / c; });
 }
 
 template <class L, class R,
@@ -319,7 +308,8 @@ template <class L, class R,
 inline auto
 operator %(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::modulus());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x % y; });
 }
 
 template <class TUPLE, class T,
@@ -328,34 +318,34 @@ template <class TUPLE, class T,
 inline auto
 operator %(const TUPLE& t, const T& c)
 {
-    return TU::tuple_transform(t, bind(TU::modulus(), placeholders::_1, c));
+    return TU::tuple_transform(t, [&](const auto& x){ return x % c; });
 }
 
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator +=(L&& y, const R& x)
+operator +=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::plus_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x += y; });
+    return l;
 }
 
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator -=(L&& y, const R& x)
+operator -=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::minus_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x -= y; });
+    return l;
 }
 
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator *=(L&& y, const R& x)
+operator *=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::multiplies_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x *= y; });
+    return l;
 }
 
 template <class TUPLE, class T>
@@ -363,18 +353,17 @@ inline typename enable_if<TU::is_tuple<TUPLE>::value &&
 			  !TU::is_tuple<T>::value, TUPLE&>::type
 operator *=(TUPLE&& t, const T& c)
 {
-    TU::tuple_for_each(forward<TUPLE>(t),
-		       bind(TU::multiplies_assign(), placeholders::_1, c));
+    TU::tuple_for_each(forward<TUPLE>(t), [&](auto& x){ x *= c; });
     return t;
 }
 
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator /=(L&& y, const R& x)
+operator /=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::divides_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x /= y; });
+    return l;
 }
 
 template <class TUPLE, class T>
@@ -382,18 +371,17 @@ inline typename enable_if<TU::is_tuple<TUPLE>::value &&
 			  !TU::is_tuple<T>::value, TUPLE&>::type
 operator /=(TUPLE&& t, const T& c)
 {
-    TU::tuple_for_each(forward<TUPLE>(t),
-		       bind(TU::divides_assign(), placeholders::_1, c));
+    TU::tuple_for_each(forward<TUPLE>(t), [&](auto& x){ x /= c; });
     return t;
 }
 
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator %=(L&& y, const R& x)
+operator %=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::modulus_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x %= y; });
+    return l;
 }
 
 template <class TUPLE, class T>
@@ -401,8 +389,7 @@ inline typename enable_if<TU::is_tuple<TUPLE>::value &&
 			  !TU::is_tuple<T>::value, TUPLE&>::type
 operator %=(TUPLE&& t, const T& c)
 {
-    TU::tuple_for_each(forward<TUPLE>(t),
-		       bind(TU::modulus_assign(), placeholders::_1, c));
+    TU::tuple_for_each(forward<TUPLE>(t), [&](auto& x){ x %= c; });
     return t;
 }
 
@@ -415,7 +402,8 @@ template <class L, class R,
 inline auto
 operator &(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::bit_and());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x & y; });
 }
     
 template <class L, class R,
@@ -424,7 +412,8 @@ template <class L, class R,
 inline auto
 operator |(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::bit_or());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x | y; });
 }
     
 template <class L, class R,
@@ -433,34 +422,35 @@ template <class L, class R,
 inline auto
 operator ^(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::bit_xor());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x ^ y; });
 }
     
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator &=(L&& y, const R& x)
+operator &=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::bit_and_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x &= y; });
+    return l;
 }
 
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator |=(L&& y, const R& x)
+operator |=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::bit_or_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x |= y; });
+    return l;
 }
 
 template <class L, class R>
 inline typename enable_if<TU::is_tuple<L>::value &&
 			  TU::is_tuple<R>::value, L&>::type
-operator ^=(L&& y, const R& x)
+operator ^=(L&& l, const R& r)
 {
-    TU::tuple_for_each(forward<L>(y), x, TU::bit_xor_assign());
-    return y;
+    TU::tuple_for_each(forward<L>(l), r, [](auto& x, const auto& y){ x ^= y; });
+    return l;
 }
 
 /************************************************************************
@@ -471,7 +461,7 @@ template <class TUPLE,
 inline auto
 operator !(const TUPLE& t)
 {
-    return TU::tuple_transform(t, TU::generic_function<logical_not>());
+    return TU::tuple_transform(t, [](const auto& x){ return !x; });
 }
     
 template <class L, class R,
@@ -480,7 +470,8 @@ template <class L, class R,
 inline auto
 operator &&(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::generic_function<logical_and>());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x && y; });
 }
     
 template <class L, class R,
@@ -489,7 +480,8 @@ template <class L, class R,
 inline auto
 operator ||(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::generic_function<logical_or>());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x || y; });
 }
     
 /************************************************************************
@@ -501,7 +493,8 @@ template <class L, class R,
 inline auto
 operator ==(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::equal_to());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x == y; });
 }
     
 template <class L, class R,
@@ -510,7 +503,8 @@ template <class L, class R,
 inline auto
 operator !=(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::not_equal_to());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x != y; });
 }
     
 template <class L, class R,
@@ -519,7 +513,8 @@ template <class L, class R,
 inline auto
 operator <(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::less());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x < y; });
 }
     
 template <class L, class R,
@@ -528,7 +523,8 @@ template <class L, class R,
 inline auto
 operator >(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::greater());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x > y; });
 }
     
 template <class L, class R,
@@ -537,7 +533,8 @@ template <class L, class R,
 inline auto
 operator <=(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::less_equal());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x <= y; });
 }
     
 template <class L, class R,
@@ -546,7 +543,8 @@ template <class L, class R,
 inline auto
 operator >=(const L& l, const R& r)
 {
-    return TU::tuple_transform(l, r, TU::greater_equal());
+    return TU::tuple_transform(l, r, [](const auto& x, const auto& y)
+				     { return x >= y; });
 }
 
 }	// namespace std
@@ -556,38 +554,38 @@ namespace TU
 /************************************************************************
 *  Selection								*
 ************************************************************************/
-template <class S, class T, class U,
+template <class S, class X, class Y,
 	  typename std::enable_if<is_tuple<S>::value &&
-				  is_tuple<T>::value &&
-				  is_tuple<U>::value>::type* = nullptr>
+				  is_tuple<X>::value &&
+				  is_tuple<Y>::value>::type* = nullptr>
 inline auto
-select(const S& s, const T& x, const U& y)
+select(const S& s, const X& x, const Y& y)
 {
-    return tuple_transform(s, x, y, generic_select());
+    return tuple_transform(s, x, y,
+			   [](const auto& t, const auto& u, const auto& v)
+			   { return select(t, u, v); });
 }
 
-template <class S, class T, class U,
+template <class S, class X, class Y,
 	  typename std::enable_if<is_tuple<S>::value &&
-				  !is_tuple<T>::value &&
-				  is_tuple<U>::value>::type* = nullptr>
+				  !is_tuple<X>::value &&
+				  is_tuple<Y>::value>::type* = nullptr>
 inline auto
-select(const S& s, const T& x, const U& y)
+select(const S& s, const X& x, const Y& y)
 {
-    return tuple_transform(s, y,
-			   std::bind(generic_select(), std::placeholders::_1,
-				     x, std::placeholders::_2));
+    return tuple_transform(s, y, [&](const auto& t, const auto& v)
+				 { return select(t, x, v); });
 }
 
-template <class S, class T, class U,
+template <class S, class X, class Y,
 	  typename std::enable_if<is_tuple<S>::value &&
-				  is_tuple<T>::value &&
-				  !is_tuple<U>::value>::type* = nullptr>
+				  is_tuple<X>::value &&
+				  !is_tuple<Y>::value>::type* = nullptr>
 inline auto
-select(const S& s, const T& x, const U& y)
+select(const S& s, const X& x, const Y& y)
 {
-    return tuple_transform(s, x,
-			   std::bind(generic_select(), std::placeholders::_1,
-				     std::placeholders::_2, y));
+    return tuple_transform(s, x, [&](const auto& t, const auto& u)
+				 { return select(t, u, y); });
 }
 
 /************************************************************************
@@ -799,7 +797,8 @@ template <class TUPLE,
 inline auto
 begin(TUPLE&& x)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_begin()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     x, detail::generic_begin()));
 }
 
 template <class TUPLE,
@@ -807,7 +806,8 @@ template <class TUPLE,
 inline auto
 end(TUPLE&& x)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_end()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     x, detail::generic_end()));
 }
     
 template <class TUPLE,
@@ -815,7 +815,8 @@ template <class TUPLE,
 inline auto
 rbegin(TUPLE&& x)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_rbegin()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     x, detail::generic_rbegin()));
 }
     
 template <class TUPLE,
@@ -823,7 +824,8 @@ template <class TUPLE,
 inline auto
 rend(TUPLE&& x)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(x, detail::generic_rend()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     x, detail::generic_rend()));
 }
 
 }	// namespace std

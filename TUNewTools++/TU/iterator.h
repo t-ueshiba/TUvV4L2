@@ -39,7 +39,6 @@
 #include <utility>			// for std::declval<T>
 #include <iterator>
 #include <boost/iterator/transform_iterator.hpp>
-#include "TU/functional.h"
 
 namespace std
 {

@@ -11,7 +11,6 @@
 #include <iostream>
 #include <cassert>
 #include <initializer_list>
-#include "TU/functional.h"
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
 #include "TU/tuple.h"
 #include "TU/iterator.h"
@@ -111,7 +110,7 @@ namespace detail
   static std::false_type has_size0(...)					;
 
   /*
-   *  A ^ b において opnode: product_opnode<bit_xor, L, R> が
+   *  A ^ b において演算子ノード product_opnode<bit_xor, L, R> が
    *  生成されるが，これを評価して2次元配列に代入する際に代入先の領域確保のため
    *  size<0>(opnode), size<1>(opnode) が呼び出される．後者はopnodeの反復子が
    *  指す先を評価するが，これは2つの3次元ベクトルのベクトル積を評価することに
@@ -119,6 +118,7 @@ namespace detail
    *  サイズだけを得るために，以下のオーバーロードを導入する．
    */
   template <class OP, class L, class R>	class product_opnode;
+  class bit_xor;
     
   template <class L, class R> constexpr size_t
   size(const product_opnode<bit_xor, L, R>&, std::integral_constant<size_t, 1>)
@@ -1041,29 +1041,6 @@ namespace detail
   {
       return {l, r, op};
   }
-
-  template <class ASSIGN, class E> inline E&
-  op_assign(E& expr, const element_t<E>& c)
-  {
-      for (auto& dst : expr)
-	  ASSIGN()(dst, c);
-
-      return expr;
-  }
-
-  template <class ASSIGN, class L, class R> inline L&
-  op_assign(L& l, const R& r)
-  {
-      assert(std::size(l) == std::size(r));
-      auto	src = std::begin(r);
-      for (auto& dst : l)
-      {
-	  ASSIGN()(dst, *src);
-	  ++src;
-      }
-
-      return l;
-  }
 }	// namespace detail
 
 //! 与えられた式の各要素の符号を反転する.
@@ -1071,12 +1048,11 @@ namespace detail
   \param expr	式
   \return	符号反転演算子ノード
 */
-template <class E,
-	  typename std::enable_if<rank<E>() != 0>::type* = nullptr>
+template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
 operator -(const E& expr)
 {
-    return detail::make_unary_opnode(expr, negate());
+    return detail::make_unary_opnode(expr, [](const auto& x){ return -x; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1090,8 +1066,7 @@ template <class E,
 inline auto
 operator *(const E& expr, const element_t<E>& c)
 {
-    return detail::make_unary_opnode(expr, std::bind(multiplies(),
-						     std::placeholders::_1, c));
+    return detail::make_unary_opnode(expr, [&](const auto& x){ return x*c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1100,13 +1075,11 @@ operator *(const E& expr, const element_t<E>& c)
   \param expr	式
   \return	乗算演算子ノード
 */
-template <class E,
-	  typename std::enable_if<rank<E>() != 0>::type* = nullptr>
+template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
 operator *(const element_t<E>& c, const E& expr)
 {
-    return detail::make_unary_opnode(expr, std::bind(multiplies(),
-						     c, std::placeholders::_1));
+    return detail::make_unary_opnode(expr, [&](const auto& x){ return c*x; });
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1115,13 +1088,11 @@ operator *(const element_t<E>& c, const E& expr)
   \param c	除数
   \return	除算演算子ノード
 */
-template <class E,
-	  typename std::enable_if<rank<E>() != 0>::type* = nullptr>
+template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
 operator /(const E& expr, const element_t<E>& c)
 {
-    return detail::make_unary_opnode(expr, std::bind(divides(),
-						     std::placeholders::_1, c));
+    return detail::make_unary_opnode(expr, [&](const auto& x){ return x/c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1135,7 +1106,8 @@ inline typename std::enable_if<rank<typename std::decay<E>::type>() != 0,
 			       E&>::type
 operator *=(E&& expr, const element_t<typename std::decay<E>::type>& c)
 {
-    return detail::op_assign<multiplies_assign>(expr, c);
+    std::for_each(expr, [&](auto& x){ x *= c; });
+    return expr;
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1149,7 +1121,8 @@ inline typename std::enable_if<rank<typename std::decay<E>::type>() != 0,
 			       E&>::type
 operator /=(E&& expr, const element_t<typename std::decay<E>::type>& c)
 {
-    return detail::op_assign<divides_assign>(expr, c);
+    std::for_each(expr, [&](auto& x){ x /= c; });
+    return expr;
 }
 
 //! 与えられた2つの式の各要素の和をとる.
@@ -1165,7 +1138,8 @@ template <class L, class R,
 inline auto
 operator +(const L& l, const R& r)
 {
-    return detail::make_binary_opnode(l, r, plus());
+    return detail::make_binary_opnode(l, r, [](const auto& x, const auto& y)
+					    { return x + y; });
 }
 
 //! 与えられた2つの式の各要素の差をとる.
@@ -1176,12 +1150,12 @@ operator +(const L& l, const R& r)
 */
 template <class L, class R,
 	  typename std::enable_if<rank<L>() != 0 &&
-				  rank<L>() == rank<R>()>::type*
-		      = nullptr>
+				  rank<L>() == rank<R>()>::type* = nullptr>
 inline auto
 operator -(const L& l, const R& r)
 {
-    return detail::make_binary_opnode(l, r, minus());
+    return detail::make_binary_opnode(l, r, [](const auto& x, const auto& y)
+					    { return x - y; });
 }
 
 //! 与えられた左辺の式の各要素に右辺の式の各要素を加える.
@@ -1196,7 +1170,9 @@ inline typename std::enable_if<rank<typename std::decay<L>::type>() != 0 &&
 			       rank<R>(), L&>::type
 operator +=(L&& l, const R& r)
 {
-    return detail::op_assign<plus_assign>(l, r);
+    for_each(std::begin(l), std::end(l), std::begin(r),
+	     [](auto& x, const auto& y){ return x += y; });
+    return l;
 }
 
 //! 与えられた左辺の式の各要素から右辺の式の各要素を減じる.
@@ -1211,7 +1187,9 @@ inline typename std::enable_if<rank<typename std::decay<L>::type>() != 0 &&
 			       rank<R>(), L&>::type
 operator -=(L&& l, const R& r)
 {
-    return detail::op_assign<minus_assign>(l, r);
+    for_each(std::begin(l), std::end(l), std::begin(r),
+	     [](auto& x, const auto& y){ return x -= y; });
+    return l;
 }
 
 /************************************************************************
@@ -1227,8 +1205,8 @@ template <class E, class T>
 typename std::enable_if<rank<typename std::decay<E>::type>() != 0>::type
 fill(E&& expr, const T& val)
 {
-    for (auto iter = std::begin(expr); iter != std::end(expr); ++iter)
-	fill(*iter, val);
+    for (auto&& dst : expr)
+	fill(dst, val);
 }
 
 //! 与えられた2次元配列式の転置を返す
@@ -1236,8 +1214,7 @@ fill(E&& expr, const T& val)
   \param expr	2次元配列式
   \return	expr を転置した2次元配列式
  */ 
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr>
+template <class E, typename std::enable_if<rank<E>() == 2>::type* = nullptr>
 inline auto
 transpose(const E& expr)
 {
@@ -1250,8 +1227,7 @@ transpose(const E& expr)
   \param x	式
   \return	式の各要素の自乗和
 */
-template <class E,
-	  typename std::enable_if<rank<E>() != 0>::type* = nullptr>
+template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
 square(const E& expr)
 {
