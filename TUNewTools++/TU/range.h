@@ -12,7 +12,7 @@
 #include <cassert>
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
-#include "TU/tuple.h"
+#include "TU/tuple.h"		// required before defining const_iterator_t<E>
 #include "TU/iterator.h"
 
 namespace TU
@@ -796,7 +796,7 @@ make_subrange_iterator(ITER iter)
 }
 
 template <class ITER, class... IS> inline auto
-make_subrange_iterator(const ITER& iter, size_t idx, size_t size, IS... is)
+make_subrange_iterator(ITER iter, size_t idx, size_t size, IS... is)
 {
     return make_range_iterator(make_subrange_iterator(
 				   iter->begin() + idx, is...),
@@ -816,7 +816,7 @@ template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES,
 	  typename std::enable_if<
 	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
 inline auto
-make_subrange_iterator(const ITER& iter, size_t idx, INDICES... indices)
+make_subrange_iterator(ITER iter, size_t idx, INDICES... indices)
 {
     return make_range_iterator<SIZE>(make_subrange_iterator<SIZES...>(
 					 iter->begin() + idx, indices...),
@@ -834,6 +834,33 @@ make_subrange(RANGE&& r, size_t idx, INDICES... indices)
 				std::begin(r) + idx, indices...));
 }
 
+/************************************************************************
+*  supports for range tuples						*
+************************************************************************/
+template <size_t... SIZES, class ITER_TUPLE, class... ARGS> inline auto
+make_range(zip_iterator<ITER_TUPLE> zip_iter, ARGS... args)
+{
+    return tuple_transform(zip_iter.get_iterator_tuple(),
+			   [=](auto iter)
+			   {
+			       return make_range<SIZES...>(iter, args...);
+			   });
+}
+    
+template <size_t... SIZES, class TUPLE, class... ARGS,
+	  typename std::enable_if<is_range_tuple<TUPLE>::value>::type*
+	  = nullptr>
+inline auto
+make_subrange(TUPLE&& t, ARGS... args)
+{
+    return tuple_transform(t,
+			   [=](auto&& x)
+			   {
+			       return make_subrange<SIZES...>(
+				   std::forward<decltype(x)>(x), args...);
+			   });
+}
+    
 /************************************************************************
 *  class column_iterator<ROW, NROWS>					*
 ************************************************************************/

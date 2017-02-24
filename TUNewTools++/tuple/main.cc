@@ -42,7 +42,7 @@ zip_iterator_test()
 	    b[i][j] = i + 0.1*j;
 
     const auto	t = std::make_tuple(std::cref(a), std::cref(b));
-
+  /*
     using	tuple_t = decltype(t);
     std::cout << rank<tuple_t>() << std::endl;
     std::cout << demangle(typeid(tuple_t).name())
@@ -51,9 +51,18 @@ zip_iterator_test()
 	      << std::endl;
     std::cout << demangle(typeid(decltype(std::begin(*std::begin(t)))).name())
 	      << std::endl;
-  //const auto	u = make_subrange<2, 4>(t, 1, 3);
+  */
+    const auto	u = make_range(std::begin(t), 3);
+    std::cout << demangle(typeid(decltype(u)).name())
+	      << std::endl
+	      << u << std::endl;
 
-    for (const auto& row : t)
+    const auto	w = make_subrange<2, 4>(t, 1, 3);
+    std::cout << demangle(typeid(decltype(w)).name())
+	      << std::endl
+	      << w << std::endl;
+    
+    for (const auto& row : w)
     {
 	for (const auto& col : row)
 	    std::cout << ' ' << col;
