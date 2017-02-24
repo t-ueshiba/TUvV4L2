@@ -2,7 +2,7 @@
  *  $Id$
  */
 #include "TU/Array++.h"
-#include <boost/core/demangle.hpp>
+//#include <boost/core/demangle.hpp>
 
 namespace TU
 {
@@ -53,15 +53,16 @@ zip_iterator_test()
 	      << std::endl;
   */
     const auto	u = make_range(std::begin(t), 3);
+    const auto	w = make_subrange<2, 4>(t, 1, 3);
+  /*
     std::cout << demangle(typeid(decltype(u)).name())
 	      << std::endl
 	      << u << std::endl;
 
-    const auto	w = make_subrange<2, 4>(t, 1, 3);
     std::cout << demangle(typeid(decltype(w)).name())
 	      << std::endl
 	      << w << std::endl;
-    
+  */
     for (const auto& row : w)
     {
 	for (const auto& col : row)
