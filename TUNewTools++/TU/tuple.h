@@ -765,67 +765,40 @@ namespace std
 /************************************************************************
 *  std::[begin|end|rbegin|rend](std::tuple<T...>)			*
 ************************************************************************/
-namespace detail
-{
-  struct generic_begin
-  {
-      template <class T>
-      auto	operator ()(T&& x)	const	{ return std::begin(x); }
-  };
-    
-  struct generic_end
-  {
-      template <class T>
-      auto	operator ()(T&& x)	const	{ return std::end(x); }
-  };
-
-  struct generic_rbegin
-  {
-      template <class T>
-      auto	operator ()(T&& x)	const	{ return std::rbegin(x); }
-  };
-    
-  struct generic_rend
-  {
-      template <class T>
-      auto	operator ()(T&& x)	const	{ return std::rend(x); }
-  };
-}	// namespace detail
-
 template <class TUPLE,
 	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
-begin(TUPLE&& x)
+begin(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(
-				     x, detail::generic_begin()));
+				     t, [](auto && x){ return begin(x); }));
 }
 
 template <class TUPLE,
 	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
-end(TUPLE&& x)
+end(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(
-				     x, detail::generic_end()));
+				     t, [](auto && x){ return end(x); }));
 }
     
 template <class TUPLE,
 	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
-rbegin(TUPLE&& x)
+rbegin(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(
-				     x, detail::generic_rbegin()));
+				     t, [](auto && x){ return rbegin(x); }));
 }
     
 template <class TUPLE,
 	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
-rend(TUPLE&& x)
+rend(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(
-				     x, detail::generic_rend()));
+				     t, [](auto && x){ return rend(x); }));
 }
 
 }	// namespace std
