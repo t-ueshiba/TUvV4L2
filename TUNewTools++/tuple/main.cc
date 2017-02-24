@@ -2,33 +2,54 @@
  *  $Id$
  */
 #include "TU/Array++.h"
-//#include <boost/core/demangle.hpp>
+#ifdef DEMANGLE
+#  include <boost/core/demangle.hpp>
+#endif
 
 namespace TU
 {
-void
+template <class S, class T>
+struct Derived : public std::tuple<S, T>
+{
+    Derived(S i, T d)	:std::tuple<S, T>(i, d), a(10)	{};
+
+    int	a;
+};
+
+template <class S, class T> void
 arithmetic_test()
 {
-    using ivec_t = std::tuple<int, int>;
-    using dvec_t = std::tuple<double, double>;
+    using	std::cout;
+    using	std::endl;
+    using	ivec_t = std::tuple<S, S>;
+    using	dvec_t = std::tuple<T, T>;
     
+    cout << "*** arithmetic test ***" << endl;
+
     ivec_t	a(1, 2), b(10, 20);
     dvec_t	x(1.1, 2.2), y(10.1, 20.2);
-    std::cout << -a << std::endl;
-    std::cout << a*a + b << std::endl;
-    std::cout << x + 2*y << std::endl;
+    cout << a*a + b << endl;
+    cout << x + 2*y << endl;
 
     std::tuple<ivec_t, dvec_t>	ax{a, x}, by{b, y};
-    std::cout << (ax *= by) << std::endl;
-
-    x += a;
-    std::cout << x << std::endl;
+    cout << (ax *= by) << endl;
+#ifdef DEMANGLE
+    using	boost::core::demangle;
+    
+    cout << demangle(typeid(tuple_t<Derived<S, T> >).name()) << endl;
+#endif
+    Derived<S, T>	c(3, 30.3), d(4, 40.4);
+    auto		u = 3*c + d*2;
+    cout << u << endl;
 }
 
 void
 zip_iterator_test()
 {
-  //using	boost::core::demangle;
+    using	std::cout;
+    using	std::endl;
+
+    cout << "*** zip iterator test ***" << endl;
     
     Array2<int>		a(10, 8);
     for (size_t i = 0; i < a.nrow(); ++i)
@@ -41,33 +62,36 @@ zip_iterator_test()
 	for (size_t j = 0; j < b.ncol(); ++j)
 	    b[i][j] = i + 0.1*j;
 
-    const auto	t = std::make_tuple(std::cref(a), std::cref(b));
-  /*
-    using	tuple_t = decltype(t);
-    std::cout << rank<tuple_t>() << std::endl;
-    std::cout << demangle(typeid(tuple_t).name())
-	      << std::endl;
-    std::cout << demangle(typeid(decltype(std::begin(t))).name())
-	      << std::endl;
-    std::cout << demangle(typeid(decltype(std::begin(*std::begin(t)))).name())
-	      << std::endl;
-  */
-    const auto	u = make_range(std::begin(t), 3);
+    const auto	t = std::make_tuple(std::ref(a), std::ref(b));
+    const auto	u = make_range<3>(std::begin(t) + 2);
     const auto	w = make_subrange<2, 4>(t, 1, 3);
-  /*
-    std::cout << demangle(typeid(decltype(u)).name())
-	      << std::endl
-	      << u << std::endl;
+#ifdef DEMANGLE
+    using	boost::core::demangle;
+    
+    cout << endl;
+    cout << "rank(tuple_t): "
+	 << rank<decltype(t)>() << endl;
+    cout << "tuple_t: "
+	 << demangle(typeid(decltype(t)).name()) << endl << endl;
+    cout << "begin(t): "
+	 << demangle(typeid(decltype(std::begin(t))).name()) << endl << endl;
+    cout << "begin(*begin(t): "
+	 << demangle(typeid(decltype(std::begin(*std::begin(t)))).name())
+	 << endl << endl;
 
-    std::cout << demangle(typeid(decltype(w)).name())
-	      << std::endl
-	      << w << std::endl;
-  */
-    for (const auto& row : w)
+    cout << demangle(typeid(decltype(u)).name()) << endl << endl;
+    cout << demangle(typeid(decltype(w)).name()) << endl << endl;
+#endif
+    cout << u << endl;
+    
+    cout << w << endl;
+    fill(w, std::make_tuple(100, 1000.0f));
+
+    for (const auto& row : t)
     {
 	for (const auto& col : row)
-	    std::cout << ' ' << col;
-	std::cout << std::endl;
+	    cout << ' ' << col;
+	cout << endl;
     }
 }
 
@@ -76,7 +100,7 @@ zip_iterator_test()
 int
 main()
 {
-    TU::arithmetic_test();
+    TU::arithmetic_test<int, double>();
     TU::zip_iterator_test();
     
     return 0;

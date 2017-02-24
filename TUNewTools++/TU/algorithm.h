@@ -35,12 +35,6 @@ for_each(ITER0 begin0, ITER0 end0, ITER1 begin1, FUNC func)
     return std::move(func);
 }
     
-template <class X, class Y> inline auto
-select(bool s, const X& x, const Y& y)
-{
-    return (s ? x : y);
-}
-    
 //! 与えられた二つの整数の最大公約数を求める．
 /*!
   \param m	第1の整数
