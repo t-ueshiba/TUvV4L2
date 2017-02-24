@@ -18,7 +18,7 @@ test_range3(BUF buf)
     std::cout << "*** 3D range/array test ***" << std::endl;
     
     size_t	size_x = 6, size_y = 2, size_z;
-    auto	a3 = make_dense_range(buf.begin(),
+    const auto	a3 = make_dense_range(buf.begin(),
 				      buf.size()/size_y/size_x, size_y, size_x);
     std::cout << "--- a3(" << print_sizes_and_strides(a3) << ") ---\n" << a3
 	      << "--- a3[1][0] ---\n" << a3[1][0]
@@ -28,7 +28,7 @@ test_range3(BUF buf)
     size_x = 3;
     size_y = 2;
     size_z = 2;
-    auto	b3 = make_range(buf.begin() + 1,
+    const auto	b3 = make_range(buf.begin() + 1,
 				size_z, size_y, size_y, size_x, 6);
     std::cout << "--- b3(" << print_sizes_and_strides(b3) << ") ---\n" << b3;
 
@@ -71,19 +71,19 @@ test_subrange(const BUF& buf)
     
     std::cout << "*** subrange test ***" << std::endl;
 
-    auto	r = make_range<2, 2, 2, 3, 6>(buf.begin());
+    const auto	r = make_range<2, 2, 2, 3, 6>(buf.begin());
     std::cout << "--- make_range<2, 2, 2, 3, 6>(" << print_sizes_and_strides(r)
 	      << ") ---\n" << r;
     
     size_t		ncol = 6;
     Array2<value_type>	a2(make_dense_range(buf.begin(),
 					    buf.size()/ncol, ncol));
-    auto		s2 = make_subrange(a2, 1, 2, 2, 3);
+    const auto		s2 = make_subrange(a2, 1, 2, 2, 3);
     std::cout << "--- a2 (" << print_sizes_and_strides(a2) << ") ---\n" << a2
 	      << "--- subrange(a2, 1, 2, 2, 3) (" << print_sizes_and_strides(s2)
 	      << ") ---\n" << s2;
 
-    auto		s3 = make_subrange<2, 3>(a2, 1, 2);
+    const auto		s3 = make_subrange<2, 3>(a2, 1, 2);
     std::cout << "--- subrange<2, 3>(a2, 1, 2) (" << print_sizes_and_strides(s3)
 	      << ") ---\n" << s3;
 }

@@ -848,7 +848,7 @@ template <size_t... SIZES, class ITER_TUPLE, class... ARGS> inline auto
 make_range(zip_iterator<ITER_TUPLE> zip_iter, ARGS... args)
 {
     return tuple_transform(zip_iter.get_iterator_tuple(),
-			   [=](auto iter)
+			   [args...](auto iter)
 			   {
 			       return make_range<SIZES...>(iter, args...);
 			   });
@@ -861,7 +861,7 @@ inline auto
 make_subrange(TUPLE&& t, ARGS... args)
 {
     return tuple_transform(t,
-			   [=](auto&& x)
+			   [args...](auto&& x)
 			   {
 			       return make_subrange<SIZES...>(
 				   std::forward<decltype(x)>(x), args...);
@@ -1100,7 +1100,7 @@ template <class E,
 inline auto
 operator *(const E& expr, const element_t<E>& c)
 {
-    return detail::make_unary_opnode(expr, [&](const auto& x){ return x*c; });
+    return detail::make_unary_opnode(expr, [&c](const auto& x){ return x*c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1113,7 +1113,7 @@ template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
 operator *(const element_t<E>& c, const E& expr)
 {
-    return detail::make_unary_opnode(expr, [&](const auto& x){ return c*x; });
+    return detail::make_unary_opnode(expr, [&c](const auto& x){ return c*x; });
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1126,7 +1126,7 @@ template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
 operator /(const E& expr, const element_t<E>& c)
 {
-    return detail::make_unary_opnode(expr, [&](const auto& x){ return x/c; });
+    return detail::make_unary_opnode(expr, [&c](const auto& x){ return x/c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1140,7 +1140,7 @@ inline typename std::enable_if<rank<typename std::decay<E>::type>() != 0,
 			       E&>::type
 operator *=(E&& expr, const element_t<typename std::decay<E>::type>& c)
 {
-    std::for_each(expr, [&](auto& x){ x *= c; });
+    std::for_each(expr, [&c](auto& x){ x *= c; });
     return expr;
 }
 
@@ -1155,7 +1155,7 @@ inline typename std::enable_if<rank<typename std::decay<E>::type>() != 0,
 			       E&>::type
 operator /=(E&& expr, const element_t<typename std::decay<E>::type>& c)
 {
-    std::for_each(expr, [&](auto& x){ x /= c; });
+    std::for_each(expr, [&c](auto& x){ x /= c; });
     return expr;
 }
 

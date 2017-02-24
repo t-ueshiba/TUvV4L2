@@ -39,10 +39,9 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		=
 HDRS		= TU/Array++.h \
 		TU/algorithm.h \
-		TU/functional.h \
 		TU/iterator.h \
 		TU/range.h \
-		TU/utility.h
+		TU/tuple.h
 SRCS		=
 OBJS		=
 

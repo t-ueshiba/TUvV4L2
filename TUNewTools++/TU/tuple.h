@@ -227,14 +227,14 @@ select(const std::tuple<S...>& s,
 template <class... S, class X, class... Y> inline auto
 select(const std::tuple<S...>& s, const X& x, const std::tuple<Y...>& y)
 {
-    return tuple_transform(s, y, [&](const auto& t, const auto& v)
+    return tuple_transform(s, y, [&x](const auto& t, const auto& v)
 				 { return select(t, x, v); });
 }
 
 template <class... S, class... X, class Y> inline auto
 select(const std::tuple<S...>& s, const std::tuple<X...>& x, const Y& y)
 {
-    return tuple_transform(s, x, [&](const auto& t, const auto& u)
+    return tuple_transform(s, x, [&y](const auto& t, const auto& u)
 				 { return select(t, u, y); });
 }
 
@@ -365,7 +365,7 @@ class zip_iterator
 		}
     void	advance(difference_type n)
 		{
-		    tuple_for_each(_iter_tuple, [=](auto& x){ x += n; });
+		    tuple_for_each(_iter_tuple, [n](auto& x){ x += n; });
 		}
     difference_type
 		distance_to(const zip_iterator& iter) const
@@ -464,13 +464,13 @@ operator *(const tuple<L...>& l, const tuple<R...>& r)
 template <class... L, class T> inline auto
 operator *(const tuple<L...>& l, const T& c)
 {
-    return TU::tuple_transform(l, [&](const auto& x){ return x * c; });
+    return TU::tuple_transform(l, [&c](const auto& x){ return x * c; });
 }
 
 template <class T, class... R> inline auto
 operator *(const T& c, const tuple<R...>& r)
 {
-    return TU::tuple_transform(r, [&](const auto& x){ return c * x; });
+    return TU::tuple_transform(r, [&c](const auto& x){ return c * x; });
 }
 
 template <class... L, class... R> inline auto
@@ -483,7 +483,7 @@ operator /(const tuple<L...>& l, const tuple<R...>& r)
 template <class... L, class T> inline auto
 operator /(const tuple<L...>& l, const T& c)
 {
-    return TU::tuple_transform(l, [&](const auto& x){ return x / c; });
+    return TU::tuple_transform(l, [&c](const auto& x){ return x / c; });
 }
 
 template <class... L, class... R> inline auto
@@ -496,7 +496,7 @@ operator %(const tuple<L...>& l, const tuple<R...>& r)
 template <class... L, class T> inline auto
 operator %(const tuple<L...>& l, const T& c)
 {
-    return TU::tuple_transform(l, [&](const auto& x){ return x % c; });
+    return TU::tuple_transform(l, [&c](const auto& x){ return x % c; });
 }
 
 template <class L, class... R>
@@ -527,7 +527,7 @@ template <class L, class T>
 inline typename enable_if<TU::is_tuple<L>::value, L&>::type
 operator *=(L&& l, const T& c)
 {
-    TU::tuple_for_each(l, [&](auto& x){ x *= c; });
+    TU::tuple_for_each(l, [&c](auto& x){ x *= c; });
     return l;
 }
 
@@ -543,7 +543,7 @@ template <class L, class T>
 inline typename enable_if<TU::is_tuple<L>::value, L&>::type
 operator /=(L&& l, const T& c)
 {
-    TU::tuple_for_each(l, [&](auto& x){ x /= c; });
+    TU::tuple_for_each(l, [&c](auto& x){ x /= c; });
     return l;
 }
 
@@ -559,7 +559,7 @@ template <class L, class T>
 inline typename enable_if<TU::is_tuple<L>::value, L&>::type
 operator %=(L&& l, const T& c)
 {
-    TU::tuple_for_each(l, [&](auto& x){ x %= c; });
+    TU::tuple_for_each(l, [&c](auto& x){ x %= c; });
     return l;
 }
 
@@ -686,7 +686,7 @@ template <class... T> inline ostream&
 operator <<(ostream& out, const tuple<T...>& t)
 {
     out << '(';
-    TU::tuple_for_each(t, [&](const auto& x){ out << ' ' << x; });
+    TU::tuple_for_each(t, [&out](const auto& x){ out << ' ' << x; });
     out << ')';
 
     return out;
