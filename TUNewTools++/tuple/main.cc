@@ -28,7 +28,7 @@ arithmetic_test()
 void
 zip_iterator_test()
 {
-    using	boost::core::demangle;
+  //using	boost::core::demangle;
     
     Array2<int>		a(10, 8);
     for (size_t i = 0; i < a.nrow(); ++i)
