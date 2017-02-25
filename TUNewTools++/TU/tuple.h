@@ -56,8 +56,7 @@ namespace detail
       -> decltype(std::make_tuple(std::begin(std::get<IDX>(x))...))	;
   template <class... T> static auto
   check_range_tuple(std::tuple<T...> x)
-      -> decltype(check_range_tuple(
-		      x, std::make_index_sequence<sizeof...(T)>()))	;
+      -> decltype(check_range_tuple(x, std::index_sequence_for<T...>()));
   static void
   check_range_tuple(...)						;
 }	// namespace detail
