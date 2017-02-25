@@ -63,7 +63,7 @@ zip_iterator_test()
 	    b[i][j] = i + 0.1*j;
 
     const auto	t = std::make_tuple(std::ref(a), std::ref(b));
-    const auto	u = make_range<3>(std::begin(t) + 2);
+  //const auto	u = make_range<3>(std::begin(t) + 2);
     const auto	w = make_subrange<2, 4>(t, 1, 3);
 #ifdef DEMANGLE
     using	boost::core::demangle;
@@ -79,10 +79,10 @@ zip_iterator_test()
 	 << demangle(typeid(decltype(std::begin(*std::begin(t)))).name())
 	 << endl << endl;
 
-    cout << demangle(typeid(decltype(u)).name()) << endl << endl;
+  //cout << demangle(typeid(decltype(u)).name()) << endl << endl;
     cout << demangle(typeid(decltype(w)).name()) << endl << endl;
 #endif
-    cout << u << endl;
+  //cout << u << endl;
     
     cout << w << endl;
     fill(w, std::make_tuple(100, 1000.0f));

@@ -394,13 +394,42 @@ namespace std
 /************************************************************************
 *  std::[begin|end|rbegin|rend](std::tuple<T...>)			*
 ************************************************************************/
+/*
+ *  icpc-17.0.2 のバグ回避のため，lambda関数ではなくgenericな関数オブジェクトを
+ *  用いて実装
+ */ 
+namespace detail
+{
+    struct generic_begin
+    {
+	template <class T_>
+	auto	operator ()(T_&& x)	const	{ return std::begin(x); }
+    };
+    struct generic_end
+    {
+	template <class T_>
+	auto	operator ()(T_&& x)	const	{ return std::end(x); }
+    };
+    struct generic_rbegin
+    {
+	template <class T_>
+	auto	operator ()(T_&& x)	const	{ return std::rbegin(x); }
+    };
+    struct generic_rend
+    {
+	template <class T_>
+	auto	operator ()(T_&& x)	const	{ return std::rend(x); }
+    };
+}	// namespace detail
+    
 template <class TUPLE,
 	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
 begin(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(
-				     t, [](auto&& x){ return begin(x); }));
+    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_begin()));
+  //return TU::make_zip_iterator(TU::tuple_transform(
+  //				     t, [](auto&& x){ return begin(x); }));
 }
 
 template <class TUPLE,
@@ -408,8 +437,9 @@ template <class TUPLE,
 inline auto
 end(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(
-				     t, [](auto&& x){ return end(x); }));
+    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_end()));
+  //return TU::make_zip_iterator(TU::tuple_transform(
+  //				     t, [](auto&& x){ return end(x); }));
 }
     
 template <class TUPLE,
@@ -417,24 +447,26 @@ template <class TUPLE,
 inline auto
 rbegin(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(
-				     t, [](auto&& x){ return rbegin(x); }));
+    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_rbegin()));
+  //return TU::make_zip_iterator(TU::tuple_transform(
+  //				     t, [](auto&& x){ return rbegin(x); }));
 }
-    
+
 template <class TUPLE,
 	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
 rend(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(
-				     t, [](auto&& x){ return rend(x); }));
+    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_rend()));
+  //return TU::make_zip_iterator(TU::tuple_transform(
+  //				     t, [](auto&& x){ return rend(x); }));
 }
-
+    
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
 template <class... T> inline auto
-operator -(const std::tuple<T...>& t)
+operator -(const tuple<T...>& t)
 {
     return TU::tuple_transform(t, [](const auto& x){ return -x; });
 }
