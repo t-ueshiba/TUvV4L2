@@ -64,7 +64,7 @@ zip_iterator_test()
 
     const auto	t = std::make_tuple(std::ref(a), std::ref(b));
   //const auto	u = make_range<3>(std::begin(t) + 2);
-    const auto	w = make_subrange<2, 4>(t, 1, 3);
+    const auto	w = make_slice<2, 4>(t, 1, 3);
 #ifdef DEMANGLE
     using	boost::core::demangle;
     

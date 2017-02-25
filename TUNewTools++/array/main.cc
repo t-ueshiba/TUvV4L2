@@ -65,11 +65,11 @@ test_initializer_list()
 }
     
 template <class BUF> static void
-test_subrange(const BUF& buf)
+test_slice(const BUF& buf)
 {
     using value_type	= typename BUF::value_type;
     
-    std::cout << "*** subrange test ***" << std::endl;
+    std::cout << "*** slice test ***" << std::endl;
 
     const auto	r = make_range<2, 2, 2, 3, 6>(buf.begin());
     std::cout << "--- make_range<2, 2, 2, 3, 6>(" << print_sizes_and_strides(r)
@@ -78,13 +78,13 @@ test_subrange(const BUF& buf)
     size_t		ncol = 6;
     Array2<value_type>	a2(make_dense_range(buf.begin(),
 					    buf.size()/ncol, ncol));
-    const auto		s2 = make_subrange(a2, 1, 2, 2, 3);
+    const auto		s2 = make_slice(a2, 1, 2, 2, 3);
     std::cout << "--- a2 (" << print_sizes_and_strides(a2) << ") ---\n" << a2
-	      << "--- subrange(a2, 1, 2, 2, 3) (" << print_sizes_and_strides(s2)
+	      << "--- slice(a2, 1, 2, 2, 3) (" << print_sizes_and_strides(s2)
 	      << ") ---\n" << s2;
 
-    const auto		s3 = make_subrange<2, 3>(a2, 1, 2);
-    std::cout << "--- subrange<2, 3>(a2, 1, 2) (" << print_sizes_and_strides(s3)
+    const auto		s3 = make_slice<2, 3>(a2, 1, 2);
+    std::cout << "--- slice<2, 3>(a2, 1, 2) (" << print_sizes_and_strides(s3)
 	      << ") ---\n" << s3;
 }
 
@@ -175,8 +175,8 @@ test_external_allocator(BUF buf)
     
     Array2<value_type, 0, 0, external_allocator<value_type> >
 	a2(buf.data(), buf.size()/6, 6);
-  //make_subrange(a2[0], 1, 3) = {1000, 2000, 300};
-    make_subrange<2, 3>(a2, 1, 2) = {{100, 200, 300}, {400, 500, 600}};
+  //make_slice(a2[0], 1, 3) = {1000, 2000, 300};
+    make_slice<2, 3>(a2, 1, 2) = {{100, 200, 300}, {400, 500, 600}};
     std::cout << "--- a2(" << print_sizes_and_strides(a2) << ") ---\n" << a2;
 }
 
@@ -291,7 +291,7 @@ main()
     TU::test_range3(buf);
     TU::test_stride();
     TU::test_initializer_list();
-    TU::test_subrange(buf);
+    TU::test_slice(buf);
     TU::test_window(buf);
     TU::test_binary_io(buf);
     TU::test_text_io(buf);

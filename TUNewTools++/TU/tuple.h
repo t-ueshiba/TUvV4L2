@@ -427,7 +427,8 @@ template <class TUPLE,
 inline auto
 begin(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_begin()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     t, detail::generic_begin()));
   //return TU::make_zip_iterator(TU::tuple_transform(
   //				     t, [](auto&& x){ return begin(x); }));
 }
@@ -437,7 +438,8 @@ template <class TUPLE,
 inline auto
 end(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_end()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     t, detail::generic_end()));
   //return TU::make_zip_iterator(TU::tuple_transform(
   //				     t, [](auto&& x){ return end(x); }));
 }
@@ -447,7 +449,8 @@ template <class TUPLE,
 inline auto
 rbegin(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_rbegin()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     t, detail::generic_rbegin()));
   //return TU::make_zip_iterator(TU::tuple_transform(
   //				     t, [](auto&& x){ return rbegin(x); }));
 }
@@ -457,7 +460,8 @@ template <class TUPLE,
 inline auto
 rend(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(t, detail::generic_rend()));
+    return TU::make_zip_iterator(TU::tuple_transform(
+				     t, detail::generic_rend()));
   //return TU::make_zip_iterator(TU::tuple_transform(
   //				     t, [](auto&& x){ return rend(x); }));
 }

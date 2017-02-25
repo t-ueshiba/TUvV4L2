@@ -790,20 +790,20 @@ make_dense_range(ITER iter, size_t size, SIZES... sizes)
 }
 
 /************************************************************************
-*  subrange extraction							*
+*  slice extraction							*
 ************************************************************************/
 namespace detail
 {
   template <class ITER> inline ITER
-  make_subrange_iterator(ITER iter)
+  make_slice_iterator(ITER iter)
   {
       return iter;
   }
 
   template <class ITER, class... IS> inline auto
-  make_subrange_iterator(ITER iter, size_t idx, size_t size, IS... is)
+  make_slice_iterator(ITER iter, size_t idx, size_t size, IS... is)
   {
-      return make_range_iterator(make_subrange_iterator(
+      return make_range_iterator(make_slice_iterator(
 				     iter->begin() + idx, is...),
 				 size, iter.stride());
   }
@@ -812,9 +812,9 @@ namespace detail
 	    typename std::enable_if<
 		sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
   inline auto
-  make_subrange_iterator(ITER iter, size_t idx, INDICES... indices)
+  make_slice_iterator(ITER iter, size_t idx, INDICES... indices)
   {
-      return make_range_iterator<SIZE>(make_subrange_iterator<SIZES...>(
+      return make_range_iterator<SIZE>(make_slice_iterator<SIZES...>(
 					   iter->begin() + idx, indices...),
 				       iter.stride());
   }
@@ -824,9 +824,9 @@ template <class RANGE, class... IS,
 	  typename std::enable_if<
 	      rank<typename std::decay<RANGE>::type>() != 0>::type* = nullptr>
 inline auto
-make_subrange(RANGE&& r, size_t idx, size_t size, IS... is)
+make_slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
-    return make_range(detail::make_subrange_iterator(
+    return make_range(detail::make_slice_iterator(
 			  std::begin(r) + idx, is...), size);
 }
 
@@ -835,9 +835,9 @@ template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 	      rank<typename std::decay<RANGE>::type>() != 0 &&
 	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
 inline auto
-make_subrange(RANGE&& r, size_t idx, INDICES... indices)
+make_slice(RANGE&& r, size_t idx, INDICES... indices)
 {
-    return make_range<SIZE>(detail::make_subrange_iterator<SIZES...>(
+    return make_range<SIZE>(detail::make_slice_iterator<SIZES...>(
 				std::begin(r) + idx, indices...));
 }
 
@@ -858,14 +858,13 @@ template <size_t... SIZES, class TUPLE, class... ARGS,
 	  typename std::enable_if<is_range_tuple<TUPLE>::value>::type*
 	  = nullptr>
 inline auto
-make_subrange(TUPLE&& t, ARGS... args)
+make_slice(TUPLE&& t, ARGS... args)
 {
-    return tuple_transform(t,
-			   [args...](auto&& x)
-			   {
-			       return make_subrange<SIZES...>(
-				   std::forward<decltype(x)>(x), args...);
-			   });
+    return tuple_transform(t, [args...](auto&& x)
+			      {
+				  return make_slice<SIZES...>(
+				      std::forward<decltype(x)>(x), args...);
+			      });
 }
     
 /************************************************************************
