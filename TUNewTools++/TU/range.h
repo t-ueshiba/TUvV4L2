@@ -13,7 +13,6 @@
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
 #include "TU/tuple.h"		// required before defining const_iterator_t<E>
-#include "TU/iterator.h"
 
 namespace TU
 {

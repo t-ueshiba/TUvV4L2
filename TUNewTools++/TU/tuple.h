@@ -38,7 +38,7 @@
 #include <functional>		// std::ref()
 #include <utility>		// std::index_sequence<...>
 #include <iostream>
-#include <boost/iterator/iterator_facade.hpp>
+#include "TU/iterator.h"
 
 namespace TU
 {
