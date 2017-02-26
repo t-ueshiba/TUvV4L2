@@ -392,9 +392,28 @@ class range
 		    assert(i < size());
 		    return *(_begin + i);
 		}
+
+    template <size_t I=0>
+    range&	shift(ptrdiff_t n)
+		{
+		    return shift_impl(n, std::integral_constant<size_t, I>());
+		}
+
+  private:
+    range&	shift_impl(ptrdiff_t n, std::integral_constant<size_t, 0>)
+		{
+		    _begin += n;
+		    return *this;
+		}
+    template <size_t I>
+    range&	shift_impl(ptrdiff_t n, std::integral_constant<size_t, I>)
+		{
+		    _begin->shift<I-1>(n);
+		    return *this;
+		}
     
   private:
-    const iterator	_begin;
+    iterator	_begin;
 };
 
 //! 可変長レンジ
@@ -472,9 +491,27 @@ class range<ITER, 0>
 		    assert(i < size());
 		    return *(_begin + i);
 		}
+    template <size_t I=0>
+    range&	shift(ptrdiff_t n)
+		{
+		    return shift(n, std::integral_constant<size_t, I>());
+		}
 
   private:
-    const iterator	_begin;
+    range&	shift(ptrdiff_t n, std::integral_constant<size_t, 0>)
+		{
+		    _begin += n;
+		    return *this;
+		}
+    template <size_t I>
+    range&	shift(ptrdiff_t n, std::integral_constant<size_t, I>)
+		{
+		    _begin->shift<I+1>(n);
+		    return *this;
+		}
+    
+  private:
+    iterator		_begin;
     const size_t	_size;
 };
 
@@ -519,46 +556,20 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 ************************************************************************/
 namespace detail
 {
-  template <size_t SIZE, size_t STRIDE>
-  struct size_and_stride
-  {
-      constexpr static size_t	size()		{ return SIZE; }
-      constexpr static size_t	stride()	{ return STRIDE; }
-  };
-  template <size_t SIZE>
-  struct size_and_stride<SIZE, 0>
-  {
-      size_and_stride(size_t stride)
-	  :_stride(stride)			{}
-      constexpr static size_t	size()		{ return SIZE; }
-      size_t			stride() const	{ return _stride; }
+    template <size_t STRIDE>
+    struct stride_impl
+    {
+	constexpr static size_t	stride()		{ return STRIDE; }
+    };
+    template <>
+    struct stride_impl<0>
+    {
+	stride_impl(size_t stride) :_stride(stride)	{}
+	size_t			stride()	 const	{ return _stride; }
 
-    private:
-      size_t	_stride;
-  };
-  template <size_t STRIDE>
-  struct size_and_stride<0, STRIDE>
-  {
-      size_and_stride(size_t size)
-	  :_size(size)				{}
-      size_t			size()	 const	{ return _size; }
-      constexpr static size_t	stride()	{ return STRIDE; }
-
-    private:
-      size_t	_size;
-  };
-  template <>
-  struct size_and_stride<0, 0>
-  {
-      size_and_stride(size_t size, size_t stride)
-	  :_size(size), _stride(stride)		{}
-      size_t			size()	 const	{ return _size; }
-      size_t			stride() const	{ return _stride; }
-
-    private:
-      size_t	_size;
-      size_t	_stride;
-  };
+      private:
+	size_t	_stride;
+    };
 }	// namespace detail
     
 //! 配列を一定間隔に切り分けたレンジを指す反復子
@@ -569,20 +580,18 @@ namespace detail
 */
 template <class ITER, size_t SIZE=0, size_t STRIDE=0>
 class range_iterator
-    : public boost::iterator_adaptor<range_iterator<ITER, SIZE, STRIDE>,
-				     ITER,
-				     range<ITER, SIZE>,
-				     boost::use_default,
-				     range<ITER, SIZE> >,
-      public detail::size_and_stride<SIZE, STRIDE>
+    : public boost::iterator_facade<range_iterator<ITER, SIZE, STRIDE>,
+				    range<ITER, SIZE>,
+				    std::random_access_iterator_tag,
+				    range<ITER, SIZE> >,
+      public detail::stride_impl<STRIDE>
 {
   private:
-    using super	= boost::iterator_adaptor<range_iterator,
-					  ITER,
-					  range<ITER, SIZE>,
-					  boost::use_default,
-					  range<ITER, SIZE> >;
-    using ss	= detail::size_and_stride<SIZE, STRIDE>;
+    using super	= boost::iterator_facade<range_iterator,
+					 range<ITER, SIZE>,
+					 std::random_access_iterator_tag,
+					 range<ITER, SIZE> >;
+    using strd	= detail::stride_impl<STRIDE>;
     
   public:
     using		typename super::reference;
@@ -595,55 +604,61 @@ class range_iterator
 	      typename std::enable_if<
 		  (SIZE_ != 0) && (STRIDE_ != 0)>::type* = nullptr>
 		range_iterator(ITER iter)
-		    :super(iter), ss()					{}
+		    :strd(), _range(iter)				{}
     template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
 	      typename std::enable_if<
 		  (SIZE_ != 0) && (STRIDE_ == 0)>::type* = nullptr>
 		range_iterator(ITER iter, size_t stride)
-		    :super(iter), ss(stride)				{}
+		    :strd(stride), _range(iter)				{}
     template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
 	      typename std::enable_if<
 		  (SIZE_ == 0) && (STRIDE_ != 0)>::type* = nullptr>
 		range_iterator(ITER iter, size_t size)
-		    :super(iter), ss(size)				{}
+		    :strd(), _range(iter, size)				{}
     template <size_t SIZE_=SIZE, size_t STRIDE_=STRIDE,
 	      typename std::enable_if<
 		  (SIZE_ == 0) && (STRIDE_ == 0)>::type* = nullptr>
 		range_iterator(ITER iter, size_t size, size_t stride)
-		    :super(iter), ss(size, stride)			{}
+		    :strd(stride), _range(iter, size)			{}
 
     template <class ITER_,
 	      typename std::enable_if<
 		  std::is_convertible<ITER_, ITER>::value>::type* = nullptr>
 		range_iterator(
 		    const range_iterator<ITER_, SIZE, STRIDE>& iter)
-		    :super(iter), ss(iter)				{}
+		    :strd(iter), _range(iter._range)			{}
 
-    using	ss::size;
-    using	ss::stride;
-    
+    using	strd::stride;
+
   private:
     reference	dereference() const
 		{
-		    return {super::base(), size()};
+		    return _range;
+		}
+    bool	equal(const range_iterator& iter) const
+		{
+		    return _range.begin() == iter._range.begin();
 		}
     void	increment()
 		{
-		    std::advance(super::base_reference(), stride());
+		    _range.shift(stride());
 		}
     void	decrement()
 		{
-		    std::advance(super::base_reference(), -stride());
+		    _range.shift(-stride());
 		}
     void	advance(difference_type n)
 		{
-		    std::advance(super::base_reference(), n*stride());
+		    _range.shift(n*stride());
 		}
     difference_type
 		distance_to(const range_iterator& iter) const
 		{
-		    return std::distance(super::base(), iter.base()) / stride();
+		    return (iter._range.begin() - _range.begin()) / stride();
 		}
+
+  private:
+    range<ITER, SIZE>	_range;
 };
 
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
