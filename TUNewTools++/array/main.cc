@@ -100,13 +100,14 @@ test_window(const BUF& buf)
     const auto	row = a2.begin();
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)
 	std::cout << make_range<3, 2>(iter, row.stride());
-
+  /*
     auto	win = make_slice<3, 2>(a2, 0, 0);
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)
     {
 	std::cout << win;
 	win.shift<1>(1);
     }
+  */
 }
 
 template <class BUF> static void

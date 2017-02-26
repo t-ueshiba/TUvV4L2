@@ -392,25 +392,7 @@ class range
 		    assert(i < size());
 		    return *(_begin + i);
 		}
-
-    template <size_t I=0>
-    range&	shift(ptrdiff_t n)
-		{
-		    return shift_impl(n, std::integral_constant<size_t, I>());
-		}
-
-  private:
-    range&	shift_impl(ptrdiff_t n, std::integral_constant<size_t, 0>)
-		{
-		    _begin += n;
-		    return *this;
-		}
-    template <size_t I>
-    range&	shift_impl(ptrdiff_t n, std::integral_constant<size_t, I>)
-		{
-		    _begin->shift<I-1>(n);
-		    return *this;
-		}
+    void	shift(ptrdiff_t n)	{ _begin += n; }
     
   private:
     iterator	_begin;
@@ -491,24 +473,7 @@ class range<ITER, 0>
 		    assert(i < size());
 		    return *(_begin + i);
 		}
-    template <size_t I=0>
-    range&	shift(ptrdiff_t n)
-		{
-		    return shift(n, std::integral_constant<size_t, I>());
-		}
-
-  private:
-    range&	shift(ptrdiff_t n, std::integral_constant<size_t, 0>)
-		{
-		    _begin += n;
-		    return *this;
-		}
-    template <size_t I>
-    range&	shift(ptrdiff_t n, std::integral_constant<size_t, I>)
-		{
-		    _begin->shift<I+1>(n);
-		    return *this;
-		}
+    void	shift(ptrdiff_t n)	{ _begin += n; }
     
   private:
     iterator		_begin;
