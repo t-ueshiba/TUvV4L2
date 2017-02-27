@@ -648,8 +648,8 @@ class range_iterator
 
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
 /*!
-  \param SIZE	レンジ長
   \param STRIDE	インクリメント時に進める要素数
+  \param SIZE	レンジ長
   \param iter	レンジの先頭要素を指す反復子
 */
 template <size_t STRIDE, size_t SIZE, class ITER>
@@ -690,7 +690,7 @@ make_range_iterator(ITER iter, size_t stride, size_t size)
 /*!
   \param STRIDE	インクリメント時に進める最上位軸のブロック数
   \param SIZE	最上位軸のレンジ長
-  \param SS	2番目以降の軸の(レンジ長, ストライド)の並び
+  \param SS	2番目以降の軸の{ストライド, レンジ長}の並び
   \param iter	レンジの先頭要素を指す反復子
 */
 template <size_t STRIDE, size_t SIZE, size_t... SS, class ITER,
@@ -747,10 +747,10 @@ make_range(ITER iter, STRIDES... strides)
   \param iter		レンジの先頭要素を指す反復子
   \param stride		最上位軸のストライド
   \param size		最上位軸のレンジ長
-  \param ss		2番目以降の軸の(ストライド, レンジ長)の並び
+  \param ss		2番目以降の軸の{ストライド, レンジ長}の並び
 */
 template <class ITER, class... SS> inline auto
-make_range_iterator(ITER iter, size_t size, size_t stride, SS... ss)
+make_range_iterator(ITER iter, size_t stride, size_t size, SS... ss)
 {
     return make_range_iterator(make_range_iterator(iter, ss...),
 			       stride, size);
@@ -872,7 +872,7 @@ make_slice(TUPLE&& t, ARGS... args)
 //! 2次元配列の列を指す反復子
 /*!
   \param ROW	begin(), end()をサポートするコンテナを指す反復子の型
-  \param SIZE	begin()とend()間の距離(0ならば可変長)
+  \param NROWS	begin()とend()間の距離(0ならば可変長)
 */ 
 template <class ROW, size_t NROWS>
 class column_iterator

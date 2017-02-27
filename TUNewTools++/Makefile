@@ -4,8 +4,8 @@
 #################################
 #  User customizable macros	#
 #################################
-#PROGRAM		= $(shell basename $(PWD))
-LIBRARY		= lib$(shell basename $(PWD))
+PROGRAM		= $(shell basename $(PWD))
+#LIBRARY		= lib$(shell basename $(PWD))
 
 VPATH		=
 
@@ -48,6 +48,6 @@ OBJS		=
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
 #include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
-include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
+#include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###

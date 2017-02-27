@@ -616,10 +616,12 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     using	super::begin;
     using	super::end;
 
-    range<iterator>
+    
+    range<iterator, SIZE>
 		operator ()()		{ return {begin(), size()}; }
-    range<const_iterator>
-		operator ()()	const	{ return {begin(), size()}; }
+    
+    range<const_iterator, SIZE>
+		operator ()() const	{ return {begin(), size()}; }
 
     constexpr static
     size_t	size0()		{ return SIZE; }
