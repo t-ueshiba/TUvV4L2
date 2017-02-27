@@ -29,7 +29,7 @@ test_range3(BUF buf)
     size_y = 2;
     size_z = 2;
     const auto	b3 = make_range(buf.begin() + 1,
-				size_z, size_y, size_y, size_x, 6);
+				size_z, size_y, size_y, 6, size_x);
     std::cout << "--- b3(" << print_sizes_and_strides(b3) << ") ---\n" << b3;
 
     b3[1][1][2] = 100;
@@ -71,8 +71,8 @@ test_slice(const BUF& buf)
     
     std::cout << "*** slice test ***" << std::endl;
 
-    const auto	r = make_range<2, 2, 2, 3, 6>(buf.begin());
-    std::cout << "--- make_range<2, 2, 2, 3, 6>(" << print_sizes_and_strides(r)
+    const auto	r = make_range<2, 2, 2, 6, 3>(buf.begin());
+    std::cout << "--- make_range<2, 2, 2, 6, 3>(" << print_sizes_and_strides(r)
 	      << ") ---\n" << r;
     
     size_t		ncol = 6;
@@ -99,7 +99,7 @@ test_window(const BUF& buf)
     const auto	row = make_dense_range(buf.begin(),
 				       buf.size()/ncol, ncol).begin();
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)
-	std::cout << make_range(iter, 3, 2, row.stride());
+	std::cout << make_range(iter, 3, row.stride(), 2);
   /*
     auto	win = make_slice<3, 2>(a2, 0, 0);
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)

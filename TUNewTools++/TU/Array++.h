@@ -420,7 +420,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    
 		    return make_range_iterator(
 			       make_iterator<SIZES_...>(iter),
-			       size<I>(), stride<I>());
+			       stride<I>(), size<I>());
 		}
 
     base_iterator
