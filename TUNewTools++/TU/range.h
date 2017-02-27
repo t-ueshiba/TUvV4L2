@@ -8,7 +8,6 @@
 #ifndef __TU_RANGE_H
 #define __TU_RANGE_H
 
-#include <iostream>
 #include <cassert>
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...

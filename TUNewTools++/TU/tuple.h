@@ -36,7 +36,6 @@
 
 #include <tuple>
 #include <functional>		// std::ref()
-#include <utility>		// std::index_sequence<...>
 #include <iostream>
 #include "TU/iterator.h"
 

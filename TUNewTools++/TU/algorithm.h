@@ -14,6 +14,9 @@
 #include <type_traits>		// for std::common_type<TYPES....>
 #include <algorithm>		// for std::copy(), std::copy_n(),...
 #include <numeric>		// for std::inner_product()
+#ifdef TU_DEBUG
+#  include <iostream>
+#endif
 
 namespace TU
 {
