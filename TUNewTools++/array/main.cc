@@ -96,10 +96,10 @@ test_window(const BUF& buf)
     std::cout << "*** window test ***" << std::endl;
 
     size_t	ncol = 6;
-    const auto	a2 = make_dense_range(buf.begin(), buf.size()/ncol, ncol);
-    const auto	row = a2.begin();
+    const auto	row = make_dense_range(buf.begin(),
+				       buf.size()/ncol, ncol).begin();
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)
-	std::cout << make_range<3, 2>(iter, row.stride());
+	std::cout << make_range(iter, 3, 2, row.stride());
   /*
     auto	win = make_slice<3, 2>(a2, 0, 0);
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)
