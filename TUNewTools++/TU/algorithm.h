@@ -1,6 +1,3 @@
-/*
- *  $Id$
- */
 /*!
   \file		algorithm.h
   \brief	各種アルゴリズムの定義と実装

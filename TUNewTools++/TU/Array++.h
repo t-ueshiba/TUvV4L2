@@ -1,6 +1,3 @@
-/*
- *  $Id$
- */
 /*!
   \file		Array++.h
   \brief	多次元配列クラスの定義と実装
@@ -616,12 +613,31 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     using	super::begin;
     using	super::end;
 
-    
-    range<iterator, SIZE>
-		operator ()()		{ return {begin(), size()}; }
-    
-    range<const_iterator, SIZE>
-		operator ()() const	{ return {begin(), size()}; }
+
+    template <class... IS_>
+    auto	operator ()(IS_... is)
+		{
+		    return make_slice(*this, is...);
+		}
+    template <class... IS_>
+    auto	operator ()(IS_... is) const
+		{
+		    return make_slice(*this, is...);
+		}
+    template <size_t SIZE_, size_t... SIZES_, class... INDICES_,
+	      typename std::enable_if<sizeof...(SIZES_) + 1 ==
+				      sizeof...(INDICES_)>::type* = nullptr>
+    auto	slice(INDICES_... indices)
+		{
+		    return make_slice<SIZE_, SIZES_...>(*this, indices...);
+		}
+    template <size_t SIZE_, size_t... SIZES_, class... INDICES_,
+	      typename std::enable_if<sizeof...(SIZES_) + 1 ==
+				      sizeof...(INDICES_)>::type* = nullptr>
+    auto	slice(INDICES_... indices) const
+		{
+		    return make_slice<SIZE_, SIZES_...>(*this, indices...);
+		}
 
     constexpr static
     size_t	size0()		{ return SIZE; }

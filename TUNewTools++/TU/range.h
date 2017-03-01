@@ -1,6 +1,3 @@
-/*
- *  $Id$
- */
 /*!
   \file		range.h
   \brief	2つの反復子によって指定されるレンジの定義と実装
@@ -115,7 +112,7 @@ namespace detail
    *  サイズだけを得るために，以下のオーバーロードを導入する．
    */
   template <class OP, class L, class R>	class product_opnode;
-  class bit_xor;
+  struct bit_xor;
     
   template <class L, class R> constexpr size_t
   size(const product_opnode<bit_xor, L, R>&, std::integral_constant<size_t, 1>)
