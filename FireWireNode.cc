@@ -104,7 +104,6 @@ FireWireNode::mapListenBuffer(u_int packet_size,
     for (auto& buffer : _buffers)
 	buffer.map(this, buf_size);
 
-    
   // raw1394_loop_iterate()は，interval個のパケットを受信するたびにユーザ側に
   // 制御を返す．libraw1394ではこのデフォルト値はパケット数の1/4である．ただし，
   // 512パケットを越える値を指定すると，raw1394_loop_iterate()から帰ってこなく
