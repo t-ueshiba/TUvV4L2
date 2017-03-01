@@ -9,9 +9,9 @@ SUBDIR	= TUTools++		\
 	  TUCollection++	\
 	  TUVision++		\
 	  TUXv++		\
+	  TUV4L2++		\
+	  TUvV4L2++		\
 #	  TUCuda++		\
-#	  TUV4L2++		\
-#	  TUvV4L2++		\
 #	  TUUSB++		\
 #	  TUHRP2++
 

@@ -91,8 +91,6 @@ test_slice(const BUF& buf)
 template <class BUF> static void
 test_window(const BUF& buf)
 {
-    using value_type	= typename BUF::value_type;
-    
     std::cout << "*** window test ***" << std::endl;
 
     size_t	ncol = 6;

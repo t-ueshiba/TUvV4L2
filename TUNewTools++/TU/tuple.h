@@ -47,16 +47,16 @@ namespace TU
 namespace detail
 {
   template <class... T>
-  static std::tuple<T...>	check_tuple(std::tuple<T...>)		;
-  static void			check_tuple(...)			;
+  std::tuple<T...>	check_tuple(std::tuple<T...>)			;
+  void			check_tuple(...)				;
 
-  template <class... T, size_t... IDX> static auto
+  template <class... T, size_t... IDX> auto
   check_range_tuple(std::tuple<T...> x, std::index_sequence<IDX...>)
       -> decltype(std::make_tuple(std::begin(std::get<IDX>(x))...))	;
-  template <class... T> static auto
+  template <class... T> auto
   check_range_tuple(std::tuple<T...> x)
       -> decltype(check_range_tuple(x, std::index_sequence_for<T...>()));
-  static void
+  void
   check_range_tuple(...)						;
 }	// namespace detail
     

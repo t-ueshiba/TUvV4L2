@@ -69,7 +69,6 @@
 
   - <b>画像の撮影モードの設定</b>
     - #TU::Ieee1394Camera::continuousShot()
-    - #TU::Ieee1394Camera::stopContinuousShot()
     - #TU::Ieee1394Camera::inContinuousShot()
     - #TU::Ieee1394Camera::oneShot()
     - #TU::Ieee1394Camera::multiShot()
@@ -563,7 +562,7 @@ class Ieee1394Camera : public Ieee1394Node
     TriggerPolarity	getTriggerPolarity()			const	;
     
   // Shotting stuffs.
-    Ieee1394Camera&	continuousShot()				;
+    Ieee1394Camera&	continuousShot(bool enable)			;
     Ieee1394Camera&	stopContinuousShot()				;
     bool		inContinuousShot()			const	;
     Ieee1394Camera&	oneShot()					;

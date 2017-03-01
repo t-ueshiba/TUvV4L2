@@ -414,7 +414,7 @@ Ieee1394Camera::Ieee1394Camera(Type type, u_int64_t uniqId,
 */
 Ieee1394Camera::~Ieee1394Camera()
 {
-    stopContinuousShot();
+    continuousShot(false);
     unembedTimestamp();
 }
 
@@ -471,15 +471,13 @@ Ieee1394Camera::setSpeed(Speed speed)
     }
 
     const bool	cont = inContinuousShot();
-    if (cont)
-	stopContinuousShot();
+    continuousShot(false);
 
     writeQuadletToRegister(ISO_Channel,
 			   (readQuadletFromRegister(ISO_Channel)
 			    & 0xf0003f00) | quad);
 
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
     
     return *this;
 }
@@ -537,8 +535,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
 		mode = (u_int(format) - u_int(YUV444_160x120)) % 0x20 / 4;
     const bool	cont = inContinuousShot();
     
-    if (cont)
-	stopContinuousShot();
+    continuousShot(false);
     u_int	rt = 0;
     for (u_int bit = FrameRate_1_875; bit != rate; bit >>= 1)
 	++rt;
@@ -753,8 +750,7 @@ Ieee1394Camera::setFormatAndFrameRate(Format format, FrameRate rate)
     (quad &= 0x0fffc0ff) |= ((ch << 28) | (ch << 8));
     writeQuadletToRegister(ISO_Channel, quad);
 
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
     
 #ifdef DEBUG
     cerr << "*** END [setFormatAndFrameRate] ***" << endl;
@@ -902,8 +898,7 @@ Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
 
   // 画像出力中はROIを変更できないので, もしそうであれば停止する.
     const bool	cont = inContinuousShot();
-    if (cont)
-	stopContinuousShot();
+    continuousShot(cont);
 
   // ROIを指定する.
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
@@ -914,8 +909,7 @@ Ieee1394Camera::setFormat_7_ROI(Format format7, u_int u0, u_int v0,
     if (getFormat() == format7)
 	setFormatAndFrameRate(format7, FrameRate_x);
     
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
     
     return *this;
 }
@@ -937,8 +931,7 @@ Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
 
   // 画像出力中はpixel formatを変更できないので, もしそうであれば停止する.
     const bool	cont = inContinuousShot();
-    if (cont)
-	stopContinuousShot();
+    continuousShot(false);
 
   // pixel formatを指定する.
     const nodeaddr_t	base = getFormat_7_BaseAddr(format7);
@@ -949,8 +942,7 @@ Ieee1394Camera::setFormat_7_PixelFormat(Format format7,
     if (getFormat() == format7)
 	setFormatAndFrameRate(format7, FrameRate_x);
     
-    if (cont)
-	continuousShot();
+    continuousShot(cont);
     
     return *this;
 }
@@ -1254,35 +1246,30 @@ Ieee1394Camera::getTriggerPolarity() const
 	return LowActiveInput;
 }
 
-//! カメラからの画像の連続的出力を開始する
+//! カメラからの画像の連続的出力を開始/終了する
 /*!
   #TRIGGER_MODE がonであれば, 撮影のタイミングは外部トリガ信号によって制御さ
-  れる. 
+  れる.
+  \param enable	trueならば出力を開始，falseならば終了
   \return	このIEEE1394カメラオブジェクト
 */
 Ieee1394Camera&
-Ieee1394Camera::continuousShot()
+Ieee1394Camera::continuousShot(bool enable)
 {
-    if (!inContinuousShot())
-	writeQuadletToRegister(ISO_EN, 0x1u << 31);
-    return *this;
-}
-
-//! カメラからの画像の連続的出力を停止する
-/*!
-  \return	このIEEE1394カメラオブジェクト
-*/
-Ieee1394Camera&
-Ieee1394Camera::stopContinuousShot()
-{
-    if (inContinuousShot())
+    if (enable != inContinuousShot())
     {
-	writeQuadletToRegister(ISO_EN, 0x0);
-	flushListenBuffer();
-	_img = 0;
-      // 再び continuoutShot() した時に	captureRaw()で使用するので, 
-      // _img_size の値は0にせずに保持する.
+	if (enable)
+	    writeQuadletToRegister(ISO_EN, 0x1u << 31);
+	else
+	{
+	    writeQuadletToRegister(ISO_EN, 0x0);
+	    flushListenBuffer();
+	    _img = 0;
+	  // 再び continuoutShot() した時に captureRaw()で使用するので, 
+	  // _img_size の値は0にせずに保持する.
+	}
     }
+    
     return *this;
 }
 
@@ -1307,7 +1294,7 @@ Ieee1394Camera&
 Ieee1394Camera::oneShot()
 {
     checkAvailability(One_Shot_Inq);
-    stopContinuousShot();
+    continuousShot(false);
     writeQuadletToRegister(One_Shot, 0x1u << 31);
     return *this;
 }
@@ -1324,7 +1311,7 @@ Ieee1394Camera&
 Ieee1394Camera::multiShot(u_short nframes)
 {
     checkAvailability(Multi_Shot_Inq);
-    stopContinuousShot();
+    continuousShot(false);
     writeQuadletToRegister(One_Shot, (0x1u << 30) | (nframes & 0xffff));
     return *this;
 }

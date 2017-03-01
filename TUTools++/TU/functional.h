@@ -419,9 +419,8 @@ namespace detail
     template <class E>
     struct value_t
     {
-	typedef typename std::iterator_traits<
-		    decltype(has_const_iterator::
-			     check<E>(nullptr))>::value_type	type;
+	typedef typename std::iterator_traits<const_iterator_t<E> >
+			    ::value_type			type;
     };
       
     template <class E, class=const_iterator_t<E> >

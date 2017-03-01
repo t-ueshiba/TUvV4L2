@@ -22,8 +22,8 @@ namespace TU
 namespace detail
 {
   template <class E>
-  static auto	check_begin(const E& x) -> decltype(std::begin(x))	;
-  static void	check_begin(...)					;
+  auto	check_begin(const E& x) -> decltype(std::begin(x))		;
+  void	check_begin(...)						;
 }	// namespace detail
     
 //! 式が持つ定数反復子の型を返す
@@ -103,9 +103,8 @@ rank()
 namespace detail
 {
   template <class E>
-  static auto		 has_size0(E) -> decltype(E::size0(),
-						  std::true_type())	;
-  static std::false_type has_size0(...)					;
+  auto		  has_size0(E) -> decltype(E::size0(), std::true_type());
+  std::false_type has_size0(...)					;
 
   /*
    *  A ^ b において演算子ノード product_opnode<bit_xor, L, R> が
@@ -555,8 +554,8 @@ namespace detail
       size_t			size()	 const	{ return _size; }
 
     private:
-      size_t	_size;
       size_t	_stride;
+      size_t	_size;
   };
 }	// namespace detail
     

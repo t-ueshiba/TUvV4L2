@@ -1,30 +1,4 @@
 /*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
  *  $Id$
  */
 /*!
@@ -252,7 +226,13 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
 template <class E> inline std::istream&
 operator >>(std::istream& in, RGB_<E>& p)
 {
-    return in >> (u_int&)p.r >> (u_int&)p.g >> (u_int&)p.b >> (u_int&)p.a;
+    u_int	r, g, b;
+    in >> r >> g >> b;
+    p.r = r;
+    p.g = g;
+    p.b = b;
+
+    return in;
 }
 
 template <class E> inline std::ostream&
@@ -280,7 +260,13 @@ RGB_<detail::RGB>::operator ==(const RGB_& p) const
 inline std::istream&
 operator >>(std::istream& in, RGB& p)
 {
-    return in >> (u_int&)p.r >> (u_int&)p.g >> (u_int&)p.b;
+    u_int	r, g, b;
+    in >> r >> g >> b;
+    p.r = r;
+    p.g = g;
+    p.b = b;
+
+    return in;
 }
 
 inline std::ostream&
@@ -307,7 +293,13 @@ RGB_<detail::BGR>::operator ==(const RGB_& p) const
 inline std::istream&
 operator >>(std::istream& in, BGR& p)
 {
-    return in >> (u_int&)p.r >> (u_int&)p.g >> (u_int&)p.b;
+    u_int	r, g, b;
+    in >> r >> g >> b;
+    p.r = r;
+    p.g = g;
+    p.b = b;
+
+    return in;
 }
 
 inline std::ostream&
@@ -363,7 +355,13 @@ struct YUV444
 inline std::istream&
 operator >>(std::istream& in, YUV444& yuv)
 {
-    return in >> (u_int&)yuv.y >> (u_int&)yuv.u >> (u_int&)yuv.v;
+    u_int	y, u, v;
+    in >> y >> u >> v;
+    yuv.y = y;
+    yuv.u = u;
+    yuv.v = v;
+    
+    return in;
 }
 
 inline std::ostream&
@@ -404,7 +402,12 @@ struct YUV422
 inline std::istream&
 operator >>(std::istream& in, YUV422& yuv)
 {
-    return in >> (u_int&)yuv.y >> (u_int&)yuv.x;
+    u_int	y, x;
+    in >> y >> x;
+    yuv.y = y;
+    yuv.x = x;
+    
+    return in;
 }
 
 inline std::ostream&
@@ -435,7 +438,12 @@ struct YUYV422
 inline std::istream&
 operator >>(std::istream& in, YUYV422& yuv)
 {
-    return in >> (u_int&)yuv.y >> (u_int&)yuv.x;
+    u_int	y, x;
+    in >> y >> x;
+    yuv.y = y;
+    yuv.x = x;
+    
+    return in;
 }
 
 inline std::ostream&
@@ -468,7 +476,13 @@ struct YUV411
 inline std::istream&
 operator >>(std::istream& in, YUV411& yuv)
 {
-    return in >> (u_int&)yuv.y0 >> (u_int&)yuv.y1 >> (u_int&)yuv.x;
+    u_int	y0, y1, x;
+    in >> y0 >> y1 >> x;
+    yuv.y0 = y0;
+    yuv.y1 = y1;
+    yuv.x  = x;
+    
+    return in;
 }
 
 inline std::ostream&
