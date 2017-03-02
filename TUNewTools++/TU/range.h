@@ -818,7 +818,7 @@ template <class RANGE, class... IS,
 	  typename std::enable_if<
 	      rank<typename std::decay<RANGE>::type>() != 0>::type* = nullptr>
 inline auto
-make_slice(RANGE&& r, size_t idx, size_t size, IS... is)
+slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
     return make_range(detail::make_slice_iterator(
 			  std::begin(r) + idx, is...), size);
@@ -829,7 +829,7 @@ template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 	      rank<typename std::decay<RANGE>::type>() != 0 &&
 	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
 inline auto
-make_slice(RANGE&& r, size_t idx, INDICES... indices)
+slice(RANGE&& r, size_t idx, INDICES... indices)
 {
     return make_range<SIZE>(detail::make_slice_iterator<SIZES...>(
 				std::begin(r) + idx, indices...));
@@ -1013,6 +1013,10 @@ namespace detail
       iterator	begin()	const	{ return {std::begin(_expr), _op}; }
       iterator	end()	const	{ return {std::end(_expr),   _op}; }
       size_t	size()	const	{ return std::size(_expr); }
+      auto	operator [](size_t i) const
+		{
+		    return *(begin() + i);
+		}
 
     private:
       argument_t<E>	_expr;
@@ -1056,6 +1060,10 @@ namespace detail
       iterator	begin()	const	{ return {std::begin(_l), std::begin(_r), _op};}
       iterator	end()	const	{ return {std::end(_l),   std::end(_r),   _op};}
       size_t	size()	const	{ return std::size(_l); }
+      auto	operator [](size_t i) const
+		{
+		    return *(begin() + i);
+		}
 
     private:
       argument_t<L>	_l;

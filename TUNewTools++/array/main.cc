@@ -78,12 +78,12 @@ test_slice(const BUF& buf)
     size_t		ncol = 6;
     Array2<value_type>	a2(make_dense_range(buf.begin(),
 					    buf.size()/ncol, ncol));
-    const auto		s2 = make_slice(a2, 1, 2, 2, 3);
+    const auto		s2 = slice(a2, 1, 2, 2, 3);
     std::cout << "--- a2 (" << print_sizes_and_strides(a2) << ") ---\n" << a2
 	      << "--- slice(a2, 1, 2, 2, 3) (" << print_sizes_and_strides(s2)
 	      << ") ---\n" << s2;
 
-    const auto		s3 = make_slice<2, 3>(a2, 1, 2);
+    const auto		s3 = slice<2, 3>(a2, 1, 2);
     std::cout << "--- slice<2, 3>(a2, 1, 2) (" << print_sizes_and_strides(s3)
 	      << ") ---\n" << s3;
 }
@@ -99,7 +99,7 @@ test_window(const BUF& buf)
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)
 	std::cout << make_range(iter, 3, row.stride(), 2);
   /*
-    auto	win = make_slice<3, 2>(a2, 0, 0);
+    auto	win = slice<3, 2>(a2, 0, 0);
     for (auto iter = row->begin(), end = row->end() - 1; iter != end; ++iter)
     {
 	std::cout << win;
@@ -182,8 +182,8 @@ test_external_allocator(BUF buf)
     
     Array2<value_type, 0, 0, external_allocator<value_type> >
 	a2(buf.data(), buf.size()/6, 6);
-  //make_slice(a2[0], 1, 3) = {1000, 2000, 300};
-    make_slice<2, 3>(a2, 1, 2) = {{100, 200, 300}, {400, 500, 600}};
+  //slice(a2[0], 1, 3) = {1000, 2000, 300};
+    slice<2, 3>(a2, 1, 2) = {{100, 200, 300}, {400, 500, 600}};
     std::cout << "--- a2(" << print_sizes_and_strides(a2) << ") ---\n" << a2;
 }
 
@@ -205,6 +205,7 @@ test_numeric(const BUF& buf)
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
   /*
     using	boost::core::demangle;
+
     
     auto	x = a + b + b;
     std::cout << demangle(typeid(result_t<decltype(a)>).name()) << std::endl;
@@ -216,7 +217,7 @@ static void
 test_numeric2()
 {
     std::cout << "*** numeric test2 ***" << std::endl;
-
+  /*
     int					a[][6]{{0, 1, 2, 3,  4,  5},
 					       {6, 7, 8, 9, 10, 11}};
     std::array<std::array<float, 6>, 2>	b{{{100, 110, 120, 130, 140, 150},
@@ -228,6 +229,7 @@ test_numeric2()
 
     auto	d = transpose(a);
     std::cout << "--- d(" << print_sizes(d) << ") ---\n" << d;
+  */
 }
 
 static void
@@ -286,6 +288,28 @@ test_prod()
     std::cout << C;
 }
 
+void
+test_vector()
+{
+    using element_type	= float;
+    using vector_type	= Array<element_type>;
+    using matrix_type	= Array2<element_type>;
+
+    std::cout << "*** vector test ***" << std::endl;
+    
+    const vector_type		a = {1, 2, 3};
+    const vector_type		b = {4, 5, 6};
+    const Array2<float, 3, 3>	A = {{0.1, 0.2, 0.3}, {1, 2, 3}, {10, 20, 30}};
+    const matrix_type		B = {{1, 2, 3}, {10, 20, 30}, {100, 200, 300}};
+
+    std::cout << "--- skew(a + b) ---\n" << skew(a+b);
+    std::cout << "homogeneous(a + b) =" << homogeneous(a + b);
+    std::cout << "inhomogeneous(a + b) =" << inhomogeneous(a + b);
+    std::cout << "--- diag<4>(1) ---\n" << diag<4>(1);
+    std::cout << "--- diag(3, 3.3) ---\n" << diag(3, 3.3);
+    std::cout << "--- trace(A + b) ---\n" << trace(A + B) << std::endl;
+}
+
 }	// namespace TU
 
 int
@@ -306,6 +330,7 @@ main()
     TU::test_numeric(buf);
     TU::test_numeric2();
     TU::test_prod();
+    TU::test_vector();
     
     return 0;
 }

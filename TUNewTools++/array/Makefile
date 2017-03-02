@@ -14,7 +14,7 @@ MOCHDRS		=
 
 INCDIRS		= -I..
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g -Wall
+CFLAGS		= -g #-Wall
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON

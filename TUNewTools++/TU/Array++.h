@@ -930,6 +930,10 @@ namespace detail
       iterator	begin()	const	{ return {std::begin(_l), _binder}; }
       iterator	end()	const	{ return {std::end(_l),   _binder}; }
       size_t	size()	const	{ return std::size(_l); }
+      auto	operator [](size_t i) const
+		{
+		    return *(begin() + i);
+		}
 
     private:
       argument_t<L>	_l;
@@ -1064,6 +1068,108 @@ inline auto
 operator ^(const L& l, const R& r)
 {
     return detail::make_product_opnode(l, r, detail::bit_xor());
+}
+
+//! 3次元ベクトルから3x3反対称行列を生成する．
+/*!
+  \return	生成された反対称行列，すなわち
+  \f[
+    \TUskew{u}{} \equiv
+    \TUbeginarray{ccc}
+      & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
+    \TUendarray
+  \f]
+  \throw std::invalid_argument	3次元ベクトルでない場合に送出
+*/
+template <class E,
+	  typename std::enable_if<rank<E>() == 1>::type* = nullptr> inline auto
+skew(const E& expr)
+{
+    using result_t = Array2<element_t<E>, 3, 3>;
+    
+    assert(size<0>(expr) != 3);
+
+    const auto&	a = evaluate(expr);
+    return result_t({{0, -a[2], a[1]}, {a[2], 0, -a[0]}, {-a[1], a[0], 0}});
+}
+
+//! 非同次座標を表すベクトルに対し，値1を持つ成分を最後に付加した同次座標ベクトルを返す．
+/*!
+  \return	同次化されたベクトル
+*/
+template <class E,
+	  typename std::enable_if<rank<E>() == 1>::type* = nullptr> inline auto
+homogeneous(const E& expr)
+{
+    constexpr size_t	N = size0<E>();
+    using element_type	= element_t<E>;
+    using result_type	= typename std::conditional<
+			      N == 0, Array<element_type, 0>,
+				      Array<element_type, N+1> >::type;
+
+    const auto	n = std::size(expr);
+    result_type	r(n + 1);
+    slice(r, 0, n) = expr;
+    r[n]	   = 1;
+    return r;
+}
+
+//! 同次座標を表すベクトルに対し，各成分を最後の成分で割った非同次座標ベクトルを返す．
+/*!
+  \return	非同次化されたベクトル
+*/
+template <class E,
+	  typename std::enable_if<rank<E>() == 1>::type* = nullptr> inline auto
+inhomogeneous(const E& expr)
+{
+    constexpr size_t	N = size0<E>();
+    using element_type	= element_t<E>;
+    using result_type	= typename std::conditional<
+			      N == 0, Array<element_type, 0>,
+				      Array<element_type, N-1> >::type;
+
+    const auto	n = std::size(expr) - 1;
+    return result_type(slice(expr, 0, n) / expr[n]);
+}
+
+//! 全て同一の対角成分値を持つ正方行列を生成する．
+/*!
+  \param c	対角成分の値
+  \return	対角行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
+*/
+template <size_t N, class T> auto
+diag(T c)
+{
+    Array2<T, N, N>	a;
+    for (size_t i = 0; i != a.size(); ++i)
+	a[i][i] = c;
+    return a;
+}
+
+template <class T> auto
+diag(size_t n, T c)
+{
+    Array2<T>	a(n, n);
+    for (size_t i = 0; i != a.size(); ++i)
+	a[i][i] = c;
+    return a;
+}
+
+//! 正方行列のtraceを返す．
+/*!
+  \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
+  \throw std::invalid_argument	正方行列でない場合に送出
+*/
+template <class E,
+	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
+trace(const E& expr)
+{
+    assert(size<0>(expr) != size<1>(expr));
+
+    element_t<E>	val = 0;
+    for (size_t i = 0; i < std::size(expr); ++i)
+	val += expr[i][i];
+    return val;
 }
 
 }	// namespace TU
