@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I..
-CPPFLAGS	= -DNDEBUG
+CPPFLAGS	= -DNDEBUG -DTU_DEBUG
 CFLAGS		= -g #-Wall
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
@@ -37,6 +37,7 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../TU/Array++.h \
+		../TU/Vector++.h \
 		../TU/algorithm.h \
 		../TU/iterator.h \
 		../TU/range.h \
@@ -52,4 +53,4 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../TU/Array++.h ../TU/range.h ../TU/algorithm.h ../TU/tuple.h \
-	../TU/iterator.h
+	../TU/iterator.h ../TU/Vector++.h

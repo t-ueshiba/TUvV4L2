@@ -171,6 +171,7 @@ class Buf : public BufTraits<T, ALLOC>
 		{
 		    if (!check_sizes(sizes, axis<D>()))
 			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
+		    init(typename std::is_arithmetic<value_type>::type());
 		}
     void	resize(const sizes_type& sizes, size_t=0)
 		{
@@ -617,26 +618,26 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     template <class... IS_>
     auto	operator ()(IS_... is)
 		{
-		    return make_slice(*this, is...);
+		    return TU::slice(*this, is...);
 		}
     template <class... IS_>
     auto	operator ()(IS_... is) const
 		{
-		    return make_slice(*this, is...);
+		    return TU::slice(*this, is...);
 		}
     template <size_t SIZE_, size_t... SIZES_, class... INDICES_,
 	      typename std::enable_if<sizeof...(SIZES_) + 1 ==
 				      sizeof...(INDICES_)>::type* = nullptr>
     auto	slice(INDICES_... indices)
 		{
-		    return make_slice<SIZE_, SIZES_...>(*this, indices...);
+		    return TU::slice<SIZE_, SIZES_...>(*this, indices...);
 		}
     template <size_t SIZE_, size_t... SIZES_, class... INDICES_,
 	      typename std::enable_if<sizeof...(SIZES_) + 1 ==
 				      sizeof...(INDICES_)>::type* = nullptr>
     auto	slice(INDICES_... indices) const
 		{
-		    return make_slice<SIZE_, SIZES_...>(*this, indices...);
+		    return TU::slice<SIZE_, SIZES_...>(*this, indices...);
 		}
 
     constexpr static
@@ -1137,19 +1138,10 @@ inhomogeneous(const E& expr)
   \param c	対角成分の値
   \return	対角行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
 */
-template <size_t N, class T> auto
-diag(T c)
+template <size_t N=0, class T> auto
+diag(T c, size_t n=N)
 {
-    Array2<T, N, N>	a;
-    for (size_t i = 0; i != a.size(); ++i)
-	a[i][i] = c;
-    return a;
-}
-
-template <class T> auto
-diag(size_t n, T c)
-{
-    Array2<T>	a(n, n);
+    Array2<T, N, N>	a(n, n);
     for (size_t i = 0; i != a.size(); ++i)
 	a[i][i] = c;
     return a;

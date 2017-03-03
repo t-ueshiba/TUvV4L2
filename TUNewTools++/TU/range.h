@@ -10,6 +10,14 @@
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
 #include "TU/tuple.h"		// required before defining const_iterator_t<E>
 
+namespace std
+{
+#if __cplusplus < 201402L
+template <class E>
+using decay_t = typename std::decay<E>::type;
+#endif
+}	// namespace std
+    
 namespace TU
 {
 /************************************************************************
@@ -815,8 +823,8 @@ namespace detail
 }	// namespace detail
     
 template <class RANGE, class... IS,
-	  typename std::enable_if<
-	      rank<typename std::decay<RANGE>::type>() != 0>::type* = nullptr>
+	  typename std::enable_if<rank<std::decay_t<RANGE>>() != 0>::type*
+	  = nullptr>
 inline auto
 slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
@@ -826,7 +834,7 @@ slice(RANGE&& r, size_t idx, size_t size, IS... is)
 
 template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 	  typename std::enable_if<
-	      rank<typename std::decay<RANGE>::type>() != 0 &&
+	      rank<std::decay_t<RANGE>>() != 0 &&
 	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
 inline auto
 slice(RANGE&& r, size_t idx, INDICES... indices)
@@ -852,11 +860,11 @@ template <size_t... SIZES, class TUPLE, class... ARGS,
 	  typename std::enable_if<is_range_tuple<TUPLE>::value>::type*
 	  = nullptr>
 inline auto
-make_slice(TUPLE&& t, ARGS... args)
+slice(TUPLE&& t, ARGS... args)
 {
     return tuple_transform(t, [args...](auto&& x)
 			      {
-				  return make_slice<SIZES...>(
+				  return slice<SIZES...>(
 				      std::forward<decltype(x)>(x), args...);
 			      });
 }
@@ -1137,11 +1145,12 @@ operator /(const E& expr, const element_t<E>& c)
   \return	各要素にcが掛けられた結果の式
 */
 template <class E>
-inline typename std::enable_if<rank<typename std::decay<E>::type>() != 0,
-			       E&>::type
-operator *=(E&& expr, const element_t<typename std::decay<E>::type>& c)
+inline typename std::enable_if<rank<std::decay_t<E> >() != 0, E&>::type
+operator *=(E&& expr, const element_t<std::decay_t<E> >& c)
 {
-    std::for_each(expr, [&c](auto& x){ x *= c; });
+    constexpr size_t	N = size0<std::decay_t<E> >();
+    
+    for_each<N>(std::begin(expr), std::size(expr), [&c](auto&& x){ x *= c; });
     return expr;
 }
 
@@ -1152,11 +1161,12 @@ operator *=(E&& expr, const element_t<typename std::decay<E>::type>& c)
   \return	各要素がcで割られた結果の式
 */
 template <class E>
-inline typename std::enable_if<rank<typename std::decay<E>::type>() != 0,
-			       E&>::type
-operator /=(E&& expr, const element_t<typename std::decay<E>::type>& c)
+inline typename std::enable_if<rank<std::decay_t<E> >() != 0, E&>::type
+operator /=(E&& expr, const element_t<std::decay_t<E> >& c)
 {
-    std::for_each(expr, [&c](auto& x){ x /= c; });
+    constexpr size_t	N = size0<std::decay_t<E> >();
+    
+    for_each<N>(std::begin(expr), std::size(expr), [&c](auto&& x){ x /= c; });
     return expr;
 }
 
@@ -1200,13 +1210,14 @@ operator -(const L& l, const R& r)
   \return	各要素が加算された左辺の式
 */
 template <class L, class R>
-inline typename std::enable_if<rank<typename std::decay<L>::type>() != 0 &&
-			       rank<typename std::decay<L>::type>() ==
-			       rank<R>(), L&>::type
+inline typename std::enable_if<rank<std::decay_t<L> >() != 0 &&
+			       rank<std::decay_t<L> >() == rank<R>(), L&>::type
 operator +=(L&& l, const R& r)
 {
-    for_each(std::begin(l), std::end(l), std::begin(r),
-	     [](auto& x, const auto& y){ return x += y; });
+    constexpr size_t	N = size0<std::decay_t<L> >();
+    
+    for_each<N>(std::begin(l), std::size(l), std::begin(r),
+		[](auto&& x, const auto& y){ x += y; });
     return l;
 }
 
@@ -1217,13 +1228,14 @@ operator +=(L&& l, const R& r)
   \return	各要素が減じられた左辺の式
 */
 template <class L, class R>
-inline typename std::enable_if<rank<typename std::decay<L>::type>() != 0 &&
-			       rank<typename std::decay<L>::type>() ==
-			       rank<R>(), L&>::type
+inline typename std::enable_if<rank<std::decay_t<L> >() != 0 &&
+			       rank<std::decay_t<L> >() == rank<R>(), L&>::type
 operator -=(L&& l, const R& r)
 {
-    for_each(std::begin(l), std::end(l), std::begin(r),
-	     [](auto& x, const auto& y){ return x -= y; });
+    constexpr size_t	N = size0<std::decay_t<L> >();
+    
+    for_each<N>(std::begin(l), std::size(l), std::begin(r),
+		[](auto&& x, const auto& y){ x -= y; });
     return l;
 }
 
@@ -1231,13 +1243,13 @@ operator -=(L&& l, const R& r)
 *  generic algorithms for ranges					*
 ************************************************************************/
 template <class E, class T>
-typename std::enable_if<rank<typename std::decay<E>::type>() == 0>::type
+typename std::enable_if<rank<std::decay_t<E> >() == 0>::type
 fill(E&& expr, const T& val)
 {
     expr = val;
 }
 template <class E, class T>
-typename std::enable_if<rank<typename std::decay<E>::type>() != 0>::type
+typename std::enable_if<rank<std::decay_t<E> >() != 0>::type
 fill(E&& expr, const T& val)
 {
     for (auto&& dst : expr)

@@ -27,14 +27,6 @@ template <class E>
 std::ostream&	operator <<(std::ostream& out, const sizes_holder<E>& holder);
 #endif
 
-template <class ITER0, class ITER1, class FUNC> FUNC
-for_each(ITER0 begin0, ITER0 end0, ITER1 begin1, FUNC func)
-{
-    for (; begin0 != end0; ++begin0, ++begin1)
-	func(*begin0, *begin1);
-    return std::move(func);
-}
-    
 //! 与えられた二つの整数の最大公約数を求める．
 /*!
   \param m	第1の整数
@@ -122,8 +114,8 @@ namespace detail
   {
       std::fill_n(begin, n, val);
   }
-  template <class ITER, class T, size_t N> inline void
-  fill(ITER begin, ITER, const T& val, std::integral_constant<size_t, 1>)
+  template <class ITER, class ARG, class T, size_t N> inline void
+  fill(ITER begin, ARG, const T& val, std::integral_constant<size_t, 1>)
   {
       *begin = val;
   }
@@ -132,6 +124,63 @@ namespace detail
   {
       *begin = val;
       fill(++begin, arg, val, std::integral_constant<size_t, N-1>());
+  }
+
+  template <class ITER, class FUNC> inline FUNC
+  for_each(ITER begin, ITER end, FUNC func, std::integral_constant<size_t, 0>)
+  {
+      return std::for_each(begin, end, func);
+  }
+  template <class ITER, class FUNC> inline FUNC
+  for_each(ITER begin, size_t n, FUNC func, std::integral_constant<size_t, 0>)
+  {
+      return std::for_each(begin, begin + n, func);
+  }
+  template <class ITER, class ARG, class FUNC> inline FUNC
+  for_each(ITER begin, ARG, FUNC func, std::integral_constant<size_t, 1>)
+  {
+      func(*begin);
+      return std::move(func);
+  }
+  template <class ITER, class ARG, class FUNC, size_t N> inline FUNC
+  for_each(ITER begin, ARG arg, FUNC func, std::integral_constant<size_t, N>)
+  {
+      func(*begin);
+      return for_each(++begin, arg, func,
+		      std::integral_constant<size_t, N-1>());
+  }
+    
+  template <class ITER0, class ITER1, class FUNC> inline FUNC
+  for_each(ITER0 begin0, ITER0 end0, ITER1 begin1, FUNC func,
+	   std::integral_constant<size_t, 0>)
+  {
+      for (; begin0 != end0; ++begin0, ++begin1)
+	  func(*begin0, *begin1);
+      return std::move(func);
+  }
+  template <class ITER0, class ITER1, class FUNC> inline FUNC
+  for_each(ITER0 begin0, size_t n, ITER1 begin1, FUNC func,
+	   std::integral_constant<size_t, 0>)
+  {
+      for (; n--; ++begin0, ++begin1)
+	  func(*begin0, *begin1);
+      return std::move(func);
+  }
+  template <class ITER0, class ARG, class ITER1, class FUNC> inline FUNC
+  for_each(ITER0 begin0, ARG, ITER1 begin1, FUNC func,
+	   std::integral_constant<size_t, 1>)
+  {
+      func(*begin0, *begin1);
+      return std::move(func);
+  }
+  template <class ITER0, class ARG, class ITER1, class FUNC, size_t N>
+  inline FUNC
+  for_each(ITER0 begin0, ARG arg, ITER1 begin1, FUNC func,
+	   std::integral_constant<size_t, N>)
+  {
+      func(*begin0, *begin1);
+      return for_each(++begin0, arg, ++begin1, func,
+		      std::integral_constant<size_t, N-1>());
   }
     
   template <class ITER0, class ITER1, class T> inline T
@@ -235,6 +284,37 @@ template <size_t N, class ITER, class ARG, class T> inline void
 fill(ITER begin, ARG arg, const T& val)
 {
     return detail::fill(begin, arg, val, std::integral_constant<size_t, N>());
+}
+    
+//! 指定された範囲の各要素に関数を適用する
+/*!
+  N != 0 の場合，Nで指定した要素数だけ適用し，argは無視．
+  N = 0 の場合，ARG = ITERなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  \param begin	適用範囲の先頭を指す反復子
+  \param arg	適用範囲の末尾の次を指す反復子または適用要素数
+  \param func	適用する関数
+*/
+template <size_t N, class ITER, class ARG, class FUNC> inline FUNC
+for_each(ITER begin, ARG arg, FUNC func)
+{
+    return detail::for_each(begin, arg, func,
+			    std::integral_constant<size_t, N>());
+}
+    
+//! 指定された2つの範囲の各要素に2変数関数を適用する
+/*!
+  N != 0 の場合，Nで指定した要素数だけ適用し，argは無視．
+  N = 0 の場合，ARG = ITER0なら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  \param begin0	第1の適用範囲の先頭を指す反復子
+  \param arg	適用範囲の末尾の次を指す反復子または適用要素数
+  \param begin1	第2の適用範囲の先頭を指す反復子
+  \param func	適用する関数
+*/
+template <size_t N, class ITER0, class ARG, class ITER1, class FUNC> inline FUNC
+for_each(ITER0 begin0, ARG arg, ITER1 begin1, FUNC func)
+{
+    return detail::for_each(begin0, arg, begin1, func,
+			    std::integral_constant<size_t, N>());
 }
     
 //! 指定された範囲の内積の値を返す

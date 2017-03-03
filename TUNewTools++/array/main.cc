@@ -5,6 +5,7 @@
 #include <vector>
 #include <typeinfo>
 #include "TU/Array++.h"
+#include "TU/Vector++.h"
 //#include <boost/core/demangle.hpp>
 
 namespace TU
@@ -280,8 +281,9 @@ test_prod()
     std::cout << C;
 
     std::cout << "--- C = c % (a + b) ---" << std::endl;
-    C = c % (a + b);
-    std::cout << C;
+    c = {1, 2};
+    C = c % a;
+    std::cout << c << a << C;
 
     std::cout << "--- C = A ^ b ---" << std::endl;
     C = A ^ b;
@@ -306,7 +308,7 @@ test_vector()
     std::cout << "homogeneous(a + b) =" << homogeneous(a + b);
     std::cout << "inhomogeneous(a + b) =" << inhomogeneous(a + b);
     std::cout << "--- diag<4>(1) ---\n" << diag<4>(1);
-    std::cout << "--- diag(3, 3.3) ---\n" << diag(3, 3.3);
+    std::cout << "--- diag(3.3, 3) ---\n" << diag(3.3, 3);
     std::cout << "--- trace(A + b) ---\n" << trace(A + B) << std::endl;
 }
 
