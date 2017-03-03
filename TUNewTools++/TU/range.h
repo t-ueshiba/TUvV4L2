@@ -1013,7 +1013,7 @@ namespace detail
       using iterator = boost::transform_iterator<OP, const_iterator_t<E> >;
 
     public:
-		unary_opnode(const E& expr, const OP& op)
+		unary_opnode(const E& expr, OP op)
 		    :_expr(expr), _op(op)				{}
 
       constexpr static size_t
@@ -1032,7 +1032,7 @@ namespace detail
   };
     
   template <class OP, class E> inline unary_opnode<OP, E>
-  make_unary_opnode(const E& expr, const OP& op)
+  make_unary_opnode(const E& expr, OP op)
   {
       return {expr, op};
   }
@@ -1054,7 +1054,7 @@ namespace detail
 					       const_iterator_t<R> >;
 
     public:
-		binary_opnode(const L& l, const R& r, const OP& op)
+		binary_opnode(const L& l, const R& r, OP op)
 		    :_l(l), _r(r), _op(op)
 		{
 		    assert(std::size(_l) == std::size(_r));
@@ -1080,7 +1080,7 @@ namespace detail
   };
     
   template <class OP, class L, class R> inline binary_opnode<OP, L, R>
-  make_binary_opnode(const L& l, const R& r, const OP& op)
+  make_binary_opnode(const L& l, const R& r, OP op)
   {
       return {l, r, op};
   }
@@ -1107,9 +1107,9 @@ operator -(const E& expr)
 template <class E,
 	  typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
-operator *(const E& expr, const element_t<E>& c)
+operator *(const E& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(expr, [&c](const auto& x){ return x*c; });
+    return detail::make_unary_opnode(expr, [c](const auto& x){ return x*c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1120,9 +1120,9 @@ operator *(const E& expr, const element_t<E>& c)
 */
 template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
-operator *(const element_t<E>& c, const E& expr)
+operator *(element_t<E> c, const E& expr)
 {
-    return detail::make_unary_opnode(expr, [&c](const auto& x){ return c*x; });
+    return detail::make_unary_opnode(expr, [c](const auto& x){ return c*x; });
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1133,9 +1133,9 @@ operator *(const element_t<E>& c, const E& expr)
 */
 template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
 inline auto
-operator /(const E& expr, const element_t<E>& c)
+operator /(const E& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(expr, [&c](const auto& x){ return x/c; });
+    return detail::make_unary_opnode(expr, [c](const auto& x){ return x/c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1146,11 +1146,11 @@ operator /(const E& expr, const element_t<E>& c)
 */
 template <class E>
 inline typename std::enable_if<rank<std::decay_t<E> >() != 0, E&>::type
-operator *=(E&& expr, const element_t<std::decay_t<E> >& c)
+operator *=(E&& expr, element_t<std::decay_t<E> > c)
 {
     constexpr size_t	N = size0<std::decay_t<E> >();
     
-    for_each<N>(std::begin(expr), std::size(expr), [&c](auto&& x){ x *= c; });
+    for_each<N>(std::begin(expr), std::size(expr), [c](auto&& x){ x *= c; });
     return expr;
 }
 
@@ -1162,11 +1162,11 @@ operator *=(E&& expr, const element_t<std::decay_t<E> >& c)
 */
 template <class E>
 inline typename std::enable_if<rank<std::decay_t<E> >() != 0, E&>::type
-operator /=(E&& expr, const element_t<std::decay_t<E> >& c)
+operator /=(E&& expr, element_t<std::decay_t<E> > c)
 {
     constexpr size_t	N = size0<std::decay_t<E> >();
     
-    for_each<N>(std::begin(expr), std::size(expr), [&c](auto&& x){ x /= c; });
+    for_each<N>(std::begin(expr), std::size(expr), [c](auto&& x){ x /= c; });
     return expr;
 }
 

@@ -905,7 +905,7 @@ namespace detail
 			      const TU::result_t<R>, const R&>::type;
 
 	public:
-		binder2nd(const OP& op, const R& r)
+		binder2nd(OP op, const R& r)
 		    :_r(evaluate(r)), _op(op) 		{}
 
 	  template <class T_>
@@ -923,7 +923,7 @@ namespace detail
 						 const_iterator_t<L> >;
       
     public:
-		product_opnode(const L& l, const R& r, const OP& op)
+		product_opnode(const L& l, const R& r, OP op)
 		    :_l(l), _binder(op, r)				{}
 
       constexpr static size_t
@@ -942,7 +942,7 @@ namespace detail
   };
 
   template <class OP, class L, class R> inline product_opnode<OP, L, R>
-  make_product_opnode(const L& l, const R& r, const OP& op)
+  make_product_opnode(const L& l, const R& r, OP op)
   {
       return {l, r, op};
   }

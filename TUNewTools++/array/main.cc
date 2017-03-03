@@ -281,9 +281,8 @@ test_prod()
     std::cout << C;
 
     std::cout << "--- C = c % (a + b) ---" << std::endl;
-    c = {1, 2};
-    C = c % a;
-    std::cout << c << a << C;
+    C = c % (a + b);
+    std::cout << C;
 
     std::cout << "--- C = A ^ b ---" << std::endl;
     C = A ^ b;

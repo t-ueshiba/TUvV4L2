@@ -1058,8 +1058,8 @@ BiDiagonal<T>::BiDiagonal(const E& a)
      _Et(std::min(size<0>(a), size<1>(a)), 1),
      _diagonal(_Dt.sigma()),
      _off_diagonal(_Et.sigma()), _anorm(0),
-     _Ut(a.size() < a.ncol() ? _Dt : _Et),
-     _Vt(a.size() < a.ncol() ? _Et : _Dt)
+     _Ut(a.nrow() < a.ncol() ? _Dt : _Et),
+     _Vt(a.nrow() < a.ncol() ? _Et : _Dt)
 {
     const auto&	A = evaluate(a);
     
@@ -1332,21 +1332,9 @@ pinv(const E& A, element_t<E> cndnum=1.0e5)
     SVDecomposition<element_type>	svd(A);
     Array2<element_type>		val(svd.ncol(), svd.nrow());
 
-    std::cout << "### DEBUG ###\n"
-	      << evaluate(svd.Vt() * A * transpose(svd.Ut())) << std::endl;
-    
     for (size_t i = 0; i < svd.diagonal().size(); ++i)
 	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
-	{
-	    auto	a = svd.Ut()[i] / svd[i];
-	    auto	tmp =  evaluate(a % svd.Vt()[i]);
-	    std::cout << evaluate(svd.Ut()[i] / svd[i]) << std::endl
-		      << svd.Vt()[i] << std::endl
-		      << svd[i] << std::endl
-		      << tmp;
-	    val += a % svd.Vt()[i];
-	  //val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
-	}
+	    val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
     return val;
 }
 
