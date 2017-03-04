@@ -253,14 +253,14 @@ namespace detail
 {
   struct generic_dereference
   {
-      template <class ITER>
+      template <class ITER_>
       std::conditional_t<
 	  std::is_reference<
-	      typename std::iterator_traits<ITER>::reference>::value,
+	      typename std::iterator_traits<ITER_>::reference>::value,
 	  std::reference_wrapper<
-	      typename std::iterator_traits<ITER>::value_type>,
-	  typename std::iterator_traits<ITER>::reference>
-      operator ()(ITER iter)			const	{ return *iter; }
+	      typename std::iterator_traits<ITER_>::value_type>,
+	  typename std::iterator_traits<ITER_>::reference>
+      operator ()(ITER_ iter)			const	{ return *iter; }
   };
 }	// namespace detail
     
@@ -359,26 +359,26 @@ namespace std
  */ 
 namespace detail
 {
-    struct generic_begin
-    {
-	template <class T_>
-	auto	operator ()(T_&& x)	const	{ return std::begin(x); }
-    };
-    struct generic_end
-    {
-	template <class T_>
-	auto	operator ()(T_&& x)	const	{ return std::end(x); }
-    };
-    struct generic_rbegin
-    {
-	template <class T_>
-	auto	operator ()(T_&& x)	const	{ return std::rbegin(x); }
-    };
-    struct generic_rend
-    {
-	template <class T_>
-	auto	operator ()(T_&& x)	const	{ return std::rend(x); }
-    };
+  struct generic_begin
+  {
+      template <class T_>
+      auto	operator ()(T_&& x)	const	{ return std::begin(x); }
+  };
+  struct generic_end
+  {
+      template <class T_>
+      auto	operator ()(T_&& x)	const	{ return std::end(x); }
+  };
+  struct generic_rbegin
+  {
+      template <class T_>
+      auto	operator ()(T_&& x)	const	{ return std::rbegin(x); }
+  };
+  struct generic_rend
+  {
+      template <class T_>
+      auto	operator ()(T_&& x)	const	{ return std::rend(x); }
+  };
 }	// namespace detail
     
 template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
