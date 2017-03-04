@@ -253,24 +253,14 @@ namespace detail
 {
   struct generic_dereference
   {
-      template <class ITER> 
-      std::enable_if_t<
-	  !std::is_reference<
+      template <class ITER>
+      std::conditional_t<
+	  std::is_reference<
 	      typename std::iterator_traits<ITER>::reference>::value,
+	  std::reference_wrapper<
+	      typename std::iterator_traits<ITER>::value_type>,
 	  typename std::iterator_traits<ITER>::reference>
-      operator ()(const ITER& iter) const
-      {
-	  return *iter;
-      }
-      template <class ITER> auto
-      operator ()(const ITER& iter) const
-	  -> std::enable_if_t<
-	      std::is_reference<
-		  typename std::iterator_traits<ITER>::reference>::value,
-	      decltype(std::ref(*iter))>
-      {
-	  return std::ref(*iter);
-      }
+      operator ()(ITER iter)			const	{ return *iter; }
   };
 }	// namespace detail
     
@@ -306,7 +296,7 @@ class zip_iterator
     friend class	boost::iterator_core_access;
 
   public:
-    zip_iterator(const ITER_TUPLE& iter_tuple)
+    zip_iterator(ITER_TUPLE iter_tuple)
 	:_iter_tuple(iter_tuple)		{}
 
     const ITER_TUPLE&
@@ -347,7 +337,7 @@ class zip_iterator
 };
 
 template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
-make_zip_iterator(const ITER_TUPLE& iter_tuple)
+make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
 }
