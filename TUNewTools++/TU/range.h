@@ -10,14 +10,6 @@
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
 #include "TU/tuple.h"		// required before defining const_iterator_t<E>
 
-namespace std
-{
-#if __cplusplus < 201402L
-template <class E>
-using decay_t = typename std::decay<E>::type;
-#endif
-}	// namespace std
-    
 namespace TU
 {
 /************************************************************************
@@ -91,15 +83,13 @@ using element_t	= typename detail::element_t<E>::type;
   \return	式の次元数
  */
 template <class E>
-constexpr typename std::enable_if<std::is_void<const_iterator_t<E> >::value,
-				  size_t>::type
+constexpr std::enable_if_t<std::is_void<const_iterator_t<E> >::value, size_t>
 rank()
 {
     return 0;
 }
 template <class E>
-constexpr typename std::enable_if<!std::is_void<const_iterator_t<E> >::value,
-				  size_t>::type
+constexpr std::enable_if_t<!std::is_void<const_iterator_t<E> >::value, size_t>
 rank()
 {
     return 1 + rank<value_t<E> >();
@@ -161,13 +151,13 @@ using has_size0 = decltype(detail::has_size0(std::declval<E>()));
   \return	最上位軸の静的な要素数(可変サイズの場合0)
  */
 template <class E>
-constexpr typename std::enable_if<!has_size0<E>::value, size_t>::type
+constexpr std::enable_if_t<!has_size0<E>::value, size_t>
 size0()
 {
     return 0;
 }
 template <class E>
-constexpr typename std::enable_if<has_size0<E>::value, size_t>::type
+constexpr std::enable_if_t<has_size0<E>::value, size_t>
 size0()
 {
     return E::size0();
@@ -179,8 +169,7 @@ size0()
   \param E	式の型
   \return	軸Iの要素数
  */
-template <size_t I, class E>
-inline typename std::enable_if<rank<E>() != 0, size_t>::type
+template <size_t I, class E> inline std::enable_if_t<rank<E>() != 0, size_t>
 size(const E& expr)
 {
     return detail::size(expr, std::integral_constant<size_t, I>());
@@ -192,8 +181,7 @@ size(const E& expr)
   \param E	式の型
   \return	軸Iのストライド
  */
-template <size_t I, class E>
-inline typename std::enable_if<rank<E>() != 0, size_t>::type
+template <size_t I, class E> inline std::enable_if_t<rank<E>() != 0, size_t>
 stride(const E& expr)
 {
     return detail::stride(expr, std::integral_constant<size_t, I>());
@@ -222,13 +210,13 @@ class sizes_holder
 			    return TU::rank<value_type>();
 			}
     template <class ITER_>
-    static typename std::enable_if<rank<ITER_>() == 0, std::ostream&>::type
+    static std::enable_if_t<rank<ITER_>() == 0, std::ostream&>
 			print_x(std::ostream& out, ITER_)
 			{
 			    return out;
 			}
     template <class ITER_>
-    static typename std::enable_if<rank<ITER_>() != 0, std::ostream&>::type
+    static std::enable_if_t<rank<ITER_>() != 0, std::ostream&>
 			print_x(std::ostream& out, ITER_)
 			{
 			    return out << 'x';
@@ -236,13 +224,13 @@ class sizes_holder
 
   private:
     template <class ITER_>
-    static typename std::enable_if<rank<ITER_>() == 0, std::ostream&>::type
+    static std::enable_if_t<rank<ITER_>() == 0, std::ostream&>
 			print_size(std::ostream& out, ITER_)
 			{
 			    return out;
 			}
     template <class ITER_>
-    static typename std::enable_if<rank<ITER_>() != 0, std::ostream&>::type
+    static std::enable_if_t<rank<ITER_>() != 0, std::ostream&>
 			print_size(std::ostream& out, ITER_ iter)
 			{
 			    const auto&	val = *iter;
@@ -273,15 +261,13 @@ class sizes_and_strides_holder : public sizes_holder<E>
     
   private:
     template <class ITER_>
-    static typename std::enable_if<super::template rank<ITER_>() == 0,
-				   std::ostream&>::type
+    static std::enable_if_t<super::template rank<ITER_>() == 0, std::ostream&>
 			print_stride(std::ostream& out, ITER_)
 			{
 			    return out;
 			}
     template <class ITER_>
-    static typename std::enable_if<super::template rank<ITER_>() != 0,
-				   std::ostream&>::type
+    static std::enable_if_t<super::template rank<ITER_>() != 0, std::ostream&>
 			print_stride(std::ostream& out, ITER_ iter)
 			{
 			    const auto&	val = *iter;
@@ -350,15 +336,14 @@ class range
     range&	operator =(range&&)				= default;
     
     template <class ITER_,
-	      typename std::enable_if<
-		  std::is_convertible<ITER_, iterator>::value>::type* = nullptr>
+	      std::enable_if_t<std::is_convertible<ITER_, iterator>::value>*
+	      = nullptr>
 		range(const range<ITER_, SIZE>& r)
 		    :_begin(r.begin())
 		{
 		}
 
-    template <class E_>
-    typename std::enable_if<rank<E_>() != 0, range&>::type
+    template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
 		operator =(const E_& expr)
 		{
 		    assert(std::size(expr) == size());
@@ -431,15 +416,14 @@ class range<ITER, 0>
     range&	operator =(range&&)				= default;
     
     template <class ITER_,
-	      typename std::enable_if<
-		  std::is_convertible<ITER_, iterator>::value>::type* = nullptr>
+	      std::enable_if_t<std::is_convertible<ITER_, iterator>::value>*
+	      = nullptr>
 		range(const range<ITER_, 0>& r)
 		    :_begin(r.begin()), _size(r.size())
 		{
 		}
 
-    template <class E_>
-    typename std::enable_if<rank<E_>() != 0, range&>::type
+    template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
 		operator =(const E_& expr)
 		{
 		    assert(std::size(expr) == size());
@@ -595,29 +579,25 @@ class range_iterator
 	  
   public:
     template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      typename std::enable_if<
-		  (STRIDE_ != 0) && (SIZE_ != 0)>::type* = nullptr>
+	      std::enable_if_t<(STRIDE_ != 0) && (SIZE_ != 0)>* = nullptr>
 		range_iterator(ITER iter)
 		    :super(iter), ss()					{}
     template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      typename std::enable_if<
-		  (STRIDE_ == 0) && (SIZE_ != 0)>::type* = nullptr>
+	      std::enable_if_t<(STRIDE_ == 0) && (SIZE_ != 0)>* = nullptr>
 		range_iterator(ITER iter, size_t stride)
 		    :super(iter), ss(stride)				{}
     template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      typename std::enable_if<
-		  (STRIDE_ != 0) && (SIZE_ == 0)>::type* = nullptr>
+	      std::enable_if_t<(STRIDE_ != 0) && (SIZE_ == 0)>* = nullptr>
 		range_iterator(ITER iter, size_t size)
 		    :super(iter), ss(size)				{}
     template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      typename std::enable_if<
-		  (STRIDE_ == 0) && (SIZE_ == 0)>::type* = nullptr>
+	      std::enable_if_t<(STRIDE_ == 0) && (SIZE_ == 0)>* = nullptr>
 		range_iterator(ITER iter, size_t stride, size_t size)
 		    :super(iter), ss(stride, size)			{}
 
     template <class ITER_,
-	      typename std::enable_if<
-		  std::is_convertible<ITER_, ITER>::value>::type* = nullptr>
+	      std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
+	      = nullptr>
 		range_iterator(
 		    const range_iterator<ITER_, SIZE, STRIDE>& iter)
 		    :super(iter), ss(iter)				{}
@@ -697,7 +677,7 @@ make_range_iterator(ITER iter, size_t stride, size_t size)
   \param iter	レンジの先頭要素を指す反復子
 */
 template <size_t STRIDE, size_t SIZE, size_t... SS, class ITER,
-	  typename std::enable_if<sizeof...(SS) != 0>::type* = nullptr>
+	  std::enable_if_t<sizeof...(SS) != 0>* = nullptr>
 inline auto
 make_range_iterator(ITER iter)
 {
@@ -705,7 +685,7 @@ make_range_iterator(ITER iter)
 }
 
 template <size_t SIZE, size_t... SS, class ITER,
-	  typename std::enable_if<sizeof...(SS) != 0>::type* = nullptr>
+	  std::enable_if_t<sizeof...(SS) != 0>* = nullptr>
 inline auto
 make_range(ITER iter)
 {
@@ -724,8 +704,7 @@ make_range(ITER iter)
   \param iter		レンジの先頭要素を指す反復子
 */
 template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
-	  typename std::enable_if<
-	      sizeof...(SIZES) == sizeof...(STRIDES)>::type* = nullptr>
+	  std::enable_if_t<sizeof...(SIZES) == sizeof...(STRIDES)>* = nullptr>
 inline auto
 make_range_iterator(ITER iter, size_t stride, STRIDES... strides)
 {
@@ -734,8 +713,7 @@ make_range_iterator(ITER iter, size_t stride, STRIDES... strides)
 }
 
 template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
-	  typename std::enable_if<
-	      sizeof...(SIZES) == sizeof...(STRIDES)>::type* = nullptr>
+	  std::enable_if_t<sizeof...(SIZES) == sizeof...(STRIDES)>* = nullptr>
 inline auto
 make_range(ITER iter, STRIDES... strides)
 {
@@ -811,8 +789,7 @@ namespace detail
   }
 
   template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES,
-	    typename std::enable_if<
-		sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
+	    std::enable_if_t<sizeof...(SIZES) == sizeof...(INDICES)>* = nullptr>
   inline auto
   make_slice_iterator(ITER iter, size_t idx, INDICES... indices)
   {
@@ -823,8 +800,7 @@ namespace detail
 }	// namespace detail
     
 template <class RANGE, class... IS,
-	  typename std::enable_if<rank<std::decay_t<RANGE>>() != 0>::type*
-	  = nullptr>
+	  std::enable_if_t<rank<std::decay_t<RANGE>>() != 0>* = nullptr>
 inline auto
 slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
@@ -833,9 +809,8 @@ slice(RANGE&& r, size_t idx, size_t size, IS... is)
 }
 
 template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
-	  typename std::enable_if<
-	      rank<std::decay_t<RANGE>>() != 0 &&
-	      sizeof...(SIZES) == sizeof...(INDICES)>::type* = nullptr>
+	  std::enable_if_t<rank<std::decay_t<RANGE>>() != 0 &&
+			   sizeof...(SIZES) == sizeof...(INDICES)>* = nullptr>
 inline auto
 slice(RANGE&& r, size_t idx, INDICES... indices)
 {
@@ -857,8 +832,7 @@ make_range(zip_iterator<ITER_TUPLE> zip_iter, ARGS... args)
 }
     
 template <size_t... SIZES, class TUPLE, class... ARGS,
-	  typename std::enable_if<is_range_tuple<TUPLE>::value>::type*
-	  = nullptr>
+	  std::enable_if_t<is_range_tuple<TUPLE>::value>* = nullptr>
 inline auto
 slice(TUPLE&& t, ARGS... args)
 {
@@ -993,9 +967,9 @@ namespace detail
       using is_range	= decltype(check_range(std::declval<E_>()));
 
       template <class E_>
-      using argument_t	= typename std::conditional<is_opnode<E_>::value ||
-						    is_range<E_>::value,
-						    const E_, const E_&>::type;
+      using argument_t	= std::conditional_t<is_opnode<E_>::value ||
+					     is_range<E_>::value,
+					     const E_, const E_&>;
   };
 
   /**********************************************************************
@@ -1091,7 +1065,7 @@ namespace detail
   \param expr	式
   \return	符号反転演算子ノード
 */
-template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
+template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr>
 inline auto
 operator -(const E& expr)
 {
@@ -1104,9 +1078,7 @@ operator -(const E& expr)
   \param c	乗数
   \return	乗算演算子ノード
 */
-template <class E,
-	  typename std::enable_if<rank<E>() != 0>::type* = nullptr>
-inline auto
+template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator *(const E& expr, element_t<E> c)
 {
     return detail::make_unary_opnode(expr, [c](const auto& x){ return x*c; });
@@ -1118,8 +1090,7 @@ operator *(const E& expr, element_t<E> c)
   \param expr	式
   \return	乗算演算子ノード
 */
-template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
-inline auto
+template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator *(element_t<E> c, const E& expr)
 {
     return detail::make_unary_opnode(expr, [c](const auto& x){ return c*x; });
@@ -1131,8 +1102,7 @@ operator *(element_t<E> c, const E& expr)
   \param c	除数
   \return	除算演算子ノード
 */
-template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
-inline auto
+template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator /(const E& expr, element_t<E> c)
 {
     return detail::make_unary_opnode(expr, [c](const auto& x){ return x/c; });
@@ -1144,8 +1114,7 @@ operator /(const E& expr, element_t<E> c)
   \param c	乗数
   \return	各要素にcが掛けられた結果の式
 */
-template <class E>
-inline typename std::enable_if<rank<std::decay_t<E> >() != 0, E&>::type
+template <class E> inline std::enable_if_t<rank<std::decay_t<E> >() != 0, E&>
 operator *=(E&& expr, element_t<std::decay_t<E> > c)
 {
     constexpr size_t	N = size0<std::decay_t<E> >();
@@ -1160,8 +1129,7 @@ operator *=(E&& expr, element_t<std::decay_t<E> > c)
   \param c	除数
   \return	各要素がcで割られた結果の式
 */
-template <class E>
-inline typename std::enable_if<rank<std::decay_t<E> >() != 0, E&>::type
+template <class E> inline std::enable_if_t<rank<std::decay_t<E> >() != 0, E&>
 operator /=(E&& expr, element_t<std::decay_t<E> > c)
 {
     constexpr size_t	N = size0<std::decay_t<E> >();
@@ -1177,9 +1145,7 @@ operator /=(E&& expr, element_t<std::decay_t<E> > c)
   \return	加算演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<rank<L>() != 0 &&
-				  rank<L>() == rank<R>()>::type*
-		      = nullptr>
+	  std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>()>* = nullptr>
 inline auto
 operator +(const L& l, const R& r)
 {
@@ -1194,8 +1160,7 @@ operator +(const L& l, const R& r)
   \return	減算演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<rank<L>() != 0 &&
-				  rank<L>() == rank<R>()>::type* = nullptr>
+	  std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>()>* = nullptr>
 inline auto
 operator -(const L& l, const R& r)
 {
@@ -1210,8 +1175,8 @@ operator -(const L& l, const R& r)
   \return	各要素が加算された左辺の式
 */
 template <class L, class R>
-inline typename std::enable_if<rank<std::decay_t<L> >() != 0 &&
-			       rank<std::decay_t<L> >() == rank<R>(), L&>::type
+inline std::enable_if_t<rank<std::decay_t<L> >() != 0 &&
+			rank<std::decay_t<L> >() == rank<R>(), L&>
 operator +=(L&& l, const R& r)
 {
     constexpr size_t	N = size0<std::decay_t<L> >();
@@ -1228,8 +1193,8 @@ operator +=(L&& l, const R& r)
   \return	各要素が減じられた左辺の式
 */
 template <class L, class R>
-inline typename std::enable_if<rank<std::decay_t<L> >() != 0 &&
-			       rank<std::decay_t<L> >() == rank<R>(), L&>::type
+inline std::enable_if_t<rank<std::decay_t<L> >() != 0 &&
+			rank<std::decay_t<L> >() == rank<R>(), L&>
 operator -=(L&& l, const R& r)
 {
     constexpr size_t	N = size0<std::decay_t<L> >();
@@ -1242,14 +1207,12 @@ operator -=(L&& l, const R& r)
 /************************************************************************
 *  generic algorithms for ranges					*
 ************************************************************************/
-template <class E, class T>
-typename std::enable_if<rank<std::decay_t<E> >() == 0>::type
+template <class E, class T> std::enable_if_t<rank<std::decay_t<E> >() == 0>
 fill(E&& expr, const T& val)
 {
     expr = val;
 }
-template <class E, class T>
-typename std::enable_if<rank<std::decay_t<E> >() != 0>::type
+template <class E, class T> std::enable_if_t<rank<std::decay_t<E> >() != 0>
 fill(E&& expr, const T& val)
 {
     for (auto&& dst : expr)
@@ -1261,8 +1224,7 @@ fill(E&& expr, const T& val)
   \param expr	2次元配列式
   \return	expr を転置した2次元配列式
  */ 
-template <class E, typename std::enable_if<rank<E>() == 2>::type* = nullptr>
-inline auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
 transpose(const E& expr)
 {
     constexpr size_t	siz0 = size0<value_t<E> >();
@@ -1274,8 +1236,7 @@ transpose(const E& expr)
   \param x	式
   \return	式の各要素の自乗和
 */
-template <class E, typename std::enable_if<rank<E>() != 0>::type* = nullptr>
-inline auto
+template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 square(const E& expr)
 {
     return square<size0<E>()>(std::begin(expr), std::size(expr));

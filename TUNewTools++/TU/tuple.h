@@ -60,7 +60,7 @@ namespace detail
 }	// namespace detail
     
 template <class TUPLE, class UNARY_FUNC>
-inline typename std::enable_if<is_tuple<TUPLE>::value>::type
+inline std::enable_if_t<is_tuple<TUPLE>::value>
 tuple_for_each(TUPLE&& x, UNARY_FUNC f)
 {
     detail::tuple_for_each(
@@ -88,8 +88,7 @@ namespace detail
 }	// namespace detail
 
 template <class TUPLE0, class TUPLE1, class BINARY_FUNC>
-inline typename std::enable_if<TU::is_tuple<TUPLE0>::value &&
-			       TU::is_tuple<TUPLE1>::value>::type
+inline std::enable_if_t<is_tuple<TUPLE0>::value && is_tuple<TUPLE1>::value>
 tuple_for_each(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
     detail::tuple_for_each(
@@ -111,7 +110,7 @@ namespace detail
 }	// namespace detail
     
 template <class TUPLE, class UNARY_FUNC,
-	  typename std::enable_if<is_tuple<TUPLE>::value>::type* = nullptr>
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
 inline auto
 tuple_transform(TUPLE&& x, UNARY_FUNC f)
 {
@@ -136,8 +135,8 @@ namespace detail
 }	// namespace detail
     
 template <class TUPLE0, class TUPLE1, class BINARY_FUNC,
-	  typename std::enable_if<is_tuple<TUPLE0>::value &&
-				  is_tuple<TUPLE1>::value>::type* = nullptr>
+	  std::enable_if_t<is_tuple<TUPLE0>::value &&
+			   is_tuple<TUPLE1>::value>* = nullptr>
 inline auto
 tuple_transform(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
@@ -163,9 +162,9 @@ namespace detail
 }	// namespace detail
     
 template <class TUPLE0, class TUPLE1, class TUPLE2, class TRINARY_FUNC,
-	  typename std::enable_if<is_tuple<TUPLE0>::value &&
-				  is_tuple<TUPLE1>::value &&
-				  is_tuple<TUPLE2>::value>::type* = nullptr>
+	  std::enable_if_t<is_tuple<TUPLE0>::value &&
+			   is_tuple<TUPLE1>::value &&
+			   is_tuple<TUPLE2>::value>* = nullptr>
 inline auto
 tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, TRINARY_FUNC f)
 {
@@ -221,7 +220,7 @@ class unarizer
     unarizer(FUNC func=FUNC())	:_func(func)		{}
 
     template <class TUPLE_,
-	      typename std::enable_if<is_tuple<TUPLE_>::value>::type* = nullptr>
+	      std::enable_if_t<is_tuple<TUPLE_>::value>* = nullptr>
     auto	operator ()(const TUPLE_& arg) const
 		{
 		    return exec(arg, std::make_index_sequence<
@@ -255,20 +254,20 @@ namespace detail
   struct generic_dereference
   {
       template <class ITER> 
-      typename std::enable_if<
+      std::enable_if_t<
 	  !std::is_reference<
 	      typename std::iterator_traits<ITER>::reference>::value,
-	  typename std::iterator_traits<ITER>::reference>::type
+	  typename std::iterator_traits<ITER>::reference>
       operator ()(const ITER& iter) const
       {
 	  return *iter;
       }
       template <class ITER> auto
       operator ()(const ITER& iter) const
-	  -> typename std::enable_if<
+	  -> std::enable_if_t<
 	      std::is_reference<
 		  typename std::iterator_traits<ITER>::reference>::value,
-	      decltype(std::ref(*iter))>::type
+	      decltype(std::ref(*iter))>
       {
 	  return std::ref(*iter);
       }
@@ -392,8 +391,7 @@ namespace detail
     };
 }	// namespace detail
     
-template <class TUPLE,
-	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
+template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
 inline auto
 begin(TUPLE&& t)
 {
@@ -403,8 +401,7 @@ begin(TUPLE&& t)
   //				     t, [](auto&& x){ return begin(x); }));
 }
 
-template <class TUPLE,
-	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
+template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
 inline auto
 end(TUPLE&& t)
 {
@@ -414,8 +411,7 @@ end(TUPLE&& t)
   //				     t, [](auto&& x){ return end(x); }));
 }
     
-template <class TUPLE,
-	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
+template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
 inline auto
 rbegin(TUPLE&& t)
 {
@@ -425,8 +421,7 @@ rbegin(TUPLE&& t)
   //				     t, [](auto&& x){ return rbegin(x); }));
 }
 
-template <class TUPLE,
-	  typename enable_if<TU::is_range_tuple<TUPLE>::value>::type* = nullptr>
+template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
 inline auto
 rend(TUPLE&& t)
 {
@@ -504,64 +499,56 @@ operator %(const tuple<L...>& l, const T& c)
     return TU::tuple_transform(l, [&c](const auto& x){ return x % c; });
 }
 
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator +=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x += y; });
     return l;
 }
 
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator -=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x -= y; });
     return l;
 }
 
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator *=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x *= y; });
     return l;
 }
 
-template <class L, class T>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class T> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator *=(L&& l, const T& c)
 {
     TU::tuple_for_each(l, [&c](auto& x){ x *= c; });
     return l;
 }
 
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator /=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x /= y; });
     return l;
 }
 
-template <class L, class T>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class T> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator /=(L&& l, const T& c)
 {
     TU::tuple_for_each(l, [&c](auto& x){ x /= c; });
     return l;
 }
 
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator %=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x %= y; });
     return l;
 }
 
-template <class L, class T>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class T> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator %=(L&& l, const T& c)
 {
     TU::tuple_for_each(l, [&c](auto& x){ x %= c; });
@@ -592,24 +579,21 @@ operator ^(const tuple<L...>& l, const tuple<R...>& r)
 				     { return x ^ y; });
 }
     
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator &=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x &= y; });
     return l;
 }
 
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator |=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x |= y; });
     return l;
 }
 
-template <class L, class... R>
-inline typename enable_if<TU::is_tuple<L>::value, L&>::type
+template <class L, class... R> inline enable_if_t<TU::is_tuple<L>::value, L&>
 operator ^=(L&& l, const tuple<R...>& r)
 {
     TU::tuple_for_each(l, r, [](auto& x, const auto& y){ x ^= y; });

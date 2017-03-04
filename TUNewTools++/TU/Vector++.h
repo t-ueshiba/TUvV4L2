@@ -17,12 +17,11 @@ template <class T, size_t N=0>
 class LUDecomposition
 {
   public:
-    template <class E_,
-	      typename std::enable_if<rank<E_>() == 2>::type* = nullptr>
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
     LUDecomposition(const E_& expr)			;
 
     template <class E_>
-    typename std::enable_if<rank<std::decay_t<E_> >() == 1, E_&>::type
+    std::enable_if_t<rank<std::decay_t<E_> >() == 1, E_&>
 		substitute(E_&& expr)		const	;
 
   //! もとの正方行列の行列式を返す．
@@ -44,8 +43,8 @@ class LUDecomposition
   \throw std::invalid_argument	mが正方行列でない場合に送出
 */
 template <class T, size_t N>
-template <class E, typename std::enable_if<rank<E>() == 2>::type*>
-LUDecomposition<T, N>::LUDecomposition(const E& expr)
+template <class E_, std::enable_if_t<rank<E_>() == 2>*>
+LUDecomposition<T, N>::LUDecomposition(const E_& expr)
     :_A(expr), _indices(size()), _det(1)
 {
     if (_A.nrow() != _A.ncol())
@@ -125,9 +124,8 @@ LUDecomposition<T, N>::LUDecomposition(const E& expr)
   \throw std::runtime_error	もとの正方行列が正則でない場合に送出
 */
 template <class T, size_t N>
-template <class E> typename std::enable_if<rank<std::decay_t<E> >() == 1,
-					   E&>::type
-LUDecomposition<T, N>::substitute(E&& b) const
+template <class E_> std::enable_if_t<rank<std::decay_t<E_> >() == 1, E_&>
+LUDecomposition<T, N>::substitute(E_&& b) const
 {
     if (std::size(b) != size())
 	throw std::invalid_argument("TU::LUDecomposition<T>::substitute: Dimension of given vector is not equal to mine!!");
@@ -171,9 +169,8 @@ class Householder : public Array2<T>
   private:
     Householder(size_t dd, size_t d)
 	:super(dd, dd), _d(d), _sigma(super::nrow())		{}
-    template <class E,
-	      typename std::enable_if<rank<E>() == 2>::type* = nullptr>
-    Householder(const E& a, size_t d)				;
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    Householder(const E_& a, size_t d)				;
 
     using		super::size;
     
@@ -195,8 +192,8 @@ class Householder : public Array2<T>
 };
 
 template <class T>
-template <class E, typename std::enable_if<rank<E>() == 2>::type*>
-Householder<T>::Householder(const E& a, size_t d)
+template <class E_, typename std::enable_if_t<rank<E_>() == 2>*>
+Householder<T>::Householder(const E_& a, size_t d)
     :super(a), _d(d), _sigma(size())
 {
     if (super::nrow() != super::ncol())
@@ -377,9 +374,8 @@ class QRDecomposition
     using element_type	= T;
     
   public:
-    template <class E,
-	      typename std::enable_if<rank<E>() == 2>::type* = nullptr>
-    QRDecomposition(const E& A)				;
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    QRDecomposition(const E_& A)				;
 
   //! QR分解の下半三角行列を返す．
   /*!
@@ -402,9 +398,8 @@ class QRDecomposition
 /*!
  \param m	QR分解する一般行列
 */
-template <class T>
-template <class E, typename std::enable_if<rank<E>() == 2>::type*>
-QRDecomposition<T>::QRDecomposition(const E& A)
+template <class T> template <class E_, std::enable_if_t<rank<E_>() == 2>*>
+QRDecomposition<T>::QRDecomposition(const E_& A)
     :_Rt(A), _Qt(_Rt.ncol(), 0)
 {
     const size_t	n = std::min(_Rt.nrow(), _Rt.ncol());
@@ -532,7 +527,7 @@ class Rotation
 		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
   */
     template <class E_>
-    typename std::enable_if<rank<std::decay_t<E_> >() == 2, E_&>::type
+    std::enable_if_t<rank<std::decay_t<E_> >() == 2, E_&>
 		apply_from_left(E_&& A) const
 		{
 		    for (size_t j = 0; j < size<1>(A); ++j)
@@ -551,7 +546,7 @@ class Rotation
 		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
   */
     template <class E_>
-    typename std::enable_if<rank<std::decay_t<E_> >() == 2, E_&>::type
+    std::enable_if_t<rank<std::decay_t<E_> >() == 2, E_&>
 		apply_from_right(E_&& A) const
 		{
 		    for (auto&& a : A)
@@ -586,8 +581,7 @@ class TriDiagonal
     using element_type	= T;	//!< 成分の型
     
   public:
-    template <class E_,
-	      typename std::enable_if<rank<E_>() == 2>::type* = nullptr>
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
     TriDiagonal(const E_& a)				;
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す．
@@ -617,7 +611,7 @@ class TriDiagonal
     void		diagonalize(bool abs=true)	;
 
     template <class E_>
-    typename std::enable_if<rank<std::decay_t<E_> >() == 1, Array2<T> >::type
+    std::enable_if_t<rank<std::decay_t<E_> >() == 1, Array2<T> >
 			move(E_&& evals)
 			{
 			    evals = std::move(_diagonal);
@@ -641,8 +635,7 @@ class TriDiagonal
   \param a			3重対角化する対称行列
   \throw std::invalid_argument	aが正方行列でない場合に送出
 */
-template <class T>
-template <class E_, typename std::enable_if<rank<E_>() == 2>::type*>
+template <class T> template <class E_, std::enable_if_t<rank<E_>() == 2>*>
 TriDiagonal<T>::TriDiagonal(const E_& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
 {
@@ -794,7 +787,7 @@ class BiDiagonal
     using element_type = T;	//!< 成分の型
     
   public:
-    template <class E, typename std::enable_if<rank<E>() == 2>::type* = nullptr>
+    template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr>
     BiDiagonal(const E& a)			;
 
   //! 2重対角化される行列の行数を返す．
@@ -856,8 +849,7 @@ class BiDiagonal
 /*!
   \param a	2重対角化する一般行列
 */
-template <class T>
-template <class E, typename std::enable_if<rank<E>() == 2>::type*>
+template <class T> template <class E, std::enable_if_t<rank<E>() == 2>*>
 BiDiagonal<T>::BiDiagonal(const E& a)
     :_Dt(std::max(size<0>(a), size<1>(a)), 0),
      _Et(std::min(size<0>(a), size<1>(a)), 1),
@@ -1096,8 +1088,8 @@ class SVDecomposition : private BiDiagonal<T>
   /*!
     \param a	特異値分解する一般行列
   */
-    template <class E, typename std::enable_if<rank<E>() == 2>::type* = nullptr>
-    SVDecomposition(const E& a)
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    SVDecomposition(const E_& a)
 	:super(a)				{ super::diagonalize(); }
 
     using	super::nrow;
@@ -1128,8 +1120,7 @@ class SVDecomposition : private BiDiagonal<T>
   \f]
   \throw std::invalid_argument	3次元ベクトルでない場合に送出
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 1>::type* = nullptr> inline auto
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
 skew(const E& expr)
 {
     using result_t = Array2<element_t<E>, 3, 3>;
@@ -1144,15 +1135,14 @@ skew(const E& expr)
 /*!
   \return	同次化されたベクトル
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 1>::type* = nullptr> inline auto
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
 homogeneous(const E& expr)
 {
     constexpr size_t	N = size0<E>();
     using element_type	= element_t<E>;
-    using result_type	= typename std::conditional<
-			      N == 0, Array<element_type, 0>,
-				      Array<element_type, N+1> >::type;
+    using result_type	= std::conditional_t<N == 0,
+					     Array<element_type, 0>,
+					     Array<element_type, N+1> >;
 
     const auto	n = std::size(expr);
     result_type	r(n + 1);
@@ -1165,15 +1155,14 @@ homogeneous(const E& expr)
 /*!
   \return	非同次化されたベクトル
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 1>::type* = nullptr> inline auto
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
 inhomogeneous(const E& expr)
 {
     constexpr size_t	N = size0<E>();
     using element_type	= element_t<E>;
-    using result_type	= typename std::conditional<
-			      N == 0, Array<element_type, 0>,
-				      Array<element_type, N-1> >::type;
+    using result_type	= std::conditional_t<N == 0,
+					     Array<element_type, 0>,
+					     Array<element_type, N-1> >;
 
     const auto	n = std::size(expr) - 1;
     return result_type(slice(expr, 0, n) / expr[n]);
@@ -1201,8 +1190,7 @@ diag(T c, size_t n=N)
   \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
   \throw std::invalid_argument	正方行列でない場合に送出
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
 trace(const E& expr)
 {
     assert(size<0>(expr) != size<1>(expr));
@@ -1222,8 +1210,7 @@ trace(const E& expr)
   \throw std::invalid_argument	正方行列でない場合に送出
   \throw std::runtime_error	正値でない場合に送出
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
 cholesky(const E& A)
 {
     if (size<0>(A) != size<1>(A))
@@ -1257,8 +1244,7 @@ cholesky(const E& A)
   \param A	正方行列
   \return	行列式，すなわち\f$\det\TUvec{A}{}\f$
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> inline auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
 det(const E& A)
 {
     return LUDecomposition<element_t<E>, size0<E>()>(A).det();
@@ -1271,8 +1257,7 @@ det(const E& A)
   \param q	元の行列から取り除く列を指定するindex
   \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
 det(const E& A, size_t p, size_t q)
 {
     const auto&			A_ = evaluate(A);
@@ -1300,8 +1285,7 @@ det(const E& A, size_t p, size_t q)
   \return	余因子行列，すなわち
 		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
 adjoint(const E& A)
 {
     constexpr size_t		N = size0<E>();
@@ -1319,8 +1303,7 @@ adjoint(const E& A)
 		の解ベクトル，すなわち \f$\TUtvec{b}{}\TUinv{A}{}\f$
 */
 template <class E, class F>
-inline typename std::enable_if<rank<E>() == 2 && rank<std::decay_t<F> >() == 1,
-			       F&>::type
+inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 1, F&>
 solve(const E& A, F&& b)
 {
     return LUDecomposition<element_t<E>, size0<E>()>(A).substitute(b);
@@ -1334,8 +1317,7 @@ solve(const E& A, F&& b)
 		の解を納めた行列，すなわち	\f$\TUvec{B}{}\TUinv{A}{}\f$
 */
 template <class E, class F>
-inline typename std::enable_if<rank<E>() == 2 && rank<std::decay_t<F> >() == 2,
-			       F&>::type
+inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 2, F&>
 solve(const E& A, F&& B)
 {
     LUDecomposition<element_t<E>, size0<E>()>	lu(A);
@@ -1349,8 +1331,7 @@ solve(const E& A, F&& B)
   \param A	正則な正方行列
   \return	逆行列，すなわち\f$\TUinv{A}{}\f$
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> inline auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
 inverse(const E& A)
 {
     using	element_type = element_t<E>;
@@ -1379,9 +1360,8 @@ inverse(const E& A)
 		なる\f$\TUtvec{U}{}\f$
 */
 template <class E, class F,
-	  typename std::enable_if<
-	      rank<E>() == 2 &&
-	      rank<std::decay_t<F> >() == 1>::type* = nullptr> auto
+	  std::enable_if_t<rank<E>() == 2 &&
+			   rank<std::decay_t<F> >() == 1>* = nullptr> auto
 eigen(const E& A, F&& evals, bool abs=true)
 {
     TriDiagonal<element_t<E> >	tri(A);
@@ -1407,10 +1387,9 @@ eigen(const E& A, F&& evals, bool abs=true)
 		なる\f$\TUtvec{U}{}\f$
 */
 template <class E, class F, class G,
-	  typename std::enable_if<
-	      rank<E>() == 2 &&
-	      rank<F>() == 2 &&
-	      rank<std::decay_t<G> >() == 1>::type* = nullptr> auto
+	  std::enable_if_t<rank<E>() == 2 &&
+			   rank<F>() == 2 &&
+			   rank<std::decay_t<G> >() == 1>* = nullptr> auto
 geigen(const E& A, const F& BB, G&& evals, bool abs=true)
 {
     const auto	Ltinv = inverse(BB.cholesky());
@@ -1435,8 +1414,7 @@ geigen(const E& A, const F& BB, G&& evals, bool abs=true)
 		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
 		\f]
 */
-template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
 pseudo_inverse(const E& A, element_t<E> cndnum=1.0e5)
 {
     using element_type	= element_t<E>;

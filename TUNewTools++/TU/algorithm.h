@@ -33,7 +33,7 @@ std::ostream&	operator <<(std::ostream& out, const sizes_holder<E>& holder);
   \param n	第2の整数
   \return	mとnの最大公約数
 */
-template <class S, class T> constexpr typename std::common_type<S, T>::type
+template <class S, class T> constexpr std::common_type_t<S, T>
 gcd(S m, T n)
 {
     return (n == 0 ? m : gcd(n, m % n));
@@ -47,7 +47,7 @@ gcd(S m, T n)
   \return	m, n, args...の最大公約数
 */
 template <class S, class T, class... ARGS>
-constexpr typename std::common_type<S, T, ARGS...>::type
+constexpr std::common_type_t<S, T, ARGS...>
 gcd(S m, T n, ARGS... args)
 {
     return gcd(gcd(m, n), args...);
@@ -59,7 +59,7 @@ gcd(S m, T n, ARGS... args)
   \param n	第2の整数
   \return	mとnの最小公倍数
 */
-template <class S, class T> constexpr typename std::common_type<S, T>::type
+template <class S, class T> constexpr std::common_type_t<S, T>
 lcm(S m, T n)
 {
     return (m*n == 0 ? 0 : (m / gcd(m, n)) * n);
@@ -73,7 +73,7 @@ lcm(S m, T n)
   \return	m, n, args...の最小公倍数
 */
 template <class S, class T, class... ARGS>
-constexpr typename std::common_type<S, T, ARGS...>::type
+constexpr std::common_type_t<S, T, ARGS...>
 lcm(S m, T n, ARGS... args)
 {
     return lcm(lcm(m, n), args...);
@@ -214,7 +214,7 @@ namespace detail
   }
 
   template <class T>
-  inline typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+  inline std::enable_if_t<std::is_arithmetic<T>::value, T>
   square(const T& val)
   {
       return val * val;

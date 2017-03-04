@@ -525,34 +525,31 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     array&	operator =(array&&)		= default;
     
     template <class... SIZES_,
-	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
     explicit	array(SIZES_... sizes)
 		    :super({to_size(sizes)...})
 		{
 		}
-    template <class... SIZES_>
-    typename std::enable_if<sizeof...(SIZES_) == D>::type
+    template <class... SIZES_> std::enable_if_t<sizeof...(SIZES_) == D>
 		resize(SIZES_... sizes)
 		{
 		    super::resize({to_size(sizes)...});
 		}
     
     template <class... SIZES_,
-	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
     explicit	array(size_t unit, SIZES_... sizes)
 		    :super({to_size(sizes)...}, to_stride(unit, sizes...))
 		{
 		}
-    template <class... SIZES_>
-    typename std::enable_if<sizeof...(SIZES_) == D>::type
+    template <class... SIZES_> std::enable_if_t<sizeof...(SIZES_) == D>
 		resize(size_t unit, SIZES_... sizes)
 		{
 		    super::resize({to_size(sizes)...},
 				  to_stride(unit, sizes...));
 		}
 
-    template <class E_,
-	      typename std::enable_if<rank<E_>() == D>::type* = nullptr>
+    template <class E_, std::enable_if_t<rank<E_>() == D>* = nullptr>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
@@ -560,8 +557,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 							TU::size0<E_>()>::value;
 		    copy<S>(std::begin(expr), size(), begin());
 		}
-    template <class E_>
-    typename std::enable_if<rank<E_>() == D, array&>::type
+    template <class E_> std::enable_if_t<rank<E_>() == D, array&>
 		operator =(const E_& expr)
 		{
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
@@ -586,14 +582,14 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class... SIZES_,
-	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
     explicit	array(pointer p, SIZES_... sizes)
 		    :super(p, {to_size(sizes)...})
 		{
 		}
 
     template <class... SIZES_,
-	      typename std::enable_if<sizeof...(SIZES_) == D>::type* = nullptr>
+	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
     explicit	array(pointer p, size_t unit, SIZES_... sizes)
 		    :super(p, {to_size(sizes)...}, to_stride(unit, sizes...))
 		{
@@ -626,15 +622,15 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    return TU::slice(*this, is...);
 		}
     template <size_t SIZE_, size_t... SIZES_, class... INDICES_,
-	      typename std::enable_if<sizeof...(SIZES_) + 1 ==
-				      sizeof...(INDICES_)>::type* = nullptr>
+	      std::enable_if_t<sizeof...(SIZES_) + 1 ==
+			       sizeof...(INDICES_)>* = nullptr>
     auto	slice(INDICES_... indices)
 		{
 		    return TU::slice<SIZE_, SIZES_...>(*this, indices...);
 		}
     template <size_t SIZE_, size_t... SIZES_, class... INDICES_,
-	      typename std::enable_if<sizeof...(SIZES_) + 1 ==
-				      sizeof...(INDICES_)>::type* = nullptr>
+	      std::enable_if_t<sizeof...(SIZES_) + 1 ==
+			       sizeof...(INDICES_)>* = nullptr>
     auto	slice(INDICES_... indices) const
 		{
 		    return TU::slice<SIZE_, SIZES_...>(*this, indices...);
@@ -682,7 +678,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     using	sizes_iterator = typename sizes_type::iterator;
     
     template <class T_>
-    static typename std::enable_if<std::is_integral<T_>::value, size_t>::type
+    static std::enable_if_t<std::is_integral<T_>::value, size_t>
 		to_size(const T_& arg)
 		{
 		    return size_t(arg);
@@ -696,13 +692,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class T_>
-    static typename std::enable_if<rank<T_>() == 0>::type
+    static std::enable_if_t<rank<T_>() == 0>
 		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& val)
 		{
 		    throw std::runtime_error("array<BUF>::set_sizes(): too shallow initializer list!");
 		}
     template <class T_>
-    static typename std::enable_if<rank<T_>() != 0>::type
+    static std::enable_if_t<rank<T_>() != 0>
 		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& r)
 		{
 		    *iter = r.size();
@@ -871,8 +867,7 @@ using result_t	= typename detail::result_t<E>::type;
 		expr自体の参照を返す
 */
 template <class E>
-inline typename std::conditional<detail::is_opnode<E>::value,
-				 result_t<E>, const E&>::type
+inline std::conditional_t<detail::is_opnode<E>::value, result_t<E>, const E&>
 evaluate(const E& expr)
 {
     return expr;
@@ -900,9 +895,9 @@ namespace detail
 	// 右辺が opnode でない場合：
 	//	右辺が range<ITER, SIZE> に変換可能ならば右辺そのもの
 	//	そうでなければそれへの定数参照
-	  using cache_t	= typename std::conditional<
-			      is_opnode<R>::value || is_range<R>::value,
-			      const TU::result_t<R>, const R&>::type;
+	  using cache_t	= std::conditional_t<is_opnode<R>::value ||
+					     is_range<R>::value,
+					     const TU::result_t<R>, const R&>;
 
 	public:
 		binder2nd(OP op, const R& r)
@@ -965,12 +960,11 @@ namespace detail
   \return	内積の評価結果
 */
 template <class L, class R,
-	  typename std::enable_if<rank<L>() == 1 &&
-				  rank<R>() == 1>::type* = nullptr>
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 1>* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
-    using value_type = typename std::common_type<value_t<L>, value_t<R> >::type;
+    using value_type = std::common_type_t<value_t<L>, value_t<R> >;
 
     assert(size<0>(l) == size<0>(r));
     constexpr size_t	S = detail::max<size0<L>(),size0<R>()>::value;
@@ -984,10 +978,9 @@ operator *(const L& l, const R& r)
   \param r	右辺の1または2次元配列式
   \return	積を表す演算子ノード
 */
-template <class L, class R,
-	  typename std::enable_if<rank<L>() == 2 &&
-				  rank<R>() >= 1 &&
-				  rank<R>() <= 2>::type* = nullptr>
+template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
+					     rank<R>() >= 1 &&
+					     rank<R>() <= 2>* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
@@ -1002,8 +995,7 @@ operator *(const L& l, const R& r)
   \return	積を表す演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<rank<L>() == 1 &&
-				  rank<R>() == 2>::type* = nullptr>
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2>* = nullptr>
 inline auto
 operator *(const L& l, const R& r)
 {
@@ -1020,8 +1012,7 @@ operator *(const L& l, const R& r)
   \return	外積を表す演算子ノード
 */
 template <class L, class R,
-	  typename std::enable_if<rank<L>() == 1 &&
-				  rank<R>() == 1>::type* = nullptr>
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 1>* = nullptr>
 inline auto
 operator %(const L& l, const R& r)
 {
@@ -1037,10 +1028,9 @@ operator %(const L& l, const R& r)
   \return	ベクトル積
 */
 template <class L, class R>
-inline typename std::enable_if<
-	   rank<L>() == 1 && rank<R>() == 1,
-	   Array<typename std::common_type<element_t<L>, element_t<R> >::type,
-		 3> >::type
+inline std::enable_if_t<rank<L>() == 1 && rank<R>() == 1,
+			Array<std::common_type_t<element_t<L>, element_t<R> >,
+			      3> >
 operator ^(const L& l, const R& r)
 {
 #ifdef TU_DEBUG
@@ -1062,9 +1052,8 @@ operator ^(const L& l, const R& r)
   \param r	右辺の1次元配列式
   \return	ベクトル積を表す演算子ノード
 */
-template <class L, class R,
-	  typename std::enable_if<rank<L>() == 2 &&
-				  rank<R>() == 1>::type* = nullptr>
+template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
+					     rank<R>() == 1>* = nullptr>
 inline auto
 operator ^(const L& l, const R& r)
 {
