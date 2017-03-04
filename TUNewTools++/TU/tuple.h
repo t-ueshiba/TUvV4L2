@@ -48,11 +48,11 @@ using is_range_tuple = std::integral_constant<
 namespace detail
 {
   template <class TUPLE, class UNARY_FUNC> inline void
-  tuple_for_each(TUPLE&, const UNARY_FUNC&, std::index_sequence<>)
+  tuple_for_each(TUPLE&, UNARY_FUNC, std::index_sequence<>)
   {
   }
   template <class TUPLE, class UNARY_FUNC, size_t I, size_t... IDX> inline void
-  tuple_for_each(TUPLE& x, const UNARY_FUNC& f, std::index_sequence<I, IDX...>)
+  tuple_for_each(TUPLE& x, UNARY_FUNC f, std::index_sequence<I, IDX...>)
   {
       f(std::get<I>(x));
       tuple_for_each(x, f, std::index_sequence<IDX...>());
@@ -61,7 +61,7 @@ namespace detail
     
 template <class TUPLE, class UNARY_FUNC>
 inline typename std::enable_if<is_tuple<TUPLE>::value>::type
-tuple_for_each(TUPLE&& x, const UNARY_FUNC& f)
+tuple_for_each(TUPLE&& x, UNARY_FUNC f)
 {
     detail::tuple_for_each(
 	x, f,
@@ -74,13 +74,13 @@ tuple_for_each(TUPLE&& x, const UNARY_FUNC& f)
 namespace detail
 {
   template <class TUPLE0, class TUPLE1, class BINARY_FUNC> inline void
-  tuple_for_each(TUPLE0&, TUPLE1&, const BINARY_FUNC&, std::index_sequence<>)
+  tuple_for_each(TUPLE0&, TUPLE1&, BINARY_FUNC, std::index_sequence<>)
   {
   }
   template <class TUPLE0, class TUPLE1,
 	    class BINARY_FUNC, size_t I, size_t... IDX> inline void
-  tuple_for_each(TUPLE0& x, TUPLE1& y,
-		 const BINARY_FUNC& f, std::index_sequence<I, IDX...>)
+  tuple_for_each(TUPLE0& x, TUPLE1& y, BINARY_FUNC f,
+		 std::index_sequence<I, IDX...>)
   {
       f(std::get<I>(x), std::get<I>(y));
       tuple_for_each(x, y, f, std::index_sequence<IDX...>());
@@ -90,7 +90,7 @@ namespace detail
 template <class TUPLE0, class TUPLE1, class BINARY_FUNC>
 inline typename std::enable_if<TU::is_tuple<TUPLE0>::value &&
 			       TU::is_tuple<TUPLE1>::value>::type
-tuple_for_each(TUPLE0&& x, TUPLE1&& y, const BINARY_FUNC& f)
+tuple_for_each(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
     detail::tuple_for_each(
 	x, y, f,
@@ -104,7 +104,7 @@ namespace detail
 {
   template <class TUPLE, class UNARY_FUNC, size_t... IDX>
   inline auto
-  tuple_transform(TUPLE& x, const UNARY_FUNC& f, std::index_sequence<IDX...>)
+  tuple_transform(TUPLE& x, UNARY_FUNC f, std::index_sequence<IDX...>)
   {
       return std::make_tuple(f(std::get<IDX>(x))...);
   }
@@ -113,7 +113,7 @@ namespace detail
 template <class TUPLE, class UNARY_FUNC,
 	  typename std::enable_if<is_tuple<TUPLE>::value>::type* = nullptr>
 inline auto
-tuple_transform(TUPLE&& x, const UNARY_FUNC& f)
+tuple_transform(TUPLE&& x, UNARY_FUNC f)
 {
     return detail::tuple_transform(
 		x, f,
@@ -128,8 +128,8 @@ namespace detail
 {
   template <class TUPLE0, class TUPLE1, class BINARY_FUNC, size_t... IDX>
   inline auto
-  tuple_transform(TUPLE0& x, TUPLE1& y,
-		  const BINARY_FUNC& f, std::index_sequence<IDX...>)
+  tuple_transform(TUPLE0& x, TUPLE1& y, BINARY_FUNC f,
+		  std::index_sequence<IDX...>)
   {
       return std::make_tuple(f(std::get<IDX>(x), std::get<IDX>(y))...);
   }
@@ -139,7 +139,7 @@ template <class TUPLE0, class TUPLE1, class BINARY_FUNC,
 	  typename std::enable_if<is_tuple<TUPLE0>::value &&
 				  is_tuple<TUPLE1>::value>::type* = nullptr>
 inline auto
-tuple_transform(TUPLE0&& x, TUPLE1&& y, const BINARY_FUNC& f)
+tuple_transform(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
     return detail::tuple_transform(
 		x, y, f,
@@ -152,10 +152,10 @@ tuple_transform(TUPLE0&& x, TUPLE1&& y, const BINARY_FUNC& f)
 ************************************************************************/
 namespace detail
 {
-  template <class TUPLE0, class TUPLE1, class TUPLE2,
-	    class TRINARY_FUNC, size_t... IDX> inline auto
-  tuple_transform(TUPLE0& x, TUPLE1& y, TUPLE2& z,
-		  const TRINARY_FUNC& f, std::index_sequence<IDX...>)
+  template <class TUPLE0, class TUPLE1, class TUPLE2, class TRINARY_FUNC,
+	    size_t... IDX> inline auto
+  tuple_transform(TUPLE0& x, TUPLE1& y, TUPLE2& z, TRINARY_FUNC f,
+		  std::index_sequence<IDX...>)
   {
       return std::make_tuple(f(std::get<IDX>(x), std::get<IDX>(y),
 			       std::get<IDX>(z))...);
@@ -167,7 +167,7 @@ template <class TUPLE0, class TUPLE1, class TUPLE2, class TRINARY_FUNC,
 				  is_tuple<TUPLE1>::value &&
 				  is_tuple<TUPLE2>::value>::type* = nullptr>
 inline auto
-tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, const TRINARY_FUNC& f)
+tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, TRINARY_FUNC f)
 {
     return detail::tuple_transform(
 		x, y, z, f,
@@ -218,7 +218,7 @@ class unarizer
     using functor_type = FUNC;
 
   public:
-    unarizer(const FUNC& func=FUNC())	:_func(func)	{}
+    unarizer(FUNC func=FUNC())	:_func(func)		{}
 
     template <class TUPLE_,
 	      typename std::enable_if<is_tuple<TUPLE_>::value>::type* = nullptr>
@@ -238,11 +238,11 @@ class unarizer
 		}
 
   private:
-    FUNC	_func;
+    const FUNC	_func;
 };
 
 template <class FUNC> inline unarizer<FUNC>
-make_unarizer(const FUNC& func)
+make_unarizer(FUNC func)
 {
     return {func};
 }
