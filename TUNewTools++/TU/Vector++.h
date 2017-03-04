@@ -618,7 +618,7 @@ class TriDiagonal
 
     template <class E_>
     typename std::enable_if<rank<std::decay_t<E_> >() == 1, Array2<T> >::type
-			finalize(E_&& evals)
+			move(E_&& evals)
 			{
 			    evals = std::move(_diagonal);
 			    return std::move(static_cast<Array2<T>&>(_Ut));
@@ -1232,17 +1232,18 @@ cholesky(const E& A)
     Array2<element_t<E>, size0<E>(), size0<E>()>	Lt(A);
     for (size_t i = 0; i < Lt.nrow(); ++i)
     {
-	auto	d = Lt[i][i];
+	const auto	Li = Lt[i];
+	auto		d = Li[i];
 	if (d <= 0)
 	    throw std::runtime_error("TU::cholesky(): not positive definite matrix!!");
 	for (size_t j = 0; j < i; ++j)
-	    Lt[i][j] = 0;
-	Lt[i][i] = d = std::sqrt(d);
-	for (size_t j = i + 1; j < Lt.ncol(); ++j)
-	    Lt[i][j] /= d;
+	    Li[j] = 0;
+	Li[i] = d = std::sqrt(d);
+	for (size_t j = i + 1; j < Li.size(); ++j)
+	    Li[j] /= d;
 	for (size_t j = i + 1; j < Lt.nrow(); ++j)
-	    for (size_t k = j; k < Lt.ncol(); ++k)
-		Lt[j][k] -= (Lt[i][j] * Lt[i][k]);
+	    for (size_t k = j; k < Li.size(); ++k)
+		Lt[j][k] -= (Li[j] * Li[k]);
     }
     
     return std::move(Lt);
@@ -1271,7 +1272,7 @@ det(const E& A)
   \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
 */
 template <class E,
-	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> inline auto
+	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
 det(const E& A, size_t p, size_t q)
 {
     const auto&			A_ = evaluate(A);
@@ -1308,7 +1309,7 @@ adjoint(const E& A)
     for (size_t i = 0; i < val.nrow(); ++i)
 	for (size_t j = 0; j < val.ncol(); ++j)
 	    val[i][j] = ((i + j) % 2 ? -det(A, j, i) : det(A, j, i));
-    return val;
+    return std::move(val);
 }
 
 //! 連立1次方程式を解く．
@@ -1385,7 +1386,7 @@ eigen(const E& A, F&& evals, bool abs=true)
 {
     TriDiagonal<element_t<E> >	tri(A);
     tri.diagonalize(abs);
-    return tri.finalize(evals);
+    return tri.move(evals);
 }
 
 //! 対称行列の一般固有値と一般固有ベクトルを返す．
