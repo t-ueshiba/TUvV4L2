@@ -119,7 +119,7 @@ class transform_iterator2
     friend	class boost::iterator_core_access;
 	
   public:
-		transform_iterator2(ITER0 iter0, ITER1 iter1, const FUNC& func)
+		transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
 		    :super(iter0), _iter(iter1), _func(func)
 		{
 		}
@@ -152,7 +152,7 @@ class transform_iterator2
 
 template <class FUNC, class ITER0, class ITER1>
 inline transform_iterator2<FUNC, ITER0, ITER1>
-make_transform_iterator2(ITER0 iter0, ITER1 iter1, const FUNC& func)
+make_transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
 {
     return {iter0, iter1, func};
 }
