@@ -1144,7 +1144,7 @@ diag(T c, size_t n=N)
     Array2<T, N, N>	a(n, n);
     for (size_t i = 0; i != a.size(); ++i)
 	a[i][i] = c;
-    return a;
+    return std::move(a);
 }
 
 //! 正方行列のtraceを返す．

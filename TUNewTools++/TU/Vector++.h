@@ -201,7 +201,7 @@ det(const E& A, size_t p, size_t q)
 */
 template <class E,
 	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
-adj(const E& A)
+adjoint(const E& A)
 {
     constexpr size_t		N = size0<E>();
     Array2<element_t<E>, N, N>	val(size<0>(A), size<1>(A));
@@ -250,10 +250,12 @@ solve(const E& A, F&& B)
 */
 template <class E,
 	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> inline auto
-inv(const E& A)
+inverse(const E& A)
 {
+    using	element_type = element_t<E>;
+    
     constexpr size_t		N = size0<E>();
-    Array2<element_t<E>, N, N>	B = diag<N>(1, std::size(A));
+    Array2<element_type, N, N>	B = diag<N>(element_type(1), std::size(A));
     return std::move(solve(A, B));
 }
     
@@ -512,11 +514,8 @@ Householder<T>::sigma_is_zero(size_t m, T comp) const
   （\f$\TUvec{A}{}\f$の各行を\f$\TUtvec{Q}{}\f$の行の線型結合で表現する）．
  */
 template <class T>
-class QRDecomposition : private Array2<T>
+class QRDecomposition
 {
-  private:
-    using super		= Array2<T>;
-    
   public:
     using element_type	= T;
     
@@ -529,7 +528,7 @@ class QRDecomposition : private Array2<T>
   /*!
     \return	下半三角行列\f$\TUtvec{R}{}\f$
   */
-    const Array2<T>&	Rt()			const	{ return *this; }
+    const Array2<T>&	Rt()			const	{ return _Rt; }
 
   //! QR分解の回転行列を返す．
   /*!
@@ -538,9 +537,7 @@ class QRDecomposition : private Array2<T>
     const Array2<T>&	Qt()			const	{ return _Qt; }
     
   private:
-    using		super::nrow;
-    using		super::ncol;
-    
+    Array2<T>		_Rt;
     Householder<T>	_Qt;			// rotation matrix
 };
 
@@ -551,17 +548,17 @@ class QRDecomposition : private Array2<T>
 template <class T>
 template <class E, typename std::enable_if<rank<E>() == 2>::type*>
 QRDecomposition<T>::QRDecomposition(const E& A)
-    :super(A), _Qt(ncol(), 0)
+    :_Rt(A), _Qt(_Rt.ncol(), 0)
 {
-    size_t	n = std::min(nrow(), ncol());
+    const size_t	n = std::min(_Rt.nrow(), _Rt.ncol());
     for (size_t j = 0; j < n; ++j)
-	_Qt.apply_from_right(*this, j);
+	_Qt.apply_from_right(_Rt, j);
     _Qt.make_transformation();
     for (size_t i = 0; i < n; ++i)
     {
-	auto	r = (*this)[i];
+	auto	r = _Rt[i];
 	r[i] = _Qt.sigma()[i];
-	for (size_t j = i + 1; j < ncol(); ++j)
+	for (size_t j = i + 1; j < _Rt.ncol(); ++j)
 	    r[j] = 0.0;
     }
 }
@@ -732,9 +729,9 @@ class TriDiagonal
     using element_type	= T;	//!< 成分の型
     
   public:
-    template <class E,
-	      typename std::enable_if<rank<E>() == 2>::type* = nullptr>
-    TriDiagonal(const E& a)				;
+    template <class E_,
+	      typename std::enable_if<rank<E_>() == 2>::type* = nullptr>
+    TriDiagonal(const E_& a)				;
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す．
   /*!
@@ -761,6 +758,14 @@ class TriDiagonal
     const Array<T>&	off_diagonal()		const	{return _Ut.sigma();}
 
     void		diagonalize(bool abs=true)	;
+
+    template <class E_>
+    typename std::enable_if<rank<std::decay_t<E_> >() == 1, Array2<T> >::type
+			finalize(E_&& evals)
+			{
+			    evals = std::move(_diagonal);
+			    return std::move(static_cast<Array2<T>&>(_Ut));
+			}
     
   private:
     enum		{NITER_MAX = 30};
@@ -780,8 +785,8 @@ class TriDiagonal
   \throw std::invalid_argument	aが正方行列でない場合に送出
 */
 template <class T>
-template <class E, typename std::enable_if<rank<E>() == 2>::type*>
-TriDiagonal<T>::TriDiagonal(const E& a)
+template <class E_, typename std::enable_if<rank<E_>() == 2>::type*>
+TriDiagonal<T>::TriDiagonal(const E_& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
 {
     if (_Ut.nrow() != _Ut.ncol())
@@ -916,7 +921,7 @@ TriDiagonal<T>::initialize_rotation(size_t m, size_t n, T& x, T& y) const
 //! 対称行列の固有値と固有ベクトルを返す．
 /*!
   \param A	対称行列 
-  \param eval	固有値が返される
+  \param evals	固有値が返される
   \param abs	固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
 		並べるならfalse
   \return	各行が固有ベクトルから成る回転行列，すなわち
@@ -932,20 +937,18 @@ template <class E, class F,
 	  typename std::enable_if<
 	      rank<E>() == 2 &&
 	      rank<std::decay_t<F> >() == 1>::type* = nullptr> auto
-eigen(const E& A, F&& eval, bool abs=true)
+eigen(const E& A, F&& evals, bool abs=true)
 {
     TriDiagonal<element_t<E> >	tri(A);
-
     tri.diagonalize(abs);
-    eval = tri.diagonal();
-    return std::move(tri.Ut());
+    return tri.finalize(evals);
 }
 
 //! 対称行列の一般固有値と一般固有ベクトルを返す．
 /*!
   \param A	対称行列 
   \param BB	Aと同一サイズの正値対称行列
-  \param eval	一般固有値が返される
+  \param evals	一般固有値が返される
   \param abs	一般固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
 		並べるならfalse
   \return	各行が一般固有ベクトルから成る正則行列
@@ -963,11 +966,11 @@ template <class E, class F, class G,
 	      rank<E>() == 2 &&
 	      rank<F>() == 2 &&
 	      rank<std::decay_t<G> >() == 1>::type* = nullptr> auto
-geigen(const E& A, const F& BB, G&& eval, bool abs=true)
+geigen(const E& A, const F& BB, G&& evals, bool abs=true)
 {
-    const auto	Ltinv = inv(BB.cholesky());
+    const auto	Ltinv = inverse(BB.cholesky());
     const auto	Linv  = transpose(Ltinv);
-    return std::move(evaluate(eigen(Linv * A * Ltinv, eval, abs) * Linv));
+    return std::move(evaluate(eigen(Linv * A * Ltinv, evals, abs) * Linv));
 }
 
 /************************************************************************
@@ -1058,11 +1061,11 @@ BiDiagonal<T>::BiDiagonal(const E& a)
      _Et(std::min(size<0>(a), size<1>(a)), 1),
      _diagonal(_Dt.sigma()),
      _off_diagonal(_Et.sigma()), _anorm(0),
-     _Ut(a.nrow() < a.ncol() ? _Dt : _Et),
-     _Vt(a.nrow() < a.ncol() ? _Et : _Dt)
+     _Ut(size<0>(a) < size<1>(a) ? _Dt : _Et),
+     _Vt(size<0>(a) < size<1>(a) ? _Et : _Dt)
 {
     const auto&	A = evaluate(a);
-    
+
     if (nrow() < ncol())
 	for (size_t i = 0; i < nrow(); ++i)
 	    for (size_t j = 0; j < ncol(); ++j)
@@ -1325,7 +1328,7 @@ class SVDecomposition : private BiDiagonal<T>
 */
 template <class E,
 	  typename std::enable_if<rank<E>() == 2>::type* = nullptr> auto
-pinv(const E& A, element_t<E> cndnum=1.0e5)
+pseudo_inverse(const E& A, element_t<E> cndnum=1.0e5)
 {
     using element_type	= element_t<E>;
     
