@@ -311,6 +311,32 @@ test_vector()
     std::cout << "--- trace(A + b) ---\n" << trace(A + B) << std::endl;
 }
 
+void
+test_rotation()
+{
+    using element_type	= float;
+    using vector_type	= Array<element_type>;
+
+    std::cout << "*** rotation test ***" << std::endl;
+    
+    const vector_type	a = {1, 2, 3};
+    auto		Rt = rotation(a);
+    
+    std::cout << "--- Rt ---\n" << Rt;
+    std::cout << "--- Rt * R ---\n" << evaluate(Rt * transpose(Rt));
+
+    const auto	axis = rotation_axis(Rt);
+    std::cout << "axis(Rt) = " << axis << std::endl;
+    std::cout << "--- Rt(axis) ---\n" << rotation(axis) << std::endl;
+
+    const auto	q = quaternion(Rt);
+    std::cout << "quaternion(Rt) = " << q
+	      << "length(q) = " << length(q) << std::endl;
+    std::cout << "--- Rt(q) ---\n" << rotation(q) << std::endl;
+
+    std::cout << "square(Rt) = " << square(Rt) << std::endl;
+}
+
 }	// namespace TU
 
 int
@@ -332,6 +358,7 @@ main()
     TU::test_numeric2();
     TU::test_prod();
     TU::test_vector();
+    TU::test_rotation();
     
     return 0;
 }

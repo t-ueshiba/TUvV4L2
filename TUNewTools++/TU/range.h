@@ -1215,8 +1215,10 @@ fill(E&& expr, const T& val)
 template <class E, class T> std::enable_if_t<rank<std::decay_t<E> >() != 0>
 fill(E&& expr, const T& val)
 {
-    for (auto&& dst : expr)
-	fill(dst, val);
+    constexpr size_t	N = size0<std::decay_t<E> >();
+
+    for_each<N>(std::begin(expr), std::size(expr),
+		[&val](auto&& e){ fill(e, val); });
 }
 
 //! 与えられた2次元配列式の転置を返す
@@ -1227,8 +1229,8 @@ fill(E&& expr, const T& val)
 template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
 transpose(const E& expr)
 {
-    constexpr size_t	siz0 = size0<value_t<E> >();
-    return make_range<siz0>(column_begin(expr), size<1>(expr));
+    constexpr size_t	SIZE = size0<value_t<E> >();
+    return make_range<SIZE>(column_begin(expr), size<1>(expr));
 }
 
 //! 与えられた式の各要素の自乗和を求める.
@@ -1236,7 +1238,7 @@ transpose(const E& expr)
   \param x	式
   \return	式の各要素の自乗和
 */
-template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
+template <class E, std::enable_if_t<(rank<E>() != 0)>* = nullptr> inline auto
 square(const E& expr)
 {
     return square<size0<E>()>(std::begin(expr), std::size(expr));
@@ -1260,7 +1262,7 @@ length(const T& x)
   \return	xとyの各要素の差の自乗和
 */
 template <class L, class R> inline auto
-sqdist(const L& x, const R& y)
+square_distance(const L& x, const R& y)
 {
     return square(x - y);
 }
@@ -1272,9 +1274,23 @@ sqdist(const L& x, const R& y)
   \return	xとyの各要素の差の自乗和の平方根
 */
 template <class L, class R> inline auto
-dist(const L& x, const R& y)
+distance(const L& x, const R& y)
 {
-    return std::sqrt(sqdist(x, y));
+    return std::sqrt(square_distance(x, y));
+}
+
+//! 与えられた式のノルムを1に正規化する．
+/*!
+   \param expr	式 
+   \return	正規化された式，すなわち
+		\f$
+		  \TUvec{e}{}\leftarrow\frac{\TUvec{e}{}}{\TUnorm{\TUvec{e}{}}}
+		\f$
+*/
+template <class E> inline std::enable_if_t<rank<std::decay_t<E> >() != 0, E&>
+normalize(E&& expr)
+{
+    return expr /= length(expr);
 }
 
 }	// namespace TU

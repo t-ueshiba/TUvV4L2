@@ -1236,6 +1236,313 @@ cholesky(const E& A)
     return std::move(Lt);
 }
 
+//! 正方行列の下半三角部分を上半三角部分にコピーして対称化する．
+/*!
+    \return	この行列
+*/
+template <class T, size_t N> Array2<T, N, N>&
+symmetrize(Array2<T, N, N>& a)
+{
+    assert(a.nrow() == a.ncol());
+    
+    for (size_t i = 0; i < a.nrow(); ++i)
+	for (size_t j = 0; j < i; ++j)
+	    a[j][i] = a[i][j];
+    return a;
+}
+
+//! この行列の下半三角部分の符号を反転し，上半三角部分にコピーして反対称化する．
+/*!
+    \return	この行列
+*/
+template <class T, size_t N> Array2<T, N, N>&
+antisymmetrize(Array2<T, N, N>& a)
+{
+    assert(a.nrow() == a.ncol());
+    
+    for (size_t i = 0; i < a.nrow(); ++i)
+    {
+	a[i][i] = 0.0;
+	for (size_t j = 0; j < i; ++j)
+	    a[j][i] = -a[i][j];
+    }
+    return a;
+}
+
+//! この3次元回転行列から各軸周りの回転角を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUvec{R}{} =
+    \TUbeginarray{ccc}
+      \cos\theta_z & -\sin\theta_z & \\
+      \sin\theta_z &  \cos\theta_z & \\
+      & & 1
+    \TUendarray
+    \TUbeginarray{ccc}
+       \cos\theta_y & & \sin\theta_y \\
+       & 1 & \\
+      -\sin\theta_y & & \cos\theta_y
+    \TUendarray
+    \TUbeginarray{ccc}
+      1 & & \\
+      & \cos\theta_x & -\sin\theta_x \\
+      & \sin\theta_x &  \cos\theta_x
+    \TUendarray
+  \f]
+  なる\f$\theta_x, \theta_y, \theta_z\f$が回転角となる．
+ \param theta_x	x軸周りの回転角(\f$ -\pi \le \theta_x \le \pi\f$)を返す．
+ \param theta_y	y軸周りの回転角
+	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)を返す．
+ \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す．
+ \throw invalid_argument	3次元正方行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2>
+rotation_angle(const E& expr, element_t<E>& theta_x,
+	       element_t<E>& theta_y, element_t<E>& theta_z)
+{
+    using	T = element_t<E>;
+    
+    const auto&	Rt = evaluate(expr);
+    
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+    if (Rt[0][0] == T(0) && Rt[0][1] == T(0))
+    {
+	theta_x = std::atan2(-Rt[2][1], Rt[1][1]);
+	theta_y = (Rt[0][2] < 0 ? M_PI/2 : -M_PI/2);
+	theta_z = T(0);
+    }
+    else
+    {
+	theta_x =  std::atan2(Rt[1][2], Rt[2][2]);
+	theta_y = -std::asin(Rt[0][2]);
+	theta_z =  std::atan2(Rt[0][1], Rt[0][0]);
+    }
+}
+
+//! この3次元回転行列から回転角と回転軸を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
+  それぞれ回転角と回転軸となる．
+  \param expr
+  \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す．
+  \param s	回転角のsin値，すなわち\f$\sin\theta (\ge 0)\f$を返す．
+  \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
+  \throw std::invalid_argument	3x3行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2, Array<element_t<E>, 3> >
+rotation_axis(const E& expr, element_t<E>& c, element_t<E>& s)
+{
+    using	T = element_t<E>;
+    
+    const auto&	Rt = expr;
+
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+  // Compute cosine and sine of rotation angle.
+    const T	trace = Rt[0][0] + Rt[1][1] + Rt[2][2];
+    c = T(0.5) * (trace - T(1));
+    s = T(0.5) * std::sqrt((T(1) + trace)*(T(3) - trace));
+
+  // Compute rotation axis.
+    Array<T, 3>	n({Rt[1][2]-Rt[2][1], Rt[2][0]-Rt[0][2], Rt[0][1]-Rt[1][0]});
+    return std::move(normalize(n));
+}
+
+//! この3次元回転行列から回転角と回転軸を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
+  それぞれ回転角と回転軸となる．
+ \return			回転角と回転軸を表す3次元ベクトル，すなわち
+				\f$\theta\TUvec{n}{}\f$
+ \throw invalid_argument	3x3行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2, Array<element_t<E>, 3> >
+rotation_axis(const E& expr)
+{
+    using	T = element_t<E>;
+    
+    const auto&	Rt = expr;
+
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+    const T	trace = Rt[0][0] + Rt[1][1] + Rt[2][2],
+		s2 = std::sqrt((T(1) + trace)*(T(3) - trace));	// 2*sin
+    if (s2 + T(1) == T(1))			// sin << 1 ?
+	return Array<T, 3>();			// zero vector
+    
+    Array<T, 3>	axis({Rt[1][2]-Rt[2][1], Rt[2][0]-Rt[0][2], Rt[0][1]-Rt[1][0]});
+
+    return std::move(axis *= (std::atan2(s2, trace - T(1)) / s2));
+}
+
+//! この3次元回転行列から四元数を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$に対して，四元数は
+  \f[
+    \TUvec{q}{} \equiv
+    \TUbeginarray{c}
+      \cos\frac{\theta}{2} \\ \TUvec{n}{}\sin\frac{\theta}{2}
+    \TUendarray
+  \f]
+  と定義される．
+ \return			四元数を表す4次元単位ベクトル
+ \throw invalid_argument	3x3行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2, Array<element_t<E>, 4> >
+quaternion(const E& expr)
+{
+    using	T = element_t<E>;
+    
+    const auto&	Rt = expr;
+
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+    Array<T, 4>	q;
+    q[0] = T(0.5) * std::sqrt(trace(Rt) + T(1));
+    if (q[0] + T(1) == T(1))	// q[0] << 1 ?
+    {
+	Array<T, 3>	eval;
+	slice(q, 1, 3) = eigen(Rt, eval, false)[0];
+    }
+    else
+    {
+	const auto	S = transpose(Rt) - Rt;
+	q[1] = T(0.25) * S[2][1] / q[0];
+	q[2] = T(0.25) * S[0][2] / q[0];
+	q[3] = T(0.25) * S[1][0] / q[0];
+    }
+
+    return q;
+}
+
+template <class T>
+inline std::enable_if_t<std::is_floating_point<T>::value, Array2<T, 2, 2> >
+rotation(T theta)
+{
+    Array2<T, 2, 2>	Qt;
+    Qt[0][0] = Qt[1][1] = std::cos(theta);
+    Qt[0][1] = std::sin(theta);
+    Qt[1][0] = -Qt[0][1];
+
+    return Qt;
+}
+
+//! 3次元回転行列を生成する．
+/*!
+  \param n	回転軸を表す3次元単位ベクトル
+  \param c	回転角のcos値
+  \param s	回転角のsin値
+  \return	生成された回転行列，すなわち
+		\f[
+		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+		  - \TUskew{n}{}\sin\theta
+		\f]
+*/
+template <class E>
+inline std::enable_if_t<rank<E>() == 1, Array2<element_t<E>, 3, 3>>
+rotation(const E& n, element_t<E> c, element_t<E> s)
+{
+    if (std::size(n) != 3)
+	throw std::invalid_argument("TU::Rt: dimension of the argument \'n\' must be 3");
+    Array2<element_t<E>, 3, 3>	Qt = n % n;
+    Qt *= (1.0 - c);
+    Qt[0][0] += c;
+    Qt[1][1] += c;
+    Qt[2][2] += c;
+    Qt[0][1] += n[2] * s;
+    Qt[0][2] -= n[1] * s;
+    Qt[1][0] -= n[2] * s;
+    Qt[1][2] += n[0] * s;
+    Qt[2][0] += n[1] * s;
+    Qt[2][1] -= n[0] * s;
+
+    return Qt;
+}
+
+//! 3次元回転行列を生成する．
+/*!
+  \param v	回転角と回転軸を表す3次元ベクトルまたは四元数を表す4次元単位ベクトル
+  \return	生成された回転行列，すなわち3次元ベクトルの場合は
+		\f[
+		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+		  - \TUskew{n}{}\sin\theta,
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \theta \equiv \TUnorm{\TUvec{v}{}},~
+		  \TUvec{n}{} \equiv \frac{\TUvec{v}{}}{\TUnorm{\TUvec{v}{}}}
+		\f]
+		4次元単位ベクトルの場合は
+		\f[
+		  \TUtvec{R}{} \equiv
+		  \TUvec{I}{3}(q_0^2 - \TUtvec{q}{}\TUvec{q}{})
+		  + 2\TUvec{q}{}\TUtvec{q}{}
+		  - 2q_0\TUskew{q}{},
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  q_0 \equiv v_0,~
+		  \TUvec{q}{} \equiv [v_1,~v_2,~v_3]^\top
+		\f]
+*/
+template <class E>
+inline std::enable_if_t<rank<E>() == 1, Array2<element_t<E>, 3, 3>>
+rotation(const E& v)
+{
+    using	T = element_t<E>;
+    
+    if (std::size(v) == 4)			// quaternion ?
+    {
+	const T		q0 = v[0];
+	Array<T, 3>	q{{v[1], v[2], v[3]}};
+	Array2<T, 3, 3>	Qt = (T(2) * q) % q;
+	const T		c = q0*q0 - square(q);
+	Qt[0][0] += c;
+	Qt[1][1] += c;
+	Qt[2][2] += c;
+	q *= (T(2) * q0);
+	Qt[0][1] += q[2];
+	Qt[0][2] -= q[1];
+	Qt[1][0] -= q[2];
+	Qt[1][2] += q[0];
+	Qt[2][0] += q[1];
+	Qt[2][1] -= q[0];
+
+	return Qt;
+    }
+
+    const T	theta = length(v);
+    if (theta + T(1) == T(1))		// theta << 1 ?
+	return diag<3>(T(1));
+    else
+    {
+	const T	c = std::cos(theta), s = std::sin(theta);
+	return rotation(v / theta, c, s);
+    }
+}
+
 /************************************************************************
 *  generic algorithms using LUDecomposition<T, N>			*
 ************************************************************************/

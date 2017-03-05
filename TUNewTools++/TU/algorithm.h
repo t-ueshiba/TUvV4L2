@@ -104,28 +104,6 @@ namespace detail
       return copy(++in, arg, ++out, std::integral_constant<size_t, N-1>());
   }
 
-  template <class ITER, class T> inline void
-  fill(ITER begin, ITER end, const T& val, std::integral_constant<size_t, 0>)
-  {
-      std::fill(begin, end, val);
-  }
-  template <class ITER, class T> inline void
-  fill(ITER begin, size_t n, const T& val, std::integral_constant<size_t, 0>)
-  {
-      std::fill_n(begin, n, val);
-  }
-  template <class ITER, class ARG, class T, size_t N> inline void
-  fill(ITER begin, ARG, const T& val, std::integral_constant<size_t, 1>)
-  {
-      *begin = val;
-  }
-  template <class ITER, class ARG, class T, size_t N> inline void
-  fill(ITER begin, ARG arg, const T& val, std::integral_constant<size_t, N>)
-  {
-      *begin = val;
-      fill(++begin, arg, val, std::integral_constant<size_t, N-1>());
-  }
-
   template <class ITER, class FUNC> inline FUNC
   for_each(ITER begin, ITER end, FUNC func, std::integral_constant<size_t, 0>)
   {
@@ -213,8 +191,7 @@ namespace detail
 			   std::integral_constant<size_t, N-1>());
   }
 
-  template <class T>
-  inline std::enable_if_t<std::is_arithmetic<T>::value, T>
+  template <class T> inline std::enable_if_t<std::is_arithmetic<T>::value, T>
   square(const T& val)
   {
       return val * val;
@@ -252,40 +229,6 @@ namespace detail
   }
 }	// namespace detail
 
-//! 指定された範囲をコピーする
-/*!
-  N != 0 の場合，Nで指定した要素数をコピーし，argは無視．
-  N = 0 の場合，ARG = INならコピー元の末尾の次を，ARG = size_tなら要素数をargで指定，
-  \param in	コピー元の先頭を指す反復子
-  \param arg	コピー元の末尾の次を指す反復子またはコピーする要素数
-  \param out	コピー先の先頭を指す反復子
-  \return	コピー先の末尾の次
-*/
-template <size_t N, class IN, class ARG, class OUT> inline OUT
-copy(IN in, ARG arg, OUT out)
-{
-#ifdef TU_DEBUG
-  //#if 0
-    std::cout << "copy<" << N << "> ["
-	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
-#endif
-    return detail::copy(in, arg, out, std::integral_constant<size_t, N>());
-}
-    
-//! 指定された範囲を与えられた値で埋める
-/*!
-  N != 0 の場合，Nで指定した要素数だけ埋め，argは無視．
-  N = 0 の場合，ARG = INなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
-  \param begin	埋める範囲の先頭を指す反復子
-  \param arg	埋める範囲の末尾の次を指す反復子または埋める要素数
-  \param val	埋める値
-*/
-template <size_t N, class ITER, class ARG, class T> inline void
-fill(ITER begin, ARG arg, const T& val)
-{
-    return detail::fill(begin, arg, val, std::integral_constant<size_t, N>());
-}
-    
 //! 指定された範囲の各要素に関数を適用する
 /*!
   N != 0 の場合，Nで指定した要素数だけ適用し，argは無視．
@@ -299,6 +242,20 @@ for_each(ITER begin, ARG arg, FUNC func)
 {
     return detail::for_each(begin, arg, func,
 			    std::integral_constant<size_t, N>());
+}
+    
+//! 指定された範囲を与えられた値で埋める
+/*!
+  N != 0 の場合，Nで指定した要素数だけ埋め，argは無視．
+  N = 0 の場合，ARG = INなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  \param begin	埋める範囲の先頭を指す反復子
+  \param arg	埋める範囲の末尾の次を指す反復子または埋める要素数
+  \param val	埋める値
+*/
+template <size_t N, class ITER, class ARG, class T> inline void
+fill(ITER begin, ARG arg, const T& val)
+{
+    for_each<N>(begin, arg, [&val](auto&& iter){ *iter = val; });
 }
     
 //! 指定された2つの範囲の各要素に2変数関数を適用する
@@ -315,6 +272,26 @@ for_each(ITER0 begin0, ARG arg, ITER1 begin1, FUNC func)
 {
     return detail::for_each(begin0, arg, begin1, func,
 			    std::integral_constant<size_t, N>());
+}
+    
+//! 指定された範囲をコピーする
+/*!
+  N != 0 の場合，Nで指定した要素数をコピーし，argは無視．
+  N = 0 の場合，ARG = INならコピー元の末尾の次を，ARG = size_tなら要素数をargで指定，
+  \param in	コピー元の先頭を指す反復子
+  \param arg	コピー元の末尾の次を指す反復子またはコピーする要素数
+  \param out	コピー先の先頭を指す反復子
+  \return	コピー先の末尾の次
+*/
+template <size_t N, class IN, class ARG, class OUT> inline void
+copy(IN in, ARG arg, OUT out)
+{
+#ifdef TU_DEBUG
+  //#if 0
+    std::cout << "copy<" << N << "> ["
+	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
+#endif
+    for_each<N>(in, arg, out, [](auto i, auto o){ *o = *i; });
 }
     
 //! 指定された範囲の内積の値を返す
@@ -346,8 +323,7 @@ inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init)
   \param arg	適用範囲の末尾の次を指す反復子または要素数
   \return	2乗和の値
 */
-template <size_t N, class ITER, class ARG>
-inline typename std::iterator_traits<ITER>::value_type
+template <size_t N, class ITER, class ARG> inline auto
 square(ITER begin, ARG arg)
 {
     return detail::square(begin, arg, std::integral_constant<size_t, N>());
