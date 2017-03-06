@@ -10,6 +10,408 @@
 namespace TU
 {
 /************************************************************************
+*  evaluation of opnodes						*
+************************************************************************/
+namespace detail
+{
+  template <class E, bool=is_opnode<E>::value>
+  struct result_t
+  {
+      using type = E;		// E が opnode でなければ E そのもの
+  };
+  template <class E>
+  struct result_t<E, true>
+  {
+    private:
+      template <class T_, size_t SIZE_>
+      struct array_t
+      {
+	  using type = array<T_, std::allocator<T_>, SIZE_>;
+      };
+      template <class T_, size_t SIZE_, size_t... SIZES_>
+      struct array_t<array<T_, std::allocator<T_>, SIZES_...>, SIZE_>
+      {
+	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
+      };
+
+    public:
+      using type = typename array_t<typename result_t<TU::value_t<E> >::type,
+				    size0<E>()>::type;
+  };
+}	// namespace detail
+
+//! 演算子の評価結果の型を返す
+/*!
+  Eの型が演算子ならばその評価結果である配列の型を，そうでなければEそのものを返す
+  \param E	配列式の型
+*/
+template <class E>
+using result_t	= typename detail::result_t<E>::type;
+
+//! 配列式の評価結果を返す
+/*!
+  \param expr	配列式
+  \return	exprが演算子ならばその評価結果である配列を，そうでなければ
+		expr自体の参照を返す
+*/
+template <class E>
+inline std::conditional_t<detail::is_opnode<E>::value, result_t<E>, const E&>
+evaluate(const E& expr)
+{
+    return expr;
+}
+    
+/************************************************************************
+*  products of two ranges						*
+************************************************************************/
+namespace detail
+{
+  //! 2つの配列式に対する積演算子を表すクラス
+  /*!
+    \param OP	積演算子の型
+    \param L	積演算子の第1引数となる式の型
+    \param R	積演算子の第2引数となる式の型
+   */
+  template <class OP, class L, class R>
+  class product_opnode : public opnode
+  {
+    private:
+      class binder2nd
+      {
+	private:
+	// 右辺が opnode の場合：その評価結果
+	// 右辺が opnode でない場合：
+	//	右辺が range<ITER, SIZE> に変換可能ならば右辺そのもの
+	//	そうでなければそれへの定数参照
+	  using cache_t	= std::conditional_t<is_opnode<R>::value ||
+					     is_range<R>::value,
+					     const TU::result_t<R>, const R&>;
+
+	public:
+		binder2nd(OP op, const R& r)
+		    :_r(evaluate(r)), _op(op) 		{}
+
+	  template <class T_>
+	  auto	operator ()(const T_& arg)	const	{ return _op(arg, _r); }
+
+	private:
+	  cache_t	_r;	// 評価後に固定された第2引数
+	  const OP	_op;
+      };
+
+    public:
+    // transform_iterator への第1テンプレートパラメータを，binder2nd そのもの
+    // ではなく，それへの定数参照とすることにより cache のコピーを防ぐ
+      using iterator = boost::transform_iterator<const binder2nd&,
+						 const_iterator_t<L> >;
+      
+    public:
+		product_opnode(const L& l, const R& r, OP op)
+		    :_l(l), _binder(op, r)				{}
+
+      constexpr static size_t
+		size0()		{ return TU::size0<L>(); }
+      iterator	begin()	const	{ return {std::begin(_l), _binder}; }
+      iterator	end()	const	{ return {std::end(_l),   _binder}; }
+      size_t	size()	const	{ return std::size(_l); }
+      auto	operator [](size_t i) const
+		{
+		    return *(begin() + i);
+		}
+
+    private:
+      argument_t<L>	_l;
+      const binder2nd	_binder;
+  };
+
+  template <class OP, class L, class R> inline product_opnode<OP, L, R>
+  make_product_opnode(const L& l, const R& r, OP op)
+  {
+      return {l, r, op};
+  }
+
+  struct bit_xor
+  {
+      template <class X_, class Y_>
+      auto	operator ()(const X_& x, const Y_& y) const
+		{
+		    return x ^ y;
+		}
+  };
+}	// namespace detail
+
+//! 2つの1次元配列式の内積をとる.
+/*!
+  演算子ノードではなく，評価結果のスカラー値が返される.
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	内積の評価結果
+*/
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 1>* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    using value_type = std::common_type_t<value_t<L>, value_t<R> >;
+
+    assert(size<0>(l) == size<0>(r));
+    constexpr size_t	S = detail::max<size0<L>(),size0<R>()>::value;
+    return inner_product<S>(std::begin(l), std::size(l), std::begin(r),
+			    value_type(0));
+}
+
+//! 2次元配列式と1または2次元配列式の積をとる.
+/*!
+  \param l	左辺の2次元配列式
+  \param r	右辺の1または2次元配列式
+  \return	積を表す演算子ノード
+*/
+template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
+					     rank<R>() >= 1 &&
+					     rank<R>() <= 2>* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
+					     { return x * y; });
+}
+
+//! 1次元配列式と2次元配列式の積をとる.
+/*!
+  \param l	左辺の1次元配列式
+  \param r	右辺の2次元配列式
+  \return	積を表す演算子ノード
+*/
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2>* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    constexpr size_t	S = size0<value_t<R> >();
+    return detail::make_product_opnode(
+      	       make_range<S>(column_begin(r), size<1>(r)), l,
+	       [](const auto& x, const auto& y){ return x * y; });
+}
+    
+//! 2つの1次元配列式の外積をとる.
+/*!
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	外積を表す演算子ノード
+*/
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 1>* = nullptr>
+inline auto
+operator %(const L& l, const R& r)
+{
+    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
+					     { return x * y; });
+}
+
+//! 2つの1次元配列式のベクトル積をとる.
+/*!
+  演算子ノードではなく，評価結果の3次元配列が返される.
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	ベクトル積
+*/
+template <class L, class R>
+inline std::enable_if_t<rank<L>() == 1 && rank<R>() == 1,
+			Array<std::common_type_t<element_t<L>, element_t<R> >,
+			      3> >
+operator ^(const L& l, const R& r)
+{
+#ifdef TU_DEBUG
+    std::cout << "operator ^ [" << print_sizes(l) << ']' << std::endl;
+#endif
+    assert(size<0>(l) == 3 && size<0>(r) == 3);
+    
+    const auto&	el = evaluate(l);
+    const auto&	er = evaluate(r);
+
+    return {el[1] * er[2] - el[2] * er[1],
+	    el[2] * er[0] - el[0] * er[2],
+	    el[0] * er[1] - el[1] * er[0]};
+}
+
+//! 2次元配列式の各行と1次元配列式のベクトル積をとる.
+/*!
+  \param l	左辺の2次元配列式
+  \param r	右辺の1次元配列式
+  \return	ベクトル積を表す演算子ノード
+*/
+template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
+					     rank<R>() == 1>* = nullptr>
+inline auto
+operator ^(const L& l, const R& r)
+{
+    return detail::make_product_opnode(l, r, detail::bit_xor());
+}
+
+/************************************************************************
+*  generic algorithms for vectors					*
+************************************************************************/
+//! 3次元ベクトルから3x3反対称行列を生成する．
+/*!
+  \return	生成された反対称行列，すなわち
+  \f[
+    \TUskew{u}{} \equiv
+    \TUbeginarray{ccc}
+      & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
+    \TUendarray
+  \f]
+  \throw std::invalid_argument	3次元ベクトルでない場合に送出
+*/
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
+skew(const E& expr)
+{
+    using result_t = Array2<element_t<E>, 3, 3>;
+    
+    assert(size<0>(expr) != 3);
+
+    const auto&	a = evaluate(expr);
+    return result_t({{0, -a[2], a[1]}, {a[2], 0, -a[0]}, {-a[1], a[0], 0}});
+}
+
+//! 非同次座標を表すベクトルに対し，値1を持つ成分を最後に付加した同次座標ベクトルを返す．
+/*!
+  \return	同次化されたベクトル
+*/
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
+homogeneous(const E& expr)
+{
+    constexpr size_t	N = size0<E>();
+    using element_type	= element_t<E>;
+    using result_type	= std::conditional_t<N == 0,
+					     Array<element_type, 0>,
+					     Array<element_type, N+1> >;
+
+    const auto	n = std::size(expr);
+    result_type	r(n + 1);
+    slice(r, 0, n) = expr;
+    r[n]	   = 1;
+    return r;
+}
+
+//! 同次座標を表すベクトルに対し，各成分を最後の成分で割った非同次座標ベクトルを返す．
+/*!
+  \return	非同次化されたベクトル
+*/
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
+inhomogeneous(const E& expr)
+{
+    constexpr size_t	N = size0<E>();
+    using element_type	= element_t<E>;
+    using result_type	= std::conditional_t<N == 0,
+					     Array<element_type, 0>,
+					     Array<element_type, N-1> >;
+
+    const auto	n = std::size(expr) - 1;
+    return result_type(slice(expr, 0, n) / expr[n]);
+}
+
+/************************************************************************
+*  generic algorithms for matrices					*
+************************************************************************/
+//! 全て同一の対角成分値を持つ正方行列を生成する．
+/*!
+  \param c	対角成分の値
+  \return	対角行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
+*/
+template <size_t N=0, class T> auto
+diag(T c, size_t n=N)
+{
+    Array2<T, N, N>	a(n, n);
+    for (size_t i = 0; i != a.size(); ++i)
+	a[i][i] = c;
+    return std::move(a);
+}
+
+//! 正方行列のtraceを返す．
+/*!
+  \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
+  \throw std::invalid_argument	正方行列でない場合に送出
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+trace(const E& expr)
+{
+    assert(size<0>(expr) != size<1>(expr));
+
+    element_t<E>	val = 0;
+    for (size_t i = 0; i < std::size(expr); ++i)
+	val += expr[i][i];
+    return val;
+}
+
+//! 正値対称行列のCholesky分解（上半三角行列）を返す．
+/*!
+  計算においては，もとの行列の上半部分しか使わない
+  \param A	正値対称行列
+  \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$なる
+		\f$\TUtvec{L}{}\f$（上半三角行列）
+  \throw std::invalid_argument	正方行列でない場合に送出
+  \throw std::runtime_error	正値でない場合に送出
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+cholesky(const E& A)
+{
+    if (size<0>(A) != size<1>(A))
+        throw std::invalid_argument("TU::cholesky(): not square matrix!!");
+
+    Array2<element_t<E>, size0<E>(), size0<E>()>	Lt(A);
+    for (size_t i = 0; i < Lt.nrow(); ++i)
+    {
+	const auto	Li = Lt[i];
+	auto		d = Li[i];
+	if (d <= 0)
+	    throw std::runtime_error("TU::cholesky(): not positive definite matrix!!");
+	for (size_t j = 0; j < i; ++j)
+	    Li[j] = 0;
+	Li[i] = d = std::sqrt(d);
+	for (size_t j = i + 1; j < Li.size(); ++j)
+	    Li[j] /= d;
+	for (size_t j = i + 1; j < Lt.nrow(); ++j)
+	    for (size_t k = j; k < Li.size(); ++k)
+		Lt[j][k] -= (Li[j] * Li[k]);
+    }
+    
+    return std::move(Lt);
+}
+
+//! 正方行列の下半三角部分を上半三角部分にコピーして対称化する．
+/*!
+    \return	この行列
+*/
+template <class T, size_t N> Array2<T, N, N>&
+symmetrize(Array2<T, N, N>& a)
+{
+    assert(a.nrow() == a.ncol());
+    
+    for (size_t i = 0; i < a.nrow(); ++i)
+	for (size_t j = 0; j < i; ++j)
+	    a[j][i] = a[i][j];
+    return a;
+}
+
+//! この行列の下半三角部分の符号を反転し，上半三角部分にコピーして反対称化する．
+/*!
+    \return	この行列
+*/
+template <class T, size_t N> Array2<T, N, N>&
+antisymmetrize(Array2<T, N, N>& a)
+{
+    assert(a.nrow() == a.ncol());
+    
+    for (size_t i = 0; i < a.nrow(); ++i)
+    {
+	a[i][i] = 0.0;
+	for (size_t j = 0; j < i; ++j)
+	    a[j][i] = -a[i][j];
+    }
+    return a;
+}
+
+/************************************************************************
 *  class LUDecomposition<T, N>						*
 ************************************************************************/
 //! 正方行列のLU分解を表すクラス
@@ -149,6 +551,111 @@ LUDecomposition<T, N>::substitute(E_&& b) const
     return b;
 }
 
+/************************************************************************
+*  generic algorithms using LUDecomposition<T, N>			*
+************************************************************************/
+//! 行列の行列式を返す．
+/*!
+  \param A	正方行列
+  \return	行列式，すなわち\f$\det\TUvec{A}{}\f$
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
+det(const E& A)
+{
+    return LUDecomposition<element_t<E>, size0<E>()>(A).det();
+}
+
+//! 行列の小行列式を返す．
+/*!
+  \param A	正方行列
+  \param p	元の行列から取り除く行を指定するindex
+  \param q	元の行列から取り除く列を指定するindex
+  \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+det(const E& A, size_t p, size_t q)
+{
+    const auto&			A_ = evaluate(A);
+    Array2<element_t<E> >	D(A_.nrow()-1, A_.ncol()-1);
+    for (size_t i = 0; i < p; ++i)
+    {
+	for (size_t j = 0; j < q; ++j)
+	    D[i][j] = A_[i][j];
+	for (size_t j = q; j < D.ncol(); ++j)
+	    D[i][j] = A_[i][j+1];
+    }
+    for (size_t i = p; i < D.nrow(); ++i)
+    {
+	for (size_t j = 0; j < q; ++j)
+	    D[i][j] = A_[i+1][j];
+	for (size_t j = q; j < D.ncol(); ++j)
+	    D[i][j] = A_[i+1][j+1];
+    }
+    return det(D);
+}
+
+//! 行列の余因子行列を返す．
+/*!
+  \param A	正方行列
+  \return	余因子行列，すなわち
+		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+adjoint(const E& A)
+{
+    constexpr size_t		N = size0<E>();
+    Array2<element_t<E>, N, N>	val(size<0>(A), size<1>(A));
+    for (size_t i = 0; i < val.nrow(); ++i)
+	for (size_t j = 0; j < val.ncol(); ++j)
+	    val[i][j] = ((i + j) % 2 ? -det(A, j, i) : det(A, j, i));
+    return std::move(val);
+}
+
+//! 連立1次方程式を解く．
+/*!
+  \param A	正則な正方行列
+  \return	\f$\TUtvec{b}{} = \TUtvec{x}{}\TUvec{A}{}\f$
+		の解ベクトル，すなわち \f$\TUtvec{b}{}\TUinv{A}{}\f$
+*/
+template <class E, class F>
+inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 1, F&>
+solve(const E& A, F&& b)
+{
+    return LUDecomposition<element_t<E>, size0<E>()>(A).substitute(b);
+}
+
+//! 連立1次方程式を解く．
+/*!
+  \param A	正則な正方行列
+  \param B	行列
+  \return	\f$\TUvec{B}{} = \TUvec{X}{}\TUvec{A}{}\f$
+		の解を納めた行列，すなわち	\f$\TUvec{B}{}\TUinv{A}{}\f$
+*/
+template <class E, class F>
+inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 2, F&>
+solve(const E& A, F&& B)
+{
+    LUDecomposition<element_t<E>, size0<E>()>	lu(A);
+    for_each<size0<std::decay_t<F> >()>(std::begin(B), std::size(B),
+					[&lu](auto&& b){ lu.substitute(b); });
+    return B;
+}
+    
+//! 行列の逆行列を返す．
+/*!
+  \param A	正則な正方行列
+  \return	逆行列，すなわち\f$\TUinv{A}{}\f$
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
+inverse(const E& A)
+{
+    using	element_type = element_t<E>;
+    
+    constexpr size_t		N = size0<E>();
+    Array2<element_type, N, N>	B = diag<N>(element_type(1), std::size(A));
+    return std::move(solve(A, B));
+}
+    
 /************************************************************************
 *  class Householder<T>							*
 ************************************************************************/
@@ -769,6 +1276,62 @@ TriDiagonal<T>::initialize_rotation(size_t m, size_t n, T& x, T& y) const
 }
 
 /************************************************************************
+*  generic algorithms using TriDiagonal<T>				*
+************************************************************************/
+//! 対称行列の固有値と固有ベクトルを返す．
+/*!
+  \param A	対称行列 
+  \param evals	固有値が返される
+  \param abs	固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
+		並べるならfalse
+  \return	各行が固有ベクトルから成る回転行列，すなわち
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
+		\f]
+		なる\f$\TUtvec{U}{}\f$
+*/
+template <class E, class F,
+	  std::enable_if_t<rank<E>() == 2 &&
+			   rank<std::decay_t<F> >() == 1>* = nullptr> auto
+eigen(const E& A, F&& evals, bool abs=true)
+{
+    TriDiagonal<element_t<E> >	tri(A);
+    tri.diagonalize(abs);
+    return tri.move(evals);
+}
+
+//! 対称行列の一般固有値と一般固有ベクトルを返す．
+/*!
+  \param A	対称行列 
+  \param BB	Aと同一サイズの正値対称行列
+  \param evals	一般固有値が返される
+  \param abs	一般固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
+		並べるならfalse
+  \return	各行が一般固有ベクトルから成る正則行列
+		（ただし直交行列ではない），すなわち
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{B}{}\TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
+		\f]
+		なる\f$\TUtvec{U}{}\f$
+*/
+template <class E, class F, class G,
+	  std::enable_if_t<rank<E>() == 2 &&
+			   rank<F>() == 2 &&
+			   rank<std::decay_t<G> >() == 1>* = nullptr> auto
+geigen(const E& A, const F& BB, G&& evals, bool abs=true)
+{
+    const auto	Ltinv = inverse(BB.cholesky());
+    const auto	Linv  = transpose(Ltinv);
+    return std::move(evaluate(eigen(Linv * A * Ltinv, evals, abs) * Linv));
+}
+
+/************************************************************************
 *  class BiDiagonal<T>							*
 ************************************************************************/
 //! 一般行列の2重対角化を表すクラス
@@ -1107,168 +1670,39 @@ class SVDecomposition : private BiDiagonal<T>
 };
 
 /************************************************************************
-*  generic algorithms for vectors					*
+*  generic algorithms using SVDecomposition<T>				*
 ************************************************************************/
-//! 3次元ベクトルから3x3反対称行列を生成する．
+//! この行列の疑似逆行列を返す．
 /*!
-  \return	生成された反対称行列，すなわち
-  \f[
-    \TUskew{u}{} \equiv
-    \TUbeginarray{ccc}
-      & -u_2 & u_1 \\ u_2 & & -u_0 \\ -u_1 & u_0 &
-    \TUendarray
-  \f]
-  \throw std::invalid_argument	3次元ベクトルでない場合に送出
-*/
-template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
-skew(const E& expr)
-{
-    using result_t = Array2<element_t<E>, 3, 3>;
-    
-    assert(size<0>(expr) != 3);
-
-    const auto&	a = evaluate(expr);
-    return result_t({{0, -a[2], a[1]}, {a[2], 0, -a[0]}, {-a[1], a[0], 0}});
-}
-
-//! 非同次座標を表すベクトルに対し，値1を持つ成分を最後に付加した同次座標ベクトルを返す．
-/*!
-  \return	同次化されたベクトル
-*/
-template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
-homogeneous(const E& expr)
-{
-    constexpr size_t	N = size0<E>();
-    using element_type	= element_t<E>;
-    using result_type	= std::conditional_t<N == 0,
-					     Array<element_type, 0>,
-					     Array<element_type, N+1> >;
-
-    const auto	n = std::size(expr);
-    result_type	r(n + 1);
-    slice(r, 0, n) = expr;
-    r[n]	   = 1;
-    return r;
-}
-
-//! 同次座標を表すベクトルに対し，各成分を最後の成分で割った非同次座標ベクトルを返す．
-/*!
-  \return	非同次化されたベクトル
-*/
-template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
-inhomogeneous(const E& expr)
-{
-    constexpr size_t	N = size0<E>();
-    using element_type	= element_t<E>;
-    using result_type	= std::conditional_t<N == 0,
-					     Array<element_type, 0>,
-					     Array<element_type, N-1> >;
-
-    const auto	n = std::size(expr) - 1;
-    return result_type(slice(expr, 0, n) / expr[n]);
-}
-
-/************************************************************************
-*  generic algorithms for matrices					*
-************************************************************************/
-//! 全て同一の対角成分値を持つ正方行列を生成する．
-/*!
-  \param c	対角成分の値
-  \return	対角行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
-*/
-template <size_t N=0, class T> auto
-diag(T c, size_t n=N)
-{
-    Array2<T, N, N>	a(n, n);
-    for (size_t i = 0; i != a.size(); ++i)
-	a[i][i] = c;
-    return std::move(a);
-}
-
-//! 正方行列のtraceを返す．
-/*!
-  \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
-  \throw std::invalid_argument	正方行列でない場合に送出
+  \param cndnum	最大特異値に対する絶対値の割合がこれに達しない基底は無視
+  \return	疑似逆行列，すなわち与えられた行列の特異値分解を
+		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
+		\TUtvec{U}{}\f$とすると
+		\f[
+		  \TUvec{u}{0}\sigma_0^{-1}\TUtvec{v}{0} + \cdots +
+		  \TUvec{u}{r}\sigma_{r-1}^{-1}\TUtvec{v}{r-1},
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUabs{\sigma_1} > \epsilon\TUabs{\sigma_0},\ldots,
+		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
+		\f]
 */
 template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
-trace(const E& expr)
+pseudo_inverse(const E& A, element_t<E> cndnum=1.0e5)
 {
-    assert(size<0>(expr) != size<1>(expr));
+    using element_type	= element_t<E>;
+    
+    SVDecomposition<element_type>	svd(A);
+    Array2<element_type>		val(svd.ncol(), svd.nrow());
 
-    element_t<E>	val = 0;
-    for (size_t i = 0; i < std::size(expr); ++i)
-	val += expr[i][i];
+    for (size_t i = 0; i < svd.diagonal().size(); ++i)
+	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
+	    val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
     return val;
 }
 
-//! 正値対称行列のCholesky分解（上半三角行列）を返す．
-/*!
-  計算においては，もとの行列の上半部分しか使わない
-  \param A	正値対称行列
-  \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$なる
-		\f$\TUtvec{L}{}\f$（上半三角行列）
-  \throw std::invalid_argument	正方行列でない場合に送出
-  \throw std::runtime_error	正値でない場合に送出
-*/
-template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
-cholesky(const E& A)
-{
-    if (size<0>(A) != size<1>(A))
-        throw std::invalid_argument("TU::cholesky(): not square matrix!!");
-
-    Array2<element_t<E>, size0<E>(), size0<E>()>	Lt(A);
-    for (size_t i = 0; i < Lt.nrow(); ++i)
-    {
-	const auto	Li = Lt[i];
-	auto		d = Li[i];
-	if (d <= 0)
-	    throw std::runtime_error("TU::cholesky(): not positive definite matrix!!");
-	for (size_t j = 0; j < i; ++j)
-	    Li[j] = 0;
-	Li[i] = d = std::sqrt(d);
-	for (size_t j = i + 1; j < Li.size(); ++j)
-	    Li[j] /= d;
-	for (size_t j = i + 1; j < Lt.nrow(); ++j)
-	    for (size_t k = j; k < Li.size(); ++k)
-		Lt[j][k] -= (Li[j] * Li[k]);
-    }
-    
-    return std::move(Lt);
-}
-
-//! 正方行列の下半三角部分を上半三角部分にコピーして対称化する．
-/*!
-    \return	この行列
-*/
-template <class T, size_t N> Array2<T, N, N>&
-symmetrize(Array2<T, N, N>& a)
-{
-    assert(a.nrow() == a.ncol());
-    
-    for (size_t i = 0; i < a.nrow(); ++i)
-	for (size_t j = 0; j < i; ++j)
-	    a[j][i] = a[i][j];
-    return a;
-}
-
-//! この行列の下半三角部分の符号を反転し，上半三角部分にコピーして反対称化する．
-/*!
-    \return	この行列
-*/
-template <class T, size_t N> Array2<T, N, N>&
-antisymmetrize(Array2<T, N, N>& a)
-{
-    assert(a.nrow() == a.ncol());
-    
-    for (size_t i = 0; i < a.nrow(); ++i)
-    {
-	a[i][i] = 0.0;
-	for (size_t j = 0; j < i; ++j)
-	    a[j][i] = -a[i][j];
-    }
-    return a;
-}
-
+/************************************************************************
+*  generic algorithms concerning with rotations				*
+************************************************************************/
 //! この3次元回転行列から各軸周りの回転角を取り出す．
 /*!
   この行列を\f$\TUtvec{R}{}\f$とすると，
@@ -1541,198 +1975,6 @@ rotation(const E& v)
 	const T	c = std::cos(theta), s = std::sin(theta);
 	return rotation(v / theta, c, s);
     }
-}
-
-/************************************************************************
-*  generic algorithms using LUDecomposition<T, N>			*
-************************************************************************/
-//! 行列の行列式を返す．
-/*!
-  \param A	正方行列
-  \return	行列式，すなわち\f$\det\TUvec{A}{}\f$
-*/
-template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
-det(const E& A)
-{
-    return LUDecomposition<element_t<E>, size0<E>()>(A).det();
-}
-
-//! 行列の小行列式を返す．
-/*!
-  \param A	正方行列
-  \param p	元の行列から取り除く行を指定するindex
-  \param q	元の行列から取り除く列を指定するindex
-  \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
-*/
-template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
-det(const E& A, size_t p, size_t q)
-{
-    const auto&			A_ = evaluate(A);
-    Array2<element_t<E> >	D(A_.nrow()-1, A_.ncol()-1);
-    for (size_t i = 0; i < p; ++i)
-    {
-	for (size_t j = 0; j < q; ++j)
-	    D[i][j] = A_[i][j];
-	for (size_t j = q; j < D.ncol(); ++j)
-	    D[i][j] = A_[i][j+1];
-    }
-    for (size_t i = p; i < D.nrow(); ++i)
-    {
-	for (size_t j = 0; j < q; ++j)
-	    D[i][j] = A_[i+1][j];
-	for (size_t j = q; j < D.ncol(); ++j)
-	    D[i][j] = A_[i+1][j+1];
-    }
-    return det(D);
-}
-
-//! 行列の余因子行列を返す．
-/*!
-  \param A	正方行列
-  \return	余因子行列，すなわち
-		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
-*/
-template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
-adjoint(const E& A)
-{
-    constexpr size_t		N = size0<E>();
-    Array2<element_t<E>, N, N>	val(size<0>(A), size<1>(A));
-    for (size_t i = 0; i < val.nrow(); ++i)
-	for (size_t j = 0; j < val.ncol(); ++j)
-	    val[i][j] = ((i + j) % 2 ? -det(A, j, i) : det(A, j, i));
-    return std::move(val);
-}
-
-//! 連立1次方程式を解く．
-/*!
-  \param A	正則な正方行列
-  \return	\f$\TUtvec{b}{} = \TUtvec{x}{}\TUvec{A}{}\f$
-		の解ベクトル，すなわち \f$\TUtvec{b}{}\TUinv{A}{}\f$
-*/
-template <class E, class F>
-inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 1, F&>
-solve(const E& A, F&& b)
-{
-    return LUDecomposition<element_t<E>, size0<E>()>(A).substitute(b);
-}
-
-//! 連立1次方程式を解く．
-/*!
-  \param A	正則な正方行列
-  \param B	行列
-  \return	\f$\TUvec{B}{} = \TUvec{X}{}\TUvec{A}{}\f$
-		の解を納めた行列，すなわち	\f$\TUvec{B}{}\TUinv{A}{}\f$
-*/
-template <class E, class F>
-inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 2, F&>
-solve(const E& A, F&& B)
-{
-    LUDecomposition<element_t<E>, size0<E>()>	lu(A);
-    for_each<size0<std::decay_t<F> >()>(std::begin(B), std::size(B),
-					[&lu](auto&& b){ lu.substitute(b); });
-    return B;
-}
-    
-//! 行列の逆行列を返す．
-/*!
-  \param A	正則な正方行列
-  \return	逆行列，すなわち\f$\TUinv{A}{}\f$
-*/
-template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
-inverse(const E& A)
-{
-    using	element_type = element_t<E>;
-    
-    constexpr size_t		N = size0<E>();
-    Array2<element_type, N, N>	B = diag<N>(element_type(1), std::size(A));
-    return std::move(solve(A, B));
-}
-    
-/************************************************************************
-*  generic algorithms using TriDiagonal<T>				*
-************************************************************************/
-//! 対称行列の固有値と固有ベクトルを返す．
-/*!
-  \param A	対称行列 
-  \param evals	固有値が返される
-  \param abs	固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
-		並べるならfalse
-  \return	各行が固有ベクトルから成る回転行列，すなわち
-		\f[
-		  \TUvec{A}{}\TUvec{U}{} =
-		  \TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
-		\f]
-		なる\f$\TUtvec{U}{}\f$
-*/
-template <class E, class F,
-	  std::enable_if_t<rank<E>() == 2 &&
-			   rank<std::decay_t<F> >() == 1>* = nullptr> auto
-eigen(const E& A, F&& evals, bool abs=true)
-{
-    TriDiagonal<element_t<E> >	tri(A);
-    tri.diagonalize(abs);
-    return tri.move(evals);
-}
-
-//! 対称行列の一般固有値と一般固有ベクトルを返す．
-/*!
-  \param A	対称行列 
-  \param BB	Aと同一サイズの正値対称行列
-  \param evals	一般固有値が返される
-  \param abs	一般固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
-		並べるならfalse
-  \return	各行が一般固有ベクトルから成る正則行列
-		（ただし直交行列ではない），すなわち
-		\f[
-		  \TUvec{A}{}\TUvec{U}{} =
-		  \TUvec{B}{}\TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
-		\f]
-		なる\f$\TUtvec{U}{}\f$
-*/
-template <class E, class F, class G,
-	  std::enable_if_t<rank<E>() == 2 &&
-			   rank<F>() == 2 &&
-			   rank<std::decay_t<G> >() == 1>* = nullptr> auto
-geigen(const E& A, const F& BB, G&& evals, bool abs=true)
-{
-    const auto	Ltinv = inverse(BB.cholesky());
-    const auto	Linv  = transpose(Ltinv);
-    return std::move(evaluate(eigen(Linv * A * Ltinv, evals, abs) * Linv));
-}
-
-/************************************************************************
-*  generic algorithms using SVDecomposition<T>				*
-************************************************************************/
-//! この行列の疑似逆行列を返す．
-/*!
-  \param cndnum	最大特異値に対する絶対値の割合がこれに達しない基底は無視
-  \return	疑似逆行列，すなわち与えられた行列の特異値分解を
-		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
-		\TUtvec{U}{}\f$とすると
-		\f[
-		  \TUvec{u}{0}\sigma_0^{-1}\TUtvec{v}{0} + \cdots +
-		  \TUvec{u}{r}\sigma_{r-1}^{-1}\TUtvec{v}{r-1},
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \TUabs{\sigma_1} > \epsilon\TUabs{\sigma_0},\ldots,
-		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
-		\f]
-*/
-template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
-pseudo_inverse(const E& A, element_t<E> cndnum=1.0e5)
-{
-    using element_type	= element_t<E>;
-    
-    SVDecomposition<element_type>	svd(A);
-    Array2<element_type>		val(svd.ncol(), svd.nrow());
-
-    for (size_t i = 0; i < svd.diagonal().size(); ++i)
-	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
-	    val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
-    return val;
 }
 
 /************************************************************************

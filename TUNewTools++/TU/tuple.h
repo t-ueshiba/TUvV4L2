@@ -421,6 +421,12 @@ rend(TUPLE&& t)
   //				     t, [](auto&& x){ return rend(x); }));
 }
     
+template <class... T> inline size_t
+size(const tuple<T...>& t)
+{
+    return size(get<0>(t));
+}
+    
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/

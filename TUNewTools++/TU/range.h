@@ -1065,8 +1065,7 @@ namespace detail
   \param expr	式
   \return	符号反転演算子ノード
 */
-template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr>
-inline auto
+template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator -(const E& expr)
 {
     return detail::make_unary_opnode(expr, [](const auto& x){ return -x; });

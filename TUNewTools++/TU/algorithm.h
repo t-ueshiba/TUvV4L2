@@ -81,29 +81,6 @@ lcm(S m, T n, ARGS... args)
 
 namespace detail
 {
-  template <class IN, class OUT> inline OUT
-  copy(IN in, IN ie, OUT out, std::integral_constant<size_t, 0>)
-  {
-      return std::copy(in, ie, out);
-  }
-  template <class IN, class OUT> inline OUT
-  copy(IN in, size_t n, OUT out, std::integral_constant<size_t, 0>)
-  {
-      return std::copy_n(in, n, out);
-  }
-  template <class IN, class ARG, class OUT> inline OUT
-  copy(IN in, ARG, OUT out, std::integral_constant<size_t, 1>)
-  {
-      *out = *in;
-      return ++out;
-  }
-  template <class IN, class ARG, class OUT, size_t N> inline OUT
-  copy(IN in, ARG arg, OUT out, std::integral_constant<size_t, N>)
-  {
-      *out = *in;
-      return copy(++in, arg, ++out, std::integral_constant<size_t, N-1>());
-  }
-
   template <class ITER, class FUNC> inline FUNC
   for_each(ITER begin, ITER end, FUNC func, std::integral_constant<size_t, 0>)
   {
@@ -291,7 +268,7 @@ copy(IN in, ARG arg, OUT out)
     std::cout << "copy<" << N << "> ["
 	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
 #endif
-    for_each<N>(in, arg, out, [](auto i, auto o){ *o = *i; });
+    for_each<N>(in, arg, out, [](const auto& src, auto&& dst){ dst = src; });
 }
     
 //! 指定された範囲の内積の値を返す
