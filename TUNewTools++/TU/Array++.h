@@ -673,6 +673,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    save(out, begin(), size());
 		    return out;
 		}
+    std::ostream&
+		put(std::ostream& out) const
+		{
+		    for (const auto& val : *this)
+			out << ' ' << val;
+		    return out;
+		}
     
   private:
     using	sizes_iterator = typename sizes_type::iterator;
@@ -787,12 +794,11 @@ stride(const array<T, ALLOC, SIZE, SIZES...>& a)
   \param a	書き出す配列
   \return	outで指定した出力ストリーム
 */
-template <class T, class ALLOC, size_t SIZE, size_t... SIZES> std::ostream&
+template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
+inline std::ostream&
 operator <<(std::ostream& out, const array<T, ALLOC, SIZE, SIZES...>& a)
 {
-    for (const auto& val : a)
-	out << ' ' << val;
-    return out << std::endl;
+    return a.put(out) << std::endl;
 }
     
 //! 入力ストリームから配列を読み込む(ASCII)．
