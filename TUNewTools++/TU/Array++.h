@@ -185,6 +185,7 @@ class Buf : public BufTraits<T, ALLOC>
     constexpr static auto	stride()	{ return siz<I_>::value; }
     constexpr static auto	nrow()		{ return siz<0>::value; }
     constexpr static auto	ncol()		{ return siz<1>::value; }
+    constexpr static auto	capacity()	{ return Capacity; }
 
     auto	data()		{ return _a.data(); }
     auto	data()	const	{ return _a.data(); }
@@ -336,6 +337,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     auto	size()		const	{ return _sizes[I_]; }
     template <size_t I_=D-1>
     auto	stride()	const	{ return stride_impl(axis<I_>()); }
+    auto	capacity()	const	{ return _capacity; }
     auto	nrow()		const	{ return _sizes[0]; }
     auto	ncol()		const	{ return _sizes[1]; }
     auto	data()			{ return _p; }

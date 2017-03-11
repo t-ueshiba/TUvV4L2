@@ -87,6 +87,53 @@ crend(const T& x) -> decltype(std::rend(x))
 namespace TU
 {
 /************************************************************************
+*  make_mbr_iterator<ITER, T>						*
+************************************************************************/
+//! T型のメンバ変数を持つオブジェクトへの反復子からそのメンバに直接アクセスする反復子を作る．
+/*!
+  \param iter	ベースとなる反復子
+  \param mbr	iterが指すオブジェクトのメンバへのポインタ
+*/
+template <class ITER, class T> inline auto
+make_mbr_iterator(const ITER& iter,
+		  T std::iterator_traits<ITER>::value_type::* mbr)
+{
+    return boost::make_transform_iterator(
+	       iter,
+	       std::function<
+		   typename std::conditional<
+		       std::is_same<
+			   typename std::iterator_traits<ITER>::pointer,
+			   typename std::iterator_traits<ITER>::value_type*>
+			   ::value,
+	           T&, const T&>::type
+	       (typename std::iterator_traits<ITER>::reference)>(
+		   std::mem_fn(mbr)));
+}
+
+//! std::pairへの反復子からその第1要素に直接アクセスする反復子を作る．
+/*!
+  \param iter	ベースとなる反復子
+*/
+template <class ITER> inline auto
+make_first_iterator(const ITER& iter)
+{
+    return make_mbr_iterator(iter,
+			     &std::iterator_traits<ITER>::value_type::first);
+}
+    
+//! std::pairへの反復子からその第2要素に直接アクセスする反復子を作る．
+/*!
+  \param iter	ベースとなる反復子
+*/
+template <class ITER> inline auto
+make_second_iterator(const ITER& iter)
+{
+    return make_mbr_iterator(iter,
+			     &std::iterator_traits<ITER>::value_type::second);
+}
+    
+/************************************************************************
 *  transform_iterator2<FUNC, ITER0, ITER1>				*
 ************************************************************************/
 template <class FUNC, class ITER0, class ITER1>

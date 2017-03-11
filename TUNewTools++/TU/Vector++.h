@@ -267,7 +267,7 @@ skew(const E& expr)
 {
     using result_t = Array2<element_t<E>, 3, 3>;
     
-    assert(size<0>(expr) != 3);
+    assert(size<0>(expr) == 3);
 
     const auto&	a = evaluate(expr);
     return result_t({{0, -a[2], a[1]}, {a[2], 0, -a[0]}, {-a[1], a[0], 0}});
@@ -335,7 +335,7 @@ diag(T c, size_t n=N)
 template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
 trace(const E& expr)
 {
-    assert(size<0>(expr) != size<1>(expr));
+    assert(size<0>(expr) == size<1>(expr));
 
     element_t<E>	val = 0;
     for (size_t i = 0; i < std::size(expr); ++i)
@@ -531,8 +531,11 @@ LUDecomposition<T, N>::substitute(E_&& b) const
 {
     if (std::size(b) != size())
 	throw std::invalid_argument("TU::LUDecomposition<T>::substitute: Dimension of given vector is not equal to mine!!");
-    
-    auto	tmp = evaluate(b);
+
+  // tmpはbと異なる実体でなければならないので，
+  //     auto tmp = evaluate(b);
+  // ではダメ．
+    Array<T, N>	tmp = b;
     for (size_t j = 0; j < size(); ++j)
 	b[j] = tmp[_indices[j]];
 
