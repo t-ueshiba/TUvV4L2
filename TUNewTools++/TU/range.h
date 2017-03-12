@@ -154,7 +154,7 @@ template <class E>
 constexpr std::enable_if_t<!has_size0<E>::value, size_t>
 size0()
 {
-    return 0;
+    return 1;
 }
 template <class E>
 constexpr std::enable_if_t<has_size0<E>::value, size_t>

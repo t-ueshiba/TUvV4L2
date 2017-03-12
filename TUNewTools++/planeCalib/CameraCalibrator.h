@@ -53,7 +53,7 @@ class ReferencePlane
     typedef Vector<element_type>			vector_type;
     typedef Matrix<element_type>			matrix_type;
     typedef Matrix<element_type, 3, 3>			matrix33_type;
-    typedef HyperPlane<Vector<element_type, 4> >	plane_type;
+    typedef PlaneP<element_type>			plane_type;
     
   public:
   //! 参照平面を生成する．
@@ -237,7 +237,7 @@ class CameraCalibrator
     typedef Matrix<element_type, 3, 3>			matrix33_type;
 
   private:
-    typedef Normalize<element_type>			normalize_type;
+    typedef Normalize<element_type, 2>			normalize_type;
     
   private:
   //! #volumeCalibにおいて非線形最適化を行う場合にその二乗を最小化すべき再投影誤差関数
@@ -402,7 +402,7 @@ class CameraCalibrator
 template <class T> template <class Iter, class Cam> void
 CameraCalibrator<T>::volumeCalib(Iter begin, Iter end, Cam& camera, bool refine)
 {
-    Projectivity23d		map(begin, end, false);
+    Projectivity23<T>		map(begin, end, false);
     camera.setProjection(map);
 
     VolumeCost<Iter, Cam>	cost(begin, end);
@@ -550,7 +550,7 @@ CameraCalibrator<T>::computeCameraNormalizations(Iter begin, Iter end)
 
     for (auto iter = begin; iter != end; ++iter)	// 各参照平面について
 	for (size_t i = 0; i < iter->size(); ++i)	// 各カメラについて
-	    norms[i].update(make_second_iterator((*iter)[i].begin()),
+	    norms[i].insert(make_second_iterator((*iter)[i].begin()),
 			    make_second_iterator((*iter)[i].end()));
 
     return norms;
@@ -581,7 +581,7 @@ CameraCalibrator<T>::computePlaneNormalizations(Iter begin, Iter end)
     for (auto iter = begin; iter != end; ++iter)	// 各参照平面について
     {
 	for (size_t i = 0; i < iter->size(); ++i)	// 各カメラについて
-	    norms[j].update(make_first_iterator((*iter)[i].begin()),
+	    norms[j].insert(make_first_iterator((*iter)[i].begin()),
 			    make_first_iterator((*iter)[i].end()));
 	++j;
     }
@@ -630,7 +630,7 @@ CameraCalibrator<T>::computeHomographies(Iter begin, Iter end)
 	
 	for (size_t i = 0; i < ncameras; ++i)
 	{
-	    Projectivity22d	H((*iter)[i].begin(), (*iter)[i].end(), true);
+	    Projectivity22<T>	H((*iter)[i].begin(), (*iter)[i].end(), true);
 	    slice<3, 3>(W, 3*i, 3*j) = H;
 #ifdef _DEBUG
 	    cerr << "--- H" << i << j << " (RMS-err: "

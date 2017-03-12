@@ -34,9 +34,11 @@ namespace detail
 	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
       };
 
+      using E1	 = typename result_t<TU::value_t<E> >::type;
+      
     public:
-      using type = typename array_t<typename result_t<TU::value_t<E> >::type,
-				    size0<E>()>::type;
+      using type = typename array_t<E1,
+				    (size0<E1>() == 0 ? 0 : size0<E>())>::type;
   };
 }	// namespace detail
 
