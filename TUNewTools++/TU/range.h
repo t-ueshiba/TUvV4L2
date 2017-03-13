@@ -15,7 +15,7 @@ namespace TU
 /************************************************************************
 *  type aliases								*
 ************************************************************************/
-//! libTUTools++ のクラスや関数 の実相の詳細を収める名前空間
+//! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
 namespace detail
 {
   template <class E>
@@ -947,6 +947,13 @@ namespace detail
   template <size_t I, size_t J>
   using max = std::integral_constant<size_t, (I > J ? I : J)>;
 
+  template <class ITER, size_t SIZE>
+  static std::true_type		check_range(range<ITER, SIZE>)		;
+  static std::false_type	check_range(...)			;
+
+  template <class E>
+  using is_range = decltype(check_range(std::declval<E>()));
+
   /**********************************************************************
   *  struct opnode							*
   **********************************************************************/
@@ -959,13 +966,6 @@ namespace detail
   class opnode
   {
     protected:
-      template <class ITER_, size_t SIZE_>
-      static std::true_type	check_range(range<ITER_, SIZE_>)	;
-      static std::false_type	check_range(...)			;
-
-      template <class E_>
-      using is_range	= decltype(check_range(std::declval<E_>()));
-
       template <class E_>
       using argument_t	= std::conditional_t<is_opnode<E_>::value ||
 					     is_range<E_>::value,

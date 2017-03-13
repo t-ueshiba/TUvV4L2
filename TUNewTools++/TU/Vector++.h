@@ -44,11 +44,15 @@ namespace detail
 
 //! 演算子の評価結果の型を返す
 /*!
-  Eの型が演算子ならばその評価結果である配列の型を，そうでなければEそのものを返す
+  Eの型が演算子ならばその評価結果である配列の型を，rangeならばE自体を，
+  どちらでもなければEへの定数参照を返す
   \param E	配列式の型
 */
 template <class E>
-using result_t	= typename detail::result_t<E>::type;
+using result_t	= std::conditional_t<detail::is_opnode<E>::value ||
+				     detail::is_range<E>::value,
+				     typename detail::result_t<E>::type,
+				     const E&>;
 
 //! 配列式の評価結果を返す
 /*!
@@ -56,8 +60,7 @@ using result_t	= typename detail::result_t<E>::type;
   \return	exprが演算子ならばその評価結果である配列を，そうでなければ
 		expr自体の参照を返す
 */
-template <class E>
-inline std::conditional_t<detail::is_opnode<E>::value, result_t<E>, const E&>
+template <class E> inline result_t<E>
 evaluate(const E& expr)
 {
     return expr;
@@ -80,25 +83,15 @@ namespace detail
     private:
       class binder2nd
       {
-	private:
-	// 右辺が opnode の場合：その評価結果
-	// 右辺が opnode でない場合：
-	//	右辺が range<ITER, SIZE> に変換可能ならば右辺そのもの
-	//	そうでなければそれへの定数参照
-	  using cache_t	= std::conditional_t<is_opnode<R>::value ||
-					     is_range<R>::value,
-					     const TU::result_t<R>, const R&>;
-
 	public:
-		binder2nd(OP op, const R& r)
-		    :_r(evaluate(r)), _op(op) 		{}
+	  binder2nd(OP op, const R& r)	:_r(r), _op(op)	{}
 
 	  template <class T_>
 	  auto	operator ()(const T_& arg)	const	{ return _op(arg, _r); }
 
 	private:
-	  cache_t	_r;	// 評価後に固定された第2引数
-	  const OP	_op;
+	  TU::result_t<R>	_r;	// 評価後に固定された第2引数
+	  const OP		_op;
       };
 
     public:

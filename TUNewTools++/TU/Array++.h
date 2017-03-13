@@ -525,26 +525,37 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     array&	operator =(const array&)	= default;
 		array(array&&)			= default;
     array&	operator =(array&&)		= default;
-    
+
+
     template <class... SIZES_,
-	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
+	      std::enable_if_t<
+		  sizeof...(SIZES_) == D &&
+		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+	      = nullptr>
     explicit	array(SIZES_... sizes)
 		    :super({to_size(sizes)...})
 		{
 		}
-    template <class... SIZES_> std::enable_if_t<sizeof...(SIZES_) == D>
+    template <class... SIZES_>
+    std::enable_if_t<sizeof...(SIZES_) == D &&
+		     all<std::is_integral, std::tuple<SIZES_...> >::value>
 		resize(SIZES_... sizes)
 		{
 		    super::resize({to_size(sizes)...});
 		}
     
     template <class... SIZES_,
-	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
+	      std::enable_if_t<
+		  sizeof...(SIZES_) == D &&
+		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+	      = nullptr>
     explicit	array(size_t unit, SIZES_... sizes)
 		    :super({to_size(sizes)...}, to_stride(unit, sizes...))
 		{
 		}
-    template <class... SIZES_> std::enable_if_t<sizeof...(SIZES_) == D>
+    template <class... SIZES_>
+    std::enable_if_t<sizeof...(SIZES_) == D &&
+		     all<std::is_integral, std::tuple<SIZES_...> >::value>
 		resize(size_t unit, SIZES_... sizes)
 		{
 		    super::resize({to_size(sizes)...},

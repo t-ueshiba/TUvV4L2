@@ -15,20 +15,31 @@ namespace TU
 /************************************************************************
 *  predicate is_tuple<T>, is_range_tuple<T>				*
 ************************************************************************/
+template <template <class> class PRED, class... T>
+struct all;
+template <template <class> class PRED>
+struct all<PRED, std::tuple<> >
+{
+    constexpr static bool	value = true;
+};
+template <template <class> class PRED, class HEAD, class... TAIL>
+struct all<PRED, std::tuple<HEAD, TAIL...> >
+{
+    constexpr static bool
+	value = (!PRED<HEAD>::value ?
+		 false : all<PRED, std::tuple<TAIL...> >::value);
+};
+
 namespace detail
 {
   template <class... T>
   std::tuple<T...>	check_tuple(std::tuple<T...>)			;
   void			check_tuple(...)				;
 
-  template <class... T, size_t... IDX> auto
-  check_range_tuple(std::tuple<T...> x, std::index_sequence<IDX...>)
-      -> decltype(std::make_tuple(std::begin(std::get<IDX>(x))...))	;
-  template <class... T> auto
-  check_range_tuple(std::tuple<T...> x)
-      -> decltype(check_range_tuple(x, std::index_sequence_for<T...>()));
-  void
-  check_range_tuple(...)						;
+  template <class E>
+  auto			has_begin(const E& x)
+			    -> decltype(std::begin(x), std::true_type());
+  std::false_type	has_begin(...)					;
 }	// namespace detail
     
 template <class T>
@@ -37,10 +48,9 @@ template <class T>
 using is_tuple	     = std::integral_constant<
 			   bool, !std::is_void<tuple_t<T> >::value>;
 template <class T>
-using range_tuple_t  = decltype(detail::check_range_tuple(std::declval<T>()));
+using has_begin	     = decltype(detail::has_begin(std::declval<T>()));
 template <class T>
-using is_range_tuple = std::integral_constant<
-			   bool, !std::is_void<range_tuple_t<T> >::value>;
+using is_range_tuple = all<has_begin, std::decay_t<T> >;
 
 /************************************************************************
 *  tuple_for_each(TUPLE, UNARY_FUNC)					*
