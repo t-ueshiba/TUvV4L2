@@ -142,7 +142,10 @@ namespace detail
   inner_product(ITER0 begin0, ITER0 end0, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, 0>)
   {
-      return std::inner_product(begin0, end0, begin1, init);
+      auto	val = init;
+      for (; begin0 != end0; ++begin0, ++begin1)
+	  val = std::fma(*begin0, *begin1, val);
+      return val;
   }
   template <class ITER0, class ITER1, class T> T
   inner_product(ITER0 begin0, size_t n, ITER1 begin1, const T& init,
@@ -150,20 +153,20 @@ namespace detail
   {
       auto	val = init;
       for (size_t i = 0; i != n; ++i, ++begin0, ++begin1)
-	  val += *begin0 * *begin1;
+	  val = std::fma(*begin0, *begin1, val);
       return val;
   }
   template <class ITER0, class ARG, class ITER1, class T> inline T
   inner_product(ITER0 begin0, ARG, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, 1>)
   {
-      return init + *begin0 * *begin1;
+      return std::fma(*begin0, *begin1, init);
   }
   template <class ITER0, class ARG, class ITER1, class T, size_t N> inline T
   inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, N>)
   {
-      const T	tmp = init + *begin0 * *begin1;
+      const T	tmp = std::fma(*begin0, *begin1, init);
       return inner_product(++begin0, arg, ++begin1, tmp,
 			   std::integral_constant<size_t, N-1>());
   }
