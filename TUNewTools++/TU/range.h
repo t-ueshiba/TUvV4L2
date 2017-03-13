@@ -150,14 +150,12 @@ using has_size0 = decltype(detail::has_size0(std::declval<E>()));
   \param E	式の型
   \return	最上位軸の静的な要素数(可変サイズの場合0)
  */
-template <class E>
-constexpr std::enable_if_t<!has_size0<E>::value, size_t>
+template <class E> constexpr std::enable_if_t<!has_size0<E>::value, size_t>
 size0()
 {
-    return 1;
+    return (is_tuple<E>::value ? 0 : 1);
 }
-template <class E>
-constexpr std::enable_if_t<has_size0<E>::value, size_t>
+template <class E> constexpr std::enable_if_t<has_size0<E>::value, size_t>
 size0()
 {
     return E::size0();
