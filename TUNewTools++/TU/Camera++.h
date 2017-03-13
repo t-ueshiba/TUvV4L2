@@ -60,7 +60,7 @@ class IntrinsicBase
     
     point2_type		u(const point2_type& x)			const	;
     point2_type		xFromU(const point2_type& u)		const	;
-    matrix22_type	Jx(const point2_type& x)		const	;
+    matrix22_type	jacobian(const point2_type& x)		const	;
 
     element_type	k()					const	;
     const point2_type&	u0()					const	;
@@ -171,7 +171,7 @@ IntrinsicBase<T>::xFromU(const point2_type& u) const
 		\f$
 */
 template <class T> inline typename IntrinsicBase<T>::matrix22_type
-IntrinsicBase<T>::Jx(const point2_type& x) const
+IntrinsicBase<T>::jacobian(const point2_type& x) const
 {
     return {{_k00, _k01}, {0, _k}};
 }
@@ -491,7 +491,7 @@ class IntrinsicWithFocalLength : public IntrinsicBase<T>
 			     element_type a=1, element_type s=0)	;
 
     using	super::u;
-    using	super::Jx;
+    using	super::jacobian;
     
     constexpr static size_t
 		dofIntrinsic()						;
@@ -584,7 +584,7 @@ class IntrinsicWithEuclideanImagePlane : public IntrinsicWithFocalLength<T>
 				     element_type a=1, element_type s=0);
 
     using	super::u;
-    using	super::Jx;
+    using	super::jacobian;
     
     constexpr static size_t
 		dofIntrinsic()						;
@@ -671,7 +671,7 @@ class Intrinsic : public IntrinsicBase<T>
     void	updateIntrinsic(const vector_type& dp)			;
 
     using	super::u;
-    using	super::Jx;
+    using	super::jacobian;
     
   protected:
     point2_type	u(const point2_type& x,
@@ -764,7 +764,7 @@ class IntrinsicWithDistortion : public I
     point2_type		u(const point2_type& x)			const	;
     point2_type		xd(const point2_type& x)		const	;
     point2_type		xFromU(const point2_type& u)		const	;
-    matrix22_type	Jx(const point2_type& x)		const	;
+    matrix22_type	jacobian(const point2_type& x)		const	;
     element_type	d1()					const	;
     element_type	d2()					const	;
     void		setDistortion(element_type d1, element_type d2)	;
@@ -871,13 +871,13 @@ IntrinsicWithDistortion<I>::xFromU(const point2_type& u) const
 		\f$
 */
 template <class I> inline typename IntrinsicWithDistortion<I>::matrix22_type
-IntrinsicWithDistortion<I>::Jx(const point2_type& x) const
+IntrinsicWithDistortion<I>::jacobian(const point2_type& x) const
 {
     const auto	sqr = x * x;
     const auto	tmp = 1 + sqr*(_d1 + sqr*_d2);
     const auto	J   = diag<2>(tmp) + ((2*_d1 + 4*sqr*_d2) * x) % x;
     
-    return super::Jx(xd(x)) * J;
+    return super::jacobian(xd(x)) * J;
 }
     
 //! 放射歪曲の第1係数を返す．
@@ -1081,9 +1081,9 @@ class CanonicalCamera
 		    const matrix33_type&
 			Rt={{1, 0, 0}, {0, 1, 0}, {0, 0, 1}})		;
 
-    point2_type		x(const point3_type& X,
-			  matrix_type* J=0, matrix_type* H=0)	const	;
-    matrix23_type	Jx(const point3_type& X)		const	;
+    point2_type		x(const point3_type& X, matrix_type* J=nullptr,
+			  matrix_type* H=nullptr)		const	;
+    matrix23_type	jacobian(const point3_type& X)		const	;
     matrix34_type	Pc()					const	;
     const point3_type&	t()					const	;
     const matrix33_type&
@@ -1206,7 +1206,7 @@ CanonicalCamera<T>::x(const point3_type& X,
 }
 
 template <class T> inline typename CanonicalCamera<T>::matrix23_type
-CanonicalCamera<T>::Jx(const point3_type& X) const
+CanonicalCamera<T>::jacobian(const point3_type& X) const
 {
     const point3_type	Xc = _Rt*(X - _t);
     const point2_type	x{{Xc[0]/Xc[2], Xc[1]/Xc[2]}};
@@ -1467,9 +1467,9 @@ class Camera : public CanonicalCamera<typename I::element_type>, public I
     Camera(const matrix34_type& P)					;
 
     point2_type		operator ()(const point3_type& X,
-				    matrix_type* J=0,
-				    matrix_type* H=0)		const	;
-    matrix23_type	Jx(const point3_type& X)		const	;
+				    matrix_type* J=nullptr,
+				    matrix_type* H=nullptr)	const	;
+    matrix23_type	jacobian(const point3_type& X)		const	;
     matrix34_type	P()					const	;
     void		setProjection(const matrix34_type& P)		;
 
@@ -1598,9 +1598,10 @@ Camera<I>::operator ()(const point3_type& X,
 }
 
 template <class I> inline typename Camera<I>::matrix23_type
-Camera<I>::Jx(const point3_type& X) const
+Camera<I>::jacobian(const point3_type& X) const
 {
-    return intrinsic_type::Jx(extrinsic_type::x(X)) * extrinsic_type::Jx(X);
+    return intrinsic_type::jacobian(extrinsic_type::x(X))
+	 * extrinsic_type::jacobian(X);
 }
 
 //! 3次元ユークリッド空間から画像平面への投影行列を求める．
@@ -1627,7 +1628,7 @@ Camera<I>::P() const
 template <class I> void
 Camera<I>::setProjection(const matrix34_type& P)
 {
-    typedef Vector<element_type, 3>	vector3_type;
+    using vector3_type = Vector<element_type, 3>;
 
     matrix33_type	K;		// camera intrinsic parameters.
     K[0]    = slice(P[2], 0, 3);

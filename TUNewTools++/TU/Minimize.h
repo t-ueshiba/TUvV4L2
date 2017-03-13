@@ -35,7 +35,7 @@ class NullConstraint
     vector_type	operator ()(const AT&)	const	{return vector_type(0);}
   //! 任意の引数に対して0x0行列を出力する．
     template <class AT>
-    matrix_type	jacobian(const AT&)	const	{return matrix_type(0, 0);}
+    matrix_type	derivative(const AT&)	const	{return matrix_type(0, 0);}
 };
 
 /************************************************************************
@@ -89,7 +89,7 @@ class ConstNormConstraint
     \param x	引数
     \return	1階微分値を収めた1xd行列(dはベクトル化された引数の次元)
   */
-    matrix_type	jacobian(const argument_type& x) const
+    matrix_type	derivative(const argument_type& x) const
 		{
 		    const auto	y = make_range(x.data(), x.capacity());
 		    matrix_type	L(1, y.size());
@@ -128,7 +128,7 @@ class ConstNormConstraint
 	Vector<F:element_type>	F::operator ()(const AT& x) const
      によって与えられる．
   -# 引数xを与えたときのヤコビアンは，メンバ関数
-	Matrix<F:element_type>	F::jacobian(const AT& x) const
+	Matrix<F:element_type>	F::J(const AT& x) const
      によって与えられる．
   -# メンバ関数
 	void	F::update(const AT& x, const Vector<F::element_type>& dx) const
@@ -143,7 +143,7 @@ class ConstNormConstraint
 	Vector<G:element_type>	G::operator ()(const AT& x) const
      によって与えられる．
   -# 引数xを与えたときのヤコビアンは，メンバ関数
-	Matrix<G::element_type>	G::jacobian(const AT& x) const
+	Matrix<G::element_type>	G::J(const AT& x) const
      によって与えられる．
 
   \param f		その2乗ノルムを最小化すべきベクトル値関数
@@ -168,7 +168,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 
     for (size_t n = 0; n++ < niter_max; )
     {
-	const auto		J    = f.jacobian(x);	// Jacobian.
+	const auto		J    = f.derivative(x);	// J.
 	const vector_type	Jtf  = fval * J;
 	const auto		gval = g(x);		// constraint residual.
 	const auto		xdim = J.ncol();
@@ -176,7 +176,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	matrix_type		A(xdim + gdim, xdim + gdim);
 
 	A(0, xdim, 0, xdim)    = transpose(J) * J;
-	A(xdim, gdim, 0, xdim) = g.jacobian(x);
+	A(xdim, gdim, 0, xdim) = g.derivative(x);
 	A(0, xdim, xdim, gdim) = transpose(A(xdim, gdim, 0, xdim));
 
 	vector_type		diagA(xdim);
@@ -263,7 +263,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	F::element_type
      という名前でtypedefしている．
   -# ヤコビアンの型を
-	F::jacobian_type
+	F::derivative_type
      という名前でtypedefしている．
   -# ATA型の引数aが持つ自由度を
 	size_t	F::adim() const
@@ -279,7 +279,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	Vector<F:element_type>	F::operator ()(const ATA& a, const ATB& b, int j) const
      によって与えられる．
   -# 引数a, b_jを与えたときのaで微分したヤコビアンは，メンバ関数
-	F::jacobian_type	F::jacobianA(const ATA& a, const ATB& b, int j) const
+	F::derivative_type	F::derivativeA(const ATA& a, const ATB& b, int j) const
      によって与えられる．
   -# メンバ関数
 	void	F::updateA(const ATA& a, const Vector<F::element_type>& da) const
@@ -297,7 +297,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	Vector<G:element_type>	G::operator ()(const ATA& a) const
      によって与えられる．
   -# 引数aを与えたときのヤコビアンは，メンバ関数
-	Matrix<G::element_type>	G::jacobian(const ATA& a) const
+	Matrix<G::element_type>	G::derivative(const ATA& a) const
      によって与えられる．
 
   \param f		その2乗ノルムを最小化すべきベクトル値関数
@@ -316,11 +316,11 @@ Matrix<typename F::element_type>
 minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		     size_t niter_max=100, double tol=1.5e-8)
 {
-    using element_type	= typename F::element_type;
-    using jacobian_type	= typename F::jacobian_type;
-    using vector_type	= Vector<element_type>;
-    using matrix_type	= Matrix<element_type>;
-    using ATB		= typename std::iterator_traits<IB>::value_type;
+    using element_type		= typename F::element_type;
+    using derivative_type	= typename F::derivative_type;
+    using vector_type		= Vector<element_type>;
+    using matrix_type		= Matrix<element_type>;
+    using ATB			= typename std::iterator_traits<IB>::value_type;
     
     const size_t	nb = std::distance(bbegin, bend);
     Array<vector_type>	fval(nb);	// function values.
@@ -337,7 +337,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     for (size_t n = 0; n++ < niter_max; )
     {
 	const auto		adim = f.adim();
-	jacobian_type		U(f.adims(), f.adims());
+	derivative_type		U(f.adims(), f.adims());
 	vector_type		Jtf(adim);
 	Array<matrix_type>	V(nb);
 	Array<matrix_type>	W(nb);
@@ -345,8 +345,8 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	j = 0;
 	for (auto b = bbegin; b != bend; ++b, ++j)
 	{
-	    const auto	J  = f.jacobianA(a, *b, j);
-	    const auto	K  = f.jacobianB(a, *b, j);
+	    const auto	J  = f.derivativeA(a, *b, j);
+	    const auto	K  = f.derivativeB(a, *b, j);
 
 	    U     += transpose(J) * J;
 	    Jtf   += fval[j] * J;
@@ -359,7 +359,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	const auto	gdim = gval.size();
 	matrix_type	A(adim + gdim, adim + gdim);
 	
-	A(adim, gdim, 0, adim) = g.jacobian(a);
+	A(adim, gdim, 0, adim) = g.derivative(a);
 	A(0, adim, adim, gdim) = transpose(A(adim, gdim, 0, adim));
 
 	for (;;)
@@ -501,9 +501,9 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	j = 0;
 	for (auto b = bbegin; b != bend; ++b, ++j)
 	{
-	    const matrix_type	J  = f.jacobianA(a, *b, j);
+	    const matrix_type	J  = f.derivativeA(a, *b, j);
 	    const matrix_type	Jt = transpose(J);
-	    const matrix_type	K  = f.jacobianB(a, *b, j);
+	    const matrix_type	K  = f.derivativeB(a, *b, j);
 
 	    U     += transpose(J) * J;
 	    Jtf   += fval[j] * J;
@@ -514,7 +514,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    A(0, adim, adim + j*f.bdim(), f.bdim()) = W[j];
 	    A(adim + j*f.bdim(), f.bdim(), 0, adim) = tranpose(W[j]);
 	}
-	A(adim + bdim, gdim, 0, adim) = g.jacobian(a);
+	A(adim + bdim, gdim, 0, adim) = g.derivative(a);
 	A(0, adim, adim + bdim, gdim) = transpose(A(adim + bdim, gdim,
 						    0, adim));
 

@@ -66,7 +66,7 @@ class ReferencePlane
     matrix33_type	Qt()					const	;
     plane_type		h()					const	;
     point3_type		operator ()(const point2_type& x)	const	;
-    matrix_type		jacobian(const point2_type& x)		const	;
+    matrix_type		derivative(const point2_type& x)	const	;
     void		update(const vector_type& dq)			;
     
   private:
@@ -180,7 +180,7 @@ ReferencePlane<T>::operator ()(const point2_type& x) const
 		\f$
 */
 template <class T> inline typename ReferencePlane<T>::matrix_type
-ReferencePlane<T>::jacobian(const point2_type& x) const
+ReferencePlane<T>::derivative(const point2_type& x) const
 {
     matrix_type	J(3, 6);
     slice<3, 3>(J, 0, 0) = diag(element_type(1), 3);
@@ -255,7 +255,7 @@ class CameraCalibrator
 	VolumeCost(Iter begin, Iter end)				;
 
 	vector_type	operator ()(const Cam& camera)		const	;
-	matrix_type	jacobian(const Cam& camera)		const	;
+	matrix_type	derivative(const Cam& camera)		const	;
 	void		update(Cam& camera,
 			       const vector_type& dc)		const	;
 	
@@ -280,7 +280,7 @@ class CameraCalibrator
     {
       public:
 	typedef CameraCalibrator::element_type		element_type;
-	typedef BlockDiagonalMatrix<element_type>	jacobian_type;
+	typedef BlockDiagonalMatrix<element_type>	derivative_type;
       //! 特定の参照平面について，全カメラに渡る参照点とその投影像の対データ
 	typedef typename Iter::value_type		CorresListArray;
       //! 特定の参照平面とカメラについて，それらの間の参照点とその投影像の対データ
@@ -298,10 +298,10 @@ class CameraCalibrator
 	vector_type	operator ()(const Array<Cam>& cameras,
 				    const plane_type& plane, int j)
 								const	;
-	jacobian_type	jacobianA(const Array<Cam>& cameras,
+	derivative_type	derivativeA(const Array<Cam>& cameras,
 				  const plane_type& plane, int j)
 								const	;
-	matrix_type	jacobianB(const Array<Cam>& cameras,
+	matrix_type	derivativeB(const Array<Cam>& cameras,
 				  const plane_type& plane, int j)
 								const	;
 	void		updateA(Array<Cam>& cameras,
@@ -691,7 +691,7 @@ CameraCalibrator<T>::VolumeCost<Iter, Cam>::operator ()(const Cam& camera) const
 */
 template <class T>
 template <class Iter, class Cam> typename CameraCalibrator<T>::matrix_type
-CameraCalibrator<T>::VolumeCost<Iter, Cam>::jacobian(const Cam& camera) const
+CameraCalibrator<T>::VolumeCost<Iter, Cam>::derivative(const Cam& camera) const
 {
     matrix_type	J(2*_npoints, 6 + Cam::dofIntrinsic());
     size_t	n = 0;
@@ -832,11 +832,11 @@ CameraCalibrator<T>::PlaneCost<Iter, Cam>::operator ()(
 			2台目以降のカメラが(2*点対数)x(6+内部パラメータ数)
 */
 template <class T> template <class Iter, class Cam> BlockDiagonalMatrix<T>
-CameraCalibrator<T>::PlaneCost<Iter, Cam>::jacobianA(
+CameraCalibrator<T>::PlaneCost<Iter, Cam>::derivativeA(
     const Array<Cam>& cameras, const plane_type& plane, int j) const
 {
     const auto&		data = corresListArray(j);
-    jacobian_type	J(ncameras());
+    derivative_type	J(ncameras());
     for (size_t i = 0; i < ncameras(); ++i)
     {
 	J[i].resize(2 * data[i].size(), _adims[i]);
@@ -865,7 +865,7 @@ CameraCalibrator<T>::PlaneCost<Iter, Cam>::jacobianA(
 */
 template <class T>
 template <class Iter, class Cam> typename CameraCalibrator<T>::matrix_type
-CameraCalibrator<T>::PlaneCost<Iter, Cam>::jacobianB(
+CameraCalibrator<T>::PlaneCost<Iter, Cam>::derivativeB(
     const Array<Cam>& cameras, const plane_type& plane, int j) const
 {
     const auto&	data = corresListArray(j);
@@ -876,7 +876,7 @@ CameraCalibrator<T>::PlaneCost<Iter, Cam>::jacobianB(
 	    typename Cam::matrix_type	J;
 	    cameras[i](plane(iter->first), &J);
 	    slice<2, 6>(K, k, 0) = -slice<2, 3>(J, 0, 0)
-				 * plane.jacobian(iter->first);
+				 * plane.derivative(iter->first);
 	    k += 2;
 	}
     
