@@ -948,8 +948,8 @@ namespace detail
   using max = std::integral_constant<size_t, (I > J ? I : J)>;
 
   template <class ITER, size_t SIZE>
-  static std::true_type		check_range(range<ITER, SIZE>)		;
-  static std::false_type	check_range(...)			;
+  std::true_type	check_range(range<ITER, SIZE>)			;
+  std::false_type	check_range(...)				;
 
   template <class E>
   using is_range = decltype(check_range(std::declval<E>()));
