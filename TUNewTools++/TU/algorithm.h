@@ -166,8 +166,8 @@ namespace detail
   inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, N>)
   {
-      const T	tmp = std::fma(*begin0, *begin1, init);
-      return inner_product(++begin0, arg, ++begin1, tmp,
+      return inner_product(begin0 + 1, arg, begin1 + 1,
+			   std::fma(*begin0, *begin1, init),
 			   std::integral_constant<size_t, N-1>());
   }
 
