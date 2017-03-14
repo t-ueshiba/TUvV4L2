@@ -24,7 +24,7 @@ namespace detail
 }	// namespace detail
 
 template <class T>
-using is_pair = decltype(check_pair(std::declval<T>()));
+using is_pair = decltype(detail::check_pair(std::declval<T>()));
 
 /************************************************************************
 *  struct pair_traits<PAIR>						*

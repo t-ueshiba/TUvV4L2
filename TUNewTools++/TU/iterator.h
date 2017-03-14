@@ -8,6 +8,7 @@
 #include <cstddef>			// for size_t
 #include <type_traits>			// for std::result_of<F(ARGS...)>
 #include <utility>			// for std::declval<T>
+#include <functional>			// for std::function
 #include <iterator>
 #include <boost/iterator/transform_iterator.hpp>
 
