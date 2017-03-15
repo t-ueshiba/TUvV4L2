@@ -1,4 +1,5 @@
 SUBDIR	= BandMatrix		\
+	  DP			\
 	  GraphCuts		\
 	  List			\
 	  NDTree		\
