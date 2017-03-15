@@ -19,6 +19,16 @@ template <class T> using Point2P = Array<T, 3>;	//!< 同次2次元点
 template <class T> using Point3	 = Array<T, 3>;	//!< 非同次3次元点
 template <class T> using Point3P = Array<T, 4>;	//!< 同次3次元点
     
+using Point2s	= Point2<short>;		//!< short型座標を持つ2次元点
+using Point2i	= Point2<int>;			//!< int型座標を持つ2次元点
+using Point2f	= Point2<float>;		//!< float型座標を持つ2次元点
+using Point2d	= Point2<double>;		//!< double型座標を持つ2次元点
+
+using Point3s	= Point3<short>;		//!< short型座標を持つ3次元点
+using Point3i	= Point3<int>;			//!< int型座標を持つ3次元点
+using Point3f	= Point3<float>;		//!< float型座標を持つ3次元点
+using Point3d	= Point3<double>;		//!< double型座標を持つ3次元点
+
 /************************************************************************
 *  algorithms concerning with 2D points					*
 ************************************************************************/

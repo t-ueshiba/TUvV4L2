@@ -65,6 +65,13 @@ evaluate(const E& expr)
 {
     return expr;
 }
+
+template <class E>
+inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
+operator <<(std::ostream& out, const E& expr)
+{
+    return out << evaluate(expr);
+}
     
 /************************************************************************
 *  products of two ranges						*

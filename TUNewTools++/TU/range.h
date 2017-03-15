@@ -318,7 +318,8 @@ class range
 					      ::value_type;
     using reference		= typename std::iterator_traits<iterator>
 					      ::reference;
-
+    using element_type		= element_t<value_type>;
+    
   public:
 		range(iterator begin)		:_begin(begin)	{}
 		range(iterator begin, size_t)	:_begin(begin)	{}
@@ -361,6 +362,12 @@ class range
 		    return *this;
 		}
 
+    range&	operator =(const element_type& c)
+		{
+		    fill<SIZE>(begin(), size(), c);
+		    return *this;
+		}
+
     constexpr static
     size_t	size0()			{ return SIZE; }
     constexpr static
@@ -397,7 +404,8 @@ class range<ITER, 0>
 					      ::value_type;
     using reference		= typename std::iterator_traits<iterator>
 					      ::reference;
-
+    using element_type		= element_t<value_type>;
+    
   public:
 		range(iterator begin, size_t size)
 		    :_begin(begin), _size(size)			{}
@@ -441,6 +449,12 @@ class range<ITER, 0>
 		    return *this;
 		}
 		
+    range&	operator =(const element_type& c)
+		{
+		    fill<0>(begin(), size(), c);
+		    return *this;
+		}
+
     constexpr static
     size_t	size0()			{ return 0; }
     size_t	size()		const	{ return _size; }

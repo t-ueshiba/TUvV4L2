@@ -235,7 +235,7 @@ for_each(ITER begin, ARG arg, FUNC func)
 template <size_t N, class ITER, class ARG, class T> inline void
 fill(ITER begin, ARG arg, const T& val)
 {
-    for_each<N>(begin, arg, [&val](auto&& iter){ *iter = val; });
+    for_each<N>(begin, arg, [&val](auto&& dst){ dst = val; });
 }
     
 //! 指定された2つの範囲の各要素に2変数関数を適用する

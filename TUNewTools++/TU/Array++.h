@@ -608,6 +608,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		}
 
+    array&	operator =(const element_type& c)
+		{
+		    TU::fill<size0()>(begin(), size(), c);
+
+		    return *this;
+		}
+    
     template <class ALLOC_>
     void	write(array<T, ALLOC_, SIZE, SIZES...>& a) const
 		{

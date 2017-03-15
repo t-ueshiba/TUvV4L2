@@ -48,7 +48,8 @@ test_stride()
     Array2<int>	c(8, 2, 3);
   //Array2<int, 4, 6>	c;
 
-    fill(c, 5);
+  //fill(c, 5);
+    c = 5;
     std::cout << "--- c(" << print_sizes_and_strides(c) << ") ---\n" << c;
 
     c[1][2] = 10;
@@ -322,7 +323,7 @@ test_rotation()
     auto		Rt = rotation(a);
     
     std::cout << "--- Rt ---\n" << Rt;
-    std::cout << "--- Rt * R ---\n" << evaluate(Rt * transpose(Rt));
+    std::cout << "--- Rt * R ---\n" << Rt * transpose(Rt);
 
     const auto	axis = rotation_axis(Rt);
     std::cout << "axis(Rt) = " << axis << std::endl;
