@@ -5,6 +5,7 @@ SUBDIR	= BandMatrix		\
 	  NDTree		\
 	  Random		\
 	  Serial		\
+	  Sparse		\
 	  TreeFilter		\
 	  Vector		\
 
