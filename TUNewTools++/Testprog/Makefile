@@ -8,6 +8,7 @@ SUBDIR	= BandMatrix		\
 	  Sparse		\
 	  TreeFilter		\
 	  Vector		\
+	  simd
 
 TARGETS	= all clean depend
 

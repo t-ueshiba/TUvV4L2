@@ -283,14 +283,12 @@ class zip_iterator
   private:
     using super = boost::iterator_facade<
 		      zip_iterator,
-		      decltype(
-			  tuple_transform(std::declval<ITER_TUPLE>(),
-					  detail::generic_dereference())),
+		      decltype(tuple_transform(std::declval<ITER_TUPLE>(),
+					       detail::generic_dereference())),
 		      iterator_category<
 			  typename std::tuple_element<0, ITER_TUPLE>::type>,
-		      decltype(
-			  tuple_transform(std::declval<ITER_TUPLE>(),
-					  detail::generic_dereference()))>;
+		      decltype(tuple_transform(std::declval<ITER_TUPLE>(),
+					       detail::generic_dereference()))>;
     
   public:
     using		typename super::reference;
