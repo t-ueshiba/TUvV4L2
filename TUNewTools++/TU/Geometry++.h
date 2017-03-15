@@ -5,7 +5,6 @@
 #ifndef __TU_GEOMETRYPP_H
 #define __TU_GEOMETRYPP_H
 
-#include "TU/Vector++.h"
 #include "TU/Minimize.h"
 #include <limits>
 

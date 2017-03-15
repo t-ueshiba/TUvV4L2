@@ -34,8 +34,6 @@
 #ifndef __TU_DP_H
 #define __TU_DP_H
 
-#include <iterator>
-#include <algorithm>
 #include "TU/Array++.h"
 
 namespace TU

@@ -6,7 +6,6 @@
 #define __TU_TUPLE_H
 
 #include <tuple>
-#include <functional>		// std::ref()
 #include <iostream>
 #include "TU/iterator.h"
 

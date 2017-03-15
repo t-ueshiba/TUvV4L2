@@ -6,7 +6,6 @@
 #define __TU_MINIMIZE_H
 
 #include "TU/Vector++.h"
-#include <algorithm>
 #include <stdexcept>
 
 namespace TU
