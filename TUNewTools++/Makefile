@@ -21,7 +21,7 @@ ifeq ($(shell arch), armv7l)
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
+#  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -48,6 +48,7 @@ HDRS		= TU/Array++.h \
 		TU/CorrectIntensity.h \
 		TU/DP.h \
 		TU/DericheConvolver.h \
+		TU/EdgeDetector.h \
 		TU/FIRFilter.h \
 		TU/FIRGaussianConvolver.h \
 		TU/Feature.h \
@@ -100,6 +101,7 @@ HDRS		= TU/Array++.h \
 		TU/tuple.h \
 		TU/types.h
 SRCS		= ColorConverter.cc \
+		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
 		GenericImage.cc \
 		ImageBase.cc \
@@ -111,6 +113,7 @@ SRCS		= ColorConverter.cc \
 		io.cc \
 		manipulators.cc
 OBJS		= ColorConverter.o \
+		EdgeDetector.o \
 		FIRGaussianCoefficients.o \
 		GenericImage.o \
 		ImageBase.o \
@@ -130,6 +133,9 @@ include $(PROJECT)/lib/common.mk
 ###
 ColorConverter.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
 	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
+EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
+	TU/iterator.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/algorithm.h \
 	TU/tuple.h TU/iterator.h
