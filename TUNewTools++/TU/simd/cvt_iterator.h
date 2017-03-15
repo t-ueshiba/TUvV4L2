@@ -23,18 +23,12 @@ template <class T, class ITER, bool MASK=false>
 class cvt_iterator
     : public boost::iterator_adaptor<cvt_iterator<T, ITER, MASK>,
 				     ITER,
-				     pack_target<
-					 T,
-					 typename std::iterator_traits<ITER>
-						     ::value_type>,
+				     pack_target<T, iterator_value<ITER> >,
 				     boost::single_pass_traversal_tag,
-				     pack_target<
-					 T,
-					 typename std::iterator_traits<ITER>
-						     ::value_type> >
+				     pack_target<T, iterator_value<ITER> > >
 {
   private:
-    using src_type	= typename std::iterator_traits<ITER>::value_type;
+    using src_type	= iterator_value<ITER>;
     using dst_type	= pack_target<T, src_type>;
     using super		= boost::iterator_adaptor<
 			      cvt_iterator,

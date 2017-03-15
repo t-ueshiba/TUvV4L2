@@ -5,6 +5,7 @@
 #define	__TU_SIMD_TRANSFORM_H
 
 #include "TU/iterator.h"
+#include "TU/functional.h"
 #include "TU/simd/cvt.h"
 
 namespace TU
@@ -29,7 +30,7 @@ namespace detail
   class transformer
   {
     public:
-      using head_iterator = std::tuple_element<0, ITER_TUPLE>;
+      using head_iterator = tuple_head<ITER_TUPLE>;
       
     private:
       template <class T_, class=void>
@@ -43,9 +44,7 @@ namespace detail
 	  using type = void;
       };
       
-      using E = typename vec_element<
-		    std::tuple_element<0, typename std::iterator_traits<OUT>
-						      ::value_type> >::type;
+      using E = typename vec_element<tuple_head<iterator_value<OUT> > >::type;
       
     //! 出力反復子に書き出すSIMDベクトルの要素型
       using O = std::conditional_t<std::is_void<E>::value, T, E>;
@@ -56,9 +55,8 @@ namespace detail
       struct generic_downArg
       {
 	  template <class T_=I, class ITER_>
-	  std::enable_if_t<
-	      (vec<T_>::size == std::iterator_traits<ITER_>::value_type::size),
-	      vec<T_> >
+	  std::enable_if_t<(vec<T_>::size == iterator_value<ITER_>::size),
+			   vec<T_> >
 			operator ()(ITER_& iter) const
 			{
 			    const auto	x = *iter;
@@ -66,13 +64,12 @@ namespace detail
 			    return cvt<T_, false, MASK>(x);
 			}
 	  template <class T_=I, class ITER_>
-	  std::enable_if_t<
-	      (vec<T_>::size > std::iterator_traits<ITER_>::value_type::size),
-	      vec<T_> >
+	  std::enable_if_t<(vec<T_>::size > iterator_value<ITER_>::size),
+			   vec<T_> >
 			operator ()(ITER_& iter) const
 			{
-			    using S = typename std::iterator_traits<ITER_>
-						  ::value_type::element_type;
+			    using S = typename
+					  iterator_value<ITER_>::element_type;
 			    using A = cvt_above_type<T_, S, MASK>;
 	  
 			    const auto	x = operator ()<A>(iter);
@@ -92,8 +89,8 @@ namespace detail
       struct generic_upArg
       {
 	  template <class ITER_>
-	  std::enable_if_t<std::iterator_traits<ITER_>::value_type::size == N_,
-			   typename std::iterator_traits<ITER_>::value_type>
+	  std::enable_if_t<iterator_value<ITER_>::size == N_,
+			   iterator_value<ITER_> >
 	  		operator ()(ITER_& iter) const
 			{
 			    const auto	x = *iter;
@@ -101,8 +98,7 @@ namespace detail
 			    return x;
 			}
 	  template <class ITER_>
-	  std::enable_if_t<
-	      std::iterator_traits<ITER_>::value_type::size != N_, ITER_&>
+	  std::enable_if_t<iterator_value<ITER_>::size != N_, ITER_&>
 			operator ()(ITER_& iter) const
 			{
 			    return iter;
@@ -121,44 +117,38 @@ namespace detail
       template <class ITER_>
       struct max_size
       {
-	  static constexpr size_t
-		value = std::iterator_traits<ITER_>::value_type::size;
+	  static constexpr size_t	value = iterator_value<ITER_>::size;
       };
       template <class ITER_>
-      struct max_size<boost::tuples::cons<ITER_, boost::tuples::null_type> >
+      struct max_size<std::tuple<ITER_> >
       {
 	  static constexpr size_t	value = max_size<ITER_>::value;
       };
-      template <class ITER_, class TAIL_>
-      struct max_size<boost::tuples::cons<ITER_, TAIL_> >
+      template <class ITER_, class... TAIL_>
+      struct max_size<std::tuple<ITER_, TAIL_...> >
       {
 	  static constexpr size_t	head_max = max_size<ITER_>::value;
-	  static constexpr size_t	tail_max = max_size<TAIL_>::value;
+	  static constexpr size_t	tail_max = max_size<
+						   std::tuple<TAIL_...> >::value;
 	  static constexpr size_t	value	 = (head_max > tail_max ?
 						    head_max : tail_max);
-      };
-      template <class... ITER_>
-      struct max_size<boost::tuple<ITER_...> >
-	  : max_size<typename boost::tuple<ITER_...>::inherited>
-      {
       };
 
     private:
     // 変換結果をconvert up
       template <class TUPLE_>
-      std::enable_if_t<(vec<O>::size == std::tuple_element<0, TUPLE_>::size)>
+      std::enable_if_t<(vec<O>::size == tuple_head<TUPLE_>::size)>
 		upResult(const TUPLE_& x)
 		{
 		    ASSIGN()(*_out, cvt<O, false, MASK>(x));
 		    ++_out;
 		}
       template <class TUPLE_>
-      std::enable_if_t<(vec<O>::size < std::tuple_element<0, TUPLE_>::size)>
+      std::enable_if_t<(vec<O>::size < tuple_head<TUPLE_>::size)>
 		upResult(const TUPLE_& x)
 		{
 		    using U = cvt_upper_type<
-				  O, typename std::tuple_element<0, TUPLE_>
-						 ::element_type,
+				  O, typename tuple_head<TUPLE_>::element_type,
 				  MASK>;
 		    
 		    upResult(cvt<U, false, MASK>(x));
@@ -169,8 +159,7 @@ namespace detail
       template <class TUPLE_> static auto
 		downResult(const TUPLE_& x)
 		{
-		    using S = typename std::tuple_element<0, TUPLE_>
-					  ::element_type;
+		    using S = typename tuple_head<TUPLE_>::element_type;
 		    using L = std::conditional_t<
 				  (vec<cvt_lower_type<O, S, MASK> >::size >
 				   vec<S>::size),
@@ -181,8 +170,7 @@ namespace detail
       template <class TUPLE_> static auto
 		downResult(const TUPLE_&x, const TUPLE_& y)
 		{
-		    using S = typename std::tuple_element<0, TUPLE_>
-					  ::element_type;
+		    using S = typename tuple_head<TUPLE_>::element_type;
 
 		    return cvt<cvt_lower_type<O, S, MASK>, MASK>(x, y);
 		}
@@ -233,8 +221,7 @@ namespace detail
 		}
 
     public:
-		transformer(const ITER_TUPLE& t,
-			    head_iterator end, OUT out, FUNC func)
+		transformer(ITER_TUPLE t, head_iterator end, OUT out, FUNC func)
 		    :_t(t), _end(end), _out(out), _func(func)		{}
 
       OUT	operator ()()
@@ -264,14 +251,14 @@ template <class T=void, class ASSIGN=assign, bool MASK=false,
 transform(FUNC func, OUT out, IN in, IN end, IN_EXTRA... in_extra)
 {
     detail::transformer<T, ASSIGN, MASK,
-			boost::tuple<IN, IN_EXTRA...>, OUT, FUNC>
+			std::tuple<IN, IN_EXTRA...>, OUT, FUNC>
 	trns(std::make_tuple(in, in_extra...), end, out, func);
     return trns();
 }
     
 template <class T=void, class ASSIGN=assign, bool MASK=false,
 	  class ITER_TUPLE, class OUT, class FUNC> inline OUT
-transform(const ITER_TUPLE& ib, const ITER_TUPLE& ie, OUT out, FUNC func)
+transform(ITER_TUPLE ib, ITER_TUPLE ie, OUT out, FUNC func)
 {
     detail::transformer<T, ASSIGN, MASK, ITER_TUPLE, OUT, FUNC>
 	trns(ib, std::get<0>(ie), out, func);
@@ -280,8 +267,8 @@ transform(const ITER_TUPLE& ib, const ITER_TUPLE& ie, OUT out, FUNC func)
     
 template <class T=void, class ASSIGN=assign, bool MASK=false,
 	  class ITER_TUPLE, class OUT, class FUNC> inline OUT
-transform(const zip_iterator<ITER_TUPLE>& ib,
-	  const zip_iterator<ITER_TUPLE>& ie, OUT out, FUNC func)
+transform(zip_iterator<ITER_TUPLE> ib,
+	  zip_iterator<ITER_TUPLE> ie, OUT out, FUNC func)
 {
     return transform<T, ASSIGN, MASK>(ib.get_iterator_tuple(),
 				      ie.get_iterator_tuple(), out, func);
@@ -292,14 +279,14 @@ template <class T=void, class ASSIGN=assign, bool MASK=false,
 copy(OUT out, IN in, IN end, IN_EXTRA... in_extra)
 {
     detail::transformer<T, ASSIGN, MASK,
-			boost::tuple<IN, IN_EXTRA...>, OUT, identity>
+			std::tuple<IN, IN_EXTRA...>, OUT, identity>
 	trns(std::make_tuple(in, in_extra...), end, out, identity());
     return trns();
 }
     
 template <class T=void, class ASSIGN=assign, bool MASK=false,
 	  class ITER_TUPLE, class OUT> inline OUT
-copy(const ITER_TUPLE& ib, const ITER_TUPLE& ie, OUT out)
+copy(ITER_TUPLE ib, ITER_TUPLE ie, OUT out)
 {
     detail::transformer<T, ASSIGN, MASK, ITER_TUPLE, OUT, identity>
 	trns(ib, std::get<0>(ie), out, identity());

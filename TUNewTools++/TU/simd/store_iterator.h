@@ -20,9 +20,9 @@ namespace detail
   class store_proxy
   {
     public:
-      typedef typename std::iterator_traits<ITER>::value_type	element_type;
-      typedef vec<element_type>					value_type;
-      typedef store_proxy					self;
+      typedef iterator_value<ITER>	element_type;
+      typedef vec<element_type>		value_type;
+      typedef store_proxy		self;
 	
     public:
       store_proxy(ITER iter)		:_iter(iter)			{}
@@ -87,7 +87,7 @@ class store_iterator
 		ITER,
 		typename detail::store_proxy<ITER, ALIGNED>::value_type,
   // boost::use_default とすると libc++ で std::fill() に適用できない
-		typename std::iterator_traits<ITER>::iterator_category,
+		iterator_category<ITER>,
 		detail::store_proxy<ITER, ALIGNED> >
 {
   private:
@@ -95,7 +95,7 @@ class store_iterator
 		store_iterator,
 		ITER,
 		typename detail::store_proxy<ITER, ALIGNED>::value_type,
-		typename std::iterator_traits<ITER>::iterator_category,
+		iterator_category<ITER>,
 		detail::store_proxy<ITER, ALIGNED> >		super;
 
   public:

@@ -42,8 +42,7 @@ namespace detail
   template <class E>
   struct value_t
   {
-      using type = typename std::iterator_traits<const_iterator_t<E> >
-			       ::value_type;
+      using type = iterator_value<const_iterator_t<E> >;
   };
       
   template <class E, class=const_iterator_t<E> >
@@ -203,8 +202,7 @@ class sizes_holder
     template <class ITER_> constexpr
     static size_t	rank()
 			{
-			    using value_type = typename std::iterator_traits<
-						   ITER_>::value_type;
+			    using value_type = iterator_value<ITER_>;
 			    return TU::rank<value_type>();
 			}
     template <class ITER_>
@@ -314,10 +312,8 @@ class range
   public:
     using iterator		= ITER;
     using reverse_iterator	= std::reverse_iterator<iterator>;
-    using value_type		= typename std::iterator_traits<iterator>
-					      ::value_type;
-    using reference		= typename std::iterator_traits<iterator>
-					      ::reference;
+    using value_type		= iterator_value<iterator>;
+    using reference		= iterator_reference<iterator>;
     using element_type		= element_t<value_type>;
     
   public:
@@ -400,10 +396,8 @@ class range<ITER, 0>
   public:
     using iterator		= ITER;
     using reverse_iterator	= std::reverse_iterator<iterator>;
-    using value_type		= typename std::iterator_traits<iterator>
-					      ::value_type;
-    using reference		= typename std::iterator_traits<iterator>
-					      ::reference;
+    using value_type		= iterator_value<iterator>;
+    using reference		= iterator_reference<iterator>;
     using element_type		= element_t<value_type>;
     
   public:

@@ -21,15 +21,15 @@ namespace simd
 			そうでなければfalse
 */
 template <class ITER, bool ALIGNED=false>
-class load_iterator : public boost::iterator_adaptor<
-			load_iterator<ITER, ALIGNED>,
-			ITER,
-			vec<typename std::iterator_traits<ITER>::value_type>,
-			boost::use_default,
-			vec<typename std::iterator_traits<ITER>::value_type> >
+class load_iterator
+    : public boost::iterator_adaptor<load_iterator<ITER, ALIGNED>,
+				     ITER,
+				     vec<iterator_value<ITER> >,
+				     boost::use_default,
+				     vec<iterator_value<ITER> > >
 {
   private:
-    typedef typename std::iterator_traits<ITER>::value_type	element_type;
+    typedef iterator_value<ITER>				element_type;
     typedef boost::iterator_adaptor<load_iterator,
 				    ITER,
 				    vec<element_type>,

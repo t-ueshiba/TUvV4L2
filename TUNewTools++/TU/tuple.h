@@ -263,12 +263,9 @@ namespace detail
   struct generic_dereference
   {
       template <class ITER_>
-      std::conditional_t<
-	  std::is_reference<
-	      typename std::iterator_traits<ITER_>::reference>::value,
-	  std::reference_wrapper<
-	      typename std::iterator_traits<ITER_>::value_type>,
-	  typename std::iterator_traits<ITER_>::reference>
+      std::conditional_t<std::is_reference<iterator_reference<ITER_> >::value,
+			 std::reference_wrapper<iterator_value<ITER_> >,
+			 iterator_reference<ITER_> >
       operator ()(ITER_ iter)			const	{ return *iter; }
   };
 }	// namespace detail
@@ -279,9 +276,7 @@ class zip_iterator
 	  zip_iterator<ITER_TUPLE>,
 	  decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 				   detail::generic_dereference())),
-	  typename std::iterator_traits<
-	      typename std::tuple_element<0, ITER_TUPLE>::type>
-			  ::iterator_category,
+	  iterator_category<typename std::tuple_element<0, ITER_TUPLE>::type>,
 	  decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 				   detail::generic_dereference()))>
 {
@@ -291,9 +286,8 @@ class zip_iterator
 		      decltype(
 			  tuple_transform(std::declval<ITER_TUPLE>(),
 					  detail::generic_dereference())),
-		      typename std::iterator_traits<
-			  typename std::tuple_element<0, ITER_TUPLE>::type>
-				      ::iterator_category,
+		      iterator_category<
+			  typename std::tuple_element<0, ITER_TUPLE>::type>,
 		      decltype(
 			  tuple_transform(std::declval<ITER_TUPLE>(),
 					  detail::generic_dereference()))>;
@@ -350,6 +344,124 @@ make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
 }
+
+/************************************************************************
+*  struct tuple_head<T>, tuple_leftmost<T>, tuple_nelms<T>		*
+************************************************************************/
+namespace detail
+{
+  template <class T>
+  struct tuple_traits
+  {
+      static constexpr size_t	nelms = 1;
+      using head_type		= T;
+      using leftmost_type	= T;
+  };
+  template <>
+  struct tuple_traits<std::tuple<> >
+  {
+      static constexpr size_t	nelms = 0;
+      using head_type		= void;
+      using leftmost_type	= void;
+  };
+  template <class HEAD, class... TAIL>
+  struct tuple_traits<std::tuple<HEAD, TAIL...> >
+  {
+      static constexpr size_t	nelms = tuple_traits<HEAD>::nelms
+				      + tuple_traits<
+					    std::tuple<TAIL...> >::nelms;
+      using head_type		= HEAD;
+      using leftmost_type	= typename tuple_traits<HEAD>::leftmost_type;
+  };
+}
+    
+//! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
+/*!
+  \param T	その先頭要素の型を調べるべき型
+*/
+template <class T>
+using tuple_head = typename detail::tuple_traits<T>::head_type;
+
+//! 与えられた型がtupleならばその最左要素の型を，そうでなければ元の型を返す．
+/*!
+  \param T	その最左要素の型を調べるべき型
+*/
+template <class T>
+using tuple_leftmost = typename detail::tuple_traits<T>::leftmost_type;
+
+//! 与えられた型がtupleまたはnull_typeならばその要素数を，そうでなければ1を返す．
+/*!
+  \param T	要素数を調べるべき型
+*/
+template <class T>
+struct tuple_nelms
+{
+    static constexpr size_t	value = detail::tuple_traits<T>::nelms;
+};
+    
+/************************************************************************
+*  struct tuple_for_all<T, COND, ARGS...>				*
+************************************************************************/
+template <class T, template <class...> class COND, class... ARGS>
+struct tuple_for_all : std::integral_constant<bool, COND<T, ARGS...>::value>
+{
+};
+template <template <class...> class COND, class... ARGS>
+struct tuple_for_all<std::tuple<>, COND, ARGS...> : std::true_type
+{
+};
+template <class HEAD, class... TAIL,
+	  template <class...> class COND, class... ARGS>
+struct tuple_for_all<std::tuple<HEAD, TAIL...>, COND,  ARGS...>
+    : std::integral_constant<
+	  bool, (COND<HEAD, ARGS...>::value &&
+		 tuple_for_all<std::tuple<TAIL...>, COND, ARGS...>::value)>
+{
+};
+
+/************************************************************************
+*  struct tuple_is_uniform<T>						*
+************************************************************************/
+template <class T>
+struct tuple_is_uniform : std::true_type
+{
+};
+template <class T>
+struct tuple_is_uniform<std::tuple<T> > : std::true_type
+{
+};
+template <class HEAD, class... TAIL>
+struct tuple_is_uniform<std::tuple<HEAD, TAIL...> >
+    : std::integral_constant<
+	  bool,
+	  (std::is_same<HEAD, tuple_head<std::tuple<TAIL...> > >::value &&
+	   tuple_is_uniform<std::tuple<TAIL...> >::value)>
+{
+};
+    
+/************************************************************************
+*  struct tuple_replace<S, T>						*
+************************************************************************/
+namespace detail
+{
+  template <class T, class S>
+  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
+  {
+  };
+  template <class T, class... S>
+  struct tuple_replace<T, std::tuple<S...> >
+  {
+      using type = std::tuple<typename tuple_replace<T, S>::type...>;
+  };
+}
+    
+//! 与えられた型がtupleならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
+/*!
+  \param S	要素型置換の対象となる型
+  \param T	置換後の要素の型．voidならば置換しない．
+*/
+template <class S, class T=void>
+using tuple_replace = typename detail::tuple_replace<T, S>::type;
 
 }	// namespace TU
 
@@ -685,6 +797,7 @@ operator <<(ostream& out, const tuple<T...>& t)
 
     return out;
 }
+
 
 }	// namespace std
 #endif	// !__TU_TUPLE_H

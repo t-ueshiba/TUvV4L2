@@ -88,6 +88,21 @@ crend(const T& x) -> decltype(std::rend(x))
 namespace TU
 {
 /************************************************************************
+*  type aliases								*
+************************************************************************/
+template <class ITER>
+using iterator_value	  = typename std::iterator_traits<ITER>::value_type;
+template <class ITER>
+using iterator_reference  = typename std::iterator_traits<ITER>::reference;
+template <class ITER>
+using iterator_pointer	  = typename std::iterator_traits<ITER>::pointer;
+template <class ITER>
+using iterator_difference = typename std::iterator_traits<ITER>::difference_type;
+template <class ITER>
+using iterator_category	  = typename std::iterator_traits<ITER>
+					::iterator_category;
+    
+/************************************************************************
 *  make_mbr_iterator<ITER, T>						*
 ************************************************************************/
 //! T型のメンバ変数を持つオブジェクトへの反復子からそのメンバに直接アクセスする反復子を作る．
@@ -96,20 +111,15 @@ namespace TU
   \param mbr	iterが指すオブジェクトのメンバへのポインタ
 */
 template <class ITER, class T> inline auto
-make_mbr_iterator(const ITER& iter,
-		  T std::iterator_traits<ITER>::value_type::* mbr)
+make_mbr_iterator(const ITER& iter, T iterator_value<ITER>::* mbr)
 {
     return boost::make_transform_iterator(
 	       iter,
-	       std::function<
-		   typename std::conditional<
-		       std::is_same<
-			   typename std::iterator_traits<ITER>::pointer,
-			   typename std::iterator_traits<ITER>::value_type*>
-			   ::value,
-	           T&, const T&>::type
-	       (typename std::iterator_traits<ITER>::reference)>(
-		   std::mem_fn(mbr)));
+	       std::function<std::conditional_t<
+				 std::is_same<iterator_pointer<ITER>,
+					      iterator_value<ITER>*>::value,
+				 T&, const T&>(iterator_reference<ITER>)>(
+				     std::mem_fn(mbr)));
 }
 
 //! std::pairへの反復子からその第1要素に直接アクセスする反復子を作る．
@@ -142,18 +152,15 @@ class transform_iterator2
     : public boost::iterator_adaptor<
 		 transform_iterator2<FUNC, ITER0, ITER1>,
 		 ITER0,
-		 typename std::result_of<FUNC(
-		     typename std::iterator_traits<ITER0>::reference,
-		     typename std::iterator_traits<ITER1>::reference)>::type,
+		 typename std::result_of<FUNC(iterator_reference<ITER0>,
+					      iterator_reference<ITER1>)>::type,
 		 boost::use_default,
-		 typename std::result_of<FUNC(
-		     typename std::iterator_traits<ITER0>::reference,
-		     typename std::iterator_traits<ITER1>::reference)>::type>
+		 typename std::result_of<FUNC(iterator_reference<ITER0>,
+					      iterator_reference<ITER1>)>::type>
 {
   private:
-    using ref	= typename std::result_of<FUNC(
-		      typename std::iterator_traits<ITER0>::reference,
-		      typename std::iterator_traits<ITER1>::reference)>::type;
+    using ref	= typename std::result_of<FUNC(iterator_reference<ITER0>,
+					       iterator_reference<ITER1>)>::type;
     using super	= boost::iterator_adaptor<transform_iterator2,
 					  ITER0,
 					  ref,
@@ -222,9 +229,8 @@ template <class ROW>
 class row2col
 {
   public:
-    using argument_type	= typename std::iterator_traits<ROW>::reference;
-    using result_type	= typename std::iterator_traits<subiterator<ROW> >
-				      ::reference;
+    using argument_type	= iterator_reference<ROW>;
+    using result_type	= iterator_reference<subiterator<ROW> >;
     
   public:
 		row2col(size_t col)	:_col(col)			{}
@@ -245,8 +251,7 @@ template <class ROW>
 using vertical_iterator = boost::transform_iterator<
 			      row2col<ROW>, ROW,
 			      boost::use_default,
-			      typename std::iterator_traits<subiterator<ROW> >
-					  ::value_type>;
+			      iterator_value<subiterator<ROW> > >;
 
 template <class ROW> inline vertical_iterator<ROW>
 make_vertical_iterator(ROW row, size_t col)

@@ -86,6 +86,7 @@ zip_iterator_test()
     
     cout << w << endl;
     fill(w, std::make_tuple(100, 1000.0f));
+  //w = std::make_tuple(100, 1000.0f);
 
     for (const auto& row : t)
     {
