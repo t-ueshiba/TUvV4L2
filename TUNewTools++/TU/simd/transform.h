@@ -44,14 +44,13 @@ namespace detail
       };
       
       using E = typename vec_element<
-		    std::tuple_element<0, 
-				       typename std::iterator_traits<OUT>
-						   ::value_type> >::type;
+		    std::tuple_element<0, typename std::iterator_traits<OUT>
+						      ::value_type> >::type;
       
     //! 出力反復子に書き出すSIMDベクトルの要素型
-      using O = typename std::conditional<std::is_void<E>::value, T, E>::type;
+      using O = std::conditional_t<std::is_void<E>::value, T, E>;
     //! 変換関数に入力するSIMDベクトルの要素型
-      using I = typename std::conditional<std::is_void<T>::value, O, T>::type;
+      using I = std::conditional_t<std::is_void<T>::value, O, T>;
 
     //! vec<I> よりも要素数が少ない入力SIMDベクトルを vec<I> に変換
       struct generic_downArg
@@ -147,18 +146,19 @@ namespace detail
     private:
     // 変換結果をconvert up
       template <class TUPLE_>
-      std::enable_if_t<(vec<O>::size == tuple_head<TUPLE_>::size)>
+      std::enable_if_t<(vec<O>::size == std::tuple_element<0, TUPLE_>::size)>
 		upResult(const TUPLE_& x)
 		{
 		    ASSIGN()(*_out, cvt<O, false, MASK>(x));
 		    ++_out;
 		}
       template <class TUPLE_>
-      std::enable_if_t<(vec<O>::size < tuple_head<TUPLE_>::size)>
+      std::enable_if_t<(vec<O>::size < std::tuple_element<0, TUPLE_>::size)>
 		upResult(const TUPLE_& x)
 		{
 		    using U = cvt_upper_type<
-				  O, typename tuple_head<TUPLE_>::element_type,
+				  O, typename std::tuple_element<0, TUPLE_>
+						 ::element_type,
 				  MASK>;
 		    
 		    upResult(cvt<U, false, MASK>(x));
@@ -169,18 +169,20 @@ namespace detail
       template <class TUPLE_> static auto
 		downResult(const TUPLE_& x)
 		{
-		    using S = typename tuple_head<TUPLE_>::element_type;
-		    using L = typename std::conditional<
+		    using S = typename std::tuple_element<0, TUPLE_>
+					  ::element_type;
+		    using L = std::conditional_t<
 				  (vec<cvt_lower_type<O, S, MASK> >::size >
 				   vec<S>::size),
-				  S, cvt_lower_type<O, S, MASK> >::type;
+				  S, cvt_lower_type<O, S, MASK> >;
 		    
 		    return cvt<L, false, MASK>(x);
 		}
       template <class TUPLE_> static auto
 		downResult(const TUPLE_&x, const TUPLE_& y)
 		{
-		    using S = typename tuple_head<TUPLE_>::element_type;
+		    using S = typename std::tuple_element<0, TUPLE_>
+					  ::element_type;
 
 		    return cvt<cvt_lower_type<O, S, MASK>, MASK>(x, y);
 		}
@@ -190,19 +192,19 @@ namespace detail
 		std::enable_if_t<(N_ == vec<I>::size)>* = nullptr>
       auto	upArg_downResult(TUPLE_&& x)
 		{
-		    return downResult(_func(boost::tuples::cons_transform(
-						generic_downArg(), x)));
+		    return downResult(_func(tuple_transform(
+						x, generic_downArg())));
 		}
       template <size_t N_, class TUPLE_,
 		std::enable_if_t<(N_ > vec<I>::size)>* = nullptr>
       auto	upArg_downResult(TUPLE_&& x)
 		{
 		    const auto	y = upArg_downResult<N_/2>(
-					boost::tuples::cons_transform(
-					    generic_upArg<N_/2, false>(), x));
+					tuple_transform(
+					    x, generic_upArg<N_/2, false>()));
 		    const auto	z = upArg_downResult<N_/2>(
-					boost::tuples::cons_transform(
-					    generic_upArg<N_/2, true >(), x));
+					tuple_transform(
+					    x, generic_upArg<N_/2, true >()));
 		    return downResult(y, z);
 		}
 
@@ -211,8 +213,7 @@ namespace detail
       std::enable_if_t<(N_ == vec<I>::size && N_ > vec<O>::size)>
 		upArg(TUPLE_&& x)
 		{
-		    upResult(_func(boost::tuples::cons_transform(
-				       generic_downArg(), x)));
+		    upResult(_func(tuple_transform(x, generic_downArg())));
 		}
       template <size_t N_, class TUPLE_>
       std::enable_if_t<(N_ == vec<O>::size)>
@@ -225,10 +226,10 @@ namespace detail
       std::enable_if_t<(N_ > vec<I>::size && N_ > vec<O>::size)>
 		upArg(TUPLE_&& x)
 		{
-		    upArg<N_/2>(boost::tuples::cons_transform(
-				    generic_upArg<N_/2, false>(), x));
-		    upArg<N_/2>(boost::tuples::cons_transform(
-				    generic_upArg<N_/2, true >(), x));
+		    upArg<N_/2>(tuple_transform(
+				    x, generic_upArg<N_/2, false>()));
+		    upArg<N_/2>(tuple_transform(
+				    x, generic_upArg<N_/2, true >()));
 		}
 
     public:
@@ -244,8 +245,8 @@ namespace detail
 			    N = (max_size<ITER_TUPLE>::value > vec<O>::size ?
 				 max_size<ITER_TUPLE>::value : vec<O>::size);
 
-			upArg<N>(boost::tuples::cons_transform(
-				     generic_upArg<N, false>(), _t));
+			upArg<N>(tuple_transform(
+				     _t, generic_upArg<N, false>()));
 		    }
 		    return _out;
 		}
