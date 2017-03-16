@@ -494,7 +494,7 @@ operator <<(std::ostream& out, const YUV411& yuv)
 ************************************************************************/
 namespace detail
 {
-  template <class ITER, class T=typename std::iterator_traits<ITER>::value_type>
+  template <class ITER, class T=iterator_value<ITER> >
   class pixel_proxy
   {
     public:
@@ -947,8 +947,7 @@ bayerDecodeBorderRowGXYG(IN inX, IN inXe, IN inY, OUT out, C X, C Y)
 template <class IN, class OUT> OUT
 bayerDecodeRGGB(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;
@@ -984,8 +983,7 @@ bayerDecodeRGGB(IN in, IN ie, OUT out)
 template <class IN, class OUT> OUT
 bayerDecodeBGGR(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;
@@ -1021,8 +1019,7 @@ bayerDecodeBGGR(IN in, IN ie, OUT out)
 template <class IN, class OUT> OUT
 bayerDecodeGRBG(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;
@@ -1058,8 +1055,7 @@ bayerDecodeGRBG(IN in, IN ie, OUT out)
 template <class IN, class OUT> OUT
 bayerDecodeGBRG(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;

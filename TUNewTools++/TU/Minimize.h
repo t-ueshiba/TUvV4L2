@@ -319,7 +319,7 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     using derivative_type	= typename F::derivative_type;
     using vector_type		= Vector<element_type>;
     using matrix_type		= Matrix<element_type>;
-    using ATB			= typename std::iterator_traits<IB>::value_type;
+    using ATB			= iterator_value<IB>;
     
     const size_t	nb = std::distance(bbegin, bend);
     Array<vector_type>	fval(nb);	// function values.
@@ -471,7 +471,7 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
     using element_type	= typename F::element_type;
     using vector_type	= Vector<element_type>;
     using matrix_type	= Matrix<element_type>;
-    using ATB		= typename std::iterator_traits<IB>::value_type;
+    using ATB		= iterator_value<IB>;
 
     const size_t	nb = std::distance(bbegin, bend);
     Array<vector_type>	fval(nb);	// function values.
