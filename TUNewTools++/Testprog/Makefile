@@ -1,6 +1,9 @@
 SUBDIR	= BandMatrix		\
+	  BoxFilter		\
 	  DP			\
+	  FIRFilter		\
 	  GraphCuts		\
+	  IIRFilter		\
 	  List			\
 	  NDTree		\
 	  Random		\
