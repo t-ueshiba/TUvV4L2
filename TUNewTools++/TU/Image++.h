@@ -182,7 +182,8 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
     RGB_(const RGB_<detail::BGR>& p)	:E(p.r, p.g, p.b)		{}
     template <class E_>
     RGB_(const RGB_<E_>& p)		:E(p.r, p.g, p.b, p.a)		{}
-    template <class T_>
+    template <class T_,
+	      std::enable_if_t<std::is_arithmetic<T_>::value>* = nullptr>
     RGB_(const T_& p)
 	:E(element_type(p), element_type(p), element_type(p))		{}
     RGB_(const YUV444& p)						;
@@ -192,8 +193,7 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
     using	E::b;
 
     template <class T_,
-	      typename std::enable_if_t<std::is_arithmetic<T_>::value>*
-	      = nullptr>
+	      std::enable_if_t<std::is_arithmetic<T_>::value>* = nullptr>
 		operator T_() const
 		{
 		    return detail::colorConverter.y<T_>(r, g, b);
@@ -1285,7 +1285,7 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
     しなければならない．
     \param expr	コピー元の配列
   */
-    template <class E_, std::enable_if_t<rank<E_> == 2>* = nullptr>
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
     Image(const E_& expr)
 	:super(expr), ImageBase()				{}
 
@@ -1296,7 +1296,7 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
     \param expr		コピー元の配列
     \return		この配列
   */
-    template <class E_> std::enable_if_t<rank<E_> == 2, Image&>
+    template <class E_> std::enable_if_t<rank<E_>() == 2, Image&>
 		operator =(const E_& expr)
 		{
 		    super::operator =(expr);
