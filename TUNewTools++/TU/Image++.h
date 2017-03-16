@@ -1478,24 +1478,24 @@ Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
     Array<S>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto line = rbegin(); line != rend(); ++line)
+	for (auto row = rbegin(); row != rend(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(buf.cbegin()),
 		      make_pixel_iterator(buf.cend()),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
     else
     {
-	for (auto line = begin(); line != end(); ++line)
+	for (auto row = begin(); row != end(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(buf.cbegin()),
 		      make_pixel_iterator(buf.cend()),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
 
@@ -1513,7 +1513,7 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
     Array<S>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto line = rbegin(); line != rend(); ++line)    
+	for (auto row = rbegin(); row != rend(); ++row)    
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -1521,12 +1521,12 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 					      buf.cbegin(), colormap)),
 		      make_pixel_iterator(boost::make_transform_iterator(
 					      buf.cend(), colormap)),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
     else
     {
-	for (auto line = begin(); line != end(); ++line)    
+	for (auto row = begin(); row != end(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -1534,7 +1534,7 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 					      buf.cbegin(), colormap)),
 		      make_pixel_iterator(boost::make_transform_iterator(
 					      buf.cend(), colormap)),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
 
@@ -1555,10 +1555,10 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     Array<D>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto line = rbegin(); line != rend(); ++line)
+	for (auto row = rbegin(); row != rend(); ++row)
 	{
-	    std::copy(make_pixel_iterator(line->cbegin()),
-		      make_pixel_iterator(line->cend()),
+	    std::copy(make_pixel_iterator(std::begin(*row)),
+		      make_pixel_iterator(std::end(*row)),
 		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;
@@ -1566,10 +1566,10 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     }
     else
     {
-	for (auto line = begin(); line != end(); ++line)
+	for (auto row = begin(); row != end(); ++row)
 	{
-	    std::copy(make_pixel_iterator(line->cbegin()),
-		      make_pixel_iterator(line->cend()),
+	    std::copy(make_pixel_iterator(std::begin(*row)),
+		      make_pixel_iterator(std::end(*row)),
 		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;

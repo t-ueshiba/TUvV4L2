@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id: FIRFilter.h 1425 2013-09-28 07:12:18Z ueshiba $
- */
 /*!
   \file		FIRFilter.h
   \brief	一般的なfinite impulse response filterを表すクラスの定義と実装
@@ -280,7 +251,9 @@ template <size_t D, class T> template <class IN, class OUT> inline void
 FIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
     std::advance(out, D/2);
-    super::convolve(ib, ie, make_row_iterator(D/2, size_t(0), out));
+    super::convolve(ib, ie, make_range_iterator(std::begin(*out) + D/2,
+						out.stride(),
+						size<0>(*out) - D/2));
 }
 
 }

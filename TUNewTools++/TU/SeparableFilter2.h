@@ -120,7 +120,7 @@ template <class F> template <class IN, class OUT> void
 SeparableFilter2<F>::convolve(IN ib, IN ie, OUT out) const
 {
     typedef iterator_value<subiterator<OUT> >			value_type;
-    typedef Array2<Array<value_type> >				buf_type;
+    typedef Array2<value_type>					buf_type;
     typedef typename std::is_arithmetic<value_type>::type	is_numeric;
 
     if (ib == ie)

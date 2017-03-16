@@ -97,7 +97,8 @@ using iterator_reference  = typename std::iterator_traits<ITER>::reference;
 template <class ITER>
 using iterator_pointer	  = typename std::iterator_traits<ITER>::pointer;
 template <class ITER>
-using iterator_difference = typename std::iterator_traits<ITER>::difference_type;
+using iterator_difference = typename std::iterator_traits<ITER>
+					::difference_type;
 template <class ITER>
 using iterator_category	  = typename std::iterator_traits<ITER>
 					::iterator_category;
