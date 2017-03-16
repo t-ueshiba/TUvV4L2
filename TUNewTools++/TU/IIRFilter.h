@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id: IIRFilter.h 1939 2016-02-20 06:58:01Z ueshiba $
- */
 /*!
   \file		IIRFilter.h
   \brief	各種infinite impulse response filterに関するクラスの定義と実装
@@ -61,14 +32,14 @@ class iir_filter_iterator
 		T>						// reference
 {
   private:
-    typedef boost::iterator_adaptor<
-		iir_filter_iterator, ITER, T,
-		boost::single_pass_traversal_tag, T>	super;
-    typedef Array<T, D>					buf_type;
-    typedef typename buf_type::const_iterator		buf_iterator;
+    using super		= boost::iterator_adaptor<
+			      iir_filter_iterator, ITER, T,
+			      boost::single_pass_traversal_tag, T>;
+    using buf_type	= std::array<T, D>;
+    using buf_iterator	= typename buf_type::const_iterator;
 
     template <size_t D_, bool FWD_>
-    struct selector				{enum {dim = D_, fwd = FWD_};};
+    struct selector	{enum {dim = D_, fwd = FWD_};};
     
   public:
     typedef typename super::value_type	value_type;
@@ -298,7 +269,7 @@ template <size_t D, bool FWD, class T, class COEFF, class ITER>
 iir_filter_iterator<D, FWD, COEFF, ITER, T>
 make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 {
-    return iir_filter_iterator<D, FWD, COEFF, ITER, T>(iter, ci, co);
+    return {iter, ci, co};
 }
 
 /************************************************************************
@@ -308,8 +279,8 @@ make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 template <size_t D, class T=float> class IIRFilter
 {
   public:
-    typedef T				coeff_type;
-    typedef std::array<T, D>		coeffs_type;
+    using coeff_type	= T;
+    using coeffs_type	= std::array<T, D>;
     
     IIRFilter&	initialize(const T c[D+D])				;
     void	limitsF(T& limit0F, T& limit1F, T& limit2F)	const	;
@@ -462,11 +433,11 @@ IIRFilter<D, T>::outLength(size_t inLength)
 template <size_t D, class T=float> class BidirectionalIIRFilter
 {
   private:
-    typedef IIRFilter<D, T>			iirf_type;
+    using iirf_type	= IIRFilter<D, T>;
     
   public:
-    typedef typename iirf_type::coeff_type	coeff_type;
-    typedef typename iirf_type::coeffs_type	coeffs_type;
+    using coeff_type	= typename iirf_type::coeff_type;
+    using coeffs_type	= typename iirf_type::coeffs_type;
     
   //! 微分の階数
     enum Order
@@ -660,13 +631,13 @@ class BidirectionalIIRFilter2
     : public SeparableFilter2<BidirectionalIIRFilter<D, T> >
 {
   private:
-    typedef BidirectionalIIRFilter<D, T>	biir_type;
-    typedef SeparableFilter2<biir_type>		super;
+    using biir_type	= BidirectionalIIRFilter<D, T>;
+    using super		= SeparableFilter2<biir_type>;
 
   public:
-    typedef typename biir_type::coeff_type	coeff_type;
-    typedef typename biir_type::coeffs_type	coeffs_type;
-    typedef typename biir_type::Order		Order;
+    using coeff_type	= typename biir_type::coeff_type;
+    using coeffs_type	= typename biir_type::coeffs_type;
+    using Order		= typename biir_type::Order;
     
   public:
     BidirectionalIIRFilter2&

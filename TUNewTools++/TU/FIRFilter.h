@@ -29,15 +29,12 @@ class fir_filter_iterator
 		T>						// reference
 {
   private:
-    typedef boost::iterator_adaptor<
-		fir_filter_iterator, ITER, T,
-		boost::forward_traversal_tag, T>	super;
-    typedef Array<T, D>					buf_type;
-    typedef typename buf_type::const_iterator		buf_iterator;
+    using super	= boost::iterator_adaptor<fir_filter_iterator, ITER, T,
+					  boost::forward_traversal_tag, T>;
 
   public:
-    typedef typename super::value_type	value_type;
-    typedef typename super::reference	reference;
+    using	typename super::value_type;
+    using	typename super::reference;
 
     friend class	boost::iterator_core_access;
 
@@ -45,8 +42,8 @@ class fir_filter_iterator
 		fir_filter_iterator(ITER const& iter, COEFF c)
 		    :super(iter), _c(c), _ibuf(), _i(0)
 		{
-		    for (; _i != D - 1; ++_i, ++super::base_reference())
-			_ibuf[_i] = *super::base();
+		    copy<D-1>(super::base(), D-1, _ibuf.begin());
+		    super::base_reference() += (D-1);
 		}
 		fir_filter_iterator(ITER const& iter)
 		    :super(iter), _c(), _ibuf(), _i(0)
@@ -56,14 +53,14 @@ class fir_filter_iterator
   private:
     reference	dereference() const
 		{
-		    value_type		val = *super::base();
+		    value_type	val = *super::base();
 		    _ibuf[_i] = val;
 		    val *= _c[D-1];
-		    COEFF		c  = _c;
-		    buf_iterator const	bi = _ibuf.cbegin() + _i;
-		    for (buf_iterator p = bi; ++p != _ibuf.cend(); ++c)
+		    auto	c  = _c;
+		    const auto	bi = _ibuf.cbegin() + _i;
+		    for (auto p = bi; ++p != _ibuf.cend(); ++c)
 			val += *c * *p;
-		    for (buf_iterator p = _ibuf.cbegin(); p != bi; ++p, ++c)
+		    for (auto p = _ibuf.cbegin(); p != bi; ++p, ++c)
 			val += *c * *p;
 
 		    return val;
@@ -76,9 +73,9 @@ class fir_filter_iterator
 		}
 
   private:
-    const COEFF		_c;	//!< 先頭のフィルタ係数を指す反復子
-    mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
-    size_t		_i;	//!< 最新の入力データへのindex
+    const COEFF			_c;	//!< 先頭のフィルタ係数を指す反復子
+    mutable std::array<T, D>	_ibuf;	//!< 過去D時点の入力データ
+    size_t			_i;	//!< 最新の入力データへのindex
 };
 
 //! finite impulse response filter反復子を生成する
@@ -91,7 +88,7 @@ template <size_t D, class T, class COEFF, class ITER>
 fir_filter_iterator<D, COEFF, ITER, T>
 make_fir_filter_iterator(ITER iter, COEFF c)
 {
-    return fir_filter_iterator<D, COEFF, ITER, T>(iter, c);
+    return {iter, c};
 }
 
 //! finite impulse response filter反復子(終端)を生成する
@@ -103,7 +100,7 @@ template <size_t D, class T, class COEFF, class ITER>
 fir_filter_iterator<D, COEFF, ITER, T>
 make_fir_filter_iterator(ITER iter)
 {
-    return fir_filter_iterator<D, COEFF, ITER, T>(iter);
+    return {iter};
 }
 
 /************************************************************************
@@ -114,8 +111,8 @@ template <size_t D, class T=float>
 class FIRFilter
 {
   public:
-    typedef T				coeff_type;
-    typedef std::array<T, D>		coeffs_type;
+    using coeff_type	= T;
+    using coeffs_type	= std::array<T, D>;
 
     FIRFilter&		initialize(const T c[D])			;
     void		limits(T& limit0, T& limit1, T& limit2)	const	;
@@ -142,7 +139,7 @@ class FIRFilter
 template <size_t D, class T> FIRFilter<D, T>&
 FIRFilter<D, T>::initialize(const T c[D])
 {
-    std::copy(c, c + D,	_c.begin());
+    copy<D>(c, D, _c.begin());
 
     return *this;
 }
@@ -205,12 +202,12 @@ template <size_t D, class T=float>
 class FIRFilter2 : public SeparableFilter2<FIRFilter<D, T> >
 {
   private:
-    typedef FIRFilter<D, T>			fir_type;
-    typedef SeparableFilter2<fir_type>		super;
+    using fir_type	= FIRFilter<D, T>;
+    using super		= SeparableFilter2<fir_type>;
 
   public:
-    typedef typename fir_type::coeff_type	coeff_type;
-    typedef typename fir_type::coeffs_type	coeffs_type;
+    using coeff_type	= typename fir_type::coeff_type;
+    using coeffs_type	= typename fir_type::coeffs_type;
 
   public:
     FIRFilter2&		initialize(const T cH[], const T cV[])		;

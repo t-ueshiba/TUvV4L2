@@ -119,8 +119,8 @@ class box_filter_iterator
 		    
 		    auto	c = curr->cbegin();
 		    auto	h = head->cbegin();
-		    for (iterator v = val->begin(), ve = val->end();
-			 v != ve; ++v, ++c, ++h)
+		    const auto	ve = val->end();
+		    for (auto v = val->begin(); v != ve; ++v, ++c, ++h)
 			update(v, c, h, value_is_expr());
 		}
 
@@ -323,8 +323,8 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 template <class IN, class OUT> void
 BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
 {
-    typedef Array<iterator_value<subiterator<IN> > >	row_type;
-    typedef box_filter_iterator<IN, row_type>		row_iterator;
+    using row_type	= Array<iterator_value<subiterator<IN> > >;
+    using row_iterator	= box_filter_iterator<IN, row_type>;
 
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");

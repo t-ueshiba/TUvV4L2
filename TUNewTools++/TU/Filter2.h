@@ -53,32 +53,32 @@ template <class F>
 class Filter2
 {
   public:
-    typedef F	filter_type;
+    using filter_type	= F;
 #if defined(USE_TBB)
   private:
     template <class IN, class OUT>
     class ConvolveRows
     {
       public:
-	ConvolveRows(F const& filter,
-		     IN const& ib, IN const& ie, OUT const& out)
+	ConvolveRows(F const& filter, IN ib, IN ie, OUT out)
 	    :_filter(filter), _ib(ib), _ie(ie), _out(out)		{}
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    IN	ib = _ib, ie = _ib;
+		    auto	ib = _ib;
+		    auto	ie = _ib;
 		    std::advance(ib, r.begin());
 		    std::advance(ie, r.end() + _filter.overlap());
-		    OUT	out = _out;
+		    auto	out = _out;
 		    std::advance(out, r.begin());
 		    _filter.convolveRows(ib, std::min(ie, _ie), out);
 		}
 
       private:
 	F	const&	_filter;
-	IN	const&	_ib;
-	IN	const&	_ie;
-	OUT	const&	_out;
+	IN	const	_ib;
+	IN	const	_ie;
+	OUT	const	_out;
     };
 #endif
   public:
