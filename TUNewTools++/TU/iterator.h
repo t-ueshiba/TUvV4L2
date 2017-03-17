@@ -214,6 +214,82 @@ make_transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
 }
     
 /************************************************************************
+*  class assignment_iterator<FUNC, ITER>				*
+************************************************************************/
+namespace detail
+{
+  template <class FUNC, class ITER>
+  class assignment_proxy
+  {
+    public:
+      using	self = assignment_proxy;
+	
+    public:
+      assignment_proxy(const ITER& iter, const FUNC& func)
+	  :_iter(iter), _func(func)					{}
+
+      template <class T_>
+      self&	operator =(const T_& val)
+		{
+		    _func(*_iter, val);
+		    return *this;
+		}
+
+    private:
+      const ITER&	_iter;
+      const FUNC&	_func;
+  };
+}
+
+//! operator *()を左辺値として使うときに，この左辺値と右辺値に指定された関数を適用するための反復子
+/*!
+  \param FUNC	変換を行う関数オブジェクトの型
+  \param ITER	変換結果の代入先を指す反復子
+*/
+template <class FUNC, class ITER>
+class assignment_iterator
+    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
+				     ITER,
+				     detail::assignment_proxy<FUNC, ITER>,
+				     boost::use_default,
+				     detail::assignment_proxy<FUNC, ITER> >
+{
+  private:
+    using super	= boost::iterator_adaptor<
+		      assignment_iterator,
+		      ITER,
+		      detail::assignment_proxy<FUNC, ITER>,
+		      boost::use_default,
+		      detail::assignment_proxy<FUNC, ITER> >;
+
+  public:
+    using		typename super::reference;
+    
+    friend class	boost::iterator_core_access;
+
+  public:
+    assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
+	:super(iter), _func(func)			{}
+
+    const FUNC&	functor()			const	{ return _func; }
+	
+  private:
+    reference	dereference() const
+		{
+		    return {super::base(), _func};
+		}
+    
+  private:
+    FUNC 	_func;	// 代入を可能にするためconstは付けない
+};
+    
+template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
+make_assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
+{
+    return {iter, func};
+}
+
+/************************************************************************
 *  alias subiterator<ITER>						*
 ************************************************************************/
 template <class ITER>
