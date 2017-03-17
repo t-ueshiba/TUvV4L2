@@ -13,6 +13,7 @@ SUBDIR	= BandMatrix		\
 	  Sparse		\
 	  TreeFilter		\
 	  Vector		\
+	  WeightedMedianFilter	\
 	  simd
 
 TARGETS	= all clean depend
