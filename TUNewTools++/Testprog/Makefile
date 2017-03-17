@@ -1,11 +1,13 @@
 SUBDIR	= BandMatrix		\
 	  BoxFilter		\
+	  BoxFilter2		\
 	  DP			\
 	  FIRFilter		\
 	  GraphCuts		\
 	  IIRFilter		\
 	  List			\
 	  NDTree		\
+	  Quantizer		\
 	  Random		\
 	  Serial		\
 	  Sparse		\
