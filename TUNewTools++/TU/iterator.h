@@ -102,7 +102,70 @@ using iterator_difference = typename std::iterator_traits<ITER>
 template <class ITER>
 using iterator_category	  = typename std::iterator_traits<ITER>
 					::iterator_category;
+
+//! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
+namespace detail
+{
+  template <class T>
+  auto	check_begin(const T& x) -> decltype(std::begin(x))		;
+  void	check_begin(...)						;
+}
+
+//! 式が持つ定数反復子の型を返す
+/*!
+  \param E	式の型
+  \return	E が定数反復子を持てばその型，持たなければ void
+*/
+
+template <class E>
+using const_iterator_t	= decltype(detail::check_begin(std::declval<E>()));
+
+//! 式が定数反復子を持つか判定する
+template <class T>
+using has_begin		= std::integral_constant<
+			      bool, !std::is_void<const_iterator_t<T> >::value>;
+namespace detail
+{
+  template <class T>
+  struct identity
+  {
+      using type = T;
+  };
+
+  template <class E>
+  struct value_t
+  {
+      using type = iterator_value<const_iterator_t<E> >;
+  };
+      
+  template <class E, class=const_iterator_t<E> >
+  struct element_t
+  {
+      using F	 = typename value_t<E>::type;
+      using type = typename element_t<F, const_iterator_t<F> >::type;
+  };
+  template <class E>
+  struct element_t<E, void> : identity<E>				{};
+}	// namespace detail
     
+//! 式が持つ定数反復子が指す型を返す
+/*!
+  定数反復子を持たない式を与えるとコンパイルエラーとなる.
+  \param E	定数反復子を持つ式の型
+  \return	E の定数反復子が指す型
+*/
+template <class E>
+using value_t	= typename detail::value_t<E>::type;
+
+//! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
+/*!
+  \param E	式の型
+  \return	E が定数反復子を持てばそれが指す型を再帰的に辿って到達する型，
+		持たなければ E 自身
+*/
+template <class E>
+using element_t	= typename detail::element_t<E>::type;
+
 /************************************************************************
 *  make_mbr_iterator<ITER, T>						*
 ************************************************************************/

@@ -36,7 +36,7 @@ arithmetic_test()
 #ifdef DEMANGLE
     using	boost::core::demangle;
     
-    cout << demangle(typeid(tuple_t<Derived<S, T> >).name()) << endl;
+  //    cout << demangle(typeid(tuple_t<Derived<S, T> >).name()) << endl;
 #endif
     Derived<S, T>	c(3, 30.3), d(4, 40.4);
     auto		u = 3*c + d*2;

@@ -13,67 +13,6 @@
 namespace TU
 {
 /************************************************************************
-*  type aliases								*
-************************************************************************/
-//! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
-namespace detail
-{
-  template <class E>
-  auto	check_begin(const E& x) -> decltype(std::begin(x))		;
-  void	check_begin(...)						;
-}	// namespace detail
-    
-//! 式が持つ定数反復子の型を返す
-/*!
-  \param E	式の型
-  \return	E が定数反復子を持てばその型，持たなければ void
-*/
-template <class E>
-using const_iterator_t = decltype(detail::check_begin(std::declval<E>()));
-
-namespace detail
-{
-  template <class T>
-  struct identity
-  {
-      using type = T;
-  };
-
-  template <class E>
-  struct value_t
-  {
-      using type = iterator_value<const_iterator_t<E> >;
-  };
-      
-  template <class E, class=const_iterator_t<E> >
-  struct element_t
-  {
-      using F	 = typename value_t<E>::type;
-      using type = typename element_t<F, const_iterator_t<F> >::type;
-  };
-  template <class E>
-  struct element_t<E, void> : identity<E>				{};
-}	// namespace detail
-    
-//! 式が持つ定数反復子が指す型を返す
-/*!
-  定数反復子を持たない式を与えるとコンパイルエラーとなる.
-  \param E	定数反復子を持つ式の型
-  \return	E の定数反復子が指す型
-*/
-template <class E>
-using value_t	= typename detail::value_t<E>::type;
-
-//! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
-/*!
-  \param E	式の型
-  \return	E が定数反復子を持てばそれが指す型を再帰的に辿って到達する型，
-		持たなければ E 自身
-*/
-template <class E>
-using element_t	= typename detail::element_t<E>::type;
-
-/************************************************************************
 *  rank<E>(), size0<E>(), size<E>() and stride<E>()			*
 ************************************************************************/
 //! 式の次元数(軸の個数)を返す
@@ -82,13 +21,13 @@ using element_t	= typename detail::element_t<E>::type;
   \return	式の次元数
  */
 template <class E>
-constexpr std::enable_if_t<std::is_void<const_iterator_t<E> >::value, size_t>
+constexpr std::enable_if_t<!has_begin<E>::value, size_t>
 rank()
 {
     return 0;
 }
 template <class E>
-constexpr std::enable_if_t<!std::is_void<const_iterator_t<E> >::value, size_t>
+constexpr std::enable_if_t<has_begin<E>::value, size_t>
 rank()
 {
     return 1 + rank<value_t<E> >();
@@ -152,7 +91,9 @@ using has_size0 = decltype(detail::has_size0(std::declval<E>()));
 template <class E> constexpr std::enable_if_t<!has_size0<E>::value, size_t>
 size0()
 {
-    return (is_tuple<E>::value ? 0 : 1);
+  // Array2<T, R, C> * Array<T, 0, 0> の評価結果の型が Array<T, R, 0>
+  // ではなく Array<T, 0, 0> になるために，0ではなく1を返すことが必要．
+    return 1;
 }
 template <class E> constexpr std::enable_if_t<has_size0<E>::value, size_t>
 size0()
@@ -840,7 +781,7 @@ make_range(zip_iterator<ITER_TUPLE> zip_iter, ARGS... args)
 }
     
 template <size_t... SIZES, class TUPLE, class... ARGS,
-	  std::enable_if_t<is_range_tuple<TUPLE>::value>* = nullptr>
+	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr>
 inline auto
 slice(TUPLE&& t, ARGS... args)
 {

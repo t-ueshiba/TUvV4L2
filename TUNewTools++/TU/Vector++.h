@@ -157,7 +157,7 @@ operator *(const L& l, const R& r)
     using value_type = std::common_type_t<value_t<L>, value_t<R> >;
 
     assert(size<0>(l) == size<0>(r));
-    constexpr size_t	S = detail::max<size0<L>(),size0<R>()>::value;
+    constexpr size_t	S = detail::max<size0<L>(), size0<R>()>::value;
     return inner_product<S>(std::begin(l), std::size(l), std::begin(r),
 			    value_type(0));
 }

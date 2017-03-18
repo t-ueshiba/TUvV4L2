@@ -12,9 +12,9 @@
 namespace TU
 {
 /************************************************************************
-*  predicate is_tuple<T>, is_range_tuple<T>				*
+*  predicates all<PRED, T>, is_tuple<T>, all_has_begin<T>		*
 ************************************************************************/
-template <template <class> class PRED, class... T>
+template <template <class> class PRED, class T>
 struct all;
 template <template <class> class PRED>
 struct all<PRED, std::tuple<> >
@@ -31,24 +31,15 @@ struct all<PRED, std::tuple<HEAD, TAIL...> >
 namespace detail
 {
   template <class... T>
-  std::tuple<T...>	check_tuple(std::tuple<T...>)			;
-  void			check_tuple(...)				;
-
-  template <class T>
-  auto			has_begin(const T& x)
-			    -> decltype(std::begin(x), std::true_type());
-  std::false_type	has_begin(...)					;
+  std::true_type	check_tuple(std::tuple<T...>)			;
+  std::false_type	check_tuple(...)				;
 }	// namespace detail
     
 template <class T>
-using tuple_t	     = decltype(detail::check_tuple(std::declval<T>()));
+using is_tuple		= decltype(detail::check_tuple(std::declval<T>()));
+
 template <class T>
-using is_tuple	     = std::integral_constant<
-			   bool, !std::is_void<tuple_t<T> >::value>;
-template <class T>
-using has_begin	     = decltype(detail::has_begin(std::declval<T>()));
-template <class T>
-using is_range_tuple = all<has_begin, std::decay_t<T> >;
+using all_has_begin	= all<has_begin, std::decay_t<T> >;
 
 /************************************************************************
 *  tuple_for_each(TUPLE, UNARY_FUNC)					*
@@ -72,8 +63,8 @@ inline std::enable_if_t<is_tuple<TUPLE>::value>
 tuple_for_each(TUPLE&& x, UNARY_FUNC f)
 {
     detail::tuple_for_each(
-	x, f,
-	std::make_index_sequence<std::tuple_size<tuple_t<TUPLE> >::value>());
+	x, f, std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE> >
+		 ::value>());
 }
 
 /************************************************************************
@@ -100,8 +91,8 @@ inline std::enable_if_t<is_tuple<TUPLE0>::value && is_tuple<TUPLE1>::value>
 tuple_for_each(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
     detail::tuple_for_each(
-	x, y, f,
-	std::make_index_sequence<std::tuple_size<tuple_t<TUPLE0> >::value>());
+	x, y, f, std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE0> >
+		    ::value>());
 }
 
 /************************************************************************
@@ -124,7 +115,7 @@ tuple_transform(TUPLE&& x, UNARY_FUNC f)
 {
     return detail::tuple_transform(
 		x, f,
-		std::make_index_sequence<std::tuple_size<tuple_t<TUPLE> >
+		std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE> >
 		   ::value>());
 }
 
@@ -150,7 +141,7 @@ tuple_transform(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
     return detail::tuple_transform(
 		x, y, f,
-		std::make_index_sequence<std::tuple_size<tuple_t<TUPLE0> >
+		std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE0> >
 		   ::value>());
 }
 
@@ -178,7 +169,7 @@ tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, TRINARY_FUNC f)
 {
     return detail::tuple_transform(
 		x, y, z, f,
-		std::make_index_sequence<std::tuple_size<tuple_t<TUPLE0> >
+		std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE0> >
 		   ::value>());
 }
 
@@ -501,7 +492,7 @@ namespace detail
   };
 }	// namespace detail
     
-template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
+template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
 inline auto
 begin(TUPLE&& t)
 {
@@ -511,7 +502,7 @@ begin(TUPLE&& t)
   //				     t, [](auto&& x){ return begin(x); }));
 }
 
-template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
+template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
 inline auto
 end(TUPLE&& t)
 {
@@ -521,7 +512,7 @@ end(TUPLE&& t)
   //				     t, [](auto&& x){ return end(x); }));
 }
     
-template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
+template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
 inline auto
 rbegin(TUPLE&& t)
 {
@@ -531,7 +522,7 @@ rbegin(TUPLE&& t)
   //				     t, [](auto&& x){ return rbegin(x); }));
 }
 
-template <class TUPLE, enable_if_t<TU::is_range_tuple<TUPLE>::value>* = nullptr>
+template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
 inline auto
 rend(TUPLE&& t)
 {

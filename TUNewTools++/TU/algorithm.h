@@ -267,7 +267,6 @@ template <size_t N, class IN, class ARG, class OUT> inline void
 copy(IN in, ARG arg, OUT out)
 {
 #ifdef TU_DEBUG
-  //#if 0
     std::cout << "copy<" << N << "> ["
 	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
 #endif

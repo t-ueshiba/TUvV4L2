@@ -4,6 +4,7 @@ SUBDIR	= BandMatrix		\
 	  DP			\
 	  FIRFilter		\
 	  GraphCuts		\
+	  GuidedFilter		\
 	  IIRFilter		\
 	  List			\
 	  NDTree		\
