@@ -31,13 +31,13 @@ class GuidedFilter : public BoxFilter
 		{
 		    using	std::get;
 		    
-		    return {get<0>(t),		 get<1>(t),
-			    get<0>(t)*get<1>(t), get<1>(t)*get<1>(t)};
+		    return Params4(get<0>(t),		get<1>(t),
+				   get<0>(t)*get<1>(t), get<1>(t)*get<1>(t));
 		}
 	template <class IN_>
 	Params2	operator ()(IN_ p) const
 		{
-		    return {p, p*p};
+		    return Params2(p, p*p);
 		}
     };
 
