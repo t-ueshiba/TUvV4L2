@@ -48,6 +48,7 @@ zip_iterator_test()
 {
     using	std::cout;
     using	std::endl;
+    using	boost::core::demangle;
 
     cout << "*** zip iterator test ***" << endl;
     
@@ -64,10 +65,8 @@ zip_iterator_test()
 
     const auto	t = std::make_tuple(std::ref(a), std::ref(b));
   //const auto	u = make_range<3>(std::begin(t) + 2);
-    const auto	w = slice<2, 4>(t, 1, 3);
+    auto	w = slice<2, 4>(t, 1, 3);
 #ifdef DEMANGLE
-    using	boost::core::demangle;
-    
     cout << endl;
     cout << "rank(tuple_t): "
 	 << rank<decltype(t)>() << endl;
@@ -83,10 +82,9 @@ zip_iterator_test()
     cout << demangle(typeid(decltype(w)).name()) << endl << endl;
 #endif
   //cout << u << endl;
-    
     cout << w << endl;
-    fill(w, std::make_tuple(100, 1000.0f));
-  //w = std::make_tuple(100, 1000.0f);
+
+    w = std::make_tuple(100, 1000.0);
 
     for (const auto& row : t)
     {

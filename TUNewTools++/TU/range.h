@@ -358,7 +358,8 @@ class range
 		    return *this;
 		}
 
-    range&	operator =(const element_type& c)
+    template <class T_> std::enable_if_t<rank<T_>() == 0, range&>
+		operator =(const T_& c)
 		{
 		    fill<SIZE>(begin(), size(), c);
 		    return *this;
@@ -443,7 +444,8 @@ class range<ITER, 0>
 		    return *this;
 		}
 		
-    range&	operator =(const element_type& c)
+    template <class T_> std::enable_if_t<rank<T_>() == 0, range&>
+		operator =(const T_& c)
 		{
 		    fill<0>(begin(), size(), c);
 		    return *this;
@@ -1212,20 +1214,6 @@ operator -=(L&& l, const R& r)
 /************************************************************************
 *  generic algorithms for ranges					*
 ************************************************************************/
-template <class E, class T> std::enable_if_t<rank<std::decay_t<E> >() == 0>
-fill(E&& expr, const T& val)
-{
-    expr = val;
-}
-template <class E, class T> std::enable_if_t<rank<std::decay_t<E> >() != 0>
-fill(E&& expr, const T& val)
-{
-    constexpr size_t	N = size0<std::decay_t<E> >();
-
-    for_each<N>(std::begin(expr), std::size(expr),
-		[&val](auto&& e){ fill(e, val); });
-}
-
 //! 与えられた2次元配列式の転置を返す
 /*
   \param expr	2次元配列式

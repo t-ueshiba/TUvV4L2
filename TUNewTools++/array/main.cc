@@ -126,7 +126,7 @@ test_binary_io(const BUF& buf)
 	      << a2;
     out.close();	// 入力ストリームを開く前にcloseしておくこと
 
-    a2.fill(1000);
+    a2 = 1000;
     std::cout << "--- modified: a2(" << print_sizes_and_strides(a2) << ") ---\n"
 	      << a2;
     

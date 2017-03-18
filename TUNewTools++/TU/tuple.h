@@ -24,9 +24,8 @@ struct all<PRED, std::tuple<> >
 template <template <class> class PRED, class HEAD, class... TAIL>
 struct all<PRED, std::tuple<HEAD, TAIL...> >
 {
-    constexpr static bool
-	value = (!PRED<HEAD>::value ?
-		 false : all<PRED, std::tuple<TAIL...> >::value);
+    constexpr static bool	value = PRED<HEAD>::value &&
+					all<PRED, std::tuple<TAIL...> >::value;
 };
 
 namespace detail
@@ -35,8 +34,8 @@ namespace detail
   std::tuple<T...>	check_tuple(std::tuple<T...>)			;
   void			check_tuple(...)				;
 
-  template <class E>
-  auto			has_begin(const E& x)
+  template <class T>
+  auto			has_begin(const T& x)
 			    -> decltype(std::begin(x), std::true_type());
   std::false_type	has_begin(...)					;
 }	// namespace detail
@@ -264,7 +263,9 @@ namespace detail
   {
       template <class ITER_>
       std::conditional_t<std::is_reference<iterator_reference<ITER_> >::value,
-			 std::reference_wrapper<iterator_value<ITER_> >,
+			 std::reference_wrapper<
+			     std::remove_reference_t<
+				 iterator_reference<ITER_> > >,
 			 iterator_reference<ITER_> >
       operator ()(ITER_ iter)			const	{ return *iter; }
   };

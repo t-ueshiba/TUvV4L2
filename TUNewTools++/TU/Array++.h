@@ -194,7 +194,6 @@ class Buf : public BufTraits<T, ALLOC>
     auto	end()		{ return make_iterator<SIZES...>(_a.end()); }
     auto	end()	const	{ return make_iterator<SIZES...>(_a.end()); }
 
-    void	fill(const T& c)		{ _a.fill(c); }
     std::istream&
 		get(std::istream& in)
 		{
@@ -359,10 +358,6 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		{
 		    return make_iterator<SIZES...>(const_base_iterator(
 						       _p + _capacity));
-		}
-    void	fill(const T& c)
-		{
-		    super::fill(_p, _capacity, c);
 		}
     std::istream&
 		get(std::istream& in)
@@ -604,7 +599,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		}
 
-    array&	operator =(const element_type& c)
+    template <class T_> std::enable_if_t<rank<T_>() == 0, array&>
+		operator =(const T_& c)
 		{
 		    TU::fill<size0()>(begin(), size(), c);
 
@@ -672,10 +668,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		    assert(i < size());
 		    return *(begin() + i);
-		}
-    void	fill(const element_type& val)
-		{
-		    super::fill(val);
 		}
     std::istream&
 		restore(std::istream& in)
