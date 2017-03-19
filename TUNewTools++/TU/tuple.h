@@ -662,6 +662,28 @@ operator %=(L&& l, const T& c)
     return l;
 }
 
+template <class... L, class... C, class... R> inline auto
+operator fma(const tuple<L...>& l, const tuple<C...>& c, const tuple<R...>& r)
+{
+    return TU::tuple_transform(l, c, r,
+			       [](const auto& x, const auto& y, const auto& z)
+			       { return fma(x, y, z); });
+}
+
+template <class T, class... L, class... R> inline auto
+operator fma(const T& c, const tuple<L...>& l, const tuple<R...>& r)
+{
+    return TU::tuple_transform(l, r, [&c](const auto& x, const auto& y)
+				     { return fma(c, x, y); });
+}
+
+template <class... L, class T, class... R> inline auto
+operator fma(const tuple<L...>& l, const T& c, const tuple<R...>& r)
+{
+    return TU::tuple_transform(l, r, [&c](const auto& x, const auto& y)
+				     { return fma(x, c, y); });
+}
+
 /************************************************************************
 *  Bit operators							*
 ************************************************************************/

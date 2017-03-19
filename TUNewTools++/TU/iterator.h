@@ -116,7 +116,6 @@ namespace detail
   \param E	式の型
   \return	E が定数反復子を持てばその型，持たなければ void
 */
-
 template <class E>
 using const_iterator_t	= decltype(detail::check_begin(std::declval<E>()));
 
@@ -124,6 +123,7 @@ using const_iterator_t	= decltype(detail::check_begin(std::declval<E>()));
 template <class T>
 using has_begin		= std::integral_constant<
 			      bool, !std::is_void<const_iterator_t<T> >::value>;
+
 namespace detail
 {
   template <class T>

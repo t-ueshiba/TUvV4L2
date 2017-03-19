@@ -61,7 +61,6 @@
 #  include "TU/simd/cvtdown_iterator.h"
 #  include "TU/simd/cvtup_iterator.h"
 #  include "TU/simd/shift_iterator.h"
-#  include "TU/simd/row_vec_iterator.h"
 
 #  include "TU/simd/BufTraits.h"
 #endif
